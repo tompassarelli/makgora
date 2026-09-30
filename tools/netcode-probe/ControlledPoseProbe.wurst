@@ -1,5 +1,6 @@
 package ControlledPoseProbe
 import Wurst
+import PoseFixtureInfo
 
 effect reference
 effect candidate
@@ -48,8 +49,8 @@ function setup()
     SetCameraField(CAMERA_FIELD_ZOFFSET, 1120, 0)
     SetCameraField(CAMERA_FIELD_FARZ, 8000, 0)
     SetCameraPosition(x, y)
-    reference = AddSpecialEffect("war3mapImported\\PoseFixture.mdx", x - 220, y)
-    candidate = AddSpecialEffect("war3mapImported\\PoseFixture.mdx", x + 100, y)
+    reference = AddSpecialEffect(POSE_FIXTURE_MODEL, x - 220, y)
+    candidate = AddSpecialEffect(POSE_FIXTURE_MODEL, x + 100, y)
     BlzSetSpecialEffectZ(reference, 1000.)
     BlzSetSpecialEffectZ(candidate, 1000.)
     BlzSetSpecialEffectAnimationBlendTime(reference, 0.)
