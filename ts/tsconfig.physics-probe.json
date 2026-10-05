@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.map.json",
   "include": [
-    "src/natives/*.d.ts",
+    "node_modules/waygate/src/natives/warcraft.d.ts",
     "src/platform/physicsProbeMain.ts"
   ],
   "exclude": [],
