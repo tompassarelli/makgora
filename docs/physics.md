@@ -2060,7 +2060,18 @@ units a frame:
 
 All three references wall jump (a Melee routine, a Melee routine and
 a Melee routine set `can_walljump`); a fighter whose tuning lacks
-`canWallJump` never wall jumps.
+`canWallJump` never wall jumps. Every hero takes Archer's (Fox's) values, so
+every selectable fighter wall techs and wall jumps.
+
+**Intangibility.** The wall tech, the wall tech's jump and the plain wall jump
+all enter through a Melee routine, which ends with
+a Melee routine: the fighter is intangible for 14
+frames, counted from the frame it meets the wall (Melee;
+the plain jump reaches it from Melee
+a Melee routine). The five-frame hang is inside that window, so the
+fighter leaves the wall on frame 6 still intangible through frame 14 and is
+hittable from frame 15. Smashcraft gives all three the same 14 frames
+(`SURFACE_TECH_WALL_COLLISION_GRACE_FRAMES`, smashcraft:ts/src/game/sim/surfaces.ts).
 
 A ceiling tech
 stops the fighter's motion and has no hang: gravity and air drift go on. On its animation's throw-flag event, frame 14 for Fox and
@@ -2086,14 +2097,15 @@ faster sideways than the minimum approach speed opens a 130-frame window while t
 stick at least 0.8 away from it within 3 frames of the stick leaving
 the horizontal smash deadzone starts the jump. It enters the wall
 tech's state: motion stops, the fighter turns away, it is
-protected for 14 frames, hangs 5, then launches as above. Each
+intangible for 14 frames, hangs 5, then launches as above. Each
 earlier wall jump since the fighter last stood on the ground scales the rise
 by 0.975. A fighter moved out of the deck's body (see above) counts
 as against that wall, as Melee's collision leaves it touching.
 
 smashcraft:ts/src/game/match/wallTechInputContracts.tests.ts checks the
-push-off, the wall tech's jump, a drift-and-flick wall jump and the ceiling
-tech's impulse for each fighter through helper journal rows, and the oracle's
+push-off, the wall tech's jump, a drift-and-flick wall jump, their 14
+intangible frames (an overlapping strike passes through until the 15th) and
+the ceiling tech's impulse for every selectable fighter through helper journal rows, and the oracle's
 wall/ceiling rows compare the hang, launch speeds, rises and the ceiling
 impulse's frame and speed with the reference values.
 
