@@ -1798,8 +1798,9 @@ corpus, with the constant and source path for each scenario, then the counts
 per area. The scenarios are in smashcraft:ts/scripts/meleeOracle.ts: jump squat
 and hop heights, dash/run/walk speeds, fast-fall, landing lag, floor techs,
 get-up options and timings, the tumble threshold, pass-through platforms, the
-main deck's walls and underside (where launches meet them and the techs off
-them), shield release and dodges, and ledge catches, one from against the wall.
+main deck's walls and underside (where launches meet them, the techs off them,
+the push-off and wall jumps), shield release and dodges, and ledge catches, one
+from against the wall.
 smashcraft:ts/scripts/meleeOracle.tests.ts runs the table in the test suite and
 fails on any mismatch not listed in its `KNOWN_MISMATCHES`, and on a listed row
 that now passes. A deliberate difference from Melee is reported as a departure
@@ -1810,7 +1811,8 @@ so the aerial landing lag without an L press is such a departure.
 Character data compares only where a fighter borrows it: Archer's and
 Rifleman's movement, landing and action timings are Fox's and Falco's, and
 Illidan's are original, so those rows read n/a for him; Illidan's ledge catch
-box is Captain Falcon's. Common rules (input windows, tech gates,
+box and wall data are Captain Falcon's, as Archer's and Rifleman's are Fox's
+and Falco's. Common rules (input windows, tech gates,
 knockback, platforms, ledge boxes) apply to all three. Where Smashcraft
 authors a value, such as ground acceleration or aerial landing lag, the
 scenario checks Melee's rule applied to it, not the value.
@@ -1879,7 +1881,7 @@ carries on over the stage. An underside stops a rise. A fighter that slips past
 a ledge's corner within its half-width of the wall, as when running off the
 ledge, is moved out sideways to its flank, as Melee's ECB slides off the
 corner. A wall tech pushes off along the facing it turns to, away from even a
-sloped wall (a Melee routine).
+sloped wall (a Melee routine); see "Wall techs and wall jumps" below.
 
 Ledge actions don't collide with the body; Melee's cliff actions run their own
 collision (a Melee routine). Climbs, rolls and ledge attacks pass through
@@ -1893,6 +1895,44 @@ table, smashcraft:ts/src/game/match/wallTechInputContracts.tests.ts launches
 each fighter into the side through helper journal rows and techs off it, and
 the oracle's wall/ceiling and ledge rows check where launches meet the side and
 underside, the techs off them and a catch from against the wall.
+
+## Wall techs and wall jumps
+
+A wall tech holds the fighter on the wall for five frames, then
+pushes it off away from the wall at its reference's `passivewall_vel_x`, or, when jump was pressed in the last 20 frames or
+the stick is up, launches its reference's wall jump (
+sideways, up), then air friction and gravity act as usual. Each fighter takes
+these from its Melee reference
+(smashcraft:docs/smash-melee-reference/physics-parameters.json), in Melee
+units a frame:
+
+| Fighter | Reference | Push-off | Wall jump sideways | Wall jump up | Minimum approach |
+| --- | --- | --- | --- | --- | --- |
+| Archer | Fox | 0.5 | 1.4 | 3.3 | 0.5 |
+| Rifleman | Falco | 0.5 | 1.3 | 3.6 | 0.5 |
+| Illidan | Captain Falcon | 0.5 | 1.4 | 3.1 | 0.5 |
+
+All three references wall jump (a Melee routine, a Melee routine and
+a Melee routine set `can_walljump`); a fighter whose tuning lacks
+`canWallJump` never wall jumps. Ceiling techs keep no sideways impulse.
+
+A wall jump follows a Melee routine.
+After the frame's collision, a fighter that is falling, jumping, tumbling
+past hitstun, or in a wall or ceiling recovery past its hang checks it;
+aerials, specials, air dodges, special fall and hitstun don't. Meeting a wall
+faster sideways than the minimum approach speed opens a 130-frame window while the fighter stays against that wall, and pushing the
+stick at least 0.8 away from it within 3 frames of the stick leaving
+the horizontal smash deadzone starts the jump. It enters the wall
+tech's state: motion stops, the fighter turns away, it is
+protected for 14 frames, hangs 5, then launches as above. Each
+earlier wall jump since the fighter last stood on the ground scales the rise
+by 0.975. A fighter moved out of the deck's body (see above) counts
+as against that wall, as Melee's collision leaves it touching.
+
+smashcraft:ts/src/game/match/wallTechInputContracts.tests.ts checks the
+push-off, the wall tech's jump and a drift-and-flick wall jump for each
+fighter through helper journal rows, and the oracle's wall/ceiling rows
+compare the hang, launch speeds and rises with the reference values.
 
 ## Shield presentation boundary
 
