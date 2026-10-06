@@ -567,6 +567,7 @@ function getupFrames(character: Character, option: DownState, choose: readonly A
 }
 
 const GETUP_ORDER = "DownBound ends into get-up attack, then held stick roll, else DownWait: Melee a Melee routine, a Melee routine.c";
+const C_STICK_GETUP = "DownWait IASA: a Melee routine attacks on a C-stick up crossing  = 0.6625, a Melee routine rolls on a C-stick sideways crossing = 0.2 within of horizontal: Melee, a Melee routine.c, Melee;
 const DOWN_ANIMATIONS = "Fox/Falco animation frames (retail-action-lengths.json)";
 
 const GETUPS: readonly Scenario[] = [
@@ -604,6 +605,16 @@ const GETUPS: readonly Scenario[] = [
     area: "getup", name: "get-up attack frames",
     cite: `${DOWN_ANIMATIONS} DownAttackU 50, entered with a Melee routine: a Melee routine.c:47`,
     run: (c) => forReference(c, () => ({ expected: 49, actual: getupFrames(c, DownState.attack, [Action.attack]) })),
+  },
+  {
+    area: "getup", name: "C-stick up flick in the down wait: get-up attack",
+    cite: C_STICK_GETUP,
+    run: (c) => ({ expected: "get-up attack", actual: downStateName(stateAfter(knockdown(c, 120, (after) => (after === 40 ? [Action.smashUp] : [])), DownState.wait)) }),
+  },
+  {
+    area: "getup", name: "C-stick right flick in the down wait: roll",
+    cite: C_STICK_GETUP,
+    run: (c) => ({ expected: "roll", actual: downStateName(stateAfter(knockdown(c, 120, (after) => (after === 40 ? [Action.smashRight] : [])), DownState.wait)) }),
   },
 ];
 
@@ -644,7 +655,36 @@ function launchCheck(character: Character, offset: number): Check {
 
 const KNOCKBACK_RULE = "knockback: Melee with  (fighter's own weight); hitstun (int), tumble when K x 0.4 >= 32: Melee;
 
+/** The test hit landed `count` times in a row by the same attacker on a target put back to 0% each time; each hit's damage, knockback and hitstun. */
+function repeatedHits(character: Character, count: number): string[] {
+  const s = scene(0, [{ character, x: 0.0, facing: 1 }, { character: Character.rifleman, x: -60.0, facing: 1 }]);
+  const target = fighter(s, 0);
+  const hits: string[] = [];
+  for (let n = 0; n < count; n++) {
+    target.status.damage = 0.0;
+    target.launch.hitstun = 0;
+    target.launch.hitlag = 0;
+    target.down.state = DownState.none;
+    beginDamageContacts();
+    collectDamageContact(s.world, 1, 0, TEST_HIT, 1, ContactKind.launch, false, undefined, false);
+    finishDamageContacts(s.world);
+    hits.push(`${target.status.damage} damage, knockback ${target.launch.knockbackX}, ${target.launch.hitstun} hitstun`);
+  }
+  return hits;
+}
+
+const STALE_MOVES = "a Melee routine scales damage by 1 - the staling table entries for each of the last 9 queued instances of the same move id, queued by a Melee routine and applied by a Melee routine";
+
 const KNOCKBACK: readonly Scenario[] = [
+  {
+    area: "knockback", name: "the same move landing 5 times in a row: hit 5 damage against hit 1",
+    cite: STALE_MOVES,
+    departure: "Stale moves and freshness bonuses omitted (owner decision 2026-10-04, reaffirmed 2026-10-06; smashcraft:docs/gameplay-design.md)",
+    run: (c) => {
+      const hits = repeatedHits(c, 5);
+      return { expected: "hit 5 deals less than hit 1", actual: hits.every((hit) => hit === hits[0]) ? `all 5 hits: ${hits[0]}` : `varies: ${hits.join("; ")}` };
+    },
+  },
   { area: "knockback", name: "10-damage hit (growth 100, base 21) 1% below the tumble threshold", cite: KNOCKBACK_RULE, run: (c) => launchCheck(c, -1) },
   { area: "knockback", name: "10-damage hit (growth 100, base 21) at the tumble threshold", cite: KNOCKBACK_RULE, run: (c) => launchCheck(c, 0) },
 ];

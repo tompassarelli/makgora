@@ -85,8 +85,8 @@ Full scale is SDL's and the normalized evdev range, ±32767, standing in for
 Melee's 80 units, so a left-stick axis counts from 9175. No resting-offset
 calibration is applied; the deadzone absorbs a pad's resting offset. Left,
 right and up are active when their axis is outside the deadzone; down needs
-the stronger threshold below. The journal's rows carry the deadzoned axes. Right-stick directions additionally need 11000
-and triggers 4000, strictly beyond. Shared sources are unioned before emission:
+the stronger threshold below. The journal's rows carry the deadzoned axes. Right-stick directions
+use the flick thresholds below and triggers need 4000, strictly beyond. Shared sources are unioned before emission:
 releasing LT while RT is held retains shield; B and Y share one held jump
 action. Stick-up is only up: aim, up-special, getup and ledge stand. Hold
 duration remains available to the game's jump logic.
@@ -107,6 +107,19 @@ Up keeps the deadzone: ledge climb = 0.25 and getup = 0.2 lie
 inside it, and the 0.6625 up actions (tap jump, up smash) are not served by
 digital up. Up-special and the direction sent with a special or
 dodge press still use the deadzone, as does the journal's analog axis.
+
+The right stick presses a direction at Melee's smash-flick thresholds, after the
+same clamp and deadzone: **0.8** sideways and **0.6625** up or down (axis
+values from about 26215 and 21709). Retail common values (NTSC 1.02 Melee,
+selected fields), all in Melee smash
+side `dash_smash_stick_threshold` = 0.8;
+smash up = 0.6625; smash down = -0.6625; get-up up = 0.6625; ledge-attack up = 0.6625 and sideways = 0.8;
+C-stick up jump = tap-jump 0.6625. Lower thresholds also
+exist: aerials, throws ( = 0.25), side get-up = 0.2 and ledge climb = 0.25 all fall inside the 0.28 deadzone, and C-stick roll and spot
+dodge use 0.7. One digital press per direction takes the smash
+values, so an aerial, throw or side get-up by C-stick needs a harder flick than
+in Melee. A full-scale diagonal clamps to 0.707 per axis, so it presses up or
+down but not sideways, as in Melee.
 
 On Linux the journal reads face buttons by position. Sony's driver reports
 positions, but xpad and other Xbox-style drivers report labels: X as `BTN_X`
