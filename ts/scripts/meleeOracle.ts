@@ -23,7 +23,7 @@ import { beginDamageContacts, collectDamageContact, finishDamageContacts } from 
 import { type Fighter, createFighter } from "../src/game/sim/fighter";
 import { uncancelledLandingLag } from "../src/game/sim/moves";
 import { type Roster, createRoster, fighterAt } from "../src/game/sim/roster";
-import { surfaceRight, surfaceZ } from "../src/game/sim/stage";
+import { SOLID_DECK_TEST_STAGE, surfaceRight, surfaceZ } from "../src/game/sim/stage";
 import { WORLD_UNITS_PER_MELEE_UNIT } from "../src/game/sim/tuning";
 
 // ------------------------------------------------------------------ harness
@@ -924,6 +924,47 @@ const WALL_HANG = " = 5 (wall tech) and = 5 (wall jump) frames held on the wall:
 const WALL_LAUNCH = " push-off 0.5, wall jump 1.4/3.3 (Fox), 1.3/3.6 (Falco), 1.4/3.1 (Captain Falcon) from the retail DATs (physics-parameters.json), set when the hang ends, then a frame of aerial friction and gravity: a Melee routine, a Melee routine";
 const WALL_JUMP = "can_walljump (ftFx/ftFc/a Melee routine); met faster than = 0.5 a frame, then the stick at least  = 0.8 away within = 3 frames of leaving the deadzone and = 130 frames of meeting the wall: Melee a Melee routine";
 
+/**
+ * Ceiling tech data:  passiveceil_vel_x (Melee units a
+ * frame) from the retail DATs and the animation's impulse event frame
+ * (retail-ceiling-tech-events.json): Fox and Falco 0.7 on frame 14, Captain
+ * Falcon (Illidan) 2.0 on frame 11.
+ */
+function referenceCeiling(character: Character): { readonly speed: number; readonly frame: number } {
+  return character === Character.demonHunter ? { speed: 2.0, frame: 11 } : { speed: 0.699999988079071, frame: 14 };
+}
+
+/**
+ * A tumbler that pressed tech, launched up into the left raised deck's
+ * underside on the solid-deck test stage, holding the stick left only on
+ * frame `leftOn` after the contact: its sideways speed then (Melee units).
+ * The shipped stages' one underside, the main deck's, is too near the bottom
+ * blast zone for a fighter to reach the impulse.
+ */
+function ceilingTechSpeed(character: Character, leftOn: number): number | undefined {
+  const s = solo(SOLID_DECK_TEST_STAGE, character, -265.0);
+  const f = fighter(s);
+  tumbling(f, -265.0, 100.0);
+  f.launch.knockbackZ = 18.0;
+  if (framesUntil(s, () => f.surfaceRecovery.contactSerial > 0, 10, (n) => (n === 1 ? [Action.leftTrigger] : [])) === undefined) return undefined;
+  if (f.surfaceRecovery.state !== SurfaceContact.techCeiling) return undefined;
+  for (let n = 1; n <= leftOn; n++) frame(s, n === leftOn ? [Action.moveLeft] : []);
+  return f.motion.grounded ? undefined : melee(f.motion.vx);
+}
+
+/** The first frame after the contact on which the stick moves the fighter faster than a frame of air drift alone. */
+function ceilingImpulseFrame(character: Character): number | string {
+  const drift = melee(createFighter(character, 0.0, 1).tuning.physics.airAcceleration);
+  for (let leftOn = 1; leftOn <= 20; leftOn++) {
+    const speed = ceilingTechSpeed(character, leftOn);
+    if (speed === undefined) return "no ceiling tech in the air";
+    if (Math.abs(speed) > drift + 0.0001) return leftOn;
+  }
+  return "no impulse";
+}
+
+const CEILING_IMPULSE = " passiveceil_vel_x 0.7 (Fox, Falco), 2.0 (Captain Falcon) from the retail DATs times the stick at the animation's throw-flag event, frame 14 (Fox, Falco) or 11 (Captain Falcon) (retail-ceiling-tech-events.json): Melee a Melee routine, then a frame of air drift; under the solid-deck test stage's raised deck";
+
 const SURFACE_GATE = "wall and ceiling techs use the floor's gate : Melee a Melee routine, a Melee routine.c";
 const WALL_FLANK = "the ECB's side meets a wall, and a Melee routine keeps an airborne ECB at least 2 units a side; airborne collision moves only the position";
 
@@ -978,6 +1019,21 @@ const SURFACES: readonly Scenario[] = [
   },
   { area: "wall/ceiling", name: "ceiling tech off the main deck's underside 19 frames before contact", cite: SURFACE_GATE, run: (c) => ({ expected: "tech", actual: surfaceTech(c, false, 19) }) },
   { area: "wall/ceiling", name: "ceiling tech off the main deck's underside 20 frames before contact", cite: SURFACE_GATE, run: (c) => ({ expected: "no tech", actual: surfaceTech(c, false, 20) }) },
+  {
+    area: "wall/ceiling", name: "ceiling tech: frame after contact of its sideways impulse", cite: CEILING_IMPULSE,
+    run: (c) => ({ expected: referenceCeiling(c).frame, actual: ceilingImpulseFrame(c) }),
+  },
+  {
+    area: "wall/ceiling", name: "ceiling tech: speed after the impulse frame with the stick fully left (Melee units/frame)",
+    cite: `${CEILING_IMPULSE}; Illidan's authored air drift caps his speed on that frame, so his row is n/a`,
+    run: (c) => {
+      if (c === Character.demonHunter) return undefined;
+      const { speed, frame: impulse } = referenceCeiling(c);
+      const drift = melee(createFighter(c, 0.0, 1).tuning.physics.airAcceleration);
+      const actual = ceilingTechSpeed(c, impulse);
+      return { expected: f32(speed + drift), actual: actual === undefined ? "no ceiling tech in the air" : -actual, tolerance: 0.0001 };
+    },
+  },
 ];
 
 // ------------------------------------------------------------------ shield and dodges
