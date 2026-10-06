@@ -26,8 +26,10 @@ more pushback (a Melee routine interpolates both by trigger pressure;
 smashcraft:docs/melee-analog-shield.md has the observed values). A full press
 within <!-- v:shield.powershield -->2<!-- /v --> frames of the trigger first moving
 starts a powershield, which reflects projectiles and, against attacks, keeps
-the shield's health and lets the defender act sooner
-(smashcraft:docs/melee-powershield.md).
+the shield's health and pushes the defender back harder. Shieldstun is
+unchanged; the reward is a 4-frame counter (a Melee routine,
+common ``) that lets an attack or grab cut the shield drop short
+(a Melee routine) (smashcraft:docs/melee-powershield.md).
 
 From a held shield the fighter can grab, jump, roll, spot-dodge or drop through
 a platform it stands on (a Melee routine; the platform drop is
