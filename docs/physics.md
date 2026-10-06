@@ -1644,8 +1644,9 @@ Spot dodge does not drop through a platform. Intangibility and recovery clocks
 pause in hitlag. Every character uses the owner's common dodge profile
 (smashcraft:docs/gameplay-design.md, "Deviations from Melee"): spot dodge
 22 / protection 2–15, both rolls 31 / protection 4–19, and air dodge 49 /
-protection 4–29 with 10 landing frames for every character. Air dodge retains
-its existing helpless fall until landing after its animation completes.
+protection 4–29 with 10 landing frames for every character. Air dodge is
+available once per airtime and ends actionable after its 49-frame animation;
+landing, a ledge catch or a hit refreshes it (#100).
 Both fighters have authored ground-dodge clips. See smashcraft:docs/fighter-animation-work.md
 for playback and art limits.
 
@@ -1807,7 +1808,7 @@ adopted in smashcraft:docs/gameplay-design.md, "Execution and reaction windows".
 A current queued attack takes priority over voluntary platform dropping during
 the movement step. Action recovery also blocks the drop, so holding Down cannot
 drop through during down-smash startup/charge or down-tilt recovery. With no
-current attack or action lock, a fresh Down drops through passable platforms:
+current attack or action lock, a fresh Down starts a platform descent:
 like Melee's Pass check (Melee, stick
 down past  = 0.66 entered under  = 6 frames ago), the
 press must be under six input frames old. The fast-fall input age is that one
@@ -1859,6 +1860,14 @@ the ECB bottom descends, `mpCheckCeiling` scans ceiling-kind lines only, and
 `mpJointUpdateDynamics` disables a platform line that is not floor-kind;
 `mpColl_80044628_Floor` skips the platform being
 dropped through. The main deck's walls and underside are below.
+
+Smashcraft departs from Melee's instant pass-through (#103): a body rising into
+a platform plays a platform ascent, a fresh Down on one a platform descent, and
+a half-circle at airborne contact a wrap around its edge, each lasting the
+fighter's jump squat (smashcraft:docs/gameplay-design.md, "Platforms";
+smashcraft:ts/src/game/sim/platformMoves.ts). The walking modifier keeps a
+digital Down on a platform for crouching and down tilts. Landing from above and
+the platforms' lack of walls and underside are unchanged.
 
 ## Main deck walls and underside
 
@@ -2254,8 +2263,8 @@ a Melee routine in Melee with their caller's falling
 and facing gates, and each action's collision callback in
 Melee Only facts and values are used.
 
-- **Who catches.** Falling and jumping fighters, helpless fall (after an
-  up-special, or once an air dodge's 49-frame animation ends), tumble once
+- **Who catches.** Falling and jumping fighters, helpless fall after an
+  up-special, fighters whose air dodge's 49-frame animation has ended, tumble once
   hitstun ends, and fighters recovering from a tech or grab release. Aerial
   attacks (AttackAir), air dodges (EscapeAir), hitstun (Damage/DamageFly),
   shield-break flight, grabs and frozen fighters never catch. Melee's specials
