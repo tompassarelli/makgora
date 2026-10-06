@@ -1910,6 +1910,75 @@ each fighter into the side through helper journal rows and techs off it, and
 the oracle's wall/ceiling and ledge rows check where launches meet the side and
 underside, the techs off them and a catch from against the wall.
 
+## Camera limits, off-screen damage and blast zones (Melee reference)
+
+Melee gives each stage three nested regions. The numbers below come from the
+owner's Melee files through the private readers
+~/.local/share/smashcraft-melee-reference/blast-zone-facts.ts,
+camera-facts.ts and offscreen-damage-facts.ts. Only the numbers are kept.
+
+**Stage points.** A stage's `map_head` general points set the camera offset (0x94),
+camera range (0x95, 0x96) and dead range (0x97, 0x98). a Melee routine and
+a Melee routine store them relative to the offset, and
+Melee adds it back, so the absolute values are the
+points themselves. In Melee units:
+
+| Stage file | Offset | Camera left/right | Camera top/bottom | Blast left/right | Blast top/bottom |
+| --- | --- | --- | --- | --- | --- |
+| GrNLa.dat (Final Destination, SHA-1 fa607d7b) | (0, 12) | -170 / 170 | 114 / -80 | -246 / 246 | 188 / -140 |
+| GrNBa.dat (Battlefield) | (0, 44) | -200 / 200 | 170 / -59 | -280 / 280 | 250 / -136 |
+| GrSt.dat (Yoshi's Story) | (0, 44) | -180 / 179 | 169 / -71 | -251 / 248 | 240 / -130 |
+| GrOp.dat (Dream Land) | (0, 9) | -165 / 165 | 190 / -81 | -255 / 255 | 250 / -123 |
+| GrIz.dat (Fountain of Dreams) | (0, 40) | -165 / 165 | 150 / -113 | -265 / 265 | 270 / -195 |
+| GrPs.dat (Pokémon Stadium) | none | -181 / 180.25 | 142 / -66 | -230 / 230 | 180 / -111 |
+
+Pokémon Stadium's file has no offset point, so a Melee routine reports
+"use dummy CamRange" and uses its default range (-170, 170, 120, -60); its
+dead range is the points above. Converted the way the main deck's walls are
+(each side keeps its distance from its own ledge, ±85.5657 on Final
+Destination; heights are six world units per Melee unit above the floor),
+Final Destination's camera limits are x ±1106.6, z -480 to 684, and its
+blast zones x ±1562.6, z -840 and 1128.
+
+**KO.** a Melee routine runs after each
+frame's movement: right
+if x > right, left if x < left, top if y > top and the fighter is grounded,
+frozen or launched upward faster than  = 2.4 Melee units/frame,
+bottom if y < bottom. Every comparison is strict.
+
+**Camera.** Melee a Melee routine each frame: subject
+extents ease toward their targets by 0.5 Melee units a frame; each subject's position and its four extent points are
+clamped into the camera range (a Melee routine, bottom also at least the
+stage's ground level + 1); the union's bottom drops by
+10 + 390 × clamp((|camera z| − 80) / 4920, 0, 1); the field of view eases
+from 30° to 38°; a Melee routine
+fits the union in the view (vertical angle -10° + clamp(-(base − 30) ×
+0.05°, -7°, 5°), where base is the union's centre height lowered by up to
+0.0682 of its height; horizontal
+clamp(-(centre x) × 0.05°, ±17.5°) on Final Destination; aspect 1.2173333) and clamps the distance to [83, 1000]; a Melee routine then shifts the target so the
+view's four corners stay inside the camera range, centering it when both
+opposite sides overflow. The interest follows its target by
+clamp(speed × 1.8, 0.0001, 1) a frame, speed 0.05 for a spread under 120,
+0.1 over 900 and linear between (;
+track smooth grGroundParam = 1.8); the eye by 0.15 × 1.8 = 0.27 a frame, the same rate zooming in and out. A fighter's camera box is
+centred 10 above its feet, reaches 22 forward
+and 9 back, 16 up and 9 down, for Fox, Falco and Captain Falcon alike; the
+extents are multiplied by the stage's track ratio times 1.5,
+1.32, 1.16 or 1.0 for one to four subjects.
+
+**Off-screen.** A fighter is off-screen when its camera bone projects outside
+the screen (a Melee routine, Melee;
+a Melee routine). The magnifier then draws
+it at the screen edge along the direction from the screen's centre, clamped
+to ±252.7 × ±162.7 of the 640×480 frame, with an arrow rotated to that
+direction. `Fighter_procAnim` counts frames in
+the magnifier while the fighter's percent is under  = 150 and
+deals  = 1% every  = 60 consecutive frames, resetting
+the count whenever the fighter is back on screen; at 150% or more the count
+neither runs nor resets. Versus matches enable it (`gmvs.c` sets the player
+flag unless the mode's xD_b2 is set; training, home-run contest, all-star and
+some events clear it).
+
 ## Wall and ceiling techs and wall jumps
 
 A wall tech holds the fighter on the wall for five frames, then
