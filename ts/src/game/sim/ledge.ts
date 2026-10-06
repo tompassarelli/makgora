@@ -81,6 +81,19 @@ export function ledgeCatchBox(character: Character): LedgeCatchBox {
   }
 }
 
+/**
+ * A fighter hanging on the ledge can't be caught by a standing, dash or shield
+ * grab, whatever its intangibility. a Melee routine and a Melee routine
+ * give the hanger
+ * x1A6A = 511 through a Melee routine; a Melee routine (a Melee routine.c) gives every
+ * catch x1A68 = 1; and a Melee routine (ftcoll.c) skips a victim whose
+ * x1A6A & x1A68 is nonzero. Fighter_ChangeMotionState clears x1A6A, so
+ * climbs, rolls, attacks and drops from the hang are catchable again.
+ */
+export function hangsOnLedge(f: Fighter): boolean {
+  return f.ledge.state === LedgeState.hang;
+}
+
 function ledgeX(stage: number, side: number): number {
   return side < 0 ? surfaceLeft(stage, 0) : surfaceRight(stage, 0);
 }
