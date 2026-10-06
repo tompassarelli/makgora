@@ -2130,6 +2130,14 @@ Melee Only facts and values are used.
   travel), and never during the regrab lock.
 - **Which ledge.** Only the ledge ahead of the fighter's facing. A catch turns
   the fighter toward the stage.
+- **Grabs.** A fighter hanging on the ledge can't be caught by a standing, dash
+  or shield grab, intangible or not. The hang gives the hanger
+  `x1A6A = 511`, every catch gives
+  its grabber `x1A68 = 1` (a Melee routine in
+  Melee), and a Melee routine skips a victim whose two masks share a bit.
+  `Fighter_ChangeMotionState` clears the mask, so climbs, rolls, ledge attacks
+  and drops are catchable again. `hangsOnLedge` in
+  smashcraft:ts/src/game/sim/ledge.ts applies it.
 - **The box.** Each fighter's ledge snap x, y and height (ftData x44, Melee `ftData_x44_t`) place it: the
   ledge vertex must lie strictly beyond the fighter's position and strictly
   less than its collision half-width plus snap x ahead, and strictly between
