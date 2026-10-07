@@ -75,7 +75,7 @@ tree, so push from a clean checkout of the commit.
 From smashcraft:ts/, use `bun test test/game.test.ts` for focused game tests,
 `bun run check` for host and map type-checking, and
 `LUA=<32-bit lua> bun scripts/lua-tests.ts` for emitted-Lua tests. Use
-`bun wisp build ...` to build a map. See smashcraft:docs/development-loop.md
+`bun wisp map build ...` to build a map. See smashcraft:docs/development-loop.md
 for the local toolchain and base-map setup.
 
 Pure simulation tests establish logical rules, not Warcraft callback timing,
