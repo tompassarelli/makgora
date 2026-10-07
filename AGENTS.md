@@ -84,8 +84,17 @@ may use more stocks or a longer timer only when its required sample needs it;
 record that reason beside the test (for example, #26's all-binding edge sample).
 Keep ordinary combat completion intact; do not force a win to shorten a test.
 
-Read warcraft3-development and its off-monitor dependency before
-controlling the game. Default automation off-monitor; use the primary display
+Pick the clients by what the test needs (Tom, 7 Oct). The offline LAN pool
+is the default for native testing: pad parity runs, captures, `accept`
+checks and desync hunts (landing; until `bun wisp lan pool` exists, use A/B).
+Signed-in A and B are only for tests that need Battle.net itself: real
+netplay or latency, direct play (#142), spectating. Tom's install (account a,
+display :0) is Tom's. A run during which a client wrote a desync report or
+crashed is invalid; read the autopsy line it printed
+(wisp:docs/autopsy.md), rerun, and debug the desync with `bun wisp engine`.
+
+Read warcraft-modding and its off-monitor dependency,
+private-desktop-development, before controlling the game. Default automation off-monitor; use the primary display
 for a requested hands-on trial. Preserve authenticated clients across map
 iterations. Never direct-launch Warcraft as assumed authentication recovery.
 Keep A/B in separate prefixes and use distinct online accounts. Credentials
