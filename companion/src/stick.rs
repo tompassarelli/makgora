@@ -30,6 +30,13 @@ pub fn stick_down(y: i16) -> bool {
     f32::from(y) >= STICK_DOWN_THRESHOLD * 32_767.0
 }
 
+/// Stick jump reads the effective shield-tilt stick before sharing button jump.
+pub fn tap_jump(y: i16, enabled: bool, tilt: bool, shield: bool) -> bool {
+    let up = -f32::from(y) / 32_767.0;
+    let up = if tilt && shield { up.min(0.65) } else { up };
+    enabled && up > STICK_DOWN_THRESHOLD
+}
+
 /// C-stick flick thresholds as fractions of full scale. Smash attacks read a
 /// sideways flick at `dash_smash_stick_threshold` (, 0.8, binary32
 /// 0x3f4ccccd; a Melee routine) and up/down at = 0.6625 and =
