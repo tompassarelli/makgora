@@ -1081,3 +1081,26 @@ coverage or all original-frame guarantees. Playable 0.0.40 remains separate.
 The source pins, exact artifact identities, corpus, failed attempt, final
 reconciliation and raw logs are in
 smashcraft:evidence/editbox-ingress-native-20261005/README.md.
+
+## Tempest-checksum desyncs: handles made at a per-client moment (#158)
+
+Learned on Warcraft III build 24268 (x86_64 `Warcraft III.exe`), 7 October 2026.
+
+**Rule.** Code that runs at a moment only this client chooses must not create
+a synchronized handle. That covers this client's own helper rows, its file
+reads, its focus and its frame or render callbacks. Synchronized handles
+include `CreateTimer`, triggers, groups, effects and units. Passing a Lua
+function where a native takes `code` counts too: `TimerStart`,
+`TriggerAddAction`, `Condition`, `Filter`, `ForGroup`. So does starting,
+pausing or restarting a shared timer. Create these at setup or from a
+synchronized event, and on the local path only read them (`TimerGetElapsed`).
+The desync guard (smashcraft:ts/test/desync-guard.test.ts) pins the input
+trace's start this way. Its lockstep compare flags any synchronized native a
+one-client call makes.
+
+If one client creates a handle a turn earlier than the other, the two
+clients' birth counters and free-list heads differ at that turn's checksum.
+That is a desync, even though both clients end with the same objects a turn
+later. The signature is births ±1 with presence ±1, or births ±2 with
+presence ±4. Every other Desync.log section matches.
+
