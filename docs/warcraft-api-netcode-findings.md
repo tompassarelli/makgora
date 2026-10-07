@@ -1104,3 +1104,8 @@ That is a desync, even though both clients end with the same objects a turn
 later. The signature is births ±1 with presence ±1, or births ±2 with
 presence ±4. Every other Desync.log section matches.
 
+- Each Errors folder's `*_Desync.log` holds the last three turns of every
+  checksum section, appended across games. Section names are FourCC decimals:
+  `ipse` is Tempest/Ipse, records #1 and #2 are the presence head and births.
+  Diff A against B by section and turn. One section differing names the
+  subsystem.
