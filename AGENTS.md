@@ -86,7 +86,7 @@ Keep ordinary combat completion intact; do not force a win to shorten a test.
 
 Pick the clients by what the test needs (Tom, 7 Oct). The offline LAN pool
 is the default for native testing: pad parity runs, captures, `accept`
-checks and desync hunts (landing; until `bun wisp lan pool` exists, use A/B).
+checks and desync hunts.
 Signed-in A and B are only for tests that need Battle.net itself: real
 netplay or latency, direct play (#142), spectating. Tom's install (account a,
 display :0) is Tom's. A run during which a client wrote a desync report or
