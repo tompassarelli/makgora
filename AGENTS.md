@@ -28,8 +28,9 @@ complete scope, and its "Rules for whoever picks this up" govern the work.
 - A problem that doesn't block a box goes in a new `priority:later` issue, not
   into the current one.
 - Don't re-run a passing check unless the code it covers changed.
-- Boxes marked (Tom) need Tom: prepare everything, ask once, keep working on
-  other boxes. Never build automated stand-ins for a human playtest.
+- Agents run every check, playtests included, by script or capture; Tom plays
+  only when he wants to, and anything he notices becomes an issue. Don't write
+  boxes that wait on Tom.
 - After two failed fixes on the same box, or about a day without progress, stop
   and tell Tom what fails, one recommended fix and its cost.
 - Keep each issue's Status section to 5 lines, edited in place, with at most
@@ -63,6 +64,14 @@ recovery clips and nine-way pain reactions. The project index of sources,
 with URLs, verified timestamps and rights, is
 smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
 
+Host tools that Bun runs (commands, runners, builds, captures, farm jobs) are
+written as Effect programs when they start processes, wait, retry, hold a
+resource or parse outside data. Load the effect-development skill before
+designing one, and follow the four rules and examples in
+smashcraft:docs/typescript.md, "Host tools". Map code compiled to Lua
+stays plain TypeScript; pure calculations stay plain functions.
+smashcraft:ts/test/effect-host-tools.test.ts enforces this.
+
 Effect is the preferred foundation for Wisp's TypeScript tooling.
 Read smashcraft:.agents/skills/effect/SKILL.md for Effect work and for the
 weekly dependency/source update. The upstream repository is vendored at
@@ -82,9 +91,18 @@ See smashcraft:docs/design/fighter-portraits.md.
 Every push runs the pre-push gate (smashcraft:.githooks/pre-push, enabled for
 the repository with `git config core.hooksPath .githooks`; safe-push runs it):
 `bun run check` and the type-escape audit (smashcraft:ts/test/source-shapes.test.ts)
-when the pushed commits change ts/, and client/ui's type-check when they change
-it, in a few seconds (smashcraft:ts/scripts/prePush.ts). It checks the working
-tree, so push from a clean checkout of the commit.
+when the pushed commits change ts/, the model facts check
+(smashcraft:ts/test/model-facts.test.ts; it refuses with the `bun wisp view models`
+refresh command) when they change clips or model build inputs, and client/ui's
+type-check when they change it, in a few seconds (smashcraft:ts/scripts/prePush.ts).
+It checks the working tree, so push from a clean checkout of the commit.
+
+Main stays green. Each CI run on main opens, updates or closes the one
+"main is red" issue (smashcraft:.github/workflows/main-red.yml), which lists the
+failing tests and the first failing commit; the pre-push gate prints that list
+on every push. A red main is not "already failing": before landing, check
+whether your change touches a listed test, and if your commit broke main, fix
+it first.
 
 From smashcraft:ts/, use `bun test test/game.test.ts` for focused game tests,
 `bun run check` for host and map type-checking, and
