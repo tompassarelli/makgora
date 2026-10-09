@@ -13,7 +13,8 @@ and, where there is one, its issue.
 
 Owner direction, 7 Oct 2026 (#175): quick reversals should dash back reliably,
 with the sampling tolerance of Slippi/UCF. The authored roster has thirteen
-initial-dash frames, then enters Run on frame fourteen. Thirteen is Melee's
+initial-dash frames, then enters Run on frame fourteen; since #390 a few heroes
+vary that inside Melee's spread ([Ground states](#ground-states-and-the-stick-map)). Thirteen is Melee's
 median initial-dash duration ([movement reference](design/melee/movement.md));
 it replaces the provisional ten-frame window. Reference test rigs keep their
 own actor timing.
@@ -51,6 +52,97 @@ to two. Its [v0.65 changelog](https://www.20xx.me/ucf-changelog.html) names a
 threshold on all three samples for small stick variation. This is an authored
 tolerance policy, not exact UCF emulation. It uses independently described
 behavior and numerical facts; no external implementation was copied.
+
+## Ground states and the stick map
+
+Tom, 9 Oct 2026 (#390): copy Melee's ground states and its analog stick map,
+each state with its own options, with a little per-fighter variation. Values
+are Melee `ftCommonData` fields.dat
+(offsets as in Melee at revision
+0296f009f32f710495979d30772d8332af2d411a; that source has no license, so only
+numbers and function names are cited, no code). SmashWiki's
+[Turn](https://www.ssbwiki.com/Turn) page agrees: tilt turn 0.28–0.78, smash
+turn 0.8–1.0, a smash turn dashes on its first frame. The pure rules are
+smashcraft:ts/src/game/sim/stickZones.ts.
+
+### Stick zones
+
+Stick values are −1 to 1 after the 0.28 absolute deadzone, which
+the input adapter applies to row directions. A side "flick" means the stick
+crossed the 0.25 smash deadzone at most two samples ago (Melee's
+`dash_smash_window` is 2; #188 keeps three samples). An up flick is the
+same on the vertical axis within the 4-frame tap-jump window. Zones
+are checked in a Melee routine's order: jump, dash, crouch, turn, walk, so the
+diagonal corners go to the earlier zone.
+
+| Zone | Condition (facing right; mirror for left) | Melee field / function |
+| --- | --- | --- |
+| Deadzone | \|x\| < 0.28 and no other zone | a Melee constant |
+| Tilt turn | x ≤ −0.28, not a fresh smash | a Melee routine |
+| Smash turn | x ≤ −0.8, fresh flick |, a Melee routine → a Melee routine |
+| Walk slow | 0.28 ≤ x < 0.4 | 0.18 (under the deadzone), 0.4 a Melee routine |
+| Walk middle | 0.4 ≤ x < 0.8 | |
+| Walk fast | x ≥ 0.8, not a fresh flick | 0.8 |
+| Dash slow | 0.8 ≤ \|x\| < 1, fresh flick; run target = \|x\| × run speed |, `getAccelAndTarget` |
+| Dash fast | \|x\| = 1, fresh flick | same |
+| Dash 1f → jump | dash zone with 0.5625 ≤ y < 0.6625 on a fresh up flick: dash, then the relaxed tap jump next frame | `relaxed_tap_jump_threshold`, a Melee routine |
+| Jump | y ≥ 0.6625 on a fresh up flick (0.5625 in dash, run, run brake, turn-run) | |
+| Crouch | y < −0.6875; held until y > −0.625 | a Melee routine, a Melee routine |
+
+Run holds while x × facing ≥ 0.625,
+turns at ≤ −0.375 and otherwise brakes; a dash enters
+Run at its run frame only with the stick past 0.625 forward.
+#392's platform stand band reuses the 0.6875 crouch threshold
+(`CROUCH_STICK_THRESHOLD`).
+
+### States and their options
+
+| State | Entered by | Tilts / jab | Smashes | Dash attack | Grab | Shield | Jump | Crouch | Dash / dash dance | Run turnaround |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Stand (a Melee routine) | neutral | yes | yes | – | yes | yes | yes | yes | dash, smash turn | – |
+| Walk slow/middle/fast (a Melee routine) | walk zone; re-enters Dash when the stick then flicks past 0.8 within the window (a Melee routine in Walk's list) | yes | yes | – | yes | yes | yes | yes | dash | – |
+| Initial dash (a Melee routine) | dash zone from stand, walk or crouch, or a dash back | no: A gives the dash attack | forward smash on frames 1–4 only | frames 1–20 | dash grab | yes | yes (relaxed) | no | dash back (the dash dance) | – |
+| Run (a Melee routine) | dash held forward to its run frame | no: A gives the dash attack | no | yes | dash grab | yes | yes (relaxed) | no | no | turn-run at x ≤ −0.375 |
+| Run brake (a Melee routine) | run with \|x\| < 0.625 | no | no | no | no | no | yes (relaxed) | yes: crouch from run goes through here | no | turn-run within its command window |
+| Turn-run (a Melee routine) | run or run brake turned | no | no | no | pivot grab (Smashcraft, #337) | no | yes (relaxed) | no | no | – |
+| Crouch (a Melee routine, a Melee routine) | crouch zone from stand, walk or run brake | yes | yes | – | yes | yes | yes | holds | dash | – |
+
+`groundOptionAllowed` holds this table and `groundGatedStyle`
+(smashcraft:ts/src/game/sim/attacks.ts) applies it: a refused ground normal in
+a dash (through frame 20) or run becomes the dash attack, otherwise it does not
+start; shield and crouch are refused in the states marked no. Recorded
+scenarios in smashcraft:ts/src/game/sim/stickZones.tests.ts drive a fighter
+into each state and check each allowed and refused option.
+
+Where Smashcraft keeps its own rule, and why:
+
+- Tap jump stays off: jumps use the jump button and Up stays the up-attack
+  direction on keyboard. The jump and dash-1f-jump zones are computed but do
+  not jump.
+- Turns have no separate 11-frame Turn state: a tilt turn walks the other way
+  at once and a smash turn is the dash back.
+- Specials are not gated by ground state (Melee's Dash allows only the side
+  special); #390 gates the normals, grab, shield and crouch.
+- Rolls come from shield on every state that allows shield (Melee also rolls
+  out of dash frames 1–3,).
+- The forward-smash window applies to every initial dash, including dash backs.
+- A held stick at full deflection (keyboard keys and a pad at the rim) still
+  dashes when it was not a fresh flick, keeping the walk modifier's release
+  to a dash (smashcraft:docs/physics.md); a pad held at 0.8–0.99 walks fast.
+- Walk speed is \|x\| × walk speed for analog sticks (#204); the walk modifier
+  gives one full walk speed.
+
+### Per-fighter variation
+
+Walk, initial dash and run speeds are clamped to Melee's roster spread (walk
+0.65–1.60, initial dash 1.00–2.00, run 1.10–2.30 Melee units a frame), and the
+run-from-dash frame to 8–19 ([movement reference](design/melee/movement.md));
+`MELEE_*_SPREAD` in smashcraft:ts/src/game/sim/tuning.ts. Heavy heroes (Anub'arak,
+Pit Lord, Thrall, Cairne) run from frame 16 like Donkey Kong and Ganondorf.
+No hero runs earlier than frame 14: a shorter initial dash would shrink #188's
+dash-back window (first opposite sample on dash frames 1–13), which the dash-dance
+sweep holds for the roster.
+Each fighter's values are listed in its section of the [move list](move-list.md).
 
 ## Air drift and jump momentum
 
