@@ -1,4 +1,4 @@
-// Tumble, knockdown, getting up and the get-up attack's frame advantage.
+
 import { assertEquals, assertFalse, assertGreaterThan, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { resolveAttacks } from "./attacks";
@@ -90,7 +90,7 @@ test("a recovery attack on the bound transition isn't discarded [spec docs/physi
   assertEquals(fighter.down.state, DownState.attack);
 });
 
-/** Lands a tumbling fighter on the main deck this frame, with the given input. */
+
 function landTumbling(fighter: Fighter, input: Readonly<Controls>): void {
   fighter.motion.grounded = false;
   fighter.motion.z = 1.0;
@@ -101,9 +101,9 @@ function landTumbling(fighter: Fighter, input: Readonly<Controls>): void {
   assertEquals(fighter.down.state, DownState.bound);
 }
 
-// Melee: DownBound's entry forgets earlier A/B presses;
-// as the bound ends, a Melee routine takes a get-up attack pressed under  = 60 frames ago
-//then a held roll (a Melee routine), before the wait reads that frame's input.
+
+// DownBound accepts get-up attacks pressed fewer than  = 60 frames ago.
+
 const MELEE_BOUND_ATTACK_PRESS_AGE_LIMIT = 60;
 
 test("a get-up attack pressed during the bound starts as it ends, ahead of a held roll [reference]", () => {
@@ -239,7 +239,7 @@ test("a down wait autostands, and a press starts the get-up attack [spec docs/ph
   assertEquals(fighter.down.state, DownState.attack);
 });
 
-/** Starts slot 0's get-up attack from a down wait and runs both fighters to its contact. */
+
 function runGetupAttackToContact(world: Roster, attacker: Fighter, target: Fighter, direction: number, distance: number): void {
   attacker.facing = direction;
   attacker.motion.grounded = true;
