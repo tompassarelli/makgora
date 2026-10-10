@@ -27,7 +27,7 @@ const BEAR: SpecialCompanion = {
   biteEffect: hit(8.182726860046387, "EDGE", 40, 1.0, HitElement.normal),
   stunFrames: 18, leash: h(6.0), leashFrames: 120,
 };
-export const BEAR_PLACEMENT: SpecialPlacement = {
+const BEAR_PLACEMENT: SpecialPlacement = {
   frame: 24, offsetX: h(f32(0.6)), radius: h(f32(0.3)), height: h(f32(0.8)),
   durability: 30.0, life: 480, fireAges: [], companion: BEAR,
 };
