@@ -97,7 +97,7 @@ export interface CueMeasurement {
   readonly popcornPresence: readonly CuePopcornPresence[];
 }
 
-export interface CueModelPixels {
+interface CueModelPixels {
   readonly model: string;
   readonly pixels: number;
   readonly frames: number;
