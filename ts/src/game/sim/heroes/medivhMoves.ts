@@ -1,7 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle, Character, GrabAction, HitElement } from "../codes";
 import { hurtCapsule } from "../../physics/contactGeometry";
-import { heroHurtPose, heroMove, heroRegion, jabStep, type FighterMoves, type StrikeCapsule, cleanLateMove } from "../heroMoves";
+import { heroHurtPose, heroMove, heroMoves, heroRegion, jabStep, type StrikeCapsule, cleanLateMove } from "../heroMoves";
 import { hurtPart } from "../hurtboxes";
 import { groundHit } from "./groundNormals";
 
@@ -17,8 +17,8 @@ const reach = (first: number, last: number, x: number, z: number) => [heroHurtPo
 const tilt = (height: number, angle: 25 | 35 | 55) => heroMove(9, 3, 20, 0, [heroRegion(9, 11, capsule(28.0, 58.0, 96.0, height), ordinary(8.219401359558105, angle))]);
 const throwMove = (contactFrame: number, recovery: number, effect: ReturnType<typeof ordinary>) => ({ contactFrame, totalFrames: contactFrame + recovery, effect });
 
-export const MEDIVH_MOVES: FighterMoves = {
-  dashAttack: AttackStyle.dashAttack, smashMaxChargeFrames: 45, smashMaxDamageMultiplier: 1.25, maxPummels: 1,
+export const MEDIVH_MOVES = heroMoves({
+  dashAttack: AttackStyle.dashAttack,
   hurtboxes: {
     stand: [torso], crouch: [hurtPart(0.0, 4.0, 0.0, f32(body.z2 * f32(0.6)), body.radius)],
     attacks: {
@@ -62,4 +62,4 @@ export const MEDIVH_MOVES: FighterMoves = {
     [GrabAction.throwUp]: throwMove(16, 15, ordinary(8.219401359558105, 90, 50.66062545776367, 50.0)),
     [GrabAction.throwDown]: throwMove(18, 24, ordinary(7.045200824737549, 70, 36.84408950805664, 75.0)),
   },
-};
+});
