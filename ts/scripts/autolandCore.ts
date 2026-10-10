@@ -16,7 +16,7 @@ const PASSED = /^passed alone on ([0-9a-f]{40}) as tree ([0-9a-f]{40})$/;
 // Runs started before the parallel queue name the branches they hold: "Autoland claude/a claude/b".
 const LEGACY_TITLE = /^Autoland (claude\/\S+(?: claude\/\S+)*)$/;
 
-export type LaneState = "test" | "testing" | "passed" | "held" | "done";
+type LaneState = "test" | "testing" | "passed" | "held" | "done";
 
 export function passedAlone(lane: Lane): { readonly base: string; readonly tree: string } | undefined {
   const [, base, tree] = (lane.status?.state === "pending" ? PASSED.exec(lane.status.description) : null) ?? [];
@@ -34,8 +34,8 @@ export function laneState(lane: Lane, runs: readonly Run[], retry: ReadonlySet<s
 const priority = (lane: Lane): number => lane.labels?.includes("priority:now") === true ? 0 : lane.labels?.includes("playtest-blocking") === true ? 1 : 2;
 const byArrival = (lanes: readonly Lane[]): Lane[] => lanes.toSorted((a, b) => priority(a) - priority(b) || (a.status?.at ?? "").localeCompare(b.status?.at ?? "") || a.branch.localeCompare(b.branch));
 
-export interface TestOrder { readonly branch: string; readonly tip: string; readonly slot: number }
-export interface Plan { readonly test: readonly TestOrder[]; readonly train: boolean }
+interface TestOrder { readonly branch: string; readonly tip: string; readonly slot: number }
+interface Plan { readonly test: readonly TestOrder[]; readonly train: boolean }
 
 export function plan(lanes: readonly Lane[], runs: readonly Run[], retry: readonly string[] = []): Plan {
   const retried = new Set(retry);
@@ -54,7 +54,7 @@ export function plan(lanes: readonly Lane[], runs: readonly Run[], retry: readon
   return { test, train: passed && !trainWaiting };
 }
 
-export interface TrainLane { readonly branch: string; readonly tip: string; readonly base: string; readonly tree: string }
+interface TrainLane { readonly branch: string; readonly tip: string; readonly base: string; readonly tree: string }
 
 export function train(lanes: readonly Lane[]): TrainLane[] {
   return byArrival(lanes).flatMap((lane) => {
@@ -63,7 +63,7 @@ export function train(lanes: readonly Lane[]): TrainLane[] {
   }).slice(0, TRAIN_CAP);
 }
 
-export type Verdict = "land" | "fail" | "retest";
+type Verdict = "land" | "fail" | "retest";
 
 export function judge(lanes: number, green: boolean): Verdict {
   if (green) return "land";

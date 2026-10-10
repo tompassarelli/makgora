@@ -371,7 +371,7 @@ const reel = (args: readonly string[]) => Effect.gen(function*() {
 });
 
 
-export function rmse(a: Frame, b: Frame): number {
+function rmse(a: Frame, b: Frame): number {
   if (a.width !== b.width || a.height !== b.height) return 1;
   const skip = Math.ceil(STAMP_CELL * (a.height / 0.6)) + 2;
   let total = 0;
