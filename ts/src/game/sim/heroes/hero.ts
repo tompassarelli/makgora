@@ -38,7 +38,7 @@ export interface HeroClip {
 
 
 
-export type HeroStatePose = "dash" | "run" | "crouch" | "fall" | "landing" | "shield" | "airDodge" | "smashCharge" | "ko" | "dizzy";
+type HeroStatePose = "dash" | "run" | "crouch" | "fall" | "landing" | "shield" | "airDodge" | "smashCharge" | "ko" | "dizzy";
 
 
 
@@ -49,7 +49,7 @@ export type HeroFollowUpPose =
   | "neutralSpecialFollowUpAir" | "sideSpecialFollowUpAir" | "upSpecialFollowUpAir" | "downSpecialFollowUpAir";
 
 
-export type JabChainPose = "jab2" | "jab3";
+type JabChainPose = "jab2" | "jab3";
 
 
 
@@ -81,7 +81,7 @@ export type HeroPose =
 
 export type HeroClipTable = { readonly [pose in HeroPose]?: HeroClip | undefined };
 
-export interface HeroPresentation {
+interface HeroPresentation {
 
   readonly model: string;
 

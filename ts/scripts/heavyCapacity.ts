@@ -17,7 +17,7 @@ const capacityHelperCandidates = [
 export const capacityHelper = capacityHelperCandidates.find((path) => existsSync(path)) ?? capacityHelperCandidates[0]!;
 
 
-export function insideCapacityScope(): boolean {
+function insideCapacityScope(): boolean {
   try {
     return /\/agent-capacity-[0-9a-z]+\.scope(\/|$)/m.test(readFileSync("/proc/self/cgroup", "utf8"));
   } catch {
