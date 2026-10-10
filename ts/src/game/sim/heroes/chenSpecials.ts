@@ -3,7 +3,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { HitElement } from "../codes";
 import { CHILL } from "../chill";
 import { HERO_REFERENCE_HEIGHT, heroRegion } from "../heroMoves";
-import { type AuthoredSpecial, type FighterSpecials, FollowUpInput, frames } from "../heroSpecials";
+import { type AuthoredSpecial, type FighterSpecials, FollowUpInput, frames, recovery, rise } from "../heroSpecials";
 import { chenCapsule, chenHit } from "./chenMoves";
 
 const fire = chenHit(9.370200157165527, 70.0, 25.73409652709961, f32(0.906308), f32(0.422618), HitElement.fire);
@@ -19,9 +19,9 @@ const haze = (air: boolean): AuthoredSpecial => ({
     status: CHILL,
   }],
 });
-const stormRise = (height: number, drift: number): AuthoredSpecial => ({
-  endFrame: 40, oncePerAirtime: true, helpless: true, facesStick: true,
-  motion: [{ ...frames(1, 7), velocityX: 0.0, velocityZ: 0.0 }, { ...frames(8, 29), velocityX: 0.0, velocityZ: f32(f32(HERO_REFERENCE_HEIGHT * height) / 22.0), driftSpeed: f32(f32(HERO_REFERENCE_HEIGHT * drift) / 22.0) }],
+const stormRise = (height: number, drift: number): AuthoredSpecial => recovery({
+  endFrame: 40, facesStick: true,
+  motion: rise(8, 29, f32(f32(HERO_REFERENCE_HEIGHT * height) / 22.0), f32(f32(HERO_REFERENCE_HEIGHT * drift) / 22.0)),
   regions: [heroRegion(8, 22, chenCapsule(0.0, 42.0, 0.0, 106.0, 42.0), chenHit(7.49616003036499, 80.0, 27.878604888916016, f32(0.34202), f32(0.939693)))],
 });
 const FIRE_PALM: AuthoredSpecial = { name: "Fire Palm", endFrame: 32, landingLag: 20,
