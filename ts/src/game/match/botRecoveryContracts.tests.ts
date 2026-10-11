@@ -2,6 +2,8 @@ import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/te
 import { Character } from "../sim/codes";
 import { createFighter, type Fighter } from "../sim/fighter";
 import { copyControls, createRoster, neutralControls, type Controls } from "../sim/roster";
+import { TOMB_OF_SARGERAS_STAGE } from "../sim/stage";
+import { SEA_SURFACE_Z } from "../sim/stageHazards";
 import { chooseRecoveryInput } from "./botRecovery";
 import { produceComputerInput } from "./botPlay";
 import { createFrameControls, type FrameControls } from "./controls";
@@ -21,7 +23,7 @@ function frameControls(first: Controls, second: Controls): FrameControls {
 }
 
 test("computerRecoversFromBothSidesWithAndWithoutJump [k1 scenario]", () => {
-  for (const character of [Character.demonHunter, Character.rifleman]) {
+  for (const character of [Character.demonHunter, Character.rifleman, Character.mountainKing]) for (const stage of [0, TOMB_OF_SARGERAS_STAGE]) {
     for (const side of [-1, 1]) for (const jumps of [0, 1]) {
       const fighter = createFighter(character, side * 680.0, -side);
       const opponent = createFighter(character === Character.rifleman ? Character.rifleman : Character.rifleman, 0.0, side);
@@ -29,17 +31,18 @@ test("computerRecoversFromBothSidesWithAndWithoutJump [k1 scenario]", () => {
       const opponentInput = neutralControls();
       const game = createMatchState();
       game.phase = Phase.match;
-      fighter.motion.z = -40.0;
+      game.stageChoice = stage;
+      fighter.motion.z = stage === TOMB_OF_SARGERAS_STAGE ? SEA_SURFACE_Z : -40.0;
       fighter.motion.vz = -4.0;
       fighter.motion.grounded = false;
       fighter.motion.surface = undefined;
       fighter.jump.remaining = jumps;
-      assertTrue(chooseRecoveryInput(fighter, 0, 0, input));
+      assertTrue(chooseRecoveryInput(fighter, stage, 0, input));
       for (let frame = 1; frame <= 180; frame++) {
         input.direction = 0;
         input.jumpPressed = false;
         input.jumpHeld = false;
-        chooseRecoveryInput(fighter, 0, 0, input);
+        chooseRecoveryInput(fighter, stage, 0, input);
         stepMatch(game, testRoster(fighter, opponent), frameControls(input, opponentInput), frame);
       }
       assertFalse(fighter.status.out);

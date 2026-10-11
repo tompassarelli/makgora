@@ -12,6 +12,8 @@ import { Character, DownState, LedgeState, PlatformMove, SpecialAction } from ".
 import { isTumbling } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
 import { totalVelocityZ } from "../sim/motion";
+import { wet } from "../sim/water";
+import { SEA_SURFACE_Z } from "../sim/stageHazards";
 import { RIFLEMAN_RECOVERY_STARTUP_FRAMES } from "../sim/specials";
 import type { Controls } from "../sim/roster";
 import { mainDeckLeft, mainDeckRight, mainDeckZ, surfaceCount, surfaceLeft, surfacePass, surfaceRight, surfaceZ, surfaceZAt } from "../sim/stage";
@@ -293,6 +295,14 @@ export function chooseRecoveryInput(fighter: Readonly<Fighter>, stage: number, m
   if (fighter.launch.hitstun > 0 || fighter.launch.hitlag > 0 || fighter.special.action !== SpecialAction.none) return true;
 
   if (ledge && outside <= LEDGE_LINE_REACH && z >= f32(floor - LEDGE_MISSED)) return true;
+
+  if (wet(fighter, stage)) {
+    if (z >= SEA_SURFACE_Z && outside >= LEDGE_LINE_NEAR && fighter.attack.cooldown === 0) {
+      input.jumpPressed = true;
+      input.jumpHeld = true;
+    }
+    return true;
+  }
 
   const coin = botChoice(fighter.visuals.hit + toInt(fighter.status.damage), fighter.character * 13 + 5, 2) === 0;
   const gameplan = gameplanOf(fighter.character, skill.basicMoves);
