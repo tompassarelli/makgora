@@ -29,7 +29,7 @@ export class StageCard {
     BlzFrameSetEnable(panel, false);
     this.picture = createBackdrop(`${id}Picture`, parent, 0);
     placeTopLeft(this.picture, left, top);
-    BlzFrameSetSize(this.picture, height, height);
+    BlzFrameSetSize(this.picture, banner ? width : height, height);
     BlzFrameSetEnable(this.picture, false);
     const side = width - height;
     this.boxWidth = f32(side * f32(0.84));

@@ -19,8 +19,8 @@ import { confirmedDropCues, createDropCueObservation, observeDropCues } from "..
 import { meterDropPoint } from "../match/meterDrops";
 import { SELECTABLE_CHARACTERS } from "../sim/heroes/registry";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
-import { coverScreen, createBackdrop, createText, gameUi } from "../ui/frames";
-import { MENU_FONT, PANEL_TEXTURE } from "../ui/hudLayout";
+import { coverScreen, createBackdrop, createText, gameUi, styleMenuPanel } from "../ui/frames";
+import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE } from "../ui/hudLayout";
 import { hideEffect, type WorldOrigin } from "./effects";
 import { SoundBank, SoundKind } from "./soundBank";
 import { resultFighterPlacement } from "../presentation/arenaCamera";
@@ -94,30 +94,28 @@ export class MatchPresentation {
     this.sounds.prepare(SoundKind.interfaceFile, interfaceSoundPaths(SELECTABLE_CHARACTERS));
     const parent = gameUi();
     this.panel = createBackdrop("MatchResultsPanel", parent, 0);
-    BlzFrameSetTexture(this.panel, "ReplaceableTextures\\TeamColor\\TeamColor20.blp", 0, true);
-    BlzFrameSetVertexColor(this.panel, -13619144);
-
     BlzFrameSetAbsPoint(this.panel, FRAMEPOINT_TOPRIGHT, f32(0.79), f32(0.52));
     BlzFrameSetSize(this.panel, f32(0.36), f32(0.05) + PARTICIPANT_CAPACITY * f32(0.04));
     BlzFrameSetEnable(this.panel, false);
+    styleMenuPanel(this.panel, "MatchResultsPanel");
     this.title = createText("MatchResultsTitle", this.panel, 0);
     BlzFrameSetPoint(this.title, FRAMEPOINT_TOPLEFT, this.panel, FRAMEPOINT_TOPLEFT, f32(0.018), f32(-0.012));
     BlzFrameSetSize(this.title, f32(0.33), f32(0.03));
-    BlzFrameSetFont(this.title, MENU_FONT, f32(0.016), 0);
+    BlzFrameSetFont(this.title, MENU_STYLE.font, MENU_STYLE.titleSize, 0);
     BlzFrameSetTextAlignment(this.title, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT);
     const lines: framehandle[] = [];
     for (let index = 0; index < PARTICIPANT_CAPACITY; index++) {
       const line = createText(`MatchResultsLine${I2S(index)}`, this.panel, 0);
       BlzFrameSetPoint(line, FRAMEPOINT_TOPLEFT, this.panel, FRAMEPOINT_TOPLEFT, f32(0.018), f32(-0.045) - index * f32(0.04));
       BlzFrameSetSize(line, f32(0.33), f32(0.036));
-      BlzFrameSetFont(line, MENU_FONT, f32(0.009), 0);
+      BlzFrameSetFont(line, MENU_STYLE.font, MENU_STYLE.bodySize, 0);
       BlzFrameSetTextAlignment(line, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT);
       lines.push(line);
     }
     this.lines = lines;
     this.help = createText("MatchResultsHelp", this.panel, 0);
     BlzFrameSetSize(this.help, f32(0.33), f32(0.06));
-    BlzFrameSetFont(this.help, MENU_FONT, f32(0.009), 0);
+    BlzFrameSetFont(this.help, MENU_STYLE.font, MENU_STYLE.bodySize, 0);
     BlzFrameSetTextAlignment(this.help, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT);
     BlzFrameSetEnable(this.help, false);
     BlzFrameSetVisible(this.panel, false);
@@ -255,12 +253,12 @@ export class MatchPresentation {
 
   private showResults(view: ResultsView): void {
     const { winner } = view;
-    BlzFrameSetText(this.title, winner === undefined ? "No contest" : "Results");
+    BlzFrameSetText(this.title, `${MENU_STYLE.gold}${winner === undefined ? "No contest" : "Results"}|r`);
     BlzFrameSetSize(this.panel, f32(0.36), f32(f32(0.115) + view.rows.length * f32(0.04)));
     BlzFrameSetPoint(this.help, FRAMEPOINT_TOPLEFT, this.panel, FRAMEPOINT_TOPLEFT, f32(0.018), f32(-0.045) - view.rows.length * f32(0.04));
     for (let index = 0; index < this.lines.length; index++) {
       const row = view.rows[index];
-      BlzFrameSetText(at(this.lines, index), row === undefined ? "" : row.winner ? `|cffffcc00${row.text}|r` : `|cffeeeeee${row.text}|r`);
+      BlzFrameSetText(at(this.lines, index), row === undefined ? "" : `${row.winner ? MENU_STYLE.gold : MENU_STYLE.text}${row.text}|r`);
     }
     BlzFrameSetVisible(this.panel, true);
     this.music = undefined;
@@ -274,7 +272,7 @@ export class MatchPresentation {
   }
 
   showResultHelp(text: string): void {
-    BlzFrameSetText(this.help, text.replace(". Press", ".\nPress"));
+    BlzFrameSetText(this.help, `${MENU_STYLE.text}${text.replace(". Press", ".\nPress")}|r`);
   }
 
   preparePoses(world: Readonly<Roster>): void {

@@ -51,7 +51,7 @@ import {
   updateSelectionDrag,
 } from "../menu/selectionDrag";
 import { cellRect, rosterGrid } from "../menu/selectionGrid";
-import { MENU_FONT, PANEL_TEXTURE, type TextBox } from "./hudLayout";
+import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE, type TextBox } from "./hudLayout";
 import { MOVES_BODY_BOX, MOVES_BUTTON_HEIGHT, MOVES_BUTTON_TOP, MOVES_TITLE_BOX, selectionTitleBox } from "./selectionLayout";
 import { PLAYABLE_CHARACTERS, fighterName, fighterPortrait, nextSelectableCharacter } from "../sim/heroes/registry";
 import {
@@ -266,7 +266,7 @@ export class SelectionPanel {
     const root = BlzCreateFrameByType("FRAME", `MeleeSelectRoot${suffix}`, gameUi(), "", 0);
     this.root = root;
     this.backdrop = createBackdrop(`MeleeSelectBackdrop${suffix}`, consoleUi(), 400 + participantId);
-    BlzFrameSetTexture(this.backdrop, "war3mapImported\\SelectionBackdrop.tga", 0, false);
+    BlzFrameSetTexture(this.backdrop, MENU_STYLE.panelTexture, 0, false);
     coverScreen(this.backdrop);
     art(root, `MeleeModeArt${suffix}`, "war3mapImported\\SelectionAction.tga", f32(0.05), f32(0.555), f32(0.295), f32(0.032));
     const grid = this.roster.grid;
@@ -276,7 +276,7 @@ export class SelectionPanel {
       const x = f32(left);
       const y = f32(top);
       const name = `${suffix}_${I2S(choice)}`;
-      const tileFrame = art(root, `MeleeTile${name}`, "war3mapImported\\SelectionTileFrame.tga", x, y, f32(grid.cellWidth), f32(grid.cellHeight));
+      const tileFrame = art(root, `MeleeTile${name}`, MENU_STYLE.borderTexture, x, y, f32(grid.cellWidth), f32(grid.cellHeight));
       const portrait = tilePortrait(scale);
       const inset = (TILE_PORTRAIT_SLOT * scale - portrait) / 2;
       const tilePortraitFrame = art(root, `MeleeTilePortrait${name}`, portraitTexture(PLAYABLE_CHARACTERS[choice], true), x + f32(0.0125) * scale + inset, y - f32(0.013) * scale - inset, portrait, portrait);
@@ -326,9 +326,9 @@ export class SelectionPanel {
     placeTopLeft(settingsButton, f32(0.055), f32(0.52));
     BlzFrameSetSize(settingsButton, f32(0.235), f32(0.037));
     this.clicks.add(settingsButton, { kind: "settings" });
-    const settingsLabel = label(settingsButton, `MeleeSettingsLabel${suffix}`, f32(0.063), f32(0.516), f32(0.219), f32(0.028), f32(0.011));
+    const settingsLabel = label(settingsButton, `MeleeSettingsLabel${suffix}`, f32(0.063), f32(0.516), f32(0.219), f32(0.028), MENU_STYLE.headerSize);
     this.settingsLabel = settingsLabel;
-    setFrameText(settingsLabel, "Controls (F1)");
+    setFrameText(settingsLabel, `${MENU_STYLE.gold}Controls (F1)|r`);
     this.delayLine = label(root, `MeleeDelayLine${suffix}`, f32(0.36), f32(0.6), f32(0.42), f32(0.03), f32(0.010));
     BlzFrameSetTextAlignment(this.delayLine, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_RIGHT);
     art(root, `MeleeMovesArt${suffix}`, "war3mapImported\\SelectionAction.tga", f32(0.318), f32(0.043), f32(0.18), f32(0.037));
@@ -356,7 +356,7 @@ export class SelectionPanel {
     const height = BlzGetLocalClientHeight();
     const titleBox = selectionTitleBox(height <= 0 ? f32(4.0 / 3.0) : I2R(BlzGetLocalClientWidth()) / I2R(height));
     this.modeLabel = page(createText(`MeleeModeLabel${suffix}`, gameUi(), 478 + participantId), titleBox.left, titleBox.top, titleBox.width, titleBox.height);
-    BlzFrameSetFont(this.modeLabel, MENU_FONT, f32(0.022), 0);
+    BlzFrameSetFont(this.modeLabel, MENU_STYLE.font, MENU_STYLE.headerSize, 0);
     placeTopLeft(this.modeLabel, titleBox.left + f32(0.006), titleBox.top);
     BlzFrameSetTextAlignment(this.modeLabel, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
     BlzFrameSetEnable(this.modeLabel, false);
@@ -390,6 +390,7 @@ export class SelectionPanel {
       placeTopLeft(frame, box.x, box.y);
       BlzFrameSetSize(frame, box.width, box.height);
       setFrameText(frame, text);
+      BlzFrameSetFont(frame, MENU_STYLE.font, MENU_STYLE.headerSize, 0);
       return this.clicks.add(frame, target);
     };
     const { fewerStocks, moreStocks, lessTime, moreTime, endless, automaticRematch } = RULE_BUTTONS;
@@ -401,8 +402,8 @@ export class SelectionPanel {
     ];
     const valueX = fewerStocks.x + fewerStocks.width;
     const valueWidth = moreStocks.x - valueX;
-    this.stockValue = label(root, `MeleeRulesStocks${suffix}`, valueX, fewerStocks.y, valueWidth, RULE_HEIGHT, f32(0.011));
-    this.timeValue = label(root, `MeleeRulesTime${suffix}`, lessTime.x + lessTime.width, lessTime.y, moreTime.x - lessTime.x - lessTime.width, RULE_HEIGHT, f32(0.011));
+    this.stockValue = label(root, `MeleeRulesStocks${suffix}`, valueX, fewerStocks.y, valueWidth, RULE_HEIGHT, MENU_STYLE.headerSize);
+    this.timeValue = label(root, `MeleeRulesTime${suffix}`, lessTime.x + lessTime.width, lessTime.y, moreTime.x - lessTime.x - lessTime.width, RULE_HEIGHT, MENU_STYLE.headerSize);
     this.endlessToggle = ruleButton(endless, { kind: "endless" }, "");
     this.rematchToggle = ruleButton(automaticRematch, { kind: "automaticRematch" }, "");
     this.itemsToggle = ruleButton(RULE_BUTTONS.items, { kind: "items" }, "");
@@ -533,7 +534,7 @@ export class SelectionPanel {
       if (card !== undefined) highlightText(card.settingsLabel, button?.kind === "cpuSettings" && button.slot === slot);
     }
     highlightText(this.confirm, button?.kind === "start");
-    highlightText(this.settingsLabel, button?.kind === "settings");
+    setFrameText(this.settingsLabel, `${MENU_STYLE.gold}${button?.kind === "settings" ? "> Controls (F1) <" : "Controls (F1)"}|r`);
     highlightText(this.movesLabel, button?.kind === "moves");
     if (updateDrag) this.drag.hover = tile;
     for (let index = 0; index < this.tiles.length; index++) {
@@ -754,7 +755,7 @@ export class SelectionPanel {
     const mode = this.movesOpen ? MOVES_HEADER : selectionModeLabel(game);
     if (mode !== this.shownMode) {
       this.shownMode = mode;
-      setFrameText(this.modeLabel, mode);
+      setFrameText(this.modeLabel, `${MENU_STYLE.gold}${mode}|r`);
     }
     if (!visible || cpuOpen || this.movesOpen) this.hideHelp();
     if (!visible) {
@@ -895,8 +896,8 @@ export class SelectionPanel {
     const rules = `${lore ? "1" : "0"} ${I2S(battle)} ${I2S(clears.count())} ${classic ? "1" : "0"} ${I2S(classicTier)} ${I2S(fighter)} ${I2S(stockCount)} ${I2S(timeLimitMinutes)} ${endless ? "1" : "0"} ${automaticRematch ? "1" : "0"} ${training ? "1" : "0"} ${I2S(trainer.behaviour)} ${I2S(trainer.escape)} ${I2S(trainer.tech)} ${I2S(trainer.damage)} ${trainer.showHitAreas ? "1" : "0"} ${I2S(trainer.speed)} ${items.on ? "1" : "0"} ${game.ultimatesOff ? "1" : "0"} ${I2S(items.enabledMask)} ${I2S(trainer.lesson)}`;
     if (rules === this.shownRules) return;
     this.shownRules = rules;
-    setFrameText(this.stockValue, stockSetting(stockCount));
-    setFrameText(this.timeValue, timeSetting(timeLimitMinutes));
+    setFrameText(this.stockValue, `${MENU_STYLE.gold}${stockSetting(stockCount)}|r`);
+    setFrameText(this.timeValue, `${MENU_STYLE.gold}${timeSetting(timeLimitMinutes)}|r`);
     setFrameText(this.endlessToggle, endlessSetting(endless));
     setFrameText(this.rematchToggle, automaticRematchSetting(automaticRematch));
     for (const step of this.steps) BlzFrameSetEnable(step, !endless);

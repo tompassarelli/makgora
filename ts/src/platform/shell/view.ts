@@ -570,7 +570,7 @@ export function renderUi(s: ShellState): void {
     ui.selections[slot].update(game, menu.title || ui.settings[slot].isOpen());
     ui.settings[slot].update();
   }
-  ui.clock.update(showMatch && timedMatch(game), remainingSeconds(game));
+  ui.clock.update(showMatch && game.phase === Phase.match && timedMatch(game), remainingSeconds(game));
   ui.training.update(showMatch && game.training && game.phase === Phase.match, game.trainer);
   ui.classic?.updateCard(game);
   const cleared = game.lore && game.phase === Phase.result && game.run.active && game.run.cleared ? game.run.current : undefined;

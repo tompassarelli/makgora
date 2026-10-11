@@ -7,6 +7,17 @@ import { f32 } from "wisp/src/sim/f32";
 export const MENU_FONT = "Fonts\\FRIZQT__.TTF";
 /** The dark tooltip backing behind every menu panel, readout and meter. */
 export const PANEL_TEXTURE = "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp";
+export const MENU_STYLE = {
+  font: MENU_FONT,
+  panelTexture: "war3mapImported\\SelectionBackdrop.tga",
+  borderTexture: "war3mapImported\\SelectionTileFrame.tga",
+  stageTexture: "war3mapImported\\StageBackdrop.tga",
+  titleSize: f32(0.024),
+  headerSize: f32(0.012),
+  bodySize: f32(0.010),
+  gold: "|cffffcc00",
+  text: "|cffd9e4eb",
+} as const;
 
 export interface TextBox {
   readonly left: number;

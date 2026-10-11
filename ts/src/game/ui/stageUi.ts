@@ -13,7 +13,7 @@ import { type StageChoice, clearStageDrag, stageDrag, stageTileLeft, stageTileTo
 import { RANDOM_STAGE, STAGE_CATALOG, STAGE_CHOICES, selectableStageChoice, stageInfo } from "../menu/stageCatalog";
 import { dropsSetting, hazardsSetting, rulesSummary } from "../shell/messages";
 import { ButtonClicks, type MenuControls, bindSyncHandler, consoleUi, coverScreen, createBackdrop, createSyncTrigger, createText, gameUi, highlightText, placeTopLeft, setFrameText } from "./frames";
-import { MENU_FONT, PANEL_TEXTURE } from "./hudLayout";
+import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE } from "./hudLayout";
 import { StageCard } from "./stageCard";
 
 
@@ -87,13 +87,13 @@ export class StagePanel {
     const root = BlzCreateFrameByType("FRAME", "MeleeStageRoot", gameUi(), "", 0);
     this.root = root;
     this.backdrop = createBackdrop("MeleeStageBackdrop", consoleUi(), 800);
-    BlzFrameSetTexture(this.backdrop, "war3mapImported\\StageBackdrop.tga", 0, false);
+    BlzFrameSetTexture(this.backdrop, MENU_STYLE.stageTexture, 0, false);
     coverScreen(this.backdrop);
-    this.ruleLabel = stageText(root, "MeleeStageRules", f32(0.41), f32(0.575), f32(0.35), f32(0.025), f32(0.012), "");
+    this.ruleLabel = stageText(root, "MeleeStageRules", f32(0.41), f32(0.575), f32(0.35), f32(0.025), MENU_STYLE.headerSize, "");
     this.preview = new StageCard(root, "MeleeStagePreview", f32(0.042), f32(0.445), f32(0.372), 0.25, false);
     this.previewName = stageText(root, "MeleeStagePreviewName", f32(0.045), f32(0.19), f32(0.37), f32(0.036), f32(0.022), "");
     this.previewDescription = stageText(root, "MeleeStageDescription", f32(0.045), f32(0.148), f32(0.36), f32(0.05), f32(0.011), "");
-    stageText(root, "MeleeStageGridTitle", f32(0.454), f32(0.48), f32(0.3), f32(0.022), f32(0.012), "CHOOSE A STAGE");
+    stageText(root, "MeleeStageGridTitle", f32(0.454), f32(0.48), f32(0.3), f32(0.022), MENU_STYLE.headerSize, `${MENU_STYLE.gold}CHOOSE A STAGE|r`);
     for (const stage of STAGE_CHOICES) {
       const choice = stage.id;
       const button = BlzCreateFrameByType("BUTTON", `MeleeStageTileButton${I2S(choice)}`, root, "", 0);
@@ -212,7 +212,7 @@ export class StagePanel {
     }
     const rules = rulesSummary(game);
     if (this.lastRules !== rules) {
-      setFrameText(this.ruleLabel, rules);
+      setFrameText(this.ruleLabel, `${MENU_STYLE.gold}${rules}|r`);
       this.lastRules = rules;
     }
     BlzFrameSetVisible(this.poolRoot, this.poolOpen);
