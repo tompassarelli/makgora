@@ -167,7 +167,7 @@ test("all-ready controller Start advances selection and enters the match without
   clients.everywhere(() => expect(shell().menuPublication?.ticks ?? 15).toBeLessThan(15));
 });
 
-test("the playable build keeps selection chips and cursor on their screen and shows no developer text through a match and results [k3 measure docs/playable-0047.md; #346 Tom 0.0.128]", () => {
+test("the playable build keeps selection chips and cursor on their screen and shows no developer text through a match and results [k3 measure #346]", () => {
   const clients = headless.clients({ install: installPlayable, start: startPlayable });
   const records = clients.clients.map(client => ({ client, view: new FrameView(client) }));
   const views = records.map(record => record.view);
