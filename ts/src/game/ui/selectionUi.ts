@@ -122,6 +122,21 @@ interface CardFrames {
 
 const portraitTexture = (choice: number | undefined, tile: boolean, slot?: number) => fighterPortrait(choice ?? Character.rifleman, tile ? "Tile" : "Card", slot);
 const nameText = (choice: number | undefined) => fighterName(choice ?? Character.rifleman);
+const TILE_NAMES: Readonly<Partial<Record<Character, string>>> = {
+  [Character.mountainKing]: "Mtn King",
+  [Character.forsakenPaladin]: "Paladin",
+  [Character.shadowHunter]: "S. Hunter",
+  [Character.blademaster]: "Blade",
+  [Character.beastmaster]: "Beast",
+  [Character.jaina]: "Jaina",
+  [Character.sylvanas]: "Sylvanas",
+  [Character.cairne]: "Cairne",
+  [Character.chen]: "Chen",
+  [Character.tinker]: "Tinker",
+  [Character.kaelthas]: "Kael'thas",
+  [Character.grom]: "Grom",
+  [Character.malfurion]: "Malfurion",
+};
 
 function art(parent: framehandle, name: string, texture: string, x: number, y: number, width: number, height: number): framehandle {
   const frame = createBackdrop(name, parent, 0);
@@ -265,9 +280,9 @@ export class SelectionPanel {
       const portrait = tilePortrait(scale);
       const inset = (TILE_PORTRAIT_SLOT * scale - portrait) / 2;
       const tilePortraitFrame = art(root, `MeleeTilePortrait${name}`, portraitTexture(PLAYABLE_CHARACTERS[choice], true), x + f32(0.0125) * scale + inset, y - f32(0.013) * scale - inset, portrait, portrait);
-      const text = nameText(PLAYABLE_CHARACTERS[choice]);
-      const fontScale = f32(Math.min(1.0, f32(8.0 / text.length)));
-      const tileName = label(root, `MeleeTileName${name}`, x + f32(0.002) * scale, y - f32(0.106) * scale, f32(0.108) * scale, f32(0.023) * scale, f32(f32(0.0064) * scale * fontScale));
+      const fighter = PLAYABLE_CHARACTERS[choice] ?? Character.rifleman;
+      const text = TILE_NAMES[fighter] ?? nameText(fighter);
+      const tileName = label(root, `MeleeTileName${name}`, x + f32(0.002) * scale, y - f32(0.106) * scale, f32(0.108) * scale, f32(0.023) * scale, f32(0.0064) * scale);
       setFrameText(tileName, text);
       this.tiles.push([tileFrame, tilePortraitFrame, tileName]);
       const button = BlzCreateFrameByType("BUTTON", `MeleeTileButton${name}`, root, "", 0);
