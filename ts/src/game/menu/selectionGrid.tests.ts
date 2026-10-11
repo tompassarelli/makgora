@@ -1,6 +1,7 @@
 import { assertEquals, assertNear, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { cellRect, rosterGrid, tileAt } from "./selectionGrid";
+import { readyChipSize } from "./selectionDrag";
 
 for (const count of [1, 3, 9, 10, 13, 17, 21, 32]) {
   test(`${count} fighters: centered balanced rows with matching pointer targets [k2 property]`, () => {
@@ -35,3 +36,16 @@ for (const count of [1, 3, 9, 10, 13, 17, 21, 32]) {
     }
   });
 }
+
+test("ready coin diameter stays 55–70% of tile width across resolution and UI scale [k3 measure #346]", () => {
+  const grid = rosterGrid(26);
+  for (const height of [720, 1080, 1440]) {
+    for (const scale of [f32(0.75), 1.0, f32(1.25)]) {
+      const scaled = { ...grid, scale: grid.scale * scale, cellWidth: grid.cellWidth * scale };
+      const pixels = height / f32(0.6);
+      const diameter = readyChipSize(scaled) * f32(0.92578125) * pixels;
+      const width = scaled.cellWidth * pixels;
+      assertEquals(diameter >= width * f32(0.55) && diameter <= width * f32(0.7), true);
+    }
+  }
+});

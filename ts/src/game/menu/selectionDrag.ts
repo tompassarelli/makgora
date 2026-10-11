@@ -63,15 +63,18 @@ export function chipY(grid: RosterGrid, slot: number, choice: number): number {
   return cellRect(grid, choice).top - (slot < 2 ? f32(0.01) : f32(0.066)) * grid.scale;
 }
 
+export const readyChipSize = (grid: RosterGrid): number => grid.cellWidth * f32(0.65);
+
 export function cardX(slot: number): number {
   return 0.054999999701976776 + slot * 0.17499999701976776;
 }
 
 
 function onChip(grid: RosterGrid, slot: number, choice: number, x: number, y: number): boolean {
-  const dx = x - (chipX(grid, slot, choice) + f32(0.024) * grid.scale);
-  const dy = y - (chipY(grid, slot, choice) - f32(0.024) * grid.scale);
-  return dx * dx + dy * dy <= f32(0.000576) * grid.scale * grid.scale;
+  const radius = readyChipSize(grid) * f32(0.5);
+  const dx = x - (chipX(grid, slot, choice) + radius);
+  const dy = y - (chipY(grid, slot, choice) - radius);
+  return dx * dx + dy * dy <= radius * radius;
 }
 
 

@@ -38,6 +38,7 @@ import {
   type RosterTile,
   cardX,
   HAND_SIZE,
+  readyChipSize,
   carriedChipLeft,
   carriedChipTop,
   chipX,
@@ -192,6 +193,7 @@ export class SelectionPanel {
   private readonly drag = selectionDrag();
   private readonly hand: framehandle;
   private cursorHidden = false;
+  private menuCursorAllowed = true;
 
   private readonly chips: RosterChip[] = PARTICIPANT_SLOTS.map(() => ({ choice: 0, placed: false }));
   private readonly roster: Roster = { grid: rosterGrid(PLAYABLE_CHARACTERS.length), selectable: 0, chips: this.chips };
@@ -685,9 +687,10 @@ export class SelectionPanel {
   private showHand(shown: boolean, x: number, y: number): void {
     BlzFrameSetVisible(this.hand, shown);
     if (shown) placeTopLeft(this.hand, handLeft(x), handTop(y));
-    if (shown === this.cursorHidden) return;
-    this.cursorHidden = shown;
-    BlzEnableCursor(!shown);
+    const hidden = shown || !this.menuCursorAllowed;
+    if (hidden === this.cursorHidden) return;
+    this.cursorHidden = hidden;
+    BlzEnableCursor(!hidden);
   }
 
   private ownsLocalClient(): boolean {
@@ -737,11 +740,12 @@ export class SelectionPanel {
     setFrameText(this.delayLine, text);
   }
 
-  update(game: Readonly<MatchState>, settingsOpen: boolean): void {
+  update(game: Readonly<MatchState>, settingsOpen: boolean, menuCursorAllowed: boolean): void {
     this.game = game;
     this.settingsOpen = settingsOpen;
     if (this.choosing() === undefined) this.cpuSlot = undefined;
     if (!this.ownsLocalClient()) return;
+    this.menuCursorAllowed = menuCursorAllowed;
     const { participantId, drag } = this;
     const visible = this.choosing() !== undefined;
     const cpuOpen = visible && this.cpuSlot !== undefined;
@@ -842,7 +846,7 @@ export class SelectionPanel {
       BlzFrameSetTexture(frames.chip, `war3mapImported\\SelectionChip${human ? `P${I2S(slot + 1)}` : "CPU"}.tga`, 0, true);
       const carried = drag.dragging === slot || (!ready && drag.held === slot && drag.hover !== undefined);
       const chipChoice = tileOfCharacter(choice ?? Character.rifleman);
-      const size = ready ? f32(0.048) * this.roster.grid.scale : f32(0.06);
+      const size = ready ? readyChipSize(this.roster.grid) : f32(0.06);
       BlzFrameSetSize(frames.chip, size, size);
       placeTopLeft(
         frames.chip,

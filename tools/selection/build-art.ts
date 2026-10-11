@@ -6,18 +6,19 @@ import { mkdirSync, rmSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { PLAYER_COLORS } from '../../ts/src/game/ui/slotColors';
 import { PARTICIPANT_CAPACITY } from '../../ts/src/game/input/participants';
+import { Effect } from '../../ts/node_modules/effect/dist/index.js';
+import { ChildProcess } from '../../ts/node_modules/effect/dist/process/index.js';
+import { BunRuntime, BunServices } from '../../ts/node_modules/@effect/platform-bun/dist/index.js';
+import { ProcessFailure, runProcess } from '../../ts/scripts/hostProcess';
+import { FAMILIES, readPins, verifiedFamily } from '../../ts/scripts/wisp/buildInputs';
 
 const project = resolve(import.meta.dir, '../..');
 const source = join(project, 'tools/selection/art');
 const index = process.argv.indexOf('--out');
 const output = index < 0 ? join(project, 'build/selection-assets') : resolve(process.argv[index + 1]!);
-mkdirSync(output, { recursive: true });
-
-function run(command: string[]): string {
-  const result = Bun.spawnSync(command, { stdout: 'pipe', stderr: 'pipe' });
-  if (result.exitCode !== 0) throw new Error(`${command[0]} failed (${result.exitCode}): ${result.stderr.toString().slice(-2000)}`);
-  return result.stdout.toString();
-}
+const privatePinch = process.argv.includes('--private-pinch');
+const ioFailure = (cause: unknown) => new ProcessFailure({ command: 'selection art', problem: String(cause) });
+const run = (command: readonly [string, ...string[]]) => runProcess(ChildProcess.make(command[0], command.slice(1)));
 
 const hex = (rgb: number) => `#${rgb.toString(16).padStart(6, '0')}`;
 
@@ -27,32 +28,47 @@ const mix = (rgb: number, target: number, amount: number) => [16, 8, 0].reduce((
 }, 0);
 
 
-async function render(name: string, svg: string, replacements: { readonly [placeholder: string]: string }, keep: boolean): Promise<void> {
-  let text = await Bun.file(join(source, svg)).text();
+const render = (name: string, svg: string, replacements: { readonly [placeholder: string]: string }, keep: boolean) => Effect.gen(function*() {
+  let text = yield* Effect.tryPromise({ try: () => Bun.file(join(source, svg)).text(), catch: ioFailure });
   for (const [placeholder, value] of Object.entries(replacements)) text = text.replaceAll(placeholder, value);
   const file = join(output, `${name}.svg`);
-  await Bun.write(file, text);
-  run(['magick', '-background', 'none', file, '-depth', '8', `TGA:${join(output, `${name}.tga`)}`]);
-  if (!keep) rmSync(file);
-}
+  yield* Effect.tryPromise({ try: () => Bun.write(file, text), catch: ioFailure });
+  yield* run(['magick', '-background', 'none', file, '-depth', '8', `TGA:${join(output, `${name}.tga`)}`]);
+  if (!keep) yield* Effect.try({ try: () => rmSync(file), catch: ioFailure });
+});
 
-for (const [fighter, label] of [['Rifleman', 'RIFLEMAN'], ['DemonHunter', 'ILLIDAN']] as const) {
-  await render(`${fighter}Name`, 'FighterName.svg', { FIGHTER_NAME: label }, true);
-}
-const slots = PLAYER_COLORS.slice(0, PARTICIPANT_CAPACITY);
-for (const [slot, color] of slots.entries()) {
-  await render(`SelectionChipP${slot + 1}`, 'SelectionChip.svg', { CHIP_COLOR: hex(mix(color.rgb, 0x000000, 0.2)), CHIP_LABEL: `P${slot + 1}` }, true);
-  await render(`SelectionCard${color.name}`, 'SelectionCard.svg', { CARD_COLOR: hex(mix(color.rgb, 0x000000, 0.4)), CARD_EDGE: hex(mix(color.rgb, 0xffffff, 0.35)), CARD_METAL: '#bbc6cf' }, false);
-  await render(`HudPlate${slot}`, 'HudPlate.svg', { PLAYER_COLOR: hex(color.rgb) }, true);
-}
-await render('SelectionChipCPU', 'SelectionChip.svg', { CHIP_COLOR: '#626977', CHIP_LABEL: 'P2' }, true);
-const HAND_POSES = {
-  Point: { THUMB: 'M42 66 L34 50 L36 40', INDEX: 'M62 40 L32 22 L13 11', SEAMS: 'M28 25 L36 17 M42 34 L50 25', SHINE: 'M30 18 L15 9' },
-  Pinch: { THUMB: 'M40 66 L30 44 L25 30', INDEX: 'M62 40 L44 20 L28 12', SEAMS: 'M27 47 L36 43 M41 25 L49 17', SHINE: 'M29 40 L25 31 M41 17 L30 12' },
-};
-for (const [pose, fingers] of Object.entries(HAND_POSES)) await render(`SelectionHand${pose}`, 'SelectionHand.svg', fingers, false);
-await render('SelectionCardGray', 'SelectionCard.svg', { CARD_COLOR: '#30353b', CARD_EDGE: '#555d65', CARD_METAL: '#687078' }, false);
-for (const name of ['SelectionBackdrop', 'SelectionTileFrame', 'SelectionAction', 'StageBackdrop', 'StageChip', 'SelectionThreeBridges']) {
-  run(['magick', '-background', 'none', join(source, `${name}.svg`), '-depth', '8', `TGA:${join(output, `${name}.tga`)}`]);
-}
-console.log(run(['magick', 'identify', ...[...new Bun.Glob('*.tga').scanSync(output)].sort().map((file) => join(output, file))]));
+BunRuntime.runMain(Effect.gen(function*() {
+  let pinchSource: string | undefined;
+  if (privatePinch) {
+    const pins = yield* Effect.try({ try: () => readPins(), catch: ioFailure });
+    const hash = pins['selection-hand-source'];
+    if (hash === undefined) return yield* new ProcessFailure({ command: 'selection art', problem: '--private-pinch requires the licensed build-inputs/selection-hand-source pin' });
+    const directory = yield* verifiedFamily('selection-hand-source', hash);
+    pinchSource = join(directory, FAMILIES['selection-hand-source'].file);
+  }
+  yield* Effect.try({ try: () => mkdirSync(output, { recursive: true }), catch: ioFailure });
+  for (const [fighter, label] of [['Rifleman', 'RIFLEMAN'], ['DemonHunter', 'ILLIDAN']] as const) {
+    yield* render(`${fighter}Name`, 'FighterName.svg', { FIGHTER_NAME: label }, true);
+  }
+  const slots = PLAYER_COLORS.slice(0, PARTICIPANT_CAPACITY);
+  for (const [slot, color] of slots.entries()) {
+    yield* render(`SelectionChipP${slot + 1}`, 'SelectionChip.svg', { CHIP_COLOR: hex(mix(color.rgb, 0x000000, 0.2)), CHIP_LABEL: `P${slot + 1}` }, true);
+    yield* render(`SelectionCard${color.name}`, 'SelectionCard.svg', { CARD_COLOR: hex(mix(color.rgb, 0x000000, 0.4)), CARD_EDGE: hex(mix(color.rgb, 0xffffff, 0.35)), CARD_METAL: '#bbc6cf' }, false);
+    yield* render(`HudPlate${slot}`, 'HudPlate.svg', { PLAYER_COLOR: hex(color.rgb) }, true);
+  }
+  yield* render('SelectionChipCPU', 'SelectionChip.svg', { CHIP_COLOR: '#626977', CHIP_LABEL: 'P2' }, true);
+  const HAND_POSES = {
+    Point: { THUMB: 'M42 66 L34 50 L36 40', INDEX: 'M62 40 L32 22 L13 11', SEAMS: 'M28 25 L36 17 M42 34 L50 25', SHINE: 'M30 18 L15 9' },
+    Pinch: { THUMB: 'M40 66 L30 44 L25 30', INDEX: 'M62 40 L44 20 L28 12', SEAMS: 'M27 47 L36 43 M41 25 L49 17', SHINE: 'M29 40 L25 31 M41 17 L30 12' },
+  };
+  for (const [pose, fingers] of Object.entries(HAND_POSES)) {
+    if (pose === 'Pinch' && pinchSource !== undefined) yield* run(['magick', pinchSource, '-depth', '8', `TGA:${join(output, 'SelectionHandPinch.tga')}`]);
+    else yield* render(`SelectionHand${pose}`, 'SelectionHand.svg', fingers, false);
+  }
+  yield* render('SelectionCardGray', 'SelectionCard.svg', { CARD_COLOR: '#30353b', CARD_EDGE: '#555d65', CARD_METAL: '#687078' }, false);
+  for (const name of ['SelectionBackdrop', 'SelectionTileFrame', 'SelectionAction', 'StageBackdrop', 'StageChip', 'SelectionThreeBridges']) {
+    yield* run(['magick', '-background', 'none', join(source, `${name}.svg`), '-depth', '8', `TGA:${join(output, `${name}.tga`)}`]);
+  }
+  const files = yield* Effect.try({ try: () => [...new Bun.Glob('*.tga').scanSync(output)].sort().map((file) => join(output, file)), catch: ioFailure });
+  console.log(yield* run(['magick', 'identify', ...files]));
+}).pipe(Effect.provide(BunServices.layer)));

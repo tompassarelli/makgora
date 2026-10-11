@@ -6,12 +6,12 @@
 import { Effect } from "effect";
 import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
 import { MapBuildFailure } from "wisp/scripts/wisp/mapBuild";
-import { FAMILIES, FAMILY_NAMES, type Family, MANIFEST, checkoutInputs, storeFamily, writePin } from "../buildInputs";
+import { FAMILIES, FAMILY_NAMES, SOURCE_FAMILY_NAMES, type Family, MANIFEST, checkoutInputs, readPins, storeFamily, verifiedFamily, writePin } from "../buildInputs";
 
 const isFamily = (name: string): name is Family => name in FAMILIES;
 
 const add = (family: string, source: string) => Effect.gen(function*() {
-  if (!isFamily(family)) return yield* new UsageFailure({ problem: `inputs add takes one of ${FAMILY_NAMES.join(", ")}` });
+  if (!isFamily(family)) return yield* new UsageFailure({ problem: `inputs add takes one of ${[...FAMILY_NAMES, ...SOURCE_FAMILY_NAMES].join(", ")}` });
   const hash = yield* Effect.tryPromise({ try: () => storeFamily(family, source), catch: (cause) => new MapBuildFailure({ operation: "store build input", path: source, cause }) });
   yield* Effect.try({ try: () => writePin(family, hash), catch: (cause) => new MapBuildFailure({ operation: "write build inputs", path: MANIFEST, cause }) });
   console.log(`${family} ${hash}\nwrote it into ${MANIFEST}/${family}; commit the change to build with it`);
@@ -23,6 +23,11 @@ export const inputs: Command = (args) => Effect.gen(function*() {
   if (verb === "add" && family !== undefined && source !== undefined && extra.length === 0) return yield* add(family, source);
   if (verb === "check" && rest.length === 0) {
     const paths = yield* checkoutInputs();
+    const pins = yield* Effect.try({ try: () => readPins(), catch: cause => new MapBuildFailure({ operation: "read source inputs", path: MANIFEST, cause }) });
+    for (const name of SOURCE_FAMILY_NAMES) {
+      const hash = pins[name];
+      if (hash !== undefined) yield* verifiedFamily(name, hash);
+    }
     console.log(`every family in ${MANIFEST} is stored and unchanged\n--assets ${paths.assets}`);
     return;
   }

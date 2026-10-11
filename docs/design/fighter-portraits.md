@@ -145,15 +145,23 @@ the same on every client.
 
 ## Selection cursor
 
-While a chip is dragged on the fighter select screen, the Warcraft cursor is
-hidden (`BlzEnableCursor`) and the local client draws a pinching steel gauntlet
-instead, the chip's top rim between thumb and fingertip; otherwise the stock
-cursor shows. The pointing pose is painted but not displayed yet. Both 128x128 TGAs (`SelectionHandPoint`, `SelectionHandPinch`) are
+Ready chips use a frame 65% of the roster tile width at every resolution and
+UI scale. The authored chip's 237-pixel rim spans a 256-pixel canvas, so its
+visible diameter is 60.18% of a tile, within #346's 55–70% reference band.
+The pointer target follows that frame size; the P1/P2 labels keep their art.
+
+On the fighter select screen, the Warcraft cursor is hidden (`BlzEnableCursor`)
+and the local client draws a pinching steel gauntlet, with a carried chip's
+top rim between thumb and fingertip. The pointing pose is painted but not
+displayed yet. Both authored 128x128 TGAs (`SelectionHandPoint`, `SelectionHandPinch`) are
 original art painted by smashcraft:tools/selection/build-art.ts from
 smashcraft:tools/selection/art/SelectionHand.svg, inspired by Super Smash Bros.
 Ultimate's gauntlet cursor; no Nintendo or Blizzard pixels are used. The pinching
 hotspot is the point between thumb and fingertip, as fractions of the image in
-smashcraft:ts/src/game/menu/selectionDrag.ts. The stock cursor returns on drop,
-when a panel opens over the roster or when the screen closes. Warcraft has no
+smashcraft:ts/src/game/menu/selectionDrag.ts. The phase owner permits the stock
+cursor in stage selection, pause, title and settings menus or when a panel
+opens over the roster. Both cursors stay hidden during gameplay and results.
+The private Pinch source build is described in smashcraft:docs/build-inputs.md.
+Warcraft has no
 per-render Lua callback (smashcraft:docs/high-refresh.md), so hand and chip move
 together once per 60 Hz tick from one mouse sample.
