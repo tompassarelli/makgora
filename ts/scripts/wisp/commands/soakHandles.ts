@@ -7,6 +7,7 @@ import { mapCompiler, report } from "wisp/scripts/compiler";
 import { type Command, UsageFailure, describeCause } from "wisp/scripts/wisp/command";
 import { step } from "wisp/scripts/wisp/timings";
 import { stockLua } from "../luaRuntimes";
+import { bundleConfig } from "../bundleConfigs";
 import { buildProject, tsDirectory } from "../project";
 
 class HandleSoakFailure extends Schema.TaggedError<HandleSoakFailure>()("HandleSoakFailure", { problem: Schema.String }) {
@@ -46,7 +47,7 @@ export const soakHandles: Command = (args) => Effect.gen(function*() {
   if (!Number.isInteger(matches) || matches < 2) return yield* new UsageFailure({ problem: "--rematches takes a whole number of at least 1" });
   const integrity = buildProject("integrity");
   yield* compile(integrity.configPath).pipe(step("compile the integrity build"));
-  yield* compile(join(tsDirectory, "tsconfig.handles.json")).pipe(step("compile the handle baseline"));
+  yield* compile(bundleConfig("handles")).pipe(step("compile the handle baseline"));
   const lua = yield* stockLua.pipe(Effect.mapError((problem) => new HandleSoakFailure({ problem })));
   const declarations = join(tsDirectory, "node_modules/wisp/src/natives/warcraft.d.ts");
   const rematches = `${matches - 1} rematches`;

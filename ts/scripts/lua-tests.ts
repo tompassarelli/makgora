@@ -25,6 +25,7 @@ import { Effect } from "effect";
 import { ChildProcess } from "effect/process";
 import { runAdmitted } from "./heavyCapacity";
 import { LUA_TEST_CEILING_INSTRUCTIONS, LUA_TEST_CEILING_S, addLuaCost, judgeLua, type LuaCosts } from "./testCost";
+import { bundleConfig } from "./wisp/bundleConfigs";
 import { stockLua } from "./wisp/luaRuntimes";
 import { refuseUntagged } from "./oracleTags";
 
@@ -102,11 +103,11 @@ await Bun.write("test/lua/index.ts", [
   "",
 ].join("\n"));
 const steps = only === "compile" ? [compile("tsconfig.lua-tests.json")]
-  : only === "stack" ? [compile("tsconfig.lua-stack.json"), run("build/lua-stack/stack.lua")]
+  : only === "stack" ? [compile(bundleConfig("lua-stack")), run("build/lua-stack/stack.lua")]
   : [
     compile("tsconfig.lua-tests.json"),
     runSharded("build/lua-tests/tests.lua"),
-    ...(soak || sweeps || !remainder ? [] : [compile("tsconfig.lua-stack.json"), run("build/lua-stack/stack.lua")]),
+    ...(soak || sweeps || !remainder ? [] : [compile(bundleConfig("lua-stack")), run("build/lua-stack/stack.lua")]),
     ...(soak || sweeps ? [] : [Effect.sync(budget)]),
   ];
 BunRuntime.runMain(Effect.gen(function*() {

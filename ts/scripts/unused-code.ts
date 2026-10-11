@@ -9,6 +9,7 @@ import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Effect, Schema } from "effect";
 import { ChildProcess } from "effect/process";
 import { runProcess } from "./hostProcess";
+import { bundleConfigs } from "./wisp/bundleConfigs";
 
 const project = resolve(import.meta.dir, "..");
 const repository = resolve(project, "..");
@@ -39,7 +40,7 @@ const bundleEntries = new Set(projectFiles.filter((file) => /(^|\/)tsconfig[^/]*
   const entry = typeof config === "object" && config !== null && "tstl" in config && typeof config.tstl === "object" && config.tstl !== null
     && "luaBundleEntry" in config.tstl && typeof config.tstl.luaBundleEntry === "string" ? config.tstl.luaBundleEntry : undefined;
   return entry === undefined ? [] : [join(project, entry)];
-}));
+}).concat(Object.values(bundleConfigs).map(({ entry }) => join(project, entry))));
 
 const usedElsewhere = new Set<ts.Symbol>();
 const importers = new Map<string, Set<string>>();

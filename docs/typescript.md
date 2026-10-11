@@ -790,7 +790,7 @@ still requires equal complete states and a TypeScript/Wurst time ratio at most
 one; new replay fields are never removed to fit an older baseline.
 
 `bun wisp map build --profile stack-trace` compiles the development build with
-Wisp's stack plugin (smashcraft:ts/tsconfig.stack-trace.json), so an in-game
+Wisp's stack plugin (its row in smashcraft:ts/scripts/wisp/bundleConfigs.ts), so an in-game
 error report lists each active TypeScript frame as `src/FILE.ts:LINE: in
 FUNCTION`, innermost first. Rebuild with
 `bun wisp map rebuild MAP.w3x --profile stack-trace`; `bun wisp hot --profile

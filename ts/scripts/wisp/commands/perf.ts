@@ -10,6 +10,7 @@
 
 import { join } from "node:path";
 import { type PerfProject, makePerf } from "wisp/scripts/wisp/commands/perf";
+import { bundleConfig } from "../bundleConfigs";
 import { buildProject, tsDirectory } from "../project";
 import { SELECTABLE_CHARACTERS, fighterSlug } from "../../../src/game/sim/heroes/registry";
 import { census, comparePairRuns, profile } from "../perfCensus";
@@ -24,7 +25,7 @@ const playableMap = { config: playable.configPath, bundle: playable.bundlePath }
 
 export const SMASHCRAFT_PERF: PerfProject = {
   map: { config: main.configPath, bundle: main.bundlePath },
-  program: { config: join(tsDirectory, "tsconfig.perf.json"), bundle: join(tsDirectory, "build/perf.lua") },
+  program: { config: bundleConfig("perf"), bundle: join(tsDirectory, "build/perf.lua") },
   defaultRun: "quick-match",
   runs: { bot: integrityMap, "bot-four": integrityMap, "playable-bot-four": playableMap, "playable-duel": playableMap, "playable-human-four": playableMap, ...Object.fromEntries(SELECTABLE_CHARACTERS.map((character) => [`bot-${fighterSlug(character)}`, integrityMap])) },
 };

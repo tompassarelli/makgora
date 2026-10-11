@@ -1,19 +1,6 @@
 {
+  "extends": "./tsconfig.lua.json",
   "compilerOptions": {
-    "target": "ESNext",
-    "lib": [
-      "ESNext"
-    ],
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-    "noEmitOnError": true,
-    "skipLibCheck": true,
-    "types": [
-      "lua-types/5.3"
-    ],
     "rootDir": ".",
     "outDir": "build/lua-tapes"
   },
@@ -22,15 +9,7 @@
     "test/tapes/lua-entry.ts"
   ],
   "tstl": {
-    "luaTarget": "5.3",
     "luaBundle": "tapes.lua",
-    "luaBundleEntry": "test/tapes/lua-entry.ts",
-    "noImplicitSelf": true,
-    "noHeader": true,
-    "luaPlugins": [
-      {
-        "name": "./node_modules/wisp/plugins/warcraft-numbers.ts"
-      }
-    ]
+    "luaBundleEntry": "test/tapes/lua-entry.ts"
   }
 }

@@ -7,6 +7,7 @@ import { join } from "node:path";
 import { Effect } from "effect";
 import { ChildProcess } from "effect/process";
 import { runProcess } from "./hostProcess";
+import { bundleConfig } from "./wisp/bundleConfigs";
 
 export const VIEWER_MODULES = ["game.replay.viewer", "game.replay.viewerDriver"] as const;
 
@@ -25,6 +26,6 @@ export function viewerModules(bundle: string, names: readonly string[] = VIEWER_
 
 
 export const buildViewerLua = Effect.fn("buildViewerLua")(function*(ts: string) {
-  yield* runProcess(ChildProcess.make(process.execPath, ["--bun", join(ts, "node_modules/typescript-to-lua/dist/tstl.js"), "-p", join(ts, "tsconfig.viewer-lua.json")], { cwd: ts }));
+  yield* runProcess(ChildProcess.make(process.execPath, ["--bun", join(ts, "node_modules/typescript-to-lua/dist/tstl.js"), "-p", bundleConfig("viewer-lua")], { cwd: ts }));
   return yield* Effect.try(() => viewerModules(readFileSync(join(ts, "build/viewer-lua/viewer.lua"), "utf8")));
 });

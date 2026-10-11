@@ -5,6 +5,7 @@ import { UsageFailure } from "wisp/scripts/wisp/command";
 import type { BuildProject } from "wisp/scripts/wisp/mapBuild";
 import { GameFiles } from "wisp/scripts/wisp/gameFiles";
 import { SourceErrors } from "wisp/scripts/wisp/sourceErrors";
+import { bundleConfig } from "./bundleConfigs";
 import { type Profile, profiles } from "./profiles";
 
 export const tsDirectory = join(import.meta.dir, "../..");
@@ -14,32 +15,14 @@ export const sourceMapDirectory = join(tsDirectory, "build/source-maps");
 
 
 export const sceneProfiles: ReadonlySet<Profile> = new Set<Profile>(["main", "integrity", "pause-probe"]);
-const profileConfigs: Readonly<Record<Profile, string>> = {
-  main: "tsconfig.map.json",
-  integrity: "tsconfig.integrity.json",
-  "pause-probe": "tsconfig.pause-probe.json",
-  playable: "tsconfig.playable.json",
-  "soak-playable": "tsconfig.soak-playable.json",
-  "soak-integrity": "tsconfig.soak-integrity.json",
-  "native-input": "tsconfig.native-input.json",
-  "native-driver": "tsconfig.native-driver.json",
-  "native-capture": "tsconfig.native-capture.json",
-  "analog-keys": "tsconfig.analog-keys.json",
-  "analog-cursor": "tsconfig.analog-cursor.json",
-  "native-perf": "tsconfig.native-perf.json",
-  "physics-probe": "tsconfig.physics-probe.json",
-  "frame-cost": "tsconfig.frame-cost.json",
-  "stack-trace": "tsconfig.stack-trace.json",
-  "damage-blend-probe": "tsconfig.damage-blend-probe.json",
-};
-const profileConfig = (profile: Profile) => join(tsDirectory, profileConfigs[profile]);
+const profileConfig = (profile: Profile) => profile === "main" ? join(tsDirectory, "tsconfig.map.json") : bundleConfig(profile);
 
 export const buildProject = (profile: Profile = "main"): BuildProject => ({
   projectRoot,
   configPath: profileConfig(profile),
   bundlePath: join(tsDirectory, profile === "main" ? "build/map.lua" : `build/${profile}.lua`),
   compileInputs: [join(tsDirectory, "src"), join(tsDirectory, "node_modules/wisp/src"), join(tsDirectory, "node_modules/wisp/plugins"), join(tsDirectory, "plugins"), join(tsDirectory, "wisp.lock"),
-    ...profiles.map(profileConfig), join(tsDirectory, "tsconfig.json")],
+    join(tsDirectory, "tsconfig.map.json"), join(tsDirectory, "tsconfig.lua.json"), join(import.meta.dir, "bundleConfigs.ts"), join(tsDirectory, "tsconfig.json")],
   packager: join(projectRoot, "build/tools/map-pack"),
   toolchainLockPath: join(projectRoot, "typescript-toolchain.lock"),
   packageDirectory: tsDirectory,
