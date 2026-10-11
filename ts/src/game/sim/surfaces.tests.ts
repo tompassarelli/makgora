@@ -92,7 +92,7 @@ function mainDeckWorldX(referenceX: number): number {
     : f32(surfaceLeft(0, 0, 0) + f32(f32(referenceX + REFERENCE_LEDGE_X) * WORLD_UNITS_PER_MELEE_UNIT));
 }
 
-test("each shipped stage's main deck has Final Destination's side walls and underside below its ledges [k4 reference melee]", () => {
+test("each shipped stage's main deck has Final Destination's side walls and underside below its ledges [k4 reference docs/physics.md#main-deck-walls-and-underside]", () => {
   for (const stage of [0, 1]) {
     assertEquals(solidSurfaceCount(stage), REFERENCE_BODY.length);
     assertEquals(MAIN_DECK_BODY_SURFACES, REFERENCE_BODY.length);
@@ -116,7 +116,7 @@ test("each shipped stage's main deck has Final Destination's side walls and unde
   assertEquals(solidSurfaceAt(0, FLAT_UNDERSIDE).startZ, -332.3291931152344);
 });
 
-test("the retail surface threshold reflects the combined velocity at the playable wall and reports the contact [k4 reference melee]", () => {
+test("the retail surface threshold reflects the combined velocity at the playable wall and reports the contact [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
   const fighter = surfaceTumbler(false);
   fighter.motion.vx = -2.0;
   fighter.launch.knockbackX = 12.0;
@@ -134,7 +134,7 @@ test("the retail surface threshold reflects the combined velocity at the playabl
   assertEquals(fighter.facing, -1);
 });
 
-test("a retail surface rebound uses a strict one-unit knockback gate [k4 reference melee]", () => {
+test("a retail surface rebound uses a strict one-unit knockback gate [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
   const fighter = surfaceTumbler(false);
   fighter.launch.knockbackX = f32(SURFACE_REFLECT_SPEED_THRESHOLD + 0.3050000071525574);
   advanceSolo(fighter, SOLID_DECK_TEST_STAGE, controls(), 0.0);
@@ -143,7 +143,7 @@ test("a retail surface rebound uses a strict one-unit knockback gate [k4 referen
   assertNear(fighter.launch.knockbackX, 0.0, 0.00009999999747378752);
 });
 
-test("a retail get-up's completion allows input on its animation end tick [k4 reference melee]", () => {
+test("a retail get-up's completion allows input on its animation end tick [k4 reference docs/smash-melee-reference/surface-action-boundaries.md#getup-roll-and-attack-completion]", () => {
   for (const character of [Character.sylvanas, Character.rifleman]) {
     for (let recovery = 0; recovery <= 2; recovery++) {
       const fighter = createReferenceFighter(character, 0.0, 1);
@@ -172,7 +172,7 @@ test("a retail get-up's completion allows input on its animation end tick [k4 re
   }
 });
 
-test("a retail wall tech uses the separate original fighter surface profile [k4 reference melee]", () => {
+test("a retail wall tech uses the separate original fighter surface profile [k4 reference docs/smash-melee-reference/wall-tech-rules.md#wall-tech]", () => {
   const fighter = techingTumbler(false, 8.0);
   const input = controls();
   fighter.tuning.surface = MELEE_CAPTAIN_FALCON_SURFACE_RECOVERY_PHYSICS;
@@ -212,7 +212,7 @@ test("a retail wall tech uses the separate original fighter surface profile [k4 
   assertTrue(fighter.surfaceRecovery.velocityApplied);
 });
 
-test("a retail wall tech's jump input age expires at the twenty-frame boundary [k4 reference melee]", () => {
+test("a retail wall tech's jump input age expires at the twenty-frame boundary [k4 reference docs/smash-melee-reference/wall-tech-rules.md#wall-tech]", () => {
   const fighter = techingTumbler(false, 8.0);
   fighter.tuning.surface = MELEE_CAPTAIN_FALCON_SURFACE_RECOVERY_PHYSICS;
   fighter.jump.inputAge = WALL_TECH_JUMP_INPUT_WINDOW_FRAMES - 1;
@@ -225,7 +225,7 @@ test("a retail wall tech's jump input age expires at the twenty-frame boundary [
   assertNear(fighter.motion.vx, -2.880000114440918, 0.0010000000474974513);
 });
 
-test("each earlier wall jump since landing lowers a wall jump's rise, and landing resets the count [k4 reference melee]", () => {
+test("each earlier wall jump since landing lowers a wall jump's rise, and landing resets the count [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
   for (const earlier of [0, 2]) {
     const fighter = createReferenceFighter(Character.sylvanas, f32(RAISED_WALL_CONTACT_X - 4.0), 1);
     fighter.motion.grounded = false;
@@ -249,7 +249,7 @@ test("each earlier wall jump since landing lowers a wall jump's rise, and landin
   }
 });
 
-test("a retail landing caps ground knockback at the decoded common value [k4 reference melee]", () => {
+test("a retail landing caps ground knockback at the decoded common value [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
   const fighter = createReferenceFighter(Character.sylvanas, 0.0, 1);
   fighter.motion.grounded = false;
   fighter.motion.z = 10.0;
@@ -263,7 +263,7 @@ test("a retail landing caps ground knockback at the decoded common value [k4 ref
   assertNear(MAX_GROUNDED_KNOCKBACK_ON_LANDING, 49.80000305175781, 0.000009999999747378752);
 });
 
-test("a retail ceiling tech protects until its one-shot actor impulse [k4 reference melee]", () => {
+test("a retail ceiling tech protects until its one-shot actor impulse [k4 reference docs/smash-melee-reference/retail-ceiling-tech-events.json]", () => {
   for (const impulseFrame of [14, 11]) {
     const fighter = techingTumbler(true, 8.0);
     fighter.tuning.surface = MELEE_CAPTAIN_FALCON_SURFACE_RECOVERY_PHYSICS;
@@ -295,7 +295,7 @@ test("a retail ceiling tech protects until its one-shot actor impulse [k4 refere
   }
 });
 
-test("shared recovery values match the decoded common table [k4 reference melee]", () => {
+test("shared recovery values match the decoded common table [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
   assertEquals(TECH_WINDOW_FRAMES, 20);
   assertEquals(TECH_REPEAT_MINIMUM_AGE_FRAMES, 40);
   assertEquals(DOWN_WAIT_FRAMES, 220);

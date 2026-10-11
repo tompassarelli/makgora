@@ -37,7 +37,7 @@ function catchesAfterMovement(character: Character, side: number, outsideBefore:
   return fighter.ledge.state === LedgeState.hang;
 }
 
-test("each fighter catches with its reference fighter's NTSC 1.02 ledge snap data [k4 reference melee]", () => {
+test("each fighter catches with its reference fighter's NTSC 1.02 ledge snap data [k4 reference docs/physics.md#outer-ledge-recovery]", () => {
   // Ledge box ftData x44: Melee/Melee = 11,13,9; Melee = 9,17,11 (ftData_x44_t).
 
   const references = [
@@ -65,7 +65,7 @@ test("each fighter catches with its reference fighter's NTSC 1.02 ledge snap dat
   assertEquals(ledgeCatchBox(Character.demonHunter).highest, 135.0);
 });
 
-test("the catch box's edges are strict for every fighter and side [k4 reference melee]", () => {
+test("the catch box's edges are strict for every fighter and side [k4 reference docs/physics.md#outer-ledge-recovery]", () => {
   for (const character of [Character.sylvanas, Character.rifleman, Character.demonHunter]) {
     const { reach, lowest, highest } = ledgeCatchBox(character);
     const middle = f32(f32(lowest + highest) * 0.5);
@@ -84,7 +84,7 @@ test("the catch box's edges are strict for every fighter and side [k4 reference 
   }
 });
 
-test("the catch box sweeps the frame's movement, and only a downward movement catches [k4 reference melee]", () => {
+test("the catch box sweeps the frame's movement, and only a downward movement catches [k4 reference docs/physics.md#outer-ledge-recovery]", () => {
   for (const character of [Character.sylvanas, Character.rifleman, Character.demonHunter]) {
     const { reach, lowest, highest } = ledgeCatchBox(character);
     const middle = f32(f32(lowest + highest) * 0.5);
@@ -100,7 +100,7 @@ test("the catch box sweeps the frame's movement, and only a downward movement ca
   }
 });
 
-test("falling, running up specials, helpless, post-dodge and tumbling fighters catch; other specials, aerials, air dodges and hitstun don't [k4 reference melee]", () => {
+test("falling, running up specials, helpless, post-dodge and tumbling fighters catch; other specials, aerials, air dodges and hitstun don't [k4 reference docs/physics.md#outer-ledge-recovery]", () => {
   for (const character of [Character.sylvanas, Character.rifleman, Character.demonHunter]) {
     const states: readonly (readonly [boolean, (f: Fighter) => void])[] = [
       [true, () => undefined],
@@ -142,7 +142,7 @@ test("falling, running up specials, helpless, post-dodge and tumbling fighters c
   }
 });
 
-test("only a full down passes ledges; a slight downward tilt still catches [k4 reference melee-decomp]", () => {
+test("only a full down passes ledges; a slight downward tilt still catches [k4 reference docs/physics.md#outer-ledge-recovery]", () => {
   // Melee refuses ledge catches at stick y -0.66.
 
   const fighter = ledgeTestFighter(Character.sylvanas, -1);
@@ -169,7 +169,7 @@ test("ledge contention uses distance, not argument order, and the owner hogs [k3
   }
 });
 
-test("the ledge release regrab cooldown expires after thirty unfrozen ticks [k4 reference melee]", () => {
+test("the ledge release regrab cooldown expires after thirty unfrozen ticks [k4 reference docs/smash-melee-reference/retail-roster.json]", () => {
   const fighter = ledgeTestFighter(Character.sylvanas, -1);
   const input = controls();
   catchTestLedge(fighter, input);
