@@ -9,8 +9,8 @@ import { DEMONHUNTER_GLIDE_SLASH_FIRST, DEMONHUNTER_GLIDE_SLASH_LAST, DEMONHUNTE
 
 
 const NEUTRAL_FLARE: Cue = { model: "Abilities\\Weapons\\FlyingMachine\\FlyingMachineImpact.mdx", anchor: "body", scale: 0.5, sequence: "stand", seconds: f32(0.3), timeScale: 0.0 };
-const FIRE_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedDamage.mdx", seconds: f32(0.2), birth: { eachFrame: false } };
-const FROST_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Other\\FrostDamage\\FrostDamage.mdx" };
+const FIRE_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedDamage.mdx", seconds: f32(0.2), timeScale: 1.0, birth: { eachFrame: false } };
+const FROST_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Other\\FrostDamage\\FrostDamage.mdx", seconds: f32(0.1), timeScale: 1.0, birth: { eachFrame: false } };
 const HOLY_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx" };
 
 export const DISJOINT_CUES: { readonly [character: number]: Cue } = {
@@ -28,7 +28,7 @@ export const DISJOINT_CUES: { readonly [character: number]: Cue } = {
   [Character.lichKing]: FROST_FLARE,
   [Character.chen]: FIRE_FLARE,
   [Character.kaelthas]: FIRE_FLARE,
-  [Character.kobold]: { ...FIRE_FLARE, timeScale: 1.0 },
+  [Character.kobold]: FIRE_FLARE,
   [Character.thrall]: NEUTRAL_FLARE,
   [Character.jaina]: FROST_FLARE,
   [Character.sylvanas]: NEUTRAL_FLARE,

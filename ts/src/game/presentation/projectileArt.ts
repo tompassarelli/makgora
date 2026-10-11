@@ -113,6 +113,8 @@ export const PROJECTILE_DRAW_CUES: { readonly [model: string]: { readonly scale:
   "Abilities\\Spells\\NightElf\\ShadowStrike\\ShadowStrikeMissile.mdx": { scale: 1.0, birth: { eachFrame: true } },
   "Abilities\\Spells\\Human\\ManaFlare\\ManaFlareTarget.mdx": { scale: 1.0, birth: { eachFrame: false } },
   "Abilities\\Weapons\\FlyingMachine\\FlyingMachineMissile.mdx": { scale: 1.0, birth: { eachFrame: false } },
+  "Abilities\\Spells\\Other\\Stampede\\StampedeMissileDeath.mdx": { scale: 1.0, birth: { eachFrame: false } },
+  "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx": { scale: 1.0, birth: { eachFrame: false } },
 };
 
 export const PROJECTILE_DRAW_OFFSETS: { readonly [model: string]: { readonly x: number; readonly z: number; readonly sequence?: string | undefined; readonly seconds?: number | undefined; readonly width?: number | undefined; readonly height?: number | undefined; readonly fill?: readonly { readonly x: number; readonly z: number }[] | undefined } | undefined } = {
