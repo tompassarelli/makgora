@@ -1,6 +1,6 @@
 import { f32 } from "wisp/src/sim/f32";
 import { imod } from "wisp/src/sim/intMath";
-import { type Character, DownState, LedgeState, ShieldBreak, SurfaceContact } from "../sim/codes";
+import { Character, DownState, LedgeState, ShieldBreak, SurfaceContact } from "../sim/codes";
 import { attackStartup, isFloorTeching, isGroundDodging, isTumbling } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
 import { HitElement } from "../sim/hitRegions";
@@ -349,7 +349,8 @@ export function finishImpactEventsAfter(events: ImpactEvents, fighter: Readonly<
     events.pummel = false;
     events.strength = 0;
     events.tier = 0;
-    events.hitMove = -1;
+    events.hitCharacter = Character.rifleman;
+    events.hitMove = specialMove(specialSlot(SpecialAction.riflemanTrap));
   }
 
   const { style } = attack;
