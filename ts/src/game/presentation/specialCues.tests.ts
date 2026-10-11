@@ -10,9 +10,14 @@ import { SPECIAL_SLOTS } from "./projectileArt";
 import { RIFLEMAN_BLASTER_AIR_SHOT_FRAME, RIFLEMAN_BLASTER_GROUND_SHOT_FRAME } from "../sim/moves";
 import { RIFLEMAN_SECOND_SHOT_FIRST, RIFLEMAN_SECOND_SHOT_FORM, RIFLEMAN_SECOND_SHOT_LAST } from "../sim/specials";
 import { HERO_BRANCH_CUES, HERO_CUES, ORIGINAL_CUES, fighterBranchCues, fighterMoveCues, heroCueWindows, specialCueState } from "./specialCues";
+import { FROST_TRAP_MODEL } from "../assets/frostAssetInfo";
 
 
 const FIGHTERS: readonly Character[] = [Character.rifleman, Character.demonHunter, ...HERO_ROSTER.map(({ character }) => character)];
+const SIGNATURE_CUE_OWNERS: readonly { readonly model: string; readonly owner: Character; readonly sharedWith: readonly Character[] }[] = [
+  { model: "Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget.mdx", owner: Character.jaina, sharedWith: [] },
+  { model: FROST_TRAP_MODEL, owner: Character.rifleman, sharedWith: [] },
+];
 
 
 function forms(special: AuthoredSpecial | undefined, into: AuthoredSpecial[]): void {
@@ -21,12 +26,18 @@ function forms(special: AuthoredSpecial | undefined, into: AuthoredSpecial[]): v
   for (const followUp of special.followUps ?? []) forms(followUp.special, into);
 }
 
-test("no two moves or branches show the same startup and active pair, nor the same active spell [k3 measure #144]", () => {
+test("no two moves or branches show the same startup and active pair, nor the same active spell, and signature cues stay with their owners [k3 measure #144]", () => {
   const pairs = new Map<string, string>();
   const actives = new Map<string, string>();
   for (const character of FIGHTERS) {
     [...fighterMoveCues(character), ...fighterBranchCues(character)].forEach((move, slot) => {
       const id = `${character}:${slot} ${move.spell}`;
+      for (const phase of [move.startup, move.active]) {
+        for (const cue of [phase, phase.definitive ?? phase]) {
+          const signature = SIGNATURE_CUE_OWNERS.find(({ model }) => model === cue.model);
+          if (signature !== undefined) assertTrue(character === signature.owner || signature.sharedWith.includes(character), `${id} signature ${cue.model}`);
+        }
+      }
       const pair = `${move.startup.model}|${move.active.model}`;
       assertEquals(pairs.get(pair), undefined, `${id} pair`);
       pairs.set(pair, id);
