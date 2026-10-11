@@ -51,7 +51,7 @@ const SAME_HIT_FRAMES = 2;
 const DRAWN_FRAMES = 64;
 
 
-export function fighterModel(character: number): string {
+function fighterModel(character: number): string {
   const hero = heroDefinition(character);
   if (hero !== undefined) return hero.presentation.model;
   return character === Character.rifleman ? RIFLEMAN_MODEL_FILE : DEMON_HUNTER_MODEL_FILE;

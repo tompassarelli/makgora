@@ -9,11 +9,11 @@ import { HandleCensus } from "./handleCensus";
 import { smashcraftNativeBehavior } from "./headlessNatives";
 
 /** Live Warcraft handles of each kind on one client, sorted by kind. */
-export type HandleCounts = readonly (readonly [string, number])[];
+type HandleCounts = readonly (readonly [string, number])[];
 
 export const BASELINE_LINEUP: readonly Character[] = [Character.demonHunter, Character.rifleman, Character.warden, Character.demonHunter];
 
-export const BASELINE_STAGE = 2;
+const BASELINE_STAGE = 2;
 
 /** The graphics mode a client reports: Definitive is the first-class look, Classic the fallback. */
 export type Look = "classic" | "definitive";

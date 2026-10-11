@@ -16,9 +16,9 @@ import { melee } from "./tuning";
 
 const SDI_PULSE_TRAVEL = 6;
 const ASDI_TRAVEL = 3;
-export const SDI_STEP_TRAVEL = 3;
+const SDI_STEP_TRAVEL = 3;
 
-export const SDI_HIT_TRAVEL = 9;
+const SDI_HIT_TRAVEL = 9;
 export const HIT_TRAVEL = SDI_HIT_TRAVEL + ASDI_TRAVEL;
 
 export const STRING_TRAVEL = 24;

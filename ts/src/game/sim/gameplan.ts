@@ -94,20 +94,3 @@ export interface FighterGameplan {
   readonly recovery: RecoveryRoute;
   readonly avoid: readonly GameplanSituation[];
 }
-
-
-function gameplanKeyMoves(plan: Readonly<FighterGameplan>): GameplanMove[] {
-  const moves: GameplanMove[] = [];
-  const add = (move: GameplanMove) => {
-    for (const known of moves) if (known === move) return;
-    moves.push(move);
-  };
-  for (const spaced of plan.spacing) add(spaced.move);
-  for (const option of plan.approach) for (const move of option.moves) add(move);
-  for (const route of plan.combos) {
-    add(route.starter);
-    for (const move of route.followUps) add(move);
-  }
-  for (const kill of plan.kills) add(kill.move);
-  return moves;
-}

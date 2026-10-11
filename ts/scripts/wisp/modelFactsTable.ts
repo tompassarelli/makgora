@@ -15,7 +15,7 @@ export function roundedFacts(facts: ModelFacts): ModelFacts {
 }
 
 /** The shard holding one model: its path made file-safe, plus a hash of the exact path so names differing only by case stay apart. */
-export const modelFactsFile = (model: string) =>
+const modelFactsFile = (model: string) =>
   `${model.replace(/[^A-Za-z0-9._-]+/g, "_")}.${new Bun.CryptoHasher("sha256").update(model).digest("hex").slice(0, 8)}.json`;
 
 export function readModelFacts(directory = MODEL_FACTS_DIRECTORY): Record<string, ModelFacts> {

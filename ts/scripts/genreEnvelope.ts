@@ -26,7 +26,7 @@ const NORMAL_CLASSES: Readonly<Record<string, MoveClass>> = {
   grab: "grab", shot: "special",
 };
 
-export function classify(move: string): { readonly moveClass: MoveClass; readonly tier: Tier } | undefined {
+function classify(move: string): { readonly moveClass: MoveClass; readonly tier: Tier } | undefined {
   const [head, ...rest] = move.split(".");
   if (head === "normal") {
     const moveClass = NORMAL_CLASSES[rest[0] ?? ""];
@@ -74,7 +74,7 @@ export function buildEnvelope(samples: readonly Sample[], fixed: readonly { read
   return envelope;
 }
 
-export function allowance(field: Field, range: Range, tier: Tier, tolerances: Tolerances): number {
+function allowance(field: Field, range: Range, tier: Tier, tolerances: Tolerances): number {
   const tolerance = tier === "ex" ? tolerances.ex : tier === "special" ? tolerances.special : tolerances;
   if (field === "shieldAdvantage") return tolerance.shieldAdvantage;
   if (field === "killPercent") return tolerance.killPercentShare * Math.max(Math.abs(range.low), Math.abs(range.high));
@@ -109,7 +109,7 @@ export function outliers(rows: readonly MoveRow[], envelope: Envelope, tolerance
   return found.sort((a, b) => b.distance - a.distance || a.fighter.localeCompare(b.fighter) || a.move.localeCompare(b.move));
 }
 
-export const FRAME_FIELDS = ["startup", "active", "endLag", "landingLag", "total"] as const;
+const FRAME_FIELDS = ["startup", "active", "endLag", "landingLag", "total"] as const;
 export interface EnvelopeExemption { readonly fighter: string; readonly move: string; readonly field: (typeof FRAME_FIELDS)[number]; readonly reason: string; readonly doc: string }
 
 export function parseEnvelopeExemptions(text: string, doc: string): EnvelopeExemption[] {

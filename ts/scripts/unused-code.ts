@@ -21,8 +21,8 @@ const sources = projectFiles.filter((file) => file.endsWith(".ts")).map((file) =
 // Hooks have no extension, so the compiler reads each one under a `.ts` alias.
 const hooks = new Map(tracked.filter((file) => file.startsWith(".githooks/")).map((file) => [join(repository, `${file}.ts`), join(repository, file)]));
 const consumers = [...tracked.filter((file) => file.startsWith("tools/") && file.endsWith(".ts")).map((file) => join(repository, file)), ...hooks.keys()];
-// Recorded pads, corpus runs and fixtures are test data that tests and tools open by directory.
-const fixture = (file: string): boolean => /^ts\/test\/(native\/(pads|captures)|corpus|fixtures)\//.test(file);
+// Recorded pads, corpus runs, fixtures and measured model facts are data that tests and tools open by directory.
+const fixture = (file: string): boolean => /^ts\/(test\/(native\/(pads|captures)|corpus|fixtures)|scripts\/wisp\/model-facts)\//.test(file);
 
 const conventional = new Set([".gitignore", "bunfig.toml", "package.json", "bun.lock", "README.md", "AGENTS.md"]);
 

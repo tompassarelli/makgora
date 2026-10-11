@@ -1,15 +1,10 @@
-export const TEST_SLOTS = 2;
-export const TRAIN_CAP = 4;
+const TEST_SLOTS = 2;
+const TRAIN_CAP = 4;
 
 export interface Status { readonly state: string; readonly description: string; readonly at: string }
 export interface Lane { readonly branch: string; readonly tip: string; readonly status: Status | null; readonly labels?: readonly string[] }
 export interface Run { readonly title: string; readonly status: string }
-
-export const QUEUED = "queued";
-export const WAITING = "waiting to test alone";
-export const TRAIN_TITLE = "Autoland train";
-export const testTitle = (slot: number, branch: string, tip: string): string => `Autoland test ${slot} ${branch} ${tip}`;
-export const passedDescription = (base: string, tree: string): string => `passed alone on ${base} as tree ${tree}`;
+const TRAIN_TITLE = "Autoland train";
 
 const TEST_TITLE = /^Autoland test (\d+) (\S+) ([0-9a-f]{40})$/;
 const PASSED = /^passed alone on ([0-9a-f]{40}) as tree ([0-9a-f]{40})$/;
@@ -18,12 +13,12 @@ const LEGACY_TITLE = /^Autoland (claude\/\S+(?: claude\/\S+)*)$/;
 
 type LaneState = "test" | "testing" | "passed" | "held" | "done";
 
-export function passedAlone(lane: Lane): { readonly base: string; readonly tree: string } | undefined {
+function passedAlone(lane: Lane): { readonly base: string; readonly tree: string } | undefined {
   const [, base, tree] = (lane.status?.state === "pending" ? PASSED.exec(lane.status.description) : null) ?? [];
   return base === undefined || tree === undefined ? undefined : { base, tree };
 }
 
-export function laneState(lane: Lane, runs: readonly Run[], retry: ReadonlySet<string> = new Set()): LaneState {
+function laneState(lane: Lane, runs: readonly Run[], retry: ReadonlySet<string> = new Set()): LaneState {
   if (lane.status !== null && lane.status.state !== "pending") return retry.has(lane.branch) ? "test" : "done";
   if (passedAlone(lane) !== undefined) return "passed";
   if (runs.some((run) => { const match = TEST_TITLE.exec(run.title); return run.status !== "completed" && match?.[2] === lane.branch && match[3] === lane.tip; })) return "testing";

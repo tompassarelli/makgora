@@ -14,7 +14,7 @@ import { loreBattle, loreResultHelp, loreResultMessage } from "../classic/loreBa
 
 export type StartControl = "Start" | "Y";
 
-export function fighterLabel(game: Readonly<MatchState>, slot: number): string {
+function fighterLabel(game: Readonly<MatchState>, slot: number): string {
   return humanFighterActive(game, slot) ? `Player ${slot + 1}` : "Computer";
 }
 

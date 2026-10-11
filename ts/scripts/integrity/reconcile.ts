@@ -295,7 +295,7 @@ function sameModes(changes: readonly SlotMode[], expected: readonly (readonly [n
 
 
 /** What integrityResult measures from a capture, before verdict judges it. */
-export interface Observations {
+interface Observations {
   readonly failures: string[];
   readonly injected: [number, number];
   readonly presses: [number, number];
@@ -322,7 +322,7 @@ export interface Observations {
   readonly sameFrameTaps: [number, number];
 }
 
-export const emptyObservations = (): Observations => ({
+const emptyObservations = (): Observations => ({
   failures: [], injected: [0, 0], presses: [0, 0], lost: 0, duplicated: 0, reordered: 0, stuck: 0, correct: 0, total: 0,
   localDelays: [], heldDelays: [], opponentLateness: [], rollbackDepths: [], stallLengths: [], localStarts: [], mismatchedEdges: [],
   missingLocal: 0, heldMissing: 0, illegalPresses: 0, legalPresses: 0, rollbackLimits: new Set(), endpoints: new Map(),
@@ -600,7 +600,7 @@ function checkJourney(evidence: CaptureEvidence, journey: readonly JourneyEvent[
 }
 
 /** Judges a capture's observations: the four gates, the commanded rollback window and the result. Pure. */
-export function verdict(seen: Observations, metadata: Pick<CaptureMetadata, "scope" | "build" | "fourFighters" | "helperSha256">, pair: EpochPair, playerViewFailures: readonly string[], window?: number): IntegrityResult {
+function verdict(seen: Observations, metadata: Pick<CaptureMetadata, "scope" | "build" | "fourFighters" | "helperSha256">, pair: EpochPair, playerViewFailures: readonly string[], window?: number): IntegrityResult {
   const { localDelays, endpoints, rollbackLimits } = seen;
   const failures = [...seen.failures];
   const gates = {

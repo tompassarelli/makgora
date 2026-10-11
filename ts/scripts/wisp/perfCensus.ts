@@ -84,7 +84,7 @@ function censusRuns(output: string) {
   return runs;
 }
 
-export function censusPairs(output: string): PairWorst[] {
+function censusPairs(output: string): PairWorst[] {
   return censusRuns(output).flatMap(({ frames, marks }) => {
     const fighter = marks[0]?.[1];
     if (fighter === undefined || fighter === "stage") return [];

@@ -164,7 +164,7 @@ function originalSpecialMeasures(character: Character): Readonly<Record<string, 
   return rows;
 }
 
-export function fighterRows(character: Character, framesOnly = false): MoveRow[] {
+function fighterRows(character: Character, framesOnly = false): MoveRow[] {
   const fighter = fighterSlug(character);
   const tuning = authoredTuning(character);
   const feel = framesOnly ? {} : currentFeel(character);

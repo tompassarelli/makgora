@@ -25,7 +25,7 @@ export interface Observation {
 }
 
 /** A recorded string: per hit the move, the attacker's move instance and the damage; gaps[i] is the victim's actionable frames between hit i and i + 1; start is the victim's percent before the first hit. */
-export interface Combo {
+interface Combo {
   readonly victim: number;
   readonly frame: number;
   readonly start: number;
@@ -42,7 +42,7 @@ interface Segment {
   readonly percent: number;
 }
 
-function trueSegments(combo: Combo): Segment[] {
+export function trueSegments(combo: Combo): Segment[] {
   const segments: Segment[] = [];
   let moves: string[] = [];
   let damage = 0;

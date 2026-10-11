@@ -78,7 +78,7 @@ export function arenaFraming(stage: number, left: number, right: number, bottom:
   return { x: camera.x, z: camera.z, distance: camera.distance, fieldOfView: cameraFieldOfView(camera, MATCH_CAMERA_ASPECT) };
 }
 
-export const RESULTS_CAMERA_FRAMES = 30;
+const RESULTS_CAMERA_FRAMES = 30;
 
 export function resultFighterPlacement(stage: number, index: number, count: number): { readonly x: number; readonly z: number } {
   const centre = (mainDeckLeft(stage) + mainDeckRight(stage)) / 2.0;

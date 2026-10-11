@@ -3,7 +3,6 @@
 // measurements read only simulation state, so the same seeds measure any
 // computer: how often a fighter edge-cancels a lag it began by the ledge the
 // opponent stands at, and how long the cornered fighter stays in the band.
-export { CORNER_BAND } from "./botCorner";
 import { f32 } from "wisp/src/sim/f32";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { at } from "wisp/src/runtime/lookup";

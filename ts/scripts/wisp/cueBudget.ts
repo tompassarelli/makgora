@@ -107,7 +107,7 @@ interface CueModelPixels {
   readonly popcornPresence: readonly CuePopcornPresence[];
 }
 
-export interface CuePopcornPresence {
+interface CuePopcornPresence {
   readonly frame: number;
   readonly emitters: readonly PopcornEmitterPose[];
 }
@@ -121,13 +121,13 @@ const emitterReport = Schema.Struct({
   })),
 });
 
-export function visiblePopcornEmitters(report: typeof emitterReport.Type, model?: string): readonly PopcornEmitterPose[] {
+function visiblePopcornEmitters(report: typeof emitterReport.Type, model?: string): readonly PopcornEmitterPose[] {
   return report.unsupportedEmitters.filter(emitter => emitter.kind === "popcorn" && emitter.visible
     && (model === undefined || emitter.model.replaceAll("\\", "/").toLowerCase().replace(/\.mdl$/, ".mdx") === model.replaceAll("\\", "/").toLowerCase().replace(/\.mdl$/, ".mdx"))
     && emitter.position.every(Number.isFinite) && emitter.scale.every(value => Number.isFinite(value) && value > 0));
 }
 
-export const cuePopcornPresence = (path: string, frame: number, model?: string) => Effect.gen(function*() {
+const cuePopcornPresence = (path: string, frame: number, model?: string) => Effect.gen(function*() {
   const report = yield* Effect.promise(() => Bun.file(path).text()).pipe(Effect.flatMap(Schema.decodeUnknownEffect(Schema.fromJsonString(emitterReport))));
   return { frame, emitters: visiblePopcornEmitters(report, model) };
 });
@@ -504,7 +504,7 @@ function drawnPixels(empty: Uint8Array, frame: Uint8Array): { readonly share: nu
 }
 
 /** The models of the effects that put pixels on screen: shown, scaled and not flat. A parked effect is scale 0 under the floor. */
-export function drawnModels(effects: readonly Pick<DrawnPose, "model" | "alpha" | "scale" | "flat">[]): string[] {
+function drawnModels(effects: readonly Pick<DrawnPose, "model" | "alpha" | "scale" | "flat">[]): string[] {
   return effects.filter(({ alpha, scale, flat }) => alpha > 0 && scale > 0 && !flat).map(({ model }) => model.split("\\").at(-1) ?? model);
 }
 

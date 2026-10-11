@@ -209,25 +209,3 @@ export function composePreview(cards: (file: string) => Rgba): Rgba {
   for (let i = 0; i < canvas.length; i++) data[i] = Math.round(clamp01((canvas[i] ?? 0)) * 255);
   return { width: PREVIEW_SIZE, height: PREVIEW_SIZE, data, alpha: true };
 }
-
-
-function encodeTga(image: Rgba): Uint8Array {
-  const out = new Uint8Array(18 + image.width * image.height * 4);
-  const view = new DataView(out.buffer);
-  out[2] = 2;
-  view.setUint16(12, image.width, true);
-  view.setUint16(14, image.height, true);
-  out[16] = 32;
-  out[17] = 8;
-  for (let y = 0; y < image.height; y++) {
-    const row = 18 + (image.height - 1 - y) * image.width * 4;
-    for (let x = 0; x < image.width; x++) {
-      const from = (y * image.width + x) * 4, to = row + x * 4;
-      out[to] = (image.data[from + 2] ?? 0);
-      out[to + 1] = (image.data[from + 1] ?? 0);
-      out[to + 2] = (image.data[from] ?? 0);
-      out[to + 3] = (image.data[from + 3] ?? 0);
-    }
-  }
-  return out;
-}
