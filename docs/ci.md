@@ -66,7 +66,9 @@ use `farm-big`, preserving the background pool. The `farm-runner` dispatch
 input measures an alternative box for even Bun/Lua jobs on the first attempt;
 retries ignore that override and select the plan's hosted output directly, including
 when the original plan job's outputs are reused. No repository variable
-controls runner placement. Delete obsolete runner variables only after these
+controls runner placement. Farm and background planners read the workflow
+revision's file, so measuring an older commit or bisecting a failing shard
+does not depend on that old source containing current routing policy. Delete obsolete runner variables only after these
 workflow versions are live on main.
 
 The local `ts/scripts/jobWatchdog.ts` command observes only `autoland.yml` and

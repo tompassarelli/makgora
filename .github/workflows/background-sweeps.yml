@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.ref || github.sha }}
+          ref: ${{ github.sha }}
       - id: route
         run: |
           runner=$(jq -er '.background | select(type == "string" and length > 0)' ts/runner-routing.json)

@@ -75,7 +75,8 @@ jobs:
         env:
           FARM: ${{ github.event_name != 'pull_request' && github.event_name != 'pull_request_target' && github.run_attempt == 1 && inputs.farm-runner || '' }}
         run: |
-          HOSTED=$(jq -er '.premerge | select(type == "string" and length > 0)' runner-routing.json)
+          git -c gc.auto=0 fetch -q --depth 1 origin "$GITHUB_SHA"
+          HOSTED=$(git show "$GITHUB_SHA:ts/runner-routing.json" | jq -er '.premerge | select(type == "string" and length > 0)')
           echo "hosted-runner=$HOSTED" >> "$GITHUB_OUTPUT"
           pool() { jq -c -n --arg farm "$FARM" --arg hosted "$HOSTED" "[range($1) | if \$farm != \"\" and . % 2 == 0 then \$farm else \$hosted end]"; }
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"

@@ -93,7 +93,7 @@ jobs:
           PER_PAIR: ${{ inputs.per-pair }}
           PROBE: ${{ inputs.probe }}
         run: |
-          background=$(jq -er '.background | select(type == "string" and length > 0)' runner-routing.json)
+          background=$(git show "$GITHUB_SHA:ts/runner-routing.json" | jq -er '.background | select(type == "string" and length > 0)')
           echo "background-runner=$background" >> "$GITHUB_OUTPUT"
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           bun scripts/farmGuard.ts --per-pair "$PER_PAIR" --probe "$PROBE" >> "$GITHUB_OUTPUT"
