@@ -69,6 +69,7 @@ mod linux {
         preset: wc3_controller::model::PadPreset,
         tap_jump: bool,
         triggers: wc3_controller::model::TriggerShields,
+        right_stick: wc3_controller::model::RightStick,
         sources: u32,
         x: i16,
         y: i16,
@@ -97,6 +98,7 @@ mod linux {
         preset: wc3_controller::model::PadPreset,
         tap_jump: bool,
         triggers: wc3_controller::model::TriggerShields,
+        right_stick: wc3_controller::model::RightStick,
         device: PathBuf,
         out: PathBuf,
         build: String,
@@ -1017,7 +1019,7 @@ mod linux {
     fn usage() -> &'static str {
         "wc3-journal --plugin\n\
          Smashcraft's map plug-in for wc3-controller --service --plugin wc3-journal: reports the map's sessions and names this helper.\n\
-         wc3-journal --follow-matches --build BUILD --slot N [--epoch N] [--menu-keys all|start] [--preset melee|z-jump|tom|script] [--tap-jump on|off] [--left-trigger full|light] [--right-trigger full|light] --device /dev/input/eventN --out DIR --editbox-display :N [--trace]\n\
+         wc3-journal --follow-matches --build BUILD --slot N [--epoch N] [--menu-keys all|start] [--preset melee|z-jump|tom|script] [--tap-jump on|off] [--left-trigger full|light] [--right-trigger full|light] [--right-stick smash|tilt] --device /dev/input/eventN --out DIR --editbox-display :N [--trace]\n\
          Start in character selection; stick left/right chooses, A selects, X backs, Start confirms. Follows matches and rematches.\n\
          Diagnostic only: wc3-journal --device /dev/input/eventN --out DIR --ready-file PATH --epoch-monotonic-ns NS [--mailbox-display :N | --editbox-display :N] [--first-frame N] [--stop-frame N] [--trace]\n\
          Keyboard output also requires --x11-window DECIMAL_ID --pid PID and exactly one of --niri-window ID / --private-wlr-app-id ID.\n\
@@ -1216,6 +1218,7 @@ mod linux {
                 right: wc3_controller::model::TriggerShield::parse(values.get("--right-trigger").map(String::as_str).unwrap_or("full"))?,
             },
             tap_jump: match values.get("--tap-jump").cloned().or_else(|| env::var("WC3_TAP_JUMP").ok()).as_deref().unwrap_or("off") { "on" => true, "off" => false, _ => return Err("--tap-jump needs on or off".into()) },
+            right_stick: wc3_controller::model::RightStick::parse(values.get("--right-stick").map(String::as_str).unwrap_or("smash"))?,
             preset: wc3_controller::model::PadPreset::parse(values.get("--preset").cloned().or_else(|| env::var("WC3_PAD_PRESET").ok()).as_deref().unwrap_or("melee"))?,
             device: take("--device")?.into(),
             out: take("--out")?.into(),
@@ -2302,11 +2305,11 @@ mod linux {
 
     /// The preset's buttons and triggers as journal bits, from wc3-controller's shown layout.
     fn button_bits(preset: wc3_controller::model::PadPreset) -> &'static [(u32, u32)] {
-        use wc3_controller::model::{Control, PadPreset, Press, TriggerShields, fighter_bindings_with};
+        use wc3_controller::model::{Control, PadPreset, Press, RightStick, TriggerShields, fighter_bindings_with};
         static LAYOUTS: std::sync::OnceLock<Vec<Vec<(u32, u32)>>> = std::sync::OnceLock::new();
         const PRESETS: [PadPreset; 4] = [PadPreset::Melee, PadPreset::ZJump, PadPreset::Tom, PadPreset::Script];
         let layouts = LAYOUTS.get_or_init(|| PRESETS.iter().map(|&preset| {
-            fighter_bindings_with(preset, TriggerShields::default()).into_iter().filter_map(|binding| {
+            fighter_bindings_with(preset, TriggerShields::default(), RightStick::default()).into_iter().filter_map(|binding| {
                 let source = match binding.control {
                     Control::A => 1 << 0, Control::B => 1 << 1, Control::X => 1 << 2, Control::Y => 1 << 3,
                     Control::Lb => 1 << 4, Control::Rb => 1 << 5, Control::LeftStick => 1 << 6,
@@ -2345,7 +2348,7 @@ mod linux {
             held |= MOVE_UP;
         }
         let (cx, cy) = c_stick(s.cx, s.cy);
-        if s.preset == wc3_controller::model::PadPreset::Tom && (cx != 0 || cy != 0) {
+        if s.right_stick == wc3_controller::model::RightStick::Tilt && (cx != 0 || cy != 0) {
             held |= WALK;
         }
         if cx < 0 {
@@ -2835,7 +2838,7 @@ mod linux {
         assert_eq!(held(0, -19_660), 0);
         assert_eq!(held(0, -22_937), SMASH_UP);
         assert_eq!(held(0, 22_937), SMASH_DOWN);
-        let tom = |cx, cy| action_state(State { preset: wc3_controller::model::PadPreset::Tom, cx, cy, ..State::default() });
+        let tom = |cx, cy| action_state(State { right_stick: wc3_controller::model::RightStick::Tilt, cx, cy, ..State::default() });
         assert_eq!(tom(26_500, 0), WALK | SMASH_RIGHT);
         assert_eq!(tom(22_937, 0), 0);
     }
@@ -3270,7 +3273,7 @@ mod linux {
             return Err("focus release exceeds supported frame range".into());
         }
         edges.entry(frame).or_default().released |= action_state(*state);
-        *state = State { preset: state.preset, tap_jump: state.tap_jump, triggers: state.triggers, ..State::default() };
+        *state = State { preset: state.preset, tap_jump: state.tap_jump, triggers: state.triggers, right_stick: state.right_stick, ..State::default() };
         snapshots.insert(frame, *state);
         Ok(frame)
     }
@@ -3992,8 +3995,9 @@ mod linux {
         physical.preset = o.preset;
         physical.tap_jump = o.tap_jump;
         physical.triggers = o.triggers;
+        physical.right_stick = o.right_stick;
         let mut capture_axes = axes;
-        let mut state = State { preset: o.preset, tap_jump: o.tap_jump, triggers: o.triggers, ..State::default() };
+        let mut state = State { preset: o.preset, tap_jump: o.tap_jump, triggers: o.triggers, right_stick: o.right_stick, ..State::default() };
         let identity = DeviceIdentity::of(&device);
         let labels = FaceLabels::of(device.input_id());
         let can_reconnect = identity.reconnectable()
@@ -4070,7 +4074,7 @@ mod linux {
                     stop_capture = false;
                     ended = false;
                     end_marker_sent = false;
-                    state = State { preset: o.preset, tap_jump: o.tap_jump, triggers: o.triggers, ..State::default() };
+                    state = State { preset: o.preset, tap_jump: o.tap_jump, triggers: o.triggers, right_stick: o.right_stick, ..State::default() };
                     row_state = state;
                     previous = 0;
                     edges.clear();
@@ -4153,6 +4157,7 @@ mod linux {
                             physical.preset = o.preset;
                             physical.tap_jump = o.tap_jump;
                             physical.triggers = o.triggers;
+                            physical.right_stick = o.right_stick;
                             let ns = monotonic_ns().map_err(|e| e.to_string())?;
                             capture_axes = ranges;
                             start_held = start;
@@ -4182,9 +4187,9 @@ mod linux {
                     device = None;
                     recovery.ready = false;
                     start_held = false;
-                    menu_input.observe(None, State { preset: o.preset, tap_jump: o.tap_jump, triggers: o.triggers, ..State::default() }, false, ns);
+                    menu_input.observe(None, State { preset: o.preset, tap_jump: o.tap_jump, triggers: o.triggers, right_stick: o.right_stick, ..State::default() }, false, ns);
                     if waiting_ready {
-                        focus_input.restore(State { preset: o.preset, tap_jump: o.tap_jump, triggers: o.triggers, ..State::default() }, false, ns, false);
+                        focus_input.restore(State { preset: o.preset, tap_jump: o.tap_jump, triggers: o.triggers, right_stick: o.right_stick, ..State::default() }, false, ns, false);
                         focus_input.armed = false;
                     } else {
                         pending_input.push_capture(Capture::Disconnected(ns))?;
@@ -4321,8 +4326,8 @@ mod linux {
                         epoch_ns: now,
                         first_frame: next_frame,
                     };
-                    state = State { preset: o.preset, tap_jump: o.tap_jump, triggers: o.triggers, ..State::default() };
-                    row_state = State { preset: o.preset, tap_jump: o.tap_jump, triggers: o.triggers, ..State::default() };
+                    state = State { preset: o.preset, tap_jump: o.tap_jump, triggers: o.triggers, right_stick: o.right_stick, ..State::default() };
+                    row_state = State { preset: o.preset, tap_jump: o.tap_jump, triggers: o.triggers, right_stick: o.right_stick, ..State::default() };
                     previous = 0;
                     edges.clear();
                     snapshots.clear();
@@ -4349,8 +4354,8 @@ mod linux {
                         epoch_ns: publication.epoch_ns + (ahead * 1_000_000_000).div_ceil(HZ),
                         first_frame: next_frame,
                     };
-                    state = State { preset: o.preset, tap_jump: o.tap_jump, triggers: o.triggers, ..State::default() };
-                    row_state = State { preset: o.preset, tap_jump: o.tap_jump, triggers: o.triggers, ..State::default() };
+                    state = State { preset: o.preset, tap_jump: o.tap_jump, triggers: o.triggers, right_stick: o.right_stick, ..State::default() };
+                    row_state = State { preset: o.preset, tap_jump: o.tap_jump, triggers: o.triggers, right_stick: o.right_stick, ..State::default() };
                     previous = 0;
                     edges.clear();
                     snapshots.clear();
@@ -4408,7 +4413,7 @@ mod linux {
                             );
                             eprintln!("controller_release mono_ns={ns} frame={frame}");
                         }
-                        focus_input.restore(State { preset: o.preset, tap_jump: o.tap_jump, triggers: o.triggers, ..State::default() }, false, ns, false);
+                        focus_input.restore(State { preset: o.preset, tap_jump: o.tap_jump, triggers: o.triggers, right_stick: o.right_stick, ..State::default() }, false, ns, false);
                         focus_input.armed = false;
                         continue;
                     }

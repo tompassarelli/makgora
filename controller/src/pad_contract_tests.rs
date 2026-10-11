@@ -1,5 +1,5 @@
 use super::*;
-use wc3_controller::{model::{Button, Control, ControllerSettings, InputView, PadKind, PadPreset, Press}, service::any_map::{Driver, MenuCurve, Output}};
+use wc3_controller::{model::{Button, Control, ControllerSettings, InputView, PadKind, PadPreset, Press, RightStick}, service::any_map::{Driver, MenuCurve, Output}};
 
 struct Preset {
     name: String,
@@ -32,8 +32,8 @@ fn contract() -> &'static [Preset] {
             Press::Key(key) => vec![key], Press::Pointer => vec!["pointer".into()],
             Press::LeftClick => vec!["left-click".into()], Press::RightClick => vec!["right-click".into()],
         };
-        PadPreset::ALL.into_iter().map(|pad_preset| {
-            let settings = ControllerSettings { pad_preset, ..ControllerSettings::default() };
+        PadPreset::ALL.into_iter().flat_map(|pad_preset| RightStick::ALL.map(|right_stick| (pad_preset, right_stick))).map(|(pad_preset, right_stick)| {
+            let settings = ControllerSettings { pad_preset, right_stick, ..ControllerSettings::default() };
             let mut fight = BTreeMap::new();
             let mut map_rows = Vec::new();
             for binding in settings.bindings(PadKind::Xbox) {
@@ -42,12 +42,12 @@ fn contract() -> &'static [Preset] {
                 for key in &keys {
                     map_rows.push(serde_json::json!({ "preset": pad_preset.name(), "control": binding.control.name(), "key": key, "label": binding.action, "action": action }));
                 }
-                if pad_preset == PadPreset::Tom && matches!(binding.control, Control::RightLeft | Control::RightRight | Control::RightUp | Control::RightDown) { keys.push("p".into()); }
+                if right_stick == RightStick::Tilt && matches!(binding.control, Control::RightLeft | Control::RightRight | Control::RightUp | Control::RightDown) { keys.push("p".into()); }
                 fight.insert(binding.control, keys);
             }
             let menus = wc3_controller::service::any_map::menu_bindings(true).into_iter()
                 .map(|binding| (binding.control, outputs(binding.press))).collect();
-            Preset { name: pad_preset.name().into(), settings, fight, menus, map_rows }
+            Preset { name: format!("{} right-stick {}", pad_preset.name(), right_stick.name()), settings, fight, menus, map_rows }
         }).collect()
     })
 }
@@ -122,7 +122,7 @@ fn generated_fighter_inputs_follow_the_models_shipped_contract_rows() {
             for _ in 0..cases {
                 let magnitude = 29_491 + (random(&mut seed) % 3277) as i16;
                 let (pad, _) = input(control, magnitude);
-                let mut driver = Driver::keys_with_ingress(preset.settings.pad_preset, wc3_controller::pad_ingress::Route::Digital);
+                let mut driver = Driver::keys_for(&preset.settings, wc3_controller::pad_ingress::Route::Digital);
                 let mut out = Desktop::default();
                 driver.step(&InputView::default(), true, 0.0, &mut out).unwrap();
                 driver.step(&pad, true, 0.0, &mut out).unwrap();
