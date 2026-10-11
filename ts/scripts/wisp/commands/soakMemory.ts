@@ -3,7 +3,7 @@
 
 
 
-import { mkdirSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { BunServices } from "@effect/platform-bun";
 import { Console, Effect, Schema, Stream } from "effect";
@@ -11,7 +11,7 @@ import { ChildProcess } from "effect/process";
 import { mapCompiler, report } from "wisp/scripts/compiler";
 import { type Command, UsageFailure, describeCause, flagValues } from "wisp/scripts/wisp/command";
 import { step } from "wisp/scripts/wisp/timings";
-import { MEMORY_LIMITS, checkMemory, parseMemoryRun } from "../memorySoak";
+import { MEMORY_LIMITS, checkMemory, checkNativeSequenceHeap, parseMemoryRun } from "../memorySoak";
 import { stockLua } from "../luaRuntimes";
 import { buildProject, tsDirectory } from "../project";
 
@@ -36,13 +36,16 @@ export const soakMemory: Command = (args) => Effect.gen(function*() {
   const minutes = Number(minutesText);
   const [matchesText] = flagValues(args, "matches");
   const [givenBundle] = flagValues(args, "bundle");
+  const nativeSequence = args.includes("--native-sequence");
+  const [summary] = flagValues(args, "summary");
   const matches = matchesText === undefined ? undefined : Number(matchesText);
   const [firstText = "0"] = flagValues(args, "first");
   const first = Number(firstText);
   if (!Number.isInteger(first) || first < 0 || first > 2000) return yield* new UsageFailure({ problem: "soak memory --first takes a lineup from 0 to 2000" });
   if (matches !== undefined && (!Number.isInteger(matches) || matches < 1 || matches > 2000)) return yield* new UsageFailure({ problem: "soak memory --matches takes 1 to 2000 all-computer matches" });
-  if (!Number.isInteger(minutes) || minutes < MEMORY_LIMITS.warmupMinutes + 3 || minutes > MAX_MINUTES) {
-    return yield* new UsageFailure({ problem: `soak memory --minutes takes ${MEMORY_LIMITS.warmupMinutes + 3} to ${MAX_MINUTES} game minutes: ${MEMORY_LIMITS.warmupMinutes} of warm-up, then the check` });
+  if (nativeSequence && (givenBundle === undefined || matches !== undefined || summary === undefined)) return yield* new UsageFailure({ problem: "soak memory --native-sequence requires --bundle build/integrity.lua and --summary the native run's summary.md; omit --matches" });
+  if (!Number.isInteger(minutes) || minutes < (nativeSequence ? 1 : MEMORY_LIMITS.warmupMinutes + 3) || minutes > MAX_MINUTES) {
+    return yield* new UsageFailure({ problem: `soak memory --minutes takes ${nativeSequence ? 1 : MEMORY_LIMITS.warmupMinutes + 3} to ${MAX_MINUTES} game minutes: ${MEMORY_LIMITS.warmupMinutes} of warm-up, then the check` });
   }
   const playable = buildProject("playable");
   if (givenBundle === undefined) yield* compile(playable.configPath).pipe(step("compile the playable build"));
@@ -51,7 +54,7 @@ export const soakMemory: Command = (args) => Effect.gen(function*() {
   const declarations = join(tsDirectory, "node_modules/wisp/src/natives/warcraft.d.ts");
 
   const text = yield* Effect.scoped(Effect.gen(function*() {
-    const child = yield* ChildProcess.make(lua, [join(tsDirectory, "build/memory.lua"), givenBundle ?? playable.bundlePath, declarations, String(minutes), ...(matches === undefined ? [] : [String(matches), String(first)])], { stdin: "ignore" });
+    const child = yield* ChildProcess.make(lua, [join(tsDirectory, "build/memory.lua"), givenBundle ?? playable.bundlePath, declarations, String(minutes), ...(nativeSequence ? ["native"] : matches === undefined ? [] : [String(matches), String(first)])], { stdin: "ignore" });
     const [output, stderr, code] = yield* Effect.all([
       child.stdout.pipe(
         Stream.decodeText,
@@ -85,8 +88,17 @@ export const soakMemory: Command = (args) => Effect.gen(function*() {
     return;
   }
   const run = yield* Effect.try({ try: () => parseMemoryRun(text), catch: (cause) => new MemorySoakFailure({ problem: `${out}: ${describeCause(cause)}` }) });
-  const verdict = checkMemory(run);
+  const verdict = nativeSequence ? checkNativeSequenceHeap(run) : checkMemory(run);
+  if (nativeSequence && summary !== undefined) yield* Effect.try({
+    try: () => {
+      const previous = readFileSync(summary, "utf8");
+      const pending = "Headless 32-bit Lua heap companion: pending.";
+      if (!previous.includes(pending)) throw new Error("the native summary has no pending heap companion");
+      writeFileSync(summary, previous.replace(pending, verdict.lines.join("\n") + (verdict.failures.length === 0 ? "" : `\n${verdict.failures.join("\n")}`)));
+    },
+    catch: (cause) => new MemorySoakFailure({ problem: `writing companion verdict to ${summary}: ${describeCause(cause)}` }),
+  });
   yield* Console.log([...verdict.lines, `samples: ${out}`].join("\n"));
-  if (verdict.failures.length > 0) return yield* new MemorySoakFailure({ problem: `memory grows after warm-up:\n${verdict.failures.join("\n")}` });
+  if (verdict.failures.length > 0) return yield* new MemorySoakFailure({ problem: `${nativeSequence ? "headless heap companion did not pass" : "memory grows after warm-up"}:\n${verdict.failures.join("\n")}` });
   yield* Console.log("memory flat after warm-up");
 });

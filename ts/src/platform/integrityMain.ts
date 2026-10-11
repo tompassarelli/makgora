@@ -13,6 +13,7 @@ export function install(this: void): void {
 
 
 export function start(this: void): void {
+  globalThis.__smashcraftNativeSoak = undefined;
   installSoakHandles();
   startBuild(INTEGRITY_BUILD);
   startMatchSceneReport();

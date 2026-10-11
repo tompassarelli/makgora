@@ -32,7 +32,10 @@ function lineup(s: ShellState, match: number): void {
 
 export function startNativeSoak(s: ShellState): boolean {
   const actor = firstHumanSlot(s.game);
-  if (actor === undefined || s.game.phase !== Phase.characterMenu || globalThis.__smashcraftSoakHandles === undefined) return false;
+  if (actor === undefined || s.game.phase !== Phase.characterMenu || globalThis.__smashcraftSoakHandles === undefined) {
+    writeLines(NATIVE_SOAK_FILE, [`dev: native soak requires an integrity map at selection; phase=${s.game.phase} actor=${actor ?? "none"} ledger=${globalThis.__smashcraftSoakHandles === undefined ? "missing" : "installed"}`]);
+    return false;
+  }
   for (const slot of PARTICIPANT_SLOTS) {
     while (!computerActive(s.game, slot)) if (!cycleSlotMode(s.game, actor, slot)) return false;
     setCpuOpponent(s.game, actor, slot, "wren");
@@ -64,7 +67,7 @@ function sample(s: ShellState): void {
   const soak = globalThis.__smashcraftNativeSoak;
   if (soak === undefined) return;
   const heap = typeof collectgarbage === "function" ? R2I(collectgarbage("count")) : -1;
-  writeLines(NATIVE_SOAK_FILE, [`soak callbacks=${soak.callbacks} frames=${soak.frames} matches=${soak.matches} results=${soak.results} phase=${s.game.phase} stage=${s.game.stageChoice} characters=${s.game.characterChoices.join(",")} cpu=${s.game.computerMask} heapKb=${heap} handles=${liveSoakHandles()}`]);
+  writeLines(NATIVE_SOAK_FILE, ["dev: native soak four CPUs", `soak callbacks=${soak.callbacks} frames=${soak.frames} matches=${soak.matches} results=${soak.results} phase=${s.game.phase} stage=${s.game.stageChoice} characters=${s.game.characterChoices.join(",")} cpu=${s.game.computerMask} heapKb=${heap} handles=${liveSoakHandles()}`]);
 }
 
 export function afterNativeSoakTick(s: ShellState): void {

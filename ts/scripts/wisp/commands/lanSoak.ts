@@ -70,19 +70,25 @@ export const lanSoak: Command = (args) => Effect.gen(function*() {
     });
     yield* openObservedChat(host, entry, batch(host, [{ kind: "keys", keys: ["Return"] }]).pipe(Effect.mapError((cause) => new NativeSoakFailure({ problem: cause.message }))));
     yield* batch(host, [{ kind: "text", text: "-dev soak", delayMillis: 35 }, { kind: "keys", keys: ["Return"], settleMillis: 0 }]);
+    const lastSnapshots = new Map<string, string>();
+    const failure = (problem: string) => new NativeSoakFailure({ problem: `${problem}\n${clients.map((client) => `${client.name}: ${join(dataDirectory(client.documents), NATIVE_SOAK_FILE)}: ${lastSnapshots.get(client.documents) ?? "no snapshot read"}`).join("\n")}` });
     const snapshot = (documents: string) => attempt("read native soak snapshot", () => {
       const path = join(dataDirectory(documents), NATIVE_SOAK_FILE);
-      if (!existsSync(path) || statSync(path).mtimeMs < since || Date.now() - statSync(path).mtimeMs > 3000) return undefined;
-      const line = preloadLines(readFileSync(path, "latin1"))?.find((text) => text.startsWith("soak "));
+      if (!existsSync(path)) { if (!lastSnapshots.has(documents)) lastSnapshots.set(documents, "file missing"); return undefined; }
+      const modified = statSync(path).mtimeMs;
+      const lines = preloadLines(readFileSync(path, "latin1"));
+      lastSnapshots.set(documents, `mtime=${modified} ageMs=${Date.now() - modified}; ${lines?.join("; ") ?? "invalid Preload record"}`);
+      if (modified < since || Date.now() - modified > 3000) return undefined;
+      const line = lines?.find((text) => text.startsWith("soak "));
       return line === undefined ? undefined : Object.fromEntries(line.substring(5).split(" ").map((field) => field.split("=")));
-    }).pipe(Effect.flatMap((value) => value === undefined ? Effect.undefined : Schema.decodeUnknownEffect(Snapshot)(value)), Effect.mapError((cause) => cause instanceof NativeSoakFailure ? cause : new NativeSoakFailure({ problem: cause.message })));
-    yield* pollUntil(Effect.forEach(clients, (client) => snapshot(client.documents)).pipe(Effect.map((rows) => rows.every((row) => row !== undefined && row.cpu === 15 && row.phase === 2 && row.heapKb >= 0 && row.handles > 0) ? true : undefined)), { every: "250 millis", within: "20 seconds", orElse: () => Effect.fail(new NativeSoakFailure({ problem: "no real heap/handle snapshot for four CPUs on both clients; build this revision with --profile integrity" })) });
+    }).pipe(Effect.flatMap((value) => value === undefined ? Effect.undefined : Schema.decodeUnknownEffect(Snapshot)(value)), Effect.mapError((cause) => failure(cause.message)));
+    yield* pollUntil(Effect.forEach(clients, (client) => snapshot(client.documents)).pipe(Effect.map((rows) => rows.every((row) => row !== undefined && row.cpu === 15 && (row.phase === 2 || row.phase === 3) && row.handles > 0) ? true : undefined)), { every: "250 millis", within: "20 seconds", orElse: () => Effect.fail(failure("no native snapshot for four CPUs on both clients; requires cpu=15 phase=2|3 handles>0")) });
     const samplingStarted = performance.now();
     const sample = Effect.gen(function*() {
       for (const [slot, client] of clients.entries()) {
         const row = yield* snapshot(client.documents);
         const pid = status.clients.find((candidate) => candidate.name.endsWith(slot === 0 ? "a" : "b"))?.pid;
-        if (row === undefined || row.cpu !== 15 || row.heapKb < 0 || pid === undefined) return yield* new NativeSoakFailure({ problem: `${client.name}: missing native snapshot or process` });
+        if (row === undefined || row.cpu !== 15 || pid === undefined) return yield* failure(`${client.name}: missing native snapshot or process`);
         const rssMiB = yield* attempt("read Warcraft RSS on pool host", () => {
           const rss = /^VmRSS:\s+(\d+)\s+kB$/m.exec(readFileSync(`/proc/${pid}/status`, "utf8"))?.[1];
           if (rss === undefined) throw new Error(`no RSS for ${client.name}`);
@@ -90,30 +96,30 @@ export const lanSoak: Command = (args) => Effect.gen(function*() {
         });
         samples.push({ elapsed: (performance.now() - samplingStarted) / 1000, client: client.name, rssMiB, snapshot: row });
       }
-      yield* attempt("write samples", () => writeFileSync(join(out, "samples.tsv"), "elapsed_s\tclient\trss_MiB\tlua_MiB\tlive_map_handles\tgame_callbacks\tsim_frames\tmatches\tresults\tphase\tstage\tcharacters\n" + samples.map(({ elapsed, client, rssMiB, snapshot: row }) => [elapsed.toFixed(3), client, rssMiB.toFixed(3), (row.heapKb / 1024).toFixed(3), row.handles, row.callbacks, row.frames, row.matches, row.results, row.phase, row.stage, row.characters].join("\t")).join("\n") + "\n"));
+      yield* attempt("write samples", () => writeFileSync(join(out, "samples.tsv"), "elapsed_s\tclient\trss_MiB\tlua_MiB\tlive_map_handles\tgame_callbacks\tsim_frames\tmatches\tresults\tphase\tstage\tcharacters\n" + samples.map(({ elapsed, client, rssMiB, snapshot: row }) => [elapsed.toFixed(3), client, rssMiB.toFixed(3), "n/a (no collectgarbage in Warcraft Lua)", row.handles, row.callbacks, row.frames, row.matches, row.results, row.phase, row.stage, row.characters].join("\t")).join("\n") + "\n"));
       yield* Console.log(`pair ${pair}: minute ${Math.floor((performance.now() - samplingStarted) / 60000)}, ${samples.length} client samples`);
     });
     yield* sample;
     let intervals = 0;
     yield* sample.pipe(Effect.delay("60 seconds"), Effect.repeat({ schedule: Schedule.spaced("0 millis"), until: () => ++intervals >= minutes }));
-    const lines = ["| Client | Samples | After minute 10 | RSS MiB/hour (<32) | Lua MiB/hour (<1) | Map handles/hour (flat) | Verdict |", "| --- | --- | --- | --- | --- | --- | --- |"];
+    const lines = ["| Client | Samples | After minute 10 | RSS MiB/hour (<32) | Lua heap | Map handles/hour (flat) | Native verdict |", "| --- | --- | --- | --- | --- | --- | --- |"];
     let failed = false;
     for (const client of clients) {
       const own = samples.filter((sample) => sample.client === client.name);
       const after = own.filter((sample) => sample.elapsed >= 600);
       const final = own.at(-1)?.snapshot;
       if (final === undefined || final.matches < 2 || final.results < 1) return yield* new NativeSoakFailure({ problem: `${client.name}: back-to-back match/result/rematch flow was not observed` });
-      if (after.length < 3) lines.push(`| ${client.name} | ${own.length} | ${after.length} | — | — | — | insufficient post-10-minute samples |`);
+      if (after.length < 3) lines.push(`| ${client.name} | ${own.length} | ${after.length} | — | n/a (no collectgarbage in Warcraft Lua) | — | insufficient post-10-minute samples |`);
       else {
         const rss = slope(after, (sample) => sample.rssMiB);
-        const lua = slope(after, (sample) => sample.snapshot.heapKb / 1024);
         const handles = slope(after, (sample) => sample.snapshot.handles);
-        const pass = rss < 32 && lua < 1 && handles <= 0;
+        const pass = rss < 32 && handles <= 0;
         failed ||= !pass;
-        lines.push(`| ${client.name} | ${own.length} | ${after.length} | ${rss.toFixed(3)} | ${lua.toFixed(3)} | ${handles.toFixed(3)} | ${pass ? "pass" : "fail"} |`);
+        lines.push(`| ${client.name} | ${own.length} | ${after.length} | ${rss.toFixed(3)} | n/a (no collectgarbage in Warcraft Lua) | ${handles.toFixed(3)} | ${pass ? "pass" : "fail"} |`);
       }
     }
     lines.push("", "The map ledger covers returned effect, unit, timer, sound, trigger and frame handles from diagnostic installation before map startup. Frame subtree destruction releases tracked descendants. Sound ownership ends at KillSoundWhenDone or StopSound(killWhenDone); deferred engine cleanup and unreturned internal handles remain in process RSS.", "", "Each sample is collected on the pool host every 60 seconds of monotonic wall time, with the map's latest periodic-callback/confirmed-frame counters. Matches rotate fighters; existing automatic rematch selects stages without Escape.");
+    lines.push("", "Headless 32-bit Lua heap companion: pending. Run the same four-CPU automatic-rematch sequence against this revision's build/integrity.lua with:", "", `bun wisp soak memory --native-sequence --bundle build/integrity.lua --minutes ${minutes} --out ${JSON.stringify(join(out, "headless-heap.txt"))} --summary ${JSON.stringify(join(out, "summary.md"))}`, "", "Acceptance also requires the companion's post-minute-10 Lua heap slope below 1 MiB/hour in this summary.");
     yield* attempt("write summary", () => writeFileSync(join(out, "summary.md"), lines.join("\n") + "\n"));
     yield* Console.log(lines.join("\n"));
     yield* Console.log(`elapsed ${((performance.now() - started) / 1000).toFixed(1)} s; ${out}`);

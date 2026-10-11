@@ -28,7 +28,8 @@ const [bundlePath, declarationsPath, minutesText = "30", matchesText, firstText 
 if (bundlePath === undefined || declarationsPath === undefined) throw new Error("usage: lua memory.lua MAP_LUA WARCRAFT_D_TS [MINUTES]");
 const FRAMES_PER_MINUTE = 3600;
 const totalFrames = Number(minutesText) * FRAMES_PER_MINUTE;
-const releaseMatches = matchesText === undefined ? undefined : Number(matchesText);
+const nativeSequence = matchesText === "native";
+const releaseMatches = matchesText === undefined || nativeSequence ? undefined : Number(matchesText);
 const declarationsText = readFile(declarationsPath);
 const { functions } = parseNativeDeclarations(declarationsText);
 const clients = luaLockstep({ filePrefix: "smashcraft", localNatives: PREDICTED_LOCAL_NATIVES, intentionalNoops: SMASHCRAFT_NOOPS, natives: smashcraftNativeBehavior }, readFile(bundlePath), declarationsText, undefined, syncDelivery(MEASURED_BATTLE_NET, 7));
@@ -45,6 +46,7 @@ const errors: string[] = [];
 let matches = 0;
 let held = 0;
 let beat = 0;
+let nativeStart = 0;
 
 const census = (heading: string) => {
   collectgarbage("collect");
@@ -79,7 +81,7 @@ const census = (heading: string) => {
 const frame = () => {
 
   const inMatch = clients.frame > 0 && gameOf(host).phase === Phase.match;
-  const [tap, hold] = inMatch && releaseMatches === undefined ? botBeatKeys(++beat) : [0, 0];
+  const [tap, hold] = inMatch && releaseMatches === undefined && !nativeSequence ? botBeatKeys(++beat) : [0, 0];
   for (const player of clients.clients) {
     if (hold !== held && held !== 0) for (const client of clients.clients) client.key(player.slot, held, 0, false);
     if (hold !== held && hold !== 0) for (const client of clients.clients) client.key(player.slot, hold, 0, true);
@@ -90,7 +92,7 @@ const frame = () => {
   if (tap !== 0) for (const player of clients.clients) for (const client of clients.clients) client.key(player.slot, tap, 0, false);
 
   for (const client of clients.clients) client.forget(client.log.length);
-  if (releaseMatches === undefined && floorMod(clients.frame, FRAMES_PER_MINUTE) === 0) census(`kind=minute minute=${floorDiv(clients.frame, FRAMES_PER_MINUTE)}`);
+  if (releaseMatches === undefined && floorMod(clients.frame - nativeStart, FRAMES_PER_MINUTE) === 0) census(`kind=minute minute=${floorDiv(clients.frame - nativeStart, FRAMES_PER_MINUTE)}`);
 };
 
 const until = (what: string, limit: number, done: () => boolean, each?: (index: number) => void) => {
@@ -121,7 +123,29 @@ const choose = (lineup: number, automaticRematch: boolean) => {
 
 clients.start();
 for (const client of clients.clients) for (const error of client.errors) print(`start p${client.slot}: ${error}`);
-for (let index = 0; index < 30; index++) frame();
+for (let index = 0; index < (nativeSequence ? 359 : 30); index++) frame();
+if (nativeSequence) {
+  nativeStart = clients.frame;
+  clients.chat(0, "-dev soak");
+  for (const client of clients.clients) if (!client.messages.includes("dev: native soak four CPUs")) throw new Error(`p${client.slot}: the integrity bundle refused the native soak: ${client.messages.join(";")}`);
+  matches = 1;
+  census("kind=start sequence=native");
+  let previous = gameOf(host).phase;
+  while (clients.frame < nativeStart + totalFrames) {
+    frame();
+    const phase = gameOf(host).phase;
+    if (phase === Phase.match && previous !== Phase.match) matches++;
+    previous = phase;
+  }
+  for (const client of clients.clients) for (const error of client.errors) errors.push(`p${client.slot}: ${error}`);
+  const divergence = clients.firstDivergence();
+  const checksums = clients.clients.map((client) => client.checksum());
+  if (divergence !== undefined || checksums.some((checksum) => checksum !== checksums[0])) errors.push(`desync: ${divergence ?? checksums.join(" ")}`);
+  for (const error of errors) print(`problem ${error}`);
+  print(`done frames=${clients.frame - nativeStart} matches=${matches} problems=${errors.length}`);
+  if (errors.length > 0) os.exit(1);
+  os.exit(0);
+}
 if (releaseMatches === undefined) census("kind=start");
 let lineup = Number(firstText);
 let rematchNext = false;
