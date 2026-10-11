@@ -15,13 +15,21 @@
   commit or matching tree, or whose Autoland status explicitly names that landed
   commit, and, if it isn't installed yet, builds it once with the play build
   path and installs it as `Smashcraft 0.0.N SHORTSHA` under Maps/00-Smashcraft,
-  moving all but the two prior versions to older/. A commit with a red,
-  pending or missing run is never built, and an older green commit never
-  replaces a newer installed build. It reads the install folder and copies one
-  file into it: it starts no Warcraft, signs in nothing, uses no account and
-  never touches a running client. A systemd user timer
-  (smashcraft:tools/green-builds/) runs it every ten minutes; the repository
-  documents it but doesn't install it.
+  moving all but the two prior versions to older/. CI/farm green only stages
+  the candidate outside Maps; installation also requires every declared `gate-*`
+  check to have verdict `pass` in Classic on its exact bytes.
+  Native owners run `bun wisp accept --only gate-* --map CANDIDATE --out DIR`
+  on the Classic pool's clients and retain the existing `report.json`, with top-level
+  `candidateMapSha256` and `graphicsLook` (`classic`), under
+  `~/.local/state/smashcraft/green-builds/accept/SHA256/LOOK/report.json`.
+  Missing checks, reports, looks, mismatched bytes and `needs-look` keep the last
+  installed build. Plato reads the candidate and failing check ids/reasons in
+  `~/.local/state/smashcraft/green-builds/status.json`.
+  A red, pending or missing CI/farm run is never built, and an older green
+  commit never replaces a newer installed build. The systemd user timer
+  (smashcraft:tools/green-builds/) runs every ten minutes; the repository
+  documents it but doesn't install it. The timer currently consumes native
+  reports; it has no route to dispatch remote Classic.
   `bun wisp play --install-green --dry-run` reports the newest green commit and
   proposed install without building, installing or starting the controller helper.
 

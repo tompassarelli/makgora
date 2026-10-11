@@ -1,4 +1,6 @@
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { homedir } from "node:os";
 import { join } from "node:path";
 import { BunServices } from "@effect/platform-bun";
 import { Effect, Schema } from "effect";
@@ -6,7 +8,8 @@ import { ChildProcess } from "effect/process";
 import { PlayProblem } from "wisp/scripts/wisp/play";
 import { runProcess } from "../hostProcess";
 import { currentPlaytest } from "./currentPlaytest";
-import { type Candidate, type RunSummary, farmVerdict, isGreen, parseInstalled, pickGreen, verdictOf } from "./greenBuilds";
+import { SMASHCRAFT_ACCEPT } from "./acceptChecks";
+import { GREEN_GATE_LOOKS, greenGateFailures, type GreenGateReport, type Candidate, type RunSummary, farmVerdict, isGreen, parseInstalled, pickGreen, verdictOf } from "./greenBuilds";
 import { installLatest } from "./mapLibrary";
 import { projectRoot } from "./project";
 
@@ -31,6 +34,14 @@ const Evidence = Schema.Array(Schema.Struct({
 }));
 const decodeEvidence = Schema.decodeUnknownEffect(Schema.fromJsonString(Evidence));
 
+const GateReport = Schema.Struct({
+  candidateMapSha256: Schema.String,
+  graphicsLook: Schema.Literals(["classic"]),
+  results: Schema.Array(Schema.Struct({ id: Schema.String, verdict: Schema.Literals(["pass", "fail", "needs-look"]), reason: Schema.String })),
+});
+const decodeGateReport = Schema.decodeUnknownEffect(Schema.fromJsonString(GateReport));
+const greenState = join(homedir(), ".local/state/smashcraft/green-builds");
+
 const problem = (cause: { readonly message: string }) => new PlayProblem({ problem: cause.message });
 
 const host = (program: string, args: readonly string[]) =>
@@ -47,6 +58,36 @@ function installedCommits(documents: string): string[] {
   return [root, join(root, "older")].flatMap((folder) => existsSync(folder) ? readdirSync(folder) : [])
     .flatMap((file) => parseInstalled(file)?.commit ?? []);
 }
+
+export const installAcceptedGreen = (documents: string, map: string, revision: string, declared: readonly string[], stateDirectory = greenState) => Effect.gen(function*() {
+  const mapSha256 = yield* Effect.try({
+    try: () => createHash("sha256").update(readFileSync(map)).digest("hex"), catch: (cause) => new PlayProblem({ problem: String(cause) }),
+  });
+  const reports: GreenGateReport[] = [];
+  const unreadable: { look: string; id: string; reason: string }[] = [];
+  for (const look of GREEN_GATE_LOOKS) {
+    const file = join(stateDirectory, "accept", mapSha256, look, "report.json");
+    const report = yield* Effect.tryPromise({ try: () => Bun.file(file).text(), catch: (cause) => new PlayProblem({ problem: `${file}: ${String(cause)}` }) }).pipe(
+      Effect.flatMap(text => decodeGateReport(text).pipe(Effect.mapError(problem))), Effect.result,
+    );
+    if (report._tag === "Success") reports.push(report.success);
+    else unreadable.push({ look, id: "gate-report", reason: report.failure.problem });
+  }
+  const failures = [...unreadable, ...greenGateFailures(mapSha256, declared, reports)];
+  yield* Effect.try({
+    try: () => {
+      mkdirSync(stateDirectory, { recursive: true, mode: 0o700 });
+      const status = join(stateDirectory, "status.json");
+      const staged = `${status}.${process.pid}.next`;
+      writeFileSync(staged, `${JSON.stringify({ revision, candidate: map, candidateMapSha256: mapSha256,
+        state: failures.length === 0 ? "accepted" : unreadable.length > 0 ? "pending-native" : "blocked", failures,
+        acceptanceDirectory: join(stateDirectory, "accept", mapSha256) }, null, 2)}\n`, { mode: 0o600 });
+      renameSync(staged, status);
+    }, catch: (cause) => new PlayProblem({ problem: String(cause) }),
+  });
+  if (failures.length > 0) return yield* new PlayProblem({ problem: `Kept last good installed map: ${failures.map(({ look, id, reason }) => `${look} ${id}: ${reason}`).join("; ")}; status ${join(stateDirectory, "status.json")}` });
+  yield* Effect.try({ try: () => installLatest(documents, map), catch: (cause) => new PlayProblem({ problem: String(cause) }) });
+});
 
 export const installGreen = (documents: string, dryRun = false) => Effect.gen(function*() {
   yield* host("git", ["fetch", "origin", "main"]);
@@ -80,7 +121,7 @@ export const installGreen = (documents: string, dryRun = false) => Effect.gen(fu
   const installed = installedCommits(documents);
   const pick = pickGreen(considered, installed);
   if (dryRun) {
-    console.log(`Dry run: newest green main ${considered.find(isGreen)?.sha ?? "none"}; ${pick === undefined ? "no install (already installed, newer installed, or no green commit)" : `would build and install ${pick.sha}`}`);
+    console.log(`Dry run: newest green main ${considered.find(isGreen)?.sha ?? "none"}; ${pick === undefined ? "no install (already installed, newer installed, or no green commit)" : `would stage ${pick.sha}; install requires exact candidate gate-* PASS in Classic`}`);
     return;
   }
 
@@ -92,6 +133,6 @@ export const installGreen = (documents: string, dryRun = false) => Effect.gen(fu
   }
 
   const { map } = yield* currentPlaytest(join(documents, "Maps/00-Smashcraft"), { revision: pick.sha, named: true, helper: false });
-  yield* Effect.try({ try: () => installLatest(documents, map.source), catch: (cause) => new PlayProblem({ problem: String(cause) }) });
+  yield* installAcceptedGreen(documents, map.source, pick.sha, SMASHCRAFT_ACCEPT.checks.filter(({ id }) => id.startsWith("gate-")).map(({ id }) => id));
   console.log(`Installed ${map.title} under Maps/${map.folder}`);
 }).pipe(Effect.provide(BunServices.layer));

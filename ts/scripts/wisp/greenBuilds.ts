@@ -77,3 +77,47 @@ export function pruneTargets(present: readonly string[], keep: string): string[]
   versions.sort((a, b) => newerVersion(a.parsed, b.parsed) || (a.file < b.file ? 1 : a.file > b.file ? -1 : 0));
   return versions.slice(KEPT_PRIOR_VERSIONS).map(({ file }) => file);
 }
+
+export const GREEN_GATE_CHECKS = [
+  "gate-cursor-visible", "gate-start-anywhere", "gate-bindings", "gate-specials-spot",
+] as const;
+export const GREEN_GATE_LOOKS = ["classic"] as const;
+
+export interface GreenGateReport {
+  readonly candidateMapSha256: string;
+  readonly graphicsLook: string;
+  readonly results: readonly { readonly id: string; readonly verdict: string; readonly reason: string }[];
+}
+
+export interface GreenGateFailure {
+  readonly look: string;
+  readonly id: string;
+  readonly reason: string;
+}
+
+export function greenGateFailures(mapSha256: string, declared: readonly string[], reports: readonly GreenGateReport[]): GreenGateFailure[] {
+  const failures: GreenGateFailure[] = [];
+  const required = [...new Set([...GREEN_GATE_CHECKS, ...declared])];
+  for (const id of required) {
+    if (!declared.includes(id)) failures.push({ look: "classic", id, reason: "gate check is not declared" });
+  }
+  for (const look of GREEN_GATE_LOOKS) {
+    const matching = reports.filter(report => report.graphicsLook === look);
+    const report = matching[0];
+    if (matching.length !== 1 || report === undefined) {
+      failures.push({ look, id: "gate-report", reason: `expected one report, found ${matching.length}` });
+      continue;
+    }
+    if (report.candidateMapSha256 !== mapSha256) {
+      failures.push({ look, id: "gate-map", reason: "report map SHA256 differs from the built candidate" });
+      continue;
+    }
+    for (const id of required) {
+      const results = report.results.filter(result => result.id === id);
+      const result = results[0];
+      if (results.length !== 1 || result === undefined) failures.push({ look, id, reason: `expected one result, found ${results.length}` });
+      else if (result.verdict !== "pass") failures.push({ look, id, reason: `${result.verdict}: ${result.reason}` });
+    }
+  }
+  return failures;
+}
