@@ -1,5 +1,6 @@
 export const WATCHED_WORKFLOWS = ["autoland.yml", "farm-test.yml"] as const;
 export const MIN_BASELINE_SAMPLES = 5;
+export const overrunLimitMs = (medianMs: number): number => Math.max(2 * medianMs, medianMs + 5 * 60 * 1000);
 export type WatchedWorkflow = typeof WATCHED_WORKFLOWS[number];
 export interface JobTiming {
   readonly id: number;
@@ -66,9 +67,10 @@ export function overruns(runs: readonly TimingRun[], history: readonly TimingRun
       const baseline = measured.get(timingKey(run.workflow, job));
       if (baseline === undefined || baseline.samples < MIN_BASELINE_SAMPLES) return [];
       const start = Date.parse(job.started_at), elapsedMs = now - start;
-      if (!Number.isFinite(start) || elapsedMs <= 2 * baseline.medianMs) return [];
-      return [{ runId: run.id, jobId: job.id, job: job.name, runner: job.runner_name, elapsedMs, deadlineMs: start + 2 * baseline.medianMs, baseline, landInProgress: landInProgress(run.jobs) }];
+      const limitMs = overrunLimitMs(baseline.medianMs);
+      if (!Number.isFinite(start) || elapsedMs <= limitMs) return [];
+      return [{ runId: run.id, jobId: job.id, job: job.name, runner: job.runner_name, elapsedMs, deadlineMs: start + limitMs, baseline, landInProgress: landInProgress(run.jobs) }];
     });
   });
 }
-export const alertLine = (overrun: Overrun): string => `job-watchdog: ${overrun.job} on ${overrun.runner}, elapsed ${Math.ceil(overrun.elapsedMs / 1000)}s > 2x7-day median ${overrun.baseline.medianMs / 1000}s (${overrun.baseline.samples} completed jobs); ${overrun.landInProgress ? "land in progress, not cancelled" : `cancelling run ${overrun.runId}, hosted retry`}`;
+export const alertLine = (overrun: Overrun): string => `job-watchdog: ${overrun.job} on ${overrun.runner}, elapsed ${Math.ceil(overrun.elapsedMs / 1000)}s > deadline ${overrunLimitMs(overrun.baseline.medianMs) / 1000}s (7-day median ${overrun.baseline.medianMs / 1000}s, ${overrun.baseline.samples} completed jobs); ${overrun.landInProgress ? "land in progress, not cancelled" : `cancelling run ${overrun.runId}, hosted retry`}`;

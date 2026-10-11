@@ -74,7 +74,8 @@ its map. Compare the samples from `ts/` with
 `bun scripts/jobWatchdog.ts --baseline` from `ts/` refreshes the local 7-day
 Autoland/farm-test job timing cache. `--once` prints measured overruns without
 changing GitHub. After review and landing, `--apply` monitors every 20 seconds,
-cancels only a run containing a running job past twice its comparable median,
+cancels only a run containing a running job past the greater of twice its
+comparable median or that median plus five minutes,
 and retries that qualifying run once on hosted runners. `--help` lists the state
 and isolated probe options. The Tom-only systemd user units and installation
 procedure in `tools/job-watchdog/README.md` supervise the production monitor
