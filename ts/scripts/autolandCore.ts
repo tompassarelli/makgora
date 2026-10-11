@@ -1,10 +1,15 @@
 export const TEST_SLOTS = 3;
 export const JOB_BUDGET = 32;
-export const RUN_PEAK = 16;
+export const RUN_PEAK = 15;
+export const RUN_BUILD = 2;
+export const PROFILE = [15, 15, 15, 15, 15, 15, 13, 12, 9, 9, 7, 6, 5, 2, 2, 1, 1, 1] as const;
+export const PROFILE_STEP = 30_000;
+export const LEAD = 30_000;
+export const AGED = 60;
 export const TRAIN_CAP = 4;
 
 export interface Status { readonly state: string; readonly description: string; readonly at: string }
-export interface Lane { readonly branch: string; readonly tip: string; readonly status: Status | null; readonly labels?: readonly string[] }
+export interface Lane { readonly branch: string; readonly tip: string; readonly status: Status | null; readonly since?: string; readonly labels?: readonly string[] }
 export interface Job { readonly name?: string; readonly status: string; readonly created: string; readonly started: string | null; readonly labels: readonly string[] }
 export interface Run { readonly title: string; readonly status: string; readonly id?: number; readonly created?: string; readonly jobs?: readonly Job[] }
 
@@ -36,30 +41,47 @@ export function laneState(lane: Lane, runs: readonly Run[], retry: ReadonlySet<s
 }
 
 const priority = (lane: Lane): number => lane.labels?.includes("priority:now") === true ? 0 : lane.labels?.includes("playtest-blocking") === true ? 1 : 2;
-const byArrival = (lanes: readonly Lane[]): Lane[] => lanes.toSorted((a, b) => priority(a) - priority(b) || (a.status?.at ?? "").localeCompare(b.status?.at ?? "") || a.branch.localeCompare(b.branch));
+const waited = (lane: Lane): string => [lane.since, lane.status?.at].filter((at): at is string => at !== undefined).toSorted()[0] ?? "";
+const aged = (lane: Lane, now: number): number => waited(lane) !== "" && minutes(now, waited(lane)) > AGED ? 0 : 1;
+const byArrival = (lanes: readonly Lane[], now: number): Lane[] => lanes.toSorted((a, b) => aged(a, now) - aged(b, now) || (aged(a, now) === 0 ? 0 : priority(a) - priority(b)) || waited(a).localeCompare(waited(b)) || a.branch.localeCompare(b.branch));
 
 export interface TestOrder { readonly branch: string; readonly tip: string; readonly slot: number }
 export interface Plan { readonly test: readonly TestOrder[]; readonly train: boolean }
 
 const SUITE_JOB = /^suite \//;
 
-export const busy = (runs: readonly Run[]): number => runs.filter((run) => run.status !== "completed").reduce((sum, run) => {
-  const jobs = run.jobs ?? [];
-  const held = jobs.filter((job) => (job.status === "queued" || job.status === "in_progress") && job.labels.every((label) => HOSTED.test(label))).length;
-  return sum + ((TEST_TITLE.test(run.title) || run.title === TRAIN_TITLE) && !jobs.some((job) => SUITE_JOB.test(job.name ?? "")) ? Math.max(held, RUN_PEAK) : held);
+const hostedHeld = (run: Run): number => (run.jobs ?? []).filter((job) => (job.status === "queued" || job.status === "in_progress") && job.labels.every((label) => HOSTED.test(label))).length;
+const suiteStart = (run: Run): number | undefined => {
+  const starts = (run.jobs ?? []).filter((job) => SUITE_JOB.test(job.name ?? "")).map((job) => Date.parse(job.created));
+  return starts.length === 0 ? undefined : Math.min(...starts);
+};
+const peaks = (run: Run): boolean => TEST_TITLE.test(run.title) || run.title === TRAIN_TITLE;
+
+export const busy = (runs: readonly Run[]): number => runs.filter((run) => run.status !== "completed").reduce((sum, run) =>
+  sum + (peaks(run) && suiteStart(run) === undefined ? Math.max(hostedHeld(run), RUN_PEAK) : hostedHeld(run)), 0);
+
+const step = (now: number, start: number): number => Math.max(0, Math.floor((now - start) / PROFILE_STEP));
+
+export const forecast = (runs: readonly Run[], now: number): number => runs.filter((run) => run.status !== "completed").reduce((sum, run) => {
+  const held = hostedHeld(run);
+  const start = suiteStart(run);
+  if (!peaks(run)) return sum + held;
+  if (start === undefined) return sum + Math.max(held, RUN_PEAK);
+  return sum + (step(now, start) >= PROFILE.length ? held : Math.min(held, PROFILE[step(now + LEAD, start)] ?? 0));
 }, 0);
 
-export function plan(lanes: readonly Lane[], runs: readonly Run[], retry: readonly string[] = []): Plan {
+export function plan(lanes: readonly Lane[], runs: readonly Run[], now: number, retry: readonly string[] = []): Plan {
   const retried = new Set(retry);
   const held = busy(runs);
+  const peak = forecast(runs, now);
   const free = Array.from({ length: TEST_SLOTS }, (_, slot) => slot).filter((slot) => !runs.some((run) => run.status !== "completed" && TEST_TITLE.exec(run.title)?.[1] === String(slot)));
   const test: TestOrder[] = [];
   let passed = false;
-  for (const lane of byArrival(lanes)) {
+  for (const lane of byArrival(lanes, now)) {
     const state = laneState(lane, runs, retried);
     passed ||= state === "passed";
     if (state !== "test") continue;
-    if (held + RUN_PEAK * (test.length + 1) > JOB_BUDGET) continue;
+    if (held + RUN_BUILD * (test.length + 1) > JOB_BUDGET || peak + RUN_PEAK * (test.length + 1) > JOB_BUDGET) continue;
     const slot = free.shift();
     if (slot === undefined) continue;
     test.push({ branch: lane.branch, tip: lane.tip, slot });
@@ -70,8 +92,8 @@ export function plan(lanes: readonly Lane[], runs: readonly Run[], retry: readon
 
 export interface TrainLane { readonly branch: string; readonly tip: string; readonly base: string; readonly tree: string }
 
-export function train(lanes: readonly Lane[]): TrainLane[] {
-  return byArrival(lanes).flatMap((lane) => {
+export function train(lanes: readonly Lane[], now: number): TrainLane[] {
+  return byArrival(lanes, now).flatMap((lane) => {
     const passed = passedAlone(lane);
     return passed === undefined ? [] : [{ branch: lane.branch, tip: lane.tip, ...passed }];
   }).slice(0, TRAIN_CAP);

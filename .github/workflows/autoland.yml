@@ -53,6 +53,10 @@ env:
     status: (.target.status.context | if . == null then null else {state: (.state | ascii_downcase), description, at: .createdAt} end)}
   FETCH_LANES: |
     gh api graphql --paginate -F owner="${GH_REPO%/*}" -F name="${GH_REPO#*/}" -f query="$LANES_QUERY" --jq "$LANES_JQ" | jq -s . > lane-refs.json
+    jq -r '.[] | select(.status.state == "pending") | .tip' lane-refs.json | while read -r tip; do
+      gh api "repos/$GH_REPO/commits/$tip/statuses?per_page=100" --jq "{\"$tip\": ([.[] | select(.context == \"autoland\") | .created_at] | min)}" || echo '{}'
+    done | jq -s 'add // {}' > since.json
+    jq --slurpfile since since.json 'map(. + ($since[0][.tip] // null | if . == null then {} else {since: .} end))' lane-refs.json > lane-since.json && mv lane-since.json lane-refs.json
     fields=$(jq -r '[.[].issues[]] | unique | map("i\(.): issue(number: \(.)) { labels(first: 100) { nodes { name } } }") | join(" ")' lane-refs.json)
     if [ -z "$fields" ]; then
       jq 'map(del(.issues) + {labels: []})' lane-refs.json

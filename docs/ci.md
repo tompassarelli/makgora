@@ -27,10 +27,12 @@ landing restarts another's suites.
    (smashcraft:ts/scripts/prePush.ts) on a scratch `farm/autoland-SHA`
    branch and the farm test workflow, which runs every check main's CI runs.
    Tests run in three slots of one farm run each, outside the landing queue;
-   a plan starts a test only while Autoland's queued and running hosted jobs
-   plus the new run's 16 stay within 32 of the account's 40 (a test or train
-   run with no `suite /` job yet counts 16), and logs "Autoland hosted jobs:
-   N/32" in its summary. The train is never held by that budget.
+   a plan fills every free slot whose run fits 32 of the account's 40 hosted
+   jobs at every moment: each run reserves the measured job profile `PROFILE`
+   left at the new run's peak (15 jobs for 2.5 min, then decaying; a run with no
+   `suite /` job yet counts 15), and logs "Autoland hosted jobs: N/32 now, M at
+   the next peak". The train is never held by that budget. A lane whose first
+   `autoland` status is over 60 min old goes ahead of every other, oldest first.
    Because tests run outside the landing queue, a red tip gets its failed status and run summary within minutes. A
    conflicting tip, or one that changes `.github/workflows/` (the workflow
    token can't push those), is refused. A green tip becomes "passed alone on
