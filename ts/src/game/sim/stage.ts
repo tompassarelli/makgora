@@ -230,7 +230,6 @@ const NORDRASSIL_DECKS = [MAIN_DECK,
 const GRYPHON_DECKS = [MAIN_DECK,
   fixed(-480.0, -291.0, melee(23.5), true),
   fixed(291.0, 480.0, melee(23.5), true),
-  fixed(-94.5, 94.5, melee(42.0), true),
 ];
 
 
@@ -284,16 +283,12 @@ const LOOP_DECK = moving(120.0, 210.0, 150.0, 0, [
 const NO_DECKS: readonly Deck[] = [];
 
 
-const CARRIED_DECK = moving(110.0, -420.0, 120.0, 0, [
-  { frames: 60, x: -420.0, z: 120.0 },
-  { frames: 280, x: 420.0, z: 120.0 },
-  { frames: 60, x: 420.0, z: 120.0 },
-  { frames: 60, x: 420.0, z: 300.0 },
-  { frames: 60, x: 420.0, z: 300.0 },
-  { frames: 280, x: -420.0, z: 300.0 },
-  { frames: 60, x: -420.0, z: 300.0 },
-  { frames: 60, x: -420.0, z: 120.0 },
-], { x: 0.0, z: 120.0 });
+const CARRIED_DECK = moving(110.0, -210.0, 280.0, 0, [
+  { frames: 60, x: -210.0, z: 280.0 },
+  { frames: 140, x: 210.0, z: 280.0 },
+  { frames: 60, x: 210.0, z: 280.0 },
+  { frames: 140, x: -210.0, z: 280.0 },
+], { x: 0.0, z: 280.0 });
 const STAGE_DECKS: readonly (readonly Deck[])[] = [
   [MAIN_DECK],
   RAISED_DECKS,
@@ -314,7 +309,7 @@ function stageDecks(stage: number): readonly Deck[] {
   if (stage === SLOPE_TEST_STAGE) return SLOPED_DECKS;
   return stage >= 0 && stage < STAGE_DECKS.length ? at(STAGE_DECKS, stage) : NO_DECKS;
 }
-const CARRIED_DECKS = [MAIN_DECK, CARRIED_DECK, at(GRYPHON_DECKS, 1), at(GRYPHON_DECKS, 2), at(GRYPHON_DECKS, 3)];
+const CARRIED_DECKS = [MAIN_DECK, CARRIED_DECK, at(GRYPHON_DECKS, 1), at(GRYPHON_DECKS, 2)];
 const TIMED_DECKS = [MAIN_DECK, LIFT_DECK];
 const SLOPED_DECKS = [SLOPED_MAIN_DECK];
 
