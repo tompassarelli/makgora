@@ -193,7 +193,7 @@ jobs:
           out scratch "$scratch"
           out verdict test
 
-  # Lanes never regenerate whole-roster reports: the candidate's are rebuilt here on the farm and land with it as one more commit.
+  # Lanes never regenerate whole-roster reports: the candidate's are rebuilt here beside its suite and land with it as one more commit.
   reports:
     needs: build
     if: needs.build.outputs.verdict == 'test' || needs.build.outputs.verdict == 'tested'
@@ -244,11 +244,11 @@ jobs:
           out sha "$(git rev-parse HEAD)"
 
   suite:
-    needs: [build, reports]
-    if: needs.reports.outputs.verdict == 'test'
+    needs: build
+    if: needs.build.outputs.verdict == 'test'
     uses: ./.github/workflows/farm-test.yml
     with:
-      ref: ${{ needs.reports.outputs.sha }}
+      ref: ${{ needs.build.outputs.sha }}
       farm-runner: ${{ inputs.farm-runner }}
 
   land:

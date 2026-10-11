@@ -36,7 +36,8 @@ landing restarts another's suites.
    very tree it passed alone lands by itself without another suite; any other
    train runs the gate and farm test once as one merged candidate.
 4. **Land.** Only when the suites pass on that exact candidate, main's known
-   failures included (#394), main is fast-forwarded to it, each branch's
+   failures included (#394), and its regenerated reports meet their targets,
+   main is fast-forwarded to it plus the reports commit, each branch's
    status becomes "landed as SHA" and its branch is deleted. Pushes made with
    the workflow token start no workflows, so the run dispatches main's CI,
    which runs only its smoke job for a landed commit.
@@ -50,10 +51,12 @@ landing restarts another's suites.
    suite.
 
 Lanes don't regenerate whole-roster reports. After the gate, Autoland's
-`reports` job reruns `bun wisp combos --advantage` on the farm runner, commits
-changed tools/move-data/advantage-state.{jsonl,md} as "Regenerate reports for
-LANES" with the changed rows in the summary, and refuses a candidate whose
-rows miss a target (ts/test/advantage-state.test.ts) before its suite.
+`reports` job runs beside the suite: it reruns `bun wisp combos --advantage`,
+commits changed tools/move-data/advantage-state.{jsonl,md} as "Regenerate
+reports for LANES" with the changed rows in the summary, and refuses a
+candidate whose regenerated rows miss a target (ts/test/advantage-state.test.ts).
+The suite tests the candidate and the reports job tests the regenerated rows,
+their only reader; `land` waits for both and pushes the reports commit.
 
 Every dispatched run ends with a plan unless it was cancelled, and a plan tests
 again any pending tip that no unfinished run holds, so a later plan rediscovers a cancelled tip. The scheduling decisions are a pure function
