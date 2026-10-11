@@ -117,6 +117,7 @@ function upgradeDefaults(bindings: KeyBindings, version: string): void {
   const first = (action: Action) => keyFor(bindings, action, 0);
   if (keyFor(bindings, Action.lightShield, 1) === undefined && free(code("T"))) rebind(bindings, Action.lightShield, 1, code("T"));
   if (keyFor(bindings, Action.meter, 0) === undefined && free(code("X"))) rebind(bindings, Action.meter, 0, code("X"));
+  if (keyFor(bindings, Action.shortHop, 0) === undefined && free(code("Z"))) rebind(bindings, Action.shortHop, 0, code("Z"));
   if (version === "K1" && free(code("P"))) rebind(bindings, Action.walk, 0, code("P"));
 
   if (first(Action.grab) === code("L") && free(code("O"))) rebind(bindings, Action.grab, 0, code("O"));
