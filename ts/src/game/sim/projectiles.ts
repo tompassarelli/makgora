@@ -369,21 +369,23 @@ const trailPiece = emptyCapsule();
 
 function strikeFromTrail(world: Roster, ownerSlot: number): void {
   const owner = fighterAt(world, ownerSlot);
-  for (let targetSlot = 0; targetSlot < PARTICIPANT_CAPACITY; targetSlot++) {
-    if (!isActive(world, targetSlot) || targetSlot === ownerSlot || targets.out[targetSlot] || targets.intangible[targetSlot]) continue;
-    const target = fighterAt(world, targetSlot);
-    const body = placeCapsule(heroTarget, hurtCapsule(target.character), at(targets.x, targetSlot), at(targets.z, targetSlot), target.facing);
-    for (const piece of owner.projectiles) {
-      const every = piece.spec?.trail?.every ?? 0;
-      if (piece.life <= 0 || piece.kind !== ProjectileKind.hero || piece.spec === undefined || every <= 0 || imod(piece.life, every) !== every - 1) continue;
-      trailPiece.x1 = piece.x;
-      trailPiece.z1 = piece.z;
-      trailPiece.x2 = piece.x;
-      trailPiece.z2 = piece.z;
-      trailPiece.radius = piece.spec.radius;
-      if (!capsulesIntersect(trailPiece, body)) continue;
+  let struck = 0;
+  for (const piece of owner.projectiles) {
+    if (piece.life <= 0 || piece.kind !== ProjectileKind.hero || piece.spec === undefined) continue;
+    const every = piece.spec.trail?.every ?? 0;
+    if (every <= 0 || imod(piece.life, every) !== every - 1) continue;
+    trailPiece.x1 = piece.x;
+    trailPiece.z1 = piece.z;
+    trailPiece.x2 = piece.x;
+    trailPiece.z2 = piece.z;
+    trailPiece.radius = piece.spec.radius;
+    for (let targetSlot = 0; targetSlot < PARTICIPANT_CAPACITY; targetSlot++) {
+      const bit = 1 << targetSlot;
+      if ((struck & bit) !== 0 || !isActive(world, targetSlot) || targetSlot === ownerSlot || targets.out[targetSlot] || targets.intangible[targetSlot]) continue;
+      const target = fighterAt(world, targetSlot);
+      if (!capsulesIntersect(trailPiece, placeCapsule(heroTarget, hurtCapsule(target.character), at(targets.x, targetSlot), at(targets.z, targetSlot), target.facing))) continue;
+      struck |= bit;
       collectDamageContact(world, ownerSlot, targetSlot, piece.spec.effect, piece.direction, ContactKind.flinch, false, undefined, target.shield.raised, undefined, piece.z);
-      break;
     }
   }
 }
