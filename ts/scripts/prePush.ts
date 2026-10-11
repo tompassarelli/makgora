@@ -131,7 +131,7 @@ export const prePush = (input: string) => Effect.gen(function*() {
   yield* mainRedNotice;
   const pushed = input.split("\n").flatMap((line) => {
     const [, local, remoteRef, remote] = line.trim().split(/\s+/);
-    return local === undefined || remote === undefined || ZERO.test(local) ? [] : [{ local, remoteRef, remote }];
+    return local === undefined || remote === undefined || ZERO.test(local) || remoteRef?.startsWith("refs/tags/") ? [] : [{ local, remoteRef, remote }];
   });
   const paths = [...new Set((yield* Effect.forEach(pushed, ({ local, remote }) => changedPaths(local, remote))).flat())];
   const checks = checksFor(paths);
