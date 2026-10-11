@@ -39,7 +39,7 @@ const RISEN_DEPTH = 0.375;
 const RISEN_ALPHA = 150;
 const RAISED_SKELETON = "Units\\Undead\\Skeleton\\Skeleton.mdx";
 const RAISED_BURST = "Abilities\\Spells\\Undead\\RaiseSkeletonWarrior\\RaiseSkeleton.mdx";
-const RAISED_FRONT = 72.0;
+const RAISED_FRONT = 62.0;
 const RAISED_LAYOUT = [{ x: f32(-0.6), yaw: f32(-1.2) }, { x: 0.0, yaw: f32(-1.5708) }, { x: f32(0.6), yaw: f32(-1.95) }];
 
 
@@ -138,6 +138,7 @@ export class ProjectilePresentation {
             crowd.push(this.models.length);
             const raisedModel = AddSpecialEffect(layer < RAISED_LAYOUT.length ? RAISED_SKELETON : RAISED_BURST, origin.x, origin.y);
             BlzSetSpecialEffectAnimationBlendTime(raisedModel, 0.0);
+            BlzSetSpecialEffectAnimation(raisedModel, "birth");
             this.models.push(raisedModel);
             this.visible.push(false);
           }
@@ -261,9 +262,8 @@ export class ProjectilePresentation {
       BlzSetSpecialEffectYaw(raisedModel, layout?.yaw ?? 0.0);
       BlzSetSpecialEffectPosition(raisedModel, x + (eyeX - x) * lift, y, z + (eyeZ - z) * lift);
       BlzSetSpecialEffectScale(raisedModel, f32((layout === undefined ? 1.5 : index === 1 ? 1.25 : f32(1.1)) * (1.0 - lift)));
-      BlzSetSpecialEffectAlpha(raisedModel, 255);
-      if (age === 0) BlzSetSpecialEffectAnimation(raisedModel, "birth");
-      BlzSetSpecialEffectTime(raisedModel, layout === undefined ? f32(f32(0.2) + f32(f32(0.3) * age)) : f32(0.5 + f32(f32(0.45) * age)));
+      BlzSetSpecialEffectAlpha(raisedModel, age === 0 && layout !== undefined ? 0 : 255);
+      BlzSetSpecialEffectTime(raisedModel, layout === undefined ? f32(f32(0.2) + f32(f32(0.3) * age)) : f32(f32(1.35) + f32(f32(0.3) * age)));
       BlzSetSpecialEffectTimeScale(raisedModel, 0.0);
     }
   }
