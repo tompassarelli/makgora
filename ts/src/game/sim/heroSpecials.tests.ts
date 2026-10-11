@@ -1,20 +1,27 @@
-import { assertEquals, assertGreaterThan, test } from "wisp/src/runtime/testing";
+import { assertDefined, assertEquals, assertGreaterThan, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { resolveAttacks } from "./attacks";
 import { Character, SpecialAction } from "./codes";
 import { beginDamageContacts, finishDamageContacts } from "./contacts";
 import { type Fighter, createFighter } from "./fighter";
 import { heroRegion } from "./heroMoves";
-import { advanceHeroStatus } from "./heroSpecialRules";
+import { advanceHeroStatus, runningHeroSpecial } from "./heroSpecialRules";
 import { ROSTER_MANA } from "./mana";
 import { type AuthoredSpecial, type FighterSpecials, frames } from "./heroSpecials";
 import { updateProjectiles } from "./projectiles";
-import { type Controls, type Roster, createRoster } from "./roster";
+import { type Controls, type Roster, createRoster, fighterAt } from "./roster";
 import { advanceSpecials, startFighterSpecial } from "./specials";
 import { advanceFighter } from "./step";
 import { controls } from "./testWorld";
 import { copyFighterState } from "../replay/fighterState";
-import { firstFighterDifference } from "../replay/difference";
+import { firstFighterDifference, firstStateDifference } from "../replay/difference";
+import { copyReplayState, createReplaySnapshot } from "../replay/snapshot";
+import { Action, maskOf } from "../input/actions";
+import { adaptInput } from "../input/adapter";
+import { inputRow } from "../input/inputRow";
+import { Phase } from "../match/rules";
+import { stepMatch } from "../match/step";
+import { setWorldMotionValue } from "./motion";
 
 const hit = (damage: number) => ({ damage, growth: 80.0, base: 20.0, launchX: f32(0.8), launchZ: f32(0.6), electric: false });
 
@@ -106,5 +113,66 @@ test("replaying a hero special from a restored snapshot reproduces every fighter
   run();
   assertEquals(firstFighterDifference(endOwner, owner, 3, 3), undefined);
   assertEquals(firstFighterDifference(endTarget, target, 3, 3), undefined);
+});
+
+test("seed 448's 18 aerial down-special landings continue to an effect and replay every frame [k1 scenario]", () => {
+  const characters = [Character.blademaster, Character.mountainKing, Character.lich, Character.dreadlord,
+    Character.shadowHunter, Character.pitLord, Character.chen, Character.peon, Character.tinker,
+    Character.kaelthas, Character.grom, Character.kobold];
+  let scenarios = 0;
+  for (const character of characters) {
+    const falls = character === Character.mountainKing || character === Character.lich || character === Character.dreadlord
+      || character === Character.shadowHunter || character === Character.pitLord || character === Character.grom;
+    for (let setup = 0; setup < (falls ? 2 : 1); setup++) {
+      const live = createReplaySnapshot();
+      const replay = createReplaySnapshot();
+      const owner = fighterAt(live.world, 0);
+      copyFighterState(owner, createFighter(character, 100.0, 1), 3);
+      copyFighterState(fighterAt(live.world, 1), createFighter(Character.rifleman, -480.0, 1), 3);
+      owner.motion.z = setup === 0 ? 40.0 : 240.0;
+      owner.motion.vz = setup === 0 ? -1.0 : -4.0;
+      owner.motion.grounded = false;
+      owner.motion.surface = undefined;
+      setWorldMotionValue(owner.motion.meleeX, owner.motion.x);
+      setWorldMotionValue(owner.motion.meleeZ, owner.motion.z);
+      setWorldMotionValue(owner.motion.meleeVelocityZ, owner.motion.vz);
+      live.match.phase = Phase.match;
+      live.match.stageChoice = 0;
+      live.match.matchSeed = 448;
+      live.match.hazards = false;
+      live.match.items.on = false;
+      live.match.timeLimitMinutes = 0;
+      live.match.ultimatesOff = true;
+      copyReplayState(replay, live);
+      let landed = false;
+      let effect = false;
+      for (let tick = 1; tick <= 120; tick++) {
+        const row = assertDefined(inputRow({ held: tick === 1 ? maskOf(Action.moveDown, Action.special) : maskOf(Action.moveDown),
+          pressed: tick === 1 ? maskOf(Action.special) : 0, axisZ: -127, specialZ: tick === 1 ? -1 : 0 }));
+        for (const state of [live, replay]) {
+          adaptInput(row, fighterAt(state.world, 0), tick, state.controls.inputs[0], state.controls.commands[0]);
+          stepMatch(state.match, state.world, state.controls, tick);
+        }
+        const difference = firstStateDifference(live, replay);
+        if (difference !== undefined) throw new Error(`seed 448 character ${character} setup ${setup} frame ${tick}: ${difference}`);
+        if (!landed && owner.motion.grounded) {
+          landed = true;
+          assertEquals(owner.special.action, SpecialAction.heroDown);
+          assertEquals(owner.special.form, 0);
+          assertEquals(owner.special.frame, tick);
+        }
+        const move = runningHeroSpecial(owner);
+        effect = effect || move?.regions?.some(region => owner.special.frame >= region.firstFrame && owner.special.frame <= region.lastFrame) === true
+          || owner.projectiles.some(projectile => projectile.life > 0) || owner.placed.life > 0
+          || owner.status.armorFrames > 0 || (move?.guard !== undefined && owner.special.frame >= move.guard.first && owner.special.frame <= move.guard.last);
+      }
+      assertEquals(landed, true);
+      assertEquals(effect, true);
+      fighterAt(replay.world, 0).special.form = 99;
+      assertDefined(firstStateDifference(live, replay));
+      scenarios++;
+    }
+  }
+  assertEquals(scenarios, 18);
 });
 
