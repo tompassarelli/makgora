@@ -78,12 +78,15 @@ function tick(): void {
     return;
   }
   const target = fixture.frames[r.frame];
-  if (target === undefined || now !== target || ++r.held < (fixture.holdTicks ?? HOLD_TICKS)) return;
-  r.held = 0;
+  if (target === undefined || now !== target) return;
   const silhouette = fixture.silhouette;
+  if (silhouette !== undefined && r.held === 0) ClearTextMessages();
+  if (++r.held < (fixture.holdTicks ?? HOLD_TICKS)) return;
+  r.held = 0;
   if (silhouette !== undefined) {
     r.hidden = !r.hidden;
     applyDeveloperCommand(s, 0, `-dev ${r.hidden ? "hide" : "show"} fighter ${silhouette.slot}`);
+    ClearTextMessages();
     if (r.hidden) {
       paintDrawnStamp(globalThis.__smashcraftDriverScripts ?? 0, target + SILHOUETTE_HIDDEN_FRAME);
       return;
