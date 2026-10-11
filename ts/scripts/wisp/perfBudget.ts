@@ -10,11 +10,11 @@ import { PerfFailure } from "wisp/scripts/wisp/commands/perf";
 import { parsePerfSamples } from "wisp/scripts/wisp/nativeFit";
 import { WARCRAFT_COST, nativeFrameCost } from "wisp/src/headless/nativeCost";
 
-export const BUDGET_P99_MS = 10;
-export const BUDGET_TOP_MS = 14;
-export const BUDGET_WORST_MS = 14;
+const BUDGET_P99_MS = 10;
+const BUDGET_TOP_MS = 14;
+const BUDGET_WORST_MS = 14;
 /** The worst frames a budget averages instead of one worst frame, whose identity moves with any bot choice (#394). */
-export const TOP_SHARE = 0.01;
+const TOP_SHARE = 0.01;
 
 
 function rank(sorted: readonly number[], share: number): number {
