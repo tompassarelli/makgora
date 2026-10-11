@@ -330,7 +330,7 @@ export class SelectionPanel {
     placeTopLeft(settingsButton, headerBoxLeft, f32(0.52));
     BlzFrameSetSize(settingsButton, f32(0.235), f32(0.037));
     this.clicks.add(settingsButton, { kind: "settings" });
-    const settingsLabel = label(settingsButton, `MeleeSettingsLabel${suffix}`, headerLeft, f32(0.52), f32(f32(0.235) - 2 * headerInset), f32(0.037), MENU_STYLE.headerSize);
+    const settingsLabel = label(settingsButton, `MeleeSettingsLabel${suffix}`, headerLeft, f32(0.516), f32(f32(0.235) - 2 * headerInset), f32(0.037), MENU_STYLE.headerSize);
     BlzFrameSetTextAlignment(settingsLabel, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
     this.settingsLabel = settingsLabel;
     setFrameText(settingsLabel, `${MENU_STYLE.gold}Controls (F1)|r`);
@@ -360,7 +360,7 @@ export class SelectionPanel {
     };
     this.modeLabel = page(createText(`MeleeModeLabel${suffix}`, gameUi(), 478 + participantId), titleBox.left, titleBox.top, titleBox.width, titleBox.height);
     sizeText(this.modeLabel, MENU_STYLE.headerSize, f32(f32(0.295) - 2 * headerInset), f32(0.032));
-    placeTopLeft(this.modeLabel, headerLeft, f32(0.555));
+    placeTopLeft(this.modeLabel, headerLeft, f32(0.551));
     BlzFrameSetTextAlignment(this.modeLabel, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
     BlzFrameSetEnable(this.modeLabel, false);
     this.movesFrames = [
