@@ -36,7 +36,6 @@ export const DISJOINT_CUES: { readonly [character: number]: Cue } = {
   [Character.tinker]: disjointCue("Abilities\\Spells\\Other\\AcidBomb\\BottleMissile.mdx"),
   [Character.murloc]: disjointCue("Abilities\\Weapons\\MurgulMagicMissile\\MurgulMagicMissile.mdx"),
   [Character.grom]: { ...disjointCue("Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedDamage.mdx"), seconds: f32(0.2), birth: { eachFrame: false } },
-  [Character.anubarak]: disjointCue("Abilities\\Weapons\\CryptFiendMissile\\CryptFiendMissile.mdx"),
   [Character.malfurion]: disjointCue("Abilities\\Weapons\\KeeperGroveMissile\\KeeperGroveMissile.mdx"),
   [Character.medivh]: disjointCue("Abilities\\Weapons\\DruidoftheTalonMissile\\DruidoftheTalonMissile.mdx"),
 };
@@ -62,7 +61,6 @@ export const DEFINITIVE_ACCENT_REDRAWS: { readonly [model: string]: string } = {
   "Abilities\\Spells\\Other\\AcidBomb\\BottleMissile.mdx": "HD acid bottle",
   "Abilities\\Weapons\\MurgulMagicMissile\\MurgulMagicMissile.mdx": "HD Mur'gul bolt",
   "Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedDamage.mdx": "Popcorn red flame",
-  "Abilities\\Weapons\\CryptFiendMissile\\CryptFiendMissile.mdx": "HD crypt fiend web",
   "Abilities\\Weapons\\KeeperGroveMissile\\KeeperGroveMissile.mdx": "HD Keeper bolt",
   "Abilities\\Weapons\\DruidoftheTalonMissile\\DruidoftheTalonMissile.mdx": "Popcorn raven bolt",
 };
@@ -82,6 +80,7 @@ export function isDisjointRegion(fighter: Readonly<Fighter>, region: Readonly<Hi
 
 export function disjointNormals(fighter: Fighter): readonly AttackStyle[] {
   const styles: AttackStyle[] = [];
+  if (DISJOINT_CUES[fighter.character] === undefined) return styles;
   const scratch = emptyHitRegion();
   const previousStyle = fighter.attack.style, previousFrame = fighter.attack.frame;
   for (const style of Object.values(AttackStyle)) {

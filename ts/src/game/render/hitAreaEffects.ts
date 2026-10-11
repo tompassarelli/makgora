@@ -21,7 +21,8 @@ export class HitAreaEffects {
 
   constructor(character: Character, private readonly origin: WorldOrigin) {
     this.styles = disjointNormals(createFighter(character, 0.0, 1));
-    for (let index = 0; index < HIT_AREA_EFFECT_CAPACITY; index++) this.models.push(AddSpecialEffect(DISJOINT_CUES[character]?.model ?? "", origin.x, origin.y));
+    const cue = DISJOINT_CUES[character];
+    if (cue !== undefined) for (let index = 0; index < HIT_AREA_EFFECT_CAPACITY; index++) this.models.push(AddSpecialEffect(cue.model, origin.x, origin.y));
     this.clear();
   }
 
@@ -35,7 +36,7 @@ export class HitAreaEffects {
 
   present(fighter: Readonly<Fighter> | undefined, playing: boolean): void {
     let shown = 0;
-    if (fighter !== undefined && playing && !fighter.status.out) {
+    if (fighter !== undefined && playing && !fighter.status.out && DISJOINT_CUES[fighter.character] !== undefined) {
       const style = fighter.attack.style;
       const normal = style !== undefined && this.styles.includes(style);
       const count = normal ? authoredHitRegionCount(style, fighter.tuning.moves) : runningHeroSpecial(fighter)?.regions?.length ?? 1;
