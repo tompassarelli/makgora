@@ -516,6 +516,7 @@ export function playCpuMatch(a: Character, b: Character, stageName: string, vari
         }
         const dealt = Math.max(0, f.status.damage - seen.damage - (terrainDamage[slot] ?? 0));
         const techChoice = seen.down !== f.down.state && (f.down.state === DownState.tech || f.down.state === DownState.techRoll
+          || (seen.down === DownState.tumble && f.down.state === DownState.bound)
           || (seen.down === DownState.bound && (f.down.state === DownState.wait || f.down.state === DownState.stand || f.down.state === DownState.roll || f.down.state === DownState.attack)));
         if (options.playtest && (terrainDamage[slot] ?? 0) > 0 && seen.punish !== undefined && other !== undefined) {
           closePunish(other.punishes, seen.punish, false, undefined, slot, frame, combos);
@@ -541,32 +542,33 @@ export function playCpuMatch(a: Character, b: Character, stageName: string, vari
         if (inCorner && !seen.cornered) own.edges.corners++;
         if (seen.cornered && !inCorner && !hit && !f.status.out && insideLip(stage, f.motion.x) > CORNER_BAND) own.edges.cornerEscapes++;
         seen.cornered = inCorner && !hit;
+        let move: number | undefined;
         if ((hit || dealt > 0) && other !== undefined) {
           const striking = strikingMove(opponent);
-          const move = striking ?? opponentSeen.lastStarted;
+          move = striking ?? opponentSeen.lastStarted;
           if (move !== undefined) {
             seen.lastHitMove = move;
             if (dealt > 0) other.damageByMove[move] = (other.damageByMove[move] ?? 0) + dealt;
           }
           if (striking === undefined) other.rangedDamage += dealt;
           other.damageDealt += dealt;
+        }
+        // Damage over time (poison, status ticks) lands without a hit: it neither adds to the last hit nor extends the string.
+        if (hit && other !== undefined) {
           if (seen.punish === undefined) {
             seen.punish = { hits: 0, damage: 0, quiet: 0, neutral: opponentSeen.punish === undefined, disadvantage: false, stunned: 0, fromStockStart: seen.stockFirstHit, free: 0, gaps: [], start: seen.damage, moves: [], instances: [], damages: [] };
             seen.stockFirstHit = false;
           }
-          if (hit && seen.punish.hits > 0) {
+          if (seen.punish.hits > 0) {
             seen.punish.gaps.push(seen.punish.free);
             seen.punish.free = 0;
           }
-          seen.punish.hits += hit ? 1 : 0;
+          seen.punish.hits++;
           seen.punish.damage += dealt;
           if (combos !== undefined) {
-            const p = seen.punish;
-            if (hit) {
-              p.moves.push(move ?? -1);
-              p.instances.push(opponentSeen.starts);
-              p.damages.push(dealt);
-            } else if (p.damages.length > 0) p.damages[p.damages.length - 1] = (p.damages[p.damages.length - 1] ?? 0) + dealt;
+            seen.punish.moves.push(move ?? -1);
+            seen.punish.instances.push(opponentSeen.starts);
+            seen.punish.damages.push(dealt);
           }
           seen.punish.quiet = 0;
         } else if (seen.punish !== undefined && other !== undefined) {
