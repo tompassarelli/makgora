@@ -8,7 +8,7 @@
 | Background sweeps (smashcraft:.github/workflows/background-sweeps.yml) | each landing (Autoland dispatches it with the landed SHA), push to main, nightly | on `farm-big`: the Bun and Lua32 suites with `SWEEPS=1`, and the per-pair worst-frame census (#405) in 7 fighter shards whose joined pairs must stay within the margin of test/fixtures/perf/census-pairs.txt; a landing's red run goes to the sheriff (see Sheriff) |
 | Playtest (smashcraft:.github/workflows/playtest.yml) | nightly, dispatch with `matches` | plays computer-versus-computer matches across every fighter, stage and computer level on the newest green main, each seed twice to compare state hashes, and opens or updates one issue per finding kind (smashcraft:docs/commands/soak.md) |
 | Autoland (smashcraft:.github/workflows/autoland.yml) | push to `claude/**`, `safe-push --to main`, dispatch with `branch` | main's one landing queue: tests each waiting tip alone at once, lands trains of tips that passed |
-| Autoland sweep (smashcraft:.github/workflows/autoland-sweep.yml) | every 5 minutes, dispatch with `dry-run` | cancels stuck Autoland runs and requeues their lanes; opens the "Autoland stalled" issue while main is idle with lanes pending |
+| Autoland sweep (smashcraft:.github/workflows/autoland-sweep.yml) | every 5 minutes, dispatch with `dry-run` or `landed` | cancels stuck Autoland runs and requeues their lanes; opens the "Autoland stalled" issue while main is idle with lanes pending |
 | Effect upgrade (smashcraft:.github/workflows/effect-upgrade.yml) | Mondays, dispatch | `effect-kit upgrade` and `effect-kit check`; a clean upgrade goes to Autoland, findings to the "Weekly Effect upgrade" issue |
 
 ## Autoland
@@ -132,7 +132,9 @@ A plan refuses a tip already tested alone 3 times (a hang, train-failure or
 retry loop) with a failed status; `-f branch=` retries it. While main has
 been idle for 30 minutes with lanes pending, the sweep dispatches a plan
 every time and opens the "Autoland stalled" issue, comments on it at most
-every 30 minutes, and closes it once main moves. Inject a stall with
+every 30 minutes, and closes it once main moves. Prove the alarm without a
+real stall with `gh workflow run autoland-sweep.yml -f landed=ISO_TIME`, which
+treats main as last moved then; inject a stuck run with
 `gh workflow run autoland.yml -f test="BRANCH SHA" -f slot=N -f farm-runner=LABEL`
 (smashcraft#513).
 

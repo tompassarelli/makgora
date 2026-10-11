@@ -9,6 +9,9 @@ on:
         description: List what the sweep would cancel without cancelling or replanning
         type: boolean
         default: false
+      landed:
+        description: "Treat main as last moved at this ISO time, to prove the stalled alarm without a real stall (smashcraft#513)"
+        default: ""
 
 permissions:
   actions: write
@@ -24,6 +27,7 @@ env:
   GH_TOKEN: ${{ github.token }}
   GH_REPO: ${{ github.repository }}
   DRY_RUN: ${{ inputs.dry-run == true }}
+  LANDED: ${{ inputs.landed }}
   STALLED_TITLE: Autoland stalled
 
 jobs:
@@ -77,7 +81,7 @@ jobs:
             nodes { name target { oid ... on Commit { status { context(name: "autoland") { state description createdAt } } } } } } } }' \
             --jq '.data.repository.refs.nodes[] | {branch: ("claude/" + .name), tip: .target.oid,
               status: (.target.status.context | if . == null then null else {state: (.state | ascii_downcase), description, at: .createdAt} end)}' | jq -s . > lanes.json
-          landed=$(gh api "repos/$GH_REPO/activity?ref=refs/heads/main&per_page=1" --jq '.[0].timestamp')
+          landed=${LANDED:-$(gh api "repos/$GH_REPO/activity?ref=refs/heads/main&per_page=1" --jq '.[0].timestamp')}
           stalled=$(bun ts/scripts/autoland.ts stalled --lanes lanes.json --landed "$landed" --now "$now")
           pending=$(jq '[.[] | select(.status.state == "pending")] | length' lanes.json)
           echo "main last moved at $landed; $pending lanes pending; stalled: $stalled" >> "$GITHUB_STEP_SUMMARY"
