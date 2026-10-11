@@ -1400,38 +1400,93 @@ mod linux {
         }
     }
 
+    #[cfg(test)]
+    fn sample_pad(seed: &mut u64) -> State {
+        let axis = |seed: &mut u64| [0, 0, -32_767, 32_767, -10_000, 10_000, 3_000][(sample(seed) % 7) as usize];
+        let mut state = State::default();
+        match sample(seed) % 4 {
+            0 => {}
+            1 => state.sources = 1 << (sample(seed) % 6),
+            2 => { state.x = axis(seed); state.y = axis(seed); }
+            _ => { state.cx = axis(seed); state.cy = axis(seed); state.lt = [0, 3_000, 32_767][(sample(seed) % 3) as usize]; state.rt = [0, 4_001][(sample(seed) % 2) as usize]; }
+        }
+        state
+    }
+
     #[test]
-    fn paused_pad_camera_repeats_motion_but_hud_and_menu_are_edges() {
-        let mut input = PauseInput::default();
-        let neutral = State::default();
-        assert_eq!(input.step(true, neutral, 0), "");
-        for (physical, expected) in [
-            (State { cx: -32_767, cy: -32_767, ..neutral }, "ji"),
-            (State { cx: 32_767, cy: 32_767, ..neutral }, "lk"),
-            (State { lt: 32_767, rt: 32_767, ..neutral }, "-="),
-            (State { sources: (1 << 1) | (1 << 4), ..neutral }, "op"),
-            (State { sources: (1 << 0) | (1 << 2) | (1 << 5), y: -32_767, ..neutral }, "nuh "),
-            (State { y: 32_767, ..neutral }, "e"),
-        ] {
-            input.next_motion_ns = 0;
-            input.buttons = 0;
-            assert_eq!(input.step(true, physical, 0), expected);
-            assert_eq!(input.step(true, physical, 1), "");
-            let repeated = input.step(true, physical, 33_333_334);
-            assert_eq!(repeated, if matches!(expected, "nuh " | "e") { "" } else { expected });
+    fn paused_pad_types_menu_edges_and_repeating_camera_only_after_neutral() {
+        let mut seed = 0x5061_7573_6550_6164;
+        for _ in 0..200 {
+            let mut input = PauseInput::default();
+            let (mut armed, mut previous, mut next_motion, mut now) = (false, 0u32, 0u128, 0u128);
+            for _ in 0..60 {
+                let active = sample(&mut seed) % 8 != 0;
+                let physical = sample_pad(&mut seed);
+                now += if sample(&mut seed) % 3 == 0 { 33_333_334 } else { u128::from(sample(&mut seed) % 50_000_000) };
+                let (x, y) = melee_stick(physical.cx, physical.cy);
+                let (_, menu_y) = melee_stick(physical.x, physical.y);
+                let buttons: Vec<char> = [(physical.sources & 1 != 0, 'n'), (physical.sources & 4 != 0, 'u'), (physical.sources & 32 != 0, 'h'), (menu_y < 0, ' '), (menu_y > 0, 'e')]
+                    .into_iter().filter(|(down, _)| *down).map(|(_, key)| key).collect();
+                let held: u32 = buttons.iter().map(|key| 1 << "nuh e".find(*key).unwrap()).sum();
+                let motion: String = [(x < 0, 'j'), (x > 0, 'l'), (y < 0, 'i'), (y > 0, 'k'), (physical.lt > 4_000, '-'), (physical.rt > 4_000, '='), (physical.sources & 16 != 0, 'o'), (physical.sources & 2 != 0, 'p')]
+                    .into_iter().filter(|(down, _)| *down).map(|(_, key)| key).collect();
+                let expected = if !active {
+                    armed = false;
+                    next_motion = 0;
+                    String::new()
+                } else if !armed {
+                    armed = held == 0 && motion.is_empty();
+                    String::new()
+                } else {
+                    let mut keys: String = buttons.iter().filter(|key| previous & 1 << "nuh e".find(**key).unwrap() == 0).collect();
+                    if !motion.is_empty() && now >= next_motion {
+                        next_motion = now + 33_333_334;
+                        keys += &motion;
+                    }
+                    keys
+                };
+                previous = held;
+                assert_eq!(input.step(active, physical, now), expected, "{physical:?} at {now}");
+            }
         }
     }
 
     #[test]
-    fn paused_pad_never_types_in_live_play_or_after_focus_loss_until_neutral() {
-        let mut input = PauseInput::default();
-        let moving = State { cx: 32_767, sources: 1 << 5, ..State::default() };
-        assert_eq!(input.step(false, moving, 0), "");
-        assert_eq!(input.step(true, moving, 1), "");
-        assert_eq!(input.step(true, State::default(), 2), "");
-        assert_eq!(input.step(true, moving, 3), "hl");
-        assert_eq!(input.step(false, moving, 100_000_000), "");
-        assert_eq!(input.step(true, moving, 200_000_000), "");
+    fn menu_taps_one_edge_per_event_only_when_armed_after_neutral_within_the_open_phase() {
+        let mut seed = 0x4d65_6e75_5461_7073;
+        let phases = [None, Some(MenuPhase::Character), Some(MenuPhase::Cpu), Some(MenuPhase::Stage), Some(MenuPhase::Result)];
+        for run in 0..200 {
+            let mut input = MenuInput { start_only: run % 2 == 1, ..MenuInput::default() };
+            let (mut phase, mut armed, mut since) = (None, false, 0u128);
+            let (mut physical, mut start, mut now) = (State::default(), false, 0u128);
+            for _ in 0..80 {
+                now += u128::from(sample(&mut seed) % 20);
+                if sample(&mut seed) % 6 == 0 {
+                    let next = phases[(sample(&mut seed) % 5) as usize];
+                    input.observe(next, physical, start, now);
+                    if next != phase { phase = next; armed = false; since = now; }
+                    armed = next.is_some() && (armed || (action_state(physical) == 0 && !start));
+                    continue;
+                }
+                let after = if sample(&mut seed) % 3 == 0 { State::default() } else { sample_pad(&mut seed) };
+                let start_after = sample(&mut seed) % 5 == 0;
+                let at = now - u128::from(sample(&mut seed) % 4 / 3) * now.min(5);
+                let pressed = menu_buttons(after, start_after) & !menu_buttons(physical, start);
+                let expected = if phase.is_none() || at < since {
+                    None
+                } else if !armed {
+                    armed = action_state(after) == 0 && !start_after;
+                    None
+                } else if input.start_only {
+                    (pressed == 1 << 31).then_some("y")
+                } else {
+                    [(MOVE_LEFT, "w"), (MOVE_RIGHT, "r"), (MOVE_UP, " "), (MOVE_DOWN, "e"), (ATTACK, "n"), (SPECIAL, "u"), (1 << 31, "y")]
+                        .into_iter().find(|(bit, _)| pressed == *bit).map(|(_, key)| key)
+                };
+                assert_eq!(input.press(physical, after, start, start_after, at), expected, "run {run}: {physical:?} -> {after:?}");
+                (physical, start) = (after, start_after);
+            }
+        }
     }
 
     #[test]
@@ -1455,54 +1510,6 @@ mod linux {
         assert_eq!(fresh_menu(&dir, "menu-test", 2, 1, 0, clock_ns(libc::CLOCK_REALTIME).unwrap()).unwrap(), None);
         fs::remove_file(path).unwrap();
         fs::remove_dir(dir).unwrap();
-    }
-
-    #[test]
-    fn menu_taps_require_edges_and_neutral_across_phase_and_focus_changes() {
-        let neutral = State::default();
-        let attack = State { sources: 1, ..neutral };
-        let left = State { x: -10_000, ..neutral };
-        let right = State { x: 10_000, ..neutral };
-        let mut input = MenuInput::default();
-        assert_eq!(input.press(neutral, attack, false, false, 1), None);
-        input.observe(Some(MenuPhase::Character), attack, false, 10);
-        assert_eq!(input.press(attack, attack, false, false, 11), None);
-        assert_eq!(input.press(attack, neutral, false, false, 12), None);
-        assert_eq!(input.press(neutral, attack, false, false, 13), Some("n"));
-        assert_eq!(input.press(attack, attack, false, false, 14), None);
-        assert_eq!(input.press(neutral, left, false, false, 15), Some("w"));
-        assert_eq!(input.press(left, left, false, false, 16), None);
-        assert_eq!(input.press(left, right, false, false, 17), Some("r"));
-        assert_eq!(input.press(neutral, State { sources: 2, ..neutral }, false, false, 18), Some("u"));
-        assert_eq!(input.press(neutral, neutral, false, true, 19), Some("y"));
-        input.observe(Some(MenuPhase::Stage), neutral, true, 20);
-        assert_eq!(input.press(neutral, attack, true, true, 21), None);
-        assert_eq!(input.press(attack, neutral, true, false, 22), None);
-        assert_eq!(input.press(neutral, neutral, false, true, 23), Some("y"));
-        // Closed menus and focus loss use the same revocation. A held-through
-        // return button cannot confirm, nor can an old queued press.
-        input.observe(None, neutral, false, 30);
-        assert_eq!(input.press(neutral, attack, false, false, 31), None);
-        input.observe(Some(MenuPhase::Result), attack, false, 40);
-        assert_eq!(input.press(attack, attack, false, false, 41), None);
-        assert_eq!(input.press(attack, neutral, false, false, 42), None);
-        assert_eq!(input.press(neutral, attack, false, false, 39), None);
-        assert_eq!(input.press(neutral, attack, false, false, 43), Some("n"));
-        // With the service's menu pointer, only Start reaches the menus.
-        let mut pointer = MenuInput { start_only: true, ..MenuInput::default() };
-        pointer.observe(Some(MenuPhase::Character), neutral, false, 50);
-        assert_eq!(pointer.press(neutral, attack, false, false, 51), None);
-        assert_eq!(pointer.press(attack, neutral, false, false, 52), None);
-        assert_eq!(pointer.press(neutral, right, false, false, 53), None);
-        assert_eq!(pointer.press(right, neutral, false, false, 54), None);
-        assert_eq!(pointer.press(neutral, neutral, false, true, 55), Some("y"));
-        // Opponent settings use the same pointer, without extra key taps.
-        pointer.observe(Some(MenuPhase::Cpu), neutral, false, 60);
-        assert_eq!(pointer.press(neutral, State { y: -10_000, ..neutral }, false, false, 61), None);
-        assert_eq!(pointer.press(neutral, State { y: 10_000, ..neutral }, false, false, 62), None);
-        assert_eq!(pointer.press(neutral, attack, false, false, 63), None);
-        assert_eq!(pointer.press(neutral, State { sources: 4, ..neutral }, false, false, 64), None);
-        assert_eq!(pointer.press(neutral, neutral, false, true, 65), Some("y"));
     }
 
     fn quiescent_path(dir: &Path, build: &str, epoch: u32, slot: u32) -> PathBuf {
@@ -2922,84 +2929,6 @@ mod linux {
         }.into()
     }
 
-    #[test]
-    fn ten_millisecond_focus_blip_keeps_input_armed_and_held_state() {
-        let mut ranges = [None; 6];
-        ranges[Abs::ABS_X.0 as usize] = Some(evdev::AbsInfo::new(0, -32_768, 32_767, 16, 128, 0));
-        let forward = State { x: 32_767, sources: 1, ..State::default() };
-        let mut input = FocusInput { eligible: true, armed: true, gameplay_armed: true, physical: forward, accept_since_ns: 0 };
-        let mut grace = FocusGrace::default();
-        let state = forward;
-        let row = encode_row(state, action_state(state), Edges::default());
-        let ms = 1_000_000;
-        for t in 1_000..1_030 {
-            let (armed, release) = observe_focus(&mut grace, &mut input, !(1_005..1_015).contains(&t), t * ms);
-            assert!(armed && !release, "t={t} ms");
-            assert!(input.armed && input.gameplay_armed, "t={t} ms");
-        }
-        assert_eq!(grace.observe(true, 1_030 * ms), None);
-        // Input during the blip is captured, not dropped.
-        assert!(input.accepts(&ranges, timed_stick_x(1_010 * ms, 32_767), false, true).unwrap());
-        // Rows keep holding forward with no release and re-press, so the map
-        // sees no new dash.
-        assert_eq!(encode_row(state, action_state(state), Edges::default()), row);
-        assert_ne!(action_state(state) & MOVE_RIGHT, 0);
-    }
-
-    #[test]
-    fn half_second_focus_loss_releases_once_and_requires_neutral() {
-        let mut ranges = [None; 6];
-        ranges[Abs::ABS_X.0 as usize] = Some(evdev::AbsInfo::new(0, -32_768, 32_767, 16, 128, 0));
-        let forward = State { x: 32_767, sources: 1, ..State::default() };
-        let mut input = FocusInput { eligible: true, armed: true, gameplay_armed: true, physical: forward, accept_since_ns: 0 };
-        let mut grace = FocusGrace::default();
-        let mut state = forward;
-        let mut edges = BTreeMap::new();
-        let mut snapshots = BTreeMap::new();
-        let segment = FrameSegment { epoch_ns: 0, first_frame: 1 };
-        let ms = 1_000_000;
-        let mut released = Vec::new();
-        for t in 1_000..1_500 {
-            let (_, release) = observe_focus(&mut grace, &mut input, false, t * ms);
-            if release {
-                released.push(t);
-                let frame = release_for_focus_loss(&mut state, &mut edges, &mut snapshots, 1, segment, t * ms).unwrap();
-                // The map receives a neutral row at the release frame.
-                let row = encode_row(snapshots[&frame], action_state(forward), edges[&frame]);
-                assert_eq!(&row[..1], "2", "release row holds nothing and has centred axes: {row}");
-                assert_eq!(edges[&frame].released & (MOVE_RIGHT | ATTACK), MOVE_RIGHT | ATTACK);
-            }
-        }
-        assert_eq!(released, [1_200]);
-        assert_eq!(state, State::default());
-        assert!(!input.armed);
-        assert_eq!(grace.observe(true, 1_500 * ms), Some(FocusChange::Back { away_ns: 500 * ms, lost: true }));
-        let (armed, release) = observe_focus(&mut grace, &mut input, true, 1_500 * ms);
-        assert!(armed && !release);
-        // The stick is still forward: nothing re-arms or resends it.
-        assert!(!input.accepts(&ranges, timed_stick_x(1_510 * ms, 32_767), false, true).unwrap());
-        input.rearm(1_515 * ms, false, true);
-        assert!(!input.armed);
-        assert_eq!(state, State::default());
-        // Neutral re-arms; the next push is a genuine new press.
-        assert!(!input.accepts(&ranges, timed_button(1_518 * ms, false), false, true).unwrap());
-        assert!(!input.armed);
-        assert!(!input.accepts(&ranges, timed_stick_x(1_520 * ms, 0), false, true).unwrap());
-        assert!(input.armed);
-        assert!(input.accepts(&ranges, timed_stick_x(1_530 * ms, 32_767), false, true).unwrap());
-    }
-
-    #[test]
-    fn a_long_loss_between_gameplay_observations_still_releases() {
-        let mut grace = FocusGrace::default();
-        let mut input = FocusInput { eligible: true, armed: true, gameplay_armed: true, physical: State { sources: 1, ..State::default() }, accept_since_ns: 0 };
-        // Typing saw the loss; the gameplay loop next looks after focus returned.
-        grace.observe(false, 1_000_000_000);
-        grace.observe(true, 1_300_000_000);
-        assert_eq!(observe_focus(&mut grace, &mut input, true, 1_301_000_000), (true, true));
-        assert!(!input.armed);
-    }
-
     struct FocusInput {
         eligible: bool,
         armed: bool,
@@ -3097,42 +3026,6 @@ mod linux {
                 self.accept_since_ns = self.accept_since_ns.max(now);
             }
         }
-    }
-
-    #[test]
-    fn focus_loss_retains_assigned_rows_and_releases_after_the_open_frame() {
-        let mut state = State {
-            sources: 1,
-            ..State::default()
-        };
-        let mut edges = BTreeMap::from([(
-            2,
-            Edges {
-                pressed: ATTACK,
-                ..Edges::default()
-            },
-        )]);
-        let mut snapshots = BTreeMap::from([(2, state)]);
-        let segment = FrameSegment {
-            epoch_ns: 0,
-            first_frame: 1,
-        };
-        let frame = release_for_focus_loss(
-            &mut state,
-            &mut edges,
-            &mut snapshots,
-            2,
-            segment,
-            20_000_000,
-        )
-        .unwrap();
-        assert_eq!(frame, 3);
-        assert_eq!(edges[&2].pressed, ATTACK);
-        assert_eq!(snapshots[&2].sources, 1);
-        assert_eq!(edges[&3].released, ATTACK);
-        assert_eq!(snapshots[&3], State::default());
-        assert_eq!(state, State::default());
-        assert_eq!(frame_at(100_000_000, segment).unwrap(), 7);
     }
 
     #[test]
@@ -3245,48 +3138,109 @@ mod linux {
         assert!(input.accepts(&[None; 6], down, false, true).unwrap());
     }
 
+
     #[test]
-    fn focus_return_requires_neutral_and_preserves_start_during_pause() {
-        let ranges = [None; 6];
-        let down = evdev::InputEvent::new(evdev::EventType::KEY.0, Key::BTN_SOUTH.0, 1);
-        let up = evdev::InputEvent::new(evdev::EventType::KEY.0, Key::BTN_SOUTH.0, 0);
-        let mut input = FocusInput {
-            eligible: true,
-            armed: true,
-            gameplay_armed: true,
-            physical: State::default(),
-            accept_since_ns: 0,
-        };
-        assert!(input.accepts(&ranges, down, false, true).unwrap());
-        assert!(input.observe(false, true, 0));
-        assert!(!input.accepts(&ranges, up, false, true).unwrap());
-        assert!(!input.accepts(&ranges, down, false, true).unwrap());
-        input.observe(true, false, 0);
-        input.rearm(0, false, true);
-        assert!(!input.armed);
-        assert!(!input.accepts(&ranges, up, false, true).unwrap());
-        assert!(input.armed);
-        assert!(input.accepts(&ranges, down, false, true).unwrap());
-        // Paused gameplay disarms independently of the focus-qualified Start control.
-        assert!(!input.accepts(&ranges, down, false, false).unwrap());
-        assert!(input.armed);
-        assert!(!input.gameplay_armed);
-        input.gameplay_armed = true;
-        input.rearm(0, false, false);
-        assert!(!input.gameplay_armed);
-        let start = evdev::InputEvent::new(evdev::EventType::KEY.0, Key::BTN_START.0, 1);
-        assert!(pause_request_wire(&start, &mut false, 7, 3, true, false, !input.armed, 168).is_some());
-        assert!(!input.accepts(&ranges, down, false, true).unwrap());
-        assert!(!input.accepts(&ranges, up, false, true).unwrap());
-        assert!(input.accepts(&ranges, down, false, true).unwrap());
-        input.observe(false, true, 1);
-        input.observe(true, false, 2);
-        // A recovered queue item older than the focus boundary cannot rearm.
-        assert!(!input.accepts(&ranges, up, false, true).unwrap());
-        assert!(!input.armed);
-        input.rearm(2, false, true);
-        assert!(input.armed);
-        assert!(!input.accepts(&ranges, down, false, true).unwrap());
+    fn focus_blips_keep_input_and_losses_release_once_then_wait_for_a_current_neutral() {
+        let mut seed = 0x466f_6375_7347_7261;
+        let ms = 1_000_000u128;
+        let mut ranges = [None; 6];
+        ranges[Abs::ABS_X.0 as usize] = Some(evdev::AbsInfo::new(0, -32_768, 32_767, 16, 128, 0));
+        let segment = FrameSegment { epoch_ns: 0, first_frame: 1 };
+        for run in 0..150 {
+            let mut grace = FocusGrace::default();
+            let mut input = FocusInput { eligible: true, armed: true, gameplay_armed: true, physical: State::default(), accept_since_ns: 0 };
+            let (mut state, mut edges, mut snapshots) = (State::default(), BTreeMap::new(), BTreeMap::new());
+            let (mut armed, mut ok, mut boundary, mut held_before) = (true, true, 0u128, true);
+            let (mut away_since, mut lost, mut eligible) = (None::<u128>, false, true);
+            let mut unobserved = false;
+            for tick in 1..2_500u128 {
+                let now = tick * ms;
+                if sample(&mut seed) % 120 == 0 {
+                    eligible = !eligible;
+                    if eligible && unobserved {
+                        grace.observe(true, now);
+                        lost |= now - away_since.take().unwrap() >= 200 * ms;
+                        unobserved = false;
+                        continue;
+                    }
+                    unobserved = !eligible && sample(&mut seed) % 4 == 0;
+                }
+                if unobserved {
+                    if !eligible && away_since.is_none() {
+                        grace.observe(false, now);
+                        away_since = Some(now);
+                    }
+                    continue;
+                }
+                let returned = eligible.then_some(away_since).flatten();
+                grace.observe(eligible, now);
+                if !eligible && away_since.is_none() { away_since = Some(now); }
+                if let Some(since) = returned { lost |= now - since >= 200 * ms; away_since = None; }
+                let held = away_since.is_none_or(|since| now - since < 200 * ms);
+                let disarm = std::mem::take(&mut lost) || !held;
+                let (armed_now, release) = observe_focus(&mut grace, &mut input, eligible, now);
+                assert_eq!((armed_now, release), (held, disarm && armed), "run {run} at {tick} ms");
+                if disarm || held != held_before {
+                    armed = false;
+                    ok = false;
+                    boundary = boundary.max(now);
+                }
+                held_before = held;
+                if release {
+                    let assigned = edges.keys().chain(snapshots.keys()).max().copied();
+                    let releasing = action_state(state);
+                    let frame = release_for_focus_loss(&mut state, &mut edges, &mut snapshots, 1, segment, now).unwrap();
+                    assert!(assigned.is_none_or(|last| frame > last) && frame >= frame_at(now, segment).unwrap());
+                    assert_eq!(edges[&frame].released & releasing, releasing);
+                    assert_eq!((action_state(state), snapshots[&frame]), (0, state));
+                }
+                let gameplay = sample(&mut seed) % 10 != 0;
+                let start = sample(&mut seed) % 25 == 0;
+                if sample(&mut seed) % 15 == 0 {
+                    let at = now.saturating_sub(u128::from(sample(&mut seed) % 3) * ms);
+                    input.rearm(at, start, gameplay);
+                    if !gameplay { ok = false; }
+                    if at >= boundary && held && action_state(input.physical) == 0 && !start && (!armed || (gameplay && !ok)) {
+                        armed = true;
+                        ok = gameplay;
+                        boundary = boundary.max(at);
+                    }
+                    continue;
+                }
+                if sample(&mut seed) % 2 == 0 { continue; }
+                let at = now.saturating_sub(u128::from(sample(&mut seed) % 4 / 3) * 30 * ms);
+                let event = if sample(&mut seed) % 2 == 0 {
+                    timed_stick_x(at, [0, 32_767, -32_767][(sample(&mut seed) % 3) as usize])
+                } else {
+                    timed_button(at, sample(&mut seed) % 2 == 0)
+                };
+                let accepted = input.accepts(&ranges, event, start, gameplay).unwrap();
+                let current = at >= boundary;
+                let neutral = action_state(input.physical) == 0 && !start;
+                let expected = if !held {
+                    armed = false;
+                    ok = false;
+                    false
+                } else if !armed {
+                    armed = current && neutral;
+                    ok = armed && gameplay;
+                    false
+                } else if !gameplay {
+                    ok = false;
+                    false
+                } else if !ok {
+                    ok = current && neutral;
+                    false
+                } else {
+                    current
+                };
+                assert_eq!(accepted, expected, "run {run} at {tick} ms: {event:?}");
+                if accepted {
+                    update_state(&ranges, &mut state, event);
+                    snapshots.insert(frame_at(at, segment).unwrap(), state);
+                }
+            }
+        }
     }
 
     fn release_for_focus_loss(
