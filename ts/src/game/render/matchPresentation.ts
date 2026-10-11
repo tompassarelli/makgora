@@ -77,6 +77,7 @@ export class MatchPresentation {
   private readonly panel: framehandle;
   private readonly backing: framehandle;
   private readonly help: framehandle;
+  private readonly helpScale: number;
   private readonly title: framehandle;
   private readonly lines: readonly framehandle[];
   private readonly poses: (VictoryPose | undefined)[] = [];
@@ -96,24 +97,24 @@ export class MatchPresentation {
     const parent = gameUi();
     this.panel = createBackdrop("MatchResultsPanel", parent, 0);
     BlzFrameSetAbsPoint(this.panel, FRAMEPOINT_TOPRIGHT, f32(0.79), f32(0.52));
-    BlzFrameSetSize(this.panel, f32(0.36), f32(0.05) + PARTICIPANT_CAPACITY * f32(0.04));
+    BlzFrameSetSize(this.panel, f32(0.36), f32(0.13) + PARTICIPANT_CAPACITY * f32(0.04));
     BlzFrameSetEnable(this.panel, false);
     this.backing = styleMenuPanel(this.panel, "MatchResultsPanel");
     this.title = createText("MatchResultsTitle", this.panel, 0);
-    BlzFrameSetPoint(this.title, FRAMEPOINT_TOP, this.panel, FRAMEPOINT_TOP, 0.0, f32(-0.012));
-    sizeText(this.title, MENU_STYLE.titleSize, f32(0.33), f32(0.03));
+    const titleScale = sizeText(this.title, MENU_STYLE.titleSize, f32(0.33), f32(0.03));
+    BlzFrameSetPoint(this.title, FRAMEPOINT_TOP, this.panel, FRAMEPOINT_TOP, 0.0, f32(f32(-0.012) / titleScale));
     BlzFrameSetTextAlignment(this.title, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_CENTER);
     const lines: framehandle[] = [];
     for (let index = 0; index < PARTICIPANT_CAPACITY; index++) {
       const line = createText(`MatchResultsLine${I2S(index)}`, this.panel, 0);
-      BlzFrameSetPoint(line, FRAMEPOINT_TOPLEFT, this.backing, FRAMEPOINT_TOPLEFT, MENU_STYLE.bodyInset, f32(-0.033) - index * f32(0.04));
-      sizeText(line, MENU_STYLE.bodySize, f32(f32(0.336) - 2 * MENU_STYLE.bodyInset), f32(0.036));
+      const scale = sizeText(line, MENU_STYLE.bodySize, f32(f32(0.336) - 2 * MENU_STYLE.bodyInset), f32(0.036));
+      BlzFrameSetPoint(line, FRAMEPOINT_TOPLEFT, this.backing, FRAMEPOINT_TOPLEFT, f32(MENU_STYLE.bodyInset / scale), f32(f32(f32(-0.04) - index * f32(0.04)) / scale));
       BlzFrameSetTextAlignment(line, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT);
       lines.push(line);
     }
     this.lines = lines;
     this.help = createText("MatchResultsHelp", this.panel, 0);
-    sizeText(this.help, MENU_STYLE.bodySize, f32(f32(0.336) - 2 * MENU_STYLE.bodyInset), f32(0.06));
+    this.helpScale = sizeText(this.help, MENU_STYLE.bodySize, f32(f32(0.336) - 2 * MENU_STYLE.bodyInset), f32(0.06));
     BlzFrameSetTextAlignment(this.help, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT);
     BlzFrameSetEnable(this.help, false);
     BlzFrameSetVisible(this.panel, false);
@@ -252,8 +253,8 @@ export class MatchPresentation {
   private showResults(view: ResultsView): void {
     const { winner } = view;
     BlzFrameSetText(this.title, `${MENU_STYLE.gold}${winner === undefined ? "No contest" : "Results"}|r`);
-    BlzFrameSetSize(this.panel, f32(0.36), f32(f32(0.115) + view.rows.length * f32(0.04)));
-    BlzFrameSetPoint(this.help, FRAMEPOINT_TOPLEFT, this.backing, FRAMEPOINT_TOPLEFT, MENU_STYLE.bodyInset, f32(-0.033) - view.rows.length * f32(0.04));
+    BlzFrameSetSize(this.panel, f32(0.36), f32(f32(0.13) + view.rows.length * f32(0.04)));
+    BlzFrameSetPoint(this.help, FRAMEPOINT_TOPLEFT, this.backing, FRAMEPOINT_TOPLEFT, f32(MENU_STYLE.bodyInset / this.helpScale), f32(f32(f32(-0.04) - view.rows.length * f32(0.04)) / this.helpScale));
     for (let index = 0; index < this.lines.length; index++) {
       const row = view.rows[index];
       BlzFrameSetVisible(at(this.lines, index), row !== undefined);

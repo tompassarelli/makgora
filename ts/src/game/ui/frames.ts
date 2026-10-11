@@ -27,11 +27,13 @@ export function createText(name: string, owner: framehandle, context: number): f
   return BlzCreateFrameByType("TEXT", name, owner, "", context);
 }
 
-export function sizeText(frame: framehandle, size: number, width: number, height: number): void {
+// Warcraft scales relative point offsets too; divide them by the returned scale.
+export function sizeText(frame: framehandle, size: number, width: number, height: number): number {
   const scale = f32(size / NATIVE_TEXT_BASE);
   BlzFrameSetScale(frame, scale);
   BlzFrameSetSize(frame, f32(width / scale), f32(height / scale));
   BlzFrameSetFont(frame, MENU_STYLE.font, size, 0);
+  return scale;
 }
 
 export function styleMenuPanel(frame: framehandle, name: string): framehandle {
