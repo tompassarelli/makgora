@@ -265,8 +265,8 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     down: { spell: "Robo-Goblin", startup: drawn("units\\creeps\\HeroTinker\\HeroTinker.mdl", "body"), active: drawn("units\\creeps\\HeroTinker\\HeroTinker.mdl", "body") },
   },
   [Character.kaelthas]: {
-    neutral: { spell: "Flamestrike", startup: cue("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", "hand", 0.5), active: cue("Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedDamage.mdx", "hand", 0.5) },
-    side: { spell: "Drain Mana", startup: FROST, active: cue("Abilities\\Spells\\Human\\ManaFlare\\ManaFlareTarget.mdx", "ahead", 0.75) },
+    neutral: { spell: "Flamestrike", startup: cue("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", "hand", 0.5), active: drawn("Abilities\\Weapons\\PhoenixMissile\\Phoenix_Missile.mdx", "hand") },
+    side: { spell: "Drain Mana", startup: cue("Abilities\\Spells\\Other\\Drain\\ManaDrainCaster.mdx", "hand", 1.0), active: cue("Abilities\\Spells\\Other\\Drain\\ManaDrainTarget.mdx", "ahead", 1.0) },
     up: KAEL_PHOENIX_CHARGE,
     down: { spell: "Banish", startup: cue("Abilities\\Spells\\Orc\\EtherealForm\\SpiritWalkerChange.mdx", "hand", 0.5), active: cue("Abilities\\Spells\\Human\\Banish\\BanishTarget.mdx", "hand", 0.5) },
   },
