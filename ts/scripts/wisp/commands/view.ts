@@ -25,6 +25,7 @@ import { characterModelScale } from "../../../src/game/presentation/modelScale";
 import { type DrawnReachRow, REACH_CHECKED, drawnReachSource, measureDrawnReach } from "../drawnReach";
 import { DRAWN_REACH } from "../drawnReachInfo";
 import { measureStrikeMoments, strikeMomentSource } from "../strikeMoments";
+import { BODY_HEIGHT, type ReachCueRow, measureReachCue, measuredStyles, reachCueSource, showsReachCue } from "../reachCues";
 import { HERO_ROSTER, SELECTABLE_CHARACTERS, isSelectableCharacter, fighterName, fighterSlug } from "../../../src/game/sim/heroes/registry";
 import { DRAWN_STRIDES } from "../../../src/game/presentation/drawnStrideInfo";
 import { DRAWN_MOTION } from "../drawnMotionInfo";
@@ -253,6 +254,32 @@ const reach = (args: readonly string[]) => Effect.gen(function*() {
 });
 
 
+const REACH_CUE_TABLE = join(import.meta.dir, "../../../src/game/presentation/reachCueInfo.ts");
+
+const reachCues = (args: readonly string[]) => Effect.gen(function*() {
+  const assets = args[0] === "--assets" && args.length === 2 ? args[1] : undefined;
+  if (assets === undefined) return yield* new UsageFailure({ problem: "view reachcues takes --assets DIR" });
+  const rows = yield* Effect.tryPromise({
+    try: async () => {
+      const measured: ReachCueRow[] = [];
+      for (const character of SELECTABLE_CHARACTERS) {
+        const hero = HERO_ROSTER.find((candidate) => candidate.character === character);
+        const model = hero === undefined ? await loadDrawnModel(assets, character)
+          : new DrawnModel(await Bun.file(join(assets, heroModelSource(hero.presentation.model))).arrayBuffer(), characterModelScale(character));
+        for (const style of measuredStyles(character)) measured.push(measureReachCue(model, character, style));
+      }
+      return measured;
+    },
+    catch: (cause) => new MapBuildFailure({ operation: "measure reach cues", path: assets, cause }),
+  });
+  for (const character of SELECTABLE_CHARACTERS) {
+    const own = rows.filter((row) => row.character === character);
+    yield* Console.log(`${fighterSlug(character)}: ${own.filter(showsReachCue).length} of ${own.length} cued; ${own.map((row) => `${STYLE_NAMES[row.style] ?? row.style} ${(row.beyond / BODY_HEIGHT).toFixed(2)}`).join(", ")}`);
+  }
+  yield* Effect.tryPromise({ try: () => Bun.write(REACH_CUE_TABLE, reachCueSource(rows)), catch: (cause) => new MapBuildFailure({ operation: "write reach cues", path: REACH_CUE_TABLE, cause }) });
+});
+
+
 const motion = (args: readonly string[]) => Effect.gen(function*() {
   const assets = args[0] === "--assets" ? args[1] : undefined;
   const selected = args[2] === "--character" ? Number(args[3]) : undefined;
@@ -329,6 +356,7 @@ export const view: Command = ([mode, ...paths]) => {
   if (mode === "models") return models(paths);
   if (mode === "motion") return motion(paths);
   if (mode === "reach") return reach(paths);
+  if (mode === "reachcues") return reachCues(paths);
   if (mode === "strikes") return strikes(paths);
   if (mode === "hurtboxes") return hurtboxes(paths);
   if (paths.length === 0) return Effect.fail(new UsageFailure({ problem: "view takes scene DATA_DIR..., frame FRAME.ppm..., models --assets DIR ..., hurtboxes, strikes or reach --assets DIR" }));

@@ -3,6 +3,7 @@ import { Character, SpecialAction } from "../sim/codes";
 import { createFighter, type Fighter } from "../sim/fighter";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../sim/hitRegions";
 import { runningHeroSpecial } from "../sim/heroSpecialRules";
+import { FAN_KNIFE_CUE } from "../presentation/specialCues";
 import { DISJOINT_CUES, disjointNormals, fanKnifePose, hitAreaPose, specialAreaRegion, type FanKnifePose, type HitAreaPose } from "../presentation/disjointCues";
 import { type ParkedFlags, type WorldOrigin, facingYaw, parkCue } from "./effects";
 
@@ -12,6 +13,8 @@ export const HIT_AREA_EFFECT_CAPACITY = 12;
 
 export class HitAreaEffects {
   private readonly models: effect[] = [];
+  private readonly knives: effect[] = [];
+  private readonly knifeParked: ParkedFlags = [];
   private frame = 0;
   private readonly styles;
   private readonly parked: ParkedFlags = [];
@@ -32,10 +35,15 @@ export class HitAreaEffects {
       const model = this.models[index];
       if (model !== undefined) parkCue(model, this.origin, this.parked, index);
     }
+    for (let index = 0; index < this.knives.length; index++) {
+      const model = this.knives[index];
+      if (model !== undefined) parkCue(model, this.origin, this.knifeParked, index);
+    }
   }
 
   present(fighter: Readonly<Fighter> | undefined, playing: boolean): void {
     let shown = 0;
+    let thrown = 0;
     if (fighter !== undefined && playing && !fighter.status.out && DISJOINT_CUES[fighter.character] !== undefined) {
       const style = fighter.attack.style;
       const normal = style !== undefined && this.styles.includes(style);
@@ -43,10 +51,10 @@ export class HitAreaEffects {
       for (let index = 0; index < count; index++) {
         if (fighter.character === Character.warden && fighter.special.action === SpecialAction.heroDown) {
           const pose = fanKnifePose(fighter, index, this.knife);
-          const model = this.models[shown];
+          const model = this.knives[thrown];
           if (!pose.visible || model === undefined) continue;
-          const starts = this.parked[shown] === true;
-          this.parked[shown++] = false;
+          const starts = this.knifeParked[thrown] === true;
+          this.knifeParked[thrown++] = false;
           BlzSetSpecialEffectPosition(model, this.origin.x + pose.x, this.origin.y - 14.0, this.origin.z + pose.z);
           BlzSetSpecialEffectYaw(model, pose.yaw);
           BlzSetSpecialEffectPitch(model, pose.pitch);
@@ -86,6 +94,10 @@ export class HitAreaEffects {
       const model = this.models[index];
       if (model !== undefined) parkCue(model, this.origin, this.parked, index);
     }
+    for (let index = thrown; index < this.knives.length; index++) {
+      const model = this.knives[index];
+      if (model !== undefined) parkCue(model, this.origin, this.knifeParked, index);
+    }
     this.frame = fighter?.special.frame ?? 0;
   }
 
@@ -96,6 +108,8 @@ export class HitAreaEffects {
   destroy(): void {
     this.clear();
     for (const model of this.models) DestroyEffect(model);
+    for (const model of this.knives) DestroyEffect(model);
     this.models.length = 0;
+    this.knives.length = 0;
   }
 }

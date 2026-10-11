@@ -1,108 +1,57 @@
 import { f32 } from "wisp/src/sim/f32";
-import { hurtCapsule } from "../physics/contactGeometry";
 import { AttackStyle, Character, SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
-import { type HitRegion, authoredHitRegion, authoredHitRegionCount, emptyHitRegion, NO_HIT_REGION } from "../sim/hitRegions";
-import { fighterHurtParts } from "../sim/hurtboxes";
+import { type HitRegion, NO_HIT_REGION } from "../sim/hitRegions";
 import { runningHeroSpecial } from "../sim/heroSpecialRules";
 import { FAN_KNIFE_CUE, type Cue, type CueBirth } from "./specialCues";
-import { attackDurationFramesForGrounding } from "../sim/moves";
+import { REACH_CUE_NORMALS } from "./reachCueInfo";
 import { DEMONHUNTER_GLIDE_SLASH_FIRST, DEMONHUNTER_GLIDE_SLASH_LAST, DEMONHUNTER_GLIDE_SLASH_FORM, DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP, felRushRegion, flameCrashRegion, immolationRegion, glideSlashRegion } from "../sim/specials";
 
 
-const disjointCue = (model: string): Cue => ({ model, anchor: "body", scale: 0.5, sequence: "stand", seconds: f32(0.3), timeScale: 0.0 });
+const NEUTRAL_FLARE: Cue = { model: "Abilities\\Weapons\\FlyingMachine\\FlyingMachineImpact.mdx", anchor: "body", scale: 0.5, sequence: "stand", seconds: f32(0.3), timeScale: 0.0 };
+const FIRE_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedDamage.mdx", seconds: f32(0.2), birth: { eachFrame: false } };
+const FROST_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Other\\FrostDamage\\FrostDamage.mdx" };
+const HOLY_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx" };
 
 export const DISJOINT_CUES: { readonly [character: number]: Cue } = {
-  [Character.rifleman]: disjointCue("Abilities\\Weapons\\FlyingMachine\\FlyingMachineImpact.mdx"),
-  [Character.demonHunter]: disjointCue("Abilities\\Weapons\\DemonHunterMissile\\DemonHunterMissile.mdx"),
-  [Character.blademaster]: disjointCue("Abilities\\Weapons\\SentinelMissile\\SentinelMissile.mdx"),
-  [Character.mountainKing]: disjointCue("Abilities\\Spells\\Other\\FrostBolt\\FrostBoltMissile.mdx"),
-  [Character.warden]: disjointCue(FAN_KNIFE_CUE.model),
-  [Character.lich]: { ...disjointCue("Abilities\\Spells\\Other\\FrostBolt\\FrostBoltMissile.mdx"), scale: f32(0.2) },
-  [Character.forsakenPaladin]: disjointCue("Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx"),
-  [Character.dreadlord]: disjointCue("Abilities\\Weapons\\BansheeMissile\\BansheeMissile.mdx"),
-  [Character.shadowHunter]: disjointCue("Abilities\\Weapons\\ShadowHunterMissile\\ShadowHunterMissile.mdx"),
-  [Character.pitLord]: disjointCue("Abilities\\Weapons\\GreenDragonMissile\\GreenDragonMissile.mdx"),
-  [Character.beastmaster]: disjointCue("Abilities\\Weapons\\Axe\\AxeMissile.mdx"),
-  [Character.lichKing]: disjointCue("Abilities\\Spells\\Undead\\FreezingBreath\\FreezingBreathMissile.mdx"),
-  [Character.chen]: { ...disjointCue("Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireMissile.mdx"), sequence: "birth", seconds: f32(0.2), birth: { eachFrame: false } },
-  [Character.kaelthas]: disjointCue("Abilities\\Weapons\\PhoenixMissile\\Phoenix_Missile.mdx"),
-  [Character.kobold]: disjointCue("Abilities\\Weapons\\Axe\\AxeMissile.mdx"),
-  [Character.thrall]: disjointCue("Abilities\\Weapons\\FarseerMissile\\FarseerMissile.mdx"),
-  [Character.jaina]: disjointCue("Abilities\\Spells\\Other\\FrostDamage\\FrostDamage.mdx"),
-  [Character.sylvanas]: disjointCue("Abilities\\Spells\\Other\\BlackArrow\\BlackArrowMissile.mdl"),
-  [Character.cairne]: disjointCue("Abilities\\Weapons\\RockBoltMissile\\RockBoltMissile.mdx"),
-  [Character.peon]: disjointCue("Abilities\\Weapons\\catapult\\CatapultMissile.mdx"),
-  [Character.tinker]: disjointCue("Abilities\\Spells\\Other\\AcidBomb\\BottleMissile.mdx"),
-  [Character.murloc]: disjointCue("Abilities\\Weapons\\MurgulMagicMissile\\MurgulMagicMissile.mdx"),
-  [Character.grom]: { ...disjointCue("Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedDamage.mdx"), seconds: f32(0.2), birth: { eachFrame: false } },
-  [Character.malfurion]: disjointCue("Abilities\\Weapons\\KeeperGroveMissile\\KeeperGroveMissile.mdx"),
-  [Character.medivh]: disjointCue("Abilities\\Weapons\\DruidoftheTalonMissile\\DruidoftheTalonMissile.mdx"),
+  [Character.rifleman]: NEUTRAL_FLARE,
+  [Character.demonHunter]: NEUTRAL_FLARE,
+  [Character.blademaster]: NEUTRAL_FLARE,
+  [Character.mountainKing]: NEUTRAL_FLARE,
+  [Character.warden]: NEUTRAL_FLARE,
+  [Character.lich]: FROST_FLARE,
+  [Character.forsakenPaladin]: HOLY_FLARE,
+  [Character.dreadlord]: NEUTRAL_FLARE,
+  [Character.shadowHunter]: NEUTRAL_FLARE,
+  [Character.pitLord]: FIRE_FLARE,
+  [Character.beastmaster]: NEUTRAL_FLARE,
+  [Character.lichKing]: FROST_FLARE,
+  [Character.chen]: FIRE_FLARE,
+  [Character.kaelthas]: FIRE_FLARE,
+  [Character.kobold]: NEUTRAL_FLARE,
+  [Character.thrall]: NEUTRAL_FLARE,
+  [Character.jaina]: FROST_FLARE,
+  [Character.sylvanas]: NEUTRAL_FLARE,
+  [Character.cairne]: NEUTRAL_FLARE,
+  [Character.peon]: NEUTRAL_FLARE,
+  [Character.tinker]: NEUTRAL_FLARE,
+  [Character.murloc]: NEUTRAL_FLARE,
+  [Character.grom]: FIRE_FLARE,
+  [Character.malfurion]: NEUTRAL_FLARE,
+  [Character.medivh]: NEUTRAL_FLARE,
 };
 
 
 export const DEFINITIVE_ACCENT_REDRAWS: { readonly [model: string]: string } = {
-  "Abilities\\Weapons\\DemonHunterMissile\\DemonHunterMissile.mdx": "Popcorn glaive missile",
-  "Abilities\\Weapons\\SentinelMissile\\SentinelMissile.mdx": "HD glaive",
-  "Abilities\\Spells\\Other\\FrostBolt\\FrostBoltMissile.mdx": "HD frost bolt with Popcorn trail",
   "Abilities\\Spells\\NightElf\\FanOfKnives\\FanOfKnivesMissile.mdx": "Popcorn knife",
   "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx": "Popcorn holy light",
-  "Abilities\\Weapons\\BansheeMissile\\BansheeMissile.mdx": "Popcorn banshee wisp",
-  "Abilities\\Weapons\\ShadowHunterMissile\\ShadowHunterMissile.mdx": "HD glaive with Popcorn trail",
-  "Abilities\\Weapons\\Axe\\AxeMissile.mdx": "HD thrown axe",
-  "Abilities\\Spells\\Undead\\FreezingBreath\\FreezingBreathMissile.mdx": "Popcorn frost breath",
-  "Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireMissile.mdx": "Popcorn flame breath",
-  "Abilities\\Weapons\\PhoenixMissile\\Phoenix_Missile.mdx": "Popcorn fireball",
-  "Abilities\\Weapons\\FarseerMissile\\FarseerMissile.mdx": "Popcorn lightning orb",
   "Abilities\\Spells\\Other\\FrostDamage\\FrostDamage.mdx": "Popcorn frost burst",
-  "Abilities\\Spells\\Other\\BlackArrow\\BlackArrowMissile.mdl": "Popcorn black arrow",
-  "Abilities\\Weapons\\RockBoltMissile\\RockBoltMissile.mdx": "HD rock bolt",
-  "Abilities\\Weapons\\catapult\\CatapultMissile.mdx": "HD catapult stone",
-  "Abilities\\Spells\\Other\\AcidBomb\\BottleMissile.mdx": "HD acid bottle",
-  "Abilities\\Weapons\\MurgulMagicMissile\\MurgulMagicMissile.mdx": "HD Mur'gul bolt",
   "Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedDamage.mdx": "Popcorn red flame",
-  "Abilities\\Weapons\\KeeperGroveMissile\\KeeperGroveMissile.mdx": "HD Keeper bolt",
-  "Abilities\\Weapons\\DruidoftheTalonMissile\\DruidoftheTalonMissile.mdx": "Popcorn raven bolt",
 };
 
-export function isDisjointRegion(fighter: Readonly<Fighter>, region: Readonly<HitRegion>): boolean {
-  let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
-  for (const part of fighterHurtParts(fighter)) {
-    minX = Math.min(minX, part.x1 - part.radius, part.x2 - part.radius);
-    maxX = Math.max(maxX, part.x1 + part.radius, part.x2 + part.radius);
-    minZ = Math.min(minZ, part.z1 - part.radius, part.z2 - part.radius);
-    maxZ = Math.max(maxZ, part.z1 + part.radius, part.z2 + part.radius);
-  }
-  const halfWidth = hurtCapsule(fighter.character).radius;
-  return region.effect.damage > 0.0 && (region.minX < minX - halfWidth || region.maxX > maxX + halfWidth || region.minZ < minZ - halfWidth || region.maxZ > maxZ + halfWidth);
-}
 
-
-export function disjointNormals(fighter: Fighter): readonly AttackStyle[] {
-  const styles: AttackStyle[] = [];
-  if (DISJOINT_CUES[fighter.character] === undefined) return styles;
-  const scratch = emptyHitRegion();
-  const previousStyle = fighter.attack.style, previousFrame = fighter.attack.frame;
-  for (const style of Object.values(AttackStyle)) {
-    if (style === AttackStyle.demonHunterDashAttack && fighter.character !== Character.demonHunter) continue;
-    if (style === AttackStyle.dashAttack && fighter.tuning.moves?.dashAttack !== style) continue;
-    if ((style === AttackStyle.jab2 || style === AttackStyle.jab3) && fighter.tuning.moves?.normals[style] === undefined) continue;
-    fighter.attack.style = style;
-    const count = authoredHitRegionCount(style, fighter.tuning.moves);
-    const duration = attackDurationFramesForGrounding(style, true, fighter.tuning.moves);
-    let found = false;
-    for (let frame = 0; frame < duration && !found; frame++) {
-      fighter.attack.frame = frame;
-      for (let index = 0; index < count; index++) {
-        const region = authoredHitRegion(scratch, fighter.character, style, frame, 0, index, fighter.tuning.moves);
-        if (isDisjointRegion(fighter, region)) { found = true; break; }
-      }
-    }
-    if (found) styles.push(style);
-  }
-  fighter.attack.style = previousStyle;
-  fighter.attack.frame = previousFrame;
-  return styles;
+export function disjointNormals(fighter: Readonly<Fighter>): readonly AttackStyle[] {
+  return DISJOINT_CUES[fighter.character] === undefined ? [] : REACH_CUE_NORMALS[fighter.character] ?? [];
 }
 
 
@@ -144,10 +93,14 @@ export function fanKnifePose(fighter: Readonly<Fighter>, index: number, out: Fan
 }
 
 
+const BODY_MIDDLE = 66.0;
+
 export function hitAreaPose(fighter: Readonly<Fighter>, region: Readonly<HitRegion>, out: HitAreaPose): HitAreaPose {
   out.visible = region.effect.damage > 0.0 && !fighter.status.out;
-  out.x = f32(fighter.motion.x + f32(fighter.facing * f32(f32(region.minX + region.maxX) * 0.5)));
-  out.z = f32(fighter.motion.z + f32(f32(region.minZ + region.maxZ) * 0.5));
+  const x = f32(f32(region.minX + region.maxX) * 0.5), z = f32(f32(region.minZ + region.maxZ) * 0.5);
+  const across = Math.abs(x) >= Math.abs(f32(z - BODY_MIDDLE));
+  out.x = f32(fighter.motion.x + f32(fighter.facing * (across ? (x >= 0.0 ? region.maxX : region.minX) : x)));
+  out.z = f32(fighter.motion.z + (across ? z : z >= BODY_MIDDLE ? region.maxZ : region.minZ));
   out.scale = f32(Math.max(0.5, f32(Math.max(f32(region.maxX - region.minX), f32(region.maxZ - region.minZ)) / 100.0)));
   return out;
 }
