@@ -4,7 +4,7 @@ import { judge, plan, train, type Lane, type Run, type Status } from "./autoland
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null;
 const isStatus = (value: unknown): value is Status => isRecord(value) && typeof value.state === "string" && typeof value.description === "string" && typeof value.at === "string";
-const isLane = (value: unknown): value is Lane => isRecord(value) && typeof value.branch === "string" && typeof value.tip === "string" && (value.status === null || isStatus(value.status));
+const isLane = (value: unknown): value is Lane => isRecord(value) && typeof value.branch === "string" && typeof value.tip === "string" && (value.status === null || isStatus(value.status)) && (value.labels === undefined || (Array.isArray(value.labels) && value.labels.every((label: unknown) => typeof label === "string")));
 const isRun = (value: unknown): value is Run => isRecord(value) && typeof value.title === "string" && typeof value.status === "string";
 
 function readList<T>(file: string | undefined, is: (value: unknown) => value is T): T[] {

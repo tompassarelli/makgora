@@ -2,7 +2,7 @@ export const TEST_SLOTS = 2;
 export const TRAIN_CAP = 4;
 
 export interface Status { readonly state: string; readonly description: string; readonly at: string }
-export interface Lane { readonly branch: string; readonly tip: string; readonly status: Status | null }
+export interface Lane { readonly branch: string; readonly tip: string; readonly status: Status | null; readonly labels?: readonly string[] }
 export interface Run { readonly title: string; readonly status: string }
 
 export const QUEUED = "queued";
@@ -26,19 +26,20 @@ export function passedAlone(lane: Lane): { readonly base: string; readonly tree:
 export function laneState(lane: Lane, runs: readonly Run[], retry: ReadonlySet<string> = new Set()): LaneState {
   if (lane.status !== null && lane.status.state !== "pending") return retry.has(lane.branch) ? "test" : "done";
   if (passedAlone(lane) !== undefined) return "passed";
-  if (runs.some((run) => { const match = TEST_TITLE.exec(run.title); return match?.[2] === lane.branch && match[3] === lane.tip; })) return "testing";
-  if (lane.status?.description === "bisect" && runs.some((run) => LEGACY_TITLE.exec(run.title)?.[1]?.split(" ").includes(lane.branch) === true)) return "held";
+  if (runs.some((run) => { const match = TEST_TITLE.exec(run.title); return run.status !== "completed" && match?.[2] === lane.branch && match[3] === lane.tip; })) return "testing";
+  if (lane.status?.description === "bisect" && runs.some((run) => run.status !== "completed" && LEGACY_TITLE.exec(run.title)?.[1]?.split(" ").includes(lane.branch) === true)) return "held";
   return "test";
 }
 
-const byArrival = (lanes: readonly Lane[]): Lane[] => lanes.toSorted((a, b) => (a.status?.at ?? "").localeCompare(b.status?.at ?? "") || a.branch.localeCompare(b.branch));
+const priority = (lane: Lane): number => lane.labels?.includes("priority:now") === true ? 0 : lane.labels?.includes("playtest-blocking") === true ? 1 : 2;
+const byArrival = (lanes: readonly Lane[]): Lane[] => lanes.toSorted((a, b) => priority(a) - priority(b) || (a.status?.at ?? "").localeCompare(b.status?.at ?? "") || a.branch.localeCompare(b.branch));
 
 export interface TestOrder { readonly branch: string; readonly tip: string; readonly slot: number }
 export interface Plan { readonly test: readonly TestOrder[]; readonly train: boolean }
 
 export function plan(lanes: readonly Lane[], runs: readonly Run[], retry: readonly string[] = []): Plan {
   const retried = new Set(retry);
-  const load = Array.from({ length: TEST_SLOTS }, (_, slot) => runs.filter((run) => TEST_TITLE.exec(run.title)?.[1] === String(slot)).length);
+  const load = Array.from({ length: TEST_SLOTS }, (_, slot) => runs.filter((run) => run.status !== "completed" && TEST_TITLE.exec(run.title)?.[1] === String(slot)).length);
   const test: TestOrder[] = [];
   let passed = false;
   for (const lane of byArrival(lanes)) {
@@ -49,7 +50,7 @@ export function plan(lanes: readonly Lane[], runs: readonly Run[], retry: readon
     load[slot] = (load[slot] ?? 0) + 1;
     test.push({ branch: lane.branch, tip: lane.tip, slot });
   }
-  const trainWaiting = runs.some((run) => run.title === TRAIN_TITLE && run.status !== "in_progress");
+  const trainWaiting = runs.some((run) => run.title === TRAIN_TITLE && run.status !== "in_progress" && run.status !== "completed");
   return { test, train: passed && !trainWaiting };
 }
 
