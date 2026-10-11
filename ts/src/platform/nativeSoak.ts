@@ -66,8 +66,8 @@ export function beforeNativeSoakTick(s: ShellState): void {
 function sample(s: ShellState): void {
   const soak = globalThis.__smashcraftNativeSoak;
   if (soak === undefined) return;
-  const heap = typeof collectgarbage === "function" ? R2I(collectgarbage("count")) : -1;
-  writeLines(NATIVE_SOAK_FILE, ["dev: native soak four CPUs", `soak callbacks=${soak.callbacks} frames=${soak.frames} matches=${soak.matches} results=${soak.results} phase=${s.game.phase} stage=${s.game.stageChoice} characters=${s.game.characterChoices.join(",")} cpu=${s.game.computerMask} heapKb=${heap} handles=${liveSoakHandles()}`]);
+  const heap = typeof collectgarbage === "function" ? `heapKb=${R2I(collectgarbage("count"))}` : "heapKbAbsent=no-collectgarbage";
+  writeLines(NATIVE_SOAK_FILE, ["dev: native soak four CPUs", `soak callbacks=${soak.callbacks} frames=${soak.frames} matches=${soak.matches} results=${soak.results} phase=${s.game.phase} stage=${s.game.stageChoice} characters=${s.game.characterChoices.join(",")} cpu=${s.game.computerMask} ${heap} handles=${liveSoakHandles()}`]);
 }
 
 export function afterNativeSoakTick(s: ShellState): void {

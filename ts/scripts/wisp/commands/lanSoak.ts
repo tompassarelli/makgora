@@ -21,7 +21,12 @@ class NativeSoakFailure extends Schema.TaggedError<NativeSoakFailure>()("NativeS
 
 const attempt = <A>(operation: string, run: () => A) => Effect.try({ try: run, catch: (cause) => new NativeSoakFailure({ problem: `${operation}: ${describeCause(cause)}` }) });
 const number = Schema.FiniteFromString;
-const Snapshot = Schema.Struct({ callbacks: number, frames: number, matches: number, results: number, phase: number, stage: number, characters: Schema.String, cpu: number, heapKb: number, handles: number });
+const counters = { callbacks: number, frames: number, matches: number, results: number, phase: number, stage: number, characters: Schema.String, cpu: number, handles: number };
+const Snapshot = Schema.Union([
+  Schema.Struct({ ...counters, heapKb: number.check(Schema.isGreaterThanOrEqualTo(0)), heapKbAbsent: Schema.optionalKey(Schema.Never) }),
+  Schema.Struct({ ...counters, heapKb: Schema.optionalKey(Schema.Never), heapKbAbsent: Schema.Literals(["no-collectgarbage"]) }),
+]);
+const heapLabel = (row: typeof Snapshot.Type): string => row.heapKb === undefined ? `n/a (${row.heapKbAbsent})` : (row.heapKb / 1024).toFixed(3);
 const Status = Schema.Struct({ clients: Schema.Array(Schema.Struct({ name: Schema.String, pid: Schema.optional(Schema.Int) })), game: Schema.optional(Schema.Unknown) });
 
 interface Sample {
@@ -96,7 +101,7 @@ export const lanSoak: Command = (args) => Effect.gen(function*() {
         });
         samples.push({ elapsed: (performance.now() - samplingStarted) / 1000, client: client.name, rssMiB, snapshot: row });
       }
-      yield* attempt("write samples", () => writeFileSync(join(out, "samples.tsv"), "elapsed_s\tclient\trss_MiB\tlua_MiB\tlive_map_handles\tgame_callbacks\tsim_frames\tmatches\tresults\tphase\tstage\tcharacters\n" + samples.map(({ elapsed, client, rssMiB, snapshot: row }) => [elapsed.toFixed(3), client, rssMiB.toFixed(3), "n/a (no collectgarbage in Warcraft Lua)", row.handles, row.callbacks, row.frames, row.matches, row.results, row.phase, row.stage, row.characters].join("\t")).join("\n") + "\n"));
+      yield* attempt("write samples", () => writeFileSync(join(out, "samples.tsv"), "elapsed_s\tclient\trss_MiB\tlua_MiB\tlive_map_handles\tgame_callbacks\tsim_frames\tmatches\tresults\tphase\tstage\tcharacters\n" + samples.map(({ elapsed, client, rssMiB, snapshot: row }) => [elapsed.toFixed(3), client, rssMiB.toFixed(3), heapLabel(row), row.handles, row.callbacks, row.frames, row.matches, row.results, row.phase, row.stage, row.characters].join("\t")).join("\n") + "\n"));
       yield* Console.log(`pair ${pair}: minute ${Math.floor((performance.now() - samplingStarted) / 60000)}, ${samples.length} client samples`);
     });
     yield* sample;
@@ -109,13 +114,13 @@ export const lanSoak: Command = (args) => Effect.gen(function*() {
       const after = own.filter((sample) => sample.elapsed >= 600);
       const final = own.at(-1)?.snapshot;
       if (final === undefined || final.matches < 2 || final.results < 1) return yield* failure(`${client.name}: back-to-back match/result/rematch flow was not observed`);
-      if (after.length < 3) lines.push(`| ${client.name} | ${own.length} | ${after.length} | — | n/a (no collectgarbage in Warcraft Lua) | — | insufficient post-10-minute samples |`);
+      if (after.length < 3) lines.push(`| ${client.name} | ${own.length} | ${after.length} | — | ${heapLabel(final)} | — | insufficient post-10-minute samples |`);
       else {
         const rss = slope(after, (sample) => sample.rssMiB);
         const handles = slope(after, (sample) => sample.snapshot.handles);
         const pass = rss < 32 && handles <= 0;
         failed ||= !pass;
-        lines.push(`| ${client.name} | ${own.length} | ${after.length} | ${rss.toFixed(3)} | n/a (no collectgarbage in Warcraft Lua) | ${handles.toFixed(3)} | ${pass ? "pass" : "fail"} |`);
+        lines.push(`| ${client.name} | ${own.length} | ${after.length} | ${rss.toFixed(3)} | ${heapLabel(final)} | ${handles.toFixed(3)} | ${pass ? "pass" : "fail"} |`);
       }
     }
     lines.push("", "The map ledger covers returned effect, unit, timer, sound, trigger and frame handles from diagnostic installation before map startup. Frame subtree destruction releases tracked descendants. Sound ownership ends at KillSoundWhenDone or StopSound(killWhenDone); deferred engine cleanup and unreturned internal handles remain in process RSS.", "", "Each sample is collected on the pool host every 60 seconds of monotonic wall time, with the map's latest periodic-callback/confirmed-frame counters. Matches rotate fighters; existing automatic rematch selects stages without Escape.");
