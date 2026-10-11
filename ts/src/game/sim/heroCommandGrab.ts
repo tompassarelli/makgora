@@ -10,6 +10,7 @@ import { queueDamageContact } from "./contacts";
 import type { Fighter } from "./fighter";
 import { runningHeroSpecial } from "./heroSpecialRules";
 import { applyHeroStatus } from "./heroStatus";
+import { currentTraits } from "./identityTraits";
 import { grabTouchesBody } from "./hurtboxes";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { type Roster, fighterAt, isActive } from "./roster";
@@ -91,9 +92,10 @@ export function advanceHeroCommandGrab(world: Roster, slot: number): void {
   clearGrabLinks(world, slot);
   const target = fighterAt(world, targetSlot);
   queueDamageContact(world, slot, targetSlot, grab.effect, owner.facing, ContactKind.throw, true, undefined);
-  if (grab.status !== undefined) applyHeroStatus(target, grab.status);
+  const traits = currentTraits(owner);
+  if (grab.status !== undefined && traits.status === true) applyHeroStatus(target, grab.status);
   const heal = grab.heal;
-  if (heal !== undefined) {
+  if (heal !== undefined && traits.heal === true) {
     const { status } = owner;
     const restored = min(heal.heal, max(0.0, status.damage));
     status.damage = f32(status.damage - restored);

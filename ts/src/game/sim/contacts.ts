@@ -3,7 +3,7 @@
 
 import { max, min, toInt } from "../../runtime/numbers";
 import { addFloat32, divideFloat32, multiplyFloat32, roundToFloat32, subtractFloat32 } from "wisp/src/sim/binary32";
-import { Character, ContactKind, DownState, HeroStatusKind, SpecialAction } from "./codes";
+import { Character, ContactKind, DownState, HeroStatusKind } from "./codes";
 import { f32 } from "wisp/src/sim/f32";
 
 /** A Banished fighter takes this much more damage from Kael's spells. */
@@ -44,6 +44,7 @@ import { knockbackWeight } from "./itemBuffs";
 import { type AppliedStatus, applyHeroStatus, damageEndsHeroStatus } from "./heroStatus";
 import { dealtManaGain, gainMana, takenManaGain } from "./mana";
 import { EX_ARMOR_DAMAGE, exArmorActive } from "./exSpecials";
+import { contactTraits } from "./identityTraits";
 import { FORSAKEN_PALADIN_DAMAGE_MULTIPLIER, forsakenPaladinHammerContact } from "./heroes/forsakenPaladinHammer";
 
 
@@ -137,8 +138,13 @@ export function collectDamageContact(
   contact.source = sourceSlot;
   contact.target = targetSlot;
   copyHitEffect(contact.effect, effect);
+  const traits = contactTraits(source, kind, direct);
+  if (traits.mana !== true) {
+    contact.effect.manaDrain = undefined;
+    contact.effect.manaSteal = undefined;
+  }
   // Banish: an ethereal fighter takes more from the Blood Mage's spells, as Warcraft's ethereal units take extra magic damage.
-  if (target.status.condition === HeroStatusKind.banish && source.character === Character.kaelthas && (!direct || source.special.action !== SpecialAction.none)) {
+  if (target.status.condition === HeroStatusKind.banish && traits.spell === true) {
     contact.effect.damage = f32(contact.effect.damage * BANISH_SPELL_DAMAGE);
   }
   contact.facing = facing;
@@ -159,7 +165,7 @@ export function collectDamageContact(
   contact.down = isDownDamageState(target);
   contact.smashCharging = target.attack.smashCharging;
   contact.throwInput = throwInput;
-  contact.status = status;
+  contact.status = traits.status === true ? status : undefined;
 
 
   contact.height = 1;

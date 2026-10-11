@@ -24,6 +24,7 @@ import { attackCapsule, emptyCapsule, placeCapsule, segmentBoxesOverlap } from "
 import { HurtContact, strikeHurtContact } from "./hurtboxes";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { mainDeckLeft, mainDeckRight, mainDeckZAt, solidSurfaceAt, solidSurfaceCount } from "./stage";
+import { currentTraits } from "./identityTraits";
 
 
 const DIAGONAL = 0.7071067690849304;
@@ -229,7 +230,7 @@ function applyWindows(f: Fighter, move: Readonly<AuthoredSpecial>, frame: number
     if (frame + 1 === armor.first) {
       status.armorFrames = armor.last - armor.first + 2;
       status.armorMaxDamage = armor.maxDamage;
-      status.armorChills = armor.chillsStriker === true;
+      status.armorChills = armor.chillsStriker === true && currentTraits(f).status === true;
     }
   } else if (armor !== undefined && (inWindow(armor, frame + 1) || inWindow(armor, frame))) {
     status.armorFrames = max(status.armorFrames, inWindow(armor, frame + 1) ? 2 : 1);
@@ -614,8 +615,10 @@ function guardSucceeds(f: Fighter, guard: Readonly<SpecialGuard>): void {
       return;
     }
   }
-  const heal = min(guard.heal, max(0.0, status.damage));
-  status.damage = f32(status.damage - heal);
+  if (currentTraits(f).heal === true) {
+    const heal = min(guard.heal, max(0.0, status.damage));
+    status.damage = f32(status.damage - heal);
+  }
   if (guard.shieldFrames !== undefined) {
     status.invincible = max(status.invincible, guard.shieldFrames);
     status.divineFrames = guard.shieldFrames;
