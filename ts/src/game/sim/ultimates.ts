@@ -220,7 +220,6 @@ const SYLVANAS: AuthoredSpecial = {
   name: "Banshee Form", endFrame: 128,
   projectiles: [
     mark("Abilities\\Spells\\Undead\\Possession\\PossessionCaster.mdx", 2, 17, 0.0),
-    mark("Abilities\\Spells\\Undead\\AnimateDead\\AnimateDeadTarget.mdx", 14, 10, 0.0),
     ...Array.from({ length: 16 }, (_, index) => wake(19 + index * 5)),
   ],
   motion: [

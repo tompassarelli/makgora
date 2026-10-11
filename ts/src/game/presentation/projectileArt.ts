@@ -128,6 +128,7 @@ export const PROJECTILE_DRAW_CUES: { readonly [model: string]: { readonly scale:
   "Abilities\\Spells\\NightElf\\Immolation\\ImmolationTarget.mdx": { scale: 1.0, birth: { eachFrame: false } },
   "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx": { scale: 1.0, birth: { eachFrame: false } },
   "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx": { scale: f32(1.2) },
+  "Abilities\\Spells\\Undead\\Possession\\PossessionMissile.mdx": { scale: 0.5 },
 };
 
 export const PROJECTILE_DRAW_OFFSETS: { readonly [model: string]: { readonly x: number; readonly z: number; readonly roll?: number | undefined; readonly sequence?: string | undefined; readonly reseek?: boolean | undefined; readonly seconds?: number | undefined; readonly width?: number | undefined; readonly height?: number | undefined; readonly fill?: readonly { readonly x: number; readonly z: number }[] | undefined; readonly loopFrames?: number | undefined; readonly disc?: readonly [number, number, number] | undefined; readonly discVertical?: boolean | undefined } | undefined } = {
