@@ -122,6 +122,8 @@ export const LICH_KING_SPECIALS: FighterSpecials = {
     description: "Plant Frostmourne to spread a shadow pool; hurting a grounded foe grows it and flashes the edge. Jump out; recasts must wait.",
     ground: DEFILE,
     air: { ...DEFILE, groundOnly: false, landingLag: AIR_LANDING_LAG,
-      projectiles: [{ ...DEFILE_POOL, pool: undefined, needsLineOfSight: undefined, activeFrom: undefined, offsetX: 0.0, offsetZ: 0.0, velocityZ: -8.0, life: 24 }] },
+      projectiles: [{ model: DEFILE_POOL.model, modelRadius: DEFILE_POOL.modelRadius, spawnFrame: DEFILE_POOL.spawnFrame,
+        offsetX: 0.0, offsetZ: 0.0, velocityX: 0.0, velocityZ: -8.0, life: 24,
+        radius: DEFILE_POOL.radius, effect: DEFILE_POOL.effect, reflectable: DEFILE_POOL.reflectable, limit: DEFILE_POOL.limit }] },
   }, { reach: 1.25 }),
 };
