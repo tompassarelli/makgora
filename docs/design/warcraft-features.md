@@ -131,11 +131,6 @@ over sky actually do belong in [visual quality](visual-quality.md).
 
 Water is terrain: it draws only where the map's terrain has water. A
 floating arena has none in view unless a stage puts terrain water there.
-Since #277 the build (smashcraft:ts/scripts/seaTerrain.ts) rewrites the base
-map's `war3map.w3e` as one flat deep-water sheet whose level is
-`STAGE_SEA_LEVEL_Z` below the arena origin (smashcraft:ts/src/game/assets/stageWater.ts),
-plus the tileset's Water.slk height offset; a stage with a `water` entry shows
-terrain and sets its `SetWaterBaseColor`, every other stage hides it.
 
 ### Doodads, destructables, effects, input
 

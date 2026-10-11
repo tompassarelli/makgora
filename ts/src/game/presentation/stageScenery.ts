@@ -1,10 +1,9 @@
 
 
 import { f32 } from "wisp/src/sim/f32";
-import { STAGE_TOMB_WATER_MODEL, STAGE_TOMB_SEA_MODEL, STAGE_LAVA_MODEL } from "../assets/terrainAssetInfo";
+import { STAGE_TOMB_WATER_MODEL, STAGE_TOMB_SEA_MODEL, STAGE_LAVA_MODEL, STAGE_SEA_MODEL } from "../assets/terrainAssetInfo";
 import { LAVA_CENTER_X, LAVA_HALF_WIDTH } from "../sim/lava";
 import { SEA_SURFACE_Z } from "../sim/stageHazards";
-import { STAGE_SEA_LEVEL_Z, type StageWater } from "../assets/stageWater";
 import { STAGE_POINT_LIGHT_MODELS, STAGE_SNOW_MODEL } from "../assets/stageAssetInfo";
 import { STAGE_LIGHTS, type StageLight } from "../assets/stageLighting";
 import { min, toInt } from "../../runtime/numbers";
@@ -37,8 +36,6 @@ export interface StageScenery {
   readonly fog?: { readonly start: number; readonly end: number; readonly red: number; readonly green: number; readonly blue: number };
   /** #360: an opaque full-width surface far below the bottom blast zone; it hides the bases of the pieces that stand in it. */
   readonly floor?: { readonly model: string; readonly z: number; readonly color: readonly [number, number, number] };
-  /** #277: the map's terrain water at STAGE_SEA_LEVEL_Z; the shell shows terrain only for a stage that has it. */
-  readonly water?: StageWater;
   readonly heightFog?: {
     readonly start: number;
     readonly end: number;
@@ -56,7 +53,7 @@ const SUMMER: StageScenery = {
   farZ: 13000.0,
   sky: STAGE_SKY_MODELS[0] ?? "",
   fog: { start: 6000.0, end: 12000.0, red: 0.6875, green: 0.8125, blue: 0.9375 },
-  water: { color: [120, 136, 156] },
+  floor: { model: STAGE_SEA_MODEL, z: -1600.0, color: [120, 136, 156] },
   pieces: [],
 };
 
@@ -65,7 +62,7 @@ const FROZEN_THRONE: StageScenery = {
   sky: STAGE_SKY_MODELS[2] ?? "",
 
   fog: { start: 5000.0, end: 11000.0, red: 0.375, green: 0.625, blue: 0.875 },
-  water: { color: [176, 208, 232] },
+  floor: { model: STAGE_SEA_MODEL, z: -1300.0, color: [176, 208, 232] },
   pieces: [
     { model: "Doodads\\Cinematic\\FrozenThrone\\FrozenThrone.mdx", x: 1900.0, y: 6500.0, z: -1300.0, scale: 0.5, yaw: 250.0 },
     { model: "Doodads\\Icecrown\\Rocks\\Glacier\\Glacier0.mdx", x: -3300.0, y: 2200.0, z: -1300.0, scale: 2.5, yaw: 185.0, matrixScale: [2.5, 1.0, 0.875] },
@@ -131,14 +128,7 @@ export function terrainPieces(stage: number): readonly SceneryPiece[] {
 }
 
 export function hiddenBelow(stage: number): number | undefined {
-  if (stage === TOMB_OF_SARGERAS_STAGE) return SEA_SURFACE_Z;
-  const scenery = stageScenery(stage);
-  return scenery.water === undefined ? scenery.floor?.z : STAGE_SEA_LEVEL_Z;
-}
-
-/** Terrain draws only under a water stage, where its water is the sea; elsewhere it stays hidden (rule 11). */
-export function terrainShown(stage: number): boolean {
-  return stageScenery(stage).water !== undefined;
+  return stage === TOMB_OF_SARGERAS_STAGE ? SEA_SURFACE_Z : stageScenery(stage).floor?.z;
 }
 
 export function lavaPiece(side: -1 | 1): SceneryPiece {

@@ -5,7 +5,7 @@ import { dirname, join } from "node:path";
 import { Effect, Schema } from "effect";
 import { WHITE_FIGHTER_MODELS } from "../../src/game/assets/whiteFighterModels";
 import { STAGE_SKY_MODELS } from "../../src/game/assets/stageSkyInfo";
-import { MapBuild, MapBuildFailure, ensurePackager, runProcess, type ArchiveEntry } from "wisp/scripts/wisp/mapBuild";
+import { MapBuild, MapBuildFailure, runProcess, type ArchiveEntry } from "wisp/scripts/wisp/mapBuild";
 import { UsageFailure } from "wisp/scripts/wisp/command";
 import { step } from "wisp/scripts/wisp/timings";
 import { type FighterOriginalClip, originalClip, originalClipCount, originalLightPath } from "../../src/game/assets/fighterOriginalClipInfo";
@@ -31,7 +31,6 @@ import { stageCardPath } from "./buildInputs";
 import { buildProject, projectRoot as PROJECT } from "./project";
 import { UI_FRAMES } from "./uiFrames";
 import { checkCueModels, cueModels } from "./headlessRender";
-import { seaTerrain } from "../seaTerrain";
 const tryMapPromise = <A>(operation: string, path: string, run: () => PromiseLike<A>) => Effect.tryPromise({ try: run, catch: (cause) => new MapBuildFailure({ operation, path, cause }) });
 const tryMapSync = <A>(operation: string, path: string, run: () => A) => Effect.try({ try: run, catch: (cause) => new MapBuildFailure({ operation, path, cause }) });
 const EMPTY_MODEL = "the map script names an empty model path";
@@ -189,23 +188,6 @@ const carriedModels = (map: string, packager: string, models: readonly string[] 
   }
 }));
 
-
-/** #277: the base map's war3map.w3e rewritten as the arena's sea (smashcraft:ts/scripts/seaTerrain.ts); it replaces the base map's terrain. */
-export const seaTerrainImport = (base: string, packager: string) => Effect.scoped(Effect.gen(function*() {
-  const scratch = yield* Effect.acquireRelease(
-    tryMapSync("create scratch directory", tmpdir(), () => mkdtempSync(join(tmpdir(), "smashcraft-terrain."))),
-    (directory) => Effect.sync(() => rmSync(directory, { recursive: true, force: true })),
-  );
-  yield* ensurePackager(packager);
-  const extracted = join(scratch, "base.w3e");
-  yield* runProcess("extract the base map's terrain", base, [packager, "extract", base, extracted, "war3map.w3e"]);
-  const bytes = yield* tryMapPromise("read the base map's terrain", extracted, () => Bun.file(extracted).bytes());
-  const sea = yield* tryMapSync("paint the sea terrain", base, () => seaTerrain(bytes));
-  const source = join(SEA_TERRAIN_DIRECTORY, "war3map.w3e");
-  yield* tryMapPromise("write the sea terrain", source, () => Bun.write(source, sea));
-  return { entry: "war3map.w3e", source } satisfies ArchiveEntry;
-}));
-const SEA_TERRAIN_DIRECTORY = join(PROJECT, "build/sea-terrain");
 
 const UI_FRAME_FILES = [...UI_FRAMES.flatMap(({ definition }) => [`${definition.name}.fdf`, `${definition.name}.toc`]), "CueGraphics.toc", "CueGraphics.fdf"];
 const CUE_GRAPHICS_DE = { entry: "_de.w3mod\\war3mapImported\\CueGraphics.fdf", source: join(PROJECT, "tools/selection/art/CueGraphicsDE.fdf") };
