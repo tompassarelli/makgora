@@ -30,6 +30,6 @@ test("holding shield, jumping and pressing Tilt down-forward wavedashes out of s
   wavedashOutOfShield({ trigger: true }, { tilt: true });
 });
 
-test("holding one trigger, jumping and pressing the other trigger down-forward wavedashes out of shield [k4 reference melee]", () => {
+test("holding one trigger, jumping and pressing the other trigger down-forward wavedashes out of shield [k4 reference docs/design/melee/techniques.md#wavedash-and-waveland]", () => {
   for (const [held, other] of [["trigger", "rightTrigger"], ["rightTrigger", "trigger"]] as const) wavedashOutOfShield({ [held]: true }, { [other]: true });
 });

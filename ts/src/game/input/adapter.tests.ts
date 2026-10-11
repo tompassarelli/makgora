@@ -53,7 +53,7 @@ test("Z hold lengths match quick-release jump height and takeoff frame, even wit
   }
 });
 
-test("LT and keyboard 9 or custom 0 raise the lightest shield, larger and weaker than RT [k4 reference melee]", () => {
+test("LT and keyboard 9 or custom 0 raise the lightest shield, larger and weaker than RT [k4 reference docs/melee-analog-shield.md]", () => {
   const lightRows = [assertDefined(inputRow({ held: maskOf(Action.leftTrigger), pressed: maskOf(Action.leftTrigger), triggerLeft: 77 }))];
   for (const preset of ["standard", "custom"] as const) {
     const action = assertDefined(actionFor(presetBindings(preset), preset === "standard" ? 57 : 48));

@@ -38,7 +38,7 @@ function testSoloMatch() {
   const game = createMatchState(); setParticipants(game, 1, 2); recallCharacter(game, 0, 1); return game;
 }
 
-test("heldShieldOrderDepletionPrecedesEveryGuardExit [k4 reference melee]", () => {
+test("heldShieldOrderDepletionPrecedesEveryGuardExit [k4 reference docs/physics.md#shield-break-recovery]", () => {
   for (let boundary = 0; boundary <= 1; boundary++) {
     for (let action = 0; action <= 3; action++) {
       const game = createMatchState();
@@ -88,7 +88,7 @@ test("heldShieldOrderDepletionPrecedesEveryGuardExit [k4 reference melee]", () =
     }
   }
 });
-test("heldShieldOrderEntryDoesNotDrainUntilNextAnimationTick [k4 reference melee-decomp]", () => {
+test("heldShieldOrderEntryDoesNotDrainUntilNextAnimationTick [k4 reference docs/physics.md#shield-break-recovery]", () => {
   const game = createMatchState();
   game.phase = Phase.match;
   const first = createFighter(1, 0, 1);
@@ -113,7 +113,7 @@ test("heldShieldOrderEntryDoesNotDrainUntilNextAnimationTick [k4 reference melee
   assertNear(first.shield.energy, 0.07000000029802322, 0.00009999999747378752);
   assertNear(second.shield.energy, 19.440000534057617, 0.00009999999747378752);
 });
-test("heldShieldOrderHitlagAndShieldstunResumeBeforeActionInputs [k4 reference melee]", () => {
+test("heldShieldOrderHitlagAndShieldstunResumeBeforeActionInputs [k4 reference docs/physics.md#shield-break-recovery]", () => {
   for (let action = 0; action <= 1; action++) {
     const game = createMatchState();
     game.phase = Phase.match;
@@ -168,7 +168,7 @@ test("heldShieldOrderHitlagAndShieldstunResumeBeforeActionInputs [k4 reference m
     assertNear(second.shield.energy, 19.719999313354492, 0.00009999999747378752);
   }
 });
-test("shieldBreakBoundaryDrainRequiresStrictlyNegativeHealth [k4 reference melee]", () => {
+test("shieldBreakBoundaryDrainRequiresStrictlyNegativeHealth [k4 reference docs/physics.md#shield-break-recovery]", () => {
   const game = createMatchState();
   game.phase = Phase.match;
   const first = createFighter(1, 0, 1);
@@ -189,7 +189,7 @@ test("shieldBreakBoundaryDrainRequiresStrictlyNegativeHealth [k4 reference melee
   assertFalse(first.shield.raised);
   assertNear(first.shield.energy, 0.07000000029802322, 0.00009999999747378752);
 });
-test("shieldBreakBoundaryDamageAtZeroStillGuardsThenRestoresThirty [k4 reference melee]", () => {
+test("shieldBreakBoundaryDamageAtZeroStillGuardsThenRestoresThirty [k4 reference docs/physics.md#shield-break-recovery]", () => {
   const game = createMatchState();
   game.phase = Phase.match;
   const first = createFighter(1, 0, 1);
@@ -226,7 +226,7 @@ test("shieldBreakBoundaryDamageAtZeroStillGuardsThenRestoresThirty [k4 reference
   stepMatch(game, testRoster(first, second), testFrameControls(firstInput, secondInput, firstCommands, secondCommands), 3);
   assertNear(second.shield.energy, 30.06999969482422, 0.00009999999747378752);
 });
-test("shieldRegenMatchContinuesDuringStoppedActions [k4 reference melee]", () => {
+test("shieldRegenMatchContinuesDuringStoppedActions [k4 reference docs/physics.md#shield-break-recovery]", () => {
   for (let state = 0; state <= 5; state++) {
     const game = createMatchState();
     game.phase = Phase.match;
@@ -278,7 +278,7 @@ test("shieldRegenMatchContinuesDuringStoppedActions [k4 reference melee]", () =>
     assertEquals(first.shield.energy, 60.0);
   }
 });
-test("shieldRegenMatchUsesGuardStateAfterGrabInput [k4 reference melee-decomp]", () => {
+test("shieldRegenMatchUsesGuardStateAfterGrabInput [k4 reference docs/physics.md#shield-break-recovery]", () => {
   const game = createMatchState();
   game.phase = Phase.match;
   const first = createFighter(1, 0, 1);
@@ -306,7 +306,7 @@ test("shieldRegenMatchUsesGuardStateAfterGrabInput [k4 reference melee-decomp]",
   assertNear(first.shield.energy, 19.860000610351562, 0.00009999999747378752);
   assertNear(second.shield.energy, 19.719999313354492, 0.00009999999747378752);
 });
-test("shieldRegenMatchFollowsDizzyRestoreExactlyOnce [k4 reference melee]", () => {
+test("shieldRegenMatchFollowsDizzyRestoreExactlyOnce [k4 reference docs/physics.md#shield-break-recovery]", () => {
   const game = createMatchState();
   game.phase = Phase.match;
   const first = createFighter(1, 0, 1);
@@ -334,7 +334,7 @@ test("shieldRegenMatchFollowsDizzyRestoreExactlyOnce [k4 reference melee]", () =
   stepMatch(game, testRoster(first, second), testFrameControls(firstInput, secondInput, firstCommands, secondCommands), 5);
   assertNear(first.shield.energy, 30.139999389648438, 0.00009999999747378752);
 });
-test("shieldRegenMatchSeesGuardClearedByCapture [k4 reference melee]", () => {
+test("shieldRegenMatchSeesGuardClearedByCapture [k4 reference docs/physics.md#shield-break-recovery]", () => {
   const game = createMatchState();
   game.phase = Phase.match;
   const first = createFighter(1, 0, 1);
@@ -417,7 +417,7 @@ test("jumpSquatBuffersBackAirUntilFirstAirborneFrame [k3 measure docs/design/mel
     }
   }
 });
-test("dashGrabUsesTestActorTimingAndWindowIsReplayable [k4 reference melee]", () => {
+test("dashGrabUsesTestActorTimingAndWindowIsReplayable [k4 reference docs/smash-melee-reference/surface-action-boundaries.md#grab-event-clock]", () => {
   const game = createMatchState();
   game.phase = Phase.match;
   const first = createFighter(1, 0, 1);
@@ -479,7 +479,7 @@ test("ordinaryDashAttackStaysAnAttackWhileGrabIntentStartsDashGrab [k3 measure d
   assertTrue(second.attack.dashGrab);
   assertEquals(second.attack.duration, attackDurationFramesForGrounding(5, true));
 });
-test("lateDashGrabGuardEntryOpensCatchDashAndEarlyEntryDoesNot [k4 reference melee]", () => {
+test("lateDashGrabGuardEntryOpensCatchDashAndEarlyEntryDoesNot [k4 reference docs/smash-melee-reference/retail-ground-movement-events.json]", () => {
   const game = createMatchState();
   game.phase = Phase.match;
   const first = createFighter(1, 0, 1);
@@ -553,7 +553,7 @@ test("lateDashGrabGuardEntryOpensCatchDashAndEarlyEntryDoesNot [k4 reference mel
   stepMatch(dashLateGame, testRoster(dashLate, dashLateOther), testFrameControls(dashLateInput, dashLateOtherInput, dashLateCommands, dashLateOtherCommands), 1);
   assertEquals(dashLate.ground.dashGrabWindow, 3);
 });
-test("dashGrabWhiffEndsAfterFortySubsequentTicks [k4 reference melee]", () => {
+test("dashGrabWhiffEndsAfterFortySubsequentTicks [k4 reference docs/smash-melee-reference/surface-action-boundaries.md#dash-grab-completion-and-contact-bounds]", () => {
   const game = createMatchState();
   game.phase = Phase.match;
   const first = createFighter(1, -240, 1);
@@ -589,7 +589,7 @@ test("dashGrabWhiffEndsAfterFortySubsequentTicks [k4 reference melee]", () => {
   assertGreaterThan(first.jump.squat, 0);
   assertEquals(second.grab.grabbedFrames, 0);
 });
-test("dashGrabSecondActiveTickCapturesButFollowingTickDoesNot [k4 reference melee]", () => {
+test("dashGrabSecondActiveTickCapturesButFollowingTickDoesNot [k4 reference docs/smash-melee-reference/surface-action-boundaries.md#grab-event-clock]", () => {
   for (let lateByOne = 0; lateByOne <= 1; lateByOne++) {
     const game = createMatchState();
     game.phase = Phase.match;

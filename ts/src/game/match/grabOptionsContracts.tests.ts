@@ -21,7 +21,7 @@ function duel(character: Character) {
   return { game, world, inputs: createBufferedFrameControls() };
 }
 
-test("standing grabs across the roster meet scaled Melee reach, height and active frames within ten percent [k4 reference melee]", () => {
+test("standing grabs across the roster meet scaled Melee reach, height and active frames within ten percent [k4 reference references/melee-frame-data/libmelee.jsonl]", () => {
   for (const character of SELECTABLE_CHARACTERS) {
     const fighter = createFighter(character, 0.0, 1);
     const hit = emptyHitRegion();
@@ -32,7 +32,7 @@ test("standing grabs across the roster meet scaled Melee reach, height and activ
   }
 });
 
-test("grab on every jump squat frame starts a grounded standing grab without takeoff [k4 reference melee]", () => {
+test("grab on every jump squat frame starts a grounded standing grab without takeoff [k4 reference docs/design/melee/techniques.md#shield-drop-jump-cancelled-grab-and-up-smash]", () => {
   for (const character of SELECTABLE_CHARACTERS) {
     const count = createFighter(character, 0.0, 1).tuning.physics.jumpSquatFrames;
     for (let squatFrame = 0; squatFrame < count; squatFrame++) {
@@ -53,7 +53,7 @@ test("grab on every jump squat frame starts a grounded standing grab without tak
   }
 });
 
-test("standing dash and pivot grabs catch Rifleman at their scaled limit for three frames and miss beyond it [k4 reference melee]", () => {
+test("standing dash and pivot grabs catch Rifleman at their scaled limit for three frames and miss beyond it [k4 reference references/melee-frame-data/libmelee.jsonl]", () => {
   for (const character of SELECTABLE_CHARACTERS) {
     for (const kind of [0, 1, 2]) {
       const reach = kind === 0 ? 96.0 : kind === 1 ? 120.0 : 144.0;

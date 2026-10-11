@@ -26,7 +26,7 @@ function magnifier() {
   return { run, fighter };
 }
 
-test("magnifier damage is 1% per 60 consecutive offscreen frames, stops at 150%, and training disables it [k4 reference melee]", () => {
+test("magnifier damage is 1% per 60 consecutive offscreen frames, stops at 150%, and training disables it [k4 reference docs/physics.md#camera-limits-off-screen-damage-and-blast-zones-melee-reference]", () => {
   const { run, fighter } = magnifier();
   for (let frame = 1; frame <= 59; frame++) playPads(run, {}, {});
   assertFalse(fighter.status.out);

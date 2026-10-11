@@ -52,7 +52,7 @@ test("shieldGrabStartsDirectlyFromActiveGuardAndCanCatchShieldingTarget [k3 meas
   assertFalse(target.shield.raised);
 });
 
-test("shieldstunKeepsTheFighterShieldingAndBlocksActions [k4 reference melee]", () => {
+test("shieldstunKeepsTheFighterShieldingAndBlocksActions [k4 reference docs/physics.md#shield-break-recovery]", () => {
   const game = testMatch();
   const attacker = createFighter(1, 0, 1);
   const target = createFighter(1, 100, -1);
