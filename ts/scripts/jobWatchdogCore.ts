@@ -1,7 +1,7 @@
 export const WATCHED_WORKFLOWS = ["autoland.yml", "farm-test.yml"] as const;
 export const MIN_BASELINE_SAMPLES = 5;
 export type WatchedWorkflow = typeof WATCHED_WORKFLOWS[number];
-export interface JobTiming {
+interface JobTiming {
   readonly id: number;
   readonly name: string;
   readonly status: string;
@@ -18,12 +18,12 @@ export interface TimingRun {
   readonly status: string;
   readonly jobs: readonly JobTiming[];
 }
-export interface Baseline {
+interface Baseline {
   readonly key: string;
   readonly medianMs: number;
   readonly samples: number;
 }
-export interface Overrun {
+interface Overrun {
   readonly runId: number;
   readonly jobId: number;
   readonly job: string;
@@ -34,7 +34,7 @@ export interface Overrun {
   readonly landInProgress: boolean;
 }
 export const landInProgress = (jobs: readonly JobTiming[]): boolean => jobs.some(job => job.status === "in_progress" && (job.name === "land" || job.name === "queue"));
-export const runnerClass = (job: JobTiming): string => job.labels.some(label => /^(ubuntu-|windows-|macos-)/.test(label)) ? "hosted" : "self-hosted";
+const runnerClass = (job: JobTiming): string => job.labels.some(label => /^(ubuntu-|windows-|macos-)/.test(label)) ? "hosted" : "self-hosted";
 export const timingKey = (workflow: WatchedWorkflow, job: JobTiming): string => `${workflow}:${job.name}:${runnerClass(job)}`;
 export function baselines(history: readonly TimingRun[], now: number): readonly Baseline[] {
   const samples = new Map<string, number[]>();

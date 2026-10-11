@@ -23,10 +23,10 @@ export const AERIAL_DOWN_SETUPS = [
   { name: "Offstage", x: 900.0, z: 240.0, vz: -4.0 },
 ] as const;
 
-export const AERIAL_DOWN_FRAMES = 120;
+const AERIAL_DOWN_FRAMES = 120;
 
 /** Each fighter's aerial down special, as the #448 lead approved it. */
-export const AERIAL_DOWN_CHOICES: Readonly<Record<number, string>> = {
+const AERIAL_DOWN_CHOICES: Readonly<Record<number, string>> = {
   [Character.rifleman]: "Freeze Trap tossed in the air falls and arms on deck contact",
   [Character.demonHunter]: "Flame Crash: stall, dive, burst on landing",
   [Character.blademaster]: "Mirror Image placed in the air, then a backward step",
@@ -55,7 +55,7 @@ export const AERIAL_DOWN_CHOICES: Readonly<Record<number, string>> = {
   [Character.kobold]: "aerial ankle sweep; lands into the grounded sweep",
 };
 
-export interface AerialDownRow {
+interface AerialDownRow {
   readonly character: Character;
   readonly setup: number;
   /** Special action and form after the press frame; action 0 means refused. */
@@ -70,7 +70,7 @@ export interface AerialDownRow {
 }
 
 /** Whether the special shows its hitbox or effect this frame. */
-export function aerialDownEffect(f: Readonly<Fighter>): boolean {
+function aerialDownEffect(f: Readonly<Fighter>): boolean {
   const { special } = f;
   if (special.action === SpecialAction.demonHunterImmolate) return flameCrashRegion(special.form, special.frame) !== NO_HIT_REGION;
   const move = runningHeroSpecial(f);
@@ -127,7 +127,7 @@ export function aerialDownSpecial(character: Character, setup: number, untilEffe
 }
 
 /** A press that does nothing: refused, or over before its effect. */
-export const deadInput = (row: Readonly<AerialDownRow>): boolean => row.action === SpecialAction.none || row.effect === 0;
+const deadInput = (row: Readonly<AerialDownRow>): boolean => row.action === SpecialAction.none || row.effect === 0;
 
 const event = (frame: number): string => frame === 0 ? "—" : `${frame}`;
 
@@ -137,7 +137,7 @@ function cell(row: Readonly<AerialDownRow>): string {
   return `${form} W${event(row.effect)} L${event(row.landed)}/E${event(row.ended)}`;
 }
 
-export function aerialDownTable(): string {
+function aerialDownTable(): string {
   const lines = [`| Fighter | Aerial choice | ${AERIAL_DOWN_SETUPS.map(setup => setup.name).join(" | ")} |`,
     `|---|---|${AERIAL_DOWN_SETUPS.map(() => "---").join("|")}|`];
   let dead = 0;
