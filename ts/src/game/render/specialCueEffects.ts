@@ -316,7 +316,6 @@ export class SpecialCueEffects {
     if (!this.definitive) for (const { model } of this.popcorn) BlzSetSpecialEffectTimeScale(model, paused ? 0.0 : 1.0);
   }
 
-  /** The disjoint weapon models that follow this fighter's hit regions. */
   weaponEffects(into: effect[]): void {
     this.areas.drawnEffects(into);
   }

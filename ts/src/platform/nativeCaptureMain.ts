@@ -11,8 +11,9 @@ import { shellState } from "./shell/state";
 import { on, trampoline } from "wisp/src/platform/dispatch";
 import { writeLines } from "wisp/src/platform/fileio";
 import { f32 } from "wisp/src/sim/f32";
-import { CAPTURE_FIXTURES, SILHOUETTE_HIDDEN_FRAME } from "./captureFixtures";
+import { CAPTURE_FIXTURES, type CaptureFixture, SILHOUETTE_HIDDEN_FRAME } from "./captureFixtures";
 import { applyDeveloperCommand } from "./shell/keys";
+import { bareFighter } from "./shell/fighterCloak";
 import { paintDrawnStamp } from "./shell/drawnStamp";
 import { CAPTURE_STATUS_FILE } from "../runtime/gameFiles";
 
@@ -37,6 +38,8 @@ interface Runner {
   tail: number;
 
   hidden: boolean;
+  hideTick?: number;
+  stampTick?: number;
   view?: number[];
 }
 declare global { var __smashcraftCaptureRunner: Runner | undefined; }
@@ -44,31 +47,31 @@ const runner = (): Runner => globalThis.__smashcraftCaptureRunner ??= { ticks: 0
 
 function status(line: string): void { writeLines(CAPTURE_STATUS_FILE, [line]); }
 
-function nextScript(r: Runner): void {
+function nextScript(r: Runner, fixtures: readonly CaptureFixture[]): void {
   r.script++;
   r.stage = "opening";
   r.frame = 0;
   r.held = 0;
-  const fixture = CAPTURE_FIXTURES[r.script];
+  const fixture = fixtures[r.script];
   if (fixture === undefined) {
     nativeDriverCommand("reset");
-    status(`CAPTURE DONE ${CAPTURE_FIXTURES.length}`);
+    status(`CAPTURE DONE ${fixtures.length}`);
     return;
   }
   nativeDriverCommand(fixture.script);
   status(`CAPTURE SCRIPT ${r.script + 1} ${fixture.name}`);
 }
 
-function tick(): void {
+export function captureTick(fixtures: readonly CaptureFixture[]): void {
   const s = shellState();
   const r = runner();
   if (s === undefined || ++r.ticks < WARMUP_TICKS) return;
-  if (r.script < 0) { nextScript(r); return; }
-  const fixture = CAPTURE_FIXTURES[r.script];
+  if (r.script < 0) { nextScript(r, fixtures); return; }
+  const fixture = fixtures[r.script];
   if (fixture === undefined) return;
   const now = s.runtime.simulationFrame;
   if (r.stage === "tail") {
-    if (now >= r.tail) nextScript(r);
+    if (now >= r.tail) nextScript(r, fixtures);
     return;
   }
   if (r.stage === "opening") {
@@ -79,9 +82,16 @@ function tick(): void {
     return;
   }
   const target = fixture.frames[r.frame];
-  if (target === undefined || now !== target) return;
   const silhouette = fixture.silhouette;
-  if (silhouette !== undefined && r.held === 0) ClearTextMessages();
+  if (silhouette !== undefined) bareFighter(s, silhouette.slot, true);
+  if (target === undefined || now !== target) return;
+  if (silhouette !== undefined && r.held === 0) {
+    ClearTextMessages();
+    if (r.hidden) {
+      paintDrawnStamp(globalThis.__smashcraftDriverScripts ?? 0, target + SILHOUETTE_HIDDEN_FRAME);
+      r.stampTick = r.ticks;
+    }
+  }
   r.view = [BlzGetLocalClientWidth(), BlzGetLocalClientHeight(), GetCameraField(CAMERA_FIELD_FIELD_OF_VIEW), GetCameraEyePositionX(), GetCameraEyePositionY(), GetCameraEyePositionZ(), GetCameraTargetPositionX(), GetCameraTargetPositionY(), GetCameraTargetPositionZ()];
   if (++r.held < (fixture.holdTicks ?? HOLD_TICKS)) return;
   r.held = 0;
@@ -90,7 +100,7 @@ function tick(): void {
     applyDeveloperCommand(s, 0, `-dev ${r.hidden ? "hide" : "show"} fighter ${silhouette.slot}`);
     ClearTextMessages();
     if (r.hidden) {
-      paintDrawnStamp(globalThis.__smashcraftDriverScripts ?? 0, target + SILHOUETTE_HIDDEN_FRAME);
+      r.hideTick = r.ticks;
       return;
     }
   }
@@ -101,8 +111,13 @@ function tick(): void {
     return;
   }
   r.stage = "tail";
+  if (silhouette !== undefined) bareFighter(s, silhouette.slot, false);
   r.tail = target + (fixture.tailFrames ?? TAIL_FRAMES);
   nativeDriverCommand(`resume ${r.tail}`);
+}
+
+function tick(): void {
+  captureTick(CAPTURE_FIXTURES);
 }
 
 export function install(this: void): void {

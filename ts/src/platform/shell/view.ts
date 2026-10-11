@@ -240,12 +240,13 @@ export function renderFighter(s: ShellState, slot: ParticipantSlot, pose: Readon
   const fighter = fighterAt(s.world, slot);
   renderDizzy(body, fighter, s.game.phase === Phase.match, s.origin);
   const hidden = s.hiddenFighters[slot];
-  if (hidden === undefined && wasOut && !fighter.status.out) ShowUnit(body.unit, true);
-  else if (hidden === undefined && !wasOut && fighter.status.out) {
+  const cloaked = hidden?.body === true;
+  if (!cloaked && wasOut && !fighter.status.out) ShowUnit(body.unit, true);
+  else if (!cloaked && !wasOut && fighter.status.out) {
     ShowUnit(body.unit, false);
   }
   const { pooled } = participant;
-  if (hidden !== undefined) hidden.unitShown = !pooled && !fighter.status.out;
+  if (hidden !== undefined && cloaked) hidden.unitShown = !pooled && !fighter.status.out;
   else ShowUnit(body.unit, !pooled && !fighter.status.out);
   if (body.renderedSelection !== pose.selectionSerial) {
     if (!pooled) {

@@ -68,7 +68,9 @@ back exactly what was drawn (receipt `dev: fighter SLOT hidden|shown`).
   against the held capture frames, without a Warcraft client.
 - Native silhouettes (wisp#125): a capture script with `#! silhouette a|b
   FIGHTER MOVE [WIDTHxHEIGHT]` (default 1920x1080) holds each capture frame
-  twice, the fighter shown and then hidden by `-dev hide fighter SLOT`, and
+  twice, the fighter shown and then hidden by `-dev hide fighter SLOT`, with
+  its team glow and missile effects off in both grabs and the hidden grab's
+  stamp painted the tick after the hide, and
   `run` saves `FIXTURE/<frame>-shown.png` and `FIXTURE/<frame>-hidden.png` plus
   `FIXTURE/silhouette.json` (match frames, slot, fighter, move, resolution) for
   Wisp's `silhouetteBounds(shown, hidden)`; `run` refuses a capture of another

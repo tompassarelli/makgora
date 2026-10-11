@@ -1,10 +1,10 @@
 
 
 
-// A `#! silhouette a|b FIGHTER MOVE [WIDTHxHEIGHT]` script holds each frame twice: the slot's fighter shown,
-// then hidden by `-dev hide fighter SLOT`, so the pair's difference is that fighter's native silhouette (wisp#125).
+
+
 export interface Silhouette {
-  readonly slot: number;
+  readonly slot: 0 | 1;
   readonly fighter: string;
   readonly move: string;
   readonly width: number;

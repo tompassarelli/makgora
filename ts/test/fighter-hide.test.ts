@@ -5,13 +5,13 @@ import type { MapEntry } from "wisp/src/headless/client";
 import { installHeadless } from "wisp/scripts/wisp/headless";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { fixtureOf } from "../scripts/nativeCapture";
+import type { CaptureFixture } from "../src/platform/captureFixtures";
 import { DISJOINT_CUES } from "../src/game/presentation/disjointCues";
 import { Character } from "../src/game/sim/codes";
 import { fighterAt } from "../src/game/sim/roster";
 
 const platform = join(import.meta.dir, "../src/platform");
 const PAD = join(import.meta.dir, "native/captures/wisp125-warden-nair.pad");
-// Warden's knives draw on nair's active frames, so this held frame shows the weapon.
 const HELD = 124;
 const NEAR = 160;
 const FEET = 20;
@@ -63,7 +63,6 @@ test("-dev hide fighter 0 hides Warden's body and nair knives on a held native f
   const a = at[0] ?? { x: 0, z: 0 };
   const b = at[1] ?? { x: 0, z: 0 };
   expect(Math.abs(a.x - b.x)).toBeGreaterThan(NEAR * 2);
-  // Warden's body box above its feet; the jump's dust stays on the floor below it.
   const nearA = (pose: { x: number; z: number }) => Math.abs(pose.x - a.x) < NEAR && pose.z > a.z - FEET && pose.z < a.z + NEAR * 2;
   const knife = DISJOINT_CUES[Character.warden]?.model ?? "";
 
@@ -90,5 +89,50 @@ test("-dev hide fighter 0 hides Warden's body and nair knives on a held native f
   expect(units()).toEqual(before.units);
   expect(effects()).toEqual(before.effects);
   expect(client.messages.join("\n")).toContain("dev: fighter 0 shown");
+  expect(client.errors).toEqual([]);
+});
+
+test("a silhouette capture keeps Warden's team glow and nair knives off in the shown and hidden grabs and stamps the hidden grab the tick after hide [k1 scenario]", async () => {
+  const { shell } = await import(join(platform, "shell/state.ts"));
+  const { captureTick }: { captureTick(fixtures: readonly CaptureFixture[]): void } = await import(join(platform, "nativeCaptureMain.ts"));
+  const entry: MapEntry = await import(join(platform, "nativeDriverMain.ts"));
+  const fixture: CaptureFixture = { ...fixtureOf(PAD, readFileSync(PAD, "utf8")), frames: [HELD], holdTicks: 6, openingTicks: 1, tailFrames: 1 };
+  const clients = headless.clients(entry, [0]);
+  const client = clients.client(0);
+  const glowOff = new Set<unknown>();
+  client.natives.BlzShowUnitTeamGlow = (unit: unknown, show: boolean) => { if (show) glowOff.delete(unit); else glowOff.add(unit); };
+  clients.start();
+  clients.frames(3);
+  const knife = DISJOINT_CUES[Character.warden]?.model ?? "";
+  type Runner = { stage: string; hidden: boolean; hideTick?: number; stampTick?: number };
+  const grabs: { hidden: boolean; body: boolean; glow: boolean; knives: number }[] = [];
+  let runner: Runner | undefined;
+  for (let guard = 0; guard < 2000 && runner?.stage !== "tail"; guard++) {
+    let unit: unknown;
+    let id = -1;
+    let held = false;
+    client.run(() => {
+      captureTick([fixture]);
+      runner = (globalThis as { __smashcraftCaptureRunner?: Runner }).__smashcraftCaptureRunner;
+      unit = shell().participants[0].body?.unit;
+      id = unit === undefined ? -1 : GetHandleId(unit as unit);
+      held = runner?.stage === "target" && shell().runtime.simulationFrame === HELD;
+    });
+    if (held && runner !== undefined) {
+      grabs.push({
+        hidden: runner.hidden,
+        body: client.unitPoses().find(pose => pose.handle.id === id)?.visible ?? false,
+        glow: !glowOff.has(unit),
+        knives: client.effectPoses({ visibleOnly: true }).filter(pose => pose.model === knife).length,
+      });
+    }
+    clients.frames(1);
+  }
+  expect(runner?.stage).toBe("tail");
+  expect(grabs.filter(grab => !grab.hidden).length).toBeGreaterThan(0);
+  expect(grabs.filter(grab => grab.hidden).length).toBeGreaterThan(0);
+  expect(grabs.map(grab => grab.body)).toEqual(grabs.map(grab => !grab.hidden));
+  expect(grabs.filter(grab => grab.glow || grab.knives > 0)).toEqual([]);
+  expect(runner?.stampTick).toBe((runner?.hideTick ?? 0) + 1);
   expect(client.errors).toEqual([]);
 });
