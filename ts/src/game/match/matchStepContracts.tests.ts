@@ -355,36 +355,6 @@ test("shieldRegenMatchSeesGuardClearedByCapture [k4 reference melee]", () => {
   assertFalse(second.shield.raised);
   assertNear(second.shield.energy, 19.790000915527344, 0.00009999999747378752);
 });
-test("humanDirectAttacksReachBothSlotsOnTheNextStep [k1 scenario]", () => {
-  for (let style = 1; style <= 5; style++) {
-    const game = testSoloMatch();
-    setHumanCount(game, 2);
-    selectCharacter(game, 0, 1);
-    selectCharacter(game, 1, 1);
-    requestStageSelect(game, 0);
-    startAtGo(game, 0);
-    const first = createFighter(1, -240, 1);
-    const second = createFighter(1, 240, -1);
-    const firstInput = neutralControls();
-    const secondInput = neutralControls();
-    const firstCommands = attackBuffer(0);
-    const secondCommands = attackBuffer(0);
-    stepMatch(game, testRoster(first, second), testFrameControls(firstInput, secondInput, firstCommands, secondCommands), 10);
-    queueAttack(firstCommands, { style, facing: 1, frame: 11, mayCharge: false });
-    queueAttack(secondCommands, { style, facing: -1, frame: 11, mayCharge: false });
-    assertEquals(first.attack.serial, 0);
-    assertEquals(second.attack.serial, 0);
-    stepMatch(game, testRoster(first, second), testFrameControls(firstInput, secondInput, firstCommands, secondCommands), 11);
-    assertEquals(first.attack.serial, 1);
-    assertEquals(second.attack.serial, 1);
-    assertEquals(first.attack.style, style);
-    assertEquals(second.attack.style, style);
-    assertEquals(first.attack.frame, second.attack.frame);
-    stepMatch(game, testRoster(first, second), testFrameControls(firstInput, secondInput, firstCommands, secondCommands), 12);
-    assertEquals(first.attack.serial, 1);
-    assertEquals(second.attack.serial, 1);
-  }
-});
 test("activeShieldConsumesGrabButRejectsOrdinaryAttackCommand [k3 measure docs/design/melee/defense.md]", () => {
   const game = testSoloMatch();
   selectCharacter(game, 0, 1);

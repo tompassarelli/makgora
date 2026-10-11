@@ -121,17 +121,18 @@ function launch(run: Run, victimPadAt: (frame: number) => Pad, strike: Pad = STR
 
 const VICTIMS = SELECTABLE_CHARACTERS;
 const NEUTRAL = (): Pad => ({});
+const LAUNCH_PERCENTS = [30.0, 60.0, 90.0, 120.0, 150.0];
 
+
+const STRIKE_EFFECT = authoredHitRegion(emptyHitRegion(), Character.rifleman, AttackStyle.forwardAir, attackStartupFrames(AttackStyle.forwardAir), 0, 0).effect;
 
 function strikeTumbles(run: Run, percent: number): boolean {
-  const effect = authoredHitRegion(emptyHitRegion(), Character.rifleman, AttackStyle.forwardAir, attackStartupFrames(AttackStyle.forwardAir), 0, 0).effect;
-  const knockback = ordinaryHitKnockback(percent, effect.damage, run.victim.tuning.physics.weight, effect.growth, effect.base, 1.0);
+  const knockback = ordinaryHitKnockback(percent, STRIKE_EFFECT.damage, run.victim.tuning.physics.weight, STRIKE_EFFECT.growth, STRIKE_EFFECT.base, 1.0);
   return multiplyFloat32(knockback, 0.4000000059604645) >= 32.0;
 }
 
-function assertWeakWallContact(victim: Fighter): void {
-  assertTrue(victim.character === Character.thrall || victim.character === Character.cairne || victim.character === Character.chen || victim.character === Character.tinker);
-  assertEquals(victim.status.damage, 67.0);
+function assertWeakWallContact(victim: Fighter, percent: number): void {
+  assertEquals(victim.status.damage, percent + STRIKE_EFFECT.damage);
   assertEquals(victim.surfaceRecovery.contactKind, SurfaceContact.wall);
   assertEquals(victim.surfaceRecovery.state, SurfaceContact.none);
   assertFalse(isTumbling(victim));
@@ -148,16 +149,16 @@ function assertMetSide(victim: Fighter): void {
   assertLessThan(contactX, surfaceRight(0, 0, 0));
 }
 
-test("a launch into the main deck's side bounces off it without a press [k3 measure #52]", () => {
+test("a launch into the main deck's side tumbles off it without a press exactly when the hit's knockback tumbles, for every fighter at 30-150 damage [k2 property]", () => {
   for (const character of VICTIMS) {
-    for (const percent of [60.0, 120.0]) {
+    for (const percent of LAUNCH_PERCENTS) {
       const run = startRun(character, percent);
       const tumbles = strikeTumbles(run, percent);
       launch(run, NEUTRAL);
       const { victim } = run;
       assertMetSide(victim);
       if (!tumbles) {
-        assertWeakWallContact(victim);
+        assertWeakWallContact(victim, percent);
         continue;
       }
       assertEquals(victim.surfaceRecovery.contactKind, SurfaceContact.wall);
@@ -167,9 +168,9 @@ test("a launch into the main deck's side bounces off it without a press [k3 meas
   }
 });
 
-test("a trigger pressed after the hit's hitlag wall techs off the main deck's side [k3 measure #52]", () => {
+test("a trigger pressed after the hit's hitlag wall techs off the main deck's side whenever the hit tumbles, for every fighter at 30-150 damage [k2 property]", () => {
   for (const character of VICTIMS) {
-    for (const percent of [60.0, 120.0]) {
+    for (const percent of LAUNCH_PERCENTS) {
       const missed = launch(startRun(character, percent), NEUTRAL);
 
       assertLessThan(missed.contact - missed.free, 20);
@@ -180,7 +181,7 @@ test("a trigger pressed after the hit's hitlag wall techs off the main deck's si
       const { victim } = run;
       assertMetSide(victim);
       if (!tumbles) {
-        assertWeakWallContact(victim);
+        assertWeakWallContact(victim, percent);
         continue;
       }
       assertEquals(victim.surfaceRecovery.contactKind, SurfaceContact.techWall);
