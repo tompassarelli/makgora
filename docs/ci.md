@@ -65,7 +65,7 @@ commit: `gh workflow run autoland.yml -f branch=claude/NAME`.
 Everything runs from source: no private build inputs, no `.w3x` build.
 Runner placement comes from the reviewed `ts/runner-routing.json` file. Autoland reports and farm-test
 Bun, Lua32 and check jobs use hosted runners (`premerge`). Balance, background
-sweeps and the census use `farm-big` (`background`), preserving the background pool. The `farm-runner` dispatch
+sweeps and the census use `farm-big` (`background`), preserving the background pool. Background sweeps on a push to main coalesce: a running sweep finishes, and a newer main replaces only the queued one, so the next run covers the newest main; dispatched and scheduled runs never coalesce. The `farm-runner` dispatch
 input measures an alternative box for even Bun/Lua jobs on the first attempt;
 retries ignore that override and select the plan's hosted output directly, including
 when the original plan job's outputs are reused. No repository variable

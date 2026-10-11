@@ -14,6 +14,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.event_name == 'push' && 'background-sweeps-main' || format('background-sweeps-run-{0}', github.run_id) }}
+  cancel-in-progress: false
+
 env:
   SWEEPS: "1"
   SWEEP_PLACEMENT: background
