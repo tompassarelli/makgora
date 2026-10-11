@@ -7,6 +7,8 @@ import { characterModelScale } from "../../ts/src/game/presentation/modelScale";
 import { AttackPhase, AttackStyle, type Character } from "../../ts/src/game/sim/codes";
 import { createFighter } from "../../ts/src/game/sim/fighter";
 import { heroDefinition } from "../../ts/src/game/sim/heroes/registry";
+import { WARDEN_MOVES } from "../../ts/src/game/sim/heroes/wardenMoves";
+import { wardenSpinTipDegrees } from "../../ts/src/game/sim/heroes/wardenSpin";
 import type { HeroPose } from "../../ts/src/game/sim/heroes/hero";
 import { attackStartupFrames, attackDurationFramesForGrounding, characterAttackActiveFrames } from "../../ts/src/game/sim/moves";
 import { FIGHTER_ULTIMATES } from "../../ts/src/game/sim/ultimates";
@@ -79,6 +81,9 @@ const DRAW_BACK: Readonly<Record<number, Readonly<Record<string, number>>>> = {
   4: { jab: 0.5, upTilt: 1 }, 8: { downTilt: 0.4 }, 11: { jab2: 0.4 },
 };
 const contactProfile=(pose: HeroPose, character: number)=>FIGHTER_CONTACT[character]?.[pose]??CONTACT[pose];
+const CONTACT_LEAD: Readonly<Record<number, Readonly<Record<string, number>>>> = {
+  5: { forwardAir: 3 },
+};
 
 const HOP: Readonly<Record<number, Readonly<Record<string, number>>>> = {
   4: { dashAttack: 36 },
@@ -171,7 +176,7 @@ function aimWeaponContact(model: mdx.Model, index: number, start: number, contac
       for (let frame = 0; frame <= total; frame++) {
         at = start + Math.round(frame*1000/60);
         const recovery = Math.max(0,1-(frame-contact-2)/(total-contact-2));
-        const lean = frame < contact-2 ? -20*frame/(contact-2) : frame <= contact ? -20+35*(frame-contact+2)/2 : 15*recovery;
+        const lean = frame < contact-3 ? -20*frame/(contact-3) : frame <= contact ? -20+35*(frame-contact+3)/3 : 15*recovery;
         root.Rotation!.Keys.find(k => k.Frame === at)!.Vector = rotate(new Float32Array([0,0,0,1]),lean);
         data.frame = at; renderer.update(0);
         if (frame > contact+2) {
@@ -183,7 +188,7 @@ function aimWeaponContact(model: mdx.Model, index: number, start: number, contac
           continue;
         }
         const arc = frame < contact ? 75 : 75-75*(frame-contact), angle = arc*Math.PI/180;
-        const b = position(body), handTarget = [b[0]!+36*Math.cos(angle),-24,85+36*Math.sin(angle)], tipTarget = [b[0]!+96*Math.cos(angle),-24,85+96*Math.sin(angle)];
+        const b = position(body), handTarget = [b[0]!+36*Math.cos(angle),-62,85+36*Math.sin(angle)], tipTarget = [b[0]!+96*Math.cos(angle),-62,85+96*Math.sin(angle)];
         const weight = Math.min(1,frame/Math.max(1,contact-1)), initial = [...arm,hand].map(node => node.Rotation!.Keys.find(k => k.Frame === at)!.Vector.slice());
         for (let iteration = 0; iteration < 20; iteration++) for (const node of arm) aim(node,handTarget,hand);
         aim(hand,tipTarget,weapon,tipPoint);
@@ -196,21 +201,33 @@ function aimWeaponContact(model: mdx.Model, index: number, start: number, contac
       }
       return;
     }
-    for (let iteration = 0; iteration < 20; iteration++) for (const node of arm) aim(node, [48,-24,90], hand);
-    aim(hand, [108,-24,90], weapon, tipPoint);
-    const h = position(body), tip = position(weapon, tipPoint), yaw = -Math.atan2(tip[1]!-h[1]!,tip[0]!-h[0]!)*180/Math.PI;
-    const held = new Map<mdx.AnimVector, Float32Array>();
-    tracks(model, track => { if (!onGlobalClock(track) && track !== root.Rotation) { const key = track.Keys.find(k => k.Frame === at); if (key) held.set(track, key.Vector.slice()); } });
+    const held = new Map<mdx.Node, Float32Array>(), spinFrames = WARDEN_MOVES.normals[AttackStyle.neutralAir]!.activeFrames;
     for (let frame = 0; frame <= total; frame++) {
-      const time = start + Math.round(frame*1000/60), weight = frame < contact ? frame/contact : frame <= contact+4 ? 1 : Math.max(0,1-(frame-contact-4)/(total-contact-4));
-      for (const [track, vector] of held) {
-        const key = track.Keys.find(k => k.Frame === time); if (!key) continue;
-        key.Vector = vector.length === 4 ? blend(key.Vector, vector, weight) : key.Vector.map((v,i) => v*(1-weight)+vector[i]!*weight);
-        if (key.InTan) { key.InTan = track.LineType === 2 && vector.length !== 4 ? new Float32Array(vector.length) : key.Vector.slice(); key.OutTan = key.InTan.slice(); }
+      at = start + Math.round(frame*1000/60);
+      const recovery = Math.max(0,1-(frame-contact-spinFrames)/(total-contact-spinFrames));
+      const spin = frame < contact ? -30*Math.sin(frame/contact*Math.PI) : frame <= contact+spinFrames ? wardenSpinTipDegrees(frame-contact,spinFrames) : 360+25*Math.sin((frame-contact-spinFrames)/(total-contact-spinFrames)*Math.PI);
+      root.Rotation!.Keys.find(k => k.Frame === at)!.Vector = rotate(new Float32Array([0,0,0,1]),-spin);
+      data.frame = at; renderer.update(0);
+      if (frame > contact+spinFrames) {
+        for (const node of [...arm,hand]) {
+          const key = node.Rotation!.Keys.find(k => k.Frame === at)!;
+          key.Vector = blend(key.Vector,held.get(node)!,recovery);
+          if (key.InTan) { key.InTan = key.Vector.slice(); key.OutTan = key.Vector.slice(); }
+        }
+        continue;
       }
-      const angle = frame < contact ? yaw*weight-30*Math.sin(frame/contact*Math.PI) : frame <= contact+4 ? yaw+90*(frame-contact) : 360+yaw*weight+25*Math.sin((frame-contact-4)/(total-contact-4)*Math.PI);
-      const key = root.Rotation!.Keys.find(k => k.Frame === time)!;
-      key.Vector = rotate(new Float32Array([0,0,0,1]),angle,2);
+      // The tip sits on the shared spin path; the hand leads it by 15 degrees so the blade trails the swing.
+      const tipAngle = spin*Math.PI/180, handAngle = tipAngle+15*Math.PI/180;
+      const handTarget = [56.6*Math.cos(handAngle),-62,60+56.6*Math.sin(handAngle)], tipTarget = [102.5*Math.cos(tipAngle),-62,60+102.5*Math.sin(tipAngle)];
+      const weight = Math.min(1,frame/Math.max(1,contact-1)), initial = [...arm,hand].map(node => node.Rotation!.Keys.find(k => k.Frame === at)!.Vector.slice());
+      for (let iteration = 0; iteration < 20; iteration++) for (const node of arm) aim(node,handTarget,hand);
+      aim(hand,tipTarget,weapon,tipPoint);
+      [...arm,hand].forEach((node,i) => {
+        const key = node.Rotation!.Keys.find(k => k.Frame === at)!;
+        key.Vector = blend(initial[i]!,key.Vector,weight);
+        if (key.InTan) { key.InTan = key.Vector.slice(); key.OutTan = key.Vector.slice(); }
+        if (frame === contact+spinFrames) held.set(node,key.Vector.slice());
+      });
     }
     return;
   }
@@ -445,7 +462,7 @@ for(const [id,poses]of Object.entries(PLAN)) {
       if (node?.Name === "Attack Gesture") return;
       const amount=node?joint(node.Name,pose,character):0;if(amount)articulated++;
       for(let frame=0;frame<=total;frame++) {
-        const anticipation=Math.max(1,contact-2);
+        const anticipation=Math.max(1,contact-(CONTACT_LEAD[character]?.[pose]??2));
         const amountAt=frame<anticipation?-back*Math.sin(frame/anticipation*Math.PI/2):frame<=contact?-back+(1+back)*(contact>anticipation?(frame-anticipation)/(contact-anticipation):1):frame<contact+3?1+0.18*(frame-contact)/3:1.18*Math.max(0,1-(frame-contact-3)/(total-contact-3));
         const Vector=amount?rotate(key.Vector,amount*amountAt):key.Vector.slice();
         track.Keys.push({...key,Frame:start+Math.round(frame*1000/60),Vector,...key.InTan?{InTan:Vector.slice(),OutTan:Vector.slice()}: {}});
