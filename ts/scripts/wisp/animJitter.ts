@@ -49,7 +49,7 @@ function curve(a: number, outTan: number, inTan: number, b: number, t: number, t
 }
 
 /** How far a curved key segment leaves its keys: vectors past the span of their two keys, rotations off the arc between them. */
-function segmentExcess(left: mdx.AnimVectorKey, right: mdx.AnimVectorKey, type: mdx.LineType, rotation: boolean): number {
+function segmentExcess(left: mdx.AnimKeyframe, right: mdx.AnimKeyframe, type: mdx.LineType, rotation: boolean): number {
   const a = left.Vector, b = right.Vector, outTan = left.OutTan ?? a, inTan = right.InTan ?? b;
   let worst = 0;
   for (let step = 1; step < STEPS; step++) {

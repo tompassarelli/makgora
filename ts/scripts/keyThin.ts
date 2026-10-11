@@ -264,14 +264,18 @@ const keyCount = (model: mdx.Model) => { let count = 0; transforms(model, track 
 
 const sameVector = (a: Vec | undefined, b: Vec) => a !== undefined && a.length === b.length && Array.from(b).every((value, axis) => a[axis] === value);
 
-/** Hermite translation and scale keys whose tangents repeat their own value become clamped Catmull-Rom slopes, zero at holds and clip ends. */
+/** Translation and scale keys with a generator's broken handles (Hermite tangents repeating the value, Bezier handles at the origin) get clamped Catmull-Rom slopes, flat at holds and clip ends. */
 export function slopeTangents(source: mdx.Model): mdx.Model {
     const model = structuredClone(source);
     const sequenceOf = (frame: number) => model.Sequences.findIndex(sequence => frame >= at(sequence.Interval, 0) && frame <= at(sequence.Interval, 1));
     transforms(model, (track, _node, channel) => {
-        if (channel === 'Rotation' || track.LineType !== mdx.LineType.Hermite) return;
+        const bezier = track.LineType === mdx.LineType.Bezier;
+        if (channel === 'Rotation' || track.LineType !== mdx.LineType.Hermite && !bezier) return;
         const keys = track.Keys;
-        const repaired = keys.map(key => sameVector(key.InTan, key.Vector) && sameVector(key.OutTan, key.Vector) && Array.from(key.Vector).some(value => value !== 0));
+        const repaired = keys.map(key => {
+            const broken = bezier ? new Float32Array(key.Vector.length) : key.Vector;
+            return sameVector(key.InTan, broken) && sameVector(key.OutTan, broken) && Array.from(key.Vector).some(value => value !== 0);
+        });
         keys.forEach((key, index) => {
             if (!repaired[index]) return;
             const sequence = sequenceOf(key.Frame), previous = keys[index - 1], next = keys[index + 1];
@@ -285,8 +289,8 @@ export function slopeTangents(source: mdx.Model): mdx.Model {
                     outTan[axis] = Math.sign(right) * Math.min(Math.abs(slope * (next.Frame - key.Frame)), 2 * Math.abs(right));
                 }
             }
-            key.InTan = inTan;
-            key.OutTan = outTan;
+            key.InTan = bezier ? inTan.map((slope, axis) => at(key.Vector, axis) - slope / 3) : inTan;
+            key.OutTan = bezier ? outTan.map((slope, axis) => at(key.Vector, axis) + slope / 3) : outTan;
         });
     });
     return model;
