@@ -3,6 +3,7 @@
 - Tapes: set `LUA` to the 32-bit Lua executable, then run `bun wisp parity tapes` to
   compare replay results across Bun, that Lua32 and a Lua32 whose raw float
   `+ - *` round toward zero (`TOWARD_ZERO_LUA`, or built with nix on first use).
+  `bun wisp parity tapes --smoke` compares one short rollback tape in all three runtimes.
 
 - Native corpus (wisp#69): every native session (`pad`, `fresh`, captures, `accept`,
   `client doctor|watch`) records what its clients' maps wrote into

@@ -133,11 +133,12 @@ const isFrame = (operation: string | undefined) => operation === "frame" || oper
 const frameCount = (run: Run) => run.records.filter(record => isFrame(record.split(" ", 2)[1])).length;
 
 export const tapes: Command = (args) => Effect.gen(function*() {
-  if (args.length > 0) return yield* new UsageFailure({ problem: "tapes takes no arguments; LUA and TOWARD_ZERO_LUA name optional 32-bit Luas" });
+  const smoke = args.length === 1 && args[0] === "--smoke";
+  if (args.length > 0 && !smoke) return yield* new UsageFailure({ problem: "tapes takes --smoke for one short deterministic tape; LUA and TOWARD_ZERO_LUA name optional 32-bit Luas" });
   const luas = yield* luaRuntimes.pipe(Effect.mapError((problem) => new TapesFailure({ problem })));
   const tapes = yield* attempt("record tapes", async () => {
     await Bun.$`mkdir -p ${build}`;
-    const recorded = [...generateTapes()].map(([name, text]) => ({ name, text, file: join(build, `${name}.tape`) }));
+    const recorded = [...generateTapes(smoke)].map(([name, text]) => ({ name, text, file: join(build, `${name}.tape`) }));
     for (const { file, text } of recorded) await Bun.write(file, text);
     return recorded;
   }).pipe(step("record tapes"));

@@ -489,7 +489,8 @@ const ULTIMATE_PAIRS: readonly (readonly [keyof typeof Character, keyof typeof C
   ["rifleman", "blademaster"], ["lich", "forsakenPaladin"], ["dreadlord", "beastmaster"], ["thrall", "jaina"], ["chen", "peon"], ["anubarak", "malfurion"], ["medivh", "kobold"],
 ];
 
-export function generateTapes(): Map<string, string> {
+export function generateTapes(smoke = false): Map<string, string> {
+  if (smoke) return new Map([["rollback", recordTape("Combat replayed from one frame up to the whole retained history.", [ROLLBACK])]]);
   const pressed = [new Set<string>(), new Set<string>()];
   const tapes = new Map([
     ["edge-cancel-turnaround", recordTape("An aerial lands at the edge, the fighter slides off, the landing lag ends at once and the fighter turns back to catch the ledge, with predictions and rollback.", [{
