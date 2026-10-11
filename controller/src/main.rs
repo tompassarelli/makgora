@@ -14,6 +14,11 @@ fn main() {
 mod linux {
     #![allow(unsafe_code)]
 
+    #[cfg(test)]
+    mod pad_contract_tests {
+        include!("pad_contract_tests.rs");
+    }
+
     use wc3_controller::focus::Foreground;
     use wc3_controller::stick::{c_stick, melee_stick, stick_down};
     use enigo::{Direction, Enigo, Key as OutputKey, Keyboard, Settings};
