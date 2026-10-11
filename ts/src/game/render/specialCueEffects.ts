@@ -129,7 +129,7 @@ export class SpecialCueEffects {
       const anchor = CUE_ANCHORS[cue.anchor];
       const model = this.popcornModel(cue, {
         x: this.origin.x + fighter.motion.x + fighter.facing * (strike?.x2 ?? anchor.x * this.scale),
-        y: this.front,
+        y: this.front - (cue.depth ?? 0.0) * this.scale,
         z: this.origin.z + fighter.motion.z + (strike?.z2 ?? anchor.z * this.scale),
       }, fighter.facing);
       if (model !== undefined) this.popcorn.push({ cue, model, born: now, seekStep: 0 });
@@ -210,7 +210,7 @@ export class SpecialCueEffects {
       }
       const { model } = entry;
       parked[index] = false;
-      placeEffect(model, this.origin.x + fighter.motion.x + fighter.facing * x, this.front, this.origin.z + fighter.motion.z + z);
+      placeEffect(model, this.origin.x + fighter.motion.x + fighter.facing * x, this.front - (cue.depth ?? 0.0) * this.scale, this.origin.z + fighter.motion.z + z);
       if (this.shown !== cue || this.shownKey !== key) {
         if (entry.cue.sequence !== undefined) BlzSetSpecialEffectAnimation(model, entry.cue.sequence);
         BlzSetSpecialEffectTime(model, entry.cue.seconds ?? 0.0);
@@ -220,7 +220,7 @@ export class SpecialCueEffects {
         BlzSetSpecialEffectTime(model, entry.cue.seconds ?? 0.0);
         this.seekAgain = false;
       }
-      BlzSetSpecialEffectYaw(model, facingYaw(fighter.facing));
+      BlzSetSpecialEffectYaw(model, cue.yaw ?? facingYaw(fighter.facing));
       BlzSetSpecialEffectPitch(model, entry.cue.pitch ?? 0.0);
       const progress = entry.cue.scaleFrames === undefined ? 0.0 : f32(Math.min(1.0, Math.max(0.0, f32((fighter.special.frame - 1) / Math.max(1, entry.cue.scaleFrames - 1)))));
       const scale = entry.cue.scaleEnd === undefined ? entry.cue.scale : f32(entry.cue.scale + f32(f32(entry.cue.scaleEnd - entry.cue.scale) * progress));
@@ -238,8 +238,8 @@ export class SpecialCueEffects {
           this.parkPopcorn(entry.model);
           continue;
         }
-        placeEffect(entry.model, this.origin.x + fighter.motion.x + fighter.facing * x, this.front, this.origin.z + fighter.motion.z + z);
-        BlzSetSpecialEffectYaw(entry.model, facingYaw(fighter.facing));
+        placeEffect(entry.model, this.origin.x + fighter.motion.x + fighter.facing * x, this.front - (entry.cue.depth ?? 0.0) * this.scale, this.origin.z + fighter.motion.z + z);
+        BlzSetSpecialEffectYaw(entry.model, entry.cue.yaw ?? facingYaw(fighter.facing));
         BlzSetSpecialEffectPitch(entry.model, entry.cue.pitch ?? 0.0);
         BlzSetSpecialEffectScale(entry.model, entry.cue.scale * this.scale);
         if (!this.definitive && entry.cue.birth === undefined) {
@@ -263,7 +263,7 @@ export class SpecialCueEffects {
       const model = AddSpecialEffect(path, position.x, position.y);
       BlzSetSpecialEffectPosition(model, position.x, position.y, position.z);
       BlzSetSpecialEffectScale(model, cue.scale * this.scale);
-      BlzSetSpecialEffectYaw(model, facingYaw(facing));
+      BlzSetSpecialEffectYaw(model, cue.yaw ?? facingYaw(facing));
       BlzSetSpecialEffectPitch(model, cue.pitch ?? 0.0);
       BlzPlaySpecialEffect(model, ANIM_TYPE_BIRTH);
       return model;
@@ -275,7 +275,7 @@ export class SpecialCueEffects {
     for (let index = this.popcorn.length - 1; index >= 0; index--) if (this.popcorn[index]?.model === model) this.popcorn.splice(index, 1);
     BlzSetSpecialEffectPosition(model, position.x, position.y, position.z);
     BlzSetSpecialEffectScale(model, cue.scale * this.scale);
-    BlzSetSpecialEffectYaw(model, facingYaw(facing));
+    BlzSetSpecialEffectYaw(model, cue.yaw ?? facingYaw(facing));
     BlzSetSpecialEffectPitch(model, cue.pitch ?? 0.0);
     BlzSetSpecialEffectTimeScale(model, 1.0);
     BlzSpecialEffectClearSubAnimations(model);
