@@ -7,9 +7,9 @@ import { join } from "node:path";
 import type * as tstl from "typescript-to-lua";
 import { SOURCE_STAMP_TEXT, sourceVersion } from "../scripts/sourceVersion";
 
-const plugin = (): tstl.Plugin => ({
+const plugin = ({ census = false }: { readonly census?: boolean } = {}): tstl.Plugin => ({
   beforeEmit(_program, _options, _host, files) {
-    const version = sourceVersion(join(import.meta.dir, ".."));
+    const version = census ? "census-input" : sourceVersion(join(import.meta.dir, ".."));
     for (const file of files) file.code = file.code.replaceAll(SOURCE_STAMP_TEXT, `"${version}"`);
   },
 });

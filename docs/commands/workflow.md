@@ -53,8 +53,14 @@ tracked content, emitted bundles, runtime, pin and oracle hashes alongside the
 existing shard artifacts. `merge MERGED BUDGET CENSUS` adds their content keys
 to `farm-test-summary` only after all three gates pass and every Lua and census
 manifest names the tested candidate and tree. Autoland supplies its exact base;
-manual runs may record an unknown base. These receipts keep source stamps and
-leave result reuse disabled.
+manual runs may record an unknown base. Census compiles the playable entry and
+perf harness to `build/census.lua` and `build/census-perf.lua` with the fixed
+`census-input` replay version. Its actual source version prints on stderr,
+outside the measured Lua output. Playable builds keep their source stamp.
+Census keys hash those emitted bundles, the pinned Wisp import graph's host
+perf dependencies, the dispatcher, receipt producer, fixture and farm workflow.
+Lua keys still hash all tracked inputs. Runtime, pin, oracle and environment
+identity remain part of both keys; result reuse stays disabled.
 
 Main stays green. Each CI run on main opens, updates or closes the one
 "main is red" issue (smashcraft:.github/workflows/main-red.yml), which lists the

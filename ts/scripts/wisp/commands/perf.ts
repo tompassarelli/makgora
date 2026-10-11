@@ -30,7 +30,10 @@ export const SMASHCRAFT_PERF: PerfProject = {
 };
 
 const measure = makePerf(SMASHCRAFT_PERF);
-const spikeCensus = census({ map: playableMap, program: SMASHCRAFT_PERF.program });
+const spikeCensus = census({
+  map: { config: join(tsDirectory, "tsconfig.census.json"), bundle: join(tsDirectory, "build/census.lua") },
+  program: { config: join(tsDirectory, "tsconfig.census-perf.json"), bundle: join(tsDirectory, "build/census-perf.lua") },
+});
 
 const runProfile = profile(SMASHCRAFT_PERF);
 const compare = comparePairRuns(measure);

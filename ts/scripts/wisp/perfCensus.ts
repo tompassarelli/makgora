@@ -23,6 +23,7 @@ import { CENSUS_PARTNER, CENSUS_STAGE } from "./census";
 import { stockLua } from "./luaRuntimes";
 import { tsDirectory } from "./project";
 import { PAIR_MARGIN, type PairWorst, comparePairs, isPairText, pairText, parsePairs } from "./perfPairs";
+import { sourceVersion } from "../sourceVersion";
 
 
 export const CENSUS_LIMIT_MS = 2;
@@ -258,6 +259,8 @@ export const census = (project: CensusProject): Command => (args) => Effect.gen(
   ];
   yield* compile(project.map.config);
   yield* compile(project.program.config);
+  const version = yield* Effect.try({ try: () => sourceVersion(tsDirectory), catch: (cause) => new PerfFailure({ problem: `source version: ${describeCause(cause)}` }) });
+  yield* Console.error(`census source version ${version}`);
   const outputs = yield* Effect.forEach(runs, (run) => runOne(project, run), { concurrency: jobs });
   const output = outputs.join("\n");
   if (out !== undefined) yield* Effect.tryPromise({ try: () => Bun.write(out, output), catch: (cause) => new PerfFailure({ problem: `writing ${out}: ${describeCause(cause)}` }) });

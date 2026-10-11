@@ -1,11 +1,12 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { arch, platform, release } from "node:os";
-import { resolve } from "node:path";
+import { relative, resolve } from "node:path";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Effect, Schema } from "effect";
 import { ChildProcess } from "effect/process";
 import { runProcess } from "./hostProcess";
+import { ImportGraph } from "wisp/scripts/wisp/importGraph";
 
 class ReceiptFailure extends Schema.TaggedError<ReceiptFailure>()("ReceiptFailure", { problem: Schema.String }) {}
 const Files = Schema.Record(Schema.String, Schema.String);
@@ -17,6 +18,7 @@ const Receipt = Schema.Struct({
   base: Schema.String,
   testedTree: Schema.String,
   inputHash: Schema.String,
+  inputs: Files,
   emitted: Files,
   runtime: Files,
   pins: Files,
@@ -35,6 +37,18 @@ const digest = (value: unknown) => hash(JSON.stringify(value));
 const attempt = <A>(action: () => A) => Effect.try({ try: action, catch: cause => new ReceiptFailure({ problem: String(cause) }) });
 const fileHash = (path: string) => hash(readFileSync(path));
 const files = (paths: readonly string[], directory: string) => Object.fromEntries([...paths].sort().map(path => [path, fileHash(resolve(directory, path))]));
+const censusInputs = () => {
+  const entry = resolve(ts, "scripts/wisp/commands/perf.ts");
+  const graph = new ImportGraph(ts);
+  graph.add([entry]);
+  const computed = graph.computedImport(entry);
+  if (computed !== undefined) throw new Error(`census host has an undeclared computed import: ${computed}`);
+  return [...graph.dependencies(entry)].map(path => relative(root, path)).concat([
+    "ts/scripts/wisp.ts", "ts/scripts/hostProcess.ts", "ts/scripts/farmReceipt.ts",
+    "ts/test/fixtures/perf/census-pairs.txt", ".github/workflows/farm-test.yml",
+    "ts/node_modules/wisp/src/natives/warcraft.d.ts",
+  ]);
+};
 const git = (...args: string[]) => runProcess(ChildProcess.make("git", args, { cwd: root }));
 const decode = <S extends Schema.Top>(schema: S, path: string) => Effect.tryPromise({
   try: () => Bun.file(path).text(), catch: cause => new ReceiptFailure({ problem: String(cause) }),
@@ -48,8 +62,8 @@ export const record = (kind: "lua" | "census", shard: string, lua: string) => Ef
   const testedTree = yield* git("rev-parse", "HEAD^{tree}");
   const tracked = (yield* git("ls-files")).split("\n");
   const pin = yield* decode(Pin, resolve(ts, "wisp.lock"));
-  const inputs = yield* attempt(() => files(tracked, root));
-  const emitted = yield* attempt(() => files(kind === "lua" ? ["build/lua-tests/tests.lua", "build/lua-plan.tsv", "plan.json"] : ["build/playable.lua", "build/perf.lua"], ts));
+  const inputs = yield* attempt(() => files(kind === "census" ? censusInputs() : tracked, root));
+  const emitted = yield* attempt(() => files(kind === "lua" ? ["build/lua-tests/tests.lua", "build/lua-plan.tsv", "plan.json"] : ["build/census.lua", "build/census-perf.lua"], ts));
   const dependencies = yield* runProcess(ChildProcess.make("ldd", [process.execPath, lua]));
   const libraries = [...dependencies.matchAll(/(?:=>\s+|^\s*)(\/\S+)\s+\(/gm)].map(match => match[1] ?? "");
   const runtime = yield* attempt(() => ({
@@ -67,9 +81,9 @@ export const record = (kind: "lua" | "census", shard: string, lua: string) => Ef
     farmShards: fileHash(resolve(ts, "node_modules/wisp/scripts/wisp/farmShards.ts")),
   }));
   const environment = Object.fromEntries(Object.entries(process.env).filter(([name, value]) =>
-    value !== undefined && /^(GAME_|LUA_|SWEEP|CENSUS_|BUN_SHARDS$|CI_TIMING$|TZ$|LANG$|LC_)/.test(name)
+    value !== undefined && /^(GAME_|LUA$|LUA_|PERF_|SWEEP|CENSUS_|BUN_SHARDS$|CI_TIMING$|TZ$|LANG$|LC_)/.test(name)
     && !/(TOKEN|SECRET|PASSWORD|KEY)/.test(name)).map(([name, value]) => [name, value ?? ""]));
-  const identity = { kind, shard, inputHash: digest(inputs), emitted, runtime, pins, oracleHash, environment };
+  const identity = { kind, shard, inputHash: digest(kind === "census" ? { inputs, emitted } : inputs), inputs, emitted, runtime, pins, oracleHash, environment };
   const receipt = { version: 1, ...identity, key: digest(identity), candidate, base: process.env.FARM_BASE ?? "unknown", testedTree,
     run: process.env.GITHUB_RUN_ID ?? "local", attempt: process.env.GITHUB_RUN_ATTEMPT ?? "local", reuseEnabled: false };
   yield* write(resolve(ts, `input-${kind}-${shard}.json`), receipt);
@@ -84,7 +98,7 @@ export const merge = (exitCodes: readonly string[]) => Effect.gen(function*() {
   const candidate = yield* git("rev-parse", "HEAD");
   const testedTree = yield* git("rev-parse", "HEAD^{tree}");
   const expectedLua = Number(process.env.LUA_JOBS);
-  const expectedCensus = 13;
+  const expectedCensus = Number(process.env.CENSUS_SHARDS);
   const complete = (["lua", "census"] as const).every(kind => {
     const shards = receipts.filter(receipt => receipt.kind === kind);
     const expected = kind === "lua" ? expectedLua : expectedCensus;
