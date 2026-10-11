@@ -146,7 +146,7 @@ jobs:
         run: |
           cat census/census-*/census-pairs-*.txt > census-pairs.txt 2>/dev/null
           measured=$(wc -l < census-pairs.txt) expected=$(wc -l < test/fixtures/perf/census-pairs.txt)
-          [ "$measured" = "$expected" ] || { echo "::error::the census measured $measured of $expected fighter pairs: see the census jobs"; exit 1; }
+          [ "$measured" = "$expected" ] || { echo "::error title=Unmeasured::the census measured $measured of $expected fighter pairs: see the census jobs"; exit 1; }
           bun wisp perf compare test/fixtures/perf/census-pairs.txt census-pairs.txt
 
   main-red:

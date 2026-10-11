@@ -9,8 +9,8 @@ class SheriffFailure extends Schema.TaggedError<SheriffFailure>()("SheriffFailur
 }
 
 export interface Step { readonly name: string; readonly conclusion: string }
-export interface Job { readonly name: string; readonly conclusion: string; readonly steps: readonly Step[] }
-export interface CiRun { readonly conclusion: string; readonly jobs: readonly Job[] }
+export interface Job { readonly name: string; readonly conclusion: string; readonly steps: readonly Step[]; readonly failures?: readonly string[] }
+export interface CiRun { readonly conclusion: string; readonly attempt?: number; readonly jobs: readonly Job[] }
 export interface Commit { readonly sha: string; readonly message: string }
 export interface Situation {
   readonly run: CiRun;
@@ -21,14 +21,27 @@ export interface Situation {
 export type Verdict =
   | { readonly kind: "none"; readonly why: string }
   | { readonly kind: "report"; readonly why: string }
+  | { readonly kind: "rerun"; readonly why: string }
   | { readonly kind: "revert"; readonly why: string; readonly step: string; readonly shas: readonly string[] };
 
 export const REVERT_TRAILER = "Sheriff-Reverts:";
 const SETUP_STEP = /^(?:Set up job|Complete job|Post |Run actions\/|Run oven-sh\/setup-bun|Run bun install|Install stock texture converter)/;
 const INFRA_JOB = new Set(["cancelled", "timed_out", "startup_failure", "action_required", "stale"]);
+const UNMEASURED_TITLE = "Unmeasured";
+const UNMEASURED = new RegExp(`^${UNMEASURED_TITLE}:|has timed out after|exceeded the maximum execution time|lost communication with the server|received a shutdown signal|The operation was canceled`);
+
+export function unmeasured(job: Job): string | undefined {
+  if (INFRA_JOB.has(job.conclusion)) return `job ${job.name} ${job.conclusion}`;
+  if (job.conclusion !== "failure") return undefined;
+  const step = job.steps.find((entry) => entry.conclusion === "failure");
+  if (step === undefined) return `job ${job.name} failed without a failing step (runner lost)`;
+  if (SETUP_STEP.test(step.name)) return `setup step failed (${job.name}: ${step.name})`;
+  const annotation = job.failures?.find((line) => UNMEASURED.test(line));
+  return annotation === undefined ? undefined : `${job.name}: ${annotation}`;
+}
 
 export function firstFailingStep(run: CiRun): string | undefined {
-  const jobs = run.jobs.filter((job) => job.conclusion === "failure").toSorted((a, b) => a.name.localeCompare(b.name));
+  const jobs = run.jobs.filter((job) => job.conclusion === "failure" && unmeasured(job) === undefined).toSorted((a, b) => a.name.localeCompare(b.name));
   for (const job of jobs) {
     const step = job.steps.find((entry) => entry.conclusion === "failure");
     if (step !== undefined) return `${job.name}: ${step.name}`;
@@ -39,11 +52,11 @@ export function firstFailingStep(run: CiRun): string | undefined {
 export function decide({ run, previous, commits, workflowFiles }: Situation): Verdict {
   if (run.conclusion === "success") return { kind: "none", why: "green" };
   if (run.conclusion !== "failure") return { kind: "report", why: `run ${run.conclusion || "unfinished"}: infrastructure, not the commit` };
-  const infra = run.jobs.find((job) => INFRA_JOB.has(job.conclusion));
-  if (infra !== undefined) return { kind: "report", why: `job ${infra.name} ${infra.conclusion}: infrastructure, not the commit` };
   const step = firstFailingStep(run);
-  if (step === undefined) return { kind: "report", why: "a job failed without a failing step (runner lost): infrastructure" };
-  if (SETUP_STEP.test(step.slice(step.indexOf(": ") + 2))) return { kind: "report", why: `setup step failed (${step}): infrastructure` };
+  if (step === undefined) {
+    const why = `${run.jobs.map(unmeasured).find((reason) => reason !== undefined) ?? "no job failed at a step"}: the run measured nothing`;
+    return (run.attempt ?? 1) === 1 ? { kind: "rerun", why: `${why}; rerunning the failed jobs` } : { kind: "report", why: `${why} again; the next run on main decides` };
+  }
   if (previous === undefined) return { kind: "report", why: `${step} failed; no earlier finished run on main to compare` };
   if (!previous.ancestor) return { kind: "report", why: `${step} failed; the previous run's commit isn't an ancestor` };
   if (previous.conclusion !== "success") {
@@ -79,16 +92,26 @@ const decode = <S extends Schema.Top>(schema: S, command: string) => (text: stri
   Schema.decodeEffect(Schema.fromJsonString(schema))(text).pipe(Effect.mapError((cause) => new SheriffFailure({ command, problem: String(cause) })));
 
 const StepSchema = Schema.Struct({ name: Schema.String, conclusion: Schema.String });
-const JobSchema = Schema.Struct({ name: Schema.String, conclusion: Schema.String, steps: Schema.Array(StepSchema) });
+const JobSchema = Schema.Struct({ name: Schema.String, conclusion: Schema.String, databaseId: Schema.Finite, steps: Schema.Array(StepSchema) });
 const RunView = Schema.Struct({
   conclusion: Schema.String, headBranch: Schema.String, headSha: Schema.String, url: Schema.String,
-  workflowName: Schema.String, databaseId: Schema.Finite, jobs: Schema.Array(JobSchema),
+  workflowName: Schema.String, databaseId: Schema.Finite, attempt: Schema.Finite, jobs: Schema.Array(JobSchema),
 });
+const Annotations = Schema.Array(Schema.Struct({ annotation_level: Schema.String, title: Schema.NullOr(Schema.String), message: Schema.String }));
 const RunList = Schema.Array(Schema.Struct({ databaseId: Schema.Finite, conclusion: Schema.String, headSha: Schema.String }));
 const IssueState = Schema.Struct({ state: Schema.String });
 
 const viewRun = (id: string) =>
-  gh("run", "view", id, "--json", "conclusion,headBranch,headSha,url,workflowName,databaseId,jobs").pipe(Effect.flatMap(decode(RunView, "gh run view")));
+  gh("run", "view", id, "--json", "conclusion,headBranch,headSha,url,workflowName,databaseId,attempt,jobs").pipe(Effect.flatMap(decode(RunView, "gh run view")));
+
+const failureLines = (jobId: number) =>
+  gh("api", `repos/{owner}/{repo}/check-runs/${jobId}/annotations`).pipe(
+    Effect.flatMap(decode(Annotations, "gh api annotations")),
+    Effect.map((entries) => entries.filter((entry) => entry.annotation_level === "failure").map((entry) => entry.title ? `${entry.title}: ${entry.message}` : entry.message)),
+  );
+const withFailures = <R extends { readonly jobs: readonly (Job & { readonly databaseId: number })[] }>(view: R) =>
+  Effect.forEach(view.jobs, (job) => job.conclusion === "failure" ? failureLines(job.databaseId).pipe(Effect.map((failures) => ({ ...job, failures }))) : Effect.succeed(job))
+    .pipe(Effect.map((jobs) => ({ ...view, jobs })));
 
 const output = (line: string) => Effect.sync(() => {
   if (process.env.GITHUB_STEP_SUMMARY !== undefined) appendFileSync(process.env.GITHUB_STEP_SUMMARY, `Sheriff: ${line}\n`);
@@ -119,7 +142,7 @@ const revertOnMain = (verdict: Extract<Verdict, { kind: "revert" }>, base: strin
 });
 
 export const sheriffRun = (runId: string) => Effect.gen(function*() {
-  const ci = yield* viewRun(runId);
+  const ci = yield* viewRun(runId).pipe(Effect.flatMap(withFailures));
   if (ci.headBranch !== "main" || ci.conclusion === "success") return yield* Console.log(`run ${runId} on ${ci.headBranch} ${ci.conclusion}: nothing to do`);
   const history = yield* gh("run", "list", "--workflow", ci.workflowName, "--branch", "main", "--limit", "50",
     "--json", "databaseId,conclusion,headSha").pipe(Effect.flatMap(decode(RunList, "gh run list")));
@@ -131,12 +154,13 @@ export const sheriffRun = (runId: string) => Effect.gen(function*() {
   const ancestor = prior === undefined ? false
     : yield* git("merge-base", "--is-ancestor", prior.headSha, ci.headSha).pipe(Effect.as(true), Effect.orElseSucceed(() => false));
   const previous = prior === undefined ? undefined
-    : { ...(prior.conclusion === "success" ? { conclusion: "success", jobs: [] } : yield* viewRun(String(prior.databaseId))), ancestor };
+    : { ...(prior.conclusion === "success" ? { conclusion: "success", jobs: [] } : yield* viewRun(String(prior.databaseId)).pipe(Effect.flatMap(withFailures))), ancestor };
   const range = ancestor && prior !== undefined ? `${prior.headSha}..${ci.headSha}` : undefined;
   const commits = range === undefined ? [] : (yield* git("log", "-z", "--format=%H%n%B", range)).split("\0").filter((entry) => entry.trim() !== "")
     .map((entry) => ({ sha: entry.slice(0, entry.indexOf("\n")), message: entry.slice(entry.indexOf("\n") + 1).trim() }));
   const workflowFiles = range === undefined ? [] : (yield* git("diff", "--name-only", prior?.headSha ?? "", ci.headSha, "--", ".github/workflows")).split("\n").filter(Boolean);
   const verdict = decide({ run: ci, previous, commits, workflowFiles });
+  if (verdict.kind === "rerun") yield* gh("run", "rerun", runId, "--failed");
   if (verdict.kind !== "revert" || prior === undefined) {
     yield* output(`${verdict.kind}: ${verdict.why} (${ci.url})`);
     return yield* Console.log(`${verdict.kind}: ${verdict.why}`);

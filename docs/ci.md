@@ -185,9 +185,8 @@ like a red CI step:
   the job summary and a `Sheriff` annotation (`gh run view RUN_ID`) name the
   reverted commits, the failing step and the run. No "main is red" issue opens for the reverted run; the revert's own
   CI run reports.
-- **Report only.** A cancelled or timed-out run or job, a job without a
-  failing step (runner lost), a failing setup step (checkout, Bun, install),
-  a red parent (whether the same first failing step or a different one), a
+- **Rerun.** A failure that measured nothing never reverts: a cancelled or timed-out job or step, a lost runner, a failing setup step or an `Unmeasured` error annotation (the census's "measured N of M") reruns the failed jobs once, then reports.
+- **Report only.** A cancelled run, a red parent (whether the same first failing step or a different one), a
   landing that is itself a revert, one that changes `.github/workflows/`
   (the workflow token can't push those) or one that doesn't revert cleanly:
   the job summary says why and "main is red" reports as before.
