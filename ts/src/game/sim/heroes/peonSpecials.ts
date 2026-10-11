@@ -38,5 +38,5 @@ export const PEON_SPECIALS: FighterSpecials = {
   neutral: withExKit({ name: "Lumber Toss", description: "Toss a slow bundle of lumber to clear some working room.", ground: lumberToss(false), air: lumberToss(true) }, { damage: 1.25 }),
   side: withExKit({ name: "Burrow", description: "Build a fragile burrow that fires spears; press again to pack it up.", ground: BURROW, recall: { name: "Pack Up", endFrame: 52, groundOnly: true, recall: true } }, { durability: 1.25, damage: 1.25, recallProtection: 4 }),
   up: withExKit({ name: "Worksite Launch", description: "Vault toward the stage, then fall helpless.", ground: vault(6.0, 16.0) }, { travel: 1.25 }),
-  down: withExKit({ name: "Repair", description: "Duck behind the tools; a correctly timed hit repairs a little damage.", ground: repair(false), air: repair(true) }, { guardFrames: 4 }),
+  down: withExKit({ name: "Repair", description: "Counter-heal: raise the tools on frames 4–7. An incoming strike repairs up to 4% damage. A miss leaves a long punish window; waits and grabs beat it.", ground: repair(false), air: repair(true) }, { guardFrames: 4 }),
 };

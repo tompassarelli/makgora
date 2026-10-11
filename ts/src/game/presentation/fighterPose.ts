@@ -292,7 +292,14 @@ function selectClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly<Ros
     return rate;
   }
   if (f.special.action !== SpecialAction.none && f.launch.hitstun === 0) {
-
+    if (character === Character.peon && f.special.action === SpecialAction.heroDown) {
+      const guard = runningHeroSpecial(f)?.guard;
+      const guarding = guard !== undefined && f.special.frame >= guard.first && f.special.frame <= guard.last;
+      const clip = guarding ? clips.clipFor(character, "shield") : fighterSpecialClip(f);
+      playIndex(pose, `repair-${guarding ? "guard" : "recover"}`, clip.index);
+      pose.clipTime = guarding ? f32(3 * FRAME_SECONDS) : f32(Math.max(0, f.special.frame - 1) * FRAME_SECONDS);
+      return guarding ? 0.0 : rate;
+    }
     playIndex(pose, `special${f.special.action}${playsFollowUpPose(f) ? "+" : ""}`, fighterSpecialClip(f).index);
     return rate;
   }

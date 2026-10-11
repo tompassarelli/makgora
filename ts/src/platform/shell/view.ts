@@ -6,7 +6,7 @@ import { deckModel, slabScale } from "../../game/presentation/stagePreload";
 import { type PlatformPart, platformParts } from "../../game/presentation/stockPlatforms";
 import { stageEdgeLight, STAGE_EDGE_LIGHT_MODEL } from "../../game/presentation/stageEdgeLights";
 import { f32 } from "wisp/src/sim/f32";
-import { Character } from "../../game/sim/codes";
+import { Character, SpecialAction } from "../../game/sim/codes";
 import { at } from "wisp/src/runtime/lookup";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../../game/input/participants";
 import type { FighterAgency } from "../../game/presentation/fighterAgency";
@@ -560,7 +560,8 @@ export function renderUi(s: ShellState): void {
   for (const slot of PARTICIPANT_SLOTS) {
     if (s.participants[slot].body !== undefined && isActive(s.world, slot)) {
       const fighter = fighterAt(s.world, slot);
-      ui.huds[slot].update(showMatch, fighter.character, fighter.status.damage, s.game.endless ? 0 : fighter.status.stocks);
+      ui.huds[slot].update(showMatch, fighter.character, fighter.status.damage, s.game.endless ? 0 : fighter.status.stocks,
+        fighter.character === Character.peon && fighter.special.action === SpecialAction.heroDown && fighter.special.guarded, s.runtime.simulationFrame);
       ui.manaBars[slot].hud.update(showMatch, fighter.mana.points, fighter.visuals.manaDenied, fighter.visuals.manaDrained);
     } else {
       ui.huds[slot].update(false, Character.rifleman, 0.0, 0);

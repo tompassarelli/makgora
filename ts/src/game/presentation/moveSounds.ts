@@ -275,6 +275,7 @@ function playLayers(layers: readonly SoundLayer[], serial: number, sink: MoveSou
 }
 
 export function playPerform(character: Character, move: number, serial: number, sink: MoveSoundSink): void {
+  if (character === Character.peon && move === specialMove(3)) return;
   const row = moveSound(character, move);
   if (row === undefined) return;
   playLayers(row.perform, serial, sink);

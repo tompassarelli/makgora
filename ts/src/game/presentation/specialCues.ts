@@ -231,7 +231,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     neutral: { spell: "Lumber Toss", startup: cue("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", "feet", f32(0.3)), active: drawn("Abilities\\Weapons\\AncientProtectorMissile\\AncientProtectorMissile.mdl", "hand") },
     side: { spell: "Burrow", startup: cue("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", "ahead", f32(0.5)), active: drawn("buildings\\orc\\TrollBurrow\\TrollBurrow.mdl", "ahead") },
     up: { spell: "Worksite Launch", startup: cue("Abilities\\Spells\\Human\\Defend\\DefendCaster.mdx", "feet", f32(0.4)), active: cue("Abilities\\Spells\\Human\\FlakCannons\\FlakTarget.mdx", "feet", f32(0.6)) },
-    down: { spell: "Repair", startup: cue("Abilities\\Spells\\Human\\Defend\\DefendCaster.mdx", "hand", f32(0.4)), active: HOLY },
+    down: { spell: "Repair", startup: cue("Abilities\\Spells\\Human\\Defend\\DefendCaster.mdx", "hand", f32(0.4)), active: timed(cue("Abilities\\Spells\\Human\\Heal\\HealTarget.mdx", "body", f32(0.8)), "birth", 0.0) },
   },
   [Character.thrall]: {
     neutral: { spell: "Chain Lightning", startup: STORM, active: cue("Abilities\\Weapons\\FarseerMissile\\FarseerMissile.mdx", "hand", 0.5) },
@@ -557,6 +557,13 @@ const NONE: CueState = { cues: undefined, phase: "none" };
 export function specialCueState(fighter: Readonly<Fighter>): CueState {
   const { action, frame } = fighter.special;
   if (action === SpecialAction.none || fighter.status.out) return NONE;
+  if (fighter.character === Character.peon && action === SpecialAction.heroDown) {
+    const cues = HERO_CUES[Character.peon]?.down;
+    const guard = runningHeroSpecial(fighter)?.guard;
+    if (cues === undefined || guard === undefined) return NONE;
+    if (fighter.special.guarded) return { cues, phase: "active" };
+    return frame >= 1 && frame <= guard.last ? { cues, phase: "startup" } : NONE;
+  }
   if (fighter.character === Character.dreadlord && action === SpecialAction.heroSide && fighter.special.grabFrame > 0) {
     return frame <= fighter.special.grabFrame + 16 ? { cues: DREADLORD_BITE_CUES, phase: "active" } : NONE;
   }
