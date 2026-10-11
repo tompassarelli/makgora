@@ -92,7 +92,7 @@ const LICH: AuthoredSpecial = {
   name: "Frost Wyrm", endFrame: 60,
   projectiles: [
     mark("Abilities\\Spells\\Undead\\FreezingBreath\\FreezingBreathTargetArt.mdx", 2, 29, -600.0, 215.0),
-    { ...shot(31, -600.0, 215.0, 28.0, 0.0, 70, 45.0, hit(16.0, 60, 85.0, 45.0, HitElement.ice), "Abilities\\Spells\\Other\\FrostBolt\\FrostBoltMissile.mdx"), status: CHILL },
+    { ...shot(31, -600.0, 215.0, 28.0, 0.0, 70, 45.0, hit(16.0, 60, 85.0, 45.0, HitElement.ice), "Abilities\\Weapons\\FrostWyrmMissile\\FrostWyrmMissile.mdx"), status: CHILL },
   ],
 };
 
