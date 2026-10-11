@@ -166,12 +166,6 @@ function aimWeaponContact(model: mdx.Model, index: number, start: number, contac
       renderer.update(0);
     };
     if (pose === "forwardAir") {
-      tracks(model, track => {
-        if (onGlobalClock(track) || track.LineType !== 2) return;
-        for (const key of track.Keys) if (key.Frame >= start && key.Frame <= start+Math.round(total*1000/60) && key.Vector.length !== 4 && key.InTan) {
-          key.InTan = new Float32Array(key.Vector.length); key.OutTan = key.InTan.slice();
-        }
-      });
       const held = new Map<mdx.Node, Float32Array>();
       for (let frame = 0; frame <= total; frame++) {
         at = start + Math.round(frame*1000/60);

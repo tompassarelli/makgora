@@ -26,11 +26,13 @@ export class PrePushRefusal extends Schema.TaggedError<PrePushRefusal>()("PrePus
 interface Check { readonly name: string; readonly directory: string; readonly args: readonly string[]; readonly fix?: string }
 
 
+const ANIMATION_INPUTS = ["build-inputs/original-clips-static-lights", "tools/animations/", "ts/scripts/keyThin.ts", "ts/scripts/wisp/animJitter.ts"];
 const MODEL_INPUTS = ["build-inputs/", "tools/animations/", "ts/src/game/assets/", "ts/src/game/presentation/", "ts/scripts/wisp/playerView.ts", "ts/scripts/wisp/model-facts/"];
 
 
 export function checksFor(paths: readonly string[]): Check[] {
   const ts = paths.some((path) => path.startsWith("ts/") || path === "typescript-toolchain.lock");
+  const animation = paths.some((path) => ANIMATION_INPUTS.some((input) => path === input || input.endsWith("/") && path.startsWith(input)));
   const models = paths.some((path) => MODEL_INPUTS.some((input) => path === input || input.endsWith("/") && path.startsWith(input)));
   return [
     ...(paths.length > 0 ? [{ name: "clean room", directory: "ts", args: ["scripts/cleanRoom.ts"], fix: "follow wisp:docs/clean-room.md and the line above." }] : []),
@@ -39,6 +41,9 @@ export function checksFor(paths: readonly string[]): Check[] {
     ] : []),
     ...(models ? [
       { name: "generated models stored", directory: "ts", args: ["scripts/storedModels.ts"], fix: "store the regenerated family (smashcraft:docs/build-inputs.md, \"Change art\")." },
+    ] : []),
+    ...(animation ? [
+      { name: "animation jitter [k3 measure #479]", directory: "ts", args: ["scripts/wisp.ts", "anim", "jitter"], fix: "regenerate the clip pool through thinKeys so close Hermite keys carry slopes (smashcraft:docs/commands/animation.md)." },
     ] : []),
   ];
 }
