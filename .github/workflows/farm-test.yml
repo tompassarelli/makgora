@@ -34,9 +34,9 @@ permissions:
 env:
   SWEEP_PLACEMENT: gate
   BUN_SHARDS: 3
-  # Lua runs one core a process: each Lua job runs LUA_PER_JOB shards at once.
-  LUA_JOBS: 8
-  LUA_PER_JOB: 4
+  # Lua runs one core a process: each job runs its eight shards four at a time.
+  LUA_JOBS: 4
+  LUA_PER_JOB: 8
 
 jobs:
   plan:
@@ -88,7 +88,7 @@ jobs:
           echo "lua=$(jq -c "[range($LUA_JOBS)]" -n)" >> "$GITHUB_OUTPUT"
           echo "bun-runners=$(pool "$(jq '.bun | length' plan.json)")" >> "$GITHUB_OUTPUT"
           echo "lua-runners=$(pool "$LUA_JOBS")" >> "$GITHUB_OUTPUT"
-          echo "lua-parallel=$([ -n "$FARM" ] && echo "$LUA_JOBS" || echo 5)" >> "$GITHUB_OUTPUT"
+          echo "lua-parallel=$LUA_JOBS" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         with:
           name: farm-test-plan
@@ -244,23 +244,26 @@ jobs:
               | jq --rawfile costs "$4" '($costs | split("\n") | map(split("\t") | select(length > 3) | {key: (.[3:] | join("\t")), value: .[0]}) | from_entries) as $modules
                   | .tests |= map(if .status == "fail" then .name = "\($modules[.unit] // "unknown module"): \(.name)" else . end)'
           }
-          pids=()
-          for slot in $(seq 0 $((LUA_PER_JOB - 1))); do
-            shard=$((${{ matrix.job }} * LUA_PER_JOB + slot))
-            ( export LUA_SHARD="$shard/$count" LUA_SHARD_PLAN=build/lua-plan.tsv
-              touch "build/lua-cost-$shard.tsv" "build/sweep-cost-$shard.tsv"
-              LUA_TEST_RESULT="build/lua-$shard.tsv" LUA_TEST_COST="build/lua-cost-$shard.tsv" "$LUA" build/lua-tests/tests.lua > "build/lua-$shard.log" 2>&1
-              code=$?
-              result "$shard" "$code" "build/lua-$shard.tsv" "build/lua-cost-$shard.tsv" > "result-lua-$shard.json"
-              SWEEPS=1 LUA_TEST_RESULT="build/lua-sweeps-$shard.tsv" LUA_TEST_COST="build/sweep-cost-$shard.tsv" "$LUA" build/lua-tests/tests.lua > "build/lua-sweeps-$shard.log" 2>&1
-              sweeps=$?
-              result "$shard" "$sweeps" "build/lua-sweeps-$shard.tsv" "build/sweep-cost-$shard.tsv" > "result-lua-sweeps-$shard.json"
-              [ "$code" = 0 ] && exit "$sweeps"
-              exit "$code" ) &
-            pids+=($!)
-          done
           failed=0
-          for pid in "${pids[@]}"; do wait "$pid" || failed=1; done
+          for start in $(seq 0 4 $((LUA_PER_JOB - 1))); do
+            pids=()
+            end=$((start + 4 < LUA_PER_JOB ? start + 4 : LUA_PER_JOB))
+            for slot in $(seq "$start" $((end - 1))); do
+              shard=$((${{ matrix.job }} * LUA_PER_JOB + slot))
+              ( export LUA_SHARD="$shard/$count" LUA_SHARD_PLAN=build/lua-plan.tsv
+                touch "build/lua-cost-$shard.tsv" "build/sweep-cost-$shard.tsv"
+                LUA_TEST_RESULT="build/lua-$shard.tsv" LUA_TEST_COST="build/lua-cost-$shard.tsv" "$LUA" build/lua-tests/tests.lua > "build/lua-$shard.log" 2>&1
+                code=$?
+                result "$shard" "$code" "build/lua-$shard.tsv" "build/lua-cost-$shard.tsv" > "result-lua-$shard.json"
+                SWEEPS=1 LUA_TEST_RESULT="build/lua-sweeps-$shard.tsv" LUA_TEST_COST="build/sweep-cost-$shard.tsv" "$LUA" build/lua-tests/tests.lua > "build/lua-sweeps-$shard.log" 2>&1
+                sweeps=$?
+                result "$shard" "$sweeps" "build/lua-sweeps-$shard.tsv" "build/sweep-cost-$shard.tsv" > "result-lua-sweeps-$shard.json"
+                [ "$code" = 0 ] && exit "$sweeps"
+                exit "$code" ) &
+              pids+=($!)
+            done
+            for pid in "${pids[@]}"; do wait "$pid" || failed=1; done
+          done
           for log in build/lua-*.log; do echo "== $log"; cat "$log"; done
           exit "$failed"
       - if: ${{ !cancelled() }}
@@ -368,12 +371,12 @@ jobs:
     timeout-minutes: 15
     strategy:
       fail-fast: false
-      max-parallel: 8
+      max-parallel: 7
       matrix:
-        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        shard: [0, 1, 2, 3, 4, 5, 6]
     name: census ${{ matrix.shard }}
     env:
-      CENSUS_SHARDS: 13
+      CENSUS_SHARDS: 7
     steps:
       - uses: actions/checkout@v4
         with:
@@ -398,7 +401,7 @@ jobs:
         run: |
           mkdir -p census-out
           fighters=$(cut -f2 test/fixtures/perf/census-pairs.txt | sed 's/ vs .*//' | awk -v n="$CENSUS_SHARDS" -v s="${{ matrix.shard }}" '(NR - 1) % n == s { printf " --fighter %s", $0 }')
-          bun wisp perf census $fighters --jobs 2 --rise-ms 1000 --pairs "census-out/census-pairs-${{ matrix.shard }}.txt"
+          bun wisp perf census $fighters --jobs 4 --rise-ms 1000 --pairs "census-out/census-pairs-${{ matrix.shard }}.txt"
       - if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
