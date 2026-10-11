@@ -1,14 +1,7 @@
 export type Verdict = "success" | "failure" | "pending" | "missing";
 
-export interface RunSummary {
-  readonly status: string;
-  readonly conclusion: string;
-  readonly createdAt: string;
-}
-
 export interface Candidate {
   readonly sha: string;
-  readonly ci: Verdict;
   readonly farm: Verdict;
 }
 
@@ -19,27 +12,23 @@ export const PLAYABLE_FILE = /^Smashcraft (\d+\.\d+\.\d+)(?: ([0-9a-f]{7,40}))?\
 
 export const KEPT_PRIOR_VERSIONS = 2;
 
-export function verdictOf(runs: readonly RunSummary[]): Verdict {
-  const latest = runs.reduce<RunSummary | undefined>((best, run) => best === undefined || run.createdAt > best.createdAt ? run : best, undefined);
-  if (latest === undefined) return "missing";
-  if (latest.status !== "completed") return "pending";
-  return latest.conclusion === "success" ? "success" : "failure";
+export const isGreen = ({ farm }: Candidate): boolean => farm === "success";
+
+export interface FullSuiteEvidence {
+  readonly sha: string;
+  readonly statuses: readonly { readonly context: string; readonly state: string }[];
 }
 
-export const isGreen = ({ ci, farm }: Candidate): boolean => ci === "success" && farm === "success";
-
-export interface AutolandStatus {
-  readonly state: string;
-  readonly description: string;
-}
-
-export function farmVerdict(sha: string, tree: string, exact: Verdict, statuses: readonly AutolandStatus[], passedTrees: readonly string[]): Verdict {
-  if (exact !== "missing") return exact;
-  const landed = statuses.some(({ state, description }) => state === "SUCCESS" && description === `landed as ${sha}`);
-  const passed = statuses.some(({ state, description }) => state === "PENDING"
-    && /^passed alone on [a-f0-9]{40} as tree [a-f0-9]{40}$/.test(description)
-    && description.endsWith(` as tree ${tree}`));
-  return landed || passed || passedTrees.includes(tree) ? "success" : "missing";
+export function fullSuiteVerdict(sha: string, evidence: readonly FullSuiteEvidence[]): Verdict {
+  const statuses = evidence.filter(item => item.sha === sha).flatMap(item => item.statuses)
+    .filter(({ context }) => context === "farm-full");
+  if (statuses.length !== 1) return "missing";
+  switch (statuses[0]?.state) {
+    case "SUCCESS": return "success";
+    case "PENDING": case "EXPECTED": return "pending";
+    case "FAILURE": case "ERROR": return "failure";
+    default: return "missing";
+  }
 }
 
 export function installName(version: string, sha: string): string {

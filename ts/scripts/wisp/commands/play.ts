@@ -22,10 +22,9 @@ import { MeleeReady, PLAYTEST_GO_FILE, PLAYTEST_REQUEST_FILE, playtestReceiptFil
 import { MELEE_READY_FILE } from "../../../src/runtime/gameFiles";
 import { clientState, gameFilesLayer } from "../project";
 import { accountField, smashcraftWatch } from "../doctor";
-import { currentPlaytest } from "../currentPlaytest";
+import { playGreen } from "../installGreen";
 import { optionalController } from "../controllerService";
 import { pollUntil } from "../../hostPoll";
-import { installLatest } from "../mapLibrary";
 import type { Command } from "wisp/scripts/wisp/command";
 import { PLAYABLE_BUILD } from "../../../src/game/shell/currentBuild";
 import type { PlayTools } from "wisp/scripts/platform/play";
@@ -237,12 +236,10 @@ export const play: Command = (args) => Effect.gen(function*() {
   }
   if (args.includes("--install-green")) {
     const { installGreen } = yield* Effect.tryPromise({ try: () => import("../installGreen"), catch: (cause) => new PlayProblem({ problem: String(cause) }) });
-    if (!args.includes("--dry-run")) console.log(`Controller helper: ${yield* optionalController()}`);
     return yield* installGreen(documentsFolder(PLAYTEST_PREFIX), args.includes("--dry-run"));
   }
+  const current = yield* playGreen(documentsFolder(PLAYTEST_PREFIX));
   yield* signInTom;
-  const current = yield* currentPlaytest(join(documentsFolder(PLAYTEST_PREFIX), "Maps/00-Smashcraft"));
   const declaration = playtest({ ...PLAYTEST, ...current });
-  yield* Effect.try({ try: () => installLatest(documentsFolder(declaration.prefix), current.map.source), catch: (cause) => new PlayProblem({ problem: String(cause) }) });
   return yield* makePlay(declaration, gameFilesLayer, tools, smashcraftWatch.pipe(Layer.provide(platformLayer())))(args);
 });

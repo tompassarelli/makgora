@@ -16,6 +16,7 @@ import { capacityHelper } from "../heavyCapacity";
 import { withLock } from "./fileLock";
 import { PLAYABLE_FILE, installName } from "./greenBuilds";
 import { projectRoot } from "./project";
+import { newestFullGreen } from "./fullGreenMain";
 
 const inputsRoot = join(homedir(), ".local/share/smashcraft-build-inputs");
 const builds = join(inputsRoot, "play-current");
@@ -174,7 +175,7 @@ const builtMap = (folder: string): string | undefined =>
   existsSync(folder) ? readdirSync(folder).find((entry) => PLAYABLE_FILE.test(entry)) : undefined;
 
 export const currentPlaytest = (library: string, { revision: wanted, named = false, helper: wantsHelper = true }: PlaytestOptions = {}) => Effect.gen(function*() {
-  const { revision, controller, mainCheckout } = yield* (wanted === undefined ? resolveMain : resolveRevision(wanted));
+  const { revision, controller, mainCheckout } = yield* resolveRevision(wanted ?? (yield* newestFullGreen));
   const version = yield* reserveVersion(library, revision);
   const final = join(builds, revision);
   const built = builtMap(final);

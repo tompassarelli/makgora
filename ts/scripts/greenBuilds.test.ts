@@ -1,4 +1,38 @@
 import { expect, test } from "bun:test";
+import { fullSuiteVerdict, pickGreen, type FullSuiteEvidence } from "./wisp/greenBuilds";
+
+test("full-green selection rejects premerge-only evidence and preserves newer installs [k2 property]", () => {
+  let seed = 394;
+  const draw = (bound: number) => {
+    seed = Math.imul(seed, 1664525) + 1013904223 | 0;
+    return (seed >>> 0) % bound;
+  };
+  const contexts = ["autoland", "farm/test", "ci", "farm-full"];
+  const states = ["SUCCESS", "PENDING", "FAILURE", "ERROR", "EXPECTED"];
+  for (let scenario = 0; scenario < 512; scenario++) {
+    const shas = Array.from({ length: 8 }, (_, index) => (scenario * 8 + index + 1).toString(16).padStart(40, "0"));
+    const evidence: FullSuiteEvidence[] = shas.map(sha => ({ sha, statuses: Array.from({ length: draw(5) }, () => ({
+      context: contexts[draw(contexts.length)]!, state: states[draw(states.length)]!,
+    })) }));
+    evidence.push({ sha: "f".repeat(40), statuses: [{ context: "farm-full", state: "SUCCESS" }] });
+    const expected = shas.findIndex(sha => {
+      const relevant = evidence.filter(item => item.sha === sha).flatMap(item => item.statuses).filter(status => status.context === "farm-full");
+      return relevant.length === 1 && relevant[0]?.state === "SUCCESS";
+    });
+    const candidates = shas.map(sha => ({ sha, farm: fullSuiteVerdict(sha, evidence) }));
+    expect(pickGreen(candidates, [])?.sha).toBe(expected < 0 ? undefined : shas[expected]);
+    const installed = draw(shas.length);
+    const installedSha = shas[installed]!;
+    expect(pickGreen(candidates, [installedSha])?.sha).toBe(expected < 0 || installed <= expected ? undefined : shas[expected]);
+  }
+  const newer = "a".repeat(40);
+  const older = "b".repeat(40);
+  const evidence = [{ sha: newer, statuses: [{ context: "autoland", state: "SUCCESS" }] },
+    { sha: older, statuses: [{ context: "farm-full", state: "SUCCESS" }] }];
+  const candidates = [newer, older].map(sha => ({ sha, farm: fullSuiteVerdict(sha, evidence) }));
+  expect(pickGreen(candidates, [])?.sha).toBe(older);
+  expect(pickGreen(candidates, [newer.slice(0, 7)])).toBeUndefined();
+});
 
 test("exact native report boundary keeps installed map through injected gate failure [k5 boundary green-native-install]", async () => {
   const { mkdtempSync, mkdirSync, readFileSync, writeFileSync, existsSync, rmSync } = await import("node:fs");

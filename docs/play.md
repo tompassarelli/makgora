@@ -30,7 +30,7 @@ defaults to `native` and keeps the same authored pad driver in every profile.
 Capture requests name logical match frames. Scene JSON also records the raw
 headless callback frame, which includes the 30 startup callbacks.
 
-From ~/code/smashcraft/main/ts, run `bun wisp play`. It builds current main,
+From ~/code/smashcraft/main/ts, run `bun wisp play`. It builds the newest main commit with exact `farm-full` success,
 points the always-on controller service at the matching helper, and hosts a match on Tom's main display
 against a computer. The match plays on the keyboard; a pad the service finds
 presses the same keys, and without one play says "keyboard" and goes on. It reuses the signed-in Battle.net launcher and never signs

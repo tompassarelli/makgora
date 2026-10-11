@@ -1,6 +1,6 @@
 # Play
 
-- Playtest: `bun wisp play` builds current main (once per revision, however
+- Playtest: `bun wisp play` builds the newest exact full-suite green main (once per revision, however
   many plays start together) and goes from Tom's desktop to a match against a computer
   (smashcraft:docs/play.md). Experiments use `fresh`, captures or `accept`,
   with maps under Maps/00-Smashcraft/tests; play preserves two prior versions
@@ -11,11 +11,10 @@
   When the always-on controller service has a pad, the pad presses the same keys.
 
 - Continuous builds: `bun wisp play --install-green` fetches origin, takes the
-  newest commit of main whose CI succeeded and whose farm suite passed for the
-  commit or matching tree, or whose Autoland status explicitly names that landed
-  commit, and, if it isn't installed yet, builds it once with the play build
+  newest commit of main whose exact SHA has a successful `farm-full` status,
+  and, if it isn't installed yet, builds it once with the play build
   path and installs it as `Smashcraft 0.0.N SHORTSHA` under Maps/00-Smashcraft,
-  moving all but the two prior versions to older/. CI/farm green only stages
+  moving all but the two prior versions to older/. Full-suite green only stages
   the candidate outside Maps; installation also requires every declared `gate-*`
   check to have verdict `pass` in Classic on its exact bytes.
   Native owners run `bun wisp accept --only gate-* --map CANDIDATE --out DIR`
@@ -25,7 +24,7 @@
   Missing checks, reports, looks, mismatched bytes and `needs-look` keep the last
   installed build. Plato reads the candidate and failing check ids/reasons in
   `~/.local/state/smashcraft/green-builds/status.json`.
-  A red, pending or missing CI/farm run is never built, and an older green
+  A red, pending or missing `farm-full` status is never built, and an older green
   commit never replaces a newer installed build. The systemd user timer
   (smashcraft:tools/green-builds/) runs every ten minutes; the repository
   documents it but doesn't install it. The timer currently consumes native
@@ -72,3 +71,10 @@
   `play --standalone --host` and `--join` windows on this machine and fails on
   a frame-time p95 over 16.7 ms in either window; run it under an exclusive
   capacity lease.
+
+The Playtest workflow calls `bun scripts/newestFullGreen.ts` from `ts/` to
+print the same newest full-green SHA, failing when none of the latest 20 main
+commits qualify. Autoland landing, smoke CI and another commit with a matching
+tree never satisfy this status. Desktop `play` uses the same selector and
+Classic native gate before it signs in or installs, and refuses to replace a
+newer installed map.

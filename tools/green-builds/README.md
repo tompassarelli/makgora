@@ -4,7 +4,8 @@
 minutes on Tom's machine; the service runs `bun wisp play --install-green` from
 its own detached worktree, `worktrees/green-builds-runner`, moved to
 `origin/main` before each run (docs/commands/play.md). These files are not installed by the
-repository.
+repository. It selects only an exact `farm-full` success and installs only
+when that map has passed every required Classic native gate.
 
 To install them:
 
