@@ -1,7 +1,6 @@
 
 
 import { f32 } from "wisp/src/sim/f32";
-import { jabSlice } from "./groundNormals";
 import { Character } from "../codes";
 import type { HeroClip, HeroDefinition } from "./hero";
 import { PIT_LORD_GAMEPLAN } from "./pitLordGameplan";
@@ -53,7 +52,7 @@ export const PIT_LORD_HERO: HeroDefinition = {
     clips: {
       idle: STAND, walk: WALK, dash: WALK_FAST, run: WALK_FAST, crouch: STAND_2, fall: STAND, landing: STAND_2,
       shield: STAND_2, airDodge: STAND_2, smashCharge: STAND_2, ko: DISSIPATE, dizzy: STAND_3,
-      jab: jabSlice(ATTACK, f32(0.68)), jab2: jabSlice(ATTACK, f32(0.71)), grab: ATTACK, forwardTilt: ATTACK, forwardTiltUp: ATTACK_SLAM_1, forwardTiltDown: ATTACK_3,
+      jab: ATTACK, jab2: ATTACK, grab: ATTACK, forwardTilt: ATTACK, forwardTiltUp: ATTACK_SLAM_1, forwardTiltDown: ATTACK_3,
       upTilt: SPELL, downTilt: ATTACK_3, dashAttack: ATTACK_SLAM_2,
       forwardSmash: ATTACK_SLAM_1, upSmash: SPELL_SLAM, downSmash: ATTACK_2,
       neutralAir: ATTACK_SLAM_2, forwardAir: ATTACK_SLAM_1, backAir: ATTACK_2, upAir: SPELL, downAir: ATTACK_3,
