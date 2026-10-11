@@ -451,7 +451,7 @@ export const WHITE_MODEL_FACTS: Readonly<Record<string, ModelFacts>> = {
     },
     "emitters": []
   },
-  "war3mapimported/anubarakwhite-dfbcb499b811722308a1491639bc3104e97f9845c7f66904c3dd06453695830c.mdx": {
+  "war3mapimported/anubarakwhite-008dc6ad20366a5d4c03deeacf7f664ef52d4a40c335a1b427ffbd12e1ac0a9e.mdx": {
     "geosets": 6,
     "triangles": 917,
     "lights": 0,

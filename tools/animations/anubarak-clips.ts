@@ -33,6 +33,11 @@ const low: Gesture = { chest: 45, pelvis: 18, arm: -45, elbow: 15, leftArm: -60,
 const back: Gesture = { chest: -12, pelvis: -15, arm: 40, leftArm: -55, head: 20, yaw: 105 };
 const cast: Gesture = { chest: -15, pelvis: 8, arm: -120, elbow: -30, leftArm: -115, leftElbow: -20, head: -12 };
 const brace: Gesture = { chest: 28, pelvis: 12, arm: -50, elbow: -30, leftArm: -70, leftElbow: -25, head: -15, thigh: 38, knee: -65, leftThigh: -35 };
+const upperAir: readonly Gesture[] = [
+  { chest: 55, pelvis: 25, lean: 25, arm: -185, elbow: 20, leftArm: -185, head: -25, thigh: 65, knee: -80, leftThigh: -55 },
+  { chest: -35, pelvis: -15, lean: -15, arm: 0, elbow: 20, leftArm: 0, thigh: -25, leftThigh: 25 },
+  { chest: -30, pelvis: -20, lean: -20, arm: -200, elbow: 20, leftArm: -200, thigh: -35, leftThigh: 35 },
+];
 const burrowRake: readonly Gesture[] = [
   { chest: 75, pelvis: 35, lean: 25, arm: -185, elbow: 20, leftArm: -185, head: -25, thigh: 65, knee: -80, leftThigh: -55 },
   { chest: -45, pelvis: -15, lean: -15, arm: 0, elbow: 20, leftArm: 0, thigh: -10, leftThigh: 10 },
@@ -161,7 +166,7 @@ for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
   model.Sequences.push({ ...stand, Name: name, Interval: new Uint32Array([start, end]), NonLooping: true, MoveSpeed: 0, Rarity: 0,
     MinimumExtent: new Float32Array([-300, -300, -200]), MaximumExtent: new Float32Array([300, 300, 350]), BoundsRadius: 400 });
   const groundGesture = groundGestures.has(action.pose);
-  const phaseFrames = [...new Set([...(action.pose === "sideSpecial" || groundGesture ? Array.from({length: action.frames + 1}, (_, i) => i) : []), 0, Math.max(1, action.contact - 3), action.contact, Math.min(action.frames - 1, action.contact + 4), action.frames,
+  const phaseFrames = [...new Set([...(action.pose === "sideSpecial" || action.pose === "upAir" || groundGesture ? Array.from({length: action.frames + 1}, (_, i) => i) : []), 0, Math.max(1, action.contact - 3), action.contact, Math.min(action.frames - 1, action.contact + 4), action.frames,
     ...(action.roll ? Array.from({ length: Math.ceil(action.frames / 3) }, (_, i) => i * 3) : []),
     ...(action.pose === "victimPummel" ? [action.contact - 1] : [])])].sort((a, b) => a - b);
   const amount = (frame: number) => action.hold || action.pain ? 1 : action.pose === "victimPummel" && frame < action.contact ? 0 : action.pose === "knockdown" && frame >= action.contact ? 1 : frame === 0 || frame === action.frames ? 0 : frame < action.contact ? -0.3 : 1;
@@ -198,6 +203,14 @@ for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
       if (node && action.pose !== "sideSpecial") { let [y, z] = joint(node.Name, action.gesture); y = node.Name === "Bone_Root" && action.roll ? frame / action.frames * 360 * action.roll : y * amount(frame);
         if (node.Name === "Bone_Root" && (action.pose === "getUp" || action.pose === "getUpAttack" || action.pose.startsWith("getUpRoll"))) y += 85 * Math.max(0, 1 - frame / action.contact);
         z *= amount(frame); Vector = rotated(first.Vector, y, z); }
+      if (node && action.pose === "upAir") {
+        const poses = upperAir.map(g => { const [y, z] = joint(node.Name, g); return rotated(first.Vector, y, z); });
+        Vector = frame <= 6 ? blend(first.Vector, poses[0]!, frame / 6)
+          : frame <= 8 ? blend(poses[0]!, poses[1]!, (frame - 6) / 2)
+          : frame <= 11 ? blend(poses[1]!, poses[2]!, (frame - 8) / 3)
+          : frame <= 13 ? poses[2]!.slice()
+          : blend(poses[2]!, first.Vector, (frame - 13) / (action.frames - 13));
+      }
       const tangent = () => match || track.LineType === mdx.LineType.Bezier ? Vector.slice() : new Float32Array(Vector.length);
       track.Keys.push({ ...first, Frame: start + Math.round(frame * 1000 / 60), Vector, ...(track.LineType > 1 ? { InTan: tangent(), OutTan: tangent() } : {}) });
     }
@@ -284,6 +297,12 @@ for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
     const key = root.Translation.Keys.find(k => k.Frame === start + Math.round(frame * 1000 / 60))!;
     const drive = frame <= 22 ? -frame / 22 : frame <= 25 ? -1 + 2 * (frame - 22) / 3 : Math.max(0, (34 - frame) / 9);
     key.Vector[0] += 42 * drive;
+    if (key.InTan) { key.InTan = root.Translation.LineType === mdx.LineType.Bezier ? key.Vector.slice() : new Float32Array(3); key.OutTan = key.InTan.slice(); }
+  }
+  if (action.pose === "upAir") for (const frame of phaseFrames) {
+    const key = root.Translation.Keys.find(k => k.Frame === start + Math.round(frame * 1000 / 60))!;
+    const drive = frame <= 6 ? -frame / 6 : frame <= 8 ? -1 + 2 * (frame - 6) / 2 : Math.max(0, (18 - frame) / 10);
+    key.Vector[2] += 30 * drive;
     if (key.InTan) { key.InTan = root.Translation.LineType === mdx.LineType.Bezier ? key.Vector.slice() : new Float32Array(3); key.OutTan = key.InTan.slice(); }
   }
   const drawn = new DrawnModel(generateMDX(model), 1);
