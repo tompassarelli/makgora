@@ -89,7 +89,7 @@ export interface GreenGateReport {
   readonly results: readonly { readonly id: string; readonly verdict: string; readonly reason: string }[];
 }
 
-export interface GreenGateFailure {
+interface GreenGateFailure {
   readonly look: string;
   readonly id: string;
   readonly reason: string;

@@ -3,8 +3,8 @@ import { ChildProcess } from "effect/process";
 import { encodePpm, type Frame } from "wisp/scripts/wisp/frameProbe";
 import { runProcess } from "./hostProcess";
 
-export type Region = readonly [number, number, number, number];
-export interface SheetRow { readonly row: string; readonly frames: readonly number[] }
+type Region = readonly [number, number, number, number];
+interface SheetRow { readonly row: string; readonly frames: readonly number[] }
 export class SheetFailure extends Schema.TaggedError<SheetFailure>()("SheetFailure", { problem: Schema.String }) {
   override get message(): string { return this.problem; }
 }
