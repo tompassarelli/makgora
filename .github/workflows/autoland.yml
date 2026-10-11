@@ -264,6 +264,24 @@ jobs:
           # Pushes made with this token start no workflows: start main's CI (main-red follows it).
           gh workflow run ci.yml --ref main || echo "::warning::couldn't start main's CI"
           echo "Landed ${SHA:0:10} on main:$(printf ' `%s`' "${branches[@]}")" >> "$GITHUB_STEP_SUMMARY"
+      # A landed copy leaves its source branch behind: delete codex/, claude/ and farm/ branches main holds patch for patch.
+      - if: success() && env.TRAIN != ''
+        run: |
+          set +e -uo pipefail
+          git fetch -q --prune origin main '+refs/heads/codex/*:refs/remotes/origin/codex/*' \
+            '+refs/heads/claude/*:refs/remotes/origin/claude/*' '+refs/heads/farm/*:refs/remotes/origin/farm/*'
+          now=$(date +%s)
+          git for-each-ref --format='%(refname:lstrip=3) %(objectname) %(committerdate:unix)' \
+              refs/remotes/origin/codex refs/remotes/origin/claude refs/remotes/origin/farm |
+          while read -r branch tip at; do
+            [ $((now - at)) -ge 600 ] || continue
+            cherry=$(git cherry origin/main "$tip") || continue
+            ! grep -q '^+' <<< "$cherry" || continue
+            state=$(gh api "repos/$GH_REPO/commits/$tip/status" --jq '[.statuses[] | select(.context == "autoland")][0].state // ""')
+            [ "$state" != pending ] || continue
+            git push -q --force-with-lease="refs/heads/$branch:$tip" origin ":refs/heads/$branch" \
+              && echo "main holds every patch of \`$branch\`: deleted it" >> "$GITHUB_STEP_SUMMARY"
+          done
       - if: always() && env.SCRATCH != ''
         run: git push origin --delete "$SCRATCH" || true
 
