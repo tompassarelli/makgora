@@ -249,9 +249,14 @@ const TINKER: AuthoredSpecial = {
   projectiles: [{ ...shot(20, 60.0, 30.0, 6.0, 0.0, 60, 40.0, hit(3.0, 30, 20.0, 30.0), "Units\\Creeps\\HeroTinkerRobot\\HeroTinkerRobot.mdl"), expiresInto: OVERDRIVE_BLAST }],
 };
 
+const GRAVITY_RING = "Abilities\\Spells\\Human\\MassTeleport\\MassTeleportTarget.mdx";
+const GRAVITY_LIFT = "Abilities\\Spells\\NightElf\\Cyclone\\CycloneTarget.mdx";
 const KAELTHAS: AuthoredSpecial = {
   name: "Gravity Lapse", endFrame: 60, groundOnly: true,
-  projectiles: [mark("Abilities\\Spells\\Human\\MassTeleport\\MassTeleportTarget.mdx", 2, 27, 0.0)],
+  projectiles: [
+    ...[-260.0, 0.0, 260.0].map((offsetX) => mark(GRAVITY_RING, 2, 27, offsetX)),
+    ...[-180.0, 0.0, 180.0].map((offsetX) => mark(GRAVITY_LIFT, 29, 24, offsetX)),
+  ],
   regions: [heroRegion(29, 31, capsule(-260.0, 40.0, 260.0, 40.0, 120.0), hit(14.0, 90, 85.0, 60.0, HitElement.arcane))],
 };
 
