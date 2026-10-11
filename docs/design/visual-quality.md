@@ -1089,10 +1089,30 @@ ST-2's roofs and brick surfaces are the separate #276 material work.
 
 ## Who sees which mode (patch 3.0.1, Oct 2026)
 
-Sources: Blizzard 3.0.0 (Sep 12) and 3.0.1 (Oct 7) notes at https://us.forums.blizzard.com/en/warcraft3/t/warcraft-iii-reforged-forsaken-kingdom-patch-notes/38400; https://outputlag.com/news/warcraft-iii-reforgeds-definitive-edition-graphics-mode-is-free-for-reforged-owners/ (Sep 12); https://www.masterofwarcraft.net/2026/09/warcraft-3-patch-3-0-forsaken-kingdom-campaign.html (Sep 16).
-- (a) Free Battle.net account: unconfirmed. No source says which modes a free account can select.
-- (b) Classic / Reign of Chaos / Frozen Throne owner: unconfirmed for Definitive and Reforged; Classic is the guess.
-- (c) Reforged owner: confirmed. Classic, Reforged and Definitive are all selectable; Definitive is free to Reforged owners and needs the 3.0 Reforged client.
-- (d) Forsaken Kingdom owner: confirmed that the campaign needs the purchase and progress carries across modes; Definitive does not need it. Modes match (c) by inference (guess).
-- Lobbies: confirmed that players on different modes can share a multiplayer game. Custom-map lobbies are not stated by any source.
-- Guess: custom maps using visuals missing in another mode may look different or be unusable there (Hive Workshop bug list, unverified).
+Which graphics modes each kind of player can select. "Confirmed" means a
+source below states it; "guess" means none does.
+
+- Free Battle.net account: unconfirmed. No source says which modes a free
+  account can select.
+- Classic owner (Reign of Chaos or The Frozen Throne): unconfirmed for
+  Definitive and Reforged. The guess is Classic.
+- Reforged owner: confirmed. Classic, Reforged and Definitive are all
+  selectable. Definitive is free to Reforged owners and needs the 3.0 Reforged
+  client.
+- Forsaken Kingdom owner: confirmed that the campaign needs the purchase and
+  that campaign progress carries across modes. Definitive does not need the
+  purchase. By inference, the selectable modes match a Reforged owner's
+  (guess).
+- Lobbies: confirmed that players on different modes can share a multiplayer
+  game. No source covers custom-map lobbies.
+- Custom maps (guess): a map that uses visuals missing from another mode may
+  look different there or be unusable (Hive Workshop bug list, unverified).
+
+Sources:
+
+- Blizzard's 3.0.0 (Sep 12) and 3.0.1 (Oct 7) patch notes:
+  https://us.forums.blizzard.com/en/warcraft3/t/warcraft-iii-reforged-forsaken-kingdom-patch-notes/38400
+- Outputlag (Sep 12):
+  https://outputlag.com/news/warcraft-iii-reforgeds-definitive-edition-graphics-mode-is-free-for-reforged-owners/
+- Master of Warcraft (Sep 16):
+  https://www.masterofwarcraft.net/2026/09/warcraft-3-patch-3-0-forsaken-kingdom-campaign.html
