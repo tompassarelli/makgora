@@ -10,6 +10,7 @@ export function fitWardenBlade(motion: mdx.Model, bytes: ArrayBuffer) {
     const classicWeapon = motion.Nodes.find(node => node?.Name === '@weapon');
     if (weapon === undefined || classicWeapon === undefined || weapon.Parent == null) throw new Error('Warden blade attachment is missing');
     const tip = vec3.fromValues(-8.521499633789062, -53.64099884033203, 14.718500137329102);
+    const bladeNormal = vec3.normalize(vec3.create(), vec3.cross(vec3.create(), vec3.sub(vec3.create(), tip, weapon.PivotPoint), [1, 0, 0]));
     const renderer = new ModelRenderer(source);
     const state = Reflect.get(renderer, 'rendererData') as { frame: number; nodes: { matrix: mat4 }[] };
     renderer.setSequence(0);
@@ -54,6 +55,15 @@ export function fitWardenBlade(motion: mdx.Model, bytes: ArrayBuffer) {
                 : localFrame <= activeEnd ? 1 : Math.max(0, (total - localFrame) / (total - activeEnd));
             const scale = 1 + (vec3.length(to) / vec3.length(from) - 1) * weight;
             const turn = quat.rotationTo(quat.create(), vec3.normalize(vec3.create(), from), vec3.normalize(vec3.create(), to));
+            const direction = vec3.normalize(vec3.create(), to);
+            const normal = vec3.transformQuat(vec3.create(), vec3.transformMat4(vec3.create(), bladeNormal, mat4.fromQuat(mat4.create(), mat4.getRotation(quat.create(), matrix))), turn);
+            vec3.scaleAndAdd(normal, normal, direction, -vec3.dot(normal, direction));
+            vec3.normalize(normal, normal);
+            const camera = vec3.fromValues(0, -1, 0);
+            vec3.scaleAndAdd(camera, camera, direction, -vec3.dot(camera, direction));
+            vec3.normalize(camera, camera);
+            const angle = Math.atan2(vec3.dot(direction, vec3.cross(vec3.create(), normal, camera)), vec3.dot(normal, camera));
+            quat.multiply(turn, quat.setAxisAngle(quat.create(), direction, angle), turn);
             quat.slerp(turn, quat.create(), turn, weight);
             const fitted = mat4.fromTranslation(mat4.create(), pivot);
             mat4.multiply(fitted, fitted, mat4.fromQuat(mat4.create(), turn));
@@ -96,5 +106,31 @@ export function fitWardenBlade(motion: mdx.Model, bytes: ArrayBuffer) {
             track.Keys = track.Keys.filter(key => key.Frame < start || key.Frame > end).concat(keys[kind]).sort((a, b) => a.Frame - b.Frame);
         }
     }
-    return { bytes: generateHdBody(model), report: { sequences: 2, samples, attachment: 'Fixed weapon pivot; visible blade follows the unchanged aerial blade regions.' } };
+    const fittedBytes = generateHdBody(model);
+    const coverage: number[] = [];
+    for (const [body, names] of [[motion, ['@pelvis', '@head']], [parseHdBody(fittedBytes), ['spine_C0_0_jnt', 'bone_head']]] as const) {
+        const pelvis = body.Nodes.find(node => node?.Name === names[0]), head = body.Nodes.find(node => node?.Name === names[1]);
+        if (pelvis === undefined || head === undefined) throw new Error('Warden visible body axis is missing');
+        const sequence = motion.Sequences.findIndex(item => item.Name === 'Attack Gesture neutralAir');
+        const start = motion.Sequences[sequence]?.Interval[0];
+        const move = WARDEN_MOVES.normals[AttackStyle.neutralAir];
+        if (start === undefined || move === undefined) throw new Error('Warden neutral air body timing is missing');
+        const drawn = new ModelRenderer(body);
+        drawn.setSequence(body === motion ? sequence : 0);
+        const data = Reflect.get(drawn, 'rendererData') as { frame: number; nodes: { matrix: mat4 }[] };
+        let previous: number | undefined, angle = 0, low = 0, high = 0;
+        for (let tick = 0; tick < move.activeFrames * 65; tick++) {
+            data.frame = start + (move.startupFrames + tick / 65) * 1000 / 60;
+            drawn.update(0);
+            const a = vec3.transformMat4(vec3.create(), pelvis.PivotPoint, data.nodes[pelvis.ObjectId].matrix);
+            const b = vec3.transformMat4(vec3.create(), head.PivotPoint, data.nodes[head.ObjectId].matrix);
+            const projected = Math.atan2(b[0] - a[0], b[2] - a[2]);
+            if (previous !== undefined) angle += Math.atan2(Math.sin(projected - previous), Math.cos(projected - previous));
+            previous = projected;
+            low = Math.min(low, angle); high = Math.max(high, angle);
+        }
+        coverage.push((high - low) * 180 / Math.PI);
+    }
+    if (coverage.some(degrees => degrees < 300)) throw new Error(`Warden exported body screen-plane rotation below 300 degrees: ${coverage.join(', ')}`);
+    return { bytes: fittedBytes, report: { sequences: 2, samples, bodyUpProjectedCoverageDegrees: coverage, attachment: 'Fixed weapon pivot; visible blade follows the unchanged aerial blade regions.' } };
 }
