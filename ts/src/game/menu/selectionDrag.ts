@@ -139,8 +139,8 @@ export function placeHovered({ held, hover }: Readonly<SelectionDrag>): Placemen
 }
 
 
-export const HAND_WIDTH = f32(0.025 * 32 / (0.117924 * 256));
-export const HAND_HEIGHT = f32(0.0239 * 32 / (0.23585 * 128));
+export const HAND_WIDTH = f32(f32(0.025) * 32 / (f32(0.117924) * 256));
+export const HAND_HEIGHT = f32(f32(0.0239) * 32 / (f32(0.23585) * 128));
 
 export const handLeft = (x: number, definitive: boolean): number => x - f32(definitive ? (22 + (223 * 100 / 1315 - 9) * 100 / 84) / 128 : (2 + (223 * 29 / 1315 - 2) * 29 / 25) / 32) * HAND_WIDTH;
 
