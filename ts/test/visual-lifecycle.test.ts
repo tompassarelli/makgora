@@ -9,7 +9,8 @@ import { ReplayCorrections, ReplayHistory } from "../src/game/replay/history";
 import { MATCH_CAMERA_ASPECT } from "../src/game/sim/matchCamera";
 import { ROSTER_MANA } from "../src/game/sim/mana";
 import { IMPACT_HIT_MODEL } from "../src/game/assets/impactAssetInfo";
-import { AttackStyle, Character } from "../src/game/sim/codes";
+import { AttackStyle, Character, SpecialAction } from "../src/game/sim/codes";
+import { FIGHTER_ULTIMATES } from "../src/game/sim/ultimates";
 import { SELECTABLE_CHARACTERS } from "../src/game/sim/heroes/registry";
 import { createFighter } from "../src/game/sim/fighter";
 import { soloWorld } from "../src/game/sim/testWorld";
@@ -261,4 +262,64 @@ test("combat effects: rollback, pause/resume and rematch neither replay nor reta
 
   });
   expect(client.errors).toEqual([]);
+});
+
+test("however Rifleman's Aimed Shot ends, no ultimate effect stays on screen one frame past its lifetime (#457) [k1 scenario]", () => {
+  const ultimate = FIGHTER_ULTIMATES[Character.rifleman];
+  if (ultimate === undefined) throw new Error("missing Rifleman ultimate");
+  const models = new Set((ultimate.projectiles ?? []).map((shot) => shot.model));
+  const shots = new Set(ultimate.projectiles ?? []);
+  for (const ending of ["natural", "hit", "ko", "match end"] as const) {
+    const clients = headless.clients({ start, install });
+    clients.start();
+    clients.frames(30);
+    const client = clients.clients[0];
+    if (client === undefined) throw new Error("missing host client");
+    client.run(() => {
+      const s = shell();
+      selectCharacter(s.game, 0, Character.demonHunter);
+      selectCharacter(s.game, 1, Character.rifleman);
+      expect(requestStageSelect(s.game, 0)).toBe(true);
+      expect(startAtGo(s.game, 0)).toBe(true);
+      startMatch(s);
+      s.game.timeLimitMinutes = 0;
+      const rifleman = fighterAt(s.world, 1), target = fighterAt(s.world, 0);
+      rifleman.motion.x = 200;
+      rifleman.facing = -1;
+      rifleman.mana.points = ROSTER_MANA.max;
+      target.motion.x = ending === "hit" ? 140 : -200;
+      target.facing = 1;
+      const ground = s.origin.z - FLOOR_HEIGHT;
+      let tick = 0;
+      const step = () => {
+        tick++;
+        for (const input of s.produced.inputs) copyControls(input, neutralControls());
+        s.produced.inputs[1].ultimatePressed = tick === 1;
+        s.produced.inputs[1].attackHeld = tick === 1;
+        s.produced.inputs[1].specialPressed = tick === 1;
+        if (ending === "hit" && tick === 12) s.produced.inputs[0].specialPressed = true;
+        if (ending === "ko" && tick === 20) rifleman.motion.x = 99999;
+        if (ending === "match end" && tick === 38) { s.game.timeLimitMinutes = 1; s.game.remainingFrames = 1; }
+        expect(captureFrame(s.frameInput, tick, s.world.mask, s.produced, s.runtime)).toBe(true);
+        applyFrame(s);
+        renderPersistentPresentation(s);
+      };
+      step();
+      expect(rifleman.special.action).toBe(SpecialAction.heroUltimate);
+      while (rifleman.special.action === SpecialAction.heroUltimate && s.game.phase === Phase.match) step();
+      if (ending === "natural") expect(tick).toBe(ultimate.endFrame);
+      else expect(tick).toBeLessThan(ultimate.endFrame);
+      while (s.game.phase === Phase.match && rifleman.projectiles.some((projectile) => projectile.spec !== undefined && shots.has(projectile.spec) && projectile.life > 0)) step();
+      step();
+      const effects = client.effectPoses({ visibleOnly: true }).filter((pose) => pose.destroyed === undefined && models.has(pose.model) && pose.z > ground);
+      expect(effects.map((pose) => `${ending}: ${pose.model}`)).toEqual([]);
+      const bolts = client.lightnings.poses().filter((bolt) => bolt.codeName === "LEAS");
+      expect(bolts).toHaveLength(2);
+      for (const bolt of bolts) {
+        expect(bolt.color[3], `${ending}: bolt alpha`).toBe(0);
+        expect(Math.max(bolt.from[2] ?? 0, bolt.to[2] ?? 0), `${ending}: bolt left on stage`).toBeLessThan(ground);
+      }
+    });
+    expect(client.errors).toEqual([]);
+  }
 });

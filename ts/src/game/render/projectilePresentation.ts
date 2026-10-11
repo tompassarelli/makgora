@@ -26,6 +26,9 @@ const STATIONARY_PARTICLE_MODELS = [
   "Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx",
 ];
 
+// Hidden bolts park below the floor, as hidden effects do: alpha alone left Aimed Shot's bolts on stage after the move (#457).
+const PARKED_LINE_DEPTH = 4096.0;
+
 interface Pool {
   readonly path: string;
   readonly drawn: string;
@@ -49,6 +52,7 @@ export class ProjectilePresentation {
   private parked: ParkedFlags | undefined;
   private readonly definitive: boolean;
   private readonly aimedShot: lightning[] = [];
+  private readonly lineShown: boolean[] = [];
   private tracerFrame = 0;
   private tracerX = 0.0;
   private tracerZ = 0.0;
@@ -60,9 +64,10 @@ export class ProjectilePresentation {
     private readonly origin: WorldOrigin,
   ) {
     if (character === Character.rifleman) for (let index = 0; index < 2; index++) {
-      const line = AddLightningEx("LEAS", false, origin.x, origin.y, origin.z - 4096.0, origin.x, origin.y, origin.z - 4096.0);
+      const line = AddLightningEx("LEAS", false, origin.x, origin.y, origin.z - PARKED_LINE_DEPTH, origin.x, origin.y, origin.z - PARKED_LINE_DEPTH);
       SetLightningColor(line, 1.0, 0.0, 0.0, 0.0);
       this.aimedShot.push(line);
+      this.lineShown.push(false);
     }
     const hero = heroDefinition(character) !== undefined;
     const paths = fighterProjectileModels(character);
@@ -119,7 +124,10 @@ export class ProjectilePresentation {
 
   clear(): void {
     this.tracerFrame = 0;
-    for (const line of this.aimedShot) SetLightningColor(line, 1.0, 0.0, 0.0, 0.0);
+    for (let index = 0; index < this.aimedShot.length; index++) {
+      this.lineShown[index] = true;
+      this.parkLine(index);
+    }
     const parked = (this.parked ??= []);
     for (let index = 0; index < this.models.length; index++) {
       const model = this.models[index];
@@ -173,9 +181,27 @@ export class ProjectilePresentation {
         MoveLightningEx(trace, false, this.origin.x + this.tracerX, this.origin.y - 12.0, this.origin.z + this.tracerZ, this.origin.x + this.tracerX + this.tracerFacing * this.tracerEnd, this.origin.y - 12.0, this.origin.z + this.tracerZ);
       }
     }
-    SetLightningColor(aim, 1.0, 0.0, 0.0, frame >= 4 && frame <= 32 ? 1.0 : 0.0);
-    SetLightningColor(trace, 1.0, f32(0.75), f32(0.25), shot !== undefined && frame >= shot.spawnFrame && frame < shot.spawnFrame + 6 ? 1.0 : 0.0);
+    if (frame >= 4 && frame <= 32) this.showLine(0, 1.0, 0.0, 0.0);
+    else this.parkLine(0);
+    if (shot !== undefined && frame >= shot.spawnFrame && frame < shot.spawnFrame + 6) this.showLine(1, 1.0, f32(0.75), f32(0.25));
+    else this.parkLine(1);
     this.tracerFrame = frame;
+  }
+
+  private showLine(index: number, red: number, green: number, blue: number): void {
+    const line = this.aimedShot[index];
+    if (line === undefined) return;
+    SetLightningColor(line, red, green, blue, 1.0);
+    this.lineShown[index] = true;
+  }
+
+  private parkLine(index: number): void {
+    const line = this.aimedShot[index];
+    if (line === undefined || this.lineShown[index] !== true) return;
+    const { x, y, z } = this.origin;
+    MoveLightningEx(line, false, x, y, z - PARKED_LINE_DEPTH, x, y, z - PARKED_LINE_DEPTH);
+    SetLightningColor(line, 1.0, 0.0, 0.0, 0.0);
+    this.lineShown[index] = false;
   }
 
   present(fighter: Readonly<Fighter> | undefined, playing: boolean, paused: boolean): void {
@@ -324,6 +350,7 @@ export class ProjectilePresentation {
     for (const model of this.models) DestroyEffect(model);
     for (const line of this.aimedShot) DestroyLightning(line);
     this.aimedShot.length = 0;
+    this.lineShown.length = 0;
     this.models.length = 0;
     this.visible.length = 0;
     this.pools.length = 0;
