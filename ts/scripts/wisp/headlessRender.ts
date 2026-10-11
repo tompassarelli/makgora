@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
@@ -75,6 +75,8 @@ export function headlessRender(options: RenderAssetOptions = {}) {
   let stockInfo: { readonly storage: string; readonly buildInfoSha256: string; readonly fields: Readonly<Record<string, string>> } | undefined;
   const attempt = <A>(operation: string, run: () => A | Promise<A>) =>
     Effect.tryPromise({ try: async () => run(), catch: (cause) => new RenderAssetFailure({ problem: `${operation}: ${cause instanceof Error ? cause.message : String(cause)}` }) });
+  let temporaries = 0;
+  const temporary = (target: string) => `${target}.${process.pid}.${++temporaries}.tmp`;
 
   const stockCache = Effect.runSync(Effect.cached(attempt("read the stock build info", async () => {
     const info = await Bun.file(join(storage, ".build.info")).text();
@@ -83,7 +85,13 @@ export function headlessRender(options: RenderAssetOptions = {}) {
     stockInfo = { storage, buildInfoSha256: createHash("sha256").update(info).digest("hex"), fields: rows.find((row) => row.Active === "1") ?? rows[0] ?? {} };
     const directory = join(options.cache ?? PRIVATE, "stock", stockInfo.buildInfoSha256);
     mkdirSync(directory, { recursive: true });
-    writeFileSync(join(directory, "build-info.json"), JSON.stringify(stockInfo, null, 2) + "\n");
+    const buildInfo = join(directory, "build-info.json"), temp = temporary(buildInfo);
+    try {
+      writeFileSync(temp, JSON.stringify(stockInfo, null, 2) + "\n");
+      renameSync(temp, buildInfo);
+    } finally {
+      rmSync(temp, { force: true });
+    }
     return directory;
   })));
   const sources = Effect.runSync(Effect.cached(Effect.gen(function*() {
@@ -111,17 +119,25 @@ export function headlessRender(options: RenderAssetOptions = {}) {
   const convertTexture = (source: string, target: string) => Effect.gen(function*() {
     const converter = Bun.which("magick") ?? Bun.which("convert");
     if (converter === null) return yield* new RenderAssetFailure({ problem: "textures need ImageMagick installed (magick or convert)" });
-    yield* runProcess(ChildProcess.make(converter, [`${source}[0]`, target], { stdin: "ignore" })).pipe(
-      Effect.mapError((failure) => new RenderAssetFailure({ problem: `cannot convert texture ${source}: ${failure.problem}` })));
+    const temp = temporary(target);
+    yield* runProcess(ChildProcess.make(converter, [`${source}[0]`, `png:${temp}`], { stdin: "ignore" })).pipe(
+      Effect.flatMap(() => attempt(`move ${temp}`, () => renameSync(temp, target))),
+      Effect.ensuring(Effect.sync(() => rmSync(temp, { force: true }))),
+      Effect.catch((failure) => read(target).pipe(Effect.flatMap((bytes) => bytes !== undefined ? Effect.void
+        : Effect.fail(new RenderAssetFailure({ problem: `cannot convert texture ${source}: ${failure.problem}` }))))));
   });
 
-  const succeeds = (program: string, args: readonly string[]) =>
-    runProcess(ChildProcess.make(program, args, { stdin: "ignore" })).pipe(
-      Effect.flatMap(() => {
-        const output = args.at(-1);
-        return output === undefined ? Effect.succeed(false) : read(output).pipe(Effect.map((bytes) => bytes !== undefined && bytes.length > 0));
-      }),
-      Effect.catchTag("ProcessFailure", () => Effect.succeed(false)));
+  const succeeds = (program: string, args: readonly string[]) => {
+    const output = args.at(-1);
+    if (output === undefined) return Effect.succeed(false);
+    const temp = temporary(output);
+    return runProcess(ChildProcess.make(program, [...args.slice(0, -1), temp], { stdin: "ignore" })).pipe(
+      Effect.flatMap(() => read(temp)),
+      Effect.flatMap((bytes) => bytes === undefined ? Effect.succeed(false) : attempt(`move ${temp}`, () => (renameSync(temp, output), true))),
+      Effect.catchTag("ProcessFailure", () => Effect.succeed(false)),
+      Effect.ensuring(Effect.sync(() => rmSync(temp, { force: true }))),
+      Effect.flatMap((moved) => moved ? Effect.succeed(true) : read(output).pipe(Effect.map((bytes) => bytes !== undefined))));
+  };
 
   const stockLayer = (normalized: string, layer: AssetLayer) => Effect.gen(function*() {
     const directory = join(yield* stockCache, layer);
