@@ -81,14 +81,18 @@ codes: 0 passes, 1 fails, and 75 requires the full fallback. Unsupported
 commands also require that fallback. Stage lines use `verdict`; failed-test
 names may be absent. Wisp's `makeCi` uses the existing dev and soak declarations
 for selection and its two soak repeats. The mandatory `determinism-check`
-workflow input must run emitted-Lua parity; a missing check returns 75.
+workflow input must run emitted-Lua parity when the shared plan requires it;
+a missing required check returns 75.
 Without `cli-command`, the temporary stub runs `bun run check` and the
 caller-selected tests, then returns 75 even when they pass. This is not full
 gate evidence; the existing train remains active until replay acceptance.
 
 `bun wisp ci pre-merge --base SHA`, `ci post-merge`, `ci nightly --minutes M`
 and `ci seeds --n N --seed S` run the shared Wisp tiers; each accepts `--json`.
-The current Wisp pre-merge tier always runs its capped soak determinism when
-a soak is declared, including on tooling and documentation lanes.
+The Wisp pre-merge plan reports `determinism: { runs, reason }` from the soak's
+import closure and declared file reads. Changes outside that scope produce a
+`skipped` stage with its reason. The adapter saves that authoritative plan in
+build/premerge-plan.jsonl and skips the emitted-Lua check only when it says
+`runs: false`; an unavailable or malformed plan requires the full fallback.
 Smashcraft's soak runs in Bun and does not read `LUA`, so these stages compare
 two fresh Bun processes; emitted-Lua parity remains a separate check.

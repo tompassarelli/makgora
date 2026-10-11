@@ -10,7 +10,7 @@
     "typescript-native": "npm:typescript@7.0.2",
     "typescript-to-lua": "1.37.1",
     "war3-model": "4.0.1",
-    "wisp": "file:vendor/wisp-b2eaa1e62d262092b348eb64e490a59714f8c6a5.tgz"
+    "wisp": "file:vendor/wisp-ccf3bcf7668c86009c0b208144487f8c92f2d3e6.tgz"
   },
   "name": "smashcraft",
   "private": true,

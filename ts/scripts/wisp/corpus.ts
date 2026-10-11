@@ -20,7 +20,7 @@ import { homedir, tmpdir } from "node:os";
 import { basename, join, relative } from "node:path";
 import { Console, Effect, Schema } from "effect";
 import { describeCause } from "wisp/scripts/wisp/command";
-import { captureProcess } from "wisp/scripts/wisp/mapBuild";
+import { captureProcess } from "wisp/scripts/wisp/hostProcess";
 import { type MatchReplayResult, parseReplayHeader, replayMatch } from "../../src/game/replay/matchReplay";
 import { sourceVersion } from "../sourceVersion";
 import { replayInLua } from "./commands/replay";

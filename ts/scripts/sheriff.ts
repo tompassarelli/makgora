@@ -1,6 +1,6 @@
 import { appendFileSync } from "node:fs";
 import { Console, Effect, Schema } from "effect";
-import { captureProcess } from "wisp/scripts/wisp/mapBuild";
+import { captureProcess } from "wisp/scripts/wisp/hostProcess";
 
 class SheriffFailure extends Schema.TaggedError<SheriffFailure>()("SheriffFailure", { command: Schema.String, problem: Schema.String }) {
   override get message(): string {

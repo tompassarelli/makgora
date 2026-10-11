@@ -7,5 +7,8 @@ export const ci = makeCi({
   sources: SMASHCRAFT_DEV.sources,
   typeCheck: SMASHCRAFT_DEV.typeCheck,
   tests: SMASHCRAFT_DEV.tests,
-  soak: SMASHCRAFT_SOAK,
+  soak: {
+    ...SMASHCRAFT_SOAK,
+    reads: ["scripts/wisp/model-facts/*.json", "node_modules/wisp/src/natives/warcraft.d.ts"],
+  },
 });
