@@ -1,7 +1,7 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { Console, Effect, Schema } from "effect";
-import { captureProcess } from "wisp/scripts/wisp/mapBuild";
+import { captureProcess } from "wisp/scripts/wisp/hostProcess";
 import { NetFailure } from "wisp/scripts/wisp/net/peer";
 import { runProxy } from "wisp/scripts/wisp/net/proxy";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";

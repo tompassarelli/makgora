@@ -5,7 +5,7 @@ import { SMASHCRAFT_PERF } from "./perf";
 
 const run: Command = (args) => makeHeadless(async () => {
   const project = (await import("../journeys")).SMASHCRAFT_JOURNEYS;
-  return args.includes("--render")
+  return args.includes("--render") || args.includes("--bounds")
     ? { ...project, render: (await import("../headlessRender")).headlessRender() }
     : project;
 }, SMASHCRAFT_PERF)(args);

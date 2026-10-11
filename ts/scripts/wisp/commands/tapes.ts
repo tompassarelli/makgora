@@ -17,7 +17,7 @@ import { decodeTape } from "../../../src/game/replay/tape";
 import { runTape } from "../../../src/game/replay/tapeRunner";
 import { type Command, UsageFailure, describeCause } from "wisp/scripts/wisp/command";
 import { step } from "wisp/scripts/wisp/timings";
-import { captureProcess } from "wisp/scripts/wisp/mapBuild";
+import { captureProcess } from "wisp/scripts/wisp/hostProcess";
 import { generateTapes } from "../acceptanceTapes";
 import { luaRuntimes } from "../luaRuntimes";
 import { runProcess } from "../../hostProcess";
