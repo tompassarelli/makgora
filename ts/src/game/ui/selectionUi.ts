@@ -319,8 +319,8 @@ export class SelectionPanel {
       const summary = label(root, `MeleeCpuSummary${name}`, x + f32(0.004), f32(0.139), f32(0.152), f32(0.031), f32(0.009));
       return { card, tag, mode, portrait, name: name_, status, chip, summary, settings, settingsLabel };
     });
-    this.hand = art(root, `MeleeHand${suffix}`, "war3mapImported\\SelectionHandPinch.tga", 0.0, 0.0, HAND_SIZE, HAND_SIZE);
-    BlzFrameSetLevel(this.hand, 20);
+    this.hand = art(consoleUi(), `MeleeHand${suffix}`, "war3mapImported\\SelectionHandPinch.tga", 0.0, 0.0, HAND_SIZE, HAND_SIZE);
+    BlzFrameSetLevel(this.hand, 30);
     BlzFrameSetVisible(this.hand, false);
     art(root, `MeleeConfirmArt${suffix}`, "war3mapImported\\SelectionAction.tga", f32(0.071), f32(0.043), f32(0.235), f32(0.037));
     this.confirm = label(root, `MeleeConfirmLabel${suffix}`, f32(0.079), f32(0.039), f32(0.219), f32(0.028), f32(0.011));
@@ -484,6 +484,7 @@ export class SelectionPanel {
     for (const frame of this.movesFrames) BlzDestroyFrame(frame);
     BlzDestroyFrame(this.modeLabel);
     BlzDestroyFrame(this.tutorial.root);
+    BlzDestroyFrame(this.hand);
     if (this.cpuRoot !== undefined) BlzDestroyFrame(this.cpuRoot);
     BlzDestroyFrame(this.root);
     BlzDestroyFrame(this.backdrop);
@@ -790,7 +791,6 @@ export class SelectionPanel {
     if (drag.held === undefined && humanFighterActive(game, participantId)) drag.held = participantId;
     let x = 0.0;
     let y = 0.0;
-    let pinching = false;
     const width = I2R(BlzGetLocalClientWidth());
     const height = I2R(BlzGetLocalClientHeight());
     if (width > 0 && height > 0) {
@@ -841,9 +841,8 @@ export class SelectionPanel {
       BlzFrameSetVisible(frames.chip, active);
       BlzFrameSetTexture(frames.chip, `war3mapImported\\SelectionChip${human ? `P${I2S(slot + 1)}` : "CPU"}.tga`, 0, true);
       const carried = drag.dragging === slot || (!ready && drag.held === slot && drag.hover !== undefined);
-      if (carried && active) pinching = true;
       const chipChoice = tileOfCharacter(choice ?? Character.rifleman);
-      const size = ready ? (carried ? f32(0.048) : f32(0.026)) * this.roster.grid.scale : f32(0.06);
+      const size = ready ? f32(0.048) * this.roster.grid.scale : f32(0.06);
       BlzFrameSetSize(frames.chip, size, size);
       placeTopLeft(
         frames.chip,
@@ -851,7 +850,7 @@ export class SelectionPanel {
         carried ? carriedChipTop(y, size) : ready ? chipY(this.roster.grid, slot, chipChoice) : f32(0.2),
       );
     }
-    this.showHand(pinching && width > 0 && height > 0 && !settingsOpen && !this.tutorialOpen, x, y);
+    this.showHand(width > 0 && height > 0 && !settingsOpen && !this.tutorialOpen, x, y);
     setFrameText(this.confirm, this.confirmText(game));
     this.showRules(game);
     this.showHelp(game, x, y);

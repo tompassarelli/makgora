@@ -16,6 +16,9 @@ import { panelActions } from "../src/platform/shell/menus";
 import { shell } from "../src/platform/shell/state";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { RESULTS_DELAY_FRAMES } from "../src/game/render/matchPresentation";
+import { rosterGrid } from "../src/game/menu/selectionGrid";
+import { PLAYABLE_CHARACTERS } from "../src/game/sim/heroes/registry";
+import { f32 } from "wisp/src/sim/f32";
 
 const headless = installHeadless(SMASHCRAFT_HEADLESS);
 afterAll(headless.restore);
@@ -36,8 +39,12 @@ type Native = (...args: unknown[]) => unknown;
 interface ShownFrame {
 
   readonly parent: unknown;
+  readonly name: string;
   text: string;
   visible: boolean;
+  width: number;
+  height: number;
+  level: number;
 }
 
 
@@ -54,7 +61,7 @@ class FrameView {
       const create = natives[name] as Native;
       natives[name] = (...args: unknown[]) => {
         const frame = create(...args);
-        this.frames.set(frame, { parent: args[parentArg], text: "", visible: true });
+        this.frames.set(frame, { parent: args[parentArg], name: String(args[name === "BlzCreateFrameByType" ? 1 : 0]), text: "", visible: true, width: 0, height: 0, level: 0 });
         return frame;
       };
     };
@@ -73,12 +80,23 @@ class FrameView {
     natives.BlzFrameSetVisible = (frame: unknown, visible: boolean) => {
       this.frame(frame).visible = visible;
     };
+    const setSize = natives.BlzFrameSetSize as Native;
+    natives.BlzFrameSetSize = (frame: unknown, width: number, height: number) => {
+      this.frame(frame).width = width;
+      this.frame(frame).height = height;
+      return setSize(frame, width, height);
+    };
+    const setLevel = natives.BlzFrameSetLevel as Native;
+    natives.BlzFrameSetLevel = (frame: unknown, level: number) => {
+      this.frame(frame).level = level;
+      return setLevel(frame, level);
+    };
   }
 
   private frame(handle: unknown): ShownFrame {
     let known = this.frames.get(handle);
     if (known === undefined) {
-      known = { parent: undefined, text: "", visible: true };
+      known = { parent: undefined, name: "", text: "", visible: true, width: 0, height: 0, level: 0 };
       this.frames.set(handle, known);
     }
     return known;
@@ -94,6 +112,23 @@ class FrameView {
     return [...this.frames].filter(([handle, { text }]) => text !== "" && this.shown(handle)).map(([, { text }]) => text);
   }
 
+  named(name: string): ShownFrame | undefined {
+    return [...this.frames.values()].find(frame => frame.name === name);
+  }
+
+  visible(name: string): boolean {
+    const found = [...this.frames].find(([, frame]) => frame.name === name);
+    return found !== undefined && this.shown(found[0]);
+  }
+
+  clickText(client: HeadlessClient, text: string): void {
+    const found = [...this.frames].find(([handle, frame]) => frame.text === text && this.shown(handle));
+    if (found === undefined) throw new Error(`Missing visible button: ${text}`);
+    const id = (client.natives.GetHandleId as Native)(found[0]);
+    if (typeof id !== "number") throw new Error(`Missing frame id: ${text}`);
+    client.run(() => client.frameEvent(client.slot, id, FRAMEEVENT_CONTROL_CLICK));
+  }
+
 }
 
 
@@ -104,14 +139,20 @@ function recordShown(clients: Lockstep, views: readonly FrameView[], shown: Set<
 
 const developerText = (text: string) => DENIED.filter((term) => text.toLowerCase().includes(term));
 
-test("the playable build shows players no developer text through selection, a match and its results [k3 measure docs/playable-0047.md]", () => {
+test("the playable build keeps selection chips and cursor on their screen and shows no developer text through a match and results [k3 measure docs/playable-0047.md; #346 Tom 0.0.128]", () => {
   const clients = headless.clients({ install: installPlayable, start: startPlayable });
-  const views = clients.clients.map((client) => new FrameView(client));
+  const records = clients.clients.map(client => ({ client, view: new FrameView(client) }));
+  const views = records.map(record => record.view);
   const shown = new Set<string>();
   const frames = (count: number) => {
     for (let frame = 0; frame < count; frame++) {
       clients.frames(1);
       recordShown(clients, views, shown);
+      for (const { client, view } of records) {
+        client.run(() => {
+          if (shell().game.phase !== Phase.characterMenu) expect(view.visible(`MeleeHand${client.slot}`)).toBe(false);
+        });
+      }
     }
   };
   const phases = () => clients.clients.map((client) => {
@@ -124,9 +165,29 @@ test("the playable build shows players no developer text through selection, a ma
 
   clients.start();
   frames(30);
+  for (const { client, view } of records) view.clickText(client, "Not now");
+  for (const pixelX of [600, 800, 1000, 1000]) {
+    for (const client of clients.clients) {
+      client.mouseScreenX = pixelX;
+      client.mouseScreenY = 400;
+    }
+    frames(2);
+    for (const { client, view } of records) {
+      const name = `MeleeHand${client.slot}`;
+      expect(view.visible(name)).toBe(true);
+      expect(view.named(name)?.level).toBeGreaterThan(view.named(`MeleeRuleHelp${client.slot}`)?.level ?? 0);
+    }
+  }
 
   for (const slot of [0, 1]) clients.press(slot, Key.r);
   frames(10);
+  const chipSize = f32(0.048) * rosterGrid(PLAYABLE_CHARACTERS.length).scale;
+  for (const { client, view } of records) {
+    const chip = view.named(`MeleeChip${client.slot}_${client.slot}`);
+    expect(chip?.width).toBeCloseTo(chipSize, 7);
+    expect(chip?.height).toBeCloseTo(chipSize, 7);
+    expect(view.visible(`MeleeHand${client.slot}`)).toBe(true);
+  }
   clients.everywhere(() => {
     panelActions().selection.changeStocks(0, -1);
     panelActions().selection.changeStocks(0, -1);
