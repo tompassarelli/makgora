@@ -25,6 +25,9 @@ on:
       tag:
         type: string
         default: ""
+      farm-runner:
+        type: string
+        default: ""
 
 run-name: Farm test ${{ inputs.ref }} ${{ inputs.tag }}
 

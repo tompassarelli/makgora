@@ -1,11 +1,13 @@
 import { readFileSync } from "node:fs";
 import { parseArgs } from "node:util";
-import { judge, plan, train, type Lane, type Run, type Status } from "./autolandCore";
+import { judge, looping, plan, stalled, stuckRuns, train, type Job, type Lane, type Run, type Status } from "./autolandCore";
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null;
 const isStatus = (value: unknown): value is Status => isRecord(value) && typeof value.state === "string" && typeof value.description === "string" && typeof value.at === "string";
 const isLane = (value: unknown): value is Lane => isRecord(value) && typeof value.branch === "string" && typeof value.tip === "string" && (value.status === null || isStatus(value.status)) && (value.labels === undefined || (Array.isArray(value.labels) && value.labels.every((label: unknown) => typeof label === "string")));
-const isRun = (value: unknown): value is Run => isRecord(value) && typeof value.title === "string" && typeof value.status === "string";
+const isJob = (value: unknown): value is Job => isRecord(value) && typeof value.status === "string" && typeof value.created === "string" && (value.started === null || typeof value.started === "string") && Array.isArray(value.labels) && value.labels.every((label: unknown) => typeof label === "string");
+const isRun = (value: unknown): value is Run => isRecord(value) && typeof value.title === "string" && typeof value.status === "string" && (value.id === undefined || typeof value.id === "number") && (value.created === undefined || typeof value.created === "string") && (value.jobs === undefined || (Array.isArray(value.jobs) && value.jobs.every(isJob)));
+const isText = (value: unknown): value is string => typeof value === "string";
 
 function readList<T>(file: string | undefined, is: (value: unknown) => value is T): T[] {
   if (file === undefined) return [];
@@ -18,7 +20,7 @@ if (import.meta.main) {
   const { values, positionals } = parseArgs({
     args: process.argv.slice(2),
     allowPositionals: true,
-    options: { lanes: { type: "string" }, runs: { type: "string" }, retry: { type: "string" }, count: { type: "string" }, green: { type: "string" } },
+    options: { lanes: { type: "string" }, runs: { type: "string" }, retry: { type: "string" }, count: { type: "string" }, green: { type: "string" }, now: { type: "string" }, landed: { type: "string" }, statuses: { type: "string" } },
   });
   const command = positionals[0];
   if (command === "plan") {
@@ -27,10 +29,16 @@ if (import.meta.main) {
     if (result.train) console.log("train");
   } else if (command === "train") {
     for (const lane of train(readList(values.lanes, isLane))) console.log([lane.branch, lane.tip, lane.base, lane.tree].join("\t"));
+  } else if (command === "sweep") {
+    for (const cancel of stuckRuns(readList(values.runs, isRun), Date.parse(values.now ?? new Date().toISOString()))) console.log([cancel.id, cancel.force, cancel.reason, cancel.title].join("\t"));
+  } else if (command === "stalled") {
+    console.log(stalled(readList(values.lanes, isLane), values.landed ?? "", Date.parse(values.now ?? new Date().toISOString())));
+  } else if (command === "loop") {
+    console.log(looping(readList(values.statuses, isText)));
   } else if (command === "judge") {
     console.log(judge(Number(values.count), values.green === "true"));
   } else {
-    console.error("usage: autoland.ts plan --lanes FILE --runs FILE [--retry BRANCHES] | train --lanes FILE | judge --count N --green true|false");
+    console.error("usage: autoland.ts plan --lanes FILE --runs FILE [--retry BRANCHES] | train --lanes FILE | judge --count N --green true|false | sweep --runs FILE [--now ISO] | stalled --lanes FILE --landed ISO [--now ISO] | loop --statuses FILE");
     process.exit(2);
   }
 }

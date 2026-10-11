@@ -8,6 +8,7 @@
 | Background sweeps (smashcraft:.github/workflows/background-sweeps.yml) | each landing (Autoland dispatches it with the landed SHA), push to main, nightly | on `farm-big`: the Bun and Lua32 suites with `SWEEPS=1`, and the per-pair worst-frame census (#405) in 7 fighter shards whose joined pairs must stay within the margin of test/fixtures/perf/census-pairs.txt; a landing's red run goes to the sheriff (see Sheriff) |
 | Playtest (smashcraft:.github/workflows/playtest.yml) | nightly, dispatch with `matches` | plays computer-versus-computer matches across every fighter, stage and computer level on the newest green main, each seed twice to compare state hashes, and opens or updates one issue per finding kind (smashcraft:docs/commands/soak.md) |
 | Autoland (smashcraft:.github/workflows/autoland.yml) | push to `claude/**`, `safe-push --to main`, dispatch with `branch` | main's one landing queue: tests each waiting tip alone at once, lands trains of tips that passed |
+| Autoland sweep (smashcraft:.github/workflows/autoland-sweep.yml) | every 5 minutes, dispatch with `dry-run` | cancels stuck Autoland runs and requeues their lanes; opens the "Autoland stalled" issue while main is idle with lanes pending |
 | Effect upgrade (smashcraft:.github/workflows/effect-upgrade.yml) | Mondays, dispatch | `effect-kit upgrade` and `effect-kit check`; a clean upgrade goes to Autoland, findings to the "Weekly Effect upgrade" issue |
 
 ## Autoland
@@ -20,8 +21,9 @@ landing restarts another's suites.
 
 1. **Queue.** A push marks the branch tip with a pending `autoland` commit
    status ("queued") and starts a plan run.
-2. **Test alone, at once.** A plan run gives every waiting tip its own test
-   run: the tip rebased onto main, the pre-push gate
+2. **Test alone.** A plan run gives each idle test slot the next waiting
+   tip (priority, then arrival); the other tips keep "queued" until a plan
+   finds a slot free, so no run waits on a busy slot. A test run is: the tip rebased onto main, the pre-push gate
    (smashcraft:ts/scripts/prePush.ts) on a scratch `farm/autoland-SHA`
    branch and the farm test workflow, which runs every check main's CI runs.
    Tests run in two slots of one farm run each, outside the landing queue, so
@@ -108,6 +110,31 @@ inside the Codex sandbox or a root service. Start the reviewed timer only after
 its routing is live. The command defaults to observation;
 `--apply` requires checked current main. An explicitly scoped `--probe-run`
 allows only the owned `codex/autoland-job-watchdog` branch.
+
+## Autoland sweep
+
+No laptop service is on the landing path. Every 5 minutes the sweep lists
+the unfinished Autoland runs with their jobs, and `stuckRuns` in
+smashcraft:ts/scripts/autolandCore.ts cancels (force-cancels after 60 min)
+any run where:
+
+- a job waited more than 5 minutes for a self-hosted runner (no runner, or
+  the runner or farm VM went offline), or 20 minutes for a hosted one;
+- a job ran more than 15 minutes (the longest healthy landing job takes
+  about 7);
+- a test run executed more than 30 minutes, or a train or plan more than 45;
+- a test run waited more than 5 minutes for its slot, or another run waited
+  more than 5 minutes with nothing running in its concurrency group.
+
+Once the cancelled runs finish, the sweep dispatches a plan, which tests
+their lanes again in free slots and starts a train for tips that passed.
+A plan refuses a tip already tested alone 3 times (a hang, train-failure or
+retry loop) with a failed status; `-f branch=` retries it. While main has
+been idle for 30 minutes with lanes pending, the sweep dispatches a plan
+every time and opens the "Autoland stalled" issue, comments on it at most
+every 30 minutes, and closes it once main moves. Inject a stall with
+`gh workflow run autoland.yml -f test="BRANCH SHA" -f slot=N -f farm-runner=LABEL`
+(smashcraft#513).
 
 ## Sheriff
 

@@ -18,6 +18,9 @@ on:
       train:
         description: "Set by Autoland: land the tips that passed alone"
         default: ""
+      farm-runner:
+        description: One-off runner label for the suite's even shard jobs, for injecting a stall (smashcraft#513)
+        default: ""
 
 run-name: ${{ github.event_name == 'push' && format('Autoland {0} (push)', github.ref_name) || inputs.test && format('Autoland test {0} {1}', inputs.slot, inputs.test) || inputs.train && 'Autoland train' || inputs.branch && format('Autoland plan {0}', inputs.branch) || 'Autoland plan' }}
 
@@ -246,6 +249,7 @@ jobs:
     uses: ./.github/workflows/farm-test.yml
     with:
       ref: ${{ needs.reports.outputs.sha }}
+      farm-runner: ${{ inputs.farm-runner }}
 
   land:
     needs: [build, reports, suite]
@@ -379,10 +383,22 @@ jobs:
         run: |
           set -euo pipefail
           bash -euo pipefail -c "$FETCH_LANES" > lanes.json
-          gh api "repos/$GH_REPO/actions/workflows/autoland.yml/runs?per_page=100" \
-            --jq "[.workflow_runs[] | select(.status != \"completed\" and .id != $GITHUB_RUN_ID) | {title: .display_title, status}]" > runs.json
+          for state in requested pending waiting queued in_progress; do
+            gh api "repos/$GH_REPO/actions/workflows/autoland.yml/runs?status=$state&per_page=100" \
+              --jq ".workflow_runs[] | select(.id != $GITHUB_RUN_ID) | {title: .display_title, status}"
+          done | jq -s . > runs.json
           bun ts/scripts/autoland.ts plan --lanes lanes.json --runs runs.json --retry "$RETRY" > plan.tsv
           while IFS=$'\t' read -r -u 3 action branch tip slot; do
+            if [ "$action" = test ] && [[ " $RETRY " != *" $branch "* ]]; then
+              gh api "repos/$GH_REPO/commits/$tip/statuses?per_page=100" --jq '[.[] | select(.context == "autoland") | .description]' > statuses.json
+              if [ "$(bun ts/scripts/autoland.ts loop --statuses statuses.json)" = true ]; then
+                why="tested alone 3 times without landing; retry with -f branch=$branch"
+                gh api "repos/$GH_REPO/statuses/$tip" -f state=failure -f context=autoland -f description="${why:0:139}" -f target_url="$RUN_URL" > /dev/null
+                echo "Autoland didn't land \`$branch\` (${tip:0:10}): $why" >> "$GITHUB_STEP_SUMMARY"
+                echo "::error title=Autoland didn't land::$branch (${tip:0:10}): $why"
+                continue
+              fi
+            fi
             if [ "$action" = test ]; then
               gh api "repos/$GH_REPO/statuses/$tip" -f state=pending -f context=autoland -f description="waiting to test alone" -f target_url="$RUN_URL" > /dev/null
               gh workflow run autoland.yml --ref main -f test="$branch $tip" -f slot="$slot"

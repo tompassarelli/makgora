@@ -3,7 +3,8 @@ export const TRAIN_CAP = 4;
 
 export interface Status { readonly state: string; readonly description: string; readonly at: string }
 export interface Lane { readonly branch: string; readonly tip: string; readonly status: Status | null; readonly labels?: readonly string[] }
-export interface Run { readonly title: string; readonly status: string }
+export interface Job { readonly status: string; readonly created: string; readonly started: string | null; readonly labels: readonly string[] }
+export interface Run { readonly title: string; readonly status: string; readonly id?: number; readonly created?: string; readonly jobs?: readonly Job[] }
 
 export const QUEUED = "queued";
 export const WAITING = "waiting to test alone";
@@ -39,15 +40,15 @@ export interface Plan { readonly test: readonly TestOrder[]; readonly train: boo
 
 export function plan(lanes: readonly Lane[], runs: readonly Run[], retry: readonly string[] = []): Plan {
   const retried = new Set(retry);
-  const load = Array.from({ length: TEST_SLOTS }, (_, slot) => runs.filter((run) => run.status !== "completed" && TEST_TITLE.exec(run.title)?.[1] === String(slot)).length);
+  const free = Array.from({ length: TEST_SLOTS }, (_, slot) => slot).filter((slot) => !runs.some((run) => run.status !== "completed" && TEST_TITLE.exec(run.title)?.[1] === String(slot)));
   const test: TestOrder[] = [];
   let passed = false;
   for (const lane of byArrival(lanes)) {
     const state = laneState(lane, runs, retried);
     passed ||= state === "passed";
     if (state !== "test") continue;
-    const slot = load.indexOf(Math.min(...load));
-    load[slot] = (load[slot] ?? 0) + 1;
+    const slot = free.shift();
+    if (slot === undefined) continue;
     test.push({ branch: lane.branch, tip: lane.tip, slot });
   }
   const trainWaiting = runs.some((run) => run.title === TRAIN_TITLE && run.status !== "in_progress" && run.status !== "completed");
@@ -69,3 +70,51 @@ export function judge(lanes: number, green: boolean): Verdict {
   if (green) return "land";
   return lanes === 1 ? "fail" : "retest";
 }
+
+const MINUTE = 60_000;
+export const BOUND = { pending: 5, noRunner: 5, hostedQueue: 20, job: 15, test: 30, run: 45, force: 60, idle: 30 } as const;
+export const LOOP_TESTS = 3;
+const HOSTED = /^(ubuntu|windows|macos)-/;
+
+const minutes = (now: number, at: string): number => (now - Date.parse(at)) / MINUTE;
+const group = (title: string): string => TEST_TITLE.exec(title)?.[1] ?? (title === TRAIN_TITLE ? "train" : title.startsWith("Autoland plan") ? "plan" : title);
+
+export function stuck(run: Run, runs: readonly Run[], now: number): string | undefined {
+  if (run.status === "completed" || run.created === undefined) return undefined;
+  const jobs = run.jobs ?? [];
+  const age = minutes(now, run.created);
+  if (jobs.length === 0) {
+    if (age <= BOUND.pending) return undefined;
+    if (TEST_TITLE.test(run.title)) return `pending ${Math.round(age)} min for its test slot`;
+    const blocked = runs.some((other) => other !== run && other.status !== "completed" && (other.jobs?.length ?? 0) > 0 && group(other.title) === group(run.title));
+    return blocked ? undefined : `pending ${Math.round(age)} min with nothing running in its concurrency group`;
+  }
+  for (const job of jobs) {
+    if (job.status === "queued") {
+      const waited = minutes(now, job.created);
+      const hosted = job.labels.every((label) => HOSTED.test(label));
+      if (waited > (hosted ? BOUND.hostedQueue : BOUND.noRunner)) return `a job waited ${Math.round(waited)} min for a ${job.labels.join(",")} runner`;
+    } else if (job.status === "in_progress" && job.started !== null) {
+      const ran = minutes(now, job.started);
+      if (ran > BOUND.job) return `a job ran ${Math.round(ran)} min`;
+    }
+  }
+  const started = Math.min(...jobs.map((job) => Date.parse(job.created)));
+  const ran = (now - started) / MINUTE;
+  return ran > (TEST_TITLE.test(run.title) ? BOUND.test : BOUND.run) ? `ran ${Math.round(ran)} min` : undefined;
+}
+
+export interface Cancel { readonly id: number; readonly title: string; readonly reason: string; readonly force: boolean }
+
+export function stuckRuns(runs: readonly Run[], now: number): Cancel[] {
+  return runs.flatMap((run) => {
+    const reason = run.id === undefined ? undefined : stuck(run, runs, now);
+    return reason === undefined || run.id === undefined ? [] : [{ id: run.id, title: run.title, reason, force: run.created !== undefined && minutes(now, run.created) > BOUND.force && (run.jobs?.length ?? 0) > 0 }];
+  });
+}
+
+export const stalled = (lanes: readonly Lane[], landed: string, now: number): boolean =>
+  minutes(now, landed) > BOUND.idle && lanes.some((lane) => lane.status?.state === "pending");
+
+export const looping = (descriptions: readonly string[]): boolean =>
+  descriptions.filter((description) => description.startsWith("testing alone on ")).length >= LOOP_TESTS;

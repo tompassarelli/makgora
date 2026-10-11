@@ -1,0 +1,100 @@
+name: Autoland sweep
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: List what the sweep would cancel without cancelling or replanning
+        type: boolean
+        default: false
+
+permissions:
+  actions: write
+  contents: read
+  issues: write
+  statuses: read
+
+concurrency:
+  group: autoland-sweep
+  cancel-in-progress: true
+
+env:
+  GH_TOKEN: ${{ github.token }}
+  GH_REPO: ${{ github.repository }}
+  DRY_RUN: ${{ inputs.dry-run == true }}
+  STALLED_TITLE: Autoland stalled
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: ts/scripts
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.13
+      - run: |
+          set -euo pipefail
+          now=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          for state in requested pending waiting queued in_progress; do
+            gh api "repos/$GH_REPO/actions/workflows/autoland.yml/runs?status=$state&per_page=100" \
+              --jq '.workflow_runs[] | {id, title: .display_title, status, created: .created_at}'
+          done | jq -c . | while read -r run; do
+            case "$(jq -r .status <<< "$run")" in
+              queued | in_progress) gh api "repos/$GH_REPO/actions/runs/$(jq -r .id <<< "$run")/jobs?per_page=100" \
+                --jq '[.jobs[] | {status, created: .created_at, started: .started_at, labels}]' | jq -c --argjson run "$run" '$run + {jobs: .}' ;;
+              *) jq -c '. + {jobs: []}' <<< "$run" ;;
+            esac
+          done | jq -s . > runs.json
+          bun ts/scripts/autoland.ts sweep --runs runs.json --now "$now" > cancel.tsv
+          echo "$(jq length runs.json) unfinished Autoland runs at $now; cancelling $(grep -c . cancel.tsv || true)" >> "$GITHUB_STEP_SUMMARY"
+          cancelled=()
+          while IFS=$'\t' read -r -u 3 id force reason title; do
+            echo "- [$title]($GITHUB_SERVER_URL/$GH_REPO/actions/runs/$id): $reason" >> "$GITHUB_STEP_SUMMARY"
+            [ "$DRY_RUN" = false ] || continue
+            if gh api -X POST "repos/$GH_REPO/actions/runs/$id/$([ "$force" = true ] && echo force-cancel || echo cancel)" > /dev/null; then
+              cancelled+=("$id")
+            else
+              echo "::warning::couldn't cancel run $id"
+            fi
+          done 3< cancel.tsv
+          for _ in $(seq 12); do
+            open=0
+            for id in "${cancelled[@]}"; do
+              [ "$(gh api "repos/$GH_REPO/actions/runs/$id" --jq .status)" = completed ] || open=$((open + 1))
+            done
+            [ "$open" -gt 0 ] || break
+            sleep 10
+          done
+          gh api graphql --paginate -F owner="${GH_REPO%/*}" -F name="${GH_REPO#*/}" -f query='
+            query($owner: String!, $name: String!, $endCursor: String) { repository(owner: $owner, name: $name) {
+            refs(refPrefix: "refs/heads/claude/", first: 100, after: $endCursor) { pageInfo { hasNextPage endCursor }
+            nodes { name target { oid ... on Commit { status { context(name: "autoland") { state description createdAt } } } } } } } }' \
+            --jq '.data.repository.refs.nodes[] | {branch: ("claude/" + .name), tip: .target.oid,
+              status: (.target.status.context | if . == null then null else {state: (.state | ascii_downcase), description, at: .createdAt} end)}' | jq -s . > lanes.json
+          landed=$(gh api "repos/$GH_REPO/activity?ref=refs/heads/main&per_page=1" --jq '.[0].timestamp')
+          stalled=$(bun ts/scripts/autoland.ts stalled --lanes lanes.json --landed "$landed" --now "$now")
+          pending=$(jq '[.[] | select(.status.state == "pending")] | length' lanes.json)
+          echo "main last moved at $landed; $pending lanes pending; stalled: $stalled" >> "$GITHUB_STEP_SUMMARY"
+          [ "$DRY_RUN" = false ] || exit 0
+          if [ "${#cancelled[@]}" -gt 0 ] || [ "$stalled" = true ]; then
+            gh workflow run autoland.yml --ref main
+            echo "Requeued: dispatched an Autoland plan" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          issue=$(gh issue list --state open --search "in:title \"$STALLED_TITLE\"" --json number,title,updatedAt \
+            --jq "[.[] | select(.title == \"$STALLED_TITLE\")][0] // empty")
+          if [ "$stalled" = true ]; then
+            body="Main hasn't moved since $landed with $pending lanes pending. This sweep ($GITHUB_SERVER_URL/$GH_REPO/actions/runs/$GITHUB_RUN_ID) cancelled ${#cancelled[@]} stuck runs and dispatched an Autoland plan. Unfinished runs: $(jq length runs.json)."
+            if [ -z "$issue" ]; then
+              gh issue create --title "$STALLED_TITLE" --body "$body (smashcraft#513)"
+            elif [ $(( $(date -d "$now" +%s) - $(date -d "$(jq -r .updatedAt <<< "$issue")" +%s) )) -ge 1800 ]; then
+              gh issue comment "$(jq -r .number <<< "$issue")" --body "$body"
+            fi
+          elif [ -n "$issue" ]; then
+            gh issue close "$(jq -r .number <<< "$issue")" --comment "Main moved at $landed: Autoland is flowing again."
+          fi
