@@ -8,25 +8,25 @@ const h = (n: number) => f32(HERO_REFERENCE_HEIGHT * f32(n));
 const WATER_SHOT: SpecialProjectile = {
   model: "Abilities\\Weapons\\WaterElementalMissile\\WaterElementalMissile.mdx",
   spawnFrame: 0, offsetX: 15.0, offsetZ: 55.0, velocityX: h(f32(0.1)), velocityZ: 0.0,
-  life: 48, radius: h(f32(0.12)), effect: jainaHit(4.6172003746032715, 35, 76.14242553710938, 20.0), reflectable: true, limit: 3,
+  life: 48, radius: h(f32(0.12)), effect: jainaHit(4.386340141296387, 35, 76.14242553710938, 20.0), reflectable: true, limit: 3,
 };
 const FROSTBOLT: AuthoredSpecial = {
   endFrame: 37, landingLag: 20, hurt: jainaCastBody(13, 22),
   projectiles: [{
     model: "Abilities\\Weapons\\SorceressMissile\\SorceressMissile.mdx",
     spawnFrame: 17, offsetX: h(f32(0.35)), offsetZ: 55.0, velocityX: h(f32(0.12)), velocityZ: 0.0,
-    life: 64, radius: h(f32(0.12)), effect: jainaHit(6.464079856872559, 35, 81.5811767578125, 18.0), reflectable: true, limit: 1,
+    life: 64, radius: h(f32(0.12)), effect: jainaHit(6.140875816345215, 35, 81.5811767578125, 18.0), reflectable: true, limit: 1,
   }],
 };
 const ice = (activeFrom: number, life: number, damage: number): SpecialProjectile => ({
   model: "Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget.mdx",
   spawnFrame: 8, offsetX: h(f32(1.6)), offsetZ: 45.0, velocityX: 0.0, velocityZ: 0.0,
-  life, activeFrom, radius: h(f32(0.55)), effect: jainaHit(damage, 80, damage === 4.6172003746032715 ? 59.826194763183594 : 108.77490234375, 24.0),
+  life, activeFrom, radius: h(f32(0.55)), effect: jainaHit(damage, 80, damage === 4.386340141296387 ? 59.826194763183594 : 108.77490234375, 24.0),
   reflectable: false, limit: 1, cancelOnInterrupt: true, needsLineOfSight: true,
 });
 const BLIZZARD: AuthoredSpecial = {
   endFrame: 48, landingLag: 20, hurt: jainaCastBody(5, 48),
-  projectiles: [ice(21, 40, 4.6172003746032715), ice(45, 48, 7.3875203132629395)],
+  projectiles: [ice(21, 40, 4.386340141296387), ice(45, 48, 7.018144130706787)],
 };
 const blink = (distance: number): AuthoredSpecial => ({
   endFrame: 34, aimFrames: 13,

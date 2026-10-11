@@ -64,7 +64,7 @@ function lowSweep(firstFrame: number, facing: number): readonly MoveRegion[] {
     capsule(f32(18.0 * facing), 14.0, f32(f32(L - BLADE_RADIUS) * facing), 14.0),
     capsule(f32(18.0 * facing), 8.0, f32(f32(L - BLADE_RADIUS) * facing), 8.0),
     capsule(f32(18.0 * facing), 2.0, f32(f32(L - BLADE_RADIUS) * facing), 2.0),
-  ], downSmashHit(hit(13.370000839233398, "EDGE", 25, facing)));
+  ], downSmashHit(hit(12.968900680541992, "EDGE", 25, facing)));
 }
 
 
@@ -136,13 +136,13 @@ const BODY: FighterHurtboxes = {
 export const BLADEMASTER_MOVES: FighterMoves = {
   normals: {
     ...BLADEMASTER_GROUND.normals,
-    [AttackStyle.forwardSmash]: heroMove(17, 3, 32, 0, cut(17, [58.0, 45.0, 32.0], XL, hit(11.977133750915527, "KILL", 40), hit(15.17103385925293, "KILL", 40))),
+    [AttackStyle.forwardSmash]: heroMove(17, 3, 32, 0, cut(17, [58.0, 45.0, 32.0], XL, hit(11.617819786071777, "KILL", 40), hit(14.715903282165527, "KILL", 40))),
     [AttackStyle.upSmash]: heroMove(15, 4, 30, 0, path(15, [
       capsule(16.0, 38.0, 24.0, f32(L - BLADE_RADIUS)),
       capsule(8.0, 38.0, 12.0, f32(L - BLADE_RADIUS)),
       capsule(0.0, 38.0, 0.0, f32(L - BLADE_RADIUS)),
       capsule(-8.0, 38.0, -12.0, f32(L - BLADE_RADIUS)),
-    ], hit(12.775609016418457, "KILL", 90))),
+    ], hit(12.392340660095215, "KILL", 90))),
     [AttackStyle.downSmash]: heroMove(14, 6, 19, 0, [...lowSweep(14, 1.0), ...lowSweep(17, -1.0)]),
 
 
@@ -154,18 +154,18 @@ export const BLADEMASTER_MOVES: FighterMoves = {
         [capsule(-20.0, 35.0, -f32(M - BLADE_RADIUS), 50.0), linkAt(3.0, 30.0, 80)],
       ] },
       { first: 13, last: 15, strikes: [
-        [capsule(20.0, 45.0, BLADE_WHEEL_INNER, 45.0, 10.0), hit(4.790853023529053, "POKE", 50)],
-        [capsule(0.0, 55.0, 0.0, f32(BLADE_WHEEL_INNER + 45.0), 10.0), hit(4.790853023529053, "POKE", 50)],
-        [capsule(-20.0, 45.0, -BLADE_WHEEL_INNER, 45.0, 10.0), hit(4.790853023529053, "POKE", 50, -1.0)],
+        [capsule(20.0, 45.0, BLADE_WHEEL_INNER, 45.0, 10.0), hit(4.647127628326416, "POKE", 50)],
+        [capsule(0.0, 55.0, 0.0, f32(BLADE_WHEEL_INNER + 45.0), 10.0), hit(4.647127628326416, "POKE", 50)],
+        [capsule(-20.0, 45.0, -BLADE_WHEEL_INNER, 45.0, 10.0), hit(4.647127628326416, "POKE", 50, -1.0)],
       ] },
     ])),
-    [AttackStyle.forwardAir]: heroMove(10, 3, 22, 14, cut(10, [60.0, 45.0, 30.0], L, hit(8.78322982788086, "EDGE", 40), hit(11.178657531738281, "EDGE", 40))),
-    [AttackStyle.backAir]: heroMove(8, 3, 23, 13, cut(8, [34.0, 45.0, 56.0], L, hit(9.581706047058105, "KILL", 35, -1.0), undefined, -1.0)),
+    [AttackStyle.forwardAir]: heroMove(10, 3, 22, 14, cut(10, [60.0, 45.0, 30.0], L, hit(8.519732475280762, "EDGE", 40), hit(10.843297958374023, "EDGE", 40))),
+    [AttackStyle.backAir]: heroMove(8, 3, 23, 13, cut(8, [34.0, 45.0, 56.0], L, hit(9.294255256652832, "KILL", 35, -1.0), undefined, -1.0)),
     [AttackStyle.upAir]: heroMove(6, 3, 19, 11, path(6, [
       capsule(0.0, 45.0, 0.0, f32(M - BLADE_RADIUS)),
       capsule(3.0, 45.0, 3.0, f32(M - BLADE_RADIUS)),
       capsule(6.0, 45.0, 6.0, f32(M - BLADE_RADIUS)),
-    ], hit(6.3878045082092285, "LAUNCH", 85))),
+    ], hit(6.196170330047607, "LAUNCH", 85))),
     [AttackStyle.downAir]: bladestorm,
     [AttackStyle.grab]: heroMove(7, 2, 22, 0, path(7, [
       capsule(18.0, 45.0, f32(S - 10.0), 45.0, 10.0),
@@ -175,8 +175,8 @@ export const BLADEMASTER_MOVES: FighterMoves = {
   throws: {
     [GrabAction.pummel]: { contactFrame: 5, totalFrames: 12, effect: { damage: 2.865000009536743, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } },
     [GrabAction.throwForward]: authoredThrow(12, 18, 5.589328765869141, "EDGE", 35),
-    [GrabAction.throwBack]: authoredThrow(15, 22, 6.3878045082092285, "EDGE", 40, -1.0),
-    [GrabAction.throwUp]: authoredThrow(13, 10, 4.790853023529053, "JUGGLE", 85),
+    [GrabAction.throwBack]: authoredThrow(15, 22, 6.196170330047607, "EDGE", 40, -1.0),
+    [GrabAction.throwUp]: authoredThrow(13, 10, 4.647127628326416, "JUGGLE", 85),
     [GrabAction.throwDown]: authoredThrow(16, 20, 3.992377519607544, "CHASE", 25),
   },
   dashAttack: AttackStyle.dashAttack,

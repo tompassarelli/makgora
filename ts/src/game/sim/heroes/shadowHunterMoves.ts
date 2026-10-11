@@ -45,7 +45,7 @@ const GLAIVE_SPINS = [9, 12, 15, 18] as const;
 const GLAIVE_THROW = 21;
 const GLAIVE_REACH = f32(M - BLADE_RADIUS);
 
-const GLAIVE_FLING: Readonly<HitEffect> = { ...hit(3.537719964981079, "EDGE", 25), base: 65.0 };
+const GLAIVE_FLING: Readonly<HitEffect> = { ...hit(3.502342700958252, "EDGE", 25), base: 65.0 };
 const GLAIVE = drillStrikes(-4.0, -80.0, GLAIVE_REACH,
   { centre: linkAt(2.0, 25.0, 20), front: linkAt(2.0, 15.0, 20), back: linkAt(2.0, 35.0, 20) },
   { centre: linkAt(2.0, 25.0, 340), front: linkAt(2.0, 15.0, 340), back: linkAt(2.0, 35.0, 340) });
@@ -105,47 +105,47 @@ export const SHADOW_HUNTER_MOVES: FighterMoves = {
   hurtboxes: SHADOW_HUNTER_BODY,
   normals: {
     ...SHADOW_HUNTER_GROUND.normals,
-    [AttackStyle.forwardSmash]: heroMove(19, 3, 34, 0, chop(19, [85.0, 45.0, 5.0], L, hit(15.919739723205566, "KILL", 40))),
+    [AttackStyle.forwardSmash]: heroMove(19, 3, 34, 0, chop(19, [85.0, 45.0, 5.0], L, hit(15.760541915893555, "KILL", 40))),
     [AttackStyle.upSmash]: heroMove(17, 4, 31, 0, path(17, [
       capsule(10.0, 36.0, 18.0, f32(L - BLADE_RADIUS)),
       capsule(5.0, 36.0, 9.0, f32(L - BLADE_RADIUS)),
       capsule(0.0, 36.0, 0.0, f32(L - BLADE_RADIUS)),
       capsule(-5.0, 36.0, -9.0, f32(L - BLADE_RADIUS)),
-    ], hit(13.266449928283691, "KILL", 90, 1.0, HitElement.normal))),
+    ], hit(13.133785247802734, "KILL", 90, 1.0, HitElement.normal))),
     [AttackStyle.downSmash]: heroMove(16, 5, 21, 0, [
       ...path(16, [
         capsule(20.0, 10.0, f32(M - 10.0), 22.0, 10.0),
         capsule(20.0, 10.0, f32(M - 10.0), 10.0, 10.0),
         capsule(20.0, 10.0, f32(M - 10.0), 0.0, 10.0),
-      ], downSmashHit(hit(13.0, "EDGE", 25, 1.0, HitElement.normal))),
+      ], downSmashHit(hit(12.869999885559082, "EDGE", 25, 1.0, HitElement.normal))),
       ...path(19, [
         capsule(-20.0, 10.0, -f32(M - 10.0), 22.0, 10.0),
         capsule(-20.0, 10.0, -f32(M - 10.0), 0.0, 10.0),
-      ], downSmashHit(hit(13.0, "EDGE", 25, -1.0, HitElement.normal))),
+      ], downSmashHit(hit(12.869999885559082, "EDGE", 25, -1.0, HitElement.normal))),
     ]),
     [AttackStyle.neutralAir]: heroMove(7, 5, 21, 13, [
       ...path(7, [
         capsule(18.0, 32.0, f32(M - BLADE_RADIUS), 32.0),
         capsule(12.0, 50.0, 60.0, 85.0),
         capsule(0.0, 52.0, 0.0, f32(M - BLADE_RADIUS)),
-      ], hit(7.075439929962158, "POKE", 50)),
+      ], hit(7.004685401916504, "POKE", 50)),
       ...path(10, [
         capsule(-12.0, 50.0, -60.0, 85.0),
         capsule(-18.0, 32.0, -f32(M - BLADE_RADIUS), 32.0),
-      ], hit(7.075439929962158, "POKE", 50, -1.0)),
+      ], hit(7.004685401916504, "POKE", 50, -1.0)),
     ]),
-    [AttackStyle.forwardAir]: heroMove(10, 3, 25, 15, chop(10, [65.0, 45.0, 25.0], L, hit(9.728730201721191, "EDGE", 40))),
+    [AttackStyle.forwardAir]: heroMove(10, 3, 25, 15, chop(10, [65.0, 45.0, 25.0], L, hit(9.63144302368164, "EDGE", 40))),
 
     [AttackStyle.backAir]: heroMove(8, 3, 23, 13, path(8, [
       capsule(-12.0, 24.0, -f32(M - 12.0), 30.0, 12.0),
       capsule(-12.0, 28.0, -f32(M - 12.0), 42.0, 12.0),
       capsule(-12.0, 30.0, -f32(M - 12.0), 54.0, 12.0),
-    ], hit(8.844300270080566, "EDGE", 35, -1.0, HitElement.normal))),
+    ], hit(8.755857467651367, "EDGE", 35, -1.0, HitElement.normal))),
     [AttackStyle.upAir]: heroMove(7, 3, 21, 12, path(7, [
       capsule(8.0, 50.0, 18.0, f32(M - BLADE_RADIUS)),
       capsule(0.0, 50.0, 0.0, f32(M - BLADE_RADIUS)),
       capsule(-8.0, 50.0, -18.0, f32(M - BLADE_RADIUS)),
-    ], hit(7.075439929962158, "LAUNCH", 85))),
+    ], hit(7.004685401916504, "LAUNCH", 85))),
     [AttackStyle.downAir]: GLAIVE_DRILL,
     [AttackStyle.grab]: heroMove(8, 2, 24, 0, [heroRegion(8, 9,
       capsule(18.0, 42.0, f32(S - 10.0), 42.0, 10.0),
@@ -153,9 +153,9 @@ export const SHADOW_HUNTER_MOVES: FighterMoves = {
   },
   throws: {
     [GrabAction.pummel]: { contactFrame: 5, totalFrames: 12, effect: { damage: 3.0, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } },
-    [GrabAction.throwForward]: { contactFrame: 12, totalFrames: 32, effect: hit(6.191009998321533, "EDGE", 35, 1.0, HitElement.normal) },
-    [GrabAction.throwBack]: { contactFrame: 16, totalFrames: 40, effect: hit(7.075439929962158, "EDGE", 40, -1.0, HitElement.normal) },
-    [GrabAction.throwUp]: { contactFrame: 14, totalFrames: 22, effect: hit(5.306580066680908, "JUGGLE", 85, 1.0, HitElement.normal) },
-    [GrabAction.throwDown]: { contactFrame: 17, totalFrames: 40, effect: hit(4.422150135040283, "CHASE", 70, 1.0, HitElement.normal) },
+    [GrabAction.throwForward]: { contactFrame: 12, totalFrames: 32, effect: hit(6.1290998458862305, "EDGE", 35, 1.0, HitElement.normal) },
+    [GrabAction.throwBack]: { contactFrame: 16, totalFrames: 40, effect: hit(7.004685401916504, "EDGE", 40, -1.0, HitElement.normal) },
+    [GrabAction.throwUp]: { contactFrame: 14, totalFrames: 22, effect: hit(5.253514289855957, "JUGGLE", 85, 1.0, HitElement.normal) },
+    [GrabAction.throwDown]: { contactFrame: 17, totalFrames: 40, effect: hit(4.377928733825684, "CHASE", 70, 1.0, HitElement.normal) },
   },
 };
