@@ -120,7 +120,7 @@ const monitor = Effect.gen(function*() {
     }
     receipt = { ...receipt, phase: "retry", cancelledAt: completed.find(job => job.id === receipt.jobId)?.completed_at ?? null, retryAt: yield* Clock.currentTimeMillis };
     yield* remember(receipt);
-    yield* gh("api", "--method", "POST", `repos/${repo}/actions/runs/${run.id}/rerun-failed-jobs`);
+    yield* gh("api", "--method", "POST", `repos/${repo}/actions/runs/${run.id}/rerun`);
   }
   const active: TimingRun[] = [];
   for (const name of WATCHED_WORKFLOWS) {

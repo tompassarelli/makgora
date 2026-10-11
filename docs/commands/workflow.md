@@ -75,6 +75,6 @@ its map. Compare the samples from `ts/` with
 Autoland/farm-test job timing cache. `--once` prints measured overruns without
 changing GitHub. After review and landing, `--apply` monitors every 20 seconds,
 cancels only a run containing a running job past twice its comparable median,
-and retries cancelled jobs once on hosted runners. `--help` lists the state
+and retries that qualifying run once on hosted runners. `--help` lists the state
 and isolated probe options. Keep a supervisor responsible for the monitor;
 refresh the baseline daily before it reaches its 24-hour freshness limit.

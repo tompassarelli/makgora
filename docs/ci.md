@@ -83,8 +83,8 @@ Only a job whose status is `in_progress`, whose runner is assigned, and whose
 execution exceeds twice that median can trigger cancellation. Queue age is
 never an execution deadline. The GitHub cancellation API stops the entire
 qualifying run, including healthy sibling jobs; it cannot cancel one job.
-After that run finishes, `rerun-failed-jobs` retries its cancelled jobs on
-hosted runners. Any genuine failed job recorded before or after cancellation
+After that run finishes, the workflow-run `rerun` endpoint retries that
+qualifying run on hosted runners, including its healthy sibling jobs. Any genuine failed job recorded before or after cancellation
 preserves the red result and prevents automatic test retries. Retry attempts
 are excluded from watchdog cancellation, preventing a recovery loop. Atomic
 local receipts track cancellation, notification and retry across restarts.
