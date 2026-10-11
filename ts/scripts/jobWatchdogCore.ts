@@ -35,11 +35,14 @@ export const runnerClass = (job: JobTiming): string => job.labels.some(label => 
 export const timingKey = (workflow: WatchedWorkflow, job: JobTiming): string => `${workflow}:${job.name}:${runnerClass(job)}`;
 export function baselines(history: readonly TimingRun[], now: number): readonly Baseline[] {
   const samples = new Map<string, number[]>();
+  const recorded = new Set<number>();
   const since = now - 7 * 24 * 60 * 60 * 1000;
   for (const run of history) for (const job of run.jobs) {
     if (job.status !== "completed" || !["success", "failure"].includes(job.conclusion ?? "") || !job.runner_name || !job.started_at || !job.completed_at) continue;
     const start = Date.parse(job.started_at), end = Date.parse(job.completed_at);
     if (!Number.isFinite(start) || !Number.isFinite(end) || start < since || end > now || end <= start) continue;
+    if (recorded.has(job.id)) continue;
+    recorded.add(job.id);
     const key = timingKey(run.workflow, job);
     const group = samples.get(key) ?? [];
     group.push(end - start);

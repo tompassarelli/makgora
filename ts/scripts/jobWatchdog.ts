@@ -24,7 +24,7 @@ const command = (program: string, args: readonly string[]) => runProcess(ChildPr
 const gh = (...args: string[]) => command("gh", args);
 const api = <A, I>(path: string, schema: Schema.Codec<A, I>) => gh("api", `repos/${repo}/${path}`).pipe(Effect.flatMap(Schema.decodeEffect(Schema.fromJsonString(schema))));
 const workflow = (path: string): WatchedWorkflow | undefined => WATCHED_WORKFLOWS.find(name => path === `.github/workflows/${name}`);
-const jobs = (id: number) => api(`actions/runs/${id}/jobs?per_page=100&filter=latest`, Schema.Struct({ jobs: Schema.Array(Job), total_count: Schema.Finite })).pipe(
+const jobs = (id: number, attempt?: number) => api(`actions/runs/${id}/${attempt === undefined ? "jobs?per_page=100&filter=latest" : `attempts/${attempt}/jobs?per_page=100`}`, Schema.Struct({ jobs: Schema.Array(Job), total_count: Schema.Finite })).pipe(
   Effect.flatMap(result => result.total_count > 100 ? Effect.fail(new WatchdogFailure({ problem: `run ${id} exceeds the bounded 100-job census` })) : Effect.succeed(result.jobs)),
 );
 const save = <A>(path: string, value: A) => Effect.gen(function*() {
@@ -43,21 +43,32 @@ const refresh = Effect.gen(function*() {
   const known = new Set(history.map(run => `${run.id}:${run.run_attempt}`));
   let requests = 0;
   for (const name of WATCHED_WORKFLOWS) {
-    const pages = yield* gh("api", "--paginate", "--slurp", `repos/${repo}/actions/workflows/${name}/runs?status=completed&per_page=100`).pipe(
-      Effect.flatMap(Schema.decodeEffect(Schema.fromJsonString(Schema.Array(Schema.Struct({ workflow_runs: Schema.Array(Run) }))))),
-    );
-    for (const run of pages.flatMap(page => page.workflow_runs)) {
+    const pages: (typeof Run.Type)[][] = [];
+    for (let page = 1; page <= 20; page++) {
+      if (requests >= 800) return yield* new WatchdogFailure({ problem: "baseline exhausted its total 800 REST request budget" });
+      requests++;
+      const result = yield* api(`actions/workflows/${name}/runs?status=completed&per_page=100&page=${page}`, Schema.Struct({ workflow_runs: Schema.Array(Run) }));
+      pages.push([...result.workflow_runs]);
+      const last = result.workflow_runs.at(-1);
+      if (result.workflow_runs.length < 100 || (last !== undefined && Date.parse(last.created_at) < now - 8 * 24 * 60 * 60 * 1000)) break;
+      if (page === 20) return yield* new WatchdogFailure({ problem: `${name} exceeded its 20-page history budget; no complete baseline claimed` });
+    }
+    for (const run of pages.flat()) {
       if (name === "autoland.yml" && !/^Autoland (test|train)(?: |$)/.test(run.display_title)) continue;
-      if (Date.parse(run.updated_at) < now - 7 * 24 * 60 * 60 * 1000 || known.has(`${run.id}:${run.run_attempt}`)) continue;
-      if (requests >= 780) return yield* new WatchdogFailure({ problem: "baseline exceeded its 780-job-read budget; partial history saved, refresh again before monitoring" });
+      if (Date.parse(run.updated_at) < now - 7 * 24 * 60 * 60 * 1000) continue;
+      for (let attempt = 1; attempt <= run.run_attempt; attempt++) {
+      if (known.has(`${run.id}:${attempt}`)) continue;
+      if (requests >= 800) return yield* new WatchdogFailure({ problem: "baseline exceeded its total 800 REST request budget; partial history saved, refresh again before monitoring" });
       if (requests % 100 === 0) {
+        requests++;
         const limit = yield* gh("api", "rate_limit").pipe(Effect.flatMap(Schema.decodeEffect(Schema.fromJsonString(Schema.Struct({ resources: Schema.Struct({ core: Schema.Struct({ remaining: Schema.Finite }) }) })))));
         if (limit.resources.core.remaining <= 3000) return yield* new WatchdogFailure({ problem: "baseline stopped at shared 3000-call reserve" });
       }
-      history = [...history, { id: run.id, workflow: name, run_attempt: run.run_attempt, status: run.status, jobs: yield* jobs(run.id) }];
+      history = [...history, { id: run.id, workflow: name, run_attempt: attempt, status: run.status, jobs: yield* jobs(run.id, attempt) }];
       requests++;
       yield* save(`${state}/history.json`, history);
-      if (requests % 25 === 0) yield* Console.log(`baseline: ${requests} job reads, ${baselines(history, now).length} comparable groups`);
+      if (requests % 25 === 0) yield* Console.log(`baseline: ${requests} REST requests, ${baselines(history, now).length} comparable groups`);
+      }
     }
   }
   history = history.filter(run => run.jobs.some(job => job.completed_at !== null && Date.parse(job.completed_at) >= now - 7 * 24 * 60 * 60 * 1000));
@@ -76,9 +87,8 @@ const monitor = Effect.gen(function*() {
     receipts = [...receipts.filter(row => row.runId !== receipt.runId), receipt];
     yield* save(`${state}/receipts.json`, receipts);
   });
-  for (let receipt of values.apply ? receipts.filter(row => row.phase !== "done") : []) {
+  for (let receipt of values.apply ? receipts.filter(row => row.phase !== "done" && (values["probe-run"] === undefined || String(row.runId) === values["probe-run"])) : []) {
     const run = yield* api(`actions/runs/${receipt.runId}`, Run);
-    if (run.run_attempt > 1) { yield* remember({ ...receipt, phase: "done" }); continue; }
     if (workflow(run.path) === undefined) return yield* new WatchdogFailure({ problem: `receipt ${receipt.runId} names an unwatched workflow` });
     for (const node of ["smashcraft-lead", "alerts"]) {
       if (receipt.alerted.includes(node)) continue;
@@ -86,6 +96,7 @@ const monitor = Effect.gen(function*() {
       receipt = { ...receipt, alerted: [...receipt.alerted, node] };
       yield* remember(receipt);
     }
+    if (run.run_attempt > 1) { yield* remember({ ...receipt, phase: "done" }); continue; }
     if (run.status !== "completed") {
       const running = yield* jobs(run.id);
       const original = running.find(job => job.id === receipt.jobId);
