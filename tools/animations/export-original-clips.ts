@@ -218,6 +218,11 @@ const typescript = [
     'export function originalClipNamed(character: number, name: string): number | undefined {',
     '  return NAMED.get(character)?.get(name);',
     '}',
+    '',
+    '/** Every original sequence name with its index. */',
+    'export function originalClipNames(character: number): ReadonlyMap<string, number> {',
+    '  return NAMED.get(character) ?? new Map();',
+    '}',
 ];
 const metadataPath = join(project, 'ts/src/game/assets/fighterOriginalClipInfo.ts');
 if (only === undefined) await Bun.write(metadataPath, typescript.join('\n') + '\n');
