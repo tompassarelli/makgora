@@ -15,6 +15,9 @@ import { IMPACT_DEFILE_MODEL } from "../assets/impactAssetInfo";
 import { heroProjectileArt } from "../presentation/projectileArt";
 import { definitiveCues } from "./specialCueEffects";
 
+const DEFILE_DECAY = "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx";
+const DEFILE_FROST = "Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdx";
+
 
 interface Pool {
   readonly path: string;
@@ -68,7 +71,8 @@ export class ProjectilePresentation {
       const fills: number[][] = [];
       const specials = heroDefinition(character)?.specials;
 
-      const drawn = swaps?.[path] ?? path;
+      const defilePool = character === Character.lichKing && specials !== undefined && heroProjectileArt(specials).some(({ spec }) => spec.model === path && spec.pool !== undefined);
+      const drawn = defilePool ? DEFILE_DECAY : swaps?.[path] ?? path;
       const groundPool = specials !== undefined && heroProjectileArt(specials).some(({ spec }) => spec.model === path && spec.pool !== undefined && spec.pool.growth > 0.0);
       for (let slot = 0; slot < size; slot++) {
         effects.push(this.models.length);
@@ -91,7 +95,7 @@ export class ProjectilePresentation {
           const layers: number[] = [];
           for (let layer = 0; layer < (character === Character.lichKing ? 2 : 1); layer++) {
             layers.push(this.models.length);
-            const boundary = AddSpecialEffect(IMPACT_DEFILE_MODEL, origin.x, origin.y);
+            const boundary = AddSpecialEffect(defilePool && layer > 0 ? DEFILE_FROST : IMPACT_DEFILE_MODEL, origin.x, origin.y);
             BlzSetSpecialEffectAnimationBlendTime(boundary, 0.0);
             BlzSetSpecialEffectAnimation(boundary, "stand");
             BlzSetSpecialEffectTime(boundary, 0.0);
@@ -263,11 +267,11 @@ export class ProjectilePresentation {
         }
       }
       if (born && projectile !== undefined && (risen || tell || defile)) {
-        BlzSetSpecialEffectAnimation(model, "birth");
+        BlzSetSpecialEffectAnimation(model, defile ? "stand" : "birth");
         this.serials[slot] = projectile.serial;
         this.specs[slot] = projectile.spec;
       }
-      if (risen || defile) {
+      if (risen) {
         BlzSetSpecialEffectTime(model, f32(0.3));
         BlzSetSpecialEffectTimeScale(model, paused ? 0.0 : this.definitive ? 1.0 : 0.0);
       } else if (tell && projectile?.spec !== undefined) {
@@ -281,6 +285,13 @@ export class ProjectilePresentation {
         BlzSetSpecialEffectTime(model, f32(0.3));
         BlzSetSpecialEffectTimeScale(model, 0.0);
       }
+      if (defile && projectile?.spec !== undefined) {
+        const age = projectile.spec.life - projectile.life;
+        BlzSetSpecialEffectScale(model, f32(pose.dangerRadius / 180.0));
+        BlzSetSpecialEffectTime(model, f32(Math.max(0, age - (projectile.spec.activeFrom ?? 0)) / 60));
+        BlzSetSpecialEffectTimeScale(model, paused ? 0.0 : 1.0);
+        if (!pose.armed) taken[slot] = false;
+      }
       const boundaries = pool?.boundaries[pool.effects.indexOf(slot)] ?? [];
       for (let layer = 0; layer < boundaries.length; layer++) {
         const boundarySlot = boundaries[layer];
@@ -288,18 +299,36 @@ export class ProjectilePresentation {
         if (boundary === undefined || boundarySlot === undefined || pose.dangerRadius <= 0.0) continue;
         taken[boundarySlot] = true;
         parked[boundarySlot] = false;
-        const raised = defile && layer > 0;
-        BlzSetSpecialEffectPosition(boundary, this.origin.x + pose.x, this.origin.y - 8.0, this.origin.z + pose.z + (raised ? f32(f32(0.4) * pose.dangerRadius) : 0.0));
-        BlzSetSpecialEffectScale(boundary, pose.dangerRadius * (raised ? f32(0.9) : 1.0));
-        if (defile) {
+        if (defile && layer > 0 && projectile?.spec?.pool !== undefined) {
+          const age = projectile.spec.life - projectile.life;
+          const pulseFrame = projectile.poolHits > 0 ? projectile.spec.pool.every - 1 - projectile.poolWait : age - (projectile.spec.activeFrom ?? 0);
+          if (!pose.armed || pulseFrame < 0 || pulseFrame > 12) {
+            taken[boundarySlot] = false;
+            continue;
+          }
           BlzResetSpecialEffectMatrix(boundary);
           BlzSetSpecialEffectRoll(boundary, f32(Math.PI * 0.5));
+          BlzSetSpecialEffectPosition(boundary, this.origin.x + pose.x, this.origin.y - 12.0, this.origin.z + pose.z);
+          BlzSetSpecialEffectScale(boundary, f32(pose.dangerRadius / 180.0));
+          BlzSetSpecialEffectColor(boundary, 155, 210, 255);
+          BlzSetSpecialEffectAlpha(boundary, 255);
+          if (!this.visible[boundarySlot]) BlzSetSpecialEffectAnimation(boundary, "birth");
+          BlzSetSpecialEffectTime(boundary, f32(pulseFrame / 60));
+          BlzSetSpecialEffectTimeScale(boundary, paused ? 0.0 : 1.0);
+        } else {
+          BlzSetSpecialEffectPosition(boundary, this.origin.x + pose.x, this.origin.y - 8.0, this.origin.z + pose.z);
+          BlzSetSpecialEffectScale(boundary, pose.dangerRadius);
+          if (defile) {
+            BlzResetSpecialEffectMatrix(boundary);
+            BlzSetSpecialEffectRoll(boundary, f32(Math.PI * 0.5));
+            BlzSetSpecialEffectMatrixScale(boundary, 1.0, f32(1.0 / f32(0.6)), 1.0);
+          }
+          const frost = fighter?.character === Character.lich;
+          BlzSetSpecialEffectColor(boundary, frost || defile ? 155 : pose.armed ? 170 + 85 * pose.poolPulse : 70, frost || defile ? 210 : pose.armed ? 75 + 180 * pose.poolPulse : 65, frost || defile ? 255 : pose.armed ? 255 : 100);
+          BlzSetSpecialEffectAlpha(boundary, pose.armed ? 255 : defile ? 96 : 160);
+          if (!this.visible[boundarySlot]) BlzSetSpecialEffectTime(boundary, 0.0);
+          BlzSetSpecialEffectTimeScale(boundary, 0.0);
         }
-        const frost = fighter?.character === Character.lich;
-        BlzSetSpecialEffectColor(boundary, frost ? 155 : pose.armed ? 170 + 85 * pose.poolPulse : 70, frost ? 210 : pose.armed ? 75 + 180 * pose.poolPulse : 65, frost ? 255 : pose.armed ? 255 : 100);
-        BlzSetSpecialEffectAlpha(boundary, pose.armed ? 255 : 160);
-        if (!this.visible[boundarySlot]) BlzSetSpecialEffectTime(boundary, 0.0);
-        BlzSetSpecialEffectTimeScale(boundary, 0.0);
       }
     }
     for (let index = 0; index < this.models.length; index++) {
