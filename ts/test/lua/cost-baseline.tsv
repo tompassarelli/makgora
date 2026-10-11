@@ -27,7 +27,7 @@ src/game/match/cpuCeilingProfiles.tests.ts	1	154000	1615
 src/game/match/cpuProfileContracts.tests.ts	2	83619000	29716
 src/game/match/cpuProfiles.tests.ts	4	38458000	35448
 src/game/match/edgeRecovery.tests.ts	8	186805000	27731
-src/game/match/frameInput.tests.ts	4	1752000	1812
+src/game/match/frameInput.tests.ts	4	142625000	12081
 src/game/match/grabOptionsContracts.tests.ts	4	14131000	111584
 src/game/match/groundNormalContracts.tests.ts	16	13273000	4754
 src/game/match/hazardsSetting.tests.ts	4	100236000	5371
