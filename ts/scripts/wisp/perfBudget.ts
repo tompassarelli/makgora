@@ -12,7 +12,7 @@ import { WARCRAFT_COST, nativeFrameCost } from "wisp/src/headless/nativeCost";
 
 export const BUDGET_P99_MS = 10;
 export const BUDGET_TOP_MS = 14;
-/** The worst frames a budget averages instead of one worst frame, whose identity moves with any bot choice (#394). */
+export const BUDGET_WORST_MS = 14;
 export const TOP_SHARE = 0.01;
 
 
@@ -53,9 +53,10 @@ export const budget: Command = (args) => Effect.gen(function*() {
   if (clients.length === 0) return yield* new PerfFailure({ problem: `${file} has no frame samples: write it with perf RUN --samples --out FILE` });
   const over: string[] = [];
   for (const client of clients) {
-    yield* Console.log(`p${client.slot} predicted ms per frame over ${client.frames} frames: ${client.p50.toFixed(2)} p50, ${client.p95.toFixed(2)} p95, ${client.p99.toFixed(2)} p99, ${client.top.toFixed(2)} top 1% mean, ${client.worst.toFixed(2)} worst (budget ${p99} p99, ${top} top 1% mean)`);
+    yield* Console.log(`p${client.slot} predicted ms per frame over ${client.frames} frames: ${client.p50.toFixed(2)} p50, ${client.p95.toFixed(2)} p95, ${client.p99.toFixed(2)} p99, ${client.top.toFixed(2)} top 1% mean, ${client.worst.toFixed(2)} worst (budget ${p99} p99, ${top} top 1% mean, ${BUDGET_WORST_MS} worst)`);
     if (client.p99 > p99) over.push(`p${client.slot} p99 ${client.p99.toFixed(2)} ms > ${p99}`);
     if (client.top > top) over.push(`p${client.slot} top 1% mean ${client.top.toFixed(2)} ms > ${top}`);
+    if (client.worst > BUDGET_WORST_MS) over.push(`p${client.slot} worst ${client.worst.toFixed(2)} ms > ${BUDGET_WORST_MS}`);
   }
   if (over.length > 0) return yield* new PerfFailure({ problem: `over the frame budget: ${over.join("; ")}` });
 });

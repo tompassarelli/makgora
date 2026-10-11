@@ -1,13 +1,6 @@
 # Perf
 
-The budget defaults to p99 10 ms and 14 ms for the mean of the worst 1% of
-frames; that older limit remains until the frame-cost work lowers it.
-Acceptance still requires the root’s 10 ms budget, so pass `--p99 10 --top 10`
-explicitly. No bot-run gate reads one worst frame: which frame is worst
-moves whenever a bot's choices change, so those gates read a percentile or
-the worst 1% mean (#394); `perf budget` still prints the worst frame. The
-census plays scripted inputs, so its worst frames hold still and the
-per-pair gate below reads them (#405).
+The #168 budget gates p99 ≤ 10 ms and worst ≤ 14 ms; CI measures Classic with `bun wisp perf playable-bot-four --samples --out CLASSIC.perf` and Definitive with `PERF_LOOK=definitive bun wisp perf playable-bot-four --samples --out DEFINITIVE.perf`, then runs `bun wisp perf budget` on each file. `--top` can additionally tighten the worst 1% mean.
 
 - Frame cost: `LUA=<32-bit lua> bun wisp perf [quick-match|bot|bot-four|playable-bot-four|playable-duel|playable-human-four]`
   plays a run in 32-bit Lua and prints each client's predicted Warcraft cost

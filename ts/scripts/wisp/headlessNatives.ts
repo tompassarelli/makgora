@@ -51,8 +51,8 @@ export const SMASHCRAFT_NOOPS: IntentionalNoops = {
   DisplayCineFilter: "the KO flash's screen filter is local presentation; headless checks do not render the screen",
 };
 
-export const smashcraftNativeBehavior = () => ({
-  GetLocalizedString: (key: string) => key === "SMASHCRAFT_CUE_GRAPHICS" ? "classic" : key,
+export const smashcraftNativeBehavior = (_client?: unknown, look: "classic" | "definitive" = "classic") => ({
+  GetLocalizedString: (key: string) => key === "SMASHCRAFT_CUE_GRAPHICS" ? look : key,
 
   PanCameraToTimed: (x: number, y: number) => SetCameraPosition(x, y),
 

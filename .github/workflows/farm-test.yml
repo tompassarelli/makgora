@@ -332,7 +332,7 @@ jobs:
               check "frame cost within 5% of the committed baseline" sh -c 'bun wisp perf playable-bot-four --samples --out build/playable-bot-four.perf && bun wisp perf compare test/fixtures/perf/playable-bot-four.perf build/playable-bot-four.perf'
               check "focused logic test" env GAME_TESTS=sim/meleeScalarMath bun test test/game.test.ts
               if [ -f build/playable-bot-four.perf ]; then
-                bun wisp perf budget build/playable-bot-four.perf || echo "perf target (#168) not met: reported, not gated (#394)"
+                check "four-fighter p99 <= 10 ms and worst <= 14 ms in both looks" sh -c 'bun wisp perf budget build/playable-bot-four.perf && PERF_LOOK=definitive bun wisp perf playable-bot-four --samples --out build/playable-bot-four-definitive.perf && bun wisp perf budget build/playable-bot-four-definitive.perf'
                 bun scripts/commitMetrics.ts build/playable-bot-four.perf build/playable.lua | tee -a "$GITHUB_STEP_SUMMARY"
               fi ;;
             parity)
