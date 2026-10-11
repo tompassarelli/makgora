@@ -4,13 +4,16 @@ import { captureFrame, createMatchFrameInput } from "../src/game/match/frameInpu
 import { Phase, requestStageSelect, selectCharacter } from "../src/game/match/rules";
 import { startAtGo } from "../src/game/match/testMatch";
 import { IMPACT_DUST, IMPACTS_PER_KIND } from "../src/game/presentation/impactState";
-import { FLOOR_HEIGHT } from "../src/game/presentation/arenaCamera";
+import { cameraPoint, FLOOR_HEIGHT } from "../src/game/presentation/arenaCamera";
 import { ReplayCorrections, ReplayHistory } from "../src/game/replay/history";
+import { MATCH_CAMERA_ASPECT } from "../src/game/sim/matchCamera";
+import { ROSTER_MANA } from "../src/game/sim/mana";
+import { IMPACT_HIT_MODEL } from "../src/game/assets/impactAssetInfo";
 import { AttackStyle, Character } from "../src/game/sim/codes";
 import { SELECTABLE_CHARACTERS } from "../src/game/sim/heroes/registry";
 import { createFighter } from "../src/game/sim/fighter";
 import { soloWorld } from "../src/game/sim/testWorld";
-import { neutralControls } from "../src/game/sim/roster";
+import { copyControls, neutralControls } from "../src/game/sim/roster";
 import { beginFighterAttack } from "../src/game/sim/attacks";
 import { advanceFighter } from "../src/game/sim/step";
 import { advanceFighterPose, createFighterPose } from "../src/game/presentation/fighterPose";
@@ -205,6 +208,58 @@ test("combat effects: rollback, pause/resume and rematch neither replay nor reta
     expect(visible(client, handles).has(animated)).toBe(true);
 
     expect(restarts().filter(({ args }) => args[0] === animated)).toHaveLength(2);
+
+    s.game.remainingFrames = 1;
+    expect(captureFrame(s.frameInput, 2, s.world.mask, s.produced, s.runtime)).toBe(true);
+    applyFrame(s);
+    renderPersistentPresentation(s);
+    confirm(s, 0);
+    confirm(s, 1);
+    expect(requestStageSelect(s.game, 0)).toBe(true);
+    expect(startAtGo(s.game, 0)).toBe(true);
+    startMatch(s);
+    const rifleman = fighterAt(s.world, 1), target = fighterAt(s.world, 0);
+    rifleman.motion.x = 200;
+    rifleman.facing = -1;
+    rifleman.mana.points = ROSTER_MANA.max;
+    target.motion.x = -200;
+    const aimed = new Set<number>(), traced = new Set<number>();
+    const lightningAllocations = client.log.filter(({ name }) => name === "AddLightningEx").length;
+    let flashed = false;
+    for (let tick = 1; tick <= 60; tick++) {
+      for (const input of s.produced.inputs) copyControls(input, neutralControls());
+      s.produced.inputs[1].ultimatePressed = tick === 1;
+      s.produced.inputs[1].attackHeld = tick === 1;
+      s.produced.inputs[1].specialPressed = tick === 1;
+      const before = client.log.length;
+      expect(captureFrame(s.frameInput, tick, s.world.mask, s.produced, s.runtime)).toBe(true);
+      applyFrame(s);
+      renderPersistentPresentation(s);
+      const calls = client.log.slice(before);
+      const aim = calls.find(({ name, args }) => name === "SetLightningColor" && args[1] === 1 && args[2] === 0 && args[3] === 0 && args[4] === 1);
+      const trace = calls.find(({ name, args }) => name === "SetLightningColor" && args[1] === 1 && args[2] === 0.75 && args[3] === 0.25 && args[4] === 1);
+      if (aim !== undefined) aimed.add(rifleman.special.frame);
+      if (trace !== undefined) {
+        traced.add(rifleman.special.frame);
+        const moved = calls.find(({ name, args }) => name === "MoveLightningEx" && args[0] === trace.args[0]);
+        expect(moved).toBeDefined();
+        const x1 = moved?.args[2], z1 = moved?.args[4], x2 = moved?.args[5], z2 = moved?.args[7];
+        if (typeof x1 !== "number" || typeof z1 !== "number" || typeof x2 !== "number" || typeof z2 !== "number") throw new Error("missing tracer segment");
+        const first = cameraPoint(s.camera, MATCH_CAMERA_ASPECT, x1 - s.origin.x, z1 - s.origin.z);
+        const last = cameraPoint(s.camera, MATCH_CAMERA_ASPECT, x2 - s.origin.x, z2 - s.origin.z);
+        expect(Math.min(first.column, last.column)).toBeLessThan(1);
+        expect(Math.max(first.column, last.column)).toBeGreaterThan(0);
+        expect(first.row).toBeGreaterThan(0);
+        expect(first.row).toBeLessThan(1);
+      }
+      flashed ||= client.effectPoses({ visibleOnly: true }).some(pose => pose.model === IMPACT_HIT_MODEL && !hidden(pose));
+    }
+    expect([...aimed]).toEqual(Array.from({ length: 29 }, (_, index) => index + 4));
+    expect([...traced]).toEqual([36, 37, 38, 39, 40, 41]);
+    expect(flashed).toBe(true);
+    expect(target.status.damage).toBeGreaterThan(0);
+    expect(client.log.filter(({ name }) => name === "AddLightningEx")).toHaveLength(lightningAllocations);
+
   });
   expect(client.errors).toEqual([]);
 });

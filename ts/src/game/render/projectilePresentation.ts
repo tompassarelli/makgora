@@ -2,7 +2,8 @@
 
 
 
-import { Character } from "../sim/codes";
+import { Character, SpecialAction } from "../sim/codes";
+import { FIGHTER_ULTIMATES } from "../sim/ultimates";
 import { PROJECTILE_CAPACITY, type Fighter } from "../sim/fighter";
 import { heroDefinition } from "../sim/heroes/registry";
 import { HERO_PROJECTILE_CAP } from "../sim/heroSpecialRules";
@@ -37,11 +38,22 @@ export class ProjectilePresentation {
   private readonly lives: number[] = [];
   private parked: ParkedFlags | undefined;
   private readonly definitive: boolean;
+  private readonly aimedShot: lightning[] = [];
+  private tracerFrame = 0;
+  private tracerX = 0.0;
+  private tracerZ = 0.0;
+  private tracerEnd = 0.0;
+  private tracerFacing = 1;
 
   constructor(
     character: Character,
     private readonly origin: WorldOrigin,
   ) {
+    if (character === Character.rifleman) for (let index = 0; index < 2; index++) {
+      const line = AddLightningEx("LEAS", false, origin.x, origin.y, origin.z - 4096.0, origin.x, origin.y, origin.z - 4096.0);
+      SetLightningColor(line, 1.0, 0.0, 0.0, 0.0);
+      this.aimedShot.push(line);
+    }
     const hero = heroDefinition(character) !== undefined;
     const paths = fighterProjectileModels(character);
     this.definitive = definitiveCues();
@@ -96,6 +108,8 @@ export class ProjectilePresentation {
   }
 
   clear(): void {
+    this.tracerFrame = 0;
+    for (const line of this.aimedShot) SetLightningColor(line, 1.0, 0.0, 0.0, 0.0);
     const parked = (this.parked ??= []);
     for (let index = 0; index < this.models.length; index++) {
       const model = this.models[index];
@@ -125,11 +139,45 @@ export class ProjectilePresentation {
     return -1;
   }
 
+  private presentAimedShot(fighter: Readonly<Fighter> | undefined, playing: boolean): void {
+    const aim = this.aimedShot[0], trace = this.aimedShot[1];
+    if (aim === undefined || trace === undefined) return;
+    const ultimate = fighter !== undefined && playing && !fighter.status.out && fighter.special.action === SpecialAction.heroUltimate;
+    const frame = ultimate && fighter !== undefined ? fighter.special.frame : 0;
+    const shot = FIGHTER_ULTIMATES[Character.rifleman]?.projectiles?.[1];
+    if (fighter !== undefined && ultimate && shot !== undefined) {
+      const x = fighter.motion.x + fighter.facing * shot.offsetX;
+      const z = fighter.motion.z + shot.offsetZ;
+      if (frame >= 4 && frame <= 32) {
+        MoveLightningEx(aim, false, this.origin.x + x, this.origin.y - 12.0, this.origin.z + z, this.origin.x + x + fighter.facing * 1200.0, this.origin.y - 12.0, this.origin.z + z);
+      }
+      if (frame >= shot.spawnFrame && frame < shot.spawnFrame + 6) {
+        if (this.tracerFrame < shot.spawnFrame || frame < this.tracerFrame) {
+          this.tracerX = x;
+          this.tracerZ = z;
+          this.tracerFacing = fighter.facing;
+          this.tracerEnd = Math.abs(shot.velocityX);
+        }
+        const projectile = fighter.projectiles.find(entry => entry.spec === shot && entry.life > 0);
+        if (projectile !== undefined) this.tracerEnd = Math.max(this.tracerEnd, Math.min(360.0, (projectile.x - this.tracerX) * this.tracerFacing));
+        MoveLightningEx(trace, false, this.origin.x + this.tracerX, this.origin.y - 12.0, this.origin.z + this.tracerZ, this.origin.x + this.tracerX + this.tracerFacing * this.tracerEnd, this.origin.y - 12.0, this.origin.z + this.tracerZ);
+      }
+    }
+    SetLightningColor(aim, 1.0, 0.0, 0.0, frame >= 4 && frame <= 32 ? 1.0 : 0.0);
+    SetLightningColor(trace, 1.0, f32(0.75), f32(0.25), shot !== undefined && frame >= shot.spawnFrame && frame < shot.spawnFrame + 6 ? 1.0 : 0.0);
+    this.tracerFrame = frame;
+  }
+
   present(fighter: Readonly<Fighter> | undefined, playing: boolean, paused: boolean): void {
+    this.presentAimedShot(fighter, playing);
     const parked = (this.parked ??= []);
     const taken = this.taken;
     for (let index = 0; index < this.models.length; index++) taken[index] = false;
     for (let index = 0; index < PROJECTILE_CAPACITY; index++) {
+      if (this.aimedShot.length > 0 && fighter?.projectiles[index]?.spec === FIGHTER_ULTIMATES[Character.rifleman]?.projectiles?.[0]) {
+        this.assigned[index] = -1;
+        continue;
+      }
       const pose = projectedProjectile(fighter, index, playing);
       const pool = fighter === undefined || !pose.visible ? undefined : this.poolOf(fighter, index);
       const slot = pool === undefined ? -1 : this.effectFor(pool, index, taken);
@@ -260,6 +308,8 @@ export class ProjectilePresentation {
   destroy(): void {
     this.clear();
     for (const model of this.models) DestroyEffect(model);
+    for (const line of this.aimedShot) DestroyLightning(line);
+    this.aimedShot.length = 0;
     this.models.length = 0;
     this.visible.length = 0;
     this.pools.length = 0;
