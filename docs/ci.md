@@ -4,7 +4,8 @@
 | --- | --- | --- |
 | CI (smashcraft:.github/workflows/ci.yml) | every push except `farm/**` and `claude/**`, pull requests, dispatch | development loop, perf gate, Lua32 suites, and the sweeps the suites skip (Sweeps (Bun), Lua32 (sweeps)); Autoland's dispatch after a landing runs only the smoke job (perf compare and commit metrics), because the farm test already ran every check on that commit |
 | Main is red (smashcraft:.github/workflows/main-red.yml) | after each CI run on main | the sheriff reverts a landing that turned green main red, then opens, updates or closes the "main is red" issue (smashcraft:AGENTS.md) |
-| Farm test (smashcraft:.github/workflows/farm-test.yml) | `bun wisp farm test`, autoland | every check CI runs: full Bun and Lua32 suites with their sweeps, sharded (wisp:docs/farm.md), and the stack trace, parity corpus, tapes and numeric, perf compare, effect-kit, clean room, benchmark and computer coverage checks. Its summary, uploaded even when the run fails or times out, names each failing test (a Lua test with its module), failing check, Lua budget overrun and missing shard |
+| Farm test (smashcraft:.github/workflows/farm-test.yml) | `bun wisp farm test`, autoland | every check CI runs: full Bun and Lua32 suites with their sweeps, sharded (wisp:docs/farm.md), and the stack trace, parity corpus, tapes and numeric, perf compare, effect-kit, clean room, benchmark and computer coverage checks; the census runs after landing in Background sweeps. Its summary, uploaded even when the run fails or times out, names each failing test (a Lua test with its module), failing check, Lua budget overrun and missing shard |
+| Background sweeps (smashcraft:.github/workflows/background-sweeps.yml) | each landing (Autoland dispatches it with the landed SHA), push to main, nightly | on `farm-big`: the Bun and Lua32 suites with `SWEEPS=1`, and the per-pair worst-frame census (#405) in 7 fighter shards whose joined pairs must stay within the margin of test/fixtures/perf/census-pairs.txt; a landing's red run goes to the sheriff (see Sheriff) |
 | Playtest (smashcraft:.github/workflows/playtest.yml) | nightly, dispatch with `matches` | plays computer-versus-computer matches across every fighter, stage and computer level on the newest green main, each seed twice to compare state hashes, and opens or updates one issue per finding kind (smashcraft:docs/commands/soak.md) |
 | Autoland (smashcraft:.github/workflows/autoland.yml) | push to `claude/**`, `safe-push --to main`, dispatch with `branch` | main's one landing queue: tests each waiting tip alone at once, lands trains of tips that passed |
 | Effect upgrade (smashcraft:.github/workflows/effect-upgrade.yml) | Mondays, dispatch | `effect-kit upgrade` and `effect-kit check`; a clean upgrade goes to Autoland, findings to the "Weekly Effect upgrade" issue |
@@ -61,8 +62,8 @@ commit: `gh workflow run autoland.yml -f branch=claude/NAME`.
 
 Everything runs from source: no private build inputs, no `.w3x` build.
 Runner placement comes from the reviewed `ts/runner-routing.json` file. Autoland reports and farm-test
-Bun, Lua32 and census jobs use hosted runners. Balance and background sweeps
-use `farm-big`, preserving the background pool. The `farm-runner` dispatch
+Bun, Lua32 and check jobs use hosted runners (`premerge`). Balance, background
+sweeps and the census use `farm-big` (`background`), preserving the background pool. The `farm-runner` dispatch
 input measures an alternative box for even Bun/Lua jobs on the first attempt;
 retries ignore that override and select the plan's hosted output directly, including
 when the original plan job's outputs are reused. No repository variable
@@ -111,7 +112,11 @@ allows only the owned `codex/autoland-job-watchdog` branch.
 ## Sheriff
 
 Main's last landing doesn't stay on main red. After each CI run on main,
-"Main is red" first runs the sheriff (smashcraft:ts/scripts/sheriff.ts) on it:
+"Main is red" first runs the sheriff (smashcraft:ts/scripts/sheriff.ts) on it.
+The same holds for each Background sweeps run Autoland dispatches for a
+landing: its `main-red` job waits for the sweeps and the census, then
+dispatches the sheriff on that run, so a census regression reverts its landing
+like a red CI step:
 
 - **Revert.** The run failed at a step after setup, and main's previous
   finished CI run was green on an ancestor. Every commit from that green
