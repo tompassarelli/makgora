@@ -142,7 +142,8 @@ any run where:
 - a test run waited more than 5 minutes for its slot, or another run waited
   more than 5 minutes with nothing running in its concurrency group.
 
-Once the cancelled runs finish, the sweep dispatches a plan, which tests
+Once the cancelled runs finish, and on every sweep while lanes are pending
+and no plan is unfinished, the sweep dispatches a plan, which tests
 their lanes again in free slots and starts a train for tips that passed.
 A plan refuses a tip already tested alone 3 times (a hang, train-failure or
 retry loop) with a failed status; `-f branch=` retries it. While main has

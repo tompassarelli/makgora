@@ -103,7 +103,8 @@ jobs:
           pending=$(jq '[.[] | select(.status.state == "pending")] | length' lanes.json)
           echo "main last moved at $landed; $pending lanes pending; stalled: $stalled" >> "$GITHUB_STEP_SUMMARY"
           [ "$DRY_RUN" = false ] || exit 0
-          if [ "${#cancelled[@]}" -gt 0 ] || [ "$stalled" = true ]; then
+          planning=$(jq '[.[] | select(.title | startswith("Autoland plan"))] | length' runs.json)
+          if [ "${#cancelled[@]}" -gt 0 ] || [ "$stalled" = true ] || { [ "$pending" -gt 0 ] && [ "$planning" = 0 ]; }; then
             gh workflow run autoland.yml --ref main
             echo "Requeued: dispatched an Autoland plan" >> "$GITHUB_STEP_SUMMARY"
           fi
