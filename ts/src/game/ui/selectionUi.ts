@@ -264,7 +264,7 @@ export class SelectionPanel {
     const height = BlzGetLocalClientHeight();
     const titleBox = selectionTitleBox(height <= 0 ? f32(4.0 / 3.0) : I2R(BlzGetLocalClientWidth()) / I2R(height));
     const headerBoxLeft = f32(0.05);
-    const headerInset = f32(0.012);
+    const headerInset = f32(0.022);
     const headerLeft = f32(headerBoxLeft + headerInset);
     this.clicks = new ButtonClicks(`ui.selection.${suffix}.click`, (button, clicker) => this.click(button, clicker), button => this.highlight(button));
     const root = BlzCreateFrameByType("FRAME", `MeleeSelectRoot${suffix}`, gameUi(), "", 0);
@@ -330,7 +330,7 @@ export class SelectionPanel {
     placeTopLeft(settingsButton, headerBoxLeft, f32(0.52));
     BlzFrameSetSize(settingsButton, f32(0.235), f32(0.037));
     this.clicks.add(settingsButton, { kind: "settings" });
-    const settingsLabel = label(settingsButton, `MeleeSettingsLabel${suffix}`, headerLeft, f32(0.516), f32(f32(0.235) - 2 * headerInset), f32(0.028), MENU_STYLE.headerSize);
+    const settingsLabel = label(settingsButton, `MeleeSettingsLabel${suffix}`, headerLeft, f32(0.52), f32(f32(0.235) - 2 * headerInset), f32(0.037), MENU_STYLE.headerSize);
     BlzFrameSetTextAlignment(settingsLabel, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
     this.settingsLabel = settingsLabel;
     setFrameText(settingsLabel, `${MENU_STYLE.gold}Controls (F1)|r`);
@@ -359,8 +359,8 @@ export class SelectionPanel {
       return this.clicks.add(frame, target);
     };
     this.modeLabel = page(createText(`MeleeModeLabel${suffix}`, gameUi(), 478 + participantId), titleBox.left, titleBox.top, titleBox.width, titleBox.height);
-    sizeText(this.modeLabel, MENU_STYLE.headerSize, f32(f32(0.295) - 2 * headerInset), titleBox.height);
-    placeTopLeft(this.modeLabel, headerLeft, titleBox.top);
+    sizeText(this.modeLabel, MENU_STYLE.headerSize, f32(f32(0.295) - 2 * headerInset), f32(0.032));
+    placeTopLeft(this.modeLabel, headerLeft, f32(0.555));
     BlzFrameSetTextAlignment(this.modeLabel, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
     BlzFrameSetEnable(this.modeLabel, false);
     this.movesFrames = [
