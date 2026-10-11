@@ -72,6 +72,22 @@ that regenerates the family.
 
 ## Other shared paths
 
+The generation registry in ts/scripts/generated.ts owns docs/move-list.md
+and build/anim-score/{classic,definitive}.tsv. Install, map build and the test
+runner regenerate them only when their input hash changes or output is missing.
+Score hashes cover the scorer and local imported sources, the pinned original
+clip models, judge records, Melee timing references and dependency/toolchain
+pins. An explicit score command with --assets hashes the model bytes it reads;
+fighter selections also participate in its hash. The score commands print the
+same report from the cached table on a hit.
+
+Score entries are optional when the pinned private clip family is absent, as
+on the public farm: generation skips them without writing a table or stamp.
+An explicit anim score command still reports missing private models as a
+failure. Per-model fact shards and build-input family hashes are measured
+inputs, while the per-import map-size and test-cost rows are acceptance
+baselines; those remain tracked and merge independently by model, family or row.
+
 - The LAN pool's ~/.local/state/wisp/lan/ and each client's CustomMapData
   belong to the agent running those clients; Wisp writes game files through
   per-process temporaries.

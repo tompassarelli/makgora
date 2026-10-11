@@ -90,7 +90,7 @@ export const build: Command = (args) => Effect.gen(function*() {
   const playable = options.profile === "playable";
   return yield* decodeBuildOptions(options.args).pipe(
     Effect.flatMap((options) => Effect.gen(function*() {
-      yield* Effect.sync(ensureGenerated);
+      yield* ensureGenerated();
       const { base, container, assets, summon, packager, ...map } = options;
       const declared = base !== undefined && container !== undefined && assets !== undefined && summon !== undefined
         ? { base, container, assets, summon }

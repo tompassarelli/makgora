@@ -1,19 +1,45 @@
-// Files generated from tracked sources instead of committed (#401). Each is
-// rebuilt when a hash of its generator and every local module it imports
-// changes; the hash is stamped under build/generated/. `bun install`, `bun run
-// test` and `wisp map build` run this; `bun scripts/generated.ts` runs it by hand.
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
+import { BunRuntime } from "@effect/platform-bun";
+import { Effect, Schema } from "effect";
 import { MOVE_LIST_PATH, moveListMarkdown } from "./moveList";
+import { INPUTS_STORE, readPins } from "./wisp/buildInputs";
+import type { CommandFailure } from "wisp/scripts/wisp/command";
+import { admit } from "./heavyCapacity";
 
 const tsDirectory = resolve(import.meta.dir, "..");
 const STAMPS = join(tsDirectory, "build/generated");
 
-interface Generated { readonly name: string; readonly generator: string; readonly output: string; readonly produce: () => string }
+export interface Generated {
+  readonly name: string;
+  readonly generator: string;
+  readonly output: string;
+  readonly produce: Effect.Effect<string, CommandFailure>;
+  readonly inputs?: readonly string[];
+  readonly inputHash?: Effect.Effect<string, CommandFailure>;
+  readonly available?: () => boolean;
+}
+
+const scoreInputs = [join(tsDirectory, "../build-inputs/original-clips-static-lights"), join(tsDirectory, "../tools/move-data/anim-score/judge.jsonl"),
+  join(tsDirectory, "../references/melee-frame-data/records.jsonl"), join(tsDirectory, "wisp.lock"), join(tsDirectory, "package.json"), join(tsDirectory, "../typescript-toolchain.lock")];
+
+const scoreAvailable = () => {
+  const hash = readPins()["original-clips-static-lights"];
+  return hash !== undefined && existsSync(join(INPUTS_STORE, "original-clips-static-lights", hash));
+};
 
 export const GENERATED: readonly Generated[] = [
-  { name: "move-list", generator: join(import.meta.dir, "moveList.ts"), output: MOVE_LIST_PATH, produce: moveListMarkdown },
+  { name: "move-list", generator: join(import.meta.dir, "moveList.ts"), output: MOVE_LIST_PATH, produce: Effect.sync(moveListMarkdown) },
+  ...(["classic", "definitive"] as const).map((look): Generated => ({
+    name: `anim-score-${look}`, generator: join(import.meta.dir, "wisp/commands/anim.ts"), output: join(tsDirectory, `../build/anim-score/${look}.tsv`),
+    inputs: scoreInputs, available: scoreAvailable,
+    produce: Effect.promise(() => import("./wisp/commands/anim")).pipe(Effect.flatMap((module) => module.scoreTable(look))),
+  })),
 ];
+
+class GenerationFailure extends Schema.TaggedError<GenerationFailure>()("GenerationFailure", { operation: Schema.String, cause: Schema.String }) {
+  override get message(): string { return `${this.operation}: ${this.cause}`; }
+}
 
 const transpiler = new Bun.Transpiler({ loader: "ts" });
 
@@ -40,23 +66,45 @@ export function sourceHash(entry: string): string {
   return hash.digest("hex");
 }
 
-/** Regenerates every generated file whose inputs changed or whose output is missing; returns the names it wrote. */
-export function ensureGenerated(): string[] {
+export const ensureGenerated = (entries: readonly Generated[] = GENERATED) => Effect.gen(function*() {
   const written: string[] = [];
-  for (const { name, generator, output, produce } of GENERATED) {
+  const sources = new Map<string, string>();
+  for (const { name, generator, output, produce, inputs = [], inputHash, available } of entries) {
+    if (available !== undefined && !available()) continue;
     const stamp = join(STAMPS, `${name}.sha256`);
-    const hash = sourceHash(generator);
-    if (existsSync(output) && existsSync(stamp) && readFileSync(stamp, "utf8").trim() === hash) continue;
-    mkdirSync(dirname(output), { recursive: true });
-    writeFileSync(output, produce());
-    mkdirSync(STAMPS, { recursive: true });
-    writeFileSync(stamp, `${hash}\n`);
+    const hash = yield* Effect.try({
+      try: () => {
+        let source = sources.get(generator);
+        if (source === undefined) { source = sourceHash(generator); sources.set(generator, source); }
+        const digest = new Bun.CryptoHasher("sha256").update(source);
+        for (const path of inputs) digest.update(`${relative(tsDirectory, path)}\0`).update(existsSync(path) ? readFileSync(path) : "missing").update("\n");
+        return digest;
+      },
+      catch: (cause) => new GenerationFailure({ operation: `hash ${name}`, cause: String(cause) }),
+    });
+    if (inputHash !== undefined) hash.update(yield* inputHash);
+    const key = hash.digest("hex");
+    if (existsSync(output) && existsSync(stamp) && readFileSync(stamp, "utf8").trim() === key) continue;
+    const content = yield* produce;
+    yield* Effect.try({
+      try: () => {
+        mkdirSync(dirname(output), { recursive: true });
+        writeFileSync(output, content);
+        mkdirSync(STAMPS, { recursive: true });
+        writeFileSync(stamp, `${key}\n`);
+      },
+      catch: (cause) => new GenerationFailure({ operation: `write ${name}`, cause: String(cause) }),
+    });
     written.push(name);
   }
   return written;
-}
+});
 
 if (import.meta.main) {
-  const written = ensureGenerated();
-  console.log(written.length === 0 ? "generated files are current" : `generated ${written.join(", ")}`);
+  BunRuntime.runMain(Effect.gen(function*() {
+    const admitted = yield* admit("moderate", "smashcraft:generated", 900);
+    if (admitted !== undefined) { process.exitCode = admitted; return; }
+    const written = yield* ensureGenerated();
+    console.log(written.length === 0 ? "generated files are current" : `generated ${written.join(", ")}`);
+  }));
 }

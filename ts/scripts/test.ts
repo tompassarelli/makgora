@@ -22,7 +22,6 @@ import { ensureGenerated } from "./generated";
 const TEST_TIMEOUT_MS = 60_000;
 const project = resolve(import.meta.dir, "..");
 process.chdir(project);
-ensureGenerated();
 const files = [...new Bun.Glob("**/*{.test,_test,.spec,_spec}.{js,jsx,ts,tsx}").scanSync(project)]
   .filter((file) => !file.startsWith("build/") && !file.split("/").some((part) => part === "node_modules" || part === ".git"))
   .sort();
@@ -138,6 +137,7 @@ const suite = Effect.gen(function*() {
 const program = Effect.gen(function*() {
   const admitted = yield* admit("heavy", "smashcraft:test", 1800);
   if (admitted !== undefined) return admitted;
+  yield* ensureGenerated();
   const { value: { results, verdicts }, pressure } = yield* withPressure(suite);
   const failed = results.some((result) => result.code !== 0) || verdicts.includes("failed");
   let inconclusive = verdicts.includes("inconclusive");

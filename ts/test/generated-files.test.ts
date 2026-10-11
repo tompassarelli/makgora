@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { Effect } from "effect";
 import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -7,7 +8,7 @@ import { MODEL_FACTS } from "../scripts/wisp/modelFacts";
 import { MODEL_FACTS_DIRECTORY, modelFactsFile, readModelFacts, writeModelFacts } from "../scripts/wisp/modelFactsTable";
 import { readMapBaseline, writeMapBaseline } from "../scripts/mapSize";
 import { MOVE_LIST_PATH, moveListMarkdown } from "../scripts/moveList";
-import { ensureGenerated } from "../scripts/generated";
+import { GENERATED, ensureGenerated } from "../scripts/generated";
 
 const scratch = () => mkdtempSync(join(tmpdir(), "smashcraft-generated-"));
 
@@ -45,10 +46,11 @@ test("the map size baseline has no total row: its total is its rows' sum [k2 pro
   expect(readMapBaseline(path)).toEqual({ total: 11_000_000, imports: new Map([["a.blp", 4_000_000], ["b.mdx", 6_000_000]]) });
 });
 
-test("the move list is generated from the kit data and regenerated when missing [k5 boundary generated-move-list]", () => {
-  ensureGenerated();
-  expect(ensureGenerated()).toEqual([]);
+test("the move list is generated from the kit data and regenerated when missing [k5 boundary generated-move-list]", async () => {
+  const entries = GENERATED.filter(({ name }) => name === "move-list");
+  await Effect.runPromise(ensureGenerated(entries));
+  expect(await Effect.runPromise(ensureGenerated(entries))).toEqual([]);
   rmSync(MOVE_LIST_PATH);
-  expect(ensureGenerated()).toEqual(["move-list"]);
+  expect(await Effect.runPromise(ensureGenerated(entries))).toEqual(["move-list"]);
   expect(readFileSync(MOVE_LIST_PATH, "utf8")).toBe(moveListMarkdown());
 });
