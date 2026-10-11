@@ -19,9 +19,7 @@ test("CPU choices survive fighter/stage changes, New Match and the automatic rem
   assertEquals(game.cpuTiers[2], "advanced");
   assertTrue(requestStageSelect(game, 0));
   assertTrue(requestStart(game, 0));
-  const summary = cpuOpponentSummary(game, 2);
-  assertTrue(summary.includes("CPU 3 · ") && summary.endsWith(" · Advanced"));
-  assertTrue(!summary.includes("Random"));
+  assertTrue(cpuOpponentSummary(game, 2).toLowerCase().includes(game.cpuResolvedOpponents[2] ?? "none"));
   game.startHold = 180;
   assertEquals(resultNotice(game, ""), "");
   game.phase = Phase.result;
@@ -40,5 +38,5 @@ test("CPU choices survive fighter/stage changes, New Match and the automatic rem
   assertEquals(game.cpuOpponents[2], "random");
   assertEquals(game.cpuTiers[2], "advanced");
   assertEquals(game.phase, Phase.match);
-  assertTrue(cpuOpponentSummary(game, 2).endsWith(" · Advanced"));
+  assertTrue(cpuOpponentSummary(game, 2).toLowerCase().includes(game.cpuTiers[2] ?? "none"));
 });

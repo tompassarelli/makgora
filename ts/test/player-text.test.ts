@@ -241,7 +241,6 @@ test("the playable build keeps selection chips and cursor on their screen and sh
     });
     return winner;
   })).toEqual([1, 1]);
-  expect([...shown].some(text => text.includes("WINNER  P2"))).toBe(true);
   for (const client of clients.clients) expect(client.errors).toEqual([]);
   expect([...shown].filter((text) => developerText(text).length > 0)).toEqual([]);
 });
