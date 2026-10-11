@@ -1,4 +1,6 @@
 import { model as mdx, renumberNodes } from '../../ts/scripts/clipNodes';
+import { removeGeosets } from '../../ts/scripts/groundPlanes';
+import { teamGlowGeosets } from './timeline-geosets';
 import { bounds, onGlobalClock, removeBodyEffects, splitStaticLights, tracks, verifyPreservedBody } from './original-clips';
 
 function clearTrack(model: mdx.Model, path: string): void {
@@ -123,6 +125,7 @@ export function timelineBody(source: mdx.Model, sequences: readonly mdx.Sequence
     renumberNodes(model);
     verifyPreservedBody(source, model);
     preserveNonunitHolds(source, model, sequences);
+    removeGeosets(model, teamGlowGeosets(model));
     tracks(model, (track, path) => { if (track.Keys.length === 0) clearTrack(model, path); });
     return model;
 }

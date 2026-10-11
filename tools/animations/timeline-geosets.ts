@@ -17,10 +17,18 @@ function visibility(model: mdx.Model) {
     };
 }
 
+// Fighters draw as special effects with no player colour, so team glow (replaceable texture 2) renders as white planes (#477).
+export function teamGlowGeosets(model: mdx.Model): Set<number> {
+    return new Set(model.Geosets.flatMap((geoset, index) => model.Materials[geoset.MaterialID].Layers
+        .some(layer => typeof layer.TextureID === 'number' && model.Textures[layer.TextureID]?.ReplaceableId === 2) ? [index] : []));
+}
 
 export function checkTimelineGeosets(source: mdx.Model, body: mdx.Model, sequences: readonly mdx.Sequence[]) {
-    for (const [index, geoset] of source.Geosets.entries()) {
-        const actual = body.Geosets[index];
+    const dropped = teamGlowGeosets(source);
+    const kept = source.Geosets.flatMap((_, index) => dropped.has(index) ? [] : [index]);
+    if (body.Geosets.length !== kept.length) throw new Error(`Timeline body has ${body.Geosets.length} geosets, expected ${kept.length}`);
+    for (const [place, index] of kept.entries()) {
+        const geoset = source.Geosets[index], actual = body.Geosets[place];
         if (actual === undefined || !isDeepStrictEqual(geoset.Vertices, actual.Vertices) || !isDeepStrictEqual(geoset.Faces, actual.Faces)) {
             throw new Error(`Source geoset ${index}/${geoset.Name ?? 'body'} is missing or changed`);
         }
@@ -32,14 +40,14 @@ export function checkTimelineGeosets(source: mdx.Model, body: mdx.Model, sequenc
         if (index < 0) throw new Error(`Unknown source sequence ${sequence.Name}`);
         const [start, end] = sequence.Interval;
         for (let frame = start; ; frame = Math.min(end, frame + 1000 / 60)) {
-            for (let geoset = 0; geoset < source.Geosets.length; geoset++) {
+            for (const [place, geoset] of kept.entries()) {
                 if (!reference(index, frame, geoset)) continue;
-                if (!drawn(0, frame, geoset)) throw new Error(`${sequence.Name}@${frame}: source geoset ${geoset}/${source.Geosets[geoset].Name ?? 'body'} is hidden`);
+                if (!drawn(0, frame, place)) throw new Error(`${sequence.Name}@${frame}: source geoset ${geoset}/${source.Geosets[geoset].Name ?? 'body'} is hidden`);
                 visible++;
             }
             samples++;
             if (frame === end) break;
         }
     }
-    return { geosets: source.Geosets.length, clips: sequences.length, samples, visible };
+    return { geosets: source.Geosets.length, dropped: dropped.size, clips: sequences.length, samples, visible };
 }
