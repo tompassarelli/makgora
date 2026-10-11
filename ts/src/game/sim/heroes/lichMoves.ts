@@ -130,7 +130,7 @@ export const LICH_MOVES: FighterMoves = {
       heroRegion(18, 20, capsule(20.0, 45.0, f32(XL - 7.0), 45.0, 7.0), hit(19.20599937438965, "KILL", 35)),
     ]), 0.25),
     [AttackStyle.upSmash]: heroMove(20, 5, 34, 0, [
-      heroRegion(20, 24, capsule(0.0, 8.0, 0.0, f32(L - 10.0), 10.0), hit(21.19542121887207, "KILL", 90)),
+      heroRegion(20, 24, capsule(0.0, 8.0, 16.0, f32(XL + 10.0), 12.0), hit(21.19542121887207, "KILL", 90)),
     ]),
     [AttackStyle.downSmash]: heroMove(19, 5, 23, 0, [
       heroRegion(19, 23, capsule(24.0, 8.0, f32(L - 10.0), 8.0, 10.0), downSmashHit(hit(14.0, "EDGE", 25))),
@@ -144,7 +144,7 @@ export const LICH_MOVES: FighterMoves = {
       frame(12, capsule(-20.0, 41.0, -f32(M - 8.0), 41.0), hit(14.96147346496582, "KILL", 35, true)),
     ]),
     [AttackStyle.upAir]: heroMove(8, 4, 23, 14, [
-      heroRegion(8, 11, circle(0.0, f32(M - 12.0), 12.0), hit(11.221104621887207, "LAUNCH", 85)),
+      heroRegion(8, 11, capsule(0.0, f32(M - 12.0), 30.0, XL, 12.0), hit(11.221104621887207, "LAUNCH", 85)),
     ]),
     [AttackStyle.downAir]: heroMove(16, 4, 31, 22, [
       heroRegion(16, 19, capsule(0.0, -12.0, 0.0, -f32(M - 10.0), 10.0), hit(14.96147346496582, "SPIKE", 270), hit(14.96147346496582, "SPIKE", 55)),
