@@ -17,7 +17,7 @@ import { definitiveCues } from "./specialCueEffects";
 import { ARENA_CAMERA } from "../presentation/arenaCamera";
 import { cosineTurns, sineTurns } from "../sim/mathTables";
 
-const STATIONARY_PARTICLE_MODELS = [
+export const STATIONARY_PARTICLE_MODELS = [
   "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx",
   "Abilities\\Spells\\Other\\Stampede\\StampedeMissileDeath.mdx",
   "Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireDamage.mdx",
