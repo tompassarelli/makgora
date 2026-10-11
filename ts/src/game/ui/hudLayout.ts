@@ -11,10 +11,10 @@ export const MENU_STYLE = {
   font: MENU_FONT,
   panelTexture: "war3mapImported\\SelectionBackdrop.tga",
   borderTexture: "war3mapImported\\SelectionTileFrame.tga",
-  stageTexture: "war3mapImported\\StageBackdrop.tga",
   titleSize: f32(0.024),
   headerSize: f32(0.012),
   bodySize: f32(0.010),
+  bodyInset: f32(0.02),
   gold: "|cffffcc00",
   text: "|cffd9e4eb",
 } as const;

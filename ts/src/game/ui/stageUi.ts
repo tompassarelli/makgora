@@ -50,6 +50,8 @@ function stageButton(parent: framehandle, x: number, y: number, width: number, h
   placeTopLeft(control, x, y);
   BlzFrameSetSize(control, width, height);
   setFrameText(control, text);
+  BlzFrameSetFont(control, MENU_STYLE.font, MENU_STYLE.headerSize, 0);
+  BlzFrameSetFont(BlzGetFrameByName("ScriptDialogButtonText", 0), MENU_STYLE.font, MENU_STYLE.headerSize, 0);
   return control;
 }
 
@@ -87,9 +89,10 @@ export class StagePanel {
     const root = BlzCreateFrameByType("FRAME", "MeleeStageRoot", gameUi(), "", 0);
     this.root = root;
     this.backdrop = createBackdrop("MeleeStageBackdrop", consoleUi(), 800);
-    BlzFrameSetTexture(this.backdrop, MENU_STYLE.stageTexture, 0, false);
+    BlzFrameSetTexture(this.backdrop, MENU_STYLE.panelTexture, 0, false);
     coverScreen(this.backdrop);
-    this.ruleLabel = stageText(root, "MeleeStageRules", f32(0.41), f32(0.575), f32(0.35), f32(0.025), MENU_STYLE.headerSize, "");
+    stageText(root, "MeleeStageTitle", f32(0.045), f32(0.575), f32(0.325), f32(0.034), MENU_STYLE.titleSize, `${MENU_STYLE.gold}STAGE SELECT|r`);
+    this.ruleLabel = stageText(root, "MeleeStageRules", f32(0.41), f32(0.575), f32(0.35), f32(0.034), MENU_STYLE.headerSize, "");
     this.preview = new StageCard(root, "MeleeStagePreview", f32(0.042), f32(0.445), f32(0.372), 0.25, false);
     this.previewName = stageText(root, "MeleeStagePreviewName", f32(0.045), f32(0.19), f32(0.37), f32(0.036), f32(0.022), "");
     this.previewDescription = stageText(root, "MeleeStageDescription", f32(0.045), f32(0.148), f32(0.36), f32(0.05), f32(0.011), "");

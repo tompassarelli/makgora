@@ -321,12 +321,12 @@ export class SelectionPanel {
     art(root, `MeleeConfirmArt${suffix}`, "war3mapImported\\SelectionAction.tga", f32(0.071), f32(0.043), f32(0.235), f32(0.037));
     this.confirm = label(root, `MeleeConfirmLabel${suffix}`, f32(0.079), f32(0.039), f32(0.219), f32(0.028), f32(0.011));
     this.clicks.add(hotspot(root, f32(0.071), f32(0.043), f32(0.235), f32(0.037)), { kind: "start" });
-    art(root, `MeleeSettingsArt${suffix}`, "war3mapImported\\SelectionAction.tga", f32(0.055), f32(0.52), f32(0.235), f32(0.037));
+    art(root, `MeleeSettingsArt${suffix}`, "war3mapImported\\SelectionAction.tga", f32(0.05), f32(0.52), f32(0.235), f32(0.037));
     const settingsButton = BlzCreateFrameByType("BUTTON", `MeleeSettingsButton${suffix}`, root, "", 0);
-    placeTopLeft(settingsButton, f32(0.055), f32(0.52));
+    placeTopLeft(settingsButton, f32(0.05), f32(0.52));
     BlzFrameSetSize(settingsButton, f32(0.235), f32(0.037));
     this.clicks.add(settingsButton, { kind: "settings" });
-    const settingsLabel = label(settingsButton, `MeleeSettingsLabel${suffix}`, f32(0.063), f32(0.516), f32(0.219), f32(0.028), MENU_STYLE.headerSize);
+    const settingsLabel = label(settingsButton, `MeleeSettingsLabel${suffix}`, f32(0.058), f32(0.516), f32(0.219), f32(0.028), MENU_STYLE.headerSize);
     this.settingsLabel = settingsLabel;
     setFrameText(settingsLabel, `${MENU_STYLE.gold}Controls (F1)|r`);
     this.delayLine = label(root, `MeleeDelayLine${suffix}`, f32(0.36), f32(0.6), f32(0.42), f32(0.03), f32(0.010));
@@ -391,6 +391,7 @@ export class SelectionPanel {
       BlzFrameSetSize(frame, box.width, box.height);
       setFrameText(frame, text);
       BlzFrameSetFont(frame, MENU_STYLE.font, MENU_STYLE.headerSize, 0);
+      BlzFrameSetFont(BlzGetFrameByName("ScriptDialogButtonText", 0), MENU_STYLE.font, MENU_STYLE.headerSize, 0);
       return this.clicks.add(frame, target);
     };
     const { fewerStocks, moreStocks, lessTime, moreTime, endless, automaticRematch } = RULE_BUTTONS;
@@ -844,7 +845,7 @@ export class SelectionPanel {
       placeTopLeft(
         frames.chip,
         carried ? carriedChipLeft(x, size) : ready ? chipX(this.roster.grid, slot, chipChoice) : cardX(slot) + f32(0.096),
-        carried ? carriedChipTop(y, size) : ready ? chipY(this.roster.grid, slot, chipChoice) : f32(0.135),
+        carried ? carriedChipTop(y, size) : ready ? chipY(this.roster.grid, slot, chipChoice) : f32(0.2),
       );
     }
     this.showHand(pinching && width > 0 && height > 0 && !settingsOpen && !this.tutorialOpen, x, y);

@@ -47,8 +47,8 @@ export class PauseMenu {
     this.controlsTitle = label("SmashcraftPauseControlsTitle", f32(0.20), f32(0.023), MENU_STYLE.headerSize);
     BlzFrameSetText(this.controlsTitle, `${MENU_STYLE.gold}Controls|r`);
     this.controls = label("SmashcraftPauseControls", f32(0.174), f32(0.13), MENU_STYLE.bodySize);
-    placeTopLeft(this.controls, f32(0.10), f32(0.174));
-    BlzFrameSetSize(this.controls, f32(0.60), f32(0.13));
+    placeTopLeft(this.controls, f32(f32(0.08) + MENU_STYLE.bodyInset), f32(0.174));
+    BlzFrameSetSize(this.controls, f32(f32(0.64) - 2 * MENU_STYLE.bodyInset), f32(0.13));
     BlzFrameSetVisible(this.root, false);
   }
 
