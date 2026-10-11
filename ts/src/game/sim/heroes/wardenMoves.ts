@@ -9,6 +9,7 @@ import { strongHit } from "../strongHits";
 import { type FighterHurtboxes, type HurtPart, type HurtPose, hurtPart, hurtPose } from "../hurtboxes";
 import { type Strike, drillStrikes, linkAt, multiHit } from "./multiHit";
 import { type Angle, capsuleOf, makeHit, path } from "./authoring";
+import { wardenSpinBlade, wardenSpinSectors } from "./wardenSpin";
 
 
 const S = f32(HERO_REFERENCE_HEIGHT * f32(0.55));
@@ -51,6 +52,19 @@ function cut(first: number, heights: readonly number[], reach: number, inner: Re
     }
     const innerEnd = tip === undefined ? end : boundary;
     regions.push(heroRegion(frame, frame, blade(f32(18.0 * facing), zAt(18.0), f32(innerEnd * facing), zAt(innerEnd)), inner));
+  }
+  return regions;
+}
+
+/** One blade per 45-degree sector the spinning tip passes through on each active frame. */
+function spin(first: number, active: number, effect: Readonly<HitEffect>): readonly MoveRegion[] {
+  const regions: MoveRegion[] = [];
+  for (let frame = 0; frame < active; frame++) {
+    const [from, to] = wardenSpinSectors(frame, active);
+    for (let sector = from; sector <= to; sector++) {
+      const { x1, z1, x2, z2 } = wardenSpinBlade(sector, 18.0, f32(M - BLADE_RADIUS));
+      regions.push(heroRegion(first + frame, first + frame, blade(x1, z1, x2, z2), effect));
+    }
   }
   return regions;
 }
@@ -106,13 +120,7 @@ const NORMALS: { readonly [style: number]: AuthoredMove | undefined } = {
         blade(-18.0, 4.0, -f32(M - BLADE_RADIUS), 4.0),
       ], downSmashHit(wardenHit(12.0, "EDGE", 25, -1.0))),
     ]),
-    [AttackStyle.neutralAir]: heroMove(5, 5, 18, 10, path(5, [
-      blade(18.0, 35.0, f32(M - BLADE_RADIUS), 35.0),
-      blade(12.0, 50.0, 62.0, 85.0),
-      blade(0.0, 52.0, 0.0, f32(M - BLADE_RADIUS)),
-      blade(-12.0, 50.0, -62.0, 85.0),
-      blade(-18.0, 35.0, -f32(M - BLADE_RADIUS), 35.0),
-    ], wardenHit(4.579607963562012, "POKE", 50))),
+    [AttackStyle.neutralAir]: heroMove(5, 5, 18, 10, spin(5, 5, wardenHit(4.579607963562012, "POKE", 50))),
     [AttackStyle.forwardAir]: heroMove(8, 3, 20, 12, cut(8, [64.0, 45.0, 26.0], M, wardenHit(7.6326799392700195, "EDGE", 40))),
 
     [AttackStyle.backAir]: heroMove(7, 3, 22, 12, [

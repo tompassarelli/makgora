@@ -54,7 +54,8 @@
     "test/projectile-rules.test.ts",
     "test/rifleman-blaster.test.ts",
     "test/tavern-gameplans.test.ts",
-    "test/text-match.test.ts"
+    "test/text-match.test.ts",
+    "test/warden-spin.test.ts"
   ],
   "exclude": [
     "src/platform/**",
