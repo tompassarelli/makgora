@@ -51,7 +51,7 @@ import {
   updateSelectionDrag,
 } from "../menu/selectionDrag";
 import { cellRect, rosterGrid } from "../menu/selectionGrid";
-import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE, type TextBox } from "./hudLayout";
+import { MENU_FONT, MENU_STYLE, NATIVE_TEXT_BASE, PANEL_TEXTURE, type TextBox } from "./hudLayout";
 import { MOVES_BODY_BOX, MOVES_BUTTON_HEIGHT, MOVES_BUTTON_TOP, MOVES_TITLE_BOX, selectionTitleBox } from "./selectionLayout";
 import { PLAYABLE_CHARACTERS, fighterName, fighterPortrait, nextSelectableCharacter } from "../sim/heroes/registry";
 import {
@@ -150,7 +150,9 @@ function art(parent: framehandle, name: string, texture: string, x: number, y: n
 function label(parent: framehandle, name: string, x: number, y: number, width: number, height: number, size: number): framehandle {
   const frame = createText(name, parent, 0);
   placeTopLeft(frame, x, y);
-  BlzFrameSetSize(frame, width, height);
+  const scale = f32(size / NATIVE_TEXT_BASE);
+  BlzFrameSetScale(frame, scale);
+  BlzFrameSetSize(frame, f32(width / scale), f32(height / scale));
   BlzFrameSetFont(frame, MENU_FONT, size, 0);
   BlzFrameSetTextAlignment(frame, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
   BlzFrameSetEnable(frame, false);
@@ -262,6 +264,9 @@ export class SelectionPanel {
     private readonly controls: MenuControls,
   ) {
     const suffix = I2S(participantId);
+    const height = BlzGetLocalClientHeight();
+    const titleBox = selectionTitleBox(height <= 0 ? f32(4.0 / 3.0) : I2R(BlzGetLocalClientWidth()) / I2R(height));
+    const headerLeft = f32(titleBox.left + f32(0.006));
     this.clicks = new ButtonClicks(`ui.selection.${suffix}.click`, (button, clicker) => this.click(button, clicker), button => this.highlight(button));
     const root = BlzCreateFrameByType("FRAME", `MeleeSelectRoot${suffix}`, gameUi(), "", 0);
     this.root = root;
@@ -282,7 +287,7 @@ export class SelectionPanel {
       const tilePortraitFrame = art(root, `MeleeTilePortrait${name}`, portraitTexture(PLAYABLE_CHARACTERS[choice], true), x + f32(0.0125) * scale + inset, y - f32(0.013) * scale - inset, portrait, portrait);
       const fighter = PLAYABLE_CHARACTERS[choice] ?? Character.rifleman;
       const text = TILE_NAMES[fighter] ?? nameText(fighter);
-      const tileName = label(root, `MeleeTileName${name}`, x + f32(0.002) * scale, y - f32(0.106) * scale, f32(0.108) * scale, f32(0.023) * scale, f32(0.0064) * scale);
+      const tileName = label(root, `MeleeTileName${name}`, x + f32(0.002) * scale, y - f32(0.106) * scale, f32(0.108) * scale, f32(0.023) * scale, NATIVE_TEXT_BASE);
       setFrameText(tileName, text);
       this.tiles.push([tileFrame, tilePortraitFrame, tileName]);
       const button = BlzCreateFrameByType("BUTTON", `MeleeTileButton${name}`, root, "", 0);
@@ -321,12 +326,13 @@ export class SelectionPanel {
     art(root, `MeleeConfirmArt${suffix}`, "war3mapImported\\SelectionAction.tga", f32(0.071), f32(0.043), f32(0.235), f32(0.037));
     this.confirm = label(root, `MeleeConfirmLabel${suffix}`, f32(0.079), f32(0.039), f32(0.219), f32(0.028), f32(0.011));
     this.clicks.add(hotspot(root, f32(0.071), f32(0.043), f32(0.235), f32(0.037)), { kind: "start" });
-    art(root, `MeleeSettingsArt${suffix}`, "war3mapImported\\SelectionAction.tga", f32(0.05), f32(0.52), f32(0.235), f32(0.037));
+    art(root, `MeleeSettingsArt${suffix}`, "war3mapImported\\SelectionAction.tga", headerLeft, f32(0.52), f32(0.235), f32(0.037));
     const settingsButton = BlzCreateFrameByType("BUTTON", `MeleeSettingsButton${suffix}`, root, "", 0);
-    placeTopLeft(settingsButton, f32(0.05), f32(0.52));
+    placeTopLeft(settingsButton, headerLeft, f32(0.52));
     BlzFrameSetSize(settingsButton, f32(0.235), f32(0.037));
     this.clicks.add(settingsButton, { kind: "settings" });
-    const settingsLabel = label(settingsButton, `MeleeSettingsLabel${suffix}`, f32(0.058), f32(0.516), f32(0.219), f32(0.028), MENU_STYLE.headerSize);
+    const settingsLabel = label(settingsButton, `MeleeSettingsLabel${suffix}`, headerLeft, f32(0.516), f32(0.219), f32(0.028), MENU_STYLE.headerSize);
+    BlzFrameSetTextAlignment(settingsLabel, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
     this.settingsLabel = settingsLabel;
     setFrameText(settingsLabel, `${MENU_STYLE.gold}Controls (F1)|r`);
     this.delayLine = label(root, `MeleeDelayLine${suffix}`, f32(0.36), f32(0.6), f32(0.42), f32(0.03), f32(0.010));
@@ -353,12 +359,13 @@ export class SelectionPanel {
       setFrameText(frame, text);
       return this.clicks.add(frame, target);
     };
-    const height = BlzGetLocalClientHeight();
-    const titleBox = selectionTitleBox(height <= 0 ? f32(4.0 / 3.0) : I2R(BlzGetLocalClientWidth()) / I2R(height));
     this.modeLabel = page(createText(`MeleeModeLabel${suffix}`, gameUi(), 478 + participantId), titleBox.left, titleBox.top, titleBox.width, titleBox.height);
     BlzFrameSetFont(this.modeLabel, MENU_STYLE.font, MENU_STYLE.headerSize, 0);
-    placeTopLeft(this.modeLabel, titleBox.left + f32(0.006), titleBox.top);
-    BlzFrameSetTextAlignment(this.modeLabel, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
+    const headerScale = f32(MENU_STYLE.headerSize / NATIVE_TEXT_BASE);
+    BlzFrameSetScale(this.modeLabel, headerScale);
+    BlzFrameSetSize(this.modeLabel, f32(titleBox.width / headerScale), f32(titleBox.height / headerScale));
+    placeTopLeft(this.modeLabel, headerLeft, titleBox.top);
+    BlzFrameSetTextAlignment(this.modeLabel, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
     BlzFrameSetEnable(this.modeLabel, false);
     this.movesFrames = [
       this.movesTitle, this.movesBody,

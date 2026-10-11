@@ -4,6 +4,7 @@
 import { f32 } from "wisp/src/sim/f32";
 
 
+export const NATIVE_TEXT_BASE = f32(0.0085);
 export const MENU_FONT = "Fonts\\FRIZQT__.TTF";
 /** The dark tooltip backing behind every menu panel, readout and meter. */
 export const PANEL_TEXTURE = "UI\\Widgets\\ToolTips\\Human\\human-tooltip-background.blp";
