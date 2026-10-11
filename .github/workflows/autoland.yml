@@ -169,27 +169,78 @@ jobs:
           out scratch "$scratch"
           out verdict test
 
-  suite:
+  # Lanes never regenerate whole-roster reports: the candidate's are rebuilt here on the farm and land with it as one more commit.
+  reports:
     needs: build
-    if: needs.build.outputs.verdict == 'test'
+    if: needs.build.outputs.verdict == 'test' || needs.build.outputs.verdict == 'tested'
+    runs-on: ${{ vars.FARM_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 30
+    outputs:
+      verdict: ${{ steps.reports.outputs.verdict }}
+      sha: ${{ steps.reports.outputs.sha }}
+      detail: ${{ steps.reports.outputs.detail }}
+    env:
+      VERDICT: ${{ needs.build.outputs.verdict }}
+      SCRATCH: ${{ needs.build.outputs.scratch }}
+      BRANCHES: ${{ needs.build.outputs.branches }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.sha }}
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.13
+      - run: bun install --frozen-lockfile
+        working-directory: ts
+      - id: reports
+        run: |
+          set -euo pipefail
+          out() { echo "$1=$2" >> "$GITHUB_OUTPUT"; }
+          reports=(tools/move-data/advantage-state.jsonl tools/move-data/advantage-state.md)
+          started=$(date +%s)
+          (cd ts && bun scripts/wisp.ts combos --advantage --jobs "$(( $(nproc) < 26 ? $(nproc) : 26 ))") 2>&1 | tail -40 | tee reports.log
+          echo "Regenerated ${reports[*]} on $(nproc) cores in $(( $(date +%s) - started )) s" >> "$GITHUB_STEP_SUMMARY"
+          if (cd ts && bun test test/advantage-state.test.ts) > targets.log 2>&1; then
+            out verdict "$VERDICT"
+          else
+            cat targets.log
+            out verdict targets
+            { echo "detail<<AUTOLAND_EOF"; tail -30 targets.log; echo "AUTOLAND_EOF"; } >> "$GITHUB_OUTPUT"
+          fi
+          if git diff --quiet -- "${reports[@]}"; then
+            echo "The reports were already current." >> "$GITHUB_STEP_SUMMARY"
+            out sha "$(git rev-parse HEAD)"
+            exit 0
+          fi
+          { echo "Changed rows (old → new):"; echo '```diff'; git diff -U0 -- tools/move-data/advantage-state.md | grep -E '^[-+]\|' | head -200; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898183+github-actions[bot]@users.noreply.github.com"
+          git commit -q -m "Regenerate reports for $(echo $BRANCHES)" -- "${reports[@]}"
+          git push -q origin "HEAD:refs/heads/$SCRATCH"
+          out sha "$(git rev-parse HEAD)"
+
+  suite:
+    needs: [build, reports]
+    if: needs.reports.outputs.verdict == 'test'
     uses: ./.github/workflows/farm-test.yml
     with:
-      ref: ${{ needs.build.outputs.sha }}
+      ref: ${{ needs.reports.outputs.sha }}
 
   land:
-    needs: [build, suite]
+    needs: [build, reports, suite]
     if: ${{ !cancelled() && needs.build.result == 'success' && needs.build.outputs.verdict != 'none' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
-      VERDICT: ${{ needs.build.outputs.verdict }}
-      SHA: ${{ needs.build.outputs.sha }}
+      VERDICT: ${{ needs.reports.outputs.verdict || needs.build.outputs.verdict }}
+      REPORTS: ${{ needs.reports.result }}
+      SHA: ${{ needs.reports.outputs.sha || needs.build.outputs.sha }}
       TREE: ${{ needs.build.outputs.tree }}
       BASE: ${{ needs.build.outputs.base }}
       SCRATCH: ${{ needs.build.outputs.scratch }}
       BRANCHES: ${{ needs.build.outputs.branches }}
       TIPS: ${{ needs.build.outputs.tips }}
-      DETAIL: ${{ needs.build.outputs.detail }}
+      DETAIL: ${{ needs.reports.outputs.detail || needs.build.outputs.detail }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -214,7 +265,11 @@ jobs:
           status() { gh api "repos/$GH_REPO/statuses/$1" -f state="$2" -f context=autoland -f description="${3:0:139}" -f target_url="$RUN_URL" > /dev/null; }
           git fetch -q origin '+refs/heads/claude/*:refs/remotes/origin/claude/*'
           why=""; failed=""
-          if [ "$VERDICT" = check ]; then
+          if [ "$REPORTS" != success ] && [ "$REPORTS" != skipped ]; then
+            why="regenerating the reports ended without a result"
+          elif [ "$VERDICT" = targets ]; then
+            why="the regenerated advantage state misses targets in docs/gameplay-design.md (Advantage state, Combo structure)"; failed=$(printf '```\n%s\n```' "$DETAIL")
+          elif [ "$VERDICT" = check ]; then
             why="the checks failed"; failed=$(printf '```\n%s\n```' "$DETAIL")
           elif [ "$VERDICT" = test ] && [ ! -f candidate/summary.json ]; then
             why="the suite run ended without a result"

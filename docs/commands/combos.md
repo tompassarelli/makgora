@@ -9,4 +9,6 @@
   heavy target with and without DI, its forced knockdown and tech-chase
   coverage, tech trap and juggle, and writes
   smashcraft:tools/move-data/advantage-state.md against the targets in
-  smashcraft:docs/gameplay-design.md, "Advantage state" (#388).
+  smashcraft:docs/gameplay-design.md, "Advantage state" (#388). Autoland
+  regenerates the whole roster for every landing (docs/ci.md#autoland); run
+  only `--fighter NAME` locally to inspect a change.

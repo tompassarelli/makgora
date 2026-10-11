@@ -1,13 +1,13 @@
 import { expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { type AdvantageRow } from "../scripts/advantageState";
+import { type AdvantageRow, unmet } from "../scripts/advantageState";
 
 const rows = (): AdvantageRow[] => readFileSync(join(import.meta.dir, "../../tools/move-data/advantage-state.jsonl"), "utf8").split("\n").filter((line) => line !== "").map((line) => JSON.parse(line));
 
-test("no throw is a true zero-to-death: none takes a stock below 60%, strings stay within two follow-ups and 30% against the escape-optimal DI, and every fighter's tech chase ends in a read [k3 measure #388]", () => {
+test("every fighter meets each advantage state target and no throw is a true zero-to-death: none takes a stock below 60%, strings stay within two follow-ups and 30% against the escape-optimal DI, and every fighter's tech chase ends in a read [k3 measure #388]", () => {
   const all = rows();
-  expect(all.flatMap((row) => row.zeroToDeath.map((problem) => `${row.fighter} ${row.target}: ${problem}`))).toEqual([]);
+  expect(all.flatMap((row) => unmet(row).map((problem) => `${row.fighter} ${row.target}: ${problem}`))).toEqual([]);
   const cells = all.flatMap((row) => row.throws.map((cell) => ({ row, cell })));
   expect(cells.filter(({ cell }) => cell.ko && cell.percent < 60).map(({ row, cell }) => `${row.fighter} ${row.target} ${cell.opener} at ${cell.percent}%`)).toEqual([]);
   expect(Math.max(...cells.map(({ cell }) => cell.withDi))).toBeLessThanOrEqual(2);

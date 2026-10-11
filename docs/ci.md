@@ -46,6 +46,12 @@ landing restarts another's suites.
    first to pass again on main leads the next train and lands without a
    suite.
 
+Lanes don't regenerate whole-roster reports. After the gate, Autoland's
+`reports` job reruns `bun wisp combos --advantage` on the farm runner, commits
+changed tools/move-data/advantage-state.{jsonl,md} as "Regenerate reports for
+LANES" with the changed rows in the summary, and refuses a candidate whose
+rows miss a target (ts/test/advantage-state.test.ts) before its suite.
+
 Every dispatched run ends with a plan, cancelled runs too, and a plan tests
 again any pending tip that no unfinished run holds, so a cancelled run never
 strands a tip. The scheduling decisions are a pure function, checked on the
