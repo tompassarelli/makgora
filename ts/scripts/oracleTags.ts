@@ -14,7 +14,7 @@ export const KIND_TAGS = [
   "  [k1 scenario]                       replayed input through the whole system, asserting invariants or agreement",
   "  [k2 property]                       a property over a pure core",
   "  [k3 measure #N] / [k3 measure docs/<path>.md]  an owner-decided number, citing the issue or doc that sets it",
-  "  [k4 reference <source>]             an external reference: melee, melee-decomp, lua32, wurst, native, …",
+  "  [k4 reference <source>]             an external reference: docs/<path>[#anchor] or references/<path> naming the file it checks, lua32, wurst, native, …",
   "  [k5 boundary <name>]                one integration check per real boundary; each name once in the suite",
   "A test that fits no kind is scaffolding: delete it (bun wisp help testing).",
 ].join("\n");
@@ -36,8 +36,9 @@ export function kindTagProblems(titles: readonly TestTitle[], docExists: (path: 
     if (tag === null) { refuse("does not end with a kind tag"); continue; }
     if ((title.match(ANY_KIND) ?? []).length !== 1) { refuse("carries more than one kind tag"); continue; }
     if (ORACLE.test(title)) { refuse("still carries an oracle tag"); continue; }
-    const [, kind, doc] = tag;
-    if (doc?.startsWith("docs/") === true && !docExists(doc)) refuse(`cites ${doc}, which does not exist`);
+    const [, kind, measured] = tag;
+    const doc = measured ?? (kind?.startsWith("k4 ") === true ? kind.slice("k4 reference ".length).split("#")[0] : undefined);
+    if ((doc?.startsWith("docs/") === true || doc?.startsWith("references/") === true) && !docExists(doc)) refuse(`cites ${doc}, which does not exist`);
     if (kind?.startsWith("k5 ") === true) {
       const name = kind.slice("k5 boundary ".length);
       const first = boundaries.get(name);
@@ -90,7 +91,7 @@ export function testTitles(root: string, files: readonly string[]): TestTitle[] 
 }
 
 
-/** Exits 1 naming each refused title; `root` is ts/, and k3 doc paths resolve from the repo root above it. */
+/** Exits 1 naming each refused title; `root` is ts/, and k3/k4 doc paths resolve from the repo root above it. */
 export function refuseUntagged(root: string, files: readonly string[]): void {
   const repo = resolve(root, "..");
   const refused = kindTagProblems(testTitles(root, files), (path) => existsSync(join(repo, path)));
