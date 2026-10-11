@@ -31,6 +31,7 @@ const stand = source.Sequences[4]!;
 interface Gesture { chest?: number; head?: number; arm?: number; elbow?: number; free?: number; freeElbow?: number; hip?: number; knee?: number; lean?: number; yaw?: number; leftHip?: number; rightHip?: number }
 interface Phase { frame: number; gesture: Gesture; target?: readonly [number,number] }
 interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; prepTravel?: number; hold?: boolean; air?: boolean; roll?: number; first?: Gesture; phases?: readonly Phase[]; target?: readonly [number, number]; damage?: boolean }
+const blend=(a:Gesture,b:Gesture,t:number):Gesture=>Object.fromEntries([...new Set([...Object.keys(a),...Object.keys(b)])].map(k=>[k,(a[k as keyof Gesture]??0)*(1-t)+(b[k as keyof Gesture]??0)*t]));
 const ready: Gesture = {};
 const reach: Gesture = { chest: 22, arm: -75, elbow: 35, free: -48, hip: -12, knee: 18, head: -12 };
 const high: Gesture = { chest: -18, arm: -160, elbow: -10, free: -105, hip: 12, knee: 8, head: -22 };
@@ -96,12 +97,12 @@ for (const [pose, key, gesture, contact] of [
 ] as const) {
   const special = CAIRNE_SPECIALS[key]; ensure(special, `${pose}: missing special`);
   for (const air of [false,true]) { const form = air ? special.air ?? special.ground : special.ground;
-    const charge: Gesture = {...brace,chest:-12,arm:-105,elbow:35,free:-75,freeElbow:25,lean:-8,yaw:-15,head:10};
-    const wound: Gesture = {...charge,chest:-24,arm:-155,elbow:55,free:-110,hip:-45,knee:70,yaw:-25};
+    const charge: Gesture = {...brace,chest:10,arm:-85,elbow:25,free:-65,freeElbow:20,hip:-45,knee:70,lean:-12,yaw:-12,head:10};
+    const wound: Gesture = {...charge,chest:-28,arm:-155,elbow:55,free:-110,hip:-65,knee:95,lean:-18,yaw:-28};
     actions.push({pose:(air?`${pose}Air`:pose) as HeroPose,frames:form.endFrame,contact,gesture,air:air||key==="up",
       first:key==="neutral"?charge:undefined,
       phases:key==="neutral"?[
-        {frame:1,gesture:charge},{frame:12,gesture:wound},{frame:contact-1,gesture:wound},
+        {frame:1,gesture:charge},{frame:3,gesture:blend(charge,wound,0.2)},{frame:12,gesture:blend(charge,wound,0.6)},{frame:contact-1,gesture:wound},
         {frame:contact,gesture},{frame:contact+4,gesture},
       ]:undefined}); }
 }
@@ -126,7 +127,6 @@ function joint(name:string,g:Gesture):[number,number] {
   if(/^Bone_Leg2[LR]$/.test(name))return [g.knee??0,0];
   return [0,0];
 }
-const blend=(a:Gesture,b:Gesture,t:number):Gesture=>Object.fromEntries([...new Set([...Object.keys(a),...Object.keys(b)])].map(k=>[k,(a[k as keyof Gesture]??0)*(1-t)+(b[k as keyof Gesture]??0)*t]));
 const originals=new Map<string,mdx.AnimVector>(); tracks(source,(track,path)=>originals.set(path,track));
 const render=new ModelRenderer(model), data=Reflect.get(render,"rendererData");
 const hand=model.Nodes.find(n=>n.Name==="Bone_HandR")!,weapon=model.Nodes.find(n=>n.Name==="Bone_Axe_Free")!,main=model.Nodes.find(n=>n.Name==="Main")!;
@@ -147,7 +147,7 @@ for (const [ordinal,action] of [...actions,...damageActions].entries()) {
   const coil=blend(ready,action.gesture,-0.32);
   const phases:Phase[]=action.roll ? [0,0.12,0.25,0.5,0.75,0.9,1].map(t=>({frame:Math.round(t*action.frames),gesture:{...blend(ready,brace,t===0||t===1?0:1),lean:t*360*action.roll!}})) : action.hold ? [{frame:0,gesture:action.gesture},{frame:action.frames,gesture:action.gesture}] : [
     {frame:0,gesture:action.first??ready},{frame:Math.max(1,action.contact-3),gesture:action.pose==="neutralSpecial"||action.pose==="neutralSpecialAir"
-      ? action.phases?.[1]?.gesture??ready : blend(action.first??ready,coil,0.75)},
+      ? action.phases?.find(phase=>phase.frame===action.contact-1)?.gesture??ready : blend(action.first??ready,coil,0.75)},
     ...(action.phases ?? [{frame:action.contact,gesture:action.gesture,target:action.target},{frame:Math.min(action.frames-1,action.contact+4),gesture:action.gesture,target:action.target}]),
     {frame:action.frames,gesture:action.pose==="pummel"||action.pose==="victimPummel"?action.first??ready:ready},
   ].sort((a,b)=>a.frame-b.frame).filter((p,i,array)=>i===0||p.frame!==array[i-1]?.frame);
