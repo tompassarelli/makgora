@@ -63,6 +63,8 @@ export function playVersion(directory: string, library: string, revision: string
   return `${major}.${minor}.${patch + 1}`;
 }
 
+/** The version play would number a build of `revision`, without reserving it. */
+export const nextPlayVersion = (library: string, revision: string) => playVersion(builds, library, revision);
 
 const reserveVersion = (library: string, revision: string) => withLock(join(locks, "play-version.lock"), "Waiting for another play build to number its map",
   tryPlay(() => {

@@ -7,10 +7,11 @@ import { Effect, Schema } from "effect";
 import { ChildProcess } from "effect/process";
 import { PlayProblem } from "wisp/scripts/wisp/play";
 import { runProcess } from "../hostProcess";
-import { currentPlaytest } from "./currentPlaytest";
+import { currentPlaytest, nextPlayVersion } from "./currentPlaytest";
 import { SMASHCRAFT_ACCEPT } from "./acceptChecks";
-import { GREEN_GATE_LOOKS, greenGateFailures, type GreenGateReport, type Candidate, type RunSummary, farmVerdict, isGreen, parseInstalled, pickGreen, verdictOf } from "./greenBuilds";
+import { GREEN_GATE_LOOKS, greenGateFailures, type GreenGateReport, type Candidate, type RunSummary, PLAYABLE_FILE, farmVerdict, isGreen, parseInstalled, pickGreen, verdictOf } from "./greenBuilds";
 import { installLatest } from "./mapLibrary";
+import { checklistPath, writePlaytestChecklist } from "./playtestChecklist";
 import { projectRoot } from "./project";
 
 const COMMITS_CONSIDERED = 20;
@@ -53,10 +54,19 @@ const runs = (args: readonly string[]) => host("gh", ["run", "list", ...args, "-
 
 const summary = ({ status, conclusion, createdAt }: RunSummary): RunSummary => ({ status, conclusion, createdAt });
 
-function installedCommits(documents: string): string[] {
+function installedBuilds(documents: string) {
   const root = join(documents, "Maps/00-Smashcraft");
   return [root, join(root, "older")].flatMap((folder) => existsSync(folder) ? readdirSync(folder) : [])
-    .flatMap((file) => parseInstalled(file)?.commit ?? []);
+    .flatMap((file) => parseInstalled(file) ?? []);
+}
+
+const installedCommits = (documents: string): string[] => installedBuilds(documents).flatMap(({ commit }) => commit ?? []);
+
+/** The commit of the newest installed numbered build, the base of the next playtest checklist. */
+function previousInstalled(documents: string): string | undefined {
+  const [newest] = installedBuilds(documents).filter(({ commit }) => commit !== undefined)
+    .sort((a, b) => b.version[0] - a.version[0] || b.version[1] - a.version[1] || b.version[2] - a.version[2]);
+  return newest?.commit;
 }
 
 export const installAcceptedGreen = (documents: string, map: string, revision: string, declared: readonly string[], stateDirectory = greenState) => Effect.gen(function*() {
@@ -122,6 +132,7 @@ export const installGreen = (documents: string, dryRun = false) => Effect.gen(fu
   const pick = pickGreen(considered, installed);
   if (dryRun) {
     console.log(`Dry run: newest green main ${considered.find(isGreen)?.sha ?? "none"}; ${pick === undefined ? "no install (already installed, newer installed, or no green commit)" : `would stage ${pick.sha}; install requires exact candidate gate-* PASS in Classic`}`);
+    if (pick !== undefined) console.log(`Dry run: would write playtest checklist ${checklistPath(nextPlayVersion(join(documents, "Maps/00-Smashcraft"), pick.sha))} for ${previousInstalled(documents) ?? `${pick.sha.slice(0, 7)}^`}..${pick.sha.slice(0, 7)}`);
     return;
   }
 
@@ -132,7 +143,15 @@ export const installGreen = (documents: string, dryRun = false) => Effect.gen(fu
     return;
   }
 
+  const previous = previousInstalled(documents);
   const { map } = yield* currentPlaytest(join(documents, "Maps/00-Smashcraft"), { revision: pick.sha, named: true, helper: false });
   yield* installAcceptedGreen(documents, map.source, pick.sha, SMASHCRAFT_ACCEPT.checks.filter(({ id }) => id.startsWith("gate-")).map(({ id }) => id));
   console.log(`Installed ${map.title} under Maps/${map.folder}`);
+  const version = PLAYABLE_FILE.exec(map.file)?.[1];
+  if (version !== undefined) {
+    yield* writePlaytestChecklist(version, pick.sha, previous).pipe(
+      Effect.map((path) => console.log(`Playtest checklist ${path}`)),
+      Effect.catch(({ problem }) => Effect.sync(() => console.warn(`Playtest checklist not written: ${problem}`))),
+    );
+  }
 }).pipe(Effect.provide(BunServices.layer));
