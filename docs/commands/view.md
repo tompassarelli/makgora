@@ -12,3 +12,6 @@
   `view cues [--move FIGHTER:MOVE]... [--graphics classic|definitive]` renders
   every attack and special cue in Wisp and fails any move over the effect budget
   (smashcraft:docs/design/visual-quality.md, "Effect budget").
+- Classic effect visibility: `bun scripts/wisp/effectVisibility.ts [--json] [--strict]`
+  (from ts/) reads every move's Classic effect from the render-asset cache and lists
+  uses whose sequence window draws or emits nothing (#496).
