@@ -51,4 +51,28 @@ test("computerRecoversFromBothSidesWithAndWithoutJump [k1 scenario]", () => {
       assertTrue(Math.abs(fighter.motion.x) <= 600.0);
     }
   }
+  for (const side of [-1, 1]) for (const tideFrame of [1, 601]) {
+    const fighter = createFighter(Character.mountainKing, side * 300.0, -side);
+    const opponent = createFighter(Character.rifleman, 0.0, side);
+    const input = neutralControls();
+    const opponentInput = neutralControls();
+    const game = createMatchState();
+    game.phase = Phase.match;
+    game.stageChoice = TOMB_OF_SARGERAS_STAGE;
+    game.matchFrame = tideFrame;
+    fighter.motion.z = SEA_SURFACE_Z;
+    fighter.motion.grounded = false;
+    fighter.motion.surface = undefined;
+    fighter.jump.remaining = 0;
+    for (let frame = 1; frame <= 240; frame++) {
+      input.direction = 0;
+      input.jumpPressed = false;
+      input.jumpHeld = false;
+      chooseRecoveryInput(fighter, game.stageChoice, game.matchFrame, input);
+      stepMatch(game, testRoster(fighter, opponent), frameControls(input, opponentInput), frame);
+    }
+    assertFalse(fighter.status.out);
+    assertEquals(fighter.status.stocks, 3);
+    assertTrue(fighter.motion.grounded);
+  }
 });

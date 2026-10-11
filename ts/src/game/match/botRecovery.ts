@@ -13,7 +13,7 @@ import { isTumbling } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
 import { totalVelocityZ } from "../sim/motion";
 import { wet } from "../sim/water";
-import { SEA_SURFACE_Z } from "../sim/stageHazards";
+import { SEA_SURFACE_Z, tideNextDirection } from "../sim/stageHazards";
 import { RIFLEMAN_RECOVERY_STARTUP_FRAMES } from "../sim/specials";
 import type { Controls } from "../sim/roster";
 import { mainDeckLeft, mainDeckRight, mainDeckZ, surfaceCount, surfaceLeft, surfacePass, surfaceRight, surfaceZ, surfaceZAt } from "../sim/stage";
@@ -297,6 +297,7 @@ export function chooseRecoveryInput(fighter: Readonly<Fighter>, stage: number, m
   if (ledge && outside <= LEDGE_LINE_REACH && z >= f32(floor - LEDGE_MISSED)) return true;
 
   if (wet(fighter, stage)) {
+    if (outside < LEDGE_LINE_NEAR) input.direction = tideNextDirection(matchFrame);
     if (z >= SEA_SURFACE_Z && outside >= LEDGE_LINE_NEAR && fighter.attack.cooldown === 0) {
       input.jumpPressed = true;
       input.jumpHeld = true;
