@@ -10,7 +10,7 @@ import type { Roster } from "./roster";
 import type { FighterMoves } from "./heroMoves";
 import type { AuthoredSpecial, FighterSpecials } from "./heroSpecials";
 import { FIGHTER_ULTIMATES } from "./ultimates";
-import { heroBody } from "./heroes/heroBodies";
+import { fighterShield, heroBody } from "./heroes/heroBodies";
 import { heroDefinition } from "./heroes/registry";
 import { originalFighterMoves } from "./originalMoves";
 
@@ -385,9 +385,9 @@ export function applyAuthoredTuning(world: Roster): void {
 function heroShieldGeometry(character: Character): ShieldGeometry {
   const cached = heroShieldRecords[character];
   if (cached !== undefined) return cached;
-  const scale = heroBody(character)?.shield;
-  if (scale === undefined) return AUTHORED_SHIELD_GEOMETRY;
-  const geometry = { centerX: 0.0, centerZ: f32(AUTHORED_SHIELD_GEOMETRY.centerZ * scale), radius: f32(AUTHORED_SHIELD_GEOMETRY.radius * scale) };
+  const shield = fighterShield(character);
+  if (shield === undefined) return AUTHORED_SHIELD_GEOMETRY;
+  const geometry = { centerX: 0.0, centerZ: shield.centerZ, radius: shield.radius };
   heroShieldRecords[character] = geometry;
   return geometry;
 }
