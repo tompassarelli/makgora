@@ -4,11 +4,11 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { parseModelMDX } from "wisp/scripts/wisp/models";
 import { BunServices } from "@effect/platform-bun";
-import { Effect } from "effect";
+import { Effect, Schema } from "effect";
 import { ChildProcess } from "effect/process";
 import { runProcess } from "../hostProcess";
 import { installHeadless } from "wisp/scripts/wisp/headless";
-import { captureScene, renderScenes, type DrawnPose, type RenderScene } from "wisp/scripts/wisp/headlessRender";
+import { captureScene, renderScenes, type DrawnPose, type PopcornEmitterPose, type RenderScene } from "wisp/scripts/wisp/headlessRender";
 import type { Graphics } from "wisp/scripts/wisp/graphicsProfiles";
 import { SMASHCRAFT_HEADLESS } from "./headless";
 import { headlessRender } from "./headlessRender";
@@ -94,6 +94,7 @@ export interface CueMeasurement {
   readonly colour?: readonly number[];
   readonly feedback?: string;
   readonly models?: readonly CueModelPixels[];
+  readonly popcornPresence: readonly CuePopcornPresence[];
 }
 
 export interface CueModelPixels {
@@ -102,7 +103,34 @@ export interface CueModelPixels {
   readonly frames: number;
   readonly popcorn: boolean;
   readonly sampledFrames: readonly number[];
+  readonly present: boolean;
+  readonly popcornPresence: readonly CuePopcornPresence[];
 }
+
+export interface CuePopcornPresence {
+  readonly frame: number;
+  readonly emitters: readonly PopcornEmitterPose[];
+}
+
+const emitterReport = Schema.Struct({
+  unsupportedEmitters: Schema.Array(Schema.Struct({
+    model: Schema.String, handle: Schema.Number, emitter: Schema.String, effect: Schema.String,
+    position: Schema.Tuple([Schema.Number, Schema.Number, Schema.Number]),
+    scale: Schema.Tuple([Schema.Number, Schema.Number, Schema.Number]),
+    kind: Schema.String, visible: Schema.Boolean,
+  })),
+});
+
+export function visiblePopcornEmitters(report: typeof emitterReport.Type, model?: string): readonly PopcornEmitterPose[] {
+  return report.unsupportedEmitters.filter(emitter => emitter.kind === "popcorn" && emitter.visible
+    && (model === undefined || emitter.model.replaceAll("\\", "/").toLowerCase().replace(/\.mdl$/, ".mdx") === model.replaceAll("\\", "/").toLowerCase().replace(/\.mdl$/, ".mdx"))
+    && emitter.position.every(Number.isFinite) && emitter.scale.every(value => Number.isFinite(value) && value > 0));
+}
+
+export const cuePopcornPresence = (path: string, frame: number, model?: string) => Effect.gen(function*() {
+  const report = yield* Effect.promise(() => Bun.file(path).text()).pipe(Effect.flatMap(Schema.decodeUnknownEffect(Schema.fromJsonString(emitterReport))));
+  return { frame, emitters: visiblePopcornEmitters(report, model) };
+});
 
 interface ParkPose { readonly handle: number; readonly model: string; readonly shown: boolean; readonly timeScale: number }
 
@@ -448,12 +476,17 @@ const measureModels = (sampled: readonly { readonly move: CueMove; readonly inde
   const rows = new Map<number, CueModelPixels[]>();
   for (const { index, model, frames, pairs, sampledFrames } of plans) {
     let pixels = 0;
-    for (const [shot, base] of pairs) {
+    const popcornPresence: CuePopcornPresence[] = [];
+    for (const [sample, [shot, base]] of pairs.entries()) {
+      if (graphics === "definitive") {
+        const presence = yield* cuePopcornPresence(join(directory, `p0-frame-${shot}.json`), sampledFrames[sample] ?? -1, model);
+        if (presence.emitters.length > 0) popcornPresence.push(presence);
+      }
       const drawn = drawnPixels(yield* rgba(join(directory, `p0-frame-${base}.png`)), yield* rgba(join(directory, `p0-frame-${shot}.png`)));
       pixels = Math.max(pixels, Math.round(drawn.share * WIDTH * HEIGHT));
     }
     const popcorn = [...undrawn].some((line) => line.toLowerCase().includes(modelKey(model)));
-    rows.set(index, [...rows.get(index) ?? [], { model, pixels, frames, popcorn, sampledFrames }]);
+    rows.set(index, [...rows.get(index) ?? [], { model, pixels, frames, popcorn, sampledFrames, present: pixels > 0 || popcornPresence.length > 0, popcornPresence }]);
   }
   return rows;
 });
@@ -501,12 +534,18 @@ export const measureCueMoves = (moves: readonly CueMove[], graphics: Graphics, d
   for (const { move, index, scenes, poses, lastDanger, feedback } of sampled) {
     const shares: number[] = [];
     const colours: (readonly number[])[] = [];
+    const popcornPresence: CuePopcornPresence[] = [];
     for (const scene of scenes) {
       const pixels = scene.effects.length === 0 ? { share: 0, colour: [0, 0, 0] } : drawnPixels(blank, yield* rgba(join(directory, `p0-frame-${frameOf(index, scene.frame)}.png`)));
+      if (graphics === "definitive" && scene.effects.length > 0) {
+        const presence = yield* cuePopcornPresence(join(directory, `p0-frame-${frameOf(index, scene.frame)}.json`), scene.frame);
+        if (presence.emitters.length > 0) popcornPresence.push(presence);
+      }
       shares.push(pixels.share);
       colours.push(pixels.colour);
     }
-    const shown = shares.flatMap((share, tick) => share >= SHOWN_SHARE ? [tick] : []);
+    const presentFrames = new Set(popcornPresence.map(({ frame }) => frame));
+    const shown = shares.flatMap((share, tick) => share >= SHOWN_SHARE || presentFrames.has(tick) ? [tick] : []);
     const tail = yield* Effect.promise(() => particleTails(poses, graphics));
     const firstShown = shown[0] ?? -1, lastShown = Math.max(shown.at(-1) ?? -1, tail);
     const linger = lastShown < 0 ? 0 : Math.max(0, lastShown - Math.max(lastDanger, 0));
@@ -520,7 +559,7 @@ export const measureCueMoves = (moves: readonly CueMove[], graphics: Graphics, d
     const popcorn = [...undrawn].filter((line) => [...models].some((model) => line.startsWith(model)));
     results.push({ move: move.name, graphics, lastDanger, firstShown, lastShown, linger, coverage, widest, over, popcorn: popcorn.length > 0,
       ...(move.spark === undefined ? {} : { colour: colours[shares.indexOf(coverage)] ?? [0, 0, 0], feedback }),
-      models: modelRows.get(index) ?? [] });
+      models: modelRows.get(index) ?? [], popcornPresence });
   }
   yield* Effect.promise(() => Bun.write(join(directory, "cue-measurements.json"), JSON.stringify({ graphics, selectors: moves.map(move => move.name), uncovered: moves.filter(move => !sampled.some(row => row.move === move)).map(move => move.name), rows: results }, null, 2)));
   return results;
