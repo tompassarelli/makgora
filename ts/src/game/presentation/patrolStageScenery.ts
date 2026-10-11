@@ -8,6 +8,7 @@ const GLACIER = "Doodads\\Icecrown\\Rocks\\Glacier\\Glacier0.mdx";
 const MOUND = "Doodads\\Barrens\\Rocks\\Barrens_Rocks\\Barrens_Rocks2.mdx";
 
 export const DUROTAR_SCENERY: StageScenery = {
+  farZ: 13000.0,
   sky: STAGE_SKY_MODELS[3] ?? "",
   fog: { start: 5000.0, end: 11000.0, red: 0.75, green: 0.5, blue: 0.25 },
   floor: { model: STAGE_SEA_MODEL, z: -1300.0, color: [168, 140, 120] },
@@ -31,6 +32,7 @@ export const DUROTAR_SCENERY: StageScenery = {
 };
 
 export const NAXXRAMAS_SCENERY: StageScenery = {
+  farZ: 20000.0,
   sky: STAGE_SKY_MODELS[4] ?? "",
   fog: { start: 3300.0, end: 19000.0, red: 0.125, green: 0.25, blue: 0.3125 },
   floor: { model: STAGE_SEA_MODEL, z: -1300.0, color: [64, 104, 104] },
@@ -62,6 +64,7 @@ export const NAXXRAMAS_SCENERY: StageScenery = {
 };
 
 export const HELLFIRE_SCENERY: StageScenery = {
+  farZ: 17000.0,
   sky: STAGE_SKY_MODELS[14] ?? "",
   fog: { start: 3300.0, end: 16000.0, red: 0.3125, green: 0.203125, blue: 0.171875 },
   floor: { model: STAGE_SEA_MODEL, z: -1300.0, color: [88, 36, 28] },

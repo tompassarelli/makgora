@@ -14,7 +14,7 @@ import type { FrameControls } from "../../game/match/controls";
 import type { PacingAndPresentation } from "../../game/match/pacingAndPresentation";
 import { type MatchState, Phase, remainingSeconds, stageClock, timedMatch } from "../../game/match/rules";
 import { fighterOffscreen, fitFighterFrames } from "../../game/presentation/fighterFraming";
-import { ARENA_CAMERA, FLOOR_HEIGHT, cameraFieldOfView, cameraPoint, extremeCamera, finalCamera, localCamera, resultCamera } from "../../game/presentation/arenaCamera";
+import { arenaFarZ, ARENA_CAMERA, FLOOR_HEIGHT, cameraFieldOfView, cameraPoint, extremeCamera, finalCamera, localCamera, resultCamera } from "../../game/presentation/arenaCamera";
 
 import { beginPauseCamera, advancePauseCamera, pauseCameraAngle, pauseHudHidden } from "./pauseCamera";
 import { type MatchCamera, copyMatchCamera } from "../../game/sim/matchCamera";
@@ -489,7 +489,7 @@ function applyArenaCamera(s: ShellState, framing: Readonly<MatchCamera>, aspect:
   SetCameraField(CAMERA_FIELD_ZOFFSET, FLOOR_HEIGHT + framing.z, duration);
   SetCameraField(CAMERA_FIELD_ROLL, 0.0, 0.0);
   SetCameraField(CAMERA_FIELD_FIELD_OF_VIEW, cameraFieldOfView(framing, aspect), duration);
-  SetCameraField(CAMERA_FIELD_FARZ, ARENA_CAMERA.farZ, 0.0);
+  SetCameraField(CAMERA_FIELD_FARZ, arenaFarZ(s.game.stageChoice), 0.0);
   if (duration > 0.0) PanCameraToTimed(targetX, centerY, duration);
   else SetCameraPosition(targetX, centerY);
 }

@@ -1,4 +1,10 @@
 import { expect, test } from "bun:test";
+import { modelReach } from "wisp/scripts/wisp/models";
+import { MODEL_FACTS } from "../scripts/wisp/modelFacts";
+import { STAGE_CATALOG } from "../src/game/menu/stageCatalog";
+import { ARENA_CAMERA, ARENA_FOG_FAR_MARGIN, arenaFarZ, extremeCamera, finalCamera } from "../src/game/presentation/arenaCamera";
+import { placedPieces, stageScenery } from "../src/game/presentation/stageScenery";
+import { createMatchCamera } from "../src/game/sim/matchCamera";
 import { MAIN_DECK_HALF_DEPTH, type DeckFace, type OutlinePoint, mainDeckFaces } from "../scripts/stageDeck";
 import { STAGE_DECK_PALETTES } from "../src/game/assets/stagePalette";
 import { MAIN_DECK_BODY_SURFACES, mainDeckLeft, mainDeckRight, mainDeckZ, solidSurfaceAt, solidSurfaceCount, surfaceLine } from "../src/game/sim/stage";
@@ -88,6 +94,39 @@ test("the main deck model's outline is the main deck's collision lines on every 
       const side = faces.find(({ corners: points }) => JSON.stringify(points.slice(0, 2)) === JSON.stringify(front));
       expect(side?.normal).toEqual([line.normalX, 0, line.normalZ]);
       expect(side?.corners.map(([, y]) => y)).toEqual([-MAIN_DECK_HALF_DEPTH, -MAIN_DECK_HALF_DEPTH, MAIN_DECK_HALF_DEPTH, MAIN_DECK_HALF_DEPTH]);
+    }
+  }
+});
+
+
+test("each stage keeps its entire scenery inside farZ at both player camera extremes and beyond fog by the #456 margin [k3 measure #456]", () => {
+  const pitch = (ARENA_CAMERA.angleOfAttack - 360) * Math.PI / 180;
+  const yaw = ARENA_CAMERA.rotation * Math.PI / 180;
+  for (const { id, name } of STAGE_CATALOG) {
+    const farZ = arenaFarZ(id);
+    const fogEnd = stageScenery(id).fog?.end ?? 0;
+    expect(farZ, name).toBeGreaterThanOrEqual(fogEnd + ARENA_FOG_FAR_MARGIN);
+    for (const aspect of [16 / 9, 64 / 27]) for (const extreme of ["near", "far"] as const) {
+      const camera = createMatchCamera();
+      extremeCamera(camera, id, aspect, extreme);
+      finalCamera(camera, id);
+      for (const piece of placedPieces(id)) {
+        const facts = MODEL_FACTS[piece.model];
+        if (facts === undefined) throw new Error(`${name}: missing facts for ${piece.model}`);
+        if (facts.triangles > 0 && facts.bounds === undefined) throw new Error(`${name}: missing mesh bounds for ${piece.model}`);
+        const reach = modelReach(facts);
+        expect(reach.unknown, `${name}: ${piece.model}`).toEqual([]);
+        const boxes = reach.boxes.length > 0 ? reach.boxes : [{ min: [0, 0, 0] as const, max: [0, 0, 0] as const }];
+        const turn = piece.yaw * Math.PI / 180;
+        const [sx, sy, sz] = piece.matrixScale ?? [1, 1, 1];
+        for (const bounds of boxes) for (const x of [bounds.min[0], bounds.max[0]]) for (const y of [bounds.min[1], bounds.max[1]]) for (const z of [bounds.min[2], bounds.max[2]]) {
+          const worldX = piece.x + piece.scale * (x * sx * Math.cos(turn) - y * sy * Math.sin(turn));
+          const worldY = piece.y + piece.scale * (x * sx * Math.sin(turn) + y * sy * Math.cos(turn));
+          const worldZ = piece.z + piece.scale * z * sz;
+          const depth = camera.distance + (worldX - camera.x) * Math.cos(pitch) * Math.cos(yaw) + worldY * Math.cos(pitch) * Math.sin(yaw) + (worldZ - camera.z) * Math.sin(pitch);
+          expect(depth, `${name} ${extreme} ${aspect}: ${piece.model}`).toBeLessThanOrEqual(farZ);
+        }
+      }
     }
   }
 });

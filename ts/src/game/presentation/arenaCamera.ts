@@ -1,6 +1,7 @@
 
 
 
+import { stageScenery } from "./stageScenery";
 import { f32 } from "wisp/src/sim/f32";
 import { copyMatchCamera, createMatchCamera, limitCamera, MATCH_CAMERA_ASPECT, type MatchCamera } from "../sim/matchCamera";
 import { arctangentDegrees } from "../sim/mathTables";
@@ -21,8 +22,14 @@ export const HIDDEN_EFFECT_DEPTH = 8192.0;
 export const PLAYABLE_BOUNDS = { left: -3328.0, right: 3328.0, front: -3584.0, back: 3072.0, centreY: -256.0 } as const;
 
 
-export const ARENA_CAMERA = { rotation: 90.0, angleOfAttack: 350.0, farZ: 19000.0 } as const;
+export const ARENA_CAMERA = { rotation: 90.0, angleOfAttack: 350.0 } as const;
 
+
+export const ARENA_FOG_FAR_MARGIN = 1000.0;
+
+export function arenaFarZ(stage: number): number {
+  return stageScenery(stage).farZ;
+}
 
 export function localCamera(target: MatchCamera, source: Readonly<MatchCamera>, stage: number, aspect: number): void {
   copyMatchCamera(target, source);
@@ -61,13 +68,13 @@ export function cameraPoint(camera: Readonly<MatchCamera>, aspect: number, x: nu
 }
 
 
-export function arenaFraming(left: number, right: number, bottom: number, top: number): { readonly x: number; readonly z: number; readonly distance: number; readonly fieldOfView: number } {
+export function arenaFraming(stage: number, left: number, right: number, bottom: number, top: number): { readonly x: number; readonly z: number; readonly distance: number; readonly fieldOfView: number } {
   const camera = createMatchCamera();
   camera.tangent = 0.3443276286125183;
   camera.x = f32(f32(left + right) / 2.0);
   camera.z = f32(f32(bottom + top) / 2.0);
   camera.distance = Math.max(1450.0, right - left, top - bottom);
-  limitCamera(camera, stageBounds(0).camera, MATCH_CAMERA_ASPECT);
+  limitCamera(camera, stageBounds(stage).camera, MATCH_CAMERA_ASPECT);
   return { x: camera.x, z: camera.z, distance: camera.distance, fieldOfView: cameraFieldOfView(camera, MATCH_CAMERA_ASPECT) };
 }
 

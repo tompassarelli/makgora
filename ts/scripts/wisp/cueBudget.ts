@@ -14,7 +14,7 @@ import { SMASHCRAFT_HEADLESS } from "./headless";
 import { headlessRender } from "./headlessRender";
 import { DISJOINT_CUES, disjointNormals } from "../../src/game/presentation/disjointCues";
 import { ATTACK_CUES } from "../../src/game/presentation/attackCues";
-import { ARENA_CAMERA, FLOOR_HEIGHT, PLAYABLE_BOUNDS, cameraFieldOfView, extremeCamera } from "../../src/game/presentation/arenaCamera";
+import { arenaFarZ, ARENA_CAMERA, FLOOR_HEIGHT, PLAYABLE_BOUNDS, cameraFieldOfView, extremeCamera } from "../../src/game/presentation/arenaCamera";
 import { ACTIVE_CUE_FRAMES, type Cue, ORIGINAL_ACTIONS, ORIGINAL_BRANCH_CUES, specialCueState } from "../../src/game/presentation/specialCues";
 import { FOLLOW_UP_FORM, SpecialForm, specialForm, specialKit } from "../../src/game/sim/heroSpecials";
 import { DEFINITIVE_CUE_EMITTERS } from "../../src/game/presentation/cueEmitterInfo";
@@ -237,7 +237,7 @@ export function sparkScenes(move: CueMove, graphics: Graphics): { readonly scene
         SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, near.distance, 0.0);
         SetCameraField(CAMERA_FIELD_ZOFFSET, FLOOR_HEIGHT + 100.0, 0.0);
         SetCameraField(CAMERA_FIELD_FIELD_OF_VIEW, cameraFieldOfView(near, MATCH_CAMERA_ASPECT), 0.0);
-        SetCameraField(CAMERA_FIELD_FARZ, ARENA_CAMERA.farZ, 0.0);
+        SetCameraField(CAMERA_FIELD_FARZ, arenaFarZ(0), 0.0);
         SetCameraPosition(origin.x + victim.motion.x, origin.y);
       });
       advanceImpacts(impacts);
@@ -285,7 +285,7 @@ function aimNear(x: number, z: number): void {
   SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, near.distance, 0.0);
   SetCameraField(CAMERA_FIELD_ZOFFSET, FLOOR_HEIGHT + z + 100.0, 0.0);
   SetCameraField(CAMERA_FIELD_FIELD_OF_VIEW, cameraFieldOfView(near, MATCH_CAMERA_ASPECT), 0.0);
-  SetCameraField(CAMERA_FIELD_FARZ, ARENA_CAMERA.farZ, 0.0);
+  SetCameraField(CAMERA_FIELD_FARZ, arenaFarZ(0), 0.0);
   SetCameraPosition(x, PLAYABLE_BOUNDS.centreY);
 }
 

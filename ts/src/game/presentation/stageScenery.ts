@@ -28,6 +28,7 @@ export interface SceneryPiece {
 }
 
 export interface StageScenery {
+  readonly farZ: number;
   readonly sky: string;
   readonly pieces: readonly SceneryPiece[];
   /** The pieces' colour under the stock light, before the stage's mood (sceneryColor). */
@@ -49,6 +50,7 @@ export interface StageScenery {
 
 
 const SUMMER: StageScenery = {
+  farZ: 13000.0,
   sky: STAGE_SKY_MODELS[0] ?? "",
   fog: { start: 6000.0, end: 12000.0, red: 0.6875, green: 0.8125, blue: 0.9375 },
   floor: { model: STAGE_SEA_MODEL, z: -1600.0, color: [120, 136, 156] },
@@ -56,6 +58,7 @@ const SUMMER: StageScenery = {
 };
 
 const FROZEN_THRONE: StageScenery = {
+  farZ: 13000.0,
   sky: STAGE_SKY_MODELS[2] ?? "",
 
   fog: { start: 5000.0, end: 11000.0, red: 0.375, green: 0.625, blue: 0.875 },

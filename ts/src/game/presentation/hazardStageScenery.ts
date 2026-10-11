@@ -21,6 +21,7 @@ const TRAP = "Doodads\\Cinematic\\FireTrapUp\\FireTrapUp.mdx";
 const PILLAR = "Doodads\\Cinematic\\FirePillarMedium\\FirePillarMedium.mdx";
 
 export const NORDRASSIL_SCENERY: StageScenery = {
+  farZ: 13000.0,
   sky: "Environment\\Sky\\FelwoodSky\\FelwoodSky.mdl",
   fog: { start: 5000.0, end: 5300.0, red: 0.375, green: 0.625, blue: 0.5 },
   heightFog: { start: 5500.0, end: 11000.0, density: 0.25, heightStart: -2600.0, heightEnd: -600.0, maxDensity: 0.5, drawOverSky: false },
@@ -67,6 +68,7 @@ export const NORDRASSIL_SCENERY: StageScenery = {
 };
 
 export const GRYPHON_SCENERY: StageScenery = {
+  farZ: 13000.0,
   sky: STAGE_SKY_MODELS[11] ?? "",
 
   fog: { start: 5000.0, end: 9000.0, red: 0.5, green: 0.625, blue: 0.75 },
@@ -91,6 +93,7 @@ export const GRYPHON_SCENERY: StageScenery = {
 };
 
 export const BLACKROCK_SCENERY: StageScenery = {
+  farZ: 17000.0,
   sky: STAGE_SKY_MODELS[12] ?? "",
   fog: { start: 8000.0, end: 16000.0, red: 0.5, green: 0.125, blue: 0.0625 },
   floor: { model: STAGE_LAVA_MODEL, z: -1300.0, color: [118, 73, 64] },
@@ -129,6 +132,7 @@ export const BLACKROCK_SCENERY: StageScenery = {
 };
 
 export const AHNQIRAJ_SCENERY: StageScenery = {
+  farZ: 17000.0,
   sky: STAGE_SKY_MODELS[13] ?? "",
   fog: { start: 8000.0, end: 16000.0, red: 0.75, green: 0.625, blue: 0.375 },
   floor: { model: STAGE_LAVA_MODEL, z: -1300.0, color: [100, 150, 255] },

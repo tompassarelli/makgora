@@ -25,7 +25,7 @@ import { STAGE_EDGE_LIGHT_MODEL } from "../../src/game/presentation/stageEdgeLig
 import { STAGE_DECK_PALETTES } from "../../src/game/assets/stagePalette";
 import { DEMON_HUNTER_MODEL_FILE } from "../../src/game/presentation/demonHunterAssetInfo";
 import { RIFLEMAN_MODEL_FILE } from "../../src/game/presentation/fighterAssetInfo";
-import { ARENA_CAMERA, FLOOR_HEIGHT, HIDDEN_EFFECT_DEPTH, arenaFraming } from "../../src/game/presentation/arenaCamera";
+import { arenaFarZ, ARENA_CAMERA, FLOOR_HEIGHT, HIDDEN_EFFECT_DEPTH, arenaFraming } from "../../src/game/presentation/arenaCamera";
 import { SUMMON_BEAR, summonClip, summonClipCount } from "../../src/game/presentation/summonClipInfo";
 import { CANNON_MODEL, HYDRA_CREST_MODEL, HYDRA_RING_MODEL } from "../../src/game/presentation/stageHazards";
 import { allProjectileModels, SPECIAL_SLOTS } from "../../src/game/presentation/projectileArt";
@@ -89,11 +89,11 @@ const spans = (low: number, high: number) => {
 
 
 
-const ARENA_CAMERAS: readonly CameraView[] = spans(stageBounds(0).blast.left, stageBounds(0).blast.right).flatMap(([left, right]) =>
-  spans(stageBounds(0).blast.bottom, stageBounds(0).blast.top).map(([bottom, top]) => {
-    const { x, z, distance, fieldOfView } = arenaFraming(left, right, bottom, top);
-    return { target: [x, 0, z], distance, angleOfAttack: ARENA_CAMERA.angleOfAttack, rotation: ARENA_CAMERA.rotation, fieldOfView, aspect: 16 / 9, farZ: ARENA_CAMERA.farZ };
-  }));
+const ARENA_CAMERAS: readonly CameraView[] = STAGE_CATALOG.flatMap(({ id }) => spans(stageBounds(id).blast.left, stageBounds(id).blast.right).flatMap(([left, right]) =>
+  spans(stageBounds(id).blast.bottom, stageBounds(id).blast.top).map(([bottom, top]) => {
+    const { x, z, distance, fieldOfView } = arenaFraming(id, left, right, bottom, top);
+    return { target: [x, 0, z], distance, angleOfAttack: ARENA_CAMERA.angleOfAttack, rotation: ARENA_CAMERA.rotation, fieldOfView, aspect: 16 / 9, farZ: arenaFarZ(id) };
+  })));
 
 
 
