@@ -49,10 +49,11 @@ const mine = registeredTests.filter(({ name }) => isSweep(name) === sweeps
   && (shardSpec === undefined || (planned.get(name) ?? hashShard(name)) === shard));
 // Counts are deterministic for one runtime and test order, unlike CPU seconds (#394).
 const HOOK_STEP = 1000;
-const COLLECT_ABOVE_KB = 65536;
+const COLLECT_GROWTH_KB = 65536;
 let ticks = 0;
 let heapKb = 0;
 let allocatedKb = 0;
+let collectAboveKb = 0;
 const sample = () => {
   const now = collectgarbage("count");
   if (now > heapKb) allocatedKb += now - heapKb;
@@ -61,9 +62,10 @@ const sample = () => {
 const tick = () => {
   ticks++;
   sample();
-  if (heapKb > COLLECT_ABOVE_KB) {
+  if (heapKb > collectAboveKb) {
     collectgarbage("collect");
     heapKb = collectgarbage("count");
+    collectAboveKb = heapKb + COLLECT_GROWTH_KB;
   }
 };
 let failures = 0;
@@ -73,6 +75,7 @@ for (const { name, run } of mine) {
   ticks = 0;
   allocatedKb = 0;
   heapKb = collectgarbage("count");
+  collectAboveKb = heapKb + COLLECT_GROWTH_KB;
   const started = os.clock();
   debug.sethook(tick, "", HOOK_STEP);
   let status = "pass";
