@@ -1,18 +1,9 @@
-import { assertEquals, assertGreaterThan, test } from "wisp/src/runtime/testing";
+import { assertEquals, assertGreaterThan } from "wisp/src/runtime/testing";
 import { SELECTABLE_CHARACTERS, fighterName } from "../sim/heroes/registry";
 import { fighterCoverage } from "./botCoverage";
 import { Character } from "../sim/codes";
 import { sweep } from "../../runtime/sweep";
 
-
-for (let index = 0; index < SELECTABLE_CHARACTERS.length; index++) {
-  test(`roster AI: ${fighterName(SELECTABLE_CHARACTERS[index] ?? -1)} moves and attacks in one seeded Wren Expert match [k3 measure #56]`, () => {
-    const report = fighterCoverage(index, undefined, SELECTABLE_CHARACTERS, 1);
-    assertEquals(report.matches, 1);
-    assertGreaterThan(report.movement, 0);
-    assertGreaterThan(report.attacks, 0);
-  });
-}
 
 for (let index = 0; index < SELECTABLE_CHARACTERS.length; index++) {
   const character = SELECTABLE_CHARACTERS[index];
@@ -32,6 +23,9 @@ for (let index = 0; index < SELECTABLE_CHARACTERS.length; index++) {
   const character = SELECTABLE_CHARACTERS[index];
   sweep(`roster AI coverage: ${fighterName(character ?? -1)} moves, attacks and uses its kit in eight Wren Expert matches; fewest attacks seen 50 on four seed offsets [k3 measure #56]`, () => {
     const report = fighterCoverage(index);
+    if (character === Character.kaelthas || character === Character.murloc || character === Character.thrall) {
+      for (const [special, count] of Object.entries(report.specials)) if (count === 0) report.missing.push(special);
+    }
     assertEquals(report.matches, 8);
     assertEquals(report.missing.join(", "), "", report.fighter);
     assertGreaterThan(report.movement, 0);

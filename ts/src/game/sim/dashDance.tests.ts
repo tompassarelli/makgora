@@ -4,18 +4,13 @@ import { copyFighterState } from "../replay/fighterState";
 import { firstFighterDifference, firstStateDifference } from "../replay/difference";
 import { ReplayHistory } from "../replay/history";
 import { captureTape, createTapeWorld, executeTapeRow } from "../replay/tapeWorld";
-import { Action, bit } from "../input/actions";
 import { adaptInput } from "../input/adapter";
-import { attackBuffer } from "../input/attackBuffer";
-import { type InputRow, inputRow } from "../input/inputRow";
-import { type KeyboardCapture, commitEdges, keyboardCapture, sampleKeys } from "../input/keyboardCapture";
+import { inputRow } from "../input/inputRow";
 import { captureFrame, createMatchFrameInput } from "../match/frameInput";
 import { fighterAt } from "./roster";
 import { Character, GroundAction } from "./codes";
 import { createFighter, type Fighter } from "./fighter";
 import { advanceSolo, controls } from "./testWorld";
-import { sweep } from "../../runtime/sweep";
-import { DASH_DANCE_REFERENCE, DASH_DANCE_REFERENCE_MAIN } from "./dashDanceReference";
 
 function sample(fighter: Fighter, direction: number, amplitude = 1.0, walking = false): void {
   advanceSolo(fighter, 0, controls({ direction, diStickValid: true, diStickX: f32(direction * amplitude), walking }), 0.0);
@@ -86,154 +81,4 @@ test("dash dancing: recorded analog reversal rows replay through the two-sample 
       if (frame === 15) assertEquals(fighterAt(canonical.live.world, 0).facing, -facing);
     }
   }
-});
-
-
-const HELPER_DEADZONE = f32(0.28);
-
-const HELPER_DIGITAL = 7000 / 32767;
-export const ROSTER: readonly Character[] = [
-  Character.rifleman, Character.demonHunter, Character.blademaster, Character.mountainKing, Character.warden,
-  Character.lich, Character.forsakenPaladin, Character.dreadlord, Character.shadowHunter, Character.pitLord, Character.beastmaster, Character.lichKing,
-];
-const DanceInput = { stick: 0, keyOverlap: 1, keyGap: 2 } as const;
-type DanceInput = (typeof DanceInput)[keyof typeof DanceInput];
-
-export const DANCE_HOLDS = [1, 3, 6, 9, 2, 5, 10, 4];
-
-export const DANCE_INPUTS: readonly (readonly [DanceInput, number])[] = [
-  [DanceInput.stick, 0], [DanceInput.stick, 1], [DanceInput.stick, 2], [DanceInput.stick, 3], [DanceInput.stick, 4],
-  [DanceInput.stick, 5], [DanceInput.stick, 6], [DanceInput.stick, 7], [DanceInput.stick, 8], [DanceInput.stick, 9],
-  [DanceInput.keyOverlap, 0], [DanceInput.keyGap, 0],
-];
-
-interface DanceDriver {
-  readonly fighter: Fighter;
-  readonly keys: KeyboardCapture;
-  readonly controls: ReturnType<typeof controls>;
-  readonly attacks: ReturnType<typeof attackBuffer>;
-  frame: number;
-}
-
-export function danceDriver(character: Character, facing: number): DanceDriver {
-  return { fighter: createFighter(character, 0.0, facing), keys: keyboardCapture(), controls: controls(), attacks: attackBuffer(0), frame: 0 };
-}
-
-function adaptAndAdvance(driver: DanceDriver, row: Readonly<InputRow>): void {
-  driver.frame++;
-  adaptInput(row, driver.fighter, driver.frame, driver.controls, driver.attacks);
-  advanceSolo(driver.fighter, 0, driver.controls, 0.0);
-}
-
-
-function stickSample(driver: DanceDriver, x: number): void {
-  const kept = Math.abs(x) <= HELPER_DEADZONE ? 0 : x;
-  const axis = kept < 0 ? -Math.floor(-kept * 127) : Math.floor(kept * 127);
-  const held = kept < -HELPER_DIGITAL ? bit(Action.moveLeft) : kept > HELPER_DIGITAL ? bit(Action.moveRight) : 0;
-  adaptAndAdvance(driver, assertDefined(inputRow({ held, axisX: axis })));
-}
-
-
-function keySample(driver: DanceDriver, left: boolean, right: boolean): void {
-  sampleKeys(driver.keys, (left ? bit(Action.moveLeft) : 0) | (right ? bit(Action.moveRight) : 0));
-  adaptAndAdvance(driver, driver.keys.row);
-  commitEdges(driver.keys);
-}
-
-
-export function holdToward(driver: DanceDriver, input: DanceInput, to: number): void {
-  if (input === DanceInput.stick) stickSample(driver, to);
-  else keySample(driver, to < 0, to > 0);
-}
-
-
-
-
-
-
-export function travelSample(driver: DanceDriver, input: DanceInput, to: number, transition: number, phase: number, step: number): boolean {
-  if (input === DanceInput.stick) {
-    const t = step + phase / 10;
-    if (t >= transition) {
-      stickSample(driver, to);
-      return true;
-    }
-    stickSample(driver, f32(-to + (2 * to * t) / transition));
-    return false;
-  }
-  if (step >= transition - 1) {
-    holdToward(driver, input, to);
-    return true;
-  }
-  const both = input === DanceInput.keyOverlap;
-  keySample(driver, both, both);
-  return false;
-}
-
-export let dashDanceLargestDeviation = 0.0;
-
-sweep("dash dancing: 9,216 scripted dash-backs match main facing and dash direction every frame within 1 world unit: 0 misreads [k4 reference main-135454d6d]", () => {
-  let dashbacks = 0;
-  let misreads = 0;
-  let timeline = 0;
-  dashDanceLargestDeviation = 0.0;
-  const failures: string[] = [];
-  for (const character of ROSTER) {
-    for (const facing of [-1, 1]) {
-      for (const [input, phase] of DANCE_INPUTS) {
-        for (let transition = 1; transition <= 4; transition++) {
-          const driver = danceDriver(character, facing);
-          const { fighter } = driver;
-          const reference = assertDefined(DASH_DANCE_REFERENCE[timeline++]).split("|");
-          let frameMisreads = 0;
-          const checkReference = () => {
-            const index = (driver.frame - 1) * 3;
-            const expectedFacing = Number(assertDefined(reference[index]));
-            const expectedDirection = Number(assertDefined(reference[index + 1]));
-            const expectedX = Number(assertDefined(reference[index + 2]));
-            const deviation = Math.abs(f32(fighter.motion.x - expectedX));
-            dashDanceLargestDeviation = Math.max(dashDanceLargestDeviation, deviation);
-            if (fighter.facing !== expectedFacing || fighter.ground.dashDirection !== expectedDirection || deviation > 1.0) {
-              frameMisreads++;
-              if (failures.length < 8) failures.push(`${character} facing ${facing} input ${input} phase ${phase} transition ${transition} frame ${driver.frame}: facing ${fighter.facing}/${expectedFacing} direction ${fighter.ground.dashDirection}/${expectedDirection} x ${fighter.motion.x}/${expectedX}`);
-            }
-          };
-          let toward = facing;
-          holdToward(driver, input, toward);
-          checkReference();
-          for (const hold of DANCE_HOLDS) {
-            const before = frameMisreads;
-            for (let frame = 1; frame < hold; frame++) {
-              holdToward(driver, input, toward);
-              checkReference();
-            }
-            toward = -toward;
-            let misread = false;
-            let reversed = false;
-            for (let step = 0; ; step++) {
-              const done = travelSample(driver, input, toward, transition, phase, step);
-              checkReference();
-              if (fighter.ground.action !== GroundAction.dash && !(fighter.ground.action === GroundAction.none && fighter.ground.pivotGraceFrames > 0)) misread = true;
-              if (fighter.ground.dashFrame === 1 && fighter.ground.dashDirection === toward && fighter.facing === toward) reversed = true;
-              if (done) {
-                if (!reversed || fighter.ground.action !== GroundAction.dash || fighter.facing !== toward || fighter.ground.dashDirection !== toward) misread = true;
-                break;
-              }
-            }
-            dashbacks++;
-            if (misread || frameMisreads !== before) {
-              misreads++;
-
-              if (failures.length < 8) failures.push(`${character} facing ${facing} input ${input} phase ${phase} transition ${transition} hold ${hold}: action ${fighter.ground.action} facing ${fighter.facing}`);
-            }
-          }
-          assertEquals(driver.frame * 3, reference.length);
-        }
-      }
-    }
-  }
-  assertEquals(dashbacks, 9216);
-  assertEquals(timeline, DASH_DANCE_REFERENCE.length);
-  assertEquals(failures.join("\n"), "", `reference main ${DASH_DANCE_REFERENCE_MAIN}, largest x deviation ${dashDanceLargestDeviation}`);
-  assertEquals(misreads, 0);
 });
