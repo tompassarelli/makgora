@@ -7,7 +7,7 @@
 import { ModelRenderer, model as mdx } from 'war3-model';
 
 
-export const KEY_BOUND = { position: 0.5, rotationDegrees: 0.5 } as const;
+export const KEY_BOUND = { position: 0.5, rotationDegrees: 0.5, tangents: 'slope' } as const;
 export type KeyBound = { readonly position: number, readonly rotationDegrees: number };
 
 export interface KeyThinReport {
@@ -262,7 +262,38 @@ const keyCount = (model: mdx.Model) => { let count = 0; transforms(model, track 
 
 
 
-export function thinKeys(source: mdx.Model, bound: KeyBound = KEY_BOUND): { model: mdx.Model, report: KeyThinReport } {
+const sameVector = (a: Vec | undefined, b: Vec) => a !== undefined && a.length === b.length && Array.from(b).every((value, axis) => a[axis] === value);
+
+/** Hermite translation and scale keys whose tangents repeat their own value become clamped Catmull-Rom slopes, zero at holds and clip ends. */
+export function slopeTangents(source: mdx.Model): mdx.Model {
+    const model = structuredClone(source);
+    const sequenceOf = (frame: number) => model.Sequences.findIndex(sequence => frame >= at(sequence.Interval, 0) && frame <= at(sequence.Interval, 1));
+    transforms(model, (track, _node, channel) => {
+        if (channel === 'Rotation' || track.LineType !== mdx.LineType.Hermite) return;
+        const keys = track.Keys;
+        const repaired = keys.map(key => sameVector(key.InTan, key.Vector) && sameVector(key.OutTan, key.Vector) && Array.from(key.Vector).some(value => value !== 0));
+        keys.forEach((key, index) => {
+            if (!repaired[index]) return;
+            const sequence = sequenceOf(key.Frame), previous = keys[index - 1], next = keys[index + 1];
+            const inTan = new Float32Array(key.Vector.length), outTan = new Float32Array(key.Vector.length);
+            if (previous !== undefined && next !== undefined && sequence >= 0 && sequenceOf(previous.Frame) === sequence && sequenceOf(next.Frame) === sequence) {
+                for (let axis = 0; axis < key.Vector.length; axis++) {
+                    const left = at(key.Vector, axis) - at(previous.Vector, axis), right = at(next.Vector, axis) - at(key.Vector, axis);
+                    if (left * right <= 0) continue;
+                    const slope = (left + right) / (next.Frame - previous.Frame);
+                    inTan[axis] = Math.sign(left) * Math.min(Math.abs(slope * (key.Frame - previous.Frame)), 2 * Math.abs(left));
+                    outTan[axis] = Math.sign(right) * Math.min(Math.abs(slope * (next.Frame - key.Frame)), 2 * Math.abs(right));
+                }
+            }
+            key.InTan = inTan;
+            key.OutTan = outTan;
+        });
+    });
+    return model;
+}
+
+export function thinKeys(original: mdx.Model, bound: KeyBound = KEY_BOUND): { model: mdx.Model, report: KeyThinReport } {
+    const source = slopeTangents(original);
     for (let scale = 0.5; scale > 0.01; scale *= 0.6) {
         const model = thinned(source, bound, scale), error = poseError(source, model);
         if (error.maxPosition <= bound.position && error.maxRotationDegrees <= bound.rotationDegrees)

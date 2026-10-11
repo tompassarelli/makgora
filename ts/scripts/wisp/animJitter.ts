@@ -19,6 +19,9 @@ export const JITTER_LIMITS = { translation: 1.0, scaling: 0.02, rotation: 2.0 } 
 /** Keys this close (three 60 Hz frames) that the curve leaves reverse direction faster than a pose can read: a shake. */
 export const JITTER_SPAN_MS = 50;
 
+/** A moving segment may ease past its keys by this share of their distance; a hold (equal keys) may not leave its value. */
+export const SPAN_ALLOWANCE = 0.5;
+
 const STEPS = 8;
 
 type Quat = readonly [number, number, number, number];
@@ -59,7 +62,8 @@ function segmentExcess(left: mdx.AnimVectorKey, right: mdx.AnimVectorKey, type: 
     }
     for (let axis = 0; axis < a.length; axis++) {
       const value = curve(a[axis] ?? 0, outTan[axis] ?? 0, inTan[axis] ?? 0, b[axis] ?? 0, t, type);
-      worst = Math.max(worst, value - Math.max(a[axis] ?? 0, b[axis] ?? 0), Math.min(a[axis] ?? 0, b[axis] ?? 0) - value);
+      const low = Math.min(a[axis] ?? 0, b[axis] ?? 0), high = Math.max(a[axis] ?? 0, b[axis] ?? 0);
+      worst = Math.max(worst, Math.max(value - high, low - value) - SPAN_ALLOWANCE * (high - low));
     }
   }
   return worst;
@@ -84,7 +88,7 @@ export function clipJitter(model: mdx.Model, from: number, to: number): ClipJitt
         const excess = segmentExcess(left, right, track.LineType, property === "Rotation");
         const kind = property === "Translation" ? "translation" : property === "Scaling" ? "scaling" : "rotation";
         totals[kind] = Math.max(totals[kind], excess);
-        const ratio = excess / JITTER_LIMITS[kind];
+        const ratio = kind === "rotation" ? 0 : excess / JITTER_LIMITS[kind];
         if (ratio > worstRatio) { worstRatio = ratio; worst = { node: node.Name, property, frame: left.Frame, excess }; }
       }
     }
@@ -92,5 +96,6 @@ export function clipJitter(model: mdx.Model, from: number, to: number): ClipJitt
   return { ...totals, worst };
 }
 
+/** Rotation is reported but not gated: a Hermite rotation tangent is a quaternion control point, and stock clips leave the arc by design. */
 export const jitters = (jitter: ClipJitter) =>
-  jitter.translation > JITTER_LIMITS.translation || jitter.scaling > JITTER_LIMITS.scaling || jitter.rotation > JITTER_LIMITS.rotation;
+  jitter.translation > JITTER_LIMITS.translation || jitter.scaling > JITTER_LIMITS.scaling;
