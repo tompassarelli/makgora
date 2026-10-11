@@ -15,6 +15,16 @@ import { IMPACT_DEFILE_MODEL } from "../assets/impactAssetInfo";
 import { heroProjectileArt } from "../presentation/projectileArt";
 import { definitiveCues } from "./specialCueEffects";
 
+const STATIONARY_PARTICLE_MODELS = [
+  "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx",
+  "Abilities\\Spells\\Other\\Stampede\\StampedeMissileDeath.mdx",
+  "Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireDamage.mdx",
+  "Abilities\\Spells\\NightElf\\TargetArtLumber\\TargetArtLumber.mdx",
+  "Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx",
+  "Units\\Undead\\PlagueCloud\\PlagueCloud.mdx",
+  "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx",
+  "Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx",
+];
 
 interface Pool {
   readonly path: string;
@@ -269,8 +279,12 @@ export class ProjectilePresentation {
         BlzSetSpecialEffectTimeScale(model, 0.0);
       } else if (cue?.birth === undefined && projectile?.spec !== undefined && projectile.velocityX === 0.0 && projectile.velocityZ === 0.0) {
 
-        BlzSetSpecialEffectTime(model, f32(0.3));
-        BlzSetSpecialEffectTimeScale(model, 0.0);
+        if (pool !== undefined && STATIONARY_PARTICLE_MODELS.includes(pool.drawn)) {
+          if (born) BlzSetSpecialEffectTime(model, f32(0.3));
+        } else {
+          BlzSetSpecialEffectTime(model, f32(0.3));
+          BlzSetSpecialEffectTimeScale(model, 0.0);
+        }
       }
       const boundarySlot = pool?.boundaries[pool.effects.indexOf(slot)];
       const boundary = boundarySlot === undefined ? undefined : this.models[boundarySlot];
