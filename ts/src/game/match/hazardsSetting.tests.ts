@@ -7,13 +7,13 @@ import { fighterAt } from "../sim/roster";
 import { Phase, stageClock } from "./rules";
 import { stepMatch } from "./step";
 
-for (const [stage, period] of [[CARRIED_TEST_STAGE, 920], [TIMED_TEST_STAGE, 420]] as const) {
+for (const [stage, period] of [[CARRIED_TEST_STAGE, 400], [TIMED_TEST_STAGE, 420]] as const) {
   test(`stage ${stage}'s complete platform timetable replays exactly and costs no neutral 0% stock [k1 scenario]`, () => {
     const live = createReplaySnapshot(); const saved = createReplaySnapshot(); const replay = createReplaySnapshot();
     live.match.phase = Phase.match; live.match.stageChoice = stage;
     live.match.humanMask = 3; live.match.humanFighterMask = 3;
     const first = fighterAt(live.world, 0);
-    first.motion.surface = 1; first.motion.x = stage === CARRIED_TEST_STAGE ? -420.0 : -330.0;
+    first.motion.surface = 1; first.motion.x = stage === CARRIED_TEST_STAGE ? -210.0 : -330.0;
     first.motion.z = surfaceZAt(stage, 1, 0, first.motion.x);
     fighterAt(live.world, 1).motion.x = 0.0;
     copyReplayState(saved, live);
