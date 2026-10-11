@@ -54,8 +54,14 @@ env:
     if [ -z "$fields" ]; then
       jq 'map(del(.issues) + {labels: []})' lane-refs.json
     else
-      gh api graphql -F owner="${GH_REPO%/*}" -F name="${GH_REPO#*/}" -f query="query(\$owner: String!, \$name: String!) { repository(owner: \$owner, name: \$name) { $fields } }" |
-        jq --slurpfile lanes lane-refs.json '.data.repository as $issues | $lanes[0] | map(. + {labels: ([.issues[] as $number | $issues["i" + ($number | tostring)].labels.nodes[]?.name] | unique)} | del(.issues))'
+      if ! gh api graphql -F owner="${GH_REPO%/*}" -F name="${GH_REPO#*/}" -f query="query(\$owner: String!, \$name: String!) { repository(owner: \$owner, name: \$name) { $fields } }" > issue-labels.json; then
+        echo "Issue labels could not all resolve; unresolved lanes keep FIFO." >&2
+      fi
+      if jq -e 'type == "object" and (.data.repository | type == "object")' issue-labels.json > /dev/null 2>&1; then
+        jq --slurpfile lanes lane-refs.json '.data.repository as $issues | $lanes[0] | map(. + {labels: ([.issues[] as $number | $issues["i" + ($number | tostring)].labels.nodes[]?.name] | unique)} | del(.issues))' issue-labels.json
+      else
+        jq 'map(del(.issues) + {labels: []})' lane-refs.json
+      fi
     fi
 
 jobs:
