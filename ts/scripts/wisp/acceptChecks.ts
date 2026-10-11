@@ -32,6 +32,7 @@ const stageProfile = (name: string) => `stage-${name.toLowerCase().replace(/[^a-
 const heroProfile = (name: string) => `hero-${name.toLowerCase().replace(/\s+/g, "-")}`;
 
 export const MAP_PROFILES: Readonly<Record<string, SmashcraftMapProfile>> = {
+  "gate-playable": { describe: "exact playable candidate, with ordinary selection and input", path: join(inputs, "play-current/9f0b248a4e20b52987bc6856ef611a823b368d00/Smashcraft 0.0.133 9f0b248.w3x"), quick: "" },
   outfits: { describe: "four-colour portrait candidate, red Illidan and blue Rifleman", path: join(inputs, "slot-outfits-161-20261007/Smashcraft diagnostic slot portrait outfits.w3x"), quick: "-dev quick" },
   "portraits-363": { describe: "Classic and Definitive portraits built for #363", path: join(homedir(), ".local/state/smashcraft/portraits-363-codex/Smashcraft-363-select-art.w3x"), quick: "-dev quick" },
   ...STAGE_COMPOSITION_MAPS,
@@ -163,6 +164,11 @@ const slashLightChecks: NativeCheck[] = (["before", "after"] as const).map((phas
 export const SMASHCRAFT_ACCEPT: AcceptSuite = {
   maps: MAP_PROFILES,
   checks: [
+    {
+      id: "gate-cursor-visible", closes: "T7 C1", map: "gate-playable", session: "gate-cursor",
+      setup: [{ chat: "gate:cursor", client: "a" }],
+      pass: [NO_ERRORS, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE cursor frames=\\d+ visible=\\d+ sweepMs=\\d+ picked=1 dropped=1 pass=1$", min: 1 }],
+    },
     {
       id: "123-selection", closes: "smashcraft#123 box 5", map: "presentation", session: "123-match-flow",
       setup: [

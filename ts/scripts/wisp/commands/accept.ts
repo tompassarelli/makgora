@@ -4,13 +4,14 @@
 
 
 
-import { existsSync, mkdirSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { BunServices } from "@effect/platform-bun";
-import { Clock, type Duration, Effect, Layer } from "effect";
+import { Clock, type Duration, Effect, Layer, Schema } from "effect";
 import { ChildProcess } from "effect/process";
-import { AcceptDriver, AcceptFailure, type AcceptSuite, type ReceiptFile } from "wisp/scripts/wisp/accept";
+import { AcceptDriver, AcceptFailure, type AcceptSuite, type ReceiptFile, selectChecks } from "wisp/scripts/wisp/accept";
 import type { Frame } from "wisp/scripts/wisp/frameProbe";
 import { liveAcceptDriver } from "wisp/scripts/wisp/acceptLive";
 import { spawnLogged } from "wisp/scripts/wisp/hostProcess";
@@ -31,6 +32,33 @@ import { profileOptions } from "./map";
 import { onHealthyClients, readClientsFile, smashcraftWatch } from "../doctor";
 import { LAN_POOL_FILE, lanPairs, withTools } from "../padBatch";
 import { platformLayer } from "wisp/scripts/platform/layer";
+import { preferencesPath, videoSettings } from "wisp/scripts/warcraft/preferences";
+import { measureCursorGate } from "../gateCursor";
+
+const ReportMetadata = Schema.fromJsonString(Schema.Record(Schema.String, Schema.Unknown));
+
+const candidateIdentity = (candidate: string, clientsFile: string) => Effect.try({
+  try: () => {
+    const looks = readClientsFile(clientsFile).clients.map(client => videoSettings(readFileSync(preferencesPath(client.documents), "utf8"), "Misc").hd);
+    if (looks.length === 0 || looks.some(look => look !== "0")) throw new Error("Classic gate requires every client's Misc.hd=0");
+    return { candidateMapSha256: createHash("sha256").update(readFileSync(candidate)).digest("hex"), graphicsLook: "classic" as const };
+  },
+  catch: cause => new AcceptFailure({ operation: "identify gate candidate", problem: describeCause(cause) }),
+});
+
+const bindCandidateReport = (directory: string, candidate: string, clientsFile: string, identity: Effect.Success<ReturnType<typeof candidateIdentity>>, since: number) => Effect.gen(function*() {
+  const path = join(directory, "report.json");
+  if (!existsSync(path)) return;
+  const text = yield* Effect.try({ try: () => readFileSync(path, "utf8"), catch: cause => new AcceptFailure({ operation: "read candidate report", problem: describeCause(cause) }) });
+  const report = yield* Schema.decodeEffect(ReportMetadata)(text).pipe(Effect.mapError(cause => new AcceptFailure({ operation: "decode candidate report", problem: cause.message })));
+  if (typeof report.started !== "number" || report.started < since) return yield* new AcceptFailure({ operation: "bind candidate report", problem: "no report written by this acceptance run" });
+  const after = yield* candidateIdentity(candidate, clientsFile);
+  if (after.candidateMapSha256 !== identity.candidateMapSha256) return yield* new AcceptFailure({ operation: "bind candidate report", problem: "candidate bytes changed during acceptance" });
+  yield* Effect.try({
+    try: () => writeFileSync(path, `${JSON.stringify({ ...report, ...identity }, null, 2)}\n`, { mode: 0o600 }),
+    catch: cause => new AcceptFailure({ operation: "bind candidate report", problem: describeCause(cause) }),
+  });
+});
 
 
 const clientNames = (clientsFile: string): [string, ...string[]] => {
@@ -219,6 +247,8 @@ export const accept: Command = (rawArgs) => Effect.gen(function*() {
   });
   if (pair !== undefined && clientsFile !== clientState) return yield* new UsageFailure({ problem: "--clients-file and --pair select different clients; give one" });
   const selectedClients = pair?.clients ?? clientsFile;
+  const gate = selectChecks(suite, flagValues(args, "only").flatMap(value => value.split(/[,\s]+/))).checks.some(check => check.id.startsWith("gate-"));
+  const identity = candidate === undefined || !gate || args.includes("--dry-run") ? undefined : yield* candidateIdentity(candidate, selectedClients);
   const names = clientNames(selectedClients);
   const withoutMap = args.filter((arg, index) => arg !== "--solo" && arg !== "--map" && !arg.startsWith("--map=") && args[index - 1] !== "--map");
   const forwarded = requested.length > 1 ? withoutMap : withoutPairFlags(withoutMap);
@@ -239,7 +269,7 @@ export const accept: Command = (rawArgs) => Effect.gen(function*() {
         const clients = yield* Clients;
         yield* Effect.forEach(clients.all, client => readyAfter(client, started), { concurrency: "unbounded" });
       }
-      yield* (solo ? sendSoloDevCommand(profile.quick) : sendDevCommand(profile.quick)).pipe(step(profile.quick));
+      if (profile.quick !== "") yield* (solo ? sendSoloDevCommand(profile.quick) : sendDevCommand(profile.quick)).pipe(step(profile.quick));
     }).pipe(Effect.provide(Layer.merge(options.services.pipe(Layer.provideMerge(Clients.layer(selectedClients))), smashcraftWatch)));
   });
   const liveDriver = liveAcceptDriver({
@@ -250,10 +280,17 @@ export const accept: Command = (rawArgs) => Effect.gen(function*() {
   const driver = Layer.effect(AcceptDriver, Effect.gen(function*() {
     const live = yield* AcceptDriver;
     const context = yield* Effect.context<Clients | GameFiles>();
-    smoke = withSmokeCapture(AcceptDriver.of({
+    const measurements = new Map<string, ReceiptFile[]>();
+    const controlled = AcceptDriver.of({
       ...live,
-      chat: (name, text) => (solo ? sendSoloDevCommand(text, name) : sendDevCommand(text, name)).pipe(Effect.mapError((cause) => new AcceptFailure({ operation: `chat ${name}`, problem: describeCause(cause) })), Effect.provide(context)),
-    }));
+      chat: (name, text) => text === "gate:cursor" ? measureCursorGate(selectedClients, name, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), "gate-cursor-visible", name)).pipe(
+        Effect.tap(receipt => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipt]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
+      ) : (solo ? sendSoloDevCommand(text, name) : sendDevCommand(text, name)).pipe(Effect.mapError((cause) => new AcceptFailure({ operation: `chat ${name}`, problem: describeCause(cause) })), Effect.provide(context)),
+      receipts: name => Effect.map(live.receipts(name), receipts => [...receipts, ...(measurements.get(name) ?? [])]),
+    });
+    const validated = withSmokeCapture(controlled);
+    smoke = validated;
+    if (gate) return AcceptDriver.of({ ...validated.driver, start: (map, session) => map === "gate-playable" ? controlled.start(map, session) : validated.driver.start(map, session) });
     return smoke.driver;
   })).pipe(Layer.provide(liveDriver), Layer.provide(Layer.mergeAll(Clients.layer(selectedClients), gameFilesLayer, smashcraftWatch)), Layer.provide(platformLayer()));
   const shards = {
@@ -276,5 +313,10 @@ export const accept: Command = (rawArgs) => Effect.gen(function*() {
     }),
   );
 
-  return yield* (args.includes("--dry-run") || requested.length > 1 ? run : onHealthyClients(run, { retry: false, clientsFile: selectedClients }));
+  const observed = args.includes("--dry-run") || requested.length > 1 ? run : onHealthyClients(run, { retry: false, clientsFile: selectedClients });
+  const [directory] = flagValues(args, "out");
+  const since = yield* Clock.currentTimeMillis;
+  return yield* (candidate === undefined || directory === undefined || identity === undefined ? observed : observed.pipe(
+    Effect.onExit(() => bindCandidateReport(directory, candidate, selectedClients, identity, since)),
+  ));
 });
