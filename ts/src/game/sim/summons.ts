@@ -9,7 +9,7 @@ import type { HitEffect } from "./hitRegions";
 import { DIAGONAL_UNIT } from "./knockback";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { type Roster, fighterAt, isActive } from "./roster";
-import { mainDeckLeft, mainDeckRight, mainDeckZAt, surfaceZAt } from "./stage";
+import { mainDeckLeft, mainDeckRight, mainDeckZAt, surfaceCount, surfaceLeft, surfaceRight, surfaceZAt } from "./stage";
 import { cancelAttack, cancelSpecialState, clearDownState, clearGrabLinks, clearLedge, clearOwnedFreezeTrap } from "./transitions";
 
 export const RIFLEMAN_BEAR_LIFETIME = 60;
@@ -45,7 +45,7 @@ export function recordSpecialHit(owner: Fighter, targetSlot: number): void {
 
 export function canStartFreezeTrap(owner: Fighter): boolean {
   const { motion, freezeTrap } = owner;
-  return owner.character === Character.rifleman && motion.grounded && motion.surface !== undefined
+  return owner.character === Character.rifleman && (!motion.grounded || motion.surface !== undefined)
     && freezeTrap.life === 0 && freezeTrap.cooldown === 0 && canAttack(owner);
 }
 
@@ -53,14 +53,14 @@ export function canStartFreezeTrap(owner: Fighter): boolean {
 export function startFreezeTrap(owner: Fighter, stage: number, matchFrame: number): boolean {
   const { motion } = owner;
   const trap = owner.freezeTrap;
-  if (owner.character !== Character.rifleman || !motion.grounded || motion.surface === undefined || trap.life > 0 || trap.cooldown > 0) {
+  if (owner.character !== Character.rifleman || (motion.grounded && motion.surface === undefined) || trap.life > 0 || trap.cooldown > 0) {
     return false;
   }
   trap.x = motion.x;
   trap.exReach = owner.special.ex;
   motion.crouching = false;
-  trap.surface = motion.surface;
-  trap.z = surfaceZAt(stage, motion.surface, matchFrame, trap.x);
+  trap.surface = motion.grounded ? motion.surface : undefined;
+  trap.z = trap.surface === undefined ? motion.z : surfaceZAt(stage, trap.surface, matchFrame, trap.x);
   trap.life = FREEZE_TRAP_LIFETIME_FRAMES;
   trap.arming = FREEZE_TRAP_ARMING_FRAMES;
   trap.serial++;
@@ -70,7 +70,7 @@ export function startFreezeTrap(owner: Fighter, stage: number, matchFrame: numbe
 
 function trapCanContact(owner: Fighter, target: Fighter): boolean {
   const trap = owner.freezeTrap;
-  return trap.life > 0 && trap.arming === 0 && !owner.status.out && !target.status.out && target.status.frozenFrames === 0 && target.status.freezeImmunityFrames === 0
+  return trap.life > 0 && trap.surface !== undefined && trap.arming === 0 && !owner.status.out && !target.status.out && target.status.frozenFrames === 0 && target.status.freezeImmunityFrames === 0
     && target.motion.grounded && target.motion.surface === trap.surface && !isIntangible(target)
     && Math.abs(f32(target.motion.x - trap.x)) <= f32(FREEZE_TRAP_TRIGGER_RADIUS * (trap.exReach ? 1.25 : 1.0));
 }
@@ -111,7 +111,7 @@ const trapScratch = { triggers: [false, false, false, false], freezes: [false, f
 
 
 
-export function advanceFreezeTraps(world: Roster): void {
+export function advanceFreezeTraps(world: Roster, stage: number, matchFrame: number): void {
   const { triggers, freezes } = trapScratch;
   for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
     triggers[slot] = false;
@@ -121,6 +121,20 @@ export function advanceFreezeTraps(world: Roster): void {
   for (let ownerSlot = 0; ownerSlot < PARTICIPANT_CAPACITY; ownerSlot++) {
     if (!isActive(world, ownerSlot)) continue;
     const owner = fighterAt(world, ownerSlot);
+
+    const trap = owner.freezeTrap;
+    if (trap.life > 0 && trap.surface === undefined) {
+      const previousZ = trap.z;
+      trap.z = f32(trap.z - 8.0);
+      for (let surface = 0; surface < surfaceCount(stage); surface++) {
+        if (trap.x < surfaceLeft(stage, surface, matchFrame) || trap.x > surfaceRight(stage, surface, matchFrame)) continue;
+        const z = surfaceZAt(stage, surface, matchFrame, trap.x);
+        if (previousZ >= z && trap.z <= z) {
+          trap.z = z;
+          trap.surface = surface;
+        }
+      }
+    }
 
     if (owner.freezeTrap.life <= 0 || owner.freezeTrap.arming !== 0 || owner.status.out) continue;
     let nearest: number | undefined;

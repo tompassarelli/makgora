@@ -73,7 +73,7 @@ function trapFrozenRifleman(): Fighter {
   owner.freezeTrap.life = 30;
   owner.freezeTrap.x = 0.0;
   owner.freezeTrap.surface = 0;
-  advanceFreezeTraps(testWorld(owner, target));
+  advanceFreezeTraps(testWorld(owner, target), 0, 0);
   assertEquals(target.status.frozenFrames, FREEZE_TRAP_FREEZE_FRAMES);
   return target;
 }

@@ -213,7 +213,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
     observedFrameLegalActions[slot] |= observedActions.legal;
     if (started) observedFrameStartedActions[slot] |= 64;
   }
-  advanceFreezeTraps(world);
+  advanceFreezeTraps(world, stage, stageFrame);
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;
     const f = fighterAt(world, slot);

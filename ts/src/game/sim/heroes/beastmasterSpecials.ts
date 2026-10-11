@@ -85,5 +85,6 @@ export const BEASTMASTER_SPECIALS: FighterSpecials = {
   neutral: withExKit({ name: "Wild Axes", description: "Throw two axes; move to guide their return through the enemy.", ground: wildAxes(false), air: wildAxes(true) }, { damage: 1.25 }),
   side: withExKit({ name: "Summon Bear", description: "Call Bear, then press again for its lunge and a Stampede.", ground: SUMMON_BEAR, recall: BEAR_COMMAND }, { damage: 1.25, durability: 1.25 }),
   up: withExKit({ name: "Summon Hawk", description: "Call Hawk, then command a dive. In the air, Hawk carries him up.", ground: SUMMON_HAWK, recall: HAWK_DIVE, recallGroundOnly: true, air: hawkLift(h(f32(3.6)), h(f32(0.3)), h(f32(3.4))) }, { travel: 1.25, durability: 1.25, recallProtection: 4 }),
-  down: withExKit({ name: "Summon Quilbeast", description: "Set a Quilbeast firing position; press again for a three-quill volley.", ground: SUMMON_QUILBEAST, recall: QUILL_VOLLEY }, { damage: 1.25, durability: 1.25, recallProtection: 4 }),
+  down: withExKit({ name: "Summon Quilbeast", description: "Set a Quilbeast firing position; press again for a three-quill volley.", ground: SUMMON_QUILBEAST, air: { endFrame: SUMMON_QUILBEAST.endFrame, landingLag: AIR_SPECIAL_LANDING_LAG,
+    projectiles: [18, 22, 26].map(spawnFrame => ({ ...QUILL, spawnFrame, offsetZ: 0.0, velocityX: h(f32(0.035)), velocityZ: -h(f32(0.14)) })) }, recall: QUILL_VOLLEY }, { damage: 1.25, durability: 1.25, recallProtection: 4 }),
 };

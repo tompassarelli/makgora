@@ -42,5 +42,6 @@ export const MURLOC_SPECIALS: FighterSpecials = {
   neutral: withExKit({ name: "Ensnare", description: "Throw a net that slows the first enemy it reaches. Shield it or jump it.", ground: ensnare(false), air: ensnare(true) }, { reach: 1.25 }),
   side: withExKit({ name: "Tidal Rush", description: "Belly-slide forward into a hit. A raised shield stops the slide.", ground: tidalRush(false), air: tidalRush(true) }, { damage: 1.25 }),
   up: withExKit({ name: "Tide Spout", description: "Ride a water spout upward and steer it, then fall helpless.", ground: tideSpout(17.0, 6.0) }, { travel: 1.25 }),
-  down: withExKit({ name: "Disease Cloud", description: "Leave a small plague cloud that poisons enemies standing in it; jumping clears it.", ground: DISEASE_CLOUD }, { reach: 1.25 }),
+  down: withExKit({ name: "Disease Cloud", description: "Leave a small plague cloud that poisons enemies standing in it; jumping clears it.", ground: DISEASE_CLOUD, air: { ...DISEASE_CLOUD, groundOnly: false, landingLag: 20,
+    projectiles: DISEASE_CLOUD.projectiles?.map(shot => ({ ...shot, pool: undefined, needsLineOfSight: undefined, offsetX: 0.0, offsetZ: 22.0 })) } }, { reach: 1.25 }),
 };

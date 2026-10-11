@@ -478,6 +478,7 @@ export function landHeroSpecial(f: Fighter): boolean {
       first = min(first, form.placement?.frame ?? first);
       first = min(first, form.command?.frame ?? first);
       first = min(first, form.guard?.first ?? first);
+      first = min(first, form.commandGrab?.first ?? first);
       first = min(first, form.armor === undefined ? first : form.armor.first - 1);
       first = min(first, form.burst?.frame ?? first);
       first = min(first, form.buff?.frame ?? first);
