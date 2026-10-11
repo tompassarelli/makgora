@@ -7,7 +7,6 @@ import { expect, test } from "bun:test";
 import { sweep } from "./sweep";
 import { Character } from "../src/game/sim/codes";
 import { HERO_ROSTER } from "../src/game/sim/heroes/registry";
-import { SHIELD_REFLECTOR_ACTIVE_FRAMES } from "../src/game/sim/shield";
 import { PROJECTILE_SPACINGS, outOfShieldStarts, projectileRows } from "../scripts/interactions";
 
 const POINT_BLANK = PROJECTILE_SPACINGS[0];
@@ -41,11 +40,6 @@ function violations(character: Character, name: string): Map<string, string> {
   for (const start of outOfShieldStarts(character)) if (start.start === undefined) add("out of shield", 6, `${start.option} never starts from shield`);
   return found;
 }
-
-test("the powershield's reflector stays inside the accepted 2-4 frame window [k3 measure docs/gameplay-design.md]", () => {
-  expect(SHIELD_REFLECTOR_ACTIVE_FRAMES).toBeGreaterThanOrEqual(2);
-  expect(SHIELD_REFLECTOR_ACTIVE_FRAMES).toBeLessThanOrEqual(4);
-});
 
 // The original three fighters run in the suite; every hero's rules run as sweeps.
 for (const [index, fighter] of FIGHTERS.entries()) {

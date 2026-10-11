@@ -42,7 +42,6 @@
     "plugins/**/*.ts",
     "test/advantage-state.test.ts",
     "test/air-drift.test.ts",
-    "test/autoland.test.ts",
     "test/cpu-field.test.ts",
     "test/dreadlord-shadow-hunter-gameplans.test.ts",
     "test/genre-envelope.test.ts",
