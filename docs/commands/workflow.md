@@ -70,3 +70,16 @@ calibration scope. Worst is diagnostic. Its note is "Lua cost predicted;
 whole frame not measured". The installed playtest keeps both files beside
 its map. Compare the samples from `ts/` with
 `bun wisp perf compare test/fixtures/perf/playable-bot-four.perf MAP.w3x.lua-cost.perf`.
+
+The reusable pre-merge adapter is `bun scripts/premerge.ts BASE_SHA` from ts/.
+Its workflow accepts `test-selection-script`, `cli-command` (the `bun <cli>`
+prefix), `selected-tests` (a JSON array of existing test paths),
+`determinism-check`, and `farm-runner` (hosted or a warm runner; `farm-big`
+is routed to hosted). The adapter calls `ci pre-merge --base SHA --json`,
+preserves raw stage lines in build/premerge-stages.jsonl, and uses only exit
+codes: 0 passes, 1 fails, and 75 requires the full fallback. Unsupported
+commands also require that fallback. Failed-test names may be absent.
+Without `cli-command`, the temporary stub runs `bun run check` and the
+caller-selected tests, then returns 75 even when they pass. This is not full
+gate evidence; the existing train remains active until replay acceptance
+and the Wisp integration are complete.
