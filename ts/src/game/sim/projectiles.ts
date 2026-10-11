@@ -1,4 +1,5 @@
 
+import { imod } from "wisp/src/sim/intMath";
 
 import { max, min } from "../../runtime/numbers";
 import { roundToFloat32 } from "wisp/src/sim/binary32";
@@ -364,6 +365,30 @@ function flyHeroProjectile(world: Roster, ownerSlot: number, projectile: Project
 }
 
 
+const trailPiece = emptyCapsule();
+
+function strikeFromTrail(world: Roster, ownerSlot: number): void {
+  const owner = fighterAt(world, ownerSlot);
+  for (let targetSlot = 0; targetSlot < PARTICIPANT_CAPACITY; targetSlot++) {
+    if (!isActive(world, targetSlot) || targetSlot === ownerSlot || targets.out[targetSlot] || targets.intangible[targetSlot]) continue;
+    const target = fighterAt(world, targetSlot);
+    const body = placeCapsule(heroTarget, hurtCapsule(target.character), at(targets.x, targetSlot), at(targets.z, targetSlot), target.facing);
+    for (const piece of owner.projectiles) {
+      const every = piece.spec?.trail?.every ?? 0;
+      if (piece.life <= 0 || piece.kind !== ProjectileKind.hero || piece.spec === undefined || every <= 0 || imod(piece.life, every) !== every - 1) continue;
+      trailPiece.x1 = piece.x;
+      trailPiece.z1 = piece.z;
+      trailPiece.x2 = piece.x;
+      trailPiece.z2 = piece.z;
+      trailPiece.radius = piece.spec.radius;
+      if (!capsulesIntersect(trailPiece, body)) continue;
+      collectDamageContact(world, ownerSlot, targetSlot, piece.spec.effect, piece.direction, ContactKind.flinch, false, undefined, target.shield.raised, undefined, piece.z);
+      break;
+    }
+  }
+}
+
+
 function side(ax: number, az: number, bx: number, bz: number, cx: number, cz: number): number {
   return f32(f32(f32(bx - ax) * f32(cz - az)) - f32(f32(bz - az) * f32(cx - ax)));
 }
@@ -524,6 +549,7 @@ export function updateProjectiles(world: Roster, stage?: number, matchFrame = 0)
       }
     }
   }
+  for (let ownerSlot = 0; ownerSlot < PARTICIPANT_CAPACITY; ownerSlot++) if (isActive(world, ownerSlot)) strikeFromTrail(world, ownerSlot);
   for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
     if (!isActive(world, slot)) continue;
     const fighter = fighterAt(world, slot);

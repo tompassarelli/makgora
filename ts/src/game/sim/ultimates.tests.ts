@@ -282,6 +282,125 @@ test("Cairne centre ankh burst and arrival replay per frame, including a displac
   }
 });
 
+interface BansheeRun {
+  contact: number;
+  contactDamage: number;
+  carry: number;
+  span: number;
+  ticks: number;
+  tickDamage: number[];
+  bystanderShift: number;
+  ownerDamage: number;
+  turnedTooFar: number;
+  intangibleSeek: number;
+  targetDamage: number;
+  recorded: string[];
+}
+
+/** Sylvanas dives at Blademaster while a Rifleman walks into her wake and stands; `fault` shifts one trail piece's clock at the seal. */
+function bansheeRun(fault: boolean, saveAt?: (state: ReplayState) => void): BansheeRun {
+  const owner = createFighter(Character.sylvanas, -50.0, 1);
+  const target = createFighter(Character.blademaster, 200.0, -1);
+  const bystander = createFighter(Character.rifleman, -330.0, 1);
+  const match = createMatchState();
+  match.phase = Phase.match;
+  match.timeLimitMinutes = 0;
+  const live: ReplayState = { world: createRoster(7, [owner, target, bystander]), match, controls: createFrameControls(), runtime: createPacingAndPresentation() };
+  const replay = createReplaySnapshot();
+  for (let frame = 1; frame <= 8; frame++) {
+    const row = createMatchFrameInput();
+    assertTrue(captureFrame(row, frame, 7, live.controls, live.runtime));
+    assertTrue(executeMatchFrame(row, match, live.world, live.controls, live.runtime, frame));
+  }
+  owner.mana.points = ROSTER_MANA.max;
+  const run: BansheeRun = { contact: 0, contactDamage: 0, carry: 0, span: 0, ticks: 0, tickDamage: [], bystanderShift: 0, ownerDamage: 0, turnedTooFar: 0, intangibleSeek: 0, targetDamage: 0, recorded: [] };
+  const turnCos = ultimateOf(Character.sylvanas).motion?.find((segment) => segment.seek !== undefined)?.seek?.turnCos ?? 1.0;
+  let contactX = 0.0;
+  let lastTarget = 0.0;
+  let lastBystander = 0.0;
+  let standingX: number | undefined;
+  let sealed = false;
+  let headingX = 0.0;
+  let lastSeekFrame = 0;
+  let headingZ = 0.0;
+  for (let tick = 1; tick <= 240; tick++) {
+    const walking = standingX === undefined && bystander.motion.x < -40.0;
+    copyControls(live.controls.inputs[0], tick === 1 ? ULTIMATE : controls());
+    copyControls(live.controls.inputs[1], controls());
+    copyControls(live.controls.inputs[2], walking ? controls({ direction: 1, walking: true }) : controls());
+    const row = createMatchFrameInput();
+    assertTrue(captureFrame(row, tick + 8, 7, live.controls, live.runtime));
+    assertTrue(executeMatchFrame(row, match, live.world, live.controls, live.runtime, tick + 8));
+    if (!walking && standingX === undefined && bystander.motion.vx === 0.0) standingX = bystander.motion.x;
+    const pieces = owner.projectiles.filter((projectile) => projectile.life > 0 && projectile.spec?.trail !== undefined && projectile.spec.trail.every > 0);
+    if (!sealed && pieces.length > 0) {
+      sealed = true;
+      run.carry = f32(owner.motion.x - contactX);
+      const xs = pieces.map((piece) => piece.x);
+      run.span = f32(Math.max(...xs) - Math.min(...xs));
+      if (fault) {
+        const piece = owner.projectiles.find((projectile) => projectile.life > 0 && projectile.spec?.trail !== undefined && projectile.spec.trail.every > 0 && projectile.x === Math.min(...xs));
+        if (piece !== undefined) piece.life -= 10;
+      }
+    }
+    if (target.status.damage > lastTarget && run.contact === 0) {
+      run.contact = owner.special.frame;
+      run.contactDamage = target.status.damage;
+      contactX = owner.motion.x;
+    }
+    lastTarget = target.status.damage;
+    if (bystander.status.damage > lastBystander) {
+      run.ticks++;
+      run.tickDamage.push(f32(bystander.status.damage - lastBystander));
+      assertEquals(bystander.launch.hitstun, 3, `tick flinch at ${tick}`);
+    }
+    lastBystander = bystander.status.damage;
+    if (standingX !== undefined) run.bystanderShift = Math.max(run.bystanderShift, Math.abs(f32(bystander.motion.x - standingX)));
+    const seeking = owner.special.action === SpecialAction.heroUltimate && owner.special.form === 0 && owner.special.frame >= 19 && owner.special.frame <= 98;
+    if (seeking && owner.special.frame !== lastSeekFrame) {
+      lastSeekFrame = owner.special.frame;
+      if (isIntangible(owner)) run.intangibleSeek++;
+      const speed = Math.sqrt(owner.motion.vx * owner.motion.vx + owner.motion.vz * owner.motion.vz);
+      const nextX = owner.motion.vx / speed;
+      const nextZ = owner.motion.vz / speed;
+      if (headingX !== 0.0 || headingZ !== 0.0) {
+        if (nextX * headingX + nextZ * headingZ < turnCos - f32(1e-6)) run.turnedTooFar++;
+      }
+      headingX = nextX;
+      headingZ = nextZ;
+    }
+    run.ownerDamage = Math.max(run.ownerDamage, owner.status.damage);
+    run.recorded.push(`${tick}:move=${owner.special.frame}/${owner.special.form},owner=${owner.motion.x}/${owner.motion.z},v=${owner.motion.vx}/${owner.motion.vz},target=${target.motion.x}/${target.status.damage},bystander=${bystander.motion.x}/${bystander.status.damage},pieces=${pieces.map((piece) => `${piece.x}@${piece.life}`).join(";")}`);
+    if (tick === 30 && saveAt !== undefined) {
+      saveAt(live);
+      copyReplayState(replay, live);
+    } else if (tick > 30 && saveAt !== undefined) {
+      assertTrue(executeMatchFrame(row, replay.match, replay.world, replay.controls, replay.runtime, tick + 8));
+      assertEquals(firstStateDifference(live, replay), undefined, run.recorded[tick - 1]);
+      if (tick === 240) assertEquals(stateChecksum(live), stateChecksum(replay), run.recorded[tick - 1]);
+    }
+  }
+  run.targetDamage = target.status.damage;
+  return run;
+}
+
+test("Sylvanas's Banshee Form homes, connects, carries through and leaves a trail that ticks a standing foe six times, replayed per frame, with a shifted trail clock fault (#511) [k1 scenario]", () => {
+  const run = bansheeRun(false, () => undefined);
+  const log = run.recorded.join("\n");
+  assertEquals(run.contact >= 19 && run.contact <= 98, true, log);
+  assertEquals(run.contactDamage, 14.0, log);
+  assertEquals(run.carry >= 72.0 && run.carry <= 90.0, true, `carry ${run.carry}\n${log}`);
+  assertEquals(run.span >= 270.0 && run.span <= 360.0, true, `span ${run.span}\n${log}`);
+  assertEquals(run.ticks, 6, log);
+  assertEquals(run.tickDamage.join(","), "1,1,1,1,1,1", log);
+  assertEquals(run.bystanderShift, 0.0, log);
+  assertEquals(run.ownerDamage, 0.0, log);
+  assertEquals(run.turnedTooFar, 0, log);
+  assertEquals(run.intangibleSeek, run.contact - 18, log);
+  assertEquals(run.targetDamage <= 20.0, true, log);
+  assertEquals(bansheeRun(true).ticks !== 6, true, "a trail piece off the shared clock must tick the standing foe a seventh time");
+});
+
 test("with Ultimates off no fighter performs an ultimate from Attack + Special, EX still spends one segment and a landed hit still fills the bar [k3 measure #382]", () => {
   const failures: string[] = [];
   for (const scenario of ULTIMATE_SCENARIOS) {

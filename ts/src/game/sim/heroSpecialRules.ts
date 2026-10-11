@@ -24,6 +24,7 @@ import { HurtContact, strikeHurtContact } from "./hurtboxes";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { mainDeckLeft, mainDeckRight, mainDeckZAt, solidSurfaceAt, solidSurfaceCount } from "./stage";
 import { currentTraits } from "./identityTraits";
+import { squareRoot } from "./warcraftMath";
 
 
 const DIAGONAL = 0.7071067690849304;
@@ -50,7 +51,9 @@ function requestedSlot(input: Readonly<Controls>): SpecialSlot {
 
 function ownedCount(f: Readonly<Fighter>, spec: Readonly<SpecialProjectile> | undefined): number {
   let count = 0;
-  for (const projectile of f.projectiles) if (projectile.life > 0 && projectile.kind === ProjectileKind.hero && (spec === undefined || projectile.spec === spec)) count++;
+  for (const projectile of f.projectiles) {
+    if (projectile.life > 0 && projectile.kind === ProjectileKind.hero && (spec === undefined ? projectile.spec?.trail === undefined : projectile.spec === spec)) count++;
+  }
   return count;
 }
 
@@ -201,6 +204,7 @@ export function enterHeroSpecial(f: Fighter, chosen: Readonly<HeroSpecialChoice>
   for (let entry = 0; entry < PARTICIPANT_CAPACITY; entry++) special.hitTargets[entry] = undefined;
   special.hit = false;
   special.guarded = false;
+  special.seekTarget = 0;
   special.cooldowns[SpecialAction.heroNeutral + chosen.slot] = move.cooldownFrames ?? 0;
   if (move.oncePerAirtime === true) special.airtimeUses |= 1 << chosen.slot;
   if (move.recallsProjectiles === true) recallProjectiles(f);
@@ -310,7 +314,84 @@ export function spawnHeroProjectileAt(owner: Fighter, spec: Readonly<SpecialProj
   }
 }
 
-function applyMotion(f: Fighter, move: Readonly<AuthoredSpecial>, frame: number, input: Readonly<Controls> | undefined): void {
+function seekTargetSlot(world: Roster, owner: Readonly<Fighter>): number {
+  let nearest = -1;
+  let distance = 0.0;
+  for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
+    if (!isActive(world, slot)) continue;
+    const other = fighterAt(world, slot);
+    if (other === owner || other.status.out) continue;
+    const dx = f32(other.motion.x - owner.motion.x);
+    const dz = f32(other.motion.z - owner.motion.z);
+    const squared = f32(f32(dx * dx) + f32(dz * dz));
+    if (nearest >= 0 && squared >= distance) continue;
+    nearest = slot;
+    distance = squared;
+  }
+  return nearest;
+}
+
+
+function seeks(move: Readonly<AuthoredSpecial>): boolean {
+  for (const segment of move.motion ?? []) if (segment.seek !== undefined) return true;
+  return false;
+}
+
+
+function seekFoe(f: Fighter, world: Roster, speed: number, turnCos: number, turnSin: number): void {
+  const { motion, special } = f;
+  if (special.seekTarget === 0) special.seekTarget = seekTargetSlot(world, f) + 1;
+  const slot = special.seekTarget - 1;
+  const foe = slot >= 0 && isActive(world, slot) ? fighterAt(world, slot) : undefined;
+  let headingX = motion.vx;
+  let headingZ = motion.vz;
+  let length = squareRoot(f32(f32(headingX * headingX) + f32(headingZ * headingZ)));
+  const towardX = foe === undefined || foe.status.out ? 0.0 : f32(foe.motion.x - motion.x);
+  const towardZ = foe === undefined || foe.status.out ? 0.0 : f32(foe.motion.z - motion.z);
+  const toward = squareRoot(f32(f32(towardX * towardX) + f32(towardZ * towardZ)));
+  if (length <= 0.0) {
+    if (toward <= 0.0) {
+      headingX = f.facing < 0 ? -1.0 : 1.0;
+      headingZ = 0.0;
+    } else {
+      headingX = f32(towardX / toward);
+      headingZ = f32(towardZ / toward);
+    }
+  } else {
+    headingX = f32(headingX / length);
+    headingZ = f32(headingZ / length);
+    if (toward > 0.0) {
+      const wantX = f32(towardX / toward);
+      const wantZ = f32(towardZ / toward);
+      const dot = f32(f32(headingX * wantX) + f32(headingZ * wantZ));
+      if (dot >= turnCos) {
+        headingX = wantX;
+        headingZ = wantZ;
+      } else {
+        const sine = f32(f32(headingX * wantZ) - f32(headingZ * wantX)) >= 0.0 ? turnSin : -turnSin;
+        const turnedX = f32(f32(headingX * turnCos) - f32(headingZ * sine));
+        const turnedZ = f32(f32(headingZ * turnCos) + f32(headingX * sine));
+        length = squareRoot(f32(f32(turnedX * turnedX) + f32(turnedZ * turnedZ)));
+        headingX = f32(turnedX / length);
+        headingZ = f32(turnedZ / length);
+      }
+    }
+  }
+  motion.vx = f32(headingX * speed);
+  motion.vz = f32(headingZ * speed);
+  if (motion.vx !== 0.0) f.facing = motion.vx < 0 ? -1 : 1;
+}
+
+
+/** Whether the running move flies through platforms this frame. */
+export function heroMotionPassesPlatforms(f: Readonly<Fighter>): boolean {
+  const move = runningHeroSpecial(f);
+  if (move === undefined) return false;
+  for (const segment of move.motion ?? []) if (segment.seek !== undefined && f.special.frame >= segment.first && f.special.frame <= segment.last) return true;
+  return false;
+}
+
+function applyMotion(f: Fighter, move: Readonly<AuthoredSpecial>, frame: number, input: Readonly<Controls> | undefined, world: Roster | undefined): void {
   const { motion, special } = f;
   if (special.grabFrame > 0 && move.commandGrab !== undefined) return;
   for (const segment of move.motion ?? []) {
@@ -332,6 +413,11 @@ function applyMotion(f: Fighter, move: Readonly<AuthoredSpecial>, frame: number,
     if (segment.liftSpeed !== undefined && input !== undefined) {
       const stick = input.diStickValid ? input.diStickZ : input.verticalDirection;
       velocityZ = f32(velocityZ + f32(min(1.0, max(-1.0, stick)) * segment.liftSpeed));
+    }
+    if (segment.seek !== undefined && world !== undefined) {
+      seekFoe(f, world, segment.seek.speed, segment.seek.turnCos, segment.seek.turnSin);
+      velocityX = motion.vx;
+      velocityZ = motion.vz;
     }
     motion.vx = velocityX;
     motion.vz = velocityZ;
@@ -424,7 +510,7 @@ function burstProjectiles(f: Fighter, from: Readonly<SpecialProjectile>, into: R
   for (const before of f.projectiles) {
     index++;
     if (before.life <= 0 || before.kind !== ProjectileKind.hero
-      || (before.spec !== from && before.spec !== ordinary?.from && before.spec !== upgraded?.from)) continue;
+      || (before.spec !== from && before.spec !== ordinary?.from && before.spec !== upgraded?.from && (from.trail === undefined || before.spec?.trail !== from.trail))) continue;
     const result = upgraded !== undefined && before.spec === upgraded.from ? upgraded.into : into;
     const projectile = mutableProjectile(f, index);
     projectile.spec = result;
@@ -442,7 +528,8 @@ export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Contr
   if (move.cleanseFrame === frame) cleansePoisonAndSlow(f);
   if (move.rehits?.includes(frame) === true) for (let entry = 0; entry < PARTICIPANT_CAPACITY; entry++) f.special.hitTargets[entry] = undefined;
   if (move.buff?.frame === frame) applyItemBuffFor(f, move.buff.kind, move.buff.frames);
-  applyMotion(f, move, frame, input);
+  if (frame === 1 && world !== undefined && f.special.seekTarget === 0 && seeks(move)) f.special.seekTarget = seekTargetSlot(world, f) + 1;
+  applyMotion(f, move, frame, input, world);
   for (const spec of move.projectiles ?? []) if (spec.spawnFrame === frame) spawnHeroProjectile(f, spec, f.attack.serial + 1, stage, world);
   if (move.placement?.frame === frame) placeObject(f, move.placement);
   if (move.command?.frame === frame) orderCompanion(f, move.command.order, move.command.slot);
@@ -725,9 +812,23 @@ export function relocateHeroSpecial(world: Roster, slot: number): void {
   }
 }
 
+/** Starts the running move's contact follow-up once it has struck; call before the frame advances. */
+export function followUpOnContact(f: Fighter): void {
+  const { special } = f;
+  if (!special.hit || special.form >= FOLLOW_UP_FORM) return;
+  const followUps = runningHeroSpecial(f)?.followUps ?? [];
+  for (let index = 0; index < followUps.length; index++) {
+    const followUp = at(followUps, index);
+    if (followUp.input !== FollowUpInput.contact || !inWindow(followUp.window, special.frame + 1)) continue;
+    special.form += FOLLOW_UP_FORM * (index + 1);
+    enterFollowUp(f, followUp.special);
+    return;
+  }
+}
+
 function followUpPressed(followUp: Readonly<SpecialFollowUp>, input: Readonly<Controls>): boolean {
   const kind = followUp.input ?? FollowUpInput.special;
-  return kind === FollowUpInput.attack ? input.attackPressed : kind === FollowUpInput.shield ? input.shieldPressed : input.specialPressed;
+  return kind === FollowUpInput.attack ? input.attackPressed : kind === FollowUpInput.shield ? input.shieldPressed : kind === FollowUpInput.special && input.specialPressed;
 }
 
 
@@ -780,6 +881,7 @@ export function enterUltimate(f: Fighter, input: Readonly<Controls>): AuthoredSp
   for (let entry = 0; entry < PARTICIPANT_CAPACITY; entry++) special.hitTargets[entry] = undefined;
   special.hit = false;
   special.guarded = false;
+  special.seekTarget = 0;
   applyWindows(f, move, 0);
   return move;
 }

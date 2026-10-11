@@ -216,6 +216,13 @@ export class FighterPoolPresentation {
       }
     }
     const transformation = specialCueState(fighter);
+    const body = transformation.phase === "none" ? undefined : transformation.cues?.body;
+    if (body !== undefined) {
+      red = body.red;
+      green = body.green;
+      blue = body.blue;
+      alpha = body.alpha;
+    }
     if (transformation.phase === "active" && transformation.cues?.active.replacesBody === true) alpha = 0;
     if (changed || this.red !== red || this.green !== green || this.blue !== blue) {
       BlzSetSpecialEffectColor(model, red, green, blue);

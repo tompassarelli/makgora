@@ -111,7 +111,8 @@ export class ProjectilePresentation {
     const ultimateOnly = paths.filter((path, index) => index > 0 && !hero && ultimateProjectiles(character).some((spec) => spec.model === path));
     paths.forEach((path, index) => {
 
-      const size = hero ? HERO_PROJECTILE_CAP + 1 : index === 0 ? PROJECTILE_CAPACITY - 4 * ultimateOnly.length : 4;
+      const trail = ultimateProjectiles(character).some((spec) => spec.model === path && spec.trail !== undefined);
+      const size = trail ? PROJECTILE_CAPACITY - HERO_PROJECTILE_CAP : hero ? HERO_PROJECTILE_CAP + 1 : index === 0 ? PROJECTILE_CAPACITY - 4 * ultimateOnly.length : 4;
       const effects: number[] = [];
       const boundaries: number[][] = [];
       const fills: number[][] = [];

@@ -2,7 +2,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { Character, HeroStatusGroup, HeroStatusKind, HitElement, ItemKind } from "./codes";
 import { CHILL } from "./chill";
 import { heroRegion, type MoveRegion, type StrikeCapsule } from "./heroMoves";
-import { frames, type AuthoredSpecial, type SpecialProjectile } from "./heroSpecials";
+import { FollowUpInput, frames, type AuthoredSpecial, type SpecialProjectile } from "./heroSpecials";
 import type { AppliedStatus } from "./heroStatus";
 import type { HitEffect } from "./hitRegions";
 import { type HurtPart, type HurtPose, hurtPart, hurtPose } from "./hurtboxes";
@@ -203,10 +203,35 @@ const JAINA: AuthoredSpecial = {
   ],
 };
 
-const CHARM: AppliedStatus = { kind: HeroStatusKind.charm, frames: 180, group: HeroStatusGroup.silence, immunityFrames: 240 };
+const POSSESSION = "Abilities\\Spells\\Undead\\Possession\\PossessionMissile.mdx";
+const SHADOW_WAKE: SpecialProjectile = { ...mark(POSSESSION, 0, 44, 0.0, 50.0), radius: 48.0, activeFrom: 45, trail: { every: 0 } };
+const SHADOW_TRAIL: SpecialProjectile = { ...shot(0, 0.0, 50.0, 0.0, 0.0, 120, 48.0, hit(1.0, 90, 0.0, 0.0, HitElement.dark), POSSESSION), activeFrom: 121, trail: { every: 20 } };
+const wake = (spawnFrame: number): SpecialProjectile => ({ ...SHADOW_WAKE, spawnFrame });
+const BANSHEE_SPEED = 9.0;
+const BANSHEE_TURN = { turnCos: f32(0.9975640502598242), turnSin: f32(0.0697564737441253) };
+const BANSHEE_CARRY: AuthoredSpecial = {
+  endFrame: 29,
+  motion: [{ ...frames(1, 9), velocityX: 0.0, velocityZ: 0.0, seek: { speed: BANSHEE_SPEED, turnCos: 1.0, turnSin: 0.0 } }, { ...frames(10, 10), velocityX: 0.0, velocityZ: 0.0 }],
+  intangible: frames(1, 9),
+  projectiles: [wake(1), wake(5), wake(9)],
+  burst: { frame: 10, from: SHADOW_WAKE, into: SHADOW_TRAIL },
+};
 const SYLVANAS: AuthoredSpecial = {
-  name: "Charm", endFrame: 40,
-  projectiles: [{ ...shot(21, 40.0, 60.0, 10.0, 0.0, 90, 34.0, hit(8.0, 45, 40.0, 30.0, HitElement.dark), "Abilities\\Weapons\\BansheeMissile\\BansheeMissile.mdx"), reflectable: true, status: CHARM }],
+  name: "Banshee Form", endFrame: 128,
+  projectiles: [
+    mark("Abilities\\Spells\\Undead\\Possession\\PossessionCaster.mdx", 2, 17, 0.0),
+    mark("Abilities\\Spells\\Undead\\AnimateDead\\AnimateDeadTarget.mdx", 14, 10, 0.0),
+    ...Array.from({ length: 16 }, (_, index) => wake(19 + index * 5)),
+  ],
+  motion: [
+    { ...frames(1, 18), velocityX: 0.0, velocityZ: 0.0 },
+    { ...frames(19, 98), velocityX: 0.0, velocityZ: 0.0, seek: { speed: BANSHEE_SPEED, ...BANSHEE_TURN } },
+    { ...frames(99, 99), velocityX: 0.0, velocityZ: 0.0 },
+  ],
+  intangible: frames(19, 98),
+  regions: [heroRegion(19, 98, capsule(0.0, 45.0, 0.0, 75.0, 32.0), hit(14.0, 45, 72.0, 45.0, HitElement.dark))],
+  followUps: [{ window: frames(19, 99), input: FollowUpInput.contact, special: BANSHEE_CARRY }],
+  burst: { frame: 99, from: SHADOW_WAKE, into: SHADOW_TRAIL },
 };
 
 const CAIRNE_ANKH: SpecialProjectile = {
@@ -397,7 +422,7 @@ const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined 
   [Character.lichKing]: "Runes mark the ground under the nearest foe; the dead claw up there a moment later. Step off the mark.",
   [Character.thrall]: "Tremors run along the ground both ways. Jump them or stand on a platform.",
   [Character.jaina]: "A ray of frost sweeps down from high ahead of her to the floor. Get behind her or shield.",
-  [Character.sylvanas]: "A slow banshee spirit; a foe it reaches has left and right swapped for 3 seconds.",
+  [Character.sylvanas]: "She becomes a banshee and dives through the nearest foe, leaving a shadow trail that stings anyone standing in it. Hit her while she changes; roll through the dive or shield it.",
   [Character.cairne]: "An ankh appears at centre stage. After 24 frames it bursts, then he teleports there with 6 frames of intangibility. Shield or leave the ankh; punish his arrival recovery.",
   [Character.chen]: "He splits into Earth, Storm and Fire, which strike around him one after another.",
   [Character.peon]: "He chops at a big tree until it falls forward across the stage. Stand behind him or hit him while he chops.",

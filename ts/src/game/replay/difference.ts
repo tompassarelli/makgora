@@ -233,6 +233,7 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   add("specialAimZ", e.special.aimZ, a.special.aimZ);
   add("specialAirtimeUses", e.special.airtimeUses, a.special.airtimeUses);
   add("specialGrabFrame", e.special.grabFrame, a.special.grabFrame);
+  add("specialSeekTarget", e.special.seekTarget, a.special.seekTarget);
   add("specialGuarded", e.special.guarded, a.special.guarded);
   add("divineFrames", e.status.divineFrames, a.status.divineFrames);
   add("buff", e.status.buff, a.status.buff);
