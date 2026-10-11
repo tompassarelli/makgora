@@ -14,6 +14,8 @@ import { projectedProjectile } from "../presentation/projectilePose";
 import { IMPACT_DEFILE_MODEL } from "../assets/impactAssetInfo";
 import { heroProjectileArt } from "../presentation/projectileArt";
 import { definitiveCues } from "./specialCueEffects";
+import { ARENA_CAMERA } from "../presentation/arenaCamera";
+import { cosineTurns, sineTurns } from "../sim/mathTables";
 
 const STATIONARY_PARTICLE_MODELS = [
   "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx",
@@ -30,6 +32,7 @@ const STATIONARY_PARTICLE_MODELS = [
 const PARKED_LINE_DEPTH = 4096.0;
 const DEFILE_DECAY = "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx";
 const DEFILE_FROST = "Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdx";
+const RISEN_FRONT = 120.0;
 
 
 interface Risen {
@@ -173,13 +176,20 @@ export class ProjectilePresentation {
     const centerZ = this.definitive
       ? born ? paused ? f32(-198.454501) : f32(-146.291377) : f32(133.889278)
       : born ? f32(-389.412987) : f32(29.882828);
+    const pitch = ARENA_CAMERA.angleOfAttack / 360.0, yaw = ARENA_CAMERA.rotation / 360.0;
+    const distance = GetCameraField(CAMERA_FIELD_TARGET_DISTANCE);
+    const eyeX = GetCameraTargetPositionX() - cosineTurns(yaw) * cosineTurns(pitch) * distance;
+    const eyeZ = GetCameraField(CAMERA_FIELD_ZOFFSET) - sineTurns(pitch) * distance;
+    const toward = sineTurns(yaw) * cosineTurns(pitch) * distance;
+    const lift = toward > RISEN_FRONT * 2.0 ? RISEN_FRONT / toward : 0.0;
+    const y = this.origin.y - RISEN_FRONT * (lift > 0.0 ? 1.0 : 0.0);
     const scaleX = f32(f32(f32(2.0 * placed.radius) / width) * (draw?.width ?? 1.0));
     const scaleZ = f32(f32(f32(2.0 * placed.radius) / height) * (draw?.height ?? 1.0));
     const x = this.origin.x + f32(placed.x - f32(centerX * scaleX));
     const z = this.origin.z + f32(placed.z - f32(centerZ * scaleZ)) + (draw?.z ?? 0.0);
     BlzResetSpecialEffectMatrix(model);
-    BlzSetSpecialEffectMatrixScale(model, scaleX, 1.0, scaleZ);
-    BlzSetSpecialEffectPosition(model, x, this.origin.y, z);
+    BlzSetSpecialEffectMatrixScale(model, scaleX * (1.0 - lift), 1.0 - lift, scaleZ * (1.0 - lift));
+    BlzSetSpecialEffectPosition(model, x + (eyeX - x) * lift, y, z + (eyeZ - z) * lift);
     for (let index = 0; index < placed.fills.length; index++) {
       const fillSlot = placed.fills[index];
       const fill = fillSlot === undefined ? undefined : this.models[fillSlot];
@@ -187,8 +197,9 @@ export class ProjectilePresentation {
       if (fill === undefined || offset === undefined) continue;
       BlzResetSpecialEffectMatrix(fill);
       BlzSetSpecialEffectYaw(fill, placed.yaw);
-      BlzSetSpecialEffectMatrixScale(fill, scaleX, 1.0, scaleZ);
-      BlzSetSpecialEffectPosition(fill, x + f32(offset.x * placed.radius), this.origin.y, z + f32(offset.z * placed.radius));
+      BlzSetSpecialEffectMatrixScale(fill, scaleX * (1.0 - lift), 1.0 - lift, scaleZ * (1.0 - lift));
+      const fillX = x + f32(offset.x * placed.radius), fillZ = z + f32(offset.z * placed.radius);
+      BlzSetSpecialEffectPosition(fill, fillX + (eyeX - fillX) * lift, y, fillZ + (eyeZ - fillZ) * lift);
       BlzSetSpecialEffectScale(fill, placed.scale);
       BlzSetSpecialEffectAlpha(fill, 255);
       if (born) BlzSetSpecialEffectAnimation(fill, "birth");
