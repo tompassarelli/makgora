@@ -115,7 +115,7 @@ export function parseProfile(block: string, doc: string): PlayStyleProfile {
     return value === undefined ? undefined : range(value, 100, where);
   };
   const signature = fields.get("signature")?.split(/\s+/);
-  const known = new Set(["fighter", "archetype", "aerials", "air-share", "approach", "ranged", "specials", "variety-floor", "top-move-ceiling", "signature", "openings-per-kill"]);
+  const known = new Set(["fighter", "archetype", "aerials", "air-share", "approach", "ranged", "specials", "variety-floor", "top-move-ceiling", "signature", "openings-per-kill", "envelope"]);
   for (const key of fields.keys()) if (!known.has(key)) throw new Error(`${where}: unknown profile key ${key}`);
   const airShare = optional("air-share"), approach = optional("approach"), ranged = optional("ranged");
   return {

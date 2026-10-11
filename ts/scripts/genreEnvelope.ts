@@ -108,3 +108,49 @@ export function outliers(rows: readonly MoveRow[], envelope: Envelope, tolerance
   }
   return found.sort((a, b) => b.distance - a.distance || a.fighter.localeCompare(b.fighter) || a.move.localeCompare(b.move));
 }
+
+export const FRAME_FIELDS = ["startup", "active", "endLag", "landingLag", "total"] as const;
+export interface EnvelopeExemption { readonly fighter: string; readonly move: string; readonly field: (typeof FRAME_FIELDS)[number]; readonly reason: string; readonly doc: string }
+
+export function parseEnvelopeExemptions(text: string, doc: string): EnvelopeExemption[] {
+  const exemptions: EnvelopeExemption[] = [];
+  for (const block of text.matchAll(/```balance-profile\n([\s\S]*?)```/g)) {
+    const body = block[1] ?? "";
+    const fighter = /^fighter:\s*(\S+)\s*$/m.exec(body)?.[1];
+    for (const line of body.split("\n")) {
+      if (!/^\s*envelope:/.test(line)) continue;
+      const match = /^\s*envelope:\s+(\S+)\s+(\S+)\s+(\S.*)$/.exec(line);
+      const field = FRAME_FIELDS.find((name) => name === match?.[2]);
+      if (fighter === undefined || match?.[1] === undefined || field === undefined || match[3] === undefined) throw new Error(`${doc}: invalid envelope exemption: ${line}`);
+      exemptions.push({ fighter, move: match[1], field, reason: match[3].trim(), doc });
+    }
+  }
+  return exemptions;
+}
+
+export function envelopeFailures(rows: readonly MoveRow[], envelope: Envelope, tolerances: Tolerances, exemptions: readonly EnvelopeExemption[] = []): string[] {
+  const failures: string[] = [];
+  for (const row of rows) {
+    const kind = classify(row.move);
+    if (kind === undefined) continue;
+    const label = `${row.fighter} ${row.move}`;
+    const hit = ["normal", "special", "grab", "throw"].includes(row.move.split(".")[0] ?? "");
+    for (const field of FRAME_FIELDS) {
+      const value = row.measures[field];
+      if ((hit && field !== "landingLag" && value === undefined) || (value !== undefined && (!Number.isInteger(value) || value < 0))) failures.push(`${label}: invalid ${field} ${value}`);
+      const range = envelope[kind.moveClass]?.[field];
+      if (value === undefined || range === undefined) continue;
+      const miss = fieldMiss(field, value, range, kind.tier, tolerances);
+      if (miss.excess > 3 * miss.allowance && !exemptions.some((entry) => entry.fighter === row.fighter && entry.move === row.move && entry.field === field)) failures.push(`${label}: ${field} exceeds 3x allowance (${value} vs ${range.low}..${range.high})`);
+    }
+    if (hit && row.measures.startup !== undefined && row.measures.active !== undefined && row.measures.endLag !== undefined && row.measures.total !== undefined && row.measures.startup + row.measures.active + row.measures.endLag !== row.measures.total) failures.push(`${label}: startup + active + endLag differs from total`);
+  }
+  for (const exemption of exemptions) {
+    const row = rows.find((row) => row.fighter === exemption.fighter && row.move === exemption.move);
+    const kind = classify(exemption.move);
+    const range = kind === undefined ? undefined : envelope[kind.moveClass]?.[exemption.field];
+    const value = row?.measures[exemption.field];
+    if (range === undefined || value === undefined || (value >= range.low && value <= range.high)) failures.push(`${exemption.doc}: stale envelope exemption ${exemption.fighter} ${exemption.move} ${exemption.field}`);
+  }
+  return failures;
+}

@@ -4,12 +4,14 @@ import { AttackStyle, Character, GrabAction, ProjectileKind } from "../src/game/
 import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/sim/heroes/registry";
 import { authoredTuning } from "../src/game/sim/tuning";
 import { attackDurationFramesForGrounding, attackLandingLag, attackStartupFrames, characterAttackActiveFrames, grabActionDuration, grabContactFrame, isAerialAttack } from "../src/game/sim/moves";
+import { emptyHitRegion, authoredHitRegion, authoredHitRegionCount } from "../src/game/sim/hitRegions";
 import { GROUND_ROLL_FRAMES, SPOT_DODGE_FRAMES } from "../src/game/sim/conditions";
 import { SHIELD_RELEASE_LAG_FRAMES, shieldstunDuration } from "../src/game/sim/shield";
 import { currentFeel } from "./balanceFeel";
 import { currentKit } from "./balanceKit";
+import { readProfiles } from "./balance";
 import * as specials from "../src/game/sim/specials";
-import { type Envelope, type Field, type Measures, type MoveClass, type MoveRow, type Range, type Sample, type Tolerances, MOVE_CLASSES, buildEnvelope } from "./genreEnvelope";
+import { type Envelope, type Field, type Measures, type MoveClass, type MoveRow, type Range, type Sample, type Tolerances, type EnvelopeExemption, parseEnvelopeExemptions, MOVE_CLASSES, buildEnvelope } from "./genreEnvelope";
 
 const ROOT = join(import.meta.dir, "../..");
 export const ENVELOPE_FILE = join(ROOT, "tools/move-data/genre-envelope.json");
@@ -94,7 +96,7 @@ interface Region { readonly firstFrame: number; readonly lastFrame: number }
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null;
 const numberAt = (row: Record<string, unknown>, key: string): number | undefined => typeof row[key] === "number" ? row[key] : undefined;
 
-function specialRows(fighter: string, specials: unknown, feel: ReturnType<typeof currentFeel>): MoveRow[] {
+function specialRows(fighter: string, specials: unknown, feel: ReturnType<typeof currentFeel>, framesOnly: boolean): MoveRow[] {
   const rows: MoveRow[] = [];
   const visit = (node: unknown, path: string, actionEnd?: number, eventFrame?: number): void => {
     if (!isRecord(node)) return;
@@ -102,7 +104,7 @@ function specialRows(fighter: string, specials: unknown, feel: ReturnType<typeof
     const event = numberAt(node, "frame") ?? eventFrame;
     const regions = Array.isArray(node.regions) ? node.regions.filter((region): region is Region => isRecord(region) && typeof region.firstFrame === "number" && typeof region.lastFrame === "number" && isRecord(region.hit)) : [];
     const spawns = Array.isArray(node.projectiles) ? node.projectiles.flatMap((projectile) => isRecord(projectile) && typeof projectile.spawnFrame === "number" ? [projectile.spawnFrame] : []) : [];
-    if (end !== undefined && (regions.length > 0 || spawns.length > 0)) {
+    if (regions.length > 0 || spawns.length > 0) {
       const first = Math.min(...regions.map((region) => region.firstFrame), ...spawns);
       const last = regions.length > 0 ? Math.max(...regions.map((region) => region.lastFrame)) : Math.max(...spawns);
       const samples = Object.entries(feel).filter(([key]) => key.startsWith(`special.${path}.regions.`) || key.startsWith(`special.${path}.projectiles.`)).map(([, sample]) => sample);
@@ -110,8 +112,8 @@ function specialRows(fighter: string, specials: unknown, feel: ReturnType<typeof
       rows.push({ fighter, move: `special.${path}`, measures: defined([
         ["startup", first + 1],
         ["active", last - first + 1],
-        ["endLag", end - last - 1],
-        ["total", end + 1],
+        ["endLag", end === undefined ? null : end - last - 1],
+        ["total", end === undefined ? null : end + 1],
         ["landingLag", numberAt(node, "landingLag") ?? null],
         ["shieldAdvantage", samples.length > 0 ? Math.max(...samples.map((sample) => sample.advantage)) : null],
         ["killPercent", kills.length > 0 ? Math.min(...kills) : null],
@@ -119,8 +121,8 @@ function specialRows(fighter: string, specials: unknown, feel: ReturnType<typeof
     }
     const sample = feel[`special.${path}`];
     const spawn = event ?? numberAt(node, "spawnFrame");
-    if (end !== undefined && spawn !== undefined && isRecord(node.effect) && sample !== undefined) {
-      rows.push({ fighter, move: `special.${path}`, measures: { ...specialMeasures(spawn, spawn, end), shieldAdvantage: sample.advantage, ...(sample.killPercent === undefined ? {} : { killPercent: sample.killPercent }) } });
+    if (end !== undefined && spawn !== undefined && isRecord(node.effect) && (sample !== undefined || framesOnly)) {
+      rows.push({ fighter, move: `special.${path}`, measures: { ...specialMeasures(spawn, spawn, end), ...(sample === undefined ? {} : { shieldAdvantage: sample.advantage, ...(sample.killPercent === undefined ? {} : { killPercent: sample.killPercent }) }) } });
     }
     for (const [key, child] of Object.entries(node)) if (key !== "regions" && key !== "projectiles" && key !== "table") visit(child, `${path}.${key}`, end, event);
   };
@@ -162,13 +164,22 @@ function originalSpecialMeasures(character: Character): Readonly<Record<string, 
   return rows;
 }
 
-export function fighterRows(character: Character): MoveRow[] {
+export function fighterRows(character: Character, framesOnly = false): MoveRow[] {
   const fighter = fighterSlug(character);
   const tuning = authoredTuning(character);
-  const feel = currentFeel(character);
+  const feel = framesOnly ? {} : currentFeel(character);
   const rows: MoveRow[] = [];
   const styles = tuning.moves === undefined
-    ? Object.values(AttackStyle).filter((style) => Object.keys(feel).some((path) => path.startsWith(`normal.${style}.hit.`)))
+    ? Object.values(AttackStyle).filter((style) => {
+      if (!framesOnly) return Object.keys(feel).some((path) => path.startsWith(`normal.${style}.hit.`));
+      if (style === AttackStyle.grab) return false;
+      const startup = attackStartupFrames(style, tuning.moves);
+      const total = attackDurationFramesForGrounding(style, !isAerialAttack(style), tuning.moves);
+      for (let index = 0; index < authoredHitRegionCount(style, tuning.moves); index++) for (let frame = startup; frame < total; frame++) {
+        if (authoredHitRegion(emptyHitRegion(), character, style, frame, 0, index, tuning.moves).effect.damage > 0) return true;
+      }
+      return false;
+    })
     : Object.keys(tuning.moves.normals).map((key) => Number(key) as AttackStyle);
   for (const style of styles) {
     const aerial = isAerialAttack(style);
@@ -178,25 +189,26 @@ export function fighterRows(character: Character): MoveRow[] {
     const hits = Object.entries(feel).filter(([path]) => path.startsWith(`normal.${style}.hit.`)).map(([, sample]) => sample);
     const kills = hits.flatMap((sample) => sample.killPercent === undefined ? [] : [sample.killPercent]);
     rows.push({ fighter, move: `normal.${styleName(style)}`, measures: defined([
-      ["startup", startup + 1], ["active", active], ["endLag", total - startup - active],
+      ["startup", startup + 1], ["active", active], ["endLag", total - startup - active], ["total", total + 1],
       ["landingLag", aerial ? attackLandingLag(style, tuning.moves) : null],
       ["shieldAdvantage", hits.length > 0 ? Math.max(...hits.map((sample) => sample.advantage)) : null],
       ["killPercent", kills.length > 0 ? Math.min(...kills) : null],
     ]) });
   }
   const dash = tuning.dashGrab;
-  if (dash !== undefined) rows.push({ fighter, move: "grab.dash", measures: { startup: dash.startupFrames + 1, active: dash.activeFrames, endLag: dash.totalFrames - dash.startupFrames - dash.activeFrames } });
+  if (dash !== undefined) rows.push({ fighter, move: "grab.dash", measures: { startup: dash.startupFrames + 1, active: dash.activeFrames, endLag: dash.totalFrames - dash.startupFrames - dash.activeFrames, total: dash.totalFrames + 1 } });
   for (const [name, action] of [["forward", GrabAction.throwForward], ["back", GrabAction.throwBack], ["up", GrabAction.throwUp], ["down", GrabAction.throwDown]] as const) {
     const contact = grabContactFrame(action, tuning.moves);
     const kill = feel[`throw.${action}`]?.killPercent;
-    rows.push({ fighter, move: `throw.${name}`, measures: defined([["startup", contact + 1], ["active", 1], ["endLag", grabActionDuration(action, tuning.moves) - contact - 1], ["killPercent", kill ?? null]]) });
+    rows.push({ fighter, move: `throw.${name}`, measures: defined([["startup", contact + 1], ["active", 1], ["endLag", grabActionDuration(action, tuning.moves) - contact - 1], ["total", grabActionDuration(action, tuning.moves) + 1], ["killPercent", kill ?? null]]) });
   }
-  rows.push(...specialRows(fighter, tuning.specials, feel));
+  rows.push(...specialRows(fighter, tuning.specials, feel, framesOnly));
   const originalFrames = originalSpecialMeasures(character);
-  for (const [key, sample] of Object.entries(feel)) {
+  for (const key of framesOnly ? Object.keys(originalFrames) : Object.keys(feel)) {
+    const sample = feel[key];
     if (!key.startsWith("special.") || key.includes(".regions.") || key.includes(".projectiles.")) continue;
     if (rows.some((row) => row.move === key)) continue;
-    rows.push({ fighter, move: key, measures: { ...originalFrames[key], ...defined([["shieldAdvantage", sample.advantage], ["killPercent", sample.killPercent ?? null]]) } });
+    rows.push({ fighter, move: key, measures: { ...originalFrames[key], ...defined([["shieldAdvantage", sample?.advantage], ["killPercent", sample?.killPercent ?? null]]) } });
   }
   rows.push({ fighter, move: "jump-squat", measures: { total: tuning.physics.jumpSquatFrames } });
   return rows;
@@ -210,6 +222,11 @@ export function universalRows(): MoveRow[] {
   ];
 }
 
-export function rosterRows(): MoveRow[] {
-  return [...universalRows(), ...SELECTABLE_CHARACTERS.flatMap(fighterRows)];
+export function rosterRows(framesOnly = false): MoveRow[] {
+  return [...universalRows(), ...SELECTABLE_CHARACTERS.flatMap((character) => fighterRows(character, framesOnly))];
+}
+
+export function envelopeExemptions(): EnvelopeExemption[] {
+  const docs = new Set([...readProfiles().values()].map((profile) => profile.doc));
+  return [...docs].flatMap((doc) => parseEnvelopeExemptions(readFileSync(join(ROOT, doc), "utf8"), doc));
 }

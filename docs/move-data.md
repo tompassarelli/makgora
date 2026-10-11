@@ -89,8 +89,14 @@ matchup or balance acceptance. Issue #12 remains open for the remaining work.
 
 `bun wisp envelope` (from ts/) lists every move of the 26 fighters outside
 its class's genre frame-data envelope, ranked by distance (#426). It is
-advisory: it never fails, and it becomes a gate only after Tom has reviewed
-the outlier list. `--ranges` prints the envelope, `--json` the outliers.
+advisory: `--ranges` prints the envelope, `--json` the outliers. The suite
+gates the frame data under the reviewed #427 ruling: every hit move has
+nonnegative integral startup, active and end lag that sum to its total; no
+frame field exceeds its class range by more than three tier allowances
+(9 normal, 30 special, 45 EX frames). Shield advantage and kill percent
+remain advisory. A fighter balance-profile block can exempt a frame field
+with `envelope: MOVE FIELD REASON`; exemptions fail once that field returns
+inside its class range. They never exempt invalid frame structure.
 
 Non-hit specials (movement, guards, buffs, recalls and commands without a hit effect) are outside the genre envelope.
 
