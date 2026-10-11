@@ -33,6 +33,8 @@ import type { CpuSkill } from "../src/game/match/cpuSkill";
 import { type GameplanMove, GameplanSpecial, GameplanThrow } from "../src/game/sim/gameplan";
 import { AttackStyle, type Character, DownState, GrabAction, LedgeState, SpecialAction } from "../src/game/sim/codes";
 import { createFighter, type Fighter } from "../src/game/sim/fighter";
+import { observeDamageContacts } from "../src/game/sim/contacts";
+import { heroStatusBlocksActions } from "../src/game/sim/heroStatus";
 import { SELECTABLE_CHARACTERS, fighterSlug, selectableCharacterBySlug } from "../src/game/sim/heroes/registry";
 import { copyControls, createRoster, fighterAt, neutralControls } from "../src/game/sim/roster";
 import { mainDeckLeft, mainDeckRight } from "../src/game/sim/stage";
@@ -68,6 +70,7 @@ const MATCHUP_LOW = BALANCE_SPEC.matchupLow;
 const MATCHUP_HIGH = BALANCE_SPEC.matchupHigh;
 
 export const SPECIAL_MOVE = GameplanSpecial;
+const ULTIMATE_MOVE = 34;
 
 const SHIFTS = [0.0, -60.0, 60.0, -120.0, 120.0, -30.0, 30.0, -90.0, 90.0] as const;
 
@@ -79,6 +82,7 @@ const MOVE_NAMES: Readonly<Record<number, string>> = {
   [AttackStyle.backAir]: "back-air", [AttackStyle.upAir]: "up-air", [AttackStyle.downAir]: "down-air", [AttackStyle.ledgeAttack]: "ledge-attack",
   [AttackStyle.demonHunterDashAttack]: "dash-attack", [AttackStyle.dashAttack]: "dash-attack",
   [SPECIAL_MOVE.neutral]: "neutral-special", [SPECIAL_MOVE.side]: "side-special", [SPECIAL_MOVE.up]: "up-special", [SPECIAL_MOVE.down]: "down-special",
+  [ULTIMATE_MOVE]: "ultimate",
 };
 export const moveName = (move: number): string => MOVE_NAMES[move] ?? `move-${move}`;
 
@@ -94,6 +98,7 @@ function specialMove(action: number): number | undefined {
       return SPECIAL_MOVE.side; case SpecialAction.riflemanRecovery: case SpecialAction.demonHunterWingAscent: case SpecialAction.heroUp:
       return SPECIAL_MOVE.up; case SpecialAction.riflemanTrap: case SpecialAction.demonHunterImmolate: case SpecialAction.heroDown:
       return SPECIAL_MOVE.down;
+    case SpecialAction.heroUltimate: return ULTIMATE_MOVE;
     default:
       return undefined;
   }
@@ -265,6 +270,7 @@ export interface FieldOptions {
 }
 
 interface Watch {
+  down: DownState;
   serial: number;
   special: number;
   specialForm: number;
@@ -312,6 +318,7 @@ interface Punish {
 }
 
 const watchOf = (f: Readonly<Fighter>): Watch => ({
+  down: f.down.state,
   serial: f.attack.serial, special: f.special.action, specialFrame: f.special.frame, specialForm: f.special.form, mana: f.mana.points, denied: f.visuals.manaDenied, hits: f.visuals.hit, damage: f.status.damage, out: f.status.out, lastHit: undefined, lastSafe: undefined, lastStarted: undefined, starts: 0, lastHitMove: undefined, punish: undefined, stockFirstHit: true,
   grounded: f.motion.grounded, lagging: false, cornered: false, recovering: false, edgeGuarded: false, ledgeUntil: -1,
 });
@@ -325,8 +332,11 @@ function strikingMove(f: Readonly<Fighter>): number | undefined {
 }
 
 
-const unactionable = (f: Readonly<Fighter>): boolean =>
-  f.launch.hitlag > 0 || f.launch.hitstun > 0 || f.grab.owner !== undefined || f.down.state !== DownState.none;
+const forcedLock = (f: Readonly<Fighter>): boolean =>
+  f.launch.hitlag > 0 || f.status.frozenFrames > 0 || heroStatusBlocksActions(f) || f.grab.owner !== undefined || f.grab.grabbedFrames > 0;
+
+const unactionable = (f: Readonly<Fighter>): boolean => forcedLock(f)
+  || (f.down.state !== DownState.wait && (f.launch.hitstun > 0 || (f.down.state !== DownState.none && f.down.state !== DownState.tumble)));
 
 const emptyPunishes = (): PunishTotals => ({ openings: 0, neutralWins: 0, neutralConverted: 0, pokes: 0, pokeDamage: 0, oneHit: 0, kills: 0, zeroToDeaths: 0, hits: 0, damage: 0, maxHits: 0, maxDamage: 0 });
 
@@ -425,171 +435,194 @@ export function playCpuMatch(a: Character, b: Character, stageName: string, vari
   };
   const camps = options.camp === true ? [campOf(seed, 0, a), campOf(seed, 1, b)] as const : undefined;
   let frame = 0;
-  while (match.phase === Phase.match && frame < limit) {
-    frame = runtime.simulationFrame + 1;
-    for (const slot of PARTICIPANT_SLOTS) {
-      copyControls(produced.inputs[slot], NEUTRAL);
-      clearAttackBuffer(produced.commands[slot]);
-      if (slot === 0 || slot === 1) produceComputerInput(match, world, runtime, slot, frame, produced.inputs[slot], produced.commands[slot], options.skills?.[slot]);
-      const only = slot === 0 || slot === 1 ? spam[slot] : undefined;
-      if (only !== undefined) spamOnly(fighterAt(world, slot), fighterAt(world, 1 - slot), only, stage, frame, produced.inputs[slot], produced.commands[slot]);
-      if (camps !== undefined && (slot === 0 || slot === 1)) campInput(camps[slot], fighterAt(world, slot), fighterAt(world, 1 - slot), stage, frame, produced.inputs[slot], produced.commands[slot]);
-    }
-    if (!captureFrame(row, frame, world.mask, produced, runtime)) throw new Error(`capture refused frame ${frame}`);
-    if (!executeMatchFrame(row, match, world, controls, runtime, frame)) throw new Error(`execution refused frame ${frame}`);
-    if (dropRule !== undefined) advanceDropVariant(dropRule, match, world);
-    if (options.ledgeRule === "melee") for (const slot of [0, 1] as const) fighterAt(world, slot).ledge.grabs = 0;
-    if (match.drops.pickupSerial !== pickups) {
-      pickups = match.drops.pickupSerial;
-      if (match.drops.lastTaker === 0 || match.drops.lastTaker === 1) takes[match.drops.lastTaker]++;
-    }
-    const first = fighterAt(world, 0), second = fighterAt(world, 1);
-    if (!first.status.out && !second.status.out) {
-      bothInFrames++;
-      if (Math.abs(f32(first.motion.x - second.motion.x)) > halfStage) {
-        apartFrames++;
-        if (onMainDeck(first, stage) && onMainDeck(second, stage)) apartOnStageFrames++;
+  const terrainDamage = [0, 0];
+  const fighterContact = [false, false];
+  if (options.playtest) observeDamageContacts((source, target, damage) => {
+    if (target !== 0 && target !== 1) return;
+    if (source === target) terrainDamage[target] = f32((terrainDamage[target] ?? 0) + damage);
+    else fighterContact[target] = true;
+  });
+  try {
+    while (match.phase === Phase.match && frame < limit) {
+      frame = runtime.simulationFrame + 1;
+      terrainDamage[0] = 0;
+      terrainDamage[1] = 0;
+      fighterContact[0] = false;
+      fighterContact[1] = false;
+      for (const slot of PARTICIPANT_SLOTS) {
+        copyControls(produced.inputs[slot], NEUTRAL);
+        clearAttackBuffer(produced.commands[slot]);
+        if (slot === 0 || slot === 1) produceComputerInput(match, world, runtime, slot, frame, produced.inputs[slot], produced.commands[slot], options.skills?.[slot]);
+        const only = slot === 0 || slot === 1 ? spam[slot] : undefined;
+        if (only !== undefined) spamOnly(fighterAt(world, slot), fighterAt(world, 1 - slot), only, stage, frame, produced.inputs[slot], produced.commands[slot]);
+        if (camps !== undefined && (slot === 0 || slot === 1)) campInput(camps[slot], fighterAt(world, slot), fighterAt(world, 1 - slot), stage, frame, produced.inputs[slot], produced.commands[slot]);
       }
-    }
-    if (checksumEvery > 0 && frame % checksumEvery === 0) checksumNow(frame);
-    for (const slot of [0, 1] as const) {
-      const f = fighterAt(world, slot);
-      const seen = watches[slot];
-      const own = sides[slot];
-      const other = sides[1 - slot];
-      const opponent = fighterAt(world, 1 - slot);
-      const opponentSeen = watches[slot === 0 ? 1 : 0];
-      if (f.attack.serial !== seen.serial && f.attack.style !== undefined) {
-        own.moves[f.attack.style] = (own.moves[f.attack.style] ?? 0) + 1;
-        seen.lastStarted = reportedMove(f.attack.style);
-        seen.starts++;
+      if (!captureFrame(row, frame, world.mask, produced, runtime)) throw new Error(`capture refused frame ${frame}`);
+      if (!executeMatchFrame(row, match, world, controls, runtime, frame)) throw new Error(`execution refused frame ${frame}`);
+      if (dropRule !== undefined) advanceDropVariant(dropRule, match, world);
+      if (options.ledgeRule === "melee") for (const slot of [0, 1] as const) fighterAt(world, slot).ledge.grabs = 0;
+      if (match.drops.pickupSerial !== pickups) {
+        pickups = match.drops.pickupSerial;
+        if (match.drops.lastTaker === 0 || match.drops.lastTaker === 1) takes[match.drops.lastTaker]++;
       }
-      const special = specialMove(f.special.action);
-      const startedSpecial = special !== undefined && (f.special.action !== seen.special || f.special.frame < seen.specialFrame);
-      if (startedSpecial) {
-        own.moves[special] = (own.moves[special] ?? 0) + 1;
-        own.specialsStarted++;
-        seen.lastStarted = special;
-        seen.starts++;
-      }
-      if (!f.status.out && !unactionable(f) && Math.abs(f.motion.vx) > 1.0) {
-        if (f32(f.motion.vx * f32(opponent.motion.x - f.motion.x)) > 0) own.approachFrames++;
-        else own.retreatFrames++;
-      }
-      const branched = special !== undefined && f.special.action === seen.special && f.special.form !== seen.specialForm;
-      if ((startedSpecial || branched) && f.mana.points < seen.mana) own.manaSpent += seen.mana - f.mana.points;
-      own.specialsRefused += f.visuals.manaDenied - seen.denied;
-      const hit = f.visuals.hit !== seen.hits;
-      const ledge = own.ledge;
-      if (f.ledge.state !== LedgeState.none) seen.ledgeUntil = frame + LEDGE_PLAY_FRAMES;
-      if (ledge !== undefined && !f.status.out) {
-        ledge.inFrames++;
-        if (f.ledge.state !== LedgeState.none || f.motion.z < 0.0) ledge.belowFrames++;
-      }
-      if (hit && other?.ledge !== undefined && ledge !== undefined) {
-        if (seen.ledgeUntil >= frame) ledge.ledgeTaken++;
-        else if (onMainDeck(f, stage)) ledge.stageTaken++;
-        if (opponent.ledge.state !== LedgeState.none || opponentSeen.ledgeUntil >= frame) other.ledge.ledgeLanded++;
-        else if (onMainDeck(opponent, stage)) other.ledge.stageLanded++;
-      }
-      const dealt = f.status.damage > seen.damage ? f.status.damage - seen.damage : 0;
-      if (hit && other !== undefined) {
-        other.hitsLanded++;
-        if (other.hitDistances !== undefined) {
-          const bin = Math.floor(Math.abs(f32(opponent.motion.x - f.motion.x)) / (10 * WORLD_UNITS_PER_MELEE_UNIT));
-          other.hitDistances[bin] = (other.hitDistances[bin] ?? 0) + 1;
-        }
-        seen.lastHit = frame;
-        if (seen.recovering) {
-          other.edges.edgeGuardHits++;
-          seen.edgeGuarded = true;
-          if (!opponent.motion.grounded && insideLip(stage, opponent.motion.x) < 0.0) other.edges.offstageHits++;
+      const first = fighterAt(world, 0), second = fighterAt(world, 1);
+      if (!first.status.out && !second.status.out) {
+        bothInFrames++;
+        if (Math.abs(f32(first.motion.x - second.motion.x)) > halfStage) {
+          apartFrames++;
+          if (onMainDeck(first, stage) && onMainDeck(second, stage)) apartOnStageFrames++;
         }
       }
-      const lagging = inLag(f);
-      if (seen.grounded && !f.motion.grounded && seen.lagging && !lagging && f.launch.hitstun <= 0 && !f.special.fall && insideLip(stage, f.motion.x) < 0.0) own.edges.edgeCancels++;
-      const inCorner = !f.status.out && cornered(f, opponent, stage);
-      if (inCorner && !seen.cornered) own.edges.corners++;
-      if (seen.cornered && !inCorner && !hit && !f.status.out && insideLip(stage, f.motion.x) > CORNER_BAND) own.edges.cornerEscapes++;
-      seen.cornered = inCorner && !hit;
-      if ((hit || dealt > 0) && other !== undefined) {
-        const striking = strikingMove(opponent);
-        const move = striking ?? opponentSeen.lastStarted;
-        if (move !== undefined) {
-          seen.lastHitMove = move;
-          if (dealt > 0) other.damageByMove[move] = (other.damageByMove[move] ?? 0) + dealt;
+      if (checksumEvery > 0 && frame % checksumEvery === 0) checksumNow(frame);
+      for (const slot of [0, 1] as const) {
+        const f = fighterAt(world, slot);
+        const seen = watches[slot];
+        const own = sides[slot];
+        const other = sides[1 - slot];
+        const opponent = fighterAt(world, 1 - slot);
+        const opponentSeen = watches[slot === 0 ? 1 : 0];
+        if (f.attack.serial !== seen.serial && f.attack.style !== undefined) {
+          own.moves[f.attack.style] = (own.moves[f.attack.style] ?? 0) + 1;
+          seen.lastStarted = reportedMove(f.attack.style);
+          seen.starts++;
         }
-        if (striking === undefined) other.rangedDamage += dealt;
-        other.damageDealt += dealt;
-        if (seen.punish === undefined) {
-          seen.punish = { hits: 0, damage: 0, quiet: 0, neutral: opponentSeen.punish === undefined, disadvantage: false, stunned: 0, fromStockStart: seen.stockFirstHit, free: 0, gaps: [], start: seen.damage, moves: [], instances: [], damages: [] };
-          seen.stockFirstHit = false;
+        const special = specialMove(f.special.action);
+        const startedSpecial = special !== undefined && (f.special.action !== seen.special || f.special.frame < seen.specialFrame);
+        if (startedSpecial) {
+          own.moves[special] = (own.moves[special] ?? 0) + 1;
+          own.specialsStarted++;
+          seen.lastStarted = special;
+          seen.starts++;
         }
-        if (hit && seen.punish.hits > 0) {
-          seen.punish.gaps.push(seen.punish.free);
-          seen.punish.free = 0;
+        if (!f.status.out && !unactionable(f) && Math.abs(f.motion.vx) > 1.0) {
+          if (f32(f.motion.vx * f32(opponent.motion.x - f.motion.x)) > 0) own.approachFrames++;
+          else own.retreatFrames++;
         }
-        seen.punish.hits += hit ? 1 : 0;
-        seen.punish.damage += dealt;
-        if (combos !== undefined) {
-          const p = seen.punish;
-          if (hit) {
-            p.moves.push(move ?? -1);
-            p.instances.push(opponentSeen.starts);
-            p.damages.push(dealt);
-          } else if (p.damages.length > 0) p.damages[p.damages.length - 1] = (p.damages[p.damages.length - 1] ?? 0) + dealt;
+        const branched = special !== undefined && f.special.action === seen.special && f.special.form !== seen.specialForm;
+        if ((startedSpecial || branched) && f.mana.points < seen.mana) own.manaSpent += seen.mana - f.mana.points;
+        own.specialsRefused += f.visuals.manaDenied - seen.denied;
+        const hit = f.visuals.hit !== seen.hits && (options.playtest !== true || fighterContact[slot] === true);
+        const ledge = own.ledge;
+        if (f.ledge.state !== LedgeState.none) seen.ledgeUntil = frame + LEDGE_PLAY_FRAMES;
+        if (ledge !== undefined && !f.status.out) {
+          ledge.inFrames++;
+          if (f.ledge.state !== LedgeState.none || f.motion.z < 0.0) ledge.belowFrames++;
         }
-        seen.punish.quiet = 0;
-      } else if (seen.punish !== undefined && other !== undefined) {
-        const punish = seen.punish;
-        if (!f.status.out && !unactionable(f)) punish.free++;
-
-        if (unactionable(f)) {
-          punish.quiet = 0;
-          if (punish.hits === 1 && ++punish.stunned >= DISADVANTAGE_FRAMES) punish.disadvantage = true;
-        } else if (f.motion.grounded && ++punish.quiet > PUNISH_RESET_FRAMES) {
-          closePunish(other.punishes, punish, false, undefined, slot, frame, combos);
+        if (hit && other?.ledge !== undefined && ledge !== undefined) {
+          if (seen.ledgeUntil >= frame) ledge.ledgeTaken++;
+          else if (onMainDeck(f, stage)) ledge.stageTaken++;
+          if (opponent.ledge.state !== LedgeState.none || opponentSeen.ledgeUntil >= frame) other.ledge.ledgeLanded++;
+          else if (onMainDeck(opponent, stage)) other.ledge.stageLanded++;
+        }
+        const dealt = Math.max(0, f.status.damage - seen.damage - (terrainDamage[slot] ?? 0));
+        const techChoice = seen.down !== f.down.state && (f.down.state === DownState.tech || f.down.state === DownState.techRoll
+          || (seen.down === DownState.bound && (f.down.state === DownState.wait || f.down.state === DownState.stand || f.down.state === DownState.roll || f.down.state === DownState.attack)));
+        if (options.playtest && (terrainDamage[slot] ?? 0) > 0 && seen.punish !== undefined && other !== undefined) {
+          closePunish(other.punishes, seen.punish, false, undefined, slot, frame, combos);
           seen.punish = undefined;
         }
-      }
+        if (seen.punish !== undefined && techChoice && !forcedLock(f)) seen.punish.free++;
+        if (hit && other !== undefined) {
+          other.hitsLanded++;
+          if (other.hitDistances !== undefined) {
+            const bin = Math.floor(Math.abs(f32(opponent.motion.x - f.motion.x)) / (10 * WORLD_UNITS_PER_MELEE_UNIT));
+            other.hitDistances[bin] = (other.hitDistances[bin] ?? 0) + 1;
+          }
+          seen.lastHit = frame;
+          if (seen.recovering) {
+            other.edges.edgeGuardHits++;
+            seen.edgeGuarded = true;
+            if (!opponent.motion.grounded && insideLip(stage, opponent.motion.x) < 0.0) other.edges.offstageHits++;
+          }
+        }
+        const lagging = inLag(f);
+        if (seen.grounded && !f.motion.grounded && seen.lagging && !lagging && f.launch.hitstun <= 0 && !f.special.fall && insideLip(stage, f.motion.x) < 0.0) own.edges.edgeCancels++;
+        const inCorner = !f.status.out && cornered(f, opponent, stage);
+        if (inCorner && !seen.cornered) own.edges.corners++;
+        if (seen.cornered && !inCorner && !hit && !f.status.out && insideLip(stage, f.motion.x) > CORNER_BAND) own.edges.cornerEscapes++;
+        seen.cornered = inCorner && !hit;
+        if ((hit || dealt > 0) && other !== undefined) {
+          const striking = strikingMove(opponent);
+          const move = striking ?? opponentSeen.lastStarted;
+          if (move !== undefined) {
+            seen.lastHitMove = move;
+            if (dealt > 0) other.damageByMove[move] = (other.damageByMove[move] ?? 0) + dealt;
+          }
+          if (striking === undefined) other.rangedDamage += dealt;
+          other.damageDealt += dealt;
+          if (seen.punish === undefined) {
+            seen.punish = { hits: 0, damage: 0, quiet: 0, neutral: opponentSeen.punish === undefined, disadvantage: false, stunned: 0, fromStockStart: seen.stockFirstHit, free: 0, gaps: [], start: seen.damage, moves: [], instances: [], damages: [] };
+            seen.stockFirstHit = false;
+          }
+          if (hit && seen.punish.hits > 0) {
+            seen.punish.gaps.push(seen.punish.free);
+            seen.punish.free = 0;
+          }
+          seen.punish.hits += hit ? 1 : 0;
+          seen.punish.damage += dealt;
+          if (combos !== undefined) {
+            const p = seen.punish;
+            if (hit) {
+              p.moves.push(move ?? -1);
+              p.instances.push(opponentSeen.starts);
+              p.damages.push(dealt);
+            } else if (p.damages.length > 0) p.damages[p.damages.length - 1] = (p.damages[p.damages.length - 1] ?? 0) + dealt;
+          }
+          seen.punish.quiet = 0;
+        } else if (seen.punish !== undefined && other !== undefined) {
+          const punish = seen.punish;
+          if (!f.status.out && !unactionable(f)) punish.free++;
 
-      if (seen.punish !== undefined && (f.down.state !== DownState.none || f.ledge.state !== LedgeState.none || f.motion.x < mainDeckLeft(stage) || f.motion.x > mainDeckRight(stage) || f.motion.z < 0.0)) seen.punish.disadvantage = true;
+          if (unactionable(f)) {
+            punish.quiet = 0;
+            if (punish.hits === 1 && ++punish.stunned >= DISADVANTAGE_FRAMES) punish.disadvantage = true;
+          } else if (f.motion.grounded && ++punish.quiet > PUNISH_RESET_FRAMES) {
+            closePunish(other.punishes, punish, false, undefined, slot, frame, combos);
+            seen.punish = undefined;
+          }
+        }
 
-      if (!f.status.out && f.launch.hitlag <= 0 && f.launch.hitstun <= 0 && (f.motion.grounded || f.ledge.state !== LedgeState.none)) {
-        seen.lastSafe = frame;
-        seen.edgeGuarded = false;
+        if (seen.punish !== undefined && (f.down.state !== DownState.none || f.ledge.state !== LedgeState.none || f.motion.x < mainDeckLeft(stage) || f.motion.x > mainDeckRight(stage) || f.motion.z < 0.0)) seen.punish.disadvantage = true;
+
+        if (!f.status.out && f.launch.hitlag <= 0 && f.launch.hitstun <= 0 && (f.motion.grounded || f.ledge.state !== LedgeState.none)) {
+          seen.lastSafe = frame;
+          seen.edgeGuarded = false;
+        }
+        if (f.status.out && !seen.out) {
+          const selfDestruct = seen.lastHit === undefined || (seen.lastSafe !== undefined && seen.lastHit < seen.lastSafe);
+          const { blast } = stageBounds(stage);
+          const exit = f.motion.z < blast.bottom ? "bottom" : f.motion.x < blast.left || f.motion.x > blast.right ? "side" : "top";
+          own.stockLosses.push({ frame, sinceHit: seen.lastHit === undefined ? undefined : frame - seen.lastHit, selfDestruct, blast: exit, percent: Math.round(seen.damage), recovering: seen.recovering });
+          if (!selfDestruct && other !== undefined && seen.lastHitMove !== undefined) other.kosByMove[seen.lastHitMove] = (other.kosByMove[seen.lastHitMove] ?? 0) + 1;
+          if (!selfDestruct && other !== undefined && seen.edgeGuarded) other.edges.edgeGuardKills++;
+          seen.edgeGuarded = false;
+          if (seen.punish !== undefined && other !== undefined) closePunish(other.punishes, seen.punish, !selfDestruct, strings, slot, frame, combos);
+          seen.punish = undefined;
+          seen.stockFirstHit = true;
+          seen.lastHit = undefined;
+          seen.lastHitMove = undefined;
+        }
+        seen.serial = f.attack.serial;
+        seen.special = f.special.action;
+        seen.specialFrame = f.special.frame;
+        seen.specialForm = f.special.form;
+        seen.mana = f.mana.points;
+        seen.denied = f.visuals.manaDenied;
+        seen.hits = f.visuals.hit;
+        if (f.status.damage !== seen.damage || f.status.out !== seen.out) {
+          if (frame - lastChange > quiet.frames) quiet = { from: lastChange, frames: frame - lastChange };
+          lastChange = frame;
+        }
+        seen.damage = f.status.damage;
+        seen.out = f.status.out;
+        seen.grounded = f.motion.grounded;
+        seen.down = f.down.state;
+        seen.lagging = lagging;
+        seen.recovering = recoveringBelow(f, stage);
       }
-      if (f.status.out && !seen.out) {
-        const selfDestruct = seen.lastHit === undefined || (seen.lastSafe !== undefined && seen.lastHit < seen.lastSafe);
-        const { blast } = stageBounds(stage);
-        const exit = f.motion.z < blast.bottom ? "bottom" : f.motion.x < blast.left || f.motion.x > blast.right ? "side" : "top";
-        own.stockLosses.push({ frame, sinceHit: seen.lastHit === undefined ? undefined : frame - seen.lastHit, selfDestruct, blast: exit, percent: Math.round(seen.damage), recovering: seen.recovering });
-        if (!selfDestruct && other !== undefined && seen.lastHitMove !== undefined) other.kosByMove[seen.lastHitMove] = (other.kosByMove[seen.lastHitMove] ?? 0) + 1;
-        if (!selfDestruct && other !== undefined && seen.edgeGuarded) other.edges.edgeGuardKills++;
-        seen.edgeGuarded = false;
-        if (seen.punish !== undefined && other !== undefined) closePunish(other.punishes, seen.punish, !selfDestruct, strings, slot, frame, combos);
-        seen.punish = undefined;
-        seen.stockFirstHit = true;
-        seen.lastHit = undefined;
-        seen.lastHitMove = undefined;
-      }
-      seen.serial = f.attack.serial;
-      seen.special = f.special.action;
-      seen.specialFrame = f.special.frame;
-      seen.specialForm = f.special.form;
-      seen.mana = f.mana.points;
-      seen.denied = f.visuals.manaDenied;
-      seen.hits = f.visuals.hit;
-      if (f.status.damage !== seen.damage || f.status.out !== seen.out) {
-        if (frame - lastChange > quiet.frames) quiet = { from: lastChange, frames: frame - lastChange };
-        lastChange = frame;
-      }
-      seen.damage = f.status.damage;
-      seen.out = f.status.out;
-      seen.grounded = f.motion.grounded;
-      seen.lagging = lagging;
-      seen.recovering = recoveringBelow(f, stage);
     }
+  } finally {
+    if (options.playtest) observeDamageContacts(undefined);
   }
   for (const slot of [0, 1] as const) {
     const open = watches[slot].punish;

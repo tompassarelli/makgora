@@ -1,5 +1,9 @@
 import { expect, test } from "bun:test";
-import { DEFAULT_CONFIG, classify, type Combo, type MatchSpec, type Observation, type Run } from "../scripts/playtestCore";
+import { DEFAULT_CONFIG, classify, trueSegments, type Combo, type MatchSpec, type Observation, type Run } from "../scripts/playtestCore";
+import { playReal, ROSTER } from "../scripts/playtest";
+import { planMatches, runPlaytest } from "../scripts/playtestCore";
+import { sweep } from "./sweep";
+import { LAVA_HIT } from "../src/game/sim/lava";
 
 const random = (seed: number) => () => {
   seed = (seed + 0x6d2b79f5) | 0;
@@ -53,6 +57,21 @@ function breaksByWindows(combo: Combo): boolean {
 }
 
 const key = (runs: readonly Run[]) => JSON.stringify(classify(runs).map(({ kind, subject, detail, frame }) => [kind, subject, detail, frame]).sort());
+
+test("seeds 6 and 43 separate tech reads while retaining the real grab into forward-tilt combo [k1 scenario]", () => {
+  const spec = [...planMatches(ROSTER, 6, 1), ...planMatches(ROSTER, 43, 1)];
+  const runs = runPlaytest(spec, playReal, 1056, true, () => 0);
+  expect(classify(runs).filter((finding) => finding.kind === "infinite-combo" || finding.kind === "desync")).toEqual([]);
+  expect(runs[1]?.first.combos.flatMap(trueSegments).some((segment) => segment.moves.join(",") === "grab,forward-tilt")).toBe(true);
+});
+
+sweep("the seven recorded #424 seeds distinguish terrain hits and tech reads from guaranteed fighter chains [k1 scenario]", () => {
+  for (const [seed, cap] of [[6, 6765], [14, 4264], [19, 1348], [24, 686], [31, 3564], [43, 3347], [47, 5688]]) {
+    const runs = runPlaytest(planMatches(ROSTER, seed ?? 0, 1), playReal, cap ?? 0, true, () => 0);
+    expect(classify(runs).filter((finding) => finding.kind === "infinite-combo" || finding.kind === "desync")).toEqual([]);
+    if (seed === 19) expect(runs[0]?.first.combos.flatMap((combo) => combo.damages).includes(LAVA_HIT.damage)).toBe(false);
+  }
+}, 60000);
 
 test("the playtester flags a string exactly when #83's true-combo rule breaks, a match as stuck exactly past 30 s with no damage or stock change, its findings ignore run order, and scaling move usage keeps every overused move [k3 measure docs/gameplay-design.md]", () => {
   const next = random(403);

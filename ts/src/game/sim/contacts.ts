@@ -89,6 +89,11 @@ function emptyContact(): DamageContact {
 
 
 const batch: { contacts: DamageContact[]; count: number; collecting: boolean } = { contacts: [], count: 0, collecting: false };
+let damageObserver: ((source: number, target: number, damage: number) => void) | undefined;
+
+export function observeDamageContacts(observer: ((source: number, target: number, damage: number) => void) | undefined): void {
+  damageObserver = observer;
+}
 
 
 function flinchHitstunFrames(damage: number): number {
@@ -237,6 +242,7 @@ function resolveDamageContacts(world: Roster, slot: number): void {
       if (!perfectShield) shieldDamage = addFloat32(shieldDamage, contact.effect.damage);
     } else {
       totalDamage = addFloat32(totalDamage, roundToFloat32(contact.effect.damage));
+      damageObserver?.(contact.source, contact.target, contact.effect.damage);
     }
   }
   const postHitPercent = addFloat32(toInt(max(0.0, roundToFloat32(status.damage))), totalDamage);
