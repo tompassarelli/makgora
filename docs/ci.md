@@ -61,6 +61,8 @@ landing restarts another's suites.
    first to pass again on main leads the next train and lands without a
    suite.
 
+A train landing past a moved main is checked by one docs-only direct commit pushed mid-train (#513).
+
 Lanes don't regenerate whole-roster reports. After the gate, Autoland's
 `reports` job runs beside the suite: it reruns `bun wisp combos --advantage`,
 commits changed tools/move-data/advantage-state.{jsonl,md} as "Regenerate
