@@ -3,7 +3,7 @@ import { checkBodySkin, checkRetarget, generateHdBody, parseHdBody, retargetHd }
 import { canonicalMotion, classicSkeleton, rigNode, type FighterRig } from './canonical-rig';
 import { timelineBody } from './timeline-body';
 import { flashableSequences } from './white-flash-keys';
-import { thinKeys } from '../../ts/scripts/keyThin';
+import { slopeTangents, thinKeys } from '../../ts/scripts/keyThin';
 import { encodeVerified, fighters, parseSource } from './original-clips';
 import { DEFINITIVE_FIGHTERS } from '../../ts/src/game/assets/definitiveFighters';
 import type { Character } from '../../ts/src/game/sim/codes';
@@ -77,8 +77,9 @@ export function definitiveBody(motion: mdx.Model, stock: ArrayBuffer, rig: Fight
     const pairs = rig.pairs;
     if (!Array.isArray(pairs) || pairs.length === 0) throw new Error('A Definitive rig needs a nonempty pairs array');
     const skin = checkBodySkin(hd);
-    const sequences = selected(motion, played);
-    const result = retargetHd(motion, hd, pairs.map(([joint, bone]) => [rigNode(joint), bone] as const), sequences, rig);
+    const repaired = slopeTangents(motion);
+    const sequences = selected(repaired, played);
+    const result = retargetHd(repaired, hd, pairs.map(([joint, bone]) => [rigNode(joint), bone] as const), sequences, rig);
     const converted = checkRetarget(result);
     if (converted.units > 0.5 || converted.degrees > 0.5) throw new Error(`${fighter.name} retarget exceeds 0.5/0.5: ${JSON.stringify(converted)}`);
     for (const collision of result.model.CollisionShapes) delete result.model.Nodes[collision.ObjectId];

@@ -22,6 +22,11 @@ export const JITTER_SPAN_MS = 50;
 /** A moving segment may ease past its keys by this share of their distance; a hold (equal keys) may not leave its value. */
 export const SPAN_ALLOWANCE = 0.5;
 
+/** Fighters whose stored body may still jitter, each until its issue's fix regenerates it; an entry whose fighter no longer jitters fails the check. */
+export const JITTER_EXEMPTIONS: ReadonlyMap<string, string> = new Map([
+  ["warden", "smashcraft#440: Warden's neutral-air spin fails warden-blade-fit (41.67°/65.02° of 300°) on main c39ada1e5, so its body cannot be regenerated until #440's fix lands"],
+]);
+
 const STEPS = 8;
 
 type Quat = readonly [number, number, number, number];
