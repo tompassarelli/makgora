@@ -6,7 +6,7 @@ import { attackDamage, attackStartupFrames } from "./moves";
 import { createRoster } from "./roster";
 import { controls } from "./testWorld";
 import { resolveLedges } from "./ledge";
-import { imod } from "wisp/src/sim/intMath";
+import { idiv, imod } from "wisp/src/sim/intMath";
 
 function fourWorld() {
   return createRoster(15, [
@@ -34,22 +34,33 @@ test("multipleAttackersKeepIndependentVictimHitWindows [k3 measure #12]", () => 
   assertEquals(world.fighters[3]!.status.damage, attackDamage(AttackStyle.jab) * 2);
 });
 
-test("fourFightersArbitrateBothLedgesByDistance [k3 measure docs/physics.md]", () => {
-  const world = fourWorld();
-  for (let slot = 0; slot < 4; slot++) {
-    const fighter = world.fighters[slot]!;
-    const side = slot < 2 ? -1 : 1;
-    fighter.motion.x = side * (imod(slot, 2) === 0 ? 630.0 : 620.0);
-    fighter.motion.z = -80.0;
-    fighter.motion.vz = -2.0;
-    fighter.motion.deltaZ = -2.0;
-    fighter.motion.grounded = false;
-    fighter.facing = -side;
-  }
-  resolveLedges(world, 0, [controls(), controls(), controls(), controls()]);
-  assertEquals(world.fighters[0]!.ledge.state, LedgeState.none);
-  assertEquals(world.fighters[1]!.ledge.state, LedgeState.hang);
-  assertEquals(world.fighters[2]!.ledge.state, LedgeState.none);
-  assertEquals(world.fighters[3]!.ledge.state, LedgeState.hang);
-});
+const LEDGE_PLACES = [-630.0, -620.0, 620.0, 630.0];
 
+test("four fighters falling past both ledges: at each ledge the nearer catches, for every assignment of slots to places [k2 property]", () => {
+  for (let order = 0; order < 24; order++) {
+    const free = [0, 1, 2, 3];
+    const placeOf: number[] = [];
+    let rest = order;
+    for (let count = 4; count > 0; count--) {
+      placeOf.push(free.splice(imod(rest, count), 1)[0]!);
+      rest = idiv(rest, count);
+    }
+    const world = fourWorld();
+    for (let slot = 0; slot < 4; slot++) {
+      const fighter = world.fighters[slot]!;
+      const x = LEDGE_PLACES[placeOf[slot]!]!;
+      const side = x < 0.0 ? -1 : 1;
+      fighter.motion.x = x;
+      fighter.motion.z = -80.0;
+      fighter.motion.vz = -2.0;
+      fighter.motion.deltaZ = -2.0;
+      fighter.motion.grounded = false;
+      fighter.facing = -side;
+    }
+    resolveLedges(world, 0, [controls(), controls(), controls(), controls()]);
+    for (let slot = 0; slot < 4; slot++) {
+      const nearer = placeOf[slot] === 1 || placeOf[slot] === 2;
+      assertEquals(world.fighters[slot]!.ledge.state, nearer ? LedgeState.hang : LedgeState.none, `order ${order} slot ${slot}`);
+    }
+  }
+});
