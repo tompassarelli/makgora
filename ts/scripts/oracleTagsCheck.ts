@@ -1,5 +1,6 @@
 import { resolve } from "node:path";
-import { refuseUntagged } from "./oracleTags";
+import { BACKGROUND_SWEEPS } from "../src/runtime/backgroundSweeps";
+import { backgroundSweepTitles, refuseUntagged } from "./oracleTags";
 
 const root = resolve(import.meta.dir, "..");
 const files = new Set([
@@ -8,4 +9,4 @@ const files = new Set([
   ...new Bun.Glob("src/**/*.tests.ts").scanSync(root),
   ...new Bun.Glob("test/lua/**/*.tests.ts").scanSync(root),
 ]);
-refuseUntagged(root, [...files].filter((file) => file !== "test/game.test.ts" && !file.startsWith("build/") && !file.split("/").some((part) => part === "node_modules" || part === ".git")).sort());
+refuseUntagged(root, [...files].filter((file) => file !== "test/game.test.ts" && !file.startsWith("build/") && !file.split("/").some((part) => part === "node_modules" || part === ".git")).sort(), backgroundSweepTitles(BACKGROUND_SWEEPS));

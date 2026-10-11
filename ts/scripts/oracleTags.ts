@@ -53,9 +53,17 @@ const REGISTRARS = new Set(["test", "it", "sweep"]);
 const CURRIED = new Set(["each", "if", "skipIf", "todoIf"]);
 
 
+/** `test`, `sweep`, or a choice between them such as `(heavy ? sweep : test)`. */
+function isRegistrar(node: ts.Expression): boolean {
+  if (ts.isParenthesizedExpression(node)) return isRegistrar(node.expression);
+  if (ts.isConditionalExpression(node)) return isRegistrar(node.whenTrue) || isRegistrar(node.whenFalse);
+  return ts.isIdentifier(node) && REGISTRARS.has(node.text);
+}
+
+
 function registersTest(call: ts.CallExpression): boolean {
   const callee = call.expression;
-  if (ts.isIdentifier(callee)) return REGISTRARS.has(callee.text);
+  if (ts.isIdentifier(callee) || ts.isParenthesizedExpression(callee)) return isRegistrar(callee);
   if (ts.isPropertyAccessExpression(callee)) return ts.isIdentifier(callee.expression) && REGISTRARS.has(callee.expression.text) && !CURRIED.has(callee.name.text);
   if (ts.isCallExpression(callee)) {
     const inner = callee.expression;
@@ -90,10 +98,16 @@ export function testTitles(root: string, files: readonly string[]): TestTitle[] 
 }
 
 
+/** Each name listed in `src/runtime/backgroundSweeps.ts`, which must carry a kind tag like the sweep it selects. */
+export function backgroundSweepTitles(names: readonly string[]): TestTitle[] {
+  return names.map((title, index) => ({ file: "src/runtime/backgroundSweeps.ts", line: index + 2, title }));
+}
+
+
 /** Exits 1 naming each refused title; `root` is ts/, and k3 doc paths resolve from the repo root above it. */
-export function refuseUntagged(root: string, files: readonly string[]): void {
+export function refuseUntagged(root: string, files: readonly string[], extra: readonly TestTitle[] = []): void {
   const repo = resolve(root, "..");
-  const refused = kindTagProblems(testTitles(root, files), (path) => existsSync(join(repo, path)));
+  const refused = kindTagProblems([...testTitles(root, files), ...extra], (path) => existsSync(join(repo, path)));
   if (refused.length === 0) return;
   console.error(`refused: ${refused.length} test title${refused.length === 1 ? " breaks" : "s break"} the kind-tag rule; nothing ran.`);
   for (const { file, line, title, why } of refused) console.error(`  ${file}:${line}  ${why}: ${title}`);

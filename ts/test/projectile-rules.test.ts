@@ -44,7 +44,7 @@ function violations(character: Character, name: string): Map<string, string> {
 // The original three fighters run in the suite; every hero's rules run as sweeps.
 for (const [index, fighter] of FIGHTERS.entries()) {
   // About 2-3 s alone; a loaded host takes a test several times that, past Bun's 5 s default.
-  (index < 2 ? test : sweep)(`${fighter.name}'s projectiles follow the projectile rules or name a departure [spec #98]`, () => {
+  (index < 2 ? test : sweep)(`${fighter.name}'s projectiles follow the projectile rules or name a departure [k3 measure #98]`, () => {
     const found = violations(fighter.character, fighter.name);
     const unexpected = [...found].filter(([key]) => DEPARTURES[key] === undefined).map(([key, detail]) => `${key}: ${detail}`);
     expect(unexpected).toEqual([]);
