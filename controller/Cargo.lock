@@ -672,8 +672,8 @@ dependencies = [
 
 [[package]]
 name = "wc3-controller"
-version = "0.3.1"
-source = "git+https://github.com/tompassarelli/wc3-controller?tag=v0.3.1#5a73bc85ea6fb2f26a894c483ee503998c7500f7"
+version = "0.3.2"
+source = "git+https://github.com/tompassarelli/wc3-controller?tag=v0.3.2#59f77b1132f742bee088fca20dfb99c508686c16"
 dependencies = [
  "ctrlc",
  "enigo",
@@ -693,8 +693,8 @@ dependencies = [
 
 [[package]]
 name = "wc3-controller-model"
-version = "0.3.1"
-source = "git+https://github.com/tompassarelli/wc3-controller?tag=v0.3.1#5a73bc85ea6fb2f26a894c483ee503998c7500f7"
+version = "0.3.2"
+source = "git+https://github.com/tompassarelli/wc3-controller?tag=v0.3.2#59f77b1132f742bee088fca20dfb99c508686c16"
 dependencies = [
  "serde",
  "serde_json",
