@@ -357,9 +357,9 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   },
   [Character.beastmaster]: {
     neutral: { spell: "Wild Axes", startup: BEAST, active: cue("Abilities\\Weapons\\Axe\\AxeMissile.mdx", "hand", 1.0) },
-    side: { spell: "Summon Bear", startup: BEAST, active: cue("Abilities\\Spells\\NightElf\\Tranquility\\TranquilityTarget.mdx", "ahead", f32(0.8)) },
-    up: { spell: "Summon Hawk", startup: BEAST, active: cue("Abilities\\Weapons\\HarpyMissile\\HarpyMissile.mdx", "body", 1.0) },
-    down: { spell: "Summon Quilbeast", startup: BEAST, active: cue("Abilities\\Spells\\Orc\\Ensnare\\EnsnareMissile.mdx", "hand", f32(0.6)) },
+    side: { spell: "Summon Bear", startup: BEAST, active: cue("Abilities\\Spells\\Orc\\FeralSpirit\\FeralSpiritTarget.mdx", "ahead", f32(0.6)) },
+    up: { spell: "Summon Hawk", startup: BEAST, active: cue("Abilities\\Weapons\\DruidoftheTalonMissile\\DruidoftheTalonMissile.mdx", "body", f32(0.6)) },
+    down: { spell: "Summon Quilbeast", startup: BEAST, active: cue("Abilities\\Weapons\\QuillSprayMissile\\QuillSprayMissile.mdx", "ahead", f32(0.6)) },
   },
 };
 
@@ -448,7 +448,7 @@ export const HERO_BRANCH_CUES: { readonly [character: number]: { readonly [slot 
   [Character.beastmaster]: {
     up: { recall: branch("Hawk Dive", BEAST, cue("Abilities\\Weapons\\DragonHawkMissile\\DragonHawkMissile.mdx", "hand", f32(0.8))) },
     side: { recall: branch("Stampede", BEAST, cue("Abilities\\Spells\\Other\\Stampede\\StampedeMissile.mdx", "ahead", f32(0.6))) },
-    down: { recall: branch("Quill Volley", BEAST, cue("Abilities\\Spells\\Orc\\CommandAura\\CommandAuraTarget.mdx", "body", f32(0.8))) },
+    down: { recall: "slot" },
   },
 };
 
