@@ -425,7 +425,6 @@ function voodoo(facing: number, jabTick: number, survive: boolean): VoodooRun {
     for (const slot of [1, 2]) {
       const ward = placedObject(b.owner, slot);
       const before = lives[slot - 1] ?? 0;
-      // The fault: each ward outlives the hit and keeps its schedule.
       if (survive && run.hitFrame >= 0 && ward.life <= 0 && before > 1) ward.life = before - 1;
       if (run.hitFrame >= 0 && ward.life > 0) run.wardsAfterHit++;
     }
@@ -439,7 +438,6 @@ function voodooFindings(facing: number, survive: boolean): string[] {
   const move = ultimateOf(Character.shadowHunter);
   const placement = move.placement;
   if (placement === undefined) return ["no wards"];
-  // A placed object is age 1 on the frame it is placed.
   const volleys = placement.fireAges.map((age) => placement.frame + age - 1);
   const untouched = voodoo(facing, 999, survive);
   for (const frame of volleys) {

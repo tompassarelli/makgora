@@ -108,7 +108,6 @@ export function cancelSpecialState(f: Fighter): void {
       const spec = projectile.spec;
       if (projectile.life > 0 && spec?.cancelOnInterrupt === true && spec.life - projectile.life < (spec.activeFrom ?? 0)) mutableProjectile(f, index).life = 0;
     }
-    // A channeled object sinks with the special that placed it, on the frame it is cut.
     for (let animal = 0; animal <= f.pack.length; animal++) {
       const placed = placedObject(f, animal);
       if (placed.spec?.channeled === true) placed.life = 0;

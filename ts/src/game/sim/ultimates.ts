@@ -120,9 +120,6 @@ const DREADLORD: AuthoredSpecial = {
   regions: [heroRegion(40, 42, capsule(260.0, 20.0, 260.0, 120.0, 100.0), hit(16.0, 80, 90.0, 45.0, HitElement.fire))],
 };
 
-// Big Bad Voodoo (#483): he dances, hittable; two Serpent Wards either side fire
-// outward and nothing breaks them while he dances. A hit on him ends the dance and sinks both.
-// The Voodoo models are not yet in the model facts, so the confirmed Command Aura models stand in.
 const VOODOO_AURA = "Abilities\\Spells\\Orc\\CommandAura\\CommandAura.mdx";
 const VOODOO_WARD_MARK = "Abilities\\Spells\\Orc\\CommandAura\\CommandAuraTarget.mdx";
 const VOODOO_BOLT = "Abilities\\Weapons\\SerpentWardMissile\\SerpentWardMissile.mdx";
