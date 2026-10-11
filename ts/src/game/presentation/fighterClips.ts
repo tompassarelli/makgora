@@ -326,10 +326,11 @@ const byGrounding = (clips: GroundingClips, grounded: boolean): HeroClip => grou
 
 
 
+// A fighter whose clip table names an ultimate clip plays it instead: Shadow Hunter dances Big Bad Voodoo to Stand Channel (#483).
 const ULTIMATE_POSES: { readonly [character: number]: HeroPose | undefined } = {
   [Character.blademaster]: "upSpecial", [Character.mountainKing]: "downSpecial", [Character.warden]: "neutralSpecial",
   [Character.lich]: "neutralSpecial", [Character.forsakenPaladin]: "downSpecial", [Character.dreadlord]: "neutralSpecial",
-  [Character.shadowHunter]: "downSpecial", [Character.pitLord]: "grab", [Character.beastmaster]: "sideSpecial",
+  [Character.pitLord]: "grab", [Character.beastmaster]: "sideSpecial",
   [Character.lichKing]: "downSpecial", [Character.thrall]: "downSpecial", [Character.jaina]: "neutralSpecial",
   [Character.sylvanas]: "neutralSpecial", [Character.cairne]: "downSpecial", [Character.chen]: "downSpecial",
   [Character.peon]: "forwardSmash", [Character.tinker]: "sideSpecial", [Character.kaelthas]: "downSpecial",

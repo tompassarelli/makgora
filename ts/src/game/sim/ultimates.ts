@@ -120,16 +120,26 @@ const DREADLORD: AuthoredSpecial = {
   regions: [heroRegion(40, 42, capsule(260.0, 20.0, 260.0, 120.0, 100.0), hit(16.0, 80, 90.0, 45.0, HitElement.fire))],
 };
 
-const VOODOO_PULSES = [30, 50, 70] as const;
+// Big Bad Voodoo (#483): he dances, hittable; two Serpent Wards either side fire
+// outward and nothing breaks them while he dances. A hit on him ends the dance and sinks both.
+// The Voodoo models are not yet in the model facts, so the confirmed Command Aura models stand in.
+const VOODOO_AURA = "Abilities\\Spells\\Orc\\CommandAura\\CommandAura.mdx";
+const VOODOO_WARD_MARK = "Abilities\\Spells\\Orc\\CommandAura\\CommandAuraTarget.mdx";
+const VOODOO_BOLT = "Abilities\\Weapons\\SerpentWardMissile\\SerpentWardMissile.mdx";
+const VOODOO_END = 105;
+const VOODOO_WARD_FRAME = 16;
+const voodooBolt = (effect: HitEffect): SpecialProjectile => shot(0, 30.0, 50.0, 14.0, 0.0, 24, 26.0, effect, VOODOO_BOLT);
 const SHADOW_HUNTER: AuthoredSpecial = {
-  name: "Big Bad Voodoo", endFrame: 120, groundOnly: true,
-  intangible: frames(13, 90),
-  projectiles: [mark("Abilities\\Spells\\Orc\\CommandAura\\CommandAura.mdx", 2, 88, 0.0)],
-  regions: [
-    ...VOODOO_PULSES.map((first): MoveRegion => heroRegion(first, first, capsule(-200.0, 40.0, 200.0, 40.0, 60.0), hit(3.0, 80, 10.0, 30.0, HitElement.dark))),
-    heroRegion(90, 92, capsule(-200.0, 50.0, 200.0, 50.0, 90.0), hit(12.0, 80, 85.0, 45.0, HitElement.dark)),
-  ],
-  rehits: [...VOODOO_PULSES, 90],
+  name: "Big Bad Voodoo", endFrame: VOODOO_END, groundOnly: true,
+  projectiles: [{ ...mark(VOODOO_AURA, 2, VOODOO_END - 2, 0.0), cancelOnInterrupt: true }],
+  placement: {
+    frame: VOODOO_WARD_FRAME, slot: 1, offsetX: 140.0, radius: 30.0, height: 130.0, durability: 1.0, life: VOODOO_END - VOODOO_WARD_FRAME + 1,
+    fireAges: [7, 22, 37, 52], outwardPair: true, channeled: true,
+    shot: voodooBolt(hit(4.0, 40, 20.0, 30.0, HitElement.poison)),
+    finalShot: voodooBolt(hit(8.0, 45, 85.0, 45.0, HitElement.poison)),
+    mark: { ...mark(VOODOO_WARD_MARK, 0, VOODOO_END - VOODOO_WARD_FRAME, 0.0), cancelOnInterrupt: true },
+    model: { path: "Units\\Orc\\SerpentWard\\SerpentWard.mdx", height: 300.0, alpha: 255 },
+  },
 };
 
 const DOOM: AppliedStatus = { kind: HeroStatusKind.poison, frames: 180, group: HeroStatusGroup.sleep, immunityFrames: 0, tick: { every: 15, damage: 1.0 } };
@@ -347,7 +357,7 @@ const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined 
   [Character.lich]: "A frost wyrm sweeps across at jump height. Stay low or shield it.",
   [Character.forsakenPaladin]: "A golden circle marks where the Light's hammer will fall, then blesses the ground twice. Leave the circle.",
   [Character.dreadlord]: "An Infernal crashes onto a burning mark ahead. Leave the mark.",
-  [Character.shadowHunter]: "He dances untouchable inside a voodoo ring that pulses, then erupts. Leave the ring.",
+  [Character.shadowHunter]: "He dances while two serpent wards beside him spit bolts outward, then a launcher. The wards can't be hurt; hit him to end the dance and sink them.",
   [Character.pitLord]: "A clawed grab that ignores shields brands the victim with Doom, burning on after the throw. Jump or roll away.",
   [Character.beastmaster]: "His pack stampedes past: a low quilbeast, a bear, then a high hawk. Jump, shield, then stay low.",
   [Character.lichKing]: "Runes mark the ground under the nearest foe; the dead claw up there a moment later. Step off the mark.",
@@ -385,7 +395,7 @@ export const ULTIMATE_REACH: { readonly [character: number]: { readonly near: nu
   [Character.lich]: { near: 0.0, far: 600.0 },
   [Character.forsakenPaladin]: { near: 150.0, far: 300.0 },
   [Character.dreadlord]: { near: 190.0, far: 330.0 },
-  [Character.shadowHunter]: { near: 0.0, far: 170.0 },
+  [Character.shadowHunter]: { near: 180.0, far: 480.0 },
   [Character.pitLord]: { near: 40.0, far: 120.0 },
   [Character.beastmaster]: { near: 100.0, far: 700.0 },
   [Character.lichKing]: { near: 150.0, far: 600.0 },

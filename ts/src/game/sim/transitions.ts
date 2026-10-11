@@ -8,7 +8,7 @@ import { mutableProjectile } from "./fighterProjectiles";
 import { max } from "../../runtime/numbers";
 import { AttackStyle, DASH_GRAB_REQUEST, DownState, GrabAction, LedgeState, PlatformMove, ProjectileKind, SpecialAction, SurfaceContact } from "./codes";
 import { isTumbling } from "./conditions";
-import { type Fighter, SHIELD_POWERSHIELD_INPUT_WINDOW_FRAMES } from "./fighter";
+import { type Fighter, SHIELD_POWERSHIELD_INPUT_WINDOW_FRAMES, placedObject } from "./fighter";
 import { clearDash } from "./groundMovement";
 import { clearMash } from "./mash";
 import { DOWN_ATTACK_FRAMES, attackDurationFramesForGrounding, isSmashAttack } from "./moves";
@@ -107,6 +107,11 @@ export function cancelSpecialState(f: Fighter): void {
       const projectile = at(f.projectiles, index);
       const spec = projectile.spec;
       if (projectile.life > 0 && spec?.cancelOnInterrupt === true && spec.life - projectile.life < (spec.activeFrom ?? 0)) mutableProjectile(f, index).life = 0;
+    }
+    // A channeled object sinks with the special that placed it, on the frame it is cut.
+    for (let animal = 0; animal <= f.pack.length; animal++) {
+      const placed = placedObject(f, animal);
+      if (placed.spec?.channeled === true) placed.life = 0;
     }
   }
   special.fall = false;

@@ -215,6 +215,14 @@ export interface SpecialPlacement {
   readonly life: number;
   readonly fireAges: readonly number[];
   readonly shot?: SpecialProjectile | undefined;
+  /** Fired instead of `shot` at the last fire age. */
+  readonly finalShot?: SpecialProjectile | undefined;
+  /** A drawn-only effect spawned on the object as it is placed. */
+  readonly mark?: SpecialProjectile | undefined;
+  /** A twin goes at the mirrored offset in the next slot; each faces, and fires, away from the owner. */
+  readonly outwardPair?: boolean | undefined;
+  /** It lasts only while the special that placed it runs, nothing breaks it meanwhile, and its fire skips the hero projectile cap. */
+  readonly channeled?: boolean | undefined;
 
   readonly companion?: SpecialCompanion | undefined;
 }

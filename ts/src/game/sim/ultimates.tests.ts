@@ -15,7 +15,7 @@ import { createFrameControls } from "../match/controls";
 import { Phase, createMatchState } from "../match/rules";
 import { stepMatch } from "../match/step";
 import { AttackStyle, Character, SpecialAction } from "./codes";
-import { type Fighter, createFighter } from "./fighter";
+import { type Fighter, createFighter, placedObject } from "./fighter";
 import { ROSTER_MANA } from "./mana";
 import { type Controls, copyControls, createRoster } from "./roster";
 import { controls } from "./testWorld";
@@ -49,7 +49,7 @@ export const ULTIMATE_SCENARIOS: readonly Scenario[] = [
   { character: Character.lich, x: 200.0, z: 150.0, defence: "ground" },
   { character: Character.forsakenPaladin, x: 220.0, defence: "shield" },
   { character: Character.dreadlord, x: 260.0, defence: "shield" },
-  { character: Character.shadowHunter, x: 120.0, defence: "shield" },
+  { character: Character.shadowHunter, x: 300.0, defence: "shield" },
   { character: Character.pitLord, x: 90.0, defence: "spotDodge", answerFrame: 16 },
   { character: Character.beastmaster, x: 300.0, defence: "shield" },
   { character: Character.lichKing, x: 300.0, defence: "shield" },
@@ -391,4 +391,74 @@ const SWEEP_FRAMES = 900;
 sweep("Wren Rookie computers never press an ultimate and no computer does with Ultimates off [k3 measure #382]", () => {
   assertEquals(cpuUltimates(SELECTABLE_CHARACTERS, "rookie", 0, SWEEP_FRAMES, false).starts, 0);
   assertEquals(cpuUltimates(SELECTABLE_CHARACTERS, "expert", 0, SWEEP_FRAMES, true).starts, 0);
+});
+
+
+interface VoodooRun {
+  /** Each bolt as it spawns: the dance frame, which side of him and which way it flies. */
+  readonly bolts: { readonly frame: number; readonly side: number; readonly direction: number }[];
+  hitFrame: number;
+  wardsAfterHit: number;
+}
+
+const sign = (value: number): number => value > 0.0 ? 1 : value < 0.0 ? -1 : 0;
+
+/** Shadow Hunter dances Big Bad Voodoo; a Blademaster beside him jabs him on `jabTick`. `survive` injects the fault: the wards outlive the hit. */
+function voodoo(facing: number, jabTick: number, survive: boolean): VoodooRun {
+  const b = bout({ character: Character.shadowHunter, x: 90.0, defence: "shield" }, facing);
+  const placement = ultimateOf(Character.shadowHunter).placement;
+  const run: VoodooRun = { bolts: [], hitFrame: -1, wardsAfterHit: 0 };
+  b.step(ULTIMATE);
+  const lives = [0, 0];
+  for (let tick = 1; tick < ultimateOf(Character.shadowHunter).endFrame + 20; tick++) {
+    if (tick === jabTick) queueAttack(b.commands[1] ?? attackBuffer(ATTACK_BUFFER_FRAMES), { style: AttackStyle.jab, facing: 0, frame: b.frame() + 1, mayCharge: false });
+    const dancing = b.owner.special.action === SpecialAction.heroUltimate;
+    lives[0] = placedObject(b.owner, 1).life;
+    lives[1] = placedObject(b.owner, 2).life;
+    b.step();
+    for (const shot of b.owner.projectiles) {
+      const spec = shot.spec;
+      if (shot.life <= 0 || spec === undefined || (spec !== placement?.shot && spec !== placement?.finalShot) || shot.life !== spec.life) continue;
+      run.bolts.push({ frame: b.owner.special.frame, side: sign(f32(shot.x - b.owner.motion.x) * facing), direction: sign(shot.velocityX * facing) });
+    }
+    if (dancing && b.owner.special.action !== SpecialAction.heroUltimate && run.hitFrame < 0 && b.owner.launch.hitstun > 0) run.hitFrame = tick;
+    for (const slot of [1, 2]) {
+      const ward = placedObject(b.owner, slot);
+      const before = lives[slot - 1] ?? 0;
+      // The fault: each ward outlives the hit and keeps its schedule.
+      if (survive && run.hitFrame >= 0 && ward.life <= 0 && before > 1) ward.life = before - 1;
+      if (run.hitFrame >= 0 && ward.life > 0) run.wardsAfterHit++;
+    }
+  }
+  return run;
+}
+
+/** What breaks the move's promise: each volley fires from both wards outward, and a hit on the dancer removes both. */
+function voodooFindings(facing: number, survive: boolean): string[] {
+  const findings: string[] = [];
+  const move = ultimateOf(Character.shadowHunter);
+  const placement = move.placement;
+  if (placement === undefined) return ["no wards"];
+  // A placed object is age 1 on the frame it is placed.
+  const volleys = placement.fireAges.map((age) => placement.frame + age - 1);
+  const untouched = voodoo(facing, 999, survive);
+  for (const frame of volleys) {
+    const volley = untouched.bolts.filter((bolt) => bolt.frame === frame);
+    const outward = volley.filter((bolt) => bolt.side === bolt.direction && bolt.side !== 0);
+    if (volley.length !== 2 || outward.length !== 2 || volley[0]?.side === volley[1]?.side) findings.push(`facing ${facing} volley ${frame}: ${volley.length} bolts, ${outward.length} outward`);
+  }
+  if (untouched.bolts.length !== 2 * volleys.length) findings.push(`facing ${facing}: ${untouched.bolts.length} bolts undisturbed`);
+  const struck = voodoo(facing, 40, survive);
+  if (struck.hitFrame < 0) findings.push(`facing ${facing}: the jab never hit the dancer`);
+  if (struck.wardsAfterHit > 0) findings.push(`facing ${facing}: wards stood ${struck.wardsAfterHit} ward-frames after the hit`);
+  const late = struck.bolts.filter((bolt) => bolt.frame === 0 || bolt.frame > struck.hitFrame);
+  if (late.length > 0) findings.push(`facing ${facing}: ${late.length} bolts after the hit`);
+  return findings;
+}
+
+test("Big Bad Voodoo: both wards fire every volley outward from their own side, and a jab on the dancer ends the dance and removes both, which an injected surviving-wards fault trips [k1 scenario]", () => {
+  for (const facing of [-1, 1]) {
+    assertEquals(voodooFindings(facing, false).join("; "), "");
+    assertGreaterThan(voodooFindings(facing, true).length, 0);
+  }
 });

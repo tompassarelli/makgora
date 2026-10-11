@@ -66,7 +66,7 @@ export const SHADOW_HUNTER_HERO: HeroDefinition = {
       forwardTiltUp: ground(ATTACK, f32(0.50), AttackStyle.forwardTiltUp), forwardTiltDown: ground(SPELL, f32(1.30), AttackStyle.forwardTiltDown),
       upTilt: ground(ATTACK, f32(0.50), AttackStyle.upTilt, 9), downTilt: ground(SPELL_THROW, f32(1.06), AttackStyle.downTilt),
       dashAttack: ground(ATTACK, f32(0.52), AttackStyle.dashAttack),
-      forwardSmash: SPELL_THROW, upSmash: SPELL, downSmash: STAND_CHANNEL,
+      forwardSmash: SPELL_THROW, upSmash: SPELL, downSmash: STAND_CHANNEL, ultimate: STAND_CHANNEL,
 
       neutralAir: STAND_2, forwardAir: ATTACK, backAir: STAND_2, upAir: SPELL, downAir: SPELL_THROW,
       getUpAttack: ATTACK,
