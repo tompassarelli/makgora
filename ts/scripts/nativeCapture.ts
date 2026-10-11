@@ -53,7 +53,7 @@ const SWITCHES = new Set(["--control", "--no-audio", "--sheets"]);
 const positional = (args: readonly string[]) => args.filter((value, index) => !value.startsWith("--") && !(args[index - 1]?.startsWith("--") === true && !SWITCHES.has(args[index - 1] ?? "")));
 
 
-export function fixtureOf(path: string, script: string): CaptureFixture {
+function fixtureOf(path: string, script: string): CaptureFixture {
   const chat = /^\s*\S+\s+[ab]\s+(?:chat|move)\s/;
   const lines = script.split("\n");
   if (lines.some(line => chat.test(line) && line.trim().startsWith("+"))) fail(`${path}: a chat line needs an absolute frame`);
