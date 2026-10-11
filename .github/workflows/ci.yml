@@ -19,6 +19,9 @@ concurrency:
 
 # Autoland lands only a candidate the farm test (farm-test.yml) passed, which runs
 # every check below; its dispatch after a landing runs only the smoke job.
+env:
+  SWEEP_PLACEMENT: gate
+
 jobs:
   # This commit's p95 frame cost, allocation and map script size on main, in the job summary and log (`grep commit-metrics`).
   smoke:

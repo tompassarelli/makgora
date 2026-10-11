@@ -318,6 +318,7 @@ jobs:
           done
           # Pushes made with this token start no workflows: start main's CI (main-red follows it).
           gh workflow run ci.yml --ref main || echo "::warning::couldn't start main's CI"
+          gh workflow run background-sweeps.yml --ref main -f ref="$SHA"
           echo "Landed ${SHA:0:10} on main:$(printf ' `%s`' "${branches[@]}")" >> "$GITHUB_STEP_SUMMARY"
       # A landed copy leaves its source branch behind: delete codex/, claude/ and farm/ branches main holds patch for patch.
       - if: success() && env.TRAIN != ''
