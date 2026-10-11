@@ -1,5 +1,5 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
-import { AttackStyle } from "../sim/codes";
+import { AttackStyle, Character } from "../sim/codes";
 import { SELECTABLE_CHARACTERS, fighterName } from "../sim/heroes/registry";
 import { VERIFIED_STOCK_SOUNDS } from "../assets/stockSoundInfo";
 import { HitElement } from "../sim/hitRegions";
@@ -43,4 +43,43 @@ test("three jabs in a row never sound alike, and the same hit always sounds the 
     }
     assertEquals(new Set(takes).size, 3, `${fighterName(character)} jab takes ${takes.join(" | ")}`);
   }
+});
+
+const SIGNATURE_SOUNDS: { readonly [label: string]: Character } = {
+  StormBolt: Character.mountainKing, StormBoltLaunch: Character.mountainKing, ThunderClap: Character.mountainKing,
+  WardBirth: Character.shadowHunter, VoodooBirth: Character.shadowHunter, ShadowHunterMissileLaunch: Character.shadowHunter, ShadowHunterMissileHit: Character.shadowHunter,
+  StampedeHit: Character.beastmaster,
+  Whirlwind: Character.blademaster, WindWalk: Character.blademaster, MirrorImage: Character.blademaster,
+  FrostNova: Character.lich, DeathAndDecayTarget: Character.lich, DarkRitual: Character.lich,
+  DeathCoil: Character.lichKing, DeathPactTarget: Character.lichKing,
+  CarrionSwarmLaunch: Character.dreadlord, CarrionSwarmDamage: Character.dreadlord, Sleep: Character.dreadlord, InfernalBirth: Character.dreadlord,
+  DemonHunterMissileLaunch: Character.demonHunter, DemonHunterMissileHit: Character.demonHunter, ManaBurn: Character.demonHunter,
+  Warstomp: Character.cairne, ShockWave: Character.cairne, Reincarnation: Character.cairne,
+  LightningBolt: Character.thrall, FeralSpiritTarget: Character.thrall, Earthquake: Character.thrall,
+  FanOfKnives: Character.warden, FanOfKnivesHit: Character.warden, ShadowStrikeMissileBirth: Character.warden, ShadowStrikeBirth: Character.warden,
+  FlameStrike: Character.kaelthas, BanishCaster: Character.kaelthas, SiphonManaCaster: Character.kaelthas, PhoenixMissileLaunch: Character.kaelthas,
+  EntanglingRoots: Character.malfurion, ForceOfNatureBirth: Character.malfurion,
+  Impale: Character.anubarak, ImpaleHit: Character.anubarak, ImpaleLand: Character.anubarak, ScarabBirth: Character.anubarak,
+  BreathOfFire: Character.chen, StrongDrinkMissile: Character.chen, StrongDrink: Character.chen,
+  ClusterRocketsLaunch: Character.tinker, ClusterRocketsImpact: Character.tinker, PocketFactoryBirth: Character.tinker, HeroTinkerMorph: Character.tinker,
+  RainOfFireWave: Character.pitLord, HowlOfTerror: Character.pitLord,
+  WaterElementalBirth: Character.jaina,
+  HolyBolt: Character.forsakenPaladin, DivineShield: Character.forsakenPaladin,
+};
+
+test("no move plays a signature sound owned by another roster hero [k2 property]", () => {
+  const borrowed: string[] = [];
+  for (const character of SELECTABLE_CHARACTERS) {
+    for (const move of soundedMoves(character)) {
+      const row = moveSound(character, move);
+      if (row === undefined) continue;
+      for (const layer of [...row.perform, ...row.hit, ...row.strong, ...row.shield, ...(row.voice === undefined ? [] : [row.voice])]) {
+        for (const sound of layer.sounds) {
+          const owner = SIGNATURE_SOUNDS[sound];
+          if (owner !== undefined && owner !== character) borrowed.push(`${fighterName(character)} ${move}: ${sound} belongs to ${fighterName(owner)}`);
+        }
+      }
+    }
+  }
+  assertEquals([...new Set(borrowed)].join("\n"), "");
 });
