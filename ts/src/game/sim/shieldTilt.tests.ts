@@ -35,7 +35,7 @@ function guarding() {
 }
 
 for (const cardinal of CARDINALS) {
-  test(`Tilt plus shield gives capped ${cardinal.name} reach without a roll, dodge or jump [k4 reference melee]`, () => {
+  test(`Tilt plus shield gives capped ${cardinal.name} reach without a roll, dodge or jump [k4 reference docs/smash-melee-reference/shield-tilt-cardinals.md]`, () => {
     const { fighter, controls, attacks } = guarding();
     const row = assertDefined(inputRow({
       held: maskOf(Action.rightTrigger, Action.walk, cardinal.action), pressed: maskOf(cardinal.action),

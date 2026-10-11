@@ -35,7 +35,7 @@ function prepareHitRegionAttack(world: Roster, attacker: Fighter, style: AttackS
   attacker.attack.cooldown = attacker.attack.duration - frame;
 }
 
-test("aerial lingering windows match the reference frame boundaries [k4 reference melee]", () => {
+test("aerial lingering windows match the reference frame boundaries [k4 reference references/melee-frame-data/records.jsonl]", () => {
   for (const style of LINGERING_AERIALS) {
     const neutral = style === AttackStyle.neutralAir;
     const lastActive = neutral ? 31 : 19;

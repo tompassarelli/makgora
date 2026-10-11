@@ -8,7 +8,7 @@ import { digitalShieldstunFrames } from "./shield";
 import { advanceFighter } from "./step";
 import { controls, testBeginAttacks, testWorld } from "./testWorld";
 
-test("hitlag and shieldstun respect Melee integer boundaries [k4 reference melee]", () => {
+test("hitlag and shieldstun respect Melee integer boundaries [k4 reference docs/smash-melee-reference/retail-hitlag-scalars.json]", () => {
   assertEquals(ordinaryHitlagFrames(0.0), 0);
   assertEquals(ordinaryHitlagFrames(2.999000072479248), 3);
   assertEquals(ordinaryHitlagFrames(3.0), 4);
@@ -28,7 +28,7 @@ test("hitlag and shieldstun respect Melee integer boundaries [k4 reference melee
   assertEquals(ordinaryHitstunFrames(100.0), 40);
 });
 
-test("a shield contact freezes both bodies before shieldstun counts down [k4 reference melee]", () => {
+test("a shield contact freezes both bodies before shieldstun counts down [k4 reference docs/smash-melee-reference/slippi-ntsc-shield-contact.json]", () => {
   const attacker = createReferenceFighter(Character.sylvanas, 0.0, 1);
   const target = createReferenceFighter(Character.sylvanas, 100.0, -1);
   const world = testWorld(attacker, target);
