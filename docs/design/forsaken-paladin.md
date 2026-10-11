@@ -37,6 +37,16 @@ The source identities become these original, provisional Smashcraft moves:
 | Up: **Ascension** | Raise and follow the hammer, steer toward the ledge, then fall helplessly with exposed sides. | 15 mana; rise 2.9H over f8–28; stop f29; 0.2H forward plus 1.6H steering. Hammer f10–15 deals 6.4 damage at 80°. Free form has no hit and reaches at least 240 units on either axis under the [#252 recovery measure](../gameplay-design.md#recovery-and-edgeguarding); the paid route remains in the heavy band. Jump spent, one use per airtime. | Paladin resurrection and HotS Hammer of Justice; Ike’s weapon-led Aether without its descent. |
 | Down: **Consecration** | Plant the hammer and defend a small holy patch. Jump or retreat to leave it. | Ground only; 20 mana; end f42; pool on f16, 70 units ahead at height 6, radius 60. Life 120 frames; 1.6 damage at most every 45 frames, growth 30/base 30, near-vertical launch. One patch; 150 frames between casts; no growth or healing. | Forsaken Consecration’s ground-only periodic damage, compressed from 10 seconds; Dedede’s placed threat and committed recovery. |
 
+### What each special does (#429)
+
+Each line is the intent a viewer should read from the move alone; its startup
+cue, active effect and result must show it.
+
+- **Cleansing Hammer:** a holy overhead bonk that launches the foe straight up and burns off his own poison or slow. Gold holy glow on the raised hammer, a Holy Bolt burst at the head on contact, the foe rising on the active and recovery frames.
+- **Righteous Fury:** an armored hammer-first charge that slows whoever it hits. Inner Fire on his body during the wind-up, a stampede impact ahead of the hammer, the hit foe chilled and sliding away on recovery.
+- **Ascension:** a hammer-led rise on a shaft of resurrection light, then a helpless fall. Resurrection light at his feet, his body and hammer climbing through the active frames, helpless descent on recovery.
+- **Consecration:** plant the hammer to bless a small patch of ground that hurts grounded foes standing in it. A holy cue at the hammer as it lands, the consecrated disc ahead of him from the active frames on, still glowing through recovery.
+
 Cleansing Hammer and Righteous Fury make the hammer central; Ascension
 carries it into a third special. Consecration does not follow Forsaken Paladin, grow or
 hit airborne opponents. Cleansing Hammer removes poison/chill only, leaving
