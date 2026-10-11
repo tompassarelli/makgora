@@ -82,7 +82,7 @@ src/game/presentation/shieldPose.tests.ts	3	66000	425
 src/game/presentation/specialCues.tests.ts	7	225000	1369
 src/game/presentation/specialEffectState.tests.ts	3	9133000	36756
 src/game/presentation/stagePreload.tests.ts	1	237000	251
-src/game/presentation/stageScenery.tests.ts	3	35000	268
+src/game/presentation/stageScenery.tests.ts	4	361000	510
 src/game/presentation/summonState.tests.ts	3	14751000	37592
 src/game/presentation/voiceBudget.tests.ts	4	232116000	63078
 src/game/presentation/windStreaks.tests.ts	1	15000	2

@@ -1,6 +1,8 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
-import { stageScenery } from "./stageScenery";
+import { STAGE_LAVA_MODEL, STAGE_SEA_MODEL } from "../assets/terrainAssetInfo";
+import { TOMB_OF_SARGERAS_STAGE } from "../sim/stage";
+import { placedPieces, stageScenery, terrainShown } from "./stageScenery";
 import { fogProblems, mirrorProblems } from "./stageRules";
 
 
@@ -40,5 +42,17 @@ test("stage scenery shows no creatures [k3 measure docs/design/stage-art.md]", (
       const creature = model.toLowerCase().startsWith("units\\") || FIGURE_WORDS.some((word) => model.toLowerCase().includes(word));
       assertEquals(creature, false, `${name}: ${model} is a creature`);
     }
+  }
+});
+
+test("water stages show terrain water with their own entry and no sea plane; other stages hide terrain [k5 boundary stage-terrain-water]", () => {
+  for (const { id, name } of STAGE_CATALOG) {
+    const scenery = stageScenery(id);
+    const water = scenery.water !== undefined;
+    const lava = scenery.floor?.model === STAGE_LAVA_MODEL;
+    assertEquals(terrainShown(id), water, `${name}: terrain ${terrainShown(id) ? "shown" : "hidden"}`);
+    assertEquals(placedPieces(id).some(({ model }) => model === STAGE_SEA_MODEL), false, `${name}: places the striped sea plane`);
+    if (lava || id === TOMB_OF_SARGERAS_STAGE) assertEquals(water, false, `${name}: keeps its own liquid model`);
+    else assertEquals(water, true, `${name}: has no water entry`);
   }
 });
