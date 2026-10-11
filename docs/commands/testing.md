@@ -19,11 +19,8 @@
   smashcraft:ts/test/sweep.ts in Bun-only files) and keep its smallest form,
   such as one seeded match, as an ordinary test. The suite skips sweeps;
   `SWEEPS=1 bun run test` and `SWEEPS=1 bun scripts/lua-tests.ts` run only
-  them. `SWEEP_PLACEMENT=gate` retains the landing sweeps;
-  `SWEEP_PLACEMENT=background` selects the approved breadth names in
-  smashcraft:ts/src/runtime/backgroundSweeps.ts. Background sweeps runs on
-  every landed main SHA and nightly on BACKGROUND_RUNNER; its commit status
-  and Main is red report preserve failure visibility (#243).
+  them, and CI's Sweeps (Bun) and six Lua32 (sweeps) jobs run them on every push,
+  so a failing sweep turns main red (#243).
   `LUA_PARTITION=K/N` divides `LUA_JOBS` name-hash shards across N jobs;
   CI runs at most six Lua jobs alongside its two Bun jobs.
 

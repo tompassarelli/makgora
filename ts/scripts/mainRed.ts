@@ -105,13 +105,6 @@ export const reportRun = (runId: string) => Effect.gen(function*() {
   const open = (yield* gh("issue", "list", "--state", "open", "--search", `"${title}" in:title`, "--json", "number,title").pipe(Effect.flatMap(decode(Issues, "gh issue list"))))
     .filter((issue) => issue.title === title);
   if (run.conclusion === "success") {
-    if (run.headBranch === "main") {
-      const other = run.workflowName === "Background sweeps" ? "CI" : "Background sweeps";
-      const otherRuns = yield* gh("run", "list", "--workflow", other, "--branch", "main", "--limit", "100",
-        "--json", "databaseId,conclusion,status,headSha,url").pipe(Effect.flatMap(decode(Schema.Array(RunSchema), "gh run list")));
-      const latest = otherRuns.find((entry) => entry.conclusion === "success" || entry.conclusion === "failure");
-      if (latest?.conclusion === "failure") return yield* summary(`main is still red in ${other}: ${latest.url}`);
-    }
     for (const { number } of open) yield* gh("issue", "close", String(number));
     const line = open.length === 0 ? `${run.headBranch} is green` : `${run.headBranch} is green again: closed #${open.map(({ number }) => number).join(", #")}`;
     yield* summary(line);

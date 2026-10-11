@@ -6,7 +6,7 @@
 
 import { beforeEach, describe, test } from "bun:test";
 import { registeredTests } from "wisp/src/runtime/testing";
-import { selectSweep, setSweepSeedOffset } from "../src/runtime/sweep";
+import { isSweep, setSweepSeedOffset } from "../src/runtime/sweep";
 import { chargeTestsTo } from "./testCost";
 
 const filter = process.env.GAME_TESTS ?? "";
@@ -24,7 +24,7 @@ for (const module of modules) {
   } catch (error) {
     loadError = error;
   }
-  const added = registeredTests.slice(before).filter((t) => soak || selectSweep(t.name, sweeps, process.env.SWEEP_PLACEMENT));
+  const added = registeredTests.slice(before).filter((t) => soak || isSweep(t.name) === sweeps);
   if (added.length === 0 && loadError === undefined) continue;
   describe(module.replace(/\.(tests|soak)\.ts$/, ""), () => {
     beforeEach(() => chargeTestsTo(`src/${module}`));

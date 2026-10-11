@@ -32,7 +32,9 @@ permissions:
   contents: read
 
 env:
-  SWEEP_PLACEMENT: gate
+  # A run holds BUN_SHARDS + the lua job's max-parallel + the four check jobs +
+  # the six census shards at once: 3 + 5 + 4 + 6 = 18. One Lua test takes about 140 s, so more than
+  # 32 Lua shards would not shorten the run.
   BUN_SHARDS: 3
   # Lua runs one core a process: each Lua job runs LUA_PER_JOB shards at once.
   LUA_JOBS: 8
@@ -365,12 +367,11 @@ jobs:
     timeout-minutes: 15
     strategy:
       fail-fast: false
-      max-parallel: 8
       matrix:
-        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        shard: [0, 1, 2, 3, 4, 5]
     name: census ${{ matrix.shard }}
     env:
-      CENSUS_SHARDS: 13
+      CENSUS_SHARDS: 6
     steps:
       - uses: actions/checkout@v4
         with:
@@ -395,7 +396,7 @@ jobs:
         run: |
           mkdir -p census-out
           fighters=$(cut -f2 test/fixtures/perf/census-pairs.txt | sed 's/ vs .*//' | awk -v n="$CENSUS_SHARDS" -v s="${{ matrix.shard }}" '(NR - 1) % n == s { printf " --fighter %s", $0 }')
-          bun wisp perf census $fighters --jobs 2 --rise-ms 1000 --pairs "census-out/census-pairs-${{ matrix.shard }}.txt"
+          bun wisp perf census $fighters --jobs 4 --rise-ms 1000 --pairs "census-out/census-pairs-${{ matrix.shard }}.txt"
       - if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
