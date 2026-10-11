@@ -201,16 +201,19 @@ const CAIRNE: AuthoredSpecial = {
   intangible: frames(27, 31),
 };
 
-const SPIRIT = "units\\creeps\\PandarenBrewmaster\\PandarenBrewmaster.mdl";
+const spirit = (model: string, sequence: string, spawnFrame: number, life: number, offsetX: number, warningSeconds: number): SpecialProjectile => ({
+  ...mark(model, spawnFrame, life, offsetX),
+  modelAnimation: { sequence, warningSeconds, activeSeconds: 0.0 },
+});
 const CHEN: AuthoredSpecial = {
   name: "Storm, Earth and Fire", endFrame: 64, groundOnly: true,
   projectiles: [
-    mark(SPIRIT, 2, 22, 40.0),
-    mark(SPIRIT, 10, 26, 220.0),
-    mark(SPIRIT, 18, 30, -150.0),
-    mark("Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdx", 21, 12, 0.0),
+    spirit("units\\creeps\\EarthPandarenBrewmaster\\EarthPandarenBrewmaster.mdl", "attack slam", 2, 30, 40.0, f32(0.13)),
+    spirit("units\\creeps\\StormPandarenBrewmaster\\StormPandarenBrewmaster.mdl", "spell", 10, 30, 220.0, f32(0.03)),
+    spirit("units\\creeps\\FirePandarenBrewmaster\\FirePandarenBrewmaster.mdl", "spell slam", 18, 36, -150.0, f32(0.47)),
+    mark("Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdx", 21, 12, 40.0),
     mark("Abilities\\Spells\\Other\\Monsoon\\MonsoonBoltTarget.mdx", 33, 12, 220.0),
-    mark("Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireDamage.mdx", 45, 14, -150.0),
+    mark("Abilities\\Spells\\Other\\Doom\\DoomDeath.mdx", 45, 14, -150.0),
   ],
   regions: [
     heroRegion(21, 23, capsule(-120.0, 20.0, 120.0, 20.0, 50.0), hit(8.0, 80, 70.0, 40.0)),
@@ -355,7 +358,7 @@ const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined 
   [Character.jaina]: "A ray of frost sweeps down from high ahead of her to the floor. Get behind her or shield.",
   [Character.sylvanas]: "A slow banshee spirit; a foe it reaches has left and right swapped for 3 seconds.",
   [Character.cairne]: "An ankh appears at centre stage. After 24 frames it bursts, then he teleports there with 6 frames of intangibility. Shield or leave the ankh; punish his arrival recovery.",
-  [Character.chen]: "He splits into Earth, Storm and Fire, which strike around him one after another.",
+  [Character.chen]: "He splits into three elemental spirits: Earth stomps in front of him, Storm calls lightning down far ahead, then Fire bursts into flame behind him.",
   [Character.peon]: "He chops at a big tree until it falls forward across the stage. Stand behind him or hit him while he chops.",
   [Character.tinker]: "His Robo-Goblin waddles ahead and explodes. Walk away or shield the blast.",
   [Character.kaelthas]: "Arcane orbs ring him, then everyone inside is lifted straight up. Leave the ring.",

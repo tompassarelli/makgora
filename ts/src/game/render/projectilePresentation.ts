@@ -15,16 +15,18 @@ import { IMPACT_DEFILE_MODEL } from "../assets/impactAssetInfo";
 import { heroProjectileArt } from "../presentation/projectileArt";
 import { definitiveCues } from "./specialCueEffects";
 
-const STATIONARY_PARTICLE_MODELS = [
-  "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx",
-  "Abilities\\Spells\\Other\\Stampede\\StampedeMissileDeath.mdx",
-  "Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireDamage.mdx",
-  "Abilities\\Spells\\NightElf\\TargetArtLumber\\TargetArtLumber.mdx",
-  "Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx",
-  "Units\\Undead\\PlagueCloud\\PlagueCloud.mdx",
-  "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx",
-  "Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx",
-];
+// Seconds each plays from: Doom Death emits its fire only in its first 0.4 s.
+const STATIONARY_PARTICLE_MODELS: { readonly [model: string]: number | undefined } = {
+  "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx": f32(0.3),
+  "Abilities\\Spells\\Other\\Stampede\\StampedeMissileDeath.mdx": f32(0.3),
+  "Abilities\\Spells\\NightElf\\TargetArtLumber\\TargetArtLumber.mdx": f32(0.3),
+  "Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx": f32(0.3),
+  "Units\\Undead\\PlagueCloud\\PlagueCloud.mdx": f32(0.3),
+  "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx": f32(0.3),
+  "Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx": f32(0.3),
+  "Abilities\\Spells\\Other\\Monsoon\\MonsoonBoltTarget.mdx": f32(0.15),
+  "Abilities\\Spells\\Other\\Doom\\DoomDeath.mdx": 0.0,
+};
 
 // Hidden bolts park below the floor, as hidden effects do: alpha alone left Aimed Shot's bolts on stage after the move (#457).
 const PARKED_LINE_DEPTH = 4096.0;
@@ -305,8 +307,9 @@ export class ProjectilePresentation {
         BlzSetSpecialEffectTimeScale(model, 0.0);
       } else if (cue?.birth === undefined && projectile?.spec !== undefined && projectile.velocityX === 0.0 && projectile.velocityZ === 0.0) {
 
-        if (pool !== undefined && STATIONARY_PARTICLE_MODELS.includes(pool.drawn)) {
-          if (born) BlzSetSpecialEffectTime(model, f32(0.3));
+        const start = pool === undefined ? undefined : STATIONARY_PARTICLE_MODELS[pool.drawn];
+        if (start !== undefined) {
+          if (born) BlzSetSpecialEffectTime(model, start);
         } else {
           BlzSetSpecialEffectTime(model, f32(0.3));
           BlzSetSpecialEffectTimeScale(model, 0.0);
