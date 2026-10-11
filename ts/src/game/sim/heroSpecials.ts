@@ -359,6 +359,9 @@ export interface AuthoredSpecial {
   /** Frames on which each target may be struck again. */
   readonly rehits?: readonly number[] | undefined;
 
+  /** The frame its user gets back her air jump and air-once specials, as a landing would give. */
+  readonly refreshesAir?: number | undefined;
+
   /** A timed movement buff granted on a frame (Metamorphosis, Avatar). */
   readonly buff?: { readonly frame: number; readonly kind: number; readonly frames: number } | undefined;
 }

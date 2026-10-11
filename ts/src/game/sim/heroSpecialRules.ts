@@ -5,7 +5,7 @@
 import { max, min } from "../../runtime/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { at } from "wisp/src/runtime/lookup";
-import { applyItemBuffFor } from "./itemBuffs";
+import { aerialJumps, applyItemBuffFor } from "./itemBuffs";
 import { advanceHeroConditions, cleansePoisonAndSlow } from "./heroStatus";
 import { AttackStyle, Character, ProjectileKind, SpecialAction } from "./codes";
 import { mutableProjectile } from "./fighterProjectiles";
@@ -528,6 +528,10 @@ export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Contr
   if (move.cleanseFrame === frame) cleansePoisonAndSlow(f);
   if (move.rehits?.includes(frame) === true) for (let entry = 0; entry < PARTICIPANT_CAPACITY; entry++) f.special.hitTargets[entry] = undefined;
   if (move.buff?.frame === frame) applyItemBuffFor(f, move.buff.kind, move.buff.frames);
+  if (move.refreshesAir === frame) {
+    f.jump.remaining = max(f.jump.remaining, aerialJumps(f));
+    f.special.airtimeUses = 0;
+  }
   if (frame === 1 && world !== undefined && f.special.seekTarget === 0 && seeks(move)) f.special.seekTarget = seekTargetSlot(world, f) + 1;
   applyMotion(f, move, frame, input, world);
   for (const spec of move.projectiles ?? []) if (spec.spawnFrame === frame) spawnHeroProjectile(f, spec, f.attack.serial + 1, stage, world);
