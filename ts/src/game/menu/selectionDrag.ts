@@ -142,10 +142,16 @@ export function placeHovered({ held, hover }: Readonly<SelectionDrag>): Placemen
 export const HAND_WIDTH = f32(f32(0.025) * 32 / (f32(0.117924) * 256));
 export const HAND_HEIGHT = f32(f32(0.0239) * 32 / (f32(0.23585) * 128));
 
-export const handLeft = (x: number, definitive: boolean): number => x - f32(definitive ? (22 + (223 * 100 / 1315 - 9) * 100 / 84) / 128 : (2 + (223 * 29 / 1315 - 2) * 29 / 25) / 32) * HAND_WIDTH;
+// SelectionHandPoint is one 128x128 texture in both looks; its index fingertip is (4, 6).
+export const handLeft = (x: number, definitive: boolean, pinching: boolean): number => x - f32(!pinching ? 4 / 128 : definitive ? (22 + (223 * 100 / 1315 - 9) * 100 / 84) / 128 : (2 + (223 * 29 / 1315 - 2) * 29 / 25) / 32) * HAND_WIDTH;
 
-export const handTop = (y: number, definitive: boolean): number => y + f32(definitive ? (3 + (255 * 121 / 1085 - 3) * 121 / 118) / 128 : (4 + 255 * 27 / 1085) / 32) * HAND_HEIGHT;
+export const handTop = (y: number, definitive: boolean, pinching: boolean): number => y + f32(!pinching ? 6 / 128 : definitive ? (3 + (255 * 121 / 1085 - 3) * 121 / 118) / 128 : (4 + 255 * 27 / 1085) / 32) * HAND_HEIGHT;
 
 export const carriedChipLeft = (x: number, size: number): number => x - size * f32(0.5);
 
 export const carriedChipTop = (y: number, size: number): number => y + size * f32(0.06);
+
+// A chip not yet on a fighter parks centred on this point of its player card.
+export const parkedChipLeft = (slot: number, size: number): number => cardX(slot) + f32(0.126) - size * f32(0.5);
+
+export const parkedChipTop = (size: number): number => f32(0.17) + size * f32(0.5);

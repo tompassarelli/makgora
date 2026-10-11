@@ -43,6 +43,8 @@ import {
   readyChipSize,
   carriedChipLeft,
   carriedChipTop,
+  parkedChipLeft,
+  parkedChipTop,
   chipX,
   chipY,
   handLeft,
@@ -194,7 +196,7 @@ export class SelectionPanel {
   private readonly syncTriggers: readonly trigger[];
   private readonly drag = selectionDrag();
   private readonly hand: framehandle;
-  private cursorHidden = false;
+  private handPinching = true;
   private menuCursorAllowed = true;
 
   private readonly chips: RosterChip[] = PARTICIPANT_SLOTS.map(() => ({ choice: 0, placed: false }));
@@ -686,13 +688,15 @@ export class SelectionPanel {
     if (this.choosing() !== undefined && chip !== undefined) this.actions.recallChoice(this.participantId, chip);
   }
 
-  private showHand(shown: boolean, x: number, y: number): void {
+  private showHand(shown: boolean, x: number, y: number, pinching = false): void {
     BlzFrameSetVisible(this.hand, shown);
-    if (shown) placeTopLeft(this.hand, handLeft(x, definitiveCues()), handTop(y, definitiveCues()));
-    const hidden = shown || !this.menuCursorAllowed;
-    if (hidden === this.cursorHidden) return;
-    this.cursorHidden = hidden;
-    BlzEnableCursor(!hidden);
+    if (shown && pinching !== this.handPinching) {
+      this.handPinching = pinching;
+      BlzFrameSetTexture(this.hand, `war3mapImported\\SelectionHand${pinching ? "Pinch" : "Point"}.tga`, 0, true);
+    }
+    if (shown) placeTopLeft(this.hand, handLeft(x, definitiveCues(), pinching), handTop(y, definitiveCues(), pinching));
+    // Warcraft shows its cursor again on its own (a frame click), so assert the hidden state every update.
+    BlzEnableCursor(!(shown || !this.menuCursorAllowed));
   }
 
   private ownsLocalClient(): boolean {
@@ -815,6 +819,7 @@ export class SelectionPanel {
       const placement = updateSelectionDrag(drag, this.roster, BlzIsMouseButtonPressed(MOUSE_BUTTON_TYPE_LEFT), x, y);
       if (placement !== undefined) this.sendPlacement(placement);
     }
+    let pinching = false;
     for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
       const frames = this.cards[slot];
       if (frames === undefined) continue;
@@ -848,15 +853,16 @@ export class SelectionPanel {
       BlzFrameSetTexture(frames.chip, `war3mapImported\\SelectionChip${human ? `P${I2S(slot + 1)}` : "CPU"}.tga`, 0, true);
       const carried = drag.dragging === slot || (!ready && drag.held === slot && drag.hover !== undefined);
       const chipChoice = tileOfCharacter(choice ?? Character.rifleman);
-      const size = ready ? readyChipSize(this.roster.grid) : f32(0.06);
+      if (carried) pinching = true;
+      const size = readyChipSize(this.roster.grid);
       BlzFrameSetSize(frames.chip, size, size);
       placeTopLeft(
         frames.chip,
-        carried ? carriedChipLeft(x, size) : ready ? chipX(this.roster.grid, slot, chipChoice) : cardX(slot) + f32(0.096),
-        carried ? carriedChipTop(y, size) : ready ? chipY(this.roster.grid, slot, chipChoice) : f32(0.2),
+        carried ? carriedChipLeft(x, size) : ready ? chipX(this.roster.grid, slot, chipChoice) : parkedChipLeft(slot, size),
+        carried ? carriedChipTop(y, size) : ready ? chipY(this.roster.grid, slot, chipChoice) : parkedChipTop(size),
       );
     }
-    this.showHand(width > 0 && height > 0 && !settingsOpen && !this.tutorialOpen, x, y);
+    this.showHand(width > 0 && height > 0 && !settingsOpen && !this.tutorialOpen, x, y, pinching);
     setFrameText(this.confirm, this.confirmText(game));
     this.showRules(game);
     this.showHelp(game, x, y);
