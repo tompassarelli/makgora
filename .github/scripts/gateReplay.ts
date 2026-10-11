@@ -2,9 +2,10 @@ import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
-import { Cause, Effect, Exit, Schema } from "effect";
+import { Cause, Effect, Exit, Layer, Schema } from "effect";
 import { captureProcess, runProcess } from "wisp/scripts/wisp/hostProcess";
 import { makeCi } from "wisp/scripts/wisp/commands/ci";
+import { platformLayer } from "wisp/scripts/platform/layer";
 import { SMASHCRAFT_DEV } from "../../ts/scripts/wisp/commands/dev";
 import { SMASHCRAFT_SOAK } from "../../ts/scripts/wisp/commands/soak";
 
@@ -27,9 +28,9 @@ const program = Effect.gen(function*() {
     const root = process.argv[3];
     const base = yield* Schema.decodeUnknownEffect(Sha)(process.argv[4]);
     if (root === undefined) return yield* new ReplayFailure({ problem: "missing replay tree" });
-    return yield* check(resolve(root), base).pipe(Effect.as(0), Effect.catchTag("CiFailure", failure => Effect.succeed(failure.exitCode)));
+    return yield* check(resolve(root), base).pipe(Effect.as(0), Effect.catchTag("CiFailure", failure => Effect.succeed(failure.exitCode ?? 1)));
   }
-  const rows = yield* Schema.decodeUnknownEffect(Schema.fromJsonString(Schema.Array(Row)))(process.env.REPLAY_COHORT ?? "[]");
+  const rows = yield* Schema.decodeEffect(Schema.fromJsonString(Schema.Array(Row)))(process.env.REPLAY_COHORT ?? "[]");
   const shard = Number(process.env.REPLAY_SHARD);
   if (rows.length !== 20 || !Number.isInteger(shard) || shard < 0 || shard > 3) return yield* new ReplayFailure({ problem: "replay requires the approved 20 rows and shard 0..3" });
   const output = resolve(gateRoot, "build/gate-replay", String(shard));
@@ -93,7 +94,7 @@ const program = Effect.gen(function*() {
           const checkWallSeconds = (performance.now() - checkStarted) / 1000;
           writeFileSync(join(folder, `${kind}.jsonl`), result.stdout);
           writeFileSync(join(folder, `${kind}.stderr`), result.stderr);
-          const stages = yield* Effect.forEach(result.stdout.trim().split("\n").filter(Boolean), line => Schema.decodeUnknownEffect(Schema.fromJsonString(Result))(line));
+          const stages = yield* Effect.forEach(result.stdout.trim().split("\n").filter(Boolean), line => Schema.decodeEffect(Schema.fromJsonString(Result))(line));
           return { sha, diffBase: reverseBase, historicalToolchain, exitCode: result.exitCode, setupWallSeconds, installWallSeconds, checkWallSeconds, stages };
         }).pipe(Effect.result);
         measurements[kind] = measured._tag === "Success" ? measured.success : { sha, verdict: "inconclusive", setupWallSeconds: setupWallSeconds || (performance.now() - setupStarted) / 1000, installWallSeconds, ...(checkStarted === undefined ? {} : { checkWallSeconds: (performance.now() - checkStarted) / 1000 }), reason: String(measured.failure) };
@@ -106,7 +107,7 @@ const program = Effect.gen(function*() {
   return 0;
 });
 
-BunRuntime.runMain(program.pipe(Effect.provide(BunServices.layer)), {
+BunRuntime.runMain(program.pipe(Effect.provide(Layer.merge(BunServices.layer, platformLayer()))), {
   disableErrorReporting: true,
   teardown: exit => {
     if (Exit.isFailure(exit) && !Cause.hasInterruptsOnly(exit.cause)) console.error(Cause.pretty(exit.cause));
