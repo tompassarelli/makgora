@@ -21,7 +21,7 @@ interface Pool {
   readonly drawn: string;
 
   readonly effects: readonly number[];
-  readonly boundaries: readonly number[];
+  readonly boundaries: readonly (readonly number[])[];
   readonly fills: readonly (readonly number[])[];
 }
 
@@ -36,6 +36,7 @@ export class ProjectilePresentation {
   private readonly serials: number[] = [];
   private readonly specs: (Fighter["projectiles"][number]["spec"])[] = [];
   private readonly lives: number[] = [];
+  private readonly lingering: number[] = [];
   private parked: ParkedFlags | undefined;
   private readonly definitive: boolean;
   private readonly aimedShot: lightning[] = [];
@@ -63,7 +64,7 @@ export class ProjectilePresentation {
 
       const size = hero ? HERO_PROJECTILE_CAP + 1 : index === 0 ? PROJECTILE_CAPACITY - 4 * ultimateOnly.length : 4;
       const effects: number[] = [];
-      const boundaries: number[] = [];
+      const boundaries: number[][] = [];
       const fills: number[][] = [];
       const specials = heroDefinition(character)?.specials;
 
@@ -87,13 +88,17 @@ export class ProjectilePresentation {
         }
         fills.push(fill);
         if (groundPool) {
-          boundaries.push(this.models.length);
-          const boundary = AddSpecialEffect(IMPACT_DEFILE_MODEL, origin.x, origin.y);
-          BlzSetSpecialEffectAnimationBlendTime(boundary, 0.0);
-          BlzSetSpecialEffectAnimation(boundary, "stand");
-          BlzSetSpecialEffectTime(boundary, 0.0);
-          this.models.push(boundary);
-          this.visible.push(false);
+          const layers: number[] = [];
+          for (let layer = 0; layer < (character === Character.lichKing ? 2 : 1); layer++) {
+            layers.push(this.models.length);
+            const boundary = AddSpecialEffect(IMPACT_DEFILE_MODEL, origin.x, origin.y);
+            BlzSetSpecialEffectAnimationBlendTime(boundary, 0.0);
+            BlzSetSpecialEffectAnimation(boundary, "stand");
+            BlzSetSpecialEffectTime(boundary, 0.0);
+            this.models.push(boundary);
+            this.visible.push(false);
+          }
+          boundaries.push(layers);
         }
       }
       this.pools.push({ path, drawn, effects, boundaries, fills });
@@ -115,6 +120,7 @@ export class ProjectilePresentation {
       const model = this.models[index];
       if (model === undefined) continue;
       this.visible[index] = false;
+      this.lingering[index] = 0;
       this.hide(model, parked, index);
     }
     for (let index = 0; index < this.assigned.length; index++) this.assigned[index] = -1;
@@ -185,6 +191,7 @@ export class ProjectilePresentation {
       const model = this.models[slot];
       if (model === undefined) continue;
       taken[slot] = true;
+      this.lingering[slot] = 0;
       parked[slot] = false;
       const projectile = fighter?.projectiles[index];
       const draw = pool === undefined ? undefined : PROJECTILE_DRAW_OFFSETS[pool.drawn];
@@ -221,6 +228,7 @@ export class ProjectilePresentation {
       }
       if (!paused && projectile !== undefined) this.lives[slot] = projectile.life;
       if (risen) {
+        this.lingering[slot] = 4;
         const width = this.definitive ? f32(87.606247) : f32(37.988001);
         const height = this.definitive ? f32(353.993782) : f32(636.061981);
         const centerX = this.definitive ? f32(0.337811) : f32(-0.3387);
@@ -241,6 +249,7 @@ export class ProjectilePresentation {
           const offset = draw?.fill?.[index];
           if (fill === undefined || fillSlot === undefined || offset === undefined) continue;
           taken[fillSlot] = true;
+          this.lingering[fillSlot] = 4;
           parked[fillSlot] = false;
           BlzResetSpecialEffectMatrix(fill);
           BlzSetSpecialEffectYaw(fill, pose.yaw);
@@ -272,16 +281,18 @@ export class ProjectilePresentation {
         BlzSetSpecialEffectTime(model, f32(0.3));
         BlzSetSpecialEffectTimeScale(model, 0.0);
       }
-      const boundarySlot = pool?.boundaries[pool.effects.indexOf(slot)];
-      const boundary = boundarySlot === undefined ? undefined : this.models[boundarySlot];
-      if (boundary !== undefined && boundarySlot !== undefined && pose.dangerRadius > 0.0) {
+      const boundaries = pool?.boundaries[pool.effects.indexOf(slot)] ?? [];
+      for (let layer = 0; layer < boundaries.length; layer++) {
+        const boundarySlot = boundaries[layer];
+        const boundary = boundarySlot === undefined ? undefined : this.models[boundarySlot];
+        if (boundary === undefined || boundarySlot === undefined || pose.dangerRadius <= 0.0) continue;
         taken[boundarySlot] = true;
         parked[boundarySlot] = false;
-        BlzSetSpecialEffectPosition(boundary, this.origin.x + pose.x, this.origin.y - 8.0, this.origin.z + pose.z);
-        BlzSetSpecialEffectScale(boundary, pose.dangerRadius);
+        const raised = defile && layer > 0;
+        BlzSetSpecialEffectPosition(boundary, this.origin.x + pose.x, this.origin.y - 8.0, this.origin.z + pose.z + (raised ? f32(0.4 * pose.dangerRadius) : 0.0));
+        BlzSetSpecialEffectScale(boundary, pose.dangerRadius * (raised ? f32(0.9) : 1.0));
         if (defile) {
           BlzResetSpecialEffectMatrix(boundary);
-          BlzSetSpecialEffectMatrixScale(boundary, 1.0, 3.0, 1.0);
           BlzSetSpecialEffectRoll(boundary, f32(Math.PI * 0.5));
         }
         const frost = fighter?.character === Character.lich;
@@ -293,6 +304,12 @@ export class ProjectilePresentation {
     }
     for (let index = 0; index < this.models.length; index++) {
       const model = this.models[index];
+      const remaining = this.lingering[index] ?? 0;
+      if (!playing || fighter === undefined || fighter.status.out) this.lingering[index] = 0;
+      else if (taken[index] !== true && remaining > 0) {
+        taken[index] = true;
+        if (!paused) this.lingering[index] = remaining - 1;
+      }
       this.visible[index] = taken[index] === true;
       if (model !== undefined && taken[index] !== true) this.hide(model, parked, index);
     }
