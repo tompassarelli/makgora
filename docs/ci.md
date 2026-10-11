@@ -62,10 +62,14 @@ summary say what landed. To test a refused branch again without a new
 commit: `gh workflow run autoland.yml -f branch=claude/NAME`.
 
 Everything runs from source: no private build inputs, no `.w3x` build.
-The farm test's Bun and Lua32 shards and Balance's shard and probe jobs run
-on the runner label in the repository variable `FARM_RUNNER` (`farm-big`, a
-self-hosted box) and on hosted runners when it is unset or for a pull
-request; delete the variable when the box is gone, or those jobs queue. The farm
+Critical jobs go to the faster pool and background jobs to the other (Tom,
+11 Oct). On 11 Oct hosted was faster: farm-big ran the same 6 farm-test
+shards 1.37x slower. So the farm test's Bun and Lua32 shards (Autoland's
+suite) run on the label in `FARM_RUNNER`, which is unset, meaning hosted
+runners. Balance's shard and probe jobs run on the label in
+`BACKGROUND_RUNNER` (`farm-big`, a self-hosted box). Both fall back to
+hosted runners when unset and for pull requests. Delete a variable when its
+box is gone, or those jobs queue. The farm
 test sends its even shard jobs to that label and its odd ones to hosted runners,
 so both pools run at once; its `farm-runner` dispatch input measures a box
 before the variable is set. On the box, jobs check out through alternates from
