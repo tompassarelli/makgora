@@ -9,8 +9,9 @@ import { Character, LedgeState, SpecialAction } from "../sim/codes";
 import { ledgeCatchBox } from "../sim/ledge";
 import { runningHeroSpecial } from "../sim/heroSpecialRules";
 import { WARDEN_SPECIALS } from "../sim/heroes/wardenSpecials";
-import { mainDeckRight } from "../sim/stage";
-import { insideMainDeckBody } from "../sim/surfaces";
+import { TOMB_OF_SARGERAS_STAGE, mainDeckRight, surfaceZ } from "../sim/stage";
+import { bodyTop, insideMainDeckBody } from "../sim/surfaces";
+import { melee } from "../sim/tuning";
 import { TELEPORT_LEDGE_INSET, TELEPORT_LIP_DEPTH } from "../sim/edgeRecovery";
 import { SELECTABLE_CHARACTERS, fighterName } from "../sim/heroes/registry";
 import {
@@ -20,7 +21,8 @@ import {
 
 const LEDGE = mainDeckRight(0);
 const BLINK_STEP = assertDefined(WARDEN_SPECIALS.up.ground.motion?.find((segment) => segment.throughEdge), "Blink step");
-const BLINK_DIAGONAL = f32(assertDefined(BLINK_STEP.aimedSpeed, "Blink distance") * f32(0.707106781));
+const BLINK_DISTANCE = assertDefined(BLINK_STEP.aimedSpeed, "Blink distance");
+const BLINK_DIAGONAL = f32(BLINK_DISTANCE * f32(0.707106781));
 
 
 const check = (ok: boolean, label: string): void => assertEquals(ok ? "" : label, "");
@@ -88,6 +90,21 @@ test(" a Blink that enters the stage through its lip passes it: above the deck, 
 
   const land = blink(800.0, -30.0, TOWARD).fighter;
   check(land.motion.grounded && land.motion.z === 0.0 && land.motion.x < f32(LEDGE - TELEPORT_LEDGE_INSET), `land ${land.motion.x},${land.motion.z}`);
+});
+
+test(" a Blink up into a pass-through platform from below the stage travels its authored distance and no further [k1 scenario]", () => {
+
+  const deckZ = surfaceZ(TOMB_OF_SARGERAS_STAGE, 1, 0);
+  const run = recoveryRun(Character.warden, 100, -660.0, -312.0);
+  run.match.game.stageChoice = TOMB_OF_SARGERAS_STAGE;
+  const start = run.fighter.motion.z;
+  let highest = start;
+  for (let frame = 1; frame <= 60; frame++) {
+    playKeys(run, frame === 1 ? SPECIAL | UP : UP);
+    highest = Math.max(highest, run.fighter.motion.z);
+  }
+  check(f32(highest + melee(bodyTop(Character.warden))) > deckZ, `never reached the platform: ${highest}`);
+  check(highest <= f32(start + BLINK_DISTANCE), `rose to ${highest}`);
 });
 
 test(" a Blink that meets the stage below its lip stops there, and a taken ledge leaves it outside the lip [k3 measure #252]", () => {

@@ -49,7 +49,7 @@ import { demonHunterGliding, demonHunterJumpOrGlideCancel } from "./specials";
 import { AIR_DODGE_ANIMATION_FRAMES, AIR_DODGE_DECAY, beginAirDodge, beginGroundDodge, beginJump, canBeginGroundDodge } from "./jumpsAndDodges";
 import { ageKnockback, applyDirectionalInfluence, decayKnockback } from "./knockback";
 import { advanceLedge } from "./ledge";
-import { EdgePass, passThroughEdge, rideWall } from "./edgeRecovery";
+import { EdgePass, passThroughEdge, rideWall, teleportsThisFrame } from "./edgeRecovery";
 import { DOWN_ATTACK_FRAMES, EARLY_ASCENT_GRAB_FRAMES, SMASH_MAX_CHARGE_FRAMES, attackFall, attackStartupFrames, felLungeStep, isSmashAttack } from "./moves";
 import {
   addMeleeWorldValues,
@@ -661,7 +661,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   let wallSide = edge === EdgePass.none ? resolveSolidSurfaceContacts(f, stage, oldX, oldZ, input) : 0;
   rideWall(f, wallSide, frameDeltaX, frameDeltaZ, oldX, oldZ);
 
-  const ascending = edge === EdgePass.none && platforms.beginPlatformAscent(f, stage, matchFrame, input);
+  const ascending = edge === EdgePass.none && !teleportsThisFrame(f) && platforms.beginPlatformAscent(f, stage, matchFrame, input);
   const landing = edge === EdgePass.land ? 0 : edge !== EdgePass.none || ascending ? undefined : landingDeck(f, stage, matchFrame, oldX, oldZ, carried);
   const contact = landing !== undefined && !motion.grounded && platforms.beginPlatformContact(f, stage, matchFrame, input, landing);
   if (landing !== undefined && !contact) {
