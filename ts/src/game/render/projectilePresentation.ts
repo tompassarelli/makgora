@@ -398,7 +398,13 @@ export class ProjectilePresentation {
             BlzSetSpecialEffectMatrixScale(boundary, 1.0, f32(1.0 / f32(0.6)), f32(1.0 / f32(0.6)));
           }
           const frost = fighter?.character === Character.lich;
-          BlzSetSpecialEffectColor(boundary, frost || defile ? 155 : pose.armed ? 170 + 85 * pose.poolPulse : 70, frost || defile ? 210 : pose.armed ? 75 + 180 * pose.poolPulse : 65, frost || defile ? 255 : pose.armed ? 255 : 100);
+          if (defile && projectile?.spec?.pool !== undefined) {
+            const age = projectile.spec.life - projectile.life;
+            const since = projectile.poolHits > 0 ? projectile.spec.pool.every - 1 - projectile.poolWait : age - (projectile.spec.activeFrom ?? 0);
+            const flash = since >= 0 && since <= 12 ? 1.0 - since / 12 : 0.0;
+            const glow = Math.min(1.0, f32(0.72) + f32(0.12) * sineTurns(age / 23) + f32(0.08) * sineTurns(age / 9) + 0.5 * flash);
+            BlzSetSpecialEffectColor(boundary, Math.floor(255 * glow), Math.floor(255 * glow), 255);
+          } else BlzSetSpecialEffectColor(boundary, frost ? 155 : pose.armed ? 170 + 85 * pose.poolPulse : 70, frost ? 210 : pose.armed ? 75 + 180 * pose.poolPulse : 65, frost ? 255 : pose.armed ? 255 : 100);
           BlzSetSpecialEffectAlpha(boundary, pose.armed ? 255 : defile ? 96 : 160);
           if (!this.visible[boundarySlot]) BlzSetSpecialEffectTime(boundary, 0.0);
           BlzSetSpecialEffectTimeScale(boundary, 0.0);
