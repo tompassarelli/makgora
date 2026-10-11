@@ -132,7 +132,8 @@ function projectileUse(character: Character, fighter: string, move: string, spec
   if (draw?.seconds !== undefined) return { ...base, sequence: draw.sequence, seconds: draw.seconds, timeScale: 0 };
   if (cue?.birth !== undefined) return { ...base, sequence: "birth", seconds: 0, timeScale: 1 };
   const sequence = draw?.sequence ?? (birthNamed ? "birth" : "stand");
-  if (!travels) return STATIONARY_PARTICLE_MODELS.includes(model) ? { ...base, sequence, seconds: 0.3, timeScale: 1 } : { ...base, sequence, seconds: 0.3, timeScale: 0 };
+  const start = STATIONARY_PARTICLE_MODELS[model];
+  if (!travels) return start !== undefined ? { ...base, sequence, seconds: start, timeScale: 1 } : { ...base, sequence, seconds: 0.3, timeScale: 0 };
   return { ...base, sequence, seconds: 0, timeScale: 1 };
 }
 
