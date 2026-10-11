@@ -20,7 +20,6 @@ import { DEMON_HUNTER_MODEL_FILE } from "../../src/game/presentation/demonHunter
 import { RIFLEMAN_MODEL_FILE } from "../../src/game/presentation/fighterAssetInfo";
 import { SUMMON_BEAR, summonClip, summonClipCount } from "../../src/game/presentation/summonClipInfo";
 import { Character } from "../../src/game/sim/codes";
-import { DEFINITIVE_FIGHTERS } from "../../src/game/assets/definitiveFighters";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { HERO_ROSTER, PORTRAIT_KINDS, RENDERED_FIGHTERS, fighterPortrait } from "../../src/game/sim/heroes/registry";
 import { PARTICIPANT_SLOTS } from "../../src/game/input/participants";
@@ -114,10 +113,6 @@ export const ORIGINAL_CLIP_MODELS = [...new Set(Object.values(Character).flatMap
   return light === undefined ? clips : [...clips, light];
 }))];
 
-
-/** Timeline bodies whose fighter's Definitive flag is set; every other fighter draws its Classic body in Definitive (#366). */
-export const DEFINITIVE_BODY_MODELS = [...DEFINITIVE_FIGHTERS]
-  .map((character) => originalClip(character, 0)?.modelPath ?? "").filter((model) => model.includes("TimelineBody-"));
 
 const IMPORTED_HERO_MODELS = HERO_ROSTER.map(({ presentation }) => presentation.model).filter((model) => importedModelFile(model) !== undefined);
 
@@ -296,28 +291,11 @@ export const importedAssets = (assets: string, summon: string) => Effect.gen(fun
   const clipEvidencePath = join(clipDirectory, "original-clips-evidence.json");
   const clipEvidence = yield* readJson(OriginalClipEvidence, clipEvidencePath);
   const clipFiles = [...new Set(clipEvidence.records.flatMap((record) => [...record.clips.map(({ filename }) => filename), ...(record.light === null ? [] : [record.light.filename])]))].filter((file) => ORIGINAL_CLIP_MODELS.includes(`war3mapImported\\${file}`));
-  const definitiveBodies = DEFINITIVE_BODY_MODELS.map((model) => {
-    const entry = `_de.w3mod\\${model}`;
-    const source = join(clipDirectory, "imports", ...entry.split("\\"));
-    return { entry, source };
-  });
-
-  const whiteEntries = new Set(generated.flat().map(({ entry }) => entry));
-  const unflashed = Object.values(Character).flatMap((character) => {
-    const white = WHITE_FIGHTER_MODELS[character];
-    const body = originalClip(character, 0)?.modelPath;
-    return white !== undefined && body !== undefined && definitiveBodies.some(({ entry }) => entry === `_de.w3mod\\${body}`) && !whiteEntries.has(`_de.w3mod\\${white}`) ? [white] : [];
-  });
-  const misshapen = Object.values(Character).flatMap((character) => {
-    const white = WHITE_FIGHTER_MODELS[character];
-    return white !== undefined && !DEFINITIVE_FIGHTERS.has(character) && whiteEntries.has(`_de.w3mod\\${white}`) ? [white] : [];
-  });
-  if (misshapen.length > 0) {
-    return yield* new MapBuildFailure({ operation: "check Definitive white bodies", path: join(assets, "impact-assets"), cause: `${some(misshapen)} have a Definitive white body but their fighter draws Classic in Definitive; regenerate with tools/animations/white-flash-models.ts --definitive` });
-  }
-  if (unflashed.length > 0) {
-    return yield* new MapBuildFailure({ operation: "check Definitive white bodies", path: join(assets, "impact-assets"), cause: `${some(unflashed)} lack a Definitive white body over their Definitive body; package them with tools/animations/white-flash-models.ts` });
-  }
+  const classicBodies = clipFiles.map((filename) => imported(join(clipDirectory, "imports/war3mapImported"), filename));
+  const classicWhites = generated.flat().filter(({ entry }) => Object.values(WHITE_FIGHTER_MODELS).includes(entry));
+  const classicOverrides = [...classicBodies, ...classicWhites].flatMap(({ entry, source }) =>
+    ["_hd.w3mod", "_de.w3mod"].map((prefix) => ({ entry: `${prefix}\\${entry}`, source })));
+  const whiteOverrides = new Set(classicOverrides.map(({ entry }) => entry));
   yield* requireListed(clipEvidencePath, clipFiles, ORIGINAL_CLIP_MODELS,
     `this assets folder's clip pool predates the checkout's clips. From the repository root, export a new pool from ${assets} ` +
     "with animation-assets and illidan-animation holding the packaged models fighterAssetInfo.ts and demonHunterAssetInfo.ts name: " +
@@ -340,11 +318,11 @@ export const importedAssets = (assets: string, summon: string) => Effect.gen(fun
     CUE_GRAPHICS_DE,
 
     ...IMPORTED_MODEL_FILES.map(({ entry, file }) => ({ entry, source: join(assets, "imported-models", file) })),
-    ...generated.flat(),
+    ...generated.flat().filter(({ entry }) => !whiteOverrides.has(entry)),
     ...TOMB_WATERFALL_IMPORTS.map(({ entry, file }) => ({ entry, source: join(assets, "stage-assets", file) })),
     ...summonFiles.map((filename) => imported(join(summon, "imports/war3mapImported"), filename)),
-    ...clipFiles.map((filename) => imported(join(clipDirectory, "imports/war3mapImported"), filename)),
-    ...definitiveBodies,
+    ...classicBodies,
+    ...classicOverrides,
   ];
   const problem = importProblem(entries);
   if (problem !== undefined) return yield* new MapBuildFailure({ operation: "check imports", path: assets, cause: problem });

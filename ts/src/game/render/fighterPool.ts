@@ -23,7 +23,6 @@ import { damageTint } from "../presentation/hitPresentation";
 import { heroCueWindows, specialCueState } from "../presentation/specialCues";
 import { runningHeroSpecial } from "../sim/heroSpecialRules";
 import { specialClip } from "../presentation/fighterClips";
-import { definitiveCues } from "./specialCueEffects";
 import { characterModelScale } from "../presentation/modelScale";
 import { fitFighterPlacement } from "../presentation/fighterPlacement";
 import { outgoingPoseAlpha, poseBlendFrames } from "../presentation/damageBlend";
@@ -112,7 +111,7 @@ export class FighterPoolPresentation {
   present(fighter: Readonly<Fighter>, pose: Readonly<FighterPose>, stage: number, frame: number): void {
     if (this.clips.length === 0) return;
     const special = specialCueState(fighter);
-    const startup = special.phase === "startup" && !definitiveCues()
+    const startup = special.phase === "startup"
       ? specialClip(this.character, fighter.special.action, fighter.motion.grounded, false).classicStartup : undefined;
     const index = startup?.index ?? pose.clipIndex ?? originalClipNamed(this.character, pose.clipName);
     const model = index === undefined ? undefined : this.clips[index];
