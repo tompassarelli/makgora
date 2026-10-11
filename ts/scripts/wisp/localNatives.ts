@@ -32,6 +32,7 @@ export const SMASHCRAFT_LOCAL_NATIVES: LocalNatives = {
   BlzGetMouseScreenPosY: "local pointer, sent through sync data when it chooses",
   BlzIsMouseButtonPressed: "local pointer, sent through sync data when it chooses",
   BlzEnableCursor: "hides this client's cursor while its painted hand is drawn",
+  BlzSetMousePos: "puts this client's pointer on Start Match as stage selection opens",
   BlzIsKeyPressed: "local keys, sent through sync data as input rows",
   BlzIsLocalClientActive: "local focus, which input polling reads",
   BlzFrameSetVisible: "shows an existing frame on this client",

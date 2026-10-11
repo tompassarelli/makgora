@@ -8,7 +8,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { bindPrototype } from "../../platform/rebind";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { type MatchState, Phase, humanActive } from "../match/rules";
-import { pointerX, pointerY } from "../menu/pointer";
+import { pixelX, pixelY, pointerX, pointerY } from "../menu/pointer";
 import { type StageChoice, clearStageDrag, stageDrag, stageTileLeft, stageTileTop, updateStageDrag } from "../menu/stageSelection";
 import { RANDOM_STAGE, STAGE_CATALOG, STAGE_CHOICES, selectableStageChoice, stageInfo } from "../menu/stageCatalog";
 import { dropsSetting, hazardsSetting, rulesSummary } from "../shell/messages";
@@ -32,6 +32,7 @@ type StageButton = { kind: "stage"; choice: StageChoice } | { kind: "hazards" } 
 
 export const HAZARDS_BUTTON = { x: f32(0.225), y: f32(0.082), width: f32(0.19), height: f32(0.037) } as const;
 export const DROPS_BUTTON = { x: f32(0.42), y: f32(0.082), width: f32(0.12), height: f32(0.037) } as const;
+export const START_MATCH_BUTTON = { x: f32(0.045), y: f32(0.514), width: f32(0.21), height: f32(0.048) } as const;
 
 
 function stageText(parent: framehandle, name: string, x: number, y: number, width: number, height: number, fontSize: number, text: string): framehandle {
@@ -64,6 +65,7 @@ export class StagePanel {
   private readonly chip: framehandle;
   private readonly hazardsToggle: framehandle;
   private readonly dropsToggle: framehandle;
+  private readonly startButton: framehandle;
   private readonly clicks: ButtonClicks<StageButton>;
   private readonly tileNames: framehandle[] = [];
   private readonly sync: trigger;
@@ -84,7 +86,7 @@ export class StagePanel {
     controls: MenuControls,
   ) {
     const journal = controls === "journal";
-    this.clicks = new ButtonClicks("ui.stage.click", (button, clicker) => this.click(button, GetPlayerId(clicker)), button => this.highlightStage(button?.kind === "stage" ? button.choice : undefined));
+    this.clicks = new ButtonClicks("ui.stage.click", (button, clicker) => this.click(button, GetPlayerId(clicker)), button => this.hover(button));
     const root = BlzCreateFrameByType("FRAME", "MeleeStageRoot", gameUi(), "", 0);
     this.root = root;
     this.backdrop = createBackdrop("MeleeStageBackdrop", consoleUi(), 800);
@@ -131,7 +133,7 @@ export class StagePanel {
       ? "Click a stage or move the stick.\nAny player can choose.\nA / Click: choose · Start: start · Click BACK: back"
       : "Click a stage or use movement controls.\nAny player can choose.\nY: start · Click BACK TO FIGHTERS: back";
     stageText(root, "MeleeStageHelp", f32(0.454), f32(0.119), f32(0.3), f32(0.025), f32(0.008), help);
-    this.clicks.add(stageButton(root, f32(0.045), f32(0.514), f32(0.21), f32(0.048), journal ? "START MATCH [A]" : "START MATCH"), { kind: "start" });
+    this.startButton = this.clicks.add(stageButton(root, START_MATCH_BUTTON.x, START_MATCH_BUTTON.y, START_MATCH_BUTTON.width, START_MATCH_BUTTON.height, journal ? "START MATCH [A]" : "START MATCH"), { kind: "start" });
     this.clicks.add(stageButton(root, f32(0.045), f32(0.082), f32(0.17), f32(0.037), journal ? "BACK" : "BACK TO FIGHTERS"), { kind: "back" });
     this.hazardsToggle = stageButton(root, HAZARDS_BUTTON.x, HAZARDS_BUTTON.y, HAZARDS_BUTTON.width, HAZARDS_BUTTON.height, "");
     this.clicks.add(this.hazardsToggle, { kind: "hazards" });
@@ -149,7 +151,7 @@ export class StagePanel {
     this.actions = actions;
     bindPrototype(this.clicks, ButtonClicks.prototype);
     bindPrototype(this.preview, StageCard.prototype);
-    this.clicks.bindHandler((button, clicker) => this.click(button, GetPlayerId(clicker)), button => this.highlightStage(button?.kind === "stage" ? button.choice : undefined));
+    this.clicks.bindHandler((button, clicker) => this.click(button, GetPlayerId(clicker)), button => this.hover(button));
     bindSyncHandler("ui.stage.drop", (sender, data) => {
       const choice = S2I(data);
       if (I2S(choice) === data && selectableStageChoice(choice)) this.actions.selectStage(sender, choice);
@@ -161,6 +163,22 @@ export class StagePanel {
     DestroyTrigger(this.sync);
     BlzDestroyFrame(this.root);
     BlzDestroyFrame(this.backdrop);
+  }
+
+  private hover(button: StageButton | undefined): void {
+    if (button?.kind !== "start") highlightText(this.startButton, false);
+    this.highlightStage(button?.kind === "stage" ? button.choice : undefined);
+  }
+
+  // Entering stage selection focuses Start Match and puts the pointer on it.
+  private focusStart(): void {
+    highlightText(this.startButton, true);
+    const width = I2R(BlzGetLocalClientWidth());
+    const height = I2R(BlzGetLocalClientHeight());
+    if (width <= 0 || height <= 0) return;
+    const x = START_MATCH_BUTTON.x + START_MATCH_BUTTON.width / 2;
+    const y = START_MATCH_BUTTON.y - START_MATCH_BUTTON.height / 2;
+    BlzSetMousePos(R2I(pixelX(x, width, height)), R2I(pixelY(y, height)));
   }
 
   private highlightStage(choice: number | undefined): void {
@@ -189,6 +207,7 @@ export class StagePanel {
     if (this.lastPhase !== game.phase) {
       BlzFrameSetVisible(this.root, enabled);
       BlzFrameSetVisible(this.backdrop, enabled);
+      if (enabled) this.focusStart();
       this.lastPhase = game.phase;
     }
     if (!enabled) {

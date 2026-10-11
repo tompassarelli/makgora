@@ -48,6 +48,7 @@ function session(endless = false, hazardsOff = false, dropsOff = false) {
   until("stage selection", () => read(() => shell().game.phase) === Phase.stageMenu, 30);
   frames(2);
   for (const client of clients.clients) expect(shows(client, "Hazards: On")).toBe(true);
+  for (const client of clients.clients) expect(shows(client, "|cffffcc00START MATCH")).toBe(true);
   if (hazardsOff) {
     expect(clients.click(1, HAZARDS_BUTTON.x + HAZARDS_BUTTON.width / 2, HAZARDS_BUTTON.y - HAZARDS_BUTTON.height / 2)).toBe(true);
     frames(1);
