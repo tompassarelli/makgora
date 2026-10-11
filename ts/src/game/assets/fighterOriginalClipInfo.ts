@@ -4709,3 +4709,8 @@ export function originalClip(character: number, sequenceIndex: number): FighterO
 export function originalClipNamed(character: number, name: string): number | undefined {
   return NAMED[character]?.get(name);
 }
+
+/** Every original sequence name with its index. */
+export function originalClipNames(character: number): ReadonlyMap<string, number> {
+  return NAMED[character] ?? new Map();
+}
