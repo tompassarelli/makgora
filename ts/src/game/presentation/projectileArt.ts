@@ -187,6 +187,7 @@ export const DEFINITIVE_PROJECTILE_REDRAWS: { readonly [model: string]: string }
   "Abilities\\Weapons\\HunterMissile\\HunterMissile.mdl": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Weapons\\KeeperGroveMissile\\KeeperGroveMissile.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Weapons\\Mortar\\MortarMissile.mdx": "HD redraw, Definitive look not yet reviewed",
+  "Abilities\\Weapons\\PhoenixMissile\\Phoenix_Missile.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Weapons\\PriestMissile\\PriestMissile.mdl": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Weapons\\QuillSprayMissile\\QuillSprayMissile.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Weapons\\RocketMissile\\RocketMissile.mdl": "HD redraw, Definitive look not yet reviewed",
