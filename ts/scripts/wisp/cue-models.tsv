@@ -7,6 +7,7 @@ redrawn	Abilities\Spells\Human\Defend\DefendCaster.mdx
 redrawn	Abilities\Spells\Human\DispelMagic\DispelMagicTarget.mdx
 redrawn	Abilities\Spells\Human\Feedback\SpellBreakerAttack.mdx
 redrawn	Abilities\Spells\Human\FlakCannons\FlakTarget.mdx
+redrawn	Abilities\Spells\Human\FlameStrike\FlameStrike.mdx
 redrawn	Abilities\Spells\Human\FlameStrike\FlameStrike1.mdx
 redrawn	Abilities\Spells\Human\FlameStrike\FlameStrikeEmbers.mdx
 redrawn	Abilities\Spells\Human\Heal\HealTarget.mdx
@@ -76,6 +77,8 @@ redrawn	Abilities\Spells\Other\CrushingWave\CrushingWaveDamage.mdx
 redrawn	Abilities\Spells\Other\CrushingWave\CrushingWaveMissile.mdx
 redrawn	Abilities\Spells\Other\Doom\DoomDeath.mdx
 redrawn	Abilities\Spells\Other\Drain\DrainCaster.mdx
+redrawn	Abilities\Spells\Other\Drain\ManaDrainCaster.mdx
+redrawn	Abilities\Spells\Other\Drain\ManaDrainTarget.mdx
 same	Abilities\Spells\Other\ForkedLightning\ForkedLightningTarget.mdx
 redrawn	Abilities\Spells\Other\FrostBolt\FrostBoltMissile.mdx
 redrawn	Abilities\Spells\Other\FrostDamage\FrostDamage.mdx

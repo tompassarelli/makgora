@@ -19,6 +19,7 @@ import { cosineTurns, sineTurns } from "../sim/mathTables";
 
 export const STATIONARY_PARTICLE_MODELS = [
   "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx",
+  "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike.mdx",
   "Abilities\\Spells\\Other\\Stampede\\StampedeMissileDeath.mdx",
   "Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireDamage.mdx",
   "Abilities\\Spells\\NightElf\\TargetArtLumber\\TargetArtLumber.mdx",
