@@ -331,6 +331,7 @@ export const importedAssets = (assets: string, summon: string) => Effect.gen(fun
     { entry: RIFLEMAN_MODEL_FILE, source: join(assets, "animation-assets/RiflemanFighter.mdx") },
     { entry: DEMON_HUNTER_MODEL_FILE, source: join(assets, "illidan-animation/DemonHunterFighter.mdx") },
     ...SELECTION_TEXTURES.map((texture) => imported(join(assets, "selection-assets"), `${texture}.tga`)),
+    { entry: "_de.w3mod\\war3mapImported\\SelectionHandPinch.tga", source: join(assets, "selection-assets/_de.w3mod/SelectionHandPinch.tga") },
     ...(yield* portraitImports(assets)),
     yield* previewImport(assets),
 

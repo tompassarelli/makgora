@@ -35,8 +35,7 @@ export function writePin(family: Family, hash: string, directory = MANIFEST): vo
 
 export const FAMILY_NAMES = ["base", "container", "summon", "animation-assets", "illidan-animation", "selection-assets", "fighter-renders",
   "stage-assets", "impact-assets", "imported-models", "original-clips-static-lights", "hero-models", "model-sounds"] as const;
-export const SOURCE_FAMILY_NAMES = ["selection-hand-source"] as const;
-export type Family = (typeof FAMILY_NAMES)[number] | (typeof SOURCE_FAMILY_NAMES)[number];
+export type Family = (typeof FAMILY_NAMES)[number];
 export const FAMILIES = {
   base: { file: "base.w3m", produce: "the private base map Melee_Prototype_Base.w3m (smashcraft:docs/development-loop.md)" },
   container: { file: "container.w3x", produce: "the private asset container map (a built Smashcraft map carrying the stock imports)" },
@@ -44,7 +43,6 @@ export const FAMILIES = {
   "animation-assets": { produce: "bash tools/animations/build-assets.sh (writes build/animation-assets)" },
   "illidan-animation": { produce: "bun tools/animations/package-illidan.ts (writes build/illidan-animation)" },
   "selection-assets": { produce: "bun tools/selection/build-art.ts (writes build/selection-assets)" },
-  "selection-hand-source": { file: "wc3-pinching-hand.png", produce: "the licensed private wc3-pinching-hand.png source" },
   "fighter-renders": { produce: "bun scripts/fighterPortraits.ts PRIVATE_OUTPUT (from ts/; stores PRIVATE_OUTPUT/fighter-renders)" },
   "stage-assets": { produce: "bun tools/stage/package.ts (writes build/stage-assets)" },
   "impact-assets": { produce: "bun tools/effects/package.ts, trap.ts and shield.ts (write build/impact-assets)" },

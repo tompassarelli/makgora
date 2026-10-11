@@ -1,3 +1,4 @@
+import { definitiveCues } from "../render/specialCueEffects";
 import { nextMatchCharacter, selectableMatchCharacter } from "../match/rules";
 import { RULE_BUTTONS, RULE_HEIGHT, type RuleBox, type TrainingSetting, cpuSettingsBox } from "./ruleButtons";
 import { RULE_HELP_HEIGHT, RULE_HELP_WIDTH, hoveredRule, ruleHelp, visibleRuleGroups } from "./ruleHelp";
@@ -37,7 +38,8 @@ import {
   type RosterChip,
   type RosterTile,
   cardX,
-  HAND_SIZE,
+  HAND_WIDTH,
+  HAND_HEIGHT,
   readyChipSize,
   carriedChipLeft,
   carriedChipTop,
@@ -321,7 +323,7 @@ export class SelectionPanel {
       const summary = label(root, `MeleeCpuSummary${name}`, x + f32(0.004), f32(0.139), f32(0.152), f32(0.031), f32(0.009));
       return { card, tag, mode, portrait, name: name_, status, chip, summary, settings, settingsLabel };
     });
-    this.hand = art(consoleUi(), `MeleeHand${suffix}`, "war3mapImported\\SelectionHandPinch.tga", 0.0, 0.0, HAND_SIZE, HAND_SIZE);
+    this.hand = art(consoleUi(), `MeleeHand${suffix}`, "war3mapImported\\SelectionHandPinch.tga", 0.0, 0.0, HAND_WIDTH, HAND_HEIGHT);
     BlzFrameSetLevel(this.hand, 30);
     BlzFrameSetVisible(this.hand, false);
     art(root, `MeleeConfirmArt${suffix}`, "war3mapImported\\SelectionAction.tga", f32(0.071), f32(0.043), f32(0.235), f32(0.037));
@@ -686,7 +688,7 @@ export class SelectionPanel {
 
   private showHand(shown: boolean, x: number, y: number): void {
     BlzFrameSetVisible(this.hand, shown);
-    if (shown) placeTopLeft(this.hand, handLeft(x), handTop(y));
+    if (shown) placeTopLeft(this.hand, handLeft(x, definitiveCues()), handTop(y, definitiveCues()));
     const hidden = shown || !this.menuCursorAllowed;
     if (hidden === this.cursorHidden) return;
     this.cursorHidden = hidden;

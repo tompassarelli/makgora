@@ -10,13 +10,11 @@ import { Effect } from '../../ts/node_modules/effect/dist/index.js';
 import { ChildProcess } from '../../ts/node_modules/effect/dist/process/index.js';
 import { BunRuntime, BunServices } from '../../ts/node_modules/@effect/platform-bun/dist/index.js';
 import { ProcessFailure, runProcess } from '../../ts/scripts/hostProcess';
-import { FAMILIES, readPins, verifiedFamily } from '../../ts/scripts/wisp/buildInputs';
 
 const project = resolve(import.meta.dir, '../..');
 const source = join(project, 'tools/selection/art');
 const index = process.argv.indexOf('--out');
 const output = index < 0 ? join(project, 'build/selection-assets') : resolve(process.argv[index + 1]!);
-const privatePinch = process.argv.includes('--private-pinch');
 const ioFailure = (cause: unknown) => new ProcessFailure({ command: 'selection art', problem: String(cause) });
 const run = (command: readonly [string, ...string[]]) => runProcess(ChildProcess.make(command[0], command.slice(1)));
 
@@ -38,14 +36,6 @@ const render = (name: string, svg: string, replacements: { readonly [placeholder
 });
 
 BunRuntime.runMain(Effect.gen(function*() {
-  let pinchSource: string | undefined;
-  if (privatePinch) {
-    const pins = yield* Effect.try({ try: () => readPins(), catch: ioFailure });
-    const hash = pins['selection-hand-source'];
-    if (hash === undefined) return yield* new ProcessFailure({ command: 'selection art', problem: '--private-pinch requires the licensed build-inputs/selection-hand-source pin' });
-    const directory = yield* verifiedFamily('selection-hand-source', hash);
-    pinchSource = join(directory, FAMILIES['selection-hand-source'].file);
-  }
   yield* Effect.try({ try: () => mkdirSync(output, { recursive: true }), catch: ioFailure });
   for (const [fighter, label] of [['Rifleman', 'RIFLEMAN'], ['DemonHunter', 'ILLIDAN']] as const) {
     yield* render(`${fighter}Name`, 'FighterName.svg', { FIGHTER_NAME: label }, true);
@@ -62,7 +52,15 @@ BunRuntime.runMain(Effect.gen(function*() {
     Pinch: { THUMB: 'M40 66 L30 44 L25 30', INDEX: 'M62 40 L44 20 L28 12', SEAMS: 'M27 47 L36 43 M41 25 L49 17', SHINE: 'M29 40 L25 31 M41 17 L30 12' },
   };
   for (const [pose, fingers] of Object.entries(HAND_POSES)) {
-    if (pose === 'Pinch' && pinchSource !== undefined) yield* run(['magick', pinchSource, '-depth', '8', `TGA:${join(output, 'SelectionHandPinch.tga')}`]);
+    if (pose === 'Pinch') {
+      for (const [directory, bounds, visible, offset, canvas] of [
+        [output, '29x27!', '25x27+2+0', '2x4', '32x32'],
+        [join(output, '_de.w3mod'), '100x121!', '84x118+9+3', '22x3', '128x128'],
+      ] as const) {
+        yield* Effect.try({ try: () => mkdirSync(directory, { recursive: true }), catch: ioFailure });
+        yield* run(['magick', join(source, 'wc3-pinching-hand.png'), '-crop', '1315x1085+33+33', '+repage', '-resize', bounds, '-crop', visible, '+repage', '-resize', bounds, '-background', 'none', '-gravity', 'northwest', '-splice', offset, '-extent', canvas, '-depth', '8', `TGA:${join(directory, 'SelectionHandPinch.tga')}`]);
+      }
+    }
     else yield* render(`SelectionHand${pose}`, 'SelectionHand.svg', fingers, false);
   }
   yield* render('SelectionCardGray', 'SelectionCard.svg', { CARD_COLOR: '#30353b', CARD_EDGE: '#555d65', CARD_METAL: '#687078' }, false);

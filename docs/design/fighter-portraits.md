@@ -153,15 +153,20 @@ The pointer target follows that frame size; the P1/P2 labels keep their art.
 On the fighter select screen, the Warcraft cursor is hidden (`BlzEnableCursor`)
 and the local client draws a pinching steel gauntlet, with a carried chip's
 top rim between thumb and fingertip. The pointing pose is painted but not
-displayed yet. Both authored 128x128 TGAs (`SelectionHandPoint`, `SelectionHandPinch`) are
-original art painted by smashcraft:tools/selection/build-art.ts from
-smashcraft:tools/selection/art/SelectionHand.svg, inspired by Super Smash Bros.
-Ultimate's gauntlet cursor; no Nintendo or Blizzard pixels are used. The pinching
-hotspot is the point between thumb and fingertip, as fractions of the image in
-smashcraft:ts/src/game/menu/selectionDrag.ts. The phase owner permits the stock
+displayed yet. `SelectionHandPoint` keeps its original 128x128 SVG art. `SelectionHandPinch`
+uses Tom's publicly approved AI-created
+smashcraft:tools/selection/art/wc3-pinching-hand.png through the same builder.
+The authored source's pinch point is (256, 288). The Classic 32x32 and
+Definitive 128x128 textures have the stock normal cursor's alpha footprints,
+29x27 at (2,4) and 100x121 at (22,3), respectively. Both use the stock
+HumanCursor model's 0.025x0.0239 UI quad over its 30.19-pixel Classic UV region;
+UI pixels scale with client height divided by 0.6. The corresponding visible
+bounds at 1080p are 43.23x38.48 and 37.27x43.11 pixels. The Definitive texture
+uses the existing `_de.w3mod` override pattern; other poses are unchanged.
+The phase owner permits the stock
 cursor in stage selection, pause, title and settings menus or when a panel
 opens over the roster. Both cursors stay hidden during gameplay and results.
-The private Pinch source build is described in smashcraft:docs/build-inputs.md.
+The selection asset build is described in smashcraft:docs/build-inputs.md.
 Warcraft has no
 per-render Lua callback (smashcraft:docs/high-refresh.md), so hand and chip move
 together once per 60 Hz tick from one mouse sample.

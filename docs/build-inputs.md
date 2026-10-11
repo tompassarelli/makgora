@@ -70,19 +70,11 @@ code:
 Never edit a stored folder; a build reports an edit in place with the command
 that regenerates the family.
 
-The generator-only `selection-hand-source` family holds the licensed private
-`wc3-pinching-hand.png` file. Store the file with
-`bun wisp inputs add selection-hand-source FILE` from ts/. Its source pin is
-checked by `inputs check`; it is never linked into the packaged assets view.
-`bun tools/selection/build-art.ts --private-pinch` verifies that pin and converts
-only the Pinch pose to TGA, preserving the source canvas dimensions and alpha.
-The other hand poses keep their SVG sources. The explicit flag requires the
-source pin; it never falls back to SVG. Without the flag the authored SVG
-generator remains unchanged. Before using the private output, calibrate its
-frame dimensions and fingertip hotspot against the stock cursor in both looks,
-then store the generated `selection-assets` family and commit both hashes.
-Originals and derived pixels remain private; public commits contain only the
-pins and generator code.
+The public authored `tools/selection/art/wc3-pinching-hand.png` is Tom's
+AI-created pinch pose, approved for public shipping. The normal
+`bun tools/selection/build-art.ts` converts it to `SelectionHandPinch.tga`;
+the other poses keep their existing SVG sources. Store the generated
+`selection-assets` family and commit its hash with the source change.
 
 ## Other shared paths
 
