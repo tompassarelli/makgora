@@ -69,7 +69,7 @@ function shieldVerdict(target: Fighter, label: string): boolean {
   return melee;
 }
 
-test("a full untilted shield contains every standing hurtbox, and a shrunken shield leaves exposed hurtboxes to melee, specials and projectiles alike while bubble contact stays a shield hit [k2 property]", () => {
+test("a full untilted hard shield centred midway up the standing body is the smallest that contains every standing hurtbox above the floor, and a shrunken shield leaves exposed hurtboxes to melee, specials and projectiles alike while bubble contact stays a shield hit [k2 property]", () => {
   let cases = 0;
   let pokes = 0;
   let covered = 0;
@@ -77,6 +77,7 @@ test("a full untilted shield contains every standing hurtbox, and a shrunken shi
     const target = createFighter(character, 0.0, -1);
     target.shield.raised = true;
     const radius = target.tuning.shield.radius;
+    const floor = target.motion.z;
     let exposedNearBreak = 0;
     let pokeX = 0.0;
     let pokeZ = 0.0;
@@ -85,6 +86,8 @@ test("a full untilted shield contains every standing hurtbox, and a shrunken shi
         target.shield.strength = strength;
         target.shield.tiltX = tiltX;
         target.shield.tiltZ = tiltZ;
+        let farthest = 0.0;
+        let top = 0.0;
         let previous = Number.POSITIVE_INFINITY;
         for (const energy of ENERGIES) {
           cases++;
@@ -119,12 +122,19 @@ test("a full untilted shield contains every standing hurtbox, and a shrunken shi
             if (energy === SHIELD_MAX && tiltX === 0.0 && tiltZ === 0.0) {
               for (const [ex, ez] of [[placed.x1, placed.z1], [placed.x2, placed.z2]] as const) {
                 const d = squareRoot(f32(f32(f32(ex - cx) * f32(ex - cx)) + f32(f32(ez - cz) * f32(ez - cz))));
-                assertEquals(f32(d + placed.radius) <= reach, true, `${label}: a full untilted shield contains the whole standing capsule`);
                 const rx = d === 0.0 ? ex : f32(cx + f32(f32(f32(ex - cx) / d) * f32(d + placed.radius)));
                 const rz = d === 0.0 ? f32(ez + placed.radius) : f32(cz + f32(f32(f32(ez - cz) / d) * f32(d + placed.radius)));
-                aim(rx, rz, rx, rz, 0.0);
-                assertEquals(shieldVerdict(target, `${label} capsule rim`), true, `${label}: the capsule's outer edge meets a full shield`);
+                const chord = rz >= floor ? 0.0 : squareRoot(f32(f32(placed.radius * placed.radius) - f32(f32(ez - floor) * f32(ez - floor))));
+                for (const [ox, oz] of rz >= floor ? [[rx, rz]] as const : [[f32(ex - chord), floor], [f32(ex + chord), floor]] as const) {
+                  const outer = squareRoot(f32(f32(f32(ox - cx) * f32(ox - cx)) + f32(f32(oz - cz) * f32(oz - cz))));
+                  assertEquals(outer <= reach, true, `${label}: a full untilted shield contains the standing capsule above the floor`);
+                  if (outer > farthest) farthest = outer;
+                  aim(ox, oz, ox, oz, 0.0);
+                  assertEquals(shieldVerdict(target, `${label} capsule rim`), true, `${label}: the capsule's outer edge above the floor meets a full shield`);
+                }
               }
+              const capsuleTop = f32(f32((placed.z1 > placed.z2 ? placed.z1 : placed.z2) + placed.radius) - floor);
+              if (capsuleTop > top) top = capsuleTop;
               covered++;
             }
             aim(px, pz, cx, cz, PROBE_RADIUS);
@@ -141,6 +151,10 @@ test("a full untilted shield contains every standing hurtbox, and a shrunken shi
             assertEquals(strikeHurtContact(strike, target), HurtContact.hit, `${label}: the poke reaches an exposed hurtbox`);
             assertEquals(shieldVerdict(target, `${label} poke`), false, `${label}: a strike only on an exposed hurtbox is a hit`);
           }
+        }
+        if (strength === 1.0 && tiltX === 0.0 && tiltZ === 0.0) {
+          assertEquals(f32(shieldCenterZ(target) - floor), f32(top / 2.0), `${fighterName(character)}: the shield centre is midway from the floor to the top of the standing hurtboxes`);
+          assertEquals(f32(f32(radius - 1.0) * shieldSizeMultiplier(SHIELD_MAX, 1.0)) < farthest, true, `${fighterName(character)}: one unit less radius leaves a standing hurtbox outside the full hard shield`);
         }
       }
     }
