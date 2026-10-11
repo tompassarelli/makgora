@@ -3,6 +3,7 @@ import { stageBounds } from "./stageBounds";
 
 import { assertEquals, assertFalse, assertGreaterThan, assertNear, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
+import { imod } from "wisp/src/sim/intMath";
 import { Character } from "./codes";
 import { canAttack } from "./conditions";
 import { AIR_DODGE_LANDING_LAG } from "./down";
@@ -99,28 +100,35 @@ test("an air dodge landing slides and restores actions after ten ticks [k4 refer
   }
 });
 
-test("a blast zone removes exactly one stock [k3 measure docs/physics.md]", () => {
-  const fighter = createReferenceFighter(Character.sylvanas, (stageBounds(0).blast.right - 2.0), 1);
-  fighter.motion.vx = 100.0;
-  const input = controls({ direction: 1 });
-  const step = () => advanceSolo(fighter, 0, input, -240.0);
-  step();
-  assertTrue(fighter.status.out);
-  assertEquals(fighter.status.stocks, 2);
-  for (let ticks = 0; ticks < 130; ticks++) step();
-  assertEquals(fighter.status.stocks, 2);
-  assertFalse(fighter.status.out);
-  fighter.motion.x = (stageBounds(0).blast.right + 0.0009765625);
-  step();
-  assertEquals(fighter.status.stocks, 1);
-  while (fighter.status.respawn > 0) step();
-  fighter.motion.x = (stageBounds(0).blast.right + 0.0009765625);
-  step();
-  assertEquals(fighter.status.stocks, 0);
-  assertTrue(fighter.status.out);
-  const finalX = fighter.motion.x;
-  step();
-  assertEquals(fighter.motion.x, finalX);
+const BLAST_EXITS = ["left", "right", "bottom"] as const;
+
+test("each crossing of a side or bottom blast zone removes exactly one stock until none is left: every exit of both blast-zone shapes [k2 property]", () => {
+  let index = 0;
+  for (const stage of [0, 2]) {
+    const { blast } = stageBounds(stage);
+    for (const exit of BLAST_EXITS) {
+      const character = ALL_FIGHTERS[imod(index * 7 + 3, ALL_FIGHTERS.length)]!;
+      index++;
+      const fighter = createReferenceFighter(character, 0.0, 1);
+      const step = () => advanceSolo(fighter, stage, controls(), -240.0);
+      assertTrue(fighter.status.stocks > 1);
+      const label = `stage ${stage} ${exit} ${character}`;
+      for (let stocks = fighter.status.stocks - 1; stocks >= 0; stocks--) {
+        while (fighter.status.respawn > 0) step();
+        assertEquals(fighter.status.out, false, label);
+        fighter.motion.grounded = false;
+        fighter.motion.x = exit === "left" ? f32(blast.left - 0.0009765625) : exit === "right" ? f32(blast.right + 0.0009765625) : 0.0;
+        if (exit === "bottom") fighter.motion.z = f32(blast.bottom - 0.0009765625);
+        step();
+        assertEquals(fighter.status.stocks, stocks, label);
+        assertEquals(fighter.status.out, true, label);
+      }
+      const finalX = fighter.motion.x;
+      step();
+      assertEquals(fighter.motion.x, finalX, label);
+      assertEquals(fighter.status.stocks, 0, label);
+    }
+  }
 });
 
 test("the top blast zone requires launch knockback rather than jump speed [k4 reference docs/smash-melee-reference/retail-death-parameters.json]", () => {
