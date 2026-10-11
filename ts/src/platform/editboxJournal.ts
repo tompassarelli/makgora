@@ -32,11 +32,6 @@ function chatEntry(gameUi: framehandle): framehandle | undefined {
   return found;
 }
 
-export function warcraftChatOpen(): boolean {
-  const chat = chatEntry(BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0));
-  return chat !== undefined && BlzFrameIsVisible(chat);
-}
-
 
 
 

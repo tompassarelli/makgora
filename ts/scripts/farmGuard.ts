@@ -3,12 +3,12 @@ import { Console, Effect, Schema } from "effect";
 import { captureProcess } from "wisp/scripts/wisp/mapBuild";
 
 export type FarmWorkflow = "balance" | "playtest" | "memory" | "perf" | "pads" | "tiers" | "test";
-export const FARM_WORKFLOWS: readonly FarmWorkflow[] = ["balance", "playtest", "memory", "perf", "pads", "tiers", "test"];
-export const MAIN_ONLY: ReadonlySet<FarmWorkflow> = new Set(["balance", "playtest", "memory"]);
+const FARM_WORKFLOWS: readonly FarmWorkflow[] = ["balance", "playtest", "memory", "perf", "pads", "tiers", "test"];
+const MAIN_ONLY: ReadonlySet<FarmWorkflow> = new Set(["balance", "playtest", "memory"]);
 
 interface MainCommit { readonly sha: string; readonly message: string }
 
-export interface Facts {
+interface Facts {
   readonly workflow: FarmWorkflow;
   readonly sha: string;
   readonly onMain: boolean;
@@ -38,7 +38,7 @@ function laneAllowed(workflow: FarmWorkflow, lane: string): boolean {
   return MAIN_ONLY.has(workflow) ? /^claude\/[^/]/.test(lane) : /^(claude|farm)\/[^/]/.test(lane);
 }
 
-export function liveness(facts: Facts): Verdict {
+function liveness(facts: Facts): Verdict {
   const short = facts.sha.slice(0, 12);
   const lane = facts.lane !== undefined && laneAllowed(facts.workflow, facts.lane) ? facts.lane : undefined;
   if (lane !== undefined && facts.onLane) return { live: true, why: `${short} is on ${lane}` };
@@ -63,7 +63,7 @@ export function admit(facts: Facts & { readonly autoland: AutolandStatus | undef
   return { kind: "refuse", why: MAIN_ONLY.has(facts.workflow) && facts.lane === undefined && !facts.onMain ? `${verdict.why}: ${facts.workflow} runs only on main or on a lane tip pushed to claude/NAME (--lane NAME)` : verdict.why };
 }
 
-export function balanceTimeouts(perPair: number, probe: number): { readonly shard: number; readonly probe: number } {
+function balanceTimeouts(perPair: number, probe: number): { readonly shard: number; readonly probe: number } {
   return { shard: Math.max(15, Math.ceil((15 * perPair) / 400)), probe: Math.max(25, Math.ceil((25 * probe) / 40)) };
 }
 

@@ -15,7 +15,7 @@ export function sweep(name: string, run: () => void): void {
   test(`${SWEEP_PREFIX}${name}`, run);
 }
 
-export const isSweep = (name: string): boolean => name.startsWith(SWEEP_PREFIX);
+const isSweep = (name: string): boolean => name.startsWith(SWEEP_PREFIX);
 
 export function selectSweep(name: string, sweeps: boolean, placement = "all"): boolean {
   if (isSweep(name) !== sweeps) return false;

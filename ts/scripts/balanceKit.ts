@@ -1,7 +1,6 @@
 import { readFileSync } from "node:fs";
 import ts from "typescript";
 import { AttackStyle, Character, GrabAction } from "../src/game/sim/codes";
-import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/sim/heroes/registry";
 import { authoredTuning } from "../src/game/sim/tuning";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../src/game/sim/hitRegions";
 import { attackStartupFrames, attackDurationFramesForGrounding, characterAttackActiveFrames, attackLandingLag, isAerialAttack } from "../src/game/sim/moves";
@@ -84,10 +83,6 @@ export function currentKit(character: Character): KitSnapshot {
   return { values: retained, play: JSON.stringify(gameplanOf(character)) };
 }
 
-function currentRosterKits(): Record<string, KitSnapshot> {
-  return Object.fromEntries(SELECTABLE_CHARACTERS.map(character => [fighterSlug(character), currentKit(character)]));
-}
-
 type KitParameter = "proportional" | "frames" | "fixed";
 
 export function parameterKind(path: string): KitParameter {
@@ -100,6 +95,3 @@ export function parameterKind(path: string): KitParameter {
 
 export interface FeelSample { readonly advantage: number; readonly killPercent?: number }
 export type FeelValues = Readonly<Record<string, FeelSample>>;
-
-
-

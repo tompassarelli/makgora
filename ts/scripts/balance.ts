@@ -286,8 +286,3 @@ export function matchupFailures(matchups: NonNullable<Measured["matchups"]>): st
     matches < BALANCE_SPEC.matchupMatches ? [`matchup ${opponent} only ${matches}/${BALANCE_SPEC.matchupMatches} matches`]
       : !Number.isFinite(rate) || outside(rate, { low: BALANCE_SPEC.matchupLow, high: BALANCE_SPEC.matchupHigh }) > 0 ? [`matchup ${opponent} ${pct(rate)} (${pct(BALANCE_SPEC.matchupLow)}-${pct(BALANCE_SPEC.matchupHigh)})`] : []);
 }
-
-
-
-
-

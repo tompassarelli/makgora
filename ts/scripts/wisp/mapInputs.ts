@@ -107,7 +107,7 @@ const SUMMON_MODELS = Array.from({ length: summonClipCount(SUMMON_BEAR) }, (_, i
 
 
 
-export const ORIGINAL_CLIP_MODELS = [...new Set(Object.values(Character).flatMap((character) => {
+const ORIGINAL_CLIP_MODELS = [...new Set(Object.values(Character).flatMap((character) => {
   const light = originalLightPath(character);
   const clips = Array.from({ length: originalClipCount(character) }, (_, index) => originalClip(character, index)?.modelPath ?? "");
   return light === undefined ? clips : [...clips, light];
@@ -117,7 +117,7 @@ export const ORIGINAL_CLIP_MODELS = [...new Set(Object.values(Character).flatMap
 const IMPORTED_HERO_MODELS = HERO_ROSTER.map(({ presentation }) => presentation.model).filter((model) => importedModelFile(model) !== undefined);
 
 
-export const SCRIPT_MODELS: readonly string[] = [
+const SCRIPT_MODELS: readonly string[] = [
   RIFLEMAN_MODEL_FILE, DEMON_HUNTER_MODEL_FILE, ...IMPORTED_HERO_MODELS, ...SUMMON_MODELS, ...ORIGINAL_CLIP_MODELS,
   ...GENERATED_MODELS.flatMap(({ models }) => models),
 ];
@@ -130,13 +130,13 @@ interface SoundTable {
   readonly clip: (character: number, sequenceIndex: number) => FighterOriginalClip | undefined;
 }
 
-export const MODEL_SOUND_TABLE: SoundTable = { cueCount: fighterSoundCueCount, cue: fighterSoundCue, label: modelSoundLabel, clip: originalClip };
+const MODEL_SOUND_TABLE: SoundTable = { cueCount: fighterSoundCueCount, cue: fighterSoundCue, label: modelSoundLabel, clip: originalClip };
 
 
 
 
 
-export function soundTableProblem(table: SoundTable): string | undefined {
+function soundTableProblem(table: SoundTable): string | undefined {
   for (const character of Object.values(Character)) {
     for (let ordinal = 0; ordinal < table.cueCount(character); ordinal++) {
       const cue = table.cue(character, ordinal);
@@ -223,7 +223,7 @@ const PORTRAIT_CACHE = join(process.env.XDG_CACHE_HOME ?? join(homedir(), ".cach
 
 
 
-export const MAP_PORTRAITS: readonly string[] = RENDERED_FIGHTERS.flatMap((character) => PORTRAIT_KINDS.flatMap((kind) =>
+const MAP_PORTRAITS: readonly string[] = RENDERED_FIGHTERS.flatMap((character) => PORTRAIT_KINDS.flatMap((kind) =>
   [...(kind === "Tile" ? [undefined] : []), ...PARTICIPANT_SLOTS].map((slot) => fighterPortrait(character, kind, slot))));
 
 /**

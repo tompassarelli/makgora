@@ -19,13 +19,13 @@ const KIND_TAGS = [
   "A test that fits no kind is scaffolding: delete it (bun wisp help testing).",
 ].join("\n");
 
-export type TestTitle = { readonly file: string; readonly line: number; readonly title: string | undefined };
+type TestTitle = { readonly file: string; readonly line: number; readonly title: string | undefined };
 
 type Refused = { readonly file: string; readonly line: number; readonly title: string; readonly why: string };
 
 
 /** The pure core: every title that breaks the kind-tag rule, and why. `docExists` answers for repo-relative paths. */
-export function kindTagProblems(titles: readonly TestTitle[], docExists: (path: string) => boolean): Refused[] {
+function kindTagProblems(titles: readonly TestTitle[], docExists: (path: string) => boolean): Refused[] {
   const refused: Refused[] = [];
   const boundaries = new Map<string, TestTitle>();
   for (const entry of titles) {

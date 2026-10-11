@@ -26,9 +26,9 @@ export function verdictOf(runs: readonly RunSummary[]): Verdict {
   return latest.conclusion === "success" ? "success" : "failure";
 }
 
-const isGreen = ({ ci, farm }: Candidate): boolean => ci === "success" && farm === "success";
+export const isGreen = ({ ci, farm }: Candidate): boolean => ci === "success" && farm === "success";
 
-export interface AutolandStatus {
+interface AutolandStatus {
   readonly state: string;
   readonly description: string;
 }

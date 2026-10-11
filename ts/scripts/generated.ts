@@ -11,7 +11,7 @@ const STAMPS = join(tsDirectory, "build/generated");
 
 interface Generated { readonly name: string; readonly generator: string; readonly output: string; readonly produce: () => string }
 
-export const GENERATED: readonly Generated[] = [
+const GENERATED: readonly Generated[] = [
   { name: "move-list", generator: join(import.meta.dir, "moveList.ts"), output: MOVE_LIST_PATH, produce: moveListMarkdown },
 ];
 
@@ -24,7 +24,7 @@ function resolveLocal(from: string, specifier: string): string | undefined {
 }
 
 /** A hash of `entry` and every local module it reaches through its imports, by path and content. */
-export function sourceHash(entry: string): string {
+function sourceHash(entry: string): string {
   const seen = new Set<string>();
   const queue = [entry];
   for (let file = queue.pop(); file !== undefined; file = queue.pop()) {

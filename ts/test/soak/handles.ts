@@ -7,7 +7,7 @@ import type { Game } from "../../scripts/wisp/botMatch";
 import { type HandleBaseline, type Look, LOOKS, SOAK_MATCHES, handleLine, handleProblems, lookNatives, playHandleBaseline } from "../../scripts/wisp/handleBaseline";
 import { SMASHCRAFT_HEADLESS } from "../../scripts/wisp/headless";
 
-export interface LookBaseline extends HandleBaseline {
+interface LookBaseline extends HandleBaseline {
   readonly slots: readonly number[];
   /** Each client's reads of the graphics-mode string, by slot. */
   readonly reads: readonly number[];

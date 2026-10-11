@@ -1,4 +1,3 @@
-import { Capture } from "../netcode/capture";
 import { ALL_ACTIONS, Action, has } from "./actions";
 import { type DirectionalInput, clearPulse, directionOf, neutralDirections, pulsePending, updateDirections } from "./directionalInput";
 import { type InputRow, THROW_CONTRIBUTION_LIMIT, emptyInput, predictInto } from "./inputRow";
@@ -13,11 +12,6 @@ export interface KeyboardCapture {
 
   readonly row: InputRow;
   readonly directions: DirectionalInput;
-}
-
-
-interface LocalSchedule {
-  captureLocal(epoch: number, sample: Readonly<InputRow>): Capture;
 }
 
 export function keyboardCapture(): KeyboardCapture {
@@ -80,13 +74,6 @@ export function commitEdges(capture: KeyboardCapture): void {
 
   predictInto(capture.row, capture.row);
   clearPulse(capture.directions);
-}
-
-
-function captureKeys(capture: KeyboardCapture, schedule: LocalSchedule, epoch: number): Capture {
-  const result = schedule.captureLocal(epoch, capture.row);
-  if (result === Capture.captured) commitEdges(capture);
-  return result;
 }
 
 

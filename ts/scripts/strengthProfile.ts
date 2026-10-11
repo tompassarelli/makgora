@@ -1,5 +1,4 @@
 export type Direction = "top" | "side" | "bottom";
-const DIRECTIONS: readonly Direction[] = ["top", "side", "bottom"];
 
 interface StockLoss { readonly selfDestruct: boolean; readonly blast?: Direction; readonly percent?: number; readonly recovering?: boolean }
 interface ProfileSide {
