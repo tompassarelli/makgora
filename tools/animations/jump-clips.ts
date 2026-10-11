@@ -32,16 +32,23 @@ const legacy = [
   { character: Character.dreadlord, poses: ["jump", "doubleJump"], flip: false },
   { character: Character.shadowHunter, poses: ["jump", "doubleJump"], flip: false },
 ] as const;
-const repairs = [
-  { character: Character.beastmaster, poses: ["doubleJump"], flip: false, style: "knee lift" },
-  { character: Character.pitLord, poses: ["doubleJump"], flip: false, style: "heave" },
-  { character: Character.peon, poses: ["doubleJump"], flip: false, style: "scramble" },
-  { character: Character.sylvanas, poses: ["doubleJump"], flip: true, style: "back flip" },
-  { character: Character.shadowHunter, poses: ["doubleJump"], flip: false, style: "twist" },
-  { character: Character.dreadlord, poses: ["doubleJump"], flip: false, style: "wing beat" },
-  { character: Character.mountainKing, poses: ["doubleJump"], flip: false, style: "cannonball" },
-  { character: Character.forsakenPaladin, poses: ["doubleJump"], flip: false, style: "knee lift" },
-] as const;
+// Each fighter's double-jump style from smashcraft:docs/design/animation-reference.md;
+// Blademaster keeps the #230 front flip authored by blademaster-clips.ts.
+const STYLES: Readonly<Record<number, string>> = {
+  [Character.rifleman]: "cannonball", [Character.demonHunter]: "wing beat", [Character.mountainKing]: "cannonball",
+  [Character.warden]: "back flip", [Character.lich]: "float", [Character.forsakenPaladin]: "knee lift",
+  [Character.dreadlord]: "wing beat", [Character.shadowHunter]: "twist", [Character.pitLord]: "heave",
+  [Character.beastmaster]: "knee lift", [Character.lichKing]: "float", [Character.thrall]: "bound",
+  [Character.jaina]: "twirl", [Character.sylvanas]: "back flip", [Character.cairne]: "knee lift",
+  [Character.chen]: "cannonball", [Character.peon]: "scramble", [Character.tinker]: "heave",
+  [Character.kaelthas]: "float", [Character.murloc]: "front flip", [Character.grom]: "front flip",
+  [Character.anubarak]: "heave", [Character.malfurion]: "twirl", [Character.medivh]: "wing beat",
+  [Character.kobold]: "back flip",
+};
+const FLIPS = new Set(["front flip", "back flip"]);
+const SPINS = new Set(["twist", "twirl"]);
+const repairs = Object.entries(STYLES).map(([character, style]) =>
+  ({ character: Number(character), poses: ["doubleJump"] as const, flip: FLIPS.has(style), style }));
 const gestures: readonly { character: number; poses: readonly ("jump" | "doubleJump")[]; flip: boolean; style?: string }[] = selected ? repairs.filter(g => g.character === only) : legacy;
 ensure(gestures.length > 0, "Select an authored double-jump fighter");
 const tables: Record<number, HeroClipTable> = { ...JUMP_CLIPS };
@@ -92,10 +99,35 @@ function jointPitch(joint: string, style: string, t: number): number {
     if (joint.startsWith("knee")) return (left ? 135 : 65) * coil;
     if (joint.startsWith("ankle")) return -35 * coil;
   }
-  if (style === "cannonball" || style === "back flip") {
+  if (style === "float") {
+    if (joint === "chest") return 20 * coil;
+    if (joint === "head") return -15 * coil;
+    if (joint.startsWith("shoulder")) return -80 * coil;
+    if (joint.startsWith("elbow")) return -25 * coil;
+    if (joint.startsWith("wrist")) return 20 * coil;
+    if (joint.startsWith("hip")) return 25 * coil;
+    if (joint.startsWith("knee")) return 30 * coil;
+  }
+  if (style === "bound") {
+    if (joint === "pelvis") return -30 * coil;
+    if (joint === "chest") return -40 * coil;
+    if (joint === "head") return 25 * coil;
+    if (joint.startsWith("shoulder")) return (left ? -60 : -140) * coil;
+    if (joint.startsWith("wrist")) return -30 * coil;
+  }
+  if (style === "twirl") {
+    if (joint === "chest") return -15 * coil;
+    if (joint === "head") return 10 * coil;
+    if (joint.startsWith("shoulder")) return -95 * coil;
+    if (joint.startsWith("elbow")) return 20 * coil;
+    if (joint.startsWith("hip")) return -15 * coil;
+    if (joint.startsWith("knee")) return 20 * coil;
+    if (joint.startsWith("ankle")) return -25 * coil;
+  }
+  if (style === "cannonball" || style === "back flip" || style === "front flip") {
     if (joint === "chest") return 45 * coil;
     if (joint === "head") return 30 * coil;
-    if (joint.startsWith("shoulder")) return (style === "cannonball" ? -105 : left ? -95 : -65) * coil;
+    if (joint.startsWith("shoulder")) return (style === "back flip" ? left ? -95 : -65 : -105) * coil;
     if (joint.startsWith("elbow")) return 85 * coil;
     if (joint.startsWith("hip")) return -110 * coil;
     if (joint.startsWith("knee")) return 140 * coil;
@@ -177,8 +209,12 @@ for (const gesture of gestures) {
     for (let frame = 0; frame <= frames; frame++) {
       const t = frame / frames;
       const progress = Math.max(0, Math.min(1, (t - 0.1) / 0.8));
-      const turn = gesture.flip ? (gesture.style === "back flip" ? -360 : 360) * progress * progress * (3 - 2 * progress) : -18 * Math.sin(Math.PI * t);
-      helper.Rotation?.Keys.push({ Frame: start + Math.round(frame * 1000 / 60), Vector: gesture.style === "twist" ? new Float32Array([0, 0, Math.sin(360 * progress * progress * (3 - 2 * progress) * Math.PI / 360), Math.cos(360 * progress * progress * (3 - 2 * progress) * Math.PI / 360)]) : pitch(new Float32Array([0, 0, 0, 1]), turn) });
+      const eased = progress * progress * (3 - 2 * progress);
+      // A float rises upright; a bound rears back, then pitches forward over the mount.
+      const lean = gesture.style === "float" ? -6 * Math.sin(Math.PI * t) : gesture.style === "bound" ? -35 * Math.sin(2 * Math.PI * Math.min(1, t / 0.7)) * (t < 0.35 ? 1 : 0.45) : -18 * Math.sin(Math.PI * t);
+      const turn = gesture.flip ? (gesture.style === "back flip" ? -360 : 360) * eased : lean;
+      const spin = (gesture.style === "twirl" ? 720 : 360) * eased * Math.PI / 360;
+      helper.Rotation?.Keys.push({ Frame: start + Math.round(frame * 1000 / 60), Vector: SPINS.has(gesture.style ?? "") ? new Float32Array([0, 0, Math.sin(spin), Math.cos(spin)]) : pitch(new Float32Array([0, 0, 0, 1]), turn) });
     }
     helper.Rotation?.Keys.sort((a, b) => a.Frame - b.Frame);
     ensure(articulated >= 2, `${fighter.name}: missing jump articulation`);

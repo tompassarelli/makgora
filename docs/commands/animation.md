@@ -24,7 +24,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `bun tools/animations/jump-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--character ID] [--no-preview]` appends
   movement-only jump gestures, including Blademaster's front flip
   (smashcraft:docs/fighter-animation-work.md). `--character` authors one selected
-  fighter's archetype double jump and retains other jump bindings; `--no-preview`
+  fighter's double jump in the style smashcraft:docs/design/animation-reference.md picks (Blademaster keeps his #230 flip) and retains other jump bindings; `--no-preview`
   skips silhouette sheets. Store the changed model family and refresh both body
   timelines and clip metadata before using the generated bindings.
   `bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT`
