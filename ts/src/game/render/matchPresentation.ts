@@ -8,7 +8,7 @@ import { Phase, type MatchState } from "../match/rules";
 import type { Character } from "../sim/codes";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { characterModelScale } from "../presentation/modelScale";
-import { MatchCue, MENU_MUSIC, cueSound, interfaceSoundPaths, presentationSoundPaths, readyVoice, victoryAnimation, victoryMusic, warcryVoice } from "../presentation/matchAudio";
+import { MatchCue, MENU_MUSIC, cueSound, defeatedAnimation, interfaceSoundPaths, presentationSoundPaths, readyVoice, victoryAnimation, victoryMusic, warcryVoice } from "../presentation/matchAudio";
 import {
   type ResultsView, clearMatchTally, confirmedFrameCues, createCueObservation, createMatchTally, createMenuCues, createMenuObservation,
   menuFrameCues, observeForCues,
@@ -55,7 +55,7 @@ interface VictoryPose {
   readonly character: Character;
   model: effect | undefined;
   readonly winnerClip: FighterOriginalClip;
-  readonly idleClip: FighterOriginalClip;
+  readonly defeatedClip: FighterOriginalClip;
 }
 
 export class MatchPresentation {
@@ -281,12 +281,11 @@ export class MatchPresentation {
       if (!isActive(world, slot)) continue;
       const character = fighterAt(world, slot).character;
       const winnerIndex = originalClipNamed(character, victoryAnimation(character));
-      const idleIndex = originalClipNamed(character, "stand") ?? originalClipNamed(character, "stand -1")
-        ?? originalClipNamed(character, "stand - 1") ?? originalClipNamed(character, "stand 1");
+      const defeatedIndex = originalClipNamed(character, defeatedAnimation(character));
       const winnerClip = winnerIndex === undefined ? undefined : originalClip(character, winnerIndex);
-      const idleClip = idleIndex === undefined ? undefined : originalClip(character, idleIndex);
-      if (winnerClip === undefined || idleClip === undefined) continue;
-      this.poses[slot] = { character, model: undefined, winnerClip, idleClip };
+      const defeatedClip = defeatedIndex === undefined ? undefined : originalClip(character, defeatedIndex);
+      if (winnerClip === undefined || defeatedClip === undefined) continue;
+      this.poses[slot] = { character, model: undefined, winnerClip, defeatedClip };
     }
   }
 
@@ -297,7 +296,7 @@ export class MatchPresentation {
       const pose = this.poses[row.slot];
       if (pose === undefined) continue;
       const winning = row.slot === view.winnerSlot;
-      const clip = winning ? pose.winnerClip : pose.idleClip;
+      const clip = winning ? pose.winnerClip : pose.defeatedClip;
       if (pose.model === undefined) {
         pose.model = AddSpecialEffect(clip.modelPath, this.origin.x, this.origin.y);
         hideEffect(pose.model, this.origin);
@@ -316,7 +315,8 @@ export class MatchPresentation {
       const cycle = winning ? duration / 2.0 : duration;
       let seconds = I2R(this.resultFrames) / 60.0;
       if (cycle <= 0.0) seconds = 0.0;
-      else seconds -= I2R(R2I(seconds / cycle)) * cycle;
+      else if (winning) seconds -= I2R(R2I(seconds / cycle)) * cycle;
+      else seconds = Math.min(seconds, Math.max(0.0, duration - 1.0 / 60.0));
       BlzSetSpecialEffectTime(model, (clip.timeline === true ? clip.startSeconds : 0.0) + start + seconds);
     }
   }

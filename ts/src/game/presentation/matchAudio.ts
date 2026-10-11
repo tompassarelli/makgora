@@ -183,6 +183,37 @@ const VICTORY_ANIMATIONS: Readonly<Record<Character, string>> = {
 
 export const victoryAnimation = (character: Character): string => VICTORY_ANIMATIONS[character];
 
+const DEFEATED_ANIMATIONS: Readonly<Record<Character, string>> = {
+  [Character.rifleman]: "death",
+  [Character.demonHunter]: "death",
+  [Character.blademaster]: "death",
+  [Character.mountainKing]: "death",
+  [Character.warden]: "death",
+  [Character.lich]: "death",
+  [Character.forsakenPaladin]: "death",
+  [Character.dreadlord]: "death",
+  [Character.shadowHunter]: "death",
+  [Character.pitLord]: "death",
+  [Character.beastmaster]: "death",
+  [Character.lichKing]: "death",
+  [Character.thrall]: "death",
+  [Character.jaina]: "death",
+  [Character.sylvanas]: "death",
+  [Character.cairne]: "death",
+  [Character.chen]: "death",
+  [Character.peon]: "death",
+  [Character.tinker]: "death",
+  [Character.kaelthas]: "death",
+  [Character.murloc]: "death",
+  [Character.grom]: "death",
+  [Character.anubarak]: "death",
+  [Character.malfurion]: "death",
+  [Character.medivh]: "death",
+  [Character.kobold]: "death",
+};
+
+export const defeatedAnimation = (character: Character): string => DEFEATED_ANIMATIONS[character];
+
 
 export function interfaceSoundPaths(characters: readonly Character[]): string[] {
   const paths = [...CUE_SOUNDS];
