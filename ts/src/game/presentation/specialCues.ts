@@ -115,7 +115,7 @@ const BIRTH_CUES = new Set([
   "DefendCaster", "ImpaleTargetDust", "GlaiveMissileTarget", "BlinkCaster", "FanOfKnivesCaster",
   "SpiritTouchTarget", "AnimateDeadTarget", "DarkRitualCaster", "FrostArmorDamage", "DarkRitualTarget",
   "HealTarget", "HolyBoltSpecialArt", "StampedeMissileDeath", "CarrionSwarmDamage", "SleepSpecialArt",
-  "HealingWaveTarget", "FeralSpiritDone", "PolymorphTarget", "AncestralSpiritCaster", "HowlCaster",
+  "FeralSpiritDone", "PolymorphTarget", "AncestralSpiritCaster", "HowlCaster",
   "FlameStrike1", "FreezingBreathMissile", "FrostNovaTarget", "DispelMagicTarget",
   "MassTeleportTarget", "WaterElementalMissile", "NeutralBuildingExplosion", "RedDragonMissile",
   "GoldCredit", "NagaDeath", "AIfbSpecialArt", "PolyMorphDoneGround", "UCancelDeath",
@@ -330,7 +330,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     down: { spell: "Sleep", startup: VAMPIRIC, active: cue("Abilities\\Spells\\Undead\\Sleep\\SleepSpecialArt.mdx", "hand", f32(0.8)) },
   },
   [Character.shadowHunter]: {
-    neutral: { spell: "Spirit Glaive", startup: VOODOO, active: cue("Abilities\\Spells\\Orc\\HealingWave\\HealingWaveTarget.mdx", "hand", f32(0.6)) },
+    neutral: { spell: "Spirit Glaive", startup: VOODOO, active: cue("Abilities\\Weapons\\ShadowHunterMissile\\ShadowHunterMissile.mdx", "hand", f32(0.25)) },
     side: { spell: "Serpent Ward", startup: VOODOO, active: cue("Abilities\\Spells\\Orc\\StasisTrap\\StasisTotemTarget.mdx", "ahead", f32(0.7)) },
     up: { spell: "Loa Vault", startup: cue("Abilities\\Spells\\Orc\\SpiritLink\\SpiritLinkTarget.mdx", "body", f32(0.7)), active: cue("Abilities\\Spells\\Orc\\FeralSpirit\\FeralSpiritDone.mdx", "feet", f32(0.8)) },
     down: { spell: "Hex", startup: VOODOO, active: cue("Abilities\\Spells\\Human\\Polymorph\\PolymorphTarget.mdx", "hand", f32(0.6)) },
