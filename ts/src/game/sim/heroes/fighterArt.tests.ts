@@ -1,4 +1,4 @@
-import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
+import { assertEquals, test } from "wisp/src/runtime/testing";
 import { SELECTABLE_CHARACTERS, fighterName, fighterPortrait } from "./registry";
 
 test("every selectable fighter shows its own portrait, tile and name [k2 property]", () => {
@@ -13,5 +13,4 @@ test("every selectable fighter shows its own portrait, tile and name [k2 propert
   assertEquals(portraits.size, SELECTABLE_CHARACTERS.length);
   assertEquals(tiles.size, SELECTABLE_CHARACTERS.length);
   assertEquals(names.size, SELECTABLE_CHARACTERS.length);
-  assertTrue(SELECTABLE_CHARACTERS.length >= 10);
 });

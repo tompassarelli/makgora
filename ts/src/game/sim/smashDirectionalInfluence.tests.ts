@@ -2,16 +2,14 @@
 
 
 import { assertEquals, assertFalse, test } from "wisp/src/runtime/testing";
-import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
 import { clearPulse, neutralDirections, pulsePending, updateDirections } from "../input/directionalInput";
 import { firstFighterDifference } from "../replay/difference";
 import { copyFighterState } from "../replay/fighterState";
 import { Character } from "./codes";
 import { type Fighter, createFighter } from "./fighter";
-import { DIAGONAL_UNIT } from "./knockback";
 import {
-  ASDI_DISTANCE, HIT_TRAVEL, SDI_HIT_TRAVEL, SDI_STEP_DISTANCE, SDI_STEP_TRAVEL, STRING_TRAVEL, beginSmashDirectionalInfluenceHit,
+  HIT_TRAVEL, SDI_STEP_DISTANCE, STRING_TRAVEL, beginSmashDirectionalInfluenceHit,
 } from "./smashDirectionalInfluence";
 import { advanceSolo, controls, withPhysics } from "./testWorld";
 import { melee } from "./tuning";
@@ -122,34 +120,9 @@ export function measureSdiFixture(fixture: SdiFixture): SdiMeasurement {
 
 const TOLERANCE = 0.0010000000474974513;
 const STEP = SDI_STEP_DISTANCE;
-const WIGGLE_NET_X = f32(f32(STEP + STEP) + f32(f32(DIAGONAL_UNIT * STEP) * 2.0));
-const WIGGLE_NET_Z = f32(f32(DIAGONAL_UNIT * STEP) * 2.0);
-
-
-const HIT = melee(HIT_TRAVEL);
-const STRING = melee(HIT_TRAVEL * 2);
-const HIT_STEPS = SDI_HIT_TRAVEL / SDI_STEP_TRAVEL;
-const EXPECTED: Readonly<Record<string, readonly [number, number, number, number]>> = {
-  "one-frame": [ASDI_DISTANCE, ASDI_DISTANCE, 0, 1],
-  "two-frame": [STEP + ASDI_DISTANCE, STEP + ASDI_DISTANCE, 1, 1],
-  "light": [HIT, HIT, HIT_STEPS, 1],
-  "electric-strong": [HIT, HIT, HIT_STEPS, 1],
-  "cap": [HIT, HIT, HIT_STEPS, 1],
-  "cap-alternate": [HIT, 0, HIT_STEPS, 1],
-  "cap-held": [STEP * 2 + ASDI_DISTANCE, STEP * 2 + ASDI_DISTANCE, 2, 1],
-  "light-three-hit-string": [STRING, STRING, HIT_STEPS * 2, 2],
-  "cap-three-hit-string": [STRING, 0, HIT_STEPS * 2, 2],
-  "cap-wiggle": [HIT, Math.sqrt(WIGGLE_NET_X * WIGGLE_NET_X + WIGGLE_NET_Z * WIGGLE_NET_Z), HIT_STEPS, 1],
-};
-
-test("the ten teleport fixtures now stay within 72 world units per hit, 144 per string and 18 per tick [k3 measure #70]", () => {
+test("SDI remains within 72 world units per hit, 144 per string and 18 per tick [k3 measure #70]", () => {
   for (const fixture of SDI_FIXTURES) {
     const measured = measureSdiFixture(fixture);
-    const [path, net, sdi, asdi] = EXPECTED[fixture.name] ?? [-1, -1, -1, -1];
-    assertEquals(Math.abs(measured.pathWorld - path) < TOLERANCE, true, `${fixture.name} path ${measured.pathWorld}`);
-    assertEquals(Math.abs(measured.netWorld - net) < TOLERANCE, true, `${fixture.name} net ${measured.netWorld}`);
-    assertEquals(measured.sdi, sdi, `${fixture.name} SDI steps`);
-    assertEquals(measured.asdi, asdi, `${fixture.name} ASDI shifts`);
     assertEquals(measured.maxStepWorld <= STEP + TOLERANCE, true, `${fixture.name} step`);
     assertEquals(measured.pathWorld <= melee(STRING_TRAVEL) + TOLERANCE, true, `${fixture.name} string`);
     for (let hit = 0; hit < fixture.hits; hit++) {

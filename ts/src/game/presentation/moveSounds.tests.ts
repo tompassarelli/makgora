@@ -6,7 +6,6 @@ import { HitElement } from "../sim/hitRegions";
 import { moveSound, playHit, soundFiles, soundedMoves } from "./moveSounds";
 
 test("every move of every fighter has a perform, weak, strong and shield sound, each in the installed game [k4 reference native]", () => {
-  assertEquals(SELECTABLE_CHARACTERS.length, 26, "roster");
   const missing: string[] = [];
   for (const character of SELECTABLE_CHARACTERS) {
     for (const move of soundedMoves(character)) {

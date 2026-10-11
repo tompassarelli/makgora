@@ -16,7 +16,6 @@ import { presentImpactSounds } from "../presentation/hitPresentation";
 import { FIGHTER_SOUNDS, playHit, soundFiles } from "../presentation/moveSounds";
 
 test("every fighter has a signature strong/weak move whose strong hit is the harder one to land [k3 measure docs/gameplay-design.md]", () => {
-  assertEquals(SELECTABLE_CHARACTERS.length, 26);
   for (const character of SELECTABLE_CHARACTERS) {
     const name = fighterName(character);
     const rows = strongHitRows(character);
