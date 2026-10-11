@@ -48,6 +48,14 @@ refresh command) when they change clips or model build inputs, in a few seconds 
 It checks the working tree, so push from a clean checkout of the commit.
 A push to main then needs a green farm suite (`bun wisp farm test`) on the exact commit it pushes: the gate reuses a farm run already green on that commit, else runs one and waits (about 4 minutes), and refuses on any failure, main's known ones included (#394). The repository's .safe-push sets `landing.queue = autoland`, so `safe-push --to main` runs the local checks, then hands the lane to Autoland's one queue, which farms each batch of waiting lanes once and lands the exact commit it tested (smashcraft:docs/ci.md, "Autoland"); a lane that changes `.github/workflows/` lands directly through the gate.
 
+Farm's internal `bun scripts/farmReceipt.ts record lua|census SHARD LUA` records
+tracked content, emitted bundles, runtime, pin and oracle hashes alongside the
+existing shard artifacts. `merge MERGED BUDGET CENSUS` adds their content keys
+to `farm-test-summary` only after all three gates pass and every Lua and census
+manifest names the tested candidate and tree. Autoland supplies its exact base;
+manual runs may record an unknown base. These receipts keep source stamps and
+leave result reuse disabled.
+
 Main stays green. Each CI run on main opens, updates or closes the one
 "main is red" issue (smashcraft:.github/workflows/main-red.yml), which lists the
 failing tests and the first failing commit; the pre-push gate prints that list

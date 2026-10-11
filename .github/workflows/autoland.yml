@@ -243,6 +243,7 @@ jobs:
     uses: ./.github/workflows/farm-test.yml
     with:
       ref: ${{ needs.reports.outputs.sha }}
+      base: ${{ needs.build.outputs.base }}
 
   land:
     needs: [build, reports, suite]

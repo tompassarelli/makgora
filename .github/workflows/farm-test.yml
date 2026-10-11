@@ -13,6 +13,9 @@ on:
       tag:
         description: Names the run so `bun wisp farm test` can find the one it dispatched
         default: ""
+      base:
+        description: Exact base of a tested Autoland candidate, when known
+        default: ""
       farm-runner:
         description: Runner label for the even shard jobs in place of the FARM_RUNNER variable (measures a box before enabling it)
         default: ""
@@ -25,6 +28,9 @@ on:
       tag:
         type: string
         default: ""
+      base:
+        type: string
+        default: ""
 
 run-name: Farm test ${{ inputs.ref }} ${{ inputs.tag }}
 
@@ -32,6 +38,7 @@ permissions:
   contents: read
 
 env:
+  FARM_BASE: ${{ inputs.base || 'unknown' }}
   SWEEP_PLACEMENT: gate
   BUN_SHARDS: 3
   # Lua runs one core a process: each Lua job runs LUA_PER_JOB shards at once.
@@ -259,6 +266,9 @@ jobs:
           failed=0
           for pid in "${pids[@]}"; do wait "$pid" || failed=1; done
           for log in build/lua-*.log; do echo "== $log"; cat "$log"; done
+          if [ "$failed" = 0 ]; then
+            bun scripts/farmReceipt.ts record lua "${{ matrix.job }}" "$LUA" || exit "$?"
+          fi
           exit "$failed"
       - if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
@@ -268,6 +278,7 @@ jobs:
             ts/result-lua-*.json
             ts/problems-*.txt
             ts/build/lua-cost-*.tsv
+            ts/input-lua-*.json
           retention-days: 3
 
   # The rest of main's CI, each check a result row of its own; a failing check
@@ -396,6 +407,9 @@ jobs:
           mkdir -p census-out
           fighters=$(cut -f2 test/fixtures/perf/census-pairs.txt | sed 's/ vs .*//' | awk -v n="$CENSUS_SHARDS" -v s="${{ matrix.shard }}" '(NR - 1) % n == s { printf " --fighter %s", $0 }')
           bun wisp perf census $fighters --jobs 2 --rise-ms 1000 --pairs "census-out/census-pairs-${{ matrix.shard }}.txt"
+          LUA=$(bun node_modules/wisp/scripts/wisp/lua32.ts stock)
+          bun scripts/farmReceipt.ts record census "${{ matrix.shard }}" "$LUA"
+          mv "input-census-${{ matrix.shard }}.json" census-out/
       - if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
@@ -474,6 +488,7 @@ jobs:
           fi
           find farm -name 'problems-*.txt' -exec sh -c 'cat "$1"; echo' _ {} \; >> problems.txt
           jq --rawfile extra problems.txt '.problems = ($extra | split("\n") | map(select(test("\\S")))) + .problems' summary.json > summary.next && mv summary.next summary.json
+          bun scripts/farmReceipt.ts merge "$merged" "$budget" "$census" || exit "$?"
           cat summary.json
           [ "$merged" = 0 ] && [ "$budget" = 0 ] && [ "$census" = 0 ]
       - if: always()
