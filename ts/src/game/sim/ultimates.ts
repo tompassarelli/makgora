@@ -288,7 +288,7 @@ const MALFURION: AuthoredSpecial = {
   name: "Wisps of Hyjal", endFrame: 50,
   projectiles: [
     mark("Abilities\\Spells\\NightElf\\Tranquility\\TranquilityTarget.mdx", 2, 26, 0.0),
-    shot(29, 60.0, 70.0, 7.0, 0.0, 120, 70.0, hit(20.0, 50, 90.0, 45.0, HitElement.holy), "Abilities\\Weapons\\KeeperGroveMissile\\KeeperGroveMissile.mdx"),
+    shot(29, 60.0, 70.0, 7.0, 0.0, 120, 70.0, hit(20.0, 50, 90.0, 45.0, HitElement.holy), "Units\\NightElf\\Wisp\\Wisp.mdx"),
   ],
 };
 
