@@ -115,7 +115,7 @@ test("replaying a hero special from a restored snapshot reproduces every fighter
   assertEquals(firstFighterDifference(endTarget, target, 3, 3), undefined);
 });
 
-test("seed 448's 18 aerial down-special landings, 11 offstage casts and falling trap reach an effect and replay every frame [k1 scenario]", () => {
+test("seed 448's early down-special landings, first-window Grom landing, 11 offstage casts and falling trap replay every frame [k1 scenario]", () => {
   const characters = [Character.blademaster, Character.mountainKing, Character.lich, Character.dreadlord,
     Character.shadowHunter, Character.pitLord, Character.chen, Character.peon, Character.tinker,
     Character.kaelthas, Character.grom, Character.kobold, Character.rifleman, Character.forsakenPaladin,
@@ -128,7 +128,7 @@ test("seed 448's 18 aerial down-special landings, 11 offstage casts and falling 
       || character === Character.cairne || character === Character.murloc || character === Character.anubarak || character === Character.malfurion;
     const falls = character === Character.mountainKing || character === Character.lich || character === Character.dreadlord
       || character === Character.shadowHunter || character === Character.pitLord || character === Character.grom;
-    for (let setup = 0; setup < (falls || character === Character.rifleman ? 2 : 1); setup++) {
+    for (let setup = 0; setup < (character === Character.grom ? 3 : falls || character === Character.rifleman ? 2 : 1); setup++) {
       const fallingTrap = character === Character.rifleman && setup === 1;
       const offstage = aerial && !fallingTrap;
       const live = createReplaySnapshot();
@@ -136,7 +136,7 @@ test("seed 448's 18 aerial down-special landings, 11 offstage casts and falling 
       const owner = fighterAt(live.world, 0);
       copyFighterState(owner, createFighter(character, offstage ? 900.0 : 100.0, 1), 3);
       copyFighterState(fighterAt(live.world, 1), createFighter(Character.rifleman, -480.0, 1), 3);
-      owner.motion.z = fallingTrap ? 600.0 : setup === 0 && !offstage ? 40.0 : 240.0;
+      owner.motion.z = fallingTrap ? 600.0 : setup === 2 ? 310.0 : setup === 0 && !offstage ? 40.0 : 240.0;
       owner.motion.vz = fallingTrap ? 0.0 : setup === 0 && !offstage ? -1.0 : -4.0;
       owner.motion.grounded = false;
       owner.motion.surface = undefined;
@@ -167,6 +167,7 @@ test("seed 448's 18 aerial down-special landings, 11 offstage casts and falling 
           assertEquals(owner.special.action, fallingTrap ? SpecialAction.riflemanTrap : SpecialAction.heroDown);
           assertEquals(owner.special.form, 0);
           assertEquals(owner.special.frame, tick);
+          if (setup === 2) assertEquals(tick, 19);
         }
         const move = runningHeroSpecial(owner);
         if (owner.freezeTrap.life > 0 && owner.freezeTrap.surface === undefined) assertGreaterThan(owner.freezeTrap.arming, 0);
@@ -187,6 +188,6 @@ test("seed 448's 18 aerial down-special landings, 11 offstage casts and falling 
       scenarios++;
     }
   }
-  assertEquals(scenarios, 30);
+  assertEquals(scenarios, 31);
 });
 

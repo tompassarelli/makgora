@@ -473,7 +473,7 @@ export function landHeroSpecial(f: Fighter): boolean {
     let groundFirstEffect = ground.endFrame;
     for (const form of [move, ground]) {
       let first = form.endFrame;
-      for (const region of form.regions ?? []) first = min(first, region.firstFrame - 1);
+      for (const region of form.regions ?? []) first = min(first, region.firstFrame);
       for (const projectile of form.projectiles ?? []) first = min(first, projectile.spawnFrame);
       first = min(first, form.placement?.frame ?? first);
       first = min(first, form.command?.frame ?? first);
