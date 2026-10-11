@@ -13,7 +13,7 @@ const Job = Schema.Struct({ id: Schema.Finite, name: Schema.String, status: Sche
 const Run = Schema.Struct({ id: Schema.Finite, path: Schema.String, status: Schema.String, run_attempt: Schema.Finite, created_at: Schema.String, updated_at: Schema.String, display_title: Schema.String });
 const History = Schema.Array(Schema.Struct({ id: Schema.Finite, workflow: Schema.Literals(WATCHED_WORKFLOWS), run_attempt: Schema.Finite, status: Schema.String, jobs: Schema.Array(Job) }));
 const Receipt = Schema.Struct({ runId: Schema.Finite, jobId: Schema.Finite, line: Schema.String,
-  priorFailure: Schema.Boolean, requestedAt: Schema.Finite, phase: Schema.Literals(["cancel", "retry", "done"]), alerted: Schema.Array(Schema.String) });
+  priorFailure: Schema.Boolean, requestedAt: Schema.Finite, cancelledAt: Schema.NullOr(Schema.String), retryAt: Schema.NullOr(Schema.Finite), phase: Schema.Literals(["cancel", "retry", "done"]), alerted: Schema.Array(Schema.String) });
 const Receipts = Schema.Array(Receipt);
 const { values } = parseArgs({ args: process.argv.slice(2), options: {
   help: { type: "boolean" }, "probe-run": { type: "string" }, baseline: { type: "boolean" }, once: { type: "boolean" }, apply: { type: "boolean" }, state: { type: "string" }, repo: { type: "string" },
@@ -57,17 +57,17 @@ const refresh = Effect.gen(function*() {
       if (name === "autoland.yml" && !/^Autoland (test|train)(?: |$)/.test(run.display_title)) continue;
       if (Date.parse(run.updated_at) < now - 7 * 24 * 60 * 60 * 1000) continue;
       for (let attempt = 1; attempt <= run.run_attempt; attempt++) {
-      if (known.has(`${run.id}:${attempt}`)) continue;
-      if (requests >= 800) return yield* new WatchdogFailure({ problem: "baseline exceeded its total 800 REST request budget; partial history saved, refresh again before monitoring" });
-      if (requests % 100 === 0) {
+        if (known.has(`${run.id}:${attempt}`)) continue;
+        if (requests >= 800) return yield* new WatchdogFailure({ problem: "baseline exceeded its total 800 REST request budget; partial history saved, refresh again before monitoring" });
+        if (requests % 100 === 0) {
+          requests++;
+          const limit = yield* gh("api", "rate_limit").pipe(Effect.flatMap(Schema.decodeEffect(Schema.fromJsonString(Schema.Struct({ resources: Schema.Struct({ core: Schema.Struct({ remaining: Schema.Finite }) }) })))));
+          if (limit.resources.core.remaining <= 3000) return yield* new WatchdogFailure({ problem: "baseline stopped at shared 3000-call reserve" });
+        }
+        history = [...history, { id: run.id, workflow: name, run_attempt: attempt, status: run.status, jobs: yield* jobs(run.id, attempt) }];
         requests++;
-        const limit = yield* gh("api", "rate_limit").pipe(Effect.flatMap(Schema.decodeEffect(Schema.fromJsonString(Schema.Struct({ resources: Schema.Struct({ core: Schema.Struct({ remaining: Schema.Finite }) }) })))));
-        if (limit.resources.core.remaining <= 3000) return yield* new WatchdogFailure({ problem: "baseline stopped at shared 3000-call reserve" });
-      }
-      history = [...history, { id: run.id, workflow: name, run_attempt: attempt, status: run.status, jobs: yield* jobs(run.id, attempt) }];
-      requests++;
-      yield* save(`${state}/history.json`, history);
-      if (requests % 25 === 0) yield* Console.log(`baseline: ${requests} REST requests, ${baselines(history, now).length} comparable groups`);
+        yield* save(`${state}/history.json`, history);
+        if (requests % 25 === 0) yield* Console.log(`baseline: ${requests} REST requests, ${baselines(history, now).length} comparable groups`);
       }
     }
   }
@@ -118,7 +118,7 @@ const monitor = Effect.gen(function*() {
       yield* remember({ ...receipt, phase: "done" });
       continue;
     }
-    receipt = { ...receipt, phase: "retry" };
+    receipt = { ...receipt, phase: "retry", cancelledAt: completed.find(job => job.id === receipt.jobId)?.completed_at ?? null, retryAt: yield* Clock.currentTimeMillis };
     yield* remember(receipt);
     yield* gh("api", "--method", "POST", `repos/${repo}/actions/runs/${run.id}/rerun-failed-jobs`);
   }
@@ -151,7 +151,7 @@ const monitor = Effect.gen(function*() {
     }
     if (name === undefined || !overruns([{ id: current.id, workflow: name, status: current.status, run_attempt: current.run_attempt, jobs: currentJobs }], history, yield* Clock.currentTimeMillis).some(row => row.jobId === candidate.jobId)) continue;
     const notice = currentJobs.some(job => job.conclusion === "failure") ? line.replace(", hosted retry", ", existing failure preserved; no retry") : line;
-    yield* remember({ runId: candidate.runId, jobId: candidate.jobId, line: notice, priorFailure: currentJobs.some(job => job.conclusion === "failure"), requestedAt: now, phase: "cancel", alerted: [] });
+    yield* remember({ runId: candidate.runId, jobId: candidate.jobId, line: notice, priorFailure: currentJobs.some(job => job.conclusion === "failure"), requestedAt: now, cancelledAt: null, retryAt: null, phase: "cancel", alerted: [] });
     yield* gh("api", "--method", "POST", `repos/${repo}/actions/runs/${candidate.runId}/cancel`);
     acted.add(candidate.runId);
   }
