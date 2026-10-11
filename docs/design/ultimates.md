@@ -48,7 +48,7 @@ Beams (Rifleman, Jaina), transformations (Illidan, Mountain King), rushes
 (Blademaster, Grom, Kobold), self-centred areas (Shadow Hunter, Kael'thas,
 Anub'arak, Chen), placed or targeted areas (Dreadlord, Forsaken Paladin,
 Lich King, Medivh), sweeps and summons (Murloc, Lich, Beastmaster, Warden,
-Thrall, Peon, Tinker, Malfurion), a status projectile (Sylvanas), a counter
+Thrall, Peon, Tinker, Malfurion), a status projectile (Sylvanas), a return to centre
 (Cairne) and command throws (Pit Lord, Grom's catch). Ground sweeps are
 answered by jumping, the high Frost Wyrm by staying low.
 
@@ -74,7 +74,7 @@ Frames count from the input frame (frame 1 is the first frame after it).
 | Thrall | **Earthquake** · Warcraft III Far Seer ultimate (tier 1) | Raises the Doomhammer; cracks run both ways, f1–26 | f27 two ground tremors run outward both ways, 16 a frame for 50 frames, grounded foes only; 15%, 70° | Jump, stand on a platform, shield; punish him through f60 | The shaman shaking the world | Earthquake target and caster effects |
 | Jaina | **Glacial Ray** · Jaina in the Battle of Dazar'alor (tier 2: Mass Teleport cannot be a strike) | Staff charges; a frost line at 45° above her, f1–24 | f25, f33, f41, f49 four frost bolts sweep from 45° up to the floor ahead, 600 long each: three 5% glances, then 10% at 30° | Get behind or under the early bolts, shield; punish f55–80 | Her admiral-era fury in one sweep | BreathOfFrost, frost bolt, Blizzard target |
 | Sylvanas | **Charm** · Warcraft III Dark Ranger ultimate (tier 1) | Draws a violet spectral arrow, f1–20 | f21 a slow banshee spirit, 10 a frame for 90 frames: 8%, then 3 s of Charm: the victim's left and right are swapped | Jump or shield the slow spirit; a charmed player still acts; punish her through f40 | Her mind games, without taking control away | Banshee missile, Possession effects |
-| Cairne | **Reincarnation** · Warcraft III Tauren Chieftain ultimate (tier 1, reimagined: it triggers on death in WC3) | Totem driven down, ancestral light rises, f1–6 | f7–50 he is untouchable; any strike or projectile that reaches him raises a spirit pillar, radius 140: 18%, 70° | Do not strike: wait it out, or bait it with a projectile from outside the pillar; punish a whiff f51–75 | The old chief who will not stay down | Reincarnation target, ancestral spirit |
+| Cairne | **Reincarnation** · Warcraft III Tauren Chieftain ultimate (tier 1, reimagined: it triggers on death in WC3) | The Reincarnation ankh appears at centre stage on the deck, f1–24 (24 frames from ankh to burst) | f25 light and a small shockwave burst from the ankh, radius 90: 12%, 70°, base 40, growth 80; next frame he teleports to the ankh, intangible for 6 frames. Total 50 | Shield or leave the ankh; punish his arrival recovery through f50 | The old chief who will not stay down, returning to the ancestors' mark | Reincarnation target, Resurrect target, War Stomp caster |
 | Chen | **Storm, Earth and Fire** · Warcraft III Brewmaster ultimate (tier 1) | He splits; three spirits appear, f1–20 | Earth stomps both sides (f21, radius 120, 8%), Storm strikes 220 ahead (f33, 7%), Fire breathes behind him (f45, 9%) | Each spirit hits once in its own place and time: read the order, shield, or roll through | His three-way split as one combination | Storm, Earth and Fire Pandaren effects, Breath of Fire |
 | Peon | **Timber!** · orc peons chopping trees (unit) | A big tree sprouts beside him; he chops three times, f1–36 | f37–48 the tree falls forward, 420 long, from upright to flat: 20%, 40°, base 45 | Stand behind him or past the treetop, shield, or hit him while he chops | Work work, and finally work complete | Ashenvale tree, lumber target art |
 | Goblin Tinker | **Robo-Goblin Overdrive** · Warcraft III Tinker ultimate (tier 1, reimagined: Robo-Goblin is his down special) | He hops out; the robot waddles forward beeping, f1–20 | The robot walks 6 a frame for 60 frames, then explodes, radius 150: 22%, 55°; touching it explodes it early | Walk away, shield the blast, or punish Tinker through f50 | Goblin engineering that is almost a weapon | Robo-Goblin unit, goblin land mine explosion |
@@ -95,13 +95,13 @@ Frames count from the input frame (frame 1 is the first frame after it).
   the speed and heavy item buffs; Charm is a status that swaps left and right.
 - smashcraft:ts/src/game/sim/ultimates.tests.ts plays each ultimate as a
   recorded scenario in both facings: it lands undefended without a KO from
-  0%, its defence (shield, spot dodge, staying grounded, not striking) takes
+  0%, its defence (shield, spot dodge, staying grounded) takes
   no damage, its first threat is at least frame 16 and its user stays
   committed at least 16 frames past it. Six `ultimate-*` parity tapes replay
   ultimates with rollbacks in Bun and both Lua32 modes.
 - Computer fighters press it at a full bar when the target is inside the
   move's authored reach (ULTIMATE_REACH), as often as their kit options;
   Rookie never does, Lich presses it at a target in the air within 600, a
-  raised shield stops the press, and Cairne (a counter) does not aim it yet.
+  raised shield stops the press, and Cairne does not aim it yet.
 - "Ultimates off" is MatchState.ultimatesOff (fighter-selection rules,
   `-dev ultimates on|off`); it clears the input before specials start.
