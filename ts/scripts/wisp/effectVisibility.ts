@@ -56,8 +56,11 @@ const anyAbove = (values: readonly number[]) => values.some((value) => value > 0
 /** Whether a Classic model draws anything while one use plays it: an emitter that emits (needs a running clock) or a geoset with a visible layer, each with a resolving texture. */
 export function effectVisibility(model: mdx.Model, use: Pick<EffectUse, "sequence" | "seconds" | "timeScale">, textureResolves: (path: string) => boolean): EffectVerdict {
   const sequences = model.Sequences.map((sequence) => ({ name: sequence.Name, start: sequence.Interval[0] ?? 0, end: sequence.Interval[1] ?? 0, looping: !sequence.NonLooping, rarity: sequence.Rarity }));
-  const wanted = use.sequence === undefined ? ["birth", "stand"] : [use.sequence];
-  const picked = wanted.map((name) => selectSequence(sequences, name)).filter((index) => index >= 0);
+  const requested = use.sequence;
+  const wanted = requested === undefined ? ["birth", "stand"] : [requested];
+  const found = wanted.map((name) => selectSequence(sequences, name)).filter((index) => index >= 0);
+  const named = requested !== undefined && sequences.some(({ name }) => name.toLowerCase().includes(requested.toLowerCase()));
+  const picked = found.length > 0 ? found : sequences.length > 0 && !named ? [0] : [];
   if (sequences.length > 0 && picked.length === 0) return { visible: false, reason: `no ${wanted.join("/")} sequence (has ${sequences.map(({ name }) => name).join(", ")})` };
   const windows: { readonly sequence: Window; readonly window: Window; readonly name: string }[] = picked.length === 0
     ? [{ sequence: [0, 0], window: [0, 0], name: "none" }]
