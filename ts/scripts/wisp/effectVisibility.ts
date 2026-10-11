@@ -75,7 +75,7 @@ export function effectVisibility(model: mdx.Model, use: Pick<EffectUse, "sequenc
     if (replaceable !== undefined && replaceable > 0) return true;
     const image = id === undefined ? undefined : model.Textures[id];
     if (image === undefined) return false;
-    return image.ReplaceableId > 0 || textureResolves(image.Image);
+    return (image.ReplaceableId ?? 0) > 0 || textureResolves(image.Image);
   };
   const reasons: string[] = [];
   for (const { sequence, window, name } of windows) {
@@ -146,7 +146,8 @@ export function effectUses(): EffectUse[] {
       if (move === undefined) continue;
       for (const [phase, cue] of [["startup", move.startup], ["active", move.active]] as const) {
         if (cue.drawn === true) {
-          const travelling = heroDefinition(character)?.specials[slot] !== undefined && heroProjectileArt(heroDefinition(character)!.specials).some((art) => art.slot === slot && (art.spec.velocityX !== 0 || art.spec.velocityZ !== 0) && art.spec.model === cue.model);
+          const specials = heroDefinition(character)?.specials;
+          const travelling = specials !== undefined && specials[slot] !== undefined && heroProjectileArt(specials).some((art) => art.slot === slot && (art.spec.velocityX !== 0 || art.spec.velocityZ !== 0) && art.spec.model === cue.model);
           if (!travelling && /missile/i.test(cue.model)) uses.push({ fighter, move: `${slotMove(slot)} ${move.spell} ${phase}`, kind: "special cue", model: cue.model, sequence: undefined, seconds: 0, timeScale: 1, travels: true, anchored: "fighter" });
           continue;
         }
