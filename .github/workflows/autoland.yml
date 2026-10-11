@@ -240,7 +240,7 @@ jobs:
             out sha "$(git rev-parse HEAD)"
             exit 0
           fi
-          { echo "Changed rows (old → new):"; echo '```diff'; git diff -U0 -- tools/move-data/advantage-state.md | grep -E '^[-+]\|' | head -200; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          { echo "Changed rows (old → new):"; echo '```diff'; git diff -U0 -- tools/move-data/advantage-state.md | grep -E '^[-+]\|' | head -200 || true; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           git config user.name "github-actions[bot]"
           git config user.email "41898183+github-actions[bot]@users.noreply.github.com"
           git commit -q -m "Regenerate reports for $(echo $BRANCHES)" -- "${reports[@]}"
