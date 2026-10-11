@@ -5,6 +5,7 @@ import { encodeVerified, fighters, hash, parseSource, tracks } from './original-
 import { timelineBody } from './timeline-body';
 import { checkTimelineGeosets } from './timeline-geosets';
 import { thinKeys } from '../../ts/scripts/keyThin';
+import { playedMoves } from './hd-models';
 import { flashableSequences } from './white-flash-keys';
 import { modelFacts } from '../../ts/node_modules/wisp/scripts/wisp/models';
 import { MODEL_FACTS } from '../../ts/scripts/wisp/modelFacts';
@@ -20,8 +21,11 @@ const fighter = [...fighters.values()].find(fighter => fighter.name === fighterN
 if (fighter === undefined) throw new Error(`Unknown fighter ${fighterName}`);
 await Effect.runPromise(Effect.tryPromise({ try: async () => {
 
-    const source = thinKeys(parseSource(await Bun.file(join(assets, fighter.source)).arrayBuffer())).model;
-    const played = flashableSequences([...fighters].find(([, item]) => item === fighter)![0], source.Sequences);
+    const sourceBytes = await Bun.file(join(assets, fighter.source)).arrayBuffer();
+    const source = thinKeys(parseSource(sourceBytes)).model;
+    const indices = playedMoves([...fighters].find(([, item]) => item === fighter)![0], source).classic;
+    const played = source.Sequences.filter((_, index) => indices.includes(index));
+    const retained = flashableSequences([...fighters].find(([, item]) => item === fighter)![0], source.Sequences);
     const bytes = encodeVerified(timelineBody(source, played));
     const geosets = checkTimelineGeosets(source, parseSource(bytes), played);
     console.log(`TIMELINE_GEOSETS_PASS ${fighter.name}: ${JSON.stringify(geosets)}`);
@@ -33,7 +37,7 @@ await Effect.runPromise(Effect.tryPromise({ try: async () => {
     if (reference === undefined) throw new Error(`Missing clip-pool reference for ${fighter.name}`);
     const timeline = new DrawnModel(bytes, 1);
     let samples = 0, maximumDifference = 0;
-    for (const sequence of played) {
+    for (const sequence of retained) {
         const index = source.Sequences.indexOf(sequence), clip = reference.clips[index];
         const pool = new DrawnModel(await Bun.file(join(assets, 'original-clips-static-lights/imports/war3mapImported', clip.filename)).arrayBuffer(), 1);
         const duration = (sequence.Interval[1] - sequence.Interval[0]) / 1000;
@@ -47,7 +51,23 @@ await Effect.runPromise(Effect.tryPromise({ try: async () => {
             samples++;
         }
     }
-    console.log(`HEADLESS_TIMELINE_POSES_PASS ${fighter.name}: ${played.length} clips, ${samples} both-facing frame samples, max ${maximumDifference} world units versus clip pool`);
+    console.log(`HEADLESS_TIMELINE_POSES_PASS ${fighter.name}: ${retained.length} retained clips, ${samples} both-facing frame samples, max ${maximumDifference} world units versus clip pool`);
+    const authored = new DrawnModel(sourceBytes, 1);
+    let victorySamples = 0, maximumVictoryDifference = 0;
+    for (const sequence of played.filter(sequence => !retained.includes(sequence))) {
+        const index = source.Sequences.indexOf(sequence);
+        const duration = (sequence.Interval[1] - sequence.Interval[0]) / 1000;
+        for (let frame = 0; frame <= Math.ceil(duration * 60); frame++) for (const facing of [-1, 1]) {
+            const seconds = Math.min(duration, frame / 60);
+            const expected = authored.triangles(index, seconds, facing);
+            const actual = timeline.triangles(0, sequence.Interval[0] / 1000 + seconds, facing);
+            if (actual.length !== expected.length) throw new Error(`${fighter.name}/${index} victory frame ${frame}: authored triangle count changed`);
+            for (let coordinate = 0; coordinate < actual.length; coordinate++) maximumVictoryDifference = Math.max(maximumVictoryDifference, Math.abs(actual[coordinate] - expected[coordinate]));
+            if (maximumVictoryDifference > 0.001) throw new Error(`${fighter.name}/${index} victory frame ${frame}: authored pose differs by ${maximumVictoryDifference}`);
+            victorySamples++;
+        }
+    }
+    console.log(`HEADLESS_TIMELINE_VICTORY_PASS ${fighter.name}: ${victorySamples} both-facing frame samples, max ${maximumVictoryDifference} world units versus authored source`);
     const sha256 = hash(bytes), filename = `${fighter.name}TimelineBody-${sha256}.mdx`;
     await Bun.write(join(output, 'imports/war3mapImported', filename), bytes);
     const evidencePath = join(output, 'original-clips-evidence.json');

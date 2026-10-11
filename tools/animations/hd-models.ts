@@ -1,10 +1,10 @@
-import { model as mdx } from '../../ts/scripts/clipNodes';
+import { ModelRenderer, model as mdx } from '../../ts/scripts/clipNodes';
 import { checkBodySkin, checkRetarget, generateHdBody, parseHdBody, retargetHd } from './hd-retarget';
 import { canonicalMotion, classicSkeleton, rigNode, type FighterRig } from './canonical-rig';
 import { timelineBody } from './timeline-body';
 import { flashableSequences } from './white-flash-keys';
 import { slopeTangents, thinKeys } from '../../ts/scripts/keyThin';
-import { encodeVerified, fighters, parseSource } from './original-clips';
+import { encodeVerified, fighters, onGlobalClock, parseSource, tracks } from './original-clips';
 import { DEFINITIVE_FIGHTERS } from '../../ts/src/game/assets/definitiveFighters';
 import type { Character } from '../../ts/src/game/sim/codes';
 import { victoryAnimation } from '../../ts/src/game/presentation/matchAudio';
@@ -12,23 +12,56 @@ import { fitWardenBlade } from './warden-blade-fit';
 
 const BLADE_FITS: Readonly<Record<number, typeof fitWardenBlade>> = { 5: fitWardenBlade };
 
-const normalize = (name: string) => name.replace(/\s+\d+$/, '').replaceAll(/\s+/g, '').toLowerCase();
+const normalize = (name: string) => name.replaceAll(/\s+/g, '').toLowerCase();
 
-/** The sequence indices each body plays: the fighter's production clips, and in Definitive its victory pose too. */
 export interface PlayedMoves { readonly classic: readonly number[]; readonly definitive: readonly number[] }
 export function playedMoves(character: number, motion: mdx.Model): PlayedMoves {
     const played = flashableSequences(character, motion.Sequences).map(sequence => motion.Sequences.indexOf(sequence));
     const victory = normalize(victoryAnimation(character));
-    const definitive = new Set(played);
-    motion.Sequences.forEach((sequence, index) => { if (normalize(sequence.Name) === victory) definitive.add(index); });
-    return { classic: played, definitive: [...definitive].sort((a, b) => a - b) };
+    const shown = new Set(played);
+    motion.Sequences.forEach((sequence, index) => { if (normalize(sequence.Name) === victory) shown.add(index); });
+    const indices = [...shown].sort((a, b) => a - b);
+    return { classic: indices, definitive: indices };
 }
 const selected = (model: mdx.Model, indices: readonly number[]) => model.Sequences.filter((_, index) => indices.includes(index));
+
+function requireVictoryKeys(body: mdx.Model, motion: mdx.Model, character: number): void {
+    const name = normalize(victoryAnimation(character));
+    const sequence = motion.Sequences.find(sequence => normalize(sequence.Name) === name);
+    if (sequence === undefined) throw new Error(`Fighter ${character}: no stock victory sequence ${name}`);
+    const [start, end] = sequence.Interval;
+    let keys = 0;
+    tracks(body, (track, path) => {
+        if (onGlobalClock(track) || !/^\.(Bones|Helpers)\.\d+\.(Translation|Rotation|Scaling)$/.test(path)) return;
+        keys += track.Keys.filter(key => key.Frame >= start && key.Frame <= end).length;
+    });
+    if (keys === 0) throw new Error(`Fighter ${character}: body has no victory pose keys at ${start}..${end}`);
+    const idle = ['stand', 'stand -1', 'stand - 1', 'stand 1'].map(name => motion.Sequences.find(sequence => normalize(sequence.Name) === normalize(name))).find(sequence => sequence !== undefined);
+    if (idle === undefined) throw new Error(`Fighter ${character}: no stock idle sequence`);
+    const renderer = new ModelRenderer(body);
+    const state = Reflect.get(renderer, 'rendererData') as { frame: number; nodes: ({ matrix: Float32Array } | undefined)[] };
+    renderer.setSequence(0);
+    state.frame = idle.Interval[0];
+    renderer.update(0);
+    const idlePose = state.nodes.map(node => node === undefined ? undefined : Array.from(node.matrix));
+    let different = false;
+    for (let frame = 12; frame <= 180; frame += 6) {
+        state.frame = Math.min(start + frame * 1000 / 60, Math.max(start, end - 1000 / 60));
+        renderer.update(0);
+        for (const [index, node] of state.nodes.entries()) {
+            const rest = idlePose[index];
+            if (node !== undefined && rest !== undefined && node.matrix.some((value, axis) => Math.abs(value - rest[axis]) > 0.00001)) different = true;
+        }
+    }
+    if (!different) throw new Error(`Fighter ${character}: victory body is idle throughout the result shot`);
+}
 
 /** One fighter's Classic timeline body, generated from its canonical motion through the Classic mapping. */
 export function classicBody(motion: mdx.Model, rig: FighterRig, played: readonly number[]): ArrayBuffer {
     const thinned = thinKeys(classicSkeleton(motion, rig)).model;
-    return encodeVerified(timelineBody(thinned, selected(thinned, played)));
+    const timeline = timelineBody(thinned, selected(thinned, played));
+    requireVictoryKeys(timeline, motion, rig.character);
+    return encodeVerified(timeline);
 }
 
 /** The stock Definitive body as a fighter's rig uses it: mirrored to its striking hand and without unshown meshes. */
