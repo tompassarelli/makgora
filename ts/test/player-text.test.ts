@@ -17,6 +17,7 @@ import { shell } from "../src/platform/shell/state";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { RESULTS_DELAY_FRAMES } from "../src/game/render/matchPresentation";
 import { rosterGrid } from "../src/game/menu/selectionGrid";
+import { readyChipSize } from "../src/game/menu/selectionDrag";
 import { PLAYABLE_CHARACTERS } from "../src/game/sim/heroes/registry";
 import { f32 } from "wisp/src/sim/f32";
 
@@ -126,7 +127,7 @@ class FrameView {
     if (found === undefined) throw new Error(`Missing visible button: ${text}`);
     const id = (client.natives.GetHandleId as Native)(found[0]);
     if (typeof id !== "number") throw new Error(`Missing frame id: ${text}`);
-    client.run(() => client.frameEvent(client.slot, id, FRAMEEVENT_CONTROL_CLICK));
+    client.frameEvent(client.slot, id, client.natives.FRAMEEVENT_CONTROL_CLICK);
   }
 
 }
@@ -209,7 +210,7 @@ test("the playable build keeps selection chips and cursor on their screen and sh
 
   for (const slot of [0, 1]) clients.press(slot, Key.r);
   frames(10);
-  const chipSize = f32(0.048) * rosterGrid(PLAYABLE_CHARACTERS.length).scale;
+  const chipSize = readyChipSize(rosterGrid(PLAYABLE_CHARACTERS.length));
   for (const { client, view } of records) {
     const chip = view.named(`MeleeChip${client.slot}_${client.slot}`);
     expect(chip?.width).toBeCloseTo(chipSize, 7);
