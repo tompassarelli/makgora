@@ -8,21 +8,23 @@ import { projectedShield } from "../presentation/shieldPose";
 import { copyFighterState } from "../replay/fighterState";
 import { Character } from "./codes";
 import { createFighter } from "./fighter";
+import { SELECTABLE_CHARACTERS } from "./heroes/registry";
 import { neutralControls } from "./roster";
-import { shieldCircleIntersects } from "./shield";
+import { shieldCircleIntersects, shieldSizeMultiplier } from "./shield";
 import { shieldCenterX, shieldCenterZ } from "./shieldTilt";
 import { SHIELD_TILT_STICK_CAP } from "./stick";
 import { advanceSolo } from "./testWorld";
 
+const MARIO_RADIUS = f32(6.799376);
 const CARDINALS = [
-  { name: "left", action: Action.moveLeft, x: -127, z: 0, centerX: f32(-18.928207), centerZ: 45.0 },
-  { name: "right", action: Action.moveRight, x: 127, z: 0, centerX: f32(15.773506), centerZ: 45.0 },
-  { name: "up", action: Action.moveUp, x: 0, z: 127, centerX: 0.0, centerZ: f32(70.237844) },
-  { name: "down", action: Action.moveDown, x: 0, z: -127, centerX: 0.0, centerZ: f32(24.180436) },
+  { name: "left", action: Action.moveLeft, x: -127, z: 0, shiftX: f32(-3.3000001), shiftZ: 0.0 },
+  { name: "right", action: Action.moveRight, x: 127, z: 0, shiftX: 2.75, shiftZ: 0.0 },
+  { name: "up", action: Action.moveUp, x: 0, z: 127, shiftX: 0.0, shiftZ: f32(4.400041) },
+  { name: "down", action: Action.moveDown, x: 0, z: -127, shiftX: 0.0, shiftZ: f32(-3.6297448) },
 ] as const;
 
-function guarding() {
-  const fighter = createFighter(Character.rifleman, 0.0, 1);
+function guarding(character: Character) {
+  const fighter = createFighter(character, 0.0, 1);
   const controls = neutralControls();
   const attacks = attackBuffer(0);
   const row = assertDefined(inputRow({ held: maskOf(Action.rightTrigger), triggerRight: 255 }));
@@ -35,39 +37,47 @@ function guarding() {
 }
 
 for (const cardinal of CARDINALS) {
-  test(`Tilt plus shield gives capped ${cardinal.name} reach without a roll, dodge or jump [k4 reference docs/smash-melee-reference/shield-tilt-cardinals.md]`, () => {
-    const { fighter, controls, attacks } = guarding();
-    const row = assertDefined(inputRow({
-      held: maskOf(Action.rightTrigger, Action.walk, cardinal.action), pressed: maskOf(cardinal.action),
-      triggerRight: 255, axisX: cardinal.x, axisZ: cardinal.z,
-    }));
-    adaptInput(row, fighter, 8, controls, attacks);
-    assertFalse(controls.groundDodgePressed);
-    assertFalse(controls.jumpPressed);
-    assertEquals(controls.diStickX, cardinal.x === 0 ? 0.0 : cardinal.x < 0 ? -SHIELD_TILT_STICK_CAP : SHIELD_TILT_STICK_CAP);
-    assertEquals(controls.diStickZ, cardinal.z === 0 ? 0.0 : cardinal.z < 0 ? -SHIELD_TILT_STICK_CAP : SHIELD_TILT_STICK_CAP);
-    advanceSolo(fighter, 0, controls, 0.0);
-    assertTrue(fighter.shield.raised);
-    assertTrue(fighter.motion.grounded);
-    assertEquals(fighter.jump.squat, 0);
-    assertEquals(fighter.dodge.groundFrame, 0);
-    assertNear(shieldCenterX(fighter), cardinal.centerX, f32(0.001));
-    assertNear(shieldCenterZ(fighter), cardinal.centerZ, f32(0.001));
-    const pose = projectedShield(fighter, true);
-    assertEquals(pose.x, shieldCenterX(fighter));
-    assertEquals(pose.z, shieldCenterZ(fighter));
-    const restored = createFighter(Character.rifleman, 100.0, -1);
-    copyFighterState(restored, fighter, 1);
-    assertEquals(projectedShield(restored, true).x, pose.x);
-    assertEquals(projectedShield(restored, true).z, pose.z);
+  test(`Tilt plus shield gives every fighter capped ${cardinal.name} reach as a fraction of its shield radius without a roll, dodge or jump [k4 reference docs/smash-melee-reference/shield-tilt-cardinals.md]`, () => {
+    for (const character of SELECTABLE_CHARACTERS) {
+      const { fighter, controls, attacks } = guarding(character);
+      const geometry = fighter.tuning.shield;
+      const fraction = SHIELD_TILT_STICK_CAP / MARIO_RADIUS;
+      const row = assertDefined(inputRow({
+        held: maskOf(Action.rightTrigger, Action.walk, cardinal.action), pressed: maskOf(cardinal.action),
+        triggerRight: 255, axisX: cardinal.x, axisZ: cardinal.z,
+      }));
+      adaptInput(row, fighter, 8, controls, attacks);
+      assertFalse(controls.groundDodgePressed);
+      assertFalse(controls.jumpPressed);
+      assertEquals(controls.diStickX, cardinal.x === 0 ? 0.0 : cardinal.x < 0 ? -SHIELD_TILT_STICK_CAP : SHIELD_TILT_STICK_CAP);
+      assertEquals(controls.diStickZ, cardinal.z === 0 ? 0.0 : cardinal.z < 0 ? -SHIELD_TILT_STICK_CAP : SHIELD_TILT_STICK_CAP);
+      advanceSolo(fighter, 0, controls, 0.0);
+      assertTrue(fighter.shield.raised);
+      assertTrue(fighter.motion.grounded);
+      assertEquals(fighter.jump.squat, 0);
+      assertEquals(fighter.dodge.groundFrame, 0);
+      assertNear(shieldCenterX(fighter), geometry.centerX + cardinal.shiftX * fraction * geometry.radius, f32(0.001));
+      assertNear(shieldCenterZ(fighter), geometry.centerZ + cardinal.shiftZ * fraction * geometry.radius, f32(0.001));
+      const pose = projectedShield(fighter, true);
+      assertEquals(pose.x, shieldCenterX(fighter));
+      assertEquals(pose.z, shieldCenterZ(fighter));
+      const restored = createFighter(character, 100.0, -1);
+      copyFighterState(restored, fighter, 1);
+      assertEquals(projectedShield(restored, true).x, pose.x);
+      assertEquals(projectedShield(restored, true).z, pose.z);
+    }
   });
 }
 
-test("shield tilt moves its projectile contact circle with its drawn bubble [k3 measure docs/smash-melee-reference/shield-tilt-cardinals.md]", () => {
-  const { fighter, controls, attacks } = guarding();
-  assertFalse(shieldCircleIntersects(fighter, -1.0, 95.0, 1.0, 95.0, 1.0));
-  const row = assertDefined(inputRow({ held: maskOf(Action.rightTrigger, Action.walk, Action.moveUp), triggerRight: 255, axisZ: 127 }));
-  adaptInput(row, fighter, 8, controls, attacks);
-  advanceSolo(fighter, 0, controls, 0.0);
-  assertTrue(shieldCircleIntersects(fighter, -1.0, 95.0, 1.0, 95.0, 1.0));
+test("shield tilt moves every fighter's projectile contact circle with its drawn bubble [k3 measure docs/smash-melee-reference/shield-tilt-cardinals.md]", () => {
+  for (const character of SELECTABLE_CHARACTERS) {
+    const { fighter, controls, attacks } = guarding(character);
+    const reach = f32(fighter.tuning.shield.radius * shieldSizeMultiplier(fighter.shield.energy, fighter.shield.strength));
+    const probe = f32(shieldCenterZ(fighter) + reach + 2.0);
+    assertFalse(shieldCircleIntersects(fighter, -1.0, probe, 1.0, probe, 1.0));
+    const row = assertDefined(inputRow({ held: maskOf(Action.rightTrigger, Action.walk, Action.moveUp), triggerRight: 255, axisZ: 127 }));
+    adaptInput(row, fighter, 8, controls, attacks);
+    advanceSolo(fighter, 0, controls, 0.0);
+    assertTrue(shieldCircleIntersects(fighter, -1.0, probe, 1.0, probe, 1.0));
+  }
 });

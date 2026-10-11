@@ -1,19 +1,25 @@
 import { readFileSync } from "node:fs";
 import { expect, test } from "bun:test";
-import { selectableCharacterBySlug } from "../src/game/sim/heroes/registry";
+import { fighterName, SELECTABLE_CHARACTERS, selectableCharacterBySlug } from "../src/game/sim/heroes/registry";
+import { Character } from "../src/game/sim/codes";
 import { DEFAULT_OPTIONS, playTextMatch } from "../scripts/textMatch";
 import { parseCommands } from "../scripts/textMatchView";
 
-test("a fresh hard shield covers short fighters from Illidan's forward air and leaves tall fighters' heads to a poke [k1 scenario]", () => {
+test("a fresh untilted hard shield blocks Illidan's forward air for every fighter it reaches, and the drained shield leaves Tinker's head to the second hit [k1 scenario]", () => {
   const input = "0 neutral\n46 shield\n70 neutral\n";
-  for (const [slug, poked] of [["warden", true], ["blademaster", true], ["thrall", true], ["dreadlord", true], ["rifleman", false], ["peon", false]] as const) {
-    const you = selectableCharacterBySlug(slug);
-    const cpu = selectableCharacterBySlug("illidan");
-    if (you === undefined || cpu === undefined) throw new Error(`no fighter ${slug}`);
+  const cpu = selectableCharacterBySlug("illidan");
+  if (cpu === undefined) throw new Error("no fighter illidan");
+  const blockedFirst: string[] = [];
+  const poked: string[] = [];
+  for (const you of SELECTABLE_CHARACTERS) {
     const lines = playTextMatch({ ...DEFAULT_OPTIONS, seed: 44, you, cpu, frames: 70 }, parseCommands(input)).lines;
-    const damaged = lines.filter((line) => /^\d+ A x\S+ z\S+ [1-9]\d*% /.test(line));
-    expect(damaged.length > 0, slug).toBe(poked);
+    const firstDamage = lines.findIndex((line) => /^\d+ A x\S+ z\S+ [1-9]\d*% /.test(line));
+    const firstBlock = lines.findIndex((line) => /^\d+ A x\S+ z\S+ 0% \S+ hitlag /.test(line));
+    if (firstBlock !== -1 && (firstDamage === -1 || firstBlock < firstDamage)) blockedFirst.push(fighterName(you));
+    if (firstDamage !== -1) poked.push(fighterName(you));
   }
+  expect(blockedFirst).toEqual(SELECTABLE_CHARACTERS.filter((character) => character !== Character.kobold).map(fighterName));
+  expect(poked).toEqual([fighterName(Character.tinker)]);
 });
 
 test("an Expert computer hit by a stationary opponent's down smash stops re-approaching into it and punishes [k1 scenario]", () => {
