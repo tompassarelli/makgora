@@ -256,6 +256,7 @@ export class MatchPresentation {
     BlzFrameSetPoint(this.help, FRAMEPOINT_TOPLEFT, this.backing, FRAMEPOINT_TOPLEFT, MENU_STYLE.bodyInset, f32(-0.033) - view.rows.length * f32(0.04));
     for (let index = 0; index < this.lines.length; index++) {
       const row = view.rows[index];
+      BlzFrameSetVisible(at(this.lines, index), row !== undefined);
       BlzFrameSetText(at(this.lines, index), row === undefined ? "" : `${row.winner ? MENU_STYLE.gold : MENU_STYLE.text}${row.text}|r`);
     }
     BlzFrameSetVisible(this.panel, true);
