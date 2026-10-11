@@ -383,6 +383,13 @@ jobs:
         run: |
           set -euo pipefail
           bash -euo pipefail -c "$FETCH_LANES" > lanes.json
+          if [ "${{ vars.AUTOLAND_HEARTBEAT }}" != off ]; then
+            beating=0
+            for state in requested pending waiting queued in_progress; do
+              beating=$(( beating + $(gh api "repos/$GH_REPO/actions/workflows/autoland-heartbeat.yml/runs?status=$state&per_page=1" --jq .total_count) ))
+            done
+            [ "$beating" != 0 ] || gh workflow run autoland-heartbeat.yml --ref main || echo "::warning::couldn't start the Autoland heartbeat"
+          fi
           for state in requested pending waiting queued in_progress; do
             gh api "repos/$GH_REPO/actions/workflows/autoland.yml/runs?status=$state&per_page=100" \
               --jq ".workflow_runs[] | select(.id != $GITHUB_RUN_ID) | {title: .display_title, status}"

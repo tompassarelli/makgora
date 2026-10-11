@@ -8,7 +8,7 @@
 | Background sweeps (smashcraft:.github/workflows/background-sweeps.yml) | each landing (Autoland dispatches it with the landed SHA), push to main, nightly | on `farm-big`: the Bun and Lua32 suites with `SWEEPS=1`, and the per-pair worst-frame census (#405) in 7 fighter shards whose joined pairs must stay within the margin of test/fixtures/perf/census-pairs.txt; a landing's red run goes to the sheriff (see Sheriff) |
 | Playtest (smashcraft:.github/workflows/playtest.yml) | nightly, dispatch with `matches` | plays computer-versus-computer matches across every fighter, stage and computer level on the newest green main, each seed twice to compare state hashes, and opens or updates one issue per finding kind (smashcraft:docs/commands/soak.md) |
 | Autoland (smashcraft:.github/workflows/autoland.yml) | push to `claude/**`, `safe-push --to main`, dispatch with `branch` | main's one landing queue: tests each waiting tip alone at once, lands trains of tips that passed |
-| Autoland sweep (smashcraft:.github/workflows/autoland-sweep.yml) | every finished Autoland or Farm test run, every 5 minutes (best effort), dispatch with `dry-run` or `landed` | cancels stuck Autoland runs and requeues their lanes; opens the "Autoland stalled" issue while main is idle with lanes pending |
+| Autoland sweep (smashcraft:.github/workflows/autoland-sweep.yml) | every 5 minutes from Autoland heartbeat while Autoland has work, every finished Autoland or Farm test run, dispatch with `dry-run` or `landed` | cancels stuck Autoland runs and requeues their lanes; opens the "Autoland stalled" issue while main is idle with lanes pending |
 | Effect upgrade (smashcraft:.github/workflows/effect-upgrade.yml) | Mondays, dispatch | `effect-kit upgrade` and `effect-kit check`; a clean upgrade goes to Autoland, findings to the "Weekly Effect upgrade" issue |
 
 ## Autoland
@@ -116,10 +116,16 @@ allows only the owned `codex/autoland-job-watchdog` branch.
 
 ## Autoland sweep
 
-No laptop service is on the landing path. Each finished Autoland or Farm test
-run starts the sweep (skipped within 2 minutes of the last one), GitHub's
-best-effort 5-minute schedule backs that up, and an outside dispatch is a
-third layer. The sweep lists
+No laptop service is on the landing path. While any `claude/` tip has a
+pending `autoland` status or an Autoland run is unfinished, Autoland heartbeat
+(smashcraft:.github/workflows/autoland-heartbeat.yml), one hosted job, starts
+the sweep every 5 minutes; it stops after 10 empty minutes and hands off to a
+successor after 5.5 hours. Every Autoland plan and every sweep starts a
+heartbeat when none is running or queued, so a push restarts it. Each finished
+Autoland or Farm test run also starts the sweep (skipped within 2 minutes of
+the last one). GitHub's 5-minute schedule is a last resort: this repository's
+schedules run about 6.5 hours late (#513). Stop the heartbeat with
+`gh variable set AUTOLAND_HEARTBEAT --body off`, then cancel its run. The sweep lists
 the unfinished Autoland runs with their jobs, and `stuckRuns` in
 smashcraft:ts/scripts/autolandCore.ts cancels (force-cancels after 60 min)
 any run where:

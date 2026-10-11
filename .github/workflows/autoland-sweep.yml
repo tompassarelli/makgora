@@ -49,6 +49,13 @@ jobs:
       - run: |
           set -euo pipefail
           now=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          if [ "${{ vars.AUTOLAND_HEARTBEAT }}" != off ] && [ "$DRY_RUN" = false ]; then
+            beating=0
+            for state in requested pending waiting queued in_progress; do
+              beating=$(( beating + $(gh api "repos/$GH_REPO/actions/workflows/autoland-heartbeat.yml/runs?status=$state&per_page=1" --jq .total_count) ))
+            done
+            [ "$beating" != 0 ] || gh workflow run autoland-heartbeat.yml --ref main || echo "::warning::couldn't start the Autoland heartbeat"
+          fi
           echo "Started by ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
           last=$(gh api "repos/$GH_REPO/actions/workflows/autoland-sweep.yml/runs?status=success&per_page=1" --jq '.workflow_runs[0].updated_at // ""')
           if [ "${{ github.event_name }}" = workflow_run ] && [ -n "$last" ] && [ $(( $(date -d "$now" +%s) - $(date -d "$last" +%s) )) -lt 120 ]; then
