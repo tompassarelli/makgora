@@ -28,6 +28,20 @@ export function verdictOf(runs: readonly RunSummary[]): Verdict {
 
 export const isGreen = ({ ci, farm }: Candidate): boolean => ci === "success" && farm === "success";
 
+export interface AutolandStatus {
+  readonly state: string;
+  readonly description: string;
+}
+
+export function farmVerdict(sha: string, tree: string, exact: Verdict, statuses: readonly AutolandStatus[], passedTrees: readonly string[]): Verdict {
+  if (exact !== "missing") return exact;
+  const landed = statuses.some(({ state, description }) => state === "SUCCESS" && description === `landed as ${sha}`);
+  const passed = statuses.some(({ state, description }) => state === "PENDING"
+    && /^passed alone on [a-f0-9]{40} as tree [a-f0-9]{40}$/.test(description)
+    && description.endsWith(` as tree ${tree}`));
+  return landed || passed || passedTrees.includes(tree) ? "success" : "missing";
+}
+
 export function installName(version: string, sha: string): string {
   return `Smashcraft ${version} ${sha.slice(0, SHORT_COMMIT)}`;
 }

@@ -237,8 +237,8 @@ export const play: Command = (args) => Effect.gen(function*() {
   }
   if (args.includes("--install-green")) {
     const { installGreen } = yield* Effect.tryPromise({ try: () => import("../installGreen"), catch: (cause) => new PlayProblem({ problem: String(cause) }) });
-    console.log(`Controller helper: ${yield* optionalController()}`);
-    return yield* installGreen(documentsFolder(PLAYTEST_PREFIX));
+    if (!args.includes("--dry-run")) console.log(`Controller helper: ${yield* optionalController()}`);
+    return yield* installGreen(documentsFolder(PLAYTEST_PREFIX), args.includes("--dry-run"));
   }
   yield* signInTom;
   const current = yield* currentPlaytest(join(documentsFolder(PLAYTEST_PREFIX), "Maps/00-Smashcraft"));

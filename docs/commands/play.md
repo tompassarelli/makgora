@@ -11,8 +11,9 @@
   When the always-on controller service has a pad, the pad presses the same keys.
 
 - Continuous builds: `bun wisp play --install-green` fetches origin, takes the
-  newest commit of main whose CI run and farm suite (`Farm test SHA`) both
-  succeeded, and, if it isn't installed yet, builds it once with the play build
+  newest commit of main whose CI succeeded and whose farm suite passed for the
+  commit or matching tree, or whose Autoland status explicitly names that landed
+  commit, and, if it isn't installed yet, builds it once with the play build
   path and installs it as `Smashcraft 0.0.N SHORTSHA` under Maps/00-Smashcraft,
   moving all but the two prior versions to older/. A commit with a red,
   pending or missing run is never built, and an older green commit never
@@ -21,6 +22,8 @@
   never touches a running client. A systemd user timer
   (smashcraft:tools/green-builds/) runs it every ten minutes; the repository
   documents it but doesn't install it.
+  `bun wisp play --install-green --dry-run` reports the newest green commit and
+  proposed install without building, installing or starting the controller helper.
 
 - Standalone play: `bun wisp play --standalone` opens the Wisp browser player
   with a full three-stock Illidan against Wren Expert Rifleman. `--script FILE`
