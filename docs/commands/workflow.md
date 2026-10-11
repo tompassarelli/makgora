@@ -67,7 +67,9 @@ candidate; a diagnostic pass does not replace that release.
 `MAP.w3x.lua-cost.perf` beside the map. The JSON records predicted Lua p50/p95
 for player 0's 1,800 `playable-bot-four` callbacks, within #19's solo/four-bot
 calibration scope. Worst is diagnostic. Its note is "Lua cost predicted;
-whole frame not measured". The installed playtest keeps both files beside
+whole frame not measured". A build whose predictor inputs (both Lua entries
+and their local modules, configs, Wisp pin, Lua binary) hash the same reuses
+`ts/build/playtest-cost/HASH.perf`. The installed playtest keeps both files beside
 its map. Compare the samples from `ts/` with
 `bun wisp perf compare test/fixtures/perf/playable-bot-four.perf MAP.w3x.lua-cost.perf`.
 
