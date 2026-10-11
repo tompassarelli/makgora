@@ -1,5 +1,35 @@
 # Native
 
+`bun wisp native-capture reel --out PRIVATE_DIR [--fighter SLUG] [--hold-ticks N]`
+prepares Classic motion-reel pad scripts from the current roster and authored
+normals, four ground specials and ultimate. Each fighter directory is one
+capture-map batch. `native-capture plan PAD...` exercises its requested held
+frames headless; this has no native pixel verdict. Build with
+`bun wisp native-capture build --out MAP.w3x PRIVATE_DIR/FIGHTER` and launch
+that map on the assigned Classic offline pair with `bun wisp lan fresh MAP.w3x
+--pair K`. Start the capture collector before launching, so it sees the first
+held sample:
+
+```sh
+bun wisp native-capture run --clients-file FILE --client NAME --install DIR \
+  --offline-build 3.0.0.24268 --manifest MAP.captures.json --out SHEETS \
+  --sheets --crop X,Y,W,H --effect-crop X,Y,W,H --minutes 10
+```
+
+Both crop rectangles are in full captured-screen pixels: calibrate the body
+crop to omit HUD and visible names, and the effect crop to omit the fighter's
+body. Eight motion tiles and two effect-only tiles share each opaque row.
+Adjacent rows pair right then left. The collector retains only the packed RGB
+canvas, writes no raw capture frames, and produces `FIGHTER.jpg` (at most
+128 KiB), `FIGHTER.rows.json` and `FIGHTER.captures.json` timing/missed-frame evidence.
+The row key is exactly `{"R01":{"slot":"side_b","facing":"right"},...}`;
+never show the key to the cold viewer. Default reel holds are 6 ticks rather
+than ordinary captures' 180, with one opening tick and no tail; increase `--hold-ticks` if measured collection
+misses frames. A 0.0.133 reel is a diagnostic rebuild with driver/capture
+changes, not the byte-identical retained native baseline map. Native full-roster
+wall time, pixel legibility, calibrated crops and one-pair versus two-pair
+throughput still require measurement on the assigned VM clients.
+
 Development builds expose the retained 3.0.0 lever diagnostic: `-dev lever fog on|off`,
 `-dev lever density NUMBER`, `-dev lever oversky on|off`, `-dev lever shadows COUNT`
 and `-dev lever light INDEX on|off`. Compare `-dev lighting stock|stage` and

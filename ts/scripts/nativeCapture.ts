@@ -34,6 +34,7 @@ import { STAMP_CELL, STAMP_CELLS, type StampCell, readStamp } from "../src/runti
 import { CAPTURE_STATUS_FILE } from "../src/runtime/gameFiles";
 import { CAPTURE_FIXTURES, type CaptureFixture } from "../src/platform/captureFixtures";
 import { platformLayer } from "wisp/scripts/platform/layer";
+import { sheetCanvas, putSheetFrame, writeSheet } from "./nativeCaptureSheet";
 
 class CaptureFailure extends Schema.TaggedError<CaptureFailure>()("CaptureFailure", { problem: Schema.String }) {
   override get message(): string { return this.problem; }
@@ -48,19 +49,26 @@ function option(args: readonly string[], name: string): string | undefined {
   return index < 0 ? undefined : args[index + 1];
 }
 
-const SWITCHES = new Set(["--control", "--no-audio"]);
+const SWITCHES = new Set(["--control", "--no-audio", "--sheets"]);
 const positional = (args: readonly string[]) => args.filter((value, index) => !value.startsWith("--") && !(args[index - 1]?.startsWith("--") === true && !SWITCHES.has(args[index - 1] ?? "")));
 
 
 export function fixtureOf(path: string, script: string): CaptureFixture {
-  const chat = /^\s*\S+\s+[ab]\s+chat\s/;
+  const chat = /^\s*\S+\s+[ab]\s+(?:chat|move)\s/;
   const lines = script.split("\n");
   if (lines.some(line => chat.test(line) && line.trim().startsWith("+"))) fail(`${path}: a chat line needs an absolute frame`);
   const frames = [...new Set(parsePadScript(lines.filter(line => !chat.test(line)).join("\n")).filter(step => step.kind === "capture").map(step => step.frame))].sort((a, b) => a - b);
   if (frames.length === 0) fail(`${path}: no capture lines`);
   if (frames[0] === 0) fail(`${path}: a capture at frame 0 can't be held`);
   const folder = basename(dirname(path));
-  return { name: folder === "pads" || folder === "captures" ? basename(path, ".pad") : `${folder}-${basename(path, ".pad")}`, frames, script };
+  const reel = /^#! reel (\S+) (R\d+) (\S+) (right|left) (\d+)$/m.exec(script);
+  const name = folder === "pads" || folder === "captures" ? basename(path, ".pad") : `${folder}-${basename(path, ".pad")}`;
+  if (reel === null) return { name, frames, script };
+  const [, fighter = "", row = "", slot = "", facing, ticks] = reel;
+  if (facing !== "right" && facing !== "left") fail("invalid reel facing");
+  const holdTicks = Number(ticks);
+  if (holdTicks < 6 || holdTicks > 180) fail("reel hold ticks must be 6..180");
+  return { name, frames, script, holdTicks, openingTicks: 1, tailFrames: 0, reel: { fighter, row, slot, facing: facing === "left" ? "left" : "right" } };
 }
 
 const build = (args: readonly string[]) => Effect.gen(function*() {
@@ -85,7 +93,7 @@ const build = (args: readonly string[]) => Effect.gen(function*() {
   );
   if (code !== 0) return yield* new CaptureFailure({ problem: `map build exited ${code}` });
   const manifest = `${out.replace(/\.w3x$/, "")}.captures.json`;
-  yield* attempt("write the manifest", () => writeFileSync(manifest, `${JSON.stringify({ map: out, fixtures: fixtures.map(({ name: fixture, frames }) => ({ name: fixture, frames })) }, null, 2)}\n`));
+  yield* attempt("write the manifest", () => writeFileSync(manifest, `${JSON.stringify({ map: out, fixtures: fixtures.map(({ script: _, ...fixture }) => fixture) }, null, 2)}\n`));
   console.log(`built ${out}: ${fixtures.length} scripts, ${fixtures.reduce((total, fixture) => total + fixture.frames.length, 0)} captures; manifest ${manifest}`);
 });
 
@@ -159,7 +167,7 @@ export function frameStamp(frame: Frame): { readonly script: number; readonly fr
   return undefined;
 }
 
-const Manifest = Schema.fromJsonString(Schema.Struct({ map: Schema.String, fixtures: Schema.Array(Schema.Struct({ name: Schema.String, frames: Schema.Array(Schema.Finite) })) }));
+const Manifest = Schema.fromJsonString(Schema.Struct({ map: Schema.String, fixtures: Schema.Array(Schema.Struct({ name: Schema.String, frames: Schema.Array(Schema.Finite), reel: Schema.optionalKey(Schema.Struct({ fighter: Schema.String, row: Schema.String, slot: Schema.String, facing: Schema.Literals(["right", "left"]) })) })) }));
 
 const PipeWireObjects = Schema.fromJsonString(Schema.Array(Schema.Struct({
   id: Schema.Finite,
@@ -235,6 +243,11 @@ const readBinding = (args: readonly string[]) => Effect.gen(function*() {
   const updateBytes = updateText === undefined ? undefined : Number(updateText);
   if (updateBytes !== undefined && !Number.isSafeInteger(updateBytes)) return yield* new CaptureFailure({ problem: "--update-bytes takes a whole number" });
   const { build, branch } = yield* attempt("read .build.info", () => installedBuild(readFileSync(join(install, ".build.info"), "utf8")));
+  const offlineBuild = option(args, "--offline-build");
+  if (offlineBuild !== undefined) {
+    if (offlineBuild !== "3.0.0.24268" || build !== offlineBuild) return yield* new CaptureFailure({ problem: "offline Classic capture requires installed 3.0.0.24268" });
+    return { install, readAt: new Date().toISOString(), installed: build, live: build, equal: true, offline: true };
+  }
   const versions = versionsFile === undefined
     ? yield* Effect.tryPromise({ try: async () => { const response = await fetch(VERSIONS_URL, { signal: AbortSignal.timeout(15000) }); if (!response.ok) throw new Error(`HTTP ${response.status}`); return response.text(); }, catch: cause => new CaptureFailure({ problem: `read ${VERSIONS_URL}: ${String(cause)}` }) })
     : yield* attempt("read --versions", () => readFileSync(versionsFile, "utf8"));
@@ -259,6 +272,13 @@ const runCaptures = (args: readonly string[]) => Effect.scoped(Effect.gen(functi
   if (clientsFile === undefined || clientName === undefined || manifestPath === undefined || out === undefined) return yield* new CaptureFailure({ problem: "usage: run --clients-file FILE --client NAME --install DIR --manifest MAP.captures.json --out DIR [--versions FILE] [--minutes M] [--crop X,Y,W,H] [--audio-sink SINK | --no-audio]" });
   const text = yield* attempt("read the manifest", () => readFileSync(manifestPath, "utf8"));
   const manifest = yield* Schema.decodeEffect(Manifest)(text).pipe(Effect.mapError(cause => new CaptureFailure({ problem: `${manifestPath}: ${String(cause)}` })));
+  const sheets = args.includes("--sheets");
+  const effectText = option(args, "--effect-crop");
+  const [ex, ey, ew, eh, ...effectExtra] = effectText?.split(",").map(Number) ?? [];
+  const effectCrop = ex !== undefined && ey !== undefined && ew !== undefined && eh !== undefined && effectExtra.length === 0 ? [ex, ey, ew, eh] as const : undefined;
+  if (sheets && (crop === undefined || effectCrop === undefined || !effectCrop.every(Number.isInteger) || manifest.fixtures.some(row => row.reel === undefined) || new Set(manifest.fixtures.map(row => row.reel?.fighter)).size !== 1)) return yield* new CaptureFailure({ problem: "--sheets needs one fighter's reel manifest, --crop X,Y,W,H excluding HUD/labels and --effect-crop X,Y,W,H excluding the body" });
+  if (sheets && (manifest.fixtures.length > 63 || manifest.fixtures.some(row => row.frames.length !== 8) || new Set(manifest.fixtures.map(row => row.reel?.row)).size !== manifest.fixtures.length)) return yield* new CaptureFailure({ problem: "a sheet needs at most 63 unique rows with eight frames each" });
+  const canvas = sheets ? sheetCanvas(manifest.fixtures.map(row => ({ row: row.reel?.row ?? "", frames: row.frames }))) : undefined;
   const client = (yield* loadClients(clientsFile).pipe(Effect.mapError(failure => new CaptureFailure({ problem: `${failure.operation}: ${failure.cause}` })))).find(row => row.name === clientName);
   if (client === undefined) return yield* new CaptureFailure({ problem: `${clientName} isn't in ${clientsFile}` });
   const binding = yield* readBinding(args);
@@ -266,7 +286,7 @@ const runCaptures = (args: readonly string[]) => Effect.scoped(Effect.gen(functi
   yield* attempt("create the result folder", () => mkdirSync(out, { recursive: true }));
   const statusPath = join(dataDirectory(client.documents), CAPTURE_STATUS_FILE);
   const started = Date.now();
-  const audio = args.includes("--no-audio") ? undefined : yield* recordAudio(option(args, "--audio-sink") ?? `wisp-online-${client.name}`, join(out, "audio.wav"), started);
+  const audio = sheets || args.includes("--no-audio") ? undefined : yield* recordAudio(option(args, "--audio-sink") ?? `wisp-online-${client.name}`, join(out, "audio.wav"), started);
   const wanted = manifest.fixtures.reduce((total, fixture) => total + fixture.frames.length, 0);
   const saved = new Map<string, { fixture: string; frame: number; file: string; capturedMs: number }>();
   const log: { ms: number; captureMs: number; stamp: string }[] = [];
@@ -278,16 +298,23 @@ const runCaptures = (args: readonly string[]) => Effect.scoped(Effect.gen(functi
     if (status !== lastStatus) { lastStatus = status; console.log(status); }
     const before = Date.now();
     const whole = yield* capture(client).pipe(Effect.mapError(failure => new CaptureFailure({ problem: `${failure.operation}: ${failure.cause}` })));
-    const shot = crop === undefined ? whole : cropFrame(whole, crop);
-    const stamp = frameStamp(shot);
+    const shot = crop === undefined || sheets ? whole : cropFrame(whole, crop);
+    const stamp = frameStamp(whole);
     log.push({ ms: before - started, captureMs: Date.now() - before, stamp: stamp === undefined ? "unreadable" : `${stamp.script}/${stamp.frame}` });
     const fixture = stamp === undefined ? undefined : manifest.fixtures[stamp.script - 1];
     if (stamp !== undefined && stamp.script > lastScript) { lastScript = stamp.script; idleSince = Date.now(); }
     if (stamp !== undefined && fixture !== undefined && fixture.frames.includes(stamp.frame) && !saved.has(`${fixture.name}/${stamp.frame}`)) {
-      const file = join(fixture.name, `frame-${stamp.frame}.ppm`);
+      const file = canvas === undefined ? join(fixture.name, `frame-${stamp.frame}.ppm`) : `${fixture.reel?.fighter}.jpg`;
       yield* attempt("save the capture", () => {
-        mkdirSync(join(out, fixture.name), { recursive: true });
-        writeFileSync(join(out, file), encodePpm(shot));
+        if (canvas === undefined) {
+          mkdirSync(join(out, fixture.name), { recursive: true });
+          writeFileSync(join(out, file), encodePpm(shot));
+        } else {
+          const row = stamp.script - 1;
+          const column = fixture.frames.indexOf(stamp.frame);
+          putSheetFrame(canvas, row, column, whole, crop ?? fail("missing crop"));
+          if (column === 3 || column === 7) putSheetFrame(canvas, row, column === 3 ? 8 : 9, whole, effectCrop ?? fail("missing effect crop"));
+        }
       });
       saved.set(`${fixture.name}/${stamp.frame}`, { fixture: fixture.name, frame: stamp.frame, file, capturedMs: before - started });
       idleSince = Date.now();
@@ -296,8 +323,15 @@ const runCaptures = (args: readonly string[]) => Effect.scoped(Effect.gen(functi
     if (lastScript >= manifest.fixtures.length && Date.now() - idleSince > 30000) break;
   }
   const missed = manifest.fixtures.flatMap(fixture => fixture.frames.filter(frame => !saved.has(`${fixture.name}/${frame}`)).map(frame => ({ fixture: fixture.name, frame })));
+  if (canvas !== undefined && missed.length === 0) {
+    const fighter = manifest.fixtures[0]?.reel?.fighter ?? fail("missing reel fighter");
+    const bytes = yield* writeSheet(canvas, manifest.fixtures.map(row => ({ row: row.reel?.row ?? "", frames: row.frames })), join(out, `${fighter}.jpg`));
+    yield* attempt("write opaque row key", () => writeFileSync(join(out, `${fighter}.rows.json`), `${JSON.stringify(Object.fromEntries(manifest.fixtures.map(row => [row.reel?.row, { slot: row.reel?.slot, facing: row.reel?.facing }])), null, 2)}\n`));
+    console.log(`sheet ${fighter}: ${bytes} bytes; ${manifest.fixtures.length} rows`);
+  }
   const result = { map: manifest.map, build: binding, captured: saved.size, wanted, missed, audio, captures: [...saved.values()], log };
-  yield* attempt("write captures.json", () => writeFileSync(join(out, "captures.json"), `${JSON.stringify(result, null, 1)}\n`));
+  const evidence = sheets ? `${manifest.fixtures[0]?.reel?.fighter}.captures.json` : "captures.json";
+  yield* attempt("write capture evidence", () => writeFileSync(join(out, evidence), `${JSON.stringify(result, null, 1)}\n`));
   const unreadable = log.filter(row => row.stamp === "unreadable").length;
   console.log(JSON.stringify({ captured: saved.size, wanted, missed: missed.length, screenCaptures: log.length, unreadable, medianCaptureMs: [...log.map(row => row.captureMs)].sort((a, b) => a - b)[Math.floor(log.length / 2)] ?? 0 }));
   if (missed.length > 0) return yield* new CaptureFailure({ problem: `missed ${missed.map(row => `${row.fixture}@${row.frame}`).join(", ")}` });
@@ -317,6 +351,23 @@ const plan = (args: readonly string[]) => Effect.gen(function*() {
   }
   console.log(`plan: ${passed}/${cues} cues shown on a capture frame, ${fixtures.length} scripts`);
   if (passed !== cues) return yield* new CaptureFailure({ problem: `${cues - passed} cues aren't shown on a capture frame` });
+});
+
+const reel = (args: readonly string[]) => Effect.gen(function*() {
+  const out = option(args, "--out");
+  if (out === undefined) return yield* new CaptureFailure({ problem: "usage: reel --out DIR [--fighter SLUG] [--hold-ticks N]" });
+  const { reelFixtures } = yield* Effect.promise(() => import("./nativeCapturePlan"));
+  const batches = yield* attempt("enumerate reel", () => reelFixtures(option(args, "--fighter"), Number(option(args, "--hold-ticks") ?? "6")));
+  yield* attempt("write reel scripts", () => {
+    for (const fixtures of batches) {
+      const fighter = fixtures[0]?.reel?.fighter ?? fail("empty fighter reel");
+      const directory = join(out, fighter);
+      mkdirSync(directory, { recursive: true });
+      for (const fixture of fixtures) writeFileSync(join(directory, `${fixture.reel?.row}.pad`), fixture.script);
+    }
+    writeFileSync(join(out, "reel-plan.json"), `${JSON.stringify(batches, null, 2)}\n`);
+  });
+  console.log(`reel: ${batches.length} fighters, ${batches.flat().length} move/facing rows, ${batches.flat().reduce((total, row) => total + row.frames.length, 0)} frames; ${out}`);
 });
 
 
@@ -354,8 +405,9 @@ const compare = (args: readonly string[]) => Effect.gen(function*() {
   for (const row of rows.spread) console.log(`${row.fixture}: frame ${row.from} vs ${row.to} rmse ${row.rmse.toFixed(4)}`);
 });
 
-if (import.meta.main) {
-  const [verb, ...args] = Bun.argv.slice(2);
-  const program = verb === "build" ? build(args) : verb === "plan" ? plan(args) : verb === "run" ? runCaptures(args) : verb === "compare" ? compare(args) : verb === "build-check" ? buildCheck(args) : Effect.fail(new CaptureFailure({ problem: "usage: nativeCapture.ts build|plan|run|compare|build-check ..." }));
-  BunRuntime.runMain(program.pipe(Effect.provide(Layer.merge(BunServices.layer, platformLayer()))));
+export function nativeCapture(argv: readonly string[]) {
+  const [verb, ...args] = argv;
+  const program = verb === "reel" ? reel(args) : verb === "build" ? build(args) : verb === "plan" ? plan(args) : verb === "run" ? runCaptures(args) : verb === "compare" ? compare(args) : verb === "build-check" ? buildCheck(args) : Effect.fail(new CaptureFailure({ problem: "usage: nativeCapture.ts reel|build|plan|run|compare|build-check ..." }));
+  return program.pipe(Effect.provide(Layer.merge(BunServices.layer, platformLayer())));
 }
+if (import.meta.main) BunRuntime.runMain(nativeCapture(Bun.argv.slice(2)));

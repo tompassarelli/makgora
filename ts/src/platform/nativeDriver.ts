@@ -17,6 +17,13 @@ import { pauseMatchPresentation } from "./shell/view";
 import { applyDeveloperCommand, startDown } from "./shell/keys";
 import { shell, type ShellState, localSlot } from "./shell/state";
 import { paintDrawnStamp } from "./shell/drawnStamp";
+import { fighterAt, neutralControls } from "../game/sim/roster";
+import { AttackStyle } from "../game/sim/codes";
+import { beginFighterAttack } from "../game/sim/attacks";
+import { startFighterSpecial } from "../game/sim/specials";
+import { isAerialAttack } from "../game/sim/moves";
+import { ROSTER_MANA } from "../game/sim/mana";
+import { beginAttack } from "../game/sim/transitions";
 
 interface Pad {
   buttons: number;
@@ -85,7 +92,7 @@ function parseScript(text: string): { readonly setup: string; readonly edges: re
     const slot = player === "a" ? 0 : 1;
     if (action === "capture") { edges.push({ order: edges.length, frame, slot, action, args }); continue; }
 
-    if (action === "chat") { edges.push({ order: edges.length, frame, slot, action, args }); continue; }
+    if (action === "chat" || action === "move") { edges.push({ order: edges.length, frame, slot, action, args }); continue; }
     if (action === "press" || action === "release" || action === "tap") {
       if (BUTTONS[(args[0] ?? "").toUpperCase()] === undefined) throw new Error("native driver: unknown pad button");
       const held = action === "tap" ? args[1] === undefined ? 1 : whole(args[1]) : 0;
@@ -223,6 +230,30 @@ export function captureNativeDriverInputs(s: ShellState): void {
     const pad = driver.pads[edge.slot];
     if (edge.action === "capture") driver.captures.push(edge.slot);
     else if (edge.action === "chat") applyDeveloperCommand(s, edge.slot, edge.args.join(" "));
+    else if (edge.action === "move") {
+      const fighter = fighterAt(s.world, edge.slot);
+      const [kind, code = "", facing] = edge.args;
+      fighter.facing = facing === "left" ? -1 : 1;
+      fighter.motion.x = 0.0;
+      fighterAt(s.world, edge.slot === 0 ? 1 : 0).motion.x = fighter.facing * 500.0;
+      if (kind === "normal") {
+        const style = Object.values(AttackStyle).find(value => value === whole(code));
+        if (style === undefined) throw new Error("native driver: invalid move style");
+        if (isAerialAttack(style)) { fighter.motion.grounded = false; fighter.motion.z = 250.0; }
+        if (style === AttackStyle.getupAttack || style === AttackStyle.ledgeAttack) beginAttack(fighter, style, false);
+        else beginFighterAttack(s.world, edge.slot, style, false);
+        if (fighter.attack.style !== style) throw new Error("native driver: normal did not start");
+      } else if (kind === "special" || kind === "ultimate") {
+        const input = neutralControls();
+        input.specialPressed = true;
+        input.ultimatePressed = kind === "ultimate";
+        const slot = whole(code);
+        input.specialX = slot === 1 ? fighter.facing : 0;
+        input.specialZ = slot === 2 ? 1 : slot === 3 ? -1 : 0;
+        fighter.mana.points = ROSTER_MANA.max;
+        if (!startFighterSpecial(fighter, s.game.stageChoice, frame, input, s.world)) throw new Error("native driver: move did not start");
+      } else throw new Error("native driver: move needs normal, special or ultimate");
+    }
     else if (pad !== undefined) applyEdge(s, pad, edge);
     driver.next++;
   }

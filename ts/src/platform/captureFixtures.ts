@@ -7,6 +7,10 @@ export interface CaptureFixture {
   readonly name: string;
   readonly frames: readonly number[];
   readonly script: string;
+  readonly holdTicks?: number;
+  readonly openingTicks?: number;
+  readonly tailFrames?: number;
+  readonly reel?: { readonly fighter: string; readonly row: string; readonly slot: string; readonly facing: "right" | "left" };
 }
 
 const WALK = "#! chat -dev quick hero rifleman\n40 a stick 1 0\n70 a stick 0 0\n90 b tap X 2\n";

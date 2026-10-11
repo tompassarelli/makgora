@@ -67,14 +67,14 @@ function tick(): void {
     return;
   }
   if (r.stage === "opening") {
-    if (++r.held < OPENING_TICKS) return;
+    if (++r.held < (fixture.openingTicks ?? OPENING_TICKS)) return;
     r.held = 0;
     r.stage = "target";
     nativeDriverCommand(`resume ${fixture.frames[0] ?? 0}`);
     return;
   }
   const target = fixture.frames[r.frame];
-  if (target === undefined || now !== target || ++r.held < HOLD_TICKS) return;
+  if (target === undefined || now !== target || ++r.held < (fixture.holdTicks ?? HOLD_TICKS)) return;
   r.held = 0;
   r.frame++;
   const next = fixture.frames[r.frame];
@@ -83,7 +83,7 @@ function tick(): void {
     return;
   }
   r.stage = "tail";
-  r.tail = target + TAIL_FRAMES;
+  r.tail = target + (fixture.tailFrames ?? TAIL_FRAMES);
   nativeDriverCommand(`resume ${r.tail}`);
 }
 

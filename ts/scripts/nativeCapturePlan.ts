@@ -19,6 +19,40 @@ import { fighterAt } from "../src/game/sim/roster";
 import { damageTint, hitlagShake } from "../src/game/presentation/hitPresentation";
 import { SMASHCRAFT_HEADLESS } from "./wisp/headless";
 import type { CaptureFixture } from "../src/platform/captureFixtures";
+import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../src/game/sim/heroes/registry";
+import { authoredTuning } from "../src/game/sim/tuning";
+import { AttackStyle } from "../src/game/sim/codes";
+import { attackDurationFramesForGrounding, attackStartupFrames, isAerialAttack } from "../src/game/sim/moves";
+import { specialKit } from "../src/game/sim/heroSpecials";
+import { heroCueWindows } from "../src/game/presentation/specialCues";
+
+export function reelFixtures(only: string | undefined, holdTicks = 6): CaptureFixture[][] {
+  if (!Number.isInteger(holdTicks) || holdTicks < 6 || holdTicks > 180) throw new Error("reel hold ticks must be 6..180");
+  const batches = SELECTABLE_CHARACTERS.filter(character => only === undefined || fighterSlug(character) === only).map(character => {
+    const tuning = authoredTuning(character);
+    const fighter = fighterSlug(character);
+    const normals = tuning.moves === undefined
+      ? Object.entries(AttackStyle).filter(([, code]) => code !== AttackStyle.grab && code !== AttackStyle.dashAttack)
+      : Object.entries(AttackStyle).filter(([, code]) => tuning.moves?.normals[code] !== undefined);
+    const moves: { slot: string; kind: string; code: number; first: number; end: number }[] = normals.map(([slot, code]) => ({ slot, kind: "normal", code, first: attackStartupFrames(code, tuning.moves), end: attackDurationFramesForGrounding(code, !isAerialAttack(code), tuning.moves) }));
+    ["neutral_b", "side_b", "up_b", "down_b"].forEach((slot, code) => {
+      const special = tuning.specials === undefined ? undefined : specialKit(tuning.specials, code).ground;
+      moves.push({ slot, kind: "special", code, first: special === undefined ? 12 : heroCueWindows(special).active.first, end: special?.endFrame ?? 120 });
+    });
+    if (tuning.ultimate !== undefined) moves.push({ slot: "ultimate", kind: "ultimate", code: 0, first: heroCueWindows(tuning.ultimate).active.first, end: tuning.ultimate.endFrame });
+    return moves.flatMap((move, index) => (["right", "left"] as const).map((facing, side) => {
+      const row = `R${String(index * 2 + side + 1).padStart(2, "0")}`;
+      const duration = Math.max(8, move.end);
+      const samples = [1, Math.max(2, Math.floor(move.first / 2)), move.first, Math.round(duration / 3), Math.round(duration * 2 / 3), duration, duration + 2, duration + (move.kind === "ultimate" ? 300 : 4)];
+      const frames: number[] = [];
+      for (const sample of samples.sort((a, b) => a - b)) frames.push(Math.max(40 + sample, (frames.at(-1) ?? 40) + 1));
+      const script = `#! chat -dev quick hero ${fighterName(character).toLowerCase()}\n#! reel ${fighter} ${row} ${move.slot} ${facing} ${holdTicks}\n40 a move ${move.kind} ${move.code} ${facing}\n${frames.map(frame => `${frame} a capture`).join("\n")}\n`;
+      return { name: `${fighter}-${row}`, frames, script, holdTicks, openingTicks: 1, tailFrames: 0, reel: { fighter, row, slot: move.slot, facing } };
+    }));
+  });
+  if (batches.length === 0) throw new Error(`unknown fighter ${only}`);
+  return batches;
+}
 
 
 const platform = join(import.meta.dir, "../src/platform");
@@ -146,9 +180,13 @@ export function judge(cues: readonly Cue[], run: ReturnType<typeof play>) {
 
 export const planFixture = (fixture: CaptureFixture) => Effect.gen(function*() {
   const cues = yield* Effect.try({ try: () => parseCues(fixture.script), catch: cause => new PlanFailure({ problem: `${fixture.name}: ${String(cause)}` }) });
-  if (cues.length === 0) return yield* new PlanFailure({ problem: `${fixture.name}: no #! cue lines to check` });
+  if (cues.length === 0 && fixture.reel === undefined) return yield* new PlanFailure({ problem: `${fixture.name}: no #! cue lines to check` });
   const loaded = yield* Effect.tryPromise({ try: loadPlatform, catch: cause => new PlanFailure({ problem: `load the map code: ${String(cause)}` }) });
   const run = yield* Effect.try({ try: () => play(loaded, fixture), catch: cause => new PlanFailure({ problem: String(cause) }) });
+  if (fixture.reel !== undefined) {
+    console.log(`PLAN ${fixture.name}: ${run.held.length} held frames through the native-driver map entry (headless, no pixel verdict)`);
+    return { fixture: fixture.name, cues: run.held.length, passed: run.held.length };
+  }
   const verdicts = judge(cues, run);
   for (const { cue, stamped, found, pass } of verdicts) {
     const seen = found.map(row => `${row.check} ${row.at === undefined ? "MISSING" : `@${row.at}`}`).join(", ");
