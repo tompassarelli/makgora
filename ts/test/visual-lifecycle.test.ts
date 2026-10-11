@@ -9,9 +9,10 @@ import { ReplayCorrections, ReplayHistory } from "../src/game/replay/history";
 import { MATCH_CAMERA_ASPECT } from "../src/game/sim/matchCamera";
 import { ROSTER_MANA } from "../src/game/sim/mana";
 import { IMPACT_HIT_MODEL } from "../src/game/assets/impactAssetInfo";
+import { PROJECTILE_DRAW_OFFSETS } from "../src/game/presentation/projectileArt";
 import { AttackStyle, Character, SpecialAction } from "../src/game/sim/codes";
 import { FIGHTER_ULTIMATES } from "../src/game/sim/ultimates";
-import { SELECTABLE_CHARACTERS } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, heroDefinition } from "../src/game/sim/heroes/registry";
 import { createFighter } from "../src/game/sim/fighter";
 import { soloWorld } from "../src/game/sim/testWorld";
 import { copyControls, neutralControls } from "../src/game/sim/roster";
@@ -319,6 +320,64 @@ test("however Rifleman's Aimed Shot ends, no ultimate effect stays on screen one
         expect(bolt.color[3], `${ending}: bolt alpha`).toBe(0);
         expect(Math.max(bolt.from[2] ?? 0, bolt.to[2] ?? 0), `${ending}: bolt left on stage`).toBeLessThan(ground);
       }
+    });
+    expect(client.errors).toEqual([]);
+  }
+});
+
+test("Classic Cairne's Shockwave draws a playing wave on its projectile for the projectile's whole life, both facings (#484) [k1 scenario]", () => {
+  const wave = heroDefinition(Character.cairne)?.specials.neutral.ground.projectiles?.[0];
+  if (wave?.model === undefined) throw new Error("missing Cairne Shockwave projectile");
+  const offset = Math.abs(PROJECTILE_DRAW_OFFSETS[wave.model]?.x ?? 0.0);
+  for (const facing of [-1, 1]) {
+    const clients = headless.clients({ start, install });
+    clients.start();
+    clients.frames(30);
+    const client = clients.clients[0];
+    if (client === undefined) throw new Error("missing host client");
+    client.run(() => {
+      globalThis.__smashcraftCueDefinitive = false;
+      const s = shell();
+      selectCharacter(s.game, 0, Character.cairne);
+      selectCharacter(s.game, 1, Character.cairne);
+      expect(requestStageSelect(s.game, 0)).toBe(true);
+      expect(startAtGo(s.game, 0)).toBe(true);
+      startMatch(s);
+      s.game.timeLimitMinutes = 0;
+      const cairne = fighterAt(s.world, 0), target = fighterAt(s.world, 1);
+      cairne.motion.x = -400 * facing;
+      cairne.facing = facing;
+      cairne.mana.points = ROSTER_MANA.max;
+      target.motion.x = 2000 * facing;
+      let tick = 0, drawn = 0, alive = 0;
+      const clocks = new Map<unknown, number>();
+      const step = () => {
+        tick++;
+        for (const input of s.produced.inputs) copyControls(input, neutralControls());
+        s.produced.inputs[0].specialPressed = tick === 1;
+        expect(captureFrame(s.frameInput, tick, s.world.mask, s.produced, s.runtime)).toBe(true);
+        applyFrame(s);
+        renderPersistentPresentation(s);
+        client.draw(1 / 60);
+      };
+      for (let frame = 0; frame < 120 && (tick < 2 || cairne.projectiles.some((p) => p.life > 0) || drawn === 0); frame++) {
+        step();
+        const live = cairne.projectiles.filter((p) => p.spec?.model === wave.model && p.life > 0);
+        const waves = client.effectPoses({ visibleOnly: true }).filter((pose) => pose.destroyed === undefined && pose.model === wave.model);
+        alive += live.length;
+        for (const projectile of live) {
+          const pose = waves.find((effect) => Math.abs(effect.x - (s.origin.x + projectile.x)) <= wave.radius + offset);
+          expect(pose, `tick ${tick}: wave drawn at projectile x ${projectile.x}`).toBeDefined();
+          if (pose === undefined) continue;
+          expect(pose.timeScale, `tick ${tick}: wave animation plays`).toBeGreaterThan(0);
+          const previous = clocks.get(pose.handle);
+          if (previous !== undefined) expect(pose.animationClock, `tick ${tick}: wave clock advances`).toBeGreaterThan(previous);
+          clocks.set(pose.handle, pose.animationClock);
+          drawn++;
+        }
+      }
+      expect(alive, "wave frames alive").toBeGreaterThan(0);
+      expect(drawn, "wave frames drawn").toBe(alive);
     });
     expect(client.errors).toEqual([]);
   }
