@@ -32,7 +32,11 @@ export const STATIONARY_PARTICLE_MODELS = [
 const PARKED_LINE_DEPTH = 4096.0;
 const DEFILE_DECAY = "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx";
 const DEFILE_FROST = "Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdx";
-const RISEN_FRONT = 120.0;
+const RISEN_FRONT = 56.0;
+const RISEN_HEADROOM = 20.0;
+const RISEN_BIRTH = 0.625;
+const RISEN_DEPTH = 0.375;
+const RISEN_ALPHA = 150;
 
 
 interface Risen {
@@ -175,7 +179,7 @@ export class ProjectilePresentation {
     const centerX = this.definitive ? f32(0.337811) : f32(-0.3387);
     const centerZ = this.definitive
       ? born ? paused ? f32(-198.454501) : f32(-146.291377) : f32(133.889278)
-      : born ? f32(-389.412987) : f32(29.882828);
+      : f32(-389.412987);
     const pitch = ARENA_CAMERA.angleOfAttack / 360.0, yaw = ARENA_CAMERA.rotation / 360.0;
     const distance = GetCameraField(CAMERA_FIELD_TARGET_DISTANCE);
     const eyeX = GetCameraTargetPositionX() - cosineTurns(yaw) * cosineTurns(pitch) * distance;
@@ -184,12 +188,17 @@ export class ProjectilePresentation {
     const lift = toward > RISEN_FRONT * 2.0 ? RISEN_FRONT / toward : 0.0;
     const y = this.origin.y - RISEN_FRONT * (lift > 0.0 ? 1.0 : 0.0);
     const scaleX = f32(f32(f32(2.0 * placed.radius) / width) * (draw?.width ?? 1.0));
-    const scaleZ = f32(f32(f32(2.0 * placed.radius) / height) * (draw?.height ?? 1.0));
+    const grown = f32(f32(f32(placed.z + placed.radius) + RISEN_HEADROOM) * (born ? RISEN_BIRTH : 1.0));
+    const scaleZ = this.definitive ? f32(f32(f32(2.0 * placed.radius) / height) * (draw?.height ?? 1.0)) : f32(grown / height);
     const x = this.origin.x + f32(placed.x - f32(centerX * scaleX));
-    const z = this.origin.z + f32(placed.z - f32(centerZ * scaleZ)) + (draw?.z ?? 0.0);
+    const z = this.definitive
+      ? this.origin.z + f32(placed.z - f32(centerZ * scaleZ)) + (draw?.z ?? 0.0)
+      : this.origin.z + f32(f32(grown * 0.5) - f32(centerZ * scaleZ));
     BlzResetSpecialEffectMatrix(model);
-    BlzSetSpecialEffectMatrixScale(model, scaleX * (1.0 - lift), 1.0 - lift, scaleZ * (1.0 - lift));
+    BlzSetSpecialEffectMatrixScale(model, scaleX * (1.0 - lift), RISEN_DEPTH * (1.0 - lift), scaleZ * (1.0 - lift));
     BlzSetSpecialEffectPosition(model, x + (eyeX - x) * lift, y, z + (eyeZ - z) * lift);
+    BlzSetSpecialEffectAlpha(model, RISEN_ALPHA);
+    if (!this.definitive) BlzSetSpecialEffectAnimation(model, "birth");
     for (let index = 0; index < placed.fills.length; index++) {
       const fillSlot = placed.fills[index];
       const fill = fillSlot === undefined ? undefined : this.models[fillSlot];
@@ -197,11 +206,11 @@ export class ProjectilePresentation {
       if (fill === undefined || offset === undefined) continue;
       BlzResetSpecialEffectMatrix(fill);
       BlzSetSpecialEffectYaw(fill, placed.yaw);
-      BlzSetSpecialEffectMatrixScale(fill, scaleX * (1.0 - lift), 1.0 - lift, scaleZ * (1.0 - lift));
+      BlzSetSpecialEffectMatrixScale(fill, scaleX * (1.0 - lift), RISEN_DEPTH * (1.0 - lift), scaleZ * (1.0 - lift));
       const fillX = x + f32(offset.x * placed.radius), fillZ = z + f32(offset.z * placed.radius);
       BlzSetSpecialEffectPosition(fill, fillX + (eyeX - fillX) * lift, y, fillZ + (eyeZ - fillZ) * lift);
       BlzSetSpecialEffectScale(fill, placed.scale);
-      BlzSetSpecialEffectAlpha(fill, 255);
+      BlzSetSpecialEffectAlpha(fill, RISEN_ALPHA);
       if (born) BlzSetSpecialEffectAnimation(fill, "birth");
       BlzSetSpecialEffectTime(fill, f32(0.3));
       BlzSetSpecialEffectTimeScale(fill, paused ? 0.0 : this.definitive ? 1.0 : 0.0);
@@ -325,7 +334,7 @@ export class ProjectilePresentation {
       if (!paused && projectile !== undefined) this.lives[slot] = projectile.life;
       if (risen) {
         this.lingering[slot] = 4;
-        this.risen[slot] = { x: pose.x, z: pose.z, radius: pose.dangerRadius, yaw: pose.yaw, scale: pose.modelScale * (cue?.scale ?? 1.0), draw, fills: pool?.fills[pool.effects.indexOf(slot)] ?? [] };
+        this.risen[slot] = { x: pose.x, z: pose.z, radius: pose.dangerRadius, yaw: pose.yaw, scale: pose.modelScale * (cue?.scale ?? 1.0), draw, fills: this.definitive ? pool?.fills[pool.effects.indexOf(slot)] ?? [] : [] };
         this.placeRisen(slot, born, paused);
         for (const [index, fillSlot] of (this.risen[slot]?.fills ?? []).entries()) {
           if (draw?.fill?.[index] === undefined) continue;
