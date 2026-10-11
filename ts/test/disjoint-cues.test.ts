@@ -36,7 +36,10 @@ function checkNormalRegions(characters: readonly Character[]): void {
           const expected: number[][] = [];
           for (let index = 0; index < authoredHitRegionCount(style, fighter.tuning.moves); index++) {
             const region = authoredHitRegion(scratch, character, style, frame, 0, index, fighter.tuning.moves);
-            if (region.effect.damage > 0) expected.push([417 + facing * Math.fround(Math.fround(region.minX + region.maxX) * 0.5), 193 + Math.fround(Math.fround(region.minZ + region.maxZ) * 0.5)]);
+            if (region.effect.damage <= 0) continue;
+            const x = Math.fround(Math.fround(region.minX + region.maxX) * 0.5), z = Math.fround(Math.fround(region.minZ + region.maxZ) * 0.5);
+            const across = Math.abs(x) >= Math.abs(z - 66);
+            expected.push([417 + facing * (across ? (x >= 0 ? region.maxX : region.minX) : x), 193 + (across ? z : z >= 66 ? region.maxZ : region.minZ)]);
           }
           renderer.present(fighter, true);
           const actual = client.effectPoses().filter(effect => effect.scale > 0 && effect.z > 0);
@@ -57,10 +60,10 @@ function checkNormalRegions(characters: readonly Character[]): void {
   console.log(`disjoint presentation: ${measured} active region frames checked, 0 missing or misplaced`);
 }
 
-test("headless renderer places one visible effect at every live Warden and Shadow Hunter disjoint normal region [k3 measure docs/disjoint-legibility.md]", () => {
+test("headless renderer places one visible effect at every live Warden and Shadow Hunter reach-cued normal region's far end [k3 measure docs/disjoint-legibility.md]", () => {
   checkNormalRegions([Character.warden, Character.shadowHunter]);
 });
 
-sweep("headless renderer places one visible effect at every fighter's live disjoint normal region [k3 measure docs/disjoint-legibility.md]", () => {
+sweep("headless renderer places one visible effect at every fighter's live reach-cued normal region's far end [k3 measure docs/disjoint-legibility.md]", () => {
   checkNormalRegions(SELECTABLE_CHARACTERS);
 });

@@ -9,6 +9,9 @@
   clips and rewrites their foot cadence and audit (smashcraft:docs/fighter-motion.md);
   `view reach --assets DIR [--character ID]` rewrites how far fighters' swings
   draw toward their strikes (smashcraft:docs/hurtboxes.md);
+  `view reachcues --assets DIR` rewrites which normals show a reach flare: an
+  active hit region more than 0.15 body heights (132 u) past the drawn Classic
+  body and weapon swept over the active frames (#481);
   `view cues [--move FIGHTER:MOVE]... [--graphics classic|definitive]` renders
   every attack and special cue in Wisp and fails any move over the effect budget
   (smashcraft:docs/design/visual-quality.md, "Effect budget").

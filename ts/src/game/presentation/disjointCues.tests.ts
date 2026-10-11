@@ -3,7 +3,7 @@ import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { SELECTABLE_CHARACTERS } from "../sim/heroes/registry";
 import { createFighter } from "../sim/fighter";
-import { AttackStyle, Character, ProjectileKind, SpecialAction } from "../sim/codes";
+import { Character, ProjectileKind, SpecialAction } from "../sim/codes";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../sim/hitRegions";
 import { attackDurationFramesForGrounding } from "../sim/moves";
 import { heroProjectileArt } from "./projectileArt";
@@ -12,6 +12,12 @@ import { disjointNormals, fanKnifePose, hitAreaPose, specialAreaRegion, type Fan
 import { specialForm, specialKit } from "../sim/heroSpecials";
 
 const pose: HitAreaPose = { visible: false, x: 0.0, z: 0.0, scale: 0.0 };
+
+function farEnd(region: { minX: number; maxX: number; minZ: number; maxZ: number }): [number, number] {
+  const x = f32(f32(region.minX + region.maxX) * 0.5), z = f32(f32(region.minZ + region.maxZ) * 0.5);
+  if (Math.abs(x) >= Math.abs(f32(z - 66.0))) return [x >= 0.0 ? region.maxX : region.minX, z];
+  return [x, z >= 66.0 ? region.maxZ : region.minZ];
+}
 
 test("Fan of Knives sprays seven oriented knives to its authored endpoints in both facings [k3 measure docs/design/warden-fan-of-knives.md]", () => {
   const knife: FanKnifePose = { ...pose, yaw: 0.0, pitch: 0.0, alpha: 0 };
@@ -39,7 +45,7 @@ test("Fan of Knives sprays seven oriented knives to its authored endpoints in bo
   }
 });
 
-test("every disjoint normal marks each active region centre every frame in both facings [k2 property]", () => {
+test("every reach-cued normal flares at each active region's far end every frame in both facings [k2 property]", () => {
   let checked = 0;
   const scratch = emptyHitRegion();
   for (const character of SELECTABLE_CHARACTERS) {
@@ -57,8 +63,9 @@ test("every disjoint normal marks each active region centre every frame in both 
           const actual = hitAreaPose(fighter, region, pose);
           assertEquals(actual.visible, region.effect.damage > 0.0);
           if (!actual.visible) continue;
-          assertEquals(actual.x, f32(417.0 + f32(facing * f32(f32(region.minX + region.maxX) * 0.5))));
-          assertEquals(actual.z, f32(193.0 + f32(f32(region.minZ + region.maxZ) * 0.5)));
+          const [x, z] = farEnd(region);
+          assertEquals(actual.x, f32(417.0 + f32(facing * x)));
+          assertEquals(actual.z, f32(193.0 + z));
           assertTrue(actual.scale > 0.0);
           checked++;
         }
@@ -66,12 +73,9 @@ test("every disjoint normal marks each active region centre every frame in both 
     }
   }
   assertTrue(checked > 1000);
-  const lich = createFighter(Character.lich, 0.0, 1);
-  assertTrue(disjointNormals(lich).includes(AttackStyle.forwardSmash));
-  assertTrue(disjointNormals(lich).includes(AttackStyle.downSmash));
 });
 
-test("every authored special form marks each live strike centre on the collision frame [k2 property]", () => {
+test("every authored special form flares at each live strike's far end on the collision frame [k2 property]", () => {
   let checked = 0;
   for (const character of SELECTABLE_CHARACTERS) {
     const fighter = createFighter(character, -321.0, -1);
@@ -91,8 +95,9 @@ test("every authored special form marks each live strike centre on the collision
           const actual = hitAreaPose(fighter, specialAreaRegion(fighter, index), pose);
           assertEquals(actual.visible, active);
           if (!active) continue;
-          assertEquals(actual.x, f32(-321.0 - f32(f32(authored.hit.minX + authored.hit.maxX) * 0.5)));
-          assertEquals(actual.z, f32(f32(authored.hit.minZ + authored.hit.maxZ) * 0.5));
+          const [x, z] = farEnd(authored.hit);
+          assertEquals(actual.x, f32(-321.0 - x));
+          assertEquals(actual.z, f32(z));
           checked++;
         }
       }
