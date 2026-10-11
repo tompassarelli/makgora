@@ -108,7 +108,7 @@ export const lanSoak: Command = (args) => Effect.gen(function*() {
       const own = samples.filter((sample) => sample.client === client.name);
       const after = own.filter((sample) => sample.elapsed >= 600);
       const final = own.at(-1)?.snapshot;
-      if (final === undefined || final.matches < 2 || final.results < 1) return yield* new NativeSoakFailure({ problem: `${client.name}: back-to-back match/result/rematch flow was not observed` });
+      if (final === undefined || final.matches < 2 || final.results < 1) return yield* failure(`${client.name}: back-to-back match/result/rematch flow was not observed`);
       if (after.length < 3) lines.push(`| ${client.name} | ${own.length} | ${after.length} | — | n/a (no collectgarbage in Warcraft Lua) | — | insufficient post-10-minute samples |`);
       else {
         const rss = slope(after, (sample) => sample.rssMiB);
@@ -123,7 +123,7 @@ export const lanSoak: Command = (args) => Effect.gen(function*() {
     yield* attempt("write summary", () => writeFileSync(join(out, "summary.md"), lines.join("\n") + "\n"));
     yield* Console.log(lines.join("\n"));
     yield* Console.log(`elapsed ${((performance.now() - started) / 1000).toFixed(1)} s; ${out}`);
-    if (failed) return yield* new NativeSoakFailure({ problem: "growth exceeds the stated post-warmup bounds" });
+    if (failed) return yield* failure("growth exceeds the stated post-warmup bounds");
   });
   yield* onHealthyClients(Effect.scoped(run).pipe(Effect.provide(ClientWatch.layer({ filePrefix: "smashcraft" }))), { clientsFile: selected.clients, retry: false });
 });
