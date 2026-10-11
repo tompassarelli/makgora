@@ -3748,22 +3748,6 @@ mod linux {
     }
 
     #[test]
-    #[ignore = "read-only native scan timing; requires access to /dev/input"]
-    fn reconnect_scan_latency_probe() {
-        let absent = DeviceIdentity {
-            id: evdev::InputId::new(evdev::BusType::BUS_USB, 0x045e, 0x02ea, 1),
-            name: Some("Smashcraft disconnected measurement".into()),
-            phys: Some("smashcraft-disconnected-measurement".into()),
-            uniq: None,
-        };
-        for sample in 0..3 {
-            let scan = Instant::now();
-            assert!(matching_devices(&absent).unwrap().is_empty());
-            eprintln!("scan_sample={sample} total_us={}", scan.elapsed().as_micros());
-        }
-    }
-
-    #[test]
     fn reconnect_sysfs_identity_retains_exact_discriminator() {
         let dir = env::temp_dir().join(format!("reconnect-identity-{}", std::process::id()));
         fs::create_dir_all(dir.join("id")).unwrap();
