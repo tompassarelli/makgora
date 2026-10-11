@@ -171,8 +171,8 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     down: { spell: "Force of Nature", startup: NATURE, active: cue("Abilities\\Spells\\NightElf\\TargetArtLumber\\TargetArtLumber.mdx", "ahead", f32(0.7)) },
   },
   [Character.jaina]: {
-    neutral: { spell: "Frostbolt", startup: ARCANE, active: cue("Abilities\\Weapons\\SorceressMissile\\SorceressMissile.mdx", "hand", 0.5) },
-    side: { spell: "Blizzard", startup: ARCANE, active: cue("Abilities\\Weapons\\LichMissile\\LichMissile.mdx", "hand", f32(0.7)) },
+    neutral: { spell: "Frostbolt", startup: ARCANE, active: cue("Abilities\\Spells\\Other\\FrostBolt\\FrostBoltMissile.mdx", "hand", 0.5) },
+    side: { spell: "Blizzard", startup: ARCANE, active: cue("Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget.mdx", "hand", f32(0.3)) },
     up: { spell: "Blink", startup: ARCANE, active: cue("Abilities\\Spells\\Human\\MassTeleport\\MassTeleportTarget.mdx", "body", 0.5) },
     down: { spell: "Summon Water Elemental", startup: ARCANE, active: cue("Abilities\\Weapons\\WaterElementalMissile\\WaterElementalMissile.mdx", "hand", f32(0.7)) },
   },
