@@ -12,7 +12,7 @@ import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
 import { captureScene, renderScenes, type RenderScene } from "wisp/scripts/wisp/headlessRender";
 import { originalClip, originalClipCount, originalClipNames } from "../../../src/game/assets/fighterOriginalClipInfo";
 import { parseMDX } from "../../clipNodes";
-import { clipJitter, jitters } from "../animJitter";
+import { clipJitter, JITTER_EXEMPTIONS, jitters } from "../animJitter";
 import { extremeCamera, cameraFieldOfView, FLOOR_HEIGHT } from "../../../src/game/presentation/arenaCamera";
 import type { Character } from "../../../src/game/sim/codes";
 import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../../../src/game/sim/heroes/registry";
@@ -368,6 +368,7 @@ const jitter: Command = (args) => Effect.gen(function*() {
   const root = join(assets, "original-clips-static-lights/imports");
   const models = new Map<string, ReturnType<typeof parseMDX>>();
   const offenders: string[] = [];
+  const exempt = new Map<string, number>();
   let clips = 0;
   for (const look of looks) for (const character of fighters) {
     const names = new Map([...originalClipNames(character)].map(([name, index]) => [index, name] as const));
@@ -387,11 +388,15 @@ const jitter: Command = (args) => Effect.gen(function*() {
       clips++;
       if (!jitters(measured)) continue;
       const worst = measured.worst;
+      if (JITTER_EXEMPTIONS.has(fighterSlug(character))) { exempt.set(fighterSlug(character), (exempt.get(fighterSlug(character)) ?? 0) + 1); continue; }
       offenders.push(`${look}\t${fighterSlug(character)}\t${names.get(index) ?? index}\t${measured.translation.toFixed(2)}\t${measured.scaling.toFixed(3)}\t${measured.rotation.toFixed(1)}\t${worst === undefined ? "" : `${worst.node} ${worst.property} @${worst.frame}`}`);
     }
   }
   yield* Console.log(["look\tfighter\tsequence\ttranslation\tscaling\trotation\tworst", ...offenders].join("\n"));
   yield* Console.log(`${offenders.length} jittering clips of ${clips}`);
+  for (const [fighter, count] of exempt) yield* Console.log(`${fighter}: ${count} jittering clips exempt (${JITTER_EXEMPTIONS.get(fighter)})`);
+  const stale = [...JITTER_EXEMPTIONS.keys()].filter((fighter) => !exempt.has(fighter) && fighters.some((character) => fighterSlug(character) === fighter));
+  if (stale.length > 0) return yield* new AnimFailure({ problem: `${stale.join(", ")} no longer jitter; remove their entries from JITTER_EXEMPTIONS in smashcraft:ts/scripts/wisp/animJitter.ts` });
   if (offenders.length > 0) return yield* new AnimFailure({ problem: `${offenders.length} clips leave their keys between frames; write curved tangents as slopes (zero for a hold) or use Linear keys` });
 }).pipe(Effect.provide(BunServices.layer));
 
