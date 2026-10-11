@@ -99,7 +99,7 @@ export const PROJECTILE_DRAW_CUES: { readonly [model: string]: { readonly scale:
   "Abilities\\Spells\\Human\\ManaFlare\\ManaFlareMissile.mdx": { scale: f32(1.2) },
   "Abilities\\Weapons\\QuillSprayMissile\\QuillSprayMissile.mdx": { scale: 1.5 },
   "Abilities\\Weapons\\ShadowHunterMissile\\ShadowHunterMissile.mdx": { scale: 1.5 },
-  "Abilities\\Weapons\\FarseerMissile\\FarseerMissile.mdx": { scale: 0.5 },
+  "Abilities\\Weapons\\FarseerMissile\\FarseerMissile.mdx": { scale: f32(0.15) },
   "Abilities\\Weapons\\AncientProtectorMissile\\AncientProtectorMissile.mdl": { scale: f32(0.25) },
   "Abilities\\Spells\\Undead\\CarrionSwarm\\CarrionSwarmMissile.mdx": { scale: f32(0.85) },
   "Abilities\\Spells\\Orc\\Shockwave\\ShockwaveMissile.mdx": { scale: f32(0.6) },
