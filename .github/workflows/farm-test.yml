@@ -177,7 +177,7 @@ jobs:
       max-parallel: ${{ fromJSON(needs.plan.outputs.lua-parallel) }}
       matrix:
         job: ${{ fromJSON(needs.plan.outputs.lua) }}
-    name: lua32 ${{ matrix.job }}
+    name: lua32 eight-shard batch ${{ matrix.job }}
     steps:
       - if: runner.environment == 'github-hosted'
         uses: actions/checkout@v4
@@ -374,7 +374,7 @@ jobs:
       max-parallel: 7
       matrix:
         shard: [0, 1, 2, 3, 4, 5, 6]
-    name: census ${{ matrix.shard }}
+    name: census seven-way ${{ matrix.shard }}
     env:
       CENSUS_SHARDS: 7
     steps:
