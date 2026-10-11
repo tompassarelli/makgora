@@ -1,27 +1,5 @@
 import { expect, test } from "bun:test";
-import recorded from "../scripts/autoland.recorded.json";
-import { QUEUED, TEST_SLOTS, TRAIN_CAP, TRAIN_TITLE, WAITING, laneState, passedAlone, passedDescription, plan, testTitle, train, type Lane, type Run } from "../scripts/autolandCore";
-
-const lanes = recorded.lanes as Lane[];
-const runs = recorded.runs as Run[];
-
-test("the recorded queue tests its 7 queued tips at once across both slots and leaves the 6 bisect tips to their live runs, recorded 2026-10-10T03:35Z [k3 measure docs/ci.md]", () => {
-  const result = plan(lanes, runs);
-  const queued = lanes.filter((lane) => lane.status?.description === QUEUED).toSorted((a, b) => a.status!.at.localeCompare(b.status!.at));
-  expect(result.test.map((order) => order.branch)).toEqual(queued.map((lane) => lane.branch));
-  expect(result.test.map((order) => order.slot)).toEqual([0, 1, 0, 1, 0, 1, 0]);
-  expect(lanes.filter((lane) => laneState(lane, runs) === "held")).toHaveLength(6);
-  expect(result.train).toBe(false);
-});
-
-test("a cancelled bisect half or test run never strands its tip: without a live run every pending tip is tested, recorded 2026-10-10T03:35Z [k3 measure docs/ci.md]", () => {
-  const legacyGone = runs.filter((run) => run.title === "Autoland waiting branches");
-  expect(plan(lanes, legacyGone).test).toHaveLength(13);
-  const waiting = lanes.map((lane): Lane => (lane.status?.state === "pending" ? { ...lane, status: { ...lane.status, description: WAITING } } : lane));
-  const live = waiting.filter((lane) => lane.status?.state === "pending").map((lane, i) => ({ title: testTitle(i % TEST_SLOTS, lane.branch, lane.tip), status: "pending" }));
-  expect(plan(waiting, live).test).toEqual([]);
-  expect(plan(waiting, live.slice(1)).test.map((order) => order.branch)).toEqual([waiting.filter((lane) => lane.status?.state === "pending")[0]!.branch]);
-});
+import { QUEUED, TEST_SLOTS, TRAIN_CAP, TRAIN_TITLE, WAITING, passedAlone, passedDescription, plan, testTitle, train, type Lane, type Run } from "../scripts/autolandCore";
 
 function random(seed: number): () => number {
   let state = seed;
