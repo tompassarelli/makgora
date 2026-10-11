@@ -288,7 +288,7 @@ const CORRECTIONS: Readonly<Record<'classic' | 'definitive', Readonly<Record<str
     "Anub'arak": { flipped: true },
     Lich: { zoom: 1.2 },
     LichKing: { turn: 150, zoom: 1.5 },
-    JainaProudmoore: { elapsed: 3.433, turn: 25, zoom: 0.45, shift: [-0.5, 0.1], bust: [0.45, 0.35, 0.84] },
+    JainaProudmoore: { elapsed: 3.433, turn: 25, zoom: 0.45, shift: [-0.5, 0.1], bust: [0.45, 0.4, 0.5] },
     MalfurionStormrage: { zoom: 2.2, shift: [0, 0.5], bust: [0.58619, 0.22423, 0.5526] },
     Murloc: { rest: true, body: true, zoom: 0.7, shift: [0.3, 1.6], bones: { bone_head: [0, -20, 0] }, bust: [0.5, 0.4, 0.98] },
   },
