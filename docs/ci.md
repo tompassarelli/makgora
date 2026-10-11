@@ -92,42 +92,7 @@ revision's file, so measuring an older commit or bisecting a failing shard
 does not depend on that old source containing current routing policy. Delete obsolete runner variables only after these
 workflow versions are live on main.
 
-The local `ts/scripts/jobWatchdog.ts` command observes only `autoland.yml` and
-`farm-test.yml`. Its pure core uses real job start/finish timestamps, grouped
-by exact workflow, job name and hosted/self-hosted class, from completed
-successful or failed jobs in the previous seven days. Cancelled, timed-out,
-skipped and unassigned jobs contribute no baseline. Missing comparable data
-or fewer than five completed samples means observation only; each such key
-logs as unbaselined once per monitor process. It never substitutes a guessed median. A completed
-baseline refresh is required within 24 hours. Job history is cached outside
-Git and refreshed separately from the 20-second monitor, with a bounded API
-budget and a shared 3,000-call reserve.
-
-Only a job whose status is `in_progress`, whose runner is assigned, and whose
-execution exceeds twice that median can trigger cancellation. A run with an
-in-progress land or queue job only alerts: "land in progress, not cancelled".
-The protection is checked again before cancellation, including pending receipts.
-Queue age is
-never an execution deadline. The GitHub cancellation API stops the entire
-qualifying run, including healthy sibling jobs; it cannot cancel one job.
-After that run finishes, the workflow-run `rerun` endpoint retries that
-qualifying run on hosted runners, including its healthy sibling jobs. Any genuine failed job recorded before or after cancellation
-preserves the red result and prevents automatic test retries. Retry attempts
-are excluded from watchdog cancellation, preventing a recovery loop. Atomic
-local receipts track cancellation, notification and retry across restarts.
-Autoland's cancelled plan job skips replanning so recovery cannot dispatch a
-second fresh run alongside its rerun.
-
-The existing `socrates-chat post --as smashcraft-lead` and `--as alerts` route
-spools the same job/runner/elapsed line to the lead room and
-`#socrates-alerts`. A successful command records local spool acceptance; the
-relay's `socrates-chat log` proves delivery. No workflow secret or new
-messaging integration is needed. Production runs through the Tom-only systemd
-user units in `tools/job-watchdog/`, with Tom's home and alert spool, never
-inside the Codex sandbox or a root service. Start the reviewed timer only after
-its routing is live. The command defaults to observation;
-`--apply` requires checked current main. An explicitly scoped `--probe-run`
-allows only the owned `codex/autoland-job-watchdog` branch.
+The Autoland sweep below is the only automatic canceller; the laptop job watchdog was removed after it cancelled healthy runs on stale code (#466, #513).
 
 ## Autoland sweep
 
