@@ -5,6 +5,7 @@
 
 
 import { ModelRenderer, model as mdx } from 'war3-model';
+import { JITTER_SPAN_MS } from './wisp/animJitter';
 
 
 export const KEY_BOUND = { position: 0.5, rotationDegrees: 0.5, tangents: 'slope' } as const;
@@ -264,7 +265,7 @@ const keyCount = (model: mdx.Model) => { let count = 0; transforms(model, track 
 
 const sameVector = (a: Vec | undefined, b: Vec) => a !== undefined && a.length === b.length && Array.from(b).every((value, axis) => a[axis] === value);
 
-/** Translation and scale keys with a generator's broken handles (Hermite tangents repeating the value, Bezier handles at the origin) get clamped Catmull-Rom slopes, flat at holds and clip ends. */
+/** Translation and scale keys with a generator's broken handles (Hermite tangents repeating the value, Bezier handles at the origin) get clamped Catmull-Rom slopes, flat at holds and clip ends; an axis held between close keys gets flat handles. */
 export function slopeTangents(source: mdx.Model): mdx.Model {
     const model = structuredClone(source);
     const sequenceOf = (frame: number) => model.Sequences.findIndex(sequence => frame >= at(sequence.Interval, 0) && frame <= at(sequence.Interval, 1));
@@ -292,6 +293,15 @@ export function slopeTangents(source: mdx.Model): mdx.Model {
             key.InTan = bezier ? inTan.map((slope, axis) => at(key.Vector, axis) - slope / 3) : inTan;
             key.OutTan = bezier ? outTan.map((slope, axis) => at(key.Vector, axis) + slope / 3) : outTan;
         });
+        for (let index = 1; index < keys.length; index++) {
+            const left = keys[index - 1]!, right = keys[index]!;
+            if (right.Frame - left.Frame > JITTER_SPAN_MS || left.OutTan === undefined || right.InTan === undefined) continue;
+            for (let axis = 0; axis < left.Vector.length; axis++) {
+                if (at(left.Vector, axis) !== at(right.Vector, axis)) continue;
+                left.OutTan[axis] = bezier ? at(left.Vector, axis) : 0;
+                right.InTan[axis] = bezier ? at(right.Vector, axis) : 0;
+            }
+        }
     });
     return model;
 }
