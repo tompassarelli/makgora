@@ -23,10 +23,12 @@ const lift = (): AuthoredSpecial => ({
     { ...frames(27, 32), velocityX: 0.0, velocityZ: 6.0, driftSpeed: 3.0 }],
   regions: [heroRegion(11, 16, c(0.0, 95.0, 0.0, 200.0, 20.0), hit(8.756999969482422, "launch", 80))],
 });
+const REINCARNATION: AuthoredSpecial = { endFrame: 46, groundOnly: true, intangible: frames(6, 9), guard: { ...frames(6, 9), heal: 12.0 } };
+
 export const CAIRNE_SPECIALS: FighterSpecials = {
   neutral: withExKit({ name: "Shockwave", description: "Plant the totem and send one low wave along the ground.", ground: shockwave(false), air: shockwave(true) }, { damage: 1.25 }),
   side: withExKit({ name: "War Stomp", description: "Step forward and stomp both sides, lifting nearby foes for a follow-up.", ground: stomp(false), air: stomp(true) }, { reach: 1.25 }),
   up: withExKit({ name: "Spirit Lift", description: "Rise behind the totem, then fall helplessly with exposed sides.", ground: lift() }, { travel: 1.25 }),
   down: withExKit({ name: "Reincarnation", description: "Read an incoming strike to heal 12 damage, up to 24 per stock. A wait or grab beats it.",
-    ground: { endFrame: 46, groundOnly: true, intangible: frames(6, 9), guard: { ...frames(6, 9), heal: 12.0 } } }, { guardFrames: 4 }),
+    ground: REINCARNATION, air: { ...REINCARNATION, groundOnly: false, landingLag: 20 } }, { guardFrames: 4 }),
 };

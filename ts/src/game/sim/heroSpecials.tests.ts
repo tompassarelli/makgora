@@ -115,22 +115,29 @@ test("replaying a hero special from a restored snapshot reproduces every fighter
   assertEquals(firstFighterDifference(endTarget, target, 3, 3), undefined);
 });
 
-test("seed 448's 18 aerial down-special landings continue to an effect and replay every frame [k1 scenario]", () => {
+test("seed 448's 18 aerial down-special landings, 11 offstage casts and falling trap reach an effect and replay every frame [k1 scenario]", () => {
   const characters = [Character.blademaster, Character.mountainKing, Character.lich, Character.dreadlord,
     Character.shadowHunter, Character.pitLord, Character.chen, Character.peon, Character.tinker,
-    Character.kaelthas, Character.grom, Character.kobold];
+    Character.kaelthas, Character.grom, Character.kobold, Character.rifleman, Character.forsakenPaladin,
+    Character.beastmaster, Character.lichKing, Character.thrall, Character.jaina, Character.sylvanas,
+    Character.cairne, Character.murloc, Character.anubarak, Character.malfurion];
   let scenarios = 0;
   for (const character of characters) {
+    const aerial = character === Character.rifleman || character === Character.forsakenPaladin || character === Character.beastmaster
+      || character === Character.lichKing || character === Character.thrall || character === Character.jaina || character === Character.sylvanas
+      || character === Character.cairne || character === Character.murloc || character === Character.anubarak || character === Character.malfurion;
     const falls = character === Character.mountainKing || character === Character.lich || character === Character.dreadlord
       || character === Character.shadowHunter || character === Character.pitLord || character === Character.grom;
-    for (let setup = 0; setup < (falls ? 2 : 1); setup++) {
+    for (let setup = 0; setup < (falls || character === Character.rifleman ? 2 : 1); setup++) {
+      const fallingTrap = character === Character.rifleman && setup === 1;
+      const offstage = aerial && !fallingTrap;
       const live = createReplaySnapshot();
       const replay = createReplaySnapshot();
       const owner = fighterAt(live.world, 0);
-      copyFighterState(owner, createFighter(character, 100.0, 1), 3);
+      copyFighterState(owner, createFighter(character, offstage ? 900.0 : 100.0, 1), 3);
       copyFighterState(fighterAt(live.world, 1), createFighter(Character.rifleman, -480.0, 1), 3);
-      owner.motion.z = setup === 0 ? 40.0 : 240.0;
-      owner.motion.vz = setup === 0 ? -1.0 : -4.0;
+      owner.motion.z = fallingTrap ? 600.0 : setup === 0 && !offstage ? 40.0 : 240.0;
+      owner.motion.vz = fallingTrap ? 0.0 : setup === 0 && !offstage ? -1.0 : -4.0;
       owner.motion.grounded = false;
       owner.motion.surface = undefined;
       setWorldMotionValue(owner.motion.meleeX, owner.motion.x);
@@ -146,7 +153,7 @@ test("seed 448's 18 aerial down-special landings continue to an effect and repla
       copyReplayState(replay, live);
       let landed = false;
       let effect = false;
-      for (let tick = 1; tick <= 120; tick++) {
+      for (let tick = 1; tick <= 80; tick++) {
         const row = assertDefined(inputRow({ held: tick === 1 ? maskOf(Action.moveDown, Action.special) : maskOf(Action.moveDown),
           pressed: tick === 1 ? maskOf(Action.special) : 0, axisZ: -127, specialZ: tick === 1 ? -1 : 0 }));
         for (const state of [live, replay]) {
@@ -155,24 +162,31 @@ test("seed 448's 18 aerial down-special landings continue to an effect and repla
         }
         const difference = firstStateDifference(live, replay);
         if (difference !== undefined) throw new Error(`seed 448 character ${character} setup ${setup} frame ${tick}: ${difference}`);
-        if (!landed && owner.motion.grounded) {
+        if (!offstage && !landed && owner.motion.grounded) {
           landed = true;
-          assertEquals(owner.special.action, SpecialAction.heroDown);
+          assertEquals(owner.special.action, fallingTrap ? SpecialAction.riflemanTrap : SpecialAction.heroDown);
           assertEquals(owner.special.form, 0);
           assertEquals(owner.special.frame, tick);
         }
         const move = runningHeroSpecial(owner);
+        if (owner.freezeTrap.life > 0 && owner.freezeTrap.surface === undefined) assertGreaterThan(owner.freezeTrap.arming, 0);
         effect = effect || move?.regions?.some(region => owner.special.frame >= region.firstFrame && owner.special.frame <= region.lastFrame) === true
-          || owner.projectiles.some(projectile => projectile.life > 0) || owner.placed.life > 0
+          || (move?.commandGrab !== undefined && owner.special.frame >= move.commandGrab.first && owner.special.frame <= move.commandGrab.last)
+          || owner.projectiles.some(projectile => projectile.life > 0) || owner.placed.life > 0 || owner.freezeTrap.life > 0
           || owner.status.armorFrames > 0 || (move?.guard !== undefined && owner.special.frame >= move.guard.first && owner.special.frame <= move.guard.last);
       }
-      assertEquals(landed, true);
+      assertEquals(landed, !offstage);
       assertEquals(effect, true);
+      if (fallingTrap) {
+        assertEquals(owner.freezeTrap.surface, 0);
+        assertEquals(owner.freezeTrap.arming, 0);
+        assertEquals(owner.freezeTrap.z, 0.0);
+      }
       fighterAt(replay.world, 0).special.form = 99;
       assertDefined(firstStateDifference(live, replay));
       scenarios++;
     }
   }
-  assertEquals(scenarios, 18);
+  assertEquals(scenarios, 30);
 });
 

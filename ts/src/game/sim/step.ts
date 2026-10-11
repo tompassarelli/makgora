@@ -150,7 +150,7 @@ function advanceFreeze(f: Fighter, input: Readonly<Controls>): boolean {
   if (trap.cooldown > 0) trap.cooldown--;
   if (trap.life > 0) {
     trap.life--;
-    if (trap.arming > 0) trap.arming--;
+    if (trap.arming > 0 && trap.surface !== undefined) trap.arming--;
     if (trap.life === 0) clearOwnedFreezeTrap(f);
   }
   return wasFrozen;

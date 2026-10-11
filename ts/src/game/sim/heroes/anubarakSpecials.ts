@@ -24,12 +24,18 @@ const eruption = (ex: boolean): AuthoredSpecial => ({
   regions: [heroRegion(9, 16, { x1: 0.0, z1: 70.0, x2: 0.0, z2: 150.0, radius: ex ? 31.0 : 21.0 }, anubarakHit(ex ? 14.865119934082031 : 9.910080909729004, 80, 76.44135284423828, 28.0))],
   ...(ex ? {} : { ex: eruption(true) }),
 });
+const beetleShot = (ex: boolean) => ({ model: "Units\\Undead\\Scarab\\Scarab.mdl", spawnFrame: 0, offsetX: 24.0, offsetZ: 32.0,
+      velocityX: 7.0, velocityZ: 0.0, life: 55, radius: 16.0, effect: anubarakHit(ex ? 8.671319961547852 : 6.19379997253418, 35, 58.45515060424805, 20.0), reflectable: true, limit: 4 });
+const aerialBeetles = (ex: boolean): AuthoredSpecial => ({
+  endFrame: 46, landingLag: 24,
+  projectiles: [{ ...beetleShot(ex), spawnFrame: 22, offsetZ: 0.0, velocityX: 0.0, velocityZ: -7.0 }],
+  ...(ex ? {} : { ex: aerialBeetles(true) }),
+});
 const beetles = (ex: boolean): AuthoredSpecial => ({
   endFrame: 46, groundOnly: true,
   placement: { frame: 22, offsetX: 55.0, radius: 24.0, height: 35.0, durability: ex ? 36.0 : 24.0, life: 180,
     fireAges: ex ? [1, 37, 73, 109] : [1, 49, 97],
-    shot: { model: "Units\\Undead\\Scarab\\Scarab.mdl", spawnFrame: 0, offsetX: 24.0, offsetZ: 32.0,
-      velocityX: 7.0, velocityZ: 0.0, life: 55, radius: 16.0, effect: anubarakHit(ex ? 8.671319961547852 : 6.19379997253418, 35, 58.45515060424805, 20.0), reflectable: true, limit: 4 },
+    shot: beetleShot(ex),
   },
   ...(ex ? {} : { ex: beetles(true) }),
 });
@@ -37,5 +43,5 @@ export const ANUBARAK_SPECIALS: FighterSpecials = {
   neutral: { name: "Impale", description: "Drive a line of spines along the floor. Jump the line or block the stamp.", ground: impale(false, false), air: impale(true, false) },
   side: { name: "Burrow Hunt", description: "Scuttle beneath the floor and erupt. Follow the mound and punish the emergence.", ground: burrow(false) },
   up: { name: "Crypt Eruption", description: "Choose a direction and launch the crown, then fall helpless.", ground: eruption(false) },
-  down: { name: "Carrion Beetle", description: "Plant a fragile nest that sends beetles along the ground. Press again to recall it.", ground: beetles(false), recall: { endFrame: 24, groundOnly: true, recall: true, ex: { endFrame: 24, groundOnly: true, recall: true, intangible: { first: 1, last: 4 } } } },
+  down: { name: "Carrion Beetle", description: "Plant a fragile nest that sends beetles along the ground. Press again to recall it.", ground: beetles(false), air: aerialBeetles(false), recall: { endFrame: 24, recall: true, ex: { endFrame: 24, recall: true, intangible: { first: 1, last: 4 } } } },
 };
