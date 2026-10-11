@@ -69,9 +69,10 @@ function shieldVerdict(target: Fighter, label: string): boolean {
   return melee;
 }
 
-test("a shrunken shield leaves exposed hurtboxes to melee, specials and projectiles alike while bubble contact stays a shield hit [k2 property]", () => {
+test("a full untilted shield contains every standing hurtbox, and a shrunken shield leaves exposed hurtboxes to melee, specials and projectiles alike while bubble contact stays a shield hit [k2 property]", () => {
   let cases = 0;
   let pokes = 0;
+  let covered = 0;
   for (const character of SELECTABLE_CHARACTERS) {
     const target = createFighter(character, 0.0, -1);
     target.shield.raised = true;
@@ -115,6 +116,17 @@ test("a shrunken shield leaves exposed hurtboxes to melee, specials and projecti
                 pz = z;
               }
             }
+            if (energy === SHIELD_MAX && tiltX === 0.0 && tiltZ === 0.0) {
+              for (const [ex, ez] of [[placed.x1, placed.z1], [placed.x2, placed.z2]] as const) {
+                const d = squareRoot(f32(f32(f32(ex - cx) * f32(ex - cx)) + f32(f32(ez - cz) * f32(ez - cz))));
+                assertEquals(f32(d + placed.radius) <= reach, true, `${label}: a full untilted shield contains the whole standing capsule`);
+                const rx = d === 0.0 ? ex : f32(cx + f32(f32(f32(ex - cx) / d) * f32(d + placed.radius)));
+                const rz = d === 0.0 ? f32(ez + placed.radius) : f32(cz + f32(f32(f32(ez - cz) / d) * f32(d + placed.radius)));
+                aim(rx, rz, rx, rz, 0.0);
+                assertEquals(shieldVerdict(target, `${label} capsule rim`), true, `${label}: the capsule's outer edge meets a full shield`);
+              }
+              covered++;
+            }
             aim(px, pz, cx, cz, PROBE_RADIUS);
             assertEquals(shieldVerdict(target, `${label} through bubble`), true, `${label}: a strike across body and bubble is a shield hit`);
             assertEquals(strikeHurtContact(strike, target), HurtContact.hit, `${label}: the cross strike reaches the body`);
@@ -143,4 +155,5 @@ test("a shrunken shield leaves exposed hurtboxes to melee, specials and projecti
   }
   assertEquals(cases, SELECTABLE_CHARACTERS.length * STRENGTHS.length * TILTS.length * ENERGIES.length);
   assertTrue(pokes > 0);
+  assertTrue(covered >= SELECTABLE_CHARACTERS.length * STRENGTHS.length);
 });
