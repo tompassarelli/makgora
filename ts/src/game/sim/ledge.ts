@@ -12,7 +12,7 @@ import { mainDeckLeft, mainDeckRight, mainDeckZ, mainDeckZAt } from "./stage";
 import { BODY_HALF_WIDTH } from "./surfaces";
 import { checkBlastZone } from "./stocks";
 import { aerialJumps, groundedJumps, jumpBuffed, speedBuffed } from "./itemBuffs";
-import { beginAttack, cancelAttack, clearDownState, clearLedge, clearPlatformMove, clearTech, leaveLedge, refreshOriginalAirtime } from "./transitions";
+import { beginAttack, cancelAttack, clearDownState, clearLedge, clearPlatformMove, clearTech, leaveLedge, refreshAirOnExit, refreshOriginalAirtime } from "./transitions";
 import { melee } from "./tuning";
 import { heroBody } from "./heroes/heroBodies";
 
@@ -177,6 +177,7 @@ function ledgeDistance(f: Fighter, stage: number, side: number): number {
 function catchLedge(f: Fighter, stage: number, side: number): void {
   const { motion, launch, ledge } = f;
 
+  refreshAirOnExit(f);
   f.special.action = SpecialAction.none;
   f.special.frame = 0;
   f.special.lockFrames = 0;

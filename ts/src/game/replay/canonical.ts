@@ -386,7 +386,7 @@ function specialMoveCanonical(move: Readonly<AuthoredSpecial>, name: string): st
     int("ritual.mana", move.ritual.mana);
   }
   if (move.cleanseFrame !== undefined) int("cleanseFrame", move.cleanseFrame);
-  if (move.refreshesAir !== undefined) int("refreshesAir", move.refreshesAir);
+  if (move.refreshesAir === true) int("refreshesAir", 1);
   if (move.placement !== undefined) result.push(specialPlacementCanonical(move.placement, `${name}.placement`));
   if (move.recall === true) int("recall", 1);
   if (move.command !== undefined) {
