@@ -261,6 +261,9 @@ interface Special {
 
   grabFrame: number;
 
+  /** The slot plus one of the foe a seeking move locked onto; 0 before it locks. */
+  seekTarget: number;
+
   guarded: boolean;
 }
 
@@ -731,6 +734,7 @@ export function createFighter(character: Character, startX: number, facing: numb
       aimZ: 0,
       airtimeUses: 0,
       grabFrame: 0,
+      seekTarget: 0,
       guarded: false,
     },
     projectiles: repeat(PROJECTILE_CAPACITY, () => emptyProjectile()),

@@ -23,7 +23,7 @@ export type SpecialForm = (typeof SpecialForm)[keyof typeof SpecialForm];
 export const FOLLOW_UP_FORM = 6;
 
 
-export const FollowUpInput = { special: 0, attack: 1, shield: 2 } as const;
+export const FollowUpInput = { special: 0, attack: 1, shield: 2, contact: 3 } as const;
 export type FollowUpInput = (typeof FollowUpInput)[keyof typeof FollowUpInput];
 
 
@@ -80,6 +80,9 @@ export interface SpecialMotion extends FrameWindow {
   readonly relocateReach?: number | undefined;
 
   readonly throughEdge?: boolean | undefined;
+
+  /** Flies at `speed` toward the foe locked on its first frame, turning at most the angle whose cosine and sine it names a frame, through platforms. */
+  readonly seek?: { readonly speed: number; readonly turnCos: number; readonly turnSin: number } | undefined;
 }
 
 
@@ -164,6 +167,8 @@ export interface SpecialProjectile {
   readonly homing?: { readonly turn: number; readonly maxRise: number } | undefined;
   /** On body or shield contact it becomes this projectile where it is, which deals the hit and then only shows. */
   readonly burstInto?: SpecialProjectile | undefined;
+  /** A still piece of a lingering trail, outside the projectile cap: on each frame its life is one less than a multiple of `every`, it strikes each foe inside once. */
+  readonly trail?: { readonly every: number } | undefined;
 }
 
 export interface SpecialArmor extends FrameWindow {

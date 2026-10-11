@@ -42,7 +42,7 @@ import {
 } from "./fighter";
 import { DASH_GUARD_EARLY_FRAMES, advanceGroundMovement, clearDash, groundOptionOpen, wantsCrouch } from "./groundMovement";
 import { GroundOption } from "./stickZones";
-import { heroMotionHolds } from "./heroSpecialRules";
+import { heroMotionHolds, heroMotionPassesPlatforms } from "./heroSpecialRules";
 import { carryHeroStatus } from "./heroStatus";
 import { exSpecialPressed } from "./exSpecials";
 import { demonHunterGliding, demonHunterJumpOrGlideCancel } from "./specials";
@@ -365,7 +365,9 @@ function landingDeck(f: Fighter, stage: number, matchFrame: number, oldX: number
   let rise: number | undefined;
   let landing: number | undefined;
   let landingZ = 0.0;
+  const passesPlatforms = heroMotionPassesPlatforms(f);
   for (let i = 0; i < stageSurfaces.surfaceCount(stage); i++) {
+    if (passesPlatforms && i !== 0) continue;
     const line = stageSurfaces.surfaceLine(stage, i);
     if (line !== undefined) {
       const lineZ = slopedLandingZ(line, i === carried, oldX, oldZ, motion.x, motion.z);
