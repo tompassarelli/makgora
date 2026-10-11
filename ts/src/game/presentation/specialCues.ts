@@ -343,7 +343,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   },
   [Character.lichKing]: {
     neutral: { spell: "Howling Blast", startup: RUNE, active: cue("Abilities\\Spells\\Undead\\FreezingBreath\\FreezingBreathMissile.mdx", "hand", 1.0) },
-    side: { spell: "Val'kyr Shadowguard", startup: RUNE, active: cue("Abilities\\Spells\\Undead\\Curse\\CurseTarget.mdx", "ahead", f32(0.8)) },
+    side: { spell: "Val'kyr Shadowguard", startup: RUNE, active: cue("Abilities\\Spells\\Undead\\Cripple\\CrippleTarget.mdx", "ahead", f32(0.8)) },
     up: { spell: "Ascension of the Damned", startup: RUNE, active: cue("Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdx", "body", 0.5) },
     down: { spell: "Defile", startup: RUNE, active: drawn("Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx", "feet") },
   },
