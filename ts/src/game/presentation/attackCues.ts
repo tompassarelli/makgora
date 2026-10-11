@@ -39,11 +39,6 @@ export const ATTACK_CUES: { readonly [character: number]: { readonly [style: num
   [Character.shadowHunter]: {
     [AttackStyle.downAir]: [{ name: "Glaive drill", fromActive: 0, cue: cue("Abilities\\Weapons\\ShadowHunterMissile\\ShadowHunterMissile.mdx", f32(1.2)) }],
   },
-  [Character.dreadlord]: {
-    [AttackStyle.neutralAir]: [{ name: "Batwing Turn", fromActive: 0, cue: cue("Abilities\\Weapons\\BansheeMissile\\BansheeMissile.mdx", f32(1.2)) }],
-
-    [AttackStyle.dashAttack]: [{ name: "Wing cross-up", fromActive: 0, cue: cue("Abilities\\Weapons\\AvengerMissile\\AvengerMissile.mdx", 1.0) }],
-  },
   [Character.lich]: {
     [AttackStyle.neutralAir]: [{ name: "Frost Halo", fromActive: 0, cue: cue("Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdx", f32(0.45)) }],
 
