@@ -11,7 +11,9 @@ import { shellState } from "./shell/state";
 import { on, trampoline } from "wisp/src/platform/dispatch";
 import { writeLines } from "wisp/src/platform/fileio";
 import { f32 } from "wisp/src/sim/f32";
-import { CAPTURE_FIXTURES } from "./captureFixtures";
+import { CAPTURE_FIXTURES, SILHOUETTE_HIDDEN_FRAME } from "./captureFixtures";
+import { applyDeveloperCommand } from "./shell/keys";
+import { paintDrawnStamp } from "./shell/drawnStamp";
 import { CAPTURE_STATUS_FILE } from "../runtime/gameFiles";
 
 const BUILD: MapBuild = { ...NATIVE_DRIVER_BUILD, presentation: "pool-predicted" };
@@ -33,9 +35,11 @@ interface Runner {
   frame: number;
   held: number;
   tail: number;
+
+  hidden: boolean;
 }
 declare global { var __smashcraftCaptureRunner: Runner | undefined; }
-const runner = (): Runner => globalThis.__smashcraftCaptureRunner ??= { ticks: 0, script: -1, stage: "opening", frame: 0, held: 0, tail: 0 };
+const runner = (): Runner => globalThis.__smashcraftCaptureRunner ??= { ticks: 0, script: -1, stage: "opening", frame: 0, held: 0, tail: 0, hidden: false };
 
 function status(line: string): void { writeLines(CAPTURE_STATUS_FILE, [line]); }
 
@@ -76,6 +80,15 @@ function tick(): void {
   const target = fixture.frames[r.frame];
   if (target === undefined || now !== target || ++r.held < (fixture.holdTicks ?? HOLD_TICKS)) return;
   r.held = 0;
+  const silhouette = fixture.silhouette;
+  if (silhouette !== undefined) {
+    r.hidden = !r.hidden;
+    applyDeveloperCommand(s, 0, `-dev ${r.hidden ? "hide" : "show"} fighter ${silhouette.slot}`);
+    if (r.hidden) {
+      paintDrawnStamp(globalThis.__smashcraftDriverScripts ?? 0, target + SILHOUETTE_HIDDEN_FRAME);
+      return;
+    }
+  }
   r.frame++;
   const next = fixture.frames[r.frame];
   if (next !== undefined) {

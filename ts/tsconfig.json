@@ -45,6 +45,7 @@
     "test/air-drift.test.ts",
     "test/cpu-field.test.ts",
     "test/dreadlord-shadow-hunter-gameplans.test.ts",
+    "test/fighter-hide.test.ts",
     "test/genre-envelope.test.ts",
     "test/headless.ts",
     "test/live-agency.test.ts",

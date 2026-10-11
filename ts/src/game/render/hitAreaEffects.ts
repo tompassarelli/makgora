@@ -89,6 +89,10 @@ export class HitAreaEffects {
     this.frame = fighter?.special.frame ?? 0;
   }
 
+  drawnEffects(into: effect[]): void {
+    for (const model of this.models) into.push(model);
+  }
+
   destroy(): void {
     this.clear();
     for (const model of this.models) DestroyEffect(model);
