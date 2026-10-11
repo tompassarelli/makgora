@@ -259,31 +259,38 @@ interface Portrait { readonly elapsed: number; readonly yaw: number; readonly an
  * crops moved right and down by these head sizes, centring a lopsided silhouette) and `flipped`
  * (the head bone's local up axis points down on screen, so the upright check reverses it).
  */
-interface Correction { readonly rest?: boolean; readonly turn?: number; readonly elapsed?: number; readonly angle?: number; readonly zoom?: number; readonly level?: boolean; readonly lift?: number; readonly body?: boolean; readonly flipped?: boolean; readonly matchLight?: boolean; readonly shift?: readonly [number, number]; readonly bones?: Readonly<Record<string, readonly [number, number, number]>> }
+type Crop = readonly [centerX: number, centerY: number, side: number];
+interface Correction { readonly bust?: Crop; readonly card?: Crop; readonly bustPose?: { readonly turn?: number; readonly angle?: number; readonly elapsed?: number }; readonly rest?: boolean; readonly turn?: number; readonly elapsed?: number; readonly angle?: number; readonly zoom?: number; readonly level?: boolean; readonly lift?: number; readonly body?: boolean; readonly flipped?: boolean; readonly matchLight?: boolean; readonly shift?: readonly [number, number]; readonly bones?: Readonly<Record<string, readonly [number, number, number]>> }
 const CORRECTIONS: Readonly<Record<'classic' | 'definitive', Readonly<Record<string, Correction>>>> = {
   classic: {
-    "Anub'arak": { zoom: 0.6, angle: -30, matchLight: true },
-    Lich: { lift: 1.3, zoom: 1.2 },
-    Murloc: { zoom: 1.2, shift: [0.14, 0] },
+    "Anub'arak": { zoom: 0.6, angle: 30, matchLight: true, bust: [0.5, 0.3, 0.8], card: [0.5, 0.3, 0.68] },
+    Lich: { lift: 1.3, zoom: 1.2, bust: [0.5, 0.25, 0.62], card: [0.5, 0.25, 0.6] },
+    Murloc: { zoom: 1.2, shift: [0.14, 0], bust: [0.48, 0.42, 0.96] },
+    Kobold: { bust: [0.5, 0.38, 0.86] },
+    ForsakenPaladin: { turn: 30, bust: [0.5, 0.31, 0.76], card: [0.5, 0.3, 0.75] },
+    Illidan: { turn: 30, bust: [0.5, 0.3, 0.82] },
+    ShadowHunter: { turn: 20, angle: 15, card: [0.5, 0.32, 0.76] },
+    SylvanasWindrunner: { turn: 20, angle: 15, card: [0.5, 0.29, 0.72] },
     PitLord: { lift: 1.3 },
     MalfurionStormrage: { lift: 1.3 },
-    JainaProudmoore: { elapsed: 3.433, turn: 25, zoom: 0.85, shift: [-0.5, 0.15] },
+    JainaProudmoore: { elapsed: 3.433, turn: 25, zoom: 0.85, shift: [-0.5, 0.15], bust: [0.43, 0.34, 0.78] },
   },
   definitive: {
-    MountainKing: { level: true, zoom: 1.5 },
+    MountainKing: { level: true, zoom: 1.5, bust: [0.49358, 0.28873, 0.60274] },
     Illidan: { elapsed: 139.173, angle: 0, zoom: 0.8, turn: 45, shift: [0, 0.4] },
-    Kobold: { rest: true, zoom: 1.5 },
-    Rifleman: { zoom: 1.5, turn: 25 },
-    Warden: { zoom: 1.5, turn: 25 },
+    Kobold: { rest: true, zoom: 1.5, bust: [0.5, 0.4, 0.94] },
+    Rifleman: { zoom: 1.5, turn: 25, bustPose: { turn: 60 }, bust: [0.5, 0.34, 0.82] },
+    Blademaster: { bust: [0.5, 0.36, 0.85] },
+    Warden: { zoom: 1.5, turn: 25, bust: [0.56165, 0.43037, 0.57785] },
     ShadowHunter: { level: true, zoom: 1.5 },
     "Kael'thasSunstrider": { angle: 15, turn: 30 },
-    CairneBloodhoof: { elapsed: 30.5, angle: 20, zoom: 1.5 },
+    CairneBloodhoof: { elapsed: 30.5, angle: 20, zoom: 1.5, bust: [0.59572, 0.57135, 0.47747] },
     "Anub'arak": { flipped: true },
     Lich: { zoom: 1.2 },
     LichKing: { turn: 150, zoom: 1.5 },
-    JainaProudmoore: { elapsed: 3.433, turn: 25, zoom: 0.45, shift: [-0.5, 0.1] },
-    MalfurionStormrage: { zoom: 2.2, shift: [0, 0.5] },
-    Murloc: { rest: true, body: true, zoom: 0.7, shift: [0.3, 1.6], bones: { bone_head: [0, -20, 0] } },
+    JainaProudmoore: { elapsed: 3.433, turn: 25, zoom: 0.45, shift: [-0.5, 0.1], bust: [0.45, 0.35, 0.84] },
+    MalfurionStormrage: { zoom: 2.2, shift: [0, 0.5], bust: [0.58619, 0.22423, 0.5526] },
+    Murloc: { rest: true, body: true, zoom: 0.7, shift: [0.3, 1.6], bones: { bone_head: [0, -20, 0] }, bust: [0.5, 0.4, 0.98] },
   },
 };
 const correctionOf = (graphics: 'classic' | 'definitive', character: number): Correction => CORRECTIONS[graphics][fighterRenderName(character)] ?? {};
@@ -495,7 +502,7 @@ const TGA = ['-depth', '8', '-compress', 'none'];
  * tiles and busts frame head and shoulders around the head mesh (headBox), stock
  * icons the head alone; without a head, the silhouette's top sixth stands in.
  */
-function crops(raw: string, directory: string, name: string, suffix: string, kinds: readonly PortraitKind[], found: Head | undefined, zoom: number, shift: readonly [number, number] = [0, 0]): boolean {
+function crops(raw: string, directory: string, name: string, suffix: string, kinds: readonly PortraitKind[], found: Head | undefined, zoom: number, shift: readonly [number, number] = [0, 0], correction: Correction = {}): boolean {
   const box = run(['magick', raw, '-alpha', 'extract', '-threshold', '10%', '-format', '%@', 'info:']).trim();
   const bounds = box.match(/(\d+)x(\d+)\+(\d+)\+(\d+)/);
   if (bounds === null) throw new Error(`${raw}: nothing drawn`);
@@ -508,13 +515,19 @@ function crops(raw: string, directory: string, name: string, suffix: string, kin
     return { size, left: Math.max(0, Math.min(RESOLUTION - size, Math.round(head.x - size / 2))), top: Math.max(0, Math.min(RESOLUTION - size, Math.round(head.y - size * above))) };
   };
   const bust = window(2.6 * head.size / zoom, 0.42), portrait = `${bust.size}x${bust.size}+${bust.left}+${bust.top}`;
+  const corrected = (crop: Crop) => {
+    const size = Math.round(Math.max(64, Math.min(RESOLUTION, crop[2] * h)));
+    const left = Math.max(0, Math.min(RESOLUTION - size, Math.round(x + crop[0] * w - size / 2)));
+    const top = Math.max(0, Math.min(RESOLUTION - size, Math.round(y + crop[1] * h - size / 2)));
+    return `${size}x${size}+${left}+${top}`;
+  };
   const file = (kind: PortraitKind) => join(directory, `Fighter${kind}${name}${suffix}.tga`);
   if (kinds.includes('Card')) {
     const inner = Math.round(CARD_TEXTURE_PX * 0.94);
-    run(['magick', raw, '-crop', box, '+repage', '-resize', `${inner}x${inner}`, '-background', 'none', '-gravity', 'center', '-extent', `${CARD_TEXTURE_PX}x${CARD_TEXTURE_PX}`, ...TGA, file('Card')]);
+    run(['magick', raw, '-crop', correction.card === undefined ? box : corrected(correction.card), '+repage', '-resize', `${inner}x${inner}`, '-background', 'none', '-gravity', 'center', '-extent', `${CARD_TEXTURE_PX}x${CARD_TEXTURE_PX}`, ...TGA, file('Card')]);
   }
   if (kinds.includes('Tile')) run(['magick', ...TILE_BACKGROUND, '(', raw, '-crop', portrait, '+repage', '-resize', `${TILE_TEXTURE_PX}x${TILE_TEXTURE_PX}`, ')', '-composite', '-alpha', 'off', ...TGA, file('Tile')]);
-  if (kinds.includes('Bust')) run(['magick', raw, '-crop', portrait, '+repage', '-resize', `${TILE_TEXTURE_PX}x${TILE_TEXTURE_PX}`, ...fadeAlpha(BUST_FADE), ...TGA, file('Bust')]);
+  if (kinds.includes('Bust')) run(['magick', raw, '-crop', correction.bust === undefined ? portrait : corrected(correction.bust), '+repage', '-resize', `${TILE_TEXTURE_PX}x${TILE_TEXTURE_PX}`, ...fadeAlpha(BUST_FADE), ...TGA, file('Bust')]);
   if (kinds.includes('Stock')) {
     const stock = window(1.5 * head.size / zoom, 0.5);
     run(['magick', raw, '-crop', `${stock.size}x${stock.size}+${stock.left}+${stock.top}`, '+repage', '-resize', `${STOCK_ICON_PX}x${STOCK_ICON_PX}`, ...fadeAlpha(STOCK_FADE), ...TGA, file('Stock')]);
@@ -612,7 +625,7 @@ await Effect.runPromise(Effect.gen(function*() {
     const draw = function*(frame: number, image: string, weights: readonly number[], gamma: number, into: string, kinds?: readonly PortraitKind[]) {
       const character = Math.floor(frame / VARIANTS.length), variant = frame % VARIANTS.length;
       const name = fighterRenderName(character), suffix = at(VARIANTS, variant).suffix;
-      const raw = join(directory, `${name}${suffix}.png`);
+      const raw = join(directory, `${name}${suffix}${kinds?.length === 1 && kinds[0] === 'Bust' && into === portraits ? '-bust' : ''}.png`);
       // Classic lights in display space and Definitive in linear space, so each sums its passes where its shader adds them.
       const space = linear ? ['-colorspace', 'RGB'] : [];
       const summed = correctionOf(graphics, character).matchLight === true
@@ -624,7 +637,7 @@ await Effect.runPromise(Effect.gen(function*() {
       // The grid keeps the neutral tile; the slot outfits carry every kind (MAP_PORTRAITS).
       const scene = required(scenes.get(frame), 'scene'), body = at(scene.effects, 0);
       const bytes = (yield* Effect.promise(() => project.resolveAsset(body.model, graphics))).bytes;
-      if (!crops(raw, into, name, suffix, kinds ?? (variant === 0 ? ['Tile'] : PORTRAIT_KINDS), bytes === undefined || required(poses.get(character), 'pose').body ? undefined : headBox(bytes, scene, required(heights.get(character), 'height'), correctionOf(graphics, character).flipped), required(poses.get(character), 'pose').zoom, correctionOf(graphics, character).shift)) upsideDown.push(`${graphics} ${name}${suffix}`);
+      if (!crops(raw, into, name, suffix, kinds ?? (variant === 0 ? ['Tile'] : PORTRAIT_KINDS), bytes === undefined || required(poses.get(character), 'pose').body ? undefined : headBox(bytes, scene, required(heights.get(character), 'height'), correctionOf(graphics, character).flipped), required(poses.get(character), 'pose').zoom, correctionOf(graphics, character).shift, into === portraits ? correctionOf(graphics, character) : {})) upsideDown.push(`${graphics} ${name}${suffix}`);
       return raw;
     };
     // Each pass's P1 bust is drawn alone; every lighting variant, exposed to the
@@ -658,6 +671,24 @@ await Effect.runPromise(Effect.gen(function*() {
     for (const { frame, image } of images) {
       const character = Math.floor(frame / VARIANTS.length);
       console.log(`${graphics}: ${yield* draw(frame, image, required(lighting.get(character), 'lighting'), gammaOf(character), portraits)}`);
+    }
+    const bustScenes = fitted.flatMap((scene) => {
+      const character = Math.floor(scene.frame / VARIANTS.length), correction = correctionOf(graphics, character).bustPose;
+      if (correction === undefined || scene.frame % VARIANTS.length === 0) return [];
+      const body = at(scene.effects, 0);
+      const adjusted = { ...scene, effects: [{ ...body, yaw: body.yaw + (correction.turn ?? 0) * Math.PI / 180, ...(correction.elapsed === undefined ? {} : { animationElapsed: correction.elapsed }) }], camera: { ...scene.camera, fields: { ...scene.camera.fields, ...(correction.angle === undefined ? {} : { CAMERA_FIELD_ANGLE_OF_ATTACK: (360 + correction.angle) % 360 }) } } };
+      scenes.set(scene.frame, adjusted);
+      return [adjusted];
+    });
+    if (bustScenes.length > 0) {
+      for (const pass of LIGHT_PASSES) {
+        images = yield* renderScenes(project, bustScenes.map((scene) => lit(scene, pass)), join(directory, `bust-${pass.name}`), graphics);
+        passes[pass.name] = join(directory, `bust-${pass.name}`);
+      }
+      for (const { frame, image } of images) {
+        const character = Math.floor(frame / VARIANTS.length);
+        yield* draw(frame, image, required(lighting.get(character), 'lighting'), gammaOf(character), portraits, ['Bust']);
+      }
     }
   }
   if (orientationOnly && upsideDown.length === 0) console.log(`upright: ${fighters.length} fighters in ${graphicsModes.join(", ")}`);
