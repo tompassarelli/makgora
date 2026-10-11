@@ -289,7 +289,7 @@ export class ProjectilePresentation {
         taken[boundarySlot] = true;
         parked[boundarySlot] = false;
         const raised = defile && layer > 0;
-        BlzSetSpecialEffectPosition(boundary, this.origin.x + pose.x, this.origin.y - 8.0, this.origin.z + pose.z + (raised ? f32(0.4 * pose.dangerRadius) : 0.0));
+        BlzSetSpecialEffectPosition(boundary, this.origin.x + pose.x, this.origin.y - 8.0, this.origin.z + pose.z + (raised ? f32(f32(0.4) * pose.dangerRadius) : 0.0));
         BlzSetSpecialEffectScale(boundary, pose.dangerRadius * (raised ? f32(0.9) : 1.0));
         if (defile) {
           BlzResetSpecialEffectMatrix(boundary);
