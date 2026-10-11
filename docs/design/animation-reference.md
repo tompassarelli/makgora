@@ -93,6 +93,62 @@ tools and checks are in [fighter animation work](../fighter-animation-work.md).
 | GDC 2017 Animation Bootcamp, [Tricks of the Trade](https://www.youtube.com/watch?v=VIgHW4ddHLc) (38:34) | page chapters: 16:28 hit reactions and body mechanics | A micro-talk on hit reactions and body mechanics. | Reacting through the whole body, not one joint. |
 | [Sakurai's Famitsu hitstop column, Source Gaming translation](https://sourcegaming.info/2015/11/11/thoughts-on-hitstop-sakurais-famitsu-column-vol-490-1/) | sections "Making Damage Look Painful", "Grounded = Horizontal, Aerial = Vertical" | Flinch into a pain pose during hitstop; shake directions. A fan translation. | Pain pose shown during hitstop; see the skill's library for details. |
 
+## Ledge hang, crouch and double jump
+
+| Source | Where | What it shows | Use |
+| --- | --- | --- | --- |
+| [Edge, SmashWiki rev. 2058821](https://www.ssbwiki.com/index.php?title=Edge&oldid=2058821) | introduction; intangibility and hang-time tables | Edges are coded internally as *cliff*. A fighter grabs from the front (Melee only from the front; Brawl onward also behind, with less range), gets brief intangibility, then climbs, attacks, rolls, jumps or drops. | The hang is its own held state, not a standing pose; the ledge options leave from it. |
+| Rivals of Aether II workshop, [Character Animation States](https://rivals2.com/workshop/?p=389) | LedgeGrab, LedgeHang; Crouch, CrouchStart, CrouchStand; DoubleJump | LedgeGrab (7 frames) leads into a looping LedgeHang; "some characters will hang on with both hands, while others will hold on with only one", by body type. Crouch is a 6-frame entry, a loop and a 6-frame exit. DoubleJump is its own clip; DoubleJumpBackward reuses it unless the character sets one. | A hang loop with a grip that suits the body; a crouch that drops quickly and holds; a double jump that is not the first jump. |
+| [Crouch, SmashWiki](https://www.ssbwiki.com/Crouch) (edited 2026-03-01) | introduction; character differences | Crouching shortens the hurtbox. Kirby, Jigglypuff, Snake, Sheik and Wii Fit Trainer nearly hug the ground; Meta Knight, Bowser and Pac-Man barely lower, and large fighters such as Donkey Kong gain little. | A crouch reads by a lower silhouette; how low is per body, but it must visibly drop. |
+| [Double jump, SmashWiki rev. 2062038](https://www.ssbwiki.com/index.php?title=Double_jump&oldid=2062038) | animations; delayed and multiple jumps | "Most characters twist or flip": Mario and Luigi spin, and backflip on a backward jump. Kirby, Jigglypuff and King Dedede inflate; Meta Knight, Charizard, Pit, Bayonetta and Ridley beat wings; Ness, Mewtwo and Lucas pause and rise (Peach in Melee too). Multi-jumpers turn 180 degrees between jumps. | Flips are the default, not the rule; the body and personality pick the style. |
+
+**Ledge hang.** Smashcraft holds a hanging fighter 90 units below the deck
+and 24 out, facing the stage, inside its standing hurt capsule. The hang
+shows the grip (hands, claws or weapon) at the ledge corner, the body
+below it, and the face toward the stage. A tall fighter reaches it with
+bent elbows and tucked knees (a pull-up hang) so the body stays inside its
+capsule; a short one hangs at full reach. The hold sways slightly so it
+reads as a held state rather than a frozen frame.
+
+**Crouch.** A crouch drops the silhouette clearly below standing at the
+far gameplay camera: hips down, knees bent, chest forward, head lowered.
+A legless or mounted body crouches by lowering and hunching its torso.
+Smashcraft's crouch clip enters quickly and holds the low pose.
+
+**Double jump.** The midair jump must differ from the first jump in
+silhouette. Flips suit acrobats; heavy, armoured or mounted bodies tuck,
+heave or bound; winged and floating bodies beat or rise; casters twirl.
+Jump physics and counts are unchanged; only the body's gesture differs.
+
+| Fighter | Double jump | Why |
+| --- | --- | --- |
+| Rifleman | cannonball | A stocky dwarf with a long rifle: a compact tuck reads at his size. |
+| Illidan | wing beat | His demon wings carry him; the arms sweep down with them. |
+| Blademaster | front flip | Keeps the #230 flip: a swordsman's acrobatics. |
+| Mountain King | cannonball | Heavy dwarf in plate: curls round his hammer, no acrobatics. |
+| Warden | back flip | A nimble assassin; the cloak trails a backward somersault, unlike Blademaster's forward one. |
+| Lich | float | He has no legs and levitates: arms spread and robes trail as he rises. |
+| Forsaken Paladin | knee lift | An armoured knight steps up off the air, sword raised, like a heavy's hop. |
+| Dreadlord | wing beat | Bat wings: a strong downward beat with the cloak. |
+| Shadow Hunter | twist | Voodoo dancer: a corkscrew turn about his body's long axis. |
+| Pit Lord | heave | A huge demon: a whole-body heave with arms thrown up, no flip. |
+| Beastmaster | knee lift | A rugged hunter: knees drive up with axes spread. |
+| Lich King | float | Regal and armoured: arms and cloak spread in a slow, rising lift. |
+| Thrall | bound | Rides a wolf: the mount arches into a second leap, the rider's hammer up. |
+| Jaina | twirl | A mage's spin about her long axis, robes flaring. |
+| Sylvanas | back flip | An agile ranger; a backward somersault keeps her bow clear. |
+| Cairne | knee lift | A giant tauren: knees drive up under his totem, no flip. |
+| Chen | cannonball | Round brewmaster: a tight rolling tuck, keg and all. |
+| Peon | scramble | Comic worker: legs pedal and arms flail to climb the air. |
+| Goblin Tinker | heave | His claw pack thrusts him up: legs dangle and the body tilts forward. |
+| Kael'thas | float | Vain prince: arms spread like the phoenix's wings in a poised lift. |
+| Murloc | front flip | Small, wet and bouncy: a quick tumbling flip. |
+| Grom | front flip | Reckless berserker: the axe leads a forward somersault. |
+| Anub'arak | heave | An insect lord: carapace pitches up and claws splay; no humanoid flip. |
+| Malfurion | twirl | A druid's turn about his staff, antlers and robe sweeping. |
+| Medivh | wing beat | The raven shapeshifter: arms beat like wings. |
+| Kobold | back flip | Small and scrappy: a quick backward tumble, candle held high. |
+
 ## Warcraft III rig and sequence boundary
 
 | Source | Where | What it shows | Use |
