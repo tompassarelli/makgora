@@ -33,6 +33,7 @@ import type { CpuSkill } from "../src/game/match/cpuSkill";
 import { type GameplanMove, GameplanSpecial, GameplanThrow } from "../src/game/sim/gameplan";
 import { AttackStyle, type Character, DownState, GrabAction, LedgeState, SpecialAction } from "../src/game/sim/codes";
 import { createFighter, type Fighter } from "../src/game/sim/fighter";
+import { FOLLOW_UP_FORM } from "../src/game/sim/heroSpecials";
 import { observeDamageContacts } from "../src/game/sim/contacts";
 import { heroStatusBlocksActions } from "../src/game/sim/heroStatus";
 import { SELECTABLE_CHARACTERS, fighterSlug, selectableCharacterBySlug } from "../src/game/sim/heroes/registry";
@@ -117,7 +118,7 @@ interface SideRecord {
   specialsRefused: number;
 
   stocksPlayed: number;
-  readonly stockLosses: { readonly frame: number; readonly sinceHit: number | undefined; readonly selfDestruct: boolean; readonly blast?: "top" | "side" | "bottom"; readonly percent?: number; readonly recovering?: boolean }[];
+  readonly stockLosses: { readonly frame: number; readonly sinceHit: number | undefined; readonly selfDestruct: boolean; readonly blast?: "top" | "side" | "bottom"; readonly percent?: number; readonly recovering?: boolean; readonly lastSpecial?: number | undefined }[];
   readonly hitDistances?: Record<number, number>;
 
   readonly damageByMove: Record<number, number>;
@@ -285,6 +286,7 @@ interface Watch {
   lastSafe: number | undefined;
 
   lastStarted: number | undefined;
+  lastSpecial: number | undefined;
   starts: number;
 
   lastHitMove: number | undefined;
@@ -319,7 +321,7 @@ interface Punish {
 
 const watchOf = (f: Readonly<Fighter>): Watch => ({
   down: f.down.state,
-  serial: f.attack.serial, special: f.special.action, specialFrame: f.special.frame, specialForm: f.special.form, mana: f.mana.points, denied: f.visuals.manaDenied, hits: f.visuals.hit, damage: f.status.damage, out: f.status.out, lastHit: undefined, lastSafe: undefined, lastStarted: undefined, starts: 0, lastHitMove: undefined, punish: undefined, stockFirstHit: true,
+  serial: f.attack.serial, special: f.special.action, specialFrame: f.special.frame, specialForm: f.special.form, mana: f.mana.points, denied: f.visuals.manaDenied, hits: f.visuals.hit, damage: f.status.damage, out: f.status.out, lastHit: undefined, lastSafe: undefined, lastStarted: undefined, lastSpecial: undefined, starts: 0, lastHitMove: undefined, punish: undefined, stockFirstHit: true,
   grounded: f.motion.grounded, lagging: false, cornered: false, recovering: false, edgeGuarded: false, ledgeUntil: -1,
 });
 
@@ -487,11 +489,13 @@ export function playCpuMatch(a: Character, b: Character, stageName: string, vari
           seen.starts++;
         }
         const special = specialMove(f.special.action);
-        const startedSpecial = special !== undefined && (f.special.action !== seen.special || f.special.frame < seen.specialFrame);
+        const followedUp = f.special.form >= FOLLOW_UP_FORM && f.special.form !== seen.specialForm;
+        const startedSpecial = special !== undefined && (f.special.action !== seen.special || (f.special.frame < seen.specialFrame && !followedUp));
         if (startedSpecial) {
           own.moves[special] = (own.moves[special] ?? 0) + 1;
           own.specialsStarted++;
           seen.lastStarted = special;
+          seen.lastSpecial = special;
           seen.starts++;
         }
         if (!f.status.out && !unactionable(f) && Math.abs(f.motion.vx) > 1.0) {
@@ -592,7 +596,7 @@ export function playCpuMatch(a: Character, b: Character, stageName: string, vari
           const selfDestruct = seen.lastHit === undefined || (seen.lastSafe !== undefined && seen.lastHit < seen.lastSafe);
           const { blast } = stageBounds(stage);
           const exit = f.motion.z < blast.bottom ? "bottom" : f.motion.x < blast.left || f.motion.x > blast.right ? "side" : "top";
-          own.stockLosses.push({ frame, sinceHit: seen.lastHit === undefined ? undefined : frame - seen.lastHit, selfDestruct, blast: exit, percent: Math.round(seen.damage), recovering: seen.recovering });
+          own.stockLosses.push({ frame, sinceHit: seen.lastHit === undefined ? undefined : frame - seen.lastHit, selfDestruct, blast: exit, percent: Math.round(seen.damage), recovering: seen.recovering, lastSpecial: seen.lastSpecial });
           if (!selfDestruct && other !== undefined && seen.lastHitMove !== undefined) other.kosByMove[seen.lastHitMove] = (other.kosByMove[seen.lastHitMove] ?? 0) + 1;
           if (!selfDestruct && other !== undefined && seen.edgeGuarded) other.edges.edgeGuardKills++;
           seen.edgeGuarded = false;
@@ -601,6 +605,7 @@ export function playCpuMatch(a: Character, b: Character, stageName: string, vari
           seen.stockFirstHit = true;
           seen.lastHit = undefined;
           seen.lastHitMove = undefined;
+          seen.lastSpecial = undefined;
         }
         seen.serial = f.attack.serial;
         seen.special = f.special.action;
@@ -1099,6 +1104,18 @@ function fieldTable(summaries: readonly FighterSummary[], records: readonly Matc
   for (const s of summaries) {
     const top = s.moves.slice(0, 6).map((use) => `${use.name} ${percent(use.share)}`).join(", ");
     lines.push(`| ${s.fighter} | ${s.matches} | ${s.wins} | ${s.losses} | ${s.ties} | ${s.timeOuts} | ${percent(s.winRate)} | ${s.stockLosses} | ${s.selfDestructs} (${percent(s.selfDestructShare)}) | ${s.noHitLosses} (${percent(s.noHitShare)}) | ${s.damagePerHit.toFixed(2)} | ${s.manaPerStock.toFixed(0)} | ${s.refusedShare === 0 ? "0%" : `${(100 * s.refusedShare).toFixed(1)}%`} | ${top} |`);
+  }
+  lines.push("", "| Fighter | Self-destructs by the last special or ultimate started that stock |", "| --- | --- |");
+  for (const s of summaries) {
+    const by = new Map<string, number>();
+    for (const record of records) record.sides.forEach((side, slot) => {
+      if (record.fighters[slot] !== s.fighter) return;
+      for (const loss of side.stockLosses) if (loss.selfDestruct) {
+        const name = loss.lastSpecial === undefined ? "none" : moveName(loss.lastSpecial);
+        by.set(name, (by.get(name) ?? 0) + 1);
+      }
+    });
+    lines.push(`| ${s.fighter} | ${[...by].sort((x, y) => y[1] - x[1]).map(([name, count]) => `${name} ${count}`).join(", ")} |`);
   }
   const names = summaries.map((s) => s.fighter);
   lines.push("", `| Row's win rate vs (matches) | ${names.join(" | ")} |`, `| --- |${names.map(() => " ---: |").join("")}`);
