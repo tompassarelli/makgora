@@ -37,6 +37,7 @@ interface Runner {
   tail: number;
 
   hidden: boolean;
+  view?: number[];
 }
 declare global { var __smashcraftCaptureRunner: Runner | undefined; }
 const runner = (): Runner => globalThis.__smashcraftCaptureRunner ??= { ticks: 0, script: -1, stage: "opening", frame: 0, held: 0, tail: 0, hidden: false };
@@ -81,6 +82,7 @@ function tick(): void {
   if (target === undefined || now !== target) return;
   const silhouette = fixture.silhouette;
   if (silhouette !== undefined && r.held === 0) ClearTextMessages();
+  r.view = [BlzGetLocalClientWidth(), BlzGetLocalClientHeight(), GetCameraField(CAMERA_FIELD_FIELD_OF_VIEW), GetCameraEyePositionX(), GetCameraEyePositionY(), GetCameraEyePositionZ(), GetCameraTargetPositionX(), GetCameraTargetPositionY(), GetCameraTargetPositionZ()];
   if (++r.held < (fixture.holdTicks ?? HOLD_TICKS)) return;
   r.held = 0;
   if (silhouette !== undefined) {
