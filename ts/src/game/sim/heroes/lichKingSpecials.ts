@@ -82,7 +82,7 @@ function ascension(height: number, steer: number): AuthoredSpecial {
 
 
 const DEFILE_POOL: SpecialProjectile = {
-  model: "Abilities\\Spells\\Demon\\DarkPortal\\DarkPortalTarget.mdx",
+  model: "Abilities\\Spells\\Undead\\UnholyAura\\UnholyAura.mdx",
 
   modelRadius: 1223.0,
   spawnFrame: 20, offsetX: h(f32(0.6)), offsetZ: 6.0, velocityX: 0.0, velocityZ: 0.0,

@@ -21,7 +21,6 @@ export const HOWLING_BLAST_MODEL = "Abilities\\Weapons\\FrostWyrmMissile\\FrostW
 
 export const VALKYR_MODEL = "Units\\Undead\\Banshee\\Banshee.mdx";
 
-export const DEFILE_MODEL = "Abilities\\Spells\\Demon\\DarkPortal\\DarkPortalTarget.mdx";
 
 
 export const IMPORTED_MODEL_FILES: readonly { readonly entry: string; readonly file: string }[] = [

@@ -30,7 +30,6 @@ export const STATIONARY_PARTICLE_MODELS = [
 
 // Hidden bolts park below the floor, as hidden effects do: alpha alone left Aimed Shot's bolts on stage after the move (#457).
 const PARKED_LINE_DEPTH = 4096.0;
-const DEFILE_DECAY = "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx";
 const DEFILE_FROST = "Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdx";
 const RISEN_FRONT = 56.0;
 const RISEN_HEADROOM = 20.0;
@@ -113,7 +112,7 @@ export class ProjectilePresentation {
       const specials = heroDefinition(character)?.specials;
 
       const defilePool = character === Character.lichKing && specials !== undefined && heroProjectileArt(specials).some(({ spec }) => spec.model === path && spec.pool !== undefined);
-      const drawn = defilePool ? DEFILE_DECAY : swaps?.[path] ?? path;
+      const drawn = swaps?.[path] ?? path;
       const groundPool = specials !== undefined && heroProjectileArt(specials).some(({ spec }) => spec.model === path && spec.pool !== undefined && spec.pool.growth > 0.0);
       for (let slot = 0; slot < size; slot++) {
         effects.push(this.models.length);

@@ -98,7 +98,7 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
   },
   [Character.lichKing]: {
     weapon: Weapon.blade, swing: ["HeroDeathKnightAttack1"], strong: "FrostWyrmAttack1",
-    specials: [s("BreathOfFrost", "FrostBoltHit"), s("DarkSummoningMissileLaunch", "DarkSummoningTarget"), s("FrostArmor", "FrostBoltHit"), s("DeathCoil", "DeathPactTarget")],
+    specials: [s("BreathOfFrost", "FrostBoltHit"), s("DarkSummoningMissileLaunch", "DarkSummoningTarget"), s("FrostArmor", "FrostBoltHit"), s("DeathPactTarget", "FrostWyrmAttack1")],
   },
   [Character.thrall]: {
     weapon: Weapon.hammer, strong: "LightningBolt",
