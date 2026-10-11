@@ -42,6 +42,7 @@ import {
 import { SPECIAL_SLOTS, type SpecialSlot } from "./projectileArt";
 import { RIFLEMAN_MODEL_FILE } from "./fighterAssetInfo";
 import { FROST_TRAP_MODEL } from "../assets/frostAssetInfo";
+import { IMPACT_DUST_MODEL } from "../assets/impactAssetInfo";
 
 
 export type CueAnchor = "hand" | "body" | "feet" | "ahead" | "behind" | "overhead" | "barrel" | "breath";
@@ -157,6 +158,7 @@ const NATURE = cue("Abilities\\Spells\\NightElf\\Tranquility\\TranquilityTarget.
 
 const RUNE = cue("Abilities\\Spells\\Undead\\DarkRitual\\DarkRitualCaster.mdx", "feet", f32(0.6));
 
+const RAIN_OF_FIRE_TARGET = "Abilities\\Spells\\Demon\\RainOfFire\\RainOfFireTarget.mdx";
 const BURROW = cue("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", "feet", f32(0.4));
 
 
@@ -337,9 +339,9 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   },
   [Character.pitLord]: {
     neutral: { spell: "Howl of Terror", startup: FEL, active: cue("Abilities\\Spells\\Other\\HowlOfTerror\\HowlCaster.mdx", "body", f32(0.7)) },
-    side: { spell: "Ruin Charge", startup: FEL, active: timed(cue("Abilities\\Weapons\\FlyingMachine\\FlyingMachineImpact.mdx", "ahead", f32(0.8)), "birth", f32(0.2)) },
-    up: { spell: "Abyssal Leap", startup: FEL, active: cue("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", "feet", f32(0.6)) },
-    down: { spell: "Rain of Fire", startup: FEL, active: { ...cue("Abilities\\Spells\\Human\\FlameStrike\\FlameStrike1.mdx", "overhead", f32(0.25)), timeScale: 1.5 } },
+    side: { spell: "Ruin Charge", startup: FEL, active: timed(cue(IMPACT_DUST_MODEL, "feet", f32(0.8)), "stand", 0.0) },
+    up: { spell: "Abyssal Leap", startup: FEL, active: timed(cue("Abilities\\Spells\\Other\\Doom\\DoomDeath.mdx", "feet", f32(0.5)), "birth", f32(0.2)) },
+    down: { spell: "Rain of Fire", startup: FEL, active: { ...timed(cue(RAIN_OF_FIRE_TARGET, "overhead", f32(0.5)), "birth", f32(0.8)), timeScale: 1.5 } },
   },
   [Character.lichKing]: {
     neutral: { spell: "Howling Blast", startup: RUNE, active: cue("Abilities\\Spells\\Undead\\FreezingBreath\\FreezingBreathMissile.mdx", "hand", 1.0) },
