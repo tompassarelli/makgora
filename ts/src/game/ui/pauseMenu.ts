@@ -1,6 +1,6 @@
 import { f32 } from "wisp/src/sim/f32";
 import { bindPrototype } from "../../platform/rebind";
-import { ButtonClicks, consoleUi, createBackdrop, createText, placeTopLeft, styleMenuPanel } from "./frames";
+import { ButtonClicks, consoleUi, createBackdrop, createText, placeTopLeft, sizeText, styleMenuPanel } from "./frames";
 import { MENU_STYLE } from "./hudLayout";
 
 export class PauseMenu {
@@ -23,12 +23,13 @@ export class PauseMenu {
     placeTopLeft(this.root, f32(0.08), f32(0.53));
     BlzFrameSetSize(this.root, f32(0.64), f32(0.53));
     BlzFrameSetLevel(this.root, 20);
-    styleMenuPanel(this.root, "SmashcraftPause");
+    const backing = styleMenuPanel(this.root, "SmashcraftPause");
+    const rowLeft = f32(f32(0.092) + MENU_STYLE.bodyInset);
+    const rowWidth = f32(f32(0.616) - 2 * MENU_STYLE.bodyInset);
     const label = (name: string, y: number, height: number, size: number, parent = this.root) => {
       const frame = createText(name, parent, 1801);
-      placeTopLeft(frame, f32(0.26), y);
-      BlzFrameSetSize(frame, f32(0.28), height);
-      BlzFrameSetFont(frame, MENU_STYLE.font, size, 0);
+      placeTopLeft(frame, rowLeft, y);
+      sizeText(frame, size, rowWidth, height);
       BlzFrameSetTextAlignment(frame, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
       BlzFrameSetEnable(frame, false);
       if (parent === this.root) BlzFrameSetLevel(frame, 21);
@@ -38,17 +39,17 @@ export class PauseMenu {
     for (let row = 0; row < 3; row++) {
       const y = f32(f32(0.359) - f32(row * f32(0.036)));
       const button = BlzCreateFrameByType("BUTTON", `SmashcraftPauseOption${I2S(row)}`, this.root, "", 1801);
-      placeTopLeft(button, f32(0.26), y);
-      BlzFrameSetSize(button, f32(0.28), f32(0.036));
+      placeTopLeft(button, rowLeft, y);
+      BlzFrameSetSize(button, rowWidth, f32(0.036));
       this.buttons.push(this.clicks.add(button, row));
-      this.options.push(label(`SmashcraftPauseOptions${I2S(row)}`, y, f32(0.036), f32(0.018), button));
+      this.options.push(label(`SmashcraftPauseOptions${I2S(row)}`, y, f32(0.036), MENU_STYLE.headerSize, button));
     }
     this.help = label("SmashcraftPauseHelp", f32(0.245), f32(0.045), MENU_STYLE.bodySize);
     this.controlsTitle = label("SmashcraftPauseControlsTitle", f32(0.20), f32(0.023), MENU_STYLE.headerSize);
     BlzFrameSetText(this.controlsTitle, `${MENU_STYLE.gold}Controls|r`);
     this.controls = label("SmashcraftPauseControls", f32(0.174), f32(0.13), MENU_STYLE.bodySize);
-    placeTopLeft(this.controls, f32(f32(0.08) + MENU_STYLE.bodyInset), f32(0.174));
-    BlzFrameSetSize(this.controls, f32(f32(0.64) - 2 * MENU_STYLE.bodyInset), f32(0.13));
+    BlzFrameSetPoint(this.controls, FRAMEPOINT_TOPLEFT, backing, FRAMEPOINT_TOPLEFT, MENU_STYLE.bodyInset, f32(-0.344));
+    sizeText(this.controls, MENU_STYLE.bodySize, rowWidth, f32(0.13));
     BlzFrameSetVisible(this.root, false);
   }
 
@@ -85,8 +86,8 @@ export class PauseMenu {
       if (titleChanged) BlzFrameSetEnable(button, !title || row === 0);
       BlzFrameSetVisible(option, !title || row === 0);
       const y = title ? f32(0.323) : f32(f32(0.359) - f32(row * f32(0.036)));
-      placeTopLeft(button, f32(0.26), y);
-      placeTopLeft(option, f32(0.26), y);
+      placeTopLeft(button, f32(f32(0.092) + MENU_STYLE.bodyInset), y);
+      placeTopLeft(option, f32(f32(0.092) + MENU_STYLE.bodyInset), y);
     }
     BlzFrameSetText(this.help, `${MENU_STYLE.text}${title ? "A / Start / Click: Play" : "Stick / arrows: choose · A: select · Click: select\nStart / Y: resume · Escape: character select"}|r`);
     BlzFrameSetVisible(this.controlsTitle, !title);

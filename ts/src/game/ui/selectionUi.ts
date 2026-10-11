@@ -65,7 +65,7 @@ import { Character, ItemKind, itemBit } from "../sim/codes";
 import { TILE_PORTRAIT_SLOT, cardPortrait, tilePortrait } from "./portraitFrames";
 import { slotColor } from "./slotColors";
 import { type TutorialButton, type TutorialMenuFrames, createTutorialMenu, markTutorialSeen, showTutorialLesson, tutorialSeen } from "./tutorialMenu";
-import { ButtonClicks, type MenuControls, bindSyncHandler, consoleUi, coverScreen, createBackdrop, createSyncTrigger, createText, gameUi, highlightText, placeTopLeft, setFrameText } from "./frames";
+import { ButtonClicks, type MenuControls, bindSyncHandler, consoleUi, coverScreen, createBackdrop, createSyncTrigger, createText, gameUi, highlightText, placeTopLeft, setFrameText, sizeText } from "./frames";
 
 
 export interface SelectionActions {
@@ -150,10 +150,7 @@ function art(parent: framehandle, name: string, texture: string, x: number, y: n
 function label(parent: framehandle, name: string, x: number, y: number, width: number, height: number, size: number): framehandle {
   const frame = createText(name, parent, 0);
   placeTopLeft(frame, x, y);
-  const scale = f32(size / NATIVE_TEXT_BASE);
-  BlzFrameSetScale(frame, scale);
-  BlzFrameSetSize(frame, f32(width / scale), f32(height / scale));
-  BlzFrameSetFont(frame, MENU_FONT, size, 0);
+  sizeText(frame, size, width, height);
   BlzFrameSetTextAlignment(frame, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
   BlzFrameSetEnable(frame, false);
   return frame;
@@ -360,10 +357,7 @@ export class SelectionPanel {
       return this.clicks.add(frame, target);
     };
     this.modeLabel = page(createText(`MeleeModeLabel${suffix}`, gameUi(), 478 + participantId), titleBox.left, titleBox.top, titleBox.width, titleBox.height);
-    BlzFrameSetFont(this.modeLabel, MENU_STYLE.font, MENU_STYLE.headerSize, 0);
-    const headerScale = f32(MENU_STYLE.headerSize / NATIVE_TEXT_BASE);
-    BlzFrameSetScale(this.modeLabel, headerScale);
-    BlzFrameSetSize(this.modeLabel, f32(titleBox.width / headerScale), f32(titleBox.height / headerScale));
+    sizeText(this.modeLabel, MENU_STYLE.headerSize, titleBox.width, titleBox.height);
     placeTopLeft(this.modeLabel, headerLeft, titleBox.top);
     BlzFrameSetTextAlignment(this.modeLabel, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
     BlzFrameSetEnable(this.modeLabel, false);

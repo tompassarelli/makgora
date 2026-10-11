@@ -12,8 +12,8 @@ import { pointerX, pointerY } from "../menu/pointer";
 import { type StageChoice, clearStageDrag, stageDrag, stageTileLeft, stageTileTop, updateStageDrag } from "../menu/stageSelection";
 import { RANDOM_STAGE, STAGE_CATALOG, STAGE_CHOICES, selectableStageChoice, stageInfo } from "../menu/stageCatalog";
 import { dropsSetting, hazardsSetting, rulesSummary } from "../shell/messages";
-import { ButtonClicks, type MenuControls, bindSyncHandler, consoleUi, coverScreen, createBackdrop, createSyncTrigger, createText, gameUi, highlightText, placeTopLeft, setFrameText } from "./frames";
-import { MENU_FONT, MENU_STYLE, NATIVE_TEXT_BASE, PANEL_TEXTURE } from "./hudLayout";
+import { ButtonClicks, type MenuControls, bindSyncHandler, consoleUi, coverScreen, createBackdrop, createSyncTrigger, createText, gameUi, highlightText, placeTopLeft, setFrameText, sizeText } from "./frames";
+import { MENU_STYLE, PANEL_TEXTURE } from "./hudLayout";
 import { StageCard } from "./stageCard";
 
 
@@ -37,12 +37,9 @@ export const DROPS_BUTTON = { x: f32(0.42), y: f32(0.082), width: f32(0.12), hei
 function stageText(parent: framehandle, name: string, x: number, y: number, width: number, height: number, fontSize: number, text: string): framehandle {
   const label = createText(name, parent, 0);
   placeTopLeft(label, x, y);
-  const scale = f32(fontSize / NATIVE_TEXT_BASE);
-  BlzFrameSetScale(label, scale);
-  BlzFrameSetSize(label, f32(width / scale), f32(height / scale));
+  sizeText(label, fontSize, width, height);
   setFrameText(label, text);
   BlzFrameSetEnable(label, false);
-  BlzFrameSetFont(label, MENU_FONT, fontSize, 0);
   BlzFrameSetTextAlignment(label, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
   return label;
 }

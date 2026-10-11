@@ -4,7 +4,7 @@
 
 import { on, trampoline } from "wisp/src/platform/dispatch";
 import { f32 } from "wisp/src/sim/f32";
-import { MENU_STYLE } from "./hudLayout";
+import { MENU_STYLE, NATIVE_TEXT_BASE } from "./hudLayout";
 
 
 export type MenuControls = "journal" | "keyboard";
@@ -27,7 +27,14 @@ export function createText(name: string, owner: framehandle, context: number): f
   return BlzCreateFrameByType("TEXT", name, owner, "", context);
 }
 
-export function styleMenuPanel(frame: framehandle, name: string): void {
+export function sizeText(frame: framehandle, size: number, width: number, height: number): void {
+  const scale = f32(size / NATIVE_TEXT_BASE);
+  BlzFrameSetScale(frame, scale);
+  BlzFrameSetSize(frame, f32(width / scale), f32(height / scale));
+  BlzFrameSetFont(frame, MENU_STYLE.font, size, 0);
+}
+
+export function styleMenuPanel(frame: framehandle, name: string): framehandle {
   BlzFrameSetTexture(frame, MENU_STYLE.borderTexture, 0, true);
   BlzFrameSetAlpha(frame, 255);
   const backing = createBackdrop(`${name}Backing`, frame, 0);
@@ -36,6 +43,7 @@ export function styleMenuPanel(frame: framehandle, name: string): void {
   BlzFrameSetPoint(backing, FRAMEPOINT_TOPLEFT, frame, FRAMEPOINT_TOPLEFT, f32(0.012), f32(-0.012));
   BlzFrameSetPoint(backing, FRAMEPOINT_BOTTOMRIGHT, frame, FRAMEPOINT_BOTTOMRIGHT, f32(-0.012), f32(0.012));
   BlzFrameSetEnable(backing, false);
+  return backing;
 }
 
 export function placeTopLeft(frame: framehandle, x: number, y: number): void {
