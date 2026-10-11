@@ -306,11 +306,14 @@ const MEDIVH: AuthoredSpecial = {
   rehits: [...PULL, 64],
 };
 
+export const KOBOLD_BURROW_FIRST = 15;
+export const KOBOLD_BURROW_LAST = 54;
+
 const KOBOLD: AuthoredSpecial = {
   name: "You No Take Candle!", endFrame: 85, groundOnly: true,
   intangible: frames(8, 54),
   projectiles: [mark("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", 8, 12, 0.0)],
-  motion: [{ ...frames(15, 54), velocityX: 10.0, velocityZ: 0.0, driftSpeed: 6.0, stopsAtBody: true }, { ...frames(55, 58), velocityX: 0.0, velocityZ: 12.0 }],
+  motion: [{ ...frames(KOBOLD_BURROW_FIRST, KOBOLD_BURROW_LAST), velocityX: 10.0, velocityZ: 0.0, driftSpeed: 6.0, stopsAtBody: true }, { ...frames(55, 58), velocityX: 0.0, velocityZ: 12.0 }],
   regions: [heroRegion(55, 58, capsule(20.0, 0.0, 20.0, 120.0, 50.0), hit(16.0, 85, 85.0, 45.0))],
 };
 

@@ -12,6 +12,7 @@ import { idiv } from "wisp/src/sim/intMath";
 import { runningHeroSpecial } from "../sim/heroSpecialRules";
 import { HERO_ROSTER } from "../sim/heroes/registry";
 import { PHOENIX_CHARGE_FRAMES, PHOENIX_FLIGHT_FRAMES } from "../sim/heroes/kaelthasSpecials";
+import { KOBOLD_BURROW_FIRST, KOBOLD_BURROW_LAST } from "../sim/ultimates";
 import {
   CHAOS_STRIKE_AIR_FORM,
   CHAOS_STRIKE_FIRST,
@@ -163,6 +164,7 @@ const RUNE = cue("Abilities\\Spells\\Undead\\DarkRitual\\DarkRitualCaster.mdx", 
 
 const RAIN_OF_FIRE_TARGET = "Abilities\\Spells\\Demon\\RainOfFire\\RainOfFireTarget.mdx";
 const BURROW = cue("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", "feet", f32(0.4));
+const KOBOLD_BURROW_TRAIL: MoveCues = { spell: "Burrow trail", startup: BURROW, active: BURROW };
 
 
 export const HERO_CUES: { readonly [character: number]: { readonly [slot in SpecialSlot]: MoveCues } } = {
@@ -294,7 +296,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   },
   [Character.kobold]: {
     neutral: { spell: "Wick Flick", startup: cue("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", "hand", f32(0.3)), active: cue("Abilities\\Weapons\\LavaSpawnMissile\\LavaSpawnMissile.mdx", "hand", f32(0.4)) },
-    side: { spell: "Panic Dig", startup: cue("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", "feet", f32(0.3)), active: cue("Abilities\\Spells\\Other\\Tornado\\TornadoElemental.mdx", "feet", f32(0.15)) },
+    side: { spell: "Panic Dig", startup: cue("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", "feet", f32(0.3)), active: cue("Abilities\\Spells\\Orc\\Shockwave\\ShockwaveMissile.mdx", "feet", f32(0.25)) },
     up: { spell: "Candle Escape", startup: cue("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", "hand", f32(0.3)), active: cue("Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedTarget.mdx", "feet", f32(0.3)) },
     down: { spell: "Mine!", startup: cue("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", "feet", f32(0.3)), active: timed(cue("Objects\\Spawnmodels\\Human\\FragmentationShards\\FragBoomSpawn.mdx", "feet", f32(0.3)), "birth", 0.0) },
   },
@@ -576,6 +578,9 @@ export function specialCueState(fighter: Readonly<Fighter>): CueState {
     if (frame > PHOENIX_CHARGE_FRAMES && frame <= PHOENIX_CHARGE_FRAMES + PHOENIX_FLIGHT_FRAMES) return { cues: KAEL_PHOENIX_FORM, phase: "active" };
     return frame <= PHOENIX_CHARGE_FRAMES ? { cues: KAEL_PHOENIX_CHARGE, phase: frame < 16 ? "startup" : "active" } : NONE;
   }
+  if (fighter.character === Character.kobold && action === SpecialAction.heroUltimate) {
+    return frame >= KOBOLD_BURROW_FIRST && frame <= KOBOLD_BURROW_LAST ? { cues: KOBOLD_BURROW_TRAIL, phase: "active" } : NONE;
+  }
   let cues: MoveCues | undefined;
   let windows: CueWindows | undefined;
   if (action >= SpecialAction.heroNeutral && action <= SpecialAction.heroDown) {
@@ -611,7 +616,7 @@ export function fighterMoveCues(character: Character): readonly MoveCues[] {
 
 
 export function fighterCueList(character: Character): readonly Cue[] {
-  return [...fighterMoveCues(character), ...fighterBranchCues(character), ...(character === Character.dreadlord ? [DREADLORD_BITE_CUES] : []), ...(character === Character.kaelthas ? [KAEL_PHOENIX_FORM] : [])].flatMap((cues) => [cues.startup, cues.active]);
+  return [...fighterMoveCues(character), ...fighterBranchCues(character), ...(character === Character.dreadlord ? [DREADLORD_BITE_CUES] : []), ...(character === Character.kaelthas ? [KAEL_PHOENIX_FORM] : []), ...(character === Character.kobold ? [KOBOLD_BURROW_TRAIL] : [])].flatMap((cues) => [cues.startup, cues.active]);
 }
 
 

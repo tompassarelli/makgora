@@ -36,14 +36,14 @@ export const KOBOLD_MOVES: FighterMoves = {
     },
   },
   normals: {
-    [AttackStyle.jab]: jabStep(heroMove(3, 2, 11, 0, [heroRegion(3, 4, pick(16.0, 40.0, 40.0, 40.0, 8.0), ordinary(2.4886200428009033, 25, 44.86880111694336, 14.0))])),
+    [AttackStyle.jab]: jabStep(heroMove(3, 2, 11, 0, [heroRegion(3, 4, pick(16.0, 40.0, 56.0, 40.0, 8.0), ordinary(2.4886200428009033, 25, 44.86880111694336, 14.0))])),
     [AttackStyle.jab2]: heroMove(5, 2, 15, 0, [heroRegion(5, 6, pick(18.0, 40.0, 46.0, 42.0), ordinary(4.977240085601807, 35))]),
     [AttackStyle.forwardTilt]: tilt(40.0, 35), [AttackStyle.forwardTiltUp]: tilt(64.0, 55), [AttackStyle.forwardTiltDown]: tilt(14.0, 25),
     [AttackStyle.upTilt]: heroMove(5, 4, 18, 0, [heroRegion(5, 8, pick(14.0, 50.0, 6.0, 90.0, 14.0), ordinary(8.710169792175293, 90, 80.76383972167969, 22.0))]),
     [AttackStyle.downTilt]: heroMove(5, 3, 16, 0, [heroRegion(5, 7, pick(18.0, 8.0, 60.0, 8.0), ordinary(7.465859889984131, 80, 80.76383972167969, 22.0))]),
     [AttackStyle.dashAttack]: heroMove(7, 5, 26, 0, [heroRegion(7, 11, pick(16.0, 26.0, 64.0, 26.0, 14.0), ordinary(11.198789596557617, 55))], 48.0, true),
     [AttackStyle.forwardSmash]: tipperMove(heroMove(14, 3, 36, 0, [heroRegion(14, 16, pick(24.0, 40.0, 86.0, 40.0, 12.0), ordinary(18.294721603393555, 35, 103.93599700927734, 26.0))]), 0.30000001192092896),
-    [AttackStyle.upSmash]: heroMove(11, 4, 34, 0, [heroRegion(11, 14, pick(0.0, 40.0, 0.0, 114.0, 16.0), ordinary(18.664649963378906, 90, 94.22447967529297, 26.0))]),
+    [AttackStyle.upSmash]: heroMove(11, 4, 34, 0, [heroRegion(11, 14, pick(24.0, 40.0, 0.0, 114.0, 16.0), ordinary(18.664649963378906, 90, 94.22447967529297, 26.0))]),
     [AttackStyle.downSmash]: heroMove(12, 4, 34, 0, [
       heroRegion(12, 15, pick(18.0, 10.0, 74.0, 10.0, 12.0), ordinary(16.176029205322266, 25, 94.22447967529297, 26.0)),
       heroRegion(12, 15, pick(-18.0, 10.0, -74.0, 10.0, 12.0), ordinary(16.176029205322266, 25, 94.22447967529297, 26.0, true)),
