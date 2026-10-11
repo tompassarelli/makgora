@@ -1,7 +1,7 @@
 // Files generated from tracked sources instead of committed (#401). Each is
 // rebuilt when a hash of its generator and every local module it imports
-// changes; the hash is stamped under build/generated/. `bun install`, `bun run
-// test` and `wisp map build` run this; `bun scripts/generated.ts` runs it by hand.
+// changes; the hash is stamped under build/generated/. `bun run test` and
+// `wisp map build` run this; `bun scripts/generated.ts` runs it by hand.
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { MOVE_LIST_PATH, moveListMarkdown } from "./moveList";
