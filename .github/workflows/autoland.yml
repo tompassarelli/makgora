@@ -23,6 +23,7 @@ run-name: ${{ github.event_name == 'push' && format('Autoland {0} (push)', githu
 
 permissions:
   contents: write
+  issues: read
   actions: write
   statuses: write
 
@@ -41,10 +42,21 @@ env:
   LANES_QUERY: >-
     query($owner: String!, $name: String!, $endCursor: String) { repository(owner: $owner, name: $name) {
     refs(refPrefix: "refs/heads/claude/", first: 100, after: $endCursor) { pageInfo { hasNextPage endCursor }
-    nodes { name target { oid ... on Commit { status { context(name: "autoland") { state description createdAt } } } } } } } }
+    nodes { name target { oid ... on Commit { message status { context(name: "autoland") { state description createdAt } } } } } } } }
   LANES_JQ: >-
-    .data.repository.refs.nodes[] | {branch: ("claude/" + .name), tip: .target.oid,
+    .data.repository.refs.nodes[] | {issues: ([.target.message |
+    scan("(?:^|[^A-Za-z0-9_/#-])(?:" + env.GH_REPO + "|" + (env.GH_REPO | split("/")[1]) + ")?#([0-9]+)|https://github.com/" + env.GH_REPO + "/issues/([0-9]+)")
+    | .[] | select(. != null and . != "") | tonumber] | unique), branch: ("claude/" + .name), tip: .target.oid,
     status: (.target.status.context | if . == null then null else {state: (.state | ascii_downcase), description, at: .createdAt} end)}
+  FETCH_LANES: |
+    gh api graphql --paginate -F owner="${GH_REPO%/*}" -F name="${GH_REPO#*/}" -f query="$LANES_QUERY" --jq "$LANES_JQ" | jq -s . > lane-refs.json
+    fields=$(jq -r '[.[].issues[]] | unique | map("i\(.): issue(number: \(.)) { labels(first: 100) { nodes { name } } }") | join(" ")' lane-refs.json)
+    if [ -z "$fields" ]; then
+      jq 'map(del(.issues) + {labels: []})' lane-refs.json
+    else
+      gh api graphql -F owner="${GH_REPO%/*}" -F name="${GH_REPO#*/}" -f query="query(\$owner: String!, \$name: String!) { repository(owner: \$owner, name: \$name) { $fields } }" |
+        jq --slurpfile lanes lane-refs.json '.data.repository as $issues | $lanes[0] | map(. + {labels: ([.issues[] as $number | $issues["i" + ($number | tostring)].labels.nodes[]?.name] | unique)} | del(.issues))'
+    fi
 
 jobs:
   # The `autoland` status on a branch tip is the queue: pending "queued", "waiting to test alone",
@@ -110,7 +122,7 @@ jobs:
             fi
             printf '%s\t%s\t\t\n' "$branch" "$tip" > lanes.tsv
           else
-            gh api graphql --paginate -F owner="${GH_REPO%/*}" -F name="${GH_REPO#*/}" -f query="$LANES_QUERY" --jq "$LANES_JQ" | jq -s . > lanes.json
+            bash -euo pipefail -c "$FETCH_LANES" > lanes.json
             bun ts/scripts/autoland.ts train --lanes lanes.json > lanes.tsv
           fi
           git checkout -q -B autoland "$base"
@@ -358,7 +370,7 @@ jobs:
           RETRY: ${{ inputs.branch }}
         run: |
           set -euo pipefail
-          gh api graphql --paginate -F owner="${GH_REPO%/*}" -F name="${GH_REPO#*/}" -f query="$LANES_QUERY" --jq "$LANES_JQ" | jq -s . > lanes.json
+          bash -euo pipefail -c "$FETCH_LANES" > lanes.json
           gh api "repos/$GH_REPO/actions/workflows/autoland.yml/runs?per_page=100" \
             --jq "[.workflow_runs[] | select(.status != \"completed\" and .id != $GITHUB_RUN_ID) | {title: .display_title, status}]" > runs.json
           bun ts/scripts/autoland.ts plan --lanes lanes.json --runs runs.json --retry "$RETRY" > plan.tsv
