@@ -8,8 +8,9 @@
 
 
 
-import { afterAll, expect } from "bun:test";
-import { installHeadless, readNativeDeclarations } from "wisp/scripts/wisp/headless";
+import { afterAll, beforeAll, expect } from "bun:test";
+import { readNativeDeclarations } from "wisp/scripts/wisp/headless";
+import { testHeadless } from "./headless";
 import { type SyncLatency, syncDelivery } from "wisp/src/headless/syncChannel";
 import type { HeadlessClient, SyncMessage } from "wisp/src/headless/client";
 import { type InputRow, type RowFields, inputRow, sameInput } from "../src/game/input/inputRow";
@@ -99,8 +100,7 @@ const helpers = new JournalHelpers(INTEGRITY_BUILD.id, true);
 helpers.rows = (_slot, frame) => BEAT_ROWS[frame] ?? BEAT_ROWS[0] as InputRow;
 let now = 0;
 helpers.clock = () => now;
-const headless = installHeadless({ ...SMASHCRAFT_HEADLESS, localNatives: unlogged }, declarations);
-afterAll(headless.restore);
+const headless = testHeadless({ ...SMASHCRAFT_HEADLESS, localNatives: unlogged }, declarations);
 
 const callbacks = [0, 0];
 const local = () => GetPlayerId(GetLocalPlayer());
@@ -138,49 +138,52 @@ const captureLocalAt = ShadowInputSchedule.prototype.captureLocalAt;
 const completeSpeculative = ShadowInputSchedule.prototype.completeSpeculative;
 const completeConfirmed = ShadowInputSchedule.prototype.completeConfirmed;
 const readConfirmed = ShadowInputSchedule.prototype.readConfirmed;
-ShadowInputSchedule.prototype.captureLocalAt = function (this: ShadowInputSchedule, epoch: number, frame: number, sample: Readonly<InputRow>) {
-  const slot = local();
-  if (sample.pressed !== 0 && !presses.has(`${slot} ${frame}`)) {
-    presses.set(`${slot} ${frame}`, { slot, frame, pressed: sample.pressed, capture: callbacks[slot] ?? 0, held: shell().rollback?.predictionHeld === true });
-  }
-  return captureLocalAt.call(this, epoch, frame, sample);
-};
-ShadowInputSchedule.prototype.completeSpeculative = function (this: ShadowInputSchedule, epoch: number, frame: number) {
-  const slot = local();
-  const press = presses.get(`${slot} ${frame}`);
-  if (press !== undefined && press.predicted === undefined) {
-    press.predicted = callbacks[slot] ?? 0;
-    press.started = press.pressed & (observedFrameStartedActions[slot as 0] ?? 0);
-    press.entering = predictedWorlds.get(`${slot} ${frame - 1}`);
-  }
-  predictedWorlds.set(`${slot} ${frame}`, worldDigest(shell().rollback?.speculative.world));
-  return completeSpeculative.call(this, epoch, frame);
-};
-ShadowInputSchedule.prototype.completeConfirmed = function (this: ShadowInputSchedule, epoch: number, frame: number) {
-  const slot = local();
-  const press = presses.get(`${slot} ${frame}`);
-  if (press !== undefined) {
-    press.legal = press.pressed & (observedFrameLegalActions[slot as 0] ?? 0);
-    press.remote = press.entering !== undefined && press.entering !== confirmedWorlds.get(`${slot} ${frame - 1}`);
-  }
-  confirmedWorlds.set(`${slot} ${frame}`, worldDigest(shell().world));
-  return completeConfirmed.call(this, epoch, frame);
-};
-ShadowInputSchedule.prototype.readConfirmed = function (this: ShadowInputSchedule, epoch: number, inputs: ParticipantInputs) {
-  const frame = this.nextConfirmedFrame();
-  const read = readConfirmed.call(this, epoch, inputs);
-  for (const slot of read ? [0, 1] : []) {
-    const row: Readonly<InputRow> | undefined = inputs[slot];
-    if (row === undefined || !sameInput(row, BEAT_ROWS[frame] as InputRow)) wrongRows.push(`client ${local()} slot ${slot} frame ${frame}`);
-  }
-  return read;
-};
+beforeAll(() => {
+  ShadowInputSchedule.prototype.captureLocalAt = function (this: ShadowInputSchedule, epoch: number, frame: number, sample: Readonly<InputRow>) {
+    const slot = local();
+    if (sample.pressed !== 0 && !presses.has(`${slot} ${frame}`)) {
+      presses.set(`${slot} ${frame}`, { slot, frame, pressed: sample.pressed, capture: callbacks[slot] ?? 0, held: shell().rollback?.predictionHeld === true });
+    }
+    return captureLocalAt.call(this, epoch, frame, sample);
+  };
+  ShadowInputSchedule.prototype.completeSpeculative = function (this: ShadowInputSchedule, epoch: number, frame: number) {
+    const slot = local();
+    const press = presses.get(`${slot} ${frame}`);
+    if (press !== undefined && press.predicted === undefined) {
+      press.predicted = callbacks[slot] ?? 0;
+      press.started = press.pressed & (observedFrameStartedActions[slot as 0] ?? 0);
+      press.entering = predictedWorlds.get(`${slot} ${frame - 1}`);
+    }
+    predictedWorlds.set(`${slot} ${frame}`, worldDigest(shell().rollback?.speculative.world));
+    return completeSpeculative.call(this, epoch, frame);
+  };
+  ShadowInputSchedule.prototype.completeConfirmed = function (this: ShadowInputSchedule, epoch: number, frame: number) {
+    const slot = local();
+    const press = presses.get(`${slot} ${frame}`);
+    if (press !== undefined) {
+      press.legal = press.pressed & (observedFrameLegalActions[slot as 0] ?? 0);
+      press.remote = press.entering !== undefined && press.entering !== confirmedWorlds.get(`${slot} ${frame - 1}`);
+    }
+    confirmedWorlds.set(`${slot} ${frame}`, worldDigest(shell().world));
+    return completeConfirmed.call(this, epoch, frame);
+  };
+  ShadowInputSchedule.prototype.readConfirmed = function (this: ShadowInputSchedule, epoch: number, inputs: ParticipantInputs) {
+    const frame = this.nextConfirmedFrame();
+    const read = readConfirmed.call(this, epoch, inputs);
+    for (const slot of read ? [0, 1] : []) {
+      const row: Readonly<InputRow> | undefined = inputs[slot];
+      if (row === undefined || !sameInput(row, BEAT_ROWS[frame] as InputRow)) wrongRows.push(`client ${local()} slot ${slot} frame ${frame}`);
+    }
+    return read;
+  };
+});
 afterAll(() => {
   ShadowInputSchedule.prototype.captureLocalAt = captureLocalAt;
   ShadowInputSchedule.prototype.completeSpeculative = completeSpeculative;
   ShadowInputSchedule.prototype.completeConfirmed = completeConfirmed;
   ShadowInputSchedule.prototype.readConfirmed = readConfirmed;
 });
+
 
 
 interface LockstepFrames {

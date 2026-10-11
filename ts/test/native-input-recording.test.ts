@@ -1,6 +1,6 @@
-import { afterAll, expect } from "bun:test";
+import { expect } from "bun:test";
 import { Effect } from "effect";
-import { installHeadless } from "wisp/scripts/wisp/headless";
+import { testHeadless } from "./headless";
 import type { Lockstep } from "wisp/src/headless/lockstep";
 import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel";
 import { Phase } from "../src/game/match/rules";
@@ -15,8 +15,7 @@ import { ResponsePage } from "../scripts/wisp/boundary";
 import { entryFor } from "./desync/journeys";
 import { sweep } from "./sweep";
 
-const headless = installHeadless(SMASHCRAFT_HEADLESS);
-afterAll(headless.restore);
+const headless = testHeadless(SMASHCRAFT_HEADLESS);
 
 const NATIVE_INPUT: MapBuild = { ...PLAYABLE_BUILD, id: "typescript-native-input", responseProbe: true, epochProbe: true, devConsole: true };
 const KEYS = ["Q", "T", "I"].map(key => key.charCodeAt(0));

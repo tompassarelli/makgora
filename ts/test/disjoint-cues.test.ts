@@ -1,5 +1,5 @@
-import { afterAll, beforeAll, expect, test } from "bun:test";
-import { installHeadless } from "wisp/scripts/wisp/headless";
+import { expect, test } from "bun:test";
+import { testHeadless } from "./headless";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { SELECTABLE_CHARACTERS } from "../src/game/sim/heroes/registry";
 import { createFighter } from "../src/game/sim/fighter";
@@ -11,9 +11,7 @@ import { effectMotion } from "../src/game/render/effects";
 import { Character } from "../src/game/sim/codes";
 import { sweep } from "./sweep";
 
-let headless: ReturnType<typeof installHeadless>;
-beforeAll(() => { headless = installHeadless(SMASHCRAFT_HEADLESS); });
-afterAll(() => headless.restore());
+const headless = testHeadless(SMASHCRAFT_HEADLESS);
 
 function checkNormalRegions(characters: readonly Character[]): void {
   const clients = headless.clients({ start: () => {}, install: () => {} });

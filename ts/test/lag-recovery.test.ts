@@ -15,8 +15,9 @@
 
 
 
-import { afterAll, expect } from "bun:test";
-import { installHeadless, readNativeDeclarations } from "wisp/scripts/wisp/headless";
+import { afterAll, beforeAll, expect } from "bun:test";
+import { readNativeDeclarations } from "wisp/scripts/wisp/headless";
+import { testHeadless } from "./headless";
 import { WARCRAFT_COST } from "wisp/src/headless/nativeCost";
 import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel";
 import type { HeadlessClient } from "wisp/src/headless/client";
@@ -45,8 +46,7 @@ helpers.workload = { denseCycles: 40, walkers: [] };
 
 let now = 0;
 helpers.clock = () => now;
-const headless = installHeadless({ ...SMASHCRAFT_HEADLESS, localNatives: unlogged }, declarations);
-afterAll(headless.restore);
+const headless = testHeadless({ ...SMASHCRAFT_HEADLESS, localNatives: unlogged }, declarations);
 
 
 const applied = { rows: 0, wrong: [] as string[] };
@@ -61,41 +61,44 @@ const capturedAt = new Map<string, readonly [callback: number, halted: boolean]>
 const localStarts: { readonly client: number; readonly frame: number; readonly callbacks: number; readonly halted: boolean }[] = [];
 const captureLocalAt = ShadowInputSchedule.prototype.captureLocalAt;
 const completeSpeculative = ShadowInputSchedule.prototype.completeSpeculative;
-ShadowInputSchedule.prototype.captureLocalAt = function (this: ShadowInputSchedule, epoch: number, frame: number, sample: Readonly<InputRow>) {
-  const captured = captureLocalAt.call(this, epoch, frame, sample);
+beforeAll(() => {
+  ShadowInputSchedule.prototype.captureLocalAt = function (this: ShadowInputSchedule, epoch: number, frame: number, sample: Readonly<InputRow>) {
+    const captured = captureLocalAt.call(this, epoch, frame, sample);
 
-  if (sample.pressed !== 0) capturedAt.set(`${GetPlayerId(GetLocalPlayer())} ${frame}`, [callbackIndex, frame - this.rollbackFrames() > this.knownThrough()]);
-  return captured;
-};
-ShadowInputSchedule.prototype.completeSpeculative = function (this: ShadowInputSchedule, epoch: number, frame: number) {
-  const completed = completeSpeculative.call(this, epoch, frame);
-  const key = `${GetPlayerId(GetLocalPlayer())} ${frame}`;
-  const captured = capturedAt.get(key);
-  if (completed && captured !== undefined) {
-    localStarts.push({ client: GetPlayerId(GetLocalPlayer()), frame, callbacks: callbackIndex - captured[0], halted: captured[1] });
-    capturedAt.delete(key);
-  }
-  return completed;
-};
+    if (sample.pressed !== 0) capturedAt.set(`${GetPlayerId(GetLocalPlayer())} ${frame}`, [callbackIndex, frame - this.rollbackFrames() > this.knownThrough()]);
+    return captured;
+  };
+  ShadowInputSchedule.prototype.completeSpeculative = function (this: ShadowInputSchedule, epoch: number, frame: number) {
+    const completed = completeSpeculative.call(this, epoch, frame);
+    const key = `${GetPlayerId(GetLocalPlayer())} ${frame}`;
+    const captured = capturedAt.get(key);
+    if (completed && captured !== undefined) {
+      localStarts.push({ client: GetPlayerId(GetLocalPlayer()), frame, callbacks: callbackIndex - captured[0], halted: captured[1] });
+      capturedAt.delete(key);
+    }
+    return completed;
+  };
+  ShadowInputSchedule.prototype.readConfirmed = function (this: ShadowInputSchedule, epoch: number, inputs: ParticipantInputs) {
+    const frame = this.nextConfirmedFrame();
+    const read = readConfirmed.call(this, epoch, inputs);
+    if (read) {
+      for (const slot of [0, 1]) {
+        applied.rows++;
+        const row: Readonly<InputRow> | undefined = inputs[slot];
+        const delay = shell().rollback?.delay ?? 0;
+        const expected = frame <= delay ? emptyInput() : rowFor(slot, frame, helpers.workload);
+        if (row === undefined || !sameInput(row, expected)) applied.wrong.push(`client ${GetPlayerId(GetLocalPlayer())} slot ${slot} frame ${frame}`);
+      }
+    }
+    return read;
+  };
+});
 afterAll(() => {
   ShadowInputSchedule.prototype.captureLocalAt = captureLocalAt;
   ShadowInputSchedule.prototype.completeSpeculative = completeSpeculative;
   ShadowInputSchedule.prototype.readConfirmed = readConfirmed;
 });
-ShadowInputSchedule.prototype.readConfirmed = function (this: ShadowInputSchedule, epoch: number, inputs: ParticipantInputs) {
-  const frame = this.nextConfirmedFrame();
-  const read = readConfirmed.call(this, epoch, inputs);
-  if (read) {
-    for (const slot of [0, 1]) {
-      applied.rows++;
-      const row: Readonly<InputRow> | undefined = inputs[slot];
-      const delay = shell().rollback?.delay ?? 0;
-      const expected = frame <= delay ? emptyInput() : rowFor(slot, frame, helpers.workload);
-      if (row === undefined || !sameInput(row, expected)) applied.wrong.push(`client ${GetPlayerId(GetLocalPlayer())} slot ${slot} frame ${frame}`);
-    }
-  }
-  return read;
-};
+
 
 const STALL_FRAMES = 120;
 

@@ -4,12 +4,12 @@
 
 
 
-import { afterAll, expect } from "bun:test";
+import { expect } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
-import { installHeadless } from "wisp/scripts/wisp/headless";
+import { testHeadless } from "./headless";
 import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel";
 import type { HeadlessClient } from "wisp/src/headless/client";
 import { Phase, holdingStart } from "../src/game/match/rules";
@@ -27,8 +27,7 @@ import { readReplay } from "../scripts/wisp/replayFiles";
 import { expectSynchronized, value } from "./rematch/playableMatch";
 import { sweep } from "./sweep";
 
-const headless = installHeadless(PREDICTED_HEADLESS);
-afterAll(headless.restore);
+const headless = testHeadless(PREDICTED_HEADLESS);
 
 
 function joinedReplay(client: HeadlessClient, serial: number): string[] {

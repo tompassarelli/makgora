@@ -1,8 +1,8 @@
 
 
 
-import { afterAll, expect, test } from "bun:test";
-import { installHeadless } from "wisp/scripts/wisp/headless";
+import { expect, test } from "bun:test";
+import { testHeadless } from "./headless";
 import { BOSSES, BossPhase, bossCycleFrames, bossDefinition, bossMoment, collectBossContacts } from "../src/game/classic/bosses";
 import { ClassicPresentation, BOSS_TELEGRAPH_MODEL } from "../src/game/render/classicPresentation";
 import { classicRoute } from "../src/game/classic/routes";
@@ -21,8 +21,7 @@ import { PREDICTED_HEADLESS } from "../scripts/wisp/headless";
 import { JournalHelpers, rowFor } from "./rematch/journalHelper";
 import { expectSynchronized, shows, value } from "./rematch/playableMatch";
 
-const headless = installHeadless(PREDICTED_HEADLESS);
-afterAll(headless.restore);
+const headless = testHeadless(PREDICTED_HEADLESS);
 
 function classicClients(idle = false) {
   const clients = headless.clients({ start: () => startBuild(INTEGRITY_BUILD), install }, [0, 1]);

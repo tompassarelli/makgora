@@ -4,8 +4,8 @@
 
 
 
-import { afterAll, expect, test } from "bun:test";
-import { installHeadless } from "wisp/scripts/wisp/headless";
+import { expect, test } from "bun:test";
+import { testHeadless } from "./headless";
 import type { HeadlessClient } from "wisp/src/headless/client";
 import type { Lockstep } from "wisp/src/headless/lockstep";
 import { Phase, holdingStart } from "../src/game/match/rules";
@@ -21,8 +21,7 @@ import { readyChipSize } from "../src/game/menu/selectionDrag";
 import { PLAYABLE_CHARACTERS } from "../src/game/sim/heroes/registry";
 import { f32 } from "wisp/src/sim/f32";
 
-const headless = installHeadless(SMASHCRAFT_HEADLESS);
-afterAll(headless.restore);
+const headless = testHeadless(SMASHCRAFT_HEADLESS);
 
 
 const DEVELOPER_LINE_TERMS = [

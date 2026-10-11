@@ -2,16 +2,15 @@
 
 
 
-import { afterAll, expect, test } from "bun:test";
-import { installHeadless } from "wisp/scripts/wisp/headless";
+import { expect, test } from "bun:test";
+import { testHeadless } from "./headless";
 import { INTEGRITY_BUILD } from "../src/game/shell/currentBuild";
 import { activeRollback, shell } from "../src/platform/shell/state";
 import { PREDICTED_HEADLESS } from "../scripts/wisp/headless";
 import { JournalHelpers } from "./rematch/journalHelper";
 import { confirmedFrame, expectSynchronized, startPlayableMatch, value } from "./rematch/playableMatch";
 
-const headless = installHeadless(PREDICTED_HEADLESS);
-afterAll(headless.restore);
+const headless = testHeadless(PREDICTED_HEADLESS);
 
 test("every client confirms the same frame in the same callback, never past the rows known a callback earlier [k1 scenario]", () => {
   const helpers = new JournalHelpers(INTEGRITY_BUILD.id, true);

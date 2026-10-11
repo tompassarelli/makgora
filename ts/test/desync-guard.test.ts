@@ -5,15 +5,14 @@
 
 
 
-import { afterAll, expect, test } from "bun:test";
-import { installHeadless } from "wisp/scripts/wisp/headless";
+import { expect, test } from "bun:test";
+import { testHeadless } from "./headless";
 import { CURRENT_BUILD } from "../src/game/shell/currentBuild";
 import { install, start } from "../src/platform/main";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { expectNoDivergence, playThroughReload } from "./desync/journeys";
 
-const headless = installHeadless(SMASHCRAFT_HEADLESS);
-afterAll(headless.restore);
+const headless = testHeadless(SMASHCRAFT_HEADLESS);
 
 test("desync guard: both clients make the same native calls through a match and a hot reload [k1 scenario]", () => {
   expect(CURRENT_BUILD.devConsole).toBe(true);

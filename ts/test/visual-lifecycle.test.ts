@@ -1,4 +1,4 @@
-import { afterAll, expect, test } from "bun:test";
+import { expect, test } from "bun:test";
 import { createFrameControls } from "../src/game/match/controls";
 import { captureFrame, createMatchFrameInput } from "../src/game/match/frameInput";
 import { Phase, requestStageSelect, selectCharacter } from "../src/game/match/rules";
@@ -26,12 +26,11 @@ import { startMatch } from "../src/platform/shell/matchStart";
 import { confirm } from "../src/platform/shell/menus";
 import { shell } from "../src/platform/shell/state";
 import { pauseMatchPresentation, renderPersistentPresentation, serviceResumePresentation } from "../src/platform/shell/view";
-import { installHeadless } from "wisp/scripts/wisp/headless";
+import { testHeadless } from "./headless";
 import type { EffectPose, HeadlessClient } from "wisp/src/headless/client";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 
-const headless = installHeadless(SMASHCRAFT_HEADLESS);
-afterAll(headless.restore);
+const headless = testHeadless(SMASHCRAFT_HEADLESS);
 
 
 function effectPoses(client: HeadlessClient): Map<unknown, EffectPose> {

@@ -1,5 +1,5 @@
-import { afterAll, expect, test } from "bun:test";
-import { installHeadless } from "wisp/scripts/wisp/headless";
+import { expect, test } from "bun:test";
+import { testHeadless } from "./headless";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { start, install } from "../src/platform/main";
 import { shell } from "../src/platform/shell/state";
@@ -12,8 +12,7 @@ import { firstFighterDifference } from "../src/game/replay/difference";
 import { ROSTER_MANA } from "../src/game/sim/mana";
 import { sweep } from "./sweep";
 
-const headless = installHeadless(SMASHCRAFT_HEADLESS);
-afterAll(headless.restore);
+const headless = testHeadless(SMASHCRAFT_HEADLESS);
 
 const fourExSpecials = (character: (typeof SELECTABLE_CHARACTERS)[number]): void => {
   const clients = headless.clients({ start, install });

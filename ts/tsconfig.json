@@ -45,6 +45,7 @@
     "test/cpu-field.test.ts",
     "test/dreadlord-shadow-hunter-gameplans.test.ts",
     "test/genre-envelope.test.ts",
+    "test/headless.ts",
     "test/live-agency.test.ts",
     "test/platform-advantage.test.ts",
     "test/playtest.test.ts",

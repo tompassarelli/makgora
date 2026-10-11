@@ -3,8 +3,8 @@
 
 
 
-import { afterAll, expect } from "bun:test";
-import { installHeadless } from "wisp/scripts/wisp/headless";
+import { expect } from "bun:test";
+import { testHeadless } from "./headless";
 import { install, start } from "../src/platform/main";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { confirmedChecksum } from "../src/platform/shell/diagnostics";
@@ -14,8 +14,7 @@ import { effectMotion } from "../src/game/render/effects";
 import { expectNoDivergence } from "./desync/journeys";
 import { sweep } from "./sweep";
 
-const headless = installHeadless(SMASHCRAFT_HEADLESS);
-afterAll(headless.restore);
+const headless = testHeadless(SMASHCRAFT_HEADLESS);
 
 const MATCH_FRAMES = 300;
 

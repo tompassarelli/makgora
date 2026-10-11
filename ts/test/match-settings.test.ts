@@ -1,6 +1,6 @@
 
-import { afterAll, expect, test } from "bun:test";
-import { installHeadless } from "wisp/scripts/wisp/headless";
+import { expect, test } from "bun:test";
+import { testHeadless } from "./headless";
 import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel";
 import { nextMatchSeed } from "../src/game/match/botRandom";
 import { randomStage } from "../src/game/menu/stageCatalog";
@@ -17,8 +17,7 @@ import { PREDICTED_HEADLESS } from "../scripts/wisp/headless";
 import { JournalHelpers } from "./rematch/journalHelper";
 import { expectSynchronized, shows, value } from "./rematch/playableMatch";
 import { sweep } from "./sweep";
-const headless = installHeadless(PREDICTED_HEADLESS);
-afterAll(headless.restore);
+const headless = testHeadless(PREDICTED_HEADLESS);
 function session(endless = false, hazardsOff = false, dropsOff = false) {
   const clients = headless.clients({ start: () => startBuild(INTEGRITY_BUILD), install }, [0, 1], { delivery: syncDelivery(MEASURED_BATTLE_NET, 74), keepCalls: 64 });
   const helpers = new JournalHelpers(INTEGRITY_BUILD.id);

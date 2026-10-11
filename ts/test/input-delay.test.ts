@@ -1,5 +1,5 @@
-import { afterAll, beforeAll, expect, test } from "bun:test";
-import { installHeadless } from "wisp/scripts/wisp/headless";
+import { expect, test } from "bun:test";
+import { testHeadless } from "./headless";
 import type { SyncDelivery } from "wisp/src/headless/lockstep";
 import type { Lockstep } from "wisp/src/headless/lockstep";
 import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel";
@@ -16,9 +16,7 @@ import { entryFor } from "./desync/journeys";
 import { confirmedChecksum } from "../src/platform/shell/diagnostics";
 import { sweep } from "./sweep";
 
-let headless: ReturnType<typeof installHeadless>;
-beforeAll(() => { headless = installHeadless(SMASHCRAFT_HEADLESS); });
-afterAll(() => headless.restore());
+const headless = testHeadless(SMASHCRAFT_HEADLESS);
 
 const BUILD: MapBuild = { ...PLAYABLE_BUILD, id: "typescript-input-delay", devConsole: true };
 const PROBED: MapBuild = { ...BUILD, responseProbe: true };

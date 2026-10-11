@@ -1,8 +1,8 @@
 
 
 
-import { afterAll, expect, test } from "bun:test";
-import { installHeadless } from "wisp/scripts/wisp/headless";
+import { expect, test } from "bun:test";
+import { testHeadless } from "./headless";
 import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel";
 import { PREDICTED_HEADLESS } from "../scripts/wisp/headless";
 import { botBeatKeys } from "../scripts/wisp/botMatch";
@@ -10,8 +10,7 @@ import { ReplayHistory } from "../src/game/replay/history";
 import { PLAYABLE_BUILD } from "../src/game/shell/currentBuild";
 import { install, startBuild } from "../src/platform/main";
 
-const headless = installHeadless(PREDICTED_HEADLESS);
-afterAll(headless.restore);
+const headless = testHeadless(PREDICTED_HEADLESS);
 
 test("rollback repair re-simulates corrected frames without a single native call [k1 scenario]", () => {
   const clients = headless.clients({ start: () => startBuild({ ...PLAYABLE_BUILD, devConsole: true }), install }, [0, 1], {

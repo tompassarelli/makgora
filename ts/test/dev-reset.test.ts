@@ -9,7 +9,7 @@
 
 import { afterAll, expect } from "bun:test";
 import { rmSync } from "node:fs";
-import { installHeadless } from "wisp/scripts/wisp/headless";
+import { testHeadless } from "./headless";
 import type { MapEntry } from "wisp/src/headless/client";
 import { Phase } from "../src/game/match/rules";
 import { clearObservedActions } from "../src/game/match/step";
@@ -22,10 +22,9 @@ import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { JournalHelpers } from "./rematch/journalHelper";
 import { value } from "./rematch/playableMatch";
 import { sweep } from "./sweep";
-const headless = installHeadless(SMASHCRAFT_HEADLESS);
+const headless = testHeadless(SMASHCRAFT_HEADLESS);
 const copies: string[] = [];
 afterAll(() => {
-  headless.restore();
   for (const copy of copies) rmSync(copy, { recursive: true });
 });
 
