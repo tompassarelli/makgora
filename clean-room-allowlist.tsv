@@ -1,7 +1,5 @@
 # Committed files the clean-room check (smashcraft:ts/scripts/cleanRoom.ts, wisp:docs/clean-room.md) would refuse, with their origin.
 # PATH<TAB>ORIGIN (original, generated, or stock-path: names stock assets by in-game path, holds none)<TAB>HOW it was made
-tools/selection/art/OpponentSettings.fdf	generated	bun scripts/wisp/uiFrames.ts (from ts/); names stock textures and fonts by in-game path
-tools/selection/art/OpponentSettings.toc	generated	bun scripts/wisp/uiFrames.ts (from ts/)
 tools/selection/art/SmashcraftHUD.fdf	generated	bun scripts/wisp/uiFrames.ts (from ts/)
 tools/selection/art/SmashcraftHUD.toc	generated	bun scripts/wisp/uiFrames.ts (from ts/)
 tools/selection/art/CueGraphics.fdf	original	Authored local graphics-mode string for Classic spell cue timing (#144).

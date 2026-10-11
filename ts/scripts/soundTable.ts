@@ -14,7 +14,7 @@ export function soundTableMarkdown(): string {
     "# Move sound table",
     "",
     "Generated from smashcraft:ts/src/game/presentation/moveSounds.ts by",
-    "`bun scripts/soundTable.ts` (from smashcraft:ts/); edit the table there, never here.",
+    "`bun install` (from smashcraft:ts/; untracked); edit the table there, never here.",
     "The model and its reasons are in [sound.md](sound.md). Names are Warcraft III sound",
     "labels (AnimSounds, AbilitySounds, UnitCombatSounds) or file names; `A / B` is",
     "alternatives a serial picks among, `A + B` layers. A whiff plays the perform column",

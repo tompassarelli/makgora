@@ -4,6 +4,7 @@
 
 
 import { createHash } from "node:crypto";
+import { join } from "node:path";
 import { STAGE_CATALOG, type StageTile } from "../src/game/menu/stageCatalog";
 import { deckModel, stageModels } from "../src/game/presentation/stagePreload";
 import { placedPieces, stageScenery, terrainPieces } from "../src/game/presentation/stageScenery";
@@ -52,6 +53,8 @@ export const CARD = {
 } as const;
 
 
+/** Generated from silhouetteSource() by scripts/generated.ts; untracked (#401). */
+export const SILHOUETTE_PATH = join(import.meta.dir, "../src/game/menu/stageSilhouettes.ts");
 export const SILHOUETTE_PIECES = 6;
 
 

@@ -6,3 +6,8 @@
 /tools/slippi/node_modules/
 # Generated from tracked sources by ts/scripts/generated.ts (#401).
 /docs/move-list.md
+/docs/design/sound-table.md
+/ts/src/game/menu/stageSilhouettes.ts
+/ts/src/game/ui/opponentSettingsFrames.ts
+/tools/selection/art/OpponentSettings.fdf
+/tools/selection/art/OpponentSettings.toc

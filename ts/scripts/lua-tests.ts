@@ -27,6 +27,7 @@ import { runAdmitted } from "./heavyCapacity";
 import { LUA_TEST_CEILING_INSTRUCTIONS, LUA_TEST_CEILING_S, addLuaCost, judgeLua, type LuaCosts } from "./testCost";
 import { stockLua } from "./wisp/luaRuntimes";
 import { refuseUntagged } from "./oracleTags";
+import { ensureGenerated } from "./generated";
 
 const processCode = (command: string, args: readonly string[], env?: Record<string, string | undefined>) => Effect.scoped(Effect.gen(function*() {
   const child = yield* ChildProcess.make(command, args, { stdout: "inherit", stderr: "inherit", ...(env === undefined ? {} : { env }) });
@@ -87,6 +88,7 @@ if (modules.length === 0) throw new Error("No Lua test modules match GAME_TESTS 
 
 
 
+ensureGenerated();
 const loaded = [...modules, ...(remainder ? ["scripts/wisp/memoryCensus.tests.ts"] : [])];
 refuseUntagged(".", loaded);
 await runAdmitted("moderate", "smashcraft:lua-tests", 1800);
