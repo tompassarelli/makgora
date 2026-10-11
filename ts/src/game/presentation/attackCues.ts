@@ -33,8 +33,8 @@ export const ATTACK_CUES: { readonly [character: number]: { readonly [style: num
     [AttackStyle.neutralAir]: [{ name: "Blade Wheel", fromActive: 0, cue: cue("Abilities\\Spells\\Human\\SunderingBlades\\SunderingBlades.mdx", f32(0.7)) }],
   },
   [Character.warden]: {
-    [AttackStyle.downAir]: [{ name: "Falling Knives", fromActive: 0, cue: cue("Abilities\\Spells\\NightElf\\FanOfKnives\\FanOfKnivesMissile.mdx", 1.0) }],
-    [AttackStyle.upAir]: [{ name: "Sky Crescent", fromActive: 0, cue: cue("Abilities\\Weapons\\SentinelMissile\\SentinelMissile.mdx", 1.0) }],
+    [AttackStyle.downAir]: [{ name: "Falling Knives", fromActive: 0, cue: cue("Abilities\\Spells\\NightElf\\FanOfKnives\\FanOfKnivesMissile.mdx", f32(0.3)) }],
+    [AttackStyle.upAir]: [{ name: "Sky Crescent", fromActive: 0, cue: cue("Abilities\\Spells\\Human\\SunderingBlades\\SunderingBlades.mdx", f32(0.45)) }],
   },
   [Character.shadowHunter]: {
     [AttackStyle.downAir]: [{ name: "Glaive drill", fromActive: 0, cue: cue("Abilities\\Weapons\\ShadowHunterMissile\\ShadowHunterMissile.mdx", f32(1.2)) }],
