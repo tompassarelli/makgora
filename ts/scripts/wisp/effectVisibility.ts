@@ -60,7 +60,9 @@ export function effectVisibility(model: mdx.Model, use: Pick<EffectUse, "sequenc
   const wanted = requested === undefined ? ["birth", "stand"] : [requested];
   const found = wanted.map((name) => selectSequence(sequences, name)).filter((index) => index >= 0);
   const named = requested !== undefined && sequences.some(({ name }) => name.toLowerCase().includes(requested.toLowerCase()));
-  const picked = found.length > 0 ? found : sequences.length > 0 && !named ? [0] : [];
+  const stand = selectSequence(sequences, "stand");
+  // Mirrors wisp/src/headless/animation.ts animationSample: Stand, else the first sequence.
+  const picked = found.length > 0 ? found : sequences.length > 0 && !named ? [stand >= 0 ? stand : 0] : [];
   if (sequences.length > 0 && picked.length === 0) return { visible: false, reason: `no ${wanted.join("/")} sequence (has ${sequences.map(({ name }) => name).join(", ")})` };
   const windows: { readonly sequence: Window; readonly window: Window; readonly name: string }[] = picked.length === 0
     ? [{ sequence: [0, 0], window: [0, 0], name: "none" }]
