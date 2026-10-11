@@ -385,6 +385,7 @@ function seekFoe(f: Fighter, world: Roster, speed: number, turnCos: number, turn
 
 /** Whether the running move flies through platforms this frame. */
 export function heroMotionPassesPlatforms(f: Readonly<Fighter>): boolean {
+  if (f.special.action === SpecialAction.none) return false;
   const move = runningHeroSpecial(f);
   if (move === undefined) return false;
   for (const segment of move.motion ?? []) if (segment.seek !== undefined && f.special.frame >= segment.first && f.special.frame <= segment.last) return true;
