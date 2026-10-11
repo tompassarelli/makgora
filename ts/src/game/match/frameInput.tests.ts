@@ -11,7 +11,7 @@ import { firstFighterDifference, firstStateDifference } from "../replay/differen
 import { type ReplayState, captureReplaySnapshot, copyReplayState, createReplaySnapshot, restoreReplaySnapshot } from "../replay/snapshot";
 import { analogShieldStrength } from "../sim/shield";
 import { Character } from "../sim/codes";
-import { sameCameraSubjects, sameMatchCamera } from "../sim/matchCamera";
+import { copyMatchCamera, createMatchCamera, sameCameraSubjects, sameMatchCamera } from "../sim/matchCamera";
 import { fighterAt } from "../sim/roster";
 import { createFrameControls } from "./controls";
 import { captureFrame, captureNetworkFrame, copyMatchFrameInput, createMatchFrameInput, executeMatchFrame, resetMatchFrameInput, sameMatchFrameInput } from "./frameInput";
@@ -95,9 +95,15 @@ test("a network row adapts again from the world it replays into [k1 scenario]", 
 test("a frame handed an earlier run's camera reaches the state recomputing the camera does [k1 scenario]", () => {
   const frames = 600;
   const earlier = testMatch(15, Character.rifleman);
-  const rows = Array.from({ length: frames + 1 }, () => createMatchFrameInput());
-  const snapshots = Array.from({ length: frames + 1 }, () => createReplaySnapshot());
-  captureReplaySnapshot(at(snapshots, 0), earlier.world, earlier.game, earlier.inputs, earlier.runtime);
+  // A corrected run: the same rows, but slot 3 carries more damage, so it moves alike until a hit launches it farther.
+  const corrected: ReplayState = createReplaySnapshot();
+  copyReplayState(corrected, replayState(earlier));
+  fighterAt(corrected.world, 3).status.damage = 120.0;
+  const copied = testMatch(15, Character.rifleman);
+  const recomputed = testMatch(15, Character.rifleman);
+  const before = createMatchCamera();
+  let reused = 0;
+  let declined = 0;
   for (let frame = 1; frame <= frames; frame++) {
     for (const slot of [0, 1, 2, 3] as const) {
       const input = earlier.inputs.inputs[slot];
@@ -107,27 +113,15 @@ test("a frame handed an earlier run's camera reaches the state recomputing the c
       input.jumpHeld = phase >= 45 && phase < 55;
       if (floorMod(phase, 20) === 10) queueAttack(earlier.inputs.commands[slot], { style: floorMod(phase, 3), facing: 0, frame, mayCharge: false });
     }
-    assertTrue(captureFrame(at(rows, frame), frame, 15, earlier.inputs, earlier.runtime));
-    assertTrue(executeMatchFrame(at(rows, frame), earlier.game, earlier.world, earlier.inputs, earlier.runtime, frame));
-    captureReplaySnapshot(at(snapshots, frame), earlier.world, earlier.game, earlier.inputs, earlier.runtime);
-  }
-
-  // A corrected run: the same rows, but slot 3 carries more damage, so it moves alike until a hit launches it farther.
-  const corrected: ReplayState = createReplaySnapshot();
-  copyReplayState(corrected, at(snapshots, 0));
-  fighterAt(corrected.world, 3).status.damage = 120.0;
-  const copied = testMatch(15, Character.rifleman);
-  const recomputed = testMatch(15, Character.rifleman);
-  let reused = 0;
-  let declined = 0;
-  for (let frame = 1; frame <= frames; frame++) {
-    const before = at(snapshots, frame - 1);
-    const after = at(snapshots, frame);
-    const framed = sameMatchCamera(corrected.match.camera, before.match.camera);
+    assertTrue(captureFrame(earlier.row, frame, 15, earlier.inputs, earlier.runtime));
+    copyMatchCamera(before, earlier.game.camera);
+    assertTrue(executeMatchFrame(earlier.row, earlier.game, earlier.world, earlier.inputs, earlier.runtime, frame));
+    const after = replayState(earlier);
+    const framed = sameMatchCamera(corrected.match.camera, before);
     copyReplayState(replayState(copied), corrected);
     copyReplayState(replayState(recomputed), corrected);
-    assertTrue(executeMatchFrame(at(rows, frame), copied.game, copied.world, copied.inputs, copied.runtime, frame, undefined, undefined, framed ? after : undefined));
-    assertTrue(executeMatchFrame(at(rows, frame), recomputed.game, recomputed.world, recomputed.inputs, recomputed.runtime, frame));
+    assertTrue(executeMatchFrame(earlier.row, copied.game, copied.world, copied.inputs, copied.runtime, frame, undefined, undefined, framed ? after : undefined));
+    assertTrue(executeMatchFrame(earlier.row, recomputed.game, recomputed.world, recomputed.inputs, recomputed.runtime, frame));
     assertEquals(firstStateDifference(replayState(recomputed), replayState(copied)), undefined);
     if (framed && sameCameraSubjects(copied.world, after.world)) reused++;
     else declined++;
