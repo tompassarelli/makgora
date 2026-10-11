@@ -2,36 +2,21 @@
 
 import { assertEquals, assertGreaterThan, assertLessThan, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
-import { resolveAttacks } from "./attacks";
 import { Character, ProjectileKind } from "./codes";
-import { beginDamageContacts, finishDamageContacts } from "./contacts";
 import { type Fighter, createFighter } from "./fighter";
-import { updateProjectiles } from "./projectiles";
-import { type Controls, type Roster, createRoster } from "./roster";
-import { advanceSpecials, startFighterSpecial } from "./specials";
-import { advanceFighter } from "./step";
+import { type Controls, type Roster } from "./roster";
 import { controls } from "./testWorld";
+import { duelPair, stepDuel } from "./testDuel";
 
-function frame(world: Roster, first: Readonly<Controls> = controls(), second: Readonly<Controls> = controls()): void {
-  const inputs = [first, second];
-  for (let slot = 0; slot < 2; slot++) advanceFighter(world, slot, 0, inputs[slot] ?? controls(), slot === 0 ? -240.0 : 240.0);
-  beginDamageContacts();
-  for (let slot = 0; slot < 2; slot++) startFighterSpecial(world.fighters[slot]!, 0, 0, inputs[slot] ?? controls(), world);
-  resolveAttacks(world);
-  advanceSpecials(world, 0, 0, [first, second]);
-  updateProjectiles(world);
-  finishDamageContacts(world);
-}
 
 const run = (world: Roster, frames: number, first: Readonly<Controls> = controls(), second: Readonly<Controls> = controls()) => {
-  for (let f = 0; f < frames; f++) frame(world, first, second);
+  for (let f = 0; f < frames; f++) stepDuel(world, first, second);
 };
 
 function airborne(character: Character, z: number, gap = 900.0, targetZ = 0.0): { world: Roster; owner: Fighter; target: Fighter } {
   const owner = createFighter(character, 0.0, 1);
   const target = createFighter(Character.rifleman, gap, -1);
-  const world = createRoster(3, [owner, target]);
-  for (let i = 0; i < 3; i++) frame(world);
+  const { world } = duelPair(owner, target);
   owner.motion.grounded = false;
   owner.motion.surface = undefined;
   owner.motion.z = z;
@@ -49,7 +34,7 @@ const recoils = (f: Fighter) => f.projectiles.filter((p) => p.life > 0 && p.kind
 
 function firstShot(stick: Readonly<Controls>): { vx: number; vz: number; shotX: number; shotZ: number } {
   const { world, owner } = airborne(Character.rifleman, 400.0);
-  frame(world, upB);
+  stepDuel(world, upB);
   run(world, 3, stick);
   const shot = recoils(owner)[0];
   return { vx: owner.motion.vx, vz: owner.motion.vz, shotX: shot?.velocityX ?? 0.0, shotZ: shot?.velocityZ ?? 0.0 };

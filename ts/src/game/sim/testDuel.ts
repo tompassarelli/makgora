@@ -1,13 +1,13 @@
 
 
 import { ATTACK_BUFFER_FRAMES, type AttackBuffer, attackBuffer } from "../input/attackBuffer";
-import { type FrameControls, createFrameControls } from "../match/controls";
-import { Phase, createMatchState } from "../match/rules";
+import { type FrameControls, createBufferedFrameControls, createFrameControls } from "../match/controls";
+import { type MatchState, Phase, createMatchState } from "../match/rules";
 import { stepMatch } from "../match/step";
 import { Character } from "./codes";
 import { type Fighter, createFighter } from "./fighter";
 import { takenManaGain } from "./mana";
-import { type Controls, copyControls, createRoster } from "./roster";
+import { type Controls, type Roster, copyControls, createRoster } from "./roster";
 import { controls } from "./testWorld";
 
 export interface Duel {
@@ -64,4 +64,36 @@ export function lift(f: Fighter, z: number): void {
   f.motion.z = z;
   f.motion.vz = 0.0;
   f.motion.vx = 0.0;
+}
+
+
+interface DuelMatch {
+  readonly game: MatchState;
+  readonly controls: FrameControls;
+  frame: number;
+}
+
+const duelMatches = new WeakMap<Roster, DuelMatch>();
+
+/** Steps a two-fighter roster through the real match step, so tests follow the game's own step order. */
+export function stepDuel(world: Roster, first: Readonly<Controls> = controls(), second: Readonly<Controls> = controls(), stage = 0): void {
+  let match = duelMatches.get(world);
+  if (match === undefined) {
+    const game = createMatchState();
+    game.phase = Phase.match;
+    game.stageChoice = stage;
+    match = { game, controls: createBufferedFrameControls(), frame: 0 };
+    duelMatches.set(world, match);
+  }
+  match.frame++;
+  copyControls(match.controls.inputs[0], first);
+  copyControls(match.controls.inputs[1], second);
+  stepMatch(match.game, world, match.controls, match.frame);
+}
+
+/** Two fighters in one roster, settled for `settle` frames of stepDuel. */
+export function duelPair<Owner extends Fighter, Target extends Fighter>(owner: Owner, target: Target, settle = 3, stage = 0): { world: Roster; owner: Owner; target: Target } {
+  const world = createRoster(3, [owner, target]);
+  for (let i = 0; i < settle; i++) stepDuel(world, controls(), controls(), stage);
+  return { world, owner, target };
 }

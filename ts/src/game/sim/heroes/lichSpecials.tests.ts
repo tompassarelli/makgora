@@ -1,41 +1,22 @@
 import { assertEquals, assertGreaterThan, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
-import { resolveAttacks } from "../attacks";
 import { Character } from "../codes";
-import { beginDamageContacts, finishDamageContacts } from "../contacts";
 import { type Fighter, createFighter } from "../fighter";
 import { HERO_REFERENCE_HEIGHT } from "../heroMoves";
-import { advanceHeroStatus } from "../heroSpecialRules";
-import { updateProjectiles } from "../projectiles";
-import { type Controls, type Roster, createRoster } from "../roster";
-import { advanceSpecials, startFighterSpecial } from "../specials";
-import { advanceFighter } from "../step";
+import { type Roster } from "../roster";
 import { controls } from "../testWorld";
 import { copyFighterState } from "../../replay/fighterState";
 import { firstFighterDifference } from "../../replay/difference";
+import { duelPair, stepDuel } from "../testDuel";
 
 const H = HERO_REFERENCE_HEIGHT;
 
-function frame(world: Roster, first: Readonly<Controls> = controls(), second: Readonly<Controls> = controls(), stage = 0): void {
-  const inputs = [first, second];
-  for (let slot = 0; slot < 2; slot++) advanceFighter(world, slot, stage, inputs[slot] ?? controls(), slot === 0 ? -240.0 : 240.0);
-  beginDamageContacts();
-  for (let slot = 0; slot < 2; slot++) startFighterSpecial(world.fighters[slot]!, stage, 0, inputs[slot] ?? controls());
-  resolveAttacks(world);
-  advanceSpecials(world, stage, 0, inputs);
-  updateProjectiles(world);
-  finishDamageContacts(world);
-  for (let slot = 0; slot < 2; slot++) {
-    advanceHeroStatus(world.fighters[slot]!);
-  }
-}
 
 function lichPair(gap: number, opponent: Character = Character.rifleman): { world: Roster; lich: Fighter; target: Fighter } {
   const lich = createFighter(Character.lich, f32(-gap * 0.5), 1);
   lich.mana.points = 100;
   const target = createFighter(opponent, f32(gap * 0.5), -1);
-  const world = createRoster(3, [lich, target]);
-  for (let i = 0; i < 3; i++) frame(world);
+  const { world } = duelPair(lich, target);
   return { world, lich, target };
 }
 
@@ -50,12 +31,12 @@ test("replaying Lich's nova, armor and ascent from a restored snapshot reproduce
   copyFighterState(savedLich, lich, 3);
   copyFighterState(savedTarget, target, 3);
   const run = () => {
-    frame(world, sideForward);
-    for (let f = 2; f <= 60; f++) frame(world);
-    frame(world, down);
-    for (let f = 2; f <= 50; f++) frame(world);
-    frame(world, up);
-    for (let f = 2; f <= 40; f++) frame(world, controls({ direction: 1 }));
+    stepDuel(world, sideForward);
+    for (let f = 2; f <= 60; f++) stepDuel(world);
+    stepDuel(world, down);
+    for (let f = 2; f <= 50; f++) stepDuel(world);
+    stepDuel(world, up);
+    for (let f = 2; f <= 40; f++) stepDuel(world, controls({ direction: 1 }));
   };
   run();
   assertGreaterThan(target.status.damage, 0.0);
