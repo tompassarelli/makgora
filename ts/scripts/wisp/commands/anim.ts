@@ -10,7 +10,9 @@ import { Console, Effect, Schema } from "effect";
 import { ChildProcess } from "effect/process";
 import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
 import { captureScene, renderScenes, type RenderScene } from "wisp/scripts/wisp/headlessRender";
-import { originalClip } from "../../../src/game/assets/fighterOriginalClipInfo";
+import { originalClip, originalClipCount, originalClipNames } from "../../../src/game/assets/fighterOriginalClipInfo";
+import { parseMDX } from "../../clipNodes";
+import { clipJitter, jitters } from "../animJitter";
 import { extremeCamera, cameraFieldOfView, FLOOR_HEIGHT } from "../../../src/game/presentation/arenaCamera";
 import type { Character } from "../../../src/game/sim/codes";
 import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../../../src/game/sim/heroes/registry";
@@ -357,10 +359,47 @@ const record = (files: readonly string[]) => Effect.gen(function*() {
   yield* Console.log(`${added.length} judgements recorded (${entries.length - added.length} already stored); ${relative(projectRoot, JUDGE_FILE)}`);
 }).pipe(Effect.provide(BunServices.layer));
 
+const jitter: Command = (args) => Effect.gen(function*() {
+  const flags = parseFlags(args, ["--fighter", "--graphics", "--assets"]);
+  const looks = flags?.get("--graphics") ?? ["classic", "definitive"];
+  if (flags === undefined || looks.some((look) => look !== "classic" && look !== "definitive")) return yield* new UsageFailure({ problem: "anim jitter [--fighter F]... [--graphics classic|definitive]... [--assets DIR]" });
+  const fighters = yield* selectFighters(flags.get("--fighter"));
+  const assets = flags.get("--assets")?.[0] ?? assetsView(yield* readManifest());
+  const root = join(assets, "original-clips-static-lights/imports");
+  const models = new Map<string, ReturnType<typeof parseMDX>>();
+  const offenders: string[] = [];
+  let clips = 0;
+  for (const look of looks) for (const character of fighters) {
+    const names = new Map([...originalClipNames(character)].map(([name, index]) => [index, name] as const));
+    for (let index = 0; index < originalClipCount(character); index++) {
+      const clip = originalClip(character, index);
+      if (clip === undefined) continue;
+      const relativePath = clip.modelPath.replaceAll("\\", "/");
+      const own = look === "definitive" && existsSync(join(root, "_de.w3mod", relativePath)) ? join(root, "_de.w3mod", relativePath) : join(root, relativePath);
+      if (!existsSync(own)) continue;
+      let model = models.get(own);
+      if (model === undefined) {
+        model = yield* attempt(`read ${own}`, async () => parseMDX(await Bun.file(own).arrayBuffer()));
+        models.set(own, model);
+      }
+      const base = clip.timeline === true ? 0 : model.Sequences[0]?.Interval[0] ?? 0;
+      const measured = clipJitter(model, base + clip.startSeconds * 1000, base + clip.endSeconds * 1000);
+      clips++;
+      if (!jitters(measured)) continue;
+      const worst = measured.worst;
+      offenders.push(`${look}\t${fighterSlug(character)}\t${names.get(index) ?? index}\t${measured.translation.toFixed(2)}\t${measured.scaling.toFixed(3)}\t${measured.rotation.toFixed(1)}\t${worst === undefined ? "" : `${worst.node} ${worst.property} @${worst.frame}`}`);
+    }
+  }
+  yield* Console.log(["look\tfighter\tsequence\ttranslation\tscaling\trotation\tworst", ...offenders].join("\n"));
+  yield* Console.log(`${offenders.length} jittering clips of ${clips}`);
+  if (offenders.length > 0) return yield* new AnimFailure({ problem: `${offenders.length} clips leave their keys between frames; write curved tangents as slopes (zero for a hold) or use Linear keys` });
+}).pipe(Effect.provide(BunServices.layer));
+
 export const anim: Command = ([mode, verb, ...rest]) => {
+  if (mode === "jitter") return jitter(verb === undefined ? [] : [verb, ...rest]);
   if (mode === "score") return score(verb === undefined ? [] : [verb, ...rest]);
   if (mode === "judge" && verb === "fetch") return fetchReferences.pipe(Effect.provide(BunServices.layer));
   if (mode === "judge" && verb === "prepare") return prepare(rest);
   if (mode === "judge" && verb === "record") return record(rest);
-  return Effect.fail(new UsageFailure({ problem: "anim score [--fighter F]... [--graphics classic|definitive] | anim judge fetch | anim judge prepare --out PRIVATE_DIR [--fighter F]... [--move FIGHTER:MOVE]... | anim judge record SCORES.jsonl..." }));
+  return Effect.fail(new UsageFailure({ problem: "anim score [--fighter F]... [--graphics classic|definitive] | anim jitter [--fighter F]... [--graphics classic|definitive]... | anim judge fetch | anim judge prepare --out PRIVATE_DIR [--fighter F]... [--move FIGHTER:MOVE]... | anim judge record SCORES.jsonl..." }));
 };
