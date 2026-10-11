@@ -653,3 +653,30 @@ four-fighter workload; GPU/render time remains outside this meter.
 observed 120-frame windows to a prediction from the same candidate and
 workload. Capture output is generated after the last measured callback; wait
 for it to finish before another timing trial.
+
+## Native memory soak (#409)
+
+`bun wisp lan soak MAP.w3x --pair K --minutes N --out PRIVATE_DIR` runs the
+assigned offline pair against an integrity map built from the same revision.
+The pair must be running at its menus with no active game. The command uses
+LAN fresh, observed chat entry, `-dev soak`, and the existing client health
+route; it never starts another pair. Four Expert Wren CPUs play one-stock,
+one-minute matches with the normal one-second automatic rematch. Fighters
+rotate at results, and the existing stage pool rotates stages without Escape.
+
+The integrity profile installs a finite map-owned ledger before startup for
+returned effects, units, timers, sounds, triggers and frames. Destroying a
+frame releases its tracked descendants. A sound leaves map ownership when
+KillSoundWhenDone or StopSound(killWhenDone) requests destruction; deferred
+engine cleanup and internal handles remain represented by process RSS.
+The ledger is diagnostic state and leaves the normal build unchanged.
+
+Every 60 seconds of monotonic wall time, `samples.tsv` records both Warcraft
+processes' RSS from `/proc` on the pool host, current Lua heap, total live
+map-owned handles, periodic callback and simulation frame counters, match,
+result, stage and roster. `summary.md` fits growth after minute ten against
+RSS <32 MiB/hour, Lua <1 MiB/hour and a nonpositive live-handle slope. A run
+needs at least three post-warmup samples for a verdict. A five-minute run
+records six samples per client and reports insufficient post-ten-minute
+samples; it verifies match/result/rematch and collection only. Run the
+command on the pool host so `/proc` refers to the selected Warcraft processes.

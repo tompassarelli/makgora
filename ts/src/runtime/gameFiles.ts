@@ -41,3 +41,5 @@ export const MATCH_RECORD_INDEX_FILE = "smashcraft-match-index.pld";
 
 export const drawnFrameFile = (build: string, slot: number) => `smashcraft-drawn-${build}-p${slot}.txt`;
 export const drawnFrameLine = (build: string, epoch: number, frame: number) => `SMASHCRAFT DRAWN v=1 build=${build} epoch=${epoch} frame=${frame}`;
+
+export const NATIVE_SOAK_FILE = "smashcraft-native-soak.txt";

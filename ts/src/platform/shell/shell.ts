@@ -51,6 +51,7 @@ import { resultMessage } from "../../game/shell/messages";
 import { beforeNativeDriverTick, afterNativeDriverTick, captureNativeDriverInputs } from "../nativeDriver";
 import { fighterAt, isActive } from "../../game/sim/roster";
 import { PAD_MOUSE, createPadTriggers, padMouse } from "./analogPad";
+import { beforeNativeSoakTick, afterNativeSoakTick } from "../nativeSoak";
 
 const INIT = "shell.init";
 const TICK = "shell.tick";
@@ -88,6 +89,7 @@ function serviceEpochWindow(s: ShellState, recorder: probe.ResponseProbe): void 
 }
 
 function gameTick(s: ShellState): void {
+  beforeNativeSoakTick(s);
   if (!beforeNativeDriverTick(s)) return;
   if (s.build.pausePositionProbe && s.game.phase === Phase.match && s.probe?.run === 0) probe.startProbe(s.probe, false);
   if (s.build.epochProbe === true && s.probe !== undefined) serviceEpochWindow(s, s.probe);
@@ -176,6 +178,7 @@ function gameTick(s: ShellState): void {
   }
   writeReadyMarker(s);
   afterNativeDriverTick(s);
+  afterNativeSoakTick(s);
 }
 
 

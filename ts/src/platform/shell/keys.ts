@@ -1,3 +1,4 @@
+import { startNativeSoak } from "../nativeSoak";
 import { cameraKey, returnPauseMenu, PAUSE_CAMERA_KEYS, pauseCameraKey } from "./pauseCamera";
 import { HIT_PRESENTATION_CASES } from "../../game/shell/hitPresentationCases";
 import { createImpactEvents } from "../../game/presentation/impactEvents";
@@ -310,7 +311,9 @@ export function applyDeveloperCommand(s: ShellState, actor: number, original: st
   if (setup === `dev: stage ${s.game.stageChoice}` && s.game.phase === Phase.characterMenu) s.dev.stageChoice = s.game.stageChoice;
   const classic = classicDevRequest(message);
   const lore = loreDevRequest(message, LORE_BATTLES.length);
-  if (message === LORE_WIN_COMMAND) {
+  if (message === "-dev soak") {
+    receipt = startNativeSoak(s) ? "dev: native soak four CPUs" : "dev: native soak requires an integrity map at selection";
+  } else if (message === LORE_WIN_COMMAND) {
     if (!winLoreBattle(s.game, s.world)) return;
     receipt = "dev: lore win";
   } else if (lore !== undefined) {
