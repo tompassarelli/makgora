@@ -191,7 +191,7 @@ jobs:
   reports:
     needs: build
     if: needs.build.outputs.verdict == 'test' || needs.build.outputs.verdict == 'tested'
-    runs-on: ${{ vars.FARM_RUNNER || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     outputs:
       verdict: ${{ steps.reports.outputs.verdict }}
@@ -359,10 +359,9 @@ jobs:
       - if: always() && env.SCRATCH != ''
         run: git push origin --delete "$SCRATCH" || true
 
-  # Every dispatched run ends here, cancelled ones too: a tip whose run ended is tested again, a passed one boards a train.
   plan:
     needs: [build, suite, land]
-    if: always() && github.event_name == 'workflow_dispatch'
+    if: ${{ !cancelled() && github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:

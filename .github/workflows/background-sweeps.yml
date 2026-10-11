@@ -20,7 +20,7 @@ env:
 
 jobs:
   sweeps:
-    runs-on: ${{ vars.BACKGROUND_RUNNER || 'ubuntu-latest' }}
+    runs-on: farm-big
     timeout-minutes: 40
     strategy:
       fail-fast: false

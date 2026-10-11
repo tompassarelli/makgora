@@ -52,29 +52,53 @@ changed tools/move-data/advantage-state.{jsonl,md} as "Regenerate reports for
 LANES" with the changed rows in the summary, and refuses a candidate whose
 rows miss a target (ts/test/advantage-state.test.ts) before its suite.
 
-Every dispatched run ends with a plan, cancelled runs too, and a plan tests
-again any pending tip that no unfinished run holds, so a cancelled run never
-strands a tip. The scheduling decisions are a pure function
+Every dispatched run ends with a plan unless it was cancelled, and a plan tests
+again any pending tip that no unfinished run holds, so a later plan rediscovers a cancelled tip. The scheduling decisions are a pure function
 (smashcraft:ts/scripts/autolandCore.ts). The
 run's own status is red whenever a suite shard fails; its `land` job and
 summary say what landed. To test a refused branch again without a new
 commit: `gh workflow run autoland.yml -f branch=claude/NAME`.
 
 Everything runs from source: no private build inputs, no `.w3x` build.
-Critical jobs go to the faster pool and background jobs to the other (Tom,
-11 Oct). On 11 Oct hosted was faster: farm-big ran the same 6 farm-test
-shards 1.37x slower. So the farm test's Bun and Lua32 shards (Autoland's
-suite) run on the label in `FARM_RUNNER`, which is unset, meaning hosted
-runners. Balance's shard and probe jobs run on the label in
-`BACKGROUND_RUNNER` (`farm-big`, a self-hosted box). Both fall back to
-hosted runners when unset and for pull requests. Delete a variable when its
-box is gone, or those jobs queue. The farm
-test sends its even shard jobs to that label and its odd ones to hosted runners,
-so both pools run at once; its `farm-runner` dispatch input measures a box
-before the variable is set. On the box, jobs check out through alternates from
-a bare mirror per repository (`/srv/farm-mirror`, refreshed each minute by
-`farm-mirror.timer`), fetching only what the mirror lacks. A change to `.github/workflows/` lands through
-`safe-push`'s direct path, which it takes by itself for such a lane.
+Runner placement is reviewed workflow code. Autoland reports and farm-test
+Bun, Lua32 and census jobs use hosted runners. Balance and background sweeps
+use `farm-big`, preserving the background pool. The `farm-runner` dispatch
+input measures an alternative box for even Bun/Lua jobs on the first attempt;
+retries ignore that override and select `ubuntu-latest` directly, including
+when the original plan job's outputs are reused. No repository variable
+controls runner placement. Delete obsolete runner variables only after these
+workflow versions are live on main.
+
+The local `ts/scripts/jobWatchdog.ts` command observes only `autoland.yml` and
+`farm-test.yml`. Its pure core uses real job start/finish timestamps, grouped
+by exact workflow, job name and hosted/self-hosted class, from completed
+successful or failed jobs in the previous seven days. Cancelled, timed-out,
+skipped and unassigned jobs contribute no baseline. Missing comparable data
+means observation only; it never substitutes a guessed median. A completed
+baseline refresh is required within 24 hours. Job history is cached outside
+Git and refreshed separately from the 20-second monitor, with a bounded API
+budget and a shared 3,000-call reserve.
+
+Only a job whose status is `in_progress`, whose runner is assigned, and whose
+execution exceeds twice that median can trigger cancellation. Queue age is
+never an execution deadline. The GitHub cancellation API stops the entire
+qualifying run, including healthy sibling jobs; it cannot cancel one job.
+After that run finishes, `rerun-failed-jobs` retries its cancelled jobs on
+hosted runners. Any genuine failed job recorded before or after cancellation
+preserves the red result and prevents automatic test retries. Retry attempts
+are excluded from watchdog cancellation, preventing a recovery loop. Atomic
+local receipts track cancellation, notification and retry across restarts.
+Autoland's cancelled plan job skips replanning so recovery cannot dispatch a
+second fresh run alongside its rerun.
+
+The existing `socrates-chat post --as smashcraft-lead` and `--as alerts` route
+spools the same job/runner/elapsed line to the lead room and
+`#socrates-alerts`. A successful command proves local spool acceptance; the
+relay's `socrates-chat log` proves delivery. No workflow secret or new
+messaging integration is needed. Start the reviewed command under a local
+supervisor only after its routing is live. The command defaults to observation;
+`--apply` requires checked current main. An explicitly scoped `--probe-run`
+allows only the owned `codex/autoland-job-watchdog` branch.
 
 ## Sheriff
 
