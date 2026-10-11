@@ -10,11 +10,12 @@ import { startFighterSpecial } from "../src/game/sim/specials";
 import { controls } from "../src/game/sim/testWorld";
 import { firstFighterDifference } from "../src/game/replay/difference";
 import { ROSTER_MANA } from "../src/game/sim/mana";
+import { sweep } from "./sweep";
 
 const headless = installHeadless(SMASHCRAFT_HEADLESS);
 afterAll(headless.restore);
 
-test.each(SELECTABLE_CHARACTERS)("real Wisp map fires fighter %i's four EX specials with matching two-client state and no errors [k1 scenario]", character => {
+const fourExSpecials = (character: (typeof SELECTABLE_CHARACTERS)[number]): void => {
   const clients = headless.clients({ start, install });
   clients.start();
   clients.frames(1);
@@ -52,4 +53,11 @@ test.each(SELECTABLE_CHARACTERS)("real Wisp map fires fighter %i's four EX speci
   }
   expect(casts).toBe(4);
   console.log(`EX real map: ${fighterName(character)}, ${casts} casts, 0 errors or divergent states`);
-});
+};
+
+const [kept, ...breadth] = SELECTABLE_CHARACTERS;
+if (kept === undefined) throw new Error("no selectable fighter");
+test("real Wisp map fires the first selectable fighter's four EX specials with matching two-client state and no errors [k1 scenario]", () => fourExSpecials(kept));
+sweep("real Wisp map fires every other selectable fighter's four EX specials with matching two-client state and no errors [k1 scenario]", () => {
+  for (const character of breadth) fourExSpecials(character);
+}, 180_000);

@@ -74,7 +74,7 @@ const main = Effect.gen(function*() {
     try: () => Bun.write(output, `export const DASH_DANCE_REFERENCE_MAIN = "${revision}";\nexport const DASH_DANCE_REFERENCE: readonly string[] = [\n${rows.map(row => `  ${row},`).join("\n")}\n];\n`),
     catch: (cause) => new ReferenceFailure({ message: String(cause) }),
   });
-  yield* Console.log(`dash-dance reference ${revision}: ${rows.length} timelines, ${frames} frames, 9,984 dash-backs`);
+  yield* Console.log(`dash-dance reference ${revision}: ${rows.length} timelines, ${frames} frames, 9,216 dash-backs`);
 });
 
 await Effect.runPromise(main);

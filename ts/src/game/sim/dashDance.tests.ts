@@ -93,7 +93,7 @@ const HELPER_DEADZONE = f32(0.28);
 
 const HELPER_DIGITAL = 7000 / 32767;
 export const ROSTER: readonly Character[] = [
-  Character.rifleman, Character.rifleman, Character.demonHunter, Character.blademaster, Character.mountainKing, Character.warden,
+  Character.rifleman, Character.demonHunter, Character.blademaster, Character.mountainKing, Character.warden,
   Character.lich, Character.forsakenPaladin, Character.dreadlord, Character.shadowHunter, Character.pitLord, Character.beastmaster, Character.lichKing,
 ];
 const DanceInput = { stick: 0, keyOverlap: 1, keyGap: 2 } as const;
@@ -172,7 +172,7 @@ export function travelSample(driver: DanceDriver, input: DanceInput, to: number,
 
 export let dashDanceLargestDeviation = 0.0;
 
-sweep("dash dancing: 9,984 scripted dash-backs match main facing and dash direction every frame within 1 world unit: 0 misreads [k4 reference main-135454d6d]", () => {
+sweep("dash dancing: 9,216 scripted dash-backs match main facing and dash direction every frame within 1 world unit: 0 misreads [k4 reference main-135454d6d]", () => {
   let dashbacks = 0;
   let misreads = 0;
   let timeline = 0;
@@ -232,7 +232,7 @@ sweep("dash dancing: 9,984 scripted dash-backs match main facing and dash direct
       }
     }
   }
-  assertEquals(dashbacks, 9984);
+  assertEquals(dashbacks, 9216);
   assertEquals(timeline, DASH_DANCE_REFERENCE.length);
   assertEquals(failures.join("\n"), "", `reference main ${DASH_DANCE_REFERENCE_MAIN}, largest x deviation ${dashDanceLargestDeviation}`);
   assertEquals(misreads, 0);

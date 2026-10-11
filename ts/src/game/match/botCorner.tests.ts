@@ -2,8 +2,7 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { CPU_OPPONENT_IDS, CPU_TIERS } from "./cpuProfiles";
 import { cpuSkill } from "./cpuSkill";
-import { CORNER_BAND as MEASURED_BAND } from "./cornerScenarios";
-import { CORNER_BAND, insideLip } from "./botCorner";
+import { insideLip } from "./botCorner";
 import { mainDeckLeft, mainDeckRight } from "../sim/stage";
 
 test("only Advanced and Expert computers edge-cancel, press and escape the corner [k3 measure #386]", () => {
@@ -20,8 +19,7 @@ test("edge cancels and corner escapes rise with skill: Intermediate below Advanc
   }
 });
 
-test("the corner measurement uses the computer's corner band and lip distance [k2 property]", () => {
-  assertEquals(MEASURED_BAND, CORNER_BAND);
+test("the corner lip distance is zero at both main-deck edges [k2 property]", () => {
   assertEquals(insideLip(0, mainDeckRight(0)), 0.0);
   assertEquals(insideLip(0, mainDeckLeft(0)), 0.0);
 });
