@@ -32,15 +32,7 @@ export const STATIONARY_PARTICLE_MODELS = [
 const PARKED_LINE_DEPTH = 4096.0;
 const DEFILE_DECAY = "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx";
 const DEFILE_FROST = "Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdx";
-const RISEN_FRONT = 56.0;
-const RISEN_HEADROOM = 20.0;
-const RISEN_BIRTH = 0.625;
-const RISEN_DEPTH = 0.375;
-const RISEN_ALPHA = 150;
-const RAISED_SKELETON = "Units\\Undead\\Skeleton\\Skeleton.mdx";
-const RAISED_BURST = "Abilities\\Spells\\Undead\\RaiseSkeletonWarrior\\RaiseSkeleton.mdx";
-const RAISED_FRONT = 72.0;
-const RAISED_LAYOUT = [{ x: f32(-0.6), yaw: f32(-1.2) }, { x: 0.0, yaw: f32(-1.5708) }, { x: f32(0.6), yaw: f32(-1.95) }];
+const RISEN_FRONT = 120.0;
 
 
 interface Risen {
@@ -51,7 +43,6 @@ interface Risen {
   readonly scale: number;
   readonly draw: (typeof PROJECTILE_DRAW_OFFSETS)[string];
   readonly fills: readonly number[];
-  readonly raised: readonly number[];
 }
 
 interface Pool {
@@ -61,7 +52,6 @@ interface Pool {
   readonly effects: readonly number[];
   readonly boundaries: readonly (readonly number[])[];
   readonly fills: readonly (readonly number[])[];
-  readonly raised: readonly (readonly number[])[];
 }
 
 export class ProjectilePresentation {
@@ -77,7 +67,6 @@ export class ProjectilePresentation {
   private readonly lives: number[] = [];
   private readonly lingering: number[] = [];
   private readonly risen: (Risen | undefined)[] = [];
-  private readonly risenAge: number[] = [];
   private parked: ParkedFlags | undefined;
   private readonly definitive: boolean;
   private readonly aimedShot: lightning[] = [];
@@ -109,7 +98,6 @@ export class ProjectilePresentation {
       const effects: number[] = [];
       const boundaries: number[][] = [];
       const fills: number[][] = [];
-      const raised: number[][] = [];
       const specials = heroDefinition(character)?.specials;
 
       const defilePool = character === Character.lichKing && specials !== undefined && heroProjectileArt(specials).some(({ spec }) => spec.model === path && spec.pool !== undefined);
@@ -132,17 +120,6 @@ export class ProjectilePresentation {
           this.visible.push(false);
         }
         fills.push(fill);
-        const crowd: number[] = [];
-        if (!this.definitive && character === Character.lichKing && path.includes("ImpaleHitTarget")) {
-          for (let layer = 0; layer <= RAISED_LAYOUT.length; layer++) {
-            crowd.push(this.models.length);
-            const raisedModel = AddSpecialEffect(layer < RAISED_LAYOUT.length ? RAISED_SKELETON : RAISED_BURST, origin.x, origin.y);
-            BlzSetSpecialEffectAnimationBlendTime(raisedModel, 0.0);
-            this.models.push(raisedModel);
-            this.visible.push(false);
-          }
-        }
-        raised.push(crowd);
         if (groundPool) {
           const layers: number[] = [];
           for (let layer = 0; layer < (character === Character.lichKing ? 2 : 1); layer++) {
@@ -157,7 +134,7 @@ export class ProjectilePresentation {
           boundaries.push(layers);
         }
       }
-      this.pools.push({ path, drawn, effects, boundaries, fills, raised });
+      this.pools.push({ path, drawn, effects, boundaries, fills });
     });
     for (let index = 0; index < PROJECTILE_CAPACITY; index++) this.assigned.push(-1);
     this.clear();
@@ -198,7 +175,7 @@ export class ProjectilePresentation {
     const centerX = this.definitive ? f32(0.337811) : f32(-0.3387);
     const centerZ = this.definitive
       ? born ? paused ? f32(-198.454501) : f32(-146.291377) : f32(133.889278)
-      : f32(-389.412987);
+      : born ? f32(-389.412987) : f32(29.882828);
     const pitch = ARENA_CAMERA.angleOfAttack / 360.0, yaw = ARENA_CAMERA.rotation / 360.0;
     const distance = GetCameraField(CAMERA_FIELD_TARGET_DISTANCE);
     const eyeX = GetCameraTargetPositionX() - cosineTurns(yaw) * cosineTurns(pitch) * distance;
@@ -207,20 +184,12 @@ export class ProjectilePresentation {
     const lift = toward > RISEN_FRONT * 2.0 ? RISEN_FRONT / toward : 0.0;
     const y = this.origin.y - RISEN_FRONT * (lift > 0.0 ? 1.0 : 0.0);
     const scaleX = f32(f32(f32(2.0 * placed.radius) / width) * (draw?.width ?? 1.0));
-    const grown = f32(f32(f32(placed.z + placed.radius) + RISEN_HEADROOM) * (born ? RISEN_BIRTH : 1.0));
-    const scaleZ = this.definitive ? f32(f32(f32(2.0 * placed.radius) / height) * (draw?.height ?? 1.0)) : f32(grown / height);
+    const scaleZ = f32(f32(f32(2.0 * placed.radius) / height) * (draw?.height ?? 1.0));
     const x = this.origin.x + f32(placed.x - f32(centerX * scaleX));
-    const z = this.definitive
-      ? this.origin.z + f32(placed.z - f32(centerZ * scaleZ)) + (draw?.z ?? 0.0)
-      : this.origin.z + f32(f32(grown * 0.5) - f32(centerZ * scaleZ));
+    const z = this.origin.z + f32(placed.z - f32(centerZ * scaleZ)) + (draw?.z ?? 0.0);
     BlzResetSpecialEffectMatrix(model);
-    BlzSetSpecialEffectMatrixScale(model, scaleX * (1.0 - lift), RISEN_DEPTH * (1.0 - lift), scaleZ * (1.0 - lift));
+    BlzSetSpecialEffectMatrixScale(model, scaleX * (1.0 - lift), 1.0 - lift, scaleZ * (1.0 - lift));
     BlzSetSpecialEffectPosition(model, x + (eyeX - x) * lift, y, z + (eyeZ - z) * lift);
-    BlzSetSpecialEffectAlpha(model, RISEN_ALPHA);
-    if (!this.definitive) {
-      BlzSetSpecialEffectAnimation(model, "birth");
-      BlzSetSpecialEffectColor(model, 120, 95, 70);
-    }
     for (let index = 0; index < placed.fills.length; index++) {
       const fillSlot = placed.fills[index];
       const fill = fillSlot === undefined ? undefined : this.models[fillSlot];
@@ -228,43 +197,14 @@ export class ProjectilePresentation {
       if (fill === undefined || offset === undefined) continue;
       BlzResetSpecialEffectMatrix(fill);
       BlzSetSpecialEffectYaw(fill, placed.yaw);
-      BlzSetSpecialEffectMatrixScale(fill, scaleX * (1.0 - lift), RISEN_DEPTH * (1.0 - lift), scaleZ * (1.0 - lift));
+      BlzSetSpecialEffectMatrixScale(fill, scaleX * (1.0 - lift), 1.0 - lift, scaleZ * (1.0 - lift));
       const fillX = x + f32(offset.x * placed.radius), fillZ = z + f32(offset.z * placed.radius);
       BlzSetSpecialEffectPosition(fill, fillX + (eyeX - fillX) * lift, y, fillZ + (eyeZ - fillZ) * lift);
       BlzSetSpecialEffectScale(fill, placed.scale);
-      BlzSetSpecialEffectAlpha(fill, RISEN_ALPHA);
+      BlzSetSpecialEffectAlpha(fill, 255);
       if (born) BlzSetSpecialEffectAnimation(fill, "birth");
       BlzSetSpecialEffectTime(fill, f32(0.3));
       BlzSetSpecialEffectTimeScale(fill, paused ? 0.0 : this.definitive ? 1.0 : 0.0);
-    }
-  }
-
-  private placeRaised(slot: number): void {
-    const placed = this.risen[slot];
-    if (placed === undefined || placed.raised.length === 0) return;
-    const age = this.risenAge[slot] ?? 0;
-    const pitch = ARENA_CAMERA.angleOfAttack / 360.0, yaw = ARENA_CAMERA.rotation / 360.0;
-    const distance = GetCameraField(CAMERA_FIELD_TARGET_DISTANCE);
-    const eyeX = GetCameraTargetPositionX() - cosineTurns(yaw) * cosineTurns(pitch) * distance;
-    const eyeZ = GetCameraField(CAMERA_FIELD_ZOFFSET) - sineTurns(pitch) * distance;
-    const toward = sineTurns(yaw) * cosineTurns(pitch) * distance;
-    const lift = toward > RAISED_FRONT * 2.0 ? RAISED_FRONT / toward : 0.0;
-    const y = this.origin.y - RAISED_FRONT * (lift > 0.0 ? 1.0 : 0.0);
-    const z = this.origin.z;
-    for (let index = 0; index < placed.raised.length; index++) {
-      const raisedSlot = placed.raised[index];
-      const raisedModel = raisedSlot === undefined ? undefined : this.models[raisedSlot];
-      if (raisedModel === undefined) continue;
-      const layout = RAISED_LAYOUT[index];
-      const x = this.origin.x + placed.x + f32((layout?.x ?? 0.0) * placed.radius);
-      BlzResetSpecialEffectMatrix(raisedModel);
-      BlzSetSpecialEffectYaw(raisedModel, layout?.yaw ?? 0.0);
-      BlzSetSpecialEffectPosition(raisedModel, x + (eyeX - x) * lift, y, z + (eyeZ - z) * lift);
-      BlzSetSpecialEffectScale(raisedModel, f32((layout === undefined ? 1.5 : index === 1 ? 1.25 : f32(1.1)) * (1.0 - lift)));
-      BlzSetSpecialEffectAlpha(raisedModel, 255);
-      if (age === 0) BlzSetSpecialEffectAnimation(raisedModel, "birth");
-      BlzSetSpecialEffectTime(raisedModel, layout === undefined ? f32(f32(0.2) + f32(f32(0.3) * age)) : f32(0.5 + f32(f32(0.45) * age)));
-      BlzSetSpecialEffectTimeScale(raisedModel, 0.0);
     }
   }
 
@@ -385,15 +325,8 @@ export class ProjectilePresentation {
       if (!paused && projectile !== undefined) this.lives[slot] = projectile.life;
       if (risen) {
         this.lingering[slot] = 4;
-        this.risen[slot] = { x: pose.x, z: pose.z, radius: pose.dangerRadius, yaw: pose.yaw, scale: pose.modelScale * (cue?.scale ?? 1.0), draw, fills: this.definitive ? pool?.fills[pool.effects.indexOf(slot)] ?? [] : [], raised: pool?.raised[pool.effects.indexOf(slot)] ?? [] };
-        this.risenAge[slot] = born ? 0 : (this.risenAge[slot] ?? 0) + (paused ? 0 : 1);
+        this.risen[slot] = { x: pose.x, z: pose.z, radius: pose.dangerRadius, yaw: pose.yaw, scale: pose.modelScale * (cue?.scale ?? 1.0), draw, fills: pool?.fills[pool.effects.indexOf(slot)] ?? [] };
         this.placeRisen(slot, born, paused);
-        this.placeRaised(slot);
-        for (const raisedSlot of this.risen[slot]?.raised ?? []) {
-          taken[raisedSlot] = true;
-          this.lingering[raisedSlot] = 4;
-          parked[raisedSlot] = false;
-        }
         for (const [index, fillSlot] of (this.risen[slot]?.fills ?? []).entries()) {
           if (draw?.fill?.[index] === undefined) continue;
           taken[fillSlot] = true;
@@ -465,13 +398,7 @@ export class ProjectilePresentation {
             BlzSetSpecialEffectMatrixScale(boundary, 1.0, f32(1.0 / f32(0.6)), f32(1.0 / f32(0.6)));
           }
           const frost = fighter?.character === Character.lich;
-          if (defile && projectile?.spec?.pool !== undefined) {
-            const age = projectile.spec.life - projectile.life;
-            const since = projectile.poolHits > 0 ? projectile.spec.pool.every - 1 - projectile.poolWait : age - (projectile.spec.activeFrom ?? 0);
-            const flash = since >= 0 && since <= 12 ? 1.0 - since / 12 : 0.0;
-            const glow = Math.min(1.0, f32(0.72) + f32(0.12) * sineTurns(age / 23) + f32(0.08) * sineTurns(age / 9) + 0.5 * flash);
-            BlzSetSpecialEffectColor(boundary, Math.floor(255 * glow), Math.floor(255 * glow), 255);
-          } else BlzSetSpecialEffectColor(boundary, frost ? 155 : pose.armed ? 170 + 85 * pose.poolPulse : 70, frost ? 210 : pose.armed ? 75 + 180 * pose.poolPulse : 65, frost ? 255 : pose.armed ? 255 : 100);
+          BlzSetSpecialEffectColor(boundary, frost || defile ? 155 : pose.armed ? 170 + 85 * pose.poolPulse : 70, frost || defile ? 210 : pose.armed ? 75 + 180 * pose.poolPulse : 65, frost || defile ? 255 : pose.armed ? 255 : 100);
           BlzSetSpecialEffectAlpha(boundary, pose.armed ? 255 : defile ? 96 : 160);
           if (!this.visible[boundarySlot]) BlzSetSpecialEffectTime(boundary, 0.0);
           BlzSetSpecialEffectTimeScale(boundary, 0.0);
@@ -486,10 +413,6 @@ export class ProjectilePresentation {
       else if (taken[index] !== true && remaining > 0) {
         taken[index] = true;
         if (!paused && remaining === 4 && this.risen[index] !== undefined) this.placeRisen(index, false, false);
-        if (!paused && this.risen[index] !== undefined) {
-          this.risenAge[index] = (this.risenAge[index] ?? 0) + 1;
-          this.placeRaised(index);
-        }
         if (!paused) this.lingering[index] = remaining - 1;
       }
       this.visible[index] = taken[index] === true;

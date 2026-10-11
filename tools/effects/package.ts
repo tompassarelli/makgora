@@ -18,7 +18,7 @@ for (let y = 0; y < 64; y++) for (let x = 0; x < 256; x++) {
 }
 const textureName = `ImpactPalette-${hash(texture)}.tga`;
 type Point = [number, number];
-type Shape = { points: Point[], tile: number, soft?: boolean, dark?: boolean, over?: boolean };
+type Shape = { points: Point[], tile: number, soft?: boolean, dark?: boolean };
 const vector = (a: number[]) => `{ ${a.join(", ")} }`;
 const extent = "MinimumExtent { -100, -1, -100 }, MaximumExtent { 100, 1, 100 }, BoundsRadius 150,";
 
@@ -72,10 +72,6 @@ for (let i = 0; i < 64; i++) {
     defile.push({points:[[.89*Math.cos(a),.54*Math.sin(a)],[Math.cos(a),.60*Math.sin(a)],
         [Math.cos(b),.60*Math.sin(b)],[.89*Math.cos(b),.54*Math.sin(b)]],tile:0});
 }
-for (let i = 0; i < 11; i++) {
-    const tip = (10 + i * 16) * Math.PI / 180, reach = i % 2 === 0 ? .95 : .74, base = -.78 + i * .156;
-    for (const side of [1, -1]) defile.push({points:[[base-.07,0],[reach*Math.cos(tip),side*.6*reach*Math.sin(tip)],[base+.07,0]],tile:0,over:true});
-}
 models.push(["Defile",defile]);
 
 
@@ -91,18 +87,10 @@ const imports = [textureName];
 const assetInfo: string[] = [];
 let preview = `<svg xmlns="http://www.w3.org/2000/svg" width="${models.length*200}" height="210"><defs><radialGradient id="dust"><stop stop-color="white"/><stop offset=".55" stop-color="white" stop-opacity=".65"/><stop offset="1" stop-color="white" stop-opacity="0"/></radialGradient></defs><rect width="${models.length*200}" height="210" fill="#18202c"/>`;
 for (const [index,[name,shapes]] of models.entries()) {
-    const material = ({soft,dark,over}: Shape) => name === "Defile" ? (dark ? 0 : over ? 2 : 1) : soft ? 1 : 0;
-    const parts = name === "Defile" ? [0,1,2].map(m => shapes.filter(shape => material(shape) === m)) : shapes.map(shape => [shape]);
-    const geometry = parts.map((part, id) => {
-        const points = part.flatMap(shape => shape.points);
+    const geometry = shapes.map(({points,tile,soft,dark}, id) => {
         const n = points.length;
-        let start = 0;
-        const faces = part.flatMap(shape => {
-            const fan = Array.from({length:shape.points.length-2}, (_,i) => [start,start+i+1,start+i+2]).flat();
-            start += shape.points.length;
-            return fan;
-        });
-        const uvs = part.flatMap(({points,tile,soft}) => soft ? [[.7501,.001],[.9999,.001],[.9999,.999],[.7501,.999]] : Array(points.length).fill([(tile+.5)/4,.5]));
+        const faces = Array.from({length:n-2}, (_,i) => [0,i+1,i+2]).flat();
+        const uvs = soft ? [[.7501,.001],[.9999,.001],[.9999,.999],[.7501,.999]] : Array(n).fill([(tile+.5)/4,.5]);
         return `Geoset {
             Vertices ${n} { ${points.map(([x,z]) => vector(name === "Defile" ? [x,z,.035] : [x,-id*.002,z])+",").join(" ")} }
             Normals ${n} { ${Array(n).fill(name === "Defile" ? "{ 0, 0, 1 }," : "{ 0, -1, 0 },").join(" ")} }
@@ -110,21 +98,21 @@ for (const [index,[name,shapes]] of models.entries()) {
             VertexGroup { ${Array(n).fill("0,").join(" ")} }
             Faces 1 ${faces.length} { Triangles { ${vector(faces)}, } }
             Groups 1 1 { Matrices { 0 }, }
-            ${extent} Anim { ${extent} } MaterialID ${material(part[0]!)}, SelectionGroup 0,
+            ${extent} Anim { ${extent} } MaterialID ${dark ? 2 : soft ? 1 : 0}, SelectionGroup 0,
         }`;
     }).join("\n");
     const light = contactLights[name];
     const mdl = `Version { FormatVersion 800, }
-        Model "Smashcraft ${name}" { NumGeosets ${parts.length}, NumBones 1, BlendTime 0, ${extent} }
+        Model "Smashcraft ${name}" { NumGeosets ${shapes.length}, NumBones 1, BlendTime 0, ${extent} }
         Sequences 1 { Anim "Stand" { Interval { 0, 1000 }, ${extent} } }
         Textures 1 { Bitmap { Image "war3mapImported\\${textureName}", } }
         Materials ${name === "Defile" ? 3 : 2} {
-            ${name === "Defile" ? 'Material { Layer { FilterMode Blend, Unshaded, TwoSided, Unfogged, NoDepthSet, static TextureID 0, static Alpha 1, } }' : ''}
             Material { Layer { FilterMode Additive, Unshaded, TwoSided, Unfogged, NoDepthSet, static TextureID 0, static Alpha 1, } }
             Material { Layer { FilterMode Blend, Unshaded, TwoSided, Unfogged, NoDepthSet, static TextureID 0, static Alpha 1, } }
+            ${name === "Defile" ? 'Material { Layer { FilterMode Blend, Unshaded, TwoSided, Unfogged, NoDepthSet, static TextureID 0, static Alpha 1, } }' : ''}
         }
         ${geometry}
-        ${name === "Defile" ? 'GeosetAnim { static Alpha 1, static Color { 0.42, 0.14, 0.2 }, GeosetId 0, }\n        GeosetAnim { static Alpha 1, static Color { 1, 0.85, 0.62 }, GeosetId 2, }' : ''}
+        ${name === "Defile" ? 'GeosetAnim { static Alpha 1, static Color { 0.045, 0.025, 0.065 }, GeosetId 0, }' : ''}
         Bone "Impact" { ObjectId 0, GeosetId Multiple, GeosetAnimId None, }
         ${light === undefined ? "" : `Light "ContactFlash" {
             ObjectId 1, Omnidirectional,
@@ -136,7 +124,7 @@ for (const [index,[name,shapes]] of models.entries()) {
         PivotPoints ${light === undefined ? 1 : 2} { { 0, 0, 0 }, ${light === undefined ? "" : "{ 0, -12, 20 },"} }`;
     const bytes = new Uint8Array(generateMDX(parseMDL(mdl)));
     const decoded = parseMDX(bytes.buffer);
-    if (decoded.Geosets.length !== parts.length || decoded.Sequences.length !== 1) throw new Error(`${name}: lost effect geometry`);
+    if (decoded.Geosets.length !== shapes.length || decoded.Sequences.length !== 1) throw new Error(`${name}: lost effect geometry`);
     if (decoded.Lights.length !== (light === undefined ? 0 : 1)) throw new Error(`${name}: lost contact light`);
     for (const geoset of decoded.Geosets) {
         if (!Array.from(geoset.Vertices).every(Number.isFinite)) throw new Error(`${name}: invalid vertex`);
