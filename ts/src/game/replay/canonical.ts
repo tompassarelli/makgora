@@ -268,6 +268,7 @@ export function specialProjectileCanonical(spec: Readonly<SpecialProjectile>, pr
     int("returns.age", spec.returns.age);
     real("returns.speed", spec.returns.speed);
   }
+  if (spec.trail !== undefined) int("trail.every", spec.trail.every);
   if (spec.pool !== undefined) {
     int("pool.every", spec.pool.every);
     real("pool.growth", spec.pool.growth);
@@ -419,6 +420,11 @@ function specialMoveCanonical(move: Readonly<AuthoredSpecial>, name: string): st
     if (segment.relocate !== undefined) int(`motion[${index}].relocate`, segment.relocate);
     if (segment.relocateProjectile !== undefined) result.push(specialProjectileCanonical(segment.relocateProjectile, `${name}.motion[${index}].relocateProjectile`));
     if (segment.relocateReach !== undefined) real(`motion[${index}].relocateReach`, segment.relocateReach);
+    if (segment.seek !== undefined) {
+      real(`motion[${index}].seek.speed`, segment.seek.speed);
+      real(`motion[${index}].seek.turnCos`, segment.seek.turnCos);
+      real(`motion[${index}].seek.turnSin`, segment.seek.turnSin);
+    }
     if (segment.stopsAtBody === true) int(`motion[${index}].stopsAtBody`, 1);
   }
   const grab = move.commandGrab;
@@ -669,6 +675,7 @@ export function writeObservations(writer: ObservationWriter, opponents: Slots<Re
     writer.number(f.special.lockFrames);
     writer.number(f.special.form);
     writer.number(f.special.grabFrame);
+    if (f.special.seekTarget !== 0) writer.number(f.special.seekTarget + 300);
     writer.number(f.shield.raised ? 1 : 0);
     writer.number(f.shield.stun);
     writer.number(f.shield.releaseLag);
@@ -1068,6 +1075,7 @@ function writeFighter(sink: StateSink, prefix: string, fighter: Readonly<Fighter
     int("specialAimZ", sp.aimZ);
     int("specialAirtimeUses", sp.airtimeUses);
     if (sp.grabFrame !== 0) int("specialGrabFrame", sp.grabFrame);
+    if (sp.seekTarget !== 0) int("specialSeekTarget", sp.seekTarget);
     int("armorFrames", st.armorFrames);
     real("armorMaxDamage", st.armorMaxDamage);
     if (st.armorChills) int("armorChills", 1);

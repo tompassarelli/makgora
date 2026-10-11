@@ -110,6 +110,8 @@ export interface MoveCues {
   readonly spell: string;
   readonly startup: Cue;
   readonly active: Cue;
+  /** The fighter's own body tint and alpha while either cue shows. */
+  readonly body?: { readonly red: number; readonly green: number; readonly blue: number; readonly alpha: number } | undefined;
 }
 
 
@@ -161,6 +163,12 @@ const KAEL_PHOENIX_CHARGE: MoveCues = { spell: "Phoenix", startup: cue("Abilitie
 // The flight is the phoenix itself: Kael's body is replaced by it until the flight ends.
 const KAEL_PHOENIX_FORM: MoveCues = { spell: "Phoenix", startup: KAEL_PHOENIX_CHARGE.active, active: { ...timed(cue("units\\human\\Phoenix\\Phoenix.mdx", "body", f32(0.55)), "stand", 0.0), replacesBody: true } };
 const FROST_TRAP = cue(FROST_TRAP_MODEL, "feet", f32(0.4));
+const BANSHEE_FORM: MoveCues = {
+  spell: "Banshee Form",
+  startup: cue("Abilities\\Spells\\Undead\\Possession\\PossessionTarget.mdx", "body", f32(0.8)),
+  active: { ...timed(cue("Units\\Undead\\Banshee\\Banshee.mdx", "body", f32(0.9)), "walk", 0.0), alpha: 150 },
+  body: { red: 140, green: 110, blue: 190, alpha: 110 },
+};
 const DREADLORD_BITE_CUES: MoveCues = { spell: "Healing bite", startup: VAMPIRIC, active: cue("Abilities\\Weapons\\Blood\\BloodImpact.mdx", "ahead", 1.0) };
 const VOODOO = cue("Abilities\\Spells\\Orc\\TrollBerserk\\TrollBeserkerTarget.mdx", "hand", f32(0.7));
 const FEL = cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", "hand", f32(0.7));
@@ -597,6 +605,12 @@ export function specialCueState(fighter: Readonly<Fighter>): CueState {
   if (fighter.character === Character.kobold && action === SpecialAction.heroUltimate) {
     return frame >= KOBOLD_BURROW_FIRST && frame <= KOBOLD_BURROW_LAST ? { cues: KOBOLD_BURROW_TRAIL, phase: "active" } : NONE;
   }
+  if (fighter.character === Character.sylvanas && action === SpecialAction.heroUltimate) {
+    const seek = runningHeroSpecial(fighter)?.motion?.find((segment) => segment.seek !== undefined);
+    if (seek === undefined) return NONE;
+    if (frame >= seek.first && frame <= seek.last) return { cues: BANSHEE_FORM, phase: "active" };
+    return fighter.special.form === 0 && frame < seek.first ? { cues: BANSHEE_FORM, phase: "startup" } : NONE;
+  }
   let cues: MoveCues | undefined;
   let windows: CueWindows | undefined;
   if (action >= SpecialAction.heroNeutral && action <= SpecialAction.heroDown) {
@@ -632,7 +646,7 @@ export function fighterMoveCues(character: Character): readonly MoveCues[] {
 
 
 export function fighterCueList(character: Character): readonly Cue[] {
-  return [...fighterMoveCues(character), ...fighterBranchCues(character), ...(character === Character.dreadlord ? [DREADLORD_BITE_CUES] : []), ...(character === Character.kaelthas ? [KAEL_PHOENIX_FORM] : []), ...(character === Character.kobold ? [KOBOLD_BURROW_TRAIL] : [])].flatMap((cues) => [cues.startup, cues.active]);
+  return [...fighterMoveCues(character), ...fighterBranchCues(character), ...(character === Character.dreadlord ? [DREADLORD_BITE_CUES] : []), ...(character === Character.kaelthas ? [KAEL_PHOENIX_FORM] : []), ...(character === Character.kobold ? [KOBOLD_BURROW_TRAIL] : []), ...(character === Character.sylvanas ? [BANSHEE_FORM] : [])].flatMap((cues) => [cues.startup, cues.active]);
 }
 
 

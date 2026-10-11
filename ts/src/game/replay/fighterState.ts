@@ -216,6 +216,7 @@ export function copyFighterState(target: Fighter, source: Readonly<Fighter>, act
   special.aimZ = sourceSpecial.aimZ;
   special.airtimeUses = sourceSpecial.airtimeUses;
   special.grabFrame = sourceSpecial.grabFrame;
+  special.seekTarget = sourceSpecial.seekTarget;
   special.guarded = sourceSpecial.guarded;
 
   copyFighterProjectiles(target, source);
@@ -603,6 +604,7 @@ export function sameFighterState(target: Readonly<Fighter>, source: Readonly<Fig
   if (special.aimZ !== sourceSpecial.aimZ || (special.aimZ === 0 && 1 / special.aimZ !== 1 / sourceSpecial.aimZ)) return false;
   if (special.airtimeUses !== sourceSpecial.airtimeUses || (special.airtimeUses === 0 && 1 / special.airtimeUses !== 1 / sourceSpecial.airtimeUses)) return false;
   if (special.grabFrame !== sourceSpecial.grabFrame || (special.grabFrame === 0 && 1 / special.grabFrame !== 1 / sourceSpecial.grabFrame)) return false;
+  if (special.seekTarget !== sourceSpecial.seekTarget) return false;
   if (special.guarded !== sourceSpecial.guarded) return false;
 
   if (!sameFighterProjectiles(target, source)) return false;
