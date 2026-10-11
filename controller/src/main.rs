@@ -240,10 +240,6 @@ mod linux {
             Ok(())
         }
 
-        fn acknowledge(&mut self, queue: &mut PendingOutput, sequence: u32) -> io::Result<()> {
-            self.receipt(queue, sequence, sequence, self.receipt_revision)
-        }
-
         fn next(
             &mut self,
             queue: &PendingOutput,
@@ -380,6 +376,158 @@ mod linux {
             return Err(io::Error::other("invalid native chat receipt"));
         }
         Ok(Some(TextReceipt { received: counter(&number)?, consumed: counter(&consumed)?, revision: counter(&revision)?, chat, chat_state }))
+    }
+
+    #[cfg(test)]
+    fn sample(seed: &mut u64) -> u32 {
+        *seed ^= *seed << 13;
+        *seed ^= *seed >> 7;
+        *seed ^= *seed << 17;
+        (*seed >> 16) as u32
+    }
+
+    #[test]
+    fn text_window_delivers_each_joined_record_once_through_loss_stalls_and_focus_loss() {
+        let mut seed = 0x5465_7874_5175_6575;
+        let retry_ms = TEXT_RETRY.as_millis() as u64;
+        for run in 0..300 {
+            let mut sender = MailboxSender::new(Path::new("/nonexistent"), "prop", 7, 0, false, true, Typist::file(Path::new("/dev/null")).unwrap()).unwrap();
+            if run % 3 == 0 {
+                sender.text_window = TextWindow::default();
+            }
+            let bounded = sender.text_window.typed_ahead.is_some();
+            let start = Instant::now();
+            let loss = sample(&mut seed) % 4;
+            let (mut ms, mut frame, mut highest_sent) = (0u64, 1u32, 0u32);
+            let (mut native_received, mut native_consumed, mut revision) = (0u32, 0u32, 0u32);
+            let (mut acked, mut outstanding_since, mut immediate, mut timer_retries) = (0u32, None::<u64>, false, 0u32);
+            let mut typed: Vec<String> = Vec::new();
+            let mut group: Option<(u32, Vec<String>)> = None;
+            let (mut stall_until, mut recovering) = (0u64, 0u32);
+            for step in 0..900 {
+                let draining = step >= 450;
+                let now = start + Duration::from_millis(ms);
+                if !draining && sample(&mut seed) % 2 == 0 && sender.queued.frame_credit() {
+                    let rows: Vec<String> = (0..2).map(|_| {
+                        let mut state = State { sources: sample(&mut seed) % 3 * ATTACK / 2, ..State::default() };
+                        if sample(&mut seed) % 4 == 0 { state.x = (sample(&mut seed) % 65_535) as i16; state.cy = (sample(&mut seed) % 65_535) as i16; }
+                        encode_row(state, 0, Edges { pressed: sample(&mut seed) % 2 * SPECIAL, ..Edges::default() })
+                    }).collect();
+                    let before = sender.queued.records.len();
+                    let typed_count = highest_sent - sender.text_window.consumed;
+                    let joinable = group.as_ref().filter(|(first, grouped)| before as u32 > typed_count && first + grouped.len() as u32 == frame && grouped.len() + 2 <= MESSAGE_FRAMES)
+                        .map(|(first, grouped)| { let all: Vec<&str> = grouped.iter().chain(&rows).map(String::as_str).collect(); (*first, encode_message(7, *first, &all)) })
+                        .filter(|(_, wire)| !bounded || ENVELOPE_BYTES + wire.len() <= TYPED_AHEAD_BYTES);
+                    sender.enqueue_packet(7, frame, &rows).unwrap();
+                    if let Some((_, wire)) = joinable {
+                        assert_eq!(sender.queued.records.len(), before);
+                        assert_eq!(sender.queued.records.back(), Some(&wire));
+                        group.as_mut().unwrap().1.extend(rows);
+                    } else {
+                        assert_eq!(sender.queued.records.len(), before + 1);
+                        assert_eq!(sender.queued.records.back(), Some(&encode_packet(7, frame, &rows)));
+                        group = Some((frame, rows));
+                    }
+                    frame += 2;
+                    if sample(&mut seed) % 8 == 0 {
+                        sender.enqueue(format!("ACK1|{}|PREPARE|{frame}", sample(&mut seed) % 9)).unwrap();
+                        group = None;
+                    }
+                }
+                if !draining && sample(&mut seed) % 40 == 0 {
+                    sender.text_window.suspend();
+                    immediate = acked < highest_sent;
+                    recovering = highest_sent;
+                    if immediate && acked < sender.text_window.consumed + TEXT_WINDOW as u32 {
+                        let resend = sender.text_window.next(&sender.queued, 7, now).unwrap();
+                        assert_eq!(resend.map(|(sequence, _)| sequence), Some(acked + 1), "run {run}: focus return resends the first unreceived record at once");
+                    }
+                }
+                while let Some((sequence, envelope)) = sender.text_window.next(&sender.queued, 7, now).unwrap() {
+                    let consumed = sender.text_window.consumed;
+                    assert!(sequence > consumed && sequence <= consumed + TEXT_WINDOW as u32, "run {run}: {sequence} outside the window after {consumed}");
+                    let record = &sender.queued.records[(sequence - consumed - 1) as usize];
+                    assert_eq!(envelope, text_envelope(7, sequence, record).unwrap());
+                    if sequence <= highest_sent {
+                        assert_eq!(envelope, typed[sequence as usize - 1], "run {run}: a retry resends the original record");
+                        assert_eq!(sequence, acked.max(consumed) + 1, "run {run}: a retry starts at the first missing record");
+                        if immediate {
+                            immediate = false;
+                        } else {
+                            assert!(ms >= outstanding_since.unwrap() + retry_ms, "run {run}: retry at {ms} before its deadline");
+                            timer_retries += 1;
+                            recovering = highest_sent;
+                            assert!(timer_retries <= 1, "run {run}: one retry per fresh receipt");
+                        }
+                    } else {
+                        assert_eq!(sequence, highest_sent + 1);
+                        typed.push(envelope.clone());
+                    }
+                    sender.text_window.sent(sequence, now);
+                    highest_sent = highest_sent.max(sequence);
+                    outstanding_since.get_or_insert(ms);
+                    if bounded && highest_sent > acked.max(consumed) + 1 {
+                        let ahead: usize = typed[acked.max(consumed) as usize..highest_sent as usize].iter().map(String::len).sum();
+                        assert!(ahead <= TYPED_AHEAD_BYTES, "run {run}: typed {ahead} bytes past the receipt");
+                    }
+                    if sequence == native_received + 1 && (draining || sample(&mut seed) % 4 >= loss) {
+                        native_received = sequence;
+                    }
+                }
+                if ms >= stall_until && (draining || sample(&mut seed) % 3 == 0) {
+                    if !draining && sample(&mut seed) % 20 == 0 {
+                        stall_until = ms + u64::from(sample(&mut seed) % 2_000);
+                    }
+                    native_consumed += sample(&mut seed) % (native_received - native_consumed + 1);
+                    if draining { native_consumed = native_received; }
+                    revision += 1;
+                    assert!(sender.text_window.receipt(&mut sender.queued, highest_sent + 1, 0, revision).is_err());
+                    assert!(sender.text_window.receipt(&mut sender.queued, native_received, native_received + 1, revision).is_err());
+                    sender.text_window.receipt(&mut sender.queued, native_received, native_consumed, revision).unwrap();
+                    let retained: Vec<String> = typed[native_consumed as usize..].iter().map(|envelope| envelope[envelope.find('|').unwrap() + 1..envelope.len() - 1].to_owned()).collect();
+                    assert_eq!(sender.queued.records.iter().take(retained.len()).cloned().collect::<Vec<_>>(), retained, "run {run}: typed records stay until consumed");
+                    assert_eq!(sender.queued.bytes, sender.queued.records.iter().map(|record| record.len() + 1).sum::<usize>());
+                    if native_received > acked {
+                        immediate = native_received < recovering;
+                        if !immediate { recovering = 0; }
+                        if immediate && native_received < sender.text_window.consumed + TEXT_WINDOW as u32 {
+                            let resend = sender.text_window.next(&sender.queued, 7, now).unwrap();
+                            assert_eq!(resend.map(|(sequence, _)| sequence), Some(native_received + 1), "run {run}: recovery resends the next gap at once");
+                        }
+                        outstanding_since = (native_received < highest_sent).then_some(ms);
+                    }
+                    acked = native_received;
+                    timer_retries = 0;
+                }
+                if !draining { ms += u64::from(sample(&mut seed) % 120); } else { ms += 10; }
+            }
+            assert!(sender.queued.is_empty() && native_consumed == highest_sent, "run {run}: lossless receipts drain every record");
+        }
+    }
+
+    #[test]
+    fn output_queue_refuses_only_past_its_bounds_and_frame_credit_leaves_room_to_seal() {
+        let mut seed = 0x4f75_7470_7574;
+        for run in 0..200 {
+            let mut output = PendingOutput::default();
+            loop {
+                let wire = "0".repeat(1 + (sample(&mut seed) % if run % 2 == 0 { 40 } else { 3 }) as usize);
+                let (records, bytes) = (output.records.len(), output.bytes);
+                if output.frame_credit() {
+                    assert!(records + 2 <= OUTPUT_RECORD_LIMIT && bytes + (59 + 1) + (32 + 1) <= OUTPUT_BYTE_LIMIT);
+                }
+                let fits = records < OUTPUT_RECORD_LIMIT && bytes + wire.len() + 1 <= OUTPUT_BYTE_LIMIT;
+                assert_eq!(output.push(wire).is_ok(), fits);
+                if !fits {
+                    assert_eq!((output.records.len(), output.bytes), (records, bytes));
+                    break;
+                }
+                if sample(&mut seed) % 5 == 0 {
+                    output.pop();
+                }
+                assert_eq!(output.bytes, output.records.iter().map(|record| record.len() + 1).sum::<usize>());
+            }
+        }
     }
 
     /// Where the helper types: the game's window, after its focus checks, or
@@ -2988,45 +3136,6 @@ mod linux {
     }
 
     #[test]
-    fn a_backlog_joins_untyped_packets_and_typing_stays_within_its_bytes_past_receipt() {
-        let path = env::temp_dir().join(format!("journal-join-{}", std::process::id()));
-        let _ = fs::remove_file(&path);
-        let mut sender = MailboxSender::new(&env::temp_dir(), "join", 3, 0, false, true, Typist::file(&path).unwrap()).unwrap();
-        let rows = || {
-            let row = encode_row(State::default(), 0, Edges::default());
-            [row.clone(), row]
-        };
-        // Steady play: each packet is typed before the next arrives, so none joins.
-        let now = Instant::now();
-        sender.enqueue_packet(3, 1, &rows()).unwrap();
-        let (sequence, _) = sender.text_window.next(&sender.queued, 3, now).unwrap().unwrap();
-        sender.text_window.sent(sequence, now);
-        sender.enqueue_packet(3, 3, &rows()).unwrap();
-        assert_eq!(sender.queued.records.len(), 2);
-        for first in (5..3 + 2 * MESSAGE_FRAMES as u32).step_by(2) {
-            sender.enqueue_packet(3, first, &rows()).unwrap();
-        }
-        assert_eq!(sender.queued.records.len(), 3);
-        assert_eq!(sender.queued.records[0], "I423100");
-        assert_eq!(sender.queued.records[1], "I533W20");
-        assert_eq!(sender.queued.records[2], "I53Z2W20");
-        assert!(sender.queued.records.iter().all(|record|
-            ENVELOPE_BYTES + record.len() <= TYPED_AHEAD_BYTES));
-        sender.enqueue("ACK1|1|PREPARE|200".into()).unwrap();
-        sender.enqueue_packet(3, 200, &rows()).unwrap();
-        assert_eq!(sender.queued.records.len(), 5);
-        assert_eq!(sender.queued.records[3], "ACK1|1|PREPARE|200");
-        assert_eq!(sender.queued.records[4], encode_packet(3, 200, &rows()));
-        let mut typed = ENVELOPE_BYTES + sender.queued.records[0].len();
-        while let Some((sequence, envelope)) = sender.text_window.next(&sender.queued, 3, now).unwrap() {
-            typed += envelope.len();
-            sender.text_window.sent(sequence, now);
-        }
-        assert!(typed <= TYPED_AHEAD_BYTES);
-        fs::remove_file(path).unwrap();
-    }
-
-    #[test]
     fn backlog_holds_keep_buttons_axes_and_triggers_but_preserve_each_edge() {
         assert_eq!(held_row("_00100100112345612999"), "D001123456");
         let press = "3001001000";
@@ -3034,94 +3143,6 @@ mod linux {
         let release = "2000001";
         assert_eq!(encode_message(3, 3, &[press, hold, release]), format!("I5333{press}1{release}"));
         assert_eq!(encode_message(1, 574, &["0"; 28]), "I51-HS0");
-    }
-
-    #[test]
-    fn a_joined_record_stays_within_the_bytes_typing_may_take_at_once() {
-        let path = env::temp_dir().join(format!("journal-join-bound-{}", std::process::id()));
-        let _ = fs::remove_file(&path);
-        let mut sender = MailboxSender::new(&env::temp_dir(), "join", 3, 0, false, true, Typist::file(&path).unwrap()).unwrap();
-        let dense = |first: u32| {
-            let state = State { sources: 1, x: -12_345, y: 23_456, cx: 3_456, cy: -4_567, lt: 30_000, rt: 1_000, ..State::default() };
-            let row = encode_row(state, 0, Edges { pressed: ATTACK, ..Edges::default() });
-            let next = encode_row(State { x: state.x + first as i16, ..state }, 0, Edges { released: ATTACK, ..Edges::default() });
-            [row, next]
-        };
-        let now = Instant::now();
-        sender.enqueue_packet(3, 1, &dense(1)).unwrap();
-        let (sequence, _) = sender.text_window.next(&sender.queued, 3, now).unwrap().unwrap();
-        sender.text_window.sent(sequence, now);
-        for first in (3..3 + MESSAGE_FRAMES as u32).step_by(2) {
-            sender.enqueue_packet(3, first, &dense(first)).unwrap();
-        }
-        let joined: Vec<_> = sender.queued.records.iter().skip(1).collect();
-        assert!(joined.len() > 2, "dense packets join into several records");
-        assert!(joined.iter().all(|record| ENVELOPE_BYTES + record.len() <= TYPED_AHEAD_BYTES));
-        assert!(joined.iter().any(|record| record.starts_with("I5")));
-        // After the receipt, typing takes at most TYPED_AHEAD_BYTES at once.
-        sender.text_window.receipt(&mut sender.queued, 1, 1, 1).unwrap();
-        let mut typed = 0;
-        while let Some((sequence, envelope)) = sender.text_window.next(&sender.queued, 3, now).unwrap() {
-            typed += envelope.len();
-            sender.text_window.sent(sequence, now);
-        }
-        assert!(typed > 0 && typed <= TYPED_AHEAD_BYTES, "typed {typed}");
-        fs::remove_file(path).unwrap();
-    }
-
-    #[test]
-    fn text_queue_retains_sent_records_until_native_consumption_and_bounds_backlog() {
-        let mut queue = PendingOutput::default();
-        let first = encode_packet(
-            7,
-            17,
-            &[encode_row(
-                State {
-                    sources: 1,
-                    ..State::default()
-                },
-                0,
-                Edges::default(),
-            )],
-        );
-        queue.push(first.clone()).unwrap();
-        queue.push("ACK1|2|P|18".into()).unwrap();
-        let mut window = TextWindow::default();
-        let now = Instant::now();
-        let pending = window.next(&queue, 7, now).unwrap().unwrap();
-        assert_eq!(window.next(&queue, 7, now).unwrap().unwrap(), pending);
-        assert_eq!(queue.records.front(), Some(&first));
-        window.sent(pending.0, now);
-        let second = window.next(&queue, 7, now).unwrap().unwrap();
-        window.sent(second.0, now);
-        assert_eq!(queue.records.len(), 2);
-        assert!(window.next(&queue, 7, now).unwrap().is_none());
-        window.suspend();
-        window.receipt(&mut queue, 0, 0, 1).unwrap();
-        assert_eq!(
-            window.next(&queue, 7, now).unwrap().unwrap(),
-            pending
-        );
-        window.sent(pending.0, now);
-        assert!(window.next(&queue, 7, now).unwrap().is_none());
-        window.acknowledge(&mut queue, 1).unwrap();
-        assert_eq!(
-            queue.records.front().map(String::as_str),
-            Some("ACK1|2|P|18")
-        );
-        assert!(window.acknowledge(&mut queue, 3).is_err());
-        window.acknowledge(&mut queue, 2).unwrap();
-        assert!(queue.is_empty());
-        assert_eq!(queue.bytes, 0);
-        for _ in 0..OUTPUT_RECORD_LIMIT {
-            queue.push("0".into()).unwrap();
-        }
-        assert!(queue.push("extra".into()).is_err());
-        assert_eq!(queue.records.len(), OUTPUT_RECORD_LIMIT);
-        let mut bytes = PendingOutput::default();
-        bytes.push("a".repeat(OUTPUT_BYTE_LIMIT - 1)).unwrap();
-        assert!(bytes.push("b".into()).is_err());
-        assert_eq!(bytes.bytes, OUTPUT_BYTE_LIMIT);
     }
 
     #[test]
@@ -3169,146 +3190,6 @@ mod linux {
             assert_eq!(edges[&2].released, ATTACK);
             assert_eq!(action_state(state), 0);
             while output.pop().is_some() {}
-        }
-    }
-
-    #[test]
-    fn text_window_is_pipelined_and_retries_original_sequence_after_missing_receipt() {
-        let mut queue = PendingOutput::default();
-        for _ in 0..20 {
-            queue.push("I421100".into()).unwrap();
-        }
-        let mut window = TextWindow::default();
-        let now = Instant::now();
-        let first = window.next(&queue, 1, now).unwrap().unwrap();
-        for sequence in 1..=16 {
-            let record = window.next(&queue, 1, now).unwrap().unwrap();
-            assert_eq!(record.0, sequence);
-            window.sent(sequence, now);
-        }
-        assert!(window.next(&queue, 1, now).unwrap().is_none());
-        assert_eq!(queue.records.len(), 20);
-        assert!(window.next(&queue, 1, now + TEXT_RETRY).unwrap().is_none());
-        window.receipt(&mut queue, 0, 0, 1).unwrap();
-        assert_eq!(
-            window.next(&queue, 1, now + TEXT_RETRY).unwrap().unwrap(),
-            first
-        );
-        window.sent(1, now + TEXT_RETRY);
-        window.receipt(&mut queue, 16, 0, 2).unwrap();
-        assert!(window.next(&queue, 1, now + TEXT_RETRY).unwrap().is_none());
-        window.receipt(&mut queue, 16, 1, 3).unwrap();
-        assert_eq!(
-            window.next(&queue, 1, now + TEXT_RETRY).unwrap().unwrap().0,
-            17
-        );
-        window.receipt(&mut queue, 16, 12, 4).unwrap();
-        assert_eq!(queue.records.len(), 8);
-    }
-
-    #[test]
-    fn stalled_native_receiver_cannot_accumulate_unbounded_retry_copies() {
-        let mut queue = PendingOutput::default();
-        for _ in 0..16 { queue.push("I421100".into()).unwrap(); }
-        let mut window = TextWindow::default();
-        let now = Instant::now();
-        window.receipt(&mut queue, 0, 0, 1).unwrap();
-        for sequence in 1..=16 {
-            assert_eq!(window.next(&queue, 1, now).unwrap().unwrap().0, sequence);
-            window.sent(sequence, now);
-        }
-        let retry = now + TEXT_RETRY;
-        assert_eq!(window.next(&queue, 1, retry).unwrap().unwrap().0, 1);
-        window.sent(1, retry);
-        assert!(window.next(&queue, 1, retry).unwrap().is_none());
-        for attempt in 2..=100 {
-            window.receipt(&mut queue, 0, 0, 1).unwrap();
-            assert!(window.next(&queue, 1, now + TEXT_RETRY * attempt).unwrap().is_none());
-        }
-        assert_eq!(queue.records.len(), 16);
-        window.receipt(&mut queue, 0, 0, 2).unwrap();
-        let fresh_retry = now + TEXT_RETRY * 101;
-        assert_eq!(window.next(&queue, 1, fresh_retry).unwrap().unwrap().0, 1);
-        window.sent(1, fresh_retry);
-        assert!(window.next(&queue, 1, fresh_retry).unwrap().is_none());
-        window.receipt(&mut queue, 16, 16, 3).unwrap();
-        assert!(queue.is_empty());
-        assert!(window.receipt(&mut queue, 16, 16, 4).is_ok());
-    }
-
-    #[test]
-    fn text_receipt_progress_defers_retry_without_releasing_unconsumed_records() {
-        let mut queue = PendingOutput::default();
-        for _ in 0..16 {
-            queue.push("I421100".into()).unwrap();
-        }
-        let mut window = TextWindow::default();
-        let now = Instant::now();
-        for sequence in 1..=16 {
-            assert_eq!(window.next(&queue, 1, now).unwrap().unwrap().0, sequence);
-            window.sent(sequence, now);
-        }
-        window.receipt(&mut queue, 8, 0, 1).unwrap();
-        let progressed = now + Duration::from_millis(200);
-        assert!(window.next(&queue, 1, progressed).unwrap().is_none());
-        assert!(window.next(&queue, 1, now + TEXT_RETRY).unwrap().is_none());
-        assert_eq!(queue.records.len(), 16);
-        assert_eq!(window.next(&queue, 1, progressed + TEXT_RETRY).unwrap().unwrap().0, 9);
-    }
-
-    #[test]
-    fn text_received_credit_stops_at_sixteen_until_gameplay_consumes_records() {
-        let mut queue = PendingOutput::default();
-        for _ in 0..20 { queue.push("I421100".into()).unwrap(); }
-        let mut window = TextWindow::default();
-        let now = Instant::now();
-        for sequence in 1..=16 {
-            let next = window.next(&queue, 1, now).unwrap().unwrap();
-            assert_eq!(next.0, sequence);
-            window.sent(sequence, now);
-        }
-        window.receipt(&mut queue, 16, 0, 1).unwrap();
-        assert!(window.next(&queue, 1, now).unwrap().is_none());
-        let retry = now + TEXT_RETRY;
-        window.receipt(&mut queue, 16, 0, 2).unwrap();
-        assert!(window.next(&queue, 1, retry).unwrap().is_none());
-        assert_eq!(queue.records.len(), 20);
-        window.receipt(&mut queue, 16, 1, 3).unwrap();
-        assert_eq!(queue.records.len(), 19);
-        assert_eq!(window.next(&queue, 1, retry).unwrap().unwrap().0, 17);
-    }
-
-    #[test]
-    fn text_retries_only_the_first_missing_record_after_partial_receipt_progress() {
-        for received in [1, 4] {
-            let mut queue = PendingOutput::default();
-            for _ in 0..16 {
-                queue.push("I421100".into()).unwrap();
-            }
-            let mut window = TextWindow::default();
-            let now = Instant::now();
-            window.receipt(&mut queue, 0, 0, 1).unwrap();
-            for sequence in 1..=16 {
-                assert_eq!(window.next(&queue, 1, now).unwrap().unwrap().0, sequence);
-                window.sent(sequence, now);
-            }
-            window.receipt(&mut queue, received, 0, 2).unwrap();
-            let progressed = now + Duration::from_millis(100);
-            assert!(window.next(&queue, 1, progressed).unwrap().is_none());
-            let retry = progressed + TEXT_RETRY;
-            let missing = window.next(&queue, 1, retry).unwrap().unwrap();
-            assert_eq!(missing.0, received + 1);
-            window.sent(missing.0, retry);
-            assert!(window.next(&queue, 1, retry).unwrap().is_none());
-            assert_eq!(queue.records.len(), 16);
-            window.receipt(&mut queue, missing.0, 0, 3).unwrap();
-            let next_gap = window.next(&queue, 1, retry).unwrap().unwrap();
-            assert_eq!(next_gap.0, missing.0 + 1);
-            window.sent(next_gap.0, retry);
-            assert!(window.next(&queue, 1, retry).unwrap().is_none());
-            window.receipt(&mut queue, 16, 16, 4).unwrap();
-            assert!(queue.is_empty());
-            assert!(window.next(&queue, 1, retry).unwrap().is_none());
         }
     }
 
