@@ -18,9 +18,12 @@ data record; the simulation, replay, selection and object data read it.
   code, portrait, projectile model, per-pose clips with a fallback) and
   `complete`.
 - `ts/src/game/sim/heroes/heroBodies.ts` holds the roster's weight, run,
-  air-speed, width and height multipliers. An optional `shield` scale grows the
-  reference shield's centre height and radius for a body that would stand
-  outside it (Pit Lord 1.35). `sim/tuning.ts` derives a hero's
+  air-speed, width and height multipliers, and each fighter's shield centre
+  height and radius (`fighterShield`). The centre sits midway between the
+  floor and the top of the highest standing hurtbox capsule; the radius is the
+  smallest whole unit whose full-energy untilted hard shield (0.575 of the
+  radius) contains every standing capsule's part above the floor (#482).
+  `sim/tuning.ts` derives a hero's
   physics from the shared baseline (weight, dash/run/walk speed, air speed; jumps and
   gravity unchanged) and `physics/contactGeometry.ts` scales the reference hurt
   capsule by width and height. Ledge, wall and roll data use the shared Fox reference.
