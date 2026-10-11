@@ -41,7 +41,7 @@ the repository with `git config core.hooksPath .githooks`; safe-push runs it):
 the clean-room check (smashcraft:ts/scripts/cleanRoom.ts: no game files or
 copied game scripts outside smashcraft:clean-room-allowlist.tsv; wisp:docs/clean-room.md),
 `bun run check` (the kind-tag refusal of test titles, smashcraft:ts/scripts/oracleTagsCheck.ts,
-then the type check) and the type-escape audit (smashcraft:ts/test/source-shapes.test.ts)
+then the type check, then Wisp's Lua number rules over the game and Lua-test configs, wisp#129) and the type-escape audit (smashcraft:ts/test/source-shapes.test.ts)
 when the pushed commits change ts/, the model facts check
 (smashcraft:ts/test/model-facts.test.ts; it refuses with the `bun wisp view models`
 refresh command) when they change clips or model build inputs, in a few seconds (smashcraft:ts/scripts/prePush.ts).
