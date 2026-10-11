@@ -66,6 +66,7 @@ jobs:
       probes: ${{ steps.plan.outputs.probes }}
       shard-timeout: ${{ steps.plan.outputs.shard-timeout }}
       probe-timeout: ${{ steps.plan.outputs.probe-timeout }}
+      background-runner: ${{ steps.plan.outputs.background-runner }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -92,6 +93,8 @@ jobs:
           PER_PAIR: ${{ inputs.per-pair }}
           PROBE: ${{ inputs.probe }}
         run: |
+          background=$(jq -er '.background | select(type == "string" and length > 0)' runner-routing.json)
+          echo "background-runner=$background" >> "$GITHUB_OUTPUT"
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           bun scripts/farmGuard.ts --per-pair "$PER_PAIR" --probe "$PROBE" >> "$GITHUB_OUTPUT"
           bun -e '
@@ -112,7 +115,7 @@ jobs:
 
   shard:
     needs: plan
-    runs-on: ${{ github.event_name != 'pull_request' && github.event_name != 'pull_request_target' && (inputs.farm-runner || 'farm-big') || 'ubuntu-latest' }}
+    runs-on: ${{ github.event_name != 'pull_request' && github.event_name != 'pull_request_target' && (inputs.farm-runner || needs.plan.outputs.background-runner) || 'ubuntu-latest' }}
     timeout-minutes: ${{ fromJSON(needs.plan.outputs.shard-timeout) }}
     strategy:
       fail-fast: true
@@ -218,7 +221,7 @@ jobs:
   probe:
     needs: [plan, merge]
     if: ${{ inputs.matchups == '' && inputs.probe != '0' }}
-    runs-on: ${{ github.event_name != 'pull_request' && github.event_name != 'pull_request_target' && (inputs.farm-runner || 'farm-big') || 'ubuntu-latest' }}
+    runs-on: ${{ github.event_name != 'pull_request' && github.event_name != 'pull_request_target' && (inputs.farm-runner || needs.plan.outputs.background-runner) || 'ubuntu-latest' }}
     timeout-minutes: ${{ fromJSON(needs.plan.outputs.probe-timeout) }}
     strategy:
       fail-fast: true

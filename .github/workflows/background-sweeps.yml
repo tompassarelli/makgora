@@ -19,8 +19,22 @@ env:
   SWEEP_PLACEMENT: background
 
 jobs:
+  routing:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      runner: ${{ steps.route.outputs.runner }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+      - id: route
+        run: |
+          runner=$(jq -er '.background | select(type == "string" and length > 0)' ts/runner-routing.json)
+          echo "runner=$runner" >> "$GITHUB_OUTPUT"
   sweeps:
-    runs-on: farm-big
+    needs: routing
+    runs-on: ${{ needs.routing.outputs.runner }}
     timeout-minutes: 40
     strategy:
       fail-fast: false

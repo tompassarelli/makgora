@@ -60,11 +60,11 @@ summary say what landed. To test a refused branch again without a new
 commit: `gh workflow run autoland.yml -f branch=claude/NAME`.
 
 Everything runs from source: no private build inputs, no `.w3x` build.
-Runner placement is reviewed workflow code. Autoland reports and farm-test
+Runner placement comes from the reviewed `ts/runner-routing.json` file. Autoland reports and farm-test
 Bun, Lua32 and census jobs use hosted runners. Balance and background sweeps
 use `farm-big`, preserving the background pool. The `farm-runner` dispatch
 input measures an alternative box for even Bun/Lua jobs on the first attempt;
-retries ignore that override and select `ubuntu-latest` directly, including
+retries ignore that override and select the plan's hosted output directly, including
 when the original plan job's outputs are reused. No repository variable
 controls runner placement. Delete obsolete runner variables only after these
 workflow versions are live on main.
@@ -93,7 +93,7 @@ second fresh run alongside its rerun.
 
 The existing `socrates-chat post --as smashcraft-lead` and `--as alerts` route
 spools the same job/runner/elapsed line to the lead room and
-`#socrates-alerts`. A successful command proves local spool acceptance; the
+`#socrates-alerts`. A successful command records local spool acceptance; the
 relay's `socrates-chat log` proves delivery. No workflow secret or new
 messaging integration is needed. Start the reviewed command under a local
 supervisor only after its routing is live. The command defaults to observation;

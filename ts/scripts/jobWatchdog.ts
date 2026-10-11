@@ -166,6 +166,6 @@ const program = Effect.gen(function*() {
     const remote = yield* api("commits/main", Schema.Struct({ sha: Schema.String }));
     if (local !== remote.sha) return yield* new WatchdogFailure({ problem: "apply requires the reviewed checked command and routing on current main" });
   }
-  yield* Effect.acquireUseRelease(fs.makeDirectory(`${state}/monitor.lock`), () => values.once ? monitor : monitor.pipe(Effect.repeat({ schedule: Schedule.spaced("20 seconds") })), () => fs.remove(`${state}/monitor.lock`));
+  yield* Effect.acquireUseRelease(fs.writeFileString(`${state}/monitor.lock`, `${process.pid}\n`, { flag: "wx", mode: 0o600 }), () => values.once ? monitor : monitor.pipe(Effect.repeat({ schedule: Schedule.spaced("20 seconds") })), () => fs.remove(`${state}/monitor.lock`));
 });
 BunRuntime.runMain(program.pipe(Effect.provide(BunServices.layer)));
