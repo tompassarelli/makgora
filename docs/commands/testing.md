@@ -47,11 +47,9 @@
   Bun ceiling, 4 s at a farm runner's 14,500 frames per CPU second; work that steps no frames is
   bounded only by the hang timeout. It reports each run's CPU and five
   heaviest tests by CPU and by frames without gating CPU;
-  ts/test/cost-baseline.tsv holds CPU estimates that order processes. CPU
-  and wall-clock budgets are judged only in the exclusive-lease perf
-  measurements (#168). Tests get a 60 s timeout, which only catches hangs; a test that asserts
-  speed is a `timingTest`, which the runner runs alone after the suite
-  (wisp:docs/testing.md).
+  ts/test/cost-baseline.tsv holds CPU estimates that order processes.
+  Bound test cost by frames, instructions, allocations or operations.
+  Test timeouts detect hangs; elapsed wall time is not a test oracle.
 
 - Kinds: every test's title ends with exactly one kind tag (#422):
   `[k1 scenario]` (replayed input through the whole system, asserting
@@ -60,7 +58,8 @@
   citing the issue or an existing doc), `[k4 reference <source>]` (an external
   reference: `melee`, `melee-decomp`, `lua32`, `wurst`, `native`, …) or
   `[k5 boundary <name>]` (one integration check per real boundary, each name
-  once in the suite). A test that fits no kind is scaffolding: don't write it.
+  once in the suite). Keep a test only if it fits one of these kinds and
+  kills a mutant that no other kept test kills; otherwise it is scaffolding.
   `bun run check`, `bun run test` and `bun scripts/lua-tests.ts` refuse a
   title that breaks this (smashcraft:ts/scripts/oracleTags.ts), so titles stay
   literal text (#243).
