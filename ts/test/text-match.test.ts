@@ -4,15 +4,15 @@ import { selectableCharacterBySlug } from "../src/game/sim/heroes/registry";
 import { DEFAULT_OPTIONS, playTextMatch } from "../scripts/textMatch";
 import { parseCommands } from "../scripts/textMatchView";
 
-test("a fully raised shield blocks Illidan's forward air for every fighter [k1 scenario]", () => {
+test("a fresh hard shield covers short fighters from Illidan's forward air and leaves tall fighters' heads to a poke [k1 scenario]", () => {
   const input = "0 neutral\n46 shield\n70 neutral\n";
-  for (const slug of ["warden", "blademaster", "thrall", "dreadlord", "rifleman", "peon"]) {
+  for (const [slug, poked] of [["warden", true], ["blademaster", true], ["thrall", true], ["dreadlord", true], ["rifleman", false], ["peon", false]] as const) {
     const you = selectableCharacterBySlug(slug);
     const cpu = selectableCharacterBySlug("illidan");
     if (you === undefined || cpu === undefined) throw new Error(`no fighter ${slug}`);
     const lines = playTextMatch({ ...DEFAULT_OPTIONS, seed: 44, you, cpu, frames: 70 }, parseCommands(input)).lines;
     const damaged = lines.filter((line) => /^\d+ A x\S+ z\S+ [1-9]\d*% /.test(line));
-    expect(damaged, slug).toEqual([]);
+    expect(damaged.length > 0, slug).toBe(poked);
   }
 });
 
