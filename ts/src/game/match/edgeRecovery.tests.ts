@@ -92,7 +92,7 @@ test(" a Blink that enters the stage through its lip passes it: above the deck, 
   check(land.motion.grounded && land.motion.z === 0.0 && land.motion.x < f32(LEDGE - TELEPORT_LEDGE_INSET), `land ${land.motion.x},${land.motion.z}`);
 });
 
-test(" a Blink up into a pass-through platform from below the stage travels its authored distance and no further [k1 scenario]", () => {
+test("a Blink up into a pass-through platform from below the stage travels its authored distance and no further [k1 scenario]", () => {
 
   const deckZ = surfaceZ(TOMB_OF_SARGERAS_STAGE, 1, 0);
   const run = recoveryRun(Character.warden, 100, -660.0, -312.0);
