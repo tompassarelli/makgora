@@ -465,6 +465,36 @@ export function heroSpecialEndFrame(f: Readonly<Fighter>, move: Readonly<Authore
 export function landHeroSpecial(f: Fighter): boolean {
   const move = runningHeroSpecial(f);
   if (move?.landingLag === undefined) return false;
+  const specials = f.tuning.specials;
+  if (f.special.action === SpecialAction.heroDown && specials !== undefined
+    && (f.special.form === SpecialForm.ground || f.special.form === SpecialForm.air)) {
+    const ground = specialForm(specials.down, SpecialForm.ground, f.special.ex);
+    let firstEffect = move.endFrame;
+    let groundFirstEffect = ground.endFrame;
+    for (const form of [move, ground]) {
+      let first = form.endFrame;
+      for (const region of form.regions ?? []) first = min(first, region.firstFrame - 1);
+      for (const projectile of form.projectiles ?? []) first = min(first, projectile.spawnFrame);
+      first = min(first, form.placement?.frame ?? first);
+      first = min(first, form.command?.frame ?? first);
+      first = min(first, form.guard?.first ?? first);
+      first = min(first, form.armor === undefined ? first : form.armor.first - 1);
+      first = min(first, form.burst?.frame ?? first);
+      first = min(first, form.buff?.frame ?? first);
+      first = min(first, form.ritual?.frame ?? first);
+      if (form === move) firstEffect = first;
+      if (form === ground) groundFirstEffect = first;
+    }
+    if (f.special.frame < firstEffect) {
+      f.special.form = SpecialForm.ground;
+      if (f.special.frame >= groundFirstEffect) f.special.frame = 0;
+      f.special.duration = ground.endFrame;
+      f.special.lockFrames = max(0, ground.endFrame - f.special.frame);
+      f.attack.cooldown = f.special.lockFrames;
+      applyWindows(f, ground, f.special.frame);
+      return true;
+    }
+  }
   f.special.action = SpecialAction.none;
   f.special.frame = 0;
   f.special.lockFrames = 0;
