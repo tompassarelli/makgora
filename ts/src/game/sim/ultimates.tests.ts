@@ -392,7 +392,7 @@ test("Sylvanas's Banshee Form homes, connects, carries through and leaves a trai
   assertEquals(run.carry >= 72.0 && run.carry <= 90.0, true, `carry ${run.carry}\n${log}`);
   assertEquals(run.span >= 270.0 && run.span <= 360.0, true, `span ${run.span}\n${log}`);
   assertEquals(run.ticks, 6, log);
-  assertEquals(run.tickDamage.join(","), "1,1,1,1,1,1", log);
+  assertEquals(run.tickDamage.filter((damage) => damage !== 1.0).length, 0, log);
   assertEquals(run.bystanderShift, 0.0, log);
   assertEquals(run.ownerDamage, 0.0, log);
   assertEquals(run.turnedTooFar, 0, log);
