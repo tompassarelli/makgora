@@ -272,7 +272,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   [Character.medivh]: {
     neutral: { spell: "Arcane Omen", startup: ARCANE, active: cue("Abilities\\Weapons\\PriestMissile\\PriestMissile.mdl", "hand", 0.5) },
     side: { spell: "Vanishing Act", startup: ARCANE, active: cue("Abilities\\Spells\\NightElf\\Blink\\BlinkTarget.mdx", "body", 0.75) },
-    up: { spell: "Raven Flight", startup: ARCANE, active: cue("Abilities\\Spells\\Human\\Polymorph\\PolyMorphDoneGround.mdx", "body", 0.75) },
+    up: { spell: "Raven Flight", startup: ARCANE, active: cue("Abilities\\Spells\\Orc\\EtherealForm\\SpiritWalkerChange.mdx", "body", 0.75) },
     down: { spell: "Last Word", startup: ARCANE, active: cue("Abilities\\Spells\\Human\\Invisibility\\InvisibilityTarget.mdx", "body", 0.75) },
   },
   [Character.anubarak]: {
