@@ -65,6 +65,10 @@ export class BodyFlash {
     this.shown = true;
   }
 
+  drawnEffects(into: effect[]): void {
+    into.push(this.model);
+  }
+
   destroy(): void {
     hideEffect(this.model, this.origin);
     DestroyEffect(this.model);

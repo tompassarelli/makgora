@@ -38,6 +38,7 @@ import { surfaceCount, surfaceLeft, surfaceMoves, surfaceRight, surfaceZ } from 
 import { CANNON_Z, SEA_SURFACE_Z, cannonAim, cannonOn, cannonX, hasTide, hasWind } from "../../game/sim/stageHazards";
 import { localParticipantSlot, traceParticipant } from "./diagnostics";
 import { placeFighterBody, renderDizzy } from "./fighterBody";
+import { concealFighter, concealFighters } from "./fighterCloak";
 import { type ShellState, type StatusFrames, activeRollback, localSlot, playsOnKeyboard } from "./state";
 import { type UiObjects, pauseEffects, views } from "./ui";
 import { loreClears } from "../../game/classic/loreClears";
@@ -238,12 +239,14 @@ export function renderFighter(s: ShellState, slot: ParticipantSlot, pose: Readon
   if (body === undefined || !isActive(s.world, slot)) return;
   const fighter = fighterAt(s.world, slot);
   renderDizzy(body, fighter, s.game.phase === Phase.match, s.origin);
-  if (wasOut && !fighter.status.out) ShowUnit(body.unit, true);
-  else if (!wasOut && fighter.status.out) {
+  const hidden = s.hiddenFighters[slot];
+  if (hidden === undefined && wasOut && !fighter.status.out) ShowUnit(body.unit, true);
+  else if (hidden === undefined && !wasOut && fighter.status.out) {
     ShowUnit(body.unit, false);
   }
   const { pooled } = participant;
-  ShowUnit(body.unit, !pooled && !fighter.status.out);
+  if (hidden !== undefined) hidden.unitShown = !pooled && !fighter.status.out;
+  else ShowUnit(body.unit, !pooled && !fighter.status.out);
   if (body.renderedSelection !== pose.selectionSerial) {
     if (!pooled) {
 
@@ -273,6 +276,7 @@ export function renderFighter(s: ShellState, slot: ParticipantSlot, pose: Readon
   const blue = frozen ? 255 : tint?.blue ?? item?.blue ?? 255;
   const alpha = !frozen && tint === undefined && isIntangible(fighter) ? 140 : 255;
   SetUnitVertexColor(body.unit, red, green, blue, alpha);
+  concealFighter(s, slot);
 }
 
 
@@ -468,6 +472,7 @@ export function renderPersistentPresentation(s: ShellState): void {
     renderers?.cues?.present(fighter, playing, s.session.paused);
     renderers?.hitAreas?.present(live);
   }
+  concealFighters(s);
 }
 
 

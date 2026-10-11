@@ -7,7 +7,11 @@ and `-dev lever light INDEX on|off`. Compare `-dev lighting stock|stage` and
 `-dev lever camz -100000|100000` to reach the camera's lowest or highest allowed
 height; `-dev lever camz off` restores the normal extreme height and
 `-dev view off` restores the match camera. The override still passes through
-the existing camera limits.
+the existing camera limits. `-dev hide fighter SLOT` (SLOT 0 to 3) stops
+drawing that fighter's body unit or effect body, its shadow, its disjoint
+weapon models, white flash, agency halo, shield and dizzy stars without
+touching the sim, stage, other fighters or HUD; `-dev show fighter SLOT` puts
+back exactly what was drawn (receipt `dev: fighter SLOT hidden|shown`).
 
 - One-client Definitive look captures (signed-in clone b, c or d):
   `bun scripts/nativeCapture.ts build --out MAP.w3x --control PAD|DIR...` bakes
@@ -32,6 +36,15 @@ the existing camera limits.
   PAD|DIR...` plays the scripts headlessly on the map's schedule and checks
   each `#! cue FROM[-TO] NAME: sound=… effect=… tint=b shake=b recoil=b` line
   against the held capture frames, without a Warcraft client.
+- Native silhouettes (wisp#125): a capture script with `#! silhouette a|b
+  FIGHTER MOVE [WIDTHxHEIGHT]` (default 1920x1080) holds each capture frame
+  twice, the fighter shown and then hidden by `-dev hide fighter SLOT`, and
+  `run` saves `FIXTURE/<frame>-shown.png` and `FIXTURE/<frame>-hidden.png` plus
+  `FIXTURE/silhouette.json` (match frames, slot, fighter, move, resolution) for
+  Wisp's `silhouetteBounds(shown, hidden)`; `run` refuses a capture of another
+  size. The default scenario is smashcraft:ts/test/native/captures/wisp125-warden-nair.pad
+  (Warden's neutral air, 10 held frames); build and run it as above on a
+  Definitive clone (clone-c, clone-d or account b), never Tom's install.
 
 Automated native match/rematch tests use one stock by default. A named workload
 may use more stocks or a longer timer only when its required sample needs it;

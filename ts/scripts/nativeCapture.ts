@@ -32,7 +32,8 @@ import { dataDirectory } from "wisp/scripts/wisp/gameFiles";
 import { parsePadScript } from "./integrity/padScript";
 import { STAMP_CELL, STAMP_CELLS, type StampCell, readStamp } from "../src/runtime/drawnStamp";
 import { CAPTURE_STATUS_FILE } from "../src/runtime/gameFiles";
-import { CAPTURE_FIXTURES, type CaptureFixture } from "../src/platform/captureFixtures";
+import { CAPTURE_FIXTURES, type CaptureFixture, SILHOUETTE_HIDDEN_FRAME, type Silhouette } from "../src/platform/captureFixtures";
+import { encodePng } from "./wisp/hurtboxView";
 import { platformLayer } from "wisp/scripts/platform/layer";
 
 class CaptureFailure extends Schema.TaggedError<CaptureFailure>()("CaptureFailure", { problem: Schema.String }) {
@@ -52,15 +53,27 @@ const SWITCHES = new Set(["--control", "--no-audio"]);
 const positional = (args: readonly string[]) => args.filter((value, index) => !value.startsWith("--") && !(args[index - 1]?.startsWith("--") === true && !SWITCHES.has(args[index - 1] ?? "")));
 
 
+// `#! silhouette a|b FIGHTER MOVE [WIDTHxHEIGHT]`: the fighter in that slot, the move it plays and the client resolution.
+export function silhouetteOf(path: string, lines: readonly string[]): Silhouette | undefined {
+  const rows = lines.filter(line => /^\s*#!\s*silhouette\b/.test(line));
+  if (rows.length === 0) return undefined;
+  const match = /^\s*#!\s*silhouette\s+([ab])\s+(\S+)\s+(\S+)(?:\s+(\d+)x(\d+))?\s*$/.exec(rows[0] ?? "");
+  if (rows.length > 1 || match === null) return fail(`${path}: a silhouette line is "#! silhouette a|b FIGHTER MOVE [WIDTHxHEIGHT]", once`);
+  return { slot: match[1] === "a" ? 0 : 1, fighter: match[2] ?? "", move: match[3] ?? "", width: Number(match[4] ?? 1920), height: Number(match[5] ?? 1080) };
+}
+
 export function fixtureOf(path: string, script: string): CaptureFixture {
   const chat = /^\s*\S+\s+[ab]\s+chat\s/;
   const lines = script.split("\n");
+  const silhouette = silhouetteOf(path, lines);
   if (lines.some(line => chat.test(line) && line.trim().startsWith("+"))) fail(`${path}: a chat line needs an absolute frame`);
   const frames = [...new Set(parsePadScript(lines.filter(line => !chat.test(line)).join("\n")).filter(step => step.kind === "capture").map(step => step.frame))].sort((a, b) => a - b);
   if (frames.length === 0) fail(`${path}: no capture lines`);
   if (frames[0] === 0) fail(`${path}: a capture at frame 0 can't be held`);
+  if (silhouette !== undefined && (frames.at(-1) ?? 0) >= SILHOUETTE_HIDDEN_FRAME) fail(`${path}: a silhouette capture frame must be below ${SILHOUETTE_HIDDEN_FRAME}`);
   const folder = basename(dirname(path));
-  return { name: folder === "pads" || folder === "captures" ? basename(path, ".pad") : `${folder}-${basename(path, ".pad")}`, frames, script };
+  const name = folder === "pads" || folder === "captures" ? basename(path, ".pad") : `${folder}-${basename(path, ".pad")}`;
+  return silhouette === undefined ? { name, frames, script } : { name, frames, script, silhouette };
 }
 
 const build = (args: readonly string[]) => Effect.gen(function*() {
@@ -85,7 +98,7 @@ const build = (args: readonly string[]) => Effect.gen(function*() {
   );
   if (code !== 0) return yield* new CaptureFailure({ problem: `map build exited ${code}` });
   const manifest = `${out.replace(/\.w3x$/, "")}.captures.json`;
-  yield* attempt("write the manifest", () => writeFileSync(manifest, `${JSON.stringify({ map: out, fixtures: fixtures.map(({ name: fixture, frames }) => ({ name: fixture, frames })) }, null, 2)}\n`));
+  yield* attempt("write the manifest", () => writeFileSync(manifest, `${JSON.stringify({ map: out, fixtures: fixtures.map(({ name: fixture, frames, silhouette }) => ({ name: fixture, frames, ...(silhouette === undefined ? {} : { silhouette }) })) }, null, 2)}\n`));
   console.log(`built ${out}: ${fixtures.length} scripts, ${fixtures.reduce((total, fixture) => total + fixture.frames.length, 0)} captures; manifest ${manifest}`);
 });
 
@@ -159,7 +172,16 @@ export function frameStamp(frame: Frame): { readonly script: number; readonly fr
   return undefined;
 }
 
-const Manifest = Schema.fromJsonString(Schema.Struct({ map: Schema.String, fixtures: Schema.Array(Schema.Struct({ name: Schema.String, frames: Schema.Array(Schema.Finite) })) }));
+const SilhouetteRow = Schema.Struct({ slot: Schema.Finite, fighter: Schema.String, move: Schema.String, width: Schema.Finite, height: Schema.Finite });
+const Manifest = Schema.fromJsonString(Schema.Struct({ map: Schema.String, fixtures: Schema.Array(Schema.Struct({ name: Schema.String, frames: Schema.Array(Schema.Finite), silhouette: Schema.optional(SilhouetteRow) })) }));
+
+
+export function heldCapture(fixture: { readonly frames: readonly number[]; readonly silhouette?: unknown }, stampFrame: number): { readonly frame: number; readonly phase: "held" | "shown" | "hidden" } | undefined {
+  if (fixture.silhouette === undefined) return fixture.frames.includes(stampFrame) ? { frame: stampFrame, phase: "held" } : undefined;
+  const hidden = stampFrame >= SILHOUETTE_HIDDEN_FRAME;
+  const frame = hidden ? stampFrame - SILHOUETTE_HIDDEN_FRAME : stampFrame;
+  return fixture.frames.includes(frame) ? { frame, phase: hidden ? "hidden" : "shown" } : undefined;
+}
 
 const PipeWireObjects = Schema.fromJsonString(Schema.Array(Schema.Struct({
   id: Schema.Finite,
@@ -267,8 +289,8 @@ const runCaptures = (args: readonly string[]) => Effect.scoped(Effect.gen(functi
   const statusPath = join(dataDirectory(client.documents), CAPTURE_STATUS_FILE);
   const started = Date.now();
   const audio = args.includes("--no-audio") ? undefined : yield* recordAudio(option(args, "--audio-sink") ?? `wisp-online-${client.name}`, join(out, "audio.wav"), started);
-  const wanted = manifest.fixtures.reduce((total, fixture) => total + fixture.frames.length, 0);
-  const saved = new Map<string, { fixture: string; frame: number; file: string; capturedMs: number }>();
+  const wanted = manifest.fixtures.reduce((total, fixture) => total + fixture.frames.length * (fixture.silhouette === undefined ? 1 : 2), 0);
+  const saved = new Map<string, { fixture: string; frame: number; phase: "held" | "shown" | "hidden"; file: string; capturedMs: number; width: number; height: number }>();
   const log: { ms: number; captureMs: number; stamp: string }[] = [];
   let lastScript = 0;
   let idleSince = Date.now();
@@ -283,24 +305,45 @@ const runCaptures = (args: readonly string[]) => Effect.scoped(Effect.gen(functi
     log.push({ ms: before - started, captureMs: Date.now() - before, stamp: stamp === undefined ? "unreadable" : `${stamp.script}/${stamp.frame}` });
     const fixture = stamp === undefined ? undefined : manifest.fixtures[stamp.script - 1];
     if (stamp !== undefined && stamp.script > lastScript) { lastScript = stamp.script; idleSince = Date.now(); }
-    if (stamp !== undefined && fixture !== undefined && fixture.frames.includes(stamp.frame) && !saved.has(`${fixture.name}/${stamp.frame}`)) {
-      const file = join(fixture.name, `frame-${stamp.frame}.ppm`);
+    const held = stamp === undefined || fixture === undefined ? undefined : heldCapture(fixture, stamp.frame);
+    const key = held === undefined || fixture === undefined ? "" : `${fixture.name}/${held.frame}/${held.phase}`;
+    if (held !== undefined && fixture !== undefined && !saved.has(key)) {
+      const file = join(fixture.name, held.phase === "held" ? `frame-${held.frame}.ppm` : `${held.frame}-${held.phase}.png`);
       yield* attempt("save the capture", () => {
         mkdirSync(join(out, fixture.name), { recursive: true });
-        writeFileSync(join(out, file), encodePpm(shot));
+        writeFileSync(join(out, file), held.phase === "held" ? encodePpm(shot) : encodePng(shot.width, shot.height, shot.rgb));
       });
-      saved.set(`${fixture.name}/${stamp.frame}`, { fixture: fixture.name, frame: stamp.frame, file, capturedMs: before - started });
+      saved.set(key, { fixture: fixture.name, frame: held.frame, phase: held.phase, file, capturedMs: before - started, width: whole.width, height: whole.height });
       idleSince = Date.now();
-      console.log(`captured ${fixture.name} ${stamp.frame} (${saved.size}/${wanted})`);
+      console.log(`captured ${fixture.name} ${held.frame}${held.phase === "held" ? "" : ` ${held.phase}`} (${saved.size}/${wanted})`);
     }
     if (lastScript >= manifest.fixtures.length && Date.now() - idleSince > 30000) break;
   }
-  const missed = manifest.fixtures.flatMap(fixture => fixture.frames.filter(frame => !saved.has(`${fixture.name}/${frame}`)).map(frame => ({ fixture: fixture.name, frame })));
+  const phases = (fixture: { readonly silhouette?: unknown }) => fixture.silhouette === undefined ? ["held"] as const : ["shown", "hidden"] as const;
+  const missed = manifest.fixtures.flatMap(fixture => fixture.frames.flatMap(frame => phases(fixture).filter(phase => !saved.has(`${fixture.name}/${frame}/${phase}`)).map(phase => ({ fixture: fixture.name, frame, phase }))));
+  const wrongSize: string[] = [];
+  for (const fixture of manifest.fixtures) {
+    const silhouette = fixture.silhouette;
+    if (silhouette === undefined) continue;
+    const pairs = fixture.frames.map(frame => ({ matchFrame: frame, shown: saved.get(`${fixture.name}/${frame}/shown`), hidden: saved.get(`${fixture.name}/${frame}/hidden`) }));
+    const sizes = [...new Set(pairs.flatMap(pair => [pair.shown, pair.hidden]).filter(row => row !== undefined).map(row => `${row.width}x${row.height}`))];
+    const receipt = {
+      fixture: fixture.name, map: manifest.map, build: binding.installed, slot: silhouette.slot, fighter: silhouette.fighter, move: silhouette.move,
+      resolution: { width: silhouette.width, height: silhouette.height }, captured: sizes, crop: crop ?? null,
+      pairs: pairs.map(pair => ({ matchFrame: pair.matchFrame, shown: pair.shown === undefined ? null : basename(pair.shown.file), hidden: pair.hidden === undefined ? null : basename(pair.hidden.file) })),
+    };
+    yield* attempt("write the silhouette receipt", () => {
+      mkdirSync(join(out, fixture.name), { recursive: true });
+      writeFileSync(join(out, fixture.name, "silhouette.json"), `${JSON.stringify(receipt, null, 1)}\n`);
+    });
+    if (sizes.some(size => size !== `${silhouette.width}x${silhouette.height}`)) wrongSize.push(`${fixture.name}: captured at ${sizes.join(", ")}, not the scenario's ${silhouette.width}x${silhouette.height}`);
+  }
   const result = { map: manifest.map, build: binding, captured: saved.size, wanted, missed, audio, captures: [...saved.values()], log };
   yield* attempt("write captures.json", () => writeFileSync(join(out, "captures.json"), `${JSON.stringify(result, null, 1)}\n`));
   const unreadable = log.filter(row => row.stamp === "unreadable").length;
   console.log(JSON.stringify({ captured: saved.size, wanted, missed: missed.length, screenCaptures: log.length, unreadable, medianCaptureMs: [...log.map(row => row.captureMs)].sort((a, b) => a - b)[Math.floor(log.length / 2)] ?? 0 }));
-  if (missed.length > 0) return yield* new CaptureFailure({ problem: `missed ${missed.map(row => `${row.fixture}@${row.frame}`).join(", ")}` });
+  if (wrongSize.length > 0) return yield* new CaptureFailure({ problem: wrongSize.join("; ") });
+  if (missed.length > 0) return yield* new CaptureFailure({ problem: `missed ${missed.map(row => `${row.fixture}@${row.frame}${row.phase === "held" ? "" : ` ${row.phase}`}`).join(", ")}` });
 }));
 
 const plan = (args: readonly string[]) => Effect.gen(function*() {

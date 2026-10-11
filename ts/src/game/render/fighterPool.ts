@@ -97,6 +97,18 @@ export class FighterPoolPresentation {
     this.blendFrom = undefined;
   }
 
+  /** Every model this body draws, for a dev command that hides the fighter. */
+  drawnEffects(into: effect[]): void {
+    for (const model of this.clips) into.push(model);
+    if (this.light !== undefined) into.push(this.light);
+  }
+
+  /** Makes the next present rewrite each cached scale. */
+  redraw(): void {
+    this.yaw = undefined;
+    this.lightYaw = undefined;
+  }
+
   hide(): void {
     this.endBlend();
     const shown = this.visible === undefined ? undefined : this.clips[this.visible];

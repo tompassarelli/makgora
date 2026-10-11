@@ -39,6 +39,10 @@ export class AgencyMarker {
     this.shown = false;
   }
 
+  drawnEffects(into: effect[]): void {
+    into.push(this.halo);
+  }
+
   destroy(): void {
     hideEffect(this.halo, this.origin);
     DestroyEffect(this.halo);

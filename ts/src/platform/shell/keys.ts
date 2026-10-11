@@ -28,6 +28,7 @@ import { probeFrameCostClock } from "./frameCost";
 import { probeRenderClock } from "./renderClock";
 import { startDrawingBetweenFrames } from "./betweenFrames";
 import { showBackdrop, showStageLighting, leverCommand } from "./stageScenery";
+import { fighterHideCommand, hideFighter } from "./fighterCloak";
 import { clearCapturedInputs } from "./inputs";
 import { journalEpoch, journalIdentity } from "./journal";
 import { chatBusy, requestPause } from "./journalPause";
@@ -291,6 +292,7 @@ export function applyDeveloperCommand(s: ShellState, actor: number, original: st
   if (original === RESET_COMMAND) {
     s.promoHudHidden = false;
     clearVisualCapture(localSlot());
+    for (const slot of PARTICIPANT_SLOTS) s.hiddenFighters[slot] = undefined;
     pauseMatchPresentation(s, s.session.paused);
   }
   const captured = s.build.responseProbe ? configureVisualCapture(original, localSlot()) : original;
@@ -306,6 +308,7 @@ export function applyDeveloperCommand(s: ShellState, actor: number, original: st
   const offstageHero = quickOffstageHero(message);
   const painHero = quickPainHero(message);
   const quickCpu = quickMatchCpuProfile(message);
+  const fighterHide = fighterHideCommand(message);
 
   const setup = applySetupCommand(s.game, actor, message);
   if (setup === `dev: stage ${s.game.stageChoice}` && s.game.phase === Phase.characterMenu) s.dev.stageChoice = s.game.stageChoice;
@@ -392,6 +395,10 @@ export function applyDeveloperCommand(s: ShellState, actor: number, original: st
   } else if (message === "-dev view near" || message === "-dev view far" || message === "-dev view off") {
     s.viewExtreme = message === "-dev view near" ? "near" : message === "-dev view far" ? "far" : undefined;
     receipt = `dev: view ${s.viewExtreme ?? "off"}`;
+  } else if (fighterHide !== undefined) {
+    if (!hideFighter(s, fighterHide.slot, fighterHide.hidden)) return;
+    if (!fighterHide.hidden) renderPersistentPresentation(s);
+    receipt = `dev: fighter ${fighterHide.slot} ${fighterHide.hidden ? "hidden" : "shown"}`;
   } else if (message.startsWith("-dev lever ")) {
     const words = message.slice(11).split(" ");
     leverCommand(s, words[0] ?? "", words[1] ?? "", words[2] ?? "");

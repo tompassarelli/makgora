@@ -43,6 +43,10 @@ export class ShieldPresentation {
     BlzSetSpecialEffectAlpha(this.model, 255);
   }
 
+  drawnEffects(into: effect[]): void {
+    into.push(this.model);
+  }
+
   destroy(): void {
     this.hide();
     DestroyEffect(this.model);
