@@ -325,12 +325,29 @@ jobs:
             echo "::error title=Autoland didn't land::${branches[0]}${SHA:+ (${SHA:0:10})}: $why"
             exit 1
           fi
-          git fetch -q origin main
-          if [ "$(git rev-parse origin/main)" != "$BASE" ]; then
-            echo "main moved while the train ran: its tips wait for the next train" >> "$GITHUB_STEP_SUMMARY"
-            exit 0
+          git fetch -q origin main "$SCRATCH"
+          main=$(git rev-parse origin/main)
+          if [ "$main" != "$BASE" ]; then
+            mkdir -p trees
+            git ls-tree -r -z "$BASE" > trees/base
+            git ls-tree -r -z "$SHA" > trees/tested
+            mains=(); landed=()
+            if git merge-base --is-ancestor "$BASE" "$main"; then
+              for commit in $(git rev-list --reverse --first-parent "$BASE..$main"); do
+                git ls-tree -r -z "$commit" > "trees/$commit"; mains+=("trees/$commit")
+              done
+            fi
+            git worktree add -q --detach "$RUNNER_TEMP/past-main" "$SHA"
+            if git -C "$RUNNER_TEMP/past-main" rebase -q --onto "$main" "$BASE" > rebase.log 2>&1; then
+              git ls-tree -r -z "$(git -C "$RUNNER_TEMP/past-main" rev-parse HEAD)" > trees/landed; landed=(--rebased trees/landed)
+            fi
+            if [ "$(bun ts/scripts/autoland.ts past-main trees/base trees/tested "${mains[@]}" "${landed[@]}")" != land ]; then
+              echo "main moved to ${main:0:10} on paths the train changes while it ran: its tips wait for the next train" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            SHA=$(git -C "$RUNNER_TEMP/past-main" rev-parse HEAD)
+            echo "main moved to ${main:0:10} only on paths the train doesn't change: the tested tree lands rebased onto it as ${SHA:0:10}" >> "$GITHUB_STEP_SUMMARY"
           fi
-          git fetch -q origin "$SCRATCH"
           if ! git push origin "$SHA:refs/heads/main" 2> push.log; then
             cat push.log
             echo "pushing to main failed: the train's tips wait for the next train" >> "$GITHUB_STEP_SUMMARY"

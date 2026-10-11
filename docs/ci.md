@@ -42,7 +42,14 @@ landing restarts another's suites.
 4. **Land.** Only when the suites pass on that exact candidate, main's known
    failures included (#394), and its regenerated reports meet their targets,
    main is fast-forwarded to it plus the reports commit, each branch's
-   status becomes "landed as SHA" and its branch is deleted. Pushes made with
+   status becomes "landed as SHA" and its branch is deleted. If main moved
+   while the train ran (a direct `safe-push` of a workflow change), the
+   tested commits are rebased onto the new main and land without another
+   suite when every new main commit misses the train's changed paths and
+   the rebased tree is exactly the tested tree plus main's changes; a main
+   commit touching a train path, `.github/workflows/` or
+   `ts/scripts/autoland*` sends the tips to the next train (`pastMain` in
+   smashcraft:ts/scripts/autolandCore.ts). Pushes made with
    the workflow token start no workflows, so the run dispatches main's CI,
    which runs only its smoke job for a landed commit.
 5. **Red.** A red lone tip gets a failed status, and its run fails with a
