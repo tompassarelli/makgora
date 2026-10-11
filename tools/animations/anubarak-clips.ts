@@ -33,6 +33,11 @@ const low: Gesture = { chest: 45, pelvis: 18, arm: -45, elbow: 15, leftArm: -60,
 const back: Gesture = { chest: -12, pelvis: -15, arm: 40, leftArm: -55, head: 20, yaw: 105 };
 const cast: Gesture = { chest: -15, pelvis: 8, arm: -120, elbow: -30, leftArm: -115, leftElbow: -20, head: -12 };
 const brace: Gesture = { chest: 28, pelvis: 12, arm: -50, elbow: -30, leftArm: -70, leftElbow: -25, head: -15, thigh: 38, knee: -65, leftThigh: -35 };
+const burrowRake: readonly Gesture[] = [
+  { chest: 75, pelvis: 35, lean: 25, arm: -185, elbow: 20, leftArm: -185, head: -25, thigh: 65, knee: -80, leftThigh: -55 },
+  { chest: -45, pelvis: -15, lean: -15, arm: 0, elbow: 20, leftArm: 0, thigh: -10, leftThigh: 10 },
+  { chest: -40, pelvis: -25, lean: -20, arm: -200, elbow: 20, leftArm: -200, thigh: -20, leftThigh: 20 },
+];
 const actions: Action[] = [];
 const normals: readonly [HeroPose, AttackStyle, Gesture, readonly [number, number]][] = [
   ["jab", AttackStyle.jab, { ...forward, chest: 25, arm: -80, elbow: 45, lean: 20 }, [31, 42]],
@@ -176,6 +181,19 @@ for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
         const keys = donor.Keys.filter(k => k.Frame >= sequence.Interval[0]! && k.Frame <= sequence.Interval[1]!);
         const selected = keys.findLast(k => k.Frame <= time) ?? keys[0];
         if (selected) Vector = selected.Vector.slice();
+        if (frame >= 24 && path.endsWith(".Translation")) Vector = first.Vector.slice();
+        if (node && (frame < 10 || frame >= 24)) {
+          const poses = burrowRake.map(g => { const [y, z] = joint(node.Name, g); return rotated(first.Vector, y, z); });
+          Vector = frame <= 22 ? blend(first.Vector, poses[0]!, frame / 22)
+            : frame <= 24 ? blend(poses[0]!, poses[1]!, (frame - 22) / 2)
+            : frame <= 28 ? blend(poses[1]!, poses[2]!, (frame - 24) / 4)
+            : frame <= 30 ? poses[2]!.slice()
+            : blend(poses[2]!, first.Vector, (frame - 30) / (action.frames - 30));
+        }
+        if (frame >= 23) {
+          const alpha = /^\.GeosetAnims\.(\d+)\.Alpha$/.exec(path);
+          if (alpha) Vector = new Float32Array([source.GeosetAnims[Number(alpha[1])]!.GeosetId < 3 ? 1 : 0]);
+        }
       }
       if (node && action.pose !== "sideSpecial") { let [y, z] = joint(node.Name, action.gesture); y = node.Name === "Bone_Root" && action.roll ? frame / action.frames * 360 * action.roll : y * amount(frame);
         if (node.Name === "Bone_Root" && (action.pose === "getUp" || action.pose === "getUpAttack" || action.pose.startsWith("getUpRoll"))) y += 85 * Math.max(0, 1 - frame / action.contact);
@@ -262,12 +280,18 @@ for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
       if (key.InTan) { key.InTan = key.Vector.slice(); key.OutTan = key.Vector.slice(); }
     });
   }
+  if (action.pose === "sideSpecial") for (const frame of phaseFrames) {
+    const key = root.Translation.Keys.find(k => k.Frame === start + Math.round(frame * 1000 / 60))!;
+    const drive = frame <= 22 ? -frame / 22 : frame <= 25 ? -1 + 2 * (frame - 22) / 3 : Math.max(0, (34 - frame) / 9);
+    key.Vector[0] += 42 * drive;
+    if (key.InTan) { key.InTan = root.Translation.LineType === mdx.LineType.Bezier ? key.Vector.slice() : new Float32Array(3); key.OutTan = key.InTan.slice(); }
+  }
   const drawn = new DrawnModel(generateMDX(model), 1);
   for (const frame of phaseFrames) {
     const triangles = drawn.triangles(index, frame / 60, 1); let lowest = Infinity;
     for (let i = 1; i < triangles.length; i += 2) lowest = Math.min(lowest, triangles[i]!);
     const key = root.Translation.Keys.find(k => k.Frame === start + Math.round(frame * 1000 / 60))!;
-    if (!action.air && action.pose !== "sideSpecial") { key.Vector[2] = key.Vector[2]! - lowest; if (key.InTan) { key.InTan = root.Translation.LineType === mdx.LineType.Bezier ? key.Vector.slice() : new Float32Array(3); key.OutTan = key.InTan.slice(); } }
+    if (!action.air && (action.pose !== "sideSpecial" || frame >= 23)) { key.Vector[2] = key.Vector[2]! - lowest; if (key.InTan) { key.InTan = root.Translation.LineType === mdx.LineType.Bezier ? key.Vector.slice() : new Float32Array(3); key.OutTan = key.InTan.slice(); } }
   }
   const victim = /^victim(Pummel|Throw)/.test(action.pose);
   const binding = `{ index: ${index}, seconds: ${seconds(victim ? 1 : (end - start) / 1000)}, aligned: true${action.paired ? `, contact: ${seconds(victim ? 0.5 : action.contact / 60)}` : ""} }`;
