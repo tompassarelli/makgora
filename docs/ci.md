@@ -97,8 +97,10 @@ The existing `socrates-chat post --as smashcraft-lead` and `--as alerts` route
 spools the same job/runner/elapsed line to the lead room and
 `#socrates-alerts`. A successful command records local spool acceptance; the
 relay's `socrates-chat log` proves delivery. No workflow secret or new
-messaging integration is needed. Start the reviewed command under a local
-supervisor only after its routing is live. The command defaults to observation;
+messaging integration is needed. Production runs through the Tom-only systemd
+user units in `tools/job-watchdog/`, with Tom's home and alert spool, never
+inside the Codex sandbox or a root service. Start the reviewed timer only after
+its routing is live. The command defaults to observation;
 `--apply` requires checked current main. An explicitly scoped `--probe-run`
 allows only the owned `codex/autoland-job-watchdog` branch.
 

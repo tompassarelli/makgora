@@ -1,0 +1,12 @@
+[Unit]
+Description=Refresh the Smashcraft watchdog baseline twice daily
+ConditionUser=tom
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=12h
+AccuracySec=1min
+
+[Install]
+WantedBy=timers.target
+

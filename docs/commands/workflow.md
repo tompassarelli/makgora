@@ -76,5 +76,6 @@ Autoland/farm-test job timing cache. `--once` prints measured overruns without
 changing GitHub. After review and landing, `--apply` monitors every 20 seconds,
 cancels only a run containing a running job past twice its comparable median,
 and retries that qualifying run once on hosted runners. `--help` lists the state
-and isolated probe options. Keep a supervisor responsible for the monitor;
-refresh the baseline daily before it reaches its 24-hour freshness limit.
+and isolated probe options. The Tom-only systemd user units and installation
+procedure in `tools/job-watchdog/README.md` supervise the production monitor
+outside the Codex sandbox and refresh its baseline every twelve hours.
