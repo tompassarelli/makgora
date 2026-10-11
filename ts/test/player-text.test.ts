@@ -8,7 +8,7 @@ import { expect, test } from "bun:test";
 import { testHeadless } from "./headless";
 import type { HeadlessClient } from "wisp/src/headless/client";
 import type { Lockstep } from "wisp/src/headless/lockstep";
-import { Phase, holdingStart } from "../src/game/match/rules";
+import { Phase, characterReady, holdingStart } from "../src/game/match/rules";
 import { CURRENT_BUILD, INTEGRITY_BUILD, PLAYABLE_BUILD } from "../src/game/shell/currentBuild";
 import { install as installPlayable, start as startPlayable } from "../src/platform/playableMain";
 import { Key } from "../src/platform/shell/keyEvents";
@@ -16,8 +16,8 @@ import { panelActions } from "../src/platform/shell/menus";
 import { shell } from "../src/platform/shell/state";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { RESULTS_DELAY_FRAMES } from "../src/game/render/matchPresentation";
-import { rosterGrid } from "../src/game/menu/selectionGrid";
-import { readyChipSize } from "../src/game/menu/selectionDrag";
+import { cellRect, rosterGrid } from "../src/game/menu/selectionGrid";
+import { cardX, readyChipSize } from "../src/game/menu/selectionDrag";
 import { PLAYABLE_CHARACTERS } from "../src/game/sim/heroes/registry";
 import { f32 } from "wisp/src/sim/f32";
 
@@ -57,6 +57,9 @@ class FrameView {
 
   constructor(client: HeadlessClient) {
     const { natives } = client;
+    natives.BlzGetMouseScreenPosX = () => client.mouseScreenX;
+    natives.BlzGetMouseScreenPosY = () => client.mouseScreenY;
+    natives.BlzIsMouseButtonPressed = (button: unknown) => client.heldMouseButtons.has(button);
     const created = (name: string, parentArg: number) => {
       const create = natives[name] as Native;
       natives[name] = (...args: unknown[]) => {
@@ -119,6 +122,24 @@ class FrameView {
   visible(name: string): boolean {
     const found = [...this.frames].find(([, frame]) => frame.name === name);
     return found !== undefined && this.shown(found[0]);
+  }
+
+  above(name: string, otherName: string): boolean {
+    const branch = (target: string) => {
+      const path: unknown[] = [];
+      let handle = [...this.frames].find(([, frame]) => frame.name === target)?.[0];
+      while (handle !== undefined) {
+        path.unshift(handle);
+        handle = this.frames.get(handle)?.parent;
+      }
+      return path;
+    };
+    const upper = branch(name);
+    const lower = branch(otherName);
+    let common = 0;
+    while (common < upper.length && common < lower.length && upper[common] === lower[common]) common++;
+    if (common === 0 || common === upper.length || common === lower.length) return false;
+    return (this.frames.get(upper[common])?.level ?? 0) > (this.frames.get(lower[common])?.level ?? 0);
   }
 
   clickText(client: HeadlessClient, text: string): void {
@@ -194,6 +215,36 @@ test("the playable build keeps selection chips and cursor on their screen and sh
   clients.start();
   frames(30);
   for (const { client, view } of records) view.clickText(client, "Not now");
+  const grid = rosterGrid(PLAYABLE_CHARACTERS.length);
+  const point = (x: number, y: number, down: boolean) => {
+    for (const client of clients.clients) {
+      const width = Number((client.natives.BlzGetLocalClientWidth as Native)());
+      const height = Number((client.natives.BlzGetLocalClientHeight as Native)());
+      client.mouseScreenX = (width - height * 4 / 3) / 2 + x * height / f32(0.6);
+      client.mouseScreenY = (f32(0.6) - y) * height / f32(0.6);
+      if (down) client.heldMouseButtons.add(client.natives.MOUSE_BUTTON_TYPE_LEFT);
+      else client.heldMouseButtons.delete(client.natives.MOUSE_BUTTON_TYPE_LEFT);
+    }
+    frames(2);
+    for (const { client, view } of records) {
+      const hand = `MeleeHand${client.slot}`;
+      expect(view.visible(hand)).toBe(true);
+      expect(view.above(hand, `MeleeCard${client.slot}_0`)).toBe(true);
+      expect(view.above(hand, `MeleeTile${client.slot}_0`)).toBe(true);
+      expect(view.above(hand, `MeleeChip${client.slot}_${client.slot}`)).toBe(true);
+    }
+  };
+  point(f32(0.03), f32(0.3), false);
+  point(cardX(0) + f32(0.126), f32(0.17), false);
+  point(cardX(0) + f32(0.126), f32(0.17), true);
+  const first = cellRect(grid, 0);
+  point((first.left + first.right) / 2, (first.top + first.bottom) / 2, true);
+  point((first.left + first.right) / 2, (first.top + first.bottom) / 2, false);
+  clients.everywhere(() => expect(characterReady(shell().game, 0)).toBe(true));
+  for (let index = 0; index < 100; index++) {
+    const cell = cellRect(grid, index % grid.count);
+    point((cell.left + cell.right) / 2, (cell.top + cell.bottom) / 2, false);
+  }
   for (const pixelX of [600, 800, 1000, 1000]) {
     for (const client of clients.clients) {
       client.mouseScreenX = pixelX;

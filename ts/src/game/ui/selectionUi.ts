@@ -323,7 +323,7 @@ export class SelectionPanel {
       const summary = label(root, `MeleeCpuSummary${name}`, x + f32(0.004), f32(0.139), f32(0.152), f32(0.031), f32(0.009));
       return { card, tag, mode, portrait, name: name_, status, chip, summary, settings, settingsLabel };
     });
-    this.hand = art(consoleUi(), `MeleeHand${suffix}`, "war3mapImported\\SelectionHandPinch.tga", 0.0, 0.0, HAND_WIDTH, HAND_HEIGHT);
+    this.hand = art(root, `MeleeHand${suffix}`, "war3mapImported\\SelectionHandPinch.tga", 0.0, 0.0, HAND_WIDTH, HAND_HEIGHT);
     BlzFrameSetLevel(this.hand, 30);
     BlzFrameSetVisible(this.hand, false);
     art(root, `MeleeConfirmArt${suffix}`, "war3mapImported\\SelectionAction.tga", f32(0.071), f32(0.043), f32(0.235), f32(0.037));
