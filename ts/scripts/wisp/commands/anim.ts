@@ -180,6 +180,7 @@ const score: Command = (args) => Effect.gen(function*() {
   const assets = suppliedAssets ?? assetsView(yield* readManifest());
   const entry = GENERATED.find(({ name }) => name === `anim-score-${look}`);
   if (entry === undefined) return yield* new AnimFailure({ problem: `no generator registered for ${look} scores` });
+  if (suppliedAssets === undefined && entry.available !== undefined && !entry.available()) return yield* new AnimFailure({ problem: "the pinned original clip models are not in the private input store" });
   const inputHash = suppliedAssets === undefined && !flags.has("--fighter") ? undefined : attempt("hash scored models", async () => {
     const hash = new Bun.CryptoHasher("sha256").update(fighters.map(fighterSlug).join("\n"));
     if (suppliedAssets !== undefined) {
