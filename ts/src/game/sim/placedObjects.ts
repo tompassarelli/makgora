@@ -102,13 +102,18 @@ export function advancePlacedObjects(world: Roster): void {
       const placed = placedObject(owner, animal);
       const spec = placed.spec;
       if (placed.life <= 0 || spec === undefined) continue;
+      const channeled = spec.channeled === true;
+      if (channeled && runningHeroSpecial(owner)?.placement !== spec) {
+        placed.life = 0;
+        continue;
+      }
       placeBody(placed, spec);
       for (let sourceSlot = 0; sourceSlot < PARTICIPANT_CAPACITY; sourceSlot++) {
         if (sourceSlot === ownerSlot || !isActive(world, sourceSlot)) continue;
         const source = fighterAt(world, sourceSlot);
         if (source.status.out) continue;
         const damage = f32(f32(normalStrike(placed, sourceSlot, source) + specialStrike(placed, sourceSlot, source)) + projectileStrikes(source));
-        placed.durability = f32(placed.durability - damage);
+        if (!channeled) placed.durability = f32(placed.durability - damage);
         if (damage > 0.0) staggerCompanion(placed);
       }
       placed.age++;
@@ -118,8 +123,9 @@ export function advancePlacedObjects(world: Roster): void {
       let scheduled = false;
       for (const age of spec.fireAges) if (age === placed.age) scheduled = true;
       const fires = scheduled && placed.mode === CompanionMode.follow && !inGrabContext(owner) && owner.launch.hitstun <= 0 && !owner.status.out;
-      const { shot } = spec;
-      if (fires && shot !== undefined && ownedProjectiles(owner) < HERO_PROJECTILE_CAP) {
+      const last = spec.fireAges[spec.fireAges.length - 1];
+      const shot = spec.finalShot !== undefined && placed.age === last ? spec.finalShot : spec.shot;
+      if (fires && shot !== undefined && (channeled || ownedProjectiles(owner) < HERO_PROJECTILE_CAP)) {
         const x = f32(placed.x + f32(placed.direction * shot.offsetX));
         spawnHeroProjectileAt(owner, shot, x, f32(placed.z + shot.offsetZ), placed.direction, false, owner.attack.serial + 1);
       }

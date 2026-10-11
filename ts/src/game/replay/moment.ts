@@ -385,6 +385,8 @@ function authoredParts(specials: Readonly<FighterSpecials>, projectiles: Map<str
     if (special.placement !== undefined) {
       placements.set(specialPlacementCanonical(special.placement, ""), special.placement);
       projectile(special.placement.shot);
+      projectile(special.placement.finalShot);
+      projectile(special.placement.mark);
     }
     for (const followUp of special.followUps ?? []) move(followUp.special);
   };

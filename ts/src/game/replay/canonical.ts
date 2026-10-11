@@ -297,6 +297,10 @@ export function specialPlacementCanonical(spec: Readonly<SpecialPlacement>, pref
   int("life", spec.life);
   for (let index = 0; index < spec.fireAges.length; index++) int(`fireAge[${index}]`, at(spec.fireAges, index));
   if (spec.shot !== undefined) result.push(specialProjectileCanonical(spec.shot, `${prefix}.shot`));
+  if (spec.finalShot !== undefined) result.push(specialProjectileCanonical(spec.finalShot, `${prefix}.finalShot`));
+  if (spec.mark !== undefined) result.push(specialProjectileCanonical(spec.mark, `${prefix}.mark`));
+  if (spec.outwardPair === true) int("outwardPair", 1);
+  if (spec.channeled === true) int("channeled", 1);
   const partner = spec.companion;
   if (partner !== undefined) {
     if (partner.behavior !== undefined) int("companion.behavior", partner.behavior === "sentry" ? 1 : 2);

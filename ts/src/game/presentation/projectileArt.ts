@@ -41,6 +41,8 @@ function formProjectiles(special: AuthoredSpecial | undefined, into: SpecialProj
     if (projectile.expiresInto !== undefined) into.push(projectile.expiresInto);
   }
   if (special.placement?.shot !== undefined) into.push(special.placement.shot);
+  if (special.placement?.finalShot !== undefined) into.push(special.placement.finalShot);
+  if (special.placement?.mark !== undefined) into.push(special.placement.mark);
   if (special.burst !== undefined) into.push(special.burst.from, special.burst.into);
   for (const followUp of special.followUps ?? []) formProjectiles(followUp.special, into);
 }

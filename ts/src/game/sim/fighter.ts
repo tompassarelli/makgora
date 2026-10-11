@@ -770,14 +770,14 @@ export function createFighter(character: Character, startX: number, facing: numb
     status: { offscreenFrames: 0, damage: 0.0, stocks: STARTING_STOCKS, respawn: 0, out: false, invincible: 0, frozenFrames: 0, freezeImmunityFrames: 0, armorFrames: 0, armorMaxDamage: 0.0, armorChills: false, condition: 0, conditionFrames: 0, conditionGroup: 0, conditionImmunityFrames: 0, conditionImmunity: [0, 0, 0], divineFrames: 0, poisonFrames: 0, poisonEvery: 0, poisonDamage: 0.0, buff: 0, buffFrames: 0 },
     mana: { points: 0 },
     placed: createPlacedObject(),
-    pack: packFrom(spares, character === Character.beastmaster ? PACK_CAPACITY : 0),
+    pack: packFrom(spares, character === Character.beastmaster || character === Character.shadowHunter ? PACK_CAPACITY : 0),
   };
   PACK_SPARES.set(fighter, spares);
   initializeInfluenceOperands(fighter);
   return fighter;
 }
 
-/** Animals a pack holds at most: a Beastmaster's quilbeast and hawk. */
+/** Animals a pack holds at most: a Beastmaster's quilbeast and hawk, or a Shadow Hunter's two Big Bad Voodoo wards. */
 export const PACK_CAPACITY = 2;
 
 // Every fighter keeps PACK_CAPACITY placed objects for its pack, kept out of

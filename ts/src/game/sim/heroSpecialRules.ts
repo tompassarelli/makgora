@@ -370,13 +370,20 @@ function orderCompanion(f: Fighter, order: CompanionOrder, slot = 0): void {
 
 
 function placeObject(f: Fighter, spec: Readonly<SpecialPlacement>): void {
-  const placed = placedObject(f, spec.slot);
+  placeOne(f, spec, spec.slot ?? 0, 1);
+  if (spec.outwardPair === true) placeOne(f, spec, (spec.slot ?? 0) + 1, -1);
+}
+
+function placeOne(f: Fighter, spec: Readonly<SpecialPlacement>, slot: number, side: number): void {
+  const placed = placedObject(f, slot);
   if (spec.keepExisting === true && placed.life > 0) return;
+  const facing = f.facing < 0 ? -1 : 1;
   placed.life = spec.life;
   placed.age = 0;
-  placed.x = f32(f.motion.x + f32(f.facing * spec.offsetX));
+  placed.x = f32(f.motion.x + f32(f32(f.facing * side) * spec.offsetX));
   placed.z = f32(f.motion.z + (spec.offsetZ ?? 0.0));
-  placed.direction = f.facing < 0 ? -1 : 1;
+  placed.direction = spec.outwardPair === true ? facing * side : facing;
+  if (spec.mark !== undefined) spawnHeroProjectileAt(f, spec.mark, placed.x, f32(placed.z + spec.mark.offsetZ), placed.direction, false, f.attack.serial + 1);
   placed.durability = spec.durability;
   placed.serial++;
   placed.spec = spec;
