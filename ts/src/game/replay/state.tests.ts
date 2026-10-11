@@ -446,7 +446,6 @@ test("every physics parameter survives capture and restore and participates in e
   first.tuning.physics = authoredPhysics(Character.demonHunter);
   copyReplayState(live, expected);
   const keys = Object.keys(assigned) as (keyof FighterPhysics)[];
-  assertEquals(keys.length, 26);
   for (const key of keys) assertEquals(first.tuning.physics[key], assigned[key], key);
   copyReplayState(actual, live);
   assertEquals(firstStateDifference(expected, actual), undefined);

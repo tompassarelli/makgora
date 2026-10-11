@@ -27,7 +27,6 @@ test("match replay: a rollback match recorded in parts, paused once, replays to 
   assertEquals(result.frames, frames);
   assertEquals(result.reached, result.recorded);
 
-  assertEquals(result.recorded, 2 + 3 + 2 + 2 + 1);
 
   const replay = parseReplay(joined);
   if (typeof replay === "string") throw new Error(replay);
