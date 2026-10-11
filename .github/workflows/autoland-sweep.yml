@@ -68,7 +68,7 @@ jobs:
           done | jq -c . | while read -r run; do
             case "$(jq -r .status <<< "$run")" in
               queued | in_progress) gh api "repos/$GH_REPO/actions/runs/$(jq -r .id <<< "$run")/jobs?per_page=100" \
-                --jq '[.jobs[] | {status, created: .created_at, started: .started_at, labels}]' | jq -c --argjson run "$run" '$run + {jobs: .}' ;;
+                --jq '[.jobs[] | {name, status, created: .created_at, started: .started_at, labels}]' | jq -c --argjson run "$run" '$run + {jobs: .}' ;;
               *) jq -c '. + {jobs: []}' <<< "$run" ;;
             esac
           done | jq -s . > runs.json

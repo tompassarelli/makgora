@@ -26,8 +26,12 @@ landing restarts another's suites.
    finds a slot free, so no run waits on a busy slot. A test run is: the tip rebased onto main, the pre-push gate
    (smashcraft:ts/scripts/prePush.ts) on a scratch `farm/autoland-SHA`
    branch and the farm test workflow, which runs every check main's CI runs.
-   Tests run in two slots of one farm run each, outside the landing queue, so
-   a red tip gets its failed status and run summary within minutes. A
+   Tests run in three slots of one farm run each, outside the landing queue;
+   a plan starts a test only while Autoland's queued and running hosted jobs
+   plus the new run's 16 stay within 32 of the account's 40 (a test or train
+   run with no `suite /` job yet counts 16), and logs "Autoland hosted jobs:
+   N/32" in its summary. The train is never held by that budget.
+   Because tests run outside the landing queue, a red tip gets its failed status and run summary within minutes. A
    conflicting tip, or one that changes `.github/workflows/` (the workflow
    token can't push those), is refused. A green tip becomes "passed alone on
    MAIN as tree TREE".

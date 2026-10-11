@@ -30,7 +30,7 @@ permissions:
   actions: write
   statuses: write
 
-# Two test slots of one farm run each (8 jobs) and one train at a time, so Autoland holds at most 3 of the account's 20 jobs' farm runs.
+# Three test slots and one train; plan starts a test only while Autoland's hosted jobs stay within JOB_BUDGET of the account's 40 (ts/scripts/autolandCore.ts).
 concurrency:
   group: ${{ github.event_name == 'push' && format('autoland-push-{0}', github.ref) || inputs.test && format('autoland-test-{0}', inputs.slot) || inputs.train && 'autoland-train' || 'autoland-plan' }}
   cancel-in-progress: false
@@ -392,8 +392,15 @@ jobs:
           fi
           for state in requested pending waiting queued in_progress; do
             gh api "repos/$GH_REPO/actions/workflows/autoland.yml/runs?status=$state&per_page=100" \
-              --jq ".workflow_runs[] | select(.id != $GITHUB_RUN_ID) | {title: .display_title, status}"
+              --jq ".workflow_runs[] | select(.id != $GITHUB_RUN_ID) | {id, title: .display_title, status}"
+          done | jq -c . | while read -r run; do
+            case "$(jq -r .status <<< "$run")" in
+              queued | in_progress) gh api "repos/$GH_REPO/actions/runs/$(jq -r .id <<< "$run")/jobs?per_page=100" \
+                --jq '[.jobs[] | {name, status, created: .created_at, started: .started_at, labels}]' | jq -c --argjson run "$run" '$run + {jobs: .}' ;;
+              *) jq -c '. + {jobs: []}' <<< "$run" ;;
+            esac
           done | jq -s . > runs.json
+          echo "Autoland hosted jobs: $(bun ts/scripts/autoland.ts busy --runs runs.json)" >> "$GITHUB_STEP_SUMMARY"
           bun ts/scripts/autoland.ts plan --lanes lanes.json --runs runs.json --retry "$RETRY" > plan.tsv
           while IFS=$'\t' read -r -u 3 action branch tip slot; do
             if [ "$action" = test ] && [[ " $RETRY " != *" $branch "* ]]; then

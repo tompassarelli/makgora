@@ -1,9 +1,11 @@
-export const TEST_SLOTS = 2;
+export const TEST_SLOTS = 3;
+export const JOB_BUDGET = 32;
+export const RUN_PEAK = 16;
 export const TRAIN_CAP = 4;
 
 export interface Status { readonly state: string; readonly description: string; readonly at: string }
 export interface Lane { readonly branch: string; readonly tip: string; readonly status: Status | null; readonly labels?: readonly string[] }
-export interface Job { readonly status: string; readonly created: string; readonly started: string | null; readonly labels: readonly string[] }
+export interface Job { readonly name?: string; readonly status: string; readonly created: string; readonly started: string | null; readonly labels: readonly string[] }
 export interface Run { readonly title: string; readonly status: string; readonly id?: number; readonly created?: string; readonly jobs?: readonly Job[] }
 
 export const QUEUED = "queued";
@@ -38,8 +40,17 @@ const byArrival = (lanes: readonly Lane[]): Lane[] => lanes.toSorted((a, b) => p
 export interface TestOrder { readonly branch: string; readonly tip: string; readonly slot: number }
 export interface Plan { readonly test: readonly TestOrder[]; readonly train: boolean }
 
+const SUITE_JOB = /^suite \//;
+
+export const busy = (runs: readonly Run[]): number => runs.filter((run) => run.status !== "completed").reduce((sum, run) => {
+  const jobs = run.jobs ?? [];
+  const held = jobs.filter((job) => (job.status === "queued" || job.status === "in_progress") && job.labels.every((label) => HOSTED.test(label))).length;
+  return sum + ((TEST_TITLE.test(run.title) || run.title === TRAIN_TITLE) && !jobs.some((job) => SUITE_JOB.test(job.name ?? "")) ? Math.max(held, RUN_PEAK) : held);
+}, 0);
+
 export function plan(lanes: readonly Lane[], runs: readonly Run[], retry: readonly string[] = []): Plan {
   const retried = new Set(retry);
+  const held = busy(runs);
   const free = Array.from({ length: TEST_SLOTS }, (_, slot) => slot).filter((slot) => !runs.some((run) => run.status !== "completed" && TEST_TITLE.exec(run.title)?.[1] === String(slot)));
   const test: TestOrder[] = [];
   let passed = false;
@@ -47,6 +58,7 @@ export function plan(lanes: readonly Lane[], runs: readonly Run[], retry: readon
     const state = laneState(lane, runs, retried);
     passed ||= state === "passed";
     if (state !== "test") continue;
+    if (held + RUN_PEAK * (test.length + 1) > JOB_BUDGET) continue;
     const slot = free.shift();
     if (slot === undefined) continue;
     test.push({ branch: lane.branch, tip: lane.tip, slot });
