@@ -19,6 +19,16 @@ const DEFILE_DECAY = "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTar
 const DEFILE_FROST = "Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdx";
 
 
+interface Risen {
+  readonly x: number;
+  readonly z: number;
+  readonly radius: number;
+  readonly yaw: number;
+  readonly scale: number;
+  readonly draw: (typeof PROJECTILE_DRAW_OFFSETS)[string];
+  readonly fills: readonly number[];
+}
+
 interface Pool {
   readonly path: string;
   readonly drawn: string;
@@ -40,6 +50,7 @@ export class ProjectilePresentation {
   private readonly specs: (Fighter["projectiles"][number]["spec"])[] = [];
   private readonly lives: number[] = [];
   private readonly lingering: number[] = [];
+  private readonly risen: (Risen | undefined)[] = [];
   private parked: ParkedFlags | undefined;
   private readonly definitive: boolean;
   private readonly aimedShot: lightning[] = [];
@@ -133,6 +144,40 @@ export class ProjectilePresentation {
 
 
 
+
+  private placeRisen(slot: number, born: boolean, paused: boolean): void {
+    const model = this.models[slot], placed = this.risen[slot];
+    if (model === undefined || placed === undefined) return;
+    const draw = placed.draw;
+    const width = this.definitive ? f32(87.606247) : f32(37.988001);
+    const height = this.definitive ? f32(353.993782) : f32(636.061981);
+    const centerX = this.definitive ? f32(0.337811) : f32(-0.3387);
+    const centerZ = this.definitive
+      ? born ? paused ? f32(-198.454501) : f32(-146.291377) : f32(133.889278)
+      : born ? f32(-389.412987) : f32(29.882828);
+    const scaleX = f32(f32(f32(2.0 * placed.radius) / width) * (draw?.width ?? 1.0));
+    const scaleZ = f32(f32(f32(2.0 * placed.radius) / height) * (draw?.height ?? 1.0));
+    const x = this.origin.x + f32(placed.x - f32(centerX * scaleX));
+    const z = this.origin.z + f32(placed.z - f32(centerZ * scaleZ)) + (draw?.z ?? 0.0);
+    BlzResetSpecialEffectMatrix(model);
+    BlzSetSpecialEffectMatrixScale(model, scaleX, 1.0, scaleZ);
+    BlzSetSpecialEffectPosition(model, x, this.origin.y, z);
+    for (let index = 0; index < placed.fills.length; index++) {
+      const fillSlot = placed.fills[index];
+      const fill = fillSlot === undefined ? undefined : this.models[fillSlot];
+      const offset = draw?.fill?.[index];
+      if (fill === undefined || offset === undefined) continue;
+      BlzResetSpecialEffectMatrix(fill);
+      BlzSetSpecialEffectYaw(fill, placed.yaw);
+      BlzSetSpecialEffectMatrixScale(fill, scaleX, 1.0, scaleZ);
+      BlzSetSpecialEffectPosition(fill, x + f32(offset.x * placed.radius), this.origin.y, z + f32(offset.z * placed.radius));
+      BlzSetSpecialEffectScale(fill, placed.scale);
+      BlzSetSpecialEffectAlpha(fill, 255);
+      if (born) BlzSetSpecialEffectAnimation(fill, "birth");
+      BlzSetSpecialEffectTime(fill, f32(0.3));
+      BlzSetSpecialEffectTimeScale(fill, paused ? 0.0 : this.definitive ? 1.0 : 0.0);
+    }
+  }
 
   private poolOf(fighter: Readonly<Fighter>, index: number): Pool | undefined {
     const projectile = fighter.projectiles[index];
@@ -233,37 +278,13 @@ export class ProjectilePresentation {
       if (!paused && projectile !== undefined) this.lives[slot] = projectile.life;
       if (risen) {
         this.lingering[slot] = 4;
-        const width = this.definitive ? f32(87.606247) : f32(37.988001);
-        const height = this.definitive ? f32(353.993782) : f32(636.061981);
-        const centerX = this.definitive ? f32(0.337811) : f32(-0.3387);
-        const centerZ = this.definitive
-          ? born ? paused ? f32(-198.454501) : f32(-146.291377) : f32(133.889278)
-          : born ? f32(-389.412987) : f32(29.882828);
-        const scaleX = f32(f32(f32(2.0 * pose.dangerRadius) / width) * (draw?.width ?? 1.0));
-        const scaleZ = f32(f32(f32(2.0 * pose.dangerRadius) / height) * (draw?.height ?? 1.0));
-        const x = this.origin.x + f32(pose.x - f32(centerX * scaleX));
-        const z = this.origin.z + f32(pose.z - f32(centerZ * scaleZ)) + (draw?.z ?? 0.0);
-        BlzResetSpecialEffectMatrix(model);
-        BlzSetSpecialEffectMatrixScale(model, scaleX, 1.0, scaleZ);
-        BlzSetSpecialEffectPosition(model, x, this.origin.y, z);
-        const fills = pool?.fills[pool.effects.indexOf(slot)] ?? [];
-        for (let index = 0; index < fills.length; index++) {
-          const fillSlot = fills[index];
-          const fill = fillSlot === undefined ? undefined : this.models[fillSlot];
-          const offset = draw?.fill?.[index];
-          if (fill === undefined || fillSlot === undefined || offset === undefined) continue;
+        this.risen[slot] = { x: pose.x, z: pose.z, radius: pose.dangerRadius, yaw: pose.yaw, scale: pose.modelScale * (cue?.scale ?? 1.0), draw, fills: pool?.fills[pool.effects.indexOf(slot)] ?? [] };
+        this.placeRisen(slot, born, paused);
+        for (const [index, fillSlot] of (this.risen[slot]?.fills ?? []).entries()) {
+          if (draw?.fill?.[index] === undefined) continue;
           taken[fillSlot] = true;
           this.lingering[fillSlot] = 4;
           parked[fillSlot] = false;
-          BlzResetSpecialEffectMatrix(fill);
-          BlzSetSpecialEffectYaw(fill, pose.yaw);
-          BlzSetSpecialEffectMatrixScale(fill, scaleX, 1.0, scaleZ);
-          BlzSetSpecialEffectPosition(fill, x + f32(offset.x * pose.dangerRadius), this.origin.y, z + f32(offset.z * pose.dangerRadius));
-          BlzSetSpecialEffectScale(fill, pose.modelScale * (cue?.scale ?? 1.0));
-          BlzSetSpecialEffectAlpha(fill, 255);
-          if (born) BlzSetSpecialEffectAnimation(fill, "birth");
-          BlzSetSpecialEffectTime(fill, f32(0.3));
-          BlzSetSpecialEffectTimeScale(fill, paused ? 0.0 : this.definitive ? 1.0 : 0.0);
         }
       }
       if (born && projectile !== undefined && (risen || tell || defile)) {
@@ -291,6 +312,7 @@ export class ProjectilePresentation {
         BlzSetSpecialEffectTime(model, f32(Math.max(0, age - (projectile.spec.activeFrom ?? 0)) / 60));
         BlzSetSpecialEffectTimeScale(model, paused ? 0.0 : 1.0);
         if (!pose.armed) taken[slot] = false;
+        else this.lingering[slot] = 1;
       }
       const boundaries = pool?.boundaries[pool.effects.indexOf(slot)] ?? [];
       for (let layer = 0; layer < boundaries.length; layer++) {
@@ -321,13 +343,15 @@ export class ProjectilePresentation {
           if (defile) {
             BlzResetSpecialEffectMatrix(boundary);
             BlzSetSpecialEffectRoll(boundary, f32(Math.PI * 0.5));
-            BlzSetSpecialEffectMatrixScale(boundary, 1.0, f32(1.0 / f32(0.6)), 1.0);
+            // Warcraft may apply matrix scale before or after the roll, so the rim's 0.6 height is stretched on Y and Z alike.
+            BlzSetSpecialEffectMatrixScale(boundary, 1.0, f32(1.0 / f32(0.6)), f32(1.0 / f32(0.6)));
           }
           const frost = fighter?.character === Character.lich;
           BlzSetSpecialEffectColor(boundary, frost || defile ? 155 : pose.armed ? 170 + 85 * pose.poolPulse : 70, frost || defile ? 210 : pose.armed ? 75 + 180 * pose.poolPulse : 65, frost || defile ? 255 : pose.armed ? 255 : 100);
           BlzSetSpecialEffectAlpha(boundary, pose.armed ? 255 : defile ? 96 : 160);
           if (!this.visible[boundarySlot]) BlzSetSpecialEffectTime(boundary, 0.0);
           BlzSetSpecialEffectTimeScale(boundary, 0.0);
+          if (defile && pose.armed) this.lingering[boundarySlot] = 1;
         }
       }
     }
@@ -337,6 +361,7 @@ export class ProjectilePresentation {
       if (!playing || fighter === undefined || fighter.status.out) this.lingering[index] = 0;
       else if (taken[index] !== true && remaining > 0) {
         taken[index] = true;
+        if (!paused && remaining === 4 && this.risen[index] !== undefined) this.placeRisen(index, false, false);
         if (!paused) this.lingering[index] = remaining - 1;
       }
       this.visible[index] = taken[index] === true;
