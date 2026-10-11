@@ -151,6 +151,8 @@ any run where:
 - a test run waited more than 5 minutes for its slot, or another run waited
   more than 5 minutes with nothing running in its concurrency group.
 
+The sweep and heartbeat also list unfinished Farm test runs (each requested or finished one starts a sweep) and cancel them on the same job, run and pending bounds without requeueing, so `bun wisp farm test --wait` in safe-push fails within a minute with no summary instead of holding the landing lock.
+
 Once the cancelled runs finish, and on every sweep while lanes are pending
 and no plan is unfinished, the sweep dispatches a plan, which tests
 their lanes again in free slots and starts a train for tips that passed.

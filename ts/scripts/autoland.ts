@@ -37,7 +37,7 @@ if (import.meta.main) {
   } else if (command === "train") {
     for (const lane of train(readList(values.lanes, isLane))) console.log([lane.branch, lane.tip, lane.base, lane.tree].join("\t"));
   } else if (command === "sweep") {
-    for (const cancel of stuckRuns(readList(values.runs, isRun), Date.parse(values.now ?? new Date().toISOString()))) console.log([cancel.id, cancel.force, cancel.reason, cancel.title].join("\t"));
+    for (const cancel of stuckRuns(readList(values.runs, isRun), Date.parse(values.now ?? new Date().toISOString()))) console.log([cancel.id, cancel.force, cancel.replan, cancel.reason, cancel.title].join("\t"));
   } else if (command === "stalled") {
     console.log(stalled(readList(values.lanes, isLane), values.landed ?? "", Date.parse(values.now ?? new Date().toISOString())));
   } else if (command === "loop") {

@@ -29,15 +29,15 @@ jobs:
           busy() {
             local runs lanes
             runs=0
-            for state in requested pending waiting queued in_progress; do
-              runs=$(( runs + $(gh api "repos/$GH_REPO/actions/workflows/autoland.yml/runs?status=$state&per_page=1" --jq .total_count) ))
-            done
+            for workflow in autoland.yml farm-test.yml; do for state in requested pending waiting queued in_progress; do
+              runs=$(( runs + $(gh api "repos/$GH_REPO/actions/workflows/$workflow/runs?status=$state&per_page=1" --jq .total_count) ))
+            done; done
             lanes=$(gh api graphql --paginate -F owner="${GH_REPO%/*}" -F name="${GH_REPO#*/}" -f query='
               query($owner: String!, $name: String!, $endCursor: String) { repository(owner: $owner, name: $name) {
               refs(refPrefix: "refs/heads/claude/", first: 100, after: $endCursor) { pageInfo { hasNextPage endCursor }
               nodes { target { ... on Commit { status { context(name: "autoland") { state } } } } } } } }' \
               --jq '.data.repository.refs.nodes[] | select(.target.status.context.state == "PENDING") | 1' | wc -l)
-            echo "$(date -u +%H:%M:%SZ) $runs unfinished Autoland runs, $lanes lanes pending"
+            echo "$(date -u +%H:%M:%SZ) $runs unfinished Autoland and Farm test runs, $lanes lanes pending"
             [ "$runs" -gt 0 ] || [ "$lanes" -gt 0 ]
           }
           while true; do

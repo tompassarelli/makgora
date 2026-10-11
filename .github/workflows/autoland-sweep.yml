@@ -3,7 +3,7 @@ name: Autoland sweep
 on:
   workflow_run:
     workflows: [Autoland, Farm test]
-    types: [completed]
+    types: [requested, completed]
   schedule:
     - cron: "*/5 * * * *"
   workflow_dispatch:
@@ -62,10 +62,10 @@ jobs:
             echo "A sweep finished at $last, under 2 minutes ago: nothing to do" >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
-          for state in requested pending waiting queued in_progress; do
-            gh api "repos/$GH_REPO/actions/workflows/autoland.yml/runs?status=$state&per_page=100" \
+          for workflow in autoland.yml farm-test.yml; do for state in requested pending waiting queued in_progress; do
+            gh api "repos/$GH_REPO/actions/workflows/$workflow/runs?status=$state&per_page=100" \
               --jq '.workflow_runs[] | {id, title: .display_title, status, created: .created_at}'
-          done | jq -c . | while read -r run; do
+          done; done | jq -c . | while read -r run; do
             case "$(jq -r .status <<< "$run")" in
               queued | in_progress) gh api "repos/$GH_REPO/actions/runs/$(jq -r .id <<< "$run")/jobs?per_page=100" \
                 --jq '[.jobs[] | {name, status, created: .created_at, started: .started_at, labels}]' | jq -c --argjson run "$run" '$run + {jobs: .}' ;;
@@ -73,13 +73,15 @@ jobs:
             esac
           done | jq -s . > runs.json
           bun ts/scripts/autoland.ts sweep --runs runs.json --now "$now" > cancel.tsv
-          echo "$(jq length runs.json) unfinished Autoland runs at $now; cancelling $(grep -c . cancel.tsv || true)" >> "$GITHUB_STEP_SUMMARY"
+          echo "$(jq length runs.json) unfinished Autoland and Farm test runs at $now; cancelling $(grep -c . cancel.tsv || true)" >> "$GITHUB_STEP_SUMMARY"
           cancelled=()
-          while IFS=$'\t' read -r -u 3 id force reason title; do
+          replan=0
+          while IFS=$'\t' read -r -u 3 id force requeue reason title; do
             echo "- [$title]($GITHUB_SERVER_URL/$GH_REPO/actions/runs/$id): $reason" >> "$GITHUB_STEP_SUMMARY"
             [ "$DRY_RUN" = false ] || continue
             if gh api -X POST "repos/$GH_REPO/actions/runs/$id/$([ "$force" = true ] && echo force-cancel || echo cancel)" > /dev/null; then
               cancelled+=("$id")
+              [ "$requeue" = false ] || replan=1
             else
               echo "::warning::couldn't cancel run $id"
             fi
@@ -104,7 +106,7 @@ jobs:
           echo "main last moved at $landed; $pending lanes pending; stalled: $stalled" >> "$GITHUB_STEP_SUMMARY"
           [ "$DRY_RUN" = false ] || exit 0
           planning=$(jq '[.[] | select(.title | startswith("Autoland plan"))] | length' runs.json)
-          if [ "${#cancelled[@]}" -gt 0 ] || [ "$stalled" = true ] || { [ "$pending" -gt 0 ] && [ "$planning" = 0 ]; }; then
+          if [ "$replan" = 1 ] || [ "$stalled" = true ] || { [ "$pending" -gt 0 ] && [ "$planning" = 0 ]; }; then
             gh workflow run autoland.yml --ref main
             echo "Requeued: dispatched an Autoland plan" >> "$GITHUB_STEP_SUMMARY"
           fi

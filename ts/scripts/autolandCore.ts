@@ -11,6 +11,7 @@ export interface Run { readonly title: string; readonly status: string; readonly
 export const QUEUED = "queued";
 export const WAITING = "waiting to test alone";
 export const TRAIN_TITLE = "Autoland train";
+export const FARM_TITLE = "Farm test ";
 export const testTitle = (slot: number, branch: string, tip: string): string => `Autoland test ${slot} ${branch} ${tip}`;
 export const passedDescription = (base: string, tree: string): string => `passed alone on ${base} as tree ${tree}`;
 
@@ -116,12 +117,12 @@ export function stuck(run: Run, runs: readonly Run[], now: number): string | und
   return ran > (TEST_TITLE.test(run.title) ? BOUND.test : BOUND.run) ? `ran ${Math.round(ran)} min` : undefined;
 }
 
-export interface Cancel { readonly id: number; readonly title: string; readonly reason: string; readonly force: boolean }
+export interface Cancel { readonly id: number; readonly title: string; readonly reason: string; readonly force: boolean; readonly replan: boolean }
 
 export function stuckRuns(runs: readonly Run[], now: number): Cancel[] {
   return runs.flatMap((run) => {
     const reason = run.id === undefined ? undefined : stuck(run, runs, now);
-    return reason === undefined || run.id === undefined ? [] : [{ id: run.id, title: run.title, reason, force: run.created !== undefined && minutes(now, run.created) > BOUND.force && (run.jobs?.length ?? 0) > 0 }];
+    return reason === undefined || run.id === undefined ? [] : [{ id: run.id, title: run.title, reason, force: run.created !== undefined && minutes(now, run.created) > BOUND.force && (run.jobs?.length ?? 0) > 0, replan: !run.title.startsWith(FARM_TITLE) }];
   });
 }
 
