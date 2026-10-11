@@ -1,3 +1,5 @@
 [landing]
 	exact = true
 	queue = autoland
+[ci]
+	budget = farm-test.yml 600
