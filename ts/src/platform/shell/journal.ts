@@ -21,7 +21,7 @@ import { CATCH_UP_FRAMES } from "../../game/shell/playback";
 import { readChunk, writeLines } from "wisp/src/platform/fileio";
 import { pollMailbox, releaseMessage } from "../keyboardJournal";
 import { startInputTrace } from "./diagnostics";
-import { controlsAvailable, pollLocalKeys } from "./inputs";
+import { pollLocalKeys } from "./inputs";
 import { views } from "./ui";
 import { probeClockMs, probeFileRead, probeInput, probeIntegrity, probePoll, probeSendFinished, probeTransportSend } from "./responseProbe";
 import { type Journal, type Rollback, type ShellState, localSlot, playsOnKeyboard } from "./state";
@@ -351,11 +351,10 @@ export function publishMenu(s: ShellState): void {
   if (journal?.editbox === undefined && s.build.input.kind !== "keyboard" && s.build.input.kind !== "callback") return;
   const slot = localSlot();
   const menu = isParticipantSlot(slot) && views(s).selections[slot].cpuSettingsOpen() ? "CPU" : MENU_PHASES[s.game.phase];
-  const live = journal !== undefined && s.rollback?.active === true && journal.lifecycle?.quiescent() !== true;
-  const phase: MenuPhase = isParticipantSlot(slot) && controlsAvailable(s, slot) && menu !== undefined && !live ? menu : "BLOCKED";
+  const phase: MenuPhase = isParticipantSlot(slot) && menu !== undefined ? menu : "BLOCKED";
   const previous = s.menuPublication;
   if (previous !== undefined) previous.ticks++;
-  if (phase === previous?.phase && (phase === "BLOCKED" || previous.ticks < 15)) return;
+  if (phase === previous?.phase && previous.ticks < 15) return;
   s.menuPublication = { phase, ticks: 0 };
   const { game } = s;
   writeJournalFile(menuFile(journalIdentity(s, s.rollback?.epoch ?? 0), phase, {

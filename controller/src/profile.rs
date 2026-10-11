@@ -219,13 +219,10 @@ impl Profile for Smashcraft {
         Some(Helper { program: std::env::current_exe().ok()?, args })
     }
 
-    /// Fighter, opponent settings, stage and results menus, while the map keeps publishing them
-    /// (it refreshes an open menu every 250 ms and publishes BLOCKED for play).
     fn pointer_menu(&mut self) -> bool {
         self.tracker.menu().is_some_and(|menu| {
             self.keys.as_ref().is_none_or(|keys| keys.build == menu.build)
                 && matches!(menu.phase.as_str(), "CHARACTER" | "CPU" | "STAGE" | "RESULT")
-                && SystemTime::now().duration_since(menu.modified).is_ok_and(|age| age <= std::time::Duration::from_secs(1))
         })
     }
 
@@ -325,7 +322,7 @@ mod tests {
     }
 
     #[test]
-    fn the_pointer_drives_fresh_menus_and_never_play() {
+    fn start_keeps_menu_confirm_until_the_map_publishes_match() {
         let documents = Path::new("/prefix/Documents/Warcraft III");
         let mut profile = Smashcraft::default();
         assert!(!profile.pointer_menu());
@@ -334,8 +331,26 @@ mod tests {
             profile.tracker.observe(documents, Menu { phase: phase.into(), modified: now, ..menu("b", 0, 1, 0) });
             assert_eq!(profile.pointer_menu(), pointer, "{phase}");
         }
-        // A menu the map stopped refreshing (it closed, or the game froze) is no menu.
-        profile.tracker.observe(documents, Menu { modified: now - Duration::from_secs(2), ..menu("b", 0, 1, 0) });
+        profile.tracker.observe(documents, Menu { phase: "STAGE".into(), modified: now - Duration::from_secs(30), ..menu("b", 0, 1, 0) });
+        assert!(profile.pointer_menu());
+        use wc3_controller::{model::{Button, InputView}, service::any_map::{Driver, MenuCurve, Output}};
+        #[derive(Default)]
+        struct Recorded(Vec<(String, bool)>);
+        impl Output for Recorded {
+            fn key(&mut self, name: &str, down: bool) -> Result<(), String> { self.0.push((name.into(), down)); Ok(()) }
+            fn click(&mut self, _: bool, _: bool) -> Result<(), String> { Ok(()) }
+            fn pointer(&mut self, _: f64, _: f64) -> Result<(), String> { Ok(()) }
+        }
+        let mut driver = Driver::menu(MenuCurve::for_window_width(1888.0), true);
+        let mut output = Recorded::default();
+        let mut pad = InputView::default();
+        driver.step(&pad, true, 0.0, &mut output).unwrap();
+        pad.press(Button::Start, true);
+        driver.step(&pad, true, 0.0, &mut output).unwrap();
+        pad.press(Button::Start, false);
+        driver.step(&pad, true, 0.0, &mut output).unwrap();
+        assert_eq!(output.0, [("y".into(), true), ("y".into(), false)]);
+        profile.tracker.observe(documents, Menu { phase: "BLOCKED".into(), modified: now, ..menu("b", 0, 2, 0) });
         assert!(!profile.pointer_menu());
     }
 

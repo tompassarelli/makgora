@@ -139,6 +139,34 @@ function recordShown(clients: Lockstep, views: readonly FrameView[], shown: Set<
 
 const developerText = (text: string) => DENIED.filter((term) => text.toLowerCase().includes(term));
 
+test("all-ready controller Start advances selection and enters the match without dropping the menu publication [k1 scenario]", () => {
+  const clients = headless.clients({ install: installPlayable, start: startPlayable });
+  clients.start();
+  clients.frames(30);
+  for (const slot of [0, 1]) clients.press(slot, Key.r);
+  clients.frames(10);
+  const publication = (phase: string) => clients.everywhere(() => expect(shell().menuPublication?.phase).toBe(phase));
+  publication("CHARACTER");
+  clients.press(0, Key.y);
+  clients.frames(20);
+  publication("STAGE");
+  clients.frames(120);
+  publication("STAGE");
+  clients.press(0, Key.y);
+  for (let frame = 0; frame < 120; frame++) {
+    clients.frames(1);
+    let playing = false;
+    clients.clients[0]?.run(() => { playing = shell().game.phase === Phase.match; });
+    if (playing) break;
+  }
+  clients.everywhere(() => {
+    expect(shell().game.phase).toBe(Phase.match);
+    expect(shell().menuPublication?.phase).toBe("BLOCKED");
+  });
+  clients.frames(45);
+  clients.everywhere(() => expect(shell().menuPublication?.ticks ?? 15).toBeLessThan(15));
+});
+
 test("the playable build keeps selection chips and cursor on their screen and shows no developer text through a match and results [k3 measure docs/playable-0047.md; #346 Tom 0.0.128]", () => {
   const clients = headless.clients({ install: installPlayable, start: startPlayable });
   const records = clients.clients.map(client => ({ client, view: new FrameView(client) }));
