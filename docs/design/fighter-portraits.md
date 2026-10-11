@@ -44,6 +44,13 @@ match draws in each mode: its timeline body, whose `_de.w3mod` alias is the
 Definitive body ([#363](https://github.com/tompassarelli/smashcraft/issues/363)).
 Use `--graphics classic` or `--graphics definitive` to refresh only that set,
 and `--only NAME,...` to limit the fighters.
+Each Classic Bust also gets Wisp's portrait receipt (scene, render size, the
+crop the texture holds, texture size and parts) in `fighter-renders/receipts/`,
+stored with the family; `PORTRAIT_PARTS` in smashcraft:ts/scripts/portraitParts.ts
+names each fighter's Classic head, face, weapon and gripping-hand nodes, kept to
+the nodes its drawn body has. The headless renderer supplies them as
+`render.portraits`, so `bun wisp headless --bounds` gives each drawn bust an
+`inFrame` row (wisp#140).
 Both sets share one rule for pose, light and camera, so only the graphics
 mode differs. Each body is posed at the frame of its Stand clip whose face
 joints (nose, else eyes, else the head attachment) stand highest above its

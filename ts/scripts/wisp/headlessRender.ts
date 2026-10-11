@@ -13,6 +13,7 @@ import { INPUTS_STORE, assetsView, readManifest } from "./buildInputs";
 import { importedAssets } from "./mapInputs";
 import { runProcess } from "../hostProcess";
 import { POST_PROCESSING_FILE } from "../postProcessing";
+import { storedPortraits } from "../portraitParts";
 import { MapBuildFailure } from "wisp/scripts/wisp/mapBuild";
 import { fighterCueList, MISSING_CUE_MODEL } from "../../src/game/presentation/specialCues";
 import { allAttackCueModels } from "../../src/game/presentation/attackCues";
@@ -224,5 +225,8 @@ export function headlessRender(options: RenderAssetOptions = {}) {
     terrain: { bounds: { minX: WORLD_BOUNDS.left, maxX: WORLD_BOUNDS.right, minY: WORLD_BOUNDS.front, maxY: WORLD_BOUNDS.back }, origin: [0.0, PLAYABLE_BOUNDS.centreY] as const },
     resolveAsset,
     readAsset: (path: string, graphics: Graphics = "classic") => resolveAsset(path, graphics).then(({ bytes }) => bytes),
+    get portraits() {
+      return storedPortraits(join(options.assets ?? assetsView(Effect.runSync(readManifest())), "fighter-renders"));
+    },
   };
 }

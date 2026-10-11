@@ -12,7 +12,7 @@ import { BunServices } from "@effect/platform-bun";
 import { ChildProcess } from "effect/process";
 import { runProcess } from "../../hostProcess";
 import { type Command, UsageFailure, describeCause, flagValues } from "wisp/scripts/wisp/command";
-import { captureProcess } from "wisp/scripts/wisp/mapBuild";
+import { captureProcess } from "wisp/scripts/wisp/hostProcess";
 import { step } from "wisp/scripts/wisp/timings";
 import { type MatchReplayResult, parseReplayHeader, replayMatch } from "../../../src/game/replay/matchReplay";
 import { stockLua } from "../luaRuntimes";

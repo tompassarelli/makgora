@@ -6,7 +6,8 @@
 // --orientation only checks each portrait pose draws its head upright, without rendering.
 // Writes the raw 1024 px renders to PRIVATE_OUTPUT/{classic,definitive}/ and the
 // map's portraits to PRIVATE_OUTPUT/fighter-renders/ (Classic) and its de/
-// folder (Definitive): store that folder as the fighter-renders family.
+// folder (Definitive), with each Classic Bust's Wisp portrait receipt in
+// fighter-renders/receipts/: store that folder as the fighter-renders family.
 import { mkdirSync, readdirSync, renameSync, rmSync, symlinkSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 import { Effect, Schema } from 'effect';
@@ -14,7 +15,7 @@ import { captureScene, renderScenes, type RenderScene } from 'wisp/scripts/wisp/
 import { createStandaloneSession, NEUTRAL_INPUT } from './wisp/standalone';
 import { headlessRender } from './wisp/headlessRender';
 import { assetsView, readManifest } from './wisp/buildInputs';
-import { PORTRAIT_KINDS, type PortraitKind, RENDERED_FIGHTERS, fighterName, fighterRenderName } from '../src/game/sim/heroes/registry';
+import { PORTRAIT_KINDS, type PortraitKind, RENDERED_FIGHTERS, fighterName, fighterPortrait, fighterRenderName } from '../src/game/sim/heroes/registry';
 import { PARTICIPANT_SLOTS } from '../src/game/input/participants';
 import { CARD_TEXTURE_PX, TILE_TEXTURE_PX } from '../src/game/ui/portraitFrames';
 import { STOCK_ICON_PX } from '../src/game/ui/plateLayout';
@@ -25,6 +26,7 @@ import { originalClip, originalClipCount } from '../src/game/assets/fighterOrigi
 import { at } from 'wisp/src/runtime/lookup';
 import { STAGE_LIGHTS } from '../src/game/assets/stageLighting';
 import { bustPixels, combine, exposureFor, lightOf } from './portraitLight';
+import { RECEIPTS, resolvedParts, type PortraitReceipt } from './portraitParts';
 
 const [outputArg] = process.argv.slice(2);
 const only = process.argv.includes('--only') ? process.argv[process.argv.indexOf('--only') + 1]?.split(',') : undefined;
@@ -494,7 +496,7 @@ const TGA = ['-depth', '8', '-compress', 'none'];
  * tiles and busts frame head and shoulders around the head mesh (headBox), stock
  * icons the head alone; without a head, the silhouette's top sixth stands in.
  */
-function crops(raw: string, directory: string, name: string, suffix: string, kinds: readonly PortraitKind[], found: Head | undefined, zoom: number, shift: readonly [number, number] = [0, 0]): boolean {
+function crops(raw: string, directory: string, name: string, suffix: string, kinds: readonly PortraitKind[], found: Head | undefined, zoom: number, shift: readonly [number, number] = [0, 0]): { readonly upright: boolean; readonly bust: { readonly size: number; readonly left: number; readonly top: number } } {
   const box = run(['magick', raw, '-alpha', 'extract', '-threshold', '10%', '-format', '%@', 'info:']).trim();
   const bounds = box.match(/(\d+)x(\d+)\+(\d+)\+(\d+)/);
   if (bounds === null) throw new Error(`${raw}: nothing drawn`);
@@ -518,7 +520,7 @@ function crops(raw: string, directory: string, name: string, suffix: string, kin
     const stock = window(1.5 * head.size / zoom, 0.5);
     run(['magick', raw, '-crop', `${stock.size}x${stock.size}+${stock.left}+${stock.top}`, '+repage', '-resize', `${STOCK_ICON_PX}x${STOCK_ICON_PX}`, ...fadeAlpha(STOCK_FADE), ...TGA, file('Stock')]);
   }
-  return found === undefined || found.upright;
+  return { upright: found === undefined || found.upright, bust };
 }
 
 await Effect.runPromise(Effect.gen(function*() {
@@ -616,7 +618,23 @@ await Effect.runPromise(Effect.gen(function*() {
       // The grid keeps the neutral tile; the slot outfits carry every kind (MAP_PORTRAITS).
       const scene = required(scenes.get(frame), 'scene'), body = at(scene.effects, 0);
       const bytes = (yield* Effect.promise(() => project.resolveAsset(body.model, graphics))).bytes;
-      if (!crops(raw, into, name, suffix, kinds ?? (variant === 0 ? ['Tile'] : PORTRAIT_KINDS), bytes === undefined || required(poses.get(character), 'pose').body ? undefined : headBox(bytes, scene, required(heights.get(character), 'height'), correctionOf(graphics, character).flipped), required(poses.get(character), 'pose').zoom, correctionOf(graphics, character).shift)) upsideDown.push(`${graphics} ${name}${suffix}`);
+      const kept = kinds ?? (variant === 0 ? ['Tile'] : PORTRAIT_KINDS);
+      const cut = crops(raw, into, name, suffix, kept, bytes === undefined || required(poses.get(character), 'pose').body ? undefined : headBox(bytes, scene, required(heights.get(character), 'height'), correctionOf(graphics, character).flipped), required(poses.get(character), 'pose').zoom, correctionOf(graphics, character).shift);
+      if (!cut.upright) upsideDown.push(`${graphics} ${name}${suffix}`);
+      if (graphics === 'classic' && into === portraits && kept.includes('Bust') && bytes !== undefined) {
+        const nodes = new Set(parseMDX(bytes.slice().buffer).Nodes.flatMap((node) => node === undefined ? [] : [node.Name]));
+        const { parts, missing } = resolvedParts(name, nodes);
+        if (missing.length > 0) console.log(`${graphics} ${name}: Classic body lacks portrait parts ${missing.join(', ')}`);
+        const half = DRAWN / RESOLUTION;
+        const receipt: PortraitReceipt = {
+          path: fighterPortrait(character, 'Bust', variant - 1),
+          scene: { camera: scene.camera, effects: scene.effects, ...(scene.world === undefined ? {} : { world: scene.world }) }, width: DRAWN, height: DRAWN,
+          crop: { x: cut.bust.left * half, y: cut.bust.top * half, width: cut.bust.size * half, height: cut.bust.size * half },
+          texture: { width: TILE_TEXTURE_PX, height: TILE_TEXTURE_PX }, parts,
+        };
+        mkdirSync(join(portraits, RECEIPTS), { recursive: true });
+        yield* Effect.promise(() => Bun.write(join(portraits, RECEIPTS, `FighterBust${name}${suffix}.json`), `${JSON.stringify(receipt)}\n`));
+      }
       return raw;
     };
     // Each pass's P1 bust is drawn alone; every lighting variant, exposed to the
