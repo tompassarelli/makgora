@@ -1,19 +1,33 @@
 // The projectile rules (smashcraft:docs/gameplay-design.md, "Projectiles and
-// powershield", #98) measured on every fighter's projectiles, the original
-// three and each registered hero, through the interaction graph's projectile
-// situations (interactions.ts). A fighter that breaks a rule on purpose names a
-// departure below and in that section.
+// powershield", #98) as one table, measured as one property over every
+// fighter's projectiles, the original three and each registered hero, through
+// the interaction graph's projectile situations (interactions.ts). A fighter
+// that breaks a rule on purpose names a departure below and in that section.
 import { expect, test } from "bun:test";
 import { sweep } from "./sweep";
 import { Character } from "../src/game/sim/codes";
 import { HERO_ROSTER } from "../src/game/sim/heroes/registry";
 import { PROJECTILE_SPACINGS, outOfShieldStarts, projectileRows } from "../scripts/interactions";
 
+type Row = ReturnType<typeof projectileRows>[number];
+type Start = ReturnType<typeof outOfShieldStarts>[number];
+
 const POINT_BLANK = PROJECTILE_SPACINGS[0];
 const MIN_POWERSHIELD_PRESSES = 2;
 const MAX_TRAVELING_OUT = 3;
 const MAX_PERSISTENT_OUT = 2;
 const MAX_FLIGHT = 90;
+
+/** Each rule once: what a projectile situation that breaks it shows, or undefined. */
+const PROJECTILE_RULES: readonly { readonly rule: number; readonly broken: (row: Row) => string | undefined }[] = [
+  { rule: 1, broken: (row) => row.traveling && row.arrives !== undefined && row.powershield.length < MIN_POWERSHIELD_PRESSES ? `${row.variant}: powershield presses ${row.powershield.join(",") || "none"}` : undefined },
+  { rule: 2, broken: (row) => row.distance === POINT_BLANK && row.arrives !== undefined && !row.pokes && row.punishes.length === 0 ? `${row.variant}: no out-of-shield punish (advantage ${row.advantage})` : undefined },
+  { rule: 3, broken: (row) => row.mostOut > (row.traveling ? MAX_TRAVELING_OUT : MAX_PERSISTENT_OUT) ? `${row.mostOut} out at once` : undefined },
+  { rule: 4, broken: (row) => row.traveling && row.flight > MAX_FLIGHT ? `flies ${row.flight} frames` : undefined },
+  { rule: 5, broken: (row) => row.hitsIdle && row.powershield.length === 0 && row.answers.every((answer) => answer.starts.length === 0) ? `${row.variant}: no answer but holding shield` : undefined },
+];
+/** Rule 6: every out-of-shield option starts from shield. */
+const SHIELD_RULE = { rule: 6, broken: (start: Start) => start.start === undefined ? `${start.option} never starts from shield` : undefined };
 
 /** "fighter source rule N" to its reason; each is also named in gameplay-design.md. A departure that no longer occurs fails. */
 const DEPARTURES: Readonly<Record<string, string>> = {};
@@ -26,29 +40,23 @@ const FIGHTERS: readonly { readonly character: Character; readonly name: string 
 
 function violations(character: Character, name: string): Map<string, string> {
   const found = new Map<string, string>();
-  const add = (source: string, rule: number, detail: string): void => {
+  const add = (source: string, rule: number, detail: string | undefined): void => {
     const key = `${name} ${source} rule ${rule}`;
-    if (!found.has(key)) found.set(key, detail);
+    if (detail !== undefined && !found.has(key)) found.set(key, detail);
   };
-  for (const row of projectileRows(character, name)) {
-    if (row.traveling && row.arrives !== undefined && row.powershield.length < MIN_POWERSHIELD_PRESSES) add(row.source, 1, `${row.variant}: powershield presses ${row.powershield.join(",") || "none"}`);
-    if (row.distance === POINT_BLANK && row.arrives !== undefined && !row.pokes && row.punishes.length === 0) add(row.source, 2, `${row.variant}: no out-of-shield punish (advantage ${row.advantage})`);
-    if (row.mostOut > (row.traveling ? MAX_TRAVELING_OUT : MAX_PERSISTENT_OUT)) add(row.source, 3, `${row.mostOut} out at once`);
-    if (row.traveling && row.flight > MAX_FLIGHT) add(row.source, 4, `flies ${row.flight} frames`);
-    if (row.hitsIdle && row.powershield.length === 0 && row.answers.every((answer) => answer.starts.length === 0)) add(row.source, 5, `${row.variant}: no answer but holding shield`);
-  }
-  for (const start of outOfShieldStarts(character)) if (start.start === undefined) add("out of shield", 6, `${start.option} never starts from shield`);
+  for (const row of projectileRows(character, name)) for (const { rule, broken } of PROJECTILE_RULES) add(row.source, rule, broken(row));
+  for (const start of outOfShieldStarts(character)) add("out of shield", SHIELD_RULE.rule, SHIELD_RULE.broken(start));
   return found;
 }
 
-// The original three fighters run in the suite; every hero's rules run as sweeps.
-for (const [index, fighter] of FIGHTERS.entries()) {
-  // About 2-3 s alone; a loaded host takes a test several times that, past Bun's 5 s default.
-  (index < 2 ? test : sweep)(`${fighter.name}'s projectiles follow the projectile rules or name a departure [spec #98]`, () => {
-    const found = violations(fighter.character, fighter.name);
-    const unexpected = [...found].filter(([key]) => DEPARTURES[key] === undefined).map(([key, detail]) => `${key}: ${detail}`);
-    expect(unexpected).toEqual([]);
-    const stale = Object.keys(DEPARTURES).filter((key) => key.startsWith(`${fighter.name} `) && !found.has(key));
-    expect(stale).toEqual([]);
-  }, 30_000);
+/** Every listed fighter's breaks are declared departures, and every departure for them still occurs. */
+function followRules(fighters: readonly { readonly character: Character; readonly name: string }[]): void {
+  const found = new Map(fighters.flatMap((fighter) => [...violations(fighter.character, fighter.name)]));
+  expect([...found].filter(([key]) => DEPARTURES[key] === undefined).map(([key, detail]) => `${key}: ${detail}`)).toEqual([]);
+  expect(Object.keys(DEPARTURES).filter((key) => fighters.some((fighter) => key.startsWith(`${fighter.name} `)) && !found.has(key))).toEqual([]);
 }
+
+// The whole roster runs as a sweep; its smallest form, the original two fighters, runs in the suite.
+sweep("every fighter's projectiles follow the projectile rules or name a departure [k2 property]", () => followRules(FIGHTERS), 600_000);
+// About 1.5 s and 53,400 frames; a loaded host takes several times that, past Bun's 5 s default.
+test("the original two fighters' projectiles follow the projectile rules or name a departure [k2 property]", () => followRules(FIGHTERS.slice(0, 2)), 30_000);
