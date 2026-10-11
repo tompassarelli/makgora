@@ -73,13 +73,22 @@ its map. Compare the samples from `ts/` with
 
 The reusable pre-merge adapter is `bun scripts/premerge.ts BASE_SHA` from ts/.
 Its workflow accepts `test-selection-script`, `cli-command` (the `bun <cli>`
-prefix), `selected-tests` (a JSON array of existing test paths),
-`determinism-check`, and `farm-runner` (hosted or a warm runner; `farm-big`
+prefix, default `bun scripts/wisp.ts`), `selected-tests` (a JSON array of
+existing test paths), `determinism-check`, and `farm-runner` (hosted or a warm runner; `farm-big`
 is routed to hosted). The adapter calls `ci pre-merge --base SHA --json`,
 preserves raw stage lines in build/premerge-stages.jsonl, and uses only exit
 codes: 0 passes, 1 fails, and 75 requires the full fallback. Unsupported
-commands also require that fallback. Failed-test names may be absent.
+commands also require that fallback. Stage lines use `verdict`; failed-test
+names may be absent. Wisp's `makeCi` uses the existing dev and soak declarations
+for selection and its two soak repeats. The mandatory `determinism-check`
+workflow input must run emitted-Lua parity; a missing check returns 75.
 Without `cli-command`, the temporary stub runs `bun run check` and the
 caller-selected tests, then returns 75 even when they pass. This is not full
-gate evidence; the existing train remains active until replay acceptance
-and the Wisp integration are complete.
+gate evidence; the existing train remains active until replay acceptance.
+
+`bun wisp ci pre-merge --base SHA`, `ci post-merge`, `ci nightly --minutes M`
+and `ci seeds --n N --seed S` run the shared Wisp tiers; each accepts `--json`.
+The current Wisp pre-merge tier always runs its capped soak determinism when
+a soak is declared, including on tooling and documentation lanes.
+Smashcraft's soak runs in Bun and does not read `LUA`, so these stages compare
+two fresh Bun processes; emitted-Lua parity remains a separate check.

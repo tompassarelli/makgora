@@ -25,7 +25,8 @@ class HelperSoakFailure extends Schema.TaggedError<HelperSoakFailure>()("HelperS
 const MAX_HELPER_MATCHES = 20;
 const MAX_HELPER_SECONDS = 90;
 
-const headless = makeSoak({ project: join(import.meta.dir, "../soak.ts"), out: SOAK_OUT });
+export const SMASHCRAFT_SOAK = { project: join(import.meta.dir, "../soak.ts"), out: SOAK_OUT };
+const headless = makeSoak(SMASHCRAFT_SOAK);
 
 
 const throughHelper: Command = (args) => Effect.gen(function*() {

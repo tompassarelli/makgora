@@ -14,7 +14,7 @@ on:
         required: true
       cli-command:
         type: string
-        default: ""
+        default: "bun scripts/wisp.ts"
       selected-tests:
         type: string
         default: "[]"

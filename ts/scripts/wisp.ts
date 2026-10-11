@@ -37,6 +37,7 @@ const COMMANDS: Record<string, { readonly usage: string; readonly load: () => Pr
   headless: { usage: "headless [quick-match|desync|cpu-expert|computer-match] [--clients N] [--cost] [--journey FILE] [--render DIR --frames N...] | headless text-match [--seed N] [--you SLUG] [--cpu SLUG] [--level TIER] [--stage NAME] [--delay N] [--every N] [--frames N] [--stocks N] [--minutes N] [--input FILE]", load: async () => (await import("./wisp/commands/headless")).headless },
   soak: { usage: "soak memory [--minutes N] [--out FILE] [--native-sequence --bundle build/integrity.lua --summary native-run/summary.md] | soak handles [--rematches N] | soak [--matches N] [--seed N] [--workers N<=4] [--minutes N<=30] [--fighter NAME]... [--stage NAME]... [--policy NAME]... [--out DIR] | --repro FILE | --helper BINARY [--matches N<=20] [--seconds S<=90] [--seed N] [--out DIR]", load: async () => (await import("./wisp/commands/soak")).soak },
   dev: { usage: "dev [--data DIR --data DIR]", load: async () => (await import("./wisp/commands/dev")).dev },
+  ci: { usage: "ci pre-merge --base SHA | post-merge | nightly [--minutes M] | seeds --n N [--seed S] [--json]", load: async () => (await import("./wisp/commands/ci")).ci },
   play: { usage: "play [--install-green | --standalone [--script FILE] [--presentation native|pool-confirmed|pool-predicted] [--headless --frames N --out DIR] [--capture-frames N,N]]   (standalone browser player, Tom's Warcraft desktop, or --install-green: build and install the newest green main without launching Warcraft)", load: async () => (await import("./wisp/commands/play")).play },
   controller: { usage: "controller   (Tom's Xbox controller for any Smashcraft session on his desktop: points the always-on controller service at main's helper, or runs it here)", load: async () => (await import("./wisp/commands/controller")).controller },
   tune: { usage: `tune --data DIR [--data DIR ...] [--port N] ${PROFILE}`, load: async () => (await import("./wisp/commands/tune")).tune },
@@ -76,7 +77,7 @@ const teardown: Teardown = (exit) => {
     if (!Cause.hasInterruptsOnly(exit.cause)) console.error(Cause.pretty(exit.cause));
     process.exit(Cause.hasInterruptsOnly(exit.cause) ? 130 : 1);
   }
-  process.exit();
+  process.exit(process.exitCode ?? 0);
 };
 
 
@@ -89,6 +90,6 @@ BunRuntime.runMain(Effect.gen(function*() {
   Effect.provide(timingsLayer((line) => console.error(line))),
   Effect.catch((failure) => Effect.sync(() => {
     console.error(failure._tag === "UsageFailure" ? `${failure.message}\nusage: bun wisp ${entry.usage}` : failure.message);
-    process.exitCode = failure._tag === "UsageFailure" ? 2 : 1;
+    process.exitCode = failure._tag === "UsageFailure" ? 2 : ("exitCode" in failure ? failure.exitCode : undefined) ?? 1;
   })),
 ), { disableErrorReporting: true, teardown });
