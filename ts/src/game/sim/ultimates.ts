@@ -120,8 +120,8 @@ const DREADLORD: AuthoredSpecial = {
   regions: [heroRegion(40, 42, capsule(260.0, 20.0, 260.0, 120.0, 100.0), hit(16.0, 80, 90.0, 45.0, HitElement.fire))],
 };
 
-const VOODOO_AURA = "Abilities\\Spells\\Orc\\CommandAura\\CommandAura.mdx";
-const VOODOO_WARD_MARK = "Abilities\\Spells\\Orc\\CommandAura\\CommandAuraTarget.mdx";
+const VOODOO_AURA = "Abilities\\Spells\\Orc\\Voodoo\\VoodooAura.mdx";
+const VOODOO_WARD_MARK = "Abilities\\Spells\\Orc\\Voodoo\\VoodooAuraTarget.mdx";
 const VOODOO_BOLT = "Abilities\\Weapons\\SerpentWardMissile\\SerpentWardMissile.mdx";
 const VOODOO_END = 105;
 const VOODOO_WARD_FRAME = 16;
