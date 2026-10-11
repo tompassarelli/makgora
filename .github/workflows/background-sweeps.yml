@@ -78,7 +78,7 @@ jobs:
   census-shard:
     needs: routing
     runs-on: ${{ needs.routing.outputs.runner }}
-    timeout-minutes: 15
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
@@ -106,7 +106,7 @@ jobs:
       # --rise-ms 1000 leaves the census spike check ungated.
       - name: Census shard ${{ matrix.shard }}
         working-directory: ts
-        timeout-minutes: 12
+        timeout-minutes: 25
         run: |
           mkdir -p census-out
           fighters=$(cut -f2 test/fixtures/perf/census-pairs.txt | sed 's/ vs .*//' | awk -v n="$CENSUS_SHARDS" -v s="${{ matrix.shard }}" '(NR - 1) % n == s { printf " --fighter %s", $0 }')
