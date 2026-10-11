@@ -282,7 +282,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: [perf, parity, corpus, policy]
+        group: [perf, parity, corpus]
     name: ${{ matrix.group }}
     steps:
       - uses: actions/checkout@v4
@@ -342,8 +342,7 @@ jobs:
             corpus)
               # Every native recording replays headless with 0 divergent frames, each on the source that recorded it (wisp#69).
               check "parity corpus: every native recording replays headless with 0 divergent frames" bun wisp parity corpus test/corpus
-              check "compiler affected-module and output-equivalence checks" env COMPILER_TIMINGS=1 bun scripts/compiler-benchmark.ts ;;
-            policy)
+              check "compiler affected-module and output-equivalence checks" env COMPILER_TIMINGS=1 bun scripts/compiler-benchmark.ts
               check "no game files or copied game scripts outside the allowlist" bun scripts/cleanRoom.ts
               check "effect-kit check" sh -c 'git clone -q --depth 1 https://github.com/tompassarelli/north "$RUNNER_TEMP/north" && cd .. && bun "$RUNNER_TEMP/north/agent-machinery/scripts/effect-kit.mjs" check'
               check "type-check edit loop and dependency validation" bun scripts/typecheck-benchmark.ts
@@ -370,10 +369,10 @@ jobs:
       fail-fast: false
       max-parallel: 8
       matrix:
-        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        shard: [0, 1, 2, 3, 4, 5, 6]
     name: census ${{ matrix.shard }}
     env:
-      CENSUS_SHARDS: 13
+      CENSUS_SHARDS: 7
     steps:
       - uses: actions/checkout@v4
         with:
@@ -398,7 +397,7 @@ jobs:
         run: |
           mkdir -p census-out
           fighters=$(cut -f2 test/fixtures/perf/census-pairs.txt | sed 's/ vs .*//' | awk -v n="$CENSUS_SHARDS" -v s="${{ matrix.shard }}" '(NR - 1) % n == s { printf " --fighter %s", $0 }')
-          bun wisp perf census $fighters --jobs 2 --rise-ms 1000 --pairs "census-out/census-pairs-${{ matrix.shard }}.txt"
+          bun wisp perf census $fighters --jobs 4 --rise-ms 1000 --pairs "census-out/census-pairs-${{ matrix.shard }}.txt"
       - if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
