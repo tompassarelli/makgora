@@ -165,6 +165,7 @@ src/game/sim/recoilAndGlide.tests.ts	1	690000	784
 src/game/sim/recovery.tests.ts	1	56000	146
 src/game/sim/runCeiling.tests.ts	1	4254000	1485
 src/game/sim/shieldBreak.tests.ts	3	3428000	2671
+src/game/sim/shieldPoke.tests.ts	1	73486000	7602
 src/game/sim/shieldTilt.tests.ts	5	283000	361
 src/game/sim/simulation.tests.ts	4	1844000	2955
 src/game/sim/slopes.tests.ts	2	2038000	638
