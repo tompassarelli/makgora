@@ -57,7 +57,7 @@ function texturePixels(frame: Frame, texture: Rgba, x: number, y: number, uiWidt
 
 const textureError = (frame: Frame, texture: Rgba, x: number, y: number, uiWidth: number, uiHeight: number) => texturePixels(frame, texture, x, y, uiWidth, uiHeight)?.error;
 
-export const cursorPixels = (frame: Frame, texture: Rgba, x: number, y: number) => texturePixels(frame, texture, handLeft(x, false), handTop(y, false), HAND_WIDTH, HAND_HEIGHT);
+const cursorPixels = (frame: Frame, texture: Rgba, x: number, y: number) => texturePixels(frame, texture, handLeft(x, false), handTop(y, false), HAND_WIDTH, HAND_HEIGHT);
 
 const cursorError = (frame: Frame, texture: Rgba, x: number, y: number) => cursorPixels(frame, texture, x, y)?.error;
 
