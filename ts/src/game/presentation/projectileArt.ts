@@ -206,6 +206,8 @@ export const DEFINITIVE_PROJECTILE_REDRAWS: { readonly [model: string]: string }
   "Abilities\\Spells\\Undead\\Impale\\ImpaleHitTarget.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Spells\\Undead\\Impale\\ImpaleMissTarget.mdl": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Spells\\Undead\\UnholyAura\\UnholyAura.mdx": "HD redraw, Definitive look not yet reviewed",
+  "Abilities\\Spells\\Undead\\Possession\\PossessionCaster.mdx": "HD redraw, Definitive look not yet reviewed",
+  "Abilities\\Spells\\Undead\\Possession\\PossessionMissile.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Weapons\\Axe\\AxeMissile.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Weapons\\Bolt\\BoltImpact.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Weapons\\BansheeMissile\\BansheeMissile.mdx": "HD redraw, Definitive look not yet reviewed",
