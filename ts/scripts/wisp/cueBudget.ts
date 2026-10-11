@@ -114,9 +114,9 @@ export interface CuePopcornPresence {
 
 const emitterReport = Schema.Struct({
   unsupportedEmitters: Schema.Array(Schema.Struct({
-    model: Schema.String, handle: Schema.Number, emitter: Schema.String, effect: Schema.String,
-    position: Schema.Tuple([Schema.Number, Schema.Number, Schema.Number]),
-    scale: Schema.Tuple([Schema.Number, Schema.Number, Schema.Number]),
+    model: Schema.String, handle: Schema.Finite, emitter: Schema.String, effect: Schema.String,
+    position: Schema.Tuple([Schema.Finite, Schema.Finite, Schema.Finite]),
+    scale: Schema.Tuple([Schema.Finite, Schema.Finite, Schema.Finite]),
     kind: Schema.String, visible: Schema.Boolean,
   })),
 });
