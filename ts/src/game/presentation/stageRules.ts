@@ -1,4 +1,5 @@
 import type { StageLight } from "../assets/stageLighting";
+import { STAGE_SNOW_MODEL } from "../assets/stageAssetInfo";
 import { luma, type DeckPalette } from "../assets/stagePalette";
 import { cosineTurns, sineTurns } from "../sim/mathTables";
 import { PATTERNED_DECKS_STAGE } from "../sim/stage";
@@ -75,7 +76,7 @@ export const SUPPORT_TOPS: Readonly<Record<string, number>> = {
 };
 
 export const isStructure = (model: string): boolean => model.toLowerCase().startsWith("buildings\\") || model.toLowerCase().includes("\\structures\\");
-const isEffect = (model: string): boolean => model.toLowerCase().startsWith("abilities\\");
+const isEffect = (model: string): boolean => model === STAGE_SNOW_MODEL || model.toLowerCase().startsWith("abilities\\");
 
 function placed(piece: SceneryPiece, box: ModelBox): Placed {
   const [mx, my, mz] = piece.matrixScale ?? [1, 1, 1];
@@ -116,8 +117,10 @@ export function landmarkProblems(name: string, pieces: readonly SceneryPiece[], 
 export function groundProblems(name: string, pieces: readonly SceneryPiece[], boundsOf: BoundsOf, ground: number | undefined): readonly string[] {
   const problems: string[] = [];
   for (const [index, piece] of pieces.entries()) {
-    if (!isStructure(piece.model) || piece.flying === true) continue;
-    if (ground !== undefined && piece.z <= ground) continue;
+    if (isEffect(piece.model) || piece.flying === true) continue;
+    const box = boundsOf(piece.model);
+    const bottom = box === undefined ? piece.z : placed(piece, box).bottom;
+    if (ground !== undefined && bottom <= ground) continue;
     const supported = pieces.some((other) => supports(other, piece, boundsOf));
     if (!supported) problems.push(`${name}: piece ${index} ${piece.model} at z ${piece.z} stands on nothing`);
   }

@@ -21,7 +21,7 @@ export const HIDDEN_EFFECT_DEPTH = 8192.0;
 export const PLAYABLE_BOUNDS = { left: -3328.0, right: 3328.0, front: -3584.0, back: 3072.0, centreY: -256.0 } as const;
 
 
-export const ARENA_CAMERA = { rotation: 90.0, angleOfAttack: 350.0, farZ: 8000.0 } as const;
+export const ARENA_CAMERA = { rotation: 90.0, angleOfAttack: 350.0, farZ: 19000.0 } as const;
 
 
 export function localCamera(target: MatchCamera, source: Readonly<MatchCamera>, stage: number, aspect: number): void {
