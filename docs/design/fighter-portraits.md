@@ -44,6 +44,17 @@ match draws in each mode: its timeline body, whose `_de.w3mod` alias is the
 Definitive body ([#363](https://github.com/tompassarelli/smashcraft/issues/363)).
 Use `--graphics classic` or `--graphics definitive` to refresh only that set,
 and `--only NAME,...` to limit the fighters.
+Every Bust texture gets a receipt in PRIVATE_OUTPUT/portrait-receipts/{classic,definitive}/,
+beside the family: Wisp's portrait receipt (scene, render size, the crop the texture holds,
+texture size and parts) plus the HUD frame's pixel rectangle for its slot (1280x720 canvas,
+96 px). `PORTRAIT_PARTS` in smashcraft:ts/scripts/portraitInFrame.ts declares each fighter's
+Classic head, face, weapon and gripping-hand nodes from its rig (smashcraft:tools/animations/hd-rigs);
+a fighter whose Classic rig names no weapon declares none. `--in-frame` scores the P1 busts
+against the lead's thresholds, fixed before any bust was scored (wisp#125 lane 7): face box
+at least 24 px tall with at least 300 face pixels; face pixels hidden by the weapon at most 2%
+of the face pixels shown; crown margin at least 2 px; at least 150 weapon pixels; and the
+gripping hand's box within 4 px of the weapon's. Where a fighter can't fit both, the clear face
+wins and the row says so.
 Both sets share one rule for pose, light and camera, so only the graphics
 mode differs. Each body is posed at the frame of its Stand clip whose face
 joints (nose, else eyes, else the head attachment) stand highest above its

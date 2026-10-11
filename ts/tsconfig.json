@@ -52,6 +52,7 @@
     "test/projectile-rules.test.ts",
     "test/rifleman-blaster.test.ts",
     "test/tavern-gameplans.test.ts",
+    "test/portrait-in-frame.test.ts",
     "test/text-match.test.ts"
   ],
   "exclude": [

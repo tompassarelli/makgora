@@ -2,8 +2,12 @@
 // Classic and once in Definitive, from the body the match draws in each mode
 // (the Definitive body resolves under _de.w3mod, docs/design/hd-fighters.md).
 // Both sets share one camera, light and pose, so only the graphics mode differs.
-// Usage: bun scripts/fighterPortraits.ts PRIVATE_OUTPUT [--only NAME,...] [--graphics classic|definitive] [--orientation]
+// Usage: bun scripts/fighterPortraits.ts PRIVATE_OUTPUT [--only NAME,...] [--graphics classic|definitive] [--orientation] [--in-frame]
 // --orientation only checks each portrait pose draws its head upright, without rendering.
+// --in-frame scores each fighter's P1 HUD bust with Wisp's inFrame against the
+// lead's thresholds (portraitInFrame.ts) and prints one row per fighter.
+// Each Bust texture's receipt (scene, render size, crop, HUD frame, parts) goes to
+// PRIVATE_OUTPUT/portrait-receipts/{classic,definitive}/, beside the family.
 // Writes the raw 1024 px renders to PRIVATE_OUTPUT/{classic,definitive}/ and the
 // map's portraits to PRIVATE_OUTPUT/fighter-renders/ (Classic) and its de/
 // folder (Definitive): store that folder as the fighter-renders family.
@@ -25,10 +29,13 @@ import { originalClip, originalClipCount } from '../src/game/assets/fighterOrigi
 import { at } from 'wisp/src/runtime/lookup';
 import { STAGE_LIGHTS } from '../src/game/assets/stageLighting';
 import { bustPixels, combine, exposureFor, lightOf } from './portraitLight';
+import { boundsModel, inFrame, type BoundsModel, type Portrait as InFramePortrait } from 'wisp/scripts/wisp/screenBounds';
+import { IN_FRAME_RULES, PORTRAIT_PARTS, type BustMeasure, boxGap, failureCause, hudBustFrame, inFrameVerdict } from './portraitInFrame';
 
 const [outputArg] = process.argv.slice(2);
 const only = process.argv.includes('--only') ? process.argv[process.argv.indexOf('--only') + 1]?.split(',') : undefined;
 const orientationOnly = process.argv.includes('--orientation');
+const scoreInFrame = process.argv.includes('--in-frame');
 const graphicsArg = process.argv.includes('--graphics') ? process.argv[process.argv.indexOf('--graphics') + 1] : undefined;
 if (graphicsArg !== undefined && graphicsArg !== 'classic' && graphicsArg !== 'definitive') throw new Error('--graphics must be classic or definitive');
 const graphicsModes: readonly ('classic' | 'definitive')[] = graphicsArg === undefined ? ['classic', 'definitive'] : [graphicsArg];
@@ -494,7 +501,7 @@ const TGA = ['-depth', '8', '-compress', 'none'];
  * tiles and busts frame head and shoulders around the head mesh (headBox), stock
  * icons the head alone; without a head, the silhouette's top sixth stands in.
  */
-function crops(raw: string, directory: string, name: string, suffix: string, kinds: readonly PortraitKind[], found: Head | undefined, zoom: number, shift: readonly [number, number] = [0, 0]): boolean {
+function crops(raw: string, directory: string, name: string, suffix: string, kinds: readonly PortraitKind[], found: Head | undefined, zoom: number, shift: readonly [number, number] = [0, 0]): { readonly upright: boolean; readonly bust: { readonly size: number; readonly left: number; readonly top: number } } {
   const box = run(['magick', raw, '-alpha', 'extract', '-threshold', '10%', '-format', '%@', 'info:']).trim();
   const bounds = box.match(/(\d+)x(\d+)\+(\d+)\+(\d+)/);
   if (bounds === null) throw new Error(`${raw}: nothing drawn`);
@@ -518,7 +525,36 @@ function crops(raw: string, directory: string, name: string, suffix: string, kin
     const stock = window(1.5 * head.size / zoom, 0.5);
     run(['magick', raw, '-crop', `${stock.size}x${stock.size}+${stock.left}+${stock.top}`, '+repage', '-resize', `${STOCK_ICON_PX}x${STOCK_ICON_PX}`, ...fadeAlpha(STOCK_FADE), ...TGA, file('Stock')]);
   }
-  return found === undefined || found.upright;
+  return { upright: found === undefined || found.upright, bust };
+}
+
+/** A Bust texture's receipt: Wisp's portrait receipt (wisp docs/headless.md, "Screen bounds") plus the HUD frame it is drawn in and its slot. */
+interface Receipt extends InFramePortrait { readonly frame: ReturnType<typeof hudBustFrame>; readonly slot: number }
+
+/** Each fighter's P1 HUD bust scored by inFrame: one row per fighter with each measure, each rule and the failure's cause class where known. */
+function inFrameTable(graphics: string, busts: ReadonlyMap<number, Receipt>, models: (path: string) => BoundsModel | undefined): void {
+  const rows: string[] = [`| fighter | face box h | face px | face hidden | crown | weapon px | hand-weapon gap | ${IN_FRAME_RULES.join(' | ')} | causes |`, `|---|---|---|---|---|---|---|${IN_FRAME_RULES.map(() => '---').join('|')}|---|`];
+  let passed = 0;
+  for (const [character, receipt] of busts) {
+    const name = fighterRenderName(character), parts = required(PORTRAIT_PARTS[name], `${name}'s portrait parts`), armed = parts.weapon.length > 0;
+    const scored = inFrame(receipt, models, receipt.frame);
+    const faceHidden = armed ? inFrame({ ...receipt, parts: { head: parts.face, weapon: parts.weapon } }, models, receipt.frame).headHiddenByWeapon : 0;
+    const measure: BustMeasure = { parts: scored.parts, crownMargin: scored.crownMargin, faceHidden };
+    const model = models(at(receipt.scene.effects, 0).model);
+    const present = new Set(model?.data.Nodes.flatMap((node) => node === undefined ? [] : [node.Name]) ?? []);
+    const missing = Object.values(parts).flat().filter((node) => !present.has(node));
+    // The whole render through a texture of its own, sampled every eighth pixel: whether the weapon draws anywhere.
+    const whole = armed ? inFrame({ ...receipt, crop: { x: 0, y: 0, width: receipt.width, height: receipt.height }, texture: { width: receipt.width / 8, height: receipt.height / 8 } }, models, { x: 0, y: 0, width: receipt.width / 8, height: receipt.height / 8 }).parts.weapon?.pixels : undefined;
+    const verdict = inFrameVerdict(measure, armed);
+    const failed = IN_FRAME_RULES.filter((rule) => verdict[rule] === 'fail');
+    if (failed.length === 0) passed++;
+    const face = scored.parts.face, weapon = scored.parts.weapon, hand = scored.parts.hand;
+    const gap = boxGap(hand?.box, weapon?.box);
+    const causes = failed.map((rule) => `${rule}: ${failureCause(rule, measure, missing, whole) ?? 'unknown'}`).concat(missing.length > 0 ? [`missing ${missing.join(', ')}`] : []);
+    const faceWins = verdict['face visible'] === 'pass' && verdict['nothing crosses the face'] === 'pass' && verdict['crown margin'] === 'pass' && failed.length > 0 ? ' (face clear; weapon short: clear face wins)' : '';
+    rows.push(`| ${name} | ${face?.box === undefined ? '-' : face.box.bottom - face.box.top} | ${face?.pixels ?? 0} | ${faceHidden} | ${scored.crownMargin ?? '-'} | ${armed ? weapon?.pixels ?? 0 : 'none'} | ${armed ? (Number.isFinite(gap) ? gap.toFixed(1) : '-') : 'none'} | ${IN_FRAME_RULES.map((rule) => verdict[rule]).join(' | ')} | ${causes.join('; ') || '-'}${faceWins} |`);
+  }
+  console.log([`${graphics} HUD bust in frame (96 px, P1):`, ...rows, `${graphics}: ${passed}/${busts.size} fighters pass every rule`].join('\n'));
 }
 
 await Effect.runPromise(Effect.gen(function*() {
@@ -600,6 +636,8 @@ await Effect.runPromise(Effect.gen(function*() {
       passes[pass.name] = join(directory, `fitted-${pass.name}`);
     }
     const portraits = join(output, 'fighter-renders', ...(graphics === 'definitive' ? ['de'] : []));
+    const receipts = join(output, 'portrait-receipts', graphics);
+    const busts = new Map<number, Receipt>();
     mkdirSync(portraits, { recursive: true });
     const linear = graphics === 'definitive';
     const gammaOf = (character: number) => (linear ? DEFINITIVE_LIFT : 1) * required(poses.get(character), 'pose').lift;
@@ -616,7 +654,22 @@ await Effect.runPromise(Effect.gen(function*() {
       // The grid keeps the neutral tile; the slot outfits carry every kind (MAP_PORTRAITS).
       const scene = required(scenes.get(frame), 'scene'), body = at(scene.effects, 0);
       const bytes = (yield* Effect.promise(() => project.resolveAsset(body.model, graphics))).bytes;
-      if (!crops(raw, into, name, suffix, kinds ?? (variant === 0 ? ['Tile'] : PORTRAIT_KINDS), bytes === undefined || required(poses.get(character), 'pose').body ? undefined : headBox(bytes, scene, required(heights.get(character), 'height'), correctionOf(graphics, character).flipped), required(poses.get(character), 'pose').zoom, correctionOf(graphics, character).shift)) upsideDown.push(`${graphics} ${name}${suffix}`);
+      const kept = kinds ?? (variant === 0 ? ['Tile'] : PORTRAIT_KINDS);
+      const cut = crops(raw, into, name, suffix, kept, bytes === undefined || required(poses.get(character), 'pose').body ? undefined : headBox(bytes, scene, required(heights.get(character), 'height'), correctionOf(graphics, character).flipped), required(poses.get(character), 'pose').zoom, correctionOf(graphics, character).shift);
+      if (!cut.upright) upsideDown.push(`${graphics} ${name}${suffix}`);
+      if (into === portraits && kept.includes('Bust')) {
+        // The raw image is the DRAWN render halved, so the bust's render crop is its window doubled.
+        const half = DRAWN / RESOLUTION, slot = variant - 1;
+        const receipt: Receipt = {
+          scene: { camera: scene.camera, effects: scene.effects, ...(scene.world === undefined ? {} : { world: scene.world }) }, width: DRAWN, height: DRAWN,
+          crop: { x: cut.bust.left * half, y: cut.bust.top * half, width: cut.bust.size * half, height: cut.bust.size * half },
+          texture: { width: TILE_TEXTURE_PX, height: TILE_TEXTURE_PX }, frame: hudBustFrame(slot), slot,
+          parts: { ...required(PORTRAIT_PARTS[name], `${name}'s portrait parts`) },
+        };
+        mkdirSync(receipts, { recursive: true });
+        yield* Effect.promise(() => Bun.write(join(receipts, `FighterBust${name}${suffix}.json`), `${JSON.stringify(receipt, null, 2)}\n`));
+        if (slot === 0) busts.set(character, receipt);
+      }
       return raw;
     };
     // Each pass's P1 bust is drawn alone; every lighting variant, exposed to the
@@ -645,6 +698,14 @@ await Effect.runPromise(Effect.gen(function*() {
     for (const { frame, image } of images) {
       const character = Math.floor(frame / VARIANTS.length);
       console.log(`${graphics}: ${yield* draw(frame, image, required(lighting.get(character), 'lighting'), gammaOf(character), portraits)}`);
+    }
+    if (scoreInFrame) {
+      const models = new Map<string, BoundsModel>();
+      for (const receipt of busts.values()) for (const effect of receipt.scene.effects) {
+        const bytes = (yield* Effect.promise(() => project.resolveAsset(effect.model, graphics))).bytes;
+        if (bytes !== undefined) models.set(effect.model, boundsModel(parseMDX(bytes.slice().buffer)));
+      }
+      inFrameTable(graphics, busts, (path) => models.get(path));
     }
   }
   if (orientationOnly && upsideDown.length === 0) console.log(`upright: ${fighters.length} fighters in ${graphicsModes.join(", ")}`);

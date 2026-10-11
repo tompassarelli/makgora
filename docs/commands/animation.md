@@ -171,3 +171,8 @@ Fighter portraits: `bun scripts/fighterPortraits.ts PRIVATE_OUTPUT` (from ts/, t
 capacity helper) renders the Classic and Definitive portrait sets, neutral and the four slot
 outfits, with Wisp's headless renderer; store PRIVATE_OUTPUT/fighter-renders as `fighter-renders`.
 See smashcraft:docs/design/fighter-portraits.md.
+HUD bust in-frame table: `bun scripts/fighterPortraits.ts PRIVATE_OUTPUT --graphics classic --in-frame`
+(from ts/) renders the Classic set, then scores each fighter's P1 bust in its 96 px HUD frame with
+Wisp's `inFrame` and prints one row per fighter: face box and pixels, face pixels the weapon hides,
+crown margin, weapon pixels, hand-to-weapon gap, each rule's pass or fail and the failure's cause
+class (smashcraft:ts/scripts/portraitInFrame.ts, #363 item 6).
