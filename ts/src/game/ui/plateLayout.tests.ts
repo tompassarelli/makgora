@@ -17,12 +17,23 @@ test("the HUD bust draws its tile render 1:1 and four plates fit side by side [k
   }
 });
 
-test("the damage readout ramps white to dark red [k3 measure #149]", () => {
-  assertEquals(damageColour(0.0), 0xffffff);
+test("the damage readout darkens in every channel from white at 0% to a dark red held from 200%: every tenth from 0 to 999.9 [k2 property]", () => {
+  const channels = (colour: number): [number, number, number] => [idiv(colour, 0x10000), imod(idiv(colour, 0x100), 0x100), imod(colour, 0x100)];
   const darkest = damageColour(200.0);
-  assertEquals(damageColour(999.0), darkest);
-  const [red, green, blue] = [idiv(darkest, 0x10000), imod(idiv(darkest, 0x100), 0x100), imod(darkest, 0x100)];
+  const [red, green, blue] = channels(darkest);
   assertEquals(red > 2 * green && red > 2 * blue && red < 0xff, true, `darkest ${darkest} is not a dark red`);
+  let previous = channels(0xffffff);
+  for (let tenth = 0; tenth < 10000; tenth++) {
+    const damage = tenth / 10;
+    const colour = damageColour(damage);
+    if (damage < 1.0) assertEquals(colour, 0xffffff);
+    if (damage >= 200.0) assertEquals(colour, darkest);
+    const current = channels(colour);
+    for (let index = 0; index < 3; index++) {
+      assertEquals((current[index] ?? 0) <= (previous[index] ?? 0), true, `channel ${index} brightens at ${damage}%`);
+    }
+    previous = current;
+  }
 });
 
 test("a hit's shake stays within its bound and settles to zero [k2 property]", () => {
