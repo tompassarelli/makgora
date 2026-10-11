@@ -21,6 +21,7 @@ interface Soak {
 
 declare global {
   var __smashcraftNativeSoak: Soak | undefined;
+  var __smashcraftNativeSoakStart: boolean | undefined;
 }
 declare const collectgarbage: ((this: void, option: "count") => number) | undefined;
 
@@ -33,7 +34,7 @@ function lineup(s: ShellState, match: number): void {
 export function startNativeSoak(s: ShellState): boolean {
   const actor = firstHumanSlot(s.game);
   if (actor === undefined || s.game.phase !== Phase.characterMenu || globalThis.__smashcraftSoakHandles === undefined) {
-    writeLines(NATIVE_SOAK_FILE, [`dev: native soak requires an integrity map at selection; phase=${s.game.phase} actor=${actor ?? "none"} ledger=${globalThis.__smashcraftSoakHandles === undefined ? "missing" : "installed"}`]);
+    writeLines(NATIVE_SOAK_FILE, [`dev: native soak requires a soak ledger at selection; phase=${s.game.phase} actor=${actor ?? "none"} ledger=${globalThis.__smashcraftSoakHandles === undefined ? "missing" : "installed"}`]);
     return false;
   }
   for (const slot of PARTICIPANT_SLOTS) {
@@ -52,6 +53,10 @@ export function startNativeSoak(s: ShellState): boolean {
 }
 
 export function beforeNativeSoakTick(s: ShellState): void {
+  if (globalThis.__smashcraftNativeSoakStart && s.game.phase === Phase.characterMenu) {
+    globalThis.__smashcraftNativeSoakStart = false;
+    startNativeSoak(s);
+  }
   const soak = globalThis.__smashcraftNativeSoak;
   if (soak === undefined) return;
   if (s.game.phase === Phase.result && soak.previousPhase !== Phase.result) {

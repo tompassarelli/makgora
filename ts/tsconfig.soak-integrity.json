@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.map.json",
+  "include": [
+    "node_modules/wisp/src/natives/warcraft.d.ts",
+    "src/platform/soakIntegrityMain.ts"
+  ],
+  "exclude": [],
+  "tstl": {
+    "luaBundle": "soak-integrity.lua",
+    "luaBundleEntry": "src/platform/soakIntegrityMain.ts"
+  }
+}

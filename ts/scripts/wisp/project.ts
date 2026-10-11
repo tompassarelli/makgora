@@ -19,6 +19,8 @@ const profileConfigs: Readonly<Record<Profile, string>> = {
   integrity: "tsconfig.integrity.json",
   "pause-probe": "tsconfig.pause-probe.json",
   playable: "tsconfig.playable.json",
+  "soak-playable": "tsconfig.soak-playable.json",
+  "soak-integrity": "tsconfig.soak-integrity.json",
   "native-input": "tsconfig.native-input.json",
   "native-driver": "tsconfig.native-driver.json",
   "native-capture": "tsconfig.native-capture.json",

@@ -45,3 +45,6 @@ export const CURRENT_BUILD: MapBuild = {
 
 
 export const NATIVE_DRIVER_BUILD: MapBuild = { ...CURRENT_BUILD, id: "typescript-native-driver", inputProfile: "native-driver", hotReload: false };
+
+export const SOAK_PLAYABLE_BUILD: MapBuild = { ...PLAYABLE_BUILD, id: "soak-playable", inputProfile: INTEGRITY_BUILD.inputProfile, input: INTEGRITY_BUILD.input };
+export const SOAK_INTEGRITY_BUILD: MapBuild = { ...INTEGRITY_BUILD, id: "soak-integrity" };

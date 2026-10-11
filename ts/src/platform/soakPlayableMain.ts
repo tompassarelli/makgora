@@ -1,0 +1,15 @@
+import { SOAK_PLAYABLE_BUILD } from "../game/shell/currentBuild";
+import { install as installGame, startBuild } from "./main";
+import { installSoakHandles } from "./soakHandles";
+
+export function install(this: void): void {
+  installSoakHandles();
+  installGame(SOAK_PLAYABLE_BUILD);
+}
+
+export function start(this: void): void {
+  globalThis.__smashcraftNativeSoak = undefined;
+  globalThis.__smashcraftNativeSoakStart = true;
+  installSoakHandles();
+  startBuild(SOAK_PLAYABLE_BUILD);
+}

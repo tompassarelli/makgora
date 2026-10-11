@@ -100,3 +100,18 @@ widescreen behavior. Keep local presentation separate from synchronized
 gameplay and create shared handles consistently.
 
 Release names and permission follow the root AGENTS.md.
+
+- Native service A/B soak: build the same revision with `bun wisp map build
+  --profile soak-playable --out OFF.w3x` and `--profile soak-integrity --out ON.w3x`,
+  then run `bun wisp lan soak MAP.w3x --pair K --minutes 30 --out DIR
+  --diagnostic-start` on the assigned offline pool host. Both named diagnostics
+  install the handle ledger before startup and start the existing rotating
+  four-CPU sequence once at selection. Both use journal editbox input, delay 2,
+  rollback 24 and ordinary pool presentation; scene reports and frame meters
+  are absent in both. Only hot reload, developer console, errors on screen and
+  response probe differ (off for soak-playable, on for soak-integrity).
+  `--diagnostic-start` skips the chat receipt and command only; both paths wait
+  for the same fresh four-CPU snapshot before the unchanged RSS/handle sampling.
+  Ordinary integrity maps retain chat startup. Native heap absence remains
+  `n/a (no-collectgarbage)`; RSS uses elapsed >=600 seconds, slope <32 MiB/hour,
+  and live-handle slope <=0.

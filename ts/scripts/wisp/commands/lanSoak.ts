@@ -45,12 +45,13 @@ const slope = (samples: readonly Sample[], value: (sample: Sample) => number): n
 
 export const lanSoak: Command = (args) => Effect.gen(function*() {
   const map = args[0];
+  const diagnosticStart = args.includes("--diagnostic-start");
   const pair = wholeFlag(args, "pair");
   const minutes = wholeFlag(args, "minutes", { min: 1, max: 1440 });
   const [outText] = flagValues(args, "out");
   if (pair instanceof UsageFailure) return yield* pair;
   if (minutes instanceof UsageFailure) return yield* minutes;
-  if (map === undefined || !existsSync(map) || pair === undefined || minutes === undefined || outText === undefined) return yield* new UsageFailure({ problem: "lan soak MAP.w3x --pair K --minutes N --out DIR (an integrity map with the native soak diagnostic)" });
+  if (map === undefined || !existsSync(map) || pair === undefined || minutes === undefined || outText === undefined) return yield* new UsageFailure({ problem: "lan soak MAP.w3x --pair K --minutes N --out DIR [--diagnostic-start] (an integrity map or named soak diagnostic)" });
   const out = resolve(outText);
   const pool = yield* readPool;
   const selected = pool?.pairs.find((entry) => entry.id === pair);
@@ -67,14 +68,16 @@ export const lanSoak: Command = (args) => Effect.gen(function*() {
     const clients = yield* loadClients(selected.clients);
     const host = clients[0];
     if (host === undefined || clients.length !== 2) return yield* new NativeSoakFailure({ problem: "the selected pair does not resolve to two clients" });
-    const chatPath = join(dataDirectory(host.documents), nativeChatFile(INTEGRITY_BUILD.id, 0));
-    const entry = attempt("read chat entry", () => {
-      if (!existsSync(chatPath) || statSync(chatPath).mtimeMs < since) return undefined;
-      const receipt = nativeChatEntryReceipt(readFileSync(chatPath, "latin1"));
-      return receipt === undefined ? undefined : { available: receipt.available === "1", open: receipt.open === "1", modified: statSync(chatPath).mtimeMs };
-    });
-    yield* openObservedChat(host, entry, batch(host, [{ kind: "keys", keys: ["Return"] }]).pipe(Effect.mapError((cause) => new NativeSoakFailure({ problem: cause.message }))));
-    yield* batch(host, [{ kind: "text", text: "-dev soak", delayMillis: 35 }, { kind: "keys", keys: ["Return"], settleMillis: 0 }]);
+    if (!diagnosticStart) {
+      const chatPath = join(dataDirectory(host.documents), nativeChatFile(INTEGRITY_BUILD.id, 0));
+      const entry = attempt("read chat entry", () => {
+        if (!existsSync(chatPath) || statSync(chatPath).mtimeMs < since) return undefined;
+        const receipt = nativeChatEntryReceipt(readFileSync(chatPath, "latin1"));
+        return receipt === undefined ? undefined : { available: receipt.available === "1", open: receipt.open === "1", modified: statSync(chatPath).mtimeMs };
+      });
+      yield* openObservedChat(host, entry, batch(host, [{ kind: "keys", keys: ["Return"] }]).pipe(Effect.mapError((cause) => new NativeSoakFailure({ problem: cause.message }))));
+      yield* batch(host, [{ kind: "text", text: "-dev soak", delayMillis: 35 }, { kind: "keys", keys: ["Return"], settleMillis: 0 }]);
+    }
     const lastSnapshots = new Map<string, string>();
     const failure = (problem: string) => new NativeSoakFailure({ problem: `${problem}\n${clients.map((client) => `${client.name}: ${join(dataDirectory(client.documents), NATIVE_SOAK_FILE)}: ${lastSnapshots.get(client.documents) ?? "no snapshot read"}`).join("\n")}` });
     const snapshot = (documents: string) => attempt("read native soak snapshot", () => {
@@ -124,7 +127,8 @@ export const lanSoak: Command = (args) => Effect.gen(function*() {
       }
     }
     lines.push("", "The map ledger covers returned effect, unit, timer, sound, trigger and frame handles from diagnostic installation before map startup. Frame subtree destruction releases tracked descendants. Sound ownership ends at KillSoundWhenDone or StopSound(killWhenDone); deferred engine cleanup and unreturned internal handles remain in process RSS.", "", "Each sample is collected on the pool host every 60 seconds of monotonic wall time, with the map's latest periodic-callback/confirmed-frame counters. Matches rotate fighters; existing automatic rematch selects stages without Escape.");
-    lines.push("", "Headless 32-bit Lua heap companion: pending. Run the same four-CPU automatic-rematch sequence against this revision's build/integrity.lua with:", "", `bun wisp soak memory --native-sequence --bundle build/integrity.lua --minutes ${minutes} --out ${JSON.stringify(join(out, "headless-heap.txt"))} --summary ${JSON.stringify(join(out, "summary.md"))}`, "", "Acceptance also requires the companion's post-minute-10 Lua heap slope below 1 MiB/hour in this summary.");
+    if (diagnosticStart) lines.push("", "Headless 32-bit Lua heap companion: pending. The existing memory --native-sequence driver requires chat startup; it must support automatic startup before measuring the matching named soak bundle. Native heap is n/a when collectgarbage is absent.");
+    else lines.push("", "Headless 32-bit Lua heap companion: pending. Run the same four-CPU automatic-rematch sequence against this revision's build/integrity.lua with:", "", `bun wisp soak memory --native-sequence --bundle build/integrity.lua --minutes ${minutes} --out ${JSON.stringify(join(out, "headless-heap.txt"))} --summary ${JSON.stringify(join(out, "summary.md"))}`, "", "Acceptance also requires the companion's post-minute-10 Lua heap slope below 1 MiB/hour in this summary.");
     yield* attempt("write summary", () => writeFileSync(join(out, "summary.md"), lines.join("\n") + "\n"));
     yield* Console.log(lines.join("\n"));
     yield* Console.log(`elapsed ${((performance.now() - started) / 1000).toFixed(1)} s; ${out}`);
