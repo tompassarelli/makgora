@@ -106,7 +106,7 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
   },
   [Character.jaina]: {
     weapon: Weapon.blunt, strong: "FrostBoltHit",
-    specials: [s("FrostBoltLaunch", "FrostBoltHit"), s("FrostArrowLaunch", "FrostBoltHit"), s("BlinkCaster", "BlinkTarget"), s("WaterElementalBirth", "WaterElementalMissile")],
+    specials: [s("FrostBoltLaunch", "FrostBoltHit"), s("Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget1.flac", "FrostBoltHit"), s("BlinkCaster", "BlinkTarget"), s("WaterElementalBirth", "WaterElementalMissile")],
   },
   [Character.sylvanas]: {
     weapon: Weapon.blunt, strong: "BlackArrowHit",

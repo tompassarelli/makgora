@@ -13,7 +13,7 @@ const WATER_SHOT: SpecialProjectile = {
 const FROSTBOLT: AuthoredSpecial = {
   endFrame: 37, landingLag: 20, hurt: jainaCastBody(13, 22),
   projectiles: [{
-    model: "Abilities\\Weapons\\SorceressMissile\\SorceressMissile.mdx",
+    model: "Abilities\\Spells\\Other\\FrostBolt\\FrostBoltMissile.mdx",
     spawnFrame: 17, offsetX: h(f32(0.35)), offsetZ: 55.0, velocityX: h(f32(0.12)), velocityZ: 0.0,
     life: 64, radius: h(f32(0.12)), effect: jainaHit(6.140875816345215, 35, 81.5811767578125, 18.0), reflectable: true, limit: 1,
   }],

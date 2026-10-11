@@ -17,7 +17,7 @@ const AIR_LANDING_LAG = 20;
 
 
 const FROST_NOVA_ORB: SpecialProjectile = {
-  model: "Abilities\\Spells\\Other\\FrostBolt\\FrostBoltMissile.mdx",
+  model: "Abilities\\Weapons\\LichMissile\\LichMissile.mdx",
   spawnFrame: 18, offsetX: h(f32(0.40)), offsetZ: CHEST, velocityX: h(f32(0.09)), velocityZ: 0.0,
   life: 80, radius: h(f32(0.16)), effect: hit(11.221104621887207, "POKE", 35), reflectable: true, limit: 1, status: CHILL,
 };
