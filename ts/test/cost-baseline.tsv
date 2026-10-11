@@ -85,7 +85,7 @@ src/game/presentation/shieldPose.tests.ts	3	0.002
 src/game/presentation/specialCues.tests.ts	7	0.006
 src/game/presentation/specialEffectState.tests.ts	3	0.028
 src/game/presentation/stagePreload.tests.ts	1	0.005
-src/game/presentation/stageScenery.tests.ts	3	0.001
+src/game/presentation/stageScenery.tests.ts	4	0.001
 src/game/presentation/summonState.tests.ts	3	0.061
 src/game/presentation/windStreaks.tests.ts	1	0.001
 src/game/render/fighterPool.tests.ts	1	0.002
