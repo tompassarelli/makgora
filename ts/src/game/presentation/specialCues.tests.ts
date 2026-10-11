@@ -35,7 +35,7 @@ test("no two moves or branches show the same startup and active pair, nor the sa
       for (const phase of [move.startup, move.active]) {
         for (const cue of [phase, phase.definitive ?? phase]) {
           const signature = SIGNATURE_CUE_OWNERS.find(({ model }) => model === cue.model);
-          if (signature !== undefined) assertTrue(character === signature.owner || signature.sharedWith.includes(character), `${id} signature ${cue.model}`);
+          if (signature !== undefined) assertTrue(character === signature.owner || signature.sharedWith.includes(character));
         }
       }
       const pair = `${move.startup.model}|${move.active.model}`;
