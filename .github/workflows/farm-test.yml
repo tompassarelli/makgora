@@ -14,7 +14,7 @@ on:
         description: Names the run so `bun wisp farm test` can find the one it dispatched
         default: ""
       farm-runner:
-        description: Runner label for the even shard jobs in place of the FARM_RUNNER variable (measures a box before enabling it)
+        description: One-off runner measurement for even shard jobs; normal and retry jobs use hosted runners
         default: ""
   # Autoland (autoland.yml) runs the suites for a rebased branch inside its own run.
   workflow_call:
@@ -49,6 +49,7 @@ jobs:
       bun-runners: ${{ steps.plan.outputs.bun-runners }}
       lua-runners: ${{ steps.plan.outputs.lua-runners }}
       lua-parallel: ${{ steps.plan.outputs.lua-parallel }}
+      hosted-runner: ${{ steps.plan.outputs.hosted-runner }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -72,10 +73,12 @@ jobs:
       - id: plan
         working-directory: ts
         env:
-          FARM: ${{ github.event_name != 'pull_request' && github.event_name != 'pull_request_target' && (inputs.farm-runner || vars.FARM_RUNNER) || '' }}
+          FARM: ${{ github.event_name != 'pull_request' && github.event_name != 'pull_request_target' && github.run_attempt == 1 && inputs.farm-runner || '' }}
         run: |
-          # Even shard jobs go to FARM_RUNNER when it is set, odd ones to hosted runners, so both pools run at once.
-          pool() { jq -c -n --arg farm "$FARM" "[range($1) | if \$farm != \"\" and . % 2 == 0 then \$farm else \"ubuntu-latest\" end]"; }
+          git -c gc.auto=0 fetch -q --depth 1 origin "$GITHUB_SHA"
+          HOSTED=$(git show "$GITHUB_SHA:ts/runner-routing.json" | jq -er '.premerge | select(type == "string" and length > 0)')
+          echo "hosted-runner=$HOSTED" >> "$GITHUB_OUTPUT"
+          pool() { jq -c -n --arg farm "$FARM" --arg hosted "$HOSTED" "[range($1) | if \$farm != \"\" and . % 2 == 0 then \$farm else \$hosted end]"; }
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           if [ -f farm-timings.json ]; then
             jq '.lua |= with_entries(select(.key | (startswith("check: ") or startswith("parity corpus: ") or . == "stack-trace profile TypeScript frames") | not))' farm-timings.json > plan-timings.json
@@ -94,7 +97,7 @@ jobs:
 
   bun:
     needs: plan
-    runs-on: ${{ fromJSON(needs.plan.outputs.bun-runners)[matrix.shard] }}
+    runs-on: ${{ github.run_attempt > 1 && needs.plan.outputs.hosted-runner || fromJSON(needs.plan.outputs.bun-runners)[matrix.shard] }}
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -167,7 +170,7 @@ jobs:
 
   lua:
     needs: plan
-    runs-on: ${{ fromJSON(needs.plan.outputs.lua-runners)[matrix.job] }}
+    runs-on: ${{ github.run_attempt > 1 && needs.plan.outputs.hosted-runner || fromJSON(needs.plan.outputs.lua-runners)[matrix.job] }}
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -361,7 +364,7 @@ jobs:
   # CENSUS_SHARDS-th fighter of the fixture; the merge job judges the joined pairs.
   census:
     needs: plan
-    runs-on: ${{ github.event_name != 'pull_request' && github.event_name != 'pull_request_target' && vars.FARM_RUNNER || 'ubuntu-latest' }}
+    runs-on: ${{ needs.plan.outputs.hosted-runner }}
     timeout-minutes: 15
     strategy:
       fail-fast: false

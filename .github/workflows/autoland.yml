@@ -82,6 +82,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     outputs:
+      premerge-runner: ${{ steps.build.outputs.premerge-runner }}
       verdict: ${{ steps.build.outputs.verdict }}
       sha: ${{ steps.build.outputs.sha }}
       tree: ${{ steps.build.outputs.tree }}
@@ -117,6 +118,8 @@ jobs:
           git config user.email "41898183+github-actions[bot]@users.noreply.github.com"
           git config core.hooksPath .githooks
           git fetch -q origin '+refs/heads/claude/*:refs/remotes/origin/claude/*'
+          premerge=$(jq -er '.premerge | select(type == "string" and length > 0)' ts/runner-routing.json) || exit 1
+          out premerge-runner "$premerge"
           base=$(git rev-parse origin/main)
           out base "$base"
           if [ -n "$TEST" ]; then
@@ -191,7 +194,7 @@ jobs:
   reports:
     needs: build
     if: needs.build.outputs.verdict == 'test' || needs.build.outputs.verdict == 'tested'
-    runs-on: ${{ vars.FARM_RUNNER || 'ubuntu-latest' }}
+    runs-on: ${{ needs.build.outputs.premerge-runner }}
     timeout-minutes: 30
     outputs:
       verdict: ${{ steps.reports.outputs.verdict }}
@@ -359,10 +362,9 @@ jobs:
       - if: always() && env.SCRATCH != ''
         run: git push origin --delete "$SCRATCH" || true
 
-  # Every dispatched run ends here, cancelled ones too: a tip whose run ended is tested again, a passed one boards a train.
   plan:
     needs: [build, suite, land]
-    if: always() && github.event_name == 'workflow_dispatch'
+    if: ${{ !cancelled() && github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
