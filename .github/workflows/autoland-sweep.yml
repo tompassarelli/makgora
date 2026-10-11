@@ -1,6 +1,9 @@
 name: Autoland sweep
 
 on:
+  workflow_run:
+    workflows: [Autoland, Farm test]
+    types: [completed]
   schedule:
     - cron: "*/5 * * * *"
   workflow_dispatch:
@@ -19,9 +22,10 @@ permissions:
   issues: write
   statuses: read
 
+# A burst collapses to the running sweep plus one pending; cancelling a running sweep could drop its replan.
 concurrency:
   group: autoland-sweep
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 env:
   GH_TOKEN: ${{ github.token }}
@@ -45,6 +49,12 @@ jobs:
       - run: |
           set -euo pipefail
           now=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          echo "Started by ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
+          last=$(gh api "repos/$GH_REPO/actions/workflows/autoland-sweep.yml/runs?status=success&per_page=1" --jq '.workflow_runs[0].updated_at // ""')
+          if [ "${{ github.event_name }}" = workflow_run ] && [ -n "$last" ] && [ $(( $(date -d "$now" +%s) - $(date -d "$last" +%s) )) -lt 120 ]; then
+            echo "A sweep finished at $last, under 2 minutes ago: nothing to do" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
           for state in requested pending waiting queued in_progress; do
             gh api "repos/$GH_REPO/actions/workflows/autoland.yml/runs?status=$state&per_page=100" \
               --jq '.workflow_runs[] | {id, title: .display_title, status, created: .created_at}'
