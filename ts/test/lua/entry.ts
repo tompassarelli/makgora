@@ -6,7 +6,7 @@
 
 import { imod } from "wisp/src/sim/intMath";
 import { AssertionFailure, registeredTests } from "wisp/src/runtime/testing";
-import { isSweep } from "../../src/runtime/sweep";
+import { selectSweep } from "../../src/runtime/sweep";
 import { testModules } from "./index";
 
 const readText = (path: string | undefined): string => {
@@ -45,7 +45,7 @@ registeredTests.forEach(({ name }, index) => {
 
 
 const sweeps = os.getenv("SWEEPS") === "1";
-const mine = registeredTests.filter(({ name }) => isSweep(name) === sweeps
+const mine = registeredTests.filter(({ name }) => selectSweep(name, sweeps, os.getenv("SWEEP_PLACEMENT"))
   && (shardSpec === undefined || (planned.get(name) ?? hashShard(name)) === shard));
 // Counts are deterministic for one runtime and test order, unlike CPU seconds (#394).
 const HOOK_STEP = 1000;

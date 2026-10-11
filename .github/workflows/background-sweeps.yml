@@ -1,0 +1,86 @@
+name: Background sweeps
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "31 3 * * *"
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Landed main commit to test
+        default: ""
+
+permissions:
+  contents: read
+
+env:
+  SWEEPS: "1"
+  SWEEP_PLACEMENT: background
+
+jobs:
+  sweeps:
+    runs-on: ${{ vars.BACKGROUND_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        runtime: [bun, lua32]
+    name: Background sweeps (${{ matrix.runtime }})
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.13
+      - uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-install-${{ hashFiles('ts/bun.lock') }}
+      - run: bun install --frozen-lockfile
+        working-directory: ts
+      - if: matrix.runtime == 'lua32'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/wisp/lua32
+          key: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/toward-zero.h') }}
+      - if: matrix.runtime == 'bun'
+        run: bun run test
+        working-directory: ts
+      - if: matrix.runtime == 'lua32'
+        run: bun scripts/lua-tests.ts
+        working-directory: ts
+        env:
+          LUA_JOBS: "4"
+
+  main-red:
+    needs: sweeps
+    if: ${{ !cancelled() && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      actions: write
+    steps:
+      - run: gh workflow run main-red.yml -R "${{ github.repository }}" -f run="${{ github.run_id }}"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+  status:
+    needs: sweeps
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      statuses: write
+    steps:
+      - run: |
+          gh api "repos/$GITHUB_REPOSITORY/statuses/$SHA" \
+            -f state="$STATE" -f context="Background sweeps" \
+            -f target_url="https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            -f description="Approved background breadth: $STATE"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ inputs.ref || github.sha }}
+          STATE: ${{ needs.sweeps.result == 'success' && 'success' || 'failure' }}

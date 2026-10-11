@@ -7,7 +7,7 @@ name: Main is red
 # any branch's run, as "BRANCH is red".
 on:
   workflow_run:
-    workflows: [CI]
+    workflows: [CI, Background sweeps]
     types: [completed]
     branches: [main]
   workflow_dispatch:

@@ -35,6 +35,7 @@ env:
   # A run holds BUN_SHARDS + the lua job's max-parallel + the four check jobs +
   # the six census shards at once: 3 + 5 + 4 + 6 = 18. One Lua test takes about 140 s, so more than
   # 32 Lua shards would not shorten the run.
+  SWEEP_PLACEMENT: gate
   BUN_SHARDS: 3
   # Lua runs one core a process: each Lua job runs LUA_PER_JOB shards at once.
   LUA_JOBS: 8
