@@ -51,3 +51,9 @@ pattern = ["bun", "scripts/playtest.ts"]
 narrowing = ["--repro", "--merge", "--issues"]
 farm = "gh workflow run playtest.yml -f ref=<sha>"
 why = "roster playtest sweep belongs on the farm"
+
+[[command]]
+pattern = ["bun", "scripts/generated.ts"]
+narrowing = []
+farm = "bun wisp farm test --ref <sha> --wait (the farm regenerates every generated file)"
+why = "regenerates every generated file for the whole roster, up to its 8 GiB cap"
