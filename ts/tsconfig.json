@@ -41,6 +41,8 @@
     "scripts/**/*.ts",
     "plugins/**/*.ts",
     "test/advantage-state.test.ts",
+    "test/zero-to-death.test.ts",
+    "test/cpu-advantage.test.ts",
     "test/air-drift.test.ts",
     "test/cpu-field.test.ts",
     "test/dreadlord-shadow-hunter-gameplans.test.ts",

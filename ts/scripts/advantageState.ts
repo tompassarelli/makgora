@@ -1,7 +1,7 @@
 import { Character } from "../src/game/sim/codes";
 import { fighterName } from "../src/game/sim/heroes/registry";
 import {
-  DIS, type Defender, type Di, type Ending, Explorer, OPENERS, type Opener, Sim, TECH_OPTIONS,
+  DIS, type Defender, type Di, type Ending, Explorer, OPENERS, type Opener, POSITIONS, type Position, Sim, TECH_OPTIONS,
   defenderMask, expand, landingSetup, measureCell, openerRoot,
 } from "./comboExplorer";
 
@@ -180,6 +180,13 @@ export function advantageRow(attacker: Character, target: (typeof TARGETS)[numbe
     },
     zeroToDeath,
   };
+}
+
+export function trueZeroToDeaths(attacker: Character, targets: readonly (typeof TARGETS)[number][] = TARGETS, positions: readonly Position[] = POSITIONS): string[] {
+  return targets.flatMap((target) => positions.flatMap((position) => OPENERS.flatMap((opener) => {
+    const { escape, escapeDi } = measureCell(attacker, target.character, opener, 0, position);
+    return escape?.ko === true ? [`${fighterName(attacker)} takes the ${target.weight} target's stock from 0% at the ${position} against DI ${escapeDi}: ${escape.moves.join(", ")}`] : [];
+  })));
 }
 
 const TARGET_NAMES = ["grabs", "techChasing", "juggling", "diMixups", "techTraps"] as const;
