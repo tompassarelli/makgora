@@ -89,6 +89,19 @@ gate evidence; the existing train remains active until replay acceptance.
 
 `bun wisp ci pre-merge --base SHA`, `ci post-merge`, `ci nightly --minutes M`
 and `ci seeds --n N --seed S` run the shared Wisp tiers; each accepts `--json`.
+The inactive gate replay runs `bun ../.github/scripts/gateReplay.ts` through the branch's
+Farm test dispatch with `replay-cohort` and four hosted shards. Its 20 public
+identity rows contain lane, exact tested candidate, base, original run ID and
+test classes. The runner uses the checkpoint's shared `makeCi` declarations;
+each historical tree installs its own committed frozen dependencies.
+Artifacts record gate SHA, runtime and historical lock hashes, install setup
+seconds and check seconds. This is a current-gate measurement rather than
+byte-identical historical CI. The base uses the reverse diff to select
+the changed paths. Original failure names must match before catch credit;
+baseline failures and the missing report-generation check remain inconclusive.
+The raw shared-command replay omits the adapter's actual emitted-Lua smoke in
+nearest and toward-zero modes, so it cannot authorize switching the gate.
+This measurement leaves the active gate unchanged.
 The Wisp pre-merge plan reports `determinism: { runs, reason }` from the soak's
 import closure and declared file reads. Changes outside that scope produce a
 `skipped` stage with its reason. The adapter saves that authoritative plan in
