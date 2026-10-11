@@ -215,6 +215,7 @@ const BANSHEE_CARRY: AuthoredSpecial = {
   intangible: frames(1, 9),
   projectiles: [wake(1), wake(5), wake(9)],
   burst: { frame: 10, from: SHADOW_WAKE, into: SHADOW_TRAIL },
+  refreshesAir: 10,
 };
 const SYLVANAS: AuthoredSpecial = {
   name: "Banshee Form", endFrame: 128,
@@ -231,6 +232,7 @@ const SYLVANAS: AuthoredSpecial = {
   regions: [heroRegion(19, 98, capsule(0.0, 45.0, 0.0, 75.0, 32.0), hit(14.0, 45, 72.0, 45.0, HitElement.dark))],
   followUps: [{ window: frames(19, 99), input: FollowUpInput.contact, special: BANSHEE_CARRY }],
   burst: { frame: 99, from: SHADOW_WAKE, into: SHADOW_TRAIL },
+  refreshesAir: 99,
 };
 
 const CAIRNE_ANKH: SpecialProjectile = {
