@@ -73,6 +73,7 @@ export function startDown(s: ShellState, slot: ParticipantSlot): void {
     else {
       clearCapturedInputs(s);
       pauseMatchPresentation(s, s.session.paused);
+      if (probeRecording(s.probe)) probeIntegrity(s.probe, `pause-boundary ${s.session.paused ? "paused" : "resumed"} ${s.runtime.simulationFrame}`);
       syncKeyEvents(s);
       setStatus(s, s.session.paused ? pausedMessage("Y") : "Resumed.", s.session.paused ? LASTING : 1.0);
     }
