@@ -112,6 +112,7 @@ export const PROJECTILE_DRAW_CUES: { readonly [model: string]: { readonly scale:
   "Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx": { scale: f32(0.7) },
   "Abilities\\Spells\\NightElf\\Cyclone\\CycloneTarget.mdx": { scale: 0.5 },
   "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike.mdx": { scale: f32(0.12) },
+  "Units\\Undead\\Locust\\Locust.mdx": { scale: f32(0.6) },
   "Abilities\\Spells\\NightElf\\ShadowStrike\\ShadowStrikeMissile.mdx": { scale: 1.0, birth: { eachFrame: true } },
   "Abilities\\Spells\\Human\\ManaFlare\\ManaFlareTarget.mdx": { scale: 1.0, birth: { eachFrame: false } },
   "Abilities\\Weapons\\FlyingMachine\\FlyingMachineMissile.mdx": { scale: 1.0, birth: { eachFrame: false } },
@@ -123,6 +124,7 @@ export const PROJECTILE_DRAW_OFFSETS: { readonly [model: string]: { readonly x: 
   "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveMissile.mdx": { x: -20.0, z: -33.0, sequence: "stand", width: f32(0.75), height: 2.0 },
   "Abilities\\Spells\\Human\\ManaFlare\\ManaFlareMissile.mdx": { x: 0.0, z: 0.0, sequence: "birth", seconds: f32(0.2) },
   "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike.mdx": { x: 0.0, z: 0.0, sequence: "birth" },
+  "Units\\Undead\\Locust\\Locust.mdx": { x: 0.0, z: 0.0, sequence: "walk" },
   "Abilities\\Spells\\Undead\\Impale\\ImpaleHitTarget.mdx": { x: 0.0, z: -25.0, width: 1.5, height: 1.25, fill: [{ x: f32(-4.0 / 9.0), z: f32(-4.0 / 9.0) }, { x: f32(-4.0 / 9.0), z: f32(4.0 / 9.0) }, { x: f32(4.0 / 9.0), z: f32(-4.0 / 9.0) }, { x: f32(4.0 / 9.0), z: f32(4.0 / 9.0) }] },
 };
 
@@ -216,6 +218,7 @@ export const DEFINITIVE_PROJECTILE_REDRAWS: { readonly [model: string]: string }
   "Units\\NightElf\\Wisp\\Wisp.mdx": "HD redraw, Definitive look not yet reviewed",
   "units\\orc\\SpiritWolf\\SpiritWolf.mdx": "HD redraw, Definitive look not yet reviewed",
   "Units\\Undead\\Banshee\\Banshee.mdx": "HD redraw, Definitive look not yet reviewed",
+  "Units\\Undead\\Locust\\Locust.mdx": "HD redraw, Definitive look not yet reviewed",
   "Units\\Undead\\PlagueCloud\\PlagueCloud.mdx": "HD redraw, Definitive look not yet reviewed",
   "Units\\Undead\\Scarab\\Scarab.mdl": "HD redraw, Definitive look not yet reviewed",
 };
