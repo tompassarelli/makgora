@@ -300,7 +300,7 @@ export interface ShellState {
   devReceipts: number;
   promoHudHidden?: boolean;
   readonly trace: InputTrace;
-  readonly probe: ResponseProbe | undefined;
+  probe: ResponseProbe | undefined;
   readonly rollback: Rollback | undefined;
   readonly keyEvents: KeyEvents;
   readyMarkerWritten: boolean;

@@ -251,11 +251,9 @@ function syncTrigger(s: ShellState, prefix: string, handler: string, humansOnly:
 
 function createTriggers(s: ShellState): void {
   createPadTriggers(s);
-  if (s.probe !== undefined) {
-    developerChord(s, Key.g, PROBE_START);
-    developerChord(s, Key.j, PROBE_EDGES);
-    developerChord(s, Key.h, PROBE_DUMP);
-  }
+  developerChord(s, s.build.responseProbe ? Key.g : 0x74, PROBE_START);
+  developerChord(s, s.build.responseProbe ? Key.j : 0x75, PROBE_EDGES);
+  developerChord(s, s.build.responseProbe ? Key.h : 0x76, PROBE_DUMP);
   developerChord(s, Key.r, RESTART);
   developerChord(s, Key.t, TRACE);
   const startDown = CreateTrigger();
