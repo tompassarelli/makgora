@@ -1,6 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { imod } from "wisp/src/sim/intMath";
-import { SHIELD_MAX, type Fighter } from "../sim/fighter";
+import { type Fighter } from "../sim/fighter";
+import { shieldSizeMultiplier } from "../sim/shield";
 import { shieldCenterX, shieldCenterZ } from "../sim/shieldTilt";
 
 interface ShieldPose {
@@ -13,6 +14,8 @@ interface ShieldPose {
   blue: number;
 }
 
+
+const SHIELD_MODEL_RADIUS = 72.0;
 
 const HIDDEN: Readonly<ShieldPose> = { visible: false, x: 0.0, z: 0.0, scale: 0.0, red: 255, green: 255, blue: 255 };
 
@@ -29,7 +32,7 @@ export function projectedShield(fighter: Readonly<Fighter> | undefined, playing:
     visible: true,
     x: f32(shieldCenterX(fighter) + recoil),
     z: shieldCenterZ(fighter),
-    scale: f32(f32(f32(0.7) + f32(f32(0.5 * fighter.shield.energy) / SHIELD_MAX)) * pulse),
+    scale: f32(f32(f32(fighter.tuning.shield.radius * shieldSizeMultiplier(fighter.shield.energy, fighter.shield.strength)) / SHIELD_MODEL_RADIUS) * pulse),
     red: 255,
     green: struck ? 225 : 255,
     blue: struck ? 150 : 255,

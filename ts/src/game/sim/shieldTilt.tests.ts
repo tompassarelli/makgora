@@ -7,8 +7,8 @@ import { inputRow } from "../input/inputRow";
 import { projectedShield } from "../presentation/shieldPose";
 import { copyFighterState } from "../replay/fighterState";
 import { Character } from "./codes";
-import { createFighter } from "./fighter";
-import { SELECTABLE_CHARACTERS } from "./heroes/registry";
+import { SHIELD_MAX, createFighter } from "./fighter";
+import { fighterName, SELECTABLE_CHARACTERS } from "./heroes/registry";
 import { neutralControls } from "./roster";
 import { shieldCircleIntersects, shieldSizeMultiplier } from "./shield";
 import { shieldCenterX, shieldCenterZ } from "./shieldTilt";
@@ -79,5 +79,21 @@ test("shield tilt moves every fighter's projectile contact circle with its drawn
     adaptInput(row, fighter, 8, controls, attacks);
     advanceSolo(fighter, 0, controls, 0.0);
     assertTrue(shieldCircleIntersects(fighter, -1.0, probe, 1.0, probe, 1.0));
+    assertEquals(fighter.shield.stun, 0);
+    assertEquals(fighter.launch.hitlag, 0);
+    for (const strength of [0.0, 1.0]) {
+      fighter.shield.strength = strength;
+      for (const energy of [SHIELD_MAX, 45.0, f32(SHIELD_MAX / 2), 15.0, 5.0, 0.25]) {
+        fighter.shield.energy = energy;
+        const pose = projectedShield(fighter, true);
+        const label = `${fighterName(character)} energy ${energy} strength ${strength}`;
+        assertEquals(pose.x, shieldCenterX(fighter), `${label}: drawn centre x`);
+        assertEquals(pose.z, shieldCenterZ(fighter), `${label}: drawn centre z`);
+        const collisionRadius = f32(fighter.tuning.shield.radius * shieldSizeMultiplier(energy, strength));
+        const drawnRadius = f32(pose.scale * 72.0);
+        assertEquals(Math.abs(drawnRadius - collisionRadius) <= f32(collisionRadius * f32(0.0000002384185791015625)), true,
+          `${label}: drawn radius ${drawnRadius} matches collision radius ${collisionRadius} within binary32 rounding`);
+      }
+    }
   }
 });
