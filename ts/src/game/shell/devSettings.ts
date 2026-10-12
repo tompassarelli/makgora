@@ -124,6 +124,17 @@ export function quickStageSettings(message: string): QuickStageSettings | undefi
 export const QUICK_HERO_COMMAND = "-dev quick hero ";
 
 const QUICK_STOCKS_SUFFIX = " stocks ";
+const QUICK_HIT_AREAS_SUFFIX = " hit-areas";
+
+function quickHeroSetup(message: string): string | undefined {
+  const at = message.indexOf(QUICK_STOCKS_SUFFIX);
+  if (at >= 0 && message.substring(at).includes(QUICK_HIT_AREAS_SUFFIX)) return undefined;
+  return at < 0 ? message : message.substring(0, at);
+}
+
+export function quickMatchHitAreas(message: string): boolean {
+  return quickHeroSetup(message)?.endsWith(QUICK_HIT_AREAS_SUFFIX) === true;
+}
 
 export function quickMatchStocks(message: string): number {
   const at = message.indexOf(QUICK_STOCKS_SUFFIX);
@@ -133,8 +144,9 @@ export function quickMatchStocks(message: string): number {
 }
 
 export function quickMatchHero(message: string): Character | undefined {
-  const at = message.indexOf(QUICK_STOCKS_SUFFIX);
-  return heroAfter(at < 0 ? message : message.substring(0, at), QUICK_HERO_COMMAND);
+  const setup = quickHeroSetup(message);
+  if (setup === undefined) return undefined;
+  return heroAfter(quickMatchHitAreas(message) ? setup.substring(0, setup.length - QUICK_HIT_AREAS_SUFFIX.length) : setup, QUICK_HERO_COMMAND);
 }
 
 export function quickMatchPair(message: string): readonly [Character, Character] | undefined {
