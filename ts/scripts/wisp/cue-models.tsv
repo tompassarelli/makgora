@@ -121,7 +121,6 @@ same	Abilities\Spells\Undead\Sleep\SleepSpecialArt.mdx
 redrawn	Abilities\Spells\Undead\UnholyAura\UnholyAura.mdx
 redrawn	Abilities\Spells\Undead\UnholyFrenzy\UnholyFrenzyTarget.mdx
 redrawn	Abilities\Spells\Undead\Unsummon\UnsummonTarget.mdx
-redrawn	Abilities\Weapons\AncientProtectorMissile\AncientProtectorMissile.mdl
 redrawn	Abilities\Weapons\Axe\AxeMissile.mdx
 redrawn	Abilities\Weapons\BansheeMissile\BansheeMissile.mdx
 same	Abilities\Weapons\Blood\BloodImpact.mdx
@@ -161,10 +160,12 @@ same	Abilities\Weapons\WingedSerpentMissile\WingedSerpentMissile.mdx
 redrawn	Abilities\Weapons\WitchDoctorMissile\WitchDoctorMissile.mdx
 redrawn	Doodads\Cinematic\FirePillarMedium\FirePillarMedium.mdx
 redrawn	Doodads\Cinematic\TownBurningFireEmitter\TownBurningFireEmitter.mdx
+redrawn	Objects\InventoryItems\BundleofLumber\BundleofLumber.mdx
 redrawn	Objects\InventoryItems\QuestionMark\QuestionMark.mdl
 same	Objects\Spawnmodels\Human\FragmentationShards\FragBoomSpawn.mdx
 redrawn	Objects\Spawnmodels\Naga\NagaDeath\NagaDeath.mdx
 same	Objects\Spawnmodels\Other\NeutralBuildingExplosion\NeutralBuildingExplosion.mdx
+redrawn	Objects\Spawnmodels\Other\ToonBoom\ToonBoom.mdx
 same	Objects\Spawnmodels\Undead\ImpaleTargetDust\ImpaleTargetDust.mdx
 redrawn	Objects\Spawnmodels\Undead\UCancelDeath\UCancelDeath.mdx
 same	UI\Feedback\GoldCredit\GoldCredit.mdl

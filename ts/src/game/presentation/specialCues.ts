@@ -120,7 +120,7 @@ const BIRTH_CUES = new Set([
   "FeralSpiritDone", "PolymorphTarget", "AncestralSpiritCaster", "HowlCaster",
   "FlameStrike1", "FreezingBreathMissile", "FrostNovaTarget", "DispelMagicTarget",
   "MassTeleportTarget", "WaterElementalMissile", "NeutralBuildingExplosion", "RedDragonMissile",
-  "GoldCredit", "NagaDeath", "AIfbSpecialArt", "PolyMorphDoneGround", "UCancelDeath",
+  "GoldCredit", "NagaDeath", "AIfbSpecialArt", "PolyMorphDoneGround", "UCancelDeath", "ToonBoom",
 ]);
 
 const cue = (model: string, anchor: CueAnchor, scale: number): Cue => {
@@ -235,9 +235,9 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     down: { spell: "Reincarnation", startup: BEAST, active: cue("Abilities\\Spells\\Orc\\Reincarnation\\ReincarnationTarget.mdx", "body", f32(0.6)) },
   },
   [Character.peon]: {
-    neutral: { spell: "Lumber Toss", startup: cue("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", "feet", f32(0.3)), active: drawn("Abilities\\Weapons\\AncientProtectorMissile\\AncientProtectorMissile.mdl", "hand") },
-    side: { spell: "Burrow", startup: cue("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", "ahead", f32(0.5)), active: drawn("buildings\\orc\\TrollBurrow\\TrollBurrow.mdl", "ahead") },
-    up: { spell: "Worksite Launch", startup: cue("Abilities\\Spells\\Human\\Defend\\DefendCaster.mdx", "feet", f32(0.4)), active: cue("Abilities\\Spells\\Human\\FlakCannons\\FlakTarget.mdx", "feet", f32(0.6)) },
+    neutral: { spell: "Lumber Toss", startup: cue("Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx", "feet", f32(0.15)), active: drawn("Objects\\InventoryItems\\BundleofLumber\\BundleofLumber.mdx", "hand") },
+    side: { spell: "Burrow", startup: cue("Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx", "ahead", f32(0.25)), active: drawn("buildings\\orc\\TrollBurrow\\TrollBurrow.mdl", "ahead") },
+    up: { spell: "Worksite Launch", startup: cue("Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx", "feet", f32(0.2)), active: cue("Objects\\Spawnmodels\\Other\\ToonBoom\\ToonBoom.mdx", "feet", f32(0.5)) },
     down: { spell: "Repair", startup: cue("Abilities\\Spells\\Human\\Defend\\DefendCaster.mdx", "hand", f32(0.4)), active: timed(cue("Abilities\\Spells\\Human\\Heal\\HealTarget.mdx", "body", f32(0.8)), "birth", 0.0) },
   },
   [Character.thrall]: {
@@ -418,7 +418,7 @@ export const HERO_BRANCH_CUES: { readonly [character: number]: { readonly [slot 
     ] },
   },
   [Character.peon]: {
-    side: { recall: branch("Pack Up", cue("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", "ahead", f32(0.3)), cue("UI\\Feedback\\GoldCredit\\GoldCredit.mdl", "hand", f32(0.7))) },
+    side: { recall: branch("Pack Up", cue("Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx", "ahead", f32(0.15)), cue("UI\\Feedback\\GoldCredit\\GoldCredit.mdl", "hand", f32(0.7))) },
   },
   [Character.tinker]: { side: { recall: "slot" } },
   [Character.blademaster]: {

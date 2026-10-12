@@ -5,7 +5,7 @@ import { peonHit } from "./peonMoves";
 const lumberToss = (air: boolean): AuthoredSpecial => ({
   endFrame: 40, landingLag: air ? 20 : undefined,
   projectiles: [{
-    model: "Abilities\\Weapons\\AncientProtectorMissile\\AncientProtectorMissile.mdl",
+    model: "Objects\\InventoryItems\\BundleofLumber\\BundleofLumber.mdx",
     spawnFrame: 14, offsetX: 34.0, offsetZ: 48.0, velocityX: 9.0, velocityZ: 0.0,
     life: 70, radius: 18.0, effect: peonHit(8.192000389099121, 35, 73.875, 18.0), reflectable: true, limit: 1,
   }],
