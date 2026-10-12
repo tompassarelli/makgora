@@ -167,22 +167,40 @@ landing: its `main-red` job waits for the sweeps and the census, then
 dispatches the sheriff on that run, so a census regression reverts its landing
 like a red CI step:
 
-- **Revert.** The run failed at a step after setup, and main's previous
-  finished CI run was green on an ancestor. Every commit from that green
-  commit to the run's commit (the landing, or the whole train) is reverted as
-  one `github-actions[bot]` commit on main, carrying `Sheriff-Reverts: SHA...`
-  and the commits' `Refs smashcraft#N`. The sheriff dispatches main's CI for
-  it and reopens every closed issue the commits reference
-  (`Refs smashcraft#N` or a subject's `(#N)`). It posts no issue comments:
-  the job summary and a `Sheriff` annotation (`gh run view RUN_ID`) name the
-  reverted commits, the failing step and the run. No "main is red" issue opens for the reverted run; the revert's own
-  CI run reports.
+- **Revert.** A single measured Bun or Lua32 suite step failed after a green
+  ancestor. Autoland records `Autoland-Lane: {"branch":"claude/name","count":N,"issues":[513]}`
+  on each lane's last commit before testing and pushing. `count` is the actual
+  first-parent commit count of that rebase, including the last commit; it
+  survives a train rebase without referring to its own SHA. The existing
+  generated reports commit carries `Autoland-Reports: 1` and may change only
+  the two advantage-state report files. The sheriff walks these records into
+  complete lanes, bisects their boundary snapshots, and replays the same suite
+  with the workflow's exact sweep and Lua partition environment. It confirms
+  that the actual culprit parent passes, the lane head fails with a recorded
+  failing test, and current main passes with only that lane reverted. A reports
+  commit between lanes is part of the actual parent confirmation. It then
+  reverts only that lane's commits, newest first; innocent lanes and report
+  commits stay landed. It pushes only while main remains the confirmed SHA.
+  The revert carries `Sheriff-Reverts: SHA...` and only that lane's issue refs,
+  dispatches main's CI, and reopens only that lane's closed issues. The job
+  summary and `Sheriff` annotation name the lane, reverted commits, failing
+  step and run. The reverted run opens no "main is red" issue; the revert's
+  own CI reports. The binary search plus confirmations uses at most
+  `ceil(log2(lanes)) + 5` probes, reusing exact SHA results. Probes share a
+  45-minute deadline; timeout or a failed install, missing test record,
+  different failing test or revert conflict confirms nothing.
 - **Rerun.** A failure that measured nothing never reverts: a cancelled or timed-out job or step, a lost runner, a failing setup step or an `Unmeasured` error annotation (the census's "measured N of M") reruns the failed jobs once, then reports.
-- **Report only.** A cancelled run, a red parent (whether the same first failing step or a different one), a
-  landing that is itself a revert, one that changes `.github/workflows/`
-  (the workflow token can't push those) or one that doesn't revert cleanly:
-  the job summary says why and "main is red" reports as before.
+- **Report only.** A cancelled run, red parent, revert, workflow change,
+  missing, malformed or partial lane metadata, unknown direct commit,
+  unconfirmed culprit, moved main or revert conflict reverts nothing and
+  leaves "main is red" to raise the alarm. The supported suite steps are
+  Background sweeps (Bun and Lua32), CI Sweeps (Bun), and CI Lua32 bot,
+  remainder and six sweep partitions. Census shards and comparisons, perf
+  measurements and budgets, parity, development-loop checks, type checks and
+  every other step are unsupported. Multiple measured failed steps or an
+  infrastructure-ambiguous run also report without reverting.
 
-The decision is a pure function, checked on main's recorded runs of
-2026-10-09 (smashcraft:ts/test/sheriff.test.ts). Rerun it on a run:
+The lane walk and bisect are checked over generated 1-6-lane trains, every
+culprit position, no culprit and two culprits, including reports parents
+(smashcraft:ts/test/sheriff.test.ts). Rerun it on a run:
 `gh workflow run main-red.yml -f run=RUN_ID`.

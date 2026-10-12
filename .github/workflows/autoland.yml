@@ -191,6 +191,7 @@ jobs:
               flag "$branch" "$tip" "lane failed: it changes .github/workflows; land it with safe-push." failed
               continue
             fi
+            lane_base=$(git rev-parse autoland)
             git checkout -q --detach "$tip"
             if ! git rebase -q autoland > rebase.log 2>&1; then
               conflicted=""; resolved=""; why="the rebase stopped without a file conflict"
@@ -229,6 +230,13 @@ jobs:
               break
             fi
             git checkout -q -B autoland
+            lane_count=$(git rev-list --count --first-parent "$lane_base..HEAD")
+            if [ "$lane_count" -gt 0 ]; then
+              git log --format=%B "$lane_base..HEAD" > lane-messages.txt
+              issues=$(bun ts/scripts/autoland.ts refs --messages lane-messages.txt | jq -s .) || exit 1
+              lane=$(jq -cn --arg branch "$branch" --argjson count "$lane_count" --argjson issues "$issues" '{branch: $branch, count: $count, issues: $issues}') || exit 1
+              git commit --amend -q --no-edit --trailer "Autoland-Lane: $lane" || exit 1
+            fi
             branches="$branches $branch"; tips="$tips $tip"; count=$((count + 1))
             [ "$step" = suite ] || tested=1
             [ "$step" != last ] || break
@@ -306,7 +314,7 @@ jobs:
           { echo "Changed rows (old → new):"; echo '```diff'; git diff -U0 -- tools/move-data/advantage-state.md | grep -E '^[-+]\|' | head -200 || true; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           git config user.name "github-actions[bot]"
           git config user.email "41898183+github-actions[bot]@users.noreply.github.com"
-          git commit -q -m "Regenerate reports for $(echo $BRANCHES)" -- "${reports[@]}"
+          git commit -q -m "Regenerate reports for $(echo $BRANCHES)" --trailer "Autoland-Reports: 1" -- "${reports[@]}"
           git push -q origin "HEAD:refs/heads/$SCRATCH"
           out sha "$(git rev-parse HEAD)"
 
