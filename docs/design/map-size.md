@@ -496,10 +496,9 @@ input to a one-level BLP1 JPEG at quality 78 (smashcraft:ts/scripts/blp.ts),
 cached by source hash under `~/.cache/smashcraft/blp-portraits/`; the map
 script names the `.blp` files. Build of 4af9c1d3 plus #307: the 260 portraits
 take 11.86 MB in the map instead of 28.63 MB, and the map measured 162.7 MB.
-smashcraft:ts/test/portrait-blp.test.ts holds every portrait import to BLP and
-their total to 15 MB in the committed baseline: the 26-fighter cap at about
-0.55 MB per fighter needs about 14.3 MB, rounded to 15 MB (Tom's #307 decision,
-9 Oct 2026).
+Tom's #307 decision (9 Oct 2026) budgets the portraits at 15 MB: the
+26-fighter cap at about 0.55 MB per fighter needs about 14.3 MB, rounded to
+15 MB. No test holds that total; its assertion was deleted in 45fc7b71.
 The complete 26-fighter set took 19.88 MB at quality 90; #323 uses quality 78
 and takes 14.22 MB with every render and slot outfit at the original resolution.
 
