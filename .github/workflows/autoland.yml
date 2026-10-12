@@ -386,6 +386,17 @@ jobs:
           fi
           if [ "$verdict" = fail ]; then
             tip=${tips[0]}
+            gh run view "$GITHUB_RUN_ID" --json jobs --jq '.jobs' > ci-jobs.json || echo '[]' > ci-jobs.json
+            for id in $(jq -r '.[] | select(.conclusion != "" and .conclusion != "success" and .conclusion != "skipped") | .databaseId' ci-jobs.json); do
+              gh api "repos/$GH_REPO/check-runs/$id/annotations" --jq "{\"$id\": [.[] | select(.annotation_level == \"failure\") | if (.title // \"\") != \"\" then \"\(.title): \(.message)\" else .message end]}" || echo '{}'
+            done | jq -s 'add // {}' > failures.json
+            jq --slurpfile failures failures.json 'map(. + {failures: ($failures[0][.databaseId | tostring] // [])})' ci-jobs.json > jobs.json
+            rerun=$(bun ts/scripts/autoland.ts rerun --jobs jobs.json --attempt "$GITHUB_RUN_ATTEMPT" --count "$(jq '.failures | length' candidate/summary.json 2> /dev/null || echo 0)")
+            if [ -n "$rerun" ]; then
+              status "$tip" pending "rerunning run $GITHUB_RUN_ID: $rerun"
+              echo "\`${branches[0]}\` measured nothing ($rerun): the sweep reruns the failed jobs once; the lane stays pending" >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
             status "$tip" failure "${SHA:+on ${SHA:0:10}: }$why"
             eval "$FLAG_CONFLICT"; base=$BASE
             flag "${branches[0]}" "$tip" "lane failed: $why. Push a fix to the branch, or restaff the issue." failed

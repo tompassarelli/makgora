@@ -38,6 +38,8 @@ export function laneState(lane: Lane, runs: readonly Run[], retry: ReadonlySet<s
   if (lane.status !== null && lane.status.state !== "pending") return retry.has(lane.branch) ? "test" : "done";
   if (passedAlone(lane) !== undefined) return "passed";
   if (lane.status?.description === WAITING && minutes(now, lane.status.at) < DISPATCHED) return "testing";
+  const rerun = RERUN.exec(lane.status?.description ?? "")?.[1];
+  if (rerun !== undefined && (minutes(now, lane.status?.at ?? "") < BOUND.idle || runs.some((run) => run.status !== "completed" && String(run.id) === rerun))) return "testing";
   if (runs.some((run) => { const match = TEST_TITLE.exec(run.title); return run.status !== "completed" && match?.[2] === lane.branch && match[3] === lane.tip; })) return "testing";
   if (lane.status?.description === "bisect" && runs.some((run) => run.status !== "completed" && LEGACY_TITLE.exec(run.title)?.[1]?.split(" ").includes(lane.branch) === true)) return "held";
   return "test";
@@ -277,4 +279,33 @@ export function autoclose(body: string, passed: ReadonlyMap<string, boolean>, sh
   const declared = all.some((box) => box.check !== undefined || box.needs !== undefined);
   const comment = !declared ? undefined : [...(close ? [`Closed by auto-close after ${sha} landed: every Done-when box is ticked.`] : []), ...sections.map((section) => section.join("\n"))].join("\n\n");
   return { body: lines.join("\n"), close, marker, ...(comment === undefined ? {} : { comment }) };
+}
+
+export interface CiStep { readonly name: string; readonly conclusion: string }
+export interface CiJob { readonly name: string; readonly conclusion: string; readonly steps: readonly CiStep[]; readonly failures?: readonly string[] }
+const SETUP_STEP = /^(?:Set up job|Complete job|Post |Run actions\/|Run oven-sh\/setup-bun|Run bun install|Install stock texture converter)/;
+const INFRA_JOB = new Set(["cancelled", "timed_out", "startup_failure", "action_required", "stale"]);
+const UNMEASURED_TITLE = "Unmeasured";
+const UNMEASURED = new RegExp(`^${UNMEASURED_TITLE}:|has timed out after|exceeded the maximum execution time|lost communication with the server|received a shutdown signal|The operation was canceled`);
+
+export function unmeasured(job: CiJob): string | undefined {
+  if (INFRA_JOB.has(job.conclusion)) return `job ${job.name} ${job.conclusion}`;
+  if (job.conclusion !== "failure") return undefined;
+  const step = job.steps.find((entry) => entry.conclusion === "failure");
+  if (step === undefined) return `job ${job.name} failed without a failing step (runner lost)`;
+  if (SETUP_STEP.test(step.name)) return `setup step failed (${job.name}: ${step.name})`;
+  const annotation = job.failures?.find((line) => UNMEASURED.test(line));
+  return annotation === undefined ? undefined : `${job.name}: ${annotation}`;
+}
+
+
+const MERGE_JOB = /(?:^|\/ )merge$/;
+export const RERUN = /^rerunning run (\d+): /;
+
+export function laneRerun(jobs: readonly CiJob[], attempt: number, testFailures: number): string | undefined {
+  if (attempt !== 1 || testFailures > 0) return undefined;
+  const failed = jobs.filter((job) => job.conclusion !== "" && job.conclusion !== "success" && job.conclusion !== "skipped" && job.conclusion !== "neutral");
+  const reasons = failed.map(unmeasured);
+  const first = reasons.find((reason) => reason !== undefined);
+  return first !== undefined && failed.every((job, index) => reasons[index] !== undefined || MERGE_JOB.test(job.name)) ? first : undefined;
 }
