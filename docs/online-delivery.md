@@ -37,7 +37,9 @@ acceptance: input integrity #26, online play #17, Linux controller #18, physics
 #9, then visuals #14, balance #12, hosting #19 and Windows/macOS #34. Current
 results and the input integrity table: roadmap #16.
 
-The 33/50/83 ms response figures are advisory targets that #26 reports
-against, not gates. Human feel, physical controllers and other platforms are
+The 33/50/83 ms response figures are soft targets that #26 reports against,
+not gates; their ceiling is Street Fighter 6's measured ~58 ms press-to-screen
+(averages of 55.65–58.93 ms across platforms, [EventHubs, 5 Jun 2023](https://www.eventhubs.com/news/2023/jun/05/input-lag-tests-sf6-platforms);
+a median figure is unverified). Human feel, physical controllers and other platforms are
 observed in the owner-gated boxes of #17, #18 and #34, never through
 synthetic stand-ins.
