@@ -1062,7 +1062,7 @@ file: no stock contact spark carries a light of that colour and length, and a
 second stock effect per hit would add a pool and script calls. Checks
 `192-slash-before|after` compare it against the f9d0fbf3 build.
 
-The #168 gate is the measured predicted frame cost (p99 ≤10 ms, worst 1% of frames ≤14 ms on average)
+The #168 gate is the measured predicted frame cost (p99 ≤10 ms, worst frame ≤14 ms)
 from a `--samples` run checked with `bun wisp perf budget RUN_FILE`. Run the
 matching workload on the hosted farm. GPU frame intervals and #165 profile
 comparisons come from the native owner's capture tooling; they are distinct
