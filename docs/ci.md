@@ -38,9 +38,13 @@ landing restarts another's suites.
    token can't push those), is refused. A green tip becomes "passed alone on
    MAIN as tree TREE".
 3. **Train.** One train at a time takes up to 4 tips that passed alone, first
-   passed first, and rebases them onto main. A leader whose rebase is the
-   very tree it passed alone lands by itself without another suite; any other
-   train runs the gate and farm test once as one merged candidate.
+   passed first, and rebases them onto main. When the leader is the tree it
+   passed alone plus only main commits that miss its paths (`pastMain`), it
+   and up to one more such tip land without another suite (`trainStep`); any
+   other train runs the gate and farm test once as one merged candidate.
+   Every plan, standalone or ending a run, holds the `autoland-plan-step`
+   lock, and a tip marked "waiting to test alone" under 2 min ago counts as
+   testing, so no tip is planned twice (#515).
 4. **Land.** Only when the suites pass on that exact candidate, main's known
    failures included (#394), and its regenerated reports meet their targets,
    main is fast-forwarded to it plus the reports commit, each branch's

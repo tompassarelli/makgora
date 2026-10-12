@@ -7,6 +7,8 @@ export const PROFILE_STEP = 30_000;
 export const LEAD = 30_000;
 export const AGED = 60;
 export const TRAIN_CAP = 4;
+export const DIRECT_CAP = 2;
+export const DISPATCHED = 2;
 
 export interface Status { readonly state: string; readonly description: string; readonly at: string }
 export interface Lane { readonly branch: string; readonly tip: string; readonly status: Status | null; readonly since?: string; readonly labels?: readonly string[] }
@@ -32,9 +34,10 @@ export function passedAlone(lane: Lane): { readonly base: string; readonly tree:
   return base === undefined || tree === undefined ? undefined : { base, tree };
 }
 
-export function laneState(lane: Lane, runs: readonly Run[], retry: ReadonlySet<string> = new Set()): LaneState {
+export function laneState(lane: Lane, runs: readonly Run[], retry: ReadonlySet<string> = new Set(), now = Number.POSITIVE_INFINITY): LaneState {
   if (lane.status !== null && lane.status.state !== "pending") return retry.has(lane.branch) ? "test" : "done";
   if (passedAlone(lane) !== undefined) return "passed";
+  if (lane.status?.description === WAITING && minutes(now, lane.status.at) < DISPATCHED) return "testing";
   if (runs.some((run) => { const match = TEST_TITLE.exec(run.title); return run.status !== "completed" && match?.[2] === lane.branch && match[3] === lane.tip; })) return "testing";
   if (lane.status?.description === "bisect" && runs.some((run) => run.status !== "completed" && LEGACY_TITLE.exec(run.title)?.[1]?.split(" ").includes(lane.branch) === true)) return "held";
   return "test";
@@ -78,7 +81,7 @@ export function plan(lanes: readonly Lane[], runs: readonly Run[], now: number, 
   const test: TestOrder[] = [];
   let passed = false;
   for (const lane of byArrival(lanes, now)) {
-    const state = laneState(lane, runs, retried);
+    const state = laneState(lane, runs, retried, now);
     passed ||= state === "passed";
     if (state !== "test") continue;
     if (held + RUN_BUILD * (test.length + 1) > JOB_BUDGET || peak + RUN_PEAK * (test.length + 1) > JOB_BUDGET) continue;
@@ -97,6 +100,14 @@ export function train(lanes: readonly Lane[], now: number): TrainLane[] {
     const passed = passedAlone(lane);
     return passed === undefined ? [] : [{ branch: lane.branch, tip: lane.tip, ...passed }];
   }).slice(0, TRAIN_CAP);
+}
+
+export type TrainStep = "suite" | "direct" | "last" | "drop";
+
+export function trainStep(direct: readonly boolean[]): TrainStep {
+  if (direct[0] !== true) return "suite";
+  if (direct.at(-1) !== true) return "drop";
+  return direct.length >= DIRECT_CAP ? "last" : "direct";
 }
 
 export type Verdict = "land" | "fail" | "retest";
@@ -159,7 +170,7 @@ const NEVER_DISJOINT = /^(?:\.github\/workflows\/|ts\/scripts\/autoland)/;
 const changed = (from: Tree, to: Tree): string[] => [...new Set([...from.keys(), ...to.keys()])].filter((path) => from.get(path) !== to.get(path));
 
 export function pastMain(base: Tree, tested: Tree, main: readonly Tree[], landed: Tree | undefined): "land" | "retest" {
-  if (landed === undefined || main.length === 0) return "retest";
+  if (landed === undefined) return "retest";
   const train = new Set(changed(base, tested));
   let before = base;
   for (const tree of main) {

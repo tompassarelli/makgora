@@ -21,7 +21,7 @@ test("a train lands past main iff every main commit misses its paths, as the tes
     let disjoint = true;
     const merged = new Map(tested);
     let before = base;
-    for (let commits = 1 + next(3); commits > 0; commits--) {
+    for (let commits = next(4); commits > 0; commits--) {
       const tree = edit(before, pick(PATHS), "main");
       for (const path of PATHS) {
         if (before.get(path) === tree.get(path)) continue;

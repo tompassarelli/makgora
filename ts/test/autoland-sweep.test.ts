@@ -18,7 +18,7 @@ const project = (run: Run, at: number, now: number): number => {
 const fits = (runs: readonly Run[], added: number, now: number): boolean => Array.from({ length: 24 }, (_, step) => now + step * PROFILE_STEP).every((at) =>
   runs.reduce((sum, run) => sum + project(run, at, now), 0) + added * (at < now + LEAD ? RUN_BUILD : PROFILE[Math.floor((at - now - LEAD) / PROFILE_STEP)] ?? 0) <= JOB_BUDGET);
 const allowed = (lanes: readonly Lane[], runs: readonly Run[], now: number): number => {
-  const most = Math.min(Array.from({ length: TEST_SLOTS }, (_, slot) => String(slot)).filter((slot) => !busySlots(runs).has(slot)).length, lanes.filter((lane) => laneState(lane, runs) === "test").length);
+  const most = Math.min(Array.from({ length: TEST_SLOTS }, (_, slot) => String(slot)).filter((slot) => !busySlots(runs).has(slot)).length, lanes.filter((lane) => laneState(lane, runs, new Set(), now) === "test").length);
   return Array.from({ length: most + 1 }, (_, added) => added).filter((added) => fits(runs, added, now)).at(-1) ?? 0;
 };
 const waited = (lane: Lane): string => [lane.since, lane.status?.at].filter((at) => at !== undefined).toSorted()[0] ?? "";
@@ -81,7 +81,7 @@ test("plan fills every free slot whose run fits the measured job profile under J
     if (orders.length > 0) expect(fits(runs, orders.length, now)).toBe(true);
     const ordered = new Set(orders.map((order) => order.branch));
     const chosen = lanes.filter((lane) => ordered.has(lane.branch));
-    for (const lane of lanes.filter((candidate) => !ordered.has(candidate.branch) && laneState(candidate, runs) === "test" && aged(candidate, now)))
+    for (const lane of lanes.filter((candidate) => !ordered.has(candidate.branch) && laneState(candidate, runs, new Set(), now) === "test" && aged(candidate, now)))
       expect(chosen.some((other) => !aged(other, now) || waited(other) > waited(lane))).toBe(false);
   }
 });
