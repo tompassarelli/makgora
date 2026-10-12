@@ -91,7 +91,7 @@ export function landedLanes(base: string, commits: readonly Commit[]): readonly 
     const start = end - count + 1;
     if (!branch.startsWith("claude/") || count < 1 || start < 0 || issues.some((issue) => issue < 1)) return undefined;
     if (commits.slice(start, end).some((entry) => entry.message.split("\n").some((line) => line.startsWith(LANE_TRAILER) || line === REPORTS_TRAILER))) return undefined;
-    lanes.unshift({ branch, issues, parent: commits[start - 1]?.sha ?? base, head: commit.sha, commits: commits.slice(start, end + 1).map((entry) => entry.sha) });
+    lanes.unshift({ branch, issues: [...new Set([...issues, ...referencedIssues(commits.slice(start, end + 1))])].toSorted((a, b) => a - b), parent: commits[start - 1]?.sha ?? base, head: commit.sha, commits: commits.slice(start, end + 1).map((entry) => entry.sha) });
     end = start - 1;
   }
   return lanes.length === 0 ? undefined : lanes;
@@ -134,14 +134,14 @@ export function suiteProbe(workflow: string, step: string): { readonly args: rea
     if (step === "Background sweeps (lua32): Run bun scripts/lua-tests.ts") return { args: ["scripts/lua-tests.ts"], env: { ...env, LUA_JOBS: "4" } };
   }
   if (workflow !== "CI") return undefined;
-  if (step === "Sweeps (Bun): Run bun run test") return { args: ["run", "test"], env: { SWEEPS: "1" } };
+  if (step === "Sweeps (Bun): Run bun run test") return { args: ["run", "test"], env: { SWEEPS: "1", SWEEP_PLACEMENT: "gate" } };
   const partition = /^Lua32 \((bot|remainder|sweeps ([1-6])\/6)\): Run bun scripts\/lua-tests\.ts$/.exec(step);
   if (partition === null) return undefined;
   const sweeps = partition[2] !== undefined;
   return { args: ["scripts/lua-tests.ts"], env: {
     GAME_TESTS: partition[1] === "bot" ? "game/match/bot" : "",
     GAME_TESTS_EXCLUDE: partition[1] === "remainder" ? "game/match/bot" : "",
-    SWEEPS: sweeps ? "1" : "", LUA_JOBS: sweeps ? "4" : "1",
+    SWEEP_PLACEMENT: "gate", SWEEPS: sweeps ? "1" : "", LUA_JOBS: sweeps ? "4" : "1",
     LUA_PARTITION: sweeps ? `${Number(partition[2]) - 1}/6` : "0/1",
   } };
 }
@@ -209,14 +209,14 @@ const probeLane = (probe: Probe, suite: NonNullable<ReturnType<typeof suiteProbe
     yield* runProcess(ChildProcess.make("bun", ["install", "--frozen-lockfile"], { cwd }));
     const measured = yield* collect(ChildProcess.make("bun", suite.args, { cwd, env: {
       GAME_TESTS: "", GAME_TESTS_EXCLUDE: "", SWEEPS: "", SWEEP_PLACEMENT: "", LUA_PARTITION: "0/1", LUA_JOBS: "1", ...suite.env,
-    }, stdin: "ignore" }));
+    }, extendEnv: true, stdin: "ignore" }));
     const log = new TextDecoder().decode(measured.stdout) + "\n" + measured.stderr;
     const names = log.split("\n").flatMap((line) => {
       const name = failedTest(line);
       return name === undefined ? [] : [name];
     });
     const result = measured.exitCode === 0 ? "pass" as const
-      : measured.exitCode === 1 && failures.some((name) => names.includes(name)) ? "fail" as const : "unmeasured" as const;
+      : measured.exitCode === 1 && failures.every((name) => names.includes(name)) ? "fail" as const : "unmeasured" as const;
     yield* Console.log(`Sheriff probe ${probe.head.slice(0, 10)}${probe.without === undefined ? "" : ` minus ${probe.without.join(" ")}`}: ${result}, exit ${measured.exitCode}${names.length === 0 ? "" : `, ${names.join("; ")}`}`);
     return result;
   }),

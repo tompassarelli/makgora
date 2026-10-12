@@ -21,8 +21,6 @@ permissions:
   contents: write
   issues: write
 
-# One queue per branch: GitHub keeps one pending run per group and cancels the
-# older, so a dispatched report would otherwise be lost to main's next event.
 concurrency:
   group: main-red-${{ github.event.workflow_run.head_branch || inputs.run }}
   cancel-in-progress: false
@@ -50,15 +48,32 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898183+github-actions[bot]@users.noreply.github.com"
-          bun scripts/sheriff.ts "${{ inputs.run || github.event.workflow_run.id }}"
+          if [ -n "$REPORT_RUN" ]; then
+            runs="$REPORT_RUN"
+          else
+            runs=""
+            for workflow in ci.yml background-sweeps.yml; do
+              newest=$(gh run list --workflow "$workflow" --branch main --status completed --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+              runs="$runs $newest"
+            done
+          fi
+          echo "runs=$runs" >> "$GITHUB_OUTPUT"
+          for run in $runs; do
+            bun scripts/sheriff.ts "$run"
+          done
         working-directory: ts
         env:
+          REPORT_RUN: ${{ inputs.run }}
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
       # A reverted landing gets no issue: the revert's own CI run reports.
       - if: ${{ !cancelled() && steps.sheriff.outputs.reverted == '' }}
-        run: bun scripts/mainRed.ts "${{ inputs.run || github.event.workflow_run.id }}"
+        run: |
+          for run in $REPORT_RUNS; do
+            bun scripts/mainRed.ts "$run"
+          done
         working-directory: ts
         env:
+          REPORT_RUNS: ${{ steps.sheriff.outputs.runs }}
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}

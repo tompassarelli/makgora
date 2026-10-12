@@ -1,4 +1,6 @@
 import { expect, test } from "bun:test";
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { bisect, decide, landedLanes, LANE_TRAILER, suiteProbe, type Commit, type LandedLane, type Probe, type ProbeResult } from "../scripts/sheriff";
 
 const sha = (value: number) => value.toString(16).padStart(40, "0");
@@ -48,10 +50,6 @@ test("sheriff reverts all and only the confirmed lane across generated trains an
       for (let culprit = 0; culprit < count; culprit++) {
         const result = search(fixture, [culprit]);
         expect(result.culprit).toEqual(fixture.expected[culprit]);
-        const reverted = result.culprit!.commits.toReversed();
-        expect(reverted).toEqual(fixture.expected[culprit]!.commits.toReversed());
-        const survivors = fixture.expected.flatMap((lane) => lane.commits).filter((commit) => !reverted.includes(commit));
-        expect(survivors).toEqual(fixture.expected.filter((_, index) => index !== culprit).flatMap((lane) => lane.commits));
         expect(search(fixture, [culprit], (probe) => probe.without === undefined && probe.head === fixture.base ? "fail" : undefined).culprit).toBeUndefined();
         expect(search(fixture, [culprit], (probe) => probe.without === undefined && probe.head === fixture.expected[culprit]!.head ? "unmeasured" : undefined).culprit).toBeUndefined();
         expect(search(fixture, [culprit], (probe) => probe.without !== undefined ? "unmeasured" : undefined).culprit).toBeUndefined();
@@ -87,5 +85,77 @@ test("sheriff bisects 1-6 lanes within ceil(log2(n))+5 probes and confirms the a
         expect(result.probes.at(-1)).toEqual({ probe: { head: fixture.main, without: expected.commits.toReversed() }, result: "pass" });
       }
     }
+  }
+});
+
+
+test("sheriff replays the recorded suite with inherited environment and every failed name before reopening only its lane refs [k5 boundary sheriff-replay]", async () => {
+  const build = resolve(import.meta.dir, "../../build");
+  mkdirSync(build, { recursive: true });
+  const root = mkdtempSync(join(build, "sheriff-boundary-"));
+  const fixture = train(7, 1);
+  const culprit = fixture.expected[0]!;
+  const names = ["first recorded failure [k1 scenario]", "second recorded failure [k1 scenario]"];
+  const commits = fixture.commits.map((commit) => culprit.commits.includes(commit.sha)
+    ? { ...commit, message: `Subject only (#777)${commit.sha === culprit.head ? `\n\n${LANE_TRAILER} ${JSON.stringify({ branch: culprit.branch, count: culprit.commits.length, issues: [] })}` : ""}` }
+    : commit);
+  const bin = join(root, "bin");
+  mkdirSync(bin);
+  const runner = `#!${process.execPath}
+import { appendFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { basename, join } from "node:path";
+const fixture = JSON.parse(readFileSync(process.env.SHERIFF_FIXTURE, "utf8"));
+const args = process.argv.slice(2);
+const command = basename(process.argv[1]);
+appendFileSync(fixture.calls, JSON.stringify({ command, args }) + "\\n");
+const print = (value) => console.log(typeof value === "string" ? value : JSON.stringify(value));
+if (command === "gh") {
+  if (args[0] === "api") print([]);
+  else if (args[0] === "issue" && args[1] === "view") print({ state: "CLOSED" });
+  else if (args[1] === "list") print([{ databaseId: 200, conclusion: "failure", headSha: fixture.main }, { databaseId: 100, conclusion: "success", headSha: fixture.base }]);
+  else if (args.includes("--log-failed")) fixture.names.forEach((name) => print("Sweeps (Bun)\\tRun bun run test\\t2026-10-12T20:00:00Z (fail) " + name));
+  else if (args[0] === "run" && args[1] === "view") print({ conclusion: "failure", headBranch: "main", headSha: fixture.main, url: "https://example.invalid/run/200", workflowName: "CI", databaseId: 200, attempt: 1, jobs: [{ name: "Sweeps (Bun)", conclusion: "failure", databaseId: 300, steps: [{ name: "Run bun run test", conclusion: "failure" }] }] });
+} else if (command === "git") {
+  if (args[0] === "log") process.stdout.write(fixture.commits.map((commit) => commit.sha + "\\n" + commit.message).join(String.fromCharCode(0)) + String.fromCharCode(0));
+  else if (args[0] === "rev-parse") print(fixture.main);
+  else if (args[0] === "diff-tree") print("tools/move-data/advantage-state.md");
+  else if (args[0] === "worktree" && args[1] === "add") { const path = args.at(-2); mkdirSync(join(path, "ts"), { recursive: true }); writeFileSync(join(path, "probe"), args.at(-1)); }
+  else if (args[0] === "worktree" && args[1] === "remove") rmSync(args.at(-1), { recursive: true, force: true });
+  else if (args[0] === "-C") writeFileSync(join(args[1], "without"), "yes");
+} else if (command === "bun" && args[0] !== "install") {
+  if (process.env.HOME !== fixture.root || !process.env.PATH?.startsWith(fixture.bin + ":") || process.env.SWEEP_PLACEMENT !== "gate" || process.env.SWEEPS !== "1") process.exit(2);
+  const head = readFileSync(join(process.cwd(), "../probe"), "utf8");
+  if (head !== fixture.base) {
+    try { readFileSync(join(process.cwd(), "../without")); } catch {
+      const failures = fixture.subset && head === fixture.head ? fixture.names.slice(0, 1) : fixture.names;
+      failures.forEach((name) => print("(fail) " + name));
+      process.exit(1);
+    }
+  }
+}
+`;
+  for (const command of ["gh", "git", "bun"]) {
+    writeFileSync(join(bin, command), runner);
+    chmodSync(join(bin, command), 0o755);
+  }
+  try {
+    const env = { ...process.env, PATH: `${bin}:${process.env.PATH}`, HOME: root, SHERIFF_FIXTURE: join(root, "fixture.json"), GITHUB_OUTPUT: join(root, "output"), GITHUB_STEP_SUMMARY: join(root, "summary") };
+    for (const subset of [false, true]) {
+      const calls = join(root, "calls");
+      writeFileSync(calls, "");
+      writeFileSync(env.GITHUB_OUTPUT, "");
+      writeFileSync(env.SHERIFF_FIXTURE, JSON.stringify({ root, bin, calls, base: fixture.base, main: fixture.main, head: culprit.head, commits, names, subset }));
+      const child = Bun.spawn([process.execPath, resolve(import.meta.dir, "../scripts/sheriff.ts"), "200"], { env, stdout: "pipe", stderr: "pipe" });
+      const [exitCode, stdout, stderr] = await Promise.all([child.exited, new Response(child.stdout).text(), new Response(child.stderr).text()]);
+      expect({ exitCode, stderr }).toEqual({ exitCode: 0, stderr: "" });
+      const recorded: { command: string; args: string[] }[] = readFileSync(calls, "utf8").trim().split("\n").map((line) => JSON.parse(line));
+      const reopened = recorded.filter(({ command, args }) => command === "gh" && args[0] === "issue" && args[1] === "reopen").map(({ args }) => Number(args[2]));
+      expect(reopened).toEqual(subset ? [] : [777]);
+      const reverted = readFileSync(env.GITHUB_OUTPUT, "utf8").startsWith("reverted=");
+      expect(reverted).toBe(!subset);
+      expect(stdout.includes(subset ? "no lane confirmed" : "confirmed culprit lane")).toBe(true);
+    }
+  } finally {
+    rmSync(root, { recursive: true, force: true });
   }
 });

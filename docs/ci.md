@@ -164,8 +164,12 @@ Main's last landing doesn't stay on main red. After each CI run on main,
 "Main is red" first runs the sheriff (smashcraft:ts/scripts/sheriff.ts) on it.
 The same holds for each Background sweeps run Autoland dispatches for a
 landing: its `main-red` job waits for the sweeps and the census, then
-dispatches the sheriff on that run, so a census regression reverts its landing
-like a red CI step:
+dispatches the sheriff on that run. Supported suite failures follow the same
+rules as CI; census regressions raise the alarm. The branch queue keeps one running and one pending job;
+a newer completion replaces the pending job. When that job starts, it reads
+the newest completed CI and Background sweeps runs afresh, so only each
+workflow's newest red range is acted on. An explicit run-ID dispatch keeps
+its requested run, which the sheriff ignores if a newer finished run exists:
 
 - **Revert.** A single measured Bun or Lua32 suite step failed after a green
   ancestor. Autoland records `Autoland-Lane: {"branch":"claude/name","count":N,"issues":[513]}`
@@ -175,13 +179,16 @@ like a red CI step:
   generated reports commit carries `Autoland-Reports: 1` and may change only
   the two advantage-state report files. The sheriff walks these records into
   complete lanes, bisects their boundary snapshots, and replays the same suite
-  with the workflow's exact sweep and Lua partition environment. It confirms
-  that the actual culprit parent passes, the lane head fails with a recorded
+  with the workflow's exact sweep and Lua partition environment, including
+  CI's workflow-level `SWEEP_PLACEMENT=gate` and Background sweeps'
+  `SWEEP_PLACEMENT=background`, while preserving inherited `PATH` and `HOME`.
+  It confirms that the actual culprit parent passes, the lane head fails with every recorded
   failing test, and current main passes with only that lane reverted. A reports
   commit between lanes is part of the actual parent confirmation. It then
   reverts only that lane's commits, newest first; innocent lanes and report
   commits stay landed. It pushes only while main remains the confirmed SHA.
-  The revert carries `Sheriff-Reverts: SHA...` and only that lane's issue refs,
+  The revert carries `Sheriff-Reverts: SHA...` and only that lane's issue refs
+  from its metadata and commit subjects (including `(#N)`),
   dispatches main's CI, and reopens only that lane's closed issues. The job
   summary and `Sheriff` annotation name the lane, reverted commits, failing
   step and run. The reverted run opens no "main is red" issue; the revert's
