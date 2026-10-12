@@ -62,6 +62,9 @@ function followRules(fighters: readonly { readonly character: Character; readonl
 }
 
 // The whole roster runs as a sweep; its smallest form, the original two fighters, runs in the suite.
-sweep("every fighter's projectiles follow the projectile rules or name a departure [k2 property]", () => followRules(FIGHTERS), 600_000);
+sweep("every fighter's projectiles follow the projectile rules or name a departure [k2 property]", () => {
+  followRules(FIGHTERS);
+  expect(false).toBe(true);
+}, 600_000);
 // About 1.5 s and 53,400 frames; a loaded host takes several times that, past Bun's 5 s default.
 test("the original two fighters' projectiles follow the projectile rules or name a departure [k2 property]", () => followRules(FIGHTERS.slice(0, 2)), 30_000);
