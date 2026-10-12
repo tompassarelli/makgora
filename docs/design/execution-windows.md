@@ -121,7 +121,7 @@ value inside a range is equally usable. Frame figures at 60 fps.
 
 | Window type | Lower | Upper | Evidence | Today |
 |---|---|---|---|---|
-| Reaction-based option (the responder must see something and then act) | 15 frames from the first visible cue, for one option | 15 plus Hick growth for several options; at 4 options about 25 | Visual reaction 190 to 250 ms is 11 to 15 frames before display and input latency; choice time rises with log2(n + 1) | not measured |
+| Reaction-based option (the responder must see something and then act) | 15 frames from the first visible cue, for one option | 15 plus Hick growth for several options | Visual reaction 190 to 250 ms is 11 to 15 frames before display and input latency; choice time rises with log2(n + 1) | not measured |
 | Tech (defensive press before contact) | 11 | 20 | Ultimate 11, Melee 20 | 20 |
 | Tech lockout between presses | 20 | 40 | Melee 40; no source for a lower value, so the lower bound is a guess | 40 |
 | Input buffer | 4 | 10 | Strive 5, SFV smallest 5, Tekken 8, Ultimate 9, Brawl 10 | 6 |
@@ -135,6 +135,6 @@ value inside a range is equally usable. Frame figures at 60 fps.
 
 Required ordinary-play inputs have at least 3 accepted frames. Reaction-based
 options have at least 15 frames after the first visible cue, with a larger
-budget for choices. Optional precision rewards can be tighter. The four-choice
-25-frame target is a design budget: the empirical Hick coefficient remains
+budget for choices. Optional precision rewards can be tighter. Several-option
+windows carry no frame number: the empirical Hick coefficient remains
 unretrieved.
