@@ -163,7 +163,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Neutral special: Chain Lightning | HeroFarSeerAttack1 | LightningBolt | LightningBolt + LightningBolt | MetalMediumBashMetal |  |
 | Side special: Feral Spirit | FeralSpiritTarget | MetalMediumChopFlesh | MetalMediumChopFlesh + LightningBolt | MetalMediumBashMetal |  |
 | Up special: Far Sight | RevealMap | MetalMediumBashFlesh | MetalMediumBashFlesh + LightningBolt | MetalMediumBashMetal |  |
-| Down special: Earthquake | RockHeavyBashFlesh | MetalHeavyBashFlesh | MetalHeavyBashFlesh + LightningBolt | MetalMediumBashMetal |  |
+| Down special: Doomhammer Slam | RockHeavyBashFlesh | MetalHeavyBashFlesh | MetalHeavyBashFlesh + LightningBolt | MetalMediumBashMetal |  |
 
 ## Jaina Proudmoore
 

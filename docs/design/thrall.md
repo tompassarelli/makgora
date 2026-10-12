@@ -2,7 +2,7 @@
 
 Thrall is a heavy ground-control brawler. Doomhammer threatens the space just
 outside a jab, lightning checks a retreat, and two spirit wolves make the
-opponent jump into his hammer. Earthquake catches a grounded approach but
+opponent jump into his hammer. Doomhammer Slam catches a grounded approach but
 leaves time to jump or punish its recovery. Values below are original,
 provisional Smashcraft values, not copied hitboxes or animation.
 
@@ -11,7 +11,7 @@ provisional Smashcraft values, not copied hitboxes or animation.
 [Wowpedia's Thrall](https://wowpedia.fandom.com/wiki/Thrall) and
 [Doomhammer](https://wowpedia.fandom.com/wiki/Doomhammer) establish the warrior,
 shaman and hammer. The [Far Seer](https://liquipedia.net/warcraft/Far_Seer)
-supplies Chain Lightning, Feral Spirit, Far Sight and Earthquake; Blizzard's
+supplies Chain Lightning, Feral Spirit, Far Sight and Earthquake (his ultimate); Blizzard's
 [Far Seer unit page](https://classic.battle.net/war3/orc/units/farseer.shtml)
 is the original ability reference. Only these ability identities and numerical
 facts are reused; no outside implementation, prose or animation is copied.
@@ -84,7 +84,7 @@ Grounded low attacks and down air use the wolf's visible paw, spanning x52–96
 at z20–34 with radius 20–24, rather than claiming the rider's hammer touches
 the floor. Their Warcraft source is Feral Spirit and their Smash reference
 is [Duck Hunt's animal strikes](https://www.ssbwiki.com/Duck_Hunt_(SSBU)#Moveset).
-Earthquake's low region is a spell pulse cast from the saddle. The wolf's
+Doomhammer Slam's low region is a spell pulse cast from the saddle. The wolf's
 body and attacking paws have exposed hurt volumes. This makes the hammer
 shorter than the initial design and the low paw his longer grounded poke.
 
@@ -95,11 +95,11 @@ shorter than the initial design and the low paw his longer grounded poke.
 | Neutral: Chain Lightning | [Far Seer](https://liquipedia.net/warcraft/Far_Seer) / [Pikachu's Thunder Jolt](https://www.ssbwiki.com/Thunder_Jolt) | A forward electrical cast travels from the hammer at frame14, 12 damage, 40° launch, end44, cost10. The longer recovery keeps a close blocked cast punishable after the damage increase. Reflect or jump the chest-height bolt; it is a spacing tool rather than a stun lock. Air landing lag18. |
 | Side: Feral Spirit | [Far Seer](https://liquipedia.net/warcraft/Far_Seer) / [Duck Hunt's dog](https://www.ssbwiki.com/Duck_Hunt_(SSBU)) | Two spectral wolves leave at frames16 and24, run low for 28 frames, each 4 damage/55°, cost18, end44, cooldown90. The second wolf makes a delayed jump or shield decision; each can hit only once. Summons can be blocked or parried but do not reflect. Air wolves descend and air landing lag20 applies. |
 | Up: Far Sight | [Far Seer](https://liquipedia.net/warcraft/Far_Seer) / [Duck Jump](https://www.ssbwiki.com/Duck_Jump) | Spirit sight points a safe way upward: after8 frames, rise2.25H with up to1.5H steering over24 frames, end40, cost12, no hitbox or armor. At low mana rise1.4H free. Both forms meet the shared recovery-distance band. Uses the aerial jump and ends helpless; the broad body can be intercepted. This movement is an original adaptation of a vision spell. |
-| Down: Earthquake | [Far Seer](https://liquipedia.net/warcraft/Far_Seer) / [Donkey Kong's Hand Slap](https://www.ssbwiki.com/Hand_Slap) | A low spell pulse hits both sides at frames18–21, 11 damage/75°, end50, cost20, cooldown90. Ground only, 135-unit reach; jump clears it. No extra shield damage, armor or repeating hold. |
+| Down: Doomhammer Slam | [Far Seer](https://liquipedia.net/warcraft/Far_Seer) / [Donkey Kong's Hand Slap](https://www.ssbwiki.com/Hand_Slap) | A low spell pulse hits both sides at frames18–21, 11 damage/75°, end50, cost20, cooldown90. Ground only, 135-unit reach; jump clears it. No extra shield damage, armor or repeating hold. |
 | Ultimate: Elemental Fury | [Far Seer's Earthquake](https://liquipedia.net/warcraft/Far_Seer) / [Pikachu's Volt Tackle](https://www.ssbwiki.com/Volt_Tackle) | Designed ultimate, matching today's hero template: a storm-assisted Earthquake that sends a broad final lightning wave. The current roster stores ultimate names/descriptions; its activation system is not yet implemented. |
 
 The computer holds midrange with lightning and wolves, approaches with down
-tilt or grab, uses Earthquake against grounded proximity, juggles with up tilt
+tilt or grab, uses Doomhammer Slam against grounded proximity, juggles with up tilt
 and up air, and saves Far Sight for return to the ledge. Every special is
 listed in the gameplan and counted by the existing eight-seed coverage.
 

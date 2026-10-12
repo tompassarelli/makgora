@@ -24,7 +24,6 @@ redrawn	Abilities\Spells\Human\Resurrect\ResurrectTarget.mdx
 redrawn	Abilities\Spells\Human\StormBolt\StormBoltMissile.mdx
 same	Abilities\Spells\Human\SunderingBlades\SunderingBlades.mdx
 redrawn	Abilities\Spells\Human\Thunderclap\ThunderClapCaster.mdx
-redrawn	Abilities\Spells\Human\Thunderclap\ThunderclapTarget.mdx
 redrawn	Abilities\Spells\Items\AIfb\AIfbSpecialArt.mdx
 redrawn	Abilities\Spells\Items\VampiricPotion\VampPotionCaster.mdx
 redrawn	Abilities\Spells\NightElf\BattleRoar\RoarTarget.mdx
@@ -127,6 +126,7 @@ same	Abilities\Weapons\Blood\BloodImpact.mdx
 redrawn	Abilities\Weapons\Bolt\BoltImpact.mdx
 redrawn	Abilities\Weapons\CannonTowerMissile\CannonTowerMissile.mdx
 redrawn	Abilities\Weapons\DemolisherFireMissile\DemolisherFireMissile.mdx
+redrawn	Abilities\Weapons\DemolisherMissile\DemolisherMissile.mdx
 redrawn	Abilities\Weapons\DemonHunterMissile\DemonHunterMissile.mdx
 redrawn	Abilities\Weapons\DragonHawkMissile\DragonHawkMissile.mdx
 redrawn	Abilities\Weapons\FarseerMissile\FarseerMissile.mdx

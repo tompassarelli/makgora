@@ -39,7 +39,7 @@ export const AERIAL_DOWN_CHOICES: Readonly<Record<number, string>> = {
   [Character.pitLord]: "aerial Rain of Fire; lands into the grounded cast",
   [Character.beastmaster]: "downward quill volley; commands a deployed Quilbeast",
   [Character.lichKing]: "downward shadow pulse with the Defile hit",
-  [Character.thrall]: "falling two-sided Earthquake clap",
+  [Character.thrall]: "falling two-sided Doomhammer Slam",
   [Character.jaina]: "downward water bolt; recall works while falling",
   [Character.sylvanas]: "Life Drain grab while falling",
   [Character.cairne]: "Reincarnation healing guard while falling",
