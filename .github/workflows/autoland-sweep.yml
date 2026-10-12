@@ -120,5 +120,12 @@ jobs:
               gh issue comment "$(jq -r .number <<< "$issue")" --body "$body"
             fi
           elif [ -n "$issue" ]; then
-            gh issue close "$(jq -r .number <<< "$issue")" --comment "Main moved at $landed: Autoland is flowing again."
+            number=$(jq -r .number <<< "$issue")
+            { gh api "repos/$GH_REPO/issues/$number" --jq .body; gh api "repos/$GH_REPO/issues/$number/comments?per_page=100" --jq '.[].body'; } | jq -Rs '[.]' > bodies.json
+            flagged=$(bun ts/scripts/autoland.ts flagged --bodies bodies.json --lanes lanes.json)
+            if [ -n "$flagged" ]; then
+              echo "The alarm stays open for conflicting lanes not yet pushed again, landed or deleted: $(cut -f1 <<< "$flagged" | xargs)" >> "$GITHUB_STEP_SUMMARY"
+            else
+              gh issue close "$number" --comment "Main moved at $landed and no flagged lane still waits at its conflicting tip: Autoland is flowing again."
+            fi
           fi

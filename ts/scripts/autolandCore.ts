@@ -223,3 +223,10 @@ export function resolveConflicts(conflicts: readonly Conflict[]): Resolution {
   }
   return { resolve: true, pins, reports: conflicts.filter(({ path }) => GENERATED_REPORTS.includes(path)).map(({ path }) => path) };
 }
+
+const FLAGGED = /<!-- autoland-conflict-lane (\S+) ([0-9a-f]{40}) -->/g;
+
+export const flaggedLanes = (bodies: readonly string[], lanes: readonly Lane[]): readonly { readonly branch: string; readonly tip: string }[] => {
+  const marked = new Map(bodies.flatMap((body) => [...body.matchAll(FLAGGED)]).map(([, branch = "", tip = ""]) => [`${branch} ${tip}`, { branch, tip }]));
+  return [...marked.values()].filter(({ branch, tip }) => lanes.some((lane) => lane.branch === branch && lane.tip === tip && lane.status?.state !== "success"));
+};

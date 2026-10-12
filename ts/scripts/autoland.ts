@@ -1,7 +1,7 @@
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { parseArgs } from "node:util";
-import { JOB_BUDGET, busy, pinFamily, resolveConflicts, type Conflict, forecast, judge, looping, pastMain, plan, stalled, stuckRuns, train, trainStep, type Job, type Lane, type Run, type Status, type Tree } from "./autolandCore";
+import { JOB_BUDGET, busy, flaggedLanes, pinFamily, resolveConflicts, type Conflict, forecast, judge, looping, pastMain, plan, stalled, stuckRuns, train, trainStep, type Job, type Lane, type Run, type Status, type Tree } from "./autolandCore";
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null;
 const isStatus = (value: unknown): value is Status => isRecord(value) && typeof value.state === "string" && typeof value.description === "string" && typeof value.at === "string";
@@ -38,9 +38,9 @@ async function resolveCommand(file: string, store: string): Promise<void> {
   });
   const resolution = resolveConflicts(conflicts);
   if (!resolution.resolve) { console.log(`flag\t${resolution.why}`); return; }
-  const { storeFamily } = await import("./wisp/buildInputs");
   const notes: string[] = [];
   for (const pin of resolution.pins) {
+    const { storeFamily } = await import("./wisp/buildInputs");
     const family = pinFamily(pin.path) ?? "";
     const { ours, theirs } = stages.find((stage) => stage.path === pin.path) ?? { ours: "", theirs: "" };
     const [mine, other] = [join(store, family, ours), join(store, family, theirs)];
@@ -72,7 +72,7 @@ if (import.meta.main) {
   const { values, positionals } = parseArgs({
     args: process.argv.slice(2),
     allowPositionals: true,
-    options: { conflicts: { type: "string" }, store: { type: "string" }, rebased: { type: "string" }, lanes: { type: "string" }, runs: { type: "string" }, retry: { type: "string" }, count: { type: "string" }, green: { type: "string" }, now: { type: "string" }, landed: { type: "string" }, statuses: { type: "string" } },
+    options: { conflicts: { type: "string" }, bodies: { type: "string" }, store: { type: "string" }, rebased: { type: "string" }, lanes: { type: "string" }, runs: { type: "string" }, retry: { type: "string" }, count: { type: "string" }, green: { type: "string" }, now: { type: "string" }, landed: { type: "string" }, statuses: { type: "string" } },
   });
   const command = positionals[0];
   const now = Date.parse(values.now ?? new Date().toISOString());
@@ -89,6 +89,8 @@ if (import.meta.main) {
     for (const cancel of stuckRuns(readList(values.runs, isRun), now)) console.log([cancel.id, cancel.force, cancel.replan, cancel.reason, cancel.title].join("\t"));
   } else if (command === "stalled") {
     console.log(stalled(readList(values.lanes, isLane), values.landed ?? "", now));
+  } else if (command === "flagged") {
+    for (const lane of flaggedLanes(readList(values.bodies, isText), readList(values.lanes, isLane))) console.log([lane.branch, lane.tip].join("\t"));
   } else if (command === "loop") {
     console.log(looping(readList(values.statuses, isText)));
   } else if (command === "past-main") {
@@ -103,7 +105,7 @@ if (import.meta.main) {
   } else if (command === "judge") {
     console.log(judge(Number(values.count), values.green === "true"));
   } else {
-    console.error("usage: autoland.ts plan --lanes FILE --runs FILE [--retry BRANCHES] [--now ISO] | busy --runs FILE [--now ISO] | train --lanes FILE [--now ISO] | judge --count N --green true|false | sweep --runs FILE [--now ISO] | stalled --lanes FILE --landed ISO [--now ISO] | loop --statuses FILE | resolve --conflicts FILE [--store DIR] | train-step land|retest... | past-main BASE TESTED MAIN... [--rebased TREE] (git ls-tree -r -z files)");
+    console.error("usage: autoland.ts plan --lanes FILE --runs FILE [--retry BRANCHES] [--now ISO] | busy --runs FILE [--now ISO] | train --lanes FILE [--now ISO] | judge --count N --green true|false | sweep --runs FILE [--now ISO] | stalled --lanes FILE --landed ISO [--now ISO] | loop --statuses FILE | flagged --bodies FILE --lanes FILE | resolve --conflicts FILE [--store DIR] | train-step land|retest... | past-main BASE TESTED MAIN... [--rebased TREE] (git ls-tree -r -z files)");
     process.exit(2);
   }
 }
