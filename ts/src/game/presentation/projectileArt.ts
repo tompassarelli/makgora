@@ -118,6 +118,8 @@ export const PROJECTILE_DRAW_CUES: { readonly [model: string]: { readonly scale:
   "Abilities\\Weapons\\CannonTowerMissile\\CannonTowerMissile.mdx": { scale: 1.0, birth: { eachFrame: false } },
   "Abilities\\Weapons\\Bolt\\BoltImpact.mdx": { scale: 0.5 },
   "Abilities\\Spells\\Other\\Stampede\\StampedeMissileDeath.mdx": { scale: 1.0, birth: { eachFrame: false } },
+  "Objects\\Spawnmodels\\Demon\\DemonLargeDeathExplode\\DemonLargeDeathExplode.mdx": { scale: 1.0, birth: { eachFrame: false } },
+  "Abilities\\Spells\\NightElf\\Immolation\\ImmolationTarget.mdx": { scale: 1.0, birth: { eachFrame: false } },
   "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx": { scale: 1.0, birth: { eachFrame: false } },
 };
 
@@ -131,7 +133,6 @@ export const PROJECTILE_DRAW_OFFSETS: { readonly [model: string]: { readonly x: 
 
 export const DEFINITIVE_ULTIMATE_MODELS: { readonly [character: number]: { readonly [model: string]: string | undefined } | undefined } = {
   [Character.cairne]: { "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveMissile.mdx": "Abilities\\Spells\\Human\\ManaFlare\\ManaFlareMissile.mdx" },
-  [Character.demonHunter]: { "Abilities\\Spells\\Human\\MarkOfChaos\\MarkOfChaosTarget.mdx": "Abilities\\Weapons\\IllidanMissile\\IllidanMissile.mdx" },
   [Character.forsakenPaladin]: { "Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx": "Abilities\\Weapons\\PriestMissile\\PriestMissile.mdl" },
   [Character.pitLord]: { "Abilities\\Spells\\Undead\\Curse\\CurseTarget.mdx": "Abilities\\Weapons\\VoidWalkerMissile\\VoidWalkerMissile.mdx" },
   [Character.sylvanas]: { "Abilities\\Weapons\\BansheeMissile\\BansheeMissile.mdx": "Units\\Undead\\Banshee\\Banshee.mdx" },
@@ -153,6 +154,7 @@ export const DEFINITIVE_PROJECTILE_REDRAWS: { readonly [model: string]: string }
   "Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Spells\\NightElf\\Cyclone\\CycloneTarget.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Spells\\NightElf\\EntanglingRoots\\EntanglingRootsTarget.mdx": "HD redraw, Definitive look not yet reviewed",
+  "Abilities\\Spells\\NightElf\\Immolation\\ImmolationTarget.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Spells\\NightElf\\ShadowStrike\\ShadowStrikeMissile.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Spells\\NightElf\\TargetArtLumber\\TargetArtLumber.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Spells\\NightElf\\Tranquility\\TranquilityTarget.mdx": "HD redraw, Definitive look not yet reviewed",
@@ -217,6 +219,7 @@ export const DEFINITIVE_PROJECTILE_REDRAWS: { readonly [model: string]: string }
   "units\\creeps\\QuillBeast\\QuillBeast.mdl": "HD redraw, Definitive look not yet reviewed",
   "units\\creeps\\WarEagle\\WarEagle.mdl": "HD redraw, Definitive look not yet reviewed",
   "units\\nightelf\\Ent\\Ent.mdl": "HD redraw, Definitive look not yet reviewed",
+  "Objects\\Spawnmodels\\Demon\\DemonLargeDeathExplode\\DemonLargeDeathExplode.mdx": "HD redraw, Definitive look not yet reviewed",
   "Units\\NightElf\\Wisp\\Wisp.mdx": "HD redraw, Definitive look not yet reviewed",
   "units\\orc\\SpiritWolf\\SpiritWolf.mdx": "HD redraw, Definitive look not yet reviewed",
   "Units\\Undead\\Banshee\\Banshee.mdx": "HD redraw, Definitive look not yet reviewed",

@@ -57,7 +57,7 @@ const RIFLEMAN: AuthoredSpecial = {
 
 const ILLIDAN: AuthoredSpecial = {
   name: "Metamorphosis", endFrame: 50, groundOnly: true,
-  projectiles: [mark("Abilities\\Spells\\Human\\MarkOfChaos\\MarkOfChaosTarget.mdx", 2, 30, 0.0)],
+  projectiles: [mark("Objects\\Spawnmodels\\Demon\\DemonLargeDeathExplode\\DemonLargeDeathExplode.mdx", 2, 30, 0.0), mark("Abilities\\Spells\\NightElf\\Immolation\\ImmolationTarget.mdx", 2, 30, 0.0)],
   regions: [heroRegion(31, 33, capsule(-160.0, 60.0, 160.0, 60.0, 70.0), hit(12.0, 70, 80.0, 45.0, HitElement.fire))],
   buff: { frame: 31, kind: ItemKind.speed, frames: 480 },
 };
