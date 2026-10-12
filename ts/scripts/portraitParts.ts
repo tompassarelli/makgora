@@ -1,6 +1,8 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { Portrait } from 'wisp/scripts/wisp/screenBounds';
+import { RENDERED_FIGHTERS } from '../src/game/sim/heroes/registry';
+import { originalClip } from '../src/game/assets/fighterOriginalClipInfo';
 
 /** Classic node names per fighter for Wisp's in-frame verdict: the head (crown margin), its face, the weapon and the hand gripping it. */
 export interface PortraitParts { readonly head: readonly string[]; readonly face: readonly string[]; readonly weapon: readonly string[]; readonly hand: readonly string[] }
@@ -48,12 +50,29 @@ export interface PortraitReceipt extends Portrait { readonly path: string }
 
 export const RECEIPTS = 'receipts';
 
+const TIMELINE_BODY = /^war3mapImported\\(.+)TimelineBody-[0-9a-f]+\.mdx$/i;
+
+const currentBodies = (): ReadonlyMap<string, string> => new Map(RENDERED_FIGHTERS.flatMap((character) => {
+  const model = originalClip(character, 0)?.modelPath, name = model === undefined ? undefined : TIMELINE_BODY.exec(model)?.[1];
+  return model === undefined || name === undefined ? [] : [[name, model] as const];
+}));
+
+const withCurrentBodies = (portrait: Portrait, bodies: ReadonlyMap<string, string>): Portrait => {
+  const effects = portrait.scene.effects.map((effect) => {
+    const name = TIMELINE_BODY.exec(effect.model)?.[1];
+    const model = name === undefined ? undefined : bodies.get(name);
+    return model === undefined ? effect : { ...effect, model };
+  });
+  return { ...portrait, scene: { ...portrait.scene, effects } };
+};
+
 /** Every stored Bust receipt by its map texture path, for Wisp's `render.portraits`. */
 export function storedPortraits(renders: string): Readonly<Record<string, Portrait>> {
   const directory = join(renders, RECEIPTS);
   if (!existsSync(directory)) return {};
+  const bodies = currentBodies();
   return Object.fromEntries(readdirSync(directory).filter((file) => file.endsWith('.json')).map((file) => {
     const { path, ...portrait } = JSON.parse(readFileSync(join(directory, file), 'utf8')) as PortraitReceipt;
-    return [path, portrait];
+    return [path, withCurrentBodies(portrait, bodies)];
   }));
 }

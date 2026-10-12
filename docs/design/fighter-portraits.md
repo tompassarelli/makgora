@@ -50,7 +50,8 @@ stored with the family; `PORTRAIT_PARTS` in smashcraft:ts/scripts/portraitParts.
 names each fighter's Classic head, face, weapon and gripping-hand nodes, kept to
 the nodes its drawn body has. The headless renderer supplies them as
 `render.portraits`, so `bun wisp headless --bounds` gives each drawn bust an
-`inFrame` row (wisp#140).
+`inFrame` row (wisp#140). It points each receipt's timeline body at the one the
+map imports now, so rebuilding a body never orphans a stored receipt.
 Both sets share one rule for pose, light and camera, so only the graphics
 mode differs. Each body is posed at the frame of its Stand clip whose face
 joints (nose, else eyes, else the head attachment) stand highest above its
