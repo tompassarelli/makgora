@@ -2374,54 +2374,135 @@ mod linux {
     }
 
     #[test]
-    fn journal_tap_jump_reads_effective_guard_stick_and_keeps_button_jump() {
-        use wc3_controller::model::PadPreset;
-        let state = State { preset: PadPreset::Script, y: -32_767, lt: 20_000, ..State::default() };
-        assert_eq!(action_state(state) & JUMP, 0);
-        let state = State { tap_jump: true, ..state };
-        assert_eq!(action_state(state) & JUMP, JUMP);
-        let state = State { sources: 1 << 4, ..state };
-        assert_eq!(action_state(state) & JUMP, 0);
-        assert_eq!(action_state(State { sources: 1 << 4 | 1 << 3, ..state }) & JUMP, JUMP);
-        assert_eq!(action_state(State { lt: 0, ..state }) & JUMP, JUMP);
-        let mut held = state;
-        release_for_focus_loss(&mut held, &mut BTreeMap::new(), &mut BTreeMap::new(), 1, FrameSegment { epoch_ns: 0, first_frame: 1 }, 0).unwrap();
-        assert!(held.tap_jump);
-        assert_eq!(held.preset, PadPreset::Script);
-    }
-
-    #[test]
-    fn journal_presets_map_buttons_and_digital_shield_pressure() {
+    fn journal_actions_follow_each_presets_layout_tap_jump_and_trigger_pressure() {
         use wc3_controller::model::{PadPreset, TriggerShield, TriggerShields};
-        let (a, b, x, y, lb, rb, l3) = (1 << 0, 1 << 1, 1 << 2, 1 << 3, 1 << 4, 1 << 5, 1 << 6);
-        for (preset, expected) in [
+        let layouts = [
             (PadPreset::Melee, [ATTACK, SPECIAL, JUMP, JUMP, 0, GRAB, 0]),
             (PadPreset::ZJump, [ATTACK, SPECIAL, GRAB, JUMP, 0, JUMP, 0]),
             (PadPreset::Tom, [ATTACK, GRAB, SPECIAL, JUMP, SHORT_HOP, 0, 0]),
             (PadPreset::Script, [ATTACK, JUMP, SPECIAL, JUMP, WALK, GRAB, SHORT_HOP]),
-        ] {
-            let state = State { preset, ..State::default() };
-            for (source, action) in [a, b, x, y, lb, rb, l3].into_iter().zip(expected) {
-                assert_eq!(action_state(State { sources: source, ..state }), action, "{} {source}", preset.name());
+        ];
+        let shields = [TriggerShield::Full, TriggerShield::Light];
+        let axis = [0, -32_767, -20_000, 32_767, 22_937, 9_000];
+        let mut seed = 0x4a6f_7572_6e61_6c4d;
+        for run in 0..2_000 {
+            let (preset, layout) = layouts[(sample(&mut seed) % 4) as usize];
+            let state = State {
+                preset,
+                tap_jump: sample(&mut seed) % 2 == 0,
+                triggers: TriggerShields { left: shields[(sample(&mut seed) % 2) as usize], right: shields[(sample(&mut seed) % 2) as usize] },
+                sources: sample(&mut seed) % 128,
+                x: axis[(sample(&mut seed) % 6) as usize],
+                y: axis[(sample(&mut seed) % 6) as usize],
+                lt: [0, 4_000, 4_001, 20_000][(sample(&mut seed) % 4) as usize],
+                rt: [0, 4_000, 4_001, 20_000][(sample(&mut seed) % 4) as usize],
+                ..State::default()
+            };
+            let mut buttons = (0..7).filter(|bit| state.sources & 1 << bit != 0).fold(0, |held, bit| held | layout[bit]);
+            buttons |= if state.lt > 4_000 { LEFT_TRIGGER } else { 0 } | if state.rt > 4_000 { RIGHT_TRIGGER } else { 0 };
+            let (x, y) = melee_stick(state.x, state.y);
+            let mut expected = buttons
+                | if x < 0 { MOVE_LEFT } else { 0 } | if x > 0 { MOVE_RIGHT } else { 0 }
+                | if y < 0 { MOVE_UP } else { 0 } | if stick_down(y) { MOVE_DOWN } else { 0 };
+            if wc3_controller::stick::tap_jump(y, state.tap_jump, buttons & WALK != 0, buttons & (LEFT_TRIGGER | RIGHT_TRIGGER) != 0) {
+                expected |= JUMP;
             }
-            for left in [TriggerShield::Full, TriggerShield::Light] {
-                for right in [TriggerShield::Full, TriggerShield::Light] {
-                    let state = State { triggers: TriggerShields { left, right }, ..state };
-                    let (left, right) = (u32::from(left.pressure()), u32::from(right.pressure()));
-                    let rows: &[(u16, u16, u32, u32)] = &[(20_000, 0, LEFT_TRIGGER, left * 256), (0, 20_000, RIGHT_TRIGGER, right), (20_000, 20_000, LEFT_TRIGGER | RIGHT_TRIGGER, left * 256 + right)];
-                    for &(lt, rt, held, pressure) in rows {
-                        let row = encode_row(State { lt, rt, ..state }, 0, Edges::default());
-                        let (flags, tail) = if pressure == 0 { ("3", String::new()) } else { ("B", compact(pressure, 3)) };
-                        assert_eq!(row, format!("{flags}{}{}000{tail}", compact(held, 3), compact(held, 3)));
-                    }
+            assert_eq!(action_state(state), expected, "run {run}: {state:?}");
+            let shield = State { sources: 0, x: 0, y: 0, ..state };
+            let held = action_state(shield);
+            let pressure = if held & LEFT_TRIGGER != 0 { u32::from(state.triggers.left.pressure()) * 256 } else { 0 }
+                + if held & RIGHT_TRIGGER != 0 { u32::from(state.triggers.right.pressure()) } else { 0 };
+            let (flags, tail) = match (held, pressure) {
+                (0, _) => ("", String::new()),
+                (_, 0) => ("3", String::new()),
+                _ => ("B", compact(pressure, 3)),
+            };
+            let row = if held == 0 { compact(0, 1) } else { format!("{flags}{}{}000{tail}", compact(held, 3), compact(held, 3)) };
+            assert_eq!(encode_row(shield, 0, Edges::default()), row, "run {run}: {shield:?}");
+            let mut released = state;
+            release_for_focus_loss(&mut released, &mut BTreeMap::new(), &mut BTreeMap::new(), 1, FrameSegment { epoch_ns: 0, first_frame: 1 }, 0).unwrap();
+            assert_eq!(released, State { preset, tap_jump: state.tap_jump, triggers: state.triggers, ..State::default() });
+        }
+    }
+
+    #[test]
+    fn journal_events_record_each_actions_first_press_and_last_release_in_its_frame() {
+        use wc3_controller::model::PadPreset;
+        let keys = [Key::BTN_SOUTH, Key::BTN_EAST, Key::BTN_WEST, Key::BTN_NORTH, Key::BTN_TL, Key::BTN_TR, Key::BTN_THUMBL];
+        let mut ranges = [None; 6];
+        ranges[Abs::ABS_Y.0 as usize] = Some(evdev::AbsInfo::new(0, -32_768, 32_767, 16, 128, 0));
+        let segment = FrameSegment { epoch_ns: 0, first_frame: 1 };
+        let mut seed = 0x4a75_6d70_536f_7572;
+        for run in 0..300 {
+            let preset = [PadPreset::Melee, PadPreset::ZJump, PadPreset::Tom, PadPreset::Script][(sample(&mut seed) % 4) as usize];
+            let mut state = State { preset, ..State::default() };
+            let mut model = state;
+            let (mut edges, mut snapshots) = (BTreeMap::new(), BTreeMap::new());
+            for step in 0..40u128 {
+                let ns = 20_000_000 * (step + 1);
+                let (type_, code, value) = if sample(&mut seed) % 4 == 0 {
+                    let value = [-32_768, -20_000, 0, 9_000, 22_937, 32_767][(sample(&mut seed) % 6) as usize];
+                    model.y = normalized_axis(&ranges, Abs::ABS_Y, value);
+                    (evdev::EventType::ABSOLUTE.0, Abs::ABS_Y.0, value)
+                } else {
+                    let bit = (sample(&mut seed) % 7) as usize;
+                    let value = (sample(&mut seed) % 3) as i32;
+                    if value == 1 { model.sources |= 1 << bit; } else if value == 0 { model.sources &= !(1 << bit); }
+                    (evdev::EventType::KEY.0, keys[bit].0, value)
+                };
+                let before = action_state(state);
+                let event = libc::input_event { time: libc::timeval { tv_sec: 0, tv_usec: (ns / 1000) as _ }, type_, code, value }.into();
+                apply_event(&ranges, &mut state, event, &mut edges, &mut snapshots, 1, segment, false).unwrap();
+                let after = action_state(model);
+                let frame = frame_at(ns, segment).unwrap();
+                assert_eq!(state, model, "run {run} step {step}");
+                assert_eq!(action_state(snapshots[&frame]), after, "run {run} step {step}");
+                assert_eq!((edges[&frame].pressed, edges[&frame].released), (after & !before, before & !after), "run {run} step {step}");
+            }
+        }
+    }
+
+    #[test]
+    fn start_requests_pause_or_resume_once_per_fresh_press_unless_blocked() {
+        let mut seed = 0x5374_6172_7450_6175;
+        for run in 0..300 {
+            let (mut held, mut model_held) = (false, false);
+            for step in 0..40 {
+                let value = (sample(&mut seed) % 3) as i32;
+                let (epoch, sequence, frame) = (sample(&mut seed) % 1_000, sample(&mut seed) % 1_000, sample(&mut seed) % 100_000);
+                let (paused, pending, blocked) = (sample(&mut seed) % 2 == 0, sample(&mut seed) % 2 == 0, sample(&mut seed) % 4 == 0);
+                let event = evdev::InputEvent::new(evdev::EventType::KEY.0, Key::BTN_START.0, value);
+                let fresh = value == 1 && !model_held;
+                if value != 2 { model_held = value != 0; }
+                let expected = (fresh && !blocked).then(|| if paused || pending {
+                    format!("JP1{epoch:010}{sequence:010}R")
+                } else {
+                    format!("JP1{epoch:010}{sequence:010}P{frame:010}")
+                });
+                assert_eq!(pause_request_wire(&event, &mut held, epoch, sequence, paused, pending, blocked, frame), expected, "run {run} step {step}");
+            }
+        }
+    }
+
+    #[test]
+    fn view_held_a_second_requests_one_moment_per_hold() {
+        let mut seed = 0x4d6f_6d65_6e74_486f;
+        for run in 0..300 {
+            let mut hold = MomentHold::default();
+            let (mut since, mut sent, mut now) = (None::<u128>, false, 0u128);
+            for step in 0..60 {
+                now += u128::from(sample(&mut seed) % 700) * 1_000_000 + u128::from(sample(&mut seed) % 2);
+                if sample(&mut seed) % 2 == 0 {
+                    let value = (sample(&mut seed) % 3) as i32;
+                    hold.observe(&evdev::InputEvent::new(evdev::EventType::KEY.0, Key::BTN_SELECT.0, value), now);
+                    if value == 0 { since = None; sent = false; } else if value == 1 && since.is_none() { since = Some(now); }
+                } else {
+                    let epoch = sample(&mut seed) % 1_000;
+                    let due = since.is_some_and(|since| !sent && now - since >= MOMENT_HOLD_NS);
+                    sent |= due;
+                    assert_eq!(hold.request(now, epoch), due.then(|| format!("JM1{epoch:010}")), "run {run} step {step}");
                 }
             }
-            let mut held = State { sources: rb, ..state };
-            let mut edges = BTreeMap::new();
-            let mut snapshots = BTreeMap::new();
-            release_for_focus_loss(&mut held, &mut edges, &mut snapshots, 1, FrameSegment { epoch_ns: 0, first_frame: 1 }, 0).unwrap();
-            assert_eq!(held.preset, preset);
-            assert_eq!(action_state(State { sources: rb, ..held }), expected[5]);
         }
     }
 
@@ -2615,21 +2696,6 @@ mod linux {
         }
     }
 
-    #[test]
-    fn view_held_a_second_requests_a_moment_once_per_hold() {
-        let down = evdev::InputEvent::new(evdev::EventType::KEY.0, Key::BTN_SELECT.0, 1);
-        let up = evdev::InputEvent::new(evdev::EventType::KEY.0, Key::BTN_SELECT.0, 0);
-        let mut hold = MomentHold::default();
-        hold.observe(&down, 5_000_000_000);
-        assert_eq!(hold.request(5_999_999_999, 7), None);
-        assert_eq!(hold.request(6_000_000_000, 7).as_deref(), Some("JM10000000007"));
-        assert_eq!(hold.request(9_000_000_000, 7), None);
-        hold.observe(&up, 9_100_000_000);
-        assert_eq!(hold.request(10_200_000_000, 7), None);
-        hold.observe(&down, 10_000_000_000);
-        assert_eq!(hold.request(11_000_000_000, 8).as_deref(), Some("JM10000000008"));
-    }
-
     /// Start asks every client to pause before the frame it was pressed in, so
     /// the pause frame follows the press, not the network round trip (#206).
     fn pause_request_wire(
@@ -2665,54 +2731,6 @@ mod linux {
     /// or the first unpublished one when the press was read late.
     fn start_frame(segment: FrameSegment, ns: u128, next_frame: u32) -> u32 {
         frame_at(ns, segment).unwrap_or(next_frame).max(next_frame)
-    }
-
-    #[test]
-    fn controller_start_requests_pause_and_resume_once_per_press() {
-        let down = evdev::InputEvent::new(evdev::EventType::KEY.0, Key::BTN_START.0, 1);
-        let repeat = evdev::InputEvent::new(evdev::EventType::KEY.0, Key::BTN_START.0, 2);
-        let up = evdev::InputEvent::new(evdev::EventType::KEY.0, Key::BTN_START.0, 0);
-        let mut held = false;
-        assert_eq!(
-            pause_request_wire(&down, &mut held, 7, 1, false, false, false, 168).as_deref(),
-            Some("JP100000000070000000001P0000000168")
-        );
-        assert_eq!(
-            pause_request_wire(&repeat, &mut held, 7, 1, false, false, false, 168),
-            None
-        );
-        assert_eq!(
-            pause_request_wire(&down, &mut held, 7, 3, true, false, false, 168),
-            None
-        );
-        assert_eq!(pause_request_wire(&up, &mut held, 7, 3, true, false, false, 168), None);
-        assert_eq!(
-            pause_request_wire(&down, &mut held, 7, 3, true, false, false, 168).as_deref(),
-            Some("JP100000000070000000003R")
-        );
-        pause_request_wire(&up, &mut held, 7, 3, true, false, true, 168);
-        assert_eq!(pause_request_wire(&down, &mut held, 7, 3, true, false, true, 168), None);
-        assert_eq!(
-            pause_request_wire(&down, &mut held, 7, 3, true, false, false, 168),
-            None
-        );
-    }
-
-    #[test]
-    fn controller_start_while_pause_settles_requests_resume() {
-        let down = evdev::InputEvent::new(evdev::EventType::KEY.0, Key::BTN_START.0, 1);
-        let up = evdev::InputEvent::new(evdev::EventType::KEY.0, Key::BTN_START.0, 0);
-        let mut held = false;
-        // Sealed before the map's PREPARE, then prepared before its commit.
-        assert_eq!(
-            pause_request_wire(&down, &mut held, 7, 1, false, true, false, 200).as_deref(),
-            Some("JP100000000070000000001R")
-        );
-        pause_request_wire(&up, &mut held, 7, 1, false, true, false, 200);
-        assert_eq!(
-            pause_request_wire(&down, &mut held, 7, 2, true, true, false, 200).as_deref(),
-            Some("JP100000000070000000002R")
-        );
     }
 
     fn update_state(
@@ -2752,72 +2770,6 @@ mod linux {
             },
             _ => {}
         }
-    }
-
-    #[test]
-    fn journal_jump_sources_retain_hold_until_last_release() {
-        let ranges = [None; 6];
-        let sources = [
-            (evdev::EventType::KEY.0, Key::BTN_WEST.0, 1),
-            (evdev::EventType::KEY.0, Key::BTN_NORTH.0, 1),
-        ];
-        for first in 0..sources.len() {
-            for second in 0..sources.len() {
-                if first == second {
-                    continue;
-                }
-                let mut state = State::default();
-                let mut edges = BTreeMap::new();
-                let mut snapshots = BTreeMap::new();
-                let segment = FrameSegment { epoch_ns: 0, first_frame: 1 };
-                for (step, (source, down)) in [(first, true), (second, true), (first, false), (second, false)].into_iter().enumerate() {
-                    let (kind, code, pressed_value) = sources[source];
-                    let ns = 20_000_000 * (step as u128 + 1);
-                    let event = libc::input_event {
-                        time: libc::timeval {
-                            tv_sec: 0,
-                            tv_usec: (ns / 1000) as _,
-                        },
-                        type_: kind,
-                        code,
-                        value: if down { pressed_value } else { 0 },
-                    }.into();
-                    apply_event(&ranges, &mut state, event, &mut edges, &mut snapshots, 1, segment, false).unwrap();
-                    let frame = frame_at(ns, segment).unwrap();
-                    assert_eq!(action_state(snapshots[&frame]) & JUMP != 0, step < 3,
-                        "sources {first}/{second}, step {step}");
-                    assert_eq!(edges[&frame].pressed & JUMP != 0, step == 0,
-                        "extra jump press for sources {first}/{second}, step {step}");
-                    assert_eq!(edges[&frame].released & JUMP != 0, step == 3,
-                        "premature jump release for sources {first}/{second}, step {step}");
-                }
-                assert_eq!(action_state(state), 0);
-            }
-        }
-    }
-
-    #[test]
-    fn stick_up_is_only_up_and_never_jumps() {
-        let mut ranges = [None; 6];
-        ranges[Abs::ABS_Y.0 as usize] = Some(evdev::AbsInfo::new(0, -32_768, 32_767, 16, 128, 0));
-        let mut state = State::default();
-        let mut edges = BTreeMap::new();
-        let mut snapshots = BTreeMap::new();
-        let segment = FrameSegment { epoch_ns: 0, first_frame: 1 };
-        for (step, value) in [-32_768, -20_000, 0].into_iter().enumerate() {
-            let ns = 20_000_000 * (step as u128 + 1);
-            let event = libc::input_event {
-                time: libc::timeval { tv_sec: 0, tv_usec: (ns / 1000) as _ },
-                type_: evdev::EventType::ABSOLUTE.0,
-                code: Abs::ABS_Y.0,
-                value,
-            }.into();
-            apply_event(&ranges, &mut state, event, &mut edges, &mut snapshots, 1, segment, false).unwrap();
-            let frame = frame_at(ns, segment).unwrap();
-            assert_eq!(action_state(snapshots[&frame]), if value < 0 { MOVE_UP } else { 0 }, "step {step}");
-            assert_eq!((edges[&frame].pressed | edges[&frame].released) & JUMP, 0, "step {step}");
-        }
-        assert_eq!(edges[&frame_at(20_000_000, segment).unwrap()].pressed, MOVE_UP);
     }
 
     #[test]
