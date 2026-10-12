@@ -126,9 +126,9 @@ export function checkNativeSequenceHeap(run: MemoryRun): MemoryVerdict {
   const failures = [...run.problems];
   if (run.matches < 2) failures.push("the native sequence did not rematch");
   if (after.length < 3) failures.push("fewer than three minute samples after minute 10");
-  const growth = fit(after.map((sample) => [Number(sample.fields.minute), sample.heapKb / 1024])).slope * 60;
-  if (growth >= 1) failures.push(`headless 32-bit Lua heap grows ${growth.toFixed(3)} MiB/hour (requires <1)`);
-  return { lines: [`Headless 32-bit Lua heap companion: ${failures.length === 0 ? "pass" : "fail"}; ${run.frames} callbacks, ${run.matches} matches, ${after.length} post-minute-10 samples; heap slope ${growth.toFixed(3)} MiB/hour (<1). Same integrity-map four-CPU automatic-rematch sequence, late chat at callback 359; emulator records compacted before heap samples.`], failures };
+  const growth = fit(after.map((sample) => [Number(sample.fields.minute), sample.heapKb])).slope * 10;
+  if (growth >= MEMORY_LIMITS.heapKbPer10Minutes) failures.push(`headless 32-bit Lua heap grows ${growth.toFixed(0)} KB per 10 min (requires <${MEMORY_LIMITS.heapKbPer10Minutes})`);
+  return { lines: [`Headless 32-bit Lua heap companion: ${failures.length === 0 ? "pass" : "fail"}; ${run.frames} callbacks, ${run.matches} matches, ${after.length} post-minute-10 samples; heap slope ${growth.toFixed(0)} KB per 10 min (<${MEMORY_LIMITS.heapKbPer10Minutes}). Same integrity-map four-CPU automatic-rematch sequence, late chat at callback 359; emulator records compacted before heap samples.`], failures };
 }
 
 
