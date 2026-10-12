@@ -127,6 +127,7 @@ export const PROJECTILE_DRAW_OFFSETS: { readonly [model: string]: { readonly x: 
   "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveMissile.mdx": { x: -20.0, z: -33.0, sequence: "stand", width: f32(0.75), height: 2.0 },
   "Abilities\\Spells\\Human\\ManaFlare\\ManaFlareMissile.mdx": { x: 0.0, z: 0.0, sequence: "birth", seconds: f32(0.2) },
   "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike.mdx": { x: 0.0, z: 0.0, sequence: "birth" },
+  "Abilities\\Spells\\Human\\Avatar\\AvatarCaster.mdx": { x: 0.0, z: 0.0, sequence: "spell" },
   "Abilities\\Spells\\Undead\\Impale\\ImpaleHitTarget.mdx": { x: 0.0, z: -25.0, width: 1.5, height: 1.25, fill: [{ x: f32(-4.0 / 9.0), z: f32(-4.0 / 9.0) }, { x: f32(-4.0 / 9.0), z: f32(4.0 / 9.0) }, { x: f32(4.0 / 9.0), z: f32(-4.0 / 9.0) }, { x: f32(4.0 / 9.0), z: f32(4.0 / 9.0) }] },
 };
 
@@ -144,6 +145,7 @@ export const DEFINITIVE_ULTIMATE_MODELS: { readonly [character: number]: { reado
 
 export const DEFINITIVE_PROJECTILE_REDRAWS: { readonly [model: string]: string } = {
   "Abilities\\Spells\\Demon\\DarkPortal\\DarkPortalTarget.mdx": "HD redraw, Definitive look not yet reviewed",
+  "Abilities\\Spells\\Human\\Avatar\\AvatarCaster.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike1.mdx": "HD redraw, Definitive look not yet reviewed",

@@ -76,7 +76,7 @@ const BLADEMASTER: AuthoredSpecial = {
 
 const MOUNTAIN_KING: AuthoredSpecial = {
   name: "Avatar", endFrame: 50, groundOnly: true,
-  projectiles: [mark("Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdx", 33, 14, 0.0)],
+  projectiles: [mark("Abilities\\Spells\\Human\\Avatar\\AvatarCaster.mdx", 16, 34, 0.0), mark("Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdx", 33, 14, 0.0)],
   regions: [heroRegion(33, 35, capsule(-180.0, 30.0, 180.0, 30.0, 50.0), hit(10.0, 75, 75.0, 40.0))],
   buff: { frame: 33, kind: ItemKind.heavy, frames: 600 },
 };
