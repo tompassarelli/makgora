@@ -11,7 +11,7 @@ import { Effect, Schema } from "effect";
 
 const capacityHelperCandidates = [
   join(homedir(), ".claude/skills/machine-capacity/scripts/machine-capacity.mjs"),
-  join(homedir(), "code/north/main/socrates/skills/machine-capacity/scripts/machine-capacity.mjs"),
+  join(homedir(), "code/north/main/harness/skills/machine-capacity/scripts/machine-capacity.mjs"),
 ];
 
 export const capacityHelper = capacityHelperCandidates.find((path) => existsSync(path)) ?? capacityHelperCandidates[0]!;
