@@ -1678,6 +1678,18 @@ projectile properties are described in [projectiles](design/projectiles.md).
    grab, jump out of shield into any aerial, both rolls, spot dodge and the
    raise-timed powershield; no fighter trades one of them away.
 
+A fighter that breaks a rule on purpose names a departure in
+smashcraft:ts/test/projectile-rules.test.ts and in this section, with its
+reason. Current departures:
+
+- **Beastmaster's down special (Quilbeast), Jaina Proudmoore's down special
+  (Water Elemental) and Goblin Tinker's side special (Pocket Factory), rule 2,
+  for the summon's shots only.** The commitment is the placement: the summon
+  itself can be hit or destroyed, and the summoner's recovery is already past
+  when the shot reaches the shield. At point blank the shots reach the shield
+  35, 62 and 58 frames after the press, so no tuning within #414's ±3-frame
+  kit bound creates a punish (#482).
+
 smashcraft:ts/scripts/projectileRules.tests.ts measures every fighter's
 projectiles, the original three and each registered hero's, through the
 interaction graph's projectile situations (each special that makes a

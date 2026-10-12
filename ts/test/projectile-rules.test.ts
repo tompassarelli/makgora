@@ -30,7 +30,12 @@ const PROJECTILE_RULES: readonly { readonly rule: number; readonly broken: (row:
 const SHIELD_RULE = { rule: 6, broken: (start: Start) => start.start === undefined ? `${start.option} never starts from shield` : undefined };
 
 /** "fighter source rule N" to its reason; each is also named in gameplay-design.md. A departure that no longer occurs fails. */
-const DEPARTURES: Readonly<Record<string, string>> = {};
+const SUMMON_SHOT = "a placed summon's shot: the commitment is the placement, the summon can be hit or destroyed, and the summoner's recovery is past when the shot reaches the shield";
+const DEPARTURES: Readonly<Record<string, string>> = {
+  "Beastmaster down special rule 2": SUMMON_SHOT,
+  "Jaina Proudmoore down special rule 2": SUMMON_SHOT,
+  "Goblin Tinker side special rule 2": SUMMON_SHOT,
+};
 
 const FIGHTERS: readonly { readonly character: Character; readonly name: string }[] = [
   { character: Character.rifleman, name: "Rifleman" },
