@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
-import { readFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { AGED, BOUND, FARM_TITLE, JOB_BUDGET, LEAD, PROFILE, PROFILE_STEP, RUN_BUILD, RUN_PEAK, TEST_SLOTS, laneState, plan, stuckRuns, type Job, type Lane, type Run } from "../scripts/autolandCore";
 
 const recorded: { now: string; lanes: Lane[]; runs: Run[] } = JSON.parse(readFileSync(new URL("fixtures/autoland-backlog.json", import.meta.url), "utf8"));
@@ -83,5 +84,68 @@ test("plan fills every free slot whose run fits the measured job profile under J
     const chosen = lanes.filter((lane) => ordered.has(lane.branch));
     for (const lane of lanes.filter((candidate) => !ordered.has(candidate.branch) && laneState(candidate, runs, new Set(), now) === "test" && aged(candidate, now)))
       expect(chosen.some((other) => !aged(other, now) || waited(other) > waited(lane))).toBe(false);
+  }
+});
+
+test("supersession selects exactly clean main-tree-equal lanes or separately replaced failed lanes, never in-flight lanes, over generated Git histories [k2 property]", () => {
+  const scratch = resolve(import.meta.dir, "../../build");
+  mkdirSync(scratch, { recursive: true });
+  const directory = mkdtempSync(join(scratch, "superseded-"));
+  const command = (args: string[], input?: string): string => {
+    const result = Bun.spawnSync(args, { cwd: directory, stdin: input === undefined ? "ignore" : new TextEncoder().encode(input), stdout: "pipe", stderr: "pipe" });
+    if (result.exitCode !== 0) throw new Error(`${args.join(" ")}: ${result.stderr.toString()}`);
+    return result.stdout.toString().trim();
+  };
+  try {
+    command(["git", "init", "-q"]);
+    let seed = 51310;
+    const next = (n: number): number => { seed = (seed * 48271) % 2147483647; return seed % n; };
+    const rounds = Array.from({ length: 32 }, (_, index) => ({ index, base: `base-${next(1_000_000)}\n`, main: `main-${next(1_000_000)}\n`, other: `other-${next(1_000_000)}\n` }));
+    let mark = 0;
+    let input = "";
+    const commit = (branch: string, parent: number | undefined, files: [string, string][], message: string): number => {
+      const id = ++mark;
+      input += `commit refs/heads/${branch}\nmark :${id}\ncommitter Property <property@example.invalid> ${1700000000 + id} +0000\ndata ${Buffer.byteLength(message)}\n${message}\n`;
+      if (parent !== undefined) input += `from :${parent}\n`;
+      for (const [path, text] of files) input += `M 100644 inline ${path}\ndata ${Buffer.byteLength(text)}\n${text}\n`;
+      input += "\n";
+      return id;
+    };
+    const base = commit("base", undefined, rounds.map((round) => [`file-${round.index}`, round.base]), "base");
+    commit("main", base, rounds.map((round) => [`file-${round.index}`, round.main]), "independently land all changes");
+    const expected: string[] = [];
+    const rows: { branch: string; state: string; failed: string; pushed: string }[] = [];
+    const runs: { head_branch: string; title: string; status: string }[] = [];
+    for (const round of rounds) {
+      for (const kind of ["identical", "partial", "conflict", "empty", "inflight", "replaced", "unreplaced", "completed"]) {
+        const branch = `claude/land-${kind}-${round.index}`;
+        const issue = 1000 + round.index * 10 + ["identical", "partial", "conflict", "empty", "inflight", "replaced", "unreplaced", "completed"].indexOf(kind);
+        const files: [string, string][] = kind === "empty" ? [] : [[`file-${round.index}`, kind === "conflict" ? round.other : round.main]];
+        if (["partial", "replaced", "unreplaced"].includes(kind)) files.push([`novel-${kind}-${round.index}`, round.other]);
+        let tip = commit(branch, base, files, `generated ${next(1_000_000)}\n\nRefs #${issue}`);
+        for (let count = next(3); count > 0; count--) tip = commit(branch, tip, [], `empty commit ${next(1_000_000)}`);
+        rows.push({ branch, state: ["replaced", "unreplaced"].includes(kind) ? "FAILURE" : ["NONE", "SUCCESS", "FAILURE", "PENDING"][next(4)] ?? "NONE", failed: "2026-10-12T00:00:00Z", pushed: "2026-10-11T00:00:00Z" });
+        if (["identical", "empty", "replaced", "completed"].includes(kind)) expected.push(branch);
+        if (kind === "inflight") runs.push({ head_branch: round.index % 2 === 0 ? branch : "main", title: `Autoland test ${next(3)} ${branch} dummy-sha`, status: ["requested", "pending", "waiting", "queued", "in_progress"][round.index % 5] ?? "in_progress" });
+        if (kind === "completed") runs.push({ head_branch: branch, title: `Autoland test 0 ${branch} dummy-sha`, status: "completed" });
+        if (["replaced", "unreplaced"].includes(kind)) {
+          const newer = `claude/land-newer-${kind}-${round.index}`;
+          commit(newer, base, [[`newer-${kind}-${round.index}`, round.other]], `new attempt\n\nRefs #${issue}`);
+          rows.push({ branch: newer, state: kind === "replaced" ? "SUCCESS" : "FAILURE", failed: "2026-10-12T00:00:00Z", pushed: "2026-10-13T00:00:00Z" });
+        }
+      }
+    }
+    command(["git", "fast-import", "--quiet"], input);
+    const tips = new Map(command(["git", "for-each-ref", "--format=%(refname:short) %(objectname)", "refs/heads/claude/"]).split("\n").map((line) => line.split(" ") as [string, string]));
+    const lanes = join(directory, "lanes.tsv");
+    const active = join(directory, "runs.json");
+    writeFileSync(lanes, rows.map((row) => `${row.branch}\t${tips.get(row.branch)}\t${row.state}\t${row.failed}\t${row.pushed}\n`).join(""));
+    writeFileSync(active, JSON.stringify(runs));
+    const select = (): string[] => command(["bash", "-euo", "pipefail", "-c", 'source "$1"; superseded main "$2" "$3"', "superseded", resolve(import.meta.dir, "../scripts/autoland-superseded.sh"), lanes, active]).split("\n").filter(Boolean).map((line) => line.split("\t")[0] ?? "").sort();
+    expect(select()).toEqual(expected.sort());
+    writeFileSync(active, JSON.stringify([...runs, { head_branch: "main", title: "Autoland train", status: "in_progress" }]));
+    expect(select()).toEqual([]);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
   }
 });
