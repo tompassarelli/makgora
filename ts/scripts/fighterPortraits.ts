@@ -278,9 +278,10 @@ const CORRECTIONS: Readonly<Record<'classic' | 'definitive', Readonly<Record<str
   definitive: {
     MountainKing: { level: true, zoom: 1.5, bust: [0.49358, 0.28873, 0.60274] },
     Illidan: { elapsed: 139.173, angle: 0, zoom: 0.8, turn: 45, shift: [0, 0.4] },
-    Kobold: { rest: true, zoom: 1.5, bust: [0.5, 0.4, 0.94] },
-    Rifleman: { zoom: 1.5, turn: 25, bustPose: { turn: 60 }, bust: [0.5, 0.34, 0.82] },
-    Blademaster: { bust: [0.5, 0.36, 0.85] },
+    Kobold: { rest: true, zoom: 1.5, bust: [0.39914, 0.44326, 0.88652] },
+    Rifleman: { zoom: 1.5, turn: 25, bustPose: { turn: 60 }, bust: [0.49121, 0.33462, 0.70785] },
+    Blademaster: { bust: [0.75108, 0.53210, 0.50054] },
+    ForsakenPaladin: { bust: [0.58379, 0.30220, 0.64008] },
     Warden: { zoom: 1.5, turn: 25, bust: [0.56165, 0.43037, 0.57785] },
     ShadowHunter: { level: true, zoom: 1.5 },
     "Kael'thasSunstrider": { angle: 15, turn: 30 },
@@ -288,9 +289,9 @@ const CORRECTIONS: Readonly<Record<'classic' | 'definitive', Readonly<Record<str
     "Anub'arak": { flipped: true },
     Lich: { zoom: 1.2 },
     LichKing: { turn: 150, zoom: 1.5 },
-    JainaProudmoore: { elapsed: 3.433, turn: 25, zoom: 0.45, shift: [-0.5, 0.1], bust: [0.45, 0.4, 0.5] },
+    JainaProudmoore: { elapsed: 3.433, turn: 25, zoom: 0.45, shift: [-0.5, 0.1], bust: [0.45995, 0.35487, 0.36017] },
     MalfurionStormrage: { zoom: 2.2, shift: [0, 0.5], bust: [0.58619, 0.22423, 0.5526] },
-    Murloc: { rest: true, body: true, zoom: 0.7, shift: [0.3, 1.6], bones: { bone_head: [0, -20, 0] }, bust: [0.5, 0.4, 0.98] },
+    Murloc: { elapsed: 9.983, body: true, zoom: 0.7, shift: [0.3, 1.6], bones: { bone_head: [0, -20, 0] }, bust: [0.42569, 0.38848, 0.84559] },
   },
 };
 const correctionOf = (graphics: 'classic' | 'definitive', character: number): Correction => CORRECTIONS[graphics][fighterRenderName(character)] ?? {};
