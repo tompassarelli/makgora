@@ -60,6 +60,7 @@ export class HitAreaPresentation {
     const { x, y, z } = this.origin;
     MoveLightningEx(line, false, x + x1, y + DEPTH, z + z1, x + x2, y + DEPTH, z + z2);
     if (kind === HitAreaKind.strike) SetLightningColor(line, 1.0, f32(0.2), f32(0.2), 1.0);
+    else if (kind === HitAreaKind.shield) SetLightningColor(line, 1.0, f32(0.8), f32(0.2), 1.0);
     else if (kind === HitAreaKind.protected) SetLightningColor(line, f32(0.3), f32(0.6), 1.0, 1.0);
     else SetLightningColor(line, f32(0.3), 1.0, f32(0.3), 1.0);
     return segment + 1;

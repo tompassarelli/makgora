@@ -4,6 +4,7 @@ import { Action, maskOf } from "../input/actions";
 import { adaptInput } from "../input/adapter";
 import { attackBuffer } from "../input/attackBuffer";
 import { inputRow } from "../input/inputRow";
+import { HitAreaKind, collectHitAreas, createHitAreaList } from "../presentation/hitAreas";
 import { projectedShield } from "../presentation/shieldPose";
 import { copyFighterState } from "../replay/fighterState";
 import { Character } from "./codes";
@@ -70,6 +71,7 @@ for (const cardinal of CARDINALS) {
 }
 
 test("shield tilt moves every fighter's projectile contact circle with its drawn bubble [k3 measure docs/smash-melee-reference/shield-tilt-cardinals.md]", () => {
+  const areas = createHitAreaList();
   for (const character of SELECTABLE_CHARACTERS) {
     const { fighter, controls, attacks } = guarding(character);
     const reach = f32(fighter.tuning.shield.radius * shieldSizeMultiplier(fighter.shield.energy, fighter.shield.strength));
@@ -90,10 +92,34 @@ test("shield tilt moves every fighter's projectile contact circle with its drawn
         assertEquals(pose.x, shieldCenterX(fighter), `${label}: drawn centre x`);
         assertEquals(pose.z, shieldCenterZ(fighter), `${label}: drawn centre z`);
         const collisionRadius = f32(fighter.tuning.shield.radius * shieldSizeMultiplier(energy, strength));
+        collectHitAreas(fighter, areas);
+        const shield = assertDefined(areas.areas.slice(0, areas.count).find(area => area.kind === HitAreaKind.shield));
+        assertEquals(shield.capsule.x1, shieldCenterX(fighter), `${label}: footprint centre x1`);
+        assertEquals(shield.capsule.x2, shieldCenterX(fighter), `${label}: footprint centre x2`);
+        assertEquals(shield.capsule.z1, shieldCenterZ(fighter), `${label}: footprint centre z1`);
+        assertEquals(shield.capsule.z2, shieldCenterZ(fighter), `${label}: footprint centre z2`);
+        assertEquals(shield.capsule.radius, collisionRadius, `${label}: footprint radius`);
         const drawnRadius = f32(pose.scale * 72.0);
         assertEquals(Math.abs(drawnRadius - collisionRadius) <= f32(collisionRadius * f32(0.0000002384185791015625)), true,
           `${label}: drawn radius ${drawnRadius} matches collision radius ${collisionRadius} within binary32 rounding`);
       }
     }
+    fighter.shield.energy = SHIELD_MAX;
+    fighter.shield.strength = 1.0;
+    for (let frame = 9; frame < 600 && fighter.shield.raised; frame++) {
+      collectHitAreas(fighter, areas);
+      const shield = assertDefined(areas.areas.slice(0, areas.count).find(area => area.kind === HitAreaKind.shield));
+      const label = `${fighterName(character)} drain frame ${frame} energy ${fighter.shield.energy}`;
+      assertEquals(shield.capsule.x1, shieldCenterX(fighter), `${label}: footprint centre x1`);
+      assertEquals(shield.capsule.x2, shieldCenterX(fighter), `${label}: footprint centre x2`);
+      assertEquals(shield.capsule.z1, shieldCenterZ(fighter), `${label}: footprint centre z1`);
+      assertEquals(shield.capsule.z2, shieldCenterZ(fighter), `${label}: footprint centre z2`);
+      assertEquals(shield.capsule.radius, f32(fighter.tuning.shield.radius * shieldSizeMultiplier(fighter.shield.energy, fighter.shield.strength)), `${label}: footprint radius`);
+      adaptInput(row, fighter, frame, controls, attacks);
+      advanceSolo(fighter, 0, controls, 0.0);
+    }
+    assertFalse(fighter.shield.raised);
+    collectHitAreas(fighter, areas);
+    assertFalse(areas.areas.slice(0, areas.count).some(area => area.kind === HitAreaKind.shield));
   }
 });

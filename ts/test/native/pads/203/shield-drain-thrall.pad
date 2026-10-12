@@ -1,0 +1,14 @@
+#! chat -dev quick hero thrall
+#! chat -dev training on
+#! chat -dev hit-areas on
+60 a shield 1
+60 a capture
+68 a capture
+112 a capture
+166 a capture
+220 a capture
+260 a capture
+273 a capture
+274 a shield 0
+300 a press VIEW
+370 a release VIEW

@@ -1,14 +1,17 @@
 
 
 
+import { multiplyFloat32 } from "wisp/src/sim/binary32";
 import { type Capsule, attackCapsule, emptyCapsule, placeCapsule } from "../physics/contactGeometry";
 import { fighterPoseFacing } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../sim/hitRegions";
 import { HurtState, fighterHurtParts } from "../sim/hurtboxes";
+import { shieldSizeMultiplier } from "../sim/shield";
+import { shieldCenterX, shieldCenterZ } from "../sim/shieldTilt";
 
 
-export const HitAreaKind = { body: 0, protected: 1, strike: 2 } as const;
+export const HitAreaKind = { body: 0, protected: 1, strike: 2, shield: 3 } as const;
 export type HitAreaKind = (typeof HitAreaKind)[keyof typeof HitAreaKind];
 
 export interface HitArea {
@@ -49,6 +52,12 @@ export function collectHitAreas(f: Readonly<Fighter>, list: HitAreaList): void {
   for (const part of fighterHurtParts(f)) {
     const state = part.state ?? HurtState.normal;
     placeCapsule(next(list, state === HurtState.normal ? HitAreaKind.body : HitAreaKind.protected), part, f.motion.x, f.motion.z, facing);
+  }
+  if (f.shield.raised) {
+    const shield = next(list, HitAreaKind.shield);
+    shield.x1 = shield.x2 = shieldCenterX(f);
+    shield.z1 = shield.z2 = shieldCenterZ(f);
+    shield.radius = multiplyFloat32(f.tuning.shield.radius, shieldSizeMultiplier(f.shield.energy, f.shield.strength));
   }
   const { attack } = f;
   if (attack.style === undefined || attack.dashGrab || f.launch.hitlag > 0) return;
