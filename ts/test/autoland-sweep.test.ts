@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { AGED, BOUND, FARM_TITLE, JOB_BUDGET, LEAD, PROFILE, PROFILE_STEP, RUN_BUILD, RUN_PEAK, TEST_SLOTS, laneState, plan, stuckRuns, type Job, type Lane, type Run } from "../scripts/autolandCore";
+import { AGED, BOUND, DIRECT_CAP, FARM_TITLE, JOB_BUDGET, LEAD, PROFILE, PROFILE_STEP, RUN_BUILD, RUN_PEAK, TEST_SLOTS, TRAIN_CAP, TRAIN_TITLE, laneState, passedDescription, plan, stuckRuns, train, trainStep, type Job, type Lane, type Run } from "../scripts/autolandCore";
 
 const recorded: { now: string; lanes: Lane[]; runs: Run[] } = JSON.parse(readFileSync(new URL("fixtures/autoland-backlog.json", import.meta.url), "utf8"));
 const now = Date.parse(recorded.now);
@@ -24,6 +24,35 @@ const allowed = (lanes: readonly Lane[], runs: readonly Run[], now: number): num
 };
 const waited = (lane: Lane): string => [lane.since, lane.status?.at].filter((at) => at !== undefined).toSorted()[0] ?? "";
 const aged = (lane: Lane, now: number): boolean => waited(lane) !== "" && now - Date.parse(waited(lane)) > AGED * 60_000;
+
+test("one unfinished train excludes another, and refreshing generated queues takes every passed lane up to the direct pair bound [k2 property]", () => {
+  let seed = 51571;
+  const next = (n: number): number => { seed = (seed * 48271) % 2147483647; return seed % n; };
+  const states = ["requested", "pending", "waiting", "queued", "in_progress", "completed"];
+  const base = "b".repeat(40);
+  const tree = "c".repeat(40);
+  for (let round = 0; round < 400; round++) {
+    const lanes: Lane[] = Array.from({ length: next(12) }, (_, index) => {
+      const at = new Date(now - next(240) * PROFILE_STEP).toISOString();
+      const state = next(4);
+      return { branch: `claude/pair-${index}`, tip: index.toString(16).padStart(40, "0"), labels: [["priority:now"], ["playtest-blocking"], []][next(3)] ?? [], status: { state: state < 2 ? "pending" : "success", description: state % 2 === 0 ? passedDescription(base, tree) : "queued", at } };
+    });
+    const passed = lanes.filter((lane) => lane.status?.state === "pending" && lane.status.description === passedDescription(base, tree));
+    const runs: Run[] = states.filter(() => next(3) === 0).map((status) => ({ title: TRAIN_TITLE, status }));
+    expect(plan(lanes, runs, now).train).toBe(passed.length > 0 && runs.every((run) => run.status === "completed"));
+    if (plan(lanes, runs, now).train) expect(plan(lanes, [...runs, { title: TRAIN_TITLE, status: "pending" }], now).train).toBe(false);
+    const priority = (lane: Lane): number => lane.labels?.includes("priority:now") === true ? 0 : lane.labels?.includes("playtest-blocking") === true ? 1 : 2;
+    const ordered = passed.toSorted((a, b) => Number(aged(b, now)) - Number(aged(a, now)) || (aged(a, now) ? 0 : priority(a) - priority(b)) || waited(a).localeCompare(waited(b)) || a.branch.localeCompare(b.branch));
+    const refreshed = train(lanes, now);
+    expect(refreshed.map((lane) => lane.branch)).toEqual(ordered.slice(0, TRAIN_CAP).map((lane) => lane.branch));
+    const pair: string[] = [];
+    for (const lane of refreshed) {
+      pair.push(lane.branch);
+      if (trainStep(pair.map(() => true)) === "last") break;
+    }
+    expect(pair).toEqual(ordered.slice(0, DIRECT_CAP).map((lane) => lane.branch));
+  }
+});
 
 test("the #513 backlog sweeps to one run per free slot without touching a healthy run, and a runnerless job is cancelled [k1 scenario]", () => {
   const cancels = stuckRuns(recorded.runs, now);

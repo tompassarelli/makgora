@@ -42,6 +42,22 @@ env:
   RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
   TEST: ${{ inputs.test }}
   TRAIN: ${{ inputs.train }}
+  PASSED: |
+    passed() {
+      local tip="$1" pbase="$2" ptree="$3" before="$4" after="$5" dir="$RUNNER_TEMP/passed-$1" verdict=retest
+      git merge-base --is-ancestor "$pbase" "$before" && git worktree add -q --detach "$dir" "$tip" || { echo retest; return; }
+      if git -C "$dir" rebase -q "$pbase" > /dev/null 2>&1 && [ "$(git -C "$dir" rev-parse 'HEAD^{tree}')" = "$ptree" ]; then
+        mkdir -p "$RUNNER_TEMP/trees"; rm -f "$RUNNER_TEMP"/trees/*
+        git ls-tree -r -z "$pbase" > "$RUNNER_TEMP/trees/base"; git ls-tree -r -z "$ptree" > "$RUNNER_TEMP/trees/tested"; git ls-tree -r -z "$after" > "$RUNNER_TEMP/trees/landed"
+        mains=()
+        for commit in $(git rev-list --reverse --first-parent "$pbase..$before"); do git ls-tree -r -z "$commit" > "$RUNNER_TEMP/trees/$commit"; mains+=("$RUNNER_TEMP/trees/$commit"); done
+        verdict=$(bun ts/scripts/autoland.ts past-main "$RUNNER_TEMP/trees/base" "$RUNNER_TEMP/trees/tested" "${mains[@]}" --rebased "$RUNNER_TEMP/trees/landed" || echo retest)
+      else
+        git -C "$dir" rebase --abort > /dev/null 2>&1
+      fi
+      git worktree remove --force "$dir"
+      echo "$verdict"
+    }
   LANES_QUERY: >-
     query($owner: String!, $name: String!, $endCursor: String) { repository(owner: $owner, name: $name) {
     refs(refPrefix: "refs/heads/claude/", first: 100, after: $endCursor) { pageInfo { hasNextPage endCursor }
@@ -141,21 +157,7 @@ jobs:
             echo "::error title=Autoland didn't land::$branch (${tip:0:10}): $3"
           }
           eval "$FLAG_CONFLICT"
-          passed() {
-            local tip="$1" pbase="$2" ptree="$3" before="$4" after="$5" dir="$RUNNER_TEMP/passed-$1" verdict=retest
-            git merge-base --is-ancestor "$pbase" "$before" && git worktree add -q --detach "$dir" "$tip" || { echo retest; return; }
-            if git -C "$dir" rebase -q "$pbase" > /dev/null 2>&1 && [ "$(git -C "$dir" rev-parse 'HEAD^{tree}')" = "$ptree" ]; then
-              mkdir -p "$RUNNER_TEMP/trees"; rm -f "$RUNNER_TEMP"/trees/*
-              git ls-tree -r -z "$pbase" > "$RUNNER_TEMP/trees/base"; git ls-tree -r -z "$ptree" > "$RUNNER_TEMP/trees/tested"; git ls-tree -r -z "$after" > "$RUNNER_TEMP/trees/landed"
-              mains=()
-              for commit in $(git rev-list --reverse --first-parent "$pbase..$before"); do git ls-tree -r -z "$commit" > "$RUNNER_TEMP/trees/$commit"; mains+=("$RUNNER_TEMP/trees/$commit"); done
-              verdict=$(bun ts/scripts/autoland.ts past-main "$RUNNER_TEMP/trees/base" "$RUNNER_TEMP/trees/tested" "${mains[@]}" --rebased "$RUNNER_TEMP/trees/landed" || echo retest)
-            else
-              git -C "$dir" rebase --abort > /dev/null 2>&1
-            fi
-            git worktree remove --force "$dir"
-            echo "$verdict"
-          }
+          eval "$PASSED"
           git config user.name "github-actions[bot]"
           git config user.email "41898183+github-actions[bot]@users.noreply.github.com"
           git config core.hooksPath .githooks
@@ -436,6 +438,29 @@ jobs:
             SHA=$(git -C "$RUNNER_TEMP/past-main" rev-parse HEAD)
             echo "main moved to ${main:0:10} only on paths the train doesn't change: the tested tree lands rebased onto it as ${SHA:0:10}" >> "$GITHUB_STEP_SUMMARY"
           fi
+          if [ -n "$TRAIN" ] && [ "${#branches[@]}" = 1 ]; then
+            eval "$PASSED"
+            if bash -euo pipefail -c "$FETCH_LANES" > lanes.json && bun ts/scripts/autoland.ts train --lanes lanes.json > late.tsv; then
+              while IFS=$'\t' read -r -u 3 branch tip passed_base passed_tree; do
+                [ "$branch" != "${branches[0]}" ] || continue
+                [ "$(git rev-parse -q --verify "refs/remotes/origin/$branch")" = "$tip" ] || continue
+                git checkout -q --detach "$tip" || continue
+                if ! git rebase -q "$SHA" > rebase.log 2>&1; then
+                  git rebase --abort
+                  git checkout -q --detach "$SHA"
+                  continue
+                fi
+                if [ "$(passed "$tip" "$passed_base" "$passed_tree" "$SHA" HEAD)" != land ]; then
+                  git checkout -q --detach "$SHA"
+                  continue
+                fi
+                SHA=$(git rev-parse HEAD)
+                branches+=("$branch"); tips+=("$tip")
+                echo "Added \`$branch\` to the train with the combined passed-alone tree proof" >> "$GITHUB_STEP_SUMMARY"
+                break
+              done 3< late.tsv
+            fi
+          fi
           if ! git push origin "$SHA:refs/heads/main" 2> push.log; then
             cat push.log
             echo "pushing to main failed: the train's tips wait for the next train" >> "$GITHUB_STEP_SUMMARY"
@@ -450,7 +475,7 @@ jobs:
           gh workflow run ci.yml --ref main || echo "::warning::couldn't start main's CI"
           gh workflow run background-sweeps.yml --ref main -f ref="$SHA"
           gh workflow run autoclose.yml --ref main -f sha="$SHA" -f base="$main" || echo "::warning::couldn't start auto-close"
-          echo "Landed ${SHA:0:10} on main:$(printf ' `%s`' "${branches[@]}")" >> "$GITHUB_STEP_SUMMARY"
+          echo "Landed ${SHA:0:10} on main:$(printf ' `%s`' "${branches[@]}")" | tee -a "$GITHUB_STEP_SUMMARY"
       # A landed copy leaves its source branch behind: delete codex/, claude/ and farm/ branches main holds patch for patch.
       - if: success() && env.TRAIN != ''
         run: |

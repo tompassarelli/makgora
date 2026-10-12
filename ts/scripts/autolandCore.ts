@@ -91,8 +91,8 @@ export function plan(lanes: readonly Lane[], runs: readonly Run[], now: number, 
     if (slot === undefined) continue;
     test.push({ branch: lane.branch, tip: lane.tip, slot });
   }
-  const trainWaiting = runs.some((run) => run.title === TRAIN_TITLE && run.status !== "in_progress" && run.status !== "completed");
-  return { test, train: passed && !trainWaiting };
+  const trainOpen = runs.some((run) => run.title === TRAIN_TITLE && run.status !== "completed");
+  return { test, train: passed && !trainOpen };
 }
 
 export interface TrainLane { readonly branch: string; readonly tip: string; readonly base: string; readonly tree: string }
