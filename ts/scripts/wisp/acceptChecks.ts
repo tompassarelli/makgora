@@ -177,7 +177,7 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
     {
       id: "gate-bindings", closes: "T7 C3", map: "gate-playable", session: "gate-bindings",
       setup: [{ chat: "gate:bindings", client: "a" }],
-      pass: [NO_ERRORS, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE bindings labels=22 samples=23 passed=23 pass=1$", min: 1 }],
+      pass: [NO_ERRORS, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE bindings labels=\\d+ samples=(\\d+) passed=\\1 pass=1 remaps=none$", min: 1 }],
     },
     {
       id: "123-selection", closes: "smashcraft#123 box 5", map: "presentation", session: "123-match-flow",

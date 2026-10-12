@@ -66,6 +66,7 @@ const TRACE = "shell.trace";
 const PROBE_START = "shell.probeStart";
 const PROBE_EDGES = "shell.probeEdges";
 const PROBE_DUMP = "shell.probeDump";
+const PROBE_KEYS = { f5: 0x74, f6: 0x75, f7: 0x76 } as const;
 
 
 interface PendingStart {
@@ -156,7 +157,7 @@ function gameTick(s: ShellState): void {
   presentMatchFlow(s);
   publishMenu(s);
   const local = localParticipantSlot(s);
-  if (s.probe !== undefined && local !== undefined) {
+  if (probe.probeRecording(s.probe) && local !== undefined) {
     const confirmed = s.participants[local].body !== undefined && isActive(s.world, local) && fighterAt(s.world, local).shield.raised;
     const predictedWorld = rollback?.speculative.world;
     const predicted = predictedWorld !== undefined && isActive(predictedWorld, local);
@@ -170,9 +171,9 @@ function gameTick(s: ShellState): void {
         const { x, z } = fighterAt(world, slot).motion;
         probe.probeFighterPosition(s.probe, slot, frame, x, z);
       }
-      if (s.build.pausePositionProbe && pausedBefore !== s.session.paused) {
+      if (pausedBefore !== s.session.paused) {
         probe.probeIntegrity(s.probe, `pause-boundary ${s.session.paused ? "paused" : "resumed"} ${frame}`);
-        if (!s.session.paused) probe.exportProbe(s.probe);
+        if (s.build.pausePositionProbe && !s.session.paused) probe.exportProbe(s.probe);
       }
     }
   }
@@ -251,9 +252,9 @@ function syncTrigger(s: ShellState, prefix: string, handler: string, humansOnly:
 
 function createTriggers(s: ShellState): void {
   createPadTriggers(s);
-  developerChord(s, s.build.responseProbe ? Key.g : 0x74, PROBE_START);
-  developerChord(s, s.build.responseProbe ? Key.j : 0x75, PROBE_EDGES);
-  developerChord(s, s.build.responseProbe ? Key.h : 0x76, PROBE_DUMP);
+  developerChord(s, s.build.responseProbe ? Key.g : PROBE_KEYS.f5, PROBE_START);
+  developerChord(s, s.build.responseProbe ? Key.j : PROBE_KEYS.f6, PROBE_EDGES);
+  developerChord(s, s.build.responseProbe ? Key.h : PROBE_KEYS.f7, PROBE_DUMP);
   developerChord(s, Key.r, RESTART);
   developerChord(s, Key.t, TRACE);
   const startDown = CreateTrigger();

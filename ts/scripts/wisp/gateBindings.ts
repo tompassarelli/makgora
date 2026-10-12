@@ -26,6 +26,7 @@ import { projectRoot } from "./project";
 
 const fail = (operation: string) => (cause: { readonly message: string }) => new AcceptFailure({ operation, problem: cause.message });
 const Contract = Schema.fromJsonString(Schema.Struct({ map_actions: Schema.Record(Schema.String, Schema.String) }));
+const QUALIFIED_HELPER_SHA256 = "a127a5ce147aa4fc4edc168475ea9583cb8c5cc7656a6d717d278106de0ce6d2";
 const Metadata = Schema.fromJsonString(Schema.Struct({ packages: Schema.Array(Schema.Struct({ name: Schema.String, manifest_path: Schema.String, source: Schema.NullOr(Schema.String) })) }));
 const controls: Readonly<Record<string, readonly [number, number]>> = {
   "button a": [EV_KEY, BTN_A], "button b": [EV_KEY, BTN_B], "button x": [EV_KEY, BTN_X], "button y": [EV_KEY, BTN_Y],
@@ -81,6 +82,8 @@ export const measureBindingsGate = (clientsFile: string, name: string, directory
   if (labels.some(label => !samples.some(sample => sample[0] === label)) || samples.some(sample => contract.map_actions[sample[0]] === undefined)) return yield* new AcceptFailure({ operation: "bindings gate contract", problem: "native samples and shipped contract labels differ" });
   const helper = Bun.env.SMASHCRAFT_BINDINGS_HELPER ?? SERVICE_LAUNCHER;
   const remaps = Bun.env.SMASHCRAFT_BINDINGS_REMAPPINGS;
+  const helperSha256 = yield* Effect.try({ try: () => createHash("sha256").update(readFileSync(helper)).digest("hex"), catch: cause => new AcceptFailure({ operation: "bindings gate helper", problem: String(cause) }) });
+  if (helperSha256 !== QUALIFIED_HELPER_SHA256) return yield* new AcceptFailure({ operation: "bindings gate helper", problem: `unqualified SHA256 ${helperSha256}` });
   yield* Effect.try({ try: () => mkdirSync(directory, { recursive: true, mode: 0o700 }), catch: cause => new AcceptFailure({ operation: "bindings gate evidence", problem: String(cause) }) });
   const pid = yield* gameProcess(client, false).pipe(Effect.mapError(fail("bindings gate process")));
   const input = yield* InputInjection;
@@ -155,42 +158,49 @@ export const measureBindingsGate = (clientsFile: string, name: string, directory
     yield* Effect.sleep("500 millis");
     for (const [label, control, down, up, rightStick, triggerMode] of samples) {
       if (rightStick !== stick || triggerMode !== triggers) continue;
-      yield* Effect.sleep("1 second");
-      const started = Date.now();
-      yield* batch(client, [{ kind: "keys", keys: ["ctrl+F5"] }]).pipe(Effect.mapError(fail("bindings gate probe start")));
-      if (label !== "Pause") yield* send(control, down);
-      yield* Effect.sleep("350 millis");
-      const image = encodePpm(yield* capture(client, region).pipe(Effect.mapError(fail("bindings gate capture"))));
-      if (label !== "Pause") yield* send(control, up);
-      yield* batch(client, [{ kind: "keys", keys: ["ctrl+F7"] }]).pipe(Effect.mapError(fail("bindings gate probe export")));
-      const page = yield* pollUntil(Effect.try({
-        try: () => readdirSync(data).filter(file => /^smashcraft-response-p0-run\d+-page0\.txt$/.test(file) && statSync(join(data, file)).mtimeMs >= started).sort((a, b) => Number(/run(\d+)/.exec(b)?.[1]) - Number(/run(\d+)/.exec(a)?.[1]))[0],
-        catch: cause => new AcceptFailure({ operation: "bindings gate journal", problem: String(cause) }),
-      }), { every: "100 millis", within: "5 seconds", orElse: () => Effect.fail(new AcceptFailure({ operation: "bindings gate journal", problem: `no fresh response page for ${label}` })) });
-      const text = readFileSync(join(data, page), "latin1");
-      const decoded = yield* ResponsePage.decode(page, text).pipe(Effect.mapError(fail("bindings gate journal")));
-      const lines = preloadLines(text) ?? [];
-      const expected = contract.map_actions[label];
-      const action = expected === undefined ? undefined : actions[expected];
-      const mask = action === undefined ? undefined : bit(action);
-      const rows = lines.filter(line => /^B \d+ /.test(line)).map(line => line.split(" ").slice(1).map(Number));
-      const edges = lines.filter(line => /^I \d+ confirmed /.test(line)).map(line => line.split(" ").slice(1));
-      const frames = new Map(lines.filter(line => /^A \d+ /.test(line)).map(line => {
-        const row = line.split(" ").slice(1).map(Number);
-        return [row[0], row[7]] as const;
-      }));
-      const matched = rows.some(row => row[5] === Phase.match && (label === "Pause" ? phases.map(phase => phase.phase).join(",") === "CHARACTER,STAGE,BLOCKED" : mask !== undefined && ((row[1] ?? 0) & mask) !== 0 && edges.some(edge => Number(edge[3]) === 0 && (Number(edge[6]) & mask) !== 0 && Number(edge[4]) <= (frames.get(row[0]) ?? -1))));
-      const shield = expected === "shield" || expected === "rightTrigger" || expected === "lightShield";
-      const raised = !shield || rows.some(row => row[5] === Phase.match && row[6] === 1 && mask !== undefined && ((row[1] ?? 0) & mask) !== 0);
-      const stem = `${String(measured.length).padStart(2, "0")}-${control.replaceAll(" ", "-")}-${stick}-${triggers}`;
-      yield* save(`${stem}.ppm`, image);
-      yield* save(`${stem}.txt`, text);
-      measured.push({ label, control, stick, triggers, run: decoded.run, file: `${stem}.ppm`, sha256: createHash("sha256").update(image).digest("hex"), lines: lines.filter(line => /^[ABI] /.test(line)), pass: matched && raised });
-      yield* Effect.sleep("400 millis");
+      for (const boundary of label === "Pause" ? ["paused", "resumed"] as const : ["sample"] as const) {
+        yield* Effect.sleep("1 second");
+        const started = Date.now();
+        yield* batch(client, [{ kind: "keys", keys: ["ctrl+F5"] }]).pipe(Effect.mapError(fail("bindings gate probe start")));
+        yield* send(control, down);
+        yield* Effect.sleep("350 millis");
+        if (label === "Pause") yield* send(control, up);
+        yield* batch(client, [{ kind: "keys", keys: ["ctrl+F7"] }]).pipe(Effect.mapError(fail("bindings gate probe export")));
+        const page = yield* pollUntil(Effect.try({
+          try: () => readdirSync(data).filter(file => /^smashcraft-response-p0-run\d+-page0\.txt$/.test(file) && statSync(join(data, file)).mtimeMs >= started).sort((a, b) => Number(/run(\d+)/.exec(b)?.[1]) - Number(/run(\d+)/.exec(a)?.[1]))[0],
+          catch: cause => new AcceptFailure({ operation: "bindings gate journal", problem: String(cause) }),
+        }), { every: "100 millis", within: "5 seconds", orElse: () => Effect.fail(new AcceptFailure({ operation: "bindings gate journal", problem: `no fresh response page for ${label}` })) });
+        const text = readFileSync(join(data, page), "latin1");
+        const decoded = yield* ResponsePage.decode(page, text).pipe(Effect.mapError(fail("bindings gate journal")));
+        const lines = preloadLines(text) ?? [];
+        const expected = contract.map_actions[label];
+        const action = expected === undefined ? undefined : actions[expected];
+        const mask = action === undefined ? undefined : bit(action);
+        const rows = lines.filter(line => /^B \d+ /.test(line)).map(line => line.split(" ").slice(1).map(Number));
+        const edges = lines.filter(line => /^I \d+ confirmed /.test(line)).map(line => line.split(" ").slice(1));
+        const frames = new Map(lines.filter(line => /^A \d+ /.test(line)).map(line => {
+          const row = line.split(" ").slice(1).map(Number);
+          return [row[0], row[7]] as const;
+        }));
+        const matched = rows.some(row => row[5] === Phase.match && (label === "Pause" ? lines.some(line => new RegExp(`^I \\d+ pause-boundary ${boundary} \\d+$`).test(line)) : mask !== undefined && ((row[1] ?? 0) & mask) !== 0 && edges.some(edge => Number(edge[3]) === 0 && (Number(edge[6]) & mask) !== 0 && Number(edge[4]) <= (frames.get(row[0]) ?? -1))));
+        const shield = expected === "shield" || expected === "rightTrigger" || expected === "lightShield";
+        const raised = !shield || rows.some(row => row[5] === Phase.match && row[6] === 1 && mask !== undefined && ((row[1] ?? 0) & mask) !== 0);
+        const image = encodePpm(yield* capture(client, region).pipe(Effect.mapError(fail("bindings gate capture"))));
+        if (label !== "Pause") yield* send(control, up);
+        const stem = `${String(boundary === "resumed" ? measured.length - 1 : measured.length).padStart(2, "0")}-${control.replaceAll(" ", "-")}-${stick}-${triggers}${boundary === "resumed" ? "-resumed" : ""}`;
+        yield* save(`${stem}.ppm`, image);
+        yield* save(`${stem}.txt`, text);
+        if (boundary === "resumed") {
+          const paused = measured[measured.length - 1];
+          if (paused === undefined) return yield* new AcceptFailure({ operation: "bindings gate Pause", problem: "missing paused measurement" });
+          paused.pass = paused.pass && matched;
+        } else measured.push({ label, control, stick, triggers, run: decoded.run, file: `${stem}.ppm`, sha256: createHash("sha256").update(image).digest("hex"), lines: lines.filter(line => /^[ABI] /.test(line)), pass: matched && raised });
+        yield* Effect.sleep("400 millis");
+      }
     }
   }));
   const passed = measured.filter(sample => sample.pass).length;
-  const receipt = `SMASHCRAFT GATE bindings labels=${labels.length} samples=${measured.length} passed=${passed} pass=${passed === samples.length ? 1 : 0}`;
-  yield* save("measurements.json", `${JSON.stringify({ text: receipt, helper, helperSha256: createHash("sha256").update(readFileSync(helper)).digest("hex"), controllerSource: dependency.source, contractPath, contractSha256: createHash("sha256").update(contractText).digest("hex"), device: pad.device, gamepad, remaps, phases, measured }, null, 2)}\n`);
+  const receipt = `SMASHCRAFT GATE bindings labels=${labels.length} samples=${measured.length} passed=${passed} pass=${passed === samples.length ? 1 : 0} remaps=${remaps ?? "none"}`;
+  yield* save("measurements.json", `${JSON.stringify({ text: receipt, helper, helperSha256, controllerSource: dependency.source, contractPath, contractSha256: createHash("sha256").update(contractText).digest("hex"), device: pad.device, gamepad, remaps, phases, measured }, null, 2)}\n`);
   return { name: "bindings-gate", text: receipt, modified: Date.now() } satisfies ReceiptFile;
 }).pipe(Effect.scoped);

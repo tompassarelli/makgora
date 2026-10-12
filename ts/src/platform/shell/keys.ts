@@ -39,7 +39,7 @@ import { clearVisualCapture, configureVisualCapture } from "../../game/shell/vis
 import { back, choose, confirm, openSettingsScreen, resetToStartingSelection, startDevClassic, startDevLore, startQuickMatch } from "./menus";
 import { LORE_BATTLES } from "../../game/classic/loreBattles";
 import { makePreview } from "./preview";
-import { createResponseProbe, exportProbe, probeIntegrity, probeRecording, startProbe } from "./responseProbe";
+import { exportProbe, probeIntegrity, probeRecording, startProbe } from "./responseProbe";
 import { type ShellState, activeRollback, cancelPendingPlaytest, keepShellMomentEnd, localSlot, playsOnKeyboard } from "./state";
 import { clearMatchEffects, views } from "./ui";
 import { ownConfirmedState } from "./confirmedState";
@@ -264,8 +264,7 @@ export function onDeveloperTrace(s: ShellState): void {
 
 
 export function onProbeStart(s: ShellState, edgeStamps: boolean): void {
-  if (s.trace.active || !fromFirstHuman(s)) return;
-  s.probe ??= createResponseProbe(s.build.id);
+  if (s.trace.active || s.probe === undefined || !fromFirstHuman(s)) return;
   startProbe(s.probe, edgeStamps);
 }
 

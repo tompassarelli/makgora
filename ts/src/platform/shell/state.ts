@@ -300,7 +300,7 @@ export interface ShellState {
   devReceipts: number;
   promoHudHidden?: boolean;
   readonly trace: InputTrace;
-  probe: ResponseProbe | undefined;
+  readonly probe: ResponseProbe | undefined;
   readonly rollback: Rollback | undefined;
   readonly keyEvents: KeyEvents;
   readyMarkerWritten: boolean;
@@ -404,7 +404,7 @@ export function createShellState(build: MapBuild, setup: ShellSetup): ShellState
     sounds: createModelSoundCursor(ORIGINAL_MODEL_SOUNDS),
     dev: { rollback: isShadow(input) ? input.rollback : 6, delay: isShadow(input) ? input.delay : 3, batch: DEFAULT_BATCH, rematchSeconds: REMATCH_COUNTDOWN_SECONDS }, devReceipts: 0,
     trace: inputTrace(build.responseProbe || build.inputProfile === "native-driver" ? 2048 : 256),
-    probe: build.responseProbe ? createResponseProbe(build.id) : undefined,
+    probe: createResponseProbe(build.id),
     rollback: isShadow(input) ? rollback(input, setup.playback, setup.editbox) : undefined,
     keyEvents: { down: undefined, up: undefined, escapeOnly: false }, readyMarkerWritten: false, restartRequested: false,
     diagnostic: createReplaySnapshot(), moment: momentSaves(), replay: replayRecording(),
