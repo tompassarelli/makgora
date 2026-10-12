@@ -111,7 +111,7 @@ export interface MoveCues {
 const BIRTH_CUES = new Set([
   "StarfallTarget", "MoonWellCasterArt", "TauntCaster", "StarfallCaster", "GyroCopterImpact",
   "FeralSpiritTarget", "FlakTarget", "FireLordDeathExplode", "BlizzardTarget",
-  "SteamTankImpact", "CrushingWaveDamage", "SpellBreakerAttack", "SilenceAreaBirth", "ImpaleHitTarget",
+  "SteamTankImpact", "CrushingWaveDamage", "SpellBreakerAttack", "ImpaleHitTarget",
   "BreathOfFireMissile", "VolcanoDeath", "MirrorImageCaster", "MirrorImageDeathCaster",
   "MarkOfChaosTarget", "SpiritWalkerChange", "MirrorImageMissile", "ForkedLightningTarget",
   "DefendCaster", "ImpaleTargetDust", "GlaiveMissileTarget", "BlinkCaster", "FanOfKnivesCaster",
@@ -383,7 +383,7 @@ export const ORIGINAL_CUES: { readonly [action: number]: MoveCues } = {
   [SpecialAction.demonHunterManaBurn]: { spell: "Mana Burn", startup: drawn(MANA_BURN_HAND, "hand"), active: cue("Abilities\\Spells\\Human\\Feedback\\SpellBreakerAttack.mdx", "hand", 1.0) },
 
   [SpecialAction.demonHunterFelRush]: { spell: "Fel Rush", startup: FEL_TELL, active: timed(cue("Abilities\\Weapons\\IllidanMissile\\IllidanMissile.mdx", "body", 1.0), "stand", 0.0) },
-  [SpecialAction.demonHunterWingAscent]: { spell: "Metamorphosis wings", startup: cue("Abilities\\Spells\\NightElf\\Immolation\\ImmolationDamage.mdx", "feet", 1.0), active: cue("Abilities\\Spells\\Other\\Silence\\SilenceAreaBirth.mdx", "feet", f32(0.3)) },
+  [SpecialAction.demonHunterWingAscent]: { spell: "Metamorphosis wings", startup: cue("Abilities\\Spells\\NightElf\\Immolation\\ImmolationDamage.mdx", "feet", 1.0), active: cue("Abilities\\Spells\\NightElf\\Immolation\\ImmolationDamage.mdx", "feet", 1.0) },
   [SpecialAction.demonHunterImmolate]: { spell: "Immolation", startup: drawn(FEL_FLAMES, "body"), active: drawn(FEL_FLAMES, "body") },
 };
 

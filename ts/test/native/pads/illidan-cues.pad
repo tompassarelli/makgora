@@ -93,7 +93,6 @@
 #! scene a BreathOfFireMissile
 #! scene a VolcanoDeath
 #! scene a ImmolationDamage
-#! scene a SilenceAreaBirth
 #! scene a ImpaleHitTarget
 873 a capture
 1000 a press VIEW
