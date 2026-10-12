@@ -174,3 +174,41 @@ export function pastMain(base: Tree, tested: Tree, main: readonly Tree[], landed
   }
   return expected.size === landed.size && [...expected].every(([path, entry]) => landed.get(path) === entry) ? "land" : "retest";
 }
+
+export const GENERATED_REPORTS: readonly string[] = ["tools/move-data/advantage-state.jsonl", "tools/move-data/advantage-state.md"];
+const PIN = /^build-inputs\/([^/]+)$/;
+export const pinFamily = (path: string): string | undefined => PIN.exec(path)?.[1];
+
+export interface FamilySides { readonly base: Tree; readonly ours: Tree; readonly theirs: Tree }
+export interface Conflict { readonly path: string; readonly sides?: FamilySides }
+export type Resolution =
+  | { readonly resolve: true; readonly pins: readonly { readonly path: string; readonly tree: Tree; readonly hash: string }[]; readonly reports: readonly string[] }
+  | { readonly resolve: false; readonly why: string };
+
+export const familyHash = (tree: Tree): string =>
+  [...tree.keys()].sort().reduce((hasher, path) => hasher.update(`${path}\0${tree.get(path)}\n`), new Bun.CryptoHasher("sha256")).digest("hex");
+
+export function mergeFamily({ base, ours, theirs }: FamilySides): { readonly tree: Tree } | { readonly both: readonly string[] } {
+  const tree = new Map<string, string>();
+  const both: string[] = [];
+  for (const path of new Set([...base.keys(), ...ours.keys(), ...theirs.keys()])) {
+    const [was, mine, other] = [base.get(path), ours.get(path), theirs.get(path)];
+    if (mine !== other && mine !== was && other !== was) { both.push(path); continue; }
+    const entry = mine === was ? other : mine;
+    if (entry !== undefined) tree.set(path, entry);
+  }
+  return both.length > 0 ? { both: both.sort() } : { tree };
+}
+
+export function resolveConflicts(conflicts: readonly Conflict[]): Resolution {
+  const source = conflicts.filter(({ path }) => pinFamily(path) === undefined && !GENERATED_REPORTS.includes(path)).map(({ path }) => path);
+  if (source.length > 0) return { resolve: false, why: `${source.join(" ")} ${source.length === 1 ? "is" : "are"} not generated; Autoland never resolves source` };
+  const pins: { path: string; tree: Tree; hash: string }[] = [];
+  for (const { path, sides } of conflicts.filter(({ path }) => pinFamily(path) !== undefined)) {
+    if (sides === undefined) return { resolve: false, why: `the build-inputs store holding ${path}'s three families isn't reachable from Autoland's runner` };
+    const merged = mergeFamily(sides);
+    if ("both" in merged) return { resolve: false, why: `${path} changed ${merged.both.length} file(s) on both sides: ${merged.both.slice(0, 5).join(" ")}` };
+    pins.push({ path, tree: merged.tree, hash: familyHash(merged.tree) });
+  }
+  return { resolve: true, pins, reports: conflicts.filter(({ path }) => GENERATED_REPORTS.includes(path)).map(({ path }) => path) };
+}
