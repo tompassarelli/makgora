@@ -6,7 +6,7 @@ import { Clock, Effect } from "effect";
 import { ChildProcess } from "effect/process";
 import { InputInjection } from "wisp/scripts/platform/services";
 import { AcceptFailure, type ReceiptFile } from "wisp/scripts/wisp/accept";
-import { encodePpm } from "wisp/scripts/wisp/frameProbe";
+import { encodePpm, type Frame } from "wisp/scripts/wisp/frameProbe";
 import { batch, capture, click, focus, frameWords, loadClients } from "wisp/scripts/warcraft/desktop";
 import { cardX } from "../../src/game/menu/selectionDrag";
 import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
@@ -15,6 +15,11 @@ import { gameProcess } from "../integrity/capture";
 import { pollUntil } from "../hostPoll";
 import { runProcess, startInputProcess } from "../hostProcess";
 import { JournalMenu } from "./boundary";
+import { type Rgba } from "../blp";
+import { texturePixels } from "./gateCursor";
+import { headlessRender } from "./headlessRender";
+import { texels } from "wisp/scripts/wisp/screenBounds";
+import { parseMDX } from "wisp/vendor/war3-model.mjs";
 import { START_MATCH_BUTTON } from "../../src/game/ui/stageUi";
 
 const fail = (operation: string) => (cause: { readonly message: string }) => new AcceptFailure({ operation, problem: cause.message });
@@ -25,8 +30,53 @@ export const measureStartGate = (clientsFile: string, name: string, directory: s
     try: () => { mkdirSync(directory, { recursive: true, mode: 0o700 }); return createHash("sha256").update(readFileSync(helperPath)).digest("hex"); },
     catch: cause => new AcceptFailure({ operation: "start gate helper", problem: String(cause) }),
   });
+  const qualified = helperSha256 === "54765117e1cae071c0aad6ded1f06af6b227287ed4a237c31cfcd2e6dbe3159d";
+  const assetClient = (yield* loadClients(clientsFile).pipe(Effect.mapError(fail("start gate clients")))).find(client => client.name === name);
+  const prefix = assetClient?.documents.split("/pfx/")[0];
+  if (prefix === undefined || !prefix.includes("/wisp/lan/clients/")) return yield* new AcceptFailure({ operation: "start gate cursor assets", problem: "requires the selected offline pool install" });
+  const renderer = headlessRender({ storage: join(prefix, "pfx/drive_c/Program Files (x86)/Warcraft III"), imports: [], cache: join(directory, "assets") });
+  const cursor = yield* Effect.tryPromise({
+    try: async () => {
+      const modelBytes = await renderer.readAsset("UI\\Cursor\\HumanCursor.mdx", "classic");
+      const textureBytes = await renderer.readAsset("UI\\Cursor\\HumanCursor.blp", "classic");
+      if (modelBytes === undefined || textureBytes === undefined) throw new Error("installed Classic HumanCursor model or texture is missing");
+      const model = parseMDX(modelBytes.slice().buffer);
+      const atlas = texels(textureBytes);
+      const plane = model.Geosets[0];
+      const uv = plane?.TVertices[0];
+      const normal = model.Sequences.find(sequence => sequence.Name === "Normal");
+      const translation = model.TextureAnims[0]?.Translation?.Keys.find(key => key.Frame === normal?.Interval[0])?.Vector;
+      if (atlas === undefined || plane === undefined || uv === undefined || normal === undefined || translation === undefined) throw new Error("installed cursor has no Normal sprite geometry");
+      const xs = Array.from(plane.Vertices).filter((_, index) => index % 3 === 0);
+      const ys = Array.from(plane.Vertices).filter((_, index) => index % 3 === 1);
+      const us = Array.from(uv).filter((_, index) => index % 2 === 0);
+      const vs = Array.from(uv).filter((_, index) => index % 2 === 1);
+      return { atlas, left: Math.min(...xs), top: Math.max(...ys), width: Math.max(...xs) - Math.min(...xs), height: Math.max(...ys) - Math.min(...ys), u: Math.min(...us) + (translation[0] ?? 0), v: Math.min(...vs) + (translation[1] ?? 0), uWidth: Math.max(...us) - Math.min(...us), vHeight: Math.max(...vs) - Math.min(...vs), modelSha256: createHash("sha256").update(modelBytes).digest("hex"), textureSha256: createHash("sha256").update(textureBytes).digest("hex") };
+    },
+    catch: cause => new AcceptFailure({ operation: "start gate cursor assets", problem: String(cause) }),
+  });
+  const locate = (frame: Frame) => {
+    const width = Math.round(cursor.width * frame.height / 0.6);
+    const height = Math.round(cursor.height * frame.height / 0.6);
+    const texture: Rgba = { width, height, data: new Uint8Array(width * height * 4), alpha: true };
+    for (let py = 0; py < height; py++) for (let px = 0; px < width; px++) {
+      const ax = (cursor.u + (px + 0.5) * cursor.uWidth / width) * cursor.atlas.width - 0.5;
+      const ay = (cursor.v + (py + 0.5) * cursor.vHeight / height) * cursor.atlas.height - 0.5;
+      const ix = Math.floor(ax), iy = Math.floor(ay), fx = ax - ix, fy = ay - iy;
+      for (let channel = 0; channel < 4; channel++) texture.data[(py * width + px) * 4 + channel] = Math.round((cursor.atlas.data[(iy * cursor.atlas.width + ix) * 4 + channel] ?? 0) * (1 - fx) * (1 - fy) + (cursor.atlas.data[(iy * cursor.atlas.width + ix + 1) * 4 + channel] ?? 0) * fx * (1 - fy) + (cursor.atlas.data[((iy + 1) * cursor.atlas.width + ix) * 4 + channel] ?? 0) * (1 - fx) * fy + (cursor.atlas.data[((iy + 1) * cursor.atlas.width + ix + 1) * 4 + channel] ?? 0) * fx * fy);
+    }
+    let best: { x: number; y: number; pixelX: number; pixelY: number; error: number; pixels: number; matchedPixels: number } | undefined;
+    for (let py = 0; py < frame.height; py += 4) for (let px = 0; px < frame.width; px += 4) {
+      const left = (px - (frame.width - frame.height * 4 / 3) / 2) * 0.6 / frame.height;
+      const top = (frame.height - py) * 0.6 / frame.height;
+      const match = texturePixels(frame, texture, left, top, cursor.width, cursor.height);
+      if (match !== undefined && match.error <= 24 && match.matchedPixels >= match.pixels * 0.8 && (best === undefined || match.error < best.error)) best = { x: left - cursor.left, y: top - cursor.top, pixelX: Math.round(px - cursor.left * frame.height / 0.6), pixelY: Math.round(py + cursor.top * frame.height / 0.6), ...match };
+    }
+    return best;
+  };
+  let negativeControl: { readonly file: string; readonly sha256: string } | undefined;
   const positions = [{ x: 0.03, y: 0.30 }, { x: 0.40, y: 0.56 }, { x: 0.75, y: 0.50 }];
-  const samples: { readonly trial: number; readonly position: { readonly x: number; readonly y: number }; readonly offButton: boolean; readonly started: boolean }[] = [];
+  const samples: { readonly trial: number; readonly observed: { readonly x: number; readonly y: number; readonly pixelX: number; readonly pixelY: number }; readonly offButton: boolean; readonly started: boolean }[] = [];
   for (const [trial, position] of positions.entries()) {
     if (trial > 0) yield* restart;
     const since = yield* Clock.currentTimeMillis;
@@ -61,20 +111,34 @@ export const measureStartGate = (clientsFile: string, name: string, directory: s
     const beforeMenu = yield* pollUntil(menu().pipe(Effect.map(value => value?.phase === "STAGE" ? value : undefined)), { every: "100 millis", within: "15 seconds", orElse: () => Effect.fail(new AcceptFailure({ operation: "start gate stage select", problem: "no fresh STAGE receipt after readying both fighters" })) });
     if (beforeMenu === undefined) return yield* new AcceptFailure({ operation: "start gate stage select", problem: "missing STAGE receipt" });
     const region = yield* input.windowRegion(client).pipe(Effect.mapError(fail("start gate viewport")));
+    const stageFrame = () => Effect.gen(function*() {
+      const frame = yield* capture(client, region).pipe(Effect.mapError(fail("start gate capture")));
+      const words = yield* frameWords(client, frame, "light").pipe(Effect.mapError(fail("start gate stage pixels")));
+      const title = words.filter(word => word.y < frame.height * 0.12).map(word => word.text.toUpperCase());
+      return { frame, words, stage: title.includes("STAGE") && title.includes("SELECT") };
+    });
+    yield* pollUntil(stageFrame().pipe(Effect.map(value => value.stage ? value : undefined)), { every: "100 millis", within: "15 seconds", orElse: () => Effect.fail(new AcceptFailure({ operation: "start gate stage pixels", problem: "no drawn STAGE SELECT title" })) });
     const target = { x: region.x + Math.round((region.width - region.height * 4 / 3) / 2 + position.x * region.height / 0.6), y: region.y + Math.round(region.height - position.y * region.height / 0.6) };
     const pointer = () => runProcess(ChildProcess.make(client.tools.xdotool, ["getmouselocation", "--shell"], { env: { ...Bun.env, ...client.x11 }, stdin: "ignore" })).pipe(Effect.map(text => ({ x: Number(/^X=(\d+)$/m.exec(text)?.[1]), y: Number(/^Y=(\d+)$/m.exec(text)?.[1]) })), Effect.mapError(fail("start gate pointer")));
     const from = yield* pointer();
     yield* runProcess(ChildProcess.make(client.tools.xdotool, ["mousemove_relative", "--", String(target.x - from.x), String(target.y - from.y)], { env: { ...Bun.env, ...client.x11 }, stdin: "ignore" })).pipe(Effect.mapError(fail("start gate pointer")));
-    const observed = yield* pointer();
-    if (observed.x !== target.x || observed.y !== target.y) return yield* new AcceptFailure({ operation: "start gate pointer", problem: `wanted ${target.x},${target.y}; observed ${observed.x},${observed.y}` });
-    const save = (phase: string) => Effect.gen(function*() {
-      const frame = yield* capture(client, region).pipe(Effect.mapError(fail("start gate capture")));
+    const xPointer = yield* pointer();
+    if (xPointer.x !== target.x || xPointer.y !== target.y) return yield* new AcceptFailure({ operation: "start gate pointer", problem: `wanted ${target.x},${target.y}; observed ${xPointer.x},${xPointer.y}` });
+    const save = (phase: string, retained?: Frame) => Effect.gen(function*() {
+      const frame = retained ?? (yield* capture(client, region).pipe(Effect.mapError(fail("start gate capture"))));
       const bytes = encodePpm(frame);
       const file = `${trial}-${phase}.ppm`;
       yield* Effect.try({ try: () => writeFileSync(join(directory, file), bytes, { mode: 0o600 }), catch: cause => new AcceptFailure({ operation: "start gate evidence", problem: String(cause) }) });
       return { file, sha256: createHash("sha256").update(bytes).digest("hex") };
     });
-    const before = yield* save("stage");
+    const observedFrame = yield* pollUntil(Effect.gen(function*() {
+      const stage = yield* stageFrame();
+      if (!stage.stage) return undefined;
+      yield* save("cursor", stage.frame);
+      const cursor = locate(stage.frame);
+      return cursor === undefined ? undefined : { ...stage, cursor };
+    }), { every: "100 millis", within: "15 seconds", orElse: () => Effect.fail(new AcceptFailure({ operation: "start gate cursor", problem: "no matched drawn hand on STAGE SELECT" })) });
+    const parked = yield* save("parked", observedFrame.frame);
     const pid = yield* gameProcess(client, true).pipe(Effect.mapError(fail("start gate process")));
     const appId = yield* Effect.try({
       try: () => {
@@ -85,28 +149,41 @@ export const measureStartGate = (clientsFile: string, name: string, directory: s
       catch: cause => new AcceptFailure({ operation: "start gate app id", problem: String(cause) }),
     });
     const args = [helperPath, "--preset", "tom", "--virtual-pad", "--emit", "--watch-seconds", "30", "--display", client.x11.DISPLAY ?? "", "--x11-window", client.window, "--pid", String(pid), "--private-wlr-app-id", `steam_app_${appId}`];
+    let prePress = observedFrame;
+    let before = parked;
     const afterMenu = yield* Effect.scoped(Effect.gen(function*() {
       const helper = yield* startInputProcess(args, { env: { ...Bun.env, ...client.x11, ...client.wayland }, stdout: join(directory, `${trial}-helper.out`), stderr: join(directory, `${trial}-helper.err`) }).pipe(Effect.mapError(fail("start gate helper")));
       yield* Effect.sleep("800 millis");
       yield* helper.write("button start 0").pipe(Effect.mapError(fail("start gate input")));
       yield* Effect.sleep("200 millis");
+      const stage = yield* stageFrame();
+      const cursor = stage.stage ? locate(stage.frame) : undefined;
+      if (!stage.stage || cursor === undefined) return yield* new AcceptFailure({ operation: "start gate pre-press", problem: "missing drawn STAGE SELECT cursor immediately before Start" });
+      prePress = { ...stage, cursor };
+      before = yield* save("stage", stage.frame);
       yield* helper.write("button start 1").pipe(Effect.mapError(fail("start gate input")));
       yield* Effect.sleep("150 millis");
       yield* helper.write("button start 0").pipe(Effect.mapError(fail("start gate input")));
       return yield* pollUntil(menu().pipe(Effect.map(value => value?.phase === "BLOCKED" && value.epoch > beforeMenu.epoch ? value : undefined)), { every: "100 millis", within: "5 seconds", orElse: menu });
     }));
-    const after = yield* save("after-start");
-    const offButton = position.x < START_MATCH_BUTTON.x || position.x > START_MATCH_BUTTON.x + START_MATCH_BUTTON.width || position.y > START_MATCH_BUTTON.y || position.y < START_MATCH_BUTTON.y - START_MATCH_BUTTON.height;
     const started = afterMenu?.phase === "BLOCKED" && afterMenu.epoch > beforeMenu.epoch;
-    const sample = { trial, position, target, observed, beforeMenu, afterMenu, before, after, args, pid, offButton, started };
+    const afterFrame = started ? yield* pollUntil(stageFrame().pipe(Effect.map(value => value.stage ? undefined : value.frame)), { every: "100 millis", within: "15 seconds", orElse: () => Effect.fail(new AcceptFailure({ operation: "start gate gameplay pixels", problem: "STAGE SELECT remains drawn after match transition" })) }) : yield* capture(client, region).pipe(Effect.mapError(fail("start gate capture")));
+    const after = yield* save("after-start", afterFrame);
+    const observed = prePress.cursor;
+    const offButton = observed.x < START_MATCH_BUTTON.x || observed.x > START_MATCH_BUTTON.x + START_MATCH_BUTTON.width || observed.y > START_MATCH_BUTTON.y || observed.y < START_MATCH_BUTTON.y - START_MATCH_BUTTON.height;
+    if (started && negativeControl === undefined) {
+      if (locate(afterFrame) !== undefined) return yield* new AcceptFailure({ operation: "start gate calibration", problem: "drawn gameplay negative control matches the stock cursor" });
+      negativeControl = after;
+    }
+    const sample = { trial, position, target, xPointer, observed, parkedCursor: observedFrame.cursor, words: prePress.words, parked, beforeMenu, afterMenu, before, after, args, pid, offButton, started };
     samples.push(sample);
     if (!started) break;
   }
   const started = samples.filter(sample => sample.started).length;
-  const distinct = new Set(samples.map(sample => `${sample.position.x},${sample.position.y}`)).size;
+  const distinct = new Set(samples.map(sample => `${sample.observed.pixelX},${sample.observed.pixelY}`)).size;
   const offButton = samples.filter(sample => sample.offButton).length;
-  const text = `SMASHCRAFT GATE start trials=${samples.length} started=${started} distinct=${distinct} offButton=${offButton} pass=${samples.length === 3 && started === 3 && distinct === 3 && offButton === 3 ? 1 : 0}`;
+  const text = `SMASHCRAFT GATE start trials=${samples.length} started=${started} distinct=${distinct} offButton=${offButton} pass=${qualified && negativeControl !== undefined && samples.length === 3 && started === 3 && distinct === 3 && offButton === 3 ? 1 : 0}`;
   const modified = yield* Clock.currentTimeMillis;
-  yield* Effect.try({ try: () => writeFileSync(join(directory, "measurements.json"), `${JSON.stringify({ text, helperPath, helperSha256, samples }, null, 2)}\n`, { mode: 0o600 }), catch: cause => new AcceptFailure({ operation: "start gate evidence", problem: String(cause) }) });
+  yield* Effect.try({ try: () => writeFileSync(join(directory, "measurements.json"), `${JSON.stringify({ text, helperPath, helperSha256, qualified, cursor: { modelSha256: cursor.modelSha256, textureSha256: cursor.textureSha256, left: cursor.left, top: cursor.top, width: cursor.width, height: cursor.height, u: cursor.u, v: cursor.v, uWidth: cursor.uWidth, vHeight: cursor.vHeight }, negativeControl, samples }, null, 2)}\n`, { mode: 0o600 }), catch: cause => new AcceptFailure({ operation: "start gate evidence", problem: String(cause) }) });
   return { name: "start-gate", text, modified } satisfies ReceiptFile;
 }).pipe(Effect.scoped);

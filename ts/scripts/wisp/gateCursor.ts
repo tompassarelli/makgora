@@ -22,7 +22,7 @@ const pixelPoint = (frame: Frame, x: number, y: number) => ({
   y: Math.round(frame.height - y * frame.height / 0.6),
 });
 
-function texturePixels(frame: Frame, texture: Rgba, x: number, y: number, uiWidth: number, uiHeight: number): { error: number; pixels: number; matchedPixels: number } | undefined {
+export function texturePixels(frame: Frame, texture: Rgba, x: number, y: number, uiWidth: number, uiHeight: number): { error: number; pixels: number; matchedPixels: number } | undefined {
   const origin = pixelPoint(frame, x, y);
   const width = Math.round(uiWidth * frame.height / 0.6);
   const height = Math.round(uiHeight * frame.height / 0.6);
