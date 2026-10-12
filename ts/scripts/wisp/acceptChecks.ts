@@ -170,6 +170,11 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
       pass: [NO_ERRORS, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE cursor frames=\\d+ visible=\\d+ sweepMs=\\d+ picked=1 dropped=1 parked=1 pinch=1 pass=1$", min: 1 }],
     },
     {
+      id: "gate-start-anywhere", closes: "T7 C2", map: "gate-playable", session: "gate-start",
+      setup: [{ chat: "gate:start", client: "a" }],
+      pass: [NO_ERRORS, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE start trials=3 started=3 distinct=3 offButton=3 pass=1$", min: 1 }],
+    },
+    {
       id: "123-selection", closes: "smashcraft#123 box 5", map: "presentation", session: "123-match-flow",
       setup: [
         { chat: "-dev reset" }, { chat: "-dev slots 1 2" }, { chat: "-dev stocks 1" },

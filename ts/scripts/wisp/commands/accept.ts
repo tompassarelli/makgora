@@ -34,6 +34,7 @@ import { LAN_POOL_FILE, lanPairs, withTools } from "../padBatch";
 import { platformLayer } from "wisp/scripts/platform/layer";
 import { preferencesPath, videoSettings } from "wisp/scripts/warcraft/preferences";
 import { measureCursorGate } from "../gateCursor";
+import { measureStartGate } from "../gateStart";
 
 const ReportMetadata = Schema.fromJsonString(Schema.Record(Schema.String, Schema.Unknown));
 
@@ -284,6 +285,8 @@ export const accept: Command = (rawArgs) => Effect.gen(function*() {
     const controlled = AcceptDriver.of({
       ...live,
       chat: (name, text) => text === "gate:cursor" ? measureCursorGate(selectedClients, name, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), "gate-cursor-visible", name)).pipe(
+        Effect.tap(receipt => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipt]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
+      ) : text === "gate:start" ? measureStartGate(selectedClients, name, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), "gate-start-anywhere", name), controlled.start("gate-playable", "gate-start")).pipe(
         Effect.tap(receipt => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipt]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
       ) : (solo ? sendSoloDevCommand(text, name) : sendDevCommand(text, name)).pipe(Effect.mapError((cause) => new AcceptFailure({ operation: `chat ${name}`, problem: describeCause(cause) })), Effect.provide(context)),
       receipts: name => Effect.map(live.receipts(name), receipts => [...receipts, ...(measurements.get(name) ?? [])]),
