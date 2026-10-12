@@ -1,8 +1,8 @@
 # Farm VM retention
 
-`smashcraft-vm-retention.timer` runs `smashcraft-vm-retention.service` every
-thirty minutes on Tom's machine, which holds the VM's SSH key. The service runs
-`vm-retention.sh`, which:
+`smashcraft-vm-retention.service` runs on Tom's machine, which holds the VM's
+SSH key, only when queued on the laptop's ledger runner after farm VM work, so
+nothing fires while no work is queued. The service runs `vm-retention.sh`, which:
 
 - rsyncs the VM's `/home/user/out` and `/home/user/fidelity` into
   `~/.local/state/smashcraft/vm-archive/{out,fidelity}`, keeping relative paths;
@@ -16,9 +16,12 @@ thirty minutes on Tom's machine, which holds the VM's SSH key. The service runs
 To install it:
 
     install -Dm755 tools/vm-retention/vm-retention.sh ~/.local/libexec/smashcraft-vm-retention.sh
-    cp tools/vm-retention/smashcraft-vm-retention.{service,timer} ~/.config/systemd/user/
+    cp tools/vm-retention/smashcraft-vm-retention.service ~/.config/systemd/user/
     systemctl --user daemon-reload
-    systemctl --user enable --now smashcraft-vm-retention.timer
+
+To queue one run:
+
+    threads queue add laptop - -- systemctl --user start --wait smashcraft-vm-retention.service
 
 Each smashcraft runner on the VM prunes its own `_work` after every job with
 `ghr-work-prune.sh` (`ACTIONS_RUNNER_HOOK_JOB_COMPLETED`, beside the disk guard):

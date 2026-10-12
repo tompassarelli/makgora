@@ -26,10 +26,10 @@
   installed build. Plato reads the candidate and failing check ids/reasons in
   `~/.local/state/smashcraft/green-builds/status.json`.
   A red, pending or missing CI/farm run is never built, and an older green
-  commit never replaces a newer installed build. The systemd user timer
-  (smashcraft:tools/green-builds/) runs every ten minutes; the repository
-  documents it but doesn't install it. The timer currently consumes native
-  reports; it has no route to dispatch remote Classic.
+  commit never replaces a newer installed build. The systemd user service
+  (smashcraft:tools/green-builds/) has no timer; it runs only when queued on
+  the laptop's ledger runner. It consumes native reports; it has no route to
+  dispatch remote Classic.
   `bun wisp play --install-green --dry-run` reports the newest green commit and
   proposed install without building, installing or starting the controller helper.
 
