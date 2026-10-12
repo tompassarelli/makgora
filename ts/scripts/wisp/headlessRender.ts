@@ -14,11 +14,7 @@ import { importedAssets } from "./mapInputs";
 import { runProcess } from "../hostProcess";
 import { POST_PROCESSING_FILE } from "../postProcessing";
 import { MapBuildFailure } from "wisp/scripts/wisp/mapBuild";
-import { fighterCueList, MISSING_CUE_MODEL } from "../../src/game/presentation/specialCues";
-import { allAttackCueModels } from "../../src/game/presentation/attackCues";
-import { DEFINITIVE_ACCENT_REDRAWS, DISJOINT_CUES } from "../../src/game/presentation/disjointCues";
-import { DEFINITIVE_PROJECTILE_REDRAWS, allProjectileModels } from "../../src/game/presentation/projectileArt";
-import { Character } from "../../src/game/sim/codes";
+import { type Look, cueModels, listedRedraws, redrawCandidates, redrawProblem, unlistedRedraws } from "./cueModels";
 import { resolveRenderAsset, type AssetLocation, type AssetLayer, type Graphics, type ResolvedRenderAsset } from "wisp/scripts/wisp/renderAssets";
 
 const key = (path: string) => path.replaceAll("\\", "/").toLowerCase().replace(/\.mdl$/, ".mdx");
@@ -41,29 +37,26 @@ export interface RenderAssetOptions {
   readonly manifest?: string;
 }
 
-export const cueModels = () => [...new Set([...Object.values(Character).flatMap(character => fighterCueList(character).map(cue => cue.model)), ...allAttackCueModels(), ...allProjectileModels(), MISSING_CUE_MODEL])];
-
-export const checkCueModels = Effect.fnUntraced(function*(renderer: { readonly resolveAsset: (path: string, graphics: Graphics) => Promise<ResolvedRenderAsset> } = headlessRender(), models: readonly string[] = cueModels()) {
+export const cueModelLooks = Effect.fnUntraced(function*(renderer: { readonly resolveAsset: (path: string, graphics: Graphics) => Promise<ResolvedRenderAsset> } = headlessRender(), models: readonly string[] = [...new Set([...cueModels(), ...redrawCandidates()])]) {
   const missing: string[] = [];
-  for (const model of models) for (const graphics of ["classic", "definitive"] as const) {
-    const resolved = yield* Effect.tryPromise({
-      try: () => renderer.resolveAsset(model, graphics),
-      catch: cause => new MapBuildFailure({ operation: "resolve cue model", path: model, cause }),
-    });
-    if (resolved.bytes === undefined || resolved.bytes.length === 0) missing.push(`${graphics}: ${model}`);
-  }
-  if (missing.length > 0) return yield* new MapBuildFailure({ operation: "check cue models", path: "Classic and Definitive", cause: missing.join("; ") });
-  const redrawn: string[] = [];
-  const listed = { ...DEFINITIVE_ACCENT_REDRAWS, ...DEFINITIVE_PROJECTILE_REDRAWS };
-  for (const model of new Set([...Object.values(DISJOINT_CUES).map(cue => cue.model), ...allProjectileModels()])) {
-    if (listed[model] !== undefined) continue;
+  const looks = new Map<string, Look>();
+  for (const model of models) {
     const [classic, definitive] = yield* Effect.tryPromise({
       try: () => Promise.all([renderer.resolveAsset(model, "classic"), renderer.resolveAsset(model, "definitive")]),
-      catch: cause => new MapBuildFailure({ operation: "resolve accent or projectile", path: model, cause }),
+      catch: cause => new MapBuildFailure({ operation: "resolve cue model", path: model, cause }),
     });
-    if (classic.bytes === undefined || definitive.bytes === undefined || !Buffer.from(classic.bytes).equals(Buffer.from(definitive.bytes))) redrawn.push(model);
+    for (const [graphics, resolved] of [["classic", classic], ["definitive", definitive]] as const) if (resolved.bytes === undefined || resolved.bytes.length === 0) missing.push(`${graphics}: ${model}`);
+    if (classic.bytes !== undefined && definitive.bytes !== undefined) looks.set(model, Buffer.from(classic.bytes).equals(Buffer.from(definitive.bytes)) ? "same" : "redrawn");
   }
-  if (redrawn.length > 0) return yield* new MapBuildFailure({ operation: "check Definitive redraws", path: "src/game/presentation", cause: `Definitive redraws these contact accents or projectiles as different models; review each in Definitive and list it in DEFINITIVE_ACCENT_REDRAWS (disjointCues.ts) or DEFINITIVE_PROJECTILE_REDRAWS (projectileArt.ts), or choose another: ${redrawn.join("; ")}` });
+  if (missing.length > 0) return yield* new MapBuildFailure({ operation: "check cue models", path: "Classic and Definitive", cause: missing.join("; ") });
+  return looks;
+});
+
+export const checkCueModels = Effect.fnUntraced(function*(renderer: { readonly resolveAsset: (path: string, graphics: Graphics) => Promise<ResolvedRenderAsset> } = headlessRender(), models: readonly string[] = cueModels()) {
+  const candidates = redrawCandidates();
+  const looks = yield* cueModelLooks(renderer, [...new Set([...models, ...candidates])]);
+  const redrawn = unlistedRedraws(candidates, listedRedraws(), looks);
+  if (redrawn.length > 0) return yield* new MapBuildFailure({ operation: "check Definitive redraws", path: "src/game/presentation", cause: redrawProblem(redrawn) });
   return models.length * 2;
 });
 

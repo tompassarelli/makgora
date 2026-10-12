@@ -9,10 +9,11 @@
 
 
 
-import { existsSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, join, relative } from "node:path";
 import { Console, Effect, Option, Schema } from "effect";
 import { issueTests, redTitle } from "./mainRed";
+import { CUE_MODEL_RECORD, RECORD_COMMAND, touchesCueInputs } from "./wisp/cueModels";
 
 const root = join(import.meta.dir, "../..");
 const ZERO = /^0+$/;
@@ -30,10 +31,30 @@ const ANIMATION_INPUTS = ["build-inputs/original-clips-static-lights", "tools/an
 const MODEL_INPUTS = ["build-inputs/", "tools/animations/", "ts/src/game/assets/", "ts/src/game/presentation/", "ts/scripts/wisp/playerView.ts", "ts/scripts/wisp/model-facts/"];
 
 
-export function checksFor(paths: readonly string[]): Check[] {
+const CUE_CHECK = "ts/scripts/cueModels.ts";
+
+export function cueInputs(): Set<string> {
+  const transpiler = new Bun.Transpiler({ loader: "ts" });
+  const seen = new Set<string>();
+  const visit = (file: string) => {
+    if (seen.has(file) || !existsSync(file)) return;
+    seen.add(file);
+    for (const { path, kind } of transpiler.scanImports(readFileSync(file, "utf8"))) {
+      if (kind === "dynamic-import" || !path.startsWith(".")) continue;
+      const base = join(dirname(file), path);
+      const found = [base, `${base}.ts`, `${base}.tsx`, join(base, "index.ts")].find((candidate) => existsSync(candidate) && candidate.match(/\.tsx?$/));
+      if (found !== undefined) visit(found);
+    }
+  };
+  visit(join(root, CUE_CHECK));
+  return new Set([CUE_MODEL_RECORD, ...[...seen].map((file) => relative(root, file))]);
+}
+
+export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = new Set()): Check[] {
   const ts = paths.some((path) => path.startsWith("ts/") || path === "typescript-toolchain.lock");
   const animation = paths.some((path) => ANIMATION_INPUTS.some((input) => path === input || input.endsWith("/") && path.startsWith(input)));
   const models = paths.some((path) => MODEL_INPUTS.some((input) => path === input || input.endsWith("/") && path.startsWith(input)));
+  const cueModels = touchesCueInputs(paths, cues);
   return [
     ...(paths.length > 0 ? [{ name: "clean room", directory: "ts", args: ["scripts/cleanRoom.ts"], fix: "follow wisp:docs/clean-room.md and the line above." }] : []),
     ...(ts ? [
@@ -41,6 +62,9 @@ export function checksFor(paths: readonly string[]): Check[] {
     ] : []),
     ...(models ? [
       { name: "generated models stored", directory: "ts", args: ["scripts/storedModels.ts"], fix: "store the regenerated family (smashcraft:docs/build-inputs.md, \"Change art\")." },
+    ] : []),
+    ...(cueModels ? [
+      { name: "cue models recorded in both looks", directory: "ts", args: ["scripts/cueModels.ts"], fix: `list each Definitive redraw after reviewing it, or record new models with ${RECORD_COMMAND} from ts/ (smashcraft:docs/commands/workflow.md).` },
     ] : []),
     ...(animation ? [
       { name: "animation jitter [k3 measure #479]", directory: "ts", args: ["scripts/wisp.ts", "anim", "jitter"], fix: "regenerate the clip pool through thinKeys so close Hermite keys carry slopes (smashcraft:docs/commands/animation.md)." },
@@ -139,7 +163,7 @@ export const prePush = (input: string) => Effect.gen(function*() {
     return local === undefined || remote === undefined || ZERO.test(local) || remoteRef?.startsWith("refs/tags/") ? [] : [{ local, remoteRef, remote }];
   });
   const paths = [...new Set((yield* Effect.forEach(pushed, ({ local, remote }) => changedPaths(local, remote))).flat())];
-  const checks = checksFor(paths);
+  const checks = checksFor(paths, cueInputs());
   const toMain = pushed.some(({ remoteRef }) => remoteRef === "refs/heads/main");
   if (checks.length === 0 && !toMain) return;
   const head = yield* git("rev-parse", "HEAD");
