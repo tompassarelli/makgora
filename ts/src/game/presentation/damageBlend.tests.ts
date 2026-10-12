@@ -39,7 +39,7 @@ test("the previous pose fades monotonically to nothing [k2 property]", () => {
   assertEquals(outgoingPoseAlpha(0, 0), 0);
 });
 
-test("only entering or leaving one of the nine pain poses blends [k3 measure #181]", () => {
+test("entering or leaving the nine pain poses uses the prescribed blend [k3 measure #181]", () => {
   for (const character of SELECTABLE_CHARACTERS) {
     const row = contactDamageClips(character);
     if (row === undefined) throw new Error(`${fighterName(character)} has no pain grid`);

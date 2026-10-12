@@ -6,7 +6,9 @@ import { at } from "wisp/src/runtime/lookup";
 import { floorDiv } from "wisp/src/sim/intMath";
 import { max, min } from "../../runtime/numbers";
 import type { Fighter } from "../sim/fighter";
+import { Character } from "../sim/codes";
 import { contactDamageClips } from "./damagePose";
+import { characterClips } from "./fighterClips";
 
 
 
@@ -15,6 +17,10 @@ import { contactDamageClips } from "./damagePose";
 export const PAIN_ENTRY_BLEND_FRAMES: readonly number[] = [3, 2, 1];
 
 export const PAIN_EXIT_BLEND_FRAMES = 4;
+
+const STOP_ENTRY_BLEND_FRAMES: Readonly<Partial<Record<Character, number>>> = {
+  [Character.mountainKing]: 6,
+};
 
 
 export function isContactPainClip(character: number, index: number): boolean {
@@ -38,6 +44,10 @@ export function poseBlendFrames(fighter: Readonly<Fighter>, from: number, to: nu
   if (from === to) return 0;
   if (isContactPainClip(fighter.character, to)) return painEntryBlendFrames(fighter.visuals.hitStrength, fighter.launch.hitlag);
   if (isContactPainClip(fighter.character, from)) return PAIN_EXIT_BLEND_FRAMES;
+  const frames = STOP_ENTRY_BLEND_FRAMES[fighter.character];
+  if (frames === undefined) return 0;
+  const clips = characterClips(fighter.character);
+  if (to === clips.stop?.index && (from === clips.dash?.index || from === clips.run?.index || from === clips.walk?.index)) return frames;
   return 0;
 }
 

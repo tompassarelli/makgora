@@ -26,7 +26,7 @@ import { specialClip } from "../presentation/fighterClips";
 import { definitiveCues } from "./specialCueEffects";
 import { characterModelScale } from "../presentation/modelScale";
 import { fitFighterPlacement } from "../presentation/fighterPlacement";
-import { outgoingPoseAlpha, poseBlendFrames } from "../presentation/damageBlend";
+import { isContactPainClip, outgoingPoseAlpha, poseBlendFrames } from "../presentation/damageBlend";
 
 export class FighterPoolPresentation {
   private readonly clips: effect[] = [];
@@ -208,6 +208,12 @@ export class FighterPoolPresentation {
     }
     const transformation = specialCueState(fighter);
     if (transformation.phase === "active" && transformation.cues?.active.replacesBody === true) alpha = 0;
+    const from = this.blendFrom === undefined ? undefined : this.clips[this.blendFrom];
+    const fade = outgoingPoseAlpha(frame - this.blendStart, this.blendFrames);
+    if (from !== undefined && this.blendFrom !== undefined
+      && !isContactPainClip(this.character, index) && !isContactPainClip(this.character, this.blendFrom)) {
+      alpha = Math.max(0, alpha - fade);
+    }
     if (changed || this.red !== red || this.green !== green || this.blue !== blue) {
       BlzSetSpecialEffectColor(model, red, green, blue);
       this.red = red;
@@ -218,9 +224,7 @@ export class FighterPoolPresentation {
       BlzSetSpecialEffectAlpha(model, alpha);
       this.alpha = alpha;
     }
-    const from = this.blendFrom === undefined ? undefined : this.clips[this.blendFrom];
     if (from === undefined) return;
-    const fade = outgoingPoseAlpha(frame - this.blendStart, this.blendFrames);
     if (fade <= 0) {
       this.endBlend();
       return;
