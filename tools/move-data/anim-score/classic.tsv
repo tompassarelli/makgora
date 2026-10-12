@@ -1,24 +1,25 @@
 fighter	move	class	passed	shortfall	L1	body share	mass shift	limb	L2	end error	jump	overshoot	L3	windup	peak	settle	fill	first active	last active	end	L4	contrast	IoU windup/contact	IoU contact/recovery	L5	judges	lowest	readability	weight	anticipation	follow-through	character	Melee reference	ref start	ref total
-anub'arak	back-air	aerial	0/4	4.19	FAIL	0.00	0.02	body	FAIL	0.01	0.01	0.00	FAIL	0	0	39	0.96	10	13	40	FAIL	0.23	0.71	0.77	unjudged	0							bowser bair	9	49
-anub'arak	dash-attack	tilt	3/4	1.00	pass	1.00	0.18	body	FAIL	0.04	0.04	0.00	pass	9	10	41	0.93	11	15	43	pass	0.36	0.42	0.64	unjudged	0							bowser dattack	10	59
-anub'arak	down-air	aerial	1/4	3.60	FAIL	1.00	-0.01	body	FAIL	0.00	0.00	0.01	FAIL	13	25	46	0.90	16	19	49	pass	0.29	0.53	0.71	unjudged	0							bowser dair	14	79
-anub'arak	down-smash	smash	1/4	4.25	FAIL	1.00	0.05	body	FAIL	0.04	0.04	0.00	pass	12	16	51	0.97	15	20	52	FAIL	0.33	0.54	0.67	unjudged	0							bowser dsmash	14	69
-anub'arak	down-tilt	tilt	3/4	0.73	pass	1.00	0.25	body	FAIL	0.04	0.04	0.01	pass	5	7	29	0.95	7	10	30	pass	0.38	0.37	0.62	unjudged	0							bowser dtilt	14	59
-anub'arak	forward-air	aerial	2/4	1.04	pass	1.00	0.07	body	FAIL	0.00	0.00	0.00	pass	9	12	39	0.89	12	15	42	FAIL	0.24	0.63	0.76	unjudged	0							bowser fair	8	45
-anub'arak	forward-smash	smash	2/4	3.92	pass	1.00	0.11	body	FAIL	0.04	0.04	0.00	pass	16	20	54	0.94	19	22	56	FAIL	0.27	0.56	0.73	unjudged	0							bowser fsmash	29	69
-anub'arak	forward-tilt	tilt	3/4	1.00	pass	1.00	0.08	body	FAIL	0.04	0.04	0.00	pass	7	9	33	0.88	9	12	36	pass	0.30	0.53	0.70	unjudged	0							bowser ftilt	12	47
-anub'arak	forward-tilt-down	tilt	3/4	1.00	pass	1.00	0.21	body	FAIL	0.04	0.04	0.00	pass	7	9	35	0.96	9	12	36	pass	0.36	0.38	0.64	unjudged	0							bowser ftilt	12	47
-anub'arak	forward-tilt-up	tilt	3/4	1.00	pass	1.00	0.08	body	pass	0.05	0.05	0.53	FAIL	7	17	35	0.96	9	12	36	pass	0.40	0.46	0.60	unjudged	0							bowser ftilt	12	47
-anub'arak	jab	jab	0/4	3.37	FAIL	1.00	0.07	body	FAIL	0.04	0.04	0.00	FAIL	3	7	22	0.88	5	7	24	FAIL	0.20	0.52	0.80	unjudged	0							bowser jab1	7	24
-anub'arak	jab2	jab	0/4	2.40	FAIL	1.00	0.07	body	FAIL	0.04	0.04	0.00	FAIL	5	8	26	0.85	7	9	29	FAIL	0.15	0.53	0.85	unjudged	0							bowser jab2	8	29
-anub'arak	neutral-air	aerial	0/4	4.65	FAIL	1.00	-0.03	body	FAIL	0.00	0.01	0.00	FAIL	6	14	37	0.92	9	15	39	FAIL	0.20	0.71	0.80	unjudged	0							bowser nair	8	49
-anub'arak	neutral-special	special	1/4	2.63	FAIL	1.00	0.05	body	pass	0.01	0.05	0.25	FAIL	15	28	44	0.93	17	17	46	FAIL	0.05	0.69	0.95	unjudged	0							bowser neutral_b	23	92
-anub'arak	side-special	special	1/4	9.88	FAIL	1.00	-0.39	body	FAIL	0.02	0.23	0.00	FAIL	0	10	35	0.27	25	28	54	pass	0.86	0.14	0.14	unjudged	0							bowser side_b	16	59
-anub'arak	ultimate	special	0/4	5.10	FAIL	0.00	0.00	body	FAIL	0.01	0.04	0.02	FAIL	16	20	56	0.95	16	16	58	FAIL	0.19	0.81	0.67	unjudged	0									
-anub'arak	up-air	aerial	3/4	1.00	pass	1.00	0.07	body	FAIL	0.01	0.01	0.00	pass	5	8	33	0.96	8	11	34	pass	0.30	0.63	0.70	unjudged	0							bowser uair	22	47
-anub'arak	up-smash	smash	2/4	4.08	pass	1.00	0.08	body	FAIL	0.04	0.04	0.00	pass	13	19	50	0.97	16	20	51	FAIL	0.35	0.61	0.65	unjudged	0							bowser usmash	16	59
-anub'arak	up-special	special	0/4	3.23	FAIL	1.00	0.02	body	FAIL	0.02	0.02	0.00	FAIL	0	8	43	0.97	8	15	44	FAIL	0.32	0.68	0.55	unjudged	0							bowser up_b	5	79
-anub'arak	up-tilt	tilt	2/4	2.00	pass	1.00	0.12	body	FAIL	0.05	0.05	0.00	FAIL	0	8	35	1.00	8	12	35	pass	0.50	0.46	0.50	unjudged	0							bowser utilt	7	54
+anub'arak	back-air	aerial	2/4	3.29	pass	1.00	0.50	body	FAIL	0.02	0.02	0.09	FAIL	8	15	40	1.00	10	13	40	pass	0.29	0.16	0.71	unjudged	0							bowser bair	9	49
+anub'arak	dash-attack	tilt	3/4	1.00	pass	1.00	0.71	body	pass	0.05	0.05	0.16	FAIL	9	17	43	1.00	11	15	43	pass	0.34	0.09	0.66	unjudged	0							bowser dattack	10	59
+anub'arak	down-air	aerial	3/4	2.06	pass	1.00	0.06	body	FAIL	0.02	0.02	0.01	pass	14	19	49	1.00	16	19	49	pass	0.39	0.18	0.61	unjudged	0							bowser dair	14	79
+anub'arak	down-smash	smash	2/4	3.04	pass	1.00	0.60	body	FAIL	0.04	0.04	0.11	pass	13	15	52	1.00	15	20	52	FAIL	0.38	0.12	0.62	unjudged	0							bowser dsmash	14	69
+anub'arak	down-special	special	1/4	2.26	pass	1.00	0.49	body	FAIL	0.05	0.10	0.04	FAIL	19	26	44	1.00	21	21	44	FAIL	0.26	0.10	0.74	unjudged	0							bowser down_b	42	106
+anub'arak	down-tilt	tilt	4/4	0.00	pass	1.00	0.57	body	pass	0.05	0.05	0.09	pass	5	7	30	1.00	7	10	30	pass	0.37	0.10	0.63	unjudged	0							bowser dtilt	14	59
+anub'arak	forward-air	aerial	3/4	2.21	pass	1.00	0.59	body	FAIL	0.02	0.02	0.10	pass	10	12	42	1.00	12	15	42	pass	0.32	0.11	0.68	unjudged	0							bowser fair	8	45
+anub'arak	forward-smash	smash	2/4	3.60	pass	1.00	0.83	body	FAIL	0.05	0.05	0.06	pass	17	19	56	1.00	19	22	56	FAIL	0.41	0.07	0.59	unjudged	0							bowser fsmash	29	69
+anub'arak	forward-tilt	tilt	3/4	1.00	pass	1.00	0.67	body	pass	0.05	0.05	0.18	FAIL	7	14	36	1.00	9	12	36	pass	0.32	0.10	0.68	unjudged	0							bowser ftilt	12	47
+anub'arak	forward-tilt-down	tilt	4/4	0.00	pass	1.00	0.61	body	pass	0.05	0.05	0.09	pass	7	9	36	1.00	9	12	36	pass	0.41	0.09	0.59	unjudged	0							bowser ftilt	12	47
+anub'arak	forward-tilt-up	tilt	4/4	0.00	pass	1.00	0.45	body	pass	0.05	0.05	0.31	pass	7	9	36	1.00	9	12	36	pass	0.38	0.27	0.62	unjudged	0							bowser ftilt	12	47
+anub'arak	jab	jab	1/4	1.99	pass	1.00	0.52	body	FAIL	0.05	0.05	0.06	FAIL	3	9	24	1.00	5	7	24	FAIL	0.30	0.16	0.70	unjudged	0							bowser jab1	7	24
+anub'arak	jab2	jab	1/4	2.09	pass	1.00	0.59	body	FAIL	0.05	0.05	0.06	FAIL	5	11	29	1.00	7	9	29	FAIL	0.27	0.13	0.73	unjudged	0							bowser jab2	8	29
+anub'arak	neutral-air	aerial	2/4	3.16	pass	1.00	0.52	body	FAIL	0.02	0.02	0.09	FAIL	7	17	39	1.00	9	15	39	pass	0.32	0.16	0.68	unjudged	0							bowser nair	8	49
+anub'arak	neutral-special	special	1/4	2.01	pass	1.00	0.53	body	FAIL	0.04	0.09	0.11	FAIL	15	22	46	1.00	17	17	46	FAIL	0.32	0.10	0.68	unjudged	0							bowser neutral_b	23	92
+anub'arak	side-special	special	1/4	6.75	FAIL	1.00	-0.37	body	FAIL	0.04	0.11	0.00	FAIL	0	10	54	1.00	25	28	54	pass	0.83	0.17	0.12	unjudged	0							bowser side_b	16	59
+anub'arak	ultimate	special	2/4	1.94	pass	1.00	0.62	body	FAIL	0.03	0.08	0.00	pass	14	16	58	1.00	16	16	58	FAIL	0.28	0.10	0.72	unjudged	0									
+anub'arak	up-air	aerial	1/4	7.56	FAIL	1.00	-0.10	body	FAIL	0.02	0.02	0.10	FAIL	6	26	34	1.00	8	11	34	pass	0.38	0.32	0.62	unjudged	0							bowser uair	22	47
+anub'arak	up-smash	smash	1/4	6.56	FAIL	1.00	-0.09	body	FAIL	0.05	0.05	0.04	pass	14	17	51	1.00	16	20	51	FAIL	0.40	0.26	0.60	unjudged	0							bowser usmash	16	59
+anub'arak	up-special	special	2/4	2.10	FAIL	1.00	-0.18	body	pass	0.04	0.04	0.04	pass	6	8	44	1.00	8	15	44	FAIL	0.37	0.34	0.63	unjudged	0							bowser up_b	5	79
+anub'arak	up-tilt	tilt	2/4	8.29	FAIL	1.00	-0.14	body	pass	0.05	0.05	0.04	FAIL	6	24	35	1.00	8	12	35	pass	0.38	0.30	0.62	unjudged	0							bowser utilt	7	54
 beastmaster	back-air	aerial	2/5	3.67	pass	0.85	0.20	arm R	FAIL	0.02	0.02	0.00	FAIL	0	8	34	1.00	8	10	34	pass	0.69	0.22	0.31	FAIL	1	2.00	3.00	3.00	2.00	3.00	3.00	link bair	6	39
 beastmaster	dash-attack	tilt	2/4	2.48	FAIL	0.62	-0.00	arm R	FAIL	0.01	0.01	0.00	pass	6	10	42	1.00	10	14	42	pass	0.53	0.47	0.43	unjudged	0							link dattack	7	53
 beastmaster	down-air	aerial	1/4	15.14	FAIL	0.00	0.37	arm L	FAIL	0.07	0.07	0.00	FAIL	12	24	49	0.97	15	18	50	pass	0.45	0.28	0.55	unjudged	0							link dair	13	89
