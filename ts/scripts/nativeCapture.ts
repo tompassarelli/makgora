@@ -335,7 +335,7 @@ const runCaptures = (args: readonly string[]) => Effect.scoped(Effect.gen(functi
     const whole = yield* capture(client).pipe(Effect.mapError(failure => new CaptureFailure({ problem: `${failure.operation}: ${failure.cause}` })));
     const shot = crop === undefined || sheets ? whole : cropFrame(whole, crop);
     const verdict = frameVerdict(whole);
-    const stamp = "keep" in verdict ? verdict.keep : undefined;
+    const stamp = "keep" in verdict && status === `CAPTURE SCRIPT ${verdict.keep.script} ${manifest.fixtures[verdict.keep.script - 1]?.name ?? ""}` ? verdict.keep : undefined;
     log.push({ ms: before - started, captureMs: Date.now() - before, stamp: "keep" in verdict ? `${verdict.keep.script}/${verdict.keep.frame}` : verdict.reject });
     const fixture = stamp === undefined ? undefined : manifest.fixtures[stamp.script - 1];
     if (stamp !== undefined && stamp.script > lastScript) { lastScript = stamp.script; idleSince = Date.now(); }
