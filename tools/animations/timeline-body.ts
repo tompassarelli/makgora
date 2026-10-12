@@ -1,6 +1,5 @@
 import { model as mdx, renumberNodes } from '../../ts/scripts/clipNodes';
-import { removeGeosets } from '../../ts/scripts/groundPlanes';
-import { teamGlowGeosets } from './timeline-geosets';
+import { removeGeosets, teamGlowGeosets } from '../../ts/scripts/groundPlanes';
 import { bounds, onGlobalClock, removeBodyEffects, splitStaticLights, tracks, verifyPreservedBody } from './original-clips';
 
 function clearTrack(model: mdx.Model, path: string): void {

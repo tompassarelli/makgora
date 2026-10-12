@@ -6,6 +6,12 @@ import { model as mdx } from "war3-model";
 
 
 
+// Fighters draw as special effects with no player colour, so team glow (replaceable texture 2) renders as white planes (#477).
+export function teamGlowGeosets(model: mdx.Model): Set<number> {
+    return new Set(model.Geosets.flatMap((geoset, index) => (model.Materials[geoset.MaterialID] as mdx.Material).Layers
+        .some(layer => typeof layer.TextureID === 'number' && model.Textures[layer.TextureID]?.ReplaceableId === 2) ? [index] : []));
+}
+
 export function groundPlaneGeosets(model: mdx.Model): number[] {
   return model.Geosets.flatMap((geoset, index) => {
     const vertices = geoset.Vertices;

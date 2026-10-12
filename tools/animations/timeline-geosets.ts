@@ -1,5 +1,6 @@
 import { isDeepStrictEqual } from 'node:util';
 import { ModelRenderer, model as mdx } from '../../ts/scripts/clipNodes';
+import { teamGlowGeosets } from '../../ts/scripts/groundPlanes';
 
 function visibility(model: mdx.Model) {
     const renderer = new ModelRenderer(model);
@@ -15,12 +16,6 @@ function visibility(model: mdx.Model) {
         const material = model.Materials[model.Geosets[geoset].MaterialID];
         return opacity > 0 && material.Layers.some(layer => layer.FilterMode <= 2 && value.call(interpolation, layer.Alpha, 1) > 0);
     };
-}
-
-// Fighters draw as special effects with no player colour, so team glow (replaceable texture 2) renders as white planes (#477).
-export function teamGlowGeosets(model: mdx.Model): Set<number> {
-    return new Set(model.Geosets.flatMap((geoset, index) => model.Materials[geoset.MaterialID].Layers
-        .some(layer => typeof layer.TextureID === 'number' && model.Textures[layer.TextureID]?.ReplaceableId === 2) ? [index] : []));
 }
 
 export function checkTimelineGeosets(source: mdx.Model, body: mdx.Model, sequences: readonly mdx.Sequence[]) {
