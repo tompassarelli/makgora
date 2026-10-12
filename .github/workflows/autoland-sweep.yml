@@ -160,7 +160,7 @@ jobs:
           filter: blob:none
       - if: steps.lanes.outputs.any == 'true'
         run: |
-          set -uo pipefail
+          set +e -uo pipefail
           git fetch -q --filter=blob:none origin main '+refs/heads/claude/*:refs/remotes/origin/claude/*'
           refs() { git log --format=%B "$(git merge-base origin/main "$1")..$1" | grep -oiE '\b(refs|fixes|closes)[: ]+((tompassarelli/)?smashcraft)?#[0-9]+' | grep -oE '[0-9]+$' | sort -un; }
           patches() { git log -p --no-merges "$(git merge-base origin/main "$1")..$1" | git patch-id --stable | cut -d' ' -f1; }
