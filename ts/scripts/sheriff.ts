@@ -1,6 +1,7 @@
 import { appendFileSync } from "node:fs";
 import { Console, Effect, Schema } from "effect";
 import { captureProcess } from "wisp/scripts/wisp/hostProcess";
+import { type CiJob, type CiStep, unmeasured } from "./autolandCore";
 
 class SheriffFailure extends Schema.TaggedError<SheriffFailure>()("SheriffFailure", { command: Schema.String, problem: Schema.String }) {
   override get message(): string {
@@ -8,9 +9,8 @@ class SheriffFailure extends Schema.TaggedError<SheriffFailure>()("SheriffFailur
   }
 }
 
-export interface Step { readonly name: string; readonly conclusion: string }
-export interface Job { readonly name: string; readonly conclusion: string; readonly steps: readonly Step[]; readonly failures?: readonly string[] }
-export interface CiRun { readonly conclusion: string; readonly attempt?: number; readonly jobs: readonly Job[] }
+export type { CiJob as Job, CiStep as Step };
+export interface CiRun { readonly conclusion: string; readonly attempt?: number; readonly jobs: readonly CiJob[] }
 export interface Commit { readonly sha: string; readonly message: string }
 export interface Situation {
   readonly run: CiRun;
@@ -25,21 +25,6 @@ export type Verdict =
   | { readonly kind: "revert"; readonly why: string; readonly step: string; readonly shas: readonly string[] };
 
 export const REVERT_TRAILER = "Sheriff-Reverts:";
-const SETUP_STEP = /^(?:Set up job|Complete job|Post |Run actions\/|Run oven-sh\/setup-bun|Run bun install|Install stock texture converter)/;
-const INFRA_JOB = new Set(["cancelled", "timed_out", "startup_failure", "action_required", "stale"]);
-const UNMEASURED_TITLE = "Unmeasured";
-const UNMEASURED = new RegExp(`^${UNMEASURED_TITLE}:|has timed out after|exceeded the maximum execution time|lost communication with the server|received a shutdown signal|The operation was canceled`);
-
-export function unmeasured(job: Job): string | undefined {
-  if (INFRA_JOB.has(job.conclusion)) return `job ${job.name} ${job.conclusion}`;
-  if (job.conclusion !== "failure") return undefined;
-  const step = job.steps.find((entry) => entry.conclusion === "failure");
-  if (step === undefined) return `job ${job.name} failed without a failing step (runner lost)`;
-  if (SETUP_STEP.test(step.name)) return `setup step failed (${job.name}: ${step.name})`;
-  const annotation = job.failures?.find((line) => UNMEASURED.test(line));
-  return annotation === undefined ? undefined : `${job.name}: ${annotation}`;
-}
-
 export function firstFailingStep(run: CiRun): string | undefined {
   const jobs = run.jobs.filter((job) => job.conclusion === "failure" && unmeasured(job) === undefined).toSorted((a, b) => a.name.localeCompare(b.name));
   for (const job of jobs) {
@@ -109,7 +94,7 @@ const failureLines = (jobId: number) =>
     Effect.flatMap(decode(Annotations, "gh api annotations")),
     Effect.map((entries) => entries.filter((entry) => entry.annotation_level === "failure").map((entry) => entry.title ? `${entry.title}: ${entry.message}` : entry.message)),
   );
-const withFailures = <R extends { readonly jobs: readonly (Job & { readonly databaseId: number })[] }>(view: R) =>
+const withFailures = <R extends { readonly jobs: readonly (CiJob & { readonly databaseId: number })[] }>(view: R) =>
   Effect.forEach(view.jobs, (job) => job.conclusion === "failure" ? failureLines(job.databaseId).pipe(Effect.map((failures) => ({ ...job, failures }))) : Effect.succeed(job))
     .pipe(Effect.map((jobs) => ({ ...view, jobs })));
 

@@ -33,6 +33,13 @@ env:
   DRY_RUN: ${{ inputs.dry-run == true }}
   LANDED: ${{ inputs.landed }}
   STALLED_TITLE: Autoland stalled
+  FETCH_LANES: |
+    gh api graphql --paginate -F owner="${GH_REPO%/*}" -F name="${GH_REPO#*/}" -f query='
+      query($owner: String!, $name: String!, $endCursor: String) { repository(owner: $owner, name: $name) {
+      refs(refPrefix: "refs/heads/claude/", first: 100, after: $endCursor) { pageInfo { hasNextPage endCursor }
+      nodes { name target { oid ... on Commit { status { context(name: "autoland") { state description createdAt } } } } } } } }' \
+      --jq '.data.repository.refs.nodes[] | {branch: ("claude/" + .name), tip: .target.oid,
+        status: (.target.status.context | if . == null then null else {state: (.state | ascii_downcase), description, at: .createdAt} end)}' | jq -s .
 
 jobs:
   sweep:
@@ -57,6 +64,13 @@ jobs:
             [ "$beating" != 0 ] || gh workflow run autoland-heartbeat.yml --ref main || echo "::warning::couldn't start the Autoland heartbeat"
           fi
           echo "Started by ${{ github.event_name }}" >> "$GITHUB_STEP_SUMMARY"
+          bash -euo pipefail -c "$FETCH_LANES" > lanes.json
+          for id in $(jq -r '.[] | select(.status.state == "pending") | .status.description | capture("^rerunning run (?<id>[0-9]+): ").id // empty' lanes.json | sort -u); do
+            [ "$(gh api "repos/$GH_REPO/actions/runs/$id" --jq '"\(.status) \(.run_attempt)"')" = "completed 1" ] || continue
+            echo "- run $id measured nothing: rerunning its failed jobs once" >> "$GITHUB_STEP_SUMMARY"
+            [ "$DRY_RUN" = false ] || continue
+            gh run rerun "$id" --failed || echo "::warning::couldn't rerun run $id"
+          done
           last=$(gh api "repos/$GH_REPO/actions/workflows/autoland-sweep.yml/runs?status=success&per_page=1" --jq '.workflow_runs[0].updated_at // ""')
           if [ "${{ github.event_name }}" = workflow_run ] && [ -n "$last" ] && [ $(( $(date -d "$now" +%s) - $(date -d "$last" +%s) )) -lt 120 ]; then
             echo "A sweep finished at $last, under 2 minutes ago: nothing to do" >> "$GITHUB_STEP_SUMMARY"
@@ -64,11 +78,11 @@ jobs:
           fi
           for workflow in autoland.yml farm-test.yml; do for state in requested pending waiting queued in_progress; do
             gh api "repos/$GH_REPO/actions/workflows/$workflow/runs?status=$state&per_page=100" \
-              --jq '.workflow_runs[] | {id, title: .display_title, status, created: .created_at}'
+              --jq '.workflow_runs[] | {id, title: .display_title, status, created: .run_started_at, attempt: .run_attempt}'
           done; done | jq -c . | while read -r run; do
             case "$(jq -r .status <<< "$run")" in
               queued | in_progress) gh api "repos/$GH_REPO/actions/runs/$(jq -r .id <<< "$run")/jobs?per_page=100" \
-                --jq '[.jobs[] | {name, status, created: .created_at, started: .started_at, labels}]' | jq -c --argjson run "$run" '$run + {jobs: .}' ;;
+                --jq '[.jobs[] | {name, status, created: .created_at, started: .started_at, labels, attempt: .run_attempt}]' | jq -c --argjson run "$run" '$run + {jobs: map(select(.attempt == $run.attempt) | del(.attempt))}' ;;
               *) jq -c '. + {jobs: []}' <<< "$run" ;;
             esac
           done | jq -s . > runs.json
@@ -94,12 +108,6 @@ jobs:
             [ "$open" -gt 0 ] || break
             sleep 10
           done
-          gh api graphql --paginate -F owner="${GH_REPO%/*}" -F name="${GH_REPO#*/}" -f query='
-            query($owner: String!, $name: String!, $endCursor: String) { repository(owner: $owner, name: $name) {
-            refs(refPrefix: "refs/heads/claude/", first: 100, after: $endCursor) { pageInfo { hasNextPage endCursor }
-            nodes { name target { oid ... on Commit { status { context(name: "autoland") { state description createdAt } } } } } } } }' \
-            --jq '.data.repository.refs.nodes[] | {branch: ("claude/" + .name), tip: .target.oid,
-              status: (.target.status.context | if . == null then null else {state: (.state | ascii_downcase), description, at: .createdAt} end)}' | jq -s . > lanes.json
           landed=${LANDED:-$(gh api "repos/$GH_REPO/activity?ref=refs/heads/main&per_page=1" --jq '.[0].timestamp')}
           stalled=$(bun ts/scripts/autoland.ts stalled --lanes lanes.json --landed "$landed" --now "$now")
           pending=$(jq '[.[] | select(.status.state == "pending")] | length' lanes.json)
