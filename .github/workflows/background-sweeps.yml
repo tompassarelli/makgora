@@ -103,14 +103,13 @@ jobs:
         with:
           path: ~/.cache/wisp/lua32
           key: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/toward-zero.h') }}
-      # --rise-ms 1000 leaves the census spike check ungated.
       - name: Census shard ${{ matrix.shard }}
         working-directory: ts
         timeout-minutes: 25
         run: |
           mkdir -p census-out
           fighters=$(cut -f2 test/fixtures/perf/census-pairs.txt | sed 's/ vs .*//' | awk -v n="$CENSUS_SHARDS" -v s="${{ matrix.shard }}" '(NR - 1) % n == s { printf " --fighter %s", $0 }')
-          bun wisp perf census $fighters --jobs 4 --rise-ms 1000 --pairs "census-out/census-pairs-${{ matrix.shard }}.txt"
+          bun wisp perf census $fighters --jobs 4 --pairs "census-out/census-pairs-${{ matrix.shard }}.txt"
       - if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:

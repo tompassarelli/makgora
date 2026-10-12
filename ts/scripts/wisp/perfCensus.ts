@@ -284,9 +284,9 @@ export const census = (project: CensusProject): Command => (args) => Effect.gen(
       for (const entry of items) yield* Console.log(profileLines(entry, profiled, name, top).join("\n"));
     }
   }
-  if (errors.length > 0) return yield* new PerfFailure({ problem: `the census found problems: ${errors.join("; ")}` });
   const over = entries.filter((entry) => entry.spikeMs > limit);
-  if (over.length > 0) return yield* new PerfFailure({ problem: `${over.length} census entries rise more than ${limit} ms: ${over.map((entry) => `${entry.group} ${entry.name} ${entry.spikeMs.toFixed(2)} ms`).join(", ")}` });
+  if (over.length > 0) yield* Console.log(`${over.length} census entries rise more than ${limit} ms: ${over.map((entry) => `${entry.group} ${entry.name} ${entry.spikeMs.toFixed(2)} ms`).join(", ")}`);
+  if (errors.length > 0) return yield* new PerfFailure({ problem: `the census found problems: ${errors.join("; ")}` });
 });
 
 
