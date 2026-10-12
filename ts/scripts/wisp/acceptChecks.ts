@@ -167,7 +167,7 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
     {
       id: "gate-cursor-visible", closes: "T7 C1", map: "gate-playable", session: "gate-cursor",
       setup: [{ chat: "gate:cursor", client: "a" }],
-      pass: [NO_ERRORS, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE cursor frames=\\d+ visible=\\d+ sweepMs=\\d+ picked=1 dropped=1 pass=1$", min: 1 }],
+      pass: [NO_ERRORS, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE cursor frames=\\d+ visible=\\d+ sweepMs=\\d+ picked=1 dropped=1 parked=1 pinch=1 pass=1$", min: 1 }],
     },
     {
       id: "123-selection", closes: "smashcraft#123 box 5", map: "presentation", session: "123-match-flow",
