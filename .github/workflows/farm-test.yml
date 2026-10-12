@@ -418,7 +418,7 @@ jobs:
             grep -E '^(src|test|scripts)/[^ ]+\.ts: ' budget.log | sed 's/^/Lua32 budget: /' >> problems.txt
             grep -q '^Lua32 budget: ' problems.txt || echo "the Lua32 budget check exited $budget: $(tail -n 3 budget.log | tr '\n' ' ')" >> problems.txt
           fi
-          find farm -name 'problems-*.txt' -exec sh -c 'cat "$1"; echo' _ {} \; >> problems.txt
+          find farm -name 'problems-*.txt' -exec sh -c 'for f; do cat "$f"; echo; done' _ {} + >> problems.txt
           jq --rawfile extra problems.txt '.problems = ($extra | split("\n") | map(select(test("\\S")))) + .problems' summary.json > summary.next && mv summary.next summary.json
           cat summary.json
           [ "$merged" = 0 ] && [ "$budget" = 0 ]
