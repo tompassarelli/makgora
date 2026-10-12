@@ -129,8 +129,8 @@ export class ClassicPresentation {
         this.parked[index] = false;
         BlzSetSpecialEffectScale(tell, 1.0);
         BlzResetSpecialEffectMatrix(tell);
-        BlzSetSpecialEffectMatrixScale(tell, f32(zone.halfWidth / MARKER_HALF), f32(f32(zone.top - zone.bottom) / f32(2.0 * MARKER_HALF)), 1.0);
         BlzSetSpecialEffectRoll(tell, QUARTER_TURN);
+        BlzSetSpecialEffectMatrixScale(tell, f32(zone.halfWidth / MARKER_HALF), f32(f32(zone.top - zone.bottom) / f32(2.0 * MARKER_HALF)), 1.0);
 
         BlzSetSpecialEffectPosition(tell, origin.x + zoneCenter(strike, zone, game.run.boss.aimX), origin.y - 220.0, origin.z + f32(f32(zone.bottom + zone.top) / 2.0));
         BlzSetSpecialEffectAlpha(tell, 255);
