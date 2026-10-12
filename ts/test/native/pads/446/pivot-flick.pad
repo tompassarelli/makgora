@@ -1,0 +1,16 @@
+# #446: 2-frame reverse-then-neutral flicks from a dash and from a run, then a held 4-frame reversal.
+#! chat -dev quick hero rifleman
+330 a stick 1 0
+334 a stick -1 0
+336 a stick 0 0
+337 a tap A 2
+400 a stick -1 0
+425 a stick 1 0
+427 a stick 0 0
+428 a tap A 2
+500 a stick 1 0
+504 a stick -1 0
+508 a stick 0 0
+560 a capture
+600 a press VIEW
+670 a release VIEW
