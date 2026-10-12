@@ -60,7 +60,7 @@ landing restarts another's suites.
    which runs only its smoke job for a landed commit.
 5. **Red.** A red lone tip gets a failed status, and its run fails with a
    job summary and annotation saying "Autoland didn't land" and naming the
-   files or tests. A conflicting rebase comments once on each issue the lane's commits reference (Refs/Fixes #N) and raises the "Autoland stalled" alarm; when every conflict is a generated report (taken from main, then regenerated) or a build-inputs pin whose families merge file by file in a reachable store (`resolveConflicts` in smashcraft:ts/scripts/autolandCore.ts), it resolves them and the lane goes on, and source conflicts are never resolved (#513). Otherwise Autoland posts no issue comments: read outcomes with
+   files or tests. A conflicting rebase (injected proof lane for #513 box 9) comments once on each issue the lane's commits reference (Refs/Fixes #N) and raises the "Autoland stalled" alarm; when every conflict is a generated report (taken from main, then regenerated) or a build-inputs pin whose families merge file by file in a reachable store (`resolveConflicts` in smashcraft:ts/scripts/autolandCore.ts), it resolves them and the lane goes on, and source conflicts are never resolved (#513). Otherwise Autoland posts no issue comments: read outcomes with
    `gh run list --workflow autoland.yml` and `gh run view RUN_ID`, or the
    tip's `autoland` commit status. The branch stays; push a fix to it and it queues
    again. A red train of several tips sends each back to testing alone; the
