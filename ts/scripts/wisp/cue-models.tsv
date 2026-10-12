@@ -69,7 +69,6 @@ redrawn	Abilities\Spells\Orc\Voodoo\VoodooAura.mdx
 redrawn	Abilities\Spells\Orc\Voodoo\VoodooAuraTarget.mdx
 redrawn	Abilities\Spells\Orc\WarStomp\WarStompCaster.mdx
 redrawn	Abilities\Spells\Other\BlackArrow\BlackArrowMissile.mdl
-redrawn	Abilities\Spells\Other\BreathOfFire\BreathOfFireDamage.mdx
 redrawn	Abilities\Spells\Other\BreathOfFire\BreathOfFireMissile.mdx
 redrawn	Abilities\Spells\Other\BreathOfFrost\BreathOfFrostTarget.mdx
 redrawn	Abilities\Spells\Other\Consecration\Consecration.mdx
@@ -174,11 +173,13 @@ redrawn	Units\Undead\Banshee\Banshee.mdx
 redrawn	Units\Undead\PlagueCloud\PlagueCloud.mdx
 redrawn	Units\Undead\Scarab\Scarab.mdl
 redrawn	buildings\orc\TrollBurrow\TrollBurrow.mdl
+redrawn	units\creeps\EarthPandarenBrewmaster\EarthPandarenBrewmaster.mdl
+redrawn	units\creeps\FirePandarenBrewmaster\FirePandarenBrewmaster.mdl
 redrawn	units\creeps\GrizzlyBear\GrizzlyBear.mdl
 redrawn	units\creeps\HeroTinker\HeroTinker.mdl
 redrawn	units\creeps\Murloc\Murloc.mdl
-redrawn	units\creeps\PandarenBrewmaster\PandarenBrewmaster.mdl
 redrawn	units\creeps\QuillBeast\QuillBeast.mdl
+redrawn	units\creeps\StormPandarenBrewmaster\StormPandarenBrewmaster.mdl
 redrawn	units\creeps\WarEagle\WarEagle.mdl
 redrawn	units\critters\BlackStagMale\BlackStagMale.mdx
 redrawn	units\human\Phoenix\Phoenix.mdx
