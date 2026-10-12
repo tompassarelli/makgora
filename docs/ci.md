@@ -102,6 +102,10 @@ The Autoland sweep below is the only automatic canceller; the laptop job watchdo
 
 ## Auto-close
 
+A local workflow-lane landing through `safe-push` for `.github` changes does
+not dispatch Auto-close; only Autoland dispatches it after landing. After a
+local workflow-lane landing, dispatch `autoclose.yml` by hand.
+
 After each landing, Auto-close reads `Refs`, `Fixes` or `Closes #N` in the
 landed commits. For each open issue opened by someone with write access, it
 runs every unticked box's declared check from ts/ on the landed main, ticks the
