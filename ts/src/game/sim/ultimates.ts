@@ -45,11 +45,13 @@ function shot(spawnFrame: number, offsetX: number, offsetZ: number, velocityX: n
   return { model, spawnFrame, offsetX, offsetZ, velocityX, velocityZ, life, radius, effect, reflectable: false, limit: 4 };
 }
 
+const AIMED_HIT = hit(24.0, 30, 95.0, 40.0);
+const AIMED_IMPACT: SpecialProjectile = { ...mark("Abilities\\Weapons\\Bolt\\BoltImpact.mdx", 0, 12, 0.0), radius: 26.0, effect: AIMED_HIT };
 const RIFLEMAN: AuthoredSpecial = {
   name: "Aimed Shot", endFrame: 70, groundOnly: true,
   projectiles: [
     mark("Abilities\\Spells\\Human\\ManaFlare\\ManaFlareTarget.mdx", 4, 32, 60.0, 50.0),
-    shot(36, 50.0, 50.0, 60.0, 0.0, 30, 26.0, hit(24.0, 30, 95.0, 40.0), "Abilities\\Weapons\\FlyingMachine\\FlyingMachineMissile.mdx"),
+    { ...shot(36, 50.0, 50.0, 60.0, 0.0, 30, 26.0, AIMED_HIT, "Abilities\\Weapons\\CannonTowerMissile\\CannonTowerMissile.mdx"), burstInto: AIMED_IMPACT },
   ],
 };
 

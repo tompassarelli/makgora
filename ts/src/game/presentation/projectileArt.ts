@@ -16,7 +16,7 @@ export const ORIGINAL_PROJECTILE_MODELS = {
 
 
 
-  [ProjectileKind.blaster]: "Abilities\\Weapons\\FlyingMachine\\FlyingMachineMissile.mdx",
+  [ProjectileKind.blaster]: "Abilities\\Weapons\\CannonTowerMissile\\CannonTowerMissile.mdx",
 
   [ProjectileKind.recoil]: "Abilities\\Weapons\\Mortar\\MortarMissile.mdx",
 
@@ -114,7 +114,8 @@ export const PROJECTILE_DRAW_CUES: { readonly [model: string]: { readonly scale:
   "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike.mdx": { scale: f32(0.12) },
   "Abilities\\Spells\\NightElf\\ShadowStrike\\ShadowStrikeMissile.mdx": { scale: 1.0, birth: { eachFrame: true } },
   "Abilities\\Spells\\Human\\ManaFlare\\ManaFlareTarget.mdx": { scale: 1.0, birth: { eachFrame: false } },
-  "Abilities\\Weapons\\FlyingMachine\\FlyingMachineMissile.mdx": { scale: 1.0, birth: { eachFrame: false } },
+  "Abilities\\Weapons\\CannonTowerMissile\\CannonTowerMissile.mdx": { scale: 1.0, birth: { eachFrame: false } },
+  "Abilities\\Weapons\\Bolt\\BoltImpact.mdx": { scale: 0.5 },
   "Abilities\\Spells\\Other\\Stampede\\StampedeMissileDeath.mdx": { scale: 1.0, birth: { eachFrame: false } },
   "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx": { scale: 1.0, birth: { eachFrame: false } },
 };
@@ -186,7 +187,9 @@ export const DEFINITIVE_PROJECTILE_REDRAWS: { readonly [model: string]: string }
   "Abilities\\Spells\\Undead\\UnholyAura\\UnholyAura.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Weapons\\AncientProtectorMissile\\AncientProtectorMissile.mdl": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Weapons\\Axe\\AxeMissile.mdx": "HD redraw, Definitive look not yet reviewed",
+  "Abilities\\Weapons\\Bolt\\BoltImpact.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Weapons\\BansheeMissile\\BansheeMissile.mdx": "HD redraw, Definitive look not yet reviewed",
+  "Abilities\\Weapons\\CannonTowerMissile\\CannonTowerMissile.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Weapons\\DemolisherFireMissile\\DemolisherFireMissile.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Weapons\\DemonHunterMissile\\DemonHunterMissile.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Weapons\\FarseerMissile\\FarseerMissile.mdx": "HD redraw, Definitive look not yet reviewed",
