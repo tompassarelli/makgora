@@ -59,7 +59,7 @@ env:
         gh issue comment "$issue" --body "Autoland: \`$branch\` (${tip:0:10}) $text ($RUN_URL)
     $marker" > /dev/null || echo "::warning::couldn't comment on #$issue"
       done
-      [ -n "${4:-}" ] || return 0
+      [ "${4:-}" = alarm ] || return 0
       alarm=$(gh issue list --state open --search 'in:title "Autoland stalled"' --json number,title --jq '[.[] | select(.title == "Autoland stalled")][0].number // empty')
       if [ -z "$alarm" ]; then
         gh issue create --title "Autoland stalled" --body "\`$branch\` (${tip:0:10}) $text ($RUN_URL) (smashcraft#513). This alarm stays open until the lane is pushed again, lands or is deleted.
@@ -188,6 +188,7 @@ jobs:
             workflows=$(git diff --name-only "$(git merge-base "$base" "$tip")" "$tip" -- .github/workflows)
             if [ -n "$workflows" ]; then
               refuse "$branch" "$tip" "it changes .github/workflows, which the workflow token can't push; land it with safe-push" "$workflows"
+              flag "$branch" "$tip" "lane failed: it changes .github/workflows; land it with safe-push." failed
               continue
             fi
             git checkout -q --detach "$tip"
@@ -386,6 +387,8 @@ jobs:
           if [ "$verdict" = fail ]; then
             tip=${tips[0]}
             status "$tip" failure "${SHA:+on ${SHA:0:10}: }$why"
+            eval "$FLAG_CONFLICT"; base=$BASE
+            flag "${branches[0]}" "$tip" "lane failed: $why. Push a fix to the branch, or restaff the issue." failed
             { echo "Autoland didn't land \`${branches[0]}\`${SHA:+ (${SHA:0:10}, rebased onto main ${BASE:0:10})}: $why:"; echo; printf '%s\n' "$failed" | head -60
               echo; echo "The branch stays; push a fix to it and it tries again."; } >> "$GITHUB_STEP_SUMMARY"
             echo "::error title=Autoland didn't land::${branches[0]}${SHA:+ (${SHA:0:10})}: $why"
@@ -521,6 +524,7 @@ jobs:
                 gh api "repos/$GH_REPO/statuses/$tip" -f state=failure -f context=autoland -f description="${why:0:139}" -f target_url="$RUN_URL" > /dev/null
                 echo "Autoland didn't land \`$branch\` (${tip:0:10}): $why" >> "$GITHUB_STEP_SUMMARY"
                 echo "::error title=Autoland didn't land::$branch (${tip:0:10}): $why"
+                flag "$branch" "$tip" "lane failed: $why." failed || true
                 continue
               fi
             fi
