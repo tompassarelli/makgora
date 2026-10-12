@@ -1,12 +1,12 @@
 import { expect, test } from "bun:test";
 import { Schema } from "effect";
 import { Action } from "../src/game/input/actions";
-import { actionFor, decodeBindings, presetBindings } from "../src/game/input/keyBindings";
+import { actionFor, decodeBindings, presetBindings, slotIndex } from "../src/game/input/keyBindings";
 
 const Rows = Schema.Array(Schema.Struct({ key: Schema.String, action: Schema.String, label: Schema.String }));
 const actions: Readonly<Record<string, readonly Action[]>> = {
   attack: [Action.attack], special: [Action.special], jump: [Action.jump], grab: [Action.grab],
-  shield: [Action.leftTrigger, Action.rightTrigger], lightShield: [Action.lightShield], shortHop: [Action.shortHop],
+  shield: [Action.leftTrigger, Action.rightTrigger], rightTrigger: [Action.rightTrigger], lightShield: [Action.lightShield], shortHop: [Action.shortHop],
   meter: [Action.meter], moveLeft: [Action.moveLeft], moveRight: [Action.moveRight], moveUp: [Action.moveUp], moveDown: [Action.moveDown],
   smashLeft: [Action.smashLeft], smashRight: [Action.smashRight], smashUp: [Action.smashUp], smashDown: [Action.smashDown],
 };
@@ -37,7 +37,9 @@ test("upstream pad keys reach labelled actions in defaults and sanitized K1 upgr
         if (actual === undefined || !expected.includes(actual)) failures.add(`${name} ${row.label} key ${row.key}: got ${actual}, expected ${row.action}`);
       }
     }
-    for (let slot = 0; slot < slots.length; slot++) expect(upgraded.keys[slot]).toBe(slots[slot]);
+    const rightAlt = slotIndex(Action.rightTrigger, 1);
+    const upgradedRight = slots[rightAlt] === 0 && !slots.includes(71) ? 71 : slots[rightAlt];
+    for (let slot = 0; slot < slots.length; slot++) expect(upgraded.keys[slot]).toBe(slot === rightAlt ? upgradedRight : slots[slot]);
   }
   expect([...failures]).toEqual([]);
 });
