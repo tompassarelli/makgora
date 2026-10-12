@@ -230,3 +230,51 @@ export const flaggedLanes = (bodies: readonly string[], lanes: readonly Lane[]):
   const marked = new Map(bodies.flatMap((body) => [...body.matchAll(FLAGGED)]).map(([, branch = "", tip = ""]) => [`${branch} ${tip}`, { branch, tip }]));
   return [...marked.values()].filter(({ branch, tip }) => lanes.some((lane) => lane.branch === branch && lane.tip === tip && lane.status?.state !== "success"));
 };
+
+const ISSUE_REF = /\b(?:refs|fixes|closes)[: ]+(?:(?:tompassarelli\/)?smashcraft)?#(\d+)/gi;
+export const issueRefs = (messages: string): readonly number[] => [...new Set([...messages.matchAll(ISSUE_REF)].map(([, number = ""]) => Number(number)))].toSorted((a, b) => a - b);
+
+export type BoxNeed = "native" | "tom" | "definitive";
+export interface Box { readonly line: number; readonly text: string; readonly done: boolean; readonly check?: string; readonly needs?: BoxNeed }
+
+const BOX = /^(\s*[-*] \[)([ xX])(\] )(.*)$/;
+const CHECK = /\bcheck: `([^`]+)`\s*\.?\s*$/;
+const NEED = /\[(native|tom|definitive)\]/i;
+
+export const boxes = (body: string): readonly Box[] => body.split("\n").flatMap((line, index) => {
+  const match = BOX.exec(line);
+  if (match === null) return [];
+  const [, , mark = " ", , text = ""] = match;
+  const check = CHECK.exec(text)?.[1];
+  const needs = NEED.exec(text)?.[1]?.toLowerCase() as BoxNeed | undefined;
+  return [{ line: index, text, done: mark !== " ", ...(check === undefined ? {} : { check }), ...(needs === undefined ? {} : { needs }) }];
+});
+
+export const pendingChecks = (body: string): readonly string[] => [...new Set(boxes(body).flatMap((box) => !box.done && box.needs === undefined && box.check !== undefined ? [box.check] : []))];
+
+export interface Autoclose { readonly body: string; readonly close: boolean; readonly comment?: string; readonly marker: string }
+
+const NEEDS_LABEL: Record<BoxNeed, string> = { native: "needs a native capture", tom: "needs Tom", definitive: "needs a Definitive capture" };
+const summary = (box: Box): string => box.text.replace(CHECK, "").trim().slice(0, 160);
+
+export function autoclose(body: string, passed: ReadonlyMap<string, boolean>, sha: string): Autoclose {
+  const lines = body.split("\n");
+  const all = boxes(body);
+  const ticked = all.filter((box) => !box.done && box.needs === undefined && box.check !== undefined && passed.get(box.check) === true);
+  for (const box of ticked) lines[box.line] = (lines[box.line] ?? "").replace(BOX, "$1x$3$4");
+  const open = all.filter((box) => !box.done && !ticked.includes(box));
+  const close = ticked.length > 0 && open.length === 0;
+  const failed = open.filter((box) => box.needs === undefined && box.check !== undefined);
+  const waiting = open.filter((box) => box.needs !== undefined);
+  const unchecked = open.filter((box) => box.needs === undefined && box.check === undefined);
+  const sections = [
+    ticked.length > 0 ? [`Ticked by auto-close after ${sha} landed:`, ...ticked.map((box) => `- ${summary(box)} (\`${box.check}\` passed)`)] : [],
+    failed.length > 0 ? ["Checks that didn't pass on this main stay open:", ...failed.map((box) => `- ${summary(box)} (\`${box.check}\` ${passed.has(box.check ?? "") ? "failed" : "didn't run"})`)] : [],
+    waiting.length > 0 ? ["Left open for a person:", ...waiting.map((box) => `- ${summary(box)} (${NEEDS_LABEL[box.needs ?? "tom"]})`)] : [],
+    unchecked.length > 0 ? ["Left open with no declared check (end the box with check: `COMMAND`, or tag it [native], [tom] or [definitive]):", ...unchecked.map((box) => `- ${summary(box)}`)] : [],
+  ].filter((section) => section.length > 0);
+  const marker = `<!-- auto-close ${new Bun.CryptoHasher("sha256").update(JSON.stringify([close, ticked, open])).digest("hex").slice(0, 16)} -->`;
+  const declared = all.some((box) => box.check !== undefined || box.needs !== undefined);
+  const comment = !declared ? undefined : [...(close ? [`Closed by auto-close after ${sha} landed: every Done-when box is ticked.`] : []), ...sections.map((section) => section.join("\n"))].join("\n\n");
+  return { body: lines.join("\n"), close, marker, ...(comment === undefined ? {} : { comment }) };
+}
