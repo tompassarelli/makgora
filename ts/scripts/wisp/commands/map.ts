@@ -9,7 +9,7 @@ import { type ArchiveEntry, type GeneratedFile, MapBuild, MapBuildFailure } from
 import { runProcess } from "wisp/scripts/wisp/hostProcess";
 import { checkoutInputs } from "../buildInputs";
 import { step } from "wisp/scripts/wisp/timings";
-import { blackTeamGlowImports, decodeBuildOptions, importedAssets, rebuildMap } from "../mapInputs";
+import { glowFreeCaptureImports, decodeBuildOptions, importedAssets, rebuildMap } from "../mapInputs";
 import { buildProject, gameFilesLayer, profileOption, projectRoot, sourceErrorsLayer } from "../project";
 import { describeMapSize, mapBudgetProblem, mapGrowthProblem, type MapSize, readMapBaseline, readTables, storedBytes, writeMapBaseline } from "../../mapSize";
 import { ensureGenerated } from "../../generated";
@@ -97,7 +97,8 @@ export const build: Command = (args) => Effect.gen(function*() {
       const declared = base !== undefined && container !== undefined && assets !== undefined && summon !== undefined
         ? { base, container, assets, summon }
         : yield* checkoutInputs().pipe(step("verify build inputs"));
-      const imports = [...yield* importedAssets(assets ?? declared.assets, summon ?? declared.summon), ...(capture ? yield* blackTeamGlowImports : [])];
+      const imported = yield* importedAssets(assets ?? declared.assets, summon ?? declared.summon);
+      const imports = capture ? yield* glowFreeCaptureImports(imported) : imported;
       const checked = yield* checkCueModels(headlessRender({ assets: assets ?? declared.assets, imports })).pipe(step("cue models resolved in both looks"));
       yield* Console.log(`${checked} cue model/look resolutions passed`);
       yield* MapBuild.use((maps) => maps.build({ ...map, base: base ?? declared.base, container: container ?? declared.container, ...(packager === undefined ? {} : { packager }), declaration: SMASHCRAFT_MAP, imports, objectData: generatedFiles() })).pipe(Effect.andThen(checkMapSize(map.out, imports, bounded)));

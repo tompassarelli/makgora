@@ -33,6 +33,9 @@ import { buildProject, projectRoot as PROJECT } from "./project";
 import { UI_FRAMES } from "./uiFrames";
 import { checkCueModels } from "./headlessRender";
 import { cueModels } from "./cueModels";
+import { teamGlowGeosets } from "../../../tools/animations/timeline-geosets";
+import { removeGeosets } from "../groundPlanes";
+import { generateModelMDX, parseModelMDX } from "../mdxCodec";
 const tryMapPromise = <A>(operation: string, path: string, run: () => PromiseLike<A>) => Effect.tryPromise({ try: run, catch: (cause) => new MapBuildFailure({ operation, path, cause }) });
 const tryMapSync = <A>(operation: string, path: string, run: () => A) => Effect.try({ try: run, catch: (cause) => new MapBuildFailure({ operation, path, cause }) });
 const EMPTY_MODEL = "the map script names an empty model path";
@@ -258,25 +261,26 @@ export const previewImport = (assets: string) => Effect.gen(function*() {
   return { entry: PREVIEW_ENTRY, source } satisfies ArchiveEntry;
 });
 
-export const blackTeamGlowImports = Effect.gen(function*() {
-  const blp = encodeBlp({ width: 32, height: 32, data: new Uint8Array(32 * 32 * 4).fill(0), alpha: false }, PORTRAIT_QUALITY);
-  const source = join(PREVIEW_CACHE, `team-glow-black-${new Bun.CryptoHasher("sha256").update(blp).digest("hex")}.blp`);
-  if (!(yield* tryMapPromise("check team glow cache", source, () => Bun.file(source).exists()))) {
-    yield* tryMapPromise("write black team glow", source, () => Bun.write(source, blp));
-  }
-  const dds = new Uint8Array(128 + 32 * 32 * 4);
-  const header = new DataView(dds.buffer);
-  for (const [offset, value] of [
-    [0, 0x20534444], [4, 124], [8, 0x100f], [12, 32], [16, 32], [20, 32 * 4],
-    [76, 32], [80, 0x41], [88, 32], [92, 0x00ff0000], [96, 0x0000ff00], [100, 0x000000ff], [104, 0xff000000], [108, 0x1000],
-  ] as const) header.setUint32(offset, value, true);
-  const ddsSource = join(PREVIEW_CACHE, `team-glow-black-${new Bun.CryptoHasher("sha256").update(dds).digest("hex")}.dds`);
-  if (!(yield* tryMapPromise("check DDS team glow cache", ddsSource, () => Bun.file(ddsSource).exists()))) {
-    yield* tryMapPromise("write black DDS team glow", ddsSource, () => Bun.write(ddsSource, dds));
-  }
-  const blpImports = Array.from({ length: 28 }, (_, player) => `ReplaceableTextures\\TeamGlow\\TeamGlow${String(player).padStart(2, "0")}.blp`)
-    .flatMap((path) => ["", "_hd.w3mod\\", "_de.w3mod\\"].map((prefix): ArchiveEntry => ({ entry: `${prefix}${path}`, source })));
-  return [...blpImports, ...blpImports.map(({ entry }): ArchiveEntry => ({ entry: entry.replace(/\.blp$/, ".dds"), source: ddsSource }))];
+export const glowFreeCaptureImports = Effect.fnUntraced(function*(imports: readonly ArchiveEntry[]) {
+  const bodies = new Set(Object.values(Character).flatMap((character) =>
+    Array.from({ length: originalClipCount(character) }, (_, index) => originalClip(character, index))
+      .flatMap((clip) => clip?.timeline ? [clip.modelPath] : [])));
+  return yield* Effect.forEach(imports, (imported) => Effect.gen(function*() {
+    if (!bodies.has(imported.entry.replace(/^_(hd|de)\.w3mod\\/, ""))) return imported;
+    const bytes = yield* tryMapPromise("read capture body", imported.source, () => Bun.file(imported.source).arrayBuffer());
+    const model = yield* tryMapSync("decode capture body", imported.source, () => parseModelMDX(bytes));
+    const removed = teamGlowGeosets(model);
+    if (removed.size === 0) return imported;
+    const stripped = yield* tryMapSync("strip capture team glow", imported.source, () => {
+      removeGeosets(model, removed);
+      return generateModelMDX(model);
+    });
+    const source = join(PREVIEW_CACHE, `team-glow-free-${new Bun.CryptoHasher("sha256").update(stripped).digest("hex")}.mdx`);
+    if (!(yield* tryMapPromise("check capture body cache", source, () => Bun.file(source).exists()))) {
+      yield* tryMapPromise("write capture body", source, () => Bun.write(source, stripped));
+    }
+    return { entry: imported.entry, source } satisfies ArchiveEntry;
+  }));
 });
 
 const PREVIEW_CACHE = join(process.env.XDG_CACHE_HOME ?? join(homedir(), ".cache"), "smashcraft/map-preview");
