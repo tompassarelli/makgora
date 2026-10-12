@@ -65,9 +65,9 @@ jobs:
           set -uo pipefail
           while IFS= read -r check; do
             [ -n "$check" ] || continue
-            echo "::group::$check"
-            if timeout 600 bash -c "$check" < /dev/null; then passed=true; else passed=false; fi
-            echo "::endgroup::"
+            echo "::group::$check" >&2
+            if timeout 600 bash -c "$check" < /dev/null >&2; then passed=true; else passed=false; fi
+            echo "::endgroup::" >&2
             echo "\`$check\`: $passed" >> "$GITHUB_STEP_SUMMARY"
             jq -cn --arg check "$check" --argjson passed "$passed" '{check: $check, passed: $passed}'
           done < "$RUNNER_TEMP/checks" | jq -s . > "$RUNNER_TEMP/results.json"
