@@ -170,10 +170,10 @@ jobs:
           set -euo pipefail
           git fetch -q --filter=blob:none origin main '+refs/heads/claude/*:refs/remotes/origin/claude/*'
           main=$(git rev-parse origin/main)
-          for state in requested pending waiting queued in_progress; do
-            gh api --paginate "repos/$GH_REPO/actions/workflows/autoland.yml/runs?status=$state&per_page=100" \
+          for workflow in autoland.yml farm-test.yml; do for state in requested pending waiting queued in_progress; do
+            gh api --paginate "repos/$GH_REPO/actions/workflows/$workflow/runs?status=$state&per_page=100" \
               --jq '.workflow_runs[] | {head_branch, title: .display_title, status}'
-          done | jq -s . > "$RUNNER_TEMP/superseded-runs.json"
+          done; done | jq -s . > "$RUNNER_TEMP/superseded-runs.json"
           source ts/scripts/autoland-superseded.sh
           superseded "$main" "$RUNNER_TEMP/lanes.tsv" "$RUNNER_TEMP/superseded-runs.json" > "$RUNNER_TEMP/superseded.tsv"
           while IFS=$'\t' read -r -u 3 branch tip why issues; do
