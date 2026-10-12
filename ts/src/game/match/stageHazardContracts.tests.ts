@@ -22,7 +22,7 @@ import { testMatch } from "./testMatch";
 const NEUTRAL: Pad = {};
 
 test("controllers ride a complete carried loop and rising-sinking timetable; every departure is warned 30 frames ahead [k1 scenario]", () => {
-  for (const [stage, period] of [[CARRIED_TEST_STAGE, 400], [TIMED_TEST_STAGE, 420]] as const) {
+  for (const [stage, period] of [[CARRIED_TEST_STAGE, 920], [TIMED_TEST_STAGE, 420]] as const) {
     const match = testMatch(3, Character.rifleman);
     match.game.stageChoice = stage;
     const fighter = fighterAt(match.world, 0);

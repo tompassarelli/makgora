@@ -21,7 +21,7 @@ interface StageInfo<Choice extends StageChoice = StageTile> {
 export const STAGE_CATALOG: readonly StageInfo[] = [
   { id: 2, name: "Frozen Throne", texture: "UI\\Glues\\Loading\\Backgrounds\\Campaigns\\IcecrownExpansion-TopLeft.blp", description: "Three icy platforms above Icecrown.\nFight beneath the Frozen Throne." },
   { id: 10, name: "Nordrassil", texture: "UI\\Glues\\Loading\\Backgrounds\\Campaigns\\AshenvaleExpansion-TopLeft.blp", description: "Three platforms beneath the World Tree.\nThe Ancients breathe alternating gusts." },
-  { id: 11, name: "Gryphon Aerie", texture: "war3mapImported\\StageCardGryphon.blp", description: "Close quarters above Aerie Peak.\nThe top perch slides from side to side." },
+  { id: 11, name: "Gryphon Aerie", texture: "war3mapImported\\StageCardGryphon.blp", description: "Close quarters above Aerie Peak.\nA carried platform circles the arena." },
   { id: 3, name: "Durotar Skies", texture: "UI\\Glues\\Loading\\Backgrounds\\Campaigns\\BarrensExpansion-TopLeft.blp", description: "Fight over Durotar's rocky spires.\nOne platform drifts from side to side." },
   { id: 4, name: "Naxxramas", texture: "UI\\Glues\\Loading\\Backgrounds\\Campaigns\\LordaeronExpansion-TopLeft.blp", description: "The Scourge citadel looms overhead.\nTwo platforms patrol their own routes." },
   { id: 14, name: "Hellfire Citadel", texture: "UI\\Glues\\Loading\\Backgrounds\\Campaigns\\OutlandExpansion-TopLeft.blp", description: "Two steady platforms before the demon gate.\nHold your ground against the Legion." },

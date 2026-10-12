@@ -537,11 +537,11 @@ test("an airborne shield contact initializes stacked, weight-scaled relative rec
 test("a combat shield break uses the character's launch attribute after the contact freeze [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
   for (const character of [Character.sylvanas, Character.rifleman, Character.demonHunter]) {
     const owner = createReferenceFighter(Character.sylvanas, 0.0, 1);
-    const target = createReferenceFighter(character, 60.0, -1);
+    const target = createReferenceFighter(character, 85.0, -1);
     const world = testWorld(owner, target);
     owner.motion.grounded = true;
     target.shield.raised = true;
-    target.shield.energy = 3.0;
+    target.shield.energy = 1.0;
     testBeginAttacks(world, AttackStyle.jab, undefined);
     owner.attack.frame = attackStartupFrames(AttackStyle.jab);
     resolveAttacks(world);

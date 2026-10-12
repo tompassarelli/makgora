@@ -291,7 +291,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   [Character.grom]: {
     neutral: { spell: "Warsong Cry", startup: BLOODLUST, active: cue("Abilities\\Spells\\NightElf\\BattleRoar\\RoarTarget.mdx", "body", 0.75) },
     side: { spell: "Gorehowl Rush", startup: BLOODLUST, active: BLOODLUST },
-    up: { spell: "Blood Leap", startup: BLOODLUST, active: { ...BEAST, anchor: "body" } },
+    up: { spell: "Blood Leap", startup: BLOODLUST, active: { ...VAMPIRIC, anchor: "body" } },
     down: { spell: "Mannoroth's Bane", startup: BLOODLUST, active: { ...VOODOO, anchor: "ahead" } },
   },
   [Character.kobold]: {
@@ -445,7 +445,7 @@ export const HERO_BRANCH_CUES: { readonly [character: number]: { readonly [slot 
     side: { recall: branch("Ward recall", VOODOO, cue("Abilities\\Spells\\Orc\\AncestralSpirit\\AncestralSpiritCaster.mdx", "ahead", 0.5)) },
   },
   [Character.beastmaster]: {
-    up: { recall: branch("Hawk Dive", BEAST, cue("Abilities\\Weapons\\DragonHawkMissile\\DragonHawkMissile.mdx", "hand", f32(0.8))) },
+    up: { recall: branch("Hawk Dive", BEAST, BEAST) },
     side: { recall: branch("Stampede", BEAST, cue("Abilities\\Spells\\Other\\Stampede\\StampedeMissile.mdx", "ahead", f32(0.6))) },
     down: { recall: branch("Quill Volley", BEAST, cue("Abilities\\Spells\\Orc\\CommandAura\\CommandAuraTarget.mdx", "body", f32(0.8))) },
   },

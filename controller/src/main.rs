@@ -1785,11 +1785,13 @@ mod linux {
         if let Some(command) = control_if_complete(&contents)? {
             let modified = after.modified().map_err(|e| e.to_string())?
                 .duration_since(UNIX_EPOCH).map_err(|e| e.to_string())?.as_nanos();
-            if modified as i128 <= clock.offset_ns + published_after_ns as i128 {
+            let epoch_ns = clock.publication(modified, read_ns)?;
+            // A fresh game reuses build/epoch/sequence filenames. A complete
+            // control from before this match's READY is absent for this match.
+            if epoch_ns <= published_after_ns {
                 result.discard_before_ns = before_ns.saturating_sub(clock.uncertainty() + current.uncertainty_ns);
                 return Ok(result);
             }
-            let epoch_ns = clock.publication(modified, read_ns)?;
             result.publication = Some(PublishedControl {
                 command,
                 epoch_ns,

@@ -30,7 +30,7 @@ import { buildProject, gameFilesLayer, sourceErrorsLayer } from "./project";
 import { INTEGRITY_BUILD } from "../../src/game/shell/currentBuild";
 import { RESET_COMMAND } from "../../src/game/shell/devSettings";
 import { devCommandReceiptFile } from "../../src/runtime/gameFiles";
-import { IntegrityFailure, tryIntegrity } from "../integrity/evidence";
+import { IntegrityFailure } from "../integrity/evidence";
 import { pollUntil } from "../hostPoll";
 import { monotonicNs } from "../integrity/linux";
 import { compareRuns, comparisonSteps, scriptChat } from "../integrity/padParity";
@@ -119,10 +119,7 @@ export const runBatchProcess = (command: string, args: readonly string[], log: s
   const { handle, written } = yield* spawnLogged(ChildProcess.make(command, args, { cwd: join(import.meta.dir, "../.."), stdin: "ignore", forceKillAfter: "1 second" }), { stdout: log, stderr: `${log}.err` });
   const code = yield* handle.exitCode;
   yield* written;
-  if (code !== 0) {
-    const stderr = yield* tryIntegrity("read batch failure", `${log}.err`, () => readFileSync(`${log}.err`, "utf8").trim());
-    return yield* new BatchProcessFailure({ command, log, code, problem: stderr || `exited ${code}` });
-  }
+  if (code !== 0) return yield* new BatchProcessFailure({ command, log, code, problem: `exited ${code}` });
 })).pipe(
   Effect.catchTag("PlatformError", (cause) => Effect.fail(new BatchProcessFailure({ command, log, code: 1, problem: cause.message }))),
   Effect.provide(BunServices.layer),
@@ -390,7 +387,7 @@ export const padBatch = (options: NativeBatchOptions) => Effect.gen(function*() 
           made.game += seconds(at);
           if (made_._tag === "Failure") {
             outcome = "broken";
-            made.summary = `no new game on ${pair.name}: ${Cause.pretty(made_.cause)}`;
+            made.summary = `no new game on ${pair.name}: ${log}.1`;
             return;
           }
           gameScope = yield* Effect.acquireRelease(Scope.make(), (scope) => Scope.close(scope, Exit.void));
