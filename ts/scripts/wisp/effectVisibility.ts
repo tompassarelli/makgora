@@ -12,6 +12,7 @@ import { DISJOINT_CUES } from "../../src/game/presentation/disjointCues";
 import { PROJECTILE_DRAW_CUES, PROJECTILE_DRAW_OFFSETS, SPECIAL_SLOTS, heroProjectileArt, ultimateProjectiles } from "../../src/game/presentation/projectileArt";
 import { STATIONARY_PARTICLE_MODELS } from "../../src/game/render/projectilePresentation";
 import type { SpecialProjectile } from "../../src/game/sim/heroSpecials";
+import { headlessRender } from "./headlessRender";
 
 /** How one move shows one model in Classic: the sequence and seek it plays, its time scale, and whether its anchor travels. */
 export interface EffectUse {
@@ -216,8 +217,14 @@ export function stockCacheReader(root = STOCK_CACHE): (path: string) => Promise<
   };
 }
 
+/** Reads stock files from the cache and the map's own imports through the headless renderer. */
+export function classicReader(stock = stockCacheReader()): (path: string) => Promise<Uint8Array | undefined> {
+  let render: ReturnType<typeof headlessRender> | undefined;
+  return async (path) => (await stock(path)) ?? (/^war3mapImported[\\/]/i.test(path) ? (render ??= headlessRender()).readAsset(path, "classic") : undefined);
+}
+
 if (import.meta.main) {
-  const findings = await checkEffects(stockCacheReader());
+  const findings = await checkEffects(classicReader());
   const invisible = findings.filter(({ visible }) => !visible);
   if (process.argv.includes("--json")) console.log(JSON.stringify(invisible, null, 2));
   else for (const finding of invisible) console.log(`${finding.fighter}\t${finding.move}\t${finding.kind}\t${finding.model}\t${finding.reason}`);

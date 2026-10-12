@@ -319,7 +319,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     down: { spell: "Fan of Knives", startup: SHADOW, active: cue("Abilities\\Spells\\NightElf\\FanOfKnives\\FanOfKnivesCaster.mdx", "body", f32(0.6)) },
   },
   [Character.lich]: {
-    neutral: { spell: "Frost Nova", startup: FROST, active: cue("Abilities\\Spells\\Other\\FrostDamage\\FrostDamage.mdx", "hand", 0.5) },
+    neutral: { spell: "Frost Nova", startup: FROST, active: timed(cue("Abilities\\Spells\\Other\\FrostDamage\\FrostDamage.mdx", "hand", 0.5), "stand", 0.0) },
     side: { spell: "Death and Decay", startup: FROST, active: FROST },
     up: { spell: "Spectral Ascent", startup: FROST, active: cue("Abilities\\Spells\\Undead\\Unsummon\\UnsummonTarget.mdx", "body", f32(0.7)) },
     down: { spell: "Frost Armor", startup: cue("Abilities\\Spells\\Undead\\DarkRitual\\DarkRitualCaster.mdx", "feet", f32(0.6)), active: timed(cue("Abilities\\Spells\\Undead\\FrostArmor\\FrostArmorDamage.mdx", "body", f32(1.2)), "birth", 0.0) },
