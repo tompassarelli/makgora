@@ -130,16 +130,19 @@ function padSample(pad: Pad): void {
   set(Action.moveDown, z <= -f32(0.6625)); set(Action.moveUp, z > 0.0);
   set(Action.smashLeft, cx <= -f32(0.8)); set(Action.smashRight, cx >= f32(0.8));
   set(Action.smashDown, cz <= -f32(0.6625)); set(Action.smashUp, cz >= f32(0.6625));
-  const row = pad.capture.row;
+  sampleNativeKeys(pad.capture, held, x, z);
+}
+
+export function sampleNativeKeys(capture: KeyboardCapture, held: number, x: number, z: number): void {
+  const row = capture.row;
   const special = (held & bit(Action.special)) !== 0 && (row.held & bit(Action.special)) === 0 && (row.pressed & bit(Action.special)) === 0;
   const dodge = (held & bit(Action.leftTrigger)) !== 0 && (row.held & bit(Action.leftTrigger)) === 0;
-  sampleKeys(pad.capture, held);
+  sampleKeys(capture, held);
   const direction = (value: number) => value > 0.0 ? 1 : value < 0.0 ? -1 : 0;
   if (special) { row.specialX = direction(x); row.specialZ = direction(z); }
   if (dodge) { row.dodgeX = direction(x); row.dodgeZ = direction(z); }
   row.axisX = Math.trunc(f32(x * 127.0));
   row.axisZ = Math.trunc(f32(z * 127.0));
-  row.triggerLeft = (held & bit(Action.leftTrigger)) !== 0 ? 77 : 0;
 }
 function applyEdge(s: ShellState, pad: Pad, edge: Edge): void {
   const button = BUTTONS[(edge.args[0] ?? "").toUpperCase()] ?? 0;

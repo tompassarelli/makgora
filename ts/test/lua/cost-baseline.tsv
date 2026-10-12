@@ -4,7 +4,7 @@ src/game/assets/stageLighting.tests.ts	8	4000	39
 src/game/assets/stagePalette.tests.ts	3	26000	98
 src/game/classic/classic.tests.ts	8	262987000	20438
 src/game/classic/loreBattles.tests.ts	4	112000	773
-src/game/input/adapter.tests.ts	10	14274000	8787
+src/game/input/adapter.tests.ts	3	14740000	7269
 src/game/input/attackBuffer.tests.ts	6	10000	54
 src/game/input/input.tests.ts	6	1389000	2777
 src/game/input/padCapture.tests.ts	2	16911000	17176

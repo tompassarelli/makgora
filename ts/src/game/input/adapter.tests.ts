@@ -5,13 +5,14 @@ import { neutralControls } from "../sim/roster";
 import { startFighterSpecial } from "../sim/specials";
 import { analogShieldActive, analogShieldStrength, shieldContactDamage, shieldSizeMultiplier, shieldstunFrames } from "../sim/shield";
 import { advanceSolo } from "../sim/testWorld";
-import { Action, maskOf } from "./actions";
+import { ACTION_ORDER, ALL_ACTIONS, Action, bit, maskOf } from "./actions";
 import { adaptInput } from "./adapter";
 import { attackBuffer, takeAttack } from "./attackBuffer";
 import { inputRow, type RowFields } from "./inputRow";
 import { actionFor, presetBindings } from "./keyBindings";
 import { commitEdges, keyboardCapture, sampleKeys } from "./keyboardCapture";
 import { heldActions, playerKeys, pressKey } from "./playerKeys";
+import { sampleNativeKeys } from "../../platform/nativeDriver";
 
 function fixture(character: Character = Character.rifleman, graceFrames = 0) {
   const fighter = createFighter(character, 0, 1);
@@ -83,4 +84,27 @@ test("LT and keyboard 9 or custom 0 raise the lightest shield, larger and weaker
   const q = keyboardCapture();
   assertTrue(sampleKeys(q, maskOf(assertDefined(actionFor(presetBindings("standard"), 81)))));
   assertEquals(q.row.triggerLeft, 255);
+});
+
+
+test("native and keyboard left trigger agree for every trigger combination across unrelated held masks [k2 property]", () => {
+  const native = keyboardCapture();
+  const keyboard = keyboardCapture();
+  const triggers = maskOf(Action.leftTrigger, Action.lightShield);
+  const otherMasks = [0, ALL_ACTIONS ^ triggers];
+  let alternating = 0;
+  for (const action of ACTION_ORDER) {
+    if (action === Action.leftTrigger || action === Action.lightShield) continue;
+    otherMasks.push(bit(action));
+    if ((action & 1) === 0) alternating |= bit(action);
+  }
+  otherMasks.push(alternating);
+  for (const other of otherMasks) {
+    for (const trigger of [0, bit(Action.leftTrigger), bit(Action.lightShield), triggers]) {
+      const held = other | trigger;
+      sampleNativeKeys(native, held, 0.0, 0.0);
+      sampleKeys(keyboard, held);
+      assertEquals(native.row.triggerLeft, keyboard.row.triggerLeft, `held ${held}: triggerLeft`);
+    }
+  }
 });
