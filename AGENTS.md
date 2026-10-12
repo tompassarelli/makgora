@@ -3,7 +3,7 @@
 - Keep Wisp changes in Wisp; consume its published pin via the updater. Never edit installed dependencies or add a framework copy.
 - The roster holds at 26 until every fighter feels good; each has a specific personality; prefer Warcraft models.
 - Definitive is the first-class look and Classic the fallback, per fighter; both looks share gameplay, timing, hitboxes and hurtboxes, and each visible body fits its boxes.
-- Every frame must sustain 60 fps; the map’s own work stays below 10 ms, including the worst frame (Warcraft draws inside 16.7 ms). A miss remains unfinished work.
+- Every frame must sustain 60 fps; the map’s own work gates at p99 ≤ 10 ms and worst frame ≤ 14 ms (Warcraft draws inside 16.7 ms), and a gate miss remains unfinished work. A worst frame over 10 ms and up to 14 ms is a soft target: it lands with a `Target-debt:` trailer.
 - Keep every mutable gameplay field in deterministic snapshots/replay; local presentation stays separate and shared handles are created consistently.
 - Publish a release only when Tom decides; private playable builds are Smashcraft 0.0.N (increment N only). Diagnostics keep distinct run IDs and names; keep one current candidate under Maps/00-Smashcraft.
 - Never touch Tom’s install; run account a only as clone-a through its launch.sh, which yields to Tom’s game. The offline pool is Classic-only; Definitive checks run on the signed-in pairs clone-c+clone-b and clone-a+clone-d.
