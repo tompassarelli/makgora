@@ -104,6 +104,12 @@ export function train(lanes: readonly Lane[], now: number): TrainLane[] {
   }).slice(0, TRAIN_CAP);
 }
 
+export function lateLane(lanes: readonly Lane[], now: number, branch: string, held: readonly string[], actualTree: string, base: Tree, tested: Tree, main: readonly Tree[], landed: Tree | undefined, reports: boolean | undefined): "regenerate" | "land" | "retest" {
+  const candidate = train(lanes, now).find((lane) => lane.branch === branch && !held.includes(lane.branch));
+  if (held.length >= DIRECT_CAP || candidate === undefined || actualTree !== candidate.tree || pastMain(base, tested, main, landed) !== "land" || reports === false) return "retest";
+  return reports === undefined ? "regenerate" : "land";
+}
+
 export type TrainStep = "suite" | "direct" | "last" | "drop";
 
 export function trainStep(direct: readonly boolean[]): TrainStep {

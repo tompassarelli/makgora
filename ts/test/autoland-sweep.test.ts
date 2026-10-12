@@ -1,7 +1,8 @@
 import { expect, test } from "bun:test";
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { AGED, BOUND, DIRECT_CAP, FARM_TITLE, JOB_BUDGET, LEAD, PROFILE, PROFILE_STEP, RUN_BUILD, RUN_PEAK, TEST_SLOTS, TRAIN_CAP, TRAIN_TITLE, laneState, passedDescription, plan, stuckRuns, train, trainStep, type Job, type Lane, type Run } from "../scripts/autolandCore";
+import { landedLanes, type Commit } from "../scripts/sheriff";
+import { AGED, BOUND, DIRECT_CAP, FARM_TITLE, JOB_BUDGET, LEAD, PROFILE, PROFILE_STEP, RUN_BUILD, RUN_PEAK, TEST_SLOTS, TRAIN_CAP, TRAIN_TITLE, laneState, lateLane, passedDescription, plan, stuckRuns, train, trainStep, type Job, type Lane, type Run } from "../scripts/autolandCore";
 
 const recorded: { now: string; lanes: Lane[]; runs: Run[] } = JSON.parse(readFileSync(new URL("fixtures/autoland-backlog.json", import.meta.url), "utf8"));
 const now = Date.parse(recorded.now);
@@ -51,6 +52,116 @@ test("one unfinished train excludes another, and refreshing generated queues tak
       if (trainStep(pair.map(() => true)) === "last") break;
     }
     expect(pair).toEqual(ordered.slice(0, DIRECT_CAP).map((lane) => lane.branch));
+    const chosen = refreshed[0];
+    if (chosen !== undefined) {
+      const original = new Map([["keep", "0"], ["lane", "0"]]);
+      const tested = new Map([["keep", "0"], ["lane", "1"]]);
+      const moved = new Map([["keep", "1"], ["lane", "0"]]);
+      const combined = new Map([["keep", "1"], ["lane", "1"]]);
+      const held = Array.from({ length: next(4) }, (_, index) => `claude/held-${index}`);
+      const actual = next(3) === 0 ? "wrong" : tree;
+      const changed = next(3) === 0;
+      const result = next(3);
+      const reports = result === 0 ? undefined : result === 1;
+      const expected = held.length >= 2 || actual !== tree || changed || reports === false ? "retest" : reports === undefined ? "regenerate" : "land";
+      expect(lateLane(lanes, now, chosen.branch, held, actual, original, tested, [moved], changed ? moved : combined, reports)).toBe(expected);
+      expect(lateLane(lanes, now, chosen.branch, [chosen.branch], tree, original, tested, [moved], combined, true)).toBe("retest");
+    }
+
+  }
+});
+
+test("the complete land shell attributes a regenerated pair, leaves failed targets queued, and retries lane one after a non-fast-forward [k5 boundary autoland-land]", () => {
+  const workflow = Bun.YAML.parse(readFileSync(new URL("../../.github/workflows/autoland.yml", import.meta.url), "utf8")) as { env: Record<string, string>; jobs: { land: { steps: { id?: string; run?: string }[] } } };
+  const shell = workflow.jobs.land.steps.find((step) => step.id === "land")?.run;
+  if (shell === undefined) throw new Error("land step missing");
+  const root = resolve(import.meta.dir, "../..");
+  const evidence = join(root, "ts/build/g515-land");
+  mkdirSync(evidence, { recursive: true });
+  const quote = (value: string): string => `'${value.replaceAll("'", "'\\''")}'`;
+  const executable = (file: string, body: string): void => writeFileSync(file, `#!${bashPath}\n${body}\n`, { mode: 0o755 });
+  const command = (cwd: string, args: string[], env?: Record<string, string | undefined>): string => {
+    const result = Bun.spawnSync(args, { cwd, env: env ?? process.env, stdout: "pipe", stderr: "pipe" });
+    if (result.exitCode !== 0) throw new Error(`${args.join(" ")}: ${result.exitCode}\n${result.stdout.toString()}\n${result.stderr.toString()}`);
+    return result.stdout.toString().trim();
+  };
+  const gitPath = command(root, ["which", "git"]);
+  const bashPath = command(root, ["which", "bash"]);
+  for (const mode of ["pair", "targets", "proof", "regeneration", "non-fast-forward"]) {
+    const fixture = mkdtempSync(join(evidence, `${mode}-`));
+    const repo = join(fixture, "repo");
+    const bin = join(fixture, "bin");
+    const temporary = join(fixture, "runner");
+    for (const directory of [repo, bin, temporary, join(repo, "ts/scripts"), join(repo, "tools/move-data")]) mkdirSync(directory, { recursive: true });
+    const git = (...args: string[]): string => command(repo, [gitPath, ...args]);
+    git("init", "-q"); git("config", "user.name", "fixture"); git("config", "user.email", "fixture@example.invalid");
+    for (const file of ["autoland.ts", "autolandCore.ts"]) copyFileSync(join(root, "ts/scripts", file), join(repo, "ts/scripts", file));
+    writeFileSync(join(repo, "tools/move-data/advantage-state.jsonl"), "original\n");
+    writeFileSync(join(repo, "tools/move-data/advantage-state.md"), "original\n");
+    git("add", "."); git("commit", "-qm", "base");
+    const base = git("rev-parse", "HEAD");
+    const tips: string[] = [];
+    const trees: string[] = [];
+    for (let index = 0; index < 3; index++) {
+      git("checkout", "-q", "--detach", base);
+      writeFileSync(join(repo, `ts/lane-${index}.ts`), `export const value${index} = ${index};\n`);
+      git("add", "."); git("commit", "-qm", `lane ${index} refs #${515 + index}`);
+      tips.push(git("rev-parse", "HEAD")); trees.push(git("rev-parse", "HEAD^{tree}"));
+      git("update-ref", `refs/remotes/origin/claude/lane-${index}`, tips[index]!);
+    }
+    git("update-ref", "refs/remotes/origin/main", base);
+    git("checkout", "-q", "--detach", tips[0]!);
+    git("commit", "--amend", "-q", "--no-edit", "--trailer", 'Autoland-Lane: {"branch":"claude/lane-0","count":1,"issues":[515]}');
+    writeFileSync(join(repo, "tools/move-data/advantage-state.jsonl"), "lane one\n");
+    writeFileSync(join(repo, "tools/move-data/advantage-state.md"), "lane one\n");
+    git("add", "tools/move-data"); git("commit", "-qm", "lane one reports", "--trailer", "Autoland-Reports: 1");
+    const solo = git("rev-parse", "HEAD");
+    git("checkout", "-q", "--detach", base);
+    const lanes = tips.map((tip, index): Lane => ({ branch: `claude/lane-${index}`, tip, status: { state: "pending", description: mode === "proof" && index === 2 ? "queued" : passedDescription(base, mode === "proof" && index === 1 ? git("rev-parse", `${base}^{tree}`) : trees[index]!), at: new Date(now + index).toISOString() } }));
+    writeFileSync(join(fixture, "lanes.json"), JSON.stringify(lanes));
+    writeFileSync(join(fixture, "land.sh"), shell);
+    const pushes = join(fixture, "pushes");
+    const events = join(fixture, "events");
+    executable(join(bin, "git"), `if [ "$1" = fetch ]; then exit 0; fi
+if [ "$1" = push ]; then
+  printf '%s\\n' "$*" >> ${quote(events)}
+  for arg in "$@"; do
+    if [[ "$arg" = *:refs/heads/main ]]; then
+      if [ "$MODE" = non-fast-forward ] && [ ! -f ${quote(join(fixture, "refused"))} ]; then
+        touch ${quote(join(fixture, "refused"))}; echo 'non-fast-forward' >&2; exit 1
+      fi
+      echo "\${arg%:refs/heads/main}" >> ${quote(pushes)}
+      ${quote(gitPath)} update-ref refs/remotes/origin/main "\${arg%:refs/heads/main}"
+    fi
+  done
+  exit 0
+fi
+exec ${quote(gitPath)} "$@"`);
+    executable(join(bin, "gh"), `printf '%s\\n' "$*" >> ${quote(events)}`);
+    executable(join(bin, "bun"), `if [ "$1" = install ]; then echo install >> ${quote(events)}; exit 0; fi
+if [ "$1" = scripts/wisp.ts ]; then
+  echo regenerate >> ${quote(events)}
+  printf 'combined\\n' > ../tools/move-data/advantage-state.jsonl
+  printf 'combined\\n' > ../tools/move-data/advantage-state.md
+  [ "$MODE" != regeneration ]; exit $?
+fi
+if [ "$1" = test ]; then echo targets >> ${quote(events)}; [ "$MODE" != targets ]; exit $?; fi
+exec ${quote(process.execPath)} "$@"`);
+    const env = { ...process.env, PATH: `${bin}:${process.env.PATH ?? ""}`, MODE: mode, TEST: "", TRAIN: "true", SHA: solo, TREE: trees[0]!, BASE: base, SCRATCH: "fixture", BRANCHES: "claude/lane-0", TIPS: tips[0]!, VERDICT: "tested", REPORTS: "success", DETAIL: "", RUNNER_TEMP: temporary, GITHUB_OUTPUT: join(fixture, "outputs"), GITHUB_STEP_SUMMARY: join(fixture, "summary"), GH_REPO: "fixture/fixture", RUN_URL: "fixture", PASSED: workflow.env.PASSED!, REPORTS_RUN: workflow.env.REPORTS_RUN!, FETCH_LANES: `cat ${quote(join(fixture, "lanes.json"))}` };
+    command(repo, ["bash", "-e", join(fixture, "land.sh")], env);
+    const pushed = readFileSync(pushes, "utf8").trim();
+    const commits: Commit[] = git("rev-list", "--reverse", "--first-parent", `${base}..${pushed}`).split("\n").map((sha) => ({ sha, message: git("show", "-s", "--format=%B", sha), files: git("diff-tree", "--no-commit-id", "--name-only", "-r", sha).split("\n") }));
+    expect(landedLanes(base, commits)?.map((lane) => ({ branch: lane.branch, issues: lane.issues }))).toEqual(mode === "pair" ? [{ branch: "claude/lane-0", issues: [515] }, { branch: "claude/lane-1", issues: [516] }] : [{ branch: "claude/lane-0", issues: [515] }]);
+    expect(git("show", `${pushed}:tools/move-data/advantage-state.md`)).toBe(mode === "pair" ? "combined" : "lane one");
+    const activity = readFileSync(events, "utf8");
+    expect(activity.includes(":refs/heads/claude/lane-1")).toBe(mode === "pair");
+    expect(activity.includes(`statuses/${tips[1]}`)).toBe(mode === "pair");
+    if (mode !== "pair") expect(git("rev-parse", "refs/remotes/origin/claude/lane-1")).toBe(tips[1]!);
+    if (mode === "targets") expect(activity).toContain("targets");
+    if (mode === "non-fast-forward") {
+      expect(pushed).toBe(solo);
+      expect(activity.split("\n").filter((line) => line.endsWith(":refs/heads/main")).length).toBe(2);
+    }
   }
 });
 

@@ -46,17 +46,51 @@ env:
     passed() {
       local tip="$1" pbase="$2" ptree="$3" before="$4" after="$5" dir="$RUNNER_TEMP/passed-$1" verdict=retest
       git merge-base --is-ancestor "$pbase" "$before" && git worktree add -q --detach "$dir" "$tip" || { echo retest; return; }
-      if git -C "$dir" rebase -q "$pbase" > /dev/null 2>&1 && [ "$(git -C "$dir" rev-parse 'HEAD^{tree}')" = "$ptree" ]; then
+      if git -C "$dir" rebase -q "$pbase" > /dev/null 2>&1; then
         mkdir -p "$RUNNER_TEMP/trees"; rm -f "$RUNNER_TEMP"/trees/*
         git ls-tree -r -z "$pbase" > "$RUNNER_TEMP/trees/base"; git ls-tree -r -z "$ptree" > "$RUNNER_TEMP/trees/tested"; git ls-tree -r -z "$after" > "$RUNNER_TEMP/trees/landed"
         mains=()
         for commit in $(git rev-list --reverse --first-parent "$pbase..$before"); do git ls-tree -r -z "$commit" > "$RUNNER_TEMP/trees/$commit"; mains+=("$RUNNER_TEMP/trees/$commit"); done
-        verdict=$(bun ts/scripts/autoland.ts past-main "$RUNNER_TEMP/trees/base" "$RUNNER_TEMP/trees/tested" "${mains[@]}" --rebased "$RUNNER_TEMP/trees/landed" || echo retest)
+        actual=$(git -C "$dir" rev-parse 'HEAD^{tree}')
+        echo "$actual" > "$RUNNER_TEMP/trees/actual"
+        if [ -n "${6:-}" ]; then
+          verdict=$(bun "$late_cli" late "$6" "$actual" "$RUNNER_TEMP/trees/base" "$RUNNER_TEMP/trees/tested" "${mains[@]}" --rebased "$RUNNER_TEMP/trees/landed" --lanes lanes.json --retry "$7" || echo retest)
+        elif [ "$actual" = "$ptree" ]; then
+          verdict=$(bun ts/scripts/autoland.ts past-main "$RUNNER_TEMP/trees/base" "$RUNNER_TEMP/trees/tested" "${mains[@]}" --rebased "$RUNNER_TEMP/trees/landed" || echo retest)
+        fi
       else
         git -C "$dir" rebase --abort > /dev/null 2>&1
       fi
       git worktree remove --force "$dir"
       echo "$verdict"
+    }
+  REPORTS_RUN: |
+    install_reports() { (cd ts && bun install --frozen-lockfile); }
+    regenerate_reports() {
+      set -euo pipefail
+      out() { echo "$1=$2" >> "$GITHUB_OUTPUT"; }
+      reports=(tools/move-data/advantage-state.jsonl tools/move-data/advantage-state.md)
+      started=$(date +%s)
+      (cd ts && bun scripts/wisp.ts combos --advantage --jobs "$(( $(nproc) < 26 ? $(nproc) : 26 ))") 2>&1 | tail -40 | tee reports.log
+      echo "Regenerated ${reports[*]} on $(nproc) cores in $(( $(date +%s) - started )) s" >> "$GITHUB_STEP_SUMMARY"
+      if (cd ts && bun test test/advantage-state.test.ts) > targets.log 2>&1; then
+        out verdict "$VERDICT"
+      else
+        cat targets.log
+        out verdict targets
+        { echo "detail<<AUTOLAND_EOF"; tail -30 targets.log; echo "AUTOLAND_EOF"; } >> "$GITHUB_OUTPUT"
+      fi
+      if git diff --quiet -- "${reports[@]}"; then
+        echo "The reports were already current." >> "$GITHUB_STEP_SUMMARY"
+        out sha "$(git rev-parse HEAD)"
+        return 0
+      fi
+      { echo "Changed rows (old → new):"; echo '```diff'; git diff -U0 -- tools/move-data/advantage-state.md | grep -E '^[-+]\|' | head -200 || true; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+      git config user.name "github-actions[bot]"
+      git config user.email "41898183+github-actions[bot]@users.noreply.github.com"
+      git commit -q -m "Regenerate reports for $(echo $BRANCHES)" --trailer "Autoland-Reports: 1" -- "${reports[@]}"
+      [ -z "$SCRATCH" ] || git push -q origin "HEAD:refs/heads/$SCRATCH"
+      out sha "$(git rev-parse HEAD)"
     }
   LANES_QUERY: >-
     query($owner: String!, $name: String!, $endCursor: String) { repository(owner: $owner, name: $name) {
@@ -291,34 +325,15 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.13
-      - run: bun install --frozen-lockfile
-        working-directory: ts
-      - id: reports
+      - name: Run bun install --frozen-lockfile
         run: |
-          set -euo pipefail
-          out() { echo "$1=$2" >> "$GITHUB_OUTPUT"; }
-          reports=(tools/move-data/advantage-state.jsonl tools/move-data/advantage-state.md)
-          started=$(date +%s)
-          (cd ts && bun scripts/wisp.ts combos --advantage --jobs "$(( $(nproc) < 26 ? $(nproc) : 26 ))") 2>&1 | tail -40 | tee reports.log
-          echo "Regenerated ${reports[*]} on $(nproc) cores in $(( $(date +%s) - started )) s" >> "$GITHUB_STEP_SUMMARY"
-          if (cd ts && bun test test/advantage-state.test.ts) > targets.log 2>&1; then
-            out verdict "$VERDICT"
-          else
-            cat targets.log
-            out verdict targets
-            { echo "detail<<AUTOLAND_EOF"; tail -30 targets.log; echo "AUTOLAND_EOF"; } >> "$GITHUB_OUTPUT"
-          fi
-          if git diff --quiet -- "${reports[@]}"; then
-            echo "The reports were already current." >> "$GITHUB_STEP_SUMMARY"
-            out sha "$(git rev-parse HEAD)"
-            exit 0
-          fi
-          { echo "Changed rows (old → new):"; echo '```diff'; git diff -U0 -- tools/move-data/advantage-state.md | grep -E '^[-+]\|' | head -200 || true; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898183+github-actions[bot]@users.noreply.github.com"
-          git commit -q -m "Regenerate reports for $(echo $BRANCHES)" --trailer "Autoland-Reports: 1" -- "${reports[@]}"
-          git push -q origin "HEAD:refs/heads/$SCRATCH"
-          out sha "$(git rev-parse HEAD)"
+          eval "$REPORTS_RUN"
+          install_reports
+      - id: reports
+        name: Run set -euo pipefail
+        run: |
+          eval "$REPORTS_RUN"
+          regenerate_reports
 
   suite:
     needs: build
@@ -438,6 +453,10 @@ jobs:
             SHA=$(git -C "$RUNNER_TEMP/past-main" rev-parse HEAD)
             echo "main moved to ${main:0:10} only on paths the train doesn't change: the tested tree lands rebased onto it as ${SHA:0:10}" >> "$GITHUB_STEP_SUMMARY"
           fi
+          mkdir -p "$RUNNER_TEMP/autoland"
+          cp ts/scripts/autoland.ts ts/scripts/autolandCore.ts "$RUNNER_TEMP/autoland/"
+          late_cli="$RUNNER_TEMP/autoland/autoland.ts"
+          solo_sha="$SHA"
           if [ -n "$TRAIN" ] && [ "${#branches[@]}" = 1 ]; then
             eval "$PASSED"
             if bash -euo pipefail -c "$FETCH_LANES" > lanes.json && bun ts/scripts/autoland.ts train --lanes lanes.json > late.tsv; then
@@ -450,9 +469,27 @@ jobs:
                   git checkout -q --detach "$SHA"
                   continue
                 fi
-                if [ "$(passed "$tip" "$passed_base" "$passed_tree" "$SHA" HEAD)" != land ]; then
+                if [ "$(passed "$tip" "$passed_base" "$passed_tree" "$SHA" HEAD "$branch" "${branches[*]}")" != regenerate ]; then
                   git checkout -q --detach "$SHA"
                   continue
+                fi
+                lane_count=$(git rev-list --count --first-parent "$SHA..HEAD")
+                [ "$lane_count" -gt 0 ] || { git checkout -q --detach "$SHA"; continue; }
+                if [ "$lane_count" -gt 0 ]; then
+                  git log --format=%B "$SHA..HEAD" > lane-messages.txt
+                  issues=$(bun ts/scripts/autoland.ts refs --messages lane-messages.txt | jq -s .) || exit 1
+                  lane=$(jq -cn --arg branch "$branch" --argjson count "$lane_count" --argjson issues "$issues" '{branch: $branch, count: $count, issues: $issues}') || exit 1
+                  git commit --amend -q --no-edit --trailer "Autoland-Lane: $lane" || exit 1
+                fi
+                : > "$RUNNER_TEMP/late-reports"
+                green=false
+                if SCRATCH="" BRANCHES="${branches[*]} $branch" GITHUB_OUTPUT="$RUNNER_TEMP/late-reports" bash -euo pipefail -c 'eval "$REPORTS_RUN"; install_reports; regenerate_reports' && [ "$(sed -n 's/^verdict=//p' "$RUNNER_TEMP/late-reports")" = "$VERDICT" ]; then green=true; fi
+                mains=()
+                for commit in $(git rev-list --reverse --first-parent "$passed_base..$SHA"); do mains+=("$RUNNER_TEMP/trees/$commit"); done
+                if [ "$(bun "$late_cli" late "$branch" "$(cat "$RUNNER_TEMP/trees/actual")" "$RUNNER_TEMP/trees/base" "$RUNNER_TEMP/trees/tested" "${mains[@]}" --rebased "$RUNNER_TEMP/trees/landed" --lanes lanes.json --retry "${branches[*]}" --green "$green")" != land ]; then
+                  git reset --hard -q "$SHA"
+                  git checkout -q --detach "$SHA"
+                  break
                 fi
                 SHA=$(git rev-parse HEAD)
                 branches+=("$branch"); tips+=("$tip")
@@ -463,8 +500,13 @@ jobs:
           fi
           if ! git push origin "$SHA:refs/heads/main" 2> push.log; then
             cat push.log
-            echo "pushing to main failed: the train's tips wait for the next train" >> "$GITHUB_STEP_SUMMARY"
-            exit 1
+            if [ "$SHA" != "$solo_sha" ] && grep -Eq 'non-fast-forward|fetch first' push.log && git push origin "$solo_sha:refs/heads/main" 2> push.log; then
+              SHA="$solo_sha"; branches=("${branches[0]}"); tips=("${tips[0]}")
+            else
+              cat push.log
+              echo "pushing to main failed: the train's tips wait for the next train" >> "$GITHUB_STEP_SUMMARY"
+              exit 1
+            fi
           fi
           for i in "${!branches[@]}"; do
             status "${tips[i]}" success "landed as $SHA"
