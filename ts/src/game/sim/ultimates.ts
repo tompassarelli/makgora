@@ -283,12 +283,13 @@ const GROM: AuthoredSpecial = {
   commandGrab: { ...frames(17, 40), strike: capsule(20.0, 50.0, 70.0, 50.0, 40.0), holdFrames: 30, effect: hit(22.0, 40, 90.0, 45.0, HitElement.slash), recovery: 24 },
 };
 
+const LOCUST = "Units\\Undead\\Locust\\Locust.mdx";
 const ANUBARAK: AuthoredSpecial = {
   name: "Locust Swarm", endFrame: 60, groundOnly: true,
-  projectiles: [{
-    ...shot(17, 60.0, 60.0, 5.0, 0.0, 90, 90.0, hit(2.0, 80, 10.0, 25.0, HitElement.poison), "Units\\Undead\\Scarab\\Scarab.mdl"),
-    pool: { every: 12, growth: 0.0, maxRadius: 90.0 },
-  }],
+  projectiles: [
+    { ...shot(17, 60.0, 60.0, 5.0, 0.0, 90, 90.0, hit(2.0, 80, 10.0, 25.0, HitElement.poison), LOCUST), pool: { every: 12, growth: 0.0, maxRadius: 90.0 } },
+    ...[{ x: 5.0, z: 105.0 }, { x: 115.0, z: 85.0 }, { x: 95.0, z: 15.0 }].map(({ x, z }) => ({ ...mark(LOCUST, 17, 90, x, z), velocityX: 5.0 })),
+  ],
 };
 
 const MALFURION: AuthoredSpecial = {
