@@ -3,7 +3,7 @@
 | Workflow | Runs | Does |
 | --- | --- | --- |
 | CI (smashcraft:.github/workflows/ci.yml) | every push except `farm/**` and `claude/**`, pull requests, dispatch | development loop, perf gate, Lua32 suites, and the sweeps the suites skip (Sweeps (Bun), Lua32 (sweeps)); Autoland's dispatch after a landing runs only the smoke job (perf compare and commit metrics), because the farm test already ran every check on that commit |
-| Main is red (smashcraft:.github/workflows/main-red.yml) | after each CI run on main | the sheriff reverts a landing that turned green main red, then opens, updates or closes the "main is red" issue (smashcraft:AGENTS.md) |
+| Main is red (smashcraft:.github/workflows/main-red.yml) | after each CI or Background sweeps run on main, or run-ID dispatch | the sheriff reverts a landing that turned green main red, then opens, updates or closes the "main is red" issue (smashcraft:AGENTS.md) |
 | Farm test (smashcraft:.github/workflows/farm-test.yml) | `bun wisp farm test`, autoland | every check CI runs: full Bun and Lua32 suites with their sweeps, sharded (wisp:docs/farm.md), and the stack trace, parity corpus, tapes and numeric, perf compare, effect-kit, clean room, benchmark and computer coverage checks; the census runs after landing in Background sweeps. Its summary, uploaded even when the run fails or times out, names each failing test (a Lua test with its module), failing check, Lua budget overrun and missing shard |
 | Background sweeps (smashcraft:.github/workflows/background-sweeps.yml) | each landing (Autoland dispatches it with the landed SHA), push to main, nightly | on `farm-big`: the Bun and Lua32 suites with `SWEEPS=1`, and the per-pair worst-frame census (#405) in 7 fighter shards whose joined pairs must stay within the margin of test/fixtures/perf/census-pairs.txt; a landing's red run goes to the sheriff (see Sheriff) |
 | Playtest (smashcraft:.github/workflows/playtest.yml) | nightly, dispatch with `matches` | plays computer-versus-computer matches across every fighter, stage and computer level on the newest green main, each seed twice to compare state hashes, and opens or updates one issue per finding kind (smashcraft:docs/commands/soak.md) |
@@ -165,11 +165,13 @@ Main's last landing doesn't stay on main red. After each CI run on main,
 The same holds for each Background sweeps run Autoland dispatches for a
 landing: its `main-red` job waits for the sweeps and the census, then
 dispatches the sheriff on that run. Supported suite failures follow the same
-rules as CI; census regressions raise the alarm. The branch queue keeps one running and one pending job;
-a newer completion replaces the pending job. When that job starts, it reads
-the newest completed CI and Background sweeps runs afresh, so only each
-workflow's newest red range is acted on. An explicit run-ID dispatch keeps
-its requested run, which the sheriff ignores if a newer finished run exists:
+rules as CI; census regressions raise the alarm. Each automatic job processes
+only the completed run that triggered it. CI and Background sweeps completions
+share main's queue, which keeps one running and one pending job; a newer
+completion replaces the pending job. A pending automatic run replaced in that
+shared queue is covered by the next red run. An explicit run-ID dispatch keeps
+its requested run and its own concurrency group. The sheriff ignores a run if a
+newer finished run exists:
 
 - **Revert.** A single measured Bun or Lua32 suite step failed after a green
   ancestor. Autoland records `Autoland-Lane: {"branch":"claude/name","count":N,"issues":[513]}`

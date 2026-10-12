@@ -48,32 +48,17 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898183+github-actions[bot]@users.noreply.github.com"
-          if [ -n "$REPORT_RUN" ]; then
-            runs="$REPORT_RUN"
-          else
-            runs=""
-            for workflow in ci.yml background-sweeps.yml; do
-              newest=$(gh run list --workflow "$workflow" --branch main --status completed --limit 1 --json databaseId --jq '.[0].databaseId // empty')
-              runs="$runs $newest"
-            done
-          fi
-          echo "runs=$runs" >> "$GITHUB_OUTPUT"
-          for run in $runs; do
-            bun scripts/sheriff.ts "$run"
-          done
+          bun scripts/sheriff.ts "$REPORT_RUN"
         working-directory: ts
         env:
-          REPORT_RUN: ${{ inputs.run }}
+          REPORT_RUN: ${{ inputs.run || github.event.workflow_run.id }}
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
       # A reverted landing gets no issue: the revert's own CI run reports.
       - if: ${{ !cancelled() && steps.sheriff.outputs.reverted == '' }}
-        run: |
-          for run in $REPORT_RUNS; do
-            bun scripts/mainRed.ts "$run"
-          done
+        run: bun scripts/mainRed.ts "$REPORT_RUN"
         working-directory: ts
         env:
-          REPORT_RUNS: ${{ steps.sheriff.outputs.runs }}
+          REPORT_RUN: ${{ inputs.run || github.event.workflow_run.id }}
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
