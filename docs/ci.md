@@ -8,6 +8,7 @@
 | Background sweeps (smashcraft:.github/workflows/background-sweeps.yml) | each landing (Autoland dispatches it with the landed SHA), push to main, nightly | on `farm-big`: the Bun and Lua32 suites with `SWEEPS=1`, and the per-pair worst-frame census (#405) in 7 fighter shards whose joined pairs must stay within the margin of test/fixtures/perf/census-pairs.txt; a landing's red run goes to the sheriff (see Sheriff) |
 | Playtest (smashcraft:.github/workflows/playtest.yml) | nightly, dispatch with `matches` | plays computer-versus-computer matches across every fighter, stage and computer level on the newest green main, each seed twice to compare state hashes, and opens or updates one issue per finding kind (smashcraft:docs/commands/soak.md) |
 | Autoland (smashcraft:.github/workflows/autoland.yml) | push to `claude/**`, `safe-push --to main`, dispatch with `branch` | main's one landing queue: tests each waiting tip alone at once, lands trains of tips that passed |
+| Auto-close (smashcraft:.github/workflows/autoclose.yml) | each landing (Autoland dispatches it with the landed SHA and the main before it) | reruns the declared Done-when checks of each issue the landed commits reference, ticks the passing boxes, closes an issue whose boxes are all ticked (see Auto-close) |
 | Autoland sweep (smashcraft:.github/workflows/autoland-sweep.yml) | every 5 minutes from Autoland heartbeat while Autoland has work, every finished Autoland or Farm test run, dispatch with `dry-run` or `landed` | cancels stuck Autoland runs and requeues their lanes; opens the "Autoland stalled" issue while main is idle with lanes pending |
 | Effect upgrade (smashcraft:.github/workflows/effect-upgrade.yml) | Mondays, dispatch | `effect-kit upgrade` and `effect-kit check`; a clean upgrade goes to Autoland, findings to the "Weekly Effect upgrade" issue |
 
@@ -98,6 +99,21 @@ does not depend on that old source containing current routing policy. Delete obs
 workflow versions are live on main.
 
 The Autoland sweep below is the only automatic canceller; the laptop job watchdog was removed after it cancelled healthy runs on stale code (#466, #513).
+
+## Auto-close
+
+After each landing, Auto-close reads `Refs`, `Fixes` or `Closes #N` in the
+landed commits. For each open issue opened by someone with write access, it
+runs every unticked box's declared check from ts/ on the landed main, ticks the
+boxes that pass, and closes the issue once it ticks the last open box. A box declares
+its check by ending with check: `COMMAND`, or names who must close it with
+`[native]`, `[tom]` or `[definitive]`; a box with neither stays open as
+unchecked and is never guessed. Its comment names the commit as "Ticked by
+auto-close after SHA landed" or "Closed by auto-close after SHA landed" (the
+`land_to_close_minutes` flow metric reads it), and lists the boxes left for a
+person or without a check. An unchanged list isn't commented twice. The parser
+and decisions are `boxes` and `autoclose` in smashcraft:ts/scripts/autolandCore.ts
+(#536).
 
 ## Autoland sweep
 
