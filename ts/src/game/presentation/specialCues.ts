@@ -195,7 +195,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
       { x: 5.645674705505371, z: 99.37751007080078 },
       { x: -1.525575041770935, z: 96.75585174560547 },
       { x: -9.642369270324707, z: 90.41620635986328 },
-    ], definitive: { ...timed(cue("Abilities\\Spells\\Human\\ManaFlare\\ManaFlareMissile.mdx", "hand", f32(0.4)), "birth", f32(0.2)), scaleEnd: f32(1.6), scaleFrames: 23, timeScale: 0.0, anchorFrames: [
+    ], definitive: { ...timed(cue("Abilities\\Spells\\Human\\ManaFlare\\ManaFlareMissile.mdx", "hand", 2.0), "birth", f32(0.2)), scaleEnd: f32(1.6), scaleFrames: 23, timeScale: 0.0, anchorFrames: [
       { x: 6.7290215492248535, z: 96.2467041015625 },
       { x: 6.727626800537109, z: 96.13724517822266 },
       { x: 5.419538974761963, z: 102.3914566040039 },
