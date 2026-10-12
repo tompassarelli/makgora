@@ -57,3 +57,13 @@ export function readStamp(cells: readonly (StampCell | "unclear")[]): { readonly
   }
   return floorMod(ones, 2) === 0 ? { script, frame } : undefined;
 }
+
+
+export type Stamp = { readonly script: number; readonly frame: number };
+export type StampVerdict = { readonly keep: Stamp } | { readonly reject: "unreadable" | "torn" };
+
+
+export function stampVerdict(top: Stamp | undefined, bottom: Stamp | undefined): StampVerdict {
+  if (top === undefined || bottom === undefined) return { reject: "unreadable" };
+  return top.script === bottom.script && top.frame === bottom.frame ? { keep: top } : { reject: "torn" };
+}

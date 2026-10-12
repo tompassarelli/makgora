@@ -30,7 +30,7 @@ import { type Frame, decodePpm, encodePpm } from "wisp/scripts/wisp/frameProbe";
 import { preloadLines } from "wisp/scripts/wisp/preloadRecord";
 import { dataDirectory } from "wisp/scripts/wisp/gameFiles";
 import { parsePadScript } from "./integrity/padScript";
-import { STAMP_CELL, STAMP_CELLS, type StampCell, readStamp } from "../src/runtime/drawnStamp";
+import { STAMP_CELL, STAMP_CELLS, type Stamp, type StampCell, type StampVerdict, readStamp, stampVerdict } from "../src/runtime/drawnStamp";
 import { CAPTURE_STATUS_FILE } from "../src/runtime/gameFiles";
 import { CAPTURE_FIXTURES, type CaptureFixture, SILHOUETTE_HIDDEN_FRAME, type Silhouette } from "../src/platform/captureFixtures";
 import { encodePng } from "./wisp/hurtboxView";
@@ -155,8 +155,8 @@ function stampAlong(frame: Frame, y: number, start: number, end: number) {
 
 
 
-export function frameStamp(frame: Frame): { readonly script: number; readonly frame: number } | undefined {
-  for (let y = 0; y < frame.height; y++) {
+function stampInRows(frame: Frame, rows: readonly number[]): Stamp | undefined {
+  for (const y of rows) {
     const runs: { start: number; end: number }[] = [];
     for (let x = 0; x < frame.width; x++) {
       const offset = (y * frame.width + x) * 3;
@@ -178,6 +178,20 @@ export function frameStamp(frame: Frame): { readonly script: number; readonly fr
     }
   }
   return undefined;
+}
+
+
+export function frameVerdict(frame: Frame): StampVerdict {
+  const half = Math.floor(frame.height / 2);
+  const top = Array.from({ length: half }, (_, index) => index);
+  const bottom = Array.from({ length: frame.height - half }, (_, index) => frame.height - 1 - index);
+  return stampVerdict(stampInRows(frame, top), stampInRows(frame, bottom));
+}
+
+
+export function frameStamp(frame: Frame): Stamp | undefined {
+  const verdict = frameVerdict(frame);
+  return "keep" in verdict ? verdict.keep : undefined;
 }
 
 const SilhouetteRow = Schema.Struct({ slot: Schema.Finite, fighter: Schema.String, move: Schema.String, width: Schema.Finite, height: Schema.Finite });
@@ -320,8 +334,9 @@ const runCaptures = (args: readonly string[]) => Effect.scoped(Effect.gen(functi
     const before = Date.now();
     const whole = yield* capture(client).pipe(Effect.mapError(failure => new CaptureFailure({ problem: `${failure.operation}: ${failure.cause}` })));
     const shot = crop === undefined || sheets ? whole : cropFrame(whole, crop);
-    const stamp = frameStamp(whole);
-    log.push({ ms: before - started, captureMs: Date.now() - before, stamp: stamp === undefined ? "unreadable" : `${stamp.script}/${stamp.frame}` });
+    const verdict = frameVerdict(whole);
+    const stamp = "keep" in verdict ? verdict.keep : undefined;
+    log.push({ ms: before - started, captureMs: Date.now() - before, stamp: "keep" in verdict ? `${verdict.keep.script}/${verdict.keep.frame}` : verdict.reject });
     const fixture = stamp === undefined ? undefined : manifest.fixtures[stamp.script - 1];
     if (stamp !== undefined && stamp.script > lastScript) { lastScript = stamp.script; idleSince = Date.now(); }
     const held = stamp === undefined || fixture === undefined ? undefined : heldCapture(fixture, stamp.frame);
@@ -374,7 +389,8 @@ const runCaptures = (args: readonly string[]) => Effect.scoped(Effect.gen(functi
   const evidence = sheets ? `${manifest.fixtures[0]?.reel?.fighter}.captures.json` : "captures.json";
   yield* attempt("write capture evidence", () => writeFileSync(join(out, evidence), `${JSON.stringify(result, null, 1)}\n`));
   const unreadable = log.filter(row => row.stamp === "unreadable").length;
-  console.log(JSON.stringify({ captured: saved.size, wanted, missed: missed.length, screenCaptures: log.length, unreadable, medianCaptureMs: [...log.map(row => row.captureMs)].sort((a, b) => a - b)[Math.floor(log.length / 2)] ?? 0 }));
+  const torn = log.filter(row => row.stamp === "torn").length;
+  console.log(JSON.stringify({ captured: saved.size, wanted, missed: missed.length, screenCaptures: log.length, unreadable, torn, medianCaptureMs: [...log.map(row => row.captureMs)].sort((a, b) => a - b)[Math.floor(log.length / 2)] ?? 0 }));
   if (wrongSize.length > 0) return yield* new CaptureFailure({ problem: wrongSize.join("; ") });
   if (missed.length > 0) return yield* new CaptureFailure({ problem: `missed ${missed.map(row => `${row.fixture}@${row.frame}${row.phase === "held" ? "" : ` ${row.phase}`}`).join(", ")}` });
 }));
@@ -418,7 +434,7 @@ export function rmse(a: Frame, b: Frame): number {
   const skip = Math.ceil(STAMP_CELL * (a.height / 0.6)) + 2;
   let total = 0;
   let count = 0;
-  for (let y = skip; y < a.height; y += 2) for (let x = 0; x < a.width; x += 2) {
+  for (let y = skip; y < a.height - skip; y += 2) for (let x = 0; x < a.width; x += 2) {
     const offset = (y * a.width + x) * 3;
     for (let channel = 0; channel < 3; channel++) {
       const difference = ((a.rgb[offset + channel] ?? 0) - (b.rgb[offset + channel] ?? 0)) / 255;

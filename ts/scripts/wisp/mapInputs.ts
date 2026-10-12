@@ -258,6 +258,16 @@ export const previewImport = (assets: string) => Effect.gen(function*() {
   return { entry: PREVIEW_ENTRY, source } satisfies ArchiveEntry;
 });
 
+export const blackTeamGlowImports = Effect.gen(function*() {
+  const blp = encodeBlp({ width: 32, height: 32, data: new Uint8Array(32 * 32 * 4).fill(0), alpha: false }, PORTRAIT_QUALITY);
+  const source = join(PREVIEW_CACHE, `team-glow-black-${new Bun.CryptoHasher("sha256").update(blp).digest("hex")}.blp`);
+  if (!(yield* tryMapPromise("check team glow cache", source, () => Bun.file(source).exists()))) {
+    yield* tryMapPromise("write black team glow", source, () => Bun.write(source, blp));
+  }
+  return Array.from({ length: 28 }, (_, player) => `ReplaceableTextures\\TeamGlow\\TeamGlow${String(player).padStart(2, "0")}.blp`)
+    .flatMap((path) => ["", "_hd.w3mod\\", "_de.w3mod\\"].map((prefix): ArchiveEntry => ({ entry: `${prefix}${path}`, source })));
+});
+
 const PREVIEW_CACHE = join(process.env.XDG_CACHE_HOME ?? join(homedir(), ".cache"), "smashcraft/map-preview");
 
 const StageCards = Schema.Struct({ stages: Schema.Array(Schema.Struct({ stage: Schema.Finite, file: Schema.String, sha256: Schema.String })) });
