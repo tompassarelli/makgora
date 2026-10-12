@@ -47,7 +47,6 @@ redrawn	Abilities\Spells\Orc\AncestralSpirit\AncestralSpiritCaster.mdx
 redrawn	Abilities\Spells\Orc\Bloodlust\BloodlustSpecial.mdx
 redrawn	Abilities\Spells\Orc\Bloodlust\BloodlustTarget.mdx
 same	Abilities\Spells\Orc\CommandAura\CommandAura.mdx
-same	Abilities\Spells\Orc\CommandAura\CommandAuraTarget.mdx
 redrawn	Abilities\Spells\Orc\EarthQuake\EarthquakeTarget.mdx
 redrawn	Abilities\Spells\Orc\Ensnare\EnsnareMissile.mdx
 redrawn	Abilities\Spells\Orc\Ensnare\EnsnareTarget.mdx
@@ -128,6 +127,7 @@ redrawn	Abilities\Weapons\DemolisherFireMissile\DemolisherFireMissile.mdx
 redrawn	Abilities\Weapons\DemolisherMissile\DemolisherMissile.mdx
 redrawn	Abilities\Weapons\DemonHunterMissile\DemonHunterMissile.mdx
 redrawn	Abilities\Weapons\DragonHawkMissile\DragonHawkMissile.mdx
+redrawn	Abilities\Weapons\DruidoftheTalonMissile\DruidoftheTalonMissile.mdx
 redrawn	Abilities\Weapons\FarseerMissile\FarseerMissile.mdx
 redrawn	Abilities\Weapons\FireBallMissile\FireBallMissile.mdx
 same	Abilities\Weapons\FlyingMachine\FlyingMachineImpact.mdx
@@ -135,7 +135,6 @@ redrawn	Abilities\Weapons\FrostWyrmMissile\FrostWyrmMissile.mdx
 redrawn	Abilities\Weapons\GlaiveMissile\GlaiveMissileTarget.mdx
 same	Abilities\Weapons\GreenDragonMissile\GreenDragonMissile.mdx
 redrawn	Abilities\Weapons\GyroCopter\GyroCopterImpact.mdx
-redrawn	Abilities\Weapons\HarpyMissile\HarpyMissile.mdx
 redrawn	Abilities\Weapons\HunterMissile\HunterMissile.mdl
 same	Abilities\Weapons\IllidanMissile\IllidanMissile.mdx
 redrawn	Abilities\Weapons\LavaSpawnMissile\LavaSpawnMissile.mdx
