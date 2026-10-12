@@ -27,6 +27,10 @@
   `LUA_PARTITION=K/N` divides `LUA_JOBS` name-hash shards across N jobs;
   CI runs at most six Lua jobs alongside its two Bun jobs.
 
+  The Farm test and CI landing suites use `SWEEP_PLACEMENT=gate`; Background
+  sweeps uses `SWEEP_PLACEMENT=background`, so the approved background names
+  run after landing.
+
 - Test cost: ts/AGENTS.md sets the per-test ceilings. The Lua32 runner
   (`bun scripts/lua-tests.ts`, enforced by smashcraft:ts/scripts/testCost.ts)
   counts each test's Lua VM instructions and kilobytes allocated, charges
