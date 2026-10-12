@@ -4,7 +4,7 @@ import { Action, maskOf } from "../input/actions";
 import { adaptInput } from "../input/adapter";
 import { attackBuffer } from "../input/attackBuffer";
 import { inputRow } from "../input/inputRow";
-import { HitAreaKind, collectHitAreas, createHitAreaList } from "../presentation/hitAreas";
+import { type HitArea, HitAreaKind, collectHitAreas, createHitAreaList } from "../presentation/hitAreas";
 import { projectedShield } from "../presentation/shieldPose";
 import { copyFighterState } from "../replay/fighterState";
 import { Character } from "./codes";
@@ -14,7 +14,8 @@ import { neutralControls } from "./roster";
 import { shieldCircleIntersects, shieldSizeMultiplier } from "./shield";
 import { shieldCenterX, shieldCenterZ } from "./shieldTilt";
 import { SHIELD_TILT_STICK_CAP } from "./stick";
-import { advanceSolo } from "./testWorld";
+import { advanceFighter } from "./step";
+import { advanceSolo, soloWorld } from "./testWorld";
 
 const MARIO_RADIUS = f32(6.799376);
 const CARDINALS = [
@@ -93,7 +94,15 @@ test("shield tilt moves every fighter's projectile contact circle with its drawn
         assertEquals(pose.z, shieldCenterZ(fighter), `${label}: drawn centre z`);
         const collisionRadius = f32(fighter.tuning.shield.radius * shieldSizeMultiplier(energy, strength));
         collectHitAreas(fighter, areas);
-        const shield = assertDefined(areas.areas.slice(0, areas.count).find(area => area.kind === HitAreaKind.shield));
+        let shieldArea: HitArea | undefined;
+        for (let index = 0; index < areas.count; index++) {
+          const area = assertDefined(areas.areas[index]);
+          if (area.kind === HitAreaKind.shield) {
+            shieldArea = area;
+            break;
+          }
+        }
+        const shield = assertDefined(shieldArea);
         assertEquals(shield.capsule.x1, shieldCenterX(fighter), `${label}: footprint centre x1`);
         assertEquals(shield.capsule.x2, shieldCenterX(fighter), `${label}: footprint centre x2`);
         assertEquals(shield.capsule.z1, shieldCenterZ(fighter), `${label}: footprint centre z1`);
@@ -104,11 +113,20 @@ test("shield tilt moves every fighter's projectile contact circle with its drawn
           `${label}: drawn radius ${drawnRadius} matches collision radius ${collisionRadius} within binary32 rounding`);
       }
     }
+    const world = soloWorld(fighter);
     fighter.shield.energy = SHIELD_MAX;
     fighter.shield.strength = 1.0;
     for (let frame = 9; frame < 600 && fighter.shield.raised; frame++) {
       collectHitAreas(fighter, areas);
-      const shield = assertDefined(areas.areas.slice(0, areas.count).find(area => area.kind === HitAreaKind.shield));
+      let shieldArea: HitArea | undefined;
+      for (let index = 0; index < areas.count; index++) {
+        const area = assertDefined(areas.areas[index]);
+        if (area.kind === HitAreaKind.shield) {
+          shieldArea = area;
+          break;
+        }
+      }
+      const shield = assertDefined(shieldArea);
       const label = `${fighterName(character)} drain frame ${frame} energy ${fighter.shield.energy}`;
       assertEquals(shield.capsule.x1, shieldCenterX(fighter), `${label}: footprint centre x1`);
       assertEquals(shield.capsule.x2, shieldCenterX(fighter), `${label}: footprint centre x2`);
@@ -116,10 +134,14 @@ test("shield tilt moves every fighter's projectile contact circle with its drawn
       assertEquals(shield.capsule.z2, shieldCenterZ(fighter), `${label}: footprint centre z2`);
       assertEquals(shield.capsule.radius, f32(fighter.tuning.shield.radius * shieldSizeMultiplier(fighter.shield.energy, fighter.shield.strength)), `${label}: footprint radius`);
       adaptInput(row, fighter, frame, controls, attacks);
-      advanceSolo(fighter, 0, controls, 0.0);
+      advanceFighter(world, 0, 0, controls, 0.0);
     }
     assertFalse(fighter.shield.raised);
     collectHitAreas(fighter, areas);
-    assertFalse(areas.areas.slice(0, areas.count).some(area => area.kind === HitAreaKind.shield));
+    let hasShield = false;
+    for (let index = 0; index < areas.count; index++) {
+      if (assertDefined(areas.areas[index]).kind === HitAreaKind.shield) hasShield = true;
+    }
+    assertFalse(hasShield);
   }
 });
