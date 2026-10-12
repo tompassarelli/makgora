@@ -209,6 +209,10 @@ newer finished run exists:
   every other step are unsupported. Multiple measured failed steps or an
   infrastructure-ambiguous run also report without reverting.
 
+The attributed range can span several Autoland trains: it starts at the
+preceding finished successful run of the same workflow on main and ends at
+the failing run's commit.
+
 The lane walk and bisect are checked over generated 1-6-lane trains, every
 culprit position, no culprit and two culprits, including reports parents
 (smashcraft:ts/test/sheriff.test.ts). Rerun it on a run:
