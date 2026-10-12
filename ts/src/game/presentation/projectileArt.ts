@@ -203,7 +203,7 @@ export const DEFINITIVE_PROJECTILE_REDRAWS: { readonly [model: string]: string }
   "Abilities\\Weapons\\PriestMissile\\PriestMissile.mdl": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Weapons\\QuillSprayMissile\\QuillSprayMissile.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Weapons\\RocketMissile\\RocketMissile.mdl": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Weapons\\SentinelMissile\\SentinelMissile.mdx": "HD redraw, Definitive look not yet reviewed",
+  "Abilities\\Weapons\\SpiritOfVengeanceMissile\\SpiritOfVengeanceMissile.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Weapons\\SerpentWardMissile\\SerpentWardMissile.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Weapons\\ShadowHunterMissile\\ShadowHunterMissile.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Weapons\\SorceressMissile\\SorceressMissile.mdx": "HD redraw, Definitive look not yet reviewed",

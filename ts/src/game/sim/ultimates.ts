@@ -85,8 +85,8 @@ const WARDEN: AuthoredSpecial = {
   name: "Vengeance", endFrame: 40, groundOnly: true,
   placement: {
     frame: 22, offsetX: -60.0, radius: 40.0, height: 140.0, durability: 30.0, life: 90, fireAges: [2, 17, 32, 47],
-    shot: shot(0, 40.0, 50.0, 18.0, 0.0, 50, 26.0, hit(7.0, 40, 60.0, 30.0, HitElement.slash), "Abilities\\Weapons\\SentinelMissile\\SentinelMissile.mdx"),
-    model: { path: "Units\\NightElf\\HeroWarden\\HeroWarden.mdx", height: 150.0, alpha: 120 },
+    shot: shot(0, 40.0, 50.0, 18.0, 0.0, 50, 26.0, hit(7.0, 40, 60.0, 30.0, HitElement.slash), "Abilities\\Weapons\\SpiritOfVengeanceMissile\\SpiritOfVengeanceMissile.mdx"),
+    model: { path: "Units\\NightElf\\SpiritOfVengeance\\SpiritOfVengeance.mdx", height: 150.0, alpha: 255 },
   },
 };
 

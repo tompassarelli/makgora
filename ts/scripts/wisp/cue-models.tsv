@@ -114,7 +114,6 @@ redrawn	Abilities\Spells\Undead\Impale\ImpaleMissTarget.mdl
 redrawn	Abilities\Spells\Undead\PlagueCloud\PlagueCloudCaster.mdx
 redrawn	Abilities\Spells\Undead\Possession\PossessionCaster.mdx
 redrawn	Abilities\Spells\Undead\Possession\PossessionMissile.mdx
-redrawn	Abilities\Spells\Undead\Possession\PossessionTarget.mdx
 redrawn	Abilities\Spells\Undead\ReplenishMana\SpiritTouchTarget.mdx
 same	Abilities\Spells\Undead\Sleep\SleepSpecialArt.mdx
 redrawn	Abilities\Spells\Undead\UnholyAura\UnholyAura.mdx
@@ -149,9 +148,9 @@ redrawn	Abilities\Weapons\PriestMissile\PriestMissile.mdl
 redrawn	Abilities\Weapons\QuillSprayMissile\QuillSprayMissile.mdx
 redrawn	Abilities\Weapons\RedDragonBreath\RedDragonMissile.mdx
 redrawn	Abilities\Weapons\RocketMissile\RocketMissile.mdl
-redrawn	Abilities\Weapons\SentinelMissile\SentinelMissile.mdx
 redrawn	Abilities\Weapons\SerpentWardMissile\SerpentWardMissile.mdx
 redrawn	Abilities\Weapons\ShadowHunterMissile\ShadowHunterMissile.mdx
+redrawn	Abilities\Weapons\SpiritOfVengeanceMissile\SpiritOfVengeanceMissile.mdx
 redrawn	Abilities\Weapons\SteamTank\SteamTankImpact.mdx
 same	Abilities\Weapons\TreantMissile\TreantMissile.mdx
 same	Abilities\Weapons\VoidWalkerMissile\VoidWalkerMissile.mdx
