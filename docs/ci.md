@@ -68,6 +68,7 @@ landing restarts another's suites.
    suite.
 
 A train landing past a moved main is checked by one docs-only direct commit pushed mid-train (#513).
+A conflicting rebase is checked by injected lanes that conflict in a generated report, a build-inputs pin and a source file (#513).
 
 Lanes don't regenerate whole-roster reports. After the gate, Autoland's
 `reports` job runs beside the suite: it reruns `bun wisp combos --advantage`,
