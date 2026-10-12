@@ -11,7 +11,6 @@ import { parsePerfSamples } from "wisp/scripts/wisp/nativeFit";
 import { WARCRAFT_COST, nativeFrameCost } from "wisp/src/headless/nativeCost";
 
 export const BUDGET_P99_MS = 10;
-export const BUDGET_TOP_MS = 14;
 export const BUDGET_WORST_MS = 14;
 export const TOP_SHARE = 0.01;
 
@@ -42,20 +41,17 @@ export function clientBudgets(samples: string): ClientBudget[] {
 
 export const budget: Command = (args) => Effect.gen(function*() {
   const [p99Text = String(BUDGET_P99_MS)] = flagValues(args, "p99");
-  const [topText = String(BUDGET_TOP_MS)] = flagValues(args, "top");
-  const files = args.filter((arg, index) => !arg.startsWith("--") && !["--p99", "--top"].includes(args[index - 1] ?? ""));
+  const files = args.filter((arg, index) => !arg.startsWith("--") && args[index - 1] !== "--p99");
   const p99 = Number(p99Text);
-  const top = Number(topText);
   const [file] = files;
-  if (file === undefined || files.length !== 1 || !(p99 > 0) || !(top > 0)) return yield* new UsageFailure({ problem: "perf budget takes a run written with --samples, and optional --p99 MS and --top MS" });
+  if (file === undefined || files.length !== 1 || !(p99 > 0)) return yield* new UsageFailure({ problem: "perf budget takes a run written with --samples, and optional --p99 MS" });
   const text = yield* Effect.tryPromise({ try: () => Bun.file(file).text(), catch: (cause) => new PerfFailure({ problem: `${file}: ${describeCause(cause)}` }) });
   const clients = clientBudgets(text);
   if (clients.length === 0) return yield* new PerfFailure({ problem: `${file} has no frame samples: write it with perf RUN --samples --out FILE` });
   const over: string[] = [];
   for (const client of clients) {
-    yield* Console.log(`p${client.slot} predicted ms per frame over ${client.frames} frames: ${client.p50.toFixed(2)} p50, ${client.p95.toFixed(2)} p95, ${client.p99.toFixed(2)} p99, ${client.top.toFixed(2)} top 1% mean, ${client.worst.toFixed(2)} worst (budget ${p99} p99, ${top} top 1% mean, ${BUDGET_WORST_MS} worst)`);
+    yield* Console.log(`p${client.slot} predicted ms per frame over ${client.frames} frames: ${client.p50.toFixed(2)} p50, ${client.p95.toFixed(2)} p95, ${client.p99.toFixed(2)} p99, ${client.top.toFixed(2)} top 1% mean, ${client.worst.toFixed(2)} worst (budget ${p99} p99, ${BUDGET_WORST_MS} worst)`);
     if (client.p99 > p99) over.push(`p${client.slot} p99 ${client.p99.toFixed(2)} ms > ${p99}`);
-    if (client.top > top) over.push(`p${client.slot} top 1% mean ${client.top.toFixed(2)} ms > ${top}`);
     if (client.worst > BUDGET_WORST_MS) over.push(`p${client.slot} worst ${client.worst.toFixed(2)} ms > ${BUDGET_WORST_MS}`);
   }
   if (over.length > 0) return yield* new PerfFailure({ problem: `over the frame budget: ${over.join("; ")}` });
