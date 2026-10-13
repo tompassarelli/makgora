@@ -1,7 +1,7 @@
 import { AttackStyle, GrabAction, HitElement } from "../codes";
 import { heroHurtPose, heroMove, heroRegion, jabStep, type FighterMoves, type StrikeCapsule, tipperMove } from "../heroMoves";
 import { groundHit } from "./groundNormals";
-import { hurtPart } from "../hurtboxes";
+import { hurtPart, hurtPose } from "../hurtboxes";
 
 export const gromHit = (damage: number, angle: 25 | 35 | 40 | 55 | 70 | 75 | 80 | 90, growth = 89.18675994873047, base = 19.799999237060547, behind = false) => groundHit(damage, angle, growth, base, HitElement.slash, behind);
 const axe = (x1: number, z1: number, x2: number, z2: number, radius = 12.0): StrikeCapsule => ({ x1, z1, x2, z2, radius });
@@ -13,10 +13,13 @@ export const GROM_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack, smashMaxChargeFrames: 45, smashMaxDamageMultiplier: 1.25, maxPummels: 1,
   hurtboxes: { stand: [torso], crouch: [hurtPart(0.0, 8.0, 0.0, 75.0, 24.0)], attacks: {
     [AttackStyle.jab]: reach(2, 8, 36.0, 52.0), [AttackStyle.jab2]: reach(4, 10, 48.0, 55.0),
+    [AttackStyle.jab3]: [hurtPose(0, 2, [hurtPart(5.0, 17.0, 5.0, 72.0, 31.0), hurtPart(-13.0, 109.0, -45.0, 157.0, 39.0)]), hurtPose(3, 5, [hurtPart(5.0, 17.0, 5.0, 72.0, 31.0), hurtPart(-13.0, 109.0, -53.0, 153.0, 39.0)]), hurtPose(6, 27, [hurtPart(9.0, 13.0, 21.0, 80.0, 59.0), hurtPart(-1.0, 109.0, -9.0, 147.0, 30.0)])],
     [AttackStyle.forwardTilt]: reach(7, 14, 60.0, 55.0), [AttackStyle.forwardTiltUp]: reach(7, 14, 52.0, 90.0), [AttackStyle.forwardTiltDown]: reach(7, 14, 52.0, 24.0),
     [AttackStyle.upTilt]: reach(6, 14, 8.0, 120.0), [AttackStyle.downTilt]: reach(5, 12, 54.0, 18.0),
-    [AttackStyle.dashAttack]: reach(7, 16, 60.0, 50.0), [AttackStyle.forwardSmash]: reach(16, 24, 66.0, 50.0), [AttackStyle.upSmash]: reach(12, 20, 0.0, 130.0), [AttackStyle.downSmash]: reach(13, 23, 56.0, 22.0),
-    [AttackStyle.neutralAir]: reach(6, 16, 45.0, 58.0), [AttackStyle.forwardAir]: reach(10, 17, 64.0, 56.0), [AttackStyle.backAir]: reach(8, 15, -60.0, 56.0), [AttackStyle.upAir]: reach(6, 14, 0.0, 122.0), [AttackStyle.downAir]: reach(13, 20, 0.0, -24.0), [AttackStyle.grab]: reach(6, 12, 48.0, 56.0),
+    [AttackStyle.dashAttack]: reach(7, 16, 60.0, 50.0), [AttackStyle.forwardSmash]: reach(16, 24, 66.0, 50.0), [AttackStyle.upSmash]: [hurtPose(0, 41, [hurtPart(15.0, 35.0, -41.0, 159.0, 34.0)])], [AttackStyle.downSmash]: reach(13, 23, 56.0, 22.0),
+    [AttackStyle.neutralAir]: [hurtPose(0, 27, [hurtPart(0.0, 48.0, -12.0, 149.0, 48.0), hurtPart(-32.0, 90.0, -40.0, 105.0, 25.0)])], [AttackStyle.forwardAir]: reach(10, 17, 64.0, 56.0), [AttackStyle.backAir]: reach(8, 15, -60.0, 56.0), [AttackStyle.upAir]: [hurtPose(0, 25, [hurtPart(8.0, 8.0, -32.0, 157.0, 40.0), hurtPart(-28.0, 98.0, -24.0, 113.0, 33.0)])], [AttackStyle.downAir]: reach(13, 20, 0.0, -24.0), [AttackStyle.grab]: [hurtPose(0, 32, [hurtPart(16.0, 16.0, -16.0, 149.0, 48.0), hurtPart(-32.0, 90.0, -32.0, 121.0, 25.0)])],
+    [AttackStyle.getupAttack]: [hurtPose(0, 8, [hurtPart(-3.0, 31.0, 33.0, 90.0, 45.0)]), hurtPose(9, 39, [hurtPart(-11.0, 47.0, -7.0, 120.0, 53.0)])],
+    [AttackStyle.ledgeAttack]: [hurtPose(0, 39, [hurtPart(16.0, 24.0, -16.0, 149.0, 48.0), hurtPart(-32.0, 90.0, -32.0, 121.0, 25.0)])],
   } },
   normals: {
     [AttackStyle.jab]: jabStep(move(4, 2, 14, 0, [heroRegion(4, 5, axe(18.0, 52.0, 108.0, 52.0, 8.0), gromHit(2.172312021255493, 25, 55.741722106933594, 12.600000381469727))])),
