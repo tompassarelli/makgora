@@ -13,7 +13,6 @@ const SpecSchema = Schema.Struct({ index: Schema.Finite, seed: Schema.Finite, a:
 const FindingsSchema = Schema.Array(Schema.Struct({
   kind: Schema.Literals(FINDING_KINDS), subject: Schema.String, detail: Schema.String, spec: Schema.optional(SpecSchema), frame: Schema.optional(Schema.Finite),
 }));
-const OpenIssuesSchema = Schema.Array(Schema.Struct({ number: Schema.Finite, title: Schema.String }));
 const readJson = (file: string): unknown => JSON.parse(readFileSync(file, "utf8"));
 const ObservationSchema = Schema.Struct({
   frames: Schema.Finite, ended: Schema.Boolean, winner: Schema.NullOr(Schema.Finite), timedOut: Schema.Boolean, stockLosses: Schema.Finite,
@@ -76,7 +75,7 @@ if (import.meta.main) {
     options: {
       first: { type: "string" }, count: { type: "string" }, out: { type: "string" }, repro: { type: "string" }, "no-repeat": { type: "boolean" },
       merge: { type: "string" }, "report-dir": { type: "string" }, header: { type: "string" }, plan: { type: "string" }, "target-minutes": { type: "string" }, cores: { type: "string" }, "ms-per-match": { type: "string" }, "max-shards": { type: "string" },
-      issues: { type: "string" }, "open-issues": { type: "string" }, "dry-run": { type: "boolean" },
+      issues: { type: "string" }, "dry-run": { type: "boolean" },
       cap: { type: "string" }, "min-string-hits": { type: "string" }, "win-low": { type: "string" }, "win-high": { type: "string" }, "min-decisive": { type: "string" },
       "move-share": { type: "string" }, "min-move-kos": { type: "string" }, "min-stage-matches": { type: "string" },
       "stuck-seconds": { type: "string" }, "follow-up-max": { type: "string" }, "guaranteed-damage-max": { type: "string" }, "guaranteed-percent-cap": { type: "string" },
@@ -94,8 +93,7 @@ if (import.meta.main) {
     const findings = Schema.decodeUnknownSync(FindingsSchema)(readJson(values.issues)).map(({ spec, frame, ...rest }): Finding => ({
       ...rest, ...(spec === undefined ? {} : { spec }), ...(frame === undefined ? {} : { frame }),
     }));
-    const open = values["open-issues"] === undefined ? [] : Schema.decodeUnknownSync(OpenIssuesSchema)(readJson(values["open-issues"]));
-    const actions = planIssueActions(findings, open, values.header ?? "");
+    const actions = planIssueActions(findings, values.header ?? "");
     for (const action of actions) console.log(values["dry-run"] === true ? describeIssueAction(action) : JSON.stringify(action));
   } else if (values.merge !== undefined) {
     const runs: Run[] = values.merge.split(",").filter(Boolean).flatMap(readRuns);

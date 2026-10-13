@@ -3,9 +3,9 @@ name: Playtest
 # #403's overnight computer playtester: headless computer-versus-computer
 # matches across every fighter, stage and computer level on the newest green
 # main, each seed played twice to compare state hashes, sharded over hosted
-# runners one process a core like the balance field. One report, and one
-# issue a finding kind, updated rather than duplicated
-# (smashcraft:ts/scripts/playtestCore.ts).
+# runners one process a core like the balance field. One report, and a
+# comment a finding kind on its epic, or on the After 0.1 issue when no epic
+# matches, never a new issue (smashcraft:ts/scripts/playtestCore.ts).
 on:
   workflow_dispatch:
     inputs:
@@ -180,7 +180,7 @@ jobs:
           name: playtest-report
           path: ts/playtest
           retention-days: 30
-      - name: Open or update one issue a finding kind
+      - name: Comment each finding kind on its epic
         working-directory: ts
         env:
           GH_TOKEN: ${{ github.token }}
@@ -188,14 +188,12 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         # planIssueActions decides (smashcraft:ts/scripts/playtestCore.ts); this only applies it.
         run: |
-          gh api --paginate "repos/$GITHUB_REPOSITORY/issues?state=open&labels=playtester&per_page=100" --jq '[.[] | {number, title}]' | jq -s add > playtest/open.json
-          bun scripts/playtest.ts --issues playtest/findings.json --open-issues playtest/open.json --header "Commit ${SHA:0:10}, run $RUN_URL" > playtest/actions.jsonl
+          bun scripts/playtest.ts --issues playtest/findings.json --header "Commit ${SHA:0:10}, run $RUN_URL" > playtest/actions.jsonl
           while IFS= read -r -u 3 line; do
-            action=$(jq -r .action <<< "$line")
+            number=$(jq -r .number <<< "$line")
+            title=$(jq -r .title <<< "$line")
             jq -r .body <<< "$line" > playtest/body.md
-            case "$action" in
-              create) gh api -X POST "repos/$GITHUB_REPOSITORY/issues" -f title="$(jq -r .title <<< "$line")" -f "labels[]=playtester" -F body=@playtest/body.md --jq '"opened #" + (.number | tostring)' ;;
-              update) gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/$(jq -r .number <<< "$line")" -F body=@playtest/body.md --jq '"updated #" + (.number | tostring)' ;;
-              comment) gh api -X POST "repos/$GITHUB_REPOSITORY/issues/$(jq -r .number <<< "$line")/comments" -F body=@playtest/body.md > /dev/null ;;
-            esac
+            last=$(gh api --paginate "repos/$GITHUB_REPOSITORY/issues/$number/comments?per_page=100" | jq -s -r --arg title "**$title**" 'add | map(select(.user.login == "github-actions[bot]" and (.body | startswith($title)))) | last.body // ""')
+            if [ "$(sed 1,3d <<< "$last")" = "$(sed 1,3d playtest/body.md)" ]; then continue; fi
+            gh api -X POST "repos/$GITHUB_REPOSITORY/issues/$number/comments" -F body=@playtest/body.md > /dev/null
           done 3< playtest/actions.jsonl
