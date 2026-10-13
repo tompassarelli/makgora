@@ -1,7 +1,6 @@
 
 
 import { Character } from "../codes";
-import { FORSAKEN_PALADIN_MODEL } from "../../assets/importedModelInfo";
 import type { HeroDefinition } from "./hero";
 import { FORSAKEN_PALADIN_CLIPS, FORSAKEN_PALADIN_FALLBACK_CLIP, FORSAKEN_PALADIN_DAMAGE_CLIPS } from "./forsakenPaladinClips";
 import { FORSAKEN_PALADIN_MOVES } from "./forsakenPaladinMoves";
@@ -19,7 +18,7 @@ export const FORSAKEN_PALADIN_HERO: HeroDefinition = {
   jab: { name: "Hammer and Haft", description: "A hammer check, then a shove of the haft on a second jab." },
   gameplan: FORSAKEN_PALADIN_GAMEPLAN,
   presentation: {
-    model: FORSAKEN_PALADIN_MODEL,
+    model: "Units\\Creeps\\HeroForsakenPaladin\\HeroForsakenPaladin.mdx",
     objectId: 0x6d667574,
     portrait: "ReplaceableTextures\\CommandButtons\\BTNForsakenPaladin.blp",
     clips: FORSAKEN_PALADIN_CLIPS,

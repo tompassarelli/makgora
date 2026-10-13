@@ -124,26 +124,26 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Lich | ledge-get-up | 24: Recovery ledgeClimb | 147.3 | 101.3 | up; 136.9/82.2 |
 | Lich | ledge-roll | 25: Recovery ledgeRoll | 179.3 | 121.3 | forward; 118.8/164.2 |
 | Lich | ledge-attack | 26: Recovery ledgeAttack | 175.6 | 125.6 | both; 110.6/108.8 |
-| Forsaken Paladin | walk | 12: Walk 1 | 85.8 | 20.9 | forward; 82.9/75.0 |
-| Forsaken Paladin | dash | 12: Walk 1 | 85.6 | 20.2 | forward; 82.7/74.3 |
-| Forsaken Paladin | run | 12: Walk 1 | 94.3 | 22.2 | forward; 81.3/93.4 |
-| Forsaken Paladin | turn | 50: Forsaken Paladin turn | 226.6 | 29.1 | back; 100.9/225.8 |
-| Forsaken Paladin | brake | 51: Forsaken Paladin stop | 41.8 | 10.4 | in place; 27.6/23.8 |
-| Forsaken Paladin | jump-squat | 52: Forsaken Paladin jumpSquat | 66.0 | 9.4 | down; 33.6/64.4 |
-| Forsaken Paladin | roll-forward | 85: Forsaken Paladin rollForward | 253.6 | 93.2 | forward; 253.2/151.9 |
-| Forsaken Paladin | roll-back | 86: Forsaken Paladin rollBackward | 253.8 | 92.9 | back; 151.8/253.1 |
-| Forsaken Paladin | spot-dodge | 66: Forsaken Paladin spotDodge | 39.8 | 13.1 | in place; 30.6/18.2 |
-| Forsaken Paladin | air-dodge | 48: Forsaken Paladin airDodge | 46.6 | 15.0 | in place; 33.6/16.1 |
-| Forsaken Paladin | tech | 67: Forsaken Paladin tech | 175.7 | 28.6 | in place; 126.2/108.8 |
-| Forsaken Paladin | tech-forward | 87: Forsaken Paladin techForward | 253.7 | 93.8 | forward; 253.2/151.9 |
-| Forsaken Paladin | tech-back | 88: Forsaken Paladin techBackward | 253.7 | 93.8 | back; 151.9/253.1 |
-| Forsaken Paladin | get-up | 64: Forsaken Paladin getUp | 214.8 | 49.7 | up; 93.5/81.3 |
-| Forsaken Paladin | get-up-forward | 89: Forsaken Paladin getUpRollForward | 253.7 | 93.5 | forward; 253.3/151.6 |
-| Forsaken Paladin | get-up-back | 90: Forsaken Paladin getUpRollBackward | 253.6 | 93.3 | back; 151.9/253.2 |
-| Forsaken Paladin | get-up-attack | 65: Forsaken Paladin getUpAttack | 220.0 | 63.5 | both; 173.9/206.2 |
-| Forsaken Paladin | ledge-get-up | 60: Forsaken Paladin ledgeClimb | 160.0 | 27.0 | up; 128.4/71.6 |
-| Forsaken Paladin | ledge-roll | 91: Forsaken Paladin ledgeRoll | 253.8 | 93.5 | forward; 253.3/151.6 |
-| Forsaken Paladin | ledge-attack | 61: Forsaken Paladin ledgeAttack | 49.6 | 9.8 | both; 44.2/19.1 |
+| Forsaken Paladin | walk | 12: Walk 1 | 85.8 | 20.7 | forward; 82.9/75.0 |
+| Forsaken Paladin | dash | 12: Walk 1 | 85.6 | 20.0 | forward; 82.7/74.3 |
+| Forsaken Paladin | run | 12: Walk 1 | 94.3 | 21.9 | forward; 81.3/93.4 |
+| Forsaken Paladin | turn | 50: Forsaken Paladin turn | 130.3 | 29.1 | back; 128.8/65.5 |
+| Forsaken Paladin | brake | 51: Forsaken Paladin stop | 41.9 | 10.5 | in place; 27.6/16.1 |
+| Forsaken Paladin | jump-squat | 52: Forsaken Paladin jumpSquat | 50.3 | 9.5 | down; 44.7/19.2 |
+| Forsaken Paladin | roll-forward | 85: Forsaken Paladin rollForward | 212.3 | 92.3 | forward; 86.5/205.4 |
+| Forsaken Paladin | roll-back | 86: Forsaken Paladin rollBackward | 212.4 | 92.1 | back; 205.7/86.4 |
+| Forsaken Paladin | spot-dodge | 66: Forsaken Paladin spotDodge | 39.8 | 13.2 | in place; 30.6/14.5 |
+| Forsaken Paladin | air-dodge | 48: Forsaken Paladin airDodge | 46.6 | 14.7 | in place; 33.6/16.1 |
+| Forsaken Paladin | tech | 67: Forsaken Paladin tech | 139.2 | 28.7 | in place; 64.2/115.3 |
+| Forsaken Paladin | tech-forward | 87: Forsaken Paladin techForward | 212.3 | 92.9 | forward; 86.6/205.6 |
+| Forsaken Paladin | tech-back | 88: Forsaken Paladin techBackward | 212.4 | 92.9 | back; 205.6/86.6 |
+| Forsaken Paladin | get-up | 64: Forsaken Paladin getUp | 180.3 | 48.7 | up; 93.5/81.3 |
+| Forsaken Paladin | get-up-forward | 89: Forsaken Paladin getUpRollForward | 212.8 | 92.6 | forward; 86.4/205.6 |
+| Forsaken Paladin | get-up-back | 90: Forsaken Paladin getUpRollBackward | 212.7 | 92.4 | back; 205.4/86.5 |
+| Forsaken Paladin | get-up-attack | 65: Forsaken Paladin getUpAttack | 242.0 | 64.8 | both; 210.3/90.5 |
+| Forsaken Paladin | ledge-get-up | 60: Forsaken Paladin ledgeClimb | 124.5 | 27.0 | up; 64.5/77.6 |
+| Forsaken Paladin | ledge-roll | 91: Forsaken Paladin ledgeRoll | 212.7 | 92.6 | forward; 86.5/205.6 |
+| Forsaken Paladin | ledge-attack | 61: Forsaken Paladin ledgeAttack | 49.7 | 11.2 | both; 38.0/19.1 |
 | Dreadlord | walk | 5: Walk | 115.4 | 38.3 | forward; 115.3/109.0 |
 | Dreadlord | dash | 5: Walk | 115.7 | 38.0 | forward; 115.7/107.5 |
 | Dreadlord | run | 5: Walk | 119.3 | 40.1 | forward; 110.1/107.2 |
