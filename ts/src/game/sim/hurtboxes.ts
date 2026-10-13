@@ -106,9 +106,16 @@ export function shippedHurtboxes(character: Character, moves?: FighterMoves): Fi
 }
 
 const FALLBACK_HURTBOXES = shippedHurtboxes(Character.demonHunter);
+const DEMON_HUNTER_HURTBOXES: FighterHurtboxes = {
+  stand: FALLBACK_HURTBOXES.stand,
+  attacks: {
+    ...FALLBACK_HURTBOXES.attacks,
+    [AttackStyle.backAir]: [hurtPose(2, 23, [...FALLBACK_HURTBOXES.stand, hurtPart(-10, 82, -32, 68, 16)])],
+  },
+};
 const CHARACTER_HURTBOXES: Readonly<Record<number, FighterHurtboxes>> = {
   1: shippedHurtboxes(Character.rifleman),
-  2: FALLBACK_HURTBOXES,
+  2: DEMON_HUNTER_HURTBOXES,
 };
 
 
