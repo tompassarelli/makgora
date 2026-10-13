@@ -104,7 +104,7 @@ const LICH_BODY: FighterHurtboxes = {
     [AttackStyle.getupAttack]: [
       hurtPose(0, 2, [hurtPart(-21.0, 36.0, -21.0, 36.0, 60.0), hurtPart(-63.0, 76.0, -63.0, 140.0, 10.0)]),
       hurtPose(3, 5, [hurtPart(-17.0, 35.0, -17.0, 35.0, 60.0), hurtPart(-51.0, 83.0, -51.0, 131.0, 18.0)]),
-      hurtPose(6, 8, [hurtPart(-28.0, 66.0, -28.0, 68.0, 60.0)]),
+      hurtPose(6, 8, [hurtPart(-28.0, 66.0, -28.0, 68.0, 56.0)]),
       hurtPose(9, 11, [hurtPart(-14.0, 62.0, -14.0, 62.0, 60.0)]),
       hurtPose(12, 14, [hurtPart(-29.0, 31.0, -29.0, 31.0, 60.0), hurtPart(12.0, 96.0, 12.0, 124.0, 32.0)]),
       hurtPose(15, 17, [hurtPart(-13.0, 29.0, -13.0, 115.0, 43.0)]),
@@ -124,22 +124,22 @@ const LICH_BODY: FighterHurtboxes = {
       hurtPose(3, 5, [hurtPart(0.0, 38.0, 14.0, 52.0, 57.0), hurtPart(20.0, 111.0, 20.0, 111.0, 34.0), hurtPart(1.0, 154.0, 1.0, 161.0, 14.0)]),
       hurtPose(6, 8, [hurtPart(0.0, 48.0, 12.0, 129.0, 53.0)]),
       hurtPose(9, 11, [hurtPart(-15.0, 28.0, -2.0, 75.0, 39.0), hurtPart(18.0, 111.0, 22.0, 136.0, 38.0), hurtPart(49.0, 162.0, 61.0, 165.0, 13.0)]),
-      hurtPose(12, 14, [hurtPart(-16.0, 57.0, -16.0, 57.0, 60.0), hurtPart(18.0, 129.0, 18.0, 169.0, 33.0)]),
+      hurtPose(12, 14, [hurtPart(-16.0, 57.0, -16.0, 57.0, 60.0), hurtPart(18.0, 129.0, 18.0, 169.0, 31.0)]),
       hurtPose(15, 17, [hurtPart(-34.0, 40.0, -34.0, 56.0, 51.0), hurtPart(-25.0, 104.0, -13.0, 103.0, 47.0), hurtPart(-90.0, 116.0, -98.0, 155.0, 20.0)]),
       hurtPose(18, 20, [hurtPart(-38.0, 53.0, -42.0, 71.0, 51.0), hurtPart(1.0, 102.0, -1.0, 100.0, 32.0), hurtPart(-83.0, 125.0, -91.0, 148.0, 22.0)]),
       hurtPose(21, 23, [hurtPart(-35.0, 61.0, -35.0, 107.0, 45.0)]),
       hurtPose(24, 26, [hurtPart(-26.0, 61.0, -26.0, 95.0, 49.0)]),
       hurtPose(27, 29, [hurtPart(-19.0, 50.0, -19.0, 109.0, 40.0)]),
       hurtPose(30, 32, [hurtPart(-25.0, 30.0, -25.0, 51.0, 22.0), hurtPart(-19.0, 95.0, -19.0, 95.0, 53.0), hurtPart(35.0, 129.0, 35.0, 146.0, 12.0)]),
-      hurtPose(33, 35, [hurtPart(-23.0, 32.0, -23.0, 49.0, 25.0), hurtPart(-18.0, 97.0, -18.0, 97.0, 60.0), hurtPart(33.0, 131.0, 33.0, 151.0, 7.0)]),
+      hurtPose(33, 35, [hurtPart(-23.0, 32.0, -23.0, 49.0, 25.0), hurtPart(-18.0, 97.0, -18.0, 97.0, 57.0), hurtPart(33.0, 131.0, 33.0, 151.0, 7.0)]),
       hurtPose(36, 38, [hurtPart(-41.0, 55.0, -26.0, 48.0, 48.0), hurtPart(11.0, 98.0, 11.0, 140.0, 22.0)]),
       hurtPose(39, 41, [hurtPart(-37.0, 52.0, -24.0, 42.0, 47.0), hurtPart(5.0, 87.0, 13.0, 114.0, 18.0), hurtPart(26.0, 146.0, 26.0, 146.0, 20.0)]),
       hurtPose(42, 44, [hurtPart(-31.0, 49.0, -16.0, 44.0, 48.0), hurtPart(10.0, 87.0, 10.0, 118.0, 16.0), hurtPart(22.0, 148.0, 22.0, 148.0, 19.0)]),
       hurtPose(45, 49, [hurtPart(-25.0, 45.0, -10.0, 46.0, 48.0), hurtPart(9.0, 91.0, 9.0, 121.0, 17.0), hurtPart(17.0, 152.0, 17.0, 152.0, 19.0)]),
     ],
     [AttackStyle.ledgeAttack]: [
-      hurtPose(0, 2, [hurtPart(-32.0, -10.0, -32.0, 28.0, 49.0), hurtPart(-32.0, 28.0, 48.0, 82.0, 10.0)]),
-      hurtPose(3, 5, [hurtPart(-15.0, -11.0, -15.0, 48.0, 48.0)]),
+      hurtPose(0, 2, [hurtPart(-32.0, -10.0, -34.0, 28.0, 46.0), hurtPart(-32.0, 28.0, 48.0, 82.0, 10.0)]),
+      hurtPose(3, 5, [hurtPart(-15.0, -11.0, -17.0, 44.0, 44.0)]),
       hurtPose(6, 8, [hurtPart(-36.0, 1.0, -36.0, 1.0, 60.0), hurtPart(12.0, 58.0, 12.0, 98.0, 27.0)]),
       hurtPose(9, 11, [hurtPart(-22.0, 16.0, -22.0, 16.0, 53.0), hurtPart(5.0, 83.0, 5.0, 120.0, 31.0)]),
       hurtPose(12, 14, [hurtPart(-20.0, 29.0, -20.0, 104.0, 52.0)]),
@@ -401,11 +401,11 @@ export const LICH_FROST_NOVA_BODY: readonly HurtPose[] = [
     hurtPose(13, 15, [hurtPart(2.0, 35.0, 2.0, 120.0, 37.0)]),
     hurtPose(16, 18, [hurtPart(-14.0, 27.0, -14.0, 27.0, 59.0), hurtPart(27.0, 92.0, 27.0, 119.0, 32.0)]),
     hurtPose(19, 21, [hurtPart(-35.0, 7.0, -43.0, 1.0, 43.0), hurtPart(17.0, 60.0, 17.0, 114.0, 34.0)]),
-    hurtPose(22, 24, [hurtPart(0.0, 64.0, -8.0, 103.0, 52.0)]),
+    hurtPose(22, 24, [hurtPart(0.0, 64.0, -8.0, 103.0, 50.0)]),
     hurtPose(25, 27, [hurtPart(-14.0, 87.0, -14.0, 87.0, 57.0), hurtPart(-4.0, 147.0, -4.0, 175.0, 27.0)]),
     hurtPose(28, 30, [hurtPart(-15.0, 44.0, -15.0, 170.0, 32.0)]),
     hurtPose(31, 33, [hurtPart(-9.0, 8.0, -9.0, 170.0, 32.0)]),
-    hurtPose(34, 38, [hurtPart(-11.0, 3.0, -11.0, 164.0, 32.0)]),
+    hurtPose(34, 38, [hurtPart(-11.0, 3.0, -11.0, 164.0, 28.0)]),
   ];
 
 export const LICH_DECAY_BODY: readonly HurtPose[] = [
@@ -423,7 +423,7 @@ export const LICH_DECAY_BODY: readonly HurtPose[] = [
     hurtPose(34, 36, [hurtPart(-7.0, 3.0, -7.0, 169.0, 28.0)]),
     hurtPose(37, 39, [hurtPart(-7.0, -3.0, -7.0, 171.0, 25.0)]),
     hurtPose(40, 42, [hurtPart(-6.0, -4.0, -6.0, 167.0, 26.0)]),
-    hurtPose(43, 45, [hurtPart(-8.0, -7.0, -8.0, 165.0, 23.0)]),
+    hurtPose(43, 45, [hurtPart(-8.0, -7.0, -8.0, 165.0, 22.0)]),
     hurtPose(46, 49, [hurtPart(-35.0, 33.0, -15.0, 46.0, 34.0), hurtPart(6.0, 91.0, 6.0, 158.0, 26.0)]),
   ];
 
