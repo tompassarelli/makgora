@@ -21,7 +21,7 @@ const windCutter: AuthoredSpecial = {
   hurt: [
       hurtPose(1, 8, [hurtPart(-32.0, 56.0, -48.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
       hurtPose(9, 11, [hurtPart(-56.0, 64.0, -40.0, 125.0, 35.0), hurtPart(0.0, 79.0, -8.0, 95.0, 41.0)]),
-      hurtPose(12, 16, [hurtPart(-20.0, 20.0, -4.0, 86.0, 51.0), hurtPart(-49.0, 66.0, 20.0, 100.0, 30.0)]),
+      hurtPose(12, 16, [hurtPart(-20.0, 20.0, -4.0, 86.0, 51.0), hurtPart(-49.0, 66.0, 20.0, 100.0, 29.0)]),
       hurtPose(17, 24, [hurtPart(0.0, 24.0, 16.0, 109.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
       hurtPose(25, 32, [hurtPart(0.0, 24.0, 16.0, 109.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
       hurtPose(33, 39, [hurtPart(16.0, 24.0, 16.0, 109.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
