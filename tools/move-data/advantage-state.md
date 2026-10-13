@@ -135,7 +135,7 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Mountain King | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Mountain King | medium | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Mountain King | medium | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Mountain King | medium | up throw | 1/1 | 1/1 in short hop, down air, out down smash | 1/1 KD | 1/1 in short hop, back air, out side special |
+| Mountain King | medium | up throw | 1/1 | 1/1 in short hop, down air, out down smash | 1/1 KD | 1/1 in short hop, back air, out dash, dash attack |
 | Mountain King | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 |
 | Mountain King | heavy | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Mountain King | heavy | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
