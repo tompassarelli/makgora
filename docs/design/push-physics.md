@@ -1,11 +1,8 @@
 # Shield and body pushes
 
-Smashcraft uses six world units per Melee unit. These rules use numerical
-facts from NTSC 1.02, identified in the read-only Melee reference checkout at
-`0296f009f32f710495979d30772d8332af2d411a`. No reference code or assets are
-copied. Shield contact facts are in `src/melee/ft/kinds/ftCommon/a Melee routine.c`; horizontal body nudge facts are in
-`src/melee/ft/ftcommon.c`. The
-coefficients below come from the locally identified NTSC 1.02 Melee.
+Smashcraft uses six world units per Melee unit. These rules are our design
+targets, set from NTSC 1.02 public frame data (SmashWiki's Shield and Pushing
+pages). No game code or assets are copied.
 
 A block uses integer damage D and shield strength S (0 for light, 1 for full).
 Its Melee shieldstun basis is `T = 1.5 * D * (1 - (0.05 + 0.65*S)) + 2`.

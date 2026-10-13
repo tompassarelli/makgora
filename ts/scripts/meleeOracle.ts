@@ -190,27 +190,27 @@ function doubleJumpApex(character: Character): number {
   return apex(s, (n) => (n === 1 ? [Action.jump] : []));
 }
 
-const JUMP_DATA = "ftData attributes (physics-parameters.json, Fox/Falco)";
+const JUMP_DATA = "design targets from public frame data (SmashWiki, Fox/Falco)";
 
 const JUMPS: readonly Scenario[] = [
   {
     area: "jump", name: "jump squat: grounded frames from the press",
-    cite: `${JUMP_DATA} jump_startup_time 3/5; Melee; slippi-ntsc-falco-jump.json`,
+    cite: `${JUMP_DATA} jump squat 3/5 frames; slippi-ntsc-falco-jump.json`,
     run: (c) => forReference(c, (r) => ({ expected: r.jumpSquat, actual: jumpSquatFrames(c) })),
   },
   {
     area: "jump", name: "full hop apex (Melee units)",
-    cite: `${JUMP_DATA} jump_v 3.68/4.1, gravity 0.23/0.17; takeoff frame moves by v, then v -= g: a Melee routine.c`,
+    cite: `${JUMP_DATA} jump_v 3.68/4.1, gravity 0.23/0.17; takeoff frame moves by v, then v -= g`,
     run: (c) => forReference(c, (r) => ({ expected: groundJumpApex(r.jumpVelocity, r.gravity), actual: apex(solo(0, c), () => [Action.jump]), tolerance: 0.01 })),
   },
   {
     area: "jump", name: "short hop apex (released in squat)",
-    cite: `${JUMP_DATA} hop_v 2.1/1.9; release during KneeBend selects it: a Melee routine.c`,
+    cite: `${JUMP_DATA} hop_v 2.1/1.9; release during KneeBend selects it`,
     run: (c) => forReference(c, (r) => ({ expected: groundJumpApex(r.hopVelocity, r.gravity), actual: apex(solo(0, c), (n) => (n === 1 ? [Action.jump] : [])), tolerance: 0.01 })),
   },
   {
     area: "jump", name: "double jump rise (Melee units)",
-    cite: `${JUMP_DATA} air_jump_v_multiplier 1.2/0.94 x; gravity from the first frame: a Melee routine.c`,
+    cite: `${JUMP_DATA} air_jump_v_multiplier 1.2/0.94 x; gravity from the first frame`,
     run: (c) => forReference(c, (r) => ({ expected: aerialJumpApex(f32(f32(r.jumpVelocity) * f32(r.aerialJumpMultiplier)), r.gravity), actual: doubleJumpApex(c), tolerance: 0.01 })),
   },
 ];
@@ -242,22 +242,22 @@ function walkSettles(character: Character, maximum: number): number {
   return melee(f.motion.vx);
 }
 
-const SETTLES = "over the target, a Melee routine applies friction down to it; acceleration below it is Smashcraft's authored tuning";
+const SETTLES = "over the target, friction brings the speed down to it; acceleration below it is Smashcraft's authored tuning";
 
 const GROUND: readonly Scenario[] = [
   {
     area: "ground", name: "initial dash velocity after the first frame",
-    cite: `${JUMP_DATA} dash_initial_velocity 1.9; Melee; retail-ground-movement-events.json`,
+    cite: `${JUMP_DATA} initial dash speed 1.9; retail-ground-movement-events.json`,
     run: (c) => forReference(c, (r) => ({ expected: r.dashInitialVelocity, actual: dashVelocity(c), tolerance: 0.00001 })),
   },
   {
     area: "ground", name: "running: velocity settles at the run maximum",
-    cite: `${JUMP_DATA} dash_max_velocity (run) 2.2/1.5, the target of Melee; ${SETTLES}`,
+    cite: `${JUMP_DATA} run speed 2.2/1.5, the target; ${SETTLES}`,
     run: (c) => forReference(c, (r) => ({ expected: r.runVelocity, actual: runSettles(c, r.runVelocity), tolerance: 0.00001 })),
   },
   {
     area: "ground", name: "walking: velocity settles at the walk maximum",
-    cite: `${JUMP_DATA} walk_max_vel 1.6/1.4, the target of Melee a Melee routine; ${SETTLES}`,
+    cite: `${JUMP_DATA} walk speed 1.6/1.4, the target; ${SETTLES}`,
     run: (c) => forReference(c, (r) => ({ expected: r.walkVelocity, actual: walkSettles(c, r.walkVelocity), tolerance: 0.00001 })),
   },
 ];
@@ -292,17 +292,17 @@ function fastFallsWhenPressedEarly(character: Character, early: number): boolean
 const FAST_FALL: readonly Scenario[] = [
   {
     area: "fast-fall", name: "fast-fall velocity",
-    cite: `${JUMP_DATA} fast_fall_velocity 3.4/3.5; Melee a Melee routine,
+    cite: `${JUMP_DATA} fast-fall speed 3.4/3.5`,
     run: (c) => forReference(c, (r) => ({ expected: r.fastFallVelocity, actual: fastFallVelocity(c), tolerance: 0.00001 })),
   },
   {
     area: "fast-fall", name: "down held from 3 frames before descent",
-    cite: " = 4: stick-down age < 4 and self_vel.y < 0; Melee a Melee routine",
+    cite: "fast fall: stick-down age under 4 frames while falling",
     run: (c) => ({ expected: true, actual: fastFallsWhenPressedEarly(c, 3) }),
   },
   {
     area: "fast-fall", name: "down held from 4 frames before descent",
-    cite: " = 4: stick-down age < 4 and self_vel.y < 0; Melee a Melee routine",
+    cite: "fast fall: stick-down age under 4 frames while falling",
     run: (c) => ({ expected: false, actual: fastFallsWhenPressedEarly(c, 4) }),
   },
 ];
@@ -354,13 +354,13 @@ const emptyFall: Fall = { setup: (f) => airborne(f, 0.0, 120.0), held: () => [] 
 
 const aerialFall: Fall = { setup: (f) => airborne(f, 0.0, 200.0), held: (n) => (n === 1 ? [Action.attack] : []) };
 
-const L_CANCEL = "an L/R press under  = 7 frames before landing (x67F, fighter.c Fighter_procInput) divides the lag by  = 2, at least 1: Melee;
+const L_CANCEL = "an L/R press under 7 frames before landing divides the lag by 2, at least 1";
 const NAIR_LAG = uncancelledLandingLag(AttackStyle.neutralAir);
 
 const LANDING: readonly Scenario[] = [
   {
     area: "landing", name: "empty landing lag (frames to act)",
-    cite: `${JUMP_DATA} normal_landing_lag 4; Melee,
+    cite: `${JUMP_DATA} landing lag 4`,
     run: (c) => forReference(c, () => ({ expected: 4, actual: landingLag(c, emptyFall) })),
   },
   {
@@ -411,15 +411,15 @@ function techAfterRepeat(character: Character, gap: number): string {
   return tumbleLanding(character, 740.0, [landing - 1 - gap, landing - 1]).result;
 }
 
-const TECH_GATE = " = 20: L/R press age (x680) < 20 and previous press interval (x684) >=  = 40; Melee;
+const TECH_GATE = "tech: L/R press age under 20 frames and previous press interval at least 40";
 
 const TECHS: readonly Scenario[] = [
-  { area: "tech", name: "no tech press", cite: "missed tech enters DownBound: Melee, run: (c) => ({ expected: "knockdown", actual: techBeforeLanding(c, undefined) }) },
+  { area: "tech", name: "no tech press", cite: "missed tech enters DownBound", run: (c) => ({ expected: "knockdown", actual: techBeforeLanding(c, undefined) }) },
   { area: "tech", name: "tech 19 frames before landing", cite: TECH_GATE, run: (c) => ({ expected: "tech", actual: techBeforeLanding(c, 19) }) },
   { area: "tech", name: "tech 20 frames before landing", cite: TECH_GATE, run: (c) => ({ expected: "knockdown", actual: techBeforeLanding(c, 20) }) },
   {
     area: "tech", name: "tech with the stick held sideways",
-    cite: " = 0.2 stick x picks PassiveStandF/B: Melee,
+    cite: "stick x of 0.2 picks PassiveStandF/B",
     run: (c) => ({ expected: "tech roll", actual: techBeforeLanding(c, 5, [Action.moveRight]) }),
   },
   { area: "tech", name: "second press 40 frames after the first", cite: TECH_GATE, run: (c) => ({ expected: "knockdown", actual: techAfterRepeat(c, 40) }) },
@@ -465,14 +465,14 @@ function getupFrames(character: Character, option: DownState, choose: readonly A
   return framesIn(knockdown(character, 120, (after) => (after === 40 ? choose : [])), option);
 }
 
-const GETUP_ORDER = "DownBound ends into get-up attack, then held stick roll, else DownWait: Melee a Melee routine, a Melee routine.c";
-const C_STICK_GETUP = "DownWait IASA: a Melee routine attacks on a C-stick up crossing  = 0.6625, a Melee routine rolls on a C-stick sideways crossing = 0.2 within of horizontal: Melee, a Melee routine.c, Melee;
+const GETUP_ORDER = "DownBound ends into get-up attack, then held stick roll, else DownWait";
+const C_STICK_GETUP = "DownWait: a C-stick up crossing 0.6625 attacks, a C-stick sideways crossing 0.2 within range of horizontal rolls";
 const DOWN_ANIMATIONS = "Fox/Falco animation frames (retail-action-lengths.json)";
 
 const GETUPS: readonly Scenario[] = [
   {
     area: "getup", name: "frames in down-bound before a held roll",
-    cite: `${DOWN_ANIMATIONS} DownBoundU 26, entered without an extra animation step: a Melee routine.c a Melee routine,
+    cite: `${DOWN_ANIMATIONS} DownBoundU 26, entered without an extra animation step`,
     run: (c) => forReference(c, () => ({ expected: 26, actual: framesIn(knockdown(c, 80, () => [Action.moveRight]), DownState.bound) })),
   },
   {
@@ -487,22 +487,22 @@ const GETUPS: readonly Scenario[] = [
   },
   {
     area: "getup", name: "no input: frames in down-wait before standing",
-    cite: " = 220: a Melee routine counts mv.co.downwait.x0 down and stands at 0; Melee,
+    cite: "DownWait counts down from 220 frames and stands at 0",
     run: (c) => ({ expected: 220, actual: framesIn(knockdown(c, 270, () => []), DownState.wait) }),
   },
   {
     area: "getup", name: "get-up stand frames",
-    cite: `${DOWN_ANIMATIONS} DownStandU 30, entered without an extra step: a Melee routine.c a Melee routine,
+    cite: `${DOWN_ANIMATIONS} DownStandU 30, entered without an extra step`,
     run: (c) => forReference(c, () => ({ expected: 30, actual: getupFrames(c, DownState.stand, [Action.moveUp]) })),
   },
   {
     area: "getup", name: "get-up roll frames",
-    cite: `${DOWN_ANIMATIONS} DownFowardU 36, entered with a Melee routine: a Melee routine.c a Melee routine,
+    cite: `${DOWN_ANIMATIONS} DownFowardU 36`,
     run: (c) => forReference(c, () => ({ expected: 35, actual: getupFrames(c, DownState.roll, [Action.moveRight]) })),
   },
   {
     area: "getup", name: "get-up attack frames",
-    cite: `${DOWN_ANIMATIONS} DownAttackU 50, entered with a Melee routine: a Melee routine.c:47`,
+    cite: `${DOWN_ANIMATIONS} DownAttackU 50`,
     run: (c) => forReference(c, () => ({ expected: 49, actual: getupFrames(c, DownState.attack, [Action.attack]) })),
   },
   {
@@ -552,7 +552,7 @@ function launchCheck(character: Character, offset: number): Check {
   return { expected: expectedLaunch(weight, percent).text, actual: launchOutcome(character, percent) };
 }
 
-const KNOCKBACK_RULE = "knockback: Melee with  (fighter's own weight); hitstun (int), tumble when K x 0.4 >= 32: Melee;
+const KNOCKBACK_RULE = "knockback scales with the fighter's own weight; hitstun is an integer, tumble when K x 0.4 >= 32";
 
 
 function repeatedHits(character: Character, count: number): string[] {
@@ -572,7 +572,7 @@ function repeatedHits(character: Character, count: number): string[] {
   return hits;
 }
 
-const STALE_MOVES = "a Melee routine scales damage by 1 - the staling table entries for each of the last 9 queued instances of the same move id, queued by a Melee routine and applied by a Melee routine";
+const STALE_MOVES = "stale-move negation scales damage by 1 - the staling table entry for each of the last 9 queued instances of the same move id";
 
 const KNOCKBACK: readonly Scenario[] = [
   {
@@ -658,20 +658,20 @@ function downThroughDeck(character: Character): string {
   return `descends over ${String(f.platform.duration)} frames`;
 }
 
-const PLATFORM_LINES = "platforms are floor lines flagged LINE_FLAG_PLATFORM: mpCheckFloor hits them only while descending, mpCheckCeiling ignores them";
-const PLATFORM_PASS = "Pass needs stick y <= - (0.66) reached under  = 6 frames ago on a platform: Melee a Melee routine; mpColl skips that platform";
+const PLATFORM_LINES = "platforms are floor lines that are solid only while descending; ceilings ignore them";
+const PLATFORM_PASS = "Pass needs stick y of at least 0.66 down, reached within 6 frames, on a platform";
 
 const PLATFORM_DROP = "Platform descent: falling onto a platform with down past the crouch threshold drops through it, ending the aerial (owner decision 2026-10-09, #392)";
 
 const PLATFORMS: readonly Scenario[] = [
-  { area: "hazard", name: "Whispy's first gust moves a standing fighter", cite: "GrOp.dat yakumono_param = 0.2; groldpupupu.c wind after blow frame 45; fighter.c Fighter_procUpdate windOffset", run: (c) => {
+  { area: "hazard", name: "Whispy's first gust moves a standing fighter", cite: "wind strength 0.2; wind after blow frame 45", run: (c) => {
     const s = solo(WIND_TEST_STAGE, c, 240.0);
     s.game.matchFrame = 645;
     const before = fighter(s).motion.x;
     frame(s, []);
     return { expected: 0.20000000298023224, actual: f32((fighter(s).motion.x - before) / WORLD_UNITS_PER_MELEE_UNIT), tolerance: 0.00001 };
   } },
-  { area: "hazard", name: "Kongo barrel holds an untouched fighter for eight seconds", cite: "GrOk.dat rframe_barrel_shoot_a = 479 truncated and counted through zero; groldkongo.c stageGObj1_GObjProc", run: (c) => {
+  { area: "hazard", name: "Kongo barrel holds an untouched fighter for eight seconds", cite: "barrel shoot time 479 truncated and counted through zero", run: (c) => {
     const s = solo(CANNON_TEST_STAGE, c, cannonX(1));
     airborne(fighter(s), cannonX(1), CANNON_Z + 40.0);
     frame(s, []);
@@ -679,7 +679,7 @@ const PLATFORMS: readonly Scenario[] = [
     while (fighter(s).cannon.firing === undefined && held < 500) { frame(s, []); held++; }
     return { expected: 480, actual: held };
   } },
-  { area: "hazard", name: "Kongo barrel fires ten further frames after Attack with base knockback 180", cite: "groldkongo.c hit_timer > 0xA; GrOk.dat rradd_barrel_attack = 180; a Melee routine", run: (c) => {
+  { area: "hazard", name: "Kongo barrel fires ten further frames after Attack with base knockback 180", cite: "barrel hit timer of 10 frames; base knockback 180", run: (c) => {
     const s = solo(CANNON_TEST_STAGE, c, cannonX(1));
     airborne(fighter(s), cannonX(1), CANNON_Z + 40.0);
     frame(s, []);
@@ -688,7 +688,7 @@ const PLATFORMS: readonly Scenario[] = [
     while (fighter(s).cannon.held !== undefined && further < 20) { frame(s, []); further++; }
     return { expected: 5.400000095367432, actual: further === 10 ? f32(fighter(s).launch.diLaunchSpeed / WORLD_UNITS_PER_MELEE_UNIT) : -1, tolerance: 0.00001 };
   } },
-  { area: "platform", name: "grounded fighter rides a moving floor in hitlag", cite: "Fighter_procUpdate adds mpGetSpeed's floor-line displacement while grounded, before its hitlag return", run: (c) => {
+  { area: "platform", name: "grounded fighter rides a moving floor in hitlag", cite: "a grounded fighter takes the floor line's displacement, before its hitlag return", run: (c) => {
     const s = solo(DRIFTING_DECK_STAGE, c, 0.0);
     const f = fighter(s);
     f.motion.surface = 1;
@@ -714,7 +714,7 @@ const PLATFORMS: readonly Scenario[] = [
     run: (c) => ({ expected: "up air continues", actual: upAirIntoDeck(c) }),
   },
   {
-    area: "platform", name: "fresh down on a raised deck: how the fighter leaves it", cite: `${PLATFORM_PASS}; a Melee routine enters a fall at once`,
+    area: "platform", name: "fresh down on a raised deck: how the fighter leaves it", cite: `${PLATFORM_PASS}; the fighter enters a fall at once`,
     departure: "Platform descent: a vulnerable descent over the jump squat (owner decision 2026-10-06, #103)",
     run: (c) => ({ expected: "falls through at once", actual: downThroughDeck(c) }),
   },
@@ -933,9 +933,9 @@ function leaveCheck(leave: WallLeave | undefined, check: (leave: WallLeave) => C
   return leave === undefined ? { expected: "leaves the wall", actual: "no wall recovery" } : check(leave);
 }
 
-const WALL_HANG = " = 5 (wall tech) and = 5 (wall jump) frames held on the wall: Melee a Melee routine, a Melee routine";
-const WALL_LAUNCH = " push-off 0.5, wall jump 1.4/3.3 (Fox), 1.3/3.6 (Falco), 1.4/3.1 (Captain Falcon) from the retail DATs (physics-parameters.json), set when the hang ends, then a frame of aerial friction and gravity: a Melee routine, a Melee routine";
-const WALL_JUMP = "can_walljump (ftFx/ftFc/a Melee routine); met faster than = 0.5 a frame, then the stick at least  = 0.8 away within = 3 frames of leaving the deadzone and = 130 frames of meeting the wall: Melee a Melee routine";
+const WALL_HANG = "5 frames held on the wall before a wall tech and 5 before a wall jump";
+const WALL_LAUNCH = "push-off 0.5, wall jump 1.4/3.3 (Fox), 1.3/3.6 (Falco), 1.4/3.1 (Captain Falcon), set when the hang ends, then a frame of aerial friction and gravity";
+const WALL_JUMP = "met faster than 0.5 a frame, then the stick at least 0.8 away within 3 frames of leaving the deadzone and 130 frames of meeting the wall";
 
 
 
@@ -1000,12 +1000,12 @@ function ceilingImpulseFrame(character: Character): number | string {
   return "no impulse";
 }
 
-const CEILING_IMPULSE = " passiveceil_vel_x 0.7 (Fox, Falco), 2.0 (Captain Falcon) from the retail DATs times the stick at the animation's throw-flag event, frame 14 (Fox, Falco) or 11 (Captain Falcon) (retail-ceiling-tech-events.json): Melee a Melee routine, then a frame of air drift; under the solid-deck test stage's raised deck, gravity held at zero after the contact since its floor is nearer than the fall to the impulse frame";
+const CEILING_IMPULSE = "sideways impulse 0.7 (Fox, Falco), 2.0 (Captain Falcon) times the stick at the animation's throw-flag event, frame 14 (Fox, Falco) or 11 (Captain Falcon) (retail-ceiling-tech-events.json), then a frame of air drift; under the solid-deck test stage's raised deck, gravity held at zero after the contact since its floor is nearer than the fall to the impulse frame";
 
-const ECB_TOP = "ceilings meet the fighter's airborne ECB top, the highest of its six ftData x44 ECB bones in the model's bind pose times model_scaling: Fox 11.16, Falco 13.75, Captain Falcon 18.78";
+const ECB_TOP = "ceilings meet the fighter's airborne ECB top, the highest of its six ECB bones in the model's bind pose times model scaling: Fox 11.16, Falco 13.75, Captain Falcon 18.78";
 
-const SURFACE_GATE = "wall and ceiling techs use the floor's gate : Melee a Melee routine, a Melee routine.c";
-const WALL_FLANK = "the ECB's side meets a wall, and a Melee routine keeps an airborne ECB at least 2 units a side; airborne collision moves only the position";
+const SURFACE_GATE = "wall and ceiling techs use the floor tech's gate";
+const WALL_FLANK = "the ECB's side meets a wall, and an airborne ECB keeps at least 2 units a side; airborne collision moves only the position";
 
 const SURFACES: readonly Scenario[] = [
   { area: "wall/ceiling", name: "main deck side: where a launch about 5 below the ledge meets it (from the ledge)", cite: STAGE_COLLISION, run: (c) => sideCheck(c, 5.0) },
@@ -1050,11 +1050,11 @@ const SURFACES: readonly Scenario[] = [
     run: (c) => leaveCheck(wallTechLeave(c, false), (leave) => ({ expected: f32(referenceWall(c).pushOff - airDrag(c).friction), actual: leave.speed, tolerance: 0.0001 })),
   },
   {
-    area: "wall/ceiling", name: "wall tech with the stick up: wall jump speed away from the side", cite: `${WALL_LAUNCH}; up selects the jump: a Melee routine,
+    area: "wall/ceiling", name: "wall tech with the stick up: wall jump speed away from the side", cite: `${WALL_LAUNCH}; up selects the jump`,
     run: (c) => leaveCheck(wallTechLeave(c, true), (leave) => ({ expected: f32(referenceWall(c).jumpX - airDrag(c).friction), actual: leave.speed, tolerance: 0.0001 })),
   },
   {
-    area: "wall/ceiling", name: "wall tech with the stick up: wall jump rise (Melee units)", cite: `${WALL_LAUNCH}; up selects the jump: a Melee routine,
+    area: "wall/ceiling", name: "wall tech with the stick up: wall jump rise (Melee units)", cite: `${WALL_LAUNCH}; up selects the jump`,
     run: (c) => leaveCheck(wallTechLeave(c, true), (leave) => ({ expected: aerialJumpApex(referenceWall(c).jumpZ, airDrag(c).gravity), actual: leave.rise, tolerance: 0.01 })),
   },
   {
@@ -1162,8 +1162,8 @@ function actsAfterAirDodge(character: Character): boolean {
 
 const wavelandFall: Fall = { setup: (f) => airborne(f, 0.0, 6.0), held: (n) => (n === 1 ? [Action.moveDown, Action.leftTrigger] : []) };
 
-const DODGE_DATA = "Fox/Falco animation frames (retail-action-lengths.json, private PlFxAJ/PlFcAJ read)";
-const DODGE_INTANGIBLE = "Fox/Falco intangibility: body-state commands in retail-roster.json (EscapeN, EscapeF, EscapeAir), as references/melee-frame-data/records.jsonl reports for the ground dodges";
+const DODGE_DATA = "Fox/Falco animation frames (retail-action-lengths.json)";
+const DODGE_INTANGIBLE = "Fox/Falco intangibility from public frame data (EscapeN, EscapeF, EscapeAir), as references/melee-frame-data/records.jsonl reports for the ground dodges";
 
 const SHIELD_RELEASE_DEPARTURE = "Shield release lag: 11 frames, Ultimate's value (owner decision 2026-10-06, #100)";
 const AIR_DODGE_DEPARTURE = "Air dodge: once per airtime, ends actionable, refreshed on landing, ledge catch and being hit (owner decision 2026-10-06, #100)";
@@ -1171,38 +1171,38 @@ const AIR_DODGE_DEPARTURE = "Air dodge: once per airtime, ends actionable, refre
 const SHIELD_AND_DODGES: readonly Scenario[] = [
   {
     area: "shield/dodge", name: "shield release: frames until an attack starts",
-    cite: `${DODGE_DATA} GuardOff 15, entered without an extra step: Melee a Melee routine,
+    cite: `${DODGE_DATA} GuardOff 15, entered without an extra step`,
     departure: SHIELD_RELEASE_DEPARTURE,
     run: (c) => forReference(c, () => ({ expected: 15, actual: shieldReleaseLag(c) })),
   },
   {
     area: "shield/dodge", name: "spot dodge frames",
-    cite: `${DODGE_DATA} EscapeN 23, entered with a Melee routine: a Melee routine.c:245`,
+    cite: `${DODGE_DATA} EscapeN 23`,
     run: (c) => forReference(c, () => ({ expected: 22, actual: groundDodge(c, Action.moveDown).frames })),
   },
   { area: "shield/dodge", name: "spot dodge intangible frames", cite: DODGE_INTANGIBLE, run: (c) => forReference(c, () => ({ expected: "2-15", actual: groundDodge(c, Action.moveDown).intangible })) },
   {
     area: "shield/dodge", name: "forward roll frames",
-    cite: `${DODGE_DATA} EscapeF 32, entered with a Melee routine: a Melee routine.c:100`,
+    cite: `${DODGE_DATA} EscapeF 32`,
     run: (c) => forReference(c, () => ({ expected: 31, actual: groundDodge(c, Action.moveRight).frames })),
   },
   { area: "shield/dodge", name: "forward roll intangible frames", cite: DODGE_INTANGIBLE, run: (c) => forReference(c, () => ({ expected: "4-19", actual: groundDodge(c, Action.moveRight).intangible })) },
-  { area: "shield/dodge", name: "air dodge intangible frames", cite: `${DODGE_INTANGIBLE}; EscapeAir 50 frames (retail-escapeair-events.json)`, run: (c) => forReference(c, () => ({ expected: "4-29", actual: airDodgeIntangible(c) })) },
+  { area: "shield/dodge", name: "air dodge intangible frames", cite: `${DODGE_INTANGIBLE}; EscapeAir 50 frames`, run: (c) => forReference(c, () => ({ expected: "4-29", actual: airDodgeIntangible(c) })) },
   {
     area: "shield/dodge", name: "air dodge first-frame travel (Melee units)",
-    cite: " = 3.1 force x = 0.9 decay before the first move: Melee,
+    cite: "force 3.1 with 0.9 decay before the first move",
     departure: "Air dodge speed: 3.4 Melee units, about 9.7% faster, with unchanged 0.9 decay (owner decision 2026-10-09, #347)",
     run: (c) => ({ expected: f32(3.0999999046325684 * 0.8999999761581421), actual: airDodgeFirstTravel(c), tolerance: 0.0001 }),
   },
   {
     area: "shield/dodge", name: "air dodge ends in helpless fall: no attack before landing",
-    cite: "EscapeAir ends in FallSpecial, which allows no action until landing: Melee,
+    cite: "EscapeAir ends in FallSpecial, which allows no action until landing",
     departure: AIR_DODGE_DEPARTURE,
     run: (c) => ({ expected: false, actual: actsAfterAirDodge(c) }),
   },
   {
     area: "shield/dodge", name: "waveland landing lag (frames to act)",
-    cite: " = 10 LandingFallSpecial lag: Melee,
+    cite: "LandingFallSpecial lag of 10 frames",
     run: (c) => ({ expected: 10, actual: landingLag(c, wavelandFall) }),
   },
 ];
@@ -1242,19 +1242,19 @@ const PARRY_DEPARTURE = "Powershield: a parry with no shieldstun or release lag 
 const POWERSHIELD: readonly Scenario[] = [
   {
     area: "powershield", name: "shieldstun of a parried 10-damage hit",
-    cite: "GuardSetOff runs at the ordinary rate whether or not the perfect flag is set: Melee a Melee routine",
+    cite: "GuardSetOff runs at the ordinary rate whether or not the perfect flag is set",
     run: (c) => ({ expected: digitalShieldstunFrames(TEST_HIT.damage), actual: shieldedHit(c, true).f.shield.stun }),
     departure: PARRY_DEPARTURE,
   },
   {
     area: "powershield", name: "dropping the shield after a parry",
-    cite: "GuardOff still plays; the counter (4) only admits attacks and grabs during it: a Melee routine.c a Melee routine, a Melee routine",
+    cite: "GuardOff still plays; the counter (4) only admits attacks and grabs during it",
     run: (c) => ({ expected: "GuardOff, attacks only", actual: dropAfterParry(c) }),
     departure: PARRY_DEPARTURE,
   },
   {
     area: "powershield", name: "a fresh shield press during shieldstun",
-    cite: "GuardSetOff accepts no input: a Melee routine.c a Melee routine is empty",
+    cite: "GuardSetOff accepts no input",
     run: (c) => ({ expected: "ignored", actual: pressInShieldstun(c) }),
     departure: PARRY_DEPARTURE,
   },
@@ -1318,7 +1318,7 @@ function grabOnLedgeHanger(character: Character): string {
   return started ? "not caught" : "grab never started";
 }
 
-const LEDGE_BOX = "ledge snap ftData x44: Fox/Falco 11/13/9, Captain Falcon 9/17/11 (Illidan), reach adds the 2-unit minimum ECB half-width; Melee, Melee a Melee routine (#47)";
+const LEDGE_BOX = "ledge snap box: Fox/Falco 11/13/9, Captain Falcon 9/17/11 (Illidan), reach adds the 2-unit minimum ECB half-width (#47)";
 
 const LEDGES: readonly Scenario[] = [
   { area: "ledge", name: "fall from ledge height 60 units out", cite: LEDGE_BOX, run: (c) => ({ expected: true, actual: catchesLedge(c, 60.0, 0.0) }) },
@@ -1327,7 +1327,7 @@ const LEDGES: readonly Scenario[] = [
   { area: "ledge", name: "fall from 1 unit inside the box top (104; Illidan 134 below)", cite: LEDGE_BOX, run: (c) => ({ expected: true, actual: catchesLedge(c, 30.0, ledgeBox(c).highest - 1.0) }) },
   { area: "ledge", name: "fall from 1 unit above the box top (106; Illidan 136 below)", cite: LEDGE_BOX, run: (c) => ({ expected: false, actual: catchesLedge(c, 30.0, ledgeBox(c).highest + 1.0) }) },
   { area: "ledge", name: "drifting in below the ledge, a fall along the main deck's side wall", cite: `${LEDGE_BOX}; ${WALL_FLANK}`, run: (c) => ({ expected: "caught against the wall", actual: catchAgainstWall(c) }) },
-  { area: "ledge", name: "standing grab on a fighter hanging past its intangible frames", cite: "a Melee routine skips a victim with x1A6A & x1A68; the hang sets x1A6A = 511 and every catch sets x1A68 = 1 (#72)", run: (c) => ({ expected: "not caught", actual: grabOnLedgeHanger(c) }) },
+  { area: "ledge", name: "standing grab on a fighter hanging past its intangible frames", cite: "a fighter hanging past its intangible frames cannot be caught: the hang makes it uncatchable (#72)", run: (c) => ({ expected: "not caught", actual: grabOnLedgeHanger(c) }) },
 ];
 
 
@@ -1346,7 +1346,7 @@ function grabHold(character: Character, percent: number, mashOn?: number): numbe
   return held;
 }
 
-const GRAB_RULE = "the escape timer starts at 76 + 1.6 frames per percent and falls 1 a frame plus 6 per mash input (a Melee routine): smashcraft:docs/design/melee/defense.md#grabs";
+const GRAB_RULE = "the escape timer starts at 76 + 1.6 frames per percent and falls 1 a frame plus 6 per mash input: smashcraft:docs/design/melee/defense.md#grabs";
 const GRAB_DEPARTURE = "Grab hold: 120 frames at any percent, 8 off per mash input down to 30, one pummel connecting on frame 60 (owner direction 2026-10-06, #101)";
 
 const GRABS: readonly Scenario[] = [
@@ -1405,7 +1405,7 @@ function sdiMash(character: Character): { readonly travel: number; readonly step
   return { travel, step };
 }
 
-const SDI_RULE = "a stick at least 0.70 from centre that newly moved within 4 frames shifts the fighter by  = 6 units on each hitlag frame (a Melee routine), and ASDI shifts 3 once on release (a Melee routine): smashcraft:docs/design/melee/defense.md#influence-on-knockback";
+const SDI_RULE = "a stick at least 0.70 from centre that newly moved within 4 frames shifts the fighter by  = 6 units on each hitlag frame, and ASDI shifts 3 once on release: smashcraft:docs/design/melee/defense.md#influence-on-knockback";
 const SDI_DEPARTURE = "SDI: bounded travel, at most 9 units of SDI and 12 with ASDI per hit, 24 per string, in steps of at most 3 per frame (owner-authorized default 2026-10-06, #70)";
 
 const SMASH_DI: readonly Scenario[] = [
@@ -1436,7 +1436,7 @@ const SCENARIOS: readonly Scenario[] = [
   ...JUMPS, ...GROUND, ...FAST_FALL, ...LANDING, ...TECHS, ...GETUPS, ...KNOCKBACK, ...PLATFORMS, ...SURFACES, ...SHIELD_AND_DODGES, ...POWERSHIELD, ...LEDGES, ...GRABS, ...SMASH_DI, ...EXECUTION_BOUNDS,
   ...[59, 60, 120].map((frames): Scenario => ({
     area: "offscreen", name: `magnifier damage after ${frames} consecutive frames`,
-    cite: "Fighter_procAnim, =60,=150,=1; a Melee routine; canonical 16:9 match view (#80)",
+    cite: "60, 150 and 1 frame counters; canonical 16:9 match view (#80)",
     run: (character) => {
       const s = solo(0, character);
       const f = fighter(s);

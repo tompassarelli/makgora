@@ -61,7 +61,7 @@ test("a shield grab requires an unstunned, grounded, active shield and keeps oth
   assertFalse(canShieldGrab(fighter));
 });
 
-test("an air dodge protects only frames four through twenty-nine [k4 reference docs/smash-melee-reference/retail-roster.json]", () => {
+test("an air dodge protects only frames four through twenty-nine [k3 measure docs/physics.md]", () => {
   for (const character of [Character.sylvanas, Character.rifleman]) {
     for (let frame = 1; frame <= 30; frame++) {
       const fighter = createReferenceFighter(character, 100.0, -1);

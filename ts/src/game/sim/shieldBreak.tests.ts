@@ -40,7 +40,7 @@ function dizzyShieldBreakTest(fighter: Fighter, input: Readonly<Controls>): void
   assertEquals(fighter.shield.breakFrame, 0);
 }
 
-test("the forced shield-break sequence rejects actions and techs for both characters [k4 reference docs/smash-melee-reference/surface-action-boundaries.md#shield-break-pose-and-release-ordering]", () => {
+test("the forced shield-break sequence rejects actions and techs for both characters [k3 measure docs/physics.md]", () => {
   for (const character of [Character.sylvanas, Character.rifleman]) {
     const fighter = shieldBreakTestFighter(character, 0.0);
     const world = testWorld(fighter, createReferenceFighter(character === Character.sylvanas ? Character.rifleman : Character.sylvanas, 100.0, -1));
@@ -107,7 +107,7 @@ test("the forced shield-break sequence rejects actions and techs for both charac
   }
 });
 
-test("dizzy length follows percent, and fresh mash edges shorten its exact tick count [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
+test("dizzy length follows percent, and fresh mash edges shorten its exact tick count [k3 measure docs/physics.md]", () => {
   for (const mode of [0, 1, 2]) {
     const fighter = shieldBreakTestFighter(Character.sylvanas, mode === 0 ? 100.0 : 0.0);
     const input = controls();

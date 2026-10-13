@@ -8,16 +8,15 @@ that faster landing velocity into each fighter's existing ground traction.
 
 How Melee's fighters move: the rules the game applies to every fighter, and the
 per-fighter parameters those rules read. Conventions and sources are in the
-[case study's README](README.md). Function names are from the decompilation at
-the revision named there.
+[case study's README](README.md).
 
 ## Ground movement
 
 Walking accelerates toward the fighter's walk speed. A stick pushed past
 <!-- v:dash.smashThreshold -->0.80<!-- /v --> within <!-- v:dash.smashWindow -->2<!-- /v -->
-frames of leaving the deadzone starts a dash (a Melee routine). The dash's
-first frame sets the fighter's initial dash speed (a Melee routine); later
-frames accelerate or brake toward its run speed (a Melee routine).
+frames of leaving the deadzone starts a dash. The dash's
+first frame sets the fighter's initial dash speed; later
+frames accelerate or brake toward its run speed.
 Run speed ranges from <!-- v:run.min -->1.10<!-- /v --> (<!-- v:run.minWho -->Jigglypuff and Zelda<!-- /v -->)
 to <!-- v:run.max -->2.30<!-- /v --> (<!-- v:run.maxWho -->Captain Falcon<!-- /v -->), median
 <!-- v:run.median -->1.50<!-- /v -->; initial dash speed from <!-- v:dashSpeed.min -->1.00<!-- /v -->
@@ -26,9 +25,9 @@ to <!-- v:run.max -->2.30<!-- /v --> (<!-- v:run.maxWho -->Captain Falcon<!-- /v
 than they run, so their dash slows into the run.
 
 The dash's command stream sets a flag on a fighter-specific frame; from that
-frame a held stick turns the dash into a run (a Melee routine). Before it, a
+frame a held stick turns the dash into a run. Before it, a
 fresh smash the other way turns the fighter into a new dash the other way
-(a Melee routine): repeated, that is the dash dance. Holding the stick
+: repeated, that is the dash dance. Holding the stick
 backward without a smash changes the dash's velocity without turning, which
 players call a moonwalk. The initial dash, the frames before a run can start,
 lasts from <!-- v:initialDash.min -->7<!-- /v --> frames (<!-- v:initialDash.minWho -->Sheik<!-- /v -->)
@@ -81,13 +80,13 @@ from the dash's first frame to the frame before a run can start.
 
 ## Jumps
 
-A ground jump spends the fighter's jump squat on the ground (a Melee routine).
+A ground jump spends the fighter's jump squat on the ground.
 Releasing jump during the squat selects the short hop's launch speed, holding it
 the full jump's. The takeoff frame moves the fighter by its launch speed alone
 (a Melee routine skips its first frame); every later frame subtracts gravity
-and caps the fall at the fighter's fall speed (a Melee routine). An aerial jump
+and caps the fall at the fighter's fall speed. An aerial jump
 launches at the full jump's speed times the fighter's aerial multiplier and
-falls from its first frame (a Melee routine).
+falls from its first frame.
 <!-- v:ownAerialJump -->Jigglypuff, Kirby, Mewtwo, Ness, Peach and Yoshi<!-- /v -->
 have their own aerial jumps, marked "own".
 
@@ -144,9 +143,9 @@ takeoff to the frame the fighter is back at the takeoff height.
 Gravity accelerates a falling fighter up to its fall speed. Fast fall replaces
 the fall speed at once with the fighter's fast-fall speed: the check runs when
 the fighter is already descending and the stick has newly crossed downward
-(a Melee routine). In the air the stick accelerates the fighter by a
+. In the air the stick accelerates the fighter by a
 base plus a stick-scaled amount up to its air speed; without stick input, or
-above air speed, air friction slows it (a Melee routine).
+above air speed, air friction slows it.
 
 Gravity ranges from <!-- v:gravity.min -->0.064<!-- /v --> (<!-- v:gravity.minWho -->Jigglypuff<!-- /v -->)
 to <!-- v:gravity.max -->0.230<!-- /v --> (<!-- v:gravity.maxWho -->Fox<!-- /v -->); fall speed
@@ -200,10 +199,10 @@ one way, during the fighter's full-hop air time.
 An air dodge sets the fighter's velocity to <!-- v:airdodge.force -->3.10<!-- /v -->
 units per frame in the stick's direction, then multiplies it by
 <!-- v:airdodge.decay -->0.90<!-- /v --> every frame before it moves
-(a Melee routine), so the first frame already covers
+, so the first frame already covers
 <!-- v:airdodge.firstFrame -->2.79<!-- /v --> units. Touching the ground ends it in a
 landing that lasts <!-- v:waveland.lag -->10<!-- /v --> frames
-(a Melee routine), and the horizontal velocity becomes the
+, and the horizontal velocity becomes the
 fighter's ground speed, braked by traction as above. The air dodge can be
 entered on the very frame a jump leaves the ground (a Melee routine checks it
 on the frame a Melee routine runs), so a dodge angled into the floor lands at

@@ -50,7 +50,7 @@ const SAMPLES: readonly Sample[] = [
   [0.0, f32(-0.6249), STALE, TAP_JUMP_WINDOW, S.crouch, Z.deadzone],
 ];
 
-test("stick map: a sample in every zone and on each boundary selects Melee's zone from Melee's thresholds [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
+test("stick map: a sample in every zone and on each boundary selects Melee's zone from Melee's thresholds [k3 measure docs/physics.md]", () => {
   for (const [x, z, sideAge, upAge, state, zone] of SAMPLES) {
     for (const facing of [-1, 1]) {
       const actual = stickZone(f32(x * facing), z, sideAge, upAge, facing, state);

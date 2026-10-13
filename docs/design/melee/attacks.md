@@ -162,9 +162,9 @@ The safest and least safe grounded normals at their best timing:
 ## Punish windows out of shield
 
 A shielding fighter can, without first dropping the shield, grab, jump, roll,
-spot-dodge, or drop through a platform (a Melee routine). Jumping starts the
+spot-dodge, or drop through a platform. Jumping starts the
 jump squat, from which the fighter can still grab or up-smash
-(a Melee routine): the jump-cancelled grab and up smash. An aerial can
+: the jump-cancelled grab and up smash. An aerial can
 start on the jump's takeoff frame. Dropping the shield itself takes the
 shield-release lag in [Defence](defense.md#shield).
 

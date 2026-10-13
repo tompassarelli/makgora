@@ -4,15 +4,10 @@
 `meleeSin(angle)`, and `meleeCos(angle)`. Inputs and intermediate results use
 explicit binary32 rounding and fused multiply-add. The implementation is
 independently authored from numerical approximation facts and mathematical
-equations, without consulting or translating decompiled code.
+equations.
 
-The numerical facts are recorded in
-`smashcraft:docs/smash-melee-reference/retail-trig-coefficients.json` and
-`smashcraft:docs/smash-melee-reference/retail-trig-scalars.json`. The source
-executable SHA-1 is `08e0bf20134dfcb260699671004527b2d6bb1a45`; reference
-revision is `0296f009f32f710495979d30772d8332af2d411a`. No license for external
-implementation code has been established, and no such code is reused.
-Proprietary executable data remains in private storage outside repositories.
+The numerical targets are recorded in this page and in the tests. No external
+implementation code is reused, and no proprietary data is kept in repositories.
 
 Atan uses an odd polynomial, reciprocal reduction, and five tangent-subtraction
 segments. Each segment stores a split denominator offset, split numerator, and
@@ -28,7 +23,7 @@ to choose positive or negative half pi. Nonfinite inputs are outside the claim;
 this is not a general replacement for all platform trigonometric functions.
 
 The subsequent original-routine fixture
-smashcraft:docs/smash-melee-reference/retail-signed-zero-scalars.json exposes a
+the recorded design targets exposes a
 branch discrepancy: atan2(-0, -1) returns negative float32(pi), whereas the
 previous implementation selected positive pi. Their sine residues have
 opposite signs. atan2(-0, +0) also selects negative half pi. The implementation

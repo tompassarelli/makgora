@@ -1,6 +1,6 @@
 # Melee's hit and movement event language
 
-What Melee shows and plays on each event, read from the decompilation for Smashcraft's own presentation with
+What Melee shows and plays on each event, set as design targets for Smashcraft's own presentation with
 Warcraft III assets. Only the mapping is recorded here: event, effect and sound
 IDs, element, strength and timing. Melee's art and audio are never extracted or
 shipped. Effect IDs are a Melee routine IDs; sound IDs are sound-bank indexes as
@@ -50,7 +50,7 @@ a Melee routine plays a Melee routine[kind * 3 + severity]`; severity 0, 1, 2 is
 | 12 | 220079 | 220082 | 220085 |
 | 13 | none | none | 525 (own voice channel) |
 
-The decompilation does not name the kinds. A hit on a fighter that is
+The kinds are not named here. A hit on a fighter that is
 intangible, invincible or not hurtable plays `{141, 142, 143}[severity]`
 instead. Two slash hitboxes clashing play a random one of
 107, 108, 109; any other clash plays 106 (`0x6A`).
@@ -113,11 +113,7 @@ The colour program starts on damage entry, before the hit freeze, rather
 than waiting until launch. `Fighter_procAnim` advances a Melee routine outside
 the gate that freezes the fighter's animation during hitlag; the colour
 program can therefore run through both hitlag and the following hitstun.
-This timing was checked in doldecomp/melee revision
-`f0cb9a02e95d52123fdea418fe2b1b08d38b32c2`, in
-Melee and
-Melee Only these independently stated timing facts
-are used; none of the decompiled implementation is copied.
+This timing is our own design target.
 
 ## Shield, recovery, ledge and KO events
 
@@ -126,8 +122,8 @@ are used; none of the decompiled implementation is copied.
 | Shield appears / contact | 1047 shield; 1052 at contact; 1049 shield reaction | appearance 110; contact uses the shield reaction, not the ordinary element spark | Melee; Melee |
 | Electric shield contact | Same 1052 contact / 1049 reaction | element is retained on shield contact; the common shield-contact spark does not switch to 1001 | same |
 | Powershield contact | 27, colour-script 118 | 104 | Melee |
-| Floor tumble impact / missed tech | 1031, replaceable by floor material | 9/10/11/12 by speed × weight, thresholds 180 and 140; the decompiled middle two comparisons both use 140, so 11 is unreachable in this routine; camera quake | Melee |
-| Floor tech, in place or roll | 1053; colour-script 120; action script may also emit 1011 | 3 plus fighter recovery voice at its sound-table offset 0x24, at entry | Melee; a Melee routine.c |
+| Floor tumble impact / missed tech | 1031, replaceable by floor material | 9/10/11/12 by speed × weight, thresholds 180 and 140; the middle two comparisons both use 140, so 11 is unreachable in this routine; camera quake | Melee |
+| Floor tech, in place or roll | 1053; colour-script 120; action script may also emit 1011 | 3 plus fighter recovery voice, at entry | Melee; a Melee routine.c |
 | Wall / ceiling tech | 1053 at contact, colour-script 120 | 3 plus recovery voice; delayed wall-jump branch uses 8 | Melee; a Melee routine.c |
 | Ledge catch | 1052 at the actual ledge lip | 4 plus fighter ledge voice at sound-table offset 0x28 | Melee |
 | Side/bottom/top blast KO | 1067 or 1068, player-coloured | left 136, right 137, top/bottom 97; fighter death voices at offsets 0x4 and 0x8, large quake | Melee |

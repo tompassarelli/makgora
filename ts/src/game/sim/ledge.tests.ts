@@ -186,7 +186,7 @@ test("the nearer of two contenders catches a ledge whatever their slot order, a 
   }
 });
 
-test("the ledge release regrab cooldown expires after thirty unfrozen ticks [k4 reference docs/smash-melee-reference/retail-roster.json]", () => {
+test("the ledge release regrab cooldown expires after thirty unfrozen ticks [k3 measure docs/physics.md]", () => {
   const fighter = ledgeTestFighter(Character.sylvanas, -1);
   const input = controls();
   catchTestLedge(fighter, input);

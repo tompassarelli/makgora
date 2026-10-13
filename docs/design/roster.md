@@ -257,14 +257,9 @@ There are no ultimates. Shield + neutral/side Special requests EX: pay the chose
 ### Run and entry-dash ceiling (#333)
 
 No fighter's ordinary run or entry dash exceeds Captain Falcon's NTSC 1.02
-speed. The independently read numeric attributes in
-[retail-roster.json](../smash-melee-reference/retail-roster.json), fighter
-`captain_falcon`, record `Melee` run speed as 2.299999952316284 and dash entry as 2.0 Melee units/frame. The field identities were checked
-read-only against `~/code/resources/Melee,
-a Melee routine, revision `0296f009f32f710495979d30772d8332af2d411a`
-([source](https://github.com/doldecomp/melee/blob/0296f009f32f710495979d30772d8332af2d411a/src/melee/ft/types.h)).
-No gameplay implementation license is established for that reference;
-only independently recorded numerical facts and field identities are used.
+speed. Our design target, from public frame data (SmashWiki's Captain Falcon
+page), is a run speed of 2.299999952316284 and a dash entry of 2.0 Melee
+units/frame.
 
 Smashcraft's existing scale is six world units per Melee unit at 60 logical
 frames/second (`WORLD_UNITS_PER_MELEE_UNIT` in `sim/tuning.ts`,

@@ -4,7 +4,7 @@ How safe a Melee aerial is against a shield is not a property of the move. It
 is arithmetic on the hit's shieldstun, the frames the attacker still has to
 fall, its landing lag, the defender's fastest out-of-shield option, and the
 spacing that decides whether that option reaches. This page derives each term
-from the decompilation (melee revision 0296f009f, NTSC 1.02) and works
+from public frame data (NTSC 1.02) and works
 examples. Per-move frame data, the cast-wide tables and pushback are in
 [Attacks](attacks.md#aerials-on-shield-by-timing-spacing-and-drift);
 conventions and sources are in the [README](README.md).
@@ -40,7 +40,7 @@ much more stun but more pushback and a smaller bubble
 (<!-- v:aos.agreeOffByOne -->6<!-- /v --> of the rest differ by one frame).
 Nothing can be done during it: a Melee routine is empty, so a press
 made then is not kept, and when the animation ends the fighter is back in
-Guard, whose interrupts (a Melee routine) read that frame's input.
+Guard, whose interrupts read that frame's input.
 
 Shieldstun grows with damage only. It is the same for ground and aerial
 attacks, and nothing about the hit's knockback, angle or element enters it.
@@ -79,7 +79,7 @@ Captain Falcon): the autocancel. An L, R or Z press within
 <!-- v:lcancel.window -->7<!-- /v --> frames before landing divides the lag by
 <!-- v:lcancel.divisor -->2<!-- /v -->, truncated, at least 1: the L-cancel.
 
-Fast fall (a Melee routine) replaces the fall speed with the fighter's
+Fast fall replaces the fall speed with the fighter's
 fast-fall speed once the hop is past its apex. It shortens *T*, so the same
 contact leaves fewer frames to fall. A short hop pressed with the aerial on its
 takeoff frame and fast-fallen at once is how an aerial hits as low as it can
@@ -87,7 +87,7 @@ early in a hop; a late press without fast fall hits low the other way.
 
 ### Out-of-shield options
 
-From a held shield (a Melee routine) a fighter can grab, jump, roll, spot
+From a held shield a fighter can grab, jump, roll, spot
 dodge or drop through a platform; dropping the shield costs the release lag in
 [Defence](defense.md#shield). The options that punish an aerial:
 
@@ -97,7 +97,7 @@ dodge or drop through a platform; dropping the shield costs the release lag in
   Guard, and a press during shieldstun is lost. Players hold the shield and
   press A on that frame; a grab pressed too early comes out as nothing.
 - **Jump out of shield.** A jump enters the jump squat (KneeBend), which can
-  still grab or up-smash (a Melee routine), and an aerial can start on the
+  still grab or up-smash, and an aerial can start on the
   takeoff frame. The aerial's hitbox therefore comes out on jump squat plus its
   startup. Fox's neutral air comes out on frame
   <!-- v:fox.oosNair -->7<!-- /v -->, one behind his grab on

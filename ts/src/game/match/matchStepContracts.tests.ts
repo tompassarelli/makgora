@@ -417,7 +417,7 @@ test("jumpSquatBuffersBackAirUntilFirstAirborneFrame [k3 measure docs/design/mel
     }
   }
 });
-test("dashGrabUsesTestActorTimingAndWindowIsReplayable [k4 reference docs/smash-melee-reference/surface-action-boundaries.md#grab-event-clock]", () => {
+test("dashGrabUsesTestActorTimingAndWindowIsReplayable [k3 measure docs/physics.md]", () => {
   const game = createMatchState();
   game.phase = Phase.match;
   const first = createFighter(1, 0, 1);
@@ -479,7 +479,7 @@ test("ordinaryDashAttackStaysAnAttackWhileGrabIntentStartsDashGrab [k3 measure d
   assertTrue(second.attack.dashGrab);
   assertEquals(second.attack.duration, attackDurationFramesForGrounding(5, true));
 });
-test("lateDashGrabGuardEntryOpensCatchDashAndEarlyEntryDoesNot [k4 reference docs/smash-melee-reference/retail-ground-movement-events.json]", () => {
+test("lateDashGrabGuardEntryOpensCatchDashAndEarlyEntryDoesNot [k3 measure docs/physics.md]", () => {
   const game = createMatchState();
   game.phase = Phase.match;
   const first = createFighter(1, 0, 1);
@@ -553,7 +553,7 @@ test("lateDashGrabGuardEntryOpensCatchDashAndEarlyEntryDoesNot [k4 reference doc
   stepMatch(dashLateGame, testRoster(dashLate, dashLateOther), testFrameControls(dashLateInput, dashLateOtherInput, dashLateCommands, dashLateOtherCommands), 1);
   assertEquals(dashLate.ground.dashGrabWindow, 3);
 });
-test("dashGrabWhiffEndsAfterFortySubsequentTicks [k4 reference docs/smash-melee-reference/surface-action-boundaries.md#dash-grab-completion-and-contact-bounds]", () => {
+test("dashGrabWhiffEndsAfterFortySubsequentTicks [k3 measure docs/physics.md]", () => {
   const game = createMatchState();
   game.phase = Phase.match;
   const first = createFighter(1, -240, 1);
@@ -589,7 +589,7 @@ test("dashGrabWhiffEndsAfterFortySubsequentTicks [k4 reference docs/smash-melee-
   assertGreaterThan(first.jump.squat, 0);
   assertEquals(second.grab.grabbedFrames, 0);
 });
-test("dashGrabSecondActiveTickCapturesButFollowingTickDoesNot [k4 reference docs/smash-melee-reference/surface-action-boundaries.md#grab-event-clock]", () => {
+test("dashGrabSecondActiveTickCapturesButFollowingTickDoesNot [k3 measure docs/physics.md]", () => {
   for (let lateByOne = 0; lateByOne <= 1; lateByOne++) {
     const game = createMatchState();
     game.phase = Phase.match;

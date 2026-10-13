@@ -92,7 +92,7 @@ Do not occupy or restart peer-owned clients to obtain this result.
 
 The current candidate includes 56 original DI vectors. The emitted-Lua check
 observes all 56 matching
-vectors; see smashcraft:docs/smash-melee-reference/retail-di-vector.json for the
+vectors; see the recorded design targets for the
 original execution boundary and limitations.
 
 
@@ -163,7 +163,7 @@ authored fighter dimensions are preserved. No reference implementation was
 copied and no recorded expectation changed.
 
 The focused check compiled the production packages plus the output of
-smashcraft:tools/physics-probe/generate-capsule-probe.mjs, then ran only
+a retired probe, then ran only
 `init_CapsuleShieldPrecisionProbe` through the existing Lua test shim.
 All 508 classifications passed in Lua 5.3; compilation reported zero errors
 and zero warnings. It used compiler `6b129956f6e7cf9582510f26b99d305526bf3ded`,

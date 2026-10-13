@@ -60,7 +60,7 @@
   invariants or agreement), `[k2 property]` (a property over a pure core),
   `[k3 measure #N]` or `[k3 measure docs/<path>.md]` (an owner-decided number,
   citing the issue or an existing doc), `[k4 reference <source>]` (an external
-  reference: `melee`, `melee-decomp`, `lua32`, `wurst`, `native`, …) or
+  reference: `melee`, `lua32`, `wurst`, `native`, …) or
   `[k5 boundary <name>]` (one integration check per real boundary, each name
   once in the suite). Keep a test only if it fits one of these kinds and
   kills a mutant that no other kept test kills; otherwise it is scaffolding.

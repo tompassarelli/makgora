@@ -50,7 +50,7 @@ launch and 0.0024999999441206455 for recoil. They are computed once at package
 initialization. Using rounded d² instead would disagree on two recorded cases.
 Changing the common decay constants requires revisiting this bounded identity.
 
-smashcraft:docs/smash-melee-reference/retail-air-cutoff-boundaries.json records
+the recorded design targets records
 eighteen vectors around the boundaries. Independently authored PPC square/sum
 arithmetic supplies the input; the unchanged original refinement block executes
 under QEMU PPC750, with only its return boundary patched in a private executable.
@@ -60,7 +60,7 @@ executed branch described below. This is not execution of the complete original 
 The error argument covers permissible hardware estimate variation separately;
 it does not claim that QEMU reproduces the Gekko estimate itself.
 
-The historical smashcraft:tools/physics-probe/generate-air-cutoff-probe.mjs
+The historical a retired probe
 checked the bound and exact boundary inequalities, then generated production
 movement assertions from the corpus. The TypeScript checks now live in
 smashcraft:ts/src/game/sim/physicsPrecisionMotion.tests.ts. The original
@@ -72,7 +72,7 @@ The replacement removes this rule's dependence on the native SquareRoot result.
 
 ## State updates below the cutoff
 
-smashcraft:docs/smash-melee-reference/retail-air-recoil-cutoff-state.json records
+the recorded design targets records
 four executions of the original post-root comparison and below-cutoff stores,
 starting at  with supplied rounded roots strictly below retail recoil
 decay. The only return patch is at . A synthetic common pointer supplies

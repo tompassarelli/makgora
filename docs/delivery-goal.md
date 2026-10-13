@@ -28,10 +28,11 @@ stay.
 
 ## Reference-grounded combat
 
-Use the pinned local Melee decompile to establish complete relevant rules:
-conditions, state transitions, frame ordering, animation/event timing,
-protection, collision/grounding, and interruption behavior. Follow references
-into common parameters and character/action data where the code consumes them.
+Establish complete relevant rules (conditions, state transitions, frame
+ordering, animation/event timing, protection, collision/grounding and
+interruption behavior) from public frame data and from watching the game, never
+from the decompilation or Melee's own files (README "Respecting Blizzard's and
+Nintendo's IP"). Write each rule as our own design target.
 Extract factual mechanics; do not copy or translate unlicensed implementation.
 
 Resolve each system's connected behavior before declaring it complete. Use

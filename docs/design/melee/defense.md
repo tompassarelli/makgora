@@ -29,16 +29,16 @@ starts a powershield, which reflects projectiles and, against attacks, keeps
 the shield's health and pushes the defender back harder. Shieldstun is
 unchanged; the reward is a 4-frame counter (a Melee routine,
 common ``) that lets an attack or grab cut the shield drop short
-(a Melee routine) (smashcraft:docs/melee-powershield.md).
+ (smashcraft:docs/melee-powershield.md).
 
 From a held shield the fighter can grab, jump, roll, spot-dodge or drop through
 a platform it stands on (a Melee routine; the platform drop is
 a Melee routine, shield held with the stick pressed down). Jumping enters the
 jump squat, which can still grab, up-smash or start a rapid jab
-(a Melee routine), and leaves the ground into any aerial. Letting go of
+, and leaves the ground into any aerial. Letting go of
 the shield plays a release of <!-- v:shield.release -->15<!-- /v --> frames (otherwise
 <!-- v:shield.releaseOthers -->Bowser 16, Captain Falcon 16, Ganondorf 16, Jigglypuff 14, Marth 16, Mewtwo 16, Mr. Game & Watch 16, Peach 14, Roy 16, Samus 16, Yoshi 16 and Zelda 14<!-- /v -->) during which
-only a jump or a spot dodge is accepted (a Melee routine), unless a
+only a jump or a spot dodge is accepted, unless a
 powershield has just landed. Which of these punishes what is in
 [Attacks](attacks.md#punish-windows-out-of-shield).
 
@@ -58,7 +58,7 @@ dodge's travel is the basis of the wavedash
 A hit freezes both fighters in hitlag: the defender's lasts
 the whole part of (damage × <!-- v:hitlag.perDamage -->0.33<!-- /v --> + <!-- v:hitlag.base -->3<!-- /v -->) frames, times <!-- v:hitlag.electric -->1.5<!-- /v --> for
 electric hits and <!-- v:hitlag.crouch -->0.67<!-- /v --> for a crouching defender,
-at most <!-- v:hitlag.cap -->20<!-- /v --> (a Melee routine). The defender has
+at most <!-- v:hitlag.cap -->20<!-- /v -->. The defender has
 three ways to change the outcome during and at the end of that freeze:
 
 - **Directional influence (DI).** When hitlag ends, the stick rotates the launch
@@ -68,12 +68,12 @@ three ways to change the outcome during and at the end of that freeze:
   at least <!-- v:sdi.stick -->0.70<!-- /v --> from centre that has newly moved within the
   last <!-- v:sdi.window -->4<!-- /v --> frames moves the fighter
   <!-- v:sdi.step -->6<!-- /v --> units times the stick
-  (a Melee routine). Each shift resets the stick's timers, so every
+. Each shift resets the stick's timers, so every
   shift needs a fresh stick movement; alternating the stick can give one on
   every frame.
 - **Automatic SDI (ASDI).** When hitlag ends, a stick or C-stick held at least
   <!-- v:sdi.stick -->0.70<!-- /v --> moves the fighter <!-- v:asdi.step -->3<!-- /v --> units
-  times it once (a Melee routine).
+  times it once.
 
 SDI's reach grows with hitlag, so the strongest and the electric hits let the
 defender travel farthest. With one fresh input on every frame and the ASDI at
@@ -111,7 +111,7 @@ all intangible. A missed tech knocks the fighter down; it may lie for up to
 <!-- v:knockdown.wait -->220<!-- /v --> frames, then get up in place, roll either
 way or attack. Hits totalling less than <!-- v:jabReset.damage -->7<!-- /v --> damage
 on a downed fighter replay a short damage animation instead of launching it
-(a Melee routine): the jab reset, which forces a get-up.
+: the jab reset, which forces a get-up.
 
 ## Ledges
 
@@ -133,7 +133,7 @@ the intangible frames a perfect ledgedash keeps, from
 A grab ignores the shield. The grabbed fighter's escape timer starts higher the
 more damage it has, by <!-- v:grab.perPercent -->1.6<!-- /v --> frames per percent, and
 falls by <!-- v:grab.decrement -->1<!-- /v --> each frame plus <!-- v:grab.mash -->6<!-- /v --> for each mash input
-(a Melee routine). The release itself happens only in the held state
-(a Melee routine): a hit during the hold puts the victim in a damage
+. The release itself happens only in the held state
+: a hit during the hold puts the victim in a damage
 state that keeps counting the timer down but cannot release it. Wobbling and
 some chain grabs follow from that ([Techniques](techniques.md#wobbling)).

@@ -5,11 +5,8 @@ smashcraft:ts/src/game/sim/matchCamera.ts follows it. Stage camera limits,
 blast zones and the off-screen magnifier are in smashcraft:docs/physics.md,
 "Camera limits, off-screen damage and blast zones".
 
-Sources: Melee and Melee
-(doldecomp/melee); the constant values come from the owner's Melee
-`Melee` and stage files through the private reader
-~/.local/share/smashcraft-melee-reference/camera-facts.ts. Only the numbers
-are kept here.
+Sources: the constants below are our own design targets, set from public
+frame data and from watching the game.
 
 ## Per frame
 

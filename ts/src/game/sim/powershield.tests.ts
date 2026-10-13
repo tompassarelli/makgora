@@ -25,7 +25,7 @@ import { respawnFighter } from "./stocks";
 import { advanceSolo, contactBatch, controls, hitEffect, testWorld } from "./testWorld";
 import { WORLD_UNITS_PER_MELEE_UNIT } from "./tuning";
 
-test("pressure to a full press honors the two-frame input window [k4 reference docs/smash-melee-reference/retail-powershield-clock.json]", () => {
+test("pressure to a full press honors the two-frame input window [k3 measure docs/physics.md]", () => {
   const fighter = createFighter(Character.rifleman, 0.0, 1);
   const input = controls({ shieldTriggerActive: true });
   advanceSolo(fighter, 0, input, 0.0);
@@ -49,7 +49,7 @@ test("pressure to a full press honors the two-frame input window [k4 reference d
   assertEquals(late.shield.reflectFrames, 0);
 });
 
-test("the reflector uses the authored circle and transfers a scaled projectile [k4 reference docs/smash-melee-reference/retail-powershield-clock.json]", () => {
+test("the reflector uses the authored circle and transfers a scaled projectile [k3 measure docs/physics.md]", () => {
   const shooter = createFighter(Character.rifleman, -30.0, 1);
   const defender = createFighter(Character.rifleman, 0.0, -1);
   const shot = mutableProjectile(shooter, 0)!;
@@ -93,7 +93,7 @@ test("the reflector uses the authored circle and transfers a scaled projectile [
   assertEquals(f32(shooter.status.damage * 2), baselineDefender.status.damage);
 });
 
-test("perfect-shield pushback matches the original contact observations [k4 reference docs/smash-melee-reference/retail-powershield-contact.json]", () => {
+test("perfect-shield pushback matches the original contact observations [k3 measure docs/physics.md]", () => {
   assertEquals(shieldContactPushback(3.0, 0.4000000059604645, true), f32(1.0210000276565552 * WORLD_UNITS_PER_MELEE_UNIT));
   assertEquals(shieldContactPushback(10.0, 0.4000000059604645, true), f32(2.0 * WORLD_UNITS_PER_MELEE_UNIT));
   assertEquals(shieldContactPushback(30.0, 0.4000000059604645, true), f32(2.0 * WORLD_UNITS_PER_MELEE_UNIT));
@@ -187,7 +187,7 @@ test("a red parry, a re-press in shieldstun on the next hit's frame or the one b
   }
 });
 
-test("original stationary capsule shield boundaries [k4 reference docs/smash-melee-reference/retail-shield-capsule.json]", () => {
+test("original stationary capsule shield boundaries [k3 measure docs/physics.md]", () => {
   assertEquals(capsuleCircleIntersects(0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0), true);
   assertEquals(capsuleCircleIntersects(2.0, 0.0, 2.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0), true);
   assertEquals(capsuleCircleIntersects(2.999999761581421, 0.0, 2.999999761581421, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0), false);
@@ -202,7 +202,7 @@ test("original stationary capsule shield boundaries [k4 reference docs/smash-mel
   assertEquals(capsuleCircleIntersects(4.0, 0.0, 4.0, 0.0, 1.0, 0.0, 0.0, 2.0, 1.0), false);
 });
 
-test("original swept capsule shield boundaries [k4 reference docs/smash-melee-reference/retail-shield-capsule.json]", () => {
+test("original swept capsule shield boundaries [k3 measure docs/physics.md]", () => {
   assertEquals(capsuleCircleIntersects(-5.0, 0.0, 5.0, 0.0, 1.0, 0.0, 0.0, 2.0, 1.0), true);
   assertEquals(capsuleCircleIntersects(5.0, 0.0, -5.0, 0.0, 1.0, 0.0, 0.0, 2.0, 1.0), true);
   assertEquals(capsuleCircleIntersects(-5.0, 3.0, 5.0, 3.0, 1.0, 0.0, 0.0, 2.0, 1.0), true);
@@ -213,7 +213,7 @@ test("original swept capsule shield boundaries [k4 reference docs/smash-melee-re
   assertEquals(capsuleCircleIntersects(5.0, 4.0, -5.0, 4.0, 1.0, 0.0, 0.0, 2.0, 1.0), false);
 });
 
-test("original scaled capsule shield boundaries [k4 reference docs/smash-melee-reference/retail-shield-capsule.json]", () => {
+test("original scaled capsule shield boundaries [k3 measure docs/physics.md]", () => {
   assertEquals(capsuleCircleIntersects(2.5, 0.0, 2.5, 0.0, 0.5, 0.0, 0.0, 2.0, 1.0), true);
   assertEquals(capsuleCircleIntersects(3.0, 0.0, 3.0, 0.0, 0.5, 0.0, 0.0, 2.0, 1.0), false);
   assertEquals(capsuleCircleIntersects(4.0, 0.0, 4.0, 0.0, 0.5, 0.0, 0.0, 2.0, 1.0), false);
@@ -222,7 +222,7 @@ test("original scaled capsule shield boundaries [k4 reference docs/smash-melee-r
   assertEquals(capsuleCircleIntersects(4.0, 0.0, 4.0, 0.0, 2.0, 0.0, 0.0, 2.0, 1.0), true);
 });
 
-test("original asymmetric capsule rounding and radius conversion [k4 reference docs/smash-melee-reference/retail-shield-capsule-boundaries.jsonl]", () => {
+test("original asymmetric capsule rounding and radius conversion [k3 measure docs/physics.md]", () => {
   assertEquals(capsuleCircleIntersects(0.2273183912038803, 1.8602772951126099, 2.7224481105804443, 7.7711381912231445, 0.0, 0.0, 0.0, 1.8741145133972168, 1.0), true);
   assertEquals(capsuleCircleIntersects(9.86154556274414, -6.86391019821167, -5.6012959480285645, 7.704383373260498, 0.0, 0.0, 0.0, 1.7665791511535645, 1.0), true);
   assertEquals(capsuleCircleIntersects(8.760266304016113, 6.5879974365234375, -8.983579635620117, -8.832010269165039, 0.0, 0.0, 0.0, 0.7736536860466003, 1.0), false);
@@ -231,7 +231,7 @@ test("original asymmetric capsule rounding and radius conversion [k4 reference d
   assertEquals(capsuleCircleIntersects(0.822984516620636, 3.0610923767089844, 9.638368606567383, 9.857255935668945, 0.0, 0.0, 0.0, 3.1697933673858643, 1.0), true);
 });
 
-test("an original scaled shield keeps its local radius separate from the joint scale [k4 reference docs/smash-melee-reference/retail-shield-capsule-scaled-counterexamples.json]", () => {
+test("an original scaled shield keeps its local radius separate from the joint scale [k3 measure docs/physics.md]", () => {
   assertEquals(
     capsuleCircleIntersects(3.7672877311706543, 3.8061885833740234, -1.257254958152771, -5.283233642578125, 0.3639150559902191, 0.0, 0.0, 1.8986871242523193, 0.5750000476837158),
     true,
@@ -242,7 +242,7 @@ test("an original scaled shield keeps its local radius separate from the joint s
   );
 });
 
-test("an original scaled shield's translation rounds matrix products before adding the translation [k4 reference docs/smash-melee-reference/retail-shield-capsule-scaled-translated.json]", () => {
+test("an original scaled shield's translation rounds matrix products before adding the translation [k3 measure docs/physics.md]", () => {
   assertEquals(
     capsuleCircleIntersects(81.35445404052734, -22.855464935302734, 83.38614654541016, -24.975975036621094, 0.38011103868484497, 80.125, -23.75, 1.9831877946853638, 0.5750000476837158),
     false,

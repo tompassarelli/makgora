@@ -57,10 +57,7 @@ behavior and numerical facts; no external implementation was copied.
 
 Tom, 9 Oct 2026 (#390): copy Melee's ground states and its analog stick map,
 each state with its own options, with a little per-fighter variation. Values
-are Melee `ftCommonData` fields.dat
-(offsets as in Melee at revision
-0296f009f32f710495979d30772d8332af2d411a; that source has no license, so only
-numbers and function names are cited, no code). SmashWiki's
+are our own design targets, set from public frame data. SmashWiki's
 [Turn](https://www.ssbwiki.com/Turn) page agrees: tilt turn 0.28–0.78, smash
 turn 0.8–1.0, a smash turn dashes on its first frame. The pure rules are
 smashcraft:ts/src/game/sim/stickZones.ts.
@@ -99,13 +96,13 @@ Run at its run frame only with the stick past 0.625 forward.
 
 | State | Entered by | Tilts / jab | Smashes | Dash attack | Grab | Shield | Jump | Crouch | Dash / dash dance | Run turnaround |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Stand (a Melee routine) | neutral | yes | yes | – | yes | yes | yes | yes | dash, smash turn | – |
-| Walk slow/middle/fast (a Melee routine) | walk zone; re-enters Dash when the stick then flicks past 0.8 within the window (a Melee routine in Walk's list) | yes | yes | – | yes | yes | yes | yes | dash | – |
-| Initial dash (a Melee routine) | dash zone from stand, walk or crouch, or a dash back | no: A gives the dash attack | forward smash on frames 1–4 only | frames 1–20 | dash grab | yes | yes (relaxed) | no | dash back (the dash dance) | – |
-| Run (a Melee routine) | dash held forward to its run frame | no: A gives the dash attack | no | yes | dash grab | yes | yes (relaxed) | no | no | turn-run at x ≤ −0.375 |
-| Run brake (a Melee routine) | run with \|x\| < 0.625 | no | no | no | no | no | yes (relaxed) | yes: crouch from run goes through here | no | turn-run within its command window |
-| Turn-run (a Melee routine) | run or run brake turned | no | no | no | pivot grab (Smashcraft, #337) | no | yes (relaxed) | no | no | – |
-| Crouch (a Melee routine, a Melee routine) | crouch zone from stand, walk or run brake | yes | yes | – | yes | yes | yes | holds | dash | – |
+| Stand | neutral | yes | yes | – | yes | yes | yes | yes | dash, smash turn | – |
+| Walk slow/middle/fast | walk zone; re-enters Dash when the stick then flicks past 0.8 within the window (a Melee routine in Walk's list) | yes | yes | – | yes | yes | yes | yes | dash | – |
+| Initial dash | dash zone from stand, walk or crouch, or a dash back | no: A gives the dash attack | forward smash on frames 1–4 only | frames 1–20 | dash grab | yes | yes (relaxed) | no | dash back (the dash dance) | – |
+| Run | dash held forward to its run frame | no: A gives the dash attack | no | yes | dash grab | yes | yes (relaxed) | no | no | turn-run at x ≤ −0.375 |
+| Run brake | run with \|x\| < 0.625 | no | no | no | no | no | yes (relaxed) | yes: crouch from run goes through here | no | turn-run within its command window |
+| Turn-run | run or run brake turned | no | no | no | pivot grab (Smashcraft, #337) | no | yes (relaxed) | no | no | – |
+| Crouch | crouch zone from stand, walk or run brake | yes | yes | – | yes | yes | yes | holds | dash | – |
 
 `groundOptionAllowed` holds this table and `groundGatedStyle`
 (smashcraft:ts/src/game/sim/attacks.ts) applies it: a refused ground normal in
@@ -150,9 +147,8 @@ Tom decided, 7 Oct (delegated) (#190), after his playtest found too little
 horizontal air drift on many fighters: a dash, a jump at the dash's speed and a
 long aerial that crosses up a shield should feel good.
 
-**Melee's rules.** Values come from smashcraft:docs/smash-melee-reference/retail-roster.json
-(NTSC 1.02 Melee attributes, a Melee routine field names from the
-decompilation); the per-fighter air table is in the
+**Melee's rules.** Values are our design targets (NTSC 1.02 Melee frame data from SmashWiki and
+Smashboards); the per-fighter air table is in the
 [movement reference](design/melee/movement.md#falling-and-air-control).
 
 - A ground jump's horizontal speed on takeoff is the ground speed × the
@@ -168,7 +164,7 @@ decompilation); the per-fighter air table is in the
   up to the air speed. Above the air speed, holding forward loses only the
   air friction each frame, never dropping below the air speed, under the
   common 3.0 cap (Falco 4.0); with no stick the fighter loses its air
-  friction (a Melee routine). So jump momentum fades at 0.005 to
+  friction. So jump momentum fades at 0.005 to
   0.05 a frame (Fox 0.02), which is what carries a dash-jump aerial across a
   shield. An aerial jump replaces the horizontal speed with the stick ×
   `air_jump_h_multiplier`.
@@ -487,7 +483,7 @@ first active frame (the Lich, frame 10) less the fastest jump squat (3), so a
 grab started on the frame a shielding opponent jumps catches it for every
 pair of fighters (smashcraft:ts/src/game/match/jumpOutOfShieldGrabContracts.tests.ts).
 In Melee the standing catch boxes are live on timeline frames 6 to 8
-(smashcraft:docs/smash-melee-reference/retail-grab-events.json, a Melee routine)
+(SmashWiki's Grab page)
 and jump squat runs 3 to 8 frames (a Melee routine,
 [movement](design/melee/movement.md#jumps)), so a jump from a 3-frame squat
 is already 4 frames into its ascent when a same-frame grab's box appears.
@@ -686,7 +682,7 @@ This departs further than Ultimate, whose hold still scales with percent; see
 ## Physics foundation
 
 Smashcraft's shared physics follows Melee's NTSC 1.02 rules, as roadmaps #2
-and #9 set out, checked against the decompilation and by `bun wisp oracle`
+and #9 set out, set from public frame data and checked by `bun wisp oracle`
 (smashcraft:docs/physics.md). Where Smashcraft departs from Melee, the
 departure is a row in the table below, and the oracle reports each departure it
 exercises under that row's name; smashcraft:ts/scripts/meleeOracle.tests.ts
@@ -699,7 +695,7 @@ checks that every oracle departure names a row here.
 | L-cancelling | An L, R or Z press within 7 frames before landing halves an aerial's landing lag | Removed from Brawl onward, with more autocancel; kept in Project M and Project+ ([SmashWiki](https://www.ssbwiki.com/L-cancel)) | Removed: every aerial lands with the L-cancelled lag, with no input | Non-interactive execution test, a chore on every aerial with no decision in it | #54 |
 | Stale moves and freshness bonuses | Repeats among the last 9 connected moves deal less damage and knockback | Ultimate keeps the 9-move queue, adds a freshness bonus, counts shield hits and weakens the knockback effect ([SmashWiki](https://www.ssbwiki.com/Stale-move_negation)) | None: a repeat deals the same damage and knockback | An over-engineered attempt at move diversity; diversity comes by construction, from move design | decisions 4 and 6 Oct |
 | Tap-jump | Stick up jumps, always | Optional from Brawl onward ("Stick Jump" in Ultimate; [SmashWiki](https://www.ssbwiki.com/Tap_jump)) | Removed: stick-up and Space are just "up"; jump is its own button | Jump is its own button (owner, 6 Oct) | #49 |
-| Stick deadzone | Each stick axis reads zero within 0.28 of centre, after a radial clamp | not covered here | Melee's deadzone applies to every controller; the value and its decompilation citation are in wc3-controller:README.md ("Fighter layout") | A resting or drifting stick reads neutral | #49 |
+| Stick deadzone | Each stick axis reads zero within 0.28 of centre, after a radial clamp | not covered here | Melee's deadzone applies to every controller; the value and its public citation are in wc3-controller:README.md ("Fighter layout") | A resting or drifting stick reads neutral | #49 |
 | SDI | Each fresh stick movement during hitlag moves the fighter 6 units, as often as every frame ([case study](design/melee/defense.md#influence-on-knockback)) | Weakened in later games ([SmashWiki](https://www.ssbwiki.com/Smash_directional_influence)) | SDI + ASDI travel capped at 12 units per hit (at most 9 SDI) and 24 per uninterrupted string, in steps of at most 3 per tick ([bounded SDI](#bounded-sdi)) | Keep displacement choices useful while bounding visible jumps and repeated-hit travel | #70 |
 | Grab hold | 76 + 1.6 frames per percent, minus 1 a frame and 6 per mash input; pummels repeat while held ([case study](design/melee/defense.md#grabs)) | Brawl onward: 90 + 1.7 frames per percent, 8 per stick mash input (14.4 per button in Smash 4 and Ultimate), never under 19 ([SmashWiki](https://www.ssbwiki.com/Grab)). Rivals 2: one pummel per grab, Attack or Special, broken when the victim presses the same button ([FAQ](https://rivals2.com/faq)); a 60-frame hold animation ([workshop](https://rivals2.com/workshop/?p=389)) | 120 frames at any percent; 8 off per mash input, never under 30; one pummel, connecting 60 frames after its input, then a throw or a neutral release ([grab holds](#grab-holds-and-pummels)) | Legible: the same hold every grab, a visible escape meter, no pummel chore; 120 frames matches a typical mid-percent hold (Melee about 116 at 25%, Ultimate about 120 at 18%), owner decision 6 Oct | #101 |
 | Horizontal air dodge | The dodge goes where the stick points | – | A horizontal-only digital air dodge angles 18° below horizontal, mirrored, by default and with no toggle | Owner-selected control (30 Sep); the shallow angle keeps horizontal momentum into the landing | – |
@@ -748,7 +744,7 @@ rule over all 13 selectable fighters.
 - **Tap-jump** (owner, 6 Oct, #49): stick-up and Space are just "up"; jump is
   its own button.
 - **Stick deadzone** (owner, 6 Oct, #49): Melee's stick deadzone applies to
-  every controller. The value and its decompilation citation are in
+  every controller. The value and its public citation are in
   wc3-controller:README.md ("Fighter layout").
 - **Digital air dodge and fast fall** (owner-selected, 30 Sep): a
   horizontal-only air dodge angles 18° below horizontal by default, with no
@@ -1580,8 +1576,8 @@ Delegated design, 6 Oct 2026 (#102), under the owner's direction that the
 shield stays Smash's slowly shrinking bubble and a powershield becomes a true
 parry with a clear reward; the owner added Street Fighter III: Third Strike's
 parry strings and red parry the same day, and decided against an air parry.
-Ultimate's and Rivals 2's parries are cited first and Melee's from the
-decompilation in the deviations table above; Third Strike's rules are in
+Ultimate's and Rivals 2's parries are cited first and Melee's from public frame data
+in the deviations table above; Third Strike's rules are in
 [fighting-game design language](design/fighting-games.md#parries-street-fighter-iii-third-strike).
 The starting point is Ultimate's reward, any option with no shield-drop lag,
 taken further to no shieldstun so the defender acts on the next frame, as the

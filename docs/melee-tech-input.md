@@ -1,9 +1,9 @@
 # Retail tech input timing
 
-Numerical observations: smashcraft:docs/smash-melee-reference/retail-tech-input-driver.json
-and smashcraft:docs/smash-melee-reference/retail-tech-hitlag-input.json.
-Authored loaders: smashcraft:tools/physics-probe/observe-tech-input-driver.mjs
-and smashcraft:tools/physics-probe/observe-tech-hitlag.mjs.
+Numerical observations: the recorded design targets
+and the recorded design targets.
+Authored loaders: a retired probe
+and a retired probe.
 
 The revision-identified NTSC 1.02 input driver at  and tech gate at
  execute under QEMU PPC750 with synthetic fighter state and controller
