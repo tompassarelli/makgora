@@ -17,9 +17,9 @@ import { pollUntil } from "../hostPoll";
 import { currentHelper } from "./currentPlaytest";
 
 export const CONTROLLER_LAUNCHER = join(homedir(), ".local/share/smashcraft-build-inputs/controller/wc3-journal");
-export const SERVICE_LAUNCHER = join(homedir(), ".local/share/wc3-controller/bin/wc3-controller");
+export const SERVICE_LAUNCHER = join(homedir(), ".local/share/padbridge/bin/padbridge");
 export const SERVICE_ARGS = ["--service", "--plugin", CONTROLLER_LAUNCHER];
-export const CONTROLLER_UNIT = "wc3-controller.service";
+export const CONTROLLER_UNIT = "padbridge.service";
 export const CONTROLLER_STATUS = join(homedir(), ".local/state/padbridge/service.txt");
 export const CONTROLLER_LOG = join(homedir(), ".local/state/padbridge/service.log");
 
