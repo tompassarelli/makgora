@@ -1,5 +1,10 @@
 # Play current Smashcraft
 
+Players download the map from [Hive Workshop](https://www.hiveworkshop.com/)
+(the link is a placeholder until the Smashcraft upload is available). Put it
+in the Warcraft III Maps folder and open it from Custom Games. The GitHub
+repositories contain code only; maps are distributed on Hive Workshop.
+
 `bun wisp play --standalone` opens Smashcraft in the Wisp browser player,
 with Illidan against a Wren Expert Rifleman over the normal three stocks and
 seven-minute clock. Keyboard controls and the browser's gamepad controls enter

@@ -353,10 +353,23 @@ which the map imports from private build inputs (never Git) at the archive
 paths their authors' readmes name (smashcraft:ts/src/game/assets/importedModelInfo.ts).
 The map's description carries the same credits.
 
-- The Lich King model by Kwaliti (Hive Workshop): LichKing2, its portrait,
-  textures and command icons
-  (https://www.hiveworkshop.com/threads/the-lich-king.154837/,
-  https://www.hiveworkshop.com/threads/btnlichking.154846/).
+- The [Lich King model by Kwaliti](https://www.hiveworkshop.com/threads/the-lich-king.154837/)
+  (Hive Workshop): LichKing2, its portrait, textures and
+  [command icons](https://www.hiveworkshop.com/threads/btnlichking.154846/),
+  used with credit as the author permits.
+
+Source terms read on 13 October 2026: the model resource identifies Kwaliti,
+`LichKing2.mdx` and `LichKing2_Portrait.mdx`, and asks users to give credit.
+Kwaliti's [23 January 2025 usage statement](https://www.hiveworkshop.com/profile-posts/951524/)
+on the [author's Hive profile](https://www.hiveworkshop.com/members/kwaliti.136001/)
+permits free use of the author's work in any way, with credit to the author
+and Hive Workshop as the original source. The relevant terms are:
+
+> “use my stuff freely whichever way you see fit”
+> “Just credit me & the Hive as the original source.”
+
+The map description credits Kwaliti and Hive Workshop; the repositories keep
+these assets outside Git in private build inputs.
 
 The individual hero sections below specify all attacks. Their counterplay descriptions are acceptance goals to test, not claims established by these numbers.
 

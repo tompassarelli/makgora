@@ -12,7 +12,11 @@ Warcraft III is still a great platform for custom games, and Melee's movement an
 combat remain the model for the platform fighter. Smashcraft brings that
 depth to Warcraft III's heroes, with the rollback netcode that online play needs.
 
-There is no public release yet. How to play: [player guide](docs/player-guide.md).
+Download the map from [Hive Workshop](https://www.hiveworkshop.com/)
+(the link is a placeholder until the Smashcraft upload is available).
+How to play: [player guide](docs/player-guide.md).
+The GitHub repositories contain code only; maps are distributed on Hive Workshop,
+not committed to Git or attached to GitHub releases.
 The desktop client (controller, play, history, stats, replays, online) is
 [smashcraft-client](https://github.com/tompassarelli/smashcraft-client); it
 reads Smashcraft through the [client interface](docs/client-interface.md).
@@ -22,13 +26,15 @@ Status and next work: [roadmap #16](https://github.com/tompassarelli/smashcraft/
 
 Smashcraft is an independent fan game inspired by Super Smash Bros. Melee, not
 affiliated with or endorsed by Blizzard Entertainment or Nintendo. It is
-written entirely from scratch and works alongside a copy of Warcraft III you
-own; it never replaces or redistributes the game.
+built with our own code and animations on Warcraft III's unit models, alongside
+the community model credited below. The map plays only inside your own copy of
+Warcraft III; it never replaces the game.
 
-- **Respect copyright and publisher IP.** Nothing of Blizzard's or Nintendo's
-  (code, art, sound, data, game scripts or in-game text) is in this repository
-  or ships with Smashcraft. Art loads at run time from your own Warcraft III
-  install.
+- **Respect copyright and publisher IP.** The map uses Warcraft III's own
+  models with animations we authored. The repositories contain no extracted
+  Blizzard files: models, textures, sounds, data, scripts or in-game text.
+  Build inputs stay private, outside Git, and Nintendo's code and assets are
+  neither in the repositories nor shipped with Smashcraft.
 - **Learn by observation.** Behaviour is measured from the outside: what
   Warcraft III shows, plays, logs and writes, and the traffic of LAN games we
   host, plus public documentation. Melee's feel comes from public frame data
@@ -65,6 +71,14 @@ Where to look next:
 - [Documentation index](docs/README.md): how the game and its systems work.
 - [Wisp feature index](https://github.com/tompassarelli/wisp/blob/main/docs/index.md):
   framework capabilities and opt-in diagnostics.
+
+## Credits
+
+The [Lich King model by Kwaliti](https://www.hiveworkshop.com/threads/the-lich-king.154837/)
+(Hive Workshop), used with credit as the author permits. Kwaliti's
+[usage terms](https://www.hiveworkshop.com/profile-posts/951524/) allow free use
+and require credit to Kwaliti and Hive Workshop as the original source.
+[Model credits and source terms](docs/design/roster.md#credits) record the details.
 
 ## License
 
