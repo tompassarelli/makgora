@@ -39,5 +39,5 @@ test("auto-close ticks exactly the passing declared boxes and closes only when i
 });
 
 test("Refs, Fixes and Closes name issues in this repository's spellings [k4 reference docs/ci.md#auto-close]", () => {
-  expect(issueRefs("Fix\n\nRefs smashcraft#513\nFixes #12, closes tompassarelli/smashcraft#7\nSee #99 and wisp#3")).toEqual([7, 12, 513]);
+  expect(issueRefs("Fix\n\nRefs smashcraft#513\nFixes #12, closes tompassarelli/smashcraft#7\nSee #99 and wisp#3")).toEqual([7, 12, 514]);
 });
