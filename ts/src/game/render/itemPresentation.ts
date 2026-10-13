@@ -1,11 +1,12 @@
 import { f32 } from "wisp/src/sim/f32";
+import { idiv } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { ITEM_HEIGHT, itemWarningFrames } from "../match/centreItem";
 import { type MatchState, Phase } from "../match/rules";
-import { ItemKind } from "../sim/codes";
+import { Character, ItemKind, SpecialAction } from "../sim/codes";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { mainDeckZAt } from "../sim/stage";
-import { ITEM_MODELS, type ItemColor, itemBlinkOff, itemColor, itemTelegraphAlpha, itemTelegraphScale } from "../presentation/itemLook";
+import { AVATAR_ALPHA, AVATAR_COLOR, AVATAR_MODEL, AVATAR_SECONDS, ITEM_MODELS, type ItemColor, itemBlinkOff, itemColor, itemTelegraphAlpha, itemTelegraphScale } from "../presentation/itemLook";
 import { hideEffect, type WorldOrigin } from "./effects";
 
 
@@ -23,11 +24,14 @@ interface Carrier {
   readonly ring: effect;
   readonly trail: effect;
   readonly shell: effect;
+  readonly avatar: effect | undefined;
   readonly pickup: Burst;
   readonly end: Burst;
   buffFrames: number;
   kind: number;
   shown: boolean;
+  avatarBuff: boolean;
+  avatarShown: boolean;
 }
 
 function create(path: string, origin: Readonly<WorldOrigin>): effect {
@@ -61,11 +65,14 @@ export class ItemPresentation {
       ring: create(ITEM_MODELS.glow, origin),
       trail: create(ITEM_MODELS.speedTrail, origin),
       shell: create(ITEM_MODELS.heavyPickup, origin),
+      avatar: create(AVATAR_MODEL, origin),
       pickup: { model: create(ITEM_MODELS.burst, origin), start: 0, shown: false },
       end: { model: create(ITEM_MODELS.end, origin), start: 0, shown: false },
       buffFrames: 0,
       kind: ItemKind.none,
       shown: false,
+      avatarBuff: false,
+      avatarShown: false,
     }));
   }
 
@@ -139,6 +146,9 @@ export class ItemPresentation {
       if (fighter !== undefined && carrier.buffFrames > 0 && carrier.buffFrames <= 3 && buffFrames === 0 && !fighter.status.out) this.fire(carrier.end, frame, x, z + 30.0, f32(0.9), itemColor(carrier.kind));
       this.settle(carrier.pickup, frame, playing);
       this.settle(carrier.end, frame, playing);
+      if (buffFrames <= 0 || buff !== ItemKind.heavy || picked === slot) carrier.avatarBuff = false;
+      else if (fighter?.character === Character.mountainKing && fighter.special.action === SpecialAction.heroUltimate) carrier.avatarBuff = true;
+      const avatar = carrier.avatarBuff && fighter?.special.action !== SpecialAction.heroUltimate;
       if (buffFrames > 0) {
         const color = itemColor(buff);
         const fade = itemBlinkOff(buffFrames) ? 70 : 255;
@@ -150,7 +160,20 @@ export class ItemPresentation {
           paint(carrier.trail, color);
           BlzSetSpecialEffectAlpha(carrier.trail, fade);
         } else hideEffect(carrier.trail, this.origin);
-        if (buff === ItemKind.heavy) {
+        if (avatar && carrier.avatar !== undefined) {
+          this.place(carrier.avatar, x, z, 1.0);
+          BlzSetSpecialEffectYaw(carrier.avatar, fighter !== undefined && fighter.facing < 0 ? f32(3.14159274) : 0.0);
+          if (!carrier.avatarShown) BlzSetSpecialEffectAnimation(carrier.avatar, "spell");
+          BlzSetSpecialEffectTime(carrier.avatar, AVATAR_SECONDS);
+          BlzSetSpecialEffectTimeScale(carrier.avatar, 0.0);
+          paint(carrier.avatar, AVATAR_COLOR);
+          BlzSetSpecialEffectAlpha(carrier.avatar, itemBlinkOff(buffFrames) ? idiv(AVATAR_ALPHA, 2) : AVATAR_ALPHA);
+          carrier.avatarShown = true;
+        } else if (carrier.avatar !== undefined && carrier.avatarShown) {
+          hideEffect(carrier.avatar, this.origin);
+          carrier.avatarShown = false;
+        }
+        if (buff === ItemKind.heavy && !carrier.avatarBuff) {
           this.place(carrier.shell, x, z + 10.0, 1.0);
           paint(carrier.shell, HEAVY_SHELL);
           BlzSetSpecialEffectAlpha(carrier.shell, fade);
@@ -161,6 +184,8 @@ export class ItemPresentation {
         hideEffect(carrier.ring, this.origin);
         hideEffect(carrier.trail, this.origin);
         hideEffect(carrier.shell, this.origin);
+        if (carrier.avatar !== undefined) hideEffect(carrier.avatar, this.origin);
+        carrier.avatarShown = false;
         carrier.shown = false;
       }
       carrier.buffFrames = buffFrames;

@@ -80,3 +80,8 @@ export const ITEM_MODELS = {
   speedTrail: "Abilities\\Spells\\Undead\\Cripple\\CrippleTarget.mdx",
   end: "Abilities\\Spells\\NightElf\\Blink\\BlinkCaster.mdx",
 } as const;
+
+export const AVATAR_MODEL = "Abilities\\Spells\\Human\\Avatar\\AvatarCaster.mdx";
+export const AVATAR_SECONDS = f32(0.3);
+export const AVATAR_COLOR: ItemColor = { red: 150, green: 150, blue: 165 };
+export const AVATAR_ALPHA = 150;
