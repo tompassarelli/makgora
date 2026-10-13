@@ -34,6 +34,19 @@ after the move ends, so line 2 measures the transition the game draws.
    and character independently. Every judged line must be at least 4/5.
    An unjudged move has no passing line 5.
 
+`anim score` also writes `build/anim-score/classic-crouch.tsv` and
+`build/anim-score/definitive-crouch.tsv`: each fighter's crouch pose-contrast
+line (#376). It holds down for 40 frames (the 24-frame crouch clip, then its held
+last frame) after 30 standing frames, then compares the drawn crouch with the
+drawn stand: the height ratio of the two bodies and one minus their silhouette
+IoU at gameplay scale, both printed to three decimals. A crouch passes at a
+height ratio of at most 0.85 and a contrast of at least 0.25 (the aerial
+readability contrast); these initial values are Tom's to tune. The `clip`
+column names the sequence the pose draws for the crouch: `no clip` marks a
+fighter whose pose falls back to its stand, and `pass*`/`FAIL*` mark one that
+draws another clip (such as Spell Slam) as its crouch. Neither counts as a
+passing crouch.
+
 The silhouette centre is a visible mass proxy, rather than a physical
 mass-weighted centre. Missing limb names use body travel; the stored `limb`
 column makes this inspectable. The independent weight judgement catches

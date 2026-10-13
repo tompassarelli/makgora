@@ -19,8 +19,8 @@ import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../../../src/ga
 import { createMatchCamera, MATCH_CAMERA_ASPECT } from "../../../src/game/sim/matchCamera";
 import { FROZEN_THRONE_STAGE } from "../../../src/game/sim/stage";
 import { runProcess } from "../../hostProcess";
-import { type MoveScore, THRESHOLDS, scoreMove } from "../animScore";
-import { type Look, type SampledMove, loadBody, sampleFighter } from "../animScoreSample";
+import { CROUCH_THRESHOLDS, type MoveScore, THRESHOLDS, scoreCrouch, scoreMove } from "../animScore";
+import { type CrouchClipKind, type Look, type SampledMove, gameplayPixelsPerUnit, loadBody, sampleCrouch, sampleFighter } from "../animScoreSample";
 import { assetsView, readManifest } from "../buildInputs";
 import { headlessRender } from "../headlessRender";
 import { projectRoot } from "../project";
@@ -103,6 +103,8 @@ const lines = (row: Row) => row.judged === undefined ? 4 : 5;
 const worstFirst = (a: Row, b: Row) => (lines(b) - passCount(b)) - (lines(a) - passCount(a)) || b.score.shortfall - a.score.shortfall || a.fighter.localeCompare(b.fighter) || a.move.localeCompare(b.move);
 const mark = (pass: boolean) => (pass ? "pass" : "FAIL");
 const n = (value: number) => value.toFixed(2);
+const n3 = (value: number) => value.toFixed(3);
+const crouchVerdict = (row: { readonly pass: boolean; readonly kind: CrouchClipKind }) => row.kind === "none" ? "no clip" : row.kind === "other" ? (row.pass ? "pass*" : "FAIL*") : mark(row.pass);
 
 const HEADER = ["fighter", "move", "class", "passed", "shortfall", "L1", "body share", "mass shift", "limb", "L2", "end error", "jump", "overshoot", "L3", "windup", "peak", "settle", "fill", "first active", "last active", "end", "L4", "contrast", "IoU windup/contact", "IoU contact/recovery", "L5", "judges", "lowest", "readability", "weight", "anticipation", "follow-through", "character", "Melee reference", "ref start", "ref total"];
 function tsvRow(row: Row): string {
@@ -191,6 +193,19 @@ const score: Command = (args) => Effect.gen(function*() {
     yield* Console.log(`${fighter.padEnd(18)} ${count((row) => row.score.line1.pass && row.score.line2.pass && row.score.line3.pass && row.score.line4.pass)}/${own.length} all  L1 ${count((row) => row.score.line1.pass)}  L2 ${count((row) => row.score.line2.pass)}  L3 ${count((row) => row.score.line3.pass)}  L4 ${count((row) => row.score.line4.pass)}  L5 ${count((row) => row.judged !== undefined && row.judged.lowest >= JUDGE_PASS)}/${count((row) => row.judged !== undefined)} judged`);
   }
   yield* Console.log(`${rows.length} rows; ${relative(projectRoot, table)}`);
+
+  const crouches = yield* Effect.forEach(fighters, (character) => attempt(`crouch ${fighterSlug(character)}`, async () => {
+    const { stand, crouch, clip, kind } = sampleCrouch(await loadBody(assets, character, look), character);
+    return { fighter: fighterSlug(character), clip, kind, ...scoreCrouch(stand, crouch, gameplayPixelsPerUnit()) };
+  }));
+  const crouchTable = join(TABLE_DIRECTORY, `${look}-crouch.tsv`);
+  const keptCrouch = yield* attempt(`read ${crouchTable}`, async () => (await Bun.file(crouchTable).exists()) ? (await Bun.file(crouchTable).text()).trim().split("\n").slice(1) : []);
+  const otherCrouch = flags.has("--fighter") ? keptCrouch.filter((line) => !chosen.has(line.split("\t")[0] ?? "")) : [];
+  const crouchLines = [...otherCrouch, ...crouches.map((row) => [row.fighter, crouchVerdict(row), row.clip, n3(row.heightRatio), n3(row.contrast)].join("\t"))].sort((a, b) => a.localeCompare(b));
+  yield* attempt(`write ${crouchTable}`, () => Bun.write(crouchTable, `fighter\tcrouch\tclip\theight ratio\tcontrast\n${crouchLines.join("\n")}\n`));
+  yield* Console.log(`\ncrouch (held crouch beside stand; pass: height ratio <= ${CROUCH_THRESHOLDS.height}, contrast >= ${CROUCH_THRESHOLDS.contrast}):`);
+  for (const row of crouches) yield* Console.log(`${row.fighter.padEnd(22)} ${crouchVerdict(row).padEnd(9)} clip ${row.clip.padEnd(24)} height ${n3(row.heightRatio)} contrast ${n3(row.contrast)}`);
+  yield* Console.log(`${crouches.filter((row) => row.pass && row.kind === "crouch").length}/${crouches.length} crouches pass (no clip: standing pose is the crouch; *: another clip stands in for a crouch clip); ${relative(projectRoot, crouchTable)}`);
 }).pipe(Effect.provide(BunServices.layer));
 
 

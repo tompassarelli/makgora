@@ -2,8 +2,8 @@
 
 
 import { join } from "node:path";
-import { originalClip } from "../../src/game/assets/fighterOriginalClipInfo";
-import { advanceFighterPose, createFighterPose } from "../../src/game/presentation/fighterPose";
+import { originalClip, originalClipNames } from "../../src/game/assets/fighterOriginalClipInfo";
+import { CROUCH_CLIP_FRAMES, advanceFighterPose, createFighterPose } from "../../src/game/presentation/fighterPose";
 import { extremeCamera } from "../../src/game/presentation/arenaCamera";
 import { characterModelScale } from "../../src/game/presentation/modelScale";
 import { beginFighterAttack, resolveAttacks } from "../../src/game/sim/attacks";
@@ -267,6 +267,45 @@ export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, charac
     move: entry.move, endFrame: moveFrames - 1, seconds: frames.map((frame) => timelineSeconds(character, frame)), heights: frames.map((frame) => frame.z),
     sample: { moveClass: "special", frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, strike, pixelsPerUnit },
   };
+}
+
+
+export type CrouchClipKind = "crouch" | "other" | "none";
+
+export interface CrouchSample {
+  readonly stand: ScoreFrame;
+  readonly crouch: ScoreFrame;
+  readonly clip: string;
+  readonly kind: CrouchClipKind;
+}
+
+const CROUCH_HOLD_FRAMES = CROUCH_CLIP_FRAMES + 16;
+
+function clipLabel(character: Character, index: number | undefined): string {
+  if (index === undefined) return "none";
+  const names = [...originalClipNames(character)].filter(([, at]) => at === index).map(([name]) => name);
+  return names.find((name) => /crouch/i.test(name)) ?? names[0] ?? `#${index}`;
+}
+
+export function sampleCrouch(model: DrawnModel, character: Character): CrouchSample {
+  const f = createFighter(character, 0.0, 1);
+  const world = createRoster(1, [f]);
+  const p = createFighterPose();
+  const hold = (down: boolean, frames: number) => {
+    const input = { ...neutralControls(), down };
+    let frame = capture(f, p);
+    for (let tick = 0; tick < frames; tick++) {
+      step(world, input);
+      advanceFighterPose(p, f, world, input, false, false, false, false);
+      frame = capture(f, p);
+    }
+    return { scored: pose(model, character, frame), clip: frame.clip };
+  };
+  const stand = hold(false, 30);
+  const crouch = hold(true, CROUCH_HOLD_FRAMES);
+  const clip = clipLabel(character, crouch.clip);
+  const kind = crouch.clip === stand.clip ? "none" : /crouch/i.test(clip) ? "crouch" : "other";
+  return { stand: stand.scored, crouch: crouch.scored, clip, kind };
 }
 
 

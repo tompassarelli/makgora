@@ -126,6 +126,17 @@ export function bodyHeight(ready: ScoreFrame): number {
 }
 
 
+export const CROUCH_THRESHOLDS = { height: 0.85, contrast: 0.25 } as const;
+
+export interface CrouchScore { readonly pass: boolean; readonly heightRatio: number; readonly contrast: number }
+
+export function scoreCrouch(stand: ScoreFrame, crouch: ScoreFrame, pixelsPerUnit: number): CrouchScore {
+  const height = bodyHeight(stand), heightRatio = bodyHeight(crouch) / height;
+  const contrast = 1 - maskIoU(silhouette(stand, pixelsPerUnit, height * 1.6), silhouette(crouch, pixelsPerUnit, height * 1.6));
+  return { pass: heightRatio <= CROUCH_THRESHOLDS.height && contrast >= CROUCH_THRESHOLDS.contrast, heightRatio, contrast };
+}
+
+
 export function meanVertexDistance(a: ScoreFrame, b: ScoreFrame): number {
   let sum = 0, count = 0;
   const vertices = Math.min(a.drawn.length, b.drawn.length);
