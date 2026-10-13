@@ -52,6 +52,7 @@
     "test/genre-envelope.test.ts",
     "test/headless.ts",
     "test/live-agency.test.ts",
+    "test/map-edition.test.ts",
     "test/platform-advantage.test.ts",
     "test/playtest.test.ts",
     "test/powershield-reflect.test.ts",
