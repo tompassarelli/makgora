@@ -29,7 +29,7 @@ export const KAELTHAS_MOVES: FighterMoves = {
       [AttackStyle.downTilt]: reach(5, 11, 42.0, 18.0), [AttackStyle.dashAttack]: reach(8, 15, 42.0, 48.0),
       [AttackStyle.forwardSmash]: reach(10, 19, 42.0, 60.0), [AttackStyle.upSmash]: reach(15, 25, 16.0, 122.0),
       [AttackStyle.downSmash]: reach(17, 26, 42.0, 20.0), [AttackStyle.neutralAir]: reach(6, 16, 34.0, 64.0),
-      [AttackStyle.forwardAir]: reach(6, 12, 42.0, 62.0), [AttackStyle.backAir]: reach(10, 16, -44.0, 62.0),
+      [AttackStyle.forwardAir]: reach(6, 12, 42.0, 62.0), [AttackStyle.backAir]: [heroHurtPose(10, 23, [torso, hurtPart(8, 94, -52, 62, 16)])],
       [AttackStyle.upAir]: reach(8, 15, 12.0, 120.0), [AttackStyle.downAir]: reach(12, 20, 12.0, -20.0),
       [AttackStyle.grab]: reach(6, 11, 48.0, 54.0),
     },
