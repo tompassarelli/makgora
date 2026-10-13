@@ -89,9 +89,8 @@ const JAB_ARM = hurtPart(10.0, 66.0, f32(SHORT - 10.0), 60.0, 10.0);
 const GRAB_ARM = hurtPart(10.0, 56.0, f32(GRAB - 12.0), 40.0, 12.0);
 
 
-const BOOT_TIP = -f32(MEDIUM - 11.0);
-const BOOT = hurtPart(-8.0, 42.0, BOOT_TIP, 30.0, 11.0);
-const HALF_BOOT = hurtPart(-8.0, 42.0, f32(BOOT_TIP * f32(0.6)), 36.0, 11.0);
+const BOOT = hurtPart(-8, 42, -89, 30, 11);
+const HALF_BOOT = hurtPart(-8, 42, -54, 36, 11);
 
 const FORSAKEN_PALADIN_HURTBOXES: FighterHurtboxes = {
   stand: [FORSAKEN_PALADIN_TORSO],
@@ -100,6 +99,7 @@ const FORSAKEN_PALADIN_HURTBOXES: FighterHurtboxes = {
     [AttackStyle.jab2]: [heroHurtPose(4, 11, [FORSAKEN_PALADIN_TORSO, JAB_ARM])],
     [AttackStyle.grab]: [heroHurtPose(6, 14, [FORSAKEN_PALADIN_TORSO, GRAB_ARM])],
     ...groundPoses(FORSAKEN_PALADIN_GROUND, forsakenPaladinReach),
+    [AttackStyle.upTilt]: [heroHurtPose(8, 15, [FORSAKEN_PALADIN_TORSO, hurtPart(6, 88, 10, 133, 10)])],
     [AttackStyle.forwardSmash]: [heroHurtPose(18, 26, forsakenPaladinReach(48.0, 60.0))],
     [AttackStyle.upSmash]: [heroHurtPose(15, 24, forsakenPaladinReach(8.0, 140.0))],
     [AttackStyle.downSmash]: [heroHurtPose(14, 19, forsakenPaladinReach(44.0, 26.0)), heroHurtPose(20, 25, forsakenPaladinReach(-44.0, 26.0))],
