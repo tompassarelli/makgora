@@ -8,7 +8,7 @@ import { HERO_REFERENCE_HEIGHT, heroRegion } from "../heroMoves";
 import { type AuthoredSpecial, type FighterSpecials, type SpecialProjectile, frames } from "../heroSpecials";
 import { CHILL } from "../chill";
 import { HitElement } from "../codes";
-import { hit, lichCastBody } from "./lichMoves";
+import { hit, lichCastBody, LICH_FROST_NOVA_BODY, LICH_DECAY_BODY } from "./lichMoves";
 
 const h = (fraction: number): number => f32(HERO_REFERENCE_HEIGHT * fraction);
 
@@ -32,7 +32,7 @@ const FROST_NOVA_BURST: SpecialProjectile = {
 const frostNova = (landingLag: number | undefined): AuthoredSpecial => ({
   endFrame: 39,
   landingLag,
-  hurt: lichCastBody(14, 24, 28.0, CHEST),
+  hurt: LICH_FROST_NOVA_BODY,
   projectiles: [FROST_NOVA_ORB],
 });
 
@@ -60,7 +60,7 @@ const decayStrike = (activeFrom: number, life: number, damage: number, kind: "PO
 const DEATH_AND_DECAY: AuthoredSpecial = {
   endFrame: 50,
   landingLag: AIR_LANDING_LAG,
-  hurt: lichCastBody(5, 14, 28.0, f32(CHEST + 12.0)),
+  hurt: LICH_DECAY_BODY,
   projectiles: [decayStrike(23, 62, 6.23394775390625, "POKE", 80), decayStrike(63, 90, 11.221104621887207, "LAUNCH", 70)],
 };
 
