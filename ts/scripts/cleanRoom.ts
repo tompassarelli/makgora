@@ -21,7 +21,7 @@ export interface Line { readonly path: string; readonly line: number; readonly t
 export function reachProblems(lines: readonly Line[]): string[] {
   return lines.filter(({ path }) => !REACH_EXEMPT.includes(path)).flatMap(({ path, line, text }) => REACH_RULES
     .filter(({ pattern }) => pattern.test(text))
-    .map(({ name }) => `clean room: ${path}:${line} has ${name}. Measure from outside the game instead (README "Respecting Blizzard's and Nintendo's IP").`));
+    .map(({ name }) => `clean room: ${path}:${line} has ${name}. Measure from outside the game instead (README "Principles").`));
 }
 
 const reach = (root: string) => Effect.promise(async () => {
