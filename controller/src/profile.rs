@@ -12,9 +12,9 @@
 //! also publishes menus. Its ready file `CustomMapData/wc3-melee-ready.txt`,
 //! written at fighter selection, names the build and its keyboard profile: that
 //! session plays on keys, so the service runs no helper and presses the
-//! fighter layout itself (wc3-controller's `any_map::Mode::Keys`).
+//! fighter layout itself (padbridge's `any_map::Mode::Keys`).
 
-use wc3_controller::{
+use padbridge::{
     model,
     service::{Game, Helper, HelperEvent, Line, Pad, Profile, Session, Target},
 };
@@ -333,7 +333,7 @@ mod tests {
         }
         profile.tracker.observe(documents, Menu { phase: "STAGE".into(), modified: now - Duration::from_secs(30), ..menu("b", 0, 1, 0) });
         assert!(profile.pointer_menu());
-        use wc3_controller::{model::{Button, InputView}, service::any_map::{Driver, MenuCurve, Output}};
+        use padbridge::{model::{Button, InputView}, service::any_map::{Driver, MenuCurve, Output}};
         #[derive(Default)]
         struct Recorded(Vec<(String, bool)>);
         impl Output for Recorded {

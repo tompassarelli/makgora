@@ -43,7 +43,7 @@ const clientsFile = values["clients-file"];
 const matches = Number(values.matches);
 if (pair === undefined || helper === undefined || map === undefined || clientsFile === undefined || out === undefined
   || (route !== "keys" && route !== "cursor") || !Number.isInteger(matches) || matches < 1) {
-  return yield* analogFailure("Use --pair N --clients-file FILE --helper WC3_CONTROLLER --map MAP --route keys|cursor --out DIR --app-id NAME=ID twice [--matches 20] [--plan]");
+  return yield* analogFailure("Use --pair N --clients-file FILE --helper PADBRIDGE --map MAP --route keys|cursor --out DIR --app-id NAME=ID twice [--matches 20] [--plan]");
 }
 const appIds = yield* Effect.try({ try: () => new Map(values["app-id"]?.map(entry => {
   const [name, id] = entry.split("=");

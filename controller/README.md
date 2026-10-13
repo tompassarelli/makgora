@@ -1,11 +1,11 @@
 # Smashcraft controller plug-in
 
-Smashcraft's controller support is [wc3-controller](https://github.com/tompassarelli/wc3-controller)
+Smashcraft's controller support is [padbridge](https://github.com/tompassarelli/padbridge)
 (the always-on service, the fighter layout, Any map, the status model) plus this
 plug-in: `wc3-journal`, built from this folder, which reports Smashcraft
 sessions to the service (`wc3-journal --plugin`) and is the journal helper that
-serves them. The pinned wc3-controller version is the `tag` in
-`smashcraft:controller/Cargo.toml` (and the client's `wc3-controller-model`
+serves them. The pinned padbridge version is the `rev` in
+`smashcraft:controller/Cargo.toml` (and the client's `padbridge-model`
 dependency); move both together.
 
 ## Build and run
@@ -19,14 +19,14 @@ nix-shell -p stdenv.cc cmake pkg-config libxkbcommon udev --run 'cargo test --lo
 ```
 
 `bun wisp controller` (smashcraft:docs/commands/controller.md) builds both
-pieces and restarts the login unit `wc3-controller.service`, which runs
+pieces and restarts the login unit `padbridge.service`, which runs
 
 ```sh
-~/.local/share/wc3-controller/bin/wc3-controller --service \
+~/.local/share/padbridge/bin/padbridge --service \
   --plugin ~/.local/share/smashcraft-build-inputs/controller/wc3-journal
 ```
 
-`smashcraft:controller/tests/service.rs` runs wc3-controller's service with
+`smashcraft:controller/tests/service.rs` runs padbridge's service with
 this plug-in program over its real protocol: a virtual pad, a fake session
 through a new map session and a game restart.
 
@@ -46,7 +46,7 @@ publishes menu phases too: its ready file `CustomMapData/wc3-melee-ready.txt` na
 the build and `INPUT keyboard-d2-r24` (the development build uses `INPUT callback`). Newer than the game's start and any different build's menu,
 it is a Smashcraft session on keys (`session=BUILD/keys/N`): the service
 runs no helper, uses the pointer in fighter, stage and results menus, and presses the pad's keys during matches through the same mapper as
-`wc3-controller --emit` (the default melee layout: A n, B u, X/Y i, RB o, LT q, RT 7; tom: A n, B o, X u, Y i, LB z, RB x (meter), LT q, RT 7;
+`padbridge --emit` (the default melee layout: A n, B u, X/Y i, RB o, LT q, RT 7; tom: A n, B o, X u, Y i, LB z, RB x (meter), LT q, RT 7;
 Start y, left stick w/r/e/space, right stick b/m/j/h, plus p when the right stick is set to Tilt attacks so it tilts and throws aerials), into the game's window
 while niri focuses it. Focus loss releases them, and nothing presses again
 until the pad is neutral. The status reads `state=serving` once that output runs.
@@ -60,7 +60,7 @@ with deflection to the power 1.7, and at full tilt crosses the game window
 in one second. It runs only while the map keeps publishing an open menu
 (CHARACTER, CPU, STAGE or RESULT, refreshed every 250 ms) and the helper reports no
 match, and stops within 100 ms of the map publishing BLOCKED for play, where
-the fighter layout applies unchanged (wc3-controller:src/service/any_map.rs,
+the fighter layout applies unchanged (padbridge:src/service/any_map.rs,
 `MenuCurve`; model::menu_pointer_bindings).
 
 The assigned offline client's menu check uses
@@ -241,7 +241,7 @@ requires `--x11-window DECIMAL_ID`, `--pid PID`, and exactly one foreground
 adapter: `--niri-window ID` or `--private-wlr-app-id ID`. The latter uses the
 selected private desktop's `XDG_RUNTIME_DIR` and `WAYLAND_DISPLAY`. These are
 the same process/window/compositor checks used by the mapper, implemented in
-wc3-controller:src/focus.rs and wc3-controller:src/wlr.rs. Missing or
+padbridge:src/focus.rs and padbridge:src/wlr.rs. Missing or
 failed target identity is an error; ordinary focus loss suspends keyboard output.
 
 Focus loss leaves assigned rows and queued I4/ACK1/JP1 records in order. A logical

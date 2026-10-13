@@ -1,5 +1,5 @@
 use super::*;
-use wc3_controller::{model::{Button, Control, ControllerSettings, InputView, PadKind, PadPreset, Press, RightStick}, service::any_map::{Driver, MenuCurve, Output}};
+use padbridge::{model::{Button, Control, ControllerSettings, InputView, PadKind, PadPreset, Press, RightStick}, service::any_map::{Driver, MenuCurve, Output}};
 
 struct Preset {
     name: String,
@@ -12,7 +12,7 @@ struct Preset {
 fn contract() -> &'static [Preset] {
     static CONTRACT: std::sync::OnceLock<Vec<Preset>> = std::sync::OnceLock::new();
     CONTRACT.get_or_init(|| {
-        let path = match std::env::var_os("WC3_CONTROLLER_CONTRACT") {
+        let path = match std::env::var_os("PADBRIDGE_CONTRACT") {
             Some(path) => PathBuf::from(path),
             None => {
                 let metadata = std::process::Command::new("cargo")
@@ -21,7 +21,7 @@ fn contract() -> &'static [Preset] {
                 assert!(metadata.status.success(), "cannot resolve the pinned controller contract");
                 let metadata: serde_json::Value = serde_json::from_slice(&metadata.stdout).unwrap();
                 let package = metadata["packages"].as_array().unwrap().iter()
-                    .find(|package| package["name"] == "wc3-controller").unwrap();
+                    .find(|package| package["name"] == "padbridge").unwrap();
                 Path::new(package["manifest_path"].as_str().unwrap()).parent().unwrap().join("contract/bindings.json")
             }
         };
@@ -45,7 +45,7 @@ fn contract() -> &'static [Preset] {
                 if right_stick == RightStick::Tilt && matches!(binding.control, Control::RightLeft | Control::RightRight | Control::RightUp | Control::RightDown) { keys.push("p".into()); }
                 fight.insert(binding.control, keys);
             }
-            let menus = wc3_controller::service::any_map::menu_bindings(true).into_iter()
+            let menus = padbridge::service::any_map::menu_bindings(true).into_iter()
                 .map(|binding| (binding.control, outputs(binding.press))).collect();
             Preset { name: format!("{} right-stick {}", pad_preset.name(), right_stick.name()), settings, fight, menus, map_rows }
         }).collect()
@@ -122,7 +122,7 @@ fn generated_fighter_inputs_follow_the_models_shipped_contract_rows() {
             for _ in 0..cases {
                 let magnitude = 29_491 + (random(&mut seed) % 3277) as i16;
                 let (pad, _) = input(control, magnitude);
-                let mut driver = Driver::keys_for(&preset.settings, wc3_controller::pad_ingress::Route::Digital);
+                let mut driver = Driver::keys_for(&preset.settings, padbridge::pad_ingress::Route::Digital);
                 let mut out = Desktop::default();
                 driver.step(&InputView::default(), true, 0.0, &mut out).unwrap();
                 driver.step(&pad, true, 0.0, &mut out).unwrap();

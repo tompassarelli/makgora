@@ -25,7 +25,7 @@ import { START_MATCH_BUTTON } from "../../src/game/ui/stageUi";
 const fail = (operation: string) => (cause: { readonly message: string }) => new AcceptFailure({ operation, problem: cause.message });
 
 export const measureStartGate = (clientsFile: string, name: string, directory: string, restart: Effect.Effect<void, AcceptFailure>) => Effect.gen(function*() {
-  const helperPath = process.env["SMASHCRAFT_GATE_HELPER"] ?? join(homedir(), ".local/bin/wc3-controller");
+  const helperPath = process.env["SMASHCRAFT_GATE_HELPER"] ?? join(homedir(), ".local/bin/padbridge");
   const helperSha256 = yield* Effect.try({
     try: () => { mkdirSync(directory, { recursive: true, mode: 0o700 }); return createHash("sha256").update(readFileSync(helperPath)).digest("hex"); },
     catch: cause => new AcceptFailure({ operation: "start gate helper", problem: String(cause) }),

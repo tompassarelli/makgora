@@ -342,6 +342,36 @@ dependencies = [
 ]
 
 [[package]]
+name = "padbridge"
+version = "0.3.6"
+source = "git+https://github.com/tompassarelli/padbridge?rev=c4b13ca8f03dd73a8b3d414c5c899aade55c46a9#c4b13ca8f03dd73a8b3d414c5c899aade55c46a9"
+dependencies = [
+ "ctrlc",
+ "enigo",
+ "evdev",
+ "libc",
+ "objc2-app-kit",
+ "objc2-core-foundation",
+ "padbridge-model",
+ "sdl3",
+ "serde",
+ "serde_json",
+ "wayland-client",
+ "wayland-protocols-wlr",
+ "windows",
+ "x11rb 0.14.0",
+]
+
+[[package]]
+name = "padbridge-model"
+version = "0.3.6"
+source = "git+https://github.com/tompassarelli/padbridge?rev=c4b13ca8f03dd73a8b3d414c5c899aade55c46a9#c4b13ca8f03dd73a8b3d414c5c899aade55c46a9"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "pkg-config"
 version = "0.3.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -556,8 +586,8 @@ dependencies = [
  "enigo",
  "evdev",
  "libc",
+ "padbridge",
  "serde_json",
- "wc3-controller",
 ]
 
 [[package]]
@@ -668,36 +698,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d8eab23fefc9e41f8e841df4a9c707e8a8c4ed26e944ef69297184de2785e3be"
 dependencies = [
  "pkg-config",
-]
-
-[[package]]
-name = "wc3-controller"
-version = "0.3.6"
-source = "git+https://github.com/tompassarelli/wc3-controller?tag=v0.3.6#4ab1f4148f7d3f81d581e87bf979590775663f56"
-dependencies = [
- "ctrlc",
- "enigo",
- "evdev",
- "libc",
- "objc2-app-kit",
- "objc2-core-foundation",
- "sdl3",
- "serde",
- "serde_json",
- "wayland-client",
- "wayland-protocols-wlr",
- "wc3-controller-model",
- "windows",
- "x11rb 0.14.0",
-]
-
-[[package]]
-name = "wc3-controller-model"
-version = "0.3.6"
-source = "git+https://github.com/tompassarelli/wc3-controller?tag=v0.3.6#4ab1f4148f7d3f81d581e87bf979590775663f56"
-dependencies = [
- "serde",
- "serde_json",
 ]
 
 [[package]]

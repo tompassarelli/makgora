@@ -74,7 +74,7 @@ const clientsFile = values["clients-file"];
 const single = pair === "tom";
 const niriWindow = values["niri-window"];
 if (pair === undefined || helper === undefined || map === undefined || clientsFile === undefined || out === undefined) {
-  return yield* padCutFailure("Use --pair N --clients-file FILE --helper WC3_CONTROLLER --map MAP --out DIR --app-id NAME=ID twice [--plan]");
+  return yield* padCutFailure("Use --pair N --clients-file FILE --helper PADBRIDGE --map MAP --out DIR --app-id NAME=ID twice [--plan]");
 }
 if (single && (niriWindow === undefined || !/^[1-9]\d*$/.test(niriWindow))) return yield* padCutFailure("The authorized Tom run needs its exact --niri-window ID");
 const script = yield* Schema.decodeUnknownEffect(Schema.Struct({

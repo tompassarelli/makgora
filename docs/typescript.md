@@ -598,7 +598,7 @@ From smashcraft:ts/:
   source. smashcraft:ts/test/tune.test.ts applies tuned gravity in two
   headless clients: both install it on the same frame, and from that frame
   both matches change alike. The input helper's stick deadzone
-  (`STICK_DEADZONE`, wc3-controller:src/stick.rs) is compiled into the
+  (`STICK_DEADZONE`, padbridge:src/stick.rs) is compiled into the
   helper, outside what a reload changes, so it is no tunable: rebuild and
   restart the helper to change it. A match with tuned values can't be
   replayed from its inputs alone.

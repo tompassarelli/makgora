@@ -51,7 +51,7 @@ const run = (args: readonly string[]) => Effect.gen(function*() {
     "clients-file": { type: "string" }, client: { type: "string" }, "app-id": { type: "string" },
     "frame-one-ns": { type: "string" }, observe: { type: "boolean" },
   } }), catch: failure });
-  if (values.script === undefined || values.helper === undefined || values.out === undefined) return yield* new KeyboardPadFailure({ problem: "requires --script FILE --helper wc3-controller --out DIR" });
+  if (values.script === undefined || values.helper === undefined || values.out === undefined) return yield* new KeyboardPadFailure({ problem: "requires --script FILE --helper padbridge --out DIR" });
   const scriptPath = values.script;
   const out = values.out;
   const plan = yield* Effect.tryPromise({ try: async () => keyboardPadPlan(await Bun.file(scriptPath).text()), catch: failure });

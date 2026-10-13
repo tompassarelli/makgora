@@ -17,7 +17,7 @@ const SettingsSchema = Schema.Struct({
 const StatusSchema = Schema.Struct({ status: Schema.Struct({ settings: Schema.Struct({ pad_preset: LayoutSchema }) }) });
 
 export type Layout = typeof LAYOUTS[number];
-export const controllerSettingsPath = () => join(process.env.XDG_CONFIG_HOME ?? join(homedir(), ".config"), "wc3-controller/settings.json");
+export const controllerSettingsPath = () => join(process.env.XDG_CONFIG_HOME ?? join(homedir(), ".config"), "padbridge/settings.json");
 
 const fail = (problem: string) => new PlayProblem({ problem });
 const readJsonLine = Schema.decodeUnknownOption(Schema.fromJsonString(Schema.Unknown));
@@ -47,7 +47,7 @@ const sendLive = (layout: Layout, port: number) =>
   );
 
 
-export const setControllerLayout = (layout: Layout, path = controllerSettingsPath(), port = Number(process.env.WC3_CONTROLLER_PORT ?? 47631)) =>
+export const setControllerLayout = (layout: Layout, path = controllerSettingsPath(), port = Number(process.env.PADBRIDGE_PORT ?? 47631)) =>
   Effect.gen(function*() {
     if (yield* sendLive(layout, port)) return "live" as const;
     const text = yield* Effect.try({ try: () => existsSync(path) ? readFileSync(path, "utf8") : "{}", catch: (cause) => fail(`couldn't read ${path}: ${String(cause)}`) });

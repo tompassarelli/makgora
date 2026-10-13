@@ -20,8 +20,8 @@ export const CONTROLLER_LAUNCHER = join(homedir(), ".local/share/smashcraft-buil
 export const SERVICE_LAUNCHER = join(homedir(), ".local/share/wc3-controller/bin/wc3-controller");
 export const SERVICE_ARGS = ["--service", "--plugin", CONTROLLER_LAUNCHER];
 export const CONTROLLER_UNIT = "wc3-controller.service";
-export const CONTROLLER_STATUS = join(homedir(), ".local/state/wc3-controller/service.txt");
-export const CONTROLLER_LOG = join(homedir(), ".local/state/wc3-controller/service.log");
+export const CONTROLLER_STATUS = join(homedir(), ".local/state/padbridge/service.txt");
+export const CONTROLLER_LOG = join(homedir(), ".local/state/padbridge/service.log");
 
 
 export type ServiceStatus = Readonly<Record<string, string>>;
@@ -77,8 +77,8 @@ const alive = (pid: string | undefined) => pid !== undefined && /^\d+$/.test(pid
 const fail = (problem: string) => new PlayProblem({ problem });
 
 
-/** The pinned wc3-controller service built beside the Smashcraft plug-in (currentPlaytest.ts). */
-export const pointLaunchers = (helper: string) => [pointLauncher(helper), pointLauncher(join(dirname(helper), "wc3-controller"), SERVICE_LAUNCHER)].some(Boolean);
+/** The pinned padbridge service built beside the Smashcraft plug-in (currentPlaytest.ts). */
+export const pointLaunchers = (helper: string) => [pointLauncher(helper), pointLauncher(join(dirname(helper), "padbridge"), SERVICE_LAUNCHER)].some(Boolean);
 
 function serviceBuildAction(running: string | undefined, wanted: string): "keep" | "relink+restart" {
   return running === wanted ? "keep" : "relink+restart";
@@ -99,7 +99,7 @@ function runningBuild(pid: string | undefined): string | undefined {
 }
 
 export const ensureService = (helper: string) => Effect.gen(function*() {
-  const wanted = yield* Effect.try({ try: () => controllerBuild(join(dirname(helper), "wc3-controller"), helper), catch: (cause) => fail(`couldn't identify the controller build: ${String(cause)}`) });
+  const wanted = yield* Effect.try({ try: () => controllerBuild(join(dirname(helper), "padbridge"), helper), catch: (cause) => fail(`couldn't identify the controller build: ${String(cause)}`) });
   const build = `${basename(dirname(helper))} (${wanted.slice(0, 12)})`;
   const installed = yield* unitInstalled;
   const servicePid: Effect.Effect<string | undefined, PlayProblem> = installed

@@ -1,10 +1,10 @@
-//! A fake Smashcraft session served by wc3-controller's service through the
+//! A fake Smashcraft session served by padbridge's service through the
 //! real plug-in program (`wc3-journal --plugin`): a virtual pad, a stand-in
 //! game folder whose menu files the test writes, and the helper typing into a
 //! file. Needs a writable /dev/uinput.
 #![cfg(target_os = "linux")]
 
-use wc3_controller::{focus, service::{self, plugin::Plugin}};
+use padbridge::{focus, service::{self, plugin::Plugin}};
 
 use evdev::{AbsInfo, AbsoluteAxisCode as Abs, AttributeSet, KeyCode, UinputAbsSetup, uinput::VirtualDevice};
 use std::{
@@ -140,7 +140,7 @@ fn the_service_follows_a_fake_session_through_new_sessions_and_game_restarts() {
 #[ignore = "requires the assigned offline Warcraft client and its private desktop"]
 fn a_private_pad_script_drives_the_published_menu_pointer() {
     use focus::{Foreground, Gate, Target};
-    use wc3_controller::{model::{Button, InputView, PadPreset}, service::{any_map::{DesktopOutput, Driver, MenuCurve}, }};
+    use padbridge::{model::{Button, InputView, PadPreset}, service::{any_map::{DesktopOutput, Driver, MenuCurve}, }};
     use smashcraft_controller::profile::newest_menu;
 
     let setting = |name| std::env::var(name).unwrap_or_else(|_| panic!("missing {name}"));

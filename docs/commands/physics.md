@@ -15,7 +15,7 @@
   Home marks an armed pad; End commits a complete payload. While Home stays
   held and End is released for an update, capture retains the last complete
   pad row's axes and pressures. Focus loss or Home release clears that packet.
-  `bun scripts/analogNative.ts --pair N --clients-file FILE --helper WC3_CONTROLLER
+  `bun scripts/analogNative.ts --pair N --clients-file FILE --helper PADBRIDGE
   --map MAP --route keys|cursor --out DIR --app-id NAME=ID --app-id NAME=ID`
   runs 20 normal one-stock matches on an already admitted LAN pair; `--plan`
   prints the setup without touching clients. It saves calibration clock anchors,

@@ -73,8 +73,8 @@ export const measureBindingsGate = (clientsFile: string, name: string, directory
   const appId = appIds.get(name);
   if (client === undefined || appId === undefined) return yield* new AcceptFailure({ operation: "bindings gate", problem: `no offline selected client ${name}` });
   const metadata = yield* runProcess(ChildProcess.make("cargo", ["metadata", "--locked", "--offline", "--format-version=1"], { cwd: join(projectRoot, "controller"), stdin: "ignore" })).pipe(Effect.flatMap(Schema.decodeEffect(Metadata)), Effect.mapError(fail("bindings gate controller contract")));
-  const dependency = metadata.packages.find(packageInfo => packageInfo.name === "wc3-controller");
-  if (dependency === undefined) return yield* new AcceptFailure({ operation: "bindings gate contract", problem: "pinned wc3-controller package missing" });
+  const dependency = metadata.packages.find(packageInfo => packageInfo.name === "padbridge");
+  if (dependency === undefined) return yield* new AcceptFailure({ operation: "bindings gate contract", problem: "pinned padbridge package missing" });
   const contractPath = join(dirname(dependency.manifest_path), "contract/bindings.json");
   const contractText = yield* Effect.try({ try: () => readFileSync(contractPath, "utf8"), catch: cause => new AcceptFailure({ operation: "bindings gate contract", problem: String(cause) }) });
   const contract = yield* Schema.decodeEffect(Contract)(contractText).pipe(Effect.mapError(fail("bindings gate contract")));

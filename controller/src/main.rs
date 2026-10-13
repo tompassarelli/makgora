@@ -1,4 +1,4 @@
-//! Smashcraft's plug-in for wc3-controller (README.md): `wc3-journal --plugin`
+//! Smashcraft's plug-in for padbridge (README.md): `wc3-journal --plugin`
 //! reports Smashcraft sessions to the service, and the same executable is the
 //! journal helper that serves them.
 #![deny(unsafe_code)]
@@ -19,8 +19,8 @@ mod linux {
         include!("pad_contract_tests.rs");
     }
 
-    use wc3_controller::focus::Foreground;
-    use wc3_controller::stick::{c_stick, melee_stick, stick_down};
+    use padbridge::focus::Foreground;
+    use padbridge::stick::{c_stick, melee_stick, stick_down};
     use enigo::{Direction, Enigo, Key as OutputKey, Keyboard, Settings};
     use evdev::{AbsoluteAxisCode as Abs, EventSummary, KeyCode as Key, raw_stream::RawDevice};
     use std::{
@@ -66,10 +66,10 @@ mod linux {
 
     #[derive(Default, Clone, Copy, Debug, PartialEq, Eq)]
     struct State {
-        preset: wc3_controller::model::PadPreset,
+        preset: padbridge::model::PadPreset,
         tap_jump: bool,
-        triggers: wc3_controller::model::TriggerShields,
-        right_stick: wc3_controller::model::RightStick,
+        triggers: padbridge::model::TriggerShields,
+        right_stick: padbridge::model::RightStick,
         sources: u32,
         x: i16,
         y: i16,
@@ -95,10 +95,10 @@ mod linux {
     }
 
     struct Options {
-        preset: wc3_controller::model::PadPreset,
+        preset: padbridge::model::PadPreset,
         tap_jump: bool,
-        triggers: wc3_controller::model::TriggerShields,
-        right_stick: wc3_controller::model::RightStick,
+        triggers: padbridge::model::TriggerShields,
+        right_stick: padbridge::model::RightStick,
         device: PathBuf,
         out: PathBuf,
         build: String,
@@ -542,16 +542,16 @@ mod linux {
     enum Typist {
         Window {
             output: Enigo,
-            gate: wc3_controller::focus::Gate,
+            gate: padbridge::focus::Gate,
             window: u32,
         },
         File(fs::File),
     }
 
     impl Typist {
-        fn window(display: &str, target: wc3_controller::focus::Target) -> Result<Self, String> {
+        fn window(display: &str, target: padbridge::focus::Target) -> Result<Self, String> {
             let window = target.window;
-            let gate = wc3_controller::focus::Gate::new(target)?;
+            let gate = padbridge::focus::Gate::new(target)?;
             let settings = Settings {
                 x11_display: Some(display.to_owned()),
                 linux_delay: 0,
@@ -1018,7 +1018,7 @@ mod linux {
 
     fn usage() -> &'static str {
         "wc3-journal --plugin\n\
-         Smashcraft's map plug-in for wc3-controller --service --plugin wc3-journal: reports the map's sessions and names this helper.\n\
+         Smashcraft's map plug-in for padbridge --service --plugin wc3-journal: reports the map's sessions and names this helper.\n\
          wc3-journal --follow-matches --build BUILD --slot N [--epoch N] [--menu-keys all|start] [--preset melee|z-jump|tom|script] [--tap-jump on|off] [--left-trigger full|light] [--right-trigger full|light] [--right-stick smash|tilt] --device /dev/input/eventN --out DIR --editbox-display :N [--trace]\n\
          Start in character selection; stick left/right chooses, A selects, X backs, Start confirms. Follows matches and rematches.\n\
          Diagnostic only: wc3-journal --device /dev/input/eventN --out DIR --ready-file PATH --epoch-monotonic-ns NS [--mailbox-display :N | --editbox-display :N] [--first-frame N] [--stop-frame N] [--trace]\n\
@@ -1213,13 +1213,13 @@ mod linux {
             return Err("--build must be 1..80 ASCII letters, digits, '-' or '_'".into());
         }
         Ok(Options {
-            triggers: wc3_controller::model::TriggerShields {
-                left: wc3_controller::model::TriggerShield::parse(values.get("--left-trigger").map(String::as_str).unwrap_or("full"))?,
-                right: wc3_controller::model::TriggerShield::parse(values.get("--right-trigger").map(String::as_str).unwrap_or("full"))?,
+            triggers: padbridge::model::TriggerShields {
+                left: padbridge::model::TriggerShield::parse(values.get("--left-trigger").map(String::as_str).unwrap_or("full"))?,
+                right: padbridge::model::TriggerShield::parse(values.get("--right-trigger").map(String::as_str).unwrap_or("full"))?,
             },
             tap_jump: match values.get("--tap-jump").cloned().or_else(|| env::var("WC3_TAP_JUMP").ok()).as_deref().unwrap_or("off") { "on" => true, "off" => false, _ => return Err("--tap-jump needs on or off".into()) },
-            right_stick: wc3_controller::model::RightStick::parse(values.get("--right-stick").map(String::as_str).unwrap_or("smash"))?,
-            preset: wc3_controller::model::PadPreset::parse(values.get("--preset").cloned().or_else(|| env::var("WC3_PAD_PRESET").ok()).as_deref().unwrap_or("melee"))?,
+            right_stick: padbridge::model::RightStick::parse(values.get("--right-stick").map(String::as_str).unwrap_or("smash"))?,
+            preset: padbridge::model::PadPreset::parse(values.get("--preset").cloned().or_else(|| env::var("WC3_PAD_PRESET").ok()).as_deref().unwrap_or("melee"))?,
             device: take("--device")?.into(),
             out: take("--out")?.into(),
             build,
@@ -2301,9 +2301,9 @@ mod linux {
         }
     }
 
-    /// The preset's buttons and triggers as journal bits, from wc3-controller's shown layout.
-    fn button_bits(preset: wc3_controller::model::PadPreset) -> &'static [(u32, u32)] {
-        use wc3_controller::model::{Control, PadPreset, Press, RightStick, TriggerShields, fighter_bindings_with};
+    /// The preset's buttons and triggers as journal bits, from padbridge's shown layout.
+    fn button_bits(preset: padbridge::model::PadPreset) -> &'static [(u32, u32)] {
+        use padbridge::model::{Control, PadPreset, Press, RightStick, TriggerShields, fighter_bindings_with};
         static LAYOUTS: std::sync::OnceLock<Vec<Vec<(u32, u32)>>> = std::sync::OnceLock::new();
         const PRESETS: [PadPreset; 4] = [PadPreset::Melee, PadPreset::ZJump, PadPreset::Tom, PadPreset::Script];
         let layouts = LAYOUTS.get_or_init(|| PRESETS.iter().map(|&preset| {
@@ -2330,7 +2330,7 @@ mod linux {
         let sources = s.sources | if s.lt > 4_000 { LT_SOURCE } else { 0 } | if s.rt > 4_000 { RT_SOURCE } else { 0 };
         let mut held = button_bits(s.preset).iter().filter(|(source, _)| sources & source != 0).fold(0, |held, (_, action)| held | action);
         let (x, y) = melee_stick(s.x, s.y);
-        if wc3_controller::stick::tap_jump(y, s.tap_jump, held & WALK != 0, held & (LEFT_TRIGGER | RIGHT_TRIGGER) != 0) {
+        if padbridge::stick::tap_jump(y, s.tap_jump, held & WALK != 0, held & (LEFT_TRIGGER | RIGHT_TRIGGER) != 0) {
             held |= JUMP;
         }
         if x < 0 {
@@ -2346,7 +2346,7 @@ mod linux {
             held |= MOVE_UP;
         }
         let (cx, cy) = c_stick(s.cx, s.cy);
-        if s.right_stick == wc3_controller::model::RightStick::Tilt && (cx != 0 || cy != 0) {
+        if s.right_stick == padbridge::model::RightStick::Tilt && (cx != 0 || cy != 0) {
             held |= WALK;
         }
         if cx < 0 {
@@ -2367,7 +2367,7 @@ mod linux {
     #[test]
     fn left_stick_click_journals_short_hop_press_and_release_spec_321() {
         {
-            let mut state = State { preset: wc3_controller::model::PadPreset::Script, ..State::default() };
+            let mut state = State { preset: padbridge::model::PadPreset::Script, ..State::default() };
             update_state(&[None; 6], &mut state, evdev::InputEvent::new(evdev::EventType::KEY.0, Key::BTN_THUMBL.0, 1));
             assert_eq!(action_state(state), SHORT_HOP);
             update_state(&[None; 6], &mut state, evdev::InputEvent::new(evdev::EventType::KEY.0, Key::BTN_THUMBL.0, 0));
@@ -2381,7 +2381,7 @@ mod linux {
 
     #[test]
     fn journal_tap_jump_reads_effective_guard_stick_and_keeps_button_jump() {
-        use wc3_controller::model::PadPreset;
+        use padbridge::model::PadPreset;
         let state = State { preset: PadPreset::Script, y: -32_767, lt: 20_000, ..State::default() };
         assert_eq!(action_state(state) & JUMP, 0);
         let state = State { tap_jump: true, ..state };
@@ -2398,7 +2398,7 @@ mod linux {
 
     #[test]
     fn journal_presets_map_buttons_and_digital_shield_pressure() {
-        use wc3_controller::model::{PadPreset, TriggerShield, TriggerShields};
+        use padbridge::model::{PadPreset, TriggerShield, TriggerShields};
         let (a, b, x, y, lb, rb, l3) = (1 << 0, 1 << 1, 1 << 2, 1 << 3, 1 << 4, 1 << 5, 1 << 6);
         for (preset, expected) in [
             (PadPreset::Melee, [ATTACK, SPECIAL, JUMP, JUMP, 0, GRAB, 0]),
@@ -2836,7 +2836,7 @@ mod linux {
         assert_eq!(held(0, -19_660), 0);
         assert_eq!(held(0, -22_937), SMASH_UP);
         assert_eq!(held(0, 22_937), SMASH_DOWN);
-        let tom = |cx, cy| action_state(State { right_stick: wc3_controller::model::RightStick::Tilt, cx, cy, ..State::default() });
+        let tom = |cx, cy| action_state(State { right_stick: padbridge::model::RightStick::Tilt, cx, cy, ..State::default() });
         assert_eq!(tom(26_500, 0), WALK | SMASH_RIGHT);
         assert_eq!(tom(22_937, 0), 0);
     }
@@ -3617,7 +3617,7 @@ mod linux {
     /// hid-playstation reports positions, while xpad and other Xbox-style
     /// drivers report labels, BTN_X (0x133, the code of BTN_NORTH) for the
     /// left button and BTN_Y (0x134, BTN_WEST) for the top one. SDL decides
-    /// by vendor in its Linux joystick mapping; wc3-controller reads SDL's
+    /// by vendor in its Linux joystick mapping; padbridge reads SDL's
     /// positions, so both helpers resolve every pad the same way.
     #[derive(Clone, Copy, Debug, PartialEq, Eq)]
     enum FaceLabels {
@@ -3944,7 +3944,7 @@ mod linux {
             (Some(path), _) => Some(Typist::file(path)?),
             (None, Some(display)) => Some(Typist::window(
                 display,
-                wc3_controller::focus::Target {
+                padbridge::focus::Target {
                     display: display.clone(),
                     window: o.window.ok_or("keyboard output requires --x11-window")?,
                     pid: o.pid.ok_or("keyboard output requires --pid")?,
@@ -4621,10 +4621,10 @@ mod linux {
         }
     }
 
-    /// `--plugin`: answers wc3-controller's requests on standard input and output.
+    /// `--plugin`: answers padbridge's requests on standard input and output.
     fn plugin() -> Result<(), String> {
         let mut profile = smashcraft_controller::profile::Smashcraft::default();
-        wc3_controller::service::plugin::serve(&mut profile, io::stdin().lock(), io::stdout().lock()).map_err(|error| error.to_string())
+        padbridge::service::plugin::serve(&mut profile, io::stdin().lock(), io::stdout().lock()).map_err(|error| error.to_string())
     }
 
     pub fn main() {

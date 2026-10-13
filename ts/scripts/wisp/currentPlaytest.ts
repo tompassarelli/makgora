@@ -130,14 +130,14 @@ const helperTarget = join(inputsRoot, "play-helper-target");
 
 const buildHelper = (lane: string, helper: string) => withLock(join(locks, "play-helper-target.lock"), "Waiting for another controller helper build", Effect.gen(function*() {
   const capacity = capacityHelper;
-  // The pinned wc3-controller service comes from the plug-in's git dependency (controller/Cargo.toml).
+  // The pinned padbridge service comes from the plug-in's git dependency (controller/Cargo.toml).
   const build = (target: string) => `cargo build --release --locked --jobs 2 --target-dir '${helperTarget}' ${target}`;
   yield* run(join(lane, "controller"), ["nix-shell", "-p", "stdenv.cc", "cmake", "pkg-config", "libxkbcommon", "udev", "--run",
-    `PATH=${join(homedir(), ".rustup/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin")}:$PATH bun '${capacity}' run --class moderate --owner smashcraft:play-helper --timeout-seconds 900 -- sh -c "${build("--bin wc3-journal")} && ${build("-p wc3-controller --bin wc3-controller")}"`]);
+    `PATH=${join(homedir(), ".rustup/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin")}:$PATH bun '${capacity}' run --class moderate --owner smashcraft:play-helper --timeout-seconds 900 -- sh -c "${build("--bin wc3-journal")} && ${build("-p padbridge --bin padbridge")}"`]);
 
   yield* tryPlay(() => {
     mkdirSync(dirname(helper), { recursive: true });
-    for (const name of ["wc3-controller", "wc3-journal"]) {
+    for (const name of ["padbridge", "wc3-journal"]) {
       const staged = join(dirname(helper), `${name}.${process.pid}.tmp`);
       copyFileSync(join(helperTarget, "release", name), staged);
       renameSync(staged, join(dirname(helper), name));

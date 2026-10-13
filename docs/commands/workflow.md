@@ -26,7 +26,7 @@ its Status until the table exists. A status question never starts a new
 investigation.
 
 - smashcraft:ts/src/ owns gameplay, deterministic state/replay, selection and UI.
-- smashcraft:controller/ owns Smashcraft's controller plug-in and journal helper (`wc3-journal`); the service itself is github.com/tompassarelli/wc3-controller, pinned by tag in controller/Cargo.toml.
+- smashcraft:controller/ owns Smashcraft's controller plug-in and journal helper (`wc3-journal`); the service itself is github.com/tompassarelli/padbridge, pinned by rev in controller/Cargo.toml.
 - The player's desktop app is github.com/tompassarelli/smashcraft-client; it reads Smashcraft only through smashcraft:docs/client-interface.md, which this repository owns.
 - smashcraft:tools/ owns build, native probes and automation.
 - smashcraft:docs/ holds durable knowledge only: how systems work, design

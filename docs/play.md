@@ -75,10 +75,10 @@ checkout of this repository.
 
 ## Controller without play
 
-The controller service ([wc3-controller](https://github.com/tompassarelli/wc3-controller)
+The controller service ([padbridge](https://github.com/tompassarelli/padbridge)
 with Smashcraft's plug-in, smashcraft:controller/README.md) runs from Tom's
-login as the systemd user unit wc3-controller.service, declared in
-nixos-config. It runs the launcher ~/.local/share/wc3-controller/bin/wc3-controller
+login as the systemd user unit padbridge.service, declared in
+nixos-config. It runs the launcher ~/.local/share/padbridge/bin/padbridge
 `--service --plugin` ~/.local/share/smashcraft-build-inputs/controller/wc3-journal;
 both are links to the pinned service and the plug-in built together under
 play-helpers/. It finds Warcraft III on :0 by itself, follows any
@@ -86,7 +86,7 @@ Smashcraft session (one Tom opens from Custom Games included, and a reopened
 map) and survives Warcraft restarts and pad replugs. `play` and
 `bun wisp controller` point the links at main's build and restart the unit
 when it changed; without the unit, `bun wisp controller` runs the service in
-the foreground. Its state is in ~/.local/state/wc3-controller/service.txt;
-its log is `journalctl --user -u wc3-controller`.
+the foreground. Its state is in ~/.local/state/padbridge/service.txt;
+its log is `journalctl --user -u padbridge`.
 
 Controller layouts: `bun wisp controller layout melee|z-jump|tom`. melee (the default) is Melee's buttons by function: A attack, B special, X and Y jump, RB grab, no tilt or short-hop button; z-jump makes RB jump and X grab; tom is Tom's own (LB short hop, RT shield, right stick tilts, L3 unbound). Both triggers shield by default. The client Controller page also chooses the layout, tap jump and full or light shield for each trigger. These choices stay in the controller service settings across restarts. A running service changes immediately; a stopped service reads the saved choice at its next start.
