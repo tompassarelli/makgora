@@ -7,16 +7,110 @@ import { groundHit } from "./groundNormals";
 export const anubarakHit = (damage: number, angle: 25 | 35 | 40 | 55 | 70 | 75 | 80 | 90, growth = 80.93789672851562, base = 26.0, behind = false) => groundHit(damage, angle, growth, base, HitElement.normal, behind);
 const claw = (x1: number, z1: number, x2: number, z2: number, radius = 15.0): StrikeCapsule => ({ x1, z1, x2, z2, radius });
 const shell = hurtPart(-24.0, 32.0, 18.0, 88.0, 35.0);
+const rear = hurtPart(-50.0, 45.0, -50.0, 75.0, 29.0);
 const tilt = (z: number, angle: 25 | 40 | 55) => heroMove(10, 4, 24, 0, [heroRegion(10, 13, claw(32.0, 60.0, 124.0, z), anubarakHit(13.626359939575195, angle))]);
 
 export const ANUBARAK_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack, smashMaxChargeFrames: 45, smashMaxDamageMultiplier: 1.25, maxPummels: 1,
   hurtboxes: {
-    stand: [shell, hurtPart(20.0, 76.0, 52.0, 100.0, 20.0)],
-    crouch: [hurtPart(-28.0, 24.0, 22.0, 55.0, 35.0)],
+    stand: [shell, hurtPart(20.0, 76.0, 52.0, 100.0, 20.0), rear],
+    crouch: [shell, hurtPart(20.0, 76.0, 52.0, 100.0, 20.0), rear, hurtPart(0.0, 120.0, 0.0, 148.0, 22.0)],
     attacks: {
-      [AttackStyle.forwardTilt]: [heroHurtPose(8, 17, [shell, hurtPart(26.0, 62.0, 72.0, 62.0, 13.0)])],
-      [AttackStyle.forwardSmash]: [heroHurtPose(17, 28, [shell, hurtPart(26.0, 66.0, 75.0, 66.0, 13.0)])],
+      [AttackStyle.downAir]: [
+        heroHurtPose(1, 8, [hurtPart(-21.0, 37.0, -21.0, 37.0, 44.0), hurtPart(-9.0, 102.0, -9.0, 102.0, 44.0), hurtPart(-33.0, 119.0, -33.0, 119.0, 41.0)]),
+        heroHurtPose(9, 16, [hurtPart(-7.0, 55.0, -23.0, 91.0, 52.0)]),
+        heroHurtPose(17, 24, [hurtPart(8.0, 42.0, -8.0, 99.0, 52.0)]),
+        heroHurtPose(25, 32, [hurtPart(5.0, 27.0, -11.0, 35.0, 52.0), hurtPart(2.0, 108.0, -14.0, 116.0, 44.0)]),
+        heroHurtPose(33, 40, [hurtPart(-2.0, 51.0, -18.0, 104.0, 52.0)]),
+        heroHurtPose(41, 50, [hurtPart(-8.0, 58.0, -8.0, 99.0, 52.0)])
+      ],
+      [AttackStyle.downSmash]: [
+        heroHurtPose(1, 8, [hurtPart(-20.0, 39.0, -20.0, 39.0, 44.0), hurtPart(-3.0, 104.0, -3.0, 104.0, 44.0), hurtPart(-33.0, 116.0, -33.0, 116.0, 44.0)]),
+        heroHurtPose(9, 16, [hurtPart(-13.0, 48.0, -5.0, 113.0, 44.0)]),
+        heroHurtPose(17, 24, [hurtPart(3.0, 22.0, 3.0, 22.0, 44.0), hurtPart(-9.0, 107.0, -9.0, 107.0, 44.0), hurtPart(3.0, 124.0, 3.0, 124.0, 36.0)]),
+        heroHurtPose(25, 32, [hurtPart(-2.0, 42.0, -2.0, 116.0, 44.0)]),
+        heroHurtPose(33, 40, [hurtPart(-5.0, 48.0, -5.0, 116.0, 44.0)]),
+        heroHurtPose(41, 48, [hurtPart(-12.0, 39.0, -12.0, 39.0, 44.0), hurtPart(-8.0, 111.0, -8.0, 111.0, 44.0), hurtPart(-21.0, 124.0, -21.0, 124.0, 36.0)]),
+        heroHurtPose(49, 53, [hurtPart(-18.0, 43.0, -18.0, 43.0, 44.0), hurtPart(-14.0, 116.0, -14.0, 116.0, 44.0)])
+      ],
+      [AttackStyle.forwardTiltDown]: [
+        heroHurtPose(1, 8, [hurtPart(-13.0, 27.0, -29.0, 35.0, 44.0), hurtPart(-13.0, 116.0, -13.0, 116.0, 44.0), hurtPart(-37.0, 122.0, -29.0, 122.0, 38.0)]),
+        heroHurtPose(9, 16, [hurtPart(18.0, 64.0, -6.0, 56.0, 60.0), hurtPart(3.0, 116.0, -5.0, 116.0, 44.0), hurtPart(-45.0, 144.0, -37.0, 144.0, 16.0)]),
+        heroHurtPose(17, 24, [hurtPart(13.0, 59.0, -11.0, 43.0, 60.0), hurtPart(21.0, 113.0, 5.0, 113.0, 44.0), hurtPart(-25.0, 116.0, -17.0, 116.0, 44.0)]),
+        heroHurtPose(25, 32, [hurtPart(-2.0, 49.0, -10.0, 41.0, 52.0), hurtPart(5.0, 101.0, -3.0, 109.0, 44.0), hurtPart(-32.0, 125.0, -24.0, 125.0, 35.0)]),
+        heroHurtPose(33, 37, [hurtPart(-16.0, 40.0, -16.0, 40.0, 44.0), hurtPart(-6.0, 106.0, -6.0, 106.0, 44.0), hurtPart(-30.0, 123.0, -30.0, 123.0, 37.0)])
+      ],
+      [AttackStyle.grab]: [
+        heroHurtPose(1, 8, [hurtPart(-17.0, 40.0, -17.0, 40.0, 44.0), hurtPart(-5.0, 106.0, -5.0, 106.0, 44.0), hurtPart(-32.0, 119.0, -32.0, 119.0, 41.0)]),
+        heroHurtPose(9, 16, [hurtPart(-17.0, 40.0, -17.0, 40.0, 44.0), hurtPart(15.0, 110.0, 15.0, 110.0, 44.0), hurtPart(-12.0, 126.0, -12.0, 126.0, 34.0)]),
+        heroHurtPose(17, 24, [hurtPart(-16.0, 40.0, -16.0, 40.0, 44.0), hurtPart(13.0, 110.0, 13.0, 110.0, 44.0), hurtPart(-18.0, 127.0, -18.0, 127.0, 33.0)]),
+        heroHurtPose(25, 32, [hurtPart(-14.0, 40.0, -14.0, 40.0, 44.0), hurtPart(1.0, 108.0, 1.0, 108.0, 44.0), hurtPart(-27.0, 125.0, -27.0, 125.0, 35.0)]),
+        heroHurtPose(33, 37, [hurtPart(-17.0, 40.0, -17.0, 40.0, 44.0), hurtPart(-6.0, 106.0, -6.0, 106.0, 44.0), hurtPart(-30.0, 124.0, -30.0, 124.0, 36.0)])
+      ],
+      [AttackStyle.backAir]: [
+        heroHurtPose(1, 8, [hurtPart(-15.0, 40.0, -15.0, 40.0, 44.0), hurtPart(-15.0, 116.0, -15.0, 116.0, 44.0)]),
+        heroHurtPose(9, 16, [hurtPart(-18.0, 41.0, -18.0, 41.0, 44.0), hurtPart(-10.0, 116.0, -10.0, 116.0, 44.0)]),
+        heroHurtPose(17, 24, [hurtPart(-28.0, 40.0, -28.0, 40.0, 44.0), hurtPart(-12.0, 116.0, -12.0, 116.0, 44.0)]),
+        heroHurtPose(25, 32, [hurtPart(-21.0, 36.0, -21.0, 36.0, 44.0), hurtPart(-10.0, 99.0, -10.0, 99.0, 44.0), hurtPart(-24.0, 116.0, -24.0, 116.0, 44.0)]),
+        heroHurtPose(33, 41, [hurtPart(-18.0, 37.0, -18.0, 37.0, 44.0), hurtPart(-7.0, 102.0, -7.0, 102.0, 44.0), hurtPart(-31.0, 117.0, -31.0, 117.0, 43.0)])
+      ],
+      [AttackStyle.forwardAir]: [
+        heroHurtPose(1, 8, [hurtPart(-19.0, 35.0, -19.0, 35.0, 44.0), hurtPart(-7.0, 101.0, -7.0, 101.0, 44.0), hurtPart(-32.0, 119.0, -32.0, 119.0, 41.0)]),
+        heroHurtPose(9, 16, [hurtPart(-17.0, 29.0, -17.0, 29.0, 44.0), hurtPart(12.0, 101.0, 12.0, 101.0, 44.0), hurtPart(-20.0, 116.0, -20.0, 116.0, 44.0)]),
+        heroHurtPose(17, 24, [hurtPart(-18.0, 29.0, -18.0, 29.0, 44.0), hurtPart(13.0, 101.0, 13.0, 101.0, 44.0), hurtPart(-16.0, 128.0, -16.0, 128.0, 32.0)]),
+        heroHurtPose(25, 32, [hurtPart(-16.0, 32.0, -16.0, 32.0, 44.0), hurtPart(4.0, 102.0, 4.0, 102.0, 44.0), hurtPart(-24.0, 126.0, -24.0, 126.0, 34.0)]),
+        heroHurtPose(33, 40, [hurtPart(-17.0, 33.0, -17.0, 33.0, 44.0), hurtPart(-4.0, 102.0, -4.0, 102.0, 44.0), hurtPart(-28.0, 124.0, -28.0, 124.0, 36.0)]),
+        heroHurtPose(41, 43, [hurtPart(-19.0, 36.0, -19.0, 36.0, 44.0), hurtPart(-7.0, 102.0, -7.0, 102.0, 44.0), hurtPart(-30.0, 124.0, -30.0, 124.0, 36.0)])
+      ],
+      [AttackStyle.neutralAir]: [
+        heroHurtPose(1, 8, [hurtPart(-10.0, 37.0, -10.0, 37.0, 44.0), hurtPart(-3.0, 103.0, -3.0, 103.0, 44.0), hurtPart(-32.0, 121.0, -32.0, 121.0, 39.0)]),
+        heroHurtPose(9, 16, [hurtPart(-30.0, 44.0, -30.0, 44.0, 44.0), hurtPart(-2.0, 116.0, 1.0, 116.0, 44.0), hurtPart(42.0, 150.0, 42.0, 150.0, 10.0)]),
+        heroHurtPose(17, 24, [hurtPart(-32.0, 41.0, -32.0, 41.0, 44.0), hurtPart(-7.0, 111.0, -7.0, 111.0, 44.0), hurtPart(37.0, 137.0, 37.0, 137.0, 23.0)]),
+        heroHurtPose(25, 32, [hurtPart(-29.0, 36.0, -29.0, 36.0, 44.0), hurtPart(10.0, 99.0, 10.0, 99.0, 44.0), hurtPart(2.0, 116.0, 2.0, 116.0, 44.0)]),
+        heroHurtPose(33, 40, [hurtPart(-14.0, 37.0, -14.0, 37.0, 44.0), hurtPart(6.0, 102.0, 6.0, 102.0, 44.0), hurtPart(-30.0, 116.0, -30.0, 116.0, 44.0)])
+      ],
+      [AttackStyle.upSmash]: [
+        heroHurtPose(1, 8, [hurtPart(-16.0, 40.0, -16.0, 40.0, 44.0), hurtPart(-7.0, 107.0, -7.0, 107.0, 44.0), hurtPart(-30.0, 123.0, -30.0, 123.0, 37.0)]),
+        heroHurtPose(9, 16, [hurtPart(-11.0, 43.0, -11.0, 43.0, 44.0), hurtPart(6.0, 116.0, 6.0, 116.0, 44.0)]),
+        heroHurtPose(17, 24, [hurtPart(-34.0, 53.0, -34.0, 53.0, 44.0), hurtPart(-13.0, 116.0, -13.0, 116.0, 44.0), hurtPart(11.0, 130.0, 11.0, 130.0, 30.0)]),
+        heroHurtPose(25, 32, [hurtPart(-35.0, 50.0, -35.0, 50.0, 44.0), hurtPart(-6.0, 116.0, -6.0, 116.0, 44.0), hurtPart(33.0, 120.0, 33.0, 120.0, 40.0)]),
+        heroHurtPose(33, 40, [hurtPart(-35.0, 43.0, -35.0, 43.0, 44.0), hurtPart(4.0, 114.0, 4.0, 114.0, 44.0), hurtPart(29.0, 116.0, 29.0, 116.0, 44.0)]),
+        heroHurtPose(41, 48, [hurtPart(-23.0, 39.0, -23.0, 39.0, 44.0), hurtPart(10.0, 103.0, 10.0, 103.0, 44.0), hurtPart(-10.0, 116.0, -10.0, 116.0, 44.0)]),
+        heroHurtPose(49, 52, [hurtPart(-18.0, 39.0, -18.0, 39.0, 44.0), hurtPart(-2.0, 104.0, -2.0, 104.0, 44.0), hurtPart(-33.0, 119.0, -33.0, 119.0, 41.0)])
+      ],
+      [AttackStyle.jab3]: [
+        heroHurtPose(1, 8, [hurtPart(-16.0, 43.0, -16.0, 43.0, 44.0), hurtPart(-7.0, 113.0, -7.0, 113.0, 44.0), hurtPart(1.0, 116.0, 1.0, 116.0, 44.0)]),
+        heroHurtPose(9, 16, [hurtPart(-14.0, 41.0, -14.0, 41.0, 44.0), hurtPart(-11.0, 110.0, -11.0, 110.0, 44.0), hurtPart(-25.0, 116.0, -25.0, 116.0, 44.0)]),
+        heroHurtPose(17, 24, [hurtPart(-17.0, 41.0, -17.0, 41.0, 44.0), hurtPart(-9.0, 108.0, -9.0, 108.0, 44.0), hurtPart(-29.0, 116.0, -29.0, 116.0, 44.0)]),
+        heroHurtPose(25, 28, [hurtPart(-19.0, 40.0, -19.0, 40.0, 44.0), hurtPart(-8.0, 105.0, -8.0, 105.0, 44.0), hurtPart(-31.0, 124.0, -31.0, 124.0, 36.0)])
+      ],
+      [AttackStyle.jab2]: [
+        heroHurtPose(1, 8, [hurtPart(-16.0, 45.0, -16.0, 45.0, 44.0), hurtPart(-8.0, 116.0, -8.0, 116.0, 44.0), hurtPart(15.0, 116.0, 15.0, 116.0, 44.0)]),
+        heroHurtPose(9, 16, [hurtPart(-14.0, 41.0, -14.0, 41.0, 44.0), hurtPart(-10.0, 109.0, -10.0, 109.0, 44.0), hurtPart(-25.0, 129.0, -25.0, 129.0, 31.0)]),
+        heroHurtPose(17, 24, [hurtPart(-17.0, 41.0, -17.0, 41.0, 44.0), hurtPart(-9.0, 108.0, -9.0, 108.0, 44.0), hurtPart(-28.0, 126.0, -28.0, 126.0, 34.0)]),
+        heroHurtPose(25, 30, [hurtPart(-18.0, 44.0, -18.0, 44.0, 44.0), hurtPart(-15.0, 116.0, -15.0, 116.0, 44.0)])
+      ],
+      [AttackStyle.jab]: [
+        heroHurtPose(1, 8, [hurtPart(-16.0, 43.0, -16.0, 43.0, 44.0), hurtPart(-9.0, 115.0, -9.0, 115.0, 44.0), hurtPart(6.0, 116.0, 6.0, 116.0, 44.0)]),
+        heroHurtPose(9, 16, [hurtPart(-14.0, 41.0, -14.0, 41.0, 44.0), hurtPart(-10.0, 110.0, -10.0, 110.0, 44.0), hurtPart(-26.0, 116.0, -26.0, 116.0, 44.0)]),
+        heroHurtPose(17, 25, [hurtPart(-18.0, 41.0, -18.0, 41.0, 44.0), hurtPart(-8.0, 107.0, -8.0, 107.0, 44.0), hurtPart(-30.0, 122.0, -30.0, 122.0, 38.0)])
+      ],
+      [AttackStyle.forwardTilt]: [
+        heroHurtPose(1, 8, [hurtPart(-15.0, 45.0, -15.0, 45.0, 44.0), hurtPart(-3.0, 116.0, -3.0, 116.0, 44.0), hurtPart(24.0, 144.0, 24.0, 144.0, 16.0)]),
+        heroHurtPose(9, 16, [hurtPart(-19.0, 41.0, -19.0, 41.0, 44.0), hurtPart(23.0, 110.0, 15.0, 110.0, 44.0), hurtPart(-2.0, 116.0, -2.0, 116.0, 44.0)]),
+        heroHurtPose(17, 24, [hurtPart(-12.0, 41.0, -12.0, 41.0, 44.0), hurtPart(17.0, 109.0, 17.0, 109.0, 44.0), hurtPart(-12.0, 116.0, -12.0, 116.0, 44.0)]),
+        heroHurtPose(25, 32, [hurtPart(-12.0, 41.0, -12.0, 41.0, 44.0), hurtPart(12.0, 99.0, 4.0, 107.0, 52.0), hurtPart(-38.0, 117.0, -30.0, 125.0, 35.0)]),
+        heroHurtPose(33, 37, [hurtPart(-16.0, 40.0, -16.0, 40.0, 44.0), hurtPart(-6.0, 105.0, -6.0, 105.0, 44.0), hurtPart(-31.0, 124.0, -31.0, 124.0, 36.0)])
+      ],
+      [AttackStyle.forwardSmash]: [
+        heroHurtPose(1, 8, [hurtPart(-19.0, 39.0, -19.0, 39.0, 44.0), hurtPart(-6.0, 104.0, -6.0, 104.0, 44.0), hurtPart(-33.0, 119.0, -33.0, 119.0, 41.0)]),
+        heroHurtPose(9, 16, [hurtPart(-20.0, 39.0, -20.0, 39.0, 44.0), hurtPart(-6.0, 103.0, -6.0, 103.0, 44.0), hurtPart(-35.0, 116.0, -35.0, 116.0, 44.0)]),
+        heroHurtPose(17, 24, [hurtPart(-10.0, 42.0, -10.0, 42.0, 44.0), hurtPart(16.0, 106.0, 8.0, 114.0, 44.0), hurtPart(-21.0, 116.0, -13.0, 116.0, 44.0)]),
+        heroHurtPose(25, 32, [hurtPart(-12.0, 42.0, -12.0, 42.0, 44.0), hurtPart(16.0, 106.0, 8.0, 114.0, 44.0), hurtPart(-7.0, 131.0, -7.0, 131.0, 29.0)]),
+        heroHurtPose(33, 40, [hurtPart(-4.0, 49.0, -12.0, 41.0, 52.0), hurtPart(11.0, 103.0, 3.0, 111.0, 44.0), hurtPart(-15.0, 129.0, -15.0, 129.0, 31.0)]),
+        heroHurtPose(41, 48, [hurtPart(-14.0, 41.0, -14.0, 41.0, 44.0), hurtPart(-2.0, 109.0, -2.0, 109.0, 44.0), hurtPart(-22.0, 126.0, -22.0, 126.0, 34.0)]),
+        heroHurtPose(49, 57, [hurtPart(-16.0, 40.0, -16.0, 40.0, 44.0), hurtPart(-5.0, 107.0, -5.0, 107.0, 44.0), hurtPart(-28.0, 122.0, -28.0, 122.0, 38.0)])
+      ],
     },
   },
   normals: {
