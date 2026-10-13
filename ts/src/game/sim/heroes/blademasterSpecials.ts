@@ -4,7 +4,7 @@
 import { withExKit } from "../exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
 import { type AuthoredSpecial, type FighterSpecials, type SpecialPlacement, CHARGED_AIM_FRAMES, FollowUpInput, Relocation, chargedAngleMotion, frames } from "../heroSpecials";
-import { hurtPose } from "../hurtboxes";
+import { hurtPart, hurtPose } from "../hurtboxes";
 import { BLADE_RADIUS, L, M, capsule, cut, hit, length, reach } from "./blademasterMoves";
 import { path } from "./authoring";
 
@@ -18,7 +18,14 @@ const AIR_LANDING_LAG = 20;
 
 const windCutter: AuthoredSpecial = {
   endFrame: 40,
-  hurt: [hurtPose(16, 24, LOW_CUT_ARM)],
+  hurt: [
+      hurtPose(1, 8, [hurtPart(-32.0, 56.0, -48.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(9, 11, [hurtPart(-56.0, 64.0, -40.0, 125.0, 35.0), hurtPart(0.0, 79.0, -8.0, 95.0, 41.0)]),
+      hurtPose(12, 16, [hurtPart(-20.0, 20.0, -4.0, 86.0, 51.0), hurtPart(-49.0, 66.0, 20.0, 100.0, 30.0)]),
+      hurtPose(17, 24, [hurtPart(0.0, 24.0, 16.0, 109.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(25, 32, [hurtPart(0.0, 24.0, 16.0, 109.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(33, 39, [hurtPart(16.0, 24.0, 16.0, 109.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+    ],
   projectiles: [{
     model: "Abilities\\Weapons\\WingedSerpentMissile\\WingedSerpentMissile.mdx",
     spawnFrame: 18,
@@ -84,7 +91,11 @@ const risingBlade: AuthoredSpecial = {
     capsule(5.0, 60.0, 5.0, BLADE_TOP),
     capsule(0.0, 60.0, 0.0, BLADE_TOP),
   ], hit(6.970690727233887, "LAUNCH", 80)),
-  hurt: [hurtPose(7, 16, reach(18.0, 128.0))],
+  hurt: [
+      hurtPose(1, 8, [hurtPart(0.0, 30.0, -16.0, 115.0, 45.0), hurtPart(-25.0, 90.0, 41.0, 115.0, 30.0)]),
+      hurtPose(9, 16, [hurtPart(-4.0, 25.0, -20.0, 115.0, 40.0), hurtPart(20.0, 96.0, 36.0, 125.0, 35.0)]),
+      hurtPose(17, 23, [hurtPart(0.0, 24.0, -32.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+    ],
   oncePerAirtime: true,
   helpless: true,
 };
@@ -96,6 +107,11 @@ const IMAGE_STEP_SPEED = f32(-f32(length(f32(1.0)) / 4));
 const MIRROR_IMAGE_OBJECT: SpecialPlacement = { frame: 8, offsetX: 0.0, radius: 22.0, height: f32(length(f32(1.05))), durability: 1.0, life: 150, fireAges: [] };
 const mirrorImage: AuthoredSpecial = {
   endFrame: 24,
+  hurt: [
+      hurtPose(1, 8, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(9, 16, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(17, 23, [hurtPart(0.0, 24.0, -32.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+    ],
   facesStick: true,
   placement: MIRROR_IMAGE_OBJECT,
   motion: [

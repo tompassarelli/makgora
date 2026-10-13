@@ -5,7 +5,7 @@ import { heroRegion, type MoveRegion, type StrikeCapsule } from "./heroMoves";
 import { frames, type AuthoredSpecial, type SpecialProjectile } from "./heroSpecials";
 import type { AppliedStatus } from "./heroStatus";
 import type { HitEffect } from "./hitRegions";
-import type { HurtPart, HurtPose } from "./hurtboxes";
+import { type HurtPart, type HurtPose, hurtPart, hurtPose } from "./hurtboxes";
 import type { NamedMove } from "./heroes/hero";
 
 // Each fighter's ultimate (docs/design/ultimates.md): ordinary authored special
@@ -66,6 +66,21 @@ const ILLIDAN: AuthoredSpecial = {
 const BLADESTORM_TICKS = [17, 26, 35, 44, 53, 62] as const;
 const BLADEMASTER: AuthoredSpecial = {
   name: "Bladestorm", endFrame: 104, groundOnly: true,
+  hurt: [
+      hurtPose(1, 8, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(9, 16, [hurtPart(0.0, 24.0, 16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(17, 24, [hurtPart(0.0, 24.0, 32.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(25, 32, [hurtPart(0.0, 24.0, 16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(33, 40, [hurtPart(0.0, 24.0, -24.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(41, 48, [hurtPart(0.0, 24.0, -32.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(49, 56, [hurtPart(0.0, 24.0, -16.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(57, 64, [hurtPart(0.0, 24.0, 0.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(65, 72, [hurtPart(0.0, 24.0, 32.0, 125.0, 35.0), hurtPart(-16.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(73, 80, [hurtPart(0.0, 24.0, 32.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(81, 88, [hurtPart(0.0, 24.0, 0.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(89, 96, [hurtPart(0.0, 24.0, -32.0, 125.0, 35.0), hurtPart(16.0, 95.0, 0.0, 95.0, 25.0)]),
+      hurtPose(97, 103, [hurtPart(0.0, 24.0, -32.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
+    ],
   motion: [{ ...frames(17, 74), velocityX: 0.0, velocityZ: 0.0, driftSpeed: 5.0 }, { ...frames(75, 75), velocityX: 0.0, velocityZ: 0.0 }],
   projectiles: [mark("Abilities\\Spells\\Other\\Tornado\\TornadoElementalSmall.mdx", 2, 12, 0.0)],
   regions: [
