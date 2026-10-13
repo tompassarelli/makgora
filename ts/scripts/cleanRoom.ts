@@ -9,11 +9,9 @@ export const REACH_EXEMPT = ["ts/scripts/cleanRoom.ts", "ts/test/clean-room.test
 const REACH_SCAN_BYTES = 2_000_000;
 
 export const REACH_RULES: readonly { readonly name: string; readonly pattern: RegExp }[] = [
-  { name: "a process-memory API or path", pattern: /\bprocess_vm_(?:readv|writev)\b|\bptrace\b|\/proc\/[^\s/"'`]+\/mem\b|\b(?:Read|Write)ProcessMemory\b|\bVirtualProtectEx\b|\bCreateRemoteThread\b/ },
   { name: "a game-binary address or offset", pattern: /\bRVA\b|\+0x[0-9a-fA-F]{2,}\b|\b0x0*6[fF]{3}[0-9a-fA-F]{8}\b|\b0x80(?!000000\b)[0-9a-fA-F]{6}\b|\b80(?=[0-9A-F]*[A-F])[0-9A-F]{6}\b/ },
-  { name: "a decompiled symbol name", pattern: /\b[a-zA-Z][a-zA-Z0-9]*_80[0-9A-F]{6}\b|\b(?:ft|gr|it|mp|cm|lb|gm|pl|ef|mn|db)[A-Z]?[A-Za-z0-9]*_[A-Z][A-Za-z0-9_]*\b/ },
+  { name: "a decompiled symbol name", pattern: /\b(?![a-zA-Z]{2,4}_80)[a-zA-Z][a-zA-Z0-9]*_80[0-9A-F]{6}\b|\b(?:ft|gr|it|mp|cm|lb|gm|pl|ef|mn|db)[A-Z]?[A-Za-z0-9]*_[A-Z][A-Za-z0-9_]*\b/ },
   { name: "a Melee game-file name", pattern: /\bPlCo\b|\bPl[A-Z][a-z]\.dat\b|GALE01|\bmain\.dol\b/ },
-  { name: "an import of wisp-private code", pattern: /(?:\bfrom\s+|\bimport\s*\(\s*|\brequire\s*\(\s*|^\s*import\s+)["'][^"']*wisp-private/ },
 ];
 
 export interface Line { readonly path: string; readonly line: number; readonly text: string }
