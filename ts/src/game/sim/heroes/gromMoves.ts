@@ -18,7 +18,7 @@ export const GROM_MOVES: FighterMoves = {
     [AttackStyle.upTilt]: reach(6, 14, 8.0, 120.0), [AttackStyle.downTilt]: reach(5, 12, 54.0, 18.0),
     [AttackStyle.dashAttack]: reach(7, 16, 60.0, 50.0), [AttackStyle.forwardSmash]: reach(16, 24, 66.0, 50.0), [AttackStyle.upSmash]: [hurtPose(0, 41, [hurtPart(15.0, 35.0, -41.0, 159.0, 34.0)])], [AttackStyle.downSmash]: reach(13, 23, 56.0, 22.0),
     [AttackStyle.neutralAir]: [hurtPose(0, 27, [hurtPart(0.0, 48.0, -12.0, 149.0, 48.0), hurtPart(-32.0, 90.0, -40.0, 105.0, 25.0)])], [AttackStyle.forwardAir]: reach(10, 17, 64.0, 56.0), [AttackStyle.backAir]: reach(8, 15, -60.0, 56.0), [AttackStyle.upAir]: [hurtPose(0, 25, [hurtPart(8.0, 8.0, -32.0, 157.0, 40.0), hurtPart(-28.0, 98.0, -24.0, 113.0, 33.0)])], [AttackStyle.downAir]: reach(13, 20, 0.0, -24.0), [AttackStyle.grab]: [hurtPose(0, 32, [hurtPart(16.0, 16.0, -16.0, 149.0, 48.0), hurtPart(-32.0, 90.0, -32.0, 121.0, 25.0)])],
-    [AttackStyle.getupAttack]: [hurtPose(0, 8, [hurtPart(-3.0, 31.0, 33.0, 90.0, 45.0)]), hurtPose(9, 39, [hurtPart(-11.0, 47.0, -7.0, 120.0, 53.0)])],
+    [AttackStyle.getupAttack]: [hurtPose(0, 8, [hurtPart(-3.0, 31.0, 33.0, 90.0, 45.0)]), hurtPose(9, 39, [hurtPart(-11.0, 47.0, -7.0, 120.0, 53.0)]), hurtPose(40, 48, [hurtPart(13.0, 47.0, -16.0, 148.0, 48.0)])],
     [AttackStyle.ledgeAttack]: [hurtPose(0, 39, [hurtPart(16.0, 24.0, -16.0, 149.0, 48.0), hurtPart(-32.0, 90.0, -32.0, 121.0, 25.0)])],
   } },
   normals: {
