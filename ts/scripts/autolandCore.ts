@@ -11,7 +11,7 @@ export const DIRECT_CAP = 2;
 export const DISPATCHED = 2;
 
 export interface Status { readonly state: string; readonly description: string; readonly at: string }
-export interface Lane { readonly branch: string; readonly tip: string; readonly status: Status | null; readonly since?: string; readonly labels?: readonly string[] }
+export interface Lane { readonly branch: string; readonly tip: string; readonly status: Status | null; readonly since?: string; readonly labels?: readonly string[]; readonly milestones?: readonly string[] }
 export interface Job { readonly name?: string; readonly status: string; readonly created: string; readonly started: string | null; readonly labels: readonly string[] }
 export interface Run { readonly title: string; readonly status: string; readonly id?: number; readonly created?: string; readonly jobs?: readonly Job[] }
 
@@ -45,7 +45,8 @@ export function laneState(lane: Lane, runs: readonly Run[], retry: ReadonlySet<s
   return "test";
 }
 
-const priority = (lane: Lane): number => lane.labels?.includes("priority:now") === true ? 0 : lane.labels?.includes("playtest-blocking") === true ? 1 : 2;
+export const RELEASE_MILESTONE = "Public 0.1";
+const priority = (lane: Lane): number => lane.milestones?.includes(RELEASE_MILESTONE) === true ? 0 : lane.labels?.includes("playtest-blocking") === true ? 1 : 2;
 const waited = (lane: Lane): string => [lane.since, lane.status?.at].filter((at): at is string => at !== undefined).toSorted()[0] ?? "";
 const aged = (lane: Lane, now: number): number => waited(lane) !== "" && minutes(now, waited(lane)) > AGED ? 0 : 1;
 const byArrival = (lanes: readonly Lane[], now: number): Lane[] => lanes.toSorted((a, b) => aged(a, now) - aged(b, now) || (aged(a, now) === 0 ? 0 : priority(a) - priority(b)) || waited(a).localeCompare(waited(b)) || a.branch.localeCompare(b.branch));

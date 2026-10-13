@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { landedLanes, type Commit } from "../scripts/sheriff";
-import { AGED, BOUND, DIRECT_CAP, FARM_TITLE, JOB_BUDGET, LEAD, PROFILE, PROFILE_STEP, RUN_BUILD, RUN_PEAK, TEST_SLOTS, TRAIN_CAP, TRAIN_TITLE, laneState, lateLane, passedDescription, plan, stuckRuns, train, trainStep, type Job, type Lane, type Run } from "../scripts/autolandCore";
+import { AGED, BOUND, RELEASE_MILESTONE, DIRECT_CAP, FARM_TITLE, JOB_BUDGET, LEAD, PROFILE, PROFILE_STEP, RUN_BUILD, RUN_PEAK, TEST_SLOTS, TRAIN_CAP, TRAIN_TITLE, laneState, lateLane, passedDescription, plan, stuckRuns, train, trainStep, type Job, type Lane, type Run } from "../scripts/autolandCore";
 
 const recorded: { now: string; lanes: Lane[]; runs: Run[] } = JSON.parse(readFileSync(new URL("fixtures/autoland-backlog.json", import.meta.url), "utf8"));
 const now = Date.parse(recorded.now);
@@ -36,13 +36,13 @@ test("one unfinished train excludes another, and refreshing generated queues tak
     const lanes: Lane[] = Array.from({ length: next(12) }, (_, index) => {
       const at = new Date(now - next(240) * PROFILE_STEP).toISOString();
       const state = next(4);
-      return { branch: `claude/pair-${index}`, tip: index.toString(16).padStart(40, "0"), labels: [["priority:now"], ["playtest-blocking"], []][next(3)] ?? [], status: { state: state < 2 ? "pending" : "success", description: state % 2 === 0 ? passedDescription(base, tree) : "queued", at } };
+      return { branch: `claude/pair-${index}`, tip: index.toString(16).padStart(40, "0"), labels: [[], ["playtest-blocking"], []][next(3)] ?? [], milestones: [[RELEASE_MILESTONE], [], ["After 0.1"]][next(3)] ?? [], status: { state: state < 2 ? "pending" : "success", description: state % 2 === 0 ? passedDescription(base, tree) : "queued", at } };
     });
     const passed = lanes.filter((lane) => lane.status?.state === "pending" && lane.status.description === passedDescription(base, tree));
     const runs: Run[] = states.filter(() => next(3) === 0).map((status) => ({ title: TRAIN_TITLE, status }));
     expect(plan(lanes, runs, now).train).toBe(passed.length > 0 && runs.every((run) => run.status === "completed"));
     if (plan(lanes, runs, now).train) expect(plan(lanes, [...runs, { title: TRAIN_TITLE, status: "pending" }], now).train).toBe(false);
-    const priority = (lane: Lane): number => lane.labels?.includes("priority:now") === true ? 0 : lane.labels?.includes("playtest-blocking") === true ? 1 : 2;
+    const priority = (lane: Lane): number => lane.milestones?.includes(RELEASE_MILESTONE) === true ? 0 : lane.labels?.includes("playtest-blocking") === true ? 1 : 2;
     const ordered = passed.toSorted((a, b) => Number(aged(b, now)) - Number(aged(a, now)) || (aged(a, now) ? 0 : priority(a) - priority(b)) || waited(a).localeCompare(waited(b)) || a.branch.localeCompare(b.branch));
     const refreshed = train(lanes, now);
     expect(refreshed.map((lane) => lane.branch)).toEqual(ordered.slice(0, TRAIN_CAP).map((lane) => lane.branch));
@@ -190,7 +190,7 @@ test("plan fills every free slot whose run fits the measured job profile under J
   const ago = (steps: number): string => new Date(now - steps * PROFILE_STEP).toISOString();
   const statuses = ["requested", "pending", "queued", "in_progress", "completed"];
   for (let round = 0; round < 400; round++) {
-    const lanes: Lane[] = recorded.lanes.map((lane) => lane.status === null ? lane : { ...lane, status: { ...lane.status, at: ago(next(240)) }, labels: [["priority:now"], ["playtest-blocking"], []][next(3)] ?? [], ...(next(2) === 0 ? { since: ago(next(240)) } : {}) });
+    const lanes: Lane[] = recorded.lanes.map((lane) => lane.status === null ? lane : { ...lane, status: { ...lane.status, at: ago(next(240)) }, labels: [[], ["playtest-blocking"], []][next(3)] ?? [], milestones: [[RELEASE_MILESTONE], [], ["After 0.1"]][next(3)] ?? [], ...(next(2) === 0 ? { since: ago(next(240)) } : {}) });
     const runs: Run[] = recorded.runs.filter(() => next(recorded.runs.length) < 2).map((run) => ({ ...run, status: statuses[next(statuses.length)] ?? "completed" }));
     for (let extra = next(5); extra > 0; extra--) {
       const lane = lanes[next(lanes.length)];

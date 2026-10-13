@@ -126,17 +126,17 @@ env:
       gh api "repos/$GH_REPO/commits/$tip/statuses?per_page=100" --jq "{\"$tip\": ([.[] | select(.context == \"autoland\") | .created_at] | min)}" || echo '{}'
     done | jq -s 'add // {}' > since.json
     jq --slurpfile since since.json 'map(. + ($since[0][.tip] // null | if . == null then {} else {since: .} end))' lane-refs.json > lane-since.json && mv lane-since.json lane-refs.json
-    fields=$(jq -r '[.[].issues[]] | unique | map("i\(.): issue(number: \(.)) { labels(first: 100) { nodes { name } } }") | join(" ")' lane-refs.json)
+    fields=$(jq -r '[.[].issues[]] | unique | map("i\(.): issue(number: \(.)) { labels(first: 100) { nodes { name } } milestone { title } }") | join(" ")' lane-refs.json)
     if [ -z "$fields" ]; then
-      jq 'map(del(.issues) + {labels: []})' lane-refs.json
+      jq 'map(del(.issues) + {labels: [], milestones: []})' lane-refs.json
     else
       if ! gh api graphql -F owner="${GH_REPO%/*}" -F name="${GH_REPO#*/}" -f query="query(\$owner: String!, \$name: String!) { repository(owner: \$owner, name: \$name) { $fields } }" > issue-labels.json; then
         echo "Issue labels could not all resolve; unresolved lanes keep FIFO." >&2
       fi
       if jq -e 'type == "object" and (.data.repository | type == "object")' issue-labels.json > /dev/null 2>&1; then
-        jq --slurpfile lanes lane-refs.json '.data.repository as $issues | $lanes[0] | map(. + {labels: ([.issues[] as $number | $issues["i" + ($number | tostring)].labels.nodes[]?.name] | unique)} | del(.issues))' issue-labels.json
+        jq --slurpfile lanes lane-refs.json '.data.repository as $issues | $lanes[0] | map(. + {labels: ([.issues[] as $number | $issues["i" + ($number | tostring)].labels.nodes[]?.name] | unique), milestones: ([.issues[] as $number | $issues["i" + ($number | tostring)].milestone.title // empty] | unique)} | del(.issues))' issue-labels.json
       else
-        jq 'map(del(.issues) + {labels: []})' lane-refs.json
+        jq 'map(del(.issues) + {labels: [], milestones: []})' lane-refs.json
       fi
     fi
 
