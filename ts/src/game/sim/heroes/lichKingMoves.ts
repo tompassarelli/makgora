@@ -4,7 +4,7 @@ import { AttackStyle, GrabAction, HitElement } from "../codes";
 import { HERO_REFERENCE_HEIGHT, jabStep, heroHurtPose, heroMove, heroRegion, type FighterMoves, type MoveRegion } from "../heroMoves";
 import type { HitEffect } from "../hitRegions";
 import { strongHit } from "../strongHits";
-import { type FighterHurtboxes, hurtPart } from "../hurtboxes";
+import { type FighterHurtboxes, hurtPart, hurtPose } from "../hurtboxes";
 import { capsuleOf, limbOf, makeHit, path, reaching } from "./authoring";
 
 
@@ -58,7 +58,15 @@ const BACK_ARM = arm(-20.0, 82.0, -66.0, 76.0);
 const LICH_KING_BODY: FighterHurtboxes = {
   stand: [BODY],
   attacks: {
-    [AttackStyle.jab]: reaching(6, 3, arm(20.0, 76.0, 56.0, 72.0)),
+    [AttackStyle.jab]: [
+      hurtPose(0, 2, [hurtPart(-5.0, 43.0, -5.0, 99.0, 48.0)]),
+      hurtPose(3, 5, [hurtPart(-3.0, 51.0, -3.0, 100.0, 52.0)]),
+      hurtPose(6, 8, [hurtPart(-1.0, 54.0, -1.0, 77.0, 55.0)]),
+      hurtPose(9, 11, [hurtPart(-2.0, 61.0, -2.0, 69.0, 60.0)]),
+      hurtPose(12, 14, [hurtPart(-2.0, 61.0, -2.0, 71.0, 60.0)]),
+      hurtPose(15, 17, [hurtPart(-1.0, 56.0, -1.0, 78.0, 56.0)]),
+      hurtPose(18, 20, [hurtPart(-1.0, 51.0, -1.0, 88.0, 51.0)]),
+    ],
     [AttackStyle.jab2]: reaching(7, 3, arm(20.0, 76.0, 58.0, 70.0)),
     [AttackStyle.jab3]: reaching(9, 3, FORWARD_ARM),
     [AttackStyle.forwardTilt]: reaching(11, 4, FORWARD_ARM),
@@ -75,6 +83,24 @@ const LICH_KING_BODY: FighterHurtboxes = {
     [AttackStyle.backAir]: reaching(11, 4, BACK_ARM),
     [AttackStyle.upAir]: reaching(10, 5, RAISED_ARM),
     [AttackStyle.downAir]: reaching(18, 5, arm(6.0, 60.0, 10.0, 8.0)),
+    [AttackStyle.getupAttack]: [
+      hurtPose(0, 2, [hurtPart(30.0, 28.0, 30.0, 28.0, 56.0)]),
+      hurtPose(3, 5, [hurtPart(24.0, 24.0, 24.0, 24.0, 60.0)]),
+      hurtPose(6, 8, [hurtPart(26.0, 24.0, 26.0, 24.0, 60.0)]),
+      hurtPose(9, 11, [hurtPart(24.0, 19.0, 24.0, 19.0, 60.0)]),
+      hurtPose(12, 14, [hurtPart(34.0, 24.0, 34.0, 26.0, 59.0)]),
+      hurtPose(15, 17, [hurtPart(40.0, 19.0, 40.0, 41.0, 49.0)]),
+      hurtPose(18, 20, [hurtPart(41.0, 21.0, 41.0, 40.0, 50.0)]),
+      hurtPose(21, 23, [hurtPart(36.0, 21.0, 36.0, 48.0, 50.0)]),
+      hurtPose(24, 26, [hurtPart(28.0, 23.0, 28.0, 56.0, 51.0)]),
+      hurtPose(27, 29, [hurtPart(22.0, 25.0, 22.0, 61.0, 49.0)]),
+      hurtPose(30, 32, [hurtPart(22.0, 27.0, 22.0, 64.0, 50.0)]),
+      hurtPose(33, 35, [hurtPart(19.0, 28.0, 19.0, 67.0, 50.0)]),
+      hurtPose(36, 38, [hurtPart(15.0, 31.0, 15.0, 75.0, 49.0)]),
+      hurtPose(39, 41, [hurtPart(10.0, 36.0, 10.0, 82.0, 49.0)]),
+      hurtPose(42, 44, [hurtPart(5.0, 41.0, 5.0, 87.0, 48.0)]),
+      hurtPose(45, 48, [hurtPart(1.0, 46.0, 1.0, 92.0, 48.0)]),
+    ],
     [AttackStyle.grab]: reaching(9, 2, arm(20.0, 66.0, 72.0, 62.0)),
   },
 };
