@@ -3,8 +3,7 @@
 
 import { withExKit } from "../exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
-import { hurtCapsule } from "../../physics/contactGeometry";
-import { Character, HitElement } from "../codes";
+import { HitElement } from "../codes";
 import { HERO_REFERENCE_HEIGHT, heroRegion } from "../heroMoves";
 import { type AuthoredSpecial, type FighterSpecials, type SpecialMotion, type SpecialProjectile, frames } from "../heroSpecials";
 import { hurtPart, hurtPose } from "../hurtboxes";
@@ -16,6 +15,27 @@ const perFrame = (distance: number, first: number, last: number): number => f32(
 
 
 const AIR_SPECIAL_LANDING_LAG = 24;
+const HOWL_HURT = [
+    hurtPose(1, 45, [hurtPart(-30.0, 26.0, 16.0, 103.0, 56.0)]),
+];
+const HOWL_AIR_HURT = [
+    hurtPose(1, 45, [hurtPart(-30.0, 26.0, 16.0, 103.0, 56.0)]),
+];
+const CHARGE_HURT = [
+    hurtPose(1, 63, [hurtPart(-37.0, 34.0, 40.0, 87.0, 56.0)]),
+];
+const CHARGE_AIR_HURT = [
+    hurtPose(1, 63, [hurtPart(-37.0, 34.0, 40.0, 87.0, 56.0)]),
+];
+const LEAP_HURT = [
+    hurtPose(1, 31, [hurtPart(-22.0, 47.0, 6.0, 113.0, 75.0)]),
+];
+const RAIN_HURT = [
+    hurtPose(1, 59, [hurtPart(-30.0, 27.0, 16.0, 103.0, 56.0)]),
+];
+const RAIN_AIR_HURT = [
+    hurtPose(1, 59, [hurtPart(-30.0, 27.0, 16.0, 103.0, 56.0)]),
+];
 
 const meteor = (spawnFrame: number, offset: number): SpecialProjectile => ({
   spawnFrame, offsetX: h(offset), offsetZ: h(f32(2.8)),
@@ -27,7 +47,7 @@ const meteor = (spawnFrame: number, offset: number): SpecialProjectile => ({
 
 const RAIN_OF_FIRE = [meteor(25, f32(1.8)), meteor(31, f32(2.2)), meteor(37, f32(2.6))] as const;
 const rain = (air: boolean): AuthoredSpecial => ({
-  endFrame: 60, projectiles: RAIN_OF_FIRE,
+  endFrame: 60, projectiles: RAIN_OF_FIRE, hurt: air ? RAIN_AIR_HURT : RAIN_HURT,
   landingLag: air ? AIR_SPECIAL_LANDING_LAG : undefined,
 });
 
@@ -37,7 +57,6 @@ const rain = (air: boolean): AuthoredSpecial => ({
 
 const CHARGE = hit(18.04050064086914, "EDGE", 35, 1.0, HitElement.normal);
 const CHARGE_BODY = capsule(10.0, 30.0, 40.0, 80.0, 40.0);
-const CHARGE_HURT = [hurtPose(16, 30, [hurtCapsule(Character.pitLord), hurtPart(10.0, 30.0, 40.0, 80.0, 40.0)])];
 const chargeMotion = (distance: number): readonly SpecialMotion[] => [
   { ...frames(19, 26), velocityX: perFrame(distance, 19, 26), velocityZ: 0.0, stopsAtBody: true },
   { ...frames(27, 27), velocityX: 0.0, velocityZ: 0.0 },
@@ -52,7 +71,7 @@ const RUIN_CHARGE: AuthoredSpecial = {
 const RUIN_CHARGE_AIR: AuthoredSpecial = {
   endFrame: 64,
   regions: [heroRegion(19, 26, CHARGE_BODY, CHARGE)],
-  hurt: CHARGE_HURT,
+  hurt: CHARGE_AIR_HURT,
   motion: chargeMotion(h(f32(0.8))),
   oncePerAirtime: true,
   helpless: true,
@@ -74,6 +93,7 @@ const LEAP_HOOF = capsule(10.0, 0.0, 40.0, 40.0, 22.0);
 const abyssalLeap = (rise: number, drift: number, steer: number): AuthoredSpecial => ({
   endFrame: 32,
   regions: [heroRegion(13, 18, LEAP_HOOF, hit(12.027000427246094, "LAUNCH", 80, 1.0, HitElement.normal))],
+  hurt: LEAP_HURT,
   motion: leap(rise, drift, steer),
   facesStick: true, oncePerAirtime: true, helpless: true,
 });
@@ -85,6 +105,7 @@ const HOWL_RADIUS = h(f32(0.5));
 const HOWL_HEIGHT = h(f32(0.6));
 const howl = (air: boolean): AuthoredSpecial => ({
   endFrame: 46,
+  hurt: air ? HOWL_AIR_HURT : HOWL_HURT,
   regions: [
     heroRegion(15, 18, capsule(0.0, HOWL_HEIGHT, f32(HOWL_REACH - HOWL_RADIUS), HOWL_HEIGHT, HOWL_RADIUS), hit(8.418900489807129, "POKE", 35, 1.0, HitElement.normal)),
     heroRegion(15, 18, capsule(0.0, HOWL_HEIGHT, -f32(HOWL_REACH - HOWL_RADIUS), HOWL_HEIGHT, HOWL_RADIUS), hit(8.418900489807129, "POKE", 35, -1.0, HitElement.normal)),
