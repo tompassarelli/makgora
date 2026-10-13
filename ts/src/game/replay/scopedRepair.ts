@@ -143,6 +143,8 @@ function rosterReach(): Extent {
         widenHurtPoses(body, kit.marked?.special.hurt);
       }
     }
+    widenHurtPoses(body, tuning.ultimate?.hurt);
+    for (const followUp of tuning.ultimate?.followUps ?? []) widenHurtPoses(body, followUp.special.hurt);
     const hurtboxes = moves?.hurtboxes ?? shippedHurtboxes(character, moves);
     widenCapsule(body, hurtCapsule(character));
     widenHurt(body, hurtboxes.stand);

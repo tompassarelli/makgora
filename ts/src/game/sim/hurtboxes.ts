@@ -5,7 +5,7 @@ import { at } from "wisp/src/runtime/lookup";
 import { f32 } from "wisp/src/sim/f32";
 import { type Capsule, capsulesIntersect, emptyCapsule, hurtCapsule, placeCapsule } from "../physics/contactGeometry";
 import { AttackStyle, Character, SpecialAction } from "./codes";
-import { specialForm, specialKit } from "./heroSpecials";
+import { specialForm, specialKit, ultimateForm } from "./heroSpecials";
 import { fighterPoseFacing } from "./conditions";
 import type { Fighter } from "./fighter";
 import type { FighterMoves } from "./heroMoves";
@@ -134,12 +134,21 @@ function defaultHurtboxes(character: Character): Readonly<FighterHurtboxes> {
 
 
 
-function specialHurtParts(f: Readonly<Fighter>): readonly HurtPart[] | undefined {
+function specialHurtPoses(f: Readonly<Fighter>): readonly HurtPose[] | undefined {
+  const { action, form } = f.special;
+  if (action === SpecialAction.heroUltimate) {
+    const ultimate = f.tuning.ultimate;
+    return ultimate === undefined ? undefined : ultimateForm(ultimate, form).hurt;
+  }
   const specials = f.tuning.specials;
-  const { action, frame, form } = f.special;
   if (specials === undefined || action < SpecialAction.heroNeutral || action > SpecialAction.heroDown) return undefined;
-  const poses = specialForm(specialKit(specials, action - SpecialAction.heroNeutral), form).hurt;
+  return specialForm(specialKit(specials, action - SpecialAction.heroNeutral), form).hurt;
+}
+
+function specialHurtParts(f: Readonly<Fighter>): readonly HurtPart[] | undefined {
+  const poses = specialHurtPoses(f);
   if (poses === undefined) return undefined;
+  const frame = f.special.frame;
   for (const pose of poses) if (frame >= pose.firstFrame && frame <= pose.lastFrame) return pose.parts;
   return undefined;
 }

@@ -1448,12 +1448,14 @@ can be hit. Counter-hit the limb, not the sword.
 
 1. **One body outside attacks.** Standing, idle, walking, dashing, running,
    jumping, falling and shielding all use the standing body; only crouch,
-   attacks and specials author others. No idle pose, animation timing or
+   attacks, specials and ultimates author others. No idle pose, animation timing or
    random draw ever selects a body.
 2. **Connected.** Every part of every body touches its first part (the torso)
    directly or through other parts: no floating hurt volumes.
 3. **Held poses.** Every authored pose lasts at least 3 frames, and an
-   attack's or special's poses do not overlap and end within the move. A
+   attack's or special's poses do not overlap and end within the frames the
+   move really runs (a getup attack's 49 and a ledge attack's 40, whatever a
+   kit authors as its length). A
    gap between poses returns to the standing body, and counts as a change.
 4. **Bounded steps.** One change of body (entering the move, pose to pose,
    returning to standing) moves the body's front, back, top or bottom extent by

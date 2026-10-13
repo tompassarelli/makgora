@@ -11,7 +11,8 @@ import { HERO_ROSTER } from "./heroes/registry";
 import type { FighterMoves } from "./heroMoves";
 import { type AuthoredSpecial, specialKit } from "./heroSpecials";
 import { type FighterHurtboxes, type HurtPart, type HurtPose, HurtState, fighterHurtboxes } from "./hurtboxes";
-import { attackDurationFramesForGrounding } from "./moves";
+import { DOWN_ATTACK_FRAMES, LEDGE_ATTACK_FRAMES, attackDurationFramesForGrounding } from "./moves";
+import { FIGHTER_ULTIMATES } from "./ultimates";
 
 
 const MIN_POSE_FRAMES = 3;
@@ -59,13 +60,20 @@ interface FighterBodies {
   readonly moves: readonly MoveBodies[];
 }
 
+/** The frames an attack really runs: the getup and ledge attacks run their shared length whatever a kit authors. */
+function runFrames(style: AttackStyle, moves: FighterMoves | undefined): number {
+  if (style === AttackStyle.getupAttack) return DOWN_ATTACK_FRAMES;
+  if (style === AttackStyle.ledgeAttack) return LEDGE_ATTACK_FRAMES;
+  return Math.max(attackDurationFramesForGrounding(style, true, moves), attackDurationFramesForGrounding(style, false, moves));
+}
+
 function attackBodies(set: Readonly<FighterHurtboxes>, moves: FighterMoves | undefined): MoveBodies[] {
   const out: MoveBodies[] = [];
   for (const key in AttackStyle) {
     const style = AttackStyle[key as keyof typeof AttackStyle];
     const poses = set.attacks[style];
     if (poses === undefined || poses.length === 0) continue;
-    const total = Math.max(attackDurationFramesForGrounding(style, true, moves), attackDurationFramesForGrounding(style, false, moves));
+    const total = runFrames(style, moves);
     out.push({ name: key, poses, firstFrame: 0, lastFrame: total - 1 });
   }
   return out;
@@ -95,6 +103,7 @@ function everyFighter(): FighterBodies[] {
         if (kit.air !== undefined) specialBodies(kit.air, `${SLOT_NAMES[slot] ?? "special"} (air)`, moves);
       }
     }
+    specialBodies(FIGHTER_ULTIMATES[hero.character], "ultimate", moves);
     fighters.push({ name: hero.name, set, moves });
   }
   return fighters;

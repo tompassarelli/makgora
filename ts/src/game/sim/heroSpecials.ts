@@ -415,6 +415,11 @@ export function specialForm(kit: Readonly<SpecialKit>, form: number, ex = false)
 }
 
 
+export function ultimateForm(ultimate: Readonly<AuthoredSpecial>, form: number): AuthoredSpecial {
+  return form >= FOLLOW_UP_FORM ? ultimate.followUps?.[idiv(form, FOLLOW_UP_FORM) - 1]?.special ?? ultimate : ultimate;
+}
+
+
 export function heroSpecialMove(specials: Readonly<FighterSpecials>, chosen: { readonly slot: number; readonly form: number }): AuthoredSpecial {
   return specialForm(specialKit(specials, chosen.slot), chosen.form);
 }
