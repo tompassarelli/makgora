@@ -43,7 +43,7 @@ Every row links both its Warcraft source and its Smash design reference.
 | Input | Worker action and decision | F/A/R; damage; reach | Sources |
 |---|---|---|---|
 | Jab 1, 2 | Haft tap, then short chop; quick interruption, little reach | 4/2/12, 3%; 6/2/18, 6%; 58/70 | [Harvest](https://liquipedia.net/warcraft/Peon), [Villager jab](https://www.ssbwiki.com/Villager_(SSBU)#Moveset) |
-| Forward tilt, up/down angles | Lumber chop; angle selects head, waist or shin | 8/3/19; 9%; 100 | [Harvest](https://liquipedia.net/warcraft/Peon), [Timber axe](https://www.ssbwiki.com/Timber) |
+| Forward tilt, up/down angles | Lumber chop; angle selects head, waist or shin | 8/3/19; 9%; 100, down angle 54 (fitted to the drawn axe) | [Harvest](https://liquipedia.net/warcraft/Peon), [Timber axe](https://www.ssbwiki.com/Timber) |
 | Up tilt | Lift the axe over one shoulder; juggle starter | 7/4/20; 8%; 126 high | [Harvest](https://liquipedia.net/warcraft/Peon), [G&W up tilt](https://www.ssbwiki.com/Mr._Game_%26_Watch_(SSBU)#Moveset) |
 | Down tilt | Dig under the feet; short launcher | 6/3/19; 7%; 82 | [Gold harvest](https://liquipedia.net/warcraft/Peon), [Villager down tilt](https://www.ssbwiki.com/Villager_(SSBU)#Moveset) |
 | Dash attack | Stumble forward behind the axe; punishable approach | 10/4/25; 10%; 88 | [Worker attack](https://liquipedia.net/warcraft/Peon), [Villager dash attack](https://www.ssbwiki.com/Villager_(SSBU)#Moveset) |
@@ -62,8 +62,9 @@ Every row links both its Warcraft source and its Smash design reference.
 | Down throw | Drop the load; a tech chase, never a bury | f17/end42; 5%, 25 degrees | [Carry resources](https://liquipedia.net/warcraft/Peon), [Villager down throw](https://www.ssbwiki.com/Villager_(SSBU)#Moveset) |
 
 Hands remain inside exposed limb capsules; the axe blade alone is disjoint.
-Get-up and ledge attacks use the template's shared actions and authored worker
-gestures. No throw is designed as an inescapable loop: up throw permits a short
+Get-up and ledge attacks are Peon-local moves with the template's shared timing
+and hit effects, their regions fitted to the drawn axe: get-up reaches 47 ahead,
+ledge attack 41. No throw is designed as an inescapable loop: up throw permits a short
 juggle, down throw offers the victim a tech direction, and shared throw-hitstun
 rules refuse immediate regrabs.
 

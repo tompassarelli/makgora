@@ -1,7 +1,9 @@
 import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle, GrabAction, HitElement } from "../codes";
+import type { HitEffect } from "../hitRegions";
 import { heroHurtPose, heroMove, heroRegion, jabStep, type FighterMoves, type MoveRegion, type StrikeCapsule, tipperMove } from "../heroMoves";
 import { hurtPart, type HurtPart, type HurtPose } from "../hurtboxes";
+import { ANGLES } from "./authoring";
 import { groundHit } from "./groundNormals";
 
 export const peonHit = (damage: number, angle: 25 | 35 | 40 | 55 | 70 | 85 | 90, growth = 88.6500015258789, base = 22.0, behind = false) =>
@@ -10,6 +12,12 @@ export const peonHit = (damage: number, angle: 25 | 35 | 40 | 55 | 70 | 85 | 90,
 const blade = (x1: number, z1: number, x2: number, z2: number, radius = 8.0): StrikeCapsule => ({ x1, z1, x2, z2, radius });
 const swing = (first: number, points: readonly (readonly [number, number])[], damage: number, angle: 25 | 35 | 40 | 55 | 70 | 85 | 90, growth = 88.6500015258789, base = 22.0, behind = false): readonly MoveRegion[] =>
   points.map(([x, z], index) => heroRegion(first + index, first + index, blade(behind ? -16.0 : 16.0, 48.0, x, z), peonHit(damage, angle, growth, base, behind)));
+
+type Cut = readonly [number, number, number, number, number];
+const axe = (first: number, cuts: readonly Cut[], effect: Readonly<HitEffect>, groundedEffect?: Readonly<HitEffect>): readonly MoveRegion[] =>
+  cuts.map(([x1, z1, x2, z2, radius], index) => heroRegion(first + index, first + index, blade(x1, z1, x2, z2, radius), effect, groundedEffect));
+const sharedHit = (damage: number, base: number): Readonly<HitEffect> =>
+  ({ damage, growth: 100.0, base, launchX: ANGLES[45].x, launchZ: ANGLES[45].z, electric: false });
 
 const BODY = hurtPart(0.0, 4.0, 0.0, f32(f32(105.44) - f32(42.24)), f32(21.12));
 const reaching = (first: number, last: number, x: number, z: number): readonly HurtPose[] => {
@@ -57,7 +65,8 @@ export const PEON_MOVES: FighterMoves = {
     [AttackStyle.jab2]: heroMove(6, 2, 18, 0, swing(6, [[62.0, 62.0], [62.0, 32.0]], 6.144000053405762, 40, 78.80000305175781, 22.0)),
     [AttackStyle.forwardTilt]: tilt(48.0),
     [AttackStyle.forwardTiltUp]: tilt(72.0),
-    [AttackStyle.forwardTiltDown]: tilt(24.0),
+    [AttackStyle.forwardTiltDown]: heroMove(8, 3, 19, 0, axe(8, [[24.0, 48.0, 46.0, 48.0, 8.0], [22.0, 47.0, 45.0, 47.0, 8.0], [19.0, 46.0, 43.0, 46.0, 8.0]],
+      peonHit(9.215999603271484, 40))),
     [AttackStyle.upTilt]: heroMove(7, 4, 20, 0, swing(7, [[45.0, 106.0], [15.0, 118.0], [-15.0, 118.0], [-36.0, 102.0]], 8.192000389099121, 85, 68.94999694824219, 40.0)),
     [AttackStyle.downTilt]: heroMove(6, 3, 19, 0, swing(6, [[74.0, 8.0], [74.0, 16.0], [66.0, 28.0]], 7.168000221252441, 70, 72.0, 45.0)),
     [AttackStyle.dashAttack]: heroMove(10, 4, 25, 0, swing(10, [[80.0, 38.0], [80.0, 42.0], [74.0, 48.0], [68.0, 50.0]], 10.239999771118164, 55), 34.0, true),
@@ -76,6 +85,8 @@ export const PEON_MOVES: FighterMoves = {
     [AttackStyle.upAir]: heroMove(8, 3, 23, 12, swing(8, [[22.0, 122.0], [0.0, 130.0], [-22.0, 122.0]], 9.215999603271484, 85, 98.5, 24.0)),
     [AttackStyle.downAir]: heroMove(14, 4, 28, 18, [heroRegion(14, 17, blade(10.0, 0.0, 10.0, -62.0),
       { ...peonHit(13.312000274658203, 90, 98.5, 24.0), launchZ: -1.0 }, peonHit(13.312000274658203, 55, 98.5, 24.0))]),
+    [AttackStyle.getupAttack]: heroMove(17, 3, 30, 0, axe(17, [[39.0, 47.0, 39.0, 69.0, 8.0], [37.0, 45.0, 37.0, 72.0, 5.0], [1.0, 44.0, 1.0, 72.0, 5.0]], sharedHit(7.0, 75.0))),
+    [AttackStyle.ledgeAttack]: heroMove(17, 3, 21, 0, axe(17, [[32.0, 60.0, 32.0, 85.0, 8.0], [33.0, 51.0, 33.0, 79.0, 7.0], [36.0, 44.0, 36.0, 74.0, 5.0]], sharedHit(7.0, 20.0))),
     [AttackStyle.grab]: heroMove(8, 2, 25, 0, [heroRegion(8, 9, blade(18.0, 40.0, 48.0, 40.0, 10.0), peonHit(0.0, 90, 0.0, 0.0))]),
   },
   throws: {

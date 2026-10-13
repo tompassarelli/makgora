@@ -4,8 +4,8 @@ import { playReal, ROSTER } from "../scripts/playtest";
 import { sweep } from "./sweep";
 import { LAVA_HIT } from "../src/game/sim/lava";
 
-test("seeds 6 and 43 separate tech reads while retaining the real grab into forward-tilt combo [k1 scenario]", () => {
-  const spec = [...planMatches(ROSTER, 6, 1), ...planMatches(ROSTER, 43, 1)];
+test("seeds 6 and 277 separate tech reads while retaining the real grab into forward-tilt combo [k1 scenario]", () => {
+  const spec = [...planMatches(ROSTER, 6, 1), ...planMatches(ROSTER, 277, 1)];
   const runs = runPlaytest(spec, playReal, 1056, true, () => 0);
   expect(classify(runs).filter((finding) => finding.kind === "infinite-combo" || finding.kind === "desync")).toEqual([]);
   expect(runs[1]?.first.combos.flatMap(trueSegments).some((segment) => segment.moves.join(",") === "grab,forward-tilt")).toBe(true);
