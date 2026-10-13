@@ -832,9 +832,11 @@ In the installed archive, Classic is
 `war3.w3mod:units/creeps/heroforsakenpaladin/heroforsakenpaladin.mdx`;
 Definitive is
 `war3.w3mod:_de.w3mod:units/creeps/heroforsakenpaladin/heroforsakenpaladin.mdx`.
-Tom chose these Blizzard models for Classic and Definitive. The match and
-victory body use `war3mapImported\\ForsakenPaladin.mdx`, with authored clips
-pooled from the same stock rig. Selection, HUD, stock and ending portraits use
+Public 0.1 ships Classic; Definitive variants remain private. The fighter's
+source path is `Units\\Creeps\\HeroForsakenPaladin\\HeroForsakenPaladin.mdx`,
+selecting private `hero-models/heroforsakenpaladin.mdx`. Match and victory bodies
+use our authored clips pooled from that stock rig, retaining our weapon marker
+metadata. Selection, HUD, stock and ending portraits use
 the `FighterTile`, `FighterBust`, `FighterStock` and `FighterCard` Forsaken Paladin
 cutouts, including each player's outfit, rendered from that same body.
 Its version-1800 skin addresses bone matrices directly. The shipped authored
