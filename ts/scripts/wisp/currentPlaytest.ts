@@ -187,7 +187,7 @@ export const currentPlaytest = (library: string, { revision: wanted, named = fal
     console.log(`Building ${title}`);
     const lane = yield* buildLane(mainCheckout, revision);
     yield* run(join(lane, "ts"), ["bun", "install", "--frozen-lockfile"]);
-    yield* run(join(lane, "ts"), ["bun", "wisp", "map", "build", "--profile", "playable", "--name", title, "--out", join(staging, map.file)]);
+    yield* run(join(lane, "ts"), ["bun", "wisp", "map", "build", "--profile", "playable", "--edition", "full", "--name", title, "--out", join(staging, map.file)]);
     if (wantsHelper && !existsSync(helper)) {
       yield* buildHelper(lane, helper).pipe(Effect.catch((problem) => Effect.sync(() => console.log(`No controller helper for this build (${problem.problem}); the keyboard plays`))));
     }

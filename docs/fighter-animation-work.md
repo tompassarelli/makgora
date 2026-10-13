@@ -1235,7 +1235,7 @@ From smashcraft:ts/ in your lane:
    then from the repository root `bun tools/animations/export-original-clips.ts
    --assets "$(cd ts && bun wisp inputs path assets)" --out NEW --keep-unchanged`.
 3. `bun wisp inputs add original-clips-static-lights NEW`, build with
-   `bun wisp map build --profile playable --name NAME --out OUT.w3x`, and commit
+   `bun wisp map build --profile playable --edition full --name NAME --out OUT.w3x`, and commit
    build-inputs/original-clips-static-lights with the clip module.
 
 ## Lich King clips on an imported model

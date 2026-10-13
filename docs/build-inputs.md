@@ -44,6 +44,17 @@ with, one file per family, so a commit fixes its art exactly as it fixes its cod
   builds of one path never share a partial file and stored inputs stay sealed.
   Game files, installed maps and play's host files are written the same way.
 
+## Public and private packages
+
+`bun wisp map build --profile playable --name NAME --out OUT.w3x` defaults
+to `--edition classic`: the public package omits every `_hd.w3mod` and
+`_de.w3mod` import. Other profiles default to `--edition full`, and
+`bun wisp play` explicitly builds a full private playable map. Use
+`--edition full` with the playable profile to check both looks during private
+development. The inputs stay intact for either edition. Rebuilds preserve
+the existing archive's edition. A Classic build rejects a base or container
+that already carries HD/DE entries; the sealed inputs contain none.
+
 ## Change art
 
 New or changed art is a new family hash and a manifest commit, landed like
@@ -56,7 +67,7 @@ code:
    then `bun tools/animations/export-original-clips.ts --assets "$(bun wisp inputs path assets)" --out NEW --keep-unchanged`.
 2. `bun wisp inputs add FAMILY DIR` (from smashcraft:ts/) stores it and writes
    its hash into your checkout's build-inputs/FAMILY.
-3. `bun wisp map build --profile playable --name NAME --out OUT.w3x` from the lane
+3. `bun wisp map build --profile playable --edition full --name NAME --out OUT.w3x` from the lane
    checks the change; commit build-inputs/FAMILY with the code that needs it and
    land it. Lanes that changed different families touch different files and
    merge cleanly; two lanes that changed the same family conflict on that one

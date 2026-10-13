@@ -44,6 +44,7 @@ export const TOMB_WATERFALL_IMPORTS = [
   { entry: "_de.w3mod\\Doodads\\Terrain\\CliffDoodad\\Waterfall\\Waterfall.mdx", file: "TombWaterfallDE.mdx" },
 ] as const;
 const BuildOptions = Schema.Struct({
+  edition: Schema.optional(Schema.Literals(["classic", "full"])),
 
   base: Schema.optional(Schema.NonEmptyString),
   container: Schema.optional(Schema.NonEmptyString),
@@ -58,10 +59,16 @@ type BuildOptions = typeof BuildOptions.Type;
 
 
 
-export const decodeBuildOptions = (args: readonly string[]) => {
+export type MapEdition = "classic" | "full";
+
+export const editionImports = (imports: readonly ArchiveEntry[], edition: MapEdition): readonly ArchiveEntry[] =>
+  edition === "full" ? imports : imports.filter(({ entry }) => !/^_(hd|de)\.w3mod[\\/]/i.test(entry));
+
+export const decodeBuildOptions = (args: readonly string[], defaultEdition: MapEdition = "full") => {
   const pairs = Object.fromEntries(args.flatMap((arg, index) => arg.startsWith("--") && args[index + 1] !== undefined ? [[arg.slice(2), args[index + 1]]] : []));
   return Schema.decodeUnknownEffect(BuildOptions)(pairs).pipe(
     Effect.mapError((cause) => new UsageFailure({ problem: cause.message })),
+    Effect.map((options) => ({ ...options, edition: options.edition ?? defaultEdition })),
   );
 };
 
@@ -190,6 +197,7 @@ const carriedModels = (map: string, packager: string, models: readonly string[] 
   if (missing.length > 0) {
     return yield* new MapBuildFailure({ operation: "check script models", path: map, cause: `the map does not carry ${some(missing)}; build it again` });
   }
+  return carried;
 }));
 
 
@@ -200,21 +208,22 @@ const CUE_GRAPHICS_DE = { entry: "_de.w3mod\\war3mapImported\\CueGraphics.fdf", 
 
 
 
-export const rebuildMap = (map: string) => {
+export const rebuildMap = (map: string) => Effect.gen(function*() {
   const packager = buildProject().packager;
-  return checkCueModels().pipe(
+  const carried = yield* carriedModels(map, packager).pipe(step("script models carried"));
+  return yield* checkCueModels().pipe(
     step("cue models resolved in both looks"),
-    Effect.andThen(carriedModels(map, packager)),
-    step("script models carried"),
     Effect.andThen(MapBuild.use((maps) => maps.rebuild(map))),
     Effect.andThen(Effect.forEach(UI_FRAME_FILES, (file) => {
       const { entry, source } = imported(join(PROJECT, "tools/selection/art"), file);
       return runProcess(`replace ${entry}`, map, [packager, "replace", map, source, entry]);
     }, { discard: true })),
-    Effect.andThen(runProcess("replace Definitive cue graphics", map, [packager, "replace", map, CUE_GRAPHICS_DE.source, CUE_GRAPHICS_DE.entry])),
+    Effect.andThen(carried.has(CUE_GRAPHICS_DE.entry.toLowerCase())
+      ? runProcess("replace Definitive cue graphics", map, [packager, "replace", map, CUE_GRAPHICS_DE.source, CUE_GRAPHICS_DE.entry])
+      : Effect.void),
     step("menu frames replaced"),
   );
-};
+});
 
 const DEFINITIVE_PREFIX = "_de.w3mod/";
 const imported = (directory: string, file: string): ArchiveEntry => ({ entry: `war3mapImported\\${file}`, source: join(directory, file) });
@@ -235,8 +244,8 @@ export const MAP_PORTRAITS: readonly string[] = RENDERED_FIGHTERS.flatMap((chara
  * (fighter-renders/de/) under _de.w3mod at the same path, which Definitive reads
  * first and Classic ignores, as the fighter bodies do (docs/design/hd-fighters.md).
  */
-const portraitImports = (assets: string) => Effect.forEach(
-  MAP_PORTRAITS.flatMap((path): { entry: string; folder: readonly string[] }[] => [{ entry: path, folder: [] }, { entry: `_de.w3mod\\${path}`, folder: ["de"] }]),
+const portraitImports = (assets: string, edition: MapEdition) => Effect.forEach(
+  MAP_PORTRAITS.flatMap((path): { entry: string; folder: readonly string[] }[] => [{ entry: path, folder: [] }, ...(edition === "full" ? [{ entry: `_de.w3mod\\${path}`, folder: ["de"] }] : [])]),
   ({ entry, folder }) => Effect.gen(function*() {
     const source = join(assets, "fighter-renders", ...folder, entry.replace(/^.*war3mapImported\\/, "").replace(/\.blp$/, ".tga"));
     const bytes = yield* tryMapPromise("read portrait", source, () => Bun.file(source).bytes());
@@ -301,7 +310,7 @@ const stageCardImports = Effect.gen(function*() {
 });
 
 
-export const importedAssets = (assets: string, summon: string) => Effect.gen(function*() {
+export const importedAssets = (assets: string, summon: string, edition: MapEdition = "full") => Effect.gen(function*() {
   const generated = yield* Effect.forEach(GENERATED_MODELS, ({ list, generator, models }) => Effect.gen(function*() {
     const path = join(assets, list);
     const files = yield* importLines(path);
@@ -336,7 +345,7 @@ export const importedAssets = (assets: string, summon: string) => Effect.gen(fun
     { entry: DEMON_HUNTER_MODEL_FILE, source: join(assets, "illidan-animation/DemonHunterFighter.mdx") },
     ...SELECTION_TEXTURES.map((texture) => imported(join(assets, "selection-assets"), `${texture}.tga`)),
     { entry: "_de.w3mod\\war3mapImported\\SelectionHandPinch.tga", source: join(assets, "selection-assets/_de.w3mod/SelectionHandPinch.tga") },
-    ...(yield* portraitImports(assets)),
+    ...(yield* portraitImports(assets, edition)),
     yield* previewImport(assets),
 
     ...(yield* stageCardImports),
@@ -350,9 +359,10 @@ export const importedAssets = (assets: string, summon: string) => Effect.gen(fun
     ...classicBodies,
     ...classicOverrides,
   ];
-  const problem = importProblem(entries);
+  const selected = editionImports(entries, edition);
+  const problem = importProblem(selected);
   if (problem !== undefined) return yield* new MapBuildFailure({ operation: "check imports", path: assets, cause: problem });
-  return entries;
+  return selected;
 });
 
 

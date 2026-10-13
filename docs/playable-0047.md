@@ -155,6 +155,8 @@ bun wisp map build --profile playable --base ~/.local/share/smashcraft-build-inp
   --name "Smashcraft 0.0.47" --out ~/.local/share/smashcraft-build-inputs/playable-0047/'Smashcraft 0.0.47.w3x'
 ```
 
+To reproduce this private build on current main, add `--edition full`.
+
 `--build` names the map's build.
 
 To check a candidate on the two engineering clients, run
