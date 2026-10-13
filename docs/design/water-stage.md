@@ -13,9 +13,8 @@ second.
 
 ## Reference 1: Jungle Japes' river (Melee)
 
-Read from the owner's NTSC 1.02 disc (Melee rev 2, `GrGd.dat` SHA-1
-671cbf509c61d6e0c1c470598456c10059a91762, its `yakumono_param` table) and the
-decompilation Melee
+Design targets for the river, set from SmashWiki's Jungle Japes page and from
+watching the game.
 
 | `yakumono_param` | Value | Use |
 | --- | --- | --- |

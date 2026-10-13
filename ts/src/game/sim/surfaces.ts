@@ -27,7 +27,7 @@ export const WALL_JUMP_REPEAT_RISE_SCALE = 0.9750000238418579;
 const WALL_JUMP_AGE_LIMIT = 254;
 const WALL_JUMPS_USED_LIMIT = 255;
 
-// Melee airborne ECB half-width is at least 2 units (a Melee routine).
+// Melee airborne ECB half-width is at least 2 units.
 
 
 

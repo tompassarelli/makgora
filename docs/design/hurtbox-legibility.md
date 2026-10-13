@@ -99,16 +99,15 @@ what surrounds it:
 
 ## Melee's comparable cases
 
-From the decompilation at revision 0296f009f32f710495979d30772d8332af2d411a
-(read-only reference; facts only, no implementation copied) and SmashWiki:
+From SmashWiki and public frame data:
 
 - **Same structure.** A fighter carries up to 15 hurt capsules, each attached to a bone
   with two offsets and a scale, a state (enabled, disabled, intangible), a
   low/mid/high height and a grabbable flag (Melee,
   `HurtCapsule`, `FighterHurtCapsule`).
 - **Swept hitbox, static hurtbox.** The hit capsule keeps its previous and
-  current position (`HitCapsule`; ftcoll.c copies the current
-  into the previous on reset), and the hit-against-hurt test takes both
+  current position (`HitCapsule`; the current
+  becomes the previous on reset), and the hit-against-hurt test takes both
   against the hurt capsule's two current endpoints.
 - **Phantom hits.** A hitbox less than 0.01 units through a hurtbox is a
   phantom hit; Jigglypuff's Rest is the famous case, where a phantom hit lets

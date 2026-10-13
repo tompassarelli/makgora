@@ -22,7 +22,7 @@ function landTumbling(fighter: Fighter, input: Readonly<Controls>): void {
 
 const MELEE_BOUND_ATTACK_PRESS_AGE_LIMIT = 60;
 
-test("a get-up attack pressed during the bound starts as it ends, ahead of a held roll [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
+test("a get-up attack pressed during the bound starts as it ends, ahead of a held roll [k3 measure docs/physics.md]", () => {
   assertGreaterThan(MELEE_BOUND_ATTACK_PRESS_AGE_LIMIT, DOWN_BOUND_FRAMES);
   for (const pressFrame of [1, DOWN_BOUND_FRAMES - 1]) {
     const fighter = createFighter(Character.rifleman, 0.0, 1);
@@ -42,7 +42,7 @@ test("a get-up attack pressed during the bound starts as it ends, ahead of a hel
 
 const analog = (x: number, z: number) => controls({ diStickValid: true, diStickX: x, diStickZ: z });
 
-test("get-up rolls and stands follow Melee's stick tilt and angle [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
+test("get-up rolls and stands follow Melee's stick tilt and angle [k3 measure docs/physics.md]", () => {
   // Common = 0.2 tilt, = 50 degrees above horizontal (a Melee routine.c a Melee routine, a Melee routine.c).
   const cases: readonly (readonly [number, number, DownState, number])[] = [
     [0.19999998807907104, 0.0, DownState.wait, 0],
@@ -64,7 +64,7 @@ test("get-up rolls and stands follow Melee's stick tilt and angle [k4 reference 
   }
 });
 
-test("a floor tech rolls only past Melee's sideways tilt [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
+test("a floor tech rolls only past Melee's sideways tilt [k3 measure docs/physics.md]", () => {
   // Common = 0.2.
   for (const [x, state] of [[0.19999998807907104, DownState.tech], [-0.20000000298023224, DownState.techRoll]] as const) {
     const fighter = createFighter(Character.rifleman, 0.0, 1);
@@ -78,7 +78,7 @@ test("a floor tech rolls only past Melee's sideways tilt [k4 reference docs/smas
   }
 });
 
-test("tumble ends only on a fresh sideways flick past Melee's threshold [k4 reference docs/smash-melee-reference/retail-tumble-exit.json]", () => {
+test("tumble ends only on a fresh sideways flick past Melee's threshold [k3 measure docs/physics.md]", () => {
   // Common = 0.8 on the frame the stick crosses = 0.25.
   const sequences: readonly (readonly [readonly Controls[], boolean])[] = [
     [[analog(0.0, 0.0), analog(-0.800000011920929, 0.0)], true],
@@ -99,7 +99,7 @@ test("tumble ends only on a fresh sideways flick past Melee's threshold [k4 refe
 });
 
 test("a jab reset compares the damage summed over the frame's contacts [k4 reference docs/physics.md#grounded-knockdown-and-jab-resets]", () => {
-  // Melee tests the frame's summed percentTemp (ftcoll.c:370) against = 7.
+  // Melee tests the frame's summed percentTemp against = 7.
   for (const [contacts, reset] of [[1, true], [2, false]] as const) {
     const attacker = createFighter(Character.rifleman, 0.0, 1);
     const lying = createFighter(Character.rifleman, 60.0, -1);

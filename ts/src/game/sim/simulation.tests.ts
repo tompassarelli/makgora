@@ -30,7 +30,7 @@ test("hit regions snapshot different effects before either trade cancels its att
   }
 });
 
-test("an empty landing recovers once, after four ticks [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
+test("an empty landing recovers once, after four ticks [k3 measure docs/physics.md]", () => {
   for (const character of [Character.sylvanas, Character.rifleman]) {
     const fighter = createReferenceFighter(character, 0.0, 1);
     const input = controls();

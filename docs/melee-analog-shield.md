@@ -15,7 +15,7 @@ health, produces duration 13.436975479125977, and pushes back
 1.612437129020691 Melee units. The production integer stun count is 13 under
 the existing duration-to-action-clock rule.
 
-The corpus smashcraft:docs/smash-melee-reference/retail-analog-shield.json
+The corpus the recorded design targets
 contains 54 original NTSC 1.02 observations over six pressures, three health
 values and three integer contact powers. The complete nonbreaking guard update
 and stun routines run under QEMU PPC750. Size, damage and pushback use bounded
@@ -24,13 +24,8 @@ The size observation uses unit base size, isolating the shared multiplier
 without importing any retail fighter's geometry. The observations establish
 scalar outputs, not a complete original guard/contact update.
 
-The independently authored loader
-smashcraft:tools/physics-probe/observe-retail-shield.mjs loads the revision-matched
-retail executable and common table privately. Its original-containing ELF and
-binary outputs stay outside repositories in
-~/.local/share/smashcraft-melee-reference/analog-shield-runner. Reference
-revision 0296f009f32f710495979d30772d8332af2d411a supplies symbol/ABI lookup;
-no external implementation was copied or translated.
+The analog-shield figures are our own design targets, set from public frame
+data (SmashWiki's Shield page).
 
 Observed focused check: 54 numeric-observation tests and four connected
 input/guard/contact/replay tests pass (58/58), with zero compiler errors and

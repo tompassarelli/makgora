@@ -39,7 +39,7 @@ function guarding(character: Character) {
 }
 
 for (const cardinal of CARDINALS) {
-  test(`Tilt plus shield gives every fighter capped ${cardinal.name} reach as a fraction of its shield radius without a roll, dodge or jump [k4 reference docs/smash-melee-reference/shield-tilt-cardinals.md]`, () => {
+  test(`Tilt plus shield gives every fighter capped ${cardinal.name} reach as a fraction of its shield radius without a roll, dodge or jump [k3 measure docs/physics.md]`, () => {
     for (const character of SELECTABLE_CHARACTERS) {
       const { fighter, controls, attacks } = guarding(character);
       const geometry = fighter.tuning.shield;
@@ -71,7 +71,7 @@ for (const cardinal of CARDINALS) {
   });
 }
 
-test("shield tilt moves every fighter's projectile contact circle with its drawn bubble [k3 measure docs/smash-melee-reference/shield-tilt-cardinals.md]", () => {
+test("shield tilt moves every fighter's projectile contact circle with its drawn bubble [k3 measure docs/physics.md]", () => {
   const areas = createHitAreaList();
   for (const character of SELECTABLE_CHARACTERS) {
     const { fighter, controls, attacks } = guarding(character);

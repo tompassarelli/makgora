@@ -68,7 +68,7 @@ function missedTechLanding(knockdown: Knockdown): number {
 
 const boundEnd = (landing: number) => landing + DOWN_BOUND_FRAMES;
 
-test("a trigger press before a tumble landing techs through the journal path at low, medium and high percent [k4 reference docs/smash-melee-reference/retail-tech-timer-gate.json]", () => {
+test("a trigger press before a tumble landing techs through the journal path at low, medium and high percent [k3 measure docs/physics.md]", () => {
   for (const knockdown of KNOCKDOWNS) {
     const landing = missedTechLanding(knockdown);
     const run = startRun(knockdown.victim, knockdown.percent);
@@ -78,7 +78,7 @@ test("a trigger press before a tumble landing techs through the journal path at 
   }
 });
 
-test("an attack pressed during the bound starts the get-up attack as Melee's bound ends [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
+test("an attack pressed during the bound starts the get-up attack as Melee's bound ends [k3 measure docs/physics.md]", () => {
   for (const knockdown of KNOCKDOWNS) {
     const run = startRun(knockdown.victim, knockdown.percent);
     const landing = knockDown(run, knockdown.strike, NEUTRAL);
@@ -90,7 +90,7 @@ test("an attack pressed during the bound starts the get-up attack as Melee's bou
   }
 });
 
-test("a stick held sideways rolls forward or back, and held up stands, as Melee's bound ends [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
+test("a stick held sideways rolls forward or back, and held up stands, as Melee's bound ends [k3 measure docs/physics.md]", () => {
   for (const knockdown of KNOCKDOWNS) {
     for (const [stick, state, direction] of [[{ x: -1.0 }, DownState.roll, -1], [{ x: 1.0 }, DownState.roll, 1], [{ y: 1.0 }, DownState.stand, 0]] as const) {
       const run = startRun(knockdown.victim, knockdown.percent);
@@ -105,7 +105,7 @@ test("a stick held sideways rolls forward or back, and held up stands, as Melee'
   }
 });
 
-test("the down wait takes Special, takes a trigger press, and stands by itself after Melee's 220 frames [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
+test("the down wait takes Special, takes a trigger press, and stands by itself after Melee's 220 frames [k3 measure docs/physics.md]", () => {
 
   const [low, mid, high] = [assertDefined(KNOCKDOWNS[0]), assertDefined(KNOCKDOWNS[1]), assertDefined(KNOCKDOWNS[2])];
   for (const [knockdown, pad, state] of [[low, { special: true }, DownState.attack], [mid, { trigger: true }, DownState.stand]] as const) {

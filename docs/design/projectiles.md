@@ -46,7 +46,7 @@ search results rather than the primary source or game data.
   projectile's arrival reflects it at half damage; against physical attacks the
   window is 4 frames and removes shield damage, at the cost of more pushback
   ([SmashWiki Perfect shield](https://www.ssbwiki.com/Perfect_shield);
-  [Melee defence](melee/defense.md); decompilation timing in
+  [Melee defence](melee/defense.md); frame timing in
   smashcraft:docs/melee-powershield.md). The reflected projectile's damage and
   speed multipliers are part of each reflector's descriptor. SmashWiki notes that humans
   rarely powershield because of "the reaction times and precision usually

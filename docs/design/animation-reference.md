@@ -163,6 +163,6 @@ Jump physics and counts are unchanged; only the body's gesture differs.
 Timings come from Smashcraft's existing data, not from the videos:
 smashcraft:references/melee-frame-data/records.jsonl and
 smashcraft:docs/smash-melee-reference/. In particular,
-smashcraft:docs/smash-melee-reference/slippi-ntsc-grounded-damage.json records
+the recorded design targets records
 measured grounded damage. An animation repair never changes action timing,
 hit regions or balance.

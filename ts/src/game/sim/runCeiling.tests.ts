@@ -6,7 +6,7 @@ import { melee } from "./tuning";
 
 test("every fighter's entry dash and run stay within Captain Falcon's speed ceiling [k3 measure #333]", () => {
   const failures: string[] = [];
-  // docs/smash-melee-reference/retail-roster.json.
+  // Captain Falcon's initial dash and run speeds in Melee units (#333).
   const dashCeiling = melee(2.0);
   const runCeiling = melee(2.299999952316284);
   for (const character of SELECTABLE_CHARACTERS) {

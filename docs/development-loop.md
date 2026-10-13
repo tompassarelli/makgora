@@ -286,9 +286,7 @@ build, not successful pummel/throw behavior. The older stuck client was closed;
 the fresh client was left running. Automated input is awaiting coordination
 with the owner to avoid competing with play.
 
-Recovery/grab reference continuation: local Melee revision remains
-0296f009f32f710495979d30772d8332af2d411a; its original-data directory contains
-only the placeholder. Public extracted character/action data is available at
+Recovery/grab reference continuation: public extracted character/action data is available at
 https://melee.theshoemaker.de/dat-dumps/Sheik.json. Local inspection cache:
 smashcraft:build/ref-Sheik-data.json and
 smashcraft:build/ref-Sheik-recovery-extract.jsonl. The extracted animation lengths
@@ -296,7 +294,7 @@ are bound 26, down damage 14, stand 30, attack 50, rolls 36. These are raw clip
 lengths, not yet certified actionable durations; reconcile indexing and native
 animation termination before adopting the owner's 26/13/30/49/35 table.
 The export includes protection events and ground/air events. Use factual data
-only; do not vendor the dump or decompiled code into Smashcraft.
+only; do not vendor the dump into Smashcraft.
 
 The owner approved starting throw motions: Archer forward pivot-kick, back
 hip toss, up rising palm, down sweep/slam; Rifleman forward stock shove, back

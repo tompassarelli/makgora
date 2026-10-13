@@ -376,7 +376,7 @@ test("#9 HITLAG_SCALARS_EXACT_PASS [k4 reference native]", () => {
   assertEquals(victimHitlagFrames(90, true, true), 20);
 });
 
-test("#9 ANALOG_SHIELD_BINARY32_EXACT_PASS [k4 reference docs/smash-melee-reference/retail-analog-shield.json]", () => {
+test("#9 ANALOG_SHIELD_BINARY32_EXACT_PASS [k3 measure docs/physics.md]", () => {
   assertEquals(subtractFloat32(60, shieldDrain(0.4000000059604645)), 59.879600524902344);
   assertEquals(shieldstunDuration(3, 0.4000000059604645), 5.105000019073486);
   assertEquals(shieldSizeMultiplier(60, 0.4000000059604645), 0.8300000429153442);
@@ -954,7 +954,7 @@ test("#9 DIRECTIONAL_INFLUENCE_BINARY32_EXACT_PASS [k4 reference native]", () =>
   assertEquals(1 / di183.velocityZ < 0, false);
 });
 
-test("#9 CAPSULE_SHIELD_CLASSIFICATION_PASS [k4 reference docs/smash-melee-reference/retail-shield-capsule-boundaries.jsonl]", () => {
+test("#9 CAPSULE_SHIELD_CLASSIFICATION_PASS [k3 measure docs/physics.md]", () => {
   assertEquals(capsuleCircleIntersects(0, 0, 0, 0, 1, 0, 0, 1, 1), true);
   assertEquals(capsuleCircleIntersects(2, 0, 2, 0, 1, 0, 0, 1, 1), true);
   assertEquals(capsuleCircleIntersects(2.999999761581421, 0, 2.999999761581421, 0, 1, 0, 0, 1, 1), false);

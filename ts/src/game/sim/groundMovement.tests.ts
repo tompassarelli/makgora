@@ -39,7 +39,7 @@ function groundActionFighter(x: number, facing: number, rules: GroundMovementRul
   return fighter;
 }
 
-test("the retail dash-to-run command uses the actor's encoded enable frame [k4 reference docs/smash-melee-reference/retail-ground-movement-events.json]", () => {
+test("the retail dash-to-run command uses the actor's encoded enable frame [k3 measure docs/physics.md]", () => {
   NTSC_RIGS.forEach((rules, rig) => {
     const fighter = createReferenceFighter(Character.sylvanas, 0.0, 1);
     const input = controls({ direction: 1 });
@@ -183,7 +183,7 @@ test("movement pivots: keyboard and stick release after one or two reverse sampl
   }
 });
 
-test("a turn-run waits for the retail facing command boundary [k4 reference docs/smash-melee-reference/retail-ground-movement-events.json]", () => {
+test("a turn-run waits for the retail facing command boundary [k3 measure docs/physics.md]", () => {
   for (const rules of [NTSC_FOX_GROUND_MOVEMENT_RULES, NTSC_CAPTAIN_FALCON_GROUND_MOVEMENT_RULES]) {
     const fighter = groundActionFighter(0.0, 1, rules, GroundAction.run, 4, 1, 13.199999809265137);
     const input = controls({ direction: -1 });
@@ -218,7 +218,7 @@ test("a turn-run waits for the retail facing command boundary [k4 reference docs
   }
 });
 
-test("a run-brake turn input closes at the actor's frame-fifteen command [k4 reference docs/smash-melee-reference/retail-ground-movement-events.json]", () => {
+test("a run-brake turn input closes at the actor's frame-fifteen command [k3 measure docs/physics.md]", () => {
   const allowed = groundActionFighter(0.0, 1, NTSC_FOX_GROUND_MOVEMENT_RULES, GroundAction.runBrake, 13, 1, 9.0);
   const denied = groundActionFighter(100.0, 1, NTSC_FOX_GROUND_MOVEMENT_RULES, GroundAction.runBrake, 14, 1, 9.0);
   const input = controls({ direction: -1 });
@@ -260,7 +260,7 @@ test("a turn-run uses the retail velocity threshold in world units [k4 reference
   }
 });
 
-test("a retail run-brake ends at its clip or its maximum frame count [k4 reference docs/smash-melee-reference/retail-roster.json]", () => {
+test("a retail run-brake ends at its clip or its maximum frame count [k3 measure docs/physics.md]", () => {
   NTSC_RIGS.forEach((rules, rig) => {
     const fighter = groundActionFighter(0.0, 1, rules, GroundAction.runBrake, 0, 1, 0.4000000059604645);
     fighter.ground.runBrakeFramesRemaining = rules.runBrakeMaximumFrames;

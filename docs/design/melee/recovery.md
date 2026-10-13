@@ -34,7 +34,7 @@ ledge until its 49-frame animation has ended (`smashcraft:docs/physics.md`, "Out
 
 - **Gravity, fall speed, air speed, aerial jump height, jump count**: from
   `smashcraft:docs/design/melee/movement.md` (Falling and Jumps tables) and
-  `smashcraft:docs/smash-melee-reference/retail-roster.json` `max_jumps`. Aerial jumps are
+  the recorded design targets `max_jumps`. Aerial jumps are
   `max_jumps − 1`; Jigglypuff has `max_jumps` 6. Peach, Mewtwo and Jigglypuff use their own
   animation-driven aerial jumps, which movement.md marks "own", so their heights are unknown.
 - **Up-B startup and total**: from `smashcraft:references/melee-frame-data/records.jsonl`
@@ -48,49 +48,45 @@ ledge until its 49-frame animation has ended (`smashcraft:docs/physics.md`, "Out
 - **Landing lag after the up-B's helpless fall**:
   attributes. Each field was identified by the argument it supplies to
   a Melee routine / a Melee routine in that fighter's SpecialHi source:
-  - Fox and Falco `x90` = 18
-  - Sheik `x5C` = 30
-  - Marth `x2C` = 34
+  - Fox and Falco 18
+  - Sheik 30
+  - Marth 34
   - Captain Falcon and Ganondorf `specialhi_landing_lag` = 30
   - Mario `specialhi.landing_lag` = 30
-  - Peach `x74` = 30
-  - Samus `x50` = 24
-  - Mewtwo `x74` = 30
+  - Peach 30
+  - Samus 24
+  - Mewtwo 30
 
   meleeframedata agrees on every value except Fox and Falco, where it lists 6 in `land_lag`. That
   6 is probably the grounded Fire Fox landing, but this was not checked.
-- **Computed from disc attributes** with the private reader
-  `~/.local/share/smashcraft-melee-reference/recovery-facts.ts`. The reader reads the special
-  attributes, the `ftData x44` ledge box and the special animation frame counts from the ISO. The
-  field meanings come from the decompilation types. None of these figures is frame-perfect: the
+- **Design targets** for the up-B figures, set from the public frame data listed under sources. None of these figures is frame-perfect: the
   frame on which an action starts and ends can shift each total by about one frame of travel.
   - Fire Fox (a Melee routine, shared with Falco):
-    - Fox: speed `x74` = 3.8 MU/f for `x68` = 30 frames. From frame `x70` = 6 onward the speed
-      drops by `x78` = 0.1 per frame. Sum over 30 frames: 81.5.
+    - Fox: speed 3.8 MU/f for 30 frames. From frame 6 onward the speed
+      drops by 0.1 per frame. Sum over 30 frames: 81.5.
     - Falco: speed 4.2 for 22 frames, dropping by 0.17 per frame from frame 4. Sum: 60.1.
     - Speed is the same at every angle, so the horizontal distance equals the vertical one.
-    - Charge sink: gravity is held off for `x54` = 15 frames, then falls at `x60` = 0.015
+    - Charge sink: gravity is held off for 15 frames, then falls at 0.015
       (Falco 0.016) per frame for the rest of the 43-frame charge.
-    - Direction: `atan2` of the stick, needing a stick sum of at least `x64` = 0.5; otherwise the
-      move goes straight up (a Melee routine).
-  - Vanish (`ftSeakAttributes`, `ftseakspecialhi.c`):
-    - Start: vertical speed `x2C` = 3.5, gravity `x30` = 0.19, terminal `x34` = 0.25, over the
+    - Direction: `atan2` of the stick, needing a stick sum of at least 0.5; otherwise the
+      move goes straight up.
+  - Vanish:
+    - Start: vertical speed 3.5, gravity 0.19, terminal 0.25, over the
       36-frame start animation. Peak 30.5.
-    - Teleport: speed `x44`·|stick| + `x48` = 1·|stick| + 1 MU/f for `x38` = 20 frames, giving
+    - Teleport: speed |stick| + 1 MU/f for 20 frames, giving
       40 at full stick.
-    - Reappearing keeps 0.3 (`x54`) of the teleport speed.
-  - Teleport (`ftMewtwoAttributes`): speed `x5C`·|stick| + `x60` = 2·|stick| + 3 MU/f for `x50` =
-    10 frames, giving 50 at full stick.
-  - Float: Peach's float timer is a Melee routine xC` = 150 frames (`ftpeachfloat.c`).
-  - Pound: speed `xF0` = 2.2 at a stick angle of up to `xE4` = 20°, multiplied by `xF4` = 0.92
+    - Reappearing keeps 0.3 of the teleport speed.
+  - Teleport: speed 2·|stick| + 3 MU/f for 10 frames, giving 50 at full stick.
+  - Float: Peach's float lasts 150 frames.
+  - Pound: speed 2.2 at a stick angle of up to 20°, multiplied by 0.92
     per frame. The 27.5 MU geometric limit is an upper bound.
   - Falcon Dive and Dark Dive horizontal bound: drift capped at `specialhi_horz_vel` 0.85 ×
     air speed, with acceleration `air_drift_stick_mul` 0.04 × 1.1, held for the whole 65-frame
     animation from frame 1. This is an upper bound, not a measurement.
   - Up-B tilt limits:
-    - Marth: `x38` = 20°.
+    - Marth: 20°.
     - Mario: `specialhi.angle_diff` = 18°.
-    - Peach: `x80` = 18°.
+    - Peach: 18°.
     - The "estimate" horizontal distances in the table assume the tilt rotates the move's whole
       travel by that angle. They are estimates, not measurements.
 - **Recorded in game** (libmelee `framedata.csv` at revision `ef679270`, SHA-256 `8e0d8112…`, the
@@ -109,16 +105,11 @@ ledge until its 49-frame animation has ended (`smashcraft:docs/physics.md`, "Out
   recorded frame counts to the disc's animation lengths, for example Falcon's 64 recorded frames
   against the 65-frame `SpecialAirHi`. These animation-driven moves have no attribute to compute
   from.
-- **Ledge grab during the move**: whether the move's collision callback calls
-  a Melee routine:
-  - Fox: in a Melee routine and a Melee routine.
-  - Sheik: in a Melee routine/1_Coll` and a Melee routine.
-  - Mewtwo: in a Melee routine.
-  - Captain Falcon and Ganondorf: in `ftcaptainspecialhi.c`, gated by `specialhi.x2_b1`.
-  - Samus: in `ftsamusspecialhi.c`.
+- **Ledge grab during the move** (design target): Fox, Sheik, Mewtwo, Captain Falcon, Ganondorf
+  and Samus can grab the ledge while the move is active.
   - Marth, Mario and Peach's up-B files contain no ledge check. They catch the ledge only from the
     helpless fall that follows.
-- **Ledge snap box**: `ftData x44` read from each `Melee` on the disc. Fox,
+- **Ledge snap box**: a per-fighter design target. Fox,
   Falco and Captain Falcon match `smashcraft:docs/physics.md`.
 
 ## Edgeguard character by archetype
@@ -152,28 +143,9 @@ ledge until its 49-frame animation has ended (`smashcraft:docs/physics.md`, "Out
 - In-repo, read only:
   - `smashcraft:ts/src/game/sim/tuning.ts`
   - `smashcraft:docs/design/melee/movement.md`
-  - `smashcraft:docs/smash-melee-reference/retail-roster.json`
   - `smashcraft:references/melee-frame-data/records.jsonl` and its `README.md`
   - `smashcraft:docs/physics.md` ("Outer ledge recovery")
   - `smashcraft:docs/design/stages.md`
-- Disc: the owner's Melee rev 2 ISO at
-  `~/.local/share/smashcraft-melee-reference/ntsc-1.02/`, read by the private reader
-  `~/.local/share/smashcraft-melee-reference/recovery-facts.ts`. Files read: `PlFx`, `PlFc`, `PlSk`,
-  `PlMt`, `PlPe`, `PlCa`, `PlGn`, `PlMs`, `PlMr`, `PlSs` and `PlPr`, each `.dat` and `AJ.dat`.
-  Rights: Nintendo/HAL copyright, owner's copy. Only numbers are used; no files leave the private
-  directory.
-- Decompilation: https://github.com/doldecomp/melee at `0296f009f32f710495979d30772d8332af2d411a`
-  (`~/code/resources/melee`). Files read: `src/melee/ft/types.h` (`ftData`) and
-  `src/melee/ft/kinds/{ftFox,ftSeak,ftMewtwo,ftPeach,ftCaptain,ftMario,ftMars,ftSamus,ftPurin}/`
-  (`types.h` plus the SpecialHi, SpecialS and float sources). Functions:
-  - a Melee routine, a Melee routine, a Melee routine
-  - a Melee routine, a Melee routine
-  - a Melee routine
-  - a Melee routine
-  - a Melee routine
-
-  Rights: no license in the repository. It was used for field meanings only; no code was copied
-  or translated.
 - meleeframedata.com database: https://github.com/mitchhit234/meleeWebProject `characters.db` at
   `ec5155149faeed24b5e5781d7efe17387cc9ee3d` (https://meleeframedata.com/). Rights: no reuse
   license found; factual numbers only.

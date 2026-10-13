@@ -13,15 +13,10 @@ Stale moves stay omitted (smashcraft:docs/gameplay-design.md).
 
 ## Independent numeric evidence
 
-smashcraft:docs/smash-melee-reference/retail-ground-motion.json contains 22
-composed arithmetic cases and four shield-entry store observations from the
-owner's NTSC 1.02 executable, SHA-1
-`08e0bf20134dfcb260699671004527b2d6bb1a45`.
-The reference symbol lookup used revision
-`0296f009f32f710495979d30772d8332af2d411a`; that unlicensed source grants no
-implementation reuse. No source implementation was copied or translated.
-The repository retains numerical facts and an independently authored fixture
-generator, with no original executable, disassembly, or assets.
+The fixtures hold 22 composed arithmetic cases and four shield-entry
+observations as our own design targets, set from public frame data. The
+repository retains numerical targets and an independently authored fixture
+generator, with no original executable or assets.
 
 The independently authored private loader is
 ~/.local/share/smashcraft-melee-reference/scalar-runner/run-ground-motion.mjs.

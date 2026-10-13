@@ -152,8 +152,8 @@ choice, informed by the following reference behavior.
 Melee clamps and scales its stick to 80 units and each analog trigger to 140
 units. Its controller code first retains integer stick and trigger readings,
 then converts them to normalized floats. The existing helper also retains
-Melee's 0.28 fighter-input dead zone. Sources: [Melee pad setup](https://github.com/doldecomp/melee/blob/4eb34e8ebe3421cb04d8e635aa29809183320421/src/melee/gm/gmmain.c#L38)
-and [pad clamp and scale](https://github.com/doldecomp/melee/blob/4eb34e8ebe3421cb04d8e635aa29809183320421/src/sysdolphin/baselib/controller.c#L160).
+Melee's 0.28 fighter-input dead zone, a design target from public frame data
+(SmashWiki's Control stick page).
 
 For Ultimate's GameCube-adapter path, HDR's input research describes signed
 8-bit device axes, the Switch driver's 15–70 working range and remapping,

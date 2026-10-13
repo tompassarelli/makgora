@@ -1,6 +1,6 @@
 import { f32 } from "wisp/src/sim/f32";
 
-/** Melee ftCommonData stick thresholds; cited per field in smashcraft:docs/gameplay-design.md, "Ground states and the stick map". */
+/** Melee stick thresholds; cited per field in smashcraft:docs/gameplay-design.md, "Ground states and the stick map". */
 export const STICK_DEADZONE = f32(0.28);
 export const STICK_SMASH_DEADZONE = 0.25;
 export const WALK_STICK_THRESHOLD = f32(0.18);
@@ -98,7 +98,7 @@ export function groundOptionAllowed(state: GroundState, frame: number, option: G
   }
 }
 
-/** Run holds while the stick stays this far forward (a Melee routine) and turns at this far back; otherwise it brakes. */
+/** Run holds while the stick stays this far forward and turns at this far back; otherwise it brakes. */
 export function runStickDirection(x: number, facing: number): number {
   const forward = f32(x * facing);
   if (forward >= RUN_HOLD_STICK_THRESHOLD) return facing;

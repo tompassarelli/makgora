@@ -33,7 +33,7 @@ function retailCombatContact(world: Roster, knockback: number, dx: number, dz: n
   finishDamageContacts(world);
 }
 
-test("retail combat stacking starts on the tenth moving frame and freezes in hitlag [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
+test("retail combat stacking starts on the tenth moving frame and freezes in hitlag [k3 measure docs/physics.md]", () => {
   for (const age of [9, 10]) {
     const owner = createReferenceFighter(Character.sylvanas, -300.0, 1);
     const target = createReferenceFighter(Character.rifleman, -100.0, -1);
@@ -62,7 +62,7 @@ test("retail combat stacking starts on the tenth moving frame and freezes in hit
   }
 });
 
-test("retail combat stacking merges each axis once after strongest contact selection [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
+test("retail combat stacking merges each axis once after strongest contact selection [k3 measure docs/physics.md]", () => {
   const owner = createReferenceFighter(Character.sylvanas, 0.0, 1);
   const target = createReferenceFighter(Character.rifleman, 100.0, -1);
   const world = testWorld(owner, target);
@@ -91,7 +91,7 @@ test("retail combat stacking merges each axis once after strongest contact selec
   assertNear(target.launch.knockbackZ, -f32(12.5999999196), f32(0.000001));
 });
 
-test("retail combat ground tangent uses the new contact, then traction rather than air decay [k4 reference docs/smash-melee-reference/retail-ground-motion.json]", () => {
+test("retail combat ground tangent uses the new contact, then traction rather than air decay [k3 measure docs/physics.md]", () => {
   for (const facing of [-1, 1]) {
     const owner = createReferenceFighter(Character.sylvanas, -100.0, 1);
     const target = createReferenceFighter(Character.rifleman, 0.0, -1);
@@ -115,7 +115,7 @@ test("retail combat ground tangent uses the new contact, then traction rather th
   }
 });
 
-test("retail combat damage levels use all three unrounded scaled thresholds [k4 reference docs/smash-melee-reference/retail-hitstun-boundaries.json]", () => {
+test("retail combat damage levels use all three unrounded scaled thresholds [k3 measure docs/physics.md]", () => {
   assertEquals(damageLevelForKnockback(24.999000549316406), 0);
   assertEquals(damageLevelForKnockback(25.0), 1);
   assertEquals(damageLevelForKnockback(52.499000549316406), 1);
@@ -128,7 +128,7 @@ test("retail combat damage levels use all three unrounded scaled thresholds [k4 
   assertEquals(ordinaryHitstunFrames(80.0), 32);
 });
 
-test("retail combat ground bounce uses a ten-degree threshold and four-fifths vertical speed [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
+test("retail combat ground bounce uses a ten-degree threshold and four-fifths vertical speed [k3 measure docs/physics.md]", () => {
   for (const grounded of [false, true]) {
     for (const steep of [false, true]) {
       const owner = createReferenceFighter(Character.sylvanas, 0.0, 1);
@@ -208,7 +208,7 @@ function recordedFalcoFallFirstDifference(hostCharacter: Character, initialVeloc
   return firstDifference;
 }
 
-test("a recorded NTSC Falco neutral fall matches ten independent positions [k4 reference docs/smash-melee-reference/slippi-ntsc-falco-fall.json]", () => {
+test("a recorded NTSC Falco neutral fall matches ten independent positions [k3 measure docs/physics.md]", () => {
   for (const host of [Character.sylvanas, Character.rifleman]) assertEquals(recordedFalcoFallFirstDifference(host, 0.0), 0);
 });
 
@@ -271,7 +271,7 @@ test("recorded Falco dash entry uses the walk self velocity for entry displaceme
   for (const host of [Character.sylvanas, Character.rifleman]) assertTrue(recordedFalcoDashEntryMatches(host));
 });
 
-test("retail walk uses character acceleration and the common taper [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
+test("retail walk uses character acceleration and the common taper [k3 measure docs/physics.md]", () => {
   for (const host of [Character.sylvanas, Character.rifleman]) {
     const f = falcoRig(host, 0.0, 1);
     const input = controls({ direction: 1, walking: true });
@@ -282,7 +282,7 @@ test("retail walk uses character acceleration and the common taper [k4 reference
   }
 });
 
-test("retail run tapers below target and brakes overspeed by character friction [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
+test("retail run tapers below target and brakes overspeed by character friction [k3 measure docs/physics.md]", () => {
   const input = controls({ direction: 1 });
   const belowTarget = falcoRig(Character.sylvanas, 0.0, 1);
   belowTarget.motion.vx = melee(0.8999999761581421);
@@ -300,7 +300,7 @@ test("retail run tapers below target and brakes overspeed by character friction 
   assertNear(overspeed.motion.vx, f32(1.82) * 6, f32(0.00001));
 });
 
-test("a recorded NTSC Falco jump has five grounded frames, then a raw takeoff [k4 reference docs/smash-melee-reference/slippi-ntsc-falco-jump.json]", () => {
+test("a recorded NTSC Falco jump has five grounded frames, then a raw takeoff [k3 measure docs/physics.md]", () => {
   for (const host of [Character.sylvanas, Character.rifleman]) assertEquals(recordedFalcoJumpFirstDifference(host, 25), 0);
 });
 
@@ -341,7 +341,7 @@ function recordedGroundedDamageFirstDifference(character: Character, velocityOff
 
 const min12 = (sample: number) => (sample < 12 ? sample : 12);
 
-test("recorded NTSC grounded damage matches freeze release, traction and actionability [k4 reference docs/smash-melee-reference/slippi-ntsc-grounded-damage.json]", () => {
+test("recorded NTSC grounded damage matches freeze release, traction and actionability [k3 measure docs/physics.md]", () => {
   for (const character of [Character.sylvanas, Character.rifleman]) assertEquals(recordedGroundedDamageFirstDifference(character, 0.0), 0);
 });
 
@@ -355,7 +355,7 @@ function contactProjectile(owner: Fighter, target: Fighter, index: number, kind:
   projectile.direction = 1;
 }
 
-test("the combat ground contact threshold keeps low downward hits on the floor [k4 reference docs/smash-melee-reference/retail-hitstun-boundaries.json]", () => {
+test("the combat ground contact threshold keeps low downward hits on the floor [k3 measure docs/physics.md]", () => {
   for (const airborne of [false, true]) {
     for (const aboveThreshold of [0, 1]) {
       const owner = createReferenceFighter(Character.sylvanas, 0.0, 1);
@@ -401,7 +401,7 @@ test("the combat ground contact threshold keeps low downward hits on the floor [
   }
 });
 
-test("combat DI uses the actual launch magnitude for authored non-unit directions [k4 reference docs/smash-melee-reference/retail-di-vector.json]", () => {
+test("combat DI uses the actual launch magnitude for authored non-unit directions [k3 measure docs/physics.md]", () => {
   const target = createReferenceFighter(Character.demonHunter, 0.0, 1);
   target.motion.grounded = false;
   target.motion.z = 300.0;
@@ -416,7 +416,7 @@ test("combat DI uses the actual launch magnitude for authored non-unit direction
   assertFalse(target.launch.diPending);
 });
 
-test("combat shield damage uses integer power before the shieldstun calculation [k4 reference docs/smash-melee-reference/retail-shield-damage-endpoints.json]", () => {
+test("combat shield damage uses integer power before the shieldstun calculation [k3 measure docs/physics.md]", () => {
   assertNear(digitalShieldstunDuration(4.0), f32(3.8), f32(0.0001));
   assertNear(digitalShieldstunDuration(4.989999771118164), f32(3.8), f32(0.0001));
   assertEquals(digitalShieldstunFrames(4.0), 3);
@@ -445,7 +445,7 @@ function advanceBoth(world: Roster, first: Readonly<Controls>, second: Readonly<
   advanceFighter(world, 1, 0, second, 0.0);
 }
 
-test("a recorded NTSC digital shield contact matches paired pushback and grounded recoil [k4 reference docs/smash-melee-reference/slippi-ntsc-shield-contact.json]", () => {
+test("a recorded NTSC digital shield contact matches paired pushback and grounded recoil [k3 measure docs/physics.md]", () => {
   for (const sourceCharacter of [Character.sylvanas, Character.rifleman]) {
     for (const targetCharacter of [Character.sylvanas, Character.rifleman]) {
       const source = createReferenceFighter(sourceCharacter, melee(38.56430435180664), 1);
@@ -534,7 +534,7 @@ test("an airborne shield contact initializes stacked, weight-scaled relative rec
   assertNear(oppositeAttacker.shield.recoilZ, oppositeDefender.motion.deltaZ * 0.25, f32(0.0001));
 });
 
-test("a combat shield break uses the character's launch attribute after the contact freeze [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
+test("a combat shield break uses the character's launch attribute after the contact freeze [k3 measure docs/physics.md]", () => {
   for (const character of [Character.sylvanas, Character.rifleman, Character.demonHunter]) {
     const owner = createReferenceFighter(Character.sylvanas, 0.0, 1);
     const target = createReferenceFighter(character, 60.0, -1);
@@ -640,7 +640,7 @@ function startObservedRoll(f: Fighter, input: Controls, profile: number, directi
   input.direction = 0;
 }
 
-test("knockback caps before motion modifiers, and fixed power ignores percent [k4 reference docs/smash-melee-reference/retail-launch-magnitude.json]", () => {
+test("knockback caps before motion modifiers, and fixed power ignores percent [k3 measure docs/physics.md]", () => {
   const twoThirds = f32(2.0 / 3.0);
   assertEquals(ordinaryHitKnockback(999.0, 100.0, 80.0, 1000.0, 500.0, 1.0), 2500.0);
   assertEquals(ordinaryHitKnockback(999.0, 100.0, 80.0, 1000.0, 500.0, twoThirds), f32(2500.0 * twoThirds));
@@ -655,7 +655,7 @@ test("knockback caps before motion modifiers, and fixed power ignores percent [k
   assertEquals(ordinaryHitstunFrames(0.0), 1);
 });
 
-test("crouch and charge are sampled before a hit interrupts the action [k4 reference docs/smash-melee-reference/retail-launch-magnitude.json]", () => {
+test("crouch and charge are sampled before a hit interrupts the action [k3 measure docs/physics.md]", () => {
   for (const context of [0, 1, 2]) {
     const attacker = createReferenceFighter(Character.sylvanas, 0.0, 1);
     const victim = createReferenceFighter(Character.rifleman, 100.0, -1);
@@ -699,7 +699,7 @@ test("air drift preserves opposed overspeed and brakes in the same direction [k4
   }
 });
 
-test("an electric contact preserves the attacker's and victim's pause boundaries [k4 reference docs/smash-melee-reference/retail-hitlag-scalars.json]", () => {
+test("an electric contact preserves the attacker's and victim's pause boundaries [k3 measure docs/physics.md]", () => {
   for (const electric of [false, true]) {
     for (const crouching of [false, true]) {
       for (const direct of [false, true]) {
@@ -743,7 +743,7 @@ test("an electric contact preserves the attacker's and victim's pause boundaries
   }
 });
 
-test("an electric contact batch uses the strongest launch's effect and the largest damage [k4 reference docs/smash-melee-reference/retail-hitlag-scalars.json]", () => {
+test("an electric contact batch uses the strongest launch's effect and the largest damage [k3 measure docs/physics.md]", () => {
   for (const electricWinner of [false, true]) {
     for (const reversed of [0, 1]) {
       const owner = createReferenceFighter(Character.sylvanas, 0.0, 1);
@@ -771,7 +771,7 @@ function airborneFalco(): Fighter {
   return f;
 }
 
-test("a retail aerial fast fall requires down at most three frames before descent [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
+test("a retail aerial fast fall requires down at most three frames before descent [k3 measure docs/physics.md]", () => {
   for (let lead = 0; lead <= 5; lead++) {
     const f = airborneFalco();
     f.motion.vz = f32(f32(lead - 0.5) * f.tuning.physics.gravity);
@@ -789,7 +789,7 @@ test("a retail aerial fast fall requires down at most three frames before descen
   }
 });
 
-test("a stronger aerial dodge keeps retail decay for every digital direction [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
+test("a stronger aerial dodge keeps retail decay for every digital direction [k3 measure docs/physics.md]", () => {
   for (const horizontal of [-1, 0, 1]) {
     for (const vertical of [-1, 0, 1]) {
       const f = airborneFalco();
@@ -848,7 +848,7 @@ test("outside a jump-squat buffer every digital air dodge is collinear with its 
   }
 });
 
-test("a stronger aerial dodge resumes gravity and drift on tick thirty [k4 reference docs/smash-melee-reference/retail-escapeair-events.json]", () => {
+test("a stronger aerial dodge resumes gravity and drift on tick thirty [k3 measure docs/physics.md]", () => {
   for (const mode of [0, 1, 2]) {
     for (const steer of [-1, 0, 1]) {
       const f = airborneFalco();

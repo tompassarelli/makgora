@@ -209,7 +209,7 @@ test("a trigger pressed after the hit's hitlag wall techs off the main deck's si
   }
 });
 
-test("up on the stick at a wall tech launches each fighter with its reference's wall jump [k4 reference docs/smash-melee-reference/wall-tech-rules.md#wall-tech]", () => {
+test("up on the stick at a wall tech launches each fighter with its reference's wall jump [k3 measure docs/physics.md]", () => {
   for (const character of VICTIMS) {
     const missed = launch(startRun(character, 120.0), NEUTRAL);
     const run = startRun(character, 120.0);
@@ -253,7 +253,7 @@ function flickOffSide(run: Run): void {
   playPads(run, {}, { x: 1.0 });
 }
 
-test("a flick away from the main deck's side wall jumps each fighter off it with its reference's wall jump [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
+test("a flick away from the main deck's side wall jumps each fighter off it with its reference's wall jump [k3 measure docs/physics.md]", () => {
   for (const character of VICTIMS) {
     const run = startDrift(character);
     const { victim } = run;
@@ -280,7 +280,7 @@ test("a flick away from the main deck's side wall jumps each fighter off it with
   }
 });
 
-test("a fighter without Melee's wall jump trait doesn't wall jump [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
+test("a fighter without Melee's wall jump trait doesn't wall jump [k3 measure docs/physics.md]", () => {
   const run = startDrift(Character.rifleman);
   const { victim } = run;
   victim.tuning = { ...victim.tuning, surface: { ...victim.tuning.surface, canWallJump: false } };
@@ -307,7 +307,7 @@ const RAISED_UNDERSIDE_Z = solidSurfaceAt(SOLID_DECK_TEST_STAGE, MAIN_DECK_BODY_
 
 const underUnderside = (character: Character) => f32(RAISED_UNDERSIDE_Z - melee(bodyTop(character)));
 
-test("a ceiling tech starts at the ECB top's contact and moves each fighter sideways by its reference's impulse on its event frame [k4 reference docs/smash-melee-reference/retail-ceiling-tech-events.json]", () => {
+test("a ceiling tech starts at the ECB top's contact and moves each fighter sideways by its reference's impulse on its event frame [k3 measure docs/physics.md]", () => {
   for (const character of VICTIMS) {
 
     const missed = launch(startUnderDeck(character), NEUTRAL, { cy: 1.0 });
@@ -379,7 +379,7 @@ function passThroughFrames(run: Run): number {
 
 
 
-test("a wall tech, its jump and a plain wall jump are each intangible for Melee's 14 frames, then hittable [k4 reference docs/smash-melee-reference/wall-tech-rules.md#wall-tech]", () => {
+test("a wall tech, its jump and a plain wall jump are each intangible for Melee's 14 frames, then hittable [k3 measure docs/physics.md]", () => {
   assertEquals(SURFACE_TECH_WALL_COLLISION_GRACE_FRAMES, 14);
   for (const character of VICTIMS) {
     const name = fighterName(character);

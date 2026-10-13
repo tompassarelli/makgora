@@ -1,7 +1,7 @@
 # Ordinary hitstun boundaries
 
 The 23 numeric observations in
-smashcraft:docs/smash-melee-reference/retail-hitstun-boundaries.json execute the
+the recorded design targets execute the
 NTSC 1.02 multiplication, duration conversion, minimum duration, and damage-level
 branches. Inputs include zero and neighboring binary32 values around scaled
 durations 1, 3, 10, 21, 32, 35, and 1000. The original executable stays in private

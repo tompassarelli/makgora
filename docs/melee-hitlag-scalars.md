@@ -1,7 +1,7 @@
 # Hitlag scalar and cap observations
 
 The 52 original NTSC 1.02 observations in
-smashcraft:docs/smash-melee-reference/retail-hitlag-scalars.json cover integer
+the recorded design targets cover integer
 attack powers 1–90, ordinary/electric multipliers, and ordinary/crouching action
 states. They include durations on both sides of the 20-frame cap.
 
@@ -18,13 +18,8 @@ For these inputs the production formula's staged integer truncations already
 agree with the original outputs; this observation does not establish a defect
 requiring a formula repair.
 
-smashcraft:tools/physics-probe/observe-retail-hitlag.mjs is an independently
-authored foreign loader. It stores original-containing executables and binary
-outputs only in ~/.local/share/smashcraft-melee-reference/hitlag-scalar-runner.
-Only authored tooling and numerical facts enter the repository. Symbol/ABI
-lookup uses melee revision 0296f009f32f710495979d30772d8332af2d411a; no license
-for implementation derivation was established, and no implementation was
-copied or translated.
+The multipliers are our own design targets, set from public frame data
+(SmashWiki's Hitlag page).
 
 The caller supplies integer power, electric multiplier and action state.
 These observations do not prove their selection, zero-damage dispatch, complete

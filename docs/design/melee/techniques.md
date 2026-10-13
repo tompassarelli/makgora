@@ -4,7 +4,7 @@ Much of how Melee is played comes from techniques its players found rather than
 ones the game teaches. Each one below is described with the engine behaviour
 that makes it possible. The last group are the ones the community itself has
 treated as broken or contested. Conventions and sources are in the
-[case study's README](README.md); function names are from the decompilation.
+[case study's README](README.md).
 
 ## Movement techniques
 
@@ -12,9 +12,8 @@ treated as broken or contested. Conventions and sources are in the
 
 An air dodge sets a fixed-speed velocity in the stick's direction and, on
 touching the ground, ends in a landing that keeps the horizontal part of that
-velocity as ground speed (a Melee routine, a Melee routine,
-a Melee routine). Because the air dodge can start on the very
-frame a jump leaves the ground (a Melee routine), a dodge angled into the floor
+velocity as ground speed. Because the air dodge can start on the very
+frame a jump leaves the ground, a dodge angled into the floor
 lands at once and the fighter slides along the ground in a standing pose,
 able to act once the landing ends: a wavedash. Landing on a floor or platform
 from an air dodge already in the air is a waveland. The slide's length is set
@@ -50,7 +49,7 @@ first game as the Z-cancel and was removed from Brawl onward
 Holding shield on a platform and pressing the stick down drops through the
 platform with no shield-release lag: the
 [shield drop](https://www.ssbwiki.com/Shield_drop), an out-of-shield option from
-a platform. The jump squat accepts a grab or an up smash (a Melee routine),
+a platform. The jump squat accepts a grab or an up smash,
 so jumping first and grabbing or up-smashing during the squat gives a running
 or shielding fighter a grab or up smash it could not otherwise start from that
 state ([jump-canceling](https://www.ssbwiki.com/Jump-canceling)).
@@ -89,7 +88,7 @@ fixed timing, so an attacker who reads or reacts to the choice can follow it:
 The Ice Climbers' leader grabs and pummels while Nana attacks the same victim on
 an alternating rhythm. Each hit puts the grabbed victim into a damage state.
 That state keeps counting the escape timer down and accepting mash input, but only the ordinary held state can release the victim
-(a Melee routine), so hits arriving before each damage animation ends
+, so hits arriving before each damage animation ends
 keep the victim from ever reaching the release
 ([SmashWiki Wobbling](https://www.ssbwiki.com/Wobbling)). Nothing the victim
 does changes the outcome; the Ice Climbers player decides when to end it.
@@ -132,6 +131,6 @@ A grounded attacker that hits a shield and then leaves the ground before its
 shield recoil has decayed can lose all of its vertical knockback in the air
 later, as if it hit an invisible ceiling. The airborne recoil decay clears the
 fighter's vertical knockback instead of the recoil's vertical part: the
-decompilation marks the line as the bug, and
+line is a known bug, and
 smashcraft:docs/melee-air-cutoff.md records the retail behaviour
 ([SmashWiki](https://www.ssbwiki.com/Invisible_ceiling_glitch)).

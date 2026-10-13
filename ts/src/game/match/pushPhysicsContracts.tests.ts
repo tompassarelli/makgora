@@ -53,7 +53,7 @@ test("dash and run cross an overlapping fighter rather than stopping at its body
   }
 });
 
-test("four-damage shield contact moves defender 2.196 and attacker 1.272 after hitlag [k4 reference docs/smash-melee-reference/slippi-ntsc-shield-contact.json]", () => {
+test("four-damage shield contact moves defender 2.196 and attacker 1.272 after hitlag [k3 measure docs/physics.md]", () => {
   const m = testMatch(3, Character.rifleman);
   const a = fighterAt(m.world, 0), b = fighterAt(m.world, 1);
   a.motion.x = 0.0; b.motion.x = 90.0;

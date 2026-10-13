@@ -11,7 +11,7 @@ Kinds, the one tag every title ends with (`bun run check` refuses any other endi
 - `[k1 scenario]`: replayed input through the whole system, asserting invariants or agreement (same seed twice, rollback equals straight play, equal client checksums).
 - `[k2 property]`: a property over a pure core: round trips, bounds, every generated input.
 - `[k3 measure #N]` / `[k3 measure docs/<path>.md]`: an owner-decided number, citing the issue or the existing doc that sets it. Read the tuned constant from the code rather than copying its literal, so retuning never breaks an unrelated test.
-- `[k4 reference <source>]`: an external reference such as `melee`, `melee-decomp` (`scripts/meleeOracle.ts`; departures listed in docs/gameplay-design.md), `lua32`, `wurst` or `native` (real Warcraft captures or tapes). Headless code never establishes Warcraft callback timing, controller latency, UI focus or online fairness; those need the native map.
+- `[k4 reference <source>]`: an external reference such as `melee` (public frame data; `scripts/meleeOracle.ts`, departures listed in docs/gameplay-design.md), `lua32`, `wurst` or `native` (real Warcraft captures or tapes). Headless code never establishes Warcraft callback timing, controller latency, UI focus or online fairness; those need the native map.
 - `[k5 boundary <name>]`: one integration check per real boundary; each name once in the suite.
 - A regression is folded into the property or scenario that should have caught it instead of becoming a standalone test.
 

@@ -636,10 +636,6 @@ of competitive balance or external tournament adoption.
 
 ## Sources
 
-- Disc reads: NTSC 1.02 Melee rev 2 stage files GrNBa, GrNLa, GrPs, GrSt,
-  GrOp, GrIz, GrOk (collision, blast zones, `yakumono_param`); decompilation
-  Melee (grbattle.c, groldpupupu.c, grstory.c, groldkongo.c,
-  grizumi.c, ground.c, grdatfiles.c).
 - SmashWiki: [Stage legality](https://www.ssbwiki.com/Stage_legality),
   [Tournament rulesets (SSBU)](https://www.ssbwiki.com/Tournament_rulesets_(SSBU)),
   [Pokémon Stadium](https://www.ssbwiki.com/Pok%C3%A9mon_Stadium),

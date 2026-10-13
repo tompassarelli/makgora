@@ -13,7 +13,7 @@ after callback one (counter 0) and cleared it during callback two (counter
 -1). Smashcraft keeps two active contact samples from the shield press: the
 entry tick and the tick after the first callback. This observed timer result is
 recorded in
-`smashcraft:docs/smash-melee-reference/retail-powershield-clock.json`.
+the recorded design targets.
 The observer now executes five complete callbacks without return patches,
 including the ordinary shield-descriptor creation at reflector expiry.
 The secondary counter at `` starts at 3: its flag remains after callbacks
@@ -33,8 +33,8 @@ strengths 0.4 and 1, and powers 3, 10 and 30. A full-strength power-10 contact
 has the same 6.5 stun duration in both cases, but defender pushback is
 0.7800000905990601 ordinarily and 1.3000000715255737 when perfect, in Melee
 units. The original contact accumulator preserves its seed on perfect contacts.
-See `smashcraft:docs/smash-melee-reference/retail-powershield-contact.json`;
-observer: `smashcraft:tools/physics-probe/observe-powershield-contact.mjs`.
+See the recorded design targets;
+observer: a retired probe.
 These are isolated original branches with return patches before presentation
 and full state-entry consumers, not a complete gameplay contact trace.
 
@@ -59,8 +59,8 @@ health 60, strength 0 gives joint scale 1, strength 0.3 gives
 local radius stays 0.75. Doubling the base size doubles the joint scale.
 The original kind-14 branch keeps its base size independent of health/pressure;
 it is reference evidence only (smashcraft:docs/gameplay-design.md, "Principles").
-See `smashcraft:docs/smash-melee-reference/retail-shield-joint.json` and
-`smashcraft:tools/physics-probe/observe-shield-joint.mjs`.
+See the recorded design targets and
+a retired probe.
 Final collision matrices, joint animation/placement and guard-entry ordering
 remain unobserved, so this does not establish complete world-geometry parity.
 The original shield-contact routine  now executes twelve synthetic
@@ -69,8 +69,8 @@ return patches. A radius-1 hit against a radius-2 shield accepts distance 3,
 including exact tangency, and rejects the next binary32 value above 3.
 The radius-1 shield similarly accepts distance 2. The cached shield position
 is zero and its joint matrix is identity; both hit-capsule endpoints coincide.
-See smashcraft:docs/smash-melee-reference/retail-shield-contact.json and
-smashcraft:tools/physics-probe/observe-shield-contact.mjs. This proves those
+See the recorded design targets and
+a retired probe. This proves those
 isolated collision classifications, not shield/body priority or pose geometry.
 Production melee selection still tests an authored rectangle against the victim
 origin, then classifies every eligible contact as blocked when shielding.
@@ -97,8 +97,8 @@ response; misses reach , before the body-check path. Return stops
 at those locations and their following instruction preserve the caller's
 return address; response consumers are not executed. The selections agree
 with the twelve isolated collision cases. See
-smashcraft:docs/smash-melee-reference/retail-shield-selection.json and
-smashcraft:tools/physics-probe/observe-shield-selection.mjs. These observations
+the recorded design targets and
+a retired probe. These observations
 support separate shield-first contact selection, while complete eligibility,
 body collision, contact response and same-frame ordering remain unverified.
 The production swept-shield predicate now calls a shared capsule/circle
@@ -109,8 +109,8 @@ contacts the radius-2 shield with hit radius 1; one binary32 step higher misses.
 Both endpoint orders agree. Hit scale 0.5 accepts distance 2.5 and rejects 3;
 hit scale 2 accepts distance 4. All executions use identity joint geometry and
 cached shield position, with no original instruction patches.
-Facts: smashcraft:docs/smash-melee-reference/retail-shield-capsule.json.
-Observer: smashcraft:tools/physics-probe/observe-shield-capsule.mjs.
+Facts: the recorded design targets.
+Observer: a retired probe.
 The existing projectile path continues to supply capsule radius zero; the
 refactor does not choose physical hitbox shapes for the authored melee moves.
 Eleven focused powershield checks pass, including the three grouped original
@@ -120,7 +120,7 @@ arithmetic parity, final joint transforms, hurt-capsule behavior or native proof
 An expanded observation adds eight diagonal/endpoint cases; these agree with
 the current double-precision classification. A subsequent 340-case boundary
 comparison exposes 133 disagreements. Three concrete counterexamples are
-retained in smashcraft:docs/smash-melee-reference/retail-shield-capsule-counterexamples.json.
+retained in the recorded design targets.
 The first is a point-path endpoint at (0.2273183912038803, 1.8602772951126099)
 against radius 1.8741145133972168: the original accepts it and the current
 double-precision squared-distance comparison rejects it. Projection and distance
@@ -135,8 +135,8 @@ signed contact-distance output. The first two report positive overlap
 simple change to the final inclusive comparison. The first reported contact
 coordinate also differs from its nearest endpoint, so a final square-root
 replacement alone has not been shown to repair the original path.
-Facts: smashcraft:docs/smash-melee-reference/retail-shield-capsule-details.json.
-Observer: smashcraft:tools/physics-probe/observe-shield-capsule-details.mjs.
+Facts: the recorded design targets.
+Observer: a retired probe.
 The observer executes the full unchanged routine and records its capsule output
 fields, with the same synthetic geometry limitations as the original cases.
 The precision defect above is now repaired for the recorded identity-circle
@@ -149,7 +149,7 @@ An identity transform still requires radius conversion: rounding its product
 and quotient can shift the effective radius by one binary32 step. Omitting that
 step left nine disagreements after repairing projection/distance arithmetic.
 All 340 boundary observations are retained as numerical facts in
-smashcraft:docs/smash-melee-reference/retail-shield-capsule-boundaries.jsonl.
+the recorded design targets.
 The production emitted-Lua probe now matches all 374 recorded classifications
 (34 geometry cases plus 340 boundary cases); all sixteen precision groups pass.
 Six selected asymmetric/normalization cases add one grouped source regression;
@@ -168,7 +168,7 @@ joint matrix together and use a finite hit radius. The two selected centers are
 binary32 inputs. Production emitted Lua matches every classification without
 another arithmetic change. The classification group now covers 408 original
 cases; all sixteen groups pass. Facts:
-smashcraft:docs/smash-melee-reference/retail-shield-capsule-translated.json.
+the recorded design targets.
 Evidence: smashcraft:build/capsule-translated-lua.log. These cases establish the
 selected translated circles with identity rotation/scale, not arbitrary joint
 transforms, animation-driven melee volumes or hurt-capsule collision.
@@ -180,9 +180,9 @@ each classification direction. The previous production API received only a
 precombined radius and could not retain the original local-radius/joint-scale
 conversion arithmetic. These counterexamples motivated the repair below;
 the 408 passing identity-scale cases alone did not close that defect.
-Facts: smashcraft:docs/smash-melee-reference/retail-shield-capsule-scaled.json.
+Facts: the recorded design targets.
 Counterexamples:
-smashcraft:docs/smash-melee-reference/retail-shield-capsule-scaled-counterexamples.json.
+the recorded design targets.
 The local-radius information loss is now repaired. The production collision
 API retains local circle radius and uniform joint scale separately; every
 in-tree caller is migrated. Projectile ordinary-shield and reflector checks
@@ -193,7 +193,7 @@ than dividing by world distance. Uniform scale and translation retain their
 separate binary32 matrix multiplication/addition steps; fusing a product with
 translation incorrectly classified six combined cases.
 Thirty-four additional original scaled-and-translated cases are recorded in
-smashcraft:docs/smash-melee-reference/retail-shield-capsule-scaled-translated.json.
+the recorded design targets.
 All 508 recorded classifications now match production emitted Lua, including
 the two scaled counterexamples and the combined-transform cases. All sixteen
 precision groups pass; the focused powershield suite passes 14/14, with two
@@ -232,8 +232,8 @@ it. A positive counter selects the side-special input check followed by the
 additional action-check chain; zero skips to the ordinary remaining checks.
 The observer stops before those selected consumers, so it does not prove that
 a requested original attack succeeds or establish full callback ordering.
-See `smashcraft:docs/smash-melee-reference/retail-powershield-actions.json` and
-`smashcraft:tools/physics-probe/observe-powershield-actions.mjs`.
+See the recorded design targets and
+a retired probe.
 
 Production keeps the counter's 4 frames, its consumption while guard remains
 held and the cleared minimum hold, but departs from Melee's reward (#102,
@@ -258,12 +258,8 @@ shield group. Evidence: `smashcraft:build/melee-powershield-focused.log`,
 `smashcraft:build/melee-powershield-assembled.log` and
 `smashcraft:build/melee-powershield-precision.log`.
 
-The numerical probe
-`smashcraft:tools/physics-probe/observe-powershield-clock.mjs` loads the retail
-files from private storage and keeps its original-containing ELF and outputs
-under `~/.local/share/smashcraft-melee-reference/powershield-clock-runner`.
-The tool uses symbol/ABI addresses only and does not publish executable bytes
-or decompiled implementation.
+The numerical targets come from public frame data (SmashWiki's Powershield
+page).
 
 The first assembled implementation passed 549 normal simulation checks and fourteen
 emitted-Lua precision groups. The playable map built from source `c0d092a`

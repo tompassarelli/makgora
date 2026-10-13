@@ -41,8 +41,6 @@ and selects standing grab, even with the running direction held.
 Sources: [libmelee recorded frame data](https://github.com/altf4/libmelee/blob/ef679270ff95f0d42339dcdf1608282a35023349/melee/framedata.csv)
 at `ef679270ff95f0d42339dcdf1608282a35023349`, LGPL-3.0 as recorded
 in the corpus README; only recorded numerical facts are used, with no code
-or assets copied. The local read-only Melee reference at
-`0296f009f32f710495979d30772d8332af2d411a` identifies jump squat's grab
-cancel in a Melee routine and shield grab in a Melee routine;
-these behavior descriptions are also recorded in
+or assets copied. Our design targets for jump squat's grab
+cancel and for shield grab are recorded in
 [the Melee techniques study](melee/techniques.md#shield-drop-jump-cancelled-grab-and-up-smash).

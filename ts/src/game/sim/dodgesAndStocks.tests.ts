@@ -50,7 +50,7 @@ test("every fighter's air dodge ends actionable, spends no jump and allows one p
   }
 });
 
-test("a diagonal air dodge displaces both axes with the same decayed vector [k4 reference docs/smash-melee-reference/physics-parameters.json]", () => {
+test("a diagonal air dodge displaces both axes with the same decayed vector [k3 measure docs/physics.md]", () => {
   for (const direction of [-1, 1]) {
     const fighter = createReferenceFighter(Character.sylvanas, 0.0, 1);
     fighter.motion.grounded = false;
@@ -71,7 +71,7 @@ test("a diagonal air dodge displaces both axes with the same decayed vector [k4 
   }
 });
 
-test("an air dodge landing slides and restores actions after ten ticks [k4 reference docs/smash-melee-reference/retail-roster.json]", () => {
+test("an air dodge landing slides and restores actions after ten ticks [k3 measure docs/physics.md]", () => {
   for (const character of [Character.sylvanas, Character.rifleman]) {
     const fighter = createReferenceFighter(character, 0.0, 1);
     fighter.motion.grounded = false;
@@ -131,7 +131,7 @@ test("each crossing of a side or bottom blast zone removes exactly one stock unt
   }
 });
 
-test("the top blast zone requires launch knockback rather than jump speed [k4 reference docs/smash-melee-reference/retail-death-parameters.json]", () => {
+test("the top blast zone requires launch knockback rather than jump speed [k3 measure docs/physics.md]", () => {
   for (const mode of [0, 1, 2]) {
     const fighter = createReferenceFighter(Character.sylvanas, 0.0, 1);
     fighter.motion.grounded = false;
