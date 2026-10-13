@@ -5,6 +5,7 @@ import { heroRegion, type MoveRegion, type StrikeCapsule } from "./heroMoves";
 import { frames, type AuthoredSpecial, type SpecialProjectile } from "./heroSpecials";
 import type { AppliedStatus } from "./heroStatus";
 import type { HitEffect } from "./hitRegions";
+import type { HurtPart, HurtPose } from "./hurtboxes";
 import type { NamedMove } from "./heroes/hero";
 
 // Each fighter's ultimate (docs/design/ultimates.md): ordinary authored special
@@ -276,11 +277,21 @@ const MURLOC: AuthoredSpecial = {
   ],
 };
 
+const part = (x1: number, z1: number, x2: number, z2: number, radius: number): HurtPart => ({ x1, z1, x2, z2, radius });
+const pose = (firstFrame: number, lastFrame: number, parts: readonly HurtPart[]): HurtPose => ({ firstFrame, lastFrame, parts });
+
 const GROM: AuthoredSpecial = {
   name: "Blood of Mannoroth", endFrame: 70, groundOnly: true,
   projectiles: [mark("Abilities\\Spells\\Orc\\Bloodlust\\BloodlustTarget.mdx", 1, 16, 0.0)],
   motion: [{ ...frames(17, 40), velocityX: 22.0, velocityZ: 0.0 }, { ...frames(41, 41), velocityX: 0.0, velocityZ: 0.0 }],
   commandGrab: { ...frames(17, 40), strike: capsule(20.0, 50.0, 70.0, 50.0, 40.0), holdFrames: 30, effect: hit(22.0, 40, 90.0, 45.0, HitElement.slash), recovery: 24 },
+  hurt: [
+    pose(1, 7, [part(-14.0, -8.0, -34.0, 141.0, 48.0)]),
+    pose(8, 13, [part(-18.0, 28.0, -26.0, 52.0, 27.0), part(-58.0, 104.0, -58.0, 104.0, 36.0), part(-94.0, 132.0, -94.0, 169.0, 20.0)]),
+    pose(14, 16, [part(-18.0, 21.0, 6.0, 62.0, 44.0), part(9.0, 90.0, 9.0, 124.0, 18.0), part(-18.0, 141.0, -59.0, 170.0, 25.0)]),
+    pose(17, 57, [part(41.0, 13.0, -16.0, 160.0, 37.0)]),
+    pose(58, 69, [part(17.0, 22.0, -45.0, 160.0, 37.0)]),
+  ],
 };
 
 const LOCUST = "Units\\Undead\\Locust\\Locust.mdx";
