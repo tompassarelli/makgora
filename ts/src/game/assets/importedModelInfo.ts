@@ -7,7 +7,6 @@
 
 export const LICH_KING_MODEL = "war3mapImported\\LichKing2.mdx";
 
-export const FORSAKEN_PALADIN_MODEL = "war3mapImported\\ForsakenPaladin.mdx";
 
 export const LICH_KING_ICON = "ReplaceableTextures\\CommandButtons\\BTNLichKing.blp";
 
@@ -24,7 +23,6 @@ export const VALKYR_MODEL = "Units\\Undead\\Banshee\\Banshee.mdx";
 
 
 export const IMPORTED_MODEL_FILES: readonly { readonly entry: string; readonly file: string }[] = [
-  { entry: FORSAKEN_PALADIN_MODEL, file: "ForsakenPaladin.mdx" },
   { entry: LICH_KING_MODEL, file: "LichKing2.mdx" },
   // Warcraft derives a unit portrait path by appending "_Portrait".
   { entry: "war3mapImported\\LichKing2_Portrait.mdx", file: "LichKing2_Portrait.mdx" },

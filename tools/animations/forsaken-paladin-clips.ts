@@ -12,7 +12,6 @@ import { DRAWN_STRIDES } from "../../ts/src/game/presentation/drawnStrideInfo";
 import type { HeroPose } from "../../ts/src/game/sim/heroes/hero";
 import { FORSAKEN_PALADIN_MOVES } from "../../ts/src/game/sim/heroes/forsakenPaladinMoves";
 import { FORSAKEN_PALADIN_SPECIALS } from "../../ts/src/game/sim/heroes/forsakenPaladinSpecials";
-import { FORSAKEN_PALADIN_MODEL } from "../../ts/src/game/assets/importedModelInfo";
 import { seconds } from "./asset-info";
 import { renumberNodes } from "../../ts/scripts/clipNodes";
 function ensure(ok: unknown, why: string): asserts ok { if (!ok) throw new Error(why); }
@@ -222,7 +221,7 @@ await Bun.write(join(project,"ts/src/game/sim/heroes/forsakenPaladinClips.ts"),[
 const before=new DrawnModel(generateHdBody(source),1.2),after=new DrawnModel(generateHdBody(model),1.2);
 const strides:DrawnStride[]=Object.entries(DRAWN_STRIDES).flatMap(([character,row])=>row===undefined||Number(character)===Character.forsakenPaladin?[]:
   (["walk","run"] as const).map(motion=>({character:Number(character) as Character,motion,...row[motion]})));
-for(const motion of ["walk","run"] as const)strides.push(measureDrawnStride(bytes,after,Character.forsakenPaladin,motion,FORSAKEN_PALADIN_MODEL));
+for(const motion of ["walk","run"] as const)strides.push(measureDrawnStride(bytes,after,Character.forsakenPaladin,motion,"Units\\Creeps\\HeroForsakenPaladin\\HeroForsakenPaladin.mdx"));
 await Bun.write(join(project,"ts/src/game/presentation/drawnStrideInfo.ts"),drawnStrideSource(strides));
 let preserved=0;
 for(const [index,sequence]of source.Sequences.entries())for(const part of [0,0.5,1]){const time=(sequence.Interval[1]-sequence.Interval[0])*part/1000,a=before.triangles(index,time,1),b=after.triangles(index,time,1);
