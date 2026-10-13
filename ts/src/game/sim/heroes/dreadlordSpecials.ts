@@ -15,8 +15,12 @@ const perFrame = (distance: number, frameCount: number): number => f32(distance 
 const AIR_LANDING_LAG = 20;
 
 
+const REAR_FOOT = hurtPart(-30.0, 25.0, -44.0, 26.0, 15.0);
+const castBody = (endFrame: number) => [hurtPose(1, endFrame, [...DREADLORD_STAND, REAR_FOOT])];
+
 const CARRION_SWARM: AuthoredSpecial = {
   endFrame: 45,
+  hurt: castBody(45),
   projectiles: [{
     model: "Abilities\\Spells\\Undead\\CarrionSwarm\\CarrionSwarmMissile.mdx",
     spawnFrame: 20, offsetX: 40.0, offsetZ: 60.0, velocityX: h(f32(0.09)), velocityZ: 0.0, life: 32, radius: h(f32(0.25)),
@@ -30,6 +34,7 @@ const CARRION_SWARM: AuthoredSpecial = {
 
 const SLEEP_ORB: AuthoredSpecial = {
   endFrame: 58,
+  hurt: castBody(58),
   projectiles: [{
     model: "Abilities\\Weapons\\VoidWalkerMissile\\VoidWalkerMissile.mdx",
     spawnFrame: 26, offsetX: 40.0, offsetZ: 60.0, velocityX: h(f32(0.06)), velocityZ: 0.0, life: 50, radius: h(f32(0.18)),
@@ -43,11 +48,16 @@ const SLEEP_ORB: AuthoredSpecial = {
 
 const POUNCE_GRAB: StrikeCapsule = { x1: 14.0, z1: 40.0, x2: f32(h(f32(0.45)) - 12.0), z2: 40.0, radius: 12.0 };
 const POUNCE_BITE = dreadlordHit(12.461036682128906, "EDGE", 40);
+const POUNCE_BODY = [
+  hurtPose(7, 9, [hurtPart(8.0, 60.0, 8.0, 60.0, 45.0), hurtPart(18.0, 132.0, 18.0, 132.0, 45.0), hurtPart(40.0, 182.0, 40.0, 182.0, 21.0), hurtPart(8.0, 60.0, 18.0, 132.0, 8.0), hurtPart(18.0, 132.0, 40.0, 182.0, 8.0)]),
+  hurtPose(10, 12, [hurtPart(9.0, 48.0, 9.0, 48.0, 45.0), hurtPart(20.0, 120.0, 20.0, 120.0, 45.0), hurtPart(35.0, 175.0, 35.0, 175.0, 21.0), hurtPart(9.0, 48.0, 20.0, 120.0, 8.0), hurtPart(20.0, 120.0, 35.0, 175.0, 8.0)]),
+  ...dreadlordLimbPoses([heroRegion(17, 19, POUNCE_GRAB, POUNCE_BITE)], 53, 1),
+];
 const NIGHT_POUNCE: AuthoredSpecial = {
   endFrame: 53,
   motion: [{ ...frames(1, 16), velocityX: h(f32(0.14)), velocityZ: 0.0, stopsAtBody: true }, { ...frames(17, 17), velocityX: 0.0, velocityZ: 0.0 }],
   commandGrab: { ...frames(17, 19), strike: POUNCE_GRAB, holdFrames: 16, effect: POUNCE_BITE, recovery: 28, heal: { heal: 4.0 } },
-  hurt: dreadlordLimbPoses([heroRegion(17, 19, POUNCE_GRAB, POUNCE_BITE)], 53, 1),
+  hurt: POUNCE_BODY,
 };
 const NIGHT_POUNCE_AIR: AuthoredSpecial = {
   ...NIGHT_POUNCE,
@@ -63,6 +73,7 @@ const SPREAD_WINGS = [hurtPose(9, 32, [
   ...DREADLORD_STAND,
   hurtPart(-14.0, 85.0, -60.0, 125.0, 16.0),
   hurtPart(14.0, 85.0, 44.0, 125.0, 14.0),
+  REAR_FOOT,
 ])];
 function batAscension(rise: number, across: number): AuthoredSpecial {
   return {
