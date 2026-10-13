@@ -10,6 +10,9 @@ on:
       ref:
         description: Commit, branch or tag to test
         default: main
+      base:
+        description: Exact base commit SHA for history attribution, if known
+        default: ""
       tag:
         description: Names the run so `bun wisp farm test` can find the one it dispatched
         default: ""
@@ -22,6 +25,9 @@ on:
       ref:
         type: string
         required: true
+      base:
+        type: string
+        default: ""
       tag:
         type: string
         default: ""
@@ -77,6 +83,7 @@ jobs:
         working-directory: ts
         env:
           FARM: ${{ github.event_name != 'pull_request' && github.event_name != 'pull_request_target' && github.run_attempt == 1 && inputs.farm-runner || '' }}
+          BASE: ${{ inputs.base }}
         run: |
           git -c gc.auto=0 fetch -q --depth 1 origin "$GITHUB_SHA"
           HOSTED=$(git show "$GITHUB_SHA:ts/runner-routing.json" | jq -er '.premerge | select(type == "string" and length > 0)')
@@ -87,6 +94,10 @@ jobs:
             jq '.lua |= with_entries(select(.key | (startswith("check: ") or startswith("parity corpus: ") or . == "stack-trace profile TypeScript frames") | not))' farm-timings.json > plan-timings.json
           fi
           bun node_modules/wisp/scripts/wisp/farmShards.ts plan --timings plan-timings.json --bun "$BUN_SHARDS" --lua $((LUA_JOBS * LUA_PER_JOB)) $(bun scripts/test.ts --units) > plan.json
+          [ -z "$BASE" ] || [[ "$BASE" =~ ^[0-9a-f]{40}$ ]]
+          jq -n --arg sha "$(git rev-parse HEAD)" --arg tree "$(git rev-parse 'HEAD^{tree}')" --arg base "$BASE" \
+            --argjson runId "$GITHUB_RUN_ID" --argjson runAttempt "$GITHUB_RUN_ATTEMPT" \
+            '{schema: 1, sha: $sha, tree: $tree, base: (if $base == "" then null else $base end), runId: $runId, runAttempt: $runAttempt}' > identity.json
           echo "bun=$(jq -c '[range(.bun | length)]' plan.json)" >> "$GITHUB_OUTPUT"
           echo "lua=$(jq -c "[range($LUA_JOBS)]" -n)" >> "$GITHUB_OUTPUT"
           echo "bun-runners=$(pool "$(jq '.bun | length' plan.json)")" >> "$GITHUB_OUTPUT"
@@ -95,7 +106,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: farm-test-plan
-          path: ts/plan.json
+          path: |
+            ts/plan.json
+            ts/identity.json
           retention-days: 3
 
   bun:
