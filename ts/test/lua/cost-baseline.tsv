@@ -145,7 +145,7 @@ src/game/sim/heroes/sylvanas.tests.ts	2	347000	551
 src/game/sim/heroes/tinker.tests.ts	1	2000	30
 src/game/sim/hitTiming.tests.ts	2	32000	66
 src/game/sim/hurtboxLegibility.tests.ts	1	1037000	1473
-src/game/sim/hurtboxes.tests.ts	2	10949000	3799
+src/game/sim/hurtboxes.tests.ts	4	10427000	49421
 src/game/sim/identityTraits.tests.ts	1	27943000	69865
 src/game/sim/illidanRaidBoss.tests.ts	2	2402000	963
 src/game/sim/knockdown.tests.ts	5	272000	1151
