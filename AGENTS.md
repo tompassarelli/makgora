@@ -1,6 +1,6 @@
 # Smashcraft
 
-- Follow README's "Respecting Blizzard's and Nintendo's IP": if a task seems to need memory reads, disassembly, decompiled code or Blizzard's or Nintendo's files in the repo, stop and measure from outside instead.
+- Follow README's "Principles": if a task seems to need memory reads, disassembly, decompiled code or Blizzard's or Nintendo's files in the repo, stop and measure from outside instead.
 - Keep Wisp changes in Wisp; consume its published pin via the updater. Never edit installed dependencies or add a framework copy.
 - The roster holds at 26 until every fighter feels good; each has a specific personality; prefer Warcraft models.
 - Definitive is the first-class look and Classic the fallback, per fighter; both looks share gameplay, timing, hitboxes and hurtboxes, and each visible body fits its boxes.

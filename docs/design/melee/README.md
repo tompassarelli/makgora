@@ -32,7 +32,7 @@ README records provenance and the meaning and traps of every field. Fighter
 attributes (speeds, gravity, jump heights, weights) are the public values that
 SmashWiki and the frame-data sites list. The generator that once filled these
 pages from a private reference roster is retired; edit the values by hand,
-citing a public source (README "Respecting Blizzard's and Nintendo's IP").
+citing a public source (README "Principles").
 
 ## Conventions
 
