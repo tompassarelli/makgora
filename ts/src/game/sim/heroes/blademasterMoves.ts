@@ -233,7 +233,7 @@ const BODY: FighterHurtboxes = {
     ],
     [AttackStyle.getupAttack]: [
       heroHurtPose(1, 3, [hurtPart(-20.0, 20.0, -20.0, 70.0, 35.0), hurtPart(-45.0, 70.0, 36.0, 84.0, 30.0)]),
-      heroHurtPose(4, 8, [hurtPart(-36.0, 36.0, -44.0, 92.0, 47.0), hurtPart(-45.0, 70.0, 20.0, 100.0, 30.0), hurtPart(12.0, 150.0, 12.0, 150.0, 22.0)]),
+      heroHurtPose(4, 8, [hurtPart(-36.0, 36.0, -44.0, 92.0, 47.0), hurtPart(-45.0, 70.0, 20.0, 100.0, 30.0), hurtPart(4.0, 142.0, 4.0, 142.0, 18.0)]),
       heroHurtPose(9, 11, [hurtPart(-32.0, 24.0, -48.0, 125.0, 35.0), hurtPart(0.0, 95.0, 0.0, 95.0, 25.0)]),
       heroHurtPose(12, 16, [hurtPart(-16.0, 30.0, 2.0, 115.0, 45.0), hurtPart(-25.0, 90.0, 25.0, 115.0, 30.0)]),
       heroHurtPose(17, 19, [hurtPart(-20.0, 25.0, -20.0, 115.0, 40.0), hurtPart(28.0, 82.0, -4.0, 125.0, 35.0)]),
