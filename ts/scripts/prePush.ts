@@ -13,6 +13,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { Console, Effect, Option, Schema } from "effect";
 import { issueTests, redTitle } from "./mainRed";
+import { EFFECT_PLAYBACK_INPUTS } from "./wisp/effectVisibility";
 import { CUE_MODEL_RECORD, RECORD_COMMAND, touchesCueInputs } from "./wisp/cueModels";
 
 const root = join(import.meta.dir, "../..");
@@ -47,7 +48,7 @@ export function cueInputs(): Set<string> {
     }
   };
   visit(join(root, CUE_CHECK));
-  return new Set([CUE_MODEL_RECORD, ...[...seen].map((file) => relative(root, file))]);
+  return new Set([CUE_MODEL_RECORD, ...EFFECT_PLAYBACK_INPUTS, ...[...seen].map((file) => relative(root, file))]);
 }
 
 export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = new Set()): Check[] {
