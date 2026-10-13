@@ -1,3 +1,4 @@
+import { effectUses, effectUseDigest, effectSourceDigest, type EffectVerdict, type EffectFinding } from "./effectVisibility";
 import { fighterCueList, MISSING_CUE_MODEL } from "../../src/game/presentation/specialCues";
 import { allAttackCueModels } from "../../src/game/presentation/attackCues";
 import { DEFINITIVE_ACCENT_REDRAWS, DISJOINT_CUES } from "../../src/game/presentation/disjointCues";
@@ -7,7 +8,7 @@ import { Character } from "../../src/game/sim/codes";
 export type Look = "same" | "redrawn";
 
 export const CUE_MODEL_RECORD = "ts/scripts/wisp/cue-models.tsv";
-export const RECORD_COMMAND = "bun scripts/cueModels.ts --record";
+export const RECORD_COMMAND = "bun scripts/cueModels.ts --record --stock-cache DIRECTORY";
 
 export const cueModels = () => [...new Set([...Object.values(Character).flatMap(character => fighterCueList(character).map(cue => cue.model)), ...allAttackCueModels(), ...allProjectileModels(), MISSING_CUE_MODEL])];
 
@@ -41,4 +42,23 @@ export function formatRecord(looks: ReadonlyMap<string, Look>): string {
 
 export function touchesCueInputs(paths: readonly string[], inputs: ReadonlySet<string>): boolean {
   return paths.some(path => inputs.has(path) || [...inputs].some(input => input.endsWith("/") && path.startsWith(input)));
+}
+
+
+export function formatEffectRecord(report: { readonly source: string; readonly provenance: string; readonly findings: readonly EffectFinding[] }): string {
+  return `classic-source\t${report.source}\t${report.provenance}\n` + report.findings.map(({ status, reason, ...use }) => `classic-use\t${effectUseDigest(use)}\t${status}\t${report.provenance}\n`).sort().join("");
+}
+
+export function effectRecordProblem(text: string): string | undefined {
+  const header = text.split("\n").find((line) => line.startsWith("classic-source\t"))?.split("\t");
+  const digest = /^[0-9a-f]{64}$/;
+  if (header?.[1] !== effectSourceDigest() || !digest.test(header[2] ?? "")) return "Classic effect record is missing or stale; record one exact24268 cache with bun scripts/cueModels.ts --record --stock-cache DIRECTORY";
+  const records = new Map<string, EffectVerdict["status"]>();
+  for (const line of text.split("\n")) {
+    const [kind, key, status, provenance] = line.split("\t");
+    if (kind !== "classic-use" || key === undefined || provenance !== header[2]) continue;
+    if (status === "visible" || status === "invisible" || status === "unknown") records.set(key, status);
+  }
+  const refused = effectUses().filter((use) => records.get(effectUseDigest(use)) !== "visible");
+  return refused.length === 0 ? undefined : `Classic effects: ${refused.length} missing/invisible/Unknown uses refuse the gate: ${refused.map((use) => `${use.fighter}/${use.move}`).join("; ")}`;
 }

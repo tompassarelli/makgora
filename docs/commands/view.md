@@ -15,6 +15,6 @@
   `view cues [--move FIGHTER:MOVE]... [--graphics classic|definitive]` renders
   every attack and special cue in Wisp and fails any move over the effect budget
   (smashcraft:docs/design/visual-quality.md, "Effect budget").
-- Classic effect visibility: `cd ts && bun scripts/wisp/effectVisibility.ts [--json] [--strict]`
-  lists every Classic effect use whose model draws nothing in its sequence window (`--strict` exits 1 when any does).
-  It reads private stock models from `~/.local/share/smashcraft-render-assets/stock`, so it is a local check, not a landing gate.
+- Classic effect visibility: `cd ts && bun scripts/wisp/effectVisibility.ts --stock-cache DIRECTORY [--json] [--strict]`
+  reads one exact private 3.0.0.24268 build cache, with imported assets from the frozen map inputs. It reports every fighter's model-data visibility as visible, invisible or Unknown; `--json` includes every use, source digest and input hashes. `--strict` refuses invisible and Unknown rows. Model-data visibility is separate from physical native acceptance.
+  Record the same evidence through `bun scripts/cueModels.ts --record --stock-cache DIRECTORY`; the existing cue-record landing check validates its per-use/source/provenance digests without private assets on hosted runners. Historical frozen Shockwave remains incomplete even with a geoset; current playing Shockwave can pass. Confirmed emitter births hidden by predicted cue phase remain Unknown (#365/#496).
