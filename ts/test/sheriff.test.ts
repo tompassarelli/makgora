@@ -94,6 +94,7 @@ test("sheriff replays the recorded suite with inherited environment and every fa
   mkdirSync(build, { recursive: true });
   const root = mkdtempSync(join(build, "sheriff-boundary-"));
   const fixture = train(7, 1);
+  const revert = sha(999);
   const culprit = fixture.expected[0]!;
   const names = ["first recorded failure [k1 scenario]", "second recorded failure [k1 scenario]"];
   const commits = fixture.commits.map((commit) => culprit.commits.includes(commit.sha)
@@ -113,11 +114,13 @@ if (command === "gh") {
   if (args[0] === "api") print([]);
   else if (args[0] === "issue" && args[1] === "view") print({ state: "CLOSED" });
   else if (args[1] === "list") print([{ databaseId: 200, conclusion: "failure", headSha: fixture.main }, { databaseId: 100, conclusion: "success", headSha: fixture.base }]);
-  else if (args.includes("--log-failed")) fixture.names.forEach((name) => print("Sweeps (Bun)\\tRun bun run test\\t2026-10-12T20:00:00Z (fail) " + name));
+  else if (args.includes("--log-failed") && fixture.mode !== "report") fixture.names.forEach((name) => print("Sweeps (Bun)\\tRun bun run test\\t2026-10-12T20:00:00Z (fail) " + name));
   else if (args[0] === "run" && args[1] === "view") print({ conclusion: "failure", headBranch: "main", headSha: fixture.main, url: "https://example.invalid/run/200", workflowName: "CI", databaseId: 200, attempt: 1, jobs: [{ name: "Sweeps (Bun)", conclusion: "failure", databaseId: 300, steps: [{ name: "Run bun run test", conclusion: "failure" }] }] });
+  else if (args[0] === "workflow" && ((fixture.mode === "ci-failure" && args[2] === "ci.yml") || (fixture.mode === "background-failure" && args[2] === "background-sweeps.yml"))) { console.error("dispatch refused"); process.exit(1); }
 } else if (command === "git") {
   if (args[0] === "log") process.stdout.write(fixture.commits.map((commit) => commit.sha + "\\n" + commit.message).join(String.fromCharCode(0)) + String.fromCharCode(0));
-  else if (args[0] === "rev-parse") print(fixture.main);
+  else if (args[0] === "rev-parse") print(args[1] === "HEAD" ? fixture.revert : fixture.main);
+  else if (args[0] === "push" && fixture.mode === "push-failure") { console.error("push refused"); process.exit(1); }
   else if (args[0] === "diff-tree") print("tools/move-data/advantage-state.md");
   else if (args[0] === "worktree" && args[1] === "add") { const path = args.at(-2); mkdirSync(join(path, "ts"), { recursive: true }); writeFileSync(join(path, "probe"), args.at(-1)); }
   else if (args[0] === "worktree" && args[1] === "remove") rmSync(args.at(-1), { recursive: true, force: true });
@@ -140,20 +143,33 @@ if (command === "gh") {
   }
   try {
     const env = { ...process.env, PATH: `${bin}:${process.env.PATH}`, HOME: root, SHERIFF_FIXTURE: join(root, "fixture.json"), GITHUB_OUTPUT: join(root, "output"), GITHUB_STEP_SUMMARY: join(root, "summary") };
-    for (const subset of [false, true]) {
+    for (const mode of ["confirmed", "subset", "report", "push-failure", "ci-failure", "background-failure"]) {
+      const subset = mode === "subset";
+      const confirmed = mode === "confirmed" || mode === "ci-failure" || mode === "background-failure";
       const calls = join(root, "calls");
       writeFileSync(calls, "");
       writeFileSync(env.GITHUB_OUTPUT, "");
-      writeFileSync(env.SHERIFF_FIXTURE, JSON.stringify({ root, bin, calls, base: fixture.base, main: fixture.main, head: culprit.head, commits, names, subset }));
+      writeFileSync(env.SHERIFF_FIXTURE, JSON.stringify({ root, bin, calls, base: fixture.base, main: fixture.main, head: culprit.head, revert, commits, names, subset, mode }));
       const child = Bun.spawn([process.execPath, resolve(import.meta.dir, "../scripts/sheriff.ts"), "200"], { env, stdout: "pipe", stderr: "pipe" });
       const [exitCode, stdout, stderr] = await Promise.all([child.exited, new Response(child.stdout).text(), new Response(child.stderr).text()]);
-      expect({ exitCode, stderr }).toEqual({ exitCode: 0, stderr: "" });
+      expect(exitCode).toBe(mode === "push-failure" ? 1 : 0);
+      if (mode === "push-failure") expect(stdout + stderr).toContain("push refused");
+      else if (mode.endsWith("failure")) expect(stdout + stderr).toContain("dispatch refused");
+      else expect(stderr).toBe("");
       const recorded: { command: string; args: string[] }[] = readFileSync(calls, "utf8").trim().split("\n").map((line) => JSON.parse(line));
       const reopened = recorded.filter(({ command, args }) => command === "gh" && args[0] === "issue" && args[1] === "reopen").map(({ args }) => Number(args[2]));
-      expect(reopened).toEqual(subset ? [] : [777]);
-      const reverted = readFileSync(env.GITHUB_OUTPUT, "utf8").startsWith("reverted=");
-      expect(reverted).toBe(!subset);
-      expect(stdout.includes(subset ? "no lane confirmed" : "confirmed culprit lane")).toBe(true);
+      expect(reopened).toEqual(confirmed ? [777] : []);
+      expect(readFileSync(env.GITHUB_OUTPUT, "utf8")).toBe(confirmed ? `reverted=${revert}\n` : "");
+      const push = recorded.findIndex(({ command, args }) => command === "git" && args[0] === "push");
+      expect(push >= 0).toBe(confirmed || mode === "push-failure");
+      const workflows = recorded.flatMap(({ command, args }, index) => command === "gh" && args[0] === "workflow" && args[1] === "run" ? [{ args, index }] : []);
+      expect(workflows.map(({ args }) => args[2])).toEqual(confirmed ? ["ci.yml", "background-sweeps.yml"] : []);
+      for (const { args, index } of workflows) {
+        expect(index).toBeGreaterThan(push);
+        expect(args[args.indexOf("--ref") + 1]).toBe("main");
+        if (args[2] === "background-sweeps.yml") expect(args[args.indexOf("-f") + 1]).toBe(`ref=${revert}`);
+      }
+      if (mode !== "push-failure") expect(stdout).toContain(confirmed ? "confirmed culprit lane" : subset ? "no lane confirmed" : "no recorded failed test");
     }
   } finally {
     rmSync(root, { recursive: true, force: true });

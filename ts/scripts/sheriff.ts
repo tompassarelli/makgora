@@ -295,6 +295,7 @@ export const sheriffRun = (runId: string) => Effect.gen(function*() {
   const revert = yield* revertOnMain(confirmed, lane, main, ci.url);
   yield* setOutput("reverted", revert);
   yield* gh("workflow", "run", "ci.yml", "--ref", "main").pipe(Effect.catch((error) => Console.warn(`couldn't start main's CI: ${error.message}`)));
+  yield* gh("workflow", "run", "background-sweeps.yml", "--ref", "main", "-f", `ref=${revert}`).pipe(Effect.catch((error) => Console.warn(`couldn't start Background sweeps on ${revert}: ${error.message}`)));
   const shorts = confirmed.shas.map((sha) => sha.slice(0, 10)).join(", ");
   for (const issue of issues) {
     const { state } = yield* gh("issue", "view", String(issue), "--json", "state").pipe(Effect.flatMap(decode(IssueState, "gh issue view")));
