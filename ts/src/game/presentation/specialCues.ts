@@ -357,7 +357,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   },
   [Character.beastmaster]: {
     neutral: { spell: "Wild Axes", startup: BEAST, active: cue("Abilities\\Weapons\\Axe\\AxeMissile.mdx", "hand", 1.0) },
-    side: { spell: "Summon Bear", startup: BEAST, active: cue("Abilities\\Spells\\Orc\\FeralSpirit\\FeralSpiritTarget.mdx", "ahead", f32(0.6)) },
+    side: { spell: "Summon Bear", startup: BEAST, active: cue("Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageCaster.mdx", "ahead", f32(0.6)) },
     up: { spell: "Summon Hawk", startup: BEAST, active: cue("Abilities\\Weapons\\DruidoftheTalonMissile\\DruidoftheTalonMissile.mdx", "body", f32(0.6)) },
     down: { spell: "Summon Quilbeast", startup: BEAST, active: cue("Abilities\\Weapons\\QuillSprayMissile\\QuillSprayMissile.mdx", "ahead", f32(0.6)) },
   },
