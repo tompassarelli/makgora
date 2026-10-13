@@ -372,14 +372,15 @@ const jitter: Command = (args) => Effect.gen(function*() {
   const measuredBodies = new Set<string>();
   let clips = 0;
   for (const look of looks) for (const character of fighters) {
-    const body = `${look}:${fighterSlug(character)}`;
     const names = new Map([...originalClipNames(character)].map(([name, index]) => [index, name] as const));
     for (let index = 0; index < originalClipCount(character); index++) {
       const clip = originalClip(character, index);
       if (clip === undefined) continue;
       const relativePath = clip.modelPath.replaceAll("\\", "/");
-      const own = look === "definitive" && existsSync(join(root, "_de.w3mod", relativePath)) ? join(root, "_de.w3mod", relativePath) : join(root, relativePath);
+      const usesDefinitive = look === "definitive" && existsSync(join(root, "_de.w3mod", relativePath));
+      const own = usesDefinitive ? join(root, "_de.w3mod", relativePath) : join(root, relativePath);
       if (!existsSync(own)) continue;
+      const body = `${usesDefinitive ? "definitive" : "classic"}:${fighterSlug(character)}`;
       let model = models.get(own);
       if (model === undefined) {
         model = yield* attempt(`read ${own}`, async () => parseMDX(await Bun.file(own).arrayBuffer()));
