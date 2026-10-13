@@ -14,7 +14,7 @@ export const ANUBARAK_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack, smashMaxChargeFrames: 45, smashMaxDamageMultiplier: 1.25, maxPummels: 1,
   hurtboxes: {
     stand: [shell, hurtPart(20.0, 76.0, 52.0, 100.0, 20.0), rear],
-    crouch: [shell, hurtPart(20.0, 76.0, 52.0, 100.0, 20.0), rear, hurtPart(0.0, 120.0, 0.0, 148.0, 22.0)],
+    crouch: [hurtPart(-28.0, 24.0, 22.0, 55.0, 35.0)],
     attacks: {
       [AttackStyle.downAir]: [
         heroHurtPose(1, 8, [hurtPart(-21.0, 37.0, -21.0, 37.0, 44.0), hurtPart(-9.0, 102.0, -9.0, 102.0, 44.0), hurtPart(-33.0, 119.0, -33.0, 119.0, 41.0)]),
