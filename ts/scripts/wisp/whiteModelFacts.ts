@@ -37,24 +37,6 @@ export const WHITE_MODEL_FACTS: Readonly<Record<string, ModelFacts>> = {
     },
     "emitters": []
   },
-  "war3mapimported/blademasterwhite-f5860a6bae2d552d05ef21165cbe90befa2fa29184378e7d35cd939ee9f11f7e.mdx": {
-    "geosets": 3,
-    "triangles": 424,
-    "lights": 0,
-    "bounds": {
-      "min": [
-        -398.0740051269531,
-        -378.6839904785156,
-        -200
-      ],
-      "max": [
-        365.17401123046875,
-        399.2030029296875,
-        1040.8699951171875
-      ]
-    },
-    "emitters": []
-  },
   "war3mapimported/mountainkingwhite-fd9327848dc69a363f7e5bdd1871d3a8fbb24e44cc44aa8b12c7135fe48fdc06.mdx": {
     "geosets": 5,
     "triangles": 482,
@@ -465,6 +447,24 @@ export const WHITE_MODEL_FACTS: Readonly<Record<string, ModelFacts>> = {
         300,
         300,
         350
+      ]
+    },
+    "emitters": []
+  },
+  "war3mapimported/blademasterwhite-a691d4a3e923da1a76f9230735e9aaa178c0eab1354d26bd01aeb43b49cbf7ab.mdx": {
+    "geosets": 3,
+    "triangles": 424,
+    "lights": 0,
+    "bounds": {
+      "min": [
+        -398.0740051269531,
+        -378.6839904785156,
+        -200
+      ],
+      "max": [
+        365.17401123046875,
+        399.2030029296875,
+        1040.8699951171875
       ]
     },
     "emitters": []

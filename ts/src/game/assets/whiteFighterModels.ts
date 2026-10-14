@@ -2,7 +2,7 @@
 export const WHITE_FIGHTER_MODELS: Readonly<Record<number, string>> = {
   1: "war3mapImported\\RiflemanWhite-6bd5ec1e164b013bd706b0d6e5741a187fa8ecf30e482e0669f6ac71aa724931.mdx",
   2: "war3mapImported\\IllidanWhite-3ad08eda0711a1c1be0e7a64296bc1ba1db08089720ae2f9b20f63211d514511.mdx",
-  3: "war3mapImported\\BlademasterWhite-f5860a6bae2d552d05ef21165cbe90befa2fa29184378e7d35cd939ee9f11f7e.mdx",
+  3: "war3mapImported\\BlademasterWhite-a691d4a3e923da1a76f9230735e9aaa178c0eab1354d26bd01aeb43b49cbf7ab.mdx",
   4: "war3mapImported\\MountainKingWhite-fd9327848dc69a363f7e5bdd1871d3a8fbb24e44cc44aa8b12c7135fe48fdc06.mdx",
   5: "war3mapImported\\WardenWhite-93a7c7c76a82091d83a3797e07cd258fca13693fc4f0c8344212fe6aaa6a8737.mdx",
   6: "war3mapImported\\LichWhite-50232aff54982a848bcb70a235dcfee866ed673eec3c83820211d577df64501d.mdx",
