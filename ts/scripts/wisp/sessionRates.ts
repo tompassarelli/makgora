@@ -5,6 +5,10 @@ import { preloadLines } from "wisp/scripts/wisp/preloadRecord";
 const DEFAULT_FOLDER = join(process.env.HOME ?? "", ".local/share/Steam/steamapps/compatdata/3516115571/pfx/drive_c/users/steamuser/Documents/Warcraft III/CustomMapData");
 const RATES_FILE = /^smashcraft-rates-(.+)-(\d+)\.txt$/;
 const GAP_FLAG_US = 250000;
+const SLOW_SIM = 55;
+const SLOW_CB = 55;
+const SLOW_DRAW = 57;
+const FULL_MINUTE = 55;
 
 export type Fields = Record<string, number>;
 
@@ -93,6 +97,26 @@ function minuteRow(minute: Minute, previousEnd: number): string {
   ].filter(part => part !== "").join(" | ");
 }
 
+const mean = (rows: readonly Fields[], key: string) => sum(rows, key) / Math.max(1, rows.length);
+
+export function forkVerdict(minutes: readonly { readonly minute: number; readonly lines: SessionRateLines }[]): string {
+  const match = (seconds: readonly Fields[]) => seconds.filter(row => row.ph === 2);
+  const onset = minutes.find(minute => {
+    const seconds = match(minute.lines.seconds);
+    return seconds.length >= FULL_MINUTE && mean(seconds, "sim") < SLOW_SIM;
+  });
+  if (onset === undefined) return `  fork: none (sim held ≥${SLOW_SIM}/s every minute)`;
+  const slow = minutes.flatMap(minute => match(minute.lines.seconds)).filter(row => (row.sim ?? 0) < SLOW_SIM);
+  const at = `onset min ${onset.minute} t ${fixed((match(onset.lines.seconds).at(-1)?.t ?? 0) / 1000, 0)}s`;
+  const speeds = [...new Set(slow.map(row => row.gs ?? -1))].filter(speed => speed !== 3);
+  if (speeds.length > 0) return `  fork: game-speed (gs=${speeds.join("/")}), ${at}`;
+  const cb = mean(slow, "cb");
+  const draw = mean(slow, "dr");
+  const sim = mean(slow, "sim");
+  if (cb < SLOW_CB) return `  fork: callbacks (Warcraft delivered cb ${fixed(cb)}/s, draw ${fixed(draw)}/s, sim ${fixed(sim)}/s; render-bound when draw falls with cb) ${draw < SLOW_DRAW ? "render-bound" : "timer-bound"}, ${at}`;
+  return `  fork: echo-wait (cb ${fixed(cb)}/s, sim ${fixed(sim)}/s, held ${fixed(100 * sum(slow, "held") / Math.max(1, sum(slow, "cb")), 0)}%, gap ${fixed(mean(slow, "gap"))}, own echo ${fixed(mean(slow, "rown"))}/s), ${at}`;
+}
+
 export function sessionRateReport(folder: string): string[] {
   const loads = new Map<string, Minute[]>();
   for (const name of readdirSync(folder)) {
@@ -122,6 +146,7 @@ export function sessionRateReport(folder: string): string[] {
       report.push(minuteRow(minute, previousEnd));
       previousEnd = minute.lines.seconds.at(-1)?.t ?? previousEnd;
     }
+    report.push(forkVerdict(minutes));
   }
   return report;
 }
