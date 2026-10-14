@@ -89,7 +89,7 @@ const mainCheckoutOf = Effect.gen(function*() {
 
 
 const resolveMain = Effect.gen(function*() {
-  const resolved = yield* capture(projectRoot, ["git", "rev-parse", "main", "main:controller"]);
+  const resolved = yield* capture(projectRoot, ["git", "rev-parse", "origin/main", "origin/main:controller"]);
   const [revision, controller] = (resolved ?? "").split("\n");
   if (resolved === undefined || revision === undefined || controller === undefined || !/^[a-f0-9]{40}$/.test(revision) || !/^[a-f0-9]{40}$/.test(controller)) return yield* playProblem(new Error("couldn't resolve Smashcraft main"));
   return { mainCheckout: yield* mainCheckoutOf, revision, controller };
