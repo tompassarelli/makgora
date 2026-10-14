@@ -219,9 +219,18 @@ const inWindow = (window: { readonly first: number; readonly last: number } | un
 
 
 
+export function prepareBansheeContacts(f: Fighter): void {
+  if (f.character !== Character.sylvanas || f.special.action !== SpecialAction.heroUltimate || f.launch.hitlag > 0) return;
+  followUpOnContact(f);
+  const move = runningHeroSpecial(f);
+  if (move !== undefined && inWindow(move.intangible, f.special.frame + 1)) f.status.invincible = max(f.status.invincible, 1);
+}
+
 function applyWindows(f: Fighter, move: Readonly<AuthoredSpecial>, frame: number): void {
   const { status } = f;
-  if (inWindow(move.intangible, frame + 1)) status.invincible = max(status.invincible, 2);
+  if (f.character === Character.sylvanas && f.special.action === SpecialAction.heroUltimate) {
+    if (inWindow(move.intangible, frame)) status.invincible = max(status.invincible, 1);
+  } else if (inWindow(move.intangible, frame + 1)) status.invincible = max(status.invincible, 2);
   else if (inWindow(move.intangible, frame)) status.invincible = max(status.invincible, 1);
   const armor = move.armor;
   if (armor?.shell === true) {

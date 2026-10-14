@@ -14,7 +14,7 @@ import { ATTACK_BUFFER_FRAMES, type AttackBuffer, attackBuffer, queueAttack } fr
 import { createFrameControls } from "../match/controls";
 import { Phase, createMatchState } from "../match/rules";
 import { stepMatch } from "../match/step";
-import { AttackStyle, Character, SpecialAction } from "./codes";
+import { AttackStyle, Character, ProjectileKind, SpecialAction } from "./codes";
 import { type Fighter, createFighter, placedObject } from "./fighter";
 import { ROSTER_MANA } from "./mana";
 import { type Controls, copyControls, createRoster } from "./roster";
@@ -25,6 +25,8 @@ import { firstStateDifference } from "../replay/difference";
 import { stateChecksum } from "../replay/canonical";
 import { type ReplayState, copyReplayState, createReplaySnapshot } from "../replay/snapshot";
 import { isIntangible } from "./conditions";
+import { spawnProjectileMotion } from "./projectiles";
+import { clearSpecialOnStock } from "./transitions";
 import { mainDeckLeft, mainDeckRight, mainDeckZAt, SLOPE_TEST_STAGE } from "./stage";
 
 /** How each ultimate is met in its recorded scenario (docs/design/ultimates.md). */
@@ -330,6 +332,11 @@ function bansheeRun(fault: boolean, saveAt?: (state: ReplayState) => void): Bans
     const row = createMatchFrameInput();
     assertTrue(captureFrame(row, tick + 8, 7, live.controls, live.runtime));
     assertTrue(executeMatchFrame(row, match, live.world, live.controls, live.runtime, tick + 8));
+    if (owner.special.action === SpecialAction.heroUltimate) {
+      const phase = owner.special.frame;
+      const ethereal = owner.special.form === 0 ? phase >= 19 && phase <= 98 : phase >= 1 && phase <= 9;
+      assertEquals(isIntangible(owner), ethereal, `Banshee contact protection ${phase}/${owner.special.form} at ${tick}`);
+    }
     if (!walking && standingX === undefined && bystander.motion.vx === 0.0) standingX = bystander.motion.x;
     const pieces = owner.projectiles.filter((projectile) => projectile.life > 0 && projectile.spec?.trail !== undefined && projectile.spec.trail.every > 0);
     if (!sealed && pieces.length > 0) {
@@ -383,7 +390,76 @@ function bansheeRun(fault: boolean, saveAt?: (state: ReplayState) => void): Bans
   return run;
 }
 
+function bansheeStartupContact(boundary: number): Fighter {
+  const owner = createFighter(Character.sylvanas, -150.0, 1);
+  const foe = createFighter(Character.rifleman, 150.0, -1);
+  const world = createRoster(3, [owner, foe]);
+  const game = createMatchState();
+  game.phase = Phase.match;
+  const inputs = createFrameControls();
+  for (let tick = 1; tick <= 8 + boundary; tick++) {
+    copyControls(inputs.inputs[0], tick === 9 ? ULTIMATE : controls());
+    if (tick === 9) owner.mana.points = ROSTER_MANA.max;
+    if (tick === 8 + boundary) {
+      const projectile = spawnProjectileMotion(foe, ProjectileKind.blaster, -36.0, 0.0, 60, 100);
+      assertTrue(projectile !== undefined);
+      if (projectile !== undefined) {
+        projectile.x = f32(owner.motion.x + 36.0);
+        projectile.z = f32(owner.motion.z + 75.0);
+      }
+    }
+    stepMatch(game, world, inputs, tick);
+  }
+  return owner;
+}
+
+function bansheeCounterplay(shield: boolean): void {
+  const owner = createFighter(Character.sylvanas, shield ? -150.0 : 0.0, 1);
+  const foe = createFighter(Character.blademaster, shield ? 150.0 : 0.0, -1);
+  const world = createRoster(3, [owner, foe]);
+  const game = createMatchState();
+  game.phase = Phase.match;
+  const inputs = createFrameControls();
+  let contact = 0;
+  let seal = 0;
+  let ended = 0;
+  for (let tick = 1; tick <= 136; tick++) {
+    if (tick === 9) {
+      owner.mana.points = ROSTER_MANA.max;
+      if (!shield) {
+        owner.motion.z = f32(mainDeckZAt(0, 0.0) + 300.0);
+        owner.motion.grounded = false;
+        owner.motion.surface = undefined;
+        owner.motion.vx = 0.0;
+        owner.motion.vz = 0.0;
+      }
+    }
+    copyControls(inputs.inputs[0], tick === 9 ? ULTIMATE : controls());
+    copyControls(inputs.inputs[1], shield ? SHIELD : tick >= 37 ? controls({ direction: 1 }) : controls());
+    stepMatch(game, world, inputs, tick);
+    if (contact === 0 && owner.special.hit) contact = tick - 8;
+    if (seal === 0 && owner.projectiles.some((piece) => piece.life > 0 && piece.spec?.trail?.every === 20)) seal = tick - 8;
+    if (ended === 0 && tick > 9 && owner.special.action === SpecialAction.none) ended = tick - 8;
+    if (!shield && (tick === 106 || tick === 107)) assertEquals(foe.status.out, false, `miss target alive at ${tick - 8}`);
+  }
+  assertEquals(contact, shield ? 43 : 0);
+  assertEquals(seal, shield ? 59 : 99);
+  assertEquals(ended, shield ? 78 : 128);
+  assertEquals(foe.status.damage, 0.0);
+}
+
 test("Sylvanas's Banshee Form homes, connects, carries through and leaves a trail that ticks a standing foe six times, replayed per frame, with a shifted trail clock fault (#511) [k1 scenario]", () => {
+  for (const frame of [17, 18, 19]) {
+    const owner = bansheeStartupContact(frame);
+    assertEquals(owner.status.damage > 0.0, frame <= 18, `startup contact frame ${frame}`);
+    assertEquals(owner.special.action === SpecialAction.none, frame <= 18, `startup cancellation frame ${frame}`);
+  }
+  const reset = createFighter(Character.sylvanas, 0.0, 1);
+  reset.special.seekTarget = 3;
+  clearSpecialOnStock(reset);
+  assertEquals(reset.special.seekTarget, 0);
+  bansheeCounterplay(true);
+  bansheeCounterplay(false);
   const run = bansheeRun(false, () => undefined);
   const log = run.recorded.join("\n");
   assertEquals(run.contact >= 19 && run.contact <= 98, true, log);
