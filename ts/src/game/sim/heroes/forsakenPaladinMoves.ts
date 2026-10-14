@@ -103,7 +103,11 @@ const FORSAKEN_PALADIN_HURTBOXES: FighterHurtboxes = {
     [AttackStyle.downSmash]: [heroHurtPose(14, 19, forsakenPaladinReach(44.0, 26.0)), heroHurtPose(20, 25, forsakenPaladinReach(-44.0, 26.0))],
     [AttackStyle.neutralAir]: [heroHurtPose(6, 10, forsakenPaladinReach(44.0, 60.0)), heroHurtPose(11, 15, forsakenPaladinReach(-44.0, 60.0))],
     [AttackStyle.forwardAir]: [heroHurtPose(10, 18, forsakenPaladinReach(46.0, 62.0))],
-    [AttackStyle.backAir]: [heroHurtPose(6, 16, forsakenPaladinReach(-44.0, 56.0))],
+    [AttackStyle.backAir]: [
+      heroHurtPose(6, 8, [FORSAKEN_PALADIN_TORSO, hurtPart(17.0, 88.0, 32.0, 102.0, 10.0)]),
+      heroHurtPose(9, 11, [FORSAKEN_PALADIN_TORSO, hurtPart(0.0, 87.0, -30.0, 61.0, 10.0), hurtPart(-10.0, 60.0, -34.0, 28.0, 10.0)]),
+      heroHurtPose(12, 16, [FORSAKEN_PALADIN_TORSO, hurtPart(-17.0, 52.0, -23.0, 27.0, 10.0)]),
+    ],
     [AttackStyle.upAir]: [heroHurtPose(6, 13, forsakenPaladinReach(6.0, 136.0))],
     [AttackStyle.downAir]: [heroHurtPose(12, 20, forsakenPaladinReach(4.0, 20.0))],
   },
