@@ -49,7 +49,7 @@ export class BearFeedback {
 
   private confirmAnimal(frame: number, fighter: Readonly<Fighter>, index: number, animal: number): void {
     const slot = this.slots[index];
-    if (slot === undefined) return;
+    if (slot === undefined || animal > fighter.pack.length) return;
     const placed = placedObject(fighter, animal);
     const cues = advanceBearFeedback(slot.cursor, fighter, frame, animal);
     const play = (label: string): void => {
