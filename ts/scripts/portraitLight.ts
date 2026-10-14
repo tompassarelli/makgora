@@ -24,6 +24,30 @@ export function lightOf(rgba: Uint8Array, floor = LIGHT_BAND.floor): Light {
   return count === 0 ? { mean: 0, lit: 0 } : { mean: total / count, lit: lit / count };
 }
 
+export interface Colour { readonly saturation: number; readonly contrast: number }
+
+export function colourOf(rgba: Uint8Array, mask = rgba): Colour {
+  let saturation = 0;
+  const lumas: number[] = [];
+  for (let at = 0; at + 3 < rgba.length; at += 4) {
+    if ((mask[at + 3] ?? 0) < 128) continue;
+    const r = rgba[at] ?? 0, g = rgba[at + 1] ?? 0, b = rgba[at + 2] ?? 0;
+    const high = Math.max(r, g, b), low = Math.min(r, g, b);
+    saturation += high === 0 ? 0 : (high - low) / high;
+    lumas.push(0.2126 * r + 0.7152 * g + 0.0722 * b);
+  }
+  lumas.sort((a, b) => a - b);
+  return { saturation: lumas.length === 0 ? 0 : saturation / lumas.length, contrast: (lumas[Math.floor(lumas.length * 0.9)] ?? 0) - (lumas[Math.floor(lumas.length * 0.1)] ?? 0) };
+}
+
+export function judgeColour(colours: ReadonlyMap<string, Colour>): string[] {
+  const median = (values: number[]) => values.sort((a, b) => a - b)[Math.floor(values.length / 2)] ?? 0;
+  const saturation = median([...colours.values()].map((colour) => colour.saturation));
+  const contrast = median([...colours.values()].map((colour) => colour.contrast));
+  return [...colours].flatMap(([name, colour]) => colour.saturation < saturation * 0.7 && colour.contrast < contrast * 0.7
+    ? [`${name}: washed out; saturation ${colour.saturation.toFixed(3)}, contrast ${colour.contrast.toFixed(1)} below roster floors ${(saturation * 0.7).toFixed(3)}, ${(contrast * 0.7).toFixed(1)}`] : []);
+}
+
 const toLinear = Array.from({ length: 256 }, (_, value) => { const c = value / 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; });
 const toDisplay = (c: number) => c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055;
 
@@ -133,6 +157,12 @@ if (import.meta.main) {
     const problems = judgePreview();
     for (const look of ['classic', 'definitive'] as const) {
       const lights = yield* lookLights(renders, look);
+      const colours = yield* Effect.forEach(RENDERED_FIGHTERS, (character) => Effect.gen(function* () {
+        const name = fighterRenderName(character);
+        const tile = join(renders, ...(look === 'definitive' ? ['de'] : []), `FighterTile${name}.tga`);
+        return [name, colourOf(yield* pixels(tile), yield* pixels(portrait(renders, look, 'Bust', name)))] as const;
+      }));
+      if (look === 'classic') problems.push(...judgeColour(new Map(colours)).map((problem) => `${look} ${problem}`));
       for (const [name, { mean, lit }] of lights) {
         const card = placementOf(yield* pixels(portrait(renders, look, 'Card', name)), CARD_TEXTURE_PX), chip = placementOf(yield* pixels(portrait(renders, look, 'Bust', name)), TILE_TEXTURE_PX);
         console.log(`${look} ${name}: mean ${mean.toFixed(1)} lit ${lit.toFixed(2)}; card centre ${(card.box.x + card.box.w / 2).toFixed(3)},${(card.box.y + card.box.h / 2).toFixed(3)} fill ${Math.max(card.box.w, card.box.h).toFixed(2)}; chip centroid ${chip.centroid.x.toFixed(2)} cover ${chip.cover.toFixed(2)}`);
