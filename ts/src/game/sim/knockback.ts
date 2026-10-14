@@ -8,6 +8,7 @@ import { meleeAtan2, meleeCos, meleeSin } from "../../sim/meleeScalarMath";
 import { DamageLanding } from "./codes";
 import type { Fighter } from "./fighter";
 import { ownedInfluenceOperands } from "./influenceOperands";
+import { aerialJumps } from "./itemBuffs";
 export { influenceOperands } from "./influenceOperands";
 import { AIR_KNOCKBACK_DECAY, AIR_KNOCKBACK_SQUARED_CUTOFF, decayedAirMotion, retainedOriginal, roundMeleeWorldValue, setMeleeKnockback, termsOfPhysics } from "./motion";
 import type { Controls } from "./roster";
@@ -132,6 +133,7 @@ export function installDamageLaunch(target: Fighter, knockback: number, directio
     if (meleeAtan2(-directionZ, Math.abs(directionX)) > GROUND_LAUNCH_BOUNCE_ANGLE) launchZ = -f32(launchZ * GROUND_LAUNCH_REBOUND);
   }
   launch.groundKnockbackX = motion.grounded ? launchX : 0.0;
+  if (!motion.grounded) target.jump.remaining = aerialJumps(target);
   if (launch.knockbackAge !== undefined && launch.knockbackAge >= KNOCKBACK_STACKING_FRAMES) {
     launch.knockbackX = mergeLaunchAxis(launch.knockbackX, launchX);
     launch.knockbackZ = mergeLaunchAxis(launch.knockbackZ, launchZ);

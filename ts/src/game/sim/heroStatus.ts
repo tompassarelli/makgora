@@ -7,6 +7,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { addFloat32, roundToFloat32 } from "wisp/src/sim/binary32";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { advanceMash, clearMash } from "./mash";
+import { aerialJumps } from "./itemBuffs";
 import type { Fighter } from "./fighter";
 import { type AttackBuffer, clearAttackBuffer } from "../input/attackBuffer";
 import { type Controls, copyControls, neutralControls } from "./roster";
@@ -227,6 +228,7 @@ export function carryHeroStatus(f: Fighter): boolean {
   if (motion.grounded) {
     motion.grounded = false;
     motion.surface = undefined;
+    f.jump.remaining = min(f.jump.remaining, aerialJumps(f));
   }
   return true;
 }
