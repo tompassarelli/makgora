@@ -117,9 +117,11 @@ export function effectVisibility(model: mdx.Model, use: Pick<EffectUse, "sequenc
         if (shows && draws([emitter.Visibility, emitter.EmissionRate], [1, 0], sequence, window, texture(emitter.TextureID, emitter.ReplaceableId), `emitter ${emitter.Name}`)) return verdict("visible", `MODEL-DATA: emitter ${emitter.Name} emits in ${name}`);
       }
       for (const emitter of model.RibbonEmitters) {
+        if (typeof emitter.HeightAbove !== "number" || typeof emitter.HeightBelow !== "number" || !Number.isFinite(emitter.HeightAbove + emitter.HeightBelow)) { unknown.push(`ribbon ${emitter.Name}: height geometry is unverified`); continue; }
+        if (emitter.HeightAbove + emitter.HeightBelow <= 0 || (emitter.LifeSpan ?? 0) <= 0) continue;
         if (!supportedNode(emitter)) { unknown.push(`ribbon ${emitter.Name}: node transforms are unverified`); continue; }
         const material = emitter.MaterialID === undefined ? undefined : model.Materials[emitter.MaterialID];
-        for (const layer of material?.Layers ?? []) if (draws([emitter.Visibility, emitter.EmissionRate, emitter.Alpha, layer.Alpha], [1, 0, 1, 1], sequence, window, texture(typeof layer.TextureID === "number" ? layer.TextureID : undefined), `ribbon ${emitter.Name}`)) return verdict("visible", `MODEL-DATA: ribbon ${emitter.Name} emits in ${name}`);
+        for (const layer of material?.Layers ?? []) if (draws([emitter.Visibility, emitter.EmissionRate, emitter.Alpha, layer.Alpha], [1, 0, 1, 1], sequence, window, texture(typeof layer.TextureID === "number" ? layer.TextureID : undefined), `ribbon ${emitter.Name}`)) unknown.push(`ribbon ${emitter.Name}: nondegenerate trail motion is unverified`);
       }
       if (model.ParticleEmitters.length + (model.ParticleEmitterPopcorns?.length ?? 0) > 0) unknown.push("model-particle/Popcorn dependency playback is unverified");
     }

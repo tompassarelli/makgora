@@ -31,6 +31,15 @@ test("Classic effect visibility requires simultaneous supported tracks and movin
     expect(effectVisibility(shape, { ...use, alpha: 0 }, () => true).status).toBe("invisible");
     expect(effectVisibility(shape, { ...use, lifetime: 0 }, () => true).status).toBe("invisible");
   }
+  const ribbon = parseMDL('Version { FormatVersion 800, } Model "synthetic ribbon" { BlendTime 0, } Textures 1 { Bitmap { Image "ribbon.blp", } } Materials 1 { Material { Layer { FilterMode None, static TextureID 0, } } } RibbonEmitter "trail" { ObjectId 0, static HeightAbove 0, static HeightBelow 0, static Alpha 1, static Visibility 1, EmissionRate 1, LifeSpan 1, Rows 1, Columns 1, MaterialID 0, }');
+  for (let example = 0; example < 128; example++) {
+    const above = bit() * (example + 1), below = bit() * (example + 1);
+    const shape = { ...ribbon, RibbonEmitters: ribbon.RibbonEmitters.map((emitter) => ({ ...emitter, HeightAbove: above, HeightBelow: below })) };
+    expect(effectVisibility(shape, use, () => true).status).toBe(above + below > 0 ? "unknown" : "invisible");
+    expect(effectVisibility(shape, { ...use, travels: true }, () => true).status).toBe(above + below > 0 ? "unknown" : "invisible");
+  }
+  const animatedRibbon = { ...ribbon, RibbonEmitters: ribbon.RibbonEmitters.map((emitter) => ({ ...emitter, HeightAbove: { LineType: 0, GlobalSeqId: -1, Keys: [{ Frame: 0, Vector: new Float32Array([1]) }] } })) };
+  expect(effectVisibility(animatedRibbon, use, () => true).status).toBe("unknown");
   const collapsed = { ...geometry, Geosets: geometry.Geosets.map((geoset) => ({ ...geoset, Vertices: new Float32Array([0, 0, 0, 1, 1, 0, 2, 2, 0]) })) };
   expect(effectVisibility(collapsed, use, () => true).status).toBe("invisible");
   const skinned = { ...geometry, Geosets: geometry.Geosets.map((geoset) => ({ ...geoset, SkinWeights: new Uint8Array(24) })) };
