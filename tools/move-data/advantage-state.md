@@ -59,9 +59,9 @@ Each fighter against a light (Lich), medium (Rifleman) and heavy (Cairne Bloodho
 | Chen Stormstout | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away full hop, neutral special; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 40% → up air against 5/5 DI |
 | Chen Stormstout | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, forward air; tech in forward smash; tech away dash grab, back throw; missed tech short hop, forward air; trap short hop, forward air covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Chen Stormstout | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away full hop, forward air; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 60% → up air against 5/5 DI |
-| Peon | light | yes | yes | yes | yes | yes | down tilt at 60%: tech in place forward smash; tech in up smash; tech away dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Peon | light | yes | yes | yes | yes | yes | down tilt at 40%: tech in place short hop, down special; tech in forward smash; tech away dash grab, back throw; missed tech short hop, down special; trap short hop, down special covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Peon | medium | yes | yes | yes | yes | yes | down tilt at 40%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Peon | heavy | yes | yes | yes | yes | yes | down tilt at 60%: tech in place forward smash; tech in forward smash; tech away full hop, forward air; missed tech forward smash; trap full hop, forward air covers tech in place, tech away, missed tech | up throw at 0% → up air against 5/5 DI |
+| Peon | heavy | yes | yes | yes | yes | yes | down tilt at 60%: tech in place forward smash; tech in down special; tech away full hop, forward air; missed tech forward smash; trap full hop, forward air covers tech in place, tech away, missed tech | up throw at 0% → up air against 5/5 DI |
 | Goblin Tinker | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in down smash; tech away dash grab, back throw; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Goblin Tinker | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Goblin Tinker | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away short hop, down special; missed tech down smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 40% → up air against 5/5 DI |
@@ -299,15 +299,15 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Chen Stormstout | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Peon | light | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Peon | light | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Peon | light | up throw | 1/1 in short hop, back air, out dash, dash attack | 1/1 KD in short hop, back air, out short hop, forward air | 1/1 in up smash, out short hop, forward air | 1/1 KD in short hop, back air, out dash, dash attack |
+| Peon | light | up throw | 1/1 in down special, out dash, dash attack | 1/1 in down special, out short hop, forward air | 1/1 in down special, out short hop, down special | 1/1 in down special, out dash, dash attack |
 | Peon | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Peon | medium | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Peon | medium | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Peon | medium | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in forward tilt, out dash, dash attack | 1/1 in up smash, out short hop, forward air | 1/1 KD in short hop, back air, out dash, dash attack |
+| Peon | medium | up throw | 1/1 in down special, out dash, dash attack | 1/1 in down special, out dash, dash attack | 1/1 in down special, out short hop, down special | 1/1 in down special, out dash, dash attack |
 | Peon | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Peon | heavy | forward throw | 0/0 | 0/0 | 0/0 | 0/0 |
 | Peon | heavy | back throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
-| Peon | heavy | up throw | 1/1 in short hop, back air, out dash, dash attack | 1/1 in short hop, back air, out short hop, forward air | 1/1 in up smash, out short hop, forward air | 1/1 in up smash, out down smash |
+| Peon | heavy | up throw | 1/1 in down special, out short hop, down special | 1/1 in down special, out short hop, down special | 1/1 in down special, out short hop, down special | 1/1 in down special, out short hop, down special |
 | Peon | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Goblin Tinker | light | forward throw | 0/0 | 0/0 | 0/0 | 0/0 |
 | Goblin Tinker | light | back throw | 0/0 | 0/0 | 0/0 | 0/0 |
