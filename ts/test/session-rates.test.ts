@@ -30,7 +30,13 @@ test("the playable build writes a per-second rate line with callbacks and match 
     expect(second.spec).toBeGreaterThanOrEqual(59);
     expect(second.spec).toBeLessThanOrEqual(61);
     expect(second.gmax).toBeGreaterThanOrEqual(0);
+    expect(second.recv).toBeGreaterThan(0);
+    expect(second.rown).toBeGreaterThan(0);
+    expect(second.cf).toBeLessThanOrEqual(second.f ?? 0);
+    expect(second.win).toBeGreaterThan(0);
   }
   expect(session.counts.map(count => count.t)).toEqual([10000, 20000, 30000]);
   expect(session.events).toHaveLength(3);
+  expect(session.live).toHaveLength(6);
+  for (const second of session.seconds) expect(second.gs).toBe(-1);
 }, 120_000);

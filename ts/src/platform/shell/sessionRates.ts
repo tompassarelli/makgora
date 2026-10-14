@@ -13,10 +13,14 @@ const KINDS: readonly Kind[] = ["trg", "tmr", "eff", "snd", "frm", "unit"];
 
 const TICK = "shell.tick";
 const DRAW = "shell.draw";
+const INPUT = "shell.input";
 const FALLBACK_TICKS = 60;
 const FLUSH_SECONDS = 10;
 const SECONDS_PER_FILE = 60;
 const TOP_EVENTS = 6;
+const TOP_EFFECTS = 6;
+const TOP_SOUNDS = 3;
+const MAX_NAME = 20;
 
 interface Second {
   ticks: number;
@@ -38,6 +42,8 @@ interface Second {
   pauses: number;
   menus: number;
   tickGap: number;
+  received: number;
+  receivedOwn: number;
 }
 
 interface SessionRates {
@@ -66,6 +72,9 @@ interface SessionRates {
   wasPaused: boolean;
   wasMenu: boolean;
   lastTick: number;
+  tags: Record<number, string | undefined>;
+  live: Record<string, number>;
+  shortNames: Record<string, string>;
 }
 
 declare global {
@@ -75,18 +84,59 @@ declare global {
 
 const emptySecond = (): Second => ({
   ticks: 0, draws: 0, events: 0, lua: 0, tick: 0, tickMax: 0, sim: 0, spec: 0, conf: 0,
-  held: 0, stalled: 0, gap: 0, gapMax: 0, gapSamples: 0, sends: 0, paused: 0, pauses: 0, menus: 0, tickGap: 0,
+  held: 0, stalled: 0, gap: 0, gapMax: 0, gapSamples: 0, sends: 0, paused: 0, pauses: 0, menus: 0, tickGap: 0, received: 0, receivedOwn: 0,
 });
 
 const zeroKinds = (): Record<Kind, number> => ({ trg: 0, tmr: 0, eff: 0, snd: 0, frm: 0, unit: 0 });
 
 const microseconds = (seconds: number): number => Math.floor(seconds * 1000000);
 
-function created<T extends handle>(rates: SessionRates, kind: Kind, value: T): T {
+function shortName(rates: SessionRates, path: unknown): string {
+  if (typeof path !== "string") return "?";
+  const known = rates.shortNames[path];
+  if (known !== undefined) return known;
+  const file = path.split("\\").join("/").split("/").at(-1) ?? path;
+  const dot = file.indexOf(".");
+  const name = (dot > 0 ? file.slice(0, dot) : file).split(" ").join("_").slice(0, MAX_NAME);
+  rates.shortNames[path] = name;
+  return name;
+}
+
+function tagFor(rates: SessionRates, kind: Kind, source: unknown): string | undefined {
+  if (kind === "eff" || kind === "snd") return `${kind === "eff" ? "e" : "s"}:${shortName(rates, source)}`;
+  if (kind === "unit") return `u:p${source === undefined ? "?" : GetPlayerId(source as player)}`;
+  return undefined;
+}
+
+function created<T extends handle>(rates: SessionRates, kind: Kind, value: T, source: unknown): T {
   rates.created[kind]++;
   const id = GetHandleId(value);
   if (id > rates.handleMax) rates.handleMax = id;
+  const tag = tagFor(rates, kind, source);
+  if (tag !== undefined && id !== 0) {
+    const previous = rates.tags[id];
+    if (previous !== undefined) rates.live[previous] = (rates.live[previous] ?? 1) - 1;
+    rates.tags[id] = tag;
+    rates.live[tag] = (rates.live[tag] ?? 0) + 1;
+  }
   return value;
+}
+
+function released(rates: SessionRates, kind: Kind, value: unknown): void {
+  rates.destroyed[kind]++;
+  if (kind !== "eff" && kind !== "snd" && kind !== "unit") return;
+  const id = GetHandleId(value as handle);
+  const tag = rates.tags[id];
+  if (tag === undefined) return;
+  rates.tags[id] = undefined;
+  rates.live[tag] = (rates.live[tag] ?? 1) - 1;
+}
+
+const gameSpeeds = (): readonly gamespeed[] => [MAP_SPEED_SLOWEST, MAP_SPEED_SLOW, MAP_SPEED_NORMAL, MAP_SPEED_FAST, MAP_SPEED_FASTEST];
+
+function gameSpeed(): string {
+  const speed = GetGameSpeed();
+  return `gs=${gameSpeeds().indexOf(speed)}`;
 }
 
 function wrapNatives(rates: SessionRates): void {
@@ -105,13 +155,14 @@ function wrapNatives(rates: SessionRates): void {
     const native = globals[name] as (this: void, ...args: unknown[]) => unknown;
     const make = kinds[name];
     const end = ends[name];
-    if (make !== undefined) globals[name] = (...args: unknown[]) => created(rates, make, native(...args) as handle);
-    else if (end !== undefined) globals[name] = (...args: unknown[]) => { rates.destroyed[end]++; return native(...args); };
+    if (make === "unit") globals[name] = (...args: unknown[]) => created(rates, make, native(...args) as handle, args[0]);
+    else if (make !== undefined) globals[name] = (...args: unknown[]) => created(rates, make, native(...args) as handle, make === "eff" || make === "snd" ? args[0] : undefined);
+    else if (end !== undefined) globals[name] = (value: unknown) => { released(rates, end, value); return native(value); };
     else if (name === "BlzTriggerRegisterPlayerKeyEvent") globals[name] = (...args: unknown[]) => { rates.keyRegistrations++; rates.registrations++; return native(...args); };
     else if (name.startsWith("TriggerRegister") || name.startsWith("BlzTriggerRegister")) globals[name] = (...args: unknown[]) => { rates.registrations++; return native(...args); };
     else if (name === "TriggerAddAction" || name === "TriggerAddCondition") globals[name] = (...args: unknown[]) => { rates.actions++; return native(...args); };
     else if (name === "BlzSendSyncData") globals[name] = (...args: unknown[]) => { rates.sends++; rates.second.sends++; return native(...args); };
-    else if (name === "StopSound") globals[name] = (value: unknown, kill: unknown, fade: unknown) => { if (kill === true) rates.destroyed.snd++; return native(value, kill, fade); };
+    else if (name === "StopSound") globals[name] = (value: unknown, kill: unknown, fade: unknown) => { if (kill === true) released(rates, "snd", value); return native(value, kill, fade); };
   }
 }
 
@@ -168,8 +219,10 @@ function rateLine(rates: SessionRates, now: number): string {
   const tick = second.ticks === 0 ? 0 : idiv(microseconds(second.tick), second.ticks);
   const phase = s === undefined ? -1 : s.game.phase;
   const match = s === undefined ? -1 : s.replay.serial;
-  const frame = s === undefined ? -1 : activeRollback(s)?.schedule.speculativeFrame() ?? s.runtime.simulationFrame;
-  return `r t=${elapsedMs(rates, now)} cb=${second.ticks} dr=${second.draws} ev=${second.events} sim=${second.sim} spec=${second.spec} conf=${second.conf} held=${second.held} stall=${second.stalled} gap=${gap} gmax=${second.gapMax} lua=${microseconds(second.lua)} tk=${tick} tkmax=${microseconds(second.tickMax)} send=${second.sends} pz=${second.paused} pt=${second.pauses} pm=${second.menus} cbgap=${microseconds(second.tickGap)} ph=${phase} m=${match} f=${frame}`;
+  const rollback = s === undefined ? undefined : activeRollback(s);
+  const frame = s === undefined ? -1 : rollback?.schedule.speculativeFrame() ?? s.runtime.simulationFrame;
+  const window = rollback === undefined ? "" : ` cf=${rollback.schedule.nextConfirmedFrame()} kn=${rollback.schedule.knownThrough()} win=${rollback.window}`;
+  return `r t=${elapsedMs(rates, now)} cb=${second.ticks} dr=${second.draws} ev=${second.events} sim=${second.sim} spec=${second.spec} conf=${second.conf} held=${second.held} stall=${second.stalled} gap=${gap} gmax=${second.gapMax} lua=${microseconds(second.lua)} tk=${tick} tkmax=${microseconds(second.tickMax)} send=${second.sends} recv=${second.received} rown=${second.receivedOwn} pz=${second.paused} pt=${second.pauses} pm=${second.menus} cbgap=${microseconds(second.tickGap)} ${gameSpeed()} ph=${phase} m=${match} f=${frame}${window}`;
 }
 
 function countLine(rates: SessionRates, now: number): string {
@@ -186,8 +239,28 @@ function eventLine(rates: SessionRates, now: number): string {
   return `e t=${elapsedMs(rates, now)} ${counts.slice(0, TOP_EVENTS).map(([name, count]) => `${name}:${count}`).join(" ")} names=${counts.length}`;
 }
 
+function liveLines(rates: SessionRates, now: number): readonly string[] {
+  const effects: [string, number][] = [];
+  const sounds: [string, number][] = [];
+  const units: string[] = [];
+  for (const tag in rates.live) {
+    const count = rates.live[tag] ?? 0;
+    if (count === 0) continue;
+    if (tag.startsWith("e:")) effects.push([tag.slice(2), count]);
+    else if (tag.startsWith("s:")) sounds.push([tag.slice(2), count]);
+    else units.push(`${tag.slice(2)}:${count}`);
+  }
+  const top = (rows: [string, number][], limit: number) => {
+    rows.sort((left, right) => right[1] !== left[1] ? right[1] - left[1] : left[0] < right[0] ? -1 : 1);
+    return rows.slice(0, limit).map(([name, count]) => `${name}:${count}`).join(",");
+  };
+  units.sort();
+  const t = elapsedMs(rates, now);
+  return [`l t=${t} models=${effects.length} eff=${top(effects, TOP_EFFECTS)}`, `s t=${t} files=${sounds.length} snd=${top(sounds, TOP_SOUNDS)} unit=${units.join(",")}`];
+}
+
 function flush(rates: SessionRates, now: number): void {
-  rates.lines.push(countLine(rates, now), eventLine(rates, now));
+  rates.lines.push(countLine(rates, now), eventLine(rates, now), ...liveLines(rates, now));
   const load = rates.load ??= `${globalThis.__smashcraftMatchSerial ?? 0}-${microseconds(rates.started)}`;
   writeLines(sessionRatesFile(load, rates.file), [sessionRatesHeader(load, rates.file, rates.build, sourceVersion(), rates.clock !== undefined), ...rates.lines]);
   if (rates.seconds - rates.file * SECONDS_PER_FILE < SECONDS_PER_FILE) return;
@@ -213,6 +286,10 @@ function account(rates: SessionRates, name: string, spent: number, now: number):
     if (spent > second.tickMax) second.tickMax = spent;
     sampleTick(rates, now);
   } else if (name === DRAW) second.draws++;
+  else if (name === INPUT) {
+    second.received++;
+    if (GetTriggerPlayer() === GetLocalPlayer()) second.receivedOwn++;
+  }
   if (rates.clock === undefined ? second.ticks >= FALLBACK_TICKS : now - rates.secondStarted >= 1) closeSecond(rates, now);
 }
 
@@ -223,6 +300,7 @@ export function installSessionRates(build: string): void {
     clock, started, secondStarted: started, seconds: 0, load: undefined, build, second: emptySecond(), lines: [], file: 0, named: {},
     epoch: -1, lastSpec: 0, lastConf: 0, lastSim: 0, created: zeroKinds(), destroyed: zeroKinds(),
     keyRegistrations: 0, registrations: 0, actions: 0, sends: 0, handleMax: 0, wrapped: false, wasPaused: false, wasMenu: false, lastTick: started,
+    tags: {}, live: {}, shortNames: {},
   };
   wrapNatives(rates);
   const table = globalThis.__smashcraftDispatch;

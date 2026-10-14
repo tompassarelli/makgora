@@ -2,6 +2,7 @@
 
 
 import { at } from "wisp/src/runtime/lookup";
+import { IMPORTED_MENU_MUSIC } from "../assets/importedMusicInfo";
 import { Character } from "../sim/codes";
 import { type StageTile, selectableStage } from "../menu/stageCatalog";
 
@@ -38,7 +39,7 @@ export const cueSound = (cue: MatchCue): string => at(CUE_SOUNDS, cue);
 const MUSIC = "Sound\\Music\\mp3Music\\";
 
 
-export const MENU_MUSIC = `${MUSIC}War3XMainScreen.flac`;
+export const MENU_MUSIC = IMPORTED_MENU_MUSIC.path;
 
 
 
