@@ -1,6 +1,7 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
-import { stageScenery } from "./stageScenery";
+import { STAGE_LAVA_MODEL, STAGE_SEA_MODEL, STAGE_TOMB_SEA_MODEL } from "../assets/terrainAssetInfo";
+import { stageScenery, terrainPieces } from "./stageScenery";
 import { fogProblems, mirrorProblems } from "./stageRules";
 
 
@@ -40,5 +41,13 @@ test("stage scenery shows no creatures [k3 measure docs/design/stage-art.md]", (
       const creature = model.toLowerCase().startsWith("units\\") || FIGURE_WORDS.some((word) => model.toLowerCase().includes(word));
       assertEquals(creature, false, `${name}: ${model} is a creature`);
     }
+  }
+});
+
+test("the space below every stage's platforms is Tomb's sea or lava, never the stretched zigzag sea plane [k2 property]", () => {
+  for (const { id, name } of STAGE_CATALOG) {
+    const floor = stageScenery(id).floor;
+    if (floor !== undefined) assertEquals(floor.model === STAGE_TOMB_SEA_MODEL || floor.model === STAGE_LAVA_MODEL, true, `${name}: floor ${floor.model}`);
+    for (const piece of terrainPieces(id)) assertEquals(piece.model === STAGE_SEA_MODEL, false, `${name}: draws the zigzag sea plane`);
   }
 });

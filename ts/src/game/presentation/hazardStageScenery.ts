@@ -1,7 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import type { StageScenery } from "./stageScenery";
 import { STAGE_SKY_MODELS } from "../assets/stageSkyInfo";
-import { STAGE_LAVA_MODEL, STAGE_SEA_MODEL } from "../assets/terrainAssetInfo";
+import { STAGE_LAVA_MODEL, STAGE_TOMB_SEA_MODEL } from "../assets/terrainAssetInfo";
 
 const MOUND = "Doodads\\Barrens\\Rocks\\Barrens_Rocks\\Barrens_Rocks2.mdx";
 const SPIRE = "Doodads\\Felwood\\Rocks\\Felwood_Spires\\Felwood_Spires0.mdx";
@@ -25,7 +25,7 @@ export const NORDRASSIL_SCENERY: StageScenery = {
   sky: "Environment\\Sky\\FelwoodSky\\FelwoodSky.mdl",
   fog: { start: 5000.0, end: 5300.0, red: 0.375, green: 0.625, blue: 0.5 },
   heightFog: { start: 5500.0, end: 11000.0, density: 0.25, heightStart: -2600.0, heightEnd: -600.0, maxDensity: 0.5, drawOverSky: false },
-  floor: { model: STAGE_SEA_MODEL, z: -1050.0, color: [56, 92, 92] },
+  floor: { model: STAGE_TOMB_SEA_MODEL, z: -1050.0, color: [56, 92, 92] },
   pieces: [
     { model: "Doodads\\Ashenvale\\Structures\\Worldtree\\Worldtree.mdx", x: 0.0, y: 4000.0, z: -1050.0, scale: f32(0.55), yaw: 300.0 },
     { model: SPIRE, x: -3890.0, y: 4300.0, z: -1508.0, scale: 3.25, yaw: 140.0, matrixScale: [2.75, 1.0, 1.5] },
@@ -73,7 +73,7 @@ export const GRYPHON_SCENERY: StageScenery = {
 
   fog: { start: 5000.0, end: 9000.0, red: 0.5, green: 0.625, blue: 0.75 },
   heightFog: { start: 5000.0, end: 9000.0, density: 0.25, heightStart: -1800.0, heightEnd: -500.0, maxDensity: 0.5, drawOverSky: true },
-  floor: { model: STAGE_SEA_MODEL, z: -1300.0, color: [96, 128, 136] },
+  floor: { model: STAGE_TOMB_SEA_MODEL, z: -1300.0, color: [96, 128, 136] },
   pieces: [
 
     { model: "Buildings\\Human\\GryphonAviary\\GryphonAviary.mdx", x: 2300.0, y: 4500.0, z: -150.0, scale: 1.25, yaw: 215.0 },
