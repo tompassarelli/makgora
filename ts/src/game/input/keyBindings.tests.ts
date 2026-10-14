@@ -52,11 +52,15 @@ test("saved default upgrades preserve every customized slot and leave current sa
     for (const [version, slots] of OLD_SAVES) {
       const decoded = decodeBindings(oldSave(version, slots, legacy));
       assertEquals(decoded === undefined ? "invalid" : encodeBindings(decoded), encodeBindings(current), `${preset} ${version} defaults`);
-      for (let index = 0; index < slots; index++) {
-        const customized = legacy.slice();
-        customized[index] = "C".charCodeAt(0);
-        const upgraded = decodeBindings(oldSave(version, slots, customized));
-        assertEquals(upgraded === undefined ? undefined : upgraded.keys[index], customized[index], `${preset} ${version} custom slot ${index}`);
+      for (const character of ["C", "A", "0"]) {
+        const customKey = character.charCodeAt(0);
+        if (legacy.includes(customKey)) continue;
+        for (let index = 0; index < slots; index++) {
+          const customized = legacy.slice();
+          customized[index] = customKey;
+          const upgraded = decodeBindings(oldSave(version, slots, customized));
+          assertEquals(upgraded === undefined ? undefined : upgraded.keys[index], customized[index], `${preset} ${version} custom ${character} slot ${index}`);
+        }
       }
     }
     const savedCurrent = { keys: legacy };
