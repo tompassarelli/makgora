@@ -10,6 +10,7 @@ import { startKeyUp } from "../../game/match/controls";
 import { Phase, copyMatchState, firstHumanSlot, humanActive, humanPresent, initializeComputerChoices, participantLeft, updateConnectedHumans } from "../../game/match/rules";
 import { chooseScenarioCharacters } from "../../game/shell/scenarios";
 import { FRAME_SECONDS } from "../../game/presentation/fighterPose";
+import { holdGameSpeed } from "./gameSpeed";
 import { FLOOR_HEIGHT } from "../../game/presentation/arenaCamera";
 import { type MapBuild, journalIngress } from "../../game/shell/build";
 import { pausing } from "../../game/shell/pauseBarrier";
@@ -286,6 +287,7 @@ function createTriggers(s: ShellState): void {
   const leave = CreateTrigger();
   for (const slot of PARTICIPANT_SLOTS) TriggerRegisterPlayerEvent(leave, Player(slot), EVENT_PLAYER_LEAVE);
   TriggerAddAction(leave, trampoline(PLAYER_LEFT));
+  holdGameSpeed();
   const tick = CreateTimer();
   TimerStart(tick, FRAME_SECONDS, true, trampoline(TICK));
   startFrameClock(tick);

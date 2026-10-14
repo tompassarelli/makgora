@@ -4,6 +4,8 @@ declare const SetCameraPosition: (x: number, y: number) => void;
 
 
 export const SMASHCRAFT_NOOPS: IntentionalNoops = {
+  SetGameSpeed: "headless frames advance one per simulated callback; there is no game clock to slow",
+  SetMapFlag: "the only flag the map sets locks the game speed, which headless clients do not model",
   GetPlayableMapRect: "stage initialization only uses this rectangle to obtain the declared zero-centered map origin",
   GetGameSpeed: "only the local session-rates log reads the game speed; headless clients have no lobby speed setting",
   GetRectCenter: "stage initialization uses the declared zero-centered map origin supplied by location getters",
