@@ -27,7 +27,7 @@ function fixture(character: Character = Character.rifleman, graceFrames = 0) {
   };
 }
 
-test("Z hold lengths match quick-release jump height and takeoff frame, even with jump held [k1 scenario]", () => {
+test("I hold lengths match quick-release jump height and takeoff frame, even with jump held [k1 scenario]", () => {
   for (const character of [Character.rifleman, Character.demonHunter]) {
     for (const jumpHeld of [false, true]) {
     for (const hold of [1, 3, 10, 60]) {
@@ -36,7 +36,7 @@ test("Z hold lengths match quick-release jump height and takeoff frame, even wit
       const capture = keyboardCapture();
       const keys = playerKeys();
       const bindings = presetBindings("standard");
-      pressKey(keys, 90, bindings);
+      pressKey(keys, 73, bindings);
       assertEquals(heldActions(keys), maskOf(Action.shortHop));
       for (let frame = 1; frame <= 90; frame++) {
         sampleKeys(capture, frame <= hold ? heldActions(keys) | (jumpHeld ? maskOf(Action.jump) : 0) : 0);
@@ -54,10 +54,10 @@ test("Z hold lengths match quick-release jump height and takeoff frame, even wit
   }
 });
 
-test("LT and keyboard 9 or custom 0 raise the lightest shield, larger and weaker than RT [k4 reference docs/melee-analog-shield.md]", () => {
+test("LT and keyboard A in both presets raise the lightest shield, larger and weaker than RT [k4 reference docs/melee-analog-shield.md]", () => {
   const lightRows = [assertDefined(inputRow({ held: maskOf(Action.leftTrigger), pressed: maskOf(Action.leftTrigger), triggerLeft: 77 }))];
   for (const preset of ["standard", "custom"] as const) {
-    const action = assertDefined(actionFor(presetBindings(preset), preset === "standard" ? 57 : 48));
+    const action = assertDefined(actionFor(presetBindings(preset), 65));
     assertEquals(action, Action.lightShield);
     const capture = keyboardCapture();
     assertTrue(sampleKeys(capture, maskOf(action)));

@@ -26,9 +26,9 @@ for (const key of bindings.keys) {
 const STICK_JUMP = "stick-up";
 SOURCES.set(STICK_JUMP, Action.jump);
 
-const LEFT = "W", RIGHT = "R", DOWN = "E", UP = "SPACE", JUMP = "I", JUMP_ALT = "8", ATTACK = "N", SPECIAL = "U",
-  GRAB = "O", SHIELD_LEFT = "Q", SHIELD_RIGHT = "7", SHIELD_RIGHT_ALT = "G", LIGHT_SHIELD = "9", LIGHT_SHIELD_ALT = "T", C_LEFT = "B", C_LEFT_ALT = "/", C_RIGHT = "M", C_UP = "J",
-  C_DOWN = "H", WALK = "P", SHORT_HOP = "Z", METER = "X";
+const LEFT = "W", RIGHT = "R", DOWN = "E", UP = "SPACE", JUMP = "Z", JUMP_ALT = "8", ATTACK = "N", SPECIAL = "U",
+  GRAB = "O", SHIELD_LEFT = "Q", SHIELD_RIGHT = "7", SHIELD_RIGHT_ALT = "G", LIGHT_SHIELD = "A", C_LEFT = "B", C_LEFT_ALT = "/", C_RIGHT = "M", C_UP = "0",
+  C_DOWN = "J", WALK = "P", SHORT_HOP = "I", METER = "X";
 
 
 const TOWARD = "toward", AWAY = "away";
@@ -238,7 +238,7 @@ const ACTIONS: MatchScript = {
     [144, 2, DOWN], [165, 2, SPECIAL], [190, 2, GRAB], [200, 2, TOWARD], [215, 8, TOWARD], [217, 2, SPECIAL],
     [235, 20, SHIELD_LEFT], [241, 2, AWAY], [270, 12, SHIELD_RIGHT], [274, 2, DOWN], [290, 3, JUMP], [296, 6, UP],
     [298, 2, SHIELD_RIGHT], [315, 2, C_LEFT], [328, 2, C_RIGHT], [340, 2, C_LEFT_ALT], [352, 2, C_UP],
-    [364, 2, C_DOWN], [378, 16, ATTACK], [380, 2, TOWARD], [396, 6, UP], [398, 2, SPECIAL], [400, 2, SHIELD_RIGHT_ALT], [402, 2, LIGHT_SHIELD], [406, 2, LIGHT_SHIELD_ALT], [408, 2, METER],
+    [364, 2, C_DOWN], [378, 16, ATTACK], [380, 2, TOWARD], [396, 6, UP], [398, 2, SPECIAL], [400, 2, SHIELD_RIGHT_ALT], [402, 2, LIGHT_SHIELD], [406, 2, LIGHT_SHIELD], [408, 2, METER],
   ], [
     [1, 1, SHORT_HOP],
     [20, 24, SHIELD_RIGHT], [50, 2, ATTACK], [60, 2, GRAB], [84, 2, SHIELD_LEFT], [95, 4, JUMP], [101, 2, C_DOWN],
@@ -246,7 +246,7 @@ const ACTIONS: MatchScript = {
     [170, 8, JUMP_ALT], [174, 2, ATTACK], [186, 2, UP], [192, 2, ATTACK], [194, 2, SPECIAL], [196, 2, JUMP],
     [210, 10, DOWN], [212, 2, SPECIAL], [230, 10, WALK, TOWARD], [232, 2, ATTACK], [250, 2, C_LEFT],
     [262, 2, WALK, C_LEFT_ALT], [274, 2, C_UP], [286, 10, TOWARD], [288, 2, GRAB], [300, 6, AWAY], [320, 6, SHIELD_LEFT],
-    [322, 2, DOWN], [334, 3, JUMP], [338, 2, SHIELD_LEFT], [350, 2, C_RIGHT], [372, 2, UP], [400, 2, SHIELD_RIGHT_ALT], [402, 2, LIGHT_SHIELD], [406, 2, LIGHT_SHIELD_ALT], [408, 2, METER],
+    [322, 2, DOWN], [334, 3, JUMP], [338, 2, SHIELD_LEFT], [350, 2, C_RIGHT], [372, 2, UP], [400, 2, SHIELD_RIGHT_ALT], [402, 2, LIGHT_SHIELD], [406, 2, LIGHT_SHIELD], [408, 2, METER],
   ]],
   approaches: [
     [[1, 45], [56, 45], [118, 50], [175, 35], [258, 45], [305, 50], [370, 45]],
@@ -517,7 +517,7 @@ export function generateTapes(): Map<string, string> {
       approaches: [[], []], rollbacks: [[1, 60], [65, 90], [95, 140]], predictions: [[10, 18], [24, 32]],
       exercise: "shieldPush",
     }])],
-    ["short-hop", recordTape("Z short and long holds with late input corrections and rollback.", [{
+    ["short-hop", recordTape("I short and long holds with late input corrections and rollback.", [{
       characters: [Character.demonHunter, Character.rifleman], stage: 0, stocks: 3, minutes: 0, frames: 180,
       holds: [[[1, 1, SHORT_HOP], [60, 60, SHORT_HOP, JUMP]], [[1, 60, SHORT_HOP], [100, 3, SHORT_HOP]]],
       approaches: [[], []], rollbacks: [[1, 30], [65, 120]], predictions: [[1, 10], [98, 110]],
