@@ -190,3 +190,17 @@ export const optionalController = (game?: { readonly pid: number; readonly build
   }).pipe(
     Effect.catchTag("PlayProblem", (problem) => Effect.succeed(`keyboard (no controller: ${problem.problem})`)),
   );
+
+export const lobbyController = (pid: number, statusFile = CONTROLLER_STATUS) => Effect.gen(function*() {
+  const runs = yield* ensureService(yield* currentHelper);
+  return yield* pollUntil(Effect.sync(() => {
+    const status = readStatus(statusFile);
+    return status.game_pid === String(pid) && status.pad_device !== undefined && alive(status.service_pid)
+      ? `connected ${status.pad ?? "controller"} for Warcraft III (pid ${pid}) through ${runs}`
+      : undefined;
+  }), {
+    every: "250 millis",
+    within: `${SERVE_SECONDS} seconds`,
+    orElse: () => Effect.fail(fail(`the playtest controller is not connected to Warcraft III (pid ${pid}); ${statusFile}`)),
+  });
+});

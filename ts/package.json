@@ -23,6 +23,9 @@
     "test": "bun scripts/test.ts",
     "literal-copies": "bun scripts/literalCopies.ts",
     "wisp": "bun scripts/wisp.ts",
+    "playtest": "bun scripts/playtestLobby.ts",
+    "playtest:build": "bun scripts/playtestBuild.ts",
+    "rc:build": "bun scripts/rcBuild.ts",
     "update:wisp": "bun scripts/update-wisp.ts",
     "parity": "bun wisp parity numeric"
   },

@@ -7,7 +7,7 @@
 
 import { readFileSync, readdirSync } from "node:fs";
 import { homedir } from "node:os";
-import { join } from "node:path";
+import { basename, join, resolve } from "node:path";
 import { Clock, Effect, Layer, Option, Schema } from "effect";
 import { linePreloadFile } from "wisp/scripts/wisp/preloadRecord";
 import { makePlay } from "wisp/scripts/wisp/commands/play";
@@ -23,9 +23,10 @@ import { MELEE_READY_FILE } from "../../../src/runtime/gameFiles";
 import { clientState, gameFilesLayer } from "../project";
 import { accountField, smashcraftWatch } from "../doctor";
 import { currentPlaytest } from "../currentPlaytest";
-import { optionalController } from "../controllerService";
+import { lobbyController, optionalController } from "../controllerService";
 import { pollUntil } from "../../hostPoll";
 import { installLatest } from "../mapLibrary";
+import { reserveStatus } from "../playtestReserve";
 import type { Command } from "wisp/scripts/wisp/command";
 import { PLAYABLE_BUILD } from "../../../src/game/shell/currentBuild";
 import type { PlayTools } from "wisp/scripts/platform/play";
@@ -231,6 +232,24 @@ const signInTom = Effect.gen(function*() {
 });
 
 export const play: Command = (args) => Effect.gen(function*() {
+  if (args.includes("--lobby-only")) {
+    const maps = args.filter((arg) => arg !== "--lobby-only");
+    const requested = maps[0];
+    if (maps.length > 1 || (requested !== undefined && (!/\.w3x$/i.test(requested) || requested.startsWith("--")))) return yield* new PlayProblem({ problem: "use play --lobby-only [MAP.w3x]" });
+    const current = requested === undefined
+      ? yield* currentPlaytest(join(documentsFolder(PLAYTEST_PREFIX), "Maps/00-Smashcraft"))
+      : { map: { folder: "00-Smashcraft", file: basename(requested), title: basename(requested, ".w3x"), source: resolve(requested) }, helper: undefined };
+    const normal = playtest({ ...PLAYTEST, ...current });
+    const declaration: PlayDeclaration<GameFiles> = {
+      ...normal,
+      graphicsMode: "classic",
+      prepare: () => Effect.void,
+      cleanup: () => Effect.void,
+      helper: { service: (game) => lobbyController(game.pid) },
+      lobbyReady: () => reserveStatus,
+    };
+    return yield* makePlay(declaration, gameFilesLayer, tools, smashcraftWatch.pipe(Layer.provide(platformLayer())))(args);
+  }
   if (args.includes("--standalone")) {
     const { standalonePlay } = yield* Effect.tryPromise({ try: () => import("../standalone"), catch: (cause) => new PlayProblem({ problem: String(cause) }) });
     return yield* standalonePlay(args);

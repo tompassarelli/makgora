@@ -34,3 +34,18 @@ binary32 tables in smashcraft:ts/src/game/sim/mathTableData.ts. Regenerate the
 data with `bun scripts/mathTables.ts` from ts/. A source-shape test refuses
 `Math.sqrt`, `Math.sin`, `Math.cos`, `Math.atan2`, `Math.pow`, the other libm
 functions and `**` in map code, because Bun and Warcraft differ by an ulp on them.
+
+`bun run playtest MAP.w3x` reserves the game slice first, then uses Wisp's
+Steam/Battle.net/Warcraft launcher and menu automation to install that map
+and host its Classic offline LOOP lobby. It reuses a running client at its
+menu or lobby and refuses an active or unreported session. A connected
+controller, the game's full tree in the reserve, and the lobby screenshot
+are required before `LOBBY-READY`; the match remains unstarted.
+
+`bun run playtest:build [FULL_MAIN_SHA]` builds and installs the selected
+main revision (current main by default), then calls that same playtest
+command. `bun run rc:build FULL_MAIN_SHA` requires an explicit revision.
+Both print `RC-READY` only after the subprocess confirms `LOBBY-READY` for
+the exact map with its screenshot path. Versions come from the existing
+playable version reservation; no candidate version is hardcoded.
+The overnight simulation runner remains `bun scripts/playtest.ts`.
