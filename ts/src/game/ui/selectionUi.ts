@@ -1,3 +1,4 @@
+import { type SessionWinsFrames, createSessionWinsFrames, presentSessionWinsFrames } from "./sessionWinsFrames";
 import { definitiveCues } from "../render/specialCueEffects";
 import { nextMatchCharacter, selectableMatchCharacter } from "../match/rules";
 import { RULE_BUTTONS, RULE_HEIGHT, type RuleBox, type TrainingSetting, cpuSettingsBox } from "./ruleButtons";
@@ -15,7 +16,7 @@ import { CPU_OPPONENT_COPY } from "./cpuOpponentCopy";
 import { createOpponentSettings } from "./opponentSettingsFrames";
 import { CPU_OPPONENT_DEFAULT, CPU_TIER_DEFAULT } from "../match/cpuProfiles";
 import { bindPrototype } from "../../platform/rebind";
-import { PARTICIPANT_CAPACITY, PARTICIPANT_SLOTS } from "../input/participants";
+import { PARTICIPANT_CAPACITY, PARTICIPANT_SLOTS, type Slots } from "../input/participants";
 import {
   type MatchState,
   Phase,
@@ -119,6 +120,7 @@ interface CardFrames {
   readonly portrait: framehandle;
   readonly name: framehandle;
   readonly status: framehandle;
+  readonly wins: SessionWinsFrames;
   readonly chip: framehandle;
   readonly summary: framehandle;
   readonly settings: framehandle;
@@ -314,7 +316,8 @@ export class SelectionPanel {
       const tag = label(mode, `MeleeTag${name}`, x + f32(0.014), f32(0.267), f32(0.132), f32(0.019), f32(0.01));
       const portrait = art(root, `MeleePortrait${name}`, portraitTexture(Character.demonHunter, false, slot), x + f32(0.029), f32(0.245), f32(0.102), f32(0.102));
       const name_ = label(root, `MeleeName${name}`, x + f32(0.008), f32(0.102), f32(0.144), f32(0.019), f32(0.011));
-      const status = label(root, `MeleeStatus${name}`, x + f32(0.014), f32(0.077), f32(0.132), f32(0.014), f32(0.011));
+      const wins = createSessionWinsFrames(root, name, f32(x + f32(0.054)), f32(0.081));
+      const status = label(root, `MeleeStatus${name}`, x + f32(0.014), f32(0.077), f32(0.132), f32(0.012), f32(0.009));
       const chip = art(root, `MeleeChip${name}`, `war3mapImported\\SelectionChipP${I2S(slot + 1)}.tga`, x + f32(0.06), f32(0.2), f32(0.06), f32(0.06));
       BlzFrameSetLevel(chip, 10);
       const box = cpuSettingsBox(slot);
@@ -326,7 +329,7 @@ export class SelectionPanel {
       setFrameText(settingsLabel, "Opponent settings");
       this.clicks.add(settings, { kind: "cpuSettings", slot }, undefined, "native");
       const summary = label(root, `MeleeCpuSummary${name}`, x + f32(0.004), f32(0.139), f32(0.152), f32(0.031), f32(0.009));
-      return { card, tag, mode, portrait, name: name_, status, chip, summary, settings, settingsLabel };
+      return { card, tag, mode, portrait, name: name_, status, wins, chip, summary, settings, settingsLabel };
     });
     this.hand = art(root, `MeleeHand${suffix}`, "war3mapImported\\SelectionHandPinch.tga", 0.0, 0.0, HAND_WIDTH, HAND_HEIGHT);
     BlzFrameSetLevel(this.hand, 30);
@@ -759,7 +762,7 @@ export class SelectionPanel {
     setFrameText(this.delayLine, text);
   }
 
-  update(game: Readonly<MatchState>, settingsOpen: boolean, menuCursorAllowed: boolean): void {
+  update(game: Readonly<MatchState>, settingsOpen: boolean, menuCursorAllowed: boolean, sessionWins: Readonly<Slots<number>>): void {
     this.game = game;
     this.settingsOpen = settingsOpen;
     if (this.choosing() === undefined) this.cpuSlot = undefined;
@@ -846,6 +849,9 @@ export class SelectionPanel {
       BlzFrameSetEnable(frames.mode, canCycleSlotMode(game, participantId, slot));
       BlzFrameSetVisible(frames.portrait, active && ready);
       BlzFrameSetVisible(frames.name, active && ready);
+      const winsShown = active && ready && sessionWins[slot] > 0;
+      presentSessionWinsFrames(frames.wins, sessionWins[slot], active && ready);
+      placeTopLeft(frames.status, f32(cardX(slot) + f32(0.014)), winsShown ? f32(0.067) : f32(0.077));
       setFrameText(frames.status, human && !humanPresent(game, slot) ? "No player" : active && !ready ? "Choose fighter" : `P${I2S(slot + 1)}`);
       if (ready) {
         BlzFrameSetTexture(frames.portrait, portraitTexture(choice, false, slot), 0, true);
