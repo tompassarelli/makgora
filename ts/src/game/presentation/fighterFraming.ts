@@ -137,14 +137,25 @@ function containFighters(camera: MatchCamera, stage: number, aspect: number, wid
   camera.x = Math.min(Math.max(camera.x, right - half), left + half);
 }
 
-function edgeOutside(camera: Readonly<MatchCamera>, aspect: number, x: number, z: number, half: number): boolean {
-  const dz = z - camera.z;
-  const depth = camera.distance - dz * PITCH_SIN;
-  const halfHeight = depth * camera.tangent;
-  return depth <= 0.0 || Math.abs(dz * PITCH_COS) > halfHeight || Math.abs(x - camera.x) + half > halfHeight * aspect;
-}
-
 export function fighterOffscreen(camera: Readonly<MatchCamera>, aspect: number, character: Character, x: number, z: number): boolean {
   const frame = fighterFrame(character);
-  return edgeOutside(camera, aspect, x, z + frame.bottom, frame.right) || edgeOutside(camera, aspect, x, z + frame.top, frame.right);
+  if (camera.distance - (z + frame.bottom - camera.z) * PITCH_SIN <= 0.0) return true;
+  let left = 0.0, right = 0.0, bottom = 0.0, top = 0.0;
+  let first = true;
+  for (let index = 0; index < 2; index++) {
+    const edge = index === 0 ? frame.bottom : frame.top;
+    const dz = z + edge - camera.z;
+    const depth = camera.distance - dz * PITCH_SIN;
+    if (depth <= 0.0) return false;
+    const halfHeight = depth * camera.tangent;
+    const l = (x + frame.left - camera.x) / (halfHeight * aspect);
+    const r = (x + frame.right - camera.x) / (halfHeight * aspect);
+    const row = dz * PITCH_COS / halfHeight;
+    left = first ? l : Math.min(left, l);
+    right = first ? r : Math.max(right, r);
+    bottom = first ? row : Math.min(bottom, row);
+    top = first ? row : Math.max(top, row);
+    first = false;
+  }
+  return left > 1.0 || right < -1.0 || bottom > 1.0 || top < -1.0;
 }

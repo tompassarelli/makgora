@@ -2,21 +2,24 @@ import { preloadModels, preloadSkies } from "../../game/presentation/stagePreloa
 import { pointLightPieces, STOCK_TERRAIN_LIGHT, STOCK_UNIT_LIGHT, placedPieces, shadowCastingLights, stageScenery } from "../../game/presentation/stageScenery";
 import { hideEffect } from "../../game/render/effects";
 import type { ShellState } from "./state";
-import { cameraZOverride } from "../../game/presentation/arenaCamera";
+import { arenaDepthOffset, arenaFogEnd, cameraZOverride } from "../../game/presentation/arenaCamera";
 
-function drawStageFog(s: ShellState): void {
+export function drawStageFog(s: ShellState): void {
+  if (s.stageFogHidden === true) return;
   const scenery = stageScenery(s.game.stageChoice);
 
   BlzSetTerrainFogMaxLinearDensity(1.0);
   BlzSetTerrainFogDrawOverSky(false);
   const fog = scenery.fog;
   if (fog === undefined) { ResetTerrainFog(); return; }
-  SetTerrainFogEx(0, fog.start, fog.end, 0.0, fog.red, fog.green, fog.blue);
+  const offset = arenaDepthOffset(s.camera);
+  const end = arenaFogEnd(s.game.stageChoice, s.camera);
+  SetTerrainFogEx(0, fog.start + offset, end, 0.0, fog.red, fog.green, fog.blue);
   const height = scenery.heightFog;
   if (height === undefined) return;
-  SetTerrainFogExV(3, height.start, height.end, height.density,
+  SetTerrainFogExV(3, height.start + offset, Math.max(height.end + offset, end), height.density,
     s.origin.z + height.heightStart, s.origin.z + height.heightEnd,
-    fog.start, fog.end, fog.red, fog.green, fog.blue);
+    fog.start + offset, end, fog.red, fog.green, fog.blue);
   BlzSetTerrainFogMaxLinearDensity(height.maxDensity);
   BlzSetTerrainFogDrawOverSky(height.drawOverSky);
 }
@@ -95,6 +98,7 @@ export function showBackdrop(s: ShellState, visible: boolean): void {
 
 
 export function showStageFog(s: ShellState, visible: boolean): void {
+  s.stageFogHidden = !visible;
   if (visible) drawStageFog(s);
   else {
     BlzSetTerrainFogMaxLinearDensity(1.0);
