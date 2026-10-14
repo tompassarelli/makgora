@@ -28,6 +28,7 @@ const normalDonors: readonly [HeroPose, AttackStyle, number][] = [
 ];
 
 function valueAt(track: mdx.AnimVector, first: number, last: number, frame: number, rotation: boolean): Float32Array {
+    ensure(track.LineType === mdx.LineType.Linear, "Stock weapon donors require their canonical linear interpolation");
     const keys = track.Keys.filter(key => key.Frame >= first && key.Frame <= last);
     ensure(keys.length > 0, "Donor track is empty");
     const left = [...keys].reverse().find(key => key.Frame <= frame) ?? keys[0]!;
@@ -108,7 +109,15 @@ BunRuntime.runMain(Effect.tryPromise({ try: async () => {
             const donorTrack = donorTracks.get(path);
             track.Keys = track.Keys.filter(k => k.Frame < start || k.Frame > end);
             if (!donorTrack || onGlobalClock(donorTrack) || !donorTrack.Keys.some(k => k.Frame >= donor.Interval[0] && k.Frame <= donor.Interval[1])) return;
-            for (let frame = 0; frame <= action.frames; frame++) track.Keys.push(key(track, start + Math.round(frame * 1000 / 60), valueAt(donorTrack, donor.Interval[0], donor.Interval[1], donorTime(frame), path.endsWith(".Rotation")), path.endsWith(".Rotation")));
+            const rotation = path.endsWith(".Rotation"), idle = stock.Sequences[1]!;
+            const idleValue = donorTrack.Keys.some(k => k.Frame >= idle.Interval[0] && k.Frame <= idle.Interval[1]) ? valueAt(donorTrack, idle.Interval[0], idle.Interval[1], idle.Interval[0], rotation) : undefined;
+            for (let frame = 0; frame <= action.frames; frame++) {
+                let vector = valueAt(donorTrack, donor.Interval[0], donor.Interval[1], donorTime(frame), rotation);
+                const entry = Math.min(3, action.first - 1), exit = Math.min(8, action.frames - action.last - 1);
+                const amount = frame < entry ? 1 - frame / entry : frame > action.frames - exit ? (frame - (action.frames - exit)) / exit : 0;
+                if (idleValue && amount > 0) vector = rotation ? Float32Array.from(quat.slerp(quat.create(), vector, idleValue, amount * amount * (3 - 2 * amount))) : Float32Array.from(vector, (v, i) => v + (idleValue[i]! - v) * amount * amount * (3 - 2 * amount));
+                track.Keys.push(key(track, start + Math.round(frame * 1000 / 60), vector, rotation));
+            }
             track.Keys.sort((a, b) => a.Frame - b.Frame);
         });
         if (["backAir", "neutralAir", "downSmash"].includes(action.pose)) {
