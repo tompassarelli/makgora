@@ -45,6 +45,7 @@ import { SPECIAL_SLOTS, type SpecialSlot } from "./projectileArt";
 import { RIFLEMAN_MODEL_FILE } from "./fighterAssetInfo";
 import { FROST_TRAP_MODEL } from "../assets/frostAssetInfo";
 import { IMPACT_DUST_MODEL } from "../assets/impactAssetInfo";
+import { GROM_BLOODLUST_MODEL } from "../assets/importedModelInfo";
 import { MOUNTAIN_KING_SPECIALS } from "../sim/heroes/mountainKingSpecials";
 
 
@@ -147,7 +148,7 @@ const drawn = (model: string, anchor: CueAnchor): Cue => ({ model, anchor, scale
 export const FAN_KNIFE_CUE: Cue = { model: "Abilities\\Spells\\NightElf\\FanOfKnives\\FanOfKnivesMissile.mdx", anchor: "body", scale: f32(0.6), birth: { eachFrame: true } };
 
 
-const BLOODLUST = cue("Abilities\\Spells\\Orc\\Bloodlust\\BloodlustSpecial.mdx", "hand", f32(0.8));
+const BLOODLUST = cue(GROM_BLOODLUST_MODEL, "hand", f32(0.8));
 // The Blademaster gathers wind and fades into Wind Walk rather than borrowing the Shaman's Bloodlust (#499).
 const WIND_GATHER = cue("Abilities\\Spells\\Other\\Tornado\\TornadoElementalSmall.mdx", "body", f32(0.4));
 const WIND_WALK = cue("Abilities\\Spells\\Human\\Invisibility\\InvisibilityTarget.mdx", "body", f32(0.8));
