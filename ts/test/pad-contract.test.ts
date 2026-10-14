@@ -41,7 +41,7 @@ test("upstream pad keys reach labelled actions in defaults and sanitized K1 upgr
     const rightAlt = slotIndex(Action.rightTrigger, 1);
     const upgradedRight = slots[rightAlt] === 0 && !slots.includes(71) ? 71 : slots[rightAlt];
     for (let slot = 0; slot < slots.length; slot++) {
-      const moved = slot === slotIndex(Action.jump, 0) ? 90 : slot === slotIndex(Action.smashUp, 0) ? 48 : slot === slotIndex(Action.smashDown, 0) ? 74 : slot === rightAlt ? upgradedRight : slots[slot];
+      const moved = slot === slotIndex(Action.jump, 0) ? 90 : slot === rightAlt ? upgradedRight : slots[slot];
       expect(upgraded.keys[slot]).toBe(moved);
     }
   }
