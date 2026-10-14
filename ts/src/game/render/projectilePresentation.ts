@@ -18,6 +18,7 @@ import { ARENA_CAMERA } from "../presentation/arenaCamera";
 import { cosineTurns, sineTurns } from "../sim/mathTables";
 
 export const STATIONARY_PARTICLE_MODELS = [
+  "Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget.mdx",
   "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx",
   "Abilities\\Spells\\Human\\MarkOfChaos\\MarkOfChaosTarget.mdx",
   "Abilities\\Spells\\Orc\\Voodoo\\VoodooAuraTarget.mdx",
@@ -471,7 +472,7 @@ export class ProjectilePresentation {
         } else {
           BlzSetSpecialEffectPosition(boundary, this.origin.x + pose.x, this.origin.y - 8.0, this.origin.z + pose.z + (draw?.disc === undefined ? 0.0 : draw.z));
           BlzSetSpecialEffectScale(boundary, pose.dangerRadius);
-          if (defile) {
+          if (defile || draw?.discVertical === true) {
             BlzResetSpecialEffectMatrix(boundary);
             BlzSetSpecialEffectRoll(boundary, f32(Math.PI * 0.5));
             // Warcraft may apply matrix scale before or after the roll, so the rim's 0.6 height is stretched on Y and Z alike.

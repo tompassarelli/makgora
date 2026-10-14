@@ -194,7 +194,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   },
   [Character.jaina]: {
     neutral: { spell: "Frostbolt", startup: ARCANE, active: cue("Abilities\\Spells\\Other\\FrostBolt\\FrostBoltMissile.mdx", "hand", 0.5) },
-    side: { spell: "Blizzard", startup: ARCANE, active: cue("Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget.mdx", "hand", f32(0.3)) },
+    side: { spell: "Blizzard", startup: ARCANE, active: ARCANE },
     up: { spell: "Blink", startup: ARCANE, active: cue("Abilities\\Spells\\Human\\MassTeleport\\MassTeleportTarget.mdx", "body", 0.5) },
     down: { spell: "Summon Water Elemental", startup: ARCANE, active: cue("Abilities\\Weapons\\WaterElementalMissile\\WaterElementalMissile.mdx", "hand", f32(0.7)) },
   },
