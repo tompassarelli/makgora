@@ -1493,8 +1493,6 @@ reason. Current departures:
 - **Chen's down air (downward boot), rule 6.** The boot is the strike, so
   the extended leg stays hittable through its full 71-unit downward reach.
   The staff remains disjoint.
-- **Forsaken Paladin's back air (boot kick), rule 6.** The extended leg is the strike,
-  about 0.78 of his height behind him, and stays hittable to its full length.
 - **Dreadlord's wings and claws, rule 6** (down smash, forward smash, forward
   air, back air, down air). The roster keeps hurtboxes on attached body parts;
   the wings reach about 0.83 of his height sideways and the claws about half
