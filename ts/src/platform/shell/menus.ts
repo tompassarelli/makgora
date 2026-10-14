@@ -9,7 +9,7 @@ import {
   requestStageSelect, requestStart, setAutomaticRematch, setCpuOpponent, setCpuTier, setEndless, setHitAreas, setPartnerDamage, setTraining, cycleMatchMode, stepClassicTier, stepLoreBattle, setItemsOn, setUltimatesOn, toggleItemKind, stepPartnerBehaviour,
   stepPartnerEscape, stepPartnerTech, stepTrainingSpeed, setTutorialLesson, tickRematchCountdown,
   returnToCharacters, selectCharacter, selectCpuCharacter, selectStage, setHazards, setMeterDropsOn, setStocks, setTimeLimit, updateConnectedHumans,
-  type MatchState, copyMatchState, createMatchState, setParticipants,
+  type MatchState, copyMatchState, createMatchState, initializeComputerChoices, setParticipants,
 } from "../../game/match/rules";
 import { resetMomentRecorder } from "../../game/replay/moment";
 import { resetPacingAndPresentation } from "../../game/match/pacingAndPresentation";
@@ -326,9 +326,10 @@ export function panelActions(): PanelActions {
 }
 
 
-export function startingSelection(scenario: Scenario): MatchState {
+export function startingSelection(scenario: Scenario, seed?: number): MatchState {
   const game = createMatchState();
   setParticipants(game, currentHumanMask(0), currentComputerMask());
+  if (seed !== undefined) initializeComputerChoices(game, seed);
   chooseScenarioCharacters(scenario, game);
   return game;
 }
@@ -350,7 +351,7 @@ export function resetToStartingSelection(s: ShellState): void {
     pauseMatchPresentation(s, false);
   }
   for (const panel of views(s).settings) panel.close();
-  copyMatchState(s.game, startingSelection(s.build.scenario));
+  copyMatchState(s.game, startingSelection(s.build.scenario, (s.menuFrames ?? 0) + s.game.matchSeed));
   s.dev.stageChoice = undefined;
   resetMomentRecorder(s.moment.recorder);
   resetPacingAndPresentation(s.runtime);

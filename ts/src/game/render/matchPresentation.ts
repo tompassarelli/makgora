@@ -2,9 +2,10 @@
 
 
 import { f32 } from "wisp/src/sim/f32";
+import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { at } from "wisp/src/runtime/lookup";
 import { PARTICIPANT_CAPACITY, PARTICIPANT_SLOTS } from "../input/participants";
-import { Phase, type MatchState } from "../match/rules";
+import { MATCH_TICKS_PER_SECOND, Phase, type MatchState } from "../match/rules";
 import type { Character } from "../sim/codes";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { characterModelScale } from "../presentation/modelScale";
@@ -83,6 +84,7 @@ export class MatchPresentation {
   private readonly help: framehandle;
   private readonly helpScale: number;
   private readonly title: framehandle;
+  private readonly countdown: framehandle;
   private readonly lines: readonly framehandle[];
   private readonly poses: (VictoryPose | undefined)[] = [];
   private readonly resultSounds: sound[] = [];
@@ -101,6 +103,12 @@ export class MatchPresentation {
     for (const path of presentationSoundPaths(SELECTABLE_CHARACTERS, STAGE_CATALOG.map(stage => stage.id))) Preload(path);
     this.sounds.prepare(SoundKind.interfaceFile, interfaceSoundPaths(SELECTABLE_CHARACTERS));
     const parent = gameUi();
+    this.countdown = createText("MatchCountdown", parent, 0);
+    BlzFrameSetAbsPoint(this.countdown, FRAMEPOINT_CENTER, f32(0.4), f32(0.34));
+    BlzFrameSetTextAlignment(this.countdown, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
+    BlzFrameSetLevel(this.countdown, 10);
+    BlzFrameSetEnable(this.countdown, false);
+    BlzFrameSetVisible(this.countdown, false);
     this.panel = createBackdrop("MatchResultsPanel", parent, 0);
     BlzFrameSetAbsPoint(this.panel, FRAMEPOINT_TOPRIGHT, f32(0.79), f32(0.52));
     BlzFrameSetSize(this.panel, f32(0.36), f32(0.13) + PARTICIPANT_CAPACITY * f32(0.04));
@@ -128,6 +136,29 @@ export class MatchPresentation {
 
   private playFile(path: string): sound | undefined {
     return this.sounds.play(SoundKind.interfaceFile, path, 127);
+  }
+
+  presentCountdown(game: Readonly<MatchState>, shown: boolean): void {
+    let text = "";
+    let age = 0;
+    if (game.phase === Phase.result && game.rematchCountdown > 0) {
+      text = I2S(floorDiv(game.rematchCountdown + MATCH_TICKS_PER_SECOND - 1, MATCH_TICKS_PER_SECOND));
+      age = floorMod(-game.rematchCountdown, MATCH_TICKS_PER_SECOND);
+    } else if (game.phase === Phase.match && game.startHold > 0 && game.matchFrame > 0) {
+      if (game.matchFrame <= game.startHold) {
+        text = I2S(floorDiv(game.startHold - game.matchFrame + MATCH_TICKS_PER_SECOND, MATCH_TICKS_PER_SECOND));
+        age = floorMod(game.matchFrame - 1, MATCH_TICKS_PER_SECOND);
+      } else if (game.matchFrame <= game.startHold + MATCH_TICKS_PER_SECOND) {
+        text = "GO!";
+        age = game.matchFrame - game.startHold - 1;
+      }
+    }
+    BlzFrameSetVisible(this.countdown, shown && text !== "");
+    if (!shown || text === "") return;
+    const pop = f32(f32(1.25) - f32(Math.min(age, 12) / 48.0));
+    sizeText(this.countdown, f32(f32(0.075) * pop), f32(0.4), f32(0.14));
+    BlzFrameSetAlpha(this.countdown, Math.min(255, floorDiv((MATCH_TICKS_PER_SECOND - age) * 255, 24)));
+    BlzFrameSetText(this.countdown, `${MENU_STYLE.gold}${text}|r`);
   }
 
   cue(cue: MatchCue): void {

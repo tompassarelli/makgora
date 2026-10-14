@@ -72,7 +72,7 @@ test("one unfinished train excludes another, and refreshing generated queues tak
 });
 
 test("the complete land shell attributes a regenerated pair, leaves failed targets queued, and retries lane one after a non-fast-forward [k5 boundary autoland-land]", () => {
-  const workflow = Bun.YAML.parse(readFileSync(new URL("../../.github/workflows/autoland.yml", import.meta.url), "utf8")) as { env: Record<string, string>; jobs: { land: { steps: { id?: string; run?: string }[] } } };
+  const workflow = Bun.YAML.parse(readFileSync(new URL("../../.github/workflows/autoland.yml", import.meta.url), "utf8")) as { env: Record<string, string>; jobs: { build: { steps: { id?: string; run?: string }[] }; land: { steps: { id?: string; run?: string }[] } } };
   const shell = workflow.jobs.land.steps.find((step) => step.id === "land")?.run;
   if (shell === undefined) throw new Error("land step missing");
   const root = resolve(import.meta.dir, "../..");
@@ -87,7 +87,7 @@ test("the complete land shell attributes a regenerated pair, leaves failed targe
   };
   const gitPath = command(root, ["which", "git"]);
   const bashPath = command(root, ["which", "bash"]);
-  for (const mode of ["pair", "targets", "proof", "regeneration", "non-fast-forward"]) {
+  for (const mode of ["pair", "merge-resolution", "targets", "proof", "regeneration", "non-fast-forward"]) {
     const fixture = mkdtempSync(join(evidence, `${mode}-`));
     const repo = join(fixture, "repo");
     const bin = join(fixture, "bin");
@@ -108,6 +108,27 @@ test("the complete land shell attributes a regenerated pair, leaves failed targe
       git("add", "."); git("commit", "-qm", `lane ${index} refs #${515 + index}`);
       tips.push(git("rev-parse", "HEAD")); trees.push(git("rev-parse", "HEAD^{tree}"));
       git("update-ref", `refs/remotes/origin/claude/lane-${index}`, tips[index]!);
+    }
+    if (mode === "merge-resolution") {
+      git("checkout", "-q", "--detach", base);
+      writeFileSync(join(repo, "ts/merge-input.txt"), "input\n");
+      git("add", "ts/merge-input.txt"); git("commit", "-qm", "additional input");
+      const input = git("rev-parse", "HEAD");
+      git("checkout", "-q", "--detach", tips[1]!);
+      git("merge", "--no-ff", "--no-commit", input);
+      writeFileSync(join(repo, "ts/merge-resolution.txt"), "resolved\n");
+      git("add", "ts/merge-resolution.txt"); git("commit", "-qm", "resolved combined input");
+      tips[1] = git("rev-parse", "HEAD"); trees[1] = git("rev-parse", "HEAD^{tree}");
+      git("update-ref", "refs/remotes/origin/claude/lane-1", tips[1]!);
+      git("checkout", "-q", "-B", "autoland", base);
+      git("checkout", "-q", "--detach", tips[1]!);
+      const build = workflow.jobs.build.steps.find((step) => step.id === "build")?.run;
+      if (build === undefined) throw new Error("build step missing");
+      command(repo, ["bash", "-e", "-c", build.slice(build.indexOf("lane_base=$("), build.indexOf("direct=retest"))], { ...process.env, tip: tips[1]! });
+      expect(git("rev-parse", "HEAD^{tree}")).toBe(trees[1]!);
+      const verdict = command(repo, ["bash", "-e", "-c", `${workflow.env.PASSED!}\npassed "$TIP" "$BASE" "$TREE" "$BASE" "$TIP"`], { ...process.env, TIP: tips[1]!, BASE: base, TREE: trees[1]!, RUNNER_TEMP: temporary });
+      expect(verdict).toBe("land");
+      continue;
     }
     git("update-ref", "refs/remotes/origin/main", base);
     git("checkout", "-q", "--detach", tips[0]!);

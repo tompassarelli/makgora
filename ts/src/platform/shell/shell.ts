@@ -7,7 +7,8 @@ import { PARTICIPANT_SLOTS, isParticipantMask, isParticipantSlot } from "../../g
 import { clearPulse } from "../../game/input/directionalInput";
 import { ownConfirmedState } from "./confirmedState";
 import { startKeyUp } from "../../game/match/controls";
-import { Phase, copyMatchState, humanActive, humanPresent, participantLeft, updateConnectedHumans } from "../../game/match/rules";
+import { Phase, copyMatchState, firstHumanSlot, humanActive, humanPresent, initializeComputerChoices, participantLeft, updateConnectedHumans } from "../../game/match/rules";
+import { chooseScenarioCharacters } from "../../game/shell/scenarios";
 import { FRAME_SECONDS } from "../../game/presentation/fighterPose";
 import { FLOOR_HEIGHT } from "../../game/presentation/arenaCamera";
 import { type MapBuild, journalIngress } from "../../game/shell/build";
@@ -322,6 +323,7 @@ function initialize(): void {
     editbox: journalIngress(build) === "editbox" ? new EditboxIngress() : undefined,
   });
   copyMatchState(s.game, startingSelection(build.scenario));
+  s.startingChoicesReady = s.game.computerMask === 0;
   createUi(s, panelActions(), (choice, clicker) => selectPauseMenu(s, GetPlayerId(clicker), choice));
   preloadStageAssets(s);
   view.drawStage(s);
@@ -358,6 +360,18 @@ function withShell(handler: (s: ShellState) => void): () => void {
   };
 }
 
+function completeStartingChoices(): void {
+  playerFileReceived();
+  const s = shellState();
+  if (s === undefined || s.startingChoicesReady !== false) return;
+  const first = firstHumanSlot(s.game);
+  if (first === undefined || !s.participants[first].bindings.ready) return;
+  initializeComputerChoices(s.game, s.menuFrames ?? 0);
+  chooseScenarioCharacters(s.build.scenario, s.game);
+  s.startingChoicesReady = true;
+  makePreview(s);
+}
+
 
 export function installShell(): void {
   on(PAD_MOUSE, withShell(padMouse));
@@ -380,7 +394,7 @@ export function installShell(): void {
   on(PROBE_EDGES, withShell(s => onProbeStart(s, true)));
   on(PROBE_DUMP, withShell(onProbeExport));
   on(probe.PROBE_EXPORT, withShell(s => { if (s.probe !== undefined) probe.exportProbePage(s.probe); }));
-  on(PLAYER_FILE_RECEIVED, playerFileReceived);
+  on(PLAYER_FILE_RECEIVED, completeStartingChoices);
   on(SAVE_MOMENT, withShell(momentKey));
   on(PLAYTEST, withShell(playtestRequested));
   on(STAGE_READY, withShell(stageReadyEvent));

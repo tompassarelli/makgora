@@ -573,10 +573,11 @@ export function renderUi(s: ShellState): void {
       ui.manaBars[slot].hud.update(false, 0, 0, 0);
     }
     ui.selections[slot].menuBindings(s.participants[slot].bindings.bindings);
-    ui.selections[slot].update(game, menu.title || ui.settings[slot].isOpen(), selecting || paused || menu.title || ui.settings[slot].isOpen());
+    ui.selections[slot].update(game, s.startingChoicesReady === false || menu.title || ui.settings[slot].isOpen(), selecting || paused || menu.title || ui.settings[slot].isOpen());
     ui.settings[slot].update();
   }
   ui.clock.update(showMatch && game.phase === Phase.match && timedMatch(game), remainingSeconds(game));
+  ui.match.presentCountdown(game, showMatch);
   ui.training.update(showMatch && game.training && game.phase === Phase.match, game.trainer);
   ui.classic?.updateCard(game);
   const cleared = game.lore && game.phase === Phase.result && game.run.active && game.run.cleared ? game.run.current : undefined;

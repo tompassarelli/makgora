@@ -255,6 +255,7 @@ export interface ShellState {
   readonly pad: NativePadCapture | undefined;
 
   menuFrames?: number;
+  startingChoicesReady?: boolean;
   readonly camera: MatchCamera;
   cameraTween?: boolean;
 

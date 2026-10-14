@@ -1,11 +1,14 @@
 import { expect, test } from "bun:test";
+import { mkdtempSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { testHeadless } from "./headless";
 import { Phase } from "../src/game/match/rules";
 import { PLAYABLE_BUILD } from "../src/game/shell/currentBuild";
 import { install, startBuild } from "../src/platform/main";
 import { installSessionRates } from "../src/platform/shell/sessionRates";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
-import { parseSessionRates } from "../scripts/wisp/sessionRates";
+import { parseSessionRates, sessionRateReport } from "../scripts/wisp/sessionRates";
 
 const headless = testHeadless(SMASHCRAFT_HEADLESS);
 
@@ -40,3 +43,21 @@ test("the playable build writes a per-second rate line with callbacks and match 
   expect(session.live).toHaveLength(6);
   for (const second of session.seconds) expect(second.gs).toBe(-1);
 }, 120_000);
+
+function forkLine(slowMinute: string): string | undefined {
+  const folder = mkdtempSync(join(tmpdir(), "session-rates-"));
+  const healthy = "ph=2 cb=60 dr=60 sim=60 held=0 gap=1 rown=60 gs=3";
+  [healthy, slowMinute].forEach((row, minute) => {
+    const lines = Array.from({ length: 60 }, (_, second) => `r t=${(minute * 60 + second + 1) * 1000} ${row}`);
+    writeFileSync(join(folder, `smashcraft-rates-x-${minute}.txt`), [`smashcraft-rates v=1 load=x minute=${minute}`, ...lines].join("\n"));
+  });
+  return sessionRateReport(folder).find(line => line.startsWith("  fork:"));
+}
+
+test("the session report names one fork per load: none, game speed, Warcraft callbacks (render- or timer-bound) or echo wait, from match seconds under 55 sim/s [k3 measure #564]", () => {
+  expect(forkLine("ph=2 cb=60 dr=60 sim=58 held=0 gap=1 rown=60 gs=3")).toBe("  fork: none (sim held ≥55/s every minute)");
+  expect(forkLine("ph=2 cb=48 dr=48 sim=48 held=0 gap=1 rown=48 gs=2")).toBe("  fork: game-speed (gs=2), onset min 1 t 120s");
+  expect(forkLine("ph=2 cb=40 dr=40 sim=40 held=0 gap=1 rown=40 gs=3")).toBe("  fork: callbacks (Warcraft delivered cb 40.0/s, draw 40.0/s, sim 40.0/s; render-bound when draw falls with cb) render-bound, onset min 1 t 120s");
+  expect(forkLine("ph=2 cb=40 dr=60 sim=40 held=0 gap=1 rown=40 gs=3")).toEndWith(") timer-bound, onset min 1 t 120s");
+  expect(forkLine("ph=2 cb=60 dr=60 sim=30 held=30 gap=4 rown=30 gs=3")).toBe("  fork: echo-wait (cb 60.0/s, sim 30.0/s, held 50%, gap 4.0, own echo 30.0/s), onset min 1 t 120s");
+});
