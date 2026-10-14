@@ -169,7 +169,7 @@ const VICTORY_ANIMATIONS: Readonly<Record<Character, string>> = {
   [Character.jaina]: "stand victory",
   [Character.sylvanas]: "spell",
   [Character.cairne]: "stand victory",
-  [Character.chen]: "spell throw",
+  [Character.chen]: "spell slam",
   [Character.peon]: "stand ready",
   [Character.tinker]: "spell three",
   [Character.kaelthas]: "spell",

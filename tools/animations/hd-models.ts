@@ -14,14 +14,14 @@ const BLADE_FITS: Readonly<Record<number, typeof fitWardenBlade>> = { 5: fitWard
 
 const normalize = (name: string) => name.replace(/\s+\d+$/, '').replaceAll(/\s+/g, '').toLowerCase();
 
-/** The sequence indices each body plays: the fighter's production clips, and in Definitive its victory pose too. */
+/** The sequence indices each body plays: the fighter's production clips and its results-screen victory pose. */
 export interface PlayedMoves { readonly classic: readonly number[]; readonly definitive: readonly number[] }
 export function playedMoves(character: number, motion: mdx.Model): PlayedMoves {
-    const played = flashableSequences(character, motion.Sequences).map(sequence => motion.Sequences.indexOf(sequence));
     const victory = normalize(victoryAnimation(character));
-    const definitive = new Set(played);
-    motion.Sequences.forEach((sequence, index) => { if (normalize(sequence.Name) === victory) definitive.add(index); });
-    return { classic: played, definitive: [...definitive].sort((a, b) => a - b) };
+    const played = new Set(flashableSequences(character, motion.Sequences).map(sequence => motion.Sequences.indexOf(sequence)));
+    motion.Sequences.forEach((sequence, index) => { if (normalize(sequence.Name) === victory) played.add(index); });
+    const sorted = [...played].sort((a, b) => a - b);
+    return { classic: sorted, definitive: sorted };
 }
 const selected = (model: mdx.Model, indices: readonly number[]) => model.Sequences.filter((_, index) => indices.includes(index));
 
