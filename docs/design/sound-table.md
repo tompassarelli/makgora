@@ -87,7 +87,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Jab, Second jab | BattleNetWooshStereo1 | WoodLightBashFlesh | WoodHeavyBashFlesh + HolyBolt | WoodLightBashMetal |  |
 | Up smash, Down smash, Forward smash, Forward tilt, Up tilt, Down tilt, Forward tilt (up), Forward tilt (down), Neutral air, Forward air, Up air, Down air, Dash attack | BattleNetWooshStereo1 + HeroPaladinAttack1 / HeroPaladinAttack2 | WoodHeavyBashFlesh | WoodHeavyBashFlesh + HolyBolt | WoodHeavyBashMetal |  |
 | Back air | BattleNetWooshStereo1 + HeroPaladinAttack1 / HeroPaladinAttack2 | WoodMediumBashFlesh | WoodHeavyBashFlesh + HolyBolt | WoodMediumBashMetal |  |
-| Neutral special: Cleansing Hammer | DispelMagic | WoodHeavyBashFlesh | WoodHeavyBashFlesh + HolyBolt | WoodMediumBashMetal |  |
+| Neutral special: Cleansing Sword | DispelMagic | WoodHeavyBashFlesh | WoodHeavyBashFlesh + HolyBolt | WoodMediumBashMetal |  |
 | Side special: Righteous Fury | DivineShield | WoodHeavyBashFlesh | WoodHeavyBashFlesh + HolyBolt | WoodMediumBashMetal |  |
 | Up special: Ascension | InnerFire | WoodMediumBashFlesh | WoodMediumBashFlesh + HolyBolt | WoodMediumBashMetal |  |
 | Down special: Consecration | Heal | HolyBolt | HolyBolt + HolyBolt | WoodMediumBashMetal |  |

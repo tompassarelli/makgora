@@ -827,7 +827,7 @@ every newly registered fighter too.
 | Mountain King | Storm Bolt (33) | Storm Rush (43) | One 8% hit armored on frames 1–6 |
 | Warden | Shadow Strike (30) | Shadow Pursuit (40) | One 8% hit armored on frames 1–6 |
 | Lich | Frost Nova (35) | Death and Decay (50) | One 8% hit armored on frames 1–6 |
-| Forsaken Paladin | Cleansing Hammer (35) | Righteous Fury (50) | One 8% hit armored on frames 1–6 |
+| Forsaken Paladin | Cleansing Sword (35) | Righteous Fury (50) | One 8% hit armored on frames 1–6 |
 | Dreadlord | Carrion Swarm (30) | Vampiric Pounce (45) | One 8% hit armored on frames 1–6 |
 | Shadow Hunter | Spirit Glaive (25) | Serpent Ward (45) | One 8% hit armored on frames 1–6 |
 | Pit Lord | Howl of Terror (37) | Ruin Charge (47) | One 8% hit armored on frames 1–6 |
@@ -1357,7 +1357,7 @@ Signature moves, with each move's regions, frames and damage in the generated
 | Mountain King | Forward smash (hammer head) | Position |
 | Warden | Forward smash (blade edge) | Position |
 | Lich | Forward smash (staff tip) | Position |
-| Forsaken Paladin | Forward smash (hammer head) | Position |
+| Forsaken Paladin | Forward smash (sword blade) | Position |
 | Dreadlord | Back air (wing-claw) | Timing |
 | Shadow Hunter | Forward tilt (spear point) | Position |
 | Pit Lord | Forward smash (cleaver edge) | Position |
@@ -1443,7 +1443,7 @@ smashcraft:docs/hurtboxes.md.
 Historical fixture before #339: Two owner principles (6 Oct 2026) frame the rules: **attacking limbs can be
 hit**, so counter-hitting an extended arm, leg or wing is always possible,
 and **weapons are disjoint**: a held weapon (Blademaster's sword, Mountain
-King's and Forsaken Paladin's hammers, Rifleman's gun) is never part of the
+King's hammer and Forsaken Paladin's sword, Rifleman's gun) is never part of the
 hurtbox, so striking the weapon does nothing while the hand and arm holding it
 can be hit. Counter-hit the limb, not the sword.
 

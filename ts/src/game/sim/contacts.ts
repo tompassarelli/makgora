@@ -45,7 +45,7 @@ import { type AppliedStatus, applyHeroStatus, damageEndsHeroStatus } from "./her
 import { dealtManaGain, gainMana, takenManaGain } from "./mana";
 import { EX_ARMOR_DAMAGE, exArmorActive } from "./exSpecials";
 import { contactTraits } from "./identityTraits";
-import { FORSAKEN_PALADIN_DAMAGE_MULTIPLIER, forsakenPaladinHammerContact } from "./heroes/forsakenPaladinHammer";
+import { FORSAKEN_PALADIN_DAMAGE_MULTIPLIER, forsakenPaladinSwordContact } from "./heroes/forsakenPaladinSword";
 
 
 interface DamageContact {
@@ -150,7 +150,7 @@ export function collectDamageContact(
   contact.facing = facing;
   contact.kind = kind;
   contact.direct = direct;
-  contact.strongHitlag = kind === ContactKind.launch && (effect.strong === true || forsakenPaladinHammerContact(source, effect.damage, direct)) ? STRONG_HIT_EXTRA_HITLAG : 0;
+  contact.strongHitlag = kind === ContactKind.launch && (effect.strong === true || forsakenPaladinSwordContact(source, effect.damage, direct)) ? STRONG_HIT_EXTRA_HITLAG : 0;
   contact.blocked = !unblockable && shieldContact;
   contact.crouching = target.motion.crouching;
   contact.grounded = target.motion.grounded;

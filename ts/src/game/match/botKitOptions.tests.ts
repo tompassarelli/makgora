@@ -194,7 +194,7 @@ sweep("computer Lich bursts Frost Nova, places Death and Decay, arms Frost Armor
   usesEvery(Character.lich, ["recall0", "special1", "special3", "recall3"]);
 });
 
-sweep("computer Forsaken Paladin uses Cleansing Hammer, Righteous Fury, Ascension and Consecration, each at least once; fewest seen 8 on four seed offsets [k1 scenario]", () => {
+sweep("computer Forsaken Paladin uses Cleansing Sword, Righteous Fury, Ascension and Consecration, each at least once; fewest seen 8 on four seed offsets [k1 scenario]", () => {
   usesEvery(Character.forsakenPaladin, ["special0", "special1", "special2", "special3"]);
 });
 

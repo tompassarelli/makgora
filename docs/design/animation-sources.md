@@ -134,7 +134,7 @@ Stock attack and cast sequences: "Attack 1", "Attack 2", "Attack Slam", "Spell",
 | Aerials | nair: forsaken paladin neutralair; fair: forsaken paladin forwardair; bair: forsaken paladin backair; uair: forsaken paladin upair; dair: down air hammer drop | Keep: every stock sequence stands on the ground; aerials need airborne legs |
 | Grab, pummel, throws | grab: forsaken paladin grab; pummel: forsaken paladin pummel; f-throw: forsaken paladin throwforward; b-throw: forsaken paladin throwback; u-throw: forsaken paladin throwup; d-throw: forsaken paladin throwdown | Keep: paired holder and victim gestures meet on a contact frame; no stock sequence holds a victim |
 | Get-up, ledge attacks | get-up: forsaken paladin getupattack; ledge: forsaken paladin ledgeattack | Keep: they start lying down or hanging; no stock sequence does |
-| Specials | N: forsaken paladin neutralspecial; N air: forsaken paladin neutralspecialair; S: forsaken paladin sidespecial; S air: forsaken paladin sidespecialair; U: forsaken paladin upspecial; U air: forsaken paladin upspecialair; D: forsaken paladin downspecial; D air: forsaken paladin downspecialair | Keep: authored with the attached hammer |
+| Specials | N: forsaken paladin neutralspecial; N air: forsaken paladin neutralspecialair; S: forsaken paladin sidespecial; S air: forsaken paladin sidespecialair; U: forsaken paladin upspecial; U air: forsaken paladin upspecialair; D: forsaken paladin downspecial; D air: forsaken paladin downspecialair | Keep: authored with the stock sword |
 
 ### Dreadlord
 

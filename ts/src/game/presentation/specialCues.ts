@@ -343,7 +343,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     down: { spell: "Frost Armor", startup: timed(cue(FROST_ARMOR_SHELL_MODEL, "body", 1.0), "birth", 0.0), active: timed(cue("Abilities\\Spells\\Undead\\FrostArmor\\FrostArmorDamage.mdx", "body", f32(1.2)), "birth", 0.0) },
   },
   [Character.forsakenPaladin]: {
-    neutral: { spell: "Cleansing Hammer", startup: { ...HOLY, scale: f32(0.35) }, active: { ...timed(cue("Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", "hand", f32(0.15)), "birth", f32(0.2)), birth: { eachFrame: true } } },
+    neutral: { spell: "Cleansing Sword", startup: { ...HOLY, scale: f32(0.35) }, active: { ...timed(cue("Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", "hand", f32(0.15)), "birth", f32(0.2)), birth: { eachFrame: true } } },
     side: { spell: "Righteous Fury", startup: timed(cue("Abilities\\Spells\\Human\\InnerFire\\InnerFireTarget.mdx", "body", f32(0.55)), "stand", f32(0.2)), active: { ...timed(cue("Abilities\\Spells\\Other\\Stampede\\StampedeMissileDeath.mdx", "hand", f32(0.2)), "birth", f32(0.2)), birth: { eachFrame: true, strike: 0 } } },
     up: { spell: "Ascension", startup: { ...HOLY, scale: f32(0.35) }, active: { ...timed(cue("Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx", "hand", f32(0.12)), "birth", f32(0.2)), birth: { eachFrame: true, strike: 0 } } },
     down: { spell: "Consecration", startup: { ...SHADOW, scale: f32(0.4) }, active: timed(cue("Abilities\\Spells\\Human\\InnerFire\\InnerFireTarget.mdx", "hand", f32(0.2)), "stand", f32(0.2)) },

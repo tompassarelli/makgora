@@ -3,7 +3,7 @@ import { AttackStyle, Character, SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { type HitRegion, NO_HIT_REGION } from "../sim/hitRegions";
 import { runningHeroSpecial } from "../sim/heroSpecialRules";
-import { forsakenPaladinHammerAttack } from "../sim/heroes/forsakenPaladinHammer";
+import { forsakenPaladinSwordAttack } from "../sim/heroes/forsakenPaladinSword";
 import { FAN_KNIFE_CUE, type Cue, type CueBirth } from "./specialCues";
 import { REACH_CUE_NORMALS } from "./reachCueInfo";
 import { DEMONHUNTER_GLIDE_SLASH_FIRST, DEMONHUNTER_GLIDE_SLASH_LAST, DEMONHUNTER_GLIDE_SLASH_FORM, DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP, felRushRegion, flameCrashRegion, immolationRegion, glideSlashRegion } from "../sim/specials";
@@ -43,7 +43,7 @@ export const DISJOINT_CUES: { readonly [character: number]: Cue } = {
 };
 
 
-const FORSAKEN_HAMMER_NORMALS: readonly AttackStyle[] = Object.values(AttackStyle).filter(style => forsakenPaladinHammerAttack(Character.forsakenPaladin, style));
+const FORSAKEN_SWORD_NORMALS: readonly AttackStyle[] = Object.values(AttackStyle).filter(style => forsakenPaladinSwordAttack(Character.forsakenPaladin, style));
 
 export const DEFINITIVE_ACCENT_REDRAWS: { readonly [model: string]: string } = {
   "Abilities\\Spells\\NightElf\\FanOfKnives\\FanOfKnivesMissile.mdx": "Popcorn knife",
@@ -54,7 +54,7 @@ export const DEFINITIVE_ACCENT_REDRAWS: { readonly [model: string]: string } = {
 
 
 export function disjointNormals(fighter: Readonly<Fighter>): readonly AttackStyle[] {
-  if (fighter.character === Character.forsakenPaladin) return FORSAKEN_HAMMER_NORMALS;
+  if (fighter.character === Character.forsakenPaladin) return FORSAKEN_SWORD_NORMALS;
   return DISJOINT_CUES[fighter.character] === undefined ? [] : REACH_CUE_NORMALS[fighter.character] ?? [];
 }
 

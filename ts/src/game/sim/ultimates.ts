@@ -115,7 +115,7 @@ const LICH: AuthoredSpecial = {
 };
 
 const FORSAKEN_PALADIN: AuthoredSpecial = {
-  name: "Light's Hammer", endFrame: 70, groundOnly: true,
+  name: "Light's Judgment", endFrame: 70, groundOnly: true,
   projectiles: [
     mark("Abilities\\Spells\\Other\\Consecration\\Consecration.mdx", 2, 62, 220.0),
     mark("Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx", 34, 14, 220.0),
@@ -389,7 +389,7 @@ const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined 
   [Character.mountainKing]: "He turns to stone with a stomp: heavier for 10 seconds. Hit him while he changes.",
   [Character.warden]: "The Avatar of Vengeance rises behind her and throws four ghostly glaives. Break it or dodge the glaives.",
   [Character.lich]: "A frost wyrm sweeps across at jump height. Stay low or shield it.",
-  [Character.forsakenPaladin]: "A golden circle marks where the Light's hammer will fall, then blesses the ground twice. Leave the circle.",
+  [Character.forsakenPaladin]: "A golden circle marks where the Light's judgment will fall, then blesses the ground twice. Leave the circle.",
   [Character.dreadlord]: "An Infernal crashes onto a burning mark ahead. Leave the mark.",
   [Character.shadowHunter]: "He dances while two serpent wards beside him spit bolts outward, then a launcher. The wards can't be hurt; hit him to end the dance and sink them.",
   [Character.pitLord]: "A clawed grab that ignores shields brands the victim with Doom, burning on after the throw. Jump or roll away.",

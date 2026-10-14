@@ -82,7 +82,7 @@ rules refuse immediate regrabs.
 
 Rifleman outrange the worker but must respect a built worksite.
 Illidan and Warden outmaneuver his slow run and punish failed Repair reads.
-Blademaster's sword and Forsaken Paladin's hammer beat his short tools directly.
+Blademaster's sword and Forsaken Paladin's sword beat his short tools directly.
 Mountain King wins close heavy trades; Peon instead makes him approach lumber.
 Lich controls broader zones; Peon's smaller Burrow can be dismantled directly.
 Dreadlord chases and grabs more effectively; Peon commits to stationary space.

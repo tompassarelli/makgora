@@ -164,11 +164,6 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   authors his strikes, recovery, paired throws and nine pain poses.
   `bun tools/animations/stock-forsaken-model.ts STOCK_CLASSIC_FORSAKEN.mdx AUTHORED_FORSAKEN.mdx PRIVATE_OUTPUT.mdx`
   restores the stock Classic mesh and version-1800 skin while retaining the shipped motion.
-  `bun tools/animations/forsaken-paladin-model.ts AUTHORED_FORSAKEN.mdx PRIVATE_OUTPUT.mdx`
-  replaces the sword with an original beveled hammer centered on `Weapon Ref`,
-  preserves the body, rig and every sequence, and writes its steel palette texture
-  beside the output. Store the model in `hero-models`, the palette in
-  `imported-models`, and refresh the clip pool and white body after animation authoring.
 
 - Chen animation authoring (from the repository root):
   `bun tools/animations/chen-clips.ts STOCK_CHEN.mdx PRIVATE_OUTPUT` authors
