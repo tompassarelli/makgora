@@ -23,10 +23,13 @@ interface Watch {
   hand: unknown;
   handShown: boolean;
   stageDialogs: { frame: unknown; events: unknown[] }[];
+  selectionDialogs: { frame: unknown; events: unknown[] }[];
+  text: Map<unknown, string>;
+  confirm: unknown;
 }
 
 function watch(client: HeadlessClient): Watch {
-  const seen: Watch = { cursor: [], warps: 0, hand: undefined, handShown: false, stageDialogs: [] };
+  const seen: Watch = { cursor: [], warps: 0, hand: undefined, handShown: false, stageDialogs: [], selectionDialogs: [], text: new Map(), confirm: undefined };
   const { natives } = client;
   const stageParents = new Set<unknown>();
   const create = natives.BlzCreateFrameByType as Native;
@@ -34,19 +37,26 @@ function watch(client: HeadlessClient): Watch {
     const frame = create(...args);
     if (args[1] === `MeleeHand${client.slot}`) seen.hand = frame;
     if (args[1] === "MeleeStageRoot" || args[1] === "MeleeStagePoolRoot") stageParents.add(frame);
+    if (args[1] === `MeleeConfirmLabel${client.slot}`) seen.confirm = frame;
+    if (args[3] === "ScriptDialogButton" && String(args[1]).startsWith("MeleeMoves")) seen.selectionDialogs.push({ frame, events: [] });
     return frame;
   };
   const dialog = natives.BlzCreateFrame as Native;
   natives.BlzCreateFrame = (...args: unknown[]) => {
     const frame = dialog(...args);
-    if (args[0] === "ScriptDialogButton" && stageParents.has(args[1])) seen.stageDialogs.push({ frame, events: [] });
+    if (args[0] === "ScriptDialogButton") (stageParents.has(args[1]) ? seen.stageDialogs : seen.selectionDialogs).push({ frame, events: [] });
     return frame;
   };
   const register = natives.BlzTriggerRegisterFrameEvent as Native;
   natives.BlzTriggerRegisterFrameEvent = (...args: unknown[]) => {
-    const button = seen.stageDialogs.find(button => button.frame === args[1]);
+    const button = [...seen.stageDialogs, ...seen.selectionDialogs].find(button => button.frame === args[1]);
     if (button !== undefined) button.events.push(args[2]);
     return register(...args);
+  };
+  const setText = natives.BlzFrameSetText as Native;
+  natives.BlzFrameSetText = (frame: unknown, text: unknown) => {
+    seen.text.set(frame, String(text));
+    return setText(frame, text);
   };
   const visible = natives.BlzFrameSetVisible as Native | undefined;
   natives.BlzFrameSetVisible = (frame: unknown, shown: boolean) => {
@@ -124,6 +134,25 @@ test("fighter select shows Warcraft's own cursor at rest and hides it only while
   seen.cursor.length = 0;
   clients.frames(20);
   expect(seen.cursor).toEqual([]);
+  for (const client of clients.clients) expect(client.errors).toEqual([]);
+});
+
+test("character select registers no cursor-displacing dialog hover events and still lights Start under a resting pointer [k1 scenario]", () => {
+  const { clients, watches, point } = menu();
+  const centre = { x: START_BUTTON.x + START_BUTTON.width / 2, y: START_BUTTON.y - START_BUTTON.height / 2 };
+  for (const [index, seen] of watches.entries()) {
+    expect(seen.selectionDialogs.length).toBeGreaterThan(10);
+    for (const dialog of seen.selectionDialogs) expect(dialog.events).toEqual([clients.clients[index]?.natives.FRAMEEVENT_CONTROL_CLICK]);
+  }
+  point(AWAY.x, AWAY.y);
+  clients.frames(5);
+  for (const seen of watches) expect(seen.text.get(seen.confirm)).not.toContain("|cffffcc00");
+  point(centre.x, centre.y);
+  clients.frames(5);
+  for (const seen of watches) expect(seen.text.get(seen.confirm)).toContain("|cffffcc00");
+  point(AWAY.x, AWAY.y);
+  clients.frames(5);
+  for (const seen of watches) expect(seen.text.get(seen.confirm)).not.toContain("|cffffcc00");
   for (const client of clients.clients) expect(client.errors).toEqual([]);
 });
 

@@ -3,8 +3,12 @@ import type { TextBox } from "./hudLayout";
 
 export const START_BUTTON = { x: f32(0.071), y: f32(0.043), width: f32(0.235), height: f32(0.037) } as const;
 
-export const startButtonContains = (x: number, y: number): boolean =>
-  x >= START_BUTTON.x && x <= f32(START_BUTTON.x + START_BUTTON.width) && y <= START_BUTTON.y && y >= f32(START_BUTTON.y - START_BUTTON.height);
+export const MOVES_BOX = { x: f32(0.318), y: f32(0.043), width: f32(0.18), height: f32(0.037) } as const;
+
+export const boxContains = (box: { readonly x: number; readonly y: number; readonly width: number; readonly height: number }, x: number, y: number): boolean =>
+  x >= box.x && x <= f32(box.x + box.width) && y <= box.y && y >= f32(box.y - box.height);
+
+export const startButtonContains = (x: number, y: number): boolean => boxContains(START_BUTTON, x, y);
 
 export const SELECTION_HEADER_FLOOR = f32(0.49);
 
