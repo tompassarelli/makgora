@@ -13,6 +13,7 @@ import { PARKED_CUE_TIME_SCALE, type ParkedFlags, type WorldOrigin, facingYaw, p
 import { HitAreaEffects } from "./hitAreaEffects";
 import { DEFINITIVE_CUE_EMITTERS } from "../presentation/cueEmitterInfo";
 import { modelFailed } from "wisp/src/platform/modelFailures";
+import { idiv } from "wisp/src/sim/intMath";
 import { fighterName } from "../sim/heroes/registry";
 import { f32 } from "wisp/src/sim/f32";
 import { specialAreaRegion } from "../presentation/disjointCues";
@@ -180,6 +181,7 @@ export class SpecialCueEffects {
         x = anchor.x * this.scale;
         z = anchor.z * this.scale;
         key = fighter.special.action * 100 + fighter.special.form;
+        if (cue.rebirthFrames !== undefined) key += 1000000 * (1 + idiv(fighter.special.frame, cue.rebirthFrames));
       } else {
         const attack = attackCueState(fighter, this.attack, this.definitive);
         cue = attack.cue;

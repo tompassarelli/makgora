@@ -98,6 +98,7 @@ export interface Cue {
   readonly alpha?: number | undefined;
 
   readonly replacesBody?: boolean | undefined;
+  readonly rebirthFrames?: number | undefined;
   readonly definitive?: Cue | undefined;
 }
 
@@ -176,8 +177,8 @@ const KOBOLD_BURROW_TRAIL: MoveCues = { spell: "Burrow trail", startup: BURROW, 
 
 export const PEON_REST_CUES: MoveCues = {
   spell: "Rest",
-  startup: cue("Abilities\\Spells\\Items\\AIlb\\AIlbSpecialArt.mdx", "body", f32(2.5)),
-  active: cue("Abilities\\Spells\\Undead\\Sleep\\SleepTarget.mdx", "body", f32(1.5)),
+  startup: cue("Abilities\\Spells\\Human\\DivineShield\\DivineShieldTarget.mdx", "body", f32(1.0)),
+  active: { ...cue("Abilities\\Spells\\Undead\\Sleep\\SleepTarget.mdx", "body", f32(1.5)), rebirthFrames: 48 },
 };
 
 
