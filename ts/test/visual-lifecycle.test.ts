@@ -414,3 +414,75 @@ test("Classic Cairne's Shockwave draws a playing wave on its projectile for the 
     expect(client.errors).toEqual([]);
   }
 });
+
+
+test("Mirror Image matches its owning fighter colour across repeated casts, expiry, results and rematches [k1 scenario]", () => {
+  const clients = headless.clients({ start, install });
+  clients.start();
+  clients.frames(30);
+  const client = clients.client(0);
+  client.run(() => {
+    const s = shell();
+    for (const slot of [0, 1]) selectCharacter(s.game, slot, Character.blademaster);
+    const imagePath = heroDefinition(Character.blademaster)?.presentation.placedModel?.path;
+    expect(imagePath).toBeDefined();
+    const images = () => client.effectPoses({ visibleOnly: true }).filter(pose => pose.model === imagePath && pose.z > s.origin.z - 500 && pose.scale > 0 && pose.alpha > 0);
+    const step = () => {
+      expect(captureFrame(s.frameInput, s.runtime.simulationFrame + 1, s.world.mask, s.produced, s.runtime)).toBe(true);
+      applyFrame(s);
+      renderPersistentPresentation(s);
+    };
+    for (let rematch = 0; rematch < 2; rematch++) {
+      expect(requestStageSelect(s.game, 0)).toBe(true);
+      expect(startAtGo(s.game, 0)).toBe(true);
+      startMatch(s);
+      s.game.practice = true;
+      s.game.timeLimitMinutes = 0;
+      expect(images()).toHaveLength(0);
+      for (const slot of [0, 1]) {
+        const body = client.unitPoses().find(pose => pose.owner === slot);
+        expect(body?.teamColor).toBe(slot);
+        const fighter = fighterAt(s.world, slot);
+        fighter.motion.x = slot === 0 ? -300 : 300;
+      }
+      for (let cast = 0; cast < (rematch === 0 ? 3 : 1); cast++) {
+        for (const slot of [0, 1]) {
+          const input = s.produced.inputs[slot];
+          input.specialPressed = true;
+          input.specialZ = -1;
+          fighterAt(s.world, slot).mana.points = ROSTER_MANA.max;
+        }
+        step();
+        for (const slot of [0, 1]) s.produced.inputs[slot].specialPressed = false;
+        while (fighterAt(s.world, 0).placed.life === 0 && s.runtime.simulationFrame < 1000) step();
+        const drawn = images();
+        expect(drawn).toHaveLength(2);
+        for (const slot of [0, 1]) {
+          const fighter = fighterAt(s.world, slot);
+          const image = drawn.find(pose => pose.x === s.origin.x + fighter.placed.x);
+          expect(image?.teamColor, `P${slot + 1} decoy matches its body`).toBe(slot);
+          expect(image?.alpha).toBe(heroDefinition(Character.blademaster)?.presentation.placedModel?.alpha);
+        }
+        if (rematch === 0 && cast < 2) {
+          const remaining = fighterAt(s.world, 0).placed.life;
+          expect(remaining + 1).toBe(fighterAt(s.world, 0).placed.spec?.life);
+          for (let tick = 1; tick <= remaining; tick++) {
+            step();
+            expect(images()).toHaveLength(tick < remaining ? 2 : 0);
+          }
+        }
+      }
+      s.game.practice = false;
+      s.game.timeLimitMinutes = 1;
+      s.game.remainingFrames = 1;
+      step();
+      expect(s.game.phase).toBe(Phase.result);
+      expect(images()).toHaveLength(0);
+      confirm(s, 0);
+      confirm(s, 1);
+      expect(s.game.phase).toBe(Phase.characterMenu);
+      expect(images()).toHaveLength(0);
+    }
+  });
+  expect(client.errors).toEqual([]);
+});

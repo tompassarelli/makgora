@@ -6,7 +6,7 @@ import { idiv } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { type Fighter, type PlacedObject, placedObject } from "../sim/fighter";
 import { type AuthoredSpecial, CompanionMode } from "../sim/heroSpecials";
-import type { Character } from "../sim/codes";
+import { Character } from "../sim/codes";
 import { authoredTuning } from "../sim/tuning";
 import { heroDefinition } from "../sim/heroes/registry";
 import { type ParkedFlags, type WorldOrigin, parkOnce, placeEffect } from "./effects";
@@ -68,6 +68,7 @@ export class PlacedObjectEffects {
     const prepared = (this.prepared ??= []);
     const parked = (this.parked ??= []);
     const paths = placementPaths(character);
+    const imagePath = character === Character.blademaster ? heroDefinition(character)?.presentation.placedModel?.path : undefined;
     for (let animal = 0; animal < 3; animal++) {
       const index = slot * 3 + animal;
       const current = this.models[index];
@@ -75,11 +76,14 @@ export class PlacedObjectEffects {
       const looks: { [path: string]: effect | undefined } = {};
       if (current !== undefined) looks[this.paths[index] ?? PLACED_OBJECT_MODEL] = current;
       for (const path of paths) {
-        if (looks[path] !== undefined) continue;
-        const model = AddSpecialEffect(path, this.origin.x, this.origin.y);
-        BlzSetSpecialEffectAnimationBlendTime(model, 0.0);
-        parkOnce(model, this.origin, [], 0);
-        looks[path] = model;
+        let model = looks[path];
+        if (model === undefined) {
+          model = AddSpecialEffect(path, this.origin.x, this.origin.y);
+          BlzSetSpecialEffectAnimationBlendTime(model, 0.0);
+          parkOnce(model, this.origin, [], 0);
+          looks[path] = model;
+        }
+        if (path === imagePath) BlzSetSpecialEffectColorByPlayer(model, Player(slot));
       }
       prepared[index] = looks;
       parked[index] = false;
