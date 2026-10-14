@@ -78,6 +78,8 @@ export class ProjectilePresentation {
   private readonly serials: number[] = [];
   private readonly specs: (Fighter["projectiles"][number]["spec"])[] = [];
   private readonly lives: number[] = [];
+  private readonly reseek: boolean[] = [];
+  private readonly birthLife: number[] = [];
   private readonly lingering: number[] = [];
   private readonly risen: (Risen | undefined)[] = [];
   private readonly risenAge: number[] = [];
@@ -366,9 +368,16 @@ export class ProjectilePresentation {
         if (cue?.birth === undefined) {
           if (draw?.seconds === undefined) BlzSetSpecialEffectAnimation(model, draw?.sequence ?? pose.animationSequence ?? (birth ? "birth" : "stand"));
           BlzSetSpecialEffectTime(model, draw?.seconds ?? 0.0);
+          this.reseek[slot] = draw?.reseek === true;
+          this.birthLife[slot] = projectile.life;
         }
         this.serials[slot] = projectile.serial;
         this.specs[slot] = projectile.spec;
+      } else if (this.reseek[slot] === true && !paused && projectile !== undefined && projectile.life < (this.birthLife[slot] ?? projectile.life)) {
+        // Warcraft discards an animation seek in the callback selecting its sequence (#58 native rulers).
+        const elapsed = f32(((this.birthLife[slot] ?? projectile.life) - projectile.life) / 60.0);
+        BlzSetSpecialEffectTime(model, f32((draw?.seconds ?? 0.0) + elapsed));
+        this.reseek[slot] = false;
       }
       BlzSetSpecialEffectYaw(model, pose.yaw);
       BlzSetSpecialEffectPitch(model, pose.pitch);
