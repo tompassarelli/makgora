@@ -44,6 +44,7 @@ import { SPECIAL_SLOTS, type SpecialSlot } from "./projectileArt";
 import { RIFLEMAN_MODEL_FILE } from "./fighterAssetInfo";
 import { FROST_TRAP_MODEL } from "../assets/frostAssetInfo";
 import { IMPACT_DUST_MODEL } from "../assets/impactAssetInfo";
+import { MOUNTAIN_KING_SPECIALS } from "../sim/heroes/mountainKingSpecials";
 
 
 export type CueAnchor = "hand" | "body" | "feet" | "ahead" | "behind" | "overhead" | "barrel" | "breath";
@@ -66,6 +67,7 @@ export interface CueBirth {
   readonly eachFrame: boolean;
   readonly strike?: number | undefined;
   readonly voices?: number | undefined;
+  readonly lingerFrames?: number | undefined;
 }
 
 export interface Cue {
@@ -87,6 +89,8 @@ export interface Cue {
   readonly sequence?: string | undefined;
   readonly seconds?: number | undefined;
   readonly pitch?: number | undefined;
+  readonly roll?: number | undefined;
+  readonly sound?: string | undefined;
   readonly yaw?: number | undefined;
   readonly depth?: number | undefined;
   readonly timeScale?: number | undefined;
@@ -144,6 +148,7 @@ const BLOODLUST = cue("Abilities\\Spells\\Orc\\Bloodlust\\BloodlustSpecial.mdx",
 const WIND_GATHER = cue("Abilities\\Spells\\Other\\Tornado\\TornadoElementalSmall.mdx", "body", f32(0.4));
 const WIND_WALK = cue("Abilities\\Spells\\Human\\Invisibility\\InvisibilityTarget.mdx", "body", f32(0.8));
 const STORM = cue("Abilities\\Weapons\\Bolt\\BoltImpact.mdx", "hand", 1.0);
+const THUNDER_CLAP_CUE: Cue = { ...cue("Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdx", "feet", f32((MOUNTAIN_KING_SPECIALS.down.ground.regions?.[0]?.hit.maxX ?? 0.0) / 180.0)), sound: "ThunderClap" };
 const SHADOW = cue("Abilities\\Spells\\Undead\\Curse\\CurseTarget.mdx", "hand", f32(0.7));
 const FROST = cue("Abilities\\Spells\\Undead\\ReplenishMana\\SpiritTouchTarget.mdx", "hand", f32(0.8));
 const ARCANE = cue("Abilities\\Spells\\Human\\DispelMagic\\DispelMagicTarget.mdx", "hand", 0.5);
@@ -254,7 +259,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     down: { spell: "Life Drain", startup: SHADOW, active: cue("Abilities\\Spells\\Other\\Drain\\DrainCaster.mdx", "hand", f32(0.6)) },
   },
   [Character.chen]: {
-    neutral: { spell: "Breath of Fire", startup: BREW, active: { ...timed(cue("Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireMissile.mdx", "breath", f32(0.4)), "birth", 0.0), birth: { eachFrame: true, strike: 0, voices: 11 } } },
+    neutral: { spell: "Breath of Fire", startup: BREW, active: { ...timed(cue("Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireMissile.mdx", "breath", 0.5), "birth", 0.0), birth: { eachFrame: true, strike: 0, voices: 11, lingerFrames: 6 } } },
     side: { spell: "Drunken Haze", startup: BREW, active: cue("Abilities\\Spells\\Other\\StrongDrink\\BrewmasterTarget.mdx", "hand", f32(0.7)) },
     up: { spell: "Storm Rise", startup: STORM, active: cue("Abilities\\Spells\\Other\\Tornado\\TornadoElementalSmall.mdx", "body", f32(0.6)) },
     down: { spell: "Threefold Stance", startup: BREW, active: cue("Abilities\\Spells\\Human\\Defend\\DefendCaster.mdx", "body", f32(0.6)) },
@@ -273,8 +278,8 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   },
   [Character.murloc]: {
     neutral: { spell: "Ensnare", startup: MURGUL, active: cue("Abilities\\Spells\\Orc\\Ensnare\\EnsnareTarget.mdx", "hand", 0.75) },
-    side: { spell: "Tidal Rush", startup: MURGUL, active: cue("Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx", "ahead", 0.5) },
-    up: { spell: "Tide Spout", startup: MURGUL, active: cue("Objects\\Spawnmodels\\Naga\\NagaDeath\\NagaDeath.mdx", "feet", 0.75) },
+    side: { spell: "Tidal Rush", startup: MURGUL, active: timed(cue("Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx", "feet", 1.0), "birth", 0.0) },
+    up: { spell: "Tide Spout", startup: MURGUL, active: timed(cue("Objects\\Spawnmodels\\Naga\\NagaDeath\\NagaDeath.mdx", "feet", 1.0), "birth", 0.0) },
     down: { spell: "Disease Cloud", startup: MURGUL, active: cue("Abilities\\Spells\\Undead\\PlagueCloud\\PlagueCloudCaster.mdx", "feet", 0.75) },
   },
   [Character.medivh]: {
@@ -311,7 +316,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     neutral: { spell: "Storm Bolt", startup: STORM, active: cue("Abilities\\Spells\\Other\\ForkedLightning\\ForkedLightningTarget.mdx", "hand", f32(0.8)) },
     side: { spell: "Storm Rush", startup: cue("Abilities\\Spells\\Human\\Defend\\DefendCaster.mdx", "body", f32(0.8)), active: cue("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", "feet", f32(0.8)) },
     up: { spell: "Thunder Leap", startup: cue("Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdx", "feet", 0.5), active: cue("Abilities\\Spells\\Orc\\LightningShield\\LightningShieldTarget.mdx", "body", f32(0.8)) },
-    down: { spell: "Thunder Clap", startup: STORM, active: cue("Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdx", "feet", f32(0.35)) },
+    down: { spell: "Thunder Clap", startup: STORM, active: THUNDER_CLAP_CUE },
   },
   [Character.warden]: {
     neutral: { spell: "Shadow Strike", startup: cue("Abilities\\Spells\\NightElf\\ShadowStrike\\ShadowStrike.mdx", "hand", f32(0.7)), active: timed(cue("Abilities\\Weapons\\PoisonSting\\PoisonStingTarget.mdx", "hand", 1.0), "stand", 0.0) },
@@ -338,7 +343,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     down: { spell: "Sleep", startup: VAMPIRIC, active: cue("Abilities\\Spells\\Undead\\Sleep\\SleepSpecialArt.mdx", "hand", f32(0.8)) },
   },
   [Character.shadowHunter]: {
-    neutral: { spell: "Spirit Glaive", startup: VOODOO, active: cue("Abilities\\Weapons\\ShadowHunterMissile\\ShadowHunterMissile.mdx", "hand", f32(0.2)) },
+    neutral: { spell: "Spirit Glaive", startup: VOODOO, active: { ...cue("Abilities\\Weapons\\ShadowHunterMissile\\ShadowHunterMissile.mdx", "hand", f32(0.3)), roll: f32(1.570796327) } },
     side: { spell: "Serpent Ward", startup: VOODOO, active: cue("Abilities\\Spells\\Orc\\StasisTrap\\StasisTotemTarget.mdx", "ahead", f32(0.7)) },
     up: { spell: "Loa Vault", startup: cue("Abilities\\Spells\\Orc\\SpiritLink\\SpiritLinkTarget.mdx", "body", f32(0.7)), active: cue("Abilities\\Spells\\Orc\\FeralSpirit\\FeralSpiritDone.mdx", "feet", f32(0.8)) },
     down: { spell: "Hex", startup: VOODOO, active: cue("Abilities\\Spells\\Human\\Polymorph\\PolymorphTarget.mdx", "hand", f32(0.6)) },
@@ -433,7 +438,7 @@ export const HERO_BRANCH_CUES: { readonly [character: number]: { readonly [slot 
     neutral: { recall: branch("Storm Bolt recall", STORM, cue("Abilities\\Spells\\Orc\\LightningShield\\LightningShieldBuff.mdx", "hand", f32(0.8))) },
     up: { followUps: [branch("Hammerfall", STORM, cue("Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdx", "feet", f32(0.6)))] },
 
-    down: { followUps: [branch("Small Clap", STORM, cue("Abilities\\Spells\\Orc\\EarthQuake\\EarthquakeTarget.mdx", "feet", f32(0.3))), "slot", "none"] },
+    down: { followUps: [branch("Small Clap", STORM, { ...cue("Abilities\\Spells\\Orc\\EarthQuake\\EarthquakeTarget.mdx", "feet", f32(0.3)), sound: "ThunderClap" }), "slot", "none"] },
   },
   [Character.warden]: {
     side: { marked: branch("Shadow Pursuit", SHADOW, cue("Abilities\\Spells\\NightElf\\ShadowStrike\\ShadowStrike.mdx", "body", f32(0.7))) },

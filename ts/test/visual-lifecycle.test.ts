@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { createFrameControls } from "../src/game/match/controls";
 import { captureFrame, createMatchFrameInput } from "../src/game/match/frameInput";
 import { Phase, requestStageSelect, selectCharacter } from "../src/game/match/rules";
-import { startAtGo } from "../src/game/match/testMatch";
+import { executeNext, startAtGo, testMatch } from "../src/game/match/testMatch";
 import { IMPACT_DUST, IMPACTS_PER_KIND } from "../src/game/presentation/impactState";
 import { cameraPoint, FLOOR_HEIGHT } from "../src/game/presentation/arenaCamera";
 import { ReplayCorrections, ReplayHistory } from "../src/game/replay/history";
@@ -31,6 +31,7 @@ import { pauseMatchPresentation, renderPersistentPresentation, serviceResumePres
 import { testHeadless } from "./headless";
 import type { EffectPose, HeadlessClient } from "wisp/src/headless/client";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
+import { SpecialCueEffects } from "../src/game/render/specialCueEffects";
 
 const headless = testHeadless(SMASHCRAFT_HEADLESS);
 
@@ -260,6 +261,31 @@ test("combat effects: rollback, pause/resume and rematch neither replay nor reta
     expect(flashed).toBe(true);
     expect(target.status.damage).toBeGreaterThan(0);
     expect(client.log.filter(({ name }) => name === "AddLightningEx")).toHaveLength(lightningAllocations);
+
+    globalThis.__smashcraftCueDefinitive = false;
+    const chenMatch = testMatch(1, Character.chen), chen = fighterAt(chenMatch.world, 0), breathInput = chenMatch.inputs.inputs[0];
+    chenMatch.game.practice = true;
+    chen.mana.points = ROSTER_MANA.max;
+    const breath = new SpecialCueEffects(Character.chen, { x: 0, y: 0, z: 100 }, true);
+    const fire = () => client.effectPoses({ visibleOnly: true }).filter(pose => pose.model.includes("BreathOfFireMissile") && !hidden(pose));
+    for (let frame = 0; frame < 14; frame++) {
+      breathInput.specialPressed = frame === 0;
+      executeNext(chenMatch);
+    }
+    breath.confirm(chen, true, 0);
+    breath.present(chen, true, false);
+    const confirmedBreath = fire();
+    expect(confirmedBreath.length).toBeGreaterThan(0);
+    for (let frame = 14; frame < 42; frame++) {
+      breathInput.specialPressed = false;
+      executeNext(chenMatch);
+    }
+    breath.present(chen, true, false);
+    expect(fire()).toEqual(confirmedBreath);
+    breath.confirm(chen, true, 0.2);
+    breath.present(chen, true, false);
+    expect(fire()).toEqual([]);
+    breath.destroy();
 
   });
   expect(client.errors).toEqual([]);
