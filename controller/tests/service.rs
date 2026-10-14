@@ -137,6 +137,46 @@ fn the_service_follows_a_fake_session_through_new_sessions_and_game_restarts() {
 }
 
 #[test]
+fn start_presses_y_at_character_select_when_the_keys_session_appears_after_the_menu() {
+    let Some((mut pad, node)) = virtual_pad() else {
+        eprintln!("skipped: /dev/uinput is not writable, so no virtual pad");
+        return;
+    };
+    until("access to the virtual pad", || fs::File::open(&node).ok());
+    let root = std::env::temp_dir().join(format!("wc3-service-start-{}", std::process::id()));
+    let (pads, documents, status) = (root.join("pads"), root.join("Warcraft III"), root.join("status.txt"));
+    let data = documents.join("CustomMapData");
+    fs::create_dir_all(&pads).unwrap();
+    fs::create_dir_all(&data).unwrap();
+    std::os::unix::fs::symlink(&node, pads.join("usb-Microsoft_Controller_TEST-event-joystick")).unwrap();
+    fs::write(documents.join("game"), "1").unwrap();
+    menu(&data, 0, "CHARACTER");
+
+    let _service = Service::start(service::Config {
+        pads: pads.clone(), headless: Some(documents.clone()), status_file: Some(status.clone()),
+        settings_file: root.join("settings.json"), poll: Duration::from_millis(50), interface: None,
+        ..service::Config::default()
+    });
+    let pressed = documents.join("pressed.txt");
+    until("the menu pointer", || fs::metadata(&pressed).ok());
+
+    // The keyboard build writes its ready file after its first menu publication.
+    fs::write(data.join("wc3-melee-ready.txt"),
+        "function PreloadFiles takes nothing returns nothing\n\tcall Preload( \"BUILD itest\" )\n\tcall Preload( \"INPUT callback PRESENTATION pool-confirmed\" )\nendfunction\n").unwrap();
+    until("the keys session", || field(&status, "session").filter(|session| session.starts_with("itest/keys/")));
+    thread::sleep(Duration::from_millis(300));
+
+    let start = |down: i32| evdev::InputEvent::new(evdev::EventType::KEY.0, KeyCode::BTN_START.0, down);
+    pad.emit(&[start(1)]).unwrap();
+    thread::sleep(Duration::from_millis(100));
+    pad.emit(&[start(0)]).unwrap();
+    until("Start to press Y", || fs::read_to_string(&pressed).ok().filter(|text| text.lines().any(|line| line == "down y")));
+
+    drop(_service);
+    let _ = fs::remove_dir_all(root);
+}
+
+#[test]
 #[ignore = "requires the assigned offline Warcraft client and its private desktop"]
 fn a_private_pad_script_drives_the_published_menu_pointer() {
     use focus::{Foreground, Gate, Target};

@@ -8,7 +8,7 @@ license = "MIT"
 description = "Smashcraft's plug-in for padbridge: the map's session and journal helper (wc3-journal)"
 
 [dependencies]
-padbridge = { git = "https://github.com/tompassarelli/padbridge", rev = "c4b13ca8f03dd73a8b3d414c5c899aade55c46a9" }
+padbridge = { git = "https://github.com/tompassarelli/padbridge", rev = "9f80580d9337d1d13140a2584fd42895e05bc290" }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 enigo = { git = "https://github.com/tompassarelli/enigo", rev = "0b7bae348b0ba7108b81bc4c7267e5bb2d6a509b" }
