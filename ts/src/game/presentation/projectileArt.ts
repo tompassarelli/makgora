@@ -1,4 +1,5 @@
 import { f32 } from "wisp/src/sim/f32";
+import { imod } from "wisp/src/sim/intMath";
 
 
 
@@ -125,17 +126,25 @@ export const PROJECTILE_DRAW_CUES: { readonly [model: string]: { readonly scale:
   "Objects\\Spawnmodels\\Demon\\DemonLargeDeathExplode\\DemonLargeDeathExplode.mdx": { scale: 1.0, birth: { eachFrame: false } },
   "Abilities\\Spells\\NightElf\\Immolation\\ImmolationTarget.mdx": { scale: 1.0, birth: { eachFrame: false } },
   "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx": { scale: 1.0, birth: { eachFrame: false } },
+  "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx": { scale: f32(1.2) },
 };
 
-export const PROJECTILE_DRAW_OFFSETS: { readonly [model: string]: { readonly x: number; readonly z: number; readonly roll?: number | undefined; readonly sequence?: string | undefined; readonly reseek?: boolean | undefined; readonly seconds?: number | undefined; readonly width?: number | undefined; readonly height?: number | undefined; readonly fill?: readonly { readonly x: number; readonly z: number }[] | undefined } | undefined } = {
+export const PROJECTILE_DRAW_OFFSETS: { readonly [model: string]: { readonly x: number; readonly z: number; readonly roll?: number | undefined; readonly sequence?: string | undefined; readonly reseek?: boolean | undefined; readonly seconds?: number | undefined; readonly width?: number | undefined; readonly height?: number | undefined; readonly fill?: readonly { readonly x: number; readonly z: number }[] | undefined; readonly loopFrames?: number | undefined } | undefined } = {
   "Abilities\\Weapons\\ShadowHunterMissile\\ShadowHunterMissile.mdx": { x: 0.0, z: 0.0, roll: f32(1.570796327) },
   "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveMissile.mdx": { x: -20.0, z: -33.0, sequence: "stand", reseek: true, width: f32(0.75), height: 2.0 },
   "Abilities\\Spells\\Human\\ManaFlare\\ManaFlareMissile.mdx": { x: 0.0, z: 0.0, sequence: "birth", seconds: f32(0.2) },
   "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike.mdx": { x: 0.0, z: 0.0, sequence: "birth" },
   "Abilities\\Spells\\Human\\Avatar\\AvatarCaster.mdx": { x: 0.0, z: 0.0, sequence: "spell" },
   "Units\\Undead\\Locust\\Locust.mdx": { x: 0.0, z: 0.0, sequence: "walk" },
+  "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx": { x: 0.0, z: f32(-59.4), loopFrames: 12 },
   "Abilities\\Spells\\Undead\\Impale\\ImpaleHitTarget.mdx": { x: 0.0, z: -25.0, width: 1.5, height: 1.25, fill: [{ x: f32(-4.0 / 9.0), z: f32(-4.0 / 9.0) }, { x: f32(-4.0 / 9.0), z: f32(4.0 / 9.0) }, { x: f32(4.0 / 9.0), z: f32(-4.0 / 9.0) }, { x: f32(4.0 / 9.0), z: f32(4.0 / 9.0) }] },
 };
+
+
+export function restartsStationaryField(model: string, age: number, born: boolean): boolean {
+  const loop = PROJECTILE_DRAW_OFFSETS[model]?.loopFrames;
+  return born || (loop !== undefined && imod(age, loop) === 0);
+}
 
 
 export const DEFINITIVE_ULTIMATE_MODELS: { readonly [character: number]: { readonly [model: string]: string | undefined } | undefined } = {

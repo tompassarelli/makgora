@@ -168,6 +168,8 @@ const BEAST = cue("Abilities\\Spells\\Orc\\Bloodlust\\BloodlustTarget.mdx", "han
 const BREW = cue("Abilities\\Spells\\Other\\StrongDrink\\BrewmasterMissile.mdx", "hand", f32(0.6));
 const NATURE = cue("Abilities\\Spells\\NightElf\\Tranquility\\TranquilityTarget.mdx", "hand", f32(0.7));
 
+export const FROST_ARMOR_SHELL_MODEL = "Abilities\\Spells\\Undead\\FrostArmor\\FrostArmorTarget.mdx";
+
 const RUNE = cue("Abilities\\Spells\\Undead\\DarkRitual\\DarkRitualCaster.mdx", "feet", f32(0.6));
 
 const RAIN_OF_FIRE_TARGET = "Abilities\\Spells\\Demon\\RainOfFire\\RainOfFireTarget.mdx";
@@ -259,7 +261,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     neutral: { spell: "Chain Lightning", startup: STORM, active: cue("Abilities\\Weapons\\FarseerMissile\\FarseerMissile.mdx", "hand", 0.5) },
     side: { spell: "Feral Spirit", startup: BEAST, active: cue("units\\orc\\SpiritWolf\\SpiritWolf.mdx", "ahead", 0.5) },
     up: { spell: "Far Sight", startup: STORM, active: cue("Abilities\\Spells\\Orc\\Purge\\PurgeBuffTarget.mdx", "body", 0.5) },
-    down: { spell: "Doomhammer Slam", startup: STORM, active: timed(cue("Abilities\\Weapons\\DemolisherMissile\\DemolisherMissile.mdx", "feet", f32(0.65)), "death", 0.0) },
+    down: { spell: "Doomhammer Slam", startup: STORM, active: timed(cue("Abilities\\Weapons\\AncientProtectorMissile\\AncientProtectorMissile.mdx", "feet", f32(1.2)), "death", f32(0.15)) },
   },
   [Character.sylvanas]: {
     neutral: { spell: "Black Arrow", startup: SHADOW, active: cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", "hand", f32(0.6)) },
@@ -335,9 +337,9 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   },
   [Character.lich]: {
     neutral: { spell: "Frost Nova", startup: FROST, active: timed(cue("Abilities\\Spells\\Other\\FrostDamage\\FrostDamage.mdx", "hand", 0.5), "stand", 0.0) },
-    side: { spell: "Death and Decay", startup: FROST, active: FROST },
+    side: { spell: "Death and Decay", startup: cue("Abilities\\Spells\\Undead\\PlagueCloud\\PlagueCloudCaster.mdx", "hand", f32(0.6)), active: cue("Abilities\\Spells\\Undead\\AnimateDead\\AnimateDeadTarget.mdx", "hand", f32(0.7)) },
     up: { spell: "Spectral Ascent", startup: FROST, active: cue("Abilities\\Spells\\Undead\\Unsummon\\UnsummonTarget.mdx", "body", f32(0.7)) },
-    down: { spell: "Frost Armor", startup: cue("Abilities\\Spells\\Undead\\DarkRitual\\DarkRitualCaster.mdx", "feet", f32(0.6)), active: timed(cue("Abilities\\Spells\\Undead\\FrostArmor\\FrostArmorDamage.mdx", "body", f32(1.2)), "birth", 0.0) },
+    down: { spell: "Frost Armor", startup: timed(cue(FROST_ARMOR_SHELL_MODEL, "body", 1.0), "birth", 0.0), active: timed(cue("Abilities\\Spells\\Undead\\FrostArmor\\FrostArmorDamage.mdx", "body", f32(1.2)), "birth", 0.0) },
   },
   [Character.forsakenPaladin]: {
     neutral: { spell: "Cleansing Hammer", startup: HOLY, active: cue("Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", "hand", f32(0.8)) },

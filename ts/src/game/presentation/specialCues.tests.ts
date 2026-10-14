@@ -69,3 +69,12 @@ test("every hero special form's cue windows lie in its action: startup from fram
   }
   assertTrue(checked >= 28);
 });
+
+
+test("the Lich's Death and Decay casts without his frost cue and Frost Armor winds up without Dark Ritual's rune [k3 measure #563]", () => {
+  const lich = HERO_CUES[Character.lich];
+  if (lich === undefined) throw new Error("the Lich has cues");
+  const frost = lich.neutral.startup.model;
+  for (const cue of [lich.side.startup, lich.side.active]) assertEquals(cue.model === frost, false, `Death and Decay shows ${cue.model}`);
+  assertEquals(lich.down.startup.model.includes("DarkRitual"), false, `Frost Armor winds up with ${lich.down.startup.model}`);
+});

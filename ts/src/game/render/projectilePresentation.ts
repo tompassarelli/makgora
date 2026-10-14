@@ -9,7 +9,7 @@ import { heroDefinition } from "../sim/heroes/registry";
 import { HERO_PROJECTILE_CAP } from "../sim/heroSpecialRules";
 import { f32 } from "wisp/src/sim/f32";
 import { PARKED_CUE_TIME_SCALE, type ParkedFlags, type WorldOrigin, parkCue } from "./effects";
-import { DEFINITIVE_ULTIMATE_MODELS, PROJECTILE_DRAW_CUES, PROJECTILE_DRAW_OFFSETS, fighterProjectileModels, projectileModelOf, ultimateProjectiles } from "../presentation/projectileArt";
+import { DEFINITIVE_ULTIMATE_MODELS, PROJECTILE_DRAW_CUES, PROJECTILE_DRAW_OFFSETS, fighterProjectileModels, projectileModelOf, restartsStationaryField, ultimateProjectiles } from "../presentation/projectileArt";
 import { projectedProjectile } from "../presentation/projectilePose";
 import { IMPACT_DEFILE_MODEL } from "../assets/impactAssetInfo";
 import { heroProjectileArt } from "../presentation/projectileArt";
@@ -431,7 +431,7 @@ export class ProjectilePresentation {
       } else if (cue?.birth === undefined && projectile?.spec !== undefined && projectile.velocityX === 0.0 && projectile.velocityZ === 0.0) {
 
         if (pool !== undefined && STATIONARY_PARTICLE_MODELS.includes(pool.drawn)) {
-          if (born) BlzSetSpecialEffectTime(model, f32(0.3));
+          if ((born || !paused) && restartsStationaryField(pool.drawn, projectile.spec.life - projectile.life, born)) BlzSetSpecialEffectTime(model, f32(0.3));
         } else {
           BlzSetSpecialEffectTime(model, f32(0.3));
           BlzSetSpecialEffectTimeScale(model, 0.0);
