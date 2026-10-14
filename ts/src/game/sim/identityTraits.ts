@@ -32,7 +32,7 @@ export const IDENTITY_TRAITS: Readonly<Record<Character, IdentityTraits>> = {
   [Character.lichKing]: { side: { status: true } },
   [Character.thrall]: {},
   [Character.jaina]: {},
-  [Character.sylvanas]: { side: { status: true }, down: { heal: true }, ultimate: { status: true } },
+  [Character.sylvanas]: { side: { status: true }, down: { heal: true } },
   [Character.cairne]: { down: { heal: true } },
   [Character.chen]: { side: { status: true } },
   [Character.peon]: {},
