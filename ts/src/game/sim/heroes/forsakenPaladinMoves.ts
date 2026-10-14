@@ -7,6 +7,7 @@ import { FORSAKEN_PALADIN_GROUND, groundPoses } from "./groundNormals";
 import type { HitEffect } from "../hitRegions";
 import { strongHit } from "../strongHits";
 import { type FighterHurtboxes, type HurtPart, hurtPart } from "../hurtboxes";
+import { forsakenWeaponRegions } from "./forsakenPaladinWeaponGeometry";
 
 
 
@@ -89,9 +90,6 @@ const JAB_ARM = hurtPart(10.0, 66.0, f32(SHORT - 10.0), 60.0, 10.0);
 const GRAB_ARM = hurtPart(10.0, 56.0, f32(GRAB - 12.0), 40.0, 12.0);
 
 
-const BOOT = hurtPart(-8, 42, -89, 30, 11);
-const HALF_BOOT = hurtPart(-8, 42, -54, 36, 11);
-
 const FORSAKEN_PALADIN_HURTBOXES: FighterHurtboxes = {
   stand: [FORSAKEN_PALADIN_TORSO],
   attacks: {
@@ -105,13 +103,13 @@ const FORSAKEN_PALADIN_HURTBOXES: FighterHurtboxes = {
     [AttackStyle.downSmash]: [heroHurtPose(14, 19, forsakenPaladinReach(44.0, 26.0)), heroHurtPose(20, 25, forsakenPaladinReach(-44.0, 26.0))],
     [AttackStyle.neutralAir]: [heroHurtPose(6, 10, forsakenPaladinReach(44.0, 60.0)), heroHurtPose(11, 15, forsakenPaladinReach(-44.0, 60.0))],
     [AttackStyle.forwardAir]: [heroHurtPose(10, 18, forsakenPaladinReach(46.0, 62.0))],
-    [AttackStyle.backAir]: [heroHurtPose(6, 8, [FORSAKEN_PALADIN_TORSO, HALF_BOOT]), heroHurtPose(9, 13, [FORSAKEN_PALADIN_TORSO, BOOT]), heroHurtPose(14, 16, [FORSAKEN_PALADIN_TORSO, HALF_BOOT])],
+    [AttackStyle.backAir]: [heroHurtPose(6, 16, forsakenPaladinReach(-44.0, 56.0))],
     [AttackStyle.upAir]: [heroHurtPose(6, 13, forsakenPaladinReach(6.0, 136.0))],
     [AttackStyle.downAir]: [heroHurtPose(12, 20, forsakenPaladinReach(4.0, 20.0))],
   },
 };
 
-export const FORSAKEN_PALADIN_MOVES: FighterMoves = {
+export const FORSAKEN_PALADIN_AUTHORING_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack,
   smashMaxChargeFrames: 45,
   smashMaxDamageMultiplier: 1.25,
@@ -128,10 +126,10 @@ export const FORSAKEN_PALADIN_MOVES: FighterMoves = {
       frame(23, capsule(18.0, 48.0, 102.0, 16.0, 8.0), FORWARD_SMASH_HANDLE),
     ]),
     [AttackStyle.upSmash]: heroMove(18, 4, 33, 0, [
-      frame(18, capsule(12.0, 68.0, 38.0, 112.0, 14.0), UP_SMASH),
-      frame(19, capsule(8.0, 78.0, 18.0, f32(LONG - 14.0), 14.0), UP_SMASH),
-      frame(20, capsule(4.0, 78.0, -12.0, f32(LONG - 14.0), 14.0), UP_SMASH),
-      frame(21, capsule(-4.0, 68.0, -32.0, 112.0, 14.0), UP_SMASH),
+      frame(18, capsule(12.0, 100.0, 38.0, 150.0, 14.0), UP_SMASH),
+      frame(19, capsule(8.0, 110.0, 18.0, 172.0, 14.0), UP_SMASH),
+      frame(20, capsule(4.0, 110.0, -12.0, 172.0, 14.0), UP_SMASH),
+      frame(21, capsule(-4.0, 100.0, -32.0, 150.0, 14.0), UP_SMASH),
     ]),
     [AttackStyle.downSmash]: heroMove(17, 6, 22, 0, [
       frame(17, capsule(18.0, 18.0, 78.0, 32.0, 12.0), DOWN_SMASH_FRONT),
@@ -155,21 +153,21 @@ export const FORSAKEN_PALADIN_MOVES: FighterMoves = {
       frame(16, capsule(18.0, 42.0, 95.0, 0.0, 14.0), FORWARD_AIR),
     ]),
     [AttackStyle.backAir]: heroMove(9, 3, 24, 14, [
-      frame(9, capsule(-30.0, 38.0, -f32(MEDIUM - 10.0), 32.0, 10.0), BACK_AIR),
-      frame(10, capsule(-30.0, 36.0, -f32(MEDIUM - 10.0), 30.0, 10.0), BACK_AIR),
-      frame(11, capsule(-30.0, 34.0, -f32(MEDIUM - 16.0), 26.0, 10.0), BACK_AIR),
+      frame(9, capsule(-30.0, 66.0, -f32(MEDIUM - 10.0), 76.0, 10.0), BACK_AIR),
+      frame(10, capsule(-30.0, 56.0, -f32(MEDIUM - 10.0), 56.0, 10.0), BACK_AIR),
+      frame(11, capsule(-30.0, 48.0, -f32(MEDIUM - 16.0), 36.0, 10.0), BACK_AIR),
     ]),
     [AttackStyle.upAir]: heroMove(8, 4, 23, 14, [
-      frame(8, head(30.0, 82.0, 14.0), UP_AIR),
-      frame(9, head(12.0, f32(MEDIUM - 14.0), 14.0), UP_AIR),
-      frame(10, head(-12.0, f32(MEDIUM - 14.0), 14.0), UP_AIR),
-      frame(11, head(-30.0, 82.0, 14.0), UP_AIR),
+      frame(8, head(30.0, 150.0, 14.0), UP_AIR),
+      frame(9, head(12.0, 166.0, 14.0), UP_AIR),
+      frame(10, head(-12.0, 166.0, 14.0), UP_AIR),
+      frame(11, head(-30.0, 150.0, 14.0), UP_AIR),
     ]),
     [AttackStyle.downAir]: heroMove(15, 4, 31, 22, [
-      frame(15, capsule(14.0, 10.0, 20.0, -75.0, 12.0), DOWN_AIR, DOWN_AIR_GROUNDED),
-      frame(16, capsule(8.0, 10.0, 8.0, -f32(MEDIUM - 12.0), 12.0), DOWN_AIR, DOWN_AIR_GROUNDED),
-      frame(17, capsule(0.0, 10.0, -8.0, -f32(MEDIUM - 12.0), 12.0), DOWN_AIR, DOWN_AIR_GROUNDED),
-      frame(18, capsule(-4.0, 10.0, -20.0, -75.0, 12.0), DOWN_AIR, DOWN_AIR_GROUNDED),
+      frame(15, capsule(14.0, 10.0, 20.0, -40.0, 12.0), DOWN_AIR, DOWN_AIR_GROUNDED),
+      frame(16, capsule(8.0, 10.0, 8.0, -52.0, 12.0), DOWN_AIR, DOWN_AIR_GROUNDED),
+      frame(17, capsule(0.0, 10.0, -8.0, -52.0, 12.0), DOWN_AIR, DOWN_AIR_GROUNDED),
+      frame(18, capsule(-4.0, 10.0, -20.0, -40.0, 12.0), DOWN_AIR, DOWN_AIR_GROUNDED),
     ]),
     [AttackStyle.grab]: heroMove(8, 2, 25, 0, [
       heroRegion(8, 9, capsule(14.0, 44.0, f32(GRAB - 12.0), 36.0, 12.0), GRAB_CONTACT),
@@ -183,3 +181,10 @@ export const FORSAKEN_PALADIN_MOVES: FighterMoves = {
     [GrabAction.throwDown]: { contactFrame: 20, totalFrames: 46, effect: hit(7.332479953765869, "CHASE", 70) },
   },
 };
+
+const weaponNormals = { ...FORSAKEN_PALADIN_AUTHORING_MOVES.normals };
+for (const [style, pose] of [[AttackStyle.jab, "jab"], [AttackStyle.jab2, "jab2"], [AttackStyle.forwardTilt, "forwardTilt"], [AttackStyle.forwardTiltUp, "forwardTiltUp"], [AttackStyle.forwardTiltDown, "forwardTiltDown"], [AttackStyle.upTilt, "upTilt"], [AttackStyle.downTilt, "downTilt"], [AttackStyle.dashAttack, "dashAttack"], [AttackStyle.forwardSmash, "forwardSmash"], [AttackStyle.upSmash, "upSmash"], [AttackStyle.downSmash, "downSmash"], [AttackStyle.neutralAir, "neutralAir"], [AttackStyle.forwardAir, "forwardAir"], [AttackStyle.backAir, "backAir"], [AttackStyle.upAir, "upAir"], [AttackStyle.downAir, "downAir"]] as const) {
+  const move = weaponNormals[style];
+  if (move !== undefined) weaponNormals[style] = { ...move, regions: forsakenWeaponRegions(pose, move.regions) };
+}
+export const FORSAKEN_PALADIN_MOVES: FighterMoves = { ...FORSAKEN_PALADIN_AUTHORING_MOVES, normals: weaponNormals };

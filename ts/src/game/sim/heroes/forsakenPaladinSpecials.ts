@@ -7,9 +7,10 @@ import { f32 } from "wisp/src/sim/f32";
 import { HitElement } from "../codes";
 import { CHILL } from "../chill";
 import { HERO_REFERENCE_HEIGHT, heroRegion } from "../heroMoves";
-import { type AuthoredSpecial, type FighterSpecials, frames } from "../heroSpecials";
+import { type AuthoredSpecial, type FighterSpecials, type SpecialKit, frames } from "../heroSpecials";
 import { hurtPose } from "../hurtboxes";
 import { MEDIUM, capsule, hit, forsakenPaladinReach } from "./forsakenPaladinMoves";
+import { forsakenWeaponRegions } from "./forsakenPaladinWeaponGeometry";
 
 const H = HERO_REFERENCE_HEIGHT;
 const heights = (multiple: number): number => f32(H * f32(multiple));
@@ -85,7 +86,7 @@ const CONSECRATION: AuthoredSpecial = {
   }],
 };
 
-export const FORSAKEN_PALADIN_SPECIALS: FighterSpecials = {
+export const FORSAKEN_PALADIN_AUTHORING_SPECIALS: FighterSpecials = {
   neutral: withExKit({ name: "Cleansing Hammer", description: "Bonk upward with the hammer; its holy impact cleanses your poison and movement slow.", ground: cleansingHammer(undefined), air: cleansingHammer(18) }, { damage: 1.25 }),
   side: withExKit({ name: "Righteous Fury", description: "Charge hammer-first. A body hit briefly slows movement; a blocked charge leaves you exposed.", ground: RIGHTEOUS_FURY, air: RIGHTEOUS_FURY_AIR }, { damage: 1.25 }),
   up: withExKit({ name: "Ascension", description: "A rising hammer strike you steer, then a helpless fall.", ground: ascension(f32(2.9)) }, { travel: 1.25 }),
@@ -93,4 +94,19 @@ export const FORSAKEN_PALADIN_SPECIALS: FighterSpecials = {
     projectiles: CONSECRATION.projectiles?.map(shot => ({ model: shot.model, modelRadius: shot.modelRadius,
       spawnFrame: shot.spawnFrame, offsetX: 0.0, offsetZ: 0.0, velocityX: 0.0, velocityZ: -8.0,
       life: 24, radius: shot.radius, effect: shot.effect, reflectable: shot.reflectable, limit: shot.limit })) } }, { reach: 1.25 }),
+};
+
+const weaponForm = (form: AuthoredSpecial, pose: string): AuthoredSpecial => ({ ...form,
+  regions: forsakenWeaponRegions(pose, form.regions ?? []),
+  ex: form.ex === undefined ? undefined : { ...form.ex, regions: forsakenWeaponRegions(pose, form.ex.regions ?? []) },
+});
+const weaponKit = (special: SpecialKit, pose: string): SpecialKit => ({ ...special,
+  ground: weaponForm(special.ground, pose),
+  air: special.air === undefined ? undefined : weaponForm(special.air, `${pose}Air`),
+});
+export const FORSAKEN_PALADIN_SPECIALS: FighterSpecials = {
+  neutral: weaponKit(FORSAKEN_PALADIN_AUTHORING_SPECIALS.neutral, "neutralSpecial"),
+  side: weaponKit(FORSAKEN_PALADIN_AUTHORING_SPECIALS.side, "sideSpecial"),
+  up: weaponKit(FORSAKEN_PALADIN_AUTHORING_SPECIALS.up, "upSpecial"),
+  down: FORSAKEN_PALADIN_AUTHORING_SPECIALS.down,
 };
