@@ -61,7 +61,7 @@ export const DRAWN_REACH: readonly { readonly character: number; readonly style:
   { character: 7, style: 10, model: "Units\\Creeps\\HeroForsakenPaladin\\HeroForsakenPaladin.mdx", clip: 32, swing: 91.2, peakFrame: 10, firstActive: 10, lastActive: 12, forward: 133.1 },
   { character: 7, style: 7, model: "Units\\Creeps\\HeroForsakenPaladin\\HeroForsakenPaladin.mdx", clip: 33, swing: 84.7, peakFrame: 9, firstActive: 9, lastActive: 12, forward: 110.7 },
   { character: 7, style: 8, model: "Units\\Creeps\\HeroForsakenPaladin\\HeroForsakenPaladin.mdx", clip: 34, swing: 91.5, peakFrame: 8, firstActive: 8, lastActive: 10, forward: 139.6 },
-  { character: 7, style: 19, model: "Units\\Creeps\\HeroForsakenPaladin\\HeroForsakenPaladin.mdx", clip: 35, swing: 40.9, peakFrame: 11, firstActive: 11, lastActive: 13, forward: 118.8 },
+  { character: 7, style: 19, model: "Units\\Creeps\\HeroForsakenPaladin\\HeroForsakenPaladin.mdx", clip: 35, swing: 99.7, peakFrame: 11, firstActive: 11, lastActive: 13, forward: 140.9 },
   { character: 8, style: 0, model: "units\\undead\\HeroDreadLord\\HeroDreadLord.mdl", clip: 10, swing: 32.0, peakFrame: 3, firstActive: 3, lastActive: 5, forward: 93.6 },
   { character: 8, style: 20, model: "units\\undead\\HeroDreadLord\\HeroDreadLord.mdl", clip: 57, swing: 49.3, peakFrame: 3, firstActive: 3, lastActive: 4, forward: 99.3 },
   { character: 8, style: 21, model: "units\\undead\\HeroDreadLord\\HeroDreadLord.mdl", clip: 58, swing: 42.0, peakFrame: 5, firstActive: 5, lastActive: 7, forward: 86.1 },
