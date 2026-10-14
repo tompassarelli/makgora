@@ -7,7 +7,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { at } from "wisp/src/runtime/lookup";
 import { applyItemBuffFor } from "./itemBuffs";
 import { advanceHeroConditions, cleansePoisonAndSlow } from "./heroStatus";
-import { AttackStyle, ProjectileKind, SpecialAction } from "./codes";
+import { AttackStyle, Character, ProjectileKind, SpecialAction } from "./codes";
 import { mutableProjectile } from "./fighterProjectiles";
 import { canAttack, inGrabContext, isIntangible } from "./conditions";
 import { type Fighter, type Projectile, placedObject } from "./fighter";
@@ -470,6 +470,16 @@ export function landHeroSpecial(f: Fighter): boolean {
   const move = runningHeroSpecial(f);
   if (move?.landingLag === undefined) return false;
   const specials = f.tuning.specials;
+  if (f.character === Character.cairne && f.special.action === SpecialAction.heroNeutral
+    && f.special.form === SpecialForm.air && specials !== undefined
+    && f.special.frame < (move.projectiles?.[0]?.spawnFrame ?? 0)) {
+    const ground = specialForm(specials.neutral, SpecialForm.ground, f.special.ex);
+    f.special.form = SpecialForm.ground;
+    f.special.duration = ground.endFrame;
+    f.landing.lag = max(f.landing.lag, f.special.lockFrames);
+    applyWindows(f, ground, f.special.frame);
+    return true;
+  }
   if (f.special.action === SpecialAction.heroDown && specials !== undefined
     && (f.special.form === SpecialForm.ground || f.special.form === SpecialForm.air)) {
     const ground = specialForm(specials.down, SpecialForm.ground, f.special.ex);
