@@ -1,6 +1,6 @@
 import { f32 } from "wisp/src/sim/f32";
 
-import { STAGE_SEA_MODEL } from "../assets/terrainAssetInfo";
+import { STAGE_TOMB_SEA_MODEL } from "../assets/terrainAssetInfo";
 import { STAGE_SKY_MODELS } from "../assets/stageSkyInfo";
 import type { StageScenery } from "./stageScenery";
 
@@ -12,7 +12,7 @@ export const STRATHOLME_SCENERY: StageScenery = {
   farZ: 13000.0,
   sky: STAGE_SKY_MODELS[6] ?? "",
   fog: { start: 3300.0, end: 9500.0, red: 0.03125, green: 0.03125, blue: 0.0390625 },
-  floor: { model: STAGE_SEA_MODEL, z: -1300.0, color: [104, 51, 42] },
+  floor: { model: STAGE_TOMB_SEA_MODEL, z: -1300.0, color: [104, 51, 42] },
   pieces: [
     { model: "Doodads\\Cityscape\\Structures\\CityBuildingLarge_45_Ruined\\CityBuildingLarge_45_Ruined.mdx", x: -3900.0, y: 4000.0, z: -1300.0, scale: 2.8125, yaw: 15.0, matrixScale: [1.0, 1.0, 1.25] },
     { model: "Doodads\\Cityscape\\Structures\\CityBuildingSmall45_0_Ruined\\CityBuildingSmall45_0_Ruined.mdx", x: -3040.0, y: 4220.0, z: -1300.0, scale: 3.1875, yaw: 76.0, matrixScale: [1.0, 1.0, 1.25] },

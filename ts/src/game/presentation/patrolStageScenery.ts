@@ -1,7 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { STAGE_SKY_MODELS } from "../assets/stageSkyInfo";
 import type { StageScenery } from "./stageScenery";
-import { STAGE_SEA_MODEL } from "../assets/terrainAssetInfo";
+import { STAGE_TOMB_SEA_MODEL } from "../assets/terrainAssetInfo";
 
 const SPIRES = "Doodads\\Outland\\Rocks\\Outland_Spires\\Outland_Spires7.mdx";
 const GLACIER = "Doodads\\Icecrown\\Rocks\\Glacier\\Glacier0.mdx";
@@ -11,7 +11,7 @@ export const DUROTAR_SCENERY: StageScenery = {
   farZ: 13000.0,
   sky: STAGE_SKY_MODELS[3] ?? "",
   fog: { start: 5000.0, end: 11000.0, red: 0.75, green: 0.5, blue: 0.25 },
-  floor: { model: STAGE_SEA_MODEL, z: -1300.0, color: [168, 140, 120] },
+  floor: { model: STAGE_TOMB_SEA_MODEL, z: -1300.0, color: [168, 140, 120] },
   pieces: [
 
     { model: MOUND, x: -4000.0, y: 4500.0, z: -1608.0, scale: 12.0, yaw: 195.0, matrixScale: [2.5, 1.0, 1.75] },
@@ -35,7 +35,7 @@ export const NAXXRAMAS_SCENERY: StageScenery = {
   farZ: 20000.0,
   sky: STAGE_SKY_MODELS[4] ?? "",
   fog: { start: 3300.0, end: 19000.0, red: 0.125, green: 0.25, blue: 0.3125 },
-  floor: { model: STAGE_SEA_MODEL, z: -1300.0, color: [64, 104, 104] },
+  floor: { model: STAGE_TOMB_SEA_MODEL, z: -1300.0, color: [64, 104, 104] },
   pieces: [
     { model: "buildings\\undead\\Necropolis\\Necropolis.mdx", x: 1900.0, y: 4600.0, z: 250.0, scale: 2.0, yaw: 250.0 },
     { model: GLACIER, x: 1900.0, y: 4650.0, z: -1800.0, scale: 4.5, yaw: 180.0, matrixScale: [1.5, 1.0, 1.0] },
@@ -67,7 +67,7 @@ export const HELLFIRE_SCENERY: StageScenery = {
   farZ: 17000.0,
   sky: STAGE_SKY_MODELS[14] ?? "",
   fog: { start: 3300.0, end: 16000.0, red: 0.3125, green: 0.203125, blue: 0.171875 },
-  floor: { model: STAGE_SEA_MODEL, z: -1300.0, color: [88, 36, 28] },
+  floor: { model: STAGE_TOMB_SEA_MODEL, z: -1300.0, color: [88, 36, 28] },
   pieces: [
     { model: "buildings\\demon\\DemonGate\\DemonGate.mdx", x: -1850.0, y: 4500.0, z: -50.0, scale: 1.5, yaw: 280.0 },
     { model: MOUND, x: -1850.0, y: 4550.0, z: -1620.0, scale: 10.0, yaw: 185.0, matrixScale: [2.5, 1.0, 2.0], color: [150, 84, 104] },
