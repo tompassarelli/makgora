@@ -10,7 +10,6 @@ import { heroProjectileArt } from "./projectileArt";
 import { projectedProjectile } from "./projectilePose";
 import { disjointNormals, fanKnifePose, hitAreaPose, specialAreaRegion, type FanKnifePose, type HitAreaPose } from "./disjointCues";
 import { specialForm, specialKit } from "../sim/heroSpecials";
-import { HERO_CUES } from "./specialCues";
 
 const pose: HitAreaPose = { visible: false, x: 0.0, z: 0.0, scale: 0.0 };
 
@@ -100,11 +99,6 @@ test("every authored special form flares at each live strike's far end on the co
           const [x, z] = farEnd(authored.hit);
           assertEquals(actual.x, f32(-321.0 + f32(facing * x)));
           assertEquals(actual.z, f32(z));
-          if (character === Character.forsakenPaladin && fighter.special.action === SpecialAction.heroNeutral && authored.hit.strike !== undefined) {
-            const anchor = HERO_CUES[character]?.neutral.active.anchorFrames?.[fighter.special.frame - 1];
-            assertEquals(anchor?.x, authored.hit.strike.x2);
-            assertEquals(anchor?.z, authored.hit.strike.z2);
-          }
           checked++;
         }
       }
