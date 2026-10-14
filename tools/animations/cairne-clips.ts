@@ -201,6 +201,16 @@ for (const [ordinal,action] of [...actions,...damageActions].entries()) {
   const duration=(end-start)/1000;
   const victimContact=action.pose.startsWith("victim");
   const contact=action.pose.startsWith("throw")||victimContact||action.pose==="pummel"?`, contact: ${seconds(victimContact?0.5:action.contact/60)}`:"";
+  if(action.pose==="neutralSpecial"||action.pose==="neutralSpecialAir"){
+    const slam=source.Sequences[10]!,strike=slam.Interval[0]+600;
+    const retime=(frame:number)=>start+Math.round(frame<=strike?(frame-slam.Interval[0])*action.contact*1000/60/600:action.contact*1000/60+(frame-strike)*(end-start-action.contact*1000/60)/(slam.Interval[1]-strike));
+    tracks(model,(track,path)=>{
+      const donor=originals.get(path);if(!donor||onGlobalClock(donor))return;
+      track.Keys=track.Keys.filter(key=>key.Frame<start||key.Frame>end);
+      for(const key of donor.Keys.filter(key=>key.Frame>=slam.Interval[0]&&key.Frame<=slam.Interval[1]))track.Keys.push({...structuredClone(key),Frame:retime(key.Frame)});
+      track.Keys.sort((a,b)=>a.Frame-b.Frame);
+    });
+  }
   const binding=`{ index: ${index}, seconds: ${seconds(victimContact?1:duration)}, aligned: true${contact} }`;
   if(action.damage)damageBindings.push(`  ${binding},`);else bindings.push(`  ${action.pose}: ${binding},`);
   records.push({pose:name,index,frames:victimContact?60:action.frames,contact:victimContact?30:action.contact});
