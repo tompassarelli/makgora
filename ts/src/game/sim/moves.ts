@@ -326,7 +326,7 @@ const GRAB_HOLD_BASE_FRAMES = 90;
 
 export const GRAB_HOLD_MINIMUM_FRAMES = 60;
 
-export const GRAB_ESCAPE_FRAMES = 10;
+const GRAB_ESCAPE_FRAMES = 10;
 
 export const GRAB_RELEASE_STUN_FRAMES = 6;
 
