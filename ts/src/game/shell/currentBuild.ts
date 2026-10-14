@@ -22,7 +22,7 @@ export const INTEGRITY_BUILD: MapBuild = {
 export const PLAYABLE_BUILD: MapBuild = {
   id: "playable-0047",
   inputProfile: "keyboard-d2-r24",
-  input: { kind: "keyboard", pairedSends: false, delay: 2, rollback: 24 },
+  input: { kind: "keyboard", pairedSends: true, delay: 2, rollback: 24 },
   presentation: "pool-predicted",
   scenario: "normal",
   responseProbe: false,
