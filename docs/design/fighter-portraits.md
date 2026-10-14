@@ -178,3 +178,17 @@ The selection asset build is described in smashcraft:docs/build-inputs.md.
 Warcraft has no
 per-render Lua callback (smashcraft:docs/high-refresh.md), so hand and chip move
 together once per 60 Hz tick from one mouse sample.
+
+## Classic tile colour floor
+
+Provenance: Tom's 0.0.192 character-select finding #563 item 22, measured
+14 October 2026 against fighter-renders `0c7fa1e1bd36802077b565a94055923d729964f050d720ceb1da4a229fc4536e`.
+The neutral tile's foreground uses its matching P1 bust alpha mask to exclude
+the shared navy background. Mean HSV saturation and Rec. 709 p90 minus p10
+luma measure colour and contrast. A tile fails when both fall below 70% of
+the Classic roster median; naturally gray fighters pass through retained
+contrast. The washed-out Anub tile measured saturation 0.129 and contrast
+106.7 against floors 0.222 and 147.0. Removing its portrait-only 2.6 gamma
+lift restores saturation 0.251 and contrast 194.9 while its P1 bust remains
+at mean luma 108.9 with lit share 0.844. `portraitLight.ts` reports this floor
+with the existing light and placement checks.
