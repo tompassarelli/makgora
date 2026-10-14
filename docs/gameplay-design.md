@@ -628,8 +628,11 @@ platform, not from taps or timing.
   Across the 676 pairs of the 26 selectable fighters at #392's landing, with
   climbs ending aerials at contact, it strikes first in 304, level in 103 and
   later in 269 (60.2% no later; 71.9% before #392, when attacks hit through
-  the platform for their whole active frames). Its test requires the fighter
-  below to strike no later in at least 60% of pairs.
+  the platform for their whole active frames). Since up smash cancels jump
+  squat (#550 finding #18), an up air pressed in jump squat comes out with
+  the tilt modifier, and the measure includes that input: 409 of 676 no
+  later (307 first, 102 level, 267 later), as before #18. Its test requires
+  the fighter below to strike no later in at least 60% of pairs.
 - Presentation: the climb plays the fighter's ledge-climb clip, the drop and
   descent its ledge-hang clip, each stretched
   over the move (smashcraft:ts/src/game/presentation/fighterClips.ts).
