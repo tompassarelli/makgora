@@ -191,4 +191,6 @@ for (const [style, pose] of [[AttackStyle.jab, "jab"], [AttackStyle.jab2, "jab2"
   const move = weaponNormals[style];
   if (move !== undefined) weaponNormals[style] = { ...move, regions: forsakenWeaponRegions(pose, move.regions) };
 }
+weaponNormals[AttackStyle.forwardTiltUp] = weaponNormals[AttackStyle.forwardTilt];
+weaponNormals[AttackStyle.forwardTiltDown] = weaponNormals[AttackStyle.forwardTilt];
 export const FORSAKEN_PALADIN_MOVES: FighterMoves = { ...FORSAKEN_PALADIN_AUTHORING_MOVES, normals: weaponNormals };
