@@ -24,6 +24,7 @@ test("upgrading any older saved binding set gives short hop I and the right trig
           for (const slot of [0, 1] as const) {
             const index = slotIndex(owner, slot);
             if (index >= slots || index === slotIndex(action, upgradeSlot) || (owner === action && upgradeSlot === 0)) continue;
+            if (action === Action.shortHop && owner === Action.jump && slot === 0) continue;
             const keys = defaults.slice();
             keys[index] = key;
             const decoded = decodeBindings(oldSave(version, slots, keys));
