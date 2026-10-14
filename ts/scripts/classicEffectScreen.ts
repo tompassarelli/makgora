@@ -57,6 +57,7 @@ export const readScreenCaptures = Effect.fnUntraced(function*(path: string) {
           const imagePath = resolve(root, reference.file), bytes = yield* readBytes(imagePath);
           hashes.set(imagePath, sha256(bytes));
           const image = yield* Effect.try({ try: () => imagePath.endsWith(".png") ? decodePng(bytes) : decodePpm(bytes), catch: cause => failure(imagePath, cause) });
+          if (image === undefined) return yield* new ScreenEvidenceFailure({ problem: "capture image is not valid PNG or PPM" });
           const stamp = frameStamp(image);
           if (stamp?.script !== fixtureIndex + 1 || stamp.frame !== frame.frame || image.width !== saved.width || image.height !== saved.height) return yield* new ScreenEvidenceFailure({ problem: "pixels have no matching native held-frame stamp or resolution" });
           if (width > 0 && (width !== image.width || height !== image.height)) return yield* new ScreenEvidenceFailure({ problem: "sample camera resolution changed" });
