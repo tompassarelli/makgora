@@ -18,9 +18,6 @@ export interface PlatformPart {
 }
 
 const ICE_FLOE = "Doodads\\Northrend\\Water\\North_IceFloe3\\North_IceFloe3.mdx";
-const ICE_ROCK = "Doodads\\Icecrown\\Rocks\\Ice_Rock\\Ice_Rock0.mdx";
-const SARONITE_RUBBLE = "Doodads\\Icecrown\\Structures\\Icecrown_Rubble\\Icecrown_Rubble0.mdx";
-
 const part = (model: string, x: number, y: number, z: number, scale: readonly [number, number, number], yaw = 0.0): PlatformPart => ({ model, x, y, z, scale, yaw });
 
 
@@ -32,9 +29,9 @@ const part = (model: string, x: number, y: number, z: number, scale: readonly [n
 const FLOE: readonly [number, number, number] = [f32(1.43), 0.5, f32(0.19)];
 const FLOE_Z = f32(-8.7);
 const FROZEN_THRONE_PLATFORMS: readonly (readonly PlatformPart[])[] = [
-  [part(ICE_FLOE, f32(-1.5), 0, FLOE_Z, FLOE), part(SARONITE_RUBBLE, -40, 10, -6, [f32(2.2), f32(0.6), -f32(0.22)]), part(ICE_ROCK, 80, 0, -6, [1.0, 0.5, -f32(0.15)], 140)],
-  [part(ICE_FLOE, f32(1.5), 0, FLOE_Z, FLOE, 180), part(ICE_ROCK, -60, 0, -6, [f32(1.4), f32(0.6), -f32(0.15)]), part(SARONITE_RUBBLE, 70, 10, -6, [f32(1.6), f32(0.6), -f32(0.22)], 200)],
-  [part(ICE_FLOE, f32(-1.5), 0, FLOE_Z, FLOE), part(SARONITE_RUBBLE, 0, 10, -8, [2.0, f32(0.6), -f32(1.1)], 20), part(ICE_ROCK, -90, 0, -16, [f32(0.9), 0.5, -f32(0.9)], 260)],
+  [part(ICE_FLOE, f32(-1.5), 0, FLOE_Z, FLOE)],
+  [part(ICE_FLOE, f32(1.5), 0, FLOE_Z, FLOE, 180)],
+  [part(ICE_FLOE, f32(-1.5), 0, FLOE_Z, FLOE)],
 ];
 
 

@@ -28,12 +28,13 @@ space a reference fighter (132 units) stands in above another deck (#322).
 
 Frozen Throne is the first stage built this way (Icecrown ice over saronite,
 [stage-art](stage-art.md) rule 10): each platform is an alpha-cut Northrend
-ice floe, its top on the walking line, over Icecrown rock and saronite rubble
-hung upside down beneath it. All three use North_IceFloe3 at yaw 0 or 180,
-the only floe and turn that spans the deck in both classic and HD, squashed
-to 0.19 of its height; the dressing differs per platform. Under the side
-decks everything stays within 25 units of the walking line, above a standing
-fighter's head. Imports: none.
+ice floe, its top on the walking line, with nothing hung beneath it: the
+Icecrown rock and saronite rubble #290 hung under each floe read as grey rock
+in Classic and were removed (Tom's 0.0.192 playtest, finding #9 in #563).
+All three use North_IceFloe3 at yaw 0 or 180, the only floe and turn that
+spans the deck in both classic and HD, squashed to 0.19 of its height. Under
+the side decks everything stays within 25 units of the walking line, above a
+standing fighter's head. Imports: none.
 
 ## Techniques
 

@@ -3,6 +3,8 @@ import { STAGE_CATALOG } from "../menu/stageCatalog";
 import { STAGE_LAVA_MODEL, STAGE_SEA_MODEL, STAGE_TOMB_SEA_MODEL } from "../assets/terrainAssetInfo";
 import { stageScenery, terrainPieces } from "./stageScenery";
 import { fogProblems, mirrorProblems } from "./stageRules";
+import { platformParts } from "./stockPlatforms";
+import { surfaceCount } from "../sim/stage";
 
 
 
@@ -41,6 +43,12 @@ test("stage scenery shows no creatures [k3 measure docs/design/stage-art.md]", (
       const creature = model.toLowerCase().startsWith("units\\") || FIGURE_WORDS.some((word) => model.toLowerCase().includes(word));
       assertEquals(creature, false, `${name}: ${model} is a creature`);
     }
+  }
+});
+
+test("every stock-built platform draws only its walking piece, with no rock or rubble hung beneath it [k2 property]", () => {
+  for (const { id, name } of STAGE_CATALOG) {
+    for (let index = 0; index < surfaceCount(id); index++) assertEquals(platformParts(id, index).length <= 1, true, `${name}: platform ${index} hangs ${platformParts(id, index).length - 1} parts beneath its walking piece`);
   }
 });
 
