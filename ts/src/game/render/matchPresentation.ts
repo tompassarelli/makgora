@@ -55,7 +55,10 @@ const createDropSounds = (): sound[] => [MatchCue.itemSpawn, MatchCue.meterReady
 interface VictoryPose {
   readonly character: Character;
   model: effect | undefined;
+  modelPath: string | undefined;
   readonly winnerClip: FighterOriginalClip;
+  readonly repeatVictory: boolean;
+  readonly heldClip: FighterOriginalClip;
   readonly idleClip: FighterOriginalClip;
 }
 
@@ -295,7 +298,9 @@ export class MatchPresentation {
       const winnerClip = winnerIndex === undefined ? undefined : originalClip(character, winnerIndex);
       const idleClip = idleIndex === undefined ? undefined : originalClip(character, idleIndex);
       if (winnerClip === undefined || idleClip === undefined) continue;
-      this.poses[slot] = { character, model: undefined, winnerClip, idleClip };
+      const readyIndex = originalClipNamed(character, "stand ready");
+      const heldClip = readyIndex === undefined ? idleClip : originalClip(character, readyIndex) ?? idleClip;
+      this.poses[slot] = { character, model: undefined, modelPath: undefined, winnerClip, repeatVictory: victoryAnimation(character).includes("victory"), heldClip, idleClip };
     }
   }
 
@@ -306,9 +311,16 @@ export class MatchPresentation {
       const pose = this.poses[row.slot];
       if (pose === undefined) continue;
       const winning = row.slot === view.winnerSlot;
-      const clip = winning ? pose.winnerClip : pose.idleClip;
+      let seconds = I2R(this.resultFrames) / 60.0;
+      const holding = winning && !pose.repeatVictory && seconds >= pose.winnerClip.endSeconds - pose.winnerClip.startSeconds;
+      const clip = winning ? holding ? pose.heldClip : pose.winnerClip : pose.idleClip;
+      if (pose.model !== undefined && pose.modelPath !== clip.modelPath) {
+        DestroyEffect(pose.model);
+        pose.model = undefined;
+      }
       if (pose.model === undefined) {
         pose.model = AddSpecialEffect(clip.modelPath, this.origin.x, this.origin.y);
+        pose.modelPath = clip.modelPath;
         hideEffect(pose.model, this.origin);
         BlzSetSpecialEffectColorByPlayer(pose.model, Player(row.slot));
         BlzSetSpecialEffectAnimationBlendTime(pose.model, 0.0);
@@ -321,12 +333,9 @@ export class MatchPresentation {
       BlzSetSpecialEffectYaw(model, FACING_CAMERA);
       BlzSetSpecialEffectScale(model, characterModelScale(pose.character));
       const duration = clip.endSeconds - clip.startSeconds;
-      const start = winning ? duration / 4.0 : 0.0;
-      const cycle = winning ? duration / 2.0 : duration;
-      let seconds = I2R(this.resultFrames) / 60.0;
-      if (cycle <= 0.0) seconds = 0.0;
-      else seconds -= I2R(R2I(seconds / cycle)) * cycle;
-      BlzSetSpecialEffectTime(model, (clip.timeline === true ? clip.startSeconds : 0.0) + start + seconds);
+      if (holding || duration <= 0.0) seconds = 0.0;
+      else if (!winning || pose.repeatVictory) seconds -= I2R(R2I(seconds / duration)) * duration;
+      BlzSetSpecialEffectTime(model, (clip.timeline === true ? clip.startSeconds : 0.0) + seconds);
     }
   }
 
