@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { Console, Effect, Schema } from "effect";
 import { BunRuntime } from "@effect/platform-bun";
-import { join } from "node:path";
+import { dirname, join, relative } from "node:path";
 import { type model as mdx } from "wisp/vendor/war3-model.mjs";
 import { parseModelMDX } from "wisp/scripts/wisp/models";
 import { selectSequence } from "wisp/src/headless/animation";
@@ -35,6 +35,11 @@ export interface EffectUse {
   readonly timeScale: number;
   readonly travels: boolean;
   readonly anchored: "fighter" | "projectile";
+  readonly scale?: number | undefined;
+  readonly scaleEnd?: number | undefined;
+  readonly alpha?: number | undefined;
+  readonly lifetime?: number | undefined;
+  readonly anchor?: string | undefined;
   readonly playbackUnknown?: string;
 }
 
@@ -69,8 +74,10 @@ export function simultaneousPositive(model: mdx.Model, tracks: readonly Track[],
   return samples.some((frame) => tracks.every((track, index) => at(track, index, frame) > 0));
 }
 
-export function effectVisibility(model: mdx.Model, use: Pick<EffectUse, "sequence" | "seconds" | "timeScale"> & Partial<Pick<EffectUse, "travels" | "playbackUnknown">>, textureResolves: (path: string) => boolean | undefined): EffectVerdict {
+export function effectVisibility(model: mdx.Model, use: Pick<EffectUse, "sequence" | "seconds" | "timeScale"> & Partial<Pick<EffectUse, "travels" | "playbackUnknown" | "scale" | "scaleEnd" | "alpha" | "lifetime">>, textureResolves: (path: string) => boolean | undefined): EffectVerdict {
+  if ((use.alpha ?? 255) <= 0 || (use.lifetime ?? Infinity) <= 0 || use.scale === 0 && (use.scaleEnd ?? 0) === 0) return verdict("invisible", "presentation scale, alpha or lifetime prevents drawing");
   if (use.playbackUnknown !== undefined) return verdict("unknown", use.playbackUnknown);
+  if (use.scaleEnd !== undefined && use.scaleEnd !== use.scale) return verdict("unknown", "per-frame scale transition coverage is unmodeled");
   const particleCount = model.ParticleEmitters2.length + model.RibbonEmitters.length + model.ParticleEmitters.length + (model.ParticleEmitterPopcorns?.length ?? 0);
   if (use.travels && use.timeScale === 0 && particleCount > 0) return verdict("unknown", "travelling particle/ribbon effect is frozen; a visible geoset does not establish its moving spell art (#484)");
   const sequences = model.Sequences.map((sequence) => ({ name: sequence.Name, start: sequence.Interval[0] ?? 0, end: sequence.Interval[1] ?? 0, looping: !sequence.NonLooping, rarity: sequence.Rarity }));
@@ -81,7 +88,7 @@ export function effectVisibility(model: mdx.Model, use: Pick<EffectUse, "sequenc
   const windows = picked.length === 0 ? [{ sequence: [0, 0] as Window, window: [0, 0] as Window, name: "none" }] : picked.map((index) => {
     const { start, end, name } = sequences[index] ?? { start: 0, end: 0, name: "none" };
     const at = Math.min(end, start + use.seconds * 1000);
-    return { sequence: [start, end] as Window, window: [at, use.timeScale > 0 ? end : at] as Window, name };
+    return { sequence: [start, end] as Window, window: [at, use.timeScale > 0 ? Math.min(end, at + (use.lifetime ?? Infinity) * use.timeScale * 1000) : at] as Window, name };
   });
   const texture = (id: number | undefined, replaceable?: number): boolean | undefined => {
     if ((replaceable ?? 0) > 0) return undefined;
@@ -90,6 +97,12 @@ export function effectVisibility(model: mdx.Model, use: Pick<EffectUse, "sequenc
     return textureResolves(image.Image);
   };
   const unknown: string[] = [];
+  const supportedNode = (node: mdx.Model["Nodes"][number] | undefined, seen = new Set<number>()): boolean => {
+    if (node === undefined || seen.has(node.ObjectId)) return false;
+    seen.add(node.ObjectId);
+    if (node.Translation?.Keys.length || node.Rotation?.Keys.length || node.Scaling?.Keys.length || (node.Flags & 255) !== 0) return false;
+    return node.Parent == null || node.Parent === -1 || node.Parent === 0xffffffff || supportedNode(model.Nodes[node.Parent], seen);
+  };
   const draws = (tracks: readonly Track[], fallbacks: readonly number[], sequence: Window, window: Window, resolved: boolean | undefined, label: string) => {
     const positive = simultaneousPositive(model, tracks, sequence, window, fallbacks);
     if (positive === undefined) unknown.push(`${label}: global or nonlinear track is unverified`);
@@ -99,10 +112,12 @@ export function effectVisibility(model: mdx.Model, use: Pick<EffectUse, "sequenc
   for (const { sequence, window, name } of windows) {
     if (use.timeScale > 0) {
       for (const emitter of model.ParticleEmitters2) {
+        if (!supportedNode(emitter)) { unknown.push(`emitter ${emitter.Name}: node transforms are unverified`); continue; }
         const shows = Math.max(0, ...(emitter.Alpha ?? [])) > 0 && Math.max(0, ...(emitter.ParticleScaling ?? [])) > 0 && (emitter.LifeSpan ?? 0) > 0;
         if (shows && draws([emitter.Visibility, emitter.EmissionRate], [1, 0], sequence, window, texture(emitter.TextureID, emitter.ReplaceableId), `emitter ${emitter.Name}`)) return verdict("visible", `MODEL-DATA: emitter ${emitter.Name} emits in ${name}`);
       }
       for (const emitter of model.RibbonEmitters) {
+        if (!supportedNode(emitter)) { unknown.push(`ribbon ${emitter.Name}: node transforms are unverified`); continue; }
         const material = emitter.MaterialID === undefined ? undefined : model.Materials[emitter.MaterialID];
         for (const layer of material?.Layers ?? []) if (draws([emitter.Visibility, emitter.EmissionRate, emitter.Alpha, layer.Alpha], [1, 0, 1, 1], sequence, window, texture(typeof layer.TextureID === "number" ? layer.TextureID : undefined), `ribbon ${emitter.Name}`)) return verdict("visible", `MODEL-DATA: ribbon ${emitter.Name} emits in ${name}`);
       }
@@ -110,6 +125,20 @@ export function effectVisibility(model: mdx.Model, use: Pick<EffectUse, "sequenc
     }
     for (const [index, geoset] of model.Geosets.entries()) {
       if (geoset.Faces.length < 3) continue;
+      if ((geoset.SkinWeights?.length ?? 0) > 0 || (geoset.Groups ?? []).some((group) => group.some((id) => !supportedNode(model.Nodes[id])))) { unknown.push(`geoset ${index}: skinning or node transforms are unverified`); continue; }
+      let area = false;
+      for (let face = 0; face + 2 < geoset.Faces.length; face += 3) {
+        const vertices = [0, 1, 2].map((offset) => {
+          const vertex = geoset.Faces[face + offset];
+          return vertex === undefined ? [] : Array.from(geoset.Vertices.slice(vertex * 3, vertex * 3 + 3));
+        });
+        if (vertices.some((vertex) => vertex.length !== 3 || vertex.some((value) => !Number.isFinite(value)))) { unknown.push(`geoset ${index}: invalid triangle vertices`); continue; }
+        const [a, b, c] = vertices;
+        const ab = [0, 1, 2].map((axis) => (b?.[axis] ?? 0) - (a?.[axis] ?? 0));
+        const ac = [0, 1, 2].map((axis) => (c?.[axis] ?? 0) - (a?.[axis] ?? 0));
+        area ||= [0, 1, 2].some((axis) => (ab[(axis + 1) % 3] ?? 0) * (ac[(axis + 2) % 3] ?? 0) - (ab[(axis + 2) % 3] ?? 0) * (ac[(axis + 1) % 3] ?? 0) !== 0);
+      }
+      if (!area) continue;
       const anim = model.GeosetAnims.find((entry) => entry.GeosetId === index);
       const material = model.Materials[geoset.MaterialID];
       for (const layer of material?.Layers ?? []) if (draws([anim?.Alpha, layer.Alpha], [1, 1], sequence, window, texture(typeof layer.TextureID === "number" ? layer.TextureID : undefined), `geoset ${index}`)) return verdict("visible", `MODEL-DATA: geoset ${index} draws in ${name}`);
@@ -122,7 +151,7 @@ const slotMove = (slot: string) => `${slot}-special`;
 
 function cueUse(fighter: string, move: string, kind: EffectUse["kind"], cue: Cue): EffectUse {
   const popcorn = kind !== "contact accent" && DEFINITIVE_CUE_EMITTERS[cue.model] === true;
-  return { fighter, move, kind, model: cue.model, sequence: popcorn && cue.birth !== undefined ? "birth" : cue.sequence, seconds: popcorn && cue.birth !== undefined ? 0 : cue.seconds ?? 0, timeScale: popcorn ? 1 : cue.timeScale ?? (kind === "contact accent" ? 0 : 1), travels: false, anchored: "fighter", ...(popcorn ? { playbackUnknown: "confirmed emitter births are hidden by predicted cue phase; active-window coverage is unverified (#365/#496)" } : {}) };
+  return { fighter, move, kind, model: cue.model, scale: cue.scale, scaleEnd: popcorn ? undefined : cue.scaleEnd, alpha: popcorn || kind === "contact accent" ? 255 : cue.alpha ?? 255, lifetime: popcorn ? 1 : undefined, anchor: cue.anchor, sequence: popcorn && cue.birth !== undefined ? "birth" : cue.sequence, seconds: popcorn && cue.birth !== undefined ? 0 : cue.seconds ?? 0, timeScale: popcorn ? 1 : cue.timeScale ?? (kind === "contact accent" ? 0 : 1), travels: false, anchored: "fighter", ...(popcorn ? { playbackUnknown: "confirmed emitter births are hidden by predicted cue phase; active-window coverage is unverified (#365/#496)" } : {}) };
 }
 
 function projectileUse(character: Character, fighter: string, move: string, spec: SpecialProjectile): EffectUse | undefined {
@@ -132,10 +161,11 @@ function projectileUse(character: Character, fighter: string, move: string, spec
   const cue = PROJECTILE_DRAW_CUES[model];
   const travels = spec.velocityX !== 0 || spec.velocityZ !== 0;
   const birthNamed = ["FreezingBreathMissile", "WaterElementalMissile", "FrostWyrmMissile"].some((name) => model.includes(name));
-  const base = { fighter, move, kind: "projectile" as const, model, travels, anchored: "projectile" as const };
+  const base = { fighter, move, kind: "projectile" as const, model, travels, anchored: "projectile" as const, scale: cue?.scale ?? 1, lifetime: spec.life / 60, anchor: "projectile" };
   if (character === Character.lichKing && spec.pool !== undefined) return { ...base, sequence: "stand", seconds: 0, timeScale: 1, playbackUnknown: "Defile per-frame age seeking and armed visibility is unmodeled" };
   if (character === Character.lichKing && model.includes("ImpaleHitTarget")) return { ...base, sequence: "birth", seconds: 0.3, timeScale: 0 };
   if (character === Character.lichKing && model.includes("AnimateDeadTarget")) return { ...base, sequence: "birth", seconds: 0, timeScale: 1, playbackUnknown: "Val'kyr tell per-frame lifetime seeking is unmodeled" };
+  if (spec.modelRadius !== undefined) return { ...base, sequence: draw?.sequence, seconds: draw?.seconds ?? 0, timeScale: draw?.seconds === undefined ? 1 : 0, playbackUnknown: "per-frame projectile radius scale coverage is unmodeled" };
   if (draw?.seconds !== undefined) return { ...base, sequence: draw.sequence, seconds: draw.seconds, timeScale: 0 };
   if (cue?.birth !== undefined) return { ...base, sequence: "birth", seconds: 0, timeScale: 1 };
   const sequence = draw?.sequence ?? (birthNamed ? "birth" : "stand");
@@ -251,11 +281,31 @@ export function classicReader(stock: (path: string) => Promise<Uint8Array | unde
   return async (path) => (await stock(path)) ?? (/^war3mapImported[\\/]/i.test(path) ? (render ??= headlessRender()).readAsset(path, "classic") : undefined);
 }
 
-export const EFFECT_PLAYBACK_INPUTS = ["ts/scripts/wisp/effectVisibility.ts", "ts/scripts/cueModels.ts", "ts/scripts/wisp/cueModels.ts", "ts/scripts/prePush.ts", "ts/src/game/render/specialCueEffects.ts", "ts/src/game/render/projectilePresentation.ts", "ts/src/game/render/hitAreaEffects.ts", "ts/src/game/render/specialEffects.ts", "ts/src/game/render/combatEffects.ts", "ts/src/game/render/placedObjectEffects.ts", "ts/src/game/render/summonPresentation.ts", "build-inputs/"];
+export const EFFECT_PLAYBACK_INPUTS = ["ts/scripts/wisp/effectVisibility.ts", "ts/scripts/cueModels.ts", "ts/scripts/wisp/cueModels.ts", "ts/scripts/prePush.ts", "ts/src/platform/shell/view.ts", "ts/src/game/presentation/specialCues.ts", "ts/src/game/presentation/attackCues.ts", "ts/src/game/presentation/projectileArt.ts", "ts/src/game/presentation/projectilePose.ts", "ts/wisp.lock", "ts/bun.lock", "ts/package.json", "typescript-toolchain.lock", "ts/src/game/render/specialCueEffects.ts", "ts/src/game/render/projectilePresentation.ts", "ts/src/game/render/hitAreaEffects.ts", "ts/src/game/render/specialEffects.ts", "ts/src/game/render/combatEffects.ts", "ts/src/game/render/placedObjectEffects.ts", "ts/src/game/render/summonPresentation.ts", "build-inputs/"];
+export function effectPlaybackInputs(root = join(import.meta.dir, "../../..")): string[] {
+  const transpiler = new Bun.Transpiler({ loader: "ts" });
+  const seen = new Set<string>(EFFECT_PLAYBACK_INPUTS);
+  const visit = (path: string) => {
+    const file = join(root, path);
+    if (!existsSync(file) || !/\.tsx?$/.test(path)) return;
+    for (const entry of transpiler.scanImports(readFileSync(file, "utf8"))) {
+      if (!entry.path.startsWith(".")) continue;
+      const base = join(dirname(file), entry.path);
+      const found = [base, `${base}.ts`, `${base}.tsx`, join(base, "index.ts")].find((candidate) => existsSync(candidate) && /\.tsx?$/.test(candidate));
+      if (found === undefined) continue;
+      const input = relative(root, found);
+      if (seen.has(input)) continue;
+      seen.add(input);
+      visit(input);
+    }
+  };
+  for (const path of EFFECT_PLAYBACK_INPUTS) visit(path);
+  return [...seen].sort();
+}
 export const effectUseDigest = (use: EffectUse) => createHash("sha256").update(JSON.stringify(use)).digest("hex");
 export function effectSourceDigest(root = join(import.meta.dir, "../../..")): string {
   const hash = createHash("sha256").update(JSON.stringify(effectUses()));
-  for (const path of EFFECT_PLAYBACK_INPUTS) if (existsSync(join(root, path))) hash.update(path).update(path.endsWith("/") ? JSON.stringify(readPins(join(root, path))) : readFileSync(join(root, path)));
+  for (const path of effectPlaybackInputs(root)) if (existsSync(join(root, path))) hash.update(path).update(path.endsWith("/") ? JSON.stringify(readPins(join(root, path))) : readFileSync(join(root, path)));
   return hash.digest("hex");
 }
 
