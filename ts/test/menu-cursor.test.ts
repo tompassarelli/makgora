@@ -22,16 +22,31 @@ interface Watch {
   warps: number;
   hand: unknown;
   handShown: boolean;
+  stageDialogs: { frame: unknown; events: unknown[] }[];
 }
 
 function watch(client: HeadlessClient): Watch {
-  const seen: Watch = { cursor: [], warps: 0, hand: undefined, handShown: false };
+  const seen: Watch = { cursor: [], warps: 0, hand: undefined, handShown: false, stageDialogs: [] };
   const { natives } = client;
+  const stageParents = new Set<unknown>();
   const create = natives.BlzCreateFrameByType as Native;
   natives.BlzCreateFrameByType = (...args: unknown[]) => {
     const frame = create(...args);
     if (args[1] === `MeleeHand${client.slot}`) seen.hand = frame;
+    if (args[1] === "MeleeStageRoot" || args[1] === "MeleeStagePoolRoot") stageParents.add(frame);
     return frame;
+  };
+  const dialog = natives.BlzCreateFrame as Native;
+  natives.BlzCreateFrame = (...args: unknown[]) => {
+    const frame = dialog(...args);
+    if (args[0] === "ScriptDialogButton" && stageParents.has(args[1])) seen.stageDialogs.push({ frame, events: [] });
+    return frame;
+  };
+  const register = natives.BlzTriggerRegisterFrameEvent as Native;
+  natives.BlzTriggerRegisterFrameEvent = (...args: unknown[]) => {
+    const button = seen.stageDialogs.find(button => button.frame === args[1]);
+    if (button !== undefined) button.events.push(args[2]);
+    return register(...args);
   };
   const visible = natives.BlzFrameSetVisible as Native | undefined;
   natives.BlzFrameSetVisible = (frame: unknown, shown: boolean) => {
@@ -112,7 +127,7 @@ test("fighter select shows Warcraft's own cursor at rest and hides it only while
   for (const client of clients.clients) expect(client.errors).toEqual([]);
 });
 
-test("entering stage select neither toggles the cursor nor moves a pointer already inside Start, and moves a pointer outside it once [k1 scenario]", () => {
+test("entering stage select avoids cursor-displacing dialog hover events and cursor toggles, leaves a pointer inside Start, and moves one outside it once [k1 scenario]", () => {
   const { clients, watches, phases, point } = menu();
   const centre = { x: START_BUTTON.x + START_BUTTON.width / 2, y: START_BUTTON.y - START_BUTTON.height / 2 };
   for (const slot of [0, 1]) clients.press(slot, Key.r);
@@ -123,7 +138,9 @@ test("entering stage select neither toggles the cursor nor moves a pointer alrea
   clients.press(0, Key.y);
   clients.frames(30);
   expect(phases()).toEqual([Phase.stageMenu, Phase.stageMenu]);
-  for (const seen of watches) {
+  for (const [index, seen] of watches.entries()) {
+    expect(seen.stageDialogs.length).toBeGreaterThan(0);
+    for (const dialog of seen.stageDialogs) expect(dialog.events).toEqual([clients.clients[index]?.natives.FRAMEEVENT_CONTROL_CLICK]);
     expect(seen.cursor.filter(enabled => !enabled)).toEqual([]);
     expect(seen.cursor.length).toBeLessThanOrEqual(1);
     expect(seen.warps).toBe(1);

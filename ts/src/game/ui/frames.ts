@@ -125,11 +125,14 @@ export class ButtonClicks<T> {
     });
   }
 
-  add(frame: framehandle, target: T, text?: string): framehandle {
+  add(frame: framehandle, target: T, text?: string, hover: "events" | "native" = "events"): framehandle {
     if (text !== undefined) setFrameText(frame, text);
     BlzTriggerRegisterFrameEvent(this.trigger, frame, FRAMEEVENT_CONTROL_CLICK);
-    BlzTriggerRegisterFrameEvent(this.trigger, frame, FRAMEEVENT_MOUSE_ENTER);
-    BlzTriggerRegisterFrameEvent(this.trigger, frame, FRAMEEVENT_MOUSE_LEAVE);
+    // Warcraft dialog-button hover events displace the cursor and loop; use the built-in hover on those frames.
+    if (hover === "events") {
+      BlzTriggerRegisterFrameEvent(this.trigger, frame, FRAMEEVENT_MOUSE_ENTER);
+      BlzTriggerRegisterFrameEvent(this.trigger, frame, FRAMEEVENT_MOUSE_LEAVE);
+    }
     this.buttons.push({ id: GetHandleId(frame), frame, target });
     return frame;
   }
