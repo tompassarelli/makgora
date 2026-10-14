@@ -507,6 +507,12 @@ function attackClip(f: Readonly<Fighter>): HeroClip | undefined {
 }
 
 
+export function selectScriptedAttackClip(pose: FighterPose, f: Readonly<Fighter>): void {
+  selectAttackClip(pose, f);
+  pose.clipTime = f32(pose.clipTime - f32(pose.rate * FRAME_SECONDS));
+}
+
+
 function selectAttackClip(pose: FighterPose, f: Readonly<Fighter>): void {
   const { style } = f.attack;
   if (f.character === Character.demonHunter) pose.animation = "";
