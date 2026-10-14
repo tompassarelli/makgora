@@ -24,6 +24,8 @@ import { startFighterSpecial } from "../game/sim/specials";
 import { isAerialAttack } from "../game/sim/moves";
 import { ROSTER_MANA } from "../game/sim/mana";
 import { beginAttack } from "../game/sim/transitions";
+import { selectScriptedAttackClip } from "../game/presentation/fighterPose";
+import { at } from "wisp/src/runtime/lookup";
 
 interface Pad {
   buttons: number;
@@ -246,6 +248,7 @@ export function captureNativeDriverInputs(s: ShellState): void {
         if (style === AttackStyle.getupAttack || style === AttackStyle.ledgeAttack) beginAttack(fighter, style, false);
         else beginFighterAttack(s.world, edge.slot, style, false);
         if (fighter.attack.style !== style) throw new Error("native driver: normal did not start");
+        selectScriptedAttackClip(at(s.runtime.poses, edge.slot), fighter);
       } else if (kind === "special" || kind === "ultimate") {
         const input = neutralControls();
         input.specialPressed = true;
