@@ -105,7 +105,7 @@ for (const [pose, frames, contact, gesture] of extra) {
   const throwCode = ({pummel:GrabAction.pummel,throwForward:GrabAction.throwForward,throwBack:GrabAction.throwBack,throwUp:GrabAction.throwUp,throwDown:GrabAction.throwDown} as Partial<Record<HeroPose,GrabAction>>)[pose];
   const thrown = throwCode === undefined ? undefined : FORSAKEN_PALADIN_MOVES.throws[throwCode];
   const move = pose === "grab" ? FORSAKEN_PALADIN_MOVES.normals[AttackStyle.grab] : undefined;
-  actions.push({pose,frames:thrown?.totalFrames ?? move?.totalFrames ?? frames,contact:thrown?.contactFrame ?? move?.startupFrames ?? contact,gesture,
+  actions.push({pose,frames:thrown?.totalFrames ?? move?.totalFrames ?? frames,contact:thrown?.contactFrame ?? (move === undefined ? contact : move.startupFrames - 1),gesture,
     phases:pose==="getUpAttack"?[{frame:16,gesture:reach,target:[125,45]},{frame:17,gesture:high,target:[0,180]},{frame:18,gesture:back,target:[-125,45]}]:undefined,
     first: pose.startsWith("victim") ? captive : pose.startsWith("throw") || pose === "pummel" ? held : pose === "getUp" || pose === "getUpAttack" ? {...brace,lean:85} : undefined,
     hold:["crouch","shield","smashCharge","grabHold","grabbed","ledgeHang"].includes(pose),
@@ -231,6 +231,21 @@ for (const [ordinal,action] of [...actions,...damageActions].entries()) {
       const key={Frame,Vector,...rootTrack.LineType>1?{InTan:new Float32Array(3),OutTan:new Float32Array(3)}:{}};
       const previous=rootTrack.Keys.find(k=>k.Frame===Frame);if(previous)Object.assign(previous,key);else rootTrack.Keys.push(key);}
     rootTrack.Keys.sort((a,b)=>a.Frame-b.Frame);}
+  if (action.pose === "grabbed") tracks(model, (track, path) => {
+    const donor = originals.get(path); if (donor === undefined || onGlobalClock(donor)) return;
+    const captiveKey = replacing ? donor.Keys.find(key => key.Frame >= start && key.Frame <= end) : track.Keys.find(key => key.Frame === start);
+    if (captiveKey === undefined) return;
+    const idle = donor.Keys.find(key => key.Frame >= stand.Interval[0] && key.Frame <= stand.Interval[1])?.Vector ?? new Float32Array(captiveKey.Vector.length);
+    const rotation = path.endsWith(".Rotation");
+    track.Keys = track.Keys.filter(key => key.Frame < start || key.Frame > end);
+    for (const frame of [0, 1, 2, 3, 4, action.frames]) {
+      const t = Math.min(1, frame / 4), Vector = rotation ? Float32Array.from(quat.slerp(quat.create(), Float32Array.from(idle), Float32Array.from(captiveKey.Vector), t)) : Float32Array.from(idle, (value, axis) => value + (captiveKey.Vector[axis]! - value) * t);
+      if (frame >= 4) Vector.set(captiveKey.Vector);
+      const tangent = () => rotation || track.LineType === mdx.LineType.Bezier ? Vector.slice() : new Float32Array(Vector.length);
+      track.Keys.push({...captiveKey, Frame:start + (frame === 4 ? Math.floor(frame * 1000 / 60) : Math.round(frame * 1000 / 60)), Vector, ...captiveKey.InTan ? {InTan:tangent(), OutTan:tangent()} : {}});
+    }
+    track.Keys.sort((a,b) => a.Frame - b.Frame);
+  });
   const duration=(end-start)/1000;
   const victimContact=action.pose.startsWith("victim");
   const contact=action.pose.startsWith("throw")||victimContact||action.pose==="pummel"?`, contact: ${seconds(victimContact?0.5:action.contact/60)}`:"";

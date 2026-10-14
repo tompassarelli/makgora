@@ -8,7 +8,7 @@ import { generateHdBody, parseHdBody } from "./hd-retarget";
 import { tracks, onGlobalClock, ensure } from "./original-clips";
 import { renumberNodes } from "../../ts/scripts/clipNodes";
 import { DrawnModel, sheet, type PoseFrame } from "../../ts/scripts/wisp/hurtboxView";
-import { AttackStyle, AttackPhase } from "../../ts/src/game/sim/codes";
+import { AttackStyle, AttackPhase, GrabAction } from "../../ts/src/game/sim/codes";
 import { FORSAKEN_PALADIN_AUTHORING_MOVES as FORSAKEN_PALADIN_MOVES } from "../../ts/src/game/sim/heroes/forsakenPaladinMoves";
 import { FORSAKEN_PALADIN_AUTHORING_SPECIALS as FORSAKEN_PALADIN_SPECIALS } from "../../ts/src/game/sim/heroes/forsakenPaladinSpecials";
 import { FORSAKEN_PALADIN_CLIPS } from "../../ts/src/game/sim/heroes/forsakenPaladinClips";
@@ -53,7 +53,7 @@ function key(track: mdx.AnimVector, frame: number, vector: Float32Array, rotatio
 }
 
 BunRuntime.runMain(Effect.tryPromise({ try: async () => {
-    const [stockArg, inputArg, outputArg] = process.argv.slice(2);
+    const [stockArg, inputArg, outputArg, ...selectedPoses] = process.argv.slice(2);
     ensure(stockArg && inputArg && outputArg, "usage: bun tools/animations/forsaken-paladin-weapon-clips.ts STOCK.mdx AUTHORED.mdx PRIVATE_OUTPUT");
     const output = resolve(outputArg);
     ensure(relative(resolve(import.meta.dir, "../.."), output).startsWith(".."), "Weapon output stays private");
@@ -82,6 +82,16 @@ BunRuntime.runMain(Effect.tryPromise({ try: async () => {
         }
     }
     actions.push({ pose: "pummel", donor: 5, frames: 12, first: 5, last: 5, targets: [{ frame: 5, x: 50 / 1.2, z: 65 / 1.2 }] });
+    for (const [pose, code, donor, x, z] of [["throwForward", GrabAction.throwForward, 5, 50, 65], ["throwBack", GrabAction.throwBack, 5, -50, 70], ["throwUp", GrabAction.throwUp, 5, 20, 105], ["throwDown", GrabAction.throwDown, 15, 35, 15]] as const) {
+        const move = FORSAKEN_PALADIN_MOVES.throws[code]!;
+        actions.push({ pose, donor, frames: move.totalFrames, first: move.contactFrame, last: move.contactFrame, targets: [{ frame: move.contactFrame, x: x / 1.2, z: z / 1.2 }] });
+    }
+    const grab = FORSAKEN_PALADIN_MOVES.normals[AttackStyle.grab]!;
+    actions.push({ pose: "grab", donor: 5, frames: grab.totalFrames, first: grab.startupFrames - 4, last: grab.startupFrames - 3, targets: [] });
+    if (selectedPoses.length > 0) {
+        ensure(selectedPoses.every(pose => actions.some(action => action.pose === pose)), "Unknown Forsaken weapon pose");
+        actions.splice(0, actions.length, ...actions.filter(action => selectedPoses.includes(action.pose)));
+    }
     const donorTracks = new Map<string, mdx.AnimVector>(); tracks(stock, (track, path) => donorTracks.set(path, track));
     const targetTracks = new Map<string, mdx.AnimVector>(); tracks(source, (track, path) => targetTracks.set(path, track));
     const renderer = new ModelRenderer(model), data = Reflect.get(renderer, "rendererData");
@@ -95,6 +105,7 @@ BunRuntime.runMain(Effect.tryPromise({ try: async () => {
     const inverse = mat4.create(); ensure(mat4.invert(inverse, data.nodes[hand.ObjectId].matrix), "Singular reference"); vec3.transformMat4(headInHand, headInHand, inverse);
     const changed = new Set<number>(), receipts = [];
     for (const action of actions) {
+        const throwing = action.pose.startsWith("throw");
         const binding = FORSAKEN_PALADIN_CLIPS[action.pose as keyof typeof FORSAKEN_PALADIN_CLIPS]; ensure(binding, `${action.pose}: no clip`);
         const index = binding.index, sequence = model.Sequences[index]!, [start, end] = sequence.Interval;
         ensure(Math.abs((end - start) - action.frames * 1000 / 60) < 1, `${action.pose}: clip timing changed`);
@@ -108,7 +119,7 @@ BunRuntime.runMain(Effect.tryPromise({ try: async () => {
         };
         tracks(model, (track, path) => {
             if (onGlobalClock(track)) return;
-            if (action.pose === "pummel") {
+            if (action.pose === "pummel" || action.pose === "grab" || throwing) {
                 const match = /^\.(Bones|Helpers|Attachments)\.(\d+)\./.exec(path);
                 const joint = match ? source[match[1] as "Bones" | "Helpers" | "Attachments"][Number(match[2])] : undefined;
                 if (joint === undefined || !/^(arm_R0_|shoulder_R0_|Wep01_|Weapon Ref)/.test(joint.Name)) return;
@@ -116,14 +127,16 @@ BunRuntime.runMain(Effect.tryPromise({ try: async () => {
             const donorTrack = donorTracks.get(path);
             track.Keys = track.Keys.filter(k => k.Frame < start || k.Frame > end);
             if (!donorTrack || onGlobalClock(donorTrack) || !donorTrack.Keys.some(k => k.Frame >= donor.Interval[0] && k.Frame <= donor.Interval[1])) return;
-            const rotation = path.endsWith(".Rotation"), idle = action.pose === "pummel" ? source.Sequences[73]! : stock.Sequences[1]!;
-            const idleTrack = action.pose === "pummel" ? targetTracks.get(path)! : donorTrack;
+            const rotation = path.endsWith(".Rotation"), idle = throwing || action.pose === "grab" ? source.Sequences[index]! : action.pose === "pummel" ? source.Sequences[73]! : stock.Sequences[1]!;
+            const idleTrack = action.pose === "pummel" || action.pose === "grab" || throwing ? targetTracks.get(path)! : donorTrack;
             const idleValue = idleTrack.Keys.some(k => k.Frame >= idle.Interval[0] && k.Frame <= idle.Interval[1]) ? valueAt(idleTrack, idle.Interval[0], idle.Interval[1], idle.Interval[0], rotation) : undefined;
             for (let frame = 0; frame <= action.frames; frame++) {
                 let vector = valueAt(donorTrack, donor.Interval[0], donor.Interval[1], donorTime(frame), rotation);
                 const entry = Math.min(3, action.first - 1), exit = Math.min(8, action.frames - action.last - 1);
                 const amount = frame < entry ? 1 - frame / entry : frame > action.frames - exit ? (frame - (action.frames - exit)) / exit : 0;
-                if (idleValue && amount > 0) vector = rotation ? Float32Array.from(quat.slerp(quat.create(), vector, idleValue, amount * amount * (3 - 2 * amount))) : Float32Array.from(vector, (v, i) => v + (idleValue[i]! - v) * amount * amount * (3 - 2 * amount));
+                const resting = (throwing || action.pose === "grab") && idleValue ? valueAt(idleTrack, idle.Interval[0], idle.Interval[1], start + Math.round(frame * 1000 / 60), rotation) : idleValue;
+                const heldAmount = action.pose === "grab" ? frame >= grab.startupFrames - 1 ? 1 : frame > action.last ? (frame - action.last) / (grab.startupFrames - 1 - action.last) : amount : amount;
+                if (resting && heldAmount > 0) vector = rotation ? Float32Array.from(quat.slerp(quat.create(), vector, resting, heldAmount * heldAmount * (3 - 2 * heldAmount))) : Float32Array.from(vector, (v, i) => v + (resting[i]! - v) * heldAmount * heldAmount * (3 - 2 * heldAmount));
                 track.Keys.push(key(track, start + Math.round(frame * 1000 / 60), vector, rotation));
             }
             track.Keys.sort((a, b) => a.Frame - b.Frame);
@@ -195,7 +208,7 @@ BunRuntime.runMain(Effect.tryPromise({ try: async () => {
     const contact = receipts.map(record => ({ ...record, measured: record.targets.map(target => { const posed = drawn.posed(record.index, target.frame / 60, 1); const x = posed.nodes[reference.ObjectId * 2]!, z = posed.nodes[reference.ObjectId * 2 + 1]!; return { frame: target.frame, x, z, targetX: target.x * 1.2, targetZ: target.z * 1.2, error: Math.hypot(x - target.x * 1.2, z - target.z * 1.2) }; }) }));
     const geometry: string[] = [], changes = [];
     for (const action of actions) {
-        if (action.pose === "pummel") continue;
+        if (action.pose === "grab" || action.pose === "pummel" || action.pose.startsWith("throw")) continue;
         const normal = normalDonors.find(([pose]) => pose === action.pose);
         const name = action.pose.replace("SpecialAir", "").replace("Special", "") as "neutral" | "side" | "up" | "down";
         const special = normal ? undefined : FORSAKEN_PALADIN_SPECIALS[name]!;
@@ -212,7 +225,7 @@ BunRuntime.runMain(Effect.tryPromise({ try: async () => {
             changes.push({ pose: action.pose, frame, region: ordinal, old, new: { x1: coordinates[0], z1: coordinates[1], x2: coordinates[2], z2: coordinates[3], radius: old.radius } });
         }
     }
-    await Bun.write(join(import.meta.dir, "../../ts/src/game/sim/heroes/forsakenPaladinWeaponGeometry.ts"), [
+    if (!selectedPoses.includes("grab")) await Bun.write(join(import.meta.dir, "../../ts/src/game/sim/heroes/forsakenPaladinWeaponGeometry.ts"), [
         'import { f32 } from "wisp/src/sim/f32";',
         'import { heroRegion, type MoveRegion } from "../heroMoves";',
         'const CONTACTS: Readonly<Record<string, readonly [number, number, number, number]>> = {', ...geometry, '};',

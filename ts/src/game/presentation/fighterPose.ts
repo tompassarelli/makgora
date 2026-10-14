@@ -359,7 +359,13 @@ function selectGrabClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly
   }
   if (illidanEscape) return clipRate(dh.DEMON_HUNTER_GRAB_ESCAPE_SECONDS, grabActionDuration(action, f.tuning.moves));
   const poses = clips.grabActionPoses(action);
-  if (poses === undefined) return 0.0;
+  if (poses === undefined) {
+    if (victim && f.character === Character.forsakenPaladin && (action === GrabAction.hold || action === GrabAction.none)) {
+      pose.clipTime = min(pose.clipTime, f32(4 * FRAME_SECONDS));
+      return owner.launch.hitlag > 0 ? 0.0 : pose.clipTime < f32(4 * FRAME_SECONDS) ? 1.0 : 0.0;
+    }
+    return 0.0;
+  }
   const clip = clips.clipFor(f.character, victim ? poses.victim : poses.holder);
   const duration = grabActionDuration(action, owner.tuning.moves);
   if (clip.contact === undefined) return clipRate(clip.seconds, duration);
