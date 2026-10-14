@@ -329,7 +329,12 @@ export const importedAssets = (assets: string, summon: string, edition: MapEditi
   const classicBodies = clipFiles.map((filename) => imported(join(clipDirectory, "imports/war3mapImported"), filename));
   const classicWhites = generated.flat().filter(({ entry }) => Object.values(WHITE_FIGHTER_MODELS).includes(entry));
   const classicOverrides = [...classicBodies, ...classicWhites].flatMap(({ entry, source }) =>
-    ["_hd.w3mod", "_de.w3mod"].map((prefix) => ({ entry: `${prefix}\\${entry}`, source })));
+    ["_hd.w3mod", "_de.w3mod"].map((prefix) => {
+      const override = `${prefix}\\${entry}`;
+      const body = join(clipDirectory, "imports", prefix, entry.replaceAll("\\", "/"));
+      const authored = generated.flat().find((asset) => asset.entry === override)?.source;
+      return { entry: override, source: prefix === "_de.w3mod" ? authored ?? (existsSync(body) ? body : source) : source };
+    }));
   const whiteOverrides = new Set(classicOverrides.map(({ entry }) => entry));
   yield* requireListed(clipEvidencePath, clipFiles, ORIGINAL_CLIP_MODELS,
     `this assets folder's clip pool predates the checkout's clips. From the repository root, export a new pool from ${assets} ` +
