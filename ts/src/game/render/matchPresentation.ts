@@ -28,6 +28,7 @@ import { type FighterOriginalClip, originalClip, originalClipNamed } from "../as
 
 
 export const RESULTS_DELAY_FRAMES = 90;
+const LEVEL_UP_FRAME = 12;
 
 const FACING_CAMERA = f32(-1.5707963705062866);
 
@@ -81,6 +82,8 @@ export class MatchPresentation {
   private readonly title: framehandle;
   private readonly lines: readonly framehandle[];
   private readonly poses: (VictoryPose | undefined)[] = [];
+  private readonly resultSounds: sound[] = [];
+  private resultEffectsMuted = false;
   private pending: ResultsView | undefined;
   private delay = 0;
 
@@ -169,6 +172,10 @@ export class MatchPresentation {
 
   beginMatch(stageMusic: string, game: Readonly<MatchState>, world: Readonly<Roster>): void {
     this.hideResults();
+    if (this.resultEffectsMuted) {
+      VolumeGroupReset();
+      this.resultEffectsMuted = false;
+    }
     this.preparePoses(world);
     this.resultStage = game.stageChoice;
     clearMatchTally(this.tally);
@@ -229,7 +236,7 @@ export class MatchPresentation {
     if (this.resultView !== undefined) {
       this.resultFrames++;
       this.placeResultPoses();
-      if (this.resultFrames === 12) {
+      if (this.resultFrames === LEVEL_UP_FRAME) {
         for (const [index, row] of this.resultView.rows.entries()) {
           if (row.slot !== this.resultView.winnerSlot) continue;
           const placement = resultFighterPlacement(this.resultStage, index, this.resultView.rows.length);
@@ -266,8 +273,10 @@ export class MatchPresentation {
     const theme = victoryMusic(winner);
     if (theme !== undefined) PlayThematicMusic(theme);
     if (winner === undefined) return;
-    this.cue(MatchCue.cheer);
-    this.playFile(warcryVoice(winner));
+    for (const path of [cueSound(MatchCue.cheer), warcryVoice(winner)]) {
+      const played = this.playFile(path);
+      if (played !== undefined) this.resultSounds.push(played);
+    }
     this.posing = view.rows[0]?.slot;
   }
 
@@ -326,6 +335,14 @@ export class MatchPresentation {
   }
 
   hideResults(): void {
+    for (const played of this.resultSounds) StopSound(played, false, true);
+    this.resultSounds.length = 0;
+    if (this.resultView !== undefined && this.resultFrames >= LEVEL_UP_FRAME) {
+      // A model's event sound outlives DestroyEffect, so the level-up burst's sound is cut through its volume groups.
+      VolumeGroupSetVolume(SOUND_VOLUMEGROUP_SPELLS, 0.0);
+      VolumeGroupSetVolume(SOUND_VOLUMEGROUP_COMBAT, 0.0);
+      this.resultEffectsMuted = true;
+    }
     this.pending = undefined;
     this.resultView = undefined;
     this.resultFrames = 0;
