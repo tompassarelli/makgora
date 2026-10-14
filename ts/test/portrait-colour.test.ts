@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test';
 import { judgeColour } from '../scripts/portraitLight';
 
-test('Classic select tiles preserve roster-relative colour and contrast [k3 #563 finding22]', () => {
+test('Classic select tiles preserve roster-relative colour and contrast [k3 measure docs/design/fighter-portraits.md]', () => {
   const roster = new Map([
     ['Rifleman', { saturation: 0.303, contrast: 192.5 }],
     ['Kobold', { saturation: 0.448, contrast: 214.9 }],
