@@ -57,7 +57,7 @@ import {
 } from "../menu/selectionDrag";
 import { cellRect, rosterGrid } from "../menu/selectionGrid";
 import { MENU_FONT, MENU_STYLE, NATIVE_TEXT_BASE, PANEL_TEXTURE, type TextBox } from "./hudLayout";
-import { MOVES_BODY_BOX, MOVES_BUTTON_HEIGHT, MOVES_BUTTON_TOP, MOVES_TITLE_BOX, START_BUTTON, selectionTitleBox } from "./selectionLayout";
+import { MOVES_BODY_BOX, MOVES_BOX, MOVES_BUTTON_HEIGHT, MOVES_BUTTON_TOP, MOVES_TITLE_BOX, START_BUTTON, boxContains, selectionTitleBox } from "./selectionLayout";
 import { PLAYABLE_CHARACTERS, fighterName, fighterPortrait, nextSelectableCharacter } from "../sim/heroes/registry";
 import {
   MOVES_HEADER, itemsSetting, ultimatesSetting, itemKindSetting, automaticRematchSetting, movesPage, selectionModeLabel, endlessSetting, hitAreasSetting, partnerBehaviourSetting, partnerDamageSetting, partnerEscapeSetting,
@@ -321,7 +321,7 @@ export class SelectionPanel {
       setFrameText(settings, "");
       const settingsLabel = label(settings, `MeleeCpuSettingsLabel${name}`, box.x + f32(0.004), box.y - f32(0.002), box.width - f32(0.008), box.height - f32(0.004), f32(0.0075));
       setFrameText(settingsLabel, "Opponent settings");
-      this.clicks.add(settings, { kind: "cpuSettings", slot });
+      this.clicks.add(settings, { kind: "cpuSettings", slot }, undefined, "native");
       const summary = label(root, `MeleeCpuSummary${name}`, x + f32(0.004), f32(0.139), f32(0.152), f32(0.031), f32(0.009));
       return { card, tag, mode, portrait, name: name_, status, chip, summary, settings, settingsLabel };
     });
@@ -330,7 +330,7 @@ export class SelectionPanel {
     BlzFrameSetVisible(this.hand, false);
     art(root, `MeleeConfirmArt${suffix}`, "war3mapImported\\SelectionAction.tga", START_BUTTON.x, START_BUTTON.y, START_BUTTON.width, START_BUTTON.height);
     this.confirm = label(root, `MeleeConfirmLabel${suffix}`, f32(0.079), f32(0.039), f32(0.219), f32(0.028), f32(0.011));
-    this.clicks.add(hotspot(root, START_BUTTON.x, START_BUTTON.y, START_BUTTON.width, START_BUTTON.height), { kind: "start" });
+    this.clicks.add(hotspot(root, START_BUTTON.x, START_BUTTON.y, START_BUTTON.width, START_BUTTON.height), { kind: "start" }, undefined, "native");
     art(root, `MeleeSettingsArt${suffix}`, "war3mapImported\\SelectionAction.tga", headerBoxLeft, f32(0.52), f32(0.235), f32(0.037));
     const settingsButton = BlzCreateFrameByType("BUTTON", `MeleeSettingsButton${suffix}`, root, "", 0);
     placeTopLeft(settingsButton, headerBoxLeft, f32(0.52));
@@ -342,10 +342,10 @@ export class SelectionPanel {
     setFrameText(settingsLabel, `${MENU_STYLE.gold}Controls (F1)|r`);
     this.delayLine = label(root, `MeleeDelayLine${suffix}`, f32(0.36), f32(0.6), f32(0.42), f32(0.03), f32(0.010));
     BlzFrameSetTextAlignment(this.delayLine, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_RIGHT);
-    art(root, `MeleeMovesArt${suffix}`, "war3mapImported\\SelectionAction.tga", f32(0.318), f32(0.043), f32(0.18), f32(0.037));
+    art(root, `MeleeMovesArt${suffix}`, "war3mapImported\\SelectionAction.tga", MOVES_BOX.x, MOVES_BOX.y, MOVES_BOX.width, MOVES_BOX.height);
     this.movesLabel = label(root, `MeleeMovesLabel${suffix}`, f32(0.324), f32(0.039), f32(0.168), f32(0.028), f32(0.011));
     setFrameText(this.movesLabel, "Moves");
-    this.clicks.add(hotspot(root, f32(0.318), f32(0.043), f32(0.18), f32(0.037)), { kind: "moves" });
+    this.clicks.add(hotspot(root, MOVES_BOX.x, MOVES_BOX.y, MOVES_BOX.width, MOVES_BOX.height), { kind: "moves" }, undefined, "native");
     const page = (frame: framehandle, x: number, y: number, width: number, height: number) => {
       placeTopLeft(frame, x, y);
       BlzFrameSetSize(frame, width, height);
@@ -362,7 +362,7 @@ export class SelectionPanel {
     const pageButton = (name: string, x: number, width: number, text: string, target: SelectionButton) => {
       const frame = page(BlzCreateFrameByType("GLUETEXTBUTTON", name, gameUi(), "ScriptDialogButton", 0), x, MOVES_BUTTON_TOP, width, MOVES_BUTTON_HEIGHT);
       setFrameText(frame, text);
-      return this.clicks.add(frame, target);
+      return this.clicks.add(frame, target, undefined, "native");
     };
     this.modeLabel = page(createText(`MeleeModeLabel${suffix}`, gameUi(), 478 + participantId), titleBox.left, titleBox.top, titleBox.width, titleBox.height);
     sizeText(this.modeLabel, MENU_STYLE.headerSize, f32(f32(0.295) - 2 * headerInset), f32(0.032));
@@ -382,7 +382,7 @@ export class SelectionPanel {
     this.cpuTitle = cpu.title;
     const cpuButton = (frame: framehandle, button: SelectionButton) => {
       if (button.kind === "cpuStep") this.cpuSteps.push(frame);
-      return this.clicks.add(frame, button, button.kind === "cpuStep" ? button.direction < 0 ? "<" : ">" : frame === cpu.close ? "Close" : "Done");
+      return this.clicks.add(frame, button, button.kind === "cpuStep" ? button.direction < 0 ? "<" : ">" : frame === cpu.close ? "Close" : "Done", "native");
     };
     cpuButton(cpu.close, { kind: "cpuClose" });
     cpuButton(cpu.opponentPrevious, { kind: "cpuStep", row: 0, direction: -1 });
@@ -401,7 +401,7 @@ export class SelectionPanel {
       setFrameText(frame, text);
       BlzFrameSetFont(frame, MENU_STYLE.font, MENU_STYLE.headerSize, 0);
       BlzFrameSetFont(BlzGetFrameByName("ScriptDialogButtonText", 0), MENU_STYLE.font, MENU_STYLE.headerSize, 0);
-      return this.clicks.add(frame, target);
+      return this.clicks.add(frame, target, undefined, "native");
     };
     const { fewerStocks, moreStocks, lessTime, moreTime, endless, automaticRematch } = RULE_BUTTONS;
     this.steps = [
@@ -439,7 +439,7 @@ export class SelectionPanel {
       return value;
     });
     this.tutorial = createTutorialMenu(gameUi(), root, suffix, (frame, target) => this.clicks.add(frame, target,
-      target.kind === "tutorialOpen" ? "Tutorial" : target.kind === "tutorialStart" ? "Start tutorial" : target.kind === "tutorialClose" ? "Not now" : target.direction < 0 ? "−" : "+"));
+      target.kind === "tutorialOpen" ? "Tutorial" : target.kind === "tutorialStart" ? "Start tutorial" : target.kind === "tutorialClose" ? "Not now" : target.direction < 0 ? "−" : "+", "native"));
     partnerFrames.push(this.tutorial.open);
     this.trainingFrames = partnerFrames;
     const { easierClassic, harderClassic } = RULE_BUTTONS;
@@ -536,8 +536,17 @@ export class SelectionPanel {
   }
 
 
+  private pointedDialog(game: Readonly<MatchState>, x: number, y: number): SelectionButton | undefined {
+    if (boxContains(START_BUTTON, x, y)) return { kind: "start" };
+    if (boxContains(MOVES_BOX, x, y)) return { kind: "moves" };
+    for (const slot of PARTICIPANT_SLOTS) {
+      if (fighterActive(game, slot) && !humanFighterActive(game, slot) && boxContains(cpuSettingsBox(slot), x, y)) return { kind: "cpuSettings", slot };
+    }
+    return undefined;
+  }
+
   private highlight(button: SelectionButton | undefined, updateDrag = true): void {
-    this.hovered = button;
+    if (updateDrag) this.hovered = button;
     const tile = button?.kind === "tile" ? button.tile : undefined;
     for (let slot = 0; slot < this.cards.length; slot++) {
       const card = this.cards[slot];
@@ -865,7 +874,7 @@ export class SelectionPanel {
     this.showRules(game);
     this.showHelp(game, x, y);
     this.clicks.refreshHover();
-    this.highlight(this.hovered, false);
+    this.highlight(this.hovered ?? (width > 0 && height > 0 ? this.pointedDialog(game, x, y) : undefined), false);
   }
 
   private showHelp(game: Readonly<MatchState>, x: number, y: number): void {
