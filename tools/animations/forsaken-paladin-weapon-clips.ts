@@ -81,7 +81,9 @@ BunRuntime.runMain(Effect.tryPromise({ try: async () => {
             actions.push({ pose: (air ? `${pose}Air` : pose) as HeroPose, donor, frames: form.endFrame!, first: Math.min(...targets.map(t => t.frame)), last: Math.max(...targets.map(t => t.frame)), targets });
         }
     }
+    actions.push({ pose: "pummel", donor: 5, frames: 12, first: 5, last: 5, targets: [{ frame: 5, x: 50 / 1.2, z: 65 / 1.2 }] });
     const donorTracks = new Map<string, mdx.AnimVector>(); tracks(stock, (track, path) => donorTracks.set(path, track));
+    const targetTracks = new Map<string, mdx.AnimVector>(); tracks(source, (track, path) => targetTracks.set(path, track));
     const renderer = new ModelRenderer(model), data = Reflect.get(renderer, "rendererData");
     const node = (name: string) => { const result = model.Nodes.find(node => node?.Name === name); ensure(result, `Missing ${name}`); return result; };
     const hand = node("arm_R0_end_jnt"), weapon = node("Wep01_R0_0_jnt"), reference = node("Weapon Ref"), root = node("local_C0_0_jnt");
@@ -106,11 +108,17 @@ BunRuntime.runMain(Effect.tryPromise({ try: async () => {
         };
         tracks(model, (track, path) => {
             if (onGlobalClock(track)) return;
+            if (action.pose === "pummel") {
+                const match = /^\.(Bones|Helpers|Attachments)\.(\d+)\./.exec(path);
+                const joint = match ? source[match[1] as "Bones" | "Helpers" | "Attachments"][Number(match[2])] : undefined;
+                if (joint === undefined || !/^(arm_R0_|shoulder_R0_|Wep01_|Weapon Ref)/.test(joint.Name)) return;
+            }
             const donorTrack = donorTracks.get(path);
             track.Keys = track.Keys.filter(k => k.Frame < start || k.Frame > end);
             if (!donorTrack || onGlobalClock(donorTrack) || !donorTrack.Keys.some(k => k.Frame >= donor.Interval[0] && k.Frame <= donor.Interval[1])) return;
-            const rotation = path.endsWith(".Rotation"), idle = stock.Sequences[1]!;
-            const idleValue = donorTrack.Keys.some(k => k.Frame >= idle.Interval[0] && k.Frame <= idle.Interval[1]) ? valueAt(donorTrack, idle.Interval[0], idle.Interval[1], idle.Interval[0], rotation) : undefined;
+            const rotation = path.endsWith(".Rotation"), idle = action.pose === "pummel" ? source.Sequences[73]! : stock.Sequences[1]!;
+            const idleTrack = action.pose === "pummel" ? targetTracks.get(path)! : donorTrack;
+            const idleValue = idleTrack.Keys.some(k => k.Frame >= idle.Interval[0] && k.Frame <= idle.Interval[1]) ? valueAt(idleTrack, idle.Interval[0], idle.Interval[1], idle.Interval[0], rotation) : undefined;
             for (let frame = 0; frame <= action.frames; frame++) {
                 let vector = valueAt(donorTrack, donor.Interval[0], donor.Interval[1], donorTime(frame), rotation);
                 const entry = Math.min(3, action.first - 1), exit = Math.min(8, action.frames - action.last - 1);
@@ -187,6 +195,7 @@ BunRuntime.runMain(Effect.tryPromise({ try: async () => {
     const contact = receipts.map(record => ({ ...record, measured: record.targets.map(target => { const posed = drawn.posed(record.index, target.frame / 60, 1); const x = posed.nodes[reference.ObjectId * 2]!, z = posed.nodes[reference.ObjectId * 2 + 1]!; return { frame: target.frame, x, z, targetX: target.x * 1.2, targetZ: target.z * 1.2, error: Math.hypot(x - target.x * 1.2, z - target.z * 1.2) }; }) }));
     const geometry: string[] = [], changes = [];
     for (const action of actions) {
+        if (action.pose === "pummel") continue;
         const normal = normalDonors.find(([pose]) => pose === action.pose);
         const name = action.pose.replace("SpecialAir", "").replace("Special", "") as "neutral" | "side" | "up" | "down";
         const special = normal ? undefined : FORSAKEN_PALADIN_SPECIALS[name]!;

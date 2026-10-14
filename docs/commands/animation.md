@@ -164,6 +164,14 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   authors his strikes, recovery, paired throws and nine pain poses.
   `bun tools/animations/stock-forsaken-model.ts STOCK_CLASSIC_FORSAKEN.mdx AUTHORED_FORSAKEN.mdx PRIVATE_OUTPUT.mdx`
   restores the stock Classic mesh and version-1800 skin while retaining the shipped motion.
+  `bun tools/animations/forsaken-paladin-weapon-clips.ts STOCK_FORSAKEN.mdx AUTHORED_FORSAKEN.mdx PRIVATE_OUTPUT`
+  replaces normal and special motion at the canonical indices with the stock Attack 1,
+  Attack Slam and Spell Slam sequences. It remaps their wind-up, strike and recovery
+  to the existing move frames, keeps the pummel's held left arm, and writes measured
+  weapon contact geometry through `forsakenPaladinWeaponGeometry.ts`. The authoring
+  move tables provide the contact targets; shipped collision follows the measured
+  grip and head. Run the hammer model helper, original clip export, timeline export
+  and Character 7 white-copy export afterward. Other fighter inputs stay unchanged.
   `bun tools/animations/forsaken-paladin-model.ts AUTHORED_FORSAKEN.mdx PRIVATE_OUTPUT.mdx`
   replaces the sword with an original beveled hammer centered on `Weapon Ref`,
   preserves the body, rig and every sequence, and writes its steel palette texture
