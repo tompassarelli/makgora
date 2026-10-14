@@ -265,10 +265,10 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     down: { spell: "Doomhammer Slam", startup: STORM, active: timed(cue("Abilities\\Weapons\\AncientProtectorMissile\\AncientProtectorMissile.mdx", "feet", f32(0.95)), "death", f32(0.3)) },
   },
   [Character.sylvanas]: {
-    neutral: { spell: "Black Arrow", startup: SHADOW, active: cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", "hand", f32(0.6)) },
-    side: { spell: "Silence", startup: SHADOW, active: cue("Abilities\\Spells\\Other\\Silence\\SilenceTarget.mdx", "ahead", f32(0.6)) },
+    neutral: { spell: "Black Arrow", startup: { ...SHADOW, scale: f32(0.25), scaleEnd: f32(0.45), scaleFrames: 15, anchorFrames: Array.from({ length: 40 }, () => ({ x: 44.0, z: 60.0 })) }, active: { ...cue("Abilities\\Spells\\Undead\\DeathCoil\\DeathCoilSpecialArt.mdx", "hand", f32(0.18)), anchorFrames: Array.from({ length: 40 }, () => ({ x: 44.0, z: 60.0 })) } },
+    side: { spell: "Silence", startup: { ...SHADOW, scale: f32(0.3), scaleEnd: f32(0.6), scaleFrames: 18 }, active: { ...cue("Abilities\\Spells\\Other\\Silence\\SilenceTarget.mdx", "ahead", f32(0.85)), birth: { eachFrame: false, strike: 0 } } },
     up: { spell: "Banshee Flight", startup: SHADOW, active: cue("Abilities\\Spells\\Undead\\Possession\\PossessionCaster.mdx", "body", f32(0.7)) },
-    down: { spell: "Life Drain", startup: SHADOW, active: cue("Abilities\\Spells\\Other\\Drain\\DrainCaster.mdx", "hand", f32(0.6)) },
+    down: { spell: "Life Drain", startup: { ...cue("Abilities\\Spells\\Other\\Drain\\DrainCaster.mdx", "hand", f32(0.2)), scaleEnd: f32(0.35), scaleFrames: 15, anchorFrames: Array.from({ length: 52 }, () => ({ x: 38.0, z: 54.0 })) }, active: { ...cue("Abilities\\Spells\\Other\\Drain\\DrainCaster.mdx", "ahead", f32(0.3)), anchorFrames: Array.from({ length: 52 }, () => ({ x: 68.0, z: 54.0 })) } },
   },
   [Character.chen]: {
     neutral: { spell: "Breath of Fire", startup: BREW, active: { ...timed(cue("Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireMissile.mdx", "breath", 0.5), "birth", 0.0), birth: { eachFrame: true, strike: 0, voices: 11, lingerFrames: 6 } } },

@@ -22,6 +22,8 @@ import type { Fighter } from "../sim/fighter";
 import { DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP, DEMONHUNTER_MANA_BURN_STARTUP, EYE_BLAST_FORM, FLAME_CRASH_BURST_LAST, FLAME_CRASH_LANDING_FORM } from "../sim/specials";
 import { EYE_BLAST_MARKS, eyeBlastMark } from "../presentation/eyeBlastMarker";
 import { type ParkedFlags, STOCK_MODELS, type WorldOrigin, facingYaw, parkOnce, placeEffect } from "./effects";
+import { runningHeroSpecial } from "../sim/heroSpecialRules";
+import { specialAreaRegion } from "../presentation/disjointCues";
 import { characterModelScale } from "../presentation/modelScale";
 import { IMMOLATE_SOUNDS } from "../presentation/elementLooks";
 import { SummonPresentation } from "./summonPresentation";
@@ -270,6 +272,29 @@ export class SpecialEffects {
 
   /** While Siphon Mana holds its victim, a drain beam joins Kael's hand to the victim's chest. */
   private presentSiphon(effects: SpecialSlot, fighter: Readonly<Fighter>): void {
+    if (fighter.character === Character.sylvanas) {
+      const move = runningHeroSpecial(fighter);
+      const target = fighter.grab.target;
+      const victim = target === undefined ? undefined : this.slots[target];
+      const drain = fighter.special.action === SpecialAction.heroDown;
+      const held = drain && fighter.special.grabFrame > 0 && victim !== undefined;
+      const grab = move?.commandGrab;
+      const strike = fighter.special.action === SpecialAction.heroSide ? specialAreaRegion(fighter, 0).strike
+        : drain && grab !== undefined && fighter.special.frame >= grab.first && fighter.special.frame <= grab.last ? grab.strike : undefined;
+      if (fighter.status.out || (!held && strike === undefined)) {
+        this.hideSiphon(effects);
+        return;
+      }
+      const startX = strike?.x1 ?? 38.0;
+      const startZ = strike?.z1 ?? 54.0;
+      const endX = held && victim !== undefined ? victim.lastX : fighter.motion.x + fighter.facing * (strike?.x2 ?? 68.0);
+      const endZ = held && victim !== undefined ? victim.lastZ + 54.0 : fighter.motion.z + (strike?.z2 ?? 54.0);
+      MoveLightningEx(effects.siphon, false, this.origin.x + fighter.motion.x + fighter.facing * startX, this.front, this.origin.z + fighter.motion.z + startZ,
+        this.origin.x + endX, this.front, this.origin.z + endZ);
+      SetLightningColor(effects.siphon, drain ? f32(0.8) : f32(0.65), drain ? f32(0.2) : f32(0.35), drain ? f32(0.5) : 1.0, 1.0);
+      effects.siphonShown = true;
+      return;
+    }
     const target = fighter.grab.target;
     const victim = target === undefined ? undefined : this.slots[target];
     if (fighter.character !== Character.kaelthas || fighter.status.out || fighter.special.action !== SpecialAction.heroSide
