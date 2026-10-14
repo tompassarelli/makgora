@@ -10,6 +10,7 @@ import type { HeroPose } from "../../ts/src/game/sim/heroes/hero";
 import { ANUBARAK_MOVES } from "../../ts/src/game/sim/heroes/anubarakMoves";
 import { ANUBARAK_SPECIALS } from "../../ts/src/game/sim/heroes/anubarakSpecials";
 import { seconds } from "./asset-info";
+import { FIGHTER_ULTIMATES } from "../../ts/src/game/sim/ultimates";
 
 function ensure(ok: unknown, message: string): asserts ok { if (!ok) throw new Error(message); }
 function tracks(value: unknown, visit: (track: mdx.AnimVector, path: string) => void, path = "") {
@@ -43,6 +44,26 @@ const burrowRake: readonly Gesture[] = [
   { chest: -45, pelvis: -15, lean: -15, arm: 0, elbow: 20, leftArm: 0, thigh: -10, leftThigh: 10 },
   { chest: -40, pelvis: -25, lean: -20, arm: -200, elbow: 20, leftArm: -200, thigh: -20, leftThigh: 20 },
 ];
+interface Lunge { contact: number; x?: number; z?: number; back: number; over?: number; ramp?: number; }
+const lunges: Partial<Record<HeroPose, Lunge>> = {
+  jab: { contact: 5, x: 16, back: 8 },
+  jab2: { contact: 7, x: 16, back: 8 },
+  downSmash: { contact: 15, x: 10, back: 6 },
+  neutralAir: { contact: 9, x: 12, back: 6 },
+  backAir: { contact: 10, x: -12, back: 6 },
+  downAir: { contact: 16, z: -12, back: 6 },
+  neutralSpecial: { contact: 17, x: 26, back: 14, over: 0.4, ramp: 8 },
+  upSpecial: { contact: 8, z: 34, back: 0 },
+  downSpecial: { contact: 21, x: 26, back: 30, over: 0.4, ramp: 4 },
+  ultimate: { contact: 16, x: 22, back: 12 },
+};
+const lungeAt = (lunge: Lunge, frame: number, frames: number) => {
+  const over = lunge.over ?? 0.25, drive = lunge.x ?? lunge.z ?? 0, reach = Math.abs(drive), sign = Math.sign(drive);
+  const windup = Math.max(1, Math.round(lunge.contact * 0.6)), hold = Math.min(frames - 1, lunge.contact + Math.max(3, lunge.ramp ?? 0));
+  return sign * (frame <= windup ? -lunge.back * Math.sin(frame / windup * Math.PI / 2)
+    : frame <= lunge.contact ? -lunge.back + (lunge.back + reach) * Math.sqrt((frame - windup) / (lunge.contact - windup))
+    : frame <= hold ? reach * (1 + over * Math.min(1, (frame - lunge.contact) / (lunge.ramp ?? 1))) : reach * (1 + over) * Math.max(0, 1 - (frame - hold) / Math.min(20, frames - hold)));
+};
 const actions: Action[] = [];
 const normals: readonly [HeroPose, AttackStyle, Gesture, readonly [number, number]][] = [
   ["jab", AttackStyle.jab, { ...forward, chest: 25, arm: -80, elbow: 45, lean: 20 }, [31, 42]],
@@ -160,16 +181,27 @@ const originals = new Map<string, mdx.AnimVector>(); tracks(source, (t, p) => or
 let cursor = Math.max(...source.Sequences.map(s => s.Interval[1])) + 100;
 const cutoff = cursor, bindings: string[] = [], damageBindings: string[] = [];
 const records: { pose: string; index: number; frames: number; contact: number }[] = [];
-for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
-  const index = model.Sequences.length, start = cursor, end = start + Math.round(action.frames * 1000 / 60); cursor = end + 100;
-  const name = ordinal < actions.length ? `Anubarak ${action.pose}` : `Anubarak Damage ${Math.floor((ordinal - actions.length) / 3)} ${(ordinal - actions.length) % 3}`;
+const ultimate = FIGHTER_ULTIMATES[Character.anubarak]!, swarm = ultimate.projectiles?.[0]?.spawnFrame;
+ensure(swarm !== undefined, "Locust Swarm release missing");
+const authoredActions: Action[] = [...actions, ...damageActions, { pose: "ultimate", frames: ultimate.endFrame, contact: swarm, gesture: { ...cast, chest: 30, lean: 15 } }];
+const victimSpan = actions.filter(a => /^victim(Pummel|Throw)/.test(a.pose)).length * 1100;
+for (const [ordinal, action] of authoredActions.entries()) {
+  const index = model.Sequences.length, start = cursor + (action.pose === "ultimate" ? victimSpan : 0), end = start + Math.round(action.frames * 1000 / 60);
+  if (action.pose !== "ultimate") cursor = end + 100;
+  const name = !action.pain ? `Anubarak ${action.pose}` : `Anubarak Damage ${Math.floor((ordinal - actions.length) / 3)} ${(ordinal - actions.length) % 3}`;
   model.Sequences.push({ ...stand, Name: name, Interval: new Uint32Array([start, end]), NonLooping: true, MoveSpeed: 0, Rarity: 0,
     MinimumExtent: new Float32Array([-300, -300, -200]), MaximumExtent: new Float32Array([300, 300, 350]), BoundsRadius: 400 });
-  const groundGesture = groundGestures.has(action.pose);
-  const phaseFrames = [...new Set([...(action.pose === "sideSpecial" || action.pose === "upAir" || groundGesture ? Array.from({length: action.frames + 1}, (_, i) => i) : []), 0, Math.max(1, action.contact - 3), action.contact, Math.min(action.frames - 1, action.contact + 4), action.frames,
+  const groundGesture = groundGestures.has(action.pose), lunge = lunges[action.pose];
+  const phaseFrames = [...new Set([...(action.pose === "sideSpecial" || action.pose === "upAir" || groundGesture || lunge ? Array.from({length: action.frames + 1}, (_, i) => i) : []), 0, Math.max(1, action.contact - 3), action.contact, Math.min(action.frames - 1, action.contact + 4), action.frames,
     ...(action.roll ? Array.from({ length: Math.ceil(action.frames / 3) }, (_, i) => i * 3) : []),
     ...(action.pose === "victimPummel" ? [action.contact - 1] : [])])].sort((a, b) => a - b);
-  const amount = (frame: number) => action.hold || action.pain ? 1 : action.pose === "victimPummel" && frame < action.contact ? 0 : action.pose === "knockdown" && frame >= action.contact ? 1 : frame === 0 || frame === action.frames ? 0 : frame < action.contact ? -0.3 : 1;
+  const keyed = (frame: number) => action.hold || action.pain ? 1 : action.pose === "victimPummel" && frame < action.contact ? 0 : action.pose === "knockdown" && frame >= action.contact ? 1 : frame === 0 || frame === action.frames ? 0 : frame < action.contact ? -0.3 : 1;
+  const sparse = [0, Math.max(1, action.contact - 3), action.contact, Math.min(action.frames - 1, action.contact + 4), action.frames];
+  const amount = (frame: number) => {
+    if (!lunge || groundGesture || sparse.includes(frame)) return keyed(frame);
+    const after = sparse.findIndex(f => f > frame), from = sparse[after - 1]!, to = sparse[after]!;
+    return keyed(from) + (keyed(to) - keyed(from)) * (frame - from) / (to - from);
+  };
   tracks(model, (track, path) => {
     const donor = originals.get(path); if (!donor || globalClock(donor)) return;
     const first = donor.Keys.find(k => k.Frame >= stand.Interval[0] && k.Frame <= stand.Interval[1]) ?? donor.Keys[0];
@@ -312,9 +344,14 @@ for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
     const key = root.Translation.Keys.find(k => k.Frame === start + Math.round(frame * 1000 / 60))!;
     if (!action.air && (action.pose !== "sideSpecial" || frame >= 23)) { key.Vector[2] = key.Vector[2]! - lowest; if (key.InTan) { key.InTan = root.Translation.LineType === mdx.LineType.Bezier ? key.Vector.slice() : new Float32Array(3); key.OutTan = key.InTan.slice(); } }
   }
+  if (lunge) for (const frame of phaseFrames) {
+    const key = root.Translation.Keys.find(k => k.Frame === start + Math.round(frame * 1000 / 60))!;
+    key.Vector[lunge.x === undefined ? 2 : 0] += lungeAt(lunge, frame, action.frames);
+    if (key.InTan) { key.InTan = root.Translation.LineType === mdx.LineType.Bezier ? key.Vector.slice() : new Float32Array(3); key.OutTan = key.InTan.slice(); }
+  }
   const victim = /^victim(Pummel|Throw)/.test(action.pose);
   const binding = `{ index: ${index}, seconds: ${seconds(victim ? 1 : (end - start) / 1000)}, aligned: true${action.paired ? `, contact: ${seconds(victim ? 0.5 : action.contact / 60)}` : ""} }`;
-  if (ordinal < actions.length) bindings.push(`  ${action.pose}: ${binding},`); else damageBindings.push(`  ${binding},`);
+  if (!action.pain) bindings.push(`  ${action.pose}: ${binding},`); else damageBindings.push(`  ${binding},`);
   records.push({ pose: name, index, frames: action.frames, contact: action.contact });
 }
 
@@ -335,7 +372,7 @@ for (const [ordinal, action] of actions.entries()) if (/^victim(Pummel|Throw)/.t
 }
 
 await Bun.write(join(project, "ts/src/game/sim/heroes/anubarakClips.ts"), [
-  "// Generated by tools/animations/anubarak-clips.ts from the stock classic Crypt Lord rig.",
+  "",
   'import { f32 } from "wisp/src/sim/f32";', 'import type { HeroClip, HeroClipTable } from "./hero";',
   'export const ANUBARAK_MODEL_FILE = "units\\\\undead\\\\HeroCryptLord\\\\HeroCryptLord.mdl";',
   'export const ANUBARAK_FALLBACK: HeroClip = { index: 0, seconds: 1.0 };',
@@ -372,7 +409,7 @@ mkdirSync(output, { recursive: true }); await Bun.write(join(output, "herocryptl
 const finalDrawn = new DrawnModel(bytes, 0.55);
 const distance = (a: Float32Array, b: Float32Array) => { ensure(a.length === b.length && a.length > 0, "Missing drawn body"); let maximum = 0; for (let i = 0; i < a.length; i += 2) maximum = Math.max(maximum, Math.hypot(a[i]! - b[i]!, a[i + 1]! - b[i + 1]!)); return maximum; };
 let measured = 0;
-for (const [i, action] of [...actions, ...damageActions].entries()) {
+for (const [i, action] of authoredActions.entries()) {
   const index = source.Sequences.length + i;
   const first = finalDrawn.triangles(index, 0, 1), contact = finalDrawn.triangles(index, action.contact / 60, 1);
   ensure(action.pose === "sideSpecial" ? contact.length > 0 : action.hold ? distance(contact, finalDrawn.triangles(index, action.frames / 60, 1)) < 0.01 : distance(first, contact) > 3, `${action.pose}: dead or drifting gesture`);

@@ -397,24 +397,6 @@ export const WHITE_MODEL_FACTS: Readonly<Record<string, ModelFacts>> = {
     },
     "emitters": []
   },
-  "war3mapimported/anubarakwhite-d2e2391841cd745aabc7de0f26133de62cf11bc8b2e4a65cc2a8d8c7f9743a83.mdx": {
-    "geosets": 6,
-    "triangles": 917,
-    "lights": 0,
-    "bounds": {
-      "min": [
-        -264.6940002441406,
-        -213.47300720214844,
-        -201.39700317382812
-      ],
-      "max": [
-        246.98800659179688,
-        212.55799865722656,
-        447.3089904785156
-      ]
-    },
-    "emitters": []
-  },
   "war3mapimported/malfurionstormragewhite-95fcde0e52cbab8486dd82dea5f05b13b1b80a82a3d85eb53e946875e865dd45.mdx": {
     "geosets": 12,
     "triangles": 1125,
@@ -465,6 +447,24 @@ export const WHITE_MODEL_FACTS: Readonly<Record<string, ModelFacts>> = {
         300,
         300,
         350
+      ]
+    },
+    "emitters": []
+  },
+  "war3mapimported/anubarakwhite-94e22019acc84d7d7ba7374fb984b4febbb94ff79db67d49c863a0ec0fa2bd5c.mdx": {
+    "geosets": 6,
+    "triangles": 917,
+    "lights": 0,
+    "bounds": {
+      "min": [
+        -264.6940002441406,
+        -213.47300720214844,
+        -201.39700317382812
+      ],
+      "max": [
+        246.98800659179688,
+        212.55799865722656,
+        447.3089904785156
       ]
     },
     "emitters": []
