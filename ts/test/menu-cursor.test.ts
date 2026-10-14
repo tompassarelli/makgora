@@ -26,10 +26,12 @@ interface Watch {
   selectionDialogs: { frame: unknown; events: unknown[] }[];
   text: Map<unknown, string>;
   confirm: unknown;
+  frames: Map<string, unknown>;
+  plainButtons: { frame: unknown; events: unknown[] }[];
 }
 
 function watch(client: HeadlessClient): Watch {
-  const seen: Watch = { cursor: [], warps: 0, hand: undefined, handShown: false, stageDialogs: [], selectionDialogs: [], text: new Map(), confirm: undefined };
+  const seen: Watch = { cursor: [], warps: 0, hand: undefined, handShown: false, stageDialogs: [], selectionDialogs: [], text: new Map(), confirm: undefined, frames: new Map(), plainButtons: [] };
   const { natives } = client;
   const stageParents = new Set<unknown>();
   const create = natives.BlzCreateFrameByType as Native;
@@ -38,6 +40,8 @@ function watch(client: HeadlessClient): Watch {
     if (args[1] === `MeleeHand${client.slot}`) seen.hand = frame;
     if (args[1] === "MeleeStageRoot" || args[1] === "MeleeStagePoolRoot") stageParents.add(frame);
     if (args[1] === `MeleeConfirmLabel${client.slot}`) seen.confirm = frame;
+    seen.frames.set(String(args[1]), frame);
+    if (args[0] === "BUTTON" && /^Melee(Tile|Mode|Settings)Button/.test(String(args[1]))) seen.plainButtons.push({ frame, events: [] });
     if (args[3] === "ScriptDialogButton" && String(args[1]).startsWith("MeleeMoves")) seen.selectionDialogs.push({ frame, events: [] });
     return frame;
   };
@@ -49,7 +53,7 @@ function watch(client: HeadlessClient): Watch {
   };
   const register = natives.BlzTriggerRegisterFrameEvent as Native;
   natives.BlzTriggerRegisterFrameEvent = (...args: unknown[]) => {
-    const button = [...seen.stageDialogs, ...seen.selectionDialogs].find(button => button.frame === args[1]);
+    const button = [...seen.stageDialogs, ...seen.selectionDialogs, ...seen.plainButtons].find(button => button.frame === args[1]);
     if (button !== undefined) button.events.push(args[2]);
     return register(...args);
   };
@@ -153,6 +157,28 @@ test("character select registers no cursor-displacing dialog hover events and st
   point(AWAY.x, AWAY.y);
   clients.frames(5);
   for (const seen of watches) expect(seen.text.get(seen.confirm)).not.toContain("|cffffcc00");
+  for (const client of clients.clients) expect(client.errors).toEqual([]);
+});
+
+test("fighter tiles register no hover events and a resting pointer still lights its tile [k1 scenario]", () => {
+  const { clients, watches, point } = menu();
+  const grid = rosterGrid(PLAYABLE_CHARACTERS.length);
+  const tile = 4;
+  const rect = cellRect(grid, tile);
+  for (const [index, seen] of watches.entries()) {
+    expect(seen.plainButtons.length).toBeGreaterThan(PLAYABLE_CHARACTERS.length);
+    for (const button of seen.plainButtons) expect(button.events).toEqual([clients.clients[index]?.natives.FRAMEEVENT_CONTROL_CLICK]);
+  }
+  const name = (seen: Watch) => seen.text.get(seen.frames.get(`MeleeTileName${clients.clients[watches.indexOf(seen)]?.slot}_${tile}`)) ?? "";
+  point(AWAY.x, AWAY.y);
+  clients.frames(5);
+  for (const seen of watches) expect(name(seen)).not.toContain("|cffffcc00");
+  point((rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2);
+  clients.frames(5);
+  for (const seen of watches) expect(name(seen)).toContain("|cffffcc00");
+  point(AWAY.x, AWAY.y);
+  clients.frames(5);
+  for (const seen of watches) expect(name(seen)).not.toContain("|cffffcc00");
   for (const client of clients.clients) expect(client.errors).toEqual([]);
 });
 

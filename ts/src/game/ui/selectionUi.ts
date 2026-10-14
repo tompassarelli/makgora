@@ -57,7 +57,7 @@ import {
 } from "../menu/selectionDrag";
 import { cellRect, rosterGrid } from "../menu/selectionGrid";
 import { MENU_FONT, MENU_STYLE, NATIVE_TEXT_BASE, PANEL_TEXTURE, type TextBox } from "./hudLayout";
-import { MOVES_BODY_BOX, MOVES_BOX, MOVES_BUTTON_HEIGHT, MOVES_BUTTON_TOP, MOVES_TITLE_BOX, START_BUTTON, boxContains, selectionTitleBox } from "./selectionLayout";
+import { MOVES_BODY_BOX, MOVES_BOX, MOVES_BUTTON_HEIGHT, MOVES_BUTTON_TOP, MOVES_TITLE_BOX, SETTINGS_BOX, START_BUTTON, boxContains, selectionTitleBox } from "./selectionLayout";
 import { PLAYABLE_CHARACTERS, fighterName, fighterPortrait, nextSelectableCharacter } from "../sim/heroes/registry";
 import {
   MOVES_HEADER, itemsSetting, ultimatesSetting, itemKindSetting, automaticRematchSetting, movesPage, selectionModeLabel, endlessSetting, hitAreasSetting, partnerBehaviourSetting, partnerDamageSetting, partnerEscapeSetting,
@@ -170,6 +170,8 @@ function hotspot(parent: framehandle, x: number, y: number, width: number, heigh
   return frame;
 }
 
+
+const modeBox = (slot: number) => ({ x: f32(cardX(slot) + f32(0.014)), y: f32(0.27), width: f32(0.132), height: f32(0.027) });
 
 const characterOfTile = (tile: RosterTile): number => PLAYABLE_CHARACTERS[tile] ?? Character.rifleman;
 function tileOfCharacter(character: number): RosterTile {
@@ -298,16 +300,17 @@ export class SelectionPanel {
       const button = BlzCreateFrameByType("BUTTON", `MeleeTileButton${name}`, root, "", 0);
       placeTopLeft(button, x, y);
       BlzFrameSetSize(button, f32(grid.cellWidth), f32(grid.cellHeight));
-      this.tileButtons.push(this.clicks.add(button, { kind: "tile", tile: choice }));
+      this.tileButtons.push(this.clicks.add(button, { kind: "tile", tile: choice }, undefined, "native"));
     }
     this.cards = PARTICIPANT_SLOTS.map((slot) => {
       const x = cardX(slot);
       const name = `${suffix}_${I2S(slot)}`;
       const card = art(root, `MeleeCard${name}`, "war3mapImported\\SelectionCardGray.tga", x, f32(0.275), f32(0.16), f32(0.22));
       const mode = BlzCreateFrameByType("BUTTON", `MeleeModeButton${name}`, root, "", 0);
-      placeTopLeft(mode, x + f32(0.014), f32(0.27));
-      BlzFrameSetSize(mode, f32(0.132), f32(0.027));
-      this.clicks.add(mode, { kind: "mode", slot });
+      const modeArea = modeBox(slot);
+      placeTopLeft(mode, modeArea.x, modeArea.y);
+      BlzFrameSetSize(mode, modeArea.width, modeArea.height);
+      this.clicks.add(mode, { kind: "mode", slot }, undefined, "native");
       const tag = label(mode, `MeleeTag${name}`, x + f32(0.014), f32(0.267), f32(0.132), f32(0.019), f32(0.01));
       const portrait = art(root, `MeleePortrait${name}`, portraitTexture(Character.demonHunter, false, slot), x + f32(0.029), f32(0.245), f32(0.102), f32(0.102));
       const name_ = label(root, `MeleeName${name}`, x + f32(0.008), f32(0.102), f32(0.144), f32(0.019), f32(0.011));
@@ -331,11 +334,11 @@ export class SelectionPanel {
     art(root, `MeleeConfirmArt${suffix}`, "war3mapImported\\SelectionAction.tga", START_BUTTON.x, START_BUTTON.y, START_BUTTON.width, START_BUTTON.height);
     this.confirm = label(root, `MeleeConfirmLabel${suffix}`, f32(0.079), f32(0.039), f32(0.219), f32(0.028), f32(0.011));
     this.clicks.add(hotspot(root, START_BUTTON.x, START_BUTTON.y, START_BUTTON.width, START_BUTTON.height), { kind: "start" }, undefined, "native");
-    art(root, `MeleeSettingsArt${suffix}`, "war3mapImported\\SelectionAction.tga", headerBoxLeft, f32(0.52), f32(0.235), f32(0.037));
+    art(root, `MeleeSettingsArt${suffix}`, "war3mapImported\\SelectionAction.tga", SETTINGS_BOX.x, SETTINGS_BOX.y, SETTINGS_BOX.width, SETTINGS_BOX.height);
     const settingsButton = BlzCreateFrameByType("BUTTON", `MeleeSettingsButton${suffix}`, root, "", 0);
-    placeTopLeft(settingsButton, headerBoxLeft, f32(0.52));
-    BlzFrameSetSize(settingsButton, f32(0.235), f32(0.037));
-    this.clicks.add(settingsButton, { kind: "settings" });
+    placeTopLeft(settingsButton, SETTINGS_BOX.x, SETTINGS_BOX.y);
+    BlzFrameSetSize(settingsButton, SETTINGS_BOX.width, SETTINGS_BOX.height);
+    this.clicks.add(settingsButton, { kind: "settings" }, undefined, "native");
     const settingsLabel = label(settingsButton, `MeleeSettingsLabel${suffix}`, headerLeft, f32(0.516), f32(f32(0.235) - 2 * headerInset), f32(0.037), MENU_STYLE.headerSize);
     BlzFrameSetTextAlignment(settingsLabel, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
     this.settingsLabel = settingsLabel;
@@ -539,8 +542,11 @@ export class SelectionPanel {
   private pointedDialog(game: Readonly<MatchState>, x: number, y: number): SelectionButton | undefined {
     if (boxContains(START_BUTTON, x, y)) return { kind: "start" };
     if (boxContains(MOVES_BOX, x, y)) return { kind: "moves" };
+    if (boxContains(SETTINGS_BOX, x, y)) return { kind: "settings" };
+    if (this.drag.hover !== undefined) return { kind: "tile", tile: this.drag.hover };
     for (const slot of PARTICIPANT_SLOTS) {
       if (fighterActive(game, slot) && !humanFighterActive(game, slot) && boxContains(cpuSettingsBox(slot), x, y)) return { kind: "cpuSettings", slot };
+      if (boxContains(modeBox(slot), x, y)) return { kind: "mode", slot };
     }
     return undefined;
   }
