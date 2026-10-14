@@ -41,6 +41,8 @@ export const SMASHCRAFT_NOOPS: IntentionalNoops = {
   StopMusic: "quick-match inspects explicit sound cues; background music playback is not simulated",
   ClearMapMusic: "quick-match inspects explicit sound cues; background music playlists are not simulated",
   PlayMusic: "quick-match inspects explicit sound cues; background music playback is not simulated",
+  VolumeGroupSetVolume: "silencing the results burst's model sound is local mixing; headless checks do not mix audio",
+  VolumeGroupReset: "restoring mixer volumes at match start is local mixing; headless checks do not mix audio",
   SetCineFilterTexture: "the KO flash's screen filter is local presentation; headless checks do not render the screen",
   SetCineFilterBlendMode: "the KO flash's screen filter is local presentation; headless checks do not render the screen",
   SetCineFilterTexMapFlags: "the KO flash's screen filter is local presentation; headless checks do not render the screen",
