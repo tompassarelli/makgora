@@ -293,7 +293,8 @@ function createTriggers(s: ShellState): void {
 
 function worldOrigin(): { x: number; y: number; z: number } {
   const center = GetRectCenter(GetPlayableMapRect());
-  const origin = { x: GetLocationX(center), y: GetLocationY(center), z: GetLocationZ(center) + FLOOR_HEIGHT };
+  // Engine: terrain water can change GetLocationZ at the map centre, so the arena stands at a fixed height over the base map's ground (z 0).
+  const origin = { x: GetLocationX(center), y: GetLocationY(center), z: FLOOR_HEIGHT };
   RemoveLocation(center);
   return origin;
 }
