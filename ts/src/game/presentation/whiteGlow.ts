@@ -1,7 +1,8 @@
 import { floorMod } from "wisp/src/sim/intMath";
 import { ROSTER_MANA } from "../sim/mana";
-import { SpecialAction } from "../sim/codes";
+import { Character, SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
+import { runningHeroSpecial } from "../sim/heroSpecialRules";
 
 export const WHITE_GLOW_PERIOD = 12;
 export const HEAVY_HITLAG_FRAMES = 8;
@@ -33,6 +34,10 @@ export function whiteGlowAlpha(state: WhiteGlowState, fighter: Readonly<Fighter>
   state.frame = frame;
   if (fighter.status.out) return 0;
   if (frame < state.readyUntil) return 230;
+  if (fighter.character === Character.mountainKing && fighter.special.action === SpecialAction.heroDown && fighter.motion.grounded) {
+    const region = runningHeroSpecial(fighter)?.regions?.[0];
+    if (region !== undefined && fighter.special.frame > region.firstFrame && fighter.special.frame <= region.firstFrame + 3) return 230;
+  }
   if (fighter.special.action === SpecialAction.heroUltimate && fighter.special.frame <= ULTIMATE_FLASH_FRAMES) return 230;
   if (remaining > 0 && state.total >= HEAVY_HITLAG_FRAMES) {
     return floorMod(state.total - remaining, 4) < 2 ? 220 : 100;

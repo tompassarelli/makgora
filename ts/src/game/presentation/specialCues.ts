@@ -150,7 +150,8 @@ const BLOODLUST = cue("Abilities\\Spells\\Orc\\Bloodlust\\BloodlustSpecial.mdx",
 const WIND_GATHER = cue("Abilities\\Spells\\Other\\Tornado\\TornadoElementalSmall.mdx", "body", f32(0.4));
 const WIND_WALK = cue("Abilities\\Spells\\Human\\Invisibility\\InvisibilityTarget.mdx", "body", f32(0.8));
 const STORM = cue("Abilities\\Weapons\\Bolt\\BoltImpact.mdx", "hand", 1.0);
-const THUNDER_CLAP_CUE: Cue = { ...cue("Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdx", "feet", f32((MOUNTAIN_KING_SPECIALS.down.ground.regions?.[0]?.hit.maxX ?? 0.0) / 180.0)), sound: "ThunderClap" };
+// Warcraft discards the first seek after selecting an animation, so this held stand ring keeps its default sequence.
+const THUNDER_CLAP_CUE: Cue = { ...cue("Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdx", "feet", f32((MOUNTAIN_KING_SPECIALS.down.ground.regions?.[0]?.hit.maxX ?? 0.0) / f32(187.05800313601685))), sequence: undefined, pitch: 0.0, timeScale: 0.0, sound: "ThunderClap" };
 const SHADOW = cue("Abilities\\Spells\\Undead\\Curse\\CurseTarget.mdx", "hand", f32(0.7));
 const FROST = cue("Abilities\\Spells\\Undead\\ReplenishMana\\SpiritTouchTarget.mdx", "hand", f32(0.8));
 const ARCANE = cue("Abilities\\Spells\\Human\\DispelMagic\\DispelMagicTarget.mdx", "hand", 0.5);
@@ -604,7 +605,7 @@ export function specialCueState(fighter: Readonly<Fighter>): CueState {
     const branchCue = heroBranchCue(HERO_BRANCH_CUES[fighter.character]?.[slot], fighter.special.form);
     if (branchCue === "none") return NONE;
     cues = branchCue === undefined || branchCue === "slot" ? HERO_CUES[fighter.character]?.[slot] : branchCue;
-    windows = move === undefined ? undefined : heroCueWindows(move);
+    windows = move === undefined ? undefined : heroCueWindows(move, cues?.active === THUNDER_CLAP_CUE ? 1 : ACTIVE_CUE_FRAMES);
   } else {
     const branch = ORIGINAL_BRANCH_CUES[action]?.[fighter.special.form];
     cues = branch === undefined ? ORIGINAL_CUES[action] : branch.cues;
