@@ -97,7 +97,7 @@ export function floatingProblems(stage: number, name: string, pieces: readonly S
       const surface = hiddenBelow(stage);
       if (surface !== undefined && piece.bottom < surface) continue;
       const shown = Array.from({ length: 21 }, (_, step) => piece.left + ((piece.right - piece.left) * step) / 20).filter((x) => {
-        if (depth(piece.front, piece.bottom) > arenaFarZ(stage)) return false;
+        if (depth(piece.front, piece.bottom) > arenaFarZ(stage, camera)) return false;
         const at = project(x, piece.front, piece.bottom);
         if (at[0] < 0 || at[0] > 1 || at[1] < 0 || at[1] > 1 || behindDeck(at)) return false;
         return !placed.some((other) => other !== piece && other.front <= piece.front && x >= other.left && x <= other.right && piece.bottom >= other.bottom && piece.bottom <= other.top);

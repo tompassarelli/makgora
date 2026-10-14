@@ -92,7 +92,7 @@ const spans = (low: number, high: number) => {
 const ARENA_CAMERAS: readonly CameraView[] = STAGE_CATALOG.flatMap(({ id }) => spans(stageBounds(id).blast.left, stageBounds(id).blast.right).flatMap(([left, right]) =>
   spans(stageBounds(id).blast.bottom, stageBounds(id).blast.top).map(([bottom, top]) => {
     const { x, z, distance, fieldOfView } = arenaFraming(id, left, right, bottom, top);
-    return { target: [x, 0, z], distance, angleOfAttack: ARENA_CAMERA.angleOfAttack, rotation: ARENA_CAMERA.rotation, fieldOfView, aspect: 16 / 9, farZ: arenaFarZ(id) };
+    return { target: [x, 0, z], distance, angleOfAttack: ARENA_CAMERA.angleOfAttack, rotation: ARENA_CAMERA.rotation, fieldOfView, aspect: 16 / 9, farZ: arenaFarZ(id, { distance, z }) };
   })));
 
 

@@ -265,7 +265,7 @@ export function sparkScenes(move: CueMove, graphics: Graphics): { readonly scene
         SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, near.distance, 0.0);
         SetCameraField(CAMERA_FIELD_ZOFFSET, FLOOR_HEIGHT + 100.0, 0.0);
         SetCameraField(CAMERA_FIELD_FIELD_OF_VIEW, cameraFieldOfView(near, MATCH_CAMERA_ASPECT), 0.0);
-        SetCameraField(CAMERA_FIELD_FARZ, arenaFarZ(0), 0.0);
+        SetCameraField(CAMERA_FIELD_FARZ, arenaFarZ(0, { distance: near.distance, z: 100.0 }), 0.0);
         SetCameraPosition(origin.x + victim.motion.x, origin.y);
       });
       advanceImpacts(impacts);
@@ -313,7 +313,7 @@ function aimNear(x: number, z: number): void {
   SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, near.distance, 0.0);
   SetCameraField(CAMERA_FIELD_ZOFFSET, FLOOR_HEIGHT + z + 100.0, 0.0);
   SetCameraField(CAMERA_FIELD_FIELD_OF_VIEW, cameraFieldOfView(near, MATCH_CAMERA_ASPECT), 0.0);
-  SetCameraField(CAMERA_FIELD_FARZ, arenaFarZ(0), 0.0);
+  SetCameraField(CAMERA_FIELD_FARZ, arenaFarZ(0, { distance: near.distance, z: z + 100.0 }), 0.0);
   SetCameraPosition(x, PLAYABLE_BOUNDS.centreY);
 }
 
