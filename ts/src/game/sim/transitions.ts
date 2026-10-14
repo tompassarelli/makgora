@@ -7,7 +7,7 @@ import { floorDiv } from "wisp/src/sim/intMath";
 import { mutableProjectile } from "./fighterProjectiles";
 import { max } from "../../runtime/numbers";
 import { AttackStyle, DASH_GRAB_REQUEST, DownState, GrabAction, LedgeState, PlatformMove, ProjectileKind, SpecialAction, SurfaceContact } from "./codes";
-import { isTumbling } from "./conditions";
+import { cancelsJumpSquat, isTumbling } from "./conditions";
 import { type Fighter, SHIELD_POWERSHIELD_INPUT_WINDOW_FRAMES, placedObject } from "./fighter";
 import { clearDash } from "./groundMovement";
 import { clearMash } from "./mash";
@@ -338,7 +338,7 @@ export function beginAttack(attacker: Fighter, style: AttackStyle, mayCharge: bo
     shield.raised = false;
     shield.heldFrames = 0;
   }
-  if (resolvedStyle === AttackStyle.grab) {
+  if (cancelsJumpSquat(resolvedStyle)) {
     attacker.jump.squat = 0;
     attacker.jump.dodgeQueued = false;
     attacker.jump.dodgeX = 0;

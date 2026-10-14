@@ -249,7 +249,7 @@ export function choosePunish(f: Readonly<Fighter>, target: Readonly<Fighter>, st
   const running = f.ground.dashFrame > 0;
   for (let index = 0; index < PUNISH_MOVES.length; index++) {
     const move = at(PUNISH_MOVES, index);
-    if (shielding && move !== AttackStyle.grab) continue;
+    if (shielding && move !== AttackStyle.grab && move !== AttackStyle.upSmash) continue;
     const style = running ? runningStyle(f, move) : move;
     const startup = attackStartupFrames(style, moves);
 
@@ -274,6 +274,10 @@ export function choosePunish(f: Readonly<Fighter>, target: Readonly<Fighter>, st
     queueAttack(commands, { style: best, facing: toward, frame, mayCharge: false });
     input.attackHeld = false;
     input.shield = false;
+    if (shielding && best === AttackStyle.upSmash) {
+      input.jumpPressed = true;
+      input.jumpHeld = true;
+    }
     return true;
   }
   if (!runFits || !safeAt(stage, f32(f.motion.x + dx), 0.0)) return false;

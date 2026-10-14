@@ -1,4 +1,4 @@
-import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
+import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { queueAttack } from "../input/attackBuffer";
 import { beginFighterAttack, resolveAttacks } from "../sim/attacks";
@@ -9,6 +9,7 @@ import { SELECTABLE_CHARACTERS, fighterName } from "../sim/heroes/registry";
 import { authoredHitRegion, emptyHitRegion } from "../sim/hitRegions";
 import { attackStartupFrames, characterAttackActiveFrames } from "../sim/moves";
 import { copyControls, createRoster, fighterAt } from "../sim/roster";
+import { SHIELD_MIN_HOLD_FRAMES } from "../sim/shield";
 import { controls } from "../sim/testWorld";
 import { createBufferedFrameControls } from "./controls";
 import { Phase, createMatchState } from "./rules";
@@ -50,6 +51,50 @@ test("grab on every jump squat frame starts a grounded standing grab without tak
       assertEquals(f.jump.serial, 0, name);
       assertTrue(f.motion.grounded);
     }
+  }
+});
+
+test("up smash on every jump squat frame starts a grounded up smash without takeoff [k4 reference docs/design/melee/techniques.md#shield-drop-jump-cancelled-grab-and-up-smash]", () => {
+  for (const character of SELECTABLE_CHARACTERS) {
+    const count = createFighter(character, 0.0, 1).tuning.physics.jumpSquatFrames;
+    for (let squatFrame = 0; squatFrame < count; squatFrame++) {
+      const d = duel(character);
+      const f = fighterAt(d.world, 0);
+      for (let frame = 0; frame <= squatFrame; frame++) {
+        copyControls(d.inputs.inputs[0], controls({ jumpPressed: frame === 0, jumpHeld: true, verticalDirection: 1 }));
+        if (frame === squatFrame) queueAttack(d.inputs.commands[0], { style: AttackStyle.upSmash, facing: 0, frame: frame + 1, mayCharge: false });
+        stepMatch(d.game, d.world, d.inputs, frame + 1);
+      }
+      const name = `${fighterName(character)} squat frame ${squatFrame}`;
+      assertEquals(f.attack.style, AttackStyle.upSmash, name);
+      assertEquals(f.jump.squat, 0, name);
+      assertEquals(f.jump.serial, 0, name);
+      assertTrue(f.motion.grounded);
+    }
+  }
+});
+
+test("shield, jump, up smash charges a grounded up smash out of shield [k3 measure #550]", () => {
+  for (const character of SELECTABLE_CHARACTERS) {
+    const d = duel(character);
+    const f = fighterAt(d.world, 0);
+    f.shield.raised = true;
+    f.shield.heldFrames = SHIELD_MIN_HOLD_FRAMES;
+    let frame = 1;
+    copyControls(d.inputs.inputs[0], controls({ shield: true, shieldTriggerActive: true, shieldStrength: 1.0, jumpPressed: true, jumpHeld: true }));
+    stepMatch(d.game, d.world, d.inputs, frame);
+    const name = fighterName(character);
+    assertTrue(f.jump.squat > 0);
+    frame++;
+    queueAttack(d.inputs.commands[0], { style: AttackStyle.upSmash, facing: 0, frame, mayCharge: true });
+    copyControls(d.inputs.inputs[0], controls({ jumpHeld: true, attackHeld: true }));
+    stepMatch(d.game, d.world, d.inputs, frame);
+    assertEquals(f.attack.style, AttackStyle.upSmash, name);
+    assertFalse(f.shield.raised);
+    for (let held = 0; held < 30; held++) stepMatch(d.game, d.world, d.inputs, ++frame);
+    assertTrue(f.attack.smashChargeFrames > 0);
+    assertEquals(f.jump.serial, 0, name);
+    assertTrue(f.motion.grounded);
   }
 });
 

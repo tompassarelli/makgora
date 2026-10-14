@@ -6,7 +6,7 @@ import { pushFighterBodies } from "../sim/bodyPush";
 import { beginFighterAttack, resolveAttacks } from "../sim/attacks";
 import { AttackStyle, DASH_GRAB_REQUEST } from "../sim/codes";
 import { clearDash } from "../sim/groundMovement";
-import { canStartAttackStyle, inGrabContext } from "../sim/conditions";
+import { canStartAttackStyle, cancelsJumpSquat, inGrabContext } from "../sim/conditions";
 import { collectLavaContacts } from "../sim/lava";
 import { beginDamageContacts, finishDamageContacts } from "../sim/contacts";
 import { advanceGrabs, captureGrabPauses, resolveGrabs } from "../sim/grabs";
@@ -179,7 +179,8 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
     resetObservedActions();
     const f = fighterAt(world, slot);
     const pending = controls.commands[slot].pending;
-    const jumpCancel = pending?.style === AttackStyle.grab && hasPendingAttack(controls.commands[slot], frame) && f.motion.grounded && canStartAttackStyle(f, AttackStyle.grab) && (f.jump.squat > 0 || controls.inputs[slot].jumpPressed);
+    const pendingStyle = requestedStyle(pending?.style);
+    const jumpCancel = cancelsJumpSquat(pendingStyle) && hasPendingAttack(controls.commands[slot], frame) && f.motion.grounded && canStartAttackStyle(f, pendingStyle) && (f.jump.squat > 0 || controls.inputs[slot].jumpPressed);
     if (jumpCancel) {
       f.jump.squat = 0;
       f.jump.dodgeQueued = false;

@@ -127,8 +127,13 @@ export function jabChainStep(f: Readonly<Fighter>): AttackStyle | undefined {
 }
 
 
+export function cancelsJumpSquat(style: AttackStyle | undefined): boolean {
+  return style === AttackStyle.grab || style === AttackStyle.upSmash;
+}
+
+
 export function canStartAttackStyle(attacker: Fighter, style: AttackStyle | undefined): boolean {
-  if (style === AttackStyle.grab && attacker.motion.grounded && attacker.jump.squat > 0) return canStartAttack(attacker, true);
+  if (cancelsJumpSquat(style) && attacker.motion.grounded && attacker.jump.squat > 0) return canStartAttack(attacker, true);
   if (style === AttackStyle.jab && jabChainStep(attacker) !== undefined) return true;
   const dashGrabs = attacker.tuning.dashGrab.startupFrames > 0;
   if (style === DASH_GRAB_REQUEST) {
