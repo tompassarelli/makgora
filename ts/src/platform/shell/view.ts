@@ -42,7 +42,7 @@ import { concealFighter, concealFighters } from "./fighterCloak";
 import { type ShellState, type StatusFrames, activeRollback, localSlot, playsOnKeyboard } from "./state";
 import { type UiObjects, pauseEffects, views } from "./ui";
 import { loreClears } from "../../game/classic/loreClears";
-import { drawStageFog, drawStageScenery } from "./stageScenery";
+import { updateStageFog, drawStageScenery } from "./stageScenery";
 import { probeCamera, probeWaiting } from "./responseProbe";
 import { clockSeconds } from "./trace";
 
@@ -496,7 +496,7 @@ function applyArenaCamera(s: ShellState, framing: Readonly<MatchCamera>, aspect:
   SetCameraField(CAMERA_FIELD_ROLL, 0.0, 0.0);
   SetCameraField(CAMERA_FIELD_FIELD_OF_VIEW, cameraFieldOfView(framing, aspect), duration);
   SetCameraField(CAMERA_FIELD_FARZ, arenaFarZ(s.game.stageChoice, framing), 0.0);
-  drawStageFog(s);
+  updateStageFog(s);
   if (duration > 0.0) PanCameraToTimed(targetX, centerY, duration);
   else SetCameraPosition(targetX, centerY);
 }

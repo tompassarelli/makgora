@@ -4,12 +4,10 @@ import { hideEffect } from "../../game/render/effects";
 import type { ShellState } from "./state";
 import { arenaDepthOffset, arenaFogEnd, cameraZOverride } from "../../game/presentation/arenaCamera";
 
-export function drawStageFog(s: ShellState): void {
-  if (s.stageFogHidden === true) return;
+export function updateStageFog(s: ShellState): void {
+  if (s.stageFogHidden === true || s.stageFogOverride === true) return;
   const scenery = stageScenery(s.game.stageChoice);
 
-  BlzSetTerrainFogMaxLinearDensity(1.0);
-  BlzSetTerrainFogDrawOverSky(false);
   const fog = scenery.fog;
   if (fog === undefined) { ResetTerrainFog(); return; }
   const offset = arenaDepthOffset(s.camera);
@@ -20,6 +18,15 @@ export function drawStageFog(s: ShellState): void {
   SetTerrainFogExV(3, height.start + offset, Math.max(height.end + offset, end), height.density,
     s.origin.z + height.heightStart, s.origin.z + height.heightEnd,
     fog.start + offset, end, fog.red, fog.green, fog.blue);
+}
+
+function drawStageFog(s: ShellState): void {
+  s.stageFogOverride = undefined;
+  BlzSetTerrainFogMaxLinearDensity(1.0);
+  BlzSetTerrainFogDrawOverSky(false);
+  updateStageFog(s);
+  const height = stageScenery(s.game.stageChoice).heightFog;
+  if (height === undefined) return;
   BlzSetTerrainFogMaxLinearDensity(height.maxDensity);
   BlzSetTerrainFogDrawOverSky(height.drawOverSky);
 }
@@ -36,6 +43,7 @@ export function drawStageScenery(s: ShellState): void {
   BlzShowTerrain(false);
   SetSkyModel(scenery.sky);
   SetDayNightModels(STOCK_TERRAIN_LIGHT, STOCK_UNIT_LIGHT);
+  s.stageFogHidden = false;
   drawStageFog(s);
 
   const shadows = shadowCastingLights(s.game.stageChoice);
