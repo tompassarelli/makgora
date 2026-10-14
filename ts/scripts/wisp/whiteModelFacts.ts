@@ -91,24 +91,6 @@ export const WHITE_MODEL_FACTS: Readonly<Record<string, ModelFacts>> = {
     },
     "emitters": []
   },
-  "war3mapimported/forsakenpaladinwhite-7deec422399625282a46f873d738093eb06b2268b0e2e1c6af4daa3d93c9dceb.mdx": {
-    "geosets": 4,
-    "triangles": 3418,
-    "lights": 0,
-    "bounds": {
-      "min": [
-        -320,
-        -320,
-        -200
-      ],
-      "max": [
-        320,
-        320,
-        391.70599365234375
-      ]
-    },
-    "emitters": []
-  },
   "war3mapimported/dreadlordwhite-04c64b736518c3a79f9fa1deb921cc2a35878941b516f71db01e746332cf798b.mdx": {
     "geosets": 11,
     "triangles": 768,
@@ -465,6 +447,24 @@ export const WHITE_MODEL_FACTS: Readonly<Record<string, ModelFacts>> = {
         300,
         300,
         350
+      ]
+    },
+    "emitters": []
+  },
+  "war3mapimported/forsakenpaladinwhite-3b986b5bfccc4e982a1d919363f16732c349911e2db09df2b7139a0c037764a5.mdx": {
+    "geosets": 5,
+    "triangles": 3318,
+    "lights": 0,
+    "bounds": {
+      "min": [
+        -320,
+        -320,
+        -200
+      ],
+      "max": [
+        320,
+        320,
+        391.70599365234375
       ]
     },
     "emitters": []

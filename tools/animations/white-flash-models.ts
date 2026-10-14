@@ -52,7 +52,7 @@ async function whiteTexture(path: string, graphics: "classic" | "definitive" = "
   if (String.fromCharCode(...bytes.subarray(0, 3)) === "BLP") pixels = getBLPImageData(decodeBLP(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)), 0);
   else if (bytes[0] === 137 && bytes[1] === 80) pixels = PNG.sync.read(Buffer.from(bytes));
   else {
-    const convert = Bun.spawn(["magick", "-", "png:-"], { stdin: bytes, stdout: "pipe", stderr: "pipe" });
+    const convert = Bun.spawn(["magick", path.toLowerCase().endsWith(".tga") ? "tga:-" : "-", "png:-"], { stdin: bytes, stdout: "pipe", stderr: "pipe" });
     const converted = await new Response(convert.stdout).arrayBuffer();
     if (await convert.exited !== 0) throw new Error(`Cannot read ${path}: ${await new Response(convert.stderr).text()}`);
     pixels = PNG.sync.read(Buffer.from(converted));
