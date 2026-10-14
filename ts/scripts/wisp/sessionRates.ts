@@ -55,11 +55,12 @@ interface Minute {
   readonly lines: SessionRateLines;
 }
 
-const SPEEDS = ["Slowest", "Slow", "Normal", "Fast", "Fastest"];
+const FAST = 2;
+const SPEEDS = ["Slow", "Normal", "Fast"];
 
 function speedFlag(seconds: readonly Fields[]): string {
   const seen = new Set(seconds.map(row => row.gs ?? -1).filter(speed => speed >= 0));
-  const other = [...seen].filter(speed => speed !== 3);
+  const other = [...seen].filter(speed => speed !== FAST);
   return other.length === 0 ? "" : `SPEED(${[...seen].map(speed => SPEEDS[speed] ?? speed).join("/")})`;
 }
 
@@ -108,8 +109,8 @@ export function forkVerdict(minutes: readonly { readonly minute: number; readonl
   if (onset === undefined) return `  fork: none (sim held ≥${SLOW_SIM}/s every minute)`;
   const slow = minutes.flatMap(minute => match(minute.lines.seconds)).filter(row => (row.sim ?? 0) < SLOW_SIM);
   const at = `onset min ${onset.minute} t ${fixed((match(onset.lines.seconds).at(-1)?.t ?? 0) / 1000, 0)}s`;
-  const speeds = [...new Set(slow.map(row => row.gs ?? -1))].filter(speed => speed !== 3);
-  if (speeds.length > 0) return `  fork: game-speed (gs=${speeds.join("/")}), ${at}`;
+  const speeds = [...new Set(slow.map(row => row.gs ?? -1))].filter(speed => speed !== FAST);
+  if (speeds.length > 0) return `  fork: game-speed (${speeds.map(speed => `gs=${speed} ${SPEEDS[speed] ?? "unknown"}`).join("/")}), ${at}`;
   const cb = mean(slow, "cb");
   const draw = mean(slow, "dr");
   const sim = mean(slow, "sim");
