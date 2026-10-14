@@ -377,6 +377,7 @@ test("Classic Cairne's Shockwave draws a playing wave on its projectile for the 
       target.motion.x = 2000 * facing;
       let tick = 0, drawn = 0, alive = 0;
       const clocks = new Map<unknown, number>();
+      const births = new Map<unknown, number>();
       const step = () => {
         tick++;
         for (const input of s.produced.inputs) copyControls(input, neutralControls());
@@ -387,7 +388,9 @@ test("Classic Cairne's Shockwave draws a playing wave on its projectile for the 
         client.draw(1 / 60);
       };
       for (let frame = 0; frame < 120 && (tick < 2 || cairne.projectiles.some((p) => p.life > 0) || drawn === 0); frame++) {
+        const traceStart = client.log.length;
         step();
+        const calls = client.log.slice(traceStart);
         const live = cairne.projectiles.filter((p) => p.spec?.model === wave.model && p.life > 0);
         const waves = client.effectPoses({ visibleOnly: true }).filter((pose) => pose.destroyed === undefined && pose.model === wave.model);
         alive += live.length;
@@ -398,6 +401,9 @@ test("Classic Cairne's Shockwave draws a playing wave on its projectile for the 
           expect(pose.timeScale, `tick ${tick}: wave animation plays`).toBeGreaterThan(0);
           const previous = clocks.get(pose.handle);
           if (previous !== undefined) expect(pose.animationClock, `tick ${tick}: wave clock advances`).toBeGreaterThan(previous);
+          const bornLife = births.get(pose.handle);
+          if (bornLife === undefined) births.set(pose.handle, projectile.life);
+          else if (projectile.life === bornLife - 1) expect(calls.some(call => call.name === "BlzSetSpecialEffectTime" && call.args[0] === pose.handle), "second callback seeks the wave after sequence selection (#58)").toBe(true);
           clocks.set(pose.handle, pose.animationClock);
           drawn++;
         }
