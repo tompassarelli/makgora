@@ -190,7 +190,7 @@ BunRuntime.runMain(Effect.tryPromise({ try: async () => {
     for (const action of actions) {
         const index = FORSAKEN_PALADIN_CLIPS[action.pose as keyof typeof FORSAKEN_PALADIN_CLIPS].index;
         const panels: PoseFrame[] = [1, -1].flatMap(facing => [0, Math.max(1, action.first - 3), action.first, action.last, Math.min(action.frames, action.last + 5), action.frames].map(frame => ({ frame, phase: frame < action.first ? AttackPhase.startup : frame <= action.last ? AttackPhase.active : AttackPhase.recovery, x: 0, z: 0, facing, parts: [], strikes: [], clip: index, seconds: frame / 60 })));
-        await Bun.write(join(output, `${action.pose}.png`), sheet(`Forsaken hammer ${action.pose}`, drawn, panels, 6).png);
+        await Bun.write(join(output, `${action.pose}.png`), sheet(`Forsaken sword ${action.pose}`, drawn, panels, 6).png);
     }
     const contact = receipts.map(record => ({ ...record, measured: record.targets.map(target => { const posed = drawn.posed(record.index, target.frame / 60, 1); const x = posed.nodes[reference.ObjectId * 2]!, z = posed.nodes[reference.ObjectId * 2 + 1]!; return { frame: target.frame, x, z, targetX: target.x * 1.2, targetZ: target.z * 1.2, error: Math.hypot(x - target.x * 1.2, z - target.z * 1.2) }; }) }));
     const geometry: string[] = [], changes = [];

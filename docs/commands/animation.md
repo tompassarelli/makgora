@@ -170,7 +170,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   to the existing move frames, keeps the pummel's held left arm, and writes measured
   weapon contact geometry through `forsakenPaladinWeaponGeometry.ts`. The authoring
   move tables provide the contact targets; shipped collision follows the measured
-  grip and head. Run the hammer model helper, original clip export, timeline export
+  grip and blade. Run the original clip export, timeline export
   and Character 7 white-copy export afterward. Other fighter inputs stay unchanged.
   `bun tools/animations/forsaken-paladin-model.ts AUTHORED_FORSAKEN.mdx PRIVATE_OUTPUT.mdx`
   replaces the sword with an original beveled hammer centered on `Weapon Ref`,
