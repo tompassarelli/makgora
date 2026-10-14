@@ -8,7 +8,7 @@ const GAP_FLAG_US = 250000;
 const SLOW_SIM = 55;
 const SLOW_CB = 55;
 const SLOW_DRAW = 57;
-const FULL_MINUTE = 55;
+const MIN_MATCH_SECONDS = 20;
 
 export type Fields = Record<string, number>;
 
@@ -103,7 +103,7 @@ export function forkVerdict(minutes: readonly { readonly minute: number; readonl
   const match = (seconds: readonly Fields[]) => seconds.filter(row => row.ph === 2);
   const onset = minutes.find(minute => {
     const seconds = match(minute.lines.seconds);
-    return seconds.length >= FULL_MINUTE && mean(seconds, "sim") < SLOW_SIM;
+    return seconds.length >= MIN_MATCH_SECONDS && mean(seconds, "sim") < SLOW_SIM;
   });
   if (onset === undefined) return `  fork: none (sim held ≥${SLOW_SIM}/s every minute)`;
   const slow = minutes.flatMap(minute => match(minute.lines.seconds)).filter(row => (row.sim ?? 0) < SLOW_SIM);
