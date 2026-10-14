@@ -247,7 +247,7 @@ export function effectUses(): EffectUse[] {
 export interface EffectFinding extends EffectUse, EffectVerdict {}
 
 /** Judges every use: a missing Classic model, a hidden sequence window, or a travelling effect held at a fighter anchor. */
-export async function checkEffects(read: (path: string) => Promise<Uint8Array | undefined>, uses: readonly EffectUse[] = effectUses()): Promise<EffectFinding[]> {
+export async function checkEffects(read: (path: string) => Promise<Uint8Array | undefined>, uses: readonly EffectUse[] = effectUses(), reads = new Map<string, readonly string[]>()): Promise<EffectFinding[]> {
   const models = new Map<string, mdx.Model | undefined>();
   const textures = new Map<string, boolean>();
   for (const use of uses) if (!models.has(use.model)) {
@@ -255,7 +255,9 @@ export async function checkEffects(read: (path: string) => Promise<Uint8Array | 
     let parsed: mdx.Model | undefined;
     try { parsed = bytes === undefined || bytes.length === 0 ? undefined : parseModelMDX(bytes.slice().buffer); } catch { parsed = undefined; }
     models.set(use.model, parsed);
-    for (const texture of parsed?.Textures ?? []) if (texture.Image !== "" && !textures.has(texture.Image)) textures.set(texture.Image, ((await read(texture.Image))?.length ?? 0) > 0);
+    const images = (parsed?.Textures ?? []).map((texture) => texture.Image).filter((image) => image !== "");
+    reads.set(use.model, [use.model, ...images]);
+    for (const image of images) if (!textures.has(image)) textures.set(image, ((await read(image))?.length ?? 0) > 0);
   }
   return uses.map((use) => {
     const model = models.get(use.model);
@@ -322,12 +324,14 @@ export const readEffectReport = Effect.fnUntraced(function*(root: string) {
   if (decoded.fields.Version !== "3.0.0.24268") return yield* new EffectCheckFailure({ problem: `Classic calibration needs 3.0.0.24268, got ${decoded.fields.Version}` });
   const input = classicReader(stockCacheReader(root));
   const hashes = new Map<string, string>();
+  const reads = new Map<string, readonly string[]>();
   const findings = yield* Effect.tryPromise({
-    try: () => checkEffects(async (path) => { const bytes = await input(path); if (bytes !== undefined) hashes.set(path, createHash("sha256").update(bytes).digest("hex")); return bytes; }),
+    try: () => checkEffects(async (path) => { const bytes = await input(path); if (bytes !== undefined) hashes.set(path, createHash("sha256").update(bytes).digest("hex")); return bytes; }, effectUses(), reads),
     catch: (cause) => new EffectCheckFailure({ problem: `Classic effect check: ${String(cause)}` }),
   });
   const provenance = createHash("sha256").update(info).update(JSON.stringify([...hashes].sort(([a], [b]) => a.localeCompare(b)))).digest("hex");
-  return { source: effectSourceDigest(), provenance, cache: root, inputs: [...hashes], findings };
+  const models = new Map([...reads].map(([model, paths]) => [model, createHash("sha256").update(JSON.stringify(paths.map((path) => [path, hashes.get(path) ?? ""]))).digest("hex")]));
+  return { source: effectSourceDigest(), cacheInfo: createHash("sha256").update(info).digest("hex"), provenance, cache: root, inputs: [...hashes], models, findings };
 });
 
 if (import.meta.main) BunRuntime.runMain(Effect.gen(function*() {
