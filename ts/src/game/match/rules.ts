@@ -118,6 +118,15 @@ export const computerActive = (game: Readonly<MatchState>, slot: number): boolea
   return mask > 0 && mask < 16 && slot >= 0 && slot < 4 && (mask & (1 << slot)) !== 0;
 };
 
+export function initializeComputerChoices(game: MatchState, seed: number): void {
+  for (const slot of PARTICIPANT_SLOTS) {
+    if (!computerActive(game, slot)) continue;
+    const salted = floorMod(floorMod(seed, 46337) + (slot + 1) * 7919, 46337);
+    const mixed = floorMod(salted * salted + 12345, 46337);
+    game.characterChoices[slot] = defaultChoice(mixed ^ floorMod(mixed * 31, 46337));
+  }
+}
+
 export function firstHumanSlot(game: Readonly<MatchState>): ParticipantSlot | undefined {
   return PARTICIPANT_SLOTS.find(slot => humanActive(game, slot));
 }
