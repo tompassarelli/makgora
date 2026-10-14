@@ -27,8 +27,8 @@ const STICK_JUMP = "stick-up";
 SOURCES.set(STICK_JUMP, Action.jump);
 
 const LEFT = "W", RIGHT = "R", DOWN = "E", UP = "SPACE", JUMP = "Z", JUMP_ALT = "8", ATTACK = "N", SPECIAL = "U",
-  GRAB = "O", SHIELD_LEFT = "Q", SHIELD_RIGHT = "7", SHIELD_RIGHT_ALT = "G", LIGHT_SHIELD = "A", C_LEFT = "B", C_LEFT_ALT = "/", C_RIGHT = "M", C_UP = "0",
-  C_DOWN = "J", WALK = "P", SHORT_HOP = "I", METER = "X";
+  GRAB = "O", SHIELD_LEFT = "Q", SHIELD_RIGHT = "7", SHIELD_RIGHT_ALT = "G", LIGHT_SHIELD = "A", C_LEFT = "B", C_LEFT_ALT = "/", C_RIGHT = "M", C_UP = "J",
+  C_DOWN = "H", WALK = "P", SHORT_HOP = "I", METER = "X";
 
 
 const TOWARD = "toward", AWAY = "away";
