@@ -41,7 +41,7 @@ export function start(this: void): void {
   SetCameraField(CAMERA_FIELD_TARGET_DISTANCE, 1450.0, 0.0);
   SetCameraField(CAMERA_FIELD_ZOFFSET, FLOOR_HEIGHT + 50.0, 0.0);
   SetCameraField(CAMERA_FIELD_FIELD_OF_VIEW, 70.0, 0.0);
-  SetCameraField(CAMERA_FIELD_FARZ, arenaFarZ(0), 0.0);
+  SetCameraField(CAMERA_FIELD_FARZ, arenaFarZ(0, { distance: 1450.0, z: 50.0 }), 0.0);
   SetCameraPosition(0.0, 0.0);
   let frame = 0;
   TimerStart(CreateTimer(), f32(1.0 / 60.0), true, () => {

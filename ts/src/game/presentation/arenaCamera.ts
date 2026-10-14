@@ -27,8 +27,17 @@ export const ARENA_CAMERA = { rotation: 90.0, angleOfAttack: 350.0 } as const;
 
 export const ARENA_FOG_FAR_MARGIN = 1000.0;
 
-export function arenaFarZ(stage: number): number {
-  return stageScenery(stage).farZ;
+export function arenaDepthOffset(camera: Readonly<Pick<MatchCamera, "distance" | "z">>): number {
+  return camera.distance + camera.z * 0.1736481785774231;
+}
+
+export function arenaFarZ(stage: number, camera: Readonly<Pick<MatchCamera, "distance" | "z">>): number {
+  return stageScenery(stage).farZ + arenaDepthOffset(camera);
+}
+
+export function arenaFogEnd(stage: number, camera: Readonly<Pick<MatchCamera, "distance" | "z">>): number {
+  const scenery = stageScenery(stage);
+  return Math.max(scenery.fog?.end ?? 0.0, scenery.farZ - ARENA_FOG_FAR_MARGIN) + arenaDepthOffset(camera);
 }
 
 export function localCamera(target: MatchCamera, source: Readonly<MatchCamera>, stage: number, aspect: number): void {

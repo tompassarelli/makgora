@@ -288,6 +288,7 @@ export interface ShellState {
   stageWind: effect[];
   stageHydra?: effect[];
   stageScenery: effect[] | undefined;
+  stageFogHidden?: boolean;
   shadowLightsRaised: boolean;
 
   viewExtreme: CameraExtreme | undefined;
