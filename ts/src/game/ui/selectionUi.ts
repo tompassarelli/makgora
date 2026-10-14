@@ -16,7 +16,7 @@ import { CPU_OPPONENT_COPY } from "./cpuOpponentCopy";
 import { createOpponentSettings } from "./opponentSettingsFrames";
 import { CPU_OPPONENT_DEFAULT, CPU_TIER_DEFAULT } from "../match/cpuProfiles";
 import { bindPrototype } from "../../platform/rebind";
-import { PARTICIPANT_CAPACITY, PARTICIPANT_SLOTS, type Slots } from "../input/participants";
+import { PARTICIPANT_SLOTS, type Slots } from "../input/participants";
 import {
   type MatchState,
   Phase,
@@ -836,7 +836,7 @@ export class SelectionPanel {
       if (placement !== undefined) this.sendPlacement(placement);
     }
     let pinching = false;
-    for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
+    for (const slot of PARTICIPANT_SLOTS) {
       const frames = this.cards[slot];
       if (frames === undefined) continue;
       const active = fighterActive(game, slot);
