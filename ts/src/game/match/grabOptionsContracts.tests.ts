@@ -1,5 +1,6 @@
 import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
+import { floorMod } from "wisp/src/sim/intMath";
 import { queueAttack } from "../input/attackBuffer";
 import { beginFighterAttack, resolveAttacks } from "../sim/attacks";
 import { AttackStyle, Character, DASH_GRAB_REQUEST, GroundAction } from "../sim/codes";
@@ -139,7 +140,7 @@ function grabbedAndReleased(grabber: Character, percent: number, mash: boolean, 
   while (frame < 400 && !(caught && victim.grab.owner === undefined)) {
     frame++;
     copyControls(d.inputs.inputs[0], controls({ attackPressed: pummel && caught && owner.grab.pummels === 0 }));
-    copyControls(d.inputs.inputs[1], controls({ grabMashPressed: mash && frame % 2 === 1, direction: mash ? (frame % 2 === 1 ? 1 : -1) : 0 }));
+    copyControls(d.inputs.inputs[1], controls({ grabMashPressed: mash && floorMod(frame, 2) === 1, direction: mash ? (floorMod(frame, 2) === 1 ? 1 : -1) : 0 }));
     stepMatch(d.game, d.world, d.inputs, frame);
     caught = caught || victim.grab.owner === 0;
   }
