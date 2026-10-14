@@ -46,6 +46,7 @@ import { RIFLEMAN_MODEL_FILE } from "./fighterAssetInfo";
 import { FROST_TRAP_MODEL } from "../assets/frostAssetInfo";
 import { IMPACT_DUST_MODEL } from "../assets/impactAssetInfo";
 import { MOUNTAIN_KING_SPECIALS } from "../sim/heroes/mountainKingSpecials";
+import { FORSAKEN_PALADIN_SPECIALS } from "../sim/heroes/forsakenPaladinSpecials";
 
 
 export type CueAnchor = "hand" | "body" | "feet" | "ahead" | "behind" | "overhead" | "barrel" | "breath";
@@ -343,10 +344,16 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     down: { spell: "Frost Armor", startup: timed(cue(FROST_ARMOR_SHELL_MODEL, "body", 1.0), "birth", 0.0), active: timed(cue("Abilities\\Spells\\Undead\\FrostArmor\\FrostArmorDamage.mdx", "body", f32(1.2)), "birth", 0.0) },
   },
   [Character.forsakenPaladin]: {
-    neutral: { spell: "Cleansing Hammer", startup: HOLY, active: cue("Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", "hand", f32(0.8)) },
-    side: { spell: "Righteous Fury", startup: cue("Abilities\\Spells\\Human\\InnerFire\\InnerFireTarget.mdx", "body", f32(0.8)), active: cue("Abilities\\Spells\\Other\\Stampede\\StampedeMissileDeath.mdx", "ahead", 1.0) },
-    up: { spell: "Ascension", startup: HOLY, active: cue("Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx", "feet", 0.25) },
-    down: { spell: "Consecration", startup: HOLY, active: cue("Abilities\\Spells\\Other\\Consecration\\Consecration.mdx", "feet", f32(0.05)) },
+    neutral: { spell: "Cleansing Hammer", startup: { ...HOLY, scale: f32(0.35) }, active: {
+      ...timed(cue("Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", "hand", f32(0.15)), "birth", f32(0.2)), birth: { eachFrame: true },
+      anchorFrames: Array.from({ length: FORSAKEN_PALADIN_SPECIALS.neutral.ground.endFrame }, (_, frame) => {
+        const strike = FORSAKEN_PALADIN_SPECIALS.neutral.ground.regions?.find(region => frame >= region.firstFrame && frame <= region.lastFrame)?.hit.strike;
+        return strike === undefined ? CUE_ANCHORS.hand : { x: strike.x2, z: strike.z2 };
+      }),
+    } },
+    side: { spell: "Righteous Fury", startup: timed(cue("Abilities\\Spells\\Human\\InnerFire\\InnerFireTarget.mdx", "body", f32(0.55)), "stand", f32(0.2)), active: { ...timed(cue("Abilities\\Spells\\Other\\Stampede\\StampedeMissileDeath.mdx", "hand", f32(0.2)), "birth", f32(0.2)), birth: { eachFrame: true, strike: 0 } } },
+    up: { spell: "Ascension", startup: { ...HOLY, scale: f32(0.35) }, active: { ...timed(cue("Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx", "hand", f32(0.12)), "birth", f32(0.2)), birth: { eachFrame: true, strike: 0 } } },
+    down: { spell: "Consecration", startup: { ...SHADOW, scale: f32(0.4) }, active: timed(cue("Abilities\\Spells\\Human\\InnerFire\\InnerFireTarget.mdx", "hand", f32(0.2)), "stand", f32(0.2)) },
   },
   [Character.dreadlord]: {
     neutral: { spell: "Carrion Swarm", startup: VAMPIRIC, active: cue("Abilities\\Spells\\Undead\\CarrionSwarm\\CarrionSwarmDamage.mdx", "hand", f32(0.8)) },

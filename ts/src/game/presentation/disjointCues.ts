@@ -3,6 +3,7 @@ import { AttackStyle, Character, SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { type HitRegion, NO_HIT_REGION } from "../sim/hitRegions";
 import { runningHeroSpecial } from "../sim/heroSpecialRules";
+import { forsakenPaladinHammerAttack } from "../sim/heroes/forsakenPaladinHammer";
 import { FAN_KNIFE_CUE, type Cue, type CueBirth } from "./specialCues";
 import { REACH_CUE_NORMALS } from "./reachCueInfo";
 import { DEMONHUNTER_GLIDE_SLASH_FIRST, DEMONHUNTER_GLIDE_SLASH_LAST, DEMONHUNTER_GLIDE_SLASH_FORM, DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP, felRushRegion, flameCrashRegion, immolationRegion, glideSlashRegion } from "../sim/specials";
@@ -11,7 +12,7 @@ import { DEMONHUNTER_GLIDE_SLASH_FIRST, DEMONHUNTER_GLIDE_SLASH_LAST, DEMONHUNTE
 const NEUTRAL_FLARE: Cue = { model: "Abilities\\Weapons\\FlyingMachine\\FlyingMachineImpact.mdx", anchor: "body", scale: 0.5, sequence: "stand", seconds: f32(0.3), timeScale: 0.0 };
 const FIRE_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedDamage.mdx", seconds: f32(0.2), timeScale: 1.0, birth: { eachFrame: false } };
 const FROST_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Other\\FrostDamage\\FrostDamage.mdx", seconds: f32(0.1), timeScale: 1.0, birth: { eachFrame: false } };
-const HOLY_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx" };
+const HOLY_FLARE: Cue = { ...NEUTRAL_FLARE, model: "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", scale: f32(0.15), sequence: "birth", seconds: f32(0.2) };
 
 export const DISJOINT_CUES: { readonly [character: number]: Cue } = {
   [Character.rifleman]: NEUTRAL_FLARE,
@@ -42,6 +43,8 @@ export const DISJOINT_CUES: { readonly [character: number]: Cue } = {
 };
 
 
+const FORSAKEN_HAMMER_NORMALS: readonly AttackStyle[] = Object.values(AttackStyle).filter(style => forsakenPaladinHammerAttack(Character.forsakenPaladin, style));
+
 export const DEFINITIVE_ACCENT_REDRAWS: { readonly [model: string]: string } = {
   "Abilities\\Spells\\NightElf\\FanOfKnives\\FanOfKnivesMissile.mdx": "Popcorn knife",
   "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx": "Popcorn holy light",
@@ -51,6 +54,7 @@ export const DEFINITIVE_ACCENT_REDRAWS: { readonly [model: string]: string } = {
 
 
 export function disjointNormals(fighter: Readonly<Fighter>): readonly AttackStyle[] {
+  if (fighter.character === Character.forsakenPaladin) return FORSAKEN_HAMMER_NORMALS;
   return DISJOINT_CUES[fighter.character] === undefined ? [] : REACH_CUE_NORMALS[fighter.character] ?? [];
 }
 

@@ -1,5 +1,5 @@
 import { mutableProjectile } from "../sim/fighterProjectiles";
-import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
+import { assertEquals, assertNear, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { SELECTABLE_CHARACTERS } from "../sim/heroes/registry";
 import { createFighter } from "../sim/fighter";
@@ -10,6 +10,7 @@ import { heroProjectileArt } from "./projectileArt";
 import { projectedProjectile } from "./projectilePose";
 import { disjointNormals, fanKnifePose, hitAreaPose, specialAreaRegion, type FanKnifePose, type HitAreaPose } from "./disjointCues";
 import { specialForm, specialKit } from "../sim/heroSpecials";
+import { HERO_CUES } from "./specialCues";
 
 const pose: HitAreaPose = { visible: false, x: 0.0, z: 0.0, scale: 0.0 };
 
@@ -81,7 +82,8 @@ test("every authored special form flares at each live strike's far end on the co
     const fighter = createFighter(character, -321.0, -1);
     const specials = fighter.tuning.specials;
     if (specials === undefined) continue;
-    for (let slot = 0; slot < 4; slot++) for (let form = 0; form < 7; form++) {
+    for (const facing of [-1, 1]) for (let slot = 0; slot < 4; slot++) for (let form = 0; form < 7; form++) {
+      fighter.facing = facing;
       fighter.special.action = [SpecialAction.heroNeutral, SpecialAction.heroSide, SpecialAction.heroUp, SpecialAction.heroDown][slot] ?? SpecialAction.heroNeutral;
       fighter.special.form = form;
       const move = specialForm(specialKit(specials, slot), form);
@@ -96,8 +98,13 @@ test("every authored special form flares at each live strike's far end on the co
           assertEquals(actual.visible, active);
           if (!active) continue;
           const [x, z] = farEnd(authored.hit);
-          assertEquals(actual.x, f32(-321.0 - x));
+          assertEquals(actual.x, f32(-321.0 + f32(facing * x)));
           assertEquals(actual.z, f32(z));
+          if (character === Character.forsakenPaladin && fighter.special.action === SpecialAction.heroNeutral && authored.hit.strike !== undefined) {
+            const anchor = HERO_CUES[character]?.neutral.active.anchorFrames?.[fighter.special.frame - 1];
+            assertEquals(anchor?.x, authored.hit.strike.x2);
+            assertEquals(anchor?.z, authored.hit.strike.z2);
+          }
           checked++;
         }
       }
@@ -126,6 +133,9 @@ test("every hero spell projectile marks its collision centre on every live frame
         assertTrue(actual.visible);
         assertEquals(actual.x, projectile.x);
         assertEquals(actual.z, projectile.z);
+        if (spec.modelRadius !== undefined && (spec.pool !== undefined || character === Character.forsakenPaladin)) {
+          assertNear(f32(actual.modelScale * spec.modelRadius), actual.dangerRadius, f32(0.0001));
+        }
         checked++;
       }
       projectile.life = 0;

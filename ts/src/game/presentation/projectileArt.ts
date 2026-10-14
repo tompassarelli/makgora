@@ -106,7 +106,7 @@ export const PROJECTILE_DRAW_CUES: { readonly [model: string]: { readonly scale:
   "Abilities\\Weapons\\FarseerMissile\\FarseerMissile.mdx": { scale: 0.5 },
   "Abilities\\Spells\\Undead\\CarrionSwarm\\CarrionSwarmMissile.mdx": { scale: f32(0.85) },
   "Abilities\\Spells\\Orc\\Shockwave\\ShockwaveMissile.mdx": { scale: f32(0.6) },
-  "Abilities\\Spells\\Other\\Consecration\\Consecration.mdx": { scale: 0.25 },
+  "Abilities\\Spells\\Other\\Consecration\\Consecration.mdx": { scale: 1.0 },
   "Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdx": { scale: 0.5 },
   "units\\creeps\\PandarenBrewmaster\\PandarenBrewmaster.mdl": { scale: f32(0.6) },
   "units\\creeps\\QuillBeast\\QuillBeast.mdl": { scale: f32(0.9) },
