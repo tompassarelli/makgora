@@ -1,3 +1,4 @@
+import { type SessionWins, createSessionWins } from "../../game/shell/sessionWins";
 
 
 
@@ -272,6 +273,7 @@ export interface ShellState {
 
   ownedConfirmed?: ReplayState | undefined;
 
+  readonly sessionWins: SessionWins;
   readonly session: MatchControls;
   readonly frameInput: MatchFrameInput;
   readonly participants: Slots<Participant>;
@@ -399,7 +401,7 @@ export function createShellState(build: MapBuild, setup: ShellSetup): ShellState
     pad: build.analogPad === undefined ? undefined : { calibration: { first: undefined, last: undefined }, packet: undefined, mouseEvents: 0, syncEvents: 0, startedAt: 0.0, rows: [], mouse: [] },
     camera: createMatchCamera(),
     build, origin: setup.origin, game: createMatchState(), world: createRoster(0), controls: createBufferedFrameControls(),
-    produced: createFrameControls(), runtime: createPacingAndPresentation(), session: createMatchControls(),
+    produced: createFrameControls(), runtime: createPacingAndPresentation(), sessionWins: createSessionWins(), session: createMatchControls(),
     frameInput: createMatchFrameInput(),
     participants: [participant(0, persistence), participant(1, persistence), participant(2, persistence), participant(3, persistence)],
     status: { text: "", seconds: 0.0 }, frames: setup.frames, stageDecks: [], stageDeckParts: [], drawnStage: 0, stageCannon: undefined, stageLava: undefined, stageWind: [], stageScenery: undefined, shadowLightsRaised: false, viewExtreme: undefined, hiddenFighters: [undefined, undefined, undefined, undefined], ui: undefined,

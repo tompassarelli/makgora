@@ -1,3 +1,4 @@
+import { beginSessionMatch } from "../../game/shell/sessionWins";
 import type { QuickStageSettings } from "../../game/shell/devSettings";
 import { showBackdrop, showStageFog, showStageLighting } from "./stageScenery";
 
@@ -30,6 +31,7 @@ import { LASTING, drawStage, pauseMatchPresentation, renderPersistentPresentatio
 
 export function startMatch(s: ShellState, scenario: Scenario = s.build.scenario, stageSettings?: QuickStageSettings): void {
 
+  beginSessionMatch(s.sessionWins);
   publishMenu(s);
   const wasPaused = s.session.paused;
 
