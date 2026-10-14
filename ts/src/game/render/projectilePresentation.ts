@@ -120,7 +120,7 @@ export class ProjectilePresentation {
       const specials = heroDefinition(character)?.specials;
 
       const defilePool = character === Character.lichKing && specials !== undefined && heroProjectileArt(specials).some(({ spec }) => spec.model === path && spec.pool !== undefined);
-      const drawn = swaps?.[path] ?? path;
+      const drawn = trail ? IMPACT_DEFILE_MODEL : swaps?.[path] ?? path;
       const groundPool = (specials !== undefined && heroProjectileArt(specials).some(({ spec }) => spec.model === path && spec.pool !== undefined && spec.pool.growth > 0.0)) || PROJECTILE_DRAW_OFFSETS[drawn]?.disc !== undefined;
       for (let slot = 0; slot < size; slot++) {
         effects.push(this.models.length);
@@ -387,6 +387,13 @@ export class ProjectilePresentation {
       BlzSetSpecialEffectPosition(model, this.origin.x + pose.x + (pose.yaw === 0.0 ? 1 : -1) * (draw?.x ?? 0.0), this.origin.y, this.origin.z + pose.z + (draw?.z ?? 0.0));
       BlzSetSpecialEffectScale(model, pose.modelScale * (cue?.scale ?? 1.0));
       if (draw?.width !== undefined || draw?.height !== undefined) BlzSetSpecialEffectMatrixScale(model, draw.width ?? 1.0, 1.0, draw.height ?? 1.0);
+      if (projectile?.spec?.trail !== undefined) {
+        BlzSetSpecialEffectPitch(model, 0.0);
+        BlzSetSpecialEffectRoll(model, f32(Math.PI * 0.5));
+        BlzSetSpecialEffectMatrixScale(model, 1.0, f32(1.0 / f32(0.6)), f32(1.0 / f32(0.6)));
+        BlzSetSpecialEffectScale(model, pose.dangerRadius);
+        BlzSetSpecialEffectColor(model, 40, 24, 64);
+      }
       BlzSetSpecialEffectAlpha(model, 255);
       BlzSetSpecialEffectTimeScale(model, paused ? 0.0 : 1.0);
       if (draw?.seconds !== undefined) {
