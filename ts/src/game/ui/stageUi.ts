@@ -65,6 +65,7 @@ export class StagePanel {
   private readonly chip: framehandle;
   private readonly hazardsToggle: framehandle;
   private readonly dropsToggle: framehandle;
+  private readonly startButton: framehandle;
   private readonly clicks: ButtonClicks<StageButton>;
   private readonly tileNames: framehandle[] = [];
   private readonly sync: trigger;
@@ -134,7 +135,7 @@ export class StagePanel {
       ? "Click a stage or move the stick.\nAny player can choose.\nA / Click: choose · Start: start · Click BACK: back"
       : "Click a stage or use movement controls.\nAny player can choose.\nY: start · Click BACK TO FIGHTERS: back";
     stageText(root, "MeleeStageHelp", f32(0.454), f32(0.119), f32(0.3), f32(0.025), f32(0.008), help);
-    dialogButton(root, START_BUTTON.x, START_BUTTON.y, START_BUTTON.width, START_BUTTON.height, journal ? "START MATCH [A]" : "START MATCH", { kind: "start" });
+    this.startButton = dialogButton(root, START_BUTTON.x, START_BUTTON.y, START_BUTTON.width, START_BUTTON.height, journal ? "START MATCH [A]" : "START MATCH", { kind: "start" });
     dialogButton(root, f32(0.045), f32(0.082), f32(0.17), f32(0.037), journal ? "BACK" : "BACK TO FIGHTERS", { kind: "back" });
     this.hazardsToggle = dialogButton(root, HAZARDS_BUTTON.x, HAZARDS_BUTTON.y, HAZARDS_BUTTON.width, HAZARDS_BUTTON.height, "", { kind: "hazards" });
     this.dropsToggle = dialogButton(root, DROPS_BUTTON.x, DROPS_BUTTON.y, DROPS_BUTTON.width, DROPS_BUTTON.height, "", { kind: "drops" });
@@ -165,10 +166,12 @@ export class StagePanel {
   }
 
   private hover(button: StageButton | undefined): void {
+    if (button?.kind !== "start") highlightText(this.startButton, false);
     this.highlightStage(button?.kind === "stage" ? button.choice : undefined);
   }
 
   private focusStart(): void {
+    highlightText(this.startButton, true);
     const width = I2R(BlzGetLocalClientWidth());
     const height = I2R(BlzGetLocalClientHeight());
     if (width <= 0 || height <= 0) return;
