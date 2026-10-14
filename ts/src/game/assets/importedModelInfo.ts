@@ -22,8 +22,12 @@ export const VALKYR_MODEL = "Units\\Undead\\Banshee\\Banshee.mdx";
 
 
 
+export const GROM_BLOODLUST_MODEL = "war3mapImported\\GromBloodlustQuiet.mdx";
+
 export const IMPORTED_MODEL_FILES: readonly { readonly entry: string; readonly file: string }[] = [
   { entry: "war3mapImported\\ForsakenPaladinHammerSteel.tga", file: "ForsakenPaladinHammerSteel.tga" },
+  { entry: GROM_BLOODLUST_MODEL, file: "GromBloodlustQuiet.mdx" },
+  { entry: "_de.w3mod\\war3mapImported\\GromBloodlustQuiet.mdx", file: "GromBloodlustQuietDE.mdx" },
   { entry: LICH_KING_MODEL, file: "LichKing2.mdx" },
   // Warcraft derives a unit portrait path by appending "_Portrait".
   { entry: "war3mapImported\\LichKing2_Portrait.mdx", file: "LichKing2_Portrait.mdx" },

@@ -1,3 +1,4 @@
+import { GROM_BLOODLUST_MODEL } from "../assets/importedModelInfo";
 import { f32 } from "wisp/src/sim/f32";
 import { imod } from "wisp/src/sim/intMath";
 
@@ -176,6 +177,7 @@ export const DEFINITIVE_PROJECTILE_REDRAWS: { readonly [model: string]: string }
   "Abilities\\Spells\\NightElf\\TargetArtLumber\\TargetArtLumber.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Spells\\NightElf\\Tranquility\\TranquilityTarget.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Spells\\Orc\\AncestralSpirit\\AncestralSpiritCaster.mdx": "HD redraw, Definitive look not yet reviewed",
+  [GROM_BLOODLUST_MODEL]: "Bloodlust visual with sound event keys removed in both looks",
   "Abilities\\Spells\\Orc\\Bloodlust\\BloodlustTarget.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Spells\\Orc\\EarthQuake\\EarthquakeTarget.mdx": "HD redraw, Definitive look not yet reviewed",
   "Abilities\\Spells\\Orc\\Ensnare\\EnsnareMissile.mdx": "HD redraw, Definitive look not yet reviewed",

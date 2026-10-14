@@ -35,7 +35,7 @@ const METAL: readonly (readonly string[])[] = [
 ];
 
 interface SpecialSound {
-  readonly perform: string;
+  readonly perform: string | undefined;
   readonly hit: string;
 }
 
@@ -48,7 +48,7 @@ interface FighterSound {
   readonly normals?: { readonly [style: number]: { readonly perform?: string; readonly hit?: string } | undefined } | undefined;
 }
 
-const s = (perform: string, hit: string): SpecialSound => ({ perform, hit });
+const s = (perform: string | undefined, hit: string): SpecialSound => ({ perform, hit });
 
 export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | undefined } = {
   [Character.rifleman]: {
@@ -138,7 +138,7 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
   },
   [Character.grom]: {
     weapon: Weapon.axe, strong: "CriticalStrike",
-    specials: [s(warcryVoice(Character.grom), "MetalMediumChopFlesh"), s("DeepFootstep2", "MetalHeavyChopFlesh"), s("Bloodlust", "MetalMediumChopFlesh"), s("Bloodlust", "MetalHeavyChopFlesh")],
+    specials: [s(warcryVoice(Character.grom), "MetalMediumChopFlesh"), s("DeepFootstep2", "MetalHeavyChopFlesh"), s(undefined, "MetalMediumChopFlesh"), s(undefined, "MetalHeavyChopFlesh")],
   },
   [Character.anubarak]: {
     weapon: Weapon.claw, effort: ["CryptLordAttack1", "CryptLordAttack2"], strong: "ImpaleHit",
@@ -204,7 +204,7 @@ function resolve(character: Character, move: number): MoveSound | undefined {
     const special = fighter.specials[move - SPECIAL_MOVE];
     if (special === undefined) return undefined;
     return {
-      perform: [layer([special.perform], PERFORM_VOLUME)],
+      perform: special.perform === undefined ? [] : [layer([special.perform], PERFORM_VOLUME)],
       hit: [layer([special.hit], at(TIER_HIT_VOLUME, SoundTier.medium))],
       strong: [layer([special.hit], at(TIER_HIT_VOLUME, SoundTier.large)), layer([fighter.strong], SWEETENER_VOLUME)],
       shield: [layer([at(at(METAL, weapon), SoundTier.medium)], SHIELD_VOLUME)],

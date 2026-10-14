@@ -3,9 +3,9 @@ import { AttackStyle, Character } from "../sim/codes";
 import { SELECTABLE_CHARACTERS, fighterName } from "../sim/heroes/registry";
 import { VERIFIED_STOCK_SOUNDS } from "../assets/stockSoundInfo";
 import { HitElement } from "../sim/hitRegions";
-import { moveSound, playHit, soundFiles, soundedMoves } from "./moveSounds";
+import { moveSound, playHit, playPerform, playShieldHit, soundFiles, soundedMoves } from "./moveSounds";
 
-test("every move of every fighter has a perform, weak, strong and shield sound, each in the installed game [k4 reference native]", () => {
+test("every move has weak, strong and shield audio and every configured sound exists in the installed game [k4 reference native]", () => {
   const missing: string[] = [];
   for (const character of SELECTABLE_CHARACTERS) {
     for (const move of soundedMoves(character)) {
@@ -16,7 +16,7 @@ test("every move of every fighter has a perform, weak, strong and shield sound, 
         continue;
       }
       for (const [slot, layers] of [["perform", row.perform], ["hit", row.hit], ["strong", row.strong], ["shield", row.shield]] as const) {
-        if (layers.length === 0) missing.push(`${name}: no ${slot}`);
+        if (slot !== "perform" && layers.length === 0) missing.push(`${name}: no ${slot}`);
         for (const layer of [...layers, ...(row.voice === undefined ? [] : [row.voice])]) {
           for (const sound of layer.sounds) {
             const files = soundFiles(sound);
@@ -82,4 +82,22 @@ test("no move plays a signature sound owned by another roster hero [k2 property]
     }
   }
   assertEquals([...new Set(borrowed)].join("\n"), "");
+});
+
+
+test("Grom performs and lands every move without Bloodlust audio while his weapon impacts remain audible [k3 measure #563]", () => {
+  const bloodlust = soundFiles("Bloodlust");
+  for (const move of soundedMoves(Character.grom)) {
+    for (let serial = 0; serial < 5; serial++) {
+      const performed: string[] = [];
+      const impacts: string[] = [];
+      const sink = (file: string) => performed.push(file);
+      playPerform(Character.grom, move, serial, sink);
+      playHit(Character.grom, move, false, HitElement.normal, serial, (file) => impacts.push(file));
+      playHit(Character.grom, move, true, HitElement.normal, serial, (file) => impacts.push(file));
+      playShieldHit(Character.grom, move, serial, (file) => impacts.push(file));
+      assertEquals([...performed, ...impacts].some((file) => bloodlust.includes(file)), false, `Grom ${move} Bloodlust`);
+      assertEquals(impacts.length > 0, true, `Grom ${move} weapon impacts`);
+    }
+  }
 });
