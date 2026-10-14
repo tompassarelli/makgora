@@ -1,5 +1,6 @@
 import { BunRuntime } from "@effect/platform-bun";
 import { Effect } from "effect";
+import { platformLayer } from "wisp/scripts/platform/layer";
 import { PlayProblem } from "wisp/scripts/wisp/play";
 import { play } from "./wisp/commands/play";
 import { reserveGame } from "./wisp/playtestReserve";
@@ -11,4 +12,4 @@ const program = Effect.gen(function*() {
   yield* play(["--lobby-only", map]);
 });
 
-BunRuntime.runMain(program);
+BunRuntime.runMain(program.pipe(Effect.provide(platformLayer())));

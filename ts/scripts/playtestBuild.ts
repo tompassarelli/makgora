@@ -17,7 +17,7 @@ export const buildPlaytest = (revision?: string) => Effect.gen(function*() {
 
 export const selectedRevision = (args: readonly string[], required = false) => Effect.gen(function*() {
   if (args.length > 1 || (required && args.length !== 1)) return yield* new PlayProblem({ problem: "takes one selected main commit SHA" });
-  return args[0] === undefined ? undefined : yield* Schema.decodeUnknownEffect(Schema.String.check(Schema.isPattern(/^[0-9a-f]{40}$/)))(args[0]).pipe(
+  return args[0] === undefined ? undefined : yield* Schema.decodeEffect(Schema.String.check(Schema.isPattern(/^[0-9a-f]{40}$/)))(args[0]).pipe(
     Effect.mapError(() => new PlayProblem({ problem: "the selected commit must be a full 40-character SHA" })),
   );
 });

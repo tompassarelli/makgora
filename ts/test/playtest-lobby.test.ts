@@ -3,7 +3,7 @@ import { Effect, Exit } from "effect";
 import { ChildProcess } from "effect/process";
 import { readyPlaytest } from "../scripts/wisp/playtestReady";
 
-test("the build publishes RC readiness only after its requested lobby is confirmed [k5 integration]", async () => {
+test("the build publishes RC readiness only after its requested lobby is confirmed [k5 boundary rc-ready]", async () => {
   const map = "/private/Smashcraft 0.0.194.w3x";
   const lines: string[] = [];
   const attempt = (output: string, code = 0) => readyPlaytest(map, ChildProcess.make(process.execPath, ["-e", `console.log(${JSON.stringify(output)}); process.exit(${code});`]), (line) => lines.push(line));
