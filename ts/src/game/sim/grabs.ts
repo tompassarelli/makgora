@@ -8,7 +8,7 @@ import { finishDamageContacts, openDamageContacts, queueDamageContact } from "./
 import type { FighterMoves } from "./heroMoves";
 import { copyHitEffect, emptyHitEffect, type HitEffect } from "./hitRegions";
 import { advanceMash, clearMash } from "./mash";
-import { GRAB_HOLD_DISTANCE, GRAB_HOLD_MINIMUM_FRAMES, PUMMEL_DAMAGE, grabActionDuration, grabContactFrame, pummelLimit } from "./moves";
+import { GRAB_HOLD_DISTANCE, GRAB_HOLD_MINIMUM_FRAMES, GRAB_RELEASE_STUN_FRAMES, PUMMEL_DAMAGE, grabActionDuration, grabContactFrame, pummelLimit } from "./moves";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import type { Fighter } from "./fighter";
 import { type Controls, type Roster, controlsAt, fighterAt, isActive } from "./roster";
@@ -62,7 +62,7 @@ function heldOffset(action: GrabAction, frame: number, contact: number, facing: 
 function escapeGrab(world: Roster, ownerSlot: number, targetSlot: number): void {
   clearGrabLinks(world, ownerSlot);
   beginGrabAction(fighterAt(world, ownerSlot), GrabAction.escape);
-  fighterAt(world, targetSlot).launch.hitstun = 10;
+  fighterAt(world, targetSlot).launch.hitstun = GRAB_RELEASE_STUN_FRAMES;
   fighterAt(world, targetSlot).launch.throwHitstun = false;
 }
 

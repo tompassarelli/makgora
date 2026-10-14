@@ -10,7 +10,7 @@ import { floorMod } from "wisp/src/sim/intMath";
 import { stepMatch } from "./step";
 import { HERO_ROSTER } from "../sim/heroes/registry";
 import { canAttack } from "../sim/conditions";
-import { attackStartupFrames, GRAB_HOLD_FRAMES } from "../sim/moves";
+import { attackStartupFrames, grabHoldFrames } from "../sim/moves";
 import { advanceFighter } from "../sim/step";
 
 function testRoster(first: Fighter, second: Fighter) { return createRoster(3, [first, second]); }
@@ -48,7 +48,7 @@ test("shieldGrabStartsDirectlyFromActiveGuardAndCanCatchShieldingTarget [k3 meas
   for (let frame = 2; frame <= attackStartupFrames(5) + 1; frame++) {
     stepMatch(game, testRoster(attacker, target), frameControls(attackerInput, targetInput, attackerCommands, targetCommands), frame);
   }
-  assertEquals(target.grab.grabbedFrames, GRAB_HOLD_FRAMES);
+  assertEquals(target.grab.grabbedFrames, grabHoldFrames(target.status.damage));
   assertFalse(target.shield.raised);
 });
 
@@ -157,7 +157,7 @@ test("successfulGrabHasPriorityOverSimultaneousStrikeInEitherOrder [k1 scenario]
   assertEquals(strikerA.status.damage, 0.0);
   assertEquals(grabberB.status.damage, grabberA.status.damage);
   assertEquals(strikerB.status.damage, strikerA.status.damage);
-  assertEquals(strikerA.grab.grabbedFrames, GRAB_HOLD_FRAMES);
+  assertEquals(strikerA.grab.grabbedFrames, grabHoldFrames(strikerA.status.damage));
   assertEquals(strikerB.grab.grabbedFrames, strikerA.grab.grabbedFrames);
   assertEquals(grabberA.attack.cooldown, 0);
   assertEquals(grabberA.grab.action, GrabAction.hold);
@@ -178,9 +178,9 @@ test("grabBreaksShieldButHasShortReachAndTimedRelease [k3 measure docs/design/me
   const attackerCommands = attackBuffer(0);
   const targetCommands = attackBuffer(0);
   runToAttackActive(game, attacker, target, attackerInput, targetInput, attackerCommands, targetCommands, 5, 1);
-  assertEquals(target.grab.grabbedFrames, GRAB_HOLD_FRAMES);
+  assertEquals(target.grab.grabbedFrames, grabHoldFrames(target.status.damage));
   assertFalse(target.shield.raised);
-  for (let frame = attackStartupFrames(5) + 2; frame <= attackStartupFrames(5) + 1 + GRAB_HOLD_FRAMES; frame++) {
+  for (let frame = attackStartupFrames(5) + 2; frame <= attackStartupFrames(5) + 1 + grabHoldFrames(target.status.damage); frame++) {
 
     stepMatch(game, testRoster(attacker, target), frameControls(attackerInput, targetInput, attackerCommands, targetCommands), frame);
   }

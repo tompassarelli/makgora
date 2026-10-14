@@ -2,9 +2,7 @@
 
 
 import { f32 } from "wisp/src/sim/f32";
-import { idiv } from "wisp/src/sim/intMath";
-import { ESCAPE_METER_BORDER, ESCAPE_METER_HEIGHT, ESCAPE_METER_SEGMENT_FRAMES, type EscapeMeterView, escapeMeterFill } from "../presentation/escapeMeter";
-import { GRAB_HOLD_FRAMES } from "../sim/moves";
+import { ESCAPE_METER_BORDER, ESCAPE_METER_HEIGHT, ESCAPE_METER_SEGMENTS, type EscapeMeterView, escapeMeterFill } from "../presentation/escapeMeter";
 import { createBackdrop, consoleUi } from "./frames";
 import { PANEL_TEXTURE } from "./hudLayout";
 
@@ -14,7 +12,7 @@ const BORDER = f32(ESCAPE_METER_BORDER);
 const LINE_WIDTH = f32(0.0006);
 const MARK_WIDTH = f32(0.0016);
 const MARK_HEIGHT = f32(0.014);
-const SEGMENTS = idiv(GRAB_HOLD_FRAMES, ESCAPE_METER_SEGMENT_FRAMES);
+const SEGMENTS = ESCAPE_METER_SEGMENTS;
 const FILL = "ReplaceableTextures\\TeamColor\\TeamColor04.blp";
 const MARK = "ReplaceableTextures\\TeamColor\\TeamColor00.blp";
 

@@ -5,7 +5,7 @@ import { canAttack, isTumbling } from "./conditions";
 import { type Fighter, createFighter } from "./fighter";
 import { SELECTABLE_CHARACTERS, fighterName } from "./heroes/registry";
 import { resolveGrabs } from "./grabs";
-import { GRAB_HOLD_FRAMES, grabContactFrame } from "./moves";
+import { grabContactFrame, grabHoldFrames } from "./moves";
 import { totalVelocityZ } from "./motion";
 import { type Controls, type Roster, sameControls } from "./roster";
 import { advanceFighter } from "./step";
@@ -108,7 +108,7 @@ for (const character of SELECTABLE_CHARACTERS) {
           owner.grab.frame = grabContactFrame(GrabAction.throwDown, owner.tuning.moves) - 1;
           owner.grab.target = 1;
           target.grab.owner = 0;
-          target.grab.grabbedFrames = GRAB_HOLD_FRAMES;
+          target.grab.grabbedFrames = grabHoldFrames(target.status.damage);
           const pending = [startThrow(owner, target)];
           let played = 0;
           for (let play = pending.pop(); play !== undefined; play = pending.pop()) {

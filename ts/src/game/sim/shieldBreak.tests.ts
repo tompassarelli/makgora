@@ -8,7 +8,7 @@ import { canAttack, isIntangible } from "./conditions";
 import { type Fighter } from "./fighter";
 import { createReferenceFighter } from "./referenceRig";
 import { beginAirDodge, beginJump } from "./jumpsAndDodges";
-import { attackStartupFrames, GRAB_HOLD_FRAMES } from "./moves";
+import { attackStartupFrames, grabHoldFrames } from "./moves";
 import type { Controls } from "./roster";
 import { shieldBreakDizzyFrames } from "./shield";
 import { advanceSolo, controls, testBeginAttacks, testWorld } from "./testWorld";
@@ -154,7 +154,7 @@ test("flinching damage and grabs interrupt every shield-break phase [k4 referenc
       if (attack === AttackStyle.jab) {
         assertGreaterThan(fighter.launch.hitstun, 0);
       } else {
-        assertEquals(fighter.grab.grabbedFrames, GRAB_HOLD_FRAMES);
+        assertEquals(fighter.grab.grabbedFrames, grabHoldFrames(fighter.status.damage));
       }
     }
   }

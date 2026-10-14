@@ -1347,7 +1347,7 @@ function grabHold(character: Character, percent: number, mashOn?: number): numbe
 }
 
 const GRAB_RULE = "the escape timer starts at 76 + 1.6 frames per percent and falls 1 a frame plus 6 per mash input: smashcraft:docs/design/melee/defense.md#grabs";
-const GRAB_DEPARTURE = "Grab hold: 120 frames at any percent, 8 off per mash input down to 30, one pummel connecting on frame 60 (owner direction 2026-10-06, #101)";
+const GRAB_DEPARTURE = "Grab hold: floor(90 + 1.75 x percent) frames, 8 off per mash input down to 60, one pummel connecting on frame 60 (owner direction 2026-10-06 #101, Ultimate formula 2026-10-14 #550)";
 
 const GRABS: readonly Scenario[] = [
   {

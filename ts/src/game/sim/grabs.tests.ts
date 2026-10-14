@@ -6,7 +6,7 @@ import { HERO_ROSTER } from "./heroes/registry";
 import { AttackStyle, Character, GrabAction } from "./codes";
 import { type Fighter, createFighter } from "./fighter";
 import { resolveGrabs } from "./grabs";
-import { GRAB_HOLD_FRAMES, GRAB_HOLD_MINIMUM_FRAMES, PUMMEL_CONTACT_FRAME, PUMMEL_DAMAGE, PUMMEL_TOTAL_FRAMES, attackStartupFrames } from "./moves";
+import { GRAB_HOLD_MINIMUM_FRAMES, grabHoldFrames, PUMMEL_CONTACT_FRAME, PUMMEL_DAMAGE, PUMMEL_TOTAL_FRAMES, attackStartupFrames } from "./moves";
 import type { Controls, Roster } from "./roster";
 import { controls, testBeginAttacks, testGrabFrame, testWorld } from "./testWorld";
 
@@ -54,15 +54,21 @@ function heldBy(character: Character, percent: number): { world: Roster; owner: 
   resolveAttacks(world);
   resolveGrabs(world);
   assertEquals(owner.grab.target, 1, `${character} catches`);
-  assertEquals(target.grab.grabbedFrames, GRAB_HOLD_FRAMES);
+  assertEquals(target.grab.grabbedFrames, grabHoldFrames(percent));
   return { world, owner, target };
 }
 
-/** The held frame each mash frees the victim on from a 120-frame hold. */
-const MASH_ESCAPE = { none: GRAB_HOLD_FRAMES, slow: 64, human: 56, quick: 48, fastest: GRAB_HOLD_MINIMUM_FRAMES };
+/** The held frame each mash frees the victim on, by percent: the hold is floor(90 + 1.75 x percent), never cut below 60. */
+const MASH_ESCAPE = {
+  0: { none: 90, slow: 60, human: 60, quick: 60, fastest: GRAB_HOLD_MINIMUM_FRAMES },
+  50: { none: 177, slow: 97, human: 83, quick: 73, fastest: GRAB_HOLD_MINIMUM_FRAMES },
+  100: { none: 265, slow: 145, human: 128, quick: 113, fastest: GRAB_HOLD_MINIMUM_FRAMES },
+} as const;
+const PERCENTS = [0, 50, 100] as const;
+const MASHES = ["none", "slow", "human", "quick", "fastest"] as const;
 
 /** Runs held frames until the victim is free; the frame it went free on, or undefined. */
-function holdUntilFree(world: Roster, target: Fighter, mash: Mash, owner: (frame: number) => Controls, frames = GRAB_HOLD_FRAMES + 30): number | undefined {
+function holdUntilFree(world: Roster, target: Fighter, mash: Mash, owner: (frame: number) => Controls, frames = 300): number | undefined {
   for (let frame = 1; frame <= frames; frame++) {
     testGrabFrame(world, [owner(frame), mashInput(mash, frame)], false);
     if (target.grab.owner === undefined) return frame;
@@ -70,14 +76,22 @@ function holdUntilFree(world: Roster, target: Fighter, mash: Mash, owner: (frame
   return undefined;
 }
 
-test("every grab holds the same time at any percent, and mashing shortens it within its bounds [k3 measure docs/gameplay-design.md]", () => {
+test("a grab holds floor(90 + 1.75 x percent) frames: 90 at 0%, 177 at 50%, 265 at 100% [k4 reference docs/gameplay-design.md#grab-holds-and-pummels]", () => {
+  assertEquals(grabHoldFrames(0.0), 90);
+  assertEquals(grabHoldFrames(50.0), 177);
+  assertEquals(grabHoldFrames(100.0), 265);
+  assertEquals(grabHoldFrames(f32(33.3)), 148);
+  assertEquals(GRAB_HOLD_MINIMUM_FRAMES, 60);
+});
+
+test("every grab holds its percent's time, and mashing shortens it but never below 60 frames [k3 measure #550]", () => {
   for (const character of GRABBERS) {
-    for (const percent of [0.0, 150.0]) {
-      for (const mash of ["none", "slow", "human", "quick", "fastest"] as const) {
+    for (const percent of PERCENTS) {
+      for (const mash of MASHES) {
         const { world, owner, target } = heldBy(character, percent);
         const frame = holdUntilFree(world, target, mash, () => controls());
         const label = `${character} at ${percent}% with ${mash} mashing`;
-        assertEquals(frame, MASH_ESCAPE[mash], label);
+        assertEquals(frame, MASH_ESCAPE[percent][mash], label);
         assertEquals(owner.grab.action, GrabAction.escape, label);
         assertEquals(target.status.damage, percent, label);
       }
@@ -85,26 +99,26 @@ test("every grab holds the same time at any percent, and mashing shortens it wit
   }
 });
 
-test("a victim mashing 8 or more times a second escapes the pummel; 6 a second or caught off guard takes it [k3 measure docs/gameplay-design.md]", () => {
-  assertTrue(MASH_ESCAPE.human < PUMMEL_CONTACT_FRAME);
-  assertTrue(MASH_ESCAPE.slow > PUMMEL_CONTACT_FRAME);
+test("at 0% any mashing escapes the pummel; from 50% only the fastest mashing does, and a pummel with no throw lets go [k3 measure #550]", () => {
+  assertTrue(GRAB_HOLD_MINIMUM_FRAMES < PUMMEL_CONTACT_FRAME + 1);
   for (const character of GRABBERS) {
-    for (const percent of [0.0, 150.0]) {
-      for (const mash of ["none", "slow", "human", "quick", "fastest"] as const) {
+    for (const percent of PERCENTS) {
+      for (const mash of MASHES) {
         const { world, owner, target } = heldBy(character, percent);
         const pummel = owner.tuning.moves?.throws[GrabAction.pummel]?.effect.damage ?? PUMMEL_DAMAGE;
         // The grabber pummels on the first held frame and keeps pressing attack.
         const frame = holdUntilFree(world, target, mash, () => controls({ attackPressed: true }));
         const label = `${character} at ${percent}% with ${mash} mashing`;
         assertEquals(owner.grab.pummels, 1, label);
-        if (mash === "none" || mash === "slow") {
+        const escapes = mash === "fastest" || (percent === 0 && mash !== "none");
+        if (escapes) {
+          assertEquals(target.status.damage, percent, label);
+          assertEquals(frame, GRAB_HOLD_MINIMUM_FRAMES, label);
+        } else {
           const damage = character === Character.forsakenPaladin ? f32(pummel * f32(0.8)) : pummel;
           assertEquals(target.status.damage, f32(percent + damage), label);
           // No throw input: the pummel's end lets the victim go.
-          assertEquals(frame, mash === "none" ? PUMMEL_TOTAL_FRAMES + 1 : MASH_ESCAPE.slow, label);
-        } else {
-          assertEquals(target.status.damage, percent, label);
-          assertEquals(frame !== undefined && frame < PUMMEL_CONTACT_FRAME, true, label);
+          assertEquals(frame, PUMMEL_TOTAL_FRAMES + 1, label);
         }
         assertEquals(owner.grab.action, GrabAction.escape, label);
         assertEquals(target.launch.throwHitstun, false, label);
@@ -112,4 +126,3 @@ test("a victim mashing 8 or more times a second escapes the pummel; 6 a second o
     }
   }
 });
-

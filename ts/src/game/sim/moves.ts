@@ -1,6 +1,6 @@
 
 
-import { max, min } from "../../runtime/numbers";
+import { max, min, toInt } from "../../runtime/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { idiv } from "wisp/src/sim/intMath";
 import { AttackStyle, Character, GrabAction } from "./codes";
@@ -322,9 +322,17 @@ export function attackDurationFramesForGrounding(style: AttackStyle, grounded: b
 export const EARLY_ASCENT_GRAB_FRAMES = 7;
 
 
-export const GRAB_HOLD_FRAMES = 120;
+const GRAB_HOLD_BASE_FRAMES = 90;
 
-export const GRAB_HOLD_MINIMUM_FRAMES = 30;
+export const GRAB_HOLD_MINIMUM_FRAMES = 60;
+
+export const GRAB_ESCAPE_FRAMES = 10;
+
+export const GRAB_RELEASE_STUN_FRAMES = 6;
+
+export function grabHoldFrames(damage: number): number {
+  return GRAB_HOLD_BASE_FRAMES + idiv(toInt(f32(damage * 7.0)), 4);
+}
 
 export const PUMMEL_CONTACT_FRAME = 60;
 export const PUMMEL_TOTAL_FRAMES = 68;
@@ -367,6 +375,6 @@ export function grabActionDuration(action: GrabAction, moves?: FighterMoves): nu
     case GrabAction.throwDown:
       return 36;
     default:
-      return 10;
+      return GRAB_ESCAPE_FRAMES;
   }
 }

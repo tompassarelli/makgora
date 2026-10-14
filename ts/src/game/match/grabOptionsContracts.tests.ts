@@ -3,7 +3,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { queueAttack } from "../input/attackBuffer";
 import { beginFighterAttack, resolveAttacks } from "../sim/attacks";
 import { AttackStyle, Character, DASH_GRAB_REQUEST, GroundAction } from "../sim/codes";
-import { attackActive, attackStartup } from "../sim/conditions";
+import { attackActive, attackStartup, canAttack } from "../sim/conditions";
 import { createFighter } from "../sim/fighter";
 import { SELECTABLE_CHARACTERS, fighterName } from "../sim/heroes/registry";
 import { authoredHitRegion, emptyHitRegion } from "../sim/hitRegions";
@@ -123,6 +123,67 @@ test("standing dash and pivot grabs catch Rifleman at their scaled limit for thr
           }
         }
       }
+    }
+  }
+});
+
+function grabbedAndReleased(grabber: Character, percent: number, mash: boolean, pummel: boolean) {
+  const d = duel(grabber);
+  d.world.fighters[1] = createFighter(Character.rifleman, 40.0, -1);
+  const owner = fighterAt(d.world, 0);
+  const victim = fighterAt(d.world, 1);
+  victim.status.damage = percent;
+  queueAttack(d.inputs.commands[0], { style: AttackStyle.grab, facing: 0, frame: 1, mayCharge: false });
+  let frame = 0;
+  let caught = false;
+  while (frame < 400 && !(caught && victim.grab.owner === undefined)) {
+    frame++;
+    copyControls(d.inputs.inputs[0], controls({ attackPressed: pummel && caught && owner.grab.pummels === 0 }));
+    copyControls(d.inputs.inputs[1], controls({ grabMashPressed: mash && frame % 2 === 1, direction: mash ? (frame % 2 === 1 ? 1 : -1) : 0 }));
+    stepMatch(d.game, d.world, d.inputs, frame);
+    caught = caught || victim.grab.owner === 0;
+  }
+  assertTrue(caught);
+  assertEquals(victim.grab.owner, undefined);
+  return { d, owner, victim, frame };
+}
+
+test("every grab release leaves the victim actionable before its grabber [k3 measure #550]", () => {
+  for (const grabber of SELECTABLE_CHARACTERS) {
+    for (const percent of [0.0, 50.0, 100.0, 150.0]) {
+      for (const [mash, pummel] of [[false, false], [true, false], [false, true]] as const) {
+        const { d, owner, victim, frame } = grabbedAndReleased(grabber, percent, mash, pummel);
+        let victimFree: number | undefined;
+        let ownerFree: number | undefined;
+        for (let after = 1; after <= 30 && ownerFree === undefined; after++) {
+          copyControls(d.inputs.inputs[0], controls());
+          copyControls(d.inputs.inputs[1], controls());
+          stepMatch(d.game, d.world, d.inputs, frame + after);
+          if (victimFree === undefined && canAttack(victim)) victimFree = after;
+          if (canAttack(owner)) ownerFree = after;
+        }
+        const name = `${fighterName(grabber)} at ${percent}% mash ${mash} pummel ${pummel}`;
+        assertEquals(victimFree !== undefined && ownerFree !== undefined && victimFree < ownerFree, true, name);
+      }
+    }
+  }
+});
+
+test("a grabber regrabbing on its first free frame cannot catch a released victim that rolls away on its first [k3 measure #550]", () => {
+  for (const grabber of SELECTABLE_CHARACTERS) {
+    for (const percent of [0.0, 100.0]) {
+      const { d, owner, victim, frame } = grabbedAndReleased(grabber, percent, false, false);
+      let rolled = false;
+      for (let after = 1; after <= 40; after++) {
+        if (canAttack(owner) && owner.attack.style === undefined) queueAttack(d.inputs.commands[0], { style: AttackStyle.grab, facing: 0, frame: frame + after, mayCharge: false });
+        const roll: boolean = !rolled && (canAttack(victim) || victim.shield.raised);
+        rolled = rolled || roll;
+        copyControls(d.inputs.inputs[0], controls());
+        copyControls(d.inputs.inputs[1], controls({ shield: true, shieldTriggerActive: true, shieldStrength: 1.0, groundDodgePressed: roll, groundDodgeDirection: 1 }));
+        stepMatch(d.game, d.world, d.inputs, frame + after);
+        assertEquals(victim.grab.owner, undefined, `${fighterName(grabber)} at ${percent}% frame ${after}`);
+      }
+      assertTrue(rolled);
     }
   }
 });

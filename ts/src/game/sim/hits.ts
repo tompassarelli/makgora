@@ -8,7 +8,7 @@ import type { Fighter } from "./fighter";
 import { clearDash } from "./groundMovement";
 import type { AppliedStatus } from "./heroStatus";
 import type { HitEffect } from "./hitRegions";
-import { GRAB_HOLD_FRAMES } from "./moves";
+import { grabHoldFrames } from "./moves";
 import { type Roster, fighterAt } from "./roster";
 import { beginGrabAction, cancelAttack, cancelSpecialState, clearDownState, clearGrabLinks, interruptJumpOrDodge } from "./transitions";
 
@@ -40,7 +40,7 @@ function catchTarget(world: Roster, attackerSlot: number, targetSlot: number): v
   interruptJumpOrDodge(target);
   clearDownState(target);
   cancelAttack(target);
-  target.grab.grabbedFrames = GRAB_HOLD_FRAMES;
+  target.grab.grabbedFrames = grabHoldFrames(target.status.damage);
   target.grab.heldFrames = 0;
   target.launch.hitstun = 0;
   target.launch.throwHitstun = false;
