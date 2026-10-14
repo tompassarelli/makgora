@@ -1,4 +1,5 @@
 import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
+import { sweep } from "../../runtime/sweep";
 import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
 import { queueAttack } from "../input/attackBuffer";
@@ -149,7 +150,7 @@ function grabbedAndReleased(grabber: Character, percent: number, mash: boolean, 
   return { d, owner, victim, frame };
 }
 
-test("every grab release leaves the victim actionable before its grabber [k3 measure #550]", () => {
+sweep("every grab release leaves the victim actionable before its grabber [k3 measure #550]", () => {
   for (const grabber of SELECTABLE_CHARACTERS) {
     for (const percent of [0.0, 50.0, 100.0, 150.0]) {
       for (const [mash, pummel] of [[false, false], [true, false], [false, true]] as const) {
