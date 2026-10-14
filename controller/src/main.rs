@@ -2315,9 +2315,9 @@ mod linux {
                 };
                 let Press::Key(key) = binding.press else { return None };
                 let action = match key.as_str() {
-                    "n" => ATTACK, "u" => SPECIAL, "i" => JUMP, "z" => SHORT_HOP, "o" => GRAB, "p" => WALK,
-                    "q" | "t" | "7" if source == LT_SOURCE => LEFT_TRIGGER,
-                    "q" | "t" | "7" | "g" => RIGHT_TRIGGER,
+                    "n" => ATTACK, "u" => SPECIAL, "z" => JUMP, "i" => SHORT_HOP, "o" => GRAB, "p" => WALK,
+                    "q" | "a" | "7" if source == LT_SOURCE => LEFT_TRIGGER,
+                    "q" | "a" | "7" | "g" => RIGHT_TRIGGER,
                     _ => return None,
                 };
                 Some((source, action))
