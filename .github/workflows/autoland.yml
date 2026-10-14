@@ -46,7 +46,7 @@ env:
     passed() {
       local tip="$1" pbase="$2" ptree="$3" before="$4" after="$5" dir="$RUNNER_TEMP/passed-$1" verdict=retest
       git merge-base --is-ancestor "$pbase" "$before" && git worktree add -q --detach "$dir" "$tip" || { echo retest; return; }
-      if git -C "$dir" rebase -q "$pbase" > /dev/null 2>&1; then
+      if git -C "$dir" merge-base --is-ancestor "$pbase" HEAD || git -C "$dir" rebase -q "$pbase" > /dev/null 2>&1; then
         mkdir -p "$RUNNER_TEMP/trees"; rm -f "$RUNNER_TEMP"/trees/*
         git ls-tree -r -z "$pbase" > "$RUNNER_TEMP/trees/base"; git ls-tree -r -z "$ptree" > "$RUNNER_TEMP/trees/tested"; git ls-tree -r -z "$after" > "$RUNNER_TEMP/trees/landed"
         mains=()
@@ -229,7 +229,7 @@ jobs:
             fi
             lane_base=$(git rev-parse autoland)
             git checkout -q --detach "$tip"
-            if ! git rebase -q autoland > rebase.log 2>&1; then
+            if ! git merge-base --is-ancestor autoland HEAD && ! git rebase -q autoland > rebase.log 2>&1; then
               conflicted=""; resolved=""; why="the rebase stopped without a file conflict"
               for _ in $(seq 20); do
                 files=$(git diff --name-only --diff-filter=U)
