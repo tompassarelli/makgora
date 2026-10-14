@@ -261,8 +261,8 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     down: { spell: "Reincarnation", startup: BEAST, active: cue("Abilities\\Spells\\Orc\\Reincarnation\\ReincarnationTarget.mdx", "body", f32(0.6)) },
   },
   [Character.peon]: {
-    neutral: { spell: "Lumber Toss", startup: cue("Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx", "feet", f32(0.15)), active: drawn("Objects\\InventoryItems\\BundleofLumber\\BundleofLumber.mdx", "hand") },
-    side: { spell: "Burrow", startup: cue("Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx", "ahead", f32(0.25)), active: drawn("buildings\\orc\\TrollBurrow\\TrollBurrow.mdl", "ahead") },
+    neutral: { spell: "Lumber Toss", startup: drawn("Objects\\InventoryItems\\BundleofLumber\\BundleofLumber.mdx", "hand"), active: drawn("Objects\\InventoryItems\\BundleofLumber\\BundleofLumber.mdx", "hand") },
+    side: { spell: "Burrow", startup: timed(cue(IMPACT_DUST_MODEL, "ahead", f32(0.25)), "stand", 0.0), active: drawn("buildings\\orc\\TrollBurrow\\TrollBurrow.mdl", "ahead") },
     up: { spell: "Worksite Launch", startup: cue("Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx", "feet", f32(0.2)), active: cue("Objects\\Spawnmodels\\Other\\ToonBoom\\ToonBoom.mdx", "feet", f32(0.5)) },
     down: PEON_REST_CUES,
   },
@@ -444,7 +444,7 @@ export const HERO_BRANCH_CUES: { readonly [character: number]: { readonly [slot 
     ] },
   },
   [Character.peon]: {
-    side: { recall: branch("Pack Up", cue("Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx", "ahead", f32(0.15)), cue("UI\\Feedback\\GoldCredit\\GoldCredit.mdl", "hand", f32(0.7))) },
+    side: { recall: branch("Pack Up", timed(cue(IMPACT_DUST_MODEL, "ahead", f32(0.15)), "stand", 0.0), cue("UI\\Feedback\\GoldCredit\\GoldCredit.mdl", "hand", f32(0.7))) },
   },
   [Character.tinker]: { side: { recall: "slot" } },
   [Character.blademaster]: {
