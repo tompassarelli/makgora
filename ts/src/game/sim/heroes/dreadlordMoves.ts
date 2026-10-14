@@ -63,7 +63,7 @@ const NORMALS: { readonly [style: number]: AuthoredMove | undefined } = {
       ...rake(18, [70.0, 58.0, 46.0, 34.0], L, dreadlordHit(20.298521041870117, "KILL", 40)),
       ...rake(18, [22.0, 34.0, 46.0, 58.0], L, dreadlordHit(20.298521041870117, "KILL", 40)),
     ]),
-    [AttackStyle.upSmash]: heroMove(16, 5, 31, 0, path(16, [
+    [AttackStyle.upSmash]: heroMove(16, 5, 37, 0, path(16, [
       capsule(20.0, 58.0, 70.0, 95.0, WING_RADIUS),
       capsule(12.0, 68.0, 38.0, 125.0, WING_RADIUS),
       capsule(0.0, 75.0, 0.0, f32(L - WING_RADIUS), WING_RADIUS),

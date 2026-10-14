@@ -39,7 +39,7 @@ const impale = (air: boolean, ex: boolean): AuthoredSpecial => ({
   endFrame: 48, hurt: air ? neutral_special_air_hurt : neutral_special_ground_hurt, landingLag: air ? 24 : undefined,
   projectiles: [{ model: "Abilities\\Spells\\Undead\\Impale\\ImpaleMissTarget.mdl",
     spawnFrame: 18, offsetX: 40.0, offsetZ: 32.0, velocityX: 10.0, velocityZ: 0.0,
-    life: 36, radius: ex ? 28.0 : 18.0, effect: anubarakHit(ex ? 16.103879928588867 : 11.148839950561523, 80, ex ? 82.73651885986328 : 68.3475570678711, 40.0), reflectable: true, limit: 1,
+    life: 36, radius: ex ? 28.0 : 18.0, effect: anubarakHit(ex ? 16.103879928588867 : 8.75, 80, ex ? 82.73651885986328 : 68.3475570678711, 40.0), reflectable: true, limit: 1,
   }],
   ...(ex ? {} : { ex: impale(air, true) }),
 });

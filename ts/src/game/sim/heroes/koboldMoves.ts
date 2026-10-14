@@ -52,7 +52,7 @@ export const KOBOLD_MOVES: FighterMoves = {
     [AttackStyle.forwardAir]: heroMove(7, 3, 23, 13, [heroRegion(7, 9, pick(18.0, 44.0, 70.0, 40.0), ordinary(12.443099975585938, 40, 80.76383972167969, 22.0))]),
     [AttackStyle.backAir]: heroMove(8, 3, 23, 13, [heroRegion(8, 10, pick(-18.0, 40.0, -72.0, 40.0, 12.0), ordinary(14.931719779968262, 35, 98.71136474609375, 26.0, true))]),
     [AttackStyle.upAir]: heroMove(6, 4, 20, 12, [heroRegion(6, 9, pick(-18.0, 92.0, 18.0, 92.0, 16.0), ordinary(11.198789596557617, 90, 80.76383972167969, 22.0))]),
-    [AttackStyle.downAir]: heroMove(12, 3, 28, 18, [heroRegion(12, 14, pick(0.0, 10.0, 0.0, -46.0, 12.0), { ...ordinary(13.687410354614258, 90, 80.76383972167969, 22.0), launchZ: -1.0 }, ordinary(13.687410354614258, 70, 80.76383972167969, 22.0))]),
+    [AttackStyle.downAir]: heroMove(12, 3, 28, 22, [heroRegion(12, 14, pick(0.0, 10.0, 0.0, -46.0, 12.0), { ...ordinary(13.687410354614258, 90, 80.76383972167969, 22.0), launchZ: -1.0 }, ordinary(13.687410354614258, 70, 80.76383972167969, 22.0))]),
     [AttackStyle.grab]: heroMove(7, 2, 24, 0, [heroRegion(7, 8, pick(16.0, 38.0, 44.0, 38.0), koboldHit(0.0, 35, 0.0, 0.0))]),
     [AttackStyle.getupAttack]: heroMove(17, 3, 30, 0, [heroRegion(17, 19, pick(-56.0, 14.0, 56.0, 14.0, 14.0), ordinary(7.465859889984131, 35))]),
     [AttackStyle.ledgeAttack]: heroMove(17, 3, 21, 0, [heroRegion(17, 19, pick(16.0, 36.0, 70.0, 36.0), ordinary(7.465859889984131, 35))]),

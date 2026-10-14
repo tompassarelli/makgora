@@ -93,7 +93,7 @@ const BLADEMASTER: AuthoredSpecial = {
 const MOUNTAIN_KING: AuthoredSpecial = {
   name: "Avatar", endFrame: 50, groundOnly: true,
   projectiles: [mark("Abilities\\Spells\\Human\\Avatar\\AvatarCaster.mdx", 16, 34, 0.0), mark("Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdx", 33, 14, 0.0)],
-  regions: [heroRegion(33, 35, capsule(-180.0, 30.0, 180.0, 30.0, 50.0), hit(10.0, 75, 75.0, 40.0))],
+  regions: [heroRegion(33, 35, capsule(-180.0, 30.0, 180.0, 30.0, 50.0), hit(8.25, 75, 75.0, 40.0))],
   buff: { frame: 33, kind: ItemKind.heavy, frames: 600 },
 };
 
@@ -135,7 +135,7 @@ const DREADLORD: AuthoredSpecial = {
     { ...mark("Abilities\\Weapons\\DemolisherFireMissile\\DemolisherFireMissile.mdx", 28, 12, 260.0, 600.0), velocityZ: -48.0 },
     mark("Abilities\\Spells\\Other\\Incinerate\\FireLordDeathExplode.mdx", 40, 14, 260.0),
   ],
-  regions: [heroRegion(40, 42, capsule(260.0, 20.0, 260.0, 120.0, 100.0), hit(16.0, 80, 90.0, 45.0, HitElement.fire))],
+  regions: [heroRegion(40, 42, capsule(260.0, 20.0, 260.0, 120.0, 100.0), hit(14.0, 80, 90.0, 45.0, HitElement.fire))],
 };
 
 const VOODOO_AURA = "Abilities\\Spells\\Orc\\Voodoo\\VoodooAura.mdx";
@@ -299,7 +299,7 @@ const GROM: AuthoredSpecial = {
   name: "Blood of Mannoroth", endFrame: 70, groundOnly: true,
   projectiles: [mark("Abilities\\Spells\\Orc\\Bloodlust\\BloodlustTarget.mdx", 1, 16, 0.0)],
   motion: [{ ...frames(17, 40), velocityX: 22.0, velocityZ: 0.0 }, { ...frames(41, 41), velocityX: 0.0, velocityZ: 0.0 }],
-  commandGrab: { ...frames(17, 40), strike: capsule(20.0, 50.0, 70.0, 50.0, 40.0), holdFrames: 30, effect: hit(22.0, 40, 90.0, 45.0, HitElement.slash), recovery: 24 },
+  commandGrab: { ...frames(17, 40), strike: capsule(20.0, 50.0, 70.0, 50.0, 40.0), holdFrames: 30, effect: hit(11.5, 40, 90.0, 45.0, HitElement.slash), recovery: 24 },
   hurt: [
     pose(1, 7, [part(-14.0, -8.0, -34.0, 141.0, 48.0)]),
     pose(8, 13, [part(-18.0, 28.0, -26.0, 52.0, 27.0), part(-58.0, 104.0, -58.0, 104.0, 36.0), part(-94.0, 132.0, -94.0, 169.0, 20.0)]),

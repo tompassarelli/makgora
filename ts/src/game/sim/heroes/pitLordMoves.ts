@@ -195,7 +195,7 @@ export const PIT_LORD_MOVES: FighterMoves = {
       ...cleave(27, [150.0, 100.0, 50.0, 10.0], f32(XL - 50.0), hit(20.045000076293945, "KILL", 40)),
     ]),
 
-    [AttackStyle.upSmash]: heroMove(24, 5, 39, 0, path(24, [
+    [AttackStyle.upSmash]: heroMove(24, 5, 41, 0, path(24, [
       capsule(40.0, 90.0, 70.0, f32(XL - 10.0)),
       capsule(20.0, 100.0, 30.0, f32(XL + 20.0)),
       capsule(0.0, 100.0, 0.0, f32(XL + 30.0)),

@@ -11,7 +11,7 @@ const AIR_LANDING_LAG = 20;
 export const KAEL_PILLAR: SpecialProjectile = {
   model: "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike.mdx",
   spawnFrame: 0, offsetX: 0.0, offsetZ: 0.0, velocityX: 0.0, velocityZ: 0.0,
-  life: 12, activeFrom: 13, radius: 40.0, effect: kaelHit(12.0, 80, 90.30785369873047, 30.0),
+  life: 12, activeFrom: 13, radius: 40.0, effect: kaelHit(10.0, 80, 90.30785369873047, 30.0),
   reflectable: false, limit: 1,
 };
 export const KAEL_FLAME_BOLT: SpecialProjectile = {
@@ -53,7 +53,7 @@ const phoenix = (speed: number): AuthoredSpecial => ({
   ],
   regions: [
     heroRegion(20, 21, SWIRL, swirl), heroRegion(26, 27, SWIRL, swirl), heroRegion(32, 33, SWIRL, swirl), heroRegion(38, 39, SWIRL, swirl),
-    heroRegion(43, 52, BIRD, kaelHit(13.016160011291504, 55, 76.04872131347656, 40.0)), heroRegion(53, 72, BIRD, kaelHit(6.508080005645752, 70, 57.03654098510742, 30.0)),
+    heroRegion(43, 52, BIRD, kaelHit(11.0, 55, 76.04872131347656, 40.0)), heroRegion(53, 72, BIRD, kaelHit(6.508080005645752, 70, 57.03654098510742, 30.0)),
   ],
 });
 
