@@ -73,7 +73,7 @@ export const SHADOW_HUNTER_HERO: HeroDefinition = {
       ledgeHang: STAND_READY, ledgeClimb: WALK, ledgeRoll: WALK, ledgeAttack: ATTACK,
       knockdown: DEATH, getUp: STAND_READY, downDamage: DEATH,
       rollForward: WALK, rollBackward: WALK, spotDodge: STAND_HIT,
-      jump: STAND_VICTORY, doubleJump: STAND_VICTORY, fallSpecial: STAND_4,
+      jump: STAND_READY, doubleJump: STAND_READY, fallSpecial: STAND_4,
 
       wallJump: SPELL_THROW, wallTech: STAND_HIT,
       damageGround: STAND_HIT, damageAir: STAND_HIT, damageTumble: STAND_HIT, damageShield: STAND_HIT,
