@@ -197,6 +197,7 @@ export function pastMain(base: Tree, tested: Tree, main: readonly Tree[], landed
 }
 
 export const GENERATED_REPORTS: readonly string[] = ["tools/move-data/advantage-state.jsonl", "tools/move-data/advantage-state.md"];
+export const CACHE_RECORDS: readonly string[] = ["ts/scripts/wisp/cue-models.tsv"];
 const PIN = /^build-inputs\/([^/]+)$/;
 export const pinFamily = (path: string): string | undefined => PIN.exec(path)?.[1];
 
@@ -222,6 +223,8 @@ export function mergeFamily({ base, ours, theirs }: FamilySides): { readonly tre
 }
 
 export function resolveConflicts(conflicts: readonly Conflict[]): Resolution {
+  const recorded = conflicts.filter(({ path }) => CACHE_RECORDS.includes(path)).map(({ path }) => path);
+  if (recorded.length > 0) return { resolve: false, why: `${recorded.join(" ")} is recorded from the private Classic cache that Autoland's runners don't hold, so Autoland keeps neither side; rebase the lane onto main, run bun scripts/cueModels.ts --record --stock-cache DIRECTORY from ts/ on the landing machine, and push again` };
   const source = conflicts.filter(({ path }) => pinFamily(path) === undefined && !GENERATED_REPORTS.includes(path)).map(({ path }) => path);
   if (source.length > 0) return { resolve: false, why: `${source.join(" ")} ${source.length === 1 ? "is" : "are"} not generated; Autoland never resolves source` };
   const pins: { path: string; tree: Tree; hash: string }[] = [];

@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { effectUses, effectUseDigest, effectSourceDigest, type EffectVerdict, type EffectFinding } from "./effectVisibility";
 import { fighterCueList, MISSING_CUE_MODEL } from "../../src/game/presentation/specialCues";
 import { allAttackCueModels } from "../../src/game/presentation/attackCues";
@@ -45,19 +46,23 @@ export function touchesCueInputs(paths: readonly string[], inputs: ReadonlySet<s
 }
 
 
-export function formatEffectRecord(report: { readonly source: string; readonly provenance: string; readonly findings: readonly EffectFinding[] }): string {
-  return `classic-source\t${report.source}\t${report.provenance}\n` + report.findings.map(({ status, reason, ...use }) => `classic-use\t${effectUseDigest(use)}\t${status}\t${report.provenance}\t${reason.replace(/[\t\r\n]/g, " ")}\n`).sort().join("");
+const effectRows = (text: string): string[] => text.split("\n").filter((line) => line.startsWith("classic-use\t"));
+const rowsDigest = (rows: readonly string[]): string => createHash("sha256").update(rows.join("\n")).digest("hex");
+
+export function formatEffectRecord(report: { readonly source: string; readonly cacheInfo: string; readonly models: ReadonlyMap<string, string>; readonly findings: readonly EffectFinding[] }): string {
+  const rows = report.findings.map(({ status, reason, ...use }) => `classic-use\t${effectUseDigest(use)}\t${status}\t${report.models.get(use.model) ?? "unread"}\t${reason.replace(/[\t\r\n]/g, " ")}`).sort();
+  return `classic-source\t${report.source}\t${report.cacheInfo}\t${rowsDigest(rows)}\n` + rows.map((row) => `${row}\n`).join("");
 }
 
 export function effectRecordProblem(text: string): string | undefined {
   const header = text.split("\n").find((line) => line.startsWith("classic-source\t"))?.split("\t");
   const digest = /^[0-9a-f]{64}$/;
-  if (header?.[1] !== effectSourceDigest() || !digest.test(header[2] ?? "")) return "Classic effect record is missing or stale; record one exact24268 cache with bun scripts/cueModels.ts --record --stock-cache DIRECTORY";
+  if (header?.[1] !== effectSourceDigest() || !digest.test(header[2] ?? "")) return `Classic effect record is missing or stale; record one exact24268 cache with ${RECORD_COMMAND}`;
+  if (header[3] !== rowsDigest(effectRows(text))) return `Classic effect record rows were edited or merged after recording; re-record them with ${RECORD_COMMAND}`;
   const records = new Map<string, EffectVerdict["status"]>();
-  for (const line of text.split("\n")) {
-    const [kind, key, status, provenance] = line.split("\t");
-    if (kind !== "classic-use" || key === undefined || provenance !== header[2]) continue;
-    if (status === "visible" || status === "invisible" || status === "unknown") records.set(key, status);
+  for (const line of effectRows(text)) {
+    const [, key, status] = line.split("\t");
+    if (key !== undefined && (status === "visible" || status === "invisible" || status === "unknown")) records.set(key, status);
   }
   const refused = effectUses().filter((use) => {
     const status = records.get(effectUseDigest(use));

@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
 import { parseMDL, type model as mdx } from "wisp/vendor/war3-model.mjs";
+import { createHash } from "node:crypto";
 import { effectVisibility, simultaneousPositive, effectUses, effectSourceDigest } from "../scripts/wisp/effectVisibility";
 
 import { formatEffectRecord, effectRecordProblem, effectRecordUnknowns } from "../scripts/wisp/cueModels";
@@ -58,16 +59,31 @@ test("Classic effect visibility requires simultaneous supported tracks and movin
   expect(effectVisibility(emitting, use, () => true).status).toBe("visible");
   const scaledEmitter = { ...emitting, ParticleEmitters2: emitting.ParticleEmitters2.map((emitter) => ({ ...emitter, Scaling: { LineType: 0, GlobalSeqId: -1, Keys: [{ Frame: 0, Vector: new Float32Array([0, 0, 0]) }] } })) };
   expect(effectVisibility(scaledEmitter, use, () => true).status).toBe("unknown");
-  const uses = effectUses(), source = effectSourceDigest(), provenance = "a".repeat(64);
+  const uses = effectUses(), source = effectSourceDigest(), cacheInfo = "a".repeat(64);
+  const models = new Map(uses.map(({ model }) => [model, createHash("sha256").update(model).digest("hex")]));
   for (let example = 0; example < 2; example++) {
     const findings = uses.map((entry) => ({ ...entry, status: bit() ? "visible" as const : "unknown" as const, reason: `unsupported playback ${example}` }));
-    const text = formatEffectRecord({ source, provenance, findings });
+    const text = formatEffectRecord({ source, cacheInfo, models, findings });
     expect(effectRecordProblem(text)).toBeUndefined();
     expect(effectRecordUnknowns(text)).toEqual(findings.filter(({ status }) => status === "unknown").map((entry) => `${entry.fighter}\t${entry.move}\tUnknown\t${entry.model}\t${entry.reason}`));
-    expect(effectRecordProblem(formatEffectRecord({ source, provenance, findings: findings.slice(1) }))).toBeDefined();
-    expect(effectRecordProblem(formatEffectRecord({ source, provenance, findings: findings.map((entry, index) => index === example ? { ...entry, status: "invisible" } : entry) }))).toBeDefined();
+    expect(effectRecordProblem(formatEffectRecord({ source, cacheInfo, models, findings: findings.slice(1) }))).toBeDefined();
+    expect(effectRecordProblem(formatEffectRecord({ source, cacheInfo, models, findings: findings.map((entry, index) => index === example ? { ...entry, status: "invisible" } : entry) }))).toBeDefined();
     expect(effectRecordProblem(text.replace(source, "b".repeat(64)))).toBeDefined();
-    expect(effectRecordProblem(text.replaceAll(`\t${provenance}\t`, `\t${"c".repeat(64)}\t`))).toBeDefined();
+    const row = text.split("\n").filter((line) => line.startsWith("classic-use\t"))[example] ?? "";
+    expect(effectRecordProblem(text.replace(row, row.replace(/^(classic-use\t[0-9a-f]{64}\t\w+\t)[0-9a-f]{64}/, `$1${"c".repeat(64)}`)))).toBeDefined();
     expect(effectRecordProblem(text.replaceAll("\tunknown\t", "\tmalformed\t").replaceAll("\tvisible\t", "\tmalformed\t"))).toBeDefined();
   }
+});
+
+test("re-recording one model's changed Classic inputs rewrites only its row and the header [k1 scenario]", () => {
+  const uses = effectUses(), source = effectSourceDigest(), cacheInfo = "a".repeat(64);
+  const models = new Map(uses.map(({ model }) => [model, createHash("sha256").update(model).digest("hex")]));
+  const findings = uses.map((use) => ({ ...use, status: "visible" as const, reason: "MODEL-DATA" }));
+  const lone = uses.find((use) => uses.filter(({ model }) => model === use.model).length === 1)?.model ?? "";
+  const before = formatEffectRecord({ source, cacheInfo, models, findings }).split("\n");
+  const after = formatEffectRecord({ source, cacheInfo, models: new Map([...models, [lone, "d".repeat(64)]]), findings }).split("\n");
+  expect(before.length).toBe(uses.length + 2);
+  expect(after.length).toBe(before.length);
+  expect(before.flatMap((line, index) => line === after[index] ? [] : [line.split("\t")[0]])).toEqual(["classic-source", "classic-use"]);
+  expect(effectRecordProblem(after.join("\n"))).toBeUndefined();
 });

@@ -1,0 +1,115 @@
+import { readdirSync, readFileSync, statSync } from "node:fs";
+import { join } from "node:path";
+import { preloadLines } from "wisp/scripts/wisp/preloadRecord";
+
+const DEFAULT_FOLDER = join(process.env.HOME ?? "", ".local/share/Steam/steamapps/compatdata/3516115571/pfx/drive_c/users/steamuser/Documents/Warcraft III/CustomMapData");
+const RATES_FILE = /^smashcraft-rates-(.+)-(\d+)\.txt$/;
+const GAP_FLAG_US = 250000;
+
+export type Fields = Record<string, number>;
+
+export interface SessionRateLines {
+  readonly header: string | undefined;
+  readonly seconds: Fields[];
+  readonly counts: Fields[];
+  readonly events: string[];
+}
+
+function fields(words: readonly string[]): Fields {
+  const parsed: Fields = {};
+  for (const word of words) {
+    const at = word.indexOf("=");
+    if (at < 0) continue;
+    const [live, created] = word.slice(at + 1).split("/");
+    parsed[word.slice(0, at)] = Number(live);
+    if (created !== undefined) parsed[`${word.slice(0, at)}Made`] = Number(created);
+  }
+  return parsed;
+}
+
+export function parseSessionRates(lines: readonly string[]): SessionRateLines {
+  const seconds: Fields[] = [];
+  const counts: Fields[] = [];
+  const events: string[] = [];
+  let header: string | undefined;
+  for (const line of lines) {
+    const words = line.split(" ");
+    if (words[0] === "smashcraft-rates") header = line;
+    else if (words[0] === "r") seconds.push(fields(words.slice(1)));
+    else if (words[0] === "c") counts.push(fields(words.slice(1)));
+    else if (words[0] === "e") events.push(line.slice(2));
+  }
+  return { header, seconds, counts, events };
+}
+
+interface Minute {
+  readonly minute: number;
+  readonly mtime: number;
+  readonly lines: SessionRateLines;
+}
+
+const sum = (rows: readonly Fields[], key: string) => rows.reduce((total, row) => total + (row[key] ?? 0), 0);
+const most = (rows: readonly Fields[], key: string) => rows.reduce((top, row) => Math.max(top, row[key] ?? 0), 0);
+const fixed = (value: number, digits = 1) => value.toFixed(digits);
+
+function minuteRow(minute: Minute, previousEnd: number): string {
+  const { seconds, counts, events } = minute.lines;
+  const end = seconds.at(-1)?.t ?? previousEnd;
+  const span = Math.max(1, (end - previousEnd) / 1000);
+  const matchTicks = sum(seconds.filter(row => row.ph === 2), "cb");
+  const flags = [
+    sum(seconds, "pt") > 0 || sum(seconds, "pz") > 0 ? `PAUSE(${sum(seconds, "pt")} toggles, ${sum(seconds, "pz")} paused cb)` : "",
+    sum(seconds, "pm") > 0 ? `MENU(${sum(seconds, "pm")})` : "",
+    most(seconds, "cbgap") > GAP_FLAG_US ? `GAP(${fixed(most(seconds, "cbgap") / 1000, 0)} ms, focus?)` : "",
+    span > seconds.length + 5 ? `MISSING(${fixed(span - seconds.length, 0)} s without lines)` : "",
+  ].filter(flag => flag !== "").join(" ");
+  const last = counts.at(-1) ?? {};
+  const live = ["trg", "tmr", "eff", "snd", "frm", "unit"].map(kind => `${kind} ${last[kind] ?? "?"}`).join(" ");
+  const topEvents = events.at(-1) ?? "";
+  return [
+    `  min ${String(minute.minute).padStart(3)} t ${fixed(end / 1000, 0).padStart(5)}s`,
+    `cb/s ${fixed(sum(seconds, "cb") / span)} (min ${seconds.length === 0 ? "-" : Math.min(...seconds.map(row => row.cb ?? 0))})`,
+    `sim/s ${fixed(sum(seconds, "sim") / span)} spec/s ${fixed(sum(seconds, "spec") / span)} conf/s ${fixed(sum(seconds, "conf") / span)}`,
+    `held ${fixed(100 * sum(seconds, "held") / Math.max(1, matchTicks), 0)}% stall ${fixed(100 * sum(seconds, "stall") / Math.max(1, matchTicks), 0)}% gap ${fixed(sum(seconds, "gap") / Math.max(1, seconds.length))}/${most(seconds, "gmax")}`,
+    `lua ms/s ${fixed(sum(seconds, "lua") / 1000 / span)} tick us ${fixed(sum(seconds, "tk") / Math.max(1, seconds.length), 0)}/${most(seconds, "tkmax")}`,
+    `draw/s ${fixed(sum(seconds, "dr") / span)} ev/s ${fixed(sum(seconds, "ev") / span)} send/s ${fixed(sum(seconds, "send") / span)}`,
+    `live ${live} kreg ${last.kreg ?? "?"} reg ${last.reg ?? "?"} act ${last.act ?? "?"} hid ${last.hid ?? "?"} heapKb ${last.heap ?? "?"}`,
+    flags,
+    topEvents === "" ? "" : `events[${topEvents}]`,
+  ].filter(part => part !== "").join(" | ");
+}
+
+export function sessionRateReport(folder: string): string[] {
+  const loads = new Map<string, Minute[]>();
+  for (const name of readdirSync(folder)) {
+    const match = RATES_FILE.exec(name);
+    if (match === null) continue;
+    const path = join(folder, name);
+    const text = readFileSync(path, "utf8");
+    const lines = preloadLines(text) ?? text.split(/\r?\n/);
+    const minutes = loads.get(match[1] ?? "") ?? [];
+    minutes.push({ minute: Number(match[2]), mtime: statSync(path).mtimeMs, lines: parseSessionRates(lines) });
+    loads.set(match[1] ?? "", minutes);
+  }
+  if (loads.size === 0) return [`no smashcraft-rates files in ${folder}`];
+  const report: string[] = [];
+  const ordered = [...loads.entries()].sort((left, right) => Math.min(...left[1].map(m => m.mtime)) - Math.min(...right[1].map(m => m.mtime)));
+  for (const [load, minutes] of ordered) {
+    minutes.sort((left, right) => left.minute - right.minute);
+    const first = minutes[0];
+    const lastMinute = minutes.at(-1);
+    if (first === undefined || lastMinute === undefined) continue;
+    const clockSpan = ((lastMinute.lines.seconds.at(-1)?.t ?? 0) - (first.lines.seconds.at(-1)?.t ?? 0)) / 1000;
+    const wallSpan = (lastMinute.mtime - first.mtime) / 1000;
+    report.push(`load ${load} started ~${new Date(first.mtime - (first.lines.seconds.at(-1)?.t ?? 0)).toISOString()} ${first.lines.header ?? ""}`);
+    report.push(`  clock check: map clock ${fixed(clockSpan)} s vs file mtimes ${fixed(wallSpan)} s between first and last file (equal when the map clock is real time)`);
+    let previousEnd = 0;
+    for (const minute of minutes) {
+      report.push(minuteRow(minute, previousEnd));
+      previousEnd = minute.lines.seconds.at(-1)?.t ?? previousEnd;
+    }
+  }
+  return report;
+}
+
+if (import.meta.main) console.log(sessionRateReport(process.argv[2] ?? DEFAULT_FOLDER).join("\n"));
