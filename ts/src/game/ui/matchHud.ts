@@ -50,7 +50,6 @@ export class FighterHud {
   private readonly portrait: framehandle;
   private readonly damage: framehandle;
   private readonly tenths: framehandle;
-  private readonly healing: framehandle;
   private readonly name: framehandle;
   private readonly slotLabel: framehandle;
   private readonly stocks: readonly framehandle[];
@@ -70,8 +69,6 @@ export class FighterHud {
 
   private shakeFrame = SHAKE_FRAMES;
   private shakeStrength = 0.0;
-  private repairGuarded = false;
-  private healingUntil = -1;
 
 
   constructor(private readonly slot: number, count: number) {
@@ -94,13 +91,6 @@ export class FighterHud {
     BlzFrameSetFont(this.tenths, MENU_FONT, f32(0.016), 1);
     BlzFrameSetTextAlignment(this.tenths, TEXT_JUSTIFY_BOTTOM, TEXT_JUSTIFY_LEFT);
     BlzFrameSetEnable(this.tenths, false);
-    this.healing = createText(`FighterHUDHealing${suffix}`, parent, context + 8 + STOCK_ICONS);
-    BlzFrameSetSize(this.healing, unitsForPixels(DAMAGE_BOX.width), unitsForPixels(24));
-    BlzFrameSetFont(this.healing, MENU_FONT, f32(0.014), 1);
-    BlzFrameSetTextAlignment(this.healing, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_RIGHT);
-    BlzFrameSetEnable(this.healing, false);
-    BlzFrameSetLevel(this.healing, 22);
-    BlzFrameSetVisible(this.healing, false);
     this.name = createText(`FighterHUDName${suffix}`, parent, context + 3);
     sizeTo(this.name, NAME_BOX);
     BlzFrameSetFont(this.name, MENU_FONT, f32(0.0072), 1);
@@ -135,7 +125,6 @@ export class FighterHud {
     for (const frame of this.body) BlzDestroyFrame(frame);
     for (const icon of this.stocks) BlzDestroyFrame(icon);
     BlzDestroyFrame(this.stockCount);
-    BlzDestroyFrame(this.healing);
   }
 
 
@@ -146,7 +135,6 @@ export class FighterHud {
     placeAt(this.portrait, left, BUST_BOX);
     placeAt(this.damage, left, DAMAGE_BOX);
     placeAt(this.tenths, left, TENTHS_BOX);
-    placeTopLeft(this.healing, boxLeft(left, DAMAGE_BOX), boxTop(DAMAGE_BOX) + unitsForPixels(24));
     placeAt(this.name, left, NAME_BOX);
     placeAt(this.slotLabel, left, SLOT_BOX);
     this.stocks.forEach((icon, index) => placeTopLeft(icon, boxLeft(left, STOCK_ROW) + unitsForPixels(index * STOCK_STEP_PX), boxTop(STOCK_ROW)));
@@ -154,17 +142,7 @@ export class FighterHud {
   }
 
 
-  update(visible: boolean, character: Character, damage: number, stocks: number, repairGuarded = false, simulationFrame = 0): void {
-    if (visible && character === Character.peon && repairGuarded && !this.repairGuarded && this.shownCharacter === character && this.shownStocks === stocks) {
-      const healed = Math.min(4.0, Math.max(0.0, this.damageValue - damage));
-      if (healed > 0.0) {
-        BlzFrameSetText(this.healing, `|cff70ff70+${healed >= 4.0 ? "4" : R2SW(healed, 0, 1)}%|r`);
-        this.healingUntil = simulationFrame + 45;
-      }
-    }
-    this.repairGuarded = repairGuarded;
-    if (!visible || this.shownCharacter !== character || this.shownStocks !== stocks) this.healingUntil = -1;
-    BlzFrameSetVisible(this.healing, visible && simulationFrame < this.healingUntil);
+  update(visible: boolean, character: Character, damage: number, stocks: number): void {
     if (this.shownVisible !== visible) {
       this.shownVisible = visible;
       for (const frame of this.body) BlzFrameSetVisible(frame, visible);

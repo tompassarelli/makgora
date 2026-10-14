@@ -75,7 +75,7 @@ rules refuse immediate regrabs.
 | Neutral: Lumber Toss | Throw a visible lumber bundle on f14; 8%, speed9, life70, radius18, at most1. End40; cost0. Ground and air share the shot; air landing lag20. Slow pressure buys setup time and is reflectable; its recovery lets the defender punish a point-blank shielded toss with the original out-of-shield options. | [Harvest lumber](https://liquipedia.net/warcraft/Peon), [Lloid Rocket](https://www.ssbwiki.com/Lloid_Rocket) |
 | Side: Burrow | Ground-only placement on f26, end52, cost20. One 32-durability Burrow, 240-frame life, fires 5% spears at ages45/85/125/165/205. A second press packs it up on end52 for no refund. Attacks break it, and shots stop while Peon is held or stunned. | [Burrow shelter](https://liquipedia.net/warcraft/Peon), [Timber setup](https://www.ssbwiki.com/Timber) |
 | Up: Worksite Launch | A frantic tool-assisted vault: f8–28 rises 16 per frame with live sideways steering up to 6, cost15, then helpless. Free form rises 11 with steering up to 4. Consumes aerial jump and once-per-airtime use. Its vulnerable return follows the held side throughout the launch. | [Burrow exit](https://classic.battle.net/war3/orc/basics.shtml), [Lloid ride](https://www.ssbwiki.com/Lloid_Rocket) |
-| Down: Repair | Duck behind the tools on f4–7; one correctly timed incoming contact restores4 damage, capped12 per stock. Those four frames are intangible. Cost20, end38, air landing lag20. A whiff grants nothing and leaves a long punish; no idle healing. | [Repair](https://liquipedia.net/warcraft/Peon), [Pocket's defensive window](https://www.ssbwiki.com/Pocket) |
+| Down: Rest | Tom's design (#563 finding 13), shaped on Jigglypuff's Rest. Startup 1; frames 2–3 a radius-30 sphere on his body deals 20.48 at 90° (growth 118.2, base 80; kills from 48% at centre stage); frame 4 a radius-40 outer ring deals 10.24 at 85° and never kills. Then he sleeps 225 frames (3.75 s) in place, unable to act; in the air he sleeps while falling and keeps sleeping after landing, waking on the same frame. EX widens the spheres 25%. Computer players use it only on a punish window or a kill-percent confirm. | [Rest](https://www.ssbwiki.com/Rest) |
 | Ultimate: Overtime | Designed roster slot: a brief work frenzy, faster worksite setup and stronger tool hits. As with the roster template, ultimate activation is disabled by the current match rules; the four-special base kit stands alone. | [Orc construction](https://liquipedia.net/warcraft/Peon), [Villager house finisher](https://www.ssbwiki.com/Villager_(SSBU)#Moveset) |
 
 ## Matchup identity
@@ -110,6 +110,8 @@ air-share: 10-40
 approach: 50-80
 ranged: 0-25
 specials: neutral 2-12, side 2-12, up 0-8, down 2-12
+envelope: special.down.ground endLag Rest's 225-frame sleep is the price of its frame-2 kill hit (#563 finding 13)
+envelope: special.down.ground.ex endLag EX Rest keeps the same 225-frame sleep
 ```
 
 Path draft for Tom to correct (#358):

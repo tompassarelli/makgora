@@ -293,12 +293,9 @@ function selectClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly<Ros
   }
   if (f.special.action !== SpecialAction.none && f.launch.hitstun === 0) {
     if (character === Character.peon && f.special.action === SpecialAction.heroDown) {
-      const guard = runningHeroSpecial(f)?.guard;
-      const guarding = guard !== undefined && f.special.frame >= guard.first && f.special.frame <= guard.last;
-      const clip = guarding ? clips.clipFor(character, "shield") : fighterSpecialClip(f);
-      playIndex(pose, `repair-${guarding ? "guard" : "recover"}`, clip.index);
-      pose.clipTime = guarding ? f32(3 * FRAME_SECONDS) : f32(Math.max(0, f.special.frame - 1) * FRAME_SECONDS);
-      return guarding ? 0.0 : rate;
+      playIndex(pose, "rest", clips.clipFor(character, "ko").index);
+      pose.clipTime = peonRestClipTime(f.special.frame);
+      return 0.0;
     }
     playIndex(pose, `special${f.special.action}${playsFollowUpPose(f) ? "+" : ""}`, fighterSpecialClip(f).index);
     return rate;
@@ -644,6 +641,14 @@ function downRate(f: Readonly<Fighter>): number {
 function groundDodgeClip(f: Readonly<Fighter>): HeroClip {
   if (f.dodge.groundDirection === 0) return clips.clipFor(f.character, "spotDodge");
   return clips.clipFor(f.character, isForwardGroundRoll(f) ? "rollForward" : "rollBackward");
+}
+
+const PEON_REST_JOLT_SECONDS = f32(0.2);
+const PEON_REST_ASLEEP_SECONDS = f32(1.4);
+
+
+export function peonRestClipTime(frame: number): number {
+  return Math.min(PEON_REST_ASLEEP_SECONDS, f32(PEON_REST_JOLT_SECONDS + f32(Math.max(0, frame - 1) * FRAME_SECONDS)));
 }
 
 function fighterSpecialClip(f: Readonly<Fighter>): HeroClip {

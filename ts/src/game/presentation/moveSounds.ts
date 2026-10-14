@@ -122,7 +122,7 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
   },
   [Character.peon]: {
     weapon: Weapon.axe, strong: "AxeMediumChopWood",
-    specials: [s("AxeMissileLaunch", "AxeMediumChopWood"), s("AxeMediumChopWood", "WyvernSpearMissile"), s("CatapultAttack1", "WoodMediumBashFlesh"), s("Repair", "AxeMediumChopWood")],
+    specials: [s("AxeMissileLaunch", "AxeMediumChopWood"), s("AxeMediumChopWood", "WyvernSpearMissile"), s("CatapultAttack1", "WoodMediumBashFlesh"), s("CreepSleep", "WoodHeavyBashFlesh")],
   },
   [Character.tinker]: {
     weapon: Weapon.hammer, strong: "ClusterRocketsImpact",
@@ -275,7 +275,6 @@ function playLayers(layers: readonly SoundLayer[], serial: number, sink: MoveSou
 }
 
 export function playPerform(character: Character, move: number, serial: number, sink: MoveSoundSink): void {
-  if (character === Character.peon && move === specialMove(3)) return;
   const row = moveSound(character, move);
   if (row === undefined) return;
   playLayers(row.perform, serial, sink);

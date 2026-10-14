@@ -13,6 +13,7 @@ import { runningHeroSpecial } from "../sim/heroSpecialRules";
 import { HERO_ROSTER } from "../sim/heroes/registry";
 import { PHOENIX_CHARGE_FRAMES, PHOENIX_FLIGHT_FRAMES } from "../sim/heroes/kaelthasSpecials";
 import { KOBOLD_BURROW_FIRST, KOBOLD_BURROW_LAST } from "../sim/ultimates";
+import { REST_SOUR_FRAME } from "../sim/heroes/peonSpecials";
 import {
   CHAOS_STRIKE_AIR_FORM,
   CHAOS_STRIKE_FIRST,
@@ -173,6 +174,13 @@ const BURROW = cue("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTarget
 const KOBOLD_BURROW_TRAIL: MoveCues = { spell: "Burrow trail", startup: BURROW, active: BURROW };
 
 
+export const PEON_REST_CUES: MoveCues = {
+  spell: "Rest",
+  startup: cue("Abilities\\Spells\\Items\\AIlb\\AIlbSpecialArt.mdx", "body", f32(2.5)),
+  active: cue("Abilities\\Spells\\Undead\\Sleep\\SleepTarget.mdx", "body", f32(1.5)),
+};
+
+
 export const HERO_CUES: { readonly [character: number]: { readonly [slot in SpecialSlot]: MoveCues } } = {
   [Character.malfurion]: {
     neutral: { spell: "Entangling Roots", startup: NATURE, active: cue("Abilities\\Spells\\NightElf\\EntanglingRoots\\EntanglingRootsTarget.mdx", "ahead", f32(0.35)) },
@@ -244,7 +252,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     neutral: { spell: "Lumber Toss", startup: cue("Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx", "feet", f32(0.15)), active: drawn("Objects\\InventoryItems\\BundleofLumber\\BundleofLumber.mdx", "hand") },
     side: { spell: "Burrow", startup: cue("Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx", "ahead", f32(0.25)), active: drawn("buildings\\orc\\TrollBurrow\\TrollBurrow.mdl", "ahead") },
     up: { spell: "Worksite Launch", startup: cue("Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx", "feet", f32(0.2)), active: cue("Objects\\Spawnmodels\\Other\\ToonBoom\\ToonBoom.mdx", "feet", f32(0.5)) },
-    down: { spell: "Repair", startup: cue("Abilities\\Spells\\Human\\Defend\\DefendCaster.mdx", "hand", f32(0.4)), active: timed(cue("Abilities\\Spells\\Human\\Heal\\HealTarget.mdx", "body", f32(0.8)), "birth", 0.0) },
+    down: PEON_REST_CUES,
   },
   [Character.thrall]: {
     neutral: { spell: "Chain Lightning", startup: STORM, active: cue("Abilities\\Weapons\\FarseerMissile\\FarseerMissile.mdx", "hand", 0.5) },
@@ -559,6 +567,8 @@ export function originalCueWindows(action: number, grounded: boolean): CueWindow
 }
 
 
+
+
 export interface CueState {
   readonly cues: MoveCues | undefined;
   readonly phase: "none" | "startup" | "active";
@@ -571,11 +581,7 @@ export function specialCueState(fighter: Readonly<Fighter>): CueState {
   const { action, frame } = fighter.special;
   if (action === SpecialAction.none || fighter.status.out) return NONE;
   if (fighter.character === Character.peon && action === SpecialAction.heroDown) {
-    const cues = HERO_CUES[Character.peon]?.down;
-    const guard = runningHeroSpecial(fighter)?.guard;
-    if (cues === undefined || guard === undefined) return NONE;
-    if (fighter.special.guarded) return { cues, phase: "active" };
-    return frame >= 1 && frame <= guard.last ? { cues, phase: "startup" } : NONE;
+    return { cues: PEON_REST_CUES, phase: frame <= REST_SOUR_FRAME ? "startup" : "active" };
   }
   if (fighter.character === Character.dreadlord && action === SpecialAction.heroSide && fighter.special.grabFrame > 0) {
     return frame <= fighter.special.grabFrame + 16 ? { cues: DREADLORD_BITE_CUES, phase: "active" } : NONE;

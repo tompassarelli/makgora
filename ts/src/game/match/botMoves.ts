@@ -22,7 +22,7 @@ import type { FighterMoves } from "../sim/heroMoves";
 import type { Controls } from "../sim/roster";
 import { immolationRegion } from "../sim/specials";
 import { deckUnder, heightAhead, horizontalAhead, safeAt, slideStaysOnDeck } from "./botFooting";
-import { HeroSpecialUse, heroSpecialUse } from "./botHeroKit";
+import { HeroSpecialUse, confirmOnly, confirms, heroSpecialUse } from "./botHeroKit";
 import { SpecialSlot } from "../sim/heroSpecials";
 import { SPACE_PLAN, avoids, gameplanOf, moveWeight, spacedAt, toGameplanMove } from "./botGameplan";
 import type { FighterGameplan, GameplanMove } from "../sim/gameplan";
@@ -240,6 +240,7 @@ function addHeroSpecials(f: Readonly<Fighter>, target: Readonly<Fighter>, stage:
   const gameplan = gameplanOf(f.character);
   for (let index = 0; index < HERO_SLOTS.length; index++) {
     if (heroSpecialUse(f, target, stage, at(HERO_SLOTS, index), observationAge) !== use) continue;
+    if (confirmOnly(f, at(HERO_SLOTS, index)) && !confirms(f, target)) continue;
 
     if (f.character === Character.thrall && at(HERO_SLOTS, index) === SpecialSlot.neutral
       && (gameplan === undefined || !spacedAt(gameplan, NEUTRAL_SPECIAL, Math.abs(aheadX(f, target, 0, undefined, observationAge)))

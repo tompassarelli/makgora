@@ -44,7 +44,7 @@ export const AERIAL_DOWN_CHOICES: Readonly<Record<number, string>> = {
   [Character.sylvanas]: "Life Drain grab while falling",
   [Character.cairne]: "Reincarnation healing guard while falling",
   [Character.chen]: "Earth stance armor in the air; lands into the grounded stance",
-  [Character.peon]: "Repair healing guard in the air; lands into the grounded guard",
+  [Character.peon]: "Rest in the air: the frame-2 jolt, then he sleeps while falling and keeps sleeping after landing",
   [Character.tinker]: "Robo-Goblin armor in the air; lands into the grounded charge",
   [Character.kaelthas]: "Banish curse in the air; lands into the grounded cast",
   [Character.murloc]: "small plague cloud at the cast point",

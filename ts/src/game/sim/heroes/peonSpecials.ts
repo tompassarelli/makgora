@@ -1,5 +1,7 @@
 import { withExKit } from "../exSpecialAuthoring";
 import { type AuthoredSpecial, type FighterSpecials, frames } from "../heroSpecials";
+import { heroRegion } from "../heroMoves";
+import { hurtPart, hurtPose } from "../hurtboxes";
 import { peonHit } from "./peonMoves";
 
 const lumberToss = (air: boolean): AuthoredSpecial => ({
@@ -29,14 +31,25 @@ const vault = (x: number, z: number): AuthoredSpecial => ({
   oncePerAirtime: true, helpless: true, facesStick: true,
 });
 
-const repair = (air: boolean): AuthoredSpecial => ({
-  endFrame: 38, landingLag: air ? 20 : undefined,
-  intangible: frames(4, 7), guard: { ...frames(4, 7), heal: 4.0 },
-});
+export const REST_SWEET_FIRST = 2;
+export const REST_SWEET_LAST = 3;
+export const REST_SOUR_FRAME = 4;
+export const REST_SLEEP_FRAMES = 225;
+export const REST_END_FRAME = REST_SOUR_FRAME + REST_SLEEP_FRAMES;
+export const REST_LYING_FRAME = 45;
+
+const REST: AuthoredSpecial = {
+  endFrame: REST_END_FRAME, confirmOnly: true,
+  regions: [
+    heroRegion(REST_SWEET_FIRST, REST_SWEET_LAST, { x1: 0.0, z1: 50.0, x2: 0.0, z2: 50.0, radius: 30.0 }, peonHit(20.479999542236328, 90, 118.19999694824219, 80.0)),
+    heroRegion(REST_SOUR_FRAME, REST_SOUR_FRAME, { x1: 0.0, z1: 50.0, x2: 0.0, z2: 50.0, radius: 40.0 }, peonHit(10.239999771118164, 85, 54.17499923706055, 50.0)),
+  ],
+  hurt: [hurtPose(REST_LYING_FRAME, REST_END_FRAME, [hurtPart(0.0, 18.0, 52.0, 18.0, 18.0)])],
+};
 
 export const PEON_SPECIALS: FighterSpecials = {
   neutral: withExKit({ name: "Lumber Toss", description: "Toss a slow bundle of lumber to clear some working room.", ground: lumberToss(false), air: lumberToss(true) }, { damage: 1.25 }),
   side: withExKit({ name: "Burrow", description: "Build a fragile burrow that fires spears; press again to pack it up.", ground: BURROW, recall: { name: "Pack Up", endFrame: 52, groundOnly: true, recall: true } }, { durability: 1.25, damage: 1.25, recallProtection: 4 }),
   up: withExKit({ name: "Worksite Launch", description: "Vault toward the stage, then fall helpless.", ground: vault(6.0, 16.0) }, { travel: 1.25 }),
-  down: withExKit({ name: "Repair", description: "Counter-heal: raise the tools on frames 4–7. An incoming strike repairs up to 4% damage. A miss leaves a long punish window; waits and grabs beat it.", ground: repair(false), air: repair(true) }, { guardFrames: 4 }),
+  down: withExKit({ name: "Rest", description: "Nap on the spot: a point-blank frame-2 jolt launches straight up and kills early, then the Peon sleeps for nearly four seconds.", ground: REST }, { reach: 1.25 }),
 };

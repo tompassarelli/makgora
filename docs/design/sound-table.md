@@ -222,7 +222,7 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Neutral special: Lumber Toss | AxeMissileLaunch | AxeMediumChopWood | AxeMediumChopWood + AxeMediumChopWood | MetalMediumChopMetal |  |
 | Side special: Burrow | AxeMediumChopWood | WyvernSpearMissile | WyvernSpearMissile + AxeMediumChopWood | MetalMediumChopMetal |  |
 | Up special: Worksite Launch | CatapultAttack1 | WoodMediumBashFlesh | WoodMediumBashFlesh + AxeMediumChopWood | MetalMediumChopMetal |  |
-| Down special: Repair | Repair | AxeMediumChopWood | AxeMediumChopWood + AxeMediumChopWood | MetalMediumChopMetal |  |
+| Down special: Rest | CreepSleep | WoodHeavyBashFlesh | WoodHeavyBashFlesh + AxeMediumChopWood | MetalMediumChopMetal |  |
 
 ## Goblin Tinker
 

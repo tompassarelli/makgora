@@ -14,6 +14,10 @@ import { type AuthoredSpecial, type FighterSpecials, type SpecialProjectile, FOL
 import { type Controls, neutralControls } from "../sim/roster";
 import { floorFriction, floorTraction } from "../sim/stage";
 import { deckUnder, heightAhead, safeAt } from "./botFooting";
+import { gameplanOf } from "./botGameplan";
+import { GameplanSpecial } from "../sim/gameplan";
+import { heroStatusBlocksActions } from "../sim/heroStatus";
+import { attackStartupFrames, characterAttackActiveFrames } from "../sim/moves";
 
 
 export const HeroSpecialUse = { none: 0, close: 1, ranged: 2 } as const;
@@ -178,6 +182,28 @@ export function heroSpecialUse(f: Readonly<Fighter>, target: Readonly<Fighter>, 
 
 
 
+
+
+export function confirmOnly(f: Readonly<Fighter>, slot: SpecialSlot): boolean {
+  return f.tuning.specials !== undefined && specialKit(f.tuning.specials, slot).ground.confirmOnly === true;
+}
+
+
+function recovering(t: Readonly<Fighter>): boolean {
+  if (t.status.out || t.shield.raised || t.launch.hitstun > 0 || t.launch.hitlag > 0) return false;
+  if (heroStatusBlocksActions(t) || t.landing.lag > 0 || t.special.lockFrames > 0 || t.shield.releaseLag > 0) return true;
+  const { style } = t.attack;
+  return style !== undefined && t.attack.cooldown > 0
+    && t.attack.frame >= attackStartupFrames(style, t.tuning.moves) + characterAttackActiveFrames(t.character, style, t.tuning.moves);
+}
+
+
+export function confirms(f: Readonly<Fighter>, target: Readonly<Fighter>): boolean {
+  if (recovering(target)) return true;
+  if (target.launch.hitstun <= 0) return false;
+  for (const kill of gameplanOf(f.character)?.kills ?? []) if (kill.move === GameplanSpecial.down && target.status.damage >= kill.fromPercent) return true;
+  return false;
+}
 
 
 export function heroStanceSlot(f: Readonly<Fighter>, arrival: number): SpecialSlot | undefined {

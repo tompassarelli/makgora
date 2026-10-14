@@ -21,6 +21,7 @@ export const PEON_GAMEPLAN: FighterGameplan = {
     { starter: GameplanThrow.down, followUps: [AttackStyle.forwardTilt] },
   ],
   kills: [
+    { move: GameplanSpecial.down, fromPercent: 45.0 },
     { move: AttackStyle.forwardSmash, fromPercent: 90.0 },
     { move: AttackStyle.upSmash, fromPercent: 105.0 },
     { move: AttackStyle.forwardAir, fromPercent: 115.0 },

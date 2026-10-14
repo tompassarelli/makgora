@@ -566,8 +566,7 @@ export function renderUi(s: ShellState): void {
   for (const slot of PARTICIPANT_SLOTS) {
     if (s.participants[slot].body !== undefined && isActive(s.world, slot)) {
       const fighter = fighterAt(s.world, slot);
-      ui.huds[slot].update(showMatch, fighter.character, fighter.status.damage, s.game.endless ? 0 : fighter.status.stocks,
-        fighter.character === Character.peon && fighter.special.action === SpecialAction.heroDown && fighter.special.guarded, s.runtime.simulationFrame);
+      ui.huds[slot].update(showMatch, fighter.character, fighter.status.damage, s.game.endless ? 0 : fighter.status.stocks);
       ui.manaBars[slot].hud.update(showMatch, fighter.mana.points, fighter.visuals.manaDenied, fighter.visuals.manaDrained);
     } else {
       ui.huds[slot].update(false, Character.rifleman, 0.0, 0);

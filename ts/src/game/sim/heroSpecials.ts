@@ -304,6 +304,8 @@ export interface AuthoredSpecial {
 
   readonly defensiveUse?: boolean | undefined;
 
+  readonly confirmOnly?: boolean | undefined;
+
   readonly groundOnly?: boolean | undefined;
 
   readonly oncePerAirtime?: boolean | undefined;

@@ -4,7 +4,7 @@
 
 
 
-import { Character, SpecialAction } from "../sim/codes";
+import { Character } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { ATTACK_CUES, type AttackCueState, attackCueState, fighterRenderedCues } from "../presentation/attackCues";
 import { characterModelScale } from "../presentation/modelScale";
@@ -70,9 +70,7 @@ export class SpecialCueEffects {
   private readonly attack: AttackCueState = { cue: undefined, x: 0.0, z: 0.0, key: 0 };
   private readonly confirmedAttack: AttackCueState = { cue: undefined, x: 0.0, z: 0.0, key: 0 };
   private readonly voices: { [model: string]: PopcornVoices | undefined } = {};
-  private readonly repairSound: sound | undefined;
   private readonly cueSounds: { [name: string]: sound | undefined } = {};
-  private repairGuarded = false;
 
   // Online, Warcraft handles must be born on the same turn on every client, so shared play restarts emitters made here instead of making fresh ones on confirmed frames.
   constructor(private readonly character: Character, private readonly origin: WorldOrigin, private readonly shared = false) {
@@ -81,7 +79,6 @@ export class SpecialCueEffects {
     this.front = origin.y - 12.0;
     this.scale = characterModelScale(character);
     this.definitive = definitiveCues();
-    if (character === Character.peon) this.repairSound = CreateSoundFromLabel("Repair", false, true, true, 10, 10);
     for (const shown of fighterRenderedCues(character)) {
       const cue = this.look(shown);
       if (cue.sound !== undefined && this.cueSounds[cue.sound] === undefined) this.cueSounds[cue.sound] = CreateSoundFromLabel(cue.sound, false, true, true, 10, 10);
@@ -116,23 +113,12 @@ export class SpecialCueEffects {
     this.confirmedKey = 0;
     this.confirmedFrame = 0;
     this.popcornNow = 0.0;
-    this.repairGuarded = false;
-    if (this.repairSound !== undefined) StopSound(this.repairSound, false, false);
     for (const sound of Object.values(this.cueSounds)) if (sound !== undefined) StopSound(sound, false, false);
   }
 
 
   confirm(fighter: Readonly<Fighter> | undefined, playing: boolean, now: number): void {
     this.popcornNow = now;
-    const repaired = playing && fighter !== undefined && !fighter.status.out && fighter.character === Character.peon
-      && fighter.special.action === SpecialAction.heroDown && fighter.special.guarded;
-    if (repaired && !this.repairGuarded && this.repairSound !== undefined && fighter !== undefined) {
-      StopSound(this.repairSound, false, false);
-      SetSoundPosition(this.repairSound, this.origin.x + fighter.motion.x, this.origin.y, this.origin.z + fighter.motion.z);
-      SetSoundVolume(this.repairSound, 127);
-      StartSound(this.repairSound);
-    }
-    this.repairGuarded = repaired;
     const state = fighter === undefined || !playing ? undefined : specialCueState(fighter);
     let cue = state?.cues === undefined || state.phase === "none" ? undefined
       : this.look(state.phase === "startup" ? state.cues.startup : state.cues.active);
@@ -349,7 +335,6 @@ export class SpecialCueEffects {
     this.clear();
     this.areas.destroy();
     DestroyEffect(this.missing);
-    if (this.repairSound !== undefined) KillSoundWhenDone(this.repairSound);
     for (const sound of Object.values(this.cueSounds)) if (sound !== undefined) KillSoundWhenDone(sound);
     for (const { model } of this.cues) DestroyEffect(model);
     this.cues.length = 0;
