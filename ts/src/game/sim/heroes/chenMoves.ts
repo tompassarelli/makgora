@@ -44,7 +44,7 @@ export const CHEN_MOVES: FighterMoves = {
     [AttackStyle.downTilt]: heroMove(7, 3, 20, 0, [region(7, 9, 14.0, 22.0, 70.0, 16.0, 13.0, lift(5.622119903564453))]),
     [AttackStyle.dashAttack]: heroMove(10, 5, 27, 0, [region(10, 14, 16.0, 42.0, 52.0, 68.0, 24.0, chenHit(9.370200157165527, 83.63581085205078, 18.0, f32(0.573576), f32(0.819152)))]),
     [AttackStyle.forwardSmash]: heroMove(19, 4, 34, 0, [region(19, 22, 24.0, 66.0, 104.0, 48.0, 14.0, finish(16.86635971069336))]),
-    [AttackStyle.upSmash]: heroMove(15, 4, 31, 0, [region(15, 18, 12.0, 62.0, 8.0, 122.0, 24.0, chenHit(14.99232006072998, 115.80342864990234, 30.0, 0.0, 1.0))]),
+    [AttackStyle.upSmash]: heroMove(15, 4, 31, 0, [region(15, 18, 12.0, 62.0, 8.0, 122.0, 24.0, chenHit(13.5, 115.80342864990234, 30.0, 0.0, 1.0))]),
     [AttackStyle.downSmash]: heroMove(15, 6, 32, 0, [region(15, 17, 18.0, 24.0, 88.0, 18.0, 13.0, finish(13.118280410766602)), region(18, 20, -18.0, 24.0, -88.0, 18.0, 13.0, finish(13.118280410766602, true))]),
     [AttackStyle.neutralAir]: cleanLateMove(heroMove(7, 5, 22, 14, [region(7, 11, -55.0, 42.0, 58.0, 48.0, 15.0, poke(7.49616003036499))]), 2),
     [AttackStyle.forwardAir]: heroMove(11, 4, 27, 17, [region(11, 14, 16.0, 45.0, 78.0, 50.0, 13.0, finish(11.244239807128906))]),

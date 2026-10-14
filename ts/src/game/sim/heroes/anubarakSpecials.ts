@@ -44,7 +44,7 @@ const impale = (air: boolean, ex: boolean): AuthoredSpecial => ({
   ...(ex ? {} : { ex: impale(air, true) }),
 });
 const burrow = (ex: boolean): AuthoredSpecial => ({
-  endFrame: 56, groundOnly: true, facesStick: true,
+  endFrame: 64, groundOnly: true, facesStick: true,
   motion: [{ ...frames(10, ex ? 29 : 25), velocityX: ex ? 13.0 : 10.0, velocityZ: 0.0, stopsAtShield: true }],
   hurt: [heroHurtPose(10, ex ? 29 : 25, [hurtPart(-20.0, 2.0, 20.0, 8.0, 14.0)])],
   regions: [heroRegion(ex ? 30 : 26, ex ? 33 : 29, { x1: -28.0, z1: 20.0, x2: 44.0, z2: 110.0, radius: ex ? 32.0 : 24.0 }, anubarakHit(ex ? 19.820161819458008 : 14.865119934082031, 80, 82.73651885986328, 38.0))],

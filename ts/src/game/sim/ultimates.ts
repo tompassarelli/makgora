@@ -86,7 +86,7 @@ const WARDEN: AuthoredSpecial = {
   name: "Vengeance", endFrame: 40, groundOnly: true,
   placement: {
     frame: 22, offsetX: -60.0, radius: 40.0, height: 140.0, durability: 30.0, life: 90, fireAges: [2, 17, 32, 47],
-    shot: shot(0, 40.0, 50.0, 18.0, 0.0, 50, 26.0, hit(7.0, 40, 60.0, 30.0, HitElement.slash), "Abilities\\Weapons\\SpiritOfVengeanceMissile\\SpiritOfVengeanceMissile.mdx"),
+    shot: shot(0, 40.0, 50.0, 18.0, 0.0, 50, 26.0, hit(5.0, 40, 60.0, 30.0, HitElement.slash), "Abilities\\Weapons\\SpiritOfVengeanceMissile\\SpiritOfVengeanceMissile.mdx"),
     model: { path: "Units\\NightElf\\SpiritOfVengeance\\SpiritOfVengeance.mdx", height: 150.0, alpha: 255 },
   },
 };
@@ -159,7 +159,7 @@ const BEASTMASTER: AuthoredSpecial = {
   ],
 };
 
-const RISEN = shot(0, 0.0, 40.0, 0.0, 0.0, 4, 90.0, hit(20.0, 85, 90.0, 45.0, HitElement.dark), "Abilities\\Spells\\Undead\\Impale\\ImpaleHitTarget.mdx");
+const RISEN = shot(0, 0.0, 40.0, 0.0, 0.0, 4, 90.0, hit(15.0, 85, 90.0, 45.0, HitElement.dark), "Abilities\\Spells\\Undead\\Impale\\ImpaleHitTarget.mdx");
 const LICH_KING: AuthoredSpecial = {
   name: "Animate Dead", endFrame: 64, groundOnly: true,
   projectiles: [mark("Abilities\\Spells\\Undead\\AnimateDead\\AnimateDeadTarget.mdx", 2, 38, 0.0, 0.0, true, RISEN)],
@@ -246,7 +246,7 @@ const PEON: AuthoredSpecial = {
   ],
 };
 
-const OVERDRIVE_BLAST = shot(0, 0.0, 30.0, 0.0, 0.0, 4, 150.0, hit(22.0, 55, 90.0, 45.0, HitElement.fire), "Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx");
+const OVERDRIVE_BLAST = shot(0, 0.0, 30.0, 0.0, 0.0, 4, 150.0, hit(18.0, 55, 90.0, 45.0, HitElement.fire), "Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx");
 const TINKER: AuthoredSpecial = {
   name: "Robo-Goblin Overdrive", endFrame: 50, groundOnly: true,
   projectiles: [{ ...shot(20, 60.0, 30.0, 6.0, 0.0, 60, 40.0, hit(3.0, 30, 20.0, 30.0), "Units\\Creeps\\HeroTinkerRobot\\HeroTinkerRobot.mdl"), expiresInto: OVERDRIVE_BLAST }],
@@ -320,7 +320,7 @@ const MEDIVH: AuthoredSpecial = {
       heroRegion(first, first, capsule(40.0, 50.0, 200.0, 50.0, 80.0), hit(1.0, 25, 0.0, 30.0, HitElement.dark)),
       heroRegion(first, first, capsule(280.0, 50.0, 440.0, 50.0, 80.0), hit(1.0, 25, 0.0, 30.0, HitElement.dark, true)),
     ]),
-    heroRegion(64, 66, capsule(240.0, 20.0, 240.0, 120.0, 110.0), hit(18.0, 60, 90.0, 45.0, HitElement.dark)),
+    heroRegion(64, 66, capsule(240.0, 20.0, 240.0, 120.0, 110.0), hit(12.0, 60, 90.0, 45.0, HitElement.dark)),
   ],
   rehits: [...PULL, 64],
 };

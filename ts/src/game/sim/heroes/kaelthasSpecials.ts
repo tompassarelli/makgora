@@ -11,7 +11,7 @@ const AIR_LANDING_LAG = 20;
 export const KAEL_PILLAR: SpecialProjectile = {
   model: "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike.mdx",
   spawnFrame: 0, offsetX: 0.0, offsetZ: 0.0, velocityX: 0.0, velocityZ: 0.0,
-  life: 12, activeFrom: 13, radius: 40.0, effect: kaelHit(13.016160011291504, 80, 90.30785369873047, 30.0),
+  life: 12, activeFrom: 13, radius: 40.0, effect: kaelHit(12.0, 80, 90.30785369873047, 30.0),
   reflectable: false, limit: 1,
 };
 export const KAEL_FLAME_BOLT: SpecialProjectile = {
