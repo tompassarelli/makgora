@@ -104,7 +104,19 @@ function selectHitRegion(world: Roster, attackerSlot: number, targetSlot: number
     const localX = facingOffsetX(attacker, target);
     if (localX < 0 || localX > region.maxX) return false;
     placeStrikeCapsule(attacker, region);
-    if (grabTouchesBody(strikeCapsule, target, grabTargetZ(attacker, target))) copyHitRegion(out, region);
+    if (grabTouchesBody(strikeCapsule, target, grabTargetZ(attacker, target))) {
+      copyHitRegion(out, region);
+      return false;
+    }
+    if (attacker.character === Character.chen && !attack.pivotGrab && !attack.dashGrab) {
+      for (let index = 0; index < authoredHitRegionCount(attack.style, attacker.tuning.moves); index++) {
+        authoredHitRegion(out, attacker.character, attack.style, attack.frame, attack.smashChargeFrames, index, attacker.tuning.moves);
+        if (out.window <= 0) continue;
+        placeStrikeCapsule(attacker, out);
+        if (grabTouchesBody(strikeCapsule, target, grabTargetZ(attacker, target))) return false;
+      }
+      copyHitRegion(out, NO_HIT_REGION);
+    }
     return false;
   }
   for (let index = 0; index < authoredHitRegionCount(attack.style, attacker.tuning.moves); index++) {
