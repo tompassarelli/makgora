@@ -75,6 +75,7 @@ src/game/presentation/impactState.tests.ts	10	9186000	38809
 src/game/presentation/jumpClips.tests.ts	1	139000	187
 src/game/presentation/koFlash.tests.ts	4	276000	1008
 src/game/presentation/matchCues.tests.ts	5	1809000	610
+src/game/presentation/moveSounds.tests.ts	4	802000	2656
 src/game/presentation/moveTiers.tests.ts	2	3302000	897
 src/game/presentation/projectileArt.tests.ts	2	162000	1085
 src/game/presentation/projectilePose.tests.ts	2	55000	395
