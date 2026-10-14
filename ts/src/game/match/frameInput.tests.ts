@@ -109,8 +109,8 @@ test("a frame handed an earlier run's camera reaches the state recomputing the c
       const input = earlier.inputs.inputs[slot];
       const phase = floorMod(frame + slot * 37, 120);
       input.direction = phase < 30 ? 1 : phase >= 60 && phase < 90 ? -1 : 0;
-      input.jumpPressed = phase === 45;
-      input.jumpHeld = phase >= 45 && phase < 55;
+      input.jumpPressed = phase === 40;
+      input.jumpHeld = phase >= 40 && phase < 50;
       if (floorMod(phase, 20) === 10) queueAttack(earlier.inputs.commands[slot], { style: floorMod(phase, 3), facing: 0, frame, mayCharge: false });
     }
     assertTrue(captureFrame(earlier.row, frame, 15, earlier.inputs, earlier.runtime));
