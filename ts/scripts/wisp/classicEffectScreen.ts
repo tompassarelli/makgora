@@ -89,7 +89,7 @@ export function calibrateScreen(samples: readonly ScreenSample[]): { readonly ca
 }
 
 export interface ScreenRow { readonly move: string; readonly status: "visible" | "invisible" | "unproven"; readonly reason: string; readonly pixels?: number; readonly frames?: number }
-export interface ScreenReport { readonly source: string; readonly provenance: string; readonly calibration?: ScreenCalibration; readonly calibrationProblem?: string; readonly rows: readonly ScreenRow[] }
+export interface ScreenReport { readonly source: string; readonly provenance: string; readonly calibration?: ScreenCalibration | undefined; readonly calibrationProblem?: string | undefined; readonly rows: readonly ScreenRow[] }
 export function screenReport(samples: readonly ScreenSample[], provenance: string, source = effectSourceDigest()): ScreenReport {
   const { calibration, problem: calibrationProblem } = calibrateScreen(samples);
   const rows = SCREEN_MOVES.map((move): ScreenRow => {
