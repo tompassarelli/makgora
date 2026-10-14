@@ -1,7 +1,8 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
 import { STAGE_LAVA_MODEL, STAGE_SEA_MODEL, STAGE_TOMB_SEA_MODEL } from "../assets/terrainAssetInfo";
-import { stageScenery, terrainPieces } from "./stageScenery";
+import { seaLook, stageScenery, terrainPieces } from "./stageScenery";
+import { TOMB_OF_SARGERAS_STAGE, WIND_TEST_STAGE } from "../sim/stage";
 import { fogProblems, mirrorProblems } from "./stageRules";
 import { platformParts } from "./stockPlatforms";
 import { surfaceCount } from "../sim/stage";
@@ -58,4 +59,16 @@ test("the space below every stage's platforms is Tomb's sea or lava, never the s
     if (floor !== undefined) assertEquals(floor.model === STAGE_TOMB_SEA_MODEL || floor.model === STAGE_LAVA_MODEL, true, `${name}: floor ${floor.model}`);
     for (const piece of terrainPieces(id)) assertEquals(piece.model === STAGE_SEA_MODEL, false, `${name}: draws the zigzag sea plane`);
   }
+});
+
+test("the sea below a stage is Warcraft's own terrain water by default; only Tomb of Sargeras and Nordrassil keep their sea model [k3 measure #277]", () => {
+  const ours: number[] = [];
+  for (const { id, name } of STAGE_CATALOG) {
+    const scenery = stageScenery(id), look = seaLook(id);
+    if (look === "ours") ours.push(id);
+    if (scenery.floor?.model === STAGE_LAVA_MODEL) assertEquals(look, undefined, `${name}: lava has no sea`);
+    if (look === "native") assertEquals(terrainPieces(id).length, 0, `${name}: places a sea model over its native water`);
+    if (look === "ours") assertEquals(terrainPieces(id).length > 0, true, `${name}: keeps no sea model`);
+  }
+  assertEquals(ours.sort((a, b) => a - b).join(","), [TOMB_OF_SARGERAS_STAGE, WIND_TEST_STAGE].sort((a, b) => a - b).join(","), "stages keeping their own sea");
 });

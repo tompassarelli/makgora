@@ -5,7 +5,7 @@ import { dirname, join } from "node:path";
 import { Effect, Schema } from "effect";
 import { WHITE_FIGHTER_MODELS } from "../../src/game/assets/whiteFighterModels";
 import { STAGE_SKY_MODELS } from "../../src/game/assets/stageSkyInfo";
-import { MapBuild, MapBuildFailure, type ArchiveEntry } from "wisp/scripts/wisp/mapBuild";
+import { MapBuild, MapBuildFailure, ensurePackager, type ArchiveEntry } from "wisp/scripts/wisp/mapBuild";
 import { runProcess } from "wisp/scripts/wisp/hostProcess";
 import { UsageFailure } from "wisp/scripts/wisp/command";
 import { step } from "wisp/scripts/wisp/timings";
@@ -30,6 +30,7 @@ import { PREVIEW_ENTRY, composePreview, encodePreview } from "../mapPreview";
 import { regenerateCommand } from "../stageThumbnailSpec";
 import { stageCardPath } from "./buildInputs";
 import { buildProject, projectRoot as PROJECT } from "./project";
+import { seaTerrain } from "../seaTerrain";
 import { UI_FRAMES } from "./uiFrames";
 import { checkCueModels } from "./headlessRender";
 import { cueModels } from "./cueModels";
@@ -182,6 +183,22 @@ const requireListed = (path: string, imports: readonly string[], models: readonl
 
 
 
+
+export const seaTerrainImport = (base: string, packager: string) => Effect.scoped(Effect.gen(function*() {
+  const scratch = yield* Effect.acquireRelease(
+    tryMapSync("create scratch directory", tmpdir(), () => mkdtempSync(join(tmpdir(), "smashcraft-terrain."))),
+    (directory) => Effect.sync(() => rmSync(directory, { recursive: true, force: true })),
+  );
+  yield* ensurePackager(packager);
+  const extracted = join(scratch, "base.w3e");
+  yield* runProcess("extract the base map's terrain", base, [packager, "extract", base, extracted, "war3map.w3e"]);
+  const bytes = yield* tryMapPromise("read the base map's terrain", extracted, () => Bun.file(extracted).bytes());
+  const sea = yield* tryMapSync("paint the sea terrain", base, () => seaTerrain(bytes));
+  const source = join(SEA_TERRAIN_DIRECTORY, "war3map.w3e");
+  yield* tryMapPromise("write the sea terrain", source, () => Bun.write(source, sea));
+  return { entry: "war3map.w3e", source } satisfies ArchiveEntry;
+}));
+const SEA_TERRAIN_DIRECTORY = join(PROJECT, "build/sea-terrain");
 
 const carriedModels = (map: string, packager: string, models: readonly string[] = [...SCRIPT_MODELS, ...cueModels().filter(model => model.toLowerCase().startsWith("war3mapimported\\"))]) => Effect.scoped(Effect.gen(function*() {
   if (models.includes("")) return yield* new MapBuildFailure({ operation: "check script models", path: map, cause: EMPTY_MODEL });

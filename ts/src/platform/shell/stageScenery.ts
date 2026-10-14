@@ -1,5 +1,5 @@
 import { preloadModels, preloadSkies } from "../../game/presentation/stagePreload";
-import { pointLightPieces, STOCK_TERRAIN_LIGHT, STOCK_UNIT_LIGHT, placedPieces, shadowCastingLights, stageScenery } from "../../game/presentation/stageScenery";
+import { nativeWaterColor, pointLightPieces, STOCK_TERRAIN_LIGHT, STOCK_UNIT_LIGHT, placedPieces, shadowCastingLights, stageScenery } from "../../game/presentation/stageScenery";
 import { hideEffect } from "../../game/render/effects";
 import type { ShellState } from "./state";
 import { cameraZOverride } from "../../game/presentation/arenaCamera";
@@ -30,7 +30,9 @@ export function drawStageScenery(s: ShellState): void {
   }
   const scenery = stageScenery(s.game.stageChoice);
 
-  BlzShowTerrain(false);
+  const water = nativeWaterColor(s.game.stageChoice);
+  BlzShowTerrain(water !== undefined);
+  if (water !== undefined) SetWaterBaseColor(water[0], water[1], water[2], 255);
   SetSkyModel(scenery.sky);
   SetDayNightModels(STOCK_TERRAIN_LIGHT, STOCK_UNIT_LIGHT);
   drawStageFog(s);
@@ -73,6 +75,7 @@ export function preloadStageAssets(s: ShellState): void {
 
 export function showBackdrop(s: ShellState, visible: boolean): void {
   BlzShowSkyBox(visible);
+  BlzShowTerrain(visible && nativeWaterColor(s.game.stageChoice) !== undefined);
   const alpha = visible ? 255 : 0;
   const pieces = placedPieces(s.game.stageChoice);
   for (const [index, effect] of (s.stageScenery ?? []).entries()) {

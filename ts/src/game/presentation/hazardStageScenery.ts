@@ -26,6 +26,7 @@ export const NORDRASSIL_SCENERY: StageScenery = {
   fog: { start: 5000.0, end: 5300.0, red: 0.375, green: 0.625, blue: 0.5 },
   heightFog: { start: 5500.0, end: 11000.0, density: 0.25, heightStart: -2600.0, heightEnd: -600.0, maxDensity: 0.5, drawOverSky: false },
   floor: { model: STAGE_TOMB_SEA_MODEL, z: -1050.0, color: [56, 92, 92] },
+  sea: "ours",
   pieces: [
     { model: "Doodads\\Ashenvale\\Structures\\Worldtree\\Worldtree.mdx", x: 0.0, y: 4000.0, z: -1050.0, scale: f32(0.55), yaw: 300.0 },
     { model: SPIRE, x: -3890.0, y: 4300.0, z: -1508.0, scale: 3.25, yaw: 140.0, matrixScale: [2.75, 1.0, 1.5] },

@@ -131,6 +131,15 @@ over sky actually do belong in [visual quality](visual-quality.md).
 
 Water is terrain: it draws only where the map's terrain has water. A
 floating arena has none in view unless a stage puts terrain water there.
+The build (smashcraft:ts/scripts/seaTerrain.ts) rewrites the base map's
+`war3map.w3e` as one flat deep-water sheet at `STAGE_SEA_LEVEL_Z` (−1300)
+below the arena, which stands at a fixed FLOOR_HEIGHT over the base map's
+ground, never at `GetLocationZ` (smashcraft:ts/test/world-origin.test.ts). A
+sea stage shows that terrain water, tinted with `SetWaterBaseColor` from its
+floor colour, unless its scenery says `sea: "ours"`: Tomb of Sargeras keeps its
+tide model (Tom: "tomb of sargeras admittedly does look good") and Nordrassil
+keeps its model because its scenery stands on a sea at −1050, above the one
+terrain water height (#277; evidence/water-options-20261014/result.md).
 
 ### Doodads, destructables, effects, input
 

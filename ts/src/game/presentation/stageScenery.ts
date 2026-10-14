@@ -4,6 +4,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { STAGE_TOMB_WATER_MODEL, STAGE_TOMB_SEA_MODEL, STAGE_LAVA_MODEL } from "../assets/terrainAssetInfo";
 import { LAVA_CENTER_X, LAVA_HALF_WIDTH } from "../sim/lava";
 import { SEA_SURFACE_Z } from "../sim/stageHazards";
+import { STAGE_SEA_LEVEL_Z } from "../assets/stageWater";
 import { STAGE_POINT_LIGHT_MODELS, STAGE_SNOW_MODEL } from "../assets/stageAssetInfo";
 import { STAGE_LIGHTS, type StageLight } from "../assets/stageLighting";
 import { min, toInt } from "../../runtime/numbers";
@@ -36,6 +37,7 @@ export interface StageScenery {
   readonly fog?: { readonly start: number; readonly end: number; readonly red: number; readonly green: number; readonly blue: number };
   /** #360: an opaque full-width surface far below the bottom blast zone; it hides the bases of the pieces that stand in it. */
   readonly floor?: { readonly model: string; readonly z: number; readonly color: readonly [number, number, number] };
+  readonly sea?: "native" | "ours";
   readonly heightFog?: {
     readonly start: number;
     readonly end: number;
@@ -121,14 +123,26 @@ export function terrainPieces(stage: number): readonly SceneryPiece[] {
       matrixScale: [240.0, 140.0, 1.0], color: [176, 160, 144], yaw: 0.0 },
   ];
   const floor = stageScenery(stage).floor;
-  if (floor !== undefined) return [
+  if (floor !== undefined && seaLook(stage) !== "native") return [
     { model: floor.model, x: 0.0, y: 2200.0, z: floor.z, scale: 1.0, matrixScale: [240.0, 140.0, 1.0], color: floor.color, yaw: 0.0 },
   ];
   return [];
 }
 
 export function hiddenBelow(stage: number): number | undefined {
-  return stage === TOMB_OF_SARGERAS_STAGE ? SEA_SURFACE_Z : stageScenery(stage).floor?.z;
+  if (stage === TOMB_OF_SARGERAS_STAGE) return SEA_SURFACE_Z;
+  return seaLook(stage) === "native" ? STAGE_SEA_LEVEL_Z : stageScenery(stage).floor?.z;
+}
+
+export function seaLook(stage: number): "native" | "ours" | undefined {
+  if (stage === TOMB_OF_SARGERAS_STAGE) return "ours";
+  const scenery = stageScenery(stage);
+  if (scenery.floor?.model !== STAGE_TOMB_SEA_MODEL) return undefined;
+  return scenery.sea ?? "native";
+}
+
+export function nativeWaterColor(stage: number): readonly [number, number, number] | undefined {
+  return seaLook(stage) === "native" ? stageScenery(stage).floor?.color : undefined;
 }
 
 export function lavaPiece(side: -1 | 1): SceneryPiece {
