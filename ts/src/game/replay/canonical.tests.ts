@@ -3,7 +3,8 @@ import { attackBuffer, queueAttack } from "../input/attackBuffer";
 import type { FrameControls } from "../match/controls";
 import { captureFrame, createMatchFrameInput } from "../match/frameInput";
 import { neutralControls } from "../sim/roster";
-import { beginStateChecksum, canonicalBoolean, canonicalChecksum, canonicalInt, canonicalReal, canonicalRealField, canonicalState, foldStateChecksum, stateChecksum, writeCanonicalNumber } from "./canonical";
+import { HAWK, HAWK_PLACEMENT, HAWK_STUN } from "../sim/heroes/beastmasterSpecials";
+import { beginStateChecksum, canonicalBoolean, canonicalChecksum, canonicalInt, canonicalReal, canonicalRealField, canonicalState, foldStateChecksum, specialPlacementCanonical, stateChecksum, writeCanonicalNumber } from "./canonical";
 import { captureTape, createTapeWorld, executeTapeRow } from "./tapeWorld";
 
 test("canonical real fields retain Wurst's exact binary representation [k4 reference wurst]", () => {
@@ -39,6 +40,13 @@ test("streamed numbers preserve canonical bytes at decimal boundaries and signed
     writeCanonicalNumber(code => { bytes.push(String.fromCharCode(code)); }, value);
     assertEquals(bytes.join(""), canonicalInt("", value).slice(2));
   }
+});
+
+test("companion bite duration changes alter the placement digest [k2 property]", () => {
+  const digest = (frames: number) => canonicalChecksum(specialPlacementCanonical({
+    ...HAWK_PLACEMENT, companion: { ...HAWK, biteStatus: { ...HAWK_STUN, frames } },
+  }, "placement"));
+  for (let frames = 1; frames <= 64; frames++) assertTrue(digest(frames) !== digest(frames + 1));
 });
 
 test("a played state's checksum folds exactly its canonical text, in which every value is an integer or exact real [k1 scenario]", () => {

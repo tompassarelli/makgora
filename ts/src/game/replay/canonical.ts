@@ -321,6 +321,17 @@ export function specialPlacementCanonical(spec: Readonly<SpecialPlacement>, pref
     real("companion.bite.z2", partner.bite.z2);
     real("companion.bite.radius", partner.bite.radius);
     result.push(hitEffectCanonical(partner.biteEffect, `${prefix}.companion.biteEffect`));
+    if (partner.biteStatus !== undefined) {
+      int("companion.biteStatus.kind", partner.biteStatus.kind);
+      int("companion.biteStatus.frames", partner.biteStatus.frames);
+      if (partner.biteStatus.airFrames !== undefined) int("companion.biteStatus.airFrames", partner.biteStatus.airFrames);
+      int("companion.biteStatus.group", partner.biteStatus.group);
+      int("companion.biteStatus.immunityFrames", partner.biteStatus.immunityFrames);
+      if (partner.biteStatus.tick !== undefined) {
+        int("companion.biteStatus.tick.every", partner.biteStatus.tick.every);
+        real("companion.biteStatus.tick.damage", partner.biteStatus.tick.damage);
+      }
+    }
     int("companion.stunFrames", partner.stunFrames);
     real("companion.leash", partner.leash);
     int("companion.leashFrames", partner.leashFrames);
