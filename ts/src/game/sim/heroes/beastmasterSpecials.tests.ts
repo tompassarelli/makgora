@@ -8,6 +8,9 @@ import { controls } from "../testWorld";
 import { copyFighterState } from "../../replay/fighterState";
 import { firstFighterDifference } from "../../replay/difference";
 import { duelPair, stepDuel } from "../testDuel";
+import { advanceBearFeedback, createBearFeedbackCursor } from "../../presentation/bearFeedback";
+import { captureImpactEventsBefore, createImpactEvents, finishImpactEventsAfter } from "../../presentation/impactEvents";
+import { playPerform } from "../../presentation/moveSounds";
 
 const up = controls({ specialPressed: true, specialZ: 1 });
 const down = controls({ specialPressed: true, specialZ: -1 });
@@ -76,4 +79,44 @@ test("rollback restores Beastmaster's three separate companion positions and com
   run(world, 55);
   assertEquals(firstFighterDifference(expectedOwner, owner, 3, 3), undefined);
   assertEquals(firstFighterDifference(expectedTarget, target, 3, 3), undefined);
+});
+
+
+test("commanded Bear and Hawk each damage and launch the dummy with one confirmed impact, while Hawk's ready cry stays silent [k1 scenario]", () => {
+  for (const animal of [0, 2]) for (const facing of [-1, 1]) {
+    const { world, owner, target } = pair(animal === 0 ? 100.0 : 200.0, facing);
+    const press = animal === 0 ? controls({ specialPressed: true, specialX: facing }) : up;
+    const cursor = createBearFeedbackCursor();
+    const events = createImpactEvents();
+    let impacts = 0;
+    let birdCues = 0;
+    let birdVolume = 0;
+    let biteDamage = 0.0;
+    let launch = 0.0;
+    for (let frame = 1; frame <= 145; frame++) {
+      captureImpactEventsBefore(events, owner);
+      const damage = target.status.damage;
+      stepDuel(world, frame === 1 || frame === 76 ? press : controls());
+      finishImpactEventsAfter(events, owner, world);
+      if (events.perform >= 0) playPerform(owner.character, events.perform, events.performSerial, (file, volume) => {
+        if (file.includes("HawkReady")) { birdCues++; birdVolume = Math.max(birdVolume, volume); }
+      });
+      const cues = advanceBearFeedback(cursor, owner, frame, animal);
+      if (cues.hit) {
+        impacts++;
+        biteDamage = f32(target.status.damage - damage);
+        launch = f32(Math.abs(target.launch.knockbackX) + Math.abs(target.launch.knockbackZ));
+        const placed = placedObject(owner, animal);
+        assertTrue(Math.abs(f32(cursor.impactX - target.motion.x)) < 100.0);
+        assertTrue(Math.abs(f32(cursor.impactZ - target.motion.z)) < 120.0);
+        assertEquals(advanceBearFeedback(cursor, owner, frame, animal).hit, false);
+        assertEquals(placed.bitten & 2, 2);
+      }
+    }
+    assertEquals(impacts, 1, `animal ${animal} facing ${facing} confirmed bite`);
+    assertGreaterThan(biteDamage, 0.0);
+    assertGreaterThan(launch, 0.0);
+    assertEquals(birdCues, 0);
+    assertEquals(birdVolume, 0);
+  }
 });

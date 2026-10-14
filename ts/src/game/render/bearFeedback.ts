@@ -1,7 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { type BearFeedbackCursor, BEAR_IMPACT_MODEL, BEAR_ROAR_MODEL, advanceBearFeedback, bearState, createBearFeedbackCursor } from "../presentation/bearFeedback";
-import type { Fighter } from "../sim/fighter";
+import { type Fighter, placedObject } from "../sim/fighter";
 import { type ParkedFlags, type WorldOrigin, parkOnce, placeEffect } from "./effects";
 import { SoundBank, SoundKind } from "./soundBank";
 
@@ -14,7 +14,7 @@ export class BearFeedback {
 
   constructor(private readonly origin: WorldOrigin) {
     this.sounds.prepare(SoundKind.label, ["MetalHeavySliceFlesh"]);
-    this.slots = PARTICIPANT_SLOTS.map(() => ({ roar: AddSpecialEffect(BEAR_ROAR_MODEL, origin.x, origin.y), impact: AddSpecialEffect(BEAR_IMPACT_MODEL, origin.x, origin.y), cursor: createBearFeedbackCursor() }));
+    this.slots = PARTICIPANT_SLOTS.flatMap(() => [0, 2].map(() => ({ roar: AddSpecialEffect(BEAR_ROAR_MODEL, origin.x, origin.y), impact: AddSpecialEffect(BEAR_IMPACT_MODEL, origin.x, origin.y), cursor: createBearFeedbackCursor() })));
     for (const slot of this.slots) {
       BlzSetSpecialEffectAnimation(slot.roar, "Stand");
       BlzSetSpecialEffectTimeScale(slot.roar, 0.0);
@@ -24,14 +24,19 @@ export class BearFeedback {
   }
 
   clear(): void {
-    for (const index of PARTICIPANT_SLOTS) {
-      this.hide(index);
+    for (let index = 0; index < this.slots.length; index++) {
+      this.hideAnimal(index);
       const slot = this.slots[index];
       if (slot !== undefined) slot.cursor = createBearFeedbackCursor();
     }
   }
 
   hide(index: number): void {
+    this.hideAnimal(index * 2);
+    this.hideAnimal(index * 2 + 1);
+  }
+
+  private hideAnimal(index: number): void {
     const slot = this.slots[index];
     if (slot === undefined) return;
     parkOnce(slot.roar, this.origin, this.parked, index * 2);
@@ -39,11 +44,16 @@ export class BearFeedback {
   }
 
   confirm(frame: number, fighter: Readonly<Fighter>, index: number): void {
+    for (const animal of [0, 2]) this.confirmAnimal(frame, fighter, index * 2 + (animal === 0 ? 0 : 1), animal);
+  }
+
+  private confirmAnimal(frame: number, fighter: Readonly<Fighter>, index: number, animal: number): void {
     const slot = this.slots[index];
     if (slot === undefined) return;
-    const cues = advanceBearFeedback(slot.cursor, fighter, frame);
+    const placed = placedObject(fighter, animal);
+    const cues = advanceBearFeedback(slot.cursor, fighter, frame, animal);
     const play = (label: string): void => {
-      this.sounds.playAt(SoundKind.label, label, this.origin.x + fighter.placed.x, this.origin.y, this.origin.z + fighter.placed.z, 127);
+      this.sounds.playAt(SoundKind.label, label, this.origin.x + placed.x, this.origin.y, this.origin.z + placed.z, 127);
     };
     if (cues.hit) {
       play("MetalHeavySliceFlesh");
@@ -53,14 +63,18 @@ export class BearFeedback {
   }
 
   present(fighter: Readonly<Fighter>, index: number): void {
+    for (const animal of [0, 2]) this.presentAnimal(fighter, index * 2 + (animal === 0 ? 0 : 1), animal);
+  }
+
+  private presentAnimal(fighter: Readonly<Fighter>, index: number, animal: number): void {
     const slot = this.slots[index];
-    const state = bearState(fighter);
+    const state = bearState(fighter, animal);
     if (slot === undefined) return;
-    if (state === undefined) { this.hide(index); return; }
-    const bear = fighter.placed;
+    if (state === undefined) { this.hideAnimal(index); return; }
+    const bear = placedObject(fighter, animal);
     const x = this.origin.x + bear.x;
     const z = this.origin.z + bear.z;
-    if (state === "CHARGING") {
+    if (animal === 0 && state === "CHARGING") {
       this.parked[index * 2] = false;
       placeEffect(slot.roar, x, this.origin.y - 12.0, z + 95.0);
       BlzSetSpecialEffectScale(slot.roar, 2.5);

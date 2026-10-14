@@ -36,6 +36,7 @@ const METAL: readonly (readonly string[])[] = [
 
 interface SpecialSound {
   readonly perform: string | undefined;
+  readonly performVolume?: number | undefined;
   readonly hit: string;
 }
 
@@ -48,7 +49,7 @@ interface FighterSound {
   readonly normals?: { readonly [style: number]: { readonly perform?: string; readonly hit?: string } | undefined } | undefined;
 }
 
-const s = (perform: string | undefined, hit: string): SpecialSound => ({ perform, hit });
+const s = (perform: string | undefined, hit: string, performVolume?: number): SpecialSound => ({ perform, hit, performVolume });
 
 export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | undefined } = {
   [Character.rifleman]: {
@@ -94,7 +95,7 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
   },
   [Character.beastmaster]: {
     weapon: Weapon.axe, effort: ["BeastmasterAttack"], strong: "AxeMissileHit",
-    specials: [s("AxeMissileLaunch", "AxeMissileHit"), s("BattleRoar", "StampedeHit"), s("Units\\Creeps\\WarEagle\\HawkReady1.flac", "DruidOfTheTalonMissileHit"), s("Units\\Creeps\\QuillBeast\\QuillBoarReady1.flac", "BristleBackMissileHit")],
+    specials: [s("AxeMissileLaunch", "AxeMissileHit"), s("BattleRoar", "StampedeHit"), s("Units\\Creeps\\WarEagle\\HawkReady1.flac", "DruidOfTheTalonMissileHit", 0), s("Units\\Creeps\\QuillBeast\\QuillBoarReady1.flac", "BristleBackMissileHit")],
   },
   [Character.lichKing]: {
     weapon: Weapon.blade, swing: ["HeroDeathKnightAttack1"], strong: "FrostWyrmAttack1",
@@ -204,7 +205,7 @@ function resolve(character: Character, move: number): MoveSound | undefined {
     const special = fighter.specials[move - SPECIAL_MOVE];
     if (special === undefined) return undefined;
     return {
-      perform: special.perform === undefined ? [] : [layer([special.perform], PERFORM_VOLUME)],
+      perform: special.perform === undefined ? [] : [layer([special.perform], special.performVolume ?? PERFORM_VOLUME)],
       hit: [layer([special.hit], at(TIER_HIT_VOLUME, SoundTier.medium))],
       strong: [layer([special.hit], at(TIER_HIT_VOLUME, SoundTier.large)), layer([fighter.strong], SWEETENER_VOLUME)],
       shield: [layer([at(at(METAL, weapon), SoundTier.medium)], SHIELD_VOLUME)],
@@ -263,6 +264,7 @@ export function soundFiles(sound: string): readonly string[] {
 export type MoveSoundSink = (file: string, volume: number, pitch: number) => void;
 
 function playLayer(sound: SoundLayer, serial: number, salt: number, sink: MoveSoundSink): void {
+  if (sound.volume <= 0) return;
   const label = at(sound.sounds, imod(serial, sound.sounds.length));
   const files = soundFiles(label);
   if (files.length === 0) return;
