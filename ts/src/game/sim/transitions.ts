@@ -144,6 +144,7 @@ export function clearSpecialOnStock(f: Fighter): void {
   bear.swipeCooldown = 0;
   for (let action = 0; action < special.cooldowns.length; action++) special.cooldowns[action] = 0;
   special.direction = 0;
+  special.seekTarget = 0;
   bear.x = 0.0;
   bear.z = 0.0;
   bear.velocityX = 0.0;

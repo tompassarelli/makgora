@@ -18,7 +18,7 @@ import { advancePlacedObjects } from "../sim/placedObjects";
 import { type Roster, copyControls, fighterAt, isActive, neutralControls } from "../sim/roster";
 import { regenerateShield } from "../sim/shield";
 import { advanceSpecials, startFighterSpecial } from "../sim/specials";
-import { advanceHeroStatus } from "../sim/heroSpecialRules";
+import { advanceHeroStatus, prepareBansheeContacts } from "../sim/heroSpecialRules";
 import { advanceItemBuff } from "../sim/itemBuffs";
 import { advanceFighterMotion } from "../sim/step";
 import { maskHeroStatusControls } from "../sim/heroStatus";
@@ -241,6 +241,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
     if (f.attack.serial !== serial) observedFrameStartedActions[slot] |= actionBits;
     if (hadDashGrabWindow[slot] && f.ground.dashGrabWindow > 0 && !f.attack.dashGrab) f.ground.dashGrabWindow = Math.max(0, f.ground.dashGrabWindow - 1);
   }
+  for (const slot of PARTICIPANT_SLOTS) if (isActive(world, slot)) prepareBansheeContacts(fighterAt(world, slot));
   resolveAttacks(world);
   if (bossFight) strikeBoss(game.run.boss, world, bossClock(game.matchFrame, game.startHold), game.run.player);
   advanceSpecials(world, stage, stageFrame, controls.inputs);
