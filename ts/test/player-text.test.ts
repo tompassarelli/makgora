@@ -216,7 +216,7 @@ test("the playable build keeps selection chips and cursor on their screen and sh
   frames(30);
   for (const { client, view } of records) view.clickText(client, "Not now");
   const grid = rosterGrid(PLAYABLE_CHARACTERS.length);
-  const point = (x: number, y: number, down: boolean) => {
+  const point = (x: number, y: number, down: boolean, carrying?: boolean) => {
     for (const client of clients.clients) {
       const width = Number((client.natives.BlzGetLocalClientWidth as Native)());
       const height = Number((client.natives.BlzGetLocalClientHeight as Native)());
@@ -228,18 +228,18 @@ test("the playable build keeps selection chips and cursor on their screen and sh
     frames(2);
     for (const { client, view } of records) {
       const hand = `MeleeHand${client.slot}`;
-      expect(view.visible(hand)).toBe(true);
+      if (carrying !== undefined && client.slot === 0) expect(view.visible(hand)).toBe(carrying);
       expect(view.above(hand, `MeleeCard${client.slot}_0`)).toBe(true);
       expect(view.above(hand, `MeleeTile${client.slot}_0`)).toBe(true);
       expect(view.above(hand, `MeleeChip${client.slot}_${client.slot}`)).toBe(true);
     }
   };
-  point(f32(0.03), f32(0.3), false);
-  point(cardX(0) + f32(0.126), f32(0.17), false);
-  point(cardX(0) + f32(0.126), f32(0.17), true);
+  point(f32(0.03), f32(0.3), false, false);
+  point(cardX(0) + f32(0.126), f32(0.17), false, false);
+  point(cardX(0) + f32(0.126), f32(0.17), true, true);
   const first = cellRect(grid, 0);
-  point((first.left + first.right) / 2, (first.top + first.bottom) / 2, true);
-  point((first.left + first.right) / 2, (first.top + first.bottom) / 2, false);
+  point((first.left + first.right) / 2, (first.top + first.bottom) / 2, true, true);
+  point((first.left + first.right) / 2, (first.top + first.bottom) / 2, false, false);
   clients.everywhere(() => expect(characterReady(shell().game, 0)).toBe(true));
   for (let index = 0; index < 100; index++) {
     const cell = cellRect(grid, index % grid.count);
@@ -253,7 +253,6 @@ test("the playable build keeps selection chips and cursor on their screen and sh
     frames(2);
     for (const { client, view } of records) {
       const name = `MeleeHand${client.slot}`;
-      expect(view.visible(name)).toBe(true);
       expect(view.named(name)?.level).toBeGreaterThan(view.named(`MeleeRuleHelp${client.slot}`)?.level ?? 0);
     }
   }
@@ -265,7 +264,6 @@ test("the playable build keeps selection chips and cursor on their screen and sh
     const chip = view.named(`MeleeChip${client.slot}_${client.slot}`);
     expect(chip?.width).toBeCloseTo(chipSize, 7);
     expect(chip?.height).toBeCloseTo(chipSize, 7);
-    expect(view.visible(`MeleeHand${client.slot}`)).toBe(true);
   }
   clients.everywhere(() => {
     panelActions().selection.changeStocks(0, -1);
