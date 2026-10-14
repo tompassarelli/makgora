@@ -12,7 +12,7 @@ const held = (run: Run): number => (run.jobs ?? []).filter((job) => (job.status 
 const project = (run: Run, at: number, now: number): number => {
   if (run.status === "completed") return 0;
   const suite = (run.jobs ?? []).filter((job) => job.name?.startsWith("suite /") === true).map((job) => Date.parse(job.created));
-  if (!/^Autoland (test \d+ |train$)/.test(run.title)) return held(run);
+  if (!/^Autoland (test \d+ |train$)/.test(run.title) || (run.jobs ?? []).some((job) => job.name === "suite" && job.status === "completed")) return held(run);
   if (suite.length === 0) return Math.max(held(run), RUN_PEAK);
   const start = Math.min(...suite);
   return at === now || now - start >= PROFILE.length * PROFILE_STEP ? held(run) : Math.min(held(run), PROFILE[Math.floor((at - start) / PROFILE_STEP)] ?? 0);
@@ -184,6 +184,18 @@ test("the #513 backlog sweeps to one run per free slot without touching a health
   expect(stuckRuns([...left.filter((run) => run !== victim), hung], now).map((cancel) => cancel.id)).toEqual([victim.id ?? 0]);
 });
 
+test("a train that lands its passed-alone trees without a suite holds only its running jobs, so lanes waiting on 14 Oct 03:24Z start in a free slot [k1 scenario]", () => {
+  const at = Date.parse("2026-10-14T03:24:26Z");
+  const job = (name: string, status: string, created: string): Job => ({ name, status, created, started: status === "queued" ? null : created, labels: name === "suite" ? [] : ["ubuntu-latest"] });
+  const suite = ["plan", "perf", "bun 0", "bun 1", "bun 2", "corpus", "parity", ...Array.from({ length: 8 }, (_, shard) => `lua32 ${shard}`)].map((name) => job(`suite / ${name}`, "in_progress", "2026-10-14T03:20:58Z"));
+  const runs: Run[] = [
+    { title: TRAIN_TITLE, status: "in_progress", jobs: [job("build", "completed", "2026-10-14T03:20:34Z"), job("suite", "completed", "2026-10-14T03:20:56Z"), job("reports", "in_progress", "2026-10-14T03:20:59Z")] },
+    { title: "Autoland test 1 claude/land-hb-lich-373fd372d217 373fd372d217c28895c5337401c23682ecfac02b", status: "in_progress", jobs: [job("build", "completed", "2026-10-14T03:20:30Z"), job("reports", "in_progress", "2026-10-14T03:20:58Z"), ...suite] },
+  ];
+  const lanes: Lane[] = ["claude/land-codex-wisp-revendor-6937794fd995", "claude/land-hb-blademaster-70b77c4b5804"].map((branch, index) => ({ branch, tip: String(index).repeat(40), status: { state: "pending", description: "queued", at: "2026-10-14T03:2" + String(index) + ":00Z" } }));
+  expect(plan(lanes, runs, at).test).toEqual([{ branch: "claude/land-codex-wisp-revendor-6937794fd995", tip: "0".repeat(40), slot: 0 }]);
+});
+
 test("plan fills every free slot whose run fits the measured job profile under JOB_BUDGET at every moment, oldest lane first past AGED minutes, over the #513 backlog, and the sweep cancels exactly the Farm test runs past a bound without replanning [k2 property]", () => {
   let seed = 51531;
   const next = (n: number): number => { seed = (seed * 48271) % 2147483647; return seed % n; };
@@ -196,7 +208,7 @@ test("plan fills every free slot whose run fits the measured job profile under J
       const lane = lanes[next(lanes.length)];
       if (lane === undefined) continue;
       const created = ago(next(20));
-      const jobs = Array.from({ length: next(16) }, (_, index): Job => ({ name: index % 3 === 0 ? "build" : `suite / lua32 ${index}`, status: ["queued", "in_progress", "completed"][next(3)] ?? "completed", created, started: created, labels: [next(5) === 0 ? "farm-big" : "ubuntu-latest"] }));
+      const jobs = Array.from({ length: next(16) }, (_, index): Job => ({ name: index % 3 === 0 ? "build" : index % 7 === 5 ? "suite" : `suite / lua32 ${index}`, status: ["queued", "in_progress", "completed"][next(3)] ?? "completed", created, started: created, labels: [next(5) === 0 ? "farm-big" : "ubuntu-latest"] }));
       runs.push({ title: next(3) === 0 ? "Autoland train" : `Autoland test ${next(TEST_SLOTS + 1)} ${lane.branch} ${lane.tip}`, status: next(2) === 0 ? "in_progress" : "pending", jobs });
     }
     const farmAgo = (max: number): string => new Date(now - next(max * 60) * 1000).toISOString();

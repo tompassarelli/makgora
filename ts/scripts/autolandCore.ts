@@ -61,7 +61,8 @@ const suiteStart = (run: Run): number | undefined => {
   const starts = (run.jobs ?? []).filter((job) => SUITE_JOB.test(job.name ?? "")).map((job) => Date.parse(job.created));
   return starts.length === 0 ? undefined : Math.min(...starts);
 };
-const peaks = (run: Run): boolean => TEST_TITLE.test(run.title) || run.title === TRAIN_TITLE;
+const suiteSkipped = (run: Run): boolean => (run.jobs ?? []).some((job) => job.name === "suite" && job.status === "completed");
+const peaks = (run: Run): boolean => (TEST_TITLE.test(run.title) || run.title === TRAIN_TITLE) && !suiteSkipped(run);
 
 export const busy = (runs: readonly Run[]): number => runs.filter((run) => run.status !== "completed").reduce((sum, run) =>
   sum + (peaks(run) && suiteStart(run) === undefined ? Math.max(hostedHeld(run), RUN_PEAK) : hostedHeld(run)), 0);
