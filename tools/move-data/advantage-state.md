@@ -27,7 +27,7 @@ Each fighter against a light (Lich), medium (Rifleman) and heavy (Cairne Bloodho
 | Lich | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in full hop, back air; tech away dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 40% → up tilt against 4/5 DI |
 | Lich | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, forward air; tech in up smash, grab, back throw; tech away full hop, forward air; missed tech short hop, forward air; trap short hop, forward air covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Forsaken Paladin | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place side special; tech in forward smash; tech away side special; missed tech side special; trap side special covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 5/5 DI |
-| Forsaken Paladin | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place side special; tech in forward smash; tech away dash grab, back throw; missed tech side special; trap side special covers tech in place, missed tech | up throw at 20% → up tilt against 5/5 DI |
+| Forsaken Paladin | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place side special; tech in forward smash; tech away dash grab, back throw; missed tech side special; trap side special covers tech in place, missed tech | up throw at 60% → up tilt against 4/5 DI |
 | Forsaken Paladin | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place side special; tech in forward smash; tech away side special; missed tech side special; trap forward smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
 | Dreadlord | light | yes | yes | yes | yes | yes | forward throw at 40%: tech in place dash grab, back throw; tech in up smash, short hop, forward air; tech away dash grab, back throw; missed tech dash grab, back throw; trap up smash, short hop, forward air covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Dreadlord | medium | yes | yes | yes | yes | yes | forward throw at 40%: tech in place short hop, forward air; tech in up smash, short hop, forward air; tech away dash grab, back throw; missed tech short hop, forward air; trap short hop, forward air covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
@@ -167,15 +167,15 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Lich | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Forsaken Paladin | light | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Forsaken Paladin | light | back throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
-| Forsaken Paladin | light | up throw | 1/1 | 1/1 in forward tilt, out side special | 1/1 in short hop, side special, out side special | 2/1 in up smash, out forward smash |
+| Forsaken Paladin | light | up throw | 1/1 in short hop, back air, out neutral special | 1/1 in short hop, back air, out side special | 1/1 in short hop, neutral special, out side special | 2/1 in up smash, out forward smash |
 | Forsaken Paladin | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Forsaken Paladin | medium | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Forsaken Paladin | medium | back throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
-| Forsaken Paladin | medium | up throw | 1/1 in neutral special, out side special | 1/1 in forward tilt, out side special | 1/1 in short hop, side special, out side special | 1/1 in short hop, neutral special, out side special |
+| Forsaken Paladin | medium | up throw | 1/1 in short hop, back air, out neutral special | 1/1 in short hop, back air, out side special | 1/1 in forward tilt, out side special | 1/1 in short hop, neutral special, out side special |
 | Forsaken Paladin | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Forsaken Paladin | heavy | forward throw | 0/0 | 0/0 | 0/0 | 0/0 |
 | Forsaken Paladin | heavy | back throw | 0/0 | 0/0 | 0/0 | 0/0 |
-| Forsaken Paladin | heavy | up throw | 1/1 | 1/1 in neutral special, out side special | 1/1 in neutral special, out side special | 1/1 in up smash, out side special |
+| Forsaken Paladin | heavy | up throw | 1/1 | 1/1 in short hop, back air, out side special | 1/1 in short hop, back air, out side special | 1/1 in short hop, side special, out side special |
 | Forsaken Paladin | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Dreadlord | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Dreadlord | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
