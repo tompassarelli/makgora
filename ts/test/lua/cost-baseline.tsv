@@ -52,7 +52,7 @@ src/game/match/startHold.tests.ts	3	9642000	388
 src/game/match/training.tests.ts	11	48907000	137667
 src/game/match/upSpecialRecovery.tests.ts	4	173571000	91270
 src/game/match/wallTechInputContracts.tests.ts	8	439982000	372980
-src/game/match/wardenRecoveryContracts.tests.ts	1	32343000	1857
+src/game/match/wardenRecoveryContracts.tests.ts	1	101018000	5801
 src/game/menu/selectionGrid.tests.ts	8	110000	349
 src/game/menu/stagePool.tests.ts	5	535000	404
 src/game/menu/stageSelection.tests.ts	2	133000	39
