@@ -1,3 +1,4 @@
+import { STAGE_CATALOG } from "../menu/stageCatalog";
 import { floorMod } from "wisp/src/sim/intMath";
 import { assertEquals, assertGreaterThan, assertLessThan, assertTrue, test } from "wisp/src/runtime/testing";
 import { sweep, sweepSeed } from "../../runtime/sweep";
@@ -46,7 +47,7 @@ export const ULTIMATE_SCENARIOS: readonly Scenario[] = [
   { character: Character.blademaster, x: 80.0, defence: "shield" },
   { character: Character.mountainKing, x: 120.0, defence: "shield" },
   { character: Character.warden, x: 250.0, defence: "shield" },
-  { character: Character.lich, x: 200.0, z: 150.0, defence: "ground" },
+  { character: Character.lich, x: 300.0, defence: "shield" },
   { character: Character.forsakenPaladin, x: 220.0, defence: "shield" },
   { character: Character.dreadlord, x: 260.0, defence: "shield" },
   { character: Character.shadowHunter, x: 300.0, defence: "shield" },
@@ -458,5 +459,86 @@ test("Big Bad Voodoo: both wards fire every volley outward from their own side, 
   for (const facing of [-1, 1]) {
     assertEquals(voodooFindings(facing, false).join("; "), "");
     assertGreaterThan(voodooFindings(facing, true).length, 0);
+  }
+});
+
+export const LICH_CONNECT_SEEDS = [17, 83, 241] as const;
+export type LichAnswer = "standing" | "moving" | "shield" | "jump" | "roll";
+
+export function lichUltimateRun(stage: number, gap: number, seed: number, facing: number, answer: LichAnswer): { started: boolean; damage: number; firstHit: number; shieldFrames: number } {
+  const owner = createFighter(Character.lich, f32(-gap * facing * 0.5), facing);
+  const target = createFighter(Character.blademaster, f32(gap * facing * 0.5), -facing);
+  owner.motion.z = mainDeckZAt(stage, owner.motion.x);
+  target.motion.z = mainDeckZAt(stage, target.motion.x);
+  const world = createRoster(3, [owner, target]);
+  const match = createMatchState();
+  match.phase = Phase.match;
+  match.stageChoice = stage;
+  match.hazards = false;
+  match.timeLimitMinutes = 0;
+  match.matchSeed = seed;
+  match.cpuOpponents[1] = "wren";
+  match.cpuResolvedOpponents[1] = "wren";
+  match.cpuTiers[1] = "expert";
+  const runtime = createPacingAndPresentation();
+  const produced = createFrameControls();
+  const executed = createFrameControls();
+  const row = createMatchFrameInput();
+  const result = { started: false, damage: 0.0, firstHit: 0, shieldFrames: 0 };
+  for (let frame = 1; frame <= 128; frame++) {
+    const tick = frame - 8;
+    copyControls(produced.inputs[0], tick === 1 ? controls({ specialPressed: true, ultimatePressed: true, attackHeld: true }) : neutralControls());
+    copyControls(produced.inputs[1], neutralControls());
+    clearAttackBuffer(produced.commands[0]);
+    clearAttackBuffer(produced.commands[1]);
+    if (tick === 1) owner.mana.points = 100;
+    if (tick >= 1) {
+      if (answer === "moving") produceComputerInput(match, world, runtime, 1, frame, produced.inputs[1], produced.commands[1]);
+      if (answer === "shield") copyControls(produced.inputs[1], controls({ shield: true, shieldTriggerActive: true, shieldStrength: 1.0 }));
+      if (answer === "jump") copyControls(produced.inputs[1], controls({ jumpPressed: tick === 42, jumpHeld: tick >= 42 && tick < 72 }));
+      if (answer === "roll") copyControls(produced.inputs[1], controls({ shield: tick >= 54 && tick <= 56, shieldTriggerActive: tick >= 54 && tick <= 56, shieldStrength: 1.0, groundDodgePressed: tick === 55, groundDodgeDirection: facing }));
+    }
+    assertTrue(captureFrame(row, frame, 3, produced, runtime));
+    assertTrue(executeMatchFrame(row, match, world, executed, runtime, frame));
+    if (tick === 1) result.started = owner.special.action === SpecialAction.heroUltimate;
+    if (target.status.damage > 0.0 && result.firstHit === 0) result.firstHit = tick;
+    if (target.shield.raised) result.shieldFrames++;
+  }
+  result.damage = target.status.damage;
+  return result;
+}
+
+function connect(stageIds: readonly number[], seeds: readonly number[], answer: "standing" | "moving"): { hits: number; total: number } {
+  let hits = 0;
+  let total = 0;
+  for (const stage of stageIds) for (const seed of seeds) for (const facing of [-1, 1]) {
+    const run = lichUltimateRun(stage, 300.0, seed, facing, answer);
+    assertEquals(run.started, true, `stage ${stage} gap 300 seed ${seed} facing ${facing}`);
+    total++;
+    if (run.damage > 0.0) hits++;
+  }
+  return { hits, total };
+}
+
+test("Frost Wyrm deals damage in at least 70% of fixed gap 300 standing and Wren Expert approaches [k3 measure docs/design/ultimates.md]", () => {
+  for (const answer of ["standing", "moving"] as const) {
+    const result = connect([0], LICH_CONNECT_SEEDS, answer);
+    assertEquals(result.hits * 10 >= result.total * 7, true, `${answer}: ${result.hits}/${result.total}`);
+  }
+});
+
+sweep("Frost Wyrm deals damage in at least 70% of fixed gap 300 standing and Wren Expert approaches on every stage [k3 measure docs/design/ultimates.md]", () => {
+  for (const answer of ["standing", "moving"] as const) for (const stage of STAGE_CATALOG) {
+    const result = connect([stage.id], LICH_CONNECT_SEEDS, answer);
+    assertEquals(result.hits * 10 >= result.total * 7, true, `${stage.name} ${answer}: ${result.hits}/${result.total}`);
+  }
+});
+
+test("Frost Wyrm startup can be answered with shield, jump or roll [k3 measure docs/design/ultimates.md]", () => {
+  for (const facing of [-1, 1]) for (const answer of ["shield", "jump", "roll"] as const) {
+    const run = lichUltimateRun(0, 300.0, 17, facing, answer);
+    assertTrue(run.started);
+    assertEquals(run.damage, 0.0, `${answer} facing ${facing}`);
+    if (answer === "shield") assertTrue(run.shieldFrames > 0);
   }
 });

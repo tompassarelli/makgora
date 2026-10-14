@@ -109,8 +109,8 @@ const WARDEN: AuthoredSpecial = {
 const LICH: AuthoredSpecial = {
   name: "Frost Wyrm", endFrame: 60,
   projectiles: [
-    mark("Abilities\\Spells\\Undead\\FreezingBreath\\FreezingBreathTargetArt.mdx", 2, 29, -600.0, 215.0),
-    { ...shot(31, -600.0, 215.0, 28.0, 0.0, 70, 45.0, hit(16.0, 60, 85.0, 45.0, HitElement.ice), "Abilities\\Weapons\\FrostWyrmMissile\\FrostWyrmMissile.mdx"), status: CHILL },
+    mark("Abilities\\Spells\\Undead\\FreezingBreath\\FreezingBreathTargetArt.mdx", 2, 29, -600.0, 95.0),
+    { ...shot(31, -600.0, 95.0, 28.0, 0.0, 70, 45.0, hit(16.0, 60, 85.0, 45.0, HitElement.ice), "Abilities\\Weapons\\FrostWyrmMissile\\FrostWyrmMissile.mdx"), status: CHILL },
   ],
 };
 
@@ -388,7 +388,7 @@ const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined 
   [Character.blademaster]: "A steerable whirlwind of cuts ending in a strong slash, then he is dizzy. Shield, jump above it or outrun it.",
   [Character.mountainKing]: "He turns to stone with a stomp: heavier for 10 seconds. Hit him while he changes.",
   [Character.warden]: "The Avatar of Vengeance rises behind her and throws four ghostly glaives. Break it or dodge the glaives.",
-  [Character.lich]: "A frost wyrm sweeps across at jump height. Stay low or shield it.",
+  [Character.lich]: "A frost wyrm sweeps straight ahead at body height. Jump or shield it.",
   [Character.forsakenPaladin]: "A golden circle marks where the Light's hammer will fall, then blesses the ground twice. Leave the circle.",
   [Character.dreadlord]: "An Infernal crashes onto a burning mark ahead. Leave the mark.",
   [Character.shadowHunter]: "He dances while two serpent wards beside him spit bolts outward, then a launcher. The wards can't be hurt; hit him to end the dance and sink them.",
