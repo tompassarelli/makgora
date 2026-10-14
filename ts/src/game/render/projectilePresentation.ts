@@ -119,7 +119,7 @@ export class ProjectilePresentation {
 
       const defilePool = character === Character.lichKing && specials !== undefined && heroProjectileArt(specials).some(({ spec }) => spec.model === path && spec.pool !== undefined);
       const drawn = swaps?.[path] ?? path;
-      const groundPool = specials !== undefined && heroProjectileArt(specials).some(({ spec }) => spec.model === path && spec.pool !== undefined && spec.pool.growth > 0.0);
+      const groundPool = (specials !== undefined && heroProjectileArt(specials).some(({ spec }) => spec.model === path && spec.pool !== undefined && spec.pool.growth > 0.0)) || PROJECTILE_DRAW_OFFSETS[drawn]?.disc !== undefined;
       for (let slot = 0; slot < size; slot++) {
         effects.push(this.models.length);
         this.models.push(AddSpecialEffect(drawn, origin.x, origin.y));
@@ -469,7 +469,7 @@ export class ProjectilePresentation {
           BlzSetSpecialEffectTime(boundary, f32(pulseFrame / 60));
           BlzSetSpecialEffectTimeScale(boundary, paused ? 0.0 : 1.0);
         } else {
-          BlzSetSpecialEffectPosition(boundary, this.origin.x + pose.x, this.origin.y - 8.0, this.origin.z + pose.z);
+          BlzSetSpecialEffectPosition(boundary, this.origin.x + pose.x, this.origin.y - 8.0, this.origin.z + pose.z + (draw?.disc === undefined ? 0.0 : draw.z));
           BlzSetSpecialEffectScale(boundary, pose.dangerRadius);
           if (defile) {
             BlzResetSpecialEffectMatrix(boundary);
@@ -484,7 +484,8 @@ export class ProjectilePresentation {
             const flash = since >= 0 && since <= 12 ? 1.0 - since / 12 : 0.0;
             const glow = Math.min(1.0, f32(0.72) + f32(0.12) * sineTurns(age / 23) + f32(0.08) * sineTurns(age / 9) + 0.5 * flash);
             BlzSetSpecialEffectColor(boundary, Math.floor(255 * glow), Math.floor(255 * glow), 255);
-          } else BlzSetSpecialEffectColor(boundary, frost ? 155 : pose.armed ? 170 + 85 * pose.poolPulse : 70, frost ? 210 : pose.armed ? 75 + 180 * pose.poolPulse : 65, frost ? 255 : pose.armed ? 255 : 100);
+          } else if (draw?.disc !== undefined) BlzSetSpecialEffectColor(boundary, draw.disc[0], draw.disc[1], draw.disc[2]);
+          else BlzSetSpecialEffectColor(boundary, frost ? 155 : pose.armed ? 170 + 85 * pose.poolPulse : 70, frost ? 210 : pose.armed ? 75 + 180 * pose.poolPulse : 65, frost ? 255 : pose.armed ? 255 : 100);
           BlzSetSpecialEffectAlpha(boundary, pose.armed ? 255 : defile ? 96 : 160);
           if (!this.visible[boundarySlot]) BlzSetSpecialEffectTime(boundary, 0.0);
           BlzSetSpecialEffectTimeScale(boundary, 0.0);
