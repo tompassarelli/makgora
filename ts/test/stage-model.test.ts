@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { modelReach } from "wisp/scripts/wisp/models";
 import { MODEL_FACTS } from "../scripts/wisp/modelFacts";
 import { STAGE_CATALOG } from "../src/game/menu/stageCatalog";
-import { ARENA_CAMERA, ARENA_FOG_FAR_MARGIN, arenaDepthOffset, arenaFogEnd, arenaFarZ, extremeCamera, finalCamera } from "../src/game/presentation/arenaCamera";
+import { ARENA_CAMERA, ARENA_FOG_FAR_MARGIN, arenaDepthOffset, arenaFogOffset, arenaFogEnd, arenaFarZ, extremeCamera, finalCamera } from "../src/game/presentation/arenaCamera";
 import { placedPieces } from "../src/game/presentation/stageScenery";
 import { stageBounds } from "../src/game/sim/stageBounds";
 import { createMatchCamera } from "../src/game/sim/matchCamera";
@@ -118,11 +118,11 @@ test("each stage keeps scenery visible through fog and farZ throughout player zo
         camera.distance = 498 + (Math.max(near.distance, far.distance) - 498) * fraction;
         camera.z = region.bottom + (region.top - region.bottom) * fraction;
         const farZ = arenaFarZ(id, camera);
-        const fogEnd = arenaFogEnd(id, camera);
+        const fogEnd = arenaFogEnd(id);
         expect(farZ, name).toBeGreaterThanOrEqual(fogEnd + ARENA_FOG_FAR_MARGIN - 0.001);
         const offset = camera.distance - camera.z * Math.sin(pitch);
         expect(arenaDepthOffset(camera), `${name}: fog camera reference`).toBeCloseTo(offset, 3);
-        expect(fogEnd - offset, `${name}: haze changes with zoom`).toBeCloseTo(arenaFogEnd(id, near) - arenaDepthOffset(near), 3);
+        expect(arenaFogOffset(id), `${name}: shared fog covers player zoom`).toBeGreaterThanOrEqual(offset);
         for (const piece of placedPieces(id)) {
           const facts = MODEL_FACTS[piece.model];
           if (facts === undefined) throw new Error(`${name}: missing facts for ${piece.model}`);

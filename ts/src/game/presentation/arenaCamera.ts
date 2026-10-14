@@ -32,12 +32,26 @@ export function arenaDepthOffset(camera: Readonly<Pick<MatchCamera, "distance" |
 }
 
 export function arenaFarZ(stage: number, camera: Readonly<Pick<MatchCamera, "distance" | "z">>): number {
-  return stageScenery(stage).farZ + arenaDepthOffset(camera);
+  return Math.max(stageScenery(stage).farZ + arenaDepthOffset(camera), arenaFogEnd(stage) + ARENA_FOG_FAR_MARGIN);
 }
 
-export function arenaFogEnd(stage: number, camera: Readonly<Pick<MatchCamera, "distance" | "z">>): number {
+const fogOffsets: Record<number, number | undefined> = {};
+
+export function arenaFogOffset(stage: number): number {
+  const cached = fogOffsets[stage];
+  if (cached !== undefined) return cached;
+  const bounds = stageBounds(stage);
+  const camera = createMatchCamera();
+  camera.distance = 100000.0;
+  limitCamera(camera, bounds.camera, 0.00390625, bounds.blast.bottom);
+  const offset = camera.distance + bounds.camera.top * 0.1736481785774231;
+  fogOffsets[stage] = offset;
+  return offset;
+}
+
+export function arenaFogEnd(stage: number): number {
   const scenery = stageScenery(stage);
-  return Math.max(scenery.fog?.end ?? 0.0, scenery.farZ - ARENA_FOG_FAR_MARGIN) + arenaDepthOffset(camera);
+  return Math.max(scenery.fog?.end ?? 0.0, scenery.farZ - ARENA_FOG_FAR_MARGIN) + arenaFogOffset(stage);
 }
 
 export function localCamera(target: MatchCamera, source: Readonly<MatchCamera>, stage: number, aspect: number): void {

@@ -2,16 +2,16 @@ import { preloadModels, preloadSkies } from "../../game/presentation/stagePreloa
 import { pointLightPieces, STOCK_TERRAIN_LIGHT, STOCK_UNIT_LIGHT, placedPieces, shadowCastingLights, stageScenery } from "../../game/presentation/stageScenery";
 import { hideEffect } from "../../game/render/effects";
 import type { ShellState } from "./state";
-import { arenaDepthOffset, arenaFogEnd, cameraZOverride } from "../../game/presentation/arenaCamera";
+import { arenaFogOffset, arenaFogEnd, cameraZOverride } from "../../game/presentation/arenaCamera";
 
-export function updateStageFog(s: ShellState): void {
+function updateStageFog(s: ShellState): void {
   if (s.stageFogHidden === true || s.stageFogOverride === true) return;
   const scenery = stageScenery(s.game.stageChoice);
 
   const fog = scenery.fog;
   if (fog === undefined) { ResetTerrainFog(); return; }
-  const offset = arenaDepthOffset(s.camera);
-  const end = arenaFogEnd(s.game.stageChoice, s.camera);
+  const offset = arenaFogOffset(s.game.stageChoice);
+  const end = arenaFogEnd(s.game.stageChoice);
   SetTerrainFogEx(0, fog.start + offset, end, 0.0, fog.red, fog.green, fog.blue);
   const height = scenery.heightFog;
   if (height === undefined) return;
