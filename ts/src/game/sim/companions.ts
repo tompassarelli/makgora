@@ -47,7 +47,7 @@ function biteOpponents(world: Roster, ownerSlot: number, placed: PlacedObject, p
     const shielded = target.shield.raised && shieldCircleIntersects(target, bite.x1, bite.z1, bite.x2, bite.z2, 1.0, bite.radius);
     if (!shielded && strikeHurtContact(bite, target) !== HurtContact.hit) continue;
     placed.bitten |= bit;
-    applyAttackHit(world, ownerSlot, targetSlot, AttackStyle.jab, placed.direction, partner.biteEffect, false, shielded, undefined);
+    applyAttackHit(world, ownerSlot, targetSlot, AttackStyle.jab, placed.direction, partner.biteEffect, false, shielded, partner.biteStatus);
   }
 }
 

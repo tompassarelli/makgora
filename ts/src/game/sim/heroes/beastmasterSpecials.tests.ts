@@ -1,7 +1,9 @@
 import { assertEquals, assertGreaterThan, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { upSpecialRoute } from "../../match/recoveryEnvelope";
-import { Character, SpecialAction } from "../codes";
+import { Character, HeroStatusKind, SpecialAction } from "../codes";
+import { HAWK_STUN } from "./beastmasterSpecials";
+import { HERO_REFERENCE_HEIGHT } from "../heroMoves";
 import { type Fighter, createFighter, placedObject } from "../fighter";
 import { type Controls, type Roster } from "../roster";
 import { controls } from "../testWorld";
@@ -118,5 +120,32 @@ test("commanded Bear and Hawk each damage and launch the dummy with one confirme
     assertGreaterThan(launch, 0.0);
     assertEquals(birdCues, 0);
     assertEquals(birdVolume, 0);
+  }
+});
+
+test("at mid range Bear's charge mauls a dummy 2.2H away into a launch, Hawk's dive stuns one 2H away and the 1.6x Quilbeast's volley lands 2.4H away [k1 scenario]", () => {
+  for (const facing of [-1, 1]) {
+    const bear = pair(f32(HERO_REFERENCE_HEIGHT * f32(2.2)), facing);
+    run(bear.world, 74, controls({ specialPressed: true, specialX: facing }));
+    run(bear.world, 40, controls({ specialPressed: true, specialX: facing }));
+    assertGreaterThan(bear.target.status.damage, 9.0);
+    assertTrue(!bear.target.motion.grounded || bear.target.launch.hitstun > 20);
+
+    const hawk = pair(f32(HERO_REFERENCE_HEIGHT * f32(2.0)), facing);
+    run(hawk.world, 30, up);
+    let stun = 0;
+    stepDuel(hawk.world, up);
+    for (let frame = 2; frame <= 40; frame++) {
+      stepDuel(hawk.world);
+      if (hawk.target.status.condition === HeroStatusKind.stun) stun = Math.max(stun, hawk.target.status.conditionFrames);
+    }
+    assertEquals(stun, HAWK_STUN.frames);
+
+    const quil = pair(f32(HERO_REFERENCE_HEIGHT * f32(2.4)), facing);
+    run(quil.world, 40, down);
+    assertEquals(placedObject(quil.owner, 1).spec?.height, f32(HERO_REFERENCE_HEIGHT * f32(0.8)));
+    const before = quil.target.status.damage;
+    run(quil.world, 60, down);
+    assertGreaterThan(quil.target.status.damage, before);
   }
 });

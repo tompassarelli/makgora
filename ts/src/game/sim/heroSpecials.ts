@@ -257,6 +257,7 @@ export interface SpecialCompanion {
 
   readonly bite: StrikeCapsule;
   readonly biteEffect: HitEffect;
+  readonly biteStatus?: AppliedStatus | undefined;
 
   readonly stunFrames: number;
 
