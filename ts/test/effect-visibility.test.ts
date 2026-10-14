@@ -1,6 +1,8 @@
 import { expect, test } from "bun:test";
 import { parseMDL, type model as mdx } from "wisp/vendor/war3-model.mjs";
-import { effectVisibility, simultaneousPositive } from "../scripts/wisp/effectVisibility";
+import { effectVisibility, simultaneousPositive, effectUses, effectSourceDigest } from "../scripts/wisp/effectVisibility";
+
+import { formatEffectRecord, effectRecordProblem, effectRecordUnknowns } from "../scripts/wisp/cueModels";
 
 test("Classic effect visibility requires simultaneous supported tracks and moving particle playback [k2 property]", () => {
   const model = parseMDL('Version { FormatVersion 800, } Model "synthetic tracks" { BlendTime 0, }');
@@ -56,4 +58,16 @@ test("Classic effect visibility requires simultaneous supported tracks and movin
   expect(effectVisibility(emitting, use, () => true).status).toBe("visible");
   const scaledEmitter = { ...emitting, ParticleEmitters2: emitting.ParticleEmitters2.map((emitter) => ({ ...emitter, Scaling: { LineType: 0, GlobalSeqId: -1, Keys: [{ Frame: 0, Vector: new Float32Array([0, 0, 0]) }] } })) };
   expect(effectVisibility(scaledEmitter, use, () => true).status).toBe("unknown");
+  const uses = effectUses(), source = effectSourceDigest(), provenance = "a".repeat(64);
+  for (let example = 0; example < 2; example++) {
+    const findings = uses.map((entry) => ({ ...entry, status: bit() ? "visible" as const : "unknown" as const, reason: `unsupported playback ${example}` }));
+    const text = formatEffectRecord({ source, provenance, findings });
+    expect(effectRecordProblem(text)).toBeUndefined();
+    expect(effectRecordUnknowns(text)).toEqual(findings.filter(({ status }) => status === "unknown").map((entry) => `${entry.fighter}\t${entry.move}\tUnknown\t${entry.model}\t${entry.reason}`));
+    expect(effectRecordProblem(formatEffectRecord({ source, provenance, findings: findings.slice(1) }))).toBeDefined();
+    expect(effectRecordProblem(formatEffectRecord({ source, provenance, findings: findings.map((entry, index) => index === example ? { ...entry, status: "invisible" } : entry) }))).toBeDefined();
+    expect(effectRecordProblem(text.replace(source, "b".repeat(64)))).toBeDefined();
+    expect(effectRecordProblem(text.replaceAll(`\t${provenance}\t`, `\t${"c".repeat(64)}\t`))).toBeDefined();
+    expect(effectRecordProblem(text.replaceAll("\tunknown\t", "\tmalformed\t").replaceAll("\tvisible\t", "\tmalformed\t"))).toBeDefined();
+  }
 });

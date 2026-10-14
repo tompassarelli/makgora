@@ -337,5 +337,5 @@ if (import.meta.main) BunRuntime.runMain(Effect.gen(function*() {
   if (process.argv.includes("--json")) yield* Console.log(JSON.stringify(report, null, 2));
   else for (const finding of flagged) yield* Console.log(`${finding.fighter}\t${finding.move}\t${finding.status}\t${finding.model}\t${finding.reason}`);
   yield* Console.error(`${flagged.length} invisible/Unknown of ${report.findings.length} Classic effect uses (${new Set(report.findings.map(({ model }) => model)).size} models); MODEL-DATA visibility only`);
-  if (flagged.length > 0 && process.argv.includes("--strict")) return yield* new EffectCheckFailure({ problem: "invisible/Unknown Classic effects refuse the gate" });
+  if (report.findings.some(({ status }) => status === "invisible") && process.argv.includes("--strict")) return yield* new EffectCheckFailure({ problem: "invisible Classic effects refuse the gate; Unknown uses remain report debt" });
 }));

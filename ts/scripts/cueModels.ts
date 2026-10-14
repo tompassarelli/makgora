@@ -2,7 +2,7 @@ import { join } from "node:path";
 import { Console, Effect } from "effect";
 import { BunRuntime } from "@effect/platform-bun";
 import { EffectCheckFailure, readEffectReport } from "./wisp/effectVisibility";
-import { CUE_MODEL_RECORD, cueModels, formatRecord, listedRedraws, parseRecord, recordProblem, redrawCandidates, formatEffectRecord, effectRecordProblem } from "./wisp/cueModels";
+import { CUE_MODEL_RECORD, cueModels, formatRecord, listedRedraws, parseRecord, recordProblem, redrawCandidates, formatEffectRecord, effectRecordProblem, effectRecordUnknowns } from "./wisp/cueModels";
 
 const record = join(import.meta.dir, "../..", CUE_MODEL_RECORD);
 const models = cueModels(), candidates = redrawCandidates();
@@ -20,5 +20,7 @@ BunRuntime.runMain(Effect.gen(function*() {
   const text = yield* Effect.tryPromise({ try: async () => await Bun.file(record).exists() ? await Bun.file(record).text() : "", catch: (cause) => new EffectCheckFailure({ problem: `read cue record: ${String(cause)}` }) });
   const problem = recordProblem(models, candidates, listedRedraws(), parseRecord(text)) ?? effectRecordProblem(text);
   if (problem !== undefined) return yield* new EffectCheckFailure({ problem });
-  yield* Console.log(`cue models: ${models.length} cue models and ${candidates.length} accents or projectiles recorded in both looks; every Classic effect use has visible MODEL-DATA evidence`);
+  const unknowns = effectRecordUnknowns(text);
+  for (const finding of unknowns) yield* Console.log(finding);
+  yield* Console.log(`cue models: ${models.length} cue models and ${candidates.length} accents or projectiles recorded in both looks; Classic effect report has ${unknowns.length} Unknown uses awaiting calibration; no missing/invisible uses; MODEL-DATA visibility only`);
 }));

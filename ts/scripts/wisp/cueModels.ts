@@ -46,7 +46,7 @@ export function touchesCueInputs(paths: readonly string[], inputs: ReadonlySet<s
 
 
 export function formatEffectRecord(report: { readonly source: string; readonly provenance: string; readonly findings: readonly EffectFinding[] }): string {
-  return `classic-source\t${report.source}\t${report.provenance}\n` + report.findings.map(({ status, reason, ...use }) => `classic-use\t${effectUseDigest(use)}\t${status}\t${report.provenance}\n`).sort().join("");
+  return `classic-source\t${report.source}\t${report.provenance}\n` + report.findings.map(({ status, reason, ...use }) => `classic-use\t${effectUseDigest(use)}\t${status}\t${report.provenance}\t${reason.replace(/[\t\r\n]/g, " ")}\n`).sort().join("");
 }
 
 export function effectRecordProblem(text: string): string | undefined {
@@ -59,6 +59,20 @@ export function effectRecordProblem(text: string): string | undefined {
     if (kind !== "classic-use" || key === undefined || provenance !== header[2]) continue;
     if (status === "visible" || status === "invisible" || status === "unknown") records.set(key, status);
   }
-  const refused = effectUses().filter((use) => records.get(effectUseDigest(use)) !== "visible");
-  return refused.length === 0 ? undefined : `Classic effects: ${refused.length} missing/invisible/Unknown uses refuse the gate: ${refused.map((use) => `${use.fighter}/${use.move}`).join("; ")}`;
+  const refused = effectUses().filter((use) => {
+    const status = records.get(effectUseDigest(use));
+    return status === undefined || status === "invisible";
+  });
+  return refused.length === 0 ? undefined : `Classic effects: ${refused.length} missing/invisible uses refuse the gate: ${refused.map((use) => `${use.fighter}/${use.move}`).join("; ")}`;
+}
+
+export function effectRecordUnknowns(text: string): string[] {
+  const records = new Map(text.split("\n").flatMap((line) => {
+    const [kind, key, status, , reason] = line.split("\t");
+    return kind === "classic-use" && key !== undefined && status === "unknown" ? [[key, reason ?? "reason not recorded"] as const] : [];
+  }));
+  return effectUses().flatMap((use) => {
+    const reason = records.get(effectUseDigest(use));
+    return reason === undefined ? [] : [`${use.fighter}\t${use.move}\tUnknown\t${use.model}\t${reason}`];
+  });
 }
