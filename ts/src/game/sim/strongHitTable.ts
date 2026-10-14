@@ -130,7 +130,7 @@ const REASONS: { readonly [character: number]: { readonly [style: number]: strin
   },
   [Character.warden]: { [AttackStyle.forwardSmash]: "The blade's far edge: a hunter who strikes at her reach." },
   [Character.lich]: { [AttackStyle.forwardSmash]: "Frost bursts at the staff's tip, so a caster who keeps distance kills at range." },
-  [Character.forsakenPaladin]: { [AttackStyle.forwardSmash]: "The hammer's head carries the blessing; the haft only shoves." },
+  [Character.forsakenPaladin]: { [AttackStyle.forwardSmash]: "The sword's blade carries the blessing; the hilt only shoves." },
   [Character.dreadlord]: { [AttackStyle.backAir]: "The wing-claw rakes hardest the frame it opens; a vampire who reads the approach takes the clean strike, the rest lingers as a weak wall." },
   [Character.shadowHunter]: { [AttackStyle.forwardTilt]: "The spear's point: a trickster who pokes from outside reach." },
   [Character.pitLord]: { [AttackStyle.forwardSmash]: "The cleaver's far edge: the demon lord's huge reach is the point." },

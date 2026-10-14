@@ -10,12 +10,12 @@ import { FORSAKEN_PALADIN_SPECIALS } from "./forsakenPaladinSpecials";
 export const FORSAKEN_PALADIN_HERO: HeroDefinition = {
   character: Character.forsakenPaladin,
   name: "Forsaken Paladin",
-  purpose: "Forsaken hammer fighter who holds consecrated ground",
-  weakness: "Slow feet and punishable hammer commitments",
+  purpose: "Forsaken sword fighter who holds consecrated ground",
+  weakness: "Slow feet and punishable sword commitments",
   complete: true,
   moves: FORSAKEN_PALADIN_MOVES,
   specials: FORSAKEN_PALADIN_SPECIALS,
-  jab: { name: "Hammer and Haft", description: "A hammer check, then a shove of the haft on a second jab." },
+  jab: { name: "Blade and Hilt", description: "A sword check, then a shove of the hilt on a second jab." },
   gameplan: FORSAKEN_PALADIN_GAMEPLAN,
   presentation: {
     model: "Units\\Creeps\\HeroForsakenPaladin\\HeroForsakenPaladin.mdx",

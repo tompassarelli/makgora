@@ -191,11 +191,11 @@ frost.
 | Up tilt | 8/8/20 | 9 | 0.50H wide, up to 1.55H | 90, 95/22 | | Zelda up tilt (long overhead arc) |
 | Down tilt | 10/4/19 | 6 | 1.15H, below 0.10H | 30, 70/25 | | Samus down tilt (slow, long) |
 
-### Forsaken Paladin: the defensive hammer
+### Forsaken Paladin: the defensive sword
 
-His forward tilt is the roster's longest and slowest tilt: an overhead hammer
+His forward tilt is the roster's longest and slowest tilt: an overhead sword
 arc from above his head to the floor in front, so it is not angled. His down
-tilt sweeps the hammer handle along the floor and knocks the victim down.
+tilt sweeps the sword hilt along the floor and knocks the victim down.
 
 | Normal | F/A/R | Damage | Reach | Launch | Angled | Inspired by |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -326,7 +326,7 @@ each jab cell gives F/A/R, damage, reach and launch (angle, growth/base).
 | Mountain King | Tavern Brawl | 6/3/18, 6, 0.67H, 35 95/24 | |
 | Warden | Crescent Flurry | 2/2/12, 3, 0.56H, 70 30/26 | 4/3/16, 4, 0.73H, 40 90/22 |
 | Lich | Chilling Touch | 6/3/17, 4 ice, 0.55H, 30 85/22 | |
-| Forsaken Paladin | Hammer and Haft | 6/3/18, 6, 0.62H, 30 90/26 | |
+| Forsaken Paladin | Blade and Hilt | 6/3/18, 6, 0.62H, 30 90/26 | |
 | Dreadlord | Vampiric Claws | 4/2/14, 3, 0.61H, 60 30/28 | 6/3/20, 6, 0.74H, 35 100/22 |
 | Shadow Hunter | Glaive Handle | 4/2/13, 3, 0.72H, 60 30/26 | 6/3/18, 5, 0.84H, 40 90/22 |
 | Pit Lord | Haft and Chop | 8/3/22, 7, 0.85H, 40 75/18 | |

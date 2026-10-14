@@ -172,11 +172,6 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   move tables provide the contact targets; shipped collision follows the measured
   grip and blade. Run the original clip export, timeline export
   and Character 7 white-copy export afterward. Other fighter inputs stay unchanged.
-  `bun tools/animations/forsaken-paladin-model.ts AUTHORED_FORSAKEN.mdx PRIVATE_OUTPUT.mdx`
-  replaces the sword with an original beveled hammer centered on `Weapon Ref`,
-  preserves the body, rig and every sequence, and writes its steel palette texture
-  beside the output. Store the model in `hero-models`, the palette in
-  `imported-models`, and refresh the clip pool and white body after animation authoring.
 
 - Chen animation authoring (from the repository root):
   `bun tools/animations/chen-clips.ts STOCK_CHEN.mdx PRIVATE_OUTPUT` authors

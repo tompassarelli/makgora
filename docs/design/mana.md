@@ -84,7 +84,7 @@ its active time. Status durations and healing caps stay unchanged.
 | Mountain King | Storm Bolt deals 25% more damage. | Storm Rush and Hammerfall deal 25% more damage. | Thunder Leap travels 25% farther. | Thunder Clap and its charged forms have 25% more reach. |
 | Warden | Shadow Strike deals 25% more damage. | Pursuit Lunge/marked slash deals 25% more damage. | Blink travels 25% farther. | Fan of Knives has 25% more reach. |
 | Lich | Frost Nova orb/burst has 25% more reach. | Death and Decay deals 25% more damage. | Spectral Ascent travels 25% farther. | Frost Armor absorbs a hit 25% heavier; Dark Ritual gains four protected entry frames. |
-| Forsaken Paladin | Cleansing Hammer deals 25% more damage. | Righteous Fury deals 25% more damage. | Ascension travels 25% farther. | Consecration has 25% more reach. |
+| Forsaken Paladin | Cleansing Sword deals 25% more damage. | Righteous Fury deals 25% more damage. | Ascension travels 25% farther. | Consecration has 25% more reach. |
 | Dreadlord | Carrion Swarm has 25% more reach. | Vampiric Pounce's bite deals 25% more damage, with the same heal cap. | Bat Ascension travels 25% farther. | Sleep orb has 25% more reach, with unchanged sleep and immunity. |
 | Shadow Hunter | Spirit Glaive deals 25% more damage in both directions. | Serpent Ward shots deal 25% more damage; recall gains four protected entry frames. | Loa Vault travels 25% farther. | Hex orb has 25% more reach, with unchanged Hex and immunity. |
 | Pit Lord | Howl of Terror has 25% more reach. | Ruin Charge deals 25% more damage. | Abyssal Leap travels 25% farther. | Rain of Fire deals 25% more damage. |

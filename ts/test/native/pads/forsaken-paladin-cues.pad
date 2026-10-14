@@ -21,7 +21,7 @@
 306 a capture
 320 b stick 0 0
 321 b release LB
-# #144: Cleansing Hammer, and Cleansing Hammer from the air.
+# #144: Cleansing Sword, and Cleansing Sword from the air.
 345 a tap X 2
 347 a capture
 365 a capture
@@ -51,7 +51,7 @@
 851 a stick 0 0
 852 a capture
 858 a capture
-# Cleansing Hammer, then Ascension.
+# Cleansing Sword, then Ascension.
 930 a tap X 2
 932 a capture
 950 a capture
@@ -60,7 +60,7 @@
 996 a stick 0 0
 # Expected, frame by frame (headless run of this script): a's shield takes three forward tilts unhurt,
 # the fourth lands with Sacred Aura ready, then every grounded/air form starts.
-# Cleansing Hammer cleanses poison/slow without healing.
+# Cleansing Sword cleanses poison/slow without healing.
 #! absent a 60-260 damage
 # #249: the 0.80 multiplier makes the 12-damage forward tilt deal 9.6.
 #! expect a 300 special 16 form 0

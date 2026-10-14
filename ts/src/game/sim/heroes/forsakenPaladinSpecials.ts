@@ -17,7 +17,7 @@ const heights = (multiple: number): number => f32(H * f32(multiple));
 const perFrame = (distance: number, first: number, last: number): number => f32(distance / (last - first + 1));
 
 const JUSTICE = { ...hit(15.887040138244629, "LAUNCH", 80, false, HitElement.holy), growth: 61.36283874511719, base: 42.0 };
-const cleansingHammer = (landingLag: number | undefined): AuthoredSpecial => ({
+const cleansingSword = (landingLag: number | undefined): AuthoredSpecial => ({
   endFrame: 38,
   cleanseFrame: 14,
   regions: [
@@ -87,10 +87,10 @@ const CONSECRATION: AuthoredSpecial = {
 };
 
 export const FORSAKEN_PALADIN_AUTHORING_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Cleansing Hammer", description: "Bonk upward with the hammer; its holy impact cleanses your poison and movement slow.", ground: cleansingHammer(undefined), air: cleansingHammer(18) }, { damage: 1.25 }),
-  side: withExKit({ name: "Righteous Fury", description: "Charge hammer-first. A body hit briefly slows movement; a blocked charge leaves you exposed.", ground: RIGHTEOUS_FURY, air: RIGHTEOUS_FURY_AIR }, { damage: 1.25 }),
-  up: withExKit({ name: "Ascension", description: "A rising hammer strike you steer, then a helpless fall.", ground: ascension(f32(2.9)) }, { travel: 1.25 }),
-  down: withExKit({ name: "Consecration", description: "Plant the hammer to bless a small patch of ground. It pulses beneath grounded foes; jumping clears it.", ground: CONSECRATION, air: { ...CONSECRATION, groundOnly: false, landingLag: 20,
+  neutral: withExKit({ name: "Cleansing Sword", description: "Strike upward with the sword; its holy impact cleanses your poison and movement slow.", ground: cleansingSword(undefined), air: cleansingSword(18) }, { damage: 1.25 }),
+  side: withExKit({ name: "Righteous Fury", description: "Charge sword-first. A body hit briefly slows movement; a blocked charge leaves you exposed.", ground: RIGHTEOUS_FURY, air: RIGHTEOUS_FURY_AIR }, { damage: 1.25 }),
+  up: withExKit({ name: "Ascension", description: "A rising sword strike you steer, then a helpless fall.", ground: ascension(f32(2.9)) }, { travel: 1.25 }),
+  down: withExKit({ name: "Consecration", description: "Plant the sword to bless a small patch of ground. It pulses beneath grounded foes; jumping clears it.", ground: CONSECRATION, air: { ...CONSECRATION, groundOnly: false, landingLag: 20,
     projectiles: CONSECRATION.projectiles?.map(shot => ({ model: shot.model, modelRadius: shot.modelRadius,
       spawnFrame: shot.spawnFrame, offsetX: 0.0, offsetZ: 0.0, velocityX: 0.0, velocityZ: -8.0,
       life: 24, radius: shot.radius, effect: shot.effect, reflectable: shot.reflectable, limit: shot.limit })) } }, { reach: 1.25 }),

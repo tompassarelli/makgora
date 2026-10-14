@@ -13,7 +13,7 @@ import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../../ts/src/ga
 import { createRoster, fighterAt } from "../../ts/src/game/sim/roster";
 import { initializePainScenario, PAIN_SCENARIOS } from "../../ts/src/game/shell/painFixture";
 import { contactDamageClips } from "../../ts/src/game/presentation/damagePose";
-import { FORSAKEN_PALADIN_DAMAGE_MULTIPLIER } from "../../ts/src/game/sim/heroes/forsakenPaladinHammer";
+import { FORSAKEN_PALADIN_DAMAGE_MULTIPLIER } from "../../ts/src/game/sim/heroes/forsakenPaladinSword";
 import { parsePadScript } from "../../ts/scripts/integrity/padScript";
 import { ensure } from "./original-clips";
 

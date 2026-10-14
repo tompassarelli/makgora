@@ -96,7 +96,7 @@ The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-wea
 | 3 | Warden | Precision mobility and edge pressure | Light body and punishable teleport endpoints |
 | 4 | Pandaren Brewmaster | Staff brawler with brew and fire combinations | Slow commitments and limited ranged reach |
 | 5 | Lich | Deliberate projectile placement | Frail body and slow attacks at close range |
-| 6 | Forsaken Paladin | Forsaken hammer fighter holding holy ground | Slow feet and committed recovery |
+| 6 | Forsaken Paladin | Forsaken sword fighter holding holy ground | Slow feet and committed recovery |
 | 7 | Dreadlord | Air movement, grabs, and close pressure | Large hurtbox and no safe long-range approach |
 | 8 | Shadow Hunter | Totem placement and angles | Setup can be destroyed or bypassed |
 | 9 | Pit Lord | Extreme heavy with long cleaves | Very large target and slow recovery |
@@ -804,7 +804,7 @@ The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-wea
 
 ## Forsaken Paladin
 
-**Identity:** a Forsaken Paladin with a substantial hammer, a short slowing
+**Identity:** a Forsaken Paladin with his stock sword, a short slowing
 charge and a small holy patch that contests grounded landings. His slow feet
 and deliberate recovery reward spacing and permit a shield or whiff punish.
 The current move identities, sources, contracts and roster distinctions are
@@ -812,9 +812,9 @@ in [Forsaken Paladin](forsaken-paladin.md); production frame data lives in forsa
 
 | Input | Move and behavior | Timing and cost |
 | --- | --- | --- |
-| Neutral B | **Cleansing Hammer:** overhead launcher, 11.05 damage at 80°, growth 70/base 42. Removes his poison and movement slow on contact frame, even on a miss. Air drifts with 18 landing frames. | Active f14–16, end f38; 10 mana |
-| Side B | **Righteous Fury:** held-hammer charge, 0.75H travel, 11.9 damage at 40°. Body hit slows movement 40% for 75 frames, then 120 immunity. Ground armor absorbs one hit up to 5 damage on f15–18. Air has no armor, one use, 20 landing frames and helpless finish. | Hammer/travel f15–20, end f49; 25 mana |
-| Up B | **Ascension:** steerable hammer rise in the [#252 heavy recovery band](../gameplay-design.md#recovery-and-edgeguarding), with the free route reaching at least 240 units on either axis; 0.2H forward and up to 1.6H steering. Paid form hits once for 6.8 damage at 80°. Jump spent, one use per airtime, helpless finish. | Hit f10–15, travel f8–28, stop/end f29; 15 mana or free |
+| Neutral B | **Cleansing Sword:** overhead launcher, 11.05 damage at 80°, growth 70/base 42. Removes his poison and movement slow on contact frame, even on a miss. Air drifts with 18 landing frames. | Active f14–16, end f38; 10 mana |
+| Side B | **Righteous Fury:** held-sword charge, 0.75H travel, 11.9 damage at 40°. Body hit slows movement 40% for 75 frames, then 120 immunity. Ground armor absorbs one hit up to 5 damage on f15–18. Air has no armor, one use, 20 landing frames and helpless finish. | Sword/travel f15–20, end f49; 25 mana |
+| Up B | **Ascension:** steerable sword rise in the [#252 heavy recovery band](../gameplay-design.md#recovery-and-edgeguarding), with the free route reaching at least 240 units on either axis; 0.2H forward and up to 1.6H steering. Paid form hits once for 6.8 damage at 80°. Jump spent, one use per airtime, helpless finish. | Hit f10–15, travel f8–28, stop/end f29; 15 mana or free |
 | Down B | **Consecration:** fixed, jumpable holy patch, radius 60, 70 units ahead. Life 120 frames, 1.7 damage at most every 45 frames; one patch and 150-frame recast interval. Ground only. | Pool f16, end f42; 20 mana |
 
 **Sacred Aura:** three blocked hits make the next non-throw launch 20% weaker.
@@ -2021,7 +2021,7 @@ none of the current kits needs a replacement effect. Archer is removed by #339; 
 | Mountain King | Hammer-and-axe chain, hammer lift and Thunder Leap | Counted Bash hitstun bonus |
 | Warden | Fan of Knives, glaive drill and chosen Blink | Aerial-hit jump refund |
 | Lich | Frost zones, deliberate ice armour and hovering cast poses | Counted reactive Frost Armour |
-| Forsaken Paladin | Hammer spacing, deliberate guard and Divine Shield | Counted launch reduction |
+| Forsaken Paladin | Sword spacing, deliberate guard and Divine Shield | Counted launch reduction |
 | Dreadlord | Corkscrew bite and wing-led close moves | Counted automatic lifesteal |
 | Shadow Hunter | Glaive drill, ward placement and crossfire | Banked Voodoo damage |
 | Pit Lord | Wide cleaver swings and armoured charge move | Third-contact cleave bonus |
