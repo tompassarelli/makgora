@@ -360,6 +360,7 @@ jobs:
               check "parity corpus: every native recording replays headless with 0 divergent frames" bun wisp parity corpus test/corpus
               check "compiler affected-module and output-equivalence checks" env COMPILER_TIMINGS=1 bun scripts/compiler-benchmark.ts
               check "no game files or copied game scripts outside the allowlist" bun scripts/cleanRoom.ts
+              check "cue models and Classic effect record current for this tree" bun scripts/cueModels.ts
               check "effect-kit check" sh -c 'git clone -q --depth 1 https://github.com/tompassarelli/north "$RUNNER_TEMP/north" && cd .. && bun "$RUNNER_TEMP/north/agent-machinery/scripts/effect-kit.mjs" check'
               check "type-check edit loop and dependency validation" bun scripts/typecheck-benchmark.ts
               check "every selectable computer fighter is active" bun scripts/cpuCoverage.ts ;;
