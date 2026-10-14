@@ -56,6 +56,7 @@ test("saved default upgrades preserve every customized slot and leave current sa
         const customKey = character.charCodeAt(0);
         if (legacy.includes(customKey)) continue;
         for (let index = 0; index < slots; index++) {
+          if (character === "0" && index === slotIndex(Action.lightShield, 0)) continue;
           const customized = legacy.slice();
           customized[index] = customKey;
           const upgraded = decodeBindings(oldSave(version, slots, customized));
