@@ -158,10 +158,12 @@ UI scale. The authored chip's 237-pixel rim spans a 256-pixel canvas, so its
 visible diameter is 60.18% of a tile, within #346's 55–70% reference band.
 The pointer target follows that frame size; the P1/P2 labels keep their art.
 
-On the fighter select screen, the Warcraft cursor is hidden (`BlzEnableCursor`)
-and the local client draws a pinching steel gauntlet, with a carried chip's
-top rim between thumb and fingertip. The pointing pose is painted but not
-displayed yet. `SelectionHandPoint` keeps its original 128x128 SVG art. `SelectionHandPinch`
+On the fighter select screen the stock Warcraft cursor (the Human gauntlet; the
+build forces every player slot to Human) stays visible. While a chip is carried
+the cursor is hidden (`BlzEnableCursor`) and the local client draws a pinching
+steel gauntlet, with the chip's top rim between thumb and fingertip. The hidden
+state is asserted every update; the shown state is sent once when it returns.
+`SelectionHandPoint` is painted but never displayed. `SelectionHandPinch`
 uses Tom's publicly approved AI-created
 smashcraft:tools/selection/art/wc3-pinching-hand.png through the same builder.
 The authored source's pinch point is (256, 288). The Classic 32x32 and

@@ -15,6 +15,7 @@ import { dropsSetting, hazardsSetting, rulesSummary } from "../shell/messages";
 import { ButtonClicks, type MenuControls, bindSyncHandler, consoleUi, coverScreen, createBackdrop, createSyncTrigger, createText, gameUi, highlightText, placeTopLeft, setFrameText, sizeText } from "./frames";
 import { MENU_STYLE, PANEL_TEXTURE } from "./hudLayout";
 import { StageCard } from "./stageCard";
+import { START_BUTTON, startButtonContains } from "./selectionLayout";
 
 
 
@@ -32,7 +33,6 @@ type StageButton = { kind: "stage"; choice: StageChoice } | { kind: "hazards" } 
 
 export const HAZARDS_BUTTON = { x: f32(0.225), y: f32(0.082), width: f32(0.19), height: f32(0.037) } as const;
 export const DROPS_BUTTON = { x: f32(0.42), y: f32(0.082), width: f32(0.12), height: f32(0.037) } as const;
-export const START_MATCH_BUTTON = { x: f32(0.045), y: f32(0.514), width: f32(0.21), height: f32(0.048) } as const;
 
 
 function stageText(parent: framehandle, name: string, x: number, y: number, width: number, height: number, fontSize: number, text: string): framehandle {
@@ -133,7 +133,7 @@ export class StagePanel {
       ? "Click a stage or move the stick.\nAny player can choose.\nA / Click: choose · Start: start · Click BACK: back"
       : "Click a stage or use movement controls.\nAny player can choose.\nY: start · Click BACK TO FIGHTERS: back";
     stageText(root, "MeleeStageHelp", f32(0.454), f32(0.119), f32(0.3), f32(0.025), f32(0.008), help);
-    this.startButton = this.clicks.add(stageButton(root, START_MATCH_BUTTON.x, START_MATCH_BUTTON.y, START_MATCH_BUTTON.width, START_MATCH_BUTTON.height, journal ? "START MATCH [A]" : "START MATCH"), { kind: "start" });
+    this.startButton = this.clicks.add(stageButton(root, START_BUTTON.x, START_BUTTON.y, START_BUTTON.width, START_BUTTON.height, journal ? "START MATCH [A]" : "START MATCH"), { kind: "start" });
     this.clicks.add(stageButton(root, f32(0.045), f32(0.082), f32(0.17), f32(0.037), journal ? "BACK" : "BACK TO FIGHTERS"), { kind: "back" });
     this.hazardsToggle = stageButton(root, HAZARDS_BUTTON.x, HAZARDS_BUTTON.y, HAZARDS_BUTTON.width, HAZARDS_BUTTON.height, "");
     this.clicks.add(this.hazardsToggle, { kind: "hazards" });
@@ -176,8 +176,9 @@ export class StagePanel {
     const width = I2R(BlzGetLocalClientWidth());
     const height = I2R(BlzGetLocalClientHeight());
     if (width <= 0 || height <= 0) return;
-    const x = START_MATCH_BUTTON.x + START_MATCH_BUTTON.width / 2;
-    const y = START_MATCH_BUTTON.y - START_MATCH_BUTTON.height / 2;
+    if (startButtonContains(pointerX(I2R(BlzGetMouseScreenPosX()), width, height), pointerY(I2R(BlzGetMouseScreenPosY()), height))) return;
+    const x = START_BUTTON.x + START_BUTTON.width / 2;
+    const y = START_BUTTON.y - START_BUTTON.height / 2;
     BlzSetMousePos(R2I(pixelX(x, width, height)), R2I(pixelY(y, height)));
   }
 

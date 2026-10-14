@@ -20,7 +20,7 @@ import { texturePixels } from "./gateCursor";
 import { headlessRender } from "./headlessRender";
 import { texels } from "wisp/scripts/wisp/screenBounds";
 import { parseMDX } from "wisp/vendor/war3-model.mjs";
-import { START_MATCH_BUTTON } from "../../src/game/ui/stageUi";
+import { START_BUTTON } from "../../src/game/ui/selectionLayout";
 
 const fail = (operation: string) => (cause: { readonly message: string }) => new AcceptFailure({ operation, problem: cause.message });
 
@@ -170,7 +170,7 @@ export const measureStartGate = (clientsFile: string, name: string, directory: s
     const afterFrame = started ? yield* pollUntil(stageFrame().pipe(Effect.map(value => value.stage ? undefined : value.frame)), { every: "100 millis", within: "15 seconds", orElse: () => Effect.fail(new AcceptFailure({ operation: "start gate gameplay pixels", problem: "STAGE SELECT remains drawn after match transition" })) }) : yield* capture(client, region).pipe(Effect.mapError(fail("start gate capture")));
     const after = yield* save("after-start", afterFrame);
     const observed = prePress.cursor;
-    const offButton = observed.x < START_MATCH_BUTTON.x || observed.x > START_MATCH_BUTTON.x + START_MATCH_BUTTON.width || observed.y > START_MATCH_BUTTON.y || observed.y < START_MATCH_BUTTON.y - START_MATCH_BUTTON.height;
+    const offButton = observed.x < START_BUTTON.x || observed.x > START_BUTTON.x + START_BUTTON.width || observed.y > START_BUTTON.y || observed.y < START_BUTTON.y - START_BUTTON.height;
     if (started && negativeControl === undefined) {
       if (locate(afterFrame) !== undefined) return yield* new AcceptFailure({ operation: "start gate calibration", problem: "drawn gameplay negative control matches the stock cursor" });
       negativeControl = after;

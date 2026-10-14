@@ -57,7 +57,7 @@ import {
 } from "../menu/selectionDrag";
 import { cellRect, rosterGrid } from "../menu/selectionGrid";
 import { MENU_FONT, MENU_STYLE, NATIVE_TEXT_BASE, PANEL_TEXTURE, type TextBox } from "./hudLayout";
-import { MOVES_BODY_BOX, MOVES_BUTTON_HEIGHT, MOVES_BUTTON_TOP, MOVES_TITLE_BOX, selectionTitleBox } from "./selectionLayout";
+import { MOVES_BODY_BOX, MOVES_BUTTON_HEIGHT, MOVES_BUTTON_TOP, MOVES_TITLE_BOX, START_BUTTON, selectionTitleBox } from "./selectionLayout";
 import { PLAYABLE_CHARACTERS, fighterName, fighterPortrait, nextSelectableCharacter } from "../sim/heroes/registry";
 import {
   MOVES_HEADER, itemsSetting, ultimatesSetting, itemKindSetting, automaticRematchSetting, movesPage, selectionModeLabel, endlessSetting, hitAreasSetting, partnerBehaviourSetting, partnerDamageSetting, partnerEscapeSetting,
@@ -196,7 +196,7 @@ export class SelectionPanel {
   private readonly syncTriggers: readonly trigger[];
   private readonly drag = selectionDrag();
   private readonly hand: framehandle;
-  private handPinching = true;
+  private cursorEnabled: boolean | undefined;
   private menuCursorAllowed = true;
 
   private readonly chips: RosterChip[] = PARTICIPANT_SLOTS.map(() => ({ choice: 0, placed: false }));
@@ -328,9 +328,9 @@ export class SelectionPanel {
     this.hand = art(root, `MeleeHand${suffix}`, "war3mapImported\\SelectionHandPinch.tga", 0.0, 0.0, HAND_WIDTH, HAND_HEIGHT);
     BlzFrameSetLevel(this.hand, 30);
     BlzFrameSetVisible(this.hand, false);
-    art(root, `MeleeConfirmArt${suffix}`, "war3mapImported\\SelectionAction.tga", f32(0.071), f32(0.043), f32(0.235), f32(0.037));
+    art(root, `MeleeConfirmArt${suffix}`, "war3mapImported\\SelectionAction.tga", START_BUTTON.x, START_BUTTON.y, START_BUTTON.width, START_BUTTON.height);
     this.confirm = label(root, `MeleeConfirmLabel${suffix}`, f32(0.079), f32(0.039), f32(0.219), f32(0.028), f32(0.011));
-    this.clicks.add(hotspot(root, f32(0.071), f32(0.043), f32(0.235), f32(0.037)), { kind: "start" });
+    this.clicks.add(hotspot(root, START_BUTTON.x, START_BUTTON.y, START_BUTTON.width, START_BUTTON.height), { kind: "start" });
     art(root, `MeleeSettingsArt${suffix}`, "war3mapImported\\SelectionAction.tga", headerBoxLeft, f32(0.52), f32(0.235), f32(0.037));
     const settingsButton = BlzCreateFrameByType("BUTTON", `MeleeSettingsButton${suffix}`, root, "", 0);
     placeTopLeft(settingsButton, headerBoxLeft, f32(0.52));
@@ -688,15 +688,13 @@ export class SelectionPanel {
     if (this.choosing() !== undefined && chip !== undefined) this.actions.recallChoice(this.participantId, chip);
   }
 
-  private showHand(shown: boolean, x: number, y: number, pinching = false): void {
+  private showHand(shown: boolean, x: number, y: number): void {
     BlzFrameSetVisible(this.hand, shown);
-    if (shown && pinching !== this.handPinching) {
-      this.handPinching = pinching;
-      BlzFrameSetTexture(this.hand, `war3mapImported\\SelectionHand${pinching ? "Pinch" : "Point"}.tga`, 0, true);
-    }
-    if (shown) placeTopLeft(this.hand, handLeft(x, definitiveCues(), pinching), handTop(y, definitiveCues(), pinching));
-    // Warcraft shows its cursor again on its own (a frame click), so assert the hidden state every update.
-    BlzEnableCursor(!(shown || !this.menuCursorAllowed));
+    if (shown) placeTopLeft(this.hand, handLeft(x, definitiveCues(), true), handTop(y, definitiveCues(), true));
+    const enabled = !shown && this.menuCursorAllowed;
+    // Warcraft shows its cursor again on its own (a frame click), so the hidden state is asserted every update; the shown state is sent once.
+    if (!enabled || this.cursorEnabled !== true) BlzEnableCursor(enabled);
+    this.cursorEnabled = enabled;
   }
 
   private ownsLocalClient(): boolean {
@@ -862,7 +860,7 @@ export class SelectionPanel {
         carried ? carriedChipTop(y, size) : ready ? chipY(this.roster.grid, slot, chipChoice) : parkedChipTop(size),
       );
     }
-    this.showHand(width > 0 && height > 0 && !settingsOpen && !this.tutorialOpen, x, y, pinching);
+    this.showHand(pinching && width > 0 && height > 0 && !settingsOpen && !this.tutorialOpen, x, y);
     setFrameText(this.confirm, this.confirmText(game));
     this.showRules(game);
     this.showHelp(game, x, y);
