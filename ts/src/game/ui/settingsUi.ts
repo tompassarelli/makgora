@@ -160,7 +160,7 @@ export class SettingsPanel {
     BlzFrameSetText(this.delayButton, settings.delay === AUTO_DELAY ? "Delay: Auto" : `Delay: ${I2S(settings.delay)} frames`);
     BlzFrameSetText(this.delayInfo, info);
     BlzFrameSetText(this.status, settings.message);
-    BlzFrameSetText(this.help, capture === undefined ? "Q: full shield · T: light shield · P: tilt · Z: short hop\nClick a binding to change it. Each action accepts two keys." : "Press an unassigned key. Escape cancels.");
+    BlzFrameSetText(this.help, capture === undefined ? "Q: full shield · A: light shield · P: tilt · I: short hop\nClick a binding to change it. Each action accepts two keys." : "Press an unassigned key. Escape cancels.");
     for (const { action, label, keys } of this.rows) {
       BlzFrameSetText(label, ACTION_LABELS[action]);
       for (const slot of KEY_SLOTS) {

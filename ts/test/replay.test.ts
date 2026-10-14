@@ -44,7 +44,7 @@ function joinedReplay(client: HeadlessClient, serial: number): string[] {
 }
 
 
-const KEYS = { left: 0x57, right: 0x52, jump: 0x49, attack: 0x4e, special: 0x55, grab: 0x4f, shield: 0x51 } as const;
+const KEYS = { left: 0x57, right: 0x52, jump: 0x5a, attack: 0x4e, special: 0x55, grab: 0x4f, shield: 0x51 } as const;
 
 const TAPS = [KEYS.jump, KEYS.attack, KEYS.special, KEYS.grab, KEYS.shield, KEYS.attack];
 
