@@ -131,3 +131,45 @@ Expert gameplan: Manage drink commitments and mix flame routes, close confirms a
 
 Neutral air, split by timing: strong hit clean, frames 7-8, 10%; weak hit late, frames 9-11, 7%. A drunken flying kick: hit early to punish, let it linger to cover a landing.
 The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-weak-hits-389) and every split in the [move list](../move-list.md).
+
+## Measured normal reach
+
+Provenance: #539, 14 October 2026. Measured the current imported Classic body
+`ChenStormstoutTimelineBody-40d4eea9edbcf081451c96086192a1943b68a867c5c7ee62707c1060f8a11fcf.mdx`
+from pinned `original-clips-static-lights` family
+`fc8c5f9985b3d9686a3b3d81005d72970c23ea78b717e6cfa69f9b71dffaa57a`,
+with the product parser, model scale 1, timeline sequence 0, and each original
+clip start plus `sampleAttack` pose time. Measurements agree exactly after
+mirroring both facings. Staff measurements use the three distal solid-shaft
+vertices 118, 119 and 121, directly weighted to Mesh33; the hanging rope and
+flask are separate props. Limb measurements use the forward-most right-hand
+vertex 353, and grab also covers the upper hand extremity 349.
+
+The original live regions remain covered. Added connected capsules keep the
+original radii and effects. Jab 2 needs a different extension endpoint on each
+of its two active frames to cover the moving tip without increasing its radius.
+Grab uses its current three live frames and radius 10; its former authored
+radius-12 region was bypassed by the shared grab producer. Chen adds its
+geometry to the standing-grab producer after the shared region misses, preserving
+the shared contact, target-centre cap of 96, dash and pivot grabs, and other fighters.
+
+Positive gap means the measured tip lies outside all live regions; negative
+gap is its inward clearance. Staff gaps below are the worst of all three tip
+vertices over every active frame. Limb gaps use the forward-most tip.
+
+| Move | Authored / live frames | Clip | Tip X/Z bounds | Previous worst gap | Extended worst gap | Added capsule endpoint(s), radius |
+| --- | --- | --- | --- | ---: | ---: | --- |
+| jab | 4–5 / 3–4 | 11 | 108.99–108.99 / 105.89–105.89 | 61.99 | -11.91 | 109/106, r12 |
+| jab2 | 5–6 / 4–5 | 12 | 129.45–132.75 / 60.22–82.70 | 61.70 | -1.99 | 132/69 then 133/76, r11 |
+| jab3 | 7–9 / 6–8 | 13 | 111.49–111.52 / 90.85–90.93 | 54.36 | -13.80 | 112/91, r14 |
+| forwardTilt | 9–11 / 8–10 | 14 | 140.52–143.96 / 66.73–83.57 | 39.34 | -2.76 | 144/75, r12 |
+| forwardTiltUp | 9–11 / 8–10 | 15 | 137.95–144.47 / 96.73–112.41 | 37.87 | -1.82 | 145/104, r12 |
+| forwardTiltDown | 9–11 / 8–10 | 16 | 141.92–145.20 / 45.57–62.61 | 48.21 | -3.11 | 146/54, r12 |
+| dashAttack | 10–14 / 9–13 | 19 | 108.78–108.80 / 105.67–105.88 | 44.27 | -23.84 | 109/106, r24 |
+| grab | 7–9 / 6–8 | 28 | 79.62–80.04 / 74.87–74.93 | 24.95 | -9.74 | 80/75 and 75/100, r10 |
+
+All authored extension coordinates are whole integers. Startup, recovery,
+damage, knockback, shield behavior, hurt poses, clips and private input pins
+are unchanged. Grab remains authored startup 7, live frames 6–8, with zero
+hit effects; the canonical region declaration now records all three live
+frames rather than the unused two-frame declaration.

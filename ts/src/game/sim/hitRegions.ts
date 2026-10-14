@@ -4,6 +4,7 @@ import { downSmashHit } from "./downMoveValues";
 
 
 import { f32 } from "wisp/src/sim/f32";
+import { CHEN_MOVES } from "./heroes/chenMoves";
 import { AttackStyle, Character, HitElement } from "./codes";
 import type { FighterMoves, StrikeCapsule } from "./heroMoves";
 import { strongHit, weakHit } from "./strongHits";
@@ -209,7 +210,7 @@ const SHARED_UP_SMASH = reachRegion(AttackStyle.upSmash);
 
 export function authoredHitRegionCount(style: AttackStyle | undefined, moves?: FighterMoves): number {
   const authored = style === undefined ? undefined : moves?.normals[style];
-  if (style === AttackStyle.grab) return 1;
+  if (style === AttackStyle.grab) return moves === CHEN_MOVES ? authored?.regions.length ?? 1 : 1;
   if (authored !== undefined) return authored.regions.length;
   return style === AttackStyle.forwardTilt ? 2 : 1;
 }
@@ -255,7 +256,10 @@ function activeRegion(character: Character, style: AttackStyle, frame: number, i
 export function authoredHitRegion(out: HitRegion, character: Character, style: AttackStyle | undefined, frame: number, chargeFrames: number, index: number, moves?: FighterMoves): HitRegion {
   if (style === AttackStyle.grab) {
     const startup = attackStartupFrames(style, moves);
-    copyHitRegion(out, index === 0 && frame >= startup && frame < startup + 3 ? SHARED_GRAB_REGION : NO_HIT_REGION);
+    if (character === Character.chen) {
+      const region = moves?.normals[style]?.regions[index];
+      copyHitRegion(out, region !== undefined && frame >= startup && frame < startup + 3 && frame >= region.firstFrame && frame <= region.lastFrame ? region.hit : NO_HIT_REGION);
+    } else copyHitRegion(out, index === 0 && frame >= startup && frame < startup + 3 ? SHARED_GRAB_REGION : NO_HIT_REGION);
     return out;
   }
   const authored = style === undefined ? undefined : moves?.normals[style];

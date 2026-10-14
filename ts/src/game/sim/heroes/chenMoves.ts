@@ -18,7 +18,7 @@ const torso = hurtCapsule(Character.chen);
 const body = hurtPart(torso.x1, torso.z1, torso.x2, torso.z2, torso.radius);
 const reach = (first: number, last: number, x: number, z: number): readonly HurtPose[] =>
   [heroHurtPose(first, last, [body, hurtPart(x < 0 ? -12.0 : 12.0, 60.0, x, z, 11.0)])];
-const tilt = (height: number) => heroMove(9, 3, 21, 0, [region(9, 11, 22.0, 58.0, 96.0, height, 12.0, poke(8.43317985534668))]);
+const tilt = (height: number, length: number, tip: number) => heroMove(9, 3, 21, 0, [region(9, 11, 22.0, 58.0, 96.0, height, 12.0, poke(8.43317985534668)), region(9, 11, 96, height, length, tip, 12, poke(8.43317985534668))]);
 
 export const CHEN_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack, smashMaxChargeFrames: 45, smashMaxDamageMultiplier: 1.25, maxPummels: 1,
@@ -36,13 +36,13 @@ export const CHEN_MOVES: FighterMoves = {
     },
   },
   normals: {
-    [AttackStyle.jab]: jabStep(heroMove(4, 2, 11, 0, [region(4, 5, 18.0, 62.0, 48.0, 64.0, 12.0, tap(2.8110599517822266))])),
-    [AttackStyle.jab2]: jabStep(heroMove(5, 2, 13, 0, [region(5, 6, 18.0, 56.0, 62.0, 58.0, 11.0, tap(2.8110599517822266))])),
-    [AttackStyle.jab3]: heroMove(7, 3, 18, 0, [region(7, 9, 20.0, 50.0, 54.0, 54.0, 14.0, poke(4.685100078582764))]),
-    [AttackStyle.forwardTilt]: tilt(58.0), [AttackStyle.forwardTiltUp]: tilt(88.0), [AttackStyle.forwardTiltDown]: tilt(26.0),
+    [AttackStyle.jab]: jabStep(heroMove(4, 2, 11, 0, [region(4, 5, 18.0, 62.0, 48.0, 64.0, 12.0, tap(2.8110599517822266)), region(4, 5, 48, 64, 109, 106, 12, tap(2.8110599517822266))])),
+    [AttackStyle.jab2]: jabStep(heroMove(5, 2, 13, 0, [region(5, 6, 18.0, 56.0, 62.0, 58.0, 11.0, tap(2.8110599517822266)), region(5, 5, 62, 58, 132, 69, 11, tap(2.8110599517822266)), region(6, 6, 62, 58, 133, 76, 11, tap(2.8110599517822266))])),
+    [AttackStyle.jab3]: heroMove(7, 3, 18, 0, [region(7, 9, 20.0, 50.0, 54.0, 54.0, 14.0, poke(4.685100078582764)), region(7, 9, 54, 54, 112, 91, 14, poke(4.685100078582764))]),
+    [AttackStyle.forwardTilt]: tilt(58.0, 144, 75), [AttackStyle.forwardTiltUp]: tilt(88.0, 145, 104), [AttackStyle.forwardTiltDown]: tilt(26.0, 146, 54),
     [AttackStyle.upTilt]: heroMove(7, 4, 20, 0, [region(7, 10, 18.0, 72.0, 26.0, 112.0, 15.0, lift(6.559140205383301))]),
     [AttackStyle.downTilt]: heroMove(7, 3, 20, 0, [region(7, 9, 14.0, 22.0, 70.0, 16.0, 13.0, lift(5.622119903564453))]),
-    [AttackStyle.dashAttack]: heroMove(10, 5, 27, 0, [region(10, 14, 16.0, 42.0, 52.0, 68.0, 24.0, chenHit(9.370200157165527, 83.63581085205078, 18.0, f32(0.573576), f32(0.819152)))]),
+    [AttackStyle.dashAttack]: heroMove(10, 5, 27, 0, [region(10, 14, 16.0, 42.0, 52.0, 68.0, 24.0, chenHit(9.370200157165527, 83.63581085205078, 18.0, f32(0.573576), f32(0.819152))), region(10, 14, 52, 68, 109, 106, 24, chenHit(9.370200157165527, 83.63581085205078, 18.0, f32(0.573576), f32(0.819152)))]),
     [AttackStyle.forwardSmash]: heroMove(19, 4, 34, 0, [region(19, 22, 24.0, 66.0, 104.0, 48.0, 14.0, finish(16.86635971069336))]),
     [AttackStyle.upSmash]: heroMove(15, 4, 31, 0, [region(15, 18, 12.0, 62.0, 8.0, 122.0, 24.0, chenHit(13.5, 115.80342864990234, 30.0, 0.0, 1.0))]),
     [AttackStyle.downSmash]: heroMove(15, 6, 32, 0, [region(15, 17, 18.0, 24.0, 88.0, 18.0, 13.0, finish(13.118280410766602)), region(18, 20, -18.0, 24.0, -88.0, 18.0, 13.0, finish(13.118280410766602, true))]),
@@ -51,7 +51,7 @@ export const CHEN_MOVES: FighterMoves = {
     [AttackStyle.backAir]: heroMove(8, 3, 23, 14, [region(8, 10, -18.0, 42.0, -76.0, 45.0, 13.0, finish(10.307220458984375, true))]),
     [AttackStyle.upAir]: heroMove(7, 4, 22, 14, [region(7, 10, -22.0, 102.0, 28.0, 110.0, 13.0, lift(7.49616003036499))]),
     [AttackStyle.downAir]: heroMove(14, 4, 30, 21, [heroRegion(14, 17, chenCapsule(12.0, 6.0, 12.0, -60.0, 13.0), chenHit(11.244239807128906, 101.86412811279297, 24.0, 0.0, -1.0), lift(11.244239807128906))]),
-    [AttackStyle.grab]: heroMove(7, 2, 24, 0, [region(7, 8, 18.0, 50.0, 52.0, 48.0, 12.0, chenHit(0.0, 0.0, 0.0, 0.0, 0.0))]),
+    [AttackStyle.grab]: heroMove(7, 2, 24, 0, [region(7, 9, 0, 45, 62, 45, 10, chenHit(0.0, 0.0, 0.0, 0.0, 0.0)), region(7, 9, 62, 45, 80, 75, 10, chenHit(0.0, 0.0, 0.0, 0.0, 0.0)), region(7, 9, 80, 75, 75, 100, 10, chenHit(0.0, 0.0, 0.0, 0.0, 0.0))]),
   },
   throws: {
     [GrabAction.pummel]: { contactFrame: 5, totalFrames: 12, effect: chenHit(2.8110599517822266, 0.0, 0.0, 0.0, 0.0) },
