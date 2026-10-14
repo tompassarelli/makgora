@@ -23,7 +23,7 @@ import { advanceMatchCamera } from "../../game/sim/matchCamera";
 import { stageBounds } from "../../game/sim/stageBounds";
 import { damageTint } from "../../game/presentation/hitPresentation";
 import { DamagePose, damagePose } from "../../game/presentation/damagePose";
-import { hideEffect } from "../../game/render/effects";
+import { FIGHTER_PHASE_ALPHA, hideEffect } from "../../game/render/effects";
 import { FRAME_SECONDS, type FighterPose } from "../../game/presentation/fighterPose";
 import { CANNON_MODEL, HYDRA_CREST_MODEL, HYDRA_RING_MODEL, PLATFORM_CUE_FRAMES, WIND_STREAK_COUNT, WIND_STREAK_MODEL, framesUntilPlatformMoves, hydraWarningX, hydraStrikeZ, lavaLook, windStreak } from "../../game/presentation/stageHazards";
 import { escapeMeterView, readEscapeMeter } from "../../game/presentation/escapeMeter";
@@ -275,7 +275,7 @@ export function renderFighter(s: ShellState, slot: ParticipantSlot, pose: Readon
   const red = frozen ? 155 : tint?.red ?? (fighter.shield.raised ? 100 : item?.red ?? 255);
   const green = frozen ? 210 : tint?.green ?? (fighter.shield.raised ? 160 : item?.green ?? 255);
   const blue = frozen ? 255 : tint?.blue ?? item?.blue ?? 255;
-  const alpha = !frozen && tint === undefined && isIntangible(fighter) ? 140 : 255;
+  const alpha = !frozen && tint === undefined && isIntangible(fighter) ? FIGHTER_PHASE_ALPHA : 255;
   SetUnitVertexColor(body.unit, red, green, blue, alpha);
   concealFighter(s, slot);
 }

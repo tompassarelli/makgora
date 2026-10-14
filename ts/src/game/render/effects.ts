@@ -28,6 +28,8 @@ export const STOCK_MODELS = {
 
 const HALF_TURN = f32(3.141592654);
 
+export const FIGHTER_PHASE_ALPHA = 192;
+
 
 export function facingYaw(facing: number): number {
   return facing > 0 ? 0.0 : HALF_TURN;
