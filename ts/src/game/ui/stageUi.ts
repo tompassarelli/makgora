@@ -65,7 +65,6 @@ export class StagePanel {
   private readonly chip: framehandle;
   private readonly hazardsToggle: framehandle;
   private readonly dropsToggle: framehandle;
-  private readonly startButton: framehandle;
   private readonly clicks: ButtonClicks<StageButton>;
   private readonly tileNames: framehandle[] = [];
   private readonly sync: trigger;
@@ -87,6 +86,8 @@ export class StagePanel {
   ) {
     const journal = controls === "journal";
     this.clicks = new ButtonClicks("ui.stage.click", (button, clicker) => this.click(button, GetPlayerId(clicker)), button => this.hover(button));
+    const dialogButton = (parent: framehandle, x: number, y: number, width: number, height: number, text: string, target: StageButton) =>
+      this.clicks.add(stageButton(parent, x, y, width, height, text), target, undefined, "native");
     const root = BlzCreateFrameByType("FRAME", "MeleeStageRoot", gameUi(), "", 0);
     this.root = root;
     this.backdrop = createBackdrop("MeleeStageBackdrop", consoleUi(), 800);
@@ -108,7 +109,7 @@ export class StagePanel {
       this.tileNames[choice] = BlzGetFrameByName(`MeleeStageTile${I2S(choice)}Name`, 0);
       setFrameText(this.tileNames[choice], stage.name);
     }
-    this.clicks.add(stageButton(root, f32(0.454), f32(0.514), f32(0.3), f32(0.027), "Stage pool"), { kind: "poolOpen" });
+    dialogButton(root, f32(0.454), f32(0.514), f32(0.3), f32(0.027), "Stage pool", { kind: "poolOpen" });
     this.poolRoot = BlzCreateFrameByType("FRAME", "MeleeStagePoolRoot", root, "", 0);
     BlzFrameSetLevel(this.poolRoot, 30);
     const poolBackdrop = createBackdrop("MeleeStagePoolBackdrop", this.poolRoot, 0);
@@ -116,11 +117,11 @@ export class StagePanel {
     placeTopLeft(poolBackdrop, f32(0.1), f32(0.49));
     BlzFrameSetSize(poolBackdrop, f32(0.6), f32(0.35));
     stageText(this.poolRoot, "MeleeStagePoolTitle", f32(0.14), f32(0.47), f32(0.4), f32(0.025), f32(0.016), "Stage pool");
-    this.clicks.add(stageButton(this.poolRoot, f32(0.575), f32(0.47), f32(0.085), f32(0.027), "Done"), { kind: "poolClose" });
-    this.poolMode = this.clicks.add(stageButton(this.poolRoot, f32(0.14), f32(0.425), f32(0.52), f32(0.027), ""), { kind: "poolMode" });
+    dialogButton(this.poolRoot, f32(0.575), f32(0.47), f32(0.085), f32(0.027), "Done", { kind: "poolClose" });
+    this.poolMode = dialogButton(this.poolRoot, f32(0.14), f32(0.425), f32(0.52), f32(0.027), "", { kind: "poolMode" });
     stageText(this.poolRoot, "MeleeStagePoolHelp", f32(0.14), f32(0.385), f32(0.52), f32(0.028), f32(0.009), "Choose stages for random matches.\nKeep at least one stage in the pool.");
-    this.poolStages = STAGE_CATALOG.map((stage, index) => this.clicks.add(
-      stageButton(this.poolRoot, f32(f32(0.14) + floorMod(index, 3) * f32(0.18)), f32(f32(0.34) - floorDiv(index, 3) * f32(0.045)), f32(0.16), f32(0.032), ""),
+    this.poolStages = STAGE_CATALOG.map((stage, index) => dialogButton(
+      this.poolRoot, f32(f32(0.14) + floorMod(index, 3) * f32(0.18)), f32(f32(0.34) - floorDiv(index, 3) * f32(0.045)), f32(0.16), f32(0.032), "",
       { kind: "poolStage", choice: stage.id },
     ));
     this.poolSummary = stageText(this.poolRoot, "MeleeStagePoolSummary", f32(0.14), f32(0.2), f32(0.52), f32(0.042), f32(0.009), "");
@@ -133,12 +134,10 @@ export class StagePanel {
       ? "Click a stage or move the stick.\nAny player can choose.\nA / Click: choose · Start: start · Click BACK: back"
       : "Click a stage or use movement controls.\nAny player can choose.\nY: start · Click BACK TO FIGHTERS: back";
     stageText(root, "MeleeStageHelp", f32(0.454), f32(0.119), f32(0.3), f32(0.025), f32(0.008), help);
-    this.startButton = this.clicks.add(stageButton(root, START_BUTTON.x, START_BUTTON.y, START_BUTTON.width, START_BUTTON.height, journal ? "START MATCH [A]" : "START MATCH"), { kind: "start" });
-    this.clicks.add(stageButton(root, f32(0.045), f32(0.082), f32(0.17), f32(0.037), journal ? "BACK" : "BACK TO FIGHTERS"), { kind: "back" });
-    this.hazardsToggle = stageButton(root, HAZARDS_BUTTON.x, HAZARDS_BUTTON.y, HAZARDS_BUTTON.width, HAZARDS_BUTTON.height, "");
-    this.clicks.add(this.hazardsToggle, { kind: "hazards" });
-    this.dropsToggle = stageButton(root, DROPS_BUTTON.x, DROPS_BUTTON.y, DROPS_BUTTON.width, DROPS_BUTTON.height, "");
-    this.clicks.add(this.dropsToggle, { kind: "drops" });
+    dialogButton(root, START_BUTTON.x, START_BUTTON.y, START_BUTTON.width, START_BUTTON.height, journal ? "START MATCH [A]" : "START MATCH", { kind: "start" });
+    dialogButton(root, f32(0.045), f32(0.082), f32(0.17), f32(0.037), journal ? "BACK" : "BACK TO FIGHTERS", { kind: "back" });
+    this.hazardsToggle = dialogButton(root, HAZARDS_BUTTON.x, HAZARDS_BUTTON.y, HAZARDS_BUTTON.width, HAZARDS_BUTTON.height, "", { kind: "hazards" });
+    this.dropsToggle = dialogButton(root, DROPS_BUTTON.x, DROPS_BUTTON.y, DROPS_BUTTON.width, DROPS_BUTTON.height, "", { kind: "drops" });
     this.sync = createSyncTrigger("ui.stage.drop", "stage-drop", PARTICIPANT_SLOTS, (sender, data) => {
       const choice = S2I(data);
       if (I2S(choice) === data && selectableStageChoice(choice)) this.actions.selectStage(sender, choice);
@@ -166,13 +165,10 @@ export class StagePanel {
   }
 
   private hover(button: StageButton | undefined): void {
-    if (button?.kind !== "start") highlightText(this.startButton, false);
     this.highlightStage(button?.kind === "stage" ? button.choice : undefined);
   }
 
-  // Entering stage selection focuses Start Match and puts the pointer on it.
   private focusStart(): void {
-    highlightText(this.startButton, true);
     const width = I2R(BlzGetLocalClientWidth());
     const height = I2R(BlzGetLocalClientHeight());
     if (width <= 0 || height <= 0) return;
