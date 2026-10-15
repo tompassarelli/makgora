@@ -125,6 +125,24 @@ function downSmash(): Authored {
   ] };
 }
 
+function backAir(): Authored {
+  const move = SHADOW_HUNTER_MOVES.normals[AttackStyle.backAir]!;
+  const c = move.startupFrames, total = move.totalFrames;
+  const legs: Gesture = { frontHip: -60, frontKnee: 85, frontFoot: 15, backHip: -35, backKnee: 80, backFoot: 15, beard: 80 };
+  const coil: Gesture = { ...legs, lunge: 6, lean: -6, chest: -14, head: 8, arm: -80, elbow: 70, wrist: 0, free: -40, freeElbow: 50 };
+  const thrust = (lean: number): Gesture => ({ ...legs, backHip: 45, backKnee: 20, backFoot: -20, cloth: -70, lean, chest: 8, head: -6, arm: -195, elbow: 0, wrist: 0, free: -70, freeElbow: 10 });
+  return { pose: "backAir", style: AttackStyle.backAir, airborne: true, phases: [
+    { frame: 0, gesture: READY },
+    { frame: c - 3, gesture: coil, tip: [35, 140] },
+    { frame: c - 1, gesture: { ...coil, arm: -100, elbow: 50 }, tip: [20, 145] },
+    { frame: c, gesture: { ...thrust(30), lunge: -10 }, tip: [-125, 30] },
+    { frame: c + 2, gesture: { ...thrust(34), lunge: -14 }, tip: [-150, 22] },
+    { frame: c + 8, gesture: { ...thrust(26), elbow: 20 }, tip: [-110, 32] },
+    { frame: c + 16, gesture: { ...legs, lean: 4, arm: -90, elbow: 40, free: -20, freeElbow: 40 } },
+    { frame: total, gesture: READY },
+  ] };
+}
+
 const hang = (action: Authored, drape = false): Authored => ({ ...action, phases: action.phases.map(phase => {
   const g = phase.gesture, cloth = g.cloth ?? 0.8 * Math.min(g.frontHip ?? 0, g.backHip ?? 0);
   return { ...phase, gesture: { ...g, beard: g.beard ?? Math.min(90, 3.5 * Math.max(0, (g.lean ?? 0) + (g.chest ?? 0) + (g.head ?? 0))), ...drape ? { cloth, clothTip: g.clothTip ?? 0.3 * cloth } : {} } };
@@ -134,6 +152,7 @@ const kicked = (make: () => Authored) => () => hang({ ...make(), ground: "sole" 
 
 const POSES: Readonly<Record<string, () => Authored>> = {
   neutralSpecial, jump, doubleJump, forwardSmash, downSmash,
+  backAir: draped(backAir),
 };
 
 function rotation(base: ArrayLike<number>, pitch: number, yaw = 0, roll = 0): Float32Array {
