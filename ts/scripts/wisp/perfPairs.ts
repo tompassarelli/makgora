@@ -7,9 +7,6 @@ export interface PairWorst {
   readonly allocatedKb: number;
 }
 
-// Five farm census runs of all 26 pairs (2026-10-10) gave identical worst-frame instructions and
-// allocation within 6.98% (kael'thas 31.5-33.7 KB); the fixture holds each pair's maximum and 10%
-// clears that spread with headroom (#405).
 export const PAIR_MARGIN = 0.1;
 
 const LINE = /^pair\t([^\t]+)\tinstructions=(\d+)\talloc-kb=(\d+(?:\.\d+)?)$/;

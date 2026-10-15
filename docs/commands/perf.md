@@ -33,12 +33,17 @@ The #168 budget gates p99 ≤ 10 ms and worst ≤ 14 ms; CI measures Classic wit
   (fighter vs the rifleman partner) worst frame, the most p0 Lua instructions
   and the most allocated KB over its moves after the first (the first move's
   start-up frames vary by up to 43% from run to run); `bun wisp perf compare
-  test/fixtures/perf/census-pairs.txt FILE` fails when any pair's worst frame
+  PRIOR_PAIRS FILE` fails when any pair's worst frame
   rises more than 10% (`PAIR_MARGIN` in smashcraft:ts/scripts/wisp/perfPairs.ts)
-  over the fixture, naming the pair. Pairs the run skipped are not judged; a
-  pair without a fixture row fails. The margin's source: five farm census runs
+  over the prior run, naming the pair. Pairs the run skipped are not judged; a
+  pair without a prior row fails. Background sweeps checks full roster coverage
+  and fetches pairs from a successful Background run on the nearest first-parent
+  main commit in the last 60 commits, excluding the current run. Without a prior
+  artifact it warns and passes drift comparison; coverage and absolute frame
+  budgets still apply. Joined pairs are uploaded after sweeps and census pass,
+  retained for 30 days, and used only once the whole Background run succeeds.
+  The margin's source: five farm census runs
   of all 26 pairs (2026-10-10) gave identical worst-frame instructions and
-  allocation within 6.98% (kael'thas 31.5–33.7 KB). After an intended rise or a cut, rewrite
-  the fixture with `--pairs` and commit it.
+  allocation within 6.98% (kael'thas 31.5–33.7 KB).
 
 Session rates (#564): the playable build writes `smashcraft-rates-LOAD-MINUTE.txt` into CustomMapData, one `r` line per real second (os.clock): tick callbacks, draw callbacks, dispatched events, simulation, speculative and confirmed frames, held and stalled callbacks, echo gap mean/max, Lua and tick microseconds, sync sends, input messages received (all and the local player's own echoes), the confirmed, known and speculative frames and the prediction window, paused callbacks, pause and pause-menu toggles and the longest real gap between ticks and Warcraft's game speed (`gs` as GetGameSpeed's index, measured as lobby Fast 2, Normal 1 and Slow 0; Normal runs 0.8 and Slow 0.6 of Fast's callbacks, and the map holds and locks Fast at load and every match start); every 10 s a `c` line of live/created triggers, timers, effects, sounds, frames and units, key-event and trigger registrations, actions, highest handle id and heap, an `e` line of the busiest events, an `l` line of live effects by model and an `s` line of live sounds by file and units by owning player, so a fighter's leaking effect shows by name. All of it is local and never synchronized. `bun scripts/wisp/sessionRates.ts [CUSTOM_MAP_DATA]` (default: Tom's Steam CustomMapData) prints per-minute rates per map load, flags pauses, menu toggles, game speeds other than Fast and long callback gaps (focus loss), checks the map clock against file times, and ends each load with a `fork:` line naming why simulation fell under 55/s (none, game speed, Warcraft callbacks render- or timer-bound, or echo wait) and the minute it began.
