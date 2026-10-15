@@ -33,6 +33,7 @@ const MODEL_INPUTS = ["build-inputs/", "tools/animations/", "ts/src/game/assets/
 
 
 const CUE_CHECK = "ts/scripts/cueModels.ts";
+const SUITE_INPUTS = [".github/workflows/farm-test.yml", ".github/workflows/autoland.yml", "ts/scripts/suiteParity.ts"];
 
 export function cueInputs(): Set<string> {
   const transpiler = new Bun.Transpiler({ loader: "ts" });
@@ -56,10 +57,14 @@ export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = 
   const animation = paths.some((path) => ANIMATION_INPUTS.some((input) => path === input || input.endsWith("/") && path.startsWith(input)));
   const models = paths.some((path) => MODEL_INPUTS.some((input) => path === input || input.endsWith("/") && path.startsWith(input)));
   const cueModels = touchesCueInputs(paths, cues);
+  const suites = paths.some((path) => SUITE_INPUTS.includes(path));
   return [
     ...(paths.length > 0 ? [{ name: "clean room", directory: "ts", args: ["scripts/cleanRoom.ts"], fix: "follow wisp:docs/clean-room.md and the line above." }] : []),
     ...(ts ? [
       { name: "kind tags and type-check ts", directory: "ts", args: ["run", "check"], fix: "end each refused test title with its kind tag (listed above) or delete the test; fix each type error." },
+    ] : []),
+    ...(suites ? [
+      { name: "Autoland suite covers the farm suite", directory: "ts", args: ["scripts/suiteParity.ts"], fix: "give Autoland's suite every farm-test job and input, since safe-push hands a lane to Autoland without its own farm run (smashcraft:docs/ci.md, \"Autoland\")." },
     ] : []),
     ...(models ? [
       { name: "generated models stored", directory: "ts", args: ["scripts/storedModels.ts"], fix: "store the regenerated family (smashcraft:docs/build-inputs.md, \"Change art\")." },
@@ -157,7 +162,17 @@ const mainRedNotice = run(["gh", "issue", "list", "--state", "open", "--search",
 );
 
 
-export const prePush = (input: string) => Effect.gen(function*() {
+const WORKFLOWS = ".github/workflows/";
+
+export function autolandLands(queue: string, paths: readonly string[]): boolean {
+  return queue === "autoland" && !paths.some((path) => path.startsWith(WORKFLOWS));
+}
+
+const landingQueue = run(["git", "config", "--file", join(root, ".safe-push"), "--default", "", "landing.queue"], root).pipe(
+  Effect.map(({ exitCode, stdout }) => (exitCode === 0 ? stdout.trim() : "")),
+);
+
+export const prePush = (input: string, landing = { gate: farmGate, queue: landingQueue }) => Effect.gen(function*() {
   yield* mainRedNotice;
   const pushed = input.split("\n").flatMap((line) => {
     const [, local, remoteRef, remote] = line.trim().split(/\s+/);
@@ -183,7 +198,9 @@ export const prePush = (input: string) => Effect.gen(function*() {
     }
     yield* Console.error(`pre-push: ${name} passed (${seconds} s)`);
   }
-  if (toMain) yield* farmGate(head);
+  if (!toMain) return;
+  if (autolandLands(yield* landing.queue, paths)) return yield* Console.error("pre-push: Autoland runs the farm suite on the rebased candidate before it lands, so this push waits for no farm run");
+  yield* landing.gate(head);
 });
 
 

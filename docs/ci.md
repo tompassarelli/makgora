@@ -17,7 +17,9 @@
 Autoland is main's one landing queue. Cloud workers push to `claude/NAME`;
 `safe-push --to main` checks a local lane, pushes it to
 `claude/land-LANE-SHA` and waits for its verdict (the repository's
-.safe-push sets `landing.queue = autoland`). Nobody else pushes main, so no
+.safe-push sets `landing.queue = autoland`); its pre-push gate runs no farm
+suite for that hand-off, since Autoland's suite covers every farm-test job
+(smashcraft:ts/scripts/suiteParity.ts). Nobody else pushes main, so no
 landing restarts another's suites.
 
 1. **Queue.** A push marks the branch tip with a pending `autoland` commit
