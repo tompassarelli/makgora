@@ -1,5 +1,5 @@
 import { Character } from "../src/game/sim/codes";
-import { SpecialForm, SpecialSlot, specialForm, specialKit } from "../src/game/sim/heroSpecials";
+import { SpecialForm, SpecialSlot, specialForm, specialKit } from "../src/game/sim/specials/schema";
 import { SELECTABLE_CHARACTERS, fighterName, heroDefinition } from "../src/game/sim/heroes/registry";
 import { fighterKit } from "../src/game/sim/moveNames";
 import { upSpecialRoute } from "../src/game/match/recoveryEnvelope";

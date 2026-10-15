@@ -33,7 +33,7 @@ import { ELEMENTS, elementLook } from "../../src/game/presentation/elementLooks"
 import { allCueModels, MISSING_CUE_MODEL } from "../../src/game/presentation/specialCues";
 import { allAttackCueModels } from "../../src/game/presentation/attackCues";
 import { Character } from "../../src/game/sim/codes";
-import type { AuthoredSpecial } from "../../src/game/sim/heroSpecials";
+import type { AuthoredSpecial } from "../../src/game/sim/specials/schema";
 import { HERO_ROSTER } from "../../src/game/sim/heroes/registry";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { stageBounds } from "../../src/game/sim/stageBounds";

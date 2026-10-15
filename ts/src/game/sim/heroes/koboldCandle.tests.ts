@@ -3,7 +3,7 @@ import { assertEquals, assertFalse, assertGreaterThan, assertNear, assertTrue, t
 import { CandleState, Character, ContactKind, SpecialAction } from "../codes";
 import { collectDamageContact } from "../contacts";
 import { type Fighter, createFighter } from "../fighter";
-import { runningHeroSpecial } from "../heroSpecialRules";
+import { runningHeroSpecial } from "../specials/engine";
 import { type Controls, type Roster, createRoster, fighterAt } from "../roster";
 import { mainDeckZAt, surfaceLeft, surfaceRight, surfaceZAt } from "../stage";
 import { duelPair, stepDuel } from "../testDuel";

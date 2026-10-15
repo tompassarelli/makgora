@@ -1,7 +1,7 @@
 import { withExKit } from "../exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
 import { HERO_REFERENCE_HEIGHT } from "../heroMoves";
-import { frames, type AuthoredSpecial, type FighterSpecials, type SpecialProjectile } from "../heroSpecials";
+import { frames, type AuthoredSpecial, type FighterSpecials, type SpecialProjectile } from "../specials/schema";
 import { jainaCastBody, jainaHit } from "./jainaMoves";
 
 const h = (n: number) => f32(HERO_REFERENCE_HEIGHT * f32(n));

@@ -24,7 +24,7 @@ import { produceScenarioComputerInput } from "../shell/scenarios";
 import { type Fighter, placedObject, PROJECTILE_CAPACITY } from "../sim/fighter";
 import { mutableProjectile } from "../sim/fighterProjectiles";
 import { initializeInfluenceOperands } from "../sim/influenceOperands";
-import type { AuthoredSpecial, FighterSpecials, SpecialPlacement, SpecialProjectile } from "../sim/heroSpecials";
+import type { AuthoredSpecial, FighterSpecials, SpecialPlacement, SpecialProjectile } from "../sim/specials/schema";
 import { type Roster, createRoster, fighterAt, isActive } from "../sim/roster";
 import { authoredTuning } from "../sim/tuning";
 import { canonicalState, fighterSpecialsCanonical, specialPlacementCanonical, specialProjectileCanonical, stateChecksum } from "./canonical";

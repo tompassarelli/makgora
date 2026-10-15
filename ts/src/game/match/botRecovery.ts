@@ -2,7 +2,7 @@
 
 
 import { lavaLeft, lavaRight, overLava } from "../sim/lava";
-import { runningHeroSpecial, specialCooldownReady } from "../sim/heroSpecialRules";
+import { runningHeroSpecial, specialCooldownReady } from "../sim/specials/engine";
 import { upSpecialStartable } from "./botHeroKit";
 import { at } from "wisp/src/runtime/lookup";
 import { f32 } from "wisp/src/sim/f32";

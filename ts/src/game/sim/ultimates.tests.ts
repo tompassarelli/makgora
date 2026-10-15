@@ -21,7 +21,7 @@ import { ROSTER_MANA } from "./mana";
 import { type Controls, copyControls, createRoster } from "./roster";
 import { controls } from "./testWorld";
 import { FIGHTER_ULTIMATES, ULTIMATE_REACH } from "./ultimates";
-import type { AuthoredSpecial } from "./heroSpecials";
+import type { AuthoredSpecial } from "./specials/schema";
 import { firstStateDifference } from "../replay/difference";
 import { stateChecksum } from "../replay/canonical";
 import { type ReplayState, copyReplayState, createReplaySnapshot } from "../replay/snapshot";

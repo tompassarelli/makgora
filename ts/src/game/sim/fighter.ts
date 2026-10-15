@@ -25,7 +25,7 @@ import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { type FighterTuning, authoredTuning } from "./tuning";
 import { HitElement } from "./hitRegions";
 import { initializeInfluenceOperands } from "./influenceOperands";
-import type { SpecialPlacement, SpecialProjectile } from "./heroSpecials";
+import type { SpecialPlacement, SpecialProjectile } from "./specials/schema";
 
 export const PROJECTILE_CAPACITY = 16;
 export const SHIELD_MAX = 60.0;

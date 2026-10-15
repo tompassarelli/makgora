@@ -10,7 +10,7 @@ import { Character, ProjectileKind } from "../sim/codes";
 import type { Projectile } from "../sim/fighter";
 import { HERO_ROSTER, heroDefinition } from "../sim/heroes/registry";
 import { FIGHTER_ULTIMATES } from "../sim/ultimates";
-import type { AuthoredSpecial, FighterSpecials, SpecialProjectile } from "../sim/heroSpecials";
+import type { AuthoredSpecial, FighterSpecials, SpecialProjectile } from "../sim/specials/schema";
 import type { CueBirth } from "./specialCues";
 
 

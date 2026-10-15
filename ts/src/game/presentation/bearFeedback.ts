@@ -1,6 +1,6 @@
 import { Character } from "../sim/codes";
 import { type Fighter, placedObject } from "../sim/fighter";
-import { CompanionMode } from "../sim/heroSpecials";
+import { CompanionMode } from "../sim/specials/schema";
 
 export type BearState = "FOLLOWING" | "CHARGING" | "ATTACKING" | "RESTING";
 

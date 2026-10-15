@@ -14,7 +14,7 @@ data record; the simulation, replay, selection and object data read it.
   (`sim/heroes/hero.ts`): product name, purpose, weakness, optional `ultimate`
   (official name and one line), `moves`
   (`FighterMoves`, `sim/heroMoves.ts`), `specials` (`FighterSpecials`,
-  `sim/heroSpecials.ts`), presentation (Warcraft model, object
+  `sim/specials/schema.ts`), presentation (Warcraft model, object
   code, portrait, projectile model, per-pose clips with a fallback) and
   `complete`.
 - `ts/src/game/sim/heroes/heroBodies.ts` holds the roster's weight, run,
@@ -158,7 +158,7 @@ A projectile's optional `pool` (Defile) keeps it alive through its hits: it wait
 frames between strikes and widens by `growth` per body hit up to `maxRadius`;
 its hit count and wait are projectile rollback state.
 
-`sim/heroSpecialRules.ts` executes them: `chooseHeroSpecial` selects the
+`sim/specials/engine.ts` executes them: `chooseHeroSpecial` selects the
 form, `enterHeroSpecial` spends and records the entry, `advanceHeroSpecial`
 runs one frame, `heroSpecialContact` selects strikes and `landHeroSpecial`
 ends a form with landing lag. A kit field a hero needs and this list lacks is

@@ -11,7 +11,7 @@ import { copyFighterState } from "../../generated/state/fighterState";
 import { firstFighterDifference } from "../replay/difference";
 import { grantParry } from "./shield";
 import { dealtManaGain } from "./mana";
-import { resetSpecialOnStock } from "./heroSpecialRules";
+import { resetSpecialOnStock } from "./specials/engine";
 import { clearSpecialOnStock } from "./transitions";
 
 const roster: readonly Character[] = [Character.rifleman, Character.demonHunter, ...HERO_ROSTER.map(hero => hero.character)];

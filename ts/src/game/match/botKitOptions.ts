@@ -17,9 +17,9 @@ import { exSpecialAffordable } from "../sim/exSpecials";
 import { type Fighter, placedObject } from "../sim/fighter";
 import { type AttackBuffer, queueAttack } from "../input/attackBuffer";
 import { attackStartupFrames, characterAttackActiveFrames } from "../sim/moves";
-import { companionReady, isHeroSpecialAction, runningHeroSpecial, specialCooldownReady } from "../sim/heroSpecialRules";
+import { companionReady, isHeroSpecialAction, runningHeroSpecial, specialCooldownReady } from "../sim/specials/engine";
 import { heroStatusBlocksActions } from "../sim/heroStatus";
-import { type AuthoredSpecial, type SpecialFollowUp, type SpecialProjectile, CompanionOrder, FOLLOW_UP_FORM, FollowUpInput, SpecialSlot, specialKit } from "../sim/heroSpecials";
+import { type AuthoredSpecial, type SpecialFollowUp, type SpecialProjectile, CompanionOrder, FOLLOW_UP_FORM, FollowUpInput, SpecialSlot, specialKit } from "../sim/specials/schema";
 import type { Controls } from "../sim/roster";
 import {
   FEL_RUSH_BRANCH_FIRST, FEL_RUSH_BRANCH_LAST, FEL_RUSH_SPEED, FEL_RUSH_FIRST, FEL_RUSH_LAST, DEMONHUNTER_GLIDE_FIRST, DEMONHUNTER_GLIDE_FORM, DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP, DEMONHUNTER_WING_DURATION,

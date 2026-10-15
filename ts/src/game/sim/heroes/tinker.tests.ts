@@ -12,7 +12,7 @@ import { createReferenceContactFighter } from "../referenceRig";
 import { controls } from "../testWorld";
 import { AUTHORED_PHYSICS, melee } from "../tuning";
 import { duelPair, stepDuel } from "../testDuel";
-import { BEAM_MIN_AHEAD, advanceHeroSpecial, beamSegment } from "../heroSpecialRules";
+import { BEAM_MIN_AHEAD, advanceHeroSpecial, beamSegment } from "../specials/engine";
 import { fightersApart } from "../../replay/scopedRepair";
 import { createRoster } from "../roster";
 import { shieldCenterX, shieldCenterZ } from "../shieldTilt";

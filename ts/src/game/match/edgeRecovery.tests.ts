@@ -7,7 +7,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { sweep } from "../../runtime/sweep";
 import { Character, LedgeState, SpecialAction } from "../sim/codes";
 import { ledgeCatchBox } from "../sim/ledge";
-import { runningHeroSpecial } from "../sim/heroSpecialRules";
+import { runningHeroSpecial } from "../sim/specials/engine";
 import { WARDEN_SPECIALS } from "../sim/heroes/wardenSpecials";
 import { TOMB_OF_SARGERAS_STAGE, mainDeckRight, surfaceZ } from "../sim/stage";
 import { bodyTop, insideMainDeckBody } from "../sim/surfaces";

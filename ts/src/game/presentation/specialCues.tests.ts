@@ -8,7 +8,7 @@ import { MOUNTAIN_KING_SPECIALS } from "../sim/heroes/mountainKingSpecials";
 import { Character, SpecialAction } from "../sim/codes";
 import { createFighter } from "../sim/fighter";
 import { HERO_ROSTER } from "../sim/heroes/registry";
-import { type AuthoredSpecial } from "../sim/heroSpecials";
+import { type AuthoredSpecial } from "../sim/specials/schema";
 import { SPECIAL_SLOTS } from "./projectileArt";
 import { RIFLEMAN_BLASTER_AIR_SHOT_FRAME, RIFLEMAN_BLASTER_GROUND_SHOT_FRAME } from "../sim/moves";
 import { RIFLEMAN_SECOND_SHOT_FIRST, RIFLEMAN_SECOND_SHOT_FORM, RIFLEMAN_SECOND_SHOT_LAST } from "../sim/specials";

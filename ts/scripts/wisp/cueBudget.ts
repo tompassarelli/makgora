@@ -16,7 +16,7 @@ import { DISJOINT_CUES, disjointNormals } from "../../src/game/presentation/disj
 import { ATTACK_CUES } from "../../src/game/presentation/attackCues";
 import { arenaFarZ, ARENA_CAMERA, FLOOR_HEIGHT, PLAYABLE_BOUNDS, cameraFieldOfView, extremeCamera } from "../../src/game/presentation/arenaCamera";
 import { ACTIVE_CUE_FRAMES, type Cue, ORIGINAL_ACTIONS, ORIGINAL_BRANCH_CUES, specialCueState } from "../../src/game/presentation/specialCues";
-import { FOLLOW_UP_FORM, SpecialForm, specialForm, specialKit } from "../../src/game/sim/heroSpecials";
+import { FOLLOW_UP_FORM, SpecialForm, specialForm, specialKit } from "../../src/game/sim/specials/schema";
 import { DEFINITIVE_CUE_EMITTERS } from "../../src/game/presentation/cueEmitterInfo";
 import { SpecialCueEffects } from "../../src/game/render/specialCueEffects";
 import { SpecialEffects } from "../../src/game/render/specialEffects";
@@ -30,7 +30,7 @@ import { AttackPhase, AttackStyle, Character, ContactKind, DownState, SpecialAct
 import { attackPhase } from "../../src/game/sim/conditions";
 import { beginDamageContacts, finishDamageContacts, queueDamageContact } from "../../src/game/sim/contacts";
 import { type Fighter, createFighter } from "../../src/game/sim/fighter";
-import { advanceHeroStatus, enterFollowUp, runningHeroSpecial } from "../../src/game/sim/heroSpecialRules";
+import { advanceHeroStatus, enterFollowUp, runningHeroSpecial } from "../../src/game/sim/specials/engine";
 import { fighterSlug } from "../../src/game/sim/heroes/registry";
 import { isAerialAttack } from "../../src/game/sim/moves";
 import { createMatchCamera, MATCH_CAMERA_ASPECT } from "../../src/game/sim/matchCamera";

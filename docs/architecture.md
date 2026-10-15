@@ -37,7 +37,7 @@ Known breaks still in the tree (removed by slices, never copied): `*Hero.ts` imp
 |---|---|---|
 | Frame data, hitbox or hurtbox of a normal | `ts/src/game/sim/heroes/<fighter>Moves.ts` (shared rows: `ts/src/game/sim/heroes/groundNormals.ts`) | `fighters/<slug>/moves.ts` in S8 |
 | A special move's data | `ts/src/game/sim/heroes/<fighter>Specials.ts` | `fighters/<slug>/specials.ts` in S8 |
-| Special engine, types, per-fighter branches | `ts/src/game/sim/heroSpecialRules.ts`, `ts/src/game/sim/heroSpecials.ts`, `ts/src/game/sim/specials.ts` | `sim/specials/` in S9c; branches become kit hooks in S13 |
+| Special engine, types, per-fighter branches | `ts/src/game/sim/specials/engine.ts`, `ts/src/game/sim/specials/schema.ts`, `ts/src/game/sim/specials.ts` | `sim/specials/` in S9c; branches become kit hooks in S13 |
 | Ultimate | `ts/src/game/sim/ultimates.ts` | `fighters/<slug>/ultimate.ts` in S7b |
 | Fighter body, strong hits, identity traits | `ts/src/game/sim/heroes/heroBodies.ts`, `ts/src/game/sim/strongHitTable.ts`, `ts/src/game/sim/identityTraits.ts` | `fighters/<slug>/kit.ts` in S7c |
 | Fighter definition (name, kit wiring) | `ts/src/game/sim/heroes/<fighter>Hero.ts` | `fighters/<slug>/kit.ts` in S8 |

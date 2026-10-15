@@ -11,7 +11,7 @@ import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import type { BotObservationFrame } from "../match/botPerception";
 import { AttackStyle, GrabAction, LAST_ATTACK_STYLE } from "../sim/codes";
 import type { FighterMoves } from "../sim/heroMoves";
-import type { AuthoredSpecial, FighterSpecials, SpecialPlacement, SpecialProjectile } from "../sim/heroSpecials";
+import type { AuthoredSpecial, FighterSpecials, SpecialPlacement, SpecialProjectile } from "../sim/specials/schema";
 import type { HitEffect } from "../sim/hitRegions";
 import { type HurtPart, HurtState } from "../sim/hurtboxes";
 import { writeMatchItems } from "../match/items";

@@ -8,7 +8,7 @@ import { AttackStyle, Character } from "./codes";
 import { attackDurationFramesForGrounding, attackStartupFrames } from "./moves";
 import type { Roster } from "./roster";
 import type { FighterMoves } from "./heroMoves";
-import type { AuthoredSpecial, FighterSpecials } from "./heroSpecials";
+import type { AuthoredSpecial, FighterSpecials } from "./specials/schema";
 import { FIGHTER_ULTIMATES } from "./ultimates";
 import { fighterShield, heroBody } from "./heroes/heroBodies";
 import { heroDefinition } from "./heroes/registry";

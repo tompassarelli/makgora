@@ -11,11 +11,11 @@ import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { AttackStyle } from "../sim/codes";
 import { moveTier } from "./moveTiers";
 import { hasImpactSound, specialMove, specialSlot } from "./moveSounds";
-import { runningHeroSpecial } from "../sim/heroSpecialRules";
+import { runningHeroSpecial } from "../sim/specials/engine";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { ProjectileKind, SpecialAction } from "../sim/codes";
 import { heroDefinition } from "../sim/heroes/registry";
-import { type AuthoredSpecial, type SpecialProjectile, specialKit } from "../sim/heroSpecials";
+import { type AuthoredSpecial, type SpecialProjectile, specialKit } from "../sim/specials/schema";
 
 
 export const ImpactLanding = { none: 0, tech: 1, missedTech: 2 } as const;

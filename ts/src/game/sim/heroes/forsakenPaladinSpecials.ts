@@ -7,7 +7,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { HitElement } from "../codes";
 import { CHILL } from "../chill";
 import { HERO_REFERENCE_HEIGHT, heroRegion } from "../heroMoves";
-import { type AuthoredSpecial, type FighterSpecials, type SpecialKit, frames } from "../heroSpecials";
+import { type AuthoredSpecial, type FighterSpecials, type SpecialKit, frames } from "../specials/schema";
 import { hurtPose } from "../hurtboxes";
 import { MEDIUM, capsule, hit, forsakenPaladinReach } from "./forsakenPaladinMoves";
 import { forsakenWeaponRegions } from "./forsakenPaladinWeaponGeometry";

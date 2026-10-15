@@ -22,7 +22,7 @@ import type { Fighter } from "../sim/fighter";
 import { DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP, DEMONHUNTER_MANA_BURN_STARTUP, EYE_BLAST_FORM, FLAME_CRASH_BURST_LAST, FLAME_CRASH_LANDING_FORM } from "../sim/specials";
 import { EYE_BLAST_MARKS, eyeBlastMark } from "../presentation/eyeBlastMarker";
 import { type ParkedFlags, STOCK_MODELS, type WorldOrigin, facingYaw, parkOnce, placeEffect } from "./effects";
-import { beamSegment, runningHeroSpecial } from "../sim/heroSpecialRules";
+import { beamSegment, runningHeroSpecial } from "../sim/specials/engine";
 import { emptyCapsule } from "../physics/contactGeometry";
 import { specialAreaRegion } from "../presentation/disjointCues";
 import { characterModelScale } from "../presentation/modelScale";

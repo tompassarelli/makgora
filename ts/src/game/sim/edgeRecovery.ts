@@ -4,7 +4,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { HERO_REFERENCE_HEIGHT } from "./heroMoves";
 import type { Fighter } from "./fighter";
-import { runningHeroSpecial } from "./heroSpecialRules";
+import { runningHeroSpecial } from "./specials/engine";
 import { isUpSpecialAction, snapToLedge } from "./ledge";
 import { setWorldMotionValue } from "./motion";
 import type { Roster } from "./roster";

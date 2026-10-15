@@ -2,8 +2,8 @@ import { assertEquals, assertGreaterThan, assertNear, assertTrue, test } from "w
 import { f32 } from "wisp/src/sim/f32";
 import { Character, SpecialAction } from "../codes";
 import { createFighter, type Fighter } from "../fighter";
-import { SpecialForm, SpecialSlot } from "../heroSpecials";
-import { advanceHeroSpecial, enterHeroSpecial, runningHeroSpecial } from "../heroSpecialRules";
+import { SpecialForm, SpecialSlot } from "../specials/schema";
+import { advanceHeroSpecial, enterHeroSpecial, runningHeroSpecial } from "../specials/engine";
 import { updateProjectiles } from "../projectiles";
 import { createRoster } from "../roster";
 import { startFighterSpecial } from "../specials";

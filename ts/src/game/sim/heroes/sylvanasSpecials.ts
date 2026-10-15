@@ -2,7 +2,7 @@ import { withExKit } from "../exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
 import { HeroStatusGroup, HeroStatusKind } from "../codes";
 import { HERO_REFERENCE_HEIGHT, heroRegion } from "../heroMoves";
-import { type AuthoredSpecial, type FighterSpecials, frames } from "../heroSpecials";
+import { type AuthoredSpecial, type FighterSpecials, frames } from "../specials/schema";
 import { hurtPose } from "../hurtboxes";
 import { sylvanasHit, sylvanasReach, sylvanasStrike } from "./sylvanasMoves";
 

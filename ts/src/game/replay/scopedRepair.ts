@@ -21,11 +21,11 @@ import type { FighterMoves, StrikeCapsule } from "../sim/heroMoves";
 import { attackCapsule, emptyCapsule, hurtCapsule } from "../physics/contactGeometry";
 import { type HitRegion, authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../sim/hitRegions";
 import { type HurtPart, type HurtPose, shippedHurtboxes } from "../sim/hurtboxes";
-import type { AuthoredSpecial } from "../sim/heroSpecials";
+import type { AuthoredSpecial } from "../sim/specials/schema";
 import { SMASH_MAX_CHARGE_FRAMES, attackStartupFrames, characterAttackActiveFrames } from "../sim/moves";
 import { felLungeStep } from "../sim/moves";
 import { EYE_BLAST_FORM, EYE_BLAST_REACH } from "../sim/specials";
-import { runningHeroSpecial } from "../sim/heroSpecialRules";
+import { runningHeroSpecial } from "../sim/specials/engine";
 import { shieldReach } from "../sim/shieldTilt";
 
 interface AuthoredTravel {

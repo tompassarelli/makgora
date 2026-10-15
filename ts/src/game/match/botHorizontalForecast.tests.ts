@@ -6,7 +6,7 @@ import { neutralControls } from "../sim/roster";
 import { aheadX, chooseAttack } from "./botMoves";
 import { perceivedCpuSkill } from "./cpuSkill";
 import { heroSpecialUse } from "./botHeroKit";
-import { SpecialSlot } from "../sim/heroSpecials";
+import { SpecialSlot } from "../sim/specials/schema";
 import { SELECTABLE_CHARACTERS } from "../sim/heroes/registry";
 
 test("twenty attack choices from a delayed moving target match its current-position reference [k2 property]", () => {

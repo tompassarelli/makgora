@@ -1,6 +1,6 @@
 import { withExKit } from "../exSpecialAuthoring";
 import { heroRegion } from "../heroMoves";
-import { frames, type AuthoredSpecial, type FighterSpecials } from "../heroSpecials";
+import { frames, type AuthoredSpecial, type FighterSpecials } from "../specials/schema";
 import { gromHit } from "./gromMoves";
 import { hurtPart, hurtPose } from "../hurtboxes";
 const cry: AuthoredSpecial = { endFrame: 34, hurt: [hurtPose(1, 12, [hurtPart(3.0, 27.0, -37.0, 171.0, 26.0)]), hurtPose(13, 33, [hurtPart(5.0, 27.0, -15.0, 173.0, 18.0)])], regions: [heroRegion(12, 15, { x1: -44.0, z1: 48.0, x2: 44.0, z2: 48.0, radius: 38.0 }, gromHit(5.068727970123291, 80, 72.46424102783203, 37.79999923706055))] };

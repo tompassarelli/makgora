@@ -1,5 +1,5 @@
 import { heroRegion } from "../heroMoves";
-import { frames, type AuthoredSpecial, type FighterSpecials } from "../heroSpecials";
+import { frames, type AuthoredSpecial, type FighterSpecials } from "../specials/schema";
 import { medivhHit } from "./medivhMoves";
 
 const omen = (ex: boolean): AuthoredSpecial => ({

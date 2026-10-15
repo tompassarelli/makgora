@@ -3,7 +3,7 @@ import { withExKit } from "../exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
 import { HeroStatusGroup, HeroStatusKind, HitElement } from "../codes";
 import { HERO_REFERENCE_HEIGHT } from "../heroMoves";
-import { type AuthoredSpecial, CompanionOrder, type FighterSpecials, type SpecialCompanion, type SpecialMotion, type SpecialPlacement, type SpecialProjectile, frames } from "../heroSpecials";
+import { type AuthoredSpecial, CompanionOrder, type FighterSpecials, type SpecialCompanion, type SpecialMotion, type SpecialPlacement, type SpecialProjectile, frames } from "../specials/schema";
 import { capsule, hit } from "./beastmasterMoves";
 import type { AppliedStatus } from "../heroStatus";
 

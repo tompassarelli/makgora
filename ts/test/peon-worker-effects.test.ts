@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { Character, SpecialAction } from "../src/game/sim/codes";
-import { SpecialForm } from "../src/game/sim/heroSpecials";
+import { SpecialForm } from "../src/game/sim/specials/schema";
 import { fighterAt } from "../src/game/sim/roster";
 import { ROSTER_MANA } from "../src/game/sim/mana";
 import { executeNext, testMatch } from "../src/game/match/testMatch";

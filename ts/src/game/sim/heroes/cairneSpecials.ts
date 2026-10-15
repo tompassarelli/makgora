@@ -1,7 +1,7 @@
 import { withExKit } from "../exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
 import { heroRegion } from "../heroMoves";
-import { frames, type AuthoredSpecial, type FighterSpecials, type SpecialProjectile } from "../heroSpecials";
+import { frames, type AuthoredSpecial, type FighterSpecials, type SpecialProjectile } from "../specials/schema";
 import { hurtPart } from "../hurtboxes";
 import { NO_LAUNCH, cairneCapsule as c, cairneHit as hit, cairneHurtPose } from "./cairneMoves";
 

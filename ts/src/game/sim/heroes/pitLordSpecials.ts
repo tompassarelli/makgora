@@ -5,7 +5,7 @@ import { withExKit } from "../exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
 import { HitElement } from "../codes";
 import { HERO_REFERENCE_HEIGHT, heroRegion } from "../heroMoves";
-import { type AuthoredSpecial, type FighterSpecials, type SpecialMotion, type SpecialProjectile, frames } from "../heroSpecials";
+import { type AuthoredSpecial, type FighterSpecials, type SpecialMotion, type SpecialProjectile, frames } from "../specials/schema";
 import { hurtPart, hurtPose } from "../hurtboxes";
 import { capsule, hit } from "./pitLordMoves";
 

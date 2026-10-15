@@ -17,7 +17,7 @@ authoring values, not measured balance; the #105 balance pass tunes them and
 Tom can veto any of them.
 
 Sources: smashcraft:ts/src/game/sim/heroes/ (each kit's `*Specials.ts`) and
-the hero special engine, smashcraft:ts/src/game/sim/heroSpecialRules.ts.
+the hero special engine, smashcraft:ts/src/game/sim/specials/engine.ts.
 
 ## How the moves are scored
 

@@ -10,7 +10,7 @@ import type { Fighter } from "../sim/fighter";
 import { attackStartupFrames, characterAttackActiveFrames, RIFLEMAN_BLASTER_AIR_SHOT_FRAME, RIFLEMAN_BLASTER_GROUND_FRAMES, RIFLEMAN_BLASTER_GROUND_SHOT_FRAME } from "../sim/moves";
 import type { Controls } from "../sim/roster";
 import { DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP, DEMONHUNTER_MANA_BURN_HEIGHT, DEMONHUNTER_MANA_BURN_LIFETIME, DEMONHUNTER_MANA_BURN_SPEED, DEMONHUNTER_MANA_BURN_STARTUP } from "../sim/specials";
-import { runningHeroSpecial } from "../sim/heroSpecialRules";
+import { runningHeroSpecial } from "../sim/specials/engine";
 import { BLASTER_AIR_SHOT_HEIGHT, BLASTER_PROJECTILE_HEIGHT, BLASTER_PROJECTILE_LIFETIME, BLASTER_PROJECTILE_RADIUS, BLASTER_PROJECTILE_SPAWN_OFFSET, BLASTER_PROJECTILE_SPEED, } from "../sim/projectiles";
 import { hurtCapsule } from "../physics/contactGeometry";
 import { deckUnder, heightAhead, safeAt } from "./botFooting";

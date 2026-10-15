@@ -21,7 +21,7 @@ import {
 } from "./transitions";
 
 import { stageBounds } from "./stageBounds";
-import { resetSpecialOnStock } from "./heroSpecialRules";
+import { resetSpecialOnStock } from "./specials/engine";
 import { clearHeroStatus } from "./heroStatus";
 import { endItemBuff, groundedJumps } from "./itemBuffs";
 import { resetCandle } from "./heroes/koboldCandle";

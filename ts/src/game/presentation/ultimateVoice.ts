@@ -1,5 +1,5 @@
 import { Character, ItemKind, SpecialAction } from "../sim/codes";
-import type { SpecialProjectile } from "../sim/heroSpecials";
+import type { SpecialProjectile } from "../sim/specials/schema";
 import { FIGHTER_ULTIMATES } from "../sim/ultimates";
 import { AVATAR_MODEL } from "./itemLook";
 

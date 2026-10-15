@@ -8,7 +8,7 @@ import { SpecialAction } from "./codes";
 import type { NamedMove } from "./heroes/hero";
 import { heroDefinition } from "./heroes/registry";
 import type { FighterMoves } from "./heroMoves";
-import { FOLLOW_UP_FORM, type AuthoredSpecial, type SpecialKit, SpecialForm, SpecialSlot, specialForm, specialKit } from "./heroSpecials";
+import { FOLLOW_UP_FORM, type AuthoredSpecial, type SpecialKit, SpecialForm, SpecialSlot, specialForm, specialKit } from "./specials/schema";
 import { ORIGINAL_KITS } from "./originalKits";
 import { ultimateText } from "./ultimates";
 

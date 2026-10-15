@@ -1,7 +1,7 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { Character } from "../sim/codes";
 import { HERO_ROSTER } from "../sim/heroes/registry";
-import { type AuthoredSpecial } from "../sim/heroSpecials";
+import { type AuthoredSpecial } from "../sim/specials/schema";
 import { SPECIAL_SLOTS } from "./projectileArt";
 import { FIGHTER_ULTIMATES } from "../sim/ultimates";
 import { AVATAR_CAST, isVoicedModel, ultimateVoiceCues } from "./ultimateVoice";

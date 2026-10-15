@@ -2,7 +2,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { withExKit } from "../exSpecialAuthoring";
 import { HitElement } from "../codes";
 import { heroRegion, type MoveRegion } from "../heroMoves";
-import { frames, type AuthoredSpecial, type FighterSpecials, type SpecialProjectile } from "../heroSpecials";
+import { frames, type AuthoredSpecial, type FighterSpecials, type SpecialProjectile } from "../specials/schema";
 import { claw, tinkerHit } from "./tinkerMoves";
 
 const rocket = (spawnFrame: number): SpecialProjectile => ({

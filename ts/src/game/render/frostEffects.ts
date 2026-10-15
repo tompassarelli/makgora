@@ -5,7 +5,7 @@ import { FROST_ICE_MODEL, FROST_TRAP_MODEL } from "../../generated/assets/frostA
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { f32 } from "wisp/src/sim/f32";
 import { Character, SpecialAction } from "../sim/codes";
-import { SpecialForm } from "../sim/heroSpecials";
+import { SpecialForm } from "../sim/specials/schema";
 import type { Fighter } from "../sim/fighter";
 import { FROST_ARMOR_SHELL_MODEL } from "../presentation/specialCues";
 import { type ParkedFlags, type WorldOrigin, parkOnce, placeEffect } from "./effects";

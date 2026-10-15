@@ -5,7 +5,7 @@ import { at } from "wisp/src/runtime/lookup";
 import { f32 } from "wisp/src/sim/f32";
 import { type Capsule, capsulesIntersect, emptyCapsule, hurtCapsule, placeCapsule } from "../physics/contactGeometry";
 import { AttackStyle, Character, SpecialAction } from "./codes";
-import { specialForm, specialKit, ultimateForm } from "./heroSpecials";
+import { specialForm, specialKit, ultimateForm } from "./specials/schema";
 import { fighterPoseFacing } from "./conditions";
 import type { Fighter } from "./fighter";
 import type { FighterMoves } from "./heroMoves";

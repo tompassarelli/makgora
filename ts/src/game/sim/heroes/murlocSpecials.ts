@@ -3,7 +3,7 @@ import { withExKit } from "../exSpecialAuthoring";
 import { HeroStatusGroup, HeroStatusKind, HitElement } from "../codes";
 import { CHILL } from "../chill";
 import { heroRegion } from "../heroMoves";
-import { frames, type AuthoredSpecial, type FighterSpecials } from "../heroSpecials";
+import { frames, type AuthoredSpecial, type FighterSpecials } from "../specials/schema";
 import type { AppliedStatus } from "../heroStatus";
 import { murlocHit } from "./murlocMoves";
 

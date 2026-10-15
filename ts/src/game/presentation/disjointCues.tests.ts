@@ -9,7 +9,7 @@ import { attackDurationFramesForGrounding } from "../sim/moves";
 import { heroProjectileArt } from "./projectileArt";
 import { projectedProjectile } from "./projectilePose";
 import { disjointNormals, fanKnifePose, hitAreaPose, specialAreaRegion, type FanKnifePose, type HitAreaPose } from "./disjointCues";
-import { specialForm, specialKit } from "../sim/heroSpecials";
+import { specialForm, specialKit } from "../sim/specials/schema";
 
 const pose: HitAreaPose = { visible: false, x: 0.0, z: 0.0, scale: 0.0 };
 

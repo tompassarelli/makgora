@@ -4,10 +4,10 @@
 
 import { idiv, imod } from "wisp/src/sim/intMath";
 import { f32 } from "wisp/src/sim/f32";
-import type { MoveRegion, StrikeCapsule } from "./heroMoves";
-import type { HitEffect } from "./hitRegions";
-import type { AppliedStatus } from "./heroStatus";
-import type { HurtPose } from "./hurtboxes";
+import type { MoveRegion, StrikeCapsule } from "../heroMoves";
+import type { HitEffect } from "../hitRegions";
+import type { AppliedStatus } from "../heroStatus";
+import type { HurtPose } from "../hurtboxes";
 
 
 export const SpecialSlot = { neutral: 0, side: 1, up: 2, down: 3 } as const;

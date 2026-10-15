@@ -10,7 +10,7 @@ import { copyFighterState } from "../src/generated/state/fighterState";
 import { Character, SpecialAction } from "../src/game/sim/codes";
 import { createFighter, type Fighter } from "../src/game/sim/fighter";
 import { NO_HIT_REGION } from "../src/game/sim/hitRegions";
-import { runningHeroSpecial } from "../src/game/sim/heroSpecialRules";
+import { runningHeroSpecial } from "../src/game/sim/specials/engine";
 import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/sim/heroes/registry";
 import { setWorldMotionValue } from "../src/game/sim/motion";
 import { fighterAt } from "../src/game/sim/roster";

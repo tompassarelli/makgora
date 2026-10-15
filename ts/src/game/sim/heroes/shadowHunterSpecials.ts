@@ -5,7 +5,7 @@
 import { withExKit } from "../exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
 import { HERO_REFERENCE_HEIGHT } from "../heroMoves";
-import { type AuthoredSpecial, type FighterSpecials, type SpecialPlacement, type SpecialProjectile, CHARGED_AIM_FRAMES, chargedAngleMotion, frames } from "../heroSpecials";
+import { type AuthoredSpecial, type FighterSpecials, type SpecialPlacement, type SpecialProjectile, CHARGED_AIM_FRAMES, chargedAngleMotion, frames } from "../specials/schema";
 import { HeroStatusGroup, HeroStatusKind, HitElement } from "../codes";
 import type { AppliedStatus } from "../heroStatus";
 import { hit } from "./shadowHunterMoves";

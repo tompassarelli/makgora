@@ -2,7 +2,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { HeroStatusGroup, HeroStatusKind } from "../codes";
 import { heroRegion, type StrikeCapsule } from "../heroMoves";
 import { withExKit } from "../exSpecialAuthoring";
-import { frames, type AuthoredSpecial, type FighterSpecials, type SpecialCompanion, type SpecialKit, type SpecialPlacement, type SpecialProjectile } from "../heroSpecials";
+import { frames, type AuthoredSpecial, type FighterSpecials, type SpecialCompanion, type SpecialKit, type SpecialPlacement, type SpecialProjectile } from "../specials/schema";
 import type { AppliedStatus } from "../heroStatus";
 import { kaelCastBody, kaelHit } from "./kaelthasMoves";
 

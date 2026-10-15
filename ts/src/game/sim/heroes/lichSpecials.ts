@@ -5,7 +5,7 @@
 import { withExKit } from "../exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
 import { HERO_REFERENCE_HEIGHT, heroRegion } from "../heroMoves";
-import { type AuthoredSpecial, type FighterSpecials, type SpecialProjectile, frames } from "../heroSpecials";
+import { type AuthoredSpecial, type FighterSpecials, type SpecialProjectile, frames } from "../specials/schema";
 import { CHILL } from "../chill";
 import { HitElement } from "../codes";
 import { hit, lichCastBody, LICH_FROST_NOVA_BODY, LICH_DECAY_BODY } from "./lichMoves";

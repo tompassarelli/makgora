@@ -10,7 +10,7 @@ import { beginFighterAttack, resolveAttacks } from "../../src/game/sim/attacks";
 import { AttackPhase, AttackStyle, Character, SpecialAction } from "../../src/game/sim/codes";
 import { beginDamageContacts, finishDamageContacts } from "../../src/game/sim/contacts";
 import { type Fighter, createFighter } from "../../src/game/sim/fighter";
-import { advanceHeroStatus, runningHeroSpecial } from "../../src/game/sim/heroSpecialRules";
+import { advanceHeroStatus, runningHeroSpecial } from "../../src/game/sim/specials/engine";
 import { HERO_ROSTER, fighterSlug } from "../../src/game/sim/heroes/registry";
 import { authoredHitRegionCount } from "../../src/game/sim/hitRegions";
 import { createMatchCamera, MATCH_CAMERA_ASPECT } from "../../src/game/sim/matchCamera";

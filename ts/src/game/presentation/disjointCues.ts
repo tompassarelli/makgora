@@ -2,7 +2,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle, Character, SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { type HitRegion, NO_HIT_REGION } from "../sim/hitRegions";
-import { runningHeroSpecial } from "../sim/heroSpecialRules";
+import { runningHeroSpecial } from "../sim/specials/engine";
 import { forsakenPaladinSwordAttack } from "../sim/heroes/forsakenPaladinSword";
 import { FAN_KNIFE_CUE, type Cue, type CueBirth } from "./specialCues";
 import { REACH_CUE_NORMALS } from "./reachCueInfo";

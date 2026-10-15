@@ -19,7 +19,7 @@ import { advanceCandleBodies, settleCandles } from "../sim/heroes/koboldCandle";
 import { type Roster, copyControls, fighterAt, isActive, neutralControls } from "../sim/roster";
 import { regenerateShield } from "../sim/shield";
 import { advanceSpecials, startFighterSpecial } from "../sim/specials";
-import { advanceHeroStatus, prepareBansheeContacts } from "../sim/heroSpecialRules";
+import { advanceHeroStatus, prepareBansheeContacts } from "../sim/specials/engine";
 import { advanceItemBuff } from "../sim/itemBuffs";
 import { advanceFighterMotion } from "../sim/step";
 import { maskHeroStatusControls } from "../sim/heroStatus";

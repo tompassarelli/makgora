@@ -16,7 +16,7 @@ import { STATIONARY_PARTICLE_MODELS, STATIONARY_SECONDS, BIRTH_MISSILES, RISEN_A
 import { ACCENT_SECONDS, ACCENT_SEQUENCE } from "../../src/game/render/hitAreaEffects";
 import { FIGHTER_ULTIMATES } from "../../src/game/sim/ultimates";
 import { summonClip, summonClipCount, SUMMON_BEAR } from "../../src/game/presentation/summonClipInfo";
-import type { AuthoredSpecial, SpecialProjectile } from "../../src/game/sim/heroSpecials";
+import type { AuthoredSpecial, SpecialProjectile } from "../../src/game/sim/specials/schema";
 import { DEFINITIVE_CUE_EMITTERS } from "../../src/game/presentation/cueEmitterInfo";
 import { impactModel, impactAnimation, impactStartSeconds, impactModelScale } from "../../src/game/presentation/hitPresentation";
 import { IMPACT_KIND_COUNT } from "../../src/game/presentation/impactState";

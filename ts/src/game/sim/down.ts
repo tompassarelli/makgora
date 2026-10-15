@@ -18,7 +18,7 @@ import { WORLD_UNITS_PER_MELEE_UNIT } from "./tuning";
 import { squareRoot } from "./warcraftMath";
 import { meleeAtan2 } from "../../sim/meleeScalarMath";
 import { stickX, stickZ } from "./stick";
-import { isHeroSpecialAction, landHeroSpecial } from "./heroSpecialRules";
+import { isHeroSpecialAction, landHeroSpecial } from "./specials/engine";
 import { aerialJumps, groundedJumps } from "./itemBuffs";
 
 export const AIR_DODGE_LANDING_LAG = 10;

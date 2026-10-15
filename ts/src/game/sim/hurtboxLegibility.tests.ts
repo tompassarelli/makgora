@@ -9,7 +9,7 @@ import { AttackStyle, Character } from "./codes";
 import { createFighter } from "./fighter";
 import { HERO_ROSTER } from "./heroes/registry";
 import type { FighterMoves } from "./heroMoves";
-import { type AuthoredSpecial, specialKit } from "./heroSpecials";
+import { type AuthoredSpecial, specialKit } from "./specials/schema";
 import { type FighterHurtboxes, type HurtPart, type HurtPose, HurtState, fighterHurtboxes } from "./hurtboxes";
 import { DOWN_ATTACK_FRAMES, LEDGE_ATTACK_FRAMES, attackDurationFramesForGrounding } from "./moves";
 import { FIGHTER_ULTIMATES } from "./ultimates";

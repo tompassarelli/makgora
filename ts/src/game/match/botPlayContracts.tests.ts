@@ -7,7 +7,7 @@ import { clearAttackBuffer, queueAttack } from "../input/attackBuffer";
 import { PARTICIPANT_SLOTS, type ParticipantSlot } from "../input/participants";
 import { stateChecksum } from "../replay/canonical";
 import { AttackStyle, Character, DownState, SpecialAction } from "../sim/codes";
-import { isHeroSpecialAction } from "../sim/heroSpecialRules";
+import { isHeroSpecialAction } from "../sim/specials/engine";
 import { HERO_ROSTER } from "../sim/heroes/registry";
 import { createFighter } from "../sim/fighter";
 import { copyControls, createRoster, fighterAt, isActive, neutralControls } from "../sim/roster";

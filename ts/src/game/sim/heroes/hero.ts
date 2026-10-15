@@ -4,7 +4,7 @@
 import type { Character } from "../codes";
 import type { FighterGameplan } from "../gameplan";
 import type { FighterMoves } from "../heroMoves";
-import type { FighterSpecials } from "../heroSpecials";
+import type { FighterSpecials } from "../specials/schema";
 
 
 export interface NamedMove {

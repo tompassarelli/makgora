@@ -2,7 +2,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { HitElement } from "../codes";
 import { upgradeSpecial, withExKit } from "../exSpecialAuthoring";
 import { heroRegion } from "../heroMoves";
-import { frames, type AuthoredSpecial, type FighterSpecials, type SpecialProjectile } from "../heroSpecials";
+import { frames, type AuthoredSpecial, type FighterSpecials, type SpecialProjectile } from "../specials/schema";
 import { koboldHit } from "./koboldMoves";
 
 const EMBER: SpecialProjectile = {

@@ -6,7 +6,7 @@ import { copyFighterState, sameFighterState } from "../../generated/state/fighte
 import { createRoster } from "../sim/roster";
 import { type FighterTuning } from "../sim/tuning";
 import { HERO_ROSTER, SELECTABLE_CHARACTERS } from "../sim/heroes/registry";
-import type { AuthoredSpecial, SpecialPlacement, SpecialProjectile } from "../sim/heroSpecials";
+import type { AuthoredSpecial, SpecialPlacement, SpecialProjectile } from "../sim/specials/schema";
 import { FIGHTER_FIELDS, type FighterFieldRow } from "../sim/state/fighterSchema";
 import { stateHash } from "./canonical";
 import { type ReplayState, createReplaySnapshot } from "./snapshot";

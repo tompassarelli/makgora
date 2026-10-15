@@ -1,6 +1,6 @@
 import { f32 } from "wisp/src/sim/f32";
 import type { HitEffect } from "./hitRegions";
-import type { AuthoredSpecial, SpecialKit, SpecialProjectile } from "./heroSpecials";
+import type { AuthoredSpecial, SpecialKit, SpecialProjectile } from "./specials/schema";
 
 export interface ExUpgrade {
   readonly damage?: number;

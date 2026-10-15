@@ -5,7 +5,7 @@ import { meleeHitIntersectsShield, resolveAttacks } from "./attacks";
 import { AttackStyle, Character } from "./codes";
 import { fighterPoseFacing } from "./conditions";
 import { type Fighter, SHIELD_MAX, createFighter } from "./fighter";
-import { heroStrikeMeetsShield } from "./heroSpecialRules";
+import { heroStrikeMeetsShield } from "./specials/engine";
 import { fighterName, SELECTABLE_CHARACTERS } from "./heroes/registry";
 import { emptyHitRegion } from "./hitRegions";
 import { HurtContact, HurtState, fighterHurtParts, strikeHurtContact } from "./hurtboxes";

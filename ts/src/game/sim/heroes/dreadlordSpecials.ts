@@ -5,7 +5,7 @@ import { withExKit } from "../exSpecialAuthoring";
 import { f32 } from "wisp/src/sim/f32";
 import { HeroStatusGroup, HeroStatusKind, HitElement } from "../codes";
 import { HERO_REFERENCE_HEIGHT, type StrikeCapsule, heroRegion } from "../heroMoves";
-import { type AuthoredSpecial, type FighterSpecials, frames } from "../heroSpecials";
+import { type AuthoredSpecial, type FighterSpecials, frames } from "../specials/schema";
 import { hurtPart, hurtPose } from "../hurtboxes";
 import { DREADLORD_STAND, dreadlordHit, dreadlordLimbPoses } from "./dreadlordMoves";
 

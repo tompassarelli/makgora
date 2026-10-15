@@ -3,7 +3,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { HitElement } from "../codes";
 import { CHILL } from "../chill";
 import { HERO_REFERENCE_HEIGHT, heroRegion } from "../heroMoves";
-import { type AuthoredSpecial, type FighterSpecials, FollowUpInput, frames } from "../heroSpecials";
+import { type AuthoredSpecial, type FighterSpecials, FollowUpInput, frames } from "../specials/schema";
 import { chenCapsule, chenHit } from "./chenMoves";
 
 const fire = chenHit(9.370200157165527, 70.0, 25.73409652709961, f32(0.906308), f32(0.422618), HitElement.fire);

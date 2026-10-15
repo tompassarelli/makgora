@@ -1,5 +1,5 @@
 import { withExKit } from "../exSpecialAuthoring";
-import { type AuthoredSpecial, type FighterSpecials, frames } from "../heroSpecials";
+import { type AuthoredSpecial, type FighterSpecials, frames } from "../specials/schema";
 import { heroRegion } from "../heroMoves";
 import { hurtPart, hurtPose } from "../hurtboxes";
 import { peonHit } from "./peonMoves";

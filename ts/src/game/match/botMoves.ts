@@ -1,7 +1,7 @@
 
 
 
-import { specialCooldownReady } from "../sim/heroSpecialRules";
+import { specialCooldownReady } from "../sim/specials/engine";
 import { at } from "wisp/src/runtime/lookup";
 import { f32 } from "wisp/src/sim/f32";
 import { floorDiv } from "wisp/src/sim/intMath";
@@ -20,7 +20,7 @@ import type { Controls } from "../sim/roster";
 import { immolationRegion } from "../sim/specials";
 import { deckUnder, heightAhead, horizontalAhead, safeAt, slideStaysOnDeck } from "./botFooting";
 import { HeroSpecialUse, confirmOnly, confirms, heroSpecialUse } from "./botHeroKit";
-import { SpecialSlot } from "../sim/heroSpecials";
+import { SpecialSlot } from "../sim/specials/schema";
 import { SPACE_PLAN, avoids, gameplanOf, moveWeight, spacedAt, toGameplanMove } from "./botGameplan";
 import type { FighterGameplan, GameplanMove } from "../sim/gameplan";
 import { type CpuSkill, FULL_SKILL } from "./cpuSkill";

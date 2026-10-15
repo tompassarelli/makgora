@@ -1,6 +1,6 @@
 import { heroRegion, heroHurtPose } from "../heroMoves";
 import { hurtPart } from "../hurtboxes";
-import { CHARGED_AIM_FRAMES, chargedAngleMotion, frames, type AuthoredSpecial, type FighterSpecials } from "../heroSpecials";
+import { CHARGED_AIM_FRAMES, chargedAngleMotion, frames, type AuthoredSpecial, type FighterSpecials } from "../specials/schema";
 import { anubarakHit } from "./anubarakMoves";
 
 const neutral_special_ground_hurt = [

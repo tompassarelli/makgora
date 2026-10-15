@@ -5,7 +5,7 @@ import { start, install } from "../src/platform/main";
 import { shell } from "../src/platform/shell/state";
 import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/sim/heroes/registry";
 import { fighterAt } from "../src/game/sim/roster";
-import { SpecialSlot } from "../src/game/sim/heroSpecials";
+import { SpecialSlot } from "../src/game/sim/specials/schema";
 import { startFighterSpecial } from "../src/game/sim/specials";
 import { controls } from "../src/game/sim/testWorld";
 import { firstFighterDifference } from "../src/game/replay/difference";

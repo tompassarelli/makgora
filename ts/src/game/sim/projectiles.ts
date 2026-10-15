@@ -13,7 +13,7 @@ import { collectDamageContact, finishDamageContacts, openDamageContacts } from "
 import { type Fighter, PROJECTILE_CAPACITY, type Projectile } from "./fighter";
 import { mutableProjectile } from "./fighterProjectiles";
 import { type HitEffect, HitElement, copyHitEffect, emptyHitEffect } from "./hitRegions";
-import type { SpecialProjectile } from "./heroSpecials";
+import type { SpecialProjectile } from "./specials/schema";
 import { capsulesIntersect, emptyCapsule, hurtCapsule, placeCapsule, segmentBoxesOverlap } from "../physics/contactGeometry";
 import { RIFLEMAN_BLASTER_GROUND_DAMAGE_MULTIPLIER, attackDamage } from "./moves";
 import { PARTICIPANT_CAPACITY } from "../input/participants";

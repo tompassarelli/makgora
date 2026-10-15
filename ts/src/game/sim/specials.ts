@@ -13,7 +13,7 @@ import {
   RIFLEMAN_BLASTER_GROUND_SHOT_FRAME,
 } from "./moves";
 import { HitElement, type HitEffect, type HitRegion, NO_HIT_REGION } from "./hitRegions";
-import { heroSpecialMove } from "./heroSpecials";
+import { heroSpecialMove } from "./specials/schema";
 import { advanceHeroCommandGrab } from "./heroCommandGrab";
 import { enterExSpecial } from "./exSpecials";
 import { ROSTER_MANA, spendMana } from "./mana";
@@ -29,7 +29,7 @@ import { advanceCompanion } from "./companions";
 import { RIFLEMAN_BEAR_LIFETIME, advanceBear, recordSpecialHit, specialAlreadyHit, canStartFreezeTrap, startFreezeTrap } from "./summons";
 import { at } from "wisp/src/runtime/lookup";
 import { travelBeforeBodies } from "./travelStop";
-import { advanceHeroSpecial, followUpOnContact, chargedAimX, enterUltimate, chargedAimZ, chooseHeroSpecial, enterHeroSpecial, followUpHeroSpecial, heroRegionOrigin, heroSpecialContact, heroStrikeMeetsShield, isHeroSpecialAction, relocateHeroSpecial, runningHeroSpecial, resolveHeroGuards, steerHeroSpecial, stopHeroMotionAtBodies } from "./heroSpecialRules";
+import { advanceHeroSpecial, followUpOnContact, chargedAimX, enterUltimate, chargedAimZ, chooseHeroSpecial, enterHeroSpecial, followUpHeroSpecial, heroRegionOrigin, heroSpecialContact, heroStrikeMeetsShield, isHeroSpecialAction, relocateHeroSpecial, runningHeroSpecial, resolveHeroGuards, steerHeroSpecial, stopHeroMotionAtBodies } from "./specials/engine";
 
 
 export const DEMONHUNTER_MANA_BURN_STARTUP = 16;

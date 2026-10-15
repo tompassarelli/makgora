@@ -6,7 +6,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { HeroStatusGroup, HeroStatusKind, HitElement } from "../codes";
 import { HERO_REFERENCE_HEIGHT, heroRegion } from "../heroMoves";
 import { type AppliedStatus } from "../heroStatus";
-import { type AuthoredSpecial, type FighterSpecials, type SpecialProjectile, frames } from "../heroSpecials";
+import { type AuthoredSpecial, type FighterSpecials, type SpecialProjectile, frames } from "../specials/schema";
 import { capsule, hit } from "./lichKingMoves";
 import { VALKYR_MODEL } from "../../assets/importedModelInfo";
 

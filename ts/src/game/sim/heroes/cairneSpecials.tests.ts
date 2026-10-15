@@ -4,7 +4,7 @@ import { imod } from "wisp/src/sim/intMath";
 import { AttackStyle, Character, SpecialAction } from "../codes";
 import { type Fighter, createFighter } from "../fighter";
 import { HERO_REFERENCE_HEIGHT } from "../heroMoves";
-import { SpecialForm, specialForm } from "../heroSpecials";
+import { SpecialForm, specialForm } from "../specials/schema";
 import { ROSTER_MANA } from "../mana";
 import { attackStartupFrames } from "../moves";
 import { beginFighterAttack } from "../attacks";

@@ -5,7 +5,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { idiv } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { type Fighter, PACK_CAPACITY, type PlacedObject, placedObject } from "../sim/fighter";
-import { type AuthoredSpecial, CompanionMode } from "../sim/heroSpecials";
+import { type AuthoredSpecial, CompanionMode } from "../sim/specials/schema";
 import { Character } from "../sim/codes";
 import { authoredTuning } from "../sim/tuning";
 import { heroDefinition } from "../sim/heroes/registry";

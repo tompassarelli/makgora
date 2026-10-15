@@ -4,7 +4,7 @@ import { hurtCapsule } from "../../physics/contactGeometry";
 import { Character, HitElement } from "../codes";
 import { HERO_REFERENCE_HEIGHT, type MoveRegion, heroRegion } from "../heroMoves";
 import { hurtPart, hurtPose } from "../hurtboxes";
-import { type AuthoredSpecial, type FighterSpecials, type SpecialKit, type SpecialMotion, type SpecialProjectile, CHARGED_AIM_FRAMES, FollowUpInput, chargedAngleMotion, frames } from "../heroSpecials";
+import { type AuthoredSpecial, type FighterSpecials, type SpecialKit, type SpecialMotion, type SpecialProjectile, CHARGED_AIM_FRAMES, FollowUpInput, chargedAngleMotion, frames } from "../specials/schema";
 import { MEDIUM, SHORT, capsule, hit } from "./mountainKingMoves";
 
 

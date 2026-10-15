@@ -2,7 +2,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { Character, HeroStatusGroup, HeroStatusKind, HitElement, ItemKind } from "./codes";
 import { CHILL } from "./chill";
 import { heroRegion, type MoveRegion, type StrikeCapsule } from "./heroMoves";
-import { FollowUpInput, frames, type AuthoredSpecial, type SpecialProjectile } from "./heroSpecials";
+import { FollowUpInput, frames, type AuthoredSpecial, type SpecialProjectile } from "./specials/schema";
 import type { AppliedStatus } from "./heroStatus";
 import type { HitEffect } from "./hitRegions";
 import { type HurtPart, type HurtPose, hurtPart, hurtPose } from "./hurtboxes";

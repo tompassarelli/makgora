@@ -98,7 +98,7 @@ These are kit data, so each fighter states which it uses:
 
 - **Branches after the press.** A running special lists follow-ups, each with
   a frame window and the input that takes it: special, attack or shield. The
-  first matching branch replaces the rest of the action (smashcraft:ts/src/game/sim/heroSpecials.ts).
+  first matching branch replaces the rest of the action (smashcraft:ts/src/game/sim/specials/schema.ts).
   A follow-up can turn the fighter to the held stick when it starts.
 - **Travel that passes bodies but stops at a raised shield.**
 - **Relocation:** a motion frame that moves the fighter to its placed object,

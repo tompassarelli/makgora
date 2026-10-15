@@ -42,7 +42,7 @@ import {
 } from "./fighter";
 import { DASH_GUARD_EARLY_FRAMES, advanceGroundMovement, clearDash, groundOptionOpen, restingTraction, wantsCrouch } from "./groundMovement";
 import { GroundOption } from "./stickZones";
-import { heroMotionHolds, heroMotionPassesPlatforms } from "./heroSpecialRules";
+import { heroMotionHolds, heroMotionPassesPlatforms } from "./specials/engine";
 import { carryHeroStatus } from "./heroStatus";
 import { exSpecialPressed } from "./exSpecials";
 import { demonHunterGliding, demonHunterJumpOrGlideCancel } from "./specials";

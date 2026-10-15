@@ -2,7 +2,7 @@ import { floorMod } from "wisp/src/sim/intMath";
 import { ROSTER_MANA } from "../sim/mana";
 import { Character, SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
-import { runningHeroSpecial } from "../sim/heroSpecialRules";
+import { runningHeroSpecial } from "../sim/specials/engine";
 
 export const WHITE_GLOW_PERIOD = 12;
 export const HEAVY_HITLAG_FRAMES = 8;

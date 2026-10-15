@@ -2,7 +2,7 @@ import { assertDefined, assertEquals, assertGreaterThan, assertNear, assertTrue,
 import { f32 } from "wisp/src/sim/f32";
 import { Character, SpecialAction } from "../codes";
 import { createFighter } from "../fighter";
-import { SpecialForm, specialForm } from "../heroSpecials";
+import { SpecialForm, specialForm } from "../specials/schema";
 import { ROSTER_MANA } from "../mana";
 import { duelPair, stepDuel } from "../testDuel";
 import { controls } from "../testWorld";

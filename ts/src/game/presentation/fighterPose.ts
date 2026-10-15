@@ -3,7 +3,7 @@
 import { max, min } from "../../runtime/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { AttackPhase, AttackStyle, Character, DownState, GrabAction, LedgeState, ShieldBreak, SpecialAction, HeroStatusKind, SurfaceContact } from "../sim/codes";
-import { FOLLOW_UP_FORM, SpecialForm } from "../sim/heroSpecials";
+import { FOLLOW_UP_FORM, SpecialForm } from "../sim/specials/schema";
 
 import { GROUND_ROLL_FRAMES, SPOT_DODGE_FRAMES, WALL_TECH_STARTUP_FRAMES, attackPhase, inGrabContext, isForwardGroundRoll, isGroundDodging } from "../sim/conditions";
 import { DOWN_BOUND_FRAMES, DOWN_DAMAGE_FRAMES, DOWN_ROLL_FRAMES, DOWN_STAND_FRAMES, TECH_IN_PLACE_FRAMES, TECH_ROLL_FRAMES } from "../sim/down";
@@ -23,7 +23,7 @@ import { groundLocomotionClip, groundLocomotionRate } from "./fighterLocomotion"
 import { HERO_STRIKE_MOMENTS } from "./heroStrikeMomentInfo";
 import { SPECIAL_KEY } from "./heroStrikeMomentKeys";
 import { heroCueWindows } from "./specialCues";
-import { runningHeroSpecial } from "../sim/heroSpecialRules";
+import { runningHeroSpecial } from "../sim/specials/engine";
 import { heroDefinition } from "../sim/heroes/registry";
 import {
   ESCAPE_FRAMES, IllidanLocomotion, LEDGE_CATCH_FRAMES, RESPAWN_FRAMES, TRANSITION_FRAMES, type IllidanMotion,

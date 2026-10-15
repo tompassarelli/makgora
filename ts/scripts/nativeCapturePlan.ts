@@ -23,7 +23,7 @@ import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../src/game/sim
 import { authoredTuning } from "../src/game/sim/tuning";
 import { AttackStyle } from "../src/game/sim/codes";
 import { attackDurationFramesForGrounding, attackStartupFrames, isAerialAttack } from "../src/game/sim/moves";
-import { specialKit } from "../src/game/sim/heroSpecials";
+import { specialKit } from "../src/game/sim/specials/schema";
 import { heroCueWindows } from "../src/game/presentation/specialCues";
 
 export function reelFixtures(only: string | undefined, holdTicks = 6): CaptureFixture[][] {

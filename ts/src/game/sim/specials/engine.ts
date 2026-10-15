@@ -1,32 +1,32 @@
-import { canHit, sameTeam } from "./teams";
+import { canHit, sameTeam } from "../teams";
 
 
 
 
-import { max, min } from "../../runtime/numbers";
+import { max, min } from "../../../runtime/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { at } from "wisp/src/runtime/lookup";
-import { applyItemBuffFor } from "./itemBuffs";
-import { advanceHeroConditions, cleansePoisonAndSlow } from "./heroStatus";
-import { AttackStyle, Character, ProjectileKind, SpecialAction } from "./codes";
-import { specialVariant } from "./heroes/koboldCandle";
-import { mutableProjectile } from "./fighterProjectiles";
-import { canAttack, inGrabContext, isIntangible } from "./conditions";
-import { type Fighter, type Projectile, placedObject } from "./fighter";
-import { type FighterSpecials, type AuthoredSpecial, CompanionMode, CompanionOrder, type SpecialFollowUp, type SpecialGuard, type SpecialKit, type SpecialBeam, type SpecialPlacement, type SpecialProjectile, FOLLOW_UP_FORM, FollowUpInput, Relocation, SpecialForm, SpecialSlot, specialForm, specialKit, ultimateForm } from "./heroSpecials";
-import { type HitRegion, NO_HIT_REGION, authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "./hitRegions";
-import { type Controls, type Roster, fighterAt, isActive } from "./roster";
-import { travelBeforeBodies } from "./travelStop";
-import { gainMana } from "./mana";
-import { endDivineShield, refreshAirOnExit } from "./transitions";
-import { capsuleCircleIntersects, shieldSizeMultiplier } from "./shield";
-import { shieldCenterX, shieldCenterZ } from "./shieldTilt";
-import { type Capsule, attackCapsule, emptyCapsule, placeCapsule, segmentBoxesOverlap } from "../physics/contactGeometry";
-import { HurtContact, strikeHurtContact } from "./hurtboxes";
-import { PARTICIPANT_CAPACITY } from "../input/participants";
-import { mainDeckLeft, mainDeckRight, mainDeckZAt, solidSurfaceAt, solidSurfaceCount } from "./stage";
-import { currentTraits } from "./identityTraits";
-import { squareRoot } from "./warcraftMath";
+import { applyItemBuffFor } from "../itemBuffs";
+import { advanceHeroConditions, cleansePoisonAndSlow } from "../heroStatus";
+import { AttackStyle, Character, ProjectileKind, SpecialAction } from "../codes";
+import { specialVariant } from "../heroes/koboldCandle";
+import { mutableProjectile } from "../fighterProjectiles";
+import { canAttack, inGrabContext, isIntangible } from "../conditions";
+import { type Fighter, type Projectile, placedObject } from "../fighter";
+import { type FighterSpecials, type AuthoredSpecial, CompanionMode, CompanionOrder, type SpecialFollowUp, type SpecialGuard, type SpecialKit, type SpecialBeam, type SpecialPlacement, type SpecialProjectile, FOLLOW_UP_FORM, FollowUpInput, Relocation, SpecialForm, SpecialSlot, specialForm, specialKit, ultimateForm } from "./schema";
+import { type HitRegion, NO_HIT_REGION, authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../hitRegions";
+import { type Controls, type Roster, fighterAt, isActive } from "../roster";
+import { travelBeforeBodies } from "../travelStop";
+import { gainMana } from "../mana";
+import { endDivineShield, refreshAirOnExit } from "../transitions";
+import { capsuleCircleIntersects, shieldSizeMultiplier } from "../shield";
+import { shieldCenterX, shieldCenterZ } from "../shieldTilt";
+import { type Capsule, attackCapsule, emptyCapsule, placeCapsule, segmentBoxesOverlap } from "../../physics/contactGeometry";
+import { HurtContact, strikeHurtContact } from "../hurtboxes";
+import { PARTICIPANT_CAPACITY } from "../../input/participants";
+import { mainDeckLeft, mainDeckRight, mainDeckZAt, solidSurfaceAt, solidSurfaceCount } from "../stage";
+import { currentTraits } from "../identityTraits";
+import { squareRoot } from "../warcraftMath";
 
 
 const DIAGONAL = 0.7071067690849304;
