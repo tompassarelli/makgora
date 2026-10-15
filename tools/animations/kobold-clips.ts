@@ -6,6 +6,7 @@ import { DrawnModel, sheet, type PoseFrame } from "../../ts/scripts/wisp/hurtbox
 import { AttackStyle, AttackPhase } from "../../ts/src/game/sim/codes";
 import type { HeroPose } from "../../ts/src/game/sim/heroes/hero";
 import { KOBOLD_MOVES } from "../../ts/src/game/sim/heroes/koboldMoves";
+import { KOBOLD_SPECIALS } from "../../ts/src/game/sim/heroes/koboldSpecials";
 import { KOBOLD_BARE_CLIPS, KOBOLD_CLIPS } from "../../ts/src/game/sim/heroes/koboldClips";
 
 function ensure(ok: unknown, message: string): asserts ok { if (!ok) throw new Error(message); }
@@ -163,6 +164,26 @@ const actions: Action[] = [...strikes, ...airStrikes].filter(([pose]) => !only |
 });
 for (const [pose, contact, beats, air] of posed) if (!only || only.includes(pose))
   actions.push({ pose, frames: Math.round(seq(pose).seconds * 60), contact, beats, air });
+const dig = KOBOLD_SPECIALS.side.ground, digRegion = dig.regions![0]!;
+const digScurry = (frame: number): Gesture => {
+  const phase = (frame - digRegion.firstFrame) * Math.PI / 3, stride = Math.cos(phase), paw = Math.sin(phase);
+  return { chest: -60, lean: 35, head: 15, pelvis: -10, tail: -30, step: 8 + Math.min(6, Math.max(0, frame - digRegion.firstFrame) * 3),
+    arm: -70, elbow: -45, leftArm: -75 + 28 * stride, leftElbow: -55 + 28 * paw,
+    thigh: -75 + 24 * stride, leftThigh: -75 - 24 * stride,
+    knee: 110 + 25 * Math.max(0, paw), leftKnee: 110 + 25 * Math.max(0, -paw) };
+};
+for (const pose of ["sideSpecial", "sideSpecialAir"] as const) if (!only || only.includes(pose)) {
+  const prep = { ...digScurry(digRegion.firstFrame), step: -42 }, last = digScurry(digRegion.lastFrame);
+  actions.push({ pose, frames: dig.endFrame, contact: digRegion.firstFrame,
+    beats: [{ frame: 0, gesture: ready }, { frame: 4, gesture: prep },
+      ...Array.from({ length: digRegion.lastFrame - digRegion.firstFrame + 1 }, (_, i) => {
+        const frame = digRegion.firstFrame + i;
+        return { frame, gesture: digScurry(frame) };
+      }), ...Array.from({ length: dig.endFrame - digRegion.lastFrame }, (_, i) => {
+        const frame = digRegion.lastFrame + i + 1;
+        return { frame, gesture: blend(last, ready, (frame - digRegion.lastFrame) / (dig.endFrame - digRegion.lastFrame)) };
+      })] });
+}
 const charge: Gesture = { chest: -30, arm: -220, elbow: -32, leftArm: -205, leftElbow: -32, lean: -15, step: -6, head: -30, thigh: -20, leftThigh: 24, knee: -22 };
 const crouch: Gesture = { chest: -60, lean: 20, head: 15, arm: 20, elbow: -60, leftArm: -40, thigh: -80, knee: 120, leftThigh: -80, leftKnee: 120 };
 if (!only || only.includes("smashCharge")) actions.push({ pose: "smashCharge", frames: 30, contact: 8, hold: true, beats: [{ frame: 0, gesture: charge }, { frame: 30, gesture: charge }] });
@@ -192,7 +213,7 @@ if (!only || only.includes("bareIdle")) actions.push({ pose: "bareIdle", frames:
   }) });
 
 let cursor = Math.max(...source.Sequences.map(s => s.Interval[1]!)) + 100;
-for (const pose of ["run", "dash", "bareIdle", "bareRun"] as const) {
+for (const pose of ["run", "dash", "bareIdle", "bareRun", "sideSpecial", "sideSpecialAir"] as const) {
   const action = actions.find(a => a.pose === pose); if (!action) continue;
   const index = seq(pose).index;
   if (model.Sequences[index]) continue;
