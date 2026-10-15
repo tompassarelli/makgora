@@ -83,15 +83,19 @@ test("fighter replay copies preserve every field, absent hit targets included, a
   copyFighterState(fresh, hitting, 15);
   assertEquals([0, 1, 2, 3].map(i => fresh.special.hitTargets[i] ?? -1).join(","), "-1,-1,-1,-1");
   const candleSlots = (fighter: Fighter) => [0, 1, 2, 3].map(i => fighter.candle.struck[i] ?? -1).join(",") + `;${fighter.candle.surface ?? -1}`;
-  // -1 marks an absent slot or surface: Lua array literals cannot hold nil.
-  for (const [struck, surface, text] of [[[4, -1, 6, -1], 2, "4,-1,6,-1;2"], [[-1, -1, -1, -1], -1, "-1,-1,-1,-1;-1"], [[-1, 5, -1, 7], 0, "-1,5,-1,7;0"]] as const) {
-    for (let slot = 0; slot < 4; slot++) hitting.candle.struck[slot] = struck[slot] === -1 ? undefined : struck[slot];
-    hitting.candle.surface = surface === -1 ? undefined : surface;
-    assertFalse(sameFighterState(fresh, hitting));
-    copyFighterState(fresh, hitting, 15);
-    assertEquals(candleSlots(fresh), text);
-    assertTrue(sameFighterState(fresh, hitting));
-  }
+  const cycleCandle = (set: (value: number | undefined) => void, first: number, second: number) => {
+    // -1 stands for absent: a Lua array literal stops at nil.
+    for (const value of [first, -1, second]) {
+      set(value === -1 ? undefined : value);
+      assertFalse(sameFighterState(fresh, hitting));
+      copyFighterState(fresh, hitting, 15);
+      assertEquals(candleSlots(fresh), candleSlots(hitting));
+      assertTrue(sameFighterState(fresh, hitting));
+    }
+  };
+  for (let slot = 0; slot < 4; slot++) cycleCandle(value => { hitting.candle.struck[slot] = value; }, slot + 4, slot + 8);
+  cycleCandle(value => { hitting.candle.surface = value; }, 2, 0);
+  assertEquals(candleSlots(fresh), "8,9,10,11;0");
   for (const variant of [3, 0]) {
     hitting.special.variant = variant;
     assertFalse(sameFighterState(fresh, hitting));

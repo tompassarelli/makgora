@@ -107,6 +107,7 @@ function flinchHitstunFrames(damage: number): number {
 export function beginDamageContacts(): void {
   batch.count = 0;
   batch.collecting = true;
+  candleHeat.fill(0);
 }
 
 
@@ -114,6 +115,7 @@ export function clearDamageContacts(): void {
   batch.contacts.length = 0;
   batch.count = 0;
   batch.collecting = false;
+  candleHeat.fill(0);
 }
 
 
@@ -435,7 +437,11 @@ export function finishDamageContacts(world: Roster): void {
     resolveDamageContacts(world, slot);
     applyContactStatuses(world, slot);
   }
-  for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) if (at(candleHeat, slot) > 0) feedCandle(fighterAt(world, slot), at(candleHeat, slot));
+  for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
+    const gain = at(candleHeat, slot);
+    candleHeat[slot] = 0;
+    if (gain > 0) feedCandle(fighterAt(world, slot), gain);
+  }
   batch.count = 0;
   batch.collecting = false;
 }
