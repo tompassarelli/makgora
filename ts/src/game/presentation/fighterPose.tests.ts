@@ -7,19 +7,24 @@ import { stateChecksum } from "../replay/canonical";
 import { firstPoseDifference, firstStateDifference } from "../replay/difference";
 import { ReplayHistory } from "../replay/history";
 import { type ReplayState, captureReplaySnapshot, copyReplayState, createReplaySnapshot } from "../replay/snapshot";
-import { AttackStyle, Character, DownState, GrabAction } from "../sim/codes";
+import { AttackStyle, Character, DownState, GrabAction, SpecialAction } from "../sim/codes";
 import { beginFighterAttack } from "../sim/attacks";
 import type { HeroPose } from "../sim/heroes/hero";
 import { DOWN_ROLL_FRAMES, TECH_IN_PLACE_FRAMES, TECH_ROLL_FRAMES } from "../sim/down";
 import { beginDownState } from "../sim/transitions";
-import { HERO_ROSTER, SELECTABLE_CHARACTERS } from "../sim/heroes/registry";
+import { HERO_ROSTER, SELECTABLE_CHARACTERS, heroDefinition } from "../sim/heroes/registry";
+import { DREADLORD_SPECIALS } from "../sim/heroes/dreadlordSpecials";
+import { HERO_REFERENCE_HEIGHT } from "../sim/heroMoves";
+import { createReferenceContactFighter } from "../sim/referenceRig";
+import { duelPair, stepDuel } from "../sim/testDuel";
+import { DREADLORD_POUNCE_CLIPS } from "./dreadlordPounceClipInfo";
 import { contactDamageClip } from "./damagePose";
 import { createFighter } from "../sim/fighter";
 import { f32 } from "wisp/src/sim/f32";
 import { characterClips, clipFor, grabActionPoses } from "./fighterClips";
 import { attackStartupFrames, grabActionDuration, grabContactFrame } from "../sim/moves";
 import { fighterAt, neutralControls } from "../sim/roster";
-import { soloWorld, testWorld } from "../sim/testWorld";
+import { controls, soloWorld, testWorld } from "../sim/testWorld";
 import * as dh from "./demonHunterAssetInfo";
 import { FRAME_SECONDS, advanceFighterPose, createFighterPose } from "./fighterPose";
 import { DRAWN_STRIDES } from "./drawnStrideInfo";
@@ -168,4 +173,35 @@ test("paired hero throws reach contact on the actual holder's frame across every
       assertTrue(Math.abs(pose.clipTime - clip.seconds) < f32(0.00001));
     }
   }
+});
+
+test("a hero holding a command grab plays its hold clip from grabFrame, Dreadlord unchanged [k3 measure docs/design/animation-reference.md]", () => {
+  const clips = heroDefinition(Character.dreadlord)!.presentation.commandGrab!;
+  const grab = DREADLORD_SPECIALS.side.ground.commandGrab!;
+  for (const gap of [HERO_REFERENCE_HEIGHT, 6.0 * HERO_REFERENCE_HEIGHT]) {
+    const owner = createFighter(Character.dreadlord, -gap * 0.5, 1);
+    owner.mana.points = 100;
+    const { world } = duelPair(owner, createReferenceContactFighter(gap * 0.5, -1));
+    const pose = createFighterPose();
+    const side = controls({ specialPressed: true, specialX: 1, direction: 1 });
+    const running = (): boolean => owner.special.action !== SpecialAction.none;
+    let held = 0;
+    for (let frame = 1; frame <= 70; frame++) {
+      stepDuel(world, frame === 1 ? side : controls(), controls());
+      advanceFighterPose(pose, owner, world, neutralControls(), false, false, false, false);
+      if (!running()) break;
+      const caught = owner.special.grabFrame;
+      const biting = caught > 0 && owner.special.frame < caught + 16;
+      const recovering = !biting && (caught > 0 || owner.special.frame > 17);
+      const clip = biting ? clips.hold : recovering ? clips.recovery : clips.travel;
+      const first = biting ? caught : recovering ? caught > 0 ? caught + 16 : 18 : 1;
+      if (biting) held++;
+      assertEquals(pose.clipIndex, clip.index, `gap ${gap} frame ${owner.special.frame}`);
+      assertEquals(pose.clipTime, f32(Math.max(0, owner.special.frame - first) * FRAME_SECONDS), `gap ${gap} frame ${owner.special.frame}`);
+    }
+    assertEquals(held, gap === HERO_REFERENCE_HEIGHT ? grab.holdFrames : 0);
+  }
+  assertEquals(clips.travel, DREADLORD_POUNCE_CLIPS.travel);
+  assertEquals(clips.hold, DREADLORD_POUNCE_CLIPS.bite);
+  assertEquals(clips.recovery, DREADLORD_POUNCE_CLIPS.recovery);
 });

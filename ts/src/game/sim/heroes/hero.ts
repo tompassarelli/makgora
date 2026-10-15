@@ -81,6 +81,12 @@ export type HeroPose =
 
 export type HeroClipTable = { readonly [pose in HeroPose]?: HeroClip | undefined };
 
+export interface CommandGrabClips {
+  readonly travel: HeroClip;
+  readonly hold: HeroClip;
+  readonly recovery: HeroClip;
+}
+
 export interface HeroPresentation {
 
   readonly model: string;
@@ -99,6 +105,8 @@ export interface HeroPresentation {
 
   readonly damageClips?: readonly HeroClip[] | undefined;
   readonly fallback: HeroClip;
+
+  readonly commandGrab?: CommandGrabClips | undefined;
 }
 
 export interface HeroDefinition {

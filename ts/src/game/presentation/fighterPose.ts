@@ -24,7 +24,7 @@ import { HERO_STRIKE_MOMENTS } from "./heroStrikeMomentInfo";
 import { SPECIAL_KEY } from "./heroStrikeMomentKeys";
 import { heroCueWindows } from "./specialCues";
 import { runningHeroSpecial } from "../sim/heroSpecialRules";
-import { DREADLORD_POUNCE_CLIPS } from "./dreadlordPounceClipInfo";
+import { heroDefinition } from "../sim/heroes/registry";
 import {
   ESCAPE_FRAMES, IllidanLocomotion, LEDGE_CATCH_FRAMES, RESPAWN_FRAMES, TRANSITION_FRAMES, type IllidanMotion,
   advanceIllidanMotion, clearIllidanMotion, copyIllidanMotion, createIllidanMotion, firstIllidanMotionDifference,
@@ -200,22 +200,31 @@ const posesDown = (f: Readonly<Fighter>): boolean =>
   f.down.state !== DownState.none && f.down.state !== DownState.tumble && f.down.state !== DownState.attack;
 
 
+function selectCommandGrabClip(pose: FighterPose, f: Readonly<Fighter>): boolean {
+  if (f.special.action === SpecialAction.none || f.grab.owner !== undefined || f.launch.hitstun !== 0) return false;
+  const clips = heroDefinition(f.character)?.presentation.commandGrab;
+  const move = clips === undefined ? undefined : runningHeroSpecial(f);
+  const grab = move?.commandGrab;
+  if (clips === undefined || move === undefined || grab === undefined) return false;
+  const caught = f.special.grabFrame;
+  const charge = move.motion?.[move.motion.length - 1]?.last ?? grab.last;
+  const holding = caught > 0 && f.special.frame < caught + grab.holdFrames;
+  const recovering = !holding && (caught > 0 || f.special.frame > charge);
+  const phase = holding ? "hold" : recovering ? "recovery" : "travel";
+  const first = holding ? caught : recovering ? caught > 0 ? caught + grab.holdFrames : charge + 1 : 1;
+  playIndex(pose, `commandGrab-${phase}`, clips[phase].index);
+  pose.clipTime = f32(Math.max(0, f.special.frame - first) * FRAME_SECONDS);
+  return true;
+}
+
+
 function selectClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly<Roster>, phase: AttackPhase, hit: boolean, charging: boolean): number {
   const reaction = damagePose(f);
   const rate = actionRate(pose, f, phase, reaction);
   const { character } = f;
   const illidan = character === Character.demonHunter;
   const table = clips.characterClips(character);
-  if (f.character === Character.dreadlord && f.special.action === SpecialAction.heroSide && f.grab.owner === undefined && f.launch.hitstun === 0) {
-    const caught = f.special.grabFrame;
-    const biting = caught > 0 && f.special.frame < caught + 16;
-    const recovering = !biting && (caught > 0 || f.special.frame > 17);
-    const clip = biting ? DREADLORD_POUNCE_CLIPS.bite : recovering ? DREADLORD_POUNCE_CLIPS.recovery : DREADLORD_POUNCE_CLIPS.travel;
-    const first = biting ? caught : recovering ? caught > 0 ? caught + 16 : 18 : 1;
-    playIndex(pose, `pounce-${biting ? "bite" : recovering ? "recovery" : "travel"}`, clip.index);
-    pose.clipTime = f32(Math.max(0, f.special.frame - first) * FRAME_SECONDS);
-    return 1.0;
-  }
+  if (selectCommandGrabClip(pose, f)) return 1.0;
   if (inGrabContext(f)) return selectGrabClip(pose, f, world);
   if (f.ledge.state !== LedgeState.none) {
     const catching = illidan && f.ledge.state === LedgeState.hang && pose.motion.ledgeCatchRemaining > 0;
