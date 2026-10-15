@@ -66,9 +66,9 @@ const budget = () => {
     }
   }
   if (savedCosts === undefined) rmSync(costDirectory, { recursive: true, force: true });
-  const judgement = judgeLua({ measured, baselinePath: resolve("test/lua/cost-baseline.tsv"), project: resolve(".") });
+  const judgement = judgeLua({ measured, baselineDirectory: resolve("../records/lua-cost"), project: resolve(".") });
   for (const line of [...over, ...judgement.risen]) console.log(line);
-  if (judgement.updated > 0) console.log(`test cost baseline: ${judgement.updated} rows updated in ts/test/lua/cost-baseline.tsv; commit them with the tests`);
+  if (judgement.updated > 0) console.log(`test cost baseline: ${judgement.updated} rows updated in records/lua-cost; commit them with the tests`);
   console.log(judgement.heaviest);
   console.log(judgement.summary);
   return over.length + judgement.risen.length === 0 ? 0 : 1;

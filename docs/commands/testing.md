@@ -42,8 +42,8 @@
 - Test cost: ts/AGENTS.md sets the per-test ceilings. The Lua32 runner
   (`bun scripts/lua-tests.ts`, enforced by smashcraft:ts/scripts/testCost.ts)
   counts each test's Lua VM instructions and kilobytes allocated, charges
-  them to its src module and compares each module with its row in
-  smashcraft:ts/test/lua/cost-baseline.tsv. Counts are deterministic for a
+  them to its src module and compares each module with its row in its
+  shard smashcraft:records/lua-cost/<module path>.tsv (one file per module). Counts are deterministic for a
   runtime and test order, so every machine judges alike and nothing is
   scaled (#394). A test over 420M instructions (the 6 s ceiling at the
   reference runner's 70M instructions per second) fails, and so does a module
@@ -51,8 +51,8 @@
   instructions or 16 MB) at the same test count; both name the module and say
   "shrink it or move it to the farm" (shrink it, or make it a `sweep()`). A
   new module or a changed test count passes under the ceiling and rewrites
-  its row: commit it with the tests. `TEST_COST_UPDATE=1` rewrites every
-  measured row, after a cut. The farm's merge job judges every shard's rows.
+  its shard: commit it with the tests. `TEST_COST_UPDATE=1` rewrites every
+  measured shard, after a cut. The farm's merge job judges every partition's rows.
   Natives are counted by the frame-cost gate (`bun wisp perf compare`), not
   here. `bun run test` counts the frames stepMatch simulates in each test
   (smashcraft:ts/test/testCost.ts) and fails a test over the 58,000-frame

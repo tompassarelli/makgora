@@ -73,7 +73,7 @@ code:
    merge cleanly; two lanes that changed the same family conflict on that one
    file. Model facts are one file per model (smashcraft:ts/scripts/wisp/model-facts/),
    the move list and the anim-score tables are generated and untracked, and
-   smashcraft:.gitattributes merges the map size and test cost baselines per row
+   smashcraft:.gitattributes merges the map size and Bun test cost baselines per row
    through smashcraft:ts/scripts/mergeGenerated.ts, which `bun install` (from ts/)
    registers in the repository's git config (#401).
 

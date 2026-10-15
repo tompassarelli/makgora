@@ -1,13 +1,13 @@
 // The suite's cost budget (ts/AGENTS.md). The Lua32 runner (scripts/lua-tests.ts)
 // gates each test file on deterministic counts: Lua VM instructions and
 // kilobytes allocated per test, against committed rows in
-// test/lua/cost-baseline.tsv (#394). Bun tests are gated on simulated frames
+// records/lua-cost/<test path>.tsv, one shard per test file (#394). Bun tests are gated on simulated frames
 // per test (test/testCost.ts). CPU seconds vary 0.5-1.9x between CI machines,
 // so they gate nothing here; `bun run test` (scripts/test.ts) only reports
 // them, and wall-clock budgets live in the exclusive-lease perf measurements
 // (#168).
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
 
 /** Bun: frames stepMatch may simulate in one test, 4 s at a farm runner's 14,500 frames/s, measured from test/projectile-rules.test.ts (28,700 frames in 1.98 s CPU) (AGENTS.md). Never raise it to fit a test. */
 export const BUN_TEST_CEILING_FRAMES = 58_000;
@@ -85,22 +85,26 @@ export function addLuaCost(costs: LuaCosts, unit: string, instructions: number, 
 
 const LUA_HEADER = "unit\ttests\tinstructions\talloc_kb";
 
-export function readLuaBaseline(path: string): LuaCosts {
+const shardPath = (directory: string, unit: string) => join(directory, `${unit}.tsv`);
+
+export function readLuaBaseline(directory: string): LuaCosts {
   const costs: LuaCosts = new Map();
-  if (!existsSync(path)) return costs;
-  for (const line of readFileSync(path, "utf8").split("\n").slice(1)) {
-    const [unit, tests, instructions, allocKb] = line.split("\t");
-    if (unit !== undefined && unit !== "" && tests !== undefined && instructions !== undefined && allocKb !== undefined) {
-      costs.set(unit, { tests: Number(tests), instructions: Number(instructions), allocKb: Number(allocKb) });
+  if (!existsSync(directory)) return costs;
+  for (const file of new Bun.Glob("**/*.tsv").scanSync({ cwd: directory, absolute: true })) {
+    for (const line of readFileSync(file, "utf8").split("\n").slice(1)) {
+      const [unit, tests, instructions, allocKb] = line.split("\t");
+      if (unit !== undefined && unit !== "" && tests !== undefined && instructions !== undefined && allocKb !== undefined) {
+        costs.set(unit, { tests: Number(tests), instructions: Number(instructions), allocKb: Number(allocKb) });
+      }
     }
   }
   return costs;
 }
 
-function writeLuaBaseline(path: string, costs: LuaCosts): void {
-  const rows = [...costs].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
-    .map(([unit, cost]) => `${unit}\t${cost.tests}\t${cost.instructions}\t${cost.allocKb}`);
-  writeFileSync(path, `${[LUA_HEADER, ...rows].join("\n")}\n`);
+function writeLuaShard(directory: string, unit: string, cost: LuaCost): void {
+  const path = shardPath(directory, unit);
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(path, `${LUA_HEADER}\n${unit}\t${cost.tests}\t${cost.instructions}\t${cost.allocKb}\n`);
 }
 
 const megas = (instructions: number) => `${(instructions / 1e6).toFixed(1)}M`;
@@ -127,19 +131,19 @@ export interface LuaJudgement {
 }
 
 /**
- * Compares a Lua run's counts with the baseline, rewrites the rows of new
- * files and of files whose test count changed (all measured rows with
- * TEST_COST_UPDATE=1), drops rows whose file is gone, and summarizes the run.
+ * Compares a Lua run's counts with the baseline shards, rewrites the shards
+ * of new files and of files whose test count changed (all measured shards with
+ * TEST_COST_UPDATE=1), drops shards whose file is gone, and summarizes the run.
  */
 export function judgeLua(options: {
   readonly measured: LuaCosts;
-  readonly baselinePath: string;
+  readonly baselineDirectory: string;
   readonly project: string;
 }): LuaJudgement {
-  const { measured, baselinePath, project } = options;
-  const baseline = readLuaBaseline(baselinePath);
+  const { measured, baselineDirectory, project } = options;
+  const baseline = readLuaBaseline(baselineDirectory);
   const rewriteAll = process.env.TEST_COST_UPDATE === "1";
-  const next: LuaCosts = new Map(baseline);
+  const written: LuaCosts = new Map();
   const risen: string[] = [];
   let updated = 0;
   let tests = 0;
@@ -155,17 +159,17 @@ export function judgeLua(options: {
       if (line !== undefined) risen.push(line);
       continue;
     }
-    next.set(unit, { tests: cost.tests, instructions: cost.instructions, allocKb: cost.allocKb });
+    written.set(unit, { tests: cost.tests, instructions: cost.instructions, allocKb: cost.allocKb });
     console.log(`test cost baseline row: ${unit}\t${cost.tests}\t${cost.instructions}\t${cost.allocKb}`);
     updated++;
   }
-  for (const unit of next.keys()) {
+  for (const [unit, cost] of written) writeLuaShard(baselineDirectory, unit, cost);
+  for (const unit of baseline.keys()) {
     if (!existsSync(resolve(project, unit))) {
-      next.delete(unit);
+      rmSync(shardPath(baselineDirectory, unit), { force: true });
       updated++;
     }
   }
-  if (updated > 0) writeLuaBaseline(baselinePath, next);
   const heaviest = [...measured].sort(([, a], [, b]) => (b.maxInstructions ?? 0) - (a.maxInstructions ?? 0)).slice(0, 5)
     .map(([unit, cost]) => `${unit} ${megas(cost.maxInstructions ?? 0)}`).join(", ");
   const summary = `Lua32: ${megas(instructions)} instructions and ${(allocKb / 1024).toFixed(0)} MB allocated for ${tests} tests; ${megas(tests === 0 ? 0 : instructions / tests)} instructions per test (about ${(instructions / LUA_INSTRUCTIONS_PER_S).toFixed(0)} reference CPU seconds)`;
