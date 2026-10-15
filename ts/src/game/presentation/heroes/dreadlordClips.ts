@@ -6,7 +6,7 @@
 
 import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle } from "../../sim/codes";
-import { DREADLORD_GROUND, jabSlice, strikeClip } from "../../sim/heroes/groundNormals";
+import { type KitNormals, jabSlice, strikeClip } from "../model/look";
 import type { HeroClip, HeroClipTable } from "../../sim/heroes/hero";
 
 export const DREADLORD_MODEL_FILE = "units\\undead\\HeroDreadLord\\HeroDreadLord.mdl";
@@ -36,38 +36,37 @@ export const DREADLORD_SEQUENCES = {
 
 const s = DREADLORD_SEQUENCES;
 
+export function dreadlordClipTable(kit: KitNormals): HeroClipTable {
+  const ground = (clip: StockClip, strike: number, style: AttackStyle, frame?: number): HeroClip =>
+    strikeClip(clip, strike, kit, style, frame);
+  return {
+    idle: s.standReady, walk: s.walk, dash: s.walk, run: s.walk, crouch: s.spellSlam, fall: s.standReady,
+    landing: s.standReady, shield: s.standReady, airDodge: s.wingStretch, smashCharge: s.standReady, ko: s.death, dizzy: s.stand,
+    jump: s.wingStretch, doubleJump: s.wingStretch, fallSpecial: s.standReady,
 
-const ground = (clip: StockClip, strike: number, style: AttackStyle, frame?: number): HeroClip =>
-  strikeClip(clip, strike, DREADLORD_GROUND, style, frame);
-
-
-export const DREADLORD_CLIP_TABLE: HeroClipTable = {
-  idle: s.standReady, walk: s.walk, dash: s.walk, run: s.walk, crouch: s.spellSlam, fall: s.standReady,
-  landing: s.standReady, shield: s.standReady, airDodge: s.wingStretch, smashCharge: s.standReady, ko: s.death, dizzy: s.stand,
-  jump: s.wingStretch, doubleJump: s.wingStretch, fallSpecial: s.standReady,
-
-  wallJump: s.rearUp, wallTech: s.spellSlam,
-  spotDodge: s.standReady, rollForward: s.walk, rollBackward: s.walk,
-  damageGround: s.standReady, damageAir: s.standReady, damageTumble: s.death, damageShield: s.standReady,
-  knockdown: s.death, downDamage: s.death, getUp: s.standReady, getUpAttack: s.attack2,
-  ledgeHang: s.standReady, ledgeClimb: s.spellSlam, ledgeRoll: s.walk, ledgeAttack: s.attack2,
+    wallJump: s.rearUp, wallTech: s.spellSlam,
+    spotDodge: s.standReady, rollForward: s.walk, rollBackward: s.walk,
+    damageGround: s.standReady, damageAir: s.standReady, damageTumble: s.death, damageShield: s.standReady,
+    knockdown: s.death, downDamage: s.death, getUp: s.standReady, getUpAttack: s.attack2,
+    ledgeHang: s.standReady, ledgeClimb: s.spellSlam, ledgeRoll: s.walk, ledgeAttack: s.attack2,
 
 
 
 
-  jab: jabSlice(s.attack2, f32(0.53)), jab2: jabSlice(s.attack2, f32(0.53)), jab3: jabSlice(s.attack2, f32(0.72)), forwardTilt: ground(s.attack1, f32(0.70), AttackStyle.forwardTilt),
-  forwardTiltUp: ground(s.rearUp, f32(0.82), AttackStyle.forwardTiltUp), forwardTiltDown: ground(s.spellSlam, f32(0.38), AttackStyle.forwardTiltDown),
-  upTilt: ground(s.spell, f32(0.93), AttackStyle.upTilt, 9), downTilt: ground(s.attack2, f32(0.76), AttackStyle.downTilt),
-  dashAttack: ground(s.attack1, f32(0.70), AttackStyle.dashAttack),
-  forwardSmash: s.attack2, upSmash: s.rearUp, downSmash: s.spellSlam,
-  neutralAir: s.spell, forwardAir: s.attack2, backAir: s.attack1, upAir: s.rearUp, downAir: s.spellSlam,
-  grab: s.attack1, grabHold: s.standReady, grabbed: s.standReady, pummel: s.attack1,
-  throwForward: s.attack2, throwBack: s.attack1, throwUp: s.spell, throwDown: s.spellSlam,
-  victimPummel: s.standReady, victimThrowForward: s.standReady, victimThrowBack: s.standReady,
-  victimThrowUp: s.standReady, victimThrowDown: s.death,
+    jab: jabSlice(s.attack2, f32(0.53)), jab2: jabSlice(s.attack2, f32(0.53)), jab3: jabSlice(s.attack2, f32(0.72)), forwardTilt: ground(s.attack1, f32(0.70), AttackStyle.forwardTilt),
+    forwardTiltUp: ground(s.rearUp, f32(0.82), AttackStyle.forwardTiltUp), forwardTiltDown: ground(s.spellSlam, f32(0.38), AttackStyle.forwardTiltDown),
+    upTilt: ground(s.spell, f32(0.93), AttackStyle.upTilt, 9), downTilt: ground(s.attack2, f32(0.76), AttackStyle.downTilt),
+    dashAttack: ground(s.attack1, f32(0.70), AttackStyle.dashAttack),
+    forwardSmash: s.attack2, upSmash: s.rearUp, downSmash: s.spellSlam,
+    neutralAir: s.spell, forwardAir: s.attack2, backAir: s.attack1, upAir: s.rearUp, downAir: s.spellSlam,
+    grab: s.attack1, grabHold: s.standReady, grabbed: s.standReady, pummel: s.attack1,
+    throwForward: s.attack2, throwBack: s.attack1, throwUp: s.spell, throwDown: s.spellSlam,
+    victimPummel: s.standReady, victimThrowForward: s.standReady, victimThrowBack: s.standReady,
+    victimThrowUp: s.standReady, victimThrowDown: s.death,
 
-  neutralSpecial: s.spell, sideSpecial: s.attack2, upSpecial: s.wingStretch, downSpecial: s.spell,
-  neutralSpecialAir: s.spell, sideSpecialAir: s.attack2, upSpecialAir: s.wingStretch, downSpecialAir: s.spell,
-};
+    neutralSpecial: s.spell, sideSpecial: s.attack2, upSpecial: s.wingStretch, downSpecial: s.spell,
+    neutralSpecialAir: s.spell, sideSpecialAir: s.attack2, upSpecialAir: s.wingStretch, downSpecialAir: s.spell,
+  };
+}
 
 export const DREADLORD_FALLBACK_CLIP = s.standReady;

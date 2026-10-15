@@ -3,7 +3,8 @@
 import { f32 } from "wisp/src/sim/f32";
 import { idiv, imod } from "wisp/src/sim/intMath";
 import { Character } from "../sim/codes";
-import { fighterName, fighterPortrait } from "../sim/heroes/registry";
+import { fighterName } from "../sim/heroes/registry";
+import { fighterPortrait } from "../roster/looks";
 import {
   BUST_BOX, DAMAGE_BOX, MANA_BOX, NAME_BOX, PLATE_HEIGHT_PX, PLATE_TOP, PLATE_WIDTH_PX, SHAKE_FRAMES, SLOT_BOX, STOCK_ICONS_SHOWN, STOCK_ROW, STOCK_STEP_PX,
   TENTHS_BOX, type PlateBox, boxLeft, boxTop, damageTenths, damageWhole, plateLeft, shakeStrength, shakeX, shakeY,

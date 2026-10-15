@@ -24,7 +24,7 @@ import { RIFLEMAN_MODEL_FILE } from "../../src/game/presentation/fighterAssetInf
 import { SUMMON_BEAR, summonClip, summonClipCount } from "../../src/game/presentation/summonClipInfo";
 import { Character } from "../../src/game/sim/codes";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
-import { HERO_ROSTER, PORTRAIT_KINDS, RENDERED_FIGHTERS, fighterPortrait } from "../../src/game/sim/heroes/registry";
+import { HERO_ROSTER, PORTRAIT_KINDS, RENDERED_FIGHTERS } from "../../src/game/sim/heroes/registry";
 import { PARTICIPANT_SLOTS } from "../../src/game/input/participants";
 import { PORTRAIT_QUALITY, encodeBlp, readTga } from "../blp";
 import { importedModelFile } from "../heroModelSource";
@@ -37,6 +37,7 @@ import { checkCueModels } from "./headlessRender";
 import { cueModels } from "./cueModels";
 import { removeGeosets, teamGlowGeosets } from "../groundPlanes";
 import { generateModelMDX, parseModelMDX } from "../mdxCodec";
+import { fighterPortrait, heroLook } from "../../src/game/roster/looks";
 const tryMapPromise = <A>(operation: string, path: string, run: () => PromiseLike<A>) => Effect.tryPromise({ try: run, catch: (cause) => new MapBuildFailure({ operation, path, cause }) });
 const tryMapSync = <A>(operation: string, path: string, run: () => A) => Effect.try({ try: run, catch: (cause) => new MapBuildFailure({ operation, path, cause }) });
 const EMPTY_MODEL = "the map script names an empty model path";
@@ -127,7 +128,7 @@ export const ORIGINAL_CLIP_MODELS = [...new Set(Object.values(Character).flatMap
 }))];
 
 
-const IMPORTED_HERO_MODELS = HERO_ROSTER.map(({ presentation }) => presentation.model).filter((model) => importedModelFile(model) !== undefined);
+const IMPORTED_HERO_MODELS = HERO_ROSTER.map(({ character }) => heroLook(character)!.model).filter((model) => importedModelFile(model) !== undefined);
 
 
 export const SCRIPT_MODELS: readonly string[] = [

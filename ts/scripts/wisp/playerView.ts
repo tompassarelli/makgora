@@ -43,6 +43,7 @@ import { MODEL_FACTS } from "./modelFacts";
 import { WHITE_MODEL_FACTS } from "../../src/generated/assets/whiteModelFacts";
 import { WHITE_FIGHTER_MODELS } from "../../src/generated/assets/whiteFighterModels";
 import { STAGE_SKIES, stageSkyTexture } from "../stageSky";
+import { heroLook } from "../../src/game/roster/looks";
 
 const FRAMES_PER_SECOND = 60;
 const seconds = (value: number) => value * FRAMES_PER_SECOND;
@@ -70,7 +71,7 @@ for (const hero of HERO_ROSTER) {
   for (const slot of SPECIAL_SLOTS) {
     const kit = hero.specials[slot];
     for (const form of [kit.ground, kit.air, kit.recall, kit.marked?.special]) {
-      recordPlacement(form, hero.presentation.placedModel?.path ?? WARD_MODEL);
+      recordPlacement(form, heroLook(hero.character)!.placedModel?.path ?? WARD_MODEL);
     }
   }
 }
@@ -116,7 +117,7 @@ export const SMASHCRAFT_SCENE: SceneExpectations & { readonly settledFrame: numb
     { name: "pooled fighter", models: fighterModels },
     { name: "body flash", models: Object.values(WHITE_FIGHTER_MODELS) },
 
-    { name: "hero body", models: HERO_ROSTER.map(({ presentation }) => presentation.model) },
+    { name: "hero body", models: HERO_ROSTER.map(({ character }) => heroLook(character)!.model) },
 
     {
       name: "hit spark", lifetime: seconds(3), models: [
@@ -126,7 +127,7 @@ export const SMASHCRAFT_SCENE: SceneExpectations & { readonly settledFrame: numb
       ],
     },
 
-    { name: "KO body", lifetime: seconds(3), models: [RIFLEMAN_MODEL_FILE, DEMON_HUNTER_MODEL_FILE, ...HERO_ROSTER.map(({ presentation }) => presentation.model)] },
+    { name: "KO body", lifetime: seconds(3), models: [RIFLEMAN_MODEL_FILE, DEMON_HUNTER_MODEL_FILE, ...HERO_ROSTER.map(({ character }) => heroLook(character)!.model)] },
 
     { name: "shield bubble", lifetime: seconds(75), models: [SHIELD_P1_MODEL, SHIELD_P2_MODEL, SHIELD_P3_MODEL, SHIELD_P4_MODEL] },
 

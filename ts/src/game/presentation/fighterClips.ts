@@ -4,9 +4,10 @@
 
 import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle, Character, GrabAction, LedgeState, SpecialAction } from "../sim/codes";
-import { type HeroClip, type HeroClipTable, type HeroFollowUpPose, type HeroPose, STOCK_FALLBACK_CLIP } from "../sim/heroes/hero";
-import { heroDefinition } from "../sim/heroes/registry";
-import { RIFLEMAN_GROUND, type GroundKit, jabSlice, strikeClip } from "../sim/heroes/groundNormals";
+import type { HeroClip, HeroClipTable, HeroFollowUpPose, HeroPose } from "../sim/heroes/hero";
+import { heroLook } from "../roster/looks";
+import { RIFLEMAN_GROUND, type GroundKit } from "../sim/heroes/groundNormals";
+import { STOCK_FALLBACK_CLIP, jabSlice, strikeClip } from "./model/look";
 import * as dh from "./demonHunterAssetInfo";
 import * as assets from "./fighterAssetInfo";
 import { RECOVERY_CLIPS } from "./recoveryClipInfo";
@@ -147,29 +148,29 @@ function recoveryTables(): Readonly<Record<number, HeroClipTable>> {
   const drills: Readonly<Record<number, HeroClipTable | undefined>> = DRILL_CLIPS;
   for (const [character, recovery] of Object.entries(RECOVERY_CLIPS)) {
     const id = Number(character);
-    tables[id] = { ...(ORIGINAL_CLIPS[id] ?? heroDefinition(id)?.presentation.clips ?? NO_CLIPS), ...recovery, ...drills[id] };
+    tables[id] = { ...(ORIGINAL_CLIPS[id] ?? heroLook(id)?.clips ?? NO_CLIPS), ...recovery, ...drills[id] };
   }
   for (const [character, grabs] of Object.entries(GRAB_CLIPS)) {
     const id = Number(character);
-    tables[id] = { ...(tables[id] ?? ORIGINAL_CLIPS[id] ?? heroDefinition(id)?.presentation.clips ?? NO_CLIPS), ...grabs };
+    tables[id] = { ...(tables[id] ?? ORIGINAL_CLIPS[id] ?? heroLook(id)?.clips ?? NO_CLIPS), ...grabs };
   }
   for (const [character, downAir] of Object.entries(DOWN_AIR_CLIPS)) {
     const id = Number(character);
-    tables[id] = { ...(tables[id] ?? ORIGINAL_CLIPS[id] ?? heroDefinition(id)?.presentation.clips ?? NO_CLIPS), ...downAir };
+    tables[id] = { ...(tables[id] ?? ORIGINAL_CLIPS[id] ?? heroLook(id)?.clips ?? NO_CLIPS), ...downAir };
   }
   for (const [character, jumps] of Object.entries(JUMP_CLIPS)) {
     const id = Number(character);
-    tables[id] = { ...(tables[id] ?? ORIGINAL_CLIPS[id] ?? heroDefinition(id)?.presentation.clips ?? NO_CLIPS), ...jumps };
+    tables[id] = { ...(tables[id] ?? ORIGINAL_CLIPS[id] ?? heroLook(id)?.clips ?? NO_CLIPS), ...jumps };
   }
   for (const [character, attacks] of Object.entries(ROSTER_ATTACK_CLIPS)) {
     const id = Number(character);
-    tables[id] = { ...(tables[id] ?? ORIGINAL_CLIPS[id] ?? heroDefinition(id)?.presentation.clips ?? NO_CLIPS), ...attacks };
+    tables[id] = { ...(tables[id] ?? ORIGINAL_CLIPS[id] ?? heroLook(id)?.clips ?? NO_CLIPS), ...attacks };
   }
   tables[Character.blademaster] = { ...tables[Character.blademaster], ...BLADEMASTER_AUTHORED_CLIPS };
   tables[Character.shadowHunter] = { ...tables[Character.shadowHunter], ...SHADOW_HUNTER_AUTHORED_CLIPS };
   for (const [character, swaps] of Object.entries(STOCK_CLIP_SWAPS)) {
     const id = Number(character);
-    tables[id] = { ...(tables[id] ?? ORIGINAL_CLIPS[id] ?? heroDefinition(id)?.presentation.clips ?? NO_CLIPS), ...swaps };
+    tables[id] = { ...(tables[id] ?? ORIGINAL_CLIPS[id] ?? heroLook(id)?.clips ?? NO_CLIPS), ...swaps };
   }
   return tables;
 }
@@ -185,13 +186,13 @@ export function namedClips(table: HeroClipTable): HeroClip[] {
 
 
 export function characterClips(character: number): HeroClipTable {
-  return COMBINED_CLIPS[character] ?? ORIGINAL_CLIPS[character] ?? heroDefinition(character)?.presentation.clips ?? NO_CLIPS;
+  return COMBINED_CLIPS[character] ?? ORIGINAL_CLIPS[character] ?? heroLook(character)?.clips ?? NO_CLIPS;
 }
 
 
 export function clipFor(character: number, pose: HeroPose): HeroClip {
   const table = characterClips(character);
-  return table[pose] ?? (pose === "jab2" || pose === "jab3" ? table.jab : undefined) ?? heroDefinition(character)?.presentation.fallback ?? STOCK_FALLBACK_CLIP;
+  return table[pose] ?? (pose === "jab2" || pose === "jab3" ? table.jab : undefined) ?? heroLook(character)?.fallback ?? STOCK_FALLBACK_CLIP;
 }
 
 

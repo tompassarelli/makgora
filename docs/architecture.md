@@ -21,7 +21,7 @@ A module may import only the modules in its "may use" column. Sim code never rea
 | match | `ts/src/game/match/` | Match step, stocks/teams/meter rules, training | sim, snapshot, ai, roster, lobby, input, core |
 | replay | `ts/src/game/replay/` (tapes, moments, viewer) | Replay files, tapes, moments, viewer driver | match, snapshot, sim, input, core |
 | netcode | `ts/src/game/netcode/` | Delay policy, input journals | input, snapshot, match, core |
-| fighter-look | `presentation` block of `<fighter>Hero.ts`, `ts/src/game/presentation/heroes/` | One fighter's model, clips, cues, sounds, scale, labels | presentation types, fighter-kit (read numbers, never restate), generated art, core |
+| fighter-look | `ts/src/game/presentation/heroes/` (`<fighter>Look.ts`), `ts/src/game/presentation/model/` | One fighter's model, clips, cues, sounds, scale, labels | presentation types, fighter-kit (read numbers, never restate), generated art, core |
 | presentation | `ts/src/game/presentation/` | Pose/clip choice, cue and sound selection; pure, no natives | fighter-look, roster, match, sim, snapshot, core |
 | render | `ts/src/game/render/` | Warcraft-native effects and sound playback | presentation, sim, core, Wisp map |
 | ui | `ts/src/game/ui/`, `ts/src/game/menu/` | Frames, menus, selection screens | lobby, roster, render, presentation, core |
@@ -42,7 +42,7 @@ Known breaks still in the tree (removed by slices, never copied): `*Hero.ts` imp
 | Fighter body, strong hits, identity traits | `ts/src/game/sim/heroes/heroBodies.ts`, `ts/src/game/sim/strongHitTable.ts`, `ts/src/game/sim/identityTraits.ts` | `fighters/<slug>/kit.ts` in S7c |
 | Fighter definition (name, kit wiring) | `ts/src/game/sim/heroes/<fighter>Hero.ts` | `fighters/<slug>/kit.ts` in S8 |
 | New fighter: id and roster line | `ts/src/game/sim/codes.ts`, `ts/src/game/sim/heroes/registry.ts` | `core/codes.ts`, `roster/*.ts` in S8 |
-| Fighter model, scale, clip binding | `presentation` block of `ts/src/game/sim/heroes/<fighter>Hero.ts`, `ts/src/game/presentation/modelScale.ts`, `ts/src/game/presentation/fighterClips.ts` | `fighters/<slug>/look.ts` in S5, S7e |
+| Fighter model, scale, clip binding | `ts/src/game/presentation/heroes/<fighter>Look.ts` (type `HeroLook` in `ts/src/game/presentation/model/look.ts`, read by character through `heroLook` in `ts/src/game/roster/looks.ts`), `ts/src/game/presentation/modelScale.ts`, `ts/src/game/presentation/fighterClips.ts` | `fighters/<slug>/look.ts` in S7e |
 | Selection label, short name | `ts/src/game/ui/selectionUi.ts` | `fighters/<slug>/look.ts` in S7e |
 | Animation clip | producer `tools/animations/<fighter>-clips.ts` (writes e.g. `ts/src/game/presentation/heroes/cairneClips.ts`) | output under `ts/src/generated/clips/` in S6a |
 | Special/attack/disjoint cue, projectile art | `ts/src/game/presentation/specialCues.ts`, `ts/src/game/presentation/attackCues.ts`, `ts/src/game/presentation/disjointCues.ts`, `ts/src/game/presentation/projectileArt.ts` | `fighters/<slug>/cues.ts` in S7a |

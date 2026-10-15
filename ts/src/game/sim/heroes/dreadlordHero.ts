@@ -1,8 +1,6 @@
 
 
 import { Character } from "../codes";
-import { DREADLORD_CLIP_TABLE, DREADLORD_FALLBACK_CLIP, DREADLORD_MODEL_FILE } from "../../presentation/heroes/dreadlordClips";
-import { DREADLORD_POUNCE_CLIPS } from "../../presentation/dreadlordPounceClipInfo";
 import type { HeroDefinition } from "./hero";
 import { DREADLORD_GAMEPLAN } from "./dreadlordGameplan";
 import { DREADLORD_MOVES } from "./dreadlordMoves";
@@ -18,12 +16,4 @@ export const DREADLORD_HERO: HeroDefinition = {
   specials: DREADLORD_SPECIALS,
   jab: { name: "Vampiric Claws", description: "Two claw rakes and a wing strike on repeated jabs." },
   gameplan: DREADLORD_GAMEPLAN,
-  presentation: {
-    model: DREADLORD_MODEL_FILE,
-    objectId: 0x6d66646c,
-    portrait: "ReplaceableTextures\\CommandButtons\\BTNHeroDreadLord.blp",
-    clips: DREADLORD_CLIP_TABLE,
-    fallback: DREADLORD_FALLBACK_CLIP,
-    commandGrab: { travel: DREADLORD_POUNCE_CLIPS.travel, hold: DREADLORD_POUNCE_CLIPS.bite, recovery: DREADLORD_POUNCE_CLIPS.recovery },
-  },
 };

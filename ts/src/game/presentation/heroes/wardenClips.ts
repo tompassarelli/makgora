@@ -4,7 +4,7 @@
 
 import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle } from "../../sim/codes";
-import { WARDEN_GROUND, jabSlice, strikeClip } from "../../sim/heroes/groundNormals";
+import { type KitNormals, jabSlice, strikeClip } from "../model/look";
 
 export const WARDEN_MODEL_FILE = "Units\\NightElf\\HeroWarden\\HeroWarden.mdx";
 
@@ -34,73 +34,72 @@ export const WARDEN_SEQUENCES = {
 
 const s = WARDEN_SEQUENCES;
 
+export function wardenClips(kit: KitNormals) {
+  const ground = (clip: StockClip, strike: number, style: AttackStyle, frame?: number): StockClip =>
+    ({ ...clip, ...strikeClip(clip, strike, kit, style, frame) });
+  return {
+    idle: s.standReady,
+    walk: s.walk,
+    dash: s.walk,
+    run: s.walk,
+    crouch: s.standChannel,
+    jump: s.standReady,
+    doubleJump: s.spellThrow,
 
-const ground = (clip: StockClip, strike: number, style: AttackStyle, frame?: number): StockClip =>
-  ({ ...clip, ...strikeClip(clip, strike, WARDEN_GROUND, style, frame) });
-
-
-export const WARDEN_CLIPS = {
-  idle: s.standReady,
-  walk: s.walk,
-  dash: s.walk,
-  run: s.walk,
-  crouch: s.standChannel,
-  jump: s.standReady,
-  doubleJump: s.spellThrow,
-
-  wallJump: s.spellSlam,
-  wallTech: s.attack1,
-  fall: s.standReady,
-  fallSpecial: s.standChannel,
-  landing: s.standReady,
-  shield: s.standChannel,
-  spotDodge: s.dissipate,
-  roll: s.walk,
-  airDodge: s.dissipate,
-  damageGround: s.standReady,
-  damageAir: s.standReady,
-  damageTumble: s.death,
-  damageShield: s.standChannel,
-  knockdown: s.death,
-  getUp: s.standReady,
-  getUpAttack: s.attack2,
-  dizzy: s.standFidget,
-  ledgeHang: s.standChannel,
-  ledgeClimb: s.spellSlam,
-  ledgeAttack: s.attack2,
-  ko: s.death,
+    wallJump: s.spellSlam,
+    wallTech: s.attack1,
+    fall: s.standReady,
+    fallSpecial: s.standChannel,
+    landing: s.standReady,
+    shield: s.standChannel,
+    spotDodge: s.dissipate,
+    roll: s.walk,
+    airDodge: s.dissipate,
+    damageGround: s.standReady,
+    damageAir: s.standReady,
+    damageTumble: s.death,
+    damageShield: s.standChannel,
+    knockdown: s.death,
+    getUp: s.standReady,
+    getUpAttack: s.attack2,
+    dizzy: s.standFidget,
+    ledgeHang: s.standChannel,
+    ledgeClimb: s.spellSlam,
+    ledgeAttack: s.attack2,
+    ko: s.death,
 
 
 
-  jab: jabSlice(s.attack1, f32(0.32)),
-  jab2: jabSlice(s.attack1, f32(0.32)),
-  jab3: jabSlice(s.attack1, f32(0.34)),
-  forwardTilt: ground(s.attack2, f32(0.52), AttackStyle.forwardTilt),
-  forwardTiltUp: ground(s.spellSlam, f32(0.20), AttackStyle.forwardTiltUp),
-  forwardTiltDown: ground(s.attack1, f32(0.38), AttackStyle.forwardTiltDown),
-  upTilt: ground(s.spell, f32(0.56), AttackStyle.upTilt, 6),
-  downTilt: ground(s.attack1, f32(0.38), AttackStyle.downTilt),
-  dashAttack: ground(s.attack2, f32(0.52), AttackStyle.dashAttack),
-  forwardSmash: s.spellSlam,
-  upSmash: s.spell,
-  downSmash: s.attack2,
-  neutralAir: s.attack1,
-  forwardAir: s.attack2,
-  backAir: s.attack1,
-  upAir: s.spell,
+    jab: jabSlice(s.attack1, f32(0.32)),
+    jab2: jabSlice(s.attack1, f32(0.32)),
+    jab3: jabSlice(s.attack1, f32(0.34)),
+    forwardTilt: ground(s.attack2, f32(0.52), AttackStyle.forwardTilt),
+    forwardTiltUp: ground(s.spellSlam, f32(0.20), AttackStyle.forwardTiltUp),
+    forwardTiltDown: ground(s.attack1, f32(0.38), AttackStyle.forwardTiltDown),
+    upTilt: ground(s.spell, f32(0.56), AttackStyle.upTilt, 6),
+    downTilt: ground(s.attack1, f32(0.38), AttackStyle.downTilt),
+    dashAttack: ground(s.attack2, f32(0.52), AttackStyle.dashAttack),
+    forwardSmash: s.spellSlam,
+    upSmash: s.spell,
+    downSmash: s.attack2,
+    neutralAir: s.attack1,
+    forwardAir: s.attack2,
+    backAir: s.attack1,
+    upAir: s.spell,
 
-  downAir: s.spell,
-  grab: s.attack1,
-  grabHold: s.standReady,
-  grabbed: s.standReady,
-  pummel: s.attack1,
-  throwForward: s.attack2,
-  throwBack: s.attack2,
-  throwUp: s.spell,
-  throwDown: s.spellSlam,
+    downAir: s.spell,
+    grab: s.attack1,
+    grabHold: s.standReady,
+    grabbed: s.standReady,
+    pummel: s.attack1,
+    throwForward: s.attack2,
+    throwBack: s.attack2,
+    throwUp: s.spell,
+    throwDown: s.spellSlam,
 
-  shadowStrike: s.spellThrow,
-  pursuitLunge: s.attack2,
-  blink: s.dissipate,
-  fanOfKnives: s.spell,
-} as const;
+    shadowStrike: s.spellThrow,
+    pursuitLunge: s.attack2,
+    blink: s.dissipate,
+    fanOfKnives: s.spell,
+  } as const;
+}

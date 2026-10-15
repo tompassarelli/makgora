@@ -21,7 +21,7 @@ import { AttackStyle, Character, DownState, GrabAction, ProjectileKind, SpecialA
 import type { Fighter } from "../../src/game/sim/fighter";
 import { isHeroSpecialAction } from "../../src/game/sim/specials/engine";
 import type { SpecialProjectile } from "../../src/game/sim/specials/schema";
-import { fighterName, heroDefinition, selectableCharacterBySlug } from "../../src/game/sim/heroes/registry";
+import { fighterName, selectableCharacterBySlug } from "../../src/game/sim/heroes/registry";
 import { fighterAt, isActive } from "../../src/game/sim/roster";
 import { mainDeckLeft, mainDeckRight } from "../../src/game/sim/stage";
 import { install as installGame, startBuild } from "../../src/platform/main";
@@ -34,6 +34,7 @@ import { LockWatch, type RecordedRows } from "../../scripts/lockWatch";
 import { JournalHelpers } from "../rematch/journalHelper";
 import { SOAK_BUTTONS, STICK_DEAD_ZONE } from "./controller";
 import { CameraFindings } from "../cameraFindings";
+import { heroLook } from "../../src/game/roster/looks";
 
 const STAGES: Readonly<Record<string, number>> = { "sky-deck": 0, "three-bridges": 1, "frozen-throne": 2, "drifting-deck": 3, "patterned-decks": 4, "wind": 10, "carried": 11, "cannon": 12, "timed-lift": 13, "hellfire": 14, "stratholme": 6, "tomb-of-sargeras": 7 };
 const FRAME_MS = 1000 / 60;
@@ -49,8 +50,8 @@ const SMASH_REACH = 101;
 
 
 const clipModels = (character: Character) => {
-  const hero = heroDefinition(character);
-  if (hero !== undefined) return [hero.presentation.model];
+  const look = heroLook(character);
+  if (look !== undefined) return [look.model];
   return Array.from({ length: originalClipCount(character) }, (_, index) => originalClip(character, index)?.modelPath ?? "").filter((path) => path !== "");
 };
 

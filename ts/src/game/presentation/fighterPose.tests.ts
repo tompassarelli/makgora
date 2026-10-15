@@ -15,7 +15,7 @@ import { beginFighterAttack } from "../sim/attacks";
 import type { HeroPose } from "../sim/heroes/hero";
 import { DOWN_ROLL_FRAMES, TECH_IN_PLACE_FRAMES, TECH_ROLL_FRAMES } from "../sim/down";
 import { beginDownState } from "../sim/transitions";
-import { HERO_ROSTER, SELECTABLE_CHARACTERS, heroDefinition } from "../sim/heroes/registry";
+import { HERO_ROSTER, SELECTABLE_CHARACTERS } from "../sim/heroes/registry";
 import { DREADLORD_SPECIALS } from "../sim/heroes/dreadlordSpecials";
 import { HERO_REFERENCE_HEIGHT } from "../sim/heroMoves";
 import { createReferenceContactFighter } from "../sim/referenceRig";
@@ -33,6 +33,7 @@ import { FRAME_SECONDS, advanceFighterPose, copyFighterPoseInto, createFighterPo
 import { DRAWN_STRIDES } from "./drawnStrideInfo";
 import { groundLocomotionClip } from "./fighterLocomotion";
 import { IllidanLocomotion, TRANSITION_FRAMES } from "./illidanMotion";
+import { heroLook } from "../roster/looks";
 
 test("Kobold switches idle and ground cadence with candle ownership on the same frame [k2 property]", () => {
   for (const gait of ["idle", "walk", "dash", "run"] as const) for (const facing of [-1, 1]) {
@@ -223,7 +224,7 @@ test("paired hero throws reach contact on the actual holder's frame across every
 });
 
 test("a hero holding a command grab plays its hold clip from grabFrame, Dreadlord unchanged [k3 measure docs/design/animation-reference.md]", () => {
-  const clips = heroDefinition(Character.dreadlord)!.presentation.commandGrab!;
+  const clips = heroLook(Character.dreadlord)!.commandGrab!;
   const grab = DREADLORD_SPECIALS.side.ground.commandGrab!;
   for (const gap of [HERO_REFERENCE_HEIGHT, 6.0 * HERO_REFERENCE_HEIGHT]) {
     const owner = createFighter(Character.dreadlord, -gap * 0.5, 1);

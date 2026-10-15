@@ -5,6 +5,7 @@ import {model as mdx, renumberNodes} from '../../ts/scripts/clipNodes';
 import {isDeepStrictEqual} from 'node:util';
 import {HERO_ROSTER} from '../../ts/src/game/sim/heroes/registry';
 import {heroModelSource, importedModelFile, stockModelPath} from '../../ts/scripts/heroModelSource';
+import { heroLook } from "../../ts/src/game/roster/looks";
 
 
 
@@ -17,8 +18,8 @@ export const fighters: ReadonlyMap<number, {readonly name: string, readonly sour
     [2, {name: 'Illidan', source: 'illidan-animation/DemonHunterFighter.mdx'}],
     ...HERO_ROSTER.toSorted((a, b) => a.character - b.character).map(hero => [hero.character, {
         name: hero.name.replaceAll(/[^A-Za-z]/g, ''),
-        source: heroModelSource(hero.presentation.model),
-        ...(importedModelFile(hero.presentation.model) === undefined ? {stock: stockModelPath(hero.presentation.model)} : {}),
+        source: heroModelSource(heroLook(hero.character)!.model),
+        ...(importedModelFile(heroLook(hero.character)!.model) === undefined ? {stock: stockModelPath(heroLook(hero.character)!.model)} : {}),
     }] as const),
 ]);
 export function ensure(ok: unknown, why: string): asserts ok { if (!ok) throw new Error(why); }

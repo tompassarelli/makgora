@@ -1,6 +1,7 @@
 import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
 import { rosterGrid } from "../menu/selectionGrid";
-import { RENDERED_FIGHTERS, SELECTABLE_CHARACTERS, fighterPortrait } from "../sim/heroes/registry";
+import { RENDERED_FIGHTERS, SELECTABLE_CHARACTERS } from "../sim/heroes/registry";
+import { fighterPortrait } from "../roster/looks";
 import { TILE_TEXTURE_PX, pixelsForUnits, tilePortrait } from "./portraitFrames";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 

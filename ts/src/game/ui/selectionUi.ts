@@ -60,7 +60,8 @@ import {
 import { cellRect, rosterGrid } from "../menu/selectionGrid";
 import { MENU_FONT, MENU_STYLE, NATIVE_TEXT_BASE, PANEL_TEXTURE, type TextBox } from "./hudLayout";
 import { MOVES_BODY_BOX, MOVES_BOX, MOVES_BUTTON_HEIGHT, MOVES_BUTTON_TOP, MOVES_TITLE_BOX, SETTINGS_BOX, START_BUTTON, boxContains, selectionTitleBox } from "./selectionLayout";
-import { PLAYABLE_CHARACTERS, fighterName, fighterPortrait, nextSelectableCharacter } from "../sim/heroes/registry";
+import { PLAYABLE_CHARACTERS, fighterName, nextSelectableCharacter } from "../sim/heroes/registry";
+import { fighterPortrait } from "../roster/looks";
 import {
   MOVES_HEADER, itemsSetting, ultimatesSetting, itemKindSetting, automaticRematchSetting, movesPage, selectionModeLabel, endlessSetting, hitAreasSetting, partnerBehaviourSetting, partnerDamageSetting, partnerEscapeSetting,
   partnerTechSetting, stockSetting, timeSetting, modeSetting, trainingSpeedSetting,

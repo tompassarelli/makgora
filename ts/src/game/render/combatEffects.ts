@@ -32,12 +32,13 @@ import { SoundBank, SoundKind } from "./soundBank";
 import { tierSoundPaths } from "../presentation/moveTiers";
 import type { ImpactEvents } from "../presentation/impactEvents";
 import { Character } from "../sim/codes";
-import { SELECTABLE_CHARACTERS, heroDefinition } from "../sim/heroes/registry";
+import { SELECTABLE_CHARACTERS } from "../sim/heroes/registry";
 import { type ParkedFlags, type WorldOrigin, hideEffect, parkOnce, placeEffect } from "./effects";
 import { characterModelScale } from "../presentation/modelScale";
 import { originalClip, originalClipNamed } from "../../generated/clips/fighterOriginalClipInfo";
 import { KO_BLUR_DISTANCE, type KoFlash, createKoFlash, endKoFlash, koFlashLevels, noteKoFlash } from "../presentation/koFlash";
 import type { Fighter } from "../sim/fighter";
+import { heroLook } from "../roster/looks";
 
 
 const KO_FIGHTERS = SELECTABLE_CHARACTERS.length;
@@ -52,8 +53,8 @@ const DRAWN_FRAMES = 64;
 
 
 export function fighterModel(character: number): string {
-  const hero = heroDefinition(character);
-  if (hero !== undefined) return hero.presentation.model;
+  const look = heroLook(character);
+  if (look !== undefined) return look.model;
   return character === Character.rifleman ? RIFLEMAN_MODEL_FILE : DEMON_HUNTER_MODEL_FILE;
 }
 

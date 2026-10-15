@@ -87,28 +87,6 @@ export interface CommandGrabClips {
   readonly recovery: HeroClip;
 }
 
-export interface HeroPresentation {
-
-  readonly model: string;
-
-  readonly objectId: number;
-
-  readonly portrait: string;
-
-  readonly placedModel?: { readonly path: string; readonly height: number; readonly alpha: number } | undefined;
-
-
-
-
-
-  readonly clips: HeroClipTable;
-
-  readonly damageClips?: readonly HeroClip[] | undefined;
-  readonly fallback: HeroClip;
-
-  readonly commandGrab?: CommandGrabClips | undefined;
-}
-
 export interface HeroDefinition {
   readonly character: Character;
 
@@ -125,10 +103,6 @@ export interface HeroDefinition {
 
   readonly jab: NamedMove;
 
-  readonly presentation: HeroPresentation;
-
   readonly gameplan?: FighterGameplan | undefined;
 }
 
-
-export const STOCK_FALLBACK_CLIP: HeroClip = { index: 0, seconds: 1.0 };

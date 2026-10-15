@@ -1,7 +1,6 @@
 
 import { Character } from "../codes";
 import type { HeroDefinition } from "./hero";
-import { MURLOC_CLIPS, MURLOC_DAMAGE_CLIPS, MURLOC_FALLBACK, MURLOC_MODEL_FILE } from "./murlocClips";
 import { MURLOC_GAMEPLAN } from "./murlocGameplan";
 import { MURLOC_MOVES } from "./murlocMoves";
 import { MURLOC_SPECIALS } from "./murlocSpecials";
@@ -16,10 +15,4 @@ export const MURLOC_HERO: HeroDefinition = {
   moves: MURLOC_MOVES,
   specials: MURLOC_SPECIALS,
   gameplan: MURLOC_GAMEPLAN,
-  presentation: {
-    model: MURLOC_MODEL_FILE,
-    objectId: 0x6d666d72,
-    portrait: "ReplaceableTextures\\CommandButtons\\BTNMurloc.blp",
-    clips: MURLOC_CLIPS, damageClips: MURLOC_DAMAGE_CLIPS, fallback: MURLOC_FALLBACK,
-  },
 };

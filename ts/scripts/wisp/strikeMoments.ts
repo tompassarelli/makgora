@@ -11,6 +11,7 @@ import { SPECIAL_SLOTS } from "../../src/game/presentation/projectileArt";
 import { AttackStyle } from "../../src/game/sim/codes";
 import { HERO_ROSTER } from "../../src/game/sim/heroes/registry";
 import { DrawnModel } from "./hurtboxView";
+import { heroLook } from "../../src/game/roster/looks";
 
 
 const CHEST = 50.0;
@@ -60,7 +61,7 @@ function measure(drawn: DrawnModel, character: number, style: number, clip: numb
 export async function measureStrikeMoments(modelBytes: (model: string) => Promise<ArrayBuffer>): Promise<StrikeMoment[]> {
   const moments: StrikeMoment[] = [];
   for (const hero of HERO_ROSTER) {
-    const bytes = await modelBytes(hero.presentation.model);
+    const bytes = await modelBytes(heroLook(hero.character)!.model);
     const sequences = parseMDX(bytes).Sequences;
     const drawn = new DrawnModel(bytes, 1.0);
     for (const style of Object.values(AttackStyle)) {

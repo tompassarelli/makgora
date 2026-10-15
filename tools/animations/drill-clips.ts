@@ -9,6 +9,7 @@ import { heroDefinition } from "../../ts/src/game/sim/heroes/registry";
 import { seconds } from "./asset-info";
 import { encodeVerified, ensure, fighters, hash, onGlobalClock, parseSource, tracks } from "./original-clips";
 import { drillBaseModel } from "./recovery-model";
+import { heroLook } from "../../ts/src/game/roster/looks";
 
 const [input, output] = process.argv.slice(2).map(p => resolve(p));
 ensure(input && output, "usage: bun tools/animations/drill-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT");
@@ -45,7 +46,7 @@ for (const character of [Character.blademaster, Character.warden, Character.shad
   ensure(!source.Helpers.some(n => n.Name === "Drill Motion"), `${fighter.name}: drill already appended`);
   const model = structuredClone(source);
   const stand = source.Sequences.find(s => /^stand ready$/i.test(s.Name)) ?? source.Sequences.find(s => /^stand(?:\s*-?\s*\d+)?$/i.test(s.Name));
-  const donor = source.Sequences[hero.presentation.clips.downAir?.index ?? -1];
+  const donor = source.Sequences[heroLook(character)!.clips.downAir?.index ?? -1];
   ensure(stand && donor, `${fighter.name}: no pose donor`);
   const [standStart, standEnd] = interval(stand);
   const frames = move.totalFrames, first = move.startupFrames, last = first + move.activeFrames;

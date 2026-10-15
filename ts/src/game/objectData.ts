@@ -5,6 +5,7 @@ import { DEMON_HUNTER_MODEL_FILE } from "./presentation/demonHunterAssetInfo";
 import { characterModelScale } from "./presentation/modelScale";
 import { Character } from "./sim/codes";
 import { HERO_ROSTER, heroDefinition } from "./sim/heroes/registry";
+import { heroLook } from "./roster/looks";
 
 export interface FighterObject {
   readonly base: string;
@@ -36,9 +37,9 @@ const fighterFields = {
 
 function heroObject(character: Character): FighterObject {
   const hero = heroDefinition(character);
-  if (hero === undefined) throw new Error(`hero ${character} is not registered`);
-  const { presentation } = hero;
-  return { ...fighterFields, base: "earc", id: presentation.objectId, name: hero.name, model: presentation.model, scale: characterModelScale(character) };
+  const look = heroLook(character);
+  if (hero === undefined || look === undefined) throw new Error(`hero ${character} is not registered`);
+  return { ...fighterFields, base: "earc", id: look.objectId, name: hero.name, model: look.model, scale: characterModelScale(character) };
 }
 
 export const FIGHTER_OBJECTS: Readonly<Record<Character, FighterObject>> = {

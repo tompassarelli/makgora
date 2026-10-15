@@ -10,7 +10,8 @@ import { modelFacts } from '../../ts/node_modules/wisp/scripts/wisp/models';
 import { MODEL_FACTS } from '../../ts/scripts/wisp/modelFacts';
 import { writeModelFacts } from '../../ts/scripts/wisp/modelFactsTable';
 import { DrawnModel } from '../../ts/scripts/wisp/hurtboxView';
-import { fighterSlug, heroDefinition } from '../../ts/src/game/sim/heroes/registry';
+import { fighterSlug } from '../../ts/src/game/sim/heroes/registry';
+import { heroLook } from '../../ts/src/game/roster/looks';
 import { CLIPS } from './fighter-shards';
 
 const [assetsArg, outputArg, fighterName] = process.argv.slice(2);
@@ -72,8 +73,8 @@ await Effect.runPromise(Effect.tryPromise({ try: async () => {
     await Bun.write(metadataPath, metadata);
     const facts = Object.fromEntries(Object.entries(MODEL_FACTS).filter(([path]) => !path.startsWith(`war3mapImported\\${fighter.name}OriginalClip`) && !path.startsWith(`war3mapImported\\${fighter.name}TimelineBody`)));
     facts[`war3mapImported\\${filename}`] = modelFacts(new Uint8Array(bytes));
-    const hero = heroDefinition(character);
-    if (hero !== undefined) facts[hero.presentation.model] = modelFacts(new Uint8Array(await Bun.file(join(assets, fighter.source)).arrayBuffer()));
+    const look = heroLook(character);
+    if (look !== undefined) facts[look.model] = modelFacts(new Uint8Array(await Bun.file(join(assets, fighter.source)).arrayBuffer()));
     writeModelFacts(facts);
     console.log(`${fighter.name}: ${played.length}/${record.clips.length} played clips → one timeline; ${oldBytes} → ${record.bytes} raw bytes (${oldBytes - record.bytes} saved). Original materials, geometry, lights and sound-cue intervals preserved.`);
 }, catch: cause => new Error('Timeline export failed', { cause }) }));

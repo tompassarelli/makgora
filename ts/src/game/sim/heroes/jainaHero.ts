@@ -1,4 +1,3 @@
-import { JAINA_CLIPS, JAINA_DAMAGE_CLIPS, JAINA_FALLBACK, JAINA_MODEL_FILE } from "../../presentation/heroes/jainaClips";
 import { Character } from "../codes";
 import type { HeroDefinition } from "./hero";
 import { JAINA_GAMEPLAN } from "./jainaGameplan";
@@ -10,12 +9,4 @@ export const JAINA_HERO: HeroDefinition = {
   weakness: "Slow on foot and exposed while setting up spells", complete: true,
   moves: JAINA_MOVES, specials: JAINA_SPECIALS, gameplan: JAINA_GAMEPLAN,
   jab: { name: "Staff Check", description: "Two short staff strikes to create space." },
-  presentation: {
-    model: JAINA_MODEL_FILE, objectId: 0x6d666a61,
-    portrait: "ReplaceableTextures\\CommandButtons\\BTNJaina.blp",
-    placedModel: { path: "units\\human\\WaterElemental\\WaterElemental.mdl", height: 110.0, alpha: 255 },
-    fallback: JAINA_FALLBACK,
-    clips: JAINA_CLIPS,
-    damageClips: JAINA_DAMAGE_CLIPS,
-  },
 };

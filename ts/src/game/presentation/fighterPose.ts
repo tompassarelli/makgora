@@ -25,7 +25,7 @@ import { HERO_STRIKE_MOMENTS } from "./heroStrikeMomentInfo";
 import { SPECIAL_KEY } from "./heroStrikeMomentKeys";
 import { heroCueWindows } from "./specialCues";
 import { runningHeroSpecial } from "../sim/specials/engine";
-import { heroDefinition } from "../sim/heroes/registry";
+import { heroLook } from "../roster/looks";
 import {
   ESCAPE_FRAMES, IllidanLocomotion, LEDGE_CATCH_FRAMES, RESPAWN_FRAMES, TRANSITION_FRAMES, type IllidanMotion,
   advanceIllidanMotion, clearIllidanMotion, copyIllidanMotion, createIllidanMotion, firstIllidanMotionDifference,
@@ -208,7 +208,7 @@ const posesDown = (f: Readonly<Fighter>): boolean =>
 
 function selectCommandGrabClip(pose: FighterPose, f: Readonly<Fighter>): boolean {
   if (f.special.action === SpecialAction.none || f.grab.owner !== undefined || f.launch.hitstun !== 0) return false;
-  const clips = heroDefinition(f.character)?.presentation.commandGrab;
+  const clips = heroLook(f.character)?.commandGrab;
   const move = clips === undefined ? undefined : runningHeroSpecial(f);
   const grab = move?.commandGrab;
   if (clips === undefined || move === undefined || grab === undefined) return false;

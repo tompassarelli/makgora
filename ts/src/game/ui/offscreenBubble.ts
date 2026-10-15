@@ -4,7 +4,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { createBackdrop, createText, consoleUi } from "./frames";
 import { MENU_FONT } from "./hudLayout";
 import { Character } from "../sim/codes";
-import { fighterPortrait } from "../sim/heroes/registry";
+import { fighterPortrait } from "../roster/looks";
 import { OFFSCREEN_PORTRAIT } from "./portraitFrames";
 
 function bubblePosition(column: number, row: number): { readonly column: number; readonly row: number; readonly arrow: string } {

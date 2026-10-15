@@ -120,20 +120,6 @@ export type PortraitKind = "Tile" | "Card" | "Bust" | "Stock";
 export const PORTRAIT_KINDS: readonly PortraitKind[] = ["Tile", "Card", "Bust", "Stock"];
 
 
-export function fighterPortrait(character: number, kind: PortraitKind, slot?: number): string {
-  for (const rendered of RENDERED_FIGHTERS) {
-    if (rendered === character) return `war3mapImported\\Fighter${kind}${fighterRenderName(character)}${slot === undefined ? "" : `P${slot + 1}`}.blp`;
-  }
-  return fighterIcon(character);
-}
-
-const ORIGINAL_ICONS: Readonly<Record<number, string>> = { [Character.rifleman]: "BTNRifleman", [Character.demonHunter]: "BTNHeroDemonHunter" };
-
-
-function fighterIcon(character: number): string {
-  return heroDefinition(character)?.presentation.portrait ?? `ReplaceableTextures\\CommandButtons\\${ORIGINAL_ICONS[character] ?? "BTNRifleman"}.blp`;
-}
-
 const ORIGINAL_SLUGS: Readonly<Record<number, string>> = { [Character.rifleman]: "rifleman", [Character.demonHunter]: "illidan" };
 
 /** The fighter's name in commands and soak records: "rifleman", "illidan", "mountain-king". */

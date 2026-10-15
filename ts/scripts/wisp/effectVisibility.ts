@@ -25,6 +25,7 @@ import { CANDLE_FLAMES, CANDLE_SMOKE } from "../../src/game/presentation/candleL
 import { characterModelScale } from "../../src/game/presentation/modelScale";
 import { IMPACT_DUST_MODEL, IMPACT_ROLL_MODEL, IMPACT_TECH_MODEL, IMPACT_DEFILE_MODEL } from "../../src/game/assets/impactAssetInfo";
 import { headlessRender } from "./headlessRender";
+import { heroLook } from "../../src/game/roster/looks";
 
 /** How one move shows one model in Classic: the sequence and seek it plays, its time scale, and whether its anchor travels. */
 export interface EffectUse {
@@ -261,7 +262,7 @@ export function effectUses(): EffectUse[] {
     for (let kind = 0; kind < IMPACT_KIND_COUNT; kind++) uses.push({ fighter, move: `common impact ${kind}`, kind: "impact", model: impactModel(kind), sequence: impactAnimation(kind), seconds: impactStartSeconds(kind), timeScale: 1, travels: false, anchored: "fighter", scale: impactModelScale(kind) });
     const visit = (special: AuthoredSpecial | undefined, move: string): void => {
       if (special === undefined) return;
-      if (special.placement !== undefined) uses.push(supplemental(fighter, `${move} placed object`, special.placement.model?.path ?? heroDefinition(character)?.presentation.placedModel?.path ?? "Units\\Orc\\SerpentWard\\SerpentWard.mdx", "placed-object animation/lifetime is unmodeled"));
+      if (special.placement !== undefined) uses.push(supplemental(fighter, `${move} placed object`, special.placement.model?.path ?? heroLook(character)?.placedModel?.path ?? "Units\\Orc\\SerpentWard\\SerpentWard.mdx", "placed-object animation/lifetime is unmodeled"));
       visit(special.ex, `${move} EX`);
       for (const followUp of special.followUps ?? []) visit(followUp.special, `${move} follow-up`);
     };

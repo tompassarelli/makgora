@@ -17,6 +17,7 @@ import { storedPortraits } from "../portraitParts";
 import { MapBuildFailure } from "wisp/scripts/wisp/mapBuild";
 import { type Look, cueModels, listedRedraws, redrawCandidates, redrawProblem, unlistedRedraws } from "./cueModels";
 import { resolveRenderAsset, type AssetLocation, type AssetLayer, type Graphics, type ResolvedRenderAsset } from "wisp/scripts/wisp/renderAssets";
+import { heroLook } from "../../src/game/roster/looks";
 
 const key = (path: string) => path.replaceAll("\\", "/").toLowerCase().replace(/\.mdl$/, ".mdx");
 const PRIVATE = join(homedir(), ".local/share/smashcraft-render-assets");
@@ -93,10 +94,11 @@ export function headlessRender(options: RenderAssetOptions = {}) {
     const assets = options.assets ?? assetsView(manifest);
     const imports = options.imports ?? (yield* importedAssets(assets, join(INPUTS_STORE, "summon", manifest.summon)));
     const paths = new Map(imports.map(({ entry, source }) => [key(entry), source]));
-    for (const { presentation } of HERO_ROSTER) {
-      if (paths.has(key(presentation.model))) continue;
-      paths.set(key(presentation.model), join(assets, heroModelSource(presentation.model)));
-      if (importedModelFile(presentation.model) === undefined) stockFallback.add(key(presentation.model));
+    for (const { character } of HERO_ROSTER) {
+      const look = heroLook(character)!;
+      if (paths.has(key(look.model))) continue;
+      paths.set(key(look.model), join(assets, heroModelSource(look.model)));
+      if (importedModelFile(look.model) === undefined) stockFallback.add(key(look.model));
     }
     return paths;
   }).pipe(Effect.mapError((cause) => cause instanceof RenderAssetFailure ? cause : new RenderAssetFailure({ problem: `read the map's imports: ${cause.message}` })))));

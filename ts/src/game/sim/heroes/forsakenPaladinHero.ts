@@ -2,7 +2,6 @@
 
 import { Character } from "../codes";
 import type { HeroDefinition } from "./hero";
-import { FORSAKEN_PALADIN_CLIPS, FORSAKEN_PALADIN_FALLBACK_CLIP, FORSAKEN_PALADIN_DAMAGE_CLIPS } from "./forsakenPaladinClips";
 import { FORSAKEN_PALADIN_MOVES } from "./forsakenPaladinMoves";
 import { FORSAKEN_PALADIN_GAMEPLAN } from "./forsakenPaladinGameplan";
 import { FORSAKEN_PALADIN_SPECIALS } from "./forsakenPaladinSpecials";
@@ -17,12 +16,4 @@ export const FORSAKEN_PALADIN_HERO: HeroDefinition = {
   specials: FORSAKEN_PALADIN_SPECIALS,
   jab: { name: "Blade and Hilt", description: "A sword check, then a shove of the hilt on a second jab." },
   gameplan: FORSAKEN_PALADIN_GAMEPLAN,
-  presentation: {
-    model: "Units\\Creeps\\HeroForsakenPaladin\\HeroForsakenPaladin.mdx",
-    objectId: 0x6d667574,
-    portrait: "ReplaceableTextures\\CommandButtons\\BTNForsakenPaladin.blp",
-    clips: FORSAKEN_PALADIN_CLIPS,
-    fallback: FORSAKEN_PALADIN_FALLBACK_CLIP,
-    damageClips: FORSAKEN_PALADIN_DAMAGE_CLIPS,
-  },
 };

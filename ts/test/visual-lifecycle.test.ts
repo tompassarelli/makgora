@@ -39,6 +39,7 @@ import { specialAreaRegion } from "../src/game/presentation/disjointCues";
 import { characterModelScale } from "../src/game/presentation/modelScale";
 import { facingYaw } from "../src/game/render/effects";
 import { f32 } from "wisp/src/sim/f32";
+import { heroLook } from "../src/game/roster/looks";
 
 const headless = testHeadless(SMASHCRAFT_HEADLESS);
 
@@ -617,7 +618,7 @@ test("Mirror Image matches its owning fighter colour across repeated casts, expi
   client.run(() => {
     const s = shell();
     for (const slot of [0, 1]) selectCharacter(s.game, slot, Character.blademaster);
-    const imagePath = heroDefinition(Character.blademaster)?.presentation.placedModel?.path;
+    const imagePath = heroLook(Character.blademaster)?.placedModel?.path;
     expect(imagePath).toBeDefined();
     const images = () => client.effectPoses({ visibleOnly: true }).filter(pose => pose.model === imagePath && pose.z > s.origin.z - 500 && pose.scale > 0 && pose.alpha > 0);
     const step = () => {
@@ -654,7 +655,7 @@ test("Mirror Image matches its owning fighter colour across repeated casts, expi
           const fighter = fighterAt(s.world, slot);
           const image = drawn.find(pose => pose.x === s.origin.x + fighter.placed.x);
           expect(image?.teamColor, `P${slot + 1} decoy matches its body`).toBe(slot);
-          expect(image?.alpha).toBe(heroDefinition(Character.blademaster)?.presentation.placedModel?.alpha);
+          expect(image?.alpha).toBe(heroLook(Character.blademaster)?.placedModel?.alpha);
         }
         if (rematch === 0 && cast < 2) {
           const remaining = fighterAt(s.world, 0).placed.life;

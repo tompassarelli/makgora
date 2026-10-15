@@ -67,6 +67,7 @@ const frames = (paths: readonly string[]) => Effect.gen(function*() {
 import { MODEL_FACTS } from "../modelFacts";
 import { MODEL_FACTS_DIRECTORY, roundedFacts, writeModelFacts } from "../modelFactsTable";
 import { DEFINITIVE_CUE_EMITTERS } from "../../../src/game/presentation/cueEmitterInfo";
+import { heroLook } from "../../../src/game/roster/looks";
 
 const MODEL_TABLE = MODEL_FACTS_DIRECTORY;
 
@@ -188,7 +189,7 @@ const strikes = (args: readonly string[]) => Effect.scoped(Effect.gen(function*(
     (directory) => Effect.sync(() => rmSync(directory, { recursive: true, force: true })),
   );
   const files = new Map<string, string>();
-  for (const [index, model] of [...new Set(HERO_ROSTER.map(({ presentation }) => presentation.model))].entries()) {
+  for (const [index, model] of [...new Set(HERO_ROSTER.map(({ character }) => heroLook(character)!.model))].entries()) {
     if (assets !== undefined) {
       files.set(model, join(assets, heroModelSource(model)));
       continue;
@@ -241,9 +242,9 @@ const reach = (args: readonly string[]) => Effect.gen(function*() {
           id = `war3mapImported\\${name}-${new Bun.CryptoHasher("sha256").update(new Uint8Array(bytes)).digest("hex")}.mdx`;
           model = await loadDrawnModel(assets, fighter);
         } else {
-          const file = join(assets, heroModelSource(hero.presentation.model));
+          const file = join(assets, heroModelSource(heroLook(hero.character)!.model));
           model = new DrawnModel(await Bun.file(file).arrayBuffer(), characterModelScale(fighter));
-          id = hero.presentation.model;
+          id = heroLook(hero.character)!.model;
         }
         for (const style of styles) measured.push({ character: fighter, style, model: id, ...measureDrawnReach(model, fighter, style) });
       }
@@ -267,7 +268,7 @@ const reachCues = (args: readonly string[]) => Effect.gen(function*() {
       for (const character of SELECTABLE_CHARACTERS) {
         const hero = HERO_ROSTER.find((candidate) => candidate.character === character);
         const model = hero === undefined ? await loadDrawnModel(assets, character)
-          : new DrawnModel(await Bun.file(join(assets, heroModelSource(hero.presentation.model))).arrayBuffer(), characterModelScale(character));
+          : new DrawnModel(await Bun.file(join(assets, heroModelSource(heroLook(hero.character)!.model))).arrayBuffer(), characterModelScale(character));
         for (const style of measuredStyles(character)) measured.push(measureReachCue(model, character, style));
       }
       return measured;
@@ -298,10 +299,10 @@ const motion = (args: readonly string[]) => Effect.gen(function*() {
       for (const character of characters) {
         if (selected !== undefined && character !== selected) continue;
         const hero = HERO_ROSTER.find((candidate) => candidate.character === character);
-        const relative = hero === undefined ? FIGHTER_MODELS[character] ?? "" : heroModelSource(hero.presentation.model);
+        const relative = hero === undefined ? FIGHTER_MODELS[character] ?? "" : heroModelSource(heroLook(hero.character)!.model);
         const bytes = await Bun.file(join(assets, relative)).arrayBuffer();
         const hash = new Bun.CryptoHasher("sha256").update(new Uint8Array(bytes)).digest("hex");
-        const model = hero?.presentation.model ?? `war3mapImported\\${relative.split("/").at(-1)?.replace(/\.mdx$/, "")}-${hash}.mdx`;
+        const model = heroLook(character)?.model ?? `war3mapImported\\${relative.split("/").at(-1)?.replace(/\.mdx$/, "")}-${hash}.mdx`;
         const drawn = new DrawnModel(bytes, characterModelScale(character));
         for (const state of ["walk", "run"] as const) {
           const stride = measureDrawnStride(bytes, drawn, character, state, model);

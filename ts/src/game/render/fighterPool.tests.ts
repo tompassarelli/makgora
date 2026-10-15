@@ -2,8 +2,9 @@ import { assertEquals, test } from "wisp/src/runtime/testing";
 import { originalClip, originalClipCount, originalClipNamed } from "../../generated/clips/fighterOriginalClipInfo";
 import { characterClips, namedClips } from "../presentation/fighterClips";
 import { Character } from "../sim/codes";
-import { SELECTABLE_CHARACTERS, fighterName, heroDefinition } from "../sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterName } from "../sim/heroes/registry";
 import { WHITE_FIGHTER_MODELS } from "../../generated/assets/whiteFighterModels";
+import { heroLook } from "../roster/looks";
 
 
 
@@ -16,7 +17,7 @@ test("every selectable fighter has a clip pool covering its clip table and a whi
     assertEquals(WHITE_FIGHTER_MODELS[character] !== undefined, true, `${name} has no white body for its smash-charge and heavy-hit flash`);
     for (let index = 0; index < count; index++) assertEquals(originalClip(character, index) !== undefined, true, `${name} clip ${index} is missing`);
     const table = characterClips(character);
-    const fallback = heroDefinition(character)?.presentation.fallback;
+    const fallback = heroLook(character)?.fallback;
     const clips = namedClips(table);
     if (fallback !== undefined) clips.push(fallback);
     for (const clip of clips) assertEquals(clip.index >= 0 && clip.index < count, true, `${name}'s clip table names sequence ${clip.index}, which its pool lacks`);

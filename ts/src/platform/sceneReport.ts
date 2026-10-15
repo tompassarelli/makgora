@@ -5,6 +5,7 @@ import { installSceneReport, startSceneReport } from "wisp/src/platform/scene";
 import { FLOOR_HEIGHT, HIDDEN_EFFECT_DEPTH } from "../game/presentation/arenaCamera";
 import { HERO_ROSTER } from "../game/sim/heroes/registry";
 import { shellState } from "../host/loop/state";
+import { heroLook } from "../game/roster/looks";
 
 export { installSceneReport };
 
@@ -22,6 +23,6 @@ export function startMatchSceneReport(): void {
       return Math.abs(z - ground) < 1.0 || z < ground - HIDDEN_EFFECT_DEPTH + 1.0;
     },
 
-    unitModel: (unitType) => HERO_ROSTER.find(({ presentation }) => presentation.objectId === unitType)?.presentation.model,
+    unitModel: (unitType) => HERO_ROSTER.map(({ character }) => heroLook(character)).find((look) => look?.objectId === unitType)?.model,
   });
 }

@@ -2,7 +2,7 @@ import { model as mdx } from "../../ts/scripts/clipNodes";
 import { isDeepStrictEqual } from "node:util";
 import { characterClips, illidanSmashClips, namedClips, specialClip } from "../../ts/src/game/presentation/fighterClips";
 import { contactDamageClips } from "../../ts/src/game/presentation/damagePose";
-import { heroDefinition } from "../../ts/src/game/sim/heroes/registry";
+import { heroLook } from "../../ts/src/game/roster/looks";
 import * as illidan from "../../ts/src/game/presentation/demonHunterAssetInfo";
 import { AttackStyle, Character, SpecialAction } from "../../ts/src/game/sim/codes";
 import { onGlobalClock } from "./original-clips";
@@ -13,7 +13,7 @@ export function flashableSequences(character: number, sequences: readonly mdx.Se
   const indices = new Set(namedClips(characterClips(character)).map(clip => clip.index));
   for (const clip of namedClips(characterClips(character))) if (clip.classicStartup !== undefined) indices.add(clip.classicStartup.index);
   for (const clip of contactDamageClips(character) ?? []) indices.add(clip.index);
-  const fallback = heroDefinition(character)?.presentation.fallback;
+  const fallback = heroLook(character)?.fallback;
   if (fallback !== undefined) indices.add(fallback.index);
   for (const name of character === Character.demonHunter ? ["stand", "stand ready", "stand hit"] : ["stand", "stand ready", "stand hit", "walk"]) {
     const index = originalClipNamed(character, name);
@@ -54,7 +54,7 @@ export function flashableSequences(character: number, sequences: readonly mdx.Se
       }
     }
   }
-  const grab = heroDefinition(character)?.presentation.commandGrab;
+  const grab = heroLook(character)?.commandGrab;
   if (grab !== undefined) for (const clip of [grab.travel, grab.hold, grab.recovery]) indices.add(clip.index);
   return sequences.filter((sequence, index) => indices.has(index));
 }

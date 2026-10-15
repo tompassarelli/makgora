@@ -7,11 +7,10 @@
 
 import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle, HitElement } from "../codes";
-import { type AuthoredMove, type FighterMoves, type MoveRegion, type StrikeCapsule, heroHurtPose, heroMove, heroRegion, jabStep, tipper, tipperMove } from "../heroMoves";
+import { type AuthoredMove, type MoveRegion, type StrikeCapsule, heroHurtPose, heroMove, heroRegion, jabStep, tipper, tipperMove } from "../heroMoves";
 import type { HitEffect } from "../hitRegions";
 import { strongHit } from "../strongHits";
 import type { HurtPart, HurtPose } from "../hurtboxes";
-import type { HeroClip } from "./hero";
 import { ANGLES, type Angle } from "./authoring";
 
 
@@ -281,20 +280,3 @@ export const RIFLEMAN_GROUND: GroundKit = {
   },
   reaches: {},
 };
-
-
-export function jabSlice(clip: { readonly index: number }, until: number): HeroClip {
-  return { index: clip.index, seconds: until, aligned: true, until };
-}
-
-
-
-
-
-
-
-export function strikeClip(clip: { readonly index: number }, strike: number, kit: Pick<FighterMoves, "normals">, style: AttackStyle, frame?: number): HeroClip {
-  const move = kit.normals[style];
-  const before = frame === undefined ? move?.startupFrames ?? 1 : frame - 1;
-  return { index: clip.index, seconds: f32(f32(strike * (move?.totalFrames ?? 1)) / Math.max(1, before)), aligned: true };
-}

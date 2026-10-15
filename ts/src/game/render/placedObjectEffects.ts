@@ -8,7 +8,7 @@ import { type Fighter, PACK_CAPACITY, type PlacedObject, placedObject } from "..
 import { type AuthoredSpecial, CompanionMode } from "../sim/specials/schema";
 import { Character } from "../sim/codes";
 import { authoredTuning } from "../sim/tuning";
-import { heroDefinition } from "../sim/heroes/registry";
+import { heroLook } from "../roster/looks";
 import { type ParkedFlags, type WorldOrigin, parkOnce, placeEffect } from "./effects";
 import { bearState } from "../presentation/bearFeedback";
 import { BearFeedback } from "./bearFeedback";
@@ -23,7 +23,7 @@ const BIRTH_SECONDS = 60.0;
 const DEATH_SECONDS = f32(2.333);
 
 function placementPaths(character: Character): string[] {
-  const paths = [heroDefinition(character)?.presentation.placedModel?.path ?? PLACED_OBJECT_MODEL];
+  const paths = [heroLook(character)?.placedModel?.path ?? PLACED_OBJECT_MODEL];
   const visit = (special: AuthoredSpecial | undefined): void => {
     if (special === undefined) return;
     visit(special.ex);
@@ -72,7 +72,7 @@ export class PlacedObjectEffects {
     const prepared = (this.prepared ??= []);
     const parked = (this.parked ??= []);
     const paths = placementPaths(character);
-    const imagePath = character === Character.blademaster ? heroDefinition(character)?.presentation.placedModel?.path : undefined;
+    const imagePath = character === Character.blademaster ? heroLook(character)?.placedModel?.path : undefined;
     for (let animal = 0; animal < ANIMALS; animal++) {
       const index = slot * ANIMALS + animal;
       const current = this.models[index];
@@ -121,7 +121,7 @@ export class PlacedObjectEffects {
   presentConfirmed(frame: number, fighter: Readonly<Fighter>, slot: number): void {
     for (let animal = 0; animal <= fighter.pack.length; animal++) {
       const placed = placedObject(fighter, animal);
-      const look = placed.spec?.model ?? heroDefinition(fighter.character)?.presentation.placedModel ?? DEFAULT_LOOK;
+      const look = placed.spec?.model ?? heroLook(fighter.character)?.placedModel ?? DEFAULT_LOOK;
       this.modelFor(slot * ANIMALS + animal, look.path);
     }
     this.feedback.confirm(frame, fighter, slot);
@@ -147,7 +147,7 @@ export class PlacedObjectEffects {
   }
 
   private presentAnimal(fighter: Readonly<Fighter>, placed: Readonly<PlacedObject>, slot: number): void {
-    const look = placed.spec?.model ?? heroDefinition(fighter.character)?.presentation.placedModel ?? DEFAULT_LOOK;
+    const look = placed.spec?.model ?? heroLook(fighter.character)?.placedModel ?? DEFAULT_LOOK;
 
     const model = this.paths[slot] === look.path ? this.models[slot] : undefined;
     const spec = placed.spec;
