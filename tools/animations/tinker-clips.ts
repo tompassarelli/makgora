@@ -12,7 +12,7 @@ import { encodeVerified, ensure, hash, onGlobalClock, originalBodyClip, parseSou
 
 interface Shape { chest?: number; head?: number; right?: number; left?: number; elbow?: number; legs?: number; knees?: number; root?: number; yaw?: number; height?: number }
 interface Phase extends Shape { frame: number }
-interface Action { pose: string; frames: number; contact?: number; phases: Phase[]; donor?: number; robot?: boolean; loop?: boolean }
+interface Action { pose: string; frames: number; contact?: number; phases: Phase[]; donor?: number; loop?: boolean }
 const strike = (pose: string, first: number, active: number, recovery: number, contact: Shape, prepare: Shape = {chest: -12, right: -20, left: -15}, donor = 6): Action => ({
   pose, frames: first - 1 + active + recovery, donor, phases: [{frame: 0}, {frame: Math.max(1, first - 3), ...prepare},
     {frame: first - 1, ...contact}, {frame: first + active - 2, ...contact},
@@ -21,6 +21,11 @@ const strike = (pose: string, first: number, active: number, recovery: number, c
 const roll = (pose: string, frames: number, sign: number, floor = false): Action => ({pose,frames,phases:[
   {frame:0,root:floor?90:0}, {frame:4,root:sign*45,legs:35,knees:65}, {frame:Math.round(frames*.4),root:sign*145,legs:55,knees:80},
   {frame:Math.round(frames*.7),root:sign*285,legs:35,knees:65}, {frame:frames,root:sign*360}],});
+const LASER_ORIGIN = {x: 30, z: 50}, LASER_ACTIVE = [20, 27] as const;
+const LASER_AIM: Shape = {chest:-35,right:100,left:-55,elbow:-65,legs:55,knees:85,head:-10};
+const LASER_PHASES: Phase[] = [{frame:0},{frame:5,chest:-15,right:-70,left:-70,elbow:15,head:-12},{frame:13,chest:-18,right:-80,left:-80,elbow:20,head:-15},
+  {frame:18,...LASER_AIM},{frame:19,...LASER_AIM},{frame:27,...LASER_AIM},{frame:31,chest:-20,right:40,left:-70,elbow:-20,head:-20,legs:35,knees:50},
+  {frame:40,chest:42,right:105,left:95,elbow:25,head:20,legs:30,knees:45},{frame:48,chest:38,right:100,left:90,elbow:20,head:18,legs:28,knees:40},{frame:54}];
 const actions: Action[] = [
   strike("jab",4,2,12,{right:44,left:-12,chest:16,elbow:-30}),
   strike("jab2",4,2,12,{right:-12,left:42,chest:16,elbow:-30}),
@@ -48,10 +53,10 @@ const actions: Action[] = [
   {...strike("throwUp",16,1,8,{right:138,left:132,chest:-30},{right:35,left:35,chest:30,legs:25,knees:40}),contact:15},
   {...strike("throwDown",20,1,24,{right:18,left:18,chest:55,legs:45,knees:60},{right:125,left:115,chest:-20}),contact:19},
   {pose:"neutralSpecial",frames:43,phases:[{frame:0},{frame:10,chest:-12,right:25,left:25},{frame:14,chest:-30,right:55,left:55},{frame:18,chest:-10,right:30,left:30},{frame:20,chest:-32,right:62,left:62},{frame:24,chest:-10,right:30,left:30},{frame:26,chest:-35,right:66,left:66},{frame:35,chest:-10},{frame:43}]},
-  strike("sideSpecial",25,1,23,{right:40,left:40,chest:45,legs:35,knees:55},{right:100,left:100,chest:-12}),
+  strike("downSpecial",25,1,23,{right:40,left:40,chest:45,legs:35,knees:55},{right:100,left:100,chest:-12}),
   {pose:"sideSpecialFollowUp",frames:36,phases:[{frame:0},{frame:12,right:85,left:85,chest:25},{frame:24,right:35,left:35,chest:-15},{frame:36}]},
   {pose:"upSpecial",frames:32,phases:[{frame:0},{frame:6,chest:28,legs:45,knees:65},{frame:7,chest:-20,right:-25,left:-25,legs:-15},{frame:20,chest:-12,right:-35,left:-35,legs:18,knees:25},{frame:29,chest:10,right:45,left:45,legs:40,knees:55},{frame:32,chest:10,legs:40,knees:55}]},
-  {pose:"downSpecial",frames:46,robot:true,phases:[{frame:0},{frame:7,chest:25,right:85,left:85,legs:35,knees:45},{frame:8,chest:-15,right:-35,left:45},{frame:12,chest:20,right:30,left:30},{frame:14,chest:30,right:85,left:65,elbow:-40},{frame:18,chest:30,right:95,left:75,elbow:-40},{frame:23,chest:15,right:55,left:45},{frame:24,chest:35,right:90,left:90,legs:35,knees:55},{frame:35,chest:20,right:25,left:25},{frame:46}]},
+  {pose:"sideSpecial",frames:54,phases:LASER_PHASES},
   {pose:"turn",frames:8,phases:[{frame:0,yaw:180},{frame:4,yaw:100,chest:15},{frame:8}]},
   {pose:"stop",frames:8,phases:[{frame:0,chest:-30,legs:25,knees:35},{frame:4,chest:-35,legs:35,knees:45},{frame:8}]},
   {pose:"jumpSquat",frames:4,phases:[{frame:0},{frame:3,chest:28,legs:48,knees:70},{frame:4,chest:20,legs:35,knees:50}]},
@@ -153,9 +158,8 @@ for(const action of actions) {
     const old=original.get(path);if(!old||onGlobalClock(old))return;
     const match=/^\.(Bones|Helpers)\.(\d+)\.(Rotation|Translation|Scaling)$/.exec(path);
     const node=match?source[match[1] as "Bones"|"Helpers"][Number(match[2])]:undefined;
-    for(const frame of [...new Set([...action.phases.map(p=>p.frame), ...(action.robot?[7,8,23,24]:[])])].sort((a,b)=>a-b)){
-      const robot=action.robot&&frame>=8&&frame<=23;
-      const sequence=robot?14:action.donor??6;
+    for(const frame of action.phases.map(p=>p.frame)){
+      const sequence=action.donor??6;
       const p=shapeAt(action,frame);
       let vector=sample(old,sequence);
       if(path.endsWith(".Scaling")&&!old.Keys.some(k=>k.Frame>=source.Sequences[sequence]!.Interval[0]!&&k.Frame<=source.Sequences[sequence]!.Interval[1]!))vector=new Float32Array([1,1,1]);
@@ -210,6 +214,14 @@ for(const pose of ["upTilt","upSmash","upAir"]){
   let highest=0;for(let i=1;i<triangles.length;i+=2)highest=Math.max(highest,triangles[i]!);
   ensure(highest>160,`${pose}: overhead claw remains inside the body (${highest})`);
 }
+{
+  const record=records.find(r=>r.pose==="sideSpecial")!,claws=drawn.nodes().flatMap((n,i)=>/^Bone_BackPack_Claw[12]Right$/.test(n.name)?[i]:[]);
+  ensure(claws.length===2,"Laser: firing claw bones missing");
+  for(let frame=LASER_ACTIVE[0]-1;frame<=LASER_ACTIVE[1];frame++)for(const facing of [1,-1]){
+    const nodes=drawn.posed(record.index,frame/60,facing).nodes,miss=Math.min(...claws.map(i=>Math.hypot(nodes[i*2]!-facing*LASER_ORIGIN.x,nodes[i*2+1]!-LASER_ORIGIN.z)));
+    ensure(miss<=12,`Laser f${frame} facing ${facing}: firing claw ${miss.toFixed(1)} units from the beam origin`);
+  }
+}
 const pain=records.filter(r=>r.pose.startsWith("pain"));
 for(let a=0;a<pain.length;a++)for(let b=a+1;b<pain.length;b++){
   const first=drawn.triangles(pain[a]!.index,0,1),second=drawn.triangles(pain[b]!.index,0,1);
@@ -225,7 +237,7 @@ await Bun.write(join(project,"ts/src/game/presentation/heroes/tinkerClipInfo.ts"
   'import { f32 } from "wisp/src/sim/f32";', 'import type { HeroClipTable, HeroClip } from "../../sim/heroes/hero";',
   "export const TINKER_AUTHORED_CLIPS = {",...bindings.filter(b=>!b.includes("pain")),"} as const satisfies HeroClipTable;",
   "export const TINKER_DAMAGE_CLIPS: readonly HeroClip[] = [",...records.filter(r=>r.pose.startsWith("pain")).map(r=>`  { index: ${r.index}, seconds: ${seconds(.4)} },`),"];"] .join("\n")+"\n");
-await Bun.write(join(output,"tinker-clips.json"),JSON.stringify({source:input,stockSequences:23,sequences:packaged.Sequences.length,records,robotVisibilityFrames:[8,23]},null,2)+"\n");
+await Bun.write(join(output,"tinker-clips.json"),JSON.stringify({source:input,stockSequences:23,sequences:packaged.Sequences.length,records},null,2)+"\n");
 const strides:DrawnStride[]=Object.entries(DRAWN_STRIDES).filter(([key])=>Number(key)!==19).flatMap(([key,row])=>row?["walk","run"].map(motion=>({character:Number(key) as Character,motion:motion as "walk"|"run",...row[motion as "walk"|"run"]})):[]);
 const walkSamples=Array.from({length:61},(_,frame)=>drawn.triangles(0,frame/60,1)),walkFirst=walkSamples[0]!;
 let walkFloor=Infinity;for(let i=1;i<walkFirst.length;i+=2)walkFloor=Math.min(walkFloor,walkFirst[i]!);
@@ -238,11 +250,13 @@ for(let index=0;index<walkFirst.length;index+=2){
 const strideSpeed=strideSum/Math.max(1,strideCount);ensure(strideSpeed>0,"Tinker Walk lacks a drawn stride");
 for(const gait of ["walk","run"]as const)strides.push({character:Character.tinker,motion:gait,clip:0,model:"units\\creeps\\HeroTinker\\HeroTinker.mdl",speed:strideSpeed});
 await Bun.write(join(project,"ts/src/game/presentation/drawnStrideInfo.ts"),drawnStrideSource(strides));
-const selected=["jab","forwardTilt","forwardTiltUp","forwardTiltDown","upTilt","dashAttack","downTilt","neutralAir","grab","throwBack","upSpecial","downSpecial"];
+const selected=["jab","forwardTilt","forwardTiltUp","forwardTiltDown","upTilt","dashAttack","downTilt","neutralAir","grab","throwBack","upSpecial","sideSpecial","downSpecial"];
 for(const pose of selected){const r=records.find(r=>r.pose===pose)!;
   const action=actions.find(a=>a.pose===pose)!;
-  const times=pose==="downSpecial"?[0,7,8,14,18,23,24,35,46]:action.phases.map(p=>p.frame);
-  const frames:PoseFrame[]=[1,-1].flatMap(facing=>times.map(frame=>({frame,phase:0,x:0,z:0,facing,parts:[],strikes:[],clip:r.index,seconds:frame/60})));
+  const laser=pose==="sideSpecial",times=laser?[0,5,13,19,20,24,27,30,40,54]:action.phases.map(p=>p.frame);
+  const beam=(frame:number,facing:number)=>laser&&frame>=LASER_ACTIVE[0]&&frame<=LASER_ACTIVE[1]?[{x1:facing*LASER_ORIGIN.x,z1:LASER_ORIGIN.z,x2:facing*(LASER_ORIGIN.x+200),z2:LASER_ORIGIN.z,radius:14}]:[];
+  const phase=(frame:number)=>!laser?0:frame<LASER_ACTIVE[0]?1:frame<=LASER_ACTIVE[1]?2:3;
+  const frames:PoseFrame[]=[1,-1].flatMap(facing=>times.map(frame=>({frame,phase:phase(frame),x:0,z:0,facing,parts:[],strikes:beam(frame,facing),clip:r.index,seconds:frame/60} as PoseFrame)));
   await Bun.write(join(output,`${pose}-both-facings.png`),sheet(pose,drawn,frames,times.length).png);
 }
 console.log(`TINKER_CLIPS_PASS ${records.length} authored actions, 23 stock sequences preserved, ${packaged.Sequences.length} model sequences`);

@@ -121,7 +121,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
 
 - Tinker animation authoring (from the repository root):
   `bun tools/animations/tinker-clips.ts PRIVATE_CLASSIC_HEROTINKER.mdx PRIVATE_OUTPUT [--no-pool]`
-  preserves the 23 classic sequences and authors the claw-pack, Robo-Goblin,
+  preserves the 23 classic sequences and authors the claw-pack, Laser aim,
   recovery, paired throws and nine pain reactions. It writes the private
   model, both-facing silhouette sheets, clip metadata and measured stride;
   `--no-pool` leaves pooled export to the combined roster pass

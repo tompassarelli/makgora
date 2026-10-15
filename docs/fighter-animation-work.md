@@ -1460,13 +1460,11 @@ with its authored contact mesh at 500 ms. Shield recoil is 97.
 It regenerates `tinkerClipInfo.ts` and Tinker's row in `drawnStrideInfo.ts`.
 The claw-pack has a measured 142.838-world-unit stride at stock scale 1.
 
-Since 15 October 2026 down special plays the factory clip and the Laser side
-special borrows the rocket-launch clip until it gets its own aim clip; the
-Robo-Goblin clip below is authored but unused.
-
-Robo-Goblin keeps the tank rig visible on simulation frames 8–23 within its
-46-frame clip, including the 14–18 contact window. Normal and robot visibility
-use their own stock geoset channels. A sequence-local parent plants feet and
+Down special (Pocket Factory) plays the factory clip at index 49. The Laser
+side special has its own 54-frame aim clip at index 52: the claw-pack arms rise
+through the 1–19 tell, the firing right claw holds within 12 model units of the
+beam origin (x 30, z 50 at stock scale) on frames 19–27 in both facings, and the
+body slumps through the 28–54 end lag. A sequence-local parent plants feet and
 floor recoveries while preserving all stock poses. Overhead claws must exceed
 160 model units at contact; nine pain silhouettes must differ pairwise by more
 than 2 units. The generator checks the original poses at start, middle and end.
