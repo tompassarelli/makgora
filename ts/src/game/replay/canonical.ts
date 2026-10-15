@@ -9,7 +9,7 @@ import { PARTICIPANT_CAPACITY, PARTICIPANT_SLOTS, participantActive, type Slots 
 import { at } from "wisp/src/runtime/lookup";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import type { BotObservationFrame } from "../match/botPerception";
-import { AttackStyle, GrabAction, LAST_ATTACK_STYLE, SPECIAL_ACTION_CAPACITY, SpecialAction } from "../sim/codes";
+import { AttackStyle, Character, GrabAction, LAST_ATTACK_STYLE, SPECIAL_ACTION_CAPACITY, SpecialAction } from "../sim/codes";
 import type { FighterMoves } from "../sim/heroMoves";
 import type { AuthoredSpecial, FighterSpecials, SpecialPlacement, SpecialProjectile } from "../sim/heroSpecials";
 import type { HitEffect } from "../sim/hitRegions";
@@ -1077,6 +1077,25 @@ function writeFighter(sink: StateSink, prefix: string, fighter: Readonly<Fighter
   sink.text(kitDigestField(`${prefix}.specials`, t.specials, SPECIALS_DIGESTS, fighterSpecialsCanonical));
   int("manaPoints", fighter.mana.points);
   int("manaDeniedSerial", v.manaDenied);
+  if (fighter.character === Character.kobold) {
+    const candle = fighter.candle;
+    int("candleHeat", candle.heat);
+    int("candleState", candle.state);
+    bool("candleLit", candle.lit);
+    real("candleX", candle.x);
+    real("candleZ", candle.z);
+    real("candleVx", candle.vx);
+    real("candleVz", candle.vz);
+    int("candleSurface", candle.surface ?? -1);
+    int("candleTimer", candle.timer);
+    int("candleAway", candle.away);
+    int("candleGuard", candle.guard);
+    for (let i = 0; i < PARTICIPANT_CAPACITY; i++) int(`candleStruck[${i}]`, candle.struck[i] ?? -1);
+    int("candleSpecialStruck", candle.specialStruck);
+    int("candleDropSerial", candle.dropSerial);
+    int("candleSnuffSerial", candle.snuffSerial);
+    int("candleReturnSerial", candle.returnSerial);
+  }
 
   if (t.specials !== undefined) {
     int("specialForm", sp.form);

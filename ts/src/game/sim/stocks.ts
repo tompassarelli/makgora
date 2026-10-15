@@ -24,6 +24,7 @@ import { stageBounds } from "./stageBounds";
 import { resetSpecialOnStock } from "./heroSpecialRules";
 import { clearHeroStatus } from "./heroStatus";
 import { endItemBuff, groundedJumps } from "./itemBuffs";
+import { resetCandle } from "./heroes/koboldCandle";
 const RESPAWN_FRAMES = 60;
 const RESPAWN_HEIGHT = 280.0;
 const RESPAWN_INVINCIBLE_FRAMES = 90;
@@ -58,6 +59,7 @@ export function checkBlastZone(world: Roster, slot: number, stage: number = 0): 
   launch.knockbackZ = 0.0;
   clearTech(f);
   endItemBuff(f);
+  resetCandle(f);
   status.stocks = max(0, status.stocks - 1);
   status.respawn = status.stocks > 0 ? RESPAWN_FRAMES : 0;
   attack.style = undefined;
@@ -94,6 +96,7 @@ export function respawnFighter(world: Roster, slot: number, startX: number): voi
   clearSpecialOnStock(f);
   f.visuals.manaDrained = 0;
   resetSpecialOnStock(f);
+  resetCandle(f);
   f.status.armorFrames = 0;
   f.status.armorChills = false;
   f.status.divineFrames = 0;

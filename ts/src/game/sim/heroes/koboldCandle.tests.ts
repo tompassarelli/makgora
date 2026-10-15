@@ -1,0 +1,36 @@
+import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
+import { Character, ContactKind } from "../codes";
+import { collectDamageContact } from "../contacts";
+import { createFighter } from "../fighter";
+import { createRoster, fighterAt } from "../roster";
+import { contactBatch, hitEffect } from "../testWorld";
+import { Phase } from "../../match/rules";
+import { stepMatch } from "../../match/step";
+import { createReplaySnapshot } from "../../replay/snapshot";
+import { candleLevel } from "./koboldCandle";
+
+test("Kobold's candle gains 8 heat per whole percent he lands, at most 75 a hit, burns down 1 every third frame and goes out with his stock [k3 measure docs/design/roster.md]", () => {
+  const state = { ...createReplaySnapshot(), world: createRoster(3, [createFighter(Character.kobold, -100.0, 1), createFighter(Character.rifleman, 100.0, -1)]) };
+  state.match.phase = Phase.match;
+  state.match.humanMask = 3;
+  state.match.humanFighterMask = 3;
+  state.match.practice = true;
+  const { world } = state;
+  const kobold = fighterAt(world, 0);
+  const land = (damage: number, growth: number, base: number) => contactBatch(world, () => collectDamageContact(world, 0, 1, hitEffect(damage, growth, base, 1.0, 1.0), 1, ContactKind.launch, true, undefined, false));
+  land(9.0, 63.0, 18.0);
+  assertEquals(kobold.candle.heat, 72);
+  assertEquals(candleLevel(kobold), 0);
+  land(18.0, 104.0, 26.0);
+  assertEquals(kobold.candle.heat, 147);
+  assertEquals(candleLevel(kobold), 1);
+  land(2.0, 50.0, 20.0);
+  assertEquals(kobold.candle.heat, 163);
+  assertEquals(candleLevel(kobold), 2);
+  for (let frame = 1; frame <= 300; frame++) stepMatch(state.match, world, state.controls, frame);
+  assertEquals(kobold.candle.heat, 63);
+  kobold.motion.x = -100000.0;
+  stepMatch(state.match, world, state.controls, 301);
+  assertTrue(kobold.status.out);
+  assertEquals(kobold.candle.heat, 0);
+});

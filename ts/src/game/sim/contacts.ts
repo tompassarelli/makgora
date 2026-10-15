@@ -44,6 +44,7 @@ import { fighterHurtParts } from "./hurtboxes";
 import { knockbackWeight } from "./itemBuffs";
 import { type AppliedStatus, applyHeroStatus, damageEndsHeroStatus } from "./heroStatus";
 import { dealtManaGain, gainMana, takenManaGain } from "./mana";
+import { candleHeatGain, feedCandle } from "./heroes/koboldCandle";
 import { EX_ARMOR_DAMAGE, exArmorActive } from "./exSpecials";
 import { contactTraits } from "./identityTraits";
 import { FORSAKEN_PALADIN_DAMAGE_MULTIPLIER, forsakenPaladinSwordContact } from "./heroes/forsakenPaladinSword";
@@ -91,6 +92,7 @@ function emptyContact(): DamageContact {
 
 
 const batch: { contacts: DamageContact[]; count: number; collecting: boolean } = { contacts: [], count: 0, collecting: false };
+const candleHeat: number[] = [0, 0, 0, 0];
 let damageObserver: ((source: number, target: number, damage: number) => void) | undefined;
 
 export function observeDamageContacts(observer: ((source: number, target: number, damage: number) => void) | undefined): void {
@@ -282,7 +284,10 @@ function resolveDamageContacts(world: Roster, slot: number): void {
       gainMana(source, stolen);
     }
     if (damage > 0) {
-      if (source !== target) gainMana(source, dealtManaGain(damage));
+      if (source !== target) {
+        gainMana(source, dealtManaGain(damage));
+        candleHeat[contact.source] = at(candleHeat, contact.source) + candleHeatGain(source, damage);
+      }
       gainMana(target, takenManaGain(damage));
     }
     if (damage > 0 && contact.kind !== ContactKind.pummel) {
@@ -424,11 +429,13 @@ function applyContactStatuses(world: Roster, slot: number): void {
 
 
 export function finishDamageContacts(world: Roster): void {
+  candleHeat.fill(0);
   for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
     if (!isActive(world, slot)) continue;
     resolveDamageContacts(world, slot);
     applyContactStatuses(world, slot);
   }
+  for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) if (at(candleHeat, slot) > 0) feedCandle(fighterAt(world, slot), at(candleHeat, slot));
   batch.count = 0;
   batch.collecting = false;
 }

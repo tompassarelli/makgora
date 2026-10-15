@@ -8,6 +8,7 @@ import { type TechInput, emptyTechInput } from "../physics/techInput";
 import { at } from "wisp/src/runtime/lookup";
 import {
   type AttackStyle,
+  CandleState,
   Character,
   DownState,
   GrabAction,
@@ -315,6 +316,25 @@ interface FreezeTrap {
   cooldown: number;
 }
 
+interface Candle {
+  heat: number;
+  state: CandleState;
+  lit: boolean;
+  x: number;
+  z: number;
+  vx: number;
+  vz: number;
+  surface: number | undefined;
+  timer: number;
+  away: number;
+  guard: number;
+  readonly struck: (number | undefined)[];
+  specialStruck: number;
+  dropSerial: number;
+  snuffSerial: number;
+  returnSerial: number;
+}
+
 interface Dodge {
   airDodging: boolean;
   airFrame: number;
@@ -534,6 +554,7 @@ export interface Fighter {
   readonly water: Water;
   readonly status: Status;
   readonly mana: Mana;
+  readonly candle: Candle;
   readonly placed: PlacedObject;
 
   readonly pack: PlacedObject[];
@@ -754,6 +775,7 @@ export function createFighter(character: Character, startX: number, facing: numb
     water: { inWater: false, frames: 0, entries: 0, hydraFrame: 0, hydraX: 0.0, hydraStrikeFrame: -1 },
     status: { offscreenFrames: 0, damage: 0.0, stocks: STARTING_STOCKS, respawn: 0, out: false, invincible: 0, frozenFrames: 0, freezeImmunityFrames: 0, armorFrames: 0, armorMaxDamage: 0.0, armorChills: false, condition: 0, conditionFrames: 0, conditionGroup: 0, conditionImmunityFrames: 0, conditionImmunity: [0, 0, 0], divineFrames: 0, poisonFrames: 0, poisonEvery: 0, poisonDamage: 0.0, buff: 0, buffFrames: 0 },
     mana: { points: 0 },
+    candle: { heat: 0, state: CandleState.held, lit: true, x: 0.0, z: 0.0, vx: 0.0, vz: 0.0, surface: undefined, timer: 0, away: 0, guard: 0, struck: noSlots(), specialStruck: 0, dropSerial: 0, snuffSerial: 0, returnSerial: 0 },
     placed: createPlacedObject(),
     pack: packFrom(spares, packLength(character)),
   };

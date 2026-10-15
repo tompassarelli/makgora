@@ -136,6 +136,7 @@ src/game/sim/heroes/forsakenPaladinSpecials.tests.ts	1	3259000	2464
 src/game/sim/heroes/grom.tests.ts	1	100297000	8977
 src/game/sim/heroes/jaina.tests.ts	1	0	0
 src/game/sim/heroes/kaelthas.tests.ts	1	2000	30
+src/game/sim/heroes/koboldCandle.tests.ts	1	7046000	300
 src/game/sim/heroes/lichSpecials.tests.ts	1	3737000	2836
 src/game/sim/heroes/medivh.tests.ts	1	1524000	1275
 src/game/sim/heroes/mountainKingSpecials.tests.ts	1	3120000	2348

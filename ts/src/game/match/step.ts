@@ -15,6 +15,7 @@ import { carryOnMovingDecks } from "../sim/movingDecks";
 import { observedActions, resetObservedActions } from "../sim/observations";
 import { updateProjectiles } from "../sim/projectiles";
 import { advancePlacedObjects } from "../sim/placedObjects";
+import { advanceCandleBodies, settleCandles } from "../sim/heroes/koboldCandle";
 import { type Roster, copyControls, fighterAt, isActive, neutralControls } from "../sim/roster";
 import { regenerateShield } from "../sim/shield";
 import { advanceSpecials, startFighterSpecial } from "../sim/specials";
@@ -254,6 +255,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
   advanceSpecials(world, stage, stageFrame, controls.inputs);
   updateProjectiles(world, stage, stageFrame);
   advancePlacedObjects(world);
+  advanceCandleBodies(world, stage);
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;
     const f = fighterAt(world, slot);
@@ -262,6 +264,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
     advanceItemBuff(f);
   }
   finishDamageContacts(world);
+  settleCandles(world, game.matchFrame);
   resolveGrabs(world);
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;

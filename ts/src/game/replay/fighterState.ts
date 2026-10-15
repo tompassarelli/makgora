@@ -360,6 +360,25 @@ export function copyFighterState(target: Fighter, source: Readonly<Fighter>, act
   const sourceMana = source.mana;
   mana.points = sourceMana.points;
 
+  const candle = target.candle;
+  const sourceCandle = source.candle;
+  candle.heat = sourceCandle.heat;
+  candle.state = sourceCandle.state;
+  candle.lit = sourceCandle.lit;
+  candle.x = sourceCandle.x;
+  candle.z = sourceCandle.z;
+  candle.vx = sourceCandle.vx;
+  candle.vz = sourceCandle.vz;
+  candle.surface = sourceCandle.surface;
+  candle.timer = sourceCandle.timer;
+  candle.away = sourceCandle.away;
+  candle.guard = sourceCandle.guard;
+  for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) candle.struck[slot] = sourceCandle.struck[slot];
+  candle.specialStruck = sourceCandle.specialStruck;
+  candle.dropSerial = sourceCandle.dropSerial;
+  candle.snuffSerial = sourceCandle.snuffSerial;
+  candle.returnSerial = sourceCandle.returnSerial;
+
 
   const pack = target.pack;
   const spares = packSpares(target);
@@ -734,6 +753,25 @@ export function sameFighterState(target: Readonly<Fighter>, source: Readonly<Fig
   const mana = target.mana;
   const sourceMana = source.mana;
   if (mana.points !== sourceMana.points || (mana.points === 0 && 1 / mana.points !== 1 / sourceMana.points)) return false;
+
+  const candle = target.candle;
+  const sourceCandle = source.candle;
+  if (candle.heat !== sourceCandle.heat || (candle.heat === 0 && 1 / candle.heat !== 1 / sourceCandle.heat)) return false;
+  if (candle.state !== sourceCandle.state || (candle.state === 0 && 1 / candle.state !== 1 / sourceCandle.state)) return false;
+  if (candle.lit !== sourceCandle.lit) return false;
+  if (candle.x !== sourceCandle.x || (candle.x === 0 && 1 / candle.x !== 1 / sourceCandle.x)) return false;
+  if (candle.z !== sourceCandle.z || (candle.z === 0 && 1 / candle.z !== 1 / sourceCandle.z)) return false;
+  if (candle.vx !== sourceCandle.vx || (candle.vx === 0 && 1 / candle.vx !== 1 / sourceCandle.vx)) return false;
+  if (candle.vz !== sourceCandle.vz || (candle.vz === 0 && 1 / candle.vz !== 1 / sourceCandle.vz)) return false;
+  if (candle.surface !== sourceCandle.surface || (candle.surface === 0 && sourceCandle.surface === 0 && 1 / candle.surface !== 1 / sourceCandle.surface)) return false;
+  if (candle.timer !== sourceCandle.timer || (candle.timer === 0 && 1 / candle.timer !== 1 / sourceCandle.timer)) return false;
+  if (candle.away !== sourceCandle.away || (candle.away === 0 && 1 / candle.away !== 1 / sourceCandle.away)) return false;
+  if (candle.guard !== sourceCandle.guard || (candle.guard === 0 && 1 / candle.guard !== 1 / sourceCandle.guard)) return false;
+  for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) if (candle.struck[slot] !== sourceCandle.struck[slot]) return false;
+  if (candle.specialStruck !== sourceCandle.specialStruck || (candle.specialStruck === 0 && 1 / candle.specialStruck !== 1 / sourceCandle.specialStruck)) return false;
+  if (candle.dropSerial !== sourceCandle.dropSerial || (candle.dropSerial === 0 && 1 / candle.dropSerial !== 1 / sourceCandle.dropSerial)) return false;
+  if (candle.snuffSerial !== sourceCandle.snuffSerial || (candle.snuffSerial === 0 && 1 / candle.snuffSerial !== 1 / sourceCandle.snuffSerial)) return false;
+  if (candle.returnSerial !== sourceCandle.returnSerial || (candle.returnSerial === 0 && 1 / candle.returnSerial !== 1 / sourceCandle.returnSerial)) return false;
 
 
   if (target.pack.length !== source.pack.length || (target.pack.length === 0 && 1 / target.pack.length !== 1 / source.pack.length)) return false;

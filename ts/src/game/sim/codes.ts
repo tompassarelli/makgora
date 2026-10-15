@@ -36,6 +36,10 @@ export const DownState = {
 export type DownState = (typeof DownState)[keyof typeof DownState];
 
 
+export const CandleState = { held: 0, airborne: 1, resting: 2, lost: 3 } as const;
+export type CandleState = (typeof CandleState)[keyof typeof CandleState];
+
+
 export const SurfaceContact = { none: 0, wall: 1, ceiling: 2, techWall: 3, techCeiling: 4 } as const;
 export type SurfaceContact = (typeof SurfaceContact)[keyof typeof SurfaceContact];
 
