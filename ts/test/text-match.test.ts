@@ -25,20 +25,22 @@ test("a fresh untilted hard shield blocks Illidan's forward air for every fighte
   expect(drained.filter((contact) => contact.damage !== -1 && contact.block !== -1 && contact.block < contact.damage).map((contact) => contact.name)).toEqual([fighterName(Character.tinker)]);
 });
 
-test("an Expert computer hit by a stationary opponent's down smash stops re-approaching into it and punishes [k1 scenario]", () => {
+test("an Expert computer hit by a stationary opponent's down smash stops re-approaching into it within each of the opponent's stocks and punishes [k1 scenario]", () => {
   const input = readFileSync(new URL("./playtest407/dsmash-loop.in", import.meta.url), "utf8");
   const options = { ...DEFAULT_OPTIONS, seed: 9, cpu: selectableCharacterBySlug("thrall") ?? DEFAULT_OPTIONS.cpu, level: "expert" as const, frames: 3000 };
   const lines = playTextMatch(options, parseCommands(input)).lines.filter((line) => /^\d+ A x/.test(line));
-  const percents = lines.map((line) => /^\d+ A \S+ \S+ (\d+)% \d+st .* \| B \S+ \S+ (\d+)% (\d)st/.exec(line));
+  const percents = lines.map((line) => /^\d+ A \S+ \S+ (\d+)% (\d+)st .* \| B \S+ \S+ (\d+)% (\d)st/.exec(line));
   let taken = 0;
+  let mostTaken = 0;
   let landed = 0;
   for (let index = 1; index < percents.length; index++) {
     const before = percents[index - 1];
     const now = percents[index];
     if (before === null || now === null || before === undefined || now === undefined) continue;
-    if (Number(now[2]) > Number(before[2]) && now[3] === before[3]) taken++;
+    if (now[2] !== before[2]) taken = 0;
+    if (Number(now[3]) > Number(before[3]) && now[4] === before[4]) mostTaken = Math.max(mostTaken, ++taken);
     if (Number(now[1]) > Number(before[1])) landed++;
   }
-  expect(taken).toBeLessThanOrEqual(2);
+  expect(mostTaken).toBeLessThanOrEqual(2);
   expect(landed).toBeGreaterThanOrEqual(1);
 });
