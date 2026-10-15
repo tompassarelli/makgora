@@ -178,8 +178,7 @@ const AdvantageRowSchema = Schema.Struct({
   zeroToDeath: Schema.Array(Schema.String),
 });
 
-const measureAdvantage = (attackers: readonly Character[], jobs: number) => Effect.gen(function* () {
-  const units = attackers.flatMap((attacker) => TARGETS.map((_, target) => ({ attacker, target })));
+const measureAdvantage = (units: readonly AdvantageUnit[], jobs: number) => Effect.gen(function* () {
   let done = 0;
   const started = performance.now();
   return yield* Effect.forEach(units, (unit) => Effect.scoped(Effect.gen(function* () {
@@ -198,36 +197,74 @@ const measureAdvantage = (attackers: readonly Character[], jobs: number) => Effe
   })), { concurrency: jobs });
 });
 
-const advantage = (attackers: readonly Character[], jobs: number, partial: boolean) => Effect.gen(function* () {
-  const rows = yield* measureAdvantage(attackers, jobs).pipe(step(`${attackers.length * TARGETS.length} fighter and target advantage rows on ${jobs} threads`));
+interface AdvantageUnit {
+  readonly attacker: Character;
+  readonly target: number;
+}
+
+const ROW_SECONDS: Readonly<Record<string, number>> = { "Rifleman heavy": 11, "Illidan heavy": 11, "Illidan light": 13, "Rifleman medium": 16, "Rifleman light": 16, "Illidan medium": 17, "Blademaster heavy": 10, "Mountain King heavy": 22, "Blademaster medium": 30, "Blademaster light": 33, "Mountain King light": 33, "Mountain King medium": 33, "Warden heavy": 11, "Warden light": 35, "Lich heavy": 11, "Lich medium": 19, "Lich light": 25, "Forsaken Paladin heavy": 12, "Forsaken Paladin light": 25, "Warden medium": 39, "Dreadlord heavy": 7, "Forsaken Paladin medium": 35, "Shadow Hunter heavy": 17, "Shadow Hunter light": 25, "Shadow Hunter medium": 25, "Dreadlord light": 46, "Pit Lord heavy": 12, "Pit Lord light": 24, "Dreadlord medium": 48, "Pit Lord medium": 25, "Lich King light": 15, "Lich King medium": 15, "Lich King heavy": 11, "Beastmaster light": 30, "Beastmaster heavy": 24, "Beastmaster medium": 30, "Jaina Proudmoore heavy": 16, "Thrall heavy": 28, "Jaina Proudmoore light": 28, "Jaina Proudmoore medium": 25, "Thrall medium": 32, "Thrall light": 37, "Sylvanas Windrunner heavy": 19, "Cairne Bloodhoof heavy": 12, "Cairne Bloodhoof light": 18, "Cairne Bloodhoof medium": 18, "Sylvanas Windrunner light": 26, "Sylvanas Windrunner medium": 31, "Chen Stormstout light": 30, "Peon light": 28, "Peon heavy": 21, "Chen Stormstout heavy": 33, "Chen Stormstout medium": 35, "Peon medium": 32, "Kael'thas Sunstrider light": 12, "Goblin Tinker light": 17, "Kael'thas Sunstrider heavy": 11, "Goblin Tinker heavy": 17, "Kael'thas Sunstrider medium": 15, "Goblin Tinker medium": 20, "Murloc light": 31, "Grom Hellscream heavy": 31, "Murloc heavy": 34, "Murloc medium": 43, "Grom Hellscream medium": 45, "Grom Hellscream light": 47, "Malfurion Stormrage light": 15, "Malfurion Stormrage heavy": 14, "Malfurion Stormrage medium": 18, "Medivh light": 14, "Medivh medium": 14, "Kobold heavy": 43, "Kobold light": 50, "Medivh heavy": 15, "Kobold medium": 54, "Anub'arak heavy": 20, "Anub'arak light": 26, "Anub'arak medium": 22 };
+const rowSeconds = (unit: AdvantageUnit): number => ROW_SECONDS[`${fighterName(unit.attacker)} ${TARGETS[unit.target]?.weight}`] ?? 20;
+const longestFirst = (units: readonly AdvantageUnit[]): AdvantageUnit[] => units.map((unit, index) => ({ unit, index })).sort((x, y) => rowSeconds(y.unit) - rowSeconds(x.unit) || x.index - y.index).map(({ unit }) => unit);
+
+function shardOf(units: readonly AdvantageUnit[], index: number, count: number): AdvantageUnit[] {
+  const loads = Array.from({ length: count }, () => 0);
+  const shards: AdvantageUnit[][] = Array.from({ length: count }, () => []);
+  for (const unit of longestFirst(units)) {
+    const lightest = loads.indexOf(Math.min(...loads));
+    loads[lightest] = (loads[lightest] ?? 0) + rowSeconds(unit);
+    shards[lightest]?.push(unit);
+  }
+  return shards[index] ?? [];
+}
+
+const decodeRows = (text: string) => Effect.forEach(text.split("\n").filter((line) => line !== ""), (line) =>
+  Schema.decodeEffect(Schema.fromJsonString(AdvantageRowSchema))(line).pipe(Effect.mapError(failure), Effect.as(JSON.parse(line) as AdvantageRow)));
+
+const readText = (file: string) => Effect.tryPromise({ try: () => Bun.file(file).text(), catch: failure });
+
+const writeAdvantage = (all: readonly AdvantageRow[], measured: readonly AdvantageRow[]) => Effect.gen(function* () {
+  const order = SELECTABLE_CHARACTERS.map(fighterName);
+  const weight = (row: AdvantageRow) => TARGETS.findIndex((target) => target.weight === row.target);
+  const sorted = [...all].sort((x, y) => order.indexOf(x.fighter) - order.indexOf(y.fighter) || weight(x) - weight(y));
+  yield* Effect.tryPromise({
+    try: async () => {
+      await Bun.write(advantageFile, sorted.map((row) => JSON.stringify(row)).join("\n") + "\n");
+      await Bun.write(advantagePageFile, advantagePage(sorted) + "\n");
+    },
+    catch: failure,
+  }).pipe(step("writing tools/move-data/advantage-state.jsonl and .md"));
+  const misses = measured.flatMap((row) => unmet(row).map((problem) => `${row.fighter}: ${problem}`));
+  yield* Console.log([`advantage state: ${measured.filter((row) => unmet(row).length === 0).length} of ${measured.length} fighter and target rows meet every target`, ...misses.map((miss) => `  ${miss}`)].join("\n"));
+});
+
+const advantage = (attackers: readonly Character[], jobs: number, partial: boolean, shard: { readonly index: number; readonly count: number; readonly rows: string } | undefined) => Effect.gen(function* () {
+  const all = attackers.flatMap((attacker) => TARGETS.map((_, target) => ({ attacker, target })));
+  const units = longestFirst(shard === undefined ? all : shardOf(all, shard.index, shard.count));
+  const rows = yield* measureAdvantage(units, jobs).pipe(step(`${units.length} fighter and target advantage rows on ${jobs} threads`));
+  if (shard !== undefined) {
+    yield* Effect.tryPromise({ try: () => Bun.write(shard.rows, rows.map((row) => JSON.stringify(row)).join("\n") + "\n"), catch: failure });
+    return;
+  }
   const previous = yield* Effect.tryPromise({
     try: async () => !partial || !(await Bun.file(advantageFile).exists()) ? "" : await Bun.file(advantageFile).text(),
     catch: failure,
   });
-  const decoded = yield* Effect.forEach(previous.split("\n").filter((line) => line !== ""),
-    (line) => Schema.decodeEffect(Schema.fromJsonString(AdvantageRowSchema))(line).pipe(Effect.mapError(failure)));
-  const kept: AdvantageRow[] = decoded.filter((row) => !rows.some((own) => own.fighter === row.fighter)).map((row) => ({
-    ...row, juggle: row.juggle,
-    throws: row.throws.map((cell) => ({ ...cell, diMixup: cell.diMixup })),
-    techChase: row.techChase === undefined ? undefined : { ...row.techChase, trap: row.techChase.trap, covered: row.techChase.covered.map(({ option, read }) => ({ option, read })) },
-  }));
-  const order = SELECTABLE_CHARACTERS.map(fighterName);
-  const weight = (row: AdvantageRow) => TARGETS.findIndex((target) => target.weight === row.target);
-  const all = [...kept, ...rows].sort((x, y) => order.indexOf(x.fighter) - order.indexOf(y.fighter) || weight(x) - weight(y));
-  yield* Effect.tryPromise({
-    try: async () => {
-      await Bun.write(advantageFile, all.map((row) => JSON.stringify(row)).join("\n") + "\n");
-      await Bun.write(advantagePageFile, advantagePage(all) + "\n");
-    },
-    catch: failure,
-  }).pipe(step("writing tools/move-data/advantage-state.jsonl and .md"));
-  const misses = rows.flatMap((row) => unmet(row).map((problem) => `${row.fighter}: ${problem}`));
-  yield* Console.log([`advantage state: ${rows.filter((row) => unmet(row).length === 0).length} of ${rows.length} fighter and target rows meet every target`, ...misses.map((miss) => `  ${miss}`)].join("\n"));
+  const decoded = yield* decodeRows(previous);
+  const kept: AdvantageRow[] = decoded.filter((row) => !rows.some((own) => own.fighter === row.fighter));
+  yield* writeAdvantage([...kept, ...rows], rows);
+});
+
+const mergeAdvantage = (files: readonly string[]) => Effect.gen(function* () {
+  const rows = (yield* Effect.forEach(files, (file) => readText(file).pipe(Effect.flatMap(decodeRows)))).flat();
+  const expected = SELECTABLE_CHARACTERS.flatMap((attacker) => TARGETS.map((target) => `${fighterName(attacker)} ${target.weight}`)).sort();
+  const found = rows.map((row) => `${row.fighter} ${row.target}`).sort();
+  if (found.join("\n") !== expected.join("\n")) return yield* new CombosFailure({ problem: `the merged rows are ${found.length} of the ${expected.length} fighter and target rows, not each exactly once` });
+  yield* writeAdvantage(rows, rows);
 });
 
 export const combos: Command = (args) => Effect.gen(function*() {
   const parsed = yield* Effect.try({
-    try: () => parseArgs({ args: [...args], options: { fighter: { type: "string", multiple: true }, jobs: { type: "string" }, advantage: { type: "boolean" } }, strict: true }).values,
+    try: () => parseArgs({ args: [...args], options: { fighter: { type: "string", multiple: true }, jobs: { type: "string" }, advantage: { type: "boolean" }, shard: { type: "string" }, rows: { type: "string" }, merge: { type: "string", multiple: true } }, strict: true }).values,
     catch: (cause) => new UsageFailure({ problem: describeCause(cause) }),
   });
   const names = parsed.fighter ?? [];
@@ -236,12 +273,18 @@ export const combos: Command = (args) => Effect.gen(function*() {
   if (unknown.length > 0) return yield* new UsageFailure({ problem: `--fighter takes ${SELECTABLE_CHARACTERS.map(fighterName).join(", ")}; not ${unknown.join(", ")}` });
   const jobs = Number(parsed.jobs ?? "6");
   if (!Number.isInteger(jobs) || jobs < 1) return yield* new UsageFailure({ problem: "--jobs takes a whole number of worker threads" });
+  if (parsed.merge !== undefined) return yield* mergeAdvantage(parsed.merge);
+  const shardMatch = parsed.shard?.match(/^(\d+)\/(\d+)$/);
+  const shard = shardMatch === undefined || shardMatch === null ? undefined : { index: Number(shardMatch[1]), count: Number(shardMatch[2]), rows: parsed.rows ?? "" };
+  if (parsed.shard !== undefined && (shard === undefined || shard.index >= shard.count || shard.rows === "" || parsed.advantage !== true || names.length > 0)) {
+    return yield* new UsageFailure({ problem: "--shard I/N takes --advantage, --rows FILE and no --fighter, with I below N" });
+  }
   const code = yield* admit("heavy", "smashcraft:combos", 3600);
   if (code !== undefined) {
     if (code !== 0) return yield* new CombosFailure({ problem: `the admitted run exited ${code}` });
     return;
   }
-  if (parsed.advantage === true) return yield* advantage(attackers.filter((attacker): attacker is Character => attacker !== undefined), jobs, names.length > 0);
+  if (parsed.advantage === true) return yield* advantage(attackers.filter((attacker): attacker is Character => attacker !== undefined), jobs, names.length > 0, shard);
   const units: Unit[] = attackers.flatMap((attacker) => attacker === undefined ? [] : OPPONENTS.flatMap((opponent) => POSITIONS.map((position) => ({ attacker, opponent, position }))));
   const reports = yield* measureUnits(units, jobs).pipe(step(`${units.length} fighter, opponent and position cells on ${jobs} threads`));
   const summaries = [...new Set(reports.map((report) => report.attacker))].map((fighter) => summarize(fighter, reports.filter((report) => report.attacker === fighter)));

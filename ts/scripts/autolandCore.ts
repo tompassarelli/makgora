@@ -1,8 +1,8 @@
 export const TEST_SLOTS = 3;
 export const JOB_BUDGET = 32;
-export const RUN_PEAK = 15;
+export const RUN_PEAK = 17;
 export const RUN_BUILD = 2;
-export const PROFILE = [15, 15, 15, 15, 15, 15, 13, 12, 9, 9, 7, 6, 5, 2, 2, 1, 1, 1] as const;
+export const PROFILE = [17, 17, 17, 17, 17, 15, 13, 12, 9, 9, 7, 6, 5, 2, 2, 1, 1, 1] as const;
 export const PROFILE_STEP = 30_000;
 export const LEAD = 30_000;
 export const AGED = 60;

@@ -79,6 +79,11 @@ env:
       started=$(date +%s)
       if [ "${REPORTS_CACHED:-}" = true ]; then
         echo "Restored ${reports[*]} from the cache for inputs ${REPORTS_KEY:0:12}" >> "$GITHUB_STEP_SUMMARY"
+      elif [ -n "${REPORTS_ROWS:-}" ] && [ -d "$REPORTS_ROWS" ]; then
+        merge=()
+        for rows in "$PWD/$REPORTS_ROWS"/*.jsonl; do merge+=(--merge "$rows"); done
+        (cd ts && bun scripts/wisp.ts combos --advantage "${merge[@]}") 2>&1 | tail -40 | tee reports.log
+        echo "Merged ${reports[*]} from $(( ${#merge[@]} / 2 )) measured shards in $(( $(date +%s) - started )) s" >> "$GITHUB_STEP_SUMMARY"
       else
         (cd ts && bun scripts/wisp.ts combos --advantage --jobs "$(( $(nproc) < 26 ? $(nproc) : 26 ))") 2>&1 | tail -40 | tee reports.log
         echo "Regenerated ${reports[*]} on $(nproc) cores in $(( $(date +%s) - started )) s" >> "$GITHUB_STEP_SUMMARY"
@@ -315,6 +320,51 @@ jobs:
           out verdict test
 
   # Lanes never regenerate whole-roster reports: the candidate's are rebuilt here beside its suite and land with it as one more commit.
+  reports-shard:
+    needs: build
+    if: needs.build.outputs.verdict == 'test' || needs.build.outputs.verdict == 'tested'
+    runs-on: ${{ needs.build.outputs.premerge-runner }}
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        shard: [1, 2]
+    name: reports shard ${{ matrix.shard }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.sha }}
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.13
+      - name: Run bun install --frozen-lockfile
+        run: |
+          eval "$REPORTS_RUN"
+          install_reports
+      - id: inputs
+        run: |
+          key=$(cd ts && bun scripts/advantageInputs.ts)
+          echo "key=$key" >> "$GITHUB_OUTPUT"
+      - id: cached
+        uses: actions/cache/restore@v4
+        with:
+          lookup-only: true
+          path: |
+            tools/move-data/advantage-state.jsonl
+            tools/move-data/advantage-state.md
+          key: advantage-state-${{ steps.inputs.outputs.key }}
+      - if: steps.cached.outputs.cache-hit != 'true'
+        run: |
+          started=$(date +%s)
+          (cd ts && bun scripts/wisp.ts combos --advantage --shard ${{ matrix.shard }}/3 --rows "$PWD/../advantage-rows-${{ matrix.shard }}.jsonl" --jobs "$(nproc)") 2>&1 | tail -40
+          echo "Measured shard ${{ matrix.shard }}/3 of the advantage rows on $(nproc) cores in $(( $(date +%s) - started )) s" >> "$GITHUB_STEP_SUMMARY"
+      - if: steps.cached.outputs.cache-hit != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: advantage-rows-${{ matrix.shard }}
+          path: advantage-rows-${{ matrix.shard }}.jsonl
+          retention-days: 1
+          if-no-files-found: error
+
   reports:
     needs: build
     if: needs.build.outputs.verdict == 'test' || needs.build.outputs.verdict == 'tested'
@@ -350,10 +400,28 @@ jobs:
             tools/move-data/advantage-state.jsonl
             tools/move-data/advantage-state.md
           key: advantage-state-${{ steps.inputs.outputs.key }}
+      - if: steps.cached.outputs.cache-hit != 'true'
+        name: Measure shard 0/3 and collect shards 1 and 2
+        run: |
+          started=$(date +%s)
+          mkdir -p advantage-rows
+          measure() { (cd ts && bun scripts/wisp.ts combos --advantage --shard "$1/3" --rows "$PWD/../advantage-rows/advantage-rows-$1.jsonl" --jobs "$(nproc)") 2>&1 | tail -40; }
+          measure 0
+          for shard in 1 2; do
+            while :; do
+              url=$(gh api "repos/$GH_REPO/actions/runs/$GITHUB_RUN_ID/artifacts?name=advantage-rows-$shard" --jq '.artifacts[0].archive_download_url // ""' || true)
+              if [ -n "$url" ] && gh api "$url" > "$RUNNER_TEMP/rows.zip" && unzip -o -q "$RUNNER_TEMP/rows.zip" -d advantage-rows; then break; fi
+              ended=$(gh api "repos/$GH_REPO/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs?per_page=100" --jq "[.jobs[] | select(.name == \"reports shard $shard\" and .status == \"completed\")] | length" || echo 0)
+              if [ "$ended" != 0 ] && [ -z "$url" ]; then echo "Shard $shard ended without rows; measuring it here"; measure "$shard"; break; fi
+              sleep 5
+            done
+          done
+          echo "Measured and collected the three advantage shards in $(( $(date +%s) - started )) s" >> "$GITHUB_STEP_SUMMARY"
       - id: reports
         name: Run set -euo pipefail
         env:
           REPORTS_CACHED: ${{ steps.cached.outputs.cache-hit }}
+          REPORTS_ROWS: ${{ steps.cached.outputs.cache-hit != 'true' && 'advantage-rows' || '' }}
           REPORTS_KEY: ${{ steps.inputs.outputs.key }}
         run: |
           eval "$REPORTS_RUN"

@@ -83,6 +83,10 @@ Lanes don't regenerate whole-roster reports. After the gate, Autoland's
 commits changed tools/move-data/advantage-state.{jsonl,md} as "Regenerate
 reports for LANES" with the changed rows in the summary, and refuses a
 candidate whose regenerated rows miss a target (ts/test/advantage-state.test.ts).
+When the cache keyed by ts/scripts/advantageInputs.ts misses, the rows are
+measured in three `--shard I/3` parts balanced by measured row cost: shard 0 in
+`reports`, shards 1 and 2 in `reports shard` jobs whose row artifacts `reports`
+collects and merges with `--merge`.
 The suite tests the candidate and the reports job tests the regenerated rows,
 their only reader; `land` waits for both and pushes the reports commit.
 
