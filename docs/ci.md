@@ -97,6 +97,13 @@ run's own status is red whenever a suite shard fails; its `land` job and
 summary say what landed. To test a refused branch again without a new
 commit: `gh workflow run autoland.yml -f branch=claude/NAME`.
 
+In the suite, the check jobs (perf, perf-definitive, parity, corpus) start
+beside the plan job on the dispatched ref; Bun and Lua32 shard jobs wait for
+its plan, packed from the newest `farm-test-timings-*` cache. The merge job
+saves that cache, and once every Lua32 shard reported it keeps only the Lua
+tests that run measured, so a removed or renamed test stops holding a shard of
+its own; a new test runs on its name's hash shard until its first measurement.
+
 Everything runs from source: no private build inputs, no `.w3x` build.
 Runner placement comes from the reviewed `ts/runner-routing.json` file. Autoland reports and farm-test
 Bun, Lua32 and check jobs use hosted runners (`premerge`). Balance, background
