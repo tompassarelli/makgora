@@ -7,6 +7,7 @@ import { AttackPhase, AttackStyle, Character } from "../../ts/src/game/sim/codes
 import type { HeroClip, HeroPose } from "../../ts/src/game/sim/heroes/hero";
 import { SHADOW_HUNTER_MOVES } from "../../ts/src/game/sim/heroes/shadowHunterMoves";
 import { SHADOW_HUNTER_SPECIALS } from "../../ts/src/game/sim/heroes/shadowHunterSpecials";
+import { CHARGED_AIM_FRAMES } from "../../ts/src/game/sim/heroSpecials";
 import { ROSTER_ATTACK_CLIPS } from "../../ts/src/game/presentation/rosterAttackClipInfo";
 import { JUMP_CLIPS } from "../../ts/src/game/presentation/jumpClipInfo";
 import { SHADOW_HUNTER_AUTHORED_CLIPS } from "../../ts/src/game/presentation/heroes/shadowHunterClipInfo";
@@ -24,7 +25,7 @@ interface Gesture {
 type End = "handL" | "handR" | "footL" | "footR";
 interface Phase { frame: number; gesture: Gesture; tip?: readonly [number, number] | readonly [number, number, number]; grip?: readonly [number, number]; reach?: readonly [End, number, number] }
 interface Authored {
-  pose: HeroPose; style?: AttackStyle; phases: readonly Phase[]; airborne?: boolean; frames?: number; looping?: boolean; forms?: readonly HeroPose[];
+  pose: HeroPose; style?: AttackStyle; phases: readonly Phase[]; airborne?: boolean; frames?: number; looping?: boolean; forms?: readonly HeroPose[]; bind?: boolean;
   ground?: "cloth" | "sole"; support?: "L" | "R";
 }
 const REACH: Readonly<Record<End, readonly [string, keyof Gesture, keyof Gesture, string, string]>> = {
@@ -259,6 +260,57 @@ function dashAttack(): Authored {
   ] };
 }
 
+function upSmash(): Authored {
+  const { contact, total } = timing(AttackStyle.upSmash);
+  const coil: Gesture = { lean: 6, chest: 10, head: -8, free: 30, freeElbow: 50, beard: -10,
+    frontHip: -62, frontKnee: 96, frontFoot: 10, backHip: 40, backKnee: 96, backFoot: 10, drop: -36, lunge: 4 };
+  const rise = (lean: number, chest: number, drop: number): Gesture => ({ lean, chest, head: 18, pelvis: -6, free: -150, freeElbow: 20, beard: 30,
+    frontHip: -12, frontKnee: 8, frontFoot: -20, backHip: 14, backKnee: 6, backFoot: -25, drop });
+  return { pose: "upSmash", style: AttackStyle.upSmash, ground: "cloth", phases: [
+    { frame: 0, gesture: READY },
+    { frame: 5, gesture: { ...coil, lean: 3, chest: 5, head: -4, frontHip: -24, frontKnee: 36, backHip: 14, backKnee: 36, drop: -14 }, tip: [70, 45] },
+    { frame: contact - 5, gesture: coil, tip: [90, 32] },
+    { frame: contact - 1, gesture: { ...coil, lean: 8, chest: 12, drop: -38 }, tip: [92, 28] },
+    { frame: contact, gesture: rise(-6, -10, 6), tip: [70, 205] },
+    { frame: contact + 1, gesture: rise(-10, -14, 8), tip: [30, 255] },
+    { frame: contact + 2, gesture: rise(-14, -18, 8), tip: [-10, 262] },
+    { frame: contact + 3, gesture: rise(-18, -22, 6), tip: [-50, 245] },
+    { frame: contact + 8, gesture: { ...rise(-20, -24, 0), free: -110, frontHip: -16, frontKnee: 16, backHip: 16, backKnee: 16 }, tip: [-120, 175] },
+    { frame: contact + 20, gesture: { lean: -8, chest: -10, head: 6, free: -40, freeElbow: 30, frontHip: -14, frontKnee: 20, backHip: 10, backKnee: 22, drop: -8 }, tip: [-110, 120] },
+    { frame: total - 10, gesture: { lean: -3, chest: -5, head: 3, free: -15, freeElbow: 15, frontHip: -8, frontKnee: 12, backHip: 6, backKnee: 12, drop: -4 }, tip: [-60, 90] },
+    { frame: total - 4, gesture: { chest: -2, frontHip: -4, frontKnee: 6, backHip: 4, backKnee: 6, drop: -2 } },
+    { frame: total, gesture: READY },
+  ] };
+}
+
+function upSpecial(): Authored {
+  const special = SHADOW_HUNTER_SPECIALS.up.ground!, total = special.endFrame, launch = CHARGED_AIM_FRAMES + 1;
+  const plant: Gesture = { lean: 18, chest: 16, head: -20, free: 10, freeElbow: 40, beard: -10,
+    frontHip: -55, frontKnee: 85, frontFoot: 10, backHip: 30, backKnee: 85, backFoot: 10, drop: -28 };
+  const tuck: Gesture = { lean: -6, chest: -8, head: 10, free: -150, freeElbow: 20, frontHip: -95, frontKnee: 110, frontFoot: 20, backHip: -80, backKnee: 120, backFoot: 20, cloth: -40 };
+  const reach: Gesture = { lean: -4, chest: -10, head: 16, free: -165, freeElbow: 5, beard: 40, frontHip: -10, frontKnee: 20, frontFoot: -30, backHip: 10, backKnee: 30, backFoot: -30 };
+  return { pose: "upSpecial", style: AttackStyle.forwardSmash, frames: total, airborne: true, forms: ["upSpecialAir"], phases: [
+    { frame: 0, gesture: READY },
+    { frame: 4, gesture: { ...plant, lean: 10, chest: 8, frontHip: -30, frontKnee: 45, backHip: 16, backKnee: 45, drop: -14 }, tip: [70, 10] },
+    { frame: launch - 1, gesture: plant, tip: [75, -2] },
+    { frame: launch + 1, gesture: { ...reach, lean: 30, chest: 10, head: -10, frontHip: 30, frontKnee: 20, backHip: 50, backKnee: 25, drop: 10 }, tip: [40, -50] },
+    { frame: launch + 4, gesture: { ...tuck, lean: -14 }, tip: [-10, -60] },
+    { frame: launch + 8, gesture: { ...tuck, frontHip: -60, frontKnee: 70, backHip: -40, backKnee: 80 }, tip: [-60, 120] },
+    { frame: launch + 12, gesture: reach, tip: [20, 250] },
+    { frame: total, gesture: { ...reach, frontHip: -20, frontKnee: 35, backHip: 0, backKnee: 45 }, tip: [30, 245] },
+  ] };
+}
+
+const HELPLESS: Gesture = { lean: -26, chest: -16, head: 24, free: -150, freeYaw: 30, freeElbow: 30, beard: 60, cloth: -30,
+  frontHip: -45, frontKnee: 30, frontFoot: 25, backHip: 20, backKnee: 70, backFoot: 30 };
+function fallSpecial(): Authored {
+  return { pose: "fallSpecial", frames: 40, airborne: true, looping: true, bind: true, phases: [
+    { frame: 0, gesture: HELPLESS, tip: [-100, 185] },
+    { frame: 20, gesture: { ...HELPLESS, lean: -32, chest: -20, head: 28, free: -125, freeElbow: 55, frontHip: -15, frontKnee: 65, backHip: -10, backKnee: 35 }, tip: [-115, 165] },
+    { frame: 40, gesture: HELPLESS, tip: [-100, 185] },
+  ] };
+}
+
 const hang = (action: Authored, drape = false): Authored => ({ ...action, phases: action.phases.map(phase => {
   const g = phase.gesture, cloth = g.cloth ?? 0.8 * Math.min(g.frontHip ?? 0, g.backHip ?? 0);
   return { ...phase, gesture: { ...g, beard: g.beard ?? Math.min(90, 3.5 * Math.max(0, (g.lean ?? 0) + (g.chest ?? 0) + (g.head ?? 0))), ...drape ? { cloth, clothTip: g.clothTip ?? 0.3 * cloth } : {} } };
@@ -267,7 +319,7 @@ const draped = (make: () => Authored) => () => hang(make(), true);
 const kicked = (make: () => Authored) => () => hang({ ...make(), ground: "sole" });
 
 const POSES: Readonly<Record<string, () => Authored>> = {
-  neutralSpecial, jump, doubleJump, forwardSmash, downSmash,
+  neutralSpecial, jump, doubleJump, forwardSmash, downSmash, upSmash, upSpecial, fallSpecial,
   backAir: draped(backAir), neutralAir: draped(neutralAir), downAir: draped(downAir),
   forwardTiltDown: kicked(() => kick("forwardTiltDown", AttackStyle.forwardTiltDown, [76, 26], -8, [80, 24], -30, -8)),
   downTilt: kicked(downTilt), jab: kicked(jab), upTilt: kicked(upTilt), dashAttack: kicked(dashAttack),
@@ -512,7 +564,7 @@ for (const pose of selected) {
   aimTip(action, start);
   if (action.ground === "sole") reachAndStand(action, index, start, frames);
   else if (action.ground === undefined && !action.airborne) settleFeet(index, start, frames);
-  if (action.style !== undefined) for (const form of [pose, ...action.forms ?? []]) bindings.set(form, { index, seconds: (time(start, frames) - start) / 1000, aligned: true });
+  if (action.style !== undefined || action.bind) for (const form of [pose, ...action.forms ?? []]) bindings.set(form, { index, seconds: (time(start, frames) - start) / 1000, aligned: true });
   authored.push({ action, index, frames });
 }
 
