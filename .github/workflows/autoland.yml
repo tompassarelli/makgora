@@ -406,11 +406,10 @@ jobs:
             echo "\`${branches[0]}\` moved or landed while it was tested: its new tip is tested on its own" >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
-          if [ -n "$TEST" ] && [ -z "$why" ]; then
+          passed_alone() {
             status "${tips[0]}" pending "passed alone on $BASE as tree $TREE"
-            echo "\`${branches[0]}\` passed alone on main ${BASE:0:10}: it joins the next train" >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
+            echo "\`${branches[0]}\` passed alone on main ${BASE:0:10}: $1, so it joins the next train" >> "$GITHUB_STEP_SUMMARY"
+          }
           if [ -n "$why" ] && hand_back_record "$DETAIL"; then exit 1; fi
           verdict=$(bun ts/scripts/autoland.ts judge --count "${#branches[@]}" --green "$([ -z "$why" ] && echo true || echo false)")
           if [ "$verdict" = retest ]; then
@@ -455,10 +454,11 @@ jobs:
             if git -C "$RUNNER_TEMP/past-main" rebase -q --onto "$main" "$BASE" > rebase.log 2>&1; then
               git ls-tree -r -z "$(git -C "$RUNNER_TEMP/past-main" rev-parse HEAD)" > trees/landed; landed=(--rebased trees/landed)
             fi
-            if [ "$(bun ts/scripts/autoland.ts past-main trees/base trees/tested "${mains[@]}" "${landed[@]}")" != land ]; then
-              echo "main moved to ${main:0:10} on paths the train changes while it ran: its tips wait for the next train" >> "$GITHUB_STEP_SUMMARY"
-              exit 0
-            fi
+            case "$(bun ts/scripts/autoland.ts landing --solo "$([ -n "$TEST" ] && echo true || echo false)" trees/base trees/tested "${mains[@]}" "${landed[@]}")" in
+              land) ;;
+              passed) passed_alone "main moved to ${main:0:10} on its paths while it was tested"; exit 0 ;;
+              *) echo "main moved to ${main:0:10} on paths the train changes while it ran: its tips wait for the next train" >> "$GITHUB_STEP_SUMMARY"; exit 0 ;;
+            esac
             SHA=$(git -C "$RUNNER_TEMP/past-main" rev-parse HEAD)
             echo "main moved to ${main:0:10} only on paths the train doesn't change: the tested tree lands rebased onto it as ${SHA:0:10}" >> "$GITHUB_STEP_SUMMARY"
           fi
@@ -515,10 +515,16 @@ jobs:
             else
               cat push.log
               if hand_back_record "$(cat push.log)"; then exit 1; fi
+              if [ -n "$TEST" ]; then
+                passed_alone "pushing it to main failed"
+                if grep -Eq 'non-fast-forward|fetch first' push.log; then exit 0; fi
+                exit 1
+              fi
               echo "pushing to main failed: the train's tips wait for the next train" >> "$GITHUB_STEP_SUMMARY"
               exit 1
             fi
           fi
+          echo "landed=1" >> "$GITHUB_OUTPUT"
           for i in "${!branches[@]}"; do
             status "${tips[i]}" success "landed as $SHA"
             git push -q --force-with-lease="refs/heads/${branches[i]}:${tips[i]}" origin ":refs/heads/${branches[i]}" \
@@ -530,7 +536,7 @@ jobs:
           gh workflow run autoclose.yml --ref main -f sha="$SHA" -f base="$main" || echo "::warning::couldn't start auto-close"
           echo "Landed ${SHA:0:10} on main:$(printf ' `%s`' "${branches[@]}")" | tee -a "$GITHUB_STEP_SUMMARY"
       # A landed copy leaves its source branch behind: delete codex/, claude/ and farm/ branches main holds patch for patch.
-      - if: success() && env.TRAIN != ''
+      - if: success() && (env.TRAIN != '' || steps.land.outputs.landed == '1')
         run: |
           set +e -uo pipefail
           git fetch -q --prune origin main '+refs/heads/codex/*:refs/remotes/origin/codex/*' \

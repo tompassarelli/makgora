@@ -7,7 +7,7 @@
 | Farm test (smashcraft:.github/workflows/farm-test.yml) | `bun wisp farm test`, autoland | every check CI runs: full Bun and Lua32 suites with their sweeps, sharded (wisp:docs/farm.md), and the stack trace, parity corpus, tapes and numeric, perf compare, effect-kit, clean room, benchmark and computer coverage checks; the census runs after landing in Background sweeps. Its summary, uploaded even when the run fails or times out, names each failing test (a Lua test with its module), failing check, Lua budget overrun and missing shard |
 | Background sweeps (smashcraft:.github/workflows/background-sweeps.yml) | each landing (Autoland dispatches it with the landed SHA), push to main, nightly | on `farm-big`: the Bun and Lua32 suites with `SWEEPS=1`, and the per-pair worst-frame census (#405) in 7 fighter shards whose joined pairs must stay within the margin of test/fixtures/perf/census-pairs.txt; a landing's red run goes to the sheriff (see Sheriff) |
 | Playtest (smashcraft:.github/workflows/playtest.yml) | nightly, dispatch with `matches` | plays computer-versus-computer matches across every fighter, stage and computer level on the newest green main, each seed twice to compare state hashes, and comments each finding kind on its epic, or on the After 0.1 issue when no epic matches (smashcraft:docs/commands/soak.md) |
-| Autoland (smashcraft:.github/workflows/autoland.yml) | push to `claude/**`, `safe-push --to main`, dispatch with `branch` | main's one landing queue: tests each waiting tip alone at once, lands trains of tips that passed |
+| Autoland (smashcraft:.github/workflows/autoland.yml) | push to `claude/**`, `safe-push --to main`, dispatch with `branch` | main's one landing queue: tests each waiting tip alone at once and lands it from its test run, or in a train of tips that passed when main moved on its paths |
 | Auto-close (smashcraft:.github/workflows/autoclose.yml) | each landing (Autoland dispatches it with the landed SHA and the main before it) | reruns the declared Done-when checks of each issue the landed commits reference, ticks the passing boxes, closes an issue whose boxes are all ticked (see Auto-close) |
 | Autoland sweep (smashcraft:.github/workflows/autoland-sweep.yml) | every 5 minutes from Autoland heartbeat while Autoland has work, every finished Autoland or Farm test run, dispatch with `dry-run` or `landed` | cancels stuck Autoland runs and requeues their lanes; opens the "Autoland stalled" issue while main is idle with lanes pending |
 | Effect upgrade (smashcraft:.github/workflows/effect-upgrade.yml) | Mondays, dispatch | `effect-kit upgrade` and `effect-kit check`; a clean upgrade goes to Autoland, findings to the "Weekly Effect upgrade" issue |
@@ -37,8 +37,13 @@ landing restarts another's suites.
    `autoland` status is over 60 min old goes ahead of every other, oldest first.
    Because tests run outside the landing queue, a red tip gets its failed status and run summary within minutes. A
    conflicting tip, or one that changes `.github/workflows/` (the workflow
-   token can't push those), is refused. A green tip becomes "passed alone on
-   MAIN as tree TREE".
+   token can't push those), is refused. A green tip lands straight from its
+   test run (step 4) when main is still the tested base or moved only on
+   paths `pastMain` proves disjoint (`landing` in
+   smashcraft:ts/scripts/autolandCore.ts), so a lone lane goes "queued",
+   "testing alone on MAIN", "landed as SHA" with no train run. When main
+   moved on its paths, or its push to main is rejected, it becomes "passed
+   alone on MAIN as tree TREE" for the next train.
 3. **Train.** One train at a time takes up to 4 tips that passed alone, first
    passed first, and rebases them onto main. When the leader is the tree it
    passed alone plus only main commits that miss its paths (`pastMain`), it
@@ -47,11 +52,11 @@ landing restarts another's suites.
    Every plan, standalone or ending a run, holds the `autoland-plan-step`
    lock, and a tip marked "waiting to test alone" under 2 min ago counts as
    testing, so no tip is planned twice (#515).
-4. **Land.** Only when the suites pass on that exact candidate, main's known
+4. **Land.** A test run or a train lands only when the suites pass on that exact candidate, main's known
    failures included (#394), and its regenerated reports meet their targets,
    main is fast-forwarded to it plus the reports commit, each branch's
    status becomes "landed as SHA" and its branch is deleted. If main moved
-   while the train ran (a direct `safe-push` of a workflow change), the
+   while the test run or train ran (a direct `safe-push` of a workflow change), the
    tested commits are rebased onto the new main and land without another
    suite when every new main commit misses the train's changed paths and
    the rebased tree is exactly the tested tree plus main's changes; a main

@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { pastMain, type Tree } from "../scripts/autolandCore";
+import { landing, pastMain, type Tree } from "../scripts/autolandCore";
 
 const PATHS = ["docs/ci.md", "docs/a.md", "ts/src/game/a.ts", "ts/src/game/b.ts", "tools/move-data/advantage-state.md", "assets/stage.png.pointer", "ts/scripts/autoland.ts", ".github/workflows/ci.yml"];
 
@@ -43,4 +43,18 @@ test("a train lands past main iff every main commit misses its paths, as the tes
     if (verdict === "land") landedCount++;
   }
   expect(landedCount).toBeGreaterThan(50);
+});
+
+test("a green test run lands its own candidate unless main moved on its paths, then it passes alone for a train [k1 scenario]", () => {
+  const base: Tree = new Map([["docs/ci.md", "100644 blob a"], ["ts/src/game/a.ts", "100644 blob b"]]);
+  const tested: Tree = new Map([...base, ["docs/ci.md", "100644 blob lane"]]);
+  const disjoint: Tree = new Map([...base, ["ts/src/game/a.ts", "100644 blob main"]]);
+  const overlap: Tree = new Map([...base, ["docs/ci.md", "100644 blob main"]]);
+  const merged: Tree = new Map([...disjoint, ["docs/ci.md", "100644 blob lane"]]);
+  expect(landing(true, base, tested, [], tested)).toBe("land");
+  expect(landing(true, base, tested, [disjoint], merged)).toBe("land");
+  expect(landing(true, base, tested, [overlap], undefined)).toBe("passed");
+  expect(landing(true, base, tested, [overlap], merged)).toBe("passed");
+  expect(landing(false, base, tested, [overlap], merged)).toBe("wait");
+  expect(landing(false, base, tested, [disjoint], merged)).toBe("land");
 });

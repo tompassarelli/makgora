@@ -196,6 +196,13 @@ export function pastMain(base: Tree, tested: Tree, main: readonly Tree[], landed
   return expected.size === landed.size && [...expected].every(([path, entry]) => landed.get(path) === entry) ? "land" : "retest";
 }
 
+export type Landing = "land" | "passed" | "wait";
+
+export function landing(solo: boolean, base: Tree, tested: Tree, main: readonly Tree[], landed: Tree | undefined): Landing {
+  if (pastMain(base, tested, main, landed) === "land") return "land";
+  return solo ? "passed" : "wait";
+}
+
 export const GENERATED_REPORTS: readonly string[] = ["tools/move-data/advantage-state.jsonl", "tools/move-data/advantage-state.md"];
 export const CACHE_RECORDS: readonly string[] = ["ts/scripts/wisp/cue-models.tsv"];
 const PIN = /^build-inputs\/([^/]+)$/;
