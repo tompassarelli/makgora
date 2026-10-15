@@ -164,7 +164,7 @@ Generated from the packaged models by `bun wisp view motion --assets DIR` (#171)
 | Dreadlord | ledge-get-up | 26: Recovery ledgeClimb | 146.1 | 90.2 | up; 136.5/12.4 |
 | Dreadlord | ledge-roll | 27: Recovery ledgeRoll | 146.5 | 70.8 | forward; 124.9/130.7 |
 | Dreadlord | ledge-attack | 28: Recovery ledgeAttack | 209.7 | 109.2 | both; 203.6/81.6 |
-| Shadow Hunter | walk | 0: Walk | 173.2 | 44.3 | forward; 158.1/166.2 |
+| Shadow Hunter | walk | 0: Walk | 173.0 | 44.3 | forward; 157.4/166.5 |
 | Shadow Hunter | dash | 0: Walk | 171.9 | 35.9 | forward; 157.1/164.3 |
 | Shadow Hunter | run | 0: Walk | 157.1 | 33.4 | forward; 150.0/130.5 |
 | Shadow Hunter | turn | 14: Recovery turn | 133.2 | 48.2 | back; 128.1/133.2 |

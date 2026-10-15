@@ -161,7 +161,7 @@ export const DRAWN_MOTION: readonly DrawnMotionRow[] = [
   {"character":8,"state":"ledge-get-up","model":"units\\undead\\HeroDreadLord\\HeroDreadLord.mdl","clips":[26],"names":["Recovery ledgeClimb"],"motion":146.1,"body":90.2,"direction":"up","toward":136.5,"against":12.4},
   {"character":8,"state":"ledge-roll","model":"units\\undead\\HeroDreadLord\\HeroDreadLord.mdl","clips":[27],"names":["Recovery ledgeRoll"],"motion":146.5,"body":70.8,"direction":"forward","toward":124.9,"against":130.7},
   {"character":8,"state":"ledge-attack","model":"units\\undead\\HeroDreadLord\\HeroDreadLord.mdl","clips":[28],"names":["Recovery ledgeAttack"],"motion":209.7,"body":109.2,"direction":"both","toward":203.6,"against":81.6},
-  {"character":9,"state":"walk","model":"units\\orc\\HeroShadowHunter\\HeroShadowHunter.mdl","clips":[0],"names":["Walk"],"motion":173.2,"body":44.3,"direction":"forward","toward":158.1,"against":166.2},
+  {"character":9,"state":"walk","model":"units\\orc\\HeroShadowHunter\\HeroShadowHunter.mdl","clips":[0],"names":["Walk"],"motion":173,"body":44.3,"direction":"forward","toward":157.4,"against":166.5},
   {"character":9,"state":"dash","model":"units\\orc\\HeroShadowHunter\\HeroShadowHunter.mdl","clips":[0],"names":["Walk"],"motion":171.9,"body":35.9,"direction":"forward","toward":157.1,"against":164.3},
   {"character":9,"state":"run","model":"units\\orc\\HeroShadowHunter\\HeroShadowHunter.mdl","clips":[0],"names":["Walk"],"motion":157.1,"body":33.4,"direction":"forward","toward":150,"against":130.5},
   {"character":9,"state":"turn","model":"units\\orc\\HeroShadowHunter\\HeroShadowHunter.mdl","clips":[14],"names":["Recovery turn"],"motion":133.2,"body":48.2,"direction":"back","toward":128.1,"against":133.2},

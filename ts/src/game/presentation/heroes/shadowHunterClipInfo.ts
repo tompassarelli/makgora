@@ -2,8 +2,20 @@
 import { f32 } from "wisp/src/sim/f32";
 import type { HeroClipTable } from "../../sim/heroes/hero";
 export const SHADOW_HUNTER_AUTHORED_CLIPS: HeroClipTable = {
+  backAir: { index: 69, seconds: f32(0.55), aligned: true },
+  dashAttack: { index: 60, seconds: f32(0.6), aligned: true },
+  downAir: { index: 71, seconds: f32(0.617), aligned: true },
+  downSmash: { index: 68, seconds: f32(0.683), aligned: true },
+  downTilt: { index: 65, seconds: f32(0.4), aligned: true },
+  forwardSmash: { index: 64, seconds: f32(0.917), aligned: true },
+  forwardTilt: { index: 57, seconds: f32(0.517), aligned: true },
+  forwardTiltDown: { index: 72, seconds: f32(0.517), aligned: true },
+  forwardTiltUp: { index: 58, seconds: f32(0.517), aligned: true },
+  jab: { index: 66, seconds: f32(0.283), aligned: true },
+  neutralAir: { index: 70, seconds: f32(0.533), aligned: true },
   neutralSpecial: { index: 67, seconds: f32(0.667), aligned: true },
   neutralSpecialAir: { index: 67, seconds: f32(0.667), aligned: true },
   neutralSpecialFollowUp: { index: 67, seconds: f32(0.667), aligned: true },
   neutralSpecialFollowUpAir: { index: 67, seconds: f32(0.667), aligned: true },
+  upTilt: { index: 59, seconds: 0.5, aligned: true },
 };
