@@ -42,8 +42,8 @@ else pushes main, so no landing restarts another's suites.
    Tests run in three slots of one farm run each, outside the landing queue;
    a plan fills every free slot whose run fits 32 of the account's 40 hosted
    jobs at every moment: each run reserves the measured job profile `PROFILE`
-   left at the new run's peak (19 jobs for 2 min, then decaying to 1 by 4 min; a run with no
-   `suite /` job yet counts 19, and one whose `suite` job was skipped, such as a
+   left at the new run's peak (11 jobs for 2 min, then decaying to 1 by 3 min; a run with no
+   `suite /` job yet counts 11, and one whose `suite` job was skipped, such as a
    train landing passed-alone trees, counts only its running jobs), and logs "Autoland hosted jobs: N/32 now, M at
    the next peak". The train is never held by that budget. A lane whose first
    `autoland` status is over 60 min old goes ahead of every other, oldest first.

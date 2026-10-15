@@ -238,7 +238,7 @@ test("a train that lands its passed-alone trees without a suite holds only its r
     { title: "Autoland test 1 claude/land-hb-lich-373fd372d217 373fd372d217c28895c5337401c23682ecfac02b", status: "in_progress", jobs: [job("build", "completed", "2026-10-14T03:20:30Z"), job("reports", "in_progress", "2026-10-14T03:20:58Z"), ...suite] },
   ];
   const lanes: Lane[] = ["claude/land-codex-wisp-revendor-6937794fd995", "claude/land-hb-blademaster-70b77c4b5804"].map((branch, index) => ({ branch, tip: String(index).repeat(40), status: { state: "pending", description: "queued", at: "2026-10-14T03:2" + String(index) + ":00Z" } }));
-  expect(plan(lanes, runs, at).test).toEqual([{ branch: "claude/land-codex-wisp-revendor-6937794fd995", tip: "0".repeat(40), slot: 0 }]);
+  expect(plan(lanes, runs, at).test).toEqual([{ branch: "claude/land-codex-wisp-revendor-6937794fd995", tip: "0".repeat(40), slot: 0 }, { branch: "claude/land-hb-blademaster-70b77c4b5804", tip: "1".repeat(40), slot: 2 }]);
 });
 
 test("plan fills every free slot whose run fits the measured job profile under JOB_BUDGET at every moment, oldest lane first past AGED minutes, over the #513 backlog, and the sweep cancels exactly the Farm test runs past a bound without replanning [k2 property]", () => {
