@@ -15,7 +15,7 @@ export const WHITE_FIGHTER_MODELS: Readonly<Record<number, string>> = {
   13: "war3mapImported\\ThrallWhite-f5a877456156530775275344e0253cd4dc8ec39204ba3de5f5973931fd229a8f.mdx",
   14: "war3mapImported\\JainaProudmooreWhite-4287baea7ccc5af461a4ca31824e5fb2b5dc5df34b08466f81d954df02850717.mdx",
   15: "war3mapImported\\SylvanasWindrunnerWhite-af96ec463dcdde6998e813b3856e2899d16dd70058363b7e609cc0e9595c17d2.mdx",
-  16: "war3mapImported\\CairneBloodhoofWhite-45f0c01400ecf48d166db7fd3b4d8b419a7500da2eb608f5871e8b397118b0e5.mdx",
+  16: "war3mapImported\\CairneBloodhoofWhite-5e185d770f32ddb37f7c7260dae77d4aa1cf89ad02074c797360f099fd95a748.mdx",
   17: "war3mapImported\\ChenStormstoutWhite-e3fc5fed16e827d66cc4a7775f4940fe29a50d7d8d9f3dfa1857ac7aeb50a78c.mdx",
   18: "war3mapImported\\PeonWhite-7727aca110dfe3857eb8330273e0444b801a8ae3577b07acec0752437e39611a.mdx",
   19: "war3mapImported\\GoblinTinkerWhite-b5888da11037d4a8206864c96cf85ef6580dc43af55b61a9eb5d0ee213475a4e.mdx",

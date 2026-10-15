@@ -30,7 +30,7 @@ ensure(source.Sequences.length === 12 && source.Nodes.some(n => n.Name === "Bone
 const stand = source.Sequences[4]!, idleSequence = source.Sequences[0]!;
 interface Gesture { chest?: number; twist?: number; head?: number; arm?: number; elbow?: number; free?: number; freeElbow?: number; hip?: number; knee?: number; lean?: number; yaw?: number; leftHip?: number; rightHip?: number; leftKnee?: number; rightKnee?: number; step?: number; pitch?: number }
 interface Phase { frame: number; gesture: Gesture; target?: readonly [number,number]; idle?: boolean }
-interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; stock?: number; stockHit?: number; prepTravel?: number; hold?: boolean; air?: boolean; roll?: number; first?: Gesture; phases?: readonly Phase[]; target?: readonly [number, number]; damage?: boolean; beats?: readonly Phase[] }
+interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; stock?: number; stockHit?: number; prepTravel?: number; hold?: boolean; air?: boolean; roll?: number; first?: Gesture; phases?: readonly Phase[]; target?: readonly [number, number]; damage?: boolean; beats?: readonly Phase[]; gore?: "travel" | "hold" | "recovery"; settleFrom?: number; stockFrom?: number }
 interface Strike { prep: Gesture; hit: Gesture; follow: Gesture; prepAt?: number; followAt?: number; settle?: number; rest?: Gesture; restTarget?: readonly [number,number]; prepTarget?: readonly [number,number]; hitTarget?: readonly [number,number]; mid?: readonly Phase[]; aim?: boolean; reach?: readonly [number,number] }
 const strikeBeats=(move:{startupFrames:number;totalFrames:number;regions:readonly {firstFrame:number;lastFrame:number;hit:{strike?:{x2:number;z2:number}}}[]},s:Strike):Phase[]=>{
   const contact=move.startupFrames,end=move.totalFrames,lastActive=Math.max(...move.regions.map(r=>r.lastFrame));
@@ -140,13 +140,13 @@ for (const pose of ["rollForward","rollBackward","techForward","techBackward","g
   actions.push({pose,frames:pose.startsWith("tech")?40:pose.startsWith("getUp")?35:pose==="ledgeRoll"?36:31,contact:10,gesture:brace,roll:pose.endsWith("Backward")?-1:1});
 for (const [pose, key, gesture, contact] of [
   ["neutralSpecial","neutral",{...low,arm:-45,chest:45},24], ["sideSpecial","side",{...brace,leftHip:-70,rightHip:10,chest:20},20],
-  ["upSpecial","up",{...high,hip:35,knee:55},11], ["downSpecial","down",{...brace,arm:-65,free:-65,head:30},6],
+  ["upSpecial","up",{...high,hip:35,knee:55},11], ["downSpecial","down",{...brace,arm:-65,free:-65,head:30},20],
 ] as const) {
   const special = CAIRNE_SPECIALS[key]; ensure(special, `${pose}: missing special`);
   for (const air of [false,true]) { const form = air ? special.air ?? special.ground : special.ground;
     const charge: Gesture = {...brace,chest:10,arm:-85,elbow:25,free:-65,freeElbow:20,hip:-45,knee:70,lean:-12,yaw:-12,head:10};
     const wound: Gesture = {...charge,chest:-28,arm:-155,elbow:55,free:-110,hip:-65,knee:95,lean:-18,yaw:-28};
-    actions.push({pose:(air?`${pose}Air`:pose) as HeroPose,frames:form.endFrame,contact,gesture,air:air||key==="up",
+    actions.push({pose:(air?`${pose}Air`:pose) as HeroPose,frames:form.endFrame,contact,gesture,air:air||key==="up",...key==="down"?{stock:9,stockFrom:200,stockHit:567,settleFrom:form.endFrame-9}:{},
       first:key==="neutral"?charge:undefined,
       phases:key==="neutral"?[
         {frame:1,gesture:charge},{frame:3,gesture:blend(charge,wound,0.2)},{frame:12,gesture:blend(charge,wound,0.6)},{frame:contact-1,gesture:wound},
@@ -204,6 +204,22 @@ for (const action of actions) { const a=authored[action.pose]; if (a) action.bea
 const stockDonors: Partial<Record<HeroPose, number>> = { grab: 6, pummel: 10, throwForward: 9 };
 const stockHits: Partial<Record<HeroPose, number>> = { pummel: 760 };
 for (const action of actions) { const donor = stockDonors[action.pose]; if (donor !== undefined) { action.stock = donor; action.stockHit = stockHits[action.pose]; } }
+const horns: Gesture = {chest:45,head:25,arm:30,elbow:25,free:-30,freeElbow:35,step:38};
+const stride=(lead:number):Gesture=>({...horns,leftHip:lead>0?-22:18,rightHip:lead>0?18:-22,leftKnee:lead>0?24:14,rightKnee:lead>0?14:24});
+const paw=(back:boolean):Gesture=>({chest:8,head:-8,arm:35,elbow:30,free:-20,freeElbow:30,step:-12,leftHip:back?0:-38,leftKnee:back?14:40,rightHip:8,rightKnee:18});
+const lower=(back:boolean):Gesture=>({...horns,head:32,step:-4,leftHip:back?-4:-28,leftKnee:back?12:28,rightHip:8,rightKnee:18});
+const fling: Gesture = {chest:-30,head:-40,arm:-60,elbow:10,free:-105,freeElbow:5,step:18,leftHip:-28,rightHip:22,leftKnee:4,rightKnee:0};
+const brake: Gesture = {chest:16,head:6,arm:10,elbow:20,free:-50,freeElbow:20,step:16,leftHip:-24,rightHip:16,knee:22};
+const goreActions: Action[] = [
+  {pose:"sideSpecial",gore:"travel",frames:26,contact:11,gesture:horns,beats:[{frame:0,gesture:ready},{frame:2,gesture:paw(false)},{frame:4,gesture:paw(true)},{frame:6,gesture:paw(false)},
+    {frame:8,gesture:lower(true)},{frame:10,gesture:lower(false)},{frame:11,gesture:stride(1)},{frame:14,gesture:stride(-1)},{frame:17,gesture:stride(1)},
+    {frame:20,gesture:stride(-1)},{frame:23,gesture:stride(1)},{frame:25,gesture:blend(stride(-1),brake,0.35)},{frame:26,gesture:blend(stride(-1),brake,0.5)}]},
+  {pose:"sideSpecial",gore:"hold",frames:20,contact:0,gesture:fling,beats:[{frame:0,gesture:{...horns,leftHip:-30,rightHip:20,knee:40}},
+    {frame:6,gesture:{...blend(horns,fling,0.3),leftHip:-30,rightHip:20,knee:42}},{frame:13,gesture:{...blend(horns,fling,0.7),leftHip:-28,rightHip:20,knee:22}},
+    {frame:17,gesture:{...fling,free:-150,freeElbow:30,chest:-24,head:-30}},{frame:19,gesture:fling},{frame:20,gesture:fling}]},
+  {pose:"sideSpecial",gore:"recovery",frames:32,contact:0,gesture:brake,beats:[{frame:0,gesture:brake},{frame:7,gesture:blend(brake,ready,0.45)},
+    {frame:14,gesture:blend(brake,ready,0.8)},{frame:21,gesture:ready},{frame:32,gesture:ready}]},
+];
 const damageActions: Action[] = [];
 for (let height=0;height<3;height++) for (let strength=0;strength<3;strength++) {
   const gain=[0.55,0.9,1.3][strength]!;
@@ -251,13 +267,13 @@ const farthestReach=(clip:number)=>{const [first,last]=source.Sequences[clip]!.I
     if(tip[0]!>best){best=tip[0]!;at=Math.round(frame*1000/60);}}
   return at;};
 let cursor=Math.max(...source.Sequences.map(s=>s.Interval[1]))+100;
-const bindings:string[]=[],damageBindings:string[]=[],records:{pose:string;index:number;frames:number;contact:number}[]=[];
-for (const [ordinal,action] of [...actions,...damageActions].entries()) {
+const bindings:string[]=[],damageBindings:string[]=[],goreBindings:string[]=[],records:{pose:string;index:number;frames:number;contact:number}[]=[];
+for (const [ordinal,action] of [...actions,...damageActions,...goreActions].entries()) {
   const index=model.Sequences.length,start=cursor,end=start+Math.round(action.frames*1000/60);cursor=end+100;
-  const name=action.damage?`Cairne Pain ${Math.floor((ordinal-actions.length)/3)} ${(ordinal-actions.length)%3}`:`Cairne ${action.pose}`;
+  const name=action.gore?`Cairne Gore ${action.gore}`:action.damage?`Cairne Pain ${Math.floor((ordinal-actions.length)/3)} ${(ordinal-actions.length)%3}`:`Cairne ${action.pose}`;
   model.Sequences.push({...stand,Name:name,Interval:new Uint32Array([start,end]),NonLooping:!action.hold,MoveSpeed:0,Rarity:0,
     MinimumExtent:new Float32Array([-320,-320,-200]),MaximumExtent:new Float32Array([320,320,360]),BoundsRadius:440});
-  if(action.stock!==undefined){const [first,last]=source.Sequences[action.stock]!.Interval,hit=first+(action.stockHit??farthestReach(action.stock)),contact=start+Math.round(action.contact*1000/60);
+  if(action.stock!==undefined){const [stockFirst,last]=source.Sequences[action.stock]!.Interval,first=stockFirst+(action.stockFrom??0),hit=stockFirst+(action.stockHit??farthestReach(action.stock)),contact=start+Math.round(action.contact*1000/60);
     const wind=Math.max(start,contact-(hit-first)),tail=Math.min(end,contact+(last-hit));
     const retimed=(frame:number)=>frame<=hit?wind+Math.round((frame-first)/Math.max(1,hit-first)*(contact-wind)):contact+Math.round((frame-hit)/Math.max(1,last-hit)*(tail-contact));
     tracks(model,(track,path)=>{const donor=originals.get(path);if(!donor||onGlobalClock(donor))return;const placed=new Set<number>();
@@ -267,6 +283,10 @@ for (const [ordinal,action] of [...actions,...damageActions].entries()) {
       for(const key of inside){const Frame=retimed(key.Frame);if(placed.has(Frame))continue;placed.add(Frame);track.Keys.push(flat(key,Frame));}
       if(inside.length&&!placed.has(start))track.Keys.push(flat(inside[0]!,start));
       if(inside.length&&!placed.has(end))track.Keys.push(flat(inside.at(-1)!,end));
+      const stance=donor.Keys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1]);
+      if(action.settleFrom!==undefined&&stance&&inside.length){const cut=start+Math.round(action.settleFrom*1000/60);
+        track.Keys=track.Keys.filter(k=>k.Frame<=cut||k.Frame>end);track.Keys.push(flat(stance,end));}
+      if(action.settleFrom!==undefined&&stance&&!inside.length)track.Keys.push(flat(stance,start),flat(stance,end));
       track.Keys.sort((a,b)=>a.Frame-b.Frame);});
   }else{
   const coil=blend(ready,action.gesture,-0.32);
@@ -333,7 +353,7 @@ for (const [ordinal,action] of [...actions,...damageActions].entries()) {
   const victimContact=action.pose.startsWith("victim");
   const contact=action.pose.startsWith("throw")||victimContact||action.pose==="pummel"?`, contact: ${seconds(victimContact?0.5:action.contact/60)}`:"";
   const binding=`{ index: ${index}, seconds: ${seconds(victimContact?1:duration)}, aligned: true${contact} }`;
-  if(action.damage)damageBindings.push(`  ${binding},`);else bindings.push(`  ${action.pose}: ${binding},`);
+  if(action.gore)goreBindings.push(`  ${action.gore}: { index: ${index}, seconds: ${seconds(duration)} },`);else if(action.damage)damageBindings.push(`  ${binding},`);else bindings.push(`  ${action.pose}: ${binding},`);
   records.push({pose:name,index,frames:victimContact?60:action.frames,contact:victimContact?30:action.contact});
 }
 
@@ -344,10 +364,10 @@ for(const [ordinal,action]of actions.entries())if(action.pose.startsWith("victim
 }
 const bytes=encodeVerified(parseSource(generateMDX(model)));mkdirSync(output,{recursive:true});await Bun.write(join(output,"herotaurenchieftain.mdx"),bytes);
 await Bun.write(join(project,"ts/src/game/presentation/heroes/cairneClips.ts"),[
-  "// Generated by tools/animations/cairne-clips.ts; regenerate instead of editing.", 'import { f32 } from "wisp/src/sim/f32";', 'import type { HeroClip, HeroClipTable } from "../../sim/heroes/hero";',
+  "// Generated by tools/animations/cairne-clips.ts; regenerate instead of editing.", 'import { f32 } from "wisp/src/sim/f32";', 'import type { CommandGrabClips, HeroClip, HeroClipTable } from "../../sim/heroes/hero";',
   'export const CAIRNE_FALLBACK: HeroClip = { index: 4, seconds: 2.0 };',
   'export const CAIRNE_CLIPS = { idle: { index: 0, seconds: f32(2.667) }, walk: { index: 3, seconds: 1.0 }, dash: { index: 3, seconds: 1.0 }, run: { index: 3, seconds: 1.0 }, ko: { index: 11, seconds: 2.0 },',
-  ...bindings,'} as const satisfies HeroClipTable;', 'export const CAIRNE_DAMAGE_CLIPS: readonly HeroClip[] = [',...damageBindings,'];',"",
+  ...bindings,'} as const satisfies HeroClipTable;', 'export const CAIRNE_DAMAGE_CLIPS: readonly HeroClip[] = [',...damageBindings,'];','export const CAIRNE_COMMAND_GRAB = {',...goreBindings,'} as const satisfies CommandGrabClips;',"",
 ].join("\n"));
 const before=new DrawnModel(generateMDX(source),1),after=new DrawnModel(bytes,1);
 const strides:DrawnStride[]=Object.entries(DRAWN_STRIDES).flatMap(([character,row])=>row===undefined||Number(character)===Character.cairne?[]:
@@ -367,6 +387,10 @@ for(const pose of ["jab","jab2","forwardTilt","upTilt","downTilt","dashAttack","
   const ordinal=actions.findIndex(a=>a.pose===pose),action=actions[ordinal]!;
   const panels:PoseFrame[]=[1,-1].flatMap(facing=>(action.beats?action.beats.map(b=>b.frame):[0,Math.max(1,action.contact-3),action.contact,Math.min(action.frames,action.contact+4),action.frames]).map(frame=>({frame,phase:frame<action.contact?AttackPhase.startup:frame<=action.contact+4?AttackPhase.active:AttackPhase.recovery,x:0,z:0,facing,parts:[],strikes:[],clip:source.Sequences.length+ordinal,seconds:frame/60})));
   await Bun.write(join(output,`${pose}.png`),sheet(`Cairne ${pose}`,framed,panels,panels.length/2).png);
+}
+for(const [ordinal,action]of goreActions.entries()){const clip=source.Sequences.length+actions.length+damageActions.length+ordinal;
+  const panels:PoseFrame[]=[1,-1].flatMap(facing=>action.beats!.map(b=>({frame:b.frame,phase:AttackPhase.active,x:0,z:0,facing,parts:[],strikes:[],clip,seconds:b.frame/60})));
+  await Bun.write(join(output,`gore-${action.gore}.png`),sheet(`Cairne gore ${action.gore}`,framed,panels,panels.length/2).png);
 }
 await Bun.write(join(output,"cairne-clips.json"),JSON.stringify({stockSequences:source.Sequences.length,preservedSamples:preserved,appended:records.length,records,motions},null,2)+"\n");
 console.log(`CAIRNE_CLIPS_PASS ${records.length} clips; ${preserved} stock pose samples retained; nine distinct first pain poses; ${output}`);

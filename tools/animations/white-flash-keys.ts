@@ -4,7 +4,6 @@ import { characterClips, illidanSmashClips, namedClips, specialClip } from "../.
 import { contactDamageClips } from "../../ts/src/game/presentation/damagePose";
 import { heroDefinition } from "../../ts/src/game/sim/heroes/registry";
 import * as illidan from "../../ts/src/game/presentation/demonHunterAssetInfo";
-import { DREADLORD_POUNCE_CLIPS } from "../../ts/src/game/presentation/dreadlordPounceClipInfo";
 import { AttackStyle, Character, SpecialAction } from "../../ts/src/game/sim/codes";
 import { onGlobalClock } from "./original-clips";
 import { originalClipNamed } from "../../ts/src/game/assets/fighterOriginalClipInfo";
@@ -55,7 +54,8 @@ export function flashableSequences(character: number, sequences: readonly mdx.Se
       }
     }
   }
-  if (character === Character.dreadlord) for (const clip of Object.values(DREADLORD_POUNCE_CLIPS)) indices.add(clip.index);
+  const grab = heroDefinition(character)?.presentation.commandGrab;
+  if (grab !== undefined) for (const clip of [grab.travel, grab.hold, grab.recovery]) indices.add(clip.index);
   return sequences.filter((sequence, index) => indices.has(index));
 }
 
