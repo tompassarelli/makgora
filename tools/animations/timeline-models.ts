@@ -1,7 +1,8 @@
 import { join, relative, resolve } from 'node:path';
 import { unlink } from 'node:fs/promises';
 import { Effect } from 'effect';
-import { encodeVerified, fighters, hash, parseSource, tracks } from './original-clips';
+import { encodeVerified, hash, parseSource, tracks } from './original-clips';
+import { fighters } from '../../ts/scripts/heroModelSource';
 import { timelineBody } from './timeline-body';
 import { checkTimelineGeosets } from './timeline-geosets';
 import { thinKeys } from '../../ts/scripts/keyThin';
@@ -13,6 +14,7 @@ import { DrawnModel } from '../../ts/scripts/wisp/hurtboxView';
 import { fighterSlug } from '../../ts/src/game/sim/heroes/registry';
 import { heroLook } from '../../ts/src/game/roster/looks';
 import { CLIPS } from './fighter-shards';
+import { readClipRecords, writeClipRecord } from '../../ts/scripts/clipEvidence';
 
 const [assetsArg, outputArg, fighterName] = process.argv.slice(2);
 if (assetsArg === undefined || outputArg === undefined || fighterName === undefined) throw new Error('usage: bun tools/animations/timeline-models.ts PRIVATE_ASSETS PRIVATE_POOL FIGHTER');
@@ -30,8 +32,7 @@ await Effect.runPromise(Effect.tryPromise({ try: async () => {
     tracks(parseSource(bytes), (track, path) => {
         if (track.Keys.length === 0) throw new Error(`${fighter.name}: timeline body left ${path} without keys`);
     });
-    const baseline = await Bun.file(join(assets, 'original-clips-static-lights/original-clips-evidence.json')).json();
-    const reference = baseline.records.find((record: { fighter: string }) => record.fighter === fighter.name);
+    const reference = readClipRecords(join(assets, 'original-clips-static-lights')).find((record: { fighter: string }) => record.fighter === fighter.name);
     if (reference === undefined) throw new Error(`Missing clip-pool reference for ${fighter.name}`);
     const timeline = new DrawnModel(bytes, 1);
     let samples = 0, maximumDifference = 0;
@@ -52,16 +53,13 @@ await Effect.runPromise(Effect.tryPromise({ try: async () => {
     console.log(`HEADLESS_TIMELINE_POSES_PASS ${fighter.name}: ${played.length} clips, ${samples} both-facing frame samples, max ${maximumDifference} world units versus clip pool`);
     const sha256 = hash(bytes), filename = `${fighter.name}TimelineBody-${sha256}.mdx`;
     await Bun.write(join(output, 'imports/war3mapImported', filename), bytes);
-    const evidencePath = join(output, 'original-clips-evidence.json');
-    const evidence = await Bun.file(evidencePath).json();
-    const record = evidence.records.find((record: { fighter: string }) => record.fighter === fighter.name);
+    const record = readClipRecords(output).find((record: { fighter: string }) => record.fighter === fighter.name);
     if (record === undefined) throw new Error(`No original clips for ${fighter.name}`);
     const oldBytes = record.bytes;
     const replacedFiles = new Set<string>(record.clips.map((clip: { filename: string }) => clip.filename));
     record.clips = record.clips.map((clip: object) => ({ ...clip, filename, modelPath: `war3mapImported\\${filename}`, sha256, bytes: bytes.byteLength, timeline: true }));
     record.bytes = bytes.byteLength + (record.light?.bytes ?? 0);
-    evidence.totalBytes += record.bytes - oldBytes;
-    await Bun.write(evidencePath, JSON.stringify(evidence, null, 2) + '\n');
+    writeClipRecord(output, record);
     for (const replaced of replacedFiles) if (replaced !== filename) await unlink(join(output, 'imports/war3mapImported', replaced));
     const character = [...fighters].find(([, item]) => item === fighter)![0];
     const metadataPath = join(CLIPS, `${fighterSlug(character)}.ts`);

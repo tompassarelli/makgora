@@ -28,6 +28,8 @@ import { HERO_ROSTER, PORTRAIT_KINDS, RENDERED_FIGHTERS } from "../../src/game/s
 import { PARTICIPANT_SLOTS } from "../../src/game/input/participants";
 import { PORTRAIT_QUALITY, encodeBlp, readTga } from "../blp";
 import { importedModelFile } from "../heroModelSource";
+import { CLIP_RECORDS, clipPoolFiles } from "../clipEvidence";
+import { importList } from "./importList";
 import { PREVIEW_ENTRY, composePreview, encodePreview } from "../mapPreview";
 import { regenerateCommand } from "../stageThumbnailSpec";
 import { stageCardPath } from "./buildInputs";
@@ -90,24 +92,15 @@ const SummonEvidence = Schema.Struct({
   records: Schema.Array(Schema.Struct({ clips: Schema.Array(Schema.Struct({ filename: Schema.String })) })),
 });
 
-const OriginalClipEvidence = Schema.Struct({
-  records: Schema.Array(Schema.Struct({
-    light: Schema.NullOr(Schema.Struct({ filename: Schema.String })),
-    clips: Schema.Array(Schema.Struct({ filename: Schema.String })),
-  })),
-});
 
-const importLines = (path: string) =>
-  tryMapPromise("read import list", path, () => Bun.file(path).text()).pipe(
-    Effect.map((text) => text.split(/\r?\n/).filter((line) => line.length > 0)),
-  );
+const importLines = (path: string) => tryMapSync("read import list", path, () => importList(path));
 
 
 
 
 
 export const GENERATED_MODELS: readonly { readonly list: string; readonly generator: string; readonly models: readonly string[] }[] = [
-  { list: "impact-assets/white-flash-imports.txt", generator: "tools/animations/white-flash-models.ts", models: Object.values(WHITE_FIGHTER_MODELS) },
+  { list: "impact-assets/white-flash-imports", generator: "tools/animations/white-flash-models.ts", models: Object.values(WHITE_FIGHTER_MODELS) },
   { list: "stage-assets/imports.txt", generator: "tools/stage/package.ts", models: [...new Set([...Object.values(STAGE_DECK_MODELS).flatMap(({ main, slab, alternate }) => alternate === undefined ? [main, slab] : [main, slab, alternate]), STAGE_SNOW_MODEL, STAGE_WATER_MODEL, STAGE_LAVA_MODEL, STAGE_SEA_MODEL, STAGE_TOMB_WATER_MODEL, STAGE_TOMB_SEA_MODEL, ...Object.values(STAGE_POINT_LIGHT_MODELS).flat(), ...Object.values(STAGE_SKY_MODELS)])] },
   { list: "impact-assets/imports.txt", generator: "tools/effects/package.ts", models: Object.values(impactModels) },
   { list: "impact-assets/frost-imports.txt", generator: "tools/effects/trap.ts", models: Object.values(frostModels) },
@@ -326,9 +319,8 @@ export const importedAssets = (assets: string, summon: string, edition: MapEditi
   const summonFiles = evidence.records.flatMap((record) => record.clips).map(({ filename }) => filename);
   yield* requireListed(evidencePath, summonFiles, SUMMON_MODELS, "summonClipInfo.ts and the summon clips differ");
   const clipDirectory = join(assets, "original-clips-static-lights");
-  const clipEvidencePath = join(clipDirectory, "original-clips-evidence.json");
-  const clipEvidence = yield* readJson(OriginalClipEvidence, clipEvidencePath);
-  const clipFiles = [...new Set(clipEvidence.records.flatMap((record) => [...record.clips.map(({ filename }) => filename), ...(record.light === null ? [] : [record.light.filename])]))].filter((file) => ORIGINAL_CLIP_MODELS.includes(`war3mapImported\\${file}`));
+  const clipEvidencePath = join(clipDirectory, CLIP_RECORDS);
+  const clipFiles = (yield* tryMapSync("read clip records", clipEvidencePath, () => clipPoolFiles(clipDirectory))).filter((file) => ORIGINAL_CLIP_MODELS.includes(`war3mapImported\\${file}`));
   const classicBodies = clipFiles.map((filename) => imported(join(clipDirectory, "imports/war3mapImported"), filename));
   const classicWhites = generated.flat().filter(({ entry }) => Object.values(WHITE_FIGHTER_MODELS).includes(entry));
   const classicOverrides = [...classicBodies, ...classicWhites].map(({ entry, source }) => {

@@ -4,7 +4,8 @@
 
 import {join, resolve, relative} from 'node:path';
 import {seconds} from './asset-info';
-import {fighters, parseSource, ensure, hash} from './original-clips';
+import {parseSource, ensure, hash} from './original-clips';
+import {fighters} from '../../ts/scripts/heroModelSource';
 import {slkRows} from './slk';
 
 const project = resolve(import.meta.dir, '../..');

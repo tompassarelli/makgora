@@ -8,7 +8,8 @@ import { AttackPhase, AttackStyle, Character, GrabAction } from "../../ts/src/ga
 import { heroDefinition } from "../../ts/src/game/sim/heroes/registry";
 import { seconds } from "./asset-info";
 import { swordGestureBaseModel } from "./recovery-model";
-import { encodeVerified, ensure, fighters, onGlobalClock, parseSource, tracks } from "./original-clips";
+import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
+import { fighters } from "../../ts/scripts/heroModelSource";
 
 const [input, output] = process.argv.slice(2).map(p => resolve(p));
 const project = resolve(import.meta.dir, "../..");

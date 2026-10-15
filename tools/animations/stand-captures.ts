@@ -6,7 +6,8 @@ import { headlessRender } from '../../ts/scripts/wisp/headlessRender';
 import { assetsView, readManifest } from '../../ts/scripts/wisp/buildInputs';
 import { originalClip } from '../../ts/src/generated/clips/fighterOriginalClipInfo';
 import { SELECTABLE_CHARACTERS, fighterName } from '../../ts/src/game/sim/heroes/registry';
-import { ensure, fighters, parseSource } from './original-clips';
+import { ensure, parseSource } from './original-clips';
+import { fighters } from '../../ts/scripts/heroModelSource';
 import { flashableSequences } from './white-flash-keys';
 import { checkTimelineGeosets } from './timeline-geosets';
 

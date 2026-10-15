@@ -14,8 +14,9 @@ import {generateMDX, model as mdx} from 'war3-model';
 import {appendedStrikeBaseModel, attackGestureBaseModel, swordGestureBaseModel, wardenFanBaseModel, damageBaseModel, downAirBaseModel, drillBaseModel, grabBaseModel, jumpBaseModel, locomotionBaseModel, pounceBaseModel, pitLordSpecialBaseModel, recoveryBaseModel} from './recovery-model';
 import {seconds} from './asset-info';
 import {mkdirSync} from 'node:fs';
-import {fighters, ensure, hash, parseSource, encodeVerified, tracks, verifyPreservedBody, removeBodyEffects,
-    originalBodyClip, splitStaticLights, staticLightGate, onGlobalClock} from './original-clips';
+import {ensure, hash, parseSource, encodeVerified, tracks, verifyPreservedBody, removeBodyEffects, originalBodyClip, splitStaticLights, staticLightGate, onGlobalClock} from './original-clips';
+import {fighters} from '../../ts/scripts/heroModelSource';
+import {CLIP_PROVENANCE, keepClipRecords, readClipRecords, writeClipRecord} from '../../ts/scripts/clipEvidence';
 import {misplacedNodes} from '../../ts/scripts/clipNodes';
 import {KEY_BOUND, savedKeyBytes, thinKeys, type KeyThinReport} from '../../ts/scripts/keyThin';
 import {fighterSlug} from '../../ts/src/game/sim/heroes/registry';
@@ -33,12 +34,12 @@ const metadataOnly = process.argv.includes('--metadata-only');
 const keepUnchanged = process.argv.includes('--keep-unchanged');
 
 const only = option('--only')?.split(',');
-const retained = metadataOnly || keepUnchanged ? await Bun.file(join(output, 'original-clips-evidence.json')).json() : null;
+const retained = metadataOnly || keepUnchanged ? readClipRecords(output) : [];
 const moduleClips: string[][] = [], moduleNames: string[][] = [], moduleLights: (string | null)[] = [];
 const clipLiteral = (modelPath: string, interval: readonly number[], looping: boolean, timeline = false) =>
     `{ modelPath: ${JSON.stringify(modelPath)}, startSeconds: ${seconds(Number((interval[0] / 1000).toFixed(3)))}, endSeconds: ${seconds(Number((interval[1] / 1000).toFixed(3)))}, looping: ${looping}${timeline ? ", timeline: true" : ""} },`;
 const records = [], keyThinRows: string[] = [];
-let totalBytes = 0, theoreticalFullSourceBytes = 0, theoreticalUntrimmedBodyBytes = 0;
+let totalBytes = 0, theoreticalFullSourceBytes = 0;
 const started = performance.now();
 for (const [character, fighter] of fighters) {
     if (only !== undefined && !only.includes(fighter.name)) continue;
@@ -51,7 +52,7 @@ for (const [character, fighter] of fighters) {
     }
     const bytes = await Bun.file(join(assets, fighter.source)).arrayBuffer();
     const sourceSha256 = hash(bytes), original = parseSource(bytes);
-    const retainedRecord = retained?.records.find((record: {fighter: string}) => record.fighter === fighter.name);
+    const retainedRecord = retained.find((record: {fighter: string}) => record.fighter === fighter.name);
     const retainedThin = isDeepStrictEqual(retainedRecord?.keyThin?.bound, KEY_BOUND);
     if (metadataOnly) ensure(retainedRecord?.sourceSha256 === sourceSha256 && retainedThin, `${fighter.name}: retained clips have a different source or key bound`);
     const reuse = metadataOnly || (keepUnchanged && retainedThin && retainedRecord?.sourceSha256 === sourceSha256);
@@ -85,7 +86,6 @@ for (const [character, fighter] of fighters) {
     const omittedTrackFamilies = new Set<string>();
     const untrimmedBytes = encodeVerified(originalBodyClip(components.body, 0, 'untrimmed-reference').model).byteLength;
     theoreticalFullSourceBytes += bytes.byteLength * source.Sequences.length;
-    theoreticalUntrimmedBodyBytes += untrimmedBytes * source.Sequences.length;
     const clips = [];
     let fighterBytes = light?.bytes ?? 0, unthinnedBytes = light?.bytes ?? 0;
     const fighterClips: string[] = [];
@@ -180,23 +180,19 @@ for (const [character, clips] of moduleClips.entries()) if (clips !== undefined)
 await Bun.write(join(CLIPS, 'fighterOriginalClip.ts'), clipTypeFile());
 await Bun.write(CLIP_INDEX, clipIndex(shardOrder(CLIP_INDEX, CLIPS, '.ts', fighters.keys()), {...staticLightGate, seconds: seconds(staticLightGate.seconds)}));
 await Bun.write(KEY_THIN_INDEX, keyThinIndex(shardOrder(KEY_THIN_INDEX, KEY_THIN, '.tsv', fighters.keys())));
-const emittedRecords = only === undefined || retained === null ? records : [...retained.records.filter((record: {fighter: string}) => !only.includes(record.fighter)), ...records];
-const emittedTotalBytes = emittedRecords.reduce((total, record) => total + record.bytes, 0);
-const emittedFullSourceBytes = emittedRecords.reduce((total, record) => total + record.sourceBytes * record.clips.length, 0);
-const emittedUntrimmedBodyBytes = emittedRecords.reduce((total, record) => total + record.untrimmedSelectedBodyBytes * record.clips.length, 0);
-if (!metadataOnly) await Bun.write(join(output, 'original-clips-evidence.json'), JSON.stringify({
-    status: 'full-roster-structural-checks-pass-static-light-visibility-gate-native-pending',
-    policy: 'Out-of-interval keys and emptied animation chunks removed; retained keys, order, tangents, interpolation, sequence flags and times unchanged. Required original static backing retained. Zero-key chunks require an explicit diagnostic mode. Global-clock tracks kept whole; unsupported empty-channel backing semantics rejected. Events, particles and ribbons omitted. Independent static lights extracted once per fighter with original illumination and remapped node/pivot tables; reversible visibility gate added. Animated or parented lights rejected.',
-    staticLightGate,
-    nativeEvidence: {omissionRun: '20261002102859948', selectedSourceComparisons: 26, selectedSourceComparisonsExact: 26,
-        separateZeroLightIntensityRun: '20261002103744679', sourceComparisonsExact: 12, illidanRestorationsExact: 4,
-        independentStaticLightRun: '20261002131240774', independentStaticLightComparisonsExact: 18},
-    nativeLimits: ['Native fidelity covers the selected diagnostic clips and times, not all 223 source sequences.',
-        'The standalone light visibility gate still requires native verification.',
-        'Full-roster resident memory, creation cost and replay restoration latency have not been measured.'],
-    sequenceCount: emittedRecords.reduce((count, record) => count + record.clips.length, 0), totalBytes: emittedTotalBytes,
-    theoreticalFullSourceBytes: emittedFullSourceBytes, theoreticalUntrimmedBodyBytes: emittedUntrimmedBodyBytes,
-    reductionFromFullSourcePercent: 100 * (1 - emittedTotalBytes / emittedFullSourceBytes),
-    records: emittedRecords,
-}, null, 2) + '\n');
+if (!metadataOnly) {
+    for (const record of records) writeClipRecord(output, record);
+    if (only === undefined) keepClipRecords(output, new Set(records.map(record => record.fighter)));
+    await Bun.write(join(output, CLIP_PROVENANCE), JSON.stringify({
+        status: 'full-roster-structural-checks-pass-static-light-visibility-gate-native-pending',
+        policy: 'Out-of-interval keys and emptied animation chunks removed; retained keys, order, tangents, interpolation, sequence flags and times unchanged. Required original static backing retained. Zero-key chunks require an explicit diagnostic mode. Global-clock tracks kept whole; unsupported empty-channel backing semantics rejected. Events, particles and ribbons omitted. Independent static lights extracted once per fighter with original illumination and remapped node/pivot tables; reversible visibility gate added. Animated or parented lights rejected.',
+        staticLightGate,
+        nativeEvidence: {omissionRun: '20261002102859948', selectedSourceComparisons: 26, selectedSourceComparisonsExact: 26,
+            separateZeroLightIntensityRun: '20261002103744679', sourceComparisonsExact: 12, illidanRestorationsExact: 4,
+            independentStaticLightRun: '20261002131240774', independentStaticLightComparisonsExact: 18},
+        nativeLimits: ['Native fidelity covers the selected diagnostic clips and times, not all 223 source sequences.',
+            'The standalone light visibility gate still requires native verification.',
+            'Full-roster resident memory, creation cost and replay restoration latency have not been measured.'],
+    }, null, 2) + '\n');
+}
 console.log(`ORIGINAL_CLIP_EXPORT_PASS ${totalBytes}/${theoreticalFullSourceBytes} bytes in ${((performance.now() - started) / 1000).toFixed(2)}s; full-roster native coverage remains unproven`);

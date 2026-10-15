@@ -29,7 +29,7 @@ export class PrePushRefusal extends Schema.TaggedError<PrePushRefusal>()("PrePus
 export interface Check { readonly name: string; readonly directory: string; readonly args: readonly string[]; readonly fix?: string; readonly hosted: boolean; readonly inputs?: readonly string[] }
 
 
-const ANIMATION_INPUTS = ["build-inputs/original-clips-static-lights", "tools/animations/", "ts/scripts/keyThin.ts", "ts/scripts/wisp/animJitter.ts"];
+const ANIMATION_INPUTS = ["build-inputs/original-clips-static-lights/", "tools/animations/", "ts/scripts/keyThin.ts", "ts/scripts/wisp/animJitter.ts"];
 const MODEL_INPUTS = ["build-inputs/", "tools/animations/", "ts/src/game/assets/", "ts/src/generated/assets/", "ts/src/generated/stages/", "ts/src/game/presentation/", "ts/scripts/wisp/playerView.ts", "ts/scripts/wisp/model-facts/"];
 
 

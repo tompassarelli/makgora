@@ -205,7 +205,7 @@ export function landing(solo: boolean, base: Tree, tested: Tree, main: readonly 
 
 export const GENERATED_REPORTS: readonly string[] = ["tools/move-data/advantage-state.jsonl", "tools/move-data/advantage-state.md", "ts/test/lua/cost-baseline.tsv"];
 export const CACHE_RECORDS: readonly string[] = ["ts/scripts/wisp/cue-models.tsv"];
-const PIN = /^build-inputs\/([^/]+)$/;
+const PIN = /^build-inputs\/([^/]+)(?:\/[^/.][^/]*)?$/;
 export const pinFamily = (path: string): string | undefined => PIN.exec(path)?.[1];
 
 export interface FamilySides { readonly base: Tree; readonly ours: Tree; readonly theirs: Tree }

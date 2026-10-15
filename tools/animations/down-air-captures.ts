@@ -9,7 +9,8 @@ import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../..
 import { attackStartupFrames, characterAttackActiveFrames, attackDurationFramesForGrounding } from "../../ts/src/game/sim/moves";
 import { SELECTABLE_CHARACTERS, fighterName } from "../../ts/src/game/sim/heroes/registry";
 import { hurtCapsule } from "../../ts/src/game/sim/geometry/contactGeometry";
-import { ensure, fighters, parseSource } from "./original-clips";
+import { ensure, parseSource } from "./original-clips";
+import { fighters } from "../../ts/scripts/heroModelSource";
 const [input, output] = process.argv.slice(2).map(p => resolve(p));
 ensure(input && output, "usage: bun tools/animations/down-air-captures.ts PRIVATE_ASSETS PRIVATE_OUTPUT");
 ensure(!output.startsWith(resolve(import.meta.dir, "../..") + "/"), "captures stay private");

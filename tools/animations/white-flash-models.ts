@@ -3,7 +3,8 @@ import { isDeepStrictEqual } from "node:util";
 import { decodeBLP, getBLPImageData, model as mdx } from "war3-model";
 import { generateModelMDX, parseModelMDX } from "../../ts/scripts/mdxCodec";
 import { PNG } from "pngjs";
-import { fighters, onGlobalClock, removeBodyEffects, tracks } from "./original-clips";
+import { onGlobalClock, removeBodyEffects, tracks } from "./original-clips";
+import { fighters } from "../../ts/scripts/heroModelSource";
 import { modelFacts } from "../../ts/node_modules/wisp/scripts/wisp/models";
 import { headlessRender } from "../../ts/scripts/wisp/headlessRender";
 import { IMPORTED_MODEL_FILES } from "../../ts/src/game/assets/importedModelInfo";
@@ -24,6 +25,7 @@ import { originalClip, originalClipCount } from "../../ts/src/generated/clips/fi
 import { DEFINITIVE_FIGHTERS } from "../../ts/src/game/assets/definitiveFighters";
 import type { Character } from "../../ts/src/game/sim/codes";
 import { fighterSlug } from "../../ts/src/game/sim/heroes/registry";
+import { keepWhiteImports, pruneWhiteTextures, writeWhiteImports } from "../../ts/scripts/whiteImports";
 import { WHITE_FACTS, WHITE_FACT_INDEX, WHITE_MODELS, WHITE_MODEL_INDEX, shardOrder, whiteFactsFile, whiteFactsIndex, whiteModelFile, whiteModelIndex } from "./fighter-shards";
 const DEFINITIVE_WHITE = "_de.w3mod";
 const DEFINITIVE_DECIMATION = { ratio: 0.5, error: 0.005 };
@@ -42,7 +44,6 @@ texture.fill(255, 18);
 const textureName = `FighterWhite-${hash(texture)}.tga`;
 await Bun.write(join(output, textureName), texture);
 const paths: Record<number, string> = selected === undefined && !definitiveOnly ? {} : { ...WHITE_FIGHTER_MODELS };
-let imports = selected === undefined && !definitiveOnly ? [textureName] : (await Bun.file(join(output, "white-flash-imports.txt")).text()).trim().split("\n");
 const sourceAssets = headlessRender({ assets, imports: IMPORTED_MODEL_FILES.map(({ entry, file }) => ({ entry, source: join(assets, "imported-models", file) })) });
 const whiteTextures = new Map<string, string>();
 async function whiteTexture(path: string, graphics: "classic" | "definitive" = "classic"): Promise<string> {
@@ -80,7 +81,6 @@ async function whiteTexture(path: string, graphics: "classic" | "definitive" = "
   }
   const name = `FighterWhite-${hash(white)}.tga`;
   await Bun.write(join(output, name), white);
-  if (!imports.includes(name)) imports.push(name);
   const imported = `war3mapImported\\${name}`;
   whiteTextures.set(`${graphics}:${path}`, imported);
   return imported;
@@ -139,29 +139,27 @@ async function definitiveWhite(character: number, name: string, filename: string
   const planes = groundPlaneGeosets(decoded);
   if (planes.length > 0) throw new Error(`${name}: Definitive white overlay kept ground plane geosets ${planes.join(", ")}`);
   await Bun.write(join(output, DEFINITIVE_WHITE, filename), bytes);
-  imports.push(`${DEFINITIVE_WHITE}/${filename}`);
   return true;
 }
 if (definitiveOnly) {
-  imports = imports.filter(file => !file.startsWith(`${DEFINITIVE_WHITE}/`));
   let count = 0;
   for (const [character, path] of Object.entries(WHITE_FIGHTER_MODELS)) {
     const fighter = fighters.get(Number(character));
     if (fighter === undefined) throw new Error(`No roster fighter ${character}`);
-    if (await definitiveWhite(Number(character), fighter.name, path.replace("war3mapImported\\", ""))) count++;
+    const filename = path.replace("war3mapImported\\", "");
+    const definitive = await definitiveWhite(Number(character), fighter.name, filename);
+    await writeWhiteImports(output, fighter.name, filename, definitive);
+    if (definitive) count++;
   }
-  await Bun.write(join(output, "white-flash-imports.txt"), imports.join("\n") + "\n");
   console.log(`${count} Definitive white bodies updated over the Definitive timeline bodies`);
+  pruneWhiteTextures(output);
   process.exit(0);
 }
 const facts: Record<string, ReturnType<typeof modelFacts>> = selected === undefined ? {} : { ...WHITE_MODEL_FACTS };
 for (const [character, fighter] of fighters.entries()) {
   if (selected !== undefined && character !== selected) continue;
   const previous = paths[character];
-  if (previous !== undefined) {
-    imports = imports.filter(file => previous !== `war3mapImported\\${file}` && previous !== `war3mapImported\\${file.replace(`${DEFINITIVE_WHITE}/`, "")}`);
-    delete facts[previous.replaceAll("\\", "/").toLowerCase()];
-  }
+  if (previous !== undefined) delete facts[previous.replaceAll("\\", "/").toLowerCase()];
   const source = await Bun.file(join(assets, fighter.source)).arrayBuffer();
   const thinned = thinKeys(parseModelMDX(source)).model;
   const original = timelineBody(thinned, flashableSequences(character, thinned.Sequences));
@@ -224,11 +222,12 @@ for (const [character, fighter] of fighters.entries()) {
   if (planes.length > 0) throw new Error(`${fighter.name}: white overlay kept ground plane geosets ${planes.join(", ")}`);
   const filename = `${fighter.name}White-${hash(bytes)}.mdx`;
   await Bun.write(join(output, filename), bytes);
-  imports.push(filename); paths[character] = `war3mapImported\\${filename}`;
-  await definitiveWhite(character, fighter.name, filename);
+  paths[character] = `war3mapImported\\${filename}`;
+  await writeWhiteImports(output, fighter.name, filename, await definitiveWhite(character, fighter.name, filename));
   facts[`war3mapImported/${filename}`.toLowerCase()] = modelFacts(bytes);
 }
-await Bun.write(join(output, "white-flash-imports.txt"), imports.join("\n") + "\n");
+if (selected === undefined) keepWhiteImports(output, new Set([...fighters.values()].map(fighter => fighter.name)));
+pruneWhiteTextures(output);
 // Only the fighters exported here get new white model and facts files; the indexes change only when a fighter is added.
 for (const character of fighters.keys()) {
   if (selected !== undefined && character !== selected) continue;

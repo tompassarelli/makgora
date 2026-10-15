@@ -9,7 +9,7 @@ import { HERO_ROSTER } from "../../src/game/sim/heroes/registry";
 import { FIGHTER_OBJECTS } from "../../src/game/objectData";
 import { PLAYABLE_BOUNDS, WORLD_BOUNDS } from "../../src/game/presentation/arenaCamera";
 import { heroModelSource, importedModelFile } from "../heroModelSource";
-import { INPUTS_STORE, assetsView, readManifest } from "./buildInputs";
+import { INPUTS_STORE, assetsView, readManifest, wholeFamily } from "./buildInputs";
 import { importedAssets } from "./mapInputs";
 import { runProcess } from "../hostProcess";
 import { POST_PROCESSING_FILE } from "../postProcessing";
@@ -92,7 +92,7 @@ export function headlessRender(options: RenderAssetOptions = {}) {
   const sources = Effect.runSync(Effect.cached(Effect.gen(function*() {
     const manifest = yield* readManifest();
     const assets = options.assets ?? assetsView(manifest);
-    const imports = options.imports ?? (yield* importedAssets(assets, join(INPUTS_STORE, "summon", manifest.summon)));
+    const imports = options.imports ?? (yield* importedAssets(assets, yield* wholeFamily(manifest, "summon")));
     const paths = new Map(imports.map(({ entry, source }) => [key(entry), source]));
     for (const { character } of HERO_ROSTER) {
       const look = heroLook(character)!;

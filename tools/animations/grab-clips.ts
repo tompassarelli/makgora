@@ -7,7 +7,8 @@ import { AttackStyle, Character } from "../../ts/src/game/sim/codes";
 import { heroDefinition } from "../../ts/src/game/sim/heroes/registry";
 import { attackDurationFramesForGrounding, attackStartupFrames, characterAttackActiveFrames, PUMMEL_CONTACT_FRAME } from "../../ts/src/game/sim/moves";
 import { seconds } from "./asset-info";
-import { encodeVerified, ensure, fighters, onGlobalClock, parseSource, tracks } from "./original-clips";
+import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
+import { fighters } from "../../ts/scripts/heroModelSource";
 
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
 const characterAt = process.argv.indexOf("--character");

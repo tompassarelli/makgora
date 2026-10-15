@@ -4,7 +4,8 @@
 import { expect, test } from "bun:test";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { INPUTS_STORE, MANIFEST, readPins } from "../scripts/wisp/buildInputs";
+import { Effect } from "effect";
+import { INPUTS_STORE, assetsView, pinHashes, readManifest } from "../scripts/wisp/buildInputs";
 import { DrawnModel, sampleState } from "../scripts/wisp/hurtboxView";
 import { DEFINITIVE_FIGHTERS } from "../src/game/assets/definitiveFighters";
 import { originalClip } from "../src/generated/clips/fighterOriginalClipInfo";
@@ -44,10 +45,11 @@ function drawnHeight(triangles: Float32Array, half: number): number {
 
 const LOOK_TOLERANCE = 0.1;
 
-const manifest = readPins();
-const family = join(INPUTS_STORE, "original-clips-static-lights", manifest["original-clips-static-lights"] ?? "missing");
+const manifest = Effect.runSync(readManifest());
+const stored = pinHashes(manifest["original-clips-static-lights"]).every((hash) => existsSync(join(INPUTS_STORE, "original-clips-static-lights", hash)));
+const family = stored ? join(assetsView(manifest), "original-clips-static-lights") : undefined;
 test("every fighter's drawn Stand height fits its hurt capsule in both looks, and Definitive matches Classic or its capsule within 10% [k3 measure docs/design/hd-fighters.md]", async () => {
-  if (!existsSync(family)) return;
+  if (family === undefined) return;
   const off: string[] = [];
   for (const character of SELECTABLE_CHARACTERS) {
     const frame = sampleState(character, false, 1);

@@ -6,7 +6,8 @@ import { originalClip } from '../../ts/src/generated/clips/fighterOriginalClipIn
 import { Character } from '../../ts/src/game/sim/codes';
 import { characterModelScale } from '../../ts/src/game/presentation/modelScale';
 import { FIGHTER_RIGS } from './hd-rigs';
-import { fighters, parseSource } from './original-clips';
+import { parseSource } from './original-clips';
+import { fighters } from '../../ts/scripts/heroModelSource';
 
 const [assetsArg, outArg] = process.argv.slice(2);
 const project = resolve(import.meta.dir, '../..');

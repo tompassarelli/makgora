@@ -15,7 +15,8 @@ import { FIGHTER_ULTIMATES } from "../../ts/src/game/sim/ultimates";
 import { heroCueWindows } from "../../ts/src/game/presentation/specialCues";
 import { ROSTER_ATTACK_CLIPS } from "../../ts/src/game/presentation/rosterAttackClipInfo";
 import { seconds } from "./asset-info";
-import { encodeVerified, ensure, fighters, onGlobalClock, parseSource, tracks } from "./original-clips";
+import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
+import { fighters } from "../../ts/scripts/heroModelSource";
 import { attackGestureBaseModel } from "./recovery-model";
 
 const PLAN: Readonly<Record<number, readonly HeroPose[]>> = {

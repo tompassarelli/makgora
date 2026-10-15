@@ -4,7 +4,8 @@ import { generateMDX, model as mdx } from "war3-model";
 import { DrawnModel, sheet } from "../../ts/scripts/wisp/hurtboxView";
 import { AttackPhase, Character } from "../../ts/src/game/sim/codes";
 import { seconds } from "./asset-info";
-import { encodeVerified, ensure, fighters, onGlobalClock, parseSource, tracks } from "./original-clips";
+import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
+import { fighters } from "../../ts/scripts/heroModelSource";
 
 const [input, output] = process.argv.slice(2).map(p => resolve(p));
 const project = resolve(import.meta.dir, "../..");

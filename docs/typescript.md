@@ -750,8 +750,8 @@ sources are their stock classic models under `--assets`'s hero-models, which
 track on a global animation clock (the heroes' blinks) keeps all its keys. smashcraft:tools/animations/export-model-sounds.ts
 resolves each model sound event through the game's AnimSounds.slk (`--sounds`)
 and writes smashcraft:ts/src/generated/assets/modelSoundInfo.ts. The build fails
-unless `--assets`'s original-clips-static-lights/original-clips-evidence.json
-lists every clip and light the module names, and unless every sound cue names a
+unless the records in `--assets`'s original-clips-static-lights/original-clips-evidence/
+(one per fighter) list every clip and light the module names, and unless every sound cue names a
 stock label and keys a pooled clip. Sound labels are the game's own sounds, so
 the map imports none. Hidden pooled clips wait collapsed on the ground beneath
 the floor, like every hidden effect, because alpha does not stop a model's

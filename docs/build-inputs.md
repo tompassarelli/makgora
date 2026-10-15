@@ -21,12 +21,23 @@ with, one file per family, so a commit fixes its art exactly as it fixes its cod
   smashcraft:ts/scripts/wisp/buildInputs.ts (`FAMILIES`), one file per family so
   two lanes that store different families never edit the same file (#401). There is
   no global pointer: a lane's manifest is its own, and main's is main's.
+- **Shards.** The families a fighter repack writes (hero-models,
+  original-clips-static-lights, impact-assets) are sharded: build-inputs/FAMILY/ holds
+  one pin per fighter slug and one for `shared`, and each shard is stored like a
+  family under store/FAMILY/HASH/. `bun wisp inputs add` splits the folder by owner
+  (smashcraft:ts/scripts/wisp/inputShards.ts): a fighter's source model, every file
+  named after the fighter (`KoboldTimelineBody-…`, `original-clips-evidence/Kobold.json`,
+  `white-flash-imports/Kobold.txt`) and every texture its white list names; the rest is
+  `shared`. The clip pool keeps one evidence record per fighter and impact-assets one
+  white import list per fighter, so no file holds two fighters' data. Two lanes that
+  repack different fighters write different pin files and land in parallel.
 - **Resolve and verify.** `bun wisp map build` without `--base`, `--container`,
   `--assets` or `--summon` reads the checkout's manifest, rehashes every family
   (about 0.6 s for 290 MB) and fails before compiling when one is missing or
   differs, naming the command that produces it. `--assets` resolves to
   store/views/HASH/, a folder of links to the asset families, itself keyed by
-  the hashes it names. An input given on the command line overrides the
+  the hashes it names; a sharded family's folder there hard-links its shards'
+  files into the one folder tools read. An input given on the command line overrides the
   manifest's for experiments.
 - **Play.** `bun wisp play` builds main from main's manifest. Builders of a
   revision share the lock ~/.local/share/smashcraft-build-inputs/locks/play-REVISION.lock
@@ -69,9 +80,9 @@ code:
    its hash into your checkout's build-inputs/FAMILY.
 3. `bun wisp map build --profile playable --edition full --name NAME --out OUT.w3x` from the lane
    checks the change; commit build-inputs/FAMILY with the code that needs it and
-   land it. Lanes that changed different families touch different files and
-   merge cleanly; two lanes that changed the same family conflict on that one
-   file. Model facts are one file per model (smashcraft:ts/scripts/wisp/model-facts/),
+   land it. Lanes that changed different families, or different fighters' shards
+   of a sharded family, touch different files and merge cleanly; two lanes that
+   changed the same family (or fighter) conflict on that one file. Model facts are one file per model (smashcraft:ts/scripts/wisp/model-facts/),
    the move list and the anim-score tables are generated and untracked, and
    smashcraft:.gitattributes merges the map size and Bun test cost baselines per row
    through smashcraft:ts/scripts/mergeGenerated.ts, which `bun install` (from ts/)

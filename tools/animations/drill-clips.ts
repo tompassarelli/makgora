@@ -7,7 +7,8 @@ import { characterModelScale } from "../../ts/src/game/presentation/modelScale";
 import { AttackPhase, AttackStyle, Character } from "../../ts/src/game/sim/codes";
 import { heroDefinition } from "../../ts/src/game/sim/heroes/registry";
 import { seconds } from "./asset-info";
-import { encodeVerified, ensure, fighters, hash, onGlobalClock, parseSource, tracks } from "./original-clips";
+import { encodeVerified, ensure, hash, onGlobalClock, parseSource, tracks } from "./original-clips";
+import { fighters } from "../../ts/scripts/heroModelSource";
 import { drillBaseModel } from "./recovery-model";
 import { heroLook } from "../../ts/src/game/roster/looks";
 

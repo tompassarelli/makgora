@@ -7,7 +7,8 @@ import { DrawnModel } from "../../ts/scripts/wisp/hurtboxView";
 import { Character } from "../../ts/src/game/sim/codes";
 import { authoredPhysics } from "../../ts/src/game/sim/tuning";
 import { seconds } from "./asset-info";
-import { fighters, ensure, parseSource, tracks, onGlobalClock, encodeVerified } from "./original-clips";
+import { ensure, parseSource, tracks, onGlobalClock, encodeVerified } from "./original-clips";
+import { fighters } from "../../ts/scripts/heroModelSource";
 
 const [assets, output] = process.argv.slice(2).map(p => resolve(p));
 const metadataOnly = process.argv.includes("--metadata-only");

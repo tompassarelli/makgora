@@ -11,7 +11,8 @@ import { DrawnModel, sheet } from "../../ts/scripts/wisp/hurtboxView";
 import { characterModelScale } from "../../ts/src/game/presentation/modelScale";
 import { AttackPhase, Character } from "../../ts/src/game/sim/codes";
 import { seconds } from "./asset-info";
-import { encodeVerified, ensure, fighters, onGlobalClock, parseSource, tracks } from "./original-clips";
+import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
+import { fighters } from "../../ts/scripts/heroModelSource";
 
 const [inputArg, outputArg, ...options] = process.argv.slice(2);
 const input = resolve(inputArg ?? ""), output = resolve(outputArg ?? "");

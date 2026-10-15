@@ -4,7 +4,8 @@ import { canonicalMotion, classicSkeleton, rigNode, type FighterRig } from './ca
 import { timelineBody } from './timeline-body';
 import { flashableSequences } from './white-flash-keys';
 import { slopeTangents, thinKeys } from '../../ts/scripts/keyThin';
-import { encodeVerified, fighters, parseSource } from './original-clips';
+import { encodeVerified, parseSource } from './original-clips';
+import { fighters } from '../../ts/scripts/heroModelSource';
 import { DEFINITIVE_FIGHTERS } from '../../ts/src/game/assets/definitiveFighters';
 import type { Character } from '../../ts/src/game/sim/codes';
 import { victoryAnimation } from '../../ts/src/game/presentation/matchAudio';

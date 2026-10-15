@@ -7,7 +7,8 @@ import { authoredMotion, fighterBodies } from './hd-models';
 import { FIGHTER_RIGS } from './hd-rigs';
 import { DEFINITIVE_FIGHTERS } from '../../ts/src/game/assets/definitiveFighters';
 import type { Character } from '../../ts/src/game/sim/codes';
-import { ensure, fighters, hash } from './original-clips';
+import { ensure, hash } from './original-clips';
+import { fighters } from '../../ts/scripts/heroModelSource';
 
 const [outputArg, ...rest] = process.argv.slice(2);
 ensure(outputArg, 'usage: bun tools/animations/hd-roster.ts PRIVATE_OUTPUT [CHARACTER...]');
