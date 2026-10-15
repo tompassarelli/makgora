@@ -48,8 +48,8 @@
   stock lost, and runs whose hashes differ. `--repro N` replays match `N`. The nightly
   Playtest workflow runs it on the newest green main in `ceil(matches / 334)`-sized
   shards (1,200 ms a match with both runs, measured locally on four cores; at most
-  eight at once, within the account's 40 jobs) and comments each kind with findings on its epic (fair combat, #553, for combos and win rates)
-  or on the After 0.1 issue (#557) when no epic matches, never as a new issue, and skips a
+  eight at once, within the account's 40 jobs) and comments each kind with findings on its epic (fair combat, #10, for combos and win rates)
+  or on the After 0.1 issue (#14) when no epic matches, never as a new issue, and skips a
   comment that repeats the last one. `--issues FINDINGS --dry-run` prints those
   actions instead of the JSON lines the workflow applies with gh. The loop, the
   classification and the issue actions are pure in smashcraft:ts/scripts/playtestCore.ts.

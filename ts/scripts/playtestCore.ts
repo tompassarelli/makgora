@@ -412,8 +412,8 @@ export const ISSUE_TITLES: Record<FindingKind, string> = {
   desync: "Playtester: desyncs and nondeterminism",
 };
 
-const AFTER_01 = 557;
-const FAIR_COMBAT_EPIC = 553;
+const AFTER_01 = 14;
+const FAIR_COMBAT_EPIC = 10;
 
 // A finding is never a new issue: it comments on the epic that owns its kind (E4,
 // fair combat) or on the standing After 0.1 issue when no epic matches.

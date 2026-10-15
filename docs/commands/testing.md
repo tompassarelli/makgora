@@ -1,5 +1,12 @@
 # Testing
 
+- Tiers: the edit loop runs locally and aims at under 60 s: `bun wisp dev`
+  on each save (type errors of the saved files, their affected unit tests and
+  journeys, then the whole type check; smashcraft:docs/commands/dev.md). The
+  landing gate is Autoland's farm test (smashcraft:docs/ci.md). After landing, Background sweeps runs every sweep
+  on the landed SHA. Nightly or on dispatch: Playtest, Memory soak, Headless
+  pads, Balance and Perf; Effect upgrade runs weekly.
+
 - Logic: run the tests a change affects locally (`bun wisp dev`), full suites
   on the farm: `bun wisp farm test --wait` runs the full Bun suite (`bun run
   test`) and the 32-bit Lua suite (`LUA=<32-bit lua> bun scripts/lua-tests.ts`)
