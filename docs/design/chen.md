@@ -58,7 +58,7 @@ Drunken Brawler is the source for original staff, hand and foot gestures.
 | Pummel | Short knee, one fresh press | Shared pummel timing; 3% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ken pummel](https://www.ssbwiki.com/Ken_%28SSBU%29#Moveset) |
 | Forward / back throw | Shoulder toss / turn-and-toss | Contact 12/16, total 33/39; 10/11.25% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ryu throws](https://www.ssbwiki.com/Ryu_%28SSBU%29#Moveset) |
 | Up / down throw | Staff lift / barrel slam into tech chase | Contact 14/18, total 25/42; 8.75/7.5% | [Drunken Brawler](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ken throws](https://www.ssbwiki.com/Ken_%28SSBU%29#Moveset) |
-| Neutral special | Breath of Fire: finite long fanning cone, one hit, jump above its wide tip or whiff-punish | Active 12–22, end 42; 12.5%, cost 10 | [Breath of Fire](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Fire Breath](https://www.ssbwiki.com/Fire_Breath) |
+| Neutral special | Breath of Fire: finite long fanning cone, one hit, jump above its wide tip or whiff-punish | Active 18–28, end 48; 12.5%, cost 10 | [Breath of Fire](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Fire Breath](https://www.ssbwiki.com/Fire_Breath) |
 | Side special | Drunken Haze: arcing flask, 3.75% and 75 frames at 60% movement speed; shield stops it | Spawn 14, end 38; cost 12 | [Drunken Haze](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ryu Hadoken spacing](https://www.ssbwiki.com/Hadoken) |
 | Up special | Storm Rise: rising staff spin with steering, then helpless fall | Rise 8–29, end 40; 10%, cost 15 | [Storm, Earth and Fire](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Ken Shoryuken](https://www.ssbwiki.com/Shoryuken) |
 | Down special | Earth stance absorbs one light hit; fresh Attack becomes Fire palm, fresh Special becomes Storm step | Armor 5–16, end 33; cost 10. Fire active 8–11, end 32, 13.75%. Storm travels 5–12, end 28, 8.75% | [Storm, Earth and Fire](https://wowpedia.fandom.com/wiki/Pandaren_Brewmaster_%28Warcraft_III%29) | [Swap](https://www.ssbwiki.com/Swap) |
@@ -71,8 +71,8 @@ neutral wall. Broad body and 1.6 run speed make projectile approaches costly.
 Tom's release cone uses four connected horizontal capsules, with centerline x36–256
 and radii 27, 40, 55 and 70. Centerline reach grows from 88 to 220 units (2.5×).
 The final rounded tip reaches x326; EX keeps its 1.25× reach upgrade.
-Startup, active frames 12–22, end frame 42, damage, cost and landing lag stay
-unchanged. Each active frame births one stock Breath of Fire flame per
+Active frames 18–28 (six more startup frames than the first cone) and end frame 48
+keep its 20 exit frames; damage, cost and landing lag are unchanged. Each active frame births one stock Breath of Fire flame per
 capsule, scaled by the square of its radius over 70 and shifted forward by 150
 units per unit of scale (the stock model draws its fire that far behind its
 origin), so the fire centres on each capsule and fans out from the mouth to the

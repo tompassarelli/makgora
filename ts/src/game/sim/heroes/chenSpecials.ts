@@ -8,12 +8,12 @@ import { chenCapsule, chenHit } from "./chenMoves";
 
 const fire = chenHit(9.370200157165527, 70.0, 25.73409652709961, f32(0.906308), f32(0.422618), HitElement.fire);
 const breath = (air: boolean): AuthoredSpecial => ({
-  endFrame: 42, landingLag: air ? 20 : undefined,
+  endFrame: 48, landingLag: air ? 20 : undefined,
   regions: [
-    heroRegion(12, 22, chenCapsule(36.0, 62.0, 76.0, 62.0, 27.0), fire),
-    heroRegion(12, 22, chenCapsule(76.0, 62.0, 136.0, 62.0, 40.0), fire),
-    heroRegion(12, 22, chenCapsule(136.0, 62.0, 196.0, 62.0, 55.0), fire),
-    heroRegion(12, 22, chenCapsule(196.0, 62.0, 256.0, 62.0, 70.0), fire),
+    heroRegion(18, 28, chenCapsule(36.0, 62.0, 76.0, 62.0, 27.0), fire),
+    heroRegion(18, 28, chenCapsule(76.0, 62.0, 136.0, 62.0, 40.0), fire),
+    heroRegion(18, 28, chenCapsule(136.0, 62.0, 196.0, 62.0, 55.0), fire),
+    heroRegion(18, 28, chenCapsule(196.0, 62.0, 256.0, 62.0, 70.0), fire),
   ],
 });
 const haze = (air: boolean): AuthoredSpecial => ({

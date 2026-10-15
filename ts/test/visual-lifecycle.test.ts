@@ -32,6 +32,7 @@ import { testHeadless } from "./headless";
 import type { EffectPose, HeadlessClient } from "wisp/src/headless/client";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { SpecialCueEffects } from "../src/game/render/specialCueEffects";
+import { specialCueState } from "../src/game/presentation/specialCues";
 import { specialAreaRegion } from "../src/game/presentation/disjointCues";
 import { characterModelScale } from "../src/game/presentation/modelScale";
 import { facingYaw } from "../src/game/render/effects";
@@ -548,10 +549,22 @@ test("Chen's confirmed Classic flames fill the long cone, one per hit capsule ta
       chen.mana.points = ROSTER_MANA.max;
       const breath = new SpecialCueEffects(Character.chen, { x: 0, y: 0, z: 100 }, true);
       const fire = () => client.effectPoses({ visibleOnly: true }).filter(pose => pose.model.includes("BreathOfFireMissile") && !hidden(pose));
-      for (let frame = 0; frame < 14; frame++) {
+      const probe = new SpecialCueEffects(Character.chen, { x: 0, y: 0, z: 100 }, true);
+      let firstActive = 0, firstFlame = 0;
+      for (let frame = 0; frame < 20; frame++) {
         breathInput.specialPressed = frame === 0;
         executeNext(chenMatch);
+        if (firstFlame !== 0) continue;
+        probe.confirm(chen, true, 0);
+        probe.present(chen, true, false);
+        if (firstActive === 0 && specialAreaRegion(chen, 0).strike !== undefined) firstActive = chen.special.frame;
+        if (fire().length > 0) firstFlame = chen.special.frame;
+        else expect(specialCueState(chen).phase).toBe("startup");
       }
+      expect(firstActive).toBe(12 + 6);
+      expect(firstFlame).toBe(firstActive);
+      probe.destroy();
+      expect(fire()).toEqual([]);
       breath.confirm(chen, true, 0);
       breath.present(chen, true, false);
       const confirmedBreath = fire();
@@ -569,7 +582,7 @@ test("Chen's confirmed Classic flames fill the long cone, one per hit capsule ta
         expect(flame.scale).toBe(f32(scale * characterModelScale(Character.chen)));
         expect(ratio).toBe(f32((ex ? 1.25 : 1) * ([27, 40, 55, 70][index] ?? 0) / 70.0));
       }
-      for (let frame = 14; frame < 42; frame++) {
+      for (let frame = 20; frame < 48; frame++) {
         breathInput.specialPressed = false;
         executeNext(chenMatch);
       }
