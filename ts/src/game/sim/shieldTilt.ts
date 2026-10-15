@@ -1,6 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import type { Fighter } from "./fighter";
 import type { Controls } from "./roster";
+import type { ShieldGeometry } from "./tuning";
 import { stickX, stickZ } from "./stick";
 
 
@@ -17,6 +18,11 @@ export function advanceShieldTilt(fighter: Fighter, input: Readonly<Controls>): 
   const active = fighter.shield.raised && input.diStickValid;
   fighter.shield.tiltX = active ? stickX(input) : 0.0;
   fighter.shield.tiltZ = active ? stickZ(input) : 0.0;
+}
+
+export function shieldReach(geometry: Readonly<ShieldGeometry>): number {
+  const tilt = f32(f32(Math.max(UP_REACH, DOWN_REACH, FORWARD_REACH, BACK_REACH) * geometry.radius) / RETAIL_RADIUS);
+  return f32(f32(Math.max(Math.abs(geometry.centerX), Math.abs(geometry.centerZ)) + tilt) + geometry.radius);
 }
 
 export function shieldCenterX(fighter: Readonly<Fighter>): number {

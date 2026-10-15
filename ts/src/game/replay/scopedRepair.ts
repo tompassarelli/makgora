@@ -26,6 +26,7 @@ import { SMASH_MAX_CHARGE_FRAMES, attackStartupFrames, characterAttackActiveFram
 import { felLungeStep } from "../sim/moves";
 import { EYE_BLAST_FORM, EYE_BLAST_REACH } from "../sim/specials";
 import { runningHeroSpecial } from "../sim/heroSpecialRules";
+import { shieldReach } from "../sim/shieldTilt";
 
 interface AuthoredTravel {
   readonly moves: FighterMoves;
@@ -115,6 +116,7 @@ const normalReach: { [character: number]: Extent | undefined } = {};
 function rosterReach(): Extent {
   const strike = { x: 0.0, z: 0.0 };
   const body = { x: 0.0, z: 0.0 };
+  let shield = 0.0;
   let travel = 0.0;
   for (const character of SELECTABLE_CHARACTERS) {
     const tuning = authoredTuning(character);
@@ -138,6 +140,7 @@ function rosterReach(): Extent {
       }
     }
     normalReach[character] = normal;
+    shield = Math.max(shield, shieldReach(tuning.shield));
     strike.x = Math.max(strike.x, normal.x);
     strike.z = Math.max(strike.z, normal.z);
     if (specials !== undefined) {
@@ -170,8 +173,8 @@ function rosterReach(): Extent {
     normal.x = f32(f32(normal.x + body.x) + both);
     normal.z = f32(f32(normal.z + body.z) + both);
   }
-  beamReach.x = f32(f32(beamReach.x + body.x) + both);
-  beamReach.z = f32(f32(beamReach.z + body.z) + both);
+  beamReach.x = f32(f32(beamReach.x + Math.max(body.x, shield)) + both);
+  beamReach.z = f32(f32(beamReach.z + Math.max(body.z, shield)) + both);
   return { x: f32(f32(strike.x + body.x) + both), z: f32(f32(strike.z + body.z) + both) };
 }
 

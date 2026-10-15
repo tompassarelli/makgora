@@ -12,7 +12,8 @@ import { createReferenceContactFighter } from "../referenceRig";
 import { controls } from "../testWorld";
 import { AUTHORED_PHYSICS, melee } from "../tuning";
 import { duelPair, stepDuel } from "../testDuel";
-import { BEAM_MIN_AHEAD, beamSegment } from "../heroSpecialRules";
+import { BEAM_MIN_AHEAD, advanceHeroSpecial, beamSegment } from "../heroSpecialRules";
+import { fightersApart } from "../../replay/scopedRepair";
 import { createRoster } from "../roster";
 import { shieldCenterX, shieldCenterZ } from "../shieldTilt";
 import { shieldSizeMultiplier } from "../shield";
@@ -165,6 +166,32 @@ test("Laser aim stays at least BEAM_MIN_AHEAD in front of his arm, so a foe cros
         assertEquals(line.z2 > 0.0, true, `speed ${speed} frame ${f}: beam end ${line.z2} stays above the floor`);
       }
       if (speed >= 9.0) assertEquals(victim.status.damage, 0.0, `speed ${speed}: a foe behind him by frame 20 escapes`);
+    }
+  }
+});
+
+test("Fighter-scoped rollback repair never treats a shield that shortens the EX Laser as apart [k2 property]", () => {
+  for (const character of SELECTABLE_CHARACTERS) {
+    for (let gap = 400; gap <= 900; gap += 10) {
+      const lengths: number[] = [];
+      let apart = true;
+      for (const raised of [false, true]) {
+        const owner = createFighter(Character.tinker, 0.0, 1);
+        const shielder = createFighter(character, gap, -1);
+        const world = createRoster(3, [owner, shielder]);
+        owner.special.action = SpecialAction.heroSide;
+        owner.special.ex = true;
+        owner.special.frame = 5;
+        owner.special.beamX = f32(gap - 240);
+        owner.special.beamZ = 50.0;
+        shielder.shield.raised = raised;
+        shielder.shield.tiltX = -1;
+        shielder.shield.strength = 0.0;
+        advanceHeroSpecial(owner, 0, undefined, world);
+        lengths.push(owner.special.beamLength);
+        if (raised) apart = fightersApart(owner, shielder);
+      }
+      if (lengths[0] !== lengths[1]) assertEquals(apart, false, `character ${character} at ${gap}: its shield shortens the beam`);
     }
   }
 });
