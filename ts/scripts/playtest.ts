@@ -21,7 +21,7 @@ const ObservationSchema = Schema.Struct({
   kos: Schema.Array(Schema.Struct({ fighter: Schema.String, move: Schema.String, count: Schema.Finite })),
   uses: Schema.Array(Schema.Struct({ fighter: Schema.String, move: Schema.String, count: Schema.Finite })),
   combos: Schema.Array(Schema.Struct({
-    victim: Schema.Finite, frame: Schema.Finite, start: Schema.Finite, moves: Schema.Array(Schema.String), instances: Schema.Array(Schema.Finite), damages: Schema.Array(Schema.Finite), gaps: Schema.Array(Schema.Finite),
+    victim: Schema.Finite, frame: Schema.Finite, start: Schema.Finite, moves: Schema.Array(Schema.String), instances: Schema.Array(Schema.Finite), damages: Schema.Array(Schema.Finite), gaps: Schema.Array(Schema.Finite), hitFrames: Schema.Array(Schema.Finite),
   })),
   quiet: Schema.Struct({ from: Schema.Finite, frames: Schema.Finite }),
 });

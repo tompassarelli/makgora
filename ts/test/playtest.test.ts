@@ -13,12 +13,12 @@ test("direct tech reads retain the grab into forward-tilt true combo [k1 scenari
     {
       frames: 120, ended: true, winner: null, timedOut: false, stockLosses: 0,
       strings: [], checksums: [[120, "tech-read"]], kos: [], uses: [], quiet: { from: 0, frames: 0 },
-      combos: [{ victim: 1, frame: 120, start: 0, moves: ["forward-tilt", "up-tilt", "jab", "forward-tilt"], instances: [1, 2, 3, 4], damages: [12, 12, 12, 12], gaps: [1, 8, 1] }],
+      combos: [{ victim: 1, frame: 120, start: 0, moves: ["forward-tilt", "up-tilt", "jab", "forward-tilt"], instances: [1, 2, 3, 4], damages: [12, 12, 12, 12], gaps: [1, 8, 1], hitFrames: [10, 30, 60, 90] }],
     },
     {
       frames: 120, ended: true, winner: null, timedOut: false, stockLosses: 0,
       strings: [], checksums: [[120, "grab-chain"]], kos: [], uses: [], quiet: { from: 0, frames: 0 },
-      combos: [{ victim: 1, frame: 120, start: 0, moves: ["grab", "grab", "forward-tilt", "up-tilt"], instances: [1, 1, 2, 3], damages: [3, 7, 12, 12], gaps: [0, 0, 1] }],
+      combos: [{ victim: 1, frame: 120, start: 0, moves: ["grab", "grab", "forward-tilt", "up-tilt"], instances: [1, 1, 2, 3], damages: [3, 7, 12, 12], gaps: [0, 0, 1], hitFrames: [10, 10, 20, 40] }],
     },
   ];
   const runs = runPlaytest(spec, (match) => observations[match.index] ?? (() => { throw new Error("missing direct fight log"); })(), 120, true, () => 0);

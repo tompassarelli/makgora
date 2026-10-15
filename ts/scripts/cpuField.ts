@@ -17,10 +17,10 @@ import { captureReplaySnapshot, createReplaySnapshot } from "../src/game/replay/
 import { parseArgs } from "node:util";
 import { clearAttackBuffer } from "../src/game/input/attackBuffer";
 import { PARTICIPANT_SLOTS } from "../src/game/input/participants";
-import { createFrameControls } from "../src/game/match/controls";
-import { captureFrame, createMatchFrameInput, executeMatchFrame } from "../src/game/match/frameInput";
-import { createPacingAndPresentation } from "../src/game/match/pacingAndPresentation";
-import { MATCH_TICKS_PER_SECOND, Phase, createMatchState, setParticipants } from "../src/game/lobby/lobbyState";
+import { type FrameControls, createFrameControls } from "../src/game/match/controls";
+import { type MatchFrameInput, captureFrame, createMatchFrameInput, executeMatchFrame } from "../src/game/match/frameInput";
+import { type PacingAndPresentation, createPacingAndPresentation } from "../src/game/match/pacingAndPresentation";
+import { MATCH_TICKS_PER_SECOND, type MatchState, Phase, createMatchState, setParticipants } from "../src/game/lobby/lobbyState";
 import { initializeMatchFighters, matchSpawnX } from "../src/game/match/step";
 import { scheduleMeterDrops } from "../src/game/match/meterDrops";
 import { produceComputerInput } from "../src/game/match/botPlay";
@@ -36,7 +36,7 @@ import { createFighter, type Fighter } from "../src/game/sim/fighter";
 import { observeDamageContacts } from "../src/game/sim/contacts";
 import { heroStatusBlocksActions } from "../src/game/sim/heroStatus";
 import { SELECTABLE_CHARACTERS, fighterSlug, selectableCharacterBySlug } from "../src/game/sim/heroes/registry";
-import { copyControls, createRoster, fighterAt, neutralControls } from "../src/game/sim/roster";
+import { type Roster, copyControls, createRoster, fighterAt, neutralControls } from "../src/game/sim/roster";
 import { mainDeckLeft, mainDeckRight } from "../src/game/sim/stage";
 import soak from "./wisp/soak";
 import { admitsThroughHelper, runAdmitted } from "./heavyCapacity";
@@ -223,6 +223,8 @@ export interface ComboRecord {
   readonly instances: readonly number[];
   readonly damages: readonly number[];
   readonly gaps: readonly number[];
+  /** The frame each hit landed on, after that frame executed. */
+  readonly hitFrames: readonly number[];
 }
 
 export interface ZeroToDeath {
@@ -311,6 +313,7 @@ interface Punish {
   fromStockStart: boolean;
   free: number;
   gaps: number[];
+  hitFrames: number[];
   start: number;
   moves: number[];
   instances: number[];
@@ -342,7 +345,7 @@ const emptyPunishes = (): PunishTotals => ({ openings: 0, neutralWins: 0, neutra
 
 
 function closePunish(totals: PunishTotals, punish: Punish, kill: boolean, strings?: ZeroToDeath[], victim = 0, frame = 0, combos?: ComboRecord[]): void {
-  if (combos !== undefined && punish.hits >= 2) combos.push({ victim, frame, start: punish.start, moves: punish.moves, instances: punish.instances, damages: punish.damages, gaps: punish.gaps });
+  if (combos !== undefined && punish.hits >= 2) combos.push({ victim, frame, start: punish.start, moves: punish.moves, instances: punish.instances, damages: punish.damages, gaps: punish.gaps, hitFrames: punish.hitFrames });
   if (punish.hits < 2) totals.oneHit++;
   if (punish.hits < 2 && !punish.disadvantage && !kill) {
     totals.pokes++;
@@ -373,7 +376,20 @@ const NEUTRAL = neutralControls();
 const onMainDeck = (f: Readonly<Fighter>, stage: number): boolean =>
   f.motion.x >= mainDeckLeft(stage) && f.motion.x <= mainDeckRight(stage) && f.motion.z >= 0.0;
 
-export function playCpuMatch(a: Character, b: Character, stageName: string, variant: number, options: FieldOptions = {}, seed = 0): MatchRecord | undefined {
+export interface FieldMatch {
+  readonly stage: number;
+  readonly match: MatchState;
+  readonly world: Roster;
+  readonly controls: FrameControls;
+  readonly produced: FrameControls;
+  readonly runtime: PacingAndPresentation;
+  readonly row: MatchFrameInput;
+  readonly dropRule: ReturnType<typeof startDropVariant> | undefined;
+  readonly opponents: readonly [CpuOpponentId, CpuOpponentId];
+  readonly tiers: readonly [CpuTier, CpuTier];
+}
+
+export function openFieldMatch(a: Character, b: Character, stageName: string, variant: number, options: FieldOptions, seed: number): FieldMatch | undefined {
   const stage = FIELD_STAGES[stageName];
   if (stage === undefined) throw new Error(`no stage named ${stageName}`);
   const shift = SHIFTS[variant % SHIFTS.length] ?? 0.0;
@@ -406,6 +422,13 @@ export function playCpuMatch(a: Character, b: Character, stageName: string, vari
   const runtime = createPacingAndPresentation();
   const row = createMatchFrameInput();
   initializeMatchFighters(match, world);
+  return { stage, match, world, controls, produced, runtime, row, dropRule, opponents, tiers };
+}
+
+export function playCpuMatch(a: Character, b: Character, stageName: string, variant: number, options: FieldOptions = {}, seed = 0): MatchRecord | undefined {
+  const opened = openFieldMatch(a, b, stageName, variant, options, seed);
+  if (opened === undefined) return undefined;
+  const { stage, match, world, controls, produced, runtime, row, dropRule, opponents, tiers } = opened;
   const side = (character: Character): SideRecord => ({
     fighter: fighterSlug(character), moves: {}, hitsLanded: 0, damageDealt: 0, manaSpent: 0, specialsStarted: 0, specialsRefused: 0, stocksPlayed: 0, stockLosses: [],
     damageByMove: {}, kosByMove: {}, rangedDamage: 0, approachFrames: 0, retreatFrames: 0, punishes: emptyPunishes(), edges: emptyEdgePlay(), hitDistances: {},
@@ -556,7 +579,7 @@ export function playCpuMatch(a: Character, b: Character, stageName: string, vari
         // Damage over time (poison, status ticks) lands without a hit: it neither adds to the last hit nor extends the string.
         if (hit && other !== undefined) {
           if (seen.punish === undefined) {
-            seen.punish = { hits: 0, damage: 0, quiet: 0, neutral: opponentSeen.punish === undefined, disadvantage: false, stunned: 0, fromStockStart: seen.stockFirstHit, free: 0, gaps: [], start: seen.damage, moves: [], instances: [], damages: [] };
+            seen.punish = { hits: 0, damage: 0, quiet: 0, neutral: opponentSeen.punish === undefined, disadvantage: false, stunned: 0, fromStockStart: seen.stockFirstHit, free: 0, gaps: [], hitFrames: [], start: seen.damage, moves: [], instances: [], damages: [] };
             seen.stockFirstHit = false;
           }
           if (seen.punish.hits > 0) {
@@ -569,6 +592,7 @@ export function playCpuMatch(a: Character, b: Character, stageName: string, vari
             seen.punish.moves.push(move ?? -1);
             seen.punish.instances.push(opponentSeen.starts);
             seen.punish.damages.push(dealt);
+            seen.punish.hitFrames.push(frame);
           }
           seen.punish.quiet = 0;
         } else if (seen.punish !== undefined && other !== undefined) {

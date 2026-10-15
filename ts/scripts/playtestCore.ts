@@ -33,6 +33,8 @@ export interface Combo {
   readonly instances: readonly number[];
   readonly damages: readonly number[];
   readonly gaps: readonly number[];
+  /** The frame each hit landed on. */
+  readonly hitFrames: readonly number[];
 }
 
 /** A true combo: consecutive moves with no actionable frame for the victim between them. Hits of one move instance (a multi-hit move, or a grab's pummels and throw) count as one move. */
