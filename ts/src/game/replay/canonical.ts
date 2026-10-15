@@ -1082,7 +1082,7 @@ function writeFighter(sink: StateSink, prefix: string, fighter: Readonly<Fighter
     int("specialForm", sp.form);
     int("specialAimX", sp.aimX);
     int("specialAimZ", sp.aimZ);
-    if (sp.beamX !== 0 || sp.beamZ !== 0) {
+    if (sp.beamX !== 0 || sp.beamZ !== 0 || 1 / sp.beamX < 0 || 1 / sp.beamZ < 0) {
       real("specialBeamX", sp.beamX);
       real("specialBeamZ", sp.beamZ);
     }
