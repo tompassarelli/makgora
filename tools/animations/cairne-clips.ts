@@ -30,7 +30,7 @@ ensure(source.Sequences.length === 12 && source.Nodes.some(n => n.Name === "Bone
 const stand = source.Sequences[4]!;
 interface Gesture { chest?: number; head?: number; arm?: number; elbow?: number; free?: number; freeElbow?: number; hip?: number; knee?: number; lean?: number; yaw?: number; leftHip?: number; rightHip?: number }
 interface Phase { frame: number; gesture: Gesture; target?: readonly [number,number] }
-interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; prepTravel?: number; hold?: boolean; air?: boolean; roll?: number; first?: Gesture; phases?: readonly Phase[]; target?: readonly [number, number]; damage?: boolean }
+interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; prep?: Gesture; prepTarget?: readonly [number,number]; prepTravel?: number; hold?: boolean; air?: boolean; roll?: number; first?: Gesture; phases?: readonly Phase[]; target?: readonly [number, number]; damage?: boolean }
 const blend=(a:Gesture,b:Gesture,t:number):Gesture=>Object.fromEntries([...new Set([...Object.keys(a),...Object.keys(b)])].map(k=>[k,(a[k as keyof Gesture]??0)*(1-t)+(b[k as keyof Gesture]??0)*t]));
 const ready: Gesture = {};
 const reach: Gesture = { chest: 22, arm: -75, elbow: 35, free: -48, hip: -12, knee: 18, head: -12 };
@@ -106,6 +106,37 @@ for (const [pose, key, gesture, contact] of [
         {frame:contact,gesture},{frame:contact+4,gesture},
       ]:undefined}); }
 }
+const authored: Partial<Record<HeroPose, Pick<Action,"prep"|"prepTarget"|"first"|"phases">>> = {
+  getUpAttack: {first:{...brace,lean:85}, prepTarget:[-110,40], prep:{chest:32,head:-10,arm:35,elbow:25,free:-40,hip:-55,knee:85,lean:30}, phases:[
+    {frame:16,target:[125,45],gesture:{chest:30,free:-30,hip:-50,knee:80,lean:12}},
+    {frame:17,target:[60,95],gesture:{chest:20,free:-30,hip:-50,knee:80,lean:8}},
+    {frame:18,target:[-60,95],gesture:{chest:14,free:-30,hip:-50,knee:80,lean:4}},
+    {frame:19,target:[-125,45],gesture:{chest:22,free:-35,hip:-50,knee:80,lean:4}},
+    {frame:27,gesture:{chest:18,arm:50,elbow:20,free:-30,hip:-30,knee:50}}]},
+  ledgeAttack: {first:{...brace,lean:35,free:-105}, prepTarget:[-110,40], prep:{chest:-8,head:-8,arm:45,elbow:30,free:-60,hip:-35,knee:55,lean:-6}, phases:[
+    {frame:16,target:[130,30],gesture:{chest:40,free:-35,hip:-42,knee:62,lean:10,leftHip:-62,rightHip:20}},
+    {frame:18,target:[135,15],gesture:{chest:44,free:-30,hip:-42,knee:62,lean:12,leftHip:-62,rightHip:20}},
+    {frame:25,target:[110,150],gesture:{chest:30,arm:-115,elbow:10,free:-40,hip:-35,knee:52,lean:8,leftHip:-52,rightHip:15}}]},
+  throwForward: {prepTarget:[-90,90], prep:{...held,chest:-16,head:-8,free:-45,freeElbow:75,arm:20,hip:15,knee:22,lean:-10}, phases:[
+    {frame:19,target:[150,90],gesture:{...held,chest:36,head:-10,free:-95,freeElbow:0,arm:-45,lean:14,leftHip:-60,rightHip:25,knee:40}},
+    {frame:25,target:[140,85],gesture:{...held,chest:32,free:-90,freeElbow:5,arm:-35,lean:12,leftHip:-55,rightHip:22,knee:38}}]},
+  throwUp: {prepTarget:[-70,30], prep:{...held,chest:36,head:10,free:-55,freeElbow:40,arm:-25,hip:-48,knee:75,lean:6}, phases:[
+    {frame:21,target:[25,255],gesture:{chest:-10,head:-32,arm:-150,elbow:-5,free:-165,freeElbow:0,hip:5,knee:0,lean:-8}},
+    {frame:26,target:[15,245],gesture:{chest:-8,head:-26,arm:-140,elbow:5,free:-155,freeElbow:5,hip:0,knee:6,lean:-6}}]},
+  grab: {prep:{chest:-12,head:-6,arm:15,free:-30,freeElbow:40,hip:-15,knee:25,lean:-6}, phases:[
+    {frame:10,gesture:{chest:34,head:-14,arm:-20,free:-95,freeElbow:0,lean:12,leftHip:-58,rightHip:24,knee:42}},
+    {frame:14,gesture:{chest:36,head:-14,arm:-20,free:-92,freeElbow:5,lean:13,leftHip:-60,rightHip:25,knee:44}}]},
+  pummel: {prep:{...held,chest:-18,head:-35,hip:-5,knee:10,lean:-6}, phases:[
+    {frame:60,gesture:{...held,chest:38,head:38,hip:-25,knee:35,lean:10}},
+    {frame:63,gesture:{...held,chest:30,head:30,hip:-20,knee:30,lean:8}}]},
+  throwBack: {prepTarget:[120,60], prep:{...held,chest:30,head:-5,free:-60,hip:-35,knee:55,lean:8}, phases:[
+    {frame:23,target:[-150,150],gesture:{...held,chest:-26,head:-28,free:-160,hip:5,knee:15,lean:-14}},
+    {frame:29,target:[-150,95],gesture:{...held,chest:-18,head:-20,free:-150,hip:0,knee:20,lean:-10}}]},
+  throwDown: {prepTarget:[0,250], prep:{chest:-8,head:-22,arm:-145,elbow:10,free:-160,freeElbow:5,hip:2,knee:4,lean:-8}, phases:[
+    {frame:24,target:[95,-10],gesture:{chest:65,head:10,arm:-105,elbow:10,free:-95,freeElbow:10,hip:-58,knee:82,lean:18}},
+    {frame:31,target:[90,-15],gesture:{chest:70,head:12,arm:-100,elbow:10,free:-90,freeElbow:10,hip:-60,knee:85,lean:20}}]},
+};
+for (const action of actions) Object.assign(action, authored[action.pose] ?? {});
 const damageActions: Action[] = [];
 for (let height=0;height<3;height++) for (let strength=0;strength<3;strength++) {
   const gain=[0.55,0.9,1.3][strength]!;
@@ -146,8 +177,8 @@ for (const [ordinal,action] of [...actions,...damageActions].entries()) {
     MinimumExtent:new Float32Array([-320,-320,-200]),MaximumExtent:new Float32Array([320,320,360]),BoundsRadius:440});
   const coil=blend(ready,action.gesture,-0.32);
   const phases:Phase[]=action.roll ? [0,0.12,0.25,0.5,0.75,0.9,1].map(t=>({frame:Math.round(t*action.frames),gesture:{...blend(ready,brace,t===0||t===1?0:1),lean:t*360*action.roll!}})) : action.hold ? [{frame:0,gesture:action.gesture},{frame:action.frames,gesture:action.gesture}] : [
-    {frame:0,gesture:action.first??ready},{frame:Math.max(1,action.contact-3),gesture:action.pose==="neutralSpecial"||action.pose==="neutralSpecialAir"
-      ? action.phases?.find(phase=>phase.frame===action.contact-1)?.gesture??ready : blend(action.first??ready,coil,0.75)},
+    {frame:0,gesture:action.first??ready},{frame:Math.max(1,action.contact-3),target:action.prepTarget,gesture:action.prep ?? (action.pose==="neutralSpecial"||action.pose==="neutralSpecialAir"
+      ? action.phases?.find(phase=>phase.frame===action.contact-1)?.gesture??ready : blend(action.first??ready,coil,0.75))},
     ...(action.phases ?? [{frame:action.contact,gesture:action.gesture,target:action.target},{frame:Math.min(action.frames-1,action.contact+4),gesture:action.gesture,target:action.target}]),
     {frame:action.frames,gesture:action.pose==="pummel"||action.pose==="victimPummel"?action.first??ready:ready},
   ].sort((a,b)=>a.frame-b.frame).filter((p,i,array)=>i===0||p.frame!==array[i-1]?.frame);
@@ -231,7 +262,7 @@ const motions=actions.map((action,ordinal)=>{const index=source.Sequences.length
   if(!action.hold)ensure(motion>=8,`${action.pose}: no local gesture (${motion})`);return {pose:action.pose,motion};});
 const pain=damageActions.map((_,ordinal)=>after.triangles(source.Sequences.length+actions.length+ordinal,0,1));
 for(let a=0;a<pain.length;a++)for(let b=a+1;b<pain.length;b++)ensure(pain[a]!.some((v,i)=>Math.abs(v-pain[b]![i]!)>2),`Pain ${a}/${b}: same silhouette`);
-for(const pose of ["forwardTilt","upTilt","downTilt","downSmash","neutralAir","backAir","upAir","downAir","neutralSpecial","sideSpecial","upSpecial","downSpecial","rollForward","throwForward","throwBack","throwUp","throwDown"] as const){
+for(const pose of ["forwardTilt","upTilt","downTilt","downSmash","neutralAir","forwardAir","backAir","upAir","downAir","getUpAttack","ledgeAttack","grab","pummel","neutralSpecial","sideSpecial","upSpecial","downSpecial","rollForward","throwForward","throwBack","throwUp","throwDown"] as const){
   const ordinal=actions.findIndex(a=>a.pose===pose),action=actions[ordinal]!;
   const panels:PoseFrame[]=[1,-1].flatMap(facing=>[0,Math.max(1,action.contact-3),action.contact,Math.min(action.frames,action.contact+4),action.frames].map(frame=>({frame,phase:frame<action.contact?AttackPhase.startup:frame<=action.contact+4?AttackPhase.active:AttackPhase.recovery,x:0,z:0,facing,parts:[],strikes:[],clip:source.Sequences.length+ordinal,seconds:frame/60})));
   await Bun.write(join(output,`${pose}.png`),sheet(`Cairne ${pose}`,after,panels,5).png);
