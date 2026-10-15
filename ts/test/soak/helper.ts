@@ -11,10 +11,11 @@ import { join } from "node:path";
 import { Effect } from "effect";
 import { installHeadless } from "wisp/scripts/wisp/headless";
 import { RealtimeClients, type TypedInput, customMapData, typedFile } from "wisp/scripts/wisp/headlessInput";
-import {
-  FUZZ_POLICY, SOAK_LIMITS, type SoakController, type SoakEdge, type SoakMatch, SoakMonitor, type SoakResult, cpuMillis, describeMatch, fuzzedInputs,
-  helperRecorder, planSoak, soakRepro,
-} from "wisp/scripts/wisp/soak";
+import { SOAK_LIMITS, SoakMonitor, type SoakResult, describeMatch, helperRecorder, planSoak } from "wisp/scripts/wisp/soak";
+import { cpuMillis } from "wisp/scripts/wisp/soak/clock";
+import { soakRepro } from "wisp/scripts/wisp/soak/file";
+import { FUZZ_POLICY, fuzzedInputs } from "wisp/scripts/wisp/soak/inputs";
+import type { SoakController, SoakEdge, SoakMatch } from "wisp/scripts/wisp/soak/types";
 import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel";
 import { at } from "wisp/src/runtime/lookup";
 import { INTEGRITY_BUILD } from "../../src/game/session/currentBuild";

@@ -1,7 +1,7 @@
 
 
 
-import type { SoakController } from "wisp/scripts/wisp/soak";
+import type { SoakController } from "wisp/scripts/wisp/soak/types";
 
 export const SOAK_BUTTONS = ["jump", "attack", "special", "grab", "leftTrigger", "rightTrigger", "walk"] as const;
 

@@ -8,7 +8,8 @@
 
 
 import { appendFileSync } from "node:fs";
-import { type SoakDriver, type SoakEdge, type SoakMatch, defineSoakGame } from "wisp/scripts/wisp/soak";
+import { type SoakDriver, defineSoakGame } from "wisp/scripts/wisp/soak";
+import type { SoakEdge, SoakMatch } from "wisp/scripts/wisp/soak/types";
 import type { HeadlessClient } from "wisp/src/headless/client";
 import type { Lockstep } from "wisp/src/headless/lockstep";
 import { originalClip, originalClipCount } from "../../src/generated/clips/fighterOriginalClipInfo";
