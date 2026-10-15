@@ -25,5 +25,5 @@ export const WHITE_FIGHTER_MODELS: Readonly<Record<number, string>> = {
   23: "war3mapImported\\AnubarakWhite-94e22019acc84d7d7ba7374fb984b4febbb94ff79db67d49c863a0ec0fa2bd5c.mdx",
   24: "war3mapImported\\MalfurionStormrageWhite-95fcde0e52cbab8486dd82dea5f05b13b1b80a82a3d85eb53e946875e865dd45.mdx",
   25: "war3mapImported\\MedivhWhite-a885df20351cafdd5adc260bfa4b236b810bae85fbfe8294e8a2e7c7b68a8944.mdx",
-  26: "war3mapImported\\KoboldWhite-cacd54f1f08166f644aed780d9bbef434796a10f269cc5454ce451d2dbb7a38a.mdx",
+  26: "war3mapImported\\KoboldWhite-8c445149176859ca99df111e298edb9341d8a323bd3f6ba7a0d376f43223c991.mdx",
 };

@@ -23,10 +23,10 @@ ensure(source.Sequences[0]?.Name === "Stand -1" && source.Sequences.some(s => s.
 const stand = source.Sequences[0]!;
 
 interface Gesture { chest?: number; pelvis?: number; arm?: number; armTwist?: number; elbow?: number; leftArm?: number; leftElbow?: number; head?: number;
-  thigh?: number; knee?: number; leftThigh?: number; leftKnee?: number; lean?: number; yaw?: number; spin?: number; step?: number; rise?: number }
+  thigh?: number; knee?: number; leftThigh?: number; leftKnee?: number; lean?: number; yaw?: number; spin?: number; step?: number; rise?: number; wrist?: number }
 interface Beat { frame: number; gesture: Gesture; target?: readonly [number, number] }
-interface Strike { prep: Gesture; hit: Gesture; follow: Gesture; prepAt?: number; followAt?: number; settle?: number; mid?: readonly Beat[]; follows?: readonly [number, number]; even?: boolean; over?: readonly [number, number]; late?: number; hitAt?: readonly [number, number] }
-interface Action { pose: HeroPose; frames: number; contact: number; beats: Beat[]; hold?: boolean }
+interface Strike { prep: Gesture; hit: Gesture; follow: Gesture; prepAt?: number; followAt?: number; settle?: number; mid?: readonly Beat[]; follows?: readonly [number, number]; even?: boolean; over?: readonly [number, number]; late?: number; hitAt?: readonly [number, number]; rest?: Gesture; air?: boolean; free?: boolean; reach?: number }
+interface Action { pose: HeroPose; frames: number; contact: number; beats: Beat[]; hold?: boolean; air?: boolean; reach?: number }
 const ready: Gesture = {};
 const blend = (a: Gesture, b: Gesture, t: number): Gesture => Object.fromEntries([...new Set([...Object.keys(a), ...Object.keys(b)])]
   .map(k => [k, (a[k as keyof Gesture] ?? 0) * (1 - t) + (b[k as keyof Gesture] ?? 0) * t]));
@@ -39,11 +39,11 @@ function strikeBeats(style: AttackStyle, s: Strike): Beat[] {
   const followAt = s.followAt ?? Math.max(contact, last?.frame ?? contact) + (s.late ?? 2);
   const over = s.over ?? [6, 0], from = last?.target ?? hitAt;
   const follows: readonly [number, number] = s.follows ?? [from[0] + over[0], from[1] + over[1]];
-  const span = end - followAt, at = (t: number) => followAt + Math.max(1, Math.round(span * t));
-  const beats: Beat[] = [{ frame: 0, gesture: ready }, { frame: s.prepAt ?? Math.max(1, contact - Math.max(2, Math.round(contact * 0.4))), gesture: s.prep },
-    { frame: contact, gesture: s.hit, target: hitAt }, ...(s.mid ?? []), { frame: followAt, gesture: s.follow, target: follows },
-    ...(s.even ? [0.25, 0.5, 0.75].map(t => ({ frame: at(t), gesture: blend(s.follow, ready, t) }))
-      : [{ frame: at(0.3), gesture: blend(s.follow, ready, 0.45) }, { frame: at(0.62), gesture: blend(s.follow, ready, 0.85) }, { frame: at(0.85), gesture: blend(s.follow, ready, 0.97) }]), { frame: end, gesture: ready }];
+  const span = end - followAt, at = (t: number) => followAt + Math.max(1, Math.round(span * t)), rest = s.rest ?? ready, start = s.rest ? { ...s.rest, spin: 0, lean: 0 } : ready;
+  const beats: Beat[] = [{ frame: 0, gesture: start }, { frame: s.prepAt ?? Math.max(1, contact - Math.max(2, Math.round(contact * 0.4))), gesture: s.prep },
+    { frame: contact, gesture: s.hit, ...(s.free ? {} : { target: hitAt }) }, ...(s.mid ?? []), { frame: followAt, gesture: s.follow, ...(s.free ? {} : { target: follows }) },
+    ...(s.even ? [0.25, 0.5, 0.75].map(t => ({ frame: at(t), gesture: blend(s.follow, rest, t) }))
+      : [{ frame: at(0.3), gesture: blend(s.follow, rest, 0.45) }, { frame: at(0.62), gesture: blend(s.follow, rest, 0.85) }, { frame: at(0.85), gesture: blend(s.follow, rest, 0.97) }]), { frame: end, gesture: rest }];
   return beats.filter((x, i) => beats.findIndex(o => o.frame === x.frame) === i).sort((x, y) => x.frame - y.frame);
 }
 
@@ -92,11 +92,64 @@ const strikes: readonly [HeroPose, AttackStyle, Strike][] = [
     mid: [{ frame: 14, gesture: { chest: 50, arm: -70, leftArm: 30, lean: 12, head: -30, thigh: 60, knee: -85, leftThigh: 50, leftKnee: -80, spin: 180 }, target: [-70, 9] }],
     follow: { chest: 52, arm: -60, leftArm: 35, lean: 14, head: -30, thigh: 60, knee: -85, leftThigh: 50, leftKnee: -80, spin: 215 }, over: [-6, -2] }],
 ];
+const fall: Gesture = {};
+const flail: Gesture = { chest: -4, arm: -80, elbow: -20, leftArm: -50, leftElbow: -45, head: -6, thigh: -10, knee: -20, leftThigh: 15, leftKnee: -45 };
+const tuck: Gesture = { chest: 30, arm: -40, elbow: -60, leftArm: -40, leftElbow: -60, head: 10, thigh: 85, knee: -115, leftThigh: 85, leftKnee: -115 };
+const squash: Gesture = { chest: 32, lean: 6, arm: 25, elbow: -25, leftArm: 25, leftElbow: -25, head: 12, thigh: 70, knee: -100, leftThigh: 70, leftKnee: -100 };
+const hold: Gesture = { chest: 12, lean: 6, step: 4, leftArm: -88, leftElbow: -10, arm: -150, elbow: -70, head: -6, thigh: 18, knee: -22, leftThigh: -16 };
+const airStrikes: readonly [HeroPose, AttackStyle, Strike][] = [
+  ["backAir", AttackStyle.backAir, { air: true, reach: 0.01, rest: fall,
+    prep: { chest: -15, yaw: 55, arm: -150, elbow: -40, leftArm: 30, lean: 8, step: 4, head: -10, thigh: 30, knee: -60, leftThigh: 40, leftKnee: -70 }, prepAt: 4,
+    hit: { wrist: 0, chest: 42, yaw: -60, arm: 95, leftArm: -70, lean: -12, step: -8, head: -25, thigh: -45, knee: -40, leftThigh: -20, leftKnee: -60 },
+    follow: { wrist: 0, chest: 45, yaw: -65, arm: 110, leftArm: -80, lean: -14, step: -10, head: -28, thigh: -50, knee: -40, leftThigh: -25, leftKnee: -60 }, over: [-6, 8] }],
+  ["upAir", AttackStyle.upAir, { air: true, reach: 0.01, rest: fall, hitAt: [16, 98],
+    prep: { chest: 30, arm: 20, elbow: 0, leftArm: 20, leftElbow: -20, lean: 10, head: 10, thigh: 80, knee: -110, leftThigh: 80, leftKnee: -110 }, prepAt: 3,
+    hit: { wrist: 0, chest: -20, arm: -185, leftArm: -150, lean: -25, head: -35, thigh: 40, knee: -10, leftThigh: -10, leftKnee: -50 },
+    mid: [{ frame: 8, gesture: { wrist: 0, chest: -28, arm: -215, leftArm: -165, lean: -35, head: -40, thigh: 70, knee: -5, leftThigh: 10, leftKnee: -40 }, target: [-18, 96] }],
+    follow: { wrist: 0, chest: -30, arm: -240, leftArm: -175, lean: -42, head: -40, thigh: 85, knee: -5, leftThigh: 30, leftKnee: -30 }, over: [-10, -10] }],
+  ["downAir", AttackStyle.downAir, { air: true, reach: 0.01, rest: fall, hitAt: [14, -40],
+    prep: { chest: -20, arm: -200, elbow: -40, leftArm: -195, leftElbow: -40, lean: -6, head: -25, thigh: 75, knee: -100, leftThigh: 75, leftKnee: -100, rise: 6 }, prepAt: 7,
+    mid: [{ frame: 10, gesture: { chest: -24, arm: -210, elbow: -45, leftArm: -205, leftElbow: -45, lean: -8, head: -28, thigh: 80, knee: -105, leftThigh: 80, leftKnee: -105, rise: 8 } }],
+    hit: { wrist: 0, chest: 40, arm: -10, leftArm: -10, lean: 2, head: 30, thigh: -25, knee: -5, leftThigh: 25, leftKnee: -5, rise: -22 },
+    follow: { wrist: 0, chest: 45, arm: -5, leftArm: -5, lean: 2, head: 32, thigh: -28, knee: -5, leftThigh: 28, leftKnee: -5, rise: -24 }, over: [0, -6] }],
+  ["grab", AttackStyle.grab, { free: true,
+    prep: { chest: -10, lean: -5, step: -2, leftArm: 25, leftElbow: -40, arm: 35, elbow: -60, head: -10, thigh: -10, leftThigh: 10 }, prepAt: 3,
+    hit: { wrist: 0, chest: 22, lean: 14, step: 10, leftArm: -95, leftElbow: 0, arm: 45, elbow: -70, head: -12, thigh: 35, knee: -35, leftThigh: -22 },
+    follow: { wrist: 0, chest: 24, lean: 15, step: 11, leftArm: -90, leftElbow: -15, arm: 45, elbow: -70, head: -10, thigh: 36, knee: -36, leftThigh: -24 } }],
+];
+const loop = (frames: number, a: Gesture, b: Gesture): Beat[] => [{ frame: 0, gesture: a }, { frame: Math.round(frames / 2), gesture: b }, { frame: frames, gesture: a }];
+const posed: [HeroPose, number, Beat[], boolean?][] = [
+  ["jumpSquat", 3, [{ frame: 0, gesture: blend(ready, squash, 0.4) }, { frame: 3, gesture: squash }, { frame: 5, gesture: { ...squash, chest: 36, thigh: 78, knee: -110, leftThigh: 78, leftKnee: -110 } }]],
+  ["jump", 3, [{ frame: 0, gesture: squash }, { frame: 3, gesture: { chest: -18, arm: -165, elbow: -10, leftArm: -170, leftElbow: -10, lean: -6, head: -22, thigh: -10, knee: -5, leftThigh: -18, leftKnee: -10 } },
+    { frame: 12, gesture: { chest: -14, arm: -150, elbow: -20, leftArm: -160, leftElbow: -15, lean: -4, head: -18, thigh: 0, knee: -15, leftThigh: -12, leftKnee: -15 } }, { frame: 24, gesture: fall }], true],
+  ["doubleJump", 4, [{ frame: 0, gesture: fall }, { frame: 3, gesture: { ...tuck, lean: 70 } }, { frame: 6, gesture: { ...tuck, lean: 160 } }, { frame: 9, gesture: { ...tuck, lean: 250 } },
+    { frame: 12, gesture: { ...tuck, lean: 330 } }, { frame: 16, gesture: { ...flail, arm: -150, leftArm: -30, lean: 360 } }, { frame: 24, gesture: { ...fall, lean: 360 } }], true],
+  ["landing", 2, [{ frame: 0, gesture: fall }, { frame: 2, gesture: { ...squash, arm: 35, leftArm: 35, chest: 40 } }, { frame: 5, gesture: blend(squash, ready, 0.55) }, { frame: 8, gesture: ready }]],
+  ["stop", 3, [{ frame: 0, gesture: { lean: 12, chest: 15, arm: 30, leftArm: -30, thigh: 30, knee: -35, leftThigh: -25 } }, { frame: 3, gesture: { lean: -16, chest: -12, step: 4, arm: -75, elbow: -20, leftArm: -85, leftElbow: -20, head: -12, thigh: 40, knee: -5, leftThigh: -15, leftKnee: -50 } },
+    { frame: 8, gesture: blend({ lean: -16, chest: -12, step: 4, arm: -75, leftArm: -85, thigh: 40, leftThigh: -15, leftKnee: -50 }, ready, 0.7) }]],
+  ["grabHold", 15, loop(30, hold, { ...hold, chest: 16, arm: -165, elbow: -80, head: -2 })],
+  ["pummel", 8, [{ frame: 0, gesture: hold }, { frame: 5, gesture: { ...hold, chest: -14, lean: -8, head: -30, step: 0 } }, { frame: 8, gesture: { ...hold, chest: 40, lean: 16, head: 35, step: 8, arm: -120 } },
+    { frame: 14, gesture: { ...hold, chest: 22, lean: 10, head: 10 } }, { frame: 24, gesture: hold }]],
+  ["throwForward", 12, [{ frame: 0, gesture: hold }, { frame: 7, gesture: { ...hold, chest: -18, lean: -12, step: -4, leftArm: -50, leftElbow: -80, arm: -60, elbow: -80, head: -15, thigh: -15, leftThigh: 15 } },
+    { frame: 12, gesture: { chest: 30, lean: 24, step: 16, leftArm: -95, leftElbow: 0, arm: -95, elbow: 0, head: -10, thigh: 45, knee: -45, leftThigh: -35 } },
+    { frame: 17, gesture: { chest: 34, lean: 26, step: 18, leftArm: -90, arm: -90, head: -8, thigh: 46, knee: -46, leftThigh: -36 } }, { frame: 24, gesture: { chest: 14, lean: 10, step: 8, leftArm: -40, arm: -40, thigh: 20, knee: -20, leftThigh: -14 } }, { frame: 32, gesture: ready }]],
+  ["throwBack", 14, [{ frame: 0, gesture: hold }, { frame: 6, gesture: { chest: -10, lean: -6, leftArm: -175, leftElbow: -10, arm: -175, elbow: -20, head: -30, thigh: 30, knee: -40, leftThigh: 20, leftKnee: -30 } },
+    { frame: 14, gesture: { chest: -40, lean: -28, step: -6, leftArm: -260, leftElbow: -10, arm: -255, elbow: -20, head: -45, thigh: 35, knee: -50, leftThigh: 25, leftKnee: -45 } },
+    { frame: 20, gesture: { chest: -42, lean: -30, step: -8, leftArm: -280, arm: -275, head: -45, thigh: 30, knee: -50, leftThigh: 20, leftKnee: -45 } }, { frame: 28, gesture: { chest: -12, lean: -8, step: -3, leftArm: -100, arm: -100, head: -10 } }, { frame: 36, gesture: ready }]],
+  ["throwUp", 12, [{ frame: 0, gesture: hold }, { frame: 5, gesture: { ...squash, leftArm: -70, leftElbow: -40, arm: -70, elbow: -40, head: -10 } },
+    { frame: 12, gesture: { chest: -14, lean: -4, leftArm: -180, leftElbow: 0, arm: -180, elbow: 0, head: -40, thigh: -5, knee: 0, leftThigh: 5, rise: 8 } },
+    { frame: 17, gesture: { chest: -18, lean: -6, leftArm: -185, arm: -185, head: -42, thigh: -5, leftThigh: 5, rise: 5 } }, { frame: 26, gesture: ready }]],
+  ["throwDown", 16, [{ frame: 0, gesture: hold }, { frame: 8, gesture: { chest: -16, lean: -8, leftArm: -165, leftElbow: -20, arm: -165, elbow: -30, head: -25, thigh: 10, leftThigh: -10, rise: 4 } },
+    { frame: 16, gesture: { chest: 60, lean: 18, step: 6, leftArm: -30, leftElbow: 0, arm: -25, elbow: 0, head: 30, thigh: 65, knee: -90, leftThigh: 55, leftKnee: -85 } },
+    { frame: 22, gesture: { chest: 62, lean: 20, step: 7, leftArm: -20, arm: -15, head: 32, thigh: 68, knee: -92, leftThigh: 58, leftKnee: -88 } }, { frame: 30, gesture: blend({ chest: 62, lean: 20, thigh: 68, knee: -92, leftThigh: 58, leftKnee: -88 }, ready, 0.7) }, { frame: 38, gesture: ready }]],
+];
 const only = process.argv.find(a => a.startsWith("--only="))?.slice(7).split(",");
-const actions: Action[] = strikes.filter(([pose]) => !only || only.includes(pose)).map(([pose, style, strike]) => {
+const actions: Action[] = [...strikes, ...airStrikes].filter(([pose]) => !only || only.includes(pose)).map(([pose, style, strike]) => {
   const move = KOBOLD_MOVES.normals[style]!;
-  return { pose, frames: move.totalFrames, contact: move.startupFrames, beats: strikeBeats(style, strike) };
+  return { pose, frames: Math.round(seq(pose).seconds * 60), contact: move.startupFrames, beats: strikeBeats(style, strike), air: strike.air, reach: strike.reach };
 });
+for (const [pose, contact, beats, air] of posed) if (!only || only.includes(pose))
+  actions.push({ pose, frames: Math.round(seq(pose).seconds * 60), contact, beats, air });
 const charge: Gesture = { chest: -30, arm: -220, elbow: -32, leftArm: -205, leftElbow: -32, lean: -15, step: -6, head: -30, thigh: -20, leftThigh: 24, knee: -22 };
 const crouch: Gesture = { chest: -60, lean: 20, head: 15, arm: 20, elbow: -60, leftArm: -40, thigh: -80, knee: 120, leftThigh: -80, leftKnee: 120 };
 if (!only || only.includes("smashCharge")) actions.push({ pose: "smashCharge", frames: 30, contact: 8, hold: true, beats: [{ frame: 0, gesture: charge }, { frame: 30, gesture: charge }] });
@@ -114,6 +167,7 @@ function joint(name: string, g: Gesture): [number, number] {
   if (name === "Bone_Pelvis") return [g.pelvis ?? 0, 0];
   if (name === "Bone_Arm1_R") return [g.arm ?? 0, g.armTwist ?? 0];
   if (name === "Bone_Arm2_R") return [g.elbow ?? 0, 0];
+  if (name === "Bone_Hand_R") return [g.wrist ?? 0, 0];
   if (name === "Bone_Arm1_L") return [g.leftArm ?? 0, 0];
   if (name === "Bone_Arm2_L") return [g.leftElbow ?? 0, 0];
   if (name === "Bone_Head") return [g.head ?? 0, 0];
@@ -129,7 +183,7 @@ function joint(name: string, g: Gesture): [number, number] {
 const originals = new Map<string, mdx.AnimVector>(); tracks(source, (t, p) => originals.set(p, t));
 const pickNode = model.Nodes.find(n => n.Name === "PickAxe")!, handNode = model.Nodes.find(n => n.Name === "Bone_Hand_R")!;
 const handPivot = model.PivotPoints[handNode.ObjectId]!;
-let tip: [number, number, number] = [0, 0, 0], tipDistance = -1;
+let pickTip: [number, number, number] = [0, 0, 0], tipDistance = -1;
 for (const geoset of model.Geosets) {
   const groups = geoset.Groups;
   for (let v = 0; v < geoset.Vertices.length / 3; v++) {
@@ -137,10 +191,20 @@ for (const geoset of model.Geosets) {
     if (group.length !== 1 || group[0] !== pickNode.ObjectId) continue;
     const p: [number, number, number] = [geoset.Vertices[v * 3]!, geoset.Vertices[v * 3 + 1]!, geoset.Vertices[v * 3 + 2]!];
     const d = Math.hypot(p[0] - handPivot[0]!, p[1] - handPivot[1]!, p[2] - handPivot[2]!);
-    if (d > tipDistance) { tipDistance = d; tip = p; }
+    if (d > tipDistance) { tipDistance = d; pickTip = p; }
   }
 }
 ensure(tipDistance > 10, "Kobold pick head not found");
+function pickHead(): [number, number, number] {
+  const verts: number[][] = [];
+  for (const geoset of model.Geosets) for (let v = 0; v < geoset.Vertices.length / 3; v++) {
+    const group = geoset.Groups[geoset.VertexGroup[v]!]!;
+    if (group.length === 1 && group[0] === pickNode.ObjectId && geoset.Vertices[v * 3]! > 8) verts.push([geoset.Vertices[v * 3]!, geoset.Vertices[v * 3 + 1]!, geoset.Vertices[v * 3 + 2]!]);
+  }
+  ensure(verts.length > 8, "Kobold pick head vertices not found");
+  return [0, 1, 2].map(i => verts.reduce((sum, p) => sum + p[i]!, 0) / verts.length) as [number, number, number];
+}
+const head = pickHead();
 const ease = (t: number) => t * t * (3 - 2 * t);
 const along = (beats: readonly Beat[], frame: number, value: (g: Gesture) => number) => {
   const after = beats.findIndex(b => b.frame >= frame); if (after <= 0) return value(beats[Math.max(0, after)]!.gesture);
@@ -170,22 +234,26 @@ for (const action of actions) {
     track.Keys.sort((a, b) => a.Frame - b.Frame);
   });
   const renderer = new ModelRenderer(model), data = Reflect.get(renderer, "rendererData"); renderer.setSequence(index);
-  const arm = model.Nodes.find(n => n.Name === "Bone_Arm1_R")!, elbow = model.Nodes.find(n => n.Name === "Bone_Arm2_R")!;
+  const arm = model.Nodes.find(n => n.Name === "Bone_Arm1_R")!, elbow = model.Nodes.find(n => n.Name === "Bone_Arm2_R")!, hand = handNode;
   const donor = (n: mdx.Node) => source.Nodes[n.ObjectId]!.Rotation!.Keys.find(k => k.Frame >= stand.Interval[0]! && k.Frame <= stand.Interval[1]!)!.Vector;
   const tipMiss: number[] = [];
   for (const beat of action.beats) if (beat.target) {
     data.frame = time(beat.frame);
     const armKey = arm.Rotation!.Keys.find(k => k.Frame === time(beat.frame))!, elbowKey = elbow.Rotation!.Keys.find(k => k.Frame === time(beat.frame))!;
-    const authored = [beat.gesture.arm ?? 0, beat.gesture.armTwist ?? 0, beat.gesture.elbow ?? 0, 0], angles = authored.slice();
+    const authored = [beat.gesture.arm ?? 0, beat.gesture.armTwist ?? 0, beat.gesture.elbow ?? 0, 0, ...(beat.gesture.wrist == null ? [] : [beat.gesture.wrist])], angles = authored.slice();
+    const handKey = beat.gesture.wrist == null ? undefined : hand.Rotation?.Keys.find(k => k.Frame === time(beat.frame));
+    ensure(beat.gesture.wrist == null || handKey, `${action.pose}: right hand has no rotation key`);
+    const [tx, tz] = action.air ? [beat.target[0] - (beat.gesture.step ?? 0), beat.target[1] - (beat.gesture.rise ?? 0)] : beat.target;
     const loss = () => {
+      if (handKey) { handKey.Vector = rotated(donor(hand), angles[4]!, 0); if (handKey.InTan) { handKey.InTan = handKey.Vector.slice(); handKey.OutTan = handKey.Vector.slice(); } }
       armKey.Vector = rotated(donor(arm), angles[0]!, angles[1]!); elbowKey.Vector = rotated(donor(elbow), angles[2]!, angles[3]!);
       if (armKey.InTan) { armKey.InTan = armKey.Vector.slice(); armKey.OutTan = armKey.Vector.slice(); }
       if (elbowKey.InTan) { elbowKey.InTan = elbowKey.Vector.slice(); elbowKey.OutTan = elbowKey.Vector.slice(); }
-      renderer.update(0); const m = data.nodes[pickNode.ObjectId].matrix;
+      renderer.update(0); const m = data.nodes[pickNode.ObjectId].matrix, tip = action.air ? head : pickTip;
       const x = m[0] * tip[0] + m[4] * tip[1] + m[8] * tip[2] + m[12], z = m[2] * tip[0] + m[6] * tip[1] + m[10] * tip[2] + m[14];
-      return (x - beat.target![0]) ** 2 + (z - beat.target![1]) ** 2 + 0.04 * angles.reduce((sum, a, i) => sum + (a - authored[i]!) ** 2, 0);
+      return (x - tx!) ** 2 + (z - tz!) ** 2 + (action.reach ?? 0.04) * angles.reduce((sum, a, i) => sum + (a - authored[i]!) ** 2, 0);
     };
-    for (let pass = 0; pass < 3; pass++) for (let dim = 0; dim < 4; dim++) {
+    for (let pass = 0; pass < 3; pass++) for (let dim = 0; dim < authored.length; dim++) {
       let best = Infinity, bestAngle = angles[dim]!;
       for (let value = authored[dim]! - 150; value <= authored[dim]! + 150; value += pass === 0 ? 15 : 5) { angles[dim] = value; const d = loss(); if (d < best) { best = d; bestAngle = value; } }
       angles[dim] = bestAngle;
@@ -202,8 +270,8 @@ for (const action of actions) {
     ...(rootFirst.InTan ? { InTan: new Float32Array(3), OutTan: new Float32Array(3) } : {}) });
   root.Translation.Keys.sort((a, b) => a.Frame - b.Frame);
   const drawn = new DrawnModel(generateMDX(model), 1);
-  const floors = frames.map(frame => { const t = drawn.triangles(index, frame / 60, 1); let lowest = Infinity; for (let i = 1; i < t.length; i += 2) lowest = Math.min(lowest, t[i]!); return lowest; });
-  const restFloor = (() => { const t = drawn.triangles(0, 0, 1); let lowest = Infinity; for (let i = 1; i < t.length; i += 2) lowest = Math.min(lowest, t[i]!); return lowest; })();
+  const floors = action.air ? frames.map(() => 0) : frames.map(frame => { const t = drawn.triangles(index, frame / 60, 1); let lowest = Infinity; for (let i = 1; i < t.length; i += 2) lowest = Math.min(lowest, t[i]!); return lowest; });
+  const restFloor = action.air ? 0 : (() => { const t = drawn.triangles(0, 0, 1); let lowest = Infinity; for (let i = 1; i < t.length; i += 2) lowest = Math.min(lowest, t[i]!); return lowest; })();
   for (const [i, frame] of frames.entries()) {
     const key = root.Translation.Keys.find(k => k.Frame === time(frame))!;
     key.Vector[0] = key.Vector[0]! + along(action.beats, frame, g => g.step ?? 0);
@@ -231,5 +299,5 @@ for (const [i, action] of actions.entries()) {
     x: 0, z: 0, facing, parts: [], strikes: [], clip: index, seconds: frame / 60 })));
   await Bun.write(join(output, `Kobold-${action.pose}.png`), sheet(`Kobold ${action.pose}`, finalDrawn, panels, panelFrames.length).png);
 }
-await Bun.write(join(output, "kobold-ground.json"), JSON.stringify({ tip, records }, null, 2) + "\n");
+await Bun.write(join(output, "kobold-ground.json"), JSON.stringify({ tip: pickTip, head, records }, null, 2) + "\n");
 console.log(`KOBOLD_CLIPS_PASS ${records.length} ground clips re-authored at their indices; other sequences unchanged; ${output}`);
