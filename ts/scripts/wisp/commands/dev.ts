@@ -19,8 +19,7 @@ export const SMASHCRAFT_DEV: DevProject = {
     preload: ["test/host-natives.ts"],
     reads: {
       "test/wisp.test.ts": ["test/fixtures/wisp/**"],
-      "test/integrity.test.ts": ["../evidence/**"],
-      "test/playable.test.ts": ["test/fixtures/playable-0045/**", "../evidence/**"],
+      "test/playable.test.ts": ["test/fixtures/playable-0045/**"],
       "test/standalone.test.ts": ["test/native/pads/cpu-expert.pad"],
       "test/melee-oracle.test.ts": ["../docs/gameplay-design.md"],
     },

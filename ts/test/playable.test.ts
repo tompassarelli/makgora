@@ -6,7 +6,7 @@ import { Effect } from "effect";
 import { playableVerdict } from "../scripts/playable";
 
 
-const EVIDENCE_0045 = join(import.meta.dir, "../../evidence/playable-0045-native-20261006/capture.json");
+const EVIDENCE_0045 = join(import.meta.dir, "fixtures/playable-0045/capture.json");
 const FIXTURES_0045 = "fixtures/playable-0045/";
 const TRACES_0045 = [
   "fixtures/playable-0045/epoch-1/0-wc3-melee-input-trace.txt",

@@ -2076,7 +2076,7 @@ A path entering deeper than the lip stops against the solid stage.
 
 The before/after record below is the full-mana envelope (height / reach, world
 units) from the recorded main baseline and recovery branch `28c15a07` in
-[evidence/recovery-envelope-20261008](../evidence/recovery-envelope-20261008/).
+smashcraft:evidence/recovery-envelope-20261008/.
 The branch's up-special and empty-mana measurements are kept there too.
 
 | Fighter | Before height / reach | After height / reach |
