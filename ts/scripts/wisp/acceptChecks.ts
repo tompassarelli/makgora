@@ -391,7 +391,7 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
     {
       id: "c39-rematch-countdown", closes: "smashcraft#7 C39N and the E1 countdown box", map: "presentation", session: "c39-countdown",
       setup: [{ receipt: "^parts [0-9]+$", client: "a", seconds: 600 }],
-      capture: [{ kind: "frames", name: "results-rematch-startup", client: "a", count: 70, everyMs: 200 }],
+      capture: [{ kind: "frames", name: "rematch-countdown", client: "a", count: 40, everyMs: 125 }, { kind: "frames", name: "startup-countdown", client: "a", count: 100, everyMs: 50 }],
       pass: [NO_IMPORT_FAILURES, NO_ERRORS],
       look: "After the first match ends, the rematch seconds 5 to 1 and then the next match's 3, 2, 1, GO! each appear centred on the stage, popping in and fading out; the next match's fighters stay held until GO!.",
     },
