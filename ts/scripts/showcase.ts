@@ -43,7 +43,7 @@ export const send = (directory: string, text: string, timeoutSeconds = 60) => Ef
   yield* pollUntil(Effect.sync(() => (statusSerial(directory) ?? 0) >= next ? next : undefined), {
     every: "200 millis",
     within: Duration.seconds(timeoutSeconds),
-    orElse: () => Effect.fail(new ShowcaseFailure({ problem: `driver command ${next} was not applied within  seconds` })),
+    orElse: () => Effect.fail(new ShowcaseFailure({ problem: `driver command ${next} was not applied within ${timeoutSeconds} seconds` })),
   });
   return next;
 });
