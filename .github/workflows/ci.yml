@@ -18,7 +18,8 @@ concurrency:
   cancel-in-progress: false
 
 # Autoland lands only a candidate the farm test (farm-test.yml) passed, which runs
-# every check below; its dispatch after a landing runs only the smoke job.
+# every check below that its changed paths can affect; its dispatch after a landing
+# runs the smoke job and the checks the farm test skips for unrelated changes.
 env:
   SWEEP_PLACEMENT: gate
 
@@ -85,6 +86,33 @@ jobs:
       - if: ${{ !cancelled() }}
         run: bun scripts/commitMetrics.ts build/playable-bot-four.perf build/playable.lua | tee -a "$GITHUB_STEP_SUMMARY"
         working-directory: ts
+
+  filtered-checks:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.13
+      - run: bun install --frozen-lockfile
+        working-directory: ts
+      - run: bun wisp parity tapes && bun wisp parity numeric
+        working-directory: ts
+      - if: ${{ !cancelled() }}
+        run: LUA_TESTS_STEP=stack bun scripts/lua-tests.ts
+        working-directory: ts
+      - if: ${{ !cancelled() }}
+        run: COMPILER_TIMINGS=1 bun scripts/compiler-benchmark.ts
+        working-directory: ts
+      - if: ${{ !cancelled() }}
+        run: bun scripts/typecheck-benchmark.ts
+        working-directory: ts
+        env:
+          CI_TIMING: report
+      - if: ${{ !cancelled() }}
+        run: git clone -q --depth 1 https://github.com/tompassarelli/north "$RUNNER_TEMP/north" && bun "$RUNNER_TEMP/north/agent-machinery/scripts/effect-kit.mjs" check
 
   development-loop:
     if: github.event_name != 'workflow_dispatch' || github.ref != 'refs/heads/main'
@@ -250,7 +278,7 @@ jobs:
   # Autoland dispatches this workflow after a landing, and a dispatched run
   # starts no workflow_run, so it hands its own result to "Main is red".
   main-red:
-    needs: [smoke, development-loop, lua-tests, sweeps]
+    needs: [smoke, filtered-checks, development-loop, lua-tests, sweeps]
     if: ${{ !cancelled() && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
