@@ -77,8 +77,12 @@ env:
       out() { echo "$1=$2" >> "$GITHUB_OUTPUT"; }
       reports=(tools/move-data/advantage-state.jsonl tools/move-data/advantage-state.md)
       started=$(date +%s)
-      (cd ts && bun scripts/wisp.ts combos --advantage --jobs "$(( $(nproc) < 26 ? $(nproc) : 26 ))") 2>&1 | tail -40 | tee reports.log
-      echo "Regenerated ${reports[*]} on $(nproc) cores in $(( $(date +%s) - started )) s" >> "$GITHUB_STEP_SUMMARY"
+      if [ "${REPORTS_CACHED:-}" = true ]; then
+        echo "Restored ${reports[*]} from the cache for inputs ${REPORTS_KEY:0:12}" >> "$GITHUB_STEP_SUMMARY"
+      else
+        (cd ts && bun scripts/wisp.ts combos --advantage --jobs "$(( $(nproc) < 26 ? $(nproc) : 26 ))") 2>&1 | tail -40 | tee reports.log
+        echo "Regenerated ${reports[*]} on $(nproc) cores in $(( $(date +%s) - started )) s" >> "$GITHUB_STEP_SUMMARY"
+      fi
       if (cd ts && bun test test/advantage-state.test.ts) > targets.log 2>&1; then
         out verdict "$VERDICT"
       else
@@ -335,11 +339,32 @@ jobs:
         run: |
           eval "$REPORTS_RUN"
           install_reports
+      - id: inputs
+        run: |
+          key=$(cd ts && bun scripts/advantageInputs.ts)
+          echo "key=$key" >> "$GITHUB_OUTPUT"
+      - id: cached
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            tools/move-data/advantage-state.jsonl
+            tools/move-data/advantage-state.md
+          key: advantage-state-${{ steps.inputs.outputs.key }}
       - id: reports
         name: Run set -euo pipefail
+        env:
+          REPORTS_CACHED: ${{ steps.cached.outputs.cache-hit }}
+          REPORTS_KEY: ${{ steps.inputs.outputs.key }}
         run: |
           eval "$REPORTS_RUN"
           regenerate_reports
+      - if: steps.cached.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            tools/move-data/advantage-state.jsonl
+            tools/move-data/advantage-state.md
+          key: advantage-state-${{ steps.inputs.outputs.key }}
 
   suite:
     needs: build
