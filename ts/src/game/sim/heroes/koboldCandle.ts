@@ -34,6 +34,11 @@ export function candleLevel(f: Readonly<Fighter>): number {
   return min(CANDLE_MAX_LEVEL, idiv(f.candle.heat, CANDLE_LEVEL_HEAT));
 }
 
+export function specialVariant(f: Readonly<Fighter>): number {
+  if (f.character !== Character.kobold) return 0;
+  return f.candle.state !== CandleState.held ? CANDLE_BARE_VARIANT : candleLevel(f);
+}
+
 export function candleHeatGain(source: Readonly<Fighter>, damage: number): number {
   if (source.character !== Character.kobold || source.candle.state !== CandleState.held || damage <= 0) return 0;
   return min(CANDLE_HIT_HEAT_CAP, CANDLE_HEAT_PER_DAMAGE * toInt(damage));

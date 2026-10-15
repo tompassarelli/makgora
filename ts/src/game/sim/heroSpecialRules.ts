@@ -8,8 +8,8 @@ import { f32 } from "wisp/src/sim/f32";
 import { at } from "wisp/src/runtime/lookup";
 import { applyItemBuffFor } from "./itemBuffs";
 import { advanceHeroConditions, cleansePoisonAndSlow } from "./heroStatus";
-import { AttackStyle, CandleState, Character, ProjectileKind, SpecialAction } from "./codes";
-import { CANDLE_BARE_VARIANT, candleLevel } from "./heroes/koboldCandle";
+import { AttackStyle, Character, ProjectileKind, SpecialAction } from "./codes";
+import { specialVariant } from "./heroes/koboldCandle";
 import { mutableProjectile } from "./fighterProjectiles";
 import { canAttack, inGrabContext, isIntangible } from "./conditions";
 import { type Fighter, type Projectile, placedObject } from "./fighter";
@@ -45,12 +45,6 @@ export function runningHeroSpecial(f: Readonly<Fighter>): AuthoredSpecial | unde
   const specials = f.tuning.specials;
   if (specials === undefined || !isHeroSpecialAction(f.special.action)) return undefined;
   return specialForm(specialKit(specials, f.special.action - SpecialAction.heroNeutral), f.special.form, f.special.ex, f.special.variant);
-}
-
-
-export function specialVariant(f: Readonly<Fighter>): number {
-  if (f.character !== Character.kobold) return 0;
-  return f.candle.state !== CandleState.held ? CANDLE_BARE_VARIANT : candleLevel(f);
 }
 
 function requestedSlot(input: Readonly<Controls>): SpecialSlot {
