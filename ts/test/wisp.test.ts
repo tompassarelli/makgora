@@ -17,7 +17,7 @@ test("each game-written file kind decodes its native Preload fixture [k5 boundar
   expect(await Effect.runPromise(DevCommandReceipt.decode("dev.txt", fixture("dev-command-receipt.pld"))))
     .toEqual({
       build: "ts-shell-r1", receipt: 1, epoch: 0, rollback: 6, delay: 0, batch: 2, rematchSeconds: 5,
-      phase: 0, humanFighters: 3, computers: 0, characters: "1,2,3,1", stocks: 1, minutes: 7, automaticRematch: 0, stage: 2,
+      phase: 0, humanFighters: 3, computers: 0, characters: "1,2,3,1", stocks: 1, minutes: 7, automaticRematch: 0, teamBattle: 0, friendlyFire: 0, teams: "0,1,0,1", stage: 2,
     });
   expect(await Effect.runPromise(InputTraceStart.decode("trace-start.txt", fixture("input-trace-start.pld"))))
     .toEqual({ build: "ts-shell-r1" });
