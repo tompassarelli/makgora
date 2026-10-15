@@ -321,6 +321,7 @@ jobs:
   # adds its last output lines to the summary.
   # Checks need no shard plan, so they start beside it on the dispatched ref (Autoland passes an exact SHA).
   checks:
+    needs: plan
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
