@@ -25,6 +25,7 @@ import { botStrategyValues } from "../match/botStrategy";
 import type { ReplayState } from "./snapshot";
 import type { PacingAndPresentation } from "../match/pacingAndPresentation";
 import { HERO_ROSTER } from "../sim/heroes/registry";
+import { writeCandleView } from "../sim/heroes/koboldCandleView";
 import { RIFLEMAN_MOVES } from "../sim/originalMoves";
 
 const REPLAY_CHECKSUM_MODULUS = 1_000_003;
@@ -742,6 +743,7 @@ export function writeObservations(writer: ObservationWriter, opponents: Slots<Re
     writer.number(f.bear.x);
     writer.number(f.bear.z);
     writer.number(f.bear.hitSerial);
+    writeCandleView(writer.number, f);
     let repeatedCount = 0;
     let repeatedText = "";
     for (const p of f.projectiles) {

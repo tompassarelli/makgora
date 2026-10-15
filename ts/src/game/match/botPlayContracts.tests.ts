@@ -1,12 +1,17 @@
 // The computer opponent's contracts (#56): it never leaves the stage chasing
 // an opponent who stands on it, it gets up from jab resets, and the same
 // start plays the same match.
+import { f32 } from "wisp/src/sim/f32";
+import { imod } from "wisp/src/sim/intMath";
 import { assertEquals, assertFalse, assertGreaterThan, assertLessThan, assertTrue, test } from "wisp/src/runtime/testing";
 import { sweep, sweepSeed } from "../core/sweep";
 import { clearAttackBuffer, queueAttack } from "../input/attackBuffer";
 import { PARTICIPANT_SLOTS, type ParticipantSlot } from "../input/participants";
 import { stateChecksum } from "../replay/canonical";
-import { AttackStyle, Character, DownState, SpecialAction } from "../sim/codes";
+import { AttackStyle, CandleState, Character, ContactKind, DownState, SpecialAction } from "../sim/codes";
+import { CANDLE_AWAY_FRAMES, CANDLE_DROP_KNOCKBACK } from "../sim/heroes/koboldCandle";
+import { collectDamageContact } from "../sim/contacts";
+import { contactBatch, hitEffect } from "../sim/testWorld";
 import { isHeroSpecialAction } from "../sim/specials/engine";
 import { HERO_ROSTER } from "../sim/heroes/registry";
 import { createFighter } from "../sim/fighter";
@@ -226,4 +231,38 @@ test("a computer repeats a decision only from the same state: any change to its 
   while (refused <= 39 && sameAt(frame + refused)) refused++;
   assertGreaterThan(refused, floor - 1);
   assertFalse(sameAt(frame + 39));
+});
+
+function candleDrops(): { fetched: number; struck: number } {
+  let fetched = 0;
+  let struck = 0;
+  for (let drop = 0; drop < 8; drop++) {
+    const side = imod(drop, 2) === 0 ? 1 : -1;
+    const x = f32(side * f32(drop * 15.0));
+    const game = computerMatch([Character.kobold, Character.mountainKing], [x, f32(x - side * 80.0)], 0, 3, drop);
+    const { world } = game;
+    const kobold = fighterAt(world, 0);
+    for (let frame = 0; frame < 60; frame++) game.step();
+    kobold.candle.heat = imod(drop, 4) === 3 ? 225 : 75;
+    contactBatch(world, () => collectDamageContact(world, 1, 0, hitEffect(10.0, 0.0, CANDLE_DROP_KNOCKBACK + 1.0, f32(side * 0.5), f32(0.85)), 1, ContactKind.launch, true, undefined, false));
+    let timer = kobold.candle.timer;
+    let away = kobold.candle.away;
+    let hit = false;
+    while (kobold.candle.state !== CandleState.held) {
+      game.step();
+      const { candle } = kobold;
+      if (candle.state === CandleState.held && timer > 1 && away < CANDLE_AWAY_FRAMES - 1) fetched++;
+      hit = hit || candle.snuffSerial > 0 || candle.state !== CandleState.held && candle.timer > timer;
+      timer = candle.timer;
+      away = candle.away;
+    }
+    if (hit) struck++;
+  }
+  return { fetched, struck };
+}
+
+test("in eight seeded Wren Expert drops Kobold's computer takes his candle back before it relights in at least 7 (7-8 on seed offsets 0, 1 and 2) and a Mountain King computer kicks or stamps it out in at least 3 (6-7) [k1 scenario]", () => {
+  const { fetched, struck } = candleDrops();
+  assertGreaterThan(fetched, 6);
+  assertGreaterThan(struck, 2);
 });

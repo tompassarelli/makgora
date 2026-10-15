@@ -7,7 +7,7 @@ export const KOBOLD_GAMEPLAN: FighterGameplan = {
     { move: AttackStyle.forwardTilt, near: 40.0, far: 85.0 },
     { move: AttackStyle.downTilt, near: 30.0, far: 70.0 },
     { move: GameplanSpecial.side, near: 110.0, far: 200.0 },
-    { move: GameplanSpecial.neutral, near: 180.0, far: 330.0 },
+    { move: GameplanSpecial.neutral, near: 180.0, far: 380.0 },
     { move: GameplanSpecial.down, near: 0.0, far: 80.0 },
   ],
   approach: [
