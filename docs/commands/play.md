@@ -10,6 +10,11 @@
   play starts no helper and never needs one.
   When the always-on controller service has a pad, the pad presses the same keys.
 
+- Every landing: the Tom build watcher (smashcraft:tools/tom-build/) builds
+  and installs each new tip of main within one build of landing, without the
+  CI/farm or gate checks below, and logs each install to
+  `~/.local/state/agents/handoffs/tom-build.log` (smashcraft:docs/play.md).
+
 - Continuous builds: `bun wisp play --install-green` fetches origin, takes the
   newest commit of main whose CI succeeded and whose farm suite passed for the
   commit or matching tree, or whose Autoland status explicitly names that landed

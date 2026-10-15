@@ -63,12 +63,13 @@ Keep proprietary game assets and base maps privately outside repository trees.
 Always identify the current playable artifact separately from an experimental
 candidate; a diagnostic pass does not replace that release.
 
-`bun wisp map build --profile playable` writes `MAP.w3x.lua-cost.json` and
+`bun wisp map build --profile playable --predict-cost` writes `MAP.w3x.lua-cost.json` and
 `MAP.w3x.lua-cost.perf` beside the map. The JSON records predicted Lua p50/p95
 for player 0's 1,800 `playable-bot-four` callbacks, within #19's solo/four-bot
 calibration scope. Worst is diagnostic. Its note is "Lua cost predicted;
 whole frame not measured". A build whose predictor inputs (both Lua entries
 and their local modules, configs, Wisp pin, Lua binary) hash the same reuses
-`ts/build/playtest-cost/HASH.perf`. The installed playtest keeps both files beside
-its map. Compare the samples from `ts/` with
+`ts/build/playtest-cost/HASH.perf`. Play builds skip the prediction (about
+280 s, two more compiles of the game) unless `bun run playtest:build --predict-cost`
+asks for it; an installed playtest built that way keeps both files beside its map. Compare the samples from `ts/` with
 `bun wisp perf compare test/fixtures/perf/playable-bot-four.perf MAP.w3x.lua-cost.perf`.

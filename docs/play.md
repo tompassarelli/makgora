@@ -51,6 +51,9 @@ one-off build is named after the version it tests, `Smashcraft 0.0.N test K`,
 and lives in tests/. Experimental builds use `wisp fresh`, captures or `wisp accept` and
 install under tests/; they do not change what `play` launches.
 
+The play build checks the build inputs, cue models, package and map size,
+and skips the Lua cost prediction; `bun run playtest:build --predict-cost` adds it (smashcraft:docs/commands/workflow.md).
+
 Main's smashcraft:build-inputs/ names the private inputs: base map,
 container, assets and summon clips, each by the hash of its contents in the
 store (smashcraft:docs/build-inputs.md). Map builds check every input against
@@ -70,6 +73,34 @@ source tree's `play-helpers/` directory, so concurrent revisions deliver their
 own helper. On 8 October 2026 the old fresh-worktree build took 4m46s;
 the first shared-cache fill took 4m32s and a second worktree reused it in
 0.15s of Cargo time (2.147s including Nix and capacity setup).
+
+## Every landing in Maps
+
+The Tom build watcher (smashcraft:tools/tom-build/) builds each new tip of
+main and installs it under Maps/00-Smashcraft, as `bun run playtest:build`
+does, without opening the lobby. It fetches origin/main every 30 s; when main
+moved to a commit it has not built, it builds that commit with the same
+version numbering and revision locks as `play`, under `Nice=10` and idle I/O.
+Commits that land during a build are not built one by one: the next build is
+of the newest tip. A sha is built once, even after a failure or a restart
+(`~/.local/state/smashcraft/tom-build/attempted`). A new build gets a new
+`Smashcraft 0.0.N` file and never replaces an existing one.
+
+Start it (once, from the main checkout):
+
+    mkdir -p ~/.config/systemd/user
+    cp tools/tom-build/smashcraft-tom-build.service ~/.config/systemd/user/
+    systemctl --user daemon-reload
+    systemctl --user enable --now smashcraft-tom-build.service
+
+Stop it with `systemctl --user disable --now smashcraft-tom-build.service`;
+`bun scripts/tomBuildWatch.ts` from ts/ runs it in the foreground. Each
+installed build appends one line to `~/.local/state/agents/handoffs/tom-build.log`:
+
+    <utc> <sha> <version> <build_s> <land_to_installed_s> <install path>
+
+`land_to_installed_s` counts from the commit's committer time. Failed builds
+are in `journalctl --user -u smashcraft-tom-build`.
 
 ## The desktop client
 

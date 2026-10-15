@@ -14,7 +14,7 @@ import { runProcess } from "../hostProcess";
 import { buildOnce } from "./buildInputs";
 import { capacityHelper } from "../heavyCapacity";
 import { withLock } from "./fileLock";
-import { PLAYABLE_FILE, installName } from "./greenBuilds";
+import { PLAYABLE_FILE, PREDICT_COST, installName } from "./greenBuilds";
 import { projectRoot } from "./project";
 
 const inputsRoot = join(homedir(), ".local/share/smashcraft-build-inputs");
@@ -170,12 +170,16 @@ export interface PlaytestOptions {
   readonly revision?: string;
   readonly named?: boolean;
   readonly helper?: boolean;
+  readonly predictCost?: boolean;
 }
+
+export const playableMapBuild = (title: string, out: string, predictCost = false) =>
+  ["bun", "wisp", "map", "build", "--profile", "playable", "--edition", "full", "--name", title, "--out", out, ...(predictCost ? [PREDICT_COST] : [])];
 
 const builtMap = (folder: string): string | undefined =>
   existsSync(folder) ? readdirSync(folder).find((entry) => PLAYABLE_FILE.test(entry)) : undefined;
 
-export const currentPlaytest = (library: string, { revision: wanted, named = false, helper: wantsHelper = true }: PlaytestOptions = {}) => Effect.gen(function*() {
+export const currentPlaytest = (library: string, { revision: wanted, named = false, helper: wantsHelper = true, predictCost = false }: PlaytestOptions = {}) => Effect.gen(function*() {
   const { revision, controller, mainCheckout } = yield* (wanted === undefined ? resolveMain : resolveRevision(wanted));
   const version = yield* reserveVersion(library, revision);
   const final = join(builds, revision);
@@ -187,7 +191,7 @@ export const currentPlaytest = (library: string, { revision: wanted, named = fal
     console.log(`Building ${title}`);
     const lane = yield* buildLane(mainCheckout, revision);
     yield* run(join(lane, "ts"), ["bun", "install", "--frozen-lockfile"]);
-    yield* run(join(lane, "ts"), ["bun", "wisp", "map", "build", "--profile", "playable", "--edition", "full", "--name", title, "--out", join(staging, map.file)]);
+    yield* run(join(lane, "ts"), playableMapBuild(title, join(staging, map.file), predictCost));
     if (wantsHelper && !existsSync(helper)) {
       yield* buildHelper(lane, helper).pipe(Effect.catch((problem) => Effect.sync(() => console.log(`No controller helper for this build (${problem.problem}); the keyboard plays`))));
     }

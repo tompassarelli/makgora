@@ -18,6 +18,7 @@ import { fighterUnits, fileIoAbility } from "../../objectData";
 import { POST_PROCESSING_FILE } from "../../postProcessing";
 import { checkCueModels, headlessRender } from "../headlessRender";
 import { writePlaytestCost } from "../playtestCost";
+import { PREDICT_COST, costPrediction } from "../greenBuilds";
 
 
 export const profileOptions = (args: readonly string[]) => Effect.gen(function*() {
@@ -90,10 +91,12 @@ const checkMapSize = (out: string, imports: readonly ArchiveEntry[], bounded: bo
 });
 
 export const build: Command = (args) => Effect.gen(function*() {
-  const options = yield* profileOptions(args);
+  const { predict, args: buildArgs } = costPrediction(args);
+  const options = yield* profileOptions(buildArgs);
   const bounded = options.profile === "main";
   const playable = options.profile === "playable";
   const capture = options.profile === "native-capture";
+  if (predict && !playable) return yield* new UsageFailure({ problem: `${PREDICT_COST} needs --profile playable` });
   return yield* decodeBuildOptions(options.args, playable ? "classic" : "full").pipe(
     Effect.flatMap((options) => Effect.gen(function*() {
       yield* Effect.sync(ensureGenerated);
@@ -106,7 +109,7 @@ export const build: Command = (args) => Effect.gen(function*() {
       const checked = yield* checkCueModels(headlessRender({ assets: assets ?? declared.assets, imports })).pipe(step("cue models resolved in both looks"));
       yield* Console.log(`${checked} cue model/look resolutions passed`);
       yield* MapBuild.use((maps) => maps.build({ ...map, base: base ?? declared.base, container: container ?? declared.container, ...(packager === undefined ? {} : { packager }), declaration: SMASHCRAFT_MAP, imports, objectData: generatedFiles() })).pipe(Effect.andThen(checkMapSize(map.out, imports, bounded, edition)));
-      if (playable) yield* writePlaytestCost(map.out).pipe(step("predict playtest Lua cost"));
+      if (predict) yield* writePlaytestCost(map.out).pipe(step("predict playtest Lua cost"));
     })),
     Effect.provide(options.services),
   );
