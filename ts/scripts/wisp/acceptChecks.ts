@@ -404,11 +404,12 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
       id: "c46-win-counts", closes: "smashcraft#7 C46", map: "presentation", session: "c39-countdown",
       setup: [
         { receipt: "^parts [0-9]+$", client: "a", seconds: 600 },
-        { chat: "-dev auto-rematch off" }, { waitMs: 4000 }, { chat: "-dev reset" }, { waitMs: 3000 },
+        { waitMs: 2500 }, { keys: ["n"], client: "a" }, { waitMs: 300 }, { keys: ["n"], client: "b" }, { waitMs: 300 },
+        { keys: ["n"], client: "a" }, { waitMs: 300 }, { keys: ["n"], client: "b" }, { waitMs: 3000 },
       ],
       capture: [{ kind: "frames", name: "fighter-select-after-three", client: "a" }, { kind: "frames", name: "fighter-select-after-three", client: "b" }],
-      pass: [NO_IMPORT_FAILURES, NO_ERRORS, DEV_RECEIPT],
-      look: "Three one-sided matches against Wren Expert have ended by KO; both clients' fighter select shows x3 on the computer's own card (slot 2) and no tally on player 1's card, so each win was awarded exactly once to the fixed slot through results, rematch and reset.",
+      pass: [NO_IMPORT_FAILURES, NO_ERRORS],
+      look: "Three one-sided matches against Wren Expert have ended by KO; after both players cancel the rematch countdown and confirm from results, both clients' fighter select still holds the computer in slot 2 and shows x3 on its card and no tally on player 1's card, so each win was awarded exactly once to the fixed slot through results, rematch and the return to the menu.",
     },
     ...(["first", "second"] as const).map((order): NativeCheck => ({
       id: `c40-cpu-startup-${order}`, closes: "smashcraft#7 C40N", map: "cpu-startup", session: `cpu-startup-${order}`,
