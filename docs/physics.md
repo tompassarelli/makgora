@@ -814,9 +814,9 @@ scaling or the disc revision.
 Holding the stick backward during the initial dash without a fresh smash is a
 moonwalk, as in Melee. The fighter stays in Dash, keeps its dash direction and
 facing, and the dash animation keeps playing forward. Each tick moves velocity
-toward the backward run target scaled by the stick, with the same ground
-acceleration multiplier and base as a forward dash, so the fighter slows and,
-when the dash started slow enough, slides backward while still facing forward.
+toward the backward run target scaled by the stick, with the forward dash's
+ground acceleration multiplier and base times a moonwalk factor of 2.25, so the
+fighter slows, reverses and slides backward while still facing forward.
 A backward tilt below 0.8 counts, and so does a full backward stick once the
 tilt has been held for the three-sample smash window (Melee needs two frames);
 a fresh smash back is still a dash-dance turn. The first two samples of a tilt
@@ -824,9 +824,12 @@ hold velocity while a smash can still arrive. The moonwalk ends at the dash's
 run-enable frame; a stick still held back then turns the fighter as before.
 Released, the dash slides on by the fighter's traction, so lower traction
 slides farther back. Dash entry replaces earlier velocity (the recorded Falco
-entry above), so with stock dash speeds the initial dash slows the fighter
-without reversing it: Blademaster at full backward stick goes from 11.9 to 4.3
-world units per tick.
+entry above); SmashWiki's moonwalk reverses most fighters from a standstill
+without carrying them past their start, and the 2.25 factor is set to that.
+Blademaster at traction 0.06, tilting back for three frames and then holding
+full back, goes from 11.9 world units per tick forward to reversing on dash
+frame 11, leaves the dash at -5.3 and comes to rest 19 units ahead of where
+the dash began.
 
 The authored dash window and three-sample stick reversal policy are specified
 in [gameplay design](gameplay-design.md#dash-dancing). Run-turn braking remains

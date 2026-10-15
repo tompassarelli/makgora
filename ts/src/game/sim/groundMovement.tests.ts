@@ -290,7 +290,7 @@ test("a retail run-brake ends at its clip or its maximum frame count [k3 measure
 
 function moonwalkSlide(traction: number): { readonly reversed: boolean; readonly backward: number } {
   const fighter = createFighter(Character.blademaster, 0.0, 1);
-  withPhysics(fighter, { traction, dashSpeed: f32(fighter.tuning.physics.walkSpeed * 0.5) });
+  withPhysics(fighter, { traction });
   const tilt = controls({ direction: -1, diStickValid: true, diStickX: f32(-0.5) });
   const back = controls({ direction: -1, diStickValid: true, diStickX: -1.0 });
   advanceSolo(fighter, 0, controls({ direction: 1 }), 0.0);

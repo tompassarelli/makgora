@@ -104,7 +104,7 @@ and Anub'arak stop shortest. Landing slides, wavedashes included, brake hard
 until the fighter is down to walking speed, then glide to a stop.
 
 To moonwalk, dash and then tilt the stick lightly backward without smashing
-it: your fighter keeps dashing forward while its momentum drains backward. Hold
+it: your fighter keeps facing forward in its dash while it slows and slides back. Hold
 the light tilt for three frames, after which you can push the stick fully
 back; a quick smash back turns you around instead (a dash dance). The slide
 lasts until the dash would become a run. On keyboard, hold down together with

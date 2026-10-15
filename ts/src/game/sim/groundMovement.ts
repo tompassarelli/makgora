@@ -16,6 +16,7 @@ import { INITIAL_DASH_FRAMES, WORLD_UNITS_PER_MELEE_UNIT, melee } from "./tuning
 const WALK_ACCEL_TAPER_GAIN = 0.5;
 const RUN_ACCEL_TAPER_GAIN = 0.4000000059604645;
 const RUN_DASH_TURN_FRICTION_MULTIPLIER = 1.0;
+export const MOONWALK_ACCELERATION_MULTIPLIER = f32(2.25);
 
 const TURN_RUN_ZERO_VELOCITY_THRESHOLD = melee(0.009999999776482582);
 /** only the Dash-to-Guard branch uses this early/late split. */
@@ -240,9 +241,9 @@ export function advanceGroundMovement(f: Fighter, direction: number, walking: bo
     ground.dashFrame = min(INITIAL_DASH_FRAMES + 1, ground.dashFrame + 1);
     ground.actionFrame = min(actionClockLimit(f), ground.actionFrame + 1);
     const moonwalkRunTarget = f32(speedBuffed(f, chillScaled(f, physics.runSpeed)) * speedScale);
-    const moonwalkAcceleration = taperedAcceleration(
+    const moonwalkAcceleration = f32(taperedAcceleration(
       f, f32(physics.groundAccelerationMultiplier * speedScale), physics.groundAccelerationBase, direction, moonwalkRunTarget, RUN_ACCEL_TAPER_GAIN, false,
-    );
+    ) * MOONWALK_ACCELERATION_MULTIPLIER);
     motion.vx = groundMovementVelocity(motion.vx, moonwalkAcceleration, f32(direction * moonwalkRunTarget), f32(traction * RUN_DASH_TURN_FRICTION_MULTIPLIER), speedBuffed(f, physics.groundSpeedCap));
     return false;
   }
