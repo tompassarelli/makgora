@@ -416,6 +416,13 @@ function selectTableAction(pose: FighterPose, f: Readonly<Fighter>, table: Reado
   const { style } = attack;
 
 
+  const release = attackClip(f);
+  const heldRelease = f.character === Character.shadowHunter && release?.aligned === true;
+  if (charging && heldRelease) {
+    playIndex(pose, "smash-charge", release.index);
+    pose.clipTime = f32(attack.frame * FRAME_SECONDS);
+    return 0.0;
+  }
   if (charging) {
     const charge = table.smashCharge ?? table.idle;
     if (charge === undefined) playName(pose, "smash-charge", "stand ready");
@@ -423,8 +430,11 @@ function selectTableAction(pose: FighterPose, f: Readonly<Fighter>, table: Reado
     return 0.0;
   }
 
-  const release = attackClip(f);
   if (style !== undefined && release !== undefined && (pose.animation === "smash-charge" || pose.animation === "smash-release")) {
+    if (heldRelease) {
+      pose.animation = "smash-release";
+      return attackRate(f, attackPhase(f));
+    }
     if (pose.animation === "smash-charge") {
       selectFighterClipIndex(pose, release.index);
       pose.animation = "smash-release";

@@ -82,6 +82,49 @@ function doubleJump(): Authored {
 }
 
 
+function forwardSmash(): Authored {
+  const move = SHADOW_HUNTER_MOVES.normals[AttackStyle.forwardSmash]!;
+  const contact = move.startupFrames, total = move.totalFrames;
+  const coil: Gesture = { lean: -14, chest: -26, chestTurn: -40, head: 22, pelvis: -8, arm: -210, elbow: 40, wrist: -20, free: 25, freeElbow: 40, beard: 12,
+    frontHip: -14, frontKnee: 12, backHip: 26, backKnee: 42, drop: -10, lunge: -22 };
+  const strike = (arm: number, drop: number, lunge: number, lean: number): Gesture => ({ lean, chest: 12, chestTurn: 22, head: -12, pelvis: 8, arm, elbow: 0, wrist: 10,
+    free: 30, freeElbow: 30, beard: -20, frontHip: -72, frontKnee: 72, backHip: 46, backKnee: 14, drop, lunge });
+  return { pose: "forwardSmash", style: AttackStyle.forwardSmash, ground: "cloth", phases: [
+    { frame: 0, gesture: READY },
+    { frame: 5, gesture: { ...coil, lean: -5, chest: -8, chestTurn: -12, frontHip: -6, frontKnee: 6, backHip: 10, backKnee: 16, lunge: -8, drop: -4 }, tip: [-20, 175] },
+    { frame: contact - 7, gesture: coil, tip: [-115, 175] },
+    { frame: contact - 1, gesture: { ...coil, chest: -32, chestTurn: -46, lean: -16, lunge: -24 }, tip: [-125, 160] },
+    { frame: contact, gesture: strike(-150, -24, 34, 20), tip: [150, 100] },
+    { frame: contact + 1, gesture: strike(-110, -28, 38, 24), tip: [160, 50] },
+    { frame: contact + 2, gesture: strike(-80, -30, 40, 26), tip: [155, 14] },
+    { frame: contact + 6, gesture: strike(-75, -30, 40, 26), tip: [150, 12] },
+    { frame: contact + 16, gesture: { ...strike(-72, -24, 34, 20) }, tip: [140, 22] },
+    { frame: contact + 26, gesture: { ...strike(-60, -12, 18, 10), frontHip: -36, frontKnee: 34, backHip: 22, backKnee: 12, chestTurn: 10 }, tip: [110, 55] },
+    { frame: total - 3, gesture: { chest: 4, arm: -40, elbow: 20, frontHip: -6, frontKnee: 6, backHip: 6, backKnee: 6, drop: -2, lunge: 3 } },
+    { frame: total, gesture: READY },
+  ] };
+}
+function downSmash(): Authored {
+  const move = SHADOW_HUNTER_MOVES.normals[AttackStyle.downSmash]!;
+  const contact = move.startupFrames, total = move.totalFrames;
+  const squat: Gesture = { lean: 12, chest: 12, head: -16, beard: -12, pelvis: 0, arm: -60, elbow: 20, wrist: 0, free: 20, freeElbow: 30,
+    frontHip: -48, frontKnee: 70, backHip: 34, backKnee: 70, drop: -30, lunge: 0 };
+  return { pose: "downSmash", style: AttackStyle.downSmash, ground: "cloth", phases: [
+    { frame: 0, gesture: READY },
+    { frame: 6, gesture: { ...squat, chestTurn: -20, drop: -24 }, tip: [-90, 70] },
+    { frame: contact - 2, gesture: { ...squat, chestTurn: -36, lean: 8, drop: -32 }, tip: [-115, 60] },
+    { frame: contact, gesture: { ...squat, chestTurn: 26, lean: 18 }, tip: [110, 20] },
+    { frame: contact + 1, gesture: { ...squat, chestTurn: 32, lean: 20 }, tip: [125, 12] },
+    { frame: contact + 2, gesture: { ...squat, chestTurn: 10, lean: 14 }, tip: [125, 12] },
+    { frame: contact + 3, gesture: { ...squat, chestTurn: -26, lean: 10 }, tip: [-110, 20] },
+    { frame: contact + 4, gesture: { ...squat, chestTurn: -32, lean: 8 }, tip: [-125, 12] },
+    { frame: contact + 10, gesture: { ...squat, chestTurn: -28, lean: 8, drop: -28 }, tip: [-115, 18] },
+    { frame: contact + 17, gesture: { lean: -4, chest: -8, head: 4, arm: -150, elbow: 30, free: 15, freeElbow: 30, drop: -6, frontHip: -14, frontKnee: 16, backHip: 10, backKnee: 16 }, tip: [-10, 170] },
+    { frame: total - 4, gesture: { drop: -3, frontHip: -6, frontKnee: 6, backHip: 4, backKnee: 6, arm: -40 } },
+    { frame: total, gesture: READY },
+  ] };
+}
+
 const hang = (action: Authored, drape = false): Authored => ({ ...action, phases: action.phases.map(phase => {
   const g = phase.gesture, cloth = g.cloth ?? 0.8 * Math.min(g.frontHip ?? 0, g.backHip ?? 0);
   return { ...phase, gesture: { ...g, beard: g.beard ?? Math.min(90, 3.5 * Math.max(0, (g.lean ?? 0) + (g.chest ?? 0) + (g.head ?? 0))), ...drape ? { cloth, clothTip: g.clothTip ?? 0.3 * cloth } : {} } };
@@ -90,7 +133,7 @@ const draped = (make: () => Authored) => () => hang(make(), true);
 const kicked = (make: () => Authored) => () => hang({ ...make(), ground: "sole" });
 
 const POSES: Readonly<Record<string, () => Authored>> = {
-  neutralSpecial, jump, doubleJump,
+  neutralSpecial, jump, doubleJump, forwardSmash, downSmash,
 };
 
 function rotation(base: ArrayLike<number>, pitch: number, yaw = 0, roll = 0): Float32Array {
