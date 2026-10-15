@@ -1,7 +1,11 @@
 import { expect, test } from "bun:test";
 import { parseMDL, type model as mdx } from "wisp/vendor/war3-model.mjs";
 import { createHash } from "node:crypto";
-import { effectVisibility, simultaneousPositive, effectUses, effectSourceDigest } from "../scripts/wisp/effectVisibility";
+import { appendFileSync, cpSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { effectVisibility, simultaneousPositive, effectUses, effectSourceDigest, effectPlaybackInputs, EFFECT_RECORD_INPUTS } from "../scripts/wisp/effectVisibility";
+import { IMPORTED_MODEL_FILES } from "../src/game/assets/importedModelInfo";
 
 import { formatEffectRecord, effectRecordProblem, effectRecordUnknowns } from "../scripts/wisp/cueModels";
 
@@ -84,6 +88,41 @@ test("re-recording one model's changed Classic inputs rewrites only its row and 
   const after = formatEffectRecord({ source, cacheInfo, models: new Map([...models, [lone, "d".repeat(64)]]), findings }).split("\n");
   expect(before.length).toBe(uses.length + 2);
   expect(after.length).toBe(before.length);
-  expect(before.flatMap((line, index) => line === after[index] ? [] : [line.split("\t")[0]])).toEqual(["classic-source", "classic-use"]);
+  expect(before.flatMap((line, index) => line === after[index] ? [] : [line.split("\t")[0]])).toEqual(["classic-use"]);
   expect(effectRecordProblem(after.join("\n"))).toBeUndefined();
+});
+
+test("unrelated main changes keep a Classic effect record valid while effect input changes refuse it [k1 scenario]", () => {
+  const repo = join(import.meta.dir, "../.."), root = mkdtempSync(join(tmpdir(), "classic-record-"));
+  try {
+    const previous = effectPlaybackInputs(repo);
+    for (const path of new Set([...previous, ...EFFECT_RECORD_INPUTS])) cpSync(join(repo, path), join(root, path), { recursive: true });
+    const uses = effectUses(), source = effectSourceDigest(root), cacheInfo = "a".repeat(64);
+    expect(source).toBe(effectSourceDigest(repo));
+    const models = new Map(uses.map(({ model }) => [model, createHash("sha256").update(model).digest("hex")]));
+    const findings = uses.map((use) => ({ ...use, status: "visible" as const, reason: "MODEL-DATA" }));
+    const text = formatEffectRecord({ source, cacheInfo, models, findings });
+    const unrelated = previous.filter((path) => !path.endsWith("/") && !EFFECT_RECORD_INPUTS.includes(path));
+    expect(unrelated).toContain("ts/src/platform/shell/view.ts");
+    for (const path of unrelated) appendFileSync(join(root, path), "\nexport const unrelatedMainChange = 1;\n");
+    for (const family of ["hero-models", "impact-assets", "stage-assets", "original-clips-static-lights"]) writeFileSync(join(root, "build-inputs", family), "f".repeat(64));
+    expect(effectRecordProblem(text, root)).toBeUndefined();
+    for (const path of EFFECT_RECORD_INPUTS) {
+      const original = join(repo, path), copy = join(root, path);
+      appendFileSync(copy, "\n");
+      expect(effectRecordProblem(text, root)).toBeDefined();
+      cpSync(original, copy);
+    }
+    expect(effectRecordProblem(text, root)).toBeUndefined();
+    const changed = uses.findIndex((use) => uses.filter(({ model }) => model === use.model).length === 1);
+    const stale = formatEffectRecord({ source, cacheInfo, models, findings: findings.map((entry, index) => index === changed ? { ...entry, seconds: entry.seconds + 1 } : entry) });
+    expect(effectRecordProblem(stale, root)).toContain(`${uses[changed]?.fighter}/${uses[changed]?.move}`);
+    const otherRecording = formatEffectRecord({ source: "b".repeat(64), cacheInfo, models, findings }).split("\n").filter((line) => line.startsWith("classic-use\t"));
+    const merged = text.split("\n").map((line, index) => index === 1 ? otherRecording[0] ?? line : line).join("\n");
+    expect(effectRecordProblem(merged, root)).toBeDefined();
+    expect(uses.filter(({ model }) => /^war3mapImported[\\/]/i.test(model) && !/-[0-9a-f]{64}\.mdx$/i.test(model)).map(({ model }) => model).filter((model) => !IMPORTED_MODEL_FILES.some(({ entry }) => entry === model))).toEqual([]);
+    expect(EFFECT_RECORD_INPUTS.every((path) => previous.includes(path) || previous.some((input) => input.endsWith("/") && path.startsWith(input)))).toBe(true);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });

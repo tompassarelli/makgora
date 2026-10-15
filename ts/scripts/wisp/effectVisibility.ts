@@ -21,7 +21,6 @@ import { impactModel, impactAnimation, impactStartSeconds } from "../../src/game
 import { IMPACT_KIND_COUNT } from "../../src/game/presentation/impactState";
 import { STOCK_MODELS } from "../../src/game/render/effects";
 import { IMPACT_DUST_MODEL, IMPACT_ROLL_MODEL, IMPACT_TECH_MODEL, IMPACT_DEFILE_MODEL } from "../../src/game/assets/impactAssetInfo";
-import { readPins } from "./buildInputs";
 import { headlessRender } from "./headlessRender";
 
 /** How one move shows one model in Classic: the sequence and seek it plays, its time scale, and whether its anchor travels. */
@@ -308,9 +307,10 @@ export function effectPlaybackInputs(root = join(import.meta.dir, "../../..")): 
   return [...seen].sort();
 }
 export const effectUseDigest = (use: EffectUse) => createHash("sha256").update(JSON.stringify(use)).digest("hex");
+export const EFFECT_RECORD_INPUTS = ["ts/scripts/wisp/effectVisibility.ts", "ts/src/game/presentation/projectilePose.ts", "ts/src/game/render/specialCueEffects.ts", "ts/src/game/render/projectilePresentation.ts", "ts/src/game/render/hitAreaEffects.ts", "ts/src/game/render/specialEffects.ts", "ts/src/game/render/combatEffects.ts", "ts/src/game/render/placedObjectEffects.ts", "ts/src/game/render/summonPresentation.ts", "ts/wisp.lock", "ts/bun.lock", "ts/package.json", "typescript-toolchain.lock", "build-inputs/imported-models"];
 export function effectSourceDigest(root = join(import.meta.dir, "../../..")): string {
-  const hash = createHash("sha256").update(JSON.stringify(effectUses()));
-  for (const path of effectPlaybackInputs(root)) if (existsSync(join(root, path))) hash.update(path).update(path.endsWith("/") ? JSON.stringify(readPins(join(root, path))) : readFileSync(join(root, path)));
+  const hash = createHash("sha256");
+  for (const path of EFFECT_RECORD_INPUTS) if (existsSync(join(root, path))) hash.update(path).update(readFileSync(join(root, path)));
   return hash.digest("hex");
 }
 

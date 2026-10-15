@@ -47,18 +47,19 @@ export function touchesCueInputs(paths: readonly string[], inputs: ReadonlySet<s
 
 
 const effectRows = (text: string): string[] => text.split("\n").filter((line) => line.startsWith("classic-use\t"));
-const rowsDigest = (rows: readonly string[]): string => createHash("sha256").update(rows.join("\n")).digest("hex");
+const rowDigest = (source: string, cacheInfo: string, row: string): string => createHash("sha256").update(`${source}\t${cacheInfo}\t${row}`).digest("hex");
 
 export function formatEffectRecord(report: { readonly source: string; readonly cacheInfo: string; readonly models: ReadonlyMap<string, string>; readonly findings: readonly EffectFinding[] }): string {
   const rows = report.findings.map(({ status, reason, ...use }) => `classic-use\t${effectUseDigest(use)}\t${status}\t${report.models.get(use.model) ?? "unread"}\t${reason.replace(/[\t\r\n]/g, " ")}`).sort();
-  return `classic-source\t${report.source}\t${report.cacheInfo}\t${rowsDigest(rows)}\n` + rows.map((row) => `${row}\n`).join("");
+  return `classic-source\t${report.source}\t${report.cacheInfo}\n` + rows.map((row) => `${row}\t${rowDigest(report.source, report.cacheInfo, row)}\n`).join("");
 }
 
-export function effectRecordProblem(text: string): string | undefined {
+export function effectRecordProblem(text: string, root?: string): string | undefined {
   const header = text.split("\n").find((line) => line.startsWith("classic-source\t"))?.split("\t");
   const digest = /^[0-9a-f]{64}$/;
-  if (header?.[1] !== effectSourceDigest() || !digest.test(header[2] ?? "")) return `Classic effect record is missing or stale; record one exact24268 cache with ${RECORD_COMMAND}`;
-  if (header[3] !== rowsDigest(effectRows(text))) return `Classic effect record rows were edited or merged after recording; re-record them with ${RECORD_COMMAND}`;
+  if (header?.[1] !== effectSourceDigest(root) || !digest.test(header[2] ?? "")) return `Classic effect record is missing or stale; record one exact24268 cache with ${RECORD_COMMAND}`;
+  const edited = effectRows(text).filter((line) => { const at = line.lastIndexOf("\t"); return line.slice(at + 1) !== rowDigest(header[1] ?? "", header[2] ?? "", line.slice(0, at)); });
+  if (edited.length > 0) return `Classic effect record has ${edited.length} rows edited by hand or recorded against another source or cache; re-record them with ${RECORD_COMMAND}`;
   const records = new Map<string, EffectVerdict["status"]>();
   for (const line of effectRows(text)) {
     const [, key, status] = line.split("\t");
