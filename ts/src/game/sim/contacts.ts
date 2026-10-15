@@ -16,6 +16,7 @@ import { HitElement, type HitEffect, copyHitEffect, emptyHitEffect } from "./hit
 import {
   applyDirectionalInfluence,
   contactKnockback,
+  damageLevelForKnockback,
   hitContextKnockback,
   installDamageLaunch,
   ordinaryHitlagFrames,
@@ -382,7 +383,7 @@ function resolveDamageContacts(world: Roster, slot: number): void {
   shield.drainResumePending = false;
   const chosen = contactAt(chosenIndex);
 
-  const jabReset = chosen.kind !== ContactKind.throw && chosen.down && totalDamage < DOWN_DAMAGE_RESET_THRESHOLD;
+  const jabReset = chosen.kind !== ContactKind.throw && chosen.down && totalDamage < DOWN_DAMAGE_RESET_THRESHOLD && (winner === undefined || damageLevelForKnockback(strongest) < 3);
   clearGrabLinks(world, slot);
   launch.diPending = false;
   beginSmashDirectionalInfluenceHit(launch);

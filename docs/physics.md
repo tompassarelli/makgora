@@ -1212,6 +1212,34 @@ tuning, not character move data from Melee. The implementation now records
 down-wait remainder and face selection in replay snapshots so jab-reset and
 recovery frames restore with the same future outcome.
 
+## Floor bounces
+
+Melee is the design target here, from public sources only:
+
+- A tumble-strength downward hit on a grounded target bounces it off the floor
+  with 20% less knockback ([SmashWiki, Meteor smash](https://www.ssbwiki.com/Meteor_smash)).
+  Smashcraft reflects the vertical launch upward at 0.800000011920929 when the
+  hit points more than 0.1745329201221466 radians below the floor (see
+  "Verified retail combat parameters"); at high percent this carries the
+  target off the top blast zone.
+- Meteor smashes on grounded targets cannot be teched up to Brawl
+  ([SmashWiki, Tech](https://www.ssbwiki.com/Tech)), so the bounce happens
+  at contact and a held tech does not stop it. The later landing techs as usual.
+- Before Smash 4 a midair target driven into the floor gets no bounce and stops
+  its fall, so it can tech ([SmashWiki, Meteor smash](https://www.ssbwiki.com/Meteor_smash)).
+  The floor rebound that lets a missed tech fly back up is a Smash 4 change
+  ([SmashWiki, Floor](https://www.ssbwiki.com/Floor)). Smashcraft keeps
+  Melee's rule: an airborne tumbling fighter that reaches the floor techs or
+  enters the bound, and only walls and ceilings reflect it.
+
+A reset also needs knockback below tumble, under 80 units
+([SmashWiki, Lock](https://www.ssbwiki.com/Lock)). A weak hit with tumble
+knockback on a bound or lying fighter launches it. A reset hit with 13 or more
+frames of hitstun is a half-reset: after the 13-frame reaction, the remaining
+hitstun runs as a down wait with get-up options, then the forced stand.
+
+smashcraft:ts/src/game/sim/knockdownBounce.tests.ts checks these rules.
+
 ## Directional influence
 
 Melee reads the control stick on the last hitlag frame. A direction perpendicular
