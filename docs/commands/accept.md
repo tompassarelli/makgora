@@ -13,6 +13,16 @@
   once, one process per pair, with each map built once; the merged report and
   each `shard-K/` are under the run's evidence folder. Declare
   a new native box there, next to the issue it closes, instead of a hand procedure.
+  Move smoke (dev#467): `bun wisp accept --only gate-moves --pair K --map CANDIDATE.w3x`
+  turns on Training on the candidate, then plays every fighter pair from
+  fighter select: each standard keyboard key once, every normal, aerial and
+  special after a training reset, and the ultimate after both fighters charge
+  their mana. Each match ends from the pause menu, and its own replay is judged
+  headless (smashcraft:ts/scripts/wisp/smokeJudge.ts): the replay must reach
+  every recorded checksum, every key must reach the game and every move must
+  start, or `gate-moves` fails and the green install keeps the last good map.
+  `bun wisp smoke` rehearses the same tapes headless on every pair in about ten
+  seconds; run it after changing a fighter's inputs or kit.
   `--map MAP.w3x` uses that already-built candidate for the selected checks
   without rebuilding it; select checks needing the same build profile. Each
   shard receives the same immutable map. Use revision-specific private paths.

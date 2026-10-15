@@ -36,6 +36,7 @@ import { preferencesPath, videoSettings } from "wisp/scripts/warcraft/preference
 import { measureCursorGate } from "../gateCursor";
 import { measureStartGate } from "../gateStart";
 import { measureBindingsGate } from "../gateBindings";
+import { measureMovesGate } from "../gateMoves";
 
 const ReportMetadata = Schema.fromJsonString(Schema.Record(Schema.String, Schema.Unknown));
 
@@ -288,6 +289,8 @@ export const accept: Command = (rawArgs) => Effect.gen(function*() {
       chat: (name, text) => text === "gate:cursor" ? measureCursorGate(selectedClients, name, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), "gate-cursor-visible", name)).pipe(
         Effect.tap(receipt => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipt]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
       ) : text === "gate:start" ? measureStartGate(selectedClients, name, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), "gate-start-anywhere", name), controlled.start("gate-playable", "gate-start")).pipe(
+        Effect.tap(receipt => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipt]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
+      ) : text === "gate:moves" ? measureMovesGate(selectedClients, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), "gate-moves", name)).pipe(
         Effect.tap(receipt => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipt]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
       ) : text === "gate:bindings" ? measureBindingsGate(selectedClients, name, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), "gate-bindings", name), pair?.appIds ?? new Map()).pipe(
         Effect.tap(receipt => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipt]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),

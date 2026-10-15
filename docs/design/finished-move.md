@@ -17,5 +17,6 @@ Every move and every Tom-facing build meets this bar whether or not its issue sa
 | 8 | The cursor is visible on every frame of every menu, through pin pick, drop and sweep. | Native C1 |
 | 9 | Pad Start starts the match from any cursor position. | Native C2 |
 | 10 | Every binding in the pad contract (controller/) works, with LT and RT both shielding. | Rust property B; native C3 |
+| 11 | Every standard keyboard key reaches the game, and every move of every fighter, the ultimate included, starts from its keys. | Headless `bun wisp smoke`; native gate-moves (dev#467) |
 
 Tom's playtest checklist holds only feel, balance and legibility questions. Anything above that reaches Tom is a gate failure, and the gate gets the missing check before the fix lands.

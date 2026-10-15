@@ -25,6 +25,7 @@ const COMMANDS: Record<string, { readonly usage: string; readonly load: () => Pr
   oracle: { usage: "oracle", load: async () => (await import("./wisp/commands/oracle")).oracle },
   agency: { usage: "agency [--attacker Illidan|Rifleman|Illidan]... [--out FILE]", load: async () => (await import("./wisp/commands/agency")).agency },
   interactions: { usage: "interactions [--check | --move FIGHTER:MOVE]", load: async () => (await import("./wisp/commands/interactions")).interactions },
+  smoke: { usage: "smoke   (the native move smoke rig rehearsed headless on every fighter pair: every key reaches the game and every move starts; scripts/wisp/smokeTape.ts)", load: async () => (await import("./wisp/commands/smoke")).smoke },
   envelope: { usage: "envelope [--ranges] [--json] [--top N]   (advisory: every move of the 26 fighters outside its genre frame-data class envelope, ranked by distance: docs/move-data.md, \"Genre envelope\")", load: async () => (await import("./wisp/commands/envelope")).envelope },
   strengths: { usage: "strengths FIELD.json   (per-fighter KO direction, KO percent, edge-guard and spacing profile against tools/move-data/fighter-strengths.json)", load: async () => (await import("./wisp/commands/strengths")).strengths },
   combos: { usage: "combos [--fighter NAME]... [--jobs N] [--advantage]", load: async () => (await import("./wisp/commands/combos")).combos },

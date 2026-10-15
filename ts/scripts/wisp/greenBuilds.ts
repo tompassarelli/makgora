@@ -87,7 +87,7 @@ export function pruneTargets(present: readonly string[], keep: string): string[]
 }
 
 export const GREEN_GATE_CHECKS = [
-  "gate-cursor-visible", "gate-start-anywhere", "gate-bindings", "gate-specials-spot",
+  "gate-cursor-visible", "gate-start-anywhere", "gate-bindings", "gate-moves", "gate-specials-spot",
 ] as const;
 export const GREEN_GATE_LOOKS = ["classic"] as const;
 

@@ -7,7 +7,7 @@ import { join } from "node:path";
 import type { AcceptSuite, NativeCheck, Rule } from "wisp/scripts/wisp/accept";
 import { QUICK_CPU_COMMAND, QUICK_HERO_COMMAND, QUICK_TRAINING_COMMAND } from "../../src/game/session/devSettings";
 import { HIT_PRESENTATION_CASES } from "../../src/game/session/hitPresentationCases";
-import { HERO_ROSTER } from "../../src/game/sim/heroes/registry";
+import { HERO_ROSTER, PLAYABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { FLOATING_STAGE_CHECKS, FLOATING_STAGE_MAPS, STAGE_COMPOSITION_CHECKS, STAGE_COMPOSITION_MAPS, STAGE_ENTRY_CHECKS, STAGE_ENTRY_MAPS, STAGE_FOG_CHECKS } from "./stageCompositionChecks";
 
@@ -181,6 +181,11 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
       id: "gate-bindings", closes: "T7 C3", map: "gate-playable", session: "gate-bindings",
       setup: [{ chat: "gate:bindings", client: "a" }],
       pass: [NO_ERRORS, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE bindings labels=\\d+ samples=(\\d+) passed=\\1 pass=1 remaps=none$", min: 1 }],
+    },
+    {
+      id: "gate-moves", closes: "smashcraft-dev#467", map: "gate-playable", session: "gate-moves",
+      setup: [{ chat: "gate:moves", client: "a" }],
+      pass: [NO_ERRORS, { kind: "receipt", client: "a", pattern: `^SMASHCRAFT GATE moves fighters=${PLAYABLE_CHARACTERS.length} moves=(\\d+) started=\\1 keys=(\\d+) live=\\2 replayed=1 pass=1$`, min: 1 }],
     },
     {
       id: "123-selection", closes: "smashcraft#123 box 5", map: "presentation", session: "123-match-flow",

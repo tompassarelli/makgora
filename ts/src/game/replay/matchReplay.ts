@@ -684,7 +684,9 @@ export interface MatchReplayResult extends ReproResult {
 }
 
 
-export function replayMatch(lines: readonly string[]): MatchReplayResult {
+export type ReplayObserver = (state: Readonly<ReplayState>, frame: number, rows: Readonly<FrameRows>) => void;
+
+export function replayMatch(lines: readonly string[], observe?: ReplayObserver): MatchReplayResult {
   const replay = parseReplay(lines);
   if (typeof replay === "string") return { checksum: "", frames: 0, problems: [replay], reached: 0, recorded: 0, digests: 0, divergent: 0 };
   const problems: string[] = [];
@@ -712,6 +714,7 @@ export function replayMatch(lines: readonly string[]): MatchReplayResult {
         return { checksum: checksumVia(checksums, state), frames, problems, reached, recorded, digests, divergent };
       }
       frames++;
+      observe?.(state, frame, at(segment.frames, index));
       const digest = segment.digests[index];
       if (digest !== undefined) {
         digests++;

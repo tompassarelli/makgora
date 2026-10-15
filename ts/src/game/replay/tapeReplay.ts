@@ -16,6 +16,7 @@ import {
 } from "./matchReplay";
 import { beginMomentFrame, createMomentRecorder, keepMomentEnd, momentFrameRan, recordMomentRow } from "./moment";
 import { copyReplayState, createReplaySnapshot } from "./snapshot";
+import type { Fighter } from "../sim/fighter";
 import { createTapeWorld } from "./tapeWorld";
 
 export const TAPE_REPLAY_SERIAL = 7;
@@ -43,8 +44,16 @@ const must = (ok: boolean, what: string) => {
 };
 
 
-export function recordTapeReplay(frames: number, pauseAt: number): TapeReplay {
-  const tape = createTapeWorld({ stocks: 3, humans: 2 });
+export interface TapeScript {
+  readonly rowAt: (slot: number, frame: number) => InputRow;
+  readonly first?: Fighter;
+  readonly second?: Fighter;
+  readonly training?: boolean;
+}
+
+export function recordTapeReplay(frames: number, pauseAt: number, script: TapeScript = { rowAt: scriptedRow }): TapeReplay {
+  const tape = createTapeWorld({ stocks: 3, humans: 2, ...(script.first === undefined ? {} : { first: script.first }), ...(script.second === undefined ? {} : { second: script.second }) });
+  tape.live.match.training = script.training ?? false;
   const { world, match, controls, runtime } = tape.live;
   const moment = createMomentRecorder();
   const recorder = createMatchReplayRecorder();
@@ -64,7 +73,7 @@ export function recordTapeReplay(frames: number, pauseAt: number): TapeReplay {
       endMatchReplaySegment(recorder, moment, world, match, controls, runtime);
       for (const slot of PARTICIPANT_SLOTS) clearAttackBuffer(controls.commands[slot]);
     }
-    for (const slot of PARTICIPANT_SLOTS) rows[slot] = scriptedRow(slot, frame);
+    for (const slot of PARTICIPANT_SLOTS) rows[slot] = script.rowAt(slot, frame);
     must(captureNetworkFrame(frameInput, frame, rows, world, match.humanMask), `frame ${frame} captured`);
     if (beginMatchReplayFrame(recorder, moment, frame, { kind: "network" }, world, match, controls, runtime) !== ReplayBegin.none) segments++;
     beginMomentFrame(moment, frame, world, match, controls, runtime);
