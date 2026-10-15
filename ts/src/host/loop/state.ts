@@ -35,6 +35,7 @@ import { type MatchReplayRecorder, createMatchReplayRecorder } from "../../game/
 import { type ReplayState, createReplaySnapshot } from "../../game/replay/snapshot";
 import { type JournalIngress, type MapBuild, type ShadowInputMode, isShadow } from "../../game/session/build";
 import type { DevSettings } from "../../game/session/devSettings";
+import { type ShowcasePads, createShowcasePads } from "../../game/session/showcase";
 import type { MenuPhase } from "../../game/session/journalFiles";
 import { type PauseBarrier, pauseBarrier } from "../../game/session/pauseBarrier";
 import type { RollbackPlayback, SpeculativeMatch } from "../../game/session/playback";
@@ -298,6 +299,8 @@ export interface ShellState {
   viewExtreme: CameraExtreme | undefined;
 
   readonly hiddenFighters: Slots<HiddenFighter | undefined>;
+  readonly showcase: ShowcasePads;
+  readonly showcaseMarkers: effect[];
 
   ui: UiObjects | undefined;
   readonly sounds: ModelSoundCursor;
@@ -405,7 +408,7 @@ export function createShellState(build: MapBuild, setup: ShellSetup): ShellState
     produced: createFrameControls(), runtime: createPacingAndPresentation(), sessionWins: createSessionWins(), session: createMatchControls(),
     frameInput: createMatchFrameInput(),
     participants: [participant(0, persistence), participant(1, persistence), participant(2, persistence), participant(3, persistence)],
-    status: { text: "", seconds: 0.0 }, frames: setup.frames, stageDecks: [], stageDeckParts: [], drawnStage: 0, stageCannon: undefined, stageLava: undefined, stageWind: [], stageScenery: undefined, shadowLightsRaised: false, viewExtreme: undefined, hiddenFighters: [undefined, undefined, undefined, undefined], ui: undefined,
+    status: { text: "", seconds: 0.0 }, frames: setup.frames, stageDecks: [], stageDeckParts: [], drawnStage: 0, stageCannon: undefined, stageLava: undefined, stageWind: [], stageScenery: undefined, shadowLightsRaised: false, viewExtreme: undefined, hiddenFighters: [undefined, undefined, undefined, undefined], showcase: createShowcasePads(), showcaseMarkers: [], ui: undefined,
     sounds: createModelSoundCursor(ORIGINAL_MODEL_SOUNDS),
     dev: { rollback: isShadow(input) ? input.rollback : 6, delay: isShadow(input) ? input.delay : 3, batch: DEFAULT_BATCH, rematchSeconds: REMATCH_COUNTDOWN_SECONDS }, devReceipts: 0,
     trace: inputTrace(build.responseProbe || build.inputProfile === "native-driver" ? 2048 : 256),

@@ -35,6 +35,8 @@ import { chatBusy, requestPause } from "./journalPause";
 import { Key, syncKeyEvents } from "./keyEvents";
 import { startBodyFit } from "./bodyFit";
 import { startAgencyFixture } from "./agencyFixture";
+import { applyShowcaseCommand } from "./showcase";
+import { showcaseRequest } from "../../game/session/showcase";
 import { clearVisualCapture, configureVisualCapture } from "../../game/session/visualCapture";
 import { back, choose, confirm, openSettingsScreen, resetToStartingSelection, startDevClassic, startDevLore, startQuickMatch } from "./menus";
 import { LORE_BATTLES } from "../../game/classic/loreBattles";
@@ -311,6 +313,7 @@ export function applyDeveloperCommand(s: ShellState, actor: number, original: st
   const painHero = quickPainHero(message);
   const quickCpu = quickMatchCpuProfile(message);
   const fighterHide = fighterHideCommand(message);
+  const showcase = showcaseRequest(message);
 
   const setup = applySetupCommand(s.game, actor, message);
   if (setup === `dev: stage ${s.game.stageChoice}` && s.game.phase === Phase.characterMenu) s.dev.stageChoice = s.game.stageChoice;
@@ -318,6 +321,8 @@ export function applyDeveloperCommand(s: ShellState, actor: number, original: st
   const lore = loreDevRequest(message, LORE_BATTLES.length);
   if (message === "-dev soak") {
     receipt = startNativeSoak(s) ? "dev: native soak four CPUs" : "dev: native soak requires an integrity map at selection";
+  } else if (showcase !== undefined) {
+    receipt = applyShowcaseCommand(s, showcase, () => applyDeveloperCommand(s, actor, RESET_COMMAND));
   } else if (message === LORE_WIN_COMMAND) {
     if (!winLoreBattle(s.game, s.world)) return;
     receipt = "dev: lore win";
