@@ -1,12 +1,25 @@
 import { expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { Schema } from "effect";
-import { CONTROLLER_CONTRACT_PATH, controllerContractText } from "../codegen/controllerContract";
+import { CONTROLLER_CONTRACT_PATH, controllerContractText, padLayoutProducers } from "../codegen/controllerContract";
 import { Action } from "../src/game/input/actions";
 import { actionFor, decodeBindings, presetBindings, slotIndex } from "../src/game/input/keyBindings";
+import { PAD_LAYOUTS, PAD_SETTINGS, type PadSetting } from "../src/game/input/padLayouts";
 
 const Rows = Schema.Array(Schema.Struct({ key: Schema.String, action: Schema.String, label: Schema.String }));
 const contract = Schema.decodeUnknownSync(Schema.Struct({ actions: Schema.Array(Schema.Struct({ name: Schema.String, bit: Schema.Number })) }))(JSON.parse(readFileSync(CONTROLLER_CONTRACT_PATH, "utf8")));
+const Layout = Schema.Struct({
+  name: Schema.String,
+  bindings: Schema.Array(Schema.Struct({
+    control: Schema.String,
+    press: Schema.String,
+    action: Schema.String,
+    when: Schema.optional(Schema.Struct({ setting: Schema.String, value: Schema.String })),
+  })),
+});
+const layouts = padLayoutProducers.map(({ path }) => Schema.decodeUnknownSync(Layout)(JSON.parse(readFileSync(path, "utf8"))));
+const settingChoices = (Object.entries(PAD_SETTINGS) as [PadSetting, readonly string[]][]).reduce<Record<string, string>[]>(
+  (choices, [setting, values]) => choices.flatMap((choice) => values.map((value) => ({ ...choice, [setting]: value }))), [{}]);
 const shield: readonly Action[] = [Action.leftTrigger, Action.rightTrigger];
 const actionsOf = (name: string): readonly number[] | undefined => {
   if (name === "shield") return shield;
@@ -53,4 +66,31 @@ test("upstream pad keys reach labelled actions in defaults and sanitized K1 upgr
     }
   }
   expect([...failures]).toEqual([]);
+});
+
+test("contracts/layouts/*.json are the pad layouts the TS sources produce [k5 boundary pad-layouts]", () => {
+  expect(padLayoutProducers.map(({ path }) => path.split("/").at(-1))).toEqual(PAD_LAYOUTS.map(({ name }) => `${name}.json`));
+  for (const { path, render } of padLayoutProducers) expect(JSON.parse(readFileSync(path, "utf8"))).toEqual(JSON.parse(render()));
+});
+
+test("every pad layout reaches each action melee binds and gives a control one action per setting [k2 property]", () => {
+  const melee = layouts.find((layout) => layout.name === "melee");
+  if (melee === undefined) throw new Error("no melee layout");
+  const reached = (layout: typeof melee) => new Set(layout.bindings.map((binding) => binding.action));
+  const failures: string[] = [];
+  for (const layout of layouts) {
+    const actions = reached(layout);
+    for (const action of reached(melee)) if (!actions.has(action)) failures.push(`${layout.name} never reaches ${action}`);
+    for (const choice of settingChoices) {
+      const bound = new Map<string, string>();
+      for (const binding of layout.bindings) {
+        if (binding.when !== undefined && choice[binding.when.setting] !== binding.when.value) continue;
+        const input = `${binding.control} ${binding.press}`;
+        const other = bound.get(input);
+        if (other !== undefined && other !== binding.action) failures.push(`${layout.name} ${JSON.stringify(choice)}: ${input} is ${other} and ${binding.action}`);
+        bound.set(input, binding.action);
+      }
+    }
+  }
+  expect(failures).toEqual([]);
 });
