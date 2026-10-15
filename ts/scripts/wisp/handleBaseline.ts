@@ -48,6 +48,8 @@ export interface HandleBaseline {
   readonly cold: readonly HandleCounts[];
   /** Each client's counts back at fighter selection after each match. */
   readonly afterMatches: readonly (readonly HandleCounts[])[];
+  /** Frames the lockstep stepped from its start to the last count. */
+  readonly frames: number;
 }
 
 const countOf = (counts: HandleCounts | undefined, kind: string) => (counts ?? []).find(([name]) => name === kind)?.[1] ?? 0;
@@ -140,5 +142,5 @@ export function playHandleBaseline(clients: Lockstep, functions: readonly (reado
       if (census !== undefined) compact(client, census.takeReleased());
     });
   }
-  return { cold, afterMatches };
+  return { cold, afterMatches, frames: clients.frame };
 }
