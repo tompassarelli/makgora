@@ -255,6 +255,9 @@ interface Special {
   aimX: number;
   aimZ: number;
 
+  beamX: number;
+  beamZ: number;
+
   airtimeUses: number;
 
   grabFrame: number;
@@ -711,6 +714,8 @@ export function createFighter(character: Character, startX: number, facing: numb
       form: 0,
       aimX: 0,
       aimZ: 0,
+      beamX: 0.0,
+      beamZ: 0.0,
       airtimeUses: 0,
       grabFrame: 0,
       seekTarget: 0,

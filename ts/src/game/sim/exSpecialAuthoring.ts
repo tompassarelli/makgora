@@ -58,6 +58,7 @@ export function withExKit(kit: SpecialKit, upgrade: ExUpgrade): SpecialKit {
         relocateReach: motion.relocateReach === undefined ? undefined : f32(motion.relocateReach * travel),
       })),
       projectiles: move.projectiles?.map((each) => projectile(each)),
+      beam: move.beam === undefined ? undefined : { ...move.beam, range: f32(move.beam.range * reach) },
       burst: move.burst === undefined ? undefined : { ...move.burst, from: projectile(move.burst.from), into: projectile(move.burst.into) },
       armor: move.armor === undefined ? undefined : { ...move.armor, maxDamage: f32(move.armor.maxDamage * (upgrade.armorDamage ?? 1.0)) },
       intangible: move.intangible === undefined ? (protection > 0 ? { first: 1, last: protection } : undefined)

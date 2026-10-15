@@ -171,6 +171,13 @@ export interface SpecialProjectile {
   readonly trail?: { readonly every: number } | undefined;
 }
 
+export interface SpecialBeam {
+  readonly originX: number;
+  readonly originZ: number;
+  readonly range: number;
+  readonly track: number;
+}
+
 export interface SpecialArmor extends FrameWindow {
 
   readonly maxDamage: number;
@@ -305,6 +312,7 @@ export interface AuthoredSpecial {
 
   readonly regions?: readonly MoveRegion[] | undefined;
   readonly regionOrigin?: SpecialProjectile | undefined;
+  readonly beam?: SpecialBeam | undefined;
   readonly motion?: readonly SpecialMotion[] | undefined;
   readonly projectiles?: readonly SpecialProjectile[] | undefined;
   readonly intangible?: FrameWindow | undefined;

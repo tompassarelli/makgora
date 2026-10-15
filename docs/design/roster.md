@@ -2033,7 +2033,7 @@ none of the current kits needs a replacement effect. Archer is removed by #339; 
 | Cairne | Large visible body, totem swings and guard read | Timed Endurance speed and stock heal bank |
 | Chen | Heavy staff actions and chosen Earth/Fire/Storm branch | Counted Drunken Brawler |
 | Peon | Tool strikes, chosen building and visible burrow | Pillage meter refund and stock heal bank |
-| Tinker | Claw pack, factory placement and Robo-Goblin branch | Banked Engineering Upgrade |
+| Tinker | Claw pack, factory placement and tracking Laser | Banked Engineering Upgrade |
 | Kael'thas | Sphere gestures and explicit spell choices | Ordinary-hit meter steal |
 | Murloc | Small visible body, quick claws and leap pressure | Ordinary-hit meter steal |
 

@@ -12,7 +12,7 @@ import { AttackStyle, Character, ProjectileKind, SpecialAction } from "./codes";
 import { mutableProjectile } from "./fighterProjectiles";
 import { canAttack, inGrabContext, isIntangible } from "./conditions";
 import { type Fighter, type Projectile, placedObject } from "./fighter";
-import { type FighterSpecials, type AuthoredSpecial, CompanionMode, CompanionOrder, type SpecialFollowUp, type SpecialGuard, type SpecialKit, type SpecialPlacement, type SpecialProjectile, FOLLOW_UP_FORM, FollowUpInput, Relocation, SpecialForm, SpecialSlot, specialForm, specialKit, ultimateForm } from "./heroSpecials";
+import { type FighterSpecials, type AuthoredSpecial, CompanionMode, CompanionOrder, type SpecialFollowUp, type SpecialGuard, type SpecialKit, type SpecialBeam, type SpecialPlacement, type SpecialProjectile, FOLLOW_UP_FORM, FollowUpInput, Relocation, SpecialForm, SpecialSlot, specialForm, specialKit, ultimateForm } from "./heroSpecials";
 import { type HitRegion, NO_HIT_REGION, authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "./hitRegions";
 import { type Controls, type Roster, fighterAt, isActive } from "./roster";
 import { travelBeforeBodies } from "./travelStop";
@@ -20,7 +20,7 @@ import { gainMana } from "./mana";
 import { endDivineShield, refreshAirOnExit } from "./transitions";
 import { capsuleCircleIntersects, shieldSizeMultiplier } from "./shield";
 import { shieldCenterX, shieldCenterZ } from "./shieldTilt";
-import { attackCapsule, emptyCapsule, placeCapsule, segmentBoxesOverlap } from "../physics/contactGeometry";
+import { type Capsule, attackCapsule, emptyCapsule, placeCapsule, segmentBoxesOverlap } from "../physics/contactGeometry";
 import { HurtContact, strikeHurtContact } from "./hurtboxes";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { mainDeckLeft, mainDeckRight, mainDeckZAt, solidSurfaceAt, solidSurfaceCount } from "./stage";
@@ -342,6 +342,87 @@ function seekTargetSlot(world: Roster, owner: Readonly<Fighter>): number {
 }
 
 
+const BEAM_TARGET_HEIGHT = 45.0;
+const beamFoe = { x: 0.0, z: 0.0 };
+
+function findBeamFoe(world: Roster, owner: Readonly<Fighter>, beam: Readonly<SpecialBeam>, originX: number, originZ: number): boolean {
+  const self = world.fighters.indexOf(owner);
+  const reach = f32(beam.range * beam.range);
+  let found = false;
+  let nearest = 0.0;
+  for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
+    if (!isActive(world, slot)) continue;
+    const other = fighterAt(world, slot);
+    if (other === owner || sameTeam(world, self, slot) || other.status.out) continue;
+    const dx = f32(other.motion.x - originX);
+    const z = f32(other.motion.z + BEAM_TARGET_HEIGHT);
+    const dz = f32(z - originZ);
+    if (f32(dx * owner.facing) < 0.0) continue;
+    const squared = f32(f32(dx * dx) + f32(dz * dz));
+    if (squared > reach || (found && squared >= nearest)) continue;
+    found = true;
+    nearest = squared;
+    beamFoe.x = other.motion.x;
+    beamFoe.z = z;
+  }
+  return found;
+}
+
+function trackBeam(f: Fighter, world: Roster, beam: Readonly<SpecialBeam>, frame: number): void {
+  const { motion, special } = f;
+  const originX = f32(motion.x + f32(f.facing * beam.originX));
+  const originZ = f32(motion.z + beam.originZ);
+  const found = findBeamFoe(world, f, beam, originX, originZ);
+  if (frame <= 1) {
+    special.beamX = found ? beamFoe.x : f32(originX + f32(f.facing * beam.range));
+    special.beamZ = found ? beamFoe.z : originZ;
+    return;
+  }
+  if (found) {
+    const dx = f32(beamFoe.x - special.beamX);
+    const dz = f32(beamFoe.z - special.beamZ);
+    const distance = squareRoot(f32(f32(dx * dx) + f32(dz * dz)));
+    if (distance <= beam.track) {
+      special.beamX = beamFoe.x;
+      special.beamZ = beamFoe.z;
+    } else {
+      const scale = f32(beam.track / distance);
+      special.beamX = f32(special.beamX + f32(dx * scale));
+      special.beamZ = f32(special.beamZ + f32(dz * scale));
+    }
+  }
+  if (f32(f32(special.beamX - originX) * f.facing) < 0.0) special.beamX = originX;
+}
+
+
+export function beamSegment(out: Capsule, owner: Readonly<Fighter>, beam: Readonly<SpecialBeam>, radius: number): Capsule {
+  const x1 = f32(owner.motion.x + f32(owner.facing * beam.originX));
+  const z1 = f32(owner.motion.z + beam.originZ);
+  let dx = f32(owner.special.beamX - x1);
+  let dz = f32(owner.special.beamZ - z1);
+  const length = squareRoot(f32(f32(dx * dx) + f32(dz * dz)));
+  if (length <= 0.0) {
+    dx = owner.facing < 0 ? -1.0 : 1.0;
+    dz = 0.0;
+  } else {
+    dx = f32(dx / length);
+    dz = f32(dz / length);
+  }
+  out.x1 = x1;
+  out.z1 = z1;
+  out.x2 = f32(x1 + f32(dx * beam.range));
+  out.z2 = f32(z1 + f32(dz * beam.range));
+  out.radius = radius;
+  return out;
+}
+
+
+export function placeHeroStrike(out: Capsule, owner: Readonly<Fighter>, path: Readonly<Capsule>, originX: number, originZ: number): Capsule {
+  const beam = runningHeroSpecial(owner)?.beam;
+  return beam === undefined ? placeCapsule(out, path, originX, originZ, owner.facing) : beamSegment(out, owner, beam, path.radius);
+}
+
+
 function seeks(move: Readonly<AuthoredSpecial>): boolean {
   for (const segment of move.motion ?? []) if (segment.seek !== undefined) return true;
   return false;
@@ -553,6 +634,7 @@ export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Contr
   if (move.rehits?.includes(frame) === true) for (let entry = 0; entry < PARTICIPANT_CAPACITY; entry++) f.special.hitTargets[entry] = undefined;
   if (move.buff?.frame === frame) applyItemBuffFor(f, move.buff.kind, move.buff.frames);
   if (frame === 1 && world !== undefined && f.special.seekTarget === 0 && seeks(move)) f.special.seekTarget = seekTargetSlot(world, f) + 1;
+  if (move.beam !== undefined && world !== undefined) trackBeam(f, world, move.beam, frame);
   applyMotion(f, move, frame, input, world);
   for (const spec of move.projectiles ?? []) if (spec.spawnFrame === frame) spawnHeroProjectile(f, spec, f.attack.serial + 1, stage, world);
   if (move.placement !== undefined) placeObjects(f, move.placement, frame, stage);
@@ -648,7 +730,7 @@ export function heroStrikeMeetsShield(owner: Readonly<Fighter>, target: Readonly
   const path = region.strike;
   if (!target.shield.raised || path === undefined) return false;
   const origin = heroRegionOrigin(owner);
-  placeCapsule(strike, path, origin.x, origin.z, owner.facing);
+  placeHeroStrike(strike, owner, path, origin.x, origin.z);
   const geometry = target.tuning.shield;
   return capsuleCircleIntersects(strike.x1, strike.z1, strike.x2, strike.z2, strike.radius,
     shieldCenterX(target), shieldCenterZ(target), geometry.radius,
@@ -671,7 +753,7 @@ export function heroSpecialContact(owner: Readonly<Fighter>, target: Readonly<Fi
   for (let index = 0; index < regions.length; index++) {
     const region = at(regions, index);
     if (frame < region.firstFrame || frame > region.lastFrame || region.hit.strike === undefined) continue;
-    placeCapsule(strike, region.hit.strike, origin.x, origin.z, owner.facing);
+    placeHeroStrike(strike, owner, region.hit.strike, origin.x, origin.z);
     const contact = strikeHurtContact(strike, target);
     if (contact === HurtContact.hit || heroStrikeMeetsShield(owner, target, region.hit)) return region.hit;
     if (contact === HurtContact.invincible) return NO_HIT_REGION;
@@ -705,7 +787,7 @@ function threatensBody(attacker: Readonly<Fighter>, target: Readonly<Fighter>): 
   for (const region of special?.regions ?? []) {
     const strike = region.hit.strike;
     if (strike === undefined || attacker.special.frame < region.firstFrame || attacker.special.frame > region.lastFrame || region.hit.effect.damage <= 0) continue;
-    placeCapsule(guardStrike, strike, origin.x, origin.z, attacker.facing);
+    placeHeroStrike(guardStrike, attacker, strike, origin.x, origin.z);
     if (strikeHurtContact(guardStrike, target) !== HurtContact.none) return true;
   }
   for (const projectile of attacker.projectiles) {

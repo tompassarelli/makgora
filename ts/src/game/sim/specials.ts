@@ -856,7 +856,8 @@ export function advanceSpecials(world: Roster, stage: number, matchFrame: number
       const target = fighterAt(world, targetSlot);
       recordSpecialHit(owner, targetSlot);
       const strike = contact.strike;
-      const contactZ = f32(heroRegionOrigin(owner).z + f32(f32((strike?.z1 ?? contact.minZ) + (strike?.z2 ?? contact.maxZ)) * 0.5));
+      const contactZ = runningHeroSpecial(owner)?.beam !== undefined ? owner.special.beamZ
+        : f32(heroRegionOrigin(owner).z + f32(f32((strike?.z1 ?? contact.minZ) + (strike?.z2 ?? contact.maxZ)) * 0.5));
       applyAttackHit(world, ownerSlot, targetSlot, AttackStyle.jab, at(facings, ownerSlot), heroContactEffect(contact, target), true,
         contact.strike === undefined ? meleeHitIntersectsShield(owner, target, contact) : heroStrikeMeetsShield(owner, target, contact), runningHeroSpecial(owner)?.strikeStatus, contactZ);
     }

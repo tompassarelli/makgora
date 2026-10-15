@@ -34,7 +34,7 @@ const SUMMON_SHOT = "a placed summon's shot: the commitment is the placement, th
 const DEPARTURES: Readonly<Record<string, string>> = {
   "Beastmaster down special rule 2": SUMMON_SHOT,
   "Jaina Proudmoore down special rule 2": SUMMON_SHOT,
-  "Goblin Tinker side special rule 2": SUMMON_SHOT,
+  "Goblin Tinker down special rule 2": SUMMON_SHOT,
 };
 
 const FIGHTERS: readonly { readonly character: Character; readonly name: string }[] = [

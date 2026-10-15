@@ -22,7 +22,8 @@ import type { Fighter } from "../sim/fighter";
 import { DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP, DEMONHUNTER_MANA_BURN_STARTUP, EYE_BLAST_FORM, FLAME_CRASH_BURST_LAST, FLAME_CRASH_LANDING_FORM } from "../sim/specials";
 import { EYE_BLAST_MARKS, eyeBlastMark } from "../presentation/eyeBlastMarker";
 import { type ParkedFlags, STOCK_MODELS, type WorldOrigin, facingYaw, parkOnce, placeEffect } from "./effects";
-import { runningHeroSpecial } from "../sim/heroSpecialRules";
+import { beamSegment, runningHeroSpecial } from "../sim/heroSpecialRules";
+import { emptyCapsule } from "../physics/contactGeometry";
 import { specialAreaRegion } from "../presentation/disjointCues";
 import { characterModelScale } from "../presentation/modelScale";
 import { IMMOLATE_SOUNDS } from "../presentation/elementLooks";
@@ -40,6 +41,8 @@ interface SpecialSlot {
   readonly silence: effect;
   readonly siphon: lightning;
   siphonShown: boolean;
+  readonly laser: lightning;
+  laserShown: boolean;
   lastX: number;
   lastZ: number;
   readonly eyeBlast: readonly effect[];
@@ -62,6 +65,7 @@ const EYE_BLAST = 8;
 const SLOT_EFFECTS = EYE_BLAST + EYE_BLAST_MARKS;
 /** Warcraft's Drain Mana lightning, the Blood Mage's own Siphon Mana beam. */
 const SIPHON_LIGHTNING = "DRAM";
+const LASER_LIGHTNING = "AFOD";
 
 export class SpecialEffects {
   private readonly slots: readonly SpecialSlot[];
@@ -70,6 +74,7 @@ export class SpecialEffects {
   private readonly sounds = new SoundBank();
 
   private readonly front: number;
+  private readonly beamLine = emptyCapsule();
 
   constructor(private readonly origin: WorldOrigin) {
     const { x, y } = origin;
@@ -86,6 +91,8 @@ export class SpecialEffects {
       const silence = AddSpecialEffect(STOCK_MODELS.silenceTarget, x, y);
       const siphon = AddLightningEx(SIPHON_LIGHTNING, false, x, y, origin.z - 4096.0, x, y, origin.z - 4096.0);
       SetLightningColor(siphon, 1.0, 1.0, 1.0, 0.0);
+      const laser = AddLightningEx(LASER_LIGHTNING, false, x, y, origin.z - 4096.0, x, y, origin.z - 4096.0);
+      SetLightningColor(laser, 1.0, 1.0, 1.0, 0.0);
       const eyeBlast: effect[] = [];
       for (let mark = 0; mark < EYE_BLAST_MARKS; mark++) eyeBlast.push(AddSpecialEffect(STOCK_MODELS.greenDragonMissile, x, y));
       BlzSetSpecialEffectTimeScale(aura, 0.0);
@@ -93,7 +100,7 @@ export class SpecialEffects {
       BlzSetSpecialEffectTimeScale(drainFlash, 0.0);
       const immolationLoop = CreateSoundFromLabel(IMMOLATE_SOUNDS.loop, true, true, true, 10000, 10000);
       return {
-        bear, aura, felFlames, manaHand, wingTrail, drainFlash, silence, siphon, siphonShown: false, lastX: 0.0, lastZ: 0.0, eyeBlast, cursor, immolationLoop,
+        bear, aura, felFlames, manaHand, wingTrail, drainFlash, silence, siphon, siphonShown: false, laser, laserShown: false, lastX: 0.0, lastZ: 0.0, eyeBlast, cursor, immolationLoop,
         previousSpecial: SpecialAction.none, previousSpecialFrame: 0,
       };
     });
@@ -116,6 +123,7 @@ export class SpecialEffects {
       this.park(slot.drainFlash, index, DRAIN_FLASH);
       this.park(slot.silence, index, SILENCE);
       this.hideSiphon(slot);
+      this.hideLaser(slot);
       this.parkEyeBlast(slot, index);
       slot.previousSpecial = SpecialAction.none;
       slot.previousSpecialFrame = 0;
@@ -249,6 +257,7 @@ export class SpecialEffects {
     if (effects === undefined) return;
     if (fighter === undefined) {
       this.hideSiphon(effects);
+      this.hideLaser(effects);
       this.park(effects.aura, slot, AURA);
       this.park(effects.wingTrail, slot, WING_TRAIL);
       this.park(effects.drainFlash, slot, DRAIN_FLASH);
@@ -258,6 +267,7 @@ export class SpecialEffects {
     effects.lastX = fighter.motion.x;
     effects.lastZ = fighter.motion.z;
     this.presentSiphon(effects, fighter);
+    this.presentLaser(effects, fighter);
     this.presentEyeBlast(effects, slot, fighter);
     this.applyStatic(effects.aura, slot, AURA, projectSpecialEffect(state, fighter, slot, STATIC_AURA, this.pose));
     this.applyStatic(effects.wingTrail, slot, WING_TRAIL, projectSpecialEffect(state, fighter, slot, STATIC_WING_TRAIL, this.pose));
@@ -268,6 +278,26 @@ export class SpecialEffects {
     if (!slot.siphonShown) return;
     SetLightningColor(slot.siphon, 1.0, 1.0, 1.0, 0.0);
     slot.siphonShown = false;
+  }
+
+  private hideLaser(slot: SpecialSlot): void {
+    if (!slot.laserShown) return;
+    SetLightningColor(slot.laser, 1.0, 1.0, 1.0, 0.0);
+    slot.laserShown = false;
+  }
+
+  private presentLaser(effects: SpecialSlot, fighter: Readonly<Fighter>): void {
+    const beam = runningHeroSpecial(fighter)?.beam;
+    const region = specialAreaRegion(fighter, 0);
+    if (beam === undefined || fighter.status.out || region.strike === undefined) {
+      this.hideLaser(effects);
+      return;
+    }
+    const line = beamSegment(this.beamLine, fighter, beam, region.strike.radius);
+    const { x, z } = this.origin;
+    MoveLightningEx(effects.laser, false, x + line.x1, this.front, z + line.z1, x + line.x2, this.front, z + line.z2);
+    SetLightningColor(effects.laser, 1.0, f32(0.3), f32(0.15), 1.0);
+    effects.laserShown = true;
   }
 
   /** While Siphon Mana holds its victim, a drain beam joins Kael's hand to the victim's chest. */
@@ -328,6 +358,7 @@ export class SpecialEffects {
       slot.bear.destroy();
       for (const model of [slot.aura, slot.felFlames, slot.manaHand, slot.wingTrail, slot.drainFlash, slot.silence, ...slot.eyeBlast]) DestroyEffect(model);
       DestroyLightning(slot.siphon);
+      DestroyLightning(slot.laser);
     }
   }
 }

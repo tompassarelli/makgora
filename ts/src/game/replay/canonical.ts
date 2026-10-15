@@ -382,6 +382,12 @@ function specialMoveCanonical(move: Readonly<AuthoredSpecial>, name: string): st
   const real = (field: string, value: number) => { result.push(canonicalRealField(`${name}.${field}`, value)); };
   int("end", move.endFrame);
   if (move.regionOrigin !== undefined) result.push(specialProjectileCanonical(move.regionOrigin, `${name}.regionOrigin`));
+  if (move.beam !== undefined) {
+    real("beam.originX", move.beam.originX);
+    real("beam.originZ", move.beam.originZ);
+    real("beam.range", move.beam.range);
+    real("beam.track", move.beam.track);
+  }
   int("groundOnly", move.groundOnly === true ? 1 : 0);
   int("oncePerAirtime", move.oncePerAirtime === true ? 1 : 0);
   int("helpless", move.helpless === true ? 1 : 0);
@@ -1076,6 +1082,10 @@ function writeFighter(sink: StateSink, prefix: string, fighter: Readonly<Fighter
     int("specialForm", sp.form);
     int("specialAimX", sp.aimX);
     int("specialAimZ", sp.aimZ);
+    if (sp.beamX !== 0 || sp.beamZ !== 0) {
+      real("specialBeamX", sp.beamX);
+      real("specialBeamZ", sp.beamZ);
+    }
     int("specialAirtimeUses", sp.airtimeUses);
     if (sp.grabFrame !== 0) int("specialGrabFrame", sp.grabFrame);
     if (sp.seekTarget !== 0) int("specialSeekTarget", sp.seekTarget);

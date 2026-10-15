@@ -10,7 +10,7 @@ import { mutableProjectile } from "./fighterProjectiles";
 import { inGrabContext } from "./conditions";
 import { staggerCompanion } from "./companions";
 import { type Fighter, type PlacedObject, placedObject } from "./fighter";
-import { HERO_PROJECTILE_CAP, runningHeroSpecial, spawnHeroProjectileAt } from "./heroSpecialRules";
+import { HERO_PROJECTILE_CAP, placeHeroStrike, runningHeroSpecial, spawnHeroProjectileAt } from "./heroSpecialRules";
 import { CompanionMode, type SpecialPlacement } from "./heroSpecials";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "./hitRegions";
 import { projectileDamage } from "./projectiles";
@@ -61,7 +61,7 @@ function specialStrike(placed: PlacedObject, sourceSlot: number, source: Readonl
   const frame = source.special.frame - 1;
   for (const path of move.regions ?? []) {
     if (frame < path.firstFrame || frame > path.lastFrame || path.hit.strike === undefined) continue;
-    placeCapsule(strike, path.hit.strike, source.motion.x, source.motion.z, source.facing);
+    placeHeroStrike(strike, source, path.hit.strike, source.motion.x, source.motion.z);
     if (!capsulesIntersect(strike, body)) continue;
     placed.specialStruck |= bit;
     return path.hit.effect.damage;

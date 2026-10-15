@@ -1460,6 +1460,10 @@ with its authored contact mesh at 500 ms. Shield recoil is 97.
 It regenerates `tinkerClipInfo.ts` and Tinker's row in `drawnStrideInfo.ts`.
 The claw-pack has a measured 142.838-world-unit stride at stock scale 1.
 
+Since 15 October 2026 down special plays the factory clip and the Laser side
+special borrows the rocket-launch clip until it gets its own aim clip; the
+Robo-Goblin clip below is authored but unused.
+
 Robo-Goblin keeps the tank rig visible on simulation frames 8–23 within its
 46-frame clip, including the 14–18 contact window. Normal and robot visibility
 use their own stock geoset channels. A sequence-local parent plants feet and

@@ -45,7 +45,7 @@ export const AERIAL_DOWN_CHOICES: Readonly<Record<number, string>> = {
   [Character.cairne]: "Reincarnation healing guard while falling",
   [Character.chen]: "Earth stance armor in the air; lands into the grounded stance",
   [Character.peon]: "Rest in the air: the frame-2 jolt, then he sleeps while falling and keeps sleeping after landing",
-  [Character.tinker]: "Robo-Goblin armor in the air; lands into the grounded charge",
+  [Character.tinker]: "drops one Clockwerk Goblin; lands into the grounded factory build",
   [Character.kaelthas]: "Banish curse in the air; lands into the grounded cast",
   [Character.murloc]: "small plague cloud at the cast point",
   [Character.grom]: "aerial chop; lands into the grounded chop",

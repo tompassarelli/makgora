@@ -232,9 +232,9 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Up smash, Down smash, Forward smash | BattleNetWooshStereo1 | MetalHeavyBashFlesh | MetalHeavyBashFlesh + ClusterRocketsImpact | MetalHeavyBashMetal |  |
 | Forward tilt, Up tilt, Down tilt, Forward tilt (up), Forward tilt (down), Neutral air, Forward air, Back air, Up air, Down air, Dash attack | BattleNetWooshStereo1 | MetalMediumBashFlesh | MetalHeavyBashFlesh + ClusterRocketsImpact | MetalMediumBashMetal |  |
 | Neutral special: Cluster Rockets | ClusterRocketsLaunch | ClusterRocketsImpact | ClusterRocketsImpact + ClusterRocketsImpact | MetalMediumBashMetal |  |
-| Side special: Pocket Factory | PocketFactoryBirth | GoblinSapperExplode | GoblinSapperExplode + ClusterRocketsImpact | MetalMediumBashMetal |  |
+| Side special: Laser | HeroTinkerMorph | SearingArrowHit | SearingArrowHit + ClusterRocketsImpact | MetalMediumBashMetal |  |
 | Up special: Rocket Boots | ClusterRocketsLaunch | MetalMediumBashFlesh | MetalMediumBashFlesh + ClusterRocketsImpact | MetalMediumBashMetal |  |
-| Down special: Robo-Goblin | HeroTinkerMorph | MetalHeavyBashMetal | MetalHeavyBashMetal + ClusterRocketsImpact | MetalMediumBashMetal |  |
+| Down special: Pocket Factory | PocketFactoryBirth | GoblinSapperExplode | GoblinSapperExplode + ClusterRocketsImpact | MetalMediumBashMetal |  |
 
 ## Kael'thas Sunstrider
 

@@ -787,7 +787,7 @@ every newly registered fighter too.
 | Cairne Bloodhoof | Shockwave (40) | War Stomp (45) | One 8% hit armored on frames 1–6 |
 | Chen Stormstout | Breath of Fire (35) | Drunken Haze (37) | One 8% hit armored on frames 1–6 |
 | Peon | Lumber Toss (25) | Burrow (45) | One 8% hit armored on frames 1–6 |
-| Goblin Tinker | Cluster Rockets (35) | Pocket Factory (45) | One 8% hit armored on frames 1–6 |
+| Goblin Tinker | Cluster Rockets (35) | Laser (45) | One 8% hit armored on frames 1–6 |
 | Kael'thas Sunstrider | Flamestrike (45) | Drain Mana (30) | One 8% hit armored on frames 1–6 |
 | Murloc | Ensnare (35) | Tidal Rush (35) | One 8% hit armored on frames 1–6 |
 
@@ -845,6 +845,50 @@ the infrastructure finish line when integrating new gameplay.
   The escape meter shows over a frozen fighter too: full is the 300-frame
   freeze (its 12 segments are 25 frames each) and empty is the thaw. A frozen
   computer presses 10 times a second and thaws on frame 131.
+
+### Tinker Laser
+
+Tom's direction (15 October 2026): the Laser's strength is accuracy, homing
+and tracking that reliably connects; its weakness is punishable start and end
+lag, so it carries modest damage and knockback. It replaced the Robo-Goblin
+down special, whose armored rush beat everything at its range, and Pocket
+Factory moved from side to down special unchanged. The numbers and why:
+
+- **Tell, frames 1–19; active 20–27.** His mechanical arms glow with laser
+  light from the press, so the defender sees 19 frames before the first
+  active frame, inside Tom's 18–22 reaction window. Eight active frames
+  outlast the end of a tech roll's intangibility without making the beam a
+  lingering wall.
+- **Tracking.** On frame 1 the aim snaps to the nearest opponent in front of
+  his arm within range; every later frame it moves at most 11 units toward
+  that opponent's centre. The beam is the capsule (radius 14) from the arm
+  through the aim, 360 units long, so drawn line and hitbox are one segment
+  (`beamSegment` in smashcraft:ts/src/game/sim/heroSpecialRules.ts). The
+  fastest roster tech roll averages 9.09 units a frame while it moves (Warden,
+  forward), and 11 is 1.2 times that, so the aim is waiting where a roll ends
+  when its 34 intangible frames run out: a tech chase. An air dodge opens at
+  20.4 units a frame (Melee's 3.4) with frames 4–29 intangible, so it outruns
+  the aim and passes through the beam: in the air the Laser forces the dodge
+  rather than winning outright. Rolling behind him or leaving range escapes.
+- **Range, 360 units from the arm.** About Cluster Rockets' far spacing, far
+  enough to reach a tech roll and a short hop at mid stage, short enough that
+  the far half of the stage stays safe.
+- **Damage, 7 fire, launch at 70°.** Modest, and it pops a grounded target up
+  for a follow-up at low percent; it does not kill.
+- **End lag, end 54 (27 frames after the last active frame).** Measured on a
+  Jaina shield: a light shield takes the beam on frame 20 and leaves shieldstun
+  on 34, a hard shield on 28, and Tinker acts on 58. A hard shield then has 30
+  frames, a light shield 24, and a light shield struck on the last active
+  frame 17. The roster median jab out of shield needs 15 (release 11 plus a
+  frame-4 jab) and the median grab 8, so both punish with a 2-frame margin
+  even in the worst case; a whiff leaves the same 27 frames. At long range
+  shield pushback and distance turn the punish into a dash-in, the price of
+  the range.
+- **EX:** 25% more damage and range.
+
+smashcraft:ts/src/game/sim/heroes/tinker.tests.ts checks the frame-20 contact,
+the range and behind cut-offs, tracking against the fastest tech roll and an
+air dodge, the shield punish and the EX upgrade.
 
 ## Historical character trade-offs and move evaluation
 
@@ -1626,7 +1670,7 @@ smashcraft:ts/test/projectile-rules.test.ts and in this section, with its
 reason. Current departures:
 
 - **Beastmaster's down special (Quilbeast), Jaina Proudmoore's down special
-  (Water Elemental) and Goblin Tinker's side special (Pocket Factory), rule 2,
+  (Water Elemental) and Goblin Tinker's down special (Pocket Factory), rule 2,
   for the summon's shots only.** The commitment is the placement: the summon
   itself can be hit or destroyed, and the summoner's recovery is already past
   when the shot reaches the shield. At point blank the shots reach the shield

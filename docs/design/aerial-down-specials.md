@@ -35,7 +35,7 @@ cancelling.
 | Cairne Bloodhoof | Reincarnation healing guard while falling | S1 W6 L27/E27 | S1 W6 L15/E15 | S1 W6 L3/E46 | S1 W6 L—/E46 |
 | Chen Stormstout | Earth stance armor in the air; lands into the grounded stance | S1 W4 L27/E27 | S1 W4 L15/E15 | S1 W4 L3/E33 | S1 W4 L—/E33 |
 | Peon | Rest in the air: the frame-2 jolt, then he sleeps while falling and keeps sleeping after landing | S0 W1 L27/E— | S0 W1 L15/E— | S0 W1 L3/E— | S0 W1 L—/E65 |
-| Goblin Tinker | Robo-Goblin armor in the air; lands into the grounded charge | S1 W13 L44/E44 | S1 W13 L31/E31 | S1 W13 L3/E46 | S1 W13 L—/E46 |
+| Goblin Tinker | drops one Clockwerk Goblin; lands into the grounded factory build | S1 W10 L27/E27 | S1 W10 L15/E15 | S1 W24 L3/E48 | S1 W10 L—/E36 |
 | Kael'thas Sunstrider | Banish curse in the air; lands into the grounded cast | S1 W11 L27/E27 | S1 W11 L15/E15 | S1 W11 L3/E36 | S1 W11 L—/E36 |
 | Murloc | small plague cloud at the cast point | S1 W14 L27/E27 | S1 W14 L15/E15 | S1 W14 L3/E38 | S1 W14 L—/E38 |
 | Grom Hellscream | aerial chop; lands into the grounded chop | S1 W19 L27/E27 | S1 W19 L15/E50 | S1 W19 L3/E50 | S1 W19 L—/E50 |

@@ -127,7 +127,7 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
   },
   [Character.tinker]: {
     weapon: Weapon.hammer, strong: "ClusterRocketsImpact",
-    specials: [s("ClusterRocketsLaunch", "ClusterRocketsImpact"), s("PocketFactoryBirth", "GoblinSapperExplode"), s("ClusterRocketsLaunch", "MetalMediumBashFlesh"), s("HeroTinkerMorph", "MetalHeavyBashMetal")],
+    specials: [s("ClusterRocketsLaunch", "ClusterRocketsImpact"), s("HeroTinkerMorph", "SearingArrowHit"), s("ClusterRocketsLaunch", "MetalMediumBashFlesh"), s("PocketFactoryBirth", "GoblinSapperExplode")],
   },
   [Character.kaelthas]: {
     weapon: Weapon.blunt, strong: "Fireball",

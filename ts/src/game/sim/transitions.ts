@@ -170,6 +170,8 @@ export function clearSpecialOnStock(f: Fighter): void {
   special.form = 0;
   special.aimX = 0;
   special.aimZ = 0;
+  special.beamX = 0.0;
+  special.beamZ = 0.0;
   special.airtimeUses = 0;
 }
 
