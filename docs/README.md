@@ -115,6 +115,7 @@ From ts/, `bun wisp help` lists commands and topics; `bun wisp help TOPIC` print
 
 ## Building and testing
 
+- [Architecture](architecture.md): module map, import direction, and which file each common change edits.
 - [Development setup and loop](development-loop.md): build, reload and test workflow.
 - [CI](ci.md): the workflows, and how a cloud worker's `claude/**` branch lands on main by itself (autoland).
 - [TypeScript workflow](typescript.md): source rules, build and test commands.
