@@ -9,8 +9,8 @@ import { KOBOLD_SPECIALS } from "./koboldSpecials";
 export const KOBOLD_HERO: HeroDefinition = {
   character: Character.kobold,
   name: "Kobold",
-  purpose: "Tiny, panicky candle-hoarder",
-  weakness: "Short pick reach, early knockouts and exposed recovery",
+  purpose: "Panicky candle-hoarder whose flame grows with every hit",
+  weakness: "Strong hits knock his candle out; bare, he only flails",
   jab: { name: "Pick Pick!", description: "Two nervous mining-pick taps. You no take candle!" },
   complete: true,
   moves: KOBOLD_MOVES,

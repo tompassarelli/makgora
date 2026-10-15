@@ -100,12 +100,15 @@ its active time. Status durations and healing caps stay unchanged.
 | Kael'thas | Flamestrike's pillar deals 25% more damage. | Drain Mana deals 25% more damage; its steal is unchanged. | Phoenix travels 25% farther and leaves a summoned phoenix that burns nearby enemies for three seconds. | Banish has 25% more reach. |
 | Murloc | Ensnare has 25% more reach, with unchanged slow. | Tidal Rush deals 25% more damage. | Tide Spout travels 25% farther. | Disease Cloud has 25% more reach, with unchanged poison duration and tick rate. |
 | Grom | Warsong Cry deals 25% more damage with 15% more reach. | Gorehowl Rush deals 25% more damage and travels 25% farther. | Blood Leap rises and steers 25% farther. | Mannoroth's Bane deals 25% more damage. |
-| Kobold | Wick Flick deals 25% more damage. | Panic Dig deals 25% more damage. | Candle Escape rises and steers 25% farther. | Mine! has 25% more reach on both sides. |
+| Kobold | Wick Flick deals 25% more damage, on top of the candle level's flame. | Panic Dig deals 25% more damage, on top of the candle level's dig. | Candle Escape rises and steers 25% farther; the candle never changes it. | Mine! has 25% more reach on both sides, on top of the candle level's sweep. |
 
 Ground, air, marked and recall forms use their matching upgrade. A
 follow-up keeps the EX cast's upgrade and never buys a second EX. Authored EX
 data is immutable; the existing replayed `special.ex` selects it. Projectiles
 and placed objects retain the selected authored data after the cast ends.
+Kobold's EX is built on every candle level's form, so EX and the candle
+level stack: the level is chosen first, then EX upgrades that form
+([roster.md](roster.md#candle)).
 The native models, sounds and animations remain the move's existing ones;
 there are no new imports.
 
