@@ -20,6 +20,8 @@ export interface SmashcraftMapProfile {
   readonly rebuild?: string;
 
   readonly quick: string;
+
+  readonly computers?: number;
 }
 
 
@@ -46,6 +48,7 @@ export const MAP_PROFILES: Readonly<Record<string, SmashcraftMapProfile>> = {
 
   keyboard: { describe: "playable input (native-perf profile) rebuilt from this checkout, `-dev quick cpu wren expert` (Wren Expert, three stocks)", path: join(inputs, "keyboard-native-166-20261007/keyboard-native.w3x"), rebuild: "native-perf", quick: `${QUICK_CPU_COMMAND}wren expert` },
   underside: { describe: "development map built with scenario underside (smashcraft:docs/player-view.md), `-dev quick`", path: join(inputs, "stage-model-20261006/Smashcraft diagnostic underside.w3x"), quick: "-dev quick" },
+  "cpu-startup": { describe: "development map rebuilt from this checkout, hosted with one lobby computer and left on fighter select", path: PRESENTATION, rebuild: "main", quick: "", computers: 1 },
   training: { describe: "development map rebuilt from this checkout, `-dev quick training` (a computer partner shielding at 40%, hit areas on)", path: PRESENTATION, rebuild: "main", quick: QUICK_TRAINING_COMMAND },
 
   ...Object.fromEntries(rankedStages.map(({ id, name }) => [stageProfile(name), {
@@ -376,6 +379,53 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
       capture: [{ kind: "frames", name: "refused", client: "a", count: 8, everyMs: 100 }],
       pass: [NO_IMPORT_FAILURES, NO_ERRORS],
       look: "player 1's bars near empty and, in some frames, blinking red; no rush starts on the refused press",
+    },
+    {
+      id: "c39-rematch-countdown", closes: "smashcraft#7 C39N and the E1 countdown box", map: "presentation", session: "c39-countdown",
+      setup: [
+        { chat: "-dev reset" }, { chat: "-dev slots 1 0" }, { chat: "-dev auto-rematch on" }, { chat: `${QUICK_CPU_COMMAND}wren expert` },
+        { receipt: "^parts [0-9]+$", client: "a", seconds: 600 },
+      ],
+      capture: [{ kind: "frames", name: "results-rematch-startup", client: "a", count: 70, everyMs: 200 }],
+      pass: [NO_IMPORT_FAILURES, NO_ERRORS],
+      look: "After the first match ends, the rematch seconds 5 to 1 and then the next match's 3, 2, 1, GO! each appear centred on the stage, popping in and fading out; the next match's fighters stay held until GO!.",
+    },
+    {
+      id: "c46-win-counts", closes: "smashcraft#7 C46", map: "presentation", session: "c39-countdown",
+      setup: [
+        { receipt: "^parts [0-9]+$", client: "a", seconds: 600 }, { receipt: "^parts [0-9]+$", client: "a", seconds: 600 },
+        { chat: "-dev auto-rematch off" }, { waitMs: 4000 }, { chat: "-dev reset" }, { waitMs: 3000 },
+      ],
+      capture: [{ kind: "frames", name: "fighter-select-after-three", client: "a" }, { kind: "frames", name: "fighter-select-after-three", client: "b" }],
+      pass: [NO_IMPORT_FAILURES, NO_ERRORS, DEV_RECEIPT],
+      look: "Three one-sided matches against Wren Expert have ended by KO; both clients' fighter select shows x3 on the computer's own card (slot 2) and no tally on player 1's card, so each win was awarded exactly once to the fixed slot through results, rematch and reset.",
+    },
+    ...(["first", "second"] as const).map((order): NativeCheck => ({
+      id: `c40-cpu-startup-${order}`, closes: "smashcraft#7 C40N", map: "cpu-startup", session: `cpu-startup-${order}`,
+      setup: [{ waitMs: 8000 }, { chat: "-dev stocks 3" }, { receipt: "^SMASHCRAFT DEV v=1 ", client: "a", seconds: 10 }, { receipt: "^SMASHCRAFT DEV v=1 ", client: "b", seconds: 10 }],
+      capture: [{ kind: "frames", name: "fighter-select", client: "a" }, { kind: "frames", name: "fighter-select", client: "b" }],
+      pass: [NO_IMPORT_FAILURES, NO_ERRORS, { kind: "receipt", client: "a", pattern: "^SETUP .* computers=[1-9]", min: 1 }, { kind: "receipt", client: "b", pattern: "^SETUP .* computers=[1-9]", min: 1 }],
+      look: "The computer's starting fighter in SETUP characters= is the same on both clients and matches both fighter-select frames; it differs between the first and second session.",
+    })),
+    {
+      id: "c37-platform-route", closes: "smashcraft#10 C37N", map: "presentation", session: "c37-platforms",
+      setup: [{ chat: "-dev reset" }, { chat: "-dev slots 3 0" }, { chat: "-dev quick" }, { waitMs: 4000 }, { keys: ["z"], client: "a" }],
+      capture: [{ kind: "frames", name: "mount-drop-repress", client: "a", count: 40, everyMs: 100 }],
+      pass: [NO_IMPORT_FAILURES, NO_ERRORS],
+      look: "Player 1 jumps under a platform, rises through it and lands on it with the ordinary landing puff; then a fresh down press drops through at once.",
+    },
+    {
+      id: "482-shield-energy", closes: "smashcraft-dev#482 box 3 (Classic)", map: "training", session: "482-shield",
+      setup: [{ chat: "-dev hit-areas off" }, { waitMs: 1000 }],
+      capture: [{ kind: "frames", name: "shield-full-to-low", client: "a", count: 30, everyMs: 500 }],
+      pass: [NO_IMPORT_FAILURES, NO_ERRORS],
+      look: "With hit areas off, the partner's drawn shield bubble stays centred on its body and shrinks as its energy falls; it reads as a shield at full, mid and low energy until it sits inside the body.",
+    },
+    {
+      id: "406-voice-trace", closes: "smashcraft-dev#406 box 4 (voice cap half)", map: "presentation", session: "406-voices",
+      setup: [{ chat: "-dev reset" }, { chat: "-dev slots 1 14" }, { chat: `${QUICK_CPU_COMMAND}wren expert` }, { waitMs: 8000 }, { keys: ["ctrl+t"], client: "a" }, { waitMs: 7000 }],
+      pass: [NO_IMPORT_FAILURES, NO_ERRORS],
+      look: "wc3-melee-input-trace.txt on client a holds per-voice lines `frame F class C slot S live L` with every L <= 16.",
     },
     ...heroes.map(({ name }): NativeCheck => ({
       id: `96-hero-${heroProfile(name).slice(5)}`,

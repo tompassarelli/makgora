@@ -267,7 +267,7 @@ export const accept: Command = (rawArgs) => Effect.gen(function*() {
       if (pair?.lan === undefined) yield* freshMatch(profile.path);
       else {
         const started = yield* Clock.currentTimeMillis;
-        yield* lan([solo ? "solo" : "fresh", profile.path, "--pair", String(pair.lan)]);
+        yield* lan([solo ? "solo" : "fresh", profile.path, "--pair", String(pair.lan), ...(profile.computers === undefined ? [] : ["--computers", String(profile.computers)])]);
         const clients = yield* Clients;
         yield* Effect.forEach(clients.all, client => readyAfter(client, started), { concurrency: "unbounded" });
       }
