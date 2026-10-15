@@ -469,7 +469,7 @@ export const WHITE_MODEL_FACTS: Readonly<Record<string, ModelFacts>> = {
     },
     "emitters": []
   },
-  "war3mapimported/cairnebloodhoofwhite-78b126b6e6284455f024930079522188e9226e6ed5001fec46e6ddc218e9c0fe.mdx": {
+  "war3mapimported/cairnebloodhoofwhite-45f0c01400ecf48d166db7fd3b4d8b419a7500da2eb608f5871e8b397118b0e5.mdx": {
     "geosets": 4,
     "triangles": 457,
     "lights": 0,

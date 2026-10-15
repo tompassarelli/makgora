@@ -261,10 +261,12 @@ for (const [ordinal,action] of [...actions,...damageActions].entries()) {
     const wind=Math.max(start,contact-(hit-first)),tail=Math.min(end,contact+(last-hit));
     const retimed=(frame:number)=>frame<=hit?wind+Math.round((frame-first)/Math.max(1,hit-first)*(contact-wind)):contact+Math.round((frame-hit)/Math.max(1,last-hit)*(tail-contact));
     tracks(model,(track,path)=>{const donor=originals.get(path);if(!donor||onGlobalClock(donor))return;const placed=new Set<number>();
+      const flat=(key:mdx.AnimKeyframe,Frame:number):mdx.AnimKeyframe=>{const copy={...structuredClone(key),Frame};if(path.endsWith(".Rotation")||!copy.InTan)return copy;
+        const handle=()=>track.LineType===mdx.LineType.Bezier?copy.Vector.slice():new Float32Array(copy.Vector.length);return {...copy,InTan:handle(),OutTan:handle()};};
       const inside=donor.Keys.filter(key=>key.Frame>=first&&key.Frame<=last);
-      for(const key of inside){const Frame=retimed(key.Frame);if(placed.has(Frame))continue;placed.add(Frame);track.Keys.push({...structuredClone(key),Frame});}
-      if(inside.length&&!placed.has(start))track.Keys.push({...structuredClone(inside[0]!),Frame:start});
-      if(inside.length&&!placed.has(end))track.Keys.push({...structuredClone(inside.at(-1)!),Frame:end});
+      for(const key of inside){const Frame=retimed(key.Frame);if(placed.has(Frame))continue;placed.add(Frame);track.Keys.push(flat(key,Frame));}
+      if(inside.length&&!placed.has(start))track.Keys.push(flat(inside[0]!,start));
+      if(inside.length&&!placed.has(end))track.Keys.push(flat(inside.at(-1)!,end));
       track.Keys.sort((a,b)=>a.Frame-b.Frame);});
   }else{
   const coil=blend(ready,action.gesture,-0.32);
