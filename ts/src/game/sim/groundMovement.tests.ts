@@ -16,7 +16,8 @@ import { AttackStyle, Character, GroundAction } from "./codes";
 import { createFighter, type Fighter } from "./fighter";
 import { fighterAt } from "./roster";
 import { createReferenceFighter } from "./referenceRig";
-import { advanceSolo, controls } from "./testWorld";
+import { DASH_FLICK_SAMPLES } from "./stickZones";
+import { advanceSolo, controls, withPhysics } from "./testWorld";
 import {
   type GroundMovementRules,
   INITIAL_DASH_FRAMES,
@@ -285,4 +286,31 @@ test("a retail run-brake ends at its clip or its maximum frame count [k3 measure
   advanceSolo(capped, 0, capInput, 0.0);
   assertEquals(capped.ground.action, GroundAction.none);
   assertEquals(capped.ground.runBrakeFramesRemaining, 0);
+});
+
+function moonwalkSlide(traction: number): { readonly reversed: boolean; readonly backward: number } {
+  const fighter = createFighter(Character.blademaster, 0.0, 1);
+  withPhysics(fighter, { traction, dashSpeed: f32(fighter.tuning.physics.walkSpeed * 0.5) });
+  const tilt = controls({ direction: -1, diStickValid: true, diStickX: f32(-0.5) });
+  const back = controls({ direction: -1, diStickValid: true, diStickX: -1.0 });
+  advanceSolo(fighter, 0, controls({ direction: 1 }), 0.0);
+  let reversed = false;
+  let farthest = fighter.motion.x;
+  for (let frame = 1; frame < fighter.tuning.ground.dashRunEnableFrame; frame++) {
+    advanceSolo(fighter, 0, frame <= DASH_FLICK_SAMPLES ? tilt : back, 0.0);
+    assertEquals(fighter.ground.action, GroundAction.dash);
+    assertEquals(fighter.facing, 1);
+    reversed ||= fighter.motion.vx < 0;
+    farthest = Math.max(farthest, fighter.motion.x);
+  }
+  for (let frame = 0; frame < 60 && fighter.motion.vx !== 0; frame++) advanceSolo(fighter, 0, controls(), 0.0);
+  return { reversed, backward: farthest - fighter.motion.x };
+}
+
+test("an analog moonwalk keeps the dash and its facing while velocity reverses, and lower traction slides farther [k4 reference melee]", () => {
+  const traction = createFighter(Character.blademaster, 0.0, 1).tuning.physics.traction;
+  const grippy = moonwalkSlide(f32(traction * 2.0));
+  const slick = moonwalkSlide(traction);
+  assertTrue(grippy.reversed && slick.reversed);
+  assertTrue(slick.backward > grippy.backward && grippy.backward > 0);
 });

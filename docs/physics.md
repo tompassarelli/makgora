@@ -811,6 +811,23 @@ ordering and the recorded overspeed-braking branch. The recording does not
 verify under-target acceleration, run transitions, turning, analog-stick
 scaling or the disc revision.
 
+Holding the stick backward during the initial dash without a fresh smash is a
+moonwalk, as in Melee. The fighter stays in Dash, keeps its dash direction and
+facing, and the dash animation keeps playing forward. Each tick moves velocity
+toward the backward run target scaled by the stick, with the same ground
+acceleration multiplier and base as a forward dash, so the fighter slows and,
+when the dash started slow enough, slides backward while still facing forward.
+A backward tilt below 0.8 counts, and so does a full backward stick once the
+tilt has been held for the three-sample smash window (Melee needs two frames);
+a fresh smash back is still a dash-dance turn. The first two samples of a tilt
+hold velocity while a smash can still arrive. The moonwalk ends at the dash's
+run-enable frame; a stick still held back then turns the fighter as before.
+Released, the dash slides on by the fighter's traction, so lower traction
+slides farther back. Dash entry replaces earlier velocity (the recorded Falco
+entry above), so with stock dash speeds the initial dash slows the fighter
+without reversing it: Blademaster at full backward stick goes from 11.9 to 4.3
+world units per tick.
+
 The authored dash window and three-sample stick reversal policy are specified
 in [gameplay design](gameplay-design.md#dash-dancing). Run-turn braking remains
 an explicit authored action rule. The authored phase

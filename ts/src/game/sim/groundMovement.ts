@@ -224,14 +224,27 @@ export function advanceGroundMovement(f: Fighter, direction: number, walking: bo
   }
 
   const travelInWindow = ground.actionFrame - motion.stickSideAge < f.tuning.ground.dashRunEnableFrame;
+  let moonwalk = false;
   if (!walking && changingDirection && ground.action !== GroundAction.run && ground.action !== GroundAction.turnRun && ground.action !== GroundAction.runBrake) {
     if (ground.action === GroundAction.dash && motion.stickSideAge < DASH_FLICK_SAMPLES - 1 && !strongStick && travelInWindow) {
 
 
       direction = 0;
+    } else if (ground.action === GroundAction.dash && (!strongStick || !freshFlick) && direction === -ground.dashDirection && ground.actionFrame < f.tuning.ground.dashRunEnableFrame) {
+      moonwalk = true;
     } else if (!strongStick || (!freshFlick && (ground.action !== GroundAction.dash || direction !== f.facing))) {
       walking = true;
     }
+  }
+  if (moonwalk) {
+    ground.dashFrame = min(INITIAL_DASH_FRAMES + 1, ground.dashFrame + 1);
+    ground.actionFrame = min(actionClockLimit(f), ground.actionFrame + 1);
+    const moonwalkRunTarget = f32(speedBuffed(f, chillScaled(f, physics.runSpeed)) * speedScale);
+    const moonwalkAcceleration = taperedAcceleration(
+      f, f32(physics.groundAccelerationMultiplier * speedScale), physics.groundAccelerationBase, direction, moonwalkRunTarget, RUN_ACCEL_TAPER_GAIN, false,
+    );
+    motion.vx = groundMovementVelocity(motion.vx, moonwalkAcceleration, f32(direction * moonwalkRunTarget), f32(traction * RUN_DASH_TURN_FRICTION_MULTIPLIER), speedBuffed(f, physics.groundSpeedCap));
+    return false;
   }
   if (walking) {
     clearDash(f);

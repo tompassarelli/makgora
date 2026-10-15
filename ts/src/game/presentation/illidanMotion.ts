@@ -118,7 +118,7 @@ export function advanceIllidanMotion(history: IllidanMotion, fighter: Readonly<F
     history.motion = IllidanLocomotion.idle;
     history.transitionRemaining = 0;
   } else if (controls.direction !== 0 && history.previousFacing !== 0
-    && (fighter.facing !== history.previousFacing || f32(motion.vx * controls.direction) < 0)) {
+    && (fighter.facing !== history.previousFacing || (ground.action !== GroundAction.dash && f32(motion.vx * controls.direction) < 0))) {
     history.motion = IllidanLocomotion.turn;
     history.transitionRemaining = TRANSITION_FRAMES;
   } else if (controls.direction === 0 && history.previouslyMoving

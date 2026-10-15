@@ -103,6 +103,14 @@ further than most after a run, a dash or a moonwalk; Thrall, Pit Lord, Cairne
 and Anub'arak stop shortest. Landing slides, wavedashes included, brake hard
 until the fighter is down to walking speed, then glide to a stop.
 
+To moonwalk, dash and then tilt the stick lightly backward without smashing
+it: your fighter keeps dashing forward while its momentum drains backward. Hold
+the light tilt for three frames, after which you can push the stick fully
+back; a quick smash back turns you around instead (a dash dance). The slide
+lasts until the dash would become a run. On keyboard, hold down together with
+the back key: the diagonal counts as a light tilt (on a platform, a fresh down
+press drops you through it).
+
 Attacks buffer for six frames, including through jump squat. Hold P to walk;
 Hold down while rising into a platform without an aerial to stand on it
 instantly, with a small landing puff. Without down, or during an aerial, you
