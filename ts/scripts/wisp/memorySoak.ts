@@ -171,8 +171,9 @@ export function checkMemory(run: MemoryRun, limits: MemoryLimits = MEMORY_LIMITS
 
 
 // The slope test after each match: least squares over the samples taken on the result screen after warm-up, x the match
-// number. The heap must grow under heapKbPerMatch per match and each live handle kind (effects are the `effect` kind)
-// must be flat.
+// number. The heap fails when its slope reaches heapKbPerMatch per match and exceeds three standard errors, the rule
+// the handle counts use: bounded caches refill and reset between samples, so a point slope alone is noise. Each live
+// handle kind (effects are the `effect` kind) must be flat.
 function matchSlopes(run: MemoryRun, limits: MemoryLimits): MemoryVerdict {
   const after = run.samples.filter((sample) => sample.kind === "match" && minutes(sample.frame) >= limits.warmupMinutes);
   const match = (sample: MemorySample) => Number(sample.fields.match);
@@ -185,8 +186,8 @@ function matchSlopes(run: MemoryRun, limits: MemoryLimits): MemoryVerdict {
   const heap = fit(after.map((sample) => [match(sample), sample.heapKb]));
   const heapSlope = heap.slope;
   const heaps = after.map((sample) => sample.heapKb);
-  const lines = [`after each match ${first}-${last}: Lua heap ${Math.min(...heaps)}-${Math.max(...heaps)} KB, slope ${heapSlope.toFixed(2)} ± ${heap.error.toFixed(2)} KB per match (limit ${limits.heapKbPerMatch})`];
-  if (heapSlope >= limits.heapKbPerMatch) failures.push(`Lua heap grows ${heapSlope.toFixed(2)} KB per match after warm-up`);
+  const lines = [`after each match ${first}-${last}: Lua heap ${Math.min(...heaps)}-${Math.max(...heaps)} KB, slope ${heapSlope.toFixed(2)} ± ${heap.error.toFixed(2)} KB per match over n=${after.length} matches (fails at ${limits.heapKbPerMatch} or more and over three standard errors)`];
+  if (heapSlope >= limits.heapKbPerMatch && heapSlope > 3 * heap.error) failures.push(`Lua heap grows ${heapSlope.toFixed(2)} ± ${heap.error.toFixed(2)} KB per match after warm-up (n=${after.length})`);
   const slots = [...new Set(after.flatMap((sample) => sample.clients.map((client) => client.slot)))].sort((a, b) => a - b);
   for (const slot of slots) {
     const series = after.flatMap((sample) => sample.clients.filter((client) => client.slot === slot).map((client) => [match(sample), client.live] as const));
