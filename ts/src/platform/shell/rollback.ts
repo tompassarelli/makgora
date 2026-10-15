@@ -35,6 +35,7 @@ import { type KeyboardRollback, type Rollback, type ShellState, localSlot, shell
 import { recordBatchWait, recordEcho, recordSend, resetEchoRing, traceSeconds } from "./trace";
 import { LASTING, resumePresentationHeld, setStatus } from "./view";
 import { holdPresentedCapture } from "./visualCapture";
+import { visualCaptureStopBefore } from "../../game/shell/visualCapture";
 import { samplePad } from "../../game/input/padCapture";
 import { pollPad, recordPadRow } from "./analogPad";
 import { beginNetEpoch, matchDelay, noteDepth, noteEcho, noteSent, requestFor } from "./netDelay";
@@ -344,7 +345,8 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
 
     const paced = journal === undefined ? undefined : resumePresentationHeld(s) ? journal.barrier.paced : pacedStop(journal.barrier);
     const speculativeStop = stopAt === undefined ? paced : paced === undefined ? stopAt : Math.min(stopAt, paced);
-    const advanced = rollback.playback.catchUp(schedule, epoch, slot, speculative, speculativeBudget(journal !== undefined), speculativeStop, observeSpeculativeFrame);
+    const presentationStop = s.build.responseProbe ? visualCaptureStopBefore(slot, speculativeStop) : speculativeStop;
+    const advanced = rollback.playback.catchUp(schedule, epoch, slot, speculative, speculativeBudget(journal !== undefined), presentationStop, observeSpeculativeFrame);
     const after = schedule.speculativeFrame();
     if (journal !== undefined) settlePace(journal.barrier, after);
     const halted = schedule.windowHalted(slot);

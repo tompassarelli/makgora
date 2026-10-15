@@ -127,7 +127,7 @@ src/game/sim/heroSpecials.tests.ts	3	177747000	40207
 src/game/sim/heroStatus.tests.ts	2	3261000	928
 src/game/sim/heroes/beastmasterSpecials.tests.ts	2	34105000	5575
 src/game/sim/heroes/cairne.tests.ts	1	0	0
-src/game/sim/heroes/chenMoves.tests.ts	1	0	0
+src/game/sim/heroes/chenMoves.tests.ts	3	16918000	6469
 src/game/sim/heroes/dreadlordSpecials.tests.ts	1	1630000	279
 src/game/sim/heroes/exCoreHeroes.tests.ts	2	843000	4025
 src/game/sim/heroes/fighterArt.tests.ts	1	7000	21

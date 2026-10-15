@@ -106,6 +106,8 @@ function widenHurtPoses(extent: Extent, poses: readonly HurtPose[] | undefined):
   for (const pose of poses ?? []) widenHurt(extent, pose.parts);
 }
 
+const normalReach: { [character: number]: Extent | undefined } = {};
+
 /** The roster's authored reach: widest strike, largest hurt body and both fighters' fastest travel, on each axis. */
 function rosterReach(): Extent {
   const strike = { x: 0.0, z: 0.0 };
@@ -114,11 +116,12 @@ function rosterReach(): Extent {
   for (const character of SELECTABLE_CHARACTERS) {
     const tuning = authoredTuning(character);
     const { moves, specials, physics } = tuning;
+    const normal = { x: 0.0, z: 0.0 };
     const charges = [0, moves?.smashMaxChargeFrames ?? SMASH_MAX_CHARGE_FRAMES];
     for (const style of Object.values(AttackStyle)) {
       const authored = style === AttackStyle.grab ? undefined : moves?.normals[style];
       if (authored !== undefined) {
-        for (const region of authored.regions) widenRegion(strike, style, region.hit);
+        for (const region of authored.regions) widenRegion(normal, style, region.hit);
         continue;
       }
       const last = attackStartupFrames(style, moves) + characterAttackActiveFrames(character, style, moves);
@@ -126,11 +129,14 @@ function rosterReach(): Extent {
         for (let frame = 0; frame <= last; frame++) {
           for (const charge of charges) {
             const region = authoredHitRegion(reachRegion, character, style, frame, charge, index, moves);
-            if (region.window > 0) widenRegion(strike, style, region);
+            if (region.window > 0) widenRegion(normal, style, region);
           }
         }
       }
     }
+    normalReach[character] = normal;
+    strike.x = Math.max(strike.x, normal.x);
+    strike.z = Math.max(strike.z, normal.z);
     if (specials !== undefined) {
       for (const kit of [specials.neutral, specials.side, specials.up, specials.down]) {
         widenSpecial(strike, kit.ground);
@@ -155,6 +161,12 @@ function rosterReach(): Extent {
       physics.aerialJumpHorizontalSpeed, physics.shieldBreakSpeed, physics.groundSpeedCap);
   }
   const both = f32(2.0 * travel);
+  for (const character of SELECTABLE_CHARACTERS) {
+    const normal = normalReach[character];
+    if (normal === undefined) continue;
+    normal.x = f32(f32(normal.x + body.x) + both);
+    normal.z = f32(f32(normal.z + body.z) + both);
+  }
   return { x: f32(f32(strike.x + body.x) + both), z: f32(f32(strike.z + body.z) + both) };
 }
 
@@ -187,6 +199,9 @@ function reaching(f: Readonly<Fighter>): boolean {
 /** How far `f` may act on another fighter this frame: Eye Blast's whole beam, any other reaching action, or a body push. */
 function strikeReach(f: Readonly<Fighter>): Readonly<Extent> {
   if (f.special.action === SpecialAction.demonHunterManaBurn && f.special.form === EYE_BLAST_FORM) return EYE_BLAST_EXTENT;
+  if (f.attack.style !== undefined && f.special.action === SpecialAction.none
+    && f.grab.owner === undefined && f.grab.target === undefined && !inGrabContext(f)
+    && f.ledge.state === LedgeState.none && f.cannon.held === undefined) return normalReach[f.character] ?? SCOPE_REACH;
   return reaching(f) ? SCOPE_REACH : BODY_EXTENT;
 }
 

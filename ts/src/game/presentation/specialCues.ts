@@ -68,6 +68,10 @@ export const CUE_ANCHORS: { readonly [anchor in CueAnchor]: { readonly x: number
 export interface CueBirth {
   readonly eachFrame: boolean;
   readonly strike?: number | undefined;
+  readonly strikes?: number | undefined;
+  readonly strikeRadius?: number | undefined;
+  readonly trail?: number | undefined;
+  readonly taper?: boolean | undefined;
   readonly voices?: number | undefined;
   readonly lingerFrames?: number | undefined;
 }
@@ -280,7 +284,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     down: { spell: "Life Drain", startup: { ...cue("Abilities\\Spells\\Other\\Drain\\DrainCaster.mdx", "hand", f32(0.2)), scaleEnd: f32(0.35), scaleFrames: 15, anchorFrames: Array.from({ length: 52 }, () => ({ x: 38.0, z: 54.0 })) }, active: { ...cue("Abilities\\Spells\\Other\\Drain\\DrainCaster.mdx", "ahead", f32(0.3)), anchorFrames: Array.from({ length: 52 }, () => ({ x: 68.0, z: 54.0 })) } },
   },
   [Character.chen]: {
-    neutral: { spell: "Breath of Fire", startup: BREW, active: { ...timed(cue("Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireMissile.mdx", "breath", 0.5), "birth", 0.0), birth: { eachFrame: true, strike: 0, voices: 11, lingerFrames: 6 } } },
+    neutral: { spell: "Breath of Fire", startup: BREW, active: { ...timed(cue("Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireMissile.mdx", "breath", 1.0), "birth", 0.0), roll: f32(1.570796327), birth: { eachFrame: true, strike: 0, strikes: 4, strikeRadius: 70.0, trail: 150.0, taper: true, voices: 24, lingerFrames: 6 } } },
     side: { spell: "Drunken Haze", startup: BREW, active: cue("Abilities\\Spells\\Other\\StrongDrink\\BrewmasterTarget.mdx", "hand", f32(0.7)) },
     up: { spell: "Storm Rise", startup: STORM, active: cue("Abilities\\Spells\\Other\\Tornado\\TornadoElementalSmall.mdx", "body", f32(0.6)) },
     down: { spell: "Threefold Stance", startup: BREW, active: cue("Abilities\\Spells\\Human\\Defend\\DefendCaster.mdx", "body", f32(0.6)) },

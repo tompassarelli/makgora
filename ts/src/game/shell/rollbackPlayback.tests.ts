@@ -10,6 +10,7 @@ import { Character } from "../sim/codes";
 import { createTapeWorld } from "../replay/tapeWorld";
 import { replayHistoryPlayback } from "./rollbackPlayback";
 import { paceResume, pacedStop, pauseBarrier, requestRound, stopFrame } from "./pauseBarrier";
+import { clearVisualCapture, configureVisualCapture, heldVisualFrame, holdVisualFrame, releaseVisualFrame, visualCaptureStopBefore } from "./visualCapture";
 
 const neutral = assertDefined(inputRow(), "neutral input");
 const localPress = assertDefined(inputRow({ pressed: bit(Action.jump) }), "local press");
@@ -19,6 +20,45 @@ function accept(schedule: ShadowInputSchedule, sender: number, epoch: number, fr
   const packet = assertDefined(inputPacket(epoch, frame, [row]), "packet");
   assertEquals(schedule.acceptSynchronized(sender, packet), "accepted");
 }
+
+test("held adjacent visual captures stop prediction at each exact frame and retain an earlier pause boundary [k1 scenario]", () => {
+  const epoch = 1;
+  const slot = 0;
+  const schedule = new ShadowInputSchedule();
+  const playback = replayHistoryPlayback();
+  const { live } = createTapeWorld({ stocks: 99, humans: 2 });
+  const match = { world: live.world, game: live.match, controls: live.controls, runtime: live.runtime };
+  assertTrue(schedule.beginEpoch(epoch, 0, 8, live.match.humanMask));
+  assertTrue(playback.beginEpoch(epoch, 8));
+  for (let frame = 1; frame <= 8; frame++) {
+    assertEquals(schedule.captureLocalAt(epoch, frame, neutral), Capture.captured);
+    accept(schedule, 1, epoch, frame, neutral);
+  }
+  configureVisualCapture("-dev fixture |capture adjacent 1,1,4 -", slot);
+  const advance = () => assertTrue(playback.catchUp(schedule, epoch, slot, match, 4, visualCaptureStopBefore(slot), () => {
+    holdVisualFrame(slot, epoch, live.runtime.simulationFrame);
+  }));
+  advance();
+  assertEquals(live.runtime.simulationFrame, 1);
+  assertEquals(heldVisualFrame(slot)?.frame, 1);
+  for (let tick = 0; tick < 3; tick++) {
+    advance();
+    assertEquals(live.runtime.simulationFrame, 1);
+  }
+  releaseVisualFrame(slot);
+  advance();
+  assertEquals(live.runtime.simulationFrame, 2);
+  assertEquals(heldVisualFrame(slot)?.frame, 2);
+  assertEquals(visualCaptureStopBefore(slot, 2), 2);
+  releaseVisualFrame(slot);
+  advance();
+  assertEquals(live.runtime.simulationFrame, 6);
+  assertEquals(heldVisualFrame(slot)?.frame, 6);
+  releaseVisualFrame(slot);
+  assertEquals(visualCaptureStopBefore(slot, 7), 7);
+  clearVisualCapture(slot);
+  assertEquals(visualCaptureStopBefore(slot), undefined);
+});
 
 test("shell rollback replaces a predicted remote row and reports executed local frames [k1 scenario]", () => {
   const epoch = 1;

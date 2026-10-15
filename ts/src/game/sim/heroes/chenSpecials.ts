@@ -9,7 +9,12 @@ import { chenCapsule, chenHit } from "./chenMoves";
 const fire = chenHit(9.370200157165527, 70.0, 25.73409652709961, f32(0.906308), f32(0.422618), HitElement.fire);
 const breath = (air: boolean): AuthoredSpecial => ({
   endFrame: 42, landingLag: air ? 20 : undefined,
-  regions: [heroRegion(12, 22, chenCapsule(36.0, 62.0, 124.0, 62.0, 27.0), fire)],
+  regions: [
+    heroRegion(12, 22, chenCapsule(36.0, 62.0, 76.0, 62.0, 27.0), fire),
+    heroRegion(12, 22, chenCapsule(76.0, 62.0, 136.0, 62.0, 40.0), fire),
+    heroRegion(12, 22, chenCapsule(136.0, 62.0, 196.0, 62.0, 55.0), fire),
+    heroRegion(12, 22, chenCapsule(196.0, 62.0, 256.0, 62.0, 70.0), fire),
+  ],
 });
 const haze = (air: boolean): AuthoredSpecial => ({
   endFrame: 38, landingLag: air ? 20 : undefined,
@@ -38,7 +43,7 @@ const earth = (air: boolean): AuthoredSpecial => ({
   ],
 });
 export const CHEN_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Breath of Fire", description: "Breathe a short cone of flame; a jump clears it.", ground: breath(false), air: breath(true) }, { reach: 1.25 }),
+  neutral: withExKit({ name: "Breath of Fire", description: "Breathe a long, fanning cone of flame; jump above its widening tip.", ground: breath(false), air: breath(true) }, { reach: 1.25 }),
   side: withExKit({ name: "Drunken Haze", description: "Lob a flask that briefly slows an enemy's movement.", ground: haze(false), air: haze(true) }, { reach: 1.25 }),
   up: withExKit({ name: "Storm Rise", description: "Rise with a spinning staff, steer toward safety, then fall helplessly.", ground: stormRise(f32(3.0), 1.0) }, { travel: 1.25 }),
   down: withExKit({ name: "Threefold Stance", description: "Brace as Earth; press Attack for Fire Palm or Special for Storm Step.", ground: earth(false), air: earth(true) }, { armorDamage: 1.25, damage: 1.25 }),

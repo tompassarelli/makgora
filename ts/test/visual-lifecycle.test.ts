@@ -32,6 +32,10 @@ import { testHeadless } from "./headless";
 import type { EffectPose, HeadlessClient } from "wisp/src/headless/client";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { SpecialCueEffects } from "../src/game/render/specialCueEffects";
+import { specialAreaRegion } from "../src/game/presentation/disjointCues";
+import { characterModelScale } from "../src/game/presentation/modelScale";
+import { facingYaw } from "../src/game/render/effects";
+import { f32 } from "wisp/src/sim/f32";
 
 const headless = testHeadless(SMASHCRAFT_HEADLESS);
 
@@ -331,32 +335,6 @@ test("combat effects: rollback, pause/resume and rematch neither replay nor reta
     expect(flashed).toBe(true);
     expect(target.status.damage).toBeGreaterThan(0);
     expect(client.log.filter(({ name }) => name === "AddLightningEx")).toHaveLength(lightningAllocations);
-
-    globalThis.__smashcraftCueDefinitive = false;
-    const chenMatch = testMatch(1, Character.chen), chen = fighterAt(chenMatch.world, 0), breathInput = chenMatch.inputs.inputs[0];
-    chenMatch.game.practice = true;
-    chen.mana.points = ROSTER_MANA.max;
-    const breath = new SpecialCueEffects(Character.chen, { x: 0, y: 0, z: 100 }, true);
-    const fire = () => client.effectPoses({ visibleOnly: true }).filter(pose => pose.model.includes("BreathOfFireMissile") && !hidden(pose));
-    for (let frame = 0; frame < 14; frame++) {
-      breathInput.specialPressed = frame === 0;
-      executeNext(chenMatch);
-    }
-    breath.confirm(chen, true, 0);
-    breath.present(chen, true, false);
-    const confirmedBreath = fire();
-    expect(confirmedBreath.length).toBeGreaterThan(0);
-    for (let frame = 14; frame < 42; frame++) {
-      breathInput.specialPressed = false;
-      executeNext(chenMatch);
-    }
-    breath.present(chen, true, false);
-    expect(fire()).toEqual(confirmedBreath);
-    breath.confirm(chen, true, 0.2);
-    breath.present(chen, true, false);
-    expect(fire()).toEqual([]);
-    breath.destroy();
-
   });
   expect(client.errors).toEqual([]);
 });
@@ -552,6 +530,55 @@ test("Mirror Image matches its owning fighter colour across repeated casts, expi
       confirm(s, 1);
       expect(s.game.phase).toBe(Phase.characterMenu);
       expect(images()).toHaveLength(0);
+    }
+  });
+  expect(client.errors).toEqual([]);
+});
+
+
+test("Chen's confirmed Classic flames fill the long cone, one per hit capsule tapered by its width, in both facings and EX through their linger [k1 scenario]", () => {
+  const client = headless.clients({ start: () => {}, install: () => {} }, [0]).client(0);
+  client.run(() => {
+    globalThis.__smashcraftCueDefinitive = false;
+    for (const facing of [-1, 1]) for (const ex of [false, true]) {
+      const chenMatch = testMatch(1, Character.chen), chen = fighterAt(chenMatch.world, 0), breathInput = chenMatch.inputs.inputs[0];
+      chen.facing = facing;
+      breathInput.shield = ex;
+      chenMatch.game.practice = true;
+      chen.mana.points = ROSTER_MANA.max;
+      const breath = new SpecialCueEffects(Character.chen, { x: 0, y: 0, z: 100 }, true);
+      const fire = () => client.effectPoses({ visibleOnly: true }).filter(pose => pose.model.includes("BreathOfFireMissile") && !hidden(pose));
+      for (let frame = 0; frame < 14; frame++) {
+        breathInput.specialPressed = frame === 0;
+        executeNext(chenMatch);
+      }
+      breath.confirm(chen, true, 0);
+      breath.present(chen, true, false);
+      const confirmedBreath = fire();
+      expect(confirmedBreath).toHaveLength(4);
+      const flames = [...confirmedBreath].sort((a, b) => facing * (a.x - b.x));
+      for (let index = 0; index < 4; index++) {
+        const capsule = specialAreaRegion(chen, index).strike, flame = flames[index];
+        expect(capsule).toBeDefined();
+        if (capsule === undefined || flame === undefined) continue;
+        const ratio = f32(capsule.radius / 70.0), scale = f32(ratio * ratio);
+        const trailing = f32(f32(f32(capsule.x1 + capsule.x2) * 0.5) + f32(150.0 * scale));
+        expect(flame.x).toBe(f32(chen.motion.x + facing * trailing));
+        expect(flame.z).toBe(f32(100 + chen.motion.z + f32(f32(capsule.z1 + capsule.z2) * 0.5)));
+        expect(flame.yaw).toBe(facingYaw(facing));
+        expect(flame.scale).toBe(f32(scale * characterModelScale(Character.chen)));
+        expect(ratio).toBe(f32((ex ? 1.25 : 1) * ([27, 40, 55, 70][index] ?? 0) / 70.0));
+      }
+      for (let frame = 14; frame < 42; frame++) {
+        breathInput.specialPressed = false;
+        executeNext(chenMatch);
+      }
+      breath.present(chen, true, false);
+      expect(fire()).toEqual(confirmedBreath);
+      breath.confirm(chen, true, 0.2);
+      breath.present(chen, true, false);
+      expect(fire()).toEqual([]);
+      breath.destroy();
     }
   });
   expect(client.errors).toEqual([]);

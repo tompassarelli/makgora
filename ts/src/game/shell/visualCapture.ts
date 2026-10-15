@@ -11,6 +11,11 @@ interface VisualCapture {
 const captures = new Map<number, VisualCapture>();
 export const heldVisualFrame = (slot: number) => captures.get(slot)?.held;
 export const visualCapture = (slot: number) => captures.get(slot);
+export function visualCaptureStopBefore(slot: number, stopBefore?: number): number | undefined {
+  const capture = captures.get(slot);
+  const frame = capture?.held?.frame ?? capture?.frames[capture.next];
+  return frame === undefined ? stopBefore : stopBefore === undefined ? frame + 1 : Math.min(stopBefore, frame + 1);
+}
 export const clearVisualCapture = (slot: number): void => { captures.delete(slot); };
 export const visualReleaseFile = (token: string, slot: number, frame: number) => `smashcraft-visual-${token}-p${slot}-f${frame}.txt`;
 
