@@ -381,19 +381,29 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
       look: "player 1's bars near empty and, in some frames, blinking red; no rush starts on the refused press",
     },
     {
-      id: "c39-rematch-countdown", closes: "smashcraft#7 C39N and the E1 countdown box", map: "presentation", session: "c39-countdown",
+      id: "c39-wren-match", closes: "smashcraft#7 C39N setup: the opening quick match's replay is written before the countdown check starts waiting", map: "presentation", session: "c39-countdown",
       setup: [
         { chat: "-dev reset" }, { chat: "-dev slots 1 0" }, { chat: "-dev auto-rematch on" }, { chat: `${QUICK_CPU_COMMAND}wren expert` },
-        { receipt: "^parts [0-9]+$", client: "a", seconds: 600 },
+        { receipt: "^SETUP phase=\\d+ human-fighters=1 computers=[1-9]\\d* .* stocks=3 ", client: "a", seconds: 10 }, { waitMs: 3000 },
       ],
+      pass: [NO_ERRORS, DEV_RECEIPT],
+    },
+    {
+      id: "c39-rematch-countdown", closes: "smashcraft#7 C39N and the E1 countdown box", map: "presentation", session: "c39-countdown",
+      setup: [{ receipt: "^parts [0-9]+$", client: "a", seconds: 600 }],
       capture: [{ kind: "frames", name: "results-rematch-startup", client: "a", count: 70, everyMs: 200 }],
       pass: [NO_IMPORT_FAILURES, NO_ERRORS],
       look: "After the first match ends, the rematch seconds 5 to 1 and then the next match's 3, 2, 1, GO! each appear centred on the stage, popping in and fading out; the next match's fighters stay held until GO!.",
     },
     {
+      id: "c46-second-match", closes: "smashcraft#7 C46 setup: the second Wren match ends", map: "presentation", session: "c39-countdown",
+      setup: [{ receipt: "^parts [0-9]+$", client: "a", seconds: 600 }],
+      pass: [NO_ERRORS],
+    },
+    {
       id: "c46-win-counts", closes: "smashcraft#7 C46", map: "presentation", session: "c39-countdown",
       setup: [
-        { receipt: "^parts [0-9]+$", client: "a", seconds: 600 }, { receipt: "^parts [0-9]+$", client: "a", seconds: 600 },
+        { receipt: "^parts [0-9]+$", client: "a", seconds: 600 },
         { chat: "-dev auto-rematch off" }, { waitMs: 4000 }, { chat: "-dev reset" }, { waitMs: 3000 },
       ],
       capture: [{ kind: "frames", name: "fighter-select-after-three", client: "a" }, { kind: "frames", name: "fighter-select-after-three", client: "b" }],
