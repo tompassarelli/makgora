@@ -266,35 +266,35 @@ function upSmash(): Authored {
     frontHip: -62, frontKnee: 96, frontFoot: 10, backHip: 40, backKnee: 96, backFoot: 10, drop: -36, lunge: 4 };
   const rise = (lean: number, chest: number, drop: number): Gesture => ({ lean, chest, head: 18, pelvis: -6, free: -150, freeElbow: 20, beard: 30,
     frontHip: -12, frontKnee: 8, frontFoot: -20, backHip: 14, backKnee: 6, backFoot: -25, drop });
-  const settle: Gesture = { lean: -3, chest: -5, head: 3, free: -30, freeElbow: 30, frontHip: -20, frontKnee: 30, backHip: 13, backKnee: 32, drop: -11 };
+  const settle: Gesture = { lean: -3, chest: -5, head: 3, free: -60, freeElbow: 30, frontHip: -22, frontKnee: 32, backHip: 14, backKnee: 34, drop: -12 };
   return { pose: "upSmash", style: AttackStyle.upSmash, ground: "cloth", phases: [
     { frame: 0, gesture: READY },
-    { frame: 5, gesture: { ...coil, lean: 3, chest: 5, head: -4, frontHip: -24, frontKnee: 36, backHip: 14, backKnee: 36, drop: -14 }, tip: [60, 30] },
-    { frame: contact - 5, gesture: coil, tip: [55, 10] },
-    { frame: contact - 1, gesture: { ...coil, lean: 8, chest: 12, drop: -38 }, tip: [50, 8] },
-    { frame: contact, gesture: rise(-6, -10, 6), tip: [95, 170] },
-    { frame: contact + 1, gesture: rise(-10, -14, 8), tip: [45, 250] },
-    { frame: contact + 2, gesture: rise(-14, -18, 8), tip: [-20, 262] },
-    { frame: contact + 3, gesture: rise(-18, -22, 6), tip: [-80, 230] },
-    { frame: contact + 8, gesture: { ...rise(-20, -24, 0), free: -110, frontHip: -16, frontKnee: 16, backHip: 16, backKnee: 16 }, tip: [-135, 160] },
-    { frame: contact + 14, gesture: { lean: -12, chest: -15, head: 10, free: -75, freeElbow: 25, frontHip: -18, frontKnee: 24, backHip: 15, backKnee: 25, drop: -6 }, tip: [-125, 120] },
-    { frame: contact + 21, gesture: settle, tip: [-105, 90] },
-    { frame: total - 3, gesture: { chest: -1, frontHip: -2, frontKnee: 3, backHip: 2, backKnee: 3, drop: -1 } },
+    { frame: 5, gesture: { ...coil, lean: 3, chest: 5, head: -4, frontHip: -24, frontKnee: 36, backHip: 14, backKnee: 36, drop: -14 }, tip: [70, 40] },
+    { frame: contact - 5, gesture: coil, tip: [82, 24] },
+    { frame: contact - 1, gesture: { ...coil, lean: 8, chest: 12, drop: -38 }, tip: [82, 18] },
+    { frame: contact, gesture: rise(-6, -10, 6), tip: [70, 205] },
+    { frame: contact + 1, gesture: rise(-10, -14, 8), tip: [35, 255] },
+    { frame: contact + 2, gesture: rise(-13, -17, 8), tip: [-15, 264] },
+    { frame: contact + 3, gesture: rise(-15, -19, 6), tip: [-60, 240] },
+    { frame: contact + 7, gesture: { ...rise(-16, -20, 2), free: -120, frontHip: -14, frontKnee: 12, backHip: 15, backKnee: 12 }, tip: [-125, 170] },
+    { frame: contact + 13, gesture: { lean: -10, chest: -13, head: 10, free: -90, freeElbow: 25, frontHip: -18, frontKnee: 22, backHip: 14, backKnee: 22, drop: -6 }, tip: [-120, 125] },
+    { frame: contact + 20, gesture: settle, tip: [-110, 85] },
+    { frame: total - 2, gesture: { chest: -1, frontHip: -2, frontKnee: 3, backHip: 2, backKnee: 3, drop: -1 } },
     { frame: total, gesture: READY },
   ] };
 }
 
 function upSpecial(): Authored {
   const special = SHADOW_HUNTER_SPECIALS.up.ground!, total = special.endFrame, launch = CHARGED_AIM_FRAMES;
-  const plant: Gesture = { lean: -6, chest: -4, head: -6, free: -40, freeElbow: 30, beard: -10,
-    frontHip: -30, frontKnee: 20, frontFoot: 10, backHip: 40, backKnee: 50, backFoot: 10, drop: -6 };
+  const plant: Gesture = { lean: -10, chest: -6, head: -6, free: -40, freeElbow: 30, beard: -10,
+    frontHip: -20, frontKnee: 10, frontFoot: 10, backHip: 60, backKnee: 75, backFoot: 10, drop: 0 };
   const sit: Gesture = { lean: 0, chest: -6, head: 6, free: 60, freeElbow: 10, frontHip: -95, frontKnee: 5, frontFoot: -20, backHip: -85, backKnee: 10, backFoot: -20, cloth: -40 };
   const stretch: Gesture = { lean: -6, chest: -12, head: 18, free: -170, freeElbow: 0, beard: 50, frontHip: 4, frontKnee: 4, frontFoot: -40, backHip: 14, backKnee: 8, backFoot: -40, cloth: 10 };
   return { pose: "upSpecial", style: AttackStyle.forwardSmash, frames: total, airborne: true, forms: ["upSpecialAir"], phases: [
     { frame: 0, gesture: READY },
-    { frame: 4, gesture: { ...plant, lean: 6, chest: 4, frontHip: -26, frontKnee: 40, backHip: 14, backKnee: 40, drop: -12 }, tip: [100, 30], grip: [45, 100] },
+    { frame: 4, gesture: { ...plant, lean: 4, chest: 2, frontHip: -40, frontKnee: 15, backHip: 25, backKnee: 30, drop: 0 }, tip: [135, 15], grip: [65, 110] },
     { frame: launch, gesture: plant, tip: [125, -2], grip: [55, 135] },
-    { frame: launch + 2, gesture: { lean: -10, chest: -6, head: 0, free: -20, freeElbow: 20, frontHip: -50, frontKnee: 30, frontFoot: -10, backHip: -30, backKnee: 50, backFoot: -10 }, tip: [95, -22], grip: [40, 120] },
+    { frame: launch + 2, gesture: { lean: -14, chest: -6, head: 0, free: -20, freeElbow: 20, frontHip: -70, frontKnee: 20, frontFoot: -10, backHip: -30, backKnee: 50, backFoot: -10 }, tip: [95, -22], grip: [40, 120] },
     { frame: launch + 5, gesture: sit, tip: [30, -95], grip: [22, 45] },
     { frame: launch + 9, gesture: stretch, tip: [20, 300], grip: [12, 200] },
     { frame: launch + 13, gesture: { ...stretch, lean: -14, chest: -16, head: 22, backKnee: 40 }, tip: [-90, 260], grip: [0, 200] },
@@ -302,14 +302,14 @@ function upSpecial(): Authored {
   ] };
 }
 
-const HELPLESS: Gesture = { lean: -42, chest: -18, head: 26, free: -140, freeYaw: 60, freeElbow: 15, beard: 70, cloth: -20,
+const HELPLESS: Gesture = { lean: -18, chest: -10, head: 26, free: -140, freeYaw: 60, freeElbow: 15, beard: 70, cloth: -20,
   frontHip: -70, frontKnee: 50, frontFoot: 30, backHip: 35, backKnee: 80, backFoot: 30 };
 function fallSpecial(): Authored {
   return { pose: "fallSpecial", frames: 40, airborne: true, looping: true, bind: true, phases: [
     { frame: 0, gesture: HELPLESS, tip: [-160, 95] },
-    { frame: 10, gesture: { ...HELPLESS, lean: -52, head: 30, free: -175, freeYaw: 30, frontHip: -35, frontKnee: 40, backHip: 50, backKnee: 60 }, tip: [-150, 140] },
-    { frame: 20, gesture: { ...HELPLESS, lean: -34, head: 20, free: -80, freeYaw: 80, freeElbow: 25, frontHip: -90, frontKnee: 80, backHip: 5, backKnee: 50 }, tip: [-165, 55] },
-    { frame: 30, gesture: { ...HELPLESS, lean: -48, head: 28, free: -120, freeYaw: 90, frontHip: -50, frontKnee: 25, backHip: 55, backKnee: 100 }, tip: [-145, 120] },
+    { frame: 10, gesture: { ...HELPLESS, lean: -26, head: 30, free: -175, freeYaw: 30, frontHip: -35, frontKnee: 40, backHip: 50, backKnee: 60 }, tip: [-150, 140] },
+    { frame: 20, gesture: { ...HELPLESS, lean: -12, head: 20, free: -80, freeYaw: 80, freeElbow: 25, frontHip: -90, frontKnee: 80, backHip: 5, backKnee: 50 }, tip: [-165, 55] },
+    { frame: 30, gesture: { ...HELPLESS, lean: -22, head: 28, free: -120, freeYaw: 90, frontHip: -50, frontKnee: 25, backHip: 55, backKnee: 100 }, tip: [-145, 120] },
     { frame: 40, gesture: HELPLESS, tip: [-160, 95] },
   ] };
 }
