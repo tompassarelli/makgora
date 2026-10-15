@@ -185,7 +185,7 @@ The shared contracts are in `ts/src/game/sim/heroSpecials.tests.ts`.
   smashcraft:tools/animations/export-original-clips.ts exports a pool for
   every hero in `HERO_ROSTER` (extracting the stock model from the game's
   archives with `--extractor`/`--storage`) and regenerates
-  `assets/fighterOriginalClipInfo.ts`; rerun it when a hero is added.
+  its `generated/clips/<fighter-slug>.ts`; rerun it when a hero is added.
   smashcraft:ts/src/game/render/fighterPool.tests.ts fails a selectable
   fighter without a pool, or whose table names a sequence its pool lacks.
 - Without a pool a hero draws with its fighter unit, made from its own object

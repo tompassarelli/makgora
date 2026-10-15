@@ -7,7 +7,7 @@ import { join } from "node:path";
 import { INPUTS_STORE, MANIFEST, readPins } from "../scripts/wisp/buildInputs";
 import { DrawnModel, sampleState } from "../scripts/wisp/hurtboxView";
 import { DEFINITIVE_FIGHTERS } from "../src/game/assets/definitiveFighters";
-import { originalClip } from "../src/game/assets/fighterOriginalClipInfo";
+import { originalClip } from "../src/generated/clips/fighterOriginalClipInfo";
 import { characterModelScale } from "../src/game/presentation/modelScale";
 import { Character } from "../src/game/sim/codes";
 import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/sim/heroes/registry";

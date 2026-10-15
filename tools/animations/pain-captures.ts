@@ -4,7 +4,7 @@ import { captureScene, renderScenes, type RenderScene } from "../../ts/node_modu
 import { createStandaloneSession, NEUTRAL_INPUT } from "../../ts/scripts/wisp/standalone";
 import { headlessRender } from "../../ts/scripts/wisp/headlessRender";
 import { assetsView, readManifest } from "../../ts/scripts/wisp/buildInputs";
-import { originalClip } from "../../ts/src/game/assets/fighterOriginalClipInfo";
+import { originalClip } from "../../ts/src/generated/clips/fighterOriginalClipInfo";
 import { contactDamageClip } from "../../ts/src/game/presentation/damagePose";
 import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../../ts/src/game/sim/heroes/registry";
 import { Character } from "../../ts/src/game/sim/codes";

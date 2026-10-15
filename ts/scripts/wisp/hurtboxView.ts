@@ -7,7 +7,7 @@
 import { deflateSync } from "node:zlib";
 import { ModelRenderer, type model as mdx } from "war3-model";
 import { parseModelMDX } from "wisp/scripts/wisp/models";
-import { originalClip, originalClipNamed } from "../../src/game/assets/fighterOriginalClipInfo";
+import { originalClip, originalClipNamed } from "../../src/generated/clips/fighterOriginalClipInfo";
 import { advanceFighterPose, createFighterPose } from "../../src/game/presentation/fighterPose";
 import { characterModelScale } from "../../src/game/presentation/modelScale";
 import { type Capsule, attackCapsule, emptyCapsule, placeCapsule } from "../../src/game/sim/geometry/contactGeometry";

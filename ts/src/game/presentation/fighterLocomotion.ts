@@ -1,5 +1,5 @@
 import { f32 } from "wisp/src/sim/f32";
-import { originalClip, originalClipNamed } from "../assets/fighterOriginalClipInfo";
+import { originalClip, originalClipNamed } from "../../generated/clips/fighterOriginalClipInfo";
 import { Character } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import type { HeroClip, HeroClipTable } from "../sim/heroes/hero";

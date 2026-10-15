@@ -10,7 +10,8 @@ import { modelFacts } from '../../ts/node_modules/wisp/scripts/wisp/models';
 import { MODEL_FACTS } from '../../ts/scripts/wisp/modelFacts';
 import { writeModelFacts } from '../../ts/scripts/wisp/modelFactsTable';
 import { DrawnModel } from '../../ts/scripts/wisp/hurtboxView';
-import { heroDefinition } from '../../ts/src/game/sim/heroes/registry';
+import { fighterSlug, heroDefinition } from '../../ts/src/game/sim/heroes/registry';
+import { CLIPS } from './fighter-shards';
 
 const [assetsArg, outputArg, fighterName] = process.argv.slice(2);
 if (assetsArg === undefined || outputArg === undefined || fighterName === undefined) throw new Error('usage: bun tools/animations/timeline-models.ts PRIVATE_ASSETS PRIVATE_POOL FIGHTER');
@@ -61,17 +62,16 @@ await Effect.runPromise(Effect.tryPromise({ try: async () => {
     evidence.totalBytes += record.bytes - oldBytes;
     await Bun.write(evidencePath, JSON.stringify(evidence, null, 2) + '\n');
     for (const replaced of replacedFiles) if (replaced !== filename) await unlink(join(output, 'imports/war3mapImported', replaced));
-    const metadataPath = join(import.meta.dir, '../../ts/src/game/assets/fighterOriginalClipInfo.ts');
+    const character = [...fighters].find(([, item]) => item === fighter)![0];
+    const metadataPath = join(CLIPS, `${fighterSlug(character)}.ts`);
     const modelPath = `war3mapImported\\${filename}`;
     let metadata = await Bun.file(metadataPath).text();
     const prefix = `modelPath: ${JSON.stringify(`war3mapImported\\${fighter.name}`).slice(0, -1)}`;
     metadata = metadata.split('\n').map(line => line.includes(`${prefix}OriginalClip`) || line.includes(`${prefix}TimelineBody`)
         ? line.replace(/modelPath: \"[^\"]+\"/, `modelPath: ${JSON.stringify(modelPath)}`).replace(/looping: (true|false)(?:, timeline: true)? \},$/, 'looping: $1, timeline: true },') : line).join('\n');
-    if (!metadata.includes('readonly timeline?: boolean;')) metadata = metadata.replace('  readonly modelPath: string;', '  readonly modelPath: string;\n  readonly timeline?: boolean;');
     await Bun.write(metadataPath, metadata);
     const facts = Object.fromEntries(Object.entries(MODEL_FACTS).filter(([path]) => !path.startsWith(`war3mapImported\\${fighter.name}OriginalClip`) && !path.startsWith(`war3mapImported\\${fighter.name}TimelineBody`)));
     facts[`war3mapImported\\${filename}`] = modelFacts(new Uint8Array(bytes));
-    const character = [...fighters].find(([, item]) => item === fighter)![0];
     const hero = heroDefinition(character);
     if (hero !== undefined) facts[hero.presentation.model] = modelFacts(new Uint8Array(await Bun.file(join(assets, fighter.source)).arrayBuffer()));
     writeModelFacts(facts);

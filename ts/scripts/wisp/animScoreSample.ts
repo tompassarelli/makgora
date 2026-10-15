@@ -2,7 +2,7 @@
 
 
 import { join } from "node:path";
-import { originalClip, originalClipNames } from "../../src/game/assets/fighterOriginalClipInfo";
+import { originalClip, originalClipNames } from "../../src/generated/clips/fighterOriginalClipInfo";
 import { CROUCH_CLIP_FRAMES, advanceFighterPose, createFighterPose } from "../../src/game/presentation/fighterPose";
 import { extremeCamera } from "../../src/game/presentation/arenaCamera";
 import { characterModelScale } from "../../src/game/presentation/modelScale";

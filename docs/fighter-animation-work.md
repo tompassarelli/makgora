@@ -1222,7 +1222,7 @@ production pose selection, and the native lane checks their appearance.
 
 The playable build imports one clip model per sequence from its private
 `--assets` (`original-clips-static-lights/`), and
-smashcraft:ts/src/game/assets/fighterOriginalClipInfo.ts names each by hash.
+smashcraft:ts/src/generated/clips/<fighter-slug>.ts names each by hash.
 Any change to a fighter's clips (a re-authored original, a new or remapped
 hero) needs a matching pool, committed as its hash in
 smashcraft:build-inputs/ with the change (smashcraft:docs/build-inputs.md,
@@ -1480,7 +1480,7 @@ from `ts/`. Preserve the other fighters in that staging family.
 Once the roster is contiguous through Tinker (Character 19), seed a writable
 private pool from the current assets' `original-clips-static-lights` family and
 run `bun tools/animations/export-original-clips.ts --assets PRIVATE_ASSETS --out PRIVATE_POOL --keep-unchanged`
-from the root. This regenerates the full `fighterOriginalClipInfo.ts` and checks
+from the root. This regenerates every fighter's file under `ts/src/generated/clips/` and checks
 retained fighters against their source and clip hashes. Store that pool with
 `bun wisp inputs add original-clips-static-lights PRIVATE_POOL`, then run
 `bun wisp view motion --assets PRIVATE_ASSETS` from `ts/` for the assembled roster.

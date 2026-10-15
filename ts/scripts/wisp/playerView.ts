@@ -12,7 +12,7 @@ import { type FrameFeature, colorRows, pixelShare } from "wisp/scripts/wisp/fram
 import type { PlayerViewExpectations } from "wisp/scripts/wisp/playerView";
 import type { SceneExpectations } from "wisp/scripts/wisp/scene";
 import type { CameraView } from "wisp/scripts/wisp/visibility";
-import { originalClip, originalClipCount, originalLightPath } from "../../src/game/assets/fighterOriginalClipInfo";
+import { originalClip, originalClipCount, originalLightPath } from "../../src/generated/clips/fighterOriginalClipInfo";
 import { FROST_ICE_MODEL, FROST_TRAP_MODEL } from "../../src/generated/assets/frostAssetInfo";
 import {
   IMPACT_DUST_MODEL, IMPACT_ELECTRIC_MODEL, IMPACT_HIT_MODEL, IMPACT_JUMP_MODEL, IMPACT_KO_MODEL,
@@ -40,7 +40,7 @@ import { stageBounds } from "../../src/game/sim/stageBounds";
 import { STAGE_LAVA_MODEL } from "../../src/generated/stages/terrainAssetInfo";
 import { placedPieces } from "../../src/game/presentation/stageScenery";
 import { MODEL_FACTS } from "./modelFacts";
-import { WHITE_MODEL_FACTS } from "./whiteModelFacts";
+import { WHITE_MODEL_FACTS } from "../../src/generated/assets/whiteModelFacts";
 import { WHITE_FIGHTER_MODELS } from "../../src/generated/assets/whiteFighterModels";
 import { STAGE_SKIES, stageSkyTexture } from "../stageSky";
 

@@ -1,5 +1,5 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
-import { originalClip, originalClipCount, originalClipNamed } from "../assets/fighterOriginalClipInfo";
+import { originalClip, originalClipCount, originalClipNamed } from "../../generated/clips/fighterOriginalClipInfo";
 import { characterClips, namedClips } from "../presentation/fighterClips";
 import { Character } from "../sim/codes";
 import { SELECTABLE_CHARACTERS, fighterName, heroDefinition } from "../sim/heroes/registry";

@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { playedMoves } from "../../tools/animations/hd-models";
-import { originalClip, originalClipCount, originalClipNamed, originalClipNames } from "../src/game/assets/fighterOriginalClipInfo";
+import { originalClip, originalClipCount, originalClipNamed, originalClipNames } from "../src/generated/clips/fighterOriginalClipInfo";
 import { victoryAnimation } from "../src/game/presentation/matchAudio";
 import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/sim/heroes/registry";
 import { MatchPresentation } from "../src/game/render/matchPresentation";

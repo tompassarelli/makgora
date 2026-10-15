@@ -22,7 +22,7 @@ import { STOCK_ICON_PX } from '../src/game/ui/plateLayout';
 import { NEUTRAL_TEAM_COLOR } from '../src/game/ui/slotColors';
 import { ModelRenderer, generateMDX, parseMDX } from 'wisp/vendor/war3-model.mjs';
 import { Character } from '../src/game/sim/codes';
-import { originalClip, originalClipCount } from '../src/game/assets/fighterOriginalClipInfo';
+import { originalClip, originalClipCount } from '../src/generated/clips/fighterOriginalClipInfo';
 import { at } from 'wisp/src/runtime/lookup';
 import { STAGE_LIGHTS } from '../src/game/assets/stageLighting';
 import { bustPixels, combine, exposureFor, lightOf } from './portraitLight';

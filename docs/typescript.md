@@ -740,9 +740,10 @@ Pooled fighters and their model sounds derive from the original fighter models.
 smashcraft:tools/animations/export-original-clips.ts reads them from
 `--assets PRIVATE_ASSETS`, writes one clip model per original sequence, each
 fighter's static light and their evidence to `--out` outside the checkout, and
-writes smashcraft:ts/src/game/assets/fighterOriginalClipInfo.ts; with
-`--metadata-only` it checks retained clips against the current sources and
-writes only the module; with `--keep-unchanged` it keeps `--out`'s retained
+writes each exported fighter's own smashcraft:ts/src/generated/clips/<slug>.ts and
+smashcraft:ts/test/fixtures/key-thin/<slug>.tsv (their indexes change only when a
+fighter is added); with `--metadata-only` it checks retained clips against the current sources and
+writes only those files; with `--keep-unchanged` it keeps `--out`'s retained
 clips for fighters whose source is unchanged and exports the rest. Heroes'
 sources are their stock classic models under `--assets`'s hero-models, which
 `--extractor CASC_EXTRACT --storage WARCRAFT_DIR` extracts when missing; a

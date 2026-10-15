@@ -35,7 +35,7 @@ import { Character } from "../sim/codes";
 import { SELECTABLE_CHARACTERS, heroDefinition } from "../sim/heroes/registry";
 import { type ParkedFlags, type WorldOrigin, hideEffect, parkOnce, placeEffect } from "./effects";
 import { characterModelScale } from "../presentation/modelScale";
-import { originalClip, originalClipNamed } from "../assets/fighterOriginalClipInfo";
+import { originalClip, originalClipNamed } from "../../generated/clips/fighterOriginalClipInfo";
 import { KO_BLUR_DISTANCE, type KoFlash, createKoFlash, endKoFlash, koFlashLevels, noteKoFlash } from "../presentation/koFlash";
 import type { Fighter } from "../sim/fighter";
 

@@ -6,7 +6,7 @@ import { heroDefinition } from "../../ts/src/game/sim/heroes/registry";
 import * as illidan from "../../ts/src/game/presentation/demonHunterAssetInfo";
 import { AttackStyle, Character, SpecialAction } from "../../ts/src/game/sim/codes";
 import { onGlobalClock } from "./original-clips";
-import { originalClipNamed } from "../../ts/src/game/assets/fighterOriginalClipInfo";
+import { originalClipNamed } from "../../ts/src/generated/clips/fighterOriginalClipInfo";
 
 export function flashableSequences(character: number, sequences: readonly mdx.Sequence[]): mdx.Sequence[] {
 

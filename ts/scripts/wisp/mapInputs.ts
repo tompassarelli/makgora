@@ -9,7 +9,8 @@ import { MapBuild, MapBuildFailure, type ArchiveEntry } from "wisp/scripts/wisp/
 import { runProcess } from "wisp/scripts/wisp/hostProcess";
 import { UsageFailure } from "wisp/scripts/wisp/command";
 import { step } from "wisp/scripts/wisp/timings";
-import { type FighterOriginalClip, originalClip, originalClipCount, originalLightPath } from "../../src/game/assets/fighterOriginalClipInfo";
+import type { FighterOriginalClip } from "../../src/generated/clips/fighterOriginalClip";
+import { originalClip, originalClipCount, originalLightPath } from "../../src/generated/clips/fighterOriginalClipInfo";
 import * as frostModels from "../../src/generated/assets/frostAssetInfo";
 import * as impactModels from "../../src/game/assets/impactAssetInfo";
 import { IMPORTED_MENU_MUSIC } from "../../src/game/assets/importedMusicInfo";

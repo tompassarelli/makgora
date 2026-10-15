@@ -28,7 +28,7 @@ may_use = ["core", "input", "generated", "sim", "fighter-kit", "snapshot", "ai",
 name = "generated"
 paths = [
   "ts/src/generated/**",
-  "ts/src/game/assets/fighterOriginalClipInfo.ts", "ts/src/game/assets/whiteFighterModels.ts", "ts/src/game/assets/stockSoundInfo.ts",
+  "ts/src/game/assets/stockSoundInfo.ts",
   "ts/src/game/assets/modelSoundInfo.ts", "ts/src/game/assets/impactAssetInfo.ts", "ts/src/game/assets/shieldAssetInfo.ts",
   "ts/src/game/assets/frostAssetInfo.ts", "ts/src/game/assets/stageAssetInfo.ts", "ts/src/game/assets/stageSkyInfo.ts",
   "ts/src/game/assets/terrainAssetInfo.ts",
@@ -190,10 +190,10 @@ may_use = []
 
 # ---------- generated: every producer below exists at 5d9be6ba6b ----------
 [[generated]]
-paths = ["ts/src/game/assets/fighterOriginalClipInfo.ts"]
+paths = ["ts/src/generated/clips/**", "ts/test/fixtures/keyThin.ts", "ts/test/fixtures/key-thin/**"]
 producer = "tools/animations/export-original-clips.ts"
 [[generated]]
-paths = ["ts/src/game/assets/whiteFighterModels.ts", "ts/scripts/wisp/whiteModelFacts.ts"]
+paths = ["ts/src/generated/assets/whiteFighterModels.ts", "ts/src/generated/assets/white-models/**", "ts/src/generated/assets/whiteModelFacts.ts", "ts/src/generated/assets/white-facts/**"]
 producer = "tools/animations/white-flash-models.ts"
 [[generated]]
 paths = ["ts/src/game/assets/stockSoundInfo.ts"]

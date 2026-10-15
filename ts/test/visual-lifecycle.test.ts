@@ -22,7 +22,7 @@ import { beginFighterAttack } from "../src/game/sim/attacks";
 import { advanceFighter } from "../src/game/sim/step";
 import { advanceFighterPose, createFighterPose } from "../src/game/presentation/fighterPose";
 import { FighterPoolPresentation } from "../src/game/render/fighterPool";
-import { originalLightPath } from "../src/game/assets/fighterOriginalClipInfo";
+import { originalLightPath } from "../src/generated/clips/fighterOriginalClipInfo";
 import { fighterAt } from "../src/game/sim/roster";
 import { install, start } from "../src/platform/main";
 import { applyFrame } from "../src/host/loop/frame";

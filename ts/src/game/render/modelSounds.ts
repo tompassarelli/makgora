@@ -2,11 +2,8 @@
 
 
 
-import {
-  type FighterOriginalClip,
-  originalClip,
-  originalClipNamed,
-} from "../assets/fighterOriginalClipInfo";
+import type { FighterOriginalClip } from "../../generated/clips/fighterOriginalClip";
+import { originalClip, originalClipNamed } from "../../generated/clips/fighterOriginalClipInfo";
 import { type ModelSoundCue, fighterSoundCue, fighterSoundCueCount } from "../../generated/assets/modelSoundInfo";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { FRAME_SECONDS, type FighterPose } from "../presentation/fighterPose";

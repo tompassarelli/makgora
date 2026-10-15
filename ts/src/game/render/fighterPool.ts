@@ -13,7 +13,7 @@ import {
   originalClipCount,
   originalClipNamed,
   originalLightPath,
-} from "../assets/fighterOriginalClipInfo";
+} from "../../generated/clips/fighterOriginalClipInfo";
 import type { FighterPose } from "../presentation/fighterPose";
 import { type Character, HeroStatusKind } from "../sim/codes";
 import { fighterPoseFacing, isIntangible } from "../sim/conditions";

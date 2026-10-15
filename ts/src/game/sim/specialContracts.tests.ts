@@ -4,7 +4,7 @@ import { RIFLEMAN_BEAR_CAST_FRAMES, RIFLEMAN_BEAR_SUMMON_FRAMES, startFighterSpe
 import { fighterAt } from "./roster";
 import { controls } from "./testWorld";
 import { executeNext, testMatch } from "../match/testMatch";
-import { originalClipNamed } from "../assets/fighterOriginalClipInfo";
+import { originalClipNamed } from "../../generated/clips/fighterOriginalClipInfo";
 
 test("Rifleman casts in his Spell pose for 24 frames before the bear appears (#111) [k3 measure #111]", () => {
   const match = testMatch(3, Character.rifleman);

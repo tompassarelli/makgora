@@ -11,7 +11,7 @@ import { appendFileSync } from "node:fs";
 import { type SoakDriver, type SoakEdge, type SoakMatch, defineSoakGame } from "wisp/scripts/wisp/soak";
 import type { HeadlessClient } from "wisp/src/headless/client";
 import type { Lockstep } from "wisp/src/headless/lockstep";
-import { originalClip, originalClipCount } from "../../src/game/assets/fighterOriginalClipInfo";
+import { originalClip, originalClipCount } from "../../src/generated/clips/fighterOriginalClipInfo";
 import { Action, bit } from "../../src/game/input/actions";
 import { INPUT_ROW_NUMBERS, type InputRow, emptyInput, inputRow, loadInputNumbers } from "../../src/game/input/inputRow";
 import { PARTICIPANT_SLOTS } from "../../src/game/input/participants";

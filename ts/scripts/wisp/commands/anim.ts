@@ -10,7 +10,7 @@ import { Console, Effect, Schema } from "effect";
 import { ChildProcess } from "effect/process";
 import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
 import { captureScene, renderScenes, type RenderScene } from "wisp/scripts/wisp/headlessRender";
-import { originalClip, originalClipCount, originalClipNames } from "../../../src/game/assets/fighterOriginalClipInfo";
+import { originalClip, originalClipCount, originalClipNames } from "../../../src/generated/clips/fighterOriginalClipInfo";
 import { parseMDX } from "../../clipNodes";
 import { clipJitter, JITTER_EXEMPTIONS, jitters } from "../animJitter";
 import { extremeCamera, cameraFieldOfView, FLOOR_HEIGHT } from "../../../src/game/presentation/arenaCamera";

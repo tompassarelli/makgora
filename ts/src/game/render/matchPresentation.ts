@@ -25,7 +25,8 @@ import { MENU_FONT, MENU_STYLE, PANEL_TEXTURE } from "../ui/hudLayout";
 import { hideEffect, type WorldOrigin } from "./effects";
 import { SoundBank, SoundKind } from "./soundBank";
 import { resultFighterPlacement } from "../presentation/arenaCamera";
-import { type FighterOriginalClip, originalClip, originalClipNamed } from "../assets/fighterOriginalClipInfo";
+import type { FighterOriginalClip } from "../../generated/clips/fighterOriginalClip";
+import { originalClip, originalClipNamed } from "../../generated/clips/fighterOriginalClipInfo";
 
 
 export const RESULTS_DELAY_FRAMES = 90;

@@ -1,6 +1,6 @@
 import { assertDefined, assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
-import type { FighterOriginalClip } from "../assets/fighterOriginalClipInfo";
+import type { FighterOriginalClip } from "../../generated/clips/fighterOriginalClip";
 import type { ModelSoundCue } from "../../generated/assets/modelSoundInfo";
 import { PARTICIPANT_SLOTS, participantActive } from "../input/participants";
 import { type FighterPose, createFighterPose, selectFighterClipIndex, selectFighterClipName } from "../presentation/fighterPose";
