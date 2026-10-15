@@ -31,7 +31,7 @@ Smashcraft takes the Street Fighter half and refuses the Smash half.
 | Counterplay | Each can be shielded or dodged on its startup frames, or escaped by movement, and leaves the user punishable on a whiff. |
 | Payoff | Strong, never a guaranteed stock: none kills from 0%. Below 100%, an ultimate and its true follow-ups stay within #83's 30% (gameplay-design.md, "Combo structure"). |
 | Off rule | "Ultimates off" removes the input; the match rule is part of replay state. |
-| Effects | Each ultimate's models count as one effect group under #380's budget: gone within 12 frames after its last active frame. |
+| Effects | Each ultimate's models count as one effect group under #380's budget: gone within 12 frames after its last active frame. Tower Rush's towers are active until they crumble, and their 30-frame Death animation is the exception Tom asked for. |
 
 ### Source order
 
@@ -52,10 +52,11 @@ Thrall, Peon, Tinker, Malfurion), a status projectile (Sylvanas), a return to ce
 (Cairne) and command throws (Pit Lord, Grom's catch). Ground sweeps are
 answered by jumping or shielding; Frost Wyrm also crosses at body height.
 
-Frost Wyrm midrange connection is measured at a literal 300-unit gap against
-standing targets and seeded Wren Expert approaches, separately. Each mode
-requires damage in at least 70% of trials, across both facings and all stages.
-Shield, jump and roll remain deliberate answers to its startup.
+Frost Wyrm and Tower Rush midrange connection is measured at a literal
+300-unit gap against standing targets and seeded Wren Expert approaches,
+separately. Each mode requires damage in at least 70% of trials, across both
+facings and all stages. Shield, jump and roll remain deliberate answers to
+Frost Wyrm's startup; a held shield or breaking the towers answers Tower Rush.
 
 ## Per fighter
 
@@ -81,7 +82,7 @@ Frames count from the input frame (frame 1 is the first frame after it).
 | Sylvanas | **Banshee Form** · WoW Sylvanas's banshee form and Warcraft III Possession (tier 1) | Turns dark and see-through as the Possession shadow and a burst of the dead wrap her, f1–18; hittable, and a hit cancels it | f19–98 intangible and ethereal, she flies at 9 a frame at the foe nearest at activation, turning at most 4° a frame, through platforms; contact 14%, 45°, base 45, growth 72 (KOs from about 140% at the edge), then she carries 80 units on and turns solid with 20 frames of endlag; a miss turns solid at f98 with 30. Her last ~360 units of path stay as a shadow trail for 120 frames: 1% jab flinches every 20 frames on one shared clock, at most 6 a foe. At most 20% from one use | Roll through the dive (a 180° turn takes her 45 frames), shield it (heavy shield damage), hit her during f1–18; step out of the trail | The Banshee Queen's wraith form: she passes through you and leaves the dark behind | Possession caster, target and missile, Banshee unit |
 | Cairne | **Reincarnation** · Warcraft III Tauren Chieftain ultimate (tier 1, reimagined: it triggers on death in WC3) | The Reincarnation ankh appears at centre stage on the deck, f1–24 (24 frames from ankh to burst) | f25 light and a small shockwave burst from the ankh, radius 90: 12%, 70°, base 40, growth 80; next frame he teleports to the ankh, intangible for 6 frames. Total 50 | Shield or leave the ankh; punish his arrival recovery through f50 | The old chief who will not stay down, returning to the ancestors' mark | Reincarnation target, Resurrect target, War Stomp caster |
 | Chen | **Storm, Earth and Fire** · Warcraft III Brewmaster ultimate (tier 1) | He splits; three spirits appear, f1–20 | Earth stomps both sides (f21, radius 120, 8%), Storm strikes 220 ahead (f33, 7%), Fire breathes behind him (f45, 9%) | Each spirit hits once in its own place and time: read the order, shield, or roll through | His three-way split as one combination | Storm, Earth and Fire Pandaren effects, Breath of Fire |
-| Peon | **Timber!** · orc peons chopping trees (unit) | A big tree sprouts beside him; he chops three times, f1–36 | f37–48 the tree falls forward, 420 long, from upright to flat: 20%, 40°, base 45 | Stand behind him or past the treetop, shield, or hit him while he chops | Work work, and finally work complete | Ashenvale tree, lumber target art |
+| Peon | **Tower Rush** · the orc tower rush, Tom's request (unit) | He hacks at the ground, f1–15; the first Orc Watch Tower starts building at f16 | Five stock Watch Towers rise in quick succession, one every 8 frames (f16–48), at 110, 250, −130, 390 and 530 ahead, held on the main deck. Each builds for 20 frames (its Birth animation), then fires a Guard Tower arrow at the nearest foe at ages 20, 60, 100 and 140: 26 a frame, homing on height, 1.5%, 40°, base 30, growth 15; at most 30% from all twenty. At 150 frames each crumbles (Death animation, 30 frames) and is gone by about 4 s. When the last tower is built he says the stock "Work complete!" (PeonJobDone). Total 70 | Break a tower (10 durability: one smash, or a few jabs or projectiles), which crumbles at once and never fires again; shield the arrows (a held shield takes all twenty); hit him while he builds, which stops the towers not yet started; punish him through f70 | Work work, then a tower rush across the stage | Orc Watch Tower, Guard Tower missile, PeonJobDone voice |
 | Goblin Tinker | **Robo-Goblin Overdrive** · Warcraft III Tinker ultimate (tier 1, reimagined: Robo-Goblin is his down special) | He hops out; the robot waddles forward beeping, f1–20 | The robot walks 6 a frame for 60 frames, then explodes, radius 150: 18%, 55°; touching it explodes it early | Walk away, shield the blast, or punish Tinker through f50 | Goblin engineering that is almost a weapon | Robo-Goblin unit, goblin land mine explosion |
 | Kael'thas | **Gravity Lapse** · Kael'thas in Tempest Keep and Magisters' Terrace (tier 2: Phoenix is his EX, #381) | Arcane orbs orbit him; a violet ring of radius 260, f1–28 | f29 everyone in the ring is lifted straight up: 14%, 90°, base 60, growth 85 | Leave the ring, shield; punish him through f60 | The prince's raid-boss signature | Mass Teleport and Cyclone effects |
 | Murloc | **Mrglglgl Stampede** · Tom's decision (unit) | Blows a conch, "MRGLGLGLGL!", water splashes where the swarm enters, f1–20 | f20 four murlocs pour across from behind him at ground level, 30 a frame: three carry grounded foes with 2% hits every 6 frames, the last launches (10%, 40°) | Jump or be airborne, shield (heavy damage); off-stage is safe; Murloc is committed until the wave ends | Legible, funny, characterful | Murloc variants at small scale, splashes |

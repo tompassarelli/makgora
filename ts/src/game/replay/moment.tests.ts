@@ -45,11 +45,11 @@ function roundTrip(callback: boolean, frames: number, row = scriptedRow, fighter
   const rows: Slots<InputRow> = [emptyInput(), emptyInput(), emptyInput(), emptyInput()];
   const selected = [0, floorDiv(frames, 2), frames, frames - 1];
   const expected = new Map<number, { state: string; checksum: string }>();
+  const scratch = createReplaySnapshot();
   const capture = (frame: number) => {
     if (!inspect || !selected.includes(frame)) return;
-    const snapshot = createReplaySnapshot();
-    copyReplayState(snapshot, tape.live);
-    expected.set(frame, { state: canonicalState(snapshot), checksum: stateChecksum(snapshot) });
+    copyReplayState(scratch, tape.live);
+    expected.set(frame, { state: canonicalState(scratch), checksum: stateChecksum(scratch) });
   };
   capture(0);
   const run = (frame: number) => {
@@ -72,7 +72,6 @@ function roundTrip(callback: boolean, frames: number, row = scriptedRow, fighter
     capture(frame);
   };
   for (let frame = 1; frame <= frames; frame++) run(frame);
-  const scratch = createReplaySnapshot();
   copyReplayState(scratch, tape.live);
   const checksum = stateChecksum(scratch);
   assertEquals(beginMomentSave(recorder, callback ? { kind: "callback", scenario: "normal" } : { kind: "network" }, world, match, controls, runtime), true);
@@ -93,7 +92,7 @@ function roundTrip(callback: boolean, frames: number, row = scriptedRow, fighter
   assertEquals(result.frames, frames >= MOMENT_FRAMES ? frames - 120 * floorDiv(frames - MOMENT_FRAMES, 120) : frames);
   if (inspect) {
     const savedText = moment.lines.join("\n");
-    const live = createReplaySnapshot();
+    const live = scratch;
     copyReplayState(live, tape.live);
     const liveText = canonicalState(live);
     for (const frame of selected) {

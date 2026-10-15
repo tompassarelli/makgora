@@ -462,19 +462,31 @@ function orderCompanion(f: Fighter, order: CompanionOrder, slot = 0): void {
 }
 
 
-function placeObject(f: Fighter, spec: Readonly<SpecialPlacement>): void {
-  placeOne(f, spec, spec.slot ?? 0, 1);
-  if (spec.outwardPair === true) placeOne(f, spec, (spec.slot ?? 0) + 1, -1);
+function placeObjects(f: Fighter, spec: Readonly<SpecialPlacement>, frame: number, stage: number): void {
+  const spread = spec.spread;
+  if (spread === undefined) {
+    if (spec.frame !== frame) return;
+    placeOne(f, spec, spec.slot ?? 0, 1, spec.offsetX, undefined);
+    if (spec.outwardPair === true) placeOne(f, spec, (spec.slot ?? 0) + 1, -1, spec.offsetX, undefined);
+    return;
+  }
+  for (let index = 0; index < spread.offsets.length; index++) {
+    if (spec.frame + index * spread.every === frame) placeOne(f, spec, (spec.slot ?? 0) + index, 1, at(spread.offsets, index), stage);
+  }
 }
 
-function placeOne(f: Fighter, spec: Readonly<SpecialPlacement>, slot: number, side: number): void {
+function placeOne(f: Fighter, spec: Readonly<SpecialPlacement>, slot: number, side: number, offsetX: number, deckStage: number | undefined): void {
   const placed = placedObject(f, slot);
   if (spec.keepExisting === true && placed.life > 0) return;
   const facing = f.facing < 0 ? -1 : 1;
   placed.life = spec.life;
   placed.age = 0;
-  placed.x = f32(f.motion.x + f32(f32(f.facing * side) * spec.offsetX));
+  placed.x = f32(f.motion.x + f32(f32(f.facing * side) * offsetX));
   placed.z = f32(f.motion.z + (spec.offsetZ ?? 0.0));
+  if (deckStage !== undefined) {
+    placed.x = min(f32(mainDeckRight(deckStage) - spec.radius), max(f32(mainDeckLeft(deckStage) + spec.radius), placed.x));
+    placed.z = mainDeckZAt(deckStage, placed.x);
+  }
   placed.direction = spec.outwardPair === true ? facing * side : facing;
   if (spec.mark !== undefined) spawnHeroProjectileAt(f, spec.mark, placed.x, f32(placed.z + spec.mark.offsetZ), placed.direction, false, f.attack.serial + 1);
   placed.durability = spec.durability;
@@ -543,7 +555,7 @@ export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Contr
   if (frame === 1 && world !== undefined && f.special.seekTarget === 0 && seeks(move)) f.special.seekTarget = seekTargetSlot(world, f) + 1;
   applyMotion(f, move, frame, input, world);
   for (const spec of move.projectiles ?? []) if (spec.spawnFrame === frame) spawnHeroProjectile(f, spec, f.attack.serial + 1, stage, world);
-  if (move.placement?.frame === frame) placeObject(f, move.placement);
+  if (move.placement !== undefined) placeObjects(f, move.placement, frame, stage);
   if (move.command?.frame === frame) orderCompanion(f, move.command.order, move.command.slot);
   if (move.burst?.frame === frame) burstProjectiles(f, move.burst.from, move.burst.into);
   if (move.ritual?.frame === frame) {

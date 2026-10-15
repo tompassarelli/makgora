@@ -660,8 +660,8 @@ test("Big Bad Voodoo: both wards fire every volley outward from their own side, 
 export const LICH_CONNECT_SEEDS = [17, 83, 241] as const;
 export type LichAnswer = "standing" | "moving" | "shield" | "jump" | "roll";
 
-export function lichUltimateRun(stage: number, gap: number, seed: number, facing: number, answer: LichAnswer): { started: boolean; damage: number; firstHit: number; shieldFrames: number } {
-  const owner = createFighter(Character.lich, f32(-gap * facing * 0.5), facing);
+export function ultimateFieldRun(stage: number, gap: number, seed: number, facing: number, answer: LichAnswer, character: Character = Character.lich, frames = 128): { started: boolean; damage: number; firstHit: number; shieldFrames: number } {
+  const owner = createFighter(character, f32(-gap * facing * 0.5), facing);
   const target = createFighter(Character.blademaster, f32(gap * facing * 0.5), -facing);
   owner.motion.z = mainDeckZAt(stage, owner.motion.x);
   target.motion.z = mainDeckZAt(stage, target.motion.x);
@@ -680,7 +680,7 @@ export function lichUltimateRun(stage: number, gap: number, seed: number, facing
   const executed = createFrameControls();
   const row = createMatchFrameInput();
   const result = { started: false, damage: 0.0, firstHit: 0, shieldFrames: 0 };
-  for (let frame = 1; frame <= 128; frame++) {
+  for (let frame = 1; frame <= frames; frame++) {
     const tick = frame - 8;
     copyControls(produced.inputs[0], tick === 1 ? controls({ specialPressed: true, ultimatePressed: true, attackHeld: true }) : neutralControls());
     copyControls(produced.inputs[1], neutralControls());
@@ -703,11 +703,11 @@ export function lichUltimateRun(stage: number, gap: number, seed: number, facing
   return result;
 }
 
-function connect(stageIds: readonly number[], seeds: readonly number[], answer: "standing" | "moving"): { hits: number; total: number } {
+function connect(stageIds: readonly number[], seeds: readonly number[], answer: "standing" | "moving", character: Character = Character.lich, frames = 128): { hits: number; total: number } {
   let hits = 0;
   let total = 0;
   for (const stage of stageIds) for (const seed of seeds) for (const facing of [-1, 1]) {
-    const run = lichUltimateRun(stage, 300.0, seed, facing, answer);
+    const run = ultimateFieldRun(stage, 300.0, seed, facing, answer, character, frames);
     assertEquals(run.started, true, `stage ${stage} gap 300 seed ${seed} facing ${facing}`);
     total++;
     if (run.damage > 0.0) hits++;
@@ -731,9 +731,65 @@ sweep("Frost Wyrm deals damage in at least 70% of fixed gap 300 standing and Wre
 
 test("Frost Wyrm startup can be answered with shield, jump or roll [k3 measure docs/design/ultimates.md]", () => {
   for (const facing of [-1, 1]) for (const answer of ["shield", "jump", "roll"] as const) {
-    const run = lichUltimateRun(0, 300.0, 17, facing, answer);
+    const run = ultimateFieldRun(0, 300.0, 17, facing, answer);
     assertTrue(run.started);
     assertEquals(run.damage, 0.0, `${answer} facing ${facing}`);
     if (answer === "shield") assertTrue(run.shieldFrames > 0);
+  }
+});
+
+const TOWER_RUSH_FRAMES = 8 + 250;
+
+test("Tower Rush deals damage in at least 70% of fixed gap 300 standing and Wren Expert approaches [k3 measure docs/design/ultimates.md]", () => {
+  for (const answer of ["standing", "moving"] as const) {
+    const result = connect([0], LICH_CONNECT_SEEDS, answer, Character.peon, TOWER_RUSH_FRAMES);
+    assertEquals(result.hits * 10 >= result.total * 7, true, `${answer}: ${result.hits}/${result.total}`);
+  }
+});
+
+sweep("Tower Rush deals damage in at least 70% of fixed gap 300 standing and Wren Expert approaches on every stage [k3 measure docs/design/ultimates.md]", () => {
+  for (const answer of ["standing", "moving"] as const) for (const stage of STAGE_CATALOG) {
+    const result = connect([stage.id], LICH_CONNECT_SEEDS, answer, Character.peon, TOWER_RUSH_FRAMES);
+    assertEquals(result.hits * 10 >= result.total * 7, true, `${stage.name} ${answer}: ${result.hits}/${result.total}`);
+  }
+});
+
+test("Tower Rush arrows are all taken on a held shield [k3 measure docs/design/ultimates.md]", () => {
+  for (const facing of [-1, 1]) {
+    const run = ultimateFieldRun(0, 300.0, 17, facing, "shield", Character.peon, TOWER_RUSH_FRAMES);
+    assertTrue(run.started);
+    assertEquals(run.damage, 0.0, `facing ${facing}`);
+    assertTrue(run.shieldFrames > 0);
+  }
+});
+
+function towerBreak(facing: number, smashTick: number): { arrows: number; crumbleTick: number; total: number } {
+  const b = bout({ character: Character.peon, x: 250.0, defence: "shield" }, facing);
+  const placement = ultimateOf(Character.peon).placement;
+  const tower = placedObject(b.owner, 2);
+  const result = { arrows: 0, crumbleTick: -1, total: 0 };
+  b.step(ULTIMATE);
+  for (let tick = 1; tick < 220; tick++) {
+    if (tick === smashTick) queueAttack(b.commands[1] ?? attackBuffer(ATTACK_BUFFER_FRAMES), { style: AttackStyle.forwardSmash, facing: facing < 0 ? 1 : -1, frame: b.frame() + 1, mayCharge: false });
+    b.step();
+    if (result.crumbleTick < 0 && tower.spec === placement && tower.life > 0 && tower.life <= (placement?.crumble ?? 0)) result.crumbleTick = tick;
+    for (const shot of b.owner.projectiles) {
+      if (shot.life <= 0 || shot.spec !== placement?.shot || shot.life !== placement?.shot?.life) continue;
+      result.total++;
+      if (Math.abs(f32(shot.x - tower.x)) <= 40.0) result.arrows++;
+    }
+  }
+  return result;
+}
+
+test("Tower Rush: a forward smash breaks a rising tower, which crumbles at once and never fires, while the rest keep shooting [k1 scenario]", () => {
+  for (const facing of [-1, 1]) {
+    const standing = towerBreak(facing, 999);
+    assertGreaterThan(standing.arrows, 0);
+    assertGreaterThan(standing.crumbleTick, 150);
+    const broken = towerBreak(facing, 16);
+    assertEquals(broken.arrows, 0, `facing ${facing}`);
+    assertTrue(broken.crumbleTick > 0 && broken.crumbleTick < 60);
+    assertGreaterThan(broken.total, 0);
   }
 });

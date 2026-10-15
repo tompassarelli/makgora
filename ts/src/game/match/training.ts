@@ -10,7 +10,7 @@ import { PARTICIPANT_SLOTS, type Slots, participantActive } from "../input/parti
 import { copyFighterState } from "../replay/fighterState";
 import { AttackStyle, Character, DownState, LedgeState, SpecialAction } from "../sim/codes";
 import { attackActive, attackStartup, canAttack, canShieldGrab, isTumbling } from "../sim/conditions";
-import { type Fighter, createFighter } from "../sim/fighter";
+import { type Fighter, PACK_CAPACITY, createFighter } from "../sim/fighter";
 import { type Controls, type Roster, createRoster, fighterAt, isActive, neutralControls } from "../sim/roster";
 import { advanceFighterMotion } from "../sim/step";
 import { respawnFighter } from "../sim/stocks";
@@ -145,7 +145,7 @@ let forecast: Forecast | undefined;
 
 function landsWithin(world: Roster, f: Readonly<Fighter>, stage: number, matchFrame: number, direction: number, frames: number): boolean {
   if (forecast === undefined) {
-    const fighter = createFighter(Character.demonHunter, 0.0, 1);
+    const fighter = createFighter(Character.demonHunter, 0.0, 1, PACK_CAPACITY);
     forecast = { fighter, world: createRoster(1, [fighter]), input: neutralControls() };
   }
   copyFighterState(forecast.fighter, f, world.mask);

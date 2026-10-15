@@ -4,7 +4,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { idiv } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS } from "../input/participants";
-import { type Fighter, type PlacedObject, placedObject } from "../sim/fighter";
+import { type Fighter, PACK_CAPACITY, type PlacedObject, placedObject } from "../sim/fighter";
 import { type AuthoredSpecial, CompanionMode } from "../sim/heroSpecials";
 import { Character } from "../sim/codes";
 import { authoredTuning } from "../sim/tuning";
@@ -18,6 +18,9 @@ import { bindPrototype } from "../../platform/rebind";
 const PLACED_OBJECT_MODEL = "Units\\Orc\\SerpentWard\\SerpentWard.mdx";
 const MODEL_HEIGHT = 300.0;
 const DEFAULT_LOOK = { path: PLACED_OBJECT_MODEL, height: MODEL_HEIGHT, alpha: 255 };
+const ANIMALS = PACK_CAPACITY + 1;
+const BIRTH_SECONDS = 60.0;
+const DEATH_SECONDS = f32(2.333);
 
 function placementPaths(character: Character): string[] {
   const paths = [heroDefinition(character)?.presentation.placedModel?.path ?? PLACED_OBJECT_MODEL];
@@ -55,7 +58,7 @@ export class PlacedObjectEffects {
     this.feedback = new BearFeedback(origin);
     this.models = [];
     this.paths = [];
-    for (const slot of PARTICIPANT_SLOTS) for (let animal = 0; animal < 3; animal++) {
+    for (const slot of PARTICIPANT_SLOTS) for (let animal = 0; animal < ANIMALS; animal++) {
       this.models.push(AddSpecialEffect(PLACED_OBJECT_MODEL, origin.x, origin.y));
       this.paths.push(PLACED_OBJECT_MODEL);
     }
@@ -69,8 +72,8 @@ export class PlacedObjectEffects {
     const parked = (this.parked ??= []);
     const paths = placementPaths(character);
     const imagePath = character === Character.blademaster ? heroDefinition(character)?.presentation.placedModel?.path : undefined;
-    for (let animal = 0; animal < 3; animal++) {
-      const index = slot * 3 + animal;
+    for (let animal = 0; animal < ANIMALS; animal++) {
+      const index = slot * ANIMALS + animal;
       const current = this.models[index];
       for (const model of Object.values(prepared[index] ?? {})) if (model !== undefined && model !== current) DestroyEffect(model);
       const looks: { [path: string]: effect | undefined } = {};
@@ -118,13 +121,13 @@ export class PlacedObjectEffects {
     for (let animal = 0; animal <= fighter.pack.length; animal++) {
       const placed = placedObject(fighter, animal);
       const look = placed.spec?.model ?? heroDefinition(fighter.character)?.presentation.placedModel ?? DEFAULT_LOOK;
-      this.modelFor(slot * 3 + animal, look.path);
+      this.modelFor(slot * ANIMALS + animal, look.path);
     }
     this.feedback.confirm(frame, fighter, slot);
   }
 
   hideSlot(slot: number): void {
-    for (let animal = 0; animal < 3; animal++) this.hideModel(slot * 3 + animal);
+    for (let animal = 0; animal < ANIMALS; animal++) this.hideModel(slot * ANIMALS + animal);
     this.feedback.hide(slot);
   }
 
@@ -135,9 +138,9 @@ export class PlacedObjectEffects {
   }
 
   present(fighter: Readonly<Fighter>, slot: number): void {
-    for (let animal = 0; animal < 3; animal++) {
-      if (animal > fighter.pack.length) this.hideModel(slot * 3 + animal);
-      else this.presentAnimal(fighter, placedObject(fighter, animal), slot * 3 + animal);
+    for (let animal = 0; animal < ANIMALS; animal++) {
+      if (animal > fighter.pack.length) this.hideModel(slot * ANIMALS + animal);
+      else this.presentAnimal(fighter, placedObject(fighter, animal), slot * ANIMALS + animal);
     }
     this.feedback.present(fighter, slot);
   }
@@ -159,6 +162,7 @@ export class PlacedObjectEffects {
     BlzSetSpecialEffectYaw(model, placed.direction > 0 ? 0.0 : f32(3.14159274));
     const bear = placed === fighter.placed ? bearState(fighter) : undefined;
     if (spec.companion !== undefined) this.animate(model, slot, placed, bear);
+    else if (spec.crumble !== undefined) this.build(model, slot, placed, spec.crumble, spec.fireAges[0] ?? 1);
     BlzSetSpecialEffectScale(model, f32(spec.height / look.height * (bear === "CHARGING" ? 1.25 : 1.0)));
 
     const left = f32(Math.max(0.0, placed.durability) / spec.durability);
@@ -166,6 +170,16 @@ export class PlacedObjectEffects {
     BlzSetSpecialEffectAlpha(model, half + Math.floor(f32((look.alpha - half) * left)));
   }
 
+
+  private build(model: effect, slot: number, placed: Readonly<PlacedObject>, crumble: number, built: number): void {
+    const anim = placed.life <= crumble ? 3 : placed.age < built ? 4 : 0;
+    const attackStarts = (this.attackStarts ??= []);
+    if (this.anims[slot] === anim && attackStarts[slot] === placed.serial) return;
+    this.anims[slot] = anim;
+    attackStarts[slot] = placed.serial;
+    BlzPlaySpecialEffect(model, anim === 3 ? ANIM_TYPE_DEATH : anim === 4 ? ANIM_TYPE_BIRTH : ANIM_TYPE_STAND);
+    BlzSetSpecialEffectTimeScale(model, anim === 3 ? f32(DEATH_SECONDS / f32(crumble / 60.0)) : anim === 4 ? f32(BIRTH_SECONDS / f32(built / 60.0)) : 1.0);
+  }
 
   private animate(model: effect, slot: number, placed: Readonly<PlacedObject>, bear: ReturnType<typeof bearState>): void {
     const { x, mode } = placed;

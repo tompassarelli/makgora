@@ -95,6 +95,23 @@ function ownedProjectiles(f: Readonly<Fighter>): number {
 }
 
 
+function towardNearestFoe(world: Roster, ownerSlot: number, placed: Readonly<PlacedObject>): number {
+  let direction = placed.direction;
+  let nearest = -1.0;
+  for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
+    if (slot === ownerSlot || !isActive(world, slot)) continue;
+    const foe = fighterAt(world, slot);
+    if (foe.status.out) continue;
+    const dx = f32(foe.motion.x - placed.x);
+    const dz = f32(foe.motion.z - placed.z);
+    const squared = f32(f32(dx * dx) + f32(dz * dz));
+    if (nearest >= 0.0 && squared >= nearest) continue;
+    nearest = squared;
+    if (dx !== 0.0) direction = dx < 0.0 ? -1 : 1;
+  }
+  return direction;
+}
+
 export function advancePlacedObjects(world: Roster): void {
   for (let ownerSlot = 0; ownerSlot < PARTICIPANT_CAPACITY; ownerSlot++) {
     if (!isActive(world, ownerSlot)) continue;
@@ -108,8 +125,9 @@ export function advancePlacedObjects(world: Roster): void {
         placed.life = 0;
         continue;
       }
+      const crumble = spec.crumble ?? 0;
       placeBody(placed, spec);
-      for (let sourceSlot = 0; sourceSlot < PARTICIPANT_CAPACITY; sourceSlot++) {
+      for (let sourceSlot = 0; sourceSlot < PARTICIPANT_CAPACITY && placed.life > crumble; sourceSlot++) {
         if (!canHit(world, sourceSlot, ownerSlot) || !isActive(world, sourceSlot)) continue;
         const source = fighterAt(world, sourceSlot);
         if (source.status.out) continue;
@@ -119,14 +137,15 @@ export function advancePlacedObjects(world: Roster): void {
       }
       placed.age++;
       placed.life--;
-      if (placed.durability <= 0.0) placed.life = 0;
-      if (placed.life <= 0) continue;
+      if (placed.durability <= 0.0 && placed.life > crumble) placed.life = crumble;
+      if (placed.life <= crumble) continue;
       let scheduled = false;
       for (const age of spec.fireAges) if (age === placed.age) scheduled = true;
       const fires = scheduled && placed.mode === CompanionMode.follow && !inGrabContext(owner) && owner.launch.hitstun <= 0 && !owner.status.out;
       const last = spec.fireAges[spec.fireAges.length - 1];
       const shot = spec.finalShot !== undefined && placed.age === last ? spec.finalShot : spec.shot;
       if (fires && shot !== undefined && (channeled || ownedProjectiles(owner) < HERO_PROJECTILE_CAP)) {
+        if (spec.aimed === true) placed.direction = towardNearestFoe(world, ownerSlot, placed);
         const x = f32(placed.x + f32(placed.direction * shot.offsetX));
         spawnHeroProjectileAt(owner, shot, x, f32(placed.z + shot.offsetZ), placed.direction, false, owner.attack.serial + 1);
       }

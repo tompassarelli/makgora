@@ -270,20 +270,19 @@ const CHEN: AuthoredSpecial = {
   rehits: [21, 33, 45],
 };
 
-const TREE = hit(20.0, 40, 90.0, 45.0);
+const WATCH_TOWER_MODEL = "buildings\\orc\\WatchTower\\WatchTower.mdx";
+const TOWER_ARROW: SpecialProjectile = {
+  ...shot(0, 30.0, 95.0, 26.0, 0.0, 26, 18.0, hit(1.5, 40, 15.0, 30.0), "Abilities\\Weapons\\GuardTowerMissile\\GuardTowerMissile.mdx"),
+  homing: { turn: 3.0, maxRise: 14.0 },
+};
 const PEON: AuthoredSpecial = {
-  name: "Timber!", endFrame: 70, groundOnly: true,
-  projectiles: [
-    mark("units\\nightelf\\Ent\\Ent.mdl", 2, 46, 80.0),
-    mark("Abilities\\Spells\\NightElf\\TargetArtLumber\\TargetArtLumber.mdx", 12, 10, 60.0, 40.0),
-    mark("Abilities\\Spells\\NightElf\\TargetArtLumber\\TargetArtLumber.mdx", 24, 10, 60.0, 40.0),
-  ],
-  regions: [
-    heroRegion(37, 39, capsule(60.0, 0.0, f32(168.703), f32(405.689), 35.0), TREE),
-    heroRegion(40, 42, capsule(60.0, 0.0, f32(329.970), f32(321.739), 35.0), TREE),
-    heroRegion(43, 45, capsule(60.0, 0.0, f32(440.646), f32(177.500), 35.0), TREE),
-    heroRegion(46, 48, capsule(60.0, 15.0, 480.0, 15.0, 35.0), TREE),
-  ],
+  name: "Tower Rush", endFrame: 70, groundOnly: true,
+  placement: {
+    frame: 16, slot: 1, offsetX: 0.0, radius: 40.0, height: 150.0, durability: 10.0, life: 180, crumble: 30,
+    fireAges: [20, 60, 100, 140], spread: { offsets: [110.0, 250.0, -130.0, 390.0, 530.0], every: 8 }, aimed: true,
+    shot: TOWER_ARROW,
+    model: { path: WATCH_TOWER_MODEL, height: 220.0, alpha: 255 },
+  },
 };
 
 const OVERDRIVE_BLAST = shot(0, 0.0, 30.0, 0.0, 0.0, 4, 150.0, hit(18.0, 55, 90.0, 45.0, HitElement.fire), "Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx");
@@ -425,7 +424,7 @@ const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined 
   [Character.sylvanas]: "She becomes a banshee and dives through the nearest foe, leaving a shadow trail that stings anyone standing in it. Hit her while she changes; roll through the dive or shield it.",
   [Character.cairne]: "An ankh appears at centre stage. After 24 frames it bursts, then he teleports there with 6 frames of intangibility. Shield or leave the ankh; punish his arrival recovery.",
   [Character.chen]: "He splits into Earth, Storm and Fire, which strike around him one after another.",
-  [Character.peon]: "He chops at a big tree until it falls forward across the stage. Stand behind him or hit him while he chops.",
+  [Character.peon]: "He builds five Orc watch towers in quick succession across the stage; each shoots arrows at the nearest foe for about three seconds, then crumbles. Break a tower, shield or dodge the arrows, or hit him while he builds.",
   [Character.tinker]: "His Robo-Goblin waddles ahead and explodes. Walk away or shield the blast.",
   [Character.kaelthas]: "Arcane orbs ring him, then everyone inside is lifted straight up. Leave the ring.",
   [Character.murloc]: "He blows a conch and a swarm of murlocs pours across the ground. Jump over it or shield.",
@@ -463,7 +462,7 @@ export const ULTIMATE_REACH: { readonly [character: number]: { readonly near: nu
   [Character.sylvanas]: { near: 150.0, far: 600.0 },
   [Character.cairne]: { near: 0.0, far: 0.0 },
   [Character.chen]: { near: 0.0, far: 240.0 },
-  [Character.peon]: { near: 80.0, far: 420.0 },
+  [Character.peon]: { near: 0.0, far: 600.0 },
   [Character.tinker]: { near: 80.0, far: 300.0 },
   [Character.kaelthas]: { near: 0.0, far: 240.0 },
   [Character.murloc]: { near: 100.0, far: 600.0 },

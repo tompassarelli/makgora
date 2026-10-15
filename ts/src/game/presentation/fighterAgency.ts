@@ -5,7 +5,7 @@ import { Character, DownState, GrabAction, LedgeState, ShieldBreak, SurfaceConta
 import { inStageCannon } from "../sim/stageHazards";
 import { surelyClear } from "./agencyClearance";
 import { canAttack, canShieldGrab } from "../sim/conditions";
-import { type Fighter, createFighter } from "../sim/fighter";
+import { type Fighter, PACK_CAPACITY, createFighter } from "../sim/fighter";
 import { advanceGrabs, resolveGrabs } from "../sim/grabs";
 import { grabContactFrame } from "../sim/moves";
 import { heroStatusBlocksActions } from "../sim/heroStatus";
@@ -39,13 +39,13 @@ function clearFlight(f: Readonly<Fighter>): boolean {
 }
 
 export class FighterAgencyForecast {
-  private readonly fighter = createFighter(Character.demonHunter, 0.0, 1);
+  private readonly fighter = createFighter(Character.demonHunter, 0.0, 1, PACK_CAPACITY);
   private readonly world = createRoster(1, [this.fighter]);
   private readonly input = neutralControls();
   private readonly pressedTech = { pressAge: 255, previousPressAge: 255, accumulatedPress: false };
 
-  private readonly holder = createFighter(Character.demonHunter, 0.0, 1);
-  private readonly thrown = createFighter(Character.demonHunter, 0.0, 1);
+  private readonly holder = createFighter(Character.demonHunter, 0.0, 1, PACK_CAPACITY);
+  private readonly thrown = createFighter(Character.demonHunter, 0.0, 1, PACK_CAPACITY);
   private readonly throwWorld = createRoster(3, [this.holder, this.thrown]);
   private readonly throwInputs = [neutralControls(), neutralControls()];
 

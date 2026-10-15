@@ -63,6 +63,7 @@ export const VERIFIED_STOCK_SOUNDS: Readonly<Record<string, string>> = {
   "Units\\Creeps\\PandarenBrewmaster\\PandarenBrewmasterWarcry1.flac": "war3.w3mod:_locales\\enus.w3mod:units\\creeps\\pandarenbrewmaster\\pandarenbrewmasterwarcry1.ogg",
   "Units\\Orc\\Peon\\PeonReady1.flac": "war3.w3mod:_locales\\enus.w3mod:units\\orc\\peon\\peonready1.ogg",
   "Units\\Orc\\Peon\\PeonWarcry1.flac": "war3.w3mod:_locales\\enus.w3mod:units\\orc\\peon\\peonwarcry1.ogg",
+  "Sound\\Buildings\\Orc\\PeonJobDone.flac": "war3.w3mod:_locales\\enus.w3mod:sound\\buildings\\orc\\peonjobdone.ogg",
   "Units\\Creeps\\HeroTinker\\HeroTinkerReady1.flac": "war3.w3mod:_locales\\enus.w3mod:units\\creeps\\herotinker\\herotinkerready1.ogg",
   "Units\\Creeps\\HeroTinker\\HeroTinkerWarcry1.flac": "war3.w3mod:units\\creeps\\herotinker\\herotinkerwarcry1.ogg",
   "Units\\Human\\Kael\\KaelReady1.flac": "war3.w3mod:_locales\\enus.w3mod:units\\human\\kael\\kaelready1.ogg",

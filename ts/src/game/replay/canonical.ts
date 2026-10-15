@@ -302,6 +302,12 @@ export function specialPlacementCanonical(spec: Readonly<SpecialPlacement>, pref
   if (spec.mark !== undefined) result.push(specialProjectileCanonical(spec.mark, `${prefix}.mark`));
   if (spec.outwardPair === true) int("outwardPair", 1);
   if (spec.channeled === true) int("channeled", 1);
+  if (spec.spread !== undefined) {
+    int("spread.every", spec.spread.every);
+    for (let index = 0; index < spec.spread.offsets.length; index++) real(`spread.offset[${index}]`, at(spec.spread.offsets, index));
+  }
+  if (spec.aimed === true) int("aimed", 1);
+  if (spec.crumble !== undefined) int("crumble", spec.crumble);
   const partner = spec.companion;
   if (partner !== undefined) {
     if (partner.behavior !== undefined) int("companion.behavior", partner.behavior === "sentry" ? 1 : 2);

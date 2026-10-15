@@ -164,7 +164,7 @@ function heldPlacedObjects(fighter: Readonly<Fighter>, into: Set<Readonly<Placed
   for (const spare of packSpares(fighter) ?? []) into.add(spare);
 }
 
-test("snapshot copies fill a cold ring with Beastmasters and follow a rematch that swaps them out and back in, creating no pack table and allocating nothing for fighters [k1 scenario]", () => {
+test("snapshot copies fill a cold ring with Peons and follow a rematch that swaps them out and back in, creating no pack table and allocating nothing for fighters [k1 scenario]", () => {
   const ring: ReplayState[] = [];
   for (let index = 0; index < REPLAY_HISTORY_CAPACITY; index++) ring.push(createReplaySnapshot());
   const held = new Set<Readonly<PlacedObject>>();
@@ -174,8 +174,8 @@ test("snapshot copies fill a cold ring with Beastmasters and follow a rematch th
   let fighterKb = 0.0;
   let frame = 0;
   let animals = 0;
-  // A cold ring fills with Beastmasters; a rematch swaps them for Riflemen through the whole ring, then back.
-  for (const character of [Character.beastmaster, Character.rifleman, Character.beastmaster]) {
+  // A cold ring fills with Peons, whose Tower Rush pack is the largest; a rematch swaps them for Riflemen through the whole ring, then back.
+  for (const character of [Character.peon, Character.rifleman, Character.peon]) {
     for (const slot of SLOTS) live.world.fighters[slot] = createFighter(character, matchSpawnX(slot), floorMod(slot, 2) === 0 ? 1 : -1);
     for (let index = 0; index < REPLAY_HISTORY_CAPACITY; index++) {
       frame++;

@@ -3,7 +3,7 @@ import { PARTICIPANT_SLOTS } from "../input/participants";
 import { type FrameControls, createFrameControls } from "../match/controls";
 import { type PacingAndPresentation, copyPacingAndPresentation, createPacingAndPresentation } from "../match/pacingAndPresentation";
 import { type MatchState, copyMatchState, createMatchState } from "../match/rules";
-import { createFighter } from "../sim/fighter";
+import { PACK_CAPACITY, createFighter } from "../sim/fighter";
 import { type Roster, createRoster, fighterAt, isActive } from "../sim/roster";
 import { copyFighterState } from "./fighterState";
 
@@ -22,7 +22,7 @@ export interface ReplayState {
 
 export function createReplaySnapshot(): ReplayState {
   return {
-    world: createRoster(3, [createFighter(1, 0.0, 1), createFighter(1, 0.0, -1), createFighter(2, 0.0, 1), createFighter(1, 0.0, -1)]),
+    world: createRoster(3, [createFighter(1, 0.0, 1, PACK_CAPACITY), createFighter(1, 0.0, -1, PACK_CAPACITY), createFighter(2, 0.0, 1, PACK_CAPACITY), createFighter(1, 0.0, -1, PACK_CAPACITY)]),
     match: createMatchState(),
     controls: createFrameControls(),
     runtime: createPacingAndPresentation(),

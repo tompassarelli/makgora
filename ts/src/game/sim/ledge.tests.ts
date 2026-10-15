@@ -12,6 +12,7 @@ import { BODY_HALF_WIDTH } from "./surfaces";
 import { advanceSolo, controls, testWorld } from "./testWorld";
 import { LEDGE_REGRAB_FRAMES, clearLedge } from "./transitions";
 import { SELECTABLE_CHARACTERS } from "./heroes/registry";
+import { copyFighterState } from "../replay/fighterState";
 
 function ledgeTestFighter(character: Character, side: number): Fighter {
   const fighter = createReferenceFighter(character, f32(side * 620.0), -side);
@@ -153,9 +154,10 @@ test("only a full down passes ledges; a slight downward tilt still catches [k4 r
   assertEquals(fighter.ledge.state, LedgeState.hang);
 });
 
-function contender(character: Character, side: number, outside: number): Fighter {
-  const box = ledgeCatchBox(character);
-  const fighter = ledgeTestFighter(character, side);
+function contender(source: Readonly<Fighter>, fighter: Fighter, side: number, outside: number): Fighter {
+  copyFighterState(fighter, source, 3);
+  const box = ledgeCatchBox(fighter.character);
+  fighter.facing = -side;
   fighter.motion.x = f32((side < 0 ? surfaceLeft(0, 0, 0) : surfaceRight(0, 0, 0)) + f32(side * outside));
   fighter.motion.z = f32(surfaceZ(0, 0, 0) - f32((box.lowest + box.highest) * 0.5));
   return fighter;
@@ -164,20 +166,26 @@ function contender(character: Character, side: number, outside: number): Fighter
 test("the nearer of two contenders catches a ledge whatever their slot order, a tie catches neither, and the owner hogs: every fighter's mirror at both ledges [k2 property]", () => {
   for (const character of SELECTABLE_CHARACTERS) {
     const reach = ledgeCatchBox(character).reach;
+    const source = ledgeTestFighter(character, 1);
+    const near = ledgeTestFighter(character, 1);
+    const far = ledgeTestFighter(character, 1);
+    const late = ledgeTestFighter(character, 1);
+    const first = ledgeTestFighter(character, 1);
+    const second = ledgeTestFighter(character, 1);
     for (const side of [-1, 1]) {
       for (const reversed of [false, true]) {
-        const near = contender(character, side, f32(reach * 0.25));
-        const far = contender(character, side, f32(reach * 0.75));
+        contender(source, near, side, f32(reach * 0.25));
+        contender(source, far, side, f32(reach * 0.75));
         const input = controls();
         resolveLedges(reversed ? testWorld(far, near) : testWorld(near, far), 0, [input, input]);
         assertEquals(near.ledge.state, LedgeState.hang, `${character} side ${side} reversed ${reversed}`);
         assertEquals(far.ledge.state, LedgeState.none, `${character} side ${side} reversed ${reversed}`);
         near.ledge.intangible = 0;
-        const late = contender(character, side, f32(reach * 0.25));
+        contender(source, late, side, f32(reach * 0.25));
         resolveLedges(reversed ? testWorld(late, near) : testWorld(near, late), 0, [input, input]);
         assertEquals(late.ledge.state, LedgeState.none, `${character} side ${side} hog`);
-        const first = contender(character, side, f32(reach * 0.5));
-        const second = contender(character, side, f32(reach * 0.5));
+        contender(source, first, side, f32(reach * 0.5));
+        contender(source, second, side, f32(reach * 0.5));
         resolveLedges(reversed ? testWorld(second, first) : testWorld(first, second), 0, [input, input]);
         assertEquals(first.ledge.state, LedgeState.none, `${character} side ${side} tie`);
         assertEquals(second.ledge.state, LedgeState.none, `${character} side ${side} tie`);

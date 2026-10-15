@@ -562,9 +562,9 @@ function emptyProjectile(): Projectile {
 }
 
 
-export function createFighter(character: Character, startX: number, facing: number): Fighter {
+export function createFighter(character: Character, startX: number, facing: number, spareCount = packLength(character) > 2 ? PACK_CAPACITY : 2): Fighter {
   const tuning = authoredTuning(character);
-  const spares = [createPlacedObject(), createPlacedObject()];
+  const spares = repeat(spareCount, createPlacedObject);
   const fighter: Fighter = {
     character,
     tuning,
@@ -750,15 +750,20 @@ export function createFighter(character: Character, startX: number, facing: numb
     status: { offscreenFrames: 0, damage: 0.0, stocks: STARTING_STOCKS, respawn: 0, out: false, invincible: 0, frozenFrames: 0, freezeImmunityFrames: 0, armorFrames: 0, armorMaxDamage: 0.0, armorChills: false, condition: 0, conditionFrames: 0, conditionGroup: 0, conditionImmunityFrames: 0, conditionImmunity: [0, 0, 0], divineFrames: 0, poisonFrames: 0, poisonEvery: 0, poisonDamage: 0.0, buff: 0, buffFrames: 0 },
     mana: { points: 0 },
     placed: createPlacedObject(),
-    pack: packFrom(spares, character === Character.beastmaster || character === Character.shadowHunter ? PACK_CAPACITY : 0),
+    pack: packFrom(spares, packLength(character)),
   };
   PACK_SPARES.set(fighter, spares);
   initializeInfluenceOperands(fighter);
   return fighter;
 }
 
-/** Animals a pack holds at most: a Beastmaster's quilbeast and hawk, or a Shadow Hunter's two Big Bad Voodoo wards. */
-export const PACK_CAPACITY = 2;
+/** Animals a pack holds at most: a Beastmaster's quilbeast and hawk, a Shadow Hunter's two Big Bad Voodoo wards, or a Peon's five Tower Rush towers. */
+export const PACK_CAPACITY = 5;
+
+function packLength(character: Character): number {
+  if (character === Character.peon) return PACK_CAPACITY;
+  return character === Character.beastmaster || character === Character.shadowHunter ? 2 : 0;
+}
 
 // Every fighter keeps PACK_CAPACITY placed objects for its pack, kept out of
 // its fields so saved records and the copy stay as they are: a copy grows the
@@ -768,7 +773,7 @@ const PACK_SPARES = new WeakMap<Readonly<Fighter>, readonly PlacedObject[]>();
 
 // The pack's table starts with every spare, so Lua sizes its array part once and growing it never allocates.
 function packFrom(spares: readonly PlacedObject[], length: number): PlacedObject[] {
-  const pack = [at(spares, 0), at(spares, 1)];
+  const pack = spares.slice();
   pack.length = length;
   return pack;
 }

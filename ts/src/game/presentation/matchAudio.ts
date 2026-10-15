@@ -152,6 +152,8 @@ export const readyVoice = (character: Character): string => voice(character, "Re
 
 export const warcryVoice = (character: Character): string => voice(character, "Warcry");
 
+export const JOB_DONE_VOICE = "Sound\\Buildings\\Orc\\PeonJobDone.flac";
+
 
 const VICTORY_ANIMATIONS: Readonly<Record<Character, string>> = {
   [Character.rifleman]: "spell",
@@ -195,5 +197,6 @@ export function presentationSoundPaths(characters: readonly Character[], stages:
   const paths = [...CUE_SOUNDS, MENU_MUSIC, ...VICTORY_MUSIC];
   for (const stage of stages) paths.push(stageMusic(stage));
   for (const character of characters) paths.push(readyVoice(character), warcryVoice(character));
+  if (characters.includes(Character.peon)) paths.push(JOB_DONE_VOICE);
   return paths.filter((path, index) => paths.indexOf(path) === index);
 }

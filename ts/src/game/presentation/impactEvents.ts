@@ -2,7 +2,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { imod } from "wisp/src/sim/intMath";
 import { Character, DownState, LedgeState, ShieldBreak, SurfaceContact } from "../sim/codes";
 import { attackStartup, isFloorTeching, isGroundDodging, isTumbling } from "../sim/conditions";
-import type { Fighter } from "../sim/fighter";
+import { type Fighter, placedObject } from "../sim/fighter";
 import { HitElement } from "../sim/hitRegions";
 import { LEDGE_HANG_DEPTH, LEDGE_HANG_OUTSET } from "../sim/ledge";
 import { SMASH_MAX_CHARGE_FRAMES } from "../sim/moves";
@@ -69,6 +69,8 @@ export interface ImpactEvents {
   throwRelease: boolean;
   charge: boolean;
   ready: boolean;
+  previousBuiltSerial: number;
+  jobDone: boolean;
   ledgeCatch: boolean;
   ledgeRecovery: boolean;
 
@@ -136,7 +138,7 @@ export function createImpactEvents(): ImpactEvents {
     previousX: 0.0, previousZ: 0.0, previousVelocityX: 0.0, previousDownFrame: 0,
     previousGrabVisualSerial: 0, previousThrowVisualSerial: 0, previouslyCharging: false,
     previousChargeFrames: 0, previousLedgeSerial: 0, previousLedgeState: LedgeState.none,
-    previousLedgeSide: 0, previousAttackSerial: 0, previousAttackFrame: 0, previousSpecialAction: SpecialAction.none, previousSpecialFrame: 0, previousSpecialForm: 0, grab: false, throwRelease: false, charge: false, ready: false,
+    previousLedgeSide: 0, previousAttackSerial: 0, previousAttackFrame: 0, previousSpecialAction: SpecialAction.none, previousSpecialFrame: 0, previousSpecialForm: 0, grab: false, throwRelease: false, charge: false, ready: false, previousBuiltSerial: -1, jobDone: false,
     ledgeCatch: false, ledgeRecovery: false, ledgeX: 0.0, ledgeZ: 0.0, hit: false, electric: false,
     element: HitElement.normal, strength: 0, tier: 0, swing: -1, variant: 0, perform: -1, performSerial: 0, hitCharacter: 1, hitMove: -1, strong: false,
     shieldCharacter: 1, shieldMove: -1, shieldVariant: 0, pummel: false, shieldElectric: false, footstep: "none",
@@ -180,10 +182,12 @@ export function captureImpactEventsBefore(events: ImpactEvents, fighter: Readonl
   events.previousSpecialAction = fighter.special.action;
   events.previousSpecialFrame = fighter.special.frame;
   events.previousSpecialForm = fighter.special.form;
+  events.previousBuiltSerial = lastBuiltSerial(fighter);
   events.grab = false;
   events.throwRelease = false;
   events.charge = false;
   events.ready = false;
+  events.jobDone = false;
   events.ledgeCatch = false;
   events.ledgeRecovery = false;
   events.hit = false;
@@ -215,6 +219,16 @@ export function captureImpactEventsBefore(events: ImpactEvents, fighter: Readonl
   events.surfaceMissedTech = false;
 }
 
+
+function lastBuiltSerial(fighter: Readonly<Fighter>): number {
+  const spec = fighter.tuning.ultimate?.placement;
+  const spread = spec?.spread;
+  if (spec === undefined || spread === undefined) return -1;
+  const slot = (spec.slot ?? 0) + spread.offsets.length - 1;
+  if (slot > fighter.pack.length) return -1;
+  const placed = placedObject(fighter, slot);
+  return placed.spec === spec && placed.life > 0 && placed.age >= (spec.fireAges[0] ?? 0) ? placed.serial : -1;
+}
 
 function hitTier(fighter: Readonly<Fighter>, world: Readonly<Roster> | undefined): number | undefined {
   const { lastAttacker, lastAttackSerial } = fighter.hits;
@@ -320,6 +334,8 @@ export function finishImpactEventsAfter(events: ImpactEvents, fighter: Readonly<
     events.throwRelease = visuals.throw !== events.previousThrowVisualSerial;
     events.charge = !events.previouslyCharging && attack.smashCharging;
     events.ready = attack.smashCharging && events.previousChargeFrames < SMASH_MAX_CHARGE_FRAMES && attack.smashChargeFrames === SMASH_MAX_CHARGE_FRAMES;
+    const built = lastBuiltSerial(fighter);
+    events.jobDone = built >= 0 && built !== events.previousBuiltSerial;
     events.ledgeCatch = ledge.serial !== events.previousLedgeSerial;
     events.ledgeRecovery = events.previousLedgeState === LedgeState.hang
       && (ledge.state === LedgeState.climb || ledge.state === LedgeState.roll || ledge.state === LedgeState.attack || jump.serial !== events.previousJumpSerial);

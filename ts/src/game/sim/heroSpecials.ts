@@ -228,6 +228,9 @@ export interface SpecialPlacement {
   readonly outwardPair?: boolean | undefined;
   /** It lasts only while the special that placed it runs, nothing breaks it meanwhile, and its fire skips the hero projectile cap. */
   readonly channeled?: boolean | undefined;
+  readonly spread?: { readonly offsets: readonly number[]; readonly every: number } | undefined;
+  readonly aimed?: boolean | undefined;
+  readonly crumble?: number | undefined;
 
   readonly companion?: SpecialCompanion | undefined;
 }
