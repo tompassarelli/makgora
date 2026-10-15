@@ -24,8 +24,11 @@ const textureError = (frame: Frame, texture: Rgba, x: number, y: number, uiWidth
 
 const COVER_MARGIN = 0.004;
 
-// Warcraft draws its own cursor a frame or more after the pointer moves.
+// Warcraft draws the cursor and the hand a frame or more after a move or click.
 const CURSOR_DRAW_ATTEMPTS = 6;
+
+// A fresh private desktop's Xwayland drops the first XTEST motion.
+const POINTER_MOVE_ATTEMPTS = 3;
 const margined = (left: number, top: number, width: number, height: number): UiRect => ({ left: left - COVER_MARGIN, top: top + COVER_MARGIN, width: width + 2 * COVER_MARGIN, height: height + 2 * COVER_MARGIN });
 
 const cursorPixels = (frame: Frame, texture: Rgba, x: number, y: number, pinching: boolean) => texturePixels(frame, texture, handLeft(x, false, pinching), handTop(y, false, pinching), HAND_WIDTH, HAND_HEIGHT);
@@ -59,10 +62,13 @@ export const measureCursorGate = (clientsFile: string, name: string, directory: 
   })), Effect.mapError(fail("cursor gate pointer")));
   const move = (x: number, y: number) => Effect.gen(function*() {
     const point = pixelPoint(frame, x, y);
-    const from = yield* pointer();
     const target = { x: region.x + point.x, y: region.y + point.y };
-    yield* runProcess(ChildProcess.make(client.tools.xdotool, ["mousemove_relative", "--", String(target.x - from.x), String(target.y - from.y)], { env: { ...Bun.env, ...client.x11 }, stdin: "ignore" })).pipe(Effect.mapError(fail("cursor gate pointer")));
-    const at = yield* pointer();
+    let at = yield* pointer();
+    for (let attempt = 0; attempt < POINTER_MOVE_ATTEMPTS && (at.x !== target.x || at.y !== target.y); attempt++) {
+      if (attempt > 0) yield* Effect.sleep("100 millis");
+      yield* runProcess(ChildProcess.make(client.tools.xdotool, ["mousemove_relative", "--", String(target.x - at.x), String(target.y - at.y)], { env: { ...Bun.env, ...client.x11 }, stdin: "ignore" })).pipe(Effect.mapError(fail("cursor gate pointer")));
+      at = yield* pointer();
+    }
     if (at.x !== target.x || at.y !== target.y) return yield* new AcceptFailure({ operation: "cursor gate pointer", problem: `pointer at ${at.x},${at.y}; wanted ${target.x},${target.y}` });
   });
   const drawnHand = (pixels: Frame, x: number, y: number) => {
@@ -81,7 +87,7 @@ export const measureCursorGate = (clientsFile: string, name: string, directory: 
       pixels = yield* capture(client, region).pipe(Effect.mapError(fail("cursor gate capture")));
       drawn = drawnHand(pixels, x, y);
       attempts++;
-    } while ((drawn.hand?.error ?? Infinity) > 24 && attempts < CURSOR_DRAW_ATTEMPTS);
+    } while (((drawn.hand?.error ?? Infinity) > 24 || (phase !== "pick" && phase !== "drop" && drawn.pinched !== (phase === "carrying"))) && attempts < CURSOR_DRAW_ATTEMPTS);
     const elapsedMs = (yield* Clock.currentTimeMillis) - started;
     const { pinched, hand } = drawn;
     const error = hand?.error;
