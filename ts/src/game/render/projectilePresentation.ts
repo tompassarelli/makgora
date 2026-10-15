@@ -40,7 +40,9 @@ const RISEN_FRONT = 56.0;
 const RISEN_HEADROOM = 20.0;
 const RISEN_BIRTH = 0.625;
 const RISEN_DEPTH = 0.375;
-const RISEN_ALPHA = 150;
+export const RISEN_ALPHA = 150;
+export const STATIONARY_SECONDS = f32(0.3);
+export const BIRTH_MISSILES = ["FreezingBreathMissile", "WaterElementalMissile", "FrostWyrmMissile"];
 const RAISED_SKELETON = "Units\\Undead\\Skeleton\\Skeleton.mdx";
 const RAISED_BURST = "Abilities\\Spells\\Undead\\RaiseSkeletonWarrior\\RaiseSkeleton.mdx";
 const RAISED_FRONT = 62.0;
@@ -366,7 +368,7 @@ export class ProjectilePresentation {
       const born = projectile !== undefined && (this.serials[slot] !== projectile.serial || this.specs[slot] !== projectile.spec || !this.visible[slot]);
       const rebirth = projectile !== undefined && cue?.birth !== undefined && !paused && (born || (cue.birth.eachFrame && this.lives[slot] !== projectile.life));
       if (born && projectile !== undefined && !risen && !tell && !defile) {
-        const birth = pool?.path.includes("FreezingBreathMissile") === true || pool?.path.includes("WaterElementalMissile") === true || pool?.path.includes("FrostWyrmMissile") === true;
+        const birth = BIRTH_MISSILES.some((name) => pool?.path.includes(name) === true);
         if (cue?.birth === undefined) {
           if (draw?.seconds === undefined) BlzSetSpecialEffectAnimation(model, draw?.sequence ?? pose.animationSequence ?? (birth ? "birth" : "stand"));
           BlzSetSpecialEffectTime(model, draw?.seconds ?? 0.0);
@@ -429,7 +431,7 @@ export class ProjectilePresentation {
         this.specs[slot] = projectile.spec;
       }
       if (risen) {
-        BlzSetSpecialEffectTime(model, f32(0.3));
+        BlzSetSpecialEffectTime(model, STATIONARY_SECONDS);
         BlzSetSpecialEffectTimeScale(model, paused ? 0.0 : this.definitive ? 1.0 : 0.0);
       } else if (tell && projectile?.spec !== undefined) {
         BlzSetSpecialEffectTime(model, f32((projectile.spec.life - projectile.life) / 60));
@@ -440,9 +442,9 @@ export class ProjectilePresentation {
       } else if (cue?.birth === undefined && projectile?.spec !== undefined && projectile.velocityX === 0.0 && projectile.velocityZ === 0.0) {
 
         if (pool !== undefined && STATIONARY_PARTICLE_MODELS.includes(pool.drawn)) {
-          if ((born || !paused) && restartsStationaryField(pool.drawn, projectile.spec.life - projectile.life, born)) BlzSetSpecialEffectTime(model, f32(0.3));
+          if ((born || !paused) && restartsStationaryField(pool.drawn, projectile.spec.life - projectile.life, born)) BlzSetSpecialEffectTime(model, STATIONARY_SECONDS);
         } else {
-          BlzSetSpecialEffectTime(model, f32(0.3));
+          BlzSetSpecialEffectTime(model, STATIONARY_SECONDS);
           BlzSetSpecialEffectTimeScale(model, 0.0);
         }
       }

@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { effectUses, effectUseDigest, effectSourceDigest, type EffectVerdict, type EffectFinding } from "./effectVisibility";
+import { effectUses, judgeUse, modelFactsKey, FACTS_VERSION, type EffectUse, type EffectFinding, type ModelFacts } from "./effectVisibility";
 import { fighterCueList, MISSING_CUE_MODEL } from "../../src/game/presentation/specialCues";
 import { allAttackCueModels } from "../../src/game/presentation/attackCues";
 import { DEFINITIVE_ACCENT_REDRAWS, DISJOINT_CUES } from "../../src/game/presentation/disjointCues";
@@ -46,39 +46,51 @@ export function touchesCueInputs(paths: readonly string[], inputs: ReadonlySet<s
 }
 
 
-const effectRows = (text: string): string[] => text.split("\n").filter((line) => line.startsWith("classic-use\t"));
-const rowDigest = (source: string, cacheInfo: string, row: string): string => createHash("sha256").update(`${source}\t${cacheInfo}\t${row}`).digest("hex");
+const factRows = (text: string): string[] => text.split("\n").filter((line) => line.startsWith("classic-model\t"));
+const rowDigest = (cacheInfo: string, row: string): string => createHash("sha256").update(`${FACTS_VERSION}\t${cacheInfo}\t${row}`).digest("hex");
+const encodeFacts = (facts: ModelFacts | null): string => JSON.stringify(facts, (_, value: unknown) => typeof value === "number" && !Number.isFinite(value) ? { number: String(value) } : value);
+const decodeFacts = (text: string): ModelFacts | null => JSON.parse(text, (_, value: unknown) => typeof value === "object" && value !== null && !Array.isArray(value) && Object.keys(value).length === 1 && typeof (value as { number?: unknown }).number === "string" ? Number((value as { number: string }).number) : value) as ModelFacts | null;
 
-export function formatEffectRecord(report: { readonly source: string; readonly cacheInfo: string; readonly models: ReadonlyMap<string, string>; readonly findings: readonly EffectFinding[] }): string {
-  const rows = report.findings.map(({ status, reason, ...use }) => `classic-use\t${effectUseDigest(use)}\t${status}\t${report.models.get(use.model) ?? "unread"}\t${reason.replace(/[\t\r\n]/g, " ")}`).sort();
-  return `classic-source\t${report.source}\t${report.cacheInfo}\n` + rows.map((row) => `${row}\t${rowDigest(report.source, report.cacheInfo, row)}\n`).join("");
+export function formatEffectRecord(report: { readonly cacheInfo: string; readonly models: ReadonlyMap<string, string>; readonly facts: ReadonlyMap<string, ModelFacts | null> }): string {
+  const rows = [...report.facts].map(([model, facts]) => `classic-model\t${modelFactsKey(model)}\t${report.models.get(model) ?? "unread"}\t${encodeFacts(facts)}`).sort();
+  return `classic-facts\t${FACTS_VERSION}\t${report.cacheInfo}\n` + rows.map((row) => `${row}\t${rowDigest(report.cacheInfo, row)}\n`).join("");
 }
 
-export function effectRecordProblem(text: string, root?: string): string | undefined {
-  const header = text.split("\n").find((line) => line.startsWith("classic-source\t"))?.split("\t");
-  const digest = /^[0-9a-f]{64}$/;
-  if (header?.[1] !== effectSourceDigest(root) || !digest.test(header[2] ?? "")) return `Classic effect record is missing or stale; record one exact24268 cache with ${RECORD_COMMAND}`;
-  const edited = effectRows(text).filter((line) => { const at = line.lastIndexOf("\t"); return line.slice(at + 1) !== rowDigest(header[1] ?? "", header[2] ?? "", line.slice(0, at)); });
-  if (edited.length > 0) return `Classic effect record has ${edited.length} rows edited by hand or recorded against another source or cache; re-record them with ${RECORD_COMMAND}`;
-  const records = new Map<string, EffectVerdict["status"]>();
-  for (const line of effectRows(text)) {
-    const [, key, status] = line.split("\t");
-    if (key !== undefined && (status === "visible" || status === "invisible" || status === "unknown")) records.set(key, status);
+type RecordedFacts = { readonly problem: string } | { readonly facts: ReadonlyMap<string, ModelFacts | null> };
+
+export function recordedFacts(text: string): RecordedFacts {
+  const headers = text.split("\n").filter((line) => line.startsWith("classic-facts\t")).map((line) => line.split("\t"));
+  const header = headers[0];
+  if (headers.length !== 1 || header?.[1] !== String(FACTS_VERSION) || !/^[0-9a-f]{64}$/.test(header[2] ?? "")) return { problem: `Classic effect record is missing or stale: it holds no model facts from extractor version ${FACTS_VERSION}; from ts/ on a machine with the exact24268 cache run ${RECORD_COMMAND} and commit the record` };
+  const facts = new Map<string, ModelFacts | null>();
+  let edited = 0;
+  for (const line of factRows(text)) {
+    const at = line.lastIndexOf("\t"), row = line.slice(0, at), [, key, , json] = row.split("\t");
+    if (line.slice(at + 1) !== rowDigest(header[2] ?? "", row) || key === undefined || json === undefined) { edited++; continue; }
+    facts.set(key, decodeFacts(json));
   }
-  const refused = effectUses().filter((use) => {
-    const status = records.get(effectUseDigest(use));
-    return status === undefined || status === "invisible";
-  });
-  return refused.length === 0 ? undefined : `Classic effects: ${refused.length} missing/invisible uses refuse the gate: ${refused.map((use) => `${use.fighter}/${use.move}`).join("; ")}`;
+  return edited > 0 ? { problem: `Classic effect record has ${edited} model facts rows edited by hand or extracted by another extractor version or cache; re-record them with ${RECORD_COMMAND}` } : { facts };
 }
 
-export function effectRecordUnknowns(text: string): string[] {
-  const records = new Map(text.split("\n").flatMap((line) => {
-    const [kind, key, status, , reason] = line.split("\t");
-    return kind === "classic-use" && key !== undefined && status === "unknown" ? [[key, reason ?? "reason not recorded"] as const] : [];
-  }));
-  return effectUses().flatMap((use) => {
-    const reason = records.get(effectUseDigest(use));
-    return reason === undefined ? [] : [`${use.fighter}\t${use.move}\tUnknown\t${use.model}\t${reason}`];
-  });
+export function effectFindings(text: string, uses: readonly EffectUse[] = effectUses()): { readonly problem: string } | { readonly findings: readonly EffectFinding[] } {
+  const recorded = recordedFacts(text);
+  if ("problem" in recorded) return recorded;
+  const unrecorded = uses.filter((use) => !recorded.facts.has(modelFactsKey(use.model)));
+  if (unrecorded.length > 0) {
+    const models = [...new Set(unrecorded.map((use) => modelFactsKey(use.model)))];
+    return { problem: `Classic effect record is missing or stale: no model facts for ${models.length} newly used models; from ts/ on a machine with the exact24268 cache run ${RECORD_COMMAND} and commit the record: ${models.map((model) => `${model} (${unrecorded.filter((use) => modelFactsKey(use.model) === model).map((use) => `${use.fighter}/${use.move}`).join(", ")})`).join("; ")}` };
+  }
+  return { findings: uses.map((use) => judgeUse(use, recorded.facts.get(modelFactsKey(use.model)) ?? null)) };
+}
+
+export function effectRecordProblem(text: string, uses: readonly EffectUse[] = effectUses()): string | undefined {
+  const judged = effectFindings(text, uses);
+  if ("problem" in judged) return judged.problem;
+  const refused = judged.findings.filter(({ status }) => status === "invisible");
+  return refused.length === 0 ? undefined : `Classic effects: ${refused.length} invisible uses refuse the gate: ${refused.map((use) => `${use.fighter}/${use.move}`).join("; ")}`;
+}
+
+export function effectRecordUnknowns(text: string, uses: readonly EffectUse[] = effectUses()): string[] {
+  const judged = effectFindings(text, uses);
+  return "problem" in judged ? [] : judged.findings.filter(({ status }) => status === "unknown").map((use) => `${use.fighter}\t${use.move}\tUnknown\t${use.model}\t${use.reason}`);
 }

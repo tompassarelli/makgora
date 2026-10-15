@@ -9,6 +9,8 @@ import { type ParkedFlags, type WorldOrigin, facingYaw, parkCue } from "./effect
 
 
 export const HIT_AREA_EFFECT_CAPACITY = 12;
+export const ACCENT_SEQUENCE = "stand";
+export const ACCENT_SECONDS = f32(0.3);
 
 
 export class HitAreaEffects {
@@ -80,13 +82,13 @@ export class HitAreaEffects {
         BlzSetSpecialEffectPitch(model, 0.0);
         BlzSetSpecialEffectScale(model, f32(pose.scale * (cue?.scale ?? 0.5)));
         BlzSetSpecialEffectAlpha(model, 255);
-        if (cue?.birth === undefined) BlzSetSpecialEffectAnimation(model, cue?.sequence ?? "stand");
+        if (cue?.birth === undefined) BlzSetSpecialEffectAnimation(model, cue?.sequence ?? ACCENT_SEQUENCE);
         else if (starts || (cue.birth.eachFrame && fighter.special.frame !== this.frame)) {
           BlzSpecialEffectClearSubAnimations(model);
           if (cue.sequence === "birth") BlzPlaySpecialEffect(model, ANIM_TYPE_BIRTH);
-          else BlzSetSpecialEffectAnimation(model, cue.sequence ?? "stand");
+          else BlzSetSpecialEffectAnimation(model, cue.sequence ?? ACCENT_SEQUENCE);
         }
-        BlzSetSpecialEffectTime(model, cue?.seconds ?? f32(0.3));
+        BlzSetSpecialEffectTime(model, cue?.seconds ?? ACCENT_SECONDS);
         BlzSetSpecialEffectTimeScale(model, cue?.timeScale ?? 0.0);
       }
     }

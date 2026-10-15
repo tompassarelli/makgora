@@ -1,13 +1,23 @@
 import { expect, test } from "bun:test";
 import { parseMDL, type model as mdx } from "wisp/vendor/war3-model.mjs";
 import { createHash } from "node:crypto";
-import { appendFileSync, cpSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { effectVisibility, simultaneousPositive, effectUses, effectSourceDigest, effectPlaybackInputs, EFFECT_RECORD_INPUTS } from "../scripts/wisp/effectVisibility";
+import { effectVisibility, effectVerdict, simultaneousPositive, trackFacts, classicModelFacts, judgeUse, effectUses, modelFactsKey, FACTS_VERSION, type EffectUse, type ModelFacts } from "../scripts/wisp/effectVisibility";
 import { IMPORTED_MODEL_FILES } from "../src/game/assets/importedModelInfo";
+import { RISEN_ALPHA } from "../src/game/render/projectilePresentation";
+import { STOCK_MODELS } from "../src/game/render/effects";
+import { merge } from "../scripts/mergeGenerated";
+import { formatEffectRecord, effectRecordProblem, effectRecordUnknowns, effectFindings, CUE_MODEL_RECORD, RECORD_COMMAND } from "../scripts/wisp/cueModels";
 
-import { formatEffectRecord, effectRecordProblem, effectRecordUnknowns } from "../scripts/wisp/cueModels";
+const triangle = parseMDL('Version { FormatVersion 800, } Model "synthetic triangle" { BlendTime 0, } Textures 1 { Bitmap { Image "triangle.blp", } } Materials 1 { Material { Layer { FilterMode None, static TextureID 0, } } } Geoset { Vertices 3 { {0,0,0}, {1,0,0}, {0,1,0}, } Faces 1 3 { Triangles { {0,1,2}, } } MaterialID 0, }');
+const drawn = classicModelFacts(triangle, () => true);
+const digestOf = (model: string) => createHash("sha256").update(model).digest("hex");
+const factsRecord = (models: Iterable<string>, facts: (model: string) => ModelFacts | null = () => drawn, cacheInfo = "a".repeat(64)) => {
+  const list = [...new Set(models)];
+  return formatEffectRecord({ cacheInfo, models: new Map(list.map((model) => [model, digestOf(model)])), facts: new Map(list.map((model) => [model, facts(model)])) });
+};
 
 test("Classic effect visibility requires simultaneous supported tracks and moving particle playback [k2 property]", () => {
   const model = parseMDL('Version { FormatVersion 800, } Model "synthetic tracks" { BlendTime 0, }');
@@ -18,9 +28,9 @@ test("Classic effect visibility requires simultaneous supported tracks and movin
     const tracks: mdx.AnimVector[] = values.map((entries) => ({ LineType: 0, GlobalSeqId: -1, Keys: entries.map((value, Frame) => ({ Frame, Vector: new Float32Array([value]) })) }));
     const from = example % 10, to = Math.min(10, from + 1 + example % 5);
     const reference = values[0]?.slice(from, to + 1).some((value, offset) => value > 0 && (values[1]?.[from + offset] ?? 0) > 0);
-    expect(simultaneousPositive(model, tracks, [0, 10], [from, to], [0, 0])).toBe(reference);
+    expect(simultaneousPositive(tracks.map(trackFacts), [0, 10], [from, to], [0, 0])).toBe(reference);
     const unsupported = tracks.map((track) => ({ ...track, LineType: 2 }));
-    expect(simultaneousPositive(model, unsupported, [0, 10], [from, to], [0, 0])).toBeUndefined();
+    expect(simultaneousPositive(unsupported.map(trackFacts), [0, 10], [from, to], [0, 0])).toBeUndefined();
   }
   const use = { sequence: "stand", seconds: 0, timeScale: 1 };
   expect(effectVisibility(model, { ...use, playbackUnknown: "unmodeled presentation" }, () => true).status).toBe("unknown");
@@ -37,6 +47,8 @@ test("Classic effect visibility requires simultaneous supported tracks and movin
     expect(effectVisibility(shape, { ...use, scale: 0 }, () => true).status).toBe("invisible");
     expect(effectVisibility(shape, { ...use, alpha: 0 }, () => true).status).toBe("invisible");
     expect(effectVisibility(shape, { ...use, lifetime: 0 }, () => true).status).toBe("invisible");
+    expect(effectVisibility(shape, { ...use, width: 0 }, () => true).status).toBe("invisible");
+    expect(effectVisibility(shape, { ...use, height: 0 }, () => true).status).toBe("invisible");
   }
   const ribbon = parseMDL('Version { FormatVersion 800, } Model "synthetic ribbon" { BlendTime 0, } Textures 1 { Bitmap { Image "ribbon.blp", } } Materials 1 { Material { Layer { FilterMode None, static TextureID 0, } } } RibbonEmitter "trail" { ObjectId 0, static HeightAbove 0, static HeightBelow 0, static Alpha 1, static Visibility 1, EmissionRate 1, LifeSpan 1, Rows 1, Columns 1, MaterialID 0, }');
   for (let example = 0; example < 128; example++) {
@@ -63,66 +75,96 @@ test("Classic effect visibility requires simultaneous supported tracks and movin
   expect(effectVisibility(emitting, use, () => true).status).toBe("visible");
   const scaledEmitter = { ...emitting, ParticleEmitters2: emitting.ParticleEmitters2.map((emitter) => ({ ...emitter, Scaling: { LineType: 0, GlobalSeqId: -1, Keys: [{ Frame: 0, Vector: new Float32Array([0, 0, 0]) }] } })) };
   expect(effectVisibility(scaledEmitter, use, () => true).status).toBe("unknown");
-  const uses = effectUses(), source = effectSourceDigest(), cacheInfo = "a".repeat(64);
-  const models = new Map(uses.map(({ model }) => [model, createHash("sha256").update(model).digest("hex")]));
-  for (let example = 0; example < 2; example++) {
-    const findings = uses.map((entry) => ({ ...entry, status: bit() ? "visible" as const : "unknown" as const, reason: `unsupported playback ${example}` }));
-    const text = formatEffectRecord({ source, cacheInfo, models, findings });
-    expect(effectRecordProblem(text)).toBeUndefined();
-    expect(effectRecordUnknowns(text)).toEqual(findings.filter(({ status }) => status === "unknown").map((entry) => `${entry.fighter}\t${entry.move}\tUnknown\t${entry.model}\t${entry.reason}`));
-    expect(effectRecordProblem(formatEffectRecord({ source, cacheInfo, models, findings: findings.slice(1) }))).toBeDefined();
-    expect(effectRecordProblem(formatEffectRecord({ source, cacheInfo, models, findings: findings.map((entry, index) => index === example ? { ...entry, status: "invisible" } : entry) }))).toBeDefined();
-    expect(effectRecordProblem(text.replace(source, "b".repeat(64)))).toBeDefined();
-    const row = text.split("\n").filter((line) => line.startsWith("classic-use\t"))[example] ?? "";
-    expect(effectRecordProblem(text.replace(row, row.replace(/^(classic-use\t[0-9a-f]{64}\t\w+\t)[0-9a-f]{64}/, `$1${"c".repeat(64)}`)))).toBeDefined();
-    expect(effectRecordProblem(text.replaceAll("\tunknown\t", "\tmalformed\t").replaceAll("\tvisible\t", "\tmalformed\t"))).toBeDefined();
+  const infinite = { ...late, Materials: late.Materials.map((material) => ({ ...material, Layers: material.Layers.map((layer) => ({ ...layer, Alpha: { LineType: 1, GlobalSeqId: -1, Keys: [{ Frame: 0, Vector: new Float32Array([-Infinity]) }, { Frame: 750, Vector: new Float32Array([Infinity]) }] } })) })) };
+  const samples: readonly mdx.Model[] = [model, particle, geometry, ribbon, animatedRibbon, collapsed, skinned, transformed, late, emitting, scaledEmitter, infinite];
+  const uses = effectUses();
+  const sample = (model: string) => samples[[...model].reduce((sum, char) => sum + char.charCodeAt(0), 0) % samples.length] ?? geometry;
+  for (const resolves of [() => true, () => undefined]) {
+    const facts = (model: string) => classicModelFacts(sample(model), resolves);
+    const text = factsRecord(uses.map(({ model }) => model), facts);
+    const judged = effectFindings(text, uses);
+    expect("findings" in judged && judged.findings).toEqual(uses.map((use) => ({ ...use, ...judgeUse(use, facts(use.model)) })));
+    expect("findings" in judged && judged.findings.map(({ status, reason }) => ({ status, reason }))).toEqual(uses.map((use) => use.playbackUnknown === undefined && use.travels && use.anchored === "fighter" ? { status: "invisible", reason: "travelling effect drawn at a fixed fighter anchor, not with its projectile" } : effectVisibility(sample(use.model), use, resolves)));
+    expect(effectRecordUnknowns(text, uses)).toEqual(uses.map((use) => judgeUse(use, facts(use.model))).filter(({ status }) => status === "unknown").map((entry) => `${entry.fighter}\t${entry.move}\tUnknown\t${entry.model}\t${entry.reason}`));
   }
+  const text = factsRecord(uses.map(({ model }) => model));
+  expect(effectRecordProblem(text, uses)).toBeUndefined();
+  const judged = uses.find((use) => use.playbackUnknown === undefined);
+  expect(effectRecordProblem(factsRecord(uses.map(({ model }) => model), (model) => model === judged?.model ? classicModelFacts(collapsed, () => true) : drawn), uses)).toContain(`${judged?.fighter}/${judged?.move}`);
+  expect(effectRecordProblem(factsRecord(uses.slice(1).filter(({ model }) => model !== uses[0]?.model).map(({ model }) => model)), uses)).toContain(`${uses[0]?.model} (${uses[0]?.fighter}/${uses[0]?.move}`);
+  expect(effectRecordProblem(text.replace(`classic-facts\t${FACTS_VERSION}\t`, `classic-facts\t${FACTS_VERSION + 1}\t`), uses)).toContain(RECORD_COMMAND);
+  expect(effectRecordProblem(text.replace("a".repeat(64), "b".repeat(64)), uses)).toBeDefined();
+  const row = text.split("\n").find((line) => line.startsWith("classic-model\t")) ?? "";
+  expect(effectRecordProblem(text.replace(row, row.replace('"area":true', '"area":false')), uses)).toContain("1 model facts rows edited by hand");
+  expect(effectVerdict(classicModelFacts(infinite, () => true), { ...use, lifetime: 1 })).toEqual(effectVisibility(infinite, { ...use, lifetime: 1 }, () => true));
 });
 
-test("re-recording one model's changed Classic inputs rewrites only its row and the header [k1 scenario]", () => {
-  const uses = effectUses(), source = effectSourceDigest(), cacheInfo = "a".repeat(64);
-  const models = new Map(uses.map(({ model }) => [model, createHash("sha256").update(model).digest("hex")]));
-  const findings = uses.map((use) => ({ ...use, status: "visible" as const, reason: "MODEL-DATA" }));
+test("re-recording one model's changed Classic facts rewrites only its row [k1 scenario]", () => {
+  const uses = effectUses(), models = uses.map(({ model }) => model);
   const lone = uses.find((use) => uses.filter(({ model }) => model === use.model).length === 1)?.model ?? "";
-  const before = formatEffectRecord({ source, cacheInfo, models, findings }).split("\n");
-  const after = formatEffectRecord({ source, cacheInfo, models: new Map([...models, [lone, "d".repeat(64)]]), findings }).split("\n");
-  expect(before.length).toBe(uses.length + 2);
+  const before = factsRecord(models).split("\n");
+  const after = factsRecord(models, (model) => model === lone ? classicModelFacts(triangle, () => undefined) : drawn).split("\n");
+  expect(before.length).toBe(new Set(models).size + 2);
   expect(after.length).toBe(before.length);
-  expect(before.flatMap((line, index) => line === after[index] ? [] : [line.split("\t")[0]])).toEqual(["classic-use"]);
-  expect(effectRecordProblem(after.join("\n"))).toBeUndefined();
+  expect(before.flatMap((line, index) => line === after[index] ? [] : [line.split("\t")[1]])).toEqual([modelFactsKey(lone)]);
+  expect(effectRecordProblem(after.join("\n"), uses)).toBeUndefined();
 });
 
-test("unrelated main changes keep a Classic effect record valid while effect input changes refuse it [k1 scenario]", () => {
+test("two lanes' Classic model facts merge row by row; changed uses are rejudged without a record change and only newly used models refuse [k1 scenario]", () => {
+  const uses = effectUses();
+  const looks = (list: readonly EffectUse[]) => [...new Set(list.map(({ model }) => model))].sort().map((model) => `same\t${model}\n`).join("");
+  const record = (list: readonly EffectUse[]) => looks(list) + factsRecord(list.map(({ model }) => model));
+  const changed = uses.findIndex((use) => use.kind === "impact");
+  const addedA: EffectUse = { ...uses[0] as EffectUse, move: "lane a move", model: "Abilities\\Spells\\Other\\LaneA\\LaneA.mdx" };
+  const addedB: EffectUse = { ...uses[0] as EffectUse, move: "lane b move", model: "Abilities\\Spells\\Other\\LaneB\\LaneB.mdx" };
+  const laneA = [...uses, addedA];
+  const laneB = [...uses.map((use, index) => index === changed ? { ...use, alpha: 128, seconds: use.seconds + 1 } : use), addedB];
+  const both = [...laneB, addedA];
+  expect(record(uses.map((use, index) => index === changed ? { ...use, alpha: 128, seconds: use.seconds + 1 } : use))).toBe(record(uses));
+  const merged = merge("record", record(uses), record(laneA), record(laneB));
+  expect(merged.conflicts).toBe(0);
+  expect(effectRecordProblem(merged.text, both)).toBeUndefined();
+  expect(merged.text.split("\n").filter((line) => line.startsWith("classic-model\t")).length).toBe(new Set(both.map(({ model }) => model)).size);
+  for (const [lane, list, added] of [[laneA, both, addedB], [laneB, both, addedA]] as const) expect(effectRecordProblem(record(lane), list)).toBe(`Classic effect record is missing or stale: no model facts for 1 newly used models; from ts/ on a machine with the exact24268 cache run ${RECORD_COMMAND} and commit the record: ${added.model} (${added.fighter}/${added.move})`);
+  expect(effectRecordProblem(record(uses), laneB.map((use, index) => index === changed ? { ...use, alpha: 0 } : use).filter((use) => use !== addedB))).toBe(`Classic effects: 1 invisible uses refuse the gate: ${uses[changed]?.fighter}/${uses[changed]?.move}`);
+});
+
+test("render, lockfile and producer edits keep the Classic record valid; a changed visibility value is rejudged and a new model path refuses with the record command [k1 scenario]", () => {
   const repo = join(import.meta.dir, "../.."), root = mkdtempSync(join(tmpdir(), "classic-record-"));
   try {
-    const previous = effectPlaybackInputs(repo);
-    for (const path of new Set([...previous, ...EFFECT_RECORD_INPUTS])) cpSync(join(repo, path), join(root, path), { recursive: true });
-    const uses = effectUses(), source = effectSourceDigest(root), cacheInfo = "a".repeat(64);
-    expect(source).toBe(effectSourceDigest(repo));
-    const models = new Map(uses.map(({ model }) => [model, createHash("sha256").update(model).digest("hex")]));
-    const findings = uses.map((use) => ({ ...use, status: "visible" as const, reason: "MODEL-DATA" }));
-    const text = formatEffectRecord({ source, cacheInfo, models, findings });
-    const unrelated = previous.filter((path) => !path.endsWith("/") && !EFFECT_RECORD_INPUTS.includes(path));
-    expect(unrelated).toContain("ts/src/platform/shell/view.ts");
-    for (const path of unrelated) appendFileSync(join(root, path), "\nexport const unrelatedMainChange = 1;\n");
-    for (const family of ["hero-models", "impact-assets", "stage-assets", "original-clips-static-lights"]) writeFileSync(join(root, "build-inputs", family), "f".repeat(64));
-    expect(effectRecordProblem(text, root)).toBeUndefined();
-    for (const path of EFFECT_RECORD_INPUTS) {
-      const original = join(repo, path), copy = join(root, path);
-      appendFileSync(copy, "\n");
-      expect(effectRecordProblem(text, root)).toBeDefined();
-      cpSync(original, copy);
-    }
-    expect(effectRecordProblem(text, root)).toBeUndefined();
-    const changed = uses.findIndex((use) => uses.filter(({ model }) => model === use.model).length === 1);
-    const stale = formatEffectRecord({ source, cacheInfo, models, findings: findings.map((entry, index) => index === changed ? { ...entry, seconds: entry.seconds + 1 } : entry) });
-    expect(effectRecordProblem(stale, root)).toContain(`${uses[changed]?.fighter}/${uses[changed]?.move}`);
-    const otherRecording = formatEffectRecord({ source: "b".repeat(64), cacheInfo, models, findings }).split("\n").filter((line) => line.startsWith("classic-use\t"));
-    const merged = text.split("\n").map((line, index) => index === 1 ? otherRecording[0] ?? line : line).join("\n");
-    expect(effectRecordProblem(merged, root)).toBeDefined();
+    for (const path of ["ts/src", "ts/scripts", "ts/package.json", "ts/tsconfig.json", "build-inputs/imported-models"]) cpSync(join(repo, path), join(root, path), { recursive: true });
+    symlinkSync(join(repo, "ts/node_modules"), join(root, "ts/node_modules"));
+    const uses = effectUses();
+    writeFileSync(join(root, CUE_MODEL_RECORD), factsRecord(uses.map(({ model }) => model)));
+    writeFileSync(join(root, "ts/check.ts"), 'import { readFileSync } from "node:fs";\nimport { effectRecordProblem } from "./scripts/wisp/cueModels";\nconsole.log(effectRecordProblem(readFileSync(new URL("../' + CUE_MODEL_RECORD + '", import.meta.url), "utf8")) ?? "valid");\n');
+    const check = () => new TextDecoder().decode(Bun.spawnSync(["bun", "check.ts"], { cwd: join(root, "ts"), env: { ...process.env, NODE_ENV: "test" } }).stdout).trim();
+    const edit = (path: string, from: string, to: string) => {
+      const file = join(root, path), text = readFileSync(file, "utf8");
+      expect(text).toContain(from);
+      writeFileSync(file, text.replace(from, to));
+    };
+    expect(check()).toBe("valid");
+    edit("ts/src/game/render/hitAreaEffects.ts", "this.origin.y - 14.0, this.origin.z + pose.z);\n        BlzSetSpecialEffectYaw(model, facingYaw", "this.origin.y - 15.0, this.origin.z + pose.z);\n        BlzSetSpecialEffectYaw(model, facingYaw");
+    edit("ts/src/game/render/specialEffects.ts", "const SIPHON_LIGHTNING", "export const unrelatedRenderChange = 1;\nconst SIPHON_LIGHTNING");
+    edit("ts/src/game/render/combatEffects.ts", "const STAR_KO_DEPTH = 1400.0;", "const STAR_KO_DEPTH = 1500.0;");
+    edit("ts/package.json", '"private": true,', '"private": true,\n  "description": "unrelated",');
+    for (const path of ["ts/bun.lock", "ts/wisp.lock", "typescript-toolchain.lock"]) writeFileSync(join(root, path), "unrelated landing\n");
+    expect(check()).toBe("valid");
+    edit("ts/src/game/render/projectilePresentation.ts", `export const RISEN_ALPHA = ${RISEN_ALPHA};`, "export const RISEN_ALPHA = 100;");
+    expect(check()).toBe("valid");
+    edit("ts/src/game/render/projectilePresentation.ts", "export const RISEN_ALPHA = 100;", "export const RISEN_ALPHA = 0;");
+    const risen = uses.filter((use) => use.alpha === RISEN_ALPHA && use.kind === "projectile");
+    expect(risen.length).toBeGreaterThan(0);
+    expect(check()).toBe(`Classic effects: ${risen.length} invisible uses refuse the gate: ${risen.map((use) => `${use.fighter}/${use.move}`).join("; ")}`);
+    edit("ts/src/game/render/projectilePresentation.ts", "export const RISEN_ALPHA = 0;", `export const RISEN_ALPHA = ${RISEN_ALPHA};`);
+    edit("ts/src/game/render/effects.ts", '"Abilities\\\\Spells\\\\Other\\\\Silence\\\\SilenceTarget.mdx"', '"Abilities\\\\Spells\\\\Other\\\\Silence\\\\SilenceLaneTarget.mdx"');
+    const silenced = uses.filter((use) => use.model === STOCK_MODELS.silenceTarget && use.kind === "presentation effect");
+    expect(silenced.length).toBe(1);
+    expect(check()).toBe(`Classic effect record is missing or stale: no model facts for 1 newly used models; from ts/ on a machine with the exact24268 cache run ${RECORD_COMMAND} and commit the record: ${STOCK_MODELS.silenceTarget.replace("SilenceTarget", "SilenceLaneTarget")} (${silenced.map((use) => `${use.fighter}/${use.move}`).join(", ")})`);
     expect(uses.filter(({ model }) => /^war3mapImported[\\/]/i.test(model) && !/-[0-9a-f]{64}\.mdx$/i.test(model)).map(({ model }) => model).filter((model) => !IMPORTED_MODEL_FILES.some(({ entry }) => entry === model))).toEqual([]);
-    expect(EFFECT_RECORD_INPUTS.every((path) => previous.includes(path) || previous.some((input) => input.endsWith("/") && path.startsWith(input)))).toBe(true);
+    edit("build-inputs/imported-models", readFileSync(join(repo, "build-inputs/imported-models"), "utf8").trim(), "f".repeat(64));
+    expect(check()).toContain(`@${"f".repeat(64)} (grom-hellscream/`);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
-});
+}, 120_000);

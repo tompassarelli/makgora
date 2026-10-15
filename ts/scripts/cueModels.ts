@@ -2,7 +2,7 @@ import { join } from "node:path";
 import { Console, Effect } from "effect";
 import { BunRuntime } from "@effect/platform-bun";
 import { EffectCheckFailure, readEffectReport } from "./wisp/effectVisibility";
-import { CUE_MODEL_RECORD, cueModels, formatRecord, listedRedraws, parseRecord, recordProblem, redrawCandidates, formatEffectRecord, effectRecordProblem, effectRecordUnknowns } from "./wisp/cueModels";
+import { CUE_MODEL_RECORD, cueModels, formatRecord, listedRedraws, parseRecord, recordProblem, redrawCandidates, formatEffectRecord, effectRecordProblem, effectRecordUnknowns, effectFindings } from "./wisp/cueModels";
 import { readScreenCaptures } from "./classicEffectScreen";
 import { screenReport, screenAcceptanceProblem } from "./wisp/classicEffectScreen";
 
@@ -17,9 +17,13 @@ BunRuntime.runMain(Effect.gen(function*() {
     const looks = yield* cueModelLooks();
     const report = yield* readEffectReport(cache);
     yield* Effect.tryPromise({ try: () => Bun.write(record, formatRecord(looks) + formatEffectRecord(report)), catch: (cause) => new EffectCheckFailure({ problem: `write cue record: ${String(cause)}` }) });
-    yield* Console.log(`cue models: recorded ${looks.size} models and ${report.findings.length} Classic effect uses in ${CUE_MODEL_RECORD}`);
+    yield* Console.log(`cue models: recorded ${looks.size} models and Classic facts for ${report.facts.size} models in ${CUE_MODEL_RECORD}`);
   }
   const text = yield* Effect.tryPromise({ try: async () => await Bun.file(record).exists() ? await Bun.file(record).text() : "", catch: (cause) => new EffectCheckFailure({ problem: `read cue record: ${String(cause)}` }) });
+  if (process.argv.includes("--verdicts")) {
+    const judged = effectFindings(text);
+    for (const finding of "findings" in judged ? judged.findings : []) yield* Console.log(`${finding.fighter}\t${finding.move}\t${finding.model}\t${finding.status}\t${finding.reason.replace(/[\t\r\n]/g, " ")}`);
+  }
   const problem = recordProblem(models, candidates, listedRedraws(), parseRecord(text)) ?? effectRecordProblem(text);
   if (problem !== undefined) return yield* new EffectCheckFailure({ problem });
   const unknowns = effectRecordUnknowns(text);

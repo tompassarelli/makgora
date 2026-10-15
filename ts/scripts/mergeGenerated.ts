@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync } from "node:fs";
 
-export type Kind = "json" | "tsv" | "facts" | "markdown";
+export type Kind = "json" | "tsv" | "record" | "facts" | "markdown";
 type Entry = { readonly key: string; readonly text: string };
 
 const unique = (entries: ReadonlyArray<{ key: string; text: string }>): Entry[] => {
@@ -22,6 +22,10 @@ const parseLines = (kind: Exclude<Kind, "json">, source: string): Entry[] => {
   let section = "";
   return unique(lines(source).map((text, index) => {
     if (kind === "tsv") return { key: index === 0 ? "\u0001header" : text.split("\t")[0] ?? text, text };
+    if (kind === "record") {
+      const [row = text, name] = text.split("\t");
+      return { key: row === "classic-model" ? `model\u0001${name}` : row === "same" || row === "redrawn" ? `look\u0001${name}` : `\u0001${row}`, text };
+    }
     if (kind === "facts") {
       const name = /^\s*("(?:[^"\\]|\\.)*"):/.exec(text)?.[1];
       return { key: name !== undefined ? name : `\u0001${text}`, text };
@@ -93,6 +97,7 @@ export const merge = (kind: Kind, base: string, ours: string, theirs: string): {
 
 export const kindOf = (path: string): Kind | undefined =>
   path.endsWith(".json") ? "json"
+  : path.endsWith("cue-models.tsv") ? "record"
   : path.endsWith(".tsv") ? "tsv"
   : path.endsWith("modelFacts.ts") ? "facts"
   : path.endsWith(".md") ? "markdown"
@@ -102,7 +107,7 @@ if (import.meta.main) {
   const [basePath, oursPath, theirsPath, path] = process.argv.slice(2);
   const kind = kindOf(path ?? "");
   if (!basePath || !oursPath || !theirsPath || !kind) {
-    console.error("usage: bun scripts/mergeGenerated.ts BASE OURS THEIRS PATH (PATH a .json, .tsv, modelFacts.ts or .md)");
+    console.error("usage: bun scripts/mergeGenerated.ts BASE OURS THEIRS PATH (PATH a .json, .tsv, cue-models.tsv, modelFacts.ts or .md)");
     process.exit(2);
   }
   const read = (p: string) => readFileSync(p, "utf8");
