@@ -23,14 +23,20 @@ import { step } from "wisp/scripts/wisp/timings";
 import { GameFiles } from "wisp/scripts/wisp/gameFiles";
 import { Phase } from "../../../src/game/lobby/lobbyState";
 import { MAP_PROFILES, SMASHCRAFT_ACCEPT, type SmashcraftMapProfile } from "../acceptChecks";
+import { currentPlaytest } from "../currentPlaytest";
+import { NativeClientInvalid, readClientEntries, requireLauncherTools, resolveTools, validateClients } from "../nativeTools";
+import { documentsFolder } from "wisp/scripts/warcraft/battleNet";
+import { PLAYTEST_PREFIX } from "./play";
 import { DevCommandReceipt } from "../boundary";
 import { rebuildMap } from "../mapInputs";
-import { clientState, gameFilesLayer } from "../project";
+import { clientState, gameFilesLayer, projectRoot } from "../project";
 import { clientArguments } from "./client";
 import { freshMatch, readyAfter, sendDevCommand } from "./fresh";
 import { profileOptions } from "./map";
-import { onHealthyClients, readClientsFile, smashcraftWatch } from "../doctor";
+import { checkClients, onHealthyClients, readClientsFile, smashcraftWatch } from "../doctor";
+import { restartDroppedPair } from "./lanPoolUnit";
 import { LAN_POOL_FILE, lanPairs, withTools } from "../padBatch";
+import { runProcess } from "../../hostProcess";
 import { platformLayer } from "wisp/scripts/platform/layer";
 import { preferencesPath, videoSettings } from "wisp/scripts/warcraft/preferences";
 import { measureCursorGate } from "../gateCursor";
@@ -230,12 +236,45 @@ export const runShard = (pair: string, ids: readonly string[], directory: string
   Effect.provide(BunServices.layer),
 );
 
+const headCandidate = Effect.gen(function*() {
+  const revision = yield* runProcess(ChildProcess.make("git", ["rev-parse", "HEAD"], { cwd: projectRoot, stdin: "ignore" })).pipe(Effect.provide(BunServices.layer));
+  const { map } = yield* currentPlaytest(join(documentsFolder(PLAYTEST_PREFIX), "Maps/00-Smashcraft"), { revision, helper: false, edition: "classic" });
+  console.log(`candidate: ${map.title} built from HEAD ${revision.slice(0, 12)}`);
+  return map.source;
+});
+
+const needsCandidate = (suite: AcceptSuite, only: readonly string[]) => selectChecks(suite, only).checks.some(({ map }) => map === "gate-playable");
+
+const nativeProblem = (cause: { readonly message: string }) => new UsageFailure({ problem: cause.message });
+
+const prepareCandidate = (args: readonly string[], only: readonly string[], dryRun: boolean) => Effect.gen(function*() {
+  const [given] = flagValues(args, "map");
+  if (given !== undefined && !existsSync(given)) return yield* new UsageFailure({ problem: `no built map ${given}` });
+  const tools = dryRun ? undefined : yield* resolveTools().pipe(Effect.mapError(nativeProblem));
+  const building = given === undefined && !dryRun && needsCandidate({ ...SMASHCRAFT_ACCEPT, maps: MAP_PROFILES }, only);
+  if (building) yield* requireLauncherTools(undefined).pipe(Effect.mapError(nativeProblem));
+  const candidate = given ?? (building ? yield* headCandidate.pipe(Effect.mapError(cause => new UsageFailure({ problem: describeCause(cause) }))) : undefined);
+  const profiles: Readonly<Record<string, SmashcraftMapProfile>> = given !== undefined
+    ? Object.fromEntries(Object.entries(MAP_PROFILES).map(([name, { rebuild: _rebuild, ...profile }]) => [name, { ...profile, path: given }]))
+    : candidate === undefined ? MAP_PROFILES
+    : Object.fromEntries(Object.entries(MAP_PROFILES).map(([name, profile]) => [name, name === "gate-playable" ? { ...profile, path: candidate } : profile]));
+  return { given, tools, candidate, profiles };
+});
+
+const usableClients = (args: readonly string[], tools: Readonly<Record<string, string>> | undefined, clientsFrom: string, pooled: boolean) => Effect.gen(function*() {
+  if (tools === undefined) return clientsFrom;
+  const selected = pooled ? clientsFrom : withTools({ name: "clients", clients: clientsFrom, appIds: new Map() }, tools, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), "clients")).clients;
+  const entries = yield* Effect.try({ try: () => readClientEntries(selected), catch: cause => new UsageFailure({ problem: `can't read ${selected}: ${describeCause(cause)}` }) });
+  yield* validateClients(entries).pipe(Effect.mapError(nativeProblem));
+  return selected;
+});
+
 export const accept: Command = (rawArgs) => Effect.gen(function*() {
   const { clientsFile, args } = yield* Effect.try({ try: () => clientArguments(rawArgs), catch: (cause) => cause instanceof UsageFailure ? cause : new UsageFailure({ problem: String(cause) }) });
   const solo = args.includes("--solo");
-  const [candidate] = flagValues(args, "map");
-  if (candidate !== undefined && !existsSync(candidate)) return yield* new UsageFailure({ problem: `no built map ${candidate}` });
-  const profiles: Readonly<Record<string, SmashcraftMapProfile>> = candidate === undefined ? MAP_PROFILES : Object.fromEntries(Object.entries(MAP_PROFILES).map(([name, { rebuild: _rebuild, ...profile }]) => [name, { ...profile, path: candidate }]));
+  const dryRun = args.includes("--dry-run");
+  const only = flagValues(args, "only").flatMap(value => value.split(/[,\s]+/));
+  const { given, tools, candidate, profiles } = yield* prepareCandidate(args, only, dryRun);
   const suite = { ...SMASHCRAFT_ACCEPT, maps: profiles };
   const requested = yield* selectedPairs(args);
   if (solo && requested.length !== 1) return yield* new UsageFailure({ problem: "--solo requires one --pair K; each client plays its own single-player game" });
@@ -244,19 +283,19 @@ export const accept: Command = (rawArgs) => Effect.gen(function*() {
     try: () => {
       const selected = lanPairs(LAN_POOL_FILE, { ids: [id] })[0];
       if (selected === undefined) throw new Error(`no offline pair ${id}`);
-      return args.includes("--dry-run") ? selected : withTools(selected, clientState, flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept", `pair-${id}`));
+      return tools === undefined ? selected : withTools(selected, tools, flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept", `pair-${id}`));
     },
     catch: cause => new UsageFailure({ problem: describeCause(cause) }),
   });
   if (pair !== undefined && clientsFile !== clientState) return yield* new UsageFailure({ problem: "--clients-file and --pair select different clients; give one" });
-  const selectedClients = pair?.clients ?? clientsFile;
-  const gate = selectChecks(suite, flagValues(args, "only").flatMap(value => value.split(/[,\s]+/))).checks.some(check => check.id.startsWith("gate-"));
+  const selectedClients = yield* usableClients(args, tools, pair?.clients ?? clientsFile, pair !== undefined);
+  const gate = selectChecks(suite, only).checks.some(check => check.id.startsWith("gate-"));
   const identity = candidate === undefined || !gate || args.includes("--dry-run") ? undefined : yield* candidateIdentity(candidate, selectedClients);
   const names = clientNames(selectedClients);
   const withoutMap = args.filter((arg, index) => arg !== "--solo" && arg !== "--map" && !arg.startsWith("--map=") && args[index - 1] !== "--map");
   const forwarded = requested.length > 1 ? withoutMap : withoutPairFlags(withoutMap);
   const rebuilt = new Set<string>();
-  const start = (map: string) => Effect.gen(function*() {
+  const startSession = (map: string) => Effect.gen(function*() {
     const profile = profiles[map];
     if (profile === undefined) return yield* new AcceptFailure({ operation: "start", problem: `unknown map profile ${map}` });
     const options = yield* profileOptions(profile.rebuild === undefined ? [] : ["--profile", profile.rebuild]);
@@ -275,6 +314,13 @@ export const accept: Command = (rawArgs) => Effect.gen(function*() {
       if (profile.quick !== "") yield* (solo ? sendSoloDevCommand(profile.quick) : sendDevCommand(profile.quick)).pipe(step(profile.quick));
     }).pipe(Effect.provide(Layer.merge(options.services.pipe(Layer.provideMerge(Clients.layer(selectedClients))), smashcraftWatch)));
   });
+  const recoverDropped = pair?.lan === undefined
+    ? checkClients(() => undefined, selectedClients).pipe(Effect.as(false), Effect.orElseSucceed(() => false))
+    : restartDroppedPair(pair.lan).pipe(Effect.mapError(cause => new AcceptFailure({ operation: `restart pair ${pair.lan}`, problem: describeCause(cause) })));
+  const start = (map: string) => recoverDropped.pipe(
+    Effect.andThen(startSession(map)),
+    Effect.catch(failure => recoverDropped.pipe(Effect.flatMap(restarted => restarted ? startSession(map) : Effect.fail(failure)))),
+  );
   const liveDriver = liveAcceptDriver({
     start,
     receipt: (name) => name.startsWith("smashcraft-dev-") || name.startsWith("smashcraft-stage-") || name.startsWith("smashcraft-error-") || name.startsWith("smashcraft-render-clock-") || name.startsWith("smashcraft-replay-"),
@@ -311,7 +357,7 @@ export const accept: Command = (rawArgs) => Effect.gen(function*() {
     flags: ["--pair", "--pairs"],
     select: () => Effect.succeed(requested),
     prepare: (sessions: readonly { readonly map: string }[]) => prebuild(sessions.map(({ map }) => map), profiles),
-    run: (pair: string, ids: readonly string[], directory: string) => runShard(pair, ids, directory, candidate),
+    run: (pair: string, ids: readonly string[], directory: string) => runShard(pair, ids, directory, given),
   };
   const accepted = makeAccept({ suite: solo ? acceptForSoloClients(suite, names) : acceptForClients(suite, names), evidenceRoot: join(homedir(), ".local/state/smashcraft/accept"), driver, clients: names, shards })(forwarded);
 

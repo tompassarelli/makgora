@@ -36,6 +36,7 @@ import { monotonicNs } from "../integrity/linux";
 import { compareRuns, comparisonSteps, scriptChat } from "../integrity/padParity";
 import { parsePadScript } from "../integrity/padScript";
 import { onHealthyClients } from "./doctor";
+import { withRuntimeTools } from "./nativeTools";
 import { type PadOptions, type NativeSession, headlessScript, headlessSession, nativeChat, nativeScript, nativeSession } from "./commands/pad";
 
 
@@ -69,22 +70,12 @@ export function lanPairs(poolFile: string, select: { readonly count: number } | 
   return parsed.slice(0, select.count);
 }
 
-const ToolsOnly = Schema.Struct({ tools: Schema.Record(Schema.String, Schema.String) });
-
-
-
-
-
-export function withTools(pair: PadPair, toolsFrom: string, dir: string): PadPair {
-  const clients = Schema.decodeSync(Schema.fromJsonString(Schema.Unknown))(readFileSync(pair.clients, "utf8"));
-  if (typeof clients === "object" && clients !== null && "tools" in clients) return pair;
-  const { tools } = Schema.decodeSync(Schema.fromJsonString(ToolsOnly))(readFileSync(toolsFrom, "utf8"));
+export function withTools(pair: PadPair, tools: Readonly<Record<string, string>>, dir: string): PadPair {
   mkdirSync(dir, { recursive: true });
   const path = join(dir, `${pair.name}-clients.json`);
-  writeFileSync(path, `${JSON.stringify({ ...(typeof clients === "object" ? clients : {}), tools }, null, 2)}\n`);
+  writeFileSync(path, withRuntimeTools(readFileSync(pair.clients, "utf8"), tools));
   return { ...pair, clients: path };
 }
-
 
 export function batchScripts(paths: readonly string[]): string[] {
   return paths.flatMap((path) => statSync(path).isDirectory()

@@ -57,6 +57,7 @@ type HeadlessClient = ReturnType<HeadlessRuntime["clients"]>["clients"][number];
 import { sceneFile } from "wisp/src/runtime/scene";
 import { clientState } from "../project";
 import { onHealthyClients, readClientsFile } from "../doctor";
+import { resolveTools } from "../nativeTools";
 import { DevCommandReceipt, nativeChatEntryReceipt } from "../boundary";
 import { devCommandReceiptFile } from "../../../src/game/core/gameFiles";
 import { Phase } from "../../../src/game/lobby/lobbyState";
@@ -630,11 +631,12 @@ const scriptBatch = (values: { readonly [name: string]: string | boolean | reado
     const separator = entry.indexOf("=");
     if (separator > 0) appIds.set(entry.slice(0, separator), entry.slice(separator + 1));
   }
+  const tools = yield* resolveTools();
   const pairs = yield* Effect.try({
     try: () => {
       const ids = (Array.isArray(values.pair) ? values.pair : []).map(Number);
-      if (pairCount === undefined && ids.length === 0) return [{ name: "a+b", clients: clientsFile, appIds }];
-      return lanPairs(text("pool") ?? LAN_POOL_FILE, ids.length > 0 ? { ids } : { count: Number(pairCount) }).map((pair) => withTools(pair, clientsFile, out));
+      if (pairCount === undefined && ids.length === 0) return [withTools({ name: "a+b", clients: clientsFile, appIds }, tools, out)];
+      return lanPairs(text("pool") ?? LAN_POOL_FILE, ids.length > 0 ? { ids } : { count: Number(pairCount) }).map((pair) => withTools(pair, tools, out));
     },
     catch: (cause) => new UsageFailure({ problem: describeCause(cause) }),
   });

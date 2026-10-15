@@ -64,7 +64,8 @@
     "test/tavern-gameplans.test.ts",
     "test/text-match.test.ts",
     "test/warden-spin.test.ts",
-    "test/effect-visibility.test.ts"
+    "test/effect-visibility.test.ts",
+    "test/native-harness.test.ts"
   ],
   "exclude": [
     "src/platform/**",

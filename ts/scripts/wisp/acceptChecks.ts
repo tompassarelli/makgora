@@ -33,8 +33,11 @@ const rankedStages = STAGE_CATALOG.filter(({ id }) => id !== 0);
 const stageProfile = (name: string) => `stage-${name.toLowerCase().replace(/[^a-z]+/g, "-")}`;
 const heroProfile = (name: string) => `hero-${name.toLowerCase().replace(/\s+/g, "-")}`;
 
+/** Stands for the Classic map built from HEAD; accept swaps in the built file, or the --map it was given. */
+export const CURRENT_CANDIDATE = "current-candidate";
+
 export const MAP_PROFILES: Readonly<Record<string, SmashcraftMapProfile>> = {
-  "gate-playable": { describe: "exact playable candidate, with ordinary selection and input", path: join(inputs, "play-current/9f0b248a4e20b52987bc6856ef611a823b368d00/Smashcraft 0.0.133 9f0b248.w3x"), quick: "" },
+  "gate-playable": { describe: "exact playable candidate, with ordinary selection and input", path: CURRENT_CANDIDATE, quick: "" },
   outfits: { describe: "four-colour portrait candidate, red Illidan and blue Rifleman", path: join(inputs, "slot-outfits-161-20261007/Smashcraft diagnostic slot portrait outfits.w3x"), quick: "-dev quick" },
   "portraits-363": { describe: "Classic and Definitive portraits built for #363", path: join(homedir(), ".local/state/smashcraft/portraits-363-codex/Smashcraft-363-select-art.w3x"), quick: "-dev quick" },
   ...STAGE_COMPOSITION_MAPS,
