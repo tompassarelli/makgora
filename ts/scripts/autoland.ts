@@ -1,7 +1,7 @@
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { parseArgs } from "node:util";
-import { JOB_BUDGET, autoclose, issueRefs, pendingChecks, busy, laneRerun, type CiJob, flaggedLanes, pinFamily, resolveConflicts, type Conflict, forecast, judge, landing, lateLane, looping, pastMain, plan, stalled, stuckRuns, train, trainStep, type Job, type Lane, type Run, type Status, type Tree } from "./autolandCore";
+import { JOB_BUDGET, autoclose, issueRefs, pendingChecks, busy, laneRerun, type CiJob, flaggedLanes, pinFamily, resolveConflicts, type Conflict, forecast, judge, landing, parseList, lateLane, looping, pastMain, plan, stalled, stuckRuns, train, trainStep, type Job, type Lane, type Run, type Status, type Tree } from "./autolandCore";
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null;
 const isStatus = (value: unknown): value is Status => isRecord(value) && typeof value.state === "string" && typeof value.description === "string" && typeof value.at === "string";
@@ -14,9 +14,7 @@ const isText = (value: unknown): value is string => typeof value === "string";
 
 function readList<T>(file: string | undefined, is: (value: unknown) => value is T): T[] {
   if (file === undefined) return [];
-  const value: unknown = JSON.parse(readFileSync(file, "utf8"));
-  if (!Array.isArray(value) || !value.every(is)) throw new Error(`${file}: expected a list of ${is.name.slice(2).toLowerCase()} records`);
-  return value;
+  return parseList(readFileSync(file, "utf8"), file, is);
 }
 
 const isStages = (value: unknown): value is { path: string; base: string; ours: string; theirs: string } => isRecord(value) && ["path", "base", "ours", "theirs"].every((key) => typeof value[key] === "string");

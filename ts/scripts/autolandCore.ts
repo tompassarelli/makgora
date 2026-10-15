@@ -327,3 +327,11 @@ export function laneRerun(jobs: readonly CiJob[], attempt: number, testFailures:
   const first = reasons.find((reason) => reason !== undefined);
   return first !== undefined && failed.every((job, index) => reasons[index] !== undefined || MERGE_JOB.test(job.name)) ? first : undefined;
 }
+
+export function parseList<T>(text: string, source: string, is: (value: unknown) => value is T): T[] {
+  if (text.trim() === "") throw new Error(`${source}: empty input, the fetch returned nothing`);
+  let value: unknown;
+  try { value = JSON.parse(text); } catch { throw new Error(`${source}: truncated or malformed JSON (${text.length} bytes)`); }
+  if (!Array.isArray(value) || !value.every(is)) throw new Error(`${source}: expected a list of ${is.name.slice(2).toLowerCase()} records`);
+  return value;
+}
