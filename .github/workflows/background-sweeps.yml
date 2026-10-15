@@ -36,54 +36,31 @@ jobs:
         run: |
           runner=$(jq -er '.background | select(type == "string" and length > 0)' ts/runner-routing.json)
           echo "runner=$runner" >> "$GITHUB_OUTPUT"
+  # Every sweep outside GATE_SWEEPS (ts/src/runtime/gateSweeps.ts) and the
+  # per-pair worst-frame census (#405), at most three jobs at once so it never
+  # crowds Autoland. Census shard N plays every CENSUS_SHARDS-th fighter of the
+  # fixture; the census job judges the joined pairs.
   sweeps:
-    needs: routing
-    runs-on: ${{ needs.routing.outputs.runner }}
-    timeout-minutes: 40
-    strategy:
-      fail-fast: false
-      max-parallel: 2
-      matrix:
-        runtime: [bun, lua32]
-    name: Background sweeps (${{ matrix.runtime }})
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.ref || github.sha }}
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.13
-      - uses: actions/cache@v4
-        with:
-          path: ~/.bun/install/cache
-          key: bun-install-${{ hashFiles('ts/bun.lock') }}
-      - run: bun install --frozen-lockfile
-        working-directory: ts
-      - if: matrix.runtime == 'lua32'
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/wisp/lua32
-          key: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/toward-zero.h') }}
-      - if: matrix.runtime == 'bun'
-        run: bun run test
-        working-directory: ts
-      - if: matrix.runtime == 'lua32'
-        run: bun scripts/lua-tests.ts
-        working-directory: ts
-        env:
-          LUA_JOBS: "4"
-
-  # Per-pair worst-frame census (#405), sharded by fighter: shard N plays every
-  # CENSUS_SHARDS-th fighter of the fixture; the census job judges the joined pairs.
-  census-shard:
     needs: routing
     runs-on: ${{ needs.routing.outputs.runner }}
     timeout-minutes: 30
     strategy:
       fail-fast: false
+      max-parallel: 3
       matrix:
-        shard: [0, 1, 2, 3, 4, 5, 6]
-    name: census ${{ matrix.shard }}
+        include:
+          - { kind: lua, part: 0, name: "Background sweeps (lua32 0/3)" }
+          - { kind: lua, part: 1, name: "Background sweeps (lua32 1/3)" }
+          - { kind: lua, part: 2, name: "Background sweeps (lua32 2/3)" }
+          - { kind: bun, part: 0, name: "Background sweeps (bun)" }
+          - { kind: census, shard: 0, name: "census 0" }
+          - { kind: census, shard: 1, name: "census 1" }
+          - { kind: census, shard: 2, name: "census 2" }
+          - { kind: census, shard: 3, name: "census 3" }
+          - { kind: census, shard: 4, name: "census 4" }
+          - { kind: census, shard: 5, name: "census 5" }
+          - { kind: census, shard: 6, name: "census 6" }
+    name: ${{ matrix.name }}
     env:
       CENSUS_SHARDS: 7
     steps:
@@ -99,18 +76,40 @@ jobs:
           key: bun-install-${{ hashFiles('ts/bun.lock') }}
       - run: bun install --frozen-lockfile
         working-directory: ts
-      - uses: actions/cache@v4
+      - if: matrix.kind != 'bun'
+        uses: actions/cache@v4
         with:
           path: ~/.cache/wisp/lua32
           key: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/toward-zero.h') }}
-      - name: Census shard ${{ matrix.shard }}
+      - if: matrix.kind == 'bun'
+        run: bun run test
+        working-directory: ts
+        env:
+          TEST_JUNIT_DIR: build/sweep-listing
+      - if: matrix.kind == 'lua'
+        run: mkdir -p ts/build/sweep-listing
+      - if: matrix.kind == 'lua'
+        run: bun scripts/lua-tests.ts
+        working-directory: ts
+        env:
+          LUA_JOBS: "4"
+          LUA_PARTITION: ${{ matrix.part }}/3
+          LUA_TEST_COST_DIR: build/sweep-listing
+      - if: ${{ !cancelled() && matrix.kind != 'census' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: sweep-listing-${{ matrix.kind }}-${{ matrix.part }}
+          path: ts/build/sweep-listing
+          retention-days: 3
+      - if: matrix.kind == 'census'
+        name: Census shard ${{ matrix.shard }}
         working-directory: ts
         timeout-minutes: 25
         run: |
           mkdir -p census-out
           fighters=$(cut -f2 test/fixtures/perf/census-pairs.txt | sed 's/ vs .*//' | awk -v n="$CENSUS_SHARDS" -v s="${{ matrix.shard }}" '(NR - 1) % n == s { printf " --fighter %s", $0 }')
           bun wisp perf census $fighters --jobs 4 --pairs "census-out/census-pairs-${{ matrix.shard }}.txt"
-      - if: ${{ !cancelled() }}
+      - if: ${{ !cancelled() && matrix.kind == 'census' }}
         uses: actions/upload-artifact@v4
         with:
           name: census-${{ matrix.shard }}
@@ -118,7 +117,7 @@ jobs:
           retention-days: 3
 
   census:
-    needs: [routing, census-shard]
+    needs: [routing, sweeps]
     if: ${{ !cancelled() }}
     runs-on: ${{ needs.routing.outputs.runner }}
     timeout-minutes: 10

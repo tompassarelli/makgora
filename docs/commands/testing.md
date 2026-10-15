@@ -19,17 +19,18 @@
   smashcraft:ts/test/sweep.ts in Bun-only files) and keep its smallest form,
   such as one seeded match, as an ordinary test. The suite skips sweeps;
   `SWEEPS=1 bun run test` and `SWEEPS=1 bun scripts/lua-tests.ts` run only
-  them. `SWEEP_PLACEMENT=gate` retains the landing sweeps;
-  `SWEEP_PLACEMENT=background` selects the approved breadth names in
-  smashcraft:ts/src/runtime/backgroundSweeps.ts. Background sweeps runs on
-  every landed main SHA and nightly on BACKGROUND_RUNNER; its commit status
-  and Main is red report preserve failure visibility (#243).
-  `LUA_PARTITION=K/N` divides `LUA_JOBS` name-hash shards across N jobs;
-  CI runs at most six Lua jobs alongside its two Bun jobs.
+  them. `SWEEP_PLACEMENT=gate` runs only the short allowlist in
+  smashcraft:ts/src/runtime/gateSweeps.ts (one cheap seeded representative
+  of a family no ordinary test protects at landing);
+  `SWEEP_PLACEMENT=background` runs every other sweep. Background sweeps runs
+  them on hosted runners on every landed main SHA and nightly, at most three
+  jobs at once; its commit status and Main is red report preserve failure
+  visibility (#243). A new sweep runs after landing unless it joins the
+  allowlist. `LUA_PARTITION=K/N` divides `LUA_JOBS` name-hash shards across N
+  jobs; CI runs at most six Lua jobs alongside its two Bun jobs.
 
   The Farm test and CI landing suites use `SWEEP_PLACEMENT=gate`; Background
-  sweeps uses `SWEEP_PLACEMENT=background`, so the approved background names
-  run after landing.
+  sweeps uses `SWEEP_PLACEMENT=background`.
 
 - Test cost: ts/AGENTS.md sets the per-test ceilings. The Lua32 runner
   (`bun scripts/lua-tests.ts`, enforced by smashcraft:ts/scripts/testCost.ts)

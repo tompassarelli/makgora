@@ -67,6 +67,7 @@ test("sheriff reverts all and only the confirmed lane across generated trains an
       const verdict = decide({ run: failedRun, previous: { conclusion: "success", jobs: [], ancestor: true }, commits: fixture.commits, workflowFiles: [] });
       expect(verdict.kind).toBe("bisect");
       expect(suiteProbe("Background sweeps", "Background census: Every fighter pair's worst frame within the margin of main's fixture (#405)")).toBeUndefined();
+      expect(suiteProbe("Background sweeps", "Background sweeps (lua32 2/3): Run bun scripts/lua-tests.ts")?.env.LUA_PARTITION).toBe("2/3");
     }
   }
 });

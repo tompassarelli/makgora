@@ -131,7 +131,8 @@ export function suiteProbe(workflow: string, step: string): { readonly args: rea
   if (workflow === "Background sweeps") {
     const env = { SWEEPS: "1", SWEEP_PLACEMENT: "background" };
     if (step === "Background sweeps (bun): Run bun run test") return { args: ["run", "test"], env };
-    if (step === "Background sweeps (lua32): Run bun scripts/lua-tests.ts") return { args: ["scripts/lua-tests.ts"], env: { ...env, LUA_JOBS: "4" } };
+    const lua = /^Background sweeps \(lua32 ([0-2])\/3\): Run bun scripts\/lua-tests\.ts$/.exec(step);
+    if (lua !== null) return { args: ["scripts/lua-tests.ts"], env: { ...env, LUA_JOBS: "4", LUA_PARTITION: `${lua[1]}/3` } };
   }
   if (workflow !== "CI") return undefined;
   if (step === "Sweeps (Bun): Run bun run test") return { args: ["run", "test"], env: { SWEEPS: "1", SWEEP_PLACEMENT: "gate" } };
