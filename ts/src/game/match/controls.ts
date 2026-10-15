@@ -1,7 +1,7 @@
 import { ATTACK_BUFFER_FRAMES, type AttackBuffer, attackBuffer } from "../input/attackBuffer";
 import { PARTICIPANT_SLOTS, type Slots, isParticipantSlot } from "../input/participants";
 import { type Controls, neutralControls } from "../sim/roster";
-import { Phase } from "./rules";
+import { Phase } from "../lobby/lobbyState";
 
 
 export interface FrameControls {

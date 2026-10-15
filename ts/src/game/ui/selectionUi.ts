@@ -1,6 +1,6 @@
 import { type SessionWinsFrames, createSessionWinsFrames, presentSessionWinsFrames } from "./sessionWinsFrames";
 import { definitiveCues } from "../render/specialCueEffects";
-import { nextMatchCharacter, selectableMatchCharacter } from "../match/rules";
+import { nextMatchCharacter, selectableMatchCharacter } from "../lobby/lobbyState";
 import { RULE_BUTTONS, RULE_HEIGHT, type RuleBox, type TrainingSetting, cpuSettingsBox, teamSettingsBox } from "./ruleButtons";
 import { RULE_HELP_HEIGHT, RULE_HELP_WIDTH, hoveredRule, ruleHelp, visibleRuleGroups } from "./ruleHelp";
 
@@ -32,7 +32,7 @@ import {
   humanActive,
   humanFighterActive,
   humanPresent,
-} from "../match/rules";
+} from "../lobby/lobbyState";
 import { pointerX, pointerY } from "../menu/pointer";
 import {
   type Placement,

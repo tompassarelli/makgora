@@ -23,7 +23,7 @@ import { attackStartupFrames } from "../sim/moves";
 import { createFrameControls } from "./controls";
 import { captureFrame, createMatchFrameInput, executeMatchFrame } from "./frameInput";
 import { createPacingAndPresentation } from "./pacingAndPresentation";
-import { Phase, createMatchState } from "./rules";
+import { Phase, createMatchState } from "../lobby/lobbyState";
 
 const NEUTRAL = neutralControls();
 

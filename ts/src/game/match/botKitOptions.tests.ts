@@ -21,7 +21,7 @@ import { CPU_PROFILES } from "./cpuProfiles";
 import { createFrameControls } from "./controls";
 import { captureFrame, createMatchFrameInput, executeMatchFrame } from "./frameInput";
 import { createPacingAndPresentation } from "./pacingAndPresentation";
-import { Phase, createMatchState } from "./rules";
+import { Phase, createMatchState } from "../lobby/lobbyState";
 
 const NEUTRAL = neutralControls();
 

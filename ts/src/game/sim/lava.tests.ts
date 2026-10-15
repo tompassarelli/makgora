@@ -9,7 +9,7 @@ import { advanceSolo, controls, testWorld } from "./testWorld";
 import { firstFighterDifference, firstStateDifference } from "../replay/difference";
 import { copyReplayState, createReplaySnapshot } from "../replay/snapshot";
 import { stateChecksum } from "../replay/canonical";
-import { Phase } from "../match/rules";
+import { Phase } from "../lobby/lobbyState";
 import { stepMatch } from "../match/step";
 import { fighterAt } from "./roster";
 import { SELECTABLE_CHARACTERS } from "./heroes/registry";

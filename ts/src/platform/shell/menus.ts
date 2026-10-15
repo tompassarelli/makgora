@@ -10,7 +10,7 @@ import {
   stepPartnerEscape, stepPartnerTech, stepTrainingSpeed, setTutorialLesson, tickRematchCountdown,
   returnToCharacters, selectCharacter, selectCpuCharacter, selectStage, setHazards, setMeterDropsOn, setStocks, setTimeLimit, updateConnectedHumans,
   type MatchState, copyMatchState, createMatchState, initializeComputerChoices, setParticipants,
-} from "../../game/match/rules";
+} from "../../game/lobby/lobbyState";
 import { resetMomentRecorder } from "../../game/replay/moment";
 import { resetPacingAndPresentation } from "../../game/match/pacingAndPresentation";
 import { clearObservedActions } from "../../game/match/step";
@@ -24,7 +24,7 @@ import type { Scenario } from "../../game/session/build";
 import type { Character } from "../../game/sim/codes";
 import { type PlaytestRequest, preparePlaytest } from "../../game/session/playtest";
 import { nextStage } from "../../game/menu/stageCatalog";
-import { nextMatchCharacter } from "../../game/match/rules";
+import { nextMatchCharacter } from "../../game/lobby/lobbyState";
 import { stepCpuOpponent, stepCpuTier } from "../../game/match/cpuProfiles";
 import { traceSelectionState } from "./diagnostics";
 import { ClassicStep, continueClassic, quitClassic, skipToClassicBoss, startClassic } from "../../game/classic/classic";

@@ -12,7 +12,7 @@ import { PartnerBehaviour, PartnerEscape, PartnerTech, type TrainingState } from
 import {
   type MatchState, Phase, characterFor, computerActive, cycleSlotMode, firstHumanSlot, humanFighterActive, humanPresent, requestStageSelect, selectCharacter, selectStage,
   setTraining, setTutorialLesson,
-} from "./rules";
+} from "../lobby/lobbyState";
 
 
 export const LessonAction = { dash: 0, doubleJump: 1, hit: 2, special: 3, dodge: 4, throw: 5, ledge: 6, knockout: 7 } as const;

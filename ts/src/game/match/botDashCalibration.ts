@@ -10,7 +10,7 @@ import { createFighter } from "../sim/fighter";
 import { createRoster, neutralControls } from "../sim/roster";
 import { clearDash } from "../sim/groundMovement";
 import { advanceFighterMotion } from "../sim/step";
-import { createMatchState, Phase } from "./rules";
+import { createMatchState, Phase } from "../lobby/lobbyState";
 import { createPacingAndPresentation } from "./pacingAndPresentation";
 import { createFrameControls } from "./controls";
 import { produceComputerInput } from "./botPlay";

@@ -1,7 +1,7 @@
 import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
 import { createFrameControls } from "../match/controls";
 import { createPacingAndPresentation } from "../match/pacingAndPresentation";
-import { Phase, createMatchState } from "../match/rules";
+import { Phase, createMatchState } from "../lobby/lobbyState";
 import { captureReplaySnapshot, createReplaySnapshot, restoreReplaySnapshot } from "../replay/snapshot";
 import { Character } from "../sim/codes";
 import { SHIELD_MAX, createFighter } from "../sim/fighter";

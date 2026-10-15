@@ -5,7 +5,7 @@ import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { queueAttack } from "../../ts/src/game/input/attackBuffer";
 import { createBufferedFrameControls } from "../../ts/src/game/match/controls";
-import { createMatchState, Phase } from "../../ts/src/game/match/rules";
+import { createMatchState, Phase } from "../../ts/src/game/lobby/lobbyState";
 import { initializeMatchFighters, matchSpawnX, stepMatch } from "../../ts/src/game/match/step";
 import { AttackStyle, Character, GrabAction } from "../../ts/src/game/sim/codes";
 import { createFighter } from "../../ts/src/game/sim/fighter";

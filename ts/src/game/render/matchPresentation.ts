@@ -5,7 +5,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { at } from "wisp/src/runtime/lookup";
 import { PARTICIPANT_CAPACITY, PARTICIPANT_SLOTS } from "../input/participants";
-import { MATCH_TICKS_PER_SECOND, Phase, type MatchState } from "../match/rules";
+import { MATCH_TICKS_PER_SECOND, Phase, type MatchState } from "../lobby/lobbyState";
 import type { Character } from "../sim/codes";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { characterModelScale } from "../presentation/modelScale";

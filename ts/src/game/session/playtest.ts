@@ -10,7 +10,7 @@ import { PARTICIPANT_SLOTS, isParticipantMask, participantActive } from "../inpu
 import {
   type MatchState, Phase, createMatchState, firstHumanSlot, humanFighterActive, humanPresent, requestStageSelect, requestStart, selectCharacter,
   selectStage, setCpuOpponent, setCpuTier, setParticipants,
-} from "../match/rules";
+} from "../lobby/lobbyState";
 import { isCpuOpponentChoice, isCpuTier, type CpuOpponentChoice, type CpuTier } from "../match/cpuProfiles";
 
 const PREFIX = "PLAY v=3 computers=";

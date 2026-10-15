@@ -5,7 +5,7 @@ import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { selectableStage } from "../menu/stageCatalog";
 import { CPU_TIERS } from "../match/cpuProfiles";
-import { type MatchState, Phase, createMatchState, fighterMask, requestStart, setParticipants } from "../match/rules";
+import { type MatchState, Phase, createMatchState, fighterMask, requestStart, setParticipants } from "../lobby/lobbyState";
 import { initializeMatchFighters, matchSpawnX } from "../match/step";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
 import { createFighter } from "../sim/fighter";

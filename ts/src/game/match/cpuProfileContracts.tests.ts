@@ -14,7 +14,7 @@ import { CPU_PROFILES, type CpuOpponentId, type CpuTier } from "./cpuProfiles";
 import { replayChecksum } from "../replay/matchReplay";
 import { captureFrame, createMatchFrameInput, executeMatchFrame } from "./frameInput";
 import { createPacingAndPresentation } from "./pacingAndPresentation";
-import { Phase, createMatchState } from "./rules";
+import { Phase, createMatchState } from "../lobby/lobbyState";
 import { sweep, sweepSeed } from "../core/sweep";
 
 const NEUTRAL = neutralControls();

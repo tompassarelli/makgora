@@ -12,7 +12,7 @@ import { type MatchFrameInput, captureNetworkFrame, createMatchFrameInput, execu
 import {
   type MatchState, copyMatchState, createMatchState, cycleSlotMode, fighterActive, fighterMask, humanFighterActive,
   requestStageSelect, requestStart, selectCharacter, setParticipants,
-} from "../../match/rules";
+} from "../../lobby/lobbyState";
 import { createPacingAndPresentation } from "../../match/pacingAndPresentation";
 import { initializeMatchFighters, matchSpawnX } from "../../match/step";
 import { stateChecksum } from "../../replay/canonical";

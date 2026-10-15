@@ -13,7 +13,7 @@ import { fighterAt, isActive, neutralControls } from "./roster";
 import { f32 } from "wisp/src/sim/f32";
 import { ATTACK_BUFFER_FRAMES, type AttackBuffer, attackBuffer, queueAttack } from "../input/attackBuffer";
 import { createFrameControls } from "../match/controls";
-import { Phase, createMatchState } from "../match/rules";
+import { Phase, createMatchState } from "../lobby/lobbyState";
 import { stepMatch } from "../match/step";
 import { AttackStyle, Character, ProjectileKind, SpecialAction } from "./codes";
 import { type Fighter, createFighter, placedObject } from "./fighter";

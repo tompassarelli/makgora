@@ -21,7 +21,7 @@ import { createFrameControls } from "./controls";
 import type { CpuOpponentId, CpuTier } from "./cpuProfiles";
 import { captureFrame, createMatchFrameInput, executeMatchFrame } from "./frameInput";
 import { createPacingAndPresentation } from "./pacingAndPresentation";
-import { Phase, createMatchState } from "./rules";
+import { Phase, createMatchState } from "../lobby/lobbyState";
 
 const STAGE = 0;
 /** A lag begun this close to the lip can slide off it. */

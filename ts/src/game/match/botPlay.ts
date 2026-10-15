@@ -32,7 +32,7 @@ import { guardOffstage, waitAtLip } from "./botEdgeGuard";
 import { escapeCorner, pokeGoal, pressCorner, pressEdgeCancel, steerEdgeCancel } from "./botCorner";
 import { pressHeroFollowUp } from "./botHeroKit";
 import { dashIn, pressKitOption, pressUltimate, steerHeroBranches, steerRunningSpecial } from "./botKitOptions";
-import { MATCH_TICKS_PER_SECOND, type MatchState, stageClock, computerActive, fighterMask } from "./rules";
+import { MATCH_TICKS_PER_SECOND, type MatchState, stageClock, computerActive, fighterMask } from "../lobby/lobbyState";
 import { trainingPartnerInput } from "./training";
 import { sameFighterState } from "../../generated/state/fighterState";
 import { type BotStrategy, copyBotStrategy, learnBotHabit, prepareBotRead, pressBotRead, sameBotStrategy } from "./botStrategy";

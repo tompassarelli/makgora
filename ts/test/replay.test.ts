@@ -12,7 +12,7 @@ import { Effect } from "effect";
 import { testHeadless } from "./headless";
 import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel";
 import type { HeadlessClient } from "wisp/src/headless/client";
-import { Phase, holdingStart } from "../src/game/match/rules";
+import { Phase, holdingStart } from "../src/game/lobby/lobbyState";
 import { joinReplay, parseReplayHeader, parseReplayPart, replayMatch } from "../src/game/replay/matchReplay";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { fighterAt } from "../src/game/sim/roster";

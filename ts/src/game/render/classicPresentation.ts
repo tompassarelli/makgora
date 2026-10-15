@@ -6,7 +6,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { BossPhase, bossClock, bossDefinition, bossMoment, bossPosition, zoneCenter, type BossDefinition, type BossMoment } from "../classic/bosses";
 import { classicEnding } from "../classic/classicText";
 import { BossKind } from "../classic/runState";
-import { type MatchState, Phase } from "../match/rules";
+import { type MatchState, Phase } from "../lobby/lobbyState";
 import { fighterPortrait } from "../sim/heroes/registry";
 import { createBackdrop, createText, gameUi, placeTopLeft } from "../ui/frames";
 import { MENU_FONT, PANEL_TEXTURE } from "../ui/hudLayout";

@@ -5,7 +5,7 @@
 
 
 import { PARTICIPANT_SLOTS, type ParticipantSlot } from "../input/participants";
-import { type MatchState, humanPresent } from "../match/rules";
+import { type MatchState, humanPresent } from "../lobby/lobbyState";
 
 
 export const STAGE_READY_PREFIX = "SC_STAGE";

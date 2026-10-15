@@ -5,7 +5,7 @@ import { queueAttack } from "../../ts/src/game/input/attackBuffer";
 import { createBufferedFrameControls } from "../../ts/src/game/match/controls";
 import { captureFrame, createMatchFrameInput, executeMatchFrame } from "../../ts/src/game/match/frameInput";
 import { createPacingAndPresentation } from "../../ts/src/game/match/pacingAndPresentation";
-import { createMatchState, Phase } from "../../ts/src/game/match/rules";
+import { createMatchState, Phase } from "../../ts/src/game/lobby/lobbyState";
 import { initializeMatchFighters } from "../../ts/src/game/match/step";
 import { AttackStyle, Character } from "../../ts/src/game/sim/codes";
 import { createFighter } from "../../ts/src/game/sim/fighter";

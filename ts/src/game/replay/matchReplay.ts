@@ -20,7 +20,7 @@ import { PARTICIPANT_SLOTS } from "../input/participants";
 import { type FrameControls, createFrameControls } from "../match/controls";
 import { createMatchFrameInput } from "../match/frameInput";
 import type { PacingAndPresentation } from "../match/pacingAndPresentation";
-import { type MatchState, Phase } from "../match/rules";
+import { type MatchState, Phase } from "../lobby/lobbyState";
 import { CPU_OPPONENT_CHOICES, CPU_OPPONENT_IDS, CPU_TIERS } from "../match/cpuProfiles";
 import { isScenario } from "../session/build";
 import { Character } from "../sim/codes";

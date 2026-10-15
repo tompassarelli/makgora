@@ -7,7 +7,7 @@ import { AttackStyle, Character } from "../sim/codes";
 import { createFighter, type Fighter } from "../sim/fighter";
 import { copyControls, createRoster, neutralControls, type Controls } from "../sim/roster";
 import { createFrameControls } from "./controls";
-import { Phase, createMatchState } from "./rules";
+import { Phase, createMatchState } from "../lobby/lobbyState";
 import { stepMatch } from "./step";
 
 function testRoster(first: Fighter, second: Fighter) {

@@ -15,7 +15,7 @@ import { type SyncLatency, syncDelivery } from "wisp/src/headless/syncChannel";
 import type { HeadlessClient, SyncMessage } from "wisp/src/headless/client";
 import { type InputRow, type RowFields, inputRow, sameInput } from "../src/game/input/inputRow";
 import type { ParticipantInputs } from "../src/game/input/participants";
-import { Phase } from "../src/game/match/rules";
+import { Phase } from "../src/game/lobby/lobbyState";
 import { observedFrameLegalActions, observedFrameStartedActions } from "../src/game/match/step";
 import { ShadowInputSchedule } from "../src/game/netcode/shadowSchedule";
 import { Character } from "../src/game/sim/codes";

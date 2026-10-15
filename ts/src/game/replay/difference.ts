@@ -21,7 +21,7 @@ import { firstItemsDifference } from "../match/items";
 import { firstMeterDropsDifference } from "../match/meterDrops";
 import { firstBotMemoryDifference, sameBotMemory } from "../match/botPerception";
 import { botStrategyValues, sameBotStrategy } from "../match/botStrategy";
-import type { MatchState } from "../match/rules";
+import type { MatchState } from "../lobby/lobbyState";
 import { sameControls } from "../sim/roster";
 import { sameFighterState } from "../../generated/state/fighterState";
 import type { ReplayState } from "./snapshot";

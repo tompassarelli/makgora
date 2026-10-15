@@ -4,7 +4,7 @@ import { VERIFIED_STOCK_SOUNDS } from "../../generated/assets/stockSoundInfo";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
 import { executeNext, testMatch } from "../match/testMatch";
 import { captureReplaySnapshot, createReplaySnapshot, restoreReplaySnapshot } from "../replay/snapshot";
-import { Phase } from "../match/rules";
+import { Phase } from "../lobby/lobbyState";
 import { Character } from "../sim/codes";
 import { SELECTABLE_CHARACTERS } from "../sim/heroes/registry";
 import type { Fighter } from "../sim/fighter";

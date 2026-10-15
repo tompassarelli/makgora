@@ -20,7 +20,7 @@ import { PARTICIPANT_SLOTS, isParticipantMask, isParticipantSlot } from "../inpu
 import {
   type MatchState, Phase, computerActive, cycleSlotMode, humanActive, humanFighterActive, selectCharacter, selectCpuCharacter, setAutomaticRematch,
   setHitAreas, setItemsOn, setMeterDropsOn, setUltimatesOn, setPartnerDamage, setStocks, setTimeLimit, setTraining, stepTrainingSpeed, toggleItemKind,
-} from "../match/rules";
+} from "../lobby/lobbyState";
 import { selectableStage } from "../menu/stageCatalog";
 import { ITEM_WARNING_FRAMES } from "../match/centreItem";
 import { type Character, ItemKind, itemBit } from "../sim/codes";

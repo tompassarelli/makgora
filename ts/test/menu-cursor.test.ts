@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { testHeadless } from "./headless";
 import type { HeadlessClient } from "wisp/src/headless/client";
-import { Phase } from "../src/game/match/rules";
+import { Phase } from "../src/game/lobby/lobbyState";
 import { install, start } from "../src/platform/playableMain";
 import { Key } from "../src/platform/shell/keyEvents";
 import { shell } from "../src/platform/shell/state";

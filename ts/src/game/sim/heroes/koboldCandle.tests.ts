@@ -9,7 +9,7 @@ import { type Controls, type Roster, createRoster, fighterAt } from "../roster";
 import { mainDeckRight, mainDeckZAt, surfaceLeft, surfaceRight, surfaceZAt } from "../stage";
 import { duelPair, stepDuel } from "../testDuel";
 import { contactBatch, controls, hitEffect } from "../testWorld";
-import { Phase } from "../../match/rules";
+import { Phase } from "../../lobby/lobbyState";
 import { stepMatch } from "../../match/step";
 import { firstFighterDifference } from "../../replay/difference";
 import { copyReplayState, createReplaySnapshot } from "../../replay/snapshot";

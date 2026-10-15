@@ -8,7 +8,7 @@ import { type ParticipantInputs, participantInputs } from "../input/participants
 import { type FrameControls, createBufferedFrameControls } from "./controls";
 import { type MatchFrameInput, captureNetworkFrame, createMatchFrameInput, executeMatchFrame } from "./frameInput";
 import { type PacingAndPresentation, createPacingAndPresentation } from "./pacingAndPresentation";
-import { type MatchState, Phase, createMatchState, setHumanMask } from "./rules";
+import { type MatchState, Phase, createMatchState, setHumanMask } from "../lobby/lobbyState";
 import { Character, DownState } from "../sim/codes";
 import { type Fighter, createFighter } from "../sim/fighter";
 import { type Roster, createRoster, fighterAt } from "../sim/roster";

@@ -1,7 +1,7 @@
 
 
 import { PARTICIPANT_SLOTS } from "../../game/input/participants";
-import { characterFor, fighterMask } from "../../game/match/rules";
+import { characterFor, fighterMask } from "../../game/lobby/lobbyState";
 import { matchSpawnX } from "../../game/match/step";
 import { Character } from "../../game/sim/codes";
 import { createFighter } from "../../game/sim/fighter";

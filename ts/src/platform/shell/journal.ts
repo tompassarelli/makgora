@@ -8,7 +8,7 @@
 import { commitEdges, resetKeys, sampleKeys } from "../../game/input/keyboardCapture";
 import { isParticipantSlot } from "../../game/input/participants";
 import { INPUT_LAST_FRAME, type InputPacket } from "../../game/input/wire";
-import { Phase, fighterMask, humanActive } from "../../game/match/rules";
+import { Phase, fighterMask, humanActive } from "../../game/lobby/lobbyState";
 import { Capture } from "../../game/netcode/capture";
 import type { JournalInputSource, JournalRead } from "../../game/netcode/journal/source";
 import { TEXT_WINDOW } from "../../game/netcode/journal/text";

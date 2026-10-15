@@ -12,7 +12,7 @@ import { Action, bit } from "../../src/game/input/actions";
 import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
 import { parkedChipLeft, readyChipSize } from "../../src/game/menu/selectionDrag";
 import { PLAYABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";
-import { Phase } from "../../src/game/match/rules";
+import { Phase } from "../../src/game/lobby/lobbyState";
 import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import { journalMenuFile } from "../../src/game/core/gameFiles";
 import { gameProcess } from "../integrity/capture";

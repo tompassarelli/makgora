@@ -1,7 +1,7 @@
 // Companion Preload filenames and lines are an external protocol.
 
 import type { DevSettings } from "./devSettings";
-import type { MatchState } from "../match/rules";
+import type { MatchState } from "../lobby/lobbyState";
 import type { JournalIngress } from "./build";
 import { devCommandReceiptFile, journalControlFile, journalLifecycleFile, journalReadyFile, journalMenuFile, journalTransportReadyFile, journalFailureFile, stageReceiptFile } from "../core/gameFiles";
 

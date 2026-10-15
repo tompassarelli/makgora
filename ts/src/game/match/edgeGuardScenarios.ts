@@ -14,7 +14,7 @@ import { createFrameControls } from "./controls";
 import type { CpuOpponentId, CpuTier } from "./cpuProfiles";
 import { captureFrame, createMatchFrameInput, executeMatchFrame } from "./frameInput";
 import { createPacingAndPresentation } from "./pacingAndPresentation";
-import { createMatchState, Phase } from "./rules";
+import { createMatchState, Phase } from "../lobby/lobbyState";
 
 const STAGE = 0;
 export const LEDGE_X = mainDeckRight(STAGE);

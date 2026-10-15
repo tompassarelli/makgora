@@ -7,7 +7,7 @@ import { REPLAY_HISTORY_CAPACITY } from "../replay/limits";
 import type { FrameControls } from "../match/controls";
 import type { PacingAndPresentation } from "../match/pacingAndPresentation";
 import type { MatchFrameInput } from "../match/frameInput";
-import type { MatchState } from "../match/rules";
+import type { MatchState } from "../lobby/lobbyState";
 import type { ReplayState } from "../replay/snapshot";
 import type { ShadowInputSchedule } from "../netcode/shadowSchedule";
 import type { Roster } from "../sim/roster";

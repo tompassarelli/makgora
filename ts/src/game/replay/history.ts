@@ -15,14 +15,14 @@ import {
 import { at } from "wisp/src/runtime/lookup";
 import { PARTICIPANT_SLOTS, participantActive } from "../input/participants";
 import { sameComputerInputs } from "../match/botPlay";
-import { computerActive } from "../match/rules";
+import { computerActive } from "../lobby/lobbyState";
 import { fighterAt, isActive } from "../sim/roster";
 import { floorMod } from "wisp/src/sim/intMath";
 import { REPLAY_HISTORY_CAPACITY, REPLAY_MAX_CORRECTION_FRAMES } from "./limits";
 import { type ReplayState, copyReplayState, createReplaySnapshot } from "./snapshot";
 import { sameInput } from "../input/inputRow";
 import { copyAttackBuffer, sameAttackBuffer } from "../input/attackBuffer";
-import { copyMatchState } from "../match/rules";
+import { copyMatchState } from "../lobby/lobbyState";
 import { copyPacingAndPresentation } from "../match/pacingAndPresentation";
 import { copyFighterState, sameFighterState } from "../../generated/state/fighterState";
 import { apartFromOthers, authoredMotionApartFromOthers, matchScopable, scopedStepHeld } from "./scopedRepair";

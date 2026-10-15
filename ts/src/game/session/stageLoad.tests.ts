@@ -1,5 +1,5 @@
 import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
-import { Phase, createMatchState, setParticipants } from "../match/rules";
+import { Phase, createMatchState, setParticipants } from "../lobby/lobbyState";
 import { beginStageLoad, stageReported } from "./stageLoad";
 
 function twoPlayers() {

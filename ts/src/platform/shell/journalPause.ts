@@ -3,7 +3,7 @@
 
 
 import { isParticipantSlot } from "../../game/input/participants";
-import { Phase, humanActive } from "../../game/match/rules";
+import { Phase, humanActive } from "../../game/lobby/lobbyState";
 import { padDecimal, parseDecimal } from "../../game/netcode/journal/decimal";
 import type { JournalInputSource } from "../../game/netcode/journal/source";
 import { readVocabularyControlAck } from "../../game/netcode/journal/vocabulary";

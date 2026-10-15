@@ -1,4 +1,4 @@
-import { winningMask } from "../../game/match/rules";
+import { winningMask } from "../../game/lobby/lobbyState";
 import { recordSessionWins } from "../../game/session/sessionWins";
 import { servicePauseCameraControls, pauseHudHidden } from "./pauseCamera";
 
@@ -9,7 +9,7 @@ import { PARTICIPANT_SLOTS, isParticipantMask, isParticipantSlot } from "../../g
 import { clearPulse } from "../../game/input/directionalInput";
 import { ownConfirmedState } from "./confirmedState";
 import { startKeyUp } from "../../game/match/controls";
-import { Phase, copyMatchState, firstHumanSlot, humanActive, humanPresent, initializeComputerChoices, participantLeft, updateConnectedHumans } from "../../game/match/rules";
+import { Phase, copyMatchState, firstHumanSlot, humanActive, humanPresent, initializeComputerChoices, participantLeft, updateConnectedHumans } from "../../game/lobby/lobbyState";
 import { chooseScenarioCharacters } from "../../game/session/scenarios";
 import { FRAME_SECONDS } from "../../game/presentation/fighterPose";
 import { holdGameSpeed } from "./gameSpeed";

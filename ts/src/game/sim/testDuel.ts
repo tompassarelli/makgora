@@ -2,7 +2,7 @@
 
 import { ATTACK_BUFFER_FRAMES, type AttackBuffer, attackBuffer } from "../input/attackBuffer";
 import { type FrameControls, createBufferedFrameControls, createFrameControls } from "../match/controls";
-import { type MatchState, Phase, createMatchState } from "../match/rules";
+import { type MatchState, Phase, createMatchState } from "../lobby/lobbyState";
 import { stepMatch } from "../match/step";
 import { Character } from "./codes";
 import { type Fighter, createFighter } from "./fighter";

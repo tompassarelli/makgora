@@ -21,7 +21,7 @@ import { ContactKind } from "../sim/codes";
 import { queueDamageContact } from "../sim/contacts";
 import { ITEM_WARNING_FRAMES, itemWarningFrames, scheduleMatchItems } from "./centreItem";
 import { createFrameControls } from "./controls";
-import { createMatchState, Phase, setHumanCount } from "./rules";
+import { createMatchState, Phase, setHumanCount } from "../lobby/lobbyState";
 import { stepMatch } from "./step";
 import { sweep } from "../core/sweep";
 

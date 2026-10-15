@@ -17,7 +17,7 @@ import { copyReplayState, createReplaySnapshot } from "../replay/snapshot";
 import { Action, maskOf } from "../input/actions";
 import { adaptInput } from "../input/adapter";
 import { inputRow } from "../input/inputRow";
-import { Phase } from "../match/rules";
+import { Phase } from "../lobby/lobbyState";
 import { stepMatch } from "../match/step";
 import { setWorldMotionValue } from "./motion";
 import { duelPair, stepDuel } from "./testDuel";

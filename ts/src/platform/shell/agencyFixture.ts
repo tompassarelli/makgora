@@ -1,5 +1,5 @@
 import { PARTICIPANT_SLOTS } from "../../game/input/participants";
-import { Phase, stageClock } from "../../game/match/rules";
+import { Phase, stageClock } from "../../game/lobby/lobbyState";
 import { Character } from "../../game/sim/codes";
 import { fighterAt, isActive } from "../../game/sim/roster";
 import { startMatch } from "./matchStart";

@@ -7,7 +7,7 @@ import { attackBuffer, clearAttackBuffer, queueAttack } from "../input/attackBuf
 import { type FrameControls, createFrameControls } from "../match/controls";
 import { type MatchFrameInput, captureFrame, createMatchFrameInput, executeMatchFrame, resetMatchFrameInput } from "../match/frameInput";
 import { createPacingAndPresentation } from "../match/pacingAndPresentation";
-import { Phase, createMatchState, setHumanCount } from "../match/rules";
+import { Phase, createMatchState, setHumanCount } from "../lobby/lobbyState";
 import { Character } from "../sim/codes";
 import { type Fighter, createFighter } from "../sim/fighter";
 import { projectileCount } from "../sim/projectiles";

@@ -1,4 +1,4 @@
-import { type MatchState, stageClock } from "../match/rules";
+import { type MatchState, stageClock } from "../lobby/lobbyState";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { BossKind } from "../classic/runState";
 import { bossNotice } from "../classic/classicText";

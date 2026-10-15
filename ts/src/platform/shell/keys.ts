@@ -11,7 +11,7 @@ import { isCarrierKey } from "../../game/netcode/journal/keyboard";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, isParticipantSlot } from "../../game/input/participants";
 import { heldActions, keyDown, pressKey, releaseKey } from "../../game/input/playerKeys";
 import { startKeyDown, startKeyUp } from "../../game/match/controls";
-import { Phase, cancelRematchCountdown, characterFor, copyMatchState, firstHumanSlot, humanActive, recallCharacter, selectCharacter, setTraining, setHitAreas } from "../../game/match/rules";
+import { Phase, cancelRematchCountdown, characterFor, copyMatchState, firstHumanSlot, humanActive, recallCharacter, selectCharacter, setTraining, setHitAreas } from "../../game/lobby/lobbyState";
 import { ROSTER_MANA } from "../../game/sim/mana";
 import { fighterAt, isActive } from "../../game/sim/roster";
 import { NO_LESSON, tutorialFinished } from "../../game/match/tutorial";

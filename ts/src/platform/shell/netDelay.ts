@@ -2,7 +2,7 @@ import { trampoline } from "wisp/src/platform/dispatch";
 import { f32 } from "wisp/src/sim/f32";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS } from "../../game/input/participants";
-import { type MatchState, humanActive } from "../../game/match/rules";
+import { type MatchState, humanActive } from "../../game/lobby/lobbyState";
 import {
   AUTO_DELAY, DEFAULT_DELAY, type DelayPolicy, type RttEstimate, agreedDelay, connectionPoor, delayPolicy, expectedRollback, highDelay,
   nextDelay, observeRtt, requestedDelay, rttEstimate, smoothedRttMs,

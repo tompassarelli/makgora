@@ -5,7 +5,7 @@ import { assertEquals, test } from "wisp/src/runtime/testing";
 import { at } from "wisp/src/runtime/lookup";
 import { queueAttack } from "../input/attackBuffer";
 import { createBufferedFrameControls } from "../match/controls";
-import { Phase, createMatchState } from "../match/rules";
+import { Phase, createMatchState } from "../lobby/lobbyState";
 import { stepMatch } from "../match/step";
 import { AttackStyle, Character, HitElement } from "../sim/codes";
 import { createFighter } from "../sim/fighter";

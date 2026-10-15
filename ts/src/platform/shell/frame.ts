@@ -1,4 +1,4 @@
-import { winningMask } from "../../game/match/rules";
+import { winningMask } from "../../game/lobby/lobbyState";
 import { recordSessionWins } from "../../game/session/sessionWins";
 
 
@@ -10,7 +10,7 @@ import { PARTICIPANT_SLOTS, type ParticipantSlot, participantActive } from "../.
 import { borrowMatchFrame, captureFrame, executeMatchFrame, hasNetworkRows } from "../../game/match/frameInput";
 import { ownConfirmedState } from "./confirmedState";
 import { beginMomentFrame, keepMomentEnd, momentFrameRan, recordMomentRow } from "../../game/replay/moment";
-import { Phase, beginRematchCountdown, computerActive, humanFighterActive } from "../../game/match/rules";
+import { Phase, beginRematchCountdown, computerActive, humanFighterActive } from "../../game/lobby/lobbyState";
 import { resultMessage } from "../../game/session/messages";
 import { produceScenarioComputerInput } from "../../game/session/scenarios";
 import { canAttack } from "../../game/sim/conditions";

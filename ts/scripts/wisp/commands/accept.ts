@@ -21,7 +21,7 @@ import { makeAccept } from "wisp/scripts/wisp/commands/accept";
 import { lan } from "wisp/scripts/wisp/commands/lan";
 import { step } from "wisp/scripts/wisp/timings";
 import { GameFiles } from "wisp/scripts/wisp/gameFiles";
-import { Phase } from "../../../src/game/match/rules";
+import { Phase } from "../../../src/game/lobby/lobbyState";
 import { MAP_PROFILES, SMASHCRAFT_ACCEPT, type SmashcraftMapProfile } from "../acceptChecks";
 import { DevCommandReceipt } from "../boundary";
 import { rebuildMap } from "../mapInputs";

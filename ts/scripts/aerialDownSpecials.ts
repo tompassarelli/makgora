@@ -3,7 +3,7 @@
 import { Action, maskOf } from "../src/game/input/actions";
 import { adaptInput } from "../src/game/input/adapter";
 import { inputRow } from "../src/game/input/inputRow";
-import { Phase } from "../src/game/match/rules";
+import { Phase } from "../src/game/lobby/lobbyState";
 import { stepMatch } from "../src/game/match/step";
 import { createReplaySnapshot } from "../src/game/replay/snapshot";
 import { copyFighterState } from "../src/generated/state/fighterState";

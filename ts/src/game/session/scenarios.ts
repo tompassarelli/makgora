@@ -5,7 +5,7 @@ import { type AttackBuffer, clearAttackBuffer, queueAttack } from "../input/atta
 import { PARTICIPANT_SLOTS, type ParticipantSlot } from "../input/participants";
 import type { FrameControls } from "../match/controls";
 import type { PacingAndPresentation } from "../match/pacingAndPresentation";
-import { type MatchState, cpuSlot, firstHumanSlot, humanActive, selectCharacter, selectCpuCharacter } from "../match/rules";
+import { type MatchState, cpuSlot, firstHumanSlot, humanActive, selectCharacter, selectCpuCharacter } from "../lobby/lobbyState";
 import { produceComputerInput } from "../match/botPlay";
 import { AttackStyle, Character, DownState } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";

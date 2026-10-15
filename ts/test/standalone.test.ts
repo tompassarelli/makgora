@@ -12,7 +12,7 @@ import { sweep } from "./sweep";
 import { parsePadScript } from "../scripts/integrity/padScript";
 import { parseExpectations, parseTrace, scriptChat, TRACE_FILE, unmetExpectations } from "../scripts/integrity/padParity";
 import { quickMatchHero, quickMatchHitAreas, quickMatchStocks } from "../src/game/session/devSettings";
-import { Phase } from "../src/game/match/rules";
+import { Phase } from "../src/game/lobby/lobbyState";
 import { fighterAt } from "../src/game/sim/roster";
 import { fighterName } from "../src/game/sim/heroes/registry";
 

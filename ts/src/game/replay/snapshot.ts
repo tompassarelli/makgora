@@ -2,7 +2,7 @@ import { copyAttackBuffer } from "../input/attackBuffer";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { type FrameControls, createFrameControls } from "../match/controls";
 import { type PacingAndPresentation, copyPacingAndPresentation, createPacingAndPresentation } from "../match/pacingAndPresentation";
-import { type MatchState, copyMatchState, createMatchState } from "../match/rules";
+import { type MatchState, copyMatchState, createMatchState } from "../lobby/lobbyState";
 import { PACK_CAPACITY, createFighter } from "../sim/fighter";
 import { type Roster, createRoster, fighterAt, isActive } from "../sim/roster";
 import { copyFighterState } from "../../generated/state/fighterState";

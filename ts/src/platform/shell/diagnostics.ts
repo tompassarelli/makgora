@@ -5,7 +5,7 @@ import { pulsePending } from "../../game/input/directionalInput";
 import { encodeBindings } from "../../game/input/keyBindings";
 import { PARTICIPANT_SLOTS, type ParticipantSlot } from "../../game/input/participants";
 import { directionX, directionZ } from "../../game/input/playerKeys";
-import { characterFor, characterReady, computerActive, fighterMask, firstHumanSlot, humanActive, humanFighterActive } from "../../game/match/rules";
+import { characterFor, characterReady, computerActive, fighterMask, firstHumanSlot, humanActive, humanFighterActive } from "../../game/lobby/lobbyState";
 import { captureReplaySnapshot } from "../../game/replay/snapshot";
 import { beginStateChecksum, foldStateChecksum, stateChecksum } from "../../game/replay/canonical";
 import { fighterAt, isActive, type Controls } from "../../game/sim/roster";

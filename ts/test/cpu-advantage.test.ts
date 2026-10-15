@@ -6,7 +6,7 @@ import { createFrameControls } from "../src/game/match/controls";
 import type { CpuTier } from "../src/game/match/cpuProfiles";
 import { captureFrame, createMatchFrameInput, executeMatchFrame } from "../src/game/match/frameInput";
 import { createPacingAndPresentation } from "../src/game/match/pacingAndPresentation";
-import { Phase, createMatchState } from "../src/game/match/rules";
+import { Phase, createMatchState } from "../src/game/lobby/lobbyState";
 import { setSweepSeedOffset, sweepSeed } from "../src/game/core/sweep";
 import { Character, DownState } from "../src/game/sim/codes";
 import { createFighter } from "../src/game/sim/fighter";

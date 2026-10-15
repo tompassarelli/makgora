@@ -7,7 +7,7 @@ import { copyControls, createRoster, neutralControls } from "../sim/roster";
 import { TOMB_OF_SARGERAS_STAGE, mainDeckLeft, mainDeckRight } from "../sim/stage";
 import { chooseRecoveryInput } from "./botRecovery";
 import { createFrameControls } from "./controls";
-import { Phase, createMatchState } from "./rules";
+import { Phase, createMatchState } from "../lobby/lobbyState";
 import { stepMatch } from "./step";
 import { sweep } from "../core/sweep";
 

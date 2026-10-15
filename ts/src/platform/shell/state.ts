@@ -17,7 +17,7 @@ import { type MatchFrameInput, createMatchFrameInput } from "../../game/match/fr
 import { type PacingAndPresentation, createPacingAndPresentation } from "../../game/match/pacingAndPresentation";
 import { BOT_HISTORY_FRAMES, reserveBotObservations } from "../../game/match/botPerception";
 import { REPLAY_HISTORY_CAPACITY, REPLAY_MAX_CORRECTION_FRAMES } from "../../game/replay/limits";
-import { type MatchState, REMATCH_COUNTDOWN_SECONDS, createMatchState } from "../../game/match/rules";
+import { type MatchState, REMATCH_COUNTDOWN_SECONDS, createMatchState } from "../../game/lobby/lobbyState";
 import { matchSpawnX } from "../../game/match/step";
 import { createMatchCamera, type MatchCamera } from "../../game/sim/matchCamera";
 import type { FixedDelay } from "../../game/netcode/fixedSchedule";

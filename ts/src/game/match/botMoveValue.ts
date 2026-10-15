@@ -9,7 +9,7 @@ import { authoredHitRegion, emptyHitRegion, type HitEffect } from "../sim/hitReg
 import { attackDurationFramesForGrounding, attackStartupFrames, isSmashAttack } from "../sim/moves";
 import { contactKnockback } from "../sim/knockback";
 import { stageBounds } from "../sim/stageBounds";
-import type { MatchState } from "./rules";
+import type { MatchState } from "../lobby/lobbyState";
 import { botChance, botChoice } from "./botRandom";
 import { startableForm } from "./botHeroKit";
 import type { BotStrategy } from "./botStrategy";

@@ -13,7 +13,7 @@ import { attackBuffer, hasPendingAttack, queueAttack } from "../input/attackBuff
 import type { Direction } from "../input/inputRow";
 import { copyControls, neutralControls, type Controls, createRoster } from "../sim/roster";
 import { createFrameControls, type FrameControls } from "./controls";
-import { Phase, createMatchState, setParticipants, recallCharacter, cpuSlot, requestStageSelect, selectCharacter, selectCpuCharacter, setHumanCount } from "./rules";
+import { Phase, createMatchState, setParticipants, recallCharacter, cpuSlot, requestStageSelect, selectCharacter, selectCpuCharacter, setHumanCount } from "../lobby/lobbyState";
 import { stepMatch } from "./step";
 import { SHIELD_MIN_HOLD_FRAMES, SHIELD_RELEASE_LAG_FRAMES, digitalShieldDamage } from "../sim/shield";
 import { ATTACK_BUFFER_FRAMES } from "../input/attackBuffer";

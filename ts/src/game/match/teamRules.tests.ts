@@ -3,7 +3,7 @@ import { PARTICIPANT_SLOTS } from "../input/participants";
 import { createFighter } from "../sim/fighter";
 import { createRoster, fighterAt } from "../sim/roster";
 import { type Team } from "../sim/teams";
-import { Phase, advanceClock, allCharactersReady, createMatchState, cycleTeam, resolveStocks, setParticipants, setTeamBattle, winningMask } from "./rules";
+import { Phase, advanceClock, allCharactersReady, createMatchState, cycleTeam, resolveStocks, setParticipants, setTeamBattle, winningMask } from "../lobby/lobbyState";
 
 test("team stock resolution and winning credit follow every four-slot partition and survivor mask, with free for all unchanged [k2 property]", () => {
   const teams: readonly Team[] = [0, 1, 2, 3];

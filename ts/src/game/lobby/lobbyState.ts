@@ -6,18 +6,18 @@ import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { type MatchCamera, createMatchCamera, copyMatchCamera } from "../sim/matchCamera";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots, isParticipantMask, isParticipantSlot, participantActive } from "../input/participants";
 import { Character, ItemKind, itemBit } from "../sim/codes";
-import { scheduleMatchItems } from "./centreItem";
-import { type MatchMeterDrops, copyMatchMeterDrops, createMatchMeterDrops, scheduleMeterDrops } from "./meterDrops";
-import { nextMatchSeed } from "./botRandom";
-import { CPU_OPPONENT_DEFAULT, CPU_TIERS, CPU_TIER_DEFAULT, type CpuOpponentChoice, type CpuOpponentId, type CpuTier, isCpuOpponentChoice, isCpuTier, resolveCpuOpponent } from "./cpuProfiles";
+import { scheduleMatchItems } from "../match/centreItem";
+import { type MatchMeterDrops, copyMatchMeterDrops, createMatchMeterDrops, scheduleMeterDrops } from "../match/meterDrops";
+import { nextMatchSeed } from "../match/botRandom";
+import { CPU_OPPONENT_DEFAULT, CPU_TIERS, CPU_TIER_DEFAULT, type CpuOpponentChoice, type CpuOpponentId, type CpuTier, isCpuOpponentChoice, isCpuTier, resolveCpuOpponent } from "../match/cpuProfiles";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
-import { type MatchItems, copyMatchItems, createMatchItems } from "./items";
+import { type MatchItems, copyMatchItems, createMatchItems } from "../match/items";
 import { type Team } from "../sim/teams";
 import { f32 } from "wisp/src/sim/f32";
 import { STAGE_AT_REST } from "../sim/stage";
 
 import { type ConfiguredRun, copyConfiguredRun, createConfiguredRun } from "../classic/runState";
-import { PARTNER_BEHAVIOURS, PARTNER_DAMAGE_MAX, PARTNER_DAMAGE_STEP, PARTNER_ESCAPES, PARTNER_TECHS, TRAINING_SPEEDS, type TrainingState, clearTrainingReadout, copyTrainingState, createTrainingState } from "./trainingState";
+import { PARTNER_BEHAVIOURS, PARTNER_DAMAGE_MAX, PARTNER_DAMAGE_STEP, PARTNER_ESCAPES, PARTNER_TECHS, TRAINING_SPEEDS, type TrainingState, clearTrainingReadout, copyTrainingState, createTrainingState } from "../match/trainingState";
 
 
 export const Phase = { characterMenu: 0, stageMenu: 1, match: 2, result: 3 } as const;

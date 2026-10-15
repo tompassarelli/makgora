@@ -59,7 +59,7 @@ import { clientState } from "../project";
 import { onHealthyClients, readClientsFile } from "../doctor";
 import { DevCommandReceipt, nativeChatEntryReceipt } from "../boundary";
 import { devCommandReceiptFile } from "../../../src/game/core/gameFiles";
-import { Phase } from "../../../src/game/match/rules";
+import { Phase } from "../../../src/game/lobby/lobbyState";
 import { admitCaptures, captureLoad, requireCaptureLease, timingCheck, timingScripts } from "../captureCapacity";
 import { quickMatchHero, quickMatchStage, quickPainHero, quickRecoveryHero, quickOffstageHero } from "../../../src/game/session/devSettings";
 import { pauseDraws } from "../pauseDraws";

@@ -14,7 +14,7 @@ import { ATTACK_BUFFER_FRAMES } from "../src/game/input/attackBuffer";
 import { type InputRow, emptyInput, inputRow } from "../src/game/input/inputRow";
 import { createFrameControls } from "../src/game/match/controls";
 import { createPacingAndPresentation } from "../src/game/match/pacingAndPresentation";
-import { Phase, createMatchState, setHumanMask } from "../src/game/match/rules";
+import { Phase, createMatchState, setHumanMask } from "../src/game/lobby/lobbyState";
 import type { ReplayState } from "../src/game/replay/snapshot";
 import { beginFighterAttack, resolveAttacks } from "../src/game/sim/attacks";
 import { AttackStyle, Character, DownState, GrabAction } from "../src/game/sim/codes";

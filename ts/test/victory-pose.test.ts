@@ -4,7 +4,7 @@ import { originalClip, originalClipCount, originalClipNamed, originalClipNames }
 import { victoryAnimation } from "../src/game/presentation/matchAudio";
 import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/sim/heroes/registry";
 import { MatchPresentation } from "../src/game/render/matchPresentation";
-import { Phase, createMatchState } from "../src/game/match/rules";
+import { Phase, createMatchState } from "../src/game/lobby/lobbyState";
 import { createMatchTally, resultsView } from "../src/game/presentation/matchCues";
 import { Character } from "../src/game/sim/codes";
 import { createRoster } from "../src/game/sim/roster";

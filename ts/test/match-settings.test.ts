@@ -5,7 +5,7 @@ import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel
 import { nextMatchSeed } from "../src/game/match/botRandom";
 import { randomStage } from "../src/game/menu/stageCatalog";
 
-import { beginRematchCountdown, copyMatchState, createMatchState, Phase, requestStageSelect, requestStart, setParticipants, tickRematchCountdown } from "../src/game/match/rules";
+import { beginRematchCountdown, copyMatchState, createMatchState, Phase, requestStageSelect, requestStart, setParticipants, tickRematchCountdown } from "../src/game/lobby/lobbyState";
 import { DROPS_BUTTON, HAZARDS_BUTTON } from "../src/game/ui/stageUi";
 
 import { RULE_BUTTONS } from "../src/game/ui/ruleButtons";

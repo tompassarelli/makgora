@@ -2,7 +2,7 @@ import { assertEquals, assertGreaterThan, assertTrue, test } from "wisp/src/runt
 import { createFrameControls } from "../match/controls";
 import { captureFrame, createMatchFrameInput, executeMatchFrame } from "../match/frameInput";
 import { createPacingAndPresentation } from "../match/pacingAndPresentation";
-import { Phase, createMatchState } from "../match/rules";
+import { Phase, createMatchState } from "../lobby/lobbyState";
 import { stateChecksum } from "../replay/canonical";
 import { firstPoseDifference, firstStateDifference } from "../replay/difference";
 import { ReplayHistory } from "../replay/history";

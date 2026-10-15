@@ -24,7 +24,7 @@ import { cpuSkill } from "./cpuSkill";
 import type { CpuTier } from "./cpuProfiles";
 import { captureFrame, createMatchFrameInput, executeMatchFrame } from "./frameInput";
 import { createPacingAndPresentation } from "./pacingAndPresentation";
-import { MATCH_TICKS_PER_SECOND, Phase, createMatchState } from "./rules";
+import { MATCH_TICKS_PER_SECOND, Phase, createMatchState } from "../lobby/lobbyState";
 
 const TICK = f32(1.0 / MATCH_TICKS_PER_SECOND);
 

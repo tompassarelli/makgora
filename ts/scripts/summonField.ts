@@ -7,7 +7,7 @@ import { createFrameControls } from "../src/game/match/controls";
 import { isCpuTier, type CpuTier } from "../src/game/match/cpuProfiles";
 import { captureFrame, createMatchFrameInput, executeMatchFrame } from "../src/game/match/frameInput";
 import { createPacingAndPresentation } from "../src/game/match/pacingAndPresentation";
-import { MATCH_TICKS_PER_SECOND, Phase, createMatchState, setParticipants } from "../src/game/match/rules";
+import { MATCH_TICKS_PER_SECOND, Phase, createMatchState, setParticipants } from "../src/game/lobby/lobbyState";
 import { initializeMatchFighters, matchSpawnX } from "../src/game/match/step";
 import type { Character } from "../src/game/sim/codes";
 import { canAttack } from "../src/game/sim/conditions";

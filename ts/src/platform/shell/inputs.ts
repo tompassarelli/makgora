@@ -6,7 +6,7 @@ import { keyFor } from "../../game/input/keyBindings";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, isParticipantSlot, participantActive } from "../../game/input/participants";
 import { clearKeys } from "../../game/input/playerKeys";
 import { endReplaySegment } from "./replays";
-import { humanFighterActive, humanPresent } from "../../game/match/rules";
+import { humanFighterActive, humanPresent } from "../../game/lobby/lobbyState";
 import { type ShellState, keepShellMomentEnd, localSlot } from "./state";
 import { settingsOpen } from "./ui";
 import { ownConfirmedState } from "./confirmedState";

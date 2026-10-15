@@ -3,7 +3,7 @@ import { attackBuffer, clearAttackBuffer, queueAttack } from "../input/attackBuf
 import { type FrameControls, createFrameControls } from "../match/controls";
 import { type MatchFrameInput, captureFrame, createMatchFrameInput, executeMatchFrame } from "../match/frameInput";
 import { createPacingAndPresentation } from "../match/pacingAndPresentation";
-import { Phase, createMatchState } from "../match/rules";
+import { Phase, createMatchState } from "../lobby/lobbyState";
 import { createFighter } from "../sim/fighter";
 import { createRoster } from "../sim/roster";
 import { canonicalState, stateChecksum } from "./canonical";

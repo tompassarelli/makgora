@@ -7,7 +7,7 @@ import { stageInPool, stagePoolCount } from "../menu/stagePool";
 import { f32 } from "wisp/src/sim/f32";
 import { bindPrototype } from "../../platform/rebind";
 import { PARTICIPANT_SLOTS } from "../input/participants";
-import { type MatchState, Phase, humanActive } from "../match/rules";
+import { type MatchState, Phase, humanActive } from "../lobby/lobbyState";
 import { pixelX, pixelY, pointerX, pointerY } from "../menu/pointer";
 import { type StageChoice, clearStageDrag, stageDrag, stageTileLeft, stageTileTop, updateStageDrag } from "../menu/stageSelection";
 import { RANDOM_STAGE, STAGE_CATALOG, STAGE_CHOICES, selectableStageChoice, stageInfo } from "../menu/stageCatalog";

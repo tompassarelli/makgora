@@ -4,7 +4,7 @@ import { createReplaySnapshot, copyReplayState } from "../replay/snapshot";
 import { stateChecksum } from "../replay/canonical";
 import { firstStateDifference } from "../replay/difference";
 import { fighterAt } from "../sim/roster";
-import { Phase, stageClock } from "./rules";
+import { Phase, stageClock } from "../lobby/lobbyState";
 import { stepMatch } from "./step";
 
 for (const [stage, period] of [[CARRIED_TEST_STAGE, 400], [TIMED_TEST_STAGE, 420]] as const) {

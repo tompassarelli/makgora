@@ -9,7 +9,7 @@
 
 import { type InputRow, emptyInput } from "../src/game/input/inputRow";
 import { PARTICIPANT_SLOTS } from "../src/game/input/participants";
-import { Phase } from "../src/game/match/rules";
+import { Phase } from "../src/game/lobby/lobbyState";
 import { type ReplayState, copyReplayState, createReplaySnapshot } from "../src/game/replay/snapshot";
 import { fighterName } from "../src/game/sim/heroes/registry";
 import { fighterAt, isActive } from "../src/game/sim/roster";

@@ -4,7 +4,7 @@ import { trampoline } from "wisp/src/platform/dispatch";
 import { PAD_ACTIVE_KEY, PAD_PRESENT_KEY, cursorWorldPacket, decodePad, padKeyPacket, type CursorCalibration } from "../../game/input/padCapture";
 import type { InputRow } from "../../game/input/inputRow";
 import { encodePacket, inputPacket } from "../../game/input/wire";
-import { humanActive, humanFighterActive } from "../../game/match/rules";
+import { humanActive, humanFighterActive } from "../../game/lobby/lobbyState";
 import { PARTICIPANT_SLOTS } from "../../game/input/participants";
 import { type ShellState, localSlot } from "./state";
 

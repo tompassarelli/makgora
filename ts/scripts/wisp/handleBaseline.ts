@@ -1,7 +1,7 @@
 import type { HeadlessClient } from "wisp/src/headless/client";
 import type { Lockstep } from "wisp/src/headless/lockstep";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
-import { Phase } from "../../src/game/match/rules";
+import { Phase } from "../../src/game/lobby/lobbyState";
 import { Character } from "../../src/game/sim/codes";
 import { Key } from "../../src/platform/shell/keyEvents";
 import type { Game } from "./botMatch";

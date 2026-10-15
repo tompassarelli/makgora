@@ -18,7 +18,7 @@ import { authoredTuning } from "../sim/tuning";
 import { ordinaryHitKnockback } from "../sim/knockback";
 import { controls } from "../sim/testWorld";
 import { type FrameControls, createBufferedFrameControls } from "./controls";
-import { type MatchState, Phase, createMatchState } from "./rules";
+import { type MatchState, Phase, createMatchState } from "../lobby/lobbyState";
 import { stepMatch } from "./step";
 
 

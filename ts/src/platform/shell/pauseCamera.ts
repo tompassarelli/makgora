@@ -3,7 +3,7 @@ import { ARENA_CAMERA, WORLD_BOUNDS } from "../../game/presentation/arenaCamera"
 import { copyMatchCamera, createMatchCamera, limitCamera, type MatchCamera } from "../../game/sim/matchCamera";
 import { stageBounds } from "../../game/sim/stageBounds";
 import { surfaceLeft, surfaceRight, surfaceZ } from "../../game/sim/stage";
-import { Phase, stageClock } from "../../game/match/rules";
+import { Phase, stageClock } from "../../game/lobby/lobbyState";
 import type { ShellState } from "./state";
 
 export interface PauseCamera {

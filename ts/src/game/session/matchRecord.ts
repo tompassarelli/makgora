@@ -8,7 +8,7 @@
 
 // Preload lines become JASS strings, so values cannot contain quotes or backslashes.
 import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots, isParticipantSlot } from "../input/participants";
-import { type MatchState, computerActive } from "../match/rules";
+import { type MatchState, computerActive } from "../lobby/lobbyState";
 import { stageInfo } from "../menu/stageCatalog";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import type { MatchTally } from "../presentation/matchCues";

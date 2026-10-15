@@ -14,7 +14,7 @@ import { Clients } from "wisp/scripts/wisp/clients";
 import { ClientWatch } from "wisp/scripts/wisp/watch";
 import { freshMatch } from "./wisp/commands/fresh";
 import { gameFilesLayer } from "./wisp/project";
-import { Phase } from "../src/game/match/rules";
+import { Phase } from "../src/game/lobby/lobbyState";
 import { padScriptPreset } from "./integrity/padScript";
 import { platformLayer } from "wisp/scripts/platform/layer";
 

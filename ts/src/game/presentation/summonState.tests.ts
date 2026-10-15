@@ -2,7 +2,7 @@ import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/te
 import { f32 } from "wisp/src/sim/f32";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { clearPresentationHistory } from "../match/pacingAndPresentation";
-import { Phase } from "../match/rules";
+import { Phase } from "../lobby/lobbyState";
 import { type FrameControls, createFrameControls } from "../match/controls";
 import { captureFrame, createMatchFrameInput } from "../match/frameInput";
 import { captureNext, executeCaptured, executeNext, replayState, testMatch } from "../match/testMatch";

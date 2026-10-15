@@ -4,7 +4,7 @@
 
 
 import { writeLine } from "wisp/src/platform/fileio";
-import { Phase } from "../../game/match/rules";
+import { Phase } from "../../game/lobby/lobbyState";
 import { drawnFrameFile, drawnFrameLine } from "../../game/core/gameFiles";
 import { type ShellState, activeRollback, localSlot } from "./state";
 import { heldVisualFrame } from "../../game/session/visualCapture";

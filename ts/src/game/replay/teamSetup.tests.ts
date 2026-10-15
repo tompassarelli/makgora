@@ -3,7 +3,7 @@ import { PARTICIPANT_SLOTS } from "../input/participants";
 import { createFighter } from "../sim/fighter";
 import { configureMatchTeams, initializeMatchFighters } from "../match/step";
 import { type Team } from "../sim/teams";
-import { Phase, resolveStocks, setParticipants, winningMask } from "../match/rules";
+import { Phase, resolveStocks, setParticipants, winningMask } from "../lobby/lobbyState";
 import { stateChecksum } from "./canonical";
 import { firstStateDifference } from "./difference";
 import { copyReplayState, createReplaySnapshot } from "./snapshot";

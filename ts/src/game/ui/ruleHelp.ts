@@ -1,6 +1,6 @@
 import { f32 } from "wisp/src/sim/f32";
 import { ITEM_INTERVAL_MAX_SECONDS, ITEM_INTERVAL_MIN_SECONDS } from "../match/centreItem";
-import type { MatchState } from "../match/rules";
+import type { MatchState } from "../lobby/lobbyState";
 import { ITEM_BUFF_FRAMES } from "../sim/itemBuffs";
 import { RULE_BUTTONS, type RuleBox } from "./ruleButtons";
 

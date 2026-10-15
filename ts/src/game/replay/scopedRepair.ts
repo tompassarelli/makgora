@@ -6,7 +6,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { at } from "wisp/src/runtime/lookup";
 import { PARTICIPANT_SLOTS } from "../input/participants";
-import { type MatchState, Phase, holdingStart, stageClock } from "../match/rules";
+import { type MatchState, Phase, holdingStart, stageClock } from "../lobby/lobbyState";
 import { LedgeState, SpecialAction } from "../sim/codes";
 import { inGrabContext } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";

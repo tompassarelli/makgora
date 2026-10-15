@@ -1,5 +1,5 @@
 import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
-import { Phase, beginRematchCountdown, confirmRematch, createMatchState, requestStageSelect, requestStart, returnToCharacters, selectCpuCharacter, selectStage, setAutomaticRematch, setCpuOpponent, setCpuTier, setParticipants, tickRematchCountdown } from "../match/rules";
+import { Phase, beginRematchCountdown, confirmRematch, createMatchState, requestStageSelect, requestStart, returnToCharacters, selectCpuCharacter, selectStage, setAutomaticRematch, setCpuOpponent, setCpuTier, setParticipants, tickRematchCountdown } from "../lobby/lobbyState";
 import { Character } from "../sim/codes";
 import { cpuOpponentSummary, resultNotice } from "../session/messages";
 

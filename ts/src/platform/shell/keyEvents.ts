@@ -2,7 +2,7 @@
 
 
 import { PARTICIPANT_SLOTS } from "../../game/input/participants";
-import { Phase, humanActive } from "../../game/match/rules";
+import { Phase, humanActive } from "../../game/lobby/lobbyState";
 import { trampoline } from "wisp/src/platform/dispatch";
 import { type ShellState, activeRollback } from "./state";
 

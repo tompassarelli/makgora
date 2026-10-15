@@ -10,7 +10,7 @@ import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { executeNext, testMatch } from "../match/testMatch";
 import { fighterAt } from "./roster";
 import { startFighterSpecial } from "./specials";
-import { setHumanMask } from "../match/rules";
+import { setHumanMask } from "../lobby/lobbyState";
 import { produceComputerInput } from "../match/botPlay";
 import { sweep, sweepSeed } from "../core/sweep";
 

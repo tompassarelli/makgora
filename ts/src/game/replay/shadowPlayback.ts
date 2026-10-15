@@ -11,7 +11,7 @@ import {
   executeMatchFrame,
   hasNetworkRows,
 } from "../match/frameInput";
-import { humanActive } from "../match/rules";
+import { humanActive } from "../lobby/lobbyState";
 import type { ShadowInputSchedule } from "../netcode/shadowSchedule";
 import { type CorrectionResult, type ReplayHistory, ReplayCorrections } from "./history";
 import type { ReplayState } from "./snapshot";

@@ -5,7 +5,7 @@ import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { install, startBuild } from "../src/platform/main";
 import { shell } from "../src/platform/shell/state";
 import { panelActions } from "../src/platform/shell/menus";
-import { createMatchState, initializeComputerChoices, Phase, setParticipants } from "../src/game/match/rules";
+import { createMatchState, initializeComputerChoices, Phase, setParticipants } from "../src/game/lobby/lobbyState";
 import { PLAYABLE_CHARACTERS } from "../src/game/sim/heroes/registry";
 
 function value<T>(client: { run(body: () => void): void }, body: () => T): T {

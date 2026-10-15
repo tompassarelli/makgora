@@ -2,7 +2,7 @@ import { assertEquals, assertFalse, assertNear, assertTrue, test } from "wisp/sr
 import { f32 } from "wisp/src/sim/f32";
 import { createFrameControls } from "../match/controls";
 import { createPacingAndPresentation } from "../match/pacingAndPresentation";
-import { Phase, createMatchState } from "../match/rules";
+import { Phase, createMatchState } from "../lobby/lobbyState";
 import { captureReplaySnapshot, createReplaySnapshot, restoreReplaySnapshot } from "../replay/snapshot";
 import { Character, ProjectileKind } from "../sim/codes";
 import { PROJECTILE_CAPACITY, createFighter } from "../sim/fighter";

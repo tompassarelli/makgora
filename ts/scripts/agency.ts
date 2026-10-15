@@ -15,7 +15,7 @@ import { Action, bit } from "../src/game/input/actions";
 import { type InputRow, copyInput, emptyInput, inputRow, sameInput } from "../src/game/input/inputRow";
 import { PARTICIPANT_SLOTS, participantInputs } from "../src/game/input/participants";
 import { captureNetworkFrame, createMatchFrameInput, executeMatchFrame, resetMatchFrameInput } from "../src/game/match/frameInput";
-import { computerActive } from "../src/game/match/rules";
+import { computerActive } from "../src/game/lobby/lobbyState";
 import { type ReplayState, copyReplayState, createReplaySnapshot } from "../src/game/replay/snapshot";
 import { TECH_REPEAT_MINIMUM_AGE_FRAMES } from "../src/game/sim/geometry/techInput";
 import { DownState, ShieldBreak } from "../src/game/sim/codes";

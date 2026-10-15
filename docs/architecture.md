@@ -17,7 +17,7 @@ A module may import only the modules in its "may use" column. Sim code never rea
 | snapshot | `ts/src/game/replay/{canonical,fighterState,difference,history,snapshot}.ts` | Canonical text, state hash, copy/compare/diff, rollback ring | sim, core |
 | ai | `ts/src/game/match/bot*.ts`, `match/cpu*.ts`, `sim/heroes/<fighter>Gameplan.ts` | Bots, perception, gameplans, edge-guard scenarios | sim, snapshot, input, core |
 | roster | `ts/src/game/sim/heroes/registry.ts`, `menu/stageCatalog.ts` | The only all-fighter and all-stage lists | fighter-kit, ai, core |
-| lobby | `ts/src/game/match/rules.ts`, `ts/src/game/menu/` | Slots, humans/CPU, character/stage select, teams, stock/timer choice | roster, core |
+| lobby | `ts/src/game/lobby/lobbyState.ts`, `ts/src/game/menu/` | Slots, humans/CPU, character/stage select, teams, stock/timer choice | roster, core |
 | match | `ts/src/game/match/` | Match step, stocks/teams/meter rules, training | sim, snapshot, ai, roster, lobby, input, core |
 | replay | `ts/src/game/replay/` (tapes, moments, viewer) | Replay files, tapes, moments, viewer driver | match, snapshot, sim, input, core |
 | netcode | `ts/src/game/netcode/` | Delay policy, input journals | input, snapshot, match, core |
@@ -58,7 +58,7 @@ Known breaks still in the tree (removed by slices, never copied): `*Hero.ts` imp
 | Stage lighting, palette, lights, scenery | `ts/src/game/assets/stageLighting.ts`, `ts/src/game/assets/stagePalette.ts`, `ts/src/game/assets/stagePointLights.ts`, `ts/src/game/presentation/stageScenery.ts` | `stages/<slug>/look.ts` |
 | New Fighter state field | `ts/src/game/sim/fighter.ts` (interface, `createFighter`), a row in `ts/src/game/sim/state/fighterSchema.ts` (copy, compare, canonical text and state hash, then `bun run generate`), `ts/src/game/replay/difference.ts`, `ts/src/game/sim/stocks.ts` | one row in `sim/state/fighterSchema.ts` after S1a-S1d |
 | Match step, stocks, training | `ts/src/game/match/step.ts`, `ts/src/game/match/training.ts` | stays |
-| Lobby option (stock, timer, teams, stage pool) | `ts/src/game/match/rules.ts`, `ts/src/game/menu/stagePool.ts` | `lobby/` in S9b |
+| Lobby option (stock, timer, teams, stage pool) | `ts/src/game/lobby/lobbyState.ts`, `ts/src/game/menu/stagePool.ts` | `lobby/` in S9b |
 | Menu or HUD frame | `ts/src/game/ui/` | stays |
 | Controller action or key | `ts/src/game/input/actions.ts`, `ts/src/game/input/keyBindings.ts` | publishes `contracts/controller.json` in K1 |
 | Pad packet, stick thresholds | `ts/src/game/input/padCapture.ts`, `ts/src/game/sim/stickZones.ts`; plug-in `controller/src/main.rs` | plug-in reads `contracts/controller.json` in K1 |

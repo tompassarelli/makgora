@@ -15,7 +15,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { Action, bit } from "../src/game/input/actions";
 import { type ComboRoute, type ComboSetup, comboScene, heldRuns } from "../src/game/match/comboRoute";
 import { resetMatchFrameInput } from "../src/game/match/frameInput";
-import { setHumanMask } from "../src/game/match/rules";
+import { setHumanMask } from "../src/game/lobby/lobbyState";
 import { type Scene, fighter, frameMasks } from "../src/game/match/padScene";
 import { type ReplayState, captureReplaySnapshot, createReplaySnapshot, restoreReplaySnapshot } from "../src/game/replay/snapshot";
 import { AttackStyle, Character, DownState, GrabAction, LedgeState, SpecialAction } from "../src/game/sim/codes";

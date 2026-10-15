@@ -3,7 +3,7 @@
 import type { InputRow } from "../input/inputRow";
 import type { FrameControls } from "../match/controls";
 import type { PacingAndPresentation } from "../match/pacingAndPresentation";
-import type { MatchState } from "../match/rules";
+import type { MatchState } from "../lobby/lobbyState";
 import { type CorrectionResult, ReplayHistory } from "../replay/history";
 import { REPLAY_MAX_CORRECTION_FRAMES } from "../replay/limits";
 import { ShadowInputPlayback } from "../replay/shadowPlayback";

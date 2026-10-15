@@ -3,7 +3,7 @@ import { sampleKeys, commitEdges, keyboardCapture, type KeyboardCapture } from "
 import { PARTICIPANT_SLOTS, isParticipantSlot } from "../game/input/participants";
 import { copyInput } from "../game/input/inputRow";
 import { startKeyUp } from "../game/match/controls";
-import { Phase, setHumanCount } from "../game/match/rules";
+import { Phase, setHumanCount } from "../game/lobby/lobbyState";
 import { parseDecimal } from "../game/netcode/journal/decimal";
 import { beginMomentSave, continueMomentSave, momentInput } from "../game/replay/moment";
 import { writeRepro } from "wisp/src/platform/repro";

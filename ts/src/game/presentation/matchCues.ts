@@ -2,7 +2,7 @@
 
 
 import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots, isParticipantSlot } from "../input/participants";
-import { MATCH_TICKS_PER_SECOND, type MatchState, Phase, humanFighterActive, keepsStocks, winningMask } from "../match/rules";
+import { MATCH_TICKS_PER_SECOND, type MatchState, Phase, humanFighterActive, keepsStocks, winningMask } from "../lobby/lobbyState";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { fighterName } from "../sim/heroes/registry";

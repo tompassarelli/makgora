@@ -18,7 +18,7 @@ import { produceComputerInput } from "../src/game/match/botPlay";
 import { createFrameControls } from "../src/game/match/controls";
 import { captureFrame, createMatchFrameInput, executeMatchFrame } from "../src/game/match/frameInput";
 import { createPacingAndPresentation } from "../src/game/match/pacingAndPresentation";
-import { MATCH_TICKS_PER_SECOND, Phase, createMatchState, setParticipants } from "../src/game/match/rules";
+import { MATCH_TICKS_PER_SECOND, Phase, createMatchState, setParticipants } from "../src/game/lobby/lobbyState";
 import { initializeMatchFighters, matchSpawnX } from "../src/game/match/step";
 import { createFighter } from "../src/game/sim/fighter";
 import { selectableCharacterBySlug } from "../src/game/sim/heroes/registry";

@@ -7,7 +7,7 @@ import { type AttackBuffer, attackBuffer, clearAttackBuffer, hasPendingAttack, q
 import type { FrameControls } from "../match/controls";
 import { captureFrame, createMatchFrameInput, executeMatchFrame } from "../match/frameInput";
 import { type PacingAndPresentation, createPacingAndPresentation } from "../match/pacingAndPresentation";
-import { type MatchState, Phase, createMatchState } from "../match/rules";
+import { type MatchState, Phase, createMatchState } from "../lobby/lobbyState";
 import { stepMatch } from "../match/step";
 import { resolveAttacks } from "../sim/attacks";
 import { AttackStyle, Character, GroundAction, ProjectileKind, ShieldBreak } from "../sim/codes";

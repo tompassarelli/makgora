@@ -3,7 +3,7 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { testHeadless } from "./headless";
-import { Phase } from "../src/game/match/rules";
+import { Phase } from "../src/game/lobby/lobbyState";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { install, startBuild } from "../src/platform/main";
 import { installSessionRates } from "../src/platform/shell/sessionRates";

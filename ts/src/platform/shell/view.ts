@@ -12,7 +12,7 @@ import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../../game/
 import type { FighterAgency } from "../../game/presentation/fighterAgency";
 import type { FrameControls } from "../../game/match/controls";
 import type { PacingAndPresentation } from "../../game/match/pacingAndPresentation";
-import { type MatchState, Phase, remainingSeconds, stageClock, timedMatch } from "../../game/match/rules";
+import { type MatchState, Phase, remainingSeconds, stageClock, timedMatch } from "../../game/lobby/lobbyState";
 import { fighterOffscreen, fitFighterFrames } from "../../game/presentation/fighterFraming";
 import { arenaFarZ, ARENA_CAMERA, FLOOR_HEIGHT, cameraFieldOfView, cameraPoint, extremeCamera, finalCamera, localCamera, resultCamera } from "../../game/presentation/arenaCamera";
 

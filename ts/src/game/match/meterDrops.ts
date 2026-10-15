@@ -9,7 +9,7 @@ import { STAGE_AT_REST, mainDeckZAt, surfaceCount, surfaceLeft, surfaceMoves, su
 import { bodyTop } from "../sim/surfaces";
 import { melee } from "../sim/tuning";
 import { itemDraw } from "./centreItem";
-import type { MatchState } from "./rules";
+import type { MatchState } from "../lobby/lobbyState";
 
 const FRAMES_PER_SECOND = 60;
 

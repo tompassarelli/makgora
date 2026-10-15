@@ -6,7 +6,7 @@ import { Character } from "../sim/codes";
 import { createFighter } from "../sim/fighter";
 import { copyControls, createRoster, fighterAt, neutralControls } from "../sim/roster";
 import { createFrameControls } from "./controls";
-import { MATCH_TICKS_PER_SECOND, Phase, START_HOLD_FRAMES, createMatchState, holdingStart, requestStart, setParticipants } from "./rules";
+import { MATCH_TICKS_PER_SECOND, Phase, START_HOLD_FRAMES, createMatchState, holdingStart, requestStart, setParticipants } from "../lobby/lobbyState";
 import { initializeMatchFighters, matchSpawnX, stepMatch } from "./step";
 
 

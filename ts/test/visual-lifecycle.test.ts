@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { createFrameControls } from "../src/game/match/controls";
 import { captureFrame, createMatchFrameInput } from "../src/game/match/frameInput";
-import { beginRematchCountdown, cancelRematchCountdown, Phase, requestStageSelect, requestStart, selectCharacter, tickRematchCountdown } from "../src/game/match/rules";
+import { beginRematchCountdown, cancelRematchCountdown, Phase, requestStageSelect, requestStart, selectCharacter, tickRematchCountdown } from "../src/game/lobby/lobbyState";
 import { executeNext, startAtGo, testMatch } from "../src/game/match/testMatch";
 import { IMPACT_DUST, IMPACTS_PER_KIND } from "../src/game/presentation/impactState";
 import { cameraPoint, FLOOR_HEIGHT } from "../src/game/presentation/arenaCamera";

@@ -11,7 +11,7 @@ import { copySummonPoseInto } from "../presentation/summonPose";
 import { type Roster, copyControls, fighterAt, isActive, sameControls } from "../sim/roster";
 import { type FrameControls, createFrameControls } from "./controls";
 import type { PacingAndPresentation } from "./pacingAndPresentation";
-import { type MatchState, Phase, computerActive } from "./rules";
+import { type MatchState, Phase, computerActive } from "../lobby/lobbyState";
 import { produceComputerInput, repeatComputerInput } from "./botPlay";
 import { type EarlierFrame, type StepScope, observedFrameLegalActions, observedFrameStartedActions, stepMatch, configureMatchTeams } from "./step";
 import { latchPresses, releasePresses } from "./training";

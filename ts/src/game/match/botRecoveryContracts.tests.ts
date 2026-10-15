@@ -8,7 +8,7 @@ import { chooseRecoveryInput } from "./botRecovery";
 import { produceComputerInput } from "./botPlay";
 import { createFrameControls, type FrameControls } from "./controls";
 import { createPacingAndPresentation } from "./pacingAndPresentation";
-import { Phase, createMatchState } from "./rules";
+import { Phase, createMatchState } from "../lobby/lobbyState";
 import { stepMatch } from "./step";
 
 function testRoster(first: Fighter, second: Fighter) {

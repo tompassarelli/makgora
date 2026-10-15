@@ -7,7 +7,7 @@ import { type FighterPose, createFighterPose, selectFighterClipIndex, selectFigh
 import { createFrameControls } from "../match/controls";
 import { captureFrame, createMatchFrameInput, executeMatchFrame } from "../match/frameInput";
 import { createPacingAndPresentation } from "../match/pacingAndPresentation";
-import { Phase, createMatchState, setHumanMask } from "../match/rules";
+import { Phase, createMatchState, setHumanMask } from "../lobby/lobbyState";
 import { ReplayCorrections, ReplayHistory } from "../replay/history";
 import type { ReplayState } from "../replay/snapshot";
 import { Character } from "../sim/codes";

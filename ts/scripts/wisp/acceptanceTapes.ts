@@ -14,7 +14,7 @@ import { Character } from "../../src/game/sim/codes";
 import { type Controls, fighterAt, isActive, neutralControls } from "../../src/game/sim/roster";
 import { surfaceShiftX, surfaceShiftZ } from "../../src/game/sim/stage";
 import { windPush } from "../../src/game/sim/stageHazards";
-import { stageClock } from "../../src/game/match/rules";
+import { stageClock } from "../../src/game/lobby/lobbyState";
 
 const bindings = presetBindings("standard");
 

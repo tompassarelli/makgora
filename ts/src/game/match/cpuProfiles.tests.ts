@@ -7,7 +7,7 @@ import { HabitChoice } from "./botHabits";
 import { useMatchSeed } from "./botRandom";
 import { createBotStrategy, learnBotHabit, prepareBotRead } from "./botStrategy";
 import { CPU_OPPONENT_IDS, CPU_PROFILES, CPU_TIERS, cpuProfile, resolveCpuOpponent } from "./cpuProfiles";
-import { Phase, copyMatchState, createMatchState, requestStart, setCpuOpponent, setCpuTier, setParticipants } from "./rules";
+import { Phase, copyMatchState, createMatchState, requestStart, setCpuOpponent, setCpuTier, setParticipants } from "../lobby/lobbyState";
 
 test("Flint changes a practiced strike read after fewer new shield events at each tier at the human response deadline [k3 measure #186]", () => {
   let earlier = 8001;

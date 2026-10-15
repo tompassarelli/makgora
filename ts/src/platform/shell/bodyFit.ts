@@ -1,7 +1,7 @@
 
 
 import { PARTICIPANT_SLOTS } from "../../game/input/participants";
-import { Phase } from "../../game/match/rules";
+import { Phase } from "../../game/lobby/lobbyState";
 import { Character } from "../../game/sim/codes";
 import { startMatch } from "./matchStart";
 import type { ShellState } from "./state";

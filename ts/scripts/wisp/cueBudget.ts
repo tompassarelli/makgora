@@ -43,7 +43,7 @@ import { DOWN_WAIT_FRAMES } from "../../src/game/sim/down";
 import { snapToLedge } from "../../src/game/sim/ledge";
 import { advanceFighter } from "../../src/game/sim/step";
 import { DROP_TELEGRAPH_FRAMES, advanceMeterDrops, meterDropPoint } from "../../src/game/match/meterDrops";
-import { Phase, createMatchState } from "../../src/game/match/rules";
+import { Phase, createMatchState } from "../../src/game/lobby/lobbyState";
 import { MeterDropPresentation } from "../../src/game/render/meterDropPresentation";
 import { CombatEffects } from "../../src/game/render/combatEffects";
 import { advanceImpacts, createImpactState, emitImpacts } from "../../src/game/presentation/impactState";

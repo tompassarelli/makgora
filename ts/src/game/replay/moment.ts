@@ -18,7 +18,7 @@ import { settleBotMemoryChecksums } from "../match/botPerception";
 import { padDecimal } from "../netcode/journal/decimal";
 import { type MatchFrameInput, captureFrame, captureNetworkFrame, createMatchFrameInput, executeMatchFrame } from "../match/frameInput";
 import type { PacingAndPresentation } from "../match/pacingAndPresentation";
-import { type MatchState, computerActive } from "../match/rules";
+import { type MatchState, computerActive } from "../lobby/lobbyState";
 import { type MapBuild, type Scenario, isScenario, isShadow } from "../session/build";
 import { produceScenarioComputerInput } from "../session/scenarios";
 import { type Fighter, placedObject, PROJECTILE_CAPACITY } from "../sim/fighter";

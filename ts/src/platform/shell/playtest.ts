@@ -8,7 +8,7 @@
 
 
 import { isParticipantSlot } from "../../game/input/participants";
-import { Phase, firstHumanSlot } from "../../game/match/rules";
+import { Phase, firstHumanSlot } from "../../game/lobby/lobbyState";
 import { parsePlaytestRequest } from "../../game/session/playtest";
 import { PLAYTEST_GO_FILE, PLAYTEST_REQUEST_FILE, playtestReceiptFile } from "../../game/core/gameFiles";
 import { readChunk, writeLine } from "wisp/src/platform/fileio";

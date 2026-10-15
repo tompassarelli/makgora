@@ -21,7 +21,7 @@ import {
   requestStart,
   selectCharacter,
   setParticipants,
-} from "../match/rules";
+} from "../lobby/lobbyState";
 import { createPacingAndPresentation } from "../match/pacingAndPresentation";
 import { matchSpawnX } from "../match/step";
 import { Capture } from "../netcode/capture";

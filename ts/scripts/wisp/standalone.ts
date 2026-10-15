@@ -7,7 +7,7 @@ import { RenderFailure } from "wisp/scripts/wisp/headlessRender";
 import { installHeadless } from "wisp/scripts/wisp/headless";
 import { Action } from "../../src/game/input/actions";
 import { keyFor, presetBindings } from "../../src/game/input/keyBindings";
-import { Phase } from "../../src/game/match/rules";
+import { Phase } from "../../src/game/lobby/lobbyState";
 import { Character } from "../../src/game/sim/codes";
 import { NATIVE_DRIVER_BUILD, PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import type { MapBuild } from "../../src/game/session/build";

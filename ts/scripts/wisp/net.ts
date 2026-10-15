@@ -2,7 +2,7 @@ import { join } from "node:path";
 import type { NetGame } from "wisp/scripts/wisp/net/peer";
 import type { StandaloneInput, StandaloneNetSession } from "wisp/scripts/wisp/standalone";
 import type { LockstepLink } from "wisp/src/headless/lockstep";
-import { Phase } from "../../src/game/match/rules";
+import { Phase } from "../../src/game/lobby/lobbyState";
 import { installHeadless } from "wisp/scripts/wisp/headless";
 import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import type { MapBuild } from "../../src/game/session/build";
@@ -82,7 +82,7 @@ export async function createNetStandalone(link: LockstepLink, slot: number, opti
     interface State { readonly game: { readonly phase: number; readonly humanFighterMask: number; readonly computerMask: number } }
     const { shell }: { shell(): State & NetcodeShell } = await import(join(platform, "shell/state.ts"));
     const { confirmedChecksum }: { confirmedChecksum(state: State): string } = await import(join(platform, "shell/diagnostics.ts"));
-    const { setHumanCount }: { setHumanCount(game: State["game"], count: number): void } = await import(join(import.meta.dir, "../../src/game/match/rules.ts"));
+    const { setHumanCount }: { setHumanCount(game: State["game"], count: number): void } = await import(join(import.meta.dir, "../../src/game/lobby/lobbyState.ts"));
     const main: { install(build: MapBuild): void; startBuild(build: MapBuild): void } = await import(join(platform, "main.ts"));
     const build: MapBuild = { ...PLAYABLE_BUILD, devConsole: true };
     const lockstep = runtime.clients({ install: () => main.install(build), start: () => main.startBuild(build) }, [slot], { humans: [0, 1], link, keepCalls: 0 });

@@ -23,7 +23,7 @@ import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel
 import type { HeadlessClient } from "wisp/src/headless/client";
 import { type InputRow, emptyInput, sameInput } from "../src/game/input/inputRow";
 import type { ParticipantInputs } from "../src/game/input/participants";
-import { Phase } from "../src/game/match/rules";
+import { Phase } from "../src/game/lobby/lobbyState";
 import { ShadowInputSchedule } from "../src/game/netcode/shadowSchedule";
 import { Character } from "../src/game/sim/codes";
 import { INTEGRITY_BUILD } from "../src/game/session/currentBuild";

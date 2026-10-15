@@ -2,7 +2,7 @@
 
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { CPU_TIERS } from "../match/cpuProfiles";
-import { MATCH_TICKS_PER_SECOND, type MatchState } from "../match/rules";
+import { MATCH_TICKS_PER_SECOND, type MatchState } from "../lobby/lobbyState";
 import { fighterName } from "../sim/heroes/registry";
 import { BossPhase, bossClock, bossDefinition, bossMoment } from "./bosses";
 import { CLASSIC_FIGHTS } from "./classic";

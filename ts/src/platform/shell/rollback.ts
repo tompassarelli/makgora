@@ -10,7 +10,7 @@ import { PARTICIPANT_SLOTS, isParticipantSlot } from "../../game/input/participa
 import { type InputPacket, TransportDecoder, encodePacket, packetSizeInRange } from "../../game/input/wire";
 import { startKeyUp } from "../../game/match/controls";
 import { captureNetworkFrame, resetMatchFrameInput } from "../../game/match/frameInput";
-import { Phase, humanActive } from "../../game/match/rules";
+import { Phase, humanActive } from "../../game/lobby/lobbyState";
 import { observedFrameLegalActions, observedFrameStartedActions } from "../../game/match/step";
 import { Capture } from "../../game/netcode/capture";
 import { PENDING_CAPACITY } from "../../game/netcode/shadowSchedule";

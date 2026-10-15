@@ -16,7 +16,7 @@ import { produceComputerInput } from "./botPlay";
 import { createFrameControls } from "./controls";
 import { captureFrame, createMatchFrameInput, executeMatchFrame } from "./frameInput";
 import { createPacingAndPresentation } from "./pacingAndPresentation";
-import { Phase, createMatchState } from "./rules";
+import { Phase, createMatchState } from "../lobby/lobbyState";
 
 export interface BotCoverage {
   readonly fighter: string;

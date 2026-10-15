@@ -15,7 +15,7 @@ import { originalClip, originalClipCount } from "../../src/game/assets/fighterOr
 import { Action, bit } from "../../src/game/input/actions";
 import { INPUT_ROW_NUMBERS, type InputRow, emptyInput, inputRow, loadInputNumbers } from "../../src/game/input/inputRow";
 import { PARTICIPANT_SLOTS } from "../../src/game/input/participants";
-import { MATCH_TICKS_PER_SECOND, Phase } from "../../src/game/match/rules";
+import { MATCH_TICKS_PER_SECOND, Phase } from "../../src/game/lobby/lobbyState";
 import { INTEGRITY_BUILD } from "../../src/game/session/currentBuild";
 import { AttackStyle, Character, DownState, GrabAction, ProjectileKind, SpecialAction } from "../../src/game/sim/codes";
 import type { Fighter } from "../../src/game/sim/fighter";

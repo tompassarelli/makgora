@@ -11,7 +11,7 @@ import { PARTICIPANT_SLOTS } from "../input/participants";
 import { inputPacket } from "../input/wire";
 import { createFrameControls } from "../match/controls";
 import { createPacingAndPresentation } from "../match/pacingAndPresentation";
-import { Phase, copyMatchState, createMatchState, fighterActive, fighterMask, setParticipants } from "../match/rules";
+import { Phase, copyMatchState, createMatchState, fighterActive, fighterMask, setParticipants } from "../lobby/lobbyState";
 import { initializeMatchFighters, matchSpawnX } from "../match/step";
 import { ShadowInputSchedule } from "../netcode/shadowSchedule";
 import { Character } from "../sim/codes";

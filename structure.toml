@@ -91,7 +91,7 @@ may_use = ["sim", "fighter-kit", "core", "generated"]
 
 [[module]]
 name = "lobby"
-paths = ["ts/src/game/lobby/**", "ts/src/game/match/rules.ts"]
+paths = ["ts/src/game/lobby/**"]
 responsibility = "Lobby state: slots, humans/CPU, character and stage select, teams, stock and timer choice."
 may_use = ["roster", "core"]
 

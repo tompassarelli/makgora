@@ -19,7 +19,7 @@ import { bodyTop } from "../sim/surfaces";
 import { melee } from "../sim/tuning";
 import type { FrameControls } from "./controls";
 import { type MatchItems, resetMatchItems } from "./items";
-import type { MatchState } from "./rules";
+import type { MatchState } from "../lobby/lobbyState";
 
 const FRAMES_PER_SECOND = 60;
 export const ITEM_INTERVAL_MIN_SECONDS = 30;

@@ -12,7 +12,7 @@ import { attackDurationFramesForGrounding, attackStartupFrames, characterAttackA
 import { type Roster, copyControls, createRoster, fighterAt, neutralControls } from "../sim/roster";
 import { authoredTuning } from "../sim/tuning";
 import { type FrameControls, createBufferedFrameControls } from "./controls";
-import { type MatchState, Phase, createMatchState } from "./rules";
+import { type MatchState, Phase, createMatchState } from "../lobby/lobbyState";
 import { stepMatch } from "./step";
 
 interface Duel {

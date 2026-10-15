@@ -5,7 +5,7 @@ import { createFighter, type Fighter } from "../sim/fighter";
 import { createRoster, copyControls, neutralControls, type Controls } from "../sim/roster";
 import { attackBuffer, queueAttack } from "../input/attackBuffer";
 import { createFrameControls, type FrameControls } from "./controls";
-import { createMatchState, setParticipants, recallCharacter, cpuSlot, selectCharacter, selectCpuCharacter, requestStageSelect } from "./rules";
+import { createMatchState, setParticipants, recallCharacter, cpuSlot, selectCharacter, selectCpuCharacter, requestStageSelect } from "../lobby/lobbyState";
 import { floorMod } from "wisp/src/sim/intMath";
 import { stepMatch } from "./step";
 import { HERO_ROSTER } from "../sim/heroes/registry";

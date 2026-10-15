@@ -10,7 +10,7 @@ import { clearBotStrategy } from "../match/botStrategy";
 import {
   computerActive, confirmRematch, createMatchState, fighterMask, requestStageSelect, requestStart, selectCharacter, selectStage, setHazards,
   setParticipants, setStocks, setTimeLimit, updateConnectedHumans,
-} from "../match/rules";
+} from "../lobby/lobbyState";
 import { clearPresentationHistory, createPacingAndPresentation } from "../match/pacingAndPresentation";
 import { initializeMatchFighters, matchSpawnX } from "../match/step";
 import { createFighter } from "../sim/fighter";

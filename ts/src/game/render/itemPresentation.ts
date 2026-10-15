@@ -2,7 +2,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { idiv } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { ITEM_HEIGHT, itemWarningFrames } from "../match/centreItem";
-import { type MatchState, Phase } from "../match/rules";
+import { type MatchState, Phase } from "../lobby/lobbyState";
 import { Character, ItemKind, SpecialAction } from "../sim/codes";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { mainDeckZAt } from "../sim/stage";

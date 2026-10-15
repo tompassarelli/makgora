@@ -16,7 +16,7 @@ import { type Controls, type Roster, copyControls, createRoster, fighterAt, neut
 import { SHIELD_MIN_HOLD_FRAMES } from "../sim/shield";
 import { controls } from "../sim/testWorld";
 import { type FrameControls, createBufferedFrameControls } from "./controls";
-import { type MatchState, Phase, createMatchState } from "./rules";
+import { type MatchState, Phase, createMatchState } from "../lobby/lobbyState";
 import { stepMatch } from "./step";
 
 

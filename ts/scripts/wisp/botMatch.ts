@@ -12,7 +12,7 @@ import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { at } from "wisp/src/runtime/lookup";
 import { Action, bit } from "../../src/game/input/actions";
 import { type InputRow, inputRow } from "../../src/game/input/inputRow";
-import { Phase } from "../../src/game/match/rules";
+import { Phase } from "../../src/game/lobby/lobbyState";
 import type { MapBuild } from "../../src/game/session/build";
 import { INTEGRITY_BUILD } from "../../src/game/session/currentBuild";
 import { Character } from "../../src/game/sim/codes";

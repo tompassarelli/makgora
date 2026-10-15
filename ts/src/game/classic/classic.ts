@@ -4,7 +4,7 @@
 
 import { at } from "wisp/src/runtime/lookup";
 import { CPU_TIERS, type CpuOpponentId } from "../match/cpuProfiles";
-import { type MatchState, Phase, characterReady, endConfiguredRun, firstHumanSlot } from "../match/rules";
+import { type MatchState, Phase, characterReady, endConfiguredRun, firstHumanSlot } from "../lobby/lobbyState";
 import { fighterName } from "../sim/heroes/registry";
 import { bossDefinition, bossHealth } from "./bosses";
 import { applyConfiguredMatch, beginConfiguredRun } from "./configuredMatch";

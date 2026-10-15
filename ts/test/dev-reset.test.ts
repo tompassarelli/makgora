@@ -11,7 +11,7 @@ import { afterAll, expect } from "bun:test";
 import { rmSync } from "node:fs";
 import { testHeadless } from "./headless";
 import type { MapEntry } from "wisp/src/headless/client";
-import { Phase } from "../src/game/match/rules";
+import { Phase } from "../src/game/lobby/lobbyState";
 import { clearObservedActions } from "../src/game/match/step";
 import { INTEGRITY_BUILD } from "../src/game/session/currentBuild";
 import { QUICK_MATCH_COMMAND, RESET_COMMAND } from "../src/game/session/devSettings";

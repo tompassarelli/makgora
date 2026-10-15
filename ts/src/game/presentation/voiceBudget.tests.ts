@@ -7,7 +7,7 @@ import { produceComputerInput } from "../match/botPlay";
 import { createFrameControls } from "../match/controls";
 import { captureFrame, createMatchFrameInput, executeMatchFrame } from "../match/frameInput";
 import { createPacingAndPresentation } from "../match/pacingAndPresentation";
-import { Phase, createMatchState } from "../match/rules";
+import { Phase, createMatchState } from "../lobby/lobbyState";
 import { Character } from "../sim/codes";
 import { createFighter } from "../sim/fighter";
 import { createRoster, fighterAt, isActive } from "../sim/roster";

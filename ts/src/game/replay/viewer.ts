@@ -16,7 +16,7 @@ import { fighterPoseFacing } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../sim/hitRegions";
 import { HurtState, fighterHurtParts } from "../sim/hurtboxes";
-import { stageClock } from "../match/rules";
+import { stageClock } from "../lobby/lobbyState";
 import { fighterAt, isActive } from "../sim/roster";
 import { surfaceCount, surfaceLeft, surfaceRight, surfaceZ } from "../sim/stage";
 import { stageBounds } from "../sim/stageBounds";

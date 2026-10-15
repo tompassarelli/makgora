@@ -5,7 +5,7 @@ import { createFighter } from "../sim/fighter";
 import { createRoster, neutralControls } from "../sim/roster";
 import { produceComputerInput } from "./botPlay";
 import { createPacingAndPresentation } from "./pacingAndPresentation";
-import { Phase, createMatchState, setParticipants } from "./rules";
+import { Phase, createMatchState, setParticipants } from "../lobby/lobbyState";
 import { configureMatchTeams } from "./step";
 
 test("seeded CPU reads select the farther enemy over a nearer teammate and hold attacks with a teammate in the friendly fire lane [k1 scenario]", () => {

@@ -13,7 +13,7 @@ import { PARTICIPANT_SLOTS } from "../input/participants";
 import {
   type MatchState, Phase, createMatchState, firstHumanSlot, humanFighterActive, humanPresent, requestStageSelect, requestStart, returnToCharacters,
   selectCharacter, selectCpuCharacter, selectStage, setStocks, computerActive, cycleSlotMode, setCpuOpponent, setCpuTier, setHitAreas, setPartnerDamage, setTraining, stepPartnerBehaviour,
-} from "../match/rules";
+} from "../lobby/lobbyState";
 import { isCpuOpponentChoice, isCpuTier, type CpuOpponentChoice, type CpuTier } from "../match/cpuProfiles";
 import { PartnerBehaviour } from "../match/trainingState";
 import { selectableStage } from "../menu/stageCatalog";

@@ -1,6 +1,6 @@
 import { parseRecord, recordTokens } from "wisp/src/runtime/recordText";
 import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
-import { copyMatchState, createMatchState, Phase, requestStageSelect, requestStart, selectStage, setParticipants, beginRematchCountdown, tickRematchCountdown, leaveMatch, changeStagePoolMode, changeStagePoolStage } from "../match/rules";
+import { copyMatchState, createMatchState, Phase, requestStageSelect, requestStart, selectStage, setParticipants, beginRematchCountdown, tickRematchCountdown, leaveMatch, changeStagePoolMode, changeStagePoolStage } from "../lobby/lobbyState";
 import { RANDOM_STAGE, STAGE_CATALOG } from "./stageCatalog";
 import { activeStageMask, createStagePool, nextPoolStage, stagePoolCount, togglePoolMode, togglePoolStage } from "./stagePool";
 

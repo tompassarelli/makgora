@@ -14,7 +14,7 @@ import { surfaceCount, surfaceLeft, surfaceMoves, surfaceRight, surfaceZ } from 
 import { fighterAt } from "../sim/roster";
 import { SEA_SURFACE_Z, cannonAim, cannonOn, cannonX, hasCannon, hasTide, hasWind, tideDirection, tidePush, windDirection, windOn, windPhase, windPush } from "../sim/stageHazards";
 import { useMatchSeed } from "./botRandom";
-import { Phase, stageClock } from "./rules";
+import { Phase, stageClock } from "../lobby/lobbyState";
 import { stepMatch } from "./step";
 
 

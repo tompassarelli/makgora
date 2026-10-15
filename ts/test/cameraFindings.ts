@@ -1,7 +1,7 @@
 
 import type { HeadlessClient } from "wisp/src/headless/client";
 import { PARTICIPANT_SLOTS } from "../src/game/input/participants";
-import { Phase } from "../src/game/match/rules";
+import { Phase } from "../src/game/lobby/lobbyState";
 import { cameraPoint } from "../src/game/presentation/arenaCamera";
 import { fighterFrame } from "../src/game/presentation/fighterFraming";
 import { fighterAt, isActive } from "../src/game/sim/roster";

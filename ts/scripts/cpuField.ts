@@ -20,7 +20,7 @@ import { PARTICIPANT_SLOTS } from "../src/game/input/participants";
 import { createFrameControls } from "../src/game/match/controls";
 import { captureFrame, createMatchFrameInput, executeMatchFrame } from "../src/game/match/frameInput";
 import { createPacingAndPresentation } from "../src/game/match/pacingAndPresentation";
-import { MATCH_TICKS_PER_SECOND, Phase, createMatchState, setParticipants } from "../src/game/match/rules";
+import { MATCH_TICKS_PER_SECOND, Phase, createMatchState, setParticipants } from "../src/game/lobby/lobbyState";
 import { initializeMatchFighters, matchSpawnX } from "../src/game/match/step";
 import { scheduleMeterDrops } from "../src/game/match/meterDrops";
 import { produceComputerInput } from "../src/game/match/botPlay";

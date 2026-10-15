@@ -8,7 +8,7 @@ import { expect, test } from "bun:test";
 import { testHeadless } from "./headless";
 import type { HeadlessClient } from "wisp/src/headless/client";
 import type { Lockstep } from "wisp/src/headless/lockstep";
-import { Phase, characterReady, holdingStart } from "../src/game/match/rules";
+import { Phase, characterReady, holdingStart } from "../src/game/lobby/lobbyState";
 import { CURRENT_BUILD, INTEGRITY_BUILD, PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { install as installPlayable, start as startPlayable } from "../src/platform/playableMain";
 import { Key } from "../src/platform/shell/keyEvents";

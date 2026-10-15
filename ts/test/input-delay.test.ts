@@ -4,7 +4,7 @@ import type { SyncDelivery } from "wisp/src/headless/lockstep";
 import type { Lockstep } from "wisp/src/headless/lockstep";
 import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel";
 import { f32 } from "wisp/src/sim/f32";
-import { Phase } from "../src/game/match/rules";
+import { Phase } from "../src/game/lobby/lobbyState";
 import { AUTO_DELAY } from "../src/game/netcode/delayPolicy";
 import type { MapBuild } from "../src/game/session/build";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";

@@ -14,7 +14,7 @@ import { cpuSkill, cpuReactionFloor } from "./cpuSkill";
 import { CPU_PROFILES, type CpuOpponentId, type CpuTier } from "./cpuProfiles";
 import { createFrameControls } from "./controls";
 import { copyPacingAndPresentation, createPacingAndPresentation } from "./pacingAndPresentation";
-import { createMatchState, Phase } from "./rules";
+import { createMatchState, Phase } from "../lobby/lobbyState";
 import { SELECTABLE_CHARACTERS } from "../sim/heroes/registry";
 import { captureFrame, createMatchFrameInput, executeMatchFrame } from "./frameInput";
 import { replayChecksum } from "../replay/matchReplay";

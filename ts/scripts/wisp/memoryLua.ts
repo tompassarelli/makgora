@@ -13,7 +13,7 @@ import { luaLockstep, readFile } from "wisp/src/headless/lua";
 import { SMASHCRAFT_NOOPS, smashcraftNativeBehavior } from "./headlessNatives";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel";
-import { Phase } from "../../src/game/match/rules";
+import { Phase } from "../../src/game/lobby/lobbyState";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import { SELECTABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";

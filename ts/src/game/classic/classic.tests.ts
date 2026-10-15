@@ -7,7 +7,7 @@ import { HOME_STAGES } from "../menu/homeStages";
 import { selectableStage } from "../menu/stageCatalog";
 import { createFrameControls } from "../match/controls";
 import { CPU_TIERS } from "../match/cpuProfiles";
-import { type MatchState, Phase, createMatchState, fighterMask, requestStart, setParticipants, selectCharacter, nextMatchCharacter } from "../match/rules";
+import { type MatchState, Phase, createMatchState, fighterMask, requestStart, setParticipants, selectCharacter, nextMatchCharacter } from "../lobby/lobbyState";
 import { initializeMatchFighters, matchSpawnX, stepMatch } from "../match/step";
 import { createPacingAndPresentation } from "../match/pacingAndPresentation";
 import { stateChecksum } from "../replay/canonical";

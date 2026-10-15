@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { testHeadless } from "./headless";
 import type { Lockstep } from "wisp/src/headless/lockstep";
 import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel";
-import { Phase } from "../src/game/match/rules";
+import { Phase } from "../src/game/lobby/lobbyState";
 import type { MapBuild } from "../src/game/session/build";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { QUICK_MATCH_COMMAND, RESET_COMMAND } from "../src/game/session/devSettings";

@@ -1,7 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { itemDraw } from "../src/game/match/centreItem";
 import { DROP_METER, DROP_TELEGRAPH_FRAMES, type DropPoint, editableMeterDropPoints, meterDropPoints } from "../src/game/match/meterDrops";
-import type { MatchState } from "../src/game/match/rules";
+import type { MatchState } from "../src/game/lobby/lobbyState";
 import { gainMana } from "../src/game/sim/mana";
 import { type Roster, fighterAt } from "../src/game/sim/roster";
 import { mainDeckZAt } from "../src/game/sim/stage";

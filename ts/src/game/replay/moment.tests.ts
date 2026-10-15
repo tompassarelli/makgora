@@ -10,7 +10,7 @@ import { type InputRow, emptyInput, inputRow } from "../input/inputRow";
 import { PARTICIPANT_SLOTS, type Slots, participantActive } from "../input/participants";
 import { createFrameControls } from "../match/controls";
 import { captureFrame, captureNetworkFrame, createMatchFrameInput, executeMatchFrame } from "../match/frameInput";
-import { computerActive, humanFighterActive, setParticipants } from "../match/rules";
+import { computerActive, humanFighterActive, setParticipants } from "../lobby/lobbyState";
 import { produceScenarioComputerInput } from "../session/scenarios";
 import { Character } from "../sim/codes";
 import { type Fighter, createFighter } from "../sim/fighter";

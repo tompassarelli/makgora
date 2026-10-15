@@ -7,7 +7,7 @@
 import { on, trampoline } from "wisp/src/platform/dispatch";
 import { installFrameMeter as installWispFrameMeter, startFrameCostCapture, startFrameMeter } from "wisp/src/platform/frameMeter";
 import { PARTICIPANT_SLOTS } from "../game/input/participants";
-import { Phase } from "../game/match/rules";
+import { Phase } from "../game/lobby/lobbyState";
 import { parseDecimal } from "../game/netcode/journal/decimal";
 import { shellState } from "./shell/state";
 

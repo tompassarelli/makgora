@@ -1,5 +1,5 @@
 import { assertEquals, assertGreaterThan, test } from "wisp/src/runtime/testing";
-import { Phase } from "../match/rules";
+import { Phase } from "../lobby/lobbyState";
 import { stepMatch } from "../match/step";
 import { stateChecksum } from "../replay/canonical";
 import { firstStateDifference } from "../replay/difference";
@@ -18,7 +18,7 @@ import { setWorldMotionValue } from "./motion";
 import { copyControls, createRoster, neutralControls } from "./roster";
 import { chooseRecoveryInput } from "../match/botRecovery";
 import { createFrameControls } from "../match/controls";
-import { createMatchState } from "../match/rules";
+import { createMatchState } from "../lobby/lobbyState";
 import { stepMatch as stepGame } from "../match/step";
 
 const TOMB = TOMB_OF_SARGERAS_STAGE;

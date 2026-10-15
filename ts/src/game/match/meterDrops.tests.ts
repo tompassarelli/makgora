@@ -22,7 +22,7 @@ import {
   advanceMeterDrops, meterDropPoint, meterDropPoints, scheduleMeterDrops,
 } from "./meterDrops";
 import { createPacingAndPresentation } from "./pacingAndPresentation";
-import { MATCH_TICKS_PER_SECOND, Phase, createMatchState, setHumanCount, setParticipants } from "./rules";
+import { MATCH_TICKS_PER_SECOND, Phase, createMatchState, setHumanCount, setParticipants } from "../lobby/lobbyState";
 import { stepMatch } from "./step";
 
 function quickGame(seed: number, stage = 0) {

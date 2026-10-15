@@ -1,5 +1,5 @@
 import { readChunk } from "wisp/src/platform/fileio";
-import { Phase } from "../../game/match/rules";
+import { Phase } from "../../game/lobby/lobbyState";
 import { clearVisualCapture, heldVisualFrame, holdVisualFrame, releaseVisualFrame, visualCapture, visualReleaseFile } from "../../game/session/visualCapture";
 import { drawnFrame } from "./drawnFrame";
 import { type ShellState, localSlot } from "./state";

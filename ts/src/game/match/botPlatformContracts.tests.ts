@@ -10,7 +10,7 @@ import { createFrameControls } from "./controls";
 import type { CpuTier } from "./cpuProfiles";
 import { captureFrame, createMatchFrameInput, executeMatchFrame } from "./frameInput";
 import { createPacingAndPresentation } from "./pacingAndPresentation";
-import { Phase, createMatchState } from "./rules";
+import { Phase, createMatchState } from "../lobby/lobbyState";
 
 const NEUTRAL = neutralControls();
 const STAGE = 1;

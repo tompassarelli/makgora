@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { testHeadless } from "./headless";
 import type { Lockstep, SyncDelivery } from "wisp/src/headless/lockstep";
-import { Phase } from "../src/game/match/rules";
+import { Phase } from "../src/game/lobby/lobbyState";
 import type { MapBuild } from "../src/game/session/build";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { shellState } from "../src/platform/shell/state";

@@ -18,7 +18,7 @@ import { produceComputerInput } from "./botPlay";
 import {
   Phase, copyMatchState, createMatchState, keepsStocks, requestStageSelect, requestStart, resolveStocks, selectCharacter,
   setHitAreas, setParticipants, setPartnerDamage, setTraining, stepPartnerBehaviour, stepPartnerEscape, stepPartnerTech, timedMatch,
-} from "./rules";
+} from "../lobby/lobbyState";
 import { matchSpawnX } from "./step";
 import { canAct, latchPresses, releasePresses } from "./training";
 import { Advantage, PartnerBehaviour, PartnerEscape, PartnerTech } from "./trainingState";

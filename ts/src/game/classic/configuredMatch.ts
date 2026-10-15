@@ -4,7 +4,7 @@
 
 import { f32 } from "wisp/src/sim/f32";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, participantActive } from "../input/participants";
-import { type MatchState, Phase } from "../match/rules";
+import { type MatchState, Phase } from "../lobby/lobbyState";
 import type { Character } from "../sim/codes";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { BossKind, type ConfiguredMatch, RunOutcome, WinCondition, resetBossState } from "./runState";

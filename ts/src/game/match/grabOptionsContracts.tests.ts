@@ -14,7 +14,7 @@ import { copyControls, createRoster, fighterAt } from "../sim/roster";
 import { SHIELD_MIN_HOLD_FRAMES } from "../sim/shield";
 import { controls } from "../sim/testWorld";
 import { createBufferedFrameControls } from "./controls";
-import { Phase, createMatchState } from "./rules";
+import { Phase, createMatchState } from "../lobby/lobbyState";
 import { stepMatch } from "./step";
 
 function duel(character: Character) {

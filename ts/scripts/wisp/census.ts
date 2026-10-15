@@ -9,7 +9,7 @@
 
 import type { Lockstep } from "wisp/src/headless/lockstep";
 import type { PerfMeasure } from "wisp/src/headless/luaPerf";
-import { Phase, type MatchState } from "../../src/game/match/rules";
+import { Phase, type MatchState } from "../../src/game/lobby/lobbyState";
 import { Character } from "../../src/game/sim/codes";
 import { canAttack } from "../../src/game/sim/conditions";
 import type { Roster } from "../../src/game/sim/roster";

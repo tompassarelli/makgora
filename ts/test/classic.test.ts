@@ -8,7 +8,7 @@ import { ClassicPresentation, BOSS_TELEGRAPH_MODEL } from "../src/game/render/cl
 import { classicRoute } from "../src/game/classic/routes";
 import { RunOutcome } from "../src/game/classic/runState";
 import { LORE_BATTLES } from "../src/game/classic/loreBattles";
-import { createMatchState, Phase } from "../src/game/match/rules";
+import { createMatchState, Phase } from "../src/game/lobby/lobbyState";
 import { INTEGRITY_BUILD } from "../src/game/session/currentBuild";
 import { Character } from "../src/game/sim/codes";
 import { createFighter } from "../src/game/sim/fighter";

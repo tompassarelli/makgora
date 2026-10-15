@@ -8,7 +8,7 @@ import { clearAttackBuffer } from "../input/attackBuffer";
 import { type InputRow, emptyInput, inputRow } from "../input/inputRow";
 import { PARTICIPANT_SLOTS, type Slots, participantActive } from "../input/participants";
 import { captureNetworkFrame, createMatchFrameInput, executeMatchFrame } from "../match/frameInput";
-import { Phase } from "../match/rules";
+import { Phase } from "../lobby/lobbyState";
 import { stateChecksum } from "./canonical";
 import {
   ReplayBegin, beginMatchReplayFrame, continueMatchReplay, createMatchReplayRecorder, endMatchReplaySegment, finishMatchReplay,

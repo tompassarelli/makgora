@@ -8,7 +8,7 @@ import { setWorldMotionValue } from "../sim/motion";
 import { copyControls, createRoster, neutralControls } from "../sim/roster";
 import { chooseRecoveryInput } from "./botRecovery";
 import { createFrameControls } from "./controls";
-import { Phase, createMatchState } from "./rules";
+import { Phase, createMatchState } from "../lobby/lobbyState";
 import { stepMatch } from "./step";
 import { useMatchSeed } from "./botRandom";
 

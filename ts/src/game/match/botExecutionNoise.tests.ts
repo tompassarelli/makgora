@@ -7,7 +7,7 @@ import { beginFighterAttack } from "../sim/attacks";
 import { queueAttack } from "../input/attackBuffer";
 import { createRoster, copyControls } from "../sim/roster";
 import { createBufferedFrameControls } from "./controls";
-import { createMatchState, Phase } from "./rules";
+import { createMatchState, Phase } from "../lobby/lobbyState";
 import { stepMatch } from "./step";
 import { contactBatch, controls, hitEffect, testWorld } from "../sim/testWorld";
 import { applyAttackHit } from "../sim/hits";
