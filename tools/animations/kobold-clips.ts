@@ -25,8 +25,8 @@ const stand = source.Sequences[0]!;
 interface Gesture { chest?: number; pelvis?: number; arm?: number; armTwist?: number; elbow?: number; leftArm?: number; leftElbow?: number; head?: number;
   thigh?: number; knee?: number; leftThigh?: number; leftKnee?: number; lean?: number; yaw?: number; spin?: number; step?: number; rise?: number; wrist?: number }
 interface Beat { frame: number; gesture: Gesture; target?: readonly [number, number] }
-interface Strike { prep: Gesture; hit: Gesture; follow: Gesture; prepAt?: number; followAt?: number; settle?: number; mid?: readonly Beat[]; follows?: readonly [number, number]; even?: boolean; over?: readonly [number, number]; late?: number; hitAt?: readonly [number, number]; rest?: Gesture; air?: boolean; free?: boolean; reach?: number }
-interface Action { pose: HeroPose; frames: number; contact: number; beats: Beat[]; hold?: boolean; air?: boolean; reach?: number }
+interface Strike { pickHead?: "local" | "world"; prep: Gesture; hit: Gesture; follow: Gesture; prepAt?: number; followAt?: number; settle?: number; mid?: readonly Beat[]; follows?: readonly [number, number]; even?: boolean; over?: readonly [number, number]; late?: number; hitAt?: readonly [number, number]; rest?: Gesture; air?: boolean; free?: boolean; reach?: number }
+interface Action { pickHead?: "local" | "world"; pose: HeroPose; frames: number; contact: number; beats: Beat[]; hold?: boolean; air?: boolean; reach?: number }
 const ready: Gesture = {};
 const blend = (a: Gesture, b: Gesture, t: number): Gesture => Object.fromEntries([...new Set([...Object.keys(a), ...Object.keys(b)])]
   .map(k => [k, (a[k as keyof Gesture] ?? 0) * (1 - t) + (b[k as keyof Gesture] ?? 0) * t]));
@@ -60,37 +60,40 @@ const strikes: readonly [HeroPose, AttackStyle, Strike][] = [
   ["jab2", AttackStyle.jab2, {
     prep: { chest: 6, yaw: 35, arm: 30, elbow: -40, leftArm: -50, lean: -5, step: -4, head: -10, thigh: -15, leftThigh: 15, knee: -15 }, prepAt: 2,
     hit: { chest: 12, yaw: -25, arm: -80, elbow: 10, leftArm: 45, lean: 12, step: 9, head: -18, thigh: 35, knee: -35, leftThigh: -25 },
-    follow: { chest: 10, yaw: -35, arm: -100, leftArm: 50, lean: 14, step: 11, head: -20, thigh: 38, knee: -38, leftThigh: -28 }, late: 1, over: [5, 2] }],
+    follow: { chest: 10, yaw: -30, arm: -92, leftArm: 47, lean: 13, step: 10, head: -19, thigh: 36, knee: -36, leftThigh: -26 }, late: 1, over: [5, 2] }],
   ["forwardTilt", AttackStyle.forwardTilt, { ...tiltStrike(0, 0), over: [6, -1] }],
   ["forwardTiltUp", AttackStyle.forwardTiltUp, { ...tiltStrike(-18, 40), over: [5, 3] }],
-  ["forwardTiltDown", AttackStyle.forwardTiltDown, { ...tiltStrike(28, -20), over: [6, -3] }],
+  ["forwardTiltDown", AttackStyle.forwardTiltDown, { pickHead: "world",
+    prep: { chest: -18, arm: -200, elbow: -30, leftArm: -150, lean: -8, step: -4, head: -22, thigh: -15, leftThigh: 20, knee: -20 }, prepAt: 3,
+    hit: { chest: 48, arm: -65, leftArm: -50, lean: 18, step: 10, head: -30, thigh: 50, knee: -65, leftThigh: -25 },
+    follow: { chest: 54, arm: -45, leftArm: -35, lean: 26, step: 20, head: -32, thigh: 55, knee: -70, leftThigh: -28 }, over: [14, -10], even: true }],
   ["upTilt", AttackStyle.upTilt, {
     prep: { chest: 28, arm: -20, elbow: -30, leftArm: -20, lean: 4, head: -5, thigh: 40, knee: -55, leftThigh: 40, leftKnee: -55 }, prepAt: 2,
     hit: { chest: -12, arm: -175, leftArm: -150, lean: -4, head: -30, thigh: 5, leftThigh: 0, rise: 3 },
     follow: { chest: -34, arm: -245, leftArm: -200, lean: -16, step: -4, head: -42, thigh: -10, leftThigh: 15, rise: 2 }, over: [-24, -6] }],
-  ["downTilt", AttackStyle.downTilt, {
-    prep: { chest: 35, arm: -175, elbow: -20, leftArm: -40, lean: 4, step: -3, head: -25, thigh: 55, knee: -75, leftThigh: 45, leftKnee: -70 }, prepAt: 2,
-    hit: { chest: 55, arm: -60, leftArm: 20, lean: 22, step: 8, head: -40, thigh: 70, knee: -95, leftThigh: -25, leftKnee: -20 },
-    follow: { chest: 58, arm: -50, leftArm: 25, lean: 25, step: 11, head: -40, thigh: 72, knee: -95, leftThigh: -30, leftKnee: -20 }, over: [7, -1] }],
-  ["dashAttack", AttackStyle.dashAttack, {
-    prep: { chest: -15, arm: -175, elbow: -20, leftArm: -160, lean: -12, step: -3, head: -20, thigh: -30, leftThigh: 35, knee: -30 }, prepAt: 3,
-    hit: { chest: 15, arm: -100, leftArm: -110, lean: 55, step: 16, head: -45, thigh: -45, knee: -20, leftThigh: -60, leftKnee: -30 },
-    follow: { chest: 18, arm: -95, leftArm: -105, lean: 62, step: 26, head: -50, thigh: -50, knee: -25, leftThigh: -65, leftKnee: -35 }, over: [7, -2] }],
+  ["downTilt", AttackStyle.downTilt, { pickHead: "local",
+    prep: { chest: 55, yaw: 50, arm: -60, elbow: -20, leftArm: -40, lean: 8, step: -18, head: -40, thigh: 55, knee: -75, leftThigh: 45, leftKnee: -70 }, prepAt: 2,
+    hit: { chest: 55, yaw: -15, arm: -60, leftArm: 20, lean: 22, step: 10, head: -40, thigh: 70, knee: -95, leftThigh: -25, leftKnee: -20 },
+    follow: { chest: 58, yaw: -40, arm: -50, leftArm: 25, lean: 25, step: 13, head: -40, thigh: 72, knee: -95, leftThigh: -30, leftKnee: -20 }, over: [7, -1], even: true }],
+  ["dashAttack", AttackStyle.dashAttack, { pickHead: "world", reach: 0.01,
+    prep: { chest: 35, arm: 24, armTwist: -34, elbow: -13, leftArm: 11, leftElbow: 6, lean: 60, step: -4, head: 2, thigh: -4, leftThigh: 2 }, prepAt: 3,
+    hit: { chest: 40, arm: -80, armTwist: 115, elbow: 45, leftArm: -35, leftElbow: -20, lean: 0, step: 10, head: -8, thigh: 12, leftThigh: -8 },
+    follow: { chest: 45, arm: -75, armTwist: 115, elbow: 45, leftArm: -40, leftElbow: -20, lean: 5, step: 16, head: -10, thigh: 20, knee: -15, leftThigh: -15 }, over: [8, -2], even: true }],
   ["forwardSmash", AttackStyle.forwardSmash, {
     prep: { chest: -28, arm: -215, elbow: -30, leftArm: -200, leftElbow: -30, lean: -14, step: -6, head: -28, thigh: -18, leftThigh: 22, knee: -20 }, prepAt: 8,
     mid: [{ frame: 11, gesture: { chest: -32, arm: -225, elbow: -35, leftArm: -210, leftElbow: -35, lean: -16, step: -7, head: -30, thigh: -20, leftThigh: 24, knee: -22 } }],
     hit: { chest: 28, arm: -110, leftArm: -105, lean: 16, step: 13, head: -12, thigh: 45, knee: -45, leftThigh: -32 },
     follow: { chest: 40, arm: -75, leftArm: -75, lean: 20, step: 14, head: -16, thigh: 50, knee: -52, leftThigh: -35 }, over: [3, -10], even: true }],
-  ["upSmash", AttackStyle.upSmash, {
-    prep: { chest: 38, arm: -15, elbow: -30, leftArm: -10, lean: 6, head: -8, thigh: 75, knee: -100, leftThigh: 75, leftKnee: -100 }, prepAt: 6,
-    mid: [{ frame: 8, gesture: { chest: 42, arm: -10, elbow: -30, leftArm: -5, lean: 7, head: -8, thigh: 80, knee: -105, leftThigh: 80, leftKnee: -105 } }],
-    hit: { chest: -15, arm: -180, leftArm: -175, lean: -4, head: -32, thigh: -5, leftThigh: 5, rise: 10 },
-    follow: { chest: -22, arm: -195, leftArm: -190, lean: -10, head: -38, thigh: -12, leftThigh: 18, knee: -20, rise: 16 }, over: [-2, 8] }],
-  ["downSmash", AttackStyle.downSmash, {
-    prep: { chest: 18, arm: -175, elbow: -20, leftArm: -60, lean: -4, head: -15, thigh: 45, knee: -60, leftThigh: 40, leftKnee: -55, spin: 30 }, prepAt: 7,
-    hit: { chest: 50, arm: -70, leftArm: 30, lean: 12, head: -30, thigh: 60, knee: -85, leftThigh: 50, leftKnee: -80, spin: -10 },
-    mid: [{ frame: 14, gesture: { chest: 50, arm: -70, leftArm: 30, lean: 12, head: -30, thigh: 60, knee: -85, leftThigh: 50, leftKnee: -80, spin: 180 }, target: [-70, 9] }],
-    follow: { chest: 52, arm: -60, leftArm: 35, lean: 14, head: -30, thigh: 60, knee: -85, leftThigh: 50, leftKnee: -80, spin: 215 }, over: [-6, -2] }],
+  ["upSmash", AttackStyle.upSmash, { pickHead: "world",
+    prep: { chest: -45, arm: -15, elbow: -30, leftArm: -10, lean: 15, head: 15, thigh: -65, knee: 100, leftThigh: -65, leftKnee: 100 }, prepAt: 6,
+    mid: [{ frame: 8, target: [10, 10], gesture: { chest: -55, arm: 20, elbow: 0, leftArm: -5, lean: 18, head: 18, thigh: -75, knee: 115, leftThigh: -75, leftKnee: 115 } }],
+    hit: { chest: -15, arm: -180, leftArm: -175, lean: -4, head: -32, thigh: -5, leftThigh: 5, rise: 25 },
+    follow: { chest: -22, arm: -195, leftArm: -190, lean: -10, head: -38, thigh: -12, leftThigh: 18, knee: -20, rise: 28 }, over: [-2, 8] }],
+  ["downSmash", AttackStyle.downSmash, { pickHead: "world", reach: 0.001,
+    prep: { chest: 18, arm: -65, armTwist: 95, elbow: 30, leftArm: -60, lean: -4, head: -15, thigh: 45, knee: -60, leftThigh: 40, leftKnee: -55, spin: 30 }, prepAt: 7,
+    hit: { chest: 50, arm: -70, leftArm: 30, lean: 12, step: 8, head: -30, thigh: 60, knee: -85, leftThigh: 50, leftKnee: -80, spin: -10 },
+    mid: [{ frame: 8, target: [-20, 9], gesture: { chest: 35, arm: -65, armTwist: 95, elbow: 30, leftArm: -60, lean: -4, step: -6, head: -15, thigh: 45, knee: -60, leftThigh: 40, leftKnee: -55, spin: 30 } }, { frame: 14, gesture: { chest: 50, arm: -70, leftArm: 30, lean: 12, head: -30, thigh: 60, knee: -85, leftThigh: 50, leftKnee: -80, spin: 180 }, target: [-70, 9] }],
+    follow: { chest: 52, arm: -60, leftArm: 35, lean: 14, head: -30, thigh: 60, knee: -85, leftThigh: 50, leftKnee: -80, spin: 215 }, over: [-6, -2], even: true }],
 ];
 const fall: Gesture = {};
 const flail: Gesture = { chest: -4, arm: -80, elbow: -20, leftArm: -50, leftElbow: -45, head: -6, thigh: -10, knee: -20, leftThigh: 15, leftKnee: -45 };
@@ -98,6 +101,15 @@ const tuck: Gesture = { chest: 30, arm: -40, elbow: -60, leftArm: -40, leftElbow
 const squash: Gesture = { chest: 32, lean: 6, arm: 25, elbow: -25, leftArm: 25, leftElbow: -25, head: 12, thigh: 70, knee: -100, leftThigh: 70, leftKnee: -100 };
 const hold: Gesture = { chest: 12, lean: 6, step: 4, leftArm: -88, leftElbow: -10, arm: -150, elbow: -70, head: -6, thigh: 18, knee: -22, leftThigh: -16 };
 const airStrikes: readonly [HeroPose, AttackStyle, Strike][] = [
+  ["neutralAir", AttackStyle.neutralAir, { air: true, reach: 0.01, rest: { spin: 360 },
+    prep: { chest: -12, arm: -130, elbow: -50, leftArm: -40, lean: -10, spin: -60, head: -15, thigh: 55, knee: -80, leftThigh: 30, leftKnee: -55 }, prepAt: 2,
+    hit: { wrist: 0, chest: 18, arm: -90, leftArm: 45, lean: 12, spin: 0, step: 4, head: -15, thigh: 35, knee: -50, leftThigh: -25, leftKnee: -35 },
+    mid: [{ frame: 7, gesture: { wrist: 0, chest: 18, arm: -90, leftArm: 45, lean: 12, spin: 180, head: -15, thigh: 35, knee: -50, leftThigh: -25, leftKnee: -35 }, target: [-28, 36] }],
+    follow: { wrist: 0, chest: 12, arm: -70, elbow: -40, leftArm: 30, lean: 5, spin: 330, head: -10, thigh: 25, knee: -35, leftThigh: -15, leftKnee: -25 }, follows: [14, 36], followAt: 9, even: true }],
+  ["forwardAir", AttackStyle.forwardAir, { air: true, reach: 0.01, rest: fall,
+    prep: { chest: -22, arm: -215, elbow: -35, leftArm: -195, leftElbow: -35, lean: -10, head: -28, thigh: 55, knee: -85, leftThigh: 35, leftKnee: -65 }, prepAt: 3,
+    hit: { wrist: 0, chest: 30, arm: -100, leftArm: -100, lean: 18, step: 10, head: -15, thigh: -25, knee: -20, leftThigh: 30, leftKnee: -45 },
+    follow: { wrist: 0, chest: 42, arm: -60, leftArm: -65, lean: 24, step: 13, head: -12, thigh: -35, knee: -15, leftThigh: 35, leftKnee: -40 }, over: [6, -12], even: true }],
   ["backAir", AttackStyle.backAir, { air: true, reach: 0.01, rest: fall,
     prep: { chest: -15, yaw: 55, arm: -150, elbow: -40, leftArm: 30, lean: 8, step: 4, head: -10, thigh: 30, knee: -60, leftThigh: 40, leftKnee: -70 }, prepAt: 4,
     hit: { wrist: 0, chest: 42, yaw: -60, arm: 95, leftArm: -70, lean: -12, step: -8, head: -25, thigh: -45, knee: -40, leftThigh: -20, leftKnee: -60 },
@@ -146,7 +158,7 @@ const posed: [HeroPose, number, Beat[], boolean?][] = [
 const only = process.argv.find(a => a.startsWith("--only="))?.slice(7).split(",");
 const actions: Action[] = [...strikes, ...airStrikes].filter(([pose]) => !only || only.includes(pose)).map(([pose, style, strike]) => {
   const move = KOBOLD_MOVES.normals[style]!;
-  return { pose, frames: Math.round(seq(pose).seconds * 60), contact: move.startupFrames, beats: strikeBeats(style, strike), air: strike.air, reach: strike.reach };
+  return { pose, frames: Math.round(seq(pose).seconds * 60), contact: move.startupFrames, beats: strikeBeats(style, strike), air: strike.air, reach: strike.reach, pickHead: strike.pickHead };
 });
 for (const [pose, contact, beats, air] of posed) if (!only || only.includes(pose))
   actions.push({ pose, frames: Math.round(seq(pose).seconds * 60), contact, beats, air });
@@ -243,13 +255,13 @@ for (const action of actions) {
     const authored = [beat.gesture.arm ?? 0, beat.gesture.armTwist ?? 0, beat.gesture.elbow ?? 0, 0, ...(beat.gesture.wrist == null ? [] : [beat.gesture.wrist])], angles = authored.slice();
     const handKey = beat.gesture.wrist == null ? undefined : hand.Rotation?.Keys.find(k => k.Frame === time(beat.frame));
     ensure(beat.gesture.wrist == null || handKey, `${action.pose}: right hand has no rotation key`);
-    const [tx, tz] = action.air ? [beat.target[0] - (beat.gesture.step ?? 0), beat.target[1] - (beat.gesture.rise ?? 0)] : beat.target;
+    const [tx, tz] = action.air || action.pickHead === "world" ? [beat.target[0] - (beat.gesture.step ?? 0), beat.target[1] - (beat.gesture.rise ?? 0)] : beat.target;
     const loss = () => {
       if (handKey) { handKey.Vector = rotated(donor(hand), angles[4]!, 0); if (handKey.InTan) { handKey.InTan = handKey.Vector.slice(); handKey.OutTan = handKey.Vector.slice(); } }
       armKey.Vector = rotated(donor(arm), angles[0]!, angles[1]!); elbowKey.Vector = rotated(donor(elbow), angles[2]!, angles[3]!);
       if (armKey.InTan) { armKey.InTan = armKey.Vector.slice(); armKey.OutTan = armKey.Vector.slice(); }
       if (elbowKey.InTan) { elbowKey.InTan = elbowKey.Vector.slice(); elbowKey.OutTan = elbowKey.Vector.slice(); }
-      renderer.update(0); const m = data.nodes[pickNode.ObjectId].matrix, tip = action.air ? head : pickTip;
+      renderer.update(0); const m = data.nodes[pickNode.ObjectId].matrix, tip = action.air || action.pickHead ? head : pickTip;
       const x = m[0] * tip[0] + m[4] * tip[1] + m[8] * tip[2] + m[12], z = m[2] * tip[0] + m[6] * tip[1] + m[10] * tip[2] + m[14];
       return (x - tx!) ** 2 + (z - tz!) ** 2 + (action.reach ?? 0.04) * angles.reduce((sum, a, i) => sum + (a - authored[i]!) ** 2, 0);
     };
