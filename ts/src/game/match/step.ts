@@ -59,8 +59,15 @@ const wasGrabbed: Slots<boolean> = [false, false, false, false];
 const beforeOut: Slots<boolean> = [false, false, false, false];
 const HELD = neutralControls();
 
+export function configureMatchTeams(game: Readonly<MatchState>, world: Roster): void {
+  world.teamBattle = game.teamBattle && !game.training && !game.run.active;
+  world.friendlyFire = game.friendlyFire;
+  for (const slot of PARTICIPANT_SLOTS) world.teamChoices[slot] = game.teamChoices[slot];
+}
+
 export function initializeMatchFighters(game: Readonly<MatchState>, world: Roster): void {
   game.camera.initialized = false;
+  configureMatchTeams(game, world);
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;
     const absent = game.practice && !humanFighterActive(game, slot);
@@ -132,6 +139,7 @@ export type EarlierFrame = Readonly<{ match: Readonly<MatchState>; world: Readon
 
 export function stepMatch(game: MatchState, world: Roster, controls: FrameControls, frame: number, scope?: Readonly<StepScope>, earlier?: EarlierFrame): void {
   if (game.phase !== Phase.match) return;
+  configureMatchTeams(game, world);
   steppedFrames.count++;
   game.matchFrame++;
   const stage = game.stageChoice;

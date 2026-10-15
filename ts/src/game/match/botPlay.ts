@@ -5,14 +5,14 @@
 import { f32 } from "wisp/src/sim/f32";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { type AttackBuffer, clearAttackBuffer, copyAttackBuffer } from "../input/attackBuffer";
-import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../input/participants";
+import { PARTICIPANT_CAPACITY, PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../input/participants";
 import { DownState, GrabAction, ShieldBreak } from "../sim/codes";
 import { heroStatusBlocksActions, heroStatusMashes } from "../sim/heroStatus";
 import type { Fighter } from "../sim/fighter";
 import { exSpecialAffordable } from "../sim/exSpecials";
 import { Character, SpecialAction } from "../sim/codes";
 import { isSmashAttack } from "../sim/moves";
-import { type Controls, type Roster, copyControls, fighterAt, neutralControls } from "../sim/roster";
+import { type Controls, type Roster, copyControls, fighterAt, isActive, neutralControls } from "../sim/roster";
 import { mainDeckLeft, mainDeckRight, surfacePass } from "../sim/stage";
 import { DROP_TELEGRAPH_FRAMES, contestedDropPoint, meterDropPoint } from "./meterDrops";
 import { type FighterGameplan, GameplanThrow } from "../sim/gameplan";
@@ -32,7 +32,7 @@ import { guardOffstage, waitAtLip } from "./botEdgeGuard";
 import { escapeCorner, pokeGoal, pressCorner, pressEdgeCancel, steerEdgeCancel } from "./botCorner";
 import { pressHeroFollowUp } from "./botHeroKit";
 import { dashIn, pressKitOption, pressUltimate, steerHeroBranches, steerRunningSpecial } from "./botKitOptions";
-import { MATCH_TICKS_PER_SECOND, type MatchState, stageClock, computerActive } from "./rules";
+import { MATCH_TICKS_PER_SECOND, type MatchState, stageClock, computerActive, fighterMask } from "./rules";
 import { trainingPartnerInput } from "./training";
 import { sameFighterState } from "../replay/fighterState";
 import { type BotStrategy, copyBotStrategy, learnBotHabit, prepareBotRead, pressBotRead, sameBotStrategy } from "./botStrategy";
@@ -176,8 +176,41 @@ export function approachPoint(f: Readonly<Fighter>, stage: number, x: number, z:
   }
 }
 
+function computerOpponentMask(game: Readonly<MatchState>, slot: ParticipantSlot): number {
+  if (!game.teamBattle) return (1 << PARTICIPANT_CAPACITY) - 1;
+  const mask = fighterMask(game);
+  let opponents = 0;
+  for (const candidate of PARTICIPANT_SLOTS) if ((mask & (1 << candidate)) !== 0 && game.teamChoices[candidate] !== game.teamChoices[slot]) opponents |= 1 << candidate;
+  return opponents;
+}
+
+function avoidTeamContact(game: Readonly<MatchState>, world: Readonly<Roster>, slot: ParticipantSlot, target: Readonly<Fighter> | undefined, input: Controls, commands: AttackBuffer): void {
+  if (!game.teamBattle || !game.friendlyFire || target === undefined) return;
+  const own = fighterAt(world, slot);
+  const targetX = f32(target.motion.x - own.motion.x);
+  const toward = targetX < 0.0 ? -1 : 1;
+  for (const ally of PARTICIPANT_SLOTS) {
+    if (ally === slot || !isActive(world, ally) || game.teamChoices[ally] !== game.teamChoices[slot]) continue;
+    const teammate = fighterAt(world, ally);
+    if (teammate.status.out || teammate.status.stocks <= 0) continue;
+    const dx = f32(teammate.motion.x - own.motion.x);
+    const dz = Math.abs(f32(teammate.motion.z - own.motion.z));
+    const between = f32(dx * toward) > 0.0 && Math.abs(dx) < Math.abs(targetX);
+    if (!(dz < 160.0 && (Math.abs(dx) < 140.0 || between)
+      || (input.specialPressed || input.ultimatePressed) && Math.abs(dx) < 400.0 && dz < 300.0)) continue;
+    clearAttackBuffer(commands);
+    input.attackRequested = false;
+    input.attackPressed = false;
+    input.attackHeld = false;
+    input.specialPressed = false;
+    input.ultimatePressed = false;
+    input.getupAttackPressed = false;
+    return;
+  }
+}
+
 function reactionDelay(game: Readonly<MatchState>, runtime: Readonly<BotRuntime>, fighter: Readonly<Fighter>, slot: ParticipantSlot, frame: number, skill: CpuSkill, floor = cpuReactionFloor(fighter, skill)): number {
-  const cue = perceivedOpponent(runtime.botMemory, fighter, slot, frame, floor);
+  const cue = perceivedOpponent(runtime.botMemory, fighter, slot, frame, floor, computerOpponentMask(game, slot));
   // Only information old enough for this kind of answer may affect its seeded delay.
   const key = cue === undefined ? 0 : cue.attack.serial * 31 + cue.special.action * 17
     + (cue.motion.x < fighter.motion.x ? 1 : 2) + (cue.shield.raised ? 4 : 0)
@@ -208,7 +241,7 @@ export function produceComputerInput(game: Readonly<MatchState>, world: Roster, 
   const fighter = fighterAt(world, slot);
   const reactionFrames = reactionDelay(game, runtime, fighter, slot, frame, skill);
   useMatchSeed(game.matchSeed);
-  const target = fighter.grab.target === undefined ? perceivedOpponent(runtime.botMemory, fighter, slot, frame, reactionFrames)
+  const target = fighter.grab.target === undefined ? perceivedOpponent(runtime.botMemory, fighter, slot, frame, reactionFrames, computerOpponentMask(game, slot))
     : perceivedHeldFighter(runtime.botMemory, fighter.grab.target, frame, reactionFrames);
   const strategy = runtime.botStrategies[slot];
   if (target !== undefined) {
@@ -225,6 +258,7 @@ export function produceComputerInput(game: Readonly<MatchState>, world: Roster, 
   if (!game.training) applyAerialExecutionNoise(fighter, target, slot, skill, input);
   // DI and escape mashing are reactions to the fighter's own state, not steering.
   if (fighter.launch.hitlag <= 0 && fighter.grab.owner === undefined) commitBotDirection(runtime.botMemory, slot, frame, input, tier, skill.decision);
+  avoidTeamContact(game, world, slot, target, input, commands);
   useMatchSeed(0);
   return execution;
 }
@@ -241,7 +275,7 @@ const negativeZero = (value: number): boolean => value === 0 && 1 / value < 0;
  * `fighterSame` says the slot's fighter is known to equal the earlier one.
  */
 export function sameComputerInputs(game: Readonly<MatchState>, world: Readonly<Roster>, runtime: Readonly<BotRuntime>, before: Readonly<MatchState>, beforeWorld: Readonly<Roster>, beforeRuntime: Readonly<BotRuntime>, slot: ParticipantSlot, frame: number, fighterSame = false): boolean {
-  if (game.training || before.training || world.mask !== beforeWorld.mask) return false;
+  if (game.training || before.training || game.teamBattle || before.teamBattle || world.mask !== beforeWorld.mask) return false;
   const opponent = game.cpuResolvedOpponents[slot];
   const tier = game.cpuTiers[slot];
   if (opponent !== before.cpuResolvedOpponents[slot] || tier !== before.cpuTiers[slot] || game.matchSeed !== before.matchSeed) return false;

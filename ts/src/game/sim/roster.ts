@@ -1,12 +1,17 @@
 
 
 import type { Fighter } from "./fighter";
+import { type Slots } from "../input/participants";
+import type { Team } from "./teams";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 
 
 export interface Roster {
 
   mask: number;
+  teamBattle: boolean;
+  friendlyFire: boolean;
+  readonly teamChoices: Slots<Team>;
 
   readonly grabPaused: boolean[];
   readonly fighters: (Fighter | undefined)[];
@@ -14,10 +19,16 @@ export interface Roster {
 
 
 export function createRoster(mask: number, fighters: readonly Fighter[] = []): Roster {
+  const grabPaused: boolean[] = [];
+  const rosterFighters: (Fighter | undefined)[] = [];
+  for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
+    grabPaused[slot] = false;
+    rosterFighters[slot] = fighters[slot];
+  }
   return {
-    mask,
-    grabPaused: Array.from({ length: PARTICIPANT_CAPACITY }, () => false),
-    fighters: Array.from({ length: PARTICIPANT_CAPACITY }, (_, slot) => fighters[slot]),
+    mask, teamBattle: false, friendlyFire: false, teamChoices: [0, 1, 0, 1],
+    grabPaused,
+    fighters: rosterFighters,
   };
 }
 

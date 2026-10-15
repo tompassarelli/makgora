@@ -5,7 +5,7 @@ import { ITEM_BUFF_FRAMES } from "../sim/itemBuffs";
 import { RULE_BUTTONS, type RuleBox } from "./ruleButtons";
 
 export type RuleName = keyof typeof RULE_BUTTONS;
-export type RuleGroup = "match" | "items" | "training" | "classic" | "mode";
+export type RuleGroup = "match" | "items" | "training" | "classic" | "mode" | "teams";
 
 export const RULE_HELP_WIDTH = f32(0.38);
 export const RULE_HELP_HEIGHT = f32(0.046);
@@ -13,6 +13,7 @@ export const RULE_HELP_HEIGHT = f32(0.046);
 const ITEM_SECONDS = ITEM_BUFF_FRAMES / 60;
 
 const MATCH_HELP = {
+  teamBattle: "Team Battle: choose each fighter’s red, blue, green or yellow team. At least two teams must join; the last team standing wins.",
   fewerStocks: "Stocks: how many times each fighter can be knocked off the stage before they lose.",
   moreStocks: "Stocks: how many times each fighter can be knocked off the stage before they lose.",
   lessTime: "Time limit: the match ends when it runs out. Lower it to “No time limit” to play until stocks run out.",
@@ -41,12 +42,13 @@ const TRAINING_HELP = {
   speed: "Game speed: slow the whole game to half or quarter speed to study moves.",
 } as const;
 
-const HELP: Readonly<Record<Exclude<RuleName, "training" | "easierClassic" | "harderClassic">, string>> = { ...MATCH_HELP, ...ITEM_HELP, ...TRAINING_HELP };
+const HELP: Readonly<Record<Exclude<RuleName, "training" | "easierClassic" | "harderClassic">, string>> = { ...MATCH_HELP, ...ITEM_HELP, ...TRAINING_HELP, friendlyFire: "Friendly Fire: when on, teammates can damage and grab each other. Computers keep targeting the opposing teams." };
 
 const isRule = (name: string): name is RuleName => name in RULE_BUTTONS;
 
 const RULE_GROUPS: readonly (readonly [RuleGroup, readonly RuleName[]])[] = [
   ["mode", ["training"]],
+  ["teams", ["friendlyFire"]],
   ["match", Object.keys(MATCH_HELP).filter((name) => isRule(name))],
   ["items", Object.keys(ITEM_HELP).filter((name) => isRule(name))],
   ["training", Object.keys(TRAINING_HELP).filter((name) => isRule(name))],
@@ -57,7 +59,10 @@ const RULE_GROUPS: readonly (readonly [RuleGroup, readonly RuleName[]])[] = [
 export function visibleRuleGroups(game: Readonly<MatchState>): readonly RuleGroup[] {
   if (game.training) return ["mode", "training"];
   if (game.classic || game.lore) return ["mode", "classic"];
-  return game.items.on ? ["mode", "match", "items"] : ["mode", "match"];
+  const groups: RuleGroup[] = ["mode", "match"];
+  if (game.items.on) groups.push("items");
+  if (game.teamBattle) groups.push("teams");
+  return groups;
 }
 
 

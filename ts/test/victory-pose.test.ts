@@ -4,6 +4,10 @@ import { originalClip, originalClipCount, originalClipNamed, originalClipNames }
 import { victoryAnimation } from "../src/game/presentation/matchAudio";
 import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/sim/heroes/registry";
 import { MatchPresentation } from "../src/game/render/matchPresentation";
+import { Phase, createMatchState } from "../src/game/match/rules";
+import { createMatchTally, resultsView } from "../src/game/presentation/matchCues";
+import { Character } from "../src/game/sim/codes";
+import { createRoster } from "../src/game/sim/roster";
 import { createFighter } from "../src/game/sim/fighter";
 import { soloWorld } from "../src/game/sim/testWorld";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
@@ -64,6 +68,23 @@ test("results playback shows full stock victories and casts once before holding 
       presentation.hideResults();
       expect(drawn(), `${name}: rematch removes result body`).toBeUndefined();
     }
+    const game = createMatchState();
+    game.phase = Phase.result; game.teamBattle = true; game.winner = 0;
+    game.humanFighterMask = 7; game.computerMask = 0;
+    game.teamChoices[0] = 0; game.teamChoices[1] = 0; game.teamChoices[2] = 1;
+    const world = createRoster(7, [createFighter(Character.blademaster, 0, 1), createFighter(Character.dreadlord, 0, 1), createFighter(Character.rifleman, 0, 1)]);
+    presentation.preparePoses(world);
+    const results = resultsView(game, world, createMatchTally());
+    expect(results.rows.filter(row => row.winner).map(row => row.slot).sort()).toEqual([0, 1]);
+    presentation.beginResults(results, 0);
+    for (const character of [Character.blademaster, Character.dreadlord]) {
+      const index = originalClipNamed(character, victoryAnimation(character));
+      const clip = index === undefined ? undefined : originalClip(character, index);
+      if (clip === undefined) throw new Error("missing team victory clip");
+      const pose = client.effectPoses({ visibleOnly: true }).find(pose => pose.destroyed === undefined && pose.model === clip.modelPath);
+      expect(pose?.animationElapsed, `${fighterName(character)} team win uses victory`).toBeCloseTo(clip.timeline === true ? clip.startSeconds : 0, 4);
+    }
+    presentation.hideResults();
   });
   expect(client.errors).toEqual([]);
 });

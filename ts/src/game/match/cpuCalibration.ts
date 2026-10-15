@@ -143,7 +143,7 @@ function reads(profile: CpuProfile, seed: number, trial: number, into: Calibrati
       copyControls(controls.inputs[0], neutralControls());
       clearAttackBuffer(controls.commands[0]); clearAttackBuffer(controls.commands[1]);
       observeOpponents(runtime.botMemory, played.state.world, frame);
-      const target = perceivedOpponent(runtime.botMemory, played.own, 0, frame, profile.reactionFrames);
+      const target = perceivedOpponent(runtime.botMemory, played.own, 0, frame, profile.reactionFrames, played.state.world.mask);
       if (target !== undefined) pressBotRead(commitment, played.own, target, 0, played.state.match.matchFrame, frame, controls.inputs[0], controls.commands[0]);
       if (frame === expectedFrame) {
         queueAttack(controls.commands[1], { style: switched ? AttackStyle.grab : AttackStyle.jab, facing: -1, frame, mayCharge: false });

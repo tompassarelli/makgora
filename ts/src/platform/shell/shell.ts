@@ -1,3 +1,4 @@
+import { winningMask } from "../../game/match/rules";
 import { recordSessionWins } from "../../game/shell/sessionWins";
 import { servicePauseCameraControls, pauseHudHidden } from "./pauseCamera";
 
@@ -215,7 +216,7 @@ function playerLeft(s: ShellState): void {
   if (isParticipantSlot(slot)) cancelBindingCapture(s.participants[slot].bindings);
   if (s.rollback !== undefined) s.rollback.active = false;
   if (wasMatch) {
-    recordSessionWins(s.sessionWins, s.game.winner === undefined ? 0 : 1 << s.game.winner);
+    recordSessionWins(s.sessionWins, winningMask(s.game));
     clearMatchEffects(s);
     s.session.paused = false;
     view.pauseMatchPresentation(s, false);

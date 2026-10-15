@@ -1,3 +1,4 @@
+import type { Team } from "../sim/teams";
 import { at } from "wisp/src/runtime/lookup";
 
 
@@ -37,4 +38,8 @@ export const NEUTRAL_TEAM_COLOR = 20;
 
 export function slotColor(slot: number): PlayerColor {
   return at(PLAYER_COLORS, slot);
+}
+
+export function teamColor(team: Team): PlayerColor {
+  return slotColor(team === 2 ? 6 : team === 3 ? 4 : team);
 }

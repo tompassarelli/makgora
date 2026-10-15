@@ -1,3 +1,4 @@
+import { canHit } from "./teams";
 
 
 import { f32 } from "wisp/src/sim/f32";
@@ -39,7 +40,7 @@ function ownerBusy(owner: Readonly<Fighter>): boolean {
 function biteOpponents(world: Roster, ownerSlot: number, placed: PlacedObject, partner: Readonly<SpecialCompanion>): void {
   placeCapsule(bite, partner.bite, placed.x, placed.z, placed.direction);
   for (let targetSlot = 0; targetSlot < PARTICIPANT_CAPACITY; targetSlot++) {
-    if (targetSlot === ownerSlot || !isActive(world, targetSlot)) continue;
+    if (!canHit(world, ownerSlot, targetSlot) || !isActive(world, targetSlot)) continue;
     const bit = 1 << targetSlot;
     if ((placed.bitten & bit) !== 0) continue;
     const target = fighterAt(world, targetSlot);

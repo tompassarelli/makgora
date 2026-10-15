@@ -1,3 +1,4 @@
+import { canHit } from "./teams";
 
 
 
@@ -32,7 +33,7 @@ function caughtTarget(world: Roster, slot: number, owner: Readonly<Fighter>): nu
   let best: number | undefined;
   let bestDistance = 0.0;
   for (let target = 0; target < PARTICIPANT_CAPACITY; target++) {
-    if (target === slot || !isActive(world, target)) continue;
+    if (!canHit(world, slot, target) || !isActive(world, target)) continue;
     const victim = fighterAt(world, target);
     if (victim.status.out || (isIntangible(victim) && victim.status.divineFrames <= 0) || !canBeGrabbed(victim) || inGrabContext(victim)) continue;
     if (!grabTouchesBody(strike, victim)) continue;

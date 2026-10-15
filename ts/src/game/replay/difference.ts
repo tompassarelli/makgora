@@ -407,6 +407,9 @@ function firstCommandDifference(expected: Readonly<AttackBuffer>, actual: Readon
 /** Wurst ReplaySnapshot.firstDifference: gameplay state only; firstPoseDifference covers presentation. */
 export function firstStateDifference(expected: Readonly<ReplayState>, actual: Readonly<ReplayState>): string | undefined {
   if (expected.world.mask !== actual.world.mask) return "participantMask";
+  if (expected.world.teamBattle !== actual.world.teamBattle) return "world.teamBattle";
+  if (expected.world.friendlyFire !== actual.world.friendlyFire) return "world.friendlyFire";
+  for (const slot of PARTICIPANT_SLOTS) if (expected.world.teamChoices[slot] !== actual.world.teamChoices[slot]) return `world.slot${slot}.team`;
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(expected.world, slot)) continue;
     const fighter = firstFighterDifference(fighterAt(expected.world, slot), fighterAt(actual.world, slot), expected.world.mask, actual.world.mask);
@@ -442,6 +445,9 @@ function firstMatchDifference(e: Readonly<MatchState>, a: Readonly<MatchState>):
   if (e.ultimatesOff !== a.ultimatesOff) return "match.ultimatesOff";
 
   if (e.winner !== a.winner) return "match.winner";
+  if (e.teamBattle !== a.teamBattle) return "match.teamBattle";
+  if (e.friendlyFire !== a.friendlyFire) return "match.friendlyFire";
+  for (const slot of PARTICIPANT_SLOTS) if (e.teamChoices[slot] !== a.teamChoices[slot]) return `match.slot${slot}.team`;
   if (e.departedMask !== a.departedMask) return "match.departedMask";
   if (e.interrupted !== a.interrupted) return "match.interrupted";
   if (e.humanFighterMask !== a.humanFighterMask) return "match.humanFighterMask";
@@ -520,6 +526,9 @@ export function sameReplayState(expected: Readonly<ReplayState>, actual: Readonl
 /** Wurst ReplaySnapshot.firstPoseDifference: presentation history, which the checksum leaves out. */
 export function firstPoseDifference(expected: Readonly<ReplayState>, actual: Readonly<ReplayState>): string | undefined {
   if (expected.world.mask !== actual.world.mask) return "participantMask";
+  if (expected.world.teamBattle !== actual.world.teamBattle) return "world.teamBattle";
+  if (expected.world.friendlyFire !== actual.world.friendlyFire) return "world.friendlyFire";
+  for (const slot of PARTICIPANT_SLOTS) if (expected.world.teamChoices[slot] !== actual.world.teamChoices[slot]) return `world.slot${slot}.team`;
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(expected.world, slot)) continue;
     const pose = firstFighterPoseDifference(expected.runtime.poses[slot], actual.runtime.poses[slot], expected.world, actual.world);

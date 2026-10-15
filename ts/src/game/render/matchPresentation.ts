@@ -272,7 +272,7 @@ export class MatchPresentation {
       this.placeResultPoses();
       if (this.resultFrames === LEVEL_UP_FRAME) {
         for (const [index, row] of this.resultView.rows.entries()) {
-          if (row.slot !== this.resultView.winnerSlot) continue;
+          if (!row.winner) continue;
           const placement = resultFighterPlacement(this.resultStage, index, this.resultView.rows.length);
           const burst = AddSpecialEffect("Abilities\\Spells\\Other\\Levelup\\LevelupCaster.mdx", this.origin.x + placement.x, this.origin.y);
           BlzSetSpecialEffectZ(burst, this.origin.z + placement.z);
@@ -341,7 +341,7 @@ export class MatchPresentation {
     for (const [index, row] of view.rows.entries()) {
       const pose = this.poses[row.slot];
       if (pose === undefined) continue;
-      const winning = row.slot === view.winnerSlot;
+      const winning = row.winner;
       let seconds = I2R(this.resultFrames) / 60.0;
       const holding = winning && !pose.repeatVictory && seconds >= pose.winnerClip.endSeconds - pose.winnerClip.startSeconds;
       const clip = winning ? holding ? pose.heldClip : pose.winnerClip : pose.idleClip;

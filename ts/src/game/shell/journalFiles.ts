@@ -126,7 +126,7 @@ export function devReceiptFile({ build, epoch, slot }: JournalIdentity, receipt:
     name: devCommandReceiptFile(build, slot),
     lines: [
       `SMASHCRAFT DEV v=1 build=${build} receipt=${receipt} epoch=${epoch} rb=${rollback} delay=${delay} batch=${batch} rematchSeconds=${rematchSeconds} `,
-      `SETUP phase=${game.phase} human-fighters=${game.humanFighterMask} computers=${game.computerMask} characters=${a},${b},${c},${d} stocks=${game.stockCount} minutes=${game.timeLimitMinutes} automatic-rematch=${game.automaticRematch ? 1 : 0} stage=${game.stageChoice} `,
+      `SETUP phase=${game.phase} human-fighters=${game.humanFighterMask} computers=${game.computerMask} characters=${a},${b},${c},${d} stocks=${game.stockCount} minutes=${game.timeLimitMinutes} automatic-rematch=${game.automaticRematch ? 1 : 0} team-battle=${game.teamBattle ? 1 : 0} friendly-fire=${game.friendlyFire ? 1 : 0} teams=${game.teamChoices.join(",")} stage=${game.stageChoice} `,
     ],
   };
 }

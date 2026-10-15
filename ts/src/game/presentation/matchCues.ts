@@ -2,13 +2,14 @@
 
 
 import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots, isParticipantSlot } from "../input/participants";
-import { MATCH_TICKS_PER_SECOND, type MatchState, Phase, humanFighterActive, keepsStocks } from "../match/rules";
+import { MATCH_TICKS_PER_SECOND, type MatchState, Phase, humanFighterActive, keepsStocks, winningMask } from "../match/rules";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { fighterName } from "../sim/heroes/registry";
 import { cpuOpponentSummary } from "../shell/messages";
 import { MatchCue } from "./matchAudio";
 import { ROSTER_MANA } from "../sim/mana";
+import { TEAM_NAMES } from "../sim/teams";
 import type { Character } from "../sim/codes";
 import { type CombatObservation, type CombatTally, clearCombatTally, createCombatObservation, createCombatTally, observeCombat, tallyCombat } from "./combatStats";
 
@@ -106,10 +107,10 @@ export function resultRows(game: Readonly<MatchState>, world: Readonly<Roster>, 
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;
     const fighter = fighterAt(world, slot);
-    const winner = game.winner === slot;
+    const winner = (winningMask(game) & (1 << slot)) !== 0;
     const stocks = game.endless ? "" : `Stocks ${fighter.status.stocks}  ·  `;
     const label = humanFighterActive(game, slot) ? `P${slot + 1}` : cpuOpponentSummary(game, slot).replace(`CPU ${slot + 1} · `, `P${slot + 1} · CPU `);
-    const text = `${winner ? "WINNER  " : ""}${label} · ${fighterName(fighter.character)}\n`
+    const text = `${winner ? "WINNER  " : ""}${label}${game.teamBattle ? ` · ${TEAM_NAMES[game.teamChoices[slot]]}` : ""} · ${fighterName(fighter.character)}\n`
       + `${stocks}Damage ${percent(fighter.status.damage)}  ·  KOs ${tally.kos[slot]}  ·  Falls ${tally.falls[slot]}`;
     const row = { slot, winner, text };
     if (winner) rows.unshift(row);

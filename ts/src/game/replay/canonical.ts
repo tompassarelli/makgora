@@ -1171,6 +1171,16 @@ function writeState(sink: StateSink, state: Readonly<ReplayState>): void {
   bool("match.hazards", match.hazards);
 
   int("match.winner", match.winner ?? -1);
+  if (match.teamBattle || match.friendlyFire || match.teamChoices[0] !== 0 || match.teamChoices[1] !== 1 || match.teamChoices[2] !== 0 || match.teamChoices[3] !== 1) {
+    bool("match.teamBattle", match.teamBattle);
+    bool("match.friendlyFire", match.friendlyFire);
+    for (const slot of PARTICIPANT_SLOTS) int(`match.slot${slot}.team`, match.teamChoices[slot]);
+  }
+  if (world.teamBattle || world.friendlyFire || world.teamChoices[0] !== 0 || world.teamChoices[1] !== 1 || world.teamChoices[2] !== 0 || world.teamChoices[3] !== 1) {
+    bool("world.teamBattle", world.teamBattle);
+    bool("world.friendlyFire", world.friendlyFire);
+    for (const slot of PARTICIPANT_SLOTS) int(`world.slot${slot}.team`, world.teamChoices[slot]);
+  }
   int("match.humanCount", match.humanCount);
   int("match.humanMask", match.humanMask);
   int("match.humanFighterMask", match.humanFighterMask);

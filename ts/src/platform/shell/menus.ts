@@ -6,7 +6,7 @@ import type { QuickStageSettings } from "../../game/shell/devSettings";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, isParticipantSlot } from "../../game/input/participants";
 import {
   Phase, changeStagePoolMode, changeStagePoolStage, canChooseComputer, cancelRematchCountdown, firstHumanSlot, characterFor, confirmRematch, cycleSlotMode, humanActive, recallCharacter,
-  requestStageSelect, requestStart, setAutomaticRematch, setCpuOpponent, setCpuTier, setEndless, setHitAreas, setPartnerDamage, setTraining, cycleMatchMode, stepClassicTier, stepLoreBattle, setItemsOn, setUltimatesOn, toggleItemKind, stepPartnerBehaviour,
+  setTeamBattle, setFriendlyFire, cycleTeam, requestStageSelect, requestStart, setAutomaticRematch, setCpuOpponent, setCpuTier, setEndless, setHitAreas, setPartnerDamage, setTraining, cycleMatchMode, stepClassicTier, stepLoreBattle, setItemsOn, setUltimatesOn, toggleItemKind, stepPartnerBehaviour,
   stepPartnerEscape, stepPartnerTech, stepTrainingSpeed, setTutorialLesson, tickRematchCountdown,
   returnToCharacters, selectCharacter, selectCpuCharacter, selectStage, setHazards, setMeterDropsOn, setStocks, setTimeLimit, updateConnectedHumans,
   type MatchState, copyMatchState, createMatchState, initializeComputerChoices, setParticipants,
@@ -229,6 +229,15 @@ export function panelActions(): PanelActions {
       }),
       changeTime: (participant, direction) => withSlot(participant, (s, slot) => {
         if (controlsAvailable(s, slot)) setTimeLimit(s.game, slot, s.game.timeLimitMinutes + direction);
+      }),
+      toggleTeamBattle: participant => withSlot(participant, (s, slot) => {
+        if (controlsAvailable(s, slot)) setTeamBattle(s.game, slot, !s.game.teamBattle);
+      }),
+      toggleFriendlyFire: participant => withSlot(participant, (s, slot) => {
+        if (controlsAvailable(s, slot)) setFriendlyFire(s.game, slot, !s.game.friendlyFire);
+      }),
+      changeTeam: (participant, fighter, direction) => withSlot(participant, (s, slot) => {
+        if (controlsAvailable(s, slot)) cycleTeam(s.game, slot, fighter, direction);
       }),
       toggleEndless: participant => withSlot(participant, (s, slot) => {
         if (controlsAvailable(s, slot)) setEndless(s.game, slot, !s.game.endless);

@@ -37,6 +37,9 @@ export function createReplaySnapshot(): ReplayState {
 export function copyReplayState(target: ReplayState, source: Readonly<ReplayState>): void {
   const mask = source.world.mask;
   target.world.mask = mask;
+  target.world.teamBattle = source.world.teamBattle;
+  target.world.friendlyFire = source.world.friendlyFire;
+  for (const slot of PARTICIPANT_SLOTS) target.world.teamChoices[slot] = source.world.teamChoices[slot];
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(source.world, slot)) continue;
     copyFighterState(fighterAt(target.world, slot), fighterAt(source.world, slot), mask);

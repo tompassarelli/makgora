@@ -1,3 +1,4 @@
+import { canHit } from "./teams";
 
 
 
@@ -16,7 +17,7 @@ export function travelBeforeBodies(world: Roster, slot: number, distance: number
   const ownRadius = ownBody.radius;
   const ownCenterZ = f32(f.motion.z + f32(f32(ownBody.z1 + ownBody.z2) * 0.5));
   for (let targetSlot = 0; targetSlot < PARTICIPANT_CAPACITY; targetSlot++) {
-    if (targetSlot === slot || !isActive(world, targetSlot)) continue;
+    if (!canHit(world, slot, targetSlot) || !isActive(world, targetSlot)) continue;
     const target = fighterAt(world, targetSlot);
     if ((!target.shield.raised && !stopsAtBody) || target.status.out) continue;
     const geometry = target.tuning.shield;

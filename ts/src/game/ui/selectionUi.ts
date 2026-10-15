@@ -1,7 +1,7 @@
 import { type SessionWinsFrames, createSessionWinsFrames, presentSessionWinsFrames } from "./sessionWinsFrames";
 import { definitiveCues } from "../render/specialCueEffects";
 import { nextMatchCharacter, selectableMatchCharacter } from "../match/rules";
-import { RULE_BUTTONS, RULE_HEIGHT, type RuleBox, type TrainingSetting, cpuSettingsBox } from "./ruleButtons";
+import { RULE_BUTTONS, RULE_HEIGHT, type RuleBox, type TrainingSetting, cpuSettingsBox, teamSettingsBox } from "./ruleButtons";
 import { RULE_HELP_HEIGHT, RULE_HELP_WIDTH, hoveredRule, ruleHelp, visibleRuleGroups } from "./ruleHelp";
 
 
@@ -23,6 +23,7 @@ import {
   allCharactersReady,
   canChooseComputer,
   canCycleSlotMode,
+  validTeams,
   characterFor,
   characterReady,
   fighterActive,
@@ -69,7 +70,8 @@ import { loreBattle, loreBattleSetting, loreBattleSummary } from "../classic/lor
 import { loreClears } from "../classic/loreClears";
 import { Character, ItemKind, itemBit } from "../sim/codes";
 import { TILE_PORTRAIT_SLOT, cardPortrait, tilePortrait } from "./portraitFrames";
-import { slotColor } from "./slotColors";
+import { TEAM_NAMES } from "../sim/teams";
+import { slotColor, teamColor } from "./slotColors";
 import { type TutorialButton, type TutorialMenuFrames, createTutorialMenu, markTutorialSeen, showTutorialLesson, tutorialSeen } from "./tutorialMenu";
 import { ButtonClicks, type MenuControls, bindSyncHandler, consoleUi, coverScreen, createBackdrop, createSyncTrigger, createText, gameUi, highlightText, placeTopLeft, setFrameText, sizeText } from "./frames";
 
@@ -83,6 +85,9 @@ export interface SelectionActions {
   start(participantId: number): void;
   changeStocks(participantId: number, direction: -1 | 1): void;
   changeTime(participantId: number, direction: -1 | 1): void;
+  toggleTeamBattle(participantId: number): void;
+  toggleFriendlyFire(participantId: number): void;
+  changeTeam(participantId: number, fighterSlot: number, direction: -1 | 1): void;
   toggleEndless(participantId: number): void;
   toggleAutomaticRematch(participantId: number): void;
   toggleItems(participantId: number): void;
@@ -100,13 +105,13 @@ export interface SelectionActions {
   closeTutorial(participantId: number): void;
 }
 
-type RuleButton = { kind: "stocks"; direction: -1 | 1 } | { kind: "time"; direction: -1 | 1 } | { kind: "endless" } | { kind: "automaticRematch" }
+type RuleButton = { kind: "teamBattle" } | { kind: "friendlyFire" } | { kind: "stocks"; direction: -1 | 1 } | { kind: "time"; direction: -1 | 1 } | { kind: "endless" } | { kind: "automaticRematch" }
   | { kind: "items" } | { kind: "ultimates" } | { kind: "itemKind"; item: ItemKind } | { kind: "training" } | { kind: "partner"; setting: TrainingSetting; direction: -1 | 1 } | { kind: "hitAreas" } | { kind: "speed" }
   | { kind: "classicTier"; direction: -1 | 1 };
-type SelectionButton = { kind: "tile"; tile: number } | { kind: "mode"; slot: number } | { kind: "cpuSettings"; slot: number } | { kind: "cpuStep"; row: 0 | 1; direction: -1 | 1 } | { kind: "cpuClose" } | { kind: "start" } | { kind: "settings" } | RuleButton
+type SelectionButton = { kind: "team"; slot: number } | { kind: "tile"; tile: number } | { kind: "mode"; slot: number } | { kind: "cpuSettings"; slot: number } | { kind: "cpuStep"; row: 0 | 1; direction: -1 | 1 } | { kind: "cpuClose" } | { kind: "start" } | { kind: "settings" } | RuleButton
   | { kind: "moves" } | { kind: "movesBack" } | { kind: "movesStep"; direction: -1 | 1 } | TutorialButton;
 
-type MenuFocus = { readonly kind: "fighter" | "settings"; readonly slot: number };
+type MenuFocus = { readonly kind: "fighter" | "settings" | "team" | "teamBattle" | "friendlyFire"; readonly slot: number };
 const titleCase = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
 function cpuCardSummary(game: Readonly<MatchState>, slot: number): string {
   return `CPU · ${titleCase(game.cpuOpponents[slot] ?? CPU_OPPONENT_DEFAULT)}\n${titleCase(game.cpuTiers[slot] ?? CPU_TIER_DEFAULT)}`;
@@ -117,6 +122,8 @@ interface CardFrames {
   readonly card: framehandle;
   readonly tag: framehandle;
   readonly mode: framehandle;
+  readonly team: framehandle;
+  readonly teamLabel: framehandle;
   readonly portrait: framehandle;
   readonly name: framehandle;
   readonly status: framehandle;
@@ -223,6 +230,8 @@ export class SelectionPanel {
   private shownMode = "";
   private readonly stockValue: framehandle;
   private readonly timeValue: framehandle;
+  private readonly teamToggle: framehandle;
+  private readonly friendlyFireToggle: framehandle;
   private readonly endlessToggle: framehandle;
   private readonly rematchToggle: framehandle;
   private readonly itemsToggle: framehandle;
@@ -314,6 +323,10 @@ export class SelectionPanel {
       BlzFrameSetSize(mode, modeArea.width, modeArea.height);
       this.clicks.add(mode, { kind: "mode", slot }, undefined, "native");
       const tag = label(mode, `MeleeTag${name}`, x + f32(0.014), f32(0.267), f32(0.132), f32(0.019), f32(0.01));
+      const teamArea = teamSettingsBox(slot);
+      const team = hotspot(root, teamArea.x, teamArea.y, teamArea.width, teamArea.height);
+      this.clicks.add(team, { kind: "team", slot }, undefined, "native");
+      const teamLabel = label(team, `MeleeTeam${name}`, teamArea.x, f32(0.267), teamArea.width, f32(0.019), f32(0.01));
       const portrait = art(root, `MeleePortrait${name}`, portraitTexture(Character.demonHunter, false, slot), x + f32(0.029), f32(0.245), f32(0.102), f32(0.102));
       const name_ = label(root, `MeleeName${name}`, x + f32(0.008), f32(0.102), f32(0.144), f32(0.019), f32(0.011));
       const wins = createSessionWinsFrames(root, name, f32(x + f32(0.054)), f32(0.081));
@@ -329,7 +342,7 @@ export class SelectionPanel {
       setFrameText(settingsLabel, "Opponent settings");
       this.clicks.add(settings, { kind: "cpuSettings", slot }, undefined, "native");
       const summary = label(root, `MeleeCpuSummary${name}`, x + f32(0.004), f32(0.139), f32(0.152), f32(0.031), f32(0.009));
-      return { card, tag, mode, portrait, name: name_, status, wins, chip, summary, settings, settingsLabel };
+      return { card, tag, mode, team, teamLabel, portrait, name: name_, status, wins, chip, summary, settings, settingsLabel };
     });
     this.hand = art(root, `MeleeHand${suffix}`, "war3mapImported\\SelectionHandPinch.tga", 0.0, 0.0, HAND_WIDTH, HAND_HEIGHT);
     BlzFrameSetLevel(this.hand, 30);
@@ -420,6 +433,8 @@ export class SelectionPanel {
     const valueWidth = moreStocks.x - valueX;
     this.stockValue = label(root, `MeleeRulesStocks${suffix}`, valueX, fewerStocks.y, valueWidth, RULE_HEIGHT, MENU_STYLE.headerSize);
     this.timeValue = label(root, `MeleeRulesTime${suffix}`, lessTime.x + lessTime.width, lessTime.y, moreTime.x - lessTime.x - lessTime.width, RULE_HEIGHT, MENU_STYLE.headerSize);
+    this.teamToggle = ruleButton(RULE_BUTTONS.teamBattle, { kind: "teamBattle" }, "");
+    this.friendlyFireToggle = ruleButton(RULE_BUTTONS.friendlyFire, { kind: "friendlyFire" }, "");
     this.endlessToggle = ruleButton(endless, { kind: "endless" }, "");
     this.rematchToggle = ruleButton(automaticRematch, { kind: "automaticRematch" }, "");
     this.itemsToggle = ruleButton(RULE_BUTTONS.items, { kind: "items" }, "");
@@ -456,7 +471,7 @@ export class SelectionPanel {
       ruleButton(harderClassic, { kind: "classicTier", direction: 1 }, "+"),
       this.classicTierValue, this.classicRoute,
     ];
-    this.matchRuleFrames = [...this.steps, this.stockValue, this.timeValue, this.endlessToggle, this.rematchToggle, this.itemsToggle, this.ultimatesToggle];
+    this.matchRuleFrames = [...this.steps, this.stockValue, this.timeValue, this.teamToggle, this.endlessToggle, this.rematchToggle, this.itemsToggle, this.ultimatesToggle];
     this.help = createBackdrop(`MeleeRuleHelp${suffix}`, root, 0);
     BlzFrameSetTexture(this.help, PANEL_TEXTURE, 0, true);
     BlzFrameSetSize(this.help, RULE_HELP_WIDTH, RULE_HELP_HEIGHT);
@@ -510,6 +525,9 @@ export class SelectionPanel {
       if (game === undefined || !selectableMatchCharacter(game, characterOfTile(button.tile))) return;
       if (this.ownsLocalClient()) this.sendPlacement({ slot: this.drag.held ?? this.participantId, tile: button.tile });
     }
+    else if (button.kind === "team") this.actions.changeTeam(this.participantId, button.slot, 1);
+    else if (button.kind === "teamBattle") this.actions.toggleTeamBattle(this.participantId);
+    else if (button.kind === "friendlyFire") this.actions.toggleFriendlyFire(this.participantId);
     else if (button.kind === "mode") this.actions.cycleMode(this.participantId, button.slot);
     else if (button.kind === "start") this.actions.start(this.participantId);
     else if (button.kind === "settings") this.actions.openSettings(this.participantId);
@@ -548,6 +566,7 @@ export class SelectionPanel {
     if (boxContains(SETTINGS_BOX, x, y)) return { kind: "settings" };
     if (this.drag.hover !== undefined) return { kind: "tile", tile: this.drag.hover };
     for (const slot of PARTICIPANT_SLOTS) {
+      if (game.teamBattle && fighterActive(game, slot) && boxContains(teamSettingsBox(slot), x, y)) return { kind: "team", slot };
       if (fighterActive(game, slot) && !humanFighterActive(game, slot) && boxContains(cpuSettingsBox(slot), x, y)) return { kind: "cpuSettings", slot };
       if (boxContains(modeBox(slot), x, y)) return { kind: "mode", slot };
     }
@@ -559,6 +578,7 @@ export class SelectionPanel {
     const tile = button?.kind === "tile" ? button.tile : undefined;
     for (let slot = 0; slot < this.cards.length; slot++) {
       const card = this.cards[slot];
+      if (card !== undefined) highlightText(card.teamLabel, button?.kind === "team" && button.slot === slot);
       if (card !== undefined) highlightText(card.tag, button?.kind === "mode" && button.slot === slot);
       if (card !== undefined) highlightText(card.settingsLabel, button?.kind === "cpuSettings" && button.slot === slot);
     }
@@ -639,6 +659,12 @@ export class SelectionPanel {
     for (const slot of PARTICIPANT_SLOTS) if (fighterActive(game, slot) && !humanFighterActive(game, slot)) {
       focus.push({ kind: "fighter", slot }, { kind: "settings", slot });
     }
+    if (!game.training && !game.classic && !game.lore) focus.push({ kind: "teamBattle", slot: this.participantId });
+    if (game.teamBattle) {
+      if (humanFighterActive(game, this.participantId)) focus.push({ kind: "team", slot: this.participantId });
+      for (const slot of PARTICIPANT_SLOTS) if (canChooseComputer(game, this.participantId, slot)) focus.push({ kind: "team", slot });
+      focus.push({ kind: "friendlyFire", slot: this.participantId });
+    }
     if (focus.length === 0) return false;
     let index = focus.findIndex(item => item.kind === this.menuFocus?.kind && item.slot === this.menuFocus.slot);
     if (index < 0) index = 0;
@@ -648,6 +674,13 @@ export class SelectionPanel {
     }
     const target = focus[index];
     if (target === undefined) return false;
+    if (target.kind === "teamBattle" || target.kind === "friendlyFire" || target.kind === "team") {
+      if (action !== Action.attack && action !== Action.moveLeft && action !== Action.moveRight) return false;
+      if (target.kind === "teamBattle") this.actions.toggleTeamBattle(this.participantId);
+      else if (target.kind === "friendlyFire") this.actions.toggleFriendlyFire(this.participantId);
+      else this.actions.changeTeam(this.participantId, target.slot, action === Action.moveLeft ? -1 : 1);
+      return true;
+    }
     if (target.kind === "settings") {
       if (action === Action.attack) this.openCpuSettings(target.slot);
       return action === Action.attack || action === Action.moveLeft || action === Action.moveRight;
@@ -843,7 +876,17 @@ export class SelectionPanel {
       const ready = characterReady(game, slot);
       const human = humanFighterActive(game, slot);
       const choice = characterFor(game, slot);
-      BlzFrameSetTexture(frames.card, `war3mapImported\\SelectionCard${active ? slotColor(slot).name : "Gray"}.tga`, 0, true);
+      const teamsShown = game.teamBattle && active;
+      const color = teamsShown ? teamColor(game.teamChoices[slot]) : slotColor(slot);
+      BlzFrameSetTexture(frames.card, `war3mapImported\\SelectionCard${teamsShown ? "Gray" : active ? color.name : "Gray"}.tga`, 0, true);
+      BlzFrameSetVertexColor(frames.card, teamsShown ? color.rgb | -16777216 : -1);
+      BlzFrameSetVisible(frames.team, teamsShown);
+      BlzFrameSetVisible(frames.teamLabel, teamsShown);
+      BlzFrameSetEnable(frames.team, teamsShown && (slot === participantId && human || canChooseComputer(game, participantId, slot)));
+      setFrameText(frames.teamLabel, `${this.menuFocus?.kind === "team" && this.menuFocus.slot === slot ? "> " : ""}${TEAM_NAMES[game.teamChoices[slot]]}`);
+      BlzFrameSetSize(frames.mode, game.teamBattle ? f32(0.078) : modeBox(slot).width, modeBox(slot).height);
+      placeTopLeft(frames.tag, f32(cardX(slot) + (game.teamBattle ? f32(0.006) : f32(0.014))), f32(0.267));
+      BlzFrameSetSize(frames.tag, game.teamBattle ? f32(0.068) : f32(0.132), f32(0.019));
       const focused = this.menuFocus?.kind === "fighter" && this.menuFocus.slot === slot;
       setFrameText(frames.tag, active ? `${focused ? "> " : ""}${human ? "Player" : "CPU"}${focused ? " <" : ""}` : "Empty");
       BlzFrameSetEnable(frames.mode, canCycleSlotMode(game, participantId, slot));
@@ -927,11 +970,13 @@ export class SelectionPanel {
     const { stockCount, timeLimitMinutes, endless, automaticRematch, training, trainer, items, classic, classicTier, lore, loreBattle: battle } = game;
     const clears = loreClears();
     const fighter = characterFor(game, this.participantId) ?? Character.rifleman;
-    const rules = `${lore ? "1" : "0"} ${I2S(battle)} ${I2S(clears.count())} ${classic ? "1" : "0"} ${I2S(classicTier)} ${I2S(fighter)} ${I2S(stockCount)} ${I2S(timeLimitMinutes)} ${endless ? "1" : "0"} ${automaticRematch ? "1" : "0"} ${training ? "1" : "0"} ${I2S(trainer.behaviour)} ${I2S(trainer.escape)} ${I2S(trainer.tech)} ${I2S(trainer.damage)} ${trainer.showHitAreas ? "1" : "0"} ${I2S(trainer.speed)} ${items.on ? "1" : "0"} ${game.ultimatesOff ? "1" : "0"} ${I2S(items.enabledMask)} ${I2S(trainer.lesson)}`;
+    const rules = `${lore ? "1" : "0"} ${I2S(battle)} ${I2S(clears.count())} ${classic ? "1" : "0"} ${I2S(classicTier)} ${I2S(fighter)} ${I2S(stockCount)} ${I2S(timeLimitMinutes)} ${endless ? "1" : "0"} ${automaticRematch ? "1" : "0"} ${training ? "1" : "0"} ${I2S(trainer.behaviour)} ${I2S(trainer.escape)} ${I2S(trainer.tech)} ${I2S(trainer.damage)} ${trainer.showHitAreas ? "1" : "0"} ${I2S(trainer.speed)} ${items.on ? "1" : "0"} ${game.ultimatesOff ? "1" : "0"} ${I2S(items.enabledMask)} ${I2S(trainer.lesson)} ${game.teamBattle ? "1" : "0"} ${game.friendlyFire ? "1" : "0"}`;
     if (rules === this.shownRules) return;
     this.shownRules = rules;
     setFrameText(this.stockValue, `${MENU_STYLE.gold}${stockSetting(stockCount)}|r`);
     setFrameText(this.timeValue, `${MENU_STYLE.gold}${timeSetting(timeLimitMinutes)}|r`);
+    setFrameText(this.teamToggle, `Team Battle: ${game.teamBattle ? "On" : "Off"}`);
+    setFrameText(this.friendlyFireToggle, `Friendly Fire: ${game.friendlyFire ? "On" : "Off"}`);
     setFrameText(this.endlessToggle, endlessSetting(endless));
     setFrameText(this.rematchToggle, automaticRematchSetting(automaticRematch));
     for (const step of this.steps) BlzFrameSetEnable(step, !endless);
@@ -958,6 +1003,7 @@ export class SelectionPanel {
     if (damage !== undefined) setFrameText(damage, partnerDamageSetting(trainer.damage));
     for (const frame of this.matchRuleFrames) BlzFrameSetVisible(frame, !training && !classic && !lore);
     for (const frame of this.itemToggles) BlzFrameSetVisible(frame, items.on && !training && !classic && !lore);
+    BlzFrameSetVisible(this.friendlyFireToggle, game.teamBattle && !training && !classic && !lore);
     for (const frame of this.trainingFrames) BlzFrameSetVisible(frame, training);
     for (const frame of this.classicFrames) BlzFrameSetVisible(frame, classic || lore);
   }
@@ -965,6 +1011,7 @@ export class SelectionPanel {
   private confirmText(game: Readonly<MatchState>): string {
     const journal = this.controls === "journal";
     if (hasUnassignedHuman(game)) return "Choose CPU or Empty";
+    if (!validTeams(game)) return "Choose at least two teams";
     if (allCharactersReady(game)) return journal ? "Start / Click" : "Start (Y) / Click";
     if (fighterMask(game) === 0) return "Add a fighter";
     return journal ? "Select [A] / Click" : "Place your chip / Click";

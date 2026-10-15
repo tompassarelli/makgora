@@ -1,3 +1,4 @@
+import { canHit } from "./teams";
 
 
 
@@ -109,7 +110,7 @@ export function advancePlacedObjects(world: Roster): void {
       }
       placeBody(placed, spec);
       for (let sourceSlot = 0; sourceSlot < PARTICIPANT_CAPACITY; sourceSlot++) {
-        if (sourceSlot === ownerSlot || !isActive(world, sourceSlot)) continue;
+        if (!canHit(world, sourceSlot, ownerSlot) || !isActive(world, sourceSlot)) continue;
         const source = fighterAt(world, sourceSlot);
         if (source.status.out) continue;
         const damage = f32(f32(normalStrike(placed, sourceSlot, source) + specialStrike(placed, sourceSlot, source)) + projectileStrikes(source));

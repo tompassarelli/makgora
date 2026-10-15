@@ -1,3 +1,4 @@
+import { canHit, sameTeam } from "./teams";
 
 
 
@@ -64,7 +65,7 @@ export function markedTarget(world: Roster, f: Readonly<Fighter>, range: number)
   for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
     if (!isActive(world, slot)) continue;
     const other = fighterAt(world, slot);
-    if (other === f || other.status.out || other.status.poisonFrames <= 0) continue;
+    if (other === f || sameTeam(world, world.fighters.indexOf(f), slot) || other.status.out || other.status.poisonFrames <= 0) continue;
     const dx = Math.abs(f32(other.motion.x - f.motion.x));
     if (dx > range || Math.abs(f32(other.motion.z - f.motion.z)) > range || (nearest !== undefined && dx >= distance)) continue;
     nearest = other;
@@ -275,7 +276,7 @@ function nearestFoe(world: Roster | undefined, owner: Readonly<Fighter>): Fighte
   for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
     if (!isActive(world, slot)) continue;
     const other = fighterAt(world, slot);
-    if (other === owner || other.status.out) continue;
+    if (other === owner || sameTeam(world, world.fighters.indexOf(owner), slot) || other.status.out) continue;
     const dx = Math.abs(f32(other.motion.x - owner.motion.x));
     if (nearest !== undefined && dx >= distance) continue;
     nearest = other;
@@ -329,7 +330,7 @@ function seekTargetSlot(world: Roster, owner: Readonly<Fighter>): number {
   for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
     if (!isActive(world, slot)) continue;
     const other = fighterAt(world, slot);
-    if (other === owner || other.status.out) continue;
+    if (other === owner || sameTeam(world, world.fighters.indexOf(owner), slot) || other.status.out) continue;
     const dx = f32(other.motion.x - owner.motion.x);
     const dz = f32(other.motion.z - owner.motion.z);
     const squared = f32(f32(dx * dx) + f32(dz * dz));
@@ -742,7 +743,7 @@ export function resolveHeroGuards(world: Roster): void {
     const guard = runningHeroSpecial(f)?.guard;
     if (guard === undefined || f.special.guarded || !inWindow(guard, f.special.frame + 1)) continue;
     for (let other = 0; other < PARTICIPANT_CAPACITY; other++) {
-      if (other === slot || !isActive(world, other) || !threatensBody(fighterAt(world, other), f)) continue;
+      if (!canHit(world, other, slot) || !isActive(world, other) || !threatensBody(fighterAt(world, other), f)) continue;
       guardSucceeds(f, guard);
       break;
     }

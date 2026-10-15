@@ -9,6 +9,7 @@ import { SPECIAL_INPUTS, fighterKit, normalName, specialName } from "../sim/move
 import { fighterName } from "../sim/heroes/registry";
 import { classicResultHelp, classicResultMessage, tierName } from "../classic/classicText";
 import { CPU_OPPONENT_DEFAULT, CPU_TIER_DEFAULT } from "../match/cpuProfiles";
+import { TEAM_NAMES } from "../sim/teams";
 import { loreBattle, loreResultHelp, loreResultMessage } from "../classic/loreBattles";
 
 
@@ -26,7 +27,7 @@ export function cpuOpponentSummary(game: Readonly<MatchState>, slot: number): st
 
 export function resultMessage(game: Readonly<MatchState>): string {
   if (game.run.active) return game.lore ? loreResultMessage(game) : classicResultMessage(game);
-  const winner = game.winner === undefined ? undefined : fighterLabel(game, game.winner);
+  const winner = game.winner === undefined ? undefined : game.teamBattle ? `${TEAM_NAMES[game.teamChoices[game.winner]]} Team` : fighterLabel(game, game.winner);
   if (game.interrupted) return winner === undefined ? "Match ended because a player left." : `${winner} wins by forfeit.`;
   if (winner !== undefined) return `${winner} wins!`;
   return game.timedOut ? "Time! Draw." : "Draw!";
@@ -77,7 +78,8 @@ export function rulesSummary(game: Readonly<MatchState>): string {
   if (game.training) return "Training · No time limit";
   if (practiceSelected(game)) return "Practice · No time limit";
   const rules = game.endless ? "Endless" : `${stockSetting(game.stockCount)}  ·  ${timeSetting(game.timeLimitMinutes)}`;
-  return game.automaticRematch ? `${rules}  ·  Automatic rematch` : rules;
+  const matchRules = game.teamBattle ? `Team Battle  ·  ${rules}  ·  Friendly Fire ${game.friendlyFire ? "On" : "Off"}` : rules;
+  return game.automaticRematch ? `${matchRules}  ·  Automatic rematch` : matchRules;
 }
 
 export const pausedMessage = (start: StartControl) => `Paused — press ${start} to resume.`;

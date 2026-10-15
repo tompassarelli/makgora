@@ -1,3 +1,4 @@
+import { canHit } from "./teams";
 
 import { max } from "../../runtime/numbers";
 import { f32 } from "wisp/src/sim/f32";
@@ -140,7 +141,7 @@ export function advanceFreezeTraps(world: Roster, stage: number, matchFrame: num
     let nearest: number | undefined;
     let distance = 0.0;
     for (let targetSlot = 0; targetSlot < PARTICIPANT_CAPACITY; targetSlot++) {
-      if (!isActive(world, targetSlot) || targetSlot === ownerSlot) continue;
+      if (!isActive(world, targetSlot) || !canHit(world, ownerSlot, targetSlot)) continue;
       const target = fighterAt(world, targetSlot);
       if (!trapCanContact(owner, target)) continue;
       const candidate = Math.abs(f32(target.motion.x - owner.freezeTrap.x));
@@ -187,7 +188,7 @@ export function advanceBear(world: Roster, ownerSlot: number, stage: number, mat
   if (bear.swipeCooldown <= 0) {
     let hit = false;
     for (let targetSlot = 0; targetSlot < PARTICIPANT_CAPACITY; targetSlot++) {
-      if (!isActive(world, targetSlot) || targetSlot === ownerSlot) continue;
+      if (!isActive(world, targetSlot) || !canHit(world, ownerSlot, targetSlot)) continue;
       const target = fighterAt(world, targetSlot);
       if (target.status.out || isIntangible(target) || Math.abs(f32(target.motion.x - bear.x)) > 70 || Math.abs(f32(target.motion.z - bear.z)) > 100) continue;
       hit = true;

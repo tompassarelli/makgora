@@ -1,3 +1,4 @@
+import { canHit } from "./teams";
 
 import { max } from "../../runtime/numbers";
 import { f32 } from "wisp/src/sim/f32";
@@ -56,6 +57,7 @@ export function applyAttackHit(
   world: Roster, attackerSlot: number, targetSlot: number, style: AttackStyle, facing: number,
   effect: Readonly<HitEffect>, directContact: boolean, shieldContact: boolean, status?: Readonly<AppliedStatus>, contactZ?: number,
 ): void {
+  if (attackerSlot !== targetSlot && !canHit(world, attackerSlot, targetSlot)) return;
   const target = fighterAt(world, targetSlot);
   if (style === AttackStyle.grab) {
     if (canBeGrabbed(target)) catchTarget(world, attackerSlot, targetSlot);

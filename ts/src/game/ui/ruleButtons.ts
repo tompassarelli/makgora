@@ -15,6 +15,8 @@ const stepBox = (x: number, y: number): RuleBox => ({ x, y, width: STEP_WIDTH, h
 const toggleBox = (x: number, y: number): RuleBox => ({ x, y, width: f32(0.178), height: RULE_HEIGHT });
 
 export const RULE_BUTTONS = {
+  teamBattle: { x: f32(0.055), y: f32(0.585), width: f32(0.14), height: RULE_HEIGHT },
+  friendlyFire: { x: f32(0.205), y: f32(0.585), width: f32(0.14), height: RULE_HEIGHT },
   fewerStocks: stepBox(f32(0.38), f32(0.585)),
   moreStocks: stepBox(f32(0.528), f32(0.585)),
   lessTime: stepBox(f32(0.572), f32(0.585)),
@@ -46,4 +48,8 @@ export type TrainingSetting = "behaviour" | "escape" | "tech" | "damage";
 
 export function cpuSettingsBox(slot: number): RuleBox {
   return { x: f32(f32(cardX(slot)) + f32(0.007)), y: f32(0.078), width: f32(0.146), height: f32(0.019) };
+}
+
+export function teamSettingsBox(slot: number): RuleBox {
+  return { x: f32(cardX(slot) + f32(0.08)), y: f32(0.271), width: f32(0.078), height: f32(0.026) };
 }

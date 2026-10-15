@@ -57,9 +57,9 @@ sweep("150 surprise-action traces: no computer input responds before its authore
         for (const game of [changed, quiet]) produceComputerInput(game.game, game.world, game.runtime, 0, frame, game.controls.inputs[0], game.controls.commands[0]);
         if (!sameControls(changed.controls.inputs[0], quiet.controls.inputs[0]) || !sameAttackBuffer(changed.controls.commands[0], quiet.controls.commands[0])) early++;
       }
-      assertEquals(perceivedOpponent(changed.runtime.botMemory, changed.own, 0, SURPRISE_FRAME + delay - 1, delay)?.motion.z, 0.0);
+      assertEquals(perceivedOpponent(changed.runtime.botMemory, changed.own, 0, SURPRISE_FRAME + delay - 1, delay, 15)?.motion.z, 0.0);
       observeOpponents(changed.runtime.botMemory, changed.world, SURPRISE_FRAME + delay);
-      const seen = assertDefined(perceivedOpponent(changed.runtime.botMemory, changed.own, 0, SURPRISE_FRAME + delay, delay));
+      const seen = assertDefined(perceivedOpponent(changed.runtime.botMemory, changed.own, 0, SURPRISE_FRAME + delay, delay, 15));
       assertEquals(seen.motion.x, changed.target.motion.x);
       assertEquals(seen.motion.z, changed.target.motion.z);
       assertEquals(seen.shield.raised, changed.target.shield.raised);

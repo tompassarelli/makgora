@@ -13,7 +13,7 @@ import { type FrameControls, createFrameControls } from "./controls";
 import type { PacingAndPresentation } from "./pacingAndPresentation";
 import { type MatchState, Phase, computerActive } from "./rules";
 import { produceComputerInput, repeatComputerInput } from "./botPlay";
-import { type EarlierFrame, type StepScope, observedFrameLegalActions, observedFrameStartedActions, stepMatch } from "./step";
+import { type EarlierFrame, type StepScope, observedFrameLegalActions, observedFrameStartedActions, stepMatch, configureMatchTeams } from "./step";
 import { latchPresses, releasePresses } from "./training";
 import { type ReplayState, copyReplayState } from "../replay/snapshot";
 import { type BotMemory, clearBotMemory, copyBotMemory, createBotMemory, firstBotMemoryDifference } from "./botPerception";
@@ -142,6 +142,7 @@ export interface RepeatedComputers {
 
 function prepareMatchFrame(row: MatchFrameInput, game: MatchState, world: Roster, controls: FrameControls, runtime: PacingAndPresentation, frame: number, repeated: RepeatedComputers | undefined): boolean {
   if (row.frame !== frame || frame !== runtime.simulationFrame + 1 || row.mask !== world.mask) return false;
+  configureMatchTeams(game, world);
   if (row.source !== "network") copyBotMemory(runtime.botMemory, row.botMemoryAfterInput);
   if (row.source !== "network") for (const slot of PARTICIPANT_SLOTS) copyBotStrategy(runtime.botStrategies[slot], row.botStrategiesAfterInput[slot]);
   for (const slot of PARTICIPANT_SLOTS) {

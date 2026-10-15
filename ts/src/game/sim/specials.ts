@@ -1,3 +1,4 @@
+import { canHit } from "./teams";
 
 
 
@@ -839,7 +840,7 @@ export function advanceSpecials(world: Roster, stage: number, matchFrame: number
     active[ownerSlot] = owner.special.action !== SpecialAction.none;
     if (!active[ownerSlot]) continue;
     for (let targetSlot = 0; targetSlot < PARTICIPANT_CAPACITY; targetSlot++) {
-      if (!isActive(world, targetSlot) || targetSlot === ownerSlot) continue;
+      if (!isActive(world, targetSlot) || !canHit(world, ownerSlot, targetSlot)) continue;
       contacts[ownerSlot * PARTICIPANT_CAPACITY + targetSlot] = isHeroSpecialAction(owner.special.action)
         ? heroSpecialContact(owner, fighterAt(world, targetSlot), specialAlreadyHit(owner, targetSlot))
         : demonHunterSpecialContact(owner, targetSlot, fighterAt(world, targetSlot));
@@ -849,7 +850,7 @@ export function advanceSpecials(world: Roster, stage: number, matchFrame: number
     if (!isActive(world, ownerSlot) || !active[ownerSlot]) continue;
     const owner = fighterAt(world, ownerSlot);
     for (let targetSlot = 0; targetSlot < PARTICIPANT_CAPACITY; targetSlot++) {
-      if (!isActive(world, targetSlot) || targetSlot === ownerSlot) continue;
+      if (!isActive(world, targetSlot) || !canHit(world, ownerSlot, targetSlot)) continue;
       const contact = at(contacts, ownerSlot * PARTICIPANT_CAPACITY + targetSlot);
       if (contact.window <= 0) continue;
       const target = fighterAt(world, targetSlot);

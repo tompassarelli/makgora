@@ -12,6 +12,8 @@ import { nextMatchSeed } from "./botRandom";
 import { CPU_OPPONENT_DEFAULT, CPU_TIERS, CPU_TIER_DEFAULT, type CpuOpponentChoice, type CpuOpponentId, type CpuTier, isCpuOpponentChoice, isCpuTier, resolveCpuOpponent } from "./cpuProfiles";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { type MatchItems, copyMatchItems, createMatchItems } from "./items";
+import { type Team } from "../sim/teams";
+import { f32 } from "wisp/src/sim/f32";
 import { STAGE_AT_REST } from "../sim/stage";
 
 import { type ConfiguredRun, copyConfiguredRun, createConfiguredRun } from "../classic/runState";
@@ -48,6 +50,9 @@ export interface MatchState {
   hazards: boolean;
 
   winner: ParticipantSlot | undefined;
+  teamBattle: boolean;
+  friendlyFire: boolean;
+  readonly teamChoices: Slots<Team>;
   stockCount: number;
   timeLimitMinutes: number;
 
@@ -94,6 +99,7 @@ export function createMatchState(): MatchState {
     cpuTiers: [CPU_TIER_DEFAULT, CPU_TIER_DEFAULT, CPU_TIER_DEFAULT, CPU_TIER_DEFAULT],
     cpuResolvedOpponents: [CPU_OPPONENT_DEFAULT, CPU_OPPONENT_DEFAULT, CPU_OPPONENT_DEFAULT, CPU_OPPONENT_DEFAULT],
     characterReadiness: [false, false, false, false], rematchReadiness: [false, false, false, false],
+    teamBattle: false, friendlyFire: false, teamChoices: [0, 1, 0, 1],
     departedMask: 0, interrupted: false, humanMask: 1, humanFighterMask: 1, humanCount: 1, computerMask: 0,
     stageChoice: 2, hazards: true, stageResolved: false, stagePool: createStagePool(), winner: undefined, stockCount: 3, timeLimitMinutes: 7, endless: false, automaticRematch: false, rematchCountdown: 0,
 
@@ -210,6 +216,8 @@ export function copyMatchState(target: MatchState, source: Readonly<MatchState>)
   target.hazards = source.hazards;
 
   target.winner = source.winner;
+  target.teamBattle = source.teamBattle;
+  target.friendlyFire = source.friendlyFire;
   target.stockCount = source.stockCount;
   target.timeLimitMinutes = source.timeLimitMinutes;
   target.endless = source.endless;
@@ -233,6 +241,7 @@ export function copyMatchState(target: MatchState, source: Readonly<MatchState>)
   copyConfiguredRun(target.run, source.run);
   for (const slot of PARTICIPANT_SLOTS) {
     target.characterChoices[slot] = source.characterChoices[slot];
+    target.teamChoices[slot] = source.teamChoices[slot];
     target.cpuOpponents[slot] = source.cpuOpponents[slot];
     target.cpuTiers[slot] = source.cpuTiers[slot];
     target.cpuResolvedOpponents[slot] = source.cpuResolvedOpponents[slot];
@@ -273,8 +282,25 @@ export function practiceSelected(game: Readonly<MatchState>): boolean {
   return game.humanCount === 1 && game.humanFighterMask === game.humanMask && !PARTICIPANT_SLOTS.some(slot => computerActive(game, slot) && game.characterReadiness[slot]);
 }
 
+export function validTeams(game: Readonly<MatchState>): boolean {
+  if (!game.teamBattle) return true;
+  let teams = 0;
+  for (const slot of PARTICIPANT_SLOTS) if (fighterActive(game, slot)) teams |= 1 << game.teamChoices[slot];
+  return teams !== 0 && (teams & (teams - 1)) !== 0;
+}
+
+export function winningMask(game: Readonly<MatchState>): number {
+  const winner = game.winner;
+  if (winner === undefined) return 0;
+  if (!game.teamBattle || game.run.active) return 1 << winner;
+  let mask = 0;
+  for (const slot of PARTICIPANT_SLOTS) if (fighterActive(game, slot) && !participantActive(game.departedMask, slot)
+    && game.teamChoices[slot] === game.teamChoices[winner]) mask |= 1 << slot;
+  return mask;
+}
+
 export function allCharactersReady(game: Readonly<MatchState>): boolean {
-  if (fighterMask(game) === 0 || hasUnassignedHuman(game)) return false;
+  if (fighterMask(game) === 0 || hasUnassignedHuman(game) || !validTeams(game)) return false;
   return !PARTICIPANT_SLOTS.some(slot => fighterActive(game, slot) && !game.characterReadiness[slot] && !(practiceSelected(game) && computerActive(game, slot)));
 }
 
@@ -330,6 +356,21 @@ export function returnToCharacters(game: MatchState, slot: number): void {
 
 const settingRules = (game: Readonly<MatchState>, slot: number): boolean => game.phase === Phase.characterMenu && humanActive(game, slot);
 
+export function setTeamBattle(game: MatchState, actor: number, on: boolean): void {
+  if (settingRules(game, actor) && !game.training && !game.classic && !game.lore) game.teamBattle = on;
+}
+
+export function setFriendlyFire(game: MatchState, actor: number, on: boolean): void {
+  if (settingRules(game, actor) && game.teamBattle) game.friendlyFire = on;
+}
+
+export function cycleTeam(game: MatchState, actor: number, slot: number, direction: number): void {
+  if (game.phase !== Phase.characterMenu || !game.teamBattle || !isParticipantSlot(slot) || !fighterActive(game, slot)
+    || !humanPresent(game, actor) || !(actor === slot && humanFighterActive(game, slot) || canChooseComputer(game, actor, slot))) return;
+  const team = floorMod(game.teamChoices[slot] + direction, 4);
+  if (team === 0 || team === 1 || team === 2 || team === 3) game.teamChoices[slot] = team;
+}
+
 export function setStocks(game: MatchState, slot: number, count: number): void {
   if (settingRules(game, slot) && count >= 1 && count <= 9) game.stockCount = count;
 }
@@ -346,6 +387,7 @@ export function setTraining(game: MatchState, slot: number, training: boolean): 
   if (!settingRules(game, slot)) return;
   game.training = training;
   if (training) {
+    game.teamBattle = false;
     game.classic = false;
     game.lore = false;
   }
@@ -360,6 +402,7 @@ export function setTutorialLesson(game: MatchState, slot: number, lesson: number
 
 export function cycleMatchMode(game: MatchState, slot: number): void {
   if (!settingRules(game, slot)) return;
+  game.teamBattle = false;
   if (game.lore) game.lore = false;
   else if (game.classic) {
     game.classic = false;
@@ -578,24 +621,25 @@ export function participantLeft(game: MatchState, slot: number, world: Roster): 
   game.interrupted = true;
   game.timedOut = false;
   game.winner = undefined;
-  let contenders = 0;
+  let survivor: ParticipantSlot | undefined;
+  let contested = false;
   for (const fighter of PARTICIPANT_SLOTS) {
     if (isActive(world, fighter) && !participantActive(game.departedMask, fighter) && fighterAt(world, fighter).status.stocks > 0) {
-      contenders++;
-      game.winner = fighter;
+      if (survivor !== undefined && (!game.teamBattle || game.teamChoices[survivor] !== game.teamChoices[fighter])) contested = true;
+      survivor = fighter;
     }
   }
-  if (contenders !== 1) game.winner = undefined;
+  game.winner = contested ? undefined : survivor;
   game.phase = Phase.result;
 }
 
 function resolveRemaining(game: MatchState, world: Roster): void {
-  let remaining = 0;
   let survivor: ParticipantSlot | undefined;
   for (const slot of PARTICIPANT_SLOTS) {
-    if (isActive(world, slot) && fighterAt(world, slot).status.stocks > 0) { remaining++; survivor = slot; }
+    if (!isActive(world, slot) || participantActive(game.departedMask, slot) || fighterAt(world, slot).status.stocks <= 0) continue;
+    if (survivor !== undefined && (!game.teamBattle || game.teamChoices[survivor] !== game.teamChoices[slot])) return;
+    survivor = slot;
   }
-  if (remaining > 1) return;
   game.winner = survivor;
   game.phase = Phase.result;
 }
@@ -610,6 +654,37 @@ export function advanceClock(game: MatchState, world: Roster): void {
   if (game.remainingFrames > 0) return;
   game.remainingFrames = 0;
   game.timedOut = true;
+  if (game.teamBattle) {
+    let best: ParticipantSlot | undefined;
+    let bestStocks = 0;
+    let bestDamage = 0.0;
+    let tied = false;
+    let seen = 0;
+    for (const slot of PARTICIPANT_SLOTS) {
+      if (!isActive(world, slot) || participantActive(game.departedMask, slot)) continue;
+      const team = game.teamChoices[slot];
+      const bit = 1 << team;
+      if ((seen & bit) !== 0) continue;
+      seen |= bit;
+      let stocks = 0;
+      let damage = 0.0;
+      for (const member of PARTICIPANT_SLOTS) {
+        if (!isActive(world, member) || participantActive(game.departedMask, member) || game.teamChoices[member] !== team) continue;
+        const fighter = fighterAt(world, member);
+        stocks += fighter.status.stocks;
+        if (fighter.status.stocks > 0) damage = f32(damage + fighter.status.damage);
+      }
+      if (best === undefined || stocks > bestStocks || stocks === bestStocks && damage < bestDamage) {
+        best = slot;
+        bestStocks = stocks;
+        bestDamage = damage;
+        tied = false;
+      } else if (stocks === bestStocks && damage === bestDamage) tied = true;
+    }
+    game.winner = tied ? undefined : best;
+    game.phase = Phase.result;
+    return;
+  }
   let best: ParticipantSlot | undefined;
   let tied = false;
   for (const slot of PARTICIPANT_SLOTS) {

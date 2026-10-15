@@ -1,3 +1,4 @@
+import { canHit } from "./teams";
 
 
 
@@ -126,6 +127,7 @@ export function collectDamageContact(
   kind: ContactKind, direct: boolean, throwInput: Readonly<Controls> | undefined, shieldContact: boolean,
   status?: Readonly<AppliedStatus>, contactZ?: number,
 ): void {
+  if (sourceSlot !== targetSlot && !canHit(world, sourceSlot, targetSlot)) return;
   const source = fighterAt(world, sourceSlot);
   const target = fighterAt(world, targetSlot);
   let contact = batch.contacts[batch.count];

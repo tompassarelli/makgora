@@ -1,3 +1,4 @@
+import { canHit, sameTeam } from "./teams";
 
 import { imod } from "wisp/src/sim/intMath";
 
@@ -232,7 +233,7 @@ function flyProjectile(world: Roster, ownerSlot: number, projectile: Projectile,
   let nearest: number | undefined;
   let distance = 0.0;
   for (let targetSlot = 0; targetSlot < PARTICIPANT_CAPACITY; targetSlot++) {
-    if (!isActive(world, targetSlot) || targetSlot === ownerSlot || targets.out[targetSlot] || targets.intangible[targetSlot]) continue;
+    if (!isActive(world, targetSlot) || !canHit(world, ownerSlot, targetSlot) || targets.out[targetSlot] || targets.intangible[targetSlot]) continue;
     const target = fighterAt(world, targetSlot);
     const targetX = at(targets.x, targetSlot);
     const centerZ = f32(at(targets.z, targetSlot) + TARGET_CENTER_HEIGHT);
@@ -298,7 +299,7 @@ function homeProjectile(world: Roster, ownerSlot: number, projectile: Projectile
   let aim: number | undefined;
   let distance = 0.0;
   for (let targetSlot = 0; targetSlot < PARTICIPANT_CAPACITY; targetSlot++) {
-    if (!isActive(world, targetSlot) || targetSlot === ownerSlot || targets.out[targetSlot]) continue;
+    if (!isActive(world, targetSlot) || !canHit(world, ownerSlot, targetSlot) || sameTeam(world, ownerSlot, targetSlot) || targets.out[targetSlot]) continue;
     const ahead = f32(f32(at(targets.x, targetSlot) - projectile.x) * direction);
     if (ahead < 0.0 || (aim !== undefined && ahead >= distance)) continue;
     aim = f32(at(targets.z, targetSlot) + TARGET_CENTER_HEIGHT);
@@ -337,7 +338,7 @@ function flyHeroProjectile(world: Roster, ownerSlot: number, projectile: Project
   let nearest: number | undefined;
   let distance = 0.0;
   for (let targetSlot = 0; targetSlot < PARTICIPANT_CAPACITY; targetSlot++) {
-    if (!isActive(world, targetSlot) || targetSlot === ownerSlot || targets.out[targetSlot] || targets.intangible[targetSlot]) continue;
+    if (!isActive(world, targetSlot) || !canHit(world, ownerSlot, targetSlot) || targets.out[targetSlot] || targets.intangible[targetSlot]) continue;
     const target = fighterAt(world, targetSlot);
     const body = hurtCapsule(target.character);
     const targetX = at(targets.x, targetSlot);
@@ -381,7 +382,7 @@ function strikeFromTrail(world: Roster, ownerSlot: number): void {
     trailPiece.radius = piece.spec.radius;
     for (let targetSlot = 0; targetSlot < PARTICIPANT_CAPACITY; targetSlot++) {
       const bit = 1 << targetSlot;
-      if ((struck & bit) !== 0 || !isActive(world, targetSlot) || targetSlot === ownerSlot || targets.out[targetSlot] || targets.intangible[targetSlot]) continue;
+      if ((struck & bit) !== 0 || !isActive(world, targetSlot) || !canHit(world, ownerSlot, targetSlot) || targets.out[targetSlot] || targets.intangible[targetSlot]) continue;
       const target = fighterAt(world, targetSlot);
       if (!capsulesIntersect(trailPiece, placeCapsule(heroTarget, hurtCapsule(target.character), at(targets.x, targetSlot), at(targets.z, targetSlot), target.facing))) continue;
       struck |= bit;

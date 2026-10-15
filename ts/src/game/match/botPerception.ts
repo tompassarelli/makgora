@@ -686,14 +686,14 @@ export function perceivedHeldFighter(memory: Readonly<BotMemory>, heldSlot: numb
 }
 
 /** The latest frame old enough to see; opponent selection also uses that observation. */
-export function perceivedOpponent(memory: Readonly<BotMemory>, own: Readonly<Fighter>, slot: ParticipantSlot, frame: number, delay: number): Readonly<Fighter> | undefined {
+export function perceivedOpponent(memory: Readonly<BotMemory>, own: Readonly<Fighter>, slot: ParticipantSlot, frame: number, delay: number, opponentMask: number): Readonly<Fighter> | undefined {
   const sample = perceivedFrame(memory, frame, delay);
   if (sample === undefined) return undefined;
   let nearest: Readonly<Fighter> | undefined;
   let distance = 0.0;
   for (const candidate of PARTICIPANT_SLOTS) {
     const target = sample.opponents[candidate];
-    if (candidate === slot || target === undefined || target.status.out || target.status.stocks <= 0) continue;
+    if (candidate === slot || (opponentMask & (1 << candidate)) === 0 || target === undefined || target.status.out || target.status.stocks <= 0) continue;
     const gap = Math.abs(f32(target.motion.x - own.motion.x));
     if (nearest === undefined || gap < distance) { nearest = target; distance = gap; }
   }

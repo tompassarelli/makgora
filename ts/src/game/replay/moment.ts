@@ -427,6 +427,7 @@ function rebindAuthoredKit(fighter: Fighter): void {
 export function savedState(record: Readonly<Record<string, unknown>>): ReplayState | undefined {
   const { mask, fighters, match, commands, runtime } = record;
   if (typeof mask !== "number" || !isList(fighters) || !isMatch(match) || !isCommands(commands) || !isRuntime(runtime)) return undefined;
+  const loadedMatch: MatchState = { ...match, teamBattle: match.teamBattle ?? false, friendlyFire: match.friendlyFire ?? false, teamChoices: match.teamChoices ?? [0, 1, 0, 1] };
   const world = createRoster(mask);
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;
@@ -436,8 +437,11 @@ export function savedState(record: Readonly<Record<string, unknown>>): ReplaySta
     initializeInfluenceOperands(fighter);
     world.fighters[slot] = fighter;
   }
+  world.teamBattle = loadedMatch.teamBattle && !loadedMatch.training && !loadedMatch.run.active;
+  world.friendlyFire = loadedMatch.friendlyFire;
+  for (const slot of PARTICIPANT_SLOTS) world.teamChoices[slot] = loadedMatch.teamChoices[slot];
   const strategies = runtime.botStrategies;
-  return { world, match, controls: { inputs: createFrameControls().inputs, commands }, runtime: { ...runtime,
+  return { world, match: loadedMatch, controls: { inputs: createFrameControls().inputs, commands }, runtime: { ...runtime,
     botStrategies: [restoredBotStrategy(strategies[0]), restoredBotStrategy(strategies[1]), restoredBotStrategy(strategies[2]), restoredBotStrategy(strategies[3])],
   } };
 }
