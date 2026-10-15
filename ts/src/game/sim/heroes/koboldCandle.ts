@@ -33,7 +33,7 @@ export const CANDLE_KICK_SPEED = 8.0;
 export const CANDLE_KICK_RISE = 4.0;
 export const CANDLE_FRICTION = 0.25;
 export const CANDLE_BODY_RADIUS = 12.0;
-export const CANDLE_BODY_HEIGHT = 30.0;
+export const CANDLE_BODY_HEIGHT = 50.0;
 
 export function candleLevel(f: Readonly<Fighter>): number {
   return min(CANDLE_MAX_LEVEL, idiv(f.candle.heat, CANDLE_LEVEL_HEAT));

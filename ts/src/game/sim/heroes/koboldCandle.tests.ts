@@ -307,6 +307,22 @@ test("a rival Kobold's jab kicks Kobold's resting candle 128 units along the dec
   assertEquals(candle.heat, 150);
 });
 
+test("Dreadlord's standing forward tilt kicks Kobold's resting candle [k1 scenario]", () => {
+  const { world, candle, step } = fallenCandle([createFighter(Character.dreadlord, 300.0, -1)]);
+  assertEquals(candle.state, CandleState.resting);
+  const from = candle.x;
+  const kicker = besideCandle(world, 1, from, 1);
+  assertTrue(kicker.motion.grounded);
+  beginFighterAttack(world, 1, AttackStyle.forwardTilt, false);
+  step(30);
+  settle(candle, step);
+  assertEquals(candle.struck[1], kicker.attack.serial);
+  assertGreaterThan(candle.x, from);
+  assertEquals(candle.state, CandleState.resting);
+  assertEquals(candle.heat, 150);
+  assertEquals(candle.snuffSerial, 0);
+});
+
 test("a rival Kobold's down tilt stamps out the candle where it lies, taking its heat and restarting its untouched timer [k1 scenario]", () => {
   const { world, candle, step } = fallenCandle([createFighter(Character.kobold, 300.0, -1)]);
   const from = candle.x;
