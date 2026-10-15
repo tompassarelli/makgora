@@ -14,6 +14,12 @@ fn main() {
 mod linux {
     #![allow(unsafe_code)]
 
+    #[allow(dead_code)]
+    mod controller_contract {
+        include!(concat!(env!("OUT_DIR"), "/controller_contract.rs"));
+    }
+    use controller_contract::*;
+
     #[cfg(test)]
     mod pad_contract_tests {
         include!("pad_contract_tests.rs");
@@ -44,22 +50,6 @@ mod linux {
     const START_SEAL_TIMEOUT: Duration = Duration::from_secs(2);
     const LAST_FRAME: u32 = 2_147_483_646;
     const ALPHABET: &[u8; 64] = b"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_";
-    const MOVE_LEFT: u32 = 1 << 0;
-    const MOVE_RIGHT: u32 = 1 << 1;
-    const MOVE_DOWN: u32 = 1 << 2;
-    const MOVE_UP: u32 = 1 << 3;
-    const JUMP: u32 = 1 << 4;
-    const SHORT_HOP: u32 = 1 << 16;
-    const ATTACK: u32 = 1 << 5;
-    const SPECIAL: u32 = 1 << 6;
-    const GRAB: u32 = 1 << 7;
-    const LEFT_TRIGGER: u32 = 1 << 8;
-    const RIGHT_TRIGGER: u32 = 1 << 9;
-    const SMASH_LEFT: u32 = 1 << 10;
-    const SMASH_RIGHT: u32 = 1 << 11;
-    const SMASH_UP: u32 = 1 << 12;
-    const SMASH_DOWN: u32 = 1 << 13;
-    const WALK: u32 = 1 << 14;
     const LT_SOURCE: u32 = 1 << 30;
     const RT_SOURCE: u32 = 1 << 31;
     const EVIOCSCLOCKID: libc::c_ulong = 0x4004_45a0;
@@ -1376,7 +1366,7 @@ mod linux {
             let (_, menu_y) = melee_stick(physical.x, physical.y);
             let buttons = physical.sources & ((1 << 0) | (1 << 2) | (1 << 5))
                 | if menu_y < 0 { 1 << 8 } else if menu_y > 0 { 1 << 9 } else { 0 };
-            let moving = x != 0 || y != 0 || physical.lt > 4_000 || physical.rt > 4_000
+            let moving = x != 0 || y != 0 || physical.lt > TRIGGER_PRESS_LEVEL || physical.rt > TRIGGER_PRESS_LEVEL
                 || physical.sources & ((1 << 1) | (1 << 4)) != 0;
             if !active {
                 self.armed = false;
@@ -1399,8 +1389,8 @@ mod linux {
                 self.next_motion_ns = now_ns + 33_333_334;
                 if x < 0 { keys.push('j'); } else if x > 0 { keys.push('l'); }
                 if y < 0 { keys.push('i'); } else if y > 0 { keys.push('k'); }
-                if physical.lt > 4_000 { keys.push('-'); }
-                if physical.rt > 4_000 { keys.push('='); }
+                if physical.lt > TRIGGER_PRESS_LEVEL { keys.push('-'); }
+                if physical.rt > TRIGGER_PRESS_LEVEL { keys.push('='); }
                 if physical.sources & (1 << 4) != 0 { keys.push('o'); }
                 if physical.sources & (1 << 1) != 0 { keys.push('p'); }
             }
@@ -1436,7 +1426,7 @@ mod linux {
                 let buttons: Vec<char> = [(physical.sources & 1 != 0, 'n'), (physical.sources & 4 != 0, 'u'), (physical.sources & 32 != 0, 'h'), (menu_y < 0, ' '), (menu_y > 0, 'e')]
                     .into_iter().filter(|(down, _)| *down).map(|(_, key)| key).collect();
                 let held: u32 = buttons.iter().map(|key| 1 << "nuh e".find(*key).unwrap()).sum();
-                let motion: String = [(x < 0, 'j'), (x > 0, 'l'), (y < 0, 'i'), (y > 0, 'k'), (physical.lt > 4_000, '-'), (physical.rt > 4_000, '='), (physical.sources & 16 != 0, 'o'), (physical.sources & 2 != 0, 'p')]
+                let motion: String = [(x < 0, 'j'), (x > 0, 'l'), (y < 0, 'i'), (y > 0, 'k'), (physical.lt > TRIGGER_PRESS_LEVEL, '-'), (physical.rt > TRIGGER_PRESS_LEVEL, '='), (physical.sources & 16 != 0, 'o'), (physical.sources & 2 != 0, 'p')]
                     .into_iter().filter(|(down, _)| *down).map(|(_, key)| key).collect();
                 let expected = if !active {
                     armed = false;
@@ -2314,10 +2304,11 @@ mod linux {
                     Control::Lt => LT_SOURCE, Control::Rt => RT_SOURCE, _ => return None,
                 };
                 let Press::Key(key) = binding.press else { return None };
-                let action = match key.as_str() {
-                    "n" => ATTACK, "u" => SPECIAL, "z" => JUMP, "i" => SHORT_HOP, "o" => GRAB, "p" => WALK,
-                    "q" | "a" | "7" if source == LT_SOURCE => LEFT_TRIGGER,
-                    "q" | "a" | "7" | "g" => RIGHT_TRIGGER,
+                let &(_, action) = STANDARD_KEYS.iter().find(|(name, _)| *name == key.as_str())?;
+                let action = match action {
+                    ATTACK | SPECIAL | JUMP | SHORT_HOP | GRAB | WALK => action,
+                    LEFT_TRIGGER | RIGHT_TRIGGER | LIGHT_SHIELD if source == LT_SOURCE && key != "g" => LEFT_TRIGGER,
+                    LEFT_TRIGGER | RIGHT_TRIGGER | LIGHT_SHIELD => RIGHT_TRIGGER,
                     _ => return None,
                 };
                 Some((source, action))
@@ -2327,7 +2318,7 @@ mod linux {
     }
 
     fn action_state(s: State) -> u32 {
-        let sources = s.sources | if s.lt > 4_000 { LT_SOURCE } else { 0 } | if s.rt > 4_000 { RT_SOURCE } else { 0 };
+        let sources = s.sources | if s.lt > TRIGGER_PRESS_LEVEL { LT_SOURCE } else { 0 } | if s.rt > TRIGGER_PRESS_LEVEL { RT_SOURCE } else { 0 };
         let mut held = button_bits(s.preset).iter().filter(|(source, _)| sources & source != 0).fold(0, |held, (_, action)| held | action);
         let (x, y) = melee_stick(s.x, s.y);
         if padbridge::stick::tap_jump(y, s.tap_jump, held & WALK != 0, held & (LEFT_TRIGGER | RIGHT_TRIGGER) != 0) {

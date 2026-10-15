@@ -1,15 +1,22 @@
 import { expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
 import { Schema } from "effect";
+import { CONTROLLER_CONTRACT_PATH, controllerContractText } from "../codegen/controllerContract";
 import { Action } from "../src/game/input/actions";
 import { actionFor, decodeBindings, presetBindings, slotIndex } from "../src/game/input/keyBindings";
 
 const Rows = Schema.Array(Schema.Struct({ key: Schema.String, action: Schema.String, label: Schema.String }));
-const actions: Readonly<Record<string, readonly Action[]>> = {
-  attack: [Action.attack], special: [Action.special], jump: [Action.jump], grab: [Action.grab],
-  shield: [Action.leftTrigger, Action.rightTrigger], rightTrigger: [Action.rightTrigger], lightShield: [Action.lightShield], shortHop: [Action.shortHop],
-  meter: [Action.meter], moveLeft: [Action.moveLeft], moveRight: [Action.moveRight], moveUp: [Action.moveUp], moveDown: [Action.moveDown],
-  smashLeft: [Action.smashLeft], smashRight: [Action.smashRight], smashUp: [Action.smashUp], smashDown: [Action.smashDown],
+const contract = Schema.decodeUnknownSync(Schema.Struct({ actions: Schema.Array(Schema.Struct({ name: Schema.String, bit: Schema.Number })) }))(JSON.parse(readFileSync(CONTROLLER_CONTRACT_PATH, "utf8")));
+const shield: readonly Action[] = [Action.leftTrigger, Action.rightTrigger];
+const actionsOf = (name: string): readonly number[] | undefined => {
+  if (name === "shield") return shield;
+  const action = contract.actions.find((entry) => entry.name === name);
+  return action === undefined ? undefined : [action.bit];
 };
+
+test("contracts/controller.json is the controller contract the TS sources produce [k5 boundary controller-contract]", () => {
+  expect(JSON.parse(readFileSync(CONTROLLER_CONTRACT_PATH, "utf8"))).toEqual(JSON.parse(controllerContractText()));
+});
 
 test("upstream pad keys reach labelled actions in defaults and sanitized K1 upgrades [k2 property]", () => {
   const rows = process.env.WC3_BINDING_ROWS === undefined
@@ -30,7 +37,7 @@ test("upstream pad keys reach labelled actions in defaults and sanitized K1 upgr
     for (const [name, bindings] of [["standard", presetBindings("standard")], ["custom", presetBindings("custom")], ["K1", upgraded]] as const) {
       for (const row of rows) {
         if (row.action === "start") continue;
-        const expected = actions[row.action];
+        const expected = actionsOf(row.action);
         if (expected === undefined) throw new Error(`unknown contract map action ${row.action}`);
         const key = row.key === "space" ? 32 : row.key.toUpperCase().charCodeAt(0);
         if (name === "K1" && key === slots[secondary]) continue;

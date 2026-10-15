@@ -95,14 +95,18 @@ export function rebind(bindings: KeyBindings, action: Action, slot: KeySlot, key
 const CURRENT_SAVE = "K9";
 const SAVED_SLOTS: Readonly<Record<string, number>> = { K1: 28, K2: 30, K3: 30, K4: KEY_SLOT_COUNT - 2, K5: KEY_SLOT_COUNT - 2, K6: KEY_SLOT_COUNT, K7: KEY_SLOT_COUNT, K8: KEY_SLOT_COUNT, [CURRENT_SAVE]: KEY_SLOT_COUNT };
 const DIGITS = "0123456789";
+const SAVED_KEY_DIGITS = 3;
+const SKIPPED_ON_LOAD = code("Y");
+
+export const SAVED_BINDING_FORMAT = { version: CURRENT_SAVE, slots: SAVED_SLOTS, keyDigits: SAVED_KEY_DIGITS, empty: EMPTY, skippedOnLoad: SKIPPED_ON_LOAD, reservedKeys: RESERVED_KEYS } as const;
 
 export function encodeBindings({ keys }: Readonly<KeyBindings>): string {
-  return CURRENT_SAVE + keys.map((key) => String(key).padStart(3, "0")).join("");
+  return CURRENT_SAVE + keys.map((key) => String(key).padStart(SAVED_KEY_DIGITS, "0")).join("");
 }
 
 function readKey(saved: string, offset: number): number | undefined {
   let value = 0;
-  for (let i = offset; i < offset + 3; i++) {
+  for (let i = offset; i < offset + SAVED_KEY_DIGITS; i++) {
     const digit = DIGITS.indexOf(saved.charAt(i));
     if (digit < 0) return undefined;
     value = value * 10 + digit;
@@ -155,14 +159,14 @@ function upgradeDefaults(bindings: KeyBindings, version: string): void {
 export function decodeBindings(saved: string): KeyBindings | undefined {
   const version = saved.slice(0, 2);
   const slots = SAVED_SLOTS[version];
-  if (slots === undefined || saved.length !== 2 + 3 * slots) return undefined;
+  if (slots === undefined || saved.length !== 2 + SAVED_KEY_DIGITS * slots) return undefined;
   const keys: number[] = [];
   for (let index = 0; index < KEY_SLOT_COUNT; index++) keys[index] = EMPTY;
   for (let index = 0; index < slots; index++) {
-    const key = readKey(saved, 2 + index * 3);
+    const key = readKey(saved, 2 + index * SAVED_KEY_DIGITS);
     if (key === undefined) return undefined;
 
-    if (key !== code("Y") && !bindSlot(keys, index, key)) return undefined;
+    if (key !== SKIPPED_ON_LOAD && !bindSlot(keys, index, key)) return undefined;
   }
   const bindings = { keys };
   if (version !== CURRENT_SAVE) upgradeDefaults(bindings, version);

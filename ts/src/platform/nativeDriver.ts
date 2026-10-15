@@ -11,6 +11,7 @@ import { reproFile } from "wisp/src/runtime/repro";
 import { installNativeDriver, startNativeDriver, serviceNativeDriver, publishNativeDriverStatus } from "wisp/src/platform/nativeDriver";
 import { squareRootFloat32 } from "wisp/src/sim/binary32";
 import { f32 } from "wisp/src/sim/f32";
+import { DASH_STICK_THRESHOLD, STICK_DEADZONE, TAP_JUMP_STICK_THRESHOLD, TRIGGER_FULL_LEVEL, TRIGGER_PRESS_LEVEL } from "../game/sim/stickZones";
 import { finishInputTrace } from "./shell/trace";
 import { confirmedChecksum, startInputTrace } from "./shell/diagnostics";
 import { pauseMatchPresentation } from "./shell/view";
@@ -115,7 +116,7 @@ function parseScript(text: string): { readonly setup: string; readonly edges: re
 function stick(x: number, z: number): readonly [number, number] {
   const radius = squareRootFloat32(f32(f32(x * x) + f32(z * z)));
   if (radius > 1.0) { x = f32(x / radius); z = f32(z / radius); }
-  return [Math.abs(x) <= f32(0.28) ? 0.0 : x, Math.abs(z) <= f32(0.28) ? 0.0 : z];
+  return [Math.abs(x) <= STICK_DEADZONE ? 0.0 : x, Math.abs(z) <= STICK_DEADZONE ? 0.0 : z];
 }
 function padSample(pad: Pad): void {
   const [x = 0.0, z = 0.0] = stick(pad.x, pad.z);
@@ -127,11 +128,11 @@ function padSample(pad: Pad): void {
   set(Action.special, (pad.buttons & 4) !== 0);
   set(Action.walk, (pad.buttons & 16) !== 0);
   set(Action.grab, (pad.buttons & 32) !== 0);
-  set(Action.leftTrigger, pad.shield > f32(4000.0 / 32767.0));
+  set(Action.leftTrigger, pad.shield > f32(TRIGGER_PRESS_LEVEL / TRIGGER_FULL_LEVEL));
   set(Action.moveLeft, x < 0.0); set(Action.moveRight, x > 0.0);
-  set(Action.moveDown, z <= -f32(0.6625)); set(Action.moveUp, z > 0.0);
-  set(Action.smashLeft, cx <= -f32(0.8)); set(Action.smashRight, cx >= f32(0.8));
-  set(Action.smashDown, cz <= -f32(0.6625)); set(Action.smashUp, cz >= f32(0.6625));
+  set(Action.moveDown, z <= -TAP_JUMP_STICK_THRESHOLD); set(Action.moveUp, z > 0.0);
+  set(Action.smashLeft, cx <= -DASH_STICK_THRESHOLD); set(Action.smashRight, cx >= DASH_STICK_THRESHOLD);
+  set(Action.smashDown, cz <= -TAP_JUMP_STICK_THRESHOLD); set(Action.smashUp, cz >= TAP_JUMP_STICK_THRESHOLD);
   sampleNativeKeys(pad.capture, held, x, z);
 }
 

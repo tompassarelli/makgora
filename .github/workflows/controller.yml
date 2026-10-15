@@ -6,6 +6,7 @@ on:
     branches-ignore: ["farm/**"]
     paths:
       - "controller/**"
+      - "contracts/controller.json"
       - ".github/workflows/controller.yml"
 
 permissions:
