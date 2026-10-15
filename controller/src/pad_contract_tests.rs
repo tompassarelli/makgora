@@ -16,9 +16,10 @@ fn contract() -> &'static [Preset] {
             Some(path) => PathBuf::from(path),
             None => {
                 let metadata = std::process::Command::new("cargo")
-                    .args(["metadata", "--locked", "--offline", "--format-version=1"])
+                    .args(["metadata", "--locked", "--offline", "--format-version=1", "--filter-platform"])
+                    .arg(format!("{}-unknown-linux-gnu", std::env::consts::ARCH))
                     .current_dir(env!("CARGO_MANIFEST_DIR")).output().unwrap();
-                assert!(metadata.status.success(), "cannot resolve the pinned controller contract");
+                assert!(metadata.status.success(), "cannot resolve the pinned controller contract: {}", String::from_utf8_lossy(&metadata.stderr));
                 let metadata: serde_json::Value = serde_json::from_slice(&metadata.stdout).unwrap();
                 let package = metadata["packages"].as_array().unwrap().iter()
                     .find(|package| package["name"] == "padbridge").unwrap();
