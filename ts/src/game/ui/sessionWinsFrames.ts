@@ -16,7 +16,7 @@ export function createSessionWinsFrames(parent: framehandle, name: string, x: nu
   BlzFrameSetEnable(coin, false);
   const count = createText(`MeleeWinCount${name}`, parent, 0);
   placeTopLeft(count, f32(x + f32(0.017)), y);
-  sizeText(count, f32(0.01), f32(0.036), f32(0.014));
+  sizeText(count, f32(0.009), f32(0.036), f32(0.012));
   BlzFrameSetTextAlignment(count, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
   BlzFrameSetEnable(count, false);
   BlzFrameSetVisible(coin, false);
