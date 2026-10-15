@@ -29,6 +29,11 @@ export const CANDLE_FALL_SPEED = 8.0;
 export const CANDLE_TOUCH_REACH = 30.0;
 const CANDLE_TOUCH_HEIGHT = melee(10.0);
 export const CANDLE_BARE_VARIANT = 4;
+export const CANDLE_KICK_SPEED = 8.0;
+export const CANDLE_KICK_RISE = 4.0;
+export const CANDLE_FRICTION = 0.25;
+export const CANDLE_BODY_RADIUS = 12.0;
+export const CANDLE_BODY_HEIGHT = 30.0;
 
 export function candleLevel(f: Readonly<Fighter>): number {
   return min(CANDLE_MAX_LEVEL, idiv(f.candle.heat, CANDLE_LEVEL_HEAT));
@@ -63,7 +68,32 @@ export function dropCandle(f: Fighter): void {
   candle.surface = undefined;
   candle.timer = CANDLE_UNTOUCHED_FRAMES;
   candle.away = 0;
+  candle.specialStruck = 0;
   candle.dropSerial++;
+}
+
+export function candleLoose(f: Readonly<Fighter>): boolean {
+  return f.candle.state === CandleState.airborne || f.candle.state === CandleState.resting;
+}
+
+export function kickCandle(f: Fighter, direction: number): void {
+  const candle = f.candle;
+  candle.vx = f32(direction * CANDLE_KICK_SPEED);
+  if (candle.state === CandleState.airborne) candle.vz = CANDLE_KICK_RISE;
+  candle.timer = CANDLE_UNTOUCHED_FRAMES;
+}
+
+export function snuffCandle(f: Fighter): void {
+  const candle = f.candle;
+  candle.heat = 0;
+  candle.lit = false;
+  candle.vx = 0.0;
+  candle.timer = CANDLE_UNTOUCHED_FRAMES;
+  candle.snuffSerial++;
+}
+
+function slowCandle(candle: Fighter["candle"]): void {
+  candle.vx = candle.vx > 0.0 ? max(0.0, f32(candle.vx - CANDLE_FRICTION)) : min(0.0, f32(candle.vx + CANDLE_FRICTION));
 }
 
 function holdCandle(f: Fighter): void {
@@ -135,7 +165,8 @@ export function advanceCandleBodies(world: Roster, stage: number, frame: number)
     const candle = fighterAt(world, slot).candle;
     if (candle.state === CandleState.resting && candle.surface !== undefined) {
       const surface = candle.surface;
-      candle.x = f32(candle.x + surfaceShiftX(stage, surface, frame));
+      candle.x = f32(f32(candle.x + surfaceShiftX(stage, surface, frame)) + candle.vx);
+      slowCandle(candle);
       if (candle.x >= surfaceLeft(stage, surface, frame) && candle.x <= surfaceRight(stage, surface, frame)) {
         candle.z = surfaceZAt(stage, surface, frame, candle.x);
         continue;

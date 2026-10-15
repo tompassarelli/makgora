@@ -1,11 +1,12 @@
 import { f32 } from "wisp/src/sim/f32";
 import { assertEquals, assertFalse, assertGreaterThan, assertNear, assertTrue, test } from "wisp/src/runtime/testing";
-import { CandleState, Character, ContactKind, SpecialAction } from "../codes";
+import { AttackStyle, CandleState, Character, ContactKind, SpecialAction } from "../codes";
+import { beginFighterAttack } from "../attacks";
 import { collectDamageContact } from "../contacts";
 import { type Fighter, createFighter } from "../fighter";
 import { runningHeroSpecial } from "../specials/engine";
 import { type Controls, type Roster, createRoster, fighterAt } from "../roster";
-import { mainDeckZAt, surfaceLeft, surfaceRight, surfaceZAt } from "../stage";
+import { mainDeckRight, mainDeckZAt, surfaceLeft, surfaceRight, surfaceZAt } from "../stage";
 import { duelPair, stepDuel } from "../testDuel";
 import { contactBatch, controls, hitEffect } from "../testWorld";
 import { Phase } from "../../match/rules";
@@ -13,7 +14,7 @@ import { stepMatch } from "../../match/step";
 import { firstFighterDifference } from "../../replay/difference";
 import { copyReplayState, createReplaySnapshot } from "../../replay/snapshot";
 import { max } from "../../core/numbers";
-import { CANDLE_DROP_KNOCKBACK, CANDLE_GUARD_FRAMES, CANDLE_HEAT_PER_DAMAGE, CANDLE_LEVEL_HEAT, CANDLE_UNTOUCHED_FRAMES, advanceCandleBodies, candleLevel } from "./koboldCandle";
+import { CANDLE_DROP_KNOCKBACK, CANDLE_GUARD_FRAMES, CANDLE_HEAT_PER_DAMAGE, CANDLE_LEVEL_HEAT, CANDLE_UNTOUCHED_FRAMES, CANDLE_AWAY_FRAMES, CANDLE_KICK_SPEED, advanceCandleBodies, candleLevel } from "./koboldCandle";
 
 test("Kobold's candle gains 8 heat per whole percent he lands, at most 75 a hit, burns down 1 every third frame and goes out with his stock [k3 measure docs/design/roster.md]", () => {
   const state = { ...createReplaySnapshot(), world: createRoster(3, [createFighter(Character.kobold, -100.0, 1), createFighter(Character.rifleman, 100.0, -1)]) };
@@ -270,4 +271,145 @@ test("a candle resting on a sliding deck rides along with it instead of falling 
     assertEquals(candle.state, CandleState.resting, `frame ${frame}`);
     assertNear(candle.x, centre(frame), f32(0.01));
   }
+});
+
+function fallenCandle(foes: Fighter[], heat = 150) {
+  const match = candleMatch([createFighter(Character.kobold, -100.0, 1), ...foes]);
+  const kobold = fighterAt(match.world, 0);
+  kobold.candle.heat = heat;
+  contactBatch(match.world, () => strike(match.world, 1, 0, CANDLE_DROP_KNOCKBACK + 1.0));
+  match.step(40);
+  return { ...match, kobold, candle: kobold.candle };
+}
+
+function besideCandle(world: Roster, slot: number, candleX: number, side: number): Fighter {
+  const foe = fighterAt(world, slot);
+  foe.motion.x = f32(candleX - side * 30.0);
+  foe.facing = side;
+  return foe;
+}
+
+function settle(candle: Fighter["candle"], step: (frames?: number) => void): void {
+  for (let frame = 0; frame < 60 && (candle.vx !== 0.0 || candle.state === CandleState.airborne); frame++) step();
+}
+
+test("a rival Kobold's jab kicks Kobold's resting candle 128 units along the deck and restarts its untouched timer [k1 scenario]", () => {
+  const { world, candle, step } = fallenCandle([createFighter(Character.kobold, 300.0, -1)]);
+  assertEquals(candle.state, CandleState.resting);
+  const from = candle.x;
+  besideCandle(world, 1, from, 1);
+  beginFighterAttack(world, 1, AttackStyle.jab, false);
+  step(4);
+  assertEquals(candle.timer, CANDLE_UNTOUCHED_FRAMES - 4 + 1);
+  settle(candle, step);
+  assertNear(candle.x - from, 128.0, 4.0);
+  assertEquals(candle.state, CandleState.resting);
+  assertEquals(candle.heat, 150);
+});
+
+test("a rival Kobold's down tilt stamps out the candle where it lies, taking its heat and restarting its untouched timer [k1 scenario]", () => {
+  const { world, candle, step } = fallenCandle([createFighter(Character.kobold, 300.0, -1)]);
+  const from = candle.x;
+  besideCandle(world, 1, from, 1);
+  beginFighterAttack(world, 1, AttackStyle.downTilt, false);
+  step(30);
+  assertEquals(candle.snuffSerial, 1);
+  assertEquals(candle.x, from);
+  assertEquals(candle.state, CandleState.resting);
+  assertEquals(candle.heat, 0);
+  assertFalse(candle.lit);
+  assertGreaterThan(candle.timer, CANDLE_UNTOUCHED_FRAMES - 40);
+});
+
+test("a Rifleman's blaster shot kicks the popping candle away from him and is spent on it [k1 scenario]", () => {
+  const { state, world, kobold, step } = knockedOut(150);
+  const rifleman = fighterAt(world, 1);
+  rifleman.motion.x = -250.0;
+  rifleman.facing = 1;
+  contactBatch(world, () => strike(world, 1, 0, CANDLE_DROP_KNOCKBACK + 1.0));
+  state.controls.inputs[1].specialPressed = true;
+  let frames = 0;
+  while (rifleman.special.action === SpecialAction.none && frames < 30) {
+    step();
+    frames++;
+  }
+  state.controls.inputs[1].specialPressed = false;
+  while (kobold.candle.vx < CANDLE_KICK_SPEED && frames < 30) {
+    step();
+    frames++;
+  }
+  assertEquals(kobold.candle.vx, CANDLE_KICK_SPEED);
+  assertEquals(kobold.candle.state, CandleState.airborne);
+  for (const shot of rifleman.projectiles) assertEquals(shot.life, 0);
+  assertEquals(kobold.status.damage, 10.0);
+});
+
+test("a candle kicked off the ledge falls below the bottom blast line, is lost and relights 300 frames after the kick [k1 scenario]", () => {
+  const { world, kobold, candle, step } = fallenCandle([createFighter(Character.kobold, 300.0, -1)]);
+  candle.x = f32(mainDeckRight(0) - 40.0);
+  candle.z = mainDeckZAt(0, candle.x);
+  besideCandle(world, 1, candle.x, 1);
+  beginFighterAttack(world, 1, AttackStyle.jab, false);
+  let frames = 0;
+  while (candle.timer !== CANDLE_UNTOUCHED_FRAMES - 1 && frames < 10) {
+    step();
+    frames++;
+  }
+  step(200);
+  assertEquals(candle.state, CandleState.lost);
+  step(CANDLE_UNTOUCHED_FRAMES - 202);
+  assertEquals(candle.state, CandleState.lost);
+  step();
+  assertEquals(candle.state, CandleState.held);
+  assertEquals(kobold.candle.heat, 0);
+});
+
+test("kicking the candle every 200 frames cannot keep it from relighting in Kobold's hand 600 frames after the drop [k1 scenario]", () => {
+  const { world, candle, step } = fallenCandle([createFighter(Character.kobold, 300.0, -1)]);
+  step(160);
+  besideCandle(world, 1, candle.x, 1);
+  beginFighterAttack(world, 1, AttackStyle.jab, false);
+  step(200);
+  besideCandle(world, 1, candle.x, -1);
+  beginFighterAttack(world, 1, AttackStyle.jab, false);
+  step(CANDLE_AWAY_FRAMES - 401);
+  assertEquals(candle.state, CandleState.resting);
+  assertGreaterThan(candle.timer, 1);
+  step();
+  assertEquals(candle.state, CandleState.held);
+  assertEquals(candle.heat, 0);
+});
+
+test("Kobold's teammates can neither kick nor stamp out his candle, with or without friendly fire [k1 scenario]", () => {
+  for (const friendlyFire of [false, true]) {
+    for (const style of [AttackStyle.jab, AttackStyle.downTilt]) {
+      const { state, world, candle, step } = fallenCandle([createFighter(Character.rifleman, 300.0, -1), createFighter(Character.kobold, 400.0, -1)]);
+      state.match.teamBattle = true;
+      state.match.friendlyFire = friendlyFire;
+      const from = candle.x;
+      const timer = candle.timer;
+      besideCandle(world, 2, from, 1);
+      beginFighterAttack(world, 2, style, false);
+      step(30);
+      assertEquals(candle.x, from);
+      assertEquals(candle.timer, timer - 30);
+      assertEquals(candle.heat, 150);
+      assertEquals(candle.snuffSerial, 0);
+    }
+  }
+});
+
+test("a stamp and a kick landing on the candle in the same frame stamp it out where it lies [k1 scenario]", () => {
+  const { world, candle, step } = fallenCandle([createFighter(Character.kobold, 300.0, -1), createFighter(Character.kobold, 400.0, -1)]);
+  const from = candle.x;
+  const kicker = besideCandle(world, 1, from, 1);
+  besideCandle(world, 2, from, -1);
+  beginFighterAttack(world, 2, AttackStyle.downTilt, false);
+  step(2);
+  beginFighterAttack(world, 1, AttackStyle.jab, false);
+  step(30);
+  assertEquals(candle.struck[1], kicker.attack.serial);
+  assertEquals(candle.snuffSerial, 1);
+  assertEquals(candle.x, from);
+  assertEquals(candle.heat, 0);
 });
