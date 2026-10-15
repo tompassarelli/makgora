@@ -5,7 +5,7 @@ import { PARTICIPANT_CAPACITY } from "../../input/participants";
 import { CandleState, Character } from "../codes";
 import type { Fighter } from "../fighter";
 import { type Roster, fighterAt, isActive } from "../roster";
-import { surfaceCount, surfaceLeft, surfaceRight, surfaceZAt } from "../stage";
+import { surfaceCount, surfaceLeft, surfaceRight, surfaceShiftX, surfaceZAt } from "../stage";
 import { stageBounds } from "../stageBounds";
 import { bodyTop } from "../surfaces";
 import { melee } from "../tuning";
@@ -130,6 +130,7 @@ export function advanceCandleBodies(world: Roster, stage: number, frame: number)
     const candle = fighterAt(world, slot).candle;
     if (candle.state === CandleState.resting && candle.surface !== undefined) {
       const surface = candle.surface;
+      candle.x = f32(candle.x + surfaceShiftX(stage, surface, frame));
       if (candle.x >= surfaceLeft(stage, surface, frame) && candle.x <= surfaceRight(stage, surface, frame)) {
         candle.z = surfaceZAt(stage, surface, frame, candle.x);
         continue;

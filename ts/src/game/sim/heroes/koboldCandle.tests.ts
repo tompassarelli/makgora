@@ -1,10 +1,11 @@
+import { f32 } from "wisp/src/sim/f32";
 import { assertEquals, assertFalse, assertGreaterThan, assertNear, assertTrue, test } from "wisp/src/runtime/testing";
 import { CandleState, Character, ContactKind, SpecialAction } from "../codes";
 import { collectDamageContact } from "../contacts";
 import { type Fighter, createFighter } from "../fighter";
 import { runningHeroSpecial } from "../heroSpecialRules";
 import { type Controls, type Roster, createRoster, fighterAt } from "../roster";
-import { mainDeckZAt } from "../stage";
+import { mainDeckZAt, surfaceLeft, surfaceRight, surfaceZAt } from "../stage";
 import { duelPair, stepDuel } from "../testDuel";
 import { contactBatch, controls, hitEffect } from "../testWorld";
 import { Phase } from "../../match/rules";
@@ -12,7 +13,7 @@ import { stepMatch } from "../../match/step";
 import { firstFighterDifference } from "../../replay/difference";
 import { copyReplayState, createReplaySnapshot } from "../../replay/snapshot";
 import { max } from "../../../runtime/numbers";
-import { CANDLE_DROP_KNOCKBACK, CANDLE_GUARD_FRAMES, CANDLE_HEAT_PER_DAMAGE, CANDLE_LEVEL_HEAT, CANDLE_UNTOUCHED_FRAMES, candleLevel } from "./koboldCandle";
+import { CANDLE_DROP_KNOCKBACK, CANDLE_GUARD_FRAMES, CANDLE_HEAT_PER_DAMAGE, CANDLE_LEVEL_HEAT, CANDLE_UNTOUCHED_FRAMES, advanceCandleBodies, candleLevel } from "./koboldCandle";
 
 test("Kobold's candle gains 8 heat per whole percent he lands, at most 75 a hit, burns down 1 every third frame and goes out with his stock [k3 measure docs/design/roster.md]", () => {
   const state = { ...createReplaySnapshot(), world: createRoster(3, [createFighter(Character.kobold, -100.0, 1), createFighter(Character.rifleman, 100.0, -1)]) };
@@ -253,5 +254,20 @@ test("in a four-fighter trade both Kobolds in the back slots keep their heat gai
     const kobold = fighterAt(world, slot);
     assertEquals(kobold.candle.heat, 9 * CANDLE_HEAT_PER_DAMAGE);
     assertEquals(kobold.candle.state, CandleState.airborne);
+  }
+});
+
+test("a candle resting on a sliding deck rides along with it instead of falling off [k1 scenario]", () => {
+  const world = createRoster(1, [createFighter(Character.kobold, 0.0, 1)]);
+  const candle = fighterAt(world, 0).candle;
+  const centre = (frame: number) => f32((surfaceLeft(3, 1, frame) + surfaceRight(3, 1, frame)) * 0.5);
+  candle.state = CandleState.resting;
+  candle.surface = 1;
+  candle.x = centre(0);
+  candle.z = surfaceZAt(3, 1, 0, candle.x);
+  for (let frame = 1; frame <= 120; frame++) {
+    advanceCandleBodies(world, 3, frame);
+    assertEquals(candle.state, CandleState.resting, `frame ${frame}`);
+    assertNear(candle.x, centre(frame), f32(0.01));
   }
 });
