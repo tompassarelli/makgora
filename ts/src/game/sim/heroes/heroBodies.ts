@@ -26,7 +26,7 @@ const HERO_BODIES: { readonly [character: number]: HeroBody | undefined } = {
   [Character.blademaster]: { ...body(f32(0.96), f32(1.08), f32(1.00), f32(1.00), f32(1.05)), runSpeed: f32(13.74), dashSpeed: f32(11.892), traction: f32(0.06) },
   [Character.mountainKing]: { ...body(f32(1.12), f32(0.88), f32(0.82), f32(1.10), f32(0.85)), traction: f32(0.065) },
   [Character.warden]: { ...body(f32(0.80), f32(1.14), f32(1.10), f32(0.90), f32(1.00)), runSpeed: 13.799999237060547, dashSpeed: 12.0, traction: f32(0.06) },
-  [Character.lich]: { ...body(f32(1.04), f32(0.90), f32(0.95), f32(0.90), f32(1.28)), traction: f32(0.045) },
+  [Character.lich]: { ...body(f32(1.04), f32(0.90), f32(0.95), f32(0.90), f32(1.28)), traction: f32(0.06) },
   [Character.forsakenPaladin]: { ...body(f32(1.22), f32(0.92), f32(0.88), f32(1.08), f32(1.02)), traction: f32(0.065) },
   [Character.dreadlord]: { ...body(f32(1.27), f32(1.10), f32(1.22), f32(1.10), f32(1.15)), runSpeed: f32(13.76), dashSpeed: f32(11.928), traction: f32(0.06) },
   [Character.shadowHunter]: { ...body(f32(0.94), f32(1.04), f32(1.00), f32(0.92), f32(1.08)), traction: f32(0.06) },

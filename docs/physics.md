@@ -1837,8 +1837,8 @@ falling contact still lands; platforms still have no walls or underside.
 
 Each hero grips the ground by its body type, in Melee units a frame
 (smashcraft:ts/src/game/sim/heroes/heroBodies.ts): Jaina 0.03, a slow runner
-on frost, is the roster's Luigi; the other robed casters 0.04-0.055
-(Malfurion 0.04, Lich 0.045, Medivh 0.05, Kael'thas 0.055); Sylvanas and Peon
+on frost, is the roster's Luigi; the other robed casters 0.04-0.06
+(Malfurion 0.04, Medivh 0.05, Kael'thas 0.055, Lich 0.06); Sylvanas and Peon
 0.05; Murloc 0.055 on wet feet; the nimble fast runners 0.06 (Blademaster,
 Warden, Shadow Hunter, Dreadlord, Kobold, Grom); sturdy fighters 0.065
 (Mountain King, Forsaken Paladin, Beastmaster, Lich King, Chen, Tinker);
@@ -1850,6 +1850,10 @@ Link, Zelda, Pichu) and gives its low traction to slow runners
 at 47 units against Melee's longest, Luigi's 36, and the 32 every fast runner
 had before. Every hero is at or below the 0.08 all fighters shared before
 15 Oct, so run brakes, dash stops and moonwalks are as long or longer.
+The Lich is the light target of the advantage-state targets
+(smashcraft:docs/gameplay-design.md, "Advantage state"); below 0.06 it slides
+out of Dreadlord's tech chase and Rifleman's DI mix-up, so it stays at 0.06.
+Jaina, Malfurion, Medivh and Kael'thas slide further than the targets measure.
 
 Standing, crouching and landing (landing lag, including a wavedash or
 waveland's air-dodge landing) brake by twice the traction while the fighter
