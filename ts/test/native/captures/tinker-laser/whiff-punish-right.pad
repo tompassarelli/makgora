@@ -1,0 +1,30 @@
+# Tinker Laser native proof, facing right: the foe dashes close, the arms glow (70-88), the foe rolls behind him, the beam fires into empty space (89-96), and the foe dash grabs the end lag (about 109) and throws.
+# The Laser starts on the frame of Tinker's side special input; its frames 1-19 are the tell and 20-27 fire (docs/gameplay-design.md, Tinker Laser).
+#! chat -dev quick pair goblin tinker / mountain king
+#! cue 70-88 tell: effect=FireBallMissile
+#! cue 89-96 beam: effect=ImmolationRedDamage
+40 b stick -1 0
+52 b stick 0 0
+70 a stick 1 0
+70 a tap X 2
+70 a capture
+72 a stick 0 0
+72 b shield 1
+73 b stick -1 0
+75 b stick 0 0
+76 b shield 0
+76 a capture
+82 a capture
+88 a capture
+89 a capture
+92 a capture
+96 b stick 1 0
+96 a capture
+99 b tap RB 2
+100 a capture
+101 b stick 0 0
+106 a capture
+110 a capture
+125 b stick 1 0
+128 b stick 0 0
+140 a capture

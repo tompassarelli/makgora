@@ -1,0 +1,22 @@
+# Tinker Laser native proof, facing left: the foe stops in front, sees the glowing arms and shields (72); the beam stops at his shield on frames 79-86.
+# The Laser starts on the frame of Tinker's side special input; its frames 1-19 are the tell and 20-27 fire (docs/gameplay-design.md, Tinker Laser).
+#! chat -dev quick pair mountain king / goblin tinker
+#! cue 60-78 tell: effect=FireBallMissile
+#! cue 79-86 beam: effect=ImmolationRedDamage
+40 a stick 1 0
+47 a stick 0 0
+60 b stick -1 0
+60 b tap X 2
+60 a capture
+62 b stick 0 0
+69 a capture
+72 a shield 1
+72 a capture
+78 a capture
+79 a capture
+81 a capture
+84 a capture
+86 a capture
+90 a capture
+100 a shield 0
+100 a capture

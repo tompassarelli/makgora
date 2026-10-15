@@ -1,0 +1,17 @@
+# Tinker Laser native proof, facing right: with hit areas shown, the foe short hops in front and the drawn beam should lie on the red hit capsule on active frames 79-86.
+# The Laser starts on the frame of Tinker's side special input; its frames 1-19 are the tell and 20-27 fire (docs/gameplay-design.md, Tinker Laser).
+#! chat -dev quick hero goblin tinker hit-areas
+#! cue 60-78 tell: effect=FireBallMissile
+#! cue 79-86 beam: effect=ImmolationRedDamage
+40 b stick -1 0
+47 b stick 0 0
+60 a stick 1 0
+60 a tap X 2
+60 a capture
+62 a stick 0 0
+70 b tap B 2
+78 a capture
+79 a capture
+81 a capture
+84 a capture
+86 a capture
