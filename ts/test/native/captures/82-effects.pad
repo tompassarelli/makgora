@@ -143,19 +143,19 @@
 1388 a capture
 1400 a capture
 # case 23
-#! cue 1440-1442 case 23: sound=BlinkTarget effect=ImpactDust-
+#! cue 1440-1442 case 23: sound=DeepFootstep effect=ImpactDust-
 1440 a chat -dev effects 23
 1442 a capture
 1448 a capture
 1460 a capture
 # case 24
-#! cue 1500-1502 case 24: sound=BlinkTarget effect=ImpactJump-
+#! cue 1500-1502 case 24: sound=DeepFootstep2 effect=ImpactJump-
 1500 a chat -dev effects 24
 1502 a capture
 1508 a capture
 1520 a capture
 # case 25
-#! cue 1560-1562 case 25: sound=BlinkTarget effect=ImpactJump-
+#! cue 1560-1562 case 25: sound=DeepFootstep2 effect=ImpactJump-
 1560 a chat -dev effects 25
 1562 a capture
 1568 a capture

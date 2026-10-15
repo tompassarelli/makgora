@@ -33,9 +33,9 @@ export const HIT_PRESENTATION_CASES = [
       { cue: { footstep: "walk" as const, movementDust: true }, sound: "DeepFootstep", model: "ImpactDust-" },
       { cue: { footstep: "run" as const, runningDust: true }, sound: "DeepFootstep2", model: "ImpactDust-" },
       { cue: { footstep: "dash" as const, movementDust: true }, sound: "DeepFootstep2", model: "ImpactDust-" },
-      { cue: { jump: JumpCue.ground }, sound: "BlinkTarget", model: "ImpactDust-" },
-      { cue: { jump: JumpCue.double, jumpOriginX: 0.0, jumpOriginZ: 55.0 }, sound: "BlinkTarget", model: "ImpactJump-" },
-      { cue: { jump: JumpCue.wall, contactX: 0.0, contactZ: 50.0, normalX: 1.0 }, sound: "BlinkTarget", model: "ImpactJump-" },
+      { cue: { jump: JumpCue.ground }, sound: "DeepFootstep", model: "ImpactDust-" },
+      { cue: { jump: JumpCue.double, jumpOriginX: 0.0, jumpOriginZ: 55.0 }, sound: "DeepFootstep2", model: "ImpactJump-" },
+      { cue: { jump: JumpCue.wall, contactX: 0.0, contactZ: 50.0, normalX: 1.0 }, sound: "DeepFootstep2", model: "ImpactJump-" },
       { cue: { ordinaryLanding: true }, sound: "DeepFootstep", model: "ImpactDust-" },
 ] as const;
 

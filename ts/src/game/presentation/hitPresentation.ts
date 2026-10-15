@@ -140,7 +140,8 @@ export function presentImpactSounds(events: Readonly<ImpactEvents>, sink: Impact
   else if (events.landing === ImpactLanding.missedTech || events.surfaceMissedTech) sink("Warstomp", x, z, 90, 1.0, false, VoiceClass.movement);
   else if (events.ordinaryLanding) sink("DeepFootstep", x, z, 65, 0.75, false, VoiceClass.movement);
   if (events.ledgeCatch || events.ledgeRecovery) sink("BlinkTarget", x, z, 55, 1.5, false, VoiceClass.movement);
-  if (events.jump !== JumpCue.none) sink("BlinkTarget", x, z, events.jump === JumpCue.ground ? 45 : 60, 1.5, false, VoiceClass.movement);
+  if (events.jump === JumpCue.ground) sink("DeepFootstep", x, z, 55, 1.25, false, VoiceClass.movement);
+  else if (events.jump !== JumpCue.none) sink("DeepFootstep2", x, z, 40, 1.5, false, VoiceClass.movement);
   if (events.footstep !== "none") sink(events.footstep === "walk" ? "DeepFootstep" : "DeepFootstep2", x, z, events.footstep === "walk" ? 35 : events.footstep === "dash" ? 115 : 90, events.footstep === "walk" ? 1.0 : 1.25, false, VoiceClass.movement);
   if (events.koDirectionX !== 0 || events.koDirectionZ !== 0) sink("ThunderClap", x, z, 100, 1.0, false, VoiceClass.ko);
 }
