@@ -60,6 +60,12 @@ export function nextStep({ body }: ChecklistIssue): string | undefined {
   return lines.find((line) => /^[-*] \[ \] /.test(line))?.slice("- [ ] ".length);
 }
 
+const DIRECTION_BOX = /^[-*] \[ \] .*(?:Tom'?s (?:direction|feel)|direction or feel|feel call|direction call)/i;
+
+/** Unticked boxes marked as Tom's direction or feel call; every other box is agent-run and never reaches the notes. */
+export const directionCalls = ({ body }: ChecklistIssue): string[] =>
+  body.split("\n").map((line) => line.trim()).filter((line) => DIRECTION_BOX.test(line)).map((line) => oneLine(line.slice("- [ ] ".length)));
+
 const oneLine = (text: string, limit = 200) => {
   const flat = text.replace(/\s+/g, " ").trim();
   return flat.length > limit ? `${flat.slice(0, limit - 1)}…` : flat;
@@ -94,10 +100,9 @@ export function playtestChecklist(input: ChecklistInput): string {
   const toCheck = [...new Set([...changedNumbers, ...closedSince])].flatMap((n) => byNumber.get(n) ?? []);
   const notesFirst = (a: ChecklistIssue, b: ChecklistIssue) => Number(fromTomsNotes(b)) - Number(fromTomsNotes(a)) || a.number - b.number;
   lines.push("## Please check", "");
-  if (toCheck.length === 0) lines.push("Nothing closed or referenced since the last installed build.");
-  for (const issue of [...toCheck].sort(notesFirst)) {
-    lines.push(`- [ ] Try: ${issue.title} (#${issue.number}, ${issue.state}${fromTomsNotes(issue) ? ", from your notes" : ""})`);
-  }
+  const calls = [...toCheck].sort(notesFirst).flatMap((issue) => directionCalls(issue).map((call) => ({ issue, call })));
+  if (calls.length === 0) lines.push("No direction or feel call is waiting on you for the issues touched since the last installed build.");
+  for (const { issue, call } of calls) lines.push(`- [ ] #${issue.number} ${issue.title}: ${call}`);
   lines.push("");
 
   const stillOpen = issues.filter((issue) => issue.state === "open" && fromTomsNotes(issue)).sort((a, b) => a.number - b.number);
