@@ -1,13 +1,13 @@
 import { chmodSync, mkdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { generateMDX, ModelRenderer, model as mdx } from "war3-model";
-import { quat, vec3 } from "gl-matrix";
+import { mat4, quat, vec3 } from "gl-matrix";
 import { DrawnModel, sampleAttack, sheet, type PoseFrame } from "../../ts/scripts/wisp/hurtboxView";
-import { AttackPhase, AttackStyle, Character } from "../../ts/src/game/sim/codes";
+import { AttackPhase, AttackStyle, Character, GrabAction } from "../../ts/src/game/sim/codes";
 import type { HeroClip, HeroPose } from "../../ts/src/game/sim/heroes/hero";
 import { SHADOW_HUNTER_MOVES } from "../../ts/src/game/sim/heroes/shadowHunterMoves";
 import { SHADOW_HUNTER_SPECIALS } from "../../ts/src/game/sim/heroes/shadowHunterSpecials";
-import { CHARGED_AIM_FRAMES } from "../../ts/src/game/sim/heroSpecials";
+import { CHARGED_AIM_FRAMES } from "../../ts/src/game/sim/specials/schema";
 import { ROSTER_ATTACK_CLIPS } from "../../ts/src/game/presentation/rosterAttackClipInfo";
 import { JUMP_CLIPS } from "../../ts/src/game/presentation/jumpClipInfo";
 import { SHADOW_HUNTER_AUTHORED_CLIPS } from "../../ts/src/game/presentation/heroes/shadowHunterClipInfo";
@@ -23,10 +23,10 @@ interface Gesture {
   drop?: number; lunge?: number; spin?: number; step?: number;
 }
 type End = "handL" | "handR" | "footL" | "footR";
-interface Phase { frame: number; gesture: Gesture; tip?: readonly [number, number] | readonly [number, number, number]; grip?: readonly [number, number]; reach?: readonly [End, number, number] }
+interface Phase { frame: number; gesture: Gesture; tip?: readonly [number, number] | readonly [number, number, number]; grip?: readonly [number, number]; reach?: readonly [End, number, number]; extraReach?: readonly [End, number, number] }
 interface Authored {
   pose: HeroPose; style?: AttackStyle; phases: readonly Phase[]; airborne?: boolean; frames?: number; looping?: boolean; forms?: readonly HeroPose[]; bind?: boolean;
-  ground?: "cloth" | "sole"; support?: "L" | "R";
+  ground?: "cloth" | "sole"; support?: "L" | "R"; contact?: number;
 }
 const REACH: Readonly<Record<End, readonly [string, keyof Gesture, keyof Gesture, string, string]>> = {
   handL: ["Hand Left Ref ", "free", "freeElbow", "Bone_Arm1_L", "Bone_Arm2_L"], handR: ["Hand Right Ref ", "arm", "elbow", "Bone_Arm1_R", "Bone_Arm2_R"],
@@ -297,7 +297,58 @@ const hang = (action: Authored, drape = false): Authored => ({ ...action, phases
 const draped = (make: () => Authored) => () => hang(make(), true);
 const kicked = (make: () => Authored) => () => hang({ ...make(), ground: "sole" });
 
+const GRIP: Gesture = { arm: 110, elbow: -60, free: -70, freeElbow: 20, chest: 8, head: -8, frontHip: -18, frontKnee: 24, backHip: 18, backKnee: 18 };
+const CAPTIVE: Gesture = { arm: 110, elbow: -60, free: 50, freeElbow: -30, chest: 12, head: -12, frontHip: -22, frontKnee: 32, backHip: 12, backKnee: 24 };
+function grab(): Authored {
+  const move = SHADOW_HUNTER_MOVES.normals[AttackStyle.grab]!;
+  return { pose: "grab", frames: move.totalFrames, ground: "sole", support: "R", phases: [
+    { frame: 0, gesture: READY },
+    { frame: move.startupFrames - 3, gesture: { ...GRIP, lean: -6, chest: -8, step: -3 }, reach: ["handL", 18, 68] },
+    { frame: move.startupFrames, gesture: { ...GRIP, lean: 14, chest: 16, step: 14 }, reach: ["handL", 86, 74] },
+    { frame: move.startupFrames + move.activeFrames, gesture: { ...GRIP, lean: 16, chest: 18, step: 16 }, reach: ["handL", 90, 74] },
+    { frame: move.totalFrames - 8, gesture: { ...GRIP, lean: 6, step: 6 }, reach: ["handL", 54, 68] },
+    { frame: move.totalFrames, gesture: READY },
+  ] };
+}
+function held(pose: "grabHold" | "grabbed"): Authored {
+  const gesture = pose === "grabHold" ? GRIP : CAPTIVE;
+  return { pose, frames: 30, ground: "sole", looping: true, phases: [0, 30].map(frame => ({ frame, gesture: { ...gesture },
+    ...(pose === "grabHold" ? { reach: ["handL", 72, 72] as const } : {}) })) };
+}
+function grabAction(pose: HeroPose, code: GrabAction, prep: Gesture, release: Gesture, from: readonly [number, number], to: readonly [number, number]): Authored {
+  const move = SHADOW_HUNTER_MOVES.throws[code]!;
+  const contact = move.contactFrame, frames = move.totalFrames;
+  return { pose, frames, contact, ground: "sole", support: code === GrabAction.pummel ? "L" : "R", phases: [
+    { frame: 0, gesture: { ...GRIP }, reach: ["handL", 72, 72] },
+    { frame: Math.max(1, contact - 4), gesture: prep, reach: ["handL", ...from], ...(code === GrabAction.throwDown ? { tip: [20, 180] as const } : {}) },
+    ...(code === GrabAction.pummel ? [{ frame: contact - 0.2, gesture: prep, reach: ["handL", ...from] as const, extraReach: ["footR", 12, 20] as const }] : []),
+    { frame: contact, gesture: release, reach: ["handL", ...to], ...(code === GrabAction.pummel ? { extraReach: ["footR", 62, 58] as const } : code === GrabAction.throwDown ? { tip: [105, 12] as const } : {}) },
+    { frame: Math.min(contact + 3, frames - 2), gesture: { ...release, chest: (release.chest ?? 0) + 4 }, reach: ["handL", to[0] * 1.06, to[1] + (code === GrabAction.throwUp ? 8 : code === GrabAction.throwDown ? -4 : 0)], ...(code === GrabAction.pummel ? { extraReach: ["footR", 66, 60] as const } : code === GrabAction.throwDown ? { tip: [110, 8] as const } : {}) },
+    { frame: frames, gesture: code === GrabAction.pummel ? { ...GRIP } : READY, ...(code === GrabAction.pummel ? { reach: ["handL", 72, 72] as const } : {}) },
+  ] };
+}
+function captiveAction(pose: HeroPose, code: GrabAction, release: Gesture): Authored {
+  const move = SHADOW_HUNTER_MOVES.throws[code]!;
+  return { pose, frames: move.totalFrames, contact: move.contactFrame, airborne: code !== GrabAction.pummel, ground: code === GrabAction.pummel ? "sole" : undefined, phases: [
+    { frame: 0, gesture: { ...CAPTIVE } },
+    ...(code === GrabAction.throwDown ? [{ frame: move.contactFrame - 5, gesture: { ...CAPTIVE, lean: -12, chest: -12, head: 12, frontKnee: 18, backKnee: 18 } }] : []),
+    { frame: move.contactFrame - 1, gesture: code === GrabAction.throwDown ? release : { ...CAPTIVE } },
+    { frame: move.contactFrame, gesture: release },
+    { frame: move.totalFrames, gesture: code === GrabAction.pummel ? { ...CAPTIVE } : { ...release, head: (release.head ?? 0) - 8 } },
+  ] };
+}
 const POSES: Readonly<Record<string, () => Authored>> = {
+  grab: draped(grab), grabHold: draped(() => held("grabHold")), grabbed: draped(() => held("grabbed")),
+  pummel: () => grabAction("pummel", GrabAction.pummel, { ...GRIP, lean: -8, chest: -12, head: -35 }, { ...GRIP, lean: 8, chest: 24, head: 38 }, [68, 72], [72, 72]),
+  throwForward: () => grabAction("throwForward", GrabAction.throwForward, { ...GRIP, lean: -10, chest: -14, chestTurn: 24, step: -6 }, { ...GRIP, lean: 20, chest: 22, chestTurn: -18, step: 16, backKnee: 8 }, [38, 65], [112, 80]),
+  throwBack: () => grabAction("throwBack", GrabAction.throwBack, { ...GRIP, lean: 12, chest: 20, frontKnee: 44, backKnee: 32 }, { ...GRIP, lean: -24, chest: -24, head: 20, free: -190, freeElbow: 0, step: -10 }, [72, 48], [-95, 105]),
+  throwUp: () => grabAction("throwUp", GrabAction.throwUp, { ...GRIP, chest: 24, lean: 12, frontHip: -44, frontKnee: 64, backHip: 24, backKnee: 48, drop: -16 }, { ...GRIP, chest: -12, lean: -12, head: 24, frontKnee: 0, backKnee: 0, free: -150, freeElbow: 0 }, [60, 38], [34, 160]),
+  throwDown: () => grabAction("throwDown", GrabAction.throwDown, { ...GRIP, lean: -12, chest: -14, head: 16, free: -150, freeElbow: 0 }, { ...GRIP, lean: 14, chest: 16, head: -20, frontHip: -30, frontKnee: 48, backHip: 20, backKnee: 32, drop: -8, step: 10 }, [48, 148], [78, 24]),
+  victimPummel: () => captiveAction("victimPummel", GrabAction.pummel, { ...CAPTIVE, lean: -12, chest: -24, head: -35, freeElbow: -45 }),
+  victimThrowForward: () => captiveAction("victimThrowForward", GrabAction.throwForward, { ...CAPTIVE, lean: -38, chest: -20, head: 24, free: -100, frontHip: -48, frontKnee: 58 }),
+  victimThrowBack: () => captiveAction("victimThrowBack", GrabAction.throwBack, { ...CAPTIVE, lean: 50, chest: 32, head: -32, free: -145, frontHip: -64, frontKnee: 90, backHip: -30, backKnee: 70 }),
+  victimThrowUp: () => captiveAction("victimThrowUp", GrabAction.throwUp, { ...CAPTIVE, lean: -24, chest: -20, head: 24, free: -155, freeElbow: 10, frontHip: -66, frontKnee: 95, backHip: -40, backKnee: 80 }),
+  victimThrowDown: () => captiveAction("victimThrowDown", GrabAction.throwDown, { ...CAPTIVE, lean: 72, chest: 36, head: -28, free: -90, frontHip: -70, frontKnee: 100, backHip: -45, backKnee: 80 }),
   neutralSpecial, jump, doubleJump, forwardSmash, downSmash, upSpecial, fallSpecial,
   backAir: draped(backAir), neutralAir: draped(neutralAir), downAir: draped(downAir),
   forwardTiltDown: kicked(() => kick("forwardTiltDown", AttackStyle.forwardTiltDown, [76, 26], -8, [80, 24], -30, -8)),
@@ -436,7 +487,7 @@ function aimTip(action: Authored, start: number) {
     };
     const loss = () => { apply(); const p = tipAt(), g = phase.grip ? gripAt() : undefined;
       return (p[0]! - tip[0]) ** 2 + (p[2]! - tip[1]) ** 2 + (tip[2] === undefined ? 0.3 * p[1]! ** 2 : (p[1]! - tip[2]) ** 2)
-        + (g ? (g[0]! - phase.grip![0]) ** 2 + (g[2]! - phase.grip![1]) ** 2 : 0) + (action.ground === "cloth" ? 40 * Math.max(0, 3 - bladeFloor()) ** 2 : 0); };
+        + (g ? (g[0]! - phase.grip![0]) ** 2 + (g[2]! - phase.grip![1]) ** 2 : 0) + (action.ground === "cloth" || paired(action.pose) ? 40 * Math.max(0, 3 - bladeFloor()) ** 2 : 0); };
     for (let pass = 0; pass < 4; pass++) for (const axis of [0, 3, 4, 1, 2, 5]) {
       let best = Infinity, bestAngle = angles[axis]!;
       const centre = angles[axis]!, span = pass < 2 ? 180 : 30, step = pass < 2 ? 10 : 2;
@@ -448,16 +499,17 @@ function aimTip(action: Authored, start: number) {
 }
 
 function reachAndStand(action: Authored, index: number, start: number, frames: number) {
+  const floorLevel = paired(action.pose) ? 0 : soleRest;
   const supportFoot = action.support === undefined ? undefined : named(REACH[action.support === "L" ? "footL" : "footR"][0]);
   data.frame = start; renderer.setSequence(index); renderer.update(0);
   const supportRest = supportFoot === undefined ? 0 : worldOf(supportFoot)[0]!;
   const settled = (p: vec3, phase: Phase) => {
-    const floor = Math.min(action.airborne ? 0 : Infinity, soleZ() - soleRest);
+    const floor = Math.min(action.airborne ? 0 : Infinity, soleZ() - floorLevel);
     const shift = supportFoot === undefined ? 0 : supportRest + (phase.gesture.step ?? 0) - worldOf(supportFoot)[0]!;
     return [p[0]! + shift, p[2]! - floor];
   };
-  for (const phase of action.phases) if (phase.reach) {
-    const [end, x, z] = phase.reach, [ref, upperField, lowerField, upperName, lowerName] = REACH[end], effector = named(ref), at = time(start, phase.frame);
+  for (const phase of action.phases) for (const reach of [phase.reach, phase.extraReach]) if (reach) {
+    const [end, x, z] = reach, [ref, upperField, lowerField, upperName, lowerName] = REACH[end], effector = named(ref), at = time(start, phase.frame);
     const keys = [named(upperName), named(lowerName)].map(n => n.Rotation!.Keys.find(k => k.Frame === at)!), bases = [named(upperName), named(lowerName)].map(baseOf);
     const preferred = phase.gesture[lowerField] ?? 0;
     let best = [phase.gesture[upperField] ?? 0, preferred], score = Infinity;
@@ -488,19 +540,21 @@ function reachAndStand(action: Authored, index: number, start: number, frames: n
     const step = (a.gesture.step ?? 0) + ((b.gesture.step ?? 0) - (a.gesture.step ?? 0)) * (b.frame === a.frame ? 1 : (frame - a.frame) / (b.frame - a.frame));
     for (let pass = 0; pass < 3; pass++) {
       data.frame = Frame; renderer.update(0);
-      const floor = Math.min(action.airborne ? 0 : Infinity, soleZ() - soleRest), shift = supportFoot === undefined ? 0 : supportRest + step - worldOf(supportFoot)[0]!;
+      const floor = Math.min(action.airborne ? 0 : Infinity, soleZ() - floorLevel), shift = supportFoot === undefined ? 0 : supportRest + step - worldOf(supportFoot)[0]!;
       key.Vector = Float32Array.from(key.Vector, (v, i) => i === 2 ? v - floor : i === 0 ? v + shift : v);
     }
   }
 }
 
 const prior: Record<string, HeroClip> = { ...ROSTER_ATTACK_CLIPS[Character.shadowHunter], ...JUMP_CLIPS[Character.shadowHunter], ...SHADOW_HUNTER_AUTHORED_CLIPS };
+const paired = (pose: string) => /^(grab|pummel|throw|victim)/.test(pose);
 let cursor = Math.max(...source.Sequences.map(s => s.Interval[1])) + 100;
 const bindings = new Map<string, HeroClip>(Object.entries(SHADOW_HUNTER_AUTHORED_CLIPS));
 const authored: { action: Authored; index: number; frames: number }[] = [];
 
 for (const pose of selected) {
-  const action = POSES[pose]!();
+  const base = POSES[pose]!();
+  const action = paired(pose) ? { ...base, phases: hang(base, true).phases.map(phase => ({ ...phase, gesture: { ...phase.gesture, beard: 70 } })) } : base;
   const frames = action.frames ?? SHADOW_HUNTER_MOVES.normals[action.style!]!.totalFrames;
   const name = `Attack Gesture ${pose}`;
   const previous = prior[pose];
@@ -543,7 +597,22 @@ for (const pose of selected) {
   aimTip(action, start);
   if (action.ground === "sole") reachAndStand(action, index, start, frames);
   else if (action.ground === undefined && !action.airborne) settleFeet(index, start, frames);
-  if (action.style !== undefined || action.bind) for (const form of [pose, ...action.forms ?? []]) bindings.set(form, { index, seconds: (time(start, frames) - start) / 1000, aligned: true });
+  if (paired(pose) && !action.airborne) liftCloth(pose, action, index, start);
+  if (paired(pose)) {
+    const drawn = new DrawnModel(generateMDX(model), 1);
+    for (let frame = 0; frame <= frames; frame++) {
+      const Frame = time(start, frame), triangles = drawn.triangles(index, (Frame - start) / 1000, 1);
+      let low = Infinity;
+      for (let coordinate = 1; coordinate < triangles.length; coordinate += 2) low = Math.min(low, triangles[coordinate]!);
+      const key = rootKey(Frame);
+      renderer.setSequence(index); data.frame = Frame; renderer.update(0);
+      const inverse = mat4.invert(mat4.create(), data.nodes[root.Parent!]!.matrix);
+      ensure(inverse, `${pose}: root parent transform is singular`);
+      key.Vector = Float32Array.from(key.Vector, (value, axis) => value + inverse[8 + axis]! * Math.max(0, 1 - low));
+    }
+  }
+  for (const form of [pose, ...action.forms ?? []]) bindings.set(form, { index, seconds: (time(start, frames) - start) / 1000, aligned: true,
+    ...(action.contact === undefined ? {} : { contact: (time(start, action.contact) - start) / 1000 }) });
   authored.push({ action, index, frames });
 }
 
@@ -557,14 +626,15 @@ for (const [index, sequence] of source.Sequences.entries()) if (!authored.some(a
 mkdirSync(output, { recursive: true });
 const target = join(output, "heroshadowhunter.mdx"); await Bun.write(target, bytes); chmodSync(target, 0o644);
 for (const { action, index, frames } of authored) {
-  let lowest = Infinity; for (let frame = 0; frame <= frames && !action.airborne; frame++) { const t = after.triangles(index, frame / 60, 1); for (let i = 1; i < t.length; i += 2) lowest = Math.min(lowest, t[i]!); }
+  let lowest = Infinity; for (let frame = 0; frame <= frames + 2 && (paired(action.pose) || !action.airborne); frame++) { const t = after.triangles(index, frame / 60, 1); for (let i = 1; i < t.length; i += 2) lowest = Math.min(lowest, t[i]!); }
+  if (paired(action.pose)) ensure(lowest >= 0, `${action.pose}: drawn body sinks ${lowest.toFixed(3)} below the floor`);
   if (lowest <= -8) console.warn(`${action.pose}: drawn body sinks ${lowest.toFixed(1)} below the floor`);
   const style = action.style === undefined ? undefined : action.frames === undefined && SHADOW_HUNTER_MOVES.normals[action.style] ? action.style : AttackStyle.forwardSmash;
   const panels: PoseFrame[] = [1, -1].flatMap(facing => { const sampled = style === undefined ? [] : sampleAttack(Character.shadowHunter, style, facing);
     return action.phases.map(p => ({ ...sampled[Math.min(p.frame, sampled.length - 1)] ?? { phase: AttackPhase.none, x: 0, z: 0, facing, parts: [], strikes: [] }, frame: p.frame, clip: index, seconds: p.frame / 60 })); });
   await Bun.write(join(output, `${action.pose}.png`), sheet(`Shadow Hunter ${action.pose}`, after, panels, action.phases.length).png);
 }
-const lines = [...bindings].sort(([a], [b]) => a.localeCompare(b)).map(([pose, clip]) => `  ${pose}: { index: ${clip.index}, seconds: ${seconds(Number(clip.seconds.toFixed(3)))}${clip.aligned ? ", aligned: true" : ""} },`);
+const lines = [...bindings].sort(([a], [b]) => a.localeCompare(b)).map(([pose, clip]) => `  ${pose}: { index: ${clip.index}, seconds: ${seconds(Number(clip.seconds.toFixed(3)))}${clip.aligned ? ", aligned: true" : ""}${clip.contact === undefined ? "" : `, contact: ${seconds(Number(clip.contact.toFixed(3)))}`} },`);
 await Bun.write(join(project, "ts/src/game/presentation/heroes/shadowHunterClipInfo.ts"), [
   "// Generated by tools/animations/shadow-hunter-clips.ts; regenerate instead of editing.",
   'import { f32 } from "wisp/src/sim/f32";',

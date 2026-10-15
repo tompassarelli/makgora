@@ -153,20 +153,21 @@ test("paired hero throws reach contact on the actual holder's frame across every
       assertTrue(poses !== undefined);
       if (poses === undefined) continue;
       const clip = clipFor(hero.character, poses.victim);
-      assertEquals(clip.contact, f32(0.5));
+      const contact = f32(clip.contact ?? -1);
+      assertTrue(contact > 0 && contact < clip.seconds);
       const pose = createFighterPose();
       owner.grab.frame = grabContactFrame(action, owner.tuning.moves) - 1;
       advanceFighterPose(pose, victim, world, neutralControls(), false, false, false, false);
-      assertTrue(pose.clipTime < f32(0.5));
+      assertTrue(pose.clipTime < contact);
       owner.grab.frame++;
       advanceFighterPose(pose, victim, world, neutralControls(), false, false, false, false);
       assertEquals(pose.clipIndex, clip.index);
-      assertEquals(pose.clipTime, f32(0.5));
+      assertEquals(pose.clipTime, contact);
 
       owner.launch.hitlag = 3;
       advanceFighterPose(pose, victim, world, neutralControls(), false, false, false, false);
       assertEquals(pose.rate, 0.0);
-      assertEquals(pose.clipTime, f32(0.5));
+      assertEquals(pose.clipTime, contact);
       owner.launch.hitlag = 0;
       owner.grab.frame = grabActionDuration(action, owner.tuning.moves);
       advanceFighterPose(pose, victim, world, neutralControls(), false, false, false, false);
