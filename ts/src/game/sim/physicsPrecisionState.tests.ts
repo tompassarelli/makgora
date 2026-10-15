@@ -9,7 +9,7 @@ import { melee } from "./tuning";
 
 
 
-test("#9 GROUNDED_BINARY32_EXACT_PASS [k3 measure docs/physics.md]", () => {
+test("a grounded fighter in hitstun loses launch speed to traction by the reference's float32 amount each frame [k3 measure docs/physics.md]", () => {
   const fighter = createReferenceFighter(Character.sylvanas, 0.0, 1);
   withPhysics(fighter, { traction: melee(0.07999999821186066) });
   fighter.launch.knockbackX = melee(0.7562744617462158);
@@ -20,7 +20,7 @@ test("#9 GROUNDED_BINARY32_EXACT_PASS [k3 measure docs/physics.md]", () => {
   assertEquals(fighter.launch.knockbackX, melee(0.6762744784355164));
 });
 
-test("#9 SHIELD_REGEN_BINARY32_EXACT_PASS [k3 measure docs/physics.md]", () => {
+test("a held-down shield regenerates by the measured float32 amount each frame [k3 measure docs/physics.md]", () => {
   const fighter = createReferenceFighter(Character.sylvanas, 0.0, 1);
   fighter.shield.energy = 20.0;
 
@@ -29,16 +29,16 @@ test("#9 SHIELD_REGEN_BINARY32_EXACT_PASS [k3 measure docs/physics.md]", () => {
   assertEquals(fighter.shield.energy, 20.06999969482422);
 });
 
-test("#9 SHIELD_DAMAGE_BINARY32_EXACT_PASS [k3 measure docs/physics.md]", () => {
+test("a digital shield takes the measured float32 damage from a hit [k3 measure docs/physics.md]", () => {
   assertEquals(digitalShieldDamage(9.0), 6.299999713897705);
 });
 
-test("#9 SHIELD_STUN_BINARY32_EXACT_PASS [k3 measure docs/physics.md]", () => {
+test("shieldstun duration for a digital shield equals the measured float32 value [k3 measure docs/physics.md]", () => {
   assertEquals(digitalShieldstunDuration(9.0), 6.050000190734863);
   assertEquals(digitalShieldstunDuration(3.0), 3.3500001430511475);
 });
 
-test("#9 SHIELD_CONTACT_SUM_BINARY32_EXACT_PASS [k4 reference native]", () => {
+test("two hits on the same shield in one frame sum their damage and drain it to exactly zero without breaking it [k4 reference native]", () => {
   const defender = createReferenceFighter(Character.sylvanas, 0.0, 1);
   const attacker = createReferenceFighter(Character.rifleman, 100.0, -1);
   const world = testWorld(defender, attacker);
