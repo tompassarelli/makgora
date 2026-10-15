@@ -52,11 +52,12 @@ landing restarts another's suites.
    Every plan, standalone or ending a run, holds the `autoland-plan-step`
    lock, and a tip marked "waiting to test alone" under 2 min ago counts as
    testing, so no tip is planned twice (#515).
-4. **Land.** A test run or a train lands only when the suites pass on that exact candidate, main's known
-   failures included (#394), and its regenerated reports meet their targets,
-   main is fast-forwarded to it plus the reports commit, each branch's
-   status becomes "landed as SHA" and its branch is deleted. If main moved
-   while the test run or train ran (a direct `safe-push` of a workflow change), the
+4. **Land.** A test run or a train lands only when the suites pass on that
+   exact candidate, main's known failures included (#394), and its
+   regenerated reports meet their targets: main is fast-forwarded to it plus
+   the reports commit, each branch's status becomes "landed as SHA" and its
+   branch is deleted. If main moved while the test run or train ran (another
+   landing, or a direct `safe-push` of a workflow change), the
    tested commits are rebased onto the new main and land without another
    suite when every new main commit misses the train's changed paths and
    the rebased tree is exactly the tested tree plus main's changes; a main
