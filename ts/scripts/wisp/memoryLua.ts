@@ -74,6 +74,12 @@ const census = (heading: string) => {
     const byModel = [...models].sort((a, b) => b[1] - a[1]).slice(0, heading.startsWith("kind=menu") ? models.size : 8).map(([model, count]) => `${model.replaceAll(" ", "_")}:${count}`).join(",");
     parts.push(`p${client.slot} tables=${found.tables} functions=${found.functions} entries=${found.entries} string-bytes=${found.stringBytes} live=${live} top=${found.byGlobal.slice(0, 6).map(([name, count]) => `${name}:${count}`).join(",")} models=${byModel}`);
   });
+  if (heading.startsWith("kind=match")) {
+    const root: Record<string, unknown> = { loaded: package.loaded, clients, censuses, emulator, errors };
+    for (const [key, value] of pairs(_G)) if (typeof key === "string" && key !== "package") root[`G.${key}`] = value;
+    const wide = reach(root, []);
+    print(`roots ${heading} frame=${clients.frame} tables=${wide.tables} functions=${wide.functions} entries=${wide.entries} string-bytes=${wide.stringBytes} top=${wide.byGlobal.slice(0, 12).map(([name, count]) => `${name}:${count}`).join(",")}`);
+  }
   print(parts.join(" | "));
 };
 
