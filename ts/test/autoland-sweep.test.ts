@@ -71,7 +71,7 @@ test("one unfinished train excludes another, and refreshing generated queues tak
   }
 });
 
-test("the complete land shell attributes a regenerated pair, leaves failed targets queued, and retries lane one after a non-fast-forward [k5 boundary autoland-land]", () => {
+function landScenarios(modes: readonly string[]): void {
   const workflow = Bun.YAML.parse(readFileSync(new URL("../../.github/workflows/autoland.yml", import.meta.url), "utf8")) as { env: Record<string, string>; jobs: { build: { steps: { id?: string; run?: string }[] }; land: { steps: { id?: string; run?: string }[] } } };
   const shell = workflow.jobs.land.steps.find((step) => step.id === "land")?.run;
   if (shell === undefined) throw new Error("land step missing");
@@ -87,7 +87,7 @@ test("the complete land shell attributes a regenerated pair, leaves failed targe
   };
   const gitPath = command(root, ["which", "git"]);
   const bashPath = command(root, ["which", "bash"]);
-  for (const mode of ["pair", "merge-resolution", "targets", "proof", "regeneration", "non-fast-forward", "stale-record", "stale-check", "stale-fallback"]) {
+  for (const mode of modes) {
     const fixture = mkdtempSync(join(evidence, `${mode}-`));
     const repo = join(fixture, "repo");
     const bin = join(fixture, "bin");
@@ -169,16 +169,20 @@ if [ "$1" = scripts/wisp.ts ]; then
 fi
 if [ "$1" = test ]; then echo targets >> ${quote(events)}; [ "$MODE" != targets ]; exit $?; fi
 exec ${quote(process.execPath)} "$@"`);
-    const env = { ...process.env, PATH: `${bin}:${process.env.PATH ?? ""}`, MODE: mode, TEST: "", TRAIN: "true", SHA: solo, TREE: trees[0]!, BASE: base, SCRATCH: "fixture", BRANCHES: "claude/lane-0", TIPS: tips[0]!, VERDICT: mode === "stale-check" ? "check" : "tested", REPORTS: "success", DETAIL: mode === "stale-check" ? "Classic effect record is missing or stale" : "", RUNNER_TEMP: temporary, GITHUB_OUTPUT: join(fixture, "outputs"), GITHUB_STEP_SUMMARY: join(fixture, "summary"), GH_REPO: "fixture/fixture", RUN_URL: "fixture", PASSED: workflow.env.PASSED!, REPORTS_RUN: workflow.env.REPORTS_RUN!, LOCAL_REFRESH: workflow.env.LOCAL_REFRESH!, FETCH_LANES: `cat ${quote(join(fixture, "lanes.json"))}` };
-    if (mode.startsWith("stale-")) {
-      const result = Bun.spawnSync(["bash", "-e", join(fixture, "land.sh")], { cwd: repo, env, stdout: "pipe", stderr: "pipe" });
-      expect(result.exitCode).toBe(1);
-      const activity = readFileSync(events, "utf8");
-      for (const tip of tips.slice(0, mode === "stale-check" ? 1 : 2)) expect(activity).toContain(`statuses/${tip} -f state=error -f context=autoland -f description=local refresh required: Classic effect record`);
-      expect(activity).not.toContain("state=success");
-      expect(git("rev-parse", "refs/remotes/origin/main")).toBe(base);
-      for (let index = 0; index < tips.length; index++) expect(git("rev-parse", `refs/remotes/origin/claude/lane-${index}`)).toBe(tips[index]!);
-      expect(readFileSync(join(fixture, "summary"), "utf8")).toContain("source lanes remain for repair and requeue");
+    const env = { ...process.env, PATH: `${bin}:${process.env.PATH ?? ""}`, MODE: mode, TEST: "", TRAIN: "true", SHA: solo, TREE: trees[0]!, BASE: base, SCRATCH: "fixture", BRANCHES: "claude/lane-0", TIPS: tips[0]!, VERDICT: "tested", REPORTS: "success", DETAIL: "", RUNNER_TEMP: temporary, GITHUB_OUTPUT: join(fixture, "outputs"), GITHUB_STEP_SUMMARY: join(fixture, "summary"), GH_REPO: "fixture/fixture", RUN_URL: "fixture", PASSED: workflow.env.PASSED!, REPORTS_RUN: workflow.env.REPORTS_RUN!, LOCAL_REFRESH: workflow.env.LOCAL_REFRESH!, FETCH_LANES: `cat ${quote(join(fixture, "lanes.json"))}` };
+    if (mode === "stale-record") {
+      for (const staleMode of ["stale-check", "stale-record", "stale-fallback"]) {
+        writeFileSync(events, "");
+        const staleEnv = { ...env, MODE: staleMode, VERDICT: staleMode === "stale-check" ? "check" : "tested", DETAIL: staleMode === "stale-check" ? "Classic effect record is missing or stale" : "" };
+        const result = Bun.spawnSync(["bash", "-e", join(fixture, "land.sh")], { cwd: repo, env: staleEnv, stdout: "pipe", stderr: "pipe" });
+        expect(result.exitCode).toBe(1);
+        const activity = readFileSync(events, "utf8");
+        for (const tip of tips.slice(0, staleMode === "stale-check" ? 1 : 2)) expect(activity).toContain(`statuses/${tip} -f state=error -f context=autoland -f description=local refresh required: Classic effect record`);
+        expect(activity).not.toContain("state=success");
+        expect(git("rev-parse", "refs/remotes/origin/main")).toBe(base);
+        for (let index = 0; index < tips.length; index++) expect(git("rev-parse", `refs/remotes/origin/claude/lane-${index}`)).toBe(tips[index]!);
+        expect(readFileSync(join(fixture, "summary"), "utf8")).toContain("source lanes remain for repair and requeue");
+      }
       continue;
     }
     command(repo, ["bash", "-e", join(fixture, "land.sh")], env);
@@ -196,6 +200,14 @@ exec ${quote(process.execPath)} "$@"`);
       expect(activity.split("\n").filter((line) => line.endsWith(":refs/heads/main")).length).toBe(2);
     }
   }
+}
+
+test("the complete land shell attributes a regenerated pair, leaves failed targets queued, and retries lane one after a non-fast-forward [k5 boundary autoland-land]", () => {
+  landScenarios(["pair", "merge-resolution", "targets", "proof", "regeneration", "non-fast-forward"]);
+});
+
+test("stale Classic records return every affected lane for local refresh without publication [k5 boundary autoland-local-refresh]", () => {
+  landScenarios(["stale-record"]);
 });
 
 test("the #513 backlog sweeps to one run per free slot without touching a healthy run, and a runnerless job is cancelled [k1 scenario]", () => {
