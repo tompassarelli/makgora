@@ -20,6 +20,7 @@ import * as dh from "./demonHunterAssetInfo";
 import type { HeroClip, HeroClipTable, HeroPose } from "../sim/heroes/hero";
 import * as clips from "./fighterClips";
 import { groundLocomotionClip, groundLocomotionRate } from "./fighterLocomotion";
+import { koboldLocomotionClips } from "./heroes/koboldLocomotion";
 import { HERO_STRIKE_MOMENTS } from "./heroStrikeMomentInfo";
 import { SPECIAL_KEY } from "./heroStrikeMomentKeys";
 import { heroCueWindows } from "./specialCues";
@@ -130,6 +131,11 @@ function playIndex(pose: FighterPose, key: string, index: number): void {
   if (pose.animation === key) return;
   selectFighterClipIndex(pose, index);
   pose.animation = key;
+}
+
+function playLocomotionIndex(pose: FighterPose, key: string, index: number): void {
+  if (pose.clipIndex !== index) pose.animation = "";
+  playIndex(pose, key, index);
 }
 
 function playName(pose: FighterPose, key: string, name: string): void {
@@ -324,21 +330,22 @@ function selectClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly<Ros
     playIndex(pose, `motion${motion}`, locomotionClipIndex(motion));
     return locomotionRate(f, motion);
   }
-  const groundClip = groundLocomotionClip(character, pose.motion.motion);
+  const locomotionTable = koboldLocomotionClips(character, f.candle.state) ?? table;
+  const groundClip = groundLocomotionClip(character, pose.motion.motion, locomotionTable);
   if (groundClip !== undefined) {
-    playIndex(pose, `motion${pose.motion.motion}`, groundClip.index);
-    return groundLocomotionRate(f, pose.motion.motion);
+    playLocomotionIndex(pose, `motion${pose.motion.motion}`, groundClip.index);
+    return groundLocomotionRate(f, pose.motion.motion, groundClip);
   }
-  const moving = tableLocomotion(table, pose.motion.motion);
+  const moving = tableLocomotion(locomotionTable, pose.motion.motion);
   if (moving !== undefined) {
     playIndex(pose, `motion${pose.motion.motion}`, moving.index);
     return pose.motion.motion === IllidanLocomotion.run ? locomotionRate(f, pose.motion.motion) : tableLocomotionRate(moving, pose.motion.motion);
   }
   const walking = f.motion.grounded && Math.abs(totalVelocityX(f)) > f32(0.1);
 
-  const locomotion = table[walking ? "walk" : "idle"];
+  const locomotion = locomotionTable[walking ? "walk" : "idle"];
   if (locomotion === undefined) playName(pose, walking ? "walk" : "stand", walking ? "walk" : "stand");
-  else playIndex(pose, walking ? "walk" : "stand", locomotion.index);
+  else playLocomotionIndex(pose, walking ? "walk" : "stand", locomotion.index);
   return walking ? min(f32(1.4), max(f32(0.2), f32(Math.abs(f.motion.vx) / f.tuning.physics.runSpeed))) : rate;
 }
 

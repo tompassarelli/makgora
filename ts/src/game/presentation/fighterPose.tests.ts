@@ -7,7 +7,10 @@ import { stateChecksum } from "../replay/canonical";
 import { firstPoseDifference, firstStateDifference } from "../replay/difference";
 import { ReplayHistory } from "../replay/history";
 import { type ReplayState, captureReplaySnapshot, copyReplayState, createReplaySnapshot } from "../replay/snapshot";
-import { AttackStyle, Character, DownState, GrabAction, SpecialAction } from "../sim/codes";
+import { AttackStyle, CandleState, Character, DownState, GrabAction, SpecialAction } from "../sim/codes";
+import { copyFighterState } from "../../generated/state/fighterState";
+import { dropCandle } from "../sim/heroes/koboldCandle";
+import { KOBOLD_BARE_CLIPS, KOBOLD_CLIPS } from "../sim/heroes/koboldClips";
 import { beginFighterAttack } from "../sim/attacks";
 import type { HeroPose } from "../sim/heroes/hero";
 import { DOWN_ROLL_FRAMES, TECH_IN_PLACE_FRAMES, TECH_ROLL_FRAMES } from "../sim/down";
@@ -26,10 +29,53 @@ import { attackStartupFrames, grabActionDuration, grabContactFrame } from "../si
 import { fighterAt, neutralControls } from "../sim/roster";
 import { controls, soloWorld, testWorld } from "../sim/testWorld";
 import * as dh from "./demonHunterAssetInfo";
-import { FRAME_SECONDS, advanceFighterPose, createFighterPose } from "./fighterPose";
+import { FRAME_SECONDS, advanceFighterPose, copyFighterPoseInto, createFighterPose, firstFighterPoseDifference } from "./fighterPose";
 import { DRAWN_STRIDES } from "./drawnStrideInfo";
 import { groundLocomotionClip } from "./fighterLocomotion";
 import { IllidanLocomotion, TRANSITION_FRAMES } from "./illidanMotion";
+
+test("Kobold switches idle and ground cadence with candle ownership on the same frame [k2 property]", () => {
+  for (const gait of ["idle", "walk", "dash", "run"] as const) for (const facing of [-1, 1]) {
+    const f = createFighter(Character.kobold, 0.0, facing);
+    const world = soloWorld(f), input = neutralControls(), pose = createFighterPose();
+    input.direction = gait === "idle" ? 0 : facing;
+    input.walking = gait === "walk";
+    f.motion.vx = gait === "idle" ? 0.0 : f32(facing * (input.walking ? f.tuning.physics.walkSpeed : f.tuning.physics.runSpeed));
+    f.ground.dashFrame = gait === "dash" ? 1 : 0;
+    advanceFighterPose(pose, f, world, input, false, false, false, false);
+    assertEquals(pose.clipIndex, KOBOLD_CLIPS[gait].index);
+    dropCandle(f);
+    assertEquals(f.candle.state, CandleState.airborne);
+    advanceFighterPose(pose, f, world, input, false, false, false, false);
+    assertEquals(pose.clipIndex, KOBOLD_BARE_CLIPS[gait].index);
+    assertEquals(pose.clipTime, 0.0);
+    if (gait !== "idle") {
+      const speed = DRAWN_STRIDES[Character.kobold]?.[gait === "walk" ? "walk" : "run"].alternates?.[KOBOLD_BARE_CLIPS[gait].index];
+      assertTrue(speed !== undefined);
+      if (speed !== undefined) assertTrue(Math.abs(f32(speed * pose.rate) - f32(Math.abs(f.motion.vx) * 60.0)) < f32(0.01));
+    }
+    const savedFighter = createFighter(Character.kobold, 0.0, facing);
+    const savedPose = createFighterPose(), expected = createFighterPose();
+    copyFighterState(savedFighter, f, world.mask);
+    copyFighterPoseInto(savedPose, pose, world);
+    advanceFighterPose(pose, f, world, input, false, false, false, false);
+    assertGreaterThan(pose.clipTime, 0.0);
+    copyFighterPoseInto(expected, pose, world);
+    f.candle.state = CandleState.held;
+    advanceFighterPose(pose, f, world, input, false, false, false, false);
+    assertEquals(pose.clipIndex, KOBOLD_CLIPS[gait].index);
+    assertEquals(pose.clipTime, 0.0);
+    copyFighterState(f, savedFighter, world.mask);
+    copyFighterPoseInto(pose, savedPose, world);
+    advanceFighterPose(pose, f, world, input, false, false, false, false);
+    assertEquals(firstFighterPoseDifference(expected, pose, world, world), undefined);
+    for (const state of [CandleState.resting, CandleState.lost]) {
+      f.candle.state = state;
+      advanceFighterPose(pose, f, world, input, false, false, false, false);
+      assertEquals(pose.clipIndex, KOBOLD_BARE_CLIPS[gait].index);
+    }
+  }
+});
 
 test("every fighter walks and runs with foot cadence following ground speed [k3 measure #171]", () => {
   for (const character of SELECTABLE_CHARACTERS) {

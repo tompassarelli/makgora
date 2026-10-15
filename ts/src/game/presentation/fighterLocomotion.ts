@@ -2,7 +2,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { originalClip, originalClipNamed } from "../assets/fighterOriginalClipInfo";
 import { Character } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
-import type { HeroClip } from "../sim/heroes/hero";
+import type { HeroClip, HeroClipTable } from "../sim/heroes/hero";
 import { characterClips } from "./fighterClips";
 import * as dh from "./demonHunterAssetInfo";
 import { IllidanLocomotion } from "./illidanMotion";
@@ -22,14 +22,13 @@ const ILLIDAN_RUN: HeroClip = { index: dh.DEMON_HUNTER_RUN_FORWARD_INDEX, second
 const ILLIDAN_DASH: HeroClip = { index: dh.DEMON_HUNTER_INITIAL_DASH_BURST_INDEX, seconds: dh.DEMON_HUNTER_INITIAL_DASH_BURST_SECONDS };
 
 
-export function groundLocomotionClip(character: Character, motion: IllidanLocomotion): HeroClip | undefined {
+export function groundLocomotionClip(character: Character, motion: IllidanLocomotion, table: Readonly<HeroClipTable> = characterClips(character)): HeroClip | undefined {
   if (character === Character.demonHunter) {
     if (motion === IllidanLocomotion.walk) return ILLIDAN_WALK;
     if (motion === IllidanLocomotion.run) return ILLIDAN_RUN;
     if (motion === IllidanLocomotion.dash) return ILLIDAN_DASH;
     return undefined;
   }
-  const table = characterClips(character);
   const walk = table.walk ?? ORIGINAL_WALKS[character];
   if (motion === IllidanLocomotion.walk) return walk;
   if (motion === IllidanLocomotion.run) return table.run ?? walk;
@@ -38,9 +37,10 @@ export function groundLocomotionClip(character: Character, motion: IllidanLocomo
 }
 
 
-export function groundLocomotionRate(f: Readonly<Fighter>, motion: IllidanLocomotion): number {
+export function groundLocomotionRate(f: Readonly<Fighter>, motion: IllidanLocomotion, clip?: HeroClip): number {
   const gait = motion === IllidanLocomotion.walk ? "walk" : "run";
   const stride = DRAWN_STRIDES[f.character]?.[gait];
   if (stride === undefined) throw new Error(`missing drawn stride for ${f.character}/${gait}`);
-  return f32(f32(Math.abs(f.motion.vx) * 60.0) / stride.speed);
+  const speed = clip === undefined ? stride.speed : stride.alternates?.[clip.index] ?? stride.speed;
+  return f32(f32(Math.abs(f.motion.vx) * 60.0) / speed);
 }
