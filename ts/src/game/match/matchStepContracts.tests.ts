@@ -38,7 +38,7 @@ function testSoloMatch() {
   const game = createMatchState(); setParticipants(game, 1, 2); recallCharacter(game, 0, 1); return game;
 }
 
-test("heldShieldOrderDepletionPrecedesEveryGuardExit [k4 reference docs/physics.md#shield-break-recovery]", () => {
+test("a shield drained below zero on the frame the player jumps, dodges, releases or grabs breaks before the action starts, while one drained to exactly zero lets the action start [k4 reference docs/physics.md#shield-break-recovery]", () => {
   for (let boundary = 0; boundary <= 1; boundary++) {
     for (let action = 0; action <= 3; action++) {
       const game = createMatchState();
@@ -88,7 +88,7 @@ test("heldShieldOrderDepletionPrecedesEveryGuardExit [k4 reference docs/physics.
     }
   }
 });
-test("heldShieldOrderEntryDoesNotDrainUntilNextAnimationTick [k4 reference docs/physics.md#shield-break-recovery]", () => {
+test("raising a shield does not drain it on the entry frame, and the first drain after that breaks a nearly empty shield before a jump [k4 reference docs/physics.md#shield-break-recovery]", () => {
   const game = createMatchState();
   game.phase = Phase.match;
   const first = createFighter(1, 0, 1);
@@ -113,7 +113,7 @@ test("heldShieldOrderEntryDoesNotDrainUntilNextAnimationTick [k4 reference docs/
   assertNear(first.shield.energy, 0.07000000029802322, 0.00009999999747378752);
   assertNear(second.shield.energy, 19.440000534057617, 0.00009999999747378752);
 });
-test("heldShieldOrderHitlagAndShieldstunResumeBeforeActionInputs [k4 reference docs/physics.md#shield-break-recovery]", () => {
+test("when hitlag and shieldstun end, the held jump or grab takes the shield down that frame and the shield regenerates, and no shield drains while frozen [k4 reference docs/physics.md#shield-break-recovery]", () => {
   for (let action = 0; action <= 1; action++) {
     const game = createMatchState();
     game.phase = Phase.match;
@@ -168,7 +168,7 @@ test("heldShieldOrderHitlagAndShieldstunResumeBeforeActionInputs [k4 reference d
     assertNear(second.shield.energy, 19.719999313354492, 0.00009999999747378752);
   }
 });
-test("shieldBreakBoundaryDrainRequiresStrictlyNegativeHealth [k4 reference docs/physics.md#shield-break-recovery]", () => {
+test("holding a shield down to exactly zero energy keeps it raised, and only the next drain breaks it [k4 reference docs/physics.md#shield-break-recovery]", () => {
   const game = createMatchState();
   game.phase = Phase.match;
   const first = createFighter(1, 0, 1);
@@ -189,7 +189,7 @@ test("shieldBreakBoundaryDrainRequiresStrictlyNegativeHealth [k4 reference docs/
   assertFalse(first.shield.raised);
   assertNear(first.shield.energy, 0.07000000029802322, 0.00009999999747378752);
 });
-test("shieldBreakBoundaryDamageAtZeroStillGuardsThenRestoresThirty [k4 reference docs/physics.md#shield-break-recovery]", () => {
+test("a hit that drains a shield to exactly zero is still blocked with no damage, and the next hit breaks it and restores thirty energy [k4 reference docs/physics.md#shield-break-recovery]", () => {
   const game = createMatchState();
   game.phase = Phase.match;
   const first = createFighter(1, 0, 1);
@@ -226,7 +226,7 @@ test("shieldBreakBoundaryDamageAtZeroStillGuardsThenRestoresThirty [k4 reference
   stepMatch(game, testRoster(first, second), testFrameControls(firstInput, secondInput, firstCommands, secondCommands), 3);
   assertNear(second.shield.energy, 30.06999969482422, 0.00009999999747378752);
 });
-test("shieldRegenMatchContinuesDuringStoppedActions [k4 reference docs/physics.md#shield-break-recovery]", () => {
+test("shield energy keeps regenerating, capped at sixty, during hitlag, ledge hang, being grabbed or grabbing, wall tech, freeze and down wait [k4 reference docs/physics.md#shield-break-recovery]", () => {
   for (let state = 0; state <= 5; state++) {
     const game = createMatchState();
     game.phase = Phase.match;
@@ -278,7 +278,7 @@ test("shieldRegenMatchContinuesDuringStoppedActions [k4 reference docs/physics.m
     assertEquals(first.shield.energy, 60.0);
   }
 });
-test("shieldRegenMatchUsesGuardStateAfterGrabInput [k4 reference docs/physics.md#shield-break-recovery]", () => {
+test("a fighter who grabs out of shield is charged one drain tick net of regeneration that frame and regenerates through hitlag, while a fighter who keeps shielding does not [k4 reference docs/physics.md#shield-break-recovery]", () => {
   const game = createMatchState();
   game.phase = Phase.match;
   const first = createFighter(1, 0, 1);
@@ -306,7 +306,7 @@ test("shieldRegenMatchUsesGuardStateAfterGrabInput [k4 reference docs/physics.md
   assertNear(first.shield.energy, 19.860000610351562, 0.00009999999747378752);
   assertNear(second.shield.energy, 19.719999313354492, 0.00009999999747378752);
 });
-test("shieldRegenMatchFollowsDizzyRestoreExactlyOnce [k4 reference docs/physics.md#shield-break-recovery]", () => {
+test("a broken shield is restored to thirty energy once as dizzy begins, regenerates only after dizzy ends, and does not regenerate while out of the match [k4 reference docs/physics.md#shield-break-recovery]", () => {
   const game = createMatchState();
   game.phase = Phase.match;
   const first = createFighter(1, 0, 1);
@@ -334,7 +334,7 @@ test("shieldRegenMatchFollowsDizzyRestoreExactlyOnce [k4 reference docs/physics.
   stepMatch(game, testRoster(first, second), testFrameControls(firstInput, secondInput, firstCommands, secondCommands), 5);
   assertNear(first.shield.energy, 30.139999389648438, 0.00009999999747378752);
 });
-test("shieldRegenMatchSeesGuardClearedByCapture [k4 reference docs/physics.md#shield-break-recovery]", () => {
+test("a shielding fighter caught by a grab loses the shield that frame and is charged one drain tick net of regeneration [k4 reference docs/physics.md#shield-break-recovery]", () => {
   const game = createMatchState();
   game.phase = Phase.match;
   const first = createFighter(1, 0, 1);
@@ -355,7 +355,7 @@ test("shieldRegenMatchSeesGuardClearedByCapture [k4 reference docs/physics.md#sh
   assertFalse(second.shield.raised);
   assertNear(second.shield.energy, 19.790000915527344, 0.00009999999747378752);
 });
-test("activeShieldConsumesGrabButRejectsOrdinaryAttackCommand [k3 measure docs/design/melee/defense.md]", () => {
+test("a fighter holding shield ignores an attack press and keeps shielding, but a grab press cancels the shield and starts the grab with no release lag [k3 measure docs/design/melee/defense.md]", () => {
   const game = testSoloMatch();
   selectCharacter(game, 0, 1);
   selectCpuCharacter(game, 0, (cpuSlot(game) ?? -1), 1);
@@ -380,7 +380,7 @@ test("activeShieldConsumesGrabButRejectsOrdinaryAttackCommand [k3 measure docs/d
   assertFalse(first.shield.raised);
   assertEquals(first.shield.releaseLag, 0);
 });
-test("jumpSquatBuffersBackAirUntilFirstAirborneFrame [k3 measure docs/design/melee/aerials-on-shield.md]", () => {
+test("a back-air pressed during jump squat waits for the first airborne frame and then starts without turning the fighter [k3 measure docs/design/melee/aerials-on-shield.md]", () => {
   for (const character of [1, 2] as const) {
     for (let facing = -1; facing <= 1; facing++) {
       if (facing !== 0) {
@@ -417,7 +417,7 @@ test("jumpSquatBuffersBackAirUntilFirstAirborneFrame [k3 measure docs/design/mel
     }
   }
 });
-test("dashGrabUsesTestActorTimingAndWindowIsReplayable [k3 measure docs/physics.md]", () => {
+test("a dash grab uses the fighter's tuned ten-frame startup, so it connects on the frame after startup and not before [k3 measure docs/physics.md]", () => {
   const game = createMatchState();
   game.phase = Phase.match;
   const first = createFighter(1, 0, 1);
@@ -449,7 +449,7 @@ test("dashGrabUsesTestActorTimingAndWindowIsReplayable [k3 measure docs/physics.
   stepMatch(game, testRoster(first, second), testFrameControls(firstInput, secondInput, firstCommands, secondCommands), 11);
   assertGreaterThan(second.grab.grabbedFrames, 0);
 });
-test("ordinaryDashAttackStaysAnAttackWhileGrabIntentStartsDashGrab [k3 measure docs/design/tilts.md]", () => {
+test("pressing attack during a dash throws a dash attack, while pressing grab during a dash starts a dash grab [k3 measure docs/design/tilts.md]", () => {
   const game = createMatchState();
   game.phase = Phase.match;
   const first = createFighter(1, -240, 1);
@@ -479,7 +479,7 @@ test("ordinaryDashAttackStaysAnAttackWhileGrabIntentStartsDashGrab [k3 measure d
   assertTrue(second.attack.dashGrab);
   assertEquals(second.attack.duration, attackDurationFramesForGrounding(5, true));
 });
-test("lateDashGrabGuardEntryOpensCatchDashAndEarlyEntryDoesNot [k3 measure docs/physics.md]", () => {
+test("raising shield late in a dash or run opens a three-frame dash-grab window that a grab uses up, and raising it early does not [k3 measure docs/physics.md]", () => {
   const game = createMatchState();
   game.phase = Phase.match;
   const first = createFighter(1, 0, 1);
@@ -553,7 +553,7 @@ test("lateDashGrabGuardEntryOpensCatchDashAndEarlyEntryDoesNot [k3 measure docs/
   stepMatch(dashLateGame, testRoster(dashLate, dashLateOther), testFrameControls(dashLateInput, dashLateOtherInput, dashLateCommands, dashLateOtherCommands), 1);
   assertEquals(dashLate.ground.dashGrabWindow, 3);
 });
-test("dashGrabWhiffEndsAfterFortySubsequentTicks [k3 measure docs/physics.md]", () => {
+test("a dash grab that hits nothing ends forty frames after it starts, and then the fighter can act again [k3 measure docs/physics.md]", () => {
   const game = createMatchState();
   game.phase = Phase.match;
   const first = createFighter(1, -240, 1);
@@ -589,7 +589,7 @@ test("dashGrabWhiffEndsAfterFortySubsequentTicks [k3 measure docs/physics.md]", 
   assertGreaterThan(first.jump.squat, 0);
   assertEquals(second.grab.grabbedFrames, 0);
 });
-test("dashGrabSecondActiveTickCapturesButFollowingTickDoesNot [k3 measure docs/physics.md]", () => {
+test("a dash grab catches a target whose invincibility ends on its second active frame but not one whose invincibility lasts a frame longer [k3 measure docs/physics.md]", () => {
   for (let lateByOne = 0; lateByOne <= 1; lateByOne++) {
     const game = createMatchState();
     game.phase = Phase.match;

@@ -13,7 +13,7 @@ import { canAttack } from "./conditions";
 import { resolveLedges } from "./ledge";
 import { cancelSpecialState } from "./transitions";
 
-test("simultaneousImmolatesTradeInEitherSlotOrder [k2 property]", () => {
+test("two Demon Hunters whose Immolates start together on the ground or in the air both take the same damage and hitstun, whichever slot is listed first [k2 property]", () => {
   for (const airborne of [false, true]) for (const reversed of [false, true]) {
     const left = createFighter(Character.demonHunter, 0.0, 1);
     const right = createFighter(Character.demonHunter, 60.0, -1);
@@ -36,7 +36,7 @@ test("simultaneousImmolatesTradeInEitherSlotOrder [k2 property]", () => {
   }
 });
 
-test("wingAscentConsumesJumpsAndEndsInHelplessFallAfterInterruptionRules [k3 measure docs/physics.md]", () => {
+test("Wing Ascent spends a jump and ends in a helpless fall that blocks jumping, dodging, attacking and specials until the fighter is hit or lands [k3 measure docs/physics.md]", () => {
   for (const character of [Character.demonHunter, Character.rifleman]) {
     const fighter = createFighter(character, 0.0, 1);
     const target = createFighter(character === Character.rifleman ? Character.rifleman : Character.rifleman, 500.0, -1);
@@ -107,7 +107,7 @@ function castOrb(illidan: Fighter, world: Roster): Projectile {
   return mutableProjectile(illidan, 0)!;
 }
 
-test("aFullJumpClearsManaBurnWhereStandingStillIsHit [k3 measure #116]", () => {
+test("Mana Burn's orb stuns a target that stands still but misses one that jumps over it [k3 measure #116]", () => {
   for (const jumps of [false, true]) {
     const illidan = createFighter(Character.demonHunter, 0.0, 1);
     const target = createFighter(Character.rifleman, 600.0, -1);

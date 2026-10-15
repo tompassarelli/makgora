@@ -29,7 +29,7 @@ function runToAttackActive(game: ReturnType<typeof createMatchState>, first: Fig
     stepMatch(game, testRoster(first, second), frameControls(firstInput, secondInput, firstCommands, secondCommands), startFrame + i);
 }
 
-test("shieldGrabStartsDirectlyFromActiveGuardAndCanCatchShieldingTarget [k3 measure docs/design/melee/defense.md]", () => {
+test("a grab pressed while shielding starts at once without shield release lag and catches a target that is shielding [k3 measure docs/design/melee/defense.md]", () => {
   const game = testMatch();
   const attacker = createFighter(1, 0, 1);
   const target = createFighter(1, 90, -1);
@@ -52,7 +52,7 @@ test("shieldGrabStartsDirectlyFromActiveGuardAndCanCatchShieldingTarget [k3 meas
   assertFalse(target.shield.raised);
 });
 
-test("shieldstunKeepsTheFighterShieldingAndBlocksActions [k4 reference docs/physics.md#shield-break-recovery]", () => {
+test("a fighter in shieldstun stays shielding after letting go of shield, and cannot jump or attack until the stun ends [k4 reference docs/physics.md#shield-break-recovery]", () => {
   const game = testMatch();
   const attacker = createFighter(1, 0, 1);
   const target = createFighter(1, 100, -1);
@@ -79,7 +79,7 @@ test("shieldstunKeepsTheFighterShieldingAndBlocksActions [k4 reference docs/phys
 
 });
 
-test("simultaneousEligibleAttacksTradeInEitherOrder [k1 scenario]", () => {
+test("two fighters whose attacks connect on the same frame both take the hit, whichever slot is listed first [k1 scenario]", () => {
   const gameA = testMatch();
   const leftA = createFighter(1, 0, 1);
   const rightA = createFighter(1, 100, -1);
@@ -122,7 +122,7 @@ test("simultaneousEligibleAttacksTradeInEitherOrder [k1 scenario]", () => {
 
 });
 
-test("successfulGrabHasPriorityOverSimultaneousStrikeInEitherOrder [k1 scenario]", () => {
+test("a grab that connects on the same frame as a strike wins and the grabber takes no damage, whichever slot is listed first [k1 scenario]", () => {
   const gameA = testMatch();
   const grabberA = createFighter(1, 0, 1);
   const strikerA = createFighter(1, 90, -1);
@@ -168,7 +168,7 @@ test("successfulGrabHasPriorityOverSimultaneousStrikeInEitherOrder [k1 scenario]
 
 });
 
-test("grabBreaksShieldButHasShortReachAndTimedRelease [k3 measure docs/design/melee/defense.md]", () => {
+test("a grab pulls a shielding target out of its shield and lets go after the hold time, but misses a target out of reach, invincible or out of the match [k3 measure docs/design/melee/defense.md]", () => {
   const game = testMatch();
   const attacker = createFighter(1, 0, 1);
   const target = createFighter(1, 90, -1);

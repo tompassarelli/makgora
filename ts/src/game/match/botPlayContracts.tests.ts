@@ -60,7 +60,7 @@ function computerMatch(characters: readonly [Character, Character], xs: readonly
   return { world, match, controls, runtime, produced, step };
 }
 
-test("computerChasesToTheEdgeWithoutLeavingTheStage [k1 scenario]", () => {
+test("a computer chasing an opponent at the deck edge never leaves the stage unless the opponent is knocked off it, and keeps its three stocks [k1 scenario]", () => {
   // The #12 soak's self-destruct: a computer chasing an opponent at the deck's edge ran off it.
   for (const character of [Character.rifleman, Character.demonHunter]) {
     for (const side of [-1, 1]) {
@@ -81,7 +81,7 @@ test("computerChasesToTheEdgeWithoutLeavingTheStage [k1 scenario]", () => {
   }
 });
 
-test("computerMatchesRepeatFromTheSameStart [k1 scenario]", () => {
+test("two computer matches from the same start reach the same state after 600 frames and both land hits [k1 scenario]", () => {
   for (const stage of [0, 1]) {
     const checksums: string[] = [];
     let landed = 0;

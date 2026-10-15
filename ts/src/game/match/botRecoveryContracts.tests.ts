@@ -22,7 +22,7 @@ function frameControls(first: Controls, second: Controls): FrameControls {
   return result;
 }
 
-test("computerRecoversFromBothSidesWithAndWithoutJump [k1 scenario]", () => {
+test("a computer knocked off either side of the deck or the Tomb of Sargeras sea, with or without a jump left, recovers to solid ground without losing a stock [k1 scenario]", () => {
   for (const character of [Character.demonHunter, Character.rifleman, Character.mountainKing]) for (const stage of [0, TOMB_OF_SARGERAS_STAGE]) {
     for (const side of [-1, 1]) for (const jumps of [0, 1]) {
       const fighter = createFighter(character, side * 680.0, -side);

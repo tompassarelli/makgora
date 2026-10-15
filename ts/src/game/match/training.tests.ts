@@ -93,7 +93,7 @@ function techOutcome(tech: number, hitSerial = 1): { state: number; direction: n
   return { state: partner.down.state, direction: partner.down.direction };
 }
 
-test("readoutShowsTheMoveAndTheAdvantageOnShieldAndOnHit [k1 scenario]", () => {
+test("the training readout shows the jab's startup, active and total frames and the frame advantage after it is shielded or hits [k1 scenario]", () => {
   for (const behaviour of [PartnerBehaviour.shield, PartnerBehaviour.stand]) {
     const match = trainingMatch(behaviour, 24.0);
     const { player, partner, game } = match;

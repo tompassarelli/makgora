@@ -17,7 +17,7 @@ function fourWorld() {
   ]);
 }
 
-test("multipleAttackersKeepIndependentVictimHitWindows [k3 measure #12]", () => {
+test("one victim hit by two attackers on the same frame takes both hits, and takes no further damage on the next resolve [k3 measure #12]", () => {
   const world = fourWorld();
   world.fighters[0]!.motion.x = 0.0;
   world.fighters[2]!.motion.x = 0.0;
