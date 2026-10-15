@@ -1,7 +1,7 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { createFighter } from "../sim/fighter";
 import { createRoster } from "../sim/roster";
-import { Phase, advanceClock, copyMatchState, createMatchState, initializeComputerChoices, selectCpuCharacter, setParticipants } from "../lobby/lobbyState";
+import { Phase, advanceClock, copyMatchState, createMatchState, initializeComputerChoices, selectCpuCharacter, setParticipants } from "./lobbyState";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { PLAYABLE_CHARACTERS } from "../sim/heroes/registry";
 

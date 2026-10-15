@@ -46,7 +46,7 @@ src/game/match/multiHitAerialContracts.tests.ts	7	0.182
 src/game/match/offscreenInputContracts.tests.ts	3	0.083
 src/game/match/parryContracts.tests.ts	2	0.070
 src/game/match/pushPhysicsContracts.tests.ts	4	0.019
-src/game/match/rules.tests.ts	5	0.007
+src/game/lobby/lobbyState.tests.ts	5	0.007
 src/game/match/simulationStepContracts.tests.ts	6	0.201
 src/game/match/stageHazardContracts.tests.ts	4	0.659
 src/game/match/stageHazardTracks.tests.ts	8	0.777
