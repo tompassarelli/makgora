@@ -149,9 +149,13 @@ test("at mid range Bear's charge mauls a dummy 2.2H away into a launch, Hawk's d
   for (const facing of [-1, 1]) {
     const bear = pair(f32(HERO_REFERENCE_HEIGHT * f32(2.2)), facing);
     run(bear.world, 74, controls({ specialPressed: true, specialX: facing }));
-    run(bear.world, 40, controls({ specialPressed: true, specialX: facing }));
+    let bearLaunched = false;
+    for (let frame = 1; frame <= 40; frame++) {
+      stepDuel(bear.world, frame === 1 ? controls({ specialPressed: true, specialX: facing }) : controls());
+      if (bear.target.launch.hitstun > 20) bearLaunched = true;
+    }
     assertGreaterThan(bear.target.status.damage, 9.0);
-    assertTrue(!bear.target.motion.grounded || bear.target.launch.hitstun > 20);
+    assertTrue(bearLaunched);
 
     const hawk = pair(f32(HERO_REFERENCE_HEIGHT * f32(2.0)), facing);
     run(hawk.world, 30, up);
