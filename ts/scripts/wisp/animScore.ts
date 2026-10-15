@@ -37,6 +37,7 @@ export interface ScoreSkeleton {
 
 export interface MoveSample {
   readonly moveClass: MoveClass;
+  readonly limbStrike: boolean;
 
   readonly frames: readonly ScoreFrame[];
 
@@ -73,7 +74,7 @@ export interface ClassThresholds {
   readonly contrast: number;
 }
 
-export interface LineOne { readonly pass: boolean; readonly bodyShare: number; readonly massShift: number; readonly limb: string }
+export interface LineOne { readonly pass: boolean; readonly bodyShare: number; readonly massShift: number; readonly limb: string; readonly rule: "body" | "limb"; readonly limbDrive: number }
 export interface LineTwo { readonly pass: boolean; readonly endError: number; readonly jump: number; readonly overshoot: number }
 export interface LineThree { readonly pass: boolean; readonly windup: number; readonly peak: number; readonly settle: number; readonly fill: number }
 export interface LineFour { readonly pass: boolean; readonly contrast: number; readonly windupContact: number; readonly contactRecovery: number }
@@ -100,6 +101,8 @@ export const THRESHOLDS: Readonly<Record<MoveClass, ClassThresholds>> = {
   special: { bodyShare: 0.9, massShift: 0.2, endError: 0.046, jump: 0.055, overshoot: 0.039, peakLate: 1, fill: 0.9, contrast: 0.48 },
 };
 
+
+export const LIMB_STRIKE = { limbDrive: 0.5 } as const;
 
 const LEAST_TRAVEL = 0.02;
 
@@ -277,9 +280,11 @@ export function scoreMove(sample: MoveSample, thresholds: ClassThresholds): Move
     return found;
   };
   const massShift = (along(maskCentroid(mask(contact), sample.pixelsPerUnit)) - along(maskCentroid(mask(windup), sample.pixelsPerUnit))) / height;
+  const rule = sample.limbStrike && limb?.name.startsWith("leg ") === true ? "limb" : "body";
+  const limbDrive = Math.max(0, tipTravel / height);
   const line1: LineOne = {
-    pass: bodyShare >= thresholds.bodyShare && massShift >= thresholds.massShift,
-    bodyShare, massShift, limb: limb?.name ?? "body",
+    pass: (rule === "limb" ? limbDrive >= LIMB_STRIKE.limbDrive : bodyShare >= thresholds.bodyShare) && massShift >= thresholds.massShift,
+    bodyShare, massShift, limb: limb?.name ?? "body", rule, limbDrive,
   };
 
 
@@ -322,7 +327,7 @@ export function scoreMove(sample: MoveSample, thresholds: ClassThresholds): Move
 
   const short = (value: number, least: number) => Math.max(0, least - value) / Math.max(least, 1e-6);
   const over = (value: number, most: number) => Math.max(0, value - most) / Math.max(most, 1e-6);
-  const shortfall = short(bodyShare, thresholds.bodyShare) + short(massShift, thresholds.massShift)
+  const shortfall = (rule === "limb" ? short(limbDrive, LIMB_STRIKE.limbDrive) : short(bodyShare, thresholds.bodyShare)) + short(massShift, thresholds.massShift)
     + over(endError, thresholds.endError) + over(jump, thresholds.jump) + short(overshoot, thresholds.overshoot)
     + (windupOk ? 0 : 1) + (peakOk ? 0 : 1) + short(fill, thresholds.fill) + short(contrast, thresholds.contrast);
   return { line1, line2, line3, line4, keys: { windup: windupKey, contact, recovery }, shortfall };

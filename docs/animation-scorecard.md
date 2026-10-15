@@ -16,6 +16,11 @@ after the move ends, so line 2 measures the transition the game draws.
    contact. A limb carrying that point is found by its hand/foot attachment;
    its shoulder/hip travel divided by tip travel measures body share. Also
    measure how far the filled silhouette's centre shifts toward the strike.
+   A limb strike (a kick, listed per fighter in `LIMB_STRIKES` in
+   `ts/scripts/wisp/animScoreSample.ts`, whose struck point rides a leg) is
+   scored on limb drive instead of body share: the foot's travel toward the
+   strike from windup to contact, as a fraction of body height. The class's
+   mass shift still applies, and the cold reader (line 5) stays the bar.
 2. **Return:** mean drawn-vertex error from ready on the final move frame,
    largest single-frame change from end lag through two following frames,
    and tip travel past contact along its incoming direction. Zero overshoot
@@ -89,6 +94,12 @@ Tom as better examples are authored.
 | aerial | .29 | .023 | .008 | .015 | .12 | 3 | .53 | .25 |
 | special | .90 | .20 | .046 | .055 | .039 | 1 | .90 | .48 |
 
+Limb strikes need limb drive ≥ .50 in place of body share. Body share is a
+weapon-strike rule calibrated on weapon tilts; a snap kick turns from the hip,
+so its hip barely travels and its body share sits near .1. The .50 line is
+calibrated on Shadow Hunter's six kicks, each named a kick by a cold reader:
+limb drive .89–1.24 in Classic and .69–.93 in Definitive.
+
 Jab weight uses Lich King's second jab; smash weight/return use Malfurion's
 down smash; tilt weight uses Mountain King's angled up tilt and Thrall's
 forward tilt. Jab return uses Grom's jab and Lich King's second jab. Special
@@ -99,9 +110,7 @@ Blademaster up smash and Beastmaster neutral special. Contrast uses each
 class's good readability examples. Tilt return, aerial weight/timing
 have no good class example and use the pooled values.
 
-`bun test test/anim-score.test.ts` pins a driven strike passing all measured
-lines, an arm-only strike failing body drive, and a direct return without
-follow-through failing line 2. `bun run check` is the named source check.
+`bun run check` is the named source check.
 Re-author worst first under #180; keep a change only when its row improves
 and no other line falls, as required by #355.
 

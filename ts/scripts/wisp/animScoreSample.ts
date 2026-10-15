@@ -79,6 +79,10 @@ const LIMBS: readonly (readonly [string, string, string])[] = [
   ["foreleg", "^bone front {S} leg(01)?$", "^bone front ?{S} toe(01)?$"],
 ];
 
+export const LIMB_STRIKES: Readonly<Record<string, readonly string[]>> = {
+  "shadow-hunter": ["forward-tilt", "forward-tilt-up", "forward-tilt-down", "up-tilt", "down-tilt", "dash-attack"],
+};
+
 export const SKELETON_EXCEPTIONS: Readonly<Record<string, { readonly pelvis?: string; readonly chest?: string; readonly limbs?: readonly { readonly name: string; readonly root: string; readonly end: string }[] }>> = {};
 
 
@@ -209,7 +213,7 @@ export function sampleNormal(model: DrawnModel, skeleton: ScoreSkeleton, charact
   const chestZ = skeleton.chest === undefined ? 50 : posed[first]?.nodes[skeleton.chest * 2 + 1] ?? 50;
   return {
     move: entry.move, endFrame: moveFrames - 1, seconds: frames.map((frame) => timelineSeconds(character, frame)), heights: frames.map((frame) => frame.z - (entry.aerial ? 900.0 - 300.0 : 0.0)),
-    sample: { moveClass: entry.moveClass, frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, strike: strikeEnd(local, chestZ), pixelsPerUnit },
+    sample: { moveClass: entry.moveClass, limbStrike: LIMB_STRIKES[fighterSlug(character)]?.includes(entry.move) === true, frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, strike: strikeEnd(local, chestZ), pixelsPerUnit },
   };
 }
 
@@ -265,7 +269,7 @@ export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, charac
   if (ready === undefined) return undefined;
   return {
     move: entry.move, endFrame: moveFrames - 1, seconds: frames.map((frame) => timelineSeconds(character, frame)), heights: frames.map((frame) => frame.z),
-    sample: { moveClass: "special", frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, strike, pixelsPerUnit },
+    sample: { moveClass: "special", limbStrike: false, frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, strike, pixelsPerUnit },
   };
 }
 

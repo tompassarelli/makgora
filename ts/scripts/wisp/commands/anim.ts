@@ -106,7 +106,7 @@ const n = (value: number) => value.toFixed(2);
 const n3 = (value: number) => value.toFixed(3);
 const crouchVerdict = (row: { readonly pass: boolean; readonly kind: CrouchClipKind }) => row.kind === "none" ? "no clip" : row.kind === "other" ? (row.pass ? "pass*" : "FAIL*") : mark(row.pass);
 
-const HEADER = ["fighter", "move", "class", "passed", "shortfall", "L1", "body share", "mass shift", "limb", "L2", "end error", "jump", "overshoot", "L3", "windup", "peak", "settle", "fill", "first active", "last active", "end", "L4", "contrast", "IoU windup/contact", "IoU contact/recovery", "L5", "judges", "lowest", "readability", "weight", "anticipation", "follow-through", "character", "Melee reference", "ref start", "ref total"];
+const HEADER = ["fighter", "move", "class", "passed", "shortfall", "L1", "body share", "mass shift", "limb", "L2", "end error", "jump", "overshoot", "L3", "windup", "peak", "settle", "fill", "first active", "last active", "end", "L4", "contrast", "IoU windup/contact", "IoU contact/recovery", "L5", "judges", "lowest", "readability", "weight", "anticipation", "follow-through", "character", "Melee reference", "ref start", "ref total", "L1 rule", "limb drive"];
 function tsvRow(row: Row): string {
   const { line1, line2, line3, line4 } = row.score, j = row.judged;
   return [row.fighter, row.move, row.moveClass, `${passCount(row)}/${lines(row)}`, n(row.score.shortfall),
@@ -115,7 +115,7 @@ function tsvRow(row: Row): string {
     mark(line3.pass), line3.windup, line3.peak, line3.settle, n(line3.fill), row.frames.firstActive, row.frames.lastActive, row.frames.end,
     mark(line4.pass), n(line4.contrast), n(line4.windupContact), n(line4.contactRecovery),
     j === undefined ? "unjudged" : mark(j.lowest >= JUDGE_PASS), j?.count ?? 0, j === undefined ? "" : n(j.lowest), ...JUDGE_LINES.map((_, index) => j === undefined ? "" : n(j.means[index] ?? 0)),
-    row.reference === undefined ? "" : `${row.reference.character} ${row.reference.action}`, row.reference?.start ?? "", row.reference?.total ?? ""].join("\t");
+    row.reference === undefined ? "" : `${row.reference.character} ${row.reference.action}`, row.reference?.start ?? "", row.reference?.total ?? "", line1.rule, n(line1.limbDrive)].join("\t");
 }
 
 const parseFlags = (args: readonly string[], allowed: readonly string[]) => {
@@ -183,7 +183,7 @@ const score: Command = (args) => Effect.gen(function*() {
   yield* Console.log(`worst first (${look}; L1 body, L2 return to ready, L3 phases, L4 contrast, L5 judged):`);
   for (const row of sorted.slice(0, 40)) {
     const { line1, line2, line3, line4 } = row.score;
-    yield* Console.log(`${String(passCount(row)).padStart(1)}/${lines(row)} ${`${row.fighter} ${row.move}`.padEnd(34)} L1 ${mark(line1.pass)} ${n(line1.bodyShare)}/${n(line1.massShift)}  L2 ${mark(line2.pass)} ${n(line2.endError)}/${n(line2.jump)}/${n(line2.overshoot)}  L3 ${mark(line3.pass)} w${line3.windup} p${line3.peak} a${row.frames.firstActive} fill ${n(line3.fill)}  L4 ${mark(line4.pass)} ${n(line4.contrast)}  L5 ${row.judged === undefined ? "unjudged" : `${mark(row.judged.lowest >= JUDGE_PASS)} ${n(row.judged.lowest)}`}`);
+    yield* Console.log(`${String(passCount(row)).padStart(1)}/${lines(row)} ${`${row.fighter} ${row.move}`.padEnd(34)} L1 ${mark(line1.pass)} ${line1.rule === "limb" ? `limb ${n(line1.limbDrive)}` : n(line1.bodyShare)}/${n(line1.massShift)}  L2 ${mark(line2.pass)} ${n(line2.endError)}/${n(line2.jump)}/${n(line2.overshoot)}  L3 ${mark(line3.pass)} w${line3.windup} p${line3.peak} a${row.frames.firstActive} fill ${n(line3.fill)}  L4 ${mark(line4.pass)} ${n(line4.contrast)}  L5 ${row.judged === undefined ? "unjudged" : `${mark(row.judged.lowest >= JUDGE_PASS)} ${n(row.judged.lowest)}`}`);
   }
   const fighterRows = new Map<string, Row[]>();
   for (const row of rows) fighterRows.set(row.fighter, [...(fighterRows.get(row.fighter) ?? []), row]);
