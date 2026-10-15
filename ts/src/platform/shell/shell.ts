@@ -17,7 +17,7 @@ import { FLOOR_HEIGHT } from "../../game/presentation/arenaCamera";
 import { type MapBuild, journalIngress } from "../../game/shell/build";
 import { pausing } from "../../game/shell/pauseBarrier";
 import type { RollbackPlayback } from "../../game/shell/playback";
-import { cancelBindingCapture, initializeBindingSettings, useDefaultBindings } from "../../game/ui/bindingSettings";
+import { cancelBindingCapture, initializeBindingSettings, loadSavedBindings, saveBindingSettings, useDefaultBindings } from "../../game/ui/bindingSettings";
 import { f32 } from "wisp/src/sim/f32";
 import { on, trampoline } from "wisp/src/platform/dispatch";
 import { DRAW_EVENT, beginPresentedFrame, drawBetweenFrames, startFrameClock } from "./betweenFrames";
@@ -65,6 +65,9 @@ const PAUSE_REQUEST = "shell.pauseRequest";
 const CHAT_CLOSED = "shell.chatClosed";
 const INPUT = "shell.input";
 const DEV_COMMAND = "shell.devCommand";
+const CONTROLS_COMMAND = "shell.controlsCommand";
+const SAVE_CONTROLS = "-save";
+const LOAD_CONTROLS = "-load";
 const RESTART = "shell.restart";
 const TRACE = "shell.trace";
 const PROBE_START = "shell.probeStart";
@@ -202,6 +205,20 @@ function presentMatchFlow(s: ShellState): void {
   if (body !== undefined) ShowUnit(body.unit, false);
 }
 
+function controlsCommand(s: ShellState): void {
+  const slot = GetPlayerId(GetTriggerPlayer());
+  if (!isParticipantSlot(slot) || !humanActive(s.game, slot)) return;
+  const settings = s.participants[slot].bindings;
+  if (!settings.ready) return;
+  const announce = (message: string): void => DisplayTextToPlayer(Player(slot), 0, 0, message);
+  if (GetEventPlayerChatString() === SAVE_CONTROLS) {
+    saveBindingSettings(settings);
+    announce(settings.message);
+  } else {
+    loadSavedBindings(settings, announce);
+  }
+}
+
 function playerLeft(s: ShellState): void {
   ownConfirmedState(s);
   const slot = GetPlayerId(GetTriggerPlayer());
@@ -285,6 +302,12 @@ function createTriggers(s: ShellState): void {
     for (const slot of PARTICIPANT_SLOTS) TriggerRegisterPlayerChatEvent(chat, Player(slot), "-dev ", false);
     TriggerAddAction(chat, trampoline(DEV_COMMAND));
   }
+  const controls = CreateTrigger();
+  for (const slot of PARTICIPANT_SLOTS) {
+    TriggerRegisterPlayerChatEvent(controls, Player(slot), SAVE_CONTROLS, true);
+    TriggerRegisterPlayerChatEvent(controls, Player(slot), LOAD_CONTROLS, true);
+  }
+  TriggerAddAction(controls, trampoline(CONTROLS_COMMAND));
   syncTrigger(s, PLAYTEST_PREFIX, PLAYTEST, true);
   syncTrigger(s, STAGE_READY_PREFIX, STAGE_READY, true);
   const leave = CreateTrigger();
@@ -392,6 +415,7 @@ export function installShell(): void {
   on(CHAT_CLOSED, withShell(journalPause.chatClosedEvent));
   on(EDITBOX_ENTER, withShell(journalPause.chatEntered));
   on(DEV_COMMAND, withShell(onDevCommand));
+  on(CONTROLS_COMMAND, withShell(controlsCommand));
   on(PLAYER_LEFT, withShell(playerLeft));
   on(RESTART, withShell(onDeveloperRestart));
   on(TRACE, withShell(onDeveloperTrace));

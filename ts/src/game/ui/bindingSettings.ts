@@ -94,6 +94,24 @@ export function initializeBindingSettings(settings: BindingSettings): void {
   });
 }
 
+export function loadSavedBindings(settings: BindingSettings, done: (message: string) => void): void {
+  if (!settings.ready) return;
+  settings.persistence.load(settings.owner, (result) => {
+    const stored = result.kind === "loaded" ? decodeDelay(result.encoded) : undefined;
+    const saved = stored === undefined ? undefined : decodeBindings(stored.bindings);
+    if (stored !== undefined && saved !== undefined) {
+      settings.bindings = saved;
+      settings.delay = stored.delay;
+      settings.capture = undefined;
+      settings.revision++;
+      settings.message = "Saved controls loaded.";
+    } else {
+      settings.message = result.kind === "loaded" ? "Saved controls were invalid; kept current controls." : result.kind === "empty" ? "No saved controls yet. Type -save to keep these." : "Saved controls are unavailable.";
+    }
+    done(settings.message);
+  });
+}
+
 
 export function useDefaultBindings(settings: BindingSettings): void {
   settings.bindings = presetBindings("standard");

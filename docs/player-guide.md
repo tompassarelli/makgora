@@ -74,7 +74,8 @@ the pointer, A to choose and B to go back. The panel shows your current control 
 
 F1 opens Controls before a match. Choose QWERTY or Custom, click either key
 slot to rebind it, then Save. Saved controls load automatically on the next map
-start. Y is reserved for Start/Pause and K for saving a moment; F6 and F7
+start. Type -save in chat to save your current controls and delay, or -load to
+bring back your saved ones. Y is reserved for Start/Pause and K for saving a moment; F6 and F7
 remain reserved for Warcraft shortcuts. Ctrl+T starts a developer input trace.
 
 Saw something wrong? Press K, or hold View on a controller for a second: the
