@@ -74,40 +74,6 @@ const census = (heading: string) => {
     const byModel = [...models].sort((a, b) => b[1] - a[1]).slice(0, heading.startsWith("kind=menu") ? models.size : 8).map(([model, count]) => `${model.replaceAll(" ", "_")}:${count}`).join(",");
     parts.push(`p${client.slot} tables=${found.tables} functions=${found.functions} entries=${found.entries} string-bytes=${found.stringBytes} live=${live} top=${found.byGlobal.slice(0, 6).map(([name, count]) => `${name}:${count}`).join(",")} models=${byModel}`);
   });
-  if (heading.startsWith("kind=match")) {
-    clients.clients.forEach((client) => {
-      const seen = new LuaTable<AnyNotNil, boolean>();
-      const queue: [unknown, string][] = [];
-      for (const [key, value] of pairs(client.natives)) if (typeof key === "string") queue.push([value, key]);
-      const big: string[] = [];
-      while (queue.length > 0) {
-        const next = queue.pop();
-        if (next === undefined) break;
-        const [value, path] = next;
-        if ((type(value) !== "table" && type(value) !== "function") || value === undefined || value === null || seen.get(value as AnyNotNil) === true) continue;
-        seen.set(value as AnyNotNil, true);
-        if (type(value) === "function") {
-          for (let index = 1; ; index++) {
-            const [name, item] = debug.getupvalue(value as (...args: unknown[]) => unknown, index);
-            if (name === undefined) break;
-            queue.push([item, `${path}<${name}>`]);
-          }
-          continue;
-        }
-        let count = 0;
-        for (const [key, item] of pairs(value as LuaTable<AnyNotNil, unknown>)) {
-          count++;
-          if (type(item) === "table" || type(item) === "function") queue.push([item, `${path}.${typeof key === "string" || typeof key === "number" ? key : type(key)}`]);
-        }
-        if (count >= 400) big.push(`${path.slice(-160)}=${count}/${(value as unknown[]).length}`);
-      }
-      print(`big ${heading} frame=${clients.frame} p${client.slot} ${big.join(" ")}`);
-    });
-    const root: Record<string, unknown> = { loaded: debug.getregistry()["_LOADED"], clients, censuses, emulator, errors };
-    for (const [key, value] of pairs(_G)) if (typeof key === "string" && key !== "package") root[`G.${key}`] = value;
-    const wide = reach(root, []);
-    print(`roots ${heading} frame=${clients.frame} tables=${wide.tables} functions=${wide.functions} entries=${wide.entries} string-bytes=${wide.stringBytes} top=${wide.byGlobal.slice(0, 12).map(([name, count]) => `${name}:${count}`).join(",")}`);
-  }
   print(parts.join(" | "));
 };
 
