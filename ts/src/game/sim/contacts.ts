@@ -44,7 +44,7 @@ import { fighterHurtParts } from "./hurtboxes";
 import { knockbackWeight } from "./itemBuffs";
 import { type AppliedStatus, applyHeroStatus, damageEndsHeroStatus } from "./heroStatus";
 import { dealtManaGain, gainMana, takenManaGain } from "./mana";
-import { candleHeatGain, feedCandle } from "./heroes/koboldCandle";
+import { candleDrops, candleHeatGain, dropCandle, feedCandle } from "./heroes/koboldCandle";
 import { EX_ARMOR_DAMAGE, exArmorActive } from "./exSpecials";
 import { contactTraits } from "./identityTraits";
 import { FORSAKEN_PALADIN_DAMAGE_MULTIPLIER, forsakenPaladinSwordContact } from "./heroes/forsakenPaladinSword";
@@ -93,6 +93,7 @@ function emptyContact(): DamageContact {
 
 const batch: { contacts: DamageContact[]; count: number; collecting: boolean } = { contacts: [], count: 0, collecting: false };
 const candleHeat: number[] = [0, 0, 0, 0];
+const candleDrop: boolean[] = [false, false, false, false];
 let damageObserver: ((source: number, target: number, damage: number) => void) | undefined;
 
 export function observeDamageContacts(observer: ((source: number, target: number, damage: number) => void) | undefined): void {
@@ -108,6 +109,7 @@ export function beginDamageContacts(): void {
   batch.count = 0;
   batch.collecting = true;
   candleHeat.fill(0);
+  candleDrop.fill(false);
 }
 
 
@@ -116,6 +118,7 @@ export function clearDamageContacts(): void {
   batch.count = 0;
   batch.collecting = false;
   candleHeat.fill(0);
+  candleDrop.fill(false);
 }
 
 
@@ -398,6 +401,7 @@ function resolveDamageContacts(world: Roster, slot: number): void {
   target.motion.vx = 0.0;
   target.motion.vz = 0.0;
   installDamageLaunch(target, strongest, multiplyFloat32(chosen.facing, chosen.effect.launchX), chosen.effect.launchZ, chosen.grounded);
+  if (candleDrops(target, strongest)) candleDrop[slot] = true;
   if (chosen.direct && chosen.effect.carry === true && !target.motion.grounded) {
     target.motion.vx = chosen.sourceVelocityX;
     target.motion.vz = chosen.sourceVelocityZ;
@@ -432,6 +436,7 @@ function applyContactStatuses(world: Roster, slot: number): void {
 
 export function finishDamageContacts(world: Roster): void {
   candleHeat.fill(0);
+  candleDrop.fill(false);
   for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
     if (!isActive(world, slot)) continue;
     resolveDamageContacts(world, slot);
@@ -441,6 +446,11 @@ export function finishDamageContacts(world: Roster): void {
     const gain = at(candleHeat, slot);
     candleHeat[slot] = 0;
     if (gain > 0) feedCandle(fighterAt(world, slot), gain);
+  }
+  for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
+    if (!at(candleDrop, slot)) continue;
+    candleDrop[slot] = false;
+    dropCandle(fighterAt(world, slot));
   }
   batch.count = 0;
   batch.collecting = false;

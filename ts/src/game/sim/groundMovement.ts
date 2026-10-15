@@ -4,7 +4,7 @@
 import { max, min } from "../../runtime/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { chillScaled } from "./chill";
-import { speedBuffed } from "./itemBuffs";
+import { candleBareSpeed, speedBuffed } from "./itemBuffs";
 import { GroundAction, SpecialAction } from "./codes";
 import type { Fighter } from "./fighter";
 import { floorTraction } from "./stage";
@@ -304,7 +304,7 @@ export function advanceGroundMovement(f: Fighter, direction: number, walking: bo
       ground.turnRunEntryFacing = reversingDash ? entryFacing : 0;
       ground.pivotEligible = reversingDash;
       f.facing = direction;
-      motion.vx = f32(direction * min(speedBuffed(f, chillScaled(f, physics.dashSpeed)), speedBuffed(f, physics.groundSpeedCap)));
+      motion.vx = f32(direction * min(candleBareSpeed(f, speedBuffed(f, chillScaled(f, physics.dashSpeed))), candleBareSpeed(f, speedBuffed(f, physics.groundSpeedCap))));
       return true;
     }
   } else {
@@ -319,13 +319,13 @@ export function advanceGroundMovement(f: Fighter, direction: number, walking: bo
       ground.turnRunEntryFacing = 0;
     }
   }
-  const runTarget = f32(speedBuffed(f, chillScaled(f, physics.runSpeed)) * speedScale);
+  const runTarget = f32(candleBareSpeed(f, speedBuffed(f, chillScaled(f, physics.runSpeed))) * speedScale);
   const targetVelocity = f32(direction * runTarget);
   const acceleration = taperedAcceleration(
     f, f32(physics.groundAccelerationMultiplier * speedScale), physics.groundAccelerationBase, direction, runTarget, RUN_ACCEL_TAPER_GAIN,
     ground.action === GroundAction.run && targetVelocity !== 0,
   );
-  motion.vx = groundMovementVelocity(motion.vx, acceleration, targetVelocity, f32(traction * RUN_DASH_TURN_FRICTION_MULTIPLIER), speedBuffed(f, physics.groundSpeedCap));
+  motion.vx = groundMovementVelocity(motion.vx, acceleration, targetVelocity, f32(traction * RUN_DASH_TURN_FRICTION_MULTIPLIER), candleBareSpeed(f, speedBuffed(f, physics.groundSpeedCap)));
 
   if (ground.action !== GroundAction.turnRun && f32(motion.vx * direction) > 0) {
     f.facing = direction;

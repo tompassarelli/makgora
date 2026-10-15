@@ -8,7 +8,8 @@ import { f32 } from "wisp/src/sim/f32";
 import { at } from "wisp/src/runtime/lookup";
 import { applyItemBuffFor } from "./itemBuffs";
 import { advanceHeroConditions, cleansePoisonAndSlow } from "./heroStatus";
-import { AttackStyle, Character, ProjectileKind, SpecialAction } from "./codes";
+import { AttackStyle, CandleState, Character, ProjectileKind, SpecialAction } from "./codes";
+import { CANDLE_BARE_VARIANT, candleLevel } from "./heroes/koboldCandle";
 import { mutableProjectile } from "./fighterProjectiles";
 import { canAttack, inGrabContext, isIntangible } from "./conditions";
 import { type Fighter, type Projectile, placedObject } from "./fighter";
@@ -25,7 +26,6 @@ import { HurtContact, strikeHurtContact } from "./hurtboxes";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { mainDeckLeft, mainDeckRight, mainDeckZAt, solidSurfaceAt, solidSurfaceCount } from "./stage";
 import { currentTraits } from "./identityTraits";
-import { candleLevel } from "./heroes/koboldCandle";
 import { squareRoot } from "./warcraftMath";
 
 
@@ -49,7 +49,8 @@ export function runningHeroSpecial(f: Readonly<Fighter>): AuthoredSpecial | unde
 
 
 export function specialVariant(f: Readonly<Fighter>): number {
-  return f.character === Character.kobold ? candleLevel(f) : 0;
+  if (f.character !== Character.kobold) return 0;
+  return f.candle.state !== CandleState.held ? CANDLE_BARE_VARIANT : candleLevel(f);
 }
 
 function requestedSlot(input: Readonly<Controls>): SpecialSlot {
