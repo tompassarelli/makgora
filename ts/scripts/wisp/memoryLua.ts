@@ -81,7 +81,9 @@ const census = (heading: string) => {
       for (const [key, value] of pairs(client.natives)) if (typeof key === "string") queue.push([value, key]);
       const big: string[] = [];
       while (queue.length > 0) {
-        const [value, path] = queue.pop() ?? [undefined, ""];
+        const next = queue.pop();
+        if (next === undefined) break;
+        const [value, path] = next;
         if ((type(value) !== "table" && type(value) !== "function") || value === undefined || value === null || seen.get(value as AnyNotNil) === true) continue;
         seen.set(value as AnyNotNil, true);
         if (type(value) === "function") {
