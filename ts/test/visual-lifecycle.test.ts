@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { createFrameControls } from "../src/game/match/controls";
 import { captureFrame, createMatchFrameInput } from "../src/game/match/frameInput";
-import { Phase, requestStageSelect, selectCharacter } from "../src/game/match/rules";
+import { beginRematchCountdown, cancelRematchCountdown, Phase, requestStageSelect, requestStart, selectCharacter, tickRematchCountdown } from "../src/game/match/rules";
 import { executeNext, startAtGo, testMatch } from "../src/game/match/testMatch";
 import { IMPACT_DUST, IMPACTS_PER_KIND } from "../src/game/presentation/impactState";
 import { cameraPoint, FLOOR_HEIGHT } from "../src/game/presentation/arenaCamera";
@@ -27,13 +27,57 @@ import { applyFrame } from "../src/platform/shell/frame";
 import { startMatch } from "../src/platform/shell/matchStart";
 import { confirm } from "../src/platform/shell/menus";
 import { shell } from "../src/platform/shell/state";
-import { pauseMatchPresentation, renderPersistentPresentation, serviceResumePresentation } from "../src/platform/shell/view";
+import { pauseMatchPresentation, renderPersistentPresentation, renderUi, serviceResumePresentation } from "../src/platform/shell/view";
 import { testHeadless } from "./headless";
 import type { EffectPose, HeadlessClient } from "wisp/src/headless/client";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { SpecialCueEffects } from "../src/game/render/specialCueEffects";
 
 const headless = testHeadless(SMASHCRAFT_HEADLESS);
+
+test("stage countdown follows held match frames and rematch cancellation [k1 scenario]", () => {
+  const clients = headless.clients({ start, install });
+  clients.start();
+  clients.frames(30);
+  const client = clients.client(0);
+  client.run(() => {
+    const s = shell();
+    selectCharacter(s.game, 0, Character.demonHunter);
+    selectCharacter(s.game, 1, Character.rifleman);
+    expect(requestStageSelect(s.game, 0)).toBe(true);
+    expect(requestStart(s.game, 0)).toBe(true);
+    startMatch(s);
+    const displayed = () => client.frames.snapshot({ visibleOnly: true }).find(frame => frame.name === "MatchCountdown");
+    let popped = 0;
+    for (let tick = 1; tick <= 241; tick++) {
+      expect(captureFrame(s.frameInput, tick, s.world.mask, s.produced, s.runtime)).toBe(true);
+      applyFrame(s);
+      renderUi(s);
+      const frame = displayed();
+      if (tick <= 240) {
+        expect(frame?.text).toBe(`|cffffcc00${tick <= 60 ? "3" : tick <= 120 ? "2" : tick <= 180 ? "1" : "GO!"}|r`);
+        expect(frame?.rectangle?.[0]).toBeCloseTo(0.2, 4);
+        expect(frame?.rectangle?.[1]).toBeCloseTo(0.41, 4);
+      } else expect(frame).toBeUndefined();
+      if (tick === 1) popped = frame?.scale ?? 0;
+      if (tick === 13) expect(frame?.scale).toBeLessThan(popped);
+      if (tick === 60) expect(frame?.alpha).toBeLessThan(20);
+    }
+    s.game.phase = Phase.result;
+    s.game.automaticRematch = true;
+    beginRematchCountdown(s.game, 3);
+    for (let remaining = 180; remaining > 0; remaining--) {
+      renderUi(s);
+      expect(displayed()?.text).toBe(`|cffffcc00${Math.ceil(remaining / 60)}|r`);
+      if (remaining === 1) break;
+      expect(tickRematchCountdown(s.game)).toBe(false);
+    }
+    expect(cancelRematchCountdown(s.game, 0)).toBe(true);
+    renderUi(s);
+    expect(displayed()).toBeUndefined();
+  });
+  expect(client.errors).toEqual([]);
+});
 
 
 function effectPoses(client: HeadlessClient): Map<unknown, EffectPose> {

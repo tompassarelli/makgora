@@ -56,7 +56,7 @@ export function clearAllInputs(s: ShellState): void {
 
 
 export function controlsAvailable(s: Readonly<ShellState>, slot: ParticipantSlot): boolean {
-  return humanPresent(s.game, slot) && s.participants[slot].bindings.ready && !settingsOpen(s, slot);
+  return s.startingChoicesReady !== false && humanPresent(s.game, slot) && s.participants[slot].bindings.ready && !settingsOpen(s, slot);
 }
 
 

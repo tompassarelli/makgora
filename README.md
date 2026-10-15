@@ -74,6 +74,8 @@ Where to look next:
 
 ## Credits
 
+Music: Before the First Strike by Tom Passarelli, made with Google Lyria.
+
 The [Lich King model by Kwaliti](https://www.hiveworkshop.com/threads/the-lich-king.154837/)
 (Hive Workshop), used with credit as the author permits. Kwaliti's
 [usage terms](https://www.hiveworkshop.com/profile-posts/951524/) allow free use

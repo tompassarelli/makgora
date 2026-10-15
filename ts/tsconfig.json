@@ -46,6 +46,7 @@
     "test/cpu-advantage.test.ts",
     "test/air-drift.test.ts",
     "test/cpu-field.test.ts",
+    "test/cpu-defaults.test.ts",
     "test/dreadlord-shadow-hunter-gameplans.test.ts",
     "test/fighter-hide.test.ts",
     "test/native-capture.test.ts",

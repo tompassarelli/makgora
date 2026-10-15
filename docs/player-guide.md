@@ -82,7 +82,7 @@ last ten seconds of the match are saved for a bug report on your computer, in
 Warcraft III's CustomMapData folder as smashcraft-repro-*.txt, and "Moment
 saved" appears. The match goes on undisturbed.
 
-The Custom preset uses W/R to move, I/9 to jump, Space to aim up, E to
+The Custom preset uses W/R to move, Z/9 to jump, Space to aim up, E to
 fast-fall or climb down through platforms, Q/8 to shield or air-dodge, O to grab, N
 to attack, and U for a special. Shield + N or O grabs. While holding an
 opponent, tap N to pummel once or a movement/C-stick direction to throw forward,
@@ -93,9 +93,9 @@ hold runs out and faster with mashing; the mark on it shows when a pummel would
 land. Mash and wiggle the same way to break out of Rifleman's frost trap
 sooner; its bar shows how long the ice has left.
 
-Z always gives the existing short hop, however long you hold it; in Tom's pad
+I always gives the existing short hop, however long you hold it; in Tom's pad
 layout, press LB. In Melee, tap X or Y to short hop. The ordinary jump keys still full hop when held and
-short hop when released during startup. In the air, Z uses your second jump.
+short hop when released during startup. In the air, I uses your second jump.
 
 Attacks buffer for six frames, including through jump squat. Hold P to walk;
 P with E crouches on a platform instead of climbing down. Jumping into a
@@ -104,7 +104,7 @@ land shielding.
 N with a direction performs a smash, or a tilt while walking. B (or /) is
 C-stick left; H is down; J is up; M is right. C-stick down-air preserves
 normal aerial momentum. QWERTY uses 7 for right trigger and 8 for the
-alternate jump key.
+alternate jump key. A gives light shield; T and 0 are unbound by default.
 
 Specials use U with a direction; every fighter's specials and
 ultimate are listed by name in the [move list](move-list.md). Shield + U is

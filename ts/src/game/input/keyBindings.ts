@@ -53,8 +53,8 @@ export function presetBindings(preset: BindingPreset): KeyBindings {
   bind(Action.rightTrigger, code(custom ? "8" : "7"), code("G"));
   bind(Action.smashLeft, code("B"), SLASH);
   bind(Action.smashRight, code("M"));
-  bind(Action.smashUp, code("0"));
-  bind(Action.smashDown, code("J"));
+  bind(Action.smashUp, code("J"));
+  bind(Action.smashDown, code("H"));
   bind(Action.walk, code("P"));
   bind(Action.lightShield, code("A"));
   bind(Action.shortHop, code("I"));
@@ -92,8 +92,8 @@ export function rebind(bindings: KeyBindings, action: Action, slot: KeySlot, key
 
 
 
-const CURRENT_SAVE = "K8";
-const SAVED_SLOTS: Readonly<Record<string, number>> = { K1: 28, K2: 30, K3: 30, K4: KEY_SLOT_COUNT - 2, K5: KEY_SLOT_COUNT - 2, K6: KEY_SLOT_COUNT, K7: KEY_SLOT_COUNT, [CURRENT_SAVE]: KEY_SLOT_COUNT };
+const CURRENT_SAVE = "K9";
+const SAVED_SLOTS: Readonly<Record<string, number>> = { K1: 28, K2: 30, K3: 30, K4: KEY_SLOT_COUNT - 2, K5: KEY_SLOT_COUNT - 2, K6: KEY_SLOT_COUNT, K7: KEY_SLOT_COUNT, K8: KEY_SLOT_COUNT, [CURRENT_SAVE]: KEY_SLOT_COUNT };
 const DIGITS = "0123456789";
 
 export function encodeBindings({ keys }: Readonly<KeyBindings>): string {
@@ -115,6 +115,11 @@ function upgradeDefaults(bindings: KeyBindings, version: string): void {
   const { keys } = bindings;
   const free = (...candidates: number[]) => candidates.every((key) => !keys.includes(key));
   const first = (action: Action) => keyFor(bindings, action, 0);
+  if (version === "K8") {
+    if (first(Action.smashDown) === code("J") && free(code("H"))) rebind(bindings, Action.smashDown, 0, code("H"));
+    if (first(Action.smashUp) === code("0") && free(code("J"))) rebind(bindings, Action.smashUp, 0, code("J"));
+    return;
+  }
   if (keyFor(bindings, Action.lightShield, 1) === undefined && free(code("T"))) rebind(bindings, Action.lightShield, 1, code("T"));
   if (keyFor(bindings, Action.rightTrigger, 1) === undefined && free(code("G"))) rebind(bindings, Action.rightTrigger, 1, code("G"));
   if (keyFor(bindings, Action.meter, 0) === undefined && free(code("X"))) rebind(bindings, Action.meter, 0, code("X"));
@@ -143,8 +148,7 @@ function upgradeDefaults(bindings: KeyBindings, version: string): void {
     keys[slotIndex(Action.lightShield, 0)] = code("A");
     keys[slotIndex(Action.lightShield, 1)] = EMPTY;
   }
-  if (first(Action.smashUp) === code("J") && free(code("0"))) rebind(bindings, Action.smashUp, 0, code("0"));
-  if (first(Action.smashDown) === code("H") && free(code("J"))) rebind(bindings, Action.smashDown, 0, code("J"));
+
 }
 
 

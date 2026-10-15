@@ -5,6 +5,7 @@ import { showBackdrop, showStageFog, showStageLighting } from "./stageScenery";
 
 
 import { PARTICIPANT_SLOTS } from "../../game/input/participants";
+import { holdGameSpeed } from "./gameSpeed";
 import { resetMatchFrameInput } from "../../game/match/frameInput";
 import { clearPresentationHistory } from "../../game/match/pacingAndPresentation";
 import { clearBotMemory } from "../../game/match/botPerception";
@@ -33,6 +34,7 @@ export function startMatch(s: ShellState, scenario: Scenario = s.build.scenario,
 
   beginSessionMatch(s.sessionWins);
   publishMenu(s);
+  holdGameSpeed();
   const wasPaused = s.session.paused;
 
   setStatus(s, s.game.startHold === 0 ? "GO!" : "", s.game.startHold === 0 ? 1.0 : 0.0);

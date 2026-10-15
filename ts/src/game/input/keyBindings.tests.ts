@@ -64,10 +64,23 @@ test("saved default upgrades preserve every customized slot and leave current sa
         }
       }
     }
+    const previous = current.keys.slice();
+    previous[slotIndex(Action.smashUp, 0)] = "0".charCodeAt(0);
+    previous[slotIndex(Action.smashDown, 0)] = "J".charCodeAt(0);
+    const upgradedPrevious = decodeBindings(oldSave("K8", previous.length, previous));
+    assertEquals(upgradedPrevious === undefined ? "invalid" : encodeBindings(upgradedPrevious), encodeBindings(current), `${preset} K8 defaults`);
+    for (let index = 0; index < previous.length; index++) {
+      for (const character of ["C", "H"]) {
+        const customized = previous.slice();
+        customized[index] = character.charCodeAt(0);
+        const upgraded = decodeBindings(oldSave("K8", customized.length, customized));
+        assertEquals(upgraded === undefined ? undefined : upgraded.keys[index], customized[index], `${preset} K8 custom ${character} slot ${index}`);
+      }
+    }
     const savedCurrent = { keys: legacy };
     const decodedCurrent = decodeBindings(encodeBindings(savedCurrent));
     assertEquals(decodedCurrent === undefined ? "invalid" : encodeBindings(decodedCurrent), encodeBindings(savedCurrent), `${preset} current save`);
-    assertEquals(actionFor(current, "H".charCodeAt(0)), undefined, `${preset} H unbound`);
+    assertEquals(actionFor(current, "0".charCodeAt(0)), undefined, `${preset} 0 unbound`);
     assertEquals(actionFor(current, "T".charCodeAt(0)), undefined, `${preset} T unbound`);
   }
 });
