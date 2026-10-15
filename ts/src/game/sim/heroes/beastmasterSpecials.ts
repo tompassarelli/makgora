@@ -23,7 +23,7 @@ const wildAxes = (air: boolean): AuthoredSpecial => ({
 });
 export const BEAR: SpecialCompanion = {
   followSpeed: h(f32(0.035)), followBehind: h(f32(0.8)), returnSpeed: h(f32(0.06)),
-  lungeStartup: 18, lungeActive: 8, lungeRecovery: 32, lungeTravel: h(f32(2.0)),
+  lungeStartup: 12, lungeActive: 8, lungeRecovery: 26, lungeTravel: h(f32(2.6)),
   bite: capsule(0.0, 25.0, h(f32(0.5)), 60.0, 28.0),
   biteEffect: hit(8.0, "KILL", 40, 1.0, HitElement.normal),
   stunFrames: 18, leash: h(6.0), leashFrames: 120,
