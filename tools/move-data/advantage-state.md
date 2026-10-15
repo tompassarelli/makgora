@@ -279,7 +279,7 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Cairne Bloodhoof | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | medium | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | medium | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Cairne Bloodhoof | medium | up throw | 1/1 in forward tilt, out down tilt | 1/1 in down tilt, out dash, dash attack | 1/1 KD in up special, out down tilt | 1/1 in side special, out dash, dash attack |
+| Cairne Bloodhoof | medium | up throw | 1/1 in forward tilt, out down tilt | 1/1 in down tilt, out dash, dash attack | 1/1 KD in up special, out down tilt | 1/1 in down special, out dash, dash attack |
 | Cairne Bloodhoof | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | heavy | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Cairne Bloodhoof | heavy | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
