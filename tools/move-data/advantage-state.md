@@ -287,15 +287,15 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Cairne Bloodhoof | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Chen Stormstout | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Chen Stormstout | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Chen Stormstout | light | up throw | 1/1 in short hop, back air, out neutral special | 1/1 in short hop, back air, out neutral special | 1/1 in short hop, forward air, out down smash | 1/1 in short hop, back air, out neutral special |
+| Chen Stormstout | light | up throw | 1/1 in short hop, back air, out dash, dash attack | 1/1 in short hop, back air, out dash, dash attack | 1/1 in short hop, forward air, out down smash | 1/1 in short hop, back air, out dash, dash attack |
 | Chen Stormstout | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 |
 | Chen Stormstout | medium | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Chen Stormstout | medium | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Chen Stormstout | medium | up throw | 1/1 | 1/1 in forward tilt, out neutral special | 2/1 in up smash, out down smash | 1/1 in short hop, back air, out neutral special |
+| Chen Stormstout | medium | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in forward tilt, out dash, dash attack | 2/1 in up smash, out down smash | 1/1 in short hop, back air, out dash, dash attack |
 | Chen Stormstout | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 |
 | Chen Stormstout | heavy | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Chen Stormstout | heavy | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Chen Stormstout | heavy | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in short hop, back air, out neutral special | 1/1 in up smash, out down smash | 1/1 in up smash, out down smash |
+| Chen Stormstout | heavy | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in short hop, back air, out dash, dash attack | 1/1 in up smash, out down smash | 1/1 in up smash, out down smash |
 | Chen Stormstout | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Peon | light | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Peon | light | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
