@@ -3,7 +3,7 @@ import { mkdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { generateMDX, parseMDX, ModelRenderer, model as mdx } from "war3-model";
 import { isDeepStrictEqual } from "node:util";
-import { mat4, quat, vec3 } from "gl-matrix";
+import { mat3, mat4, quat, vec3 } from "gl-matrix";
 import { DrawnModel, sheet, type PoseFrame } from "../../ts/scripts/wisp/hurtboxView";
 import { AttackPhase, AttackStyle, Character, GrabAction } from "../../ts/src/game/sim/codes";
 import { drawnStrideSource, measureDrawnStride, type DrawnStride } from "../../ts/scripts/wisp/drawnMotion";
@@ -30,15 +30,15 @@ ensure(source.Sequences.length === 12 && source.Nodes.some(n => n.Name === "Bone
 const stand = source.Sequences[4]!, idleSequence = source.Sequences[0]!;
 interface Gesture { chest?: number; twist?: number; head?: number; arm?: number; elbow?: number; free?: number; freeElbow?: number; hip?: number; knee?: number; lean?: number; yaw?: number; leftHip?: number; rightHip?: number; leftKnee?: number; rightKnee?: number; step?: number; pitch?: number }
 interface Phase { frame: number; gesture: Gesture; target?: readonly [number,number]; idle?: boolean }
-interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; prep?: Gesture; prepTarget?: readonly [number,number]; prepTravel?: number; hold?: boolean; air?: boolean; roll?: number; first?: Gesture; phases?: readonly Phase[]; target?: readonly [number, number]; damage?: boolean; beats?: readonly Phase[] }
-interface Strike { prep: Gesture; hit: Gesture; follow: Gesture; prepAt?: number; followAt?: number; settle?: number; mid?: readonly Phase[]; aim?: boolean; reach?: readonly [number,number] }
+interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; stock?: number; stockHit?: number; prepTravel?: number; hold?: boolean; air?: boolean; roll?: number; first?: Gesture; phases?: readonly Phase[]; target?: readonly [number, number]; damage?: boolean; beats?: readonly Phase[] }
+interface Strike { prep: Gesture; hit: Gesture; follow: Gesture; prepAt?: number; followAt?: number; settle?: number; rest?: Gesture; restTarget?: readonly [number,number]; prepTarget?: readonly [number,number]; hitTarget?: readonly [number,number]; mid?: readonly Phase[]; aim?: boolean; reach?: readonly [number,number] }
 const strikeBeats=(move:{startupFrames:number;totalFrames:number;regions:readonly {firstFrame:number;lastFrame:number;hit:{strike?:{x2:number;z2:number}}}[]},s:Strike):Phase[]=>{
   const contact=move.startupFrames,end=move.totalFrames,lastActive=Math.max(...move.regions.map(r=>r.lastFrame));
   const followAt=s.followAt??Math.min(end-4,lastActive+2),settleAt=Math.round(followAt+(end-followAt)*(s.settle??0.55));
   const strike=move.regions[0]!.hit.strike!;
-  return [{frame:0,gesture:ready},{frame:s.prepAt??Math.max(1,contact-Math.max(2,Math.round(contact*0.3))),gesture:s.prep},
-    {frame:contact,gesture:s.hit,target:s.aim?[strike.x2,strike.z2]:undefined},...(s.mid??[]),{frame:followAt,gesture:s.follow,target:s.reach},
-    {frame:settleAt,gesture:blend(s.follow,ready,0.62)},{frame:end-1,gesture:ready,idle:true},{frame:end,gesture:ready,idle:true}];
+  return [{frame:0,gesture:ready},{frame:s.prepAt??Math.max(1,contact-Math.max(2,Math.round(contact*0.3))),gesture:s.prep,target:s.prepTarget},
+    {frame:contact,gesture:s.hit,target:s.hitTarget??(s.aim?[strike.x2,strike.z2]:undefined)},...(s.mid??[]),{frame:followAt,gesture:s.follow,target:s.reach},
+    {frame:settleAt,gesture:s.rest??blend(s.follow,ready,0.62),target:s.restTarget},{frame:end-1,gesture:ready,idle:true},{frame:end,gesture:ready,idle:true}].sort((a,b)=>a.frame-b.frame);
 };
 const blend=(a:Gesture,b:Gesture,t:number):Gesture=>Object.fromEntries([...new Set([...Object.keys(a),...Object.keys(b)])].map(k=>[k,(a[k as keyof Gesture]??0)*(1-t)+(b[k as keyof Gesture]??0)*t]));
 const ready: Gesture = {};
@@ -65,27 +65,31 @@ const forwardTiltStrike=(bend:number):Strike=>({prep:{chest:-22+bend,arm:-170,el
 const slam: Gesture = {chest:60,arm:-45,elbow:0,free:-50,pitch:20,step:26,leftHip:-60,rightHip:35,leftKnee:65,rightKnee:10,head:-5};
 const sweep: Gesture = {chest:60,twist:-25,arm:-50,elbow:5,free:-45,pitch:14,step:8,hip:-60,knee:85};
 const strikes: Partial<Record<HeroPose, Strike>> = {
-  jab2:{prep:{chest:0,twist:15,arm:-20,elbow:75,free:-60,pitch:-6,step:-8,hip:-8,knee:20},
-    hit:{chest:34,twist:-15,arm:-70,elbow:0,free:-30,pitch:14,step:22,leftHip:-45,rightHip:22,leftKnee:35,knee:10,head:-14},aim:true,
-    follow:{chest:38,twist:-18,arm:-74,elbow:0,free:-28,pitch:16,step:27,leftHip:-47,rightHip:22,leftKnee:37,knee:10,head:-14},followAt:9,reach:[122,55]},
+  jab2:{prep:{chest:-8,twist:25,arm:10,elbow:80,free:-20,pitch:-10,step:-10,hip:-10,knee:22,head:-8},
+    hit:{chest:38,twist:-25,arm:-88,elbow:0,free:-25,pitch:16,step:28,leftHip:-50,rightHip:24,leftKnee:38,knee:10,head:-14},aim:true,
+    follow:{chest:36,twist:-28,arm:-90,elbow:0,free:-22,pitch:15,step:27,leftHip:-50,rightHip:24,leftKnee:38,knee:10,head:-14},followAt:12,reach:[124,52],settle:0.6,restTarget:[60,25],
+    rest:{chest:4,twist:-4,arm:-45,elbow:20,free:-25,pitch:2,step:5,leftHip:-12,rightHip:6,leftKnee:10,head:-4}},
   forwardTilt:forwardTiltStrike(0),forwardTiltUp:forwardTiltStrike(-8),forwardTiltDown:forwardTiltStrike(8),
-  upTilt:{prep:{chest:22,arm:-40,elbow:40,free:-40,pitch:6,step:4,hip:-25,knee:45},
-    hit:{chest:-5,arm:-150,elbow:10,free:-140,pitch:-4,hip:-5,knee:10,head:-25},aim:true,
-    mid:[{frame:14,gesture:{chest:-20,arm:-180,elbow:10,free:-175,pitch:-10,step:-3,head:-35,knee:5},target:[0,215]},{frame:16,gesture:{chest:-30,arm:-195,elbow:15,free:-190,pitch:-14,step:-6,head:-40,hip:5,knee:12},target:[-90,175]}],
-    follow:{chest:-34,arm:-200,elbow:20,free:-195,pitch:-16,step:-8,head:-40,hip:8,knee:15},followAt:18},
+  upTilt:{prep:{chest:22,twist:22,arm:-40,elbow:40,free:-40,pitch:6,step:-4,hip:-25,knee:45},
+    hit:{chest:-5,twist:-12,arm:-150,elbow:10,free:-140,pitch:-4,step:14,leftHip:-38,rightHip:18,leftKnee:28,knee:10,head:-25},aim:true,
+    mid:[{frame:14,gesture:{chest:-20,twist:-25,arm:-180,elbow:10,free:-175,pitch:-10,step:16,leftHip:-32,rightHip:16,leftKnee:22,head:-35,knee:5},target:[0,215]},{frame:16,gesture:{chest:-30,twist:-35,arm:-195,elbow:15,free:-190,pitch:-14,step:14,leftHip:-24,rightHip:14,leftKnee:18,head:-40,knee:12},target:[-90,175]}],
+    follow:{chest:-30,twist:-40,arm:-235,elbow:25,free:-225,pitch:-14,step:12,leftHip:-20,rightHip:12,leftKnee:16,head:-30,knee:15},followAt:18,reach:[-140,140],settle:0.45,restTarget:[-55,175],
+    rest:{chest:-6,twist:-15,arm:-325,elbow:10,free:-300,pitch:-4,step:8,head:-10,hip:4,knee:10}},
   downTilt:{prep:{chest:30,twist:25,arm:-10,elbow:60,free:-30,pitch:6,step:-8,hip:-45,knee:70,head:-10},
     hit:{chest:55,twist:-20,arm:-45,elbow:5,free:-40,pitch:16,step:18,leftHip:-65,rightHip:-20,leftKnee:70,rightKnee:85,head:-20},aim:true,
     follow:{chest:58,twist:-35,arm:-48,elbow:5,free:-42,pitch:18,step:22,leftHip:-65,rightHip:-20,leftKnee:70,rightKnee:85,head:-20},followAt:14,reach:[152,8]},
-  dashAttack:{prep:{chest:-15,arm:-30,elbow:70,free:-30,pitch:-14,step:-14,leftHip:-25,rightHip:15,knee:25,head:-10},
-    hit:{chest:30,arm:-80,elbow:10,free:-80,freeElbow:10,pitch:18,step:26,leftHip:-55,rightHip:30,leftKnee:30,rightKnee:5,head:-12},aim:true,
-    follow:{chest:34,arm:-84,elbow:10,free:-84,freeElbow:10,pitch:22,step:32,leftHip:-58,rightHip:32,leftKnee:32,rightKnee:5,head:-12},followAt:21,reach:[110,74]},
+  dashAttack:{prep:{chest:20,twist:35,arm:20,elbow:40,free:10,freeElbow:40,pitch:6,step:-6,leftHip:-35,rightHip:20,knee:40,head:-5},
+    hit:{chest:58,twist:40,arm:35,elbow:25,free:-20,freeElbow:70,pitch:32,step:50,leftHip:-72,rightHip:40,leftKnee:40,rightKnee:4,head:5},
+    follow:{chest:64,twist:44,arm:40,elbow:25,free:-16,freeElbow:70,pitch:40,step:68,leftHip:-74,rightHip:42,leftKnee:42,rightKnee:4,head:5},followAt:21},
   forwardSmash:{prep:{chest:-30,arm:-195,elbow:50,free:-180,freeElbow:40,pitch:-14,step:-18,leftHip:-10,rightHip:20,knee:20,head:-25},prepAt:20,
     hit:{chest:5,arm:-140,elbow:5,free:-130,pitch:2,step:6,leftHip:-30,rightHip:15,leftKnee:25,head:-18},aim:true,
     mid:[{frame:29,gesture:{chest:40,arm:-80,elbow:0,free:-80,pitch:14,step:22,leftHip:-55,rightHip:30,leftKnee:55,head:-8},target:[175,60]},{frame:30,gesture:slam,target:[175,10]}],
     follow:{...slam,chest:66,pitch:22,step:28},followAt:34,reach:[190,0]},
-  upSmash:{prep:{chest:40,arm:-20,elbow:60,free:-20,pitch:10,hip:-55,knee:85,head:-5},prepAt:18,
-    hit:{chest:-10,arm:-175,elbow:0,free:-175,pitch:-4,hip:5,knee:0,head:-30},aim:true,
-    follow:{chest:-18,arm:-185,elbow:0,free:-185,pitch:-8,hip:10,knee:-5,head:-35},followAt:30},
+  upSmash:{prep:{chest:14,arm:-5,elbow:70,free:-5,freeElbow:60,pitch:0,hip:-80,knee:120,head:4},prepAt:18,prepTarget:[75,55],
+    hit:{chest:-12,arm:-178,elbow:0,free:-178,pitch:-4,hip:6,knee:-2,head:-32},aim:true,
+    mid:[{frame:21,gesture:{chest:25,arm:-130,elbow:10,free:-120,freeElbow:20,pitch:4,hip:-45,knee:65,head:-12},target:[70,185]}],
+    follow:{chest:-24,arm:-196,elbow:0,free:-150,freeElbow:40,pitch:-9,hip:10,knee:-6,head:-36},followAt:30,
+    rest:{chest:-6,arm:-150,elbow:20,free:-60,freeElbow:30,pitch:-3,hip:4,knee:4,head:-14}},
   downSmash:{prep:{chest:20,twist:30,arm:-150,elbow:30,free:-140,pitch:-4,hip:-30,knee:45},prepAt:16,
     hit:sweep,aim:true,mid:[{frame:26,gesture:{...sweep,yaw:160,twist:0},target:[-148,10]}],
     follow:{...sweep,yaw:180,twist:10},followAt:30,reach:[-158,8]},
@@ -149,29 +153,40 @@ for (const [pose, key, gesture, contact] of [
         {frame:contact,gesture},{frame:contact+4,gesture},
       ]:undefined}); }
 }
-const authored: Partial<Record<HeroPose, Pick<Action,"prep"|"prepTarget"|"first"|"phases">>> = {
+interface Authored { prep: Gesture; prepTarget?: readonly [number,number]; first?: Gesture; phases: readonly Phase[] }
+const authored: Partial<Record<HeroPose, Authored>> = {
+  forwardAir: {prepTarget:[-60,200], prep:{chest:-35,head:-18,arm:-178,elbow:-25,free:-165,freeElbow:35,hip:22,knee:38,lean:-25}, phases:[
+    {frame:19,target:[150,175],gesture:{chest:0,arm:-150,free:-140,freeElbow:20,hip:0,knee:30,lean:5}},
+    {frame:20,target:[165,110],gesture:{chest:14,free:-120,freeElbow:15,hip:-10,knee:36,lean:8}},
+    {frame:21,target:[145,35],gesture:{chest:32,head:-10,free:-90,freeElbow:12,hip:-24,knee:48,lean:11}},
+    {frame:22,target:[120,-5],gesture:{chest:40,head:-12,free:-70,freeElbow:10,hip:-30,knee:55,lean:12}},
+    {frame:25,target:[90,-25],gesture:{chest:44,head:-14,arm:0,elbow:15,free:-55,hip:-34,knee:58,lean:12}},
+    {frame:30,target:[30,-25],gesture:{chest:42,head:-12,arm:25,elbow:20,free:-45,hip:-36,knee:58,lean:11}}]},
   getUpAttack: {first:{...brace,lean:85}, prepTarget:[-110,40], prep:{chest:32,head:-10,arm:35,elbow:25,free:-40,hip:-55,knee:85,lean:30}, phases:[
-    {frame:16,target:[125,45],gesture:{chest:30,free:-30,hip:-50,knee:80,lean:12}},
-    {frame:17,target:[60,95],gesture:{chest:20,free:-30,hip:-50,knee:80,lean:8}},
-    {frame:18,target:[-60,95],gesture:{chest:14,free:-30,hip:-50,knee:80,lean:4}},
-    {frame:19,target:[-125,45],gesture:{chest:22,free:-35,hip:-50,knee:80,lean:4}},
-    {frame:27,gesture:{chest:18,arm:50,elbow:20,free:-30,hip:-30,knee:50}}]},
-  ledgeAttack: {first:{...brace,lean:35,free:-105}, prepTarget:[-110,40], prep:{chest:-8,head:-8,arm:45,elbow:30,free:-60,hip:-35,knee:55,lean:-6}, phases:[
-    {frame:16,target:[130,30],gesture:{chest:40,free:-35,hip:-42,knee:62,lean:10,leftHip:-62,rightHip:20}},
-    {frame:18,target:[135,15],gesture:{chest:44,free:-30,hip:-42,knee:62,lean:12,leftHip:-62,rightHip:20}},
-    {frame:25,target:[110,150],gesture:{chest:30,arm:-115,elbow:10,free:-40,hip:-35,knee:52,lean:8,leftHip:-52,rightHip:15}}]},
-  throwForward: {prepTarget:[-90,90], prep:{...held,chest:-16,head:-8,free:-45,freeElbow:75,arm:20,hip:15,knee:22,lean:-10}, phases:[
-    {frame:19,target:[150,90],gesture:{...held,chest:36,head:-10,free:-95,freeElbow:0,arm:-45,lean:14,leftHip:-60,rightHip:25,knee:40}},
-    {frame:25,target:[140,85],gesture:{...held,chest:32,free:-90,freeElbow:5,arm:-35,lean:12,leftHip:-55,rightHip:22,knee:38}}]},
-  throwUp: {prepTarget:[-70,30], prep:{...held,chest:36,head:10,free:-55,freeElbow:40,arm:-25,hip:-48,knee:75,lean:6}, phases:[
-    {frame:21,target:[25,255],gesture:{chest:-10,head:-32,arm:-150,elbow:-5,free:-165,freeElbow:0,hip:5,knee:0,lean:-8}},
-    {frame:26,target:[15,245],gesture:{chest:-8,head:-26,arm:-140,elbow:5,free:-155,freeElbow:5,hip:0,knee:6,lean:-6}}]},
-  grab: {prep:{chest:-12,head:-6,arm:15,free:-30,freeElbow:40,hip:-15,knee:25,lean:-6}, phases:[
-    {frame:10,gesture:{chest:34,head:-14,arm:-20,free:-95,freeElbow:0,lean:12,leftHip:-58,rightHip:24,knee:42}},
-    {frame:14,gesture:{chest:36,head:-14,arm:-20,free:-92,freeElbow:5,lean:13,leftHip:-60,rightHip:25,knee:44}}]},
-  pummel: {prep:{...held,chest:-18,head:-35,hip:-5,knee:10,lean:-6}, phases:[
-    {frame:60,gesture:{...held,chest:38,head:38,hip:-25,knee:35,lean:10}},
-    {frame:63,gesture:{...held,chest:30,head:30,hip:-20,knee:30,lean:8}}]},
+    {frame:16,target:[125,45],gesture:{chest:30,free:-30,hip:-50,knee:80,lean:12,yaw:0}},
+    {frame:17,target:[130,40],gesture:{chest:32,free:-30,hip:-50,knee:80,lean:12,yaw:20}},
+    {frame:18,target:[-125,45],gesture:{chest:28,free:-35,hip:-50,knee:80,lean:10,yaw:150}},
+    {frame:22,target:[-130,40],gesture:{chest:30,free:-35,hip:-50,knee:80,lean:10,yaw:175}},
+    {frame:30,target:[100,30],gesture:{chest:24,arm:50,elbow:20,free:-30,hip:-35,knee:55,yaw:340}}]},
+  ledgeAttack: {first:{...brace,lean:35,free:-105}, prepTarget:[-90,190], prep:{chest:-10,head:-12,arm:-170,elbow:20,free:-60,freeElbow:20,hip:-15,knee:20,lean:-4,leftHip:-25,rightHip:10}, phases:[
+    {frame:16,target:[140,45],gesture:{chest:26,head:-8,arm:-90,free:-80,hip:-30,knee:42,lean:6,leftHip:-50,rightHip:20}},
+    {frame:19,target:[125,20],gesture:{chest:32,head:-6,arm:-60,free:-60,hip:-30,knee:44,lean:8,leftHip:-52,rightHip:22}},
+    {frame:27,target:[100,30],gesture:{chest:22,arm:-40,elbow:20,free:-45,hip:-20,knee:30,lean:3,leftHip:-30,rightHip:12}}]},
+  throwForward: {prepTarget:[-120,100], prep:{...held,chest:-10,twist:30,head:-8,free:-60,freeElbow:60,arm:20,hip:10,knee:25,lean:-10,yaw:-40}, phases:[
+    {frame:19,target:[150,110],gesture:{...held,chest:34,twist:-20,head:-10,free:-110,freeElbow:0,arm:-45,lean:14,leftHip:-60,rightHip:25,knee:40,yaw:20}},
+    {frame:24,target:[170,95],gesture:{...held,chest:42,twist:-28,head:-12,free:-95,freeElbow:0,arm:-25,lean:16,leftHip:-64,rightHip:28,knee:44,yaw:32}},
+    {frame:31,target:[130,60],gesture:{...held,chest:30,twist:-15,head:-6,free:-65,freeElbow:20,arm:-10,lean:8,leftHip:-45,rightHip:20,knee:32,yaw:18}}]},
+  throwUp: {prepTarget:[-90,60], prep:{...held,chest:36,head:10,free:-40,freeElbow:70,arm:-25,hip:-48,knee:75,lean:6}, phases:[
+    {frame:21,target:[-100,110],gesture:{chest:-12,head:-35,arm:-30,elbow:20,free:-175,freeElbow:0,hip:5,knee:0,lean:-8}},
+    {frame:24,target:[-105,115],gesture:{chest:-14,head:-35,arm:-30,elbow:20,free:-180,freeElbow:0,hip:4,knee:2,lean:-9}},
+    {frame:28,target:[-100,90],gesture:{chest:-2,head:-15,arm:-20,elbow:20,free:-120,freeElbow:20,hip:-8,knee:15,lean:-3}}]},
+  grab: {prepTarget:[-90,120], prep:{chest:-14,head:-6,arm:20,elbow:40,free:-40,freeElbow:70,hip:-10,knee:18,lean:-8,step:-8}, phases:[
+    {frame:9,target:[-95,125],gesture:{chest:30,head:-16,arm:20,elbow:40,free:-95,freeElbow:0,lean:10,leftHip:-48,rightHip:22,knee:20,step:18}},
+    {frame:14,target:[-95,125],gesture:{chest:32,head:-16,arm:20,elbow:40,free:-92,freeElbow:0,lean:11,leftHip:-50,rightHip:23,knee:22,step:20}}]},
+  pummel: {prepTarget:[-90,125], prep:{...held,chest:-18,head:-35,hip:-5,knee:10,lean:-6}, phases:[
+    {frame:60,target:[-80,130],gesture:{...held,chest:30,head:40,hip:-15,knee:25,lean:8}},
+    {frame:63,target:[-80,130],gesture:{...held,chest:26,head:32,hip:-12,knee:22,lean:6}},
+    {frame:66,target:[-85,125],gesture:{...held,chest:12,head:12,hip:-6,knee:14,lean:2}}]},
   throwBack: {prepTarget:[120,60], prep:{...held,chest:30,head:-5,free:-60,hip:-35,knee:55,lean:8}, phases:[
     {frame:23,target:[-150,150],gesture:{...held,chest:-26,head:-28,free:-160,hip:5,knee:15,lean:-14}},
     {frame:29,target:[-150,95],gesture:{...held,chest:-18,head:-20,free:-150,hip:0,knee:20,lean:-10}}]},
@@ -179,7 +194,16 @@ const authored: Partial<Record<HeroPose, Pick<Action,"prep"|"prepTarget"|"first"
     {frame:24,target:[95,-10],gesture:{chest:65,head:10,arm:-105,elbow:10,free:-95,freeElbow:10,hip:-58,knee:82,lean:18}},
     {frame:31,target:[90,-15],gesture:{chest:70,head:12,arm:-100,elbow:10,free:-90,freeElbow:10,hip:-60,knee:85,lean:20}}]},
 };
-for (const action of actions) Object.assign(action, authored[action.pose] ?? {});
+const authoredBeats=(action:Action,a:Authored):Phase[]=>{const last=a.phases.at(-1)!,settle=Math.round(last.frame+(action.frames-last.frame)*0.55),last2=a.phases.at(-1)!.gesture.yaw;
+  const rest:Gesture={...ready,yaw:last2!==undefined&&Math.abs(last2)>180?360:undefined};
+  const begin=[{frame:0,gesture:a.first??action.first??ready},{frame:Math.max(1,action.contact-3),gesture:a.prep,target:a.prepTarget},...a.phases];
+  if(action.pose==="pummel")return [...begin,{frame:action.frames,gesture:a.first??action.first??ready}];
+  if(action.air)return [...begin,{frame:settle,gesture:blend(last.gesture,rest,0.62)},{frame:action.frames-2,gesture:rest},{frame:action.frames,gesture:rest}];
+  return [...begin,{frame:settle,gesture:blend(last.gesture,rest,0.62),target:last.target?[last.target[0]*0.5-45,last.target[1]*0.5+30] as const:undefined},{frame:action.frames-1,gesture:rest,idle:true},{frame:action.frames,gesture:rest,idle:true}];};
+for (const action of actions) { const a=authored[action.pose]; if (a) action.beats=authoredBeats(action,a); }
+const stockDonors: Partial<Record<HeroPose, number>> = { grab: 6, pummel: 10, throwForward: 9 };
+const stockHits: Partial<Record<HeroPose, number>> = { pummel: 760 };
+for (const action of actions) { const donor = stockDonors[action.pose]; if (donor !== undefined) { action.stock = donor; action.stockHit = stockHits[action.pose]; } }
 const damageActions: Action[] = [];
 for (let height=0;height<3;height++) for (let strength=0;strength<3;strength++) {
   const gain=[0.55,0.9,1.3][strength]!;
@@ -211,6 +235,7 @@ ensure(mat4.invert(offset,handRest),"Hand's stock pose is singular"); mat4.multi
 const weaponRef=model.Nodes.find(n=>n.Name==="Weapon Ref")!,weaponPivot=model.PivotPoints[weaponRef.ObjectId]!;
 const weaponPoint=vec3.fromValues(weaponPivot[0]!,weaponPivot[1]!,weaponPivot[2]!);vec3.transformMat4(weaponPoint,weaponPoint,data.nodes[weaponRef.ObjectId].matrix);
 const inverseHand=mat4.create();ensure(mat4.invert(inverseHand,handRest),"Hand pose is singular");vec3.transformMat4(weaponPoint,weaponPoint,inverseHand);
+const bladeNormal=vec3.fromValues(0,1,0);{const turn=mat3.create();mat3.fromMat4(turn,inverseHand);vec3.transformMat3(bladeNormal,bladeNormal,turn);vec3.normalize(bladeNormal,bladeNormal);}
 evaluate(0,0);const idleOffset=mat4.create();ensure(mat4.invert(idleOffset,data.nodes[hand.ObjectId].matrix),"Hand's idle pose is singular");mat4.multiply(idleOffset,idleOffset,data.nodes[weapon.ObjectId].matrix);
 const mixMatrix=(a:mat4,b:mat4,t:number)=>{const qa=quat.create(),qb=quat.create(),ta=vec3.create(),tb=vec3.create(),out=mat4.create();mat4.getRotation(qa,a);mat4.getRotation(qb,b);mat4.getTranslation(ta,a);mat4.getTranslation(tb,b);
   quat.slerp(qa,qa,qb,t);vec3.lerp(ta,ta,tb,t);return mat4.fromRotationTranslation(out,quat.normalize(qa,qa),ta);};
@@ -221,6 +246,10 @@ const resting=(path:string,like:ArrayLike<number>)=>path.endsWith("Rotation")?ne
 const ease=(t:number)=>t*t*(3-2*t);
 const along=(phases:readonly Phase[],frame:number,value:(phase:Phase)=>number)=>{const after=phases.findIndex(p=>p.frame>=frame);if(after<=0)return value(phases[Math.max(0,after)]??phases[phases.length-1]!);
   const a=phases[after-1]!,b=phases[after]!;return value(a)+(value(b)-value(a))*ease((frame-a.frame)/(b.frame-a.frame));};
+const farthestReach=(clip:number)=>{const [first,last]=source.Sequences[clip]!.Interval;let best=-Infinity,at=0;
+  for(let frame=0;frame*1000/60<=last-first;frame++){evaluate(clip,frame);const tip=vec3.fromValues(weaponPivot[0]!,weaponPivot[1]!,weaponPivot[2]!);vec3.transformMat4(tip,tip,data.nodes[weaponRef.ObjectId].matrix);
+    if(tip[0]!>best){best=tip[0]!;at=Math.round(frame*1000/60);}}
+  return at;};
 let cursor=Math.max(...source.Sequences.map(s=>s.Interval[1]))+100;
 const bindings:string[]=[],damageBindings:string[]=[],records:{pose:string;index:number;frames:number;contact:number}[]=[];
 for (const [ordinal,action] of [...actions,...damageActions].entries()) {
@@ -228,10 +257,20 @@ for (const [ordinal,action] of [...actions,...damageActions].entries()) {
   const name=action.damage?`Cairne Pain ${Math.floor((ordinal-actions.length)/3)} ${(ordinal-actions.length)%3}`:`Cairne ${action.pose}`;
   model.Sequences.push({...stand,Name:name,Interval:new Uint32Array([start,end]),NonLooping:!action.hold,MoveSpeed:0,Rarity:0,
     MinimumExtent:new Float32Array([-320,-320,-200]),MaximumExtent:new Float32Array([320,320,360]),BoundsRadius:440});
+  if(action.stock!==undefined){const [first,last]=source.Sequences[action.stock]!.Interval,hit=first+(action.stockHit??farthestReach(action.stock)),contact=start+Math.round(action.contact*1000/60);
+    const wind=Math.max(start,contact-(hit-first)),tail=Math.min(end,contact+(last-hit));
+    const retimed=(frame:number)=>frame<=hit?wind+Math.round((frame-first)/Math.max(1,hit-first)*(contact-wind)):contact+Math.round((frame-hit)/Math.max(1,last-hit)*(tail-contact));
+    tracks(model,(track,path)=>{const donor=originals.get(path);if(!donor||onGlobalClock(donor))return;const placed=new Set<number>();
+      const inside=donor.Keys.filter(key=>key.Frame>=first&&key.Frame<=last);
+      for(const key of inside){const Frame=retimed(key.Frame);if(placed.has(Frame))continue;placed.add(Frame);track.Keys.push({...structuredClone(key),Frame});}
+      if(inside.length&&!placed.has(start))track.Keys.push({...structuredClone(inside[0]!),Frame:start});
+      if(inside.length&&!placed.has(end))track.Keys.push({...structuredClone(inside.at(-1)!),Frame:end});
+      track.Keys.sort((a,b)=>a.Frame-b.Frame);});
+  }else{
   const coil=blend(ready,action.gesture,-0.32);
   const phases:Phase[]=action.beats ? [...action.beats] : action.roll ? [0,0.12,0.25,0.5,0.75,0.9,1].map(t=>({frame:Math.round(t*action.frames),gesture:{...blend(ready,brace,t===0||t===1?0:1),lean:t*360*action.roll!}})) : action.hold ? [{frame:0,gesture:action.gesture},{frame:action.frames,gesture:action.gesture}] : [
-    {frame:0,gesture:action.first??ready},{frame:Math.max(1,action.contact-3),target:action.prepTarget,gesture:action.prep ?? (action.pose==="neutralSpecial"||action.pose==="neutralSpecialAir"
-      ? action.phases?.find(phase=>phase.frame===action.contact-1)?.gesture??ready : blend(action.first??ready,coil,0.75))},
+    {frame:0,gesture:action.first??ready},{frame:Math.max(1,action.contact-3),gesture:action.pose==="neutralSpecial"||action.pose==="neutralSpecialAir"
+      ? action.phases?.find(phase=>phase.frame===action.contact-1)?.gesture??ready : blend(action.first??ready,coil,0.75)},
     ...(action.phases ?? [{frame:action.contact,gesture:action.gesture,target:action.target},{frame:Math.min(action.frames-1,action.contact+4),gesture:action.gesture,target:action.target}]),
     {frame:action.frames,gesture:action.pose==="pummel"||action.pose==="victimPummel"?action.first??ready:ready},
   ].sort((a,b)=>a.frame-b.frame).filter((p,i,array)=>i===0||p.frame!==array[i-1]?.frame);
@@ -250,10 +289,10 @@ for (const [ordinal,action] of [...actions,...damageActions].entries()) {
   const baseline=(node:mdx.Node)=>source.Nodes[node.ObjectId]!.Rotation!.Keys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1])!.Vector;
   for(const phase of phases)if(phase.target){
     const armKey=shoulder.Rotation!.Keys.find(k=>k.Frame===start+Math.round(phase.frame*1000/60))!,elbowKey=elbow.Rotation!.Keys.find(k=>k.Frame===start+Math.round(phase.frame*1000/60))!;
-    const angles=[phase.gesture.arm??0,0,phase.gesture.elbow??0,0],authored=angles.slice(),pull=action.beats?0.05:0;
+    const angles=[phase.gesture.arm??0,0,phase.gesture.elbow??0,0],authored=angles.slice(),pull=action.beats?0.05:0,depth=0.5,flat=3000;
     const loss=()=>{armKey.Vector=rotation(baseline(shoulder),angles[0]!,angles[1]!);elbowKey.Vector=rotation(baseline(elbow),angles[2]!,angles[3]!);
-      evaluate(index,phase.frame);const point=vec3.create();vec3.transformMat4(point,weaponPoint,data.nodes[hand.ObjectId].matrix);
-      return (point[0]!-phase.target![0])**2+(point[2]!-phase.target![1])**2+pull*angles.reduce((sum,angle,axis)=>sum+(angle-authored[axis]!)**2,0);};
+      evaluate(index,phase.frame);const facingCamera=()=>{const turn=mat3.create(),n=vec3.create();mat3.fromMat4(turn,data.nodes[hand.ObjectId].matrix);vec3.transformMat3(n,bladeNormal,turn);return n[1]!/vec3.length(n);};const point=vec3.create();vec3.transformMat4(point,weaponPoint,data.nodes[hand.ObjectId].matrix);
+      return (point[0]!-phase.target![0])**2+(point[2]!-phase.target![1])**2+depth*point[1]!**2+flat*(1-Math.abs(facingCamera()))**2+pull*angles.reduce((sum,angle,axis)=>sum+(angle-authored[axis]!)**2,0);};
     for(let pass=0;pass<4;pass++)for(let axis=0;axis<4;axis++){let best=Infinity,bestAngle=angles[axis]!;for(let centre=pull?authored[axis]!:0,angle=centre-180;angle<=centre+180;angle+=pass<2?15:5){angles[axis]=angle;const value=loss();if(value<best){best=value;bestAngle=angle;}}angles[axis]=bestAngle;}
     loss();for(const key of [armKey,elbowKey])if(key.InTan){key.InTan=key.Vector.slice();key.OutTan=key.Vector.slice();}
   }
@@ -287,6 +326,7 @@ for (const [ordinal,action] of [...actions,...damageActions].entries()) {
       const key={Frame,Vector,...rootTrack.LineType>1?{InTan:new Float32Array(3),OutTan:new Float32Array(3)}:{}};
       const previous=rootTrack.Keys.find(k=>k.Frame===Frame);if(previous)Object.assign(previous,key);else rootTrack.Keys.push(key);}
     rootTrack.Keys.sort((a,b)=>a.Frame-b.Frame);}
+  }
   const duration=(end-start)/1000;
   const victimContact=action.pose.startsWith("victim");
   const contact=action.pose.startsWith("throw")||victimContact||action.pose==="pummel"?`, contact: ${seconds(victimContact?0.5:action.contact/60)}`:"";
@@ -320,10 +360,11 @@ const motions=actions.map((action,ordinal)=>{const index=source.Sequences.length
   if(!action.hold)ensure(motion>=8,`${action.pose}: no local gesture (${motion})`);return {pose:action.pose,motion};});
 const pain=damageActions.map((_,ordinal)=>after.triangles(source.Sequences.length+actions.length+ordinal,0,1));
 for(let a=0;a<pain.length;a++)for(let b=a+1;b<pain.length;b++)ensure(pain[a]!.some((v,i)=>Math.abs(v-pain[b]![i]!)>2),`Pain ${a}/${b}: same silhouette`);
+const framed={sequenceStart:(clip:number)=>after.sequenceStart(clip),triangles:(clip:number,at:number,facing:number)=>{const t=after.triangles(clip,at,facing).slice();for(let i=1;i<t.length;i+=2)t[i]=t[i]!*0.7-30;for(let i=0;i<t.length;i+=2)t[i]=t[i]!*0.8;return t;}} as unknown as DrawnModel;
 for(const pose of ["jab","jab2","forwardTilt","upTilt","downTilt","dashAttack","forwardSmash","upSmash","smashCharge","downSmash","neutralAir","forwardAir","backAir","upAir","downAir","getUpAttack","ledgeAttack","grab","pummel","neutralSpecial","sideSpecial","upSpecial","downSpecial","rollForward","throwForward","throwBack","throwUp","throwDown"] as const){
   const ordinal=actions.findIndex(a=>a.pose===pose),action=actions[ordinal]!;
   const panels:PoseFrame[]=[1,-1].flatMap(facing=>(action.beats?action.beats.map(b=>b.frame):[0,Math.max(1,action.contact-3),action.contact,Math.min(action.frames,action.contact+4),action.frames]).map(frame=>({frame,phase:frame<action.contact?AttackPhase.startup:frame<=action.contact+4?AttackPhase.active:AttackPhase.recovery,x:0,z:0,facing,parts:[],strikes:[],clip:source.Sequences.length+ordinal,seconds:frame/60})));
-  await Bun.write(join(output,`${pose}.png`),sheet(`Cairne ${pose}`,after,panels,panels.length/2).png);
+  await Bun.write(join(output,`${pose}.png`),sheet(`Cairne ${pose}`,framed,panels,panels.length/2).png);
 }
 await Bun.write(join(output,"cairne-clips.json"),JSON.stringify({stockSequences:source.Sequences.length,preservedSamples:preserved,appended:records.length,records,motions},null,2)+"\n");
 console.log(`CAIRNE_CLIPS_PASS ${records.length} clips; ${preserved} stock pose samples retained; nine distinct first pain poses; ${output}`);

@@ -69,12 +69,12 @@ export const CAIRNE_CLIPS = { idle: { index: 0, seconds: f32(2.667) }, walk: { i
   ledgeRoll: { index: 75, seconds: f32(0.6), aligned: true },
   neutralSpecial: { index: 76, seconds: f32(0.967), aligned: true },
   neutralSpecialAir: { index: 77, seconds: f32(0.967), aligned: true },
-  sideSpecial: { index: 78, seconds: f32(0.95), aligned: true },
-  sideSpecialAir: { index: 79, seconds: f32(0.95), aligned: true },
+  sideSpecial: { index: 78, seconds: f32(0.967), aligned: true },
+  sideSpecialAir: { index: 79, seconds: f32(0.967), aligned: true },
   upSpecial: { index: 80, seconds: f32(0.533), aligned: true },
   upSpecialAir: { index: 81, seconds: f32(0.533), aligned: true },
-  downSpecial: { index: 82, seconds: f32(0.767), aligned: true },
-  downSpecialAir: { index: 83, seconds: f32(0.767), aligned: true },
+  downSpecial: { index: 82, seconds: f32(0.9), aligned: true },
+  downSpecialAir: { index: 83, seconds: f32(0.9), aligned: true },
 } as const satisfies HeroClipTable;
 export const CAIRNE_DAMAGE_CLIPS: readonly HeroClip[] = [
   { index: 84, seconds: f32(0.4), aligned: true },
