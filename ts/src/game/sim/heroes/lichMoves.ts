@@ -405,7 +405,7 @@ export const LICH_FROST_NOVA_BODY: readonly HurtPose[] = [
     hurtPose(25, 27, [hurtPart(-14.0, 87.0, -14.0, 87.0, 57.0), hurtPart(-4.0, 147.0, -4.0, 175.0, 27.0)]),
     hurtPose(28, 30, [hurtPart(-15.0, 44.0, -15.0, 170.0, 32.0)]),
     hurtPose(31, 33, [hurtPart(-9.0, 8.0, -9.0, 170.0, 32.0)]),
-    hurtPose(34, 38, [hurtPart(-11.0, 3.0, -11.0, 164.0, 28.0)]),
+    hurtPose(34, 39, [hurtPart(-11.0, 3.0, -11.0, 164.0, 28.0)]),
   ];
 
 export const LICH_DECAY_BODY: readonly HurtPose[] = [
