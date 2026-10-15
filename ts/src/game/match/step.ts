@@ -22,7 +22,6 @@ import { advanceHeroStatus, prepareBansheeContacts } from "../sim/heroSpecialRul
 import { advanceItemBuff } from "../sim/itemBuffs";
 import { advanceFighterMotion } from "../sim/step";
 import { maskHeroStatusControls } from "../sim/heroStatus";
-import { platformSpecialInput } from "../sim/platformMoves";
 import { advanceStageCannon } from "../sim/stageHazards";
 import { advanceWater, collectHydraContacts } from "../sim/water";
 import { surfaceCount, surfaceLine, surfaceZAt } from "../sim/stage";
@@ -221,7 +220,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
     resetObservedActions();
     const special = fighterAt(world, slot);
     if (game.ultimatesOff) controls.inputs[slot].ultimatePressed = false;
-    const started = startFighterSpecial(special, stage, stageFrame, platformSpecialInput(special, controls.inputs[slot]), world);
+    const started = startFighterSpecial(special, stage, stageFrame, controls.inputs[slot], world);
     observedFrameLegalActions[slot] |= observedActions.legal;
     if (started) observedFrameStartedActions[slot] |= 64;
   }

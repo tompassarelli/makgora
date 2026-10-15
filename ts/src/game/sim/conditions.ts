@@ -1,6 +1,6 @@
 
 
-import { AttackPhase, AttackStyle, DASH_GRAB_REQUEST, DownState, GrabAction, LedgeState, PlatformMove, ShieldBreak, SurfaceContact } from "./codes";
+import { AttackPhase, AttackStyle, DASH_GRAB_REQUEST, DownState, GrabAction, LedgeState, ShieldBreak, SurfaceContact } from "./codes";
 import type { Fighter } from "./fighter";
 import { attackStartupFrames, characterAttackActiveFrames, jabChainFrom, nextJab } from "./moves";
 
@@ -96,7 +96,7 @@ export function canStartAttack(attacker: Fighter, allowJumpSquat = false): boole
   const { grab, shield } = attacker;
   if (grab.target !== undefined || grab.action !== GrabAction.none) return false;
   if (attacker.status.frozenFrames > 0) return false;
-  if (attacker.ledge.state !== LedgeState.none || attacker.cannon.held !== undefined || attacker.platform.move !== PlatformMove.none) return false;
+  if (attacker.ledge.state !== LedgeState.none || attacker.cannon.held !== undefined) return false;
   return !attacker.status.out && !attacker.special.fall && attacker.special.lockFrames <= 0 && shield.breakState === ShieldBreak.none
     && (attacker.down.state === DownState.none || isTumbling(attacker)) && grab.grabbedFrames <= 0
     && attacker.launch.hitlag <= 0 && attacker.launch.hitstun <= 0 && shield.stun <= 0 && shield.releaseLag <= 0

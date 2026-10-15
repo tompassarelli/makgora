@@ -103,7 +103,7 @@ const TUNING_FIELDS = ["physics", "surface", "ground", "dashGrab", "shield", "te
 
 // Integer codes, counts and frames: Lua integers have no -0, so their comparisons skip the signed-zero test.
 const INTEGER_FIELDS = [
-  ".character", ".special.seekTarget", ".launch.hitlagFrames", ".launch.hitlagEndAge", ".water.hydraStrikeFrame", ".platform.landedFrames", ".status.conditionImmunity[]",
+  ".character", ".special.seekTarget", ".launch.hitlagFrames", ".launch.hitlagEndAge", ".water.hydraStrikeFrame", ".platform.downAge", ".status.conditionImmunity[]",
   ".projectiles[].life", ".projectiles[].direction", ".projectiles[].kind", ".projectiles[].visualFamily", ".projectiles[].serial", ".projectiles[].poolHits", ".projectiles[].poolWait",
 ];
 // Dense number lists, read as `?? 0`, which never hold undefined.

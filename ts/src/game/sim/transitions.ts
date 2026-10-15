@@ -7,7 +7,7 @@ import { floorDiv } from "wisp/src/sim/intMath";
 import { mutableProjectile } from "./fighterProjectiles";
 import { aerialJumps } from "./itemBuffs";
 import { max } from "../../runtime/numbers";
-import { AttackStyle, DASH_GRAB_REQUEST, DownState, GrabAction, LedgeState, PlatformMove, ProjectileKind, SpecialAction, SurfaceContact } from "./codes";
+import { AttackStyle, DASH_GRAB_REQUEST, DownState, GrabAction, LedgeState, ProjectileKind, SpecialAction, SurfaceContact } from "./codes";
 import { cancelsJumpSquat, isTumbling } from "./conditions";
 import { type Fighter, SHIELD_POWERSHIELD_INPUT_WINDOW_FRAMES, placedObject } from "./fighter";
 import { clearDash } from "./groundMovement";
@@ -184,31 +184,16 @@ export function clearOwnedFreezeTrap(f: Fighter): void {
 }
 
 
-export function clearPlatformMove(f: Fighter): void {
-  const p = f.platform;
-  p.move = PlatformMove.none;
-  p.frame = 0;
-  p.duration = 0;
-  p.deck = undefined;
-  p.fromX = 0.0;
-  p.toX = 0.0;
-  p.fromZ = 0.0;
-  p.toZ = 0.0;
-  p.rise = 0.0;
-  p.stand = false;
-  p.shield = false;
-  p.dodgeQueued = false;
-  p.dodgeX = 0;
-  p.dodgeZ = 0;
-  p.specialQueued = false;
-  p.specialX = 0;
-  p.specialZ = 0;
+export function clearPlatformInput(f: Fighter): void {
+  f.platform.downHeld = false;
+  f.platform.downAge = 3;
+  f.platform.dropConsumed = false;
 }
 
 
 export function interruptJumpOrDodge(f: Fighter): void {
   const { jump, dodge, shield } = f;
-  clearPlatformMove(f);
+  clearPlatformInput(f);
   f.motion.fastFalling = false;
   f.motion.crouching = false;
   clearDash(f);

@@ -11,7 +11,7 @@
 
 
 import { Action } from "../src/game/input/actions";
-import { AttackStyle, Character, ContactKind, DownState, LedgeState, PlatformMove, SurfaceContact } from "../src/game/sim/codes";
+import { AttackStyle, Character, ContactKind, DownState, LedgeState, SurfaceContact } from "../src/game/sim/codes";
 import { isIntangible } from "../src/game/sim/conditions";
 import { beginDamageContacts, collectDamageContact, finishDamageContacts } from "../src/game/sim/contacts";
 import { type Fighter, createFighter } from "../src/game/sim/fighter";
@@ -637,7 +637,7 @@ function upAirIntoDeck(character: Character): string {
     if (f.motion.z + bodyTop(character) * WORLD_UNITS_PER_MELEE_UNIT < deckZ) continue;
     frame(s, [Action.jump]);
     if (f.attack.style === AttackStyle.upAir) return "up air continues";
-    return f.platform.move === PlatformMove.ascent ? "cancelled into an ascent" : "other";
+    return "other";
   }
   return "never met the deck";
 }
@@ -654,8 +654,7 @@ function downThroughDeck(character: Character): string {
   f.motion.surface = 1;
   frame(s, []);
   frame(s, [Action.moveDown]);
-  if (f.platform.move !== PlatformMove.descent) return f.motion.grounded ? "stays" : "falls through at once";
-  return `descends over ${String(f.platform.duration)} frames`;
+  return f.motion.grounded ? "stays" : "falls through at once";
 }
 
 const PLATFORM_LINES = "platforms are floor lines that are solid only while descending; ceilings ignore them";
@@ -710,12 +709,10 @@ const PLATFORMS: readonly Scenario[] = [
   { area: "platform", name: "down pressed on a raised deck", cite: PLATFORM_PASS, run: (c) => ({ expected: "main deck", actual: downOnDeck(c) }) },
   {
     area: "platform", name: "up air rising into a raised deck", cite: `${PLATFORM_LINES}; a fighter's action is unchanged by passing a platform`,
-    departure: "Platform ascent: the climb starts as the body meets the platform; an aerial strikes on that frame and ends as the climb's first frame begins (owner decision 2026-10-09, #392)",
     run: (c) => ({ expected: "up air continues", actual: upAirIntoDeck(c) }),
   },
   {
     area: "platform", name: "fresh down on a raised deck: how the fighter leaves it", cite: `${PLATFORM_PASS}; the fighter enters a fall at once`,
-    departure: "Platform descent: a vulnerable descent over the jump squat (owner decision 2026-10-06, #103)",
     run: (c) => ({ expected: "falls through at once", actual: downThroughDeck(c) }),
   },
   { area: "platform", name: "falling onto a raised deck holding down: landing", cite: `${PLATFORM_LINES}; airborne collision has no stick test`, departure: PLATFORM_DROP, run: (c) => ({ expected: "raised deck", actual: landHoldingDown(c, 0) }) },

@@ -1,7 +1,7 @@
 import { assertEquals, assertGreaterThan, assertTrue, test } from "wisp/src/runtime/testing";
 import { clearAttackBuffer } from "../input/attackBuffer";
 import { PARTICIPANT_SLOTS } from "../input/participants";
-import { Character, PlatformMove } from "../sim/codes";
+import { Character } from "../sim/codes";
 import { createFighter } from "../sim/fighter";
 import { copyControls, createRoster, fighterAt, isActive, neutralControls } from "../sim/roster";
 import { surfaceLeft, surfaceRight, surfaceZ } from "../sim/stage";
@@ -48,7 +48,7 @@ function platformUse(tier: CpuTier, layout: Layout): PlatformUse {
   const row = createMatchFrameInput();
   const c = fighterAt(world, 1);
   const use: PlatformUse = { climbs: 0, stands: 0, drops: 0 };
-  let previous: number = c.platform.move;
+  let previousZ = c.motion.z;
   let previousGrounded = c.motion.grounded;
   for (let i = 1; i <= FRAMES; i++) {
     const frame = runtime.simulationFrame + 1;
@@ -60,19 +60,15 @@ function platformUse(tier: CpuTier, layout: Layout): PlatformUse {
     }
     assertTrue(captureFrame(row, frame, world.mask, produced, runtime));
     assertTrue(executeMatchFrame(row, match, world, controls, runtime, frame));
-    const move = c.platform.move;
-    if (move !== previous) {
-      if (move === PlatformMove.ascent) use.climbs++;
-      if (move === PlatformMove.descent && !previousGrounded) use.drops++;
-    }
-    if (previous === PlatformMove.ascent && move === PlatformMove.none && c.motion.grounded) use.stands++;
-    previous = move;
+    if (!previousGrounded && c.motion.grounded && c.motion.surface === DECK && previousZ < surfaceZ(STAGE, DECK, frame)) { use.climbs++; use.stands++; }
+    if (!previousGrounded && !c.motion.grounded && previousZ >= surfaceZ(STAGE, DECK, frame) && c.motion.z < surfaceZ(STAGE, DECK, frame) && produced.inputs[1].down) use.drops++;
+    previousZ = c.motion.z;
     previousGrounded = c.motion.grounded;
   }
   return use;
 }
 
-test("expert computers climb and drop through platforms; rookies climb and stand only [k1 scenario]", () => {
+test("expert computers mount and drop through platforms; rookies mount and stand only [k1 scenario]", () => {
   assertGreaterThan(platformUse("expert", "under").climbs, 0);
   assertGreaterThan(platformUse("expert", "aboveBelowTarget").drops, 0);
   for (const layout of ["under", "aboveBelowTarget"] as const) {

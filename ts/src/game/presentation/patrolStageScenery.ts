@@ -69,8 +69,6 @@ export const HELLFIRE_SCENERY: StageScenery = {
   fog: { start: 3300.0, end: 16000.0, red: 0.3125, green: 0.203125, blue: 0.171875 },
   floor: { model: STAGE_TOMB_SEA_MODEL, z: -1300.0, color: [88, 36, 28] },
   pieces: [
-    { model: "buildings\\demon\\DemonGate\\DemonGate.mdx", x: -1850.0, y: 4500.0, z: -50.0, scale: 1.5, yaw: 280.0 },
-    { model: MOUND, x: -1850.0, y: 4550.0, z: -1620.0, scale: 10.0, yaw: 185.0, matrixScale: [2.5, 1.0, 2.0], color: [150, 84, 104] },
     { model: SPIRES, x: -3800.0, y: 4500.0, z: -1321.0, scale: 5.0, yaw: 175.0, matrixScale: [1.75, 1.0, 0.75] },
     { model: SPIRES, x: -3250.0, y: 4350.0, z: -1816.0, scale: 4.5, yaw: 195.0, matrixScale: [2.0, 1.0, 1.0] },
     { model: SPIRES, x: -2550.0, y: 4650.0, z: -1443.0, scale: 5.5, yaw: 165.0, matrixScale: [1.5, 1.0, 0.75] },

@@ -3,7 +3,7 @@
 
 
 import { f32 } from "wisp/src/sim/f32";
-import { AttackStyle, Character, GrabAction, LedgeState, PlatformMove, SpecialAction } from "../sim/codes";
+import { AttackStyle, Character, GrabAction, LedgeState, SpecialAction } from "../sim/codes";
 import { type HeroClip, type HeroClipTable, type HeroFollowUpPose, type HeroPose, STOCK_FALLBACK_CLIP } from "../sim/heroes/hero";
 import { heroDefinition } from "../sim/heroes/registry";
 import { RIFLEMAN_GROUND, type GroundKit, jabSlice, strikeClip } from "../sim/heroes/groundNormals";
@@ -197,12 +197,6 @@ export function clipFor(character: number, pose: HeroPose): HeroClip {
 
 
 
-export function platformClip(character: number, move: PlatformMove): HeroClip {
-  switch (move) {
-    case PlatformMove.ascent: return clipFor(character, "ledgeClimb");
-    default: return clipFor(character, "ledgeHang");
-  }
-}
 
 export function ledgePose(state: LedgeState): HeroPose {
   switch (state) {

@@ -14,7 +14,6 @@ import {
   GroundAction,
   LedgeState,
   ParryBuffer,
-  PlatformMove,
   ProjectileKind,
   SPECIAL_ACTION_CAPACITY,
   ShieldBreak,
@@ -35,7 +34,6 @@ export const FAST_FALL_INPUT_WINDOW = 4;
 /** a platform drop needs down pressed fewer input frames ago than this. */
 export const PLATFORM_DROP_INPUT_WINDOW = 6;
 /** Frames after platform contact whose stick still chooses stand or drop (smashcraft:docs/gameplay-design.md, "Platforms"). */
-export const PLATFORM_INTENT_FRAMES = 3;
 export const WALL_TECH_JUMP_INPUT_WINDOW_FRAMES = 20;
 /** a wall jump needs the stick to have crossed the horizontal smash deadzone fewer input frames ago than this. */
 export const WALL_JUMP_FLICK_FRAMES = 3;
@@ -393,29 +391,10 @@ interface Grab {
 
 
 
-interface PlatformTransit {
-  move: PlatformMove;
-  frame: number;
-  duration: number;
-  deck: number | undefined;
-  fromX: number;
-  toX: number;
-  fromZ: number;
-  toZ: number;
-
-  rise: number;
-
-  stand: boolean;
-  shield: boolean;
-
-  landedFrames: number;
-
-  dodgeQueued: boolean;
-  dodgeX: number;
-  dodgeZ: number;
-  specialQueued: boolean;
-  specialX: number;
-  specialZ: number;
+interface PlatformInput {
+  downHeld: boolean;
+  downAge: number;
+  dropConsumed: boolean;
 }
 
 interface Ledge {
@@ -547,7 +526,7 @@ export interface Fighter {
   readonly surfaceRecovery: SurfaceRecovery;
   readonly grab: Grab;
   readonly ledge: Ledge;
-  readonly platform: PlatformTransit;
+  readonly platform: PlatformInput;
   readonly cannon: StageCannon;
   readonly water: Water;
   readonly status: Status;
@@ -765,10 +744,7 @@ export function createFighter(character: Character, startX: number, facing: numb
     },
     grab: { pummels: 0, grabbedFrames: 0, heldFrames: 0, queuedThrow: GrabAction.none, action: GrabAction.none, frame: 0, serial: 0, mashX: 0, mashZ: 0, owner: undefined, target: undefined },
     ledge: { state: LedgeState.none, side: 0, frame: 0, serial: 0, intangible: 0, regrab: 0, grabs: 0 },
-    platform: {
-      move: PlatformMove.none, frame: 0, duration: 0, deck: undefined, fromX: 0.0, toX: 0.0, fromZ: 0.0, toZ: 0.0, rise: 0.0,
-      stand: false, shield: false, landedFrames: PLATFORM_INTENT_FRAMES + 1, dodgeQueued: false, dodgeX: 0, dodgeZ: 0, specialQueued: false, specialX: 0, specialZ: 0,
-    },
+    platform: { downHeld: false, downAge: 3, dropConsumed: false },
     cannon: { held: undefined, firing: undefined, cooldown: 0, passing: false },
     water: { inWater: false, frames: 0, entries: 0, hydraFrame: 0, hydraX: 0.0, hydraStrikeFrame: -1 },
     status: { offscreenFrames: 0, damage: 0.0, stocks: STARTING_STOCKS, respawn: 0, out: false, invincible: 0, frozenFrames: 0, freezeImmunityFrames: 0, armorFrames: 0, armorMaxDamage: 0.0, armorChills: false, condition: 0, conditionFrames: 0, conditionGroup: 0, conditionImmunityFrames: 0, conditionImmunity: [0, 0, 0], divineFrames: 0, poisonFrames: 0, poisonEvery: 0, poisonDamage: 0.0, buff: 0, buffFrames: 0 },

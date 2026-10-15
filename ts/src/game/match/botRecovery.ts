@@ -8,7 +8,7 @@ import { at } from "wisp/src/runtime/lookup";
 import { f32 } from "wisp/src/sim/f32";
 import { toInt } from "../../runtime/numbers";
 import { TECH_REPEAT_MINIMUM_AGE_FRAMES } from "../physics/techInput";
-import { Character, DownState, LedgeState, PlatformMove, SpecialAction } from "../sim/codes";
+import { Character, DownState, LedgeState, SpecialAction } from "../sim/codes";
 import { isTumbling } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
 import { totalVelocityZ } from "../sim/motion";
@@ -224,12 +224,19 @@ function platformBelow(f: Readonly<Fighter>, stage: number, matchFrame: number):
   return undefined;
 }
 
-/** Below the higher tiers it stands on every platform it climbs; above, it climbs on toward a target above it and otherwise stands. */
-function choosePlatformClimb(f: Readonly<Fighter>, target: Readonly<Fighter> | undefined, stage: number, matchFrame: number, input: Controls, skill: CpuSkill): void {
-  const deck = f.platform.deck ?? 0;
-  if (skill.platformCancels && target !== undefined && target.motion.z > surfaceZ(stage, deck, matchFrame) && !target.motion.grounded) return;
-  input.down = true;
-  input.verticalDirection = -1;
+function choosePlatformMount(f: Readonly<Fighter>, target: Readonly<Fighter> | undefined, stage: number, matchFrame: number, input: Controls, skill: CpuSkill): boolean {
+  if (f.motion.grounded || f.motion.vz <= 0 || f.attack.style !== undefined
+    || f.motion.z < mainDeckZ(stage) || f.motion.x < mainDeckLeft(stage) || f.motion.x > mainDeckRight(stage)) return false;
+  for (let deck = 0; deck < surfaceCount(stage); deck++) {
+    if (!surfacePass(stage, deck) || f.motion.x < surfaceLeft(stage, deck, matchFrame) || f.motion.x > surfaceRight(stage, deck, matchFrame)) continue;
+    const z = surfaceZ(stage, deck, matchFrame);
+    if (f.motion.z >= z) continue;
+    if (skill.platformCancels && target !== undefined && target.motion.z > z && !target.motion.grounded) continue;
+    input.down = true;
+    input.verticalDirection = -1;
+    return true;
+  }
+  return false;
 }
 
 /** Falling onto a platform: a target below is reached by dropping through it (ending any aerial). */
@@ -254,10 +261,7 @@ export function chooseRecoveryInput(fighter: Readonly<Fighter>, stage: number, m
     chooseLedgeOption(fighter, stage, input, target, skill.mixesUp);
     return true;
   }
-  if (fighter.platform.move === PlatformMove.ascent) {
-    choosePlatformClimb(fighter, target, stage, matchFrame, input, skill);
-    return true;
-  }
+  if (choosePlatformMount(fighter, target, stage, matchFrame, input, skill)) return true;
   if (chooseGetUp(fighter, input, target, skill.mixesUp)) return true;
   techLanding(fighter, stage, matchFrame, input, skill);
   const left = mainDeckLeft(stage);

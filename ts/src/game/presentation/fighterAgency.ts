@@ -1,7 +1,7 @@
 import { ATTACK_BUFFER_FRAMES } from "../input/attackBuffer";
 import { advanceTechInput, techInputEligible, TECH_REPEAT_MINIMUM_AGE_FRAMES, TECH_WINDOW_FRAMES, type TechInput } from "../physics/techInput";
 import { copyFighterState } from "../replay/fighterState";
-import { Character, DownState, GrabAction, LedgeState, PlatformMove, ShieldBreak, SurfaceContact } from "../sim/codes";
+import { Character, DownState, GrabAction, LedgeState, ShieldBreak, SurfaceContact } from "../sim/codes";
 import { inStageCannon } from "../sim/stageHazards";
 import { surelyClear } from "./agencyClearance";
 import { canAttack, canShieldGrab } from "../sim/conditions";
@@ -35,7 +35,7 @@ function mayTechWithoutFreshPress(tech: Readonly<TechInput>): boolean {
 
 function clearFlight(f: Readonly<Fighter>): boolean {
   return f.down.state === DownState.tumble && !f.motion.grounded && f.launch.hitlag === 0 && f.status.frozenFrames === 0 && !f.status.out
-    && f.ledge.state === LedgeState.none && f.surfaceRecovery.state === SurfaceContact.none && f.platform.move === PlatformMove.none && !inStageCannon(f);
+    && f.ledge.state === LedgeState.none && f.surfaceRecovery.state === SurfaceContact.none && !inStageCannon(f);
 }
 
 export class FighterAgencyForecast {

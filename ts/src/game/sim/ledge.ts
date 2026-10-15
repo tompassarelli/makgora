@@ -12,7 +12,7 @@ import { mainDeckLeft, mainDeckRight, mainDeckZ, mainDeckZAt } from "./stage";
 import { BODY_HALF_WIDTH } from "./surfaces";
 import { checkBlastZone } from "./stocks";
 import { aerialJumps, groundedJumps, jumpBuffed, speedBuffed } from "./itemBuffs";
-import { beginAttack, cancelAttack, clearDownState, clearLedge, clearPlatformMove, clearTech, leaveLedge, refreshAirOnExit, refreshOriginalAirtime } from "./transitions";
+import { beginAttack, cancelAttack, clearDownState, clearLedge, clearPlatformInput, clearTech, leaveLedge, refreshAirOnExit, refreshOriginalAirtime } from "./transitions";
 import { melee } from "./tuning";
 import { heroBody } from "./heroes/heroBodies";
 
@@ -209,7 +209,7 @@ function catchLedge(f: Fighter, stage: number, side: number): void {
   f.dodge.airUsed = false;
   refreshOriginalAirtime(f);
   f.jump.remaining = aerialJumps(f);
-  clearPlatformMove(f);
+  clearPlatformInput(f);
   clearTech(f);
 }
 

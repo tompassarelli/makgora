@@ -1768,11 +1768,14 @@ adopted in smashcraft:docs/gameplay-design.md, "Execution and reaction windows".
 A current queued attack takes priority over voluntary platform dropping during
 the movement step. Action recovery also blocks the drop, so holding Down cannot
 drop through during down-smash startup/charge or down-tilt recovery. With no
-current attack or action lock, a fresh Down starts a platform descent:
-like Melee's Pass check (Melee, stick
-down past  = 0.66 entered under  = 6 frames ago), the
-press must be under six input frames old. The fast-fall input age is that one
-stick timer, so landing on a deck with Down still held stays on it.
+current attack or action lock, a fresh hard Down drops immediately, with no
+descent animation or frames. Analog input must cross the down zone within the
+three-sample flick window; a keyboard Down needs a fresh press edge. Holding
+Down after an instant mount stays crouched, so release and press again to drop.
+The drop consumes that press: continuous Down never fast-falls. Leave the down
+zone toward neutral, or release the key, then press again to fast-fall within
+the existing window. The synchronized down intent and consumption fields
+survive snapshot copy and replay.
 The command queue's actual frame window determines whether an attack is current;
 expired and future commands do not suppress movement. This is our digital-input
 priority rule. The adopted mechanic defaults add no dedicated analog-threshold
@@ -1820,14 +1823,15 @@ the ECB bottom descends, `mpCheckCeiling` scans ceiling-kind lines only, and
 `mpColl_80044628_Floor` skips the platform being
 dropped through. The main deck's walls and underside are below.
 
-Smashcraft departs from Melee's instant pass-through (#103, #392): a body
-whose ECB top rises into a platform climbs it, ending any aerial; a fresh Down
-on one, or full Down when falling onto it, drops through it; and the stick's
-depth toward the platform at contact chooses whether a climb stands on it,
-each move lasting the fighter's jump squat (smashcraft:docs/gameplay-design.md,
-"Platforms"; smashcraft:ts/src/game/sim/platformMoves.ts). The walking modifier
-keeps a digital Down on a platform for crouching and down tilts. Falling onto a platform with no intent lands, and the platforms' lack of
-walls and underside is unchanged.
+Tom’s final 14 Oct 2026 rule replaces #103/#392’s climb and descent states.
+Rising through a platform while holding Down past the deadzone, without an
+aerial, instantly stands on it and emits the ordinary landing puff; the next
+frame is actionable. Neutral rising and active aerials pass through. A fresh
+hard Down while standing drops immediately; held Down after mounting remains
+a crouch and permits down tilt or down-B. Falling with full Down passes through
+and cancels the aerial without landing lag. Drops consume Down until a neutral
+reset and fresh press, so the drop itself never starts fast fall. Ordinary
+falling contact still lands; platforms still have no walls or underside.
 
 ## Slippery floors
 

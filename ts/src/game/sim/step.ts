@@ -5,7 +5,7 @@
 import { max, min } from "../../runtime/numbers";
 import { divideFloat32, roundToFloat32, subtractFloat32 } from "wisp/src/sim/binary32";
 import { f32 } from "wisp/src/sim/f32";
-import { AttackPhase, Character, DownState, GroundAction, LedgeState, ParryBuffer, PlatformMove, ShieldBreak, SpecialAction, SurfaceContact } from "./codes";
+import { AttackPhase, Character, DownState, GroundAction, LedgeState, ParryBuffer, ShieldBreak, SpecialAction, SurfaceContact } from "./codes";
 import {
   SPOT_DODGE_FRAMES,
   GROUND_ROLL_FRAMES,
@@ -424,7 +424,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   const stickSide = horizontalStick >= STICK_SMASH_DEADZONE_X ? 1 : horizontalStick <= -STICK_SMASH_DEADZONE_X ? -1 : 0;
   const tumbleExitFlick = stickSide !== 0 && stickSide !== motion.previousStickSide && Math.abs(horizontalStick) >= TUMBLE_EXIT_STICK_X;
   motion.stickSideAge = stickSide === 0 ? WALL_JUMP_FLICK_FRAMES : stickSide === motion.previousStickSide ? min(WALL_JUMP_FLICK_FRAMES, motion.stickSideAge + 1) : 0;
-  platforms.trackPlatformInput(f);
+  platforms.trackPlatformInput(f, input);
   motion.previousStickSide = stickSide;
   if (input.direction !== 0) {
     motion.turnaroundSide = input.direction < 0 ? -1 : 1;
@@ -534,16 +534,6 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   advanceGroundDodge(f, groundDodgeStarted);
   checkBlastZone(world, slot, stage);
   if (status.out) return;
-  if (f.platform.move !== PlatformMove.none) {
-    const transitOldX = motion.x;
-    const transitOldZ = motion.z;
-    status.invincible = max(0, status.invincible - 1);
-    platforms.advancePlatformMove(f, stage, matchFrame, input);
-    motion.deltaX = f32(motion.x - transitOldX);
-    motion.deltaZ = f32(motion.z - transitOldZ);
-    checkBlastZone(world, slot, stage);
-    return;
-  }
   const downOldX = motion.x;
   const downOldZ = motion.z;
   if (advanceDownState(f, stage, matchFrame, input)) {
@@ -577,7 +567,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   const canSteer = !authoredMotion && down.state === DownState.none && launch.hitstun <= 0 && (!dodge.airDodging || !dodgeActive) && !isGroundDodging(f)
     && shield.releaseLag <= 0 && f.landing.lag <= 0 && shield.stun <= 0 && jump.squat <= 0 && !smashChargePaused
     && (!motion.grounded || attack.cooldown <= 0) && f.surfaceRecovery.state !== SurfaceContact.techWall;
-  motion.crouching = input.down && wantsCrouch(f, input, horizontalStick) && motion.grounded && canSteer && !wantsShield
+  motion.crouching = (input.down && wantsCrouch(f, input, horizontalStick) || (motion.crouching && f.platform.dropConsumed && f.platform.downHeld && input.direction === 0)) && motion.grounded && canSteer && !wantsShield
     && attack.style === undefined && f.special.action === SpecialAction.none
     && groundOptionOpen(f, GroundOption.crouch);
   if (motion.crouching) direction = 0;
@@ -613,16 +603,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   }
 
 
-  if (platforms.dropAfterPlatformLanding(f, stage, matchFrame, input)) {
-    checkBlastZone(world, slot, stage);
-    return;
-  }
-  if (input.down && !input.walking && motion.fastFallInputAge < PLATFORM_DROP_INPUT_WINDOW && !input.attackRequested && down.state === DownState.none
-    && motion.grounded && motion.surface !== undefined && stageSurfaces.surfacePass(stage, motion.surface) && canAttack(f)) {
-    platforms.beginPlatformDescent(f, stage, matchFrame, motion.surface);
-    checkBlastZone(world, slot, stage);
-    return;
-  }
+  platforms.dropFromPlatform(f, stage, matchFrame, input);
   const oldX = motion.x;
   const oldZ = motion.z;
   dashEntryDisplacementAdjustment = f32(dashEntryDisplacementAdjustment + attackStartupTravel(world, slot));
@@ -642,7 +623,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
     buoyant = true;
     sea.applyBuoyancy(f);
   } else if ((!dodgeActive || motion.grounded) && !groundTakeoff && !authoredMotion) {
-    if (!motion.grounded && !motion.fastFalling && downHeld && motion.fastFallInputAge < FAST_FALL_INPUT_WINDOW && input.direction === 0
+    if (!motion.grounded && !motion.fastFalling && !f.platform.dropConsumed && downHeld && motion.fastFallInputAge < FAST_FALL_INPUT_WINDOW && input.direction === 0
       && down.state === DownState.none && launch.hitstun <= 0 && motion.vz < 0) {
       motion.fastFalling = true;
       motion.fastFallInputAge = PLATFORM_DROP_INPUT_WINDOW;
@@ -663,14 +644,11 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   let wallSide = edge === EdgePass.none ? resolveSolidSurfaceContacts(f, stage, oldX, oldZ, input) : 0;
   rideWall(f, wallSide, frameDeltaX, frameDeltaZ, oldX, oldZ);
 
-  const ascending = edge === EdgePass.none && !teleportsThisFrame(f) && platforms.beginPlatformAscent(f, stage, matchFrame, input);
+  const ascending = edge === EdgePass.none && !teleportsThisFrame(f) && platforms.mountPlatform(f, stage, matchFrame, input);
   const landing = edge === EdgePass.land ? 0 : edge !== EdgePass.none || ascending ? undefined : landingDeck(f, stage, matchFrame, oldX, oldZ, carried);
   const contact = landing !== undefined && !motion.grounded && platforms.beginPlatformContact(f, stage, matchFrame, input, landing);
   if (landing !== undefined && !contact) {
-    const touchdown = !motion.grounded;
-    const airDodged = dodge.airDodging;
     finishLanding(f, stage, matchFrame, input, landing, false);
-    if (touchdown) platforms.markPlatformLanding(f, stage, landing, airDodged);
   } else if (!ascending && !contact) {
 
 

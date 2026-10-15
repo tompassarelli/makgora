@@ -41,7 +41,6 @@ export interface CpuSkill {
   readonly kitTenths: number;
   /** Punish windows (botPunish.ts), in tenths, it recognizes and answers: an opponent's end lag, missed grab, landing or dropped shield. */
   readonly punishTenths: number;
-  /** Whether it climbs and drops through platforms to cancel aerials (smashcraft:docs/gameplay-design.md, "Platforms"); below, it stands on every platform it climbs. */
   readonly platformCancels: boolean;
   /** Whether it edge-cancels toward a cornered opponent, presses the corner and escapes one by a readable option (botCorner.ts); below, it plays the corner as neutral. */
   readonly cornerPlay: boolean;
