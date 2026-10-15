@@ -300,6 +300,12 @@ export function chooseRecoveryInput(fighter: Readonly<Fighter>, stage: number, m
 
   if (ledge && outside <= LEDGE_LINE_REACH && z >= f32(floor - LEDGE_MISSED)) return true;
 
+  if (wet(fighter, stage) && fighter.water.hydraFrame > 0) {
+    if (outside < LEDGE_LINE_NEAR) input.direction = side;
+    input.jumpPressed = fighter.attack.cooldown === 0;
+    input.jumpHeld = true;
+    return true;
+  }
   if (wet(fighter, stage)) {
     if (outside < LEDGE_LINE_NEAR) input.direction = tideNextDirection(matchFrame);
     if (z >= SEA_SURFACE_Z && outside >= LEDGE_LINE_NEAR && fighter.attack.cooldown === 0) {

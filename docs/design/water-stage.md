@@ -151,8 +151,8 @@ or catalog tile is needed.
   stops it, past the bottom blast line, so spikes into the sea still kill;
   a fall or a weak hit floats.
 - **Swimming.** At the surface, left and right swim at up to 3.6 a frame
-  (Brawl's 0.6 mu, acceleration 0.3). There is no swim or drowning timer:
-  the current and the hydra end every stay.
+  (Brawl's 0.6 mu, acceleration 0.3). There is no swim timer; the hydra is
+  the drowning timer, and with the current it ends every stay.
 
 ### The current: the tide turns every ten seconds
 
@@ -205,19 +205,20 @@ The stage's creature is a hydra of the Broken Isles, the amphibious creep
   dark ring and the hydra's crest break the surface at the fighter's x on the
   tell's first frame, with its stock attack sound. The mark then drifts with
   the tide at the current's speed; it never steers toward a fighter.
-- **Strike, on frame 46.** The hydra lunges up through a circle of radius 90
-  (15 mu) round the mark, from the surface to 150 above it. Every fighter in
-  it takes 15% (Summit's fish) and a launch straight down of base knockback
-  120 with no growth, through ordinary body-hit resolution as Blackrock's
-  lava uses: from the surface that carries a fighter through the bottom blast
-  line at any percent, the bite Tom remembers. Shields don't help in the
-  water; invincibility and dodge intangibility do.
-  The stock hydra rises above its crest at the drifting mark on impact and
+- **Catch, on frame 46.** If that fighter is still in the water, anywhere in
+  it, the hydra seizes it and drags it under: 15% (Summit's fish) and the
+  stock, lost on that frame through the bottom blast line's ordinary
+  stock-loss path. Tom's rule: staying in the water too long is a KO. The
+  catch is a grab, not a hit: shields, dodge intangibility, invincibility and
+  hitlag don't stop it, and it takes only the fighter whose count started the
+  tell, so a bystander in the water keeps its own clock.
+  The stock hydra rises above its crest at the drifting mark on that frame and
   sinks over the following 18 frames; its last strike frame is replayed with
   the fighter, so correcting a prediction restores the same lunge.
-- **Dodge.** Jump out during the tell, or swim against the tide: the mark
-  drifts with the current and a fighter swimming against it opens 3.6 a frame,
-  162 over the tell, enough to leave the circle.
+- **Escape.** Be out of the water on frame 46: jump out during the tell and
+  stay out, onto a deck or with the double jump and recovery. Swimming away
+  doesn't help. The computer leaves the water whenever a tell is running
+  (smashcraft:ts/src/game/match/botRecovery.ts).
 - **Once per visit.** After a strike the hydra submerges; that fighter's
   count restarts from zero.
 - **Hazards Off** removes the hydra. The current stays, as Ultimate keeps
@@ -228,7 +229,7 @@ The stage's creature is a hydra of the Broken Isles, the amphibious creep
 | #274 rule | The tide | The hydra |
 | --- | --- | --- |
 | Fixed function | of the match frame and the fighter's position | of the fighter's own water count and position on the tell's first frame, then of the match frame |
-| Telegraphed | foam always shows the flow; a one-second slack and notice before every turn | a 45-frame ring, crest and sound before any hit |
+| Telegraphed | foam always shows the flow; a one-second slack and notice before every turn | a 45-frame ring, crest and sound before the catch |
 | Learnable | every ten seconds, right first | 2.5 s in the water, then 0.75 s |
 | No random draw | none | none |
 

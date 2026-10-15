@@ -8,9 +8,6 @@ import { PARTICIPANT_SLOTS } from "../input/participants";
 import type { Fighter } from "./fighter";
 import { type Roster, fighterAt, isActive } from "./roster";
 import { SEA_SURFACE_Z, TIDE_SPEED, hasTide, inSea, tideDirection, tidePush } from "./stageHazards";
-import { collectTerrainContact } from "./contacts";
-import type { HitEffect } from "./hitRegions";
-import { isIntangible } from "./conditions";
 import { moveMeleeX, setWorldMotionValue } from "./motion";
 import { melee } from "./tuning";
 import { SurfaceContact } from "./codes";
@@ -18,6 +15,8 @@ import { aerialJumps, jumpBuffed } from "./itemBuffs";
 import { JUMP_BIT, lockedOut } from "./jumpsAndDodges";
 import { observeActionDecision, observeActionStart } from "./observations";
 import { clearDownState } from "./transitions";
+import { stageBounds } from "./stageBounds";
+import { checkBlastZone } from "./stocks";
 
 
 export const HYDRA_TRIGGER_FRAMES = 150;
@@ -25,10 +24,9 @@ export const HYDRA_TRIGGER_FRAMES = 150;
 export const HYDRA_TELL_FRAMES = 45;
 export const HYDRA_STRIKE_FRAME = HYDRA_TELL_FRAMES + 1;
 
-const HYDRA_RADIUS = melee(15.0);
 export const HYDRA_REACH = 150.0;
 
-export const HYDRA_HIT: Readonly<HitEffect> = { damage: 15.0, growth: 0.0, base: 120.0, launchX: 0.0, launchZ: -1.0, electric: false };
+export const HYDRA_CATCH_DAMAGE = 15.0;
 
 
 const WATER_BUOYANCY = melee(0.10000000149011612);
@@ -133,29 +131,23 @@ export function advanceWater(world: Roster, stage: number, matchFrame: number, h
 }
 
 
-function inHydraStrike(markX: number, x: number, z: number): boolean {
-  const dx = f32(x - markX);
-  const dz = z < SEA_SURFACE_Z ? f32(z - SEA_SURFACE_Z) : z > SEA_SURFACE_Z + HYDRA_REACH ? f32(z - f32(SEA_SURFACE_Z + HYDRA_REACH)) : 0.0;
-  return f32(f32(dx * dx) + f32(dz * dz)) <= f32(HYDRA_RADIUS * HYDRA_RADIUS);
+function hydraCatch(world: Roster, slot: number, stage: number): void {
+  const f = fighterAt(world, slot);
+  f.status.damage = f32(f.status.damage + HYDRA_CATCH_DAMAGE);
+  f.motion.z = f32(stageBounds(stage).blast.bottom - 1.0);
+  setWorldMotionValue(f.motion.meleeZ, f.motion.z);
+  checkBlastZone(world, slot, stage);
 }
-
-
-
-
 
 
 export function collectHydraContacts(world: Roster, stage: number, matchFrame: number): void {
   if (!hasTide(stage)) return;
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;
-    const { water } = fighterAt(world, slot);
+    const f = fighterAt(world, slot);
+    const { water } = f;
     if (water.hydraFrame < HYDRA_STRIKE_FRAME) continue;
-    for (const target of PARTICIPANT_SLOTS) {
-      if (!isActive(world, target)) continue;
-      const victim = fighterAt(world, target);
-      if (victim.status.out || isIntangible(victim) || victim.launch.hitlag > 0) continue;
-      if (inHydraStrike(water.hydraX, victim.motion.x, victim.motion.z)) collectTerrainContact(world, target, HYDRA_HIT);
-    }
+    if (!f.status.out && inSea(stage, f.motion.x, f.motion.z)) hydraCatch(world, slot, stage);
     water.hydraStrikeFrame = matchFrame;
     water.hydraFrame = 0;
     water.frames = 0;

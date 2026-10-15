@@ -92,7 +92,7 @@ the hydra) implement it, pinned by smashcraft:ts/src/game/sim/water.tests.ts.
 - **Floating.** Out of hitstun, a fighter in the water gains 0.6 a frame
   upward in place of gravity (at most 18) and floats at the surface; a
   helpless fighter recovers its actions there, as at a ledge. In hitstun it
-  falls as in the air, so spikes and the hydra still carry it through the
+  falls as in the air, so spikes still carry it through the
   bottom blast line.
 - **Swimming.** Left and right swim at up to 3.6 a frame, gaining 0.3;
   against the tide that still loses 1.2 a frame.
@@ -108,12 +108,14 @@ the hydra) implement it, pinned by smashcraft:ts/src/game/sim/water.tests.ts.
 - **The hydra.** On a fighter's 150th frame in the water its 45-frame tell
   starts at the fighter's x; the mark then drifts with the tide at the
   current's speed and never steers. On the tell's frame 46 (the 195th in the
-  water if the fighter stayed) every fighter within 90 of the mark, from
-  the surface to 150 above it, takes 15% and a straight-down launch of base
-  knockback 120 with no growth, through the body-hit batch the lava uses:
-  shields don't help, invincibility and dodge intangibility do. Then the
-  hydra submerges and that fighter's count restarts. Jumping out or
-  swimming against the tide through the tell escapes it.
+  water if the fighter stayed) a fighter still anywhere in the water is
+  caught: it takes 15%, is moved below the bottom blast line and loses the
+  stock that frame through `checkBlastZone`, the normal stock-loss path, so
+  rollback needs no state beyond the water fields above. Shields, dodge
+  intangibility, invincibility and hitlag don't stop it; it catches only the
+  fighter whose tell it is. Then the hydra submerges and that fighter's count
+  restarts. Being out of the water on frame 46 is the only escape, and the
+  computer jumps out whenever its tell is running.
 - **Cost.** Off the Tomb the water pass and the hydra are two early returns
   per frame and the motion step one stage check per fighter. On the Tomb,
   Bun measured 0.8 µs a frame for two fighters in the sea (water pass and
