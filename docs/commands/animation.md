@@ -68,6 +68,13 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   run it twice for a fresh clip table, since its reach search reads the table.
   Add `--kobold` with the stock Kobold input to author Kobold's pick, candle,
   recovery, throw and nine pain gestures and refresh only his clip/stride rows.
+  `bun tools/animations/kobold-clips.ts AUTHORED_KOBOLD.mdx PRIVATE_OUTPUT` then
+  re-authors Kobold's ground normals, smash charge and crouch in place on that
+  model (hero-models/kobold.mdx) with per-move strike beats: prep, contact with
+  the pick head on the hit region's far end, follow-through past it, and a
+  settle into the idle pose; it adds a root step, lean and rise, grounds the
+  body every frame and keeps the candle upright. Every other sequence stays
+  byte-identical, and Murloc's generator output does not change.
   `bun tools/animations/anubarak-clips.ts STOCK_CRYPT_LORD.mdx PRIVATE_OUTPUT` authors
   Anub'arak's insect gestures, floor burrow, paired throws and nine pain poses,
   preserving all seventeen stock clips and writing both-facing pose sheets.
