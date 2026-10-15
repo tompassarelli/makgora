@@ -157,7 +157,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/wisp/lua32
-          key: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/toward-zero.h') }}
+          key: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/*.h') }}
       - uses: actions/download-artifact@v4
         with:
           name: farm-test-plan
@@ -235,7 +235,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/wisp/lua32
-          key: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/toward-zero.h') }}
+          key: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/*.h') }}
       - uses: actions/download-artifact@v4
         with:
           name: farm-test-plan
@@ -365,8 +365,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/wisp/lua32
-          key: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/toward-zero.h') }}-${{ matrix.group }}
-          restore-keys: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/toward-zero.h') }}
+          key: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/*.h') }}-${{ matrix.group }}
+          restore-keys: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/*.h') }}
       - if: steps.scope.outputs.run == 'true'
         name: Run the ${{ matrix.group }} checks
         working-directory: ts

@@ -80,7 +80,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/wisp/lua32
-          key: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/toward-zero.h') }}
+          key: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/*.h') }}
       - if: matrix.kind == 'bun'
         run: bun run test
         working-directory: ts
@@ -142,15 +142,19 @@ jobs:
         with:
           pattern: census-[0-9]*
           path: ts/census
+      # Pairs compare only within one instrument: the Lua32 build and the profiler that measured them.
+      - id: instrument
+        run: echo "key=${{ hashFiles('ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/*.h', 'ts/node_modules/wisp/src/headless/luaPerf.ts') }}" >> "$GITHUB_OUTPUT"
       - name: Fetch main's last green Background census pairs
         working-directory: ts
         timeout-minutes: 3
         env:
           GH_TOKEN: ${{ github.token }}
+          INSTRUMENT: ${{ steps.instrument.outputs.key }}
         run: |
           git -c gc.auto=0 fetch -q --depth 60 origin main
           for commit in $(git rev-list --first-parent -n 60 FETCH_HEAD); do
-            gh api --paginate "repos/$GITHUB_REPOSITORY/actions/artifacts?name=census-pairs-$commit&per_page=100" --jq '.artifacts[] | select((.expired | not) and .workflow_run.head_branch == "main") | [.id, .workflow_run.id] | @tsv' > prior-artifacts.tsv
+            gh api --paginate "repos/$GITHUB_REPOSITORY/actions/artifacts?name=census-pairs-$INSTRUMENT-$commit&per_page=100" --jq '.artifacts[] | select((.expired | not) and .workflow_run.head_branch == "main") | [.id, .workflow_run.id] | @tsv' > prior-artifacts.tsv
             while read -r artifact run; do
               [ "$run" != "$GITHUB_RUN_ID" ] || continue
               green=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run" --jq '.conclusion == "success" and .path == ".github/workflows/background-sweeps.yml"')
@@ -163,7 +167,7 @@ jobs:
               exit 0
             done < prior-artifacts.tsv
           done
-          echo "::warning::No green Background census artifact on main's last 60 first-parent commits: only coverage and absolute frame budgets apply"
+          echo "::warning::No green Background census artifact from this instrument on main's last 60 first-parent commits: only coverage and absolute frame budgets apply"
       - name: Every fighter pair's worst frame within the margin of main's last green census (#405)
         working-directory: ts
         run: |
@@ -177,7 +181,7 @@ jobs:
       - if: success() && needs.sweeps.result == 'success'
         uses: actions/upload-artifact@v4
         with:
-          name: census-pairs-${{ inputs.ref || github.sha }}
+          name: census-pairs-${{ steps.instrument.outputs.key }}-${{ inputs.ref || github.sha }}
           path: ts/census-pairs.txt
           overwrite: true
           retention-days: 30
