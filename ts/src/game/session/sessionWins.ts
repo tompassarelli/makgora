@@ -1,4 +1,5 @@
 import { PARTICIPANT_SLOTS, type Slots } from "../input/participants";
+import { type MatchState, winningMask } from "../lobby/lobbyState";
 
 export interface SessionWins {
   readonly counts: Slots<number>;
@@ -11,8 +12,9 @@ export function beginSessionMatch(wins: SessionWins): void {
   wins.completed = false;
 }
 
-export function recordSessionWins(wins: SessionWins, winningMask: number): void {
+export function recordSessionWins(wins: SessionWins, game: Readonly<MatchState>): void {
   if (wins.completed) return;
   wins.completed = true;
-  for (const slot of PARTICIPANT_SLOTS) if ((winningMask & (1 << slot)) !== 0) wins.counts[slot] += 1;
+  const winners = winningMask(game);
+  for (const slot of PARTICIPANT_SLOTS) if ((winners & (1 << slot)) !== 0) wins.counts[slot] += 1;
 }

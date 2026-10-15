@@ -1,4 +1,3 @@
-import { winningMask } from "../../game/lobby/lobbyState";
 import { recordSessionWins } from "../../game/session/sessionWins";
 
 
@@ -160,7 +159,7 @@ export function applyFrame(s: ShellState, recorded = false): void {
   }
   const cues = ui.match.presentConfirmed(s.game, world);
   if (s.game.phase !== Phase.result) return;
-  recordSessionWins(s.sessionWins, winningMask(s.game));
+  recordSessionWins(s.sessionWins, s.game);
   clearMatchEffects(s);
 
   keepMomentEnd(recorder, world, s.game, s.controls, runtime);
