@@ -1,8 +1,9 @@
-import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { Console, Effect, Schedule, Schema } from "effect";
 import { type Command, UsageFailure, flagValues, wholeFlag, describeCause } from "wisp/scripts/wisp/command";
 import { lan as frameworkLan } from "wisp/scripts/wisp/commands/lan";
+import { fresh } from "./fresh";
 import { agentSocket, readPool } from "wisp/scripts/wisp/lan/pool";
 import { dataDirectory } from "wisp/scripts/wisp/gameFiles";
 import { batch, loadClients } from "wisp/scripts/warcraft/desktop";
@@ -26,6 +27,20 @@ const Snapshot = Schema.Union([
   Schema.Struct({ ...counters, heapKb: number.check(Schema.isGreaterThanOrEqualTo(0)), heapKbAbsent: Schema.optionalKey(Schema.Never) }),
   Schema.Struct({ ...counters, heapKb: Schema.optionalKey(Schema.Never), heapKbAbsent: Schema.Literals(["no-collectgarbage"]) }),
 ]);
+const warcraftPid = (documents: string): number | undefined => {
+  const prefix = documents.split("/pfx/")[0];
+  let best: { pid: number; rss: number } | undefined;
+  for (const entry of readdirSync("/proc")) {
+    if (!/^\d+$/.test(entry)) continue;
+    try {
+      if (!/_retail_.*Warcraft III\.exe/.test(readFileSync(`/proc/${entry}/cmdline`, "latin1").replaceAll("\0", " "))) continue;
+      if (!readFileSync(`/proc/${entry}/environ`, "latin1").split("\0").some((variable) => variable === `STEAM_COMPAT_DATA_PATH=${prefix}` || variable === `STEAM_COMPAT_DATA_PATH=${prefix}/`)) continue;
+      const rss = Number(/^VmRSS:\s+(\d+)\s+kB$/m.exec(readFileSync(`/proc/${entry}/status`, "utf8"))?.[1] ?? 0);
+      if (best === undefined || rss > best.rss) best = { pid: Number(entry), rss };
+    } catch { continue; }
+  }
+  return best?.pid;
+};
 const heapLabel = (row: typeof Snapshot.Type): string => row.heapKb === undefined ? `n/a (${row.heapKbAbsent})` : (row.heapKb / 1024).toFixed(3);
 const Status = Schema.Struct({ clients: Schema.Array(Schema.Struct({ name: Schema.String, pid: Schema.optional(Schema.Int) })), game: Schema.optional(Schema.Unknown) });
 
@@ -47,24 +62,28 @@ export const lanSoak: Command = (args) => Effect.gen(function*() {
   const map = args[0];
   const diagnosticStart = args.includes("--diagnostic-start");
   const pair = wholeFlag(args, "pair");
+  const [signedIn] = flagValues(args, "clients");
   const minutes = wholeFlag(args, "minutes", { min: 1, max: 1440 });
   const [outText] = flagValues(args, "out");
   if (pair instanceof UsageFailure) return yield* pair;
   if (minutes instanceof UsageFailure) return yield* minutes;
-  if (map === undefined || !existsSync(map) || pair === undefined || minutes === undefined || outText === undefined) return yield* new UsageFailure({ problem: "lan soak MAP.w3x --pair K --minutes N --out DIR [--diagnostic-start] (an integrity map or named soak diagnostic)" });
+  if (map === undefined || !existsSync(map) || (pair === undefined) === (signedIn === undefined) || minutes === undefined || outText === undefined) return yield* new UsageFailure({ problem: "lan soak MAP.w3x (--pair K | --clients FILE) --minutes N --out DIR [--diagnostic-start] (an integrity map or named soak diagnostic)" });
   const out = resolve(outText);
-  const pool = yield* readPool;
-  const selected = pool?.pairs.find((entry) => entry.id === pair);
+  const label = signedIn === undefined ? `pair ${pair}` : "signed-in clients";
+  const pool = signedIn === undefined ? yield* readPool : undefined;
+  const selected = signedIn === undefined ? pool?.pairs.find((entry) => entry.id === pair) : { clients: resolve(signedIn) };
   if (selected === undefined) return yield* new NativeSoakFailure({ problem: `pair ${pair} is not running; start the assigned pair with lan pool` });
-  const status = yield* Effect.tryPromise({ try: () => fetch("http://pair/status", { unix: agentSocket(pair) }).then((response) => response.json()), catch: (cause) => new NativeSoakFailure({ problem: `pair ${pair} status: ${describeCause(cause)}` }) }).pipe(Effect.flatMap(Schema.decodeUnknownEffect(Status)), Effect.mapError((cause) => cause instanceof NativeSoakFailure ? cause : new NativeSoakFailure({ problem: cause.message })));
-  if (status.game !== undefined || status.clients.length !== 2 || status.clients.some((client) => client.pid === undefined)) return yield* new NativeSoakFailure({ problem: `pair ${pair} must have two live offline clients at their menus and no active game` });
+  const status = signedIn !== undefined ? { clients: [] as readonly { readonly name: string; readonly pid?: number | undefined }[], game: undefined } : yield* Effect.tryPromise({ try: () => fetch("http://pair/status", { unix: agentSocket(pair) }).then((response) => response.json()), catch: (cause) => new NativeSoakFailure({ problem: `pair ${pair} status: ${describeCause(cause)}` }) }).pipe(Effect.flatMap(Schema.decodeUnknownEffect(Status)), Effect.mapError((cause) => cause instanceof NativeSoakFailure ? cause : new NativeSoakFailure({ problem: cause.message })));
+  if (signedIn === undefined && (status.game !== undefined || status.clients.length !== 2 || status.clients.some((client) => client.pid === undefined))) return yield* new NativeSoakFailure({ problem: `pair ${pair} must have two live offline clients at their menus and no active game` });
   yield* attempt("prepare output", () => { mkdirSync(out, { recursive: true }); if (existsSync(join(out, "samples.tsv"))) throw new Error("samples.tsv already exists; choose a new run directory"); });
   const samples: Sample[] = [];
   const started = performance.now();
   const since = Date.now();
   const run = Effect.gen(function*() {
-    yield* frameworkLan(["fresh", resolve(map), "--pair", String(pair)]);
-    yield* Effect.addFinalizer(() => frameworkLan(["end", "--pair", String(pair)]).pipe(Effect.catch((cause) => Console.error(`pair ${pair} cleanup: ${cause.message}`))));
+    if (signedIn === undefined) {
+      yield* frameworkLan(["fresh", resolve(map), "--pair", String(pair)]);
+      yield* Effect.addFinalizer(() => frameworkLan(["end", "--pair", String(pair)]).pipe(Effect.catch((cause) => Console.error(`${label} cleanup: ${cause.message}`))));
+    } else yield* fresh([resolve(map), "--no-quick", "--clients-file", resolve(signedIn)]);
     const clients = yield* loadClients(selected.clients);
     const host = clients[0];
     if (host === undefined || clients.length !== 2) return yield* new NativeSoakFailure({ problem: "the selected pair does not resolve to two clients" });
@@ -95,7 +114,7 @@ export const lanSoak: Command = (args) => Effect.gen(function*() {
     const sample = Effect.gen(function*() {
       for (const [slot, client] of clients.entries()) {
         const row = yield* snapshot(client.documents);
-        const pid = status.clients.find((candidate) => candidate.name.endsWith(slot === 0 ? "a" : "b"))?.pid;
+        const pid = signedIn === undefined ? status.clients.find((candidate) => candidate.name.endsWith(slot === 0 ? "a" : "b"))?.pid : warcraftPid(client.documents);
         if (row === undefined || row.cpu !== 15 || pid === undefined) return yield* failure(`${client.name}: missing native snapshot or process`);
         const rssMiB = yield* attempt("read Warcraft RSS on pool host", () => {
           const rss = /^VmRSS:\s+(\d+)\s+kB$/m.exec(readFileSync(`/proc/${pid}/status`, "utf8"))?.[1];
@@ -105,7 +124,7 @@ export const lanSoak: Command = (args) => Effect.gen(function*() {
         samples.push({ elapsed: (performance.now() - samplingStarted) / 1000, client: client.name, rssMiB, snapshot: row });
       }
       yield* attempt("write samples", () => writeFileSync(join(out, "samples.tsv"), "elapsed_s\tclient\trss_MiB\tlua_MiB\tlive_map_handles\tgame_callbacks\tsim_frames\tmatches\tresults\tphase\tstage\tcharacters\n" + samples.map(({ elapsed, client, rssMiB, snapshot: row }) => [elapsed.toFixed(3), client, rssMiB.toFixed(3), heapLabel(row), row.handles, row.callbacks, row.frames, row.matches, row.results, row.phase, row.stage, row.characters].join("\t")).join("\n") + "\n"));
-      yield* Console.log(`pair ${pair}: minute ${Math.floor((performance.now() - samplingStarted) / 60000)}, ${samples.length} client samples`);
+      yield* Console.log(`${label}: minute ${Math.floor((performance.now() - samplingStarted) / 60000)}, ${samples.length} client samples`);
     });
     yield* sample;
     let intervals = 0;
