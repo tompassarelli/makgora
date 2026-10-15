@@ -3,8 +3,10 @@ import { expect, test } from "bun:test";
 import { installHeadless } from "wisp/scripts/wisp/headless";
 import { createStandaloneSession, NEUTRAL_INPUT } from "../scripts/wisp/standalone";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
-import { nativeDriverCommand } from "../src/platform/nativeDriver";
+import { nativeDriverCommand, startScriptedMove } from "../src/platform/nativeDriver";
 import { install, start } from "../src/host/entries/nativeDriverMain";
+import * as showcase from "../src/host/entries/showcaseMain";
+import { driverCommandFile, driverReadyFile, driverStatusFile } from "wisp/src/runtime/nativeDriver";
 import { confirmedChecksum } from "../src/host/loop/diagnostics";
 import { shell } from "../src/host/loop/state";
 import { value } from "./rematch/playableMatch";
@@ -90,6 +92,66 @@ test("shield drain pads enable the overlay before quick hero and keep every capt
       clients.everywhere(() => nativeDriverCommand(script.replace(command, `${command} stocks 3`)));
       for (const client of clients.clients) expect(value(client, () => [shell().game.stockCount, shell().game.training, shell().game.trainer.showHitAreas]))
         .toEqual([3, true, true]);
+    }
+  } finally { runtime.restore(); }
+});
+
+test("a dev command sent after a script changes the meter and leaves the match running with no reset [k1 scenario]", () => {
+  const script = readFileSync(new URL("./native/pads/cpu-expert.pad", import.meta.url), "utf8");
+  const runtime = installHeadless(SMASHCRAFT_HEADLESS);
+  try {
+    const clients = runtime.clients({ install, start }, [0, 1], { keepCalls: 0 });
+    clients.start();
+    clients.frames(30);
+    clients.everywhere(() => nativeDriverCommand(script));
+    clients.everywhere(() => nativeDriverCommand("resume"));
+    clients.frames(40);
+    const before = value(clients.clients[0]!, () => shell().runtime.simulationFrame);
+    expect(before).toBeGreaterThan(0);
+    clients.everywhere(() => nativeDriverCommand("dev -dev meter 50"));
+    for (const client of clients.clients) {
+      expect(value(client, () => [shell().runtime.simulationFrame, shell().game.phase, fighterAt(shell().world, 0).mana.points])).toEqual([before, Phase.match, 50]);
+    }
+    clients.frames(10);
+    for (const client of clients.clients) {
+      expect(value(client, () => shell().runtime.simulationFrame)).toBeGreaterThan(before);
+      expect(client.errors).toEqual([]);
+    }
+  } finally { runtime.restore(); }
+});
+
+test("a one-player showcase client applies a sent driver command and advances its status to serial 1 [k1 scenario]", () => {
+  const runtime = installHeadless(SMASHCRAFT_HEADLESS);
+  try {
+    const clients = runtime.clients(showcase, [0], { keepCalls: 0 });
+    clients.start();
+    clients.frames(30);
+    const [client] = clients.clients;
+    if (client === undefined) throw new Error("missing client");
+    const status = () => client.files.get(driverStatusFile("smashcraft"))?.[0]?.split(" ")[1];
+    expect(status()).toBe("0");
+    client.published.set(driverCommandFile("smashcraft", 1), ["dev -dev meter 50"]);
+    client.published.set(driverReadyFile("smashcraft", 1), ["ready"]);
+    clients.frames(60);
+    expect(status()).toBe("1");
+    expect(client.errors).toEqual([]);
+  } finally { runtime.restore(); }
+});
+
+test("the exported scripted move starts an attack from a nonzero pad x and keeps that position [k1 scenario]", () => {
+  const runtime = installHeadless(SMASHCRAFT_HEADLESS);
+  try {
+    const clients = runtime.clients({ install, start }, [0, 1], { keepCalls: 0 });
+    clients.start();
+    clients.frames(30);
+    clients.everywhere(() => nativeDriverCommand("#! chat -dev quick hero forsaken paladin\n"));
+    for (const client of clients.clients) {
+      expect(value(client, () => {
+        const fighter = fighterAt(shell().world, 0);
+        fighter.motion.x = 321.0;
+        startScriptedMove(shell(), 0, "normal", "2", "right");
+        return [fighter.motion.x, fighter.attack.style];
+      })).toEqual([321.0, 2]);
     }
   } finally { runtime.restore(); }
 });

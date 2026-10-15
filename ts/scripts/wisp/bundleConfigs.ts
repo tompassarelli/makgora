@@ -38,6 +38,7 @@ export const bundleConfigs = {
   "native-input": { entry: "src/host/entries/nativeInputMain.ts", bundle: "native-input.lua" },
   "native-driver": { entry: "src/host/entries/nativeDriverMain.ts", bundle: "native-driver.lua" },
   "native-capture": { entry: "src/host/entries/nativeCaptureMain.ts", bundle: "native-capture.lua" },
+  showcase: { entry: "src/host/entries/showcaseMain.ts", bundle: "showcase.lua" },
   "analog-keys": { entry: "src/host/entries/analogKeysMain.ts", bundle: "analog-keys.lua" },
   "analog-cursor": { entry: "src/host/entries/analogCursorMain.ts", bundle: "analog-cursor.lua" },
   "native-perf": { entry: "src/host/entries/nativePerfMain.ts", bundle: "native-perf.lua" },

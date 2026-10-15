@@ -64,7 +64,8 @@ declare global {
 
 const neutralPad = (): Pad => ({ buttons: 0, x: 0.0, z: 0.0, cx: 0.0, cz: 0.0, shield: 0.0, viewSince: undefined, viewSaved: false, capture: keyboardCapture() });
 const state = (): Driver => globalThis.__smashcraftNativeDriver ??= { edges: [], next: 0, captures: [], paused: true, target: undefined, frozen: false, pads: PARTICIPANT_SLOTS.map(() => neutralPad()) };
-const BUTTONS: Readonly<Record<string, number>> = { A: 1, B: 2, X: 4, Y: 8, LB: 16, TL: 16, RB: 32, TR: 32, START: 64, VIEW: 128 };
+const PAD_LETTERS = "abcd";
+const BUTTONS: Readonly<Record<string, number>> ={ A: 1, B: 2, X: 4, Y: 8, LB: 16, TL: 16, RB: 32, TR: 32, START: 64, VIEW: 128 };
 
 function whole(text: string): number {
   const result = parseDecimal(text);
@@ -88,11 +89,11 @@ function parseScript(text: string): { readonly setup: string; readonly edges: re
     const source = line.split("#")[0]?.trim() ?? "";
     if (source === "") continue;
     const [frameText, player, action, ...args] = source.split("\t").join(" ").split(" ").filter(word => word !== "");
-    if (frameText === undefined || action === undefined || (player !== "a" && player !== "b")) throw new Error(`native driver: invalid pad line ${source}`);
+    const slot = player === undefined ? -1 : PAD_LETTERS.indexOf(player);
+    if (frameText === undefined || action === undefined || player?.length !== 1 || slot < 0) throw new Error(`native driver: invalid pad line ${source}`);
     const frame = frameText.startsWith("+") ? previous + whole(frameText.substring(1)) : whole(frameText);
     if (frame < previous) throw new Error("native driver: pad frames must be ordered");
     previous = frame;
-    const slot = player === "a" ? 0 : 1;
     if (action === "capture") { edges.push({ order: edges.length, frame, slot, action, args }); continue; }
 
     if (action === "chat" || action === "move") { edges.push({ order: edges.length, frame, slot, action, args }); continue; }
@@ -182,6 +183,26 @@ function freeze(s: ShellState, driver: Driver, frozen: boolean): void {
 }
 
 
+function resume(s: ShellState, driver: Driver, command: string): void {
+  if (s.session.paused) { s.session.paused = false; pauseMatchPresentation(s, false); }
+  freeze(s, driver, false);
+  const stepping = command.startsWith("step ");
+  const count = command === "resume" ? undefined : whole(command.substring(command.indexOf(" ") + 1));
+  driver.target = count === undefined ? undefined : stepping ? s.runtime.simulationFrame + count : count;
+  if (driver.target !== undefined && driver.target < s.runtime.simulationFrame) throw new Error("native driver: target frame is behind this match");
+  driver.paused = driver.target === s.runtime.simulationFrame;
+  publish(s);
+}
+
+function runDevVerb(s: ShellState, command: string): boolean {
+  if (!command.startsWith("dev ")) return false;
+  if (s.build.inputProfile === "native-driver") {
+    applyDeveloperCommand(s, 0, command.substring(4).trim());
+    publish(s);
+  }
+  return true;
+}
+
 export function nativeDriverCommand(text: string): void {
   const s = shell();
   const driver = state();
@@ -194,17 +215,8 @@ export function nativeDriverCommand(text: string): void {
   }
   if (command === "capture") { driver.paused = true; driver.target = undefined; saveFrame(s); finishInputTrace(s.trace); publish(s); return; }
   if (command === "pause") { driver.paused = true; driver.target = undefined; publish(s); return; }
-  if (command === "resume" || command.startsWith("resume ") || command.startsWith("step ")) {
-    if (s.session.paused) { s.session.paused = false; pauseMatchPresentation(s, false); }
-    freeze(s, driver, false);
-    const stepping = command.startsWith("step ");
-    const count = command === "resume" ? undefined : whole(command.substring(command.indexOf(" ") + 1));
-    driver.target = count === undefined ? undefined : stepping ? s.runtime.simulationFrame + count : count;
-    if (driver.target !== undefined && driver.target < s.runtime.simulationFrame) throw new Error("native driver: target frame is behind this match");
-    driver.paused = driver.target === s.runtime.simulationFrame;
-    publish(s);
-    return;
-  }
+  if (command === "resume" || command.startsWith("resume ") || command.startsWith("step ")) { resume(s, driver, command); return; }
+  if (runDevVerb(s, command)) return;
   const script = parseScript(text);
   applyDeveloperCommand(s, 0, "-dev reset");
 
@@ -217,6 +229,31 @@ export function nativeDriverCommand(text: string): void {
   publish(s);
 }
 
+
+export function startScriptedMove(s: ShellState, slot: number, kind: string | undefined, code: string, facing: string | undefined): void {
+  if (s.build.inputProfile !== "native-driver") return;
+  const fighter = fighterAt(s.world, slot);
+  const frame = s.runtime.simulationFrame + 1;
+  fighter.facing = facing === "left" ? -1 : 1;
+  if (kind === "normal") {
+    const style = Object.values(AttackStyle).find(value => value === whole(code));
+    if (style === undefined) throw new Error("native driver: invalid move style");
+    if (isAerialAttack(style)) { fighter.motion.grounded = false; fighter.motion.z = 250.0; }
+    if (style === AttackStyle.getupAttack || style === AttackStyle.ledgeAttack) beginAttack(fighter, style, false);
+    else beginFighterAttack(s.world, slot, style, false);
+    if (fighter.attack.style !== style) throw new Error("native driver: normal did not start");
+    selectScriptedAttackClip(at(s.runtime.poses, slot), fighter);
+  } else if (kind === "special" || kind === "ultimate") {
+    const input = neutralControls();
+    input.specialPressed = true;
+    input.ultimatePressed = kind === "ultimate";
+    const direction = whole(code);
+    input.specialX = direction === 1 ? fighter.facing : 0;
+    input.specialZ = direction === 2 ? 1 : direction === 3 ? -1 : 0;
+    fighter.mana.points = ROSTER_MANA.max;
+    if (!startFighterSpecial(fighter, s.game.stageChoice, frame, input, s.world)) throw new Error("native driver: move did not start");
+  } else throw new Error("native driver: move needs normal, special or ultimate");
+}
 
 export function beforeNativeDriverTick(s: ShellState): boolean {
   if (s.build.inputProfile !== "native-driver") return true;
@@ -237,29 +274,10 @@ export function captureNativeDriverInputs(s: ShellState): void {
     if (edge.action === "capture") driver.captures.push(edge.slot);
     else if (edge.action === "chat") applyDeveloperCommand(s, edge.slot, edge.args.join(" "));
     else if (edge.action === "move") {
-      const fighter = fighterAt(s.world, edge.slot);
       const [kind, code = "", facing] = edge.args;
-      fighter.facing = facing === "left" ? -1 : 1;
-      fighter.motion.x = 0.0;
-      fighterAt(s.world, edge.slot === 0 ? 1 : 0).motion.x = fighter.facing * 500.0;
-      if (kind === "normal") {
-        const style = Object.values(AttackStyle).find(value => value === whole(code));
-        if (style === undefined) throw new Error("native driver: invalid move style");
-        if (isAerialAttack(style)) { fighter.motion.grounded = false; fighter.motion.z = 250.0; }
-        if (style === AttackStyle.getupAttack || style === AttackStyle.ledgeAttack) beginAttack(fighter, style, false);
-        else beginFighterAttack(s.world, edge.slot, style, false);
-        if (fighter.attack.style !== style) throw new Error("native driver: normal did not start");
-        selectScriptedAttackClip(at(s.runtime.poses, edge.slot), fighter);
-      } else if (kind === "special" || kind === "ultimate") {
-        const input = neutralControls();
-        input.specialPressed = true;
-        input.ultimatePressed = kind === "ultimate";
-        const slot = whole(code);
-        input.specialX = slot === 1 ? fighter.facing : 0;
-        input.specialZ = slot === 2 ? 1 : slot === 3 ? -1 : 0;
-        fighter.mana.points = ROSTER_MANA.max;
-        if (!startFighterSpecial(fighter, s.game.stageChoice, frame, input, s.world)) throw new Error("native driver: move did not start");
-      } else throw new Error("native driver: move needs normal, special or ultimate");
+      fighterAt(s.world, edge.slot).motion.x = 0.0;
+      fighterAt(s.world, edge.slot === 0 ? 1 : 0).motion.x = (facing === "left" ? -1 : 1) * 500.0;
+      startScriptedMove(s, edge.slot, kind, code, facing);
     }
     else if (pad !== undefined) applyEdge(s, pad, edge);
     driver.next++;
@@ -294,4 +312,4 @@ export function afterNativeDriverTick(s: ShellState): void {
   } else paintDrawnStamp(globalThis.__smashcraftDriverScripts ?? 0, s.runtime.simulationFrame);
 }
 export function installSmashcraftNativeDriver(): void { installNativeDriver(nativeDriverCommand); }
-export function startSmashcraftNativeDriver(): void { state(); startNativeDriver([0, 1]); }
+export function startSmashcraftNativeDriver(players: readonly number[] = [0, 1]): void { state(); startNativeDriver(players); }
