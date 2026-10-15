@@ -81,7 +81,6 @@ function doubleJump(): Authored {
   ] };
 }
 
-
 function forwardSmash(): Authored {
   const move = SHADOW_HUNTER_MOVES.normals[AttackStyle.forwardSmash]!;
   const contact = move.startupFrames, total = move.totalFrames;
@@ -178,6 +177,18 @@ function downAir(): Authored {
 }
 
 function timing(style: AttackStyle) { const move = SHADOW_HUNTER_MOVES.normals[style]!; return { contact: move.startupFrames, total: move.totalFrames }; }
+function jab(): Authored {
+  const { contact, total } = timing(AttackStyle.jab);
+  const hold: Gesture = STILL;
+  return { pose: "jab", style: AttackStyle.jab, support: "R", phases: [
+    { frame: 0, gesture: READY },
+    { frame: contact - 2, gesture: { ...hold, lean: -6, chest: -12, head: 6, step: -2 }, reach: ["handL", 16, 74] },
+    { frame: contact, gesture: { ...hold, lean: 0, chest: 6, head: -14, step: 11 }, reach: ["handL", 82, 76] },
+    { frame: contact + 2, gesture: { ...hold, lean: 2, chest: 10, head: -16, step: 16 }, reach: ["handL", 98, 76] },
+    { frame: contact + 7, gesture: { ...hold, lean: 0, chest: 6, head: -10, step: 13 }, reach: ["handL", 74, 74] },
+    { frame: total, gesture: READY },
+  ] };
+}
 const GUARD: Gesture = { arm: -150, elbow: 30, free: 120, freeElbow: -40 };
 const guard = (k: number): Gesture => Object.fromEntries(Object.entries(GUARD).map(([key, v]) => [key, v * k]));
 function kick(pose: HeroPose, style: AttackStyle, target: readonly [number, number], lean: number, through: readonly [number, number], raise = 0, drop = 0): Authored {
@@ -193,6 +204,34 @@ function kick(pose: HeroPose, style: AttackStyle, target: readonly [number, numb
     { frame: total, gesture: READY },
   ] };
 }
+const STILL: Gesture = { arm: 110, elbow: -60, free: 50, freeElbow: -30 };
+const still = (k: number): Gesture => ({ arm: STILL.arm! * k, elbow: STILL.elbow! * k, free: STILL.free! * k, freeElbow: STILL.freeElbow! * k });
+function sideKick(pose: HeroPose, style: AttackStyle, chamber: readonly [number, number], target: readonly [number, number], through: readonly [number, number], lean: number, back: readonly [number, number], fold: readonly [number, number] = chamber): Authored {
+  const { contact, total } = timing(style);
+  return { pose, style, support: "L", phases: [
+    { frame: 0, gesture: READY },
+    { frame: Math.max(1, contact - 6), gesture: { ...still(1), lean: lean * 0.2, backKnee: 70 }, reach: ["footR", -14, 22] },
+    { frame: contact - 2, gesture: { ...still(1), lean: lean * 0.6, chest: lean * 0.2, backKnee: 125, step: 4 }, reach: ["footR", chamber[0], chamber[1]] },
+    { frame: contact, gesture: { ...still(1), lean, chest: lean * 0.4, head: -lean * 0.4, backKnee: 0, step: 8 }, reach: ["footR", target[0], target[1]] },
+    { frame: contact + 2, gesture: { ...still(1), lean: lean * 1.05, chest: lean * 0.45, head: -lean * 0.4, backKnee: 0, step: 9 }, reach: ["footR", through[0], through[1]] },
+    { frame: contact + 3, gesture: { ...still(1), lean: lean * 0.95, chest: lean * 0.4, head: -lean * 0.35, backKnee: 30, step: 8 }, reach: ["footR", back[0], back[1]] },
+    { frame: contact + 8, gesture: { ...still(1), lean: lean * 0.5, chest: lean * 0.2, backKnee: 120, step: 6 }, reach: ["footR", fold[0], fold[1]] },
+    { frame: total, gesture: READY },
+  ] };
+}
+function upTilt(): Authored {
+  const { contact, total } = timing(AttackStyle.upTilt);
+  return { pose: "upTilt", style: AttackStyle.upTilt, support: "L", phases: [
+    { frame: 0, gesture: READY },
+    { frame: contact - 4, gesture: { ...still(1), lean: 4, chest: 4, backKnee: 60, drop: -6, frontKnee: 16 }, reach: ["footR", -50, 2] },
+    { frame: contact - 2, gesture: { ...still(1), lean: -10, backKnee: 120, step: 2 }, reach: ["footR", 26, 76] },
+    { frame: contact, gesture: { ...still(1), lean: -28, chest: -14, head: 14, backKnee: 0, step: 2 }, reach: ["footR", 20, 150] },
+    { frame: contact + 2, gesture: { ...still(1), lean: -32, chest: -16, head: 16, backKnee: 0, step: 2 }, reach: ["footR", -10, 160] },
+    { frame: contact + 6, gesture: { ...still(1), lean: -14, chest: -6, backKnee: 40, step: 4 }, reach: ["footR", 50, 90] },
+    { frame: contact + 12, gesture: { ...still(0.8), lean: -2, backKnee: 50, step: 6 }, reach: ["footR", 50, 20] },
+    { frame: total, gesture: READY },
+  ] };
+}
 function downTilt(): Authored {
   const { contact, total } = timing(AttackStyle.downTilt);
   const low = (k: number): Gesture => ({ ...guard(1), arm: -180, lean: -6 * k, chest: -4 * k, frontHip: -40 * k, frontKnee: 70 * k, drop: -14 * k, step: 4 * k });
@@ -205,20 +244,20 @@ function downTilt(): Authored {
     { frame: total, gesture: READY },
   ] };
 }
-function jab(): Authored {
-  const { contact, total } = timing(AttackStyle.jab);
-  const hold: Gesture = STILL;
-  return { pose: "jab", style: AttackStyle.jab, support: "R", phases: [
+function dashAttack(): Authored {
+  const { contact, total } = timing(AttackStyle.dashAttack);
+  const fly = (k: number): Gesture => ({ ...still(1), lean: -18 * k, chest: -6 * k, head: 6 * k, frontHip: -10 * k, frontKnee: 80 * k, lunge: 10 * k, drop: 18 * k });
+  return { pose: "dashAttack", style: AttackStyle.dashAttack, airborne: true, phases: [
     { frame: 0, gesture: READY },
-    { frame: contact - 2, gesture: { ...hold, lean: -6, chest: -12, head: 6, step: -2 }, reach: ["handL", 16, 74] },
-    { frame: contact, gesture: { ...hold, lean: 0, chest: 6, head: -14, step: 11 }, reach: ["handL", 82, 76] },
-    { frame: contact + 2, gesture: { ...hold, lean: 2, chest: 10, head: -16, step: 16 }, reach: ["handL", 98, 76] },
-    { frame: contact + 7, gesture: { ...hold, lean: 0, chest: 6, head: -10, step: 13 }, reach: ["handL", 74, 74] },
+    { frame: Math.max(1, contact - 5), gesture: { ...fly(0.3), backKnee: 90 }, reach: ["footR", -40, 20] },
+    { frame: contact - 2, gesture: { ...fly(0.6), backKnee: 120 }, reach: ["footR", 26, 50] },
+    { frame: contact, gesture: { ...fly(1), backKnee: 0 }, reach: ["footR", 96, 56] },
+    { frame: contact + 2, gesture: { ...fly(1), lunge: 28, backKnee: 0 }, reach: ["footR", 108, 55] },
+    { frame: contact + 8, gesture: { ...fly(1), backKnee: 0 }, reach: ["footR", 98, 50] },
+    { frame: contact + 13, gesture: { ...fly(0.5), backKnee: 110 }, reach: ["footR", 30, 30] },
     { frame: total, gesture: READY },
   ] };
 }
-const STILL: Gesture = { arm: 110, elbow: -60, free: 50, freeElbow: -30 };
-const still = (k: number): Gesture => ({ arm: STILL.arm! * k, elbow: STILL.elbow! * k, free: STILL.free! * k, freeElbow: STILL.freeElbow! * k });
 
 const hang = (action: Authored, drape = false): Authored => ({ ...action, phases: action.phases.map(phase => {
   const g = phase.gesture, cloth = g.cloth ?? 0.8 * Math.min(g.frontHip ?? 0, g.backHip ?? 0);
@@ -231,8 +270,9 @@ const POSES: Readonly<Record<string, () => Authored>> = {
   neutralSpecial, jump, doubleJump, forwardSmash, downSmash,
   backAir: draped(backAir), neutralAir: draped(neutralAir), downAir: draped(downAir),
   forwardTiltDown: kicked(() => kick("forwardTiltDown", AttackStyle.forwardTiltDown, [76, 26], -8, [80, 24], -30, -8)),
-  downTilt: kicked(downTilt),
-  jab: kicked(jab),
+  downTilt: kicked(downTilt), jab: kicked(jab), upTilt: kicked(upTilt), dashAttack: kicked(dashAttack),
+  forwardTilt: kicked(() => sideKick("forwardTilt", AttackStyle.forwardTilt, [34, 64], [88, 60], [100, 61], -8, [66, 41])),
+  forwardTiltUp: kicked(() => sideKick("forwardTiltUp", AttackStyle.forwardTiltUp, [30, 80], [74, 108], [82, 120], -26, [34, 72], [30, 40])),
 };
 
 function rotation(base: ArrayLike<number>, pitch: number, yaw = 0, roll = 0): Float32Array {
