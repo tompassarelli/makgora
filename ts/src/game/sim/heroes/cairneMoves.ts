@@ -30,11 +30,12 @@ const sweep = (first: number, reach: number, heights: readonly number[], damage:
   heights.map((z, i) => strike(first + i, first + i, c(34.0 * direction, 95.0, (reach - 14.0) * direction, z), damage, strength, 40, direction));
 const BODY = hurtCapsule(Character.cairne);
 const half = (part: HurtPart): HurtPart => ({ ...part, x2: f32(f32(part.x1 + part.x2) * 0.5), z2: f32(f32(part.z1 + part.z2) * 0.5) });
-const pose = (first: number, last: number, part: HurtPart) => [
+export const cairneHurtPose = (first: number, last: number, part: HurtPart) => [
   heroHurtPose(first - 3, first - 1, [BODY, half(part)]),
   heroHurtPose(first, last, [BODY, part]),
   heroHurtPose(last + 1, last + 3, [BODY, half(part)]),
 ];
+const pose = cairneHurtPose;
 const pairedPose = (first: number, turn: number, last: number, front: HurtPart, back: HurtPart) => [
   heroHurtPose(first - 3, first - 1, [BODY, half(front)]),
   heroHurtPose(first, turn - 1, [BODY, front]),
@@ -44,7 +45,7 @@ const pairedPose = (first: number, turn: number, last: number, front: HurtPart, 
 ];
 const arm = (x: number, z: number) => hurtPart(20.0, 90.0, x, z, 18.0);
 const FORWARD_TILT = heroMove(14, 4, 29, 0, sweep(14, 170.0, [170.0, 115.0, 60.0, 12.0], 12.64900016784668, "edge"));
-const NO_LAUNCH = { growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } as const;
+export const NO_LAUNCH = { growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } as const;
 
 export const CAIRNE_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack, smashMaxChargeFrames: 45, smashMaxDamageMultiplier: 1.25, maxPummels: 1,

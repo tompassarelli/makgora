@@ -127,7 +127,7 @@ test("every hero spell projectile marks its collision centre on every live frame
         assertTrue(actual.visible);
         assertEquals(actual.x, projectile.x);
         assertEquals(actual.z, projectile.z);
-        if (spec.modelRadius !== undefined && (spec.pool !== undefined || character === Character.forsakenPaladin)) {
+        if (spec.modelRadius !== undefined) {
           assertNear(f32(actual.modelScale * spec.modelRadius), actual.dangerRadius, f32(0.0001));
         }
         checked++;

@@ -1,7 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import type { Fighter } from "../sim/fighter";
 import { heroProjectileRadius, projectileActive } from "../sim/projectiles";
-import { Character, ProjectileKind } from "../sim/codes";
+import { ProjectileKind } from "../sim/codes";
 import { meleeAtan2 } from "../../sim/meleeScalarMath";
 
 interface ProjectilePose {
@@ -50,7 +50,7 @@ export function projectedProjectile(fighter: Readonly<Fighter> | undefined, inde
     armed,
     poolPulse: spec?.pool === undefined || projectile.poolHits === 0 ? 0.0
       : f32(Math.max(0.0, f32((projectile.poolWait - (spec.pool.every - 13)) / 12.0))),
-    modelScale: spec?.modelRadius === undefined ? 1.0 : f32((fighter.character === Character.forsakenPaladin ? heroProjectileRadius(projectile, spec) : radius) / spec.modelRadius),
+    modelScale: spec?.modelRadius === undefined ? 1.0 : f32(heroProjectileRadius(projectile, spec) / spec.modelRadius),
     animationSequence: animation?.sequence,
     animationSeconds,
   };
