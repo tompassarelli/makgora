@@ -3,7 +3,7 @@ import { f32 } from "wisp/src/sim/f32";
 import type { HeroClip, HeroClipTable } from "./hero";
 export const KOBOLD_MODEL_FILE = "units\\creeps\\Kobold\\Kobold.mdl";
 export const KOBOLD_FALLBACK: HeroClip = { index: 0, seconds: 1.0 };
-export const KOBOLD_CLIPS = { idle: KOBOLD_FALLBACK, walk: { index: 1, seconds: 1.0 }, dash: { index: 1, seconds: 1.0 }, run: { index: 1, seconds: 1.0 }, ko: { index: 5, seconds: f32(1.667) },
+export const KOBOLD_CLIPS = { idle: KOBOLD_FALLBACK, walk: { index: 1, seconds: 1.0 }, dash: { index: 91, seconds: f32(0.2) }, run: { index: 90, seconds: f32(0.4) }, ko: { index: 5, seconds: f32(1.667) },
   jab: { index: 9, seconds: 0.25, aligned: true },
   jab2: { index: 10, seconds: f32(0.35), aligned: true },
   forwardTilt: { index: 11, seconds: f32(0.45), aligned: true },
@@ -76,6 +76,12 @@ export const KOBOLD_CLIPS = { idle: KOBOLD_FALLBACK, walk: { index: 1, seconds: 
   upSpecialAir: { index: 78, seconds: f32(0.567), aligned: true },
   downSpecial: { index: 79, seconds: f32(0.567), aligned: true },
   downSpecialAir: { index: 80, seconds: f32(0.567), aligned: true },
+} as const satisfies HeroClipTable;
+export const KOBOLD_BARE_CLIPS = {
+  idle: { index: 92, seconds: 2.0 },
+  walk: { index: 93, seconds: f32(0.4) },
+  dash: { index: 93, seconds: f32(0.4) },
+  run: { index: 93, seconds: f32(0.4) },
 } as const satisfies HeroClipTable;
 export const KOBOLD_DAMAGE_CLIPS: readonly HeroClip[] = [
   { index: 81, seconds: f32(0.4), aligned: true },

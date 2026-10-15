@@ -6,7 +6,7 @@ import { DrawnModel, sheet, type PoseFrame } from "../../ts/scripts/wisp/hurtbox
 import { AttackStyle, AttackPhase } from "../../ts/src/game/sim/codes";
 import type { HeroPose } from "../../ts/src/game/sim/heroes/hero";
 import { KOBOLD_MOVES } from "../../ts/src/game/sim/heroes/koboldMoves";
-import { KOBOLD_CLIPS } from "../../ts/src/game/sim/heroes/koboldClips";
+import { KOBOLD_BARE_CLIPS, KOBOLD_CLIPS } from "../../ts/src/game/sim/heroes/koboldClips";
 
 function ensure(ok: unknown, message: string): asserts ok { if (!ok) throw new Error(message); }
 function tracks(value: unknown, visit: (track: mdx.AnimVector, path: string) => void, path = "") {
@@ -17,20 +17,21 @@ function tracks(value: unknown, visit: (track: mdx.AnimVector, path: string) => 
 const globalClock = (track: mdx.AnimVector) => track.GlobalSeqId != null && track.GlobalSeqId !== -1 && track.GlobalSeqId !== 0xffffffff;
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/kobold-clips.ts AUTHORED_KOBOLD.mdx PRIVATE_OUTPUT");
+ensure(input && output && (relative(project, output).startsWith("..") || relative(project, output).startsWith("build/")), "usage: bun tools/animations/kobold-clips.ts AUTHORED_KOBOLD.mdx PRIVATE_OUTPUT");
 const source = parseMDX(await Bun.file(input).arrayBuffer()), model = structuredClone(source);
 ensure(source.Sequences[0]?.Name === "Stand -1" && source.Sequences.some(s => s.Name === "Kobold jab") && source.Nodes.some(n => n.Name === "Candle"), "Expected the authored classic Kobold (stock rig plus murloc-clips.ts --kobold clips)");
 const stand = source.Sequences[0]!;
 
-interface Gesture { chest?: number; pelvis?: number; arm?: number; armTwist?: number; elbow?: number; leftArm?: number; leftElbow?: number; head?: number;
+type KoboldPose = HeroPose | "bareIdle" | "bareRun";
+interface Gesture { chest?: number; pelvis?: number; arm?: number; armTwist?: number; elbow?: number; leftArm?: number; leftElbow?: number; head?: number; headYaw?: number; tail?: number;
   thigh?: number; knee?: number; leftThigh?: number; leftKnee?: number; lean?: number; yaw?: number; spin?: number; step?: number; rise?: number; wrist?: number }
 interface Beat { frame: number; gesture: Gesture; target?: readonly [number, number] }
 interface Strike { pickHead?: "local" | "world"; prep: Gesture; hit: Gesture; follow: Gesture; prepAt?: number; followAt?: number; settle?: number; mid?: readonly Beat[]; follows?: readonly [number, number]; even?: boolean; over?: readonly [number, number]; late?: number; hitAt?: readonly [number, number]; rest?: Gesture; air?: boolean; free?: boolean; reach?: number }
-interface Action { pickHead?: "local" | "world"; pose: HeroPose; frames: number; contact: number; beats: Beat[]; hold?: boolean; air?: boolean; reach?: number }
+interface Action { pickHead?: "local" | "world"; pose: KoboldPose; frames: number; contact: number; beats: Beat[]; hold?: boolean; air?: boolean; reach?: number; loop?: boolean; bare?: boolean }
 const ready: Gesture = {};
 const blend = (a: Gesture, b: Gesture, t: number): Gesture => Object.fromEntries([...new Set([...Object.keys(a), ...Object.keys(b)])]
   .map(k => [k, (a[k as keyof Gesture] ?? 0) * (1 - t) + (b[k as keyof Gesture] ?? 0) * t]));
-const seq = (pose: HeroPose) => { const clip = (KOBOLD_CLIPS as Record<string, { index: number; seconds: number }>)[pose]; ensure(clip, `${pose}: no clip`); return clip; };
+const seq = (pose: KoboldPose) => { const clip = ({ ...KOBOLD_CLIPS, bareIdle: KOBOLD_BARE_CLIPS.idle, bareRun: KOBOLD_BARE_CLIPS.run } as Record<string, { index: number; seconds: number }>)[pose]; ensure(clip, `${pose}: no clip`); return clip; };
 
 function strikeBeats(style: AttackStyle, s: Strike): Beat[] {
   const move = KOBOLD_MOVES.normals[style]; ensure(move, `missing timing ${style}`);
@@ -167,6 +168,43 @@ const crouch: Gesture = { chest: -60, lean: 20, head: 15, arm: 20, elbow: -60, l
 if (!only || only.includes("smashCharge")) actions.push({ pose: "smashCharge", frames: 30, contact: 8, hold: true, beats: [{ frame: 0, gesture: charge }, { frame: 30, gesture: charge }] });
 if (!only || only.includes("crouch")) actions.push({ pose: "crouch", frames: 30, contact: 8, hold: true, beats: [{ frame: 0, gesture: crouch }, { frame: 30, gesture: crouch }] });
 
+const scurry = (frame: number, bare: boolean): Gesture => {
+  const phase = frame * Math.PI / 12, stride = Math.cos(phase), lift = Math.sin(phase);
+  return { chest: -30, lean: 20, head: 10, tail: -30, pelvis: -6,
+    thigh: -35 + 22 * stride, leftThigh: -35 - 22 * stride,
+    knee: 50 + 24 * Math.max(0, lift), leftKnee: 50 + 24 * Math.max(0, -lift),
+    arm: bare ? -170 + 24 * stride : -70 + 5 * stride, elbow: bare ? -20 - 15 * lift : -45,
+    leftArm: bare ? -170 - 24 * stride : -50 - 8 * stride, leftElbow: bare ? -20 + 15 * lift : -60,
+    rise: 1.5 * (1 - Math.cos(phase * 2)) };
+};
+for (const pose of ["run", "dash", "bareRun"] as const) if (!only || only.includes(pose)) {
+  const frames = pose === "dash" ? 12 : 24, bare = pose === "bareRun";
+  actions.push({ pose, frames, contact: 6, loop: pose !== "dash", bare, pickHead: "local", reach: 0.01,
+    beats: Array.from({ length: frames + 1 }, (_, frame) => ({ frame, gesture: scurry(frame, bare), ...(bare ? {} : { target: [32, 30] as const }) })) });
+}
+if (!only || only.includes("bareIdle")) actions.push({ pose: "bareIdle", frames: 120, contact: 30, loop: true, bare: true,
+  beats: Array.from({ length: 121 }, (_, frame) => {
+    const phase = frame * Math.PI / 60;
+    return { frame, gesture: { chest: 8 + 2 * Math.sin(phase * 2), lean: 3, head: -12, headYaw: 40 * Math.sin(phase),
+      arm: -75 + 4 * Math.sin(phase * 4), elbow: -100 + 3 * Math.sin(phase * 4),
+      leftArm: -80 - 4 * Math.sin(phase * 4), leftElbow: -100 - 3 * Math.sin(phase * 4),
+      thigh: 12, leftThigh: 12, knee: -22, leftKnee: -22, tail: -12 } };
+  }) });
+
+let cursor = Math.max(...source.Sequences.map(s => s.Interval[1]!)) + 100;
+for (const pose of ["run", "dash", "bareIdle", "bareRun"] as const) {
+  const action = actions.find(a => a.pose === pose); if (!action) continue;
+  const index = seq(pose).index;
+  if (model.Sequences[index]) continue;
+  ensure(model.Sequences.length === index, `${pose}: cannot append sequence ${index}`);
+  const end = cursor + Math.round(action.frames * 1000 / 60);
+  model.Sequences.push({ ...source.Sequences[seq("jab").index]!, Name: `Kobold ${pose}`, Interval: new Uint32Array([cursor, end]), NonLooping: !action.loop, MoveSpeed: 0, Rarity: 0 });
+  cursor = end + 100;
+}
+const candle = model.Nodes.find(n => n.Name === "Candle")!;
+if (actions.some(a => a.bare) && !candle.Scaling) candle.Scaling = { LineType: mdx.LineType.DontInterp, GlobalSeqId: null,
+  Keys: source.Sequences.flatMap(s => Array.from(s.Interval).map(Frame => ({ Frame, Vector: new Float32Array([1, 1, 1]) }))) };
+
 function rotated(q: ArrayLike<number>, y: number, z = 0) {
   const a = y * Math.PI / 360, b = z * Math.PI / 360;
   const [i, j, k, l] = [-Math.sin(a) * Math.sin(b), Math.sin(a) * Math.cos(b), Math.cos(a) * Math.sin(b), Math.cos(a) * Math.cos(b)];
@@ -182,7 +220,8 @@ function joint(name: string, g: Gesture): [number, number] {
   if (name === "Bone_Hand_R") return [g.wrist ?? 0, 0];
   if (name === "Bone_Arm1_L") return [g.leftArm ?? 0, 0];
   if (name === "Bone_Arm2_L") return [g.leftElbow ?? 0, 0];
-  if (name === "Bone_Head") return [g.head ?? 0, 0];
+  if (name === "Bone_Head") return [g.head ?? 0, g.headYaw ?? 0];
+  if (name === "K_Tail") return [g.tail ?? 0, 0];
   if (name === "Bone_Leg1_R") return [g.thigh ?? 0, 0];
   if (name === "Bone_Leg1_L") return [g.leftThigh ?? 0, 0];
   if (name === "Bone_Leg2_R") return [g.knee ?? 0, 0];
@@ -245,6 +284,19 @@ for (const action of actions) {
     }
     track.Keys.sort((a, b) => a.Frame - b.Frame);
   });
+  if (action.bare) {
+    ensure(candle.Scaling, "Bare Kobold needs candle scaling");
+    candle.Scaling.Keys = candle.Scaling.Keys.filter(k => k.Frame < start || k.Frame > end);
+    for (const Frame of [start, end]) candle.Scaling.Keys.push({ Frame, Vector: new Float32Array(3) });
+    candle.Scaling.Keys.sort((a, b) => a.Frame - b.Frame);
+    const flame = model.ParticleEmitters2.find(n => n.Name === "BlizParticle01");
+    ensure(flame?.Visibility, "Bare Kobold needs flame visibility");
+    ensure(!globalClock(flame.Visibility), "Kobold flame visibility uses a global clock");
+    flame.Visibility.Keys = flame.Visibility.Keys.filter(k => k.Frame < start || k.Frame > end);
+    for (const Frame of [start, end]) flame.Visibility.Keys.push({ Frame, Vector: new Float32Array([0]),
+      ...(flame.Visibility.LineType > mdx.LineType.Linear ? { InTan: new Float32Array([0]), OutTan: new Float32Array([0]) } : {}) });
+    flame.Visibility.Keys.sort((a, b) => a.Frame - b.Frame);
+  }
   const renderer = new ModelRenderer(model), data = Reflect.get(renderer, "rendererData"); renderer.setSequence(index);
   const arm = model.Nodes.find(n => n.Name === "Bone_Arm1_R")!, elbow = model.Nodes.find(n => n.Name === "Bone_Arm2_R")!, hand = handNode;
   const donor = (n: mdx.Node) => source.Nodes[n.ObjectId]!.Rotation!.Keys.find(k => k.Frame >= stand.Interval[0]! && k.Frame <= stand.Interval[1]!)!.Vector;
@@ -293,7 +345,16 @@ for (const action of actions) {
   records.push({ pose: action.pose, index, frames: action.frames, contact: action.contact, beats: action.beats.map(b => b.frame), tipMiss });
 }
 
+if (!source.Nodes[candle.ObjectId]!.Scaling && candle.Scaling) {
+  const bareIntervals = actions.filter(a => a.bare).map(a => model.Sequences[seq(a.pose).index]!.Interval);
+  for (const key of candle.Scaling.Keys) {
+    const bare = bareIntervals.some(([start, end]) => key.Frame >= start! && key.Frame <= end!);
+    ensure(key.Vector.every(v => v === (bare ? 0 : 1)), "Candle scaling changed outside bare clips");
+  }
+}
 const outside = (m: mdx.Model) => { const copy = structuredClone(m);
+  copy.Sequences = copy.Sequences.slice(0, source.Sequences.length);
+  if (!source.Nodes[candle.ObjectId]!.Scaling) delete copy.Nodes[candle.ObjectId]!.Scaling;
   tracks(copy, track => { if (!globalClock(track)) track.Keys = track.Keys.filter(k => !replaced.some(([a, b]) => k.Frame >= a && k.Frame <= b)); }); return copy; };
 ensure(isDeepStrictEqual(outside(model), outside(source)), "Re-authoring changed a sequence outside the Kobold ground set");
 const bytes = generateMDX(model), decoded = parseMDX(bytes);
@@ -306,7 +367,7 @@ for (const [i, action] of actions.entries()) {
   const first = finalDrawn.triangles(index, 0, 1), contact = finalDrawn.triangles(index, action.contact / 60, 1);
   let moved = 0; for (let v = 0; v < first.length; v++) moved = Math.max(moved, Math.abs(first[v]! - contact[v]!));
   ensure(action.hold || moved > 3, `${action.pose}: dead gesture`);
-  const panelFrames = action.hold ? [0, action.frames] : action.beats.map(b => b.frame);
+  const panelFrames = action.loop ? Array.from({ length: 9 }, (_, i) => Math.round(action.frames * i / 8)) : action.pose === "dash" ? [0, 3, 6, 9, 12] : action.hold ? [0, action.frames] : action.beats.map(b => b.frame);
   const panels: PoseFrame[] = [1, -1].flatMap(facing => panelFrames.map(frame => ({ frame, phase: frame < action.contact ? AttackPhase.startup : frame <= action.contact + 4 ? AttackPhase.active : AttackPhase.recovery,
     x: 0, z: 0, facing, parts: [], strikes: [], clip: index, seconds: frame / 60 })));
   await Bun.write(join(output, `Kobold-${action.pose}.png`), sheet(`Kobold ${action.pose}`, finalDrawn, panels, panelFrames.length).png);
