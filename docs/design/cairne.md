@@ -103,10 +103,11 @@ the gesture plants his feet, moves the whole shoulder and follows through.
 Map or author the complete hero pose table, including both sides of throws,
 recovery, and nine pain poses. His gameplan is the hard read: Shockwave makes
 a foe jump or shield, a jump meets up tilt or up air, a shield meets Gore, and
-pressure on him meets the armored stomp. The computer seeks totem spacing,
-sends a wave at distant ground approaches, gores shields and kills with Gore
-near the ledge, stomps through incoming light hits and after a down throw, and
-saves Spirit Lift for returning to the ledge.
+pressure on him meets the armored stomp. The computer stands just inside
+stomp range, sends a wave at distant ground approaches, runs in with the stomp
+and stomps again on a tech, stomps through incoming light hits and after a down
+throw, saves Gore for kills from 105%, and saves Spirit Lift for returning to
+the ledge.
 
 [wc]: https://liquipedia.net/warcraft/Tauren_Chieftain
 [bowser]: https://www.ssbwiki.com/Bowser_(SSBU)
