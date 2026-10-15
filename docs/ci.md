@@ -101,6 +101,12 @@ measured in three `--shard I/3` parts balanced by measured row cost: shard 0 in
 collects and merges with `--merge`.
 The suite tests the candidate and the reports job tests the regenerated rows,
 their only reader; `land` waits for both and pushes the reports commit.
+A `code-health` job also runs beside the suite on the same candidate and base:
+north's `harness/code-health/cli.ts gate BASE CANDIDATE` (Bun 1.3.13,
+ast-grep 0.42.1). `land` waits for it too and refuses the candidate like a red
+suite ("it adds code-health debt", or "the code-health gate failed to run" on
+exit 2), with the gate's lines in the summary and annotation. The gate passes
+without `structure.toml`.
 
 Every dispatched run ends with a plan unless it was cancelled, and a plan tests
 again any pending tip that no unfinished run holds, so a later plan rediscovers a cancelled tip. The scheduling decisions are a pure function

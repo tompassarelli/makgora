@@ -443,8 +443,41 @@ jobs:
       base: ${{ needs.build.outputs.base }}
       farm-runner: ${{ inputs.farm-runner }}
 
+  # The code-health ratchet (north harness/code-health) on the candidate, beside the suite: land refuses new debt.
+  code-health:
+    needs: build
+    if: needs.build.outputs.verdict == 'test' || needs.build.outputs.verdict == 'tested'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      verdict: ${{ steps.gate.outputs.verdict }}
+      detail: ${{ steps.gate.outputs.detail }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.build.outputs.sha }}
+          fetch-depth: 0
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.13
+      - run: npm i -g @ast-grep/cli@0.42.1
+      - run: git clone --depth 1 https://github.com/tompassarelli/north "$RUNNER_TEMP/north"
+      - id: gate
+        env:
+          BASE: ${{ needs.build.outputs.base }}
+          SHA: ${{ needs.build.outputs.sha }}
+        run: |
+          set +e -uo pipefail
+          bun "$RUNNER_TEMP/north/harness/code-health/cli.ts" gate "$BASE" "$SHA" > gate.log 2>&1
+          code=$?
+          cat gate.log
+          case "$code" in 0) verdict=pass ;; 1) verdict=debt ;; *) verdict=error ;; esac
+          echo "verdict=$verdict" >> "$GITHUB_OUTPUT"
+          { echo "detail<<AUTOLAND_EOF"; tail -40 gate.log; echo "AUTOLAND_EOF"; } >> "$GITHUB_OUTPUT"
+          echo "code-health gate ${BASE:0:10}..${SHA:0:10}: $verdict" >> "$GITHUB_STEP_SUMMARY"
+
   land:
-    needs: [build, reports, suite]
+    needs: [build, reports, suite, code-health]
     if: ${{ !cancelled() && needs.build.result == 'success' && needs.build.outputs.verdict != 'none' }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -458,6 +491,9 @@ jobs:
       BRANCHES: ${{ needs.build.outputs.branches }}
       TIPS: ${{ needs.build.outputs.tips }}
       DETAIL: ${{ needs.reports.outputs.detail || needs.build.outputs.detail }}
+      CODE_HEALTH: ${{ needs.code-health.result }}
+      CODE_HEALTH_VERDICT: ${{ needs.code-health.outputs.verdict }}
+      CODE_HEALTH_DETAIL: ${{ needs.code-health.outputs.detail }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -494,6 +530,15 @@ jobs:
           elif [ "$VERDICT" = test ]; then
             failed=$(jq -r '.failures[], .problems[]' candidate/summary.json | sed 's/^/- /')
             [ -z "$failed" ] || why="$(grep -c . <<< "$failed") failing; main lands only on a green suite, including tests main already fails"
+          fi
+          if [ -z "$why" ]; then
+            if [ "$CODE_HEALTH" != success ] && [ "$CODE_HEALTH" != skipped ]; then
+              why="the code-health gate ended without a result"
+            elif [ "$CODE_HEALTH_VERDICT" = debt ]; then
+              why="it adds code-health debt"; failed=$(printf '```\n%s\n```' "$CODE_HEALTH_DETAIL")
+            elif [ "$CODE_HEALTH_VERDICT" = error ]; then
+              why="the code-health gate failed to run"; failed=$(printf '```\n%s\n```' "$CODE_HEALTH_DETAIL")
+            fi
           fi
           if [ -n "$TEST" ] && [ "$(git rev-parse -q --verify "refs/remotes/origin/${branches[0]}")" != "${tips[0]}" ]; then
             echo "\`${branches[0]}\` moved or landed while it was tested: its new tip is tested on its own" >> "$GITHUB_STEP_SUMMARY"

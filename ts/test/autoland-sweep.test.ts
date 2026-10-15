@@ -169,7 +169,7 @@ if [ "$1" = scripts/wisp.ts ]; then
 fi
 if [ "$1" = test ]; then echo targets >> ${quote(events)}; [ "$MODE" != targets ]; exit $?; fi
 exec ${quote(process.execPath)} "$@"`);
-    const env = { ...process.env, PATH: `${bin}:${process.env.PATH ?? ""}`, MODE: mode, TEST: "", TRAIN: "true", SHA: solo, TREE: trees[0]!, BASE: base, SCRATCH: "fixture", BRANCHES: "claude/lane-0", TIPS: tips[0]!, VERDICT: "tested", REPORTS: "success", DETAIL: "", RUNNER_TEMP: temporary, GITHUB_OUTPUT: join(fixture, "outputs"), GITHUB_STEP_SUMMARY: join(fixture, "summary"), GH_REPO: "fixture/fixture", RUN_URL: "fixture", PASSED: workflow.env.PASSED!, REPORTS_RUN: workflow.env.REPORTS_RUN!, LOCAL_REFRESH: workflow.env.LOCAL_REFRESH!, FETCH_LANES: `cat ${quote(join(fixture, "lanes.json"))}` };
+    const env = { ...process.env, PATH: `${bin}:${process.env.PATH ?? ""}`, MODE: mode, TEST: "", TRAIN: "true", SHA: solo, TREE: trees[0]!, BASE: base, SCRATCH: "fixture", BRANCHES: "claude/lane-0", TIPS: tips[0]!, VERDICT: "tested", REPORTS: "success", DETAIL: "", CODE_HEALTH: "success", CODE_HEALTH_VERDICT: "pass", CODE_HEALTH_DETAIL: "", RUNNER_TEMP: temporary, GITHUB_OUTPUT: join(fixture, "outputs"), GITHUB_STEP_SUMMARY: join(fixture, "summary"), GH_REPO: "fixture/fixture", RUN_URL: "fixture", PASSED: workflow.env.PASSED!, REPORTS_RUN: workflow.env.REPORTS_RUN!, LOCAL_REFRESH: workflow.env.LOCAL_REFRESH!, FETCH_LANES: `cat ${quote(join(fixture, "lanes.json"))}` };
     if (mode === "stale-record") {
       for (const staleMode of ["stale-check", "stale-record", "stale-fallback"]) {
         writeFileSync(events, "");
