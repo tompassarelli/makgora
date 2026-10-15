@@ -7,6 +7,7 @@ import { AttackPhase, AttackStyle, Character } from "../../ts/src/game/sim/codes
 import type { HeroClip, HeroPose } from "../../ts/src/game/sim/heroes/hero";
 import { SHADOW_HUNTER_MOVES } from "../../ts/src/game/sim/heroes/shadowHunterMoves";
 import { SHADOW_HUNTER_SPECIALS } from "../../ts/src/game/sim/heroes/shadowHunterSpecials";
+import { CHARGED_AIM_FRAMES } from "../../ts/src/game/sim/heroSpecials";
 import { ROSTER_ATTACK_CLIPS } from "../../ts/src/game/presentation/rosterAttackClipInfo";
 import { JUMP_CLIPS } from "../../ts/src/game/presentation/jumpClipInfo";
 import { SHADOW_HUNTER_AUTHORED_CLIPS } from "../../ts/src/game/presentation/heroes/shadowHunterClipInfo";
@@ -24,7 +25,7 @@ interface Gesture {
 type End = "handL" | "handR" | "footL" | "footR";
 interface Phase { frame: number; gesture: Gesture; tip?: readonly [number, number] | readonly [number, number, number]; grip?: readonly [number, number]; reach?: readonly [End, number, number] }
 interface Authored {
-  pose: HeroPose; style?: AttackStyle; phases: readonly Phase[]; airborne?: boolean; frames?: number; looping?: boolean; forms?: readonly HeroPose[];
+  pose: HeroPose; style?: AttackStyle; phases: readonly Phase[]; airborne?: boolean; frames?: number; looping?: boolean; forms?: readonly HeroPose[]; bind?: boolean;
   ground?: "cloth" | "sole"; support?: "L" | "R";
 }
 const REACH: Readonly<Record<End, readonly [string, keyof Gesture, keyof Gesture, string, string]>> = {
@@ -259,6 +260,36 @@ function dashAttack(): Authored {
   ] };
 }
 
+function upSpecial(): Authored {
+  const special = SHADOW_HUNTER_SPECIALS.up.ground!, total = special.endFrame, launch = CHARGED_AIM_FRAMES;
+  const plant: Gesture = { lean: -10, chest: -6, head: -6, free: -40, freeElbow: 30, beard: -10,
+    frontHip: -20, frontKnee: 10, frontFoot: 10, backHip: 60, backKnee: 75, backFoot: 10, drop: 0 };
+  const sit: Gesture = { lean: 0, chest: -6, head: 6, free: 60, freeElbow: 10, frontHip: -95, frontKnee: 5, frontFoot: -20, backHip: -85, backKnee: 10, backFoot: -20, cloth: -40 };
+  const stretch: Gesture = { lean: -6, chest: -12, head: 18, free: -170, freeElbow: 0, beard: 50, frontHip: 4, frontKnee: 4, frontFoot: -40, backHip: 14, backKnee: 8, backFoot: -40, cloth: 10 };
+  return { pose: "upSpecial", style: AttackStyle.forwardSmash, frames: total, airborne: true, forms: ["upSpecialAir"], phases: [
+    { frame: 0, gesture: READY },
+    { frame: 4, gesture: { ...plant, lean: 4, chest: 2, frontHip: -40, frontKnee: 15, backHip: 25, backKnee: 30, drop: 0 }, tip: [135, 15], grip: [65, 110] },
+    { frame: launch, gesture: plant, tip: [125, -2], grip: [55, 135] },
+    { frame: launch + 2, gesture: { lean: -14, chest: -6, head: 0, free: -20, freeElbow: 20, frontHip: -70, frontKnee: 20, frontFoot: -10, backHip: -30, backKnee: 50, backFoot: -10 }, tip: [95, -22], grip: [40, 120] },
+    { frame: launch + 5, gesture: sit, tip: [30, -95], grip: [22, 45] },
+    { frame: launch + 9, gesture: stretch, tip: [20, 300], grip: [12, 200] },
+    { frame: launch + 13, gesture: { ...stretch, lean: -14, chest: -16, head: 22, backKnee: 40 }, tip: [-90, 260], grip: [0, 200] },
+    { frame: total, gesture: { ...stretch, lean: -25, chest: -15, head: 22, free: -130, freeElbow: 30, frontHip: -40, frontKnee: 45, backHip: 10, backKnee: 60 }, tip: [-135, 165], grip: [-10, 150] },
+  ] };
+}
+
+const HELPLESS: Gesture = { lean: -18, chest: -10, head: 26, free: -140, freeYaw: 60, freeElbow: 15, beard: 70, cloth: -20,
+  frontHip: -70, frontKnee: 50, frontFoot: 30, backHip: 35, backKnee: 80, backFoot: 30 };
+function fallSpecial(): Authored {
+  return { pose: "fallSpecial", frames: 40, airborne: true, looping: true, bind: true, phases: [
+    { frame: 0, gesture: HELPLESS, tip: [-160, 95] },
+    { frame: 10, gesture: { ...HELPLESS, lean: -26, head: 30, free: -175, freeYaw: 30, frontHip: -35, frontKnee: 40, backHip: 50, backKnee: 60 }, tip: [-150, 140] },
+    { frame: 20, gesture: { ...HELPLESS, lean: -12, head: 20, free: -80, freeYaw: 80, freeElbow: 25, frontHip: -90, frontKnee: 80, backHip: 5, backKnee: 50 }, tip: [-165, 55] },
+    { frame: 30, gesture: { ...HELPLESS, lean: -22, head: 28, free: -120, freeYaw: 90, frontHip: -50, frontKnee: 25, backHip: 55, backKnee: 100 }, tip: [-145, 120] },
+    { frame: 40, gesture: HELPLESS, tip: [-160, 95] },
+  ] };
+}
+
 const hang = (action: Authored, drape = false): Authored => ({ ...action, phases: action.phases.map(phase => {
   const g = phase.gesture, cloth = g.cloth ?? 0.8 * Math.min(g.frontHip ?? 0, g.backHip ?? 0);
   return { ...phase, gesture: { ...g, beard: g.beard ?? Math.min(90, 3.5 * Math.max(0, (g.lean ?? 0) + (g.chest ?? 0) + (g.head ?? 0))), ...drape ? { cloth, clothTip: g.clothTip ?? 0.3 * cloth } : {} } };
@@ -267,7 +298,7 @@ const draped = (make: () => Authored) => () => hang(make(), true);
 const kicked = (make: () => Authored) => () => hang({ ...make(), ground: "sole" });
 
 const POSES: Readonly<Record<string, () => Authored>> = {
-  neutralSpecial, jump, doubleJump, forwardSmash, downSmash,
+  neutralSpecial, jump, doubleJump, forwardSmash, downSmash, upSpecial, fallSpecial,
   backAir: draped(backAir), neutralAir: draped(neutralAir), downAir: draped(downAir),
   forwardTiltDown: kicked(() => kick("forwardTiltDown", AttackStyle.forwardTiltDown, [76, 26], -8, [80, 24], -30, -8)),
   downTilt: kicked(downTilt), jab: kicked(jab), upTilt: kicked(upTilt), dashAttack: kicked(dashAttack),
@@ -512,7 +543,7 @@ for (const pose of selected) {
   aimTip(action, start);
   if (action.ground === "sole") reachAndStand(action, index, start, frames);
   else if (action.ground === undefined && !action.airborne) settleFeet(index, start, frames);
-  if (action.style !== undefined) for (const form of [pose, ...action.forms ?? []]) bindings.set(form, { index, seconds: (time(start, frames) - start) / 1000, aligned: true });
+  if (action.style !== undefined || action.bind) for (const form of [pose, ...action.forms ?? []]) bindings.set(form, { index, seconds: (time(start, frames) - start) / 1000, aligned: true });
   authored.push({ action, index, frames });
 }
 

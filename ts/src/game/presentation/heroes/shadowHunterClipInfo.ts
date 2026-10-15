@@ -7,6 +7,7 @@ export const SHADOW_HUNTER_AUTHORED_CLIPS: HeroClipTable = {
   downAir: { index: 71, seconds: f32(0.617), aligned: true },
   downSmash: { index: 68, seconds: f32(0.683), aligned: true },
   downTilt: { index: 65, seconds: f32(0.4), aligned: true },
+  fallSpecial: { index: 74, seconds: f32(0.667), aligned: true },
   forwardSmash: { index: 64, seconds: f32(0.917), aligned: true },
   forwardTilt: { index: 57, seconds: f32(0.517), aligned: true },
   forwardTiltDown: { index: 72, seconds: f32(0.517), aligned: true },
@@ -17,5 +18,7 @@ export const SHADOW_HUNTER_AUTHORED_CLIPS: HeroClipTable = {
   neutralSpecialAir: { index: 67, seconds: f32(0.667), aligned: true },
   neutralSpecialFollowUp: { index: 67, seconds: f32(0.667), aligned: true },
   neutralSpecialFollowUpAir: { index: 67, seconds: f32(0.667), aligned: true },
+  upSpecial: { index: 73, seconds: f32(0.433), aligned: true },
+  upSpecialAir: { index: 73, seconds: f32(0.433), aligned: true },
   upTilt: { index: 59, seconds: 0.5, aligned: true },
 };

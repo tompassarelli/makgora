@@ -5,7 +5,7 @@ import { encodeVerified, fighters, hash, parseSource, tracks } from './original-
 import { timelineBody } from './timeline-body';
 import { checkTimelineGeosets } from './timeline-geosets';
 import { thinKeys } from '../../ts/scripts/keyThin';
-import { flashableSequences } from './white-flash-keys';
+import { playedMoves } from './hd-models';
 import { modelFacts } from '../../ts/node_modules/wisp/scripts/wisp/models';
 import { MODEL_FACTS } from '../../ts/scripts/wisp/modelFacts';
 import { writeModelFacts } from '../../ts/scripts/wisp/modelFactsTable';
@@ -21,7 +21,7 @@ if (fighter === undefined) throw new Error(`Unknown fighter ${fighterName}`);
 await Effect.runPromise(Effect.tryPromise({ try: async () => {
 
     const source = thinKeys(parseSource(await Bun.file(join(assets, fighter.source)).arrayBuffer())).model;
-    const played = flashableSequences([...fighters].find(([, item]) => item === fighter)![0], source.Sequences);
+    const played = playedMoves([...fighters].find(([, item]) => item === fighter)![0], source).classic.map(index => source.Sequences[index]!);
     const bytes = encodeVerified(timelineBody(source, played));
     const geosets = checkTimelineGeosets(source, parseSource(bytes), played);
     console.log(`TIMELINE_GEOSETS_PASS ${fighter.name}: ${JSON.stringify(geosets)}`);
