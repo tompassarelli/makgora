@@ -174,6 +174,7 @@ function label(parent: framehandle, name: string, x: number, y: number, width: n
 const BOTTOM_BAR_TOP = f32(0.077);
 const BAR_COIN = f32(0.011);
 const BAR_GAP = f32(0.003);
+const BAR_LABEL_GAP = f32(0.006);
 const BAR_CHAR_WIDTH = f32(0.0055);
 
 function placeBottomBar(frames: { readonly status: framehandle; readonly wins: SessionWinsFrames }, slot: number, winsShown: boolean, statusText: string, countText: string): void {
@@ -187,9 +188,9 @@ function placeBottomBar(frames: { readonly status: framehandle; readonly wins: S
   }
   const statusWidth = f32(I2R(StringLength(statusText)) * BAR_CHAR_WIDTH);
   const countWidth = f32(I2R(StringLength(countText)) * BAR_CHAR_WIDTH);
-  const group = f32(f32(f32(statusWidth + countWidth) + BAR_COIN) + f32(BAR_GAP * 2));
+  const group = f32(f32(f32(statusWidth + countWidth) + BAR_COIN) + f32(BAR_GAP + BAR_LABEL_GAP));
   const statusRight = f32(f32(f32(cardX(slot) + f32(0.08)) - f32(group / 2)) + statusWidth);
-  const coinLeft = f32(statusRight + BAR_GAP);
+  const coinLeft = f32(statusRight + BAR_LABEL_GAP);
   placeTopLeft(frames.status, left, BOTTOM_BAR_TOP);
   BlzFrameSetSize(frames.status, f32(statusRight - left), f32(0.012));
   BlzFrameSetTextAlignment(frames.status, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_RIGHT);
