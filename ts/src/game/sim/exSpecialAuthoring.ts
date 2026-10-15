@@ -85,9 +85,13 @@ export function upgradeSpecial(move: AuthoredSpecial, upgrade: ExUpgrade): Autho
 
 export function withExKit(kit: SpecialKit, upgrade: ExUpgrade): SpecialKit {
   const exMove = upgrader(upgrade);
-  const withEx = (move: AuthoredSpecial, recall: boolean): AuthoredSpecial => move.variants === undefined
-    ? { ...move, ex: exMove(move, recall) }
-    : { ...move, ex: exMove({ ...move, variants: undefined }, recall), variants: move.variants.map(variant => ({ ...variant, ex: exMove(variant, recall) })) };
+  const withEx = (move: AuthoredSpecial, recall: boolean): AuthoredSpecial => {
+    const base = { ...move };
+    base.variants = undefined;
+    return move.variants === undefined
+      ? { ...move, ex: exMove(base, recall) }
+      : { ...move, ex: exMove(base, recall), variants: move.variants.map(variant => ({ ...variant, ex: exMove(variant, recall) })) };
+  };
   const form = (move: AuthoredSpecial | undefined, recall = false): AuthoredSpecial | undefined =>
     move === undefined ? undefined : withEx(move, recall);
   return {

@@ -12,6 +12,7 @@ import { IMPACT_HIT_MODEL } from "../src/game/assets/impactAssetInfo";
 import { PROJECTILE_DRAW_OFFSETS } from "../src/game/presentation/projectileArt";
 import { AttackStyle, CandleState, Character, HeroStatusKind, SpecialAction } from "../src/game/sim/codes";
 import { CANDLE_FLAMES } from "../src/game/presentation/candleLook";
+import { dropCandle } from "../src/game/sim/heroes/koboldCandle";
 import { FIGHTER_ULTIMATES } from "../src/game/sim/ultimates";
 import { SELECTABLE_CHARACTERS, heroDefinition } from "../src/game/sim/heroes/registry";
 import { createFighter } from "../src/game/sim/fighter";
@@ -400,7 +401,7 @@ test("combat effects: rollback, pause/resume and rematch neither replay nor reta
     serviceResumePresentation(s);
     candleStep();
     expect(effectPoses(client).get(flames[0])?.timeScale).toBe(1);
-    kobold.candle.state = CandleState.airborne;
+    dropCandle(kobold);
     candleStep();
     expect(shownFlames()).toEqual([]);
     kobold.candle.state = CandleState.held;
