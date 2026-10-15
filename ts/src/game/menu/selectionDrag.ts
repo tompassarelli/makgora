@@ -79,7 +79,7 @@ function onChip(grid: RosterGrid, slot: number, choice: number, x: number, y: nu
 
 
 export function cardSlot(x: number, y: number, selectable: number): number | undefined {
-  if (y < f32(0.11) || y > 0.24199999868869781) return undefined;
+  if (y < f32(0.11) || y > f32(0.225)) return undefined;
   for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
     const left = cardX(slot);
     if (x >= left && x <= left + 0.1599999964237213 && participantActive(selectable, slot)) return slot;

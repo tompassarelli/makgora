@@ -171,6 +171,33 @@ function label(parent: framehandle, name: string, x: number, y: number, width: n
 }
 
 
+const BOTTOM_BAR_TOP = f32(0.077);
+const BAR_COIN = f32(0.011);
+const BAR_GAP = f32(0.003);
+const BAR_CHAR_WIDTH = f32(0.0055);
+
+function placeBottomBar(frames: { readonly status: framehandle; readonly wins: SessionWinsFrames }, slot: number, winsShown: boolean, statusText: string, countText: string): void {
+  const left = f32(cardX(slot) + f32(0.014));
+  const width = f32(0.132);
+  if (!winsShown) {
+    placeTopLeft(frames.status, left, BOTTOM_BAR_TOP);
+    BlzFrameSetSize(frames.status, width, f32(0.012));
+    BlzFrameSetTextAlignment(frames.status, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
+    return;
+  }
+  const statusWidth = f32(I2R(StringLength(statusText)) * BAR_CHAR_WIDTH);
+  const countWidth = f32(I2R(StringLength(countText)) * BAR_CHAR_WIDTH);
+  const group = f32(f32(f32(statusWidth + countWidth) + BAR_COIN) + f32(BAR_GAP * 2));
+  const statusRight = f32(f32(f32(cardX(slot) + f32(0.08)) - f32(group / 2)) + statusWidth);
+  const coinLeft = f32(statusRight + BAR_GAP);
+  placeTopLeft(frames.status, left, BOTTOM_BAR_TOP);
+  BlzFrameSetSize(frames.status, f32(statusRight - left), f32(0.012));
+  BlzFrameSetTextAlignment(frames.status, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_RIGHT);
+  placeTopLeft(frames.wins.coin, coinLeft, f32(BOTTOM_BAR_TOP + f32(f32(BAR_COIN - f32(0.012)) / 2)));
+  BlzFrameSetSize(frames.wins.coin, BAR_COIN, BAR_COIN);
+  placeTopLeft(frames.wins.count, f32(f32(coinLeft + BAR_COIN) + BAR_GAP), BOTTOM_BAR_TOP);
+}
+
 function hotspot(parent: framehandle, x: number, y: number, width: number, height: number): framehandle {
   const frame = BlzCreateFrame("ScriptDialogButton", parent, 0, 0);
   placeTopLeft(frame, x, y);
@@ -329,8 +356,8 @@ export class SelectionPanel {
       const teamLabel = label(team, `MeleeTeam${name}`, teamArea.x, f32(0.267), teamArea.width, f32(0.019), f32(0.01));
       const portrait = art(root, `MeleePortrait${name}`, portraitTexture(Character.demonHunter, false, slot), x + f32(0.029), f32(0.245), f32(0.102), f32(0.102));
       const name_ = label(root, `MeleeName${name}`, x + f32(0.008), f32(0.102), f32(0.144), f32(0.019), f32(0.011));
-      const wins = createSessionWinsFrames(root, name, f32(x + f32(0.054)), f32(0.081));
-      const status = label(root, `MeleeStatus${name}`, x + f32(0.014), f32(0.077), f32(0.132), f32(0.012), f32(0.009));
+      const wins = createSessionWinsFrames(root, name, f32(x + f32(0.054)), BOTTOM_BAR_TOP);
+      const status = label(root, `MeleeStatus${name}`, x + f32(0.014), BOTTOM_BAR_TOP, f32(0.132), f32(0.012), f32(0.009));
       const chip = art(root, `MeleeChip${name}`, `war3mapImported\\SelectionChipP${I2S(slot + 1)}.tga`, x + f32(0.06), f32(0.2), f32(0.06), f32(0.06));
       BlzFrameSetLevel(chip, 10);
       const box = cpuSettingsBox(slot);
@@ -894,8 +921,9 @@ export class SelectionPanel {
       BlzFrameSetVisible(frames.name, active && ready);
       const winsShown = active && ready && sessionWins[slot] > 0;
       presentSessionWinsFrames(frames.wins, sessionWins[slot], active && ready);
-      placeTopLeft(frames.status, f32(cardX(slot) + f32(0.014)), winsShown ? f32(0.067) : f32(0.077));
-      setFrameText(frames.status, human && !humanPresent(game, slot) ? "No player" : active && !ready ? "Choose fighter" : `P${I2S(slot + 1)}`);
+      const statusText = human && !humanPresent(game, slot) ? "No player" : active && !ready ? "Choose fighter" : active && !human ? "CPU" : `P${I2S(slot + 1)}`;
+      setFrameText(frames.status, statusText);
+      placeBottomBar(frames, slot, winsShown, statusText, `x${I2S(sessionWins[slot])}`);
       if (ready) {
         BlzFrameSetTexture(frames.portrait, portraitTexture(choice, false, slot), 0, true);
         setFrameText(frames.name, nameText(choice));
@@ -907,10 +935,9 @@ export class SelectionPanel {
       BlzFrameSetVisible(frames.summary, computer);
       BlzFrameSetVisible(frames.settings, computer);
       if (computer) {
-        BlzFrameSetVisible(frames.status, false);
         setFrameText(frames.summary, cpuCardSummary(game, slot));
         setFrameText(frames.settingsLabel, this.menuFocus?.kind === "settings" && this.menuFocus.slot === slot ? "> Opponent settings <" : "Opponent settings");
-      } else BlzFrameSetVisible(frames.status, true);
+      }
       BlzFrameSetVisible(frames.chip, active);
       BlzFrameSetTexture(frames.chip, `war3mapImported\\SelectionChip${human ? `P${I2S(slot + 1)}` : "CPU"}.tga`, 0, true);
       const carried = drag.dragging === slot || (!ready && drag.held === slot && drag.hover !== undefined);

@@ -47,7 +47,7 @@ export type TrainingSetting = "behaviour" | "escape" | "tech" | "damage";
 
 
 export function cpuSettingsBox(slot: number): RuleBox {
-  return { x: f32(f32(cardX(slot)) + f32(0.007)), y: f32(0.078), width: f32(0.146), height: f32(0.019) };
+  return { x: f32(f32(cardX(slot)) + f32(0.007)), y: f32(0.243), width: f32(0.146), height: f32(0.017) };
 }
 
 export function teamSettingsBox(slot: number): RuleBox {
