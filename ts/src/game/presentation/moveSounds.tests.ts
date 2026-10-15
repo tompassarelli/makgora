@@ -3,7 +3,8 @@ import { AttackStyle, Character } from "../sim/codes";
 import { SELECTABLE_CHARACTERS, fighterName } from "../sim/heroes/registry";
 import { VERIFIED_STOCK_SOUNDS } from "../assets/stockSoundInfo";
 import { HitElement } from "../sim/hitRegions";
-import { moveSound, playHit, playPerform, playShieldHit, soundFiles, soundedMoves } from "./moveSounds";
+import { CONSECRATION_SOUND, CONSECRATION_VOLUME, isSpecialMove, moveSound, playHit, playPerform, playShieldHit, soundFiles, soundedMoves, specialMove } from "./moveSounds";
+import { SWING_SOUND } from "./moveTiers";
 
 test("every move has weak, strong and shield audio and every configured sound exists in the installed game [k4 reference native]", () => {
   const missing: string[] = [];
@@ -100,4 +101,46 @@ test("Grom performs and lands every move without Bloodlust audio while his weapo
       assertEquals(impacts.length > 0, true, `Grom ${move} weapon impacts`);
     }
   }
+});
+
+const SWORD_HIT: { readonly [move: number]: string } = {
+  [AttackStyle.jab]: "MetalLightSliceFlesh", [AttackStyle.jab2]: "MetalLightSliceFlesh",
+  [AttackStyle.forwardTilt]: "MetalHeavySliceFlesh", [AttackStyle.forwardTiltUp]: "MetalHeavySliceFlesh", [AttackStyle.forwardTiltDown]: "MetalHeavySliceFlesh",
+  [AttackStyle.upTilt]: "MetalHeavySliceFlesh", [AttackStyle.downTilt]: "MetalHeavySliceFlesh", [AttackStyle.dashAttack]: "MetalHeavySliceFlesh",
+  [AttackStyle.forwardSmash]: "MetalHeavySliceFlesh", [AttackStyle.upSmash]: "MetalHeavySliceFlesh", [AttackStyle.downSmash]: "MetalHeavySliceFlesh",
+  [AttackStyle.neutralAir]: "MetalHeavySliceFlesh", [AttackStyle.forwardAir]: "MetalHeavySliceFlesh", [AttackStyle.backAir]: "MetalMediumSliceFlesh",
+  [AttackStyle.upAir]: "MetalHeavySliceFlesh", [AttackStyle.downAir]: "MetalHeavySliceFlesh",
+  [specialMove(0)]: "MetalHeavySliceFlesh", [specialMove(1)]: "MetalHeavySliceFlesh", [specialMove(2)]: "MetalMediumSliceFlesh", [specialMove(3)]: "WoodLightBashFlesh",
+};
+const PALADIN_PERFORM: { readonly [move: number]: string } = {
+  [specialMove(0)]: "DispelMagic", [specialMove(1)]: "DivineShield", [specialMove(2)]: "InnerFire", [specialMove(3)]: CONSECRATION_SOUND,
+};
+const CONSECRATION_VOLUME_BEFORE = 100;
+
+test("Forsaken Paladin swings and hits with stock sword sounds and plays Consecration's sound once per cast, quieter than before [k3 measure #216]", () => {
+  const paladin = Character.forsakenPaladin;
+  const consecration = soundFiles(CONSECRATION_SOUND);
+  const rows: string[] = [];
+  const expected: string[] = [];
+  for (const move of soundedMoves(paladin)) {
+    const row = moveSound(paladin, move);
+    const labels = (layers: readonly { readonly sounds: readonly string[] }[] | undefined) => (layers ?? []).map((layer) => layer.sounds.join("|")).join("+");
+    rows.push(`${move}: perform ${labels(row?.perform)} hit ${labels(row?.hit)} strong ${labels(row?.strong)} voice ${row?.voice === undefined ? "-" : "yes"}`);
+    const hit = SWORD_HIT[move] ?? "missing";
+    expected.push(`${move}: perform ${PALADIN_PERFORM[move] ?? SWING_SOUND} hit ${hit} strong ${isSpecialMove(move) ? hit : "MetalHeavySliceFlesh"}+MetalHeavySliceMetal voice -`);
+    for (let serial = 0; serial < 6; serial++) {
+      const performed: { file: string; volume: number }[] = [];
+      const impacts: string[] = [];
+      playPerform(paladin, move, serial, (file, volume) => performed.push({ file, volume }));
+      playHit(paladin, move, false, HitElement.normal, serial, (file) => impacts.push(file));
+      playHit(paladin, move, true, HitElement.normal, serial, (file) => impacts.push(file));
+      playShieldHit(paladin, move, serial, (file) => impacts.push(file));
+      const casts = performed.filter((sound) => consecration.includes(sound.file));
+      assertEquals(casts.length, move === specialMove(3) ? 1 : 0, `${move} Consecration sounds per cast`);
+      for (const cast of casts) assertEquals(cast.volume < CONSECRATION_VOLUME_BEFORE, true, `${move} Consecration volume ${cast.volume}`);
+      assertEquals(impacts.some((file) => consecration.includes(file)), false, `${move} Consecration sound on impact`);
+    }
+  }
+  assertEquals(rows.join("\n"), expected.join("\n"));
+  assertEquals(CONSECRATION_VOLUME < CONSECRATION_VOLUME_BEFORE, true);
 });

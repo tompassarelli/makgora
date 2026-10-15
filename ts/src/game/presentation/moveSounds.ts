@@ -49,6 +49,8 @@ interface FighterSound {
   readonly normals?: { readonly [style: number]: { readonly perform?: string; readonly hit?: string } | undefined } | undefined;
 }
 
+export const CONSECRATION_SOUND = "HolyBolt";
+export const CONSECRATION_VOLUME = 70;
 const s = (perform: string | undefined, hit: string, performVolume?: number): SpecialSound => ({ perform, hit, performVolume });
 
 export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | undefined } = {
@@ -77,8 +79,8 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
     specials: [s("ZigguratFrostMissileLaunch", "FrostNova"), s("DeathAndDecayTarget", "DeathAndDecayTarget"), s("DarkRitual", "LichMissile"), s("FrostArmor", "FrostBoltHit")],
   },
   [Character.forsakenPaladin]: {
-    weapon: Weapon.blunt, swing: ["HeroPaladinAttack1", "HeroPaladinAttack2"], strong: "HolyBolt",
-    specials: [s("DispelMagic", "WoodHeavyBashFlesh"), s("DivineShield", "WoodHeavyBashFlesh"), s("InnerFire", "WoodMediumBashFlesh"), s("Heal", "HolyBolt")],
+    weapon: Weapon.blade, strong: "MetalHeavySliceMetal",
+    specials: [s("DispelMagic", "MetalHeavySliceFlesh"), s("DivineShield", "MetalHeavySliceFlesh"), s("InnerFire", "MetalMediumSliceFlesh"), s(CONSECRATION_SOUND, "WoodLightBashFlesh", CONSECRATION_VOLUME)],
   },
   [Character.dreadlord]: {
     weapon: Weapon.claw, strong: "CarrionSwarmDamage",
