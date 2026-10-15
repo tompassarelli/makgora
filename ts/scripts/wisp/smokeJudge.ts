@@ -9,6 +9,7 @@ import { fighterAt, isActive } from "../../src/game/sim/roster";
 import { type MoveClass, SMOKE_BINDINGS, type SmokeStep, type SmokeTape, bindingSweep, keyName, tapeFrames } from "./smokeTape";
 
 export const STEP_SLACK = 24;
+export const FREEZE_FRAMES = STEP_SLACK;
 
 export type SmokePlan = SmokeTape;
 
@@ -19,11 +20,19 @@ export interface StepResult {
   readonly kind: "binding" | "move" | "setup";
   readonly pass: boolean;
   readonly reason: string;
+  readonly lost?: number;
+}
+
+export interface FrozenStep {
+  readonly slot: number;
+  readonly step: string;
+  readonly lost: number;
 }
 
 export interface SmokeVerdict {
   readonly replay: MatchReplayResult;
   readonly results: readonly StepResult[];
+  readonly frozen: readonly FrozenStep[];
 }
 
 interface Start {
@@ -98,22 +107,54 @@ export function judgeSmoke(lines: readonly string[], plans: readonly SmokePlan[]
     for (const [slot, trace] of traces) if (isActive(state.world, slot)) traceFrame(trace, state, slot, frame, rows.rows[slot]?.held ?? 0);
   });
   const results: StepResult[] = [];
+  const frozen: FrozenStep[] = [];
   const cursors = new Map<number, number>();
+  const carried = new Map<number, number>();
   for (const { slot, steps } of plans) {
     const trace = traces.get(slot);
     if (trace === undefined) continue;
     const from = cursors.get(slot) ?? 1;
+    const anchors: (number | undefined)[] = [];
+    const expectations: (number | undefined)[] = [];
+    const ats: number[] = [];
     let expected: number | undefined;
+    let previous = from - 1;
     for (const step of steps) {
-      const anchor = expected === undefined ? anchorOf(trace, firstPressMask(step), from, trace.held.length) : anchorOf(trace, firstPressMask(step), Math.max(from, expected - STEP_SLACK), expected + STEP_SLACK);
+      const anchor = anchorOf(trace, firstPressMask(step), Math.max(from, previous + 1), expected === undefined ? trace.held.length : expected + STEP_SLACK);
       const at = anchor ?? expected ?? from;
-      const result = stepResult(slot, trace, step, anchor, at, expected);
-      if (result !== undefined) results.push(result);
+      anchors.push(anchor);
+      expectations.push(expected);
+      ats.push(at);
       expected = at + step.frames;
+      previous = at;
     }
+    let carry = carried.get(slot) ?? 0;
+    let judged = false;
+    steps.forEach((step, index) => {
+      const at = ats[index] ?? from;
+      const next = anchors[index + 1];
+      const own = next === undefined ? 0 : Math.max(0, at + step.frames - next);
+      if (own > FREEZE_FRAMES) frozen.push({ slot, step: step.name, lost: own });
+      const result = stepResult(slot, trace, step, anchors[index], at, expectations[index]);
+      if (result === undefined) {
+        carry += own;
+        return;
+      }
+      judged = true;
+      const lost = carry + own;
+      carry = 0;
+      results.push(!result.pass && lost > FREEZE_FRAMES ? { ...result, lost, reason: `${result.reason}, while the client froze and lost ${lost} frames` } : result);
+    });
+    carried.set(slot, judged ? 0 : carry);
     cursors.set(slot, Math.max(from, (expected ?? from) - STEP_SLACK));
   }
-  return { replay, results };
+  return { replay, results, frozen };
+}
+
+export function freezeInvalid({ results, frozen }: SmokeVerdict, spotFailures: readonly string[] = []): string[] {
+  const moves = results.filter(({ pass, lost }) => !pass && lost !== undefined).map(({ slot, fighter, step, lost }) => `P${slot + 1} ${fighter} ${step} lost ${lost} frames`);
+  const spots = spotFailures.flatMap((step) => frozen.filter((freeze) => freeze.step === step).map(({ slot, lost }) => `${step} spot lost ${lost} frames on P${slot + 1}`));
+  return [...moves, ...spots];
 }
 
 export function smokeReceipt({ replay, results }: SmokeVerdict, fighters: number): string {
@@ -132,6 +173,7 @@ export const smokeLines = ({ replay, results }: SmokeVerdict): string[] => [
 export const mergeVerdicts = (verdicts: readonly SmokeVerdict[]): SmokeVerdict => ({
   replay: verdicts.reduce<MatchReplayResult>((sum, { replay }) => ({ ...sum, frames: sum.frames + replay.frames, problems: [...sum.problems, ...replay.problems], reached: sum.reached + replay.reached, recorded: sum.recorded + replay.recorded }), { checksum: "", frames: 0, problems: [], reached: 0, recorded: 0, digests: 0, divergent: 0 }),
   results: verdicts.flatMap(({ results }) => results),
+  frozen: verdicts.flatMap(({ frozen }) => frozen),
 });
 
 export function smokePace(lines: readonly string[], sweep: readonly SmokeStep[] = bindingSweep()): number | undefined {

@@ -21,6 +21,12 @@
   headless (smashcraft:ts/scripts/wisp/smokeJudge.ts): the replay must reach
   every recorded checksum, every key must reach the game and every move must
   start, or `gate-moves` fails and the green install keeps the last good map.
+  Keys go out through xdotool with no per-key delay, timed from the game
+  rate each match's replay measures. When a step's next reset arrives more
+  than 24 frames early, the client froze for that long; a failed move or spot
+  check in such a step makes the match invalid, and the gate plays it again,
+  up to three attempts, keeping `match-NN-invalid-K.txt` and its reasons. A
+  failed spot check also keeps its before and after frames as PPM files.
   `bun wisp smoke` rehearses the same tapes headless on every pair in about ten
   seconds; run it after changing a fighter's inputs or kit.
   `gate-specials-spot` runs in the same session, after `gate-moves`: at each

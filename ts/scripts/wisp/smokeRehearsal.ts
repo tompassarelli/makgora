@@ -46,12 +46,18 @@ export function approachFrames(character: Character, slot: number): number {
 
 export const smokeApproaches = (first: Character, second: Character): [number, number] => [approachFrames(first, 0), approachFrames(second, 1)];
 
+export interface Freeze {
+  readonly segment: number;
+  readonly at: number;
+  readonly frames: number;
+}
+
 export interface Rehearsal {
   readonly lines: string[];
   readonly starts: number[];
 }
 
-export function rehearsal(first: Character, second: Character, bindings: KeyBindings, schedule: readonly SmokeSegment[], rate = 1): Rehearsal {
+export function rehearsal(first: Character, second: Character, bindings: KeyBindings, schedule: readonly SmokeSegment[], rate = 1, freeze?: Freeze): Rehearsal {
   const tape = schedule.reduce((total, segment) => total + segmentFrames(segment) + BETWEEN_FRAMES, LEAD_FRAMES);
   const masks = [new Array<number>(tape).fill(0), new Array<number>(tape).fill(0)];
   let start = LEAD_FRAMES;
@@ -61,8 +67,14 @@ export function rehearsal(first: Character, second: Character, bindings: KeyBind
     for (const { slot, steps } of segment) heldMasks(steps, bindings).forEach((held, index) => { const row = masks[slot]; if (row !== undefined) row[start + index] = held; });
     start += segmentFrames(segment) + BETWEEN_FRAMES;
   }
-  const frames = Math.ceil(tape * rate);
-  const paced = masks.map((row) => Array.from({ length: frames }, (_, frame) => row[Math.floor(frame / rate)] ?? 0));
+  const frozenAt = freeze === undefined ? tape : (starts[freeze.segment] ?? tape) + freeze.at;
+  const skipped = freeze?.frames ?? 0;
+  const tapeAt = (frame: number) => {
+    const played = Math.floor(frame / rate);
+    return played < frozenAt ? played : played + skipped;
+  };
+  const frames = Math.ceil((tape - skipped) * rate);
+  const paced = masks.map((row) => Array.from({ length: frames }, (_, frame) => row[tapeAt(frame)] ?? 0));
   return { lines: recorded(first, second, frames, paced.map(keyboardRows)), starts: starts.map((frame) => Math.round(frame * rate)) };
 }
 

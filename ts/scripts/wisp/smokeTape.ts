@@ -167,15 +167,14 @@ function edges(steps: readonly SmokeStep[]): KeyEdge[] {
 
 export const FRAME_MILLIS = 1000 / 60;
 
-export const NATIVE_PACE = 1.04;
-
 export function xdotoolArgs(steps: readonly SmokeStep[], pace = 1): string[] {
   const args: string[] = [];
   let frame = 0;
   for (const edge of edges(steps)) {
     if (edge.frame > frame) args.push("sleep", ((edge.frame - frame) * FRAME_MILLIS / 1000 / pace).toFixed(3));
     frame = edge.frame;
-    args.push(edge.down ? "keydown" : "keyup", keyName(edge.key));
+    // xdotool sleeps 12 ms after every key event unless told otherwise, which would stretch each edge past its frame.
+    args.push(edge.down ? "keydown" : "keyup", "--delay", "0", keyName(edge.key));
   }
   return args;
 }

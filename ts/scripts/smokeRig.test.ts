@@ -5,9 +5,9 @@ import { Character } from "../src/game/sim/codes";
 import { PLAYABLE_CHARACTERS } from "../src/game/sim/heroes/registry";
 import { SMASHCRAFT_ACCEPT } from "./wisp/acceptChecks";
 import { GREEN_GATE_CHECKS, greenGateFailures } from "./wisp/greenBuilds";
-import { judgeSmoke, smokeLines, smokePace, smokeReceipt } from "./wisp/smokeJudge";
+import { FREEZE_FRAMES, freezeInvalid, judgeSmoke, smokeLines, smokePace, smokeReceipt } from "./wisp/smokeJudge";
 import { rehearsal, rehearseSmoke, smokeApproaches } from "./wisp/smokeRehearsal";
-import { NATIVE_PACE, SMOKE_BINDINGS, bindingSweep, keyName, smokeSchedule, xdotoolArgs } from "./wisp/smokeTape";
+import { SMOKE_BINDINGS, bindingSweep, keyName, smokeSchedule, tapeFrames, xdotoolArgs } from "./wisp/smokeTape";
 import { type Settle, specialsReceipt, specialsSpot } from "./wisp/specialsSpot";
 
 test("the smoke tape starts every move, the ultimate included, and reaches every standard key for both fighters of a pair [k1 scenario]", () => {
@@ -28,6 +28,7 @@ test("a key the map no longer binds fails that key and every move pressed with i
   expect(failed.some(({ step }) => step === "Ultimate")).toBe(true);
   expect(failed.some(({ step }) => step === "Jab")).toBe(false);
   expect(smokeReceipt(verdict, 2)).toEndWith("pass=0");
+  expect(freezeInvalid(verdict)).toEqual([]);
 });
 
 test("the green gate refuses a candidate whose move smoke failed, and the move gate demands the whole roster [k2 property]", () => {
@@ -64,12 +65,32 @@ test("a special whose effect is still drawn at the next rest fails the spot chec
   expect(pattern.test(specialsReceipt(PLAYABLE_CHARACTERS.length, []))).toBe(false);
 });
 
-test("a native client stepping faster than the wall clock still starts every move, and the rig measures that pace from the replay and slows its keys to match [k1 scenario]", () => {
+test("a native client stepping slower than the wall clock still starts every move, and the rig measures that pace from the replay and stretches its keys to match, sending every key edge without xdotool's own delay [k1 scenario]", () => {
+  const pace = 59.5 / 60;
   const schedule = smokeSchedule(smokeApproaches(Character.rifleman, Character.demonHunter));
-  const paced = rehearsal(Character.rifleman, Character.demonHunter, SMOKE_BINDINGS, schedule, NATIVE_PACE);
+  const paced = rehearsal(Character.rifleman, Character.demonHunter, SMOKE_BINDINGS, schedule, pace);
   expect(smokeLines(judgeSmoke(paced.lines, schedule.flat())).filter((line) => !line.startsWith("PASS"))).toEqual([]);
-  expect(Math.abs((smokePace(paced.lines) ?? 0) - NATIVE_PACE)).toBeLessThan(0.005);
+  expect(Math.abs((smokePace(paced.lines) ?? 0) - pace)).toBeLessThan(0.005);
   const sweep = bindingSweep();
-  const slept = (args: readonly string[]) => args.reduce((total, arg, index) => (args[index - 1] === "sleep" ? total + Number(arg) : total), 0);
-  expect(Math.abs(slept(xdotoolArgs(sweep, NATIVE_PACE)) - slept(xdotoolArgs(sweep)) / NATIVE_PACE)).toBeLessThan(0.05);
+  const args = xdotoolArgs(sweep, pace);
+  const slept = (list: readonly string[]) => list.reduce((total, arg, index) => (list[index - 1] === "sleep" ? total + Number(arg) : total), 0);
+  expect(Math.abs(slept(args) - slept(xdotoolArgs(sweep)) / pace)).toBeLessThan(0.05);
+  const edges = args.flatMap((arg, index) => (arg === "keydown" || arg === "keyup" ? [args.slice(index + 1, index + 3).join(" ")] : []));
+  expect(edges.length).toBe(2 * sweep.length);
+  expect(edges.every((edge) => edge === "--delay 0")).toBe(true);
+});
+
+test("a client freeze that swallows a special's keys fails that special as invalid for the rerun, and the steps after it are still judged on their own keys [k1 scenario]", () => {
+  const schedule = smokeSchedule(smokeApproaches(Character.rifleman, Character.demonHunter));
+  const steps = schedule[1]?.[0]?.steps ?? [];
+  const away = steps.findIndex(({ name }) => name === "Side special away");
+  const lost = 110;
+  const paced = rehearsal(Character.rifleman, Character.demonHunter, SMOKE_BINDINGS, schedule, 1, { segment: 1, at: tapeFrames(steps.slice(0, away)) + 70, frames: lost });
+  const verdict = judgeSmoke(paced.lines, schedule.flat());
+  const failed = verdict.results.filter(({ pass }) => !pass);
+  expect(failed.map(({ step }) => step)).toEqual(["Side special away", "Side special away"]);
+  expect(failed.every((result) => (result.lost ?? 0) > FREEZE_FRAMES)).toBe(true);
+  expect(verdict.results.filter(({ step }) => step === "Up special" || step === "Ultimate").every(({ pass }) => pass)).toBe(true);
+  expect(freezeInvalid(verdict)).toHaveLength(2);
+  expect(freezeInvalid(verdict, ["Side special away"])).toHaveLength(4);
 });

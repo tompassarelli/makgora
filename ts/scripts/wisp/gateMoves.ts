@@ -3,7 +3,8 @@ import { join } from "node:path";
 import { Clock, Effect } from "effect";
 import { ChildProcess } from "effect/process";
 import { AcceptFailure, type ReceiptFile } from "wisp/scripts/wisp/accept";
-import { InputInjection } from "wisp/scripts/platform/services";
+import { InputInjection, encodePpm } from "wisp/scripts/platform/services";
+import type { Frame } from "wisp/scripts/wisp/frameProbe";
 import { type Client, batch, capture, captureTimed, click, focus, frameWords, loadClients } from "wisp/scripts/warcraft/desktop";
 import { journalMenuFile } from "../../src/game/core/gameFiles";
 import { cardX } from "../../src/game/menu/selectionDrag";
@@ -16,9 +17,9 @@ import { pollUntil } from "../hostPoll";
 import { runProcess } from "../hostProcess";
 import { JournalMenu } from "./boundary";
 import { readReplay } from "./replayFiles";
-import { type SmokeVerdict, judgeSmoke, mergeVerdicts, smokeLines, smokePace, smokeReceipt } from "./smokeJudge";
+import { type SmokeVerdict, freezeInvalid, judgeSmoke, mergeVerdicts, smokeLines, smokePace, smokeReceipt } from "./smokeJudge";
 import { smokeApproaches } from "./smokeRehearsal";
-import { FRAME_MILLIS, NATIVE_PACE, RESET_LEAD, SETTLE_AT, type SettlePoint, settlePoints, smokeSchedule, xdotoolArgs } from "./smokeTape";
+import { FRAME_MILLIS, RESET_LEAD, SETTLE_AT, type SettlePoint, settlePoints, smokeSchedule, xdotoolArgs } from "./smokeTape";
 import { type Settle, type SpotResult, brightCount, playArea, specialsReceipt, specialsSpot } from "./specialsSpot";
 
 const fail = (operation: string) => (cause: { readonly message: string }) => new AcceptFailure({ operation, problem: cause.message });
@@ -26,6 +27,7 @@ const REPLAY = /^smashcraft-replay-(\d+)\.txt$/;
 const SEGMENT_GAP = "1 second";
 const MATCH_SETTLE = "6 seconds";
 const PAUSE_SETTLE = "1500 millis";
+const MATCH_ATTEMPTS = 3;
 
 // A fresh private desktop's Xwayland drops the first XTEST motion.
 const POINTER_PRIME_ATTEMPTS = 3;
@@ -53,6 +55,29 @@ export interface MovesGateReceipts {
 }
 
 const nowNs = () => performance.now() * 1_000_000;
+
+interface SettleShot {
+  readonly settle: Settle;
+  readonly frame: Frame | undefined;
+}
+
+const spotFrameFiles = (stem: string, runs: readonly (readonly SettleShot[])[], failed: readonly string[]): [string, Uint8Array][] => runs.flatMap(run => run.flatMap(({ settle: { step }, frame }, index): [string, Uint8Array][] => {
+  const after = run[index + 1]?.frame;
+  if (!failed.includes(step) || frame === undefined || after === undefined) return [];
+  const slug = step.toLowerCase().replaceAll(" ", "-");
+  return [[`${stem}-${slug}-before.ppm`, encodePpm(frame)], [`${stem}-${slug}-after.ppm`, encodePpm(after)]];
+}));
+
+function withSelection(judged: SmokeVerdict, fighters: readonly string[]): SmokeVerdict {
+  const seen = [0, 1].map(slot => judged.results.find(result => result.slot === slot)?.fighter ?? "none");
+  return { ...judged, results: [{ slot: 0, fighter: seen.join(" vs "), step: "fighter selection", kind: "setup", pass: seen.join() === fighters.join(), reason: `wanted ${fighters.join(" vs ")}` }, ...judged.results] };
+}
+
+const matchRecord =(header: readonly string[], verdict: SmokeVerdict, results: readonly SpotResult[], fighters: readonly string[], settles: readonly Settle[]) => `${[
+  ...header, smokeReceipt(verdict, 2), ...smokeLines(verdict), specialsReceipt(2, results), ...spotLines(fighters, results),
+  ...verdict.frozen.map(({ slot, step, lost }) => `freeze P${slot + 1} ${step}: the client lost ${lost} frames`),
+  ...settles.map(({ step, count, onTime }) => `settle ${step} bright=${count}${onTime ? "" : " late"}`),
+].join("\n")}\n`;
 
 export const measureMovesGate = (clientsFile: string, directory: string) => Effect.gen(function*() {
   const clients = yield* loadClients(clientsFile).pipe(Effect.mapError(fail("moves gate clients")));
@@ -83,7 +108,7 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
     return yield* new AcceptFailure({ operation: "moves gate pointer", problem: `no pointer motion reached ${client.name} in ${POINTER_PRIME_ATTEMPTS} tries` });
   });
   const tap = (client: Client, key: string) => xdotool(client, ["keydown", key, "sleep", "0.12", "keyup", key]);
-  const save = (file: string, text: string) => Effect.try({ try: () => writeFileSync(join(directory, file), text, { mode: 0o600 }), catch: cause => new AcceptFailure({ operation: "moves gate evidence", problem: String(cause) }) });
+  const save = (file: string, text: string | Uint8Array) => Effect.try({ try: () => writeFileSync(join(directory, file), text, { mode: 0o600 }), catch: cause => new AcceptFailure({ operation: "moves gate evidence", problem: String(cause) }) });
 
   const initial = yield* menu();
   if (initial.phase !== "CHARACTER") return yield* new AcceptFailure({ operation: "moves gate setup", problem: `expected CHARACTER, got ${initial.phase}` });
@@ -105,17 +130,17 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
   const verdicts: { readonly fighters: readonly string[]; readonly verdict: SmokeVerdict }[] = [];
   const spots: { readonly fighters: readonly string[]; readonly results: readonly SpotResult[] }[] = [];
   let area = 0;
-  let pace = NATIVE_PACE;
-  const settle = (points: readonly SettlePoint[], startNs: number) => Effect.forEach(points, point => Effect.gen(function*() {
+  let pace = 1;
+  const settle = (points: readonly SettlePoint[], startNs: number) => Effect.forEach(points, (point, index) => Effect.gen(function*() {
     const targetNs = startNs + point.frame * FRAME_MILLIS * 1_000_000 / pace;
     const waitMillis = (targetNs - nowNs()) / 1_000_000;
     if (waitMillis > 0) yield* Effect.sleep(`${Math.round(waitMillis)} millis`);
     const { frame, afterNs } = yield* captureTimed(host, nowNs, hostView).pipe(Effect.mapError(fail("moves gate settle frame")));
     area = playArea(frame);
-    return { step: point.step, special: point.special, count: brightCount(frame), onTime: afterNs - targetNs < (RESET_LEAD - SETTLE_AT) * FRAME_MILLIS * 1_000_000 / pace } satisfies Settle;
+    const kept = point.special || points[index - 1]?.special === true ? frame : undefined;
+    return { settle: { step: point.step, special: point.special, count: brightCount(frame), onTime: afterNs - targetNs < (RESET_LEAD - SETTLE_AT) * FRAME_MILLIS * 1_000_000 / pace } satisfies Settle, frame: kept };
   }));
-  for (const [index, pair] of smokePairs().entries()) {
-    const characters = pair.map(choice => PLAYABLE_CHARACTERS[choice] ?? Character.rifleman);
+  const playMatch = (index: number, pair: readonly [number, number], characters: readonly Character[]) => Effect.gen(function*() {
     for (const [slot, client] of clients.entries()) {
       const viewport = yield* input.windowRegion(client).pipe(Effect.mapError(fail("moves gate viewport")));
       const cell = cellRect(grid, pair[slot] ?? 0);
@@ -138,7 +163,7 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
     ), { every: "200 millis", within: "30 seconds", orElse: () => Effect.fail(new AcceptFailure({ operation: "moves gate match", problem: "STAGE SELECT stays drawn after the start" })) });
     yield* Effect.sleep(MATCH_SETTLE);
     const schedule = smokeSchedule(smokeApproaches(characters[0] ?? Character.rifleman, characters[1] ?? Character.rifleman));
-    const runs: Settle[][] = [];
+    const runs: SettleShot[][] = [];
     for (const segment of schedule) {
       yield* Effect.forEach(segment.flatMap(({ slot }) => clients[slot] ?? []), client => focus(client).pipe(Effect.mapError(fail("moves gate focus"))), { discard: true });
       const points = settlePoints(segment[0]?.steps ?? []);
@@ -166,18 +191,35 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
     }), { every: "200 millis", within: "15 seconds", orElse: () => Effect.fail(new AcceptFailure({ operation: "moves gate replay", problem: `no replay written after match ${index + 1}` })) });
     const lines = readReplay(join(data, manifest));
     if (typeof lines === "string") return yield* new AcceptFailure({ operation: "moves gate replay", problem: lines });
-    const judged = judgeSmoke(lines, schedule.flat());
-    const measured = smokePace(lines);
-    const played = pace;
-    if (measured !== undefined) pace = measured * played;
+    return { manifest, lines, schedule, runs };
+  });
+  for (const [index, pair] of smokePairs().entries()) {
+    const characters = pair.map(choice => PLAYABLE_CHARACTERS[choice] ?? Character.rifleman);
     const fighters = characters.map(fighterName);
-    const seen = [0, 1].map(slot => judged.results.find(result => result.slot === slot)?.fighter ?? "none");
-    const verdict: SmokeVerdict = { ...judged, results: [{ slot: 0, fighter: seen.join(" vs "), step: "fighter selection", kind: "setup", pass: seen.join() === fighters.join(), reason: `wanted ${fighters.join(" vs ")}` }, ...judged.results] };
-    verdicts.push({ fighters, verdict });
-    const results = specialsSpot(runs, area);
-    spots.push({ fighters, results });
-    const settleLines = runs.flat().map(({ step, count, onTime }) => `settle ${step} bright=${count}${onTime ? "" : " late"}`);
-    yield* save(`match-${String(index + 1).padStart(2, "0")}.txt`, `${[`replay ${manifest}`, `fighters ${fighters.join(" vs ")}`, `pace played ${played.toFixed(4)} next ${pace.toFixed(4)}`, smokeReceipt(verdict, 2), ...smokeLines(verdict), specialsReceipt(2, results), ...spotLines(fighters, results), ...settleLines].join("\n")}\n`);
+    const name = `match-${String(index + 1).padStart(2, "0")}`;
+    const invalid: string[] = [];
+    for (let attempt = 1; ; attempt++) {
+      const { manifest, lines, schedule, runs } = yield* playMatch(index, pair, characters);
+      const judged = judgeSmoke(lines, schedule.flat());
+      const measured = smokePace(lines);
+      const played = pace;
+      if (measured !== undefined) pace = measured * played;
+      const verdict = withSelection(judged, fighters);
+      const settles = runs.map(run => run.map(({ settle }) => settle));
+      const results = specialsSpot(settles, area);
+      const failedSpots = results.filter(({ pass }) => !pass).map(({ step }) => step);
+      const frozen = freezeInvalid(verdict, failedSpots);
+      const final = frozen.length === 0 || attempt === MATCH_ATTEMPTS;
+      const stem = final ? name : `${name}-invalid-${attempt}`;
+      yield* Effect.forEach(spotFrameFiles(stem, runs, failedSpots), ([file, bytes]) => save(file, bytes), { discard: true });
+      yield* save(`${stem}.txt`, matchRecord([`replay ${manifest}`, `fighters ${fighters.join(" vs ")}`, `attempt ${attempt}`, `pace played ${played.toFixed(4)} next ${pace.toFixed(4)}`, ...invalid], verdict, results, fighters, settles.flat()));
+      if (final) {
+        verdicts.push({ fighters, verdict });
+        spots.push({ fighters, results });
+        break;
+      }
+      invalid.push(`attempt ${attempt} invalid, a failure fell in a client freeze: ${frozen.join("; ")}`);
+    }
   }
   const all = mergeVerdicts(verdicts.map(({ verdict }) => verdict));
   const roster = new Set(verdicts.flatMap(({ fighters }) => fighters)).size;
