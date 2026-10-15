@@ -1,7 +1,7 @@
 import { at } from "wisp/src/runtime/lookup";
 import { fitFighterPlacement } from "../presentation/fighterPlacement";
 import { characterModelScale } from "../presentation/modelScale";
-import { CANDLE_FLAMES } from "../presentation/candleLook";
+import { CANDLE_FLAMES, CANDLE_SMOKE } from "../presentation/candleLook";
 import { CandleState } from "../sim/codes";
 import { fighterPoseFacing } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
@@ -12,6 +12,12 @@ import { facingYaw, hideEffect, placeEffect, type WorldOrigin } from "./effects"
 const CLASSIC_TIP = { x: 8.0, z: 74.0 };
 const DEFINITIVE_TIP = { x: 8.0, z: 74.0 };
 
+function candleEffectIndex(fighter: Readonly<Fighter> | undefined): number {
+  if (fighter === undefined || fighter.status.out) return -1;
+  if (fighter.candle.state === CandleState.airborne || fighter.candle.state === CandleState.resting) return CANDLE_FLAMES.length + (fighter.candle.lit ? candleLevel(fighter) : CANDLE_FLAMES.length);
+  return fighter.candle.state === CandleState.held && fighter.candle.lit ? candleLevel(fighter) : -1;
+}
+
 export class CandlePresentation {
   private readonly flames: effect[] = [];
   private readonly placement = { x: 0.0, z: 0.0 };
@@ -20,7 +26,7 @@ export class CandlePresentation {
   private paused = false;
 
   constructor(private readonly origin: Readonly<WorldOrigin>) {
-    for (const level of CANDLE_FLAMES) {
+    for (const level of [...CANDLE_FLAMES, ...CANDLE_FLAMES, CANDLE_SMOKE]) {
       const model = AddSpecialEffect(level.model, origin.x, origin.y);
       hideEffect(model, origin);
       this.flames.push(model);
@@ -28,17 +34,22 @@ export class CandlePresentation {
   }
 
   present(fighter: Readonly<Fighter> | undefined, stage: number): void {
-    const level = fighter === undefined || fighter.status.out || fighter.candle.state !== CandleState.held || !fighter.candle.lit ? -1 : candleLevel(fighter);
+    const loose = fighter !== undefined && (fighter.candle.state === CandleState.airborne || fighter.candle.state === CandleState.resting);
+    const level = candleEffectIndex(fighter);
     if (level !== this.shown && this.shown >= 0) hideEffect(at(this.flames, this.shown), this.origin);
     this.shown = level;
     if (fighter === undefined || level < 0) return;
     const model = at(this.flames, level);
     const facing = fighterPoseFacing(fighter);
     const scale = characterModelScale(fighter.character);
-    fitFighterPlacement(this.placement, fighter, stage);
-    placeEffect(model, this.origin.x + this.placement.x + this.tip.x * scale * facing, this.origin.y, this.origin.z + this.placement.z + this.tip.z * scale);
+    if (loose) placeEffect(model, this.origin.x + fighter.candle.x, this.origin.y, this.origin.z + fighter.candle.z);
+    else {
+      fitFighterPlacement(this.placement, fighter, stage);
+      placeEffect(model, this.origin.x + this.placement.x + this.tip.x * scale * facing, this.origin.y, this.origin.z + this.placement.z + this.tip.z * scale);
+    }
     BlzSetSpecialEffectYaw(model, facingYaw(facing));
-    BlzSetSpecialEffectScale(model, at(CANDLE_FLAMES, level).scale * scale);
+    const look = level === CANDLE_FLAMES.length * 2 ? CANDLE_SMOKE : at(CANDLE_FLAMES, loose ? level - CANDLE_FLAMES.length : level);
+    BlzSetSpecialEffectScale(model, look.scale * scale);
     BlzSetSpecialEffectTimeScale(model, this.paused ? 0.0 : 1.0);
   }
 

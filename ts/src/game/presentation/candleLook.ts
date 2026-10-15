@@ -11,3 +11,8 @@ export const CANDLE_FLAMES: readonly FlameLevel[] = [
   { model: "Environment\\SmallBuildingFire\\SmallBuildingFire0.mdx", scale: f32(0.35) },
   { model: "Environment\\LargeBuildingFire\\LargeBuildingFire1.mdx", scale: f32(0.3) },
 ];
+
+export const CANDLE_SMOKE: FlameLevel = {
+  model: "Abilities\\Spells\\Human\\CloudOfFog\\CloudOfFog.mdx",
+  scale: f32(0.15),
+};

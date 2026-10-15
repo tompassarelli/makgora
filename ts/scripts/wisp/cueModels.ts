@@ -5,13 +5,14 @@ import { allAttackCueModels } from "../../src/game/presentation/attackCues";
 import { DEFINITIVE_ACCENT_REDRAWS, DISJOINT_CUES } from "../../src/game/presentation/disjointCues";
 import { DEFINITIVE_PROJECTILE_REDRAWS, allProjectileModels } from "../../src/game/presentation/projectileArt";
 import { Character } from "../../src/game/sim/codes";
+import { CANDLE_FLAMES, CANDLE_SMOKE } from "../../src/game/presentation/candleLook";
 
 export type Look = "same" | "redrawn";
 
 export const CUE_MODEL_RECORD = "ts/scripts/wisp/cue-models.tsv";
 export const RECORD_COMMAND = "bun scripts/cueModels.ts --record --stock-cache DIRECTORY";
 
-export const cueModels = () => [...new Set([...Object.values(Character).flatMap(character => fighterCueList(character).map(cue => cue.model)), ...allAttackCueModels(), ...allProjectileModels(), MISSING_CUE_MODEL])];
+export const cueModels = () => [...new Set([...Object.values(Character).flatMap(character => fighterCueList(character).map(cue => cue.model)), ...allAttackCueModels(), ...allProjectileModels(), ...CANDLE_FLAMES.map(flame => flame.model), CANDLE_SMOKE.model, MISSING_CUE_MODEL])];
 
 export const redrawCandidates = () => [...new Set([...Object.values(DISJOINT_CUES).map(cue => cue.model), ...allProjectileModels()])];
 
