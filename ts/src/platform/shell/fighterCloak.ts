@@ -24,6 +24,7 @@ function fighterEffects(s: ShellState, slot: ParticipantSlot, everything: boolea
   renderers.flash.drawnEffects(drawn);
   renderers.agency.drawnEffects(drawn);
   renderers.shield.drawnEffects(drawn);
+  renderers.candle?.drawnEffects(drawn);
   renderers.cues?.weaponEffects(drawn);
   return drawn;
 }

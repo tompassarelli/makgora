@@ -16,7 +16,7 @@ import type { ModelSoundSink } from "../../game/render/modelSounds";
 import { ProjectilePresentation } from "../../game/render/projectilePresentation";
 import { ShieldPresentation } from "../../game/render/shieldPresentation";
 import { SpecialEffects } from "../../game/render/specialEffects";
-import type { Character } from "../../game/sim/codes";
+import { Character } from "../../game/sim/codes";
 import { isActive } from "../../game/sim/roster";
 import type { MenuControls } from "../../game/ui/frames";
 import { FighterHud, MatchClock, plateManaSlot } from "../../game/ui/matchHud";
@@ -35,6 +35,7 @@ import type { ShellState } from "./state";
 import { bindPrototype } from "../rebind";
 import { ItemPresentation } from "../../game/render/itemPresentation";
 import { MeterDropPresentation } from "../../game/render/meterDropPresentation";
+import { CandlePresentation } from "../../game/render/candlePresentation";
 import { BodyFlash } from "../../game/render/bodyFlash";
 import { ClassicPresentation } from "../../game/render/classicPresentation";
 import { PauseMenu } from "../../game/ui/pauseMenu";
@@ -49,6 +50,7 @@ interface FighterRenderers {
   readonly pool: FighterPoolPresentation | undefined;
   readonly agency: AgencyMarker;
   readonly flash: BodyFlash;
+  readonly candle: CandlePresentation | undefined;
 
   readonly hitAreas: HitAreaPresentation | undefined;
 }
@@ -147,6 +149,7 @@ function endFighterRenderers(renderers: FighterRenderers | undefined): void {
   renderers?.pool?.destroy();
   renderers?.agency.destroy();
   renderers?.flash.destroy();
+  renderers?.candle?.destroy();
   renderers?.hitAreas?.destroy();
 }
 
@@ -169,6 +172,7 @@ export function beginFighterRenderers(s: ShellState, slot: ParticipantSlot, char
   const pool = pooled ? new FighterPoolPresentation(character, slot, s.origin) : undefined;
   ui.placed.prepareFighter(slot, character);
   ui.fighters[slot] = { character, shield: new ShieldPresentation(slot, s.origin), projectiles: new ProjectilePresentation(character, s.origin), cues: new SpecialCueEffects(character, s.origin, sharedPlay()), pool, agency: new AgencyMarker(s.origin), flash: new BodyFlash(character, s.origin),
+    candle: character === Character.kobold ? new CandlePresentation(s.origin) : undefined,
     hitAreas: s.game.training && s.game.trainer.showHitAreas ? new HitAreaPresentation(s.origin) : undefined,
   };
   return pool?.admitted() === true;
@@ -256,6 +260,7 @@ export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (c
     if (renderers.pool !== undefined) bindPrototype(renderers.pool, FighterPoolPresentation.prototype);
     bindPrototype(renderers.agency, AgencyMarker.prototype);
     bindPrototype(renderers.flash, BodyFlash.prototype);
+    if (renderers.candle !== undefined) bindPrototype(renderers.candle, CandlePresentation.prototype);
     bindPrototype(renderers.agency.forecast, FighterAgencyForecast.prototype);
     if (renderers.hitAreas !== undefined) bindPrototype(renderers.hitAreas, HitAreaPresentation.prototype);
   }
@@ -274,6 +279,7 @@ export function clearMatchEffects(s: ShellState): void {
   ui.special.clear();
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.projectiles.clear();
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.cues?.clear();
+  for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.candle?.hide();
   ui.classic?.endMatch();
 }
 
@@ -284,4 +290,5 @@ export function pauseEffects(s: ShellState, paused: boolean): void {
   ui.elements.setPaused(paused);
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.projectiles.setPaused(paused);
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.cues?.setPaused(paused);
+  for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.candle?.setPaused(paused);
 }
