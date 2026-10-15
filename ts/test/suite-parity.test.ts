@@ -1,7 +1,11 @@
 import { expect, test } from "bun:test";
-import { Effect } from "effect";
-import { autolandLands, prePush } from "../scripts/prePush";
-import { FARM_TEST, readWorkflow, suiteGaps, type Workflow } from "../scripts/suiteParity";
+import { mkdtempSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { Effect, Option } from "effect";
+import { type Check, type CheckRun, type Local, autolandLands, checkKey, directoryCache, laptop, prePush, runChecks } from "../scripts/prePush";
+import { FARM_TEST, HOOKED_PUSH, hookGaps, readWorkflow, suiteGaps, type Workflow } from "../scripts/suiteParity";
+import { CUE_MODEL_RECORD } from "../scripts/wisp/cueModels";
 
 const farm = readWorkflow(".github/workflows/farm-test.yml");
 const autoland = readWorkflow(".github/workflows/autoland.yml");
@@ -34,4 +38,97 @@ test("a main push Autoland lands waits for no farm run, and a direct main push s
   };
   expect(await gated("autoland")).toEqual([]);
   expect(await gated("")).toEqual([head]);
+});
+
+const LOCAL_ONLY = ["generated models stored", "animation jitter [k3 measure #479]"];
+const HOSTED = ["clean room", "kind tags and type-check ts", "Autoland suite covers the farm suite", "cue models recorded in both looks"];
+const EVERY_PATH = ["ts/scripts/prePush.ts", "build-inputs/original-clips-static-lights", CUE_MODEL_RECORD];
+
+const stubbed = (paths: readonly string[], ran: string[], exitCode = (_: Check) => 0): Local => ({
+  changed: () => Effect.succeed(paths),
+  head: Effect.succeed("c0ffee"),
+  dirty: () => Effect.succeed(""),
+  runner: (check) => Effect.sync(() => (ran.push(check.name), { exitCode: exitCode(check), stdout: "", stderr: "" })),
+  key: () => Effect.succeedNone,
+  cache: { has: () => Effect.succeed(false), record: () => Effect.void },
+});
+
+test("an Autoland hand-off push runs only the checks that need local inputs, and a direct main push, farm push or workflow lane runs every check [k2 property]", async () => {
+  const pushed = async (queue: string, paths: readonly string[], ref = "refs/heads/claude/land-lane-c0ffee") => {
+    const ran: string[] = [], gated: string[] = [];
+    await Effect.runPromise(prePush(`HEAD c0ffee ${ref} 0000000000000000000000000000000000000000\n`, { gate: (sha) => Effect.sync(() => void gated.push(sha)), queue: Effect.succeed(queue), notice: Effect.void }, stubbed(paths, ran)));
+    return { ran, gated };
+  };
+  expect(await pushed("autoland", EVERY_PATH)).toEqual({ ran: LOCAL_ONLY, gated: [] });
+  expect(await pushed("autoland", ["docs/ci.md"])).toEqual({ ran: [], gated: [] });
+  expect(await pushed("autoland", EVERY_PATH, "refs/heads/main")).toEqual({ ran: LOCAL_ONLY, gated: [] });
+  expect((await pushed("", EVERY_PATH, "refs/heads/main")).ran.toSorted()).toEqual([...HOSTED, ...LOCAL_ONLY].toSorted());
+  expect((await pushed("", EVERY_PATH, "refs/heads/main")).gated).toEqual(["c0ffee"]);
+  expect((await pushed("autoland", EVERY_PATH, "refs/heads/farm/autoland-c0ffee")).ran.toSorted()).toEqual([...HOSTED, ...LOCAL_ONLY].toSorted());
+  expect((await pushed("autoland", [...EVERY_PATH, ".github/workflows/autoland.yml"])).ran.toSorted()).toEqual([...HOSTED, ...LOCAL_ONLY].toSorted());
+});
+
+test("Autoland's build pushes each candidate through the pre-push hook, and a --no-verify push or a dropped hooks path is a gap [k2 property]", () => {
+  expect(hookGaps(autoland)).toEqual([]);
+  const build = autoland.jobs.build!;
+  const steps = build.steps as readonly { readonly run?: string }[];
+  const rewritten = (edit: (run: string) => string): Workflow => ({ ...autoland, jobs: { ...autoland.jobs, build: { ...build, steps: steps.map((step) => (step.run === undefined ? step : { ...step, run: edit(step.run) })) } } });
+  const gap = [`Autoland's build no longer pushes the candidate with the pre-push hook (${HOOKED_PUSH} after git config core.hooksPath .githooks), so the checks safe-push leaves to it never run`];
+  expect(hookGaps(rewritten((run) => run.replaceAll(HOOKED_PUSH, 'git push --no-verify origin "HEAD:refs/heads/$scratch"')))).toEqual(gap);
+  expect(hookGaps(rewritten((run) => run.replaceAll("git config core.hooksPath .githooks", "true")))).toEqual(gap);
+});
+
+test("a passed check is skipped while its input tree and bun.lock stay the same, a failure is never cached, and a changed input runs it again [k5 boundary pre-push-cache]", async () => {
+  const repo = mkdtempSync(join(tmpdir(), "prepush-cache-repo-")), store = mkdtempSync(join(tmpdir(), "prepush-cache-"));
+  try {
+    const sh = async (...command: string[]) => void await Bun.$`${command}`.cwd(repo).quiet();
+    const commit = async (path: string, text: string) => {
+      writeFileSync(join(repo, path), text);
+      await sh("git", "add", "-A");
+      await sh("git", "-c", "user.name=t", "-c", "user.email=t@t", "commit", "-q", "-m", path);
+    };
+    await sh("git", "init", "-q");
+    await Bun.$`mkdir -p a b ts`.cwd(repo).quiet();
+    await commit("a/x", "1");
+    await commit("b/y", "1");
+    await commit("ts/bun.lock", "1");
+    const ran: string[] = [];
+    const exits = new Map<string, number>();
+    const local: Local = { ...laptop, key: (check) => checkKey(repo, check), cache: directoryCache(store), runner: (check) => Effect.sync((): CheckRun => (ran.push(check.name), { exitCode: exits.get(check.name) ?? 0, stdout: "", stderr: "" })) };
+    const scoped: Check = { name: "scoped", directory: ".", args: [], hosted: false, inputs: ["a"] };
+    const whole: Check = { name: "whole", directory: ".", args: [], hosted: false };
+    const runs = async (check: Check) => {
+      const before = ran.length;
+      const result = await Effect.runPromise(runChecks([check], local).pipe(Effect.as("passed"), Effect.catchTag("PrePushRefusal", () => Effect.succeed("refused"))));
+      return { result, ran: ran.length - before };
+    };
+    expect(await runs(scoped)).toEqual({ result: "passed", ran: 1 });
+    expect(await runs(scoped)).toEqual({ result: "passed", ran: 0 });
+    expect(await runs(whole)).toEqual({ result: "passed", ran: 1 });
+    expect(await runs(whole)).toEqual({ result: "passed", ran: 0 });
+    await commit("b/y", "2");
+    expect(await runs(scoped)).toEqual({ result: "passed", ran: 0 });
+    expect(await runs(whole)).toEqual({ result: "passed", ran: 1 });
+    await commit("a/x", "2");
+    expect(await runs(scoped)).toEqual({ result: "passed", ran: 1 });
+    await commit("ts/bun.lock", "2");
+    expect(await runs(scoped)).toEqual({ result: "passed", ran: 1 });
+    writeFileSync(join(repo, "a/x"), "dirty");
+    expect(Option.isNone(await Effect.runPromise(checkKey(repo, scoped)))).toBe(true);
+    expect(await runs(scoped)).toEqual({ result: "passed", ran: 1 });
+    expect(await runs(scoped)).toEqual({ result: "passed", ran: 1 });
+    await sh("git", "checkout", "-q", "--", "a/x");
+    const stored = readdirSync(store).length;
+    exits.set("failing", 1);
+    const failing: Check = { name: "failing", directory: ".", args: [], hosted: false, inputs: ["a"] };
+    expect(await runs(failing)).toEqual({ result: "refused", ran: 1 });
+    expect(await runs(failing)).toEqual({ result: "refused", ran: 1 });
+    expect(readdirSync(store).length).toBe(stored);
+    exits.set("failing", 0);
+    expect(await runs(failing)).toEqual({ result: "passed", ran: 1 });
+    expect(await runs(failing)).toEqual({ result: "passed", ran: 0 });
+  } finally {
+    rmSync(repo, { recursive: true, force: true });
+    rmSync(store, { recursive: true, force: true });
+  }
 });

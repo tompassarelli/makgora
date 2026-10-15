@@ -15,12 +15,22 @@
 ## Autoland
 
 Autoland is main's one landing queue. Cloud workers push to `claude/NAME`;
-`safe-push --to main` checks a local lane, pushes it to
-`claude/land-LANE-SHA` and waits for its verdict (the repository's
-.safe-push sets `landing.queue = autoland`); its pre-push gate runs no farm
-suite for that hand-off, since Autoland's suite covers every farm-test job
-(smashcraft:ts/scripts/suiteParity.ts). Nobody else pushes main, so no
-landing restarts another's suites.
+`safe-push --to main` checks a local lane, pushes it to `claude/land-LANE-SHA`
+and waits for its verdict (the repository's .safe-push sets `landing.queue =
+autoland`); its pre-push gate runs no farm suite for that hand-off, since
+Autoland's suite covers every farm-test job
+(smashcraft:ts/scripts/suiteParity.ts). For that hand-off the gate also runs
+locally only the checks that need private or local inputs (generated models
+stored, animation jitter); every hosted check it selects (`hosted` in
+smashcraft:ts/scripts/prePush.ts: clean room, kind tags and type-check, suite
+parity, cue models) runs instead in this same hook when Autoland's build
+pushes the rebased candidate to `farm/autoland-SHA`, and a refusal there fails
+the lane. Suite parity fails when that push skips the hook. A check that stays
+local is skipped when it passed before on the same key: its name, the git tree
+of its input paths (the whole tree when it names none, and only while they are
+clean) and the hash of ts/bun.lock, recorded under
+~/.local/state/smashcraft/prepush-cache; a failure is never recorded. Nobody
+else pushes main, so no landing restarts another's suites.
 
 1. **Queue.** A push marks the branch tip with a pending `autoland` commit
    status ("queued") and starts a plan run.

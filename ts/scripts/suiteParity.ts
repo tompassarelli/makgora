@@ -30,9 +30,19 @@ export function suiteGaps(farm: Workflow, autoland: Workflow): string[] {
   ];
 }
 
+export const HOOKED_PUSH = 'git push origin "HEAD:refs/heads/$scratch"';
+
+export function hookGaps(autoland: Workflow): string[] {
+  const runs = ((autoland.jobs.build?.steps ?? []) as readonly { readonly run?: unknown }[]).map(({ run }) => String(run ?? ""));
+  return runs.some((run) => run.includes("git config core.hooksPath .githooks")) && runs.some((run) => run.includes(HOOKED_PUSH))
+    ? []
+    : [`Autoland's build no longer pushes the candidate with the pre-push hook (${HOOKED_PUSH} after git config core.hooksPath .githooks), so the checks safe-push leaves to it never run`];
+}
+
 const check = Effect.gen(function*() {
-  const gaps = suiteGaps(readWorkflow(".github/workflows/farm-test.yml"), readWorkflow(".github/workflows/autoland.yml"));
-  if (gaps.length === 0) return yield* Console.log("suite parity: Autoland runs every farm-test job with the same test selection");
+  const autoland = readWorkflow(".github/workflows/autoland.yml");
+  const gaps = [...suiteGaps(readWorkflow(".github/workflows/farm-test.yml"), autoland), ...hookGaps(autoland)];
+  if (gaps.length === 0) return yield* Console.log(`suite parity: Autoland runs every farm-test job with the same test selection, and its build runs the pre-push hook on each candidate`);
   yield* Effect.forEach(gaps, (gap) => Console.error(`suite parity: ${gap}`), { discard: true });
   process.exit(1);
 });

@@ -9,7 +9,8 @@
 
 
 
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync } from "node:fs";
+import { homedir } from "node:os";
 import { dirname, join, relative } from "node:path";
 import { Console, Effect, Option, Schema } from "effect";
 import { issueTests, redTitle } from "./mainRed";
@@ -25,7 +26,7 @@ export class PrePushRefusal extends Schema.TaggedError<PrePushRefusal>()("PrePus
   }
 }
 
-interface Check { readonly name: string; readonly directory: string; readonly args: readonly string[]; readonly fix?: string }
+export interface Check { readonly name: string; readonly directory: string; readonly args: readonly string[]; readonly fix?: string; readonly hosted: boolean; readonly inputs?: readonly string[] }
 
 
 const ANIMATION_INPUTS = ["build-inputs/original-clips-static-lights", "tools/animations/", "ts/scripts/keyThin.ts", "ts/scripts/wisp/animJitter.ts"];
@@ -33,7 +34,8 @@ const MODEL_INPUTS = ["build-inputs/", "tools/animations/", "ts/src/game/assets/
 
 
 const CUE_CHECK = "ts/scripts/cueModels.ts";
-const SUITE_INPUTS = [".github/workflows/farm-test.yml", ".github/workflows/autoland.yml", "ts/scripts/suiteParity.ts"];
+const SUITE_INPUTS = [".github/workflows/farm-test.yml", ".github/workflows/autoland.yml", "ts/scripts/suiteParity.ts", "ts/scripts/prePush.ts"];
+const SCRIPT_INPUTS = ["ts/scripts", "ts/src", "ts/package.json", "ts/bunfig.toml"];
 
 export function cueInputs(): Set<string> {
   const transpiler = new Bun.Transpiler({ loader: "ts" });
@@ -59,21 +61,21 @@ export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = 
   const cueModels = touchesCueInputs(paths, cues);
   const suites = paths.some((path) => SUITE_INPUTS.includes(path));
   return [
-    ...(paths.length > 0 ? [{ name: "clean room", directory: "ts", args: ["scripts/cleanRoom.ts"], fix: "follow wisp:docs/clean-room.md and the line above." }] : []),
+    ...(paths.length > 0 ? [{ name: "clean room", directory: "ts", args: ["scripts/cleanRoom.ts"], fix: "follow wisp:docs/clean-room.md and the line above.", hosted: true }] : []),
     ...(ts ? [
-      { name: "kind tags and type-check ts", directory: "ts", args: ["run", "check"], fix: "end each refused test title with its kind tag (listed above) or delete the test; fix each type error." },
+      { name: "kind tags and type-check ts", directory: "ts", args: ["run", "check"], fix: "end each refused test title with its kind tag (listed above) or delete the test; fix each type error.", hosted: true },
     ] : []),
     ...(suites ? [
-      { name: "Autoland suite covers the farm suite", directory: "ts", args: ["scripts/suiteParity.ts"], fix: "give Autoland's suite every farm-test job and input, since safe-push hands a lane to Autoland without its own farm run (smashcraft:docs/ci.md, \"Autoland\")." },
+      { name: "Autoland suite covers the farm suite", directory: "ts", args: ["scripts/suiteParity.ts"], fix: "give Autoland's suite every farm-test job and input, since safe-push hands a lane to Autoland without its own farm run (smashcraft:docs/ci.md, \"Autoland\").", hosted: true },
     ] : []),
     ...(models ? [
-      { name: "generated models stored", directory: "ts", args: ["scripts/storedModels.ts"], fix: "store the regenerated family (smashcraft:docs/build-inputs.md, \"Change art\")." },
+      { name: "generated models stored", directory: "ts", args: ["scripts/storedModels.ts"], fix: "store the regenerated family (smashcraft:docs/build-inputs.md, \"Change art\").", hosted: false, inputs: ["build-inputs", "tools/animations", ...SCRIPT_INPUTS] },
     ] : []),
     ...(cueModels ? [
-      { name: "cue models recorded in both looks", directory: "ts", args: ["scripts/cueModels.ts"], fix: `list each Definitive redraw after reviewing it, or record new models with ${RECORD_COMMAND} from ts/ (smashcraft:docs/commands/workflow.md).` },
+      { name: "cue models recorded in both looks", directory: "ts", args: ["scripts/cueModels.ts"], fix: `list each Definitive redraw after reviewing it, or record new models with ${RECORD_COMMAND} from ts/ (smashcraft:docs/commands/workflow.md).`, hosted: true },
     ] : []),
     ...(animation ? [
-      { name: "animation jitter [k3 measure #479]", directory: "ts", args: ["scripts/wisp.ts", "anim", "jitter"], fix: "regenerate the clip pool through thinKeys so close Hermite keys carry slopes (smashcraft:docs/commands/animation.md)." },
+      { name: "animation jitter [k3 measure #479]", directory: "ts", args: ["scripts/wisp.ts", "anim", "jitter"], fix: "regenerate the clip pool through thinKeys so close Hermite keys carry slopes (smashcraft:docs/commands/animation.md).", hosted: false, inputs: ["build-inputs", "tools/animations", ...SCRIPT_INPUTS] },
     ] : []),
   ];
 }
@@ -129,11 +131,13 @@ export const run = (command: readonly string[], cwd: string, stdout: "pipe" | "i
 );
 
 
-const git = (...args: string[]) => run(["git", ...args], root).pipe(
+const gitIn = (cwd: string, ...args: string[]) => run(["git", ...args], cwd).pipe(
   Effect.flatMap(({ exitCode, stdout, stderr }) => exitCode === 0
     ? Effect.succeed(stdout.trim())
     : Effect.fail(new PrePushRefusal({ problem: `pre-push: git ${args.join(" ")} exited ${exitCode}${stderr.trim() === "" ? "" : `: ${stderr.trim()}`}` }))),
 );
+
+const git = (...args: string[]) => gitIn(root, ...args);
 
 
 const hasCommit = (commit: string) => run(["git", "cat-file", "-e", `${commit}^{commit}`], root).pipe(Effect.map(({ exitCode }) => exitCode === 0));
@@ -143,6 +147,63 @@ const changedPaths = (local: string, remote: string) => Effect.gen(function*() {
   const base = !ZERO.test(remote) && (yield* hasCommit(remote)) ? remote : yield* git("merge-base", local, "origin/main");
   return (yield* git("diff", "--name-only", base, local)).split("\n").filter((path) => path.length > 0);
 });
+
+export interface CheckRun { readonly exitCode: number; readonly stdout: string; readonly stderr: string }
+
+export interface Local {
+  readonly changed: (local: string, remote: string) => Effect.Effect<readonly string[], PrePushRefusal>;
+  readonly head: Effect.Effect<string, PrePushRefusal>;
+  readonly dirty: (directories: readonly string[]) => Effect.Effect<string, PrePushRefusal>;
+  readonly runner: (check: Check) => Effect.Effect<CheckRun, PrePushRefusal>;
+  readonly key: (check: Check) => Effect.Effect<Option.Option<string>, PrePushRefusal>;
+  readonly cache: { readonly has: (key: string) => Effect.Effect<boolean>; readonly record: (key: string) => Effect.Effect<void> };
+}
+
+export const PREPUSH_CACHE = join(homedir(), ".local/state/smashcraft/prepush-cache");
+
+export const checkKey = (repo: string, check: Check) => Effect.gen(function*() {
+  const scope = check.inputs ?? [];
+  if ((yield* gitIn(repo, "status", "--porcelain", "--", ...scope)) !== "") return Option.none<string>();
+  const tree = check.inputs === undefined ? yield* gitIn(repo, "rev-parse", "HEAD^{tree}") : yield* gitIn(repo, "ls-tree", "HEAD", "--", ...check.inputs);
+  const lock = existsSync(join(repo, "ts/bun.lock")) ? yield* gitIn(repo, "hash-object", "ts/bun.lock") : "";
+  return Option.some(new Bun.CryptoHasher("sha256").update(`${check.name}\0${tree}\0${lock}`).digest("hex"));
+});
+
+export const directoryCache = (directory: string): Local["cache"] => ({
+  has: (key) => Effect.sync(() => existsSync(join(directory, key))),
+  record: (key) => Effect.promise(async () => {
+    mkdirSync(directory, { recursive: true });
+    await Bun.write(join(directory, key), `${new Date().toISOString()}\n`);
+  }),
+});
+
+const runCheck = (check: Check) => Effect.gen(function*() {
+  const cwd = join(root, check.directory);
+  if (!existsSync(join(cwd, "node_modules"))) yield* run([process.execPath, "install", "--frozen-lockfile"], cwd, "ignore");
+  return yield* run([process.execPath, ...check.args], cwd);
+});
+
+export const laptop: Local = {
+  changed: changedPaths,
+  head: git("rev-parse", "HEAD"),
+  dirty: (directories) => git("status", "--porcelain", "--", ...directories),
+  runner: runCheck,
+  key: (check) => checkKey(root, check),
+  cache: directoryCache(PREPUSH_CACHE),
+};
+
+export const runChecks = (checks: readonly Check[], local: Local) => Effect.forEach(checks, (check) => Effect.gen(function*() {
+  const key = yield* local.key(check);
+  if (Option.isSome(key) && (yield* local.cache.has(key.value))) return yield* Console.error(`pre-push: ${check.name} passed before on these inputs (cache ${key.value.slice(0, 12)})`);
+  const started = performance.now();
+  const child = yield* local.runner(check);
+  const seconds = ((performance.now() - started) / 1000).toFixed(1);
+  if (child.exitCode !== 0) {
+    return yield* new PrePushRefusal({ problem: `${child.stdout}${child.stderr}\npre-push: ${check.name} failed (${seconds} s); ${check.fix ?? "fix it before landing."}` });
+  }
+  if (Option.isSome(key)) yield* local.cache.record(key.value);
+  yield* Console.error(`pre-push: ${check.name} passed (${seconds} s)`);
+}), { discard: true });
 
 const RedIssues = Schema.fromJsonString(Schema.Array(Schema.Struct({ number: Schema.Finite, title: Schema.String, body: Schema.String, url: Schema.String })));
 
@@ -164,6 +225,8 @@ const mainRedNotice = run(["gh", "issue", "list", "--state", "open", "--search",
 
 const WORKFLOWS = ".github/workflows/";
 
+export const HAND_OFF = "refs/heads/claude/land-";
+
 export function autolandLands(queue: string, paths: readonly string[]): boolean {
   return queue === "autoland" && !paths.some((path) => path.startsWith(WORKFLOWS));
 }
@@ -172,37 +235,31 @@ const landingQueue = run(["git", "config", "--file", join(root, ".safe-push"), "
   Effect.map(({ exitCode, stdout }) => (exitCode === 0 ? stdout.trim() : "")),
 );
 
-export const prePush = (input: string, landing = { gate: farmGate, queue: landingQueue }) => Effect.gen(function*() {
-  yield* mainRedNotice;
+export const prePush = (input: string, landing: { readonly gate: typeof farmGate; readonly queue: typeof landingQueue; readonly notice?: Effect.Effect<void> } = { gate: farmGate, queue: landingQueue }, local: Local = laptop) => Effect.gen(function*() {
+  yield* landing.notice ?? mainRedNotice;
   const pushed = input.split("\n").flatMap((line) => {
-    const [, local, remoteRef, remote] = line.trim().split(/\s+/);
-    return local === undefined || remote === undefined || ZERO.test(local) || remoteRef?.startsWith("refs/tags/") ? [] : [{ local, remoteRef, remote }];
+    const [, commit, remoteRef, remote] = line.trim().split(/\s+/);
+    return commit === undefined || remote === undefined || ZERO.test(commit) || remoteRef?.startsWith("refs/tags/") ? [] : [{ commit, remoteRef, remote }];
   });
-  const paths = [...new Set((yield* Effect.forEach(pushed, ({ local, remote }) => changedPaths(local, remote))).flat())];
-  const checks = checksFor(paths, cueInputs());
+  const paths = [...new Set((yield* Effect.forEach(pushed, ({ commit, remote }) => local.changed(commit, remote))).flat())];
+  const selected = checksFor(paths, cueInputs());
   const toMain = pushed.some(({ remoteRef }) => remoteRef === "refs/heads/main");
+  const handsOff = pushed.some(({ remoteRef }) => remoteRef === "refs/heads/main" || remoteRef?.startsWith(HAND_OFF) === true);
+  const lands = handsOff ? autolandLands(yield* landing.queue, paths) : false;
+  const checks = lands ? selected.filter(({ hosted }) => !hosted) : selected;
+  const deferred = lands ? selected.filter(({ hosted }) => hosted) : [];
   if (checks.length === 0 && !toMain) return;
-  const head = yield* git("rev-parse", "HEAD");
-  const dirty = checks.length === 0 ? "" : yield* git("status", "--porcelain", "--", ...new Set(checks.map(({ directory }) => directory)));
-  if (pushed.some(({ local }) => local !== head) || dirty !== "") {
+  const head = yield* local.head;
+  const dirty = checks.length === 0 ? "" : yield* local.dirty([...new Set(checks.map(({ directory }) => directory))]);
+  if (pushed.some(({ commit }) => commit !== head) || dirty !== "") {
     return yield* new PrePushRefusal({ problem: `pre-push: the checks read the working tree, so push the clean checked-out commit (HEAD ${head.slice(0, 12)}).\n${dirty}` });
   }
-  for (const { name, directory, args, fix } of checks) {
-    const cwd = join(root, directory);
-    if (!existsSync(join(cwd, "node_modules"))) yield* run([process.execPath, "install", "--frozen-lockfile"], cwd, "ignore");
-    const started = performance.now();
-    const child = yield* run([process.execPath, ...args], cwd);
-    const seconds = ((performance.now() - started) / 1000).toFixed(1);
-    if (child.exitCode !== 0) {
-      return yield* new PrePushRefusal({ problem: `${child.stdout}${child.stderr}\npre-push: ${name} failed (${seconds} s); ${fix ?? "fix it before landing."}` });
-    }
-    yield* Console.error(`pre-push: ${name} passed (${seconds} s)`);
-  }
+  if (deferred.length > 0) yield* Console.error(`pre-push: Autoland's build runs ${deferred.map(({ name }) => name).join(", ")} in this hook on the rebased candidate before it lands`);
+  yield* runChecks(checks, local);
   if (!toMain) return;
-  if (autolandLands(yield* landing.queue, paths)) return yield* Console.error("pre-push: Autoland runs the farm suite on the rebased candidate before it lands, so this push waits for no farm run");
+  if (lands) return yield* Console.error("pre-push: Autoland runs the farm suite on the rebased candidate before it lands, so this push waits for no farm run");
   yield* landing.gate(head);
 });
-
 
 const FARM_TIMEOUT_MINUTES = 30;
 const FarmRuns = Schema.fromJsonString(Schema.Array(Schema.Struct({ displayTitle: Schema.String, conclusion: Schema.String, url: Schema.String })));
@@ -228,3 +285,4 @@ const farmGate = (head: string) => Effect.gen(function*() {
   }
   yield* Console.error(`pre-push: the farm suite passed on ${head.slice(0, 12)} (${minutes} min)`);
 });
+
