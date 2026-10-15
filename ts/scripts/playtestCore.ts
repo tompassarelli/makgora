@@ -105,7 +105,7 @@ export interface Run {
 
 export type Play = (spec: MatchSpec, frameCap: number) => Observation;
 
-export const FINDING_KINDS = ["never-ends", "stuck", "zero-to-death", "infinite-combo", "win-rate-band", "move-share", "move-usage", "stage-no-kos", "desync"] as const;
+export const FINDING_KINDS = ["never-ends", "stuck", "zero-to-death", "combo-over-limit", "win-rate-band", "move-share", "move-usage", "stage-no-kos", "desync"] as const;
 export type FindingKind = (typeof FINDING_KINDS)[number];
 
 export interface Finding {
@@ -242,7 +242,7 @@ export function classify(runs: readonly Run[], config: Config = DEFAULT_CONFIG):
       const victim = combo.victim === 0 ? spec.a : spec.b;
       const worst = trueSegments(combo).filter((segment) => trueComboBreak(segment, config) !== undefined).sort((x, y) => y.moves.length - x.moves.length || y.damage - x.damage)[0];
       if (worst === undefined) continue;
-      findings.push({ kind: "infinite-combo", subject: matchId(spec), spec, frame: combo.frame, detail: `${attacker} hit ${victim} with ${worst.moves.length} moves (${worst.moves.join(", ")}) for ${worst.damage.toFixed(1)}% from ${worst.percent.toFixed(1)}% with no actionable frame between them, ${trueComboBreak(worst, config) ?? ""} (#83); the string ended at frame ${combo.frame}` });
+      findings.push({ kind: "combo-over-limit", subject: matchId(spec), spec, frame: combo.frame, detail: `${attacker} hit ${victim} with ${worst.moves.length} moves (${worst.moves.join(", ")}) for ${worst.damage.toFixed(1)}% from ${worst.percent.toFixed(1)}% with no actionable frame between them, ${trueComboBreak(worst, config) ?? ""} (#83); the string ended at frame ${combo.frame}` });
     }
     for (const use of first.uses) {
       const moves = uses.get(use.fighter) ?? new Map<string, number>();
@@ -382,7 +382,7 @@ export function renderReport(runs: readonly Run[], findings: readonly Finding[],
     `Wall time ${(s.wallMs / 1000).toFixed(1)} s, ${s.msPerMatch.toFixed(0)} ms a match (both runs), slowest ${s.slowestMs.toFixed(0)} ms.`,
     "",
     `Bands: fighter win rate ${(100 * config.winLow).toFixed(0)}-${(100 * config.winHigh).toFixed(0)}% over at least ${config.minDecisive} decisive matches; a move at most ${(100 * config.moveShareMax).toFixed(0)}% of its fighter's KOs over at least ${config.minMoveKos}; a zero-to-death string is ${config.minStringHits} or more hits with no actionable frame between them; a stage with no KOs needs ${config.minStageMatches} matches; frame cap ${config.frameCap}.`,
-    `Stuck: no damage or stock change for ${config.stuckSeconds} s. Infinite combo (#83, #388): a true combo of more than ${config.followUpMax} follow-ups, or of two or more moves over ${config.guaranteedDamageMax}% from below ${config.guaranteedPercentCap}%. Dominant move: a move whose KO share passes the band above, or whose usage share passes its fighter's Tukey fence (Q3 + ${config.usageFence} IQR) and ${(100 * config.usageShareMin).toFixed(0)}% over at least ${config.minMoveUses} starts.`,
+    `Stuck: no damage or stock change for ${config.stuckSeconds} s. Combo over limit (#83, #388): a true combo, with no frame where the victim can act, of more than ${config.followUpMax} follow-ups, or of two or more moves over ${config.guaranteedDamageMax}% from below ${config.guaranteedPercentCap}%. Dominant move: a move whose KO share passes the band above, or whose usage share passes its fighter's Tukey fence (Q3 + ${config.usageFence} IQR) and ${(100 * config.usageShareMin).toFixed(0)}% over at least ${config.minMoveUses} starts.`,
     "",
     "| Finding | Count |",
     "| --- | --- |",
@@ -404,7 +404,7 @@ export const ISSUE_TITLES: Record<FindingKind, string> = {
   "never-ends": "Playtester: matches that never end",
   stuck: "Playtester: stuck matches",
   "zero-to-death": "Playtester: zero-to-death strings",
-  "infinite-combo": "Playtester: true combos over #83's rule",
+  "combo-over-limit": "Playtester: true combos past #83's follow-up or damage limit",
   "win-rate-band": "Playtester: fighters outside the win-rate band",
   "move-share": "Playtester: moves that take most of a fighter's KOs",
   "move-usage": "Playtester: moves a fighter overuses",
@@ -421,7 +421,7 @@ export const ISSUE_TARGETS: Record<FindingKind, number> = {
   "never-ends": AFTER_01,
   stuck: AFTER_01,
   "zero-to-death": FAIR_COMBAT_EPIC,
-  "infinite-combo": FAIR_COMBAT_EPIC,
+  "combo-over-limit": FAIR_COMBAT_EPIC,
   "win-rate-band": FAIR_COMBAT_EPIC,
   "move-share": AFTER_01,
   "move-usage": AFTER_01,

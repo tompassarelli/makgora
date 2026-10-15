@@ -22,7 +22,7 @@ test("direct tech reads retain the grab into forward-tilt true combo [k1 scenari
     },
   ];
   const runs = runPlaytest(spec, (match) => observations[match.index] ?? (() => { throw new Error("missing direct fight log"); })(), 120, true, () => 0);
-  expect(classify(runs).filter((finding) => finding.kind === "infinite-combo" || finding.kind === "desync")).toEqual([]);
+  expect(classify(runs).filter((finding) => finding.kind === "combo-over-limit" || finding.kind === "desync")).toEqual([]);
   expect(runs[1]?.first.combos.flatMap(trueSegments).some((segment) => segment.moves.join(",") === "grab,forward-tilt")).toBe(true);
   expect(runs[0]?.first.combos.flatMap(trueSegments).map((segment) => segment.moves)).toEqual([["forward-tilt"], ["up-tilt"], ["jab"], ["forward-tilt"]]);
   expect(runs[1]?.first.combos.flatMap(trueSegments)).toEqual([
@@ -34,7 +34,7 @@ test("direct tech reads retain the grab into forward-tilt true combo [k1 scenari
 sweep("the seven recorded #424 seeds and #461 seed 799 distinguish terrain hits, tech reads and missed techs from guaranteed fighter chains [k1 scenario]", () => {
   for (const [seed, cap] of [[6, 6765], [14, 4264], [19, 1348], [24, 686], [31, 3564], [43, 3347], [47, 5688], [799, 683]]) {
     const runs = runPlaytest(planMatches(ROSTER, seed ?? 0, 1), playReal, cap ?? 0, true, () => 0);
-    expect(classify(runs).filter((finding) => finding.kind === "infinite-combo" || finding.kind === "desync")).toEqual([]);
+    expect(classify(runs).filter((finding) => finding.kind === "combo-over-limit" || finding.kind === "desync")).toEqual([]);
     if (seed === 19) expect(runs[0]?.first.combos.flatMap((combo) => combo.damages).includes(LAVA_HIT.damage)).toBe(false);
   }
 }, 60000);
