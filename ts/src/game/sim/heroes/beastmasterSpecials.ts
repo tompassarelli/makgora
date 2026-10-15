@@ -23,19 +23,19 @@ const wildAxes = (air: boolean): AuthoredSpecial => ({
 });
 export const BEAR: SpecialCompanion = {
   followSpeed: h(f32(0.035)), followBehind: h(f32(0.8)), returnSpeed: h(f32(0.06)),
-  lungeStartup: 12, lungeActive: 8, lungeRecovery: 26, lungeTravel: h(f32(2.0)),
+  lungeStartup: 18, lungeActive: 8, lungeRecovery: 32, lungeTravel: h(f32(2.0)),
   bite: capsule(0.0, 25.0, h(f32(0.5)), 60.0, 28.0),
   biteEffect: hit(8.0, "KILL", 40, 1.0, HitElement.normal),
   stunFrames: 18, leash: h(6.0), leashFrames: 120,
 };
 export const BEAR_PLACEMENT: SpecialPlacement = {
   frame: 29, offsetX: h(f32(0.6)), radius: h(f32(0.4)), height: h(f32(1.1)),
-  durability: 30.0, life: 480, fireAges: [], companion: BEAR,
+  durability: 20.0, life: 240, fireAges: [], companion: BEAR,
 };
 const stampede = (spawnFrame: number): SpecialProjectile => ({
   spawnFrame, offsetX: h(f32(0.4)), offsetZ: h(f32(0.15)),
   velocityX: h(f32(0.14)), velocityZ: 0.0, life: 44, radius: h(f32(0.15)),
-  effect: hit(2.7275757789611816, "POKE", 25, 1.0, HitElement.normal), reflectable: false, limit: 1,
+  effect: hit(0.5, "POKE", 25, 1.0, HitElement.normal), reflectable: false, limit: 1,
   model: "Abilities\\Spells\\Other\\Stampede\\StampedeMissile.mdx",
 });
 export const STAMPEDE = [stampede(2), stampede(5), stampede(8)];
@@ -85,7 +85,7 @@ const hawkLift = (rise: number, drift: number, steer: number): AuthoredSpecial =
 });
 export const BEASTMASTER_SPECIALS: FighterSpecials = {
   neutral: withExKit({ name: "Wild Axes", description: "Throw two axes; move to guide their return through the enemy.", ground: wildAxes(false), air: wildAxes(true) }, { damage: 1.25 }),
-  side: withExKit({ name: "Summon Bear", description: "Call Bear; press again and it roars, charges far ahead and mauls for heavy knockback while three thunder lizards stampede.", ground: SUMMON_BEAR, recall: BEAR_COMMAND }, { damage: f32(0.65), durability: f32(0.8) }),
+  side: withExKit({ name: "Summon Bear", description: "Call Bear; press again and it roars, charges far ahead and mauls for heavy knockback while three thunder lizards stampede.", ground: SUMMON_BEAR, recall: BEAR_COMMAND }, { damage: 1.25, durability: 1.25 }),
   up: withExKit({ name: "Summon Hawk", description: "Call Hawk, then command a fast dive that stuns whoever it strikes. In the air, Hawk carries him up.", ground: SUMMON_HAWK, recall: HAWK_DIVE, recallGroundOnly: true, air: hawkLift(h(f32(3.6)), h(f32(0.3)), h(f32(3.4))) }, { travel: 1.25, durability: 1.25, recallProtection: 4 }),
   down: withExKit({ name: "Summon Quilbeast", description: "Set a large Quilbeast firing position; press again for a three-quill volley from it.", ground: SUMMON_QUILBEAST, air: { endFrame: SUMMON_QUILBEAST.endFrame, landingLag: AIR_SPECIAL_LANDING_LAG,
     projectiles: [18, 22, 26].map(spawnFrame => ({ ...QUILL, spawnFrame, offsetZ: 0.0, velocityX: h(f32(0.035)), velocityZ: -h(f32(0.14)) })) }, recall: QUILL_VOLLEY }, { damage: 1.25, durability: 1.25, recallProtection: 4 }),
