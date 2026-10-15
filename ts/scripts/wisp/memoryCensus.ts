@@ -33,8 +33,9 @@ const triggerOf = (registration: unknown): unknown => (typeof registration === "
 export function compactEmulator(client: HeadlessClient, released: ReadonlySet<number>): string[] {
   if (released.size > 0) {
     const live = (item: unknown) => !isHandle(item) || !released.has(item.id);
-    keepIn(client, "timers", live);
-    keepIn(client, "registrations", (registration) => live(triggerOf(registration)));
+    const scheduler = isLuaTable(client) ? client.get("timers") : undefined;
+    keepIn(scheduler, "timers", live);
+    keepIn(scheduler, "registrations", (registration) => live(triggerOf(registration)));
     keepIn(client.frames, "all", live);
   }
   const errors = [...client.errors];
