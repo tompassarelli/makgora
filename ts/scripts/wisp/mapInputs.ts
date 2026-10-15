@@ -329,13 +329,12 @@ export const importedAssets = (assets: string, summon: string, edition: MapEditi
   const clipFiles = [...new Set(clipEvidence.records.flatMap((record) => [...record.clips.map(({ filename }) => filename), ...(record.light === null ? [] : [record.light.filename])]))].filter((file) => ORIGINAL_CLIP_MODELS.includes(`war3mapImported\\${file}`));
   const classicBodies = clipFiles.map((filename) => imported(join(clipDirectory, "imports/war3mapImported"), filename));
   const classicWhites = generated.flat().filter(({ entry }) => Object.values(WHITE_FIGHTER_MODELS).includes(entry));
-  const classicOverrides = [...classicBodies, ...classicWhites].flatMap(({ entry, source }) =>
-    ["_hd.w3mod", "_de.w3mod"].map((prefix) => {
-      const override = `${prefix}\\${entry}`;
-      const body = join(clipDirectory, "imports", prefix, entry.replaceAll("\\", "/"));
-      const authored = generated.flat().find((asset) => asset.entry === override)?.source;
-      return { entry: override, source: prefix === "_de.w3mod" ? authored ?? (existsSync(body) ? body : source) : source };
-    }));
+  const classicOverrides = [...classicBodies, ...classicWhites].map(({ entry, source }) => {
+    const override = `_de.w3mod\\${entry}`;
+    const body = join(clipDirectory, "imports/_de.w3mod", entry.replaceAll("\\", "/"));
+    const authored = generated.flat().find((asset) => asset.entry === override)?.source;
+    return { entry: override, source: authored ?? (existsSync(body) ? body : source) };
+  });
   const whiteOverrides = new Set(classicOverrides.map(({ entry }) => entry));
   yield* requireListed(clipEvidencePath, clipFiles, ORIGINAL_CLIP_MODELS,
     `this assets folder's clip pool predates the checkout's clips. From the repository root, export a new pool from ${assets} ` +
