@@ -12,6 +12,11 @@ import { createReferenceContactFighter } from "../referenceRig";
 import { controls } from "../testWorld";
 import { AUTHORED_PHYSICS, melee } from "../tuning";
 import { duelPair, stepDuel } from "../testDuel";
+import { BEAM_MIN_AHEAD, beamSegment } from "../heroSpecialRules";
+import { createRoster } from "../roster";
+import { shieldCenterX, shieldCenterZ } from "../shieldTilt";
+import { shieldSizeMultiplier } from "../shield";
+import { emptyCapsule } from "../../physics/contactGeometry";
 
 test("Tinker body keeps ROB run and air speed with weight 92 for about 9% earlier standard-smash KOs [k4 reference ssbu]", () => {
   const f = createFighter(Character.tinker, 0.0, 1);
@@ -113,4 +118,53 @@ test("EX Laser reaches a quarter farther and hits a quarter harder [k2 property]
   const ex = assertDefined(LASER.ex, "EX Laser");
   assertNear(assertDefined(ex.beam, "EX beam").range, f32(BEAM.range * 1.25), f32(0.001));
   assertNear(assertDefined(ex.regions?.[0], "EX region").hit.effect.damage, f32(assertDefined(LASER.regions?.[0], "region").hit.effect.damage * 1.25), f32(0.001));
+});
+
+test("A shielded Laser ends at the shield and spares a foe standing behind the shielding foe [k2 property]", () => {
+  const shield = controls({ shield: true, shieldTriggerActive: true, shieldStrength: 0.0 });
+  for (const facing of [1, -1]) {
+    for (const gap of [150.0, 220.0, 290.0]) {
+      const owner = createFighter(Character.tinker, 0.0, facing);
+      const shielder = createFighter(Character.jaina, f32(facing * gap), -facing);
+      const behind = createReferenceContactFighter(f32(facing * f32(gap + 70.0)), -facing);
+      const world = createRoster(7, [owner, shielder, behind]);
+      const line = emptyCapsule();
+      for (let i = 0; i < 3; i++) stepDuel(world, controls(), shield);
+      for (let f = 1; f <= LASER.endFrame; f++) {
+        stepDuel(world, f === 1 ? controls({ specialPressed: true, specialX: facing }) : controls(), shield);
+        if (f < 20 || f > 27 || !shielder.shield.raised) continue;
+        beamSegment(line, owner, BEAM, 14.0);
+        const radius = f32(shielder.tuning.shield.radius * shieldSizeMultiplier(shielder.shield.energy, shielder.shield.strength));
+        const ex = f32(line.x2 - shieldCenterX(shielder));
+        const ez = f32(line.z2 - shieldCenterZ(shielder));
+        const end = Math.sqrt(ex * ex + ez * ez);
+        assertEquals(end >= radius - 0.5 && end <= radius + 14.0, true, `gap ${gap} facing ${facing} frame ${f}: the beam ends ${end} from a shield of ${radius}`);
+      }
+      assertEquals(shielder.status.damage, 0.0, `gap ${gap} facing ${facing}: the shield holds`);
+      assertEquals(behind.status.damage, 0.0, `gap ${gap} facing ${facing}: the foe behind the shield is not hit`);
+    }
+  }
+});
+
+test("Laser aim stays at least BEAM_MIN_AHEAD in front of his arm, so a foe crossing under him never pulls the beam into the floor and escapes once behind [k2 property]", () => {
+  const line = emptyCapsule();
+  for (const facing of [1, -1]) {
+    for (const speed of [4.0, 9.0, 16.0]) {
+      const owner = createFighter(Character.tinker, 0.0, facing);
+      const victim = createReferenceContactFighter(f32(facing * 90.0), -facing);
+      const { world } = duelPair(owner, victim);
+      for (let f = 1; f <= 27; f++) {
+        victim.motion.grounded = true;
+        place(victim, f32(facing * f32(90.0 - f32(speed * (f - 1)))), 0.0);
+        stepDuel(world, f === 1 ? controls({ specialPressed: true, specialX: facing }) : controls());
+        beamSegment(line, owner, BEAM, 14.0);
+        const ahead = f32(f32(line.x2 - line.x1) * facing);
+        const drop = f32(line.z1 - line.z2);
+        assertEquals(f32(f32(owner.special.beamX - line.x1) * facing) >= f32(BEAM_MIN_AHEAD - f32(0.001)), true, `speed ${speed} frame ${f}: aim ${owner.special.beamX} too close to the arm`);
+        assertEquals(drop <= f32(ahead * f32(5.0 / 60.0)) + f32(0.01), true, `speed ${speed} frame ${f}: beam drops ${drop} over ${ahead}`);
+        assertEquals(line.z2 > 0.0, true, `speed ${speed} frame ${f}: beam end ${line.z2} stays above the floor`);
+      }
+      if (speed >= 9.0) assertEquals(victim.status.damage, 0.0, `speed ${speed}: a foe behind him by frame 20 escapes`);
+    }
+  }
 });

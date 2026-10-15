@@ -855,7 +855,8 @@ down special, whose armored rush beat everything at its range, and Pocket
 Factory moved from side to down special unchanged. The numbers and why:
 
 - **Tell, frames 1–19; active 20–27.** His mechanical arms glow with laser
-  light from the press, so the defender sees 19 frames before the first
+  light from the press (a fireball glow at the hand growing from 1.2 to 2.2
+  scale over the 19 frames), so the defender sees 19 frames before the first
   active frame, inside Tom's 18–22 reaction window. Eight active frames
   outlast the end of a tech roll's intangibility without making the beam a
   lingering wall.
@@ -870,6 +871,19 @@ Factory moved from side to down special unchanged. The numbers and why:
   20.4 units a frame (Melee's 3.4) with frames 4–29 intangible, so it outruns
   the aim and passes through the beam: in the air the Laser forces the dodge
   rather than winning outright. Rolling behind him or leaving range escapes.
+- **Aim bound, 60 units ahead of the arm.** The aim never comes closer than
+  60 units in front of the arm. Without the bound a foe crossing under him
+  pulled the aim onto the arm and the beam pointed into the floor. At 60 a
+  grounded foe's centre (45 up, 5 below the arm) tilts the beam at most 5 in
+  60, so the 360-unit beam still ends about 20 above the floor, and 60 sits
+  just past a standing foe's body so a close foe in front is still hit. A
+  foe that gets behind him escapes.
+- **Shields stop the beam.** The beam ends where its centre line first enters
+  a raised opponent shield (shield radius times its current size), checked
+  in slot order every frame. The drawn line and the hit capsule end there
+  together, so the shield takes the hit and a foe behind the shielding foe
+  is safe. If the arm starts inside a shield the beam has no length and only
+  that shield is struck.
 - **Range, 360 units from the arm.** About Cluster Rockets' far spacing, far
   enough to reach a tech roll and a short hop at mid stage, short enough that
   the far half of the stage stays safe.
@@ -888,7 +902,8 @@ Factory moved from side to down special unchanged. The numbers and why:
 
 smashcraft:ts/src/game/sim/heroes/tinker.tests.ts checks the frame-20 contact,
 the range and behind cut-offs, tracking against the fastest tech roll and an
-air dodge, the shield punish and the EX upgrade.
+air dodge, the shield punish, the shield stop, the aim bound and the EX
+upgrade.
 
 ## Historical character trade-offs and move evaluation
 

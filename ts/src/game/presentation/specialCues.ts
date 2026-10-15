@@ -291,7 +291,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
   },
   [Character.tinker]: {
     neutral: { spell: "Cluster Rockets", startup: drawn("units\\creeps\\HeroTinker\\HeroTinker.mdl", "body"), active: drawn("Abilities\\Weapons\\RocketMissile\\RocketMissile.mdl", "hand") },
-    side: { spell: "Laser", startup: cue("Abilities\\Weapons\\FireBallMissile\\FireBallMissile.mdx", "hand", f32(0.6)), active: cue("Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedDamage.mdx", "hand", f32(0.6)) },
+    side: { spell: "Laser", startup: { ...cue("Abilities\\Weapons\\FireBallMissile\\FireBallMissile.mdx", "hand", f32(1.2)), scaleEnd: f32(2.2), scaleFrames: 19 }, active: cue("Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedDamage.mdx", "hand", f32(0.6)) },
     up: { spell: "Rocket Boots", startup: drawn("units\\creeps\\HeroTinker\\HeroTinker.mdl", "body"), active: cue("Doodads\\Cinematic\\FirePillarMedium\\FirePillarMedium.mdx", "feet", 0.25) },
     down: { spell: "Pocket Factory", startup: drawn("units\\creeps\\HeroTinker\\HeroTinker.mdl", "body"), active: drawn("Units\\Creeps\\HeroTinkerFactory\\HeroTinkerFactory.mdl", "ahead") },
   },

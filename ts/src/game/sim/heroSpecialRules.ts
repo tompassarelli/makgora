@@ -377,36 +377,31 @@ function findBeamFoe(world: Roster, owner: Readonly<Fighter>, beam: Readonly<Spe
   return found;
 }
 
-function trackBeam(f: Fighter, world: Roster, beam: Readonly<SpecialBeam>, frame: number): void {
-  const { motion, special } = f;
-  const originX = f32(motion.x + f32(f.facing * beam.originX));
-  const originZ = f32(motion.z + beam.originZ);
+export const BEAM_MIN_AHEAD = 60.0;
+
+function aimBeam(f: Fighter, world: Roster, beam: Readonly<SpecialBeam>, frame: number, originX: number, originZ: number): void {
+  const { special } = f;
   const found = findBeamFoe(world, f, beam, originX, originZ);
   if (frame <= 1) {
     special.beamX = found ? beamFoe.x : f32(originX + f32(f.facing * beam.range));
     special.beamZ = found ? beamFoe.z : originZ;
     return;
   }
-  if (found) {
-    const dx = f32(beamFoe.x - special.beamX);
-    const dz = f32(beamFoe.z - special.beamZ);
-    const distance = squareRoot(f32(f32(dx * dx) + f32(dz * dz)));
-    if (distance <= beam.track) {
-      special.beamX = beamFoe.x;
-      special.beamZ = beamFoe.z;
-    } else {
-      const scale = f32(beam.track / distance);
-      special.beamX = f32(special.beamX + f32(dx * scale));
-      special.beamZ = f32(special.beamZ + f32(dz * scale));
-    }
+  if (!found) return;
+  const dx = f32(beamFoe.x - special.beamX);
+  const dz = f32(beamFoe.z - special.beamZ);
+  const distance = squareRoot(f32(f32(dx * dx) + f32(dz * dz)));
+  if (distance <= beam.track) {
+    special.beamX = beamFoe.x;
+    special.beamZ = beamFoe.z;
+  } else {
+    const scale = f32(beam.track / distance);
+    special.beamX = f32(special.beamX + f32(dx * scale));
+    special.beamZ = f32(special.beamZ + f32(dz * scale));
   }
-  if (f32(f32(special.beamX - originX) * f.facing) < 0.0) special.beamX = originX;
 }
 
-
-export function beamSegment(out: Capsule, owner: Readonly<Fighter>, beam: Readonly<SpecialBeam>, radius: number): Capsule {
-  const x1 = f32(owner.motion.x + f32(owner.facing * beam.originX));
-  const z1 = f32(owner.motion.z + beam.originZ);
+function beamDirection(owner: Readonly<Fighter>, x1: number, z1: number): void {
   let dx = f32(owner.special.beamX - x1);
   let dz = f32(owner.special.beamZ - z1);
   const length = squareRoot(f32(f32(dx * dx) + f32(dz * dz)));
@@ -417,10 +412,53 @@ export function beamSegment(out: Capsule, owner: Readonly<Fighter>, beam: Readon
     dx = f32(dx / length);
     dz = f32(dz / length);
   }
+  beamUnit.x = dx;
+  beamUnit.z = dz;
+}
+
+const beamUnit = { x: 0.0, z: 0.0 };
+
+function shieldStop(world: Roster, owner: Readonly<Fighter>, range: number, x1: number, z1: number): number {
+  const self = world.fighters.indexOf(owner);
+  let stop = range;
+  for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
+    if (!isActive(world, slot)) continue;
+    const other = fighterAt(world, slot);
+    if (other === owner || !other.shield.raised || sameTeam(world, self, slot) || other.status.out) continue;
+    const radius = f32(other.tuning.shield.radius * shieldSizeMultiplier(other.shield.energy, other.shield.strength));
+    const wx = f32(shieldCenterX(other) - x1);
+    const wz = f32(shieldCenterZ(other) - z1);
+    const along = f32(f32(wx * beamUnit.x) + f32(wz * beamUnit.z));
+    const across = f32(f32(f32(wx * wx) + f32(wz * wz)) - f32(along * along));
+    const reach = f32(radius * radius);
+    if (across > reach) continue;
+    const half = squareRoot(f32(reach - across));
+    if (f32(along + half) < 0.0) continue;
+    const entry = max(0.0, f32(along - half));
+    if (entry < stop) stop = entry;
+  }
+  return stop;
+}
+
+function trackBeam(f: Fighter, world: Roster, beam: Readonly<SpecialBeam>, frame: number): void {
+  const { motion, special } = f;
+  const originX = f32(motion.x + f32(f.facing * beam.originX));
+  const originZ = f32(motion.z + beam.originZ);
+  aimBeam(f, world, beam, frame, originX, originZ);
+  if (f32(f32(special.beamX - originX) * f.facing) < BEAM_MIN_AHEAD) special.beamX = f32(originX + f32(f.facing * BEAM_MIN_AHEAD));
+  beamDirection(f, originX, originZ);
+  special.beamLength = shieldStop(world, f, beam.range, originX, originZ);
+}
+
+
+export function beamSegment(out: Capsule, owner: Readonly<Fighter>, beam: Readonly<SpecialBeam>, radius: number): Capsule {
+  const x1 = f32(owner.motion.x + f32(owner.facing * beam.originX));
+  const z1 = f32(owner.motion.z + beam.originZ);
+  beamDirection(owner, x1, z1);
   out.x1 = x1;
   out.z1 = z1;
-  out.x2 = f32(x1 + f32(dx * beam.range));
-  out.z2 = f32(z1 + f32(dz * beam.range));
+  out.x2 = f32(x1 + f32(beamUnit.x * owner.special.beamLength));
+  out.z2 = f32(z1 + f32(beamUnit.z * owner.special.beamLength));
   out.radius = radius;
   return out;
 }

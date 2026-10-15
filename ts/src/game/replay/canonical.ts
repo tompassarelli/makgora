@@ -1108,6 +1108,7 @@ function writeFighter(sink: StateSink, prefix: string, fighter: Readonly<Fighter
       real("specialBeamX", sp.beamX);
       real("specialBeamZ", sp.beamZ);
     }
+    if (sp.beamLength !== 0 || 1 / sp.beamLength < 0) real("specialBeamLength", sp.beamLength);
     int("specialAirtimeUses", sp.airtimeUses);
     if (sp.grabFrame !== 0) int("specialGrabFrame", sp.grabFrame);
     if (sp.seekTarget !== 0) int("specialSeekTarget", sp.seekTarget);
