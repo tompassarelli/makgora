@@ -3,7 +3,7 @@ import { mkdtempSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect, Option } from "effect";
-import { type Check, type CheckRun, type Local, autolandLands, checkKey, directoryCache, laptop, prePush, runChecks } from "../scripts/prePush";
+import { type Check, type CheckRun, type FarmVerdict, type Local, autolandLands, checkKey, directoryCache, farmOutcome, laptop, prePush, runChecks } from "../scripts/prePush";
 import { FARM_TEST, HOOKED_PUSH, hookGaps, readWorkflow, suiteGaps, type Workflow } from "../scripts/suiteParity";
 import { CUE_MODEL_RECORD } from "../scripts/wisp/cueModels";
 
@@ -131,4 +131,20 @@ test("a passed check is skipped while its input tree and bun.lock stay the same,
     rmSync(repo, { recursive: true, force: true });
     rmSync(store, { recursive: true, force: true });
   }
+});
+
+test("a farm run that never started is infrastructure and is started once more, a started run is judged by its own conclusion, and a red run is never restarted [k2 property]", async () => {
+  const url = "https://github.com/tompassarelli/smashcraft/actions/runs/38678091576";
+  const outcome = async (exits: readonly { readonly exitCode: number; readonly stderr: string }[], concluded: FarmVerdict = "green") => {
+    let starts = 0, conclusions = 0;
+    const result = await Effect.runPromise(farmOutcome("c0ffee", () => Effect.sync((): CheckRun => ({ stdout: "", ...exits[Math.min(starts++, exits.length - 1)]! })), () => Effect.sync(() => (conclusions++, concluded))));
+    return { verdict: result.verdict, starts, conclusions };
+  };
+  const rejected = { exitCode: 1, stderr: "safe-push: cannot lock ref 'refs/heads/farm/17d6e4374124': unable to resolve reference" };
+  expect(await outcome([rejected])).toEqual({ verdict: "infra", starts: 2, conclusions: 0 });
+  expect(await outcome([rejected, { exitCode: 0, stderr: `Farm test c0ffee x: ${url}` }])).toEqual({ verdict: "green", starts: 2, conclusions: 0 });
+  expect(await outcome([{ exitCode: 1, stderr: `Farm test c0ffee x: ${url}\nc0ffee failed on the farm: ${url}` }])).toEqual({ verdict: "red", starts: 1, conclusions: 0 });
+  expect(await outcome([{ exitCode: 1, stderr: `Farm test c0ffee x: ${url}\ngh: i/o timeout` }])).toEqual({ verdict: "green", starts: 1, conclusions: 1 });
+  expect(await outcome([{ exitCode: 1, stderr: `Farm test c0ffee x: ${url}\ngh: i/o timeout` }], "red")).toEqual({ verdict: "red", starts: 1, conclusions: 1 });
+  expect(await outcome([{ exitCode: 1, stderr: `Farm test c0ffee x: ${url}\ngh: i/o timeout` }], "infra")).toEqual({ verdict: "infra", starts: 1, conclusions: 1 });
 });

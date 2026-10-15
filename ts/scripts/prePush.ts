@@ -270,6 +270,38 @@ export function greenFarmRun(runs: readonly { readonly displayTitle: string; rea
 }
 
 
+export const FARM_RUN_URL = /https:\/\/github\.com\/[^\s]+\/actions\/runs\/(\d+)/;
+
+export type FarmStart = (head: string) => Effect.Effect<CheckRun, PrePushRefusal>;
+export type FarmVerdict = "green" | "red" | "infra";
+export type FarmConclusion = (runId: string) => Effect.Effect<FarmVerdict, PrePushRefusal>;
+const RunConclusion = Schema.fromJsonString(Schema.Struct({ status: Schema.String, conclusion: Schema.String }));
+
+const farmStart: FarmStart = (head) => run([process.execPath, "wisp", "farm", "test", "--ref", head, "--wait"], join(root, "ts"));
+const farmConclusion: FarmConclusion = (runId) => Effect.gen(function*() {
+  yield* run(["gh", "run", "watch", runId, "--interval", "30"], root, "ignore");
+  const viewed = yield* run(["gh", "run", "view", runId, "--json", "status,conclusion"], root);
+  const state = viewed.exitCode === 0 ? yield* Schema.decodeEffect(RunConclusion)(viewed.stdout).pipe(Effect.orElseSucceed(() => undefined)) : undefined;
+  return state?.status !== "completed" ? "infra" : state.conclusion === "success" ? "green" : "red";
+});
+
+export const farmOutcome = (head: string, start: FarmStart = farmStart, conclusion: FarmConclusion = farmConclusion) => Effect.gen(function*() {
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    const farm = yield* start(head);
+    if (farm.exitCode === 0) return { verdict: "green" as FarmVerdict, output: `${farm.stdout}${farm.stderr}` };
+    const output = `${farm.stdout}${farm.stderr}`;
+    const runId = FARM_RUN_URL.exec(output)?.[1];
+    if (runId !== undefined) {
+      if (/ failed on the farm: | without a summary /.test(output)) return { verdict: "red" as FarmVerdict, output };
+      const verdict = yield* conclusion(runId);
+      return { verdict, output: `${output}\npre-push: farm run ${runId} concluded ${verdict} after the farm command exited ${farm.exitCode}` };
+    }
+    if (attempt === 2) return { verdict: "infra" as FarmVerdict, output };
+    yield* Console.error(`pre-push: no farm run started on ${head.slice(0, 12)} (infrastructure, not a test result); starting it once more`);
+  }
+  return { verdict: "infra" as FarmVerdict, output: "" };
+});
+
 const farmGate = (head: string) => Effect.gen(function*() {
   const listed = yield* run(["gh", "run", "list", "--workflow", "farm-test.yml", "--status", "success", "--limit", "100", "--json", "displayTitle,conclusion,url"], root);
   const runs = listed.exitCode === 0 ? yield* Schema.decodeEffect(FarmRuns)(listed.stdout).pipe(Effect.orElseSucceed(() => [])) : [];
@@ -277,12 +309,14 @@ const farmGate = (head: string) => Effect.gen(function*() {
   if (green !== undefined) return yield* Console.error(`pre-push: the farm suite is green on ${head.slice(0, 12)} (${green})`);
   yield* Console.error(`pre-push: main lands only on a green farm suite for this exact commit; running bun wisp farm test --ref ${head.slice(0, 12)} --wait`);
   const started = performance.now();
-  const farm = yield* run([process.execPath, "wisp", "farm", "test", "--ref", head, "--wait"], join(root, "ts")).pipe(Effect.timeoutOption(`${FARM_TIMEOUT_MINUTES} minutes`));
+  const farm = yield* farmOutcome(head).pipe(Effect.timeoutOption(`${FARM_TIMEOUT_MINUTES} minutes`));
   const minutes = ((performance.now() - started) / 60000).toFixed(1);
   if (Option.isNone(farm)) return yield* new PrePushRefusal({ problem: `pre-push: the farm suite on ${head.slice(0, 12)} didn't finish within ${FARM_TIMEOUT_MINUTES} minutes; NOT landed` });
-  if (farm.value.exitCode !== 0) {
-    return yield* new PrePushRefusal({ problem: `${farm.value.stdout}${farm.value.stderr}\npre-push: the farm suite failed on ${head.slice(0, 12)} (${minutes} min); main lands only on a green suite, including tests main already fails` });
+  if (farm.value.verdict === "infra") {
+    return yield* new PrePushRefusal({ problem: `${farm.value.output}\npre-push: INFRA, not a red suite: no farm run started on ${head.slice(0, 12)} in two tries (${minutes} min); NOT landed, re-run safe-push once GitHub accepts the scratch push` });
+  }
+  if (farm.value.verdict === "red") {
+    return yield* new PrePushRefusal({ problem: `${farm.value.output}\npre-push: the farm suite failed on ${head.slice(0, 12)} (${minutes} min); main lands only on a green suite, including tests main already fails` });
   }
   yield* Console.error(`pre-push: the farm suite passed on ${head.slice(0, 12)} (${minutes} min)`);
 });
-
