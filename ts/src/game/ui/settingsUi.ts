@@ -13,7 +13,7 @@ import {
   chooseDelay,
   saveBindingSettings,
 } from "./bindingSettings";
-import { ButtonClicks, createText, gameUi, placeTopLeft } from "./frames";
+import { ButtonClicks, createText, gameUi, placeTopLeft, setFrameText } from "./frames";
 import { AUTO_DELAY, MAX_FIXED_DELAY } from "../netcode/delayPolicy";
 
 export interface SettingsActions {
@@ -64,35 +64,34 @@ export class SettingsPanel {
       const frame = BlzCreateFrameByType("GLUETEXTBUTTON", name, gameUi(), "ScriptDialogButton", context);
       placeTopLeft(frame, x, y);
       BlzFrameSetSize(frame, width, f32(0.032));
-      BlzFrameSetText(frame, label);
-      return this.clicks.add(frame, target);
+      return this.clicks.add(frame, target, label);
     };
     this.title = text(`MeleeSettingsTitle${suffix}`, 410 + offset, f32(0.17), f32(0.575), f32(0.48), f32(0.035));
     BlzFrameSetText(this.title, "CONTROLS");
-    this.help = text(`MeleeSettingsHelp${suffix}`, 411 + offset, f32(0.17), f32(0.542), f32(0.48), f32(0.032));
+    this.help = text(`MeleeSettingsHelp${suffix}`, 411 + offset, f32(0.17), f32(0.548), f32(0.48), f32(0.042));
     BlzFrameSetText(this.help, "Click a key to rebind. Tilt + left/right + Special: neutral special facing that way. Up/down keep their specials.");
-    this.status = text(`MeleeSettingsStatus${suffix}`, 412 + offset, f32(0.17), f32(0.105), f32(0.48), f32(0.03));
+    this.status = text(`MeleeSettingsStatus${suffix}`, 412 + offset, f32(0.17), f32(0.108), f32(0.48), f32(0.02));
     this.buttons = [
-      button(`MeleeSettingsQwerty${suffix}`, 420 + offset, f32(0.17), f32(0.065), f32(0.105), "QWERTY", { kind: "standard" }),
-      button(`MeleeSettingsCustom${suffix}`, 421 + offset, f32(0.28), f32(0.065), f32(0.105), "Custom", { kind: "custom" }),
-      button(`MeleeSettingsSave${suffix}`, 422 + offset, f32(0.39), f32(0.065), f32(0.105), "Save", { kind: "save" }),
-      button(`MeleeSettingsClose${suffix}`, 424 + offset, 0.5, f32(0.065), f32(0.105), "Back", { kind: "close" }),
+      button(`MeleeSettingsQwerty${suffix}`, 420 + offset, f32(0.17), f32(0.075), f32(0.105), "QWERTY", { kind: "standard" }),
+      button(`MeleeSettingsCustom${suffix}`, 421 + offset, f32(0.28), f32(0.075), f32(0.105), "Custom", { kind: "custom" }),
+      button(`MeleeSettingsSave${suffix}`, 422 + offset, f32(0.39), f32(0.075), f32(0.105), "Save", { kind: "save" }),
+      button(`MeleeSettingsClose${suffix}`, 424 + offset, f32(0.5), f32(0.075), f32(0.105), "Back", { kind: "close" }),
     ];
-    this.delayButton = button(`MeleeSettingsDelay${suffix}`, 425 + offset, f32(0.625), f32(0.505), f32(0.15), "Delay: Auto", { kind: "delay" });
-    const recalibrate = button(`MeleeSettingsRecalibrate${suffix}`, 426 + offset, f32(0.625), f32(0.468), f32(0.15), "Recalibrate", { kind: "recalibrate" });
-    this.delayInfo = text(`MeleeSettingsDelayInfo${suffix}`, 427 + offset, f32(0.625), f32(0.43), f32(0.15), f32(0.1));
+    this.delayButton = button(`MeleeSettingsDelay${suffix}`, 425 + offset, f32(0.625), f32(0.495), f32(0.15), "Delay: Auto", { kind: "delay" });
+    const recalibrate = button(`MeleeSettingsRecalibrate${suffix}`, 426 + offset, f32(0.625), f32(0.458), f32(0.15), "Recalibrate", { kind: "recalibrate" });
+    this.delayInfo = text(`MeleeSettingsDelayInfo${suffix}`, 427 + offset, f32(0.625), f32(0.42), f32(0.15), f32(0.1));
     this.buttons = [...this.buttons, this.delayButton, recalibrate];
     const rows: ActionRow[] = [];
     for (const action of ACTION_ORDER) {
-      const y = f32(0.505) - action * f32(0.023);
-      const label = text(`MeleeSettingsAction${suffix}${I2S(action)}`, 430 + offset + action, f32(0.18), y, f32(0.22), f32(0.025));
+      const y = f32(0.495) - action * f32(0.021);
+      const label = text(`MeleeSettingsAction${suffix}${I2S(action)}`, 430 + offset + action, f32(0.17), y, f32(0.25), f32(0.02));
       const key = (slot: KeySlot, x: number): framehandle => {
         const keyIndex = action * 2 + slot;
-        const frame = button(`MeleeSettingsKey${suffix}${I2S(keyIndex)}`, 460 + offset + keyIndex, x, y, f32(0.095), "—", { kind: "key", action, slot });
-        BlzFrameSetSize(frame, f32(0.095), f32(0.024));
+        const frame = button(`MeleeSettingsKey${suffix}${I2S(keyIndex)}`, 460 + offset + keyIndex, x, y, f32(0.085), "—", { kind: "key", action, slot });
+        BlzFrameSetSize(frame, f32(0.085), f32(0.02));
         return frame;
       };
-      rows.push({ action, label, keys: [key(0, f32(0.41)), key(1, f32(0.52))] });
+      rows.push({ action, label, keys: [key(0, f32(0.43)), key(1, f32(0.525))] });
     }
     this.rows = rows;
     this.all = [this.title, this.help, this.status, this.delayInfo, ...this.buttons];
@@ -157,7 +156,7 @@ export class SettingsPanel {
     if (signature === this.lastSignature) return;
     this.lastSignature = signature;
     this.setVisible(true);
-    BlzFrameSetText(this.delayButton, settings.delay === AUTO_DELAY ? "Delay: Auto" : `Delay: ${I2S(settings.delay)} frames`);
+    setFrameText(this.delayButton, settings.delay === AUTO_DELAY ? "Delay: Auto" : `Delay: ${I2S(settings.delay)} frames`);
     BlzFrameSetText(this.delayInfo, info);
     BlzFrameSetText(this.status, settings.message);
     BlzFrameSetText(this.help, capture === undefined ? "Q: full shield · A: light shield · P: tilt · I: short hop\nClick a binding to change it. Each action accepts two keys." : "Press an unassigned key. Escape cancels.");
@@ -165,8 +164,9 @@ export class SettingsPanel {
       BlzFrameSetText(label, ACTION_LABELS[action]);
       for (const slot of KEY_SLOTS) {
         const capturing = capture?.action === action && capture.slot === slot;
-        BlzFrameSetText(keys[slot], `${capturing ? "> " : ""}${keyLabel(keyFor(settings.bindings, action, slot))}`);
+        setFrameText(keys[slot], `${capturing ? "> " : ""}${keyLabel(keyFor(settings.bindings, action, slot))}`);
       }
     }
+    this.clicks.refreshHover();
   }
 }
