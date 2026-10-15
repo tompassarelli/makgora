@@ -133,7 +133,7 @@ const BIRTH_CUES = new Set([
   "FeralSpiritDone", "PolymorphTarget", "AncestralSpiritCaster", "HowlCaster",
   "FlameStrike1", "FreezingBreathMissile", "FrostNovaTarget", "DispelMagicTarget",
   "MassTeleportTarget", "WaterElementalMissile", "NeutralBuildingExplosion", "RedDragonMissile",
-  "GoldCredit", "NagaDeath", "AIfbSpecialArt", "PolyMorphDoneGround", "UCancelDeath", "ToonBoom",
+  "GoldCredit", "NagaDeath", "AIfbSpecialArt", "PolyMorphDoneGround", "UCancelDeath", "ToonBoom", "BloodlustSpecial",
 ]);
 
 const cue = (model: string, anchor: CueAnchor, scale: number): Cue => {
@@ -261,7 +261,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
       { x: -23.49820327758789, z: 161.7350311279297 },
       { x: -23.49820327758789, z: 161.7318878173828 },
     ] } }, active: drawn("Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveMissile.mdx", "ahead") },
-    side: { spell: "Bloodhoof Gore", startup: BEAST, active: cue("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", "feet", f32(0.35)) },
+    side: { spell: "Bloodhoof Gore", startup: cue("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", "feet", f32(0.35)), active: cue("Abilities\\Spells\\Orc\\Bloodlust\\BloodlustSpecial.mdx", "body", f32(0.8)) },
     up: { spell: "Spirit Lift", startup: BEAST, active: cue("Abilities\\Spells\\Orc\\CommandAura\\CommandAura.mdx", "feet", f32(0.7)) },
     down: { spell: "War Stomp", startup: BEAST, active: cue("Abilities\\Spells\\Orc\\CommandAura\\CommandAuraTarget.mdx", "body", f32(0.5)) },
   },
