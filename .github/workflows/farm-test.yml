@@ -341,6 +341,13 @@ jobs:
             esac
           fi
           echo "run=$run" | tee -a "$GITHUB_OUTPUT"
+          echo "$GROUP filtered out by the changed paths" > "skipped-check-$GROUP.txt"
+      - if: steps.scope.outputs.run == 'false'
+        uses: actions/upload-artifact@v4
+        with:
+          name: farm-test-skipped-check-${{ matrix.group }}
+          path: skipped-check-${{ matrix.group }}.txt
+          retention-days: 3
       - if: steps.scope.outputs.run == 'true'
         uses: oven-sh/setup-bun@v2
         with:
@@ -465,6 +472,9 @@ jobs:
           zero='{"passed":0,"failed":0,"skipped":0,"shards":0,"slowestShardSeconds":0}'
           fallback "$zero" '"the merge step did not finish: see its log"'
           : > problems.txt
+          for group in perf perf-definitive parity corpus; do
+            [ -n "$(find farm \( -name "result-check-$group.json" -o -name "skipped-check-$group.txt" \))" ] || echo "check group $group neither ran nor was filtered out: it left no result" >> problems.txt
+          done
           [ "$PLAN_RESULT" = success ] || echo "the plan job ended $PLAN_RESULT, so no shard ran: see its log" >> problems.txt
           bun node_modules/wisp/scripts/wisp/farmShards.ts merge --plan farm/farm-test-plan/plan.json --timings farm-timings.json --out summary.json $(find farm -name 'result*.json') 2> merge.log
           merged=$?
