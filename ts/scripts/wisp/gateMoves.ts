@@ -16,9 +16,9 @@ import { pollUntil } from "../hostPoll";
 import { runProcess } from "../hostProcess";
 import { JournalMenu } from "./boundary";
 import { readReplay } from "./replayFiles";
-import { type SmokeVerdict, judgeSmoke, mergeVerdicts, smokeLines, smokeReceipt } from "./smokeJudge";
+import { type SmokeVerdict, judgeSmoke, mergeVerdicts, smokeLines, smokePace, smokeReceipt } from "./smokeJudge";
 import { smokeApproaches } from "./smokeRehearsal";
-import { FRAME_MILLIS, RESET_LEAD, SETTLE_AT, type SettlePoint, settlePoints, smokeSchedule, xdotoolArgs } from "./smokeTape";
+import { FRAME_MILLIS, NATIVE_PACE, RESET_LEAD, SETTLE_AT, type SettlePoint, settlePoints, smokeSchedule, xdotoolArgs } from "./smokeTape";
 import { type Settle, type SpotResult, brightCount, playArea, specialsReceipt, specialsSpot } from "./specialsSpot";
 
 const fail = (operation: string) => (cause: { readonly message: string }) => new AcceptFailure({ operation, problem: cause.message });
@@ -26,6 +26,9 @@ const REPLAY = /^smashcraft-replay-(\d+)\.txt$/;
 const SEGMENT_GAP = "1 second";
 const MATCH_SETTLE = "6 seconds";
 const PAUSE_SETTLE = "1500 millis";
+
+// A fresh private desktop's Xwayland drops the first XTEST motion.
+const POINTER_PRIME_ATTEMPTS = 3;
 
 const spotLines = (fighters: readonly string[], results: readonly SpotResult[]) => results.map(({ step, pass, reason }) => `${pass ? "PASS" : "FAIL"} ${fighters.join(" vs ")} ${step}: ${reason}`);
 
@@ -69,6 +72,16 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
     every: "100 millis", within: `${seconds} seconds`, orElse: () => Effect.fail(new AcceptFailure({ operation: "moves gate menu", problem: `no ${wanted} journal phase within ${seconds} s` })),
   });
   const xdotool = (client: Client, args: readonly string[]) => runProcess(ChildProcess.make(client.tools.xdotool, args, { env: { ...Bun.env, ...client.x11 }, stdin: "ignore" })).pipe(Effect.mapError(fail(`moves gate input ${client.name}`)));
+  const pointerX = (client: Client) => runProcess(ChildProcess.make(client.tools.xdotool, ["getmouselocation", "--shell"], { env: { ...Bun.env, ...client.x11 }, stdin: "ignore" })).pipe(Effect.map(text => Number(/^X=(\d+)$/m.exec(text)?.[1])), Effect.mapError(fail(`moves gate pointer ${client.name}`)));
+  const prime = (client: Client) => Effect.gen(function*() {
+    for (let attempt = 0; attempt < POINTER_PRIME_ATTEMPTS; attempt++) {
+      const before = yield* pointerX(client);
+      yield* xdotool(client, ["mousemove_relative", "--", before > 0 ? "-1" : "1", "0"]);
+      if ((yield* pointerX(client)) !== before) return;
+      yield* Effect.sleep("100 millis");
+    }
+    return yield* new AcceptFailure({ operation: "moves gate pointer", problem: `no pointer motion reached ${client.name} in ${POINTER_PRIME_ATTEMPTS} tries` });
+  });
   const tap = (client: Client, key: string) => xdotool(client, ["keydown", key, "sleep", "0.12", "keyup", key]);
   const save = (file: string, text: string) => Effect.try({ try: () => writeFileSync(join(directory, file), text, { mode: 0o600 }), catch: cause => new AcceptFailure({ operation: "moves gate evidence", problem: String(cause) }) });
 
@@ -76,6 +89,7 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
   if (initial.phase !== "CHARACTER") return yield* new AcceptFailure({ operation: "moves gate setup", problem: `expected CHARACTER, got ${initial.phase}` });
   for (const client of clients) {
     yield* focus(client).pipe(Effect.mapError(fail("moves gate setup")));
+    yield* prime(client);
     const viewport = yield* input.windowRegion(client).pipe(Effect.mapError(fail("moves gate setup")));
     const words = yield* frameWords(client, yield* capture(client, viewport).pipe(Effect.mapError(fail("moves gate setup"))), "light").pipe(Effect.mapError(fail("moves gate tutorial")));
     const notNow = words.find(word => word.text === "Not");
@@ -91,13 +105,14 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
   const verdicts: { readonly fighters: readonly string[]; readonly verdict: SmokeVerdict }[] = [];
   const spots: { readonly fighters: readonly string[]; readonly results: readonly SpotResult[] }[] = [];
   let area = 0;
+  let pace = NATIVE_PACE;
   const settle = (points: readonly SettlePoint[], startNs: number) => Effect.forEach(points, point => Effect.gen(function*() {
-    const targetNs = startNs + point.frame * FRAME_MILLIS * 1_000_000;
+    const targetNs = startNs + point.frame * FRAME_MILLIS * 1_000_000 / pace;
     const waitMillis = (targetNs - nowNs()) / 1_000_000;
     if (waitMillis > 0) yield* Effect.sleep(`${Math.round(waitMillis)} millis`);
     const { frame, afterNs } = yield* captureTimed(host, nowNs, hostView).pipe(Effect.mapError(fail("moves gate settle frame")));
     area = playArea(frame);
-    return { step: point.step, special: point.special, count: brightCount(frame), onTime: afterNs - targetNs < (RESET_LEAD - SETTLE_AT) * FRAME_MILLIS * 1_000_000 } satisfies Settle;
+    return { step: point.step, special: point.special, count: brightCount(frame), onTime: afterNs - targetNs < (RESET_LEAD - SETTLE_AT) * FRAME_MILLIS * 1_000_000 / pace } satisfies Settle;
   }));
   for (const [index, pair] of smokePairs().entries()) {
     const characters = pair.map(choice => PLAYABLE_CHARACTERS[choice] ?? Character.rifleman);
@@ -130,7 +145,7 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
       const [, settles] = yield* Effect.all([
         Effect.forEach(segment, ({ slot, steps }) => {
           const client = clients[slot];
-          return client === undefined ? Effect.void : xdotool(client, xdotoolArgs(steps));
+          return client === undefined ? Effect.void : xdotool(client, xdotoolArgs(steps, pace));
         }, { concurrency: "unbounded", discard: true }),
         settle(points, nowNs()),
       ], { concurrency: "unbounded" });
@@ -152,6 +167,9 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
     const lines = readReplay(join(data, manifest));
     if (typeof lines === "string") return yield* new AcceptFailure({ operation: "moves gate replay", problem: lines });
     const judged = judgeSmoke(lines, schedule.flat());
+    const measured = smokePace(lines);
+    const played = pace;
+    if (measured !== undefined) pace = measured * played;
     const fighters = characters.map(fighterName);
     const seen = [0, 1].map(slot => judged.results.find(result => result.slot === slot)?.fighter ?? "none");
     const verdict: SmokeVerdict = { ...judged, results: [{ slot: 0, fighter: seen.join(" vs "), step: "fighter selection", kind: "setup", pass: seen.join() === fighters.join(), reason: `wanted ${fighters.join(" vs ")}` }, ...judged.results] };
@@ -159,7 +177,7 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
     const results = specialsSpot(runs, area);
     spots.push({ fighters, results });
     const settleLines = runs.flat().map(({ step, count, onTime }) => `settle ${step} bright=${count}${onTime ? "" : " late"}`);
-    yield* save(`match-${String(index + 1).padStart(2, "0")}.txt`, `${[`replay ${manifest}`, `fighters ${fighters.join(" vs ")}`, smokeReceipt(verdict, 2), ...smokeLines(verdict), specialsReceipt(2, results), ...spotLines(fighters, results), ...settleLines].join("\n")}\n`);
+    yield* save(`match-${String(index + 1).padStart(2, "0")}.txt`, `${[`replay ${manifest}`, `fighters ${fighters.join(" vs ")}`, `pace played ${played.toFixed(4)} next ${pace.toFixed(4)}`, smokeReceipt(verdict, 2), ...smokeLines(verdict), specialsReceipt(2, results), ...spotLines(fighters, results), ...settleLines].join("\n")}\n`);
   }
   const all = mergeVerdicts(verdicts.map(({ verdict }) => verdict));
   const roster = new Set(verdicts.flatMap(({ fighters }) => fighters)).size;

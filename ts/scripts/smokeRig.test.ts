@@ -5,9 +5,9 @@ import { Character } from "../src/game/sim/codes";
 import { PLAYABLE_CHARACTERS } from "../src/game/sim/heroes/registry";
 import { SMASHCRAFT_ACCEPT } from "./wisp/acceptChecks";
 import { GREEN_GATE_CHECKS, greenGateFailures } from "./wisp/greenBuilds";
-import { smokeLines, smokeReceipt } from "./wisp/smokeJudge";
-import { rehearseSmoke } from "./wisp/smokeRehearsal";
-import { SMOKE_BINDINGS, keyName } from "./wisp/smokeTape";
+import { judgeSmoke, smokeLines, smokePace, smokeReceipt } from "./wisp/smokeJudge";
+import { rehearsal, rehearseSmoke, smokeApproaches } from "./wisp/smokeRehearsal";
+import { NATIVE_PACE, SMOKE_BINDINGS, bindingSweep, keyName, smokeSchedule, xdotoolArgs } from "./wisp/smokeTape";
 import { type Settle, specialsReceipt, specialsSpot } from "./wisp/specialsSpot";
 
 test("the smoke tape starts every move, the ultimate included, and reaches every standard key for both fighters of a pair [k1 scenario]", () => {
@@ -62,4 +62,14 @@ test("a special whose effect is still drawn at the next rest fails the spot chec
   expect(pattern.test(specialsReceipt(PLAYABLE_CHARACTERS.length, results.slice(0, 1)))).toBe(true);
   expect(pattern.test(specialsReceipt(PLAYABLE_CHARACTERS.length, results))).toBe(false);
   expect(pattern.test(specialsReceipt(PLAYABLE_CHARACTERS.length, []))).toBe(false);
+});
+
+test("a native client stepping faster than the wall clock still starts every move, and the rig measures that pace from the replay and slows its keys to match [k1 scenario]", () => {
+  const schedule = smokeSchedule(smokeApproaches(Character.rifleman, Character.demonHunter));
+  const paced = rehearsal(Character.rifleman, Character.demonHunter, SMOKE_BINDINGS, schedule, NATIVE_PACE);
+  expect(smokeLines(judgeSmoke(paced.lines, schedule.flat())).filter((line) => !line.startsWith("PASS"))).toEqual([]);
+  expect(Math.abs((smokePace(paced.lines) ?? 0) - NATIVE_PACE)).toBeLessThan(0.005);
+  const sweep = bindingSweep();
+  const slept = (args: readonly string[]) => args.reduce((total, arg, index) => (args[index - 1] === "sleep" ? total + Number(arg) : total), 0);
+  expect(Math.abs(slept(xdotoolArgs(sweep, NATIVE_PACE)) - slept(xdotoolArgs(sweep)) / NATIVE_PACE)).toBeLessThan(0.05);
 });

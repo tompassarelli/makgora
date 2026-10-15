@@ -38,7 +38,7 @@ export const RESET_LEAD = 120;
 export const DROP_AT = 60;
 export const SETTLE_AT = 90;
 export const SPECIAL_TAIL = 240;
-export const MANA_CYCLES = 14;
+export const MANA_CYCLES = 20;
 export const APPROACH_FRAMES = 100;
 export const STRIKES = 3;
 export const STRIKE_EVERY = 30;
@@ -76,7 +76,7 @@ const rest = (): SmokeStep => afterReset("rest", [], 0);
 
 const ultimate = (): SmokeStep[] => [afterReset("Ultimate", [tap([key(Action.attack), key(Action.special)])], SPECIAL_TAIL, special("ultimate")), rest()];
 
-function bindingSweep(): SmokeStep[] {
+export function bindingSweep(): SmokeStep[] {
   const jumps = [key(Action.jump), key(Action.jump, true), key(Action.shortHop)];
   return SMOKE_BINDINGS.keys.filter((bound) => bound !== 0).map((bound): SmokeStep => ({ name: `binding ${keyName(bound)}`, presses: [tap([bound], 6)], frames: jumps.includes(bound) ? 60 : 30, binding: bound }));
 }
@@ -167,11 +167,13 @@ function edges(steps: readonly SmokeStep[]): KeyEdge[] {
 
 export const FRAME_MILLIS = 1000 / 60;
 
-export function xdotoolArgs(steps: readonly SmokeStep[]): string[] {
+export const NATIVE_PACE = 1.04;
+
+export function xdotoolArgs(steps: readonly SmokeStep[], pace = 1): string[] {
   const args: string[] = [];
   let frame = 0;
   for (const edge of edges(steps)) {
-    if (edge.frame > frame) args.push("sleep", ((edge.frame - frame) * FRAME_MILLIS / 1000).toFixed(3));
+    if (edge.frame > frame) args.push("sleep", ((edge.frame - frame) * FRAME_MILLIS / 1000 / pace).toFixed(3));
     frame = edge.frame;
     args.push(edge.down ? "keydown" : "keyup", keyName(edge.key));
   }

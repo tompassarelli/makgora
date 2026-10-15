@@ -6,7 +6,7 @@ import { traitMove } from "../../src/game/sim/identityTraits";
 import { normalName } from "../../src/game/sim/moveNames";
 import { fighterName } from "../../src/game/sim/heroes/registry";
 import { fighterAt, isActive } from "../../src/game/sim/roster";
-import { type MoveClass, SMOKE_BINDINGS, type SmokeStep, type SmokeTape, keyName } from "./smokeTape";
+import { type MoveClass, SMOKE_BINDINGS, type SmokeStep, type SmokeTape, bindingSweep, keyName, tapeFrames } from "./smokeTape";
 
 export const STEP_SLACK = 24;
 
@@ -133,3 +133,17 @@ export const mergeVerdicts = (verdicts: readonly SmokeVerdict[]): SmokeVerdict =
   replay: verdicts.reduce<MatchReplayResult>((sum, { replay }) => ({ ...sum, frames: sum.frames + replay.frames, problems: [...sum.problems, ...replay.problems], reached: sum.reached + replay.reached, recorded: sum.recorded + replay.recorded }), { checksum: "", frames: 0, problems: [], reached: 0, recorded: 0, digests: 0, divergent: 0 }),
   results: verdicts.flatMap(({ results }) => results),
 });
+
+export function smokePace(lines: readonly string[], sweep: readonly SmokeStep[] = bindingSweep()): number | undefined {
+  const rises: number[] = [];
+  let previous = 0;
+  replayMatch(lines, (_state, frame, rows) => {
+    const held = rows.rows[0]?.held ?? 0;
+    if (held !== 0 && previous === 0) rises.push(frame);
+    previous = held;
+  });
+  const first = rises[0];
+  const last = rises[sweep.length - 1];
+  const tape = tapeFrames(sweep.slice(0, -1));
+  return first === undefined || last === undefined || tape === 0 ? undefined : (last - first) / tape;
+}
