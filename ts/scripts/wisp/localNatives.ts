@@ -52,6 +52,7 @@ export const SMASHCRAFT_LOCAL_NATIVES: LocalNatives = {
   R2I: "pure conversion",
   I2R: "pure conversion",
   S2I: "pure conversion",
+  StringLength: "pure string measure, for the selection bar's local layout",
   ConvertOsKeyType: "pure conversion, for the local keys the keyboard polls",
 };
 
