@@ -85,13 +85,13 @@ const advance = (opened: FieldMatch, victim: Slot, press: ((input: Controls) => 
   return frame;
 };
 
-interface Branch {
+export interface Branch {
   readonly escaped: boolean;
   readonly end: string;
 }
 
 /** Plays `horizon` frames from `from` with the victim's controls scripted and reports whether the victim was hit again and the state reached. */
-function runBranch(opened: FieldMatch, from: ReplayState, scratch: ReplayState, victim: Slot, horizon: number, hit: () => boolean, option: VictimOption | undefined): Branch {
+export function runBranch(opened: FieldMatch, from: ReplayState, scratch: ReplayState, victim: Slot, horizon: number, hit: () => boolean, option: VictimOption | undefined): Branch {
   const { match, world, controls, runtime } = opened;
   restoreReplaySnapshot(from, world, match, controls, runtime);
   opened.row.frame = -1;

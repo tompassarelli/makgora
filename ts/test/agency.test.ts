@@ -1,6 +1,10 @@
 import { expect, test } from "bun:test";
 import { type AgencyLink, type AgencyRule, type AgencyString, DEFAULT_RULE, type KillConfirm, TICKS_PER_SECOND, conversion, distribution, flagString, linkCause, linkEscape } from "../scripts/agencyCore";
-import { DEFAULT_POLICY, measureString } from "../scripts/agencyBranch";
+import { DEFAULT_POLICY, measureString, runBranch } from "../scripts/agencyBranch";
+import { openFieldMatch } from "../scripts/cpuField";
+import { isCpuTier } from "../src/game/match/cpuProfiles";
+import { captureReplaySnapshot, createReplaySnapshot } from "../src/game/replay/snapshot";
+import { selectableCharacterBySlug } from "../src/game/sim/heroes/registry";
 import { ROSTER, playReal } from "../scripts/playtest";
 import { DEFAULT_CONFIG, FINDING_KINDS, type Observation, classify, planMatches } from "../scripts/playtestCore";
 
@@ -144,4 +148,20 @@ test("classify turns a measured string into findings of the new kinds and none o
   expect(findings.map((finding) => finding.kind)).toContain("true-chain");
   expect(findings.find((finding) => finding.kind === "true-chain")?.detail).toContain("caused by");
   expect(findings.every((finding) => (FINDING_KINDS as readonly string[]).includes(finding.kind))).toBe(true);
+});
+
+test("a branch that ends on its first frame leaves the next branch's capture accepted [k1 scenario]", () => {
+  const spec = planMatches(ROSTER, 6, 1)[0];
+  if (spec === undefined) throw new Error("no match planned");
+  const a = selectableCharacterBySlug(spec.a);
+  const b = selectableCharacterBySlug(spec.b);
+  if (a === undefined || b === undefined || !isCpuTier(spec.tier)) throw new Error("unplayable spec");
+  const opened = openFieldMatch(a, b, spec.stage, 0, { tiers: [spec.tier, spec.tier], frameCap: DEFAULT_CONFIG.frameCap, playtest: true }, spec.seed);
+  if (opened === undefined) throw new Error("no spawn");
+  const from = createReplaySnapshot();
+  captureReplaySnapshot(from, opened.world, opened.match, opened.controls, opened.runtime);
+  const scratch = createReplaySnapshot();
+  const first = runBranch(opened, from, scratch, 1, 5, () => true, undefined);
+  const second = runBranch(opened, from, scratch, 1, 5, () => true, undefined);
+  expect(second.end).toBe(first.end);
 });
