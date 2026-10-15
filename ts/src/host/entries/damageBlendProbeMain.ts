@@ -2,9 +2,9 @@
 
 import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
-import { arenaFarZ, ARENA_CAMERA, FLOOR_HEIGHT } from "../game/presentation/arenaCamera";
-import { facingYaw } from "../game/render/effects";
-import { DAMAGE_BLEND_PROBE_MODELS } from "./damageBlendProbeModels";
+import { arenaFarZ, ARENA_CAMERA, FLOOR_HEIGHT } from "../../game/presentation/arenaCamera";
+import { facingYaw } from "../../game/render/effects";
+import { DAMAGE_BLEND_PROBE_MODELS } from "../../platform/damageBlendProbeModels";
 
 interface Case {
   readonly model: effect;

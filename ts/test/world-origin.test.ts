@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { testHeadless } from "./headless";
 import { install, start } from "../src/platform/main";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
-import { shellState } from "../src/platform/shell/state";
+import { shellState } from "../src/host/loop/state";
 import { FLOOR_HEIGHT } from "../src/game/presentation/arenaCamera";
 
 const WATER_SURFACE_Z = 500.0;

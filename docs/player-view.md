@@ -46,7 +46,7 @@ Logic tests, type checks, the desync guard and the native match gate can all
 pass while a player sees no stage or an effect that never leaves. Smashcraft
 uses Wisp's player-view checks (wisp:docs/player-view.md) to fail on those:
 
-- **Scene report.** The development entry (smashcraft:ts/src/platform/devMain.ts)
+- **Scene report.** The development entry (smashcraft:ts/src/host/entries/devMain.ts)
   and the integrity entry start Wisp's scene recorder through
   smashcraft:ts/src/platform/sceneReport.ts. The recorder's clock is the
   confirmed simulation frame. An effect is out of view only when it is parked
@@ -67,7 +67,7 @@ soon as it is in view, so a new model needs a kind before it ships.
 
 The winter arena's sky, fog and backdrop are declared in
 smashcraft:ts/src/game/presentation/stageScenery.ts and drawn by
-smashcraft:ts/src/platform/shell/stageScenery.ts. They never enter match or
+smashcraft:ts/src/host/loop/stageScenery.ts. They never enter match or
 replay state. Frozen Throne uses classic Lordaeron Winter sky and Icecrown
 doodads referenced by their game paths. Its drifting snow is an authored
 model from smashcraft:tools/stage/package.ts using the stock snowflake texture:

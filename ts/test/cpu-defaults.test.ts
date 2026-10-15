@@ -3,8 +3,8 @@ import { testHeadless } from "./headless";
 import { PREDICTED_HEADLESS } from "../scripts/wisp/headless";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { install, startBuild } from "../src/platform/main";
-import { shell } from "../src/platform/shell/state";
-import { panelActions } from "../src/platform/shell/menus";
+import { shell } from "../src/host/loop/state";
+import { panelActions } from "../src/host/loop/menus";
 import { createMatchState, initializeComputerChoices, Phase, setParticipants } from "../src/game/lobby/lobbyState";
 import { PLAYABLE_CHARACTERS } from "../src/game/sim/heroes/registry";
 

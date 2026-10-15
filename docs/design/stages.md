@@ -302,7 +302,7 @@ WorldEditData.txt's sky list, and the CASC file list.
   `Environment\DNC\` (Lordaeron, Ashenvale, Felwood, Dalaran, Dungeon,
   Underground).
 - Doodads and units are drawn as special effects, as the decks already are
-  (smashcraft:ts/src/platform/shell/view.ts); tiles only matter for ground the
+  (smashcraft:ts/src/host/loop/view.ts); tiles only matter for ground the
   camera sees behind the stage.
 
 ### Undead and the Scourge

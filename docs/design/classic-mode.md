@@ -151,7 +151,7 @@ voice acting, unlocks, a bonus stage, saved records.
 ## The tournament opening
 
 #269 builds a 30-60 second opening the first time Classic starts.
-It plays in smashcraft:ts/src/platform/shell/menus.ts, where Classic's start
+It plays in smashcraft:ts/src/host/loop/menus.ts, where Classic's start
 calls `requestStageLoad`: before a run's first fight loads, from the same
 synchronized event, calling the fight's start when it ends.
 

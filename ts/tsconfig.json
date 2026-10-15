@@ -67,6 +67,7 @@
   ],
   "exclude": [
     "src/platform/**",
+    "src/host/**",
     "src/game/ui/**",
     "src/game/render/**",
     "src/game/host/entries/parityMain.ts",

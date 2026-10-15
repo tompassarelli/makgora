@@ -397,7 +397,7 @@ The companion helper assigns each row by its own clock, `segment_frame +
 floor((t − epoch)·60/1e9)`, so it keeps journaling 60 frames a second whatever
 the game does. Each 60 Hz callback admits the local journal's rows, runs
 confirmed frames on accepted rows, reconciles, and runs speculative frames on
-local rows and predictions (smashcraft:ts/src/platform/shell/rollback.ts).
+local rows and predictions (smashcraft:ts/src/host/loop/rollback.ts).
 When the game loses time — a stall, or a game clock behind real time, as
 saturated clients showed (wisp:docs/network-model.md) — the helper is ahead
 by the lost time, and only running more than one frame a callback brings the

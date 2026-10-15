@@ -10,10 +10,10 @@ import { Phase } from "../../src/game/lobby/lobbyState";
 import { INTEGRITY_BUILD } from "../../src/game/session/currentBuild";
 import { Character } from "../../src/game/sim/codes";
 import { install, startBuild } from "../../src/platform/main";
-import { confirmedChecksum } from "../../src/platform/shell/diagnostics";
-import { Key } from "../../src/platform/shell/keyEvents";
-import { panelActions } from "../../src/platform/shell/menus";
-import { shell } from "../../src/platform/shell/state";
+import { confirmedChecksum } from "../../src/host/loop/diagnostics";
+import { Key } from "../../src/host/loop/keyEvents";
+import { panelActions } from "../../src/host/loop/menus";
+import { shell } from "../../src/host/loop/state";
 import type { JournalHelpers } from "./journalHelper";
 
 export const WAITING = "Waiting for Player 2";

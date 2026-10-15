@@ -21,10 +21,10 @@ beforeAll(() => { headless = installHeadless(SMASHCRAFT_HEADLESS); });
 afterAll(() => headless.restore());
 
 test("-dev hide fighter 0 hides Warden's body and nair knives on a held native frame, leaves b and the stage drawn, and show restores every pose [k1 scenario]", async () => {
-  const { shell } = await import(join(platform, "shell/state.ts"));
+  const { shell } = await import(join(platform, "../host/loop/state.ts"));
   const { nativeDriverCommand }: { nativeDriverCommand(text: string): void } = await import(join(platform, "nativeDriver.ts"));
-  const { applyDeveloperCommand }: { applyDeveloperCommand(s: unknown, actor: number, message: string): void } = await import(join(platform, "shell/keys.ts"));
-  const entry: MapEntry = await import(join(platform, "nativeDriverMain.ts"));
+  const { applyDeveloperCommand }: { applyDeveloperCommand(s: unknown, actor: number, message: string): void } = await import(join(platform, "../host/loop/keys.ts"));
+  const entry: MapEntry = await import(join(platform, "../host/entries/nativeDriverMain.ts"));
   const fixture = fixtureOf(PAD, readFileSync(PAD, "utf8"));
   expect(fixture.silhouette).toEqual({ slot: 0, fighter: "warden", move: "neutral-air", width: 1920, height: 1080 });
   expect(fixture.frames).toContain(HELD);
@@ -93,9 +93,9 @@ test("-dev hide fighter 0 hides Warden's body and nair knives on a held native f
 });
 
 test("a silhouette capture keeps Warden's team glow and nair knives off in the shown and hidden grabs and stamps the hidden grab the tick after hide [k1 scenario]", async () => {
-  const { shell } = await import(join(platform, "shell/state.ts"));
-  const { captureTick }: { captureTick(fixtures: readonly CaptureFixture[]): void } = await import(join(platform, "nativeCaptureMain.ts"));
-  const entry: MapEntry = await import(join(platform, "nativeDriverMain.ts"));
+  const { shell } = await import(join(platform, "../host/loop/state.ts"));
+  const { captureTick }: { captureTick(fixtures: readonly CaptureFixture[]): void } = await import(join(platform, "../host/entries/nativeCaptureMain.ts"));
+  const entry: MapEntry = await import(join(platform, "../host/entries/nativeDriverMain.ts"));
   const fixture: CaptureFixture = { ...fixtureOf(PAD, readFileSync(PAD, "utf8")), frames: [HELD], holdTicks: 6, openingTicks: 1, tailFrames: 1 };
   const clients = headless.clients(entry, [0]);
   const client = clients.client(0);

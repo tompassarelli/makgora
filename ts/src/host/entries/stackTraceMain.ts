@@ -1,9 +1,9 @@
 
 
-import { CURRENT_BUILD } from "../game/session/currentBuild";
-import type { MapBuild } from "../game/session/build";
-import { install as installMap, startBuild } from "./main";
-import { installStackDemo, startStackDemo } from "./stackDemo";
+import { CURRENT_BUILD } from "../../game/session/currentBuild";
+import type { MapBuild } from "../../game/session/build";
+import { install as installMap, startBuild } from "../../platform/main";
+import { installStackDemo, startStackDemo } from "../../platform/stackDemo";
 
 const STACK_TRACE_BUILD: MapBuild = { ...CURRENT_BUILD, id: "typescript-stack-trace" };
 

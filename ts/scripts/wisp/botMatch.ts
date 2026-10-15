@@ -16,7 +16,7 @@ import { Phase } from "../../src/game/lobby/lobbyState";
 import type { MapBuild } from "../../src/game/session/build";
 import { INTEGRITY_BUILD } from "../../src/game/session/currentBuild";
 import { Character } from "../../src/game/sim/codes";
-import { Key } from "../../src/platform/shell/keyEvents";
+import { Key } from "../../src/host/loop/keyEvents";
 import { JournalHelpers } from "../../test/rematch/journalHelper";
 
 interface BotMatch {

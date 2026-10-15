@@ -14,7 +14,7 @@ const FRAMES = 1800;
 // their configs, the Wisp pin and the Lua binary. Equal hashes reuse one run.
 const inputsHash = () => {
   const hash = new Bun.CryptoHasher("sha256").update(`${RUN} ${FRAMES} ${process.env.LUA ?? "stock"}\n`);
-  for (const entry of ["src/platform/playableMain.ts", "scripts/wisp/perfLua.ts"]) hash.update(sourceHash(join(tsDirectory, entry))).update("\n");
+  for (const entry of ["src/host/entries/playableMain.ts", "scripts/wisp/perfLua.ts"]) hash.update(sourceHash(join(tsDirectory, entry))).update("\n");
   for (const file of ["package.json", "wisp.lock", "tsconfig.map.json", ".tsconfig.playable.json", ".tsconfig.perf.json"]) hash.update(`${file}\0`).update(readFileSync(join(tsDirectory, file))).update("\n");
   return hash.digest("hex");
 };

@@ -87,7 +87,7 @@ measurements are in [Measured on 3.0](#measured-on-30-under-wine).
 | --- | --- | --- | --- | --- |
 | Lighting model | `SetDayNightModels(terrain, unit)` | The directional key light, its colour and the ambient fill for terrain and for every unit and effect, sampled at the time of day | all; each mode loads its own stock model, an imported one is the same file in every mode | **Measured**: an authored stage light lifts fighter L\* by 8–13 against stock on four stages; the decks and sky barely move |
 | Shadow strength | none | No field for it in the MDX 800 light record (smashcraft:ts/scripts/stageLight.ts writes all of them) | — | Version-1800 light records carry 24 bytes the decoder doesn't read; whether they hold shadow settings is unknown *(guess: they might)* |
-| Time of day | `SetTimeOfDay`, `SetTimeOfDayScale(0)` | Where the lighting model is sampled; the shell freezes noon (smashcraft:ts/src/platform/shell/shell.ts) | all | Source only; the authored lights are constant over the day, so the frozen hour can't move them |
+| Time of day | `SetTimeOfDay`, `SetTimeOfDayScale(0)` | Where the lighting model is sampled; the shell freezes noon (smashcraft:ts/src/host/loop/shell.ts) | all | Source only; the authored lights are constant over the day, so the frozen hour can't move them |
 | Distance fog | `SetTerrainFogEx(style, start, end, density, r, g, b)` | Linear (0), exponential (1) or exponential-squared (2) fog over terrain, units and effects | all | In use (linear, density 0) on every stage; no separate fog measurement |
 | 3.0 fog | `SetTerrainFogExV`, `BlzSetTerrainFog{Style,ZStart,ZEnd,Density,HeightStart,HeightEnd,LinearStart,LinearEnd,MaxLinearDensity,DrawOverSky,Color}`, styles 3–5 | Height fog, a density cap and fog drawn over the sky | per PN3 all, with HD fog | **Unmeasured**; `-dev fogv` and the `192-*-linear\|height` checks exist, no run yet |
 | Sky | `SetSkyModel`, `BlzShowSkyBox` | The sky dome model; hiding it leaves the clear colour | all; HD-only stock skies are blank in Classic | **Measured**: authored skies fill 76–96% of the top band on all nine #178 stages; hidden, the empty screen reads rgb(4,4,4) |
@@ -620,7 +620,7 @@ For fighters on every stage: AO and point-light shadows give contact shading
 in HD when the player turns them on. `DisallowHeroGlowOnUnit` and
 `BlzShowUnitTeamGlow(false)` remove ground glows that a floating arena can
 misplace. *(guess)* The 3.0 HD air-to-ground indicators may draw under
-fighters, since fighters use fly height (smashcraft:ts/src/platform/shell/fighterBody.ts);
+fighters, since fighters use fly height (smashcraft:ts/src/host/loop/fighterBody.ts);
 check one HD capture before any stage issue.
 
 ## Measured on 3.0 under Wine

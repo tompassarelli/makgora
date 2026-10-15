@@ -3,7 +3,7 @@ import type { Lockstep } from "wisp/src/headless/lockstep";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { Phase } from "../../src/game/lobby/lobbyState";
 import { Character } from "../../src/game/sim/codes";
-import { Key } from "../../src/platform/shell/keyEvents";
+import { Key } from "../../src/host/loop/keyEvents";
 import type { Game } from "./botMatch";
 import { HandleCensus } from "./handleCensus";
 import { smashcraftNativeBehavior } from "./headlessNatives";

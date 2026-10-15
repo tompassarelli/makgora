@@ -1,7 +1,7 @@
 import { FIGHTER_OBJECT_ORDER, FIGHTER_OBJECTS } from "../../game/objectData";
 import { checksum } from "wisp/src/runtime/payload";
 import { writeLines } from "wisp/src/platform/fileio";
-import { applyFighterObject, applyFileIoObject } from "../objectData";
+import { applyFighterObject, applyFileIoObject } from "../../platform/objectData";
 import { confirmedChecksum } from "./diagnostics";
 import { shellState } from "./state";
 import { objectDataReceiptFile } from "../../game/core/gameFiles";

@@ -32,7 +32,7 @@ import { type SelectionActions, SelectionPanel } from "../../game/ui/selectionUi
 import { type SettingsActions, SettingsPanel } from "../../game/ui/settingsUi";
 import { type StageActions, StagePanel } from "../../game/ui/stageUi";
 import type { ShellState } from "./state";
-import { bindPrototype } from "../rebind";
+import { bindPrototype } from "../../platform/rebind";
 import { ItemPresentation } from "../../game/render/itemPresentation";
 import { MeterDropPresentation } from "../../game/render/meterDropPresentation";
 import { CandlePresentation } from "../../game/render/candlePresentation";

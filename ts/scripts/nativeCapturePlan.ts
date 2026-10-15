@@ -58,9 +58,9 @@ export function reelFixtures(only: string | undefined, holdTicks = 6): CaptureFi
 const platform = join(import.meta.dir, "../src/platform");
 interface Shell { readonly world: Roster; readonly runtime: { readonly simulationFrame: number } }
 const loadPlatform = async () => {
-  const { shell }: { shell(): Shell } = await import(join(platform, "shell/state.ts"));
+  const { shell }: { shell(): Shell } = await import(join(platform, "../host/loop/state.ts"));
   const { nativeDriverCommand }: { nativeDriverCommand(text: string): void } = await import(join(platform, "nativeDriver.ts"));
-  const entry: MapEntry = await import(join(platform, "nativeDriverMain.ts"));
+  const entry: MapEntry = await import(join(platform, "../host/entries/nativeDriverMain.ts"));
   return { shell, nativeDriverCommand, entry };
 };
 type Platform = Awaited<ReturnType<typeof loadPlatform>>;

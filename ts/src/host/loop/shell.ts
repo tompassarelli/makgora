@@ -21,7 +21,7 @@ import { cancelBindingCapture, initializeBindingSettings, loadSavedBindings, sav
 import { f32 } from "wisp/src/sim/f32";
 import { on, trampoline } from "wisp/src/platform/dispatch";
 import { DRAW_EVENT, beginPresentedFrame, drawBetweenFrames, startFrameClock } from "./betweenFrames";
-import { EDITBOX_ENTER, EditboxIngress } from "../editboxJournal";
+import { EDITBOX_ENTER, EditboxIngress } from "../../platform/editboxJournal";
 import { localParticipantSlot, traceTick, writeReadyMarker } from "./diagnostics";
 import { writeDrawnFrame } from "./drawnFrame";
 import { heldVisualFrame } from "../../game/session/visualCapture";
@@ -52,10 +52,10 @@ import { clearMatchEffects, createUi, recreateUi, views } from "./ui";
 import { resultsView } from "../../game/presentation/matchCues";
 import * as view from "./view";
 import { resultMessage } from "../../game/session/messages";
-import { beforeNativeDriverTick, afterNativeDriverTick, captureNativeDriverInputs } from "../nativeDriver";
+import { beforeNativeDriverTick, afterNativeDriverTick, captureNativeDriverInputs } from "../../platform/nativeDriver";
 import { fighterAt, isActive } from "../../game/sim/roster";
 import { PAD_MOUSE, createPadTriggers, padMouse } from "./analogPad";
-import { beforeNativeSoakTick, afterNativeSoakTick } from "../nativeSoak";
+import { beforeNativeSoakTick, afterNativeSoakTick } from "../../platform/nativeSoak";
 
 const INIT = "shell.init";
 const TICK = "shell.tick";

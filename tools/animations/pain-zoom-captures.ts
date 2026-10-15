@@ -7,8 +7,8 @@ import { headlessRender } from "../../ts/scripts/wisp/headlessRender";
 import { assetsView, readManifest } from "../../ts/scripts/wisp/buildInputs";
 import { PAIN_EXIT_BLEND_FRAMES, PAIN_ENTRY_BLEND_FRAMES } from "../../ts/src/game/presentation/damageBlend";
 import { fighterAt } from "../../ts/src/game/sim/roster";
-import { shell } from "../../ts/src/platform/shell/state";
-import { views } from "../../ts/src/platform/shell/ui";
+import { shell } from "../../ts/src/host/loop/state";
+import { views } from "../../ts/src/host/loop/ui";
 import { ensure } from "./original-clips";
 
 const [outputArg, ...only] = process.argv.slice(2);

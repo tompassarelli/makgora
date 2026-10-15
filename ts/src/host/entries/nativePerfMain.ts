@@ -1,10 +1,10 @@
 
 
 
-import type { MapBuild } from "../game/session/build";
-import { PLAYABLE_BUILD } from "../game/session/currentBuild";
-import { installFrameMeter, startMatchFrameMeter } from "./frameMeter";
-import { install as installGame, startBuild } from "./main";
+import type { MapBuild } from "../../game/session/build";
+import { PLAYABLE_BUILD } from "../../game/session/currentBuild";
+import { installFrameMeter, startMatchFrameMeter } from "../../platform/frameMeter";
+import { install as installGame, startBuild } from "../../platform/main";
 
 const NATIVE_PERF_BUILD: MapBuild = { ...PLAYABLE_BUILD, id: "typescript-native-perf", devConsole: true };
 

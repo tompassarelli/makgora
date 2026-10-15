@@ -6,7 +6,7 @@ import { testHeadless } from "./headless";
 import { Phase } from "../src/game/lobby/lobbyState";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { install, startBuild } from "../src/platform/main";
-import { installSessionRates } from "../src/platform/shell/sessionRates";
+import { installSessionRates } from "../src/host/loop/sessionRates";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { parseSessionRates, sessionRateReport } from "../scripts/wisp/sessionRates";
 

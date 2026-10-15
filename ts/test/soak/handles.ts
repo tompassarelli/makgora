@@ -2,7 +2,7 @@ import { installHeadless, readNativeDeclarations } from "wisp/scripts/wisp/headl
 import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel";
 import { INTEGRITY_BUILD } from "../../src/game/session/currentBuild";
 import { install, startBuild } from "../../src/platform/main";
-import { shell } from "../../src/platform/shell/state";
+import { shell } from "../../src/host/loop/state";
 import type { Game } from "../../scripts/wisp/botMatch";
 import { type HandleBaseline, type Look, LOOKS, SOAK_MATCHES, handleLine, handleProblems, lookNatives, playHandleBaseline } from "../../scripts/wisp/handleBaseline";
 import { SMASHCRAFT_HEADLESS } from "../../scripts/wisp/headless";

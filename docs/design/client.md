@@ -230,7 +230,7 @@ lobbies (Phase 4).
     rows. It is a full-match replay limited to a window.
 - **Confirmed-frame funnel.** Every confirmed frame, in both callback and
   rollback matches, passes through `applyFrame`
-  (smashcraft:ts/src/platform/shell/frame.ts). That is where moments record
+  (smashcraft:ts/src/host/loop/frame.ts). That is where moments record
   rows, the results tally counts KOs and falls
   (smashcraft:ts/src/game/presentation/matchCues.ts), and the match-end
   hook runs. Predicted frames never reach it.
@@ -258,7 +258,7 @@ At every match result each client writes its player's record. Nothing is
 synchronized and the simulation is unchanged.
 
 - **Code.** smashcraft:ts/src/game/session/matchRecord.ts builds the lines and
-  smashcraft:ts/src/platform/shell/matchRecords.ts writes the file.
+  smashcraft:ts/src/host/loop/matchRecords.ts writes the file.
 - **When.** At the result of a finished match in `applyFrame`, and when a
   player leaves mid-match in `playerLeft`.
 - **File name.** `smashcraft-match-<serial>.txt`.
@@ -352,7 +352,7 @@ A replay plays only on its build. The client keeps the simulation bundle of
 every build it has played and names the version an unknown replay needs.
 
 **What the map writes.** smashcraft:ts/src/game/replay/matchReplay.ts records
-and smashcraft:ts/src/platform/shell/replays.ts writes.
+and smashcraft:ts/src/host/loop/replays.ts writes.
 
 - **Parts.** `smashcraft-replay-<serial>-<part>.txt`, from part 1, each
   written once 48 lines are waiting. The serial is the match record's: it is

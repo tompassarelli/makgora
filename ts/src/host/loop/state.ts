@@ -42,7 +42,7 @@ import type { DownState, GrabAction, LedgeState, ShieldBreak, SpecialAction } fr
 import { createFighter } from "../../game/sim/fighter";
 import { type Roster, createRoster } from "../../game/sim/roster";
 import { type BindingPersistence, type BindingSettings, createBindingSettings } from "../../game/ui/bindingSettings";
-import type { EditboxIngress } from "../editboxJournal";
+import type { EditboxIngress } from "../../platform/editboxJournal";
 import { type ResponseProbe, createResponseProbe } from "./responseProbe";
 import { type InputTrace, inputTrace } from "./trace";
 import type { UiObjects } from "./ui";

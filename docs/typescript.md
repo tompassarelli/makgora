@@ -214,7 +214,7 @@ profile still writes the report to `smashcraft-error-p<slot>.txt`, which
 smashcraft:ts/test/player-text.test.ts keeps both halves.
 
 Without the clients, `bun wisp headless [quick-match|desync|cpu-expert|computer-match] [--clients N]`
-plays the development build (src/platform/devMain.ts) in Wisp's headless
+plays the development build (src/host/entries/devMain.ts) in Wisp's headless
 runtime ([Wisp headless](https://github.com/tompassarelli/wisp/blob/main/docs/headless.md)):
 start, `-dev quick`, Ctrl+T, a hot reload through the map's reloader at frame
 480, 600 frames in all, in about a second. It prints each client's native calls
@@ -590,7 +590,7 @@ From smashcraft:ts/:
   `dev --data`, against a profile that polls for reloads (the playable
   profile doesn't). Fighters carry their tuning records, so every `install()`
   gives each fighter its authored tuning again
-  (smashcraft:ts/src/platform/shell/tuning.ts): in the confirmed match and,
+  (smashcraft:ts/src/host/loop/tuning.ts): in the confirmed match and,
   under rollback, in the speculative match and every history snapshot, so a
   correction can't bring the old value back. Keep writes the running value
   into smashcraft:ts/src/game/sim/tuning.ts or knockback.ts and prints the
@@ -703,7 +703,7 @@ names, after checking each against its hash (smashcraft:docs/build-inputs.md).
 
 The map's script is
 the base map's script plus the TSTL bundle, whose entry is
-smashcraft:ts/src/platform/devMain.ts: smashcraft:ts/src/platform/main.ts,
+smashcraft:ts/src/host/entries/devMain.ts: smashcraft:ts/src/platform/main.ts,
 which every profile's entry shares, plus the scene recorder. Bun generates the fighter units
 (war3map.w3u), FileIO's `$wsl` ability (war3map.w3a), the map description
 (war3map.w3i), the map header and the matching `config()` from
@@ -772,7 +772,7 @@ persistent helper's journal/editbox input, predicted fighter presentation and
 native response export. Rebuild it with
 `bun wisp map rebuild MAP.w3x --profile integrity`. Its build ID is
 `typescript-integrity`, as declared in smashcraft:ts/src/game/session/currentBuild.ts;
-the entry in smashcraft:ts/src/platform/integrityMain.ts shares the normal shell
+the entry in smashcraft:ts/src/host/entries/integrityMain.ts shares the normal shell
 and reload lifecycle. Use this profile for native input-integrity and
 four-fighter match/rematch captures.
 
@@ -796,7 +796,7 @@ FUNCTION`, innermost first. Rebuild with
 `bun wisp map rebuild MAP.w3x --profile stack-trace`; `bun wisp hot --profile
 stack-trace --data DIR ... --watch` reloads and prints that bundle's reports.
 Its build ID is `typescript-stack-trace`, and its entry
-smashcraft:ts/src/platform/stackTraceMain.ts adds one command to the
+smashcraft:ts/src/host/entries/stackTraceMain.ts adds one command to the
 development build: `-dev stack-demo`, which throws three calls below its chat
 handler (smashcraft:ts/src/platform/stackDemo.ts). Only a build with a developer
 console registers it, and no other entry compiles it. The report is written

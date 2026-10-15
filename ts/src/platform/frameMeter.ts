@@ -9,7 +9,7 @@ import { installFrameMeter as installWispFrameMeter, startFrameCostCapture, star
 import { PARTICIPANT_SLOTS } from "../game/input/participants";
 import { Phase } from "../game/lobby/lobbyState";
 import { parseDecimal } from "../game/netcode/journal/decimal";
-import { shellState } from "./shell/state";
+import { shellState } from "../host/loop/state";
 
 
 const PERF_COMMAND = "-dev perf";

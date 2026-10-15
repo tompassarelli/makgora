@@ -8,9 +8,9 @@ import { configureRuntime } from "wisp/src/runtime/config";
 import { installDispatch } from "wisp/src/platform/dispatch";
 import { installHotReload, startHotReload } from "wisp/src/platform/hotReload";
 import { startModelFailures } from "wisp/src/platform/modelFailures";
-import { installShell, startShell } from "./shell/shell";
-import { installObjectData } from "./shell/objectData";
-import { installTuning } from "./shell/tuning";
+import { installShell, startShell } from "../host/loop/shell";
+import { installObjectData } from "../host/loop/objectData";
+import { installTuning } from "../host/loop/tuning";
 import { prepareKitDigests } from "../game/replay/canonical";
 
 

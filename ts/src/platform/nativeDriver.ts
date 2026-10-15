@@ -12,12 +12,12 @@ import { installNativeDriver, startNativeDriver, serviceNativeDriver, publishNat
 import { squareRootFloat32 } from "wisp/src/sim/binary32";
 import { f32 } from "wisp/src/sim/f32";
 import { DASH_STICK_THRESHOLD, STICK_DEADZONE, TAP_JUMP_STICK_THRESHOLD, TRIGGER_FULL_LEVEL, TRIGGER_PRESS_LEVEL } from "../game/sim/stickZones";
-import { finishInputTrace } from "./shell/trace";
-import { confirmedChecksum, startInputTrace } from "./shell/diagnostics";
-import { pauseMatchPresentation } from "./shell/view";
-import { applyDeveloperCommand, startDown } from "./shell/keys";
-import { shell, type ShellState, localSlot } from "./shell/state";
-import { paintDrawnStamp } from "./shell/drawnStamp";
+import { finishInputTrace } from "../host/loop/trace";
+import { confirmedChecksum, startInputTrace } from "../host/loop/diagnostics";
+import { pauseMatchPresentation } from "../host/loop/view";
+import { applyDeveloperCommand, startDown } from "../host/loop/keys";
+import { shell, type ShellState, localSlot } from "../host/loop/state";
+import { paintDrawnStamp } from "../host/loop/drawnStamp";
 import { fighterAt, neutralControls } from "../game/sim/roster";
 import { AttackStyle } from "../game/sim/codes";
 import { beginFighterAttack } from "../game/sim/attacks";

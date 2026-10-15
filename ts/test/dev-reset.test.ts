@@ -16,7 +16,7 @@ import { clearObservedActions } from "../src/game/match/step";
 import { INTEGRITY_BUILD } from "../src/game/session/currentBuild";
 import { QUICK_MATCH_COMMAND, RESET_COMMAND } from "../src/game/session/devSettings";
 import { install, startBuild } from "../src/platform/main";
-import { shell } from "../src/platform/shell/state";
+import { shell } from "../src/host/loop/state";
 import { TRACE_FILE, parseTrace } from "../scripts/integrity/padParity";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { JournalHelpers } from "./rematch/journalHelper";

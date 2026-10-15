@@ -63,7 +63,7 @@ Known breaks still in the tree (removed by slices, never copied): `*Hero.ts` imp
 | Controller action or key | `ts/src/game/input/actions.ts`, `ts/src/game/input/keyBindings.ts` | publishes `contracts/controller.json` in K1 |
 | Pad packet, stick thresholds | `ts/src/game/input/padCapture.ts`, `ts/src/game/sim/stickZones.ts`; plug-in `controller/src/main.rs` | plug-in reads `contracts/controller.json` in K1 |
 | `bun wisp` verb | `ts/scripts/wisp/commands/<verb>.ts` plus its line in `ts/scripts/wisp.ts`; help page `docs/commands/<verb>.md` | one file `ts/commands/<verb>.ts` in S2 |
-| Map entry point, live view loop | `ts/src/platform/`, `ts/src/platform/shell/view.ts` | `host/entries/`, `host/loop/` in S9e |
+| Map entry point, live view loop | `ts/src/host/entries/`, `ts/src/host/loop/view.ts` | stays |
 | Session, playback, dev settings | `ts/src/game/session/` | stays |
 | Lua cost baseline row | `records/lua-cost/<test path>.tsv`, one file per test | stays |
 | Advantage-state report | `tools/move-data/advantage-state.jsonl` (autoland regenerates it) | `records/` in S11 |

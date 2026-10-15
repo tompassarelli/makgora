@@ -101,9 +101,9 @@ const padThread = Effect.acquireRelease(
   ({ worker }) => Effect.sync(() => worker.terminate()),
 );
 
-export const loadEntry = tryIntegrityPromise("load the integrity entry", "src/platform/integrityMain.ts", async (): Promise<MapEntry> => {
+export const loadEntry = tryIntegrityPromise("load the integrity entry", "src/host/entries/integrityMain.ts", async (): Promise<MapEntry> => {
 
-  const module: unknown = await import(join(tsDirectory, "src/platform/integrityMain.ts"));
+  const module: unknown = await import(join(tsDirectory, "src/host/entries/integrityMain.ts"));
   if (typeof module !== "object" || module === null || !("start" in module) || !("install" in module)) throw new Error("no start() and install()");
   const { start, install } = module;
   if (typeof start !== "function" || typeof install !== "function") throw new Error("start and install aren't functions");

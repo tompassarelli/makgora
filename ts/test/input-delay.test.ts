@@ -9,11 +9,11 @@ import { AUTO_DELAY } from "../src/game/netcode/delayPolicy";
 import type { MapBuild } from "../src/game/session/build";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { chooseDelay } from "../src/game/ui/bindingSettings";
-import { type ShellState, localSlot, shellState } from "../src/platform/shell/state";
-import { startProbe } from "../src/platform/shell/responseProbe";
+import { type ShellState, localSlot, shellState } from "../src/host/loop/state";
+import { startProbe } from "../src/host/loop/responseProbe";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { entryFor } from "./desync/journeys";
-import { confirmedChecksum } from "../src/platform/shell/diagnostics";
+import { confirmedChecksum } from "../src/host/loop/diagnostics";
 import { sweep } from "./sweep";
 
 const headless = testHeadless(SMASHCRAFT_HEADLESS);

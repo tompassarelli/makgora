@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { createStandaloneSession, NEUTRAL_INPUT } from "../scripts/wisp/standalone";
-import { shell } from "../src/platform/shell/state";
+import { shell } from "../src/host/loop/state";
 import { clipFor } from "../src/game/presentation/fighterClips";
 import { Character } from "../src/game/sim/codes";
 

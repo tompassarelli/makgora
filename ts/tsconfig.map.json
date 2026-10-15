@@ -7,28 +7,29 @@
     "src/game/core/*.ts",
     "src/game/core/math/*.ts",
     "node_modules/wisp/src/natives/warcraft.d.ts",
-    "src/platform/*.ts"
+    "src/platform/*.ts",
+    "src/host/entries/*.ts"
   ],
   "exclude": [
     "src/**/*.test.ts",
     "src/**/*.tests.ts",
     "src/game/core/math/parityCorpus.ts",
     "src/platform/airCutoffProbe.ts",
-    "src/platform/physicsProbeMain.ts",
-    "src/platform/frameCostMain.ts",
-    "src/platform/integrityMain.ts",
-    "src/platform/playableMain.ts",
-    "src/platform/soakPlayableMain.ts",
-    "src/platform/soakIntegrityMain.ts",
-    "src/platform/nativePerfMain.ts",
+    "src/host/entries/physicsProbeMain.ts",
+    "src/host/entries/frameCostMain.ts",
+    "src/host/entries/integrityMain.ts",
+    "src/host/entries/playableMain.ts",
+    "src/host/entries/soakPlayableMain.ts",
+    "src/host/entries/soakIntegrityMain.ts",
+    "src/host/entries/nativePerfMain.ts",
     "src/platform/stackDemo.ts",
-    "src/platform/stackTraceMain.ts",
-    "src/platform/damageBlendProbeMain.ts",
+    "src/host/entries/stackTraceMain.ts",
+    "src/host/entries/damageBlendProbeMain.ts",
     "src/platform/damageBlendProbeModels.ts"
   ],
   "tstl": {
     "luaBundle": "map.lua",
-    "luaBundleEntry": "src/platform/devMain.ts",
+    "luaBundleEntry": "src/host/entries/devMain.ts",
     "luaPlugins": [
       {
         "name": "./node_modules/wisp/plugins/warcraft-numbers.ts"

@@ -15,7 +15,7 @@ its walking line, a per-axis scale in the model's own axes, and a yaw in
 degrees. The first part stands in for the palette slab, so the scene still
 counts one deck piece per platform; the rest are dressing parts that the
 shell creates, fades and clears with the decks
-(smashcraft:ts/src/platform/shell/view.ts). A stage with no list keeps its
+(smashcraft:ts/src/host/loop/view.ts). A stage with no list keeps its
 palette slab. The parts' models are declared as "stage deck" in
 smashcraft:ts/scripts/wisp/playerView.ts and need model facts like any other
 model (smashcraft:docs/player-view.md).

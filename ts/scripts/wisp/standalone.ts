@@ -56,17 +56,17 @@ export async function createStandaloneSession(options: { readonly script?: strin
 
     const platform = join(import.meta.dir, "../../src/platform");
     interface State { readonly game: { readonly phase: number; stockCount: number }; readonly runtime: { readonly simulationFrame: number } }
-    const { shell }: { shell(): State } = await import(join(platform, "shell/state.ts"));
-    const { confirmedChecksum }: { confirmedChecksum(state: State): string } = await import(join(platform, "shell/diagnostics.ts"));
-    const { applyDeveloperCommand }: { applyDeveloperCommand(state: State, slot: number, text: string): void } = await import(join(platform, "shell/keys.ts"));
-    const { drawnFrame }: { drawnFrame(state: State): { readonly frame: number } } = await import(join(platform, "shell/drawnFrame.ts"));
+    const { shell }: { shell(): State } = await import(join(platform, "../host/loop/state.ts"));
+    const { confirmedChecksum }: { confirmedChecksum(state: State): string } = await import(join(platform, "../host/loop/diagnostics.ts"));
+    const { applyDeveloperCommand }: { applyDeveloperCommand(state: State, slot: number, text: string): void } = await import(join(platform, "../host/loop/keys.ts"));
+    const { drawnFrame }: { drawnFrame(state: State): { readonly frame: number } } = await import(join(platform, "../host/loop/drawnFrame.ts"));
     const { botBeatKeys }: { botBeatKeys(frame: number): readonly [tap: number, held: number] } = await import(join(import.meta.dir, "botMatch.ts"));
-    const { startQuickMatch }: { startQuickMatch(state: State, stage: number, scenario: undefined, character: Character | undefined, stocks: number): void } = await import(join(platform, "shell/menus.ts"));
+    const { startQuickMatch }: { startQuickMatch(state: State, stage: number, scenario: undefined, character: Character | undefined, stocks: number): void } = await import(join(platform, "../host/loop/menus.ts"));
     const build = { ...PLAYABLE_BUILD, devConsole: true, ...(presentation === undefined ? {} : { presentation }) };
     const main: { install(build: MapBuild): void; startBuild(build: MapBuild): void } = await import(join(platform, "main.ts"));
     const driverApi: { nativeDriverCommand(text: string): void; installSmashcraftNativeDriver(): void; startSmashcraftNativeDriver(): void } | undefined = script === undefined ? undefined : await import(join(platform, "nativeDriver.ts"));
     const driverBuild = { ...NATIVE_DRIVER_BUILD, ...(presentation === undefined ? {} : { presentation }) };
-    const driver: MapEntry | undefined = script === undefined ? undefined : presentation === undefined ? await import(join(platform, "nativeDriverMain.ts")) : {
+    const driver: MapEntry | undefined = script === undefined ? undefined : presentation === undefined ? await import(join(platform, "../host/entries/nativeDriverMain.ts")) : {
       install() { main.install(driverBuild); driverApi?.installSmashcraftNativeDriver(); },
       start() { main.startBuild(driverBuild); driverApi?.installSmashcraftNativeDriver(); driverApi?.startSmashcraftNativeDriver(); },
     };

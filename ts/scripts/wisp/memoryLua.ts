@@ -17,7 +17,7 @@ import { Phase } from "../../src/game/lobby/lobbyState";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import { SELECTABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";
-import { Key } from "../../src/platform/shell/keyEvents";
+import { Key } from "../../src/host/loop/keyEvents";
 import { botBeatKeys, gameOf } from "./botMatch";
 import { PREDICTED_LOCAL_NATIVES } from "./localNatives";
 import { HandleCensus, compactEmulator, reach } from "./memoryCensus";

@@ -80,14 +80,14 @@ export async function createNetStandalone(link: LockstepLink, slot: number, opti
   try {
     const platform = join(import.meta.dir, "../../src/platform");
     interface State { readonly game: { readonly phase: number; readonly humanFighterMask: number; readonly computerMask: number } }
-    const { shell }: { shell(): State & NetcodeShell } = await import(join(platform, "shell/state.ts"));
-    const { confirmedChecksum }: { confirmedChecksum(state: State): string } = await import(join(platform, "shell/diagnostics.ts"));
+    const { shell }: { shell(): State & NetcodeShell } = await import(join(platform, "../host/loop/state.ts"));
+    const { confirmedChecksum }: { confirmedChecksum(state: State): string } = await import(join(platform, "../host/loop/diagnostics.ts"));
     const { setHumanCount }: { setHumanCount(game: State["game"], count: number): void } = await import(join(import.meta.dir, "../../src/game/lobby/lobbyState.ts"));
     const main: { install(build: MapBuild): void; startBuild(build: MapBuild): void } = await import(join(platform, "main.ts"));
     const build: MapBuild = { ...PLAYABLE_BUILD, devConsole: true };
     const lockstep = runtime.clients({ install: () => main.install(build), start: () => main.startBuild(build) }, [slot], { humans: [0, 1], link, keepCalls: 0 });
     const client = lockstep.client(slot);
-    const { applyDeveloperCommand }: { applyDeveloperCommand(state: State, slot: number, text: string): void } = await import(join(platform, "shell/keys.ts"));
+    const { applyDeveloperCommand }: { applyDeveloperCommand(state: State, slot: number, text: string): void } = await import(join(platform, "../host/loop/keys.ts"));
     const scripted = options.script === undefined ? undefined : padInputs(padEdges(options.script).edges, slot);
     const chat = (options.script ?? "").split("\n").map((line) => line.trim()).filter((line) => line.startsWith("#! chat ")).map((line) => line.substring(8));
     let latest: StandaloneInput = { buttons: [], axisX: 0, axisY: 0 };

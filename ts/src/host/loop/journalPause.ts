@@ -11,7 +11,7 @@ import { controlFile } from "../../game/session/journalFiles";
 import { pausedMessage } from "../../game/session/messages";
 import { CONTROL_ACK_PREFIX, PAUSE_REQUEST_PREFIX, agreedFrame, encodeControlAck, paceResume, pausing, preparedFrame, receiveControlAck, requestRound } from "../../game/session/pauseBarrier";
 import { readChunk } from "wisp/src/platform/fileio";
-import { releaseMessage } from "../keyboardJournal";
+import { releaseMessage } from "../../platform/keyboardJournal";
 import { consumeEditbox, failJournal, journalEpoch, journalIdentity, mailboxMessage, peekEditbox, setAsideRows, writeJournalFile } from "./journal";
 import { type Journal, type Rollback, type ShellState, localSlot, playsOnKeyboard } from "./state";
 import { syncKeyEvents } from "./keyEvents";

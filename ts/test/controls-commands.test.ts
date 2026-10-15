@@ -5,8 +5,8 @@ import type { Lockstep } from "wisp/src/headless/lockstep";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import type { MapBuild } from "../src/game/session/build";
 import { applyBindingPreset, chooseDelay, encodeSettings } from "../src/game/ui/bindingSettings";
-import { type ShellState, shellState } from "../src/platform/shell/state";
-import { confirmedChecksum } from "../src/platform/shell/diagnostics";
+import { type ShellState, shellState } from "../src/host/loop/state";
+import { confirmedChecksum } from "../src/host/loop/diagnostics";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { entryFor } from "./desync/journeys";
 

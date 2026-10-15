@@ -46,7 +46,7 @@ export const TEXT_JOURNEYS: readonly string[] = ["text-match"];
 
 export const SMASHCRAFT_JOURNEYS: HeadlessProject = {
   map: SMASHCRAFT_HEADLESS,
-  entry: join(import.meta.dir, "../../src/platform/devMain.ts"),
+  entry: join(import.meta.dir, "../../src/host/entries/devMain.ts"),
   journeys: { "quick-match": QUICK_MATCH, desync: DESYNC, "cpu-expert": CPU_EXPERT, "computer-match": COMPUTER_MATCH, "frozen-throne": { ...QUICK_MATCH, events: QUICK_MATCH.events.map((event) => "chat" in event && event.frame === 30 ? { ...event, chat: FROZEN_THRONE_QUICK_COMMAND } : event) } },
   scene: SMASHCRAFT_SCENE,
 };

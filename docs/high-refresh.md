@@ -141,7 +141,7 @@ the captured intervals decide the observed recording cadence.
 Renderers place moving effects (fighters, their lights, projectiles and pooled
 effects) through `placeEffect` (smashcraft:ts/src/game/render/effects.ts). By
 default it only sets the position. `-dev smooth-draw` starts a zero-period
-draw timer (smashcraft:ts/src/platform/shell/betweenFrames.ts); while it fires
+draw timer (smashcraft:ts/src/host/loop/betweenFrames.ts); while it fires
 at least 1.5 times per simulation frame, each effect is drawn between where the
 last two simulation frames put it (smashcraft:ts/src/game/render/motion.ts),
 trailing the simulation by one frame and snapping on teleports. It never reads

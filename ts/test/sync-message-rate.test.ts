@@ -4,7 +4,7 @@ import type { Lockstep, SyncDelivery } from "wisp/src/headless/lockstep";
 import { Phase } from "../src/game/lobby/lobbyState";
 import type { MapBuild } from "../src/game/session/build";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
-import { shellState } from "../src/platform/shell/state";
+import { shellState } from "../src/host/loop/state";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { entryFor } from "./desync/journeys";
 

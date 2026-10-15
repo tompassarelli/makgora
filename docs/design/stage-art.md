@@ -309,7 +309,7 @@ it before contrast.ts and the judge.
 ## Warcraft limits
 
 Scenery is special effects from the stock classic-graphics models the clients
-draw, placed by smashcraft:ts/src/platform/shell/stageScenery.ts and loaded
+draw, placed by smashcraft:ts/src/host/loop/stageScenery.ts and loaded
 before the match by smashcraft:ts/src/game/presentation/stagePreload.ts. A new
 model needs model facts (smashcraft:docs/player-view.md) before the player-view
 checks accept it, so a pass reuses the models those facts already list unless

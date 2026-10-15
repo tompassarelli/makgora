@@ -3,19 +3,19 @@
 
 
 
-import type { MapBuild } from "../game/session/build";
-import { NATIVE_DRIVER_BUILD } from "../game/session/currentBuild";
-import { install as installGame, startBuild } from "./main";
-import { nativeDriverCommand } from "./nativeDriver";
-import { shellState } from "./shell/state";
+import type { MapBuild } from "../../game/session/build";
+import { NATIVE_DRIVER_BUILD } from "../../game/session/currentBuild";
+import { install as installGame, startBuild } from "../../platform/main";
+import { nativeDriverCommand } from "../../platform/nativeDriver";
+import { shellState } from "../loop/state";
 import { on, trampoline } from "wisp/src/platform/dispatch";
 import { writeLines } from "wisp/src/platform/fileio";
 import { f32 } from "wisp/src/sim/f32";
-import { CAPTURE_FIXTURES, type CaptureFixture, SILHOUETTE_HIDDEN_FRAME } from "./captureFixtures";
-import { applyDeveloperCommand } from "./shell/keys";
-import { bareFighter } from "./shell/fighterCloak";
-import { paintDrawnStamp } from "./shell/drawnStamp";
-import { CAPTURE_STATUS_FILE } from "../game/core/gameFiles";
+import { CAPTURE_FIXTURES, type CaptureFixture, SILHOUETTE_HIDDEN_FRAME } from "../../platform/captureFixtures";
+import { applyDeveloperCommand } from "../loop/keys";
+import { bareFighter } from "../loop/fighterCloak";
+import { paintDrawnStamp } from "../loop/drawnStamp";
+import { CAPTURE_STATUS_FILE } from "../../game/core/gameFiles";
 
 const BUILD: MapBuild = { ...NATIVE_DRIVER_BUILD, presentation: "pool-predicted" };
 const TICK = "capture.fixtures";

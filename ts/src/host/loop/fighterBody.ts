@@ -8,7 +8,7 @@ import { FLOOR_HEIGHT } from "../../game/presentation/arenaCamera";
 import type { WorldOrigin } from "../../game/render/effects";
 import type { FighterBody } from "./state";
 import { FIGHTER_OBJECTS } from "../../game/objectData";
-import { applyFighterObject } from "../objectData";
+import { applyFighterObject } from "../../platform/objectData";
 import { fitFighterPlacement } from "../../game/presentation/fighterPlacement";
 import { characterModelScale } from "../../game/presentation/modelScale";
 

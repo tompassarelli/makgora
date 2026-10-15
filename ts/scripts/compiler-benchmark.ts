@@ -9,7 +9,7 @@ import { ChildProcess } from "effect/process";
 import { runProcess } from "./hostProcess";
 
 const project = resolve(import.meta.dir, "..");
-const source = resolve(project, "src/platform/shell/diagnostics.ts");
+const source = resolve(project, "src/host/loop/diagnostics.ts");
 const bundle = resolve(project, "build/map.lua");
 const sourceMap = `${bundle}.map`;
 const original = readFileSync(source, "utf8");
@@ -69,7 +69,7 @@ const main = Effect.gen(function*() {
   writeFileSync(source, signatureEdit);
   currentSource = signatureEdit;
   const signatureDiagnostics = incremental();
-  if (!signatureDiagnostics.some((diagnostic) => diagnostic.code === 2554 && diagnostic.file?.fileName.endsWith("/platform/shell/view.ts"))) {
+  if (!signatureDiagnostics.some((diagnostic) => diagnostic.code === 2554 && diagnostic.file?.fileName.endsWith("/host/loop/view.ts"))) {
     throw new Error("changed exported signature did not report the dependent call-site error");
   }
 

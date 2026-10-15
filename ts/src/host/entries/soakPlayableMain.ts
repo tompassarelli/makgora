@@ -1,6 +1,6 @@
-import { SOAK_PLAYABLE_BUILD } from "../game/session/currentBuild";
-import { install as installGame, startBuild } from "./main";
-import { installSoakHandles } from "./soakHandles";
+import { SOAK_PLAYABLE_BUILD } from "../../game/session/currentBuild";
+import { install as installGame, startBuild } from "../../platform/main";
+import { installSoakHandles } from "../../platform/soakHandles";
 
 export function install(this: void): void {
   installSoakHandles();

@@ -1,11 +1,11 @@
 
 
 import { AssertionFailure, registeredTests } from "wisp/src/runtime/testing";
-import { PHYSICS_REPORT_FILE } from "../game/core/gameFiles";
-import "../game/sim/physicsPrecisionState.tests";
-import "../game/sim/physicsPrecisionScalar.tests";
-import "../game/sim/physicsPrecisionMotion.tests";
-import { airCutoffTrace } from "./airCutoffProbe";
+import { PHYSICS_REPORT_FILE } from "../../game/core/gameFiles";
+import "../../game/sim/physicsPrecisionState.tests";
+import "../../game/sim/physicsPrecisionScalar.tests";
+import "../../game/sim/physicsPrecisionMotion.tests";
+import { airCutoffTrace } from "../../platform/airCutoffProbe";
 
 const GROUPS = [
   "GROUNDED_BINARY32_EXACT_PASS",

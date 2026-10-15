@@ -10,7 +10,7 @@ import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../../ts/src/ga
 import { Character } from "../../ts/src/game/sim/codes";
 import { FORSAKEN_PALADIN_DAMAGE_MULTIPLIER } from "../../ts/src/game/sim/heroes/forsakenPaladinSword";
 import { fighterAt } from "../../ts/src/game/sim/roster";
-import { shell } from "../../ts/src/platform/shell/state";
+import { shell } from "../../ts/src/host/loop/state";
 import { ensure, parseSource, tracks } from "./original-clips";
 
 const [outputArg, from] = process.argv.slice(2);

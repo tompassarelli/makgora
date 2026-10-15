@@ -92,7 +92,7 @@ async function stockLightCheck(args: readonly string[]): Promise<number> {
   const { captureScene, renderScenes } = await import("../../ts/node_modules/wisp/scripts/wisp/headlessRender");
   const { SMASHCRAFT_HEADLESS } = await import("../../ts/scripts/wisp/headless");
   const { headlessRender } = await import("../../ts/scripts/wisp/headlessRender");
-  const { start, install } = await import("../../ts/src/platform/devMain");
+  const { start, install } = await import("../../ts/src/host/entries/devMain");
   const { stageModels } = await import("../../ts/src/game/presentation/stagePreload");
   const { placedPieces } = await import("../../ts/src/game/presentation/stageScenery");
   const { STAGE_CATALOG } = await import("../../ts/src/game/menu/stageCatalog");

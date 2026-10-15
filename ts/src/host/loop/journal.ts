@@ -19,7 +19,7 @@ import { type JournalIdentity, type MenuPhase, endFile, failureFile, menuFile, q
 import { KEYBOARD_FALLBACK_MESSAGE } from "../../game/session/messages";
 import { CATCH_UP_FRAMES } from "../../game/session/playback";
 import { readChunk, writeLines } from "wisp/src/platform/fileio";
-import { pollMailbox, releaseMessage } from "../keyboardJournal";
+import { pollMailbox, releaseMessage } from "../../platform/keyboardJournal";
 import { startInputTrace } from "./diagnostics";
 import { pollLocalKeys } from "./inputs";
 import { views } from "./ui";

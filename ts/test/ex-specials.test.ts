@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { testHeadless } from "./headless";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { start, install } from "../src/platform/main";
-import { shell } from "../src/platform/shell/state";
+import { shell } from "../src/host/loop/state";
 import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/sim/heroes/registry";
 import { fighterAt } from "../src/game/sim/roster";
 import { SpecialSlot } from "../src/game/sim/specials/schema";

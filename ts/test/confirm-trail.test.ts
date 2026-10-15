@@ -5,7 +5,7 @@
 import { expect, test } from "bun:test";
 import { testHeadless } from "./headless";
 import { INTEGRITY_BUILD } from "../src/game/session/currentBuild";
-import { activeRollback, shell } from "../src/platform/shell/state";
+import { activeRollback, shell } from "../src/host/loop/state";
 import { PREDICTED_HEADLESS } from "../scripts/wisp/headless";
 import { JournalHelpers } from "./rematch/journalHelper";
 import { confirmedFrame, expectSynchronized, startPlayableMatch, value } from "./rematch/playableMatch";

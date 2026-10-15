@@ -5,7 +5,7 @@ import { Phase } from "../src/game/lobby/lobbyState";
 import { cameraPoint } from "../src/game/presentation/arenaCamera";
 import { fighterFrame } from "../src/game/presentation/fighterFraming";
 import { fighterAt, isActive } from "../src/game/sim/roster";
-import { shell } from "../src/platform/shell/state";
+import { shell } from "../src/host/loop/state";
 
 export class CameraFindings {
   private readonly out = new Map<HeadlessClient, Map<number, boolean>>();

@@ -25,6 +25,7 @@
     "node_modules/wisp/src/natives/warcraft.d.ts",
     "src/game/**/*.ts",
     "src/platform/**/*.ts",
+    "src/host/**/*.ts",
     "scripts/wisp/perfLua.ts",
     "scripts/wisp/memoryLua.ts",
     "scripts/wisp/handleBaselineLua.ts",

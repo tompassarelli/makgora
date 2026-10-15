@@ -64,7 +64,7 @@ For that recheck, the native lane uses one development match and runs
 `bun wisp hot --data <A CustomMapData> --data <B CustomMapData> --watch` from
 the same source checkout. Wait for the first full publish to be acknowledged,
 then make ten distinct one-line edits to the `dev: reset` receipt string in
-`ts/src/platform/shell/keys.ts`, waiting for both acknowledgements before each
+`ts/src/host/loop/keys.ts`, waiting for both acknowledgements before each
 next edit, and restore it afterwards. Record each save-to-running time and its
 compile, publish and acknowledgement steps; report the median of the ten
 edits, excluding the warmup and restore. Keep the client build and source

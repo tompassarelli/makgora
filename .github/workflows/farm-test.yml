@@ -119,7 +119,7 @@ jobs:
           fi
           changed=$([ -n "$base" ] && git diff --name-only "$base" HEAD || echo unknown)
           echo "$changed" | sed 's/^/changed: /'
-          if [ -z "$base" ] || echo "$changed" | grep -qE '^(ts/src/game/(render|presentation|assets|ui|menu)/|ts/src/game/objectData\.ts$|ts/src/platform/|ts/scripts/wisp/|ts/plugins/|ts/vendor/|ts/(package\.json|bun\.lock|wisp\.lock|tsconfig[^/]*\.json)$|typescript-toolchain\.lock$|build-inputs/|tools/(animations|effects|presentation|selection|stage)/|\.github/workflows/farm-test\.yml$)'; then
+          if [ -z "$base" ] || echo "$changed" | grep -qE '^(ts/src/game/(render|presentation|assets|ui|menu)/|ts/src/game/objectData\.ts$|ts/src/platform/|ts/src/host/|ts/scripts/wisp/|ts/plugins/|ts/vendor/|ts/(package\.json|bun\.lock|wisp\.lock|tsconfig[^/]*\.json)$|typescript-toolchain\.lock$|build-inputs/|tools/(animations|effects|presentation|selection|stage)/|\.github/workflows/farm-test\.yml$)'; then
             groups='["perf","perf-definitive","parity","corpus"]'
           fi
           echo "groups=$groups" | tee -a "$GITHUB_OUTPUT"

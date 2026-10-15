@@ -5,8 +5,8 @@ import { SELECTABLE_CHARACTERS } from "../game/sim/heroes/registry";
 import { at } from "wisp/src/runtime/lookup";
 import { floorMod } from "wisp/src/sim/intMath";
 import { writeLines } from "wisp/src/platform/fileio";
-import { startQuickMatch } from "./shell/menus";
-import { type ShellState } from "./shell/state";
+import { startQuickMatch } from "../host/loop/menus";
+import { type ShellState } from "../host/loop/state";
 import { liveSoakHandles } from "./soakHandles";
 
 interface Soak {

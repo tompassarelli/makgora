@@ -1,4 +1,4 @@
-import { startNativeSoak } from "../nativeSoak";
+import { startNativeSoak } from "../../platform/nativeSoak";
 import { cameraKey, returnPauseMenu, PAUSE_CAMERA_KEYS, pauseCameraKey } from "./pauseCamera";
 import { HIT_PRESENTATION_CASES } from "../../game/session/hitPresentationCases";
 import { createImpactEvents } from "../../game/presentation/impactEvents";

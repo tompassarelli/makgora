@@ -4,7 +4,7 @@ The TypeScript diagnostic uses the same production simulation fixtures as the
 Bun and Lua32 checks: smashcraft:ts/src/game/sim/physicsPrecisionState.tests.ts,
 smashcraft:ts/src/game/sim/physicsPrecisionScalar.tests.ts and
 smashcraft:ts/src/game/sim/physicsPrecisionMotion.tests.ts.
-Its entry is smashcraft:ts/src/platform/physicsProbeMain.ts, selected by its row
+Its entry is smashcraft:ts/src/host/entries/physicsProbeMain.ts, selected by its row
 in smashcraft:ts/scripts/wisp/bundleConfigs.ts. The report's `SOURCE` value is the
 compiled bundle key passed by the packaged map's entry.
 
