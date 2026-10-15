@@ -116,7 +116,7 @@ tuning from move names alone. Deliver
 his full normals, aerials, grabs/throws, shared actions, effects, portraits,
 selection and replay coverage, not just his specials or model.
 
-Apply smashcraft-character-creation to every completed/new fighter.
+Apply the smashcraft skill (references/character-creation.md) to every completed/new fighter.
 Author distinct startup, contact and recovery poses in the existing Blender
 pipeline, preserving interpolation and existing clips. Include grounded and
 airborne hitstun reactions, contact-pose hitlag freezing, prone/getup poses,

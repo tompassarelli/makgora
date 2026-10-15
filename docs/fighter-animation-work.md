@@ -498,9 +498,8 @@ smashcraft:build/animation-assets/check-ground-preservation.log. This pass still
 needs native both-facing checks at gameplay size; Blender views do not prove
 Warcraft texture, blend or playback behavior.
 
-Character completion follows the active `smashcraft-character-creation`
-skill, owned at
-nixos-config:dotfiles/agents/skills/smashcraft-character-creation/SKILL.md.
+Character completion follows the active `smashcraft` skill, owned at
+north:harness/skills/smashcraft/references/character-creation.md.
 Every fighter requires grounded/airborne damage reactions and exact hitlag pose
 holds, alongside the complete normal, aerial, special, defense and grab/throw
 coverage. Hitlag freezes the appropriate contact pose; it is not a looping clip.

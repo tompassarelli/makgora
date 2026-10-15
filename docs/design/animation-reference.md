@@ -4,9 +4,9 @@ Public sources for authoring Smashcraft fighter animation: silhouettes,
 anticipation/contact/recovery, drills, defensive movement, grabs and throws,
 and the nine damage reactions. Use them for study. Smashcraft motion is
 authored originally on licensed Warcraft rigs. The authoring standard and
-procedure are in the `smashcraft-animation` skill
-(nixos-config:dotfiles/agents/skills/smashcraft-animation/SKILL.md, whose
-references/library.md records the Sakurai hitstop article in detail). The
+procedure are in the `smashcraft` skill
+(north:harness/skills/smashcraft/references/animation.md, whose
+animation-library.md records the Sakurai hitstop article in detail). The
 tools and checks are in [fighter animation work](../fighter-animation-work.md).
 
 ## Provenance and rights

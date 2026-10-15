@@ -1,7 +1,7 @@
 # Animation
 
 For fighter animation quality and action coverage, use the source-owned
-`smashcraft-animation` skill (`agents path smashcraft-animation`): its
+`smashcraft` skill (`agents path smashcraft`, references/animation.md): its
 reference library supplies Sakurai's impact/attack principles and the Fox
 drill example; its procedure routes the existing motion audit, paired throws,
 recovery clips and nine-way pain reactions. The project index of sources,

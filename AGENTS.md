@@ -24,10 +24,10 @@ Issues: [roadmap #16](https://github.com/tompassarelli/smashcraft/issues/16); a 
 
 Read the relevant router before working, even when your cwd is the root:
 - Map/TypeScript: warcraft-modding and [ts/AGENTS.md](ts/AGENTS.md); [TypeScript](docs/commands/typescript.md).
-- Tests: the testing skill and [testing](docs/commands/testing.md).
+- Tests: the verification skill and [testing](docs/commands/testing.md).
 - Host commands: effect-development; [host tools](docs/typescript.md#host-tools); enforce via `effect-kit check` (effect-kit.json).
-- Fighter art: smashcraft-animation and [tools/animations/AGENTS.md](tools/animations/AGENTS.md); [animation help](docs/commands/animation.md).
-- Stage art: smashcraft-stage-design; [stage help](docs/commands/stage.md).
+- Fighter art: the smashcraft skill (references/animation.md) and [tools/animations/AGENTS.md](tools/animations/AGENTS.md); [animation help](docs/commands/animation.md).
+- Stage art: the smashcraft skill (references/stage-design.md); [stage help](docs/commands/stage.md).
 - Native tools/clients: warcraft-modding and private-desktop-development; [native rules](ts/scripts/wisp/AGENTS.md) and [native help](docs/commands/native.md).
 - Builds/pins/private inputs, issue closure and pushes: [workflow](docs/commands/workflow.md).
 
