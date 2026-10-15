@@ -42,9 +42,9 @@ permissions:
 
 env:
   SWEEP_PLACEMENT: gate
-  BUN_SHARDS: 4
+  BUN_SHARDS: 2
   # Lua runs one core a process: each Lua job runs LUA_PER_JOB shards at once.
-  LUA_JOBS: 8
+  LUA_JOBS: 2
   LUA_PER_JOB: 4
 
 jobs:
