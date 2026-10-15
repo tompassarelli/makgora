@@ -3,21 +3,21 @@ import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { Effect, Schema } from "effect";
-import { WHITE_FIGHTER_MODELS } from "../../src/game/assets/whiteFighterModels";
-import { STAGE_SKY_MODELS } from "../../src/game/assets/stageSkyInfo";
+import { WHITE_FIGHTER_MODELS } from "../../src/generated/assets/whiteFighterModels";
+import { STAGE_SKY_MODELS } from "../../src/generated/stages/stageSkyInfo";
 import { MapBuild, MapBuildFailure, type ArchiveEntry } from "wisp/scripts/wisp/mapBuild";
 import { runProcess } from "wisp/scripts/wisp/hostProcess";
 import { UsageFailure } from "wisp/scripts/wisp/command";
 import { step } from "wisp/scripts/wisp/timings";
 import { type FighterOriginalClip, originalClip, originalClipCount, originalLightPath } from "../../src/game/assets/fighterOriginalClipInfo";
-import * as frostModels from "../../src/game/assets/frostAssetInfo";
+import * as frostModels from "../../src/generated/assets/frostAssetInfo";
 import * as impactModels from "../../src/game/assets/impactAssetInfo";
 import { IMPORTED_MENU_MUSIC } from "../../src/game/assets/importedMusicInfo";
 import { IMPORTED_MODEL_FILES } from "../../src/game/assets/importedModelInfo";
-import { type ModelSoundCue, fighterSoundCue, fighterSoundCueCount, modelSoundLabel } from "../../src/game/assets/modelSoundInfo";
-import * as shieldModels from "../../src/game/assets/shieldAssetInfo";
-import { STAGE_WATER_MODEL, STAGE_LAVA_MODEL, STAGE_SEA_MODEL, STAGE_TOMB_WATER_MODEL, STAGE_TOMB_SEA_MODEL } from "../../src/game/assets/terrainAssetInfo";
-import { STAGE_DECK_MODELS, STAGE_POINT_LIGHT_MODELS, STAGE_SNOW_MODEL } from "../../src/game/assets/stageAssetInfo";
+import { type ModelSoundCue, fighterSoundCue, fighterSoundCueCount, modelSoundLabel } from "../../src/generated/assets/modelSoundInfo";
+import * as shieldModels from "../../src/generated/assets/shieldAssetInfo";
+import { STAGE_WATER_MODEL, STAGE_LAVA_MODEL, STAGE_SEA_MODEL, STAGE_TOMB_WATER_MODEL, STAGE_TOMB_SEA_MODEL } from "../../src/generated/stages/terrainAssetInfo";
+import { STAGE_DECK_MODELS, STAGE_POINT_LIGHT_MODELS, STAGE_SNOW_MODEL } from "../../src/generated/stages/stageAssetInfo";
 import { DEMON_HUNTER_MODEL_FILE } from "../../src/game/presentation/demonHunterAssetInfo";
 import { RIFLEMAN_MODEL_FILE } from "../../src/game/presentation/fighterAssetInfo";
 import { SUMMON_BEAR, summonClip, summonClipCount } from "../../src/game/presentation/summonClipInfo";
@@ -343,7 +343,7 @@ export const importedAssets = (assets: string, summon: string, edition: MapEditi
     "then `bun wisp inputs add original-clips-static-lights NEW` and commit build-inputs/original-clips-static-lights (smashcraft:docs/build-inputs.md)");
   const soundProblem = soundTableProblem(MODEL_SOUND_TABLE);
   if (soundProblem !== undefined) {
-    return yield* new MapBuildFailure({ operation: "check model sounds", path: "ts/src/game/assets/modelSoundInfo.ts", cause: `${soundProblem}; export them with tools/animations/export-model-sounds.ts` });
+    return yield* new MapBuildFailure({ operation: "check model sounds", path: "ts/src/generated/assets/modelSoundInfo.ts", cause: `${soundProblem}; export them with tools/animations/export-model-sounds.ts` });
   }
   const entries: ArchiveEntry[] = [
     { entry: RIFLEMAN_MODEL_FILE, source: join(assets, "animation-assets/RiflemanFighter.mdx") },

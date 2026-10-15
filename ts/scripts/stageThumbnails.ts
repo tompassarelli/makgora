@@ -27,7 +27,7 @@ import { platformLayer } from "wisp/scripts/platform/layer";
 
 const TS = resolve(import.meta.dir, "..");
 const MANIFEST_FILE = join(TS, "stage-thumbnails.json");
-const SILHOUETTE_FILE = join(TS, "src/game/menu/stageSilhouettes.ts");
+const SILHOUETTE_FILE = join(TS, "src/generated/stages/stageSilhouettes.ts");
 const FRAME = 80;
 
 class ThumbnailFailure extends Schema.TaggedError<ThumbnailFailure>()("ThumbnailFailure", { problem: Schema.String }) {

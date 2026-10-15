@@ -1,7 +1,7 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { AttackStyle, Character } from "../sim/codes";
 import { SELECTABLE_CHARACTERS, fighterName } from "../sim/heroes/registry";
-import { VERIFIED_STOCK_SOUNDS } from "../assets/stockSoundInfo";
+import { VERIFIED_STOCK_SOUNDS } from "../../generated/assets/stockSoundInfo";
 import { HitElement } from "../sim/hitRegions";
 import { CONSECRATION_SOUND, CONSECRATION_VOLUME, isSpecialMove, moveSound, playHit, playPerform, playShieldHit, soundFiles, soundedMoves, specialMove } from "./moveSounds";
 import { SWING_SOUND } from "./moveTiers";

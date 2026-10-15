@@ -1,7 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 
-import { STAGE_TOMB_SEA_MODEL } from "../assets/terrainAssetInfo";
-import { STAGE_SKY_MODELS } from "../assets/stageSkyInfo";
+import { STAGE_TOMB_SEA_MODEL } from "../../generated/stages/terrainAssetInfo";
+import { STAGE_SKY_MODELS } from "../../generated/stages/stageSkyInfo";
 import type { StageScenery } from "./stageScenery";
 
 const SPIRES = "Doodads\\Outland\\Rocks\\Outland_Spires\\Outland_Spires7.mdx";

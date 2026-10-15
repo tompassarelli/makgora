@@ -1,7 +1,7 @@
 
 
 
-import { FROST_ICE_MODEL, FROST_TRAP_MODEL } from "../assets/frostAssetInfo";
+import { FROST_ICE_MODEL, FROST_TRAP_MODEL } from "../../generated/assets/frostAssetInfo";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { f32 } from "wisp/src/sim/f32";
 import { Character, SpecialAction } from "../sim/codes";

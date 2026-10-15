@@ -1,5 +1,5 @@
 import type { StageLight } from "../assets/stageLighting";
-import { STAGE_SNOW_MODEL } from "../assets/stageAssetInfo";
+import { STAGE_SNOW_MODEL } from "../../generated/stages/stageAssetInfo";
 import { luma, type DeckPalette } from "../assets/stagePalette";
 import { cosineTurns, sineTurns } from "../sim/mathTables";
 import { PATTERNED_DECKS_STAGE } from "../sim/stage";

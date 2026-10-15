@@ -1,5 +1,5 @@
 import { HEAVY_SHEEN, HEAVY_SHEEN_ALPHA, heavySheen } from "../presentation/itemLook";
-import { WHITE_FIGHTER_MODELS } from "../assets/whiteFighterModels";
+import { WHITE_FIGHTER_MODELS } from "../../generated/assets/whiteFighterModels";
 import { ARENA_CAMERA, FLOOR_HEIGHT } from "../presentation/arenaCamera";
 import { originalClip, originalClipNamed } from "../assets/fighterOriginalClipInfo";
 import { fitFighterPlacement } from "../presentation/fighterPlacement";

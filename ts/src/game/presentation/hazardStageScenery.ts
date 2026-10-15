@@ -1,7 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import type { StageScenery } from "./stageScenery";
-import { STAGE_SKY_MODELS } from "../assets/stageSkyInfo";
-import { STAGE_LAVA_MODEL, STAGE_TOMB_SEA_MODEL } from "../assets/terrainAssetInfo";
+import { STAGE_SKY_MODELS } from "../../generated/stages/stageSkyInfo";
+import { STAGE_LAVA_MODEL, STAGE_TOMB_SEA_MODEL } from "../../generated/stages/terrainAssetInfo";
 
 const MOUND = "Doodads\\Barrens\\Rocks\\Barrens_Rocks\\Barrens_Rocks2.mdx";
 const SPIRE = "Doodads\\Felwood\\Rocks\\Felwood_Spires\\Felwood_Spires0.mdx";

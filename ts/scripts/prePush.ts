@@ -29,7 +29,7 @@ interface Check { readonly name: string; readonly directory: string; readonly ar
 
 
 const ANIMATION_INPUTS = ["build-inputs/original-clips-static-lights", "tools/animations/", "ts/scripts/keyThin.ts", "ts/scripts/wisp/animJitter.ts"];
-const MODEL_INPUTS = ["build-inputs/", "tools/animations/", "ts/src/game/assets/", "ts/src/game/presentation/", "ts/scripts/wisp/playerView.ts", "ts/scripts/wisp/model-facts/"];
+const MODEL_INPUTS = ["build-inputs/", "tools/animations/", "ts/src/game/assets/", "ts/src/generated/assets/", "ts/src/generated/stages/", "ts/src/game/presentation/", "ts/scripts/wisp/playerView.ts", "ts/scripts/wisp/model-facts/"];
 
 
 const CUE_CHECK = "ts/scripts/cueModels.ts";

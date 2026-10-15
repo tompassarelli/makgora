@@ -96,7 +96,7 @@ const typescript = [
     '  return CUES.get(character)?.[ordinal];',
     '}',
 ];
-await Bun.write(join(project, 'ts/src/game/assets/modelSoundInfo.ts'), typescript.join('\n') + '\n');
+await Bun.write(join(project, 'ts/src/generated/assets/modelSoundInfo.ts'), typescript.join('\n') + '\n');
 await Bun.write(join(output, 'model-sounds-evidence.json'), JSON.stringify({
     status: 'authored-sound-metadata-extracted-native-pending', table: 'AnimSounds.slk', tableSha256: hash(tableBytes), sounds, records,
     policy: 'Exact source event key/sequence identity; label and variant files resolved from installed stock AnimSounds.slk. Runtime dispatch is confirmed only.',

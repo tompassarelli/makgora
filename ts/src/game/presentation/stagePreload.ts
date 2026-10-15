@@ -1,10 +1,10 @@
 
-import { STAGE_DECK_MODEL, STAGE_DECK_MODELS, STAGE_MAIN_DECK_MODEL } from "../assets/stageAssetInfo";
+import { STAGE_DECK_MODEL, STAGE_DECK_MODELS, STAGE_MAIN_DECK_MODEL } from "../../generated/stages/stageAssetInfo";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
 import { surfaceCount } from "../sim/stage";
 import { hasCannon, hasTide } from "../sim/stageHazards";
 import { hasLava } from "../sim/lava";
-import { STAGE_LAVA_MODEL } from "../assets/terrainAssetInfo";
+import { STAGE_LAVA_MODEL } from "../../generated/stages/terrainAssetInfo";
 import { CANNON_MODEL, HYDRA_CREST_MODEL, HYDRA_RING_MODEL } from "./stageHazards";
 import { placedPieces, stageScenery } from "./stageScenery";
 import { platformParts } from "./stockPlatforms";

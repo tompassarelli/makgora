@@ -3,7 +3,7 @@ import { originalClip, originalClipCount, originalClipNamed } from "../assets/fi
 import { characterClips, namedClips } from "../presentation/fighterClips";
 import { Character } from "../sim/codes";
 import { SELECTABLE_CHARACTERS, fighterName, heroDefinition } from "../sim/heroes/registry";
-import { WHITE_FIGHTER_MODELS } from "../assets/whiteFighterModels";
+import { WHITE_FIGHTER_MODELS } from "../../generated/assets/whiteFighterModels";
 
 
 

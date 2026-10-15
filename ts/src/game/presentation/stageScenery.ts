@@ -1,14 +1,14 @@
 
 
 import { f32 } from "wisp/src/sim/f32";
-import { STAGE_TOMB_WATER_MODEL, STAGE_TOMB_SEA_MODEL, STAGE_LAVA_MODEL } from "../assets/terrainAssetInfo";
+import { STAGE_TOMB_WATER_MODEL, STAGE_TOMB_SEA_MODEL, STAGE_LAVA_MODEL } from "../../generated/stages/terrainAssetInfo";
 import { LAVA_CENTER_X, LAVA_HALF_WIDTH } from "../sim/lava";
 import { SEA_SURFACE_Z } from "../sim/stageHazards";
-import { STAGE_POINT_LIGHT_MODELS, STAGE_SNOW_MODEL } from "../assets/stageAssetInfo";
+import { STAGE_POINT_LIGHT_MODELS, STAGE_SNOW_MODEL } from "../../generated/stages/stageAssetInfo";
 import { STAGE_LIGHTS, type StageLight } from "../assets/stageLighting";
 import { min, toInt } from "../../runtime/numbers";
 import { STAGE_POINT_LIGHTS } from "../assets/stagePointLights";
-import { STAGE_SKY_MODELS } from "../assets/stageSkyInfo";
+import { STAGE_SKY_MODELS } from "../../generated/stages/stageSkyInfo";
 import { AHNQIRAJ_SCENERY, BLACKROCK_SCENERY, GRYPHON_SCENERY, NORDRASSIL_SCENERY } from "./hazardStageScenery";
 import { STRATHOLME_SCENERY, TOMB_OF_SARGERAS_SCENERY } from "./homeStageScenery";
 import { DUROTAR_SCENERY, HELLFIRE_SCENERY, NAXXRAMAS_SCENERY } from "./patrolStageScenery";

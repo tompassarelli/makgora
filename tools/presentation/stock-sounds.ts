@@ -104,6 +104,6 @@ const lines = [
   '};',
   '',
 ];
-const out = join(project, 'ts/src/game/assets/stockSoundInfo.ts');
+const out = join(project, 'ts/src/generated/assets/stockSoundInfo.ts');
 await Bun.write(out, lines.join('\n'));
 console.log(`${paths.length} paths and ${labels.length} labels verified: ${out}`);

@@ -115,7 +115,7 @@ layers, and each layer is a native sound with alternatives:
   summon, a freeze.
 - **Model-keyed sounds stay.** The original Rifleman and Illidan models play
   their own attack sounds from their animation keys
-  (smashcraft:ts/src/game/assets/modelSoundInfo.ts): the rifle shot, and
+  (smashcraft:ts/src/generated/assets/modelSoundInfo.ts): the rifle shot, and
   Illidan's glaive swings. The table does not layer those again.
 - **Kits in flux.** Kael'thas (#381) and Illidan (#379) are being reworked.
   Sounds key on the special slot and the normal's input, not on a kit's

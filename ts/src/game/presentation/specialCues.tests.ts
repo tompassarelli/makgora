@@ -13,7 +13,7 @@ import { SPECIAL_SLOTS } from "./projectileArt";
 import { RIFLEMAN_BLASTER_AIR_SHOT_FRAME, RIFLEMAN_BLASTER_GROUND_SHOT_FRAME } from "../sim/moves";
 import { RIFLEMAN_SECOND_SHOT_FIRST, RIFLEMAN_SECOND_SHOT_FORM, RIFLEMAN_SECOND_SHOT_LAST } from "../sim/specials";
 import { HERO_BRANCH_CUES, HERO_CUES, ORIGINAL_CUES, fighterBranchCues, fighterMoveCues, heroCueWindows, specialCueState } from "./specialCues";
-import { FROST_TRAP_MODEL } from "../assets/frostAssetInfo";
+import { FROST_TRAP_MODEL } from "../../generated/assets/frostAssetInfo";
 
 
 const FIGHTERS: readonly Character[] = [Character.rifleman, Character.demonHunter, ...HERO_ROSTER.map(({ character }) => character)];

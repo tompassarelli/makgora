@@ -6,7 +6,7 @@ import { HitElement } from "../sim/hitRegions";
 import { isSmashAttack, jabChainFrom } from "../sim/moves";
 import { heroDefinition } from "../sim/heroes/registry";
 import { originalFighterMoves } from "../sim/originalMoves";
-import { VERIFIED_STOCK_SOUND_LABELS } from "../assets/stockSoundInfo";
+import { VERIFIED_STOCK_SOUND_LABELS } from "../../generated/assets/stockSoundInfo";
 import { elementLook } from "./elementLooks";
 import { warcryVoice } from "./matchAudio";
 import { SWING_SOUND, SoundTier, TIER_HIT_VOLUME, TIER_SWING_PITCH, TIER_SWING_VOLUME, moveTier } from "./moveTiers";

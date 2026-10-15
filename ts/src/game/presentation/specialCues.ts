@@ -43,7 +43,7 @@ import {
 } from "../sim/specials";
 import { SPECIAL_SLOTS, type SpecialSlot } from "./projectileArt";
 import { RIFLEMAN_MODEL_FILE } from "./fighterAssetInfo";
-import { FROST_TRAP_MODEL } from "../assets/frostAssetInfo";
+import { FROST_TRAP_MODEL } from "../../generated/assets/frostAssetInfo";
 import { IMPACT_DUST_MODEL } from "../assets/impactAssetInfo";
 import { GROM_BLOODLUST_MODEL } from "../assets/importedModelInfo";
 import { MOUNTAIN_KING_SPECIALS } from "../sim/heroes/mountainKingSpecials";

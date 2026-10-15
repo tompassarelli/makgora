@@ -51,7 +51,7 @@ Every card has the same three parts (smashcraft:ts/src/game/ui/stageCard.ts):
    (`TeamColor21`, alpha 230), the main deck thick and platforms thin at their
    true spacing, centred in a box 84% of the panel's width and half as tall.
    The silhouette is generated from the stage's surfaces into
-   smashcraft:ts/src/game/menu/stageSilhouettes.ts.
+   smashcraft:ts/src/generated/stages/stageSilhouettes.ts.
 3. **Name banner** on grid tiles: a coal strip (alpha 210) along the bottom
    22% of the card with the stage's name in the menu font. The large preview
    leaves it out: its name and description sit below it.

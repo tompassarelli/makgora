@@ -13,13 +13,13 @@ import type { PlayerViewExpectations } from "wisp/scripts/wisp/playerView";
 import type { SceneExpectations } from "wisp/scripts/wisp/scene";
 import type { CameraView } from "wisp/scripts/wisp/visibility";
 import { originalClip, originalClipCount, originalLightPath } from "../../src/game/assets/fighterOriginalClipInfo";
-import { FROST_ICE_MODEL, FROST_TRAP_MODEL } from "../../src/game/assets/frostAssetInfo";
+import { FROST_ICE_MODEL, FROST_TRAP_MODEL } from "../../src/generated/assets/frostAssetInfo";
 import {
   IMPACT_DUST_MODEL, IMPACT_ELECTRIC_MODEL, IMPACT_HIT_MODEL, IMPACT_JUMP_MODEL, IMPACT_KO_MODEL,
   IMPACT_MISS_MODEL, IMPACT_RESPAWN_MODEL, IMPACT_ROLL_MODEL, IMPACT_SHIELD_MODEL, IMPACT_TECH_MODEL,
 } from "../../src/game/assets/impactAssetInfo";
-import { SHIELD_P1_MODEL, SHIELD_P2_MODEL, SHIELD_P3_MODEL, SHIELD_P4_MODEL } from "../../src/game/assets/shieldAssetInfo";
-import { STAGE_DECK_MODELS } from "../../src/game/assets/stageAssetInfo";
+import { SHIELD_P1_MODEL, SHIELD_P2_MODEL, SHIELD_P3_MODEL, SHIELD_P4_MODEL } from "../../src/generated/assets/shieldAssetInfo";
+import { STAGE_DECK_MODELS } from "../../src/generated/stages/stageAssetInfo";
 import { STOCK_PLATFORM_MODELS } from "../../src/game/presentation/stockPlatforms";
 import { STAGE_EDGE_LIGHT_MODEL } from "../../src/game/presentation/stageEdgeLights";
 import { STAGE_DECK_PALETTES } from "../../src/game/assets/stagePalette";
@@ -37,11 +37,11 @@ import type { AuthoredSpecial } from "../../src/game/sim/heroSpecials";
 import { HERO_ROSTER } from "../../src/game/sim/heroes/registry";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { stageBounds } from "../../src/game/sim/stageBounds";
-import { STAGE_LAVA_MODEL } from "../../src/game/assets/terrainAssetInfo";
+import { STAGE_LAVA_MODEL } from "../../src/generated/stages/terrainAssetInfo";
 import { placedPieces } from "../../src/game/presentation/stageScenery";
 import { MODEL_FACTS } from "./modelFacts";
 import { WHITE_MODEL_FACTS } from "./whiteModelFacts";
-import { WHITE_FIGHTER_MODELS } from "../../src/game/assets/whiteFighterModels";
+import { WHITE_FIGHTER_MODELS } from "../../src/generated/assets/whiteFighterModels";
 import { STAGE_SKIES, stageSkyTexture } from "../stageSky";
 
 const FRAMES_PER_SECOND = 60;

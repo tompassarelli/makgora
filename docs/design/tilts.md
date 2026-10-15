@@ -386,7 +386,7 @@ smashcraft:ts/src/game/presentation/moveTiers.ts).
   sound rotates through the game's three variants.
 - **Checked against the game.** smashcraft:tools/presentation/stock-sounds.ts
   checks every path against the installed game and records it in
-  smashcraft:ts/src/game/assets/stockSoundInfo.ts.
+  smashcraft:ts/src/generated/assets/stockSoundInfo.ts.
 
 ## Dash attacks
 

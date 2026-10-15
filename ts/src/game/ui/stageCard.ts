@@ -4,7 +4,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { at } from "wisp/src/runtime/lookup";
 import { RANDOM_STAGE, stageInfo } from "../menu/stageCatalog";
-import { STAGE_SILHOUETTES, SILHOUETTE_PIECES } from "../menu/stageSilhouettes";
+import { STAGE_SILHOUETTES, SILHOUETTE_PIECES } from "../../generated/stages/stageSilhouettes";
 import { createBackdrop, createText, placeTopLeft } from "./frames";
 import { MENU_FONT } from "./hudLayout";
 

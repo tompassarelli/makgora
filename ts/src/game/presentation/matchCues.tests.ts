@@ -1,6 +1,6 @@
 import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
 import { IMPORTED_MENU_MUSIC } from "../assets/importedMusicInfo";
-import { VERIFIED_STOCK_SOUNDS } from "../assets/stockSoundInfo";
+import { VERIFIED_STOCK_SOUNDS } from "../../generated/assets/stockSoundInfo";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
 import { executeNext, testMatch } from "../match/testMatch";
 import { Phase } from "../match/rules";

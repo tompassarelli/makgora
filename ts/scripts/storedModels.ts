@@ -9,7 +9,7 @@ import { Console, Effect } from "effect";
 import { FAMILY_NAMES, INPUTS_STORE, MANIFEST, readManifest, regenerate } from "./wisp/buildInputs";
 import { GENERATED_MODELS, TOMB_WATERFALL_IMPORTS, missingModels } from "./wisp/mapInputs";
 import { parseModelMDX } from "./mdxCodec";
-import { WHITE_FIGHTER_MODELS } from "../src/game/assets/whiteFighterModels";
+import { WHITE_FIGHTER_MODELS } from "../src/generated/assets/whiteFighterModels";
 import { groundPlaneGeosets } from "./groundPlanes";
 
 const store = process.argv[2] ?? INPUTS_STORE;

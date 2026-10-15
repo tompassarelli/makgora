@@ -49,7 +49,7 @@ Known breaks still in the tree (removed by slices, never copied): `*Hero.ts` imp
 | A move's sound | `ts/src/game/presentation/moveSounds.ts` | `fighters/<slug>/sounds.ts` in S7d |
 | Warcry, victory, stage music, hurt voice | `ts/src/game/presentation/matchAudio.ts`, `ts/src/game/presentation/hurtVoice.ts` | `fighters/<slug>/sounds.ts` in S7d |
 | Sound tier and cue selection; playback | `ts/src/game/presentation/moveTiers.ts`; `ts/src/game/render/soundBank.ts` | `presentation/sound/`; stays in render |
-| Stock sound paths (generated) | producer `tools/presentation/stock-sounds.ts` (writes `ts/src/game/assets/stockSoundInfo.ts`) | `generated/assets/` in S6b |
+| Stock sound paths (generated) | producer `tools/presentation/stock-sounds.ts` (writes `ts/src/generated/assets/stockSoundInfo.ts`) | same path (S6b done) |
 | Bot gameplan for one fighter | `ts/src/game/sim/heroes/<fighter>Gameplan.ts` | `fighters/<slug>/gameplan.ts` in S8 |
 | Bot habit, edge-guard scenario | `ts/src/game/match/botHabits.ts`, `ts/src/game/match/edgeGuardScenarios.ts` | scenarios to `gameplan.ts` in S7f |
 | Stage deck geometry, surfaces | `ts/src/game/sim/stage.ts` | `stages/<slug>/deck.ts` (no slice yet) |

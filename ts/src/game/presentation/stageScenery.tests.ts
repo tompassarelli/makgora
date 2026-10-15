@@ -1,6 +1,6 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
-import { STAGE_LAVA_MODEL, STAGE_SEA_MODEL, STAGE_TOMB_SEA_MODEL } from "../assets/terrainAssetInfo";
+import { STAGE_LAVA_MODEL, STAGE_SEA_MODEL, STAGE_TOMB_SEA_MODEL } from "../../generated/stages/terrainAssetInfo";
 import { stageScenery, terrainPieces } from "./stageScenery";
 import { fogProblems, mirrorProblems } from "./stageRules";
 import { platformParts } from "./stockPlatforms";

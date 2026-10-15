@@ -1,6 +1,6 @@
 
 
-import { modelSoundIs3D, modelSoundLabel } from "../assets/modelSoundInfo";
+import { modelSoundIs3D, modelSoundLabel } from "../../generated/assets/modelSoundInfo";
 import type { WorldOrigin } from "./effects";
 import type { ModelSoundEvent, ModelSoundSink } from "./modelSounds";
 import { type SoundBank, SoundKind } from "./soundBank";
