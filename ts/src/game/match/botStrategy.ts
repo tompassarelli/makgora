@@ -48,8 +48,8 @@ interface SavedBotRead {
 }
 
 export interface BotStrategy {
-
-  readonly history: number[];
+  // Lua arrays keep their peak capacity, so snapshots share each history instead of copying it; replace it, never mutate it.
+  history: readonly number[];
 
   historyKey: string;
   observedFrame: number;
@@ -80,10 +80,12 @@ export interface BotStrategy {
   readonly recentOptions: number[];
 }
 
+const NO_HABITS: readonly number[] = [];
+
 const noRecentOptions = (): number[] => Array.from({ length: 2 * VARIETY_STARTS }, () => -1);
 
 export function createBotStrategy(): BotStrategy {
-  return { history: [], historyKey: "", observedFrame: -1, opponent: -1, lastChoice: HabitChoice.none, lastContext: 0, lastSerial: -1, events: 0, readActive: false, readChoice: HabitChoice.none, readContext: 0, readExpectedFrame: 0, readExpires: 0, readConfidence: 0, readActed: false, readActionFrame: -1, readActionSerial: -1, readActionStyle: -1, readActionFacing: 0, lastOption: -1, burnHurt: false, burnStyle: -1, burnCharacter: -1, burnFrame: -1, burnCount: 0, burnGap: 0, recentOptions: noRecentOptions() };
+  return { history: NO_HABITS, historyKey: "", observedFrame: -1, opponent: -1, lastChoice: HabitChoice.none, lastContext: 0, lastSerial: -1, events: 0, readActive: false, readChoice: HabitChoice.none, readContext: 0, readExpectedFrame: 0, readExpires: 0, readConfidence: 0, readActed: false, readActionFrame: -1, readActionSerial: -1, readActionStyle: -1, readActionFacing: 0, lastOption: -1, burnHurt: false, burnStyle: -1, burnCharacter: -1, burnFrame: -1, burnCount: 0, burnGap: 0, recentOptions: noRecentOptions() };
 }
 
 export type SavedBotStrategy = Pick<BotStrategy, "observedFrame" | "opponent" | "lastChoice" | "lastContext" | "lastSerial" | "events" | "lastOption" | "recentOptions" | "burnHurt" | "burnStyle" | "burnCharacter" | "burnFrame" | "burnCount" | "burnGap"> & {
@@ -114,8 +116,10 @@ export function savedBotStrategy(state: Readonly<BotStrategy>): SavedBotStrategy
 
 export function restoredBotStrategy(saved: Readonly<SavedBotStrategy>): BotStrategy {
   const state = createBotStrategy();
-  for (const habit of saved.history) state.history.push(habit.frame, habit.context, habit.choice, habit.interval);
-  state.historyKey = state.history.join(",");
+  const history: number[] = [];
+  for (const habit of saved.history) history.push(habit.frame, habit.context, habit.choice, habit.interval);
+  state.history = history;
+  state.historyKey = history.join(",");
   state.observedFrame = saved.observedFrame;
   state.opponent = saved.opponent;
   state.lastChoice = saved.lastChoice;
@@ -147,11 +151,8 @@ export function restoredBotStrategy(saved: Readonly<SavedBotStrategy>): BotStrat
 }
 
 export function copyBotStrategy(target: BotStrategy, source: Readonly<BotStrategy>): void {
-  if (target.historyKey !== source.historyKey) {
-    target.history.length = source.history.length;
-    for (let index = 0; index < source.history.length; index++) target.history[index] = at(source.history, index);
-    target.historyKey = source.historyKey;
-  }
+  target.history = source.history;
+  target.historyKey = source.historyKey;
   target.observedFrame = source.observedFrame;
   target.opponent = source.opponent;
   target.lastChoice = source.lastChoice;
@@ -254,14 +255,14 @@ export function learnBotHabit(state: BotStrategy, ownObserved: Readonly<Fighter>
         if (at(state.history, index + 1) === fromContext && ++kept >= policy.historyCapacity) continue;
         retained.push(index);
       }
-      let into = 0;
+      const history: number[] = [];
       for (let index = retained.length - 1; index >= 0; index--) {
         const from = at(retained, index);
-        for (let field = 0; field < HABIT_FIELDS; field++) state.history[into++] = at(state.history, from + field);
+        for (let field = 0; field < HABIT_FIELDS; field++) history.push(at(state.history, from + field));
       }
-      state.history.length = into;
-      state.history.push(observedFrame, fromContext, choice, previous < 0 ? 0 : observedFrame - previous);
-      state.historyKey = state.history.join(",");
+      history.push(observedFrame, fromContext, choice, previous < 0 ? 0 : observedFrame - previous);
+      state.history = history;
+      state.historyKey = history.join(",");
     }
   }
   state.observedFrame = observedFrame;
