@@ -1,8 +1,15 @@
 import { expect, test } from "bun:test";
 import { playedMoves } from "../../tools/animations/hd-models";
-import { originalClipCount, originalClipNamed, originalClipNames } from "../src/game/assets/fighterOriginalClipInfo";
+import { originalClip, originalClipCount, originalClipNamed, originalClipNames } from "../src/game/assets/fighterOriginalClipInfo";
 import { victoryAnimation } from "../src/game/presentation/matchAudio";
 import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/sim/heroes/registry";
+import { MatchPresentation } from "../src/game/render/matchPresentation";
+import { createFighter } from "../src/game/sim/fighter";
+import { soloWorld } from "../src/game/sim/testWorld";
+import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
+import { testHeadless } from "./headless";
+
+const headless = testHeadless(SMASHCRAFT_HEADLESS);
 
 test("every fighter's Classic body carries its results-screen victory pose [k2 property]", () => {
   for (const character of SELECTABLE_CHARACTERS) {
@@ -13,4 +20,50 @@ test("every fighter's Classic body carries its results-screen victory pose [k2 p
     expect(victory, `${fighterName(character)} has no victory clip`).toBeDefined();
     expect(playedMoves(character, motion).classic, fighterName(character)).toContain(victory as number);
   }
+});
+
+test("results playback shows full stock victories and casts once before holding ready [k5 boundary results-animation]", () => {
+  const client = headless.clients({ start: () => {}, install: () => {} }, [0]).client(0);
+  client.run(() => {
+    const presentation = new MatchPresentation({ x: 0, y: 0, z: 0 });
+    for (const character of SELECTABLE_CHARACTERS) {
+      const name = fighterName(character);
+      const clipIndex = originalClipNamed(character, victoryAnimation(character));
+      const clip = clipIndex === undefined ? undefined : originalClip(character, clipIndex);
+      if (clip === undefined) throw new Error(`${name}: missing victory`);
+      const duration = clip.endSeconds - clip.startSeconds;
+      presentation.preparePoses(soloWorld(createFighter(character, 0, 1)));
+      presentation.beginResults({ rows: [{ slot: 0, winner: true, text: name }], winner: character, winnerSlot: 0, x: 0, z: 0 }, 0);
+      const drawn = () => client.effectPoses({ visibleOnly: true }).find(pose => pose.destroyed === undefined && pose.model === clip.modelPath);
+      expect(drawn()?.animationElapsed, `${name}: clip begins at its first frame`).toBeCloseTo(clip.timeline === true ? clip.startSeconds : 0, 4);
+      let previous = drawn()?.animationElapsed ?? 0;
+      let held: number | undefined;
+      for (let frame = 1; frame <= 360; frame++) {
+        presentation.tick();
+        const pose = drawn();
+        expect(pose, `${name}/${frame}: visible body`).toBeDefined();
+        if (pose === undefined) throw new Error(`${name}: missing body`);
+        expect(pose.timeScale).toBe(0);
+        const elapsed = frame / 60;
+        if (victoryAnimation(character).includes("victory")) {
+          expect(pose.animationElapsed).toBeGreaterThanOrEqual(clip.startSeconds);
+          expect(pose.animationElapsed).toBeLessThanOrEqual(clip.endSeconds);
+          if (elapsed < duration) expect(pose.animationElapsed).toBeGreaterThan(previous);
+        } else if (elapsed < duration) {
+          expect(pose.animationElapsed, `${name}: cast cannot restart`).toBeGreaterThan(previous);
+          expect(pose.animationElapsed).toBeLessThanOrEqual(clip.endSeconds);
+        } else if (held === undefined) {
+          held = pose.animationElapsed;
+          const readyIndex = originalClipNamed(character, "stand ready") ?? originalClipNamed(character, "stand");
+          const ready = readyIndex === undefined ? undefined : originalClip(character, readyIndex);
+          expect(ready, `${name}: ready/stand exists`).toBeDefined();
+          expect(held, `${name}: finishes in the first ready/stand pose`).toBeCloseTo(ready?.timeline === true ? ready.startSeconds : 0, 4);
+        } else expect(pose.animationElapsed, `${name}: final ready/stand pose stays held`).toBe(held);
+        previous = pose.animationElapsed;
+      }
+      presentation.hideResults();
+      expect(drawn(), `${name}: rematch removes result body`).toBeUndefined();
+    }
+  });
+  expect(client.errors).toEqual([]);
 });

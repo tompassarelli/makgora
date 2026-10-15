@@ -10,7 +10,7 @@ import { MATCH_CAMERA_ASPECT } from "../src/game/sim/matchCamera";
 import { ROSTER_MANA } from "../src/game/sim/mana";
 import { IMPACT_HIT_MODEL } from "../src/game/assets/impactAssetInfo";
 import { PROJECTILE_DRAW_OFFSETS } from "../src/game/presentation/projectileArt";
-import { AttackStyle, Character, SpecialAction } from "../src/game/sim/codes";
+import { AttackStyle, Character, HeroStatusKind, SpecialAction } from "../src/game/sim/codes";
 import { FIGHTER_ULTIMATES } from "../src/game/sim/ultimates";
 import { SELECTABLE_CHARACTERS, heroDefinition } from "../src/game/sim/heroes/registry";
 import { createFighter } from "../src/game/sim/fighter";
@@ -85,6 +85,32 @@ function effectPoses(client: HeadlessClient): Map<unknown, EffectPose> {
 }
 
 const hidden = (pose: EffectPose) => pose.alpha === 0 || pose.scale === 0;
+
+test("Dreadlord and Lich status fades retain their alpha-keyed bodies and restore opacity [k4 reference native]", () => {
+  const client = headless.clients({ start: () => {}, install: () => {} }, [0]).client(0);
+  client.run(() => {
+    for (const character of [Character.dreadlord, Character.lich]) {
+      const fighter = createFighter(character, 0, 1);
+      const world = soloWorld(fighter), input = neutralControls(), pose = createFighterPose();
+      const pool = new FighterPoolPresentation(character, 0, { x: 0, y: 0, z: 0 });
+      for (let frame = 0; frame < 36; frame++) {
+        fighter.status.invincible = frame < 12 ? 1 : 0;
+        fighter.status.condition = frame >= 12 && frame < 24 ? HeroStatusKind.banish : HeroStatusKind.none;
+        advanceFighterPose(pose, fighter, world, input, false, false, frame === 0, false);
+        pool.present(fighter, pose, 0, frame);
+        const body = client.effectPoses({ visibleOnly: true }).find(effect => effect.destroyed === undefined && effect.model !== originalLightPath(character));
+        expect(body, `${character}/${frame}: drawn body`).toBeDefined();
+        if (body === undefined) throw new Error("missing drawn body");
+        expect(body.alpha / 255, `${character}/${frame}: alpha-key cutoff`).toBeGreaterThan(0.75);
+        expect(body.alpha < 255).toBe(frame < 24);
+        expect(body.color).toEqual(frame >= 12 && frame < 24 ? [120, 255, 150] : [255, 255, 255]);
+      }
+      expect(pool.missingSelections).toBe(0);
+      pool.destroy();
+    }
+  });
+  expect(client.errors).toEqual([]);
+});
 
 function visible(client: HeadlessClient, handles: ReadonlySet<unknown>): Map<unknown, EffectPose> {
   return new Map([...effectPoses(client)].filter(([handle, pose]) => handles.has(handle) && !hidden(pose)));
