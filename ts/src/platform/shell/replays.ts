@@ -11,7 +11,7 @@ import {
 } from "../../game/replay/matchReplay";
 import { momentInput } from "../../game/replay/moment";
 import { sourceVersion } from "../../game/shell/sourceVersion";
-import { replayFile, replayPartFile } from "../../runtime/gameFiles";
+import { replayFile, replayPartFile } from "../../game/core/gameFiles";
 import { takeMatchSerial } from "./matchRecords";
 import type { ShellState } from "./state";
 

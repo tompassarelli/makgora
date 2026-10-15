@@ -2,8 +2,8 @@
 import { Effect, Option, Schema } from "effect";
 import { preloadLines, preloadRecord, Count, Seconds, type GameFileKind } from "wisp/scripts/wisp/preloadRecord";
 import { MAX_BATCH } from "../../src/game/netcode/journal/transport";
-import * as files from "../../src/runtime/gameFiles";
-export * from "../../src/runtime/gameFiles";
+import * as files from "../../src/game/core/gameFiles";
+export * from "../../src/game/core/gameFiles";
 
 
 export const MeleeReady = preloadRecord(

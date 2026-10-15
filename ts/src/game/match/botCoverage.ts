@@ -1,4 +1,4 @@
-import { sweepSeed } from "../../runtime/sweep";
+import { sweepSeed } from "../core/sweep";
 
 import { at } from "wisp/src/runtime/lookup";
 import { floorMod } from "wisp/src/sim/intMath";

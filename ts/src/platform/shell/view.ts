@@ -30,8 +30,8 @@ import { escapeMeterView, readEscapeMeter } from "../../game/presentation/escape
 import { lavaPiece } from "../../game/presentation/stageScenery";
 import { hasLava, lavaSide } from "../../game/sim/lava";
 import type { Fighter } from "../../game/sim/fighter";
-import { journalIngress } from "../../game/shell/build";
-import { type StartControl, matchHelp, resultNotice, waitingMessage } from "../../game/shell/messages";
+import { journalIngress } from "../../game/session/build";
+import { type StartControl, matchHelp, resultNotice, waitingMessage } from "../../game/session/messages";
 import { isIntangible } from "../../game/sim/conditions";
 import { type Roster, fighterAt, isActive } from "../../game/sim/roster";
 import { surfaceCount, surfaceLeft, surfaceMoves, surfaceRight, surfaceZ } from "../../game/sim/stage";

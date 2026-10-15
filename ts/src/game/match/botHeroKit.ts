@@ -6,7 +6,7 @@
 
 
 import { f32 } from "wisp/src/sim/f32";
-import { hurtCapsule } from "../physics/contactGeometry";
+import { hurtCapsule } from "../sim/geometry/contactGeometry";
 import { canAttack } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
 import { chooseHeroSpecial, isHeroSpecialAction, runningHeroSpecial } from "../sim/specials/engine";

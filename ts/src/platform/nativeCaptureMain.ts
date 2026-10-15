@@ -3,8 +3,8 @@
 
 
 
-import type { MapBuild } from "../game/shell/build";
-import { NATIVE_DRIVER_BUILD } from "../game/shell/currentBuild";
+import type { MapBuild } from "../game/session/build";
+import { NATIVE_DRIVER_BUILD } from "../game/session/currentBuild";
 import { install as installGame, startBuild } from "./main";
 import { nativeDriverCommand } from "./nativeDriver";
 import { shellState } from "./shell/state";
@@ -15,7 +15,7 @@ import { CAPTURE_FIXTURES, type CaptureFixture, SILHOUETTE_HIDDEN_FRAME } from "
 import { applyDeveloperCommand } from "./shell/keys";
 import { bareFighter } from "./shell/fighterCloak";
 import { paintDrawnStamp } from "./shell/drawnStamp";
-import { CAPTURE_STATUS_FILE } from "../runtime/gameFiles";
+import { CAPTURE_STATUS_FILE } from "../game/core/gameFiles";
 
 const BUILD: MapBuild = { ...NATIVE_DRIVER_BUILD, presentation: "pool-predicted" };
 const TICK = "capture.fixtures";

@@ -8,7 +8,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS, participantActive } from "../input/participants";
-import { attackCapsule, emptyCapsule, placeCapsule } from "../physics/contactGeometry";
+import { attackCapsule, emptyCapsule, placeCapsule } from "../sim/geometry/contactGeometry";
 import { AttackStyle, ContactKind, HitElement } from "../sim/codes";
 import { isIntangible } from "../sim/conditions";
 import { collectDamageContact } from "../sim/contacts";

@@ -167,7 +167,7 @@ development build sets: the fighter and the underside nearest it show above
 77% of the frame in all 60 cases.
 
 For a native capture, set `CURRENT_BUILD`'s scenario to `underside`
-(smashcraft:ts/src/game/shell/currentBuild.ts), build the development map and
+(smashcraft:ts/src/game/session/currentBuild.ts), build the development map and
 run `bun wisp fresh MAP.w3x`. The quick match freezes player 1 in the air
 beside the main deck's lower right corner, level with its underside, for ten
 seconds, and fresh saves each client's frame at match frame 30.

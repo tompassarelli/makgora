@@ -6,7 +6,7 @@
 
 import { installDispatch, trampoline } from "wisp/src/platform/dispatch";
 import { configureRuntime } from "wisp/src/runtime/config";
-import { CURRENT_BUILD } from "../../src/game/shell/currentBuild";
+import { CURRENT_BUILD } from "../../src/game/session/currentBuild";
 import { STACK_DEMO_COMMAND, STACK_DEMO_HANDLER, installStackDemo } from "../../src/platform/stackDemo";
 
 const SOURCE = "src/platform/stackDemo.ts";

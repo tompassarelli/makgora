@@ -2,8 +2,8 @@ import { canHit } from "./teams";
 
 
 
-import { max, min, toInt } from "../../runtime/numbers";
-import { addFloat32, divideFloat32, multiplyFloat32, roundToFloat32, subtractFloat32 } from "wisp/src/sim/binary32";
+import { max, min } from "../core/numbers";
+import { addFloat32, divideFloat32, multiplyFloat32, roundToFloat32, subtractFloat32, toInt } from "wisp/src/sim/binary32";
 import { Character, ContactKind, DownState, HeroStatusKind } from "./codes";
 import { f32 } from "wisp/src/sim/f32";
 

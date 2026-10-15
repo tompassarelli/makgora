@@ -7,7 +7,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { Schema } from "effect";
 import type { ReplayedArrival } from "wisp/src/headless/syncChannel";
-import { CONTROL_ACK_PREFIX, PAUSE_REQUEST_PREFIX } from "../../src/game/shell/pauseBarrier";
+import { CONTROL_ACK_PREFIX, PAUSE_REQUEST_PREFIX } from "../../src/game/session/pauseBarrier";
 
 const START = 315;
 

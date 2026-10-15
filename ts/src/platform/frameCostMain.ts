@@ -1,6 +1,6 @@
 
 import { runFrameCostBenchmark } from "../game/replay/frameCostBenchmark";
-import { frameCostFile } from "../runtime/gameFiles";
+import { frameCostFile } from "../game/core/gameFiles";
 
 declare const os: { readonly clock: (this: void) => number };
 

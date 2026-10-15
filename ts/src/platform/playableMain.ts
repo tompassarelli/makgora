@@ -1,4 +1,4 @@
-import { PLAYABLE_BUILD } from "../game/shell/currentBuild";
+import { PLAYABLE_BUILD } from "../game/session/currentBuild";
 import { install as installGame, startBuild } from "./main";
 import { installSessionRates } from "./shell/sessionRates";
 

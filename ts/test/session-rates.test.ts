@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { testHeadless } from "./headless";
 import { Phase } from "../src/game/match/rules";
-import { PLAYABLE_BUILD } from "../src/game/shell/currentBuild";
+import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { install, startBuild } from "../src/platform/main";
 import { installSessionRates } from "../src/platform/shell/sessionRates";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";

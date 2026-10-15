@@ -42,7 +42,7 @@ if (only.length > 0) files.splice(0, files.length, ...files.filter((file) => onl
 const junitDirectory = process.env.TEST_JUNIT_DIR;
 
 // A file's CPU depends on the files before it in its process, so the processes are fixed by name hash, never by machine.
-// SWEEPS=1 runs only the sweeps (src/runtime/sweep.ts) in the same processes.
+// SWEEPS=1 runs only the sweeps (src/game/core/sweep.ts) in the same processes.
 const GAME_SHARDS = 3;
 const REST_SHARDS = 4;
 const baseline = readBaseline(resolve(project, "test/cost-baseline.tsv"));

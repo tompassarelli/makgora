@@ -4,7 +4,7 @@
 
 
 // Replay checksums serialize an absent fighter slot or surface as -1.
-import { type TechInput, emptyTechInput } from "../physics/techInput";
+import { type TechInput, emptyTechInput } from "./geometry/techInput";
 import { at } from "wisp/src/runtime/lookup";
 import {
   type AttackStyle,

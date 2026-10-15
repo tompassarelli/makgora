@@ -1,6 +1,6 @@
 import { startNativeSoak } from "../nativeSoak";
 import { cameraKey, returnPauseMenu, PAUSE_CAMERA_KEYS, pauseCameraKey } from "./pauseCamera";
-import { HIT_PRESENTATION_CASES } from "../../game/shell/hitPresentationCases";
+import { HIT_PRESENTATION_CASES } from "../../game/session/hitPresentationCases";
 import { createImpactEvents } from "../../game/presentation/impactEvents";
 import { emitImpacts } from "../../game/presentation/impactState";
 
@@ -15,12 +15,12 @@ import { Phase, cancelRematchCountdown, characterFor, copyMatchState, firstHuman
 import { ROSTER_MANA } from "../../game/sim/mana";
 import { fighterAt, isActive } from "../../game/sim/roster";
 import { NO_LESSON, tutorialFinished } from "../../game/match/tutorial";
-import { METER_COMMAND, classicDevRequest, loreDevRequest, LORE_WIN_COMMAND, winLoreBattle, DESYNC_COMMAND, QUICK_CPU_STOCKS, RESET_COMMAND, QUICK_TRAINING_COMMAND, applyDevCommand, prepareQuickCpu, prepareQuickTraining, quickMatchCpuHero, quickMatchCpuProfile, quickMatchHero, quickMatchHitAreas, quickMatchStocks, quickMatchPair, quickPromoRequest, prepareQuickPromo, quickStageSettings, quickPainHero, quickRecoveryHero, quickOffstageHero } from "../../game/shell/devSettings";
+import { METER_COMMAND, classicDevRequest, loreDevRequest, LORE_WIN_COMMAND, winLoreBattle, DESYNC_COMMAND, QUICK_CPU_STOCKS, RESET_COMMAND, QUICK_TRAINING_COMMAND, applyDevCommand, prepareQuickCpu, prepareQuickTraining, quickMatchCpuHero, quickMatchCpuProfile, quickMatchHero, quickMatchHitAreas, quickMatchStocks, quickMatchPair, quickPromoRequest, prepareQuickPromo, quickStageSettings, quickPainHero, quickRecoveryHero, quickOffstageHero } from "../../game/session/devSettings";
 import { fighterName } from "../../game/sim/heroes/registry";
 import { endReplaySegment } from "./replays";
-import { devReceiptFile } from "../../game/shell/journalFiles";
-import { applySetupCommand } from "../../game/shell/sessionSetup";
-import { pausedMessage } from "../../game/shell/messages";
+import { devReceiptFile } from "../../game/session/journalFiles";
+import { applySetupCommand } from "../../game/session/sessionSetup";
+import { pausedMessage } from "../../game/session/messages";
 import { captureBinding } from "../../game/ui/bindingSettings";
 import { writeLines } from "wisp/src/platform/fileio";
 import { confirmedChecksum, startInputTrace, traceParticipant } from "./diagnostics";
@@ -35,7 +35,7 @@ import { chatBusy, requestPause } from "./journalPause";
 import { Key, syncKeyEvents } from "./keyEvents";
 import { startBodyFit } from "./bodyFit";
 import { startAgencyFixture } from "./agencyFixture";
-import { clearVisualCapture, configureVisualCapture } from "../../game/shell/visualCapture";
+import { clearVisualCapture, configureVisualCapture } from "../../game/session/visualCapture";
 import { back, choose, confirm, openSettingsScreen, resetToStartingSelection, startDevClassic, startDevLore, startQuickMatch } from "./menus";
 import { LORE_BATTLES } from "../../game/classic/loreBattles";
 import { makePreview } from "./preview";

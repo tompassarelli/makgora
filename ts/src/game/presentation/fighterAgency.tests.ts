@@ -5,7 +5,7 @@ import { createFighter } from "../sim/fighter";
 import { createRoster, neutralControls } from "../sim/roster";
 import { advanceFighterMotion } from "../sim/step";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
-import { sweep } from "../../runtime/sweep";
+import { sweep } from "../core/sweep";
 
 test("locked input boundaries agree with the replay agency references in Lua32 [k4 reference lua32]", () => {
 

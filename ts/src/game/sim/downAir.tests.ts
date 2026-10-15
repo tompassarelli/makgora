@@ -1,6 +1,6 @@
 import { f32 } from "wisp/src/sim/f32";
 import { assertTrue, test } from "wisp/src/runtime/testing";
-import { hurtCapsule } from "../physics/contactGeometry";
+import { hurtCapsule } from "./geometry/contactGeometry";
 import { AttackStyle } from "./codes";
 import { createFighter } from "./fighter";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "./hitRegions";

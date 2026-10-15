@@ -1,7 +1,7 @@
 
 
 import { test } from "bun:test";
-import { selectSweep, SWEEP_PREFIX } from "../src/runtime/sweep";
+import { selectSweep, SWEEP_PREFIX } from "../src/game/core/sweep";
 
 export const SWEEPS = process.env.SWEEPS === "1";
 

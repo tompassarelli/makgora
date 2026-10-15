@@ -2,7 +2,7 @@
 
 
 import { multiplyFloat32 } from "wisp/src/sim/binary32";
-import { type Capsule, attackCapsule, emptyCapsule, placeCapsule } from "../physics/contactGeometry";
+import { type Capsule, attackCapsule, emptyCapsule, placeCapsule } from "../sim/geometry/contactGeometry";
 import { fighterPoseFacing } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../sim/hitRegions";

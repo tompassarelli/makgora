@@ -4,7 +4,7 @@
 
 import { f32 } from "wisp/src/sim/f32";
 import { assertEquals, test } from "wisp/src/runtime/testing";
-import { capsulesIntersect } from "../physics/contactGeometry";
+import { capsulesIntersect } from "./geometry/contactGeometry";
 import { AttackStyle, Character } from "./codes";
 import { createFighter } from "./fighter";
 import { HERO_ROSTER } from "./heroes/registry";

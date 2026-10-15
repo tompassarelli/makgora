@@ -1,5 +1,5 @@
-import { beginSessionMatch } from "../../game/shell/sessionWins";
-import type { QuickStageSettings } from "../../game/shell/devSettings";
+import { beginSessionMatch } from "../../game/session/sessionWins";
+import type { QuickStageSettings } from "../../game/session/devSettings";
 import { showBackdrop, showStageFog, showStageLighting } from "./stageScenery";
 
 
@@ -13,11 +13,11 @@ import { clearBotStrategy } from "../../game/match/botStrategy";
 import { initializeMatchFighters } from "../../game/match/step";
 import { beginModelSoundEpoch, confirmModelSounds } from "../../game/render/modelSounds";
 import { stageMusic } from "../../game/presentation/matchAudio";
-import { readyFile, stageDrawnFile } from "../../game/shell/journalFiles";
-import { initializeScenario } from "../../game/shell/scenarios";
+import { readyFile, stageDrawnFile } from "../../game/session/journalFiles";
+import { initializeScenario } from "../../game/session/scenarios";
 import { classicIntro } from "../../game/classic/classicText";
 import { loreIntro } from "../../game/classic/loreBattles";
-import { type Scenario, usesPool } from "../../game/shell/build";
+import { type Scenario, usesPool } from "../../game/session/build";
 import { fighterAt, isActive } from "../../game/sim/roster";
 import { surfaceCount } from "../../game/sim/stage";
 import { writeLines } from "wisp/src/platform/fileio";

@@ -68,7 +68,7 @@ Sources: [TrainingMode Community Edition](https://github.com/AlexanderHarrison/T
 - **Frame advance and savestates.** Warcraft matches are multiplayer and
   rollback-confirmed; a paused frame advance would need every client's
   controller helper to agree on each step (the pause barrier,
-  smashcraft:ts/src/game/shell/pauseBarrier.ts) and savestates would need a
+  smashcraft:ts/src/game/session/pauseBarrier.ts) and savestates would need a
   second snapshot channel. Quarter speed covers most of the use.
 - **Changing partner settings mid-match.** Settings are chosen at fighter
   selection; leaving from the pause returns there in two presses. Changing
@@ -96,7 +96,7 @@ with the fighter's renderers at match start and posed from the predicted
 world, like the other effects; it never feeds the simulation. Setup commands
 for native sessions: `-dev training on`, `-dev hit-areas on`,
 `-dev partner BEHAVIOUR DRIFT TECH DAMAGE`, `-dev speed 1|2|4`
-(smashcraft:ts/src/game/shell/sessionSetup.ts).
+(smashcraft:ts/src/game/session/sessionSetup.ts).
 
 ## Tutorial
 

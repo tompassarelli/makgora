@@ -4,7 +4,7 @@
 
 import { assertDefined, assertEquals, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
-import { sweep } from "../../runtime/sweep";
+import { sweep } from "../core/sweep";
 import { Character, LedgeState, SpecialAction } from "../sim/codes";
 import { ledgeCatchBox } from "../sim/ledge";
 import { runningHeroSpecial } from "../sim/specials/engine";

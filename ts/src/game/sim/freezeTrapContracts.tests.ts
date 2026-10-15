@@ -12,7 +12,7 @@ import { fighterAt } from "./roster";
 import { startFighterSpecial } from "./specials";
 import { setHumanMask } from "../match/rules";
 import { produceComputerInput } from "../match/botPlay";
-import { sweep, sweepSeed } from "../../runtime/sweep";
+import { sweep, sweepSeed } from "../core/sweep";
 
 test("Frost Trap appears at frame 22 and releases Rifleman at frame 38 [k3 measure #325]", () => {
   const match = testMatch(3, Character.rifleman);

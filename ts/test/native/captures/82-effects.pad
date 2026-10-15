@@ -1,5 +1,5 @@
 # smashcraft#82 box 2: each mapped cue's Warcraft effect and sound, made by `-dev effects N` at stage
-# centre (smashcraft:ts/src/game/shell/hitPresentationCases.ts) and held 2, 8 and 20 frames
+# centre (smashcraft:ts/src/game/session/hitPresentationCases.ts) and held 2, 8 and 20 frames
 # later with the effects frozen; every case, so the run's audio.wav holds every sound. Native
 # captures only (bun scripts/nativeCapture.ts): chat lines are the native driver's; pad parity
 # runs don't read this folder. `#! cue` lines are checked by `bun scripts/nativeCapture.ts plan`.

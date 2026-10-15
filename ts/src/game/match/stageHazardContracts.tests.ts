@@ -4,7 +4,7 @@
 
 import { assertDefined, assertEquals, assertFalse, assertGreaterThan, assertLessThan, assertNear, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
-import { meleeCos, meleeSin } from "../../sim/meleeScalarMath";
+import { meleeCos, meleeSin } from "../core/math/meleeScalarMath";
 import { Character, DownState } from "../sim/codes";
 import { isIntangible } from "../sim/conditions";
 import { type Fighter, createFighter } from "../sim/fighter";

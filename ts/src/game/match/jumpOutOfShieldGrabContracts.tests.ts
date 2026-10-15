@@ -5,7 +5,7 @@
 
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
-import { sweep } from "../../runtime/sweep";
+import { sweep } from "../core/sweep";
 import { queueAttack } from "../input/attackBuffer";
 import { beginFighterAttack, resolveAttacks } from "../sim/attacks";
 import { AttackStyle, Character } from "../sim/codes";

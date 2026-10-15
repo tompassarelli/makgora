@@ -1,6 +1,6 @@
 
 
-import { max } from "../../runtime/numbers";
+import { max } from "../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { ShieldBreak } from "./codes";
 import type { Fighter } from "./fighter";

@@ -6,8 +6,8 @@ import type { Client } from "wisp/scripts/warcraft/desktop";
 import * as platform from "wisp/scripts/platform/layer";
 import { InputInjection, ScreenCapture } from "wisp/scripts/platform/services";
 import { encodePpm } from "wisp/scripts/wisp/frameProbe";
-import { stampCells } from "../src/runtime/drawnStamp";
-import { CAPTURE_STATUS_FILE } from "../src/runtime/gameFiles";
+import { stampCells } from "../src/game/core/drawnStamp";
+import { CAPTURE_STATUS_FILE } from "../src/game/core/gameFiles";
 
 let boundary: Layer.Layer<InputInjection | ScreenCapture> | undefined;
 const realPlatformLayer = platform.platformLayer;

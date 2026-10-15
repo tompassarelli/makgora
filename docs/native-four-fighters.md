@@ -17,7 +17,7 @@ map inputs, or rebuild an already packaged private candidate with:
 bun wisp map rebuild /absolute/path/to/candidate.w3x --profile integrity
 ```
 
-This selects `INTEGRITY_BUILD` in smashcraft:ts/src/game/shell/currentBuild.ts,
+This selects `INTEGRITY_BUILD` in smashcraft:ts/src/game/session/currentBuild.ts,
 with build ID `typescript-integrity`. The default development profile uses
 keyboard input and cannot produce these receipts. Match `--build` to the actual
 map's build ID, not its display name.

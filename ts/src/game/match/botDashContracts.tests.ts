@@ -1,6 +1,6 @@
 import { at } from "wisp/src/runtime/lookup";
 import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
-import { sweep } from "../../runtime/sweep";
+import { sweep } from "../core/sweep";
 import { attackBuffer } from "../input/attackBuffer";
 import { Character } from "../sim/codes";
 import { createFighter } from "../sim/fighter";

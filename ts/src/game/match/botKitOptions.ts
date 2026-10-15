@@ -9,8 +9,8 @@
 
 import { f32 } from "wisp/src/sim/f32";
 import { floorDiv } from "wisp/src/sim/intMath";
-import { toInt } from "../../runtime/numbers";
-import { hurtCapsule } from "../physics/contactGeometry";
+import { toInt } from "wisp/src/sim/binary32";
+import { hurtCapsule } from "../sim/geometry/contactGeometry";
 import { AttackStyle, Character, DownState, HeroStatusKind, ProjectileKind, SpecialAction } from "../sim/codes";
 import { canAttack } from "../sim/conditions";
 import { exSpecialAffordable } from "../sim/exSpecials";

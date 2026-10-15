@@ -1,6 +1,6 @@
 import { f32 } from "wisp/src/sim/f32";
 import { PARTICIPANT_SLOTS, type Slots } from "../input/participants";
-import { hurtCapsule } from "../physics/contactGeometry";
+import { hurtCapsule } from "./geometry/contactGeometry";
 import { inGrabContext, isGroundDodging } from "./conditions";
 import { moveMeleeX } from "./motion";
 import { fighterAt, isActive, type Roster } from "./roster";

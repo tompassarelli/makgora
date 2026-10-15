@@ -236,7 +236,7 @@ lobbies (Phase 4).
   hook runs. Predicted frames never reach it.
 - **Journal receipts.** With a controller helper, the end-of-match
   journal file names the winner
-  (smashcraft:ts/src/game/shell/journalFiles.ts, `endFile`). The dev
+  (smashcraft:ts/src/game/session/journalFiles.ts, `endFile`). The dev
   receipt names the setup and the stage receipt names the drawn stage. These
   are protocol for the helper and automation, not for players.
 - **Headless runtime.** `bun wisp headless` runs the map's TypeScript in
@@ -257,7 +257,7 @@ lobbies (Phase 4).
 At every match result each client writes its player's record. Nothing is
 synchronized and the simulation is unchanged.
 
-- **Code.** smashcraft:ts/src/game/shell/matchRecord.ts builds the lines and
+- **Code.** smashcraft:ts/src/game/session/matchRecord.ts builds the lines and
   smashcraft:ts/src/platform/shell/matchRecords.ts writes the file.
 - **When.** At the result of a finished match in `applyFrame`, and when a
   player leaves mid-match in `playerLeft`.

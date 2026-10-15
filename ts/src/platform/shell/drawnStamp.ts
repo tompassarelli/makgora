@@ -1,7 +1,7 @@
 
 
 
-import { STAMP_CELL, STAMP_CELLS, type StampCell, stampCells } from "../../runtime/drawnStamp";
+import { STAMP_CELL, STAMP_CELLS, type StampCell, stampCells } from "../../game/core/drawnStamp";
 import { createBackdrop, gameUi, placeTopLeft } from "../../game/ui/frames";
 import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";

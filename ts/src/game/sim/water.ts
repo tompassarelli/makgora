@@ -3,7 +3,7 @@
 
 
 import { f32 } from "wisp/src/sim/f32";
-import { max, min } from "../../runtime/numbers";
+import { max, min } from "../core/numbers";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import type { Fighter } from "./fighter";
 import { type Roster, fighterAt, isActive } from "./roster";

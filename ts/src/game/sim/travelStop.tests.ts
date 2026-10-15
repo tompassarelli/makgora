@@ -1,6 +1,6 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
-import { hurtCapsule } from "../physics/contactGeometry";
+import { hurtCapsule } from "./geometry/contactGeometry";
 import { createFighter } from "./fighter";
 import { SELECTABLE_CHARACTERS } from "./heroes/registry";
 import { testWorld } from "./testWorld";

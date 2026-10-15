@@ -3,7 +3,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { at } from "wisp/src/runtime/lookup";
 import { fighterHurtParts } from "../sim/hurtboxes";
-import { hurtCapsule } from "../physics/contactGeometry";
+import { hurtCapsule } from "../sim/geometry/contactGeometry";
 import { ProjectileKind } from "../sim/codes";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import type { Scenario } from "./build";

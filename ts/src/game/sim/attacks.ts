@@ -18,7 +18,7 @@ import { spawnProjectile } from "./projectiles";
 import { type Roster, fighterAt, isActive } from "./roster";
 import { capsuleCircleIntersects, shieldSizeMultiplier } from "./shield";
 import { shieldCenterX, shieldCenterZ } from "./shieldTilt";
-import { attackCapsule, emptyCapsule, placeCapsule } from "../physics/contactGeometry";
+import { attackCapsule, emptyCapsule, placeCapsule } from "./geometry/contactGeometry";
 import { HurtContact, grabTouchesBody, strikeHurtContact } from "./hurtboxes";
 import { beginAttack } from "./transitions";
 import { at } from "wisp/src/runtime/lookup";

@@ -12,7 +12,7 @@ A module may import only the modules in its "may use" column. Sim code never rea
 |---|---|---|---|
 | core | `ts/src/game/sim/codes.ts`, `sim/mathTables.ts`, `sim/warcraftMath.ts` | Ids (`Character`), state codes, number helpers, trig tables | Wisp num/runtime |
 | input | `ts/src/game/input/` | Action vocabulary, key bindings, pad packet decode, wire; owns the controller contract | core |
-| sim | `ts/src/game/sim/`, `ts/src/game/physics/` | Deterministic per-frame simulation; no natives, no presentation | core |
+| sim | `ts/src/game/sim/` (geometry helpers in `sim/geometry/`) | Deterministic per-frame simulation; no natives, no presentation | core |
 | fighter-kit | `ts/src/game/sim/heroes/` | One fighter's gameplay data and special hooks | sim, core |
 | snapshot | `ts/src/game/replay/{canonical,fighterState,difference,history,snapshot}.ts` | Canonical text, state hash, copy/compare/diff, rollback ring | sim, core |
 | ai | `ts/src/game/match/bot*.ts`, `match/cpu*.ts`, `sim/heroes/<fighter>Gameplan.ts` | Bots, perception, gameplans, edge-guard scenarios | sim, snapshot, input, core |
@@ -25,7 +25,7 @@ A module may import only the modules in its "may use" column. Sim code never rea
 | presentation | `ts/src/game/presentation/` | Pose/clip choice, cue and sound selection; pure, no natives | fighter-look, roster, match, sim, snapshot, core |
 | render | `ts/src/game/render/` | Warcraft-native effects and sound playback | presentation, sim, core, Wisp map |
 | ui | `ts/src/game/ui/`, `ts/src/game/menu/` | Frames, menus, selection screens | lobby, roster, render, presentation, core |
-| session | `ts/src/game/shell/` | Session, playback, dev settings, match record writer | match, replay, lobby, ui, netcode, presentation, render, roster, core |
+| session | `ts/src/game/session/` | Session, playback, dev settings, match record writer | match, replay, lobby, ui, netcode, presentation, render, roster, core |
 | classic | `ts/src/game/classic/` | Classic mode routes and lore battles | session, match, lobby, roster, core |
 | host | `ts/src/platform/` (`*Main.ts` entries, `shell/` live loop) | Map entry points; view, keys, rollback tick | everything above, Wisp map |
 
@@ -64,8 +64,8 @@ Known breaks still in the tree (removed by slices, never copied): `*Hero.ts` imp
 | Pad packet, stick thresholds | `ts/src/game/input/padCapture.ts`, `ts/src/game/sim/stickZones.ts`; plug-in `controller/src/main.rs` | plug-in reads `contracts/controller.json` in K1 |
 | `bun wisp` verb | `ts/scripts/wisp/commands/<verb>.ts` plus its line in `ts/scripts/wisp.ts`; help page `docs/commands/<verb>.md` | one file `ts/commands/<verb>.ts` in S2 |
 | Map entry point, live view loop | `ts/src/platform/`, `ts/src/platform/shell/view.ts` | `host/entries/`, `host/loop/` in S9e |
-| Session, playback, dev settings | `ts/src/game/shell/` | `session/` in S9d |
-| Lua cost baseline row | `ts/test/lua/cost-baseline.tsv` | `records/lua-cost/` in S4 |
+| Session, playback, dev settings | `ts/src/game/session/` | stays |
+| Lua cost baseline row | `records/lua-cost/<test path>.tsv`, one file per test | stays |
 | Advantage-state report | `tools/move-data/advantage-state.jsonl` (autoland regenerates it) | `records/` in S11 |
 | Client kit contract | `ts/scripts/clientKit.ts` | kit 2 in C2 |
 | A Wisp import | `wisp/src/...` deep paths today | declared `wisp/*` exports in W18s |

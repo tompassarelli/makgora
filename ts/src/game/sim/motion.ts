@@ -1,11 +1,11 @@
 
 
 
-import { max, min } from "../../runtime/numbers";
+import { max, min } from "../core/numbers";
 import { addFloat32, divideFloat32, fusedMultiplyAddFloat32, multiplyFloat32, roundToFloat32, subtractFloat32 } from "wisp/src/sim/binary32";
 import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
-import { meleeAtan2, meleeCos, meleeSin } from "../../sim/meleeScalarMath";
+import { meleeAtan2, meleeCos, meleeSin } from "../core/math/meleeScalarMath";
 import { heavyFall, speedBuffed } from "./itemBuffs";
 import { chillScaled } from "./chill";
 import type { Fighter, MeleeMotionValue } from "./fighter";

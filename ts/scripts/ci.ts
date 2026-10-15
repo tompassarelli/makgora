@@ -59,7 +59,7 @@ const checks = [
     "focused logic test (target ≤0.1 s)",
     ["test", "test/game.test.ts"],
     100,
-    { ...process.env, GAME_TESTS: "sim/meleeScalarMath" },
+    { ...process.env, GAME_TESTS: "core/math/meleeScalarMath" },
   ),
   check("full logic suite (target ≤5 s)", ["run", "test"], 5000),
   check(

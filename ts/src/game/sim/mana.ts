@@ -1,4 +1,5 @@
-import { max, min, toInt } from "../../runtime/numbers";
+import { max, min } from "../core/numbers";
+import { toInt } from "wisp/src/sim/binary32";
 import { idiv } from "wisp/src/sim/intMath";
 import type { Fighter } from "./fighter";
 

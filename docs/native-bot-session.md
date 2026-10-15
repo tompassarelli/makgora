@@ -124,7 +124,7 @@ before `--bot` adds its own. It then plays the game's next match and its rematch
 On a build with the dev console (development and integrity builds), a
 capture sets the match up by typing chat commands into client A, never by
 clicking the menus or reading their labels
-(smashcraft:ts/src/game/shell/sessionSetup.ts). Each command applies the
+(smashcraft:ts/src/game/session/sessionSetup.ts). Each command applies the
 menus' own rule for player 1, and both clients write their developer receipt
 `smashcraft-dev-BUILD-pN.txt`: its `receipt=` count (the game's commands
 so far) and its `SETUP` line, the fighter-selection state after the command

@@ -7,7 +7,7 @@ import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel
 import type { HeadlessClient } from "wisp/src/headless/client";
 import type { Lockstep } from "wisp/src/headless/lockstep";
 import { Phase } from "../../src/game/match/rules";
-import { INTEGRITY_BUILD } from "../../src/game/shell/currentBuild";
+import { INTEGRITY_BUILD } from "../../src/game/session/currentBuild";
 import { Character } from "../../src/game/sim/codes";
 import { install, startBuild } from "../../src/platform/main";
 import { confirmedChecksum } from "../../src/platform/shell/diagnostics";

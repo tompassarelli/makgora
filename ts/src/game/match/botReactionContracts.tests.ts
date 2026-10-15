@@ -1,4 +1,4 @@
-import { reportTestLine } from "../../runtime/testReport";
+import { reportTestLine } from "../core/testReport";
 import { mutableProjectile } from "../sim/fighterProjectiles";
 import { assertDefined, assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
 import { at } from "wisp/src/runtime/lookup";
@@ -19,7 +19,7 @@ import { SELECTABLE_CHARACTERS } from "../sim/heroes/registry";
 import { captureFrame, createMatchFrameInput, executeMatchFrame } from "./frameInput";
 import { replayChecksum } from "../replay/matchReplay";
 import { botObservationCanonical, canonicalState } from "../replay/canonical";
-import { sweep, sweepSeed } from "../../runtime/sweep";
+import { sweep, sweepSeed } from "../core/sweep";
 
 const SURPRISE_FRAME = 50;
 

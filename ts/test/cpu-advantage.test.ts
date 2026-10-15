@@ -7,7 +7,7 @@ import type { CpuTier } from "../src/game/match/cpuProfiles";
 import { captureFrame, createMatchFrameInput, executeMatchFrame } from "../src/game/match/frameInput";
 import { createPacingAndPresentation } from "../src/game/match/pacingAndPresentation";
 import { Phase, createMatchState } from "../src/game/match/rules";
-import { setSweepSeedOffset, sweepSeed } from "../src/runtime/sweep";
+import { setSweepSeedOffset, sweepSeed } from "../src/game/core/sweep";
 import { Character, DownState } from "../src/game/sim/codes";
 import { createFighter } from "../src/game/sim/fighter";
 import { SELECTABLE_CHARACTERS } from "../src/game/sim/heroes/registry";

@@ -6,7 +6,7 @@
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { f32 } from "wisp/src/sim/f32";
 import { PARTICIPANT_SLOTS } from "../input/participants";
-import { meleeCos, meleeSin } from "../../sim/meleeScalarMath";
+import { meleeCos, meleeSin } from "../core/math/meleeScalarMath";
 import { DownState, LedgeState } from "./codes";
 import { inGrabContext } from "./conditions";
 import type { Fighter } from "./fighter";

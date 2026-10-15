@@ -1,7 +1,7 @@
 import { assertEquals } from "wisp/src/runtime/testing";
 import { CPU_PROFILES } from "./cpuProfiles";
 import { calibrationFailures, collectCalibrationRow } from "./cpuCalibration";
-import { sweep } from "../../runtime/sweep";
+import { sweep } from "../core/sweep";
 
 
 for (const profile of CPU_PROFILES) {

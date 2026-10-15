@@ -19,7 +19,7 @@ import { SELECTABLE_CHARACTERS } from "../sim/heroes/registry";
 import { matchSpawnX } from "../match/step";
 import { scheduleMatchItems } from "../match/centreItem";
 import { createFighter } from "../sim/fighter";
-import { sweep } from "../../runtime/sweep";
+import { sweep } from "../core/sweep";
 
 function frameControls(first: Controls, second: Controls, firstCommands: AttackBuffer, secondCommands: AttackBuffer): FrameControls {
   return { inputs: [first, second, neutralControls(), neutralControls()], commands: [firstCommands, secondCommands, attackBuffer(0), attackBuffer(0)] };

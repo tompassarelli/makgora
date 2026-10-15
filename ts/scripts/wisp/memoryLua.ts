@@ -15,7 +15,7 @@ import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel";
 import { Phase } from "../../src/game/match/rules";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
-import { PLAYABLE_BUILD } from "../../src/game/shell/currentBuild";
+import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import { SELECTABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";
 import { Key } from "../../src/platform/shell/keyEvents";
 import { botBeatKeys, gameOf } from "./botMatch";

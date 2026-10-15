@@ -6,8 +6,8 @@ import { runningHeroSpecial, specialCooldownReady } from "../sim/specials/engine
 import { upSpecialStartable } from "./botHeroKit";
 import { at } from "wisp/src/runtime/lookup";
 import { f32 } from "wisp/src/sim/f32";
-import { toInt } from "../../runtime/numbers";
-import { TECH_REPEAT_MINIMUM_AGE_FRAMES } from "../physics/techInput";
+import { toInt } from "wisp/src/sim/binary32";
+import { TECH_REPEAT_MINIMUM_AGE_FRAMES } from "../sim/geometry/techInput";
 import { Character, DownState, LedgeState, SpecialAction } from "../sim/codes";
 import { isTumbling } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";

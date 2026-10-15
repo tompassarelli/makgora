@@ -1,6 +1,6 @@
 # Melee scalar approximation
 
-`smashcraft:ts/src/sim/meleeScalarMath.ts` supplies `meleeAtan2(y, x)`,
+`smashcraft:ts/src/game/core/math/meleeScalarMath.ts` supplies `meleeAtan2(y, x)`,
 `meleeSin(angle)`, and `meleeCos(angle)`. Inputs and intermediate results use
 explicit binary32 rounding and fused multiply-add. The implementation is
 independently authored from numerical approximation facts and mathematical

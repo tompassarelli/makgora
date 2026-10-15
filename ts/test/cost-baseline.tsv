@@ -9,6 +9,7 @@ src/game/assets/stageLighting.tests.ts	8	0.002
 src/game/assets/stagePalette.tests.ts	3	0.003
 src/game/classic/classic.tests.ts	8	1.111
 src/game/classic/loreBattles.tests.ts	4	0.010
+src/game/core/math/meleeScalarMath.tests.ts	2	0.000
 src/game/input/adapter.tests.ts	8	0.171
 src/game/input/attackBuffer.tests.ts	6	0.002
 src/game/input/input.tests.ts	5	0.020
@@ -62,7 +63,6 @@ src/game/netcode/fixedSchedule.tests.ts	6	0.077
 src/game/netcode/inputBatch.tests.ts	1	0.005
 src/game/netcode/journal/text.tests.ts	6	0.008
 src/game/netcode/journal/transport.tests.ts	3	0.076
-src/game/physics/techInput.tests.ts	3	0.000
 src/game/presentation/attackClipFamilies.tests.ts	26	0.003
 src/game/presentation/attackCues.tests.ts	1	0.003
 src/game/presentation/blademasterClips.tests.ts	1	0.001
@@ -100,11 +100,11 @@ src/game/replay/matchReplay.tests.ts	2	0.372
 src/game/replay/moment.tests.ts	4	0.526
 src/game/replay/shadowPlayback.tests.ts	8	0.567
 src/game/replay/state.tests.ts	8	0.070
-src/game/shell/localInput.tests.ts	1	0.014
-src/game/shell/pauseBarrier.tests.ts	4	0.002
-src/game/shell/rollbackPlayback.tests.ts	3	0.015
-src/game/shell/scenarios.tests.ts	1	0.003
-src/game/shell/stageLoad.tests.ts	1	0.000
+src/game/session/localInput.tests.ts	1	0.014
+src/game/session/pauseBarrier.tests.ts	4	0.002
+src/game/session/rollbackPlayback.tests.ts	3	0.015
+src/game/session/scenarios.tests.ts	1	0.003
+src/game/session/stageLoad.tests.ts	1	0.000
 src/game/sim/actionLocks.tests.ts	19	0.030
 src/game/sim/analogAirDrift.tests.ts	1	0.040
 src/game/sim/analogShield.tests.ts	8	0.002
@@ -181,7 +181,6 @@ src/game/ui/cpuSettingsLayout.tests.ts	2	0.001
 src/game/ui/plateLayout.tests.ts	3	0.001
 src/game/ui/portraitFrames.tests.ts	4	0.003
 src/game/ui/slotColors.tests.ts	2	0.000
-src/sim/meleeScalarMath.tests.ts	2	0.000
 test/capture-capacity.test.ts	2	0.456
 test/classic.test.ts	7	6.225
 test/cli-vocabulary.test.ts	1	0.023

@@ -182,7 +182,7 @@ not claims that Warcraft renders Melee's artwork or exact animation programs.
 
 Inspection command in developer builds: `-dev quick`, then `-dev effects N`.
 The numbered cases are declared in
-smashcraft:ts/src/game/shell/hitPresentationCases.ts; the command changes only
+smashcraft:ts/src/game/session/hitPresentationCases.ts; the command changes only
 presentation. It gives native capture an exact event list, while the matching
 headless test checks the effect pose, sound dispatch, and rejection of repeat
 or older confirmed frames. A fresh map start is required after changing the

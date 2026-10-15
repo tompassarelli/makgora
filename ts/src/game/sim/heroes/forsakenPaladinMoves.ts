@@ -1,7 +1,7 @@
 import { downSmashHit } from "../downMoveValues";
 import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle, Character, GrabAction, HitElement } from "../codes";
-import { hurtCapsule } from "../../physics/contactGeometry";
+import { hurtCapsule } from "../geometry/contactGeometry";
 import { HERO_REFERENCE_HEIGHT, heroHurtPose, heroMove, heroRegion, type FighterMoves, type StrikeCapsule } from "../heroMoves";
 import { FORSAKEN_PALADIN_GROUND, groundPoses } from "./groundNormals";
 import type { HitEffect } from "../hitRegions";

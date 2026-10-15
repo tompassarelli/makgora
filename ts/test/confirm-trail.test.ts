@@ -4,7 +4,7 @@
 
 import { expect, test } from "bun:test";
 import { testHeadless } from "./headless";
-import { INTEGRITY_BUILD } from "../src/game/shell/currentBuild";
+import { INTEGRITY_BUILD } from "../src/game/session/currentBuild";
 import { activeRollback, shell } from "../src/platform/shell/state";
 import { PREDICTED_HEADLESS } from "../scripts/wisp/headless";
 import { JournalHelpers } from "./rematch/journalHelper";

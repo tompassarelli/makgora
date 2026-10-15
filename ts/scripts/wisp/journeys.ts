@@ -5,8 +5,8 @@
 import { join } from "node:path";
 import type { HeadlessProject } from "wisp/scripts/wisp/headless";
 import type { Journey } from "wisp/src/headless/journey";
-import { DESYNC_COMMAND, FROZEN_THRONE_QUICK_COMMAND, QUICK_CPU_COMMAND } from "../../src/game/shell/devSettings";
-import { SLOTS_COMMAND, STOCKS_COMMAND } from "../../src/game/shell/sessionSetup";
+import { DESYNC_COMMAND, FROZEN_THRONE_QUICK_COMMAND, QUICK_CPU_COMMAND } from "../../src/game/session/devSettings";
+import { SLOTS_COMMAND, STOCKS_COMMAND } from "../../src/game/session/sessionSetup";
 import { SMASHCRAFT_HEADLESS } from "./headless";
 import { SMASHCRAFT_SCENE } from "./playerView";
 import { QUICK_MATCH } from "./quickMatch";

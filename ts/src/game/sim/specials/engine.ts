@@ -3,7 +3,7 @@ import { canHit, sameTeam } from "../teams";
 
 
 
-import { max, min } from "../../../runtime/numbers";
+import { max, min } from "../../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { at } from "wisp/src/runtime/lookup";
 import { applyItemBuffFor } from "../itemBuffs";
@@ -21,7 +21,7 @@ import { gainMana } from "../mana";
 import { endDivineShield, refreshAirOnExit } from "../transitions";
 import { capsuleCircleIntersects, shieldSizeMultiplier } from "../shield";
 import { shieldCenterX, shieldCenterZ } from "../shieldTilt";
-import { type Capsule, attackCapsule, emptyCapsule, placeCapsule, segmentBoxesOverlap } from "../../physics/contactGeometry";
+import { type Capsule, attackCapsule, emptyCapsule, placeCapsule, segmentBoxesOverlap } from "../geometry/contactGeometry";
 import { HurtContact, strikeHurtContact } from "../hurtboxes";
 import { PARTICIPANT_CAPACITY } from "../../input/participants";
 import { mainDeckLeft, mainDeckRight, mainDeckZAt, solidSurfaceAt, solidSurfaceCount } from "../stage";

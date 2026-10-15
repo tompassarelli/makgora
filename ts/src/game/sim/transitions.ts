@@ -1,12 +1,12 @@
 
 
 
-import { clearTechInput } from "../physics/techInput";
+import { clearTechInput } from "./geometry/techInput";
 import { at } from "wisp/src/runtime/lookup";
 import { floorDiv } from "wisp/src/sim/intMath";
 import { mutableProjectile } from "./fighterProjectiles";
 import { aerialJumps } from "./itemBuffs";
-import { max } from "../../runtime/numbers";
+import { max } from "../core/numbers";
 import { AttackStyle, DASH_GRAB_REQUEST, DownState, GrabAction, LedgeState, ProjectileKind, SpecialAction, SurfaceContact } from "./codes";
 import { cancelsJumpSquat, isTumbling } from "./conditions";
 import { type Fighter, SHIELD_POWERSHIELD_INPUT_WINDOW_FRAMES, placedObject } from "./fighter";

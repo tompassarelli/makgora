@@ -11,8 +11,8 @@
 import { basename, join } from "node:path";
 import { Clock, Console, Effect, Layer, Schedule } from "effect";
 import { MENU_SECONDS } from "wisp/scripts/wisp/lobby";
-import { QUICK_MATCH_COMMAND } from "../../../src/game/shell/devSettings";
-import { devCommandReceiptFile, MELEE_READY_FILE } from "../../../src/runtime/gameFiles";
+import { QUICK_MATCH_COMMAND } from "../../../src/game/session/devSettings";
+import { devCommandReceiptFile, MELEE_READY_FILE } from "../../../src/game/core/gameFiles";
 import { DevCommandReceipt, MeleeReady } from "../boundary";
 import type { MalformedGameFile } from "wisp/scripts/wisp/preloadRecord";
 import { type Client, Clients, type DesktopFailure, waitFor } from "wisp/scripts/wisp/clients";

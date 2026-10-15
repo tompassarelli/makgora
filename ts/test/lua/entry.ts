@@ -6,7 +6,7 @@
 
 import { imod } from "wisp/src/sim/intMath";
 import { AssertionFailure, registeredTests } from "wisp/src/runtime/testing";
-import { selectSweep } from "../../src/runtime/sweep";
+import { selectSweep } from "../../src/game/core/sweep";
 import { testModules } from "./index";
 
 const readText = (path: string | undefined): string => {

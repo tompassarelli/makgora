@@ -1,5 +1,6 @@
 import { f32 } from "wisp/src/sim/f32";
-import { min, toInt } from "../../runtime/numbers";
+import { min } from "../core/numbers";
+import { toInt } from "wisp/src/sim/binary32";
 import { Character, SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { EYE_BLAST_FIRST, EYE_BLAST_FORM, EYE_BLAST_LAST, EYE_BLAST_NEAR, EYE_BLAST_REACH, EYE_BLAST_SWEEP, EYE_BLAST_WINDUP } from "../sim/specials";

@@ -18,9 +18,9 @@
     "outDir": "build"
   },
   "include": [
-    "src/sim/**/*.ts",
-    "src/parity/corpus.ts",
-    "src/parity/lua-entry.ts"
+    "src/game/core/math/meleeScalarMath.ts",
+    "src/game/core/math/parityCorpus.ts",
+    "src/game/host/entries/parityMain.ts"
   ],
   "exclude": [
     "src/**/*.test.ts"
@@ -28,7 +28,7 @@
   "tstl": {
     "luaTarget": "5.3",
     "luaBundle": "parity.lua",
-    "luaBundleEntry": "src/parity/lua-entry.ts",
+    "luaBundleEntry": "src/game/host/entries/parityMain.ts",
     "noImplicitSelf": true,
     "noHeader": true,
     "luaPlugins": [

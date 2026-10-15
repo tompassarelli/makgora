@@ -139,7 +139,7 @@ synchronized message once its drawing has settled (`STAGE_SETTLE_FRAMES`). The
 match, and so its countdown, begins on the callback where the last present
 player's report arrives, or after `STAGE_LOAD_TIMEOUT_FRAMES` (ten seconds), so
 a stuck client can't hold the others. Every step runs from a synchronized event,
-so all clients start together (smashcraft:ts/src/game/shell/stageLoad.ts).
+so all clients start together (smashcraft:ts/src/game/session/stageLoad.ts).
 The slowest stage, Gryphon Aerie, measured natively on Smashcraft 0.0.72
 (Warcraft 3.0.0.24268, 2880x1920, one human and a computer, two samples):
 the loading screen is up 0.05 s after the press, the match starts at

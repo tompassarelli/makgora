@@ -1,4 +1,4 @@
-import { NATIVE_DRIVER_BUILD } from "../game/shell/currentBuild";
+import { NATIVE_DRIVER_BUILD } from "../game/session/currentBuild";
 import { install as installGame, startBuild } from "./main";
 import { installSmashcraftNativeDriver, startSmashcraftNativeDriver } from "./nativeDriver";
 

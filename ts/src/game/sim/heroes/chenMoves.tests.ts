@@ -2,7 +2,7 @@ import { assertDefined, assertEquals, assertTrue, test } from "wisp/src/runtime/
 import { f32 } from "wisp/src/sim/f32";
 import { Character } from "../codes";
 import { authoredPhysics, melee } from "../tuning";
-import { capsulesIntersect, emptyCapsule, placeCapsule } from "../../physics/contactGeometry";
+import { capsulesIntersect, emptyCapsule, placeCapsule } from "../geometry/contactGeometry";
 import { CHEN_SPECIALS } from "./chenSpecials";
 import { createFighter } from "../fighter";
 import { duelPair, stepDuel } from "../testDuel";

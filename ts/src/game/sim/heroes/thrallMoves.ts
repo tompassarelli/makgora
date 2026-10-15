@@ -1,5 +1,5 @@
 import { f32 } from "wisp/src/sim/f32";
-import { hurtCapsule } from "../../physics/contactGeometry";
+import { hurtCapsule } from "../geometry/contactGeometry";
 import { AttackStyle, Character, GrabAction, HitElement } from "../codes";
 import { type FighterMoves, type StrikeCapsule, heroMove, heroRegion, heroHurtPose, jabStep, cleanLateMove } from "../heroMoves";
 import { hurtPart } from "../hurtboxes";

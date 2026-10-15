@@ -17,7 +17,7 @@ import {
 } from "wisp/scripts/wisp/soak";
 import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel";
 import { at } from "wisp/src/runtime/lookup";
-import { INTEGRITY_BUILD } from "../../src/game/shell/currentBuild";
+import { INTEGRITY_BUILD } from "../../src/game/session/currentBuild";
 import { startHelper } from "../../scripts/integrity/capture";
 import { IntegrityFailure, tryIntegrity } from "../../scripts/integrity/evidence";
 import { type Pad, openPad } from "../../scripts/integrity/linux";

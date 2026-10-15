@@ -11,7 +11,7 @@ import { PARTICIPANT_SLOTS, type Slots, participantActive } from "../input/parti
 import { createFrameControls } from "../match/controls";
 import { captureFrame, captureNetworkFrame, createMatchFrameInput, executeMatchFrame } from "../match/frameInput";
 import { computerActive, humanFighterActive, setParticipants } from "../match/rules";
-import { produceScenarioComputerInput } from "../shell/scenarios";
+import { produceScenarioComputerInput } from "../session/scenarios";
 import { Character } from "../sim/codes";
 import { type Fighter, createFighter } from "../sim/fighter";
 import { fighterAt, isActive } from "../sim/roster";

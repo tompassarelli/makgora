@@ -2,7 +2,7 @@ import { assertEquals, assertGreaterThan } from "wisp/src/runtime/testing";
 import { SELECTABLE_CHARACTERS, fighterName } from "../sim/heroes/registry";
 import { fighterCoverage } from "./botCoverage";
 import { Character } from "../sim/codes";
-import { sweep } from "../../runtime/sweep";
+import { sweep } from "../core/sweep";
 
 
 for (let index = 0; index < SELECTABLE_CHARACTERS.length; index++) {

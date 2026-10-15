@@ -3,7 +3,7 @@
 
 import { f32 } from "wisp/src/sim/f32";
 import { type TrainingState, copyTrainingState, createTrainingState } from "../match/trainingState";
-import { trainingReadout } from "../shell/messages";
+import { trainingReadout } from "../session/messages";
 import { tutorialOn, tutorialText } from "../match/tutorial";
 import { createBackdrop, createText, gameUi, placeTopLeft } from "./frames";
 import { MENU_FONT, PANEL_TEXTURE } from "./hudLayout";

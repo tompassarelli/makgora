@@ -2,7 +2,7 @@ import { canHit } from "./teams";
 
 
 import { f32 } from "wisp/src/sim/f32";
-import { max, min } from "../../runtime/numbers";
+import { max, min } from "../core/numbers";
 import { AttackStyle } from "./codes";
 import { inGrabContext, isIntangible } from "./conditions";
 import { type Fighter, type PlacedObject, placedObject } from "./fighter";
@@ -13,7 +13,7 @@ import { HurtContact, strikeHurtContact } from "./hurtboxes";
 import { type Roster, fighterAt, isActive } from "./roster";
 import { shieldCircleIntersects } from "./shield";
 import { surfaceLeft, surfaceRight, surfaceZAt } from "./stage";
-import { emptyCapsule, placeCapsule } from "../physics/contactGeometry";
+import { emptyCapsule, placeCapsule } from "./geometry/contactGeometry";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 
 

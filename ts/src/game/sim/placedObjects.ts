@@ -15,7 +15,7 @@ import { CompanionMode, type SpecialPlacement } from "./specials/schema";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "./hitRegions";
 import { projectileDamage } from "./projectiles";
 import { type Roster, fighterAt, isActive } from "./roster";
-import { attackCapsule, capsulesIntersect, emptyCapsule, placeCapsule } from "../physics/contactGeometry";
+import { attackCapsule, capsulesIntersect, emptyCapsule, placeCapsule } from "./geometry/contactGeometry";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 
 

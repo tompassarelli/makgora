@@ -1,6 +1,6 @@
 import { installHeadless, readNativeDeclarations } from "wisp/scripts/wisp/headless";
 import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel";
-import { INTEGRITY_BUILD } from "../../src/game/shell/currentBuild";
+import { INTEGRITY_BUILD } from "../../src/game/session/currentBuild";
 import { install, startBuild } from "../../src/platform/main";
 import { shell } from "../../src/platform/shell/state";
 import type { Game } from "../../scripts/wisp/botMatch";

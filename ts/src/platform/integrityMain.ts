@@ -1,4 +1,4 @@
-import { INTEGRITY_BUILD } from "../game/shell/currentBuild";
+import { INTEGRITY_BUILD } from "../game/session/currentBuild";
 import { install as installGame, startBuild } from "./main";
 import { installFrameMeter, startMatchFrameMeter } from "./frameMeter";
 import { installSceneReport, startMatchSceneReport } from "./sceneReport";

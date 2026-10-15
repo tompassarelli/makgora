@@ -1,5 +1,5 @@
 
-import { max, min } from "../../runtime/numbers";
+import { max, min } from "../core/numbers";
 import { roundToFloat32 } from "wisp/src/sim/binary32";
 import { f32 } from "wisp/src/sim/f32";
 import { Character, DamageLanding, DownState, SpecialAction } from "./codes";
@@ -12,11 +12,11 @@ import { clearMotionValue, setWorldMotionValue, totalVelocityX } from "./motion"
 import type { Controls } from "./roster";
 import { floorFriction, surfaceCount, surfaceLeft, surfaceLine, surfaceRight, surfaceZAt } from "./stage";
 
-import { rollTravel } from "../physics/rollTravel";
+import { rollTravel } from "./geometry/rollTravel";
 import { beginDownState, cancelAttack, clearDownState } from "./transitions";
 import { WORLD_UNITS_PER_MELEE_UNIT } from "./tuning";
 import { squareRoot } from "./warcraftMath";
-import { meleeAtan2 } from "../../sim/meleeScalarMath";
+import { meleeAtan2 } from "../core/math/meleeScalarMath";
 import { stickX, stickZ } from "./stick";
 import { isHeroSpecialAction, landHeroSpecial } from "./specials/engine";
 import { aerialJumps, groundedJumps } from "./itemBuffs";

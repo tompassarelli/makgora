@@ -22,7 +22,7 @@ import { createMatchFrameInput } from "../match/frameInput";
 import type { PacingAndPresentation } from "../match/pacingAndPresentation";
 import { type MatchState, Phase } from "../match/rules";
 import { CPU_OPPONENT_CHOICES, CPU_OPPONENT_IDS, CPU_TIERS } from "../match/cpuProfiles";
-import { isScenario } from "../shell/build";
+import { isScenario } from "../session/build";
 import { Character } from "../sim/codes";
 import { type Fighter } from "../sim/fighter";
 import { authoredTuning } from "../sim/tuning";

@@ -1,6 +1,6 @@
 import { f32 } from "wisp/src/sim/f32";
 import { idiv, imod } from "wisp/src/sim/intMath";
-import { max, min, toInt } from "../../../runtime/numbers";
+import { max, min, toInt } from "../../core/numbers";
 import { PARTICIPANT_CAPACITY } from "../../input/participants";
 import { CandleState, Character } from "../codes";
 import type { Fighter } from "../fighter";

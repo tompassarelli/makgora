@@ -4,8 +4,8 @@ import type { StandaloneInput, StandaloneNetSession } from "wisp/scripts/wisp/st
 import type { LockstepLink } from "wisp/src/headless/lockstep";
 import { Phase } from "../../src/game/match/rules";
 import { installHeadless } from "wisp/scripts/wisp/headless";
-import { PLAYABLE_BUILD } from "../../src/game/shell/currentBuild";
-import type { MapBuild } from "../../src/game/shell/build";
+import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
+import type { MapBuild } from "../../src/game/session/build";
 import { PREDICTED_HEADLESS } from "./headless";
 import { heldKeys } from "./standalone";
 import { actionFor, presetBindings } from "../../src/game/input/keyBindings";

@@ -7,7 +7,7 @@ import { Effect, Stream } from "effect";
 import { ChildProcess } from "effect/process";
 
 const project = resolve(import.meta.dir, "..");
-const source = resolve(project, "src/runtime/gameFiles.ts");
+const source = resolve(project, "src/game/core/gameFiles.ts");
 const original = readFileSync(source, "utf8");
 const body = '`smashcraft-dev-${build}-p${slot}.txt`';
 const signature = "export const devCommandReceiptFile = (build: string, slot: number)";
@@ -77,7 +77,7 @@ const main = Effect.gen(function*() {
   const invalid = yield* check("invalid shared signature");
   if (invalid.exitCode === 0
     || !/scripts\/wisp\/commands\/fresh\.ts\(\d+,\d+\): error TS2345/.test(invalid.stdout)
-    || !/src\/game\/shell\/journalFiles\.ts\(\d+,\d+\): error TS2345/.test(invalid.stdout)) {
+    || !/src\/game\/session\/journalFiles\.ts\(\d+,\d+\): error TS2345/.test(invalid.stdout)) {
     throw new Error("changed shared signature did not fail at both host and game consumers");
   }
   console.log("changed shared signature rejected by host and game consumers");

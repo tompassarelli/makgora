@@ -10,7 +10,7 @@ import { parseModelMDX } from "wisp/scripts/wisp/models";
 import { originalClip, originalClipNamed } from "../../src/game/assets/fighterOriginalClipInfo";
 import { advanceFighterPose, createFighterPose } from "../../src/game/presentation/fighterPose";
 import { characterModelScale } from "../../src/game/presentation/modelScale";
-import { type Capsule, attackCapsule, emptyCapsule, placeCapsule } from "../../src/game/physics/contactGeometry";
+import { type Capsule, attackCapsule, emptyCapsule, placeCapsule } from "../../src/game/sim/geometry/contactGeometry";
 import { beginFighterAttack } from "../../src/game/sim/attacks";
 import { AttackPhase, AttackStyle, Character, DownState, LedgeState } from "../../src/game/sim/codes";
 import { attackPhase, fighterPoseFacing } from "../../src/game/sim/conditions";

@@ -6,7 +6,7 @@ import { MATCH_TICKS_PER_SECOND, type MatchState, Phase, humanFighterActive, kee
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { fighterName } from "../sim/heroes/registry";
-import { cpuOpponentSummary } from "../shell/messages";
+import { cpuOpponentSummary } from "../session/messages";
 import { MatchCue } from "./matchAudio";
 import { ROSTER_MANA } from "../sim/mana";
 import { TEAM_NAMES } from "../sim/teams";

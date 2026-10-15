@@ -2,8 +2,8 @@
 
 
 import { f32 } from "wisp/src/sim/f32";
-import { WORLD_UNITS_PER_MELEE_UNIT } from "../sim/tuning";
-import { heroBody } from "../sim/heroes/heroBodies";
+import { WORLD_UNITS_PER_MELEE_UNIT } from "../tuning";
+import { heroBody } from "../heroes/heroBodies";
 
 type RollKind = "roll" | "faceUpGetup" | "faceDownGetup" | "tech";
 type RollDirection = "forward" | "back";

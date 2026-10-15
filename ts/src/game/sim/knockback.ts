@@ -1,10 +1,10 @@
 
 
 
-import { max, min, toInt, toReal } from "../../runtime/numbers";
-import { addFloat32, divideFloat32, fusedMultiplyAddFloat32, multiplyFloat32, roundToFloat32, subtractFloat32 } from "wisp/src/sim/binary32";
+import { max, min, toReal } from "../core/numbers";
+import { addFloat32, divideFloat32, fusedMultiplyAddFloat32, multiplyFloat32, roundToFloat32, subtractFloat32, toInt } from "wisp/src/sim/binary32";
 import { f32 } from "wisp/src/sim/f32";
-import { meleeAtan2, meleeCos, meleeSin } from "../../sim/meleeScalarMath";
+import { meleeAtan2, meleeCos, meleeSin } from "../core/math/meleeScalarMath";
 import { DamageLanding } from "./codes";
 import type { Fighter } from "./fighter";
 import { ownedInfluenceOperands } from "./influenceOperands";

@@ -4,7 +4,7 @@
 import type { ParticipantSlot } from "../../game/input/participants";
 import { canRequestStart, requestStart, resolveStageChoice } from "../../game/match/rules";
 import { stageInfo } from "../../game/menu/stageCatalog";
-import { STAGE_READY_PREFIX, StageLoadStep, beginStageLoad, stageReported, tickStageLoad } from "../../game/shell/stageLoad";
+import { STAGE_READY_PREFIX, StageLoadStep, beginStageLoad, stageReported, tickStageLoad } from "../../game/session/stageLoad";
 import { startMatch } from "./matchStart";
 import type { ShellState } from "./state";
 import { views } from "./ui";

@@ -1,6 +1,6 @@
 
 
-import { frameCostClockFile } from "../../runtime/gameFiles";
+import { frameCostClockFile } from "../../game/core/gameFiles";
 declare const os: { readonly clock?: () => number } | undefined;
 
 const WORK_ITERATIONS = 100000;

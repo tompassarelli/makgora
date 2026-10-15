@@ -7,7 +7,7 @@ import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel
 import { PREDICTED_HEADLESS } from "../scripts/wisp/headless";
 import { botBeatKeys } from "../scripts/wisp/botMatch";
 import { ReplayHistory } from "../src/game/replay/history";
-import { PLAYABLE_BUILD } from "../src/game/shell/currentBuild";
+import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { install, startBuild } from "../src/platform/main";
 
 const headless = testHeadless(PREDICTED_HEADLESS);

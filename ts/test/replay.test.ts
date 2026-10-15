@@ -14,10 +14,10 @@ import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel
 import type { HeadlessClient } from "wisp/src/headless/client";
 import { Phase, holdingStart } from "../src/game/match/rules";
 import { joinReplay, parseReplayHeader, parseReplayPart, replayMatch } from "../src/game/replay/matchReplay";
-import { PLAYABLE_BUILD } from "../src/game/shell/currentBuild";
+import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { fighterAt } from "../src/game/sim/roster";
 import { RULE_BUTTONS } from "../src/game/ui/ruleButtons";
-import { matchRecordFile, replayFile, replayPartFile } from "../src/runtime/gameFiles";
+import { matchRecordFile, replayFile, replayPartFile } from "../src/game/core/gameFiles";
 import { install, startBuild } from "../src/platform/main";
 import { Key } from "../src/platform/shell/keyEvents";
 import { shell } from "../src/platform/shell/state";

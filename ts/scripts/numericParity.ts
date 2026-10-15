@@ -1,7 +1,7 @@
 
 import { Effect, Schema } from "effect";
 import { ChildProcess } from "effect/process";
-import { evaluateCase } from "../src/parity/corpus";
+import { evaluateCase } from "../src/game/core/math/parityCorpus";
 import { at } from "wisp/src/runtime/lookup";
 import { runProcess } from "./hostProcess";
 

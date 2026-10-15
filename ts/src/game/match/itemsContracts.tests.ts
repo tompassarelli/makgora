@@ -5,7 +5,7 @@ import { queueAttack } from "../input/attackBuffer";
 import { stateChecksum } from "../replay/canonical";
 import { firstStateDifference } from "../replay/difference";
 import { copyReplayState, createReplaySnapshot } from "../replay/snapshot";
-import { prepareQuickMatch } from "../shell/devSettings";
+import { prepareQuickMatch } from "../session/devSettings";
 import { AttackStyle, Character, GroundAction, ItemKind, LedgeState, itemBit } from "../sim/codes";
 import { createFighter } from "../sim/fighter";
 import { advanceGroundMovement } from "../sim/groundMovement";
@@ -23,7 +23,7 @@ import { ITEM_WARNING_FRAMES, itemWarningFrames, scheduleMatchItems } from "./ce
 import { createFrameControls } from "./controls";
 import { createMatchState, Phase, setHumanCount } from "./rules";
 import { stepMatch } from "./step";
-import { sweep } from "../../runtime/sweep";
+import { sweep } from "../core/sweep";
 
 function gameAtCentre(character: Character = Character.rifleman) {
   const game = createMatchState();

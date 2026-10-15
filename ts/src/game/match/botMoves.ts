@@ -7,7 +7,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { floorDiv } from "wisp/src/sim/intMath";
 import { botChance, botChoice } from "./botRandom";
 import { type AttackBuffer, queueAttack } from "../input/attackBuffer";
-import { attackCapsule, capsulesIntersect, emptyCapsule, hurtCapsule, placeCapsule } from "../physics/contactGeometry";
+import { attackCapsule, capsulesIntersect, emptyCapsule, hurtCapsule, placeCapsule } from "../sim/geometry/contactGeometry";
 import { AttackStyle, Character, LAST_ATTACK_STYLE, SpecialAction } from "../sim/codes";
 import { canAttack } from "../sim/conditions";
 import { groundGatedStyle } from "../sim/attacks";

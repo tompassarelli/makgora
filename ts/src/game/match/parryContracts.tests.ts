@@ -16,7 +16,7 @@ import { controls } from "../sim/testWorld";
 import { type FrameControls, createBufferedFrameControls } from "./controls";
 import { type MatchState, Phase, createMatchState } from "./rules";
 import { stepMatch } from "./step";
-import { sweep } from "../../runtime/sweep";
+import { sweep } from "../core/sweep";
 
 interface Duel {
   readonly game: MatchState;

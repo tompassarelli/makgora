@@ -2,9 +2,9 @@
 
 
 
-import { max, min, toInt } from "../../runtime/numbers";
+import { max, min } from "../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
-import { addFloat32, roundToFloat32 } from "wisp/src/sim/binary32";
+import { addFloat32, roundToFloat32, toInt } from "wisp/src/sim/binary32";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { advanceMash, clearMash } from "./mash";
 import { aerialJumps } from "./itemBuffs";

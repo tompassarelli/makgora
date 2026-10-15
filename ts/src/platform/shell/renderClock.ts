@@ -4,7 +4,7 @@
 
 
 import { f32 } from "wisp/src/sim/f32";
-import { renderClockFile } from "../../runtime/gameFiles";
+import { renderClockFile } from "../../game/core/gameFiles";
 declare const os: { readonly clock?: (this: void) => number } | undefined;
 
 const PROBE_GAME_SECONDS = 4.0;

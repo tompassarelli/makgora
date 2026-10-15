@@ -4,7 +4,7 @@
 
 import { at } from "wisp/src/runtime/lookup";
 import { floorDiv } from "wisp/src/sim/intMath";
-import { max, min } from "../../runtime/numbers";
+import { max, min } from "../core/numbers";
 import type { Fighter } from "../sim/fighter";
 import { contactDamageClips } from "./damagePose";
 

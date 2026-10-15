@@ -17,7 +17,7 @@ import { PARTICIPANT_SLOTS, participantInputs } from "../src/game/input/particip
 import { captureNetworkFrame, createMatchFrameInput, executeMatchFrame, resetMatchFrameInput } from "../src/game/match/frameInput";
 import { computerActive } from "../src/game/match/rules";
 import { type ReplayState, copyReplayState, createReplaySnapshot } from "../src/game/replay/snapshot";
-import { TECH_REPEAT_MINIMUM_AGE_FRAMES } from "../src/game/physics/techInput";
+import { TECH_REPEAT_MINIMUM_AGE_FRAMES } from "../src/game/sim/geometry/techInput";
 import { DownState, ShieldBreak } from "../src/game/sim/codes";
 import type { Fighter } from "../src/game/sim/fighter";
 import { fighterAt, isActive } from "../src/game/sim/roster";

@@ -1,4 +1,4 @@
-import { sweepSeed } from "../../runtime/sweep";
+import { sweepSeed } from "../core/sweep";
 
 
 import { assertEquals, assertFalse, assertGreaterThan, assertTrue, test } from "wisp/src/runtime/testing";
@@ -23,7 +23,7 @@ import { matchSpawnX } from "./step";
 import { canAct, latchPresses, releasePresses } from "./training";
 import { Advantage, PartnerBehaviour, PartnerEscape, PartnerTech } from "./trainingState";
 import { HitAreaKind, collectHitAreas, createHitAreaList } from "../presentation/hitAreas";
-import { attackCapsule, emptyCapsule, placeCapsule } from "../physics/contactGeometry";
+import { attackCapsule, emptyCapsule, placeCapsule } from "../sim/geometry/contactGeometry";
 import { authoredHitRegion, emptyHitRegion } from "../sim/hitRegions";
 import { HurtContact, fighterHurtParts, strikeHurtContact } from "../sim/hurtboxes";
 

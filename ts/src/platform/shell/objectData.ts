@@ -4,7 +4,7 @@ import { writeLines } from "wisp/src/platform/fileio";
 import { applyFighterObject, applyFileIoObject } from "../objectData";
 import { confirmedChecksum } from "./diagnostics";
 import { shellState } from "./state";
-import { objectDataReceiptFile } from "../../runtime/gameFiles";
+import { objectDataReceiptFile } from "../../game/core/gameFiles";
 
 // install() runs on the same synchronized frame on every client.
 export function installObjectData(): void {

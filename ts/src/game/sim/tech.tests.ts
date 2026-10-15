@@ -1,4 +1,4 @@
-import { TECH_WINDOW_FRAMES, TECH_PRESS_AGE_LIMIT } from "../physics/techInput";
+import { TECH_WINDOW_FRAMES, TECH_PRESS_AGE_LIMIT } from "./geometry/techInput";
 
 import { assertEquals, assertFalse, assertGreaterThan, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";

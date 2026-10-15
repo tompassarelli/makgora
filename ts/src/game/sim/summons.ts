@@ -1,6 +1,6 @@
 import { canHit } from "./teams";
 
-import { max } from "../../runtime/numbers";
+import { max } from "../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle, Character, SpecialAction } from "./codes";
 import { canAttack, isIntangible } from "./conditions";

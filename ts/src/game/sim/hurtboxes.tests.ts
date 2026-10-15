@@ -4,7 +4,7 @@ import { copyReplayState, createReplaySnapshot } from "../replay/snapshot";
 import { AttackStyle, Character, SpecialAction } from "./codes";
 import { type Fighter, createFighter } from "./fighter";
 import { f32 } from "wisp/src/sim/f32";
-import { hurtCapsule } from "../physics/contactGeometry";
+import { hurtCapsule } from "./geometry/contactGeometry";
 import { attackStartupFrames } from "./moves";
 import { BLADEMASTER_MOVES } from "./heroes/blademasterMoves";
 import { heroHurtPose } from "./heroMoves";

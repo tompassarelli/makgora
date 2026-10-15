@@ -7,7 +7,7 @@
 
 
 import { at } from "wisp/src/runtime/lookup";
-import { hurtCapsule } from "../physics/contactGeometry";
+import { hurtCapsule } from "../sim/geometry/contactGeometry";
 import { f32 } from "wisp/src/sim/f32";
 import { floorDiv } from "wisp/src/sim/intMath";
 import { type AttackBuffer, queueAttack } from "../input/attackBuffer";

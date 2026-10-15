@@ -7,7 +7,7 @@ import { join } from "node:path";
 import { Clock, Effect, Schedule } from "effect";
 import { dataDirectory, readGameFile } from "wisp/scripts/wisp/gameFiles";
 import { type MenuEvent, MenuFailure, type MenuSocket, type Outcome, hostLobby, joinLobby, startLobby } from "wisp/scripts/wisp/menus";
-import { MELEE_READY_FILE } from "../../src/runtime/gameFiles";
+import { MELEE_READY_FILE } from "../../src/game/core/gameFiles";
 import { pollUntil } from "../hostPoll";
 import { MeleeReady } from "./boundary";
 import { type JoinCode, newJoinCode } from "./joinCode";

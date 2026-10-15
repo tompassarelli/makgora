@@ -2,7 +2,7 @@ import { f32 } from "wisp/src/sim/f32";
 import type { AttackStyle } from "./codes";
 import type { HitEffect, HitRegion } from "./hitRegions";
 import { strongHit, weakHit } from "./strongHits";
-import { hurtCapsule } from "../physics/contactGeometry";
+import { hurtCapsule } from "./geometry/contactGeometry";
 import { Character } from "./codes";
 import { type FighterHurtboxes, type HurtPart, type HurtPose, hurtPose } from "./hurtboxes";
 

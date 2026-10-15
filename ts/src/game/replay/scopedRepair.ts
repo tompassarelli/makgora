@@ -18,7 +18,7 @@ import { AttackStyle, LAST_ATTACK_STYLE } from "../sim/codes";
 import { SELECTABLE_CHARACTERS } from "../sim/heroes/registry";
 import { authoredTuning } from "../sim/tuning";
 import type { FighterMoves, StrikeCapsule } from "../sim/heroMoves";
-import { attackCapsule, emptyCapsule, hurtCapsule } from "../physics/contactGeometry";
+import { attackCapsule, emptyCapsule, hurtCapsule } from "../sim/geometry/contactGeometry";
 import { type HitRegion, authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../sim/hitRegions";
 import { type HurtPart, type HurtPose, shippedHurtboxes } from "../sim/hurtboxes";
 import type { AuthoredSpecial } from "../sim/specials/schema";

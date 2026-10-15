@@ -15,7 +15,7 @@ import { replayChecksum } from "../replay/matchReplay";
 import { captureFrame, createMatchFrameInput, executeMatchFrame } from "./frameInput";
 import { createPacingAndPresentation } from "./pacingAndPresentation";
 import { Phase, createMatchState } from "./rules";
-import { sweep, sweepSeed } from "../../runtime/sweep";
+import { sweep, sweepSeed } from "../core/sweep";
 
 const NEUTRAL = neutralControls();
 

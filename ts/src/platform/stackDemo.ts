@@ -3,7 +3,7 @@
 
 import { on, trampoline } from "wisp/src/platform/dispatch";
 import { PARTICIPANT_SLOTS } from "../game/input/participants";
-import type { MapBuild } from "../game/shell/build";
+import type { MapBuild } from "../game/session/build";
 
 export const STACK_DEMO_COMMAND = "-dev stack-demo";
 export const STACK_DEMO_HANDLER = "stackDemo.command";

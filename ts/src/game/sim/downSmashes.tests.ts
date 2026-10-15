@@ -1,4 +1,4 @@
-import { sweep } from "../../runtime/sweep";
+import { sweep } from "../core/sweep";
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { AttackStyle, Character, DownState } from "./codes";
 import { canAttack, isTumbling } from "./conditions";

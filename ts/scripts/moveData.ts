@@ -6,7 +6,7 @@ import { Predicate, Schema } from "effect";
 import { AttackStyle, Character } from "../src/game/sim/codes";
 import { type Fighter, createFighter } from "../src/game/sim/fighter";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../src/game/sim/hitRegions";
-import { attackCapsule, emptyCapsule, hurtCapsule } from "../src/game/physics/contactGeometry";
+import { attackCapsule, emptyCapsule, hurtCapsule } from "../src/game/sim/geometry/contactGeometry";
 import { authoredTuning } from "../src/game/sim/tuning";
 import { attackLandingLag, attackStartupFrames, attackDurationFramesForGrounding, characterAttackActiveFrames,
   isAerialAttack, isSmashAttack, SMASH_MAX_CHARGE_FRAMES, smashDamageMultiplier } from "../src/game/sim/moves";

@@ -1,4 +1,4 @@
-import { max } from "../../runtime/numbers";
+import { max } from "../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { GrabAction, GroundAction, LedgeState, SpecialAction } from "../sim/codes";
 import { canAttack } from "../sim/conditions";

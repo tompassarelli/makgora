@@ -1,7 +1,7 @@
 import { STAGE_CATALOG } from "../menu/stageCatalog";
 import { floorMod } from "wisp/src/sim/intMath";
 import { assertEquals, assertGreaterThan, assertLessThan, assertTrue, test } from "wisp/src/runtime/testing";
-import { sweep, sweepSeed } from "../../runtime/sweep";
+import { sweep, sweepSeed } from "../core/sweep";
 import { clearAttackBuffer } from "../input/attackBuffer";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { produceComputerInput } from "../match/botPlay";

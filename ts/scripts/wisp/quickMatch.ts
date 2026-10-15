@@ -2,7 +2,7 @@
 
 
 import type { Journey } from "wisp/src/headless/journey";
-import { QUICK_MATCH_COMMAND } from "../../src/game/shell/devSettings";
+import { QUICK_MATCH_COMMAND } from "../../src/game/session/devSettings";
 
 
 const TRACE_KEY = { key: 0x54, meta: 2 };

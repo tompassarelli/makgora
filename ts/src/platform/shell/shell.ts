@@ -1,5 +1,5 @@
 import { winningMask } from "../../game/match/rules";
-import { recordSessionWins } from "../../game/shell/sessionWins";
+import { recordSessionWins } from "../../game/session/sessionWins";
 import { servicePauseCameraControls, pauseHudHidden } from "./pauseCamera";
 
 
@@ -10,13 +10,13 @@ import { clearPulse } from "../../game/input/directionalInput";
 import { ownConfirmedState } from "./confirmedState";
 import { startKeyUp } from "../../game/match/controls";
 import { Phase, copyMatchState, firstHumanSlot, humanActive, humanPresent, initializeComputerChoices, participantLeft, updateConnectedHumans } from "../../game/match/rules";
-import { chooseScenarioCharacters } from "../../game/shell/scenarios";
+import { chooseScenarioCharacters } from "../../game/session/scenarios";
 import { FRAME_SECONDS } from "../../game/presentation/fighterPose";
 import { holdGameSpeed } from "./gameSpeed";
 import { FLOOR_HEIGHT } from "../../game/presentation/arenaCamera";
-import { type MapBuild, journalIngress } from "../../game/shell/build";
-import { pausing } from "../../game/shell/pauseBarrier";
-import type { RollbackPlayback } from "../../game/shell/playback";
+import { type MapBuild, journalIngress } from "../../game/session/build";
+import { pausing } from "../../game/session/pauseBarrier";
+import type { RollbackPlayback } from "../../game/session/playback";
 import { cancelBindingCapture, initializeBindingSettings, loadSavedBindings, saveBindingSettings, useDefaultBindings } from "../../game/ui/bindingSettings";
 import { f32 } from "wisp/src/sim/f32";
 import { on, trampoline } from "wisp/src/platform/dispatch";
@@ -24,7 +24,7 @@ import { DRAW_EVENT, beginPresentedFrame, drawBetweenFrames, startFrameClock } f
 import { EDITBOX_ENTER, EditboxIngress } from "../editboxJournal";
 import { localParticipantSlot, traceTick, writeReadyMarker } from "./diagnostics";
 import { writeDrawnFrame } from "./drawnFrame";
-import { heldVisualFrame } from "../../game/shell/visualCapture";
+import { heldVisualFrame } from "../../game/session/visualCapture";
 import { holdPresentedCapture, serviceVisualCapture } from "./visualCapture";
 import { callbackMatchTick } from "./frame";
 import { clearAllInputs, clearParticipantInputs, currentHumanMask } from "./inputs";
@@ -36,7 +36,7 @@ import { panelActions, serviceAutomaticRematch, startingSelection } from "./menu
 import { PLAYER_FILE_RECEIVED, bindingFiles, playerFileReceived, playerFilesOwnerLeft, startPlayerFiles } from "./playerFiles";
 import { PLAYTEST, PLAYTEST_PREFIX, playtestRequested, readPlaytestRequest, servicePlaytestRequest } from "./playtest";
 import { STAGE_READY, cancelStageLoad, serviceStageLoad, stageReadyEvent } from "./stageLoad";
-import { STAGE_READY_PREFIX } from "../../game/shell/stageLoad";
+import { STAGE_READY_PREFIX } from "../../game/session/stageLoad";
 import { makePreview } from "./preview";
 import { preloadStageAssets } from "./stageScenery";
 import * as probe from "./responseProbe";
@@ -47,11 +47,11 @@ import { SAVE_MOMENT, momentKey, serviceMomentRequest, serviceMomentSave } from 
 import { readMatchIndex, writeMatchRecord } from "./matchRecords";
 import { type Rollback, type ShellState, activeRollback, createShellState, keepShellMomentEnd, localSlot, momentSaves, replayRecording, shellState } from "./state";
 import { endReplaySegment, serviceReplay } from "./replays";
-import { CONTROL_ACK_PREFIX, PAUSE_REQUEST_PREFIX } from "../../game/shell/pauseBarrier";
+import { CONTROL_ACK_PREFIX, PAUSE_REQUEST_PREFIX } from "../../game/session/pauseBarrier";
 import { clearMatchEffects, createUi, recreateUi, views } from "./ui";
 import { resultsView } from "../../game/presentation/matchCues";
 import * as view from "./view";
-import { resultMessage } from "../../game/shell/messages";
+import { resultMessage } from "../../game/session/messages";
 import { beforeNativeDriverTick, afterNativeDriverTick, captureNativeDriverInputs } from "../nativeDriver";
 import { fighterAt, isActive } from "../../game/sim/roster";
 import { PAD_MOUSE, createPadTriggers, padMouse } from "./analogPad";

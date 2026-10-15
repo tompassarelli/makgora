@@ -771,7 +771,7 @@ against smashcraft:typescript-toolchain.lock.
 persistent helper's journal/editbox input, predicted fighter presentation and
 native response export. Rebuild it with
 `bun wisp map rebuild MAP.w3x --profile integrity`. Its build ID is
-`typescript-integrity`, as declared in smashcraft:ts/src/game/shell/currentBuild.ts;
+`typescript-integrity`, as declared in smashcraft:ts/src/game/session/currentBuild.ts;
 the entry in smashcraft:ts/src/platform/integrityMain.ts shares the normal shell
 and reload lifecycle. Use this profile for native input-integrity and
 four-fighter match/rematch captures.

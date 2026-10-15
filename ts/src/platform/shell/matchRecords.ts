@@ -5,8 +5,8 @@
 
 import { readChunk, writeChunks, writeLines } from "wisp/src/platform/fileio";
 import { PARTICIPANT_SLOTS, type Slots } from "../../game/input/participants";
-import { matchRecordLines, nextSerial } from "../../game/shell/matchRecord";
-import { MATCH_RECORD_INDEX_FILE, matchRecordFile } from "../../runtime/gameFiles";
+import { matchRecordLines, nextSerial } from "../../game/session/matchRecord";
+import { MATCH_RECORD_INDEX_FILE, matchRecordFile } from "../../game/core/gameFiles";
 import { type ShellState, localSlot } from "./state";
 import { views } from "./ui";
 import { exportPad } from "./analogPad";

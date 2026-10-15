@@ -1,4 +1,5 @@
-import { min, toInt } from "../../runtime/numbers";
+import { min } from "../core/numbers";
+import { toInt } from "wisp/src/sim/binary32";
 import { f32 } from "wisp/src/sim/f32";
 import { summonClip } from "./summonClipInfo";
 

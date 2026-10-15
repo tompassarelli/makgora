@@ -9,7 +9,7 @@ import { beginRematchCountdown, copyMatchState, createMatchState, Phase, request
 import { DROPS_BUTTON, HAZARDS_BUTTON } from "../src/game/ui/stageUi";
 
 import { RULE_BUTTONS } from "../src/game/ui/ruleButtons";
-import { INTEGRITY_BUILD } from "../src/game/shell/currentBuild";
+import { INTEGRITY_BUILD } from "../src/game/session/currentBuild";
 import { install, startBuild } from "../src/platform/main";
 import { Key } from "../src/platform/shell/keyEvents";
 import { shell } from "../src/platform/shell/state";

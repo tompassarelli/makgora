@@ -6,8 +6,8 @@ import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel
 import { f32 } from "wisp/src/sim/f32";
 import { Phase } from "../src/game/match/rules";
 import { AUTO_DELAY } from "../src/game/netcode/delayPolicy";
-import type { MapBuild } from "../src/game/shell/build";
-import { PLAYABLE_BUILD } from "../src/game/shell/currentBuild";
+import type { MapBuild } from "../src/game/session/build";
+import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { chooseDelay } from "../src/game/ui/bindingSettings";
 import { type ShellState, localSlot, shellState } from "../src/platform/shell/state";
 import { startProbe } from "../src/platform/shell/responseProbe";

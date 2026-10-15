@@ -2,7 +2,7 @@ import { writeLines } from "wisp/src/platform/fileio";
 import { floorMod, idiv } from "wisp/src/sim/intMath";
 import { Phase } from "../../game/match/rules";
 import { sourceVersion } from "../../game/shell/sourceVersion";
-import { sessionRatesFile, sessionRatesHeader } from "../../runtime/gameFiles";
+import { sessionRatesFile, sessionRatesHeader } from "../../game/core/gameFiles";
 import { activeRollback, shellState } from "./state";
 
 declare const os: { readonly clock?: (this: void) => number } | undefined;

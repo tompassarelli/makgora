@@ -1,6 +1,6 @@
 import { assertEquals, assertGreaterThan, assertLessThan, assertTrue, test } from "wisp/src/runtime/testing";
 import { imod } from "wisp/src/sim/intMath";
-import { sweep, sweepSeed } from "../../runtime/sweep";
+import { sweep, sweepSeed } from "../core/sweep";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { clearAttackBuffer } from "../input/attackBuffer";
 import { produceComputerInput } from "../match/botPlay";

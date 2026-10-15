@@ -412,7 +412,7 @@ reach the screen later and later until the helper's 120-record output queue
 fills (4 s), then stay that late, the lasting slowdown the 0.0.47 playtest
 reported (#48).
 
-Since #48, `CATCH_UP_FRAMES` (smashcraft:ts/src/game/shell/playback.ts) bounds
+Since #48, `CATCH_UP_FRAMES` (smashcraft:ts/src/game/session/playback.ts) bounds
 every callback alike: at most 6 admitted rows, 6 confirmed and 6 speculative
 frames, the confirmed and speculative limits it had before. A sender may admit
 `FUTURE_LIMIT` = 128 frames past its confirmed frame (64 before): while catching
@@ -509,7 +509,7 @@ Exact f32 arithmetic (#59) made every frame about a quarter costlier, and
 the worst four-fighter callbacks ran 21–31 frames: a message's 6 confirmed
 frames, a correction 15–24 frames deep replayed whole, and up to 6
 predicted. Every frame costs about the same, so each kind is now bounded
-(smashcraft:ts/src/game/shell/playback.ts): a correction replays at most 6
+(smashcraft:ts/src/game/session/playback.ts): a correction replays at most 6
 frames a callback in the history's own state while the speculative match
 keeps running local rows, and replaces it once the replay reaches the
 present; a message's frames confirm 3 a callback, and only a backlog of

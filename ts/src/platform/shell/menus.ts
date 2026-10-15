@@ -1,4 +1,4 @@
-import type { QuickStageSettings } from "../../game/shell/devSettings";
+import type { QuickStageSettings } from "../../game/session/devSettings";
 
 
 
@@ -16,13 +16,13 @@ import { resetPacingAndPresentation } from "../../game/match/pacingAndPresentati
 import { clearObservedActions } from "../../game/match/step";
 import { clearAttackBuffer } from "../../game/input/attackBuffer";
 import { copyControls, neutralControls } from "../../game/sim/roster";
-import { chooseScenarioCharacters } from "../../game/shell/scenarios";
+import { chooseScenarioCharacters } from "../../game/session/scenarios";
 import { PARTNER_DAMAGE_STEP } from "../../game/match/trainingState";
 import { LESSONS, NO_LESSON, prepareTutorial, stepTutorialLesson } from "../../game/match/tutorial";
-import { prepareQuickMatch } from "../../game/shell/devSettings";
-import type { Scenario } from "../../game/shell/build";
+import { prepareQuickMatch } from "../../game/session/devSettings";
+import type { Scenario } from "../../game/session/build";
 import type { Character } from "../../game/sim/codes";
-import { type PlaytestRequest, preparePlaytest } from "../../game/shell/playtest";
+import { type PlaytestRequest, preparePlaytest } from "../../game/session/playtest";
 import { nextStage } from "../../game/menu/stageCatalog";
 import { nextMatchCharacter } from "../../game/match/rules";
 import { stepCpuOpponent, stepCpuTier } from "../../game/match/cpuProfiles";

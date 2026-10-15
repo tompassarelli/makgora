@@ -12,7 +12,7 @@ import type { Controls } from "../sim/roster";
 import { DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP, DEMONHUNTER_MANA_BURN_HEIGHT, DEMONHUNTER_MANA_BURN_LIFETIME, DEMONHUNTER_MANA_BURN_SPEED, DEMONHUNTER_MANA_BURN_STARTUP } from "../sim/specials";
 import { runningHeroSpecial } from "../sim/specials/engine";
 import { BLASTER_AIR_SHOT_HEIGHT, BLASTER_PROJECTILE_HEIGHT, BLASTER_PROJECTILE_LIFETIME, BLASTER_PROJECTILE_RADIUS, BLASTER_PROJECTILE_SPAWN_OFFSET, BLASTER_PROJECTILE_SPEED, } from "../sim/projectiles";
-import { hurtCapsule } from "../physics/contactGeometry";
+import { hurtCapsule } from "../sim/geometry/contactGeometry";
 import { deckUnder, heightAhead, safeAt } from "./botFooting";
 import { heroStanceLater, heroStanceSlot, pressHeroStance } from "./botHeroKit";
 import { moveReaches } from "./botMoves";

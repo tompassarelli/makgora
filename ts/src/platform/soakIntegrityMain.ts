@@ -1,4 +1,4 @@
-import { SOAK_INTEGRITY_BUILD } from "../game/shell/currentBuild";
+import { SOAK_INTEGRITY_BUILD } from "../game/session/currentBuild";
 import { install as installGame, startBuild } from "./main";
 import { installSoakHandles } from "./soakHandles";
 

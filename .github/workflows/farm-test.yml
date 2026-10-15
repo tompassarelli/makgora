@@ -375,7 +375,7 @@ jobs:
           case "$GROUP" in
             perf)
               check "four-fighter p99 <= 10 ms and worst <= 14 ms in Classic" sh -c 'bun wisp perf playable-bot-four --samples --out build/playable-bot-four.perf && bun wisp perf budget build/playable-bot-four.perf'
-              check "focused logic test" env GAME_TESTS=sim/meleeScalarMath bun test test/game.test.ts
+              check "focused logic test" env GAME_TESTS=core/math/meleeScalarMath bun test test/game.test.ts
               if [ -f build/playable-bot-four.perf ]; then
                 bun scripts/commitMetrics.ts build/playable-bot-four.perf build/playable.lua | tee -a "$GITHUB_STEP_SUMMARY"
               fi ;;

@@ -1,4 +1,4 @@
-import { TECH_WINDOW_FRAMES, TECH_REPEAT_MINIMUM_AGE_FRAMES } from "../physics/techInput";
+import { TECH_WINDOW_FRAMES, TECH_REPEAT_MINIMUM_AGE_FRAMES } from "./geometry/techInput";
 
 
 import { beginFighterAttack, resolveAttacks } from "./attacks";

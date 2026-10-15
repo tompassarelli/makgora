@@ -8,7 +8,7 @@ import { createFighter } from "../../ts/src/game/sim/fighter";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../../ts/src/game/sim/hitRegions";
 import { attackStartupFrames, characterAttackActiveFrames, attackDurationFramesForGrounding } from "../../ts/src/game/sim/moves";
 import { SELECTABLE_CHARACTERS, fighterName } from "../../ts/src/game/sim/heroes/registry";
-import { hurtCapsule } from "../../ts/src/game/physics/contactGeometry";
+import { hurtCapsule } from "../../ts/src/game/sim/geometry/contactGeometry";
 import { ensure, fighters, parseSource } from "./original-clips";
 const [input, output] = process.argv.slice(2).map(p => resolve(p));
 ensure(input && output, "usage: bun tools/animations/down-air-captures.ts PRIVATE_ASSETS PRIVATE_OUTPUT");

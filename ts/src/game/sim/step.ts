@@ -2,7 +2,7 @@
 
 
 
-import { max, min } from "../../runtime/numbers";
+import { max, min } from "../core/numbers";
 import { divideFloat32, roundToFloat32, subtractFloat32 } from "wisp/src/sim/binary32";
 import { f32 } from "wisp/src/sim/f32";
 import { AttackPhase, Character, DownState, GroundAction, LedgeState, ParryBuffer, ShieldBreak, SpecialAction, SurfaceContact } from "./codes";
@@ -91,8 +91,8 @@ import * as sea from "./water";
 import { stickX } from "./stick";
 import { checkBlastZone, respawnFighter } from "./stocks";
 import { advanceSurfaceRecovery, advanceWallJump, leaveMainDeckBody, resolveSolidSurfaceContacts } from "./surfaces";
-import { forwardRollTurnFrame, rollTravel } from "../physics/rollTravel";
-import { advanceTechInput, techContactWindow } from "../physics/techInput";
+import { forwardRollTurnFrame, rollTravel } from "./geometry/rollTravel";
+import { advanceTechInput, techContactWindow } from "./geometry/techInput";
 import { freezeMinimumFrames, cancelAttack, clearDownState, clearOwnedFreezeTrap, thawFighter } from "./transitions";
 import { advanceMash } from "./mash";
 import { WORLD_UNITS_PER_MELEE_UNIT } from "./tuning";

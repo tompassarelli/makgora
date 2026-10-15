@@ -3,7 +3,7 @@
 
 
 
-import { max, min } from "../../runtime/numbers";
+import { max, min } from "../core/numbers";
 import { assertDefined, assertEquals, assertFalse, assertGreaterThan, assertLessThan, assertNear, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { Character, SurfaceContact } from "../sim/codes";

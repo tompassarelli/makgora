@@ -2,9 +2,9 @@ import { canHit, sameTeam } from "./teams";
 
 import { imod } from "wisp/src/sim/intMath";
 
-import { max, min } from "../../runtime/numbers";
+import { max, min } from "../core/numbers";
 import { roundToFloat32 } from "wisp/src/sim/binary32";
-import { meleeCos, meleeSin } from "../../sim/meleeScalarMath";
+import { meleeCos, meleeSin } from "../core/math/meleeScalarMath";
 import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle, ContactKind, HeroStatusGroup, HeroStatusKind, ProjectileKind } from "./codes";
 import type { AppliedStatus } from "./heroStatus";
@@ -14,7 +14,7 @@ import { type Fighter, PROJECTILE_CAPACITY, type Projectile } from "./fighter";
 import { mutableProjectile } from "./fighterProjectiles";
 import { type HitEffect, HitElement, copyHitEffect, emptyHitEffect } from "./hitRegions";
 import type { SpecialProjectile } from "./specials/schema";
-import { capsulesIntersect, emptyCapsule, hurtCapsule, placeCapsule, segmentBoxesOverlap } from "../physics/contactGeometry";
+import { capsulesIntersect, emptyCapsule, hurtCapsule, placeCapsule, segmentBoxesOverlap } from "./geometry/contactGeometry";
 import { RIFLEMAN_BLASTER_GROUND_DAMAGE_MULTIPLIER, attackDamage } from "./moves";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { type Roster, fighterAt, isActive } from "./roster";

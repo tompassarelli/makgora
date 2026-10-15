@@ -19,7 +19,7 @@ import { captureNetworkFrame, executeMatchFrame } from "./frameInput";
 import { type PadMatch, padMatch, playPads } from "./helperPads";
 import { RECOVERY_BANDS, recoveryArchetype, upSpecialRoute } from "./recoveryEnvelope";
 import { testMatch } from "./testMatch";
-import { sweep } from "../../runtime/sweep";
+import { sweep } from "../core/sweep";
 
 const CHARGED_ANGLE: readonly Character[] = [Character.rifleman, Character.warden, Character.blademaster, Character.mountainKing, Character.shadowHunter, Character.kaelthas];
 

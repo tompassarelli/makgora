@@ -1,5 +1,5 @@
 import { assertEquals, assertFalse, assertNear, assertTrue, test } from "wisp/src/runtime/testing";
-import { max } from "../../runtime/numbers";
+import { max } from "../core/numbers";
 import { resolveAttacks } from "./attacks";
 import { AttackStyle, Character } from "./codes";
 import { canAttack, canShieldGrab, canStartAttackStyle } from "./conditions";

@@ -96,7 +96,7 @@ developer statements on buffer lengths. Add them with their source when found.
 
 | Window | Frames | Where |
 |---|---|---|
-| Tech press window; lockout between presses | 20; 40 | smashcraft:ts/src/game/physics/techInput.ts |
+| Tech press window; lockout between presses | 20; 40 | smashcraft:ts/src/game/sim/geometry/techInput.ts |
 | Tech intangibility; tech roll | 20; 34 | smashcraft:ts/src/game/sim/conditions.ts |
 | Wall tech startup; wall-tech jump input; wall jump stick flick | 5; 20; 3 | conditions.ts, smashcraft:ts/src/game/sim/fighter.ts |
 | Attack buffer (human) | 6 | smashcraft:ts/src/game/input/attackBuffer.ts |

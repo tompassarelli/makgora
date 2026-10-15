@@ -1,5 +1,5 @@
 
-import { max, min } from "../../runtime/numbers";
+import { max, min } from "../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle, Character, DownState, LedgeState, ShieldBreak, SpecialAction } from "./codes";
 import { inGrabContext, isTumbling } from "./conditions";

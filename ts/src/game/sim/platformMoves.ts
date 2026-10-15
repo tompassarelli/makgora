@@ -1,4 +1,4 @@
-import { min } from "../../runtime/numbers";
+import { min } from "../core/numbers";
 import { addFloat32, subtractFloat32 } from "wisp/src/sim/binary32";
 import { DownState, SpecialAction } from "./codes";
 import { isAerialAttack } from "./moves";

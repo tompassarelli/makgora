@@ -3,7 +3,7 @@
 import type { DevSettings } from "./devSettings";
 import type { MatchState } from "../match/rules";
 import type { JournalIngress } from "./build";
-import { devCommandReceiptFile, journalControlFile, journalLifecycleFile, journalReadyFile, journalMenuFile, journalTransportReadyFile, journalFailureFile, stageReceiptFile } from "../../runtime/gameFiles";
+import { devCommandReceiptFile, journalControlFile, journalLifecycleFile, journalReadyFile, journalMenuFile, journalTransportReadyFile, journalFailureFile, stageReceiptFile } from "../core/gameFiles";
 
 interface PreloadFile {
   readonly name: string;

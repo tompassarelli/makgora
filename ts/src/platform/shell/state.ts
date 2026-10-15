@@ -1,11 +1,11 @@
-import { type SessionWins, createSessionWins } from "../../game/shell/sessionWins";
+import { type SessionWins, createSessionWins } from "../../game/session/sessionWins";
 
 
 
 
 
 import type { CryGate } from "../../game/presentation/hurtVoice";
-import type { StageLoad } from "../../game/shell/stageLoad";
+import type { StageLoad } from "../../game/session/stageLoad";
 import type { CameraExtreme } from "../../game/presentation/arenaCamera";
 import type { Action } from "../../game/input/actions";
 import { type KeyboardCapture, keyboardCapture } from "../../game/input/keyboardCapture";
@@ -33,11 +33,11 @@ import { type ModelSoundCursor, ORIGINAL_MODEL_SOUNDS, createModelSoundCursor } 
 import { type MomentRecorder, createMomentRecorder, keepMomentEnd } from "../../game/replay/moment";
 import { type MatchReplayRecorder, createMatchReplayRecorder } from "../../game/replay/matchReplay";
 import { type ReplayState, createReplaySnapshot } from "../../game/replay/snapshot";
-import { type JournalIngress, type MapBuild, type ShadowInputMode, isShadow } from "../../game/shell/build";
-import type { DevSettings } from "../../game/shell/devSettings";
-import type { MenuPhase } from "../../game/shell/journalFiles";
-import { type PauseBarrier, pauseBarrier } from "../../game/shell/pauseBarrier";
-import type { RollbackPlayback, SpeculativeMatch } from "../../game/shell/playback";
+import { type JournalIngress, type MapBuild, type ShadowInputMode, isShadow } from "../../game/session/build";
+import type { DevSettings } from "../../game/session/devSettings";
+import type { MenuPhase } from "../../game/session/journalFiles";
+import { type PauseBarrier, pauseBarrier } from "../../game/session/pauseBarrier";
+import type { RollbackPlayback, SpeculativeMatch } from "../../game/session/playback";
 import type { DownState, GrabAction, LedgeState, ShieldBreak, SpecialAction } from "../../game/sim/codes";
 import { createFighter } from "../../game/sim/fighter";
 import { type Roster, createRoster } from "../../game/sim/roster";

@@ -7,7 +7,7 @@
 import { addFloat32, divideFloat32, fusedMultiplyAddFloat32, multiplyFloat32, subtractFloat32 } from "wisp/src/sim/binary32";
 import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
-import { meleeAtan2, meleeCos, meleeSin } from "../sim/meleeScalarMath";
+import { meleeAtan2, meleeCos, meleeSin } from "./meleeScalarMath";
 
 function powerOfTwo(exponent: number): number {
   let result = 1.0;

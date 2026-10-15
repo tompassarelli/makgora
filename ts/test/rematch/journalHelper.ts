@@ -15,8 +15,8 @@ import { decodeTransport } from "../../src/game/netcode/journal/transport";
 import { TEXT_WINDOW, TYPED_AHEAD_CHARACTERS, textEnvelope } from "../../src/game/netcode/journal/text";
 import { momentRequest } from "../../src/game/replay/moment";
 import { padDecimal } from "../../src/game/netcode/journal/decimal";
-import { quiescentFile } from "../../src/game/shell/journalFiles";
-import { journalControlFile, journalLifecycleFile, journalReadyFile } from "../../src/runtime/gameFiles";
+import { quiescentFile } from "../../src/game/session/journalFiles";
+import { journalControlFile, journalLifecycleFile, journalReadyFile } from "../../src/game/core/gameFiles";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 
 

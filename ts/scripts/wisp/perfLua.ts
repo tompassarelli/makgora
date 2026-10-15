@@ -15,7 +15,7 @@ import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel
 import { SELECTABLE_CHARACTERS, fighterSlug } from "../../src/game/sim/heroes/registry";
 import { BOT_FOUR, BOT_THREE, HUMAN_DUEL, HUMAN_FOUR, botMatchAgainst, playBotMatch } from "./botMatch";
 import { PREDICTED_LOCAL_NATIVES, SMASHCRAFT_LOCAL_NATIVES } from "./localNatives";
-import { PLAYABLE_BUILD } from "../../src/game/shell/currentBuild";
+import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import { QUICK_MATCH } from "./quickMatch";
 import { playFighterCensus, playStageCensus } from "./census";
 import { profileRun } from "./censusProfile";

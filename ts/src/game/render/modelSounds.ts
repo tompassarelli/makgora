@@ -11,7 +11,7 @@ import { type ModelSoundCue, fighterSoundCue, fighterSoundCueCount } from "../..
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { FRAME_SECONDS, type FighterPose } from "../presentation/fighterPose";
 import { f32 } from "wisp/src/sim/f32";
-import { toInt } from "../../runtime/numbers";
+import { toInt } from "wisp/src/sim/binary32";
 import type { Fighter } from "../sim/fighter";
 
 

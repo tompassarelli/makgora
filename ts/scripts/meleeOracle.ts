@@ -22,7 +22,7 @@ import { bodyTop } from "../src/game/sim/surfaces";
 import { WORLD_UNITS_PER_MELEE_UNIT } from "../src/game/sim/tuning";
 import { type Scene, airborne, fighter, frame, frameRows, framesUntil, scene, solo, tumbling } from "../src/game/match/padScene";
 import { ATTACK_BUFFER_FRAMES } from "../src/game/input/attackBuffer";
-import { TECH_WINDOW_FRAMES, TECH_REPEAT_MINIMUM_AGE_FRAMES } from "../src/game/physics/techInput";
+import { TECH_WINDOW_FRAMES, TECH_REPEAT_MINIMUM_AGE_FRAMES } from "../src/game/sim/geometry/techInput";
 import { SHIELD_POWERSHIELD_INPUT_WINDOW_FRAMES } from "../src/game/sim/fighter";
 import { SHIELD_RED_PARRY_FRAMES, digitalShieldstunFrames } from "../src/game/sim/shield";
 import { LEDGE_INTANGIBLE_FRAMES } from "../src/game/sim/ledge";

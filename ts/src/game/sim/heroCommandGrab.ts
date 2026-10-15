@@ -2,9 +2,9 @@ import { canHit } from "./teams";
 
 
 
-import { max, min } from "../../runtime/numbers";
+import { max, min } from "../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
-import { emptyCapsule, placeCapsule } from "../physics/contactGeometry";
+import { emptyCapsule, placeCapsule } from "./geometry/contactGeometry";
 import { ContactKind } from "./codes";
 import { canBeGrabbed, inGrabContext, isIntangible } from "./conditions";
 import { queueDamageContact } from "./contacts";

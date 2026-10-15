@@ -4,7 +4,7 @@ import { clearAttackBuffer } from "../input/attackBuffer";
 import { stateChecksum } from "../replay/canonical";
 import { firstStateDifference } from "../replay/difference";
 import { copyReplayState, createReplaySnapshot } from "../replay/snapshot";
-import { prepareQuickMatch } from "../shell/devSettings";
+import { prepareQuickMatch } from "../session/devSettings";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
 import { Character } from "../sim/codes";
 import { createFighter } from "../sim/fighter";

@@ -6,7 +6,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { preloadLines } from "wisp/scripts/wisp/preloadRecord";
 import { joinReplay, parseReplayHeader, parseReplayPart } from "../../src/game/replay/matchReplay";
-import { replayPartFile } from "../../src/runtime/gameFiles";
+import { replayPartFile } from "../../src/game/core/gameFiles";
 
 
 function fileLines(path: string): string[] {

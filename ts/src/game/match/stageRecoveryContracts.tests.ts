@@ -9,7 +9,7 @@ import { chooseRecoveryInput } from "./botRecovery";
 import { createFrameControls } from "./controls";
 import { Phase, createMatchState } from "./rules";
 import { stepMatch } from "./step";
-import { sweep } from "../../runtime/sweep";
+import { sweep } from "../core/sweep";
 
 function recover(stage: number, name: string, character: Character, side: number, z: number, jumps: number): void {
   const ledge = side < 0 ? mainDeckLeft(stage) : mainDeckRight(stage);

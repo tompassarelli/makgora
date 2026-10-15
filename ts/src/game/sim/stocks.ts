@@ -1,5 +1,5 @@
 
-import { max } from "../../runtime/numbers";
+import { max } from "../core/numbers";
 import { GrabAction, SurfaceContact } from "./codes";
 import { PLATFORM_DROP_INPUT_WINDOW, SHIELD_MAX, SHIELD_POWERSHIELD_INPUT_WINDOW_FRAMES, TURNAROUND_SPECIAL_WINDOW_FRAMES, WALL_JUMP_FLICK_FRAMES, WALL_TECH_JUMP_INPUT_WINDOW_FRAMES } from "./fighter";
 import { clearDash } from "./groundMovement";

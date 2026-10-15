@@ -7,7 +7,7 @@ import { decayKnockback } from "../game/sim/knockback";
 import { AIR_KNOCKBACK_DECAY, AIR_KNOCKBACK_SQUARED_CUTOFF, decayedAirMotion, setMeleeKnockback } from "../game/sim/motion";
 import { advanceFighter } from "../game/sim/step";
 import { controls, soloWorld } from "../game/sim/testWorld";
-import { meleeAtan2, meleeCos, meleeSin } from "../sim/meleeScalarMath";
+import { meleeAtan2, meleeCos, meleeSin } from "../game/core/math/meleeScalarMath";
 
 // Power-of-two scaling exposes binary32 significands hidden by Lua float formatting.
 

@@ -1,7 +1,7 @@
 
 
-import { CURRENT_BUILD } from "../game/shell/currentBuild";
-import type { MapBuild } from "../game/shell/build";
+import { CURRENT_BUILD } from "../game/session/currentBuild";
+import type { MapBuild } from "../game/session/build";
 import { install as installMap, startBuild } from "./main";
 import { installStackDemo, startStackDemo } from "./stackDemo";
 

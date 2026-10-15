@@ -1,5 +1,5 @@
 
-import { evaluateCase } from "./corpus";
+import { evaluateCase } from "../../core/math/parityCorpus";
 
 const count = 2000;
 for (let index = 0; index < count; index++) {

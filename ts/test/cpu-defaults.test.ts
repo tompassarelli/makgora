@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { testHeadless } from "./headless";
 import { PREDICTED_HEADLESS } from "../scripts/wisp/headless";
-import { PLAYABLE_BUILD } from "../src/game/shell/currentBuild";
+import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { install, startBuild } from "../src/platform/main";
 import { shell } from "../src/platform/shell/state";
 import { panelActions } from "../src/platform/shell/menus";

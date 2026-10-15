@@ -64,7 +64,7 @@ import { PLAYABLE_CHARACTERS, fighterName, fighterPortrait, nextSelectableCharac
 import {
   MOVES_HEADER, itemsSetting, ultimatesSetting, itemKindSetting, automaticRematchSetting, movesPage, selectionModeLabel, endlessSetting, hitAreasSetting, partnerBehaviourSetting, partnerDamageSetting, partnerEscapeSetting,
   partnerTechSetting, stockSetting, timeSetting, modeSetting, trainingSpeedSetting,
-} from "../shell/messages";
+} from "../session/messages";
 import { classicRouteSummary, classicTierSetting } from "../classic/classicText";
 import { loreBattle, loreBattleSetting, loreBattleSummary } from "../classic/loreBattles";
 import { loreClears } from "../classic/loreClears";

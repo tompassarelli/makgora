@@ -1,6 +1,6 @@
 
 
-import { max, min } from "../../runtime/numbers";
+import { max, min } from "../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { AttackPhase, AttackStyle, Character, DownState, GrabAction, LedgeState, ShieldBreak, SpecialAction, HeroStatusKind, SurfaceContact } from "../sim/codes";
 import { FOLLOW_UP_FORM, SpecialForm } from "../sim/specials/schema";

@@ -1,6 +1,6 @@
 import { readChunk } from "wisp/src/platform/fileio";
 import { Phase } from "../../game/match/rules";
-import { clearVisualCapture, heldVisualFrame, holdVisualFrame, releaseVisualFrame, visualCapture, visualReleaseFile } from "../../game/shell/visualCapture";
+import { clearVisualCapture, heldVisualFrame, holdVisualFrame, releaseVisualFrame, visualCapture, visualReleaseFile } from "../../game/session/visualCapture";
 import { drawnFrame } from "./drawnFrame";
 import { type ShellState, localSlot } from "./state";
 import { lockArenaCamera, pauseMatchPresentation, renderPersistentPresentation, renderUi } from "./view";

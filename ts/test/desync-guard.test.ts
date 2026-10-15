@@ -7,7 +7,7 @@
 
 import { expect, test } from "bun:test";
 import { testHeadless } from "./headless";
-import { CURRENT_BUILD } from "../src/game/shell/currentBuild";
+import { CURRENT_BUILD } from "../src/game/session/currentBuild";
 import { install, start } from "../src/platform/main";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { expectNoDivergence, playThroughReload } from "./desync/journeys";

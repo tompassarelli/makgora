@@ -1,9 +1,9 @@
 
 
 
-import { CURRENT_BUILD } from "../game/shell/currentBuild";
-import type { MapBuild } from "../game/shell/build";
-import { replayHistoryPlayback } from "../game/shell/rollbackPlayback";
+import { CURRENT_BUILD } from "../game/session/currentBuild";
+import type { MapBuild } from "../game/session/build";
+import { replayHistoryPlayback } from "../game/session/rollbackPlayback";
 import { configureRuntime } from "wisp/src/runtime/config";
 import { installDispatch } from "wisp/src/platform/dispatch";
 import { installHotReload, startHotReload } from "wisp/src/platform/hotReload";

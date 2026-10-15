@@ -1,4 +1,4 @@
-import { sweepSeed } from "../../runtime/sweep";
+import { sweepSeed } from "../core/sweep";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { at } from "wisp/src/runtime/lookup";
 import { Character, GroundAction } from "../sim/codes";

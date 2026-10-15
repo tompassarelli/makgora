@@ -1,5 +1,5 @@
 import { winningMask } from "../../game/match/rules";
-import { recordSessionWins } from "../../game/shell/sessionWins";
+import { recordSessionWins } from "../../game/session/sessionWins";
 
 
 
@@ -11,8 +11,8 @@ import { borrowMatchFrame, captureFrame, executeMatchFrame, hasNetworkRows } fro
 import { ownConfirmedState } from "./confirmedState";
 import { beginMomentFrame, keepMomentEnd, momentFrameRan, recordMomentRow } from "../../game/replay/moment";
 import { Phase, beginRematchCountdown, computerActive, humanFighterActive } from "../../game/match/rules";
-import { resultMessage } from "../../game/shell/messages";
-import { produceScenarioComputerInput } from "../../game/shell/scenarios";
+import { resultMessage } from "../../game/session/messages";
+import { produceScenarioComputerInput } from "../../game/session/scenarios";
 import { canAttack } from "../../game/sim/conditions";
 import { influenceOperands } from "../../game/sim/knockback";
 import { canonicalReal } from "../../game/replay/canonical";
@@ -21,7 +21,7 @@ import { fighterAt, isActive } from "../../game/sim/roster";
 import { traceFrameInput, traceParticipant } from "./diagnostics";
 import { confirmModelSounds } from "../../game/render/modelSounds";
 import { type FrameObservation, type ShellState, activeRollback, localSlot } from "./state";
-import { heldVisualFrame } from "../../game/shell/visualCapture";
+import { heldVisualFrame } from "../../game/session/visualCapture";
 import { clearMatchEffects, views } from "./ui";
 import { traceInput } from "./trace";
 import { probeRecording } from "./responseProbe";

@@ -5,9 +5,9 @@
 
 import { writeLine } from "wisp/src/platform/fileio";
 import { Phase } from "../../game/match/rules";
-import { drawnFrameFile, drawnFrameLine } from "../../runtime/gameFiles";
+import { drawnFrameFile, drawnFrameLine } from "../../game/core/gameFiles";
 import { type ShellState, activeRollback, localSlot } from "./state";
-import { heldVisualFrame } from "../../game/shell/visualCapture";
+import { heldVisualFrame } from "../../game/session/visualCapture";
 
 
 const written = new Map<number, string>();

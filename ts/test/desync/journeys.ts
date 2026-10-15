@@ -3,7 +3,7 @@ import { expect } from "bun:test";
 import type { HeadlessRuntime } from "wisp/scripts/wisp/headless";
 import type { MapEntry } from "wisp/src/headless/client";
 import type { Lockstep } from "wisp/src/headless/lockstep";
-import type { MapBuild } from "../../src/game/shell/build";
+import type { MapBuild } from "../../src/game/session/build";
 import { install, startBuild } from "../../src/platform/main";
 
 const CTRL = 2;

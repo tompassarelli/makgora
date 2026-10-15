@@ -1,6 +1,6 @@
 import { assertDefined, assertEquals, assertNear, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
-import { rollTravel } from "../../physics/rollTravel";
+import { rollTravel } from "../geometry/rollTravel";
 import { Character, SpecialAction } from "../codes";
 import { TECH_ROLL_FRAMES } from "../down";
 import { type Fighter, createFighter } from "../fighter";
@@ -17,7 +17,7 @@ import { fightersApart } from "../../replay/scopedRepair";
 import { createRoster } from "../roster";
 import { shieldCenterX, shieldCenterZ } from "../shieldTilt";
 import { shieldSizeMultiplier } from "../shield";
-import { emptyCapsule } from "../../physics/contactGeometry";
+import { emptyCapsule } from "../geometry/contactGeometry";
 
 test("Tinker body keeps ROB run and air speed with weight 92 for about 9% earlier standard-smash KOs [k4 reference ssbu]", () => {
   const f = createFighter(Character.tinker, 0.0, 1);

@@ -2,10 +2,10 @@ import { canHit } from "./teams";
 
 
 
-import { max, min } from "../../runtime/numbers";
+import { max, min } from "../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { shieldCenterX, shieldCenterZ } from "./shieldTilt";
-import { hurtCapsule } from "../physics/contactGeometry";
+import { hurtCapsule } from "./geometry/contactGeometry";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { type Roster, fighterAt, isActive } from "./roster";
 import { shieldSizeMultiplier } from "./shield";

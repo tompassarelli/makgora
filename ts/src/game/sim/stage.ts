@@ -4,7 +4,7 @@
 import { at } from "wisp/src/runtime/lookup";
 import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
-import { min } from "../../runtime/numbers";
+import { min } from "../core/numbers";
 import { SurfaceContact } from "./codes";
 import { melee } from "./tuning";
 import { squareRoot } from "./warcraftMath";

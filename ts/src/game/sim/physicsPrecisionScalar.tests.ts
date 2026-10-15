@@ -3,7 +3,7 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { multiplyFloat32, subtractFloat32 } from "wisp/src/sim/binary32";
 import { f32 } from "wisp/src/sim/f32";
-import { meleeAtan2, meleeCos, meleeSin } from "../../sim/meleeScalarMath";
+import { meleeAtan2, meleeCos, meleeSin } from "../core/math/meleeScalarMath";
 import { directionalInfluenceVector, damageLevelForKnockback, fixedHitKnockback, hitContextKnockback, ordinaryHitKnockback, ordinaryHitstunFrames, victimHitlagFrames } from "./knockback";
 import { analogShieldStrength, capsuleCircleIntersects, shieldContactDamage, shieldContactPushback, shieldContactPushbackMelee, shieldDrain, shieldPushback, shieldSizeMultiplier, shieldstunDuration } from "./shield";
 import { WORLD_UNITS_PER_MELEE_UNIT } from "./tuning";

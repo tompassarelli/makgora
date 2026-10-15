@@ -1,5 +1,5 @@
 import { ATTACK_BUFFER_FRAMES } from "../input/attackBuffer";
-import { advanceTechInput, techInputEligible, TECH_REPEAT_MINIMUM_AGE_FRAMES, TECH_WINDOW_FRAMES, type TechInput } from "../physics/techInput";
+import { advanceTechInput, techInputEligible, TECH_REPEAT_MINIMUM_AGE_FRAMES, TECH_WINDOW_FRAMES, type TechInput } from "../sim/geometry/techInput";
 import { copyFighterState } from "../../generated/state/fighterState";
 import { Character, DownState, GrabAction, LedgeState, ShieldBreak, SurfaceContact } from "../sim/codes";
 import { inStageCannon } from "../sim/stageHazards";

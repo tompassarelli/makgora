@@ -10,7 +10,7 @@ import { captureReplaySnapshot } from "../../game/replay/snapshot";
 import { beginStateChecksum, foldStateChecksum, stateChecksum } from "../../game/replay/canonical";
 import { fighterAt, isActive, type Controls } from "../../game/sim/roster";
 import { floorMod, idiv } from "wisp/src/sim/intMath";
-import { INPUT_START_FILE, MELEE_READY_FILE, RESPONSE_TRACE_CALLBACKS, traceStartLine } from "../../runtime/gameFiles";
+import { INPUT_START_FILE, MELEE_READY_FILE, RESPONSE_TRACE_CALLBACKS, traceStartLine } from "../../game/core/gameFiles";
 import { writeLines } from "wisp/src/platform/fileio";
 import { type ShellState, activeRollback, localSlot } from "./state";
 import { views } from "./ui";

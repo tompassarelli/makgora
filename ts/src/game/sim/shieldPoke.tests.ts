@@ -1,6 +1,6 @@
 import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
-import { emptyCapsule, placeCapsule } from "../physics/contactGeometry";
+import { emptyCapsule, placeCapsule } from "./geometry/contactGeometry";
 import { meleeHitIntersectsShield, resolveAttacks } from "./attacks";
 import { AttackStyle, Character } from "./codes";
 import { fighterPoseFacing } from "./conditions";

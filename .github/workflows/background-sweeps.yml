@@ -36,7 +36,7 @@ jobs:
         run: |
           runner=$(jq -er '.background | select(type == "string" and length > 0)' ts/runner-routing.json)
           echo "runner=$runner" >> "$GITHUB_OUTPUT"
-  # Every sweep outside GATE_SWEEPS (ts/src/runtime/gateSweeps.ts) and the
+  # Every sweep outside GATE_SWEEPS (ts/src/game/core/gateSweeps.ts) and the
   # per-pair worst-frame census (#405), at most three jobs at once so it never
   # crowds Autoland. Census shard N plays every CENSUS_SHARDS-th fighter of the
   # roster; the census job judges the joined pairs.

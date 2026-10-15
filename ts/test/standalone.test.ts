@@ -11,7 +11,7 @@ import { value } from "./rematch/playableMatch";
 import { sweep } from "./sweep";
 import { parsePadScript } from "../scripts/integrity/padScript";
 import { parseExpectations, parseTrace, scriptChat, TRACE_FILE, unmetExpectations } from "../scripts/integrity/padParity";
-import { quickMatchHero, quickMatchHitAreas, quickMatchStocks } from "../src/game/shell/devSettings";
+import { quickMatchHero, quickMatchHitAreas, quickMatchStocks } from "../src/game/session/devSettings";
 import { Phase } from "../src/game/match/rules";
 import { fighterAt } from "../src/game/sim/roster";
 import { fighterName } from "../src/game/sim/heroes/registry";

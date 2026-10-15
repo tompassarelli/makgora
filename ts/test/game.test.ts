@@ -6,7 +6,7 @@
 
 import { beforeEach, describe, test } from "bun:test";
 import { registeredTests } from "wisp/src/runtime/testing";
-import { selectSweep, setSweepSeedOffset } from "../src/runtime/sweep";
+import { selectSweep, setSweepSeedOffset } from "../src/game/core/sweep";
 import { chargeTestsTo } from "./testCost";
 
 const filter = process.env.GAME_TESTS ?? "";

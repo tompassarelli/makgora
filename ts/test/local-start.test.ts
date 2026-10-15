@@ -20,7 +20,7 @@ import { observedFrameLegalActions, observedFrameStartedActions } from "../src/g
 import { ShadowInputSchedule } from "../src/game/netcode/shadowSchedule";
 import { Character } from "../src/game/sim/codes";
 import type { Roster } from "../src/game/sim/roster";
-import { INTEGRITY_BUILD } from "../src/game/shell/currentBuild";
+import { INTEGRITY_BUILD } from "../src/game/session/currentBuild";
 import { install, startBuild } from "../src/platform/main";
 import { confirmedChecksum } from "../src/platform/shell/diagnostics";
 import { Key } from "../src/platform/shell/keyEvents";

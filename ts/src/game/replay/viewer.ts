@@ -10,7 +10,7 @@
 import { at } from "wisp/src/runtime/lookup";
 import { floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS } from "../input/participants";
-import { type Capsule, attackCapsule, emptyCapsule, placeCapsule } from "../physics/contactGeometry";
+import { type Capsule, attackCapsule, emptyCapsule, placeCapsule } from "../sim/geometry/contactGeometry";
 import { AttackStyle } from "../sim/codes";
 import { fighterPoseFacing } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";

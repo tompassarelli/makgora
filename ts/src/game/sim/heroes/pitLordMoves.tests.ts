@@ -1,5 +1,5 @@
 import { assertGreaterThan, assertLessThan, assertTrue, test } from "wisp/src/runtime/testing";
-import { hurtCapsule } from "../../physics/contactGeometry";
+import { hurtCapsule } from "../geometry/contactGeometry";
 import { Character } from "../codes";
 import { heroBody } from "./heroBodies";
 

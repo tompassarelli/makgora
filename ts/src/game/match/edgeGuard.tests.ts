@@ -1,5 +1,5 @@
 import { assertDefined, assertEquals, test } from "wisp/src/runtime/testing";
-import { sweep } from "../../runtime/sweep";
+import { sweep } from "../core/sweep";
 import { Character } from "../sim/codes";
 import { SELECTABLE_CHARACTERS, fighterName } from "../sim/heroes/registry";
 import { EDGE_GUARD_SCENARIOS, MIXED_PLANS, OPENING_MIN, PREDICTABLE, guardedReturn, playScenario, recoveryProfile, unguarded } from "./edgeGuardScenarios";

@@ -3,7 +3,7 @@
 
 
 
-import { INPUT_TRACE_FILE, traceEndLines } from "../../runtime/gameFiles";
+import { INPUT_TRACE_FILE, traceEndLines } from "../../game/core/gameFiles";
 import { floorMod } from "wisp/src/sim/intMath";
 import type { ParticipantSlot, Slots } from "../../game/input/participants";
 import { writeLines } from "wisp/src/platform/fileio";

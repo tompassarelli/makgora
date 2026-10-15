@@ -4,7 +4,7 @@
 import { EDITBOX_CAPACITY, type EditboxFailure, EditboxSession, pauseLabel } from "../game/netcode/journal/editbox";
 import { trampoline } from "wisp/src/platform/dispatch";
 import { readChunk, writeLine } from "wisp/src/platform/fileio";
-import { nativeChatFile } from "../runtime/gameFiles";
+import { nativeChatFile } from "../game/core/gameFiles";
 
 
 export const EDITBOX_ENTER = "journal.editboxEnter";

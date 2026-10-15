@@ -4,8 +4,8 @@
 
 import { f32 } from "wisp/src/sim/f32";
 import { at } from "wisp/src/runtime/lookup";
-import { heroBody } from "../sim/heroes/heroBodies";
-import { Character } from "../sim/codes";
+import { heroBody } from "../heroes/heroBodies";
+import { Character } from "../codes";
 
 
 export interface Capsule {

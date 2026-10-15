@@ -9,7 +9,7 @@ import { classicRoute } from "../src/game/classic/routes";
 import { RunOutcome } from "../src/game/classic/runState";
 import { LORE_BATTLES } from "../src/game/classic/loreBattles";
 import { createMatchState, Phase } from "../src/game/match/rules";
-import { INTEGRITY_BUILD } from "../src/game/shell/currentBuild";
+import { INTEGRITY_BUILD } from "../src/game/session/currentBuild";
 import { Character } from "../src/game/sim/codes";
 import { createFighter } from "../src/game/sim/fighter";
 import { createRoster } from "../src/game/sim/roster";

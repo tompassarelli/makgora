@@ -6,7 +6,7 @@
 import { writeRepro } from "wisp/src/platform/repro";
 import { reproFile } from "wisp/src/runtime/repro";
 import { beginMomentSave, continueMomentSave, isMomentRequest, momentInput, momentRequest } from "../../game/replay/moment";
-import { journalIngress } from "../../game/shell/build";
+import { journalIngress } from "../../game/session/build";
 import { consumeEditbox, peekEditbox } from "./journal";
 import { type Journal, type Rollback, type ShellState, localSlot } from "./state";
 

@@ -3,7 +3,7 @@
 
 
 import { f32 } from "wisp/src/sim/f32";
-import type { Capsule } from "../physics/contactGeometry";
+import type { Capsule } from "../sim/geometry/contactGeometry";
 import { HitAreaKind, type HitAreaList, collectHitAreas, createHitAreaList } from "../presentation/hitAreas";
 import type { Fighter } from "../sim/fighter";
 import { cosineTurns, sineTurns } from "../sim/mathTables";

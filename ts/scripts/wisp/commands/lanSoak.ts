@@ -12,8 +12,8 @@ import { preloadLines } from "wisp/scripts/wisp/preloadRecord";
 import { nativeChatEntryReceipt } from "../boundary";
 import { onHealthyClients } from "../doctor";
 import { pollUntil } from "../../hostPoll";
-import { NATIVE_SOAK_FILE, nativeChatFile } from "../../../src/runtime/gameFiles";
-import { INTEGRITY_BUILD } from "../../../src/game/shell/currentBuild";
+import { NATIVE_SOAK_FILE, nativeChatFile } from "../../../src/game/core/gameFiles";
+import { INTEGRITY_BUILD } from "../../../src/game/session/currentBuild";
 
 class NativeSoakFailure extends Schema.TaggedError<NativeSoakFailure>()("NativeSoakFailure", { problem: Schema.String }) {
   override get message(): string { return this.problem; }

@@ -1,7 +1,7 @@
 import { mutableProjectile } from "./fighterProjectiles";
 import { floorMod } from "wisp/src/sim/intMath";
 import { assertEquals, assertFalse, assertGreaterThan, assertNear, assertTrue, test } from "wisp/src/runtime/testing";
-import { max } from "../../runtime/numbers";
+import { max } from "../core/numbers";
 import { addFloat32, divideFloat32 } from "wisp/src/sim/binary32";
 import { f32 } from "wisp/src/sim/f32";
 import { resolveAttacks } from "./attacks";

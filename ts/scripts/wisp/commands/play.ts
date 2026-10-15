@@ -17,9 +17,9 @@ import { platformLayer } from "wisp/scripts/platform/layer";
 import { GameFiles, dataDirectory, readGameFile } from "wisp/scripts/wisp/gameFiles";
 import { type PlayDeclaration, type PlayGame, PlayProblem } from "wisp/scripts/wisp/play";
 import { CPU_OPPONENT_DEFAULT, CPU_TIER_DEFAULT, type CpuOpponentChoice, type CpuTier } from "../../../src/game/match/cpuProfiles";
-import { playtestRequest } from "../../../src/game/shell/playtest";
+import { playtestRequest } from "../../../src/game/session/playtest";
 import { MeleeReady, PLAYTEST_GO_FILE, PLAYTEST_REQUEST_FILE, playtestReceiptFile } from "../boundary";
-import { MELEE_READY_FILE } from "../../../src/runtime/gameFiles";
+import { MELEE_READY_FILE } from "../../../src/game/core/gameFiles";
 import { clientState, gameFilesLayer } from "../project";
 import { accountField, smashcraftWatch } from "../doctor";
 import { currentPlaytest } from "../currentPlaytest";
@@ -28,7 +28,7 @@ import { pollUntil } from "../../hostPoll";
 import { installLatest } from "../mapLibrary";
 import { reserveStatus } from "../playtestReserve";
 import type { Command } from "wisp/scripts/wisp/command";
-import { PLAYABLE_BUILD } from "../../../src/game/shell/currentBuild";
+import { PLAYABLE_BUILD } from "../../../src/game/session/currentBuild";
 import type { PlayTools } from "wisp/scripts/platform/play";
 
 interface Playtest {

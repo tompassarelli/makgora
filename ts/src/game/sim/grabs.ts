@@ -1,5 +1,5 @@
 
-import { min } from "../../runtime/numbers";
+import { min } from "../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
 import { at } from "wisp/src/runtime/lookup";

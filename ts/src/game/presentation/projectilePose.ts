@@ -2,7 +2,7 @@ import { f32 } from "wisp/src/sim/f32";
 import type { Fighter } from "../sim/fighter";
 import { heroProjectileRadius, projectileActive } from "../sim/projectiles";
 import { ProjectileKind } from "../sim/codes";
-import { meleeAtan2 } from "../../sim/meleeScalarMath";
+import { meleeAtan2 } from "../core/math/meleeScalarMath";
 
 interface ProjectilePose {
   visible: boolean;

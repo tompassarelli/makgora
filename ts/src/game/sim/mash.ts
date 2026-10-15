@@ -1,6 +1,6 @@
 
 
-import { max, min } from "../../runtime/numbers";
+import { max, min } from "../core/numbers";
 import type { Controls } from "./roster";
 
 

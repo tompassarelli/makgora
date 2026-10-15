@@ -3,7 +3,7 @@
 
 
 import { assertEquals, assertGreaterThan, assertTrue } from "wisp/src/runtime/testing";
-import { sweep, sweepSeed } from "../../runtime/sweep";
+import { sweep, sweepSeed } from "../core/sweep";
 import { floorDiv } from "wisp/src/sim/intMath";
 import { attackBuffer, clearAttackBuffer } from "../input/attackBuffer";
 import { PARTICIPANT_SLOTS } from "../input/participants";

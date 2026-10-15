@@ -12,7 +12,7 @@ import { Phase } from "../../match/rules";
 import { stepMatch } from "../../match/step";
 import { firstFighterDifference } from "../../replay/difference";
 import { copyReplayState, createReplaySnapshot } from "../../replay/snapshot";
-import { max } from "../../../runtime/numbers";
+import { max } from "../../core/numbers";
 import { CANDLE_DROP_KNOCKBACK, CANDLE_GUARD_FRAMES, CANDLE_HEAT_PER_DAMAGE, CANDLE_LEVEL_HEAT, CANDLE_UNTOUCHED_FRAMES, advanceCandleBodies, candleLevel } from "./koboldCandle";
 
 test("Kobold's candle gains 8 heat per whole percent he lands, at most 75 a hit, burns down 1 every third frame and goes out with his stock [k3 measure docs/design/roster.md]", () => {

@@ -1,8 +1,8 @@
 
 
 
-import type { MapBuild } from "../game/shell/build";
-import { PLAYABLE_BUILD } from "../game/shell/currentBuild";
+import type { MapBuild } from "../game/session/build";
+import { PLAYABLE_BUILD } from "../game/session/currentBuild";
 import { installFrameMeter, startMatchFrameMeter } from "./frameMeter";
 import { install as installGame, startBuild } from "./main";
 

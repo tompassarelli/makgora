@@ -1,5 +1,5 @@
 import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
-import { sweep } from "../../runtime/sweep";
+import { sweep } from "../core/sweep";
 import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
 import { queueAttack } from "../input/attackBuffer";

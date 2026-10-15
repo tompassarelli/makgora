@@ -22,12 +22,12 @@
   smashcraft:ts/tsconfig.json's `include` so `bun run check` type-checks it.
 
 - Sweeps: a test that plays many matches, a whole roster or every stage is a
-  sweep: register it with `sweep()` (smashcraft:ts/src/runtime/sweep.ts, or
+  sweep: register it with `sweep()` (smashcraft:ts/src/game/core/sweep.ts, or
   smashcraft:ts/test/sweep.ts in Bun-only files) and keep its smallest form,
   such as one seeded match, as an ordinary test. The suite skips sweeps;
   `SWEEPS=1 bun run test` and `SWEEPS=1 bun scripts/lua-tests.ts` run only
   them. `SWEEP_PLACEMENT=gate` runs only the short allowlist in
-  smashcraft:ts/src/runtime/gateSweeps.ts (one cheap seeded representative
+  smashcraft:ts/src/game/core/gateSweeps.ts (one cheap seeded representative
   of a family no ordinary test protects at landing);
   `SWEEP_PLACEMENT=background` runs every other sweep. Background sweeps runs
   them on hosted runners on every landed main SHA and nightly, at most three
@@ -84,7 +84,7 @@
 
 - Seed offsets: `SWEEP_SEED_OFFSET=N SWEEPS=1 bun test test/game.test.ts`
   shifts every computer sweep's match seeds by N (`sweepSeed()` in
-  smashcraft:ts/src/runtime/sweep.ts). A computer-behaviour sweep is a
+  smashcraft:ts/src/game/core/sweep.ts). A computer-behaviour sweep is a
   property whose title states its threshold and the range seen on three
   unrelated offsets, or a measurement with a tolerance band (#394).
 

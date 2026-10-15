@@ -69,7 +69,7 @@
     "src/platform/**",
     "src/game/ui/**",
     "src/game/render/**",
-    "src/parity/lua-entry.ts",
+    "src/game/host/entries/parityMain.ts",
     "scripts/wisp/perfLua.ts",
     "scripts/wisp/memoryLua.ts",
     "scripts/wisp/handleBaselineLua.ts",
