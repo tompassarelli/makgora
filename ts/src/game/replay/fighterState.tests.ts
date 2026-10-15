@@ -5,7 +5,10 @@ import { firstFighterDifference, sameReplayState } from "./difference";
 import { copyFighterState, sameFighterState } from "../../generated/state/fighterState";
 import { createRoster } from "../sim/roster";
 import { type FighterTuning } from "../sim/tuning";
-import { SELECTABLE_CHARACTERS } from "../sim/heroes/registry";
+import { HERO_ROSTER, SELECTABLE_CHARACTERS } from "../sim/heroes/registry";
+import type { AuthoredSpecial, SpecialPlacement, SpecialProjectile } from "../sim/heroSpecials";
+import { FIGHTER_FIELDS, type FighterFieldRow } from "../sim/state/fighterSchema";
+import { stateHash } from "./canonical";
 import { type ReplayState, createReplaySnapshot } from "./snapshot";
 
 interface LeafPair {
@@ -220,5 +223,133 @@ test("the comparators repair trusts tell apart every changed fighter field, and 
     leaf.setRight(original);
   }
   assertTrue(same());
+  assertEquals(misses.join("; "), "");
+});
+
+interface SchemaLeaf {
+  readonly list: unknown[] | undefined;
+  readonly record: Field | undefined;
+  readonly key: string;
+  readonly index: number;
+}
+
+// `[]` takes the last element, or the first where Lua reads a list of undefined slots as empty.
+function schemaLeaf(fighter: Fighter, path: string): SchemaLeaf {
+  const parts = path.split(".");
+  let holder: Field = fighter as unknown as Field;
+  for (let at = 0; at < parts.length; at++) {
+    const part = parts[at] ?? "";
+    const indexed = part.endsWith("[]");
+    const key = indexed ? part.slice(0, -2) : part;
+    const last = at === parts.length - 1;
+    if (indexed) {
+      const list = holder[key] as unknown[];
+      if (last) return { list, record: undefined, key, index: Math.max(0, list.length - 1) };
+      holder = list[list.length - 1] as Field;
+      continue;
+    }
+    if (last) return { list: undefined, record: holder, key, index: 0 };
+    if (at > 0 && parts[0] === "tuning") holder[key] = { ...(holder[key] as Field) };
+    holder = holder[key] as Field;
+  }
+  throw new Error(`${path} names no leaf`);
+}
+
+const leafValue = (leaf: SchemaLeaf): unknown => (leaf.list === undefined ? leaf.record?.[leaf.key] : leaf.list[leaf.index]);
+
+function setLeaf(leaf: SchemaLeaf, value: unknown): void {
+  if (leaf.list !== undefined) leaf.list[leaf.index] = value;
+  else if (leaf.record !== undefined) leaf.record[leaf.key] = value;
+}
+
+function specialForms(): AuthoredSpecial[] {
+  const forms: AuthoredSpecial[] = [];
+  for (const hero of HERO_ROSTER) {
+    const specials = hero.specials;
+    if (specials === undefined) continue;
+    for (const kit of [specials.neutral, specials.side, specials.up, specials.down]) {
+      forms.push(kit.ground);
+      if (kit.air !== undefined) forms.push(kit.air);
+    }
+  }
+  return forms;
+}
+
+function companionPlacement(): SpecialPlacement {
+  for (const form of specialForms()) if (form.placement?.companion !== undefined) return form.placement;
+  throw new Error("no authored placement has a companion");
+}
+
+function authoredProjectile(): SpecialProjectile {
+  for (const form of specialForms()) {
+    const projectile = form.projectiles?.[0];
+    if (projectile !== undefined) return projectile;
+  }
+  throw new Error("no authored special has a projectile");
+}
+
+function mutatedValue(row: FighterFieldRow, value: unknown): unknown {
+  if (typeof value === "boolean") return !value;
+  if (row.type === "ref" || row.type === "optionalRef") {
+    const writer = row.canon === "none" ? undefined : row.canon.writer;
+    if (writer === "digest" || writer === "specText") {
+      if (value !== undefined) return undefined;
+      return row.path.startsWith("projectiles") ? authoredProjectile() : companionPlacement();
+    }
+    return value === undefined ? {} : { ...(value as Field) };
+  }
+  if (typeof value === "number") return row.type === "real" ? value + 0.5 : value + 1;
+  if (value === undefined) return 1;
+  return undefined;
+}
+
+interface Armed {
+  readonly base: Fighter;
+  readonly changed: Fighter;
+  readonly hash: string;
+}
+
+const alone = (snapshot: ReplayState, fighter: Fighter): ReplayState => ({ ...snapshot, world: createRoster(1, [fighter]) });
+
+function armedFighters(row: FighterFieldRow, armed: Map<string, Armed>, snapshot: ReplayState): Armed {
+  const when = (row.canon === "none" ? [] : row.canon.when ?? []).filter((guard) => ["kobold", "condition", "poison", "buff", "companion"].includes(guard));
+  const key = when.join();
+  const known = armed.get(key);
+  if (known !== undefined) return known;
+  const base = createFighter(when.includes("kobold") ? Character.kobold : Character.beastmaster, 0.0, 1);
+  if (when.includes("condition")) base.status.condition = 1;
+  if (when.includes("poison")) base.status.poisonFrames = 3;
+  if (when.includes("buff")) base.status.buff = 1;
+  if (when.includes("companion")) {
+    base.placed.spec = companionPlacement();
+    for (const animal of base.pack) animal.spec = base.placed.spec;
+  }
+  const fighters = { base, changed: createFighter(base.character, 0.0, 1), hash: stateHash(alone(snapshot, base)) };
+  armed.set(key, fighters);
+  return fighters;
+}
+
+test("every Fighter schema row, changed alone, is told apart by sameFighterState and changes stateHash unless its canon is none [k2 property]", () => {
+  const misses: string[] = [];
+  const armed = new Map<string, Armed>();
+  const snapshot = createReplaySnapshot();
+  let rows = 0;
+  for (const row of FIGHTER_FIELDS) {
+    const { base, changed, hash } = armedFighters(row, armed, snapshot);
+    copyFighterState(changed, base, 1);
+    if (!sameFighterState(changed, base)) misses.push(`${row.path}: the copy differs`);
+    if (row.type === "length") {
+      const list = leafValue(schemaLeaf(changed, row.path.slice(0, -".length".length))) as unknown[];
+      list.length = list.length - 1;
+    } else {
+      const leaf = schemaLeaf(changed, row.path);
+      setLeaf(leaf, mutatedValue(row, leafValue(leaf)));
+    }
+    if (sameFighterState(changed, base)) misses.push(`${row.path}: sameFighterState`);
+    const hashed = row.canon !== "none" || row.type === "length";
+    if ((stateHash(alone(snapshot, changed)) !== hash) !== hashed) misses.push(`${row.path}: stateHash ${hashed ? "unchanged" : "changed"}`);
+    rows++;
+  }
+  assertEquals(rows, FIGHTER_FIELDS.length);
   assertEquals(misses.join("; "), "");
 });

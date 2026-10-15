@@ -1,5 +1,5 @@
 import { FIGHTER_ARRAYS, FIGHTER_CONSTANTS, FIGHTER_FIELDS, FIGHTER_GROUPS, FIGHTER_SAME_ORDER } from "../src/game/sim/state/fighterSchema";
-import type { FighterArray, FighterFieldRow, FighterGroup } from "../src/game/sim/state/fighterSchema";
+import type { CanonColumn, CanonKit, FighterArray, FighterFieldRow, FighterGroup, Guard } from "../src/game/sim/state/fighterSchema";
 
 export const output = "src/generated/state/fighterState.ts";
 export const producer = "ts/codegen/fighterState.ts";
@@ -196,6 +196,211 @@ const body = (mode: "copy" | "same"): string[] => {
   return lines;
 };
 
+const imported = new Map<string, string>();
+const use = (name: string, module: string) => {
+  imported.set(name, module);
+  return name;
+};
+
+const FIELD_GUARDS: Readonly<Partial<Record<Guard, (value: string) => string>>> = {
+  nonzero: (value) => `${value} !== 0`,
+  nonzeroSigned: (value) => `${value} !== 0 || 1 / ${value} < 0`,
+  cooldownSlot: (value) => `i < ${use("SpecialAction", "sim/codes")}.heroNeutral || ${value} !== 0`,
+  defined: (value) => `${value} !== undefined`,
+};
+
+const GROUP_GUARDS: Readonly<Partial<Record<Guard, () => string>>> = {
+  kobold: () => `fighter.character === ${use("Character", "sim/codes")}.kobold`,
+  specials: () => "tuning.specials !== undefined",
+  beamPair: () => "special.beamX !== 0 || special.beamZ !== 0 || 1 / special.beamX < 0 || 1 / special.beamZ < 0",
+  buff: () => "status.buff !== 0 || status.buffFrames !== 0",
+  condition: () => "status.condition !== 0 || anyNonzero(status.conditionImmunity)",
+  poison: () => "status.poisonFrames !== 0",
+};
+
+const ELEMENT_GUARDS: Readonly<Partial<Record<Guard, () => string>>> = {
+  companion: () => "placed.spec?.companion !== undefined",
+};
+
+const KIT_TYPES: Readonly<Record<CanonKit, string>> = {
+  moves: 'Readonly<Fighter>["tuning"]["moves"]',
+  specials: 'Readonly<Fighter>["tuning"]["specials"]',
+  placedSpec: 'Readonly<Fighter>["placed"]["spec"]',
+  projectileSpec: 'NonNullable<Readonly<Fighter>["projectiles"][number]["spec"]>',
+};
+
+interface CanonScope {
+  readonly key: string;
+  readonly open: readonly string[];
+}
+
+const groupLocal = (key: string) => {
+  const group = FIGHTER_GROUPS.find((candidate) => candidate.key === key);
+  if (group === undefined) throw new Error(`no group ${key}`);
+  return group.local;
+};
+
+const canonOf = (row: FighterFieldRow): CanonColumn => {
+  if (row.canon === "none") throw new Error(`${row.path} is not canonical`);
+  return row.canon;
+};
+
+const nameExpression = (name: string, animal: boolean) => {
+  if (animal) {
+    if (!name.startsWith("placed")) throw new Error(`${name} must start with placed`);
+    return `\`\${animalName}${name.slice("placed".length)}\``;
+  }
+  return name.includes("${") ? `\`${name}\`` : JSON.stringify(name);
+};
+
+const canonWalk = (): { readonly locals: readonly string[]; readonly body: readonly string[] } => {
+  const lines: string[] = [];
+  const locals = new Set<string>();
+  const open: CanonScope[] = [];
+  let loops = 0;
+  let lastLoop = "";
+  const local = (key: string) => {
+    locals.add(key);
+    return groupLocal(key);
+  };
+  const indentOf = (depth: number) => "  ".repeat(depth + 1);
+  for (const row of FIGHTER_FIELDS) {
+    if (row.canon === "none" || row.path.startsWith("pack[]")) continue;
+    const canon = canonOf(row);
+    const when = canon.when ?? [];
+    for (const guard of when) if (FIELD_GUARDS[guard] === undefined && GROUP_GUARDS[guard] === undefined && ELEMENT_GUARDS[guard] === undefined) throw new Error(`${row.path}: unknown guard ${guard}`);
+    const scopes: CanonScope[] = [];
+    for (const guard of when) {
+      const expression = GROUP_GUARDS[guard];
+      if (expression !== undefined) scopes.push({ key: `guard:${guard}`, open: [`if (${expression()}) {`] });
+    }
+    const animal = row.path.startsWith("placed.");
+    if (animal) {
+      scopes.push({
+        key: "loop:pack",
+        open: [
+          "for (let animal = 0; animal <= fighter.pack.length; animal++) {",
+          "  const placed = placedObject(fighter, animal);",
+          '  const animalName = animal === 0 ? "placed" : `pack[${animal - 1}]`;',
+        ],
+      });
+    }
+    for (const guard of when) {
+      const expression = ELEMENT_GUARDS[guard];
+      if (expression === undefined) continue;
+      if (!animal) throw new Error(`${row.path}: ${guard} guards a placed object`);
+      scopes.push({ key: `guard:${guard}`, open: [`if (${expression()}) {`] });
+    }
+    const array = arrayOf(row);
+    let value: string;
+    if (array === undefined) {
+      const dot = row.path.indexOf(".");
+      if (animal) value = `placed.${row.path.slice("placed.".length)}`;
+      else if (dot < 0) value = `fighter.${row.path}`;
+      else value = `${local(row.path.slice(0, dot))}.${row.path.slice(dot + 1)}`;
+    } else {
+      const loop = canon.sharedLoop === true ? lastLoop : `loop:${array.path}#${loops++}`;
+      if (canon.sharedLoop === true && !lastLoop.startsWith(`loop:${array.path}#`)) throw new Error(`${row.path} shares no ${array.path} loop`);
+      lastLoop = loop;
+      const owner = array.path.includes(".") ? array.path.slice(0, array.path.indexOf(".")) : "";
+      const container = animal ? `placed.${array.path.slice(array.path.indexOf(".") + 1)}` : owner === "" ? `fighter.${array.path}` : `${local(owner)}.${array.path.slice(owner.length + 1)}`;
+      const head = `for (let i = 0; i < ${capacity(array)}; i++) {`;
+      if (array.layout === "fieldMajor") {
+        const element = array.path === "projectiles" ? "projectile" : "entry";
+        scopes.push({ key: loop, open: [head, `  const ${element} = ${use("at", "wisp/src/runtime/lookup")}(${container}, i);`] });
+        value = `${element}.${leaf(row, `${array.path}[].`)}`;
+      } else if (array.layout === "scalarArray") {
+        scopes.push({ key: loop, open: [head] });
+        value = `${container}[i]${array.fallback === undefined ? "" : ` ?? ${array.fallback}`}`;
+      } else throw new Error(`${row.path}: ${array.layout} is not a canonical loop`);
+    }
+    let shared = 0;
+    while (shared < open.length && shared < scopes.length && open[shared]?.key === scopes[shared]?.key) shared++;
+    while (open.length > shared) {
+      open.pop();
+      lines.push(`${indentOf(open.length)}}`);
+    }
+    for (const scope of scopes.slice(shared)) {
+      const indent = indentOf(open.length);
+      for (const line of scope.open) lines.push(`${indent}${line}`);
+      open.push(scope);
+    }
+    const indent = indentOf(open.length);
+    const name = nameExpression(canon.name, animal);
+    const fieldGuards = when.filter((guard) => FIELD_GUARDS[guard] !== undefined);
+    if (fieldGuards.length > 1) throw new Error(`${row.path} has more than one field guard`);
+    const fieldGuard = fieldGuards[0];
+    let guarded = "";
+    if (fieldGuard !== undefined) {
+      if (!/^[\w.]+$/.test(value)) {
+        lines.push(`${indent}const value = ${value};`);
+        value = "value";
+      }
+      guarded = `if (${FIELD_GUARDS[fieldGuard]?.(value)}) `;
+    }
+    const kit = () => {
+      if (canon.kit === undefined) throw new Error(`${row.path} names no kit`);
+      return canon.kit;
+    };
+    const named = animal ? `\`\${prefix}.\${animalName}${canon.name.slice("placed".length)}\`` : `\`\${prefix}.${canon.name}\``;
+    switch (canon.writer) {
+      case "int": lines.push(`${indent}${guarded}sink.int(prefix, ${name}, ${value});`); break;
+      case "real": lines.push(`${indent}${guarded}sink.real(prefix, ${name}, ${value});`); break;
+      case "bool": lines.push(`${indent}${guarded}sink.bool(prefix, ${name}, ${value});`); break;
+      case "boolAsInt": lines.push(`${indent}${guarded}sink.int(prefix, ${name}, ${value} ? 1 : 0);`); break;
+      case "flagInt": lines.push(`${indent}if (${value}) sink.int(prefix, ${name}, 1);`); break;
+      case "flagBool": lines.push(`${indent}if (${value}) sink.bool(prefix, ${name}, true);`); break;
+      case "optionalInt": lines.push(`${indent}${guarded}sink.int(prefix, ${name}, ${value} ?? -1);`); break;
+      case "slotRef": lines.push(`${indent}${guarded}sink.int(prefix, ${name}, kits.slot(${value}, participantMask));`); break;
+      case "digest": lines.push(`${indent}${guarded}sink.text(kits.${kit()}(${named}, ${value}));`); break;
+      case "specText": lines.push(`${indent}${guarded}sink.text(kits.${kit()}(${value}, ${named}));`); break;
+    }
+    if ((canon.writer === "flagInt" || canon.writer === "flagBool") && fieldGuard !== undefined) throw new Error(`${row.path}: a flag writer takes no field guard`);
+    if ((canon.writer === "digest" || canon.writer === "specText") !== (canon.kit !== undefined)) throw new Error(`${row.path}: only digest and specText writers name a kit`);
+  }
+  while (open.length > 0) {
+    open.pop();
+    lines.push(`${indentOf(open.length)}}`);
+  }
+  const declared = FIGHTER_GROUPS.filter((group) => locals.has(group.key)).map((group) => `  const ${group.local} = fighter.${group.key};`);
+  return { locals: declared, body: lines };
+};
+
+const kitInterface = (): string[] => [
+  "export interface FighterFieldSink {",
+  "  int(prefix: string, name: string, value: number): void;",
+  "  bool(prefix: string, name: string, value: boolean): void;",
+  "  real(prefix: string, name: string, value: number): void;",
+  "  text(fragment: string): void;",
+  "}",
+  "",
+  "export interface FighterKitText {",
+  "  slot(slot: number | undefined, participantMask: number): number;",
+  ...(Object.keys(KIT_TYPES) as CanonKit[]).map((kit) =>
+    kit === "projectileSpec" ? `  ${kit}(spec: ${KIT_TYPES[kit]}, prefix: string): string;` : `  ${kit}(name: string, kit: ${KIT_TYPES[kit]}): string;`),
+  "}",
+  "",
+  "function anyNonzero(values: readonly number[]): boolean {",
+  "  for (let i = 0; i < values.length; i++) if (values[i] !== 0) return true;",
+  "  return false;",
+  "}",
+];
+
+const checkPackCanon = () => {
+  for (const row of FIGHTER_FIELDS.filter((candidate) => candidate.path.startsWith("pack[]."))) {
+    const placed = FIGHTER_FIELDS.find((candidate) => candidate.path === `placed.${row.path.slice("pack[].".length)}`);
+    if (placed === undefined) throw new Error(`${row.path} has no placed row`);
+    if (row.canon === "none" || placed.canon === "none") {
+      if (row.canon !== placed.canon) throw new Error(`${row.path} and its placed row disagree on canon`);
+      continue;
+    }
+    const expected = `pack[\${animal-1}]${placed.canon.name.slice("placed".length)}`;
+    if (row.canon.name !== expected || row.canon.writer !== placed.canon.writer || (row.canon.when ?? []).join() !== (placed.canon.when ?? []).join() || row.canon.kit !== placed.canon.kit) {
+      throw new Error(`${row.path} canon must mirror ${placed.path} as ${expected}`);
+    }
+  }
+};
+
 const checkCoverage = () => {
   const known = new Set(FIGHTER_GROUPS.map((group) => group.key));
   for (const row of FIGHTER_FIELDS) {
@@ -209,22 +414,31 @@ const checkCoverage = () => {
 
 export function renderFighterState(): string {
   checkCoverage();
+  checkPackCanon();
   used.clear();
+  imported.clear();
   const copy = body("copy");
   const same = body("same");
   const projectiles = projectileFunctions();
-  const constants = [...used].sort();
-  const modules = new Map<string, string[]>();
-  for (const name of constants) {
+  const canon = canonWalk();
+  for (const name of used) {
     const module = FIGHTER_CONSTANTS[name];
     if (module === undefined) throw new Error(`no module for ${name}`);
+    use(name, module);
+  }
+  const modules = new Map<string, string[]>();
+  for (const name of [...imported.keys()].sort()) {
+    const module = imported.get(name) ?? "";
     modules.set(module, [...(modules.get(module) ?? []), name]);
   }
+  const specifier = (module: string) => (module.startsWith("wisp/") ? module : `../../game/${module}`);
+  const fighterNames = ["createPlacedObject", "packSpares", "placedObject", ...(modules.get("sim/fighter") ?? [])].sort();
+  modules.delete("sim/fighter");
   return [
     `// Generated by ${producer}; regenerate instead of editing.`,
-    'import { createPlacedObject, packSpares, placedObject } from "../../game/sim/fighter";',
+    `import { ${fighterNames.join(", ")} } from "../../game/sim/fighter";`,
     'import type { Fighter } from "../../game/sim/fighter";',
-    ...[...modules].map(([module, names]) => `import { ${names.join(", ")} } from "../../game/${module}";`),
+    ...[...modules].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)).map(([module, names]) => `import { ${names.join(", ")} } from "${specifier(module)}";`),
     "",
     "const retained = (activeMask: number, slot: number | undefined) =>",
     "  (slot !== undefined && activeMask > 0 && activeMask < 16 && slot >= 0 && slot < 4 && (activeMask & (1 << slot)) !== 0 ? slot : undefined);",
@@ -240,6 +454,13 @@ export function renderFighterState(): string {
     "export function sameFighterState(target: Readonly<Fighter>, source: Readonly<Fighter>): boolean {",
     ...same,
     "  return true;",
+    "}",
+    "",
+    ...kitInterface(),
+    "",
+    "export function writeFighterFields(sink: FighterFieldSink, prefix: string, fighter: Readonly<Fighter>, participantMask: number, kits: FighterKitText): void {",
+    ...canon.locals,
+    ...canon.body,
     "}",
     "",
   ].join("\n");

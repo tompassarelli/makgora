@@ -1,23 +1,22 @@
-import { placedObject } from "../sim/fighter";
+import { type FighterFieldSink, type FighterKitText, writeFighterFields } from "../../generated/state/fighterState";
 
 
 
 
 
 import { attackBufferCanonicalState } from "../input/attackBuffer";
-import { PARTICIPANT_CAPACITY, PARTICIPANT_SLOTS, participantActive, type Slots } from "../input/participants";
+import { PARTICIPANT_SLOTS, participantActive, type Slots } from "../input/participants";
 import { at } from "wisp/src/runtime/lookup";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import type { BotObservationFrame } from "../match/botPerception";
-import { AttackStyle, Character, GrabAction, LAST_ATTACK_STYLE, SPECIAL_ACTION_CAPACITY, SpecialAction } from "../sim/codes";
+import { AttackStyle, GrabAction, LAST_ATTACK_STYLE } from "../sim/codes";
 import type { FighterMoves } from "../sim/heroMoves";
 import type { AuthoredSpecial, FighterSpecials, SpecialPlacement, SpecialProjectile } from "../sim/heroSpecials";
 import type { HitEffect } from "../sim/hitRegions";
 import { type HurtPart, HurtState } from "../sim/hurtboxes";
-import { HERO_STATUS_GROUPS } from "../sim/codes";
 import { writeMatchItems } from "../match/items";
 import { writeMatchMeterDrops } from "../match/meterDrops";
-import { PROJECTILE_CAPACITY, type Fighter } from "../sim/fighter";
+import type { Fighter } from "../sim/fighter";
 import { CONTROL_FIELDS, fighterAt, isActive } from "../sim/roster";
 import { writeTrainingState } from "../match/trainingState";
 import { writeConfiguredRun } from "../classic/runState";
@@ -566,11 +565,7 @@ export function canonicalChecksum(text: string): string {
 type Emit = (fragment: string) => void;
 
 /** Where writeState sends each field: canonical text, or the per-frame state hash. */
-interface StateSink {
-  int(prefix: string, name: string, value: number): void;
-  bool(prefix: string, name: string, value: boolean): void;
-  real(prefix: string, name: string, value: number): void;
-  text(fragment: string): void;
+interface StateSink extends FighterFieldSink {
   observation(name: string, sample: Readonly<BotObservationFrame>): void;
 }
 
@@ -614,6 +609,14 @@ function kitDigestField<K>(name: string, kit: K | undefined, digests: Map<K, str
   return `|${name}.digest=${digest}`;
 }
 
+
+const FIGHTER_KITS: FighterKitText = {
+  slot: (slot, participantMask) => canonicalSlot(slot, participantMask),
+  moves: (name, moves) => kitDigestField(name, moves, MOVES_DIGESTS, fighterMovesCanonical),
+  specials: (name, specials) => kitDigestField(name, specials, SPECIALS_DIGESTS, fighterSpecialsCanonical),
+  placedSpec: (name, spec) => kitDigestField(name, spec, PLACEMENT_DIGESTS, placedSpecCanonical),
+  projectileSpec: (spec, prefix) => specialProjectileCanonical(spec, prefix),
+};
 
 export function observedOpponentKitCanonical(fighter: Readonly<Fighter>): string {
   return kitDigestField("moves", fighter.tuning.moves, MOVES_DIGESTS, fighterMovesCanonical)
@@ -767,403 +770,6 @@ export function botObservationCanonical(sample: Readonly<BotObservationFrame>): 
   return parts.join("");
 }
 
-function writeFighter(sink: StateSink, prefix: string, fighter: Readonly<Fighter>, participantMask: number): void {
-  const int = (name: string, value: number) => sink.int(prefix, name, value);
-  const bool = (name: string, value: boolean) => sink.bool(prefix, name, value);
-  const real = (name: string, value: number) => sink.real(prefix, name, value);
-  const reference = (name: string, slot: number | undefined) => int(name, canonicalSlot(slot, participantMask));
-  const t = fighter.tuning;
-  const m = fighter.motion;
-  const g = fighter.ground;
-  const j = fighter.jump;
-  const l = fighter.launch;
-  const s = fighter.shield;
-  const a = fighter.attack;
-  const sp = fighter.special;
-  const v = fighter.visuals;
-  const sr = fighter.surfaceRecovery;
-  const gr = fighter.grab;
-  const ledge = fighter.ledge;
-  const st = fighter.status;
-
-  int("ceilingTechImpulseFrame", t.tech.ceilingImpulseFrame);
-  int("ceilingTechAnimationEndFrame", t.tech.ceilingAnimationEndFrame);
-  int("wallTechAnimationEndFrame", t.tech.wallAnimationEndFrame);
-  int("wallJumpTechAnimationEndFrame", t.tech.wallJumpAnimationEndFrame);
-  int("dashGrabWindow", g.dashGrabWindow);
-  int("groundAction", g.action);
-  int("groundActionFrame", g.actionFrame);
-  int("groundRunBrakeFramesRemaining", g.runBrakeFramesRemaining);
-  int("groundTurnRunEntryFacing", g.turnRunEntryFacing);
-  int("groundRules.dashRunEnableFrame", t.ground.dashRunEnableFrame);
-  int("groundRules.turnRunFacingCommandFrame", t.ground.turnRunFacingCommandFrame);
-  int("groundRules.turnRunAnimationEndFrame", t.ground.turnRunAnimationEndFrame);
-  int("groundRules.runBrakeTurnCommandEndFrame", t.ground.runBrakeTurnCommandEndFrame);
-  int("groundRules.runBrakeAnimationEndFrame", t.ground.runBrakeAnimationEndFrame);
-  int("groundRules.runBrakeMaximumFrames", t.ground.runBrakeMaximumFrames);
-  int("dashGrabTiming.startupFrames", t.dashGrab.startupFrames);
-  int("dashGrabTiming.activeFrames", t.dashGrab.activeFrames);
-  int("dashGrabTiming.totalFrames", t.dashGrab.totalFrames);
-  bool("dashGrabAttack", a.dashGrab);
-  bool("pivotGrabAttack", a.pivotGrab);
-  bool("groundTurnRunFacingCommandLatched", g.turnRunFacingCommandLatched);
-  bool("groundTurnRunPausePending", g.turnRunPausePending);
-  bool("groundPivotEligible", g.pivotEligible);
-  int("groundPivotGraceFrames", g.pivotGraceFrames);
-  int("groundPivotDashFrame", g.pivotDashFrame);
-  int("groundPivotDashActionFrame", g.pivotDashActionFrame);
-  int("character", fighter.character);
-  sink.text(kitDigestField(`${prefix}.moves`, t.moves, MOVES_DIGESTS, fighterMovesCanonical));
-
-  real("physics.weight", t.physics.weight);
-  real("physics.gravity", t.physics.gravity);
-  real("physics.terminalSpeed", t.physics.terminalSpeed);
-  real("physics.fastFallSpeed", t.physics.fastFallSpeed);
-  real("physics.airAcceleration", t.physics.airAcceleration);
-  real("physics.airSpeed", t.physics.airSpeed);
-  real("physics.airFriction", t.physics.airFriction);
-  real("physics.airCap", t.physics.airCap);
-  real("physics.traction", t.physics.traction);
-  real("physics.dashSpeed", t.physics.dashSpeed);
-  real("physics.runSpeed", t.physics.runSpeed);
-  real("physics.walkSpeed", t.physics.walkSpeed);
-  int("physics.jumpSquatFrames", t.physics.jumpSquatFrames);
-  real("physics.fullJumpSpeed", t.physics.fullJumpSpeed);
-  real("physics.shortJumpSpeed", t.physics.shortJumpSpeed);
-  real("physics.aerialJumpSpeed", t.physics.aerialJumpSpeed);
-  real("physics.jumpMomentum", t.physics.jumpMomentum);
-  real("physics.jumpHorizontalSpeed", t.physics.jumpHorizontalSpeed);
-  real("physics.jumpHorizontalCap", t.physics.jumpHorizontalCap);
-  real("physics.aerialJumpHorizontalSpeed", t.physics.aerialJumpHorizontalSpeed);
-  real("physics.shieldBreakSpeed", t.physics.shieldBreakSpeed);
-  int("facing", fighter.facing);
-  int("turnaroundSide", m.turnaroundSide);
-  int("turnaroundAge", m.turnaroundAge);
-  int("dashFrame", g.dashFrame);
-  int("dashDirection", g.dashDirection);
-  real("x", m.x);
-  real("z", m.z);
-  real("vx", m.vx);
-  real("vz", m.vz);
-  real("motionX.original", m.meleeX.original);
-  real("motionX.published", m.meleeX.published);
-  real("motionZ.original", m.meleeZ.original);
-  real("motionZ.published", m.meleeZ.published);
-  real("motionVelocityZ.original", m.meleeVelocityZ.original);
-  real("motionVelocityZ.published", m.meleeVelocityZ.published);
-  real("knockbackX", l.knockbackX);
-  real("knockbackZ", l.knockbackZ);
-  real("motionKnockbackX.original", l.meleeKnockbackX.original);
-  real("motionKnockbackX.published", l.meleeKnockbackX.published);
-  real("motionKnockbackZ.original", l.meleeKnockbackZ.original);
-  real("motionKnockbackZ.published", l.meleeKnockbackZ.published);
-  real("damage", st.damage);
-  int("stocks", st.stocks);
-  int("hitstun", l.hitstun);
-  bool("throwHitstun", l.throwHitstun);
-  int("hitlag", l.hitlag);
-  bool("diPending", l.diPending);
-  real("diLaunchSpeed", l.diLaunchSpeed);
-  int("hitlagFrames", l.hitlagFrames);
-  int("hitlagEndAge", l.hitlagEndAge);
-  bool("sdiFollowup", l.sdiFollowup);
-  int("diSerial", l.diSerial);
-  real("diAngleDegrees", l.diAngleDegrees);
-  bool("sdiWasGrounded", l.sdiWasGrounded);
-  bool("sdiLaunchesUpward", l.sdiLaunchesUpward);
-  int("sdiSerial", l.sdiSerial);
-  int("asdiSerial", l.asdiSerial);
-  int("sdiHitTravel", l.sdiHitTravel);
-  int("sdiStringTravel", l.sdiStringTravel);
-  int("sdiStepX", l.sdiStepX);
-  int("sdiStepZ", l.sdiStepZ);
-  int("sdiStepTravel", l.sdiStepTravel);
-  int("sdiNextX", l.sdiNextX);
-  int("sdiNextZ", l.sdiNextZ);
-  int("sdiNextTravel", l.sdiNextTravel);
-  int("cooldown", a.cooldown);
-  int("attackStyle", a.style ?? -1);
-  int("attackFrame", a.frame);
-  int("attackDuration", a.duration);
-  int("attackSerial", a.serial);
-  bool("attackHit", a.hit);
-  for (let i = 0; i < PARTICIPANT_CAPACITY; i++) reference(`hitAttackers[${i}]`, at(fighter.hits.entries, i).attacker);
-  for (let i = 0; i < PARTICIPANT_CAPACITY; i++) int(`hitSerials[${i}]`, at(fighter.hits.entries, i).attackSerial);
-  for (let i = 0; i < PARTICIPANT_CAPACITY; i++) int(`hitWindows[${i}]`, at(fighter.hits.entries, i).window);
-  for (let i = 0; i < PARTICIPANT_CAPACITY; i++) reference(`specialHitTargets[${i}]`, sp.hitTargets[i]);
-  reference("lastHitAttacker", fighter.hits.lastAttacker);
-  int("lastHitAttackSerial", fighter.hits.lastAttackSerial ?? -1);
-  int("lastHitWindow", fighter.hits.lastWindow);
-  bool("smashCharging", a.smashCharging);
-  int("smashChargeFrames", a.smashChargeFrames);
-  bool("smashChargeAllowed", a.smashChargeAllowed);
-  for (let i = 0; i < PROJECTILE_CAPACITY; i++) int(`projectileLife[${i}]`, at(fighter.projectiles, i).life);
-  for (let i = 0; i < PROJECTILE_CAPACITY; i++) real(`projectileX[${i}]`, at(fighter.projectiles, i).x);
-  for (let i = 0; i < PROJECTILE_CAPACITY; i++) real(`projectileZ[${i}]`, at(fighter.projectiles, i).z);
-  for (let i = 0; i < PROJECTILE_CAPACITY; i++) int(`projectileDirection[${i}]`, at(fighter.projectiles, i).direction);
-  for (let i = 0; i < PROJECTILE_CAPACITY; i++) int(`projectileKind[${i}]`, at(fighter.projectiles, i).kind);
-  for (let i = 0; i < PROJECTILE_CAPACITY; i++) real(`projectileDamageMultiplier[${i}]`, at(fighter.projectiles, i).damageMultiplier);
-  for (let i = 0; i < PROJECTILE_CAPACITY; i++) int(`projectileVisualFamily[${i}]`, at(fighter.projectiles, i).visualFamily);
-  for (let i = 0; i < PROJECTILE_CAPACITY; i++) bool(`projectileNewlyReflected[${i}]`, at(fighter.projectiles, i).newlyReflected);
-  for (let i = 0; i < PROJECTILE_CAPACITY; i++) real(`projectileVelocityX[${i}]`, at(fighter.projectiles, i).velocityX);
-  for (let i = 0; i < PROJECTILE_CAPACITY; i++) real(`projectileVelocityZ[${i}]`, at(fighter.projectiles, i).velocityZ);
-  for (let i = 0; i < PROJECTILE_CAPACITY; i++) int(`projectileSerial[${i}]`, at(fighter.projectiles, i).serial);
-  int("manaDrainedSerial", v.manaDrained);
-  for (let i = 0; i < PROJECTILE_CAPACITY; i++) if (at(fighter.projectiles, i).exReach) int(`projectileExReach[${i}]`, 1);
-
-  for (let i = 0; i < PROJECTILE_CAPACITY; i++) {
-    const projectile = at(fighter.projectiles, i);
-    if (projectile.poolHits !== 0) int(`projectilePoolHits[${i}]`, projectile.poolHits);
-    if (projectile.poolWait !== 0) int(`projectilePoolWait[${i}]`, projectile.poolWait);
-  }
-  int("specialAction", sp.action);
-  if (sp.ex) bool("specialEx", true);
-  if (sp.exArmorUsed) bool("specialExArmorUsed", true);
-  int("specialFrame", sp.frame);
-  int("specialDuration", sp.duration);
-  int("specialLockFrames", sp.lockFrames);
-  bool("specialFall", sp.fall);
-  for (let i = 0; i < SPECIAL_ACTION_CAPACITY; i++) {
-    const cooldown = at(sp.cooldowns, i);
-    if (i < SpecialAction.heroNeutral || cooldown !== 0) int(`specialCooldowns[${i}]`, cooldown);
-  }
-  int("specialDirection", sp.direction);
-  bool("specialHit", sp.hit);
-  int("bearLife", fighter.bear.life);
-  if (fighter.bear.exDamage) int("bearExDamage", 1);
-  real("bearX", fighter.bear.x);
-  real("bearZ", fighter.bear.z);
-  real("bearVelocityX", fighter.bear.velocityX);
-  real("bearVelocityZ", fighter.bear.velocityZ);
-  int("bearSwipeCooldown", fighter.bear.swipeCooldown);
-  int("bearHitSerial", fighter.bear.hitSerial);
-  int("bearSurface", fighter.bear.surface ?? -1);
-  int("freezeTrapLife", fighter.freezeTrap.life);
-  if (fighter.freezeTrap.exReach) int("freezeTrapExReach", 1);
-  int("freezeTrapArming", fighter.freezeTrap.arming);
-  real("freezeTrapX", fighter.freezeTrap.x);
-  real("freezeTrapZ", fighter.freezeTrap.z);
-  int("freezeTrapSurface", fighter.freezeTrap.surface ?? -1);
-  int("freezeTrapSerial", fighter.freezeTrap.serial);
-  int("frozenFrames", st.frozenFrames);
-  int("offscreenFrames", st.offscreenFrames);
-  int("freezeImmunityFrames", st.freezeImmunityFrames);
-  int("freezeTrapCooldown", fighter.freezeTrap.cooldown);
-  bool("out", st.out);
-  int("respawn", st.respawn);
-  bool("shield", s.raised);
-  real("shieldTiltX", s.tiltX);
-  real("shieldTiltZ", s.tiltZ);
-  real("shieldEnergy", s.energy);
-  int("shieldStun", s.stun);
-  int("shieldHeldFrames", s.heldFrames);
-  int("shieldReleaseLag", s.releaseLag);
-  int("shieldBreakState", s.breakState);
-  int("shieldBreakFrame", s.breakFrame);
-  int("shieldBreakSerial", s.breakSerial);
-  real("shieldBreakRemaining", s.breakRemaining);
-  bool("grounded", m.grounded);
-  bool("crouching", m.crouching);
-  bool("fastFalling", m.fastFalling);
-  int("jumps", j.remaining);
-  int("jumpSerial", j.serial);
-  bool("jumpIsDouble", j.isDouble);
-  int("jumpSquat", j.squat);
-  int("jumpAscent", j.ascent);
-  bool("jumpDodgeQueued", j.dodgeQueued);
-  int("jumpDodgeX", j.dodgeX);
-  int("jumpDodgeZ", j.dodgeZ);
-  bool("jumpHeld", j.held);
-  int("invincible", st.invincible);
-  int("surface", m.surface ?? -1);
-  int("airDodgeTime", fighter.dodge.airMotionFrames);
-  int("landingLag", fighter.landing.lag);
-  bool("airDodging", fighter.dodge.airDodging);
-  int("airDodgeFrame", fighter.dodge.airFrame);
-  bool("airDodgeUsed", fighter.dodge.airUsed);
-  int("groundDodgeFrame", fighter.dodge.groundFrame);
-  int("groundDodgeDirection", fighter.dodge.groundDirection);
-  int("groundDodgeEntryFacing", fighter.dodge.groundEntryFacing);
-  int("downState", fighter.down.state);
-  int("downFrame", fighter.down.frame);
-  int("downDirection", fighter.down.direction);
-  int("downWaitRemaining", fighter.down.waitRemaining);
-  bool("downFaceUp", fighter.down.faceUp);
-  bool("downAttackQueued", fighter.down.attackQueued);
-  int("techWindow", fighter.tech.window);
-  int("techPressAge", fighter.tech.pressAge);
-  int("techPreviousPressAge", fighter.tech.previousPressAge);
-  bool("techAccumulatedPress", fighter.tech.accumulatedPress);
-  int("grabbedFrames", gr.grabbedFrames);
-  int("grabAction", gr.action);
-  int("grabFrame", gr.frame);
-  int("grabPummels", gr.pummels);
-  int("grabHeldFrames", gr.heldFrames);
-  int("grabQueuedThrow", gr.queuedThrow);
-  int("grabSerial", gr.serial);
-  int("grabMashX", gr.mashX);
-  int("grabMashZ", gr.mashZ);
-  reference("grabOwner", gr.owner);
-  reference("grabTarget", gr.target);
-  int("ledgeState", ledge.state);
-  int("ledgeSide", ledge.side);
-  int("ledgeFrame", ledge.frame);
-  int("ledgeSerial", ledge.serial);
-  int("ledgeIntangible", ledge.intangible);
-  int("ledgeRegrab", ledge.regrab);
-  int("ledgeGrabs", ledge.grabs);
-  const p = fighter.platform;
-  bool("platformDownHeld", p.downHeld);
-  int("platformDownAge", p.downAge);
-  bool("platformDropConsumed", p.dropConsumed);
-  int("cannonHeld", fighter.cannon.held ?? -1);
-  int("cannonFiring", fighter.cannon.firing ?? -1);
-  int("cannonCooldown", fighter.cannon.cooldown);
-  bool("cannonPassing", fighter.cannon.passing);
-  bool("waterIn", fighter.water.inWater);
-  int("waterFrames", fighter.water.frames);
-  int("waterEntries", fighter.water.entries);
-  int("waterHydraFrame", fighter.water.hydraFrame);
-  real("waterHydraX", fighter.water.hydraX);
-  int("waterHydraStrikeFrame", fighter.water.hydraStrikeFrame);
-
-  real("physics.walkAccelerationMultiplier", t.physics.walkAccelerationMultiplier);
-  real("physics.walkAccelerationBase", t.physics.walkAccelerationBase);
-  real("physics.groundAccelerationMultiplier", t.physics.groundAccelerationMultiplier);
-  real("physics.groundAccelerationBase", t.physics.groundAccelerationBase);
-  real("physics.groundSpeedCap", t.physics.groundSpeedCap);
-  real("positionDeltaX", m.deltaX);
-  real("positionDeltaZ", m.deltaZ);
-  real("groundKnockbackX", l.groundKnockbackX);
-  int("knockbackAgeFrames", l.knockbackAge ?? -1);
-  int("damageLevel", l.damageLevel);
-  real("shieldPushbackX", s.pushbackX);
-  real("shieldRecoilX", s.recoilX);
-  real("shieldRecoilZ", s.recoilZ);
-  real("motionRecoilX.original", s.meleeRecoilX.original);
-  real("motionRecoilX.published", s.meleeRecoilX.published);
-  real("motionRecoilZ.original", s.meleeRecoilZ.original);
-  real("motionRecoilZ.published", s.meleeRecoilZ.published);
-  bool("shieldDrainResumePending", s.drainResumePending);
-  int("grabVisualSerial", v.grab);
-  int("throwVisualSerial", v.throw);
-  int("hitVisualSerial", v.hit);
-  bool("hitVisualElectric", v.hitElectric);
-  int("hitVisualElement", v.hitElement);
-  int("hitVisualStrength", v.hitStrength);
-  bool("hitVisualStrong", v.hitStrong);
-  int("hitVisualHeight", v.hitHeight);
-  bool("hitVisualPummel", v.hitPummel);
-  bool("shieldVisualElectric", v.shieldElectric);
-  int("shieldVisualSerial", v.shield);
-  bool("fastFallDownHeld", m.fastFallDownHeld);
-  int("fastFallInputAge", m.fastFallInputAge);
-  int("surfaceRecoveryState", sr.state);
-  int("surfaceRecoveryFrame", sr.frame);
-  bool("surfaceRecoveryVelocityApplied", sr.velocityApplied);
-  int("surfaceReflectCooldown", sr.reflectCooldown);
-  int("lastReflectedSurface", sr.lastReflectedSurface ?? -1);
-  int("surfaceContactSerial", sr.contactSerial);
-  int("surfaceContactKind", sr.contactKind);
-  real("surfaceContactApproachSpeed", sr.contactApproachSpeed);
-  real("surfaceContactX", sr.contactX);
-  real("surfaceContactZ", sr.contactZ);
-  real("surfaceContactNormalX", sr.contactNormalX);
-  real("surfaceContactNormalZ", sr.contactNormalZ);
-  real("surfacePhysics.passiveWallSpeed", t.surface.passiveWallSpeed);
-  real("surfacePhysics.wallJumpHorizontalSpeed", t.surface.wallJumpHorizontalSpeed);
-  real("surfacePhysics.wallJumpVerticalSpeed", t.surface.wallJumpVerticalSpeed);
-  real("surfacePhysics.passiveCeilingSpeed", t.surface.passiveCeilingSpeed);
-  real("surfacePhysics.wallJumpMinimumApproach", t.surface.wallJumpMinimumApproach);
-  bool("surfacePhysics.canWallJump", t.surface.canWallJump);
-  sink.text(kitDigestField(`${prefix}.specials`, t.specials, SPECIALS_DIGESTS, fighterSpecialsCanonical));
-  int("manaPoints", fighter.mana.points);
-  int("manaDeniedSerial", v.manaDenied);
-  if (fighter.character === Character.kobold) {
-    const candle = fighter.candle;
-    int("candleHeat", candle.heat);
-    int("candleState", candle.state);
-    bool("candleLit", candle.lit);
-    real("candleX", candle.x);
-    real("candleZ", candle.z);
-    real("candleVx", candle.vx);
-    real("candleVz", candle.vz);
-    int("candleSurface", candle.surface ?? -1);
-    int("candleTimer", candle.timer);
-    int("candleAway", candle.away);
-    int("candleGuard", candle.guard);
-    for (let i = 0; i < PARTICIPANT_CAPACITY; i++) int(`candleStruck[${i}]`, candle.struck[i] ?? -1);
-    int("candleSpecialStruck", candle.specialStruck);
-    int("candleDropSerial", candle.dropSerial);
-    int("candleSnuffSerial", candle.snuffSerial);
-    int("candleReturnSerial", candle.returnSerial);
-  }
-
-  if (t.specials !== undefined) {
-    int("specialForm", sp.form);
-    if (sp.variant !== 0) int("specialVariant", sp.variant);
-    int("specialAimX", sp.aimX);
-    int("specialAimZ", sp.aimZ);
-    if (sp.beamX !== 0 || sp.beamZ !== 0 || 1 / sp.beamX < 0 || 1 / sp.beamZ < 0) {
-      real("specialBeamX", sp.beamX);
-      real("specialBeamZ", sp.beamZ);
-    }
-    if (sp.beamLength !== 0 || 1 / sp.beamLength < 0) real("specialBeamLength", sp.beamLength);
-    int("specialAirtimeUses", sp.airtimeUses);
-    if (sp.grabFrame !== 0) int("specialGrabFrame", sp.grabFrame);
-    if (sp.seekTarget !== 0) int("specialSeekTarget", sp.seekTarget);
-    int("armorFrames", st.armorFrames);
-    real("armorMaxDamage", st.armorMaxDamage);
-    if (st.armorChills) int("armorChills", 1);
-    for (let animal = 0; animal <= fighter.pack.length; animal++) {
-      const placed = placedObject(fighter, animal);
-      const animalName = animal === 0 ? "placed" : `pack[${animal - 1}]`;
-      int(`${animalName}Life`, placed.life);
-      int(`${animalName}Age`, placed.age);
-      real(`${animalName}X`, placed.x);
-      real(`${animalName}Z`, placed.z);
-      int(`${animalName}Direction`, placed.direction);
-      real(`${animalName}Durability`, placed.durability);
-      int(`${animalName}Serial`, placed.serial);
-      for (let i = 0; i < PARTICIPANT_CAPACITY; i++) int(`${animalName}Struck[${i}]`, placed.struck[i] ?? -1);
-      int(`${animalName}SpecialStruck`, placed.specialStruck);
-
-      if (placed.spec?.companion !== undefined) {
-        int(`${animalName}Mode`, placed.mode);
-        int(`${animalName}ModeFrame`, placed.modeFrame);
-        int(`${animalName}Apart`, placed.apart);
-        int(`${animalName}Bitten`, placed.bitten);
-        int(`${animalName}Surface`, placed.surface ?? -1);
-      }
-      sink.text(kitDigestField(`${prefix}.${animalName}Spec`, placed.spec, PLACEMENT_DIGESTS, placedSpecCanonical));
-    }
-    int("specialGuarded", sp.guarded ? 1 : 0);
-    if (st.divineFrames !== 0) int("divineFrames", st.divineFrames);
-  }
-
-  if (st.buff !== 0 || st.buffFrames !== 0) {
-    int("buff", st.buff);
-    int("buffFrames", st.buffFrames);
-  }
-
-  if (st.condition !== 0 || st.conditionImmunity.some(frames => frames !== 0)) {
-    int("condition", st.condition);
-    int("conditionFrames", st.conditionFrames);
-    int("conditionGroup", st.conditionGroup);
-    int("conditionImmunityFrames", st.conditionImmunityFrames);
-    for (let i = 0; i < HERO_STATUS_GROUPS; i++) int(`conditionImmunity[${i}]`, st.conditionImmunity[i] ?? 0);
-  }
-  if (st.poisonFrames !== 0) {
-    int("poisonFrames", st.poisonFrames);
-    int("poisonEvery", st.poisonEvery);
-    real("poisonDamage", st.poisonDamage);
-  }
-  for (let i = 0; i < PROJECTILE_CAPACITY; i++) {
-    const spec = at(fighter.projectiles, i).spec;
-    if (spec !== undefined) sink.text(specialProjectileCanonical(spec, `${prefix}.projectileSpec[${i}]`));
-  }
-}
-
 function writeState(sink: StateSink, state: Readonly<ReplayState>): void {
   const { world, match, controls, runtime } = state;
   const int = (name: string, value: number) => sink.int("", name, value);
@@ -1173,7 +779,7 @@ function writeState(sink: StateSink, state: Readonly<ReplayState>): void {
   int("participantMask", world.mask);
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;
-    writeFighter(sink, `fighter[${slot}]`, fighterAt(world, slot), world.mask);
+    writeFighterFields(sink, `fighter[${slot}]`, fighterAt(world, slot), world.mask, FIGHTER_KITS);
     const command = attackBufferCanonicalState(controls.commands[slot]);
     int(`commands[${slot}].windowFrames`, command.graceFrames);
     int(`commands[${slot}].style`, command.style);

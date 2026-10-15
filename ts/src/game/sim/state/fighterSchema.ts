@@ -1,6 +1,7 @@
 export type FieldType = "int" | "real" | "bool" | "enum" | "optionalInt" | "optionalEnum" | "slot" | "ref" | "optionalRef" | "length";
 export type CopyForm = "plain" | "retained" | "none";
 export type SameForm = "signedZero" | "signedZeroOptional" | "plain" | "sameReal" | "none";
+export type CanonKit = "moves" | "specials" | "placedSpec" | "projectileSpec";
 export type CanonWriter = "int" | "real" | "bool" | "boolAsInt" | "flagInt" | "flagBool" | "optionalInt" | "slotRef" | "digest" | "specText";
 export type Guard = "specials" | "companion" | "condition" | "poison" | "buff" | "beamPair" | "nonzero" | "nonzeroSigned" | "cooldownSlot" | "defined" | "kobold";
 export type ArrayLayout = "fieldMajor" | "animalMajor" | "scalarArray";
@@ -9,6 +10,8 @@ export interface CanonColumn {
   readonly name: string;
   readonly writer: CanonWriter;
   readonly when?: readonly Guard[];
+  readonly kit?: CanonKit;
+  readonly sharedLoop?: true;
 }
 
 export interface RespawnColumn {
@@ -166,7 +169,7 @@ export const FIGHTER_FIELDS: readonly FighterFieldRow[] = [
   { path: "ground.pivotDashFrame", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "groundPivotDashFrame", writer: "int" }, diff: "groundPivotDashFrame", respawn: { blast: "0", helper: "clearDash", respawn: "0" } },
   { path: "ground.pivotDashActionFrame", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "groundPivotDashActionFrame", writer: "int" }, diff: "groundPivotDashActionFrame", respawn: { blast: "0", helper: "clearDash", respawn: "0" } },
   { path: "character", type: "enum", init: "character", copy: "plain", same: "plain", canon: { name: "character", writer: "int" }, diff: "character", respawn: "keep" },
-  { path: "tuning.moves", type: "ref", init: "authoredTuning(character)", copy: "plain", same: "plain", canon: { name: "moves", writer: "digest" }, diff: "none", respawn: "keep" },
+  { path: "tuning.moves", type: "ref", init: "authoredTuning(character)", copy: "plain", same: "plain", canon: { name: "moves", writer: "digest", kit: "moves" }, diff: "none", respawn: "keep" },
   { path: "tuning.physics", type: "ref", init: "authoredTuning(character)", copy: "plain", same: "plain", canon: "none", diff: { record: "physics" }, respawn: "keep" },
   { path: "tuning.physics.weight", type: "real", init: "authoredTuning(character) (shared object)", copy: "none", same: "none", canon: { name: "physics.weight", writer: "real" }, diff: { record: "physics" }, respawn: "keep" },
   { path: "tuning.physics.gravity", type: "real", init: "authoredTuning(character) (shared object)", copy: "none", same: "none", canon: { name: "physics.gravity", writer: "real" }, diff: { record: "physics" }, respawn: "keep" },
@@ -264,7 +267,7 @@ export const FIGHTER_FIELDS: readonly FighterFieldRow[] = [
   { path: "visuals.manaDrained", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "manaDrainedSerial", writer: "int" }, diff: "manaDrainedSerial", respawn: { respawn: "0" } },
   { path: "projectiles[].exReach", type: "bool", init: "false", copy: "plain", same: "plain", canon: { name: "projectileExReach[${i}]", writer: "flagInt" }, diff: "projectileExReach[${i}]", respawn: { blast: "false", helper: "clearSpecialOnStock", respawn: "false" } },
   { path: "projectiles[].poolHits", type: "int", init: "0", copy: "plain", same: "plain", canon: { name: "projectilePoolHits[${i}]", writer: "int", when: ["nonzero"] }, diff: "projectilePoolHits[${i}]", respawn: "keep" },
-  { path: "projectiles[].poolWait", type: "int", init: "0", copy: "plain", same: "plain", canon: { name: "projectilePoolWait[${i}]", writer: "int", when: ["nonzero"] }, diff: "projectilePoolWait[${i}]", respawn: "keep" },
+  { path: "projectiles[].poolWait", type: "int", init: "0", copy: "plain", same: "plain", canon: { name: "projectilePoolWait[${i}]", writer: "int", when: ["nonzero"], sharedLoop: true }, diff: "projectilePoolWait[${i}]", respawn: "keep" },
   { path: "special.action", type: "enum", init: "SpecialAction.none", copy: "plain", same: "signedZero", canon: { name: "specialAction", writer: "int" }, diff: "specialAction", respawn: { blast: "SpecialAction.none", helper: "clearSpecialOnStock>cancelSpecialState", respawn: "SpecialAction.none" } },
   { path: "special.ex", type: "bool", init: "false", copy: "plain", same: "plain", canon: { name: "specialEx", writer: "flagBool" }, diff: "specialEx", respawn: { blast: "false", helper: "clearSpecialOnStock>cancelSpecialState", respawn: "false" } },
   { path: "special.exArmorUsed", type: "bool", init: "false", copy: "plain", same: "plain", canon: { name: "specialExArmorUsed", writer: "flagBool" }, diff: "specialExArmorUsed", respawn: { blast: "false", helper: "clearSpecialOnStock>cancelSpecialState", respawn: "false" } },
@@ -439,7 +442,7 @@ export const FIGHTER_FIELDS: readonly FighterFieldRow[] = [
   { path: "tuning.surface.passiveCeilingSpeed", type: "real", init: "authoredTuning(character) (shared object)", copy: "none", same: "none", canon: { name: "surfacePhysics.passiveCeilingSpeed", writer: "real" }, diff: { record: "surfacePhysics" }, respawn: "keep" },
   { path: "tuning.surface.wallJumpMinimumApproach", type: "real", init: "authoredTuning(character) (shared object)", copy: "none", same: "none", canon: { name: "surfacePhysics.wallJumpMinimumApproach", writer: "real" }, diff: { record: "surfacePhysics" }, respawn: "keep" },
   { path: "tuning.surface.canWallJump", type: "bool", init: "authoredTuning(character) (shared object)", copy: "none", same: "none", canon: { name: "surfacePhysics.canWallJump", writer: "bool" }, diff: { record: "surfacePhysics" }, respawn: "keep" },
-  { path: "tuning.specials", type: "ref", init: "authoredTuning(character)", copy: "plain", same: "plain", canon: { name: "specials", writer: "digest" }, diff: "none", respawn: "keep" },
+  { path: "tuning.specials", type: "ref", init: "authoredTuning(character)", copy: "plain", same: "plain", canon: { name: "specials", writer: "digest", kit: "specials" }, diff: "none", respawn: "keep" },
   { path: "tuning.ultimate", type: "ref", init: "authoredTuning(character)", copy: "plain", same: "plain", canon: "none", diff: "none", respawn: "keep" },
   { path: "mana.points", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "manaPoints", writer: "int" }, diff: "manaPoints", respawn: "keep" },
   { path: "visuals.manaDenied", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "manaDeniedSerial", writer: "int" }, diff: "manaDeniedSerial", respawn: "keep" },
@@ -501,8 +504,8 @@ export const FIGHTER_FIELDS: readonly FighterFieldRow[] = [
   { path: "pack[].bitten", type: "int", init: "0 (spares: createPlacedObject; length packLength(character): peon 5, beastmaster/shadowHunter 2, else 0)", copy: "plain", same: "signedZero", canon: { name: "pack[${animal-1}]Bitten", writer: "int", when: ["specials", "companion"] }, diff: "${animalName}Bitten", respawn: "keep" },
   { path: "placed.surface", type: "optionalInt", init: "undefined", copy: "plain", same: "signedZeroOptional", canon: { name: "placedSurface", writer: "optionalInt", when: ["specials", "companion"] }, diff: "${animalName}Surface", respawn: "keep" },
   { path: "pack[].surface", type: "optionalInt", init: "undefined (spares: createPlacedObject; length packLength(character): peon 5, beastmaster/shadowHunter 2, else 0)", copy: "plain", same: "signedZeroOptional", canon: { name: "pack[${animal-1}]Surface", writer: "optionalInt", when: ["specials", "companion"] }, diff: "${animalName}Surface", respawn: "keep" },
-  { path: "placed.spec", type: "optionalRef", init: "undefined", copy: "plain", same: "plain", canon: { name: "placedSpec", writer: "digest", when: ["specials"] }, diff: "placedSpec", respawn: "keep" },
-  { path: "pack[].spec", type: "optionalRef", init: "undefined (spares: createPlacedObject; length packLength(character): peon 5, beastmaster/shadowHunter 2, else 0)", copy: "plain", same: "plain", canon: { name: "pack[${animal-1}]Spec", writer: "digest", when: ["specials"] }, diff: "pack[k]Spec", respawn: "keep" },
+  { path: "placed.spec", type: "optionalRef", init: "undefined", copy: "plain", same: "plain", canon: { name: "placedSpec", writer: "digest", when: ["specials"], kit: "placedSpec" }, diff: "placedSpec", respawn: "keep" },
+  { path: "pack[].spec", type: "optionalRef", init: "undefined (spares: createPlacedObject; length packLength(character): peon 5, beastmaster/shadowHunter 2, else 0)", copy: "plain", same: "plain", canon: { name: "pack[${animal-1}]Spec", writer: "digest", when: ["specials"], kit: "placedSpec" }, diff: "pack[k]Spec", respawn: "keep" },
   { path: "special.guarded", type: "bool", init: "false", copy: "plain", same: "plain", canon: { name: "specialGuarded", writer: "boolAsInt", when: ["specials"] }, diff: "specialGuarded", respawn: "keep" },
   { path: "status.divineFrames", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "divineFrames", writer: "int", when: ["specials", "nonzero"] }, diff: "divineFrames", respawn: { respawn: "0" } },
   { path: "status.buff", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "buff", writer: "int", when: ["buff"] }, diff: "buff", respawn: { blast: "ItemKind.none", helper: "endItemBuff", respawn: "ItemKind.none" } },
@@ -515,5 +518,5 @@ export const FIGHTER_FIELDS: readonly FighterFieldRow[] = [
   { path: "status.poisonFrames", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "poisonFrames", writer: "int", when: ["poison"] }, diff: "poisonFrames", respawn: { respawn: "0", helper: "clearHeroStatus" } },
   { path: "status.poisonEvery", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "poisonEvery", writer: "int", when: ["poison"] }, diff: "poisonEvery", respawn: { respawn: "0", helper: "clearHeroStatus" } },
   { path: "status.poisonDamage", type: "real", init: "0.0", copy: "plain", same: "signedZero", canon: { name: "poisonDamage", writer: "real", when: ["poison"] }, diff: "poisonDamage", respawn: { respawn: "0.0", helper: "clearHeroStatus" } },
-  { path: "projectiles[].spec", type: "optionalRef", init: "undefined", copy: "plain", same: "plain", canon: { name: "projectileSpec[${i}]", writer: "specText", when: ["defined"] }, diff: "projectileSpec[${i}]", respawn: { blast: "undefined", helper: "clearSpecialOnStock", respawn: "undefined" } },
+  { path: "projectiles[].spec", type: "optionalRef", init: "undefined", copy: "plain", same: "plain", canon: { name: "projectileSpec[${i}]", writer: "specText", when: ["defined"], kit: "projectileSpec" }, diff: "projectileSpec[${i}]", respawn: { blast: "undefined", helper: "clearSpecialOnStock", respawn: "undefined" } },
 ];
