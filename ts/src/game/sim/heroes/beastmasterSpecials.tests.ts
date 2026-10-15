@@ -2,7 +2,7 @@ import { assertEquals, assertGreaterThan, assertTrue, test } from "wisp/src/runt
 import { f32 } from "wisp/src/sim/f32";
 import { upSpecialRoute } from "../../match/recoveryEnvelope";
 import { Character, HeroStatusKind, SpecialAction } from "../codes";
-import { HAWK_STUN } from "./beastmasterSpecials";
+import { BEASTMASTER_SPECIALS, HAWK_STUN } from "./beastmasterSpecials";
 import { HERO_REFERENCE_HEIGHT } from "../heroMoves";
 import { type Fighter, createFighter, placedObject } from "../fighter";
 import { type Controls, type Roster } from "../roster";
@@ -13,6 +13,7 @@ import { duelPair, stepDuel } from "../testDuel";
 import { advanceBearFeedback, createBearFeedbackCursor } from "../../presentation/bearFeedback";
 import { captureImpactEventsBefore, createImpactEvents, finishImpactEventsAfter } from "../../presentation/impactEvents";
 import { playPerform } from "../../presentation/moveSounds";
+import { heroCueWindows, specialCueState } from "../../presentation/specialCues";
 
 const up = controls({ specialPressed: true, specialZ: 1 });
 const down = controls({ specialPressed: true, specialZ: -1 });
@@ -40,6 +41,27 @@ function withPack() {
   run(scene.world, 30, up);
   return scene;
 }
+
+test("Summon Bear places Bear on frame 29 and ends on 49, its startup cue through 28 and active cue from 29 [k1 scenario]", () => {
+  const { world, owner } = pair();
+  const windows = heroCueWindows(BEASTMASTER_SPECIALS.side.ground!);
+  assertEquals(windows.startup.last, 28);
+  assertEquals(windows.active.first, 29);
+  let placed = 0;
+  let ended = 0;
+  for (let frame = 1; frame <= 60; frame++) {
+    stepDuel(world, frame === 1 ? controls({ specialPressed: true, specialX: 1 }) : controls());
+    if (placed === 0 && placedObject(owner, 0).life > 0) {
+      placed = frame;
+      assertEquals(owner.special.frame, 29);
+      assertEquals(specialCueState(owner).phase, "active");
+    }
+    if (placed === 0) assertEquals(specialCueState(owner).phase, "startup");
+    if (ended === 0 && owner.special.action === SpecialAction.none) ended = frame;
+  }
+  assertEquals(placed, 29);
+  assertEquals(ended, 49);
+});
 
 test("Beastmaster Hawk Lift rises 380–520 and reaches 600–900, its free route at least 240 on each axis; Hawk survives the helpless fall [k3 measure #335]", () => {
   for (const mana of [100, 10]) {

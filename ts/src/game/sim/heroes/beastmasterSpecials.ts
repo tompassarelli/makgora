@@ -29,7 +29,7 @@ export const BEAR: SpecialCompanion = {
   stunFrames: 18, leash: h(6.0), leashFrames: 120,
 };
 export const BEAR_PLACEMENT: SpecialPlacement = {
-  frame: 24, offsetX: h(f32(0.6)), radius: h(f32(0.4)), height: h(f32(1.1)),
+  frame: 29, offsetX: h(f32(0.6)), radius: h(f32(0.4)), height: h(f32(1.1)),
   durability: 30.0, life: 480, fireAges: [], companion: BEAR,
 };
 const stampede = (spawnFrame: number): SpecialProjectile => ({
@@ -39,7 +39,7 @@ const stampede = (spawnFrame: number): SpecialProjectile => ({
   model: "Abilities\\Spells\\Other\\Stampede\\StampedeMissile.mdx",
 });
 export const STAMPEDE = [stampede(2), stampede(5), stampede(8)];
-const SUMMON_BEAR: AuthoredSpecial = { endFrame: 44, groundOnly: true, placement: BEAR_PLACEMENT };
+const SUMMON_BEAR: AuthoredSpecial = { endFrame: 49, groundOnly: true, placement: BEAR_PLACEMENT };
 const BEAR_COMMAND: AuthoredSpecial = { name: "Stampede", endFrame: 32, command: { frame: 4, order: CompanionOrder.lunge }, projectiles: STAMPEDE };
 export const QUILL: SpecialProjectile = {
   spawnFrame: 0, offsetX: h(f32(0.4)), offsetZ: h(f32(0.45)),
