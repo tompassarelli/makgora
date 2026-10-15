@@ -1,4 +1,5 @@
 import { ITEM_MODELS } from "../../src/game/presentation/itemLook";
+import { STOCK_MODELS } from "../../src/game/render/effects";
 import { ITEM_INTERVAL_MAX_SECONDS } from "../../src/game/match/centreItem";
 import { impactModel } from "../../src/game/presentation/hitPresentation";
 import { IMPACT_KIND_COUNT } from "../../src/game/presentation/impactState";
@@ -6,6 +7,7 @@ import { IMPACT_KIND_COUNT } from "../../src/game/presentation/impactState";
 
 
 
+import { sourceNamedModels } from "./sourceModels";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { type FrameFeature, colorRows, pixelShare } from "wisp/scripts/wisp/frameProbe";
@@ -138,6 +140,8 @@ export const SMASHCRAFT_SCENE: SceneExpectations & { readonly settledFrame: numb
       lifetime: lifetime + seconds(1), models: [model],
     })),
     { name: "centre item", lifetime: seconds(ITEM_INTERVAL_MAX_SECONDS + 1), models: Object.values(ITEM_MODELS) },
+    { name: "stock effect", lifetime: seconds(5), models: Object.values(STOCK_MODELS) },
+    { name: "source-named model", lifetime: seconds(5), models: sourceNamedModels() },
     { name: "agency marker", models: ["Abilities\\Spells\\Other\\GeneralAuraTarget\\GeneralAuraTarget.mdl"] },
 
     {
