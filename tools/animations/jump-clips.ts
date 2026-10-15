@@ -37,7 +37,7 @@ const legacy = [
 const STYLES: Readonly<Record<number, string>> = {
   [Character.rifleman]: "cannonball", [Character.demonHunter]: "wing beat", [Character.mountainKing]: "cannonball",
   [Character.warden]: "back flip", [Character.lich]: "float", [Character.forsakenPaladin]: "knee lift",
-  [Character.dreadlord]: "wing beat", [Character.shadowHunter]: "twist", [Character.pitLord]: "heave",
+  [Character.dreadlord]: "wing beat", [Character.pitLord]: "heave",
   [Character.beastmaster]: "knee lift", [Character.lichKing]: "float", [Character.thrall]: "bound",
   [Character.jaina]: "twirl", [Character.sylvanas]: "back flip", [Character.cairne]: "knee lift",
   [Character.chen]: "cannonball", [Character.peon]: "scramble", [Character.tinker]: "heave",

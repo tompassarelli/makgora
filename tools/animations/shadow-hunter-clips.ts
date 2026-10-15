@@ -3,23 +3,34 @@ import { join, relative, resolve } from "node:path";
 import { generateMDX, ModelRenderer, model as mdx } from "war3-model";
 import { quat, vec3 } from "gl-matrix";
 import { DrawnModel, sampleAttack, sheet, type PoseFrame } from "../../ts/scripts/wisp/hurtboxView";
-import { AttackStyle, Character } from "../../ts/src/game/sim/codes";
+import { AttackPhase, AttackStyle, Character } from "../../ts/src/game/sim/codes";
 import type { HeroClip, HeroPose } from "../../ts/src/game/sim/heroes/hero";
 import { SHADOW_HUNTER_MOVES } from "../../ts/src/game/sim/heroes/shadowHunterMoves";
 import { SHADOW_HUNTER_SPECIALS } from "../../ts/src/game/sim/heroes/shadowHunterSpecials";
+import { ROSTER_ATTACK_CLIPS } from "../../ts/src/game/presentation/rosterAttackClipInfo";
+import { JUMP_CLIPS } from "../../ts/src/game/presentation/jumpClipInfo";
 import { SHADOW_HUNTER_AUTHORED_CLIPS } from "../../ts/src/game/presentation/heroes/shadowHunterClipInfo";
 import { seconds } from "./asset-info";
 import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
 
 interface Gesture {
-  lean?: number; chest?: number; chestTurn?: number; head?: number; pelvis?: number;
+  lean?: number; chest?: number; chestTurn?: number; head?: number; pelvis?: number; beard?: number;
   arm?: number; armYaw?: number; elbow?: number; wrist?: number; wristRoll?: number;
   free?: number; freeYaw?: number; freeElbow?: number;
   frontHip?: number; frontKnee?: number; frontFoot?: number; backHip?: number; backKnee?: number; backFoot?: number;
-  drop?: number; lunge?: number; spin?: number;
+  cloth?: number; clothTip?: number;
+  drop?: number; lunge?: number; spin?: number; step?: number;
 }
-interface Phase { frame: number; gesture: Gesture; tip?: readonly [number, number] | readonly [number, number, number]; grip?: readonly [number, number] }
-interface Authored { pose: HeroPose; style: AttackStyle; phases: readonly Phase[]; airborne?: boolean; frames?: number; looping?: boolean; forms?: readonly HeroPose[] }
+type End = "handL" | "handR" | "footL" | "footR";
+interface Phase { frame: number; gesture: Gesture; tip?: readonly [number, number] | readonly [number, number, number]; grip?: readonly [number, number]; reach?: readonly [End, number, number] }
+interface Authored {
+  pose: HeroPose; style?: AttackStyle; phases: readonly Phase[]; airborne?: boolean; frames?: number; looping?: boolean; forms?: readonly HeroPose[];
+  ground?: "cloth" | "sole"; support?: "L" | "R";
+}
+const REACH: Readonly<Record<End, readonly [string, keyof Gesture, keyof Gesture, string, string]>> = {
+  handL: ["Hand Left Ref ", "free", "freeElbow", "Bone_Arm1_L", "Bone_Arm2_L"], handR: ["Hand Right Ref ", "arm", "elbow", "Bone_Arm1_R", "Bone_Arm2_R"],
+  footL: ["Foot Left Ref ", "frontHip", "frontKnee", "Bone_Leg1_L", "Bone_Leg2_L"], footR: ["Foot Right Ref ", "backHip", "backKnee", "Bone_Leg1_R", "Bone_Leg2_R"],
+};
 
 const READY: Gesture = {};
 
@@ -45,10 +56,50 @@ function neutralSpecial(): Authored {
   ] };
 }
 
-const POSES: Readonly<Record<string, () => Authored>> = { neutralSpecial };
+const FALL: Gesture = { chest: 6, head: -4, arm: -205, elbow: 15, wrist: -60, free: -80, freeElbow: 30, frontHip: 66, frontKnee: -89, frontFoot: 15, backHip: 83, backKnee: -71, backFoot: 20, cloth: -10 };
+
+function jump(): Authored {
+  return { pose: "jump", frames: 24, airborne: true, phases: [
+    { frame: 0, gesture: { chest: 14, head: -14, arm: -205, elbow: 15, wrist: -60, free: 20, freeElbow: 20, frontHip: 16, frontKnee: 26, frontFoot: 0, backHip: 8, backKnee: 44, backFoot: 0, cloth: -25 } },
+    { frame: 3, gesture: { chest: 12, head: -14, arm: -205, elbow: 15, wrist: -60, free: -160, freeElbow: 10, frontHip: 106, frontKnee: -140, frontFoot: 45, backHip: 98, backKnee: -127, backFoot: 45, cloth: 10 } },
+    { frame: 6, gesture: { chest: 10, head: -10, arm: -205, elbow: 15, wrist: -60, free: -150, freeElbow: 15, frontHip: 81, frontKnee: -94, frontFoot: 35, backHip: 73, backKnee: -76, backFoot: 35, cloth: 0 } },
+    { frame: 10, gesture: { chest: 12, head: -6, arm: -205, elbow: 15, wrist: -60, free: -115, freeElbow: 25, frontHip: 61, frontKnee: -66, frontFoot: 25, backHip: 58, backKnee: -54, backFoot: 25, cloth: -15 } },
+    { frame: 14, gesture: { chest: 18, head: -2, arm: -205, elbow: 15, wrist: -60, free: -60, freeElbow: 50, frontHip: 26, frontKnee: 2, frontFoot: 15, backHip: 23, backKnee: 15, backFoot: 15, cloth: -40, clothTip: -15 } },
+    { frame: 19, gesture: { chest: 8, head: -6, arm: -205, elbow: 15, wrist: -60, free: -95, freeElbow: 25, frontHip: 56, frontKnee: -55, frontFoot: 15, backHip: 63, backKnee: -62, backFoot: 20, cloth: -20 } },
+    { frame: 24, gesture: FALL },
+  ] };
+}
+
+function doubleJump(): Authored {
+  return { pose: "doubleJump", frames: 30, airborne: true, phases: [
+    { frame: 0, gesture: FALL },
+    { frame: 3, gesture: { chest: 10, head: -18, arm: -205, elbow: 15, wrist: -60, free: -40, freeElbow: 40, frontHip: 11, frontKnee: 26, frontFoot: 10, backHip: -7, backKnee: 44, backFoot: 10, cloth: -50, clothTip: -20 } },
+    { frame: 8, gesture: { chest: 0, head: -12, arm: -205, elbow: 15, wrist: -60, free: -170, freeElbow: 5, frontHip: 111, frontKnee: -145, frontFoot: 45, backHip: 98, backKnee: -127, backFoot: 45, cloth: 15 } },
+    { frame: 14, gesture: { chest: 6, head: -8, arm: -205, elbow: 15, wrist: -60, free: -135, freeElbow: 15, frontHip: 81, frontKnee: -94, frontFoot: 30, backHip: 73, backKnee: -76, backFoot: 30, cloth: 0 } },
+    { frame: 20, gesture: { chest: 10, head: -5, arm: -205, elbow: 15, wrist: -60, free: -95, freeElbow: 25, frontHip: 61, frontKnee: -66, frontFoot: 20, backHip: 58, backKnee: -54, backFoot: 20, cloth: -20 } },
+    { frame: 30, gesture: FALL },
+  ] };
+}
+
+
+const hang = (action: Authored, drape = false): Authored => ({ ...action, phases: action.phases.map(phase => {
+  const g = phase.gesture, cloth = g.cloth ?? 0.8 * Math.min(g.frontHip ?? 0, g.backHip ?? 0);
+  return { ...phase, gesture: { ...g, beard: g.beard ?? Math.min(90, 3.5 * Math.max(0, (g.lean ?? 0) + (g.chest ?? 0) + (g.head ?? 0))), ...drape ? { cloth, clothTip: g.clothTip ?? 0.3 * cloth } : {} } };
+}) });
+const draped = (make: () => Authored) => () => hang(make(), true);
+const kicked = (make: () => Authored) => () => hang({ ...make(), ground: "sole" });
+
+const POSES: Readonly<Record<string, () => Authored>> = {
+  neutralSpecial, jump, doubleJump,
+};
 
 function rotation(base: ArrayLike<number>, pitch: number, yaw = 0, roll = 0): Float32Array {
   const q = quat.create(); quat.rotateY(q, q, pitch * Math.PI / 180); quat.rotateZ(q, q, yaw * Math.PI / 180); quat.rotateX(q, q, roll * Math.PI / 180);
+  quat.multiply(q, q, Float32Array.from(base)); quat.normalize(q, q); return new Float32Array(q);
+}
+function depthTurn(base: ArrayLike<number>, parent: ArrayLike<number>, degrees: number, world = 1): Float32Array {
+  const axis = [0, 1, 2].map(i => parent[i * 4 + world]! / Math.hypot(parent[i * 4]!, parent[i * 4 + 1]!, parent[i * 4 + 2]!)), n = Math.hypot(...axis);
+  const q = quat.setAxisAngle(quat.create(), axis.map(v => v / n) as [number, number, number], degrees * Math.PI / 180);
   quat.multiply(q, q, Float32Array.from(base)); quat.normalize(q, q); return new Float32Array(q);
 }
 function joint(name: string, g: Gesture): [number, number, number] {
@@ -56,6 +107,9 @@ function joint(name: string, g: Gesture): [number, number, number] {
     case "Attack Gesture": return [g.lean ?? 0, g.spin ?? 0, 0];
     case "Bone_Chest": return [g.chest ?? 0, g.chestTurn ?? 0, 0];
     case "Bone_Head": return [g.head ?? 0, 0, 0];
+    case "Beard1": return [g.beard ?? 0, 0, 0];
+    case "Object02": return [g.cloth ?? 0, 0, 0];
+    case "Object04": return [g.clothTip ?? 0, 0, 0];
     case "Bone_Pelvis": return [g.pelvis ?? 0, 0, 0];
     case "Bone_Arm1_R": return [g.arm ?? 0, g.armYaw ?? 0, 0];
     case "Bone_Arm2_R": return [g.elbow ?? 0, 0, 0];
@@ -86,18 +140,159 @@ const renderer = new ModelRenderer(model), data = Reflect.get(renderer, "rendere
 const hand = named("Bone_Hand_R"), tipNode = named("Weapon Ref"), root = named("Bone_Root");
 const tipPivot = model.PivotPoints[tipNode.ObjectId]!;
 const tipAt = () => { const p = vec3.fromValues(tipPivot[0]!, tipPivot[1]!, tipPivot[2]!); vec3.transformMat4(p, p, data.nodes[tipNode.ObjectId]!.matrix as unknown as Float32Array); return p; };
+const blade = tipNode.Parent!;
+const bladePoints = model.Geosets.flatMap(geoset => Array.from({ length: geoset.Vertices.length / 3 }, (_, v) => v)
+  .filter(v => (geoset.Groups[geoset.VertexGroup[v] ?? 0] ?? []).every(node => node === blade))
+  .filter((_, i) => i % 4 === 0).map(v => vec3.fromValues(geoset.Vertices[v * 3]!, geoset.Vertices[v * 3 + 1]!, geoset.Vertices[v * 3 + 2]!)));
+ensure(bladePoints.length > 0, "no glaive vertices");
+const bladeFloor = () => { const m = data.nodes[blade]!.matrix as unknown as Float32Array, p = vec3.create(); let low = Infinity; for (const v of bladePoints) { vec3.transformMat4(p, v, m); low = Math.min(low, p[2]!); } return low; };
 const footRest = Math.min(model.PivotPoints[model.Nodes.find(n => n?.Name === "Foot Left Ref ")!.ObjectId]![2]!, model.PivotPoints[model.Nodes.find(n => n?.Name === "Foot Right Ref ")!.ObjectId]![2]!);
+const soleNodes = new Set(["Bone_Foot_L", "Bone_Foot_R"].map(name => named(name).ObjectId));
+const soles = model.Geosets.flatMap(geoset => Array.from({ length: geoset.Vertices.length / 3 }, (_, v) => ({ geoset, v, bones: [...geoset.Groups[geoset.VertexGroup[v]!]!] })).filter(sole => sole.bones.some(bone => soleNodes.has(bone))));
+const soleZ = () => { let low = Infinity; for (const { geoset, v, bones } of soles) { let z = 0; for (const bone of bones) { const m = data.nodes[bone]!.matrix; z += (m[2]! * geoset.Vertices[v * 3]! + m[6]! * geoset.Vertices[v * 3 + 1]! + m[10]! * geoset.Vertices[v * 3 + 2]! + m[14]!) / bones.length; } low = Math.min(low, z); } return low; };
+renderer.setSequence(standIndex); data.frame = stand.Interval[0]; renderer.update(0);
+const soleRest = soleZ();
 const time = (start: number, frame: number) => start + Math.round(frame * 1000 / 60);
+const worldOf = (node: mdx.Node) => { const pivot = model.PivotPoints[node.ObjectId]!, p = vec3.fromValues(pivot[0]!, pivot[1]!, pivot[2]!); vec3.transformMat4(p, p, data.nodes[node.ObjectId]!.matrix as unknown as Float32Array); return p; };
+const baseOf = (node: mdx.Node) => originals.get(`.Bones.${source.Bones.findIndex(b => b.Name === node.Name)}.Rotation`)!.Keys.find(k => k.Frame >= stand.Interval[0] && k.Frame <= stand.Interval[1])!.Vector;
+const rootKey = (Frame: number) => {
+  let key = root.Translation!.Keys.find(k => k.Frame === Frame);
+  if (!key) {
+    const before = root.Translation!.Keys.filter(k => k.Frame <= Frame).at(-1)!, after = root.Translation!.Keys.find(k => k.Frame >= Frame)!;
+    const t = after.Frame === before.Frame ? 0 : (Frame - before.Frame) / (after.Frame - before.Frame);
+    key = { ...before, Frame, Vector: Float32Array.from(before.Vector, (v, i) => v + (after.Vector[i]! - v) * t), ...before.InTan ? { InTan: new Float32Array(3), OutTan: new Float32Array(3) } : {} };
+    root.Translation!.Keys.push(key); root.Translation!.Keys.sort((a, b) => a.Frame - b.Frame);
+  }
+  return key;
+};
 
+function settleFeet(index: number, start: number, frames: number) {
+  const feet = [named("Foot Left Ref "), named("Foot Right Ref ")];
+  for (let frame = 0; frame <= frames; frame++) {
+    const Frame = time(start, frame);
+    renderer.setSequence(index); data.frame = Frame; renderer.update(0);
+    const floor = Math.min(...feet.map(node => worldOf(node)[2]!)) - footRest;
+    const key = rootKey(Frame);
+    key.Vector = Float32Array.from(key.Vector, (v, i) => i === 2 ? v - floor : v);
+  }
+}
+
+function liftCloth(pose: string, action: Authored, index: number, start: number) {
+  const cloth = named("Object02"), clothIds = new Set([cloth.ObjectId, named("Object04").ObjectId, named("Object01").ObjectId]);
+  ensure(cloth.Rotation, "Object02 has no rotation track");
+  const clothPoints = model.Geosets.flatMap(geoset => Array.from({ length: geoset.Vertices.length / 3 }, (_, v) => v)
+    .filter(v => { const g = geoset.Groups[geoset.VertexGroup[v] ?? 0] ?? []; return g.length > 0 && g.every(n => clothIds.has(n)); })
+    .map(v => ({ node: geoset.Groups[geoset.VertexGroup[v] ?? 0]![0]!, p: vec3.fromValues(geoset.Vertices[v * 3]!, geoset.Vertices[v * 3 + 1]!, geoset.Vertices[v * 3 + 2]!) })));
+  const clothFloor = () => { const q = vec3.create(); let low = Infinity; for (const { node, p } of clothPoints) { vec3.transformMat4(q, p, data.nodes[node]!.matrix as unknown as Float32Array); low = Math.min(low, q[2]!); } return low; };
+  const clothBase = baseOf(cloth);
+  const cloth2 = named("Object04");
+  const cloth2Base = originals.get(`.Bones.${source.Bones.findIndex(b => b.Name === "Object04")}.Rotation`)?.Keys.find(k => k.Frame >= stand.Interval[0] && k.Frame <= stand.Interval[1])?.Vector ?? new Float32Array([0, 0, 0, 1]);
+  const clothAngles = [0, ...Array.from({ length: 64 }, (_, i) => (i % 2 ? -1 : 1) * (Math.floor(i / 2) * 5 + 5))];
+  renderer.setSequence(index);
+  for (const phase of action.phases) {
+    const at = time(start, phase.frame), key = cloth.Rotation!.Keys.find(k => k.Frame === at)!;
+    const key2 = cloth2.Rotation?.Keys.find(k => k.Frame === at);
+    const set = (angle: number) => {
+      key.Vector = rotation(clothBase, Math.max(-90, Math.min(90, angle))); if (key.InTan) { key.InTan = key.Vector.slice(); key.OutTan = key.Vector.slice(); }
+      if (key2) { key2.Vector = rotation(cloth2Base, Math.abs(angle) > 90 ? angle - Math.sign(angle) * 90 : 0); if (key2.InTan) { key2.InTan = key2.Vector.slice(); key2.OutTan = key2.Vector.slice(); } }
+      data.frame = at; renderer.update(0); };
+    let chosen = 0, bestLow = -Infinity;
+    for (const angle of clothAngles) {
+      set(angle); const low = clothFloor();
+      if (low >= 0) { chosen = angle; bestLow = low; break; }
+      if (low > bestLow) { bestLow = low; chosen = angle; }
+    }
+    set(chosen);
+    if (chosen !== 0) console.log(`${pose} f${phase.frame}: loincloth pitched ${chosen} (low ${bestLow.toFixed(1)})`);
+  }
+}
+
+function aimTip(action: Authored, start: number) {
+  const arm = named("Bone_Arm1_R"), elbow = named("Bone_Arm2_R");
+  const gripAt = () => worldOf(hand);
+  for (const phase of action.phases) if (phase.tip) {
+    const at = time(start, phase.frame), tip = phase.tip;
+    const keys = [arm, elbow, hand].map(n => n.Rotation!.Keys.find(k => k.Frame === at)!);
+    const angles = [phase.gesture.arm ?? 0, phase.gesture.armYaw ?? 0, 0, phase.gesture.elbow ?? 0, phase.gesture.wrist ?? 0, phase.gesture.wristRoll ?? 0];
+    const apply = () => {
+      keys[0]!.Vector = rotation(baseOf(arm), angles[0]!, angles[1]!, angles[2]!);
+      keys[1]!.Vector = rotation(baseOf(elbow), angles[3]!, 0, 0);
+      keys[2]!.Vector = rotation(baseOf(hand), angles[4]!, 0, angles[5]!);
+      for (const key of keys) if (key.InTan) { key.InTan = key.Vector.slice(); key.OutTan = key.Vector.slice(); }
+      data.frame = at; renderer.update(0);
+    };
+    const loss = () => { apply(); const p = tipAt(), g = phase.grip ? gripAt() : undefined;
+      return (p[0]! - tip[0]) ** 2 + (p[2]! - tip[1]) ** 2 + (tip[2] === undefined ? 0.3 * p[1]! ** 2 : (p[1]! - tip[2]) ** 2)
+        + (g ? (g[0]! - phase.grip![0]) ** 2 + (g[2]! - phase.grip![1]) ** 2 : 0) + (action.ground === "cloth" ? 40 * Math.max(0, 3 - bladeFloor()) ** 2 : 0); };
+    for (let pass = 0; pass < 4; pass++) for (const axis of [0, 3, 4, 1, 2, 5]) {
+      let best = Infinity, bestAngle = angles[axis]!;
+      const centre = angles[axis]!, span = pass < 2 ? 180 : 30, step = pass < 2 ? 10 : 2;
+      for (let angle = centre - span; angle <= centre + span; angle += step) { angles[axis] = angle; const value = loss(); if (value < best) { best = value; bestAngle = angle; } }
+      angles[axis] = bestAngle;
+    }
+    loss();
+  }
+}
+
+function reachAndStand(action: Authored, index: number, start: number, frames: number) {
+  const supportFoot = action.support === undefined ? undefined : named(REACH[action.support === "L" ? "footL" : "footR"][0]);
+  data.frame = start; renderer.setSequence(index); renderer.update(0);
+  const supportRest = supportFoot === undefined ? 0 : worldOf(supportFoot)[0]!;
+  const settled = (p: vec3, phase: Phase) => {
+    const floor = Math.min(action.airborne ? 0 : Infinity, soleZ() - soleRest);
+    const shift = supportFoot === undefined ? 0 : supportRest + (phase.gesture.step ?? 0) - worldOf(supportFoot)[0]!;
+    return [p[0]! + shift, p[2]! - floor];
+  };
+  for (const phase of action.phases) if (phase.reach) {
+    const [end, x, z] = phase.reach, [ref, upperField, lowerField, upperName, lowerName] = REACH[end], effector = named(ref), at = time(start, phase.frame);
+    const keys = [named(upperName), named(lowerName)].map(n => n.Rotation!.Keys.find(k => k.Frame === at)!), bases = [named(upperName), named(lowerName)].map(baseOf);
+    const preferred = phase.gesture[lowerField] ?? 0;
+    let best = [phase.gesture[upperField] ?? 0, preferred], score = Infinity;
+    let tuck = 0, bestTuck = 0;
+    const trial = (a: number, b: number) => {
+      data.frame = at;
+      [a, b].forEach((angle, i) => {
+        const node = [named(upperName), named(lowerName)][i]!, key = keys[i]!; key.Vector = bases[i]!.slice(); renderer.update(0);
+        const parent = data.nodes[node.Parent!]!.matrix;
+        key.Vector = depthTurn(i === 0 ? depthTurn(bases[i]!, parent, tuck, 0) : bases[i]!, parent, angle);
+        if (key.InTan) { key.InTan = key.Vector.slice(); key.OutTan = key.Vector.slice(); }
+        renderer.update(0);
+      });
+      const [px, pz] = settled(worldOf(effector), phase), value = (px! - x) ** 2 + (pz! - z) ** 2 + 0.002 * (b - preferred) ** 2;
+      if (value < score) { score = value; best = [a, b]; bestTuck = tuck; }
+    };
+    for (const t of end.startsWith("foot") ? [0, -20, 20, -40, 40, -60, 60] : [0]) { if (score < 16) break; tuck = t; for (let a = -180; a < 180; a += 10) for (let b = -170; b <= 170; b += 10) trial(a, b); }
+    tuck = bestTuck;
+    for (const step of [4, 2, 1]) { const [a0, b0] = best; for (let a = a0! - 3 * step; a <= a0! + 3 * step; a += step) for (let b = b0! - 3 * step; b <= b0! + 3 * step; b += step) trial(a, b); }
+    trial(best[0]!, best[1]!);
+    phase.gesture[upperField] = best[0]; phase.gesture[lowerField] = best[1];
+  }
+  for (let frame = 0; frame <= frames; frame++) {
+    const Frame = time(start, frame);
+    renderer.setSequence(index); data.frame = Frame; renderer.update(0);
+    const key = rootKey(Frame);
+    const next = action.phases.findIndex(p => p.frame >= frame), b = action.phases[next]!, a = action.phases[Math.max(0, next - 1)]!;
+    const step = (a.gesture.step ?? 0) + ((b.gesture.step ?? 0) - (a.gesture.step ?? 0)) * (b.frame === a.frame ? 1 : (frame - a.frame) / (b.frame - a.frame));
+    for (let pass = 0; pass < 3; pass++) {
+      data.frame = Frame; renderer.update(0);
+      const floor = Math.min(action.airborne ? 0 : Infinity, soleZ() - soleRest), shift = supportFoot === undefined ? 0 : supportRest + step - worldOf(supportFoot)[0]!;
+      key.Vector = Float32Array.from(key.Vector, (v, i) => i === 2 ? v - floor : i === 0 ? v + shift : v);
+    }
+  }
+}
+
+const prior: Record<string, HeroClip> = { ...ROSTER_ATTACK_CLIPS[Character.shadowHunter], ...JUMP_CLIPS[Character.shadowHunter], ...SHADOW_HUNTER_AUTHORED_CLIPS };
 let cursor = Math.max(...source.Sequences.map(s => s.Interval[1])) + 100;
 const bindings = new Map<string, HeroClip>(Object.entries(SHADOW_HUNTER_AUTHORED_CLIPS));
-const authored: { pose: HeroPose; index: number; frames: number; phases: readonly Phase[] }[] = [];
+const authored: { action: Authored; index: number; frames: number }[] = [];
 
 for (const pose of selected) {
   const action = POSES[pose]!();
-  const frames = action.frames ?? SHADOW_HUNTER_MOVES.normals[action.style]!.totalFrames;
+  const frames = action.frames ?? SHADOW_HUNTER_MOVES.normals[action.style!]!.totalFrames;
   const name = `Attack Gesture ${pose}`;
+  const previous = prior[pose];
   let index = model.Sequences.findIndex(s => s.Name === name);
+  if (index < 0 && previous !== undefined && /^(Attack Gesture|Jump Motion) /.test(model.Sequences[previous.index]?.Name ?? "")) index = previous.index;
   let start: number;
   if (index >= 0) {
     const sequence = model.Sequences[index]!; start = sequence.Interval[0];
@@ -130,48 +325,13 @@ for (const pose of selected) {
     key.Vector = new Float32Array([rootBase[0]! + (phase.gesture.lunge ?? 0), rootBase[1]!, rootBase[2]! + (phase.gesture.drop ?? 0)]);
     if (key.InTan) { key.InTan = new Float32Array(3); key.OutTan = new Float32Array(3); }
   }
+  if (action.ground === "cloth" && !action.airborne) { settleFeet(index, start, frames); liftCloth(pose, action, index, start); }
   renderer.setSequence(index);
-  const arm = named("Bone_Arm1_R"), elbow = named("Bone_Arm2_R");
-  const baseOf = (node: mdx.Node) => originals.get(`.Bones.${source.Bones.findIndex(b => b.Name === node.Name)}.Rotation`)!.Keys.find(k => k.Frame >= stand.Interval[0] && k.Frame <= stand.Interval[1])!.Vector;
-  for (const phase of action.phases) if (phase.tip) {
-    const at = time(start, phase.frame);
-    const keys = [arm, elbow, hand].map(n => n.Rotation!.Keys.find(k => k.Frame === at)!);
-    const angles = [phase.gesture.arm ?? 0, phase.gesture.armYaw ?? 0, 0, phase.gesture.elbow ?? 0, phase.gesture.wrist ?? 0, phase.gesture.wristRoll ?? 0];
-    const apply = () => {
-      keys[0]!.Vector = rotation(baseOf(arm), angles[0]!, angles[1]!, angles[2]!);
-      keys[1]!.Vector = rotation(baseOf(elbow), angles[3]!, 0, 0);
-      keys[2]!.Vector = rotation(baseOf(hand), angles[4]!, 0, angles[5]!);
-      for (const key of keys) if (key.InTan) { key.InTan = key.Vector.slice(); key.OutTan = key.Vector.slice(); }
-      data.frame = at; renderer.update(0);
-    };
-    const gripAt = () => { const pivot = model.PivotPoints[hand.ObjectId]!, p = vec3.fromValues(pivot[0]!, pivot[1]!, pivot[2]!); vec3.transformMat4(p, p, data.nodes[hand.ObjectId]!.matrix as unknown as Float32Array); return p; };
-    const loss = () => { apply(); const p = tipAt(), g = phase.grip ? gripAt() : undefined;
-      return (p[0]! - phase.tip![0]) ** 2 + (p[2]! - phase.tip![1]) ** 2 + (phase.tip![2] === undefined ? 0.3 * p[1]! ** 2 : (p[1]! - phase.tip![2]) ** 2) + (g ? (g[0]! - phase.grip![0]) ** 2 + (g[2]! - phase.grip![1]) ** 2 : 0); };
-    for (let pass = 0; pass < 4; pass++) for (const axis of [0, 3, 4, 1, 2, 5]) {
-      let best = Infinity, bestAngle = angles[axis]!;
-      const centre = angles[axis]!, span = pass < 2 ? 180 : 30, step = pass < 2 ? 10 : 2;
-      for (let angle = centre - span; angle <= centre + span; angle += step) { angles[axis] = angle; const value = loss(); if (value < best) { best = value; bestAngle = angle; } }
-      angles[axis] = bestAngle;
-    }
-    loss();
-  }
-  const feet = [named("Foot Left Ref "), named("Foot Right Ref ")];
-  for (let frame = 0; frame <= frames && !action.airborne; frame++) {
-    const Frame = time(start, frame);
-    renderer.setSequence(index); data.frame = Frame; renderer.update(0);
-    const floor = Math.min(...feet.map(node => { const pivot = model.PivotPoints[node.ObjectId]!, p = vec3.fromValues(pivot[0]!, pivot[1]!, pivot[2]!); vec3.transformMat4(p, p, data.nodes[node.ObjectId]!.matrix as unknown as Float32Array); return p[2]!; })) - footRest;
-    let key = root.Translation!.Keys.find(k => k.Frame === Frame);
-    if (!key) {
-      data.frame = Frame; renderer.setSequence(index);
-      const before = root.Translation!.Keys.filter(k => k.Frame <= Frame).at(-1)!, after = root.Translation!.Keys.find(k => k.Frame >= Frame)!;
-      const t = after.Frame === before.Frame ? 0 : (Frame - before.Frame) / (after.Frame - before.Frame);
-      key = { ...before, Frame, Vector: Float32Array.from(before.Vector, (v, i) => v + (after.Vector[i]! - v) * t), ...before.InTan ? { InTan: new Float32Array(3), OutTan: new Float32Array(3) } : {} };
-      root.Translation!.Keys.push(key); root.Translation!.Keys.sort((a, b) => a.Frame - b.Frame);
-    }
-    key.Vector = Float32Array.from(key.Vector, (v, i) => i === 2 ? v - floor : v);
-  }
-  for (const form of [pose, ...action.forms ?? []]) bindings.set(form, { index, seconds: (time(start, frames) - start) / 1000, aligned: true });
-  authored.push({ pose: action.pose, index, frames, phases: action.phases });
+  aimTip(action, start);
+  if (action.ground === "sole") reachAndStand(action, index, start, frames);
+  else if (action.ground === undefined && !action.airborne) settleFeet(index, start, frames);
+  if (action.style !== undefined) for (const form of [pose, ...action.forms ?? []]) bindings.set(form, { index, seconds: (time(start, frames) - start) / 1000, aligned: true });
+  authored.push({ action, index, frames });
 }
 
 const bytes = encodeVerified(parseSource(generateMDX(model)));
@@ -183,16 +343,19 @@ for (const [index, sequence] of source.Sequences.entries()) if (!authored.some(a
 }
 mkdirSync(output, { recursive: true });
 const target = join(output, "heroshadowhunter.mdx"); await Bun.write(target, bytes); chmodSync(target, 0o644);
-for (const action of authored) {
-  const panels: PoseFrame[] = [1, -1].flatMap(facing => { const sampled = sampleAttack(Character.shadowHunter, POSES[action.pose]!().frames === undefined ? POSES[action.pose]!().style : AttackStyle.forwardSmash, facing);
-    return action.phases.map(p => ({ ...sampled[Math.min(p.frame, sampled.length - 1)]!, frame: p.frame, clip: action.index, seconds: p.frame / 60 })); });
+for (const { action, index, frames } of authored) {
+  let lowest = Infinity; for (let frame = 0; frame <= frames && !action.airborne; frame++) { const t = after.triangles(index, frame / 60, 1); for (let i = 1; i < t.length; i += 2) lowest = Math.min(lowest, t[i]!); }
+  if (lowest <= -8) console.warn(`${action.pose}: drawn body sinks ${lowest.toFixed(1)} below the floor`);
+  const style = action.style === undefined ? undefined : action.frames === undefined && SHADOW_HUNTER_MOVES.normals[action.style] ? action.style : AttackStyle.forwardSmash;
+  const panels: PoseFrame[] = [1, -1].flatMap(facing => { const sampled = style === undefined ? [] : sampleAttack(Character.shadowHunter, style, facing);
+    return action.phases.map(p => ({ ...sampled[Math.min(p.frame, sampled.length - 1)] ?? { phase: AttackPhase.none, x: 0, z: 0, facing, parts: [], strikes: [] }, frame: p.frame, clip: index, seconds: p.frame / 60 })); });
   await Bun.write(join(output, `${action.pose}.png`), sheet(`Shadow Hunter ${action.pose}`, after, panels, action.phases.length).png);
 }
-const lines = [...bindings].sort(([a], [b]) => a.localeCompare(b)).map(([pose, clip]) => `  ${pose}: { index: ${clip.index}, seconds: ${seconds(clip.seconds)}${clip.aligned ? ", aligned: true" : ""} },`);
+const lines = [...bindings].sort(([a], [b]) => a.localeCompare(b)).map(([pose, clip]) => `  ${pose}: { index: ${clip.index}, seconds: ${seconds(Number(clip.seconds.toFixed(3)))}${clip.aligned ? ", aligned: true" : ""} },`);
 await Bun.write(join(project, "ts/src/game/presentation/heroes/shadowHunterClipInfo.ts"), [
   "// Generated by tools/animations/shadow-hunter-clips.ts; regenerate instead of editing.",
   'import { f32 } from "wisp/src/sim/f32";',
   'import type { HeroClipTable } from "../../sim/heroes/hero";',
   "export const SHADOW_HUNTER_AUTHORED_CLIPS: HeroClipTable = {", ...lines, "};", "",
 ].join("\n"));
-console.log(`SHADOW_HUNTER_CLIPS_PASS ${authored.map(a => `${a.pose}@${a.index}`).join(" ")}; ${preserved} earlier pose samples retained; ${target}`);
+console.log(`SHADOW_HUNTER_CLIPS_PASS ${authored.map(a => `${a.action.pose}@${a.index}`).join(" ")}; ${preserved} earlier pose samples retained; ${target}`);
