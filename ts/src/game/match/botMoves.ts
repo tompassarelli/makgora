@@ -51,10 +51,11 @@ const SPACING_STEP = 30.0;
 
 const STYLE_SLOTS = LAST_ATTACK_STYLE + 1;
 
-const strikeBounds: number[] = [];
-const strikeFilled: boolean[] = [];
-
-const strikeMoves: (FighterMoves | undefined)[] = [];
+const STRIKE_SLOTS = (Math.max(...Object.values(Character)) + 1) * STYLE_SLOTS;
+const UNMEASURED: object = {};
+// Sized up front: Lua arrays grow by doubling as new fighters appear and never shrink.
+const strikeBounds: number[] = Array.from({ length: STRIKE_SLOTS * 4 }, () => 0.0);
+const strikeMoves: (FighterMoves | undefined | object)[] = Array.from({ length: STRIKE_SLOTS }, () => UNMEASURED);
 const scratchRegion = emptyHitRegion();
 const scratchCapsule = emptyCapsule();
 const projectileFlight = emptyCapsule();
@@ -68,7 +69,7 @@ const weights: number[] = [];
 function strikeIndex(character: Character, style: AttackStyle, moves?: FighterMoves): number {
   const slot = character * STYLE_SLOTS + style;
   const index = slot * 4;
-  if (strikeFilled[slot] === true && strikeMoves[slot] === moves) return index;
+  if (strikeMoves[slot] === moves) return index;
   const startup = attackStartupFrames(style, moves);
   let found = false;
   let minX = 1.0;
@@ -93,7 +94,6 @@ function strikeIndex(character: Character, style: AttackStyle, moves?: FighterMo
   strikeBounds[index + 1] = maxX;
   strikeBounds[index + 2] = minZ;
   strikeBounds[index + 3] = maxZ;
-  strikeFilled[slot] = true;
   strikeMoves[slot] = moves;
   return index;
 }
