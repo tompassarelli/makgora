@@ -9,7 +9,7 @@ import * as BunServices from "@effect/platform-bun/BunServices";
 import { Cause, Effect, Exit, Layer, Schema } from "effect";
 import { BUSY_PRESSURE, INCONCLUSIVE_EXIT, timingTestFiles, timingTests, withPressure } from "wisp/scripts/wisp/testRunner";
 import { TEST_PHASE_ENV } from "wisp/scripts/wisp/timingTest";
-import { ISOLATED_TEST_GROUPS, SWEEP_PARTS, testWorkerEnvironment } from "./testWorkers";
+import { ISOLATED_TEST_GROUPS, SWEEP_PARTS, TEST_TIMEOUT_MS, testWorkerEnvironment } from "./testWorkers";
 import { admit } from "./heavyCapacity";
 import { runMeasuredProcess } from "./hostProcess";
 import { BUN_TEST_CEILING_FRAMES, addCost, cpuReport, readBaseline, type Costs } from "./testCost";
@@ -18,8 +18,6 @@ import { refuseLiteralCopies } from "./literalCopies";
 import { platformLayer } from "wisp/scripts/platform/layer";
 import { ensureGenerated } from "./generated";
 
-/** The hang timeout per test; cost is bounded by BUN_TEST_CEILING_FRAMES. */
-const TEST_TIMEOUT_MS = 60_000;
 const project = resolve(import.meta.dir, "..");
 process.chdir(project);
 ensureGenerated();

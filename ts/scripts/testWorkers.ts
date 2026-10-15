@@ -16,6 +16,9 @@ export const ISOLATED_TEST_GROUPS: readonly (readonly string[])[] = [
   ["test/local-start.test.ts", "test/match-settings.test.ts"],
 ];
 
+/** The hang timeout per test; cost is bounded by BUN_TEST_CEILING_FRAMES. */
+export const TEST_TIMEOUT_MS = 60_000;
+
 export const SWEEP_PARTS: Readonly<Record<string, number>> = { "test/zero-to-death.test.ts": 4 };
 
 /**
