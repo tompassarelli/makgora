@@ -27,10 +27,19 @@ const project = resolve(import.meta.dir, "../..");
 ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/cairne-clips.ts STOCK_TAUREN.mdx PRIVATE_OUTPUT");
 const source = parseSource(await Bun.file(input).arrayBuffer()), model = structuredClone(source);
 ensure(source.Sequences.length === 12 && source.Nodes.some(n => n.Name === "Bone_Axe_Free"), "Expected classic Tauren Chieftain");
-const stand = source.Sequences[4]!;
-interface Gesture { chest?: number; head?: number; arm?: number; elbow?: number; free?: number; freeElbow?: number; hip?: number; knee?: number; lean?: number; yaw?: number; leftHip?: number; rightHip?: number }
-interface Phase { frame: number; gesture: Gesture; target?: readonly [number,number] }
-interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; prep?: Gesture; prepTarget?: readonly [number,number]; prepTravel?: number; hold?: boolean; air?: boolean; roll?: number; first?: Gesture; phases?: readonly Phase[]; target?: readonly [number, number]; damage?: boolean }
+const stand = source.Sequences[4]!, idleSequence = source.Sequences[0]!;
+interface Gesture { chest?: number; twist?: number; head?: number; arm?: number; elbow?: number; free?: number; freeElbow?: number; hip?: number; knee?: number; lean?: number; yaw?: number; leftHip?: number; rightHip?: number; leftKnee?: number; rightKnee?: number; step?: number; pitch?: number }
+interface Phase { frame: number; gesture: Gesture; target?: readonly [number,number]; idle?: boolean }
+interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; prep?: Gesture; prepTarget?: readonly [number,number]; prepTravel?: number; hold?: boolean; air?: boolean; roll?: number; first?: Gesture; phases?: readonly Phase[]; target?: readonly [number, number]; damage?: boolean; beats?: readonly Phase[] }
+interface Strike { prep: Gesture; hit: Gesture; follow: Gesture; prepAt?: number; followAt?: number; settle?: number; mid?: readonly Phase[]; aim?: boolean; reach?: readonly [number,number] }
+const strikeBeats=(move:{startupFrames:number;totalFrames:number;regions:readonly {firstFrame:number;lastFrame:number;hit:{strike?:{x2:number;z2:number}}}[]},s:Strike):Phase[]=>{
+  const contact=move.startupFrames,end=move.totalFrames,lastActive=Math.max(...move.regions.map(r=>r.lastFrame));
+  const followAt=s.followAt??Math.min(end-4,lastActive+2),settleAt=Math.round(followAt+(end-followAt)*(s.settle??0.55));
+  const strike=move.regions[0]!.hit.strike!;
+  return [{frame:0,gesture:ready},{frame:s.prepAt??Math.max(1,contact-Math.max(2,Math.round(contact*0.3))),gesture:s.prep},
+    {frame:contact,gesture:s.hit,target:s.aim?[strike.x2,strike.z2]:undefined},...(s.mid??[]),{frame:followAt,gesture:s.follow,target:s.reach},
+    {frame:settleAt,gesture:blend(s.follow,ready,0.62)},{frame:end-1,gesture:ready,idle:true},{frame:end,gesture:ready,idle:true}];
+};
 const blend=(a:Gesture,b:Gesture,t:number):Gesture=>Object.fromEntries([...new Set([...Object.keys(a),...Object.keys(b)])].map(k=>[k,(a[k as keyof Gesture]??0)*(1-t)+(b[k as keyof Gesture]??0)*t]));
 const ready: Gesture = {};
 const reach: Gesture = { chest: 22, arm: -75, elbow: 35, free: -48, hip: -12, knee: 18, head: -12 };
@@ -49,8 +58,42 @@ const normals: readonly [HeroPose, AttackStyle, Gesture][] = [
   ["neutralAir", AttackStyle.neutralAir, reach], ["forwardAir", AttackStyle.forwardAir, {...reach, chest: 32}], ["backAir", AttackStyle.backAir, back],
   ["upAir", AttackStyle.upAir, {chest:-22,head:-38,arm:15,free:10,hip:28,knee:40}], ["downAir", AttackStyle.downAir, {...low, chest: 38, arm: -55}],
 ];
+const tiltHit: Gesture = {chest:10,arm:-130,elbow:5,free:-120,pitch:4,step:10,leftHip:-30,rightHip:15,leftKnee:25,head:-14};
+const forwardTiltStrike=(bend:number):Strike=>({prep:{chest:-22+bend,arm:-170,elbow:40,free:-140,freeElbow:30,pitch:-10,step:-12,leftHip:-5,rightHip:10,knee:12,head:-20},
+  hit:{...tiltHit,chest:10+bend},aim:true,mid:[{frame:15,gesture:{chest:38+bend,arm:-70,elbow:0,free:-70,pitch:12,step:18,leftHip:-42,rightHip:20,leftKnee:40,head:-6},target:[156,60]}],
+  follow:{chest:52+bend,arm:-40,elbow:5,free:-45,pitch:16,step:20,leftHip:-48,rightHip:24,leftKnee:50,knee:15},followAt:18});
+const slam: Gesture = {chest:60,arm:-45,elbow:0,free:-50,pitch:20,step:26,leftHip:-60,rightHip:35,leftKnee:65,rightKnee:10,head:-5};
+const sweep: Gesture = {chest:60,twist:-25,arm:-50,elbow:5,free:-45,pitch:14,step:8,hip:-60,knee:85};
+const strikes: Partial<Record<HeroPose, Strike>> = {
+  jab2:{prep:{chest:0,twist:15,arm:-20,elbow:75,free:-60,pitch:-6,step:-8,hip:-8,knee:20},
+    hit:{chest:34,twist:-15,arm:-70,elbow:0,free:-30,pitch:14,step:22,leftHip:-45,rightHip:22,leftKnee:35,knee:10,head:-14},aim:true,
+    follow:{chest:38,twist:-18,arm:-74,elbow:0,free:-28,pitch:16,step:27,leftHip:-47,rightHip:22,leftKnee:37,knee:10,head:-14},followAt:9,reach:[122,55]},
+  forwardTilt:forwardTiltStrike(0),forwardTiltUp:forwardTiltStrike(-8),forwardTiltDown:forwardTiltStrike(8),
+  upTilt:{prep:{chest:22,arm:-40,elbow:40,free:-40,pitch:6,step:4,hip:-25,knee:45},
+    hit:{chest:-5,arm:-150,elbow:10,free:-140,pitch:-4,hip:-5,knee:10,head:-25},aim:true,
+    mid:[{frame:14,gesture:{chest:-20,arm:-180,elbow:10,free:-175,pitch:-10,step:-3,head:-35,knee:5},target:[0,215]},{frame:16,gesture:{chest:-30,arm:-195,elbow:15,free:-190,pitch:-14,step:-6,head:-40,hip:5,knee:12},target:[-90,175]}],
+    follow:{chest:-34,arm:-200,elbow:20,free:-195,pitch:-16,step:-8,head:-40,hip:8,knee:15},followAt:18},
+  downTilt:{prep:{chest:30,twist:25,arm:-10,elbow:60,free:-30,pitch:6,step:-8,hip:-45,knee:70,head:-10},
+    hit:{chest:55,twist:-20,arm:-45,elbow:5,free:-40,pitch:16,step:18,leftHip:-65,rightHip:-20,leftKnee:70,rightKnee:85,head:-20},aim:true,
+    follow:{chest:58,twist:-35,arm:-48,elbow:5,free:-42,pitch:18,step:22,leftHip:-65,rightHip:-20,leftKnee:70,rightKnee:85,head:-20},followAt:14,reach:[152,8]},
+  dashAttack:{prep:{chest:-15,arm:-30,elbow:70,free:-30,pitch:-14,step:-14,leftHip:-25,rightHip:15,knee:25,head:-10},
+    hit:{chest:30,arm:-80,elbow:10,free:-80,freeElbow:10,pitch:18,step:26,leftHip:-55,rightHip:30,leftKnee:30,rightKnee:5,head:-12},aim:true,
+    follow:{chest:34,arm:-84,elbow:10,free:-84,freeElbow:10,pitch:22,step:32,leftHip:-58,rightHip:32,leftKnee:32,rightKnee:5,head:-12},followAt:21,reach:[110,74]},
+  forwardSmash:{prep:{chest:-30,arm:-195,elbow:50,free:-180,freeElbow:40,pitch:-14,step:-18,leftHip:-10,rightHip:20,knee:20,head:-25},prepAt:20,
+    hit:{chest:5,arm:-140,elbow:5,free:-130,pitch:2,step:6,leftHip:-30,rightHip:15,leftKnee:25,head:-18},aim:true,
+    mid:[{frame:29,gesture:{chest:40,arm:-80,elbow:0,free:-80,pitch:14,step:22,leftHip:-55,rightHip:30,leftKnee:55,head:-8},target:[175,60]},{frame:30,gesture:slam,target:[175,10]}],
+    follow:{...slam,chest:66,pitch:22,step:28},followAt:34,reach:[190,0]},
+  upSmash:{prep:{chest:40,arm:-20,elbow:60,free:-20,pitch:10,hip:-55,knee:85,head:-5},prepAt:18,
+    hit:{chest:-10,arm:-175,elbow:0,free:-175,pitch:-4,hip:5,knee:0,head:-30},aim:true,
+    follow:{chest:-18,arm:-185,elbow:0,free:-185,pitch:-8,hip:10,knee:-5,head:-35},followAt:30},
+  downSmash:{prep:{chest:20,twist:30,arm:-150,elbow:30,free:-140,pitch:-4,hip:-30,knee:45},prepAt:16,
+    hit:sweep,aim:true,mid:[{frame:26,gesture:{...sweep,yaw:160,twist:0},target:[-148,10]}],
+    follow:{...sweep,yaw:180,twist:10},followAt:30,reach:[-158,8]},
+};
 for (const [pose, style, gesture] of normals) {
   const move = CAIRNE_MOVES.normals[style]; ensure(move, `${pose}: missing timing`);
+  const strike = strikes[pose];
+  if (strike) { actions.push({pose,frames:move.totalFrames,contact:move.startupFrames,gesture:strike.hit,beats:strikeBeats(move,strike)}); continue; }
   const first = move.startupFrames;
   const sweeping = ["forwardTilt","forwardTiltUp","forwardTiltDown","forwardSmash","forwardAir","backAir","upTilt","downSmash","neutralAir"].includes(pose);
   const phases:Phase[]|undefined = sweeping ? move.regions.map(region => ({frame: region.firstFrame, target:[region.hit.strike!.x2,region.hit.strike!.z2],gesture: {...gesture,
@@ -62,7 +105,7 @@ for (const [pose, style, gesture] of normals) {
     target: style===AttackStyle.upAir || style===AttackStyle.dashAttack ? undefined : [move.regions[0]!.hit.strike!.x2, move.regions[0]!.hit.strike!.z2]});
 }
 const extra: readonly [HeroPose, number, number, Gesture][] = [
-  ["crouch",30,10,brace], ["landing",8,2,{...brace,chest:38}], ["shield",30,1,{...brace,free:-100}], ["smashCharge",30,1,{...high,arm:-110}],
+  ["crouch",30,10,brace], ["landing",8,2,{...brace,chest:38}], ["shield",30,1,{...brace,free:-100}], ["smashCharge",30,1,{chest:-28,arm:-190,elbow:50,free:-175,freeElbow:40,lean:-12,hip:-15,knee:35,head:-22}],
   ["airDodge",49,4,{...brace,lean:-30}], ["dizzy",60,20,{chest:-15,head:35,arm:20,free:30,yaw:20}],
   ["turn",8,4,{chest:-10,yaw:130,hip:-15,knee:25}], ["stop",8,3,{...brace,lean:-20}], ["jumpSquat",5,4,brace],
   ["jump",24,6,{...high,hip:-35,knee:65}], ["doubleJump",24,6,{...high,hip:35,knee:45}], ["wallJump",24,6,{...reach,lean:-35,leftHip:-65,rightHip:25}],
@@ -150,12 +193,12 @@ function rotation(base: ArrayLike<number>, pitch:number, yaw=0): Float32Array {
   quat.multiply(q,q,Float32Array.from(base)); quat.normalize(q,q); return new Float32Array(q);
 }
 function joint(name:string,g:Gesture):[number,number] {
-  if(name==="Root")return [g.lean??0,g.yaw??0];
-  if(name==="Bone_Chest")return [g.chest??0,0]; if(name==="Bone_Head")return [g.head??0,0];
+  if(name==="Root")return [(g.lean??0)-(g.pitch??0),g.yaw??0];
+  if(name==="Bone_Chest")return [g.chest??0,g.twist??0]; if(name==="Bone_Head")return [g.head??0,0];
   if(name==="Bone_UpperArmR")return [g.arm??0,0]; if(name==="Bone_LowerArmR")return [g.elbow??0,0];
   if(name==="Bone_UpperArmL")return [g.free??0,0]; if(name==="Bone_LowerArmL")return [g.freeElbow??0,0];
   if(name==="Bone_UpperlegL")return [g.leftHip??g.hip??0,0]; if(name==="Bone_UpperlegR")return [g.rightHip??(g.hip??0)*0.55,0];
-  if(/^Bone_Leg2[LR]$/.test(name))return [g.knee??0,0];
+  if(name==="Bone_Leg2L")return [g.leftKnee??g.knee??0,0]; if(name==="Bone_Leg2R")return [g.rightKnee??g.knee??0,0];
   return [0,0];
 }
 const originals=new Map<string,mdx.AnimVector>(); tracks(source,(track,path)=>originals.set(path,track));
@@ -168,6 +211,16 @@ ensure(mat4.invert(offset,handRest),"Hand's stock pose is singular"); mat4.multi
 const weaponRef=model.Nodes.find(n=>n.Name==="Weapon Ref")!,weaponPivot=model.PivotPoints[weaponRef.ObjectId]!;
 const weaponPoint=vec3.fromValues(weaponPivot[0]!,weaponPivot[1]!,weaponPivot[2]!);vec3.transformMat4(weaponPoint,weaponPoint,data.nodes[weaponRef.ObjectId].matrix);
 const inverseHand=mat4.create();ensure(mat4.invert(inverseHand,handRest),"Hand pose is singular");vec3.transformMat4(weaponPoint,weaponPoint,inverseHand);
+evaluate(0,0);const idleOffset=mat4.create();ensure(mat4.invert(idleOffset,data.nodes[hand.ObjectId].matrix),"Hand's idle pose is singular");mat4.multiply(idleOffset,idleOffset,data.nodes[weapon.ObjectId].matrix);
+const mixMatrix=(a:mat4,b:mat4,t:number)=>{const qa=quat.create(),qb=quat.create(),ta=vec3.create(),tb=vec3.create(),out=mat4.create();mat4.getRotation(qa,a);mat4.getRotation(qb,b);mat4.getTranslation(ta,a);mat4.getTranslation(tb,b);
+  quat.slerp(qa,qa,qb,t);vec3.lerp(ta,ta,tb,t);return mat4.fromRotationTranslation(out,quat.normalize(qa,qa),ta);};
+const feet=["Foot Left Ref ","Foot Right Ref "].map(name=>model.Nodes.find(n=>n.Name===name)!);
+const soles=()=>Math.min(...feet.map(foot=>{const pivot=model.PivotPoints[foot.ObjectId]!,at=vec3.fromValues(pivot[0]!,pivot[1]!,pivot[2]!);vec3.transformMat4(at,at,data.nodes[foot.ObjectId].matrix);return at[2]!;}));
+evaluate(4,0);const soleRest=soles()-Math.min(...[...new DrawnModel(generateMDX(source),1).triangles(4,0,1)].filter((_,i)=>i%2===1));
+const resting=(path:string,like:ArrayLike<number>)=>path.endsWith("Rotation")?new Float32Array([0,0,0,1]):path.endsWith("Scaling")?new Float32Array([1,1,1]):path.endsWith("Translation")?new Float32Array(3):Float32Array.from(like);
+const ease=(t:number)=>t*t*(3-2*t);
+const along=(phases:readonly Phase[],frame:number,value:(phase:Phase)=>number)=>{const after=phases.findIndex(p=>p.frame>=frame);if(after<=0)return value(phases[Math.max(0,after)]??phases[phases.length-1]!);
+  const a=phases[after-1]!,b=phases[after]!;return value(a)+(value(b)-value(a))*ease((frame-a.frame)/(b.frame-a.frame));};
 let cursor=Math.max(...source.Sequences.map(s=>s.Interval[1]))+100;
 const bindings:string[]=[],damageBindings:string[]=[],records:{pose:string;index:number;frames:number;contact:number}[]=[];
 for (const [ordinal,action] of [...actions,...damageActions].entries()) {
@@ -176,7 +229,7 @@ for (const [ordinal,action] of [...actions,...damageActions].entries()) {
   model.Sequences.push({...stand,Name:name,Interval:new Uint32Array([start,end]),NonLooping:!action.hold,MoveSpeed:0,Rarity:0,
     MinimumExtent:new Float32Array([-320,-320,-200]),MaximumExtent:new Float32Array([320,320,360]),BoundsRadius:440});
   const coil=blend(ready,action.gesture,-0.32);
-  const phases:Phase[]=action.roll ? [0,0.12,0.25,0.5,0.75,0.9,1].map(t=>({frame:Math.round(t*action.frames),gesture:{...blend(ready,brace,t===0||t===1?0:1),lean:t*360*action.roll!}})) : action.hold ? [{frame:0,gesture:action.gesture},{frame:action.frames,gesture:action.gesture}] : [
+  const phases:Phase[]=action.beats ? [...action.beats] : action.roll ? [0,0.12,0.25,0.5,0.75,0.9,1].map(t=>({frame:Math.round(t*action.frames),gesture:{...blend(ready,brace,t===0||t===1?0:1),lean:t*360*action.roll!}})) : action.hold ? [{frame:0,gesture:action.gesture},{frame:action.frames,gesture:action.gesture}] : [
     {frame:0,gesture:action.first??ready},{frame:Math.max(1,action.contact-3),target:action.prepTarget,gesture:action.prep ?? (action.pose==="neutralSpecial"||action.pose==="neutralSpecialAir"
       ? action.phases?.find(phase=>phase.frame===action.contact-1)?.gesture??ready : blend(action.first??ready,coil,0.75))},
     ...(action.phases ?? [{frame:action.contact,gesture:action.gesture,target:action.target},{frame:Math.min(action.frames-1,action.contact+4),gesture:action.gesture,target:action.target}]),
@@ -185,10 +238,11 @@ for (const [ordinal,action] of [...actions,...damageActions].entries()) {
   tracks(model,(track,path)=>{
     const donor=originals.get(path); if(!donor||onGlobalClock(donor))return;
     const first=donor.Keys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1]);if(!first)return;
+    const idleKey=donor.Keys.find(k=>k.Frame>=idleSequence.Interval[0]&&k.Frame<=idleSequence.Interval[1])??{...first,Vector:resting(path,first.Vector)};
     const match=/^\.(Bones|Helpers)\.(\d+)\.Rotation$/.exec(path),node=match?source[match[1] as "Bones"|"Helpers"][Number(match[2])]:undefined;
-    for(const phase of phases){const [pitch,yaw]=node?joint(node.Name,phase.gesture):[0,0];const Vector=node?rotation(first.Vector,pitch,yaw):first.Vector.slice();
+    for(const phase of phases){const base=phase.idle?idleKey:first;const [pitch,yaw]=node?joint(node.Name,phase.gesture):[0,0];const Vector=node?rotation(base.Vector,pitch,yaw):base.Vector.slice();
       const tangent=()=>match||track.LineType===mdx.LineType.Bezier?Vector.slice():new Float32Array(Vector.length);
-      track.Keys.push({...first,Frame:start+Math.round(phase.frame*1000/60),Vector,...first.InTan?{InTan:tangent(),OutTan:tangent()}: {}});}
+      track.Keys.push({...base,Frame:start+Math.round(phase.frame*1000/60),Vector,...first.InTan?{InTan:tangent(),OutTan:tangent()}: {}});}
   });
 
 
@@ -196,11 +250,11 @@ for (const [ordinal,action] of [...actions,...damageActions].entries()) {
   const baseline=(node:mdx.Node)=>source.Nodes[node.ObjectId]!.Rotation!.Keys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1])!.Vector;
   for(const phase of phases)if(phase.target){
     const armKey=shoulder.Rotation!.Keys.find(k=>k.Frame===start+Math.round(phase.frame*1000/60))!,elbowKey=elbow.Rotation!.Keys.find(k=>k.Frame===start+Math.round(phase.frame*1000/60))!;
-    const angles=[phase.gesture.arm??0,0,phase.gesture.elbow??0,0];
+    const angles=[phase.gesture.arm??0,0,phase.gesture.elbow??0,0],authored=angles.slice(),pull=action.beats?0.05:0;
     const loss=()=>{armKey.Vector=rotation(baseline(shoulder),angles[0]!,angles[1]!);elbowKey.Vector=rotation(baseline(elbow),angles[2]!,angles[3]!);
       evaluate(index,phase.frame);const point=vec3.create();vec3.transformMat4(point,weaponPoint,data.nodes[hand.ObjectId].matrix);
-      return (point[0]!-phase.target![0])**2+(point[2]!-phase.target![1])**2;};
-    for(let pass=0;pass<4;pass++)for(let axis=0;axis<4;axis++){let best=Infinity,bestAngle=angles[axis]!;for(let angle=-180;angle<=180;angle+=pass<2?15:5){angles[axis]=angle;const value=loss();if(value<best){best=value;bestAngle=angle;}}angles[axis]=bestAngle;}
+      return (point[0]!-phase.target![0])**2+(point[2]!-phase.target![1])**2+pull*angles.reduce((sum,angle,axis)=>sum+(angle-authored[axis]!)**2,0);};
+    for(let pass=0;pass<4;pass++)for(let axis=0;axis<4;axis++){let best=Infinity,bestAngle=angles[axis]!;for(let centre=pull?authored[axis]!:0,angle=centre-180;angle<=centre+180;angle+=pass<2?15:5){angles[axis]=angle;const value=loss();if(value<best){best=value;bestAngle=angle;}}angles[axis]=bestAngle;}
     loss();for(const key of [armKey,elbowKey])if(key.InTan){key.InTan=key.Vector.slice();key.OutTan=key.Vector.slice();}
   }
 
@@ -215,16 +269,20 @@ for (const [ordinal,action] of [...actions,...damageActions].entries()) {
       if(existing)Object.assign(existing,key);else track.Keys.push(key);
     }
   };
+  const settled=phases.findIndex(p=>p.idle),idleFrom=settled>0?phases[settled-1]!.frame:Infinity,idleAt=settled>0?phases[settled]!.frame:Infinity;
+  const idleWeight=(frame:number)=>frame<=idleFrom?0:Math.min(1,(frame-idleFrom)/(idleAt-idleFrom));
   for(let frame=0;frame<=action.frames;frame++){
-    evaluate(index,frame);const world=mat4.create(),local=mat4.create();mat4.multiply(world,data.nodes[hand.ObjectId].matrix,offset);
+    evaluate(index,frame);const world=mat4.create(),local=mat4.create();mat4.multiply(world,data.nodes[hand.ObjectId].matrix,mixMatrix(offset,idleOffset,idleWeight(frame)));
     ensure(mat4.invert(local,data.nodes[main.ObjectId].matrix),"Main pose is singular");mat4.multiply(local,local,world);addTransform(weapon,frame,local);
   }
   weapon.Rotation!.Keys.sort((a,b)=>a.Frame-b.Frame);weapon.Translation!.Keys.sort((a,b)=>a.Frame-b.Frame);
 
   const drawn=new DrawnModel(generateMDX(model),1);const rootTrack=main.Translation!;
-  if(!action.air){const mainDonor=source.Nodes[main.ObjectId]!.Translation!.Keys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1])!;
+  if(!action.air){const mainKeys=source.Nodes[main.ObjectId]!.Translation!.Keys,mainDonor=mainKeys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1])!,mainIdle=mainKeys.find(k=>k.Frame>=idleSequence.Interval[0]&&k.Frame<=idleSequence.Interval[1])??{...mainDonor,Vector:resting(".Translation",mainDonor.Vector)};
     for(let frame=0;frame<=action.frames;frame++){const vertices=drawn.triangles(index,frame/60,1);let floor=Infinity;for(let i=1;i<vertices.length;i+=2)floor=Math.min(floor,vertices[i]!);
-      const Frame=start+Math.round(frame*1000/60),Vector=mainDonor.Vector.slice();Vector[2]=Vector[2]!-floor;
+      if(action.beats){evaluate(index,frame);floor=soles()-soleRest;}
+      const Frame=start+Math.round(frame*1000/60),w=idleWeight(frame),Vector=mainDonor.Vector.map((v,i)=>v*(1-w)+mainIdle.Vector[i]!*w);Vector[2]=Vector[2]!-floor;
+      if(action.beats)Vector[0]=Vector[0]!+along(action.beats,frame,p=>p.gesture.step??0);
       if(action.prepTravel&&frame<action.contact){const wind=Math.max(1,action.contact-3);Vector[0]=Vector[0]!-action.prepTravel*(frame<=wind?frame/wind:(action.contact-frame)/(action.contact-wind));}
       const key={Frame,Vector,...rootTrack.LineType>1?{InTan:new Float32Array(3),OutTan:new Float32Array(3)}:{}};
       const previous=rootTrack.Keys.find(k=>k.Frame===Frame);if(previous)Object.assign(previous,key);else rootTrack.Keys.push(key);}
@@ -262,10 +320,10 @@ const motions=actions.map((action,ordinal)=>{const index=source.Sequences.length
   if(!action.hold)ensure(motion>=8,`${action.pose}: no local gesture (${motion})`);return {pose:action.pose,motion};});
 const pain=damageActions.map((_,ordinal)=>after.triangles(source.Sequences.length+actions.length+ordinal,0,1));
 for(let a=0;a<pain.length;a++)for(let b=a+1;b<pain.length;b++)ensure(pain[a]!.some((v,i)=>Math.abs(v-pain[b]![i]!)>2),`Pain ${a}/${b}: same silhouette`);
-for(const pose of ["forwardTilt","upTilt","downTilt","downSmash","neutralAir","forwardAir","backAir","upAir","downAir","getUpAttack","ledgeAttack","grab","pummel","neutralSpecial","sideSpecial","upSpecial","downSpecial","rollForward","throwForward","throwBack","throwUp","throwDown"] as const){
+for(const pose of ["jab","jab2","forwardTilt","upTilt","downTilt","dashAttack","forwardSmash","upSmash","smashCharge","downSmash","neutralAir","forwardAir","backAir","upAir","downAir","getUpAttack","ledgeAttack","grab","pummel","neutralSpecial","sideSpecial","upSpecial","downSpecial","rollForward","throwForward","throwBack","throwUp","throwDown"] as const){
   const ordinal=actions.findIndex(a=>a.pose===pose),action=actions[ordinal]!;
-  const panels:PoseFrame[]=[1,-1].flatMap(facing=>[0,Math.max(1,action.contact-3),action.contact,Math.min(action.frames,action.contact+4),action.frames].map(frame=>({frame,phase:frame<action.contact?AttackPhase.startup:frame<=action.contact+4?AttackPhase.active:AttackPhase.recovery,x:0,z:0,facing,parts:[],strikes:[],clip:source.Sequences.length+ordinal,seconds:frame/60})));
-  await Bun.write(join(output,`${pose}.png`),sheet(`Cairne ${pose}`,after,panels,5).png);
+  const panels:PoseFrame[]=[1,-1].flatMap(facing=>(action.beats?action.beats.map(b=>b.frame):[0,Math.max(1,action.contact-3),action.contact,Math.min(action.frames,action.contact+4),action.frames]).map(frame=>({frame,phase:frame<action.contact?AttackPhase.startup:frame<=action.contact+4?AttackPhase.active:AttackPhase.recovery,x:0,z:0,facing,parts:[],strikes:[],clip:source.Sequences.length+ordinal,seconds:frame/60})));
+  await Bun.write(join(output,`${pose}.png`),sheet(`Cairne ${pose}`,after,panels,panels.length/2).png);
 }
 await Bun.write(join(output,"cairne-clips.json"),JSON.stringify({stockSequences:source.Sequences.length,preservedSamples:preserved,appended:records.length,records,motions},null,2)+"\n");
 console.log(`CAIRNE_CLIPS_PASS ${records.length} clips; ${preserved} stock pose samples retained; nine distinct first pain poses; ${output}`);
