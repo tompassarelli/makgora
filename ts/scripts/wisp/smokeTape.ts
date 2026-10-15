@@ -36,6 +36,8 @@ const tap = (keys: readonly number[], hold = 4): Press => ({ at: 0, keys, hold }
 
 export const RESET_LEAD = 120;
 export const DROP_AT = 60;
+export const SETTLE_AT = 90;
+export const SPECIAL_TAIL = 240;
 export const MANA_CYCLES = 14;
 export const APPROACH_FRAMES = 100;
 export const STRIKES = 3;
@@ -70,7 +72,9 @@ function charge(slot: number, approaches: readonly [number, number]): SmokeStep[
   });
 }
 
-const ultimate = (): SmokeStep => afterReset("Ultimate", [tap([key(Action.attack), key(Action.special)])], 240, special("ultimate"));
+const rest = (): SmokeStep => afterReset("rest", [], 0);
+
+const ultimate = (): SmokeStep[] => [afterReset("Ultimate", [tap([key(Action.attack), key(Action.special)])], SPECIAL_TAIL, special("ultimate")), rest()];
 
 function bindingSweep(): SmokeStep[] {
   const jumps = [key(Action.jump), key(Action.jump, true), key(Action.shortHop)];
@@ -100,21 +104,37 @@ export function smokeMoves(facing: 1 | -1): readonly SmokeStep[] {
     aerial("Back air", smashAway, AttackStyle.backAir),
     aerial("Up air", Action.smashUp, AttackStyle.upAir),
     aerial("Down air", Action.smashDown, AttackStyle.downAir),
-    move("Neutral special", [tap([key(Action.special)])], special("neutral")),
-    move("Side special", [tap([key(toward), key(Action.special)])], special("side")),
-    move("Side special away", [tap([key(away), key(Action.special)])], special("side")),
-    move("Up special", [tap([key(Action.moveUp), key(Action.special)])], special("up")),
-    move("Down special", [tap([key(Action.moveDown), key(Action.special)])], special("down")),
+    move("Neutral special", [tap([key(Action.special)])], special("neutral"), SPECIAL_TAIL),
+    move("Side special", [tap([key(toward), key(Action.special)])], special("side"), SPECIAL_TAIL),
+    move("Side special away", [tap([key(away), key(Action.special)])], special("side"), SPECIAL_TAIL),
+    move("Up special", [tap([key(Action.moveUp), key(Action.special)])], special("up"), SPECIAL_TAIL),
+    move("Down special", [tap([key(Action.moveDown), key(Action.special)])], special("down"), SPECIAL_TAIL),
   ];
 }
 
 export function smokeSchedule(approaches: readonly [number, number]): readonly SmokeSegment[] {
   return [
     [{ slot: 0, steps: bindingSweep() }, { slot: 1, steps: bindingSweep() }],
-    [{ slot: 0, steps: smokeMoves(facingOf(0)) }, { slot: 1, steps: smokeMoves(facingOf(1)) }],
+    [{ slot: 0, steps: [...smokeMoves(facingOf(0)), rest()] }, { slot: 1, steps: [...smokeMoves(facingOf(1)), rest()] }],
     [{ slot: 0, steps: charge(0, approaches) }, { slot: 1, steps: charge(1, approaches) }],
-    [{ slot: 0, steps: [ultimate()] }, { slot: 1, steps: [ultimate()] }],
+    [{ slot: 0, steps: ultimate() }, { slot: 1, steps: ultimate() }],
   ];
+}
+
+export interface SettlePoint {
+  readonly step: string;
+  readonly special: boolean;
+  readonly frame: number;
+}
+
+export function settlePoints(steps: readonly SmokeStep[]): SettlePoint[] {
+  const points: SettlePoint[] = [];
+  let start = 0;
+  for (const step of steps) {
+    if (step.presses[0] === RESET) points.push({ step: step.name, special: step.expect?.kind === "special", frame: start + SETTLE_AT });
+    start += step.frames;
+  }
+  return points;
 }
 
 export const tapeFrames = (steps: readonly SmokeStep[]): number => steps.reduce((total, step) => total + step.frames, 0);

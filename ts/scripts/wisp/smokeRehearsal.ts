@@ -46,13 +46,24 @@ export function approachFrames(character: Character, slot: number): number {
 
 export const smokeApproaches = (first: Character, second: Character): [number, number] => [approachFrames(first, 0), approachFrames(second, 1)];
 
-export function rehearseSmoke(first: Character, second: Character, bindings: KeyBindings = SMOKE_BINDINGS, schedule: readonly SmokeSegment[] = smokeSchedule(smokeApproaches(first, second))): SmokeVerdict {
+export interface Rehearsal {
+  readonly lines: string[];
+  readonly starts: number[];
+}
+
+export function rehearsal(first: Character, second: Character, bindings: KeyBindings, schedule: readonly SmokeSegment[]): Rehearsal {
   const frames = schedule.reduce((total, segment) => total + segmentFrames(segment) + BETWEEN_FRAMES, LEAD_FRAMES);
   const masks = [new Array<number>(frames).fill(0), new Array<number>(frames).fill(0)];
   let start = LEAD_FRAMES;
+  const starts: number[] = [];
   for (const segment of schedule) {
+    starts.push(start);
     for (const { slot, steps } of segment) heldMasks(steps, bindings).forEach((held, index) => { const row = masks[slot]; if (row !== undefined) row[start + index] = held; });
     start += segmentFrames(segment) + BETWEEN_FRAMES;
   }
-  return judgeSmoke(recorded(first, second, frames, masks.map(keyboardRows)), schedule.flat());
+  return { lines: recorded(first, second, frames, masks.map(keyboardRows)), starts };
+}
+
+export function rehearseSmoke(first: Character, second: Character, bindings: KeyBindings = SMOKE_BINDINGS, schedule: readonly SmokeSegment[] = smokeSchedule(smokeApproaches(first, second))): SmokeVerdict {
+  return judgeSmoke(rehearsal(first, second, bindings, schedule).lines, schedule.flat());
 }

@@ -23,6 +23,12 @@
   start, or `gate-moves` fails and the green install keeps the last good map.
   `bun wisp smoke` rehearses the same tapes headless on every pair in about ten
   seconds; run it after changing a fighter's inputs or kit.
+  `gate-specials-spot` runs in the same session, after `gate-moves`: at each
+  rest between training resets the host frame's bright play-area pixels are
+  counted, and a special or ultimate fails when the next rest is brighter than
+  the rest before it by more than three times the largest rest-to-rest change
+  of the normals (smashcraft:ts/scripts/wisp/specialsSpot.ts). Training mode
+  drops no meter orb and the count skips the HUD band, so the orb never counts.
   `--map MAP.w3x` uses that already-built candidate for the selected checks
   without rebuilding it; select checks needing the same build profile. Each
   shard receives the same immutable map. Use revision-specific private paths.

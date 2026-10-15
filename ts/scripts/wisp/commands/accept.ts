@@ -284,6 +284,7 @@ export const accept: Command = (rawArgs) => Effect.gen(function*() {
     const live = yield* AcceptDriver;
     const context = yield* Effect.context<Clients | GameFiles>();
     const measurements = new Map<string, ReceiptFile[]>();
+    const specials = new Map<string, ReceiptFile>();
     const controlled = AcceptDriver.of({
       ...live,
       chat: (name, text) => text === "gate:cursor" ? measureCursorGate(selectedClients, name, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), "gate-cursor-visible", name)).pipe(
@@ -291,8 +292,12 @@ export const accept: Command = (rawArgs) => Effect.gen(function*() {
       ) : text === "gate:start" ? measureStartGate(selectedClients, name, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), "gate-start-anywhere", name), controlled.start("gate-playable", "gate-start")).pipe(
         Effect.tap(receipt => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipt]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
       ) : text === "gate:moves" ? measureMovesGate(selectedClients, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), "gate-moves", name)).pipe(
-        Effect.tap(receipt => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipt]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
-      ) : text === "gate:bindings" ? measureBindingsGate(selectedClients, name, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), "gate-bindings", name), pair?.appIds ?? new Map()).pipe(
+        Effect.tap(receipts => Effect.sync(() => { measurements.set(name, [...(measurements.get(name) ?? []), receipts.moves]); specials.set(name, receipts.specials); })), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
+      ) : text === "gate:specials" ? Effect.gen(function*() {
+        const measured = specials.get(name);
+        if (measured === undefined) return yield* new AcceptFailure({ operation: "specials gate", problem: "gate-moves did not run in this session; the specials spot check reads its settle frames" });
+        measurements.set(name, [...(measurements.get(name) ?? []), { ...measured, modified: yield* Clock.currentTimeMillis }]);
+      }) : text === "gate:bindings" ? measureBindingsGate(selectedClients, name, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), "gate-bindings", name), pair?.appIds ?? new Map()).pipe(
         Effect.tap(receipt => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipt]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
       ) : (solo ? sendSoloDevCommand(text, name) : sendDevCommand(text, name)).pipe(Effect.mapError((cause) => new AcceptFailure({ operation: `chat ${name}`, problem: describeCause(cause) })), Effect.provide(context)),
       receipts: name => Effect.map(live.receipts(name), receipts => [...receipts, ...(measurements.get(name) ?? [])]),

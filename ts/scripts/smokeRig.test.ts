@@ -4,10 +4,11 @@ import { keyFor, presetBindings, slotIndex } from "../src/game/input/keyBindings
 import { Character } from "../src/game/sim/codes";
 import { PLAYABLE_CHARACTERS } from "../src/game/sim/heroes/registry";
 import { SMASHCRAFT_ACCEPT } from "./wisp/acceptChecks";
-import { greenGateFailures } from "./wisp/greenBuilds";
+import { GREEN_GATE_CHECKS, greenGateFailures } from "./wisp/greenBuilds";
 import { smokeLines, smokeReceipt } from "./wisp/smokeJudge";
 import { rehearseSmoke } from "./wisp/smokeRehearsal";
 import { SMOKE_BINDINGS, keyName } from "./wisp/smokeTape";
+import { type Settle, specialsReceipt, specialsSpot } from "./wisp/specialsSpot";
 
 test("the smoke tape starts every move, the ultimate included, and reaches every standard key for both fighters of a pair [k1 scenario]", () => {
   const verdict = rehearseSmoke(Character.rifleman, Character.demonHunter);
@@ -41,4 +42,24 @@ test("the green gate refuses a candidate whose move smoke failed, and the move g
   expect(pattern.test(passing)).toBe(true);
   expect(pattern.test(passing.replace(`fighters=${PLAYABLE_CHARACTERS.length}`, "fighters=2"))).toBe(false);
   expect(pattern.test(passing.replace("live=4", "live=3"))).toBe(false);
+});
+
+test("every check the green install requires is declared, so no undeclared gate blocks every install [k2 property]", () => {
+  const declared = new Set(SMASHCRAFT_ACCEPT.checks.map(({ id }) => id));
+  expect(GREEN_GATE_CHECKS.filter((id) => !declared.has(id))).toEqual([]);
+});
+
+test("a special whose effect is still drawn at the next rest fails the spot check, within the rest-to-rest noise [k2 property]", () => {
+  const rest = (step: string, count: number, special = false): Settle => ({ step, special, count, onTime: true });
+  const moves = [rest("Jab", 100), rest("Grab", 140), rest("Neutral special", 120, true), rest("Side special", 230, true), rest("rest", 900)];
+  const results = specialsSpot([moves, [rest("Ultimate", 150, true), rest("rest", 140)]], 10_000);
+  expect(results.map(({ step, pass }) => [step, pass])).toEqual([["Neutral special", true], ["Side special", false], ["Ultimate", true]]);
+  expect(specialsReceipt(2, results)).toBe("SMASHCRAFT GATE specials fighters=2 checked=3 clear=2 pass=0");
+  expect(specialsSpot([[{ ...rest("Neutral special", 120, true), onTime: false }, rest("rest", 120)]], 10_000).map(({ pass }) => pass)).toEqual([false]);
+  const gate = SMASHCRAFT_ACCEPT.checks.find(({ id }) => id === "gate-specials-spot");
+  const rule = gate?.pass?.find((pass) => pass.kind === "receipt" && "pattern" in pass && pass.pattern.includes("GATE specials"));
+  const pattern = new RegExp(rule !== undefined && "pattern" in rule ? rule.pattern : "^$");
+  expect(pattern.test(specialsReceipt(PLAYABLE_CHARACTERS.length, results.slice(0, 1)))).toBe(true);
+  expect(pattern.test(specialsReceipt(PLAYABLE_CHARACTERS.length, results))).toBe(false);
+  expect(pattern.test(specialsReceipt(PLAYABLE_CHARACTERS.length, []))).toBe(false);
 });

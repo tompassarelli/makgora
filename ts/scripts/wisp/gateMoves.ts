@@ -4,7 +4,7 @@ import { Clock, Effect } from "effect";
 import { ChildProcess } from "effect/process";
 import { AcceptFailure, type ReceiptFile } from "wisp/scripts/wisp/accept";
 import { InputInjection } from "wisp/scripts/platform/services";
-import { type Client, batch, capture, click, focus, frameWords, loadClients } from "wisp/scripts/warcraft/desktop";
+import { type Client, batch, capture, captureTimed, click, focus, frameWords, loadClients } from "wisp/scripts/warcraft/desktop";
 import { journalMenuFile } from "../../src/game/core/gameFiles";
 import { cardX } from "../../src/game/menu/selectionDrag";
 import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
@@ -18,13 +18,16 @@ import { JournalMenu } from "./boundary";
 import { readReplay } from "./replayFiles";
 import { type SmokeVerdict, judgeSmoke, mergeVerdicts, smokeLines, smokeReceipt } from "./smokeJudge";
 import { smokeApproaches } from "./smokeRehearsal";
-import { smokeSchedule, xdotoolArgs } from "./smokeTape";
+import { FRAME_MILLIS, RESET_LEAD, SETTLE_AT, type SettlePoint, settlePoints, smokeSchedule, xdotoolArgs } from "./smokeTape";
+import { type Settle, type SpotResult, brightCount, playArea, specialsReceipt, specialsSpot } from "./specialsSpot";
 
 const fail = (operation: string) => (cause: { readonly message: string }) => new AcceptFailure({ operation, problem: cause.message });
 const REPLAY = /^smashcraft-replay-(\d+)\.txt$/;
 const SEGMENT_GAP = "1 second";
 const MATCH_SETTLE = "6 seconds";
 const PAUSE_SETTLE = "1500 millis";
+
+const spotLines = (fighters: readonly string[], results: readonly SpotResult[]) => results.map(({ step, pass, reason }) => `${pass ? "PASS" : "FAIL"} ${fighters.join(" vs ")} ${step}: ${reason}`);
 
 export const smokePairs = (roster: readonly number[] = PLAYABLE_CHARACTERS): (readonly [number, number])[] =>
   Array.from({ length: Math.ceil(roster.length / 2) }, (_, index) => [2 * index, (2 * index + 1) % roster.length] as const);
@@ -40,6 +43,13 @@ const point = (viewport: Viewport, x: number, y: number) => ({
   x: Math.round(viewport.x + (viewport.width - viewport.height * 4 / 3) / 2 + x * viewport.height / 0.6),
   y: Math.round(viewport.y + viewport.height - y * viewport.height / 0.6),
 });
+
+export interface MovesGateReceipts {
+  readonly moves: ReceiptFile;
+  readonly specials: ReceiptFile;
+}
+
+const nowNs = () => performance.now() * 1_000_000;
 
 export const measureMovesGate = (clientsFile: string, directory: string) => Effect.gen(function*() {
   const clients = yield* loadClients(clientsFile).pipe(Effect.mapError(fail("moves gate clients")));
@@ -79,6 +89,16 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
 
   const grid = rosterGrid(PLAYABLE_CHARACTERS.length);
   const verdicts: { readonly fighters: readonly string[]; readonly verdict: SmokeVerdict }[] = [];
+  const spots: { readonly fighters: readonly string[]; readonly results: readonly SpotResult[] }[] = [];
+  let area = 0;
+  const settle = (points: readonly SettlePoint[], startNs: number) => Effect.forEach(points, point => Effect.gen(function*() {
+    const targetNs = startNs + point.frame * FRAME_MILLIS * 1_000_000;
+    const waitMillis = (targetNs - nowNs()) / 1_000_000;
+    if (waitMillis > 0) yield* Effect.sleep(`${Math.round(waitMillis)} millis`);
+    const { frame, afterNs } = yield* captureTimed(host, nowNs, hostView).pipe(Effect.mapError(fail("moves gate settle frame")));
+    area = playArea(frame);
+    return { step: point.step, special: point.special, count: brightCount(frame), onTime: afterNs - targetNs < (RESET_LEAD - SETTLE_AT) * FRAME_MILLIS * 1_000_000 } satisfies Settle;
+  }));
   for (const [index, pair] of smokePairs().entries()) {
     const characters = pair.map(choice => PLAYABLE_CHARACTERS[choice] ?? Character.rifleman);
     for (const [slot, client] of clients.entries()) {
@@ -103,11 +123,18 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
     ), { every: "200 millis", within: "30 seconds", orElse: () => Effect.fail(new AcceptFailure({ operation: "moves gate match", problem: "STAGE SELECT stays drawn after the start" })) });
     yield* Effect.sleep(MATCH_SETTLE);
     const schedule = smokeSchedule(smokeApproaches(characters[0] ?? Character.rifleman, characters[1] ?? Character.rifleman));
+    const runs: Settle[][] = [];
     for (const segment of schedule) {
-      yield* Effect.forEach(segment, ({ slot, steps }) => {
-        const client = clients[slot];
-        return client === undefined ? Effect.void : focus(client).pipe(Effect.mapError(fail("moves gate focus")), Effect.andThen(xdotool(client, xdotoolArgs(steps))));
-      }, { concurrency: "unbounded", discard: true });
+      yield* Effect.forEach(segment.flatMap(({ slot }) => clients[slot] ?? []), client => focus(client).pipe(Effect.mapError(fail("moves gate focus"))), { discard: true });
+      const points = settlePoints(segment[0]?.steps ?? []);
+      const [, settles] = yield* Effect.all([
+        Effect.forEach(segment, ({ slot, steps }) => {
+          const client = clients[slot];
+          return client === undefined ? Effect.void : xdotool(client, xdotoolArgs(steps));
+        }, { concurrency: "unbounded", discard: true }),
+        settle(points, nowNs()),
+      ], { concurrency: "unbounded" });
+      if (settles.length > 0) runs.push(settles);
       yield* Effect.sleep(SEGMENT_GAP);
     }
     const ended = yield* Clock.currentTimeMillis;
@@ -129,10 +156,16 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
     const seen = [0, 1].map(slot => judged.results.find(result => result.slot === slot)?.fighter ?? "none");
     const verdict: SmokeVerdict = { ...judged, results: [{ slot: 0, fighter: seen.join(" vs "), step: "fighter selection", kind: "setup", pass: seen.join() === fighters.join(), reason: `wanted ${fighters.join(" vs ")}` }, ...judged.results] };
     verdicts.push({ fighters, verdict });
-    yield* save(`match-${String(index + 1).padStart(2, "0")}.txt`, `${[`replay ${manifest}`, `fighters ${fighters.join(" vs ")}`, smokeReceipt(verdict, 2), ...smokeLines(verdict)].join("\n")}\n`);
+    const results = specialsSpot(runs, area);
+    spots.push({ fighters, results });
+    const settleLines = runs.flat().map(({ step, count, onTime }) => `settle ${step} bright=${count}${onTime ? "" : " late"}`);
+    yield* save(`match-${String(index + 1).padStart(2, "0")}.txt`, `${[`replay ${manifest}`, `fighters ${fighters.join(" vs ")}`, smokeReceipt(verdict, 2), ...smokeLines(verdict), specialsReceipt(2, results), ...spotLines(fighters, results), ...settleLines].join("\n")}\n`);
   }
   const all = mergeVerdicts(verdicts.map(({ verdict }) => verdict));
-  const text = smokeReceipt(all, new Set(verdicts.flatMap(({ fighters }) => fighters)).size);
-  yield* save("report.txt", `${[text, ...smokeLines(all)].join("\n")}\n`);
-  return { name: "moves-gate", text, modified: yield* Clock.currentTimeMillis } satisfies ReceiptFile;
+  const roster = new Set(verdicts.flatMap(({ fighters }) => fighters)).size;
+  const text = smokeReceipt(all, roster);
+  const specials = specialsReceipt(roster, spots.flatMap(({ results }) => results));
+  yield* save("report.txt", `${[text, ...smokeLines(all), specials, ...spots.flatMap(({ fighters, results }) => spotLines(fighters, results))].join("\n")}\n`);
+  const modified = yield* Clock.currentTimeMillis;
+  return { moves: { name: "moves-gate", text, modified }, specials: { name: "specials-gate", text: specials, modified } } satisfies MovesGateReceipts;
 });

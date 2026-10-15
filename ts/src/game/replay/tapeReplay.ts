@@ -45,7 +45,7 @@ const must = (ok: boolean, what: string) => {
 
 
 export interface TapeScript {
-  readonly rowAt: (slot: number, frame: number) => InputRow;
+  readonly rowAt: (this: void, slot: number, frame: number) => InputRow;
   readonly first?: Fighter;
   readonly second?: Fighter;
   readonly training?: boolean;
