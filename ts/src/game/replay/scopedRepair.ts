@@ -25,6 +25,7 @@ import type { AuthoredSpecial } from "../sim/heroSpecials";
 import { SMASH_MAX_CHARGE_FRAMES, attackStartupFrames, characterAttackActiveFrames } from "../sim/moves";
 import { felLungeStep } from "../sim/moves";
 import { EYE_BLAST_FORM, EYE_BLAST_REACH } from "../sim/specials";
+import { runningHeroSpecial } from "../sim/heroSpecialRules";
 
 interface AuthoredTravel {
   readonly moves: FighterMoves;
@@ -90,9 +91,11 @@ function widenRegion(extent: Extent, style: number | undefined, region: Readonly
   widenCapsule(extent, attackCapsule(reachCapsule, style, region));
 }
 
+const beamReach: Extent = { x: 0.0, z: 0.0 };
+
 function widenSpecial(extent: Extent, special: Readonly<AuthoredSpecial> | undefined): void {
   if (special === undefined) return;
-  for (const region of special.regions ?? []) widenRegion(extent, undefined, region.hit);
+  for (const region of special.regions ?? []) widenRegion(special.beam === undefined ? extent : beamReach, undefined, region.hit);
   if (special.commandGrab !== undefined) widenCapsule(extent, special.commandGrab.strike);
   widenSpecial(extent, special.ex);
   for (const followUp of special.followUps ?? []) widenSpecial(extent, followUp.special);
@@ -167,13 +170,15 @@ function rosterReach(): Extent {
     normal.x = f32(f32(normal.x + body.x) + both);
     normal.z = f32(f32(normal.z + body.z) + both);
   }
+  beamReach.x = f32(f32(beamReach.x + body.x) + both);
+  beamReach.z = f32(f32(beamReach.z + body.z) + both);
   return { x: f32(f32(strike.x + body.x) + both), z: f32(f32(strike.z + body.z) + both) };
 }
 
 /**
  * Farther apart than this on an axis, a fighter's strikes, specials, grabs
- * and summons can't reach another this frame, except Eye Blast's beam
- * (`strikeReach`). A special that moves its caster next to another fighter is
+ * and summons can't reach another this frame, except Eye Blast's beam and
+ * tracking beams (`strikeReach`). A special that moves its caster next to another fighter is
  * caught by the same test on the states after the frame.
  */
 export const SCOPE_REACH: Readonly<Extent> = rosterReach();
@@ -183,6 +188,7 @@ const SCOPE_BODY = 150.0;
 const BODY_EXTENT: Readonly<Extent> = { x: SCOPE_BODY, z: SCOPE_BODY };
 
 const EYE_BLAST_EXTENT: Readonly<Extent> = { x: Math.max(EYE_BLAST_REACH, SCOPE_REACH.x), z: Math.max(EYE_BLAST_REACH, SCOPE_REACH.z) };
+const BEAM_EXTENT: Readonly<Extent> = { x: Math.max(beamReach.x, SCOPE_REACH.x), z: Math.max(beamReach.z, SCOPE_REACH.z) };
 
 const apart = (ax: number, az: number, bx: number, bz: number, distance: Readonly<Extent>): boolean =>
   Math.abs(f32(ax - bx)) >= distance.x || Math.abs(f32(az - bz)) >= distance.z;
@@ -196,9 +202,10 @@ function reaching(f: Readonly<Fighter>): boolean {
     || f.ledge.state !== LedgeState.none || f.cannon.held !== undefined;
 }
 
-/** How far `f` may act on another fighter this frame: Eye Blast's whole beam, any other reaching action, or a body push. */
+/** How far `f` may act on another fighter this frame: Eye Blast's whole beam, a tracking beam and its aim, any other reaching action, or a body push. */
 function strikeReach(f: Readonly<Fighter>): Readonly<Extent> {
   if (f.special.action === SpecialAction.demonHunterManaBurn && f.special.form === EYE_BLAST_FORM) return EYE_BLAST_EXTENT;
+  if (runningHeroSpecial(f)?.beam !== undefined) return BEAM_EXTENT;
   if (f.attack.style !== undefined && f.special.action === SpecialAction.none
     && f.grab.owner === undefined && f.grab.target === undefined && !inGrabContext(f)
     && f.ledge.state === LedgeState.none && f.cannon.held === undefined) return normalReach[f.character] ?? SCOPE_REACH;
