@@ -42,7 +42,7 @@ export const AERIAL_DOWN_CHOICES: Readonly<Record<number, string>> = {
   [Character.thrall]: "falling two-sided Doomhammer Slam",
   [Character.jaina]: "downward water bolt; recall works while falling",
   [Character.sylvanas]: "Life Drain grab while falling",
-  [Character.cairne]: "Reincarnation healing guard while falling",
+  [Character.cairne]: "War Stomp: Endurance armor while falling, two-sided stomp, 26 landing frames",
   [Character.chen]: "Earth stance armor in the air; lands into the grounded stance",
   [Character.peon]: "Rest in the air: the frame-2 jolt, then he sleeps while falling and keeps sleeping after landing",
   [Character.tinker]: "drops one Clockwerk Goblin; lands into the grounded factory build",

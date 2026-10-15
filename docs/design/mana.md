@@ -93,7 +93,7 @@ its active time. Status durations and healing caps stay unchanged.
 | Thrall | Chain Lightning deals 25% more damage. | Feral Spirit wolves deal 25% more damage. | Far Sight travels 25% farther. | Doomhammer Slam has 25% more reach. |
 | Jaina | Frostbolt deals 25% more damage. | Blizzard deals 25% more damage. | Blink travels 25% farther. | Water Elemental has 25% more durability and shot damage; recall gains four protected entry frames. |
 | Sylvanas | Black Arrow deals 25% more damage. | Silence has 25% more reach, with unchanged silence duration. | Banshee Flight travels 25% farther. | Life Drain deals 25% more damage, with the same heal cap. |
-| Cairne | Shockwave deals 25% more damage. | War Stomp has 25% more reach. | Spirit Lift travels 25% farther. | Reincarnation's guard and matching intangibility last four more frames, with the same heal cap. |
+| Cairne | Shockwave deals 25% more damage. | Bloodhoof Gore deals 25% more damage. | Spirit Lift travels 25% farther. | War Stomp's armor absorbs a hit 50% heavier and its reach, ring included, grows 20%. |
 | Chen | Breath of Fire has 25% more reach. | Drunken Haze has 25% more reach, with unchanged slow. | Storm Rise travels 25% farther. | Earth Stance absorbs a hit 25% heavier; Fire Palm/Storm Step deal 25% more damage. |
 | Peon | Lumber Toss deals 25% more damage. | Burrow has 25% more durability and spear damage; Pack Up gains four protected entry frames. | Worksite Launch travels 25% farther. | Rest's sweetspot and sourspot are 25% wider. |
 | Tinker | Cluster Rockets deal 25% more damage. | Laser deals 25% more damage and reaches 25% farther. | Rocket Boots travels 25% farther. | Pocket Factory has 25% more durability and goblin damage; recall gains four protected entry frames. |

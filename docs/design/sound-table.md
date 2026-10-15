@@ -196,9 +196,9 @@ poison or arcane hit also layers that element's sound. Normals sharing every sou
 | Jab, Second jab | BattleNetWooshStereo1 | WoodMediumBashFlesh | RockHeavyBashFlesh + Pulverize | WoodMediumBashMetal |  |
 | Up smash, Down smash, Forward smash, Forward tilt, Up tilt, Down tilt, Forward tilt (up), Forward tilt (down), Neutral air, Forward air, Back air, Up air, Down air, Dash attack | BattleNetWooshStereo1 + HeroTaurenChieftainAttack1 / HeroTaurenChieftainAttack2 | RockHeavyBashFlesh | RockHeavyBashFlesh + Pulverize | RockHeavyBashMetal |  |
 | Neutral special: Shockwave | ShockWave | RockHeavyBashFlesh | RockHeavyBashFlesh + Pulverize | RockHeavyBashMetal |  |
-| Side special: War Stomp | HeroTaurenChieftainAttack2 | Warstomp | Warstomp + Pulverize | RockHeavyBashMetal |  |
+| Side special: Bloodhoof Gore | HeroTaurenChieftainAttack2 | Warstomp | Warstomp + Pulverize | RockHeavyBashMetal |  |
 | Up special: Spirit Lift | AncestralSpirit | WoodMediumBashFlesh | WoodMediumBashFlesh + Pulverize | RockHeavyBashMetal |  |
-| Down special: Reincarnation | Reincarnation | Pulverize | Pulverize + Pulverize | RockHeavyBashMetal |  |
+| Down special: War Stomp | Reincarnation | Pulverize | Pulverize + Pulverize | RockHeavyBashMetal |  |
 
 ## Chen Stormstout
 

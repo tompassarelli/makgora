@@ -784,7 +784,7 @@ every newly registered fighter too.
 | Thrall | Chain Lightning (35) | Feral Spirit (43) | One 8% hit armored on frames 1–6 |
 | Jaina Proudmoore | Frostbolt (31) | Blizzard (43) | One 8% hit armored on frames 1–6 |
 | Sylvanas Windrunner | Black Arrow (33) | Silence (45) | One 8% hit armored on frames 1–6 |
-| Cairne Bloodhoof | Shockwave (40) | War Stomp (45) | One 8% hit armored on frames 1–6 |
+| Cairne Bloodhoof | Shockwave (40) | Bloodhoof Gore (33) | One 8% hit armored on frames 1–6 |
 | Chen Stormstout | Breath of Fire (35) | Drunken Haze (37) | One 8% hit armored on frames 1–6 |
 | Peon | Lumber Toss (25) | Burrow (45) | One 8% hit armored on frames 1–6 |
 | Goblin Tinker | Cluster Rockets (35) | Laser (45) | One 8% hit armored on frames 1–6 |
