@@ -87,7 +87,7 @@ test("the complete land shell attributes a regenerated pair, leaves failed targe
   };
   const gitPath = command(root, ["which", "git"]);
   const bashPath = command(root, ["which", "bash"]);
-  for (const mode of ["pair", "merge-resolution", "targets", "proof", "regeneration", "non-fast-forward"]) {
+  for (const mode of ["pair", "merge-resolution", "targets", "proof", "regeneration", "non-fast-forward", "stale-record", "stale-check"]) {
     const fixture = mkdtempSync(join(evidence, `${mode}-`));
     const repo = join(fixture, "repo");
     const bin = join(fixture, "bin");
@@ -148,6 +148,7 @@ if [ "$1" = push ]; then
   printf '%s\\n' "$*" >> ${quote(events)}
   for arg in "$@"; do
     if [[ "$arg" = *:refs/heads/main ]]; then
+      if [ "$MODE" = stale-record ]; then echo 'Classic effect record is missing or stale' >&2; exit 1; fi
       if [ "$MODE" = non-fast-forward ] && [ ! -f ${quote(join(fixture, "refused"))} ]; then
         touch ${quote(join(fixture, "refused"))}; echo 'non-fast-forward' >&2; exit 1
       fi
@@ -168,7 +169,18 @@ if [ "$1" = scripts/wisp.ts ]; then
 fi
 if [ "$1" = test ]; then echo targets >> ${quote(events)}; [ "$MODE" != targets ]; exit $?; fi
 exec ${quote(process.execPath)} "$@"`);
-    const env = { ...process.env, PATH: `${bin}:${process.env.PATH ?? ""}`, MODE: mode, TEST: "", TRAIN: "true", SHA: solo, TREE: trees[0]!, BASE: base, SCRATCH: "fixture", BRANCHES: "claude/lane-0", TIPS: tips[0]!, VERDICT: "tested", REPORTS: "success", DETAIL: "", RUNNER_TEMP: temporary, GITHUB_OUTPUT: join(fixture, "outputs"), GITHUB_STEP_SUMMARY: join(fixture, "summary"), GH_REPO: "fixture/fixture", RUN_URL: "fixture", PASSED: workflow.env.PASSED!, REPORTS_RUN: workflow.env.REPORTS_RUN!, FETCH_LANES: `cat ${quote(join(fixture, "lanes.json"))}` };
+    const env = { ...process.env, PATH: `${bin}:${process.env.PATH ?? ""}`, MODE: mode, TEST: "", TRAIN: "true", SHA: solo, TREE: trees[0]!, BASE: base, SCRATCH: "fixture", BRANCHES: "claude/lane-0", TIPS: tips[0]!, VERDICT: mode === "stale-check" ? "check" : "tested", REPORTS: "success", DETAIL: mode === "stale-check" ? "Classic effect record is missing or stale" : "", RUNNER_TEMP: temporary, GITHUB_OUTPUT: join(fixture, "outputs"), GITHUB_STEP_SUMMARY: join(fixture, "summary"), GH_REPO: "fixture/fixture", RUN_URL: "fixture", PASSED: workflow.env.PASSED!, REPORTS_RUN: workflow.env.REPORTS_RUN!, LOCAL_REFRESH: workflow.env.LOCAL_REFRESH!, FETCH_LANES: `cat ${quote(join(fixture, "lanes.json"))}` };
+    if (mode.startsWith("stale-")) {
+      const result = Bun.spawnSync(["bash", "-e", join(fixture, "land.sh")], { cwd: repo, env, stdout: "pipe", stderr: "pipe" });
+      expect(result.exitCode).toBe(1);
+      const activity = readFileSync(events, "utf8");
+      expect(activity).toContain(`statuses/${tips[0]} -f state=error -f context=autoland -f description=local refresh required: Classic effect record`);
+      expect(activity).not.toContain("state=success");
+      expect(git("rev-parse", "refs/remotes/origin/main")).toBe(base);
+      for (let index = 0; index < tips.length; index++) expect(git("rev-parse", `refs/remotes/origin/claude/lane-${index}`)).toBe(tips[index]!);
+      expect(readFileSync(join(fixture, "summary"), "utf8")).toContain("source lanes remain for repair and requeue");
+      continue;
+    }
     command(repo, ["bash", "-e", join(fixture, "land.sh")], env);
     const pushed = readFileSync(pushes, "utf8").trim();
     const commits: Commit[] = git("rev-list", "--reverse", "--first-parent", `${base}..${pushed}`).split("\n").map((sha) => ({ sha, message: git("show", "-s", "--format=%B", sha), files: git("diff-tree", "--no-commit-id", "--name-only", "-r", sha).split("\n") }));

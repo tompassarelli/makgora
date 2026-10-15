@@ -42,6 +42,12 @@ env:
   RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
   TEST: ${{ inputs.test }}
   TRAIN: ${{ inputs.train }}
+  LOCAL_REFRESH: |
+    hand_back_record() {
+      grep -Fq 'Classic effect record is missing or stale' <<< "$1" || return 1
+      for tip in "${tips[@]}"; do status "$tip" error 'local refresh required: Classic effect record'; done
+      echo "Classic effect record needs the local waiter's refresh; source lanes remain for repair and requeue." >> "$GITHUB_STEP_SUMMARY"
+    }
   PASSED: |
     passed() {
       local tip="$1" pbase="$2" ptree="$3" before="$4" after="$5" dir="$RUNNER_TEMP/passed-$1" verdict=retest
@@ -381,6 +387,7 @@ jobs:
           read -ra branches <<< "$BRANCHES"
           read -ra tips <<< "$TIPS"
           status() { gh api "repos/$GH_REPO/statuses/$1" -f state="$2" -f context=autoland -f description="${3:0:139}" -f target_url="$RUN_URL" > /dev/null; }
+          eval "$LOCAL_REFRESH"
           git fetch -q origin '+refs/heads/claude/*:refs/remotes/origin/claude/*'
           why=""; failed=""
           if [ "$REPORTS" != success ] && [ "$REPORTS" != skipped ]; then
@@ -404,6 +411,7 @@ jobs:
             echo "\`${branches[0]}\` passed alone on main ${BASE:0:10}: it joins the next train" >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
+          if [ -n "$why" ] && hand_back_record "$DETAIL"; then exit 1; fi
           verdict=$(bun ts/scripts/autoland.ts judge --count "${#branches[@]}" --green "$([ -z "$why" ] && echo true || echo false)")
           if [ "$verdict" = retest ]; then
             for tip in "${tips[@]}"; do status "$tip" pending queued; done
@@ -501,6 +509,7 @@ jobs:
           fi
           if ! git push origin "$SHA:refs/heads/main" 2> push.log; then
             cat push.log
+            if hand_back_record "$(cat push.log)"; then exit 1; fi
             if [ "$SHA" != "$solo_sha" ] && grep -Eq 'non-fast-forward|fetch first' push.log && git push origin "$solo_sha:refs/heads/main" 2> push.log; then
               SHA="$solo_sha"; branches=("${branches[0]}"); tips=("${tips[0]}")
             else
