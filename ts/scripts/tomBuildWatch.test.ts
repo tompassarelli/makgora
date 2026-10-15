@@ -6,7 +6,8 @@ import { Effect } from "effect";
 import { PlayProblem } from "wisp/scripts/wisp/play";
 import { type WatchSteps, watchOnce } from "./tomBuildWatch";
 import { playableMapBuild } from "./wisp/currentPlaytest";
-import { PREDICT_COST, costPrediction } from "./wisp/greenBuilds";
+import { PLAYTEST_PREFIX } from "./wisp/commands/play";
+import { PLAYABLE_FILE, PREDICT_COST, type Verdict, costPrediction, installName, landingDecision, verdictOf } from "./wisp/greenBuilds";
 
 const sha = (letter: string) => letter.repeat(40);
 
@@ -19,7 +20,9 @@ test("tips landing during a build coalesce into one build of the newest, and no 
     const landing: Record<string, readonly string[]> = { [sha("a")]: [sha("b"), sha("c")] };
     const steps: WatchSteps<never> = {
       tip: Effect.sync(() => remote),
+      decision: () => Effect.succeed("build"),
       landedAt: () => Effect.succeed(0),
+      notes: () => Effect.succeed("notes.md"),
       retire: () => Effect.succeed([]),
       build: (revision) => Effect.gen(function*() {
         built.push(revision);
@@ -54,4 +57,54 @@ test("the Tom-facing playable build omits the Lua cost prediction unless --predi
   expect(costPrediction(predicted)).toEqual({ predict: true, args: plain });
   expect(plain).not.toContain(PREDICT_COST);
   expect(plain.slice(0, 6)).toEqual(["bun", "wisp", "map", "build", "--profile", "playable"]);
+});
+
+test("a red commit is never built, a pending one waits and builds once its run succeeds, and installs go only to Tom's profile [k2 property]", async () => {
+  const root = mkdtempSync(join(tmpdir(), "smashcraft-tom-build-"));
+  try {
+    const files = { log: join(root, "tom-build.log"), attempts: join(root, "attempted") };
+    let verdict: Verdict = "failure";
+    const built: string[] = [];
+    const noted: string[] = [];
+    let current = sha("a");
+    const steps: WatchSteps<never> = {
+      tip: Effect.sync(() => current),
+      decision: () => Effect.succeed(landingDecision(verdict)),
+      landedAt: () => Effect.succeed(0),
+      notes: (version, revision, previous) => Effect.sync(() => { noted.push(`${version} ${revision} ${previous}`); return "notes.md"; }),
+      retire: () => Effect.succeed([]),
+      build: (revision) => Effect.sync(() => { built.push(revision); return { version: "0.0.1", path: join(root, "Smashcraft 0.0.1 aaaaaaa.w3x") }; }),
+    };
+    const tick = () => Effect.runPromise(watchOnce(steps, files));
+    await tick();
+    expect(built).toEqual([]);
+    verdict = "success";
+    await tick();
+    expect(built).toEqual([]);
+    verdict = "pending";
+    current = sha("b");
+    await tick();
+    expect(built).toEqual([]);
+    verdict = "success";
+    await tick();
+    expect(built).toEqual([sha("b")]);
+    expect(noted).toEqual([`0.0.1 ${sha("b")} undefined`]);
+    expect(PLAYTEST_PREFIX).not.toContain("clone-a");
+    expect(PLAYTEST_PREFIX).toContain("compatdata/3516115571");
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("only a succeeded CI run is green; a failed one is red and anything else waits [k2 property]", () => {
+  const run = (status: string, conclusion: string, createdAt: string) => ({ status, conclusion, createdAt });
+  expect(landingDecision(verdictOf([]))).toBe("wait");
+  expect(landingDecision(verdictOf([run("in_progress", "", "2")]))).toBe("wait");
+  expect(landingDecision(verdictOf([run("completed", "failure", "1"), run("completed", "success", "2")]))).toBe("build");
+  expect(landingDecision(verdictOf([run("completed", "success", "1"), run("completed", "failure", "2")]))).toBe("red");
+});
+
+test("Tom's playable build names the map with the short commit [k2 property]", () => {
+  expect(installName("0.0.263", sha("a"))).toBe("Smashcraft 0.0.263 aaaaaaa");
+  expect(PLAYABLE_FILE.test(`${installName("0.0.263", sha("a"))}.w3x`)).toBe(true);
 });

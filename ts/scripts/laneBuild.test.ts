@@ -82,7 +82,9 @@ test("the main build that lands a lane removes that lane's map and no other [k2 
     const ranges: (string | undefined)[] = [];
     const steps: WatchSteps<never> = {
       tip: Effect.sync(() => tip),
+      decision: () => Effect.succeed("build"),
       landedAt: () => Effect.succeed(0),
+      notes: () => Effect.succeed("notes.md"),
       build: () => Effect.succeed({ version: "0.0.9", path: join(maps, "Smashcraft 0.0.9.w3x") }),
       retire: (previous, sha) => Effect.sync(() => {
         ranges.push(previous);

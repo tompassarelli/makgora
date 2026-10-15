@@ -29,6 +29,11 @@ export function verdictOf(runs: readonly RunSummary[]): Verdict {
   return latest.conclusion === "success" ? "success" : "failure";
 }
 
+export type LandingDecision = "build" | "wait" | "red";
+
+export const landingDecision = (ci: Verdict): LandingDecision =>
+  ci === "success" ? "build" : ci === "failure" ? "red" : "wait";
+
 export const isGreen = ({ ci, farm }: Candidate): boolean => ci === "success" && farm === "success";
 
 export interface AutolandStatus {
