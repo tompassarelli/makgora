@@ -111,3 +111,52 @@ test("showcase commands leave builds without the native driver profile untouched
     } finally { runtime.restore(); }
   }
 }, 60000);
+
+test("showcase camera centres the focused pad on screen [k1 scenario]", () => {
+  const { runtime, read, chat, frames } = showcaseSession();
+  try {
+    chat("-dev showcase start rifleman,forsaken paladin,goblin tinker");
+    frames(10);
+    chat("-dev showcase camera 3");
+    frames(5);
+    expect(Math.abs(read(() => shell().camera.x) - SHOWCASE_PAD_X[2])).toBeLessThanOrEqual(1.0);
+  } finally { runtime.restore(); }
+}, 60000);
+
+test("showcase camera leaves the confirmed checksum untouched [k1 scenario]", () => {
+  const run = (focus: boolean) => {
+    const { runtime, read, chat, frames } = showcaseSession();
+    try {
+      chat("-dev showcase start rifleman,forsaken paladin,goblin tinker");
+      const checksums: number[] = [];
+      for (let frame = 0; frame < 120; frame++) {
+        if (focus && frame === 20) chat("-dev showcase camera 3");
+        if (focus && frame === 80) chat("-dev showcase camera all");
+        frames(1);
+        checksums.push(read(() => confirmedChecksum(shell())));
+      }
+      return checksums;
+    } finally { runtime.restore(); }
+  };
+  expect(run(true)).toEqual(run(false));
+}, 60000);
+
+test("showcase camera hides the other pads without resetting and camera all shows them again [k1 scenario]", () => {
+  const { runtime, read, chat, frames } = showcaseSession();
+  try {
+    chat("-dev showcase start rifleman,forsaken paladin,goblin tinker");
+    frames(30);
+    const before = read(() => [shell().runtime.simulationFrame, shell().devReceipts]);
+    chat("-dev showcase camera 3");
+    expect(read(() => shell().devReceipts)).toBe(before[1]! + 1);
+    expect(read(() => [0, 1, 2].map(slot => shell().hiddenFighters[slot] !== undefined))).toEqual([true, true, false]);
+    frames(10);
+    expect(read(() => shell().runtime.simulationFrame)).toBeGreaterThan(before[0]!);
+    const middle = read(() => shell().runtime.simulationFrame);
+    chat("-dev showcase camera all");
+    expect(read(() => shell().devReceipts)).toBe(before[1]! + 2);
+    expect(read(() => shell().hiddenFighters.every(hidden => hidden === undefined))).toBe(true);
+    frames(10);
+    expect(read(() => shell().runtime.simulationFrame)).toBeGreaterThan(middle);
+  } finally { runtime.restore(); }
+}, 60000);

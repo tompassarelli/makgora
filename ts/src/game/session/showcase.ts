@@ -11,6 +11,7 @@ export type ShowcaseRequest =
   | { readonly kind: "start"; readonly fighters: readonly Character[] }
   | { readonly kind: "spawn"; readonly slot: ParticipantSlot; readonly character: Character }
   | { readonly kind: "clear"; readonly slot: ParticipantSlot }
+  | { readonly kind: "camera"; readonly slot: ParticipantSlot | "all" }
   | { readonly kind: "invalid" };
 
 export interface ShowcasePads {
@@ -45,6 +46,11 @@ function padSlot(text: string): ParticipantSlot | undefined {
   return isParticipantSlot(slot) ? slot : undefined;
 }
 
+function cameraRequest(args: string): ShowcaseRequest {
+  const focus = args === "all" ? "all" : padSlot(args);
+  return focus === undefined ? { kind: "invalid" } : { kind: "camera", slot: focus };
+}
+
 export function showcaseRequest(message: string): ShowcaseRequest | undefined {
   if (!message.startsWith(SHOWCASE_COMMAND)) return undefined;
   const rest = message.substring(SHOWCASE_COMMAND.length);
@@ -56,6 +62,7 @@ export function showcaseRequest(message: string): ShowcaseRequest | undefined {
     const fighters = names.map(name => characterNamed(name)).filter(character => character !== undefined);
     return fighters.length === names.length && fighters.length <= PARTICIPANT_SLOTS.length ? { kind: "start", fighters } : { kind: "invalid" };
   }
+  if (verb === "camera") return cameraRequest(args);
   const gap = args.indexOf(" ");
   const slot = padSlot(gap < 0 ? args : args.substring(0, gap));
   if (slot === undefined) return { kind: "invalid" };
@@ -76,7 +83,7 @@ export function showcasePadsReceipt(pads: Readonly<ShowcasePads>): string {
 }
 
 export function applyShowcaseRequest(pads: ShowcasePads, request: ShowcaseRequest): string | undefined {
-  if (request.kind === "invalid") return undefined;
+  if (request.kind === "invalid" || request.kind === "camera") return undefined;
   if (request.kind === "clear") {
     if (pads.fighters[request.slot] === undefined || showcaseMask(pads) === 1 << request.slot) return undefined;
     pads.fighters[request.slot] = undefined;

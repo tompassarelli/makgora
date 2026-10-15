@@ -9,6 +9,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { Character, SpecialAction } from "../../game/sim/codes";
 import { at } from "wisp/src/runtime/lookup";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../../game/input/participants";
+import { SHOWCASE_PAD_X } from "../../game/session/showcase";
 import type { FighterAgency } from "../../game/presentation/fighterAgency";
 import type { FrameControls } from "../../game/match/controls";
 import type { PacingAndPresentation } from "../../game/match/pacingAndPresentation";
@@ -513,7 +514,8 @@ export function lockArenaCamera(s: ShellState): void {
   else if (s.session.paused && s.pauseCamera !== undefined) advancePauseCamera(s, aspect);
   else localCamera(s.camera, game.camera.initialized ? game.camera : s.camera, game.stageChoice, aspect);
   if (game.phase !== Phase.result && s.viewExtreme !== undefined) extremeCamera(s.camera, game.stageChoice, aspect, s.viewExtreme);
-  if (game.phase !== Phase.result && (!s.session.paused || s.pauseCamera === undefined)) fitFighterFrames(s.camera, world, game.stageChoice, aspect);
+  if (game.phase !== Phase.result && s.showcaseFocus !== undefined) s.camera.x = SHOWCASE_PAD_X[s.showcaseFocus];
+  if (game.phase !== Phase.result && s.showcaseFocus === undefined && (!s.session.paused || s.pauseCamera === undefined)) fitFighterFrames(s.camera, world, game.stageChoice, aspect);
   const { x: centerX, y: centerY } = s.origin;
   const framing = s.camera;
   if (game.phase === Phase.match && game.run.active && game.run.boss.kind !== 0 && !s.session.paused) {

@@ -3,10 +3,12 @@ import { Phase, firstHumanSlot, setEndless, setItemsOn, setMeterDropsOn, setPart
 import { SHOWCASE_PAD_X, type ShowcasePads, type ShowcaseRequest, applyShowcaseRequest, copyShowcasePads, createShowcasePads, showcaseMask } from "../../game/session/showcase";
 import { STAGE_EDGE_LIGHT_MODEL } from "../../game/presentation/stageEdgeLights";
 import { Character } from "../../game/sim/codes";
-import { fighterAt } from "../../game/sim/roster";
+import { fighterAt, isActive } from "../../game/sim/roster";
 import { surfaceZ } from "../../game/sim/stage";
+import { hideFighter } from "./fighterCloak";
 import { startQuickMatch } from "./menus";
 import type { ShellState } from "./state";
+import { renderPersistentPresentation } from "./view";
 
 const SHOWCASE_STAGE = 0;
 const matchStarted = (s: Readonly<ShellState>): boolean => s.game.phase === Phase.match;
@@ -51,12 +53,21 @@ export function applyShowcaseSetup(s: ShellState, pads: Readonly<ShowcasePads>):
     fighter.facing = SHOWCASE_PAD_X[slot] < 0.0 ? 1 : -1;
   }
   s.promoHudHidden = true;
+  s.showcaseFocus = undefined;
   drawPadMarkers(s);
   return true;
 }
 
 export function applyShowcaseCommand(s: ShellState, request: ShowcaseRequest, reset: () => void): string | undefined {
   if (s.build.inputProfile !== "native-driver") return undefined;
+  if (request.kind === "camera") {
+    const focus = request.slot;
+    if (!matchStarted(s) || focus !== "all" && (s.showcase.fighters[focus] === undefined || !isActive(s.world, focus))) return "dev: showcase refused";
+    s.showcaseFocus = focus === "all" ? undefined : focus;
+    for (const slot of PARTICIPANT_SLOTS) if (isActive(s.world, slot)) hideFighter(s, slot, focus !== "all" && slot !== focus);
+    if (focus === "all") renderPersistentPresentation(s);
+    return `dev: showcase camera ${focus === "all" ? "all" : focus + 1}`;
+  }
   const pads = createShowcasePads();
   copyShowcasePads(pads, s.showcase);
   const receipt = applyShowcaseRequest(pads, request);
