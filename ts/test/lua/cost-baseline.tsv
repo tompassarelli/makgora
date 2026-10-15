@@ -123,7 +123,7 @@ src/game/sim/fourPlayerContracts.tests.ts	2	55000	251
 src/game/sim/freezeTrapContracts.tests.ts	3	13317000	8787
 src/game/sim/grabs.tests.ts	3	40909000	292401
 src/game/sim/groundMovement.tests.ts	7	399079000	471677
-src/game/sim/heroSpecials.tests.ts	3	177747000	40207
+src/game/sim/heroSpecials.tests.ts	4	213739000	53573
 src/game/sim/heroStatus.tests.ts	2	3261000	928
 src/game/sim/heroes/beastmasterSpecials.tests.ts	2	34105000	5575
 src/game/sim/heroes/cairne.tests.ts	1	0	0

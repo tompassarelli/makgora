@@ -239,6 +239,7 @@ interface Special {
   action: SpecialAction;
   ex: boolean;
   exArmorUsed: boolean;
+  variant: number;
   frame: number;
   duration: number;
   lockFrames: number;
@@ -724,6 +725,7 @@ export function createFighter(character: Character, startX: number, facing: numb
       action: SpecialAction.none,
       ex: false,
       exArmorUsed: false,
+      variant: 0,
       frame: 0,
       duration: 0,
       lockFrames: 0,

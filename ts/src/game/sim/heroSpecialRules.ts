@@ -43,7 +43,12 @@ export function runningHeroSpecial(f: Readonly<Fighter>): AuthoredSpecial | unde
   }
   const specials = f.tuning.specials;
   if (specials === undefined || !isHeroSpecialAction(f.special.action)) return undefined;
-  return specialForm(specialKit(specials, f.special.action - SpecialAction.heroNeutral), f.special.form, f.special.ex);
+  return specialForm(specialKit(specials, f.special.action - SpecialAction.heroNeutral), f.special.form, f.special.ex, f.special.variant);
+}
+
+
+export function specialVariant(_f: Readonly<Fighter>): number {
+  return 0;
 }
 
 function requestedSlot(input: Readonly<Controls>): SpecialSlot {
@@ -118,10 +123,11 @@ export interface SpecialRefusal {
 export interface HeroSpecialChoice {
   slot: SpecialSlot;
   form: SpecialForm;
+  variant: number;
 }
 
 
-const choice: HeroSpecialChoice = { slot: SpecialSlot.neutral, form: SpecialForm.ground };
+const choice: HeroSpecialChoice = { slot: SpecialSlot.neutral, form: SpecialForm.ground, variant: 0 };
 
 
 
@@ -136,7 +142,8 @@ export function chooseHeroSpecial(f: Readonly<Fighter>, specials: Readonly<Fight
   const recalls = kit.recall !== undefined && recallHolds(f, kit);
   const marks = kit.marked !== undefined && world !== undefined && markedTarget(world, f, kit.marked.range) !== undefined;
   const form: SpecialForm = recalls ? SpecialForm.recall : marks ? SpecialForm.marked : airborne && kit.air !== undefined ? SpecialForm.air : SpecialForm.ground;
-  const move = specialForm(kit, form);
+  const variant = specialVariant(f);
+  const move = specialForm(kit, form, false, variant);
   if (move.groundOnly === true && airborne) {
     out.groundOnly = true;
     return undefined;
@@ -147,6 +154,7 @@ export function chooseHeroSpecial(f: Readonly<Fighter>, specials: Readonly<Fight
   if (!projectilesFit(f, move)) return undefined;
   choice.slot = slot;
   choice.form = form;
+  choice.variant = variant;
   return choice;
 }
 
@@ -193,10 +201,11 @@ export function steerHeroSpecial(f: Fighter, input: Readonly<Controls>): void {
 export function enterHeroSpecial(f: Fighter, chosen: Readonly<HeroSpecialChoice>, input: Readonly<Controls>): AuthoredSpecial {
   const specials = f.tuning.specials;
   if (specials === undefined) throw new Error("hero special without a kit");
-  const move = specialForm(specialKit(specials, chosen.slot), chosen.form, f.special.ex);
+  const move = specialForm(specialKit(specials, chosen.slot), chosen.form, f.special.ex, chosen.variant);
   const { special } = f;
   endDivineShield(f);
   special.form = chosen.form;
+  special.variant = chosen.variant;
   special.grabFrame = 0;
   const aimX = input.specialX !== 0 ? input.specialX : input.direction;
   const aimZ = input.specialZ !== 0 ? input.specialZ : input.verticalDirection;
@@ -609,8 +618,8 @@ function endHeroSpecial(f: Fighter, move: Readonly<AuthoredSpecial>): void {
 function burstProjectiles(f: Fighter, from: Readonly<SpecialProjectile>, into: Readonly<SpecialProjectile>): void {
   const specials = f.tuning.specials;
   const kit = specials === undefined || f.special.action === SpecialAction.heroUltimate ? undefined : specialKit(specials, f.special.action - SpecialAction.heroNeutral);
-  const ordinary = kit === undefined ? undefined : specialForm(kit, f.special.form).burst;
-  const upgraded = kit === undefined ? undefined : specialForm(kit, f.special.form, true).burst;
+  const ordinary = kit === undefined ? undefined : specialForm(kit, f.special.form, false, f.special.variant).burst;
+  const upgraded = kit === undefined ? undefined : specialForm(kit, f.special.form, true, f.special.variant).burst;
   let index = -1;
   for (const before of f.projectiles) {
     index++;
@@ -666,7 +675,7 @@ export function landHeroSpecial(f: Fighter): boolean {
   if (f.character === Character.cairne && f.special.action === SpecialAction.heroNeutral
     && f.special.form === SpecialForm.air && specials !== undefined
     && f.special.frame < (move.projectiles?.[0]?.spawnFrame ?? 0)) {
-    const ground = specialForm(specials.neutral, SpecialForm.ground, f.special.ex);
+    const ground = specialForm(specials.neutral, SpecialForm.ground, f.special.ex, f.special.variant);
     f.special.form = SpecialForm.ground;
     f.special.duration = ground.endFrame;
     f.landing.lag = max(f.landing.lag, f.special.lockFrames);
@@ -675,7 +684,7 @@ export function landHeroSpecial(f: Fighter): boolean {
   }
   if (f.special.action === SpecialAction.heroDown && specials !== undefined
     && (f.special.form === SpecialForm.ground || f.special.form === SpecialForm.air)) {
-    const ground = specialForm(specials.down, SpecialForm.ground, f.special.ex);
+    const ground = specialForm(specials.down, SpecialForm.ground, f.special.ex, f.special.variant);
     let firstEffect = move.endFrame;
     let groundFirstEffect = ground.endFrame;
     for (const form of [move, ground]) {

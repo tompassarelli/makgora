@@ -34,7 +34,7 @@ export function startableForm(f: Readonly<Fighter>, specials: Readonly<FighterSp
   press.specialX = slot === SpecialSlot.side ? f.facing : 0;
   press.specialZ = slot === SpecialSlot.up ? 1 : slot === SpecialSlot.down ? -1 : 0;
   const choice = chooseHeroSpecial(f, specials, press, refusal);
-  return choice === undefined ? undefined : specialForm(specialKit(specials, slot), choice.form);
+  return choice === undefined ? undefined : specialForm(specialKit(specials, slot), choice.form, false, choice.variant);
 }
 
 

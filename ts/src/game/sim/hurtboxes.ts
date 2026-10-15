@@ -142,14 +142,14 @@ function defaultHurtboxes(character: Character): Readonly<FighterHurtboxes> {
 
 
 function specialHurtPoses(f: Readonly<Fighter>): readonly HurtPose[] | undefined {
-  const { action, form } = f.special;
+  const { action, form, variant } = f.special;
   if (action === SpecialAction.heroUltimate) {
     const ultimate = f.tuning.ultimate;
     return ultimate === undefined ? undefined : ultimateForm(ultimate, form).hurt;
   }
   const specials = f.tuning.specials;
   if (specials === undefined || action < SpecialAction.heroNeutral || action > SpecialAction.heroDown) return undefined;
-  return specialForm(specialKit(specials, action - SpecialAction.heroNeutral), form).hurt;
+  return specialForm(specialKit(specials, action - SpecialAction.heroNeutral), form, false, variant).hurt;
 }
 
 function specialHurtParts(f: Readonly<Fighter>): readonly HurtPart[] | undefined {

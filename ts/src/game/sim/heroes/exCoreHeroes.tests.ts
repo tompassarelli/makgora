@@ -20,7 +20,7 @@ function cast(character: Character, slot: SpecialSlot, form: SpecialForm, ex: bo
   assertTrue(startFighterSpecial(fighter, 0, 0, input));
   assertEquals(fighter.special.action, SpecialAction.heroNeutral + slot);
   assertEquals(fighter.special.ex, ex);
-  if (fighter.special.form !== form) enterHeroSpecial(fighter, { slot, form }, input);
+  if (fighter.special.form !== form) enterHeroSpecial(fighter, { slot, form, variant: 0 }, input);
   return fighter;
 }
 

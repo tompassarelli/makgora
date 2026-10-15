@@ -92,6 +92,13 @@ test("fighter replay copies preserve every field, absent hit targets included, a
     assertEquals(candleSlots(fresh), text);
     assertTrue(sameFighterState(fresh, hitting));
   }
+  for (const variant of [3, 0]) {
+    hitting.special.variant = variant;
+    assertFalse(sameFighterState(fresh, hitting));
+    copyFighterState(fresh, hitting, 15);
+    assertEquals(fresh.special.variant, variant);
+    assertTrue(sameFighterState(fresh, hitting));
+  }
 });
 
 test("every mutable fighter field participates in replay equality [k2 property]", () => {

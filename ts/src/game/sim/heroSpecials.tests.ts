@@ -1,11 +1,13 @@
-import { assertDefined, assertEquals, assertGreaterThan, test } from "wisp/src/runtime/testing";
+import { assertDefined, assertEquals, assertGreaterThan, assertTrue, test } from "wisp/src/runtime/testing";
+import { at } from "wisp/src/runtime/lookup";
 import { f32 } from "wisp/src/sim/f32";
 import { Character, SpecialAction } from "./codes";
 import { type Fighter, createFighter } from "./fighter";
 import { heroRegion } from "./heroMoves";
-import { runningHeroSpecial } from "./heroSpecialRules";
+import { enterHeroSpecial, runningHeroSpecial, specialVariant } from "./heroSpecialRules";
+import { withExKit } from "./exSpecialAuthoring";
 import { ROSTER_MANA } from "./mana";
-import { type AuthoredSpecial, type FighterSpecials, frames } from "./heroSpecials";
+import { type AuthoredSpecial, type FighterSpecials, SpecialForm, SpecialSlot, frames } from "./heroSpecials";
 import { type Roster, fighterAt } from "./roster";
 import { controls } from "./testWorld";
 import { copyFighterState } from "../replay/fighterState";
@@ -69,6 +71,35 @@ test("a regular hero special spends no meter and the fighter acts again the fram
   assertEquals(owner.special.action, SpecialAction.none);
   stepDuel(world, neutral);
   assertEquals(owner.special.action, SpecialAction.heroNeutral);
+});
+
+test("a hero special keeps the variant latched at entry while the live variant differs, and its EX is that variant's EX [k2 property]", () => {
+  const strike = { x1: 10.0, z1: 50.0, x2: 90.0, z2: 50.0, radius: 12.0 };
+  const kit = withExKit({ name: "Test Dash", description: "", ground: { ...SIDE, variants: [
+    { ...SIDE, regions: [heroRegion(10, 12, strike, hit(12.0))] },
+    { ...SIDE, regions: [heroRegion(8, 14, strike, hit(14.0))] },
+  ] } }, { damage: 1.25 });
+  const variants = kit.ground.variants ?? [];
+  for (const ex of [false, true]) {
+    for (let variant = 0; variant <= variants.length; variant++) {
+      const { world, owner } = pair(600.0);
+      owner.tuning = { ...owner.tuning, specials: { ...KIT, side: kit } };
+      const input = controls({ specialPressed: true, specialX: 1, shield: ex });
+      stepDuel(world, input);
+      assertEquals(owner.special.ex, ex);
+      enterHeroSpecial(owner, { slot: SpecialSlot.side, form: SpecialForm.ground, variant }, input);
+      const base = variant === 0 ? kit.ground : at(variants, variant - 1);
+      const expected = ex ? base.ex : base;
+      assertDefined(expected);
+      for (let f = 0; f < 20; f++) {
+        assertEquals(owner.special.action, SpecialAction.heroSide);
+        assertEquals(owner.special.variant, variant);
+        assertEquals(specialVariant(owner), 0);
+        assertTrue(runningHeroSpecial(owner) === expected);
+        stepDuel(world);
+      }
+    }
+  }
 });
 
 test("replaying a hero special from a restored snapshot reproduces every fighter field [k1 scenario]", () => {

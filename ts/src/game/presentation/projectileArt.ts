@@ -48,6 +48,7 @@ function formProjectiles(special: AuthoredSpecial | undefined, into: SpecialProj
   if (special.placement?.mark !== undefined) into.push(special.placement.mark);
   if (special.burst !== undefined) into.push(special.burst.from, special.burst.into);
   for (const followUp of special.followUps ?? []) formProjectiles(followUp.special, into);
+  for (const variant of special.variants ?? []) formProjectiles(variant, into);
 }
 
 

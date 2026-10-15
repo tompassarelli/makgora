@@ -140,6 +140,7 @@ function startSpecialAction(owner: Fighter, action: SpecialAction, duration: num
   special.action = action;
   special.ex = false;
   special.exArmorUsed = false;
+  special.variant = 0;
   special.frame = 0;
 
   special.form = 0;

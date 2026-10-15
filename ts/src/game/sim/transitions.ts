@@ -125,6 +125,7 @@ export function cancelSpecialState(f: Fighter): void {
   special.fall = false;
   special.ex = false;
   special.exArmorUsed = false;
+  special.variant = 0;
   special.action = SpecialAction.none;
   special.frame = 0;
   special.duration = 0;
@@ -168,6 +169,7 @@ export function clearSpecialOnStock(f: Fighter): void {
     projectile.spec = undefined;
   }
   special.form = 0;
+  special.variant = 0;
   special.aimX = 0;
   special.aimZ = 0;
   special.beamX = 0.0;

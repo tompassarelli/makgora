@@ -300,6 +300,7 @@ export interface SpecialGuard extends FrameWindow {
 export interface AuthoredSpecial {
 
   readonly ex?: AuthoredSpecial | undefined;
+  readonly variants?: readonly AuthoredSpecial[] | undefined;
 
 
 
@@ -425,15 +426,16 @@ export function specialKit(specials: Readonly<FighterSpecials>, slot: number): S
 }
 
 
-export function specialForm(kit: Readonly<SpecialKit>, form: number, ex = false): AuthoredSpecial {
+export function specialForm(kit: Readonly<SpecialKit>, form: number, ex = false, variant = 0): AuthoredSpecial {
   if (form >= FOLLOW_UP_FORM) {
-    const base = specialForm(kit, imod(form, FOLLOW_UP_FORM), ex);
+    const base = specialForm(kit, imod(form, FOLLOW_UP_FORM), ex, variant);
     return base.followUps?.[idiv(form, FOLLOW_UP_FORM) - 1]?.special ?? base;
   }
   const move = form === SpecialForm.recall ? kit.recall ?? kit.ground
     : form === SpecialForm.marked ? kit.marked?.special ?? kit.ground
     : form === SpecialForm.air ? kit.air ?? kit.ground : kit.ground;
-  return ex ? move.ex ?? move : move;
+  const chosen = variant > 0 ? move.variants?.[variant - 1] ?? move : move;
+  return ex ? chosen.ex ?? chosen : chosen;
 }
 
 
@@ -442,8 +444,8 @@ export function ultimateForm(ultimate: Readonly<AuthoredSpecial>, form: number):
 }
 
 
-export function heroSpecialMove(specials: Readonly<FighterSpecials>, chosen: { readonly slot: number; readonly form: number }): AuthoredSpecial {
-  return specialForm(specialKit(specials, chosen.slot), chosen.form);
+export function heroSpecialMove(specials: Readonly<FighterSpecials>, chosen: { readonly slot: number; readonly form: number; readonly variant: number }): AuthoredSpecial {
+  return specialForm(specialKit(specials, chosen.slot), chosen.form, false, chosen.variant);
 }
 
 

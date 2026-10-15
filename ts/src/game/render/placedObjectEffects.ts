@@ -30,6 +30,7 @@ function placementPaths(character: Character): string[] {
     const path = special.placement?.model?.path;
     if (path !== undefined && !paths.includes(path)) paths.push(path);
     for (const followUp of special.followUps ?? []) visit(followUp.special);
+    for (const variant of special.variants ?? []) visit(variant);
   };
   const tuning = authoredTuning(character);
   const specials = tuning.specials;

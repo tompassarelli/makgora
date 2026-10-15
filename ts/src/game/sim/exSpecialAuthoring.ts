@@ -14,7 +14,7 @@ export interface ExUpgrade {
 }
 
 
-export function withExKit(kit: SpecialKit, upgrade: ExUpgrade): SpecialKit {
+function upgrader(upgrade: ExUpgrade): (move: AuthoredSpecial, recall: boolean) => AuthoredSpecial {
   const damage = upgrade.damage ?? 1.0;
   const reach = upgrade.reach ?? 1.0;
   const travel = upgrade.travel ?? 1.0;
@@ -73,11 +73,25 @@ export function withExKit(kit: SpecialKit, upgrade: ExUpgrade): SpecialKit {
       followUps: move.followUps?.map(branch => ({ ...branch, special: exMove(branch.special, false) })),
     };
   };
+  return exMove;
+}
+
+
+export function upgradeSpecial(move: AuthoredSpecial, upgrade: ExUpgrade): AuthoredSpecial {
+  return upgrader(upgrade)(move, false);
+}
+
+
+export function withExKit(kit: SpecialKit, upgrade: ExUpgrade): SpecialKit {
+  const exMove = upgrader(upgrade);
+  const withEx = (move: AuthoredSpecial, recall: boolean): AuthoredSpecial => move.variants === undefined
+    ? { ...move, ex: exMove(move, recall) }
+    : { ...move, ex: exMove({ ...move, variants: undefined }, recall), variants: move.variants.map(variant => ({ ...variant, ex: exMove(variant, recall) })) };
   const form = (move: AuthoredSpecial | undefined, recall = false): AuthoredSpecial | undefined =>
-    move === undefined ? undefined : { ...move, ex: exMove(move, recall) };
+    move === undefined ? undefined : withEx(move, recall);
   return {
-    ...kit, ground: { ...kit.ground, ex: exMove(kit.ground, false) },
+    ...kit, ground: withEx(kit.ground, false),
     air: form(kit.air), recall: form(kit.recall, true),
-    marked: kit.marked === undefined ? undefined : { ...kit.marked, special: { ...kit.marked.special, ex: exMove(kit.marked.special, false) } },
+    marked: kit.marked === undefined ? undefined : { ...kit.marked, special: withEx(kit.marked.special, false) },
   };
 }

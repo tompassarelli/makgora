@@ -245,6 +245,7 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   add("candleSnuffSerial", e.candle.snuffSerial, a.candle.snuffSerial);
   add("candleReturnSerial", e.candle.returnSerial, a.candle.returnSerial);
   add("specialForm", e.special.form, a.special.form);
+  add("specialVariant", e.special.variant, a.special.variant);
   add("specialAimX", e.special.aimX, a.special.aimX);
   add("specialAimZ", e.special.aimZ, a.special.aimZ);
   add("specialBeamX", e.special.beamX, a.special.beamX);

@@ -200,6 +200,7 @@ export function copyFighterState(target: Fighter, source: Readonly<Fighter>, act
   special.action = sourceSpecial.action;
   special.ex = sourceSpecial.ex;
   special.exArmorUsed = sourceSpecial.exArmorUsed;
+  special.variant = sourceSpecial.variant;
   special.frame = sourceSpecial.frame;
   special.duration = sourceSpecial.duration;
   special.lockFrames = sourceSpecial.lockFrames;
@@ -591,6 +592,7 @@ export function sameFighterState(target: Readonly<Fighter>, source: Readonly<Fig
   if (special.action !== sourceSpecial.action || (special.action === 0 && 1 / special.action !== 1 / sourceSpecial.action)) return false;
   if (special.ex !== sourceSpecial.ex) return false;
   if (special.exArmorUsed !== sourceSpecial.exArmorUsed) return false;
+  if (special.variant !== sourceSpecial.variant || (special.variant === 0 && 1 / special.variant !== 1 / sourceSpecial.variant)) return false;
   if (special.frame !== sourceSpecial.frame || (special.frame === 0 && 1 / special.frame !== 1 / sourceSpecial.frame)) return false;
   if (special.duration !== sourceSpecial.duration || (special.duration === 0 && 1 / special.duration !== 1 / sourceSpecial.duration)) return false;
   if (special.lockFrames !== sourceSpecial.lockFrames || (special.lockFrames === 0 && 1 / special.lockFrames !== 1 / sourceSpecial.lockFrames)) return false;

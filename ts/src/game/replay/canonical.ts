@@ -378,6 +378,8 @@ export function fighterSpecialsCanonical(specials: Readonly<FighterSpecials> | u
 function specialMoveCanonical(move: Readonly<AuthoredSpecial>, name: string): string {
   const result: string[] = [];
   if (move.ex !== undefined) result.push(specialMoveCanonical(move.ex, `${name}.ex`));
+  const variants = move.variants ?? [];
+  for (let index = 0; index < variants.length; index++) result.push(specialMoveCanonical(at(variants, index), `${name}.variant[${index + 1}]`));
   const int = (field: string, value: number) => { result.push(canonicalInt(`${name}.${field}`, value)); };
   const real = (field: string, value: number) => { result.push(canonicalRealField(`${name}.${field}`, value)); };
   int("end", move.endFrame);
@@ -1099,6 +1101,7 @@ function writeFighter(sink: StateSink, prefix: string, fighter: Readonly<Fighter
 
   if (t.specials !== undefined) {
     int("specialForm", sp.form);
+    if (sp.variant !== 0) int("specialVariant", sp.variant);
     int("specialAimX", sp.aimX);
     int("specialAimZ", sp.aimZ);
     if (sp.beamX !== 0 || sp.beamZ !== 0 || 1 / sp.beamX < 0 || 1 / sp.beamZ < 0) {
