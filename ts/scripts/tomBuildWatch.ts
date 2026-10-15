@@ -8,6 +8,7 @@ import { PlayProblem } from "wisp/scripts/wisp/play";
 import { runProcess } from "./hostProcess";
 import { installPlaytest } from "./playtestBuild";
 import { PLAYABLE_FILE, costPrediction } from "./wisp/greenBuilds";
+import { TOM_EDITION } from "./wisp/currentPlaytest";
 import { projectRoot } from "./wisp/project";
 import { landedBranches, laneSlug, removeLaneMaps } from "./wisp/laneMaps";
 import { documentsFolder } from "wisp/scripts/warcraft/battleNet";
@@ -84,7 +85,7 @@ const git = (...args: readonly string[]) =>
 export const hostSteps = (predictCost: boolean): WatchSteps<ChildProcessSpawner.ChildProcessSpawner> => ({
   tip: git("fetch", "-q", "origin", "main").pipe(Effect.andThen(git("rev-parse", "origin/main"))),
   landedAt: (sha) => git("show", "-s", "--format=%ct", sha).pipe(Effect.map((seconds) => Number(seconds) * 1000)),
-  build: (sha) => installPlaytest(sha, predictCost).pipe(Effect.flatMap(({ file, installed }) => {
+  build: (sha) => installPlaytest(sha, predictCost, false, TOM_EDITION).pipe(Effect.flatMap(({ file, installed }) => {
     const version = PLAYABLE_FILE.exec(file)?.[1];
     return version === undefined ? Effect.fail(new PlayProblem({ problem: `not a playable map: ${file}` })) : Effect.succeed({ version, path: installed });
   })),

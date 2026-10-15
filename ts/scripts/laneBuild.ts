@@ -8,7 +8,7 @@ import { documentsFolder } from "wisp/scripts/warcraft/battleNet";
 import { PlayProblem } from "wisp/scripts/wisp/play";
 import { runProcess } from "./hostProcess";
 import { PLAYTEST_PREFIX } from "./wisp/commands/play";
-import { nextPlayVersion, playableMapBuild } from "./wisp/currentPlaytest";
+import { TOM_EDITION, nextPlayVersion, playableMapBuild } from "./wisp/currentPlaytest";
 import { withLock } from "./wisp/fileLock";
 import { installLaneMap, laneMapTitle, laneSlug } from "./wisp/laneMaps";
 import { tsDirectory } from "./wisp/project";
@@ -66,7 +66,7 @@ const hostSteps: LaneSteps<ChildProcessSpawner.ChildProcessSpawner> = {
     if (host.length + game.length === 0) console.log("The lane changes no test files");
   }),
   version: git("rev-parse", "HEAD").pipe(Effect.map((head) => nextPlayVersion(join(documentsFolder(PLAYTEST_PREFIX), "Maps/00-Smashcraft"), head))),
-  build: (title, out) => run("the lane map build", playableMapBuild(title, out)),
+  build: (title, out) => run("the lane map build", playableMapBuild(title, out, false, TOM_EDITION)),
 };
 
 if (import.meta.main) {

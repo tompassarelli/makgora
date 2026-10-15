@@ -133,7 +133,7 @@ const buildHelper = (lane: string, helper: string) => withLock(join(locks, "play
   // The pinned padbridge service comes from the plug-in's git dependency (controller/Cargo.toml).
   const build = (target: string) => `cargo build --release --locked --jobs 2 --target-dir '${helperTarget}' ${target}`;
   yield* run(join(lane, "controller"), ["nix-shell", "-p", "stdenv.cc", "cmake", "pkg-config", "libxkbcommon", "udev", "--run",
-    `PATH=${join(homedir(), ".rustup/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin")}:$PATH bun '${capacity}' run --class moderate --owner smashcraft:play-helper --timeout-seconds 900 -- sh -c "${build("--bin wc3-journal")} && ${build("-p padbridge --bin padbridge")}"`]);
+    `PATH=${join(homedir(), ".rustup/toolchains/1.96.1-x86_64-unknown-linux-gnu/bin")}:$PATH bun '${capacity}' run --class tom --owner smashcraft:play-helper --timeout-seconds 900 -- sh -c "${build("--bin wc3-journal")} && ${build("-p padbridge --bin padbridge")}"`]);
 
   yield* tryPlay(() => {
     mkdirSync(dirname(helper), { recursive: true });
@@ -171,18 +171,22 @@ export interface PlaytestOptions {
   readonly named?: boolean;
   readonly helper?: boolean;
   readonly predictCost?: boolean;
+  readonly edition?: Edition;
 }
 
-export const playableMapBuild = (title: string, out: string, predictCost = false) =>
-  ["bun", "wisp", "map", "build", "--profile", "playable", "--edition", "full", "--name", title, "--out", out, ...(predictCost ? [PREDICT_COST] : [])];
+export type Edition = "classic" | "full";
+export const TOM_EDITION: Edition = "classic";
+
+export const playableMapBuild = (title: string, out: string, predictCost = false, edition: Edition = "full") =>
+  ["bun", "wisp", "map", "build", "--profile", "playable", "--edition", edition, "--name", title, "--out", out, ...(predictCost ? [PREDICT_COST] : [])];
 
 const builtMap = (folder: string): string | undefined =>
   existsSync(folder) ? readdirSync(folder).find((entry) => PLAYABLE_FILE.test(entry)) : undefined;
 
-export const currentPlaytest = (library: string, { revision: wanted, named = false, helper: wantsHelper = true, predictCost = false }: PlaytestOptions = {}) => Effect.gen(function*() {
+export const currentPlaytest = (library: string, { revision: wanted, named = false, helper: wantsHelper = true, predictCost = false, edition = "full" }: PlaytestOptions = {}) => Effect.gen(function*() {
   const { revision, controller, mainCheckout } = yield* (wanted === undefined ? resolveMain : resolveRevision(wanted));
   const version = yield* reserveVersion(library, revision);
-  const final = join(builds, revision);
+  const final = join(builds, edition === "full" ? revision : `${revision}-${edition}`);
   const built = builtMap(final);
   const title = built !== undefined ? built.slice(0, -".w3x".length) : named ? installName(version, revision) : `Smashcraft ${version}`;
   const map = { folder: "00-Smashcraft", file: `${title}.w3x`, title, source: join(final, `${title}.w3x`) };
@@ -191,7 +195,7 @@ export const currentPlaytest = (library: string, { revision: wanted, named = fal
     console.log(`Building ${title}`);
     const lane = yield* buildLane(mainCheckout, revision);
     yield* run(join(lane, "ts"), ["bun", "install", "--frozen-lockfile"]);
-    yield* run(join(lane, "ts"), playableMapBuild(title, join(staging, map.file), predictCost));
+    yield* run(join(lane, "ts"), playableMapBuild(title, join(staging, map.file), predictCost, edition));
     if (wantsHelper && !existsSync(helper)) {
       yield* buildHelper(lane, helper).pipe(Effect.catch((problem) => Effect.sync(() => console.log(`No controller helper for this build (${problem.problem}); the keyboard plays`))));
     }
