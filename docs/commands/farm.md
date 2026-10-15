@@ -5,9 +5,11 @@
   (smashcraft:.github/workflows/farm-test.yml). It refuses a commit already
   on main (main's CI runs these suites) or pending in Autoland (queued,
   testing alone, passed alone or in a train: Autoland runs them).
-  Balance, Playtest and memory soaks run only on a commit on main or on a lane
-  tip named with `--lane NAME` (pushed to `claude/NAME`), never on a scratch
-  branch; perf, pads and difficulty runs may also use a `farm/` scratch branch.
+  Balance and Playtest run only on a commit on main or on a lane tip named
+  with `--lane NAME` (pushed to `claude/NAME`), never on a scratch branch;
+  memory soaks, perf, pads and difficulty runs may also use a `farm/` scratch
+  branch, the place for scratch instrumentation, since Autoland lands every
+  pushed `claude/` lane.
   A newer run of the same shape on the same line (main, the lane or the
   scratch commit) cancels the older one, and every job first cancels its run
   when the commit has left main (or main reverted it) and its lane

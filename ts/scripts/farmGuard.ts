@@ -4,7 +4,7 @@ import { captureProcess } from "wisp/scripts/wisp/hostProcess";
 
 export type FarmWorkflow = "balance" | "playtest" | "memory" | "perf" | "pads" | "tiers" | "test";
 export const FARM_WORKFLOWS: readonly FarmWorkflow[] = ["balance", "playtest", "memory", "perf", "pads", "tiers", "test"];
-export const MAIN_ONLY: ReadonlySet<FarmWorkflow> = new Set(["balance", "playtest", "memory"]);
+export const MAIN_ONLY: ReadonlySet<FarmWorkflow> = new Set(["balance", "playtest"]);
 
 export interface MainCommit { readonly sha: string; readonly message: string }
 
