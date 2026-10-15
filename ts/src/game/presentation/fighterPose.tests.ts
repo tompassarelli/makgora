@@ -253,3 +253,32 @@ test("a hero holding a command grab plays its hold clip from grabFrame, Dreadlor
   assertEquals(clips.hold, DREADLORD_POUNCE_CLIPS.bite);
   assertEquals(clips.recovery, DREADLORD_POUNCE_CLIPS.recovery);
 });
+
+test("a grounded special holds its last pose while its lock outlasts it, then skids with neutral input, never flashing fall or run [k2 property]", () => {
+  const owner = createFighter(Character.kobold, -300.0, 1);
+  owner.mana.points = 100;
+  const { world } = duelPair(owner, createReferenceContactFighter(900.0, -1));
+  const pose = createFighterPose();
+  const side = controls({ specialPressed: true, specialX: 1, direction: 1 });
+  let ended = 0, skidded = false;
+  for (let frame = 1; frame <= 90; frame++) {
+    const input = frame === 1 ? side : controls();
+    stepDuel(world, input, controls());
+    advanceFighterPose(pose, owner, world, input, false, false, false, false);
+    if (owner.special.action !== SpecialAction.none) continue;
+    ended++;
+    assertEquals(owner.motion.grounded, true, `frame ${frame}`);
+    if (owner.special.lockFrames > 0) {
+      assertEquals(pose.clipIndex, KOBOLD_CLIPS.sideSpecial.index, `frame ${frame}`);
+      assertEquals(pose.rate, 0.0, `frame ${frame}`);
+      continue;
+    }
+    assertEquals(pose.clipIndex !== KOBOLD_CLIPS.fall.index && pose.clipIndex !== KOBOLD_CLIPS.run.index, true, `frame ${frame} shows clip ${pose.clipIndex}`);
+    if (Math.abs(owner.motion.vx) > f32(0.1)) {
+      assertEquals(pose.motion.motion, IllidanLocomotion.stop, `frame ${frame}`);
+      skidded = true;
+    }
+  }
+  assertGreaterThan(ended, TRANSITION_FRAMES);
+  assertTrue(skidded);
+});

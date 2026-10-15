@@ -132,6 +132,8 @@ const airStrikes: readonly [HeroPose, AttackStyle, Strike][] = [
     follow: { wrist: 0, chest: 24, lean: 15, step: 11, leftArm: -90, leftElbow: -15, arm: 45, elbow: -70, head: -10, thigh: 36, knee: -36, leftThigh: -24 } }],
 ];
 const loop = (frames: number, a: Gesture, b: Gesture): Beat[] => [{ frame: 0, gesture: a }, { frame: Math.round(frames / 2), gesture: b }, { frame: frames, gesture: a }];
+const runBrake: Gesture = { lean: 12, chest: 15, arm: 30, leftArm: -30, thigh: 30, knee: -35, leftKnee: -35, leftThigh: -25 };
+const brace: Gesture = { lean: -16, chest: -12, step: 4, arm: -75, elbow: -20, leftArm: -85, leftElbow: -20, head: -12, thigh: 40, knee: -5, leftThigh: -15, leftKnee: -50 };
 const posed: [HeroPose, number, Beat[], boolean?][] = [
   ["jumpSquat", 3, [{ frame: 0, gesture: blend(ready, squash, 0.4) }, { frame: 3, gesture: squash }, { frame: 5, gesture: { ...squash, chest: 36, thigh: 78, knee: -110, leftThigh: 78, leftKnee: -110 } }]],
   ["jump", 3, [{ frame: 0, gesture: squash }, { frame: 3, gesture: { chest: -18, arm: -165, elbow: -10, leftArm: -170, leftElbow: -10, lean: -6, head: -22, thigh: -10, knee: -5, leftThigh: -18, leftKnee: -10 } },
@@ -139,7 +141,7 @@ const posed: [HeroPose, number, Beat[], boolean?][] = [
   ["doubleJump", 4, [{ frame: 0, gesture: fall }, { frame: 3, gesture: { ...tuck, lean: 70 } }, { frame: 6, gesture: { ...tuck, lean: 160 } }, { frame: 9, gesture: { ...tuck, lean: 250 } },
     { frame: 12, gesture: { ...tuck, lean: 330 } }, { frame: 16, gesture: { ...flail, arm: -150, leftArm: -30, lean: 360 } }, { frame: 24, gesture: { ...fall, lean: 360 } }], true],
   ["landing", 2, [{ frame: 0, gesture: fall }, { frame: 2, gesture: { ...squash, arm: 35, leftArm: 35, chest: 40 } }, { frame: 5, gesture: blend(squash, ready, 0.55) }, { frame: 8, gesture: ready }]],
-  ["stop", 3, [{ frame: 0, gesture: { lean: 12, chest: 15, arm: 30, leftArm: -30, thigh: 30, knee: -35, leftThigh: -25 } }, { frame: 3, gesture: { lean: -16, chest: -12, step: 4, arm: -75, elbow: -20, leftArm: -85, leftElbow: -20, head: -12, thigh: 40, knee: -5, leftThigh: -15, leftKnee: -50 } },
+  ["stop", 3, [{ frame: 0, gesture: runBrake }, { frame: 1, gesture: blend(runBrake, brace, 0.12) }, { frame: 2, gesture: blend(runBrake, brace, 0.4) }, { frame: 4, gesture: brace },
     { frame: 8, gesture: blend({ lean: -16, chest: -12, step: 4, arm: -75, leftArm: -85, thigh: 40, leftThigh: -15, leftKnee: -50 }, ready, 0.7) }]],
   ["grabHold", 15, loop(30, hold, { ...hold, chest: 16, arm: -165, elbow: -80, head: -2 })],
   ["pummel", 8, [{ frame: 0, gesture: hold }, { frame: 5, gesture: { ...hold, chest: -14, lean: -8, head: -30, step: 0 } }, { frame: 8, gesture: { ...hold, chest: 40, lean: 16, head: 35, step: 8, arm: -120 } },
@@ -173,7 +175,7 @@ const digScurry = (frame: number): Gesture => {
     knee: 110 + 25 * Math.max(0, paw), leftKnee: 110 + 25 * Math.max(0, -paw) };
 };
 for (const pose of ["sideSpecial", "sideSpecialAir"] as const) if (!only || only.includes(pose)) {
-  const prep = { ...digScurry(digRegion.firstFrame), step: -42 }, last = digScurry(digRegion.lastFrame);
+  const prep = { ...digScurry(digRegion.firstFrame), step: -42 }, last = digScurry(digRegion.lastFrame), settle = pose === "sideSpecial" ? runBrake : ready;
   actions.push({ pose, frames: dig.endFrame, contact: digRegion.firstFrame,
     beats: [{ frame: 0, gesture: ready }, { frame: 4, gesture: prep },
       ...Array.from({ length: digRegion.lastFrame - digRegion.firstFrame + 1 }, (_, i) => {
@@ -181,7 +183,7 @@ for (const pose of ["sideSpecial", "sideSpecialAir"] as const) if (!only || only
         return { frame, gesture: digScurry(frame) };
       }), ...Array.from({ length: dig.endFrame - digRegion.lastFrame }, (_, i) => {
         const frame = digRegion.lastFrame + i + 1;
-        return { frame, gesture: blend(last, ready, (frame - digRegion.lastFrame) / (dig.endFrame - digRegion.lastFrame)) };
+        return { frame, gesture: blend(last, settle, (frame - digRegion.lastFrame) / (dig.endFrame - digRegion.lastFrame)) };
       })] });
 }
 const charge: Gesture = { chest: -30, arm: -220, elbow: -32, leftArm: -205, leftElbow: -32, lean: -15, step: -6, head: -30, thigh: -20, leftThigh: 24, knee: -22 };

@@ -206,6 +206,11 @@ const posesDown = (f: Readonly<Fighter>): boolean =>
   f.down.state !== DownState.none && f.down.state !== DownState.tumble && f.down.state !== DownState.attack;
 
 
+const holdsSpecialEnd = (pose: Readonly<FighterPose>, f: Readonly<Fighter>): boolean =>
+  f.special.lockFrames > 0 && f.motion.grounded && f.landing.lag <= 0
+  && pose.animation.startsWith("special") && pose.animation !== "specialfall";
+
+
 function selectCommandGrabClip(pose: FighterPose, f: Readonly<Fighter>): boolean {
   if (f.special.action === SpecialAction.none || f.grab.owner !== undefined || f.launch.hitstun !== 0) return false;
   const clips = heroLook(f.character)?.commandGrab;
@@ -309,6 +314,7 @@ function selectClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly<Ros
     playIndex(pose, `special${f.special.action}${playsFollowUpPose(f) ? "+" : ""}`, fighterSpecialClip(f).index);
     return rate;
   }
+  if (holdsSpecialEnd(pose, f)) return 0.0;
   const stateRate = illidan ? selectIllidanAction(pose, f, charging) : selectTableAction(pose, f, table, charging);
   if (stateRate !== undefined) return stateRate;
   if (pose.jumpAnimationRemaining > 0) {

@@ -237,7 +237,7 @@ export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, charac
     advanceFighterPose(p, f, world, input, false, false, false, false);
     const running = f.special.action !== SpecialAction.none;
     if (tick === 0 && !running) return undefined;
-    if (!running && moveFrames === 0) moveFrames = frames.length;
+    if (!running && f.special.lockFrames <= 0 && moveFrames === 0) moveFrames = frames.length;
     const captured = capture(f, p);
     if (running) {
       const move = runningHeroSpecial(f);

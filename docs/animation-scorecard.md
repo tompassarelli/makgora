@@ -10,7 +10,8 @@ Each row measures the mesh at the exact animation time chosen by production
 pose selection while the simulation plays the move. Distances are fractions
 of the ready body's height; silhouette masks use the far gameplay camera's
 pixel scale. Ready is the pose production pose selection shows on the frame
-after the move ends, so line 2 measures the transition the game draws.
+after the move ends (a special ends when its lock does, the first frame the
+fighter can act), so line 2 measures the transition the game draws.
 
 1. **Body drive:** find the mesh vertex nearest the strike's far end at
    contact. A limb carrying that point is found by its hand/foot attachment;
