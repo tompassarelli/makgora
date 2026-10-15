@@ -25,7 +25,7 @@ export const DRAWN_STRIDES: { readonly [character: number]: { readonly walk: { r
   21: { walk: { clip: 1, model: "units\\creeps\\Murloc\\Murloc.mdl", speed: f32(199.640) }, run: { clip: 1, model: "units\\creeps\\Murloc\\Murloc.mdl", speed: f32(199.640) } },
   22: { walk: { clip: 5, model: "units\\orc\\Hellscream\\Hellscream.mdl", speed: f32(260.738) }, run: { clip: 5, model: "units\\orc\\Hellscream\\Hellscream.mdl", speed: f32(260.738) } },
   23: { walk: { clip: 2, model: "units\\undead\\HeroCryptLord\\HeroCryptLord.mdl", speed: f32(172.192) }, run: { clip: 2, model: "units\\undead\\HeroCryptLord\\HeroCryptLord.mdl", speed: f32(172.192) } },
-  24: { walk: { clip: 7, model: "units\\nightelf\\Furion\\Furion.mdl", speed: f32(189.734) }, run: { clip: 7, model: "units\\nightelf\\Furion\\Furion.mdl", speed: f32(189.734) } },
+  24: { walk: { clip: 7, model: "units\\nightelf\\Furion\\Furion.mdl", speed: f32(208.708) }, run: { clip: 7, model: "units\\nightelf\\Furion\\Furion.mdl", speed: f32(208.708) } },
   25: { walk: { clip: 1, model: "units\\creeps\\Medivh\\Medivh.mdl", speed: f32(188.981) }, run: { clip: 1, model: "units\\creeps\\Medivh\\Medivh.mdl", speed: f32(188.981) } },
   26: { walk: { clip: 1, model: "units\\creeps\\Kobold\\Kobold.mdl", speed: f32(70.069) }, run: { clip: 1, model: "units\\creeps\\Kobold\\Kobold.mdl", speed: f32(70.069) } },
 };
