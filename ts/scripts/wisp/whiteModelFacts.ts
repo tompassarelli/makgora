@@ -433,24 +433,6 @@ export const WHITE_MODEL_FACTS: Readonly<Record<string, ModelFacts>> = {
     },
     "emitters": []
   },
-  "war3mapimported/koboldwhite-c758f8b75f11b97d6293d6f31b9d46f6cd01cce82255b4f1c3c45748fd46a1d5.mdx": {
-    "geosets": 7,
-    "triangles": 394,
-    "lights": 0,
-    "bounds": {
-      "min": [
-        -300,
-        -300,
-        -200
-      ],
-      "max": [
-        300,
-        300,
-        350
-      ]
-    },
-    "emitters": []
-  },
   "war3mapimported/shadowhunterwhite-6897b78a1ab11504e1aa9c5e721930b27767353f823f6a5950477571adcc2a5c.mdx": {
     "geosets": 5,
     "triangles": 515,
@@ -483,6 +465,24 @@ export const WHITE_MODEL_FACTS: Readonly<Record<string, ModelFacts>> = {
         320,
         320,
         464.3380126953125
+      ]
+    },
+    "emitters": []
+  },
+  "war3mapimported/koboldwhite-504c164f40cc17951ad38d0315b4d9c4a8e37ef120d2c0d54568ed8e8912f29f.mdx": {
+    "geosets": 7,
+    "triangles": 394,
+    "lights": 0,
+    "bounds": {
+      "min": [
+        -300,
+        -300,
+        -200
+      ],
+      "max": [
+        300,
+        300,
+        350
       ]
     },
     "emitters": []
