@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, rmSync } from "node:fs";
 import { homedir, userInfo } from "node:os";
 import { basename, delimiter, join } from "node:path";
 import { BunServices } from "@effect/platform-bun";
@@ -124,3 +124,18 @@ export const readClientEntries = (path: string): readonly ClientEntry[] => {
     ? [{ name: entry.name, documents: entry.documents, ...("offline" in entry && entry.offline === true ? { offline: true } : {}) }]
     : []);
 };
+
+export const unresolvedLibraries = (lddOutput: string): readonly string[] =>
+  lddOutput.split("\n").flatMap((line) => /^\s*(\S+) => not found/.exec(line)?.[1] ?? []);
+
+const liveLdd = (path: string) => runProcess(ChildProcess.make("ldd", [path], { stdin: "ignore" })).pipe(Effect.provide(BunServices.layer));
+
+/** Drops the packager's source stamp when a library it links has left the store, so Wisp's own check recompiles it against the current stormlib. */
+export const repairPackager = (packer = MAP_PACKER, ldd: (path: string) => Effect.Effect<string, unknown> = liveLdd) => Effect.gen(function*() {
+  if (!existsSync(packer)) return false;
+  const missing = unresolvedLibraries(yield* ldd(packer).pipe(Effect.orElseSucceed(() => "")));
+  if (missing.length === 0) return false;
+  rmSync(`${packer}.source-sha256`, { force: true });
+  console.log(`map packager misses ${missing.join(", ")}; it will be recompiled against the current stormlib`);
+  return true;
+});

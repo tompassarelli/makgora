@@ -8,6 +8,7 @@ import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
 import { type ArchiveEntry, type GeneratedFile, MapBuild, MapBuildFailure } from "wisp/scripts/wisp/mapBuild";
 import { runProcess } from "wisp/scripts/wisp/hostProcess";
 import { checkoutInputs } from "../buildInputs";
+import { repairPackager } from "../nativeTools";
 import { step } from "wisp/scripts/wisp/timings";
 import { glowFreeCaptureImports, decodeBuildOptions, editionImports, importedAssets, rebuildMap, type MapEdition } from "../mapInputs";
 import { buildProject, gameFilesLayer, profileOption, projectRoot, sourceErrorsLayer } from "../project";
@@ -123,4 +124,4 @@ export const rebuild: Command = (args) => Effect.gen(function*() {
 });
 
 
-export const map: Command = ([verb, ...args]) => verb === "build" ? build(args) : verb === "rebuild" ? rebuild(args) : Effect.fail(new UsageFailure({ problem: "map takes build or rebuild" }));
+export const map: Command = ([verb, ...args]) => verb === "build" ? repairPackager().pipe(Effect.andThen(build(args))) : verb === "rebuild" ? repairPackager().pipe(Effect.andThen(rebuild(args))) : Effect.fail(new UsageFailure({ problem: "map takes build or rebuild" }));

@@ -1,12 +1,14 @@
 import { expect, test } from "bun:test";
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { GameFiles } from "wisp/scripts/wisp/gameFiles";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
 import { CURRENT_CANDIDATE, MAP_PROFILES } from "../scripts/wisp/acceptChecks";
 import { poolUnitCommand, poolUnitName, pairNeedsRestart } from "../scripts/wisp/commands/lanPoolUnit";
 import { smashcraftDoctor } from "../scripts/wisp/doctor";
-import { NativeClientInvalid, NativeToolMissing, resolveTools, validateClients, withRuntimeTools } from "../scripts/wisp/nativeTools";
+import { gameFilesLayer } from "../scripts/wisp/project";
+import { NativeClientInvalid, NativeToolMissing, repairPackager, resolveTools, unresolvedLibraries, validateClients, withRuntimeTools } from "../scripts/wisp/nativeTools";
 
 const here = mkdtempSync(join(tmpdir(), "native-harness-"));
 const real = join(here, "xdotool");
@@ -63,4 +65,25 @@ test("the pool runs in a user unit that lan stop names, and a dropped client res
   expect(pairNeedsRestart({ clients: [{ name: "a", pid: 1 }, { name: "b", pid: 2 }] })).toBe(false);
   expect(pairNeedsRestart({ clients: [{ name: "a", pid: 1 }, { name: "b" }] })).toBe(true);
   expect(pairNeedsRestart(undefined)).toBe(true);
+});
+
+test("a packager whose stormlib left the store loses its source stamp so it is recompiled [k2 property]", async () => {
+  const packer = join(here, "map-pack");
+  writeFileSync(packer, "");
+  writeFileSync(`${packer}.source-sha256`, "abc\n");
+  const live = () => Effect.succeed("\tlibc.so.6 => /nix/store/x/lib/libc.so.6 (0x1)\n");
+  expect(await Effect.runPromise(repairPackager(packer, live))).toBe(false);
+  expect(existsSync(`${packer}.source-sha256`)).toBe(true);
+  const stale = () => Effect.succeed("\tlibstorm.so.9 => not found\n\tlibc.so.6 => /nix/store/x/lib/libc.so.6 (0x1)\n");
+  expect(await Effect.runPromise(repairPackager(packer, stale))).toBe(true);
+  expect(existsSync(`${packer}.source-sha256`)).toBe(false);
+  expect(unresolvedLibraries("\tlibstorm.so.9 => not found\n")).toEqual(["libstorm.so.9"]);
+});
+
+test("installing a map into a fresh Documents folder creates Maps/00-Smashcraft/tests [k2 property]", async () => {
+  const documents = join(here, "fresh-documents");
+  const map = join(here, "candidate.w3x");
+  writeFileSync(map, "map");
+  await Effect.runPromise(GameFiles.use((files) => files.installMap(documents, map)).pipe(Effect.provide(gameFilesLayer)));
+  expect(existsSync(join(documents, "Maps/00-Smashcraft/tests/candidate.w3x"))).toBe(true);
 });
