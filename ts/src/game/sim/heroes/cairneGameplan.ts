@@ -2,13 +2,12 @@ import { AttackStyle } from "../codes";
 import { GameplanSpecial, GameplanThrow, type FighterGameplan } from "../gameplan";
 
 export const CAIRNE_GAMEPLAN: FighterGameplan = {
-  range: { near: 110.0, far: 165.0 },
+  range: { near: 95.0, far: 155.0 },
   spacing: [{ move: AttackStyle.forwardTilt, near: 105.0, far: 180.0 },
-    { move: GameplanSpecial.side, near: 40.0, far: 170.0 },
-    { move: GameplanSpecial.down, near: 0.0, far: 120.0 },
+    { move: GameplanSpecial.down, near: 0.0, far: 150.0 },
     { move: GameplanSpecial.neutral, near: 210.0, far: 450.0 }],
   approach: [{ via: "shoot", moves: [GameplanSpecial.neutral, AttackStyle.forwardTilt], weight: 2 },
-    { via: "run", moves: [GameplanSpecial.side, GameplanSpecial.down, AttackStyle.grab, AttackStyle.downTilt], weight: 2 }],
+    { via: "run", moves: [GameplanSpecial.down, AttackStyle.grab, AttackStyle.downTilt], weight: 2 }],
   defense: ["stance", "shield", "stance", "retreat"],
   combos: [{ starter: AttackStyle.downTilt, followUps: [AttackStyle.upTilt, AttackStyle.upAir] },
     { starter: GameplanSpecial.down, followUps: [AttackStyle.upTilt, AttackStyle.upAir] },
