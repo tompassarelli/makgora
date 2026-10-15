@@ -18,6 +18,7 @@ import { WORLD_UNITS_PER_MELEE_UNIT } from "./tuning";
 import { squareRoot } from "./warcraftMath";
 import { meleeAtan2 } from "../core/math/meleeScalarMath";
 import { stickX, stickZ } from "./stick";
+import { SURFACE_REFLECT_ATTENUATION, SURFACE_REFLECT_COOLDOWN_FRAMES, SURFACE_REFLECT_SPEED_THRESHOLD } from "./surfaces";
 import { isHeroSpecialAction, landHeroSpecial } from "./specials/engine";
 import { aerialJumps, groundedJumps } from "./itemBuffs";
 
@@ -78,8 +79,33 @@ function landRiflemanBlaster(f: Fighter): void {
 }
 
 
+function reboundsOffFloor(f: Fighter, fromAsdi: boolean): boolean {
+  const { motion, launch, surfaceRecovery: recovery } = f;
+  return !motion.grounded && !fromAsdi && isTumbling(f) && f.tech.window <= 0 && recovery.reflectCooldown === 0 && -launch.knockbackZ > SURFACE_REFLECT_SPEED_THRESHOLD;
+}
+
+function reboundOffFloor(f: Fighter, stage: number, matchFrame: number, landing: number): void {
+  const { motion, launch, surfaceRecovery: recovery } = f;
+  const combinedX = f32(motion.vx + launch.knockbackX);
+  const combinedZ = f32(motion.vz + launch.knockbackZ);
+  launch.knockbackX = f32(combinedX * SURFACE_REFLECT_ATTENUATION);
+  launch.knockbackZ = f32(-combinedZ * SURFACE_REFLECT_ATTENUATION);
+  motion.vx = 0.0;
+  motion.vz = 0.0;
+  clearMotionValue(motion.meleeVelocityZ);
+  motion.fastFalling = false;
+  motion.z = surfaceZAt(stage, landing, matchFrame, motion.x);
+  setWorldMotionValue(motion.meleeZ, motion.z);
+  f.facing = launch.knockbackX < 0 ? -1 : 1;
+  recovery.reflectCooldown = SURFACE_REFLECT_COOLDOWN_FRAMES;
+}
+
 export function finishLanding(f: Fighter, stage: number, matchFrame: number, input: Readonly<Controls>, landing: number, fromAsdi: boolean): void {
   const { motion, launch, landing: landingState, dodge } = f;
+  if (reboundsOffFloor(f, fromAsdi)) {
+    reboundOffFloor(f, stage, matchFrame, landing);
+    return;
+  }
   motion.fastFalling = false;
   const wasGrounded = motion.grounded;
   const damageLanding = !wasGrounded && !fromAsdi && launch.hitstun > 0 && !isTumbling(f) ? damageLandingReaction(f) : undefined;

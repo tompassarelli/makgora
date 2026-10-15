@@ -9,6 +9,7 @@ import { type Fighter, createFighter } from "./fighter";
 import { DIAGONAL_UNIT, contactKnockback, damageLevelForKnockback } from "./knockback";
 import { type Roster, createRoster } from "./roster";
 import { stageBounds } from "./stageBounds";
+import { SURFACE_REFLECT_ATTENUATION, SURFACE_REFLECT_SPEED_THRESHOLD } from "./surfaces";
 import { stepDuel } from "./testDuel";
 import { contactBatch, controls, hitEffect, seedTechWindow } from "./testWorld";
 import { melee } from "./tuning";
@@ -86,32 +87,91 @@ test("a high-percent grounded meteor bounces through a held tech and off the top
   assertGreaterThan(highest, stageBounds(0).blast.top - 40.0);
 });
 
-function diveIntoFloor(tech: boolean): Fighter {
+type Dive = { world: Roster; target: Fighter; rebounded: boolean; arrivalKnockbackZ: number; reboundKnockbackZ: number };
+
+function diveIntoFloor(tech: boolean, damage: number): Dive {
   const target = createFighter(Character.rifleman, 0.0, -1);
   const world = pair(target);
-  target.status.damage = 150.0;
+  target.status.damage = damage;
   target.motion.grounded = false;
   target.motion.surface = undefined;
   target.motion.z = 40.0;
   strike(world, 18.0, 100.0, 40.0, 0.0, -1.0);
   assertTrue(isTumbling(target));
   assertTrue(target.launch.knockbackZ < 0.0);
-  for (let frames = 0; frames < ROUTE_LIMIT_FRAMES && !target.motion.grounded; frames++) {
+  let arrivalKnockbackZ = 0.0;
+  let reboundKnockbackZ = 0.0;
+  let rebounded = false;
+  for (let frames = 0; frames < ROUTE_LIMIT_FRAMES && !target.motion.grounded && !rebounded; frames++) {
     if (tech && target.launch.hitlag === 1) seedTechWindow(target, 15);
+    const before = target.launch.knockbackZ;
     stepDuel(world);
+    if (before < 0.0 && target.launch.knockbackZ > 0.0) {
+      rebounded = true;
+      arrivalKnockbackZ = before;
+      reboundKnockbackZ = target.launch.knockbackZ;
+    }
   }
-  return target;
+  return { world, target, rebounded, arrivalKnockbackZ, reboundKnockbackZ };
 }
 
-// Before Smash 4 a midair target driven into the floor stops its fall and can tech; it never rebounds (SmashWiki "Meteor smash", "Floor").
-test("an airborne tumbling fighter driven into the floor techs in the window, else lands in the bound without rebounding [k4 reference docs/physics.md#floor-bounces]", () => {
-  const teched = diveIntoFloor(true);
-  assertTrue(teched.motion.grounded);
-  assertEquals(teched.down.state, DownState.tech);
-  const missed = diveIntoFloor(false);
-  assertTrue(missed.motion.grounded);
-  assertEquals(missed.down.state, DownState.bound);
-  assertEquals(missed.launch.knockbackZ, 0.0);
+// Smash 4 onward, a midair target driven into the floor who misses the tech rebounds like a wall spike, so a hard meteor can KO off the top (SmashWiki "Floor", "Meteor smash"); owner decision 15 Oct 2026.
+test("an airborne tumbling fighter driven hard into the floor rebounds when it misses the tech and at high percent reaches the top blast zone [k4 reference docs/physics.md#floor-bounces]", () => {
+  for (const damage of [60.0, 150.0]) {
+    const { rebounded, target, arrivalKnockbackZ, reboundKnockbackZ } = diveIntoFloor(false, damage);
+    assertTrue(rebounded);
+    assertFalse(target.motion.grounded);
+    assertTrue(isTumbling(target));
+    assertGreaterThan(-arrivalKnockbackZ, SURFACE_REFLECT_SPEED_THRESHOLD);
+    const kept = reboundKnockbackZ / -arrivalKnockbackZ;
+    assertTrue(kept > SURFACE_REFLECT_ATTENUATION - 0.0625 && kept < SURFACE_REFLECT_ATTENUATION + 0.0625);
+  }
+  const { world, target } = diveIntoFloor(false, 150.0);
+  let highest = target.motion.z;
+  let frames = 0;
+  while (!target.status.out && frames < ROUTE_LIMIT_FRAMES) {
+    stepDuel(world);
+    frames++;
+    if (!target.status.out) highest = Math.max(highest, target.motion.z);
+  }
+  assertTrue(target.status.out);
+  assertGreaterThan(highest, stageBounds(0).blast.top - 40.0);
+});
+
+// A tech pressed in the window still techs on the floor instead of rebounding (SmashWiki "Floor": "All floors can be ... teched on").
+test("an airborne tumbling fighter driven into the floor with a tech in the window techs instead of rebounding [k4 reference docs/physics.md#floor-bounces]", () => {
+  for (const damage of [60.0, 150.0]) {
+    const { rebounded, target } = diveIntoFloor(true, damage);
+    assertFalse(rebounded);
+    assertTrue(target.motion.grounded);
+    assertEquals(target.down.state, DownState.tech);
+  }
+});
+
+// A tumbling fighter driven into the floor slower than the reflect threshold lands in the bound, as a slow wall contact does not reflect.
+test("a tumbling fighter driven into the floor slowly lands in the bound without rebounding [k4 reference docs/physics.md#floor-bounces]", () => {
+  for (const knockback of [80.0, 120.0]) {
+    const target = createFighter(Character.rifleman, 0.0, -1);
+    const world = pair(target);
+    target.motion.grounded = false;
+    target.motion.surface = undefined;
+    target.motion.z = 40.0;
+    const [dx, dz] = steepMeteor(12.0);
+    strike(world, 5.0, 0.0, knockback, dx, dz);
+    assertTrue(target.launch.knockbackZ < 0.0);
+    assertTrue(isTumbling(target));
+    let frames = 0;
+    let arrival = 0.0;
+    while (!target.motion.grounded && frames < ROUTE_LIMIT_FRAMES) {
+      arrival = target.launch.knockbackZ;
+      stepDuel(world);
+      frames++;
+      assertFalse(target.launch.knockbackZ > 0.0 && arrival < 0.0);
+    }
+    assertTrue(target.motion.grounded);
+    assertTrue(-arrival <= SURFACE_REFLECT_SPEED_THRESHOLD);
+    assertEquals(target.down.state, DownState.bound);
+  }
 });
 
 function downed(state: DownState): { world: Roster; target: Fighter } {
@@ -123,11 +183,11 @@ function downed(state: DownState): { world: Roster; target: Fighter } {
   return { world, target };
 }
 
-// Melee's reset: a weak hit without tumble knockback in the missed-tech bound or lying down forces a getup; 13+ hitstun half-resets first (SmashWiki "Lock").
-test("a hit under 7% on a bound or lying fighter forces a getup, after any half-reset wait; 7% launches [k4 reference docs/physics.md#grounded-knockdown-and-jab-resets]", () => {
+// Melee's reset: a hit of at most 7% without tumble knockback in the missed-tech bound or lying down forces a getup; 13+ hitstun half-resets first (SmashWiki "Lock").
+test("a hit of 7% or less on a bound or lying fighter forces a getup, after any half-reset wait; above 7% launches [k4 reference docs/physics.md#grounded-knockdown-and-jab-resets]", () => {
   assertEquals(DOWN_DAMAGE_RESET_THRESHOLD, 7.0);
   for (const state of [DownState.bound, DownState.wait]) {
-    for (const [damage, growth] of [[1.0, 0.0], [3.0, 100.0], [6.5, 100.0]] as const) {
+    for (const [damage, growth] of [[1.0, 0.0], [3.0, 100.0], [6.5, 100.0], [7.0, 100.0]] as const) {
       const { world, target } = downed(state);
       strike(world, damage, growth, 20.0, DIAGONAL_UNIT, DIAGONAL_UNIT);
       assertEquals(target.down.state, DownState.damage, `${damage}% resets from ${state}`);
@@ -139,8 +199,8 @@ test("a hit under 7% on a bound or lying fighter forces a getup, after any half-
       assertEquals(target.down.state, DownState.stand, `${damage}% from ${state} forces the stand`);
     }
     const { world, target } = downed(state);
-    strike(world, DOWN_DAMAGE_RESET_THRESHOLD, 100.0, 20.0, DIAGONAL_UNIT, DIAGONAL_UNIT);
-    assertEquals(target.down.state, DownState.none, `7% launches from ${state}`);
+    strike(world, f32(7.1), 100.0, 20.0, DIAGONAL_UNIT, DIAGONAL_UNIT);
+    assertEquals(target.down.state, DownState.none, `7.1% launches from ${state}`);
     assertFalse(target.motion.grounded);
   }
 });

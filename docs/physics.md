@@ -1192,11 +1192,11 @@ verification.
 
 The down-damage entry compares the frame's summed damage (`percentTemp`,
 accumulated per contact in Melee) against = 7.
-A frame whose contacts sum below 7 damage on a fighter in
+A frame whose contacts sum to 7 damage or less on a fighter in
 DownBound, DownWait, or DownDamage enters the 13-tick
 DownDamage reaction. Its hitstun is retained; after the animation, remaining
 hitstun sets the down-wait timeout, and an expired timer forces stand. Damage
-of 7 or more interrupts the grounded recovery and follows ordinary launch
+above 7 interrupts the grounded recovery and follows ordinary launch
 resolution. Damage-only arrows do not enter DownDamage.
 
 The numerical face-up/down choice follows the sign of the launch's vertical
@@ -1226,11 +1226,18 @@ Melee is the design target here, from public sources only:
   ([SmashWiki, Tech](https://www.ssbwiki.com/Tech)), so the bounce happens
   at contact and a held tech does not stop it. The later landing techs as usual.
 - Before Smash 4 a midair target driven into the floor gets no bounce and stops
-  its fall, so it can tech ([SmashWiki, Meteor smash](https://www.ssbwiki.com/Meteor_smash)).
-  The floor rebound that lets a missed tech fly back up is a Smash 4 change
-  ([SmashWiki, Floor](https://www.ssbwiki.com/Floor)). Smashcraft keeps
-  Melee's rule: an airborne tumbling fighter that reaches the floor techs or
-  enters the bound, and only walls and ceilings reflect it.
+  its fall ([SmashWiki, Meteor smash](https://www.ssbwiki.com/Meteor_smash)).
+  Smashcraft instead follows Smash 4 and Ultimate, where floors "no longer halt
+  the momentum" and the fighter rebounds "much like a stage spike with the
+  floor instead of a wall" ([SmashWiki, Floor](https://www.ssbwiki.com/Floor)),
+  so a meteor can carry a midair target off the top blast zone (a deliberate
+  divergence, smashcraft:docs/gameplay-design.md "Deviations from Melee").
+  A tumbling airborne fighter with no tech in the window whose downward
+  knockback exceeds the wall reflect threshold (1 Melee unit a frame) rebounds:
+  its knockback plus own velocity reflects upward at 0.800000011920929, it stays
+  tumbling with its hitstun, and the 3-frame reflect cooldown applies, the same
+  rule walls and ceilings use. A tech pressed in the window still techs, and a
+  slower arrival enters the bound.
 
 A reset also needs knockback below tumble, under 80 units
 ([SmashWiki, Lock](https://www.ssbwiki.com/Lock)). A weak hit with tumble
