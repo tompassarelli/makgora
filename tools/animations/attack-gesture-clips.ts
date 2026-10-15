@@ -33,9 +33,7 @@ const PLAN: Readonly<Record<number, readonly HeroPose[]>> = {
 const SPIN_POSES: Readonly<Record<number, readonly HeroPose[]>> = {
   9: ["dashAttack"],
 };
-const NO_FORM_BINDINGS: Readonly<Record<number, readonly HeroPose[]>> = {
-  9: ["neutralSpecial"],
-};
+const NO_FORM_BINDINGS: Readonly<Record<number, readonly HeroPose[]>> = {};
 
 const CONTACT: Readonly<Record<string, readonly number[]>> = {
   jab: [12, -22, 38, -15, 0, -10, 18, 0], jab2: [-12, -48, -12, 38, -20, 18, -8, 0], jab3: [28, -75, 45, -42, 25, -24, 35, 0],
