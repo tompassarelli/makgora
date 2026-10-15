@@ -205,6 +205,20 @@ function downTilt(): Authored {
     { frame: total, gesture: READY },
   ] };
 }
+function jab(): Authored {
+  const { contact, total } = timing(AttackStyle.jab);
+  const hold: Gesture = STILL;
+  return { pose: "jab", style: AttackStyle.jab, support: "R", phases: [
+    { frame: 0, gesture: READY },
+    { frame: contact - 2, gesture: { ...hold, lean: -6, chest: -12, head: 6, step: -2 }, reach: ["handL", 16, 74] },
+    { frame: contact, gesture: { ...hold, lean: 0, chest: 6, head: -14, step: 11 }, reach: ["handL", 82, 76] },
+    { frame: contact + 2, gesture: { ...hold, lean: 2, chest: 10, head: -16, step: 16 }, reach: ["handL", 98, 76] },
+    { frame: contact + 7, gesture: { ...hold, lean: 0, chest: 6, head: -10, step: 13 }, reach: ["handL", 74, 74] },
+    { frame: total, gesture: READY },
+  ] };
+}
+const STILL: Gesture = { arm: 110, elbow: -60, free: 50, freeElbow: -30 };
+const still = (k: number): Gesture => ({ arm: STILL.arm! * k, elbow: STILL.elbow! * k, free: STILL.free! * k, freeElbow: STILL.freeElbow! * k });
 
 const hang = (action: Authored, drape = false): Authored => ({ ...action, phases: action.phases.map(phase => {
   const g = phase.gesture, cloth = g.cloth ?? 0.8 * Math.min(g.frontHip ?? 0, g.backHip ?? 0);
@@ -218,6 +232,7 @@ const POSES: Readonly<Record<string, () => Authored>> = {
   backAir: draped(backAir), neutralAir: draped(neutralAir), downAir: draped(downAir),
   forwardTiltDown: kicked(() => kick("forwardTiltDown", AttackStyle.forwardTiltDown, [76, 26], -8, [80, 24], -30, -8)),
   downTilt: kicked(downTilt),
+  jab: kicked(jab),
 };
 
 function rotation(base: ArrayLike<number>, pitch: number, yaw = 0, roll = 0): Float32Array {
