@@ -5,7 +5,7 @@ import { type Fighter, createFighter } from "../fighter";
 import { HERO_REFERENCE_HEIGHT } from "../heroMoves";
 import { type Roster } from "../roster";
 import { controls } from "../testWorld";
-import { copyFighterState } from "../../replay/fighterState";
+import { copyFighterState } from "../../../generated/state/fighterState";
 import { firstFighterDifference } from "../../replay/difference";
 import { duelPair, stepDuel } from "../testDuel";
 

@@ -7,7 +7,7 @@ import { EYE_BLAST_FORM, EYE_BLAST_FRAMES, startFighterSpecial } from "./special
 import { advanceFighterMotion } from "./step";
 import { collectDamageContact } from "./contacts";
 import { contactBatch, controls, hitEffect, testWorld } from "./testWorld";
-import { copyFighterState } from "../replay/fighterState";
+import { copyFighterState } from "../../generated/state/fighterState";
 import { firstFighterDifference } from "../replay/difference";
 import { grantParry } from "./shield";
 import { dealtManaGain } from "./mana";

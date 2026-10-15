@@ -1,7 +1,7 @@
 import { assertEquals, assertGreaterThan, test } from "wisp/src/runtime/testing";
 import { Character, AttackStyle } from "../sim/codes";
 import { createFighter } from "../sim/fighter";
-import { copyFighterState } from "../replay/fighterState";
+import { copyFighterState } from "../../generated/state/fighterState";
 import { attackStartupFrames } from "../sim/moves";
 import { beginFighterAttack } from "../sim/attacks";
 import { queueAttack } from "../input/attackBuffer";

@@ -1,7 +1,7 @@
 
 
 import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
-import { copyFighterState } from "../replay/fighterState";
+import { copyFighterState } from "../../generated/state/fighterState";
 import { firstFighterDifference } from "../replay/difference";
 import { stateChecksum } from "../replay/canonical";
 import { createReplaySnapshot } from "../replay/snapshot";

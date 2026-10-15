@@ -6,7 +6,7 @@ import { inputRow } from "../src/game/input/inputRow";
 import { Phase } from "../src/game/match/rules";
 import { stepMatch } from "../src/game/match/step";
 import { createReplaySnapshot } from "../src/game/replay/snapshot";
-import { copyFighterState } from "../src/game/replay/fighterState";
+import { copyFighterState } from "../src/generated/state/fighterState";
 import { Character, SpecialAction } from "../src/game/sim/codes";
 import { createFighter, type Fighter } from "../src/game/sim/fighter";
 import { NO_HIT_REGION } from "../src/game/sim/hitRegions";

@@ -5,7 +5,7 @@ import { assertEquals, assertFalse, test } from "wisp/src/runtime/testing";
 import { floorMod } from "wisp/src/sim/intMath";
 import { clearPulse, neutralDirections, pulsePending, updateDirections } from "../input/directionalInput";
 import { firstFighterDifference } from "../replay/difference";
-import { copyFighterState } from "../replay/fighterState";
+import { copyFighterState } from "../../generated/state/fighterState";
 import { Character } from "./codes";
 import { type Fighter, createFighter } from "./fighter";
 import {

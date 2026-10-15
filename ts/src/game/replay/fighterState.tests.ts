@@ -2,7 +2,7 @@ import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/te
 import { Character } from "../sim/codes";
 import { type Fighter, createFighter } from "../sim/fighter";
 import { firstFighterDifference, sameReplayState } from "./difference";
-import { copyFighterState, sameFighterState } from "./fighterState";
+import { copyFighterState, sameFighterState } from "../../generated/state/fighterState";
 import { createRoster } from "../sim/roster";
 import { type FighterTuning } from "../sim/tuning";
 import { SELECTABLE_CHARACTERS } from "../sim/heroes/registry";

@@ -23,7 +23,7 @@ import { firstBotMemoryDifference, sameBotMemory } from "../match/botPerception"
 import { botStrategyValues, sameBotStrategy } from "../match/botStrategy";
 import type { MatchState } from "../match/rules";
 import { sameControls } from "../sim/roster";
-import { sameFighterState } from "./fighterState";
+import { sameFighterState } from "../../generated/state/fighterState";
 import type { ReplayState } from "./snapshot";
 
 type Value = number | boolean | undefined;

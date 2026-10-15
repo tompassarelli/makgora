@@ -12,7 +12,7 @@ import { BODY_HALF_WIDTH } from "./surfaces";
 import { advanceSolo, controls, testWorld } from "./testWorld";
 import { LEDGE_REGRAB_FRAMES, clearLedge } from "./transitions";
 import { SELECTABLE_CHARACTERS } from "./heroes/registry";
-import { copyFighterState } from "../replay/fighterState";
+import { copyFighterState } from "../../generated/state/fighterState";
 
 function ledgeTestFighter(character: Character, side: number): Fighter {
   const fighter = createReferenceFighter(character, f32(side * 620.0), -side);

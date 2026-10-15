@@ -7,7 +7,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { type AttackBuffer, queueAttack } from "../input/attackBuffer";
 import type { Direction } from "../input/inputRow";
 import { PARTICIPANT_SLOTS, type Slots, participantActive } from "../input/participants";
-import { copyFighterState } from "../replay/fighterState";
+import { copyFighterState } from "../../generated/state/fighterState";
 import { AttackStyle, Character, DownState, LedgeState, SpecialAction } from "../sim/codes";
 import { attackActive, attackStartup, canAttack, canShieldGrab, isTumbling } from "../sim/conditions";
 import { type Fighter, PACK_CAPACITY, createFighter } from "../sim/fighter";

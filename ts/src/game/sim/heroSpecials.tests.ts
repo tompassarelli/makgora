@@ -10,7 +10,7 @@ import { ROSTER_MANA } from "./mana";
 import { type AuthoredSpecial, type FighterSpecials, SpecialForm, SpecialSlot, frames } from "./heroSpecials";
 import { type Roster, fighterAt } from "./roster";
 import { controls } from "./testWorld";
-import { copyFighterState } from "../replay/fighterState";
+import { copyFighterState } from "../../generated/state/fighterState";
 import { firstFighterDifference, firstStateDifference } from "../replay/difference";
 import { copyReplayState, createReplaySnapshot } from "../replay/snapshot";
 import { Action, maskOf } from "../input/actions";

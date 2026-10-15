@@ -5,7 +5,7 @@ import { type PacingAndPresentation, copyPacingAndPresentation, createPacingAndP
 import { type MatchState, copyMatchState, createMatchState } from "../match/rules";
 import { PACK_CAPACITY, createFighter } from "../sim/fighter";
 import { type Roster, createRoster, fighterAt, isActive } from "../sim/roster";
-import { copyFighterState } from "./fighterState";
+import { copyFighterState } from "../../generated/state/fighterState";
 
 
 

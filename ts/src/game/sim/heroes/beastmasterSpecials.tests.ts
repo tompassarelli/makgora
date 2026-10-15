@@ -7,7 +7,7 @@ import { HERO_REFERENCE_HEIGHT } from "../heroMoves";
 import { type Fighter, createFighter, placedObject } from "../fighter";
 import { type Controls, type Roster } from "../roster";
 import { controls } from "../testWorld";
-import { copyFighterState } from "../../replay/fighterState";
+import { copyFighterState } from "../../../generated/state/fighterState";
 import { firstFighterDifference } from "../../replay/difference";
 import { duelPair, stepDuel } from "../testDuel";
 import { advanceBearFeedback, createBearFeedbackCursor } from "../../presentation/bearFeedback";

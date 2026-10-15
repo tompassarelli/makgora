@@ -1,6 +1,6 @@
 import { assertDefined, assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
-import { copyFighterState } from "../replay/fighterState";
+import { copyFighterState } from "../../generated/state/fighterState";
 import { firstFighterDifference, firstStateDifference } from "../replay/difference";
 import { ReplayHistory } from "../replay/history";
 import { captureTape, createTapeWorld, executeTapeRow } from "../replay/tapeWorld";

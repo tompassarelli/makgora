@@ -13,7 +13,7 @@ import { PARTICIPANT_SLOTS } from "../input/participants";
 import { AttackStyle, Character, DownState, HeroStatusKind } from "../sim/codes";
 import { beginDownState } from "../sim/transitions";
 import { createFighter, type Fighter } from "../sim/fighter";
-import { copyFighterState } from "../replay/fighterState";
+import { copyFighterState } from "../../generated/state/fighterState";
 import { SELECTABLE_CHARACTERS } from "../sim/heroes/registry";
 import { attackLandingLag } from "../sim/moves";
 import { copyControls, createRoster, fighterAt, isActive, neutralControls } from "../sim/roster";

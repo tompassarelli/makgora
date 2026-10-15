@@ -24,7 +24,7 @@ import { sameInput } from "../input/inputRow";
 import { copyAttackBuffer, sameAttackBuffer } from "../input/attackBuffer";
 import { copyMatchState } from "../match/rules";
 import { copyPacingAndPresentation } from "../match/pacingAndPresentation";
-import { copyFighterState, sameFighterState } from "./fighterState";
+import { copyFighterState, sameFighterState } from "../../generated/state/fighterState";
 import { apartFromOthers, authoredMotionApartFromOthers, matchScopable, scopedStepHeld } from "./scopedRepair";
 import { sameReplayState } from "./difference";
 import { sameMatchCamera } from "../sim/matchCamera";

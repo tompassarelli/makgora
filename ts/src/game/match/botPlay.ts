@@ -34,7 +34,7 @@ import { pressHeroFollowUp } from "./botHeroKit";
 import { dashIn, pressKitOption, pressUltimate, steerHeroBranches, steerRunningSpecial } from "./botKitOptions";
 import { MATCH_TICKS_PER_SECOND, type MatchState, stageClock, computerActive, fighterMask } from "./rules";
 import { trainingPartnerInput } from "./training";
-import { sameFighterState } from "../replay/fighterState";
+import { sameFighterState } from "../../generated/state/fighterState";
 import { type BotStrategy, copyBotStrategy, learnBotHabit, prepareBotRead, pressBotRead, sameBotStrategy } from "./botStrategy";
 import { applyAerialExecutionNoise, chooseHitlagInput } from "./botExecutionNoise";
 import { executeBotTechnique, type TechnicalOutcome } from "./botTechnicalExecution";

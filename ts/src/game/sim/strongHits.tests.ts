@@ -8,7 +8,7 @@ import { SIGNATURE_STRONG_HIT, strongHitReason, strongHitRows } from "./strongHi
 import { strongHit, weakHit } from "./strongHits";
 import { STRONG_HIT_EXTRA_HITLAG, victimHitlagFrames } from "./knockback";
 import { contactBatch, hitEffect, testWorld } from "./testWorld";
-import { copyFighterState } from "../replay/fighterState";
+import { copyFighterState } from "../../generated/state/fighterState";
 import { captureImpactEventsBefore, createImpactEvents, finishImpactEventsAfter } from "../presentation/impactEvents";
 import { IMPACT_HIT, IMPACTS_PER_KIND, createImpactState, emitImpacts } from "../presentation/impactState";
 import { STRONG_SPARK_SCALE, SoundTier, TIER_HIT_VOLUME, TIER_SPARK_SCALE } from "../presentation/moveTiers";

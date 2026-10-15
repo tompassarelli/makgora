@@ -1,5 +1,5 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
-import { copyFighterState } from "../replay/fighterState";
+import { copyFighterState } from "../../generated/state/fighterState";
 import { Character, DownState, GrabAction } from "./codes";
 import { canAttack, isTumbling } from "./conditions";
 import { type Fighter, createFighter } from "./fighter";

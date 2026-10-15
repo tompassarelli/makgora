@@ -11,7 +11,7 @@ import { spawnProjectileMotion } from "../sim/projectiles";
 import { createRoster, fighterAt } from "../sim/roster";
 import { canonicalState, stateChecksum, stateHash } from "./canonical";
 import { sameReplayState } from "./difference";
-import { copyFighterState } from "./fighterState";
+import { copyFighterState } from "../../generated/state/fighterState";
 import { ReplayHistory } from "./history";
 import { REPLAY_HISTORY_CAPACITY, REPLAY_MAX_CORRECTION_FRAMES } from "./limits";
 import { type ReplayState, copyReplayState, createReplaySnapshot } from "./snapshot";

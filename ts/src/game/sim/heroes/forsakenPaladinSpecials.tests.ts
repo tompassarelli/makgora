@@ -1,6 +1,6 @@
 import { assertEquals, assertGreaterThan, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
-import { copyFighterState } from "../../replay/fighterState";
+import { copyFighterState } from "../../../generated/state/fighterState";
 import { firstFighterDifference } from "../../replay/difference";
 import { Character } from "../codes";
 import { type Fighter, createFighter } from "../fighter";

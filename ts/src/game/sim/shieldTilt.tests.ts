@@ -6,7 +6,7 @@ import { attackBuffer } from "../input/attackBuffer";
 import { inputRow } from "../input/inputRow";
 import { type HitArea, HitAreaKind, collectHitAreas, createHitAreaList } from "../presentation/hitAreas";
 import { projectedShield } from "../presentation/shieldPose";
-import { copyFighterState } from "../replay/fighterState";
+import { copyFighterState } from "../../generated/state/fighterState";
 import { Character } from "./codes";
 import { SHIELD_MAX, createFighter } from "./fighter";
 import { fighterName, SELECTABLE_CHARACTERS } from "./heroes/registry";

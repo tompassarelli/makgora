@@ -4,7 +4,7 @@ import { collectDamageContact } from "../sim/contacts";
 import { createFighter } from "../sim/fighter";
 import { contactBatch, hitEffect, testWorld } from "../sim/testWorld";
 import { contactDamageClip } from "./damagePose";
-import { copyFighterState } from "../replay/fighterState";
+import { copyFighterState } from "../../generated/state/fighterState";
 
 test("simultaneous contacts keep the strongest hit's pain pose through a snapshot [k2 property]", () => {
   for (const reversed of [false, true]) {

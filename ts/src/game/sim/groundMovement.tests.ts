@@ -10,7 +10,7 @@ import { firstPoseDifference, firstStateDifference } from "../replay/difference"
 import { IllidanLocomotion } from "../presentation/illidanMotion";
 import { ReplayHistory } from "../replay/history";
 import { copyReplayState, createReplaySnapshot } from "../replay/snapshot";
-import { copyFighterState } from "../replay/fighterState";
+import { copyFighterState } from "../../generated/state/fighterState";
 import { createTapeWorld, executeTapeRow } from "../replay/tapeWorld";
 import { AttackStyle, Character, GroundAction } from "./codes";
 import { createFighter, type Fighter } from "./fighter";

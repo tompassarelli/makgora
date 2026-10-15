@@ -33,7 +33,7 @@ import { advanceMatchCamera, copyMatchCamera, sameCameraSubjects } from "../sim/
 import { nextJab } from "../sim/moves";
 import { advanceOffscreenDamage } from "../sim/offscreenDamage";
 import type { FrameControls } from "./controls";
-import { copyFighterState } from "../replay/fighterState";
+import { copyFighterState } from "../../generated/state/fighterState";
 import { type MatchState, Phase, advanceClock, holdingStart, humanFighterActive, keepsStocks, resolveStocks, stageClock } from "./rules";
 import { advanceItems } from "./centreItem";
 import { advanceMeterDrops } from "./meterDrops";

@@ -5,7 +5,7 @@ import { createFighter } from "./fighter";
 import { advanceSpecials, startFighterSpecial } from "./specials";
 import { updateProjectiles } from "./projectiles";
 import { controls, testWorld } from "./testWorld";
-import { copyFighterState, sameFighterState } from "../replay/fighterState";
+import { copyFighterState, sameFighterState } from "../../generated/state/fighterState";
 import { firstFighterDifference } from "../replay/difference";
 import { canonicalState } from "../replay/canonical";
 import { createReplaySnapshot } from "../replay/snapshot";

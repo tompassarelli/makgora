@@ -11,7 +11,7 @@ import { beginFighterAttack } from "../attacks";
 import { type Roster } from "../roster";
 import { controls } from "../testWorld";
 import { duelPair, stepDuel } from "../testDuel";
-import { copyFighterState } from "../../replay/fighterState";
+import { copyFighterState } from "../../../generated/state/fighterState";
 import { firstFighterDifference } from "../../replay/difference";
 import { projectedProjectile } from "../../presentation/projectilePose";
 import { PROJECTILE_DRAW_CUES } from "../../presentation/projectileArt";
