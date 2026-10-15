@@ -42,7 +42,7 @@ permissions:
 
 env:
   SWEEP_PLACEMENT: gate
-  BUN_SHARDS: 3
+  BUN_SHARDS: 4
   # Lua runs one core a process: each Lua job runs LUA_PER_JOB shards at once.
   LUA_JOBS: 8
   LUA_PER_JOB: 4
@@ -102,7 +102,7 @@ jobs:
           echo "lua=$(jq -c "[range($LUA_JOBS)]" -n)" >> "$GITHUB_OUTPUT"
           echo "bun-runners=$(pool "$(jq '.bun | length' plan.json)")" >> "$GITHUB_OUTPUT"
           echo "lua-runners=$(pool "$LUA_JOBS")" >> "$GITHUB_OUTPUT"
-          echo "lua-parallel=$([ -n "$FARM" ] && echo "$LUA_JOBS" || echo 5)" >> "$GITHUB_OUTPUT"
+          echo "lua-parallel=$LUA_JOBS" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         with:
           name: farm-test-plan
@@ -121,9 +121,10 @@ jobs:
         shard: ${{ fromJSON(needs.plan.outputs.bun) }}
     name: bun ${{ matrix.shard }}
     steps:
-      - name: Install stock texture converter
+      - name: Start installing the stock texture converter
         if: runner.environment == 'github-hosted'
-        run: sudo apt-get update -q && sudo apt-get install -y -q imagemagick
+        run: |
+          ( sudo apt-get update -q && sudo apt-get install -y -q imagemagick; echo $? > "$RUNNER_TEMP/imagemagick.exit" ) > "$RUNNER_TEMP/imagemagick.log" 2>&1 &
       - if: runner.environment == 'github-hosted'
         uses: actions/checkout@v4
         with:
@@ -161,6 +162,13 @@ jobs:
         with:
           name: farm-test-plan
           path: ts
+      - name: Finish installing the stock texture converter
+        if: runner.environment == 'github-hosted'
+        timeout-minutes: 5
+        run: |
+          until [ -f "$RUNNER_TEMP/imagemagick.exit" ]; do sleep 1; done
+          cat "$RUNNER_TEMP/imagemagick.log"
+          exit "$(cat "$RUNNER_TEMP/imagemagick.exit")"
       # The shard's files, then their sweeps (SWEEPS=1): a file's measured time counts both.
       - name: Test shard ${{ matrix.shard }}
         working-directory: ts
@@ -262,7 +270,7 @@ jobs:
           }
           pids=()
           for slot in $(seq 0 $((LUA_PER_JOB - 1))); do
-            shard=$((${{ matrix.job }} * LUA_PER_JOB + slot))
+            shard=$((slot * LUA_JOBS + ${{ matrix.job }}))
             ( export LUA_SHARD="$shard/$count" LUA_SHARD_PLAN=build/lua-plan.tsv
               touch "build/lua-cost-$shard.tsv" "build/sweep-cost-$shard.tsv"
               LUA_TEST_RESULT="build/lua-$shard.tsv" LUA_TEST_COST="build/lua-cost-$shard.tsv" "$LUA" build/lua-tests/tests.lua > "build/lua-$shard.log" 2>&1
@@ -298,7 +306,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: [perf, parity, corpus]
+        group: [perf, perf-definitive, parity, corpus]
     name: ${{ matrix.group }}
     steps:
       - uses: actions/checkout@v4
@@ -313,10 +321,12 @@ jobs:
           key: bun-install-${{ hashFiles('ts/bun.lock') }}
       - run: bun install --frozen-lockfile
         working-directory: ts
+      # Each group keeps its own Lua32 builds: parity's include the toward-zero variant.
       - uses: actions/cache@v4
         with:
           path: ~/.cache/wisp/lua32
-          key: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/toward-zero.h') }}
+          key: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/toward-zero.h') }}-${{ matrix.group }}
+          restore-keys: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/toward-zero.h') }}
       - name: Run the ${{ matrix.group }} checks
         working-directory: ts
         timeout-minutes: 20
@@ -345,12 +355,13 @@ jobs:
           case "$GROUP" in
             perf)
               # Frame-cost landing gate (#48, #168): see ci.yml for rewriting the baseline.
-              check "frame cost within 5% of the committed baseline" sh -c 'bun wisp perf playable-bot-four --samples --out build/playable-bot-four.perf && bun wisp perf compare test/fixtures/perf/playable-bot-four.perf build/playable-bot-four.perf'
+              check "frame cost within 5% of the committed baseline, and four-fighter p99 <= 10 ms and worst <= 14 ms in Classic" sh -c 'bun wisp perf playable-bot-four --samples --out build/playable-bot-four.perf || exit; bun wisp perf compare test/fixtures/perf/playable-bot-four.perf build/playable-bot-four.perf; compared=$?; bun wisp perf budget build/playable-bot-four.perf && exit "$compared"'
               check "focused logic test" env GAME_TESTS=sim/meleeScalarMath bun test test/game.test.ts
               if [ -f build/playable-bot-four.perf ]; then
-                check "four-fighter p99 <= 10 ms and worst <= 14 ms in both looks" sh -c 'bun wisp perf budget build/playable-bot-four.perf && PERF_LOOK=definitive bun wisp perf playable-bot-four --samples --out build/playable-bot-four-definitive.perf && bun wisp perf budget build/playable-bot-four-definitive.perf'
                 bun scripts/commitMetrics.ts build/playable-bot-four.perf build/playable.lua | tee -a "$GITHUB_STEP_SUMMARY"
               fi ;;
+            perf-definitive)
+              check "four-fighter p99 <= 10 ms and worst <= 14 ms in Definitive" sh -c 'PERF_LOOK=definitive bun wisp perf playable-bot-four --samples --out build/playable-bot-four-definitive.perf && bun wisp perf budget build/playable-bot-four-definitive.perf' ;;
             parity)
               # Tapes and the numeric corpus in stock Lua32 and in one whose raw float + - * round toward zero must equal Bun (wisp:docs/headless.md#raw-float-rounding).
               check "parity tapes and numeric" sh -c 'bun wisp parity tapes && bun wisp parity numeric'

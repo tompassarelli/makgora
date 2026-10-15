@@ -9,7 +9,7 @@ import * as BunServices from "@effect/platform-bun/BunServices";
 import { Cause, Effect, Exit, Layer, Schema } from "effect";
 import { BUSY_PRESSURE, INCONCLUSIVE_EXIT, timingTestFiles, timingTests, withPressure } from "wisp/scripts/wisp/testRunner";
 import { TEST_PHASE_ENV } from "wisp/scripts/wisp/timingTest";
-import { ISOLATED_TEST_GROUPS, testWorkerEnvironment } from "./testWorkers";
+import { ISOLATED_TEST_GROUPS, SWEEP_PARTS, testWorkerEnvironment } from "./testWorkers";
 import { admit } from "./heavyCapacity";
 import { runMeasuredProcess } from "./hostProcess";
 import { BUN_TEST_CEILING_FRAMES, addCost, cpuReport, readBaseline, type Costs } from "./testCost";
@@ -66,7 +66,11 @@ const byName = (names: readonly string[], count: number) =>
 const groups: Group[] = [
   ...byName(gameModules, GAME_SHARDS).filter((modules) => modules.length > 0).map((modules) => ({ files: ["test/game.test.ts"], env: { GAME_MODULES: modules.join(",") } })),
   ...byName(shared, REST_SHARDS).map((bin) => ({ files: bin })),
-  ...isolated.map((names) => ({ files: testFiles.filter((file) => names.includes(file)) })),
+  ...isolated.flatMap((names) => {
+    const files = testFiles.filter((file) => names.includes(file));
+    const parts = sweeps && files.length === 1 ? SWEEP_PARTS[files[0] ?? ""] ?? 1 : 1;
+    return parts === 1 ? [{ files }] : Array.from({ length: parts }, (_, part) => ({ files, env: { SWEEP_PART: `${part}/${parts}` } }));
+  }),
 ].filter((group) => group.files.length > 0);
 refuseUntagged(project, [...testFiles, ...gameModules.map((module) => `src/${module}`)]);
 refuseLiteralCopies(project);

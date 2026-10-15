@@ -8,12 +8,15 @@
 export const ISOLATED_TEST_GROUPS: readonly (readonly string[])[] = [
   ["test/standalone.test.ts"],
   ["test/platform-advantage.test.ts"],
+  ["test/zero-to-death.test.ts"],
   ["test/game.test.ts"],
   ["test/desync-guard.test.ts"],
   ["test/visual-lifecycle.test.ts", "test/player-text.test.ts"],
   ["test/lag-recovery.test.ts"],
   ["test/local-start.test.ts", "test/match-settings.test.ts"],
 ];
+
+export const SWEEP_PARTS: Readonly<Record<string, number>> = { "test/zero-to-death.test.ts": 4 };
 
 /**
  * Engine settings for short-lived test processes: they cannot amortize the
@@ -30,6 +33,7 @@ export const TEST_WORKER_ENV: Readonly<Record<string, string>> = {
   BUN_JSC_useConcurrentGC: "false",
 };
 
-/** Full matches and the all-pairs platform measurement amortize the production runtime's optimizing tiers. */
+/** Full matches, the all-pairs platform measurement and the combo explorer amortize the production runtime's optimizing tiers. */
+const OPTIMIZED = /test\/(standalone|platform-advantage|zero-to-death)\.test\.ts$/;
 export const testWorkerEnvironment = (files: readonly string[]): Readonly<Record<string, string>> =>
-  files.some((file) => file.endsWith("test/standalone.test.ts") || file.endsWith("test/platform-advantage.test.ts")) ? {} : TEST_WORKER_ENV;
+  files.some((file) => OPTIMIZED.test(file)) ? {} : TEST_WORKER_ENV;
