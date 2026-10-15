@@ -64,7 +64,7 @@ declare global {
 
 const neutralPad = (): Pad => ({ buttons: 0, x: 0.0, z: 0.0, cx: 0.0, cz: 0.0, shield: 0.0, viewSince: undefined, viewSaved: false, capture: keyboardCapture() });
 const state = (): Driver => globalThis.__smashcraftNativeDriver ??= { edges: [], next: 0, captures: [], paused: true, target: undefined, frozen: false, pads: PARTICIPANT_SLOTS.map(() => neutralPad()) };
-const PAD_LETTERS = "abcd";
+const PAD_LETTERS: readonly string[] = ["a", "b", "c", "d"];
 const BUTTONS: Readonly<Record<string, number>> ={ A: 1, B: 2, X: 4, Y: 8, LB: 16, TL: 16, RB: 32, TR: 32, START: 64, VIEW: 128 };
 
 function whole(text: string): number {
@@ -90,7 +90,7 @@ function parseScript(text: string): { readonly setup: string; readonly edges: re
     if (source === "") continue;
     const [frameText, player, action, ...args] = source.split("\t").join(" ").split(" ").filter(word => word !== "");
     const slot = player === undefined ? -1 : PAD_LETTERS.indexOf(player);
-    if (frameText === undefined || action === undefined || player?.length !== 1 || slot < 0) throw new Error(`native driver: invalid pad line ${source}`);
+    if (frameText === undefined || action === undefined || slot < 0) throw new Error(`native driver: invalid pad line ${source}`);
     const frame = frameText.startsWith("+") ? previous + whole(frameText.substring(1)) : whole(frameText);
     if (frame < previous) throw new Error("native driver: pad frames must be ordered");
     previous = frame;
