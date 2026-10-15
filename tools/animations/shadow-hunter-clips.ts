@@ -125,6 +125,24 @@ function downSmash(): Authored {
   ] };
 }
 
+function neutralAir(): Authored {
+  const move = SHADOW_HUNTER_MOVES.normals[AttackStyle.neutralAir]!;
+  const c = move.startupFrames, total = move.totalFrames;
+  const legs: Gesture = { frontHip: -40, frontKnee: 55, frontFoot: 10, backHip: -15, backKnee: 50, backFoot: 10, beard: 50 };
+  const cut = (spin: number): Gesture => ({ ...legs, spin, lean: 0, chest: 4, head: -4, arm: -25, elbow: 0, wrist: 0, free: -60, freeElbow: 20 });
+  return { pose: "neutralAir", style: AttackStyle.neutralAir, airborne: true, phases: [
+    { frame: 0, gesture: READY },
+    { frame: c - 2, gesture: { ...cut(70), chest: -4, lunge: -6 }, tip: [-20, 70] },
+    { frame: c, gesture: { ...cut(0), lunge: 8 }, tip: [130, 60] },
+    { frame: c + 1, gesture: { ...cut(-50), lunge: 6 } },
+    { frame: c + 2, gesture: cut(-100) },
+    { frame: c + 3, gesture: cut(-145) },
+    { frame: c + 4, gesture: cut(-180) },
+    { frame: c + 9, gesture: { ...cut(-260), elbow: 20 } },
+    { frame: c + 18, gesture: { ...legs, spin: -340, arm: -40, elbow: 30, frontHip: -25, frontKnee: 40, backHip: -10, backKnee: 35 } },
+    { frame: total, gesture: { spin: -360 } },
+  ] };
+}
 function backAir(): Authored {
   const move = SHADOW_HUNTER_MOVES.normals[AttackStyle.backAir]!;
   const c = move.startupFrames, total = move.totalFrames;
@@ -142,6 +160,22 @@ function backAir(): Authored {
     { frame: total, gesture: READY },
   ] };
 }
+function downAir(): Authored {
+  const move = SHADOW_HUNTER_MOVES.normals[AttackStyle.downAir]!;
+  const c = move.startupFrames, total = move.totalFrames, fling = 20;
+  const stab = (bob: number): Gesture => ({ lean: 12, chest: 18, head: -20, beard: 90, cloth: 10, arm: 60, elbow: 0, wrist: 0, free: -20, freeElbow: 30,
+    frontHip: 10, frontKnee: 70, frontFoot: 10, backHip: 45, backKnee: 60, backFoot: -10, drop: 14 + bob });
+  const holds: Phase[] = [{ frame: c, gesture: { ...stab(-4), chest: 24 }, tip: [6, -100] }];
+  for (let frame = c + 2; frame <= fling; frame += 2) holds.push({ frame, gesture: stab(frame % 4 === 0 ? 4 : 2), tip: [6, frame % 4 === 0 ? -80 : -86] });
+  return { pose: "downAir", style: AttackStyle.downAir, airborne: true, phases: [
+    { frame: 0, gesture: READY },
+    { frame: c - 4, gesture: { lean: -12, chest: -18, head: 12, beard: 40, arm: -100, elbow: 30, free: -60, freeElbow: 40, frontHip: -70, frontKnee: 100, backHip: -50, backKnee: 100, drop: 8 }, tip: [10, 175] },
+    ...holds,
+    { frame: fling + 4, gesture: { ...stab(6), lean: 10, chest: 10, arm: 30 } },
+    { frame: fling + 10, gesture: { lean: 5, beard: 40, arm: -30, elbow: 40, frontHip: -40, frontKnee: 60, backHip: -10, backKnee: 60 } },
+    { frame: total, gesture: READY },
+  ] };
+}
 
 const hang = (action: Authored, drape = false): Authored => ({ ...action, phases: action.phases.map(phase => {
   const g = phase.gesture, cloth = g.cloth ?? 0.8 * Math.min(g.frontHip ?? 0, g.backHip ?? 0);
@@ -152,7 +186,7 @@ const kicked = (make: () => Authored) => () => hang({ ...make(), ground: "sole" 
 
 const POSES: Readonly<Record<string, () => Authored>> = {
   neutralSpecial, jump, doubleJump, forwardSmash, downSmash,
-  backAir: draped(backAir),
+  backAir: draped(backAir), neutralAir: draped(neutralAir), downAir: draped(downAir),
 };
 
 function rotation(base: ArrayLike<number>, pitch: number, yaw = 0, roll = 0): Float32Array {
