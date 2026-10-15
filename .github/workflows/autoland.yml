@@ -514,6 +514,7 @@ jobs:
               SHA="$solo_sha"; branches=("${branches[0]}"); tips=("${tips[0]}")
             else
               cat push.log
+              if hand_back_record "$(cat push.log)"; then exit 1; fi
               echo "pushing to main failed: the train's tips wait for the next train" >> "$GITHUB_STEP_SUMMARY"
               exit 1
             fi

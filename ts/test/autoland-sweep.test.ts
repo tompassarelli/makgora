@@ -87,7 +87,7 @@ test("the complete land shell attributes a regenerated pair, leaves failed targe
   };
   const gitPath = command(root, ["which", "git"]);
   const bashPath = command(root, ["which", "bash"]);
-  for (const mode of ["pair", "merge-resolution", "targets", "proof", "regeneration", "non-fast-forward", "stale-record", "stale-check"]) {
+  for (const mode of ["pair", "merge-resolution", "targets", "proof", "regeneration", "non-fast-forward", "stale-record", "stale-check", "stale-fallback"]) {
     const fixture = mkdtempSync(join(evidence, `${mode}-`));
     const repo = join(fixture, "repo");
     const bin = join(fixture, "bin");
@@ -148,8 +148,8 @@ if [ "$1" = push ]; then
   printf '%s\\n' "$*" >> ${quote(events)}
   for arg in "$@"; do
     if [[ "$arg" = *:refs/heads/main ]]; then
-      if [ "$MODE" = stale-record ]; then echo 'Classic effect record is missing or stale' >&2; exit 1; fi
-      if [ "$MODE" = non-fast-forward ] && [ ! -f ${quote(join(fixture, "refused"))} ]; then
+      if [ "$MODE" = stale-record ] || { [ "$MODE" = stale-fallback ] && [ -f ${quote(join(fixture, "refused"))} ]; }; then echo 'Classic effect record is missing or stale' >&2; exit 1; fi
+      if { [ "$MODE" = non-fast-forward ] || [ "$MODE" = stale-fallback ]; } && [ ! -f ${quote(join(fixture, "refused"))} ]; then
         touch ${quote(join(fixture, "refused"))}; echo 'non-fast-forward' >&2; exit 1
       fi
       echo "\${arg%:refs/heads/main}" >> ${quote(pushes)}
@@ -174,7 +174,7 @@ exec ${quote(process.execPath)} "$@"`);
       const result = Bun.spawnSync(["bash", "-e", join(fixture, "land.sh")], { cwd: repo, env, stdout: "pipe", stderr: "pipe" });
       expect(result.exitCode).toBe(1);
       const activity = readFileSync(events, "utf8");
-      expect(activity).toContain(`statuses/${tips[0]} -f state=error -f context=autoland -f description=local refresh required: Classic effect record`);
+      for (const tip of tips.slice(0, mode === "stale-check" ? 1 : 2)) expect(activity).toContain(`statuses/${tip} -f state=error -f context=autoland -f description=local refresh required: Classic effect record`);
       expect(activity).not.toContain("state=success");
       expect(git("rev-parse", "refs/remotes/origin/main")).toBe(base);
       for (let index = 0; index < tips.length; index++) expect(git("rev-parse", `refs/remotes/origin/claude/lane-${index}`)).toBe(tips[index]!);
