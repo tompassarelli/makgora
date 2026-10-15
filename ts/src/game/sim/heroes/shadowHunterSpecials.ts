@@ -22,7 +22,7 @@ const CAST_HEIGHT = h(f32(0.45));
 const SPIRIT_GLAIVE_SHOT: SpecialProjectile = {
   model: "Abilities\\Weapons\\ShadowHunterMissile\\ShadowHunterMissile.mdx",
   spawnFrame: 18, offsetX: h(f32(0.35)), offsetZ: CAST_HEIGHT,
-  velocityX: h(f32(0.12)), velocityZ: 0.0, life: 70, radius: h(f32(0.15)),
+  velocityX: h(f32(0.12)), velocityZ: 0.0, life: 70, radius: h(f32(0.2)),
   effect: hit(5.253514289855957, "POKE", 35), reflectable: true, limit: 1,
   returns: { age: 22, speed: h(f32(0.12)) }, returnEffect: hit(4.377928733825684, "POKE", 35),
 };

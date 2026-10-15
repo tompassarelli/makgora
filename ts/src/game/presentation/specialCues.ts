@@ -368,7 +368,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     down: { spell: "Sleep", startup: VAMPIRIC, active: cue("Abilities\\Spells\\Undead\\Sleep\\SleepSpecialArt.mdx", "hand", f32(0.8)) },
   },
   [Character.shadowHunter]: {
-    neutral: { spell: "Spirit Glaive", startup: VOODOO, active: { ...cue("Abilities\\Weapons\\ShadowHunterMissile\\ShadowHunterMissile.mdx", "hand", f32(0.3)), roll: f32(1.570796327) } },
+    neutral: { spell: "Spirit Glaive", startup: VOODOO, active: { ...cue("Abilities\\Weapons\\ShadowHunterMissile\\ShadowHunterMissile.mdx", "hand", f32(0.4)), roll: f32(1.570796327) } },
     side: { spell: "Serpent Ward", startup: VOODOO, active: cue("Abilities\\Spells\\Orc\\StasisTrap\\StasisTotemTarget.mdx", "ahead", f32(0.7)) },
     up: { spell: "Loa Vault", startup: cue("Abilities\\Spells\\Orc\\SpiritLink\\SpiritLinkTarget.mdx", "body", f32(0.7)), active: cue("Abilities\\Spells\\Orc\\FeralSpirit\\FeralSpiritDone.mdx", "feet", f32(0.8)) },
     down: { spell: "Hex", startup: VOODOO, active: cue("Abilities\\Spells\\Human\\Polymorph\\PolymorphTarget.mdx", "hand", f32(0.6)) },
