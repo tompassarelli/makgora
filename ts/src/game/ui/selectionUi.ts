@@ -795,9 +795,9 @@ export class SelectionPanel {
     setFrameText(this.delayLine, text);
   }
 
-  update(game: Readonly<MatchState>, settingsOpen: boolean, menuCursorAllowed: boolean, sessionWins: Readonly<Slots<number>>): void {
+  update(game: Readonly<MatchState>, loading: boolean, settingsOpen: boolean, menuCursorAllowed: boolean, sessionWins: Readonly<Slots<number>>): void {
     this.game = game;
-    this.settingsOpen = settingsOpen;
+    this.settingsOpen = loading || settingsOpen;
     if (this.choosing() === undefined) this.cpuSlot = undefined;
     if (!this.ownsLocalClient()) return;
     this.menuCursorAllowed = menuCursorAllowed;
@@ -813,7 +813,7 @@ export class SelectionPanel {
     BlzFrameSetVisible(this.tutorial.root, visible && this.tutorialOpen && !cpuOpen && !this.movesOpen);
     BlzFrameSetVisible(this.cpuRoot, cpuOpen);
     BlzFrameSetVisible(this.root, visible);
-    BlzFrameSetVisible(this.backdrop, visible);
+    BlzFrameSetVisible(this.backdrop, visible || (loading && game.phase === Phase.characterMenu && humanActive(game, participantId)));
     for (const frame of this.movesFrames) BlzFrameSetVisible(frame, visible && this.movesOpen);
     BlzFrameSetVisible(this.modeLabel, visible);
     const mode = this.movesOpen ? MOVES_HEADER : selectionModeLabel(game);
