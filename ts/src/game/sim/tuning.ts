@@ -251,7 +251,7 @@ function heroPhysics(character: Character): FighterPhysics {
     weight: f32(REFERENCE_WEIGHT * body.weight),
     dashSpeed: meleeSpread(body.dashSpeed ?? f32(reference.dashSpeed * body.run), MELEE_DASH_SPEED_SPREAD),
     runSpeed: meleeSpread(body.runSpeed ?? f32(reference.runSpeed * body.run), MELEE_RUN_SPEED_SPREAD),
-    walkSpeed: meleeSpread(f32(reference.walkSpeed * body.run), MELEE_WALK_SPEED_SPREAD),
+    walkSpeed: meleeSpread(body.walkSpeed ?? f32(reference.walkSpeed * body.run), MELEE_WALK_SPEED_SPREAD),
     airSpeed: f32(REFERENCE_AIR_SPEED * body.air),
     traction: body.traction === undefined ? reference.traction : melee(body.traction),
   };

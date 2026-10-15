@@ -9,6 +9,7 @@ export interface HeroBody {
   readonly weight: number;
   readonly run: number;
 
+  readonly walkSpeed?: number | undefined;
   readonly runSpeed?: number | undefined;
   readonly dashSpeed?: number | undefined;
   readonly dashRunFrame?: number | undefined;
@@ -44,7 +45,7 @@ const HERO_BODIES: { readonly [character: number]: HeroBody | undefined } = {
   [Character.peon]: { ...body(f32(92.0 / 75.0), f32(f32(1.6) / f32(2.2)), f32(0.987), f32(0.88), f32(0.80)), traction: f32(0.05) },
   [Character.medivh]: { ...body(f32(0.90), f32(0.98), f32(1.20), f32(0.90), f32(1.10)), traction: f32(0.05) },
   [Character.murloc]: { ...body(f32(0.94), f32(1.12), f32(1.06), f32(0.90), f32(0.72)), runSpeed: 13.79999828338623, dashSpeed: 11.999999046325684, traction: f32(0.055) },
-  [Character.kobold]: { ...body(f32(1.00), f32(1.10), f32(1.02), f32(0.78), f32(0.66)), runSpeed: f32(13.78), dashSpeed: f32(11.95), traction: f32(0.06) },
+  [Character.kobold]: { ...body(f32(1.00), f32(1.10), f32(0.918), f32(0.78), f32(0.66)), walkSpeed: f32(8.64), runSpeed: f32(12.402), dashSpeed: f32(10.755), traction: f32(0.06) },
   [Character.grom]: { ...body(f32(0.98), f32(1.04), f32(0.92), f32(1.12), f32(1.10)), traction: f32(0.06) },
   [Character.tinker]: { ...body(f32(106.0 / 75.0), f32(f32(1.725) / f32(2.2)), f32(1.134), f32(1.12), f32(0.95)), traction: f32(0.065) },
 };
