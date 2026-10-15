@@ -10,7 +10,8 @@ import { WORLD_UNITS_PER_MELEE_UNIT } from "../sim/tuning";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { AttackStyle } from "../sim/codes";
 import { moveTier } from "./moveTiers";
-import { specialMove, specialSlot } from "./moveSounds";
+import { hasImpactSound, specialMove, specialSlot } from "./moveSounds";
+import { runningHeroSpecial } from "../sim/heroSpecialRules";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { ProjectileKind, SpecialAction } from "../sim/codes";
 import { heroDefinition } from "../sim/heroes/registry";
@@ -88,6 +89,7 @@ export interface ImpactEvents {
   variant: number;
   perform: number;
   performSerial: number;
+  impact: number;
   hitCharacter: Character;
   hitMove: number;
   strong: boolean;
@@ -140,7 +142,7 @@ export function createImpactEvents(): ImpactEvents {
     previousChargeFrames: 0, previousLedgeSerial: 0, previousLedgeState: LedgeState.none,
     previousLedgeSide: 0, previousAttackSerial: 0, previousAttackFrame: 0, previousSpecialAction: SpecialAction.none, previousSpecialFrame: 0, previousSpecialForm: 0, grab: false, throwRelease: false, charge: false, ready: false, previousBuiltSerial: -1, jobDone: false,
     ledgeCatch: false, ledgeRecovery: false, ledgeX: 0.0, ledgeZ: 0.0, hit: false, electric: false,
-    element: HitElement.normal, strength: 0, tier: 0, swing: -1, variant: 0, perform: -1, performSerial: 0, hitCharacter: 1, hitMove: -1, strong: false,
+    element: HitElement.normal, strength: 0, tier: 0, swing: -1, variant: 0, perform: -1, performSerial: 0, impact: -1, hitCharacter: 1, hitMove: -1, strong: false,
     shieldCharacter: 1, shieldMove: -1, shieldVariant: 0, pummel: false, shieldElectric: false, footstep: "none",
     shieldHit: false, shieldReflect: false, shieldBreak: false, ordinaryLanding: false,
     movementDust: false, runningDust: false, launchTrail: false, dodgeTrail: false, airDodge: false,
@@ -206,6 +208,7 @@ export function captureImpactEventsBefore(events: ImpactEvents, fighter: Readonl
   events.respawn = false;
   events.swing = -1;
   events.perform = -1;
+  events.impact = -1;
   events.hitMove = -1;
   events.shieldMove = -1;
   events.strong = false;
@@ -257,6 +260,12 @@ function projectileSlot(character: Character, spec: Readonly<SpecialProjectile> 
     if (firesProjectile(kit.ground, spec) || firesProjectile(kit.air, spec) || firesProjectile(kit.recall, spec) || firesProjectile(kit.marked?.special, spec)) return slot;
   }
   return 0;
+}
+
+function firstRegionFrame(fighter: Readonly<Fighter>): number {
+  let first = -1;
+  for (const region of runningHeroSpecial(fighter)?.regions ?? []) if (first < 0 || region.firstFrame < first) first = region.firstFrame;
+  return first;
 }
 
 function strikingMove(fighter: Readonly<Fighter>, world: Readonly<Roster> | undefined, shield: boolean, events: ImpactEvents): void {
@@ -381,6 +390,11 @@ export function finishImpactEventsAfter(events: ImpactEvents, fighter: Readonly<
   if (present && slot >= 0 && (special.action !== events.previousSpecialAction || special.frame < events.previousSpecialFrame || special.form !== events.previousSpecialForm)) {
     events.perform = specialMove(slot);
     events.performSerial = attack.serial + jump.serial + visuals.hit;
+  }
+  if (present && slot >= 0 && (special.action !== events.previousSpecialAction || special.frame !== events.previousSpecialFrame)
+    && hasImpactSound(fighter.character, specialMove(slot)) && special.frame === firstRegionFrame(fighter)) {
+    events.impact = specialMove(slot);
+    if (events.perform < 0) events.performSerial = attack.serial + jump.serial + visuals.hit;
   }
   events.shieldElectric = visuals.shieldElectric;
   events.shieldHit = present && visuals.shield !== events.previousShieldVisualSerial;

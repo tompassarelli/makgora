@@ -38,6 +38,7 @@ interface SpecialSound {
   readonly perform: string | undefined;
   readonly performVolume?: number | undefined;
   readonly hit: string;
+  readonly impact?: string | undefined;
 }
 
 interface FighterSound {
@@ -117,7 +118,7 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
   },
   [Character.cairne]: {
     weapon: Weapon.rock, swing: ["HeroTaurenChieftainAttack1", "HeroTaurenChieftainAttack2"], strong: "Pulverize",
-    specials: [s("ShockWave", "RockHeavyBashFlesh"), s("HeroTaurenChieftainAttack2", "Warstomp"), s("AncestralSpirit", "WoodMediumBashFlesh"), s("Reincarnation", "Pulverize")],
+    specials: [s("ShockWave", "RockHeavyBashFlesh"), s("HeroTaurenChieftainAttack2", "RockHeavyBashFlesh"), s("AncestralSpirit", "WoodMediumBashFlesh"), { ...s("HeroTaurenChieftainAttack2", "Pulverize"), impact: "Warstomp" }],
   },
   [Character.chen]: {
     weapon: Weapon.blunt, effort: ["BrewmasterAttack1", "BrewmasterAttack2"], strong: "WoodHeavyBashMetal",
@@ -172,6 +173,7 @@ export interface MoveSound {
   readonly hit: readonly SoundLayer[];
   readonly strong: readonly SoundLayer[];
   readonly shield: readonly SoundLayer[];
+  readonly impact: readonly SoundLayer[];
   readonly voice: SoundLayer | undefined;
 }
 
@@ -211,6 +213,7 @@ function resolve(character: Character, move: number): MoveSound | undefined {
       hit: [layer([special.hit], at(TIER_HIT_VOLUME, SoundTier.medium))],
       strong: [layer([special.hit], at(TIER_HIT_VOLUME, SoundTier.large)), layer([fighter.strong], SWEETENER_VOLUME)],
       shield: [layer([at(at(METAL, weapon), SoundTier.medium)], SHIELD_VOLUME)],
+      impact: special.impact === undefined ? [] : [layer([special.impact], at(TIER_HIT_VOLUME, SoundTier.large))],
       voice: undefined,
     };
   }
@@ -226,6 +229,7 @@ function resolve(character: Character, move: number): MoveSound | undefined {
     hit: [layer([body], at(TIER_HIT_VOLUME, tier))],
     strong: [layer([own?.hit ?? at(at(FLESH, weapon), SoundTier.large)], at(TIER_HIT_VOLUME, SoundTier.large)), layer([fighter.strong], SWEETENER_VOLUME)],
     shield: [layer([at(at(METAL, weapon), tier)], SHIELD_VOLUME)],
+    impact: [],
     voice: fighter.effort !== undefined && isSmashAttack(style) ? layer(fighter.effort, VOICE_VOLUME) : undefined,
   };
 }
@@ -293,6 +297,15 @@ export function playHit(character: Character, move: number, strong: boolean, ele
   if (sweetener !== undefined && !isSpecialMove(move)) playLayer(layer([sweetener], SWEETENER_VOLUME), serial, 0, sink);
 }
 
+export function hasImpactSound(character: Character, move: number): boolean {
+  return (moveSound(character, move)?.impact.length ?? 0) > 0;
+}
+
+export function playImpact(character: Character, move: number, serial: number, sink: MoveSoundSink): void {
+  const row = moveSound(character, move);
+  if (row !== undefined) playLayers(row.impact, serial, sink);
+}
+
 export function playShieldHit(character: Character, move: number, serial: number, sink: MoveSoundSink): void {
   const row = moveSound(character, move);
   if (row !== undefined) playLayers(row.shield, serial, sink);
@@ -305,12 +318,12 @@ export function moveSoundLabels(characters: readonly Character[]): string[] {
     for (let style = 0; style <= AttackStyle.jab3; style++) {
       const row = moveSound(character, style);
       if (row === undefined) continue;
-      for (const each of [...row.perform, ...row.hit, ...row.strong, ...row.shield, ...(row.voice === undefined ? [] : [row.voice])]) each.sounds.forEach((sound) => add(sound));
+      for (const each of [...row.perform, ...row.hit, ...row.strong, ...row.shield, ...row.impact, ...(row.voice === undefined ? [] : [row.voice])]) each.sounds.forEach((sound) => add(sound));
     }
     for (let slot = 0; slot < 4; slot++) {
       const row = moveSound(character, specialMove(slot));
       if (row === undefined) continue;
-      for (const each of [...row.perform, ...row.hit, ...row.strong, ...row.shield, ...(row.voice === undefined ? [] : [row.voice])]) each.sounds.forEach((sound) => add(sound));
+      for (const each of [...row.perform, ...row.hit, ...row.strong, ...row.shield, ...row.impact, ...(row.voice === undefined ? [] : [row.voice])]) each.sounds.forEach((sound) => add(sound));
     }
   }
   return labels;

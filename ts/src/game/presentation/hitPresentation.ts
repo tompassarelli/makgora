@@ -6,7 +6,7 @@ import { elementLook } from "./elementLooks";
 import { SoundTier, SWING_SOUND, TIER_HIT_VOLUME, TIER_SWING_PITCH, TIER_SWING_VOLUME, tierHitPath } from "./moveTiers";
 import { at } from "wisp/src/runtime/lookup";
 import { type ImpactEvents, ImpactLanding, JumpCue } from "./impactEvents";
-import { moveSoundLabels, playHit, playPerform, playShieldHit, soundFiles } from "./moveSounds";
+import { moveSoundLabels, playHit, playImpact, playPerform, playShieldHit, soundFiles } from "./moveSounds";
 import { VoiceClass } from "./voiceBudget";
 import { Character } from "../sim/codes";
 import { JOB_DONE_VOICE } from "./matchAudio";
@@ -122,6 +122,7 @@ export function presentImpactSounds(events: Readonly<ImpactEvents>, sink: Impact
   const { x, z } = events;
   if (events.perform >= 0) playPerform(events.character, events.perform, events.performSerial, fileSink(sink, x, z, VoiceClass.special));
   else if (events.swing >= 0) sink(SWING_SOUND, x, z, at(TIER_SWING_VOLUME, events.swing), at(TIER_SWING_PITCH, events.swing), true, VoiceClass.special);
+  if (events.impact >= 0) playImpact(events.character, events.impact, events.performSerial, fileSink(sink, x, z, VoiceClass.hit));
   if (events.throwRelease) sink("BlinkTarget", x, z, 100, 1.0, false, VoiceClass.hit);
   else if (events.pummel) sink("Defend", x, z, 75, 1.5, false, VoiceClass.hit);
   else if (events.hit && events.hitMove >= 0) playHit(events.hitCharacter, events.hitMove, events.strong, events.element, events.variant, fileSink(sink, x, z, VoiceClass.hit));

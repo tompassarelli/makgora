@@ -261,9 +261,9 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
       { x: -23.49820327758789, z: 161.7350311279297 },
       { x: -23.49820327758789, z: 161.7318878173828 },
     ] } }, active: drawn("Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveMissile.mdx", "ahead") },
-    side: { spell: "War Stomp", startup: BEAST, active: cue("Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx", "feet", f32(0.4)) },
+    side: { spell: "Bloodhoof Gore", startup: BEAST, active: cue("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", "feet", f32(0.35)) },
     up: { spell: "Spirit Lift", startup: BEAST, active: cue("Abilities\\Spells\\Orc\\CommandAura\\CommandAura.mdx", "feet", f32(0.7)) },
-    down: { spell: "Reincarnation", startup: BEAST, active: cue("Abilities\\Spells\\Orc\\Reincarnation\\ReincarnationTarget.mdx", "body", f32(0.6)) },
+    down: { spell: "War Stomp", startup: BEAST, active: cue("Abilities\\Spells\\Orc\\CommandAura\\CommandAuraTarget.mdx", "body", f32(0.5)) },
   },
   [Character.peon]: {
     neutral: { spell: "Lumber Toss", startup: drawn("Objects\\InventoryItems\\BundleofLumber\\BundleofLumber.mdx", "hand"), active: drawn("Objects\\InventoryItems\\BundleofLumber\\BundleofLumber.mdx", "hand") },

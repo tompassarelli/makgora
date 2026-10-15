@@ -16,8 +16,8 @@ test("every move has weak, strong and shield audio and every configured sound ex
         missing.push(`${name}: no sounds`);
         continue;
       }
-      for (const [slot, layers] of [["perform", row.perform], ["hit", row.hit], ["strong", row.strong], ["shield", row.shield]] as const) {
-        if (slot !== "perform" && layers.length === 0) missing.push(`${name}: no ${slot}`);
+      for (const [slot, layers] of [["perform", row.perform], ["hit", row.hit], ["strong", row.strong], ["shield", row.shield], ["impact", row.impact]] as const) {
+        if (slot !== "perform" && slot !== "impact" && layers.length === 0) missing.push(`${name}: no ${slot}`);
         for (const layer of [...layers, ...(row.voice === undefined ? [] : [row.voice])]) {
           for (const sound of layer.sounds) {
             const files = soundFiles(sound);
@@ -55,7 +55,7 @@ const SIGNATURE_SOUNDS: { readonly [label: string]: Character } = {
   DeathCoil: Character.lichKing, DeathPactTarget: Character.lichKing,
   CarrionSwarmLaunch: Character.dreadlord, CarrionSwarmDamage: Character.dreadlord, Sleep: Character.dreadlord, InfernalBirth: Character.dreadlord,
   DemonHunterMissileLaunch: Character.demonHunter, DemonHunterMissileHit: Character.demonHunter, ManaBurn: Character.demonHunter,
-  Warstomp: Character.cairne, ShockWave: Character.cairne, Reincarnation: Character.cairne,
+  Warstomp: Character.cairne, ShockWave: Character.cairne,
   LightningBolt: Character.thrall, FeralSpiritTarget: Character.thrall, Earthquake: Character.thrall,
   FanOfKnives: Character.warden, FanOfKnivesHit: Character.warden, ShadowStrikeMissileBirth: Character.warden, ShadowStrikeBirth: Character.warden,
   FlameStrike: Character.kaelthas, BanishCaster: Character.kaelthas, SiphonManaCaster: Character.kaelthas, PhoenixMissileLaunch: Character.kaelthas,
@@ -74,7 +74,7 @@ test("no move plays a signature sound owned by another roster hero [k2 property]
     for (const move of soundedMoves(character)) {
       const row = moveSound(character, move);
       if (row === undefined) continue;
-      for (const layer of [...row.perform, ...row.hit, ...row.strong, ...row.shield, ...(row.voice === undefined ? [] : [row.voice])]) {
+      for (const layer of [...row.perform, ...row.hit, ...row.strong, ...row.shield, ...row.impact, ...(row.voice === undefined ? [] : [row.voice])]) {
         for (const sound of layer.sounds) {
           const owner = SIGNATURE_SOUNDS[sound];
           if (owner !== undefined && owner !== character) borrowed.push(`${fighterName(character)} ${move}: ${sound} belongs to ${fighterName(owner)}`);
