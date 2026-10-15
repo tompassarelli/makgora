@@ -25,7 +25,6 @@ const DRAWN: { readonly [model: string]: { readonly sequence: string; readonly f
   "Abilities\\Weapons\\GreenDragonMissile\\GreenDragonMissile.mdx": { sequence: "birth", fromMs: 0, toMs: 500 },
   "Abilities\\Spells\\Other\\Drain\\DrainCaster.mdx": { sequence: "stand", fromMs: 0, toMs: 1000 },
   "Abilities\\Weapons\\DemonHunterMissile\\DemonHunterMissile.mdx": { sequence: "stand", fromMs: 0, toMs: 3300 },
-  "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike1.mdx": { sequence: "birth", fromMs: 1300, toMs: 4300 },
   "Abilities\\Spells\\Demon\\DemonBoltImpact\\DemonBoltImpact.mdx": { sequence: "stand", fromMs: 230, toMs: 790 },
   "Abilities\\Spells\\NightElf\\ManaBurn\\ManaBurnTarget.mdx": { sequence: "birth", fromMs: 230, toMs: 790 },
 };
@@ -60,3 +59,18 @@ test("every Illidan option's effect starts where its model already draws [k4 ref
   for (const [name, cue] of cues) startsDrawn(name, cue);
   startsDrawn("Mana drain", MANA_DRAIN_LOOK);
 });
+
+const FIRE_MODELS = ["FlameStrike", "Incinerate", "FireLord", "Fire", "Flame", "Volcano", "RedDragon", "Immolation"];
+
+const isFire = (model: string | undefined): boolean => model !== undefined && FIRE_MODELS.some((name) => model.includes(name));
+
+test("Illidan's down smash spawns only its warglaive effect, no Flame Strike or fire model [k4 reference native]", () => {
+  const cues = ATTACK_CUES[Character.demonHunter]?.[AttackStyle.downSmash] ?? [];
+  assertEquals(cues.length, 1, "down smash has one effect");
+  for (const { name, cue } of cues) {
+    assertEquals(cue.model, "Abilities\\Weapons\\DemonHunterMissile\\DemonHunterMissile.mdx", `${name} is the warglaive missile`);
+    assertEquals(cue.definitive, undefined, `${name} has no Definitive replacement`);
+    assertEquals(isFire(cue.model) || isFire(cue.definitive?.model), false, `${name} draws no fire`);
+  }
+});
+
