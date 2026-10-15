@@ -17,6 +17,7 @@ export const PREDICT_COST = "--predict-cost";
 export const costPrediction = (args: readonly string[]) => ({ predict: args.includes(PREDICT_COST), args: args.filter((arg) => arg !== PREDICT_COST) });
 export const PLAYTEST_COST_SUFFIXES = [".lua-cost.json", ".lua-cost.perf"] as const;
 
+export const LANE_FILE = /^Smashcraft (\d+\.\d+\.\d+)-([a-z0-9]+(?:-[a-z0-9]+)*)\.w3x$/;
 export const PLAYABLE_FILE = /^Smashcraft (\d+\.\d+\.\d+)(?: ([0-9a-f]{7,40}))?\.w3x$/;
 
 export const KEPT_PRIOR_VERSIONS = 2;

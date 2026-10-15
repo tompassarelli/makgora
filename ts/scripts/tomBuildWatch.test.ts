@@ -20,6 +20,7 @@ test("tips landing during a build coalesce into one build of the newest, and no 
     const steps: WatchSteps<never> = {
       tip: Effect.sync(() => remote),
       landedAt: () => Effect.succeed(0),
+      retire: () => Effect.succeed([]),
       build: (revision) => Effect.gen(function*() {
         built.push(revision);
         for (const next of landing[revision] ?? []) remote = next;

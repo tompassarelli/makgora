@@ -9,10 +9,14 @@ import { runProcess } from "./hostProcess";
 import { installPlaytest } from "./playtestBuild";
 import { PLAYABLE_FILE, costPrediction } from "./wisp/greenBuilds";
 import { projectRoot } from "./wisp/project";
+import { landedBranches, laneSlug, removeLaneMaps } from "./wisp/laneMaps";
+import { documentsFolder } from "wisp/scripts/warcraft/battleNet";
+import { PLAYTEST_PREFIX } from "./wisp/commands/play";
 
 export const TOM_BUILD_LOG = join(homedir(), ".local/state/agents/handoffs/tom-build.log");
 export const TOM_BUILD_ATTEMPTS = join(homedir(), ".local/state/smashcraft/tom-build/attempted");
 const POLL = "30 seconds";
+const FIRST_RETIRE_COMMITS = 50;
 
 export interface Installed {
   readonly version: string;
@@ -23,6 +27,7 @@ export interface WatchSteps<R> {
   readonly tip: Effect.Effect<string, PlayProblem, R>;
   readonly landedAt: (sha: string) => Effect.Effect<number, PlayProblem, R>;
   readonly build: (sha: string) => Effect.Effect<Installed, PlayProblem, R>;
+  readonly retire: (previous: string | undefined, sha: string) => Effect.Effect<readonly string[], PlayProblem, R>;
 }
 
 export interface WatchFiles {
@@ -49,6 +54,7 @@ export const buildLine = (finished: number, sha: string, { version, path }: Inst
 export const watchOnce = <R>(steps: WatchSteps<R>, files: WatchFiles) => Effect.gen(function*() {
   const sha = yield* steps.tip;
   if (attemptedShas(files).has(sha)) return undefined;
+  const previous = lines(files.log).at(-1)?.split(" ")[1];
   yield* append(files.attempts, sha);
   const started = yield* Clock.currentTimeMillis;
   const installed = yield* steps.build(sha);
@@ -56,6 +62,10 @@ export const watchOnce = <R>(steps: WatchSteps<R>, files: WatchFiles) => Effect.
   const landed = yield* steps.landedAt(sha);
   const line = buildLine(finished, sha, installed, finished - started, finished - landed);
   yield* append(files.log, line);
+  const retired = yield* steps.retire(previous, sha).pipe(
+    Effect.catch(({ problem }) => Effect.sync(() => { console.error(`Lane maps not retired: ${problem}`); return []; })),
+  );
+  for (const path of retired) console.log(`Removed landed lane map ${path}`);
   return line;
 });
 
@@ -78,6 +88,12 @@ export const hostSteps = (predictCost: boolean): WatchSteps<ChildProcessSpawner.
     const version = PLAYABLE_FILE.exec(file)?.[1];
     return version === undefined ? Effect.fail(new PlayProblem({ problem: `not a playable map: ${file}` })) : Effect.succeed({ version, path: installed });
   })),
+  retire: (previous, sha) => git("log", "--format=%B", ...(previous === undefined ? ["-n", String(FIRST_RETIRE_COMMITS), sha] : [`${previous}..${sha}`])).pipe(
+    Effect.flatMap((messages) => Effect.try({
+      try: () => removeLaneMaps(documentsFolder(PLAYTEST_PREFIX), landedBranches(messages).map(laneSlug)),
+      catch: (cause) => new PlayProblem({ problem: String(cause) }),
+    })),
+  ),
 });
 
 if (import.meta.main) {

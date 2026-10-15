@@ -1,6 +1,6 @@
 import { copyFileSync, existsSync, mkdirSync, readdirSync, renameSync } from "node:fs";
 import { basename, join } from "node:path";
-import { PLAYABLE_FILE, PLAYTEST_COST_SUFFIXES, pruneTargets } from "./greenBuilds";
+import { LANE_FILE, PLAYABLE_FILE, PLAYTEST_COST_SUFFIXES, pruneTargets } from "./greenBuilds";
 
 
 const PLAYABLE = PLAYABLE_FILE;
@@ -29,7 +29,7 @@ export function installLatest(documents: string, map: string): void {
       }
     }
   }
-  for (const entry of readdirSync(root).filter((entry) => /\b(?:diagnostic|integrity|probe|test)\b.*\.w3x$/i.test(entry))) {
+  for (const entry of readdirSync(root).filter((entry) => !LANE_FILE.test(entry) && /\b(?:diagnostic|integrity|probe|test)\b.*\.w3x$/i.test(entry))) {
     const target = join(tests, entry);
     if (!existsSync(target)) renameSync(join(root, entry), target);
   }

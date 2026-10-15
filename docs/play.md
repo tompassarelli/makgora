@@ -102,6 +102,22 @@ installed build appends one line to `~/.local/state/agents/handoffs/tom-build.lo
 `land_to_installed_s` counts from the commit's committer time. Failed builds
 are in `journalctl --user -u smashcraft-tom-build`.
 
+## Lane builds before landing
+
+From a lane's worktree, `cd ts && bun scripts/laneBuild.ts` runs `bun run check`
+and the lane's own tests (test files changed since its merge base with
+origin/main, uncommitted ones included), then builds the lane's working tree
+with the play build (no Lua prediction) and installs it under
+Maps/00-Smashcraft as `Smashcraft 0.0.N-LANE.w3x`. 0.0.N is the version main's
+next build would take; LANE is the branch's last segment without `land-`
+(`claude/land-cairne-air-924c72aef489` installs
+`Smashcraft 0.0.N-cairne-air-924c72aef489.w3x`); `--lane BRANCH` names it
+explicitly. A lane build replaces that lane's previous map and leaves every
+other file alone; builds of one lane wait for each other. Main's numbering and
+pruning ignore lane maps. When the watcher installs a main build, it removes
+the maps of every lane whose `Autoland-Lane` trailer is among the commits since
+its previous build.
+
 ## The desktop client
 
 Players use [smashcraft-client](https://github.com/tompassarelli/smashcraft-client):
