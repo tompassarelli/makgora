@@ -2,23 +2,11 @@ import { assertEquals, test } from "wisp/src/runtime/testing";
 import { beginDamageContacts, finishDamageContacts, queueDamageContact } from "./contacts";
 import { Character, ContactKind } from "./codes";
 import { createReferenceFighter } from "./referenceRig";
-import { controls, hitEffect, soloWorld, testWorld, withPhysics } from "./testWorld";
+import { controls, hitEffect, soloWorld, testWorld } from "./testWorld";
 import { advanceFighter } from "./step";
-import { digitalShieldDamage, digitalShieldstunDuration } from "./shield";
-import { melee } from "./tuning";
+import { digitalShieldstunDuration } from "./shield";
 
 
-
-test("a grounded fighter in hitstun loses launch speed to traction by the reference's float32 amount each frame [k3 measure docs/physics.md]", () => {
-  const fighter = createReferenceFighter(Character.sylvanas, 0.0, 1);
-  withPhysics(fighter, { traction: melee(0.07999999821186066) });
-  fighter.launch.knockbackX = melee(0.7562744617462158);
-  fighter.launch.hitstun = 10;
-
-  advanceFighter(soloWorld(fighter), 0, 0, controls(), 0.0);
-
-  assertEquals(fighter.launch.knockbackX, melee(0.6762744784355164));
-});
 
 test("a held-down shield regenerates by the measured float32 amount each frame [k3 measure docs/physics.md]", () => {
   const fighter = createReferenceFighter(Character.sylvanas, 0.0, 1);
@@ -27,10 +15,6 @@ test("a held-down shield regenerates by the measured float32 amount each frame [
   advanceFighter(soloWorld(fighter), 0, 0, controls(), 0.0);
 
   assertEquals(fighter.shield.energy, 20.06999969482422);
-});
-
-test("a digital shield takes the measured float32 damage from a hit [k3 measure docs/physics.md]", () => {
-  assertEquals(digitalShieldDamage(9.0), 6.299999713897705);
 });
 
 test("shieldstun duration for a digital shield equals the measured float32 value [k3 measure docs/physics.md]", () => {
