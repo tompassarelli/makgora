@@ -101,6 +101,7 @@ export interface Cue {
   readonly depth?: number | undefined;
   readonly timeScale?: number | undefined;
   readonly alpha?: number | undefined;
+  readonly color?: readonly [number, number, number] | undefined;
 
   readonly replacesBody?: boolean | undefined;
   readonly rebirthFrames?: number | undefined;
@@ -305,7 +306,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     neutral: { spell: "Ensnare", startup: MURGUL, active: cue("Abilities\\Spells\\Orc\\Ensnare\\EnsnareTarget.mdx", "hand", 0.75) },
     side: { spell: "Tidal Rush", startup: MURGUL, active: timed(cue("Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx", "feet", 1.0), "birth", 0.0) },
     up: { spell: "Tide Spout", startup: MURGUL, active: timed(cue("Objects\\Spawnmodels\\Naga\\NagaDeath\\NagaDeath.mdx", "feet", 1.0), "birth", 0.0) },
-    down: { spell: "Disease Cloud", startup: MURGUL, active: cue("Abilities\\Spells\\Undead\\PlagueCloud\\PlagueCloudCaster.mdx", "feet", 0.75) },
+    down: { spell: "Disease Cloud", startup: MURGUL, active: { ...cue("Abilities\\Spells\\Undead\\PlagueCloud\\PlagueCloudCaster.mdx", "feet", 0.75), color: [104, 156, 104] } },
   },
   [Character.medivh]: {
     neutral: { spell: "Arcane Omen", startup: ARCANE, active: cue("Abilities\\Weapons\\PriestMissile\\PriestMissile.mdl", "hand", 0.5) },

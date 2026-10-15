@@ -265,6 +265,8 @@ export class SpecialCueEffects {
       const scale = entry.cue.scaleEnd === undefined ? entry.cue.scale : f32(entry.cue.scale + f32(f32(entry.cue.scaleEnd - entry.cue.scale) * progress));
       BlzSetSpecialEffectScale(model, scale * strikeScale * this.scale);
       BlzSetSpecialEffectAlpha(model, entry.cue.alpha ?? 255);
+      const color = entry.cue.color;
+      if (color !== undefined) BlzSetSpecialEffectColor(model, color[0], color[1], color[2]);
       BlzSetSpecialEffectTimeScale(model, paused || fighter.launch.hitlag > 0 ? 0.0 : entry.cue.timeScale ?? 1.0);
     }
     if (fighter !== undefined && playing) {

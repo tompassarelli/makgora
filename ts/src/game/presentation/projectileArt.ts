@@ -100,7 +100,7 @@ export function allProjectileModels(): readonly string[] {
   return models;
 }
 
-export const PROJECTILE_DRAW_CUES: { readonly [model: string]: { readonly scale: number; readonly birth?: CueBirth | undefined } | undefined } = {
+export const PROJECTILE_DRAW_CUES: { readonly [model: string]: { readonly scale: number; readonly birth?: CueBirth | undefined; readonly color?: readonly [number, number, number] | undefined } | undefined } = {
   "Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget.mdx": { scale: f32(0.16) },
   "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveMissile.mdx": { scale: f32(0.3) },
   "Abilities\\Spells\\Human\\ManaFlare\\ManaFlareMissile.mdx": { scale: f32(1.2) },
@@ -111,6 +111,7 @@ export const PROJECTILE_DRAW_CUES: { readonly [model: string]: { readonly scale:
   "Abilities\\Spells\\Orc\\Shockwave\\ShockwaveMissile.mdx": { scale: f32(0.6) },
   "Abilities\\Spells\\Other\\Consecration\\Consecration.mdx": { scale: 1.0 },
   "Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdx": { scale: 0.5 },
+  "Units\\Undead\\PlagueCloud\\PlagueCloud.mdx": { scale: 1.0, color: [104, 156, 104] },
   "units\\creeps\\PandarenBrewmaster\\PandarenBrewmaster.mdl": { scale: f32(0.6) },
   "units\\creeps\\QuillBeast\\QuillBeast.mdl": { scale: f32(0.9) },
   "units\\creeps\\GrizzlyBear\\GrizzlyBear.mdl": { scale: f32(0.7) },

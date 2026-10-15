@@ -17,6 +17,7 @@ import { definitiveCues } from "./specialCueEffects";
 import { carrierDrawsMark } from "../presentation/ultimateVoice";
 import { ARENA_CAMERA } from "../presentation/arenaCamera";
 import { cosineTurns, sineTurns } from "../sim/mathTables";
+import { tintProjectile } from "./projectileTint";
 
 export const STATIONARY_PARTICLE_MODELS = [
   "Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget.mdx",
@@ -393,6 +394,7 @@ export class ProjectilePresentation {
       BlzSetSpecialEffectRoll(model, draw?.roll ?? 0.0);
       BlzSetSpecialEffectPosition(model, this.origin.x + pose.x + (pose.yaw === 0.0 ? 1 : -1) * (draw?.x ?? 0.0), this.origin.y, this.origin.z + pose.z + (draw?.z ?? 0.0));
       BlzSetSpecialEffectScale(model, pose.modelScale * (cue?.scale ?? 1.0));
+      tintProjectile(model, cue);
       if (draw?.width !== undefined || draw?.height !== undefined) BlzSetSpecialEffectMatrixScale(model, draw.width ?? 1.0, 1.0, draw.height ?? 1.0);
       if (projectile?.spec?.trail !== undefined) {
         BlzSetSpecialEffectPitch(model, 0.0);
