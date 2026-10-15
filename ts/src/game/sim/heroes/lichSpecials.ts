@@ -30,7 +30,7 @@ const FROST_NOVA_BURST: SpecialProjectile = {
 };
 
 const frostNova = (landingLag: number | undefined): AuthoredSpecial => ({
-  endFrame: 39,
+  endFrame: 40,
   landingLag,
   hurt: LICH_FROST_NOVA_BODY,
   projectiles: [FROST_NOVA_ORB],

@@ -718,7 +718,7 @@ Standing grab 8/3/25, reach 0.60H. Pummel: belly bump.
 
 | Input | Proposed move and behavior | Timing and cost |
 | --- | --- | --- |
-| Neutral B | **Frost Nova** (#130, [kit review 2](kit-review-2.md#lich-130)): a slow orb, speed 0.09H/frame, life 80, radius 0.16H; 9 damage, POKE at 35 degrees and Chill on a body. Neutral B again while it flies stops it on the gesture's frame 4; 6 frames later it bursts for 3 frames: radius 0.7H, 10 damage, LAUNCH at 70 degrees, Chill. One orb, reflectable until burst. **Chill:** 75 frames at 60% walk, dash, run and air-drift top speed; a shield stops it; 120 frames of immunity. | Orb f18, end f39; 10 mana. Burst gesture end f14, free |
+| Neutral B | **Frost Nova** (#130, [kit review 2](kit-review-2.md#lich-130)): a slow orb, speed 0.09H/frame, life 80, radius 0.16H; 9 damage, POKE at 35 degrees and Chill on a body. Neutral B again while it flies stops it on the gesture's frame 4; 6 frames later it bursts for 3 frames: radius 0.7H, 10 damage, LAUNCH at 70 degrees, Chill. One orb, reflectable until burst. **Chill:** 75 frames at 60% walk, dash, run and air-drift top speed; a shield stops it; 120 frames of immunity. | Orb f18, end f40 (one frame longer since 15 Oct traction slides a shield out of grab range; projectile rule 2); 10 mana. Burst gesture end f14, free |
 | Side B | **Death and Decay** (#130): a field placed 1.5H ahead (a backward press turns Lich first, as every side special does), only with line of sight; radius 0.75H. It strikes the first body or shield in it from f30 (5 damage, POKE at 80 degrees) and again from f70 (9 damage, LAUNCH at 70 degrees), and is gone after f97. Interrupting Lich before f30 removes it. | Field f8, end f50; 25 mana |
 | Up B | **Spectral Ascent:** visible upward glide, 2.1H height and up to 0.4H lateral drift, no hitbox or intangibility. Free version 1.4H. | Movement f10–34, helpless afterward; 15 mana |
 | Down B | **Frost Armor** (#130): f22 cast grants a 240-frame shell that absorbs the hit reaction of one hit of at most 8 damage and chills the melee striker. Damage still applies; grabs bypass it. **Dark Ritual:** down B while the shell holds shatters it on f6 into a 0.6H burst around Lich (5 damage, POKE at 60 degrees) and restores 30 mana. | Cast f22, end f45; 20 mana. Ritual end f24, free |
@@ -749,7 +749,7 @@ the tables:
   field 1.5H ahead of the new facing (gameplay-design "Turnaround specials"). A field whose line from Lich crosses solid stage geometry is not
   placed (the cast and its cost still happen). Its two strikes are two
   stationary zones, so with Frost Nova's orb Lich owns three projectiles.
-- **Frost Nova's burst** press is accepted once the 39-frame cast has ended,
+- **Frost Nova's burst** press is accepted once the 40-frame cast has ended,
   so the nearest burst is about 1.9H ahead.
 - **Spectral Ascent** steers with the live stick at up to 0.4H/25 per frame
   over its window, in place of air drift; with a neutral stick it rises
