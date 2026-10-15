@@ -1,7 +1,8 @@
 # Tom builds
 
-`smashcraft-tom-build.service` runs `bun scripts/tomBuildWatch.ts` from
-`~/code/smashcraft/main/ts` under `Nice=10` and idle I/O. Every 30 s it fetches
+`smashcraft-tom-build.service` runs `bun scripts/tomBuildWatch.ts` from its own
+detached worktree `~/code/smashcraft/worktrees/tom-build-watch/ts`, which it moves
+to `origin/main` on each start, under `Nice=10` and idle I/O. Every 30 s it fetches
 `origin/main`; when the tip is a commit it has not built, it builds that tip's
 playable map with the play build path and installs it under
 Maps/00-Smashcraft (smashcraft:docs/play.md). Commits that land during a build
@@ -9,12 +10,14 @@ are skipped for the newest tip. Between landings it only fetches.
 
 To install and start the unit:
 
+    git -C ~/code/smashcraft/main worktree add --detach ~/code/smashcraft/worktrees/tom-build-watch origin/main
     mkdir -p ~/.config/systemd/user
     cp tools/tom-build/smashcraft-tom-build.service ~/.config/systemd/user/
     systemctl --user daemon-reload
     systemctl --user enable --now smashcraft-tom-build.service
 
-To stop it, and keep it from starting at login:
+`systemctl --user restart smashcraft-tom-build.service` picks up a newer
+watcher. To stop it, and keep it from starting at login:
 
     systemctl --user disable --now smashcraft-tom-build.service
 
