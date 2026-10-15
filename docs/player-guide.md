@@ -97,6 +97,12 @@ I always gives the existing short hop, however long you hold it; in Tom's pad
 layout, press LB. In Melee, tap X or Y to short hop. The ordinary jump keys still full hop when held and
 short hop when released during startup. In the air, I uses your second jump.
 
+Fighters grip the ground differently. Jaina is the most slippery and slides
+furthest on a wavedash; Malfurion, Lich, Medivh, Kael'thas and Murloc slide
+further than most after a run, a dash or a moonwalk; Thrall, Pit Lord, Cairne
+and Anub'arak stop shortest. Landing slides, wavedashes included, brake hard
+until the fighter is down to walking speed, then glide to a stop.
+
 Attacks buffer for six frames, including through jump squat. Hold P to walk;
 Hold down while rising into a platform without an aerial to stand on it
 instantly, with a small landing puff. Without down, or during an aerial, you

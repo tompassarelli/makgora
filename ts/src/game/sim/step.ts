@@ -40,7 +40,7 @@ import {
   WALL_JUMP_FLICK_FRAMES,
   WALL_TECH_JUMP_INPUT_WINDOW_FRAMES,
 } from "./fighter";
-import { DASH_GUARD_EARLY_FRAMES, advanceGroundMovement, clearDash, groundOptionOpen, wantsCrouch } from "./groundMovement";
+import { DASH_GUARD_EARLY_FRAMES, advanceGroundMovement, clearDash, groundOptionOpen, restingTraction, wantsCrouch } from "./groundMovement";
 import { GroundOption } from "./stickZones";
 import { heroMotionHolds, heroMotionPassesPlatforms } from "./heroSpecialRules";
 import { carryHeroStatus } from "./heroStatus";
@@ -598,7 +598,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   } else if (isGroundDodging(f)) {
     motion.vx = 0.0;
   } else if (!groundTakeoff && !authoredMotion && (!canSteer || direction === 0) && launch.hitstun <= 0 && (!dodgeActive || motion.grounded)) {
-    const drag = motion.grounded ? stageSurfaces.floorTraction(physics.traction, stageSurfaces.floorFriction(stage, motion)) : physics.airFriction;
+    const drag = motion.grounded ? restingTraction(f, stageSurfaces.floorTraction(physics.traction, stageSurfaces.floorFriction(stage, motion))) : physics.airFriction;
     motion.vx = motion.vx > 0 ? max(0.0, f32(motion.vx - drag)) : min(0.0, f32(motion.vx + drag));
   }
 

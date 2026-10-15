@@ -12,7 +12,6 @@ import { createReferenceFighter } from "./referenceRig";
 import { AIR_DODGE_ANIMATION_FRAMES, beginAirDodge } from "./jumpsAndDodges";
 import { TOP_KO_MINIMUM_UPWARD_KNOCKBACK } from "./knockback";
 import { advanceSolo, controls } from "./testWorld";
-import { GROUND_TRACTION } from "./tuning";
 
 const ALL_FIGHTERS = Object.values(Character);
 
@@ -82,13 +81,15 @@ test("an air dodge landing slides and restores actions after ten ticks [k3 measu
     assertTrue(fighter.motion.grounded);
     assertEquals(fighter.landing.lag, AIR_DODGE_LANDING_LAG);
     assertFalse(canAttack(fighter));
-    const landingSpeed = fighter.motion.vx;
+    const { traction, walkSpeed } = fighter.tuning.physics;
+    let expected = fighter.motion.vx;
     input.direction = -1;
     for (let tick = 1; tick <= 9; tick++) {
       const previousX = fighter.motion.x;
       advanceSolo(fighter, 0, input, 0.0);
       assertGreaterThan(fighter.motion.x, previousX);
-      assertNear(fighter.motion.vx, landingSpeed - tick * GROUND_TRACTION, 0.0010000000474974513);
+      expected = f32(expected - (expected > walkSpeed ? f32(traction * 2.0) : traction));
+      assertEquals(fighter.motion.vx, expected);
       assertEquals(fighter.landing.lag, AIR_DODGE_LANDING_LAG - tick);
       assertFalse(canAttack(fighter));
     }

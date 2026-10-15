@@ -4,6 +4,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import type { Fighter } from "../sim/fighter";
 import type { Controls } from "../sim/roster";
+import { restingTraction } from "../sim/groundMovement";
 import { floorFriction, floorTraction, mainDeckLeft, mainDeckRight, surfaceCount, surfaceLeft, surfaceLine, surfaceMoves, surfaceRight, surfaceZAt } from "../sim/stage";
 
 
@@ -23,9 +24,15 @@ export function safeAt(stage: number, x: number, inset: number): boolean {
 }
 
 
-function restingX(x: number, vx: number, deceleration: number): number {
+export function brakingDistance(speed: number, deceleration: number, walkSpeed = speed): number {
+  if (speed <= walkSpeed) return f32(f32(speed * speed) / f32(2.0 * deceleration));
+  const walkSquared = f32(walkSpeed * walkSpeed);
+  return f32(f32(f32(f32(speed * speed) - walkSquared) / f32(4.0 * deceleration)) + f32(walkSquared / f32(2.0 * deceleration)));
+}
+
+function restingX(x: number, vx: number, deceleration: number, walkSpeed = Math.abs(vx)): number {
   const speed = Math.abs(vx);
-  const distance = f32(f32(f32(speed * speed) / f32(2.0 * deceleration)) + speed);
+  const distance = f32(brakingDistance(speed, deceleration, walkSpeed) + speed);
   return vx < 0 ? f32(x - distance) : f32(x + distance);
 }
 
@@ -36,7 +43,8 @@ function restingX(x: number, vx: number, deceleration: number): number {
 
 export function slideStaysOnDeck(f: Readonly<Fighter>, stage: number, matchFrame: number): boolean {
   const { x, vx, surface } = f.motion;
-  const rest = restingX(x, vx, floorTraction(f.tuning.physics.traction, floorFriction(stage, f.motion)));
+  const traction = floorTraction(f.tuning.physics.traction, floorFriction(stage, f.motion));
+  const rest = restingX(x, vx, traction, restingTraction(f, traction) === traction ? Math.abs(vx) : f.tuning.physics.walkSpeed);
   if (surface === undefined || surface === 0) return rest >= safeLeft(stage) && rest <= safeRight(stage);
   return rest >= surfaceLeft(stage, surface, matchFrame) && rest <= surfaceRight(stage, surface, matchFrame);
 }
@@ -167,8 +175,13 @@ export function horizontalAhead(f: Readonly<Fighter>, frames: number, stage: num
   if (landing > frames) return straight;
   const traction = floorTraction(f.tuning.physics.traction, floorFriction(stage, { grounded: true, surface: deck }));
   const speed = Math.abs(deltaX);
-  const braking = Math.min(frames - landing, Math.floor(f32(speed / traction)));
-  const slide = f32(f32(speed * braking) - f32(traction * ((braking * (braking + 1)) / 2)));
+  const walkSpeed = f.tuning.physics.walkSpeed;
+  let velocity = speed;
+  let slide = 0.0;
+  for (let frame = landing; frame < frames && velocity > 0.0; frame++) {
+    velocity = Math.max(0.0, f32(velocity - (velocity > walkSpeed ? f32(traction * 2.0) : traction)));
+    slide = f32(slide + velocity);
+  }
   const landed = f32(x + f32(deltaX * landing));
   const rest = deltaX < 0 ? f32(landed - slide) : f32(landed + slide);
   return Math.max(surfaceLeft(stage, deck, matchFrame), Math.min(surfaceRight(stage, deck, matchFrame), rest));

@@ -1833,6 +1833,52 @@ and cancels the aerial without landing lag. Drops consume Down until a neutral
 reset and fresh press, so the drop itself never starts fast fall. Ordinary
 falling contact still lands; platforms still have no walls or underside.
 
+## Ground traction by fighter
+
+Each hero grips the ground by its body type, in Melee units a frame
+(smashcraft:ts/src/game/sim/heroes/heroBodies.ts): Jaina 0.03, a slow runner
+on frost, is the roster's Luigi; the other robed casters 0.04-0.055
+(Malfurion 0.04, Lich 0.045, Medivh 0.05, Kael'thas 0.055); Sylvanas and Peon
+0.05; Murloc 0.055 on wet feet; the nimble fast runners 0.06 (Blademaster,
+Warden, Shadow Hunter, Dreadlord, Kobold, Grom); sturdy fighters 0.065
+(Mountain King, Forsaken Paladin, Beastmaster, Lich King, Chen, Tinker);
+Thrall 0.07; Pit Lord, Cairne and Anub'arak 0.08. Rifleman and Illidan keep
+Fox's and Captain Falcon's 0.08. Melee spans 0.025 (Luigi) to 0.1 (Peach,
+Link, Zelda, Pichu) and gives its low traction to slow runners
+(smashcraft:docs/design/melee/movement.md); so do we: no hero runs faster than
+2.2 with traction under 0.055, which keeps the longest run brake (Murloc's)
+at 47 units against Melee's longest, Luigi's 36, and the 32 every fast runner
+had before. Every hero is at or below the 0.08 all fighters shared before
+15 Oct, so run brakes, dash stops and moonwalks are as long or longer.
+
+Standing, crouching and landing (landing lag, including a wavedash or
+waveland's air-dodge landing) brake by twice the traction while the fighter
+moves faster than its walk speed, then by traction, as in Melee
+(https://www.ssbwiki.com/Traction). Dash, run, run brake, turn-run, attacks,
+shield, jump squat and knockback brake by traction alone
+(`restingTraction`, smashcraft:ts/src/game/sim/groundMovement.ts). With the
+3.4 air dodge (2.91 units a frame at landing) a wavedash, whole slide,
+measured in the headless sim:
+
+| Hero (traction, walk) | Wavedash before | Wavedash now | Run brake before | Run brake now |
+| --- | ---: | ---: | ---: | ---: |
+| Jaina (0.03, 0.80) | 54.4 | 76.7 | 7.0 | 19.6 |
+| Malfurion (0.04, 1.31) | 54.4 | 63.9 | 19.4 | 39.6 |
+| Murloc (0.055, 1.60) | 54.4 | 51.4 | 31.9 | 46.9 |
+| Blademaster (0.06, 1.60) | 54.4 | 47.3 | 31.6 | 42.6 |
+| Chen (0.065, 1.16) | 54.4 | 38.6 | 15.2 | 18.9 |
+| Thrall (0.07, 1.09) | 54.4 | 34.9 | 13.2 | 15.2 |
+| Cairne (0.08, 1.08) | 54.4 | 31.0 | 13.1 | 13.1 |
+
+Before, every fighter slid 54.4 units on a wavedash. The doubling alone would
+have cut that to 29-35; the lower traction spread keeps the median near the
+old length for the fast runners while the casters slide much further and
+the heaviest less. smashcraft:ts/src/game/sim/floorFriction.tests.ts
+reproduces Melee's Fox, Marth and Luigi wavedash lengths (31.0, 41.5, 83.8)
+with Melee's dodge, and checks that Jaina slides furthest. The computer's slide predictions
+(smashcraft:ts/src/game/match/botFooting.ts, botCorner.ts) brake landing and
+standing slides by the same doubled rule.
+
 ## Slippery floors
 
 A deck can have a floor friction below one; shallow water's, on Tomb of
@@ -2361,7 +2407,7 @@ a horizontal-only air dodge uses an angle
 of 18 degrees below horizontal for either fighter, mirrored for left/right.
 Its initial vector uses 3.4 Melee units (20.4 world units), deliberately about
 9.7% faster than Melee's 3.1 (#347), before the unchanged 0.9 air-dodge decay.
-The 10-frame landing lag, intangibility, and per-fighter traction are unchanged. This is the default,
+The 10-frame landing lag and intangibility are unchanged; the slide brakes by the fighter's own traction, doubled above its walk speed ([Ground traction by fighter](#ground-traction-by-fighter)). This is the default,
 with no modifier or toggle. Explicit up/down/diagonal input retains its
 previous direction and normalized speed; neutral retains zero initial velocity.
 A dodge started too high may still expire before reaching the ground. The angle

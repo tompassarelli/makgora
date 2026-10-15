@@ -11,7 +11,7 @@ import { canAttack } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
 import type { Controls } from "../sim/roster";
 import { floorFriction, floorTraction, mainDeckLeft, mainDeckRight } from "../sim/stage";
-import { heightAhead } from "./botFooting";
+import { brakingDistance, heightAhead } from "./botFooting";
 import { botChance, botChoice } from "./botRandom";
 import type { CpuSkill } from "./cpuSkill";
 
@@ -70,7 +70,7 @@ export function steerEdgeCancel(f: Fighter, target: Readonly<Fighter> | undefine
   const out = f32(f.motion.vx * side);
   const landing = f32(inside - f32(out * landingFrames(f)));
   const traction = floorTraction(f.tuning.physics.traction, floorFriction(stage, MAIN_DECK));
-  const rest = f32(Math.max(landing, LAND_SNAP) - f32(f32(f32(out * out) / f32(2.0 * traction)) - f32(out * 0.5)));
+  const rest = f32(Math.max(landing, LAND_SNAP) - f32(brakingDistance(out, traction, f.tuning.physics.walkSpeed) - f32(out * 0.5)));
   input.direction = landing < LAND_NEAR ? -side : rest > LAND_PAST ? side : 0;
   return true;
 }
