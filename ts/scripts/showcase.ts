@@ -1,7 +1,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { BunRuntime } from "@effect/platform-bun";
-import { Effect, Schema } from "effect";
+import { Duration, Effect, Schema } from "effect";
 import { hostPath, linePreloadFile, payloadPreloadFile, preloadLines } from "wisp/scripts/wisp/preloadRecord";
 import { driverCommandFile, driverReadyFile, driverStatusFile } from "wisp/src/runtime/nativeDriver";
 import { pollUntil } from "./hostPoll";
@@ -29,7 +29,7 @@ function writeFileAt(path: string, content: string | Uint8Array): void {
   writeFileSync(path, content);
 }
 
-export const send = (directory: string, text: string, timeout = "60 seconds") => Effect.gen(function*() {
+export const send = (directory: string, text: string, timeoutSeconds = 60) => Effect.gen(function*() {
   const serial = statusSerial(directory);
   if (serial === undefined) return yield* new ShowcaseFailure({ problem: `${directory}: no driver status; the showcase map is not running here` });
   const next = serial + 1;
@@ -42,8 +42,8 @@ export const send = (directory: string, text: string, timeout = "60 seconds") =>
   });
   yield* pollUntil(Effect.sync(() => (statusSerial(directory) ?? 0) >= next ? next : undefined), {
     every: "200 millis",
-    within: timeout,
-    orElse: () => Effect.fail(new ShowcaseFailure({ problem: `driver command ${next} was not applied within ${timeout}` })),
+    within: Duration.seconds(timeoutSeconds),
+    orElse: () => Effect.fail(new ShowcaseFailure({ problem: `driver command ${next} was not applied within  seconds` })),
   });
   return next;
 });
