@@ -3,8 +3,10 @@ import { attackBuffer, queueAttack } from "../input/attackBuffer";
 import type { FrameControls } from "../match/controls";
 import { captureFrame, createMatchFrameInput } from "../match/frameInput";
 import { neutralControls } from "../sim/roster";
+import { upgradeSpecial } from "../sim/exSpecialAuthoring";
 import { HAWK, HAWK_PLACEMENT, HAWK_STUN } from "../sim/heroes/beastmasterSpecials";
-import { beginStateChecksum, canonicalBoolean, canonicalChecksum, canonicalInt, canonicalReal, canonicalRealField, canonicalState, foldStateChecksum, specialPlacementCanonical, stateChecksum, writeCanonicalNumber } from "./canonical";
+import { KOBOLD_SPECIALS } from "../sim/heroes/koboldSpecials";
+import { beginStateChecksum, canonicalBoolean, canonicalChecksum, canonicalInt, canonicalReal, canonicalRealField, canonicalState, foldStateChecksum, specialPlacementCanonical, specialProjectileCanonical, stateChecksum, writeCanonicalNumber } from "./canonical";
 import { captureTape, createTapeWorld, executeTapeRow } from "./tapeWorld";
 
 test("canonical real fields retain Wurst's exact binary representation [k4 reference wurst]", () => {
@@ -47,6 +49,19 @@ test("companion bite duration changes alter the placement digest [k2 property]",
     ...HAWK_PLACEMENT, companion: { ...HAWK, biteStatus: { ...HAWK_STUN, frames } },
   }, "placement"));
   for (let frames = 1; frames <= 64; frames++) assertTrue(digest(frames) !== digest(frames + 1));
+});
+
+test("a projectile's expiresInto spec is part of its digest, and an upgrade scales it once while two shots keep sharing it [k2 property]", () => {
+  const flame = KOBOLD_SPECIALS.neutral.ground.variants?.[2]?.projectiles?.[0];
+  const ember = flame?.expiresInto;
+  assertTrue(flame !== undefined && ember !== undefined);
+  if (flame === undefined || ember === undefined) return;
+  const digest = (life: number) => canonicalChecksum(specialProjectileCanonical({ ...flame, expiresInto: { ...ember, life } }, "projectile"));
+  for (let life = 1; life <= 64; life++) assertTrue(digest(life) !== digest(life + 1));
+  const upgraded = upgradeSpecial({ endFrame: 30, projectiles: [flame, { ...flame, spawnFrame: 20 }] }, { damage: 2.0 }).projectiles ?? [];
+  const first = upgraded[0]?.expiresInto;
+  assertTrue(first !== undefined && first === upgraded[1]?.expiresInto);
+  assertEquals(first?.effect.damage, ember.effect.damage * 2.0);
 });
 
 test("a played state's checksum folds exactly its canonical text, in which every value is an integer or exact real [k1 scenario]", () => {

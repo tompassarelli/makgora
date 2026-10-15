@@ -278,6 +278,7 @@ export function specialProjectileCanonical(spec: Readonly<SpecialProjectile>, pr
     real("homing.maxRise", spec.homing.maxRise);
   }
   if (spec.burstInto !== undefined) result.push(specialProjectileCanonical(spec.burstInto, `${prefix}.burstInto`));
+  if (spec.expiresInto !== undefined) result.push(specialProjectileCanonical(spec.expiresInto, `${prefix}.expiresInto`));
   return result.join("");
 }
 

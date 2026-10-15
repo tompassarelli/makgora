@@ -30,6 +30,7 @@ function upgrader(upgrade: ExUpgrade): (move: AuthoredSpecial, recall: boolean) 
       returnEffect: spec.returnEffect === undefined ? undefined : hit(spec.returnEffect),
       pool: spec.pool === undefined ? undefined : { ...spec.pool, growth: f32(spec.pool.growth * reach), maxRadius: f32(spec.pool.maxRadius * reach) },
       burstInto: spec.burstInto === undefined ? undefined : projectile(spec.burstInto),
+      expiresInto: spec.expiresInto === undefined ? undefined : projectile(spec.expiresInto),
     };
     originals.push(spec);
     upgraded.push(result);

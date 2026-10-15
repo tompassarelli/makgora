@@ -25,6 +25,7 @@ import { HurtContact, strikeHurtContact } from "./hurtboxes";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { mainDeckLeft, mainDeckRight, mainDeckZAt, solidSurfaceAt, solidSurfaceCount } from "./stage";
 import { currentTraits } from "./identityTraits";
+import { candleLevel } from "./heroes/koboldCandle";
 import { squareRoot } from "./warcraftMath";
 
 
@@ -47,8 +48,8 @@ export function runningHeroSpecial(f: Readonly<Fighter>): AuthoredSpecial | unde
 }
 
 
-export function specialVariant(_f: Readonly<Fighter>): number {
-  return 0;
+export function specialVariant(f: Readonly<Fighter>): number {
+  return f.character === Character.kobold ? candleLevel(f) : 0;
 }
 
 function requestedSlot(input: Readonly<Controls>): SpecialSlot {
