@@ -16,8 +16,8 @@ const heights = (amount: number) => f32(H * f32(amount));
 
 
 
-const BOLT_SPEED = heights(f32(0.12));
-const BOLT_RETURN = { age: 45, speed: heights(f32(0.14)) };
+export const BOLT_SPEED = heights(f32(0.102));
+export const BOLT_RETURN = { age: 45, speed: heights(f32(0.119)) };
 
 const BOLT_RECALL: AuthoredSpecial = { endFrame: 10, recallsProjectiles: true, landingLag: 10 };
 const BOLT_RADIUS = heights(f32(0.18));
@@ -62,16 +62,18 @@ const HAMMERFALL: AuthoredSpecial = {
 
 
 
-const CLAP_REACH = heights(f32(0.85));
+export const CLAP_REACH = heights(f32(0.7225));
+export const CLAP_RADIUS = f32(13.6);
+const WAVE_ART_RADIUS = 16.0;
 const ring = (first: number, damage: number): readonly MoveRegion[] => [
-  heroRegion(first, first + 3, capsule(0.0, 14.0, f32(CLAP_REACH - 16.0), 14.0, 16.0), hit(damage, "LAUNCH", 70, false, HitElement.electric)),
-  heroRegion(first, first + 3, capsule(0.0, 14.0, -f32(CLAP_REACH - 16.0), 14.0, 16.0), hit(damage, "LAUNCH", 70, true, HitElement.electric)),
+  heroRegion(first, first + 3, capsule(0.0, 14.0, f32(CLAP_REACH - CLAP_RADIUS), 14.0, CLAP_RADIUS), hit(damage, "LAUNCH", 70, false, HitElement.electric)),
+  heroRegion(first, first + 3, capsule(0.0, 14.0, -f32(CLAP_REACH - CLAP_RADIUS), 14.0, CLAP_RADIUS), hit(damage, "LAUNCH", 70, true, HitElement.electric)),
 ];
-const WAVE_SPEED = heights(f32(0.10));
+const WAVE_SPEED = heights(f32(0.085));
 const wave = (spawnFrame: number, sign: number): SpecialProjectile => ({
   model: "Abilities\\Spells\\Orc\\Shockwave\\ShockwaveMissile.mdx",
   spawnFrame, offsetX: f32(sign * CLAP_REACH), offsetZ: 14.0, velocityX: f32(sign * WAVE_SPEED), velocityZ: 0.0, activeFrom: 6,
-  life: 24, radius: 16.0, effect: hit(7.5648298263549805, "LAUNCH", 75, false, HitElement.electric), reflectable: true, limit: 1,
+  life: 24, radius: CLAP_RADIUS, modelRadius: WAVE_ART_RADIUS, effect: hit(7.5648298263549805, "LAUNCH", 75, false, HitElement.electric), reflectable: true, limit: 1,
 });
 const WAVES = (spawnFrame: number) => [wave(spawnFrame, 1), wave(spawnFrame, -1)];
 

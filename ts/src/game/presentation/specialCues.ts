@@ -463,7 +463,7 @@ export const HERO_BRANCH_CUES: { readonly [character: number]: { readonly [slot 
     neutral: { recall: branch("Storm Bolt recall", STORM, cue("Abilities\\Spells\\Orc\\LightningShield\\LightningShieldBuff.mdx", "hand", f32(0.8))) },
     up: { followUps: [branch("Hammerfall", STORM, cue("Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdx", "feet", f32(0.6)))] },
 
-    down: { followUps: [branch("Small Clap", STORM, { ...cue("Abilities\\Spells\\Orc\\EarthQuake\\EarthquakeTarget.mdx", "feet", f32(0.3)), sound: "ThunderClap" }), "slot", "none"] },
+    down: { followUps: [branch("Small Clap", STORM, { ...cue("Abilities\\Spells\\Orc\\EarthQuake\\EarthquakeTarget.mdx", "feet", f32(0.255)), sound: "ThunderClap" }), "slot", "none"] },
   },
   [Character.warden]: {
     side: { marked: branch("Shadow Pursuit", SHADOW, cue("Abilities\\Spells\\NightElf\\ShadowStrike\\ShadowStrike.mdx", "body", f32(0.7))) },

@@ -14,6 +14,7 @@ import { projectedProjectile } from "../presentation/projectilePose";
 import { IMPACT_DEFILE_MODEL } from "../assets/impactAssetInfo";
 import { heroProjectileArt } from "../presentation/projectileArt";
 import { definitiveCues } from "./specialCueEffects";
+import { carrierDrawsMark } from "../presentation/ultimateVoice";
 import { ARENA_CAMERA } from "../presentation/arenaCamera";
 import { cosineTurns, sineTurns } from "../sim/mathTables";
 
@@ -346,6 +347,10 @@ export class ProjectilePresentation {
     for (let index = 0; index < this.models.length; index++) taken[index] = false;
     for (let index = 0; index < PROJECTILE_CAPACITY; index++) {
       if (this.aimedShot.length > 0 && fighter?.projectiles[index]?.spec === FIGHTER_ULTIMATES[Character.rifleman]?.projectiles?.[0]) {
+        this.assigned[index] = -1;
+        continue;
+      }
+      if (carrierDrawsMark(fighter?.projectiles[index]?.spec)) {
         this.assigned[index] = -1;
         continue;
       }

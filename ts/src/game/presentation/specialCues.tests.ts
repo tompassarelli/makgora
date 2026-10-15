@@ -1,7 +1,10 @@
 
 
 
-import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
+import { assertEquals, assertNear, assertTrue, test } from "wisp/src/runtime/testing";
+import { f32 } from "wisp/src/sim/f32";
+import { HERO_REFERENCE_HEIGHT } from "../sim/heroMoves";
+import { MOUNTAIN_KING_SPECIALS } from "../sim/heroes/mountainKingSpecials";
 import { Character, SpecialAction } from "../sim/codes";
 import { createFighter } from "../sim/fighter";
 import { HERO_ROSTER } from "../sim/heroes/registry";
@@ -77,4 +80,13 @@ test("the Lich's Death and Decay casts without his frost cue and Frost Armor win
   const frost = lich.neutral.startup.model;
   for (const cue of [lich.side.startup, lich.side.active]) assertEquals(cue.model === frost, false, `Death and Decay shows ${cue.model}`);
   assertEquals(lich.down.startup.model.includes("DarkRitual"), false, `Frost Armor winds up with ${lich.down.startup.model}`);
+});
+
+test("Thunder Clap's ring and Small Clap art shrink to 0.85x with the hitbox [k2 property]", () => {
+  const reach = MOUNTAIN_KING_SPECIALS.down.ground.regions?.[0]?.hit.maxX ?? 0.0;
+  assertNear(HERO_CUES[Character.mountainKing]?.down.active.scale ?? 0.0, f32(f32(0.85) * f32(f32(HERO_REFERENCE_HEIGHT * f32(0.85)) / f32(187.05800313601685))), f32(0.001));
+  assertNear(HERO_CUES[Character.mountainKing]?.down.active.scale ?? 0.0, f32(reach / f32(187.05800313601685)), f32(0.0001));
+  const small = HERO_BRANCH_CUES[Character.mountainKing]?.down?.followUps?.[0];
+  assertTrue(small !== undefined && small !== "slot" && small !== "none");
+  if (small !== undefined && small !== "slot" && small !== "none") assertNear(small.active.scale, f32(f32(0.85) * f32(0.3)), f32(0.001));
 });
