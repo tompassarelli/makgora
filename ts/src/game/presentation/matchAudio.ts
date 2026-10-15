@@ -2,6 +2,7 @@
 
 
 import { at } from "wisp/src/runtime/lookup";
+import { floorMod } from "wisp/src/sim/intMath";
 import { IMPORTED_MENU_MUSIC } from "../assets/importedMusicInfo";
 import { Character } from "../sim/codes";
 import { type StageTile, selectableStage } from "../menu/stageCatalog";
@@ -9,6 +10,7 @@ import { type StageTile, selectableStage } from "../menu/stageCatalog";
 
 export const MatchCue = {
   three: 0, two: 1, one: 2, go: 3, game: 4, time: 5, stockLost: 6, lastStock: 7, hover: 8, confirm: 9, cheer: 10, meterReady: 11, itemSpawn: 12,
+  candleDrop: 13, candleSnuff: 14, candleReturn: 15, candleRelight: 16,
 } as const;
 export type MatchCue = (typeof MatchCue)[keyof typeof MatchCue];
 
@@ -16,23 +18,41 @@ export type MatchCue = (typeof MatchCue)[keyof typeof MatchCue];
 
 
 
-const CUE_SOUNDS: readonly string[] = [
-  "Sound\\Interface\\BattleNetTick.flac",
-  "Sound\\Interface\\BattleNetTick.flac",
-  "Sound\\Interface\\BattleNetTick.flac",
-  "Sound\\Interface\\GameFound.flac",
-  "Sound\\Cinematics\\BellTollAlliance.flac",
-  "Sound\\Cinematics\\BellTollAlliance.flac",
-  "Sound\\Interface\\BattleNetDeath1.flac",
-  "Sound\\Interface\\Warning.flac",
-  "Sound\\Interface\\MouseOver1.flac",
-  "Sound\\Interface\\BigButtonClick.flac",
-  "Sound\\Cinematics\\CrowdCheer1.flac",
-  "Sound\\Interface\\ItemReceived.flac",
-  "Sound\\Interface\\Hint.flac",
+const KOBOLD_VOICE = ["Units\\Creeps\\Kobold\\", "Kobold", "What", "YesAttack"] as const;
+
+const koboldLines = (line: string, count: number): string[] =>
+  Array.from({ length: count }, (_, index) => `${KOBOLD_VOICE[0]}${KOBOLD_VOICE[1]}${line}${index + 1}.flac`);
+
+const CUE_SOUNDS: readonly (readonly string[])[] = [
+  ["Sound\\Interface\\BattleNetTick.flac"],
+  ["Sound\\Interface\\BattleNetTick.flac"],
+  ["Sound\\Interface\\BattleNetTick.flac"],
+  ["Sound\\Interface\\GameFound.flac"],
+  ["Sound\\Cinematics\\BellTollAlliance.flac"],
+  ["Sound\\Cinematics\\BellTollAlliance.flac"],
+  ["Sound\\Interface\\BattleNetDeath1.flac"],
+  ["Sound\\Interface\\Warning.flac"],
+  ["Sound\\Interface\\MouseOver1.flac"],
+  ["Sound\\Interface\\BigButtonClick.flac"],
+  ["Sound\\Cinematics\\CrowdCheer1.flac"],
+  ["Sound\\Interface\\ItemReceived.flac"],
+  ["Sound\\Interface\\Hint.flac"],
+  koboldLines("Pissed", 4),
+  ["Abilities\\Spells\\Undead\\FrostArmor\\FrostArmorTarget1.flac"],
+  koboldLines("Yes", 3),
+  ["Abilities\\Spells\\Human\\InnerFire\\InnerFireBirth.flac"],
 ];
 
-export const cueSound = (cue: MatchCue): string => at(CUE_SOUNDS, cue);
+export function cueSound(cue: MatchCue, serial = 0): string {
+  const variants = at(CUE_SOUNDS, cue);
+  return at(variants, floorMod(serial, variants.length));
+}
+
+const cueSoundPaths = (): string[] => {
+  const paths: string[] = [];
+  for (const variants of CUE_SOUNDS) paths.push(...variants);
+  return paths;
+};
 
 
 
@@ -134,7 +154,7 @@ const VOICES: Readonly<Record<Exclude<Character, typeof Character.medivh>, reado
   19: ["Units\\Creeps\\HeroTinker\\","HeroTinker"],
   20: ["Units\\Human\\Kael\\","Kael"],
   21: ["Units\\Creeps\\Murloc\\", "Murloc", "Ready", "YesAttack"],
-  26: ["Units\\Creeps\\Kobold\\", "Kobold", "What", "YesAttack"],
+  26: KOBOLD_VOICE,
   22: ["Units\\Orc\\Hellscream\\", "Grom"],
   24: ["Units\\NightElf\\Furion\\", "Furion", "What"],
 };
@@ -188,13 +208,13 @@ export const victoryAnimation = (character: Character): string => VICTORY_ANIMAT
 
 
 export function interfaceSoundPaths(characters: readonly Character[]): string[] {
-  const paths = [...CUE_SOUNDS];
+  const paths = cueSoundPaths();
   for (const character of characters) paths.push(readyVoice(character), warcryVoice(character));
   return paths.filter((path, index) => paths.indexOf(path) === index);
 }
 
 export function presentationSoundPaths(characters: readonly Character[], stages: readonly StageTile[]): string[] {
-  const paths = [...CUE_SOUNDS, MENU_MUSIC, ...VICTORY_MUSIC];
+  const paths = [...cueSoundPaths(), MENU_MUSIC, ...VICTORY_MUSIC];
   for (const stage of stages) paths.push(stageMusic(stage));
   for (const character of characters) paths.push(readyVoice(character), warcryVoice(character));
   if (characters.includes(Character.peon)) paths.push(JOB_DONE_VOICE);

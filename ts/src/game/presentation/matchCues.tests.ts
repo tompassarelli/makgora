@@ -3,9 +3,11 @@ import { IMPORTED_MENU_MUSIC } from "../assets/importedMusicInfo";
 import { VERIFIED_STOCK_SOUNDS } from "../../generated/assets/stockSoundInfo";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
 import { executeNext, testMatch } from "../match/testMatch";
+import { captureReplaySnapshot, createReplaySnapshot, restoreReplaySnapshot } from "../replay/snapshot";
 import { Phase } from "../match/rules";
 import { Character } from "../sim/codes";
 import { SELECTABLE_CHARACTERS } from "../sim/heroes/registry";
+import type { Fighter } from "../sim/fighter";
 import { fighterAt } from "../sim/roster";
 import { MENU_MUSIC, MatchCue, cueSound, presentationSoundPaths, readyVoice, stageMusic, victoryMusic, warcryVoice } from "./matchAudio";
 import {
@@ -42,10 +44,11 @@ test("every selectable stage plays its own stock Warcraft track [k3 measure docs
 });
 
 
-function presentFrame(match: TestMatch, observation: CueObservation, tally: MatchTally, cues: MatchCue[]): void {
+function presentFrame(match: TestMatch, observation: CueObservation, tally: MatchTally, cues: MatchCue[], serials: number[] = [], simulated?: (candle: Fighter["candle"]) => void): void {
   observeForCues(observation, match.game, match.world);
   executeNext(match);
-  confirmedFrameCues(observation, match.game, match.world, tally, cues);
+  simulated?.(fighterAt(match.world, 0).candle);
+  confirmedFrameCues(observation, match.game, match.world, tally, cues, serials);
 }
 
 
@@ -81,4 +84,41 @@ test("knockouts, the last stock and GAME! each cue once, on their confirmed fram
   assertEquals(view.winner, Character.rifleman);
   assertEquals(view.rows.length, 2);
   assertTrue(view.rows[0]?.winner === true && view.rows[0]?.slot === 0);
+});
+
+test("a Kobold's candle drop, snuff and return each cue once on their confirmed frame, and a rolled-back drop never plays [k1 scenario]", () => {
+  const match = testMatch(3, Character.kobold);
+  const observation = createCueObservation();
+  const tally = createMatchTally();
+  const cues: MatchCue[] = [];
+  const serials: number[] = [];
+  presentFrame(match, observation, tally, cues, serials);
+  const confirmed = createReplaySnapshot();
+  captureReplaySnapshot(confirmed, match.world, match.game, match.inputs, match.runtime);
+  executeNext(match);
+  fighterAt(match.world, 0).candle.dropSerial++;
+  executeNext(match);
+  restoreReplaySnapshot(confirmed, match.world, match.game, match.inputs, match.runtime);
+  presentFrame(match, observation, tally, cues, serials);
+  assertEquals(cues.length, 0, "the rolled-back drop is not confirmed");
+  presentFrame(match, observation, tally, cues, serials, candle => candle.dropSerial++);
+  assertEquals(cues.join(","), `${MatchCue.candleDrop}`);
+  assertEquals(cueSound(MatchCue.candleDrop, serials[0]), cueSound(MatchCue.candleDrop, fighterAt(match.world, 0).candle.dropSerial));
+  presentFrame(match, observation, tally, cues, serials);
+  assertEquals(cues.length, 0, "a drop cues once");
+  presentFrame(match, observation, tally, cues, serials, candle => candle.snuffSerial++);
+  assertEquals(cues.join(","), `${MatchCue.candleSnuff}`);
+  presentFrame(match, observation, tally, cues, serials, candle => {
+    candle.heat = 90;
+    candle.returnSerial++;
+  });
+  assertEquals(cues.join(","), `${MatchCue.candleReturn}`, "a pickup keeps its flame and does not relight");
+  presentFrame(match, observation, tally, cues, serials, candle => {
+    candle.heat = 0;
+    candle.returnSerial++;
+  });
+  assertEquals(cues.join(","), `${MatchCue.candleReturn},${MatchCue.candleRelight}`);
+  presentFrame(match, observation, tally, cues, serials);
+  assertEquals(cues.length, 0, "a return cues once");
+  assertFalse(cueSound(MatchCue.candleDrop, 1) === cueSound(MatchCue.candleDrop, 2));
 });
