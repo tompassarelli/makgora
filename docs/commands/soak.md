@@ -40,9 +40,15 @@
   computer level, each seed twice with state hashes every 600 frames; `--merge FILES
   --report-dir DIR` classifies them into one report and one body per finding kind:
   matches still in play at the frame cap, stuck matches (no damage or stock change for
-  `--stuck-seconds`, 30), zero-to-death strings of three or more hits, true combos over
-  #83's rule (more than two follow-ups, or two or more moves over 30% from below 100%,
-  with no actionable frame between them; one move instance's hits count once), fighter
+  `--stuck-seconds`, 30), zero-to-death strings of three or more hits, strings of two or more
+  true moves (no actionable frame between them; one move instance's hits count once)
+  branched over every victim option (smashcraft#10 C12): `true-chain` (more than
+  `--chain-max`, 2, follow-ups no option escapes), `low-agency-link` (a later
+  follow-up escaped by under `--escape-floor`, 0.2, of options), `long-no-control`
+  (links each under that floor for over `--control-seconds`, 2.5) and `loop` (a
+  block repeated `--loop-repeats`, 3, times with the escape not rising), each naming
+  its causing move property, over the `--agency-strings` (6) longest strings a match;
+  fighter
   win rate outside 35-65%, a move over half its fighter's KOs, a move whose usage share
   passes its fighter's Tukey fence (Q3 + 3 IQR) and 30% over 100 starts, stages with no
   stock lost, and runs whose hashes differ. `--repro N` replays match `N`. The nightly

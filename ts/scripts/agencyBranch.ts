@@ -1,4 +1,3 @@
-import { parseArgs } from "node:util";
 import { stateChecksum } from "../src/game/replay/canonical";
 import { type ReplayState, captureReplaySnapshot, createReplaySnapshot, restoreReplaySnapshot } from "../src/game/replay/snapshot";
 import { clearAttackBuffer } from "../src/game/input/attackBuffer";
@@ -9,10 +8,9 @@ import { isCpuTier } from "../src/game/match/cpuProfiles";
 import { observeDamageContacts } from "../src/game/sim/contacts";
 import { selectableCharacterBySlug } from "../src/game/sim/heroes/registry";
 import { type Controls, copyControls, fighterAt, neutralControls } from "../src/game/sim/roster";
-import { type OptionWeights, type BranchOutcome, conversion, linkEscape } from "./agencyCore";
+import { type AgencyLink, type AgencyString, type OptionWeights, type BranchOutcome, conversion, linkEscape } from "./agencyCore";
 import { type FieldMatch, openFieldMatch } from "./cpuField";
-import { DEFAULT_CONFIG, type Combo, type MatchSpec, planMatches } from "./playtestCore";
-import { ROSTER, playReal } from "./playtest";
+import type { Combo, MatchSpec } from "./playtestCore";
 
 const NEUTRAL = neutralControls();
 
@@ -65,27 +63,8 @@ export interface BranchPolicy {
 
 export const DEFAULT_POLICY: BranchPolicy = { slack: 12, maxHorizon: 120, weights: {} };
 
-export interface LinkMeasure {
-  /** Index of the hit that opens the link; the link runs to hit `link + 1`. */
-  readonly link: number;
-  readonly frame: number;
-  readonly nextFrame: number;
-  readonly horizon: number;
-  /** The recorded gap to the next hit plus slack exceeded the policy cap, so the escape is measured over a shorter window than the string itself waited. */
-  readonly truncated: boolean;
-  /** Whether the victim computer's own play escaped, which the recorded string says it did not. */
-  readonly computerEscaped: boolean;
-  readonly options: readonly BranchOutcome[];
-  /** Options whose branch ended in the neutral branch's exact state: they changed nothing at this frame. */
-  readonly inert: readonly string[];
-  readonly escape: number;
-}
-
-export interface StringMeasure {
+export interface StringMeasure extends AgencyString {
   readonly spec: MatchSpec;
-  readonly moves: readonly string[];
-  readonly links: readonly LinkMeasure[];
-  readonly conversion: number;
 }
 
 const advance = (opened: FieldMatch, victim: Slot, press: ((input: Controls) => void) | undefined): number => {
@@ -115,6 +94,7 @@ interface Branch {
 function runBranch(opened: FieldMatch, from: ReplayState, scratch: ReplayState, victim: Slot, horizon: number, hit: () => boolean, option: VictimOption | undefined): Branch {
   const { match, world, controls, runtime } = opened;
   restoreReplaySnapshot(from, world, match, controls, runtime);
+  opened.row.frame = -1;
   const away = Math.sign(fighterAt(world, victim).motion.x - fighterAt(world, 1 - victim as Slot).motion.x) || 1;
   let hitAgain = false;
   for (let k = 1; k <= horizon && !hitAgain; k++) {
@@ -125,86 +105,76 @@ function runBranch(opened: FieldMatch, from: ReplayState, scratch: ReplayState, 
   return { escaped: !hitAgain, end: stateChecksum(scratch) };
 }
 
-/** Replays the recorded match to each hit of the string, then branches every victim option from the state just after it. */
-export function measureString(spec: MatchSpec, combo: Combo, frameCap: number, policy: BranchPolicy = DEFAULT_POLICY): StringMeasure {
+/** Replays the recorded match once to each hit of every string in it, then branches every victim option from the state just after each hit. */
+export function measureCombos(spec: MatchSpec, combos: readonly Combo[], frameCap: number, policy: BranchPolicy = DEFAULT_POLICY): StringMeasure[] {
+  if (combos.length === 0) return [];
   const a = selectableCharacterBySlug(spec.a);
   const b = selectableCharacterBySlug(spec.b);
   if (a === undefined || b === undefined || !isCpuTier(spec.tier)) throw new Error(`cannot play ${spec.a} against ${spec.b} at ${spec.tier}`);
   const opened = openFieldMatch(a, b, spec.stage, 0, { tiers: [spec.tier, spec.tier], frameCap, playtest: true }, spec.seed);
   if (opened === undefined) throw new Error(`no spawn for ${spec.stage}`);
-  const victim: Slot = combo.victim === 0 ? 0 : 1;
-  const linkFrames = combo.hitFrames.slice(0, -1);
-  const last = combo.hitFrames.at(-1) ?? 0;
+  const wanted = new Set(combos.flatMap((combo) => combo.hitFrames.slice(0, -1)));
+  const last = Math.max(...combos.map((combo) => combo.hitFrames.at(-1) ?? 0));
   const snapshots = new Map<number, ReplayState>();
-  let contact = false;
+  const hitAt: Set<number>[] = [new Set(), new Set()];
+  const contact = [false, false];
   observeDamageContacts((source, target) => {
-    if (target === victim && source !== target) contact = true;
+    if ((target === 0 || target === 1) && source !== target) contact[target] = true;
   });
   try {
-    const hits = new Set<number>();
     let frame = 0;
     while (frame < last) {
-      contact = false;
-      frame = advance(opened, victim, undefined);
-      if (contact) hits.add(frame);
-      if (linkFrames.includes(frame)) {
+      contact[0] = false;
+      contact[1] = false;
+      frame = advance(opened, 0, undefined);
+      for (const slot of [0, 1]) if (contact[slot]) hitAt[slot]?.add(frame);
+      if (wanted.has(frame)) {
         const snapshot = createReplaySnapshot();
         captureReplaySnapshot(snapshot, opened.world, opened.match, opened.controls, opened.runtime);
         snapshots.set(frame, snapshot);
       }
     }
-    const missing = combo.hitFrames.filter((at) => !hits.has(at));
-    if (missing.length > 0) throw new Error(`replay of ${spec.a} v ${spec.b} seed ${spec.seed} lost hits at frames ${missing.join(", ")}`);
     const scratch = createReplaySnapshot();
-    const links: LinkMeasure[] = [];
-    for (const [link, frame] of linkFrames.entries()) {
-      const from = snapshots.get(frame);
-      const nextFrame = combo.hitFrames[link + 1];
-      if (from === undefined || nextFrame === undefined) continue;
-      const wanted = nextFrame - frame + policy.slack;
-      const horizon = Math.min(policy.maxHorizon, wanted);
-      const play = (option: VictimOption | undefined): Branch => {
-        contact = false;
-        return runBranch(opened, from, scratch, victim, horizon, () => contact, option);
-      };
-      const computer = play(undefined);
-      const neutral = play(VICTIM_OPTIONS[0]);
-      const options: BranchOutcome[] = [{ option: "neutral", escaped: neutral.escaped }];
-      const inert: string[] = [];
-      for (const option of VICTIM_OPTIONS.slice(1)) {
-        const branch = play(option);
-        if (branch.end === neutral.end) inert.push(option.id);
-        else options.push({ option: option.id, escaped: branch.escaped });
+    return combos.map((combo): StringMeasure => {
+      const victim: Slot = combo.victim === 0 ? 0 : 1;
+      const missing = combo.hitFrames.filter((at) => !hitAt[victim]?.has(at));
+      if (missing.length > 0) throw new Error(`replay of ${spec.a} v ${spec.b} seed ${spec.seed} lost hits at frames ${missing.join(", ")}`);
+      const links: AgencyLink[] = [];
+      for (const [link, frame] of combo.hitFrames.slice(0, -1).entries()) {
+        const from = snapshots.get(frame);
+        const nextFrame = combo.hitFrames[link + 1];
+        if (from === undefined || nextFrame === undefined) continue;
+        const window = nextFrame - frame + policy.slack;
+        const horizon = Math.min(policy.maxHorizon, window);
+        const play = (option: VictimOption | undefined): Branch => {
+          contact[victim] = false;
+          return runBranch(opened, from, scratch, victim, horizon, () => contact[victim] === true, option);
+        };
+        const computer = play(undefined);
+        const neutral = play(VICTIM_OPTIONS[0]);
+        const options: BranchOutcome[] = [{ option: "neutral", escaped: neutral.escaped }];
+        const inert: string[] = [];
+        for (const option of VICTIM_OPTIONS.slice(1)) {
+          const branch = play(option);
+          if (branch.end === neutral.end) inert.push(option.id);
+          else options.push({ option: option.id, escaped: branch.escaped });
+        }
+        const within = combo.instances[link] === combo.instances[link + 1] && combo.moves[link] === combo.moves[link + 1];
+        links.push({ link, frame, nextFrame, horizon, truncated: window > horizon, within, computerEscaped: computer.escaped, options, inert, escape: linkEscape(options, policy.weights) });
       }
-      links.push({ link, frame, nextFrame, horizon, truncated: wanted > horizon, computerEscaped: computer.escaped, options, inert, escape: linkEscape(options, policy.weights) });
-    }
-    return { spec, moves: combo.moves, links, conversion: conversion(links.map((link) => link.escape)) };
+      let dealt = combo.start;
+      const percents = combo.damages.map((damage) => (dealt += damage));
+      const attacker = combo.victim === 0 ? spec.b : spec.a;
+      const victimName = combo.victim === 0 ? spec.a : spec.b;
+      return { spec, attacker, victim: victimName, moves: combo.moves, instances: combo.instances, percents, links, conversion: conversion(links.map((link) => link.escape)) };
+    });
   } finally {
     observeDamageContacts(undefined);
   }
 }
 
-if (import.meta.main) {
-  const { values } = parseArgs({
-    args: process.argv.slice(2),
-    options: { first: { type: "string" }, count: { type: "string" }, repro: { type: "string" }, "min-hits": { type: "string" }, "max-strings": { type: "string" }, slack: { type: "string" }, horizon: { type: "string" }, out: { type: "string" } },
-    strict: true,
-  });
-  const policy: BranchPolicy = { ...DEFAULT_POLICY, slack: Number(values.slack ?? DEFAULT_POLICY.slack), maxHorizon: Number(values.horizon ?? DEFAULT_POLICY.maxHorizon) };
-  const specs = values.repro === undefined ? planMatches(ROSTER, Number(values.first ?? 0), Number(values.count ?? 1)) : planMatches(ROSTER, Number(values.repro), 1);
-  const minHits = Number(values["min-hits"] ?? 2);
-  let budget = Number(values["max-strings"] ?? 20);
-  const measured: StringMeasure[] = [];
-  for (const spec of specs) {
-    const observed = playReal(spec, DEFAULT_CONFIG.frameCap);
-    for (const combo of observed.combos) {
-      if (budget <= 0 || combo.hitFrames.length < minHits) continue;
-      budget--;
-      measured.push(measureString(spec, combo, DEFAULT_CONFIG.frameCap, policy));
-    }
-  }
-  const text = JSON.stringify(measured, null, 1);
-  if (values.out === undefined) console.log(text);
-  else await Bun.write(values.out, `${text}\n`);
-  console.error(`${measured.length} strings, ${measured.reduce((sum, string) => sum + string.links.length, 0)} links`);
-}
+export const measureString = (spec: MatchSpec, combo: Combo, frameCap: number, policy: BranchPolicy = DEFAULT_POLICY): StringMeasure => {
+  const [measured] = measureCombos(spec, [combo], frameCap, policy);
+  if (measured === undefined) throw new Error("no string measured");
+  return measured;
+};

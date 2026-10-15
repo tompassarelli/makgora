@@ -4,8 +4,10 @@ import { parseArgs } from "node:util";
 import { Schema } from "effect";
 import { CPU_TIERS, isCpuTier } from "../src/game/match/cpuProfiles";
 import { SELECTABLE_CHARACTERS, fighterSlug, selectableCharacterBySlug } from "../src/game/sim/heroes/registry";
+import { measureCombos } from "./agencyBranch";
+import type { AgencyString } from "./agencyCore";
 import { FIELD_STAGES, moveName, playCpuMatch, reportedMove } from "./cpuField";
-import { DEFAULT_CONFIG, FINDING_KINDS, classify, describeIssueAction, issueBody, planIssueActions, planMatches, renderReport, runPlaytest, shardRanges, shardsFor, type Config, type Finding, type MatchSpec, type Observation, type Play, type Run } from "./playtestCore";
+import { DEFAULT_CONFIG, FINDING_KINDS, agencyCandidates, classify, describeIssueAction, issueBody, planIssueActions, planMatches, renderReport, runPlaytest, shardRanges, shardsFor, type Config, type Finding, type MatchSpec, type Observation, type Play, type Run } from "./playtestCore";
 
 const CHECKSUM_EVERY = 600;
 
@@ -14,6 +16,13 @@ const FindingsSchema = Schema.Array(Schema.Struct({
   kind: Schema.Literals(FINDING_KINDS), subject: Schema.String, detail: Schema.String, spec: Schema.optional(SpecSchema), frame: Schema.optional(Schema.Finite),
 }));
 const readJson = (file: string): unknown => JSON.parse(readFileSync(file, "utf8"));
+const AgencySchema = Schema.Struct({
+  attacker: Schema.String, victim: Schema.String, moves: Schema.Array(Schema.String), instances: Schema.Array(Schema.Finite), percents: Schema.Array(Schema.Finite), conversion: Schema.Finite,
+  links: Schema.Array(Schema.Struct({
+    link: Schema.Finite, frame: Schema.Finite, nextFrame: Schema.Finite, horizon: Schema.Finite, truncated: Schema.Boolean, within: Schema.Boolean, computerEscaped: Schema.Boolean,
+    options: Schema.Array(Schema.Struct({ option: Schema.String, escaped: Schema.Boolean })), inert: Schema.Array(Schema.String), escape: Schema.Finite,
+  })),
+});
 const ObservationSchema = Schema.Struct({
   frames: Schema.Finite, ended: Schema.Boolean, winner: Schema.NullOr(Schema.Finite), timedOut: Schema.Boolean, stockLosses: Schema.Finite,
   strings: Schema.Array(Schema.Struct({ victim: Schema.Finite, frame: Schema.Finite, hits: Schema.Finite, damage: Schema.Finite, gaps: Schema.Array(Schema.Finite), tail: Schema.Finite })),
@@ -24,6 +33,7 @@ const ObservationSchema = Schema.Struct({
     victim: Schema.Finite, frame: Schema.Finite, start: Schema.Finite, moves: Schema.Array(Schema.String), instances: Schema.Array(Schema.Finite), damages: Schema.Array(Schema.Finite), gaps: Schema.Array(Schema.Finite), hitFrames: Schema.Array(Schema.Finite),
   })),
   quiet: Schema.Struct({ from: Schema.Finite, frames: Schema.Finite }),
+  agency: Schema.optional(Schema.Array(AgencySchema)),
 });
 const RunsSchema = Schema.Array(Schema.Struct({
   spec: SpecSchema,
@@ -37,7 +47,7 @@ export const ROSTER = {
   tiers: CPU_TIERS.map((tier): string => tier),
 };
 
-export const playReal: Play = (spec: MatchSpec, frameCap: number): Observation => {
+export const observeReal: Play = (spec: MatchSpec, frameCap: number): Observation => {
   const a = selectableCharacterBySlug(spec.a);
   const b = selectableCharacterBySlug(spec.b);
   if (a === undefined || b === undefined || !isCpuTier(spec.tier)) throw new Error(`cannot play ${spec.a} against ${spec.b} at ${spec.tier}`);
@@ -57,14 +67,20 @@ export const playReal: Play = (spec: MatchSpec, frameCap: number): Observation =
   };
 };
 
+export const playReal: Play = (spec: MatchSpec, frameCap: number): Observation => {
+  const observed = observeReal(spec, frameCap);
+  const chosen = agencyCandidates(observed.combos, DEFAULT_CONFIG.agencyStrings);
+  return chosen.length === 0 ? observed : { ...observed, agency: measureCombos(spec, chosen, frameCap).map(({ spec: _spec, ...string }): AgencyString => string) };
+};
+
 const configFrom = (values: Record<string, string | boolean | undefined>): Config => {
   const number = (key: string, fallback: number) => (values[key] === undefined ? fallback : Number(values[key]));
   return {
     frameCap: number("cap", DEFAULT_CONFIG.frameCap), minStringHits: number("min-string-hits", DEFAULT_CONFIG.minStringHits),
     winLow: number("win-low", DEFAULT_CONFIG.winLow), winHigh: number("win-high", DEFAULT_CONFIG.winHigh), minDecisive: number("min-decisive", DEFAULT_CONFIG.minDecisive),
     moveShareMax: number("move-share", DEFAULT_CONFIG.moveShareMax), minMoveKos: number("min-move-kos", DEFAULT_CONFIG.minMoveKos), minStageMatches: number("min-stage-matches", DEFAULT_CONFIG.minStageMatches),
-    stuckSeconds: number("stuck-seconds", DEFAULT_CONFIG.stuckSeconds), followUpMax: number("follow-up-max", DEFAULT_CONFIG.followUpMax),
-    guaranteedDamageMax: number("guaranteed-damage-max", DEFAULT_CONFIG.guaranteedDamageMax), guaranteedPercentCap: number("guaranteed-percent-cap", DEFAULT_CONFIG.guaranteedPercentCap),
+    stuckSeconds: number("stuck-seconds", DEFAULT_CONFIG.stuckSeconds), escapeFloor: number("escape-floor", DEFAULT_CONFIG.escapeFloor),
+    controlSeconds: number("control-seconds", DEFAULT_CONFIG.controlSeconds), chainMax: number("chain-max", DEFAULT_CONFIG.chainMax), loopRepeats: number("loop-repeats", DEFAULT_CONFIG.loopRepeats), agencyStrings: number("agency-strings", DEFAULT_CONFIG.agencyStrings),
     usageFence: number("usage-fence", DEFAULT_CONFIG.usageFence), usageShareMin: number("usage-share-min", DEFAULT_CONFIG.usageShareMin), minMoveUses: number("min-move-uses", DEFAULT_CONFIG.minMoveUses),
   };
 };
@@ -78,7 +94,7 @@ if (import.meta.main) {
       issues: { type: "string" }, "dry-run": { type: "boolean" },
       cap: { type: "string" }, "min-string-hits": { type: "string" }, "win-low": { type: "string" }, "win-high": { type: "string" }, "min-decisive": { type: "string" },
       "move-share": { type: "string" }, "min-move-kos": { type: "string" }, "min-stage-matches": { type: "string" },
-      "stuck-seconds": { type: "string" }, "follow-up-max": { type: "string" }, "guaranteed-damage-max": { type: "string" }, "guaranteed-percent-cap": { type: "string" },
+      "stuck-seconds": { type: "string" }, "escape-floor": { type: "string" }, "control-seconds": { type: "string" }, "chain-max": { type: "string" }, "loop-repeats": { type: "string" }, "agency-strings": { type: "string" },
       "usage-fence": { type: "string" }, "usage-share-min": { type: "string" }, "min-move-uses": { type: "string" },
     },
     strict: true,

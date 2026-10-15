@@ -1,3 +1,5 @@
+import { type AgencyRule, type AgencyString, FLAG_KINDS, TICKS_PER_SECOND, flagString } from "./agencyCore";
+
 export interface MatchSpec {
   readonly index: number;
   readonly seed: number;
@@ -20,6 +22,8 @@ export interface Observation {
   readonly uses: readonly { readonly fighter: string; readonly move: string; readonly count: number }[];
   /** Every string of two or more hits. */
   readonly combos: readonly Combo[];
+  /** The strings of `combos` branched over the victim's options, when the run measured them. */
+  readonly agency?: readonly AgencyString[] | undefined;
   /** The longest span with no damage or stock change on either fighter. */
   readonly quiet: { readonly from: number; readonly frames: number };
 }
@@ -66,11 +70,9 @@ export function trueSegments(combo: Combo): Segment[] {
   return segments;
 }
 
-/** #83's rule (docs/gameplay-design.md): at most followUpMax guaranteed follow-ups after an opening, and at most guaranteedDamageMax from an opening and its follow-ups while the victim is below guaranteedPercentCap. One move alone is no combo. */
-export function trueComboBreak(segment: Segment, config: Config): string | undefined {
-  if (segment.moves.length > config.followUpMax + 1) return `more than ${config.followUpMax} follow-ups`;
-  if (segment.moves.length > 1 && segment.damage > config.guaranteedDamageMax && segment.percent < config.guaranteedPercentCap) return `over ${config.guaranteedDamageMax}% from below ${config.guaranteedPercentCap}%`;
-  return undefined;
+/** The strings worth branching: those with a true segment of two or more moves, longest first, at most `limit`. */
+export function agencyCandidates(combos: readonly Combo[], limit: number): Combo[] {
+  return combos.filter((combo) => trueSegments(combo).some((segment) => segment.moves.length > 1)).sort((x, y) => y.hitFrames.length - x.hitFrames.length || x.frame - y.frame).slice(0, limit);
 }
 
 /** Tukey's upper fence over a fighter's move shares. */
@@ -107,7 +109,7 @@ export interface Run {
 
 export type Play = (spec: MatchSpec, frameCap: number) => Observation;
 
-export const FINDING_KINDS = ["never-ends", "stuck", "zero-to-death", "combo-over-limit", "win-rate-band", "move-share", "move-usage", "stage-no-kos", "desync"] as const;
+export const FINDING_KINDS = ["never-ends", "stuck", "zero-to-death", ...FLAG_KINDS, "win-rate-band", "move-share", "move-usage", "stage-no-kos", "desync"] as const;
 export type FindingKind = (typeof FINDING_KINDS)[number];
 
 export interface Finding {
@@ -128,15 +130,17 @@ export interface Config {
   readonly minMoveKos: number;
   readonly minStageMatches: number;
   readonly stuckSeconds: number;
-  readonly followUpMax: number;
-  readonly guaranteedDamageMax: number;
-  readonly guaranteedPercentCap: number;
+  /** The candidate rule numbers, Tom's to pick: the escape floor E, the longest time without control T, the longest true chain, and the repeats that make a loop. */
+  readonly escapeFloor: number;
+  readonly controlSeconds: number;
+  readonly chainMax: number;
+  readonly loopRepeats: number;
+  /** Most strings a match branches. */
+  readonly agencyStrings: number;
   readonly usageFence: number;
   readonly usageShareMin: number;
   readonly minMoveUses: number;
 }
-
-const TICKS_PER_SECOND = 60;
 
 export const DEFAULT_CONFIG: Config = {
   frameCap: 14700,
@@ -148,9 +152,11 @@ export const DEFAULT_CONFIG: Config = {
   minMoveKos: 15,
   minStageMatches: 5,
   stuckSeconds: 30,
-  followUpMax: 2,
-  guaranteedDamageMax: 30,
-  guaranteedPercentCap: 100,
+  escapeFloor: 0.2,
+  controlSeconds: 2.5,
+  chainMax: 2,
+  loopRepeats: 3,
+  agencyStrings: 6,
   usageFence: 3,
   usageShareMin: 0.3,
   minMoveUses: 100,
@@ -226,6 +232,8 @@ export function firstDivergence(x: Observation, y: Observation): number | undefi
 
 const byRank = (x: Finding, y: Finding) => (x.kind === y.kind ? (x.spec?.index ?? 0) - (y.spec?.index ?? 0) || x.subject.localeCompare(y.subject) : FINDING_KINDS.indexOf(x.kind) - FINDING_KINDS.indexOf(y.kind));
 
+export const agencyRule = (config: Config): AgencyRule => ({ escapeFloor: config.escapeFloor, controlFrames: config.controlSeconds * TICKS_PER_SECOND, chainMax: config.chainMax, loopRepeats: config.loopRepeats });
+
 export function classify(runs: readonly Run[], config: Config = DEFAULT_CONFIG): Finding[] {
   const findings: Finding[] = [];
   const wins = new Map<string, { wins: number; decisive: number }>();
@@ -239,12 +247,10 @@ export function classify(runs: readonly Run[], config: Config = DEFAULT_CONFIG):
     if (first.quiet.frames >= config.stuckSeconds * TICKS_PER_SECOND) {
       findings.push({ kind: "stuck", subject: matchId(spec), spec, frame: first.quiet.from, detail: `no damage or stock change for ${(first.quiet.frames / TICKS_PER_SECOND).toFixed(1)} s from frame ${first.quiet.from}` });
     }
-    for (const combo of first.combos) {
-      const attacker = combo.victim === 0 ? spec.b : spec.a;
-      const victim = combo.victim === 0 ? spec.a : spec.b;
-      const worst = trueSegments(combo).filter((segment) => trueComboBreak(segment, config) !== undefined).sort((x, y) => y.moves.length - x.moves.length || y.damage - x.damage)[0];
-      if (worst === undefined) continue;
-      findings.push({ kind: "combo-over-limit", subject: matchId(spec), spec, frame: combo.frame, detail: `${attacker} hit ${victim} with ${worst.moves.length} moves (${worst.moves.join(", ")}) for ${worst.damage.toFixed(1)}% from ${worst.percent.toFixed(1)}% with no actionable frame between them, ${trueComboBreak(worst, config) ?? ""} (#83); the string ended at frame ${combo.frame}` });
+    for (const string of first.agency ?? []) {
+      for (const flag of flagString(string, agencyRule(config))) {
+        findings.push({ kind: flag.kind, subject: matchId(spec), spec, frame: flag.frame, detail: `${string.attacker} hit ${string.victim} with ${string.moves.join(", ")}: ${flag.detail}; caused by ${flag.cause}` });
+      }
     }
     for (const use of first.uses) {
       const moves = uses.get(use.fighter) ?? new Map<string, number>();
@@ -384,7 +390,7 @@ export function renderReport(runs: readonly Run[], findings: readonly Finding[],
     `Wall time ${(s.wallMs / 1000).toFixed(1)} s, ${s.msPerMatch.toFixed(0)} ms a match (both runs), slowest ${s.slowestMs.toFixed(0)} ms.`,
     "",
     `Bands: fighter win rate ${(100 * config.winLow).toFixed(0)}-${(100 * config.winHigh).toFixed(0)}% over at least ${config.minDecisive} decisive matches; a move at most ${(100 * config.moveShareMax).toFixed(0)}% of its fighter's KOs over at least ${config.minMoveKos}; a zero-to-death string is ${config.minStringHits} or more hits with no actionable frame between them; a stage with no KOs needs ${config.minStageMatches} matches; frame cap ${config.frameCap}.`,
-    `Stuck: no damage or stock change for ${config.stuckSeconds} s. Combo over limit (#83, #388): a true combo, with no frame where the victim can act, of more than ${config.followUpMax} follow-ups, or of two or more moves over ${config.guaranteedDamageMax}% from below ${config.guaranteedPercentCap}%. Dominant move: a move whose KO share passes the band above, or whose usage share passes its fighter's Tukey fence (Q3 + ${config.usageFence} IQR) and ${(100 * config.usageShareMin).toFixed(0)}% over at least ${config.minMoveUses} starts.`,
+    `Stuck: no damage or stock change for ${config.stuckSeconds} s. Agency (smashcraft#10 C12), over up to ${config.agencyStrings} true strings a match branched over every victim option: true-chain is more than ${config.chainMax} follow-ups in a row that no victim option escapes; low-agency-link is a later follow-up escaped by under ${(100 * config.escapeFloor).toFixed(0)}% of options; long-no-control is more than ${config.controlSeconds} s of links each under that floor; loop is a block of moves repeated ${config.loopRepeats} times without the escape rising. These are candidate numbers, not a rule. Dominant move: a move whose KO share passes the band above, or whose usage share passes its fighter's Tukey fence (Q3 + ${config.usageFence} IQR) and ${(100 * config.usageShareMin).toFixed(0)}% over at least ${config.minMoveUses} starts.`,
     "",
     "| Finding | Count |",
     "| --- | --- |",
@@ -406,7 +412,10 @@ export const ISSUE_TITLES: Record<FindingKind, string> = {
   "never-ends": "Playtester: matches that never end",
   stuck: "Playtester: stuck matches",
   "zero-to-death": "Playtester: zero-to-death strings",
-  "combo-over-limit": "Playtester: true combos past #83's follow-up or damage limit",
+  "true-chain": "Playtester: true chains past the follow-up limit",
+  "low-agency-link": "Playtester: follow-ups the victim has no real escape from",
+  "long-no-control": "Playtester: strings that leave the victim without control too long",
+  loop: "Playtester: repeating loops that never get easier to escape",
   "win-rate-band": "Playtester: fighters outside the win-rate band",
   "move-share": "Playtester: moves that take most of a fighter's KOs",
   "move-usage": "Playtester: moves a fighter overuses",
@@ -423,7 +432,10 @@ export const ISSUE_TARGETS: Record<FindingKind, number> = {
   "never-ends": AFTER_01,
   stuck: AFTER_01,
   "zero-to-death": FAIR_COMBAT_EPIC,
-  "combo-over-limit": FAIR_COMBAT_EPIC,
+  "true-chain": FAIR_COMBAT_EPIC,
+  "low-agency-link": FAIR_COMBAT_EPIC,
+  "long-no-control": FAIR_COMBAT_EPIC,
+  loop: FAIR_COMBAT_EPIC,
   "win-rate-band": FAIR_COMBAT_EPIC,
   "move-share": AFTER_01,
   "move-usage": AFTER_01,
