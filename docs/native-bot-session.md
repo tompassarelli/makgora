@@ -564,7 +564,7 @@ clock steps; this calibration does not cover GPU/render time, native RSS,
 or native p99. A candidate's computed p99 and worst prediction remain useful
 diagnostics, but #19's 20% guarantee applies to p50 and p95 at this scope.
 
-From Smashcraft's `ts/`, first save the current candidate:
+From Smashcraft's `ts/`, save `build/main.perf` the same way on main, then the current candidate:
 
 ```sh
 bun wisp perf playable-bot-four --samples --out build/frame-cost-candidate.perf
@@ -578,7 +578,7 @@ bun wisp perf native "$cost_refs/exclusive-1791383217845/bot-native-p0.txt" \
   --samples "$cost_refs/bot.perf" --json &&
 bun wisp perf native "$cost_refs/exclusive-1791383217845/bot-four-native-p0.txt" \
   --samples "$cost_refs/bot-four.perf" --json &&
-bun wisp perf compare test/fixtures/perf/playable-bot-four.perf \
+bun wisp perf compare build/main.perf \
   build/frame-cost-candidate.perf --json
 ```
 

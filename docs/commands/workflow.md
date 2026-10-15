@@ -72,4 +72,4 @@ and their local modules, configs, Wisp pin, Lua binary) hash the same reuses
 `ts/build/playtest-cost/HASH.perf`. Play builds skip the prediction (about
 280 s, two more compiles of the game) unless `bun run playtest:build --predict-cost`
 asks for it; an installed playtest built that way keeps both files beside its map. Compare the samples from `ts/` with
-`bun wisp perf compare test/fixtures/perf/playable-bot-four.perf MAP.w3x.lua-cost.perf`.
+`bun wisp perf compare MAIN.perf MAP.w3x.lua-cost.perf`, MAIN.perf from `bun wisp perf playable-bot-four --samples --out MAIN.perf` on main.

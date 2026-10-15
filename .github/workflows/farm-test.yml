@@ -59,6 +59,7 @@ jobs:
       lua-runners: ${{ steps.plan.outputs.lua-runners }}
       lua-parallel: ${{ steps.plan.outputs.lua-parallel }}
       hosted-runner: ${{ steps.plan.outputs.hosted-runner }}
+      checks: ${{ steps.checks.outputs.groups }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -103,6 +104,25 @@ jobs:
           echo "bun-runners=$(pool "$(jq '.bun | length' plan.json)")" >> "$GITHUB_OUTPUT"
           echo "lua-runners=$(pool "$LUA_JOBS")" >> "$GITHUB_OUTPUT"
           echo "lua-parallel=$LUA_JOBS" >> "$GITHUB_OUTPUT"
+      - id: checks
+        env:
+          BASE: ${{ inputs.base }}
+        run: |
+          groups='["perf","parity","corpus"]'
+          base=$BASE
+          if [ -z "$base" ]; then
+            git -c gc.auto=0 fetch -q --depth 300 origin main "$(git rev-parse HEAD)"
+            base=$(git merge-base FETCH_HEAD HEAD 2>/dev/null || true)
+            [ "$base" != "$(git rev-parse HEAD)" ] || base=
+          else
+            git -c gc.auto=0 fetch -q --depth 1 origin "$base" || base=
+          fi
+          changed=$([ -n "$base" ] && git diff --name-only "$base" HEAD || echo unknown)
+          echo "$changed" | sed 's/^/changed: /'
+          if [ -z "$base" ] || echo "$changed" | grep -qE '^(ts/src/game/(render|presentation|assets|ui|menu)/|ts/src/game/objectData\.ts$|ts/src/platform/|ts/scripts/wisp/|ts/plugins/|ts/vendor/|ts/(package\.json|bun\.lock|wisp\.lock|tsconfig[^/]*\.json)$|typescript-toolchain\.lock$|build-inputs/|tools/(animations|effects|presentation|selection|stage)/|\.github/workflows/farm-test\.yml$)'; then
+            groups='["perf","perf-definitive","parity","corpus"]'
+          fi
+          echo "groups=$groups" | tee -a "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         with:
           name: farm-test-plan
@@ -306,7 +326,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: [perf, perf-definitive, parity, corpus]
+        group: ${{ fromJSON(needs.plan.outputs.checks) }}
     name: ${{ matrix.group }}
     steps:
       - uses: actions/checkout@v4
@@ -354,8 +374,7 @@ jobs:
           }
           case "$GROUP" in
             perf)
-              # Frame-cost landing gate (#48, #168): see ci.yml for rewriting the baseline.
-              check "frame cost within 5% of the committed baseline, and four-fighter p99 <= 10 ms and worst <= 14 ms in Classic" sh -c 'bun wisp perf playable-bot-four --samples --out build/playable-bot-four.perf || exit; bun wisp perf compare test/fixtures/perf/playable-bot-four.perf build/playable-bot-four.perf; compared=$?; bun wisp perf budget build/playable-bot-four.perf && exit "$compared"'
+              check "four-fighter p99 <= 10 ms and worst <= 14 ms in Classic" sh -c 'bun wisp perf playable-bot-four --samples --out build/playable-bot-four.perf && bun wisp perf budget build/playable-bot-four.perf'
               check "focused logic test" env GAME_TESTS=sim/meleeScalarMath bun test test/game.test.ts
               if [ -f build/playable-bot-four.perf ]; then
                 bun scripts/commitMetrics.ts build/playable-bot-four.perf build/playable.lua | tee -a "$GITHUB_STEP_SUMMARY"

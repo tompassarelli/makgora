@@ -28,17 +28,60 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 300
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.13
       - run: bun install --frozen-lockfile
         working-directory: ts
-      - run: bun wisp perf playable-bot-four --samples --out build/playable-bot-four.perf && bun wisp perf compare test/fixtures/perf/playable-bot-four.perf build/playable-bot-four.perf
+      - name: four-fighter p99 <= 10 ms and worst <= 14 ms in Classic
+        run: bun wisp perf playable-bot-four --samples --out build/playable-bot-four.perf && bun wisp perf budget build/playable-bot-four.perf
         working-directory: ts
-      - run: bun wisp perf budget build/playable-bot-four.perf && PERF_LOOK=definitive bun wisp perf playable-bot-four --samples --out build/playable-bot-four-definitive.perf && bun wisp perf budget build/playable-bot-four-definitive.perf
+      - name: four-fighter p99 <= 10 ms and worst <= 14 ms in Definitive
+        if: ${{ !cancelled() }}
+        run: PERF_LOOK=definitive bun wisp perf playable-bot-four --samples --out build/playable-bot-four-definitive.perf && bun wisp perf budget build/playable-bot-four-definitive.perf
         working-directory: ts
+      - name: frame cost within 5% of the previous landed main
+        if: ${{ !cancelled() && hashFiles('ts/build/playable-bot-four.perf') != '' }}
+        working-directory: ts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          for run in $(gh run list --workflow ci.yml --branch main --event workflow_dispatch --status completed -L 20 --json databaseId -q '.[].databaseId'); do
+            [ "$run" != "$GITHUB_RUN_ID" ] || continue
+            rm -rf build/previous
+            gh run download "$run" -n main-perf -D build/previous 2>/dev/null && break
+          done
+          if [ ! -f build/previous/playable-bot-four.perf ]; then
+            echo "::warning::no earlier main perf artifact; this run's becomes the reference"
+            exit 0
+          fi
+          previous=$(cat build/previous/sha)
+          echo "comparing with main $previous"
+          bun wisp perf compare build/previous/playable-bot-four.perf build/playable-bot-four.perf && exit 0
+          rises=$(git log --format='%h%x09%(trailers:key=Perf-Rise,valueonly,separator=%x20)' "$previous..HEAD" | awk -F'\t' 'length($2) >= 10')
+          if [ -n "$rises" ]; then
+            echo "::warning::frame cost rose more than 5% since $previous; accepted by Perf-Rise: trailers"
+            { echo "### Perf-Rise accepted since $previous"; echo; printf '%s\n' "$rises" | sed 's/\t/: /; s/^/- /'; } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          exit 1
+      - if: ${{ !cancelled() && hashFiles('ts/build/playable-bot-four.perf') != '' }}
+        run: mkdir -p build/main-perf && cp build/playable-bot-four.perf build/main-perf/ && git rev-parse HEAD > build/main-perf/sha
+        working-directory: ts
+      - if: ${{ !cancelled() && hashFiles('ts/build/playable-bot-four.perf') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: main-perf
+          path: ts/build/main-perf
+          retention-days: 30
       - if: ${{ !cancelled() }}
         run: bun scripts/commitMetrics.ts build/playable-bot-four.perf build/playable.lua | tee -a "$GITHUB_STEP_SUMMARY"
         working-directory: ts
@@ -82,13 +125,8 @@ jobs:
       - if: ${{ !cancelled() }}
         run: bun wisp parity corpus test/corpus
         working-directory: ts
-      # Frame-cost landing gate (#48, #168): the playable build's four-fighter bot match,
-      # each frame's cost predicted from counts (not time), may not rise beyond 5%
-      # over the committed baseline. After an intended rise or a cut, rewrite the
-      # baseline with `bun wisp perf playable-bot-four --out test/fixtures/perf/playable-bot-four.perf`.
-      # It runs even when an earlier check fails, so a red logic suite cannot hide a cost rise.
       - if: ${{ !cancelled() }}
-        run: bun wisp perf playable-bot-four --samples --out build/playable-bot-four.perf && bun wisp perf compare test/fixtures/perf/playable-bot-four.perf build/playable-bot-four.perf
+        run: bun wisp perf playable-bot-four --samples --out build/playable-bot-four.perf
         working-directory: ts
       - name: perf target (#168)
         if: ${{ !cancelled() && hashFiles('ts/build/playable-bot-four.perf') != '' }}

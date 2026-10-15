@@ -7,8 +7,13 @@ The #168 budget gates p99 ≤ 10 ms and worst ≤ 14 ms; CI measures Classic wit
   per frame (p50, p95, worst, typing stall); `bun wisp perf compare A B` fails
   on a 5% rise in instructions (mean or worst 1% mean), predicted cost,
   allocation or typing stall (worst 1% mean). Landing gate (#48):
-  CI holds `playable-bot-four` to smashcraft:ts/test/fixtures/perf/playable-bot-four.perf;
-  after an intended rise or a cut, rewrite that file with `--out` and commit it.
+  each change must hold `playable-bot-four` to the Classic budget below, and
+  Definitive's when a render path changes (smashcraft:.github/workflows/farm-test.yml);
+  after landing, main's smoke run compares it with the previous landed main's
+  `main-perf` artifact and reports a 5% rise as main red. A commit whose message
+  carries a `Perf-Rise: <reason>` trailer stating why accepts an intended rise;
+  the absolute budget still applies, nothing is re-recorded, and the smoke
+  run's summary lists every accepted use.
   Wisp-only acceptance: `bun wisp perf native READINGS --samples FILE --json`
   checks retained solo/four-fighter references within 20% at callback p50/p95;
   then `bun wisp perf compare BASELINE CANDIDATE --json` gates the current
