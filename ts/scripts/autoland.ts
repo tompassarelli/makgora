@@ -1,7 +1,7 @@
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { parseArgs } from "node:util";
-import { JOB_BUDGET, autoclose, issueRefs, pendingChecks, busy, laneRerun, type CiJob, flaggedLanes, pinFamily, resolveConflicts, type Conflict, forecast, judge, landing, parseList, lateLane, looping, pastMain, plan, stalled, stuckRuns, train, trainStep, type Job, type Lane, type Run, type Status, type Tree } from "./autolandCore";
+import { JOB_BUDGET, autoclose, issueRefs, pendingChecks, busy, laneRerun, type CiJob, flaggedLanes, pinFamily, resolveConflicts, type Conflict, forecast, judge, landing, parseList, lateLane, looping, handbackDue, pastMain, plan, stalled, stuckRuns, train, trainStep, type Job, type Lane, type Run, type Status, type Tree } from "./autolandCore";
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null;
 const isStatus = (value: unknown): value is Status => isRecord(value) && typeof value.state === "string" && typeof value.description === "string" && typeof value.at === "string";
@@ -91,6 +91,8 @@ if (import.meta.main) {
     console.log(stalled(readList(values.lanes, isLane), values.landed ?? "", now));
   } else if (command === "flagged") {
     for (const lane of flaggedLanes(readList(values.bodies, isText), readList(values.lanes, isLane))) console.log([lane.branch, lane.tip].join("\t"));
+  } else if (command === "handback") {
+    for (const lane of handbackDue(readList(values.lanes, isLane), now)) console.log([lane.branch, lane.tip].join("\t"));
   } else if (command === "loop") {
     console.log(looping(readList(values.statuses, isText)));
   } else if (command === "past-main") {
@@ -123,7 +125,7 @@ if (import.meta.main) {
   } else if (command === "judge") {
     console.log(judge(Number(values.count), values.green === "true"));
   } else {
-    console.error("usage: autoland.ts plan --lanes FILE --runs FILE [--retry BRANCHES] [--now ISO] | busy --runs FILE [--now ISO] | train --lanes FILE [--now ISO] | judge --count N --green true|false | rerun --jobs FILE --attempt N --count TEST_FAILURES | sweep --runs FILE [--now ISO] | stalled --lanes FILE --landed ISO [--now ISO] | loop --statuses FILE | flagged --bodies FILE --lanes FILE | resolve --conflicts FILE [--store DIR] | refs --messages FILE | checks --body FILE | autoclose --body FILE --sha SHA [--results FILE] | train-step land|retest... | late BRANCH ACTUAL BASE TESTED MAIN... --lanes FILE --retry BRANCHES [--rebased TREE] [--green true|false] | past-main BASE TESTED MAIN... [--rebased TREE] | landing --solo true|false BASE TESTED MAIN... [--rebased TREE] (git ls-tree -r -z files)");
+    console.error("usage: autoland.ts plan --lanes FILE --runs FILE [--retry BRANCHES] [--now ISO] | busy --runs FILE [--now ISO] | train --lanes FILE [--now ISO] | judge --count N --green true|false | rerun --jobs FILE --attempt N --count TEST_FAILURES | sweep --runs FILE [--now ISO] | stalled --lanes FILE --landed ISO [--now ISO] | handback --lanes FILE [--now ISO] | loop --statuses FILE | flagged --bodies FILE --lanes FILE | resolve --conflicts FILE [--store DIR] | refs --messages FILE | checks --body FILE | autoclose --body FILE --sha SHA [--results FILE] | train-step land|retest... | late BRANCH ACTUAL BASE TESTED MAIN... --lanes FILE --retry BRANCHES [--rebased TREE] [--green true|false] | past-main BASE TESTED MAIN... [--rebased TREE] | landing --solo true|false BASE TESTED MAIN... [--rebased TREE] (git ls-tree -r -z files)");
     process.exit(2);
   }
 }

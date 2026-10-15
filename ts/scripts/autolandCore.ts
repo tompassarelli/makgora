@@ -128,7 +128,7 @@ export function judge(lanes: number, green: boolean): Verdict {
 }
 
 const MINUTE = 60_000;
-export const BOUND = { pending: 5, noRunner: 5, hostedQueue: 20, job: 15, test: 30, run: 45, force: 60, idle: 30 } as const;
+export const BOUND = { pending: 5, noRunner: 5, hostedQueue: 20, job: 15, test: 30, run: 45, force: 60, idle: 30, handback: 10 } as const;
 export const LOOP_TESTS = 3;
 const HOSTED = /^(ubuntu|windows|macos)-/;
 
@@ -335,3 +335,8 @@ export function parseList<T>(text: string, source: string, is: (value: unknown) 
   if (!Array.isArray(value) || !value.every(is)) throw new Error(`${source}: expected a list of ${is.name.slice(2).toLowerCase()} records`);
   return value;
 }
+
+export const CONFLICT_STATUS = "conflicts with main ";
+
+export const handbackDue = (lanes: readonly Lane[], now: number): Lane[] =>
+  lanes.filter((lane) => lane.status?.state === "pending" && lane.status.description.startsWith(CONFLICT_STATUS) && minutes(now, lane.status.at) >= BOUND.handback);

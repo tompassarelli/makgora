@@ -724,6 +724,12 @@ jobs:
           eval "$FLAG_CONFLICT"
           git fetch -q --filter=blob:none origin main '+refs/heads/claude/*:refs/remotes/origin/claude/*'
           base=$(git rev-parse origin/main)
+          bun ts/scripts/autoland.ts handback --lanes lanes.json > handback.tsv
+          while IFS=$'\t' read -r -u 4 branch tip; do
+            gh api "repos/$GH_REPO/statuses/$tip" -f state=failure -f context=autoland -f description="conflict not resolved within 10 min: handed back to its owner" -f target_url="$RUN_URL" > /dev/null || echo "::warning::couldn't fail $branch's status"
+            flag "$branch" "$tip" "had a conflict with main for 10 minutes without a fix: handed back to its owner. Push a rebased fix to the branch." alarm || true
+            jq --arg branch "$branch" 'map(select(.branch != $branch))' lanes.json > lanes.next && mv lanes.next lanes.json
+          done 4< handback.tsv
           jq -r '.[] | select(.status.state == "pending") | "\(.branch)\t\(.tip)"' lanes.json > pending.tsv
           while IFS=$'\t' read -r -u 3 branch tip; do
             git cat-file -e "$tip" 2> /dev/null || continue
