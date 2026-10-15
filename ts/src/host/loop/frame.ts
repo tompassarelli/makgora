@@ -145,7 +145,10 @@ export function applyFrame(s: ShellState, recorded = false): void {
     }
     const held = heldVisualFrame(localSlot()) !== undefined || resumePresentationHeld(s);
     ui.combat.presentConfirmed(runtime.simulationFrame, slot, runtime.frameImpacts[slot], s.trace.active
-      ? (sound, volume, pitch) => traceInput(s.trace, `participant ${slot} frame ${runtime.simulationFrame} sound ${sound} volume ${volume} pitch ${canonicalReal(pitch)}`)
+      ? (sound, volume, pitch, cls, voiceSlot, live) => {
+        traceInput(s.trace, `participant ${slot} frame ${runtime.simulationFrame} sound ${sound} volume ${volume} pitch ${canonicalReal(pitch)}`);
+        traceInput(s.trace, `frame ${runtime.simulationFrame} class ${cls} slot ${voiceSlot} live ${live}`);
+      }
       : undefined);
     ui.combat.confirmContacts(runtime.simulationFrame, runtime.frameImpacts[slot]);
     ui.combat.confirmKo(runtime.simulationFrame, slot, fighter, runtime.frameImpacts[slot]);
