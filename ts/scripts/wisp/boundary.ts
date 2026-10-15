@@ -8,7 +8,7 @@ export * from "../../src/game/core/gameFiles";
 
 export const MeleeReady = preloadRecord(
   {
-    head: ["BUILD {build}", "INPUT {input} PRESENTATION {presentation}", "SCENARIO {scenario}", "BINDINGS {bindings}", "HUMANS {humans} FIGHTERS {fighters}"],
+    head: ["BUILD {build}", "INPUT {input} PRESENTATION {presentation}", "SCENARIO {scenario}", "CONSOLE {console}", "BINDINGS {bindings}", "HUMANS {humans} FIGHTERS {fighters}"],
     rest: "slotBindings",
   },
   Schema.Struct({
@@ -16,6 +16,7 @@ export const MeleeReady = preloadRecord(
     input: Schema.NonEmptyString,
     presentation: Schema.NonEmptyString,
     scenario: Schema.NonEmptyString,
+    console: Schema.Literals(["dev", "off"]),
     bindings: Schema.NonEmptyString,
     humans: Count,
     fighters: Count,

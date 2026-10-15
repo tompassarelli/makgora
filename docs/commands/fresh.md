@@ -1,8 +1,10 @@
 # Fresh
 
-- Fresh match: `bun wisp fresh MAP.w3x [--rebuild]` starts a new game, sends
+- Fresh match: `bun wisp fresh MAP.w3x [--rebuild] [--no-quick]` starts a new game, sends
   `-dev quick`, and waits until every signed-in client writes its receipt.
-  `--rebuild` replaces the map script first. Other quick starts for `--chat`
+  A build whose fighter-selection record reads `CONSOLE off` (the playable
+  map) has no dev console, so fresh leaves it at fighter selection;
+  `--no-quick` does the same for any build. `--rebuild` replaces the map script first. Other quick starts for `--chat`
   and pad scripts: `-dev quick hero NAME [stocks N]` (one stock unless N is 1 to 9), `-dev quick recovery hero NAME`
   (starts tumbling above the floor for recovery captures), and `-dev quick cpu OPPONENT DIFFICULTY [hero NAME]`,
   a quick match against a named computer at the selected difficulty over three stocks.

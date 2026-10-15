@@ -44,12 +44,15 @@ export const fresh: Command = (rawArgs) => Effect.gen(function*() {
 
 
   yield* onHealthyClients(Effect.gen(function*() {
-    yield* freshMatch(map);
-    if (!flags.includes("--no-quick")) {
-      const since = yield* Clock.currentTimeMillis;
-      yield* sendQuickMatchCommand.pipe(step("quick match and client receipts"));
-      yield* checkPlayerView(smashcraftPlayerView({ frame: true, scene: sceneProfiles.has(profile) }), since, freshFrames).pipe(step("player view"));
+    const ready = yield* freshMatch(map);
+    if (flags.includes("--no-quick")) return;
+    if (ready.some((client) => client.console === "off")) {
+      yield* Console.log(`build ${ready[0]?.build ?? ""} has no dev console: left at fighter selection`);
+      return;
     }
+    const since = yield* Clock.currentTimeMillis;
+    yield* sendQuickMatchCommand.pipe(step("quick match and client receipts"));
+    yield* checkPlayerView(smashcraftPlayerView({ frame: true, scene: sceneProfiles.has(profile) }), since, freshFrames).pipe(step("player view"));
   }).pipe(Effect.provide(Layer.merge(options.services.pipe(Layer.provideMerge(Clients.layer(clientsFile))), ClientWatch.layer({ filePrefix: "smashcraft" })))), { clientsFile });
 });
 

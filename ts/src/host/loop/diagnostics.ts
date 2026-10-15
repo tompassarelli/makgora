@@ -158,6 +158,7 @@ export function writeReadyMarker(s: ShellState): void {
     `BUILD ${s.build.id}`,
     `INPUT ${s.build.inputProfile} PRESENTATION ${s.build.presentation}`,
     `SCENARIO ${s.build.scenario}`,
+    `CONSOLE ${s.build.devConsole ? "dev" : "off"}`,
     `BINDINGS ${encodeBindings(s.participants[local].bindings.bindings)}`,
     `HUMANS ${s.game.humanMask} FIGHTERS ${s.world.mask}`,
   ];
