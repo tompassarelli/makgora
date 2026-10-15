@@ -231,32 +231,58 @@ function countLine(rates: SessionRates, now: number): string {
   return `c t=${elapsedMs(rates, now)} ${live} kreg=${rates.keyRegistrations} reg=${rates.registrations} act=${rates.actions} send=${rates.sends} hid=${rates.handleMax} heap=${heap}`;
 }
 
+interface Row {
+  name: string;
+  count: number;
+}
+
+interface Top {
+  kept: Row[];
+  rows: number;
+}
+
+const ranksBefore = (count: number, name: string, other: Row): boolean =>
+  count !== other.count ? count > other.count : name < other.name;
+
+function offer(top: Top, limit: number, name: string, count: number): void {
+  top.rows++;
+  let at = top.kept.length;
+  while (at > 0) {
+    const other = top.kept[at - 1];
+    if (other === undefined || !ranksBefore(count, name, other)) break;
+    at--;
+  }
+  if (at >= limit) return;
+  top.kept.splice(at, 0, { name, count });
+  if (top.kept.length > limit) top.kept.pop();
+}
+
+const emptyTop = (): Top => ({ kept: [], rows: 0 });
+
+const topText = (top: Top, from: number, separator: string): string =>
+  top.kept.map((row) => `${row.name.slice(from)}:${row.count}`).join(separator);
+
 function eventLine(rates: SessionRates, now: number): string {
-  const counts: [string, number][] = [];
-  for (const name in rates.named) counts.push([name, rates.named[name] ?? 0]);
-  counts.sort((left, right) => right[1] !== left[1] ? right[1] - left[1] : left[0] < right[0] ? -1 : 1);
+  const top = emptyTop();
+  for (const name in rates.named) offer(top, TOP_EVENTS, name, rates.named[name] ?? 0);
   rates.named = {};
-  return `e t=${elapsedMs(rates, now)} ${counts.slice(0, TOP_EVENTS).map(([name, count]) => `${name}:${count}`).join(" ")} names=${counts.length}`;
+  return `e t=${elapsedMs(rates, now)} ${topText(top, 0, " ")} names=${top.rows}`;
 }
 
 function liveLines(rates: SessionRates, now: number): readonly string[] {
-  const effects: [string, number][] = [];
-  const sounds: [string, number][] = [];
+  const effects = emptyTop();
+  const sounds = emptyTop();
   const units: string[] = [];
   for (const tag in rates.live) {
     const count = rates.live[tag] ?? 0;
     if (count === 0) continue;
-    if (tag.startsWith("e:")) effects.push([tag.slice(2), count]);
-    else if (tag.startsWith("s:")) sounds.push([tag.slice(2), count]);
+    if (tag.startsWith("e:")) offer(effects, TOP_EFFECTS, tag, count);
+    else if (tag.startsWith("s:")) offer(sounds, TOP_SOUNDS, tag, count);
     else units.push(`${tag.slice(2)}:${count}`);
   }
-  const top = (rows: [string, number][], limit: number) => {
-    rows.sort((left, right) => right[1] !== left[1] ? right[1] - left[1] : left[0] < right[0] ? -1 : 1);
-    return rows.slice(0, limit).map(([name, count]) => `${name}:${count}`).join(",");
-  };
   units.sort();
   const t = elapsedMs(rates, now);
-  return [`l t=${t} models=${effects.length} eff=${top(effects, TOP_EFFECTS)}`, `s t=${t} files=${sounds.length} snd=${top(sounds, TOP_SOUNDS)} unit=${units.join(",")}`];
+  return [`l t=${t} models=${effects.rows} eff=${topText(effects, 2, ",")}`, `s t=${t} files=${sounds.rows} snd=${topText(sounds, 2, ",")} unit=${units.join(",")}`];
 }
 
 function flush(rates: SessionRates, now: number): void {
