@@ -1,37 +1,29 @@
 # Warden: Fan of Knives
 
-Fan of Knives throws a wide outward burst that pushes nearby opponents away,
-poisons them and marks them for Shadow Pursuit, on the ground or in the air.
+Tom (17 Oct): Fan of Knives plays Warcraft III's own Fan of Knives, not too
+far out, and works like Falco's shine, the way Illidan's Immolate works like
+Fox's.
 
-The burst reaches **1.30 reference fighter heights**, up from 0.85: **1.529×**
-the previous reach. Seven knife rays cover both sides, diagonals and overhead,
-centred 48 units above Warden's feet. Each opponent takes one 7-damage hit,
-launching 45 degrees outward, followed by the existing three 1-damage poison
-ticks over 180 frames. It costs 18 mana. Startup remains eight empty frames;
-contact occurs on frames 9–11 and Warden commits through frame 38. Shielding
-the close burst leaves time for a punish. Retreating beyond its short range
-also lets the opponent answer the recovery. These are provisional original
-values, not Melee hitboxes.
+Falco's Melee Reflector hits on frame 1, its only active frame, with an
+invincible first frame. Falco can jump out of it from frame 4, and its
+upward angle with high base knockback pops the foe into a follow-up
+([SmashWiki: Shine (Falco)](https://ssbwiki.com/Shine_(Falco)),
+[SmashWiki: Falco's down special](https://www.ssbwiki.com/Falco_(SSBM)/Down_special),
+[Liquipedia: Frame](https://liquipedia.net/smash/Frame)).
 
-The cast coils the shoulders and draws both hands inward, then opens the arms
-and chest sharply at frame 9. The arms stay spread through contact before
-settling back to ready. The ground stance plants the legs; the air form folds
-the knees beneath the same outward release. Seven individually oriented
-Warcraft knife models spray from the torso to each ray's full reach over the
-contact frames, including the back-facing rays; they are distinct from the
-central cast flash. Motion is authored through the existing Warden rig.
+Fan of Knives copies that shape:
 
-**No charge or stored knives.** Melee Sheik's Needle Storm holds to accumulate
-up to six needles, releases to fire and can cancel into shield to store them
-([Melee Needle Storm](https://www.ssbwiki.com/Needle_Storm#In_Super_Smash_Bros._Melee)).
-That decision gives up present movement to prepare a later ranged volley.
-Warcraft's Fan of Knives is an immediate surrounding attack, including air
-targets ([Blizzard's Warden guide](https://classic.battle.net/war3/nightelf/units/warden.shtml)).
-Smashcraft keeps that immediate identity: Warden already has Shadow Strike for
-a forward ranged mark and Shadow Pursuit to spend the mark. Making down B a
-second stored ranged setup would duplicate that job and remove her quick
-answer to opponents approaching from either side. The wider burst gives her
-a spacing choice now, paid for by mana and exposed recovery, without adding a
-second resource to watch. Only the relation between preparation and reward is
-borrowed from Sheik; the geometry, timing and reward here are authored for
-Warden's kit.
+- One active frame, frame 1, on both sides of her body: 8% at 85 degrees
+  with the CHASE knockback (base 75, growth about 50), a pop of about 0.6
+  fighter heights with 34 frames of hitstun at 0%. It reaches 0.7 fighter
+  heights. Anyone hit is still marked and poisoned for Shadow Pursuit.
+- Her first frame is intangible.
+- A jump press from frame 4 ends it and jumps (her double jump in the air).
+- In the air it holds her in place for its 27 frames, as Immolate does.
+- Uncancelled it lasts 27 frames, so a whiffed shine is punishable.
+- EX: 25% more reach, as before.
+
+It looks like the stock cast: Warcraft's FanOfKnivesCaster effect at scale
+0.13, so its knives stop near the hit area instead of flying about 750 units
+as the stock model does at full size. Warden plays her stock Spell animation.
+The earlier seven-ray custom knife pose code never drew in-game and is gone.

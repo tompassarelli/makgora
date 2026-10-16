@@ -4,7 +4,7 @@ import type { Fighter } from "../sim/fighter";
 import { type HitRegion, NO_HIT_REGION } from "../sim/hitRegions";
 import { runningHeroSpecial } from "../sim/specials/engine";
 import { forsakenPaladinSwordAttack } from "../sim/heroes/forsakenPaladinSword";
-import { FAN_KNIFE_CUE, type Cue, type CueBirth } from "./specialCues";
+import { type Cue, type CueBirth } from "./specialCues";
 import { REACH_CUE_NORMALS } from "./reachCueInfo";
 import { DEMONHUNTER_GLIDE_SLASH_FIRST, DEMONHUNTER_GLIDE_SLASH_LAST, DEMONHUNTER_GLIDE_SLASH_FORM, DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP, felRushRegion, immolationRegion, glideSlashRegion } from "../sim/specials";
 
@@ -76,24 +76,6 @@ export function specialAreaRegion(fighter: Readonly<Fighter>, index: number): Re
 
 export interface HitAreaPose { visible: boolean; x: number; z: number; scale: number; }
 
-export interface FanKnifePose extends HitAreaPose { yaw: number; pitch: number; alpha: number; birth?: CueBirth | undefined; }
-
-
-export function fanKnifePose(fighter: Readonly<Fighter>, index: number, out: FanKnifePose): FanKnifePose {
-  const ray = specialAreaRegion(fighter, index).strike;
-  out.visible = fighter.character === Character.warden && fighter.special.action === SpecialAction.heroDown
-    && !fighter.status.out && ray !== undefined;
-  if (!out.visible || ray === undefined) return out;
-  out.x = f32(fighter.motion.x + f32(fighter.facing * ray.x2));
-  out.z = f32(fighter.motion.z + ray.z2);
-  out.yaw = ray.x2 * fighter.facing < 0.0 ? f32(Math.PI) : 0.0;
-  const tilt = ray.x2 === 0.0 ? f32(Math.PI * 0.5) : f32(Math.PI * 0.25);
-  out.pitch = ray.z2 === 48.0 ? 0.0 : ray.z2 > 48.0 ? -tilt : tilt;
-  out.scale = FAN_KNIFE_CUE.scale;
-  out.alpha = 255;
-  out.birth = FAN_KNIFE_CUE.birth;
-  return out;
-}
 
 
 const BODY_MIDDLE = 66.0;

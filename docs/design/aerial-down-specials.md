@@ -20,8 +20,8 @@ cancelling.
 | Rifleman | Freeze Trap tossed in the air falls and arms on deck contact | A8 W22 L31/E38 | A8 W22 L13/E38 | A8 W22 L3/E38 | A8 W22 L—/E38 |
 | Illidan | Immolate in the air, a shine-like stall that a jump cancels | A12 W4 L47/E27 | A12 W4 L45/E27 | A12 W4 L18/E27 | A12 W4 L—/E27 |
 | Blademaster | Mirror Image placed in the air, then a backward step | S1 W8 L34/E24 | S1 W8 L25/E24 | S1 W8 L3/E24 | S1 W8 L—/E24 |
-| Mountain King | aerial Thunder Clap; lands into the grounded clap | S1 W17 L27/E27 | S1 W52 L15/E81 | S1 W52 L3/E81 | S1 W17 L—/E53 |
-| Warden | Fan of Knives, same fan in the air | S1 W8 L27/E38 | S1 W8 L15/E38 | S1 W8 L3/E38 | S1 W8 L—/E38 |
+| Mountain King | aerial Thunder Clap; lands into the grounded clap | S1 W18 L27/E27 | S1 W53 L15/E81 | S1 W53 L3/E81 | S1 W18 L—/E53 |
+| Warden | Fan of Knives in the air, a Falco-style shine that holds her in place and a jump cancels | S1 W1 L48/E27 | S1 W1 L46/E27 | S1 W1 L32/E27 | S1 W1 L—/E27 |
 | Lich | Frost Armor cast in the air; lands into the grounded cast | S0 W21 L27/E27 | S0 W21 L15/E45 | S0 W21 L3/E45 | S0 W21 L—/E45 |
 | Forsaken Paladin | downward holy pulse with the Consecration hit | S1 W16 L27/E27 | S1 W16 L15/E42 | S1 W16 L3/E42 | S1 W16 L—/E42 |
 | Dreadlord | aerial Sleep orb; lands into the grounded cast | S1 W26 L27/E27 | S1 W26 L15/E58 | S1 W26 L3/E58 | S1 W26 L—/E58 |

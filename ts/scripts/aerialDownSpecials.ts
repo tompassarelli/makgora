@@ -30,7 +30,7 @@ export const AERIAL_DOWN_CHOICES: Readonly<Record<number, string>> = {
   [Character.demonHunter]: "Immolate in the air, a shine-like stall that a jump cancels",
   [Character.blademaster]: "Mirror Image placed in the air, then a backward step",
   [Character.mountainKing]: "aerial Thunder Clap; lands into the grounded clap",
-  [Character.warden]: "Fan of Knives, same fan in the air",
+  [Character.warden]: "Fan of Knives in the air, a Falco-style shine that holds her in place and a jump cancels",
   [Character.lich]: "Frost Armor cast in the air; lands into the grounded cast",
   [Character.forsakenPaladin]: "downward holy pulse with the Consecration hit",
   [Character.dreadlord]: "aerial Sleep orb; lands into the grounded cast",
@@ -75,7 +75,7 @@ export function aerialDownEffect(f: Readonly<Fighter>): boolean {
   const move = runningHeroSpecial(f);
   const during = (window: { readonly first: number; readonly last: number } | undefined): boolean =>
     window !== undefined && special.frame >= window.first && special.frame <= window.last;
-  return move?.regions?.some(region => special.frame >= region.firstFrame && special.frame <= region.lastFrame) === true
+  return move?.regions?.some(region => special.frame - 1 >= region.firstFrame && special.frame - 1 <= region.lastFrame) === true
     || during(move?.commandGrab) || during(move?.guard)
     || f.projectiles.some(projectile => projectile.life > 0) || f.placed.life > 0 || f.pack.some(placed => placed.life > 0) || f.freezeTrap.life > 0 || f.status.armorFrames > 0;
 }

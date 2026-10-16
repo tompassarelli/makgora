@@ -8,7 +8,7 @@ import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../si
 import { attackDurationFramesForGrounding } from "../sim/moves";
 import { heroProjectileArt } from "./projectileArt";
 import { projectedProjectile } from "./projectilePose";
-import { disjointNormals, fanKnifePose, hitAreaPose, specialAreaRegion, type FanKnifePose, type HitAreaPose } from "./disjointCues";
+import { disjointNormals, hitAreaPose, specialAreaRegion, type HitAreaPose } from "./disjointCues";
 import { specialForm, specialKit } from "../sim/specials/schema";
 
 const pose: HitAreaPose = { visible: false, x: 0.0, z: 0.0, scale: 0.0 };
@@ -19,31 +19,6 @@ function farEnd(region: { minX: number; maxX: number; minZ: number; maxZ: number
   return [x, z >= 66.0 ? region.maxZ : region.minZ];
 }
 
-test("Fan of Knives sprays seven oriented knives to its authored endpoints in both facings [k3 measure docs/design/warden-fan-of-knives.md]", () => {
-  const knife: FanKnifePose = { ...pose, yaw: 0.0, pitch: 0.0, alpha: 0 };
-  for (const facing of [-1, 1]) {
-    const fighter = createFighter(Character.warden, 0.0, facing);
-    fighter.special.action = SpecialAction.heroDown;
-    for (let index = 0; index < 7; index++) {
-      fighter.special.frame = 8;
-      assertEquals(fanKnifePose(fighter, index, knife).visible, false);
-      fighter.special.frame = 10;
-      const start = fanKnifePose(fighter, index, knife).x;
-      assertTrue(knife.visible);
-      fighter.special.frame = 11;
-      fanKnifePose(fighter, index, knife);
-      const ray = fighter.tuning.specials?.down.ground.regions?.[index]?.hit.strike;
-      assertTrue(ray !== undefined);
-      if (ray === undefined) continue;
-      assertEquals(knife.x, f32(ray.x2 * facing));
-      assertEquals(knife.z, ray.z2);
-      assertTrue(Math.abs(knife.x) >= Math.abs(start));
-      assertEquals(knife.yaw, ray.x2 * facing < 0.0 ? f32(Math.PI) : 0.0);
-      fighter.special.frame = 15;
-      assertEquals(fanKnifePose(fighter, index, knife).visible, false);
-    }
-  }
-});
 
 test("every reach-cued normal flares at each active region's far end every frame in both facings [k2 property]", () => {
   let checked = 0;

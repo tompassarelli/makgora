@@ -1035,3 +1035,13 @@ export function enterUltimate(f: Fighter, input: Readonly<Controls>): AuthoredSp
   applyWindows(f, move, 0);
   return move;
 }
+
+
+export function jumpCancelHeroSpecial(f: Fighter, input: Readonly<Controls>): void {
+  const move = runningHeroSpecial(f);
+  if (move?.jumpCancelFrame === undefined || !input.jumpPressed || f.launch.hitlag > 0 || f.special.frame < move.jumpCancelFrame) return;
+  f.special.action = SpecialAction.none;
+  f.special.frame = 0;
+  f.special.lockFrames = 0;
+  f.attack.cooldown = 0;
+}

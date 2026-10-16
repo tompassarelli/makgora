@@ -42,7 +42,7 @@ import {
 } from "./fighter";
 import { DASH_GUARD_EARLY_FRAMES, advanceGroundMovement, clearDash, groundOptionOpen, restingTraction, wantsCrouch } from "./groundMovement";
 import { GroundOption } from "./stickZones";
-import { heroMotionHolds, heroMotionPassesPlatforms } from "./specials/engine";
+import { heroMotionHolds, heroMotionPassesPlatforms, jumpCancelHeroSpecial } from "./specials/engine";
 import { carryHeroStatus } from "./heroStatus";
 import { exSpecialPressed } from "./exSpecials";
 import { demonHunterGliding, demonHunterJumpOrGlideCancel } from "./specials";
@@ -505,6 +505,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   if (launch.hitstun === 0) launch.throwHitstun = false;
   const squatBeforeInput = jump.squat;
   if (input.jumpPressed || input.attackPressed) demonHunterJumpOrGlideCancel(f, input);
+  if (input.jumpPressed) jumpCancelHeroSpecial(f, input);
 
   const wet = sea.wet(f, stage);
   const waterJumped = wet && (input.jumpPressed || parryOption === ParryBuffer.jump) && !wallJumped && sea.beginWaterJump(f, input.direction);

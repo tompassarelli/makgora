@@ -377,6 +377,8 @@ export interface AuthoredSpecial {
   /** Its user gets back her air jump and air-once specials whenever it ends, as a landing would give. */
   readonly refreshesAir?: true | undefined;
 
+  readonly jumpCancelFrame?: number | undefined;
+
   /** A timed movement buff granted on a frame (Metamorphosis, Avatar). */
   readonly buff?: { readonly frame: number; readonly kind: number; readonly frames: number } | undefined;
 }
