@@ -38,12 +38,16 @@ const LEG_BONES: Readonly<Partial<Record<number, readonly (readonly [string, str
   [Character.pitLord]: [["Bone Front L Leg01", "Bone Front L Shin01", "Bone FrontL Toe01"], ["Bone Front R Leg01", "Bone Front R Shin01", "Bone Front R Toe01"], ["Bone Back L Leg01", "Bone Back L Shin01", "Bone Toe L "], ["Bone Back R Leg01", "Bone Back R Shin01", "Bone Toe R"]],
   [Character.anubarak]: [["Bone_LFLeg04", "Bone_LFLeg03", "Bone_LegEnd03"], ["Bone_LFLeg07", "Bone_LFLeg06", "Bone_LegEnd01"], ["Bone_LFLeg13", "Bone_LFLeg14", "Bone_LegEnd04"], ["Bone_LFLeg09", "Bone_LFLeg10", "Bone_LegEnd02"]],
 };
+const PINNED: Readonly<Partial<Record<number, Readonly<Partial<Record<Pose, Choice>>>>>> = {
+  [Character.pitLord]: { crouch: { frame: 0, hip: -80, knee: 110, chest: 80, shoulder: 10, elbow: -40, weapon: 0, pelvis: 20, squash: 0.15 } },
+  [Character.chen]: { ledgeHang: { frame: 0, shoulder: -207.5, elbow: 22.5, chest: 38, hip: -85, knee: 77.5, lean: 7.5, pelvis: -15, weapon: -45, head: -120 } },
+};
 const FRAMES: Readonly<Record<Pose, number>> = { crouch: 24, ledgeHang: 60 };
 const LEDGE_CATCH_CLIPS: Readonly<Partial<Record<number, number>>> = { [Character.demonHunter]: DEMON_HUNTER_LEDGE_CATCH_INDEX };
 const CATCH_SETTLED = 0.6;
 const OWN_CLIP = /crouch|ledge ?hang/i;
 
-interface Variant { readonly name: string; readonly angles: Readonly<Record<string, number>>; readonly fold: number; readonly lean: number; readonly parentFrame: boolean }
+interface Variant { readonly name: string; readonly angles: Readonly<Record<string, number>>; readonly fold: number; readonly lean: number; readonly squash?: number; readonly parentFrame: boolean }
 type Choice = Readonly<Record<string, number>>;
 interface Space { readonly starts: readonly Choice[]; readonly options: Readonly<Record<string, readonly number[]>>; readonly variant: (choice: Choice) => Variant }
 const describe = (choice: Choice) => Object.entries(choice).map(([key, value]) => `${key} ${value}`).join(" ");
@@ -51,14 +55,14 @@ const SPACES: Readonly<Record<Pose, Space>> = {
   crouch: {
     starts: [{ frame: 0, hip: -80, knee: 110, chest: 35, shoulder: -30, elbow: -40, weapon: 0 }, { frame: 1, hip: -115, knee: 140, chest: 65, shoulder: -70, elbow: -80, weapon: -60 }],
     options: { frame: [0, 1], hip: [-115, -100, -80, -60], knee: [80, 110, 140], chest: [20, 35, 50, 65, 80], shoulder: [-110, -70, -30, 10, 50], elbow: [-80, -40, 0, 40], weapon: [-60, 0, 60] },
-    variant: (c) => ({ name: describe(c), fold: 40 + (c.chest ?? 0) * 0.3, lean: 0, parentFrame: c.frame === 1,
-      angles: { hip: c.hip ?? 0, knee: c.knee ?? 0, ankle: -((c.hip ?? 0) + (c.knee ?? 0)), chest: c.chest ?? 0, head: -(c.chest ?? 0) * 0.6, shoulder: c.shoulder ?? 0, elbow: c.elbow ?? -40, weapon: c.weapon ?? 0 } }),
+    variant: (c) => ({ name: describe(c), fold: 40 + (c.chest ?? 0) * 0.3, lean: c.lean ?? 0, squash: c.squash ?? 0, parentFrame: c.frame === 1,
+      angles: { hip: c.hip ?? 0, knee: c.knee ?? 0, ankle: -((c.hip ?? 0) + (c.knee ?? 0)), chest: c.chest ?? 0, head: c.head ?? -(c.chest ?? 0) * 0.6, shoulder: c.shoulder ?? 0, elbow: c.elbow ?? -40, weapon: c.weapon ?? 0, pelvis: c.pelvis ?? 0 } }),
   },
   ledgeHang: {
     starts: [{ frame: 0, shoulder: -165, elbow: -20, chest: 5, hip: -30, knee: 60, lean: 0 }, { frame: 0, shoulder: -150, elbow: -60, chest: 25, hip: -100, knee: 140, lean: 0 }],
     options: { frame: [0, 1], shoulder: [-200, -185, -170, -155, -140, -125], elbow: [-90, -60, -30, 0, 30], chest: [-15, 5, 25], hip: [-120, -100, -70, -40, -10, 20], knee: [0, 40, 80, 110, 140], lean: [-70, -50, -35, -20, -10, 0, 10, 20, 35, 50, 70] },
     variant: (c) => ({ name: describe(c), fold: 30, lean: c.lean ?? 0, parentFrame: c.frame === 1,
-      angles: { shoulder: c.shoulder ?? 0, elbow: c.elbow ?? 0, chest: c.chest ?? 0, head: -15, hip: c.hip ?? 0, knee: c.knee ?? 0, ankle: -((c.hip ?? 0) + (c.knee ?? 0)) } }),
+      angles: { shoulder: c.shoulder ?? 0, elbow: c.elbow ?? 0, chest: c.chest ?? 0, head: c.head ?? -15, hip: c.hip ?? 0, knee: c.knee ?? 0, ankle: -((c.hip ?? 0) + (c.knee ?? 0)), weapon: c.weapon ?? 0, pelvis: c.pelvis ?? 0 } }),
   },
 };
 const smooth = (t: number) => { const c = Math.max(0, Math.min(1, t)); return c * c * (3 - 2 * c); };
@@ -171,6 +175,8 @@ function keyJoints(slot: Slot, moved: readonly number[], locals: readonly Readon
 }
 
 function keyRoot(slot: Slot, variant: Variant): void {
+  if (variant.squash) helper.Scaling ??= { LineType: mdx.LineType.Linear, GlobalSeqId: null, Keys: source.Sequences.flatMap((s) => Array.from(s.Interval, (Frame) => ({ Frame, Vector: new Float32Array([1, 1, 1]) }))) };
+  if (helper.Scaling) replaceKeys(helper.Scaling, slot, (frame) => new Float32Array([1, 1, 1 - (variant.squash ?? 0) * amount(slot.pose, frame / slot.frames, "")]));
   replaceKeys(rotation, slot, (frame) => new Float32Array(lateral(variant.lean * amount(slot.pose, frame / slot.frames, ""))));
   replaceKeys(translation, slot, () => new Float32Array(3));
   const posed = new DrawnModel(generateMDX(model), 1);
@@ -214,7 +220,7 @@ for (const pose of poses) {
     model.Sequences.push({ ...stand, Name: `Movement ${pose}`, Interval: new Uint32Array([slot.start, slot.start + ms(frames)]), NonLooping: pose === "crouch", MoveSpeed: 0, Rarity: 0,
       MinimumExtent: new Float32Array([-300, -300, -250]), MaximumExtent: new Float32Array([300, 300, 350]), BoundsRadius: 400 });
   }
-  const space = SPACES[pose];
+  const space = SPACES[pose], pinned = PINNED[character]?.[pose];
   const evaluate = (choice: Choice) => { ensure(author(slot, space.variant(choice)) >= 3, `${fighter.name}: ${pose} moves fewer than three joints`); return { choice, ...shortfall(slot) }; };
   const descend = (start: Choice) => {
     let found = evaluate(start);
@@ -232,7 +238,7 @@ for (const pose of poses) {
     }
     return found;
   };
-  const best = space.starts.map(descend).reduce((a, b) => b.value < a.value - 1e-6 ? b : a);
+  const best = pinned ? evaluate(pinned) : space.starts.map(descend).reduce((a, b) => b.value < a.value - 1e-6 ? b : a);
   author(slot, space.variant(best.choice));
   const written = shortfall(slot);
   ensure(Math.abs(written.value - best.value) < 1e-6, `${fighter.name}: ${pose} re-authored as ${written.report}, not the chosen ${best.report}`);
