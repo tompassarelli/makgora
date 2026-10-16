@@ -1,3 +1,4 @@
+import { traceCallbacks } from "../../game/session/traceSettings";
 
 
 import { hasPendingAttack, type AttackBuffer } from "../../game/input/attackBuffer";
@@ -10,7 +11,7 @@ import { captureReplaySnapshot } from "../../game/replay/snapshot";
 import { beginStateChecksum, foldStateChecksum, stateChecksum } from "../../game/replay/canonical";
 import { fighterAt, isActive, type Controls } from "../../game/sim/roster";
 import { floorMod, idiv } from "wisp/src/sim/intMath";
-import { INPUT_START_FILE, MELEE_READY_FILE, RESPONSE_TRACE_CALLBACKS, traceStartLine } from "../../game/core/gameFiles";
+import { INPUT_START_FILE, MELEE_READY_FILE, traceStartLine } from "../../game/core/gameFiles";
 import { writeLines } from "wisp/src/platform/fileio";
 import { type ShellState, activeRollback, localSlot } from "./state";
 import { views } from "./ui";
@@ -96,9 +97,7 @@ export function localParticipantSlot(s: Readonly<ShellState>): ParticipantSlot |
 
 
 function traceLength(s: Readonly<ShellState>): number {
-  if (s.build.responseProbe) return RESPONSE_TRACE_CALLBACKS;
-  if (s.build.inputProfile === "native-driver") return 1200;
-  return s.build.scenario === "shield-break" || s.build.scenario === "ledge" ? 600 : 300;
+  return traceCallbacks(s.build, s.trace.limit);
 }
 
 

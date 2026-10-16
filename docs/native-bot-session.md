@@ -222,6 +222,11 @@ into client A once the helpers run (for example `-dev quick hero lich`, or
 `-dev quick cpu wren expert hero NAME` to select any roster fighter as that computer
 through the menu's selection rule). The `cpu-roster-*.pad` scripts cover the
 complete selectable roster in one batch.
+Pad runs set the same trace cutoff in native and headless setup chat: 180
+unpaused callbacks after the latest input edge, capture or expectation frame.
+This includes a tap's release and the VIEW release that requests a moment.
+Collection waits for that cutoff, including expectations later than the input
+script. Reset clears the cutoff; `integrity delay` retains its 4,500 callbacks.
 Each line is `FRAME CLIENT ACTION [ARGS]`: the match frame the edge is
 meant for (or `+N` after the previous line), `a` or `b`, and
 `press|release|tap BUTTON [FRAMES]`, `stick X Y`, `cstick X Y`

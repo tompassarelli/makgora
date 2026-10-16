@@ -45,13 +45,13 @@ import { IntegrityFailure, producerLine, tryIntegrity } from "../../integrity/ev
 import { loadEntry } from "../../integrity/headless";
 import { type Pad, inject, monotonicNs, openPad } from "../../integrity/linux";
 import { BTN_SELECT, PAD_BUTTONS } from "../../integrity/linuxInput";
-import { MATCH_REPLAY_NAME, REPRO_NAME, TRACE_FILE, checkHeadlessRun, compareRuns, comparisonSteps, scriptChat } from "../../integrity/padParity";
+import { MATCH_REPLAY_NAME, REPRO_NAME, TRACE_FILE, checkHeadlessRun, compareRuns, comparisonSteps, scriptChat, padTraceCommand, padTraceLength } from "../../integrity/padParity";
 import type { Schedule, ScheduleReply, ScheduledEdge } from "../../integrity/padScheduleWorker";
 import { type PadStep, type SentEdge, deadlineOrder, frameWriteNs, landEdges, matchStart, padScriptPreset, parsePadScript, ruleFrame } from "../../integrity/padScript";
 import { SLOTS } from "../../integrity/reconcile";
 import { captureWhenDrawn, drawnFrom, visualCaptureCommand, visualCaptureToken } from "../../integrity/drawnCapture";
 import { visualReleaseFile } from "../../../src/game/session/visualCapture";
-import { drawnFrameFile, nativeChatFile, RESPONSE_TRACE_CALLBACKS, responsePageFile } from "../../../src/game/core/gameFiles";
+import { drawnFrameFile, nativeChatFile, responsePageFile } from "../../../src/game/core/gameFiles";
 import { PREDICTED_HEADLESS, SMASHCRAFT_HEADLESS } from "../headless";
 type HeadlessClient = ReturnType<HeadlessRuntime["clients"]>["clients"][number];
 import { sceneFile } from "wisp/src/runtime/scene";
@@ -73,7 +73,7 @@ type DevReceipt = Effect.Success<ReturnType<typeof DevCommandReceipt.decode>>;
 
 
 export function requestedSetup(command: string, receipt: DevReceipt): boolean {
-  const original = command.split(" |capture ")[0] ?? command;
+  const original = (command.split(" |trace ")[0] ?? command).split(" |capture ")[0] ?? command;
   if (original === "-dev reset") return receipt.phase === Phase.characterMenu;
   const hero = quickMatchHero(original) ?? quickRecoveryHero(original) ?? quickOffstageHero(original) ?? quickPainHero(original)?.character;
   if (hero !== undefined) return receipt.phase === Phase.match && receipt.characters.split(",").every((value, slot) => (receipt.humanFighters & (1 << slot)) === 0 || Number(value) === hero);
@@ -110,7 +110,7 @@ const USAGE = "pad SCRIPT --helper BINARY --build BUILD --out DIR --app-id a=ID 
 const CAPTURE_WAIT_MS = 10_000;
 
 
-const TRACE_WAIT_MS = RESPONSE_TRACE_CALLBACKS * 1000 / 60 + 25_000;
+const traceWaitMs = (callbacks: number) => callbacks * 1000 / 60 + 25_000;
 
 const fromDesktop = (failure: DesktopFailure) => new IntegrityFailure({ operation: failure.operation, path: failure.client, cause: failure.cause });
 
@@ -172,10 +172,10 @@ const finish = (out: string, scriptPath: string, build: string, epochs: readonly
 
 const RESPONSE_PAGE = new Bun.Glob(responsePageFile("*", "*", "*"));
 
-const collect = (data: readonly [string, string], out: string, sinceMs: number) => Effect.gen(function*() {
+const collect = (data: readonly [string, string], out: string, sinceMs: number, callbacks: number) => Effect.gen(function*() {
   const fresh = (path: string) => existsSync(path) && statSync(path).mtimeMs >= sinceMs;
   const waited = yield* Effect.exit(pollUntil(tryIntegrity("collect traces and moments", out, () => data.every((dir) => fresh(join(dir, TRACE_FILE))) ? true : undefined), {
-    every: "250 millis", within: TRACE_WAIT_MS,
+    every: "250 millis", within: traceWaitMs(callbacks),
     orElse: () => Effect.fail(new IntegrityFailure({ operation: "collect traces and moments", path: out, cause: "no input trace written since the run began" })),
   }));
   yield* tryIntegrity("collect traces and moments", out, () => {
@@ -292,6 +292,7 @@ export const nativeChat = (session: NativeSession, text: string) => setupCommand
 
 export const nativeScript = (session: NativeSession, options: PadOptions) => Effect.scoped(Effect.gen(function*() {
   const { scriptPath, steps, build, out, chat } = options;
+  const callbacks = yield* tryIntegrity("derive pad trace", scriptPath, () => padTraceLength(readFileSync(scriptPath, "utf8"), steps));
   const { clients, data, pads } = session;
   yield* tryIntegrity("create pad directory", out, () => {
     mkdirSync(out, { recursive: true });
@@ -305,9 +306,9 @@ export const nativeScript = (session: NativeSession, options: PadOptions) => Eff
     const [a, b] = session.logs();
     return [a.slice(from[0]), b.slice(from[1])];
   };
-  if (chat !== undefined) {
+  {
     yield* Effect.sleep("1 second");
-    const command = yield* tryIntegrity("prepare visual capture", scriptPath, () => captureToken === undefined ? chat : visualCaptureCommand(chat, captureToken, steps));
+    const command = yield* tryIntegrity("prepare pad trace", scriptPath, () => padTraceCommand(captureToken === undefined ? chat : visualCaptureCommand(chat ?? "-dev trace", captureToken, steps), callbacks));
     const setup = yield* Effect.exit(selectionChat(session, command, timingCheck([steps])));
     if (setup._tag === "Failure") {
       const boundary = describeCause(setup.cause);
@@ -366,7 +367,7 @@ export const nativeScript = (session: NativeSession, options: PadOptions) => Eff
   if (captures.length > 0) yield* tryIntegrity("write captures", out, () => writeFileSync(join(out, "captures.json"), json(captures)));
   const finished = yield* Effect.exit(finish(out, scriptPath, build, epochs, sent, logs()));
   yield* tryIntegrity("save script helper logs", out, () => logs().forEach((text, slot) => writeFileSync(join(out, `helper-${slot}.log`), text)));
-  yield* collect(data, out, startedMs);
+  yield* collect(data, out, startedMs, callbacks);
   const invalid = [...captureFailures.sort((a, b) => a.frame - b.frame).map(({ message }) => message), ...invalidRun(clients.map((client) => client.name), clients.map((client) => client.documents), data, startedMs)];
   if (captures.length > 0) console.log(`captures ${invalid.length === 0 ? "PASS" : "INVALID"}: ${captures.length - captureFailures.length}/${captures.length} retained; ${join(out, "captures.json")}`);
   if (invalid.length > 0) {
@@ -485,6 +486,7 @@ export type HeadlessSession = Effect.Success<ReturnType<typeof headlessSession>>
 
 export const headlessScript = (session: HeadlessSession, options: PadOptions) => Effect.gen(function*() {
   const { scriptPath, steps, build, out, chat } = options;
+  const callbacks = yield* tryIntegrity("derive pad trace", scriptPath, () => padTraceLength(readFileSync(scriptPath, "utf8"), steps));
   yield* tryIntegrity("create pad directory", out, () => mkdirSync(out, { recursive: true }));
   const { clients, pads, worker, data } = session;
   const startedMs = Date.now();
@@ -496,9 +498,10 @@ export const headlessScript = (session: HeadlessSession, options: PadOptions) =>
     return [a.slice(from[0]), b.slice(from[1])];
   };
   const errorsBefore = clients.clients.map((client) => client.errors.length);
-  if (chat !== undefined) {
+  {
+    const command = yield* tryIntegrity("prepare pad trace", scriptPath, () => padTraceCommand(chat, callbacks));
     yield* Effect.sleep("1 second");
-    clients.chat(0, chat);
+    clients.chat(0, command);
   }
   const epochs = yield* matchEpochs(logs, startedNs, out);
   yield* checkFirstEdge(steps, epochs, scriptPath);
@@ -508,7 +511,7 @@ export const headlessScript = (session: HeadlessSession, options: PadOptions) =>
   const last = steps.at(-1)?.frame ?? 0;
   yield* until(frameWriteNs(Math.max(...epochs), last + 30));
   const finished = yield* Effect.exit(finish(out, scriptPath, build, epochs, sent, logs()));
-  yield* collect(data, out, startedMs);
+  yield* collect(data, out, startedMs, callbacks);
   const errors = clients.clients.flatMap((client, index) => client.errors.slice(errorsBefore[index]).map((error) => `p${client.slot}: ${error}`));
   if (session.state.crashed !== undefined) errors.push(`headless clients stopped: ${describeCause(session.state.crashed)}`);
   if (errors.length > 0) return yield* new IntegrityFailure({ operation: "run headless clients", path: out, cause: errors.join("; ") });
