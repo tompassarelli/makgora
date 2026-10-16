@@ -91,6 +91,16 @@ export interface MovesGateReceipts {
   readonly specials: ReceiptFile;
 }
 
+export const startPromptReady = (words: readonly { readonly text: string; readonly y: number }[], height: number): boolean => {
+  const prompt = words.filter(({ y }) => y >= height * 0.88).map(({ text }) => text.toLowerCase());
+  return prompt.includes("start") && prompt.includes("click");
+};
+
+const waitForStartPrompt = (host: Client, viewport: Viewport) => pollUntil(capture(host, viewport).pipe(
+  Effect.flatMap(frame => frameWords(host, frame, "light").pipe(Effect.map(words => startPromptReady(words, frame.height)))),
+  Effect.mapError(fail("moves gate selection ready")),
+), { every: "250 millis", within: 15, orElse: () => Effect.fail(new AcceptFailure({ operation: "moves gate selection ready", problem: "fighter choices did not reach the Start / Click prompt" })) });
+
 const nowNs = () => performance.now() * 1_000_000;
 
 interface SettleShot {
@@ -187,6 +197,7 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
       yield* batch(client, [{ kind: "click", ...pin, holdMillis: 200 }, { kind: "wait", millis: 150 }, { kind: "click", ...drop, holdMillis: 200 }, { kind: "wait", millis: 300 }]).pipe(Effect.mapError(fail("moves gate pick")));
     }
     const picked = yield* Clock.currentTimeMillis;
+    yield* waitForStartPrompt(host, hostView);
     yield* focus(host).pipe(Effect.mapError(fail("moves gate stage")));
     yield* tap(host, "y");
     yield* phase("STAGE", picked, 15);
