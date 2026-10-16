@@ -99,7 +99,7 @@ export const startPromptReady = (words: readonly { readonly text: string; readon
 const waitForStartPrompt = (host: Client, viewport: Viewport) => pollUntil(capture(host, viewport).pipe(
   Effect.flatMap(frame => frameWords(host, frame, "light").pipe(Effect.map(words => startPromptReady(words, frame.height)))),
   Effect.mapError(fail("moves gate selection ready")),
-), { every: "250 millis", within: 15, orElse: () => Effect.fail(new AcceptFailure({ operation: "moves gate selection ready", problem: "fighter choices did not reach the Start / Click prompt" })) });
+), { every: "250 millis", within: "15 seconds", orElse: () => Effect.fail(new AcceptFailure({ operation: "moves gate selection ready", problem: "fighter choices did not reach the Start / Click prompt" })) });
 
 const nowNs = () => performance.now() * 1_000_000;
 
