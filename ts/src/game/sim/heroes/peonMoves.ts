@@ -26,7 +26,7 @@ const reaching = (first: number, last: number, x: number, z: number): readonly H
 };
 const arm = (first: number, last: number, shoulderX: number, shoulderZ: number, handX: number, handZ: number): HurtPose =>
   heroHurtPose(first, last, [BODY, hurtPart(shoulderX, shoulderZ, handX, handZ, 10.0)]);
-const tilt = (z: number) => heroMove(8, 3, 37, 0, swing(8, [[92.0, f32(z + 16.0)], [92.0, z], [84.0, f32(z - 16.0)]], 9.215999603271484, 40));
+const tilt = (z: number) => heroMove(8, 3, 19, 0, swing(8, [[92.0, f32(z + 16.0)], [92.0, z], [84.0, f32(z - 16.0)]], 9.215999603271484, 40));
 const FORWARD_SMASH = peonHit(19.45599937438965, 40, 122.13999938964844, 28.0);
 
 export const PEON_MOVES: FighterMoves = {
