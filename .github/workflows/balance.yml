@@ -170,7 +170,7 @@ jobs:
         run: bun scripts/balanceTimings.ts > shard-timings.json
       - uses: actions/upload-artifact@v4
         with:
-          name: balance-shard-timings-${{ strategy.job-index }}
+          name: balance-timings-shard-${{ strategy.job-index }}
           path: ts/shard-timings.json
           retention-days: 30
 

@@ -58,7 +58,7 @@ const historicalTimings = (repo: string, pairs: readonly string[], slugs: readon
   (folder) => Effect.sync(() => rmSync(folder, { recursive: true, force: true })),
 );
 
-const TIMING_ARTIFACT = /^balance-(shard-)?timings(-[0-9]+)?$/;
+const TIMING_ARTIFACT = /^balance-timings(-shard-[0-9]+)?$/;
 
 const fieldSamples = (repo: string, pairs: readonly string[]) => Effect.acquireUseRelease(
   Effect.sync(() => mkdtempSync(join(tmpdir(), "balance-field-timings-"))),
