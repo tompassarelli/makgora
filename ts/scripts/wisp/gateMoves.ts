@@ -18,7 +18,8 @@ import { pollUntil } from "../hostPoll";
 import { runProcess } from "../hostProcess";
 import { JournalMenu } from "./boundary";
 import { readReplay } from "./replayFiles";
-import { type SmokeVerdict, freezeInvalid, judgeSmoke, mergeVerdicts, smokeLines, smokePace, smokeReceipt } from "./smokeJudge";
+import { type MapStall, readMapStalls } from "./mapStalls";
+import { type SmokeVerdict, disturbedSteps, judgeSmoke, mergeVerdicts, smokeLines, smokePace, smokeReceipt } from "./smokeJudge";
 import { smokeApproaches } from "./smokeRehearsal";
 import { FRAME_MILLIS, RESET_LEAD, SETTLE_AT, type SettlePoint, settlePoints, smokeSchedule, xdotoolArgs } from "./smokeTape";
 import { type Settle, type SpotResult, brightCount, playArea, specialsReceipt, specialsSpot } from "./specialsSpot";
@@ -55,6 +56,13 @@ const newestReplay = (data: string, since: number, match: number) => pollUntil(E
   try: () => readdirSync(data).filter(file => REPLAY.test(file) && statSync(join(data, file)).mtimeMs >= since).sort((a, b) => Number(REPLAY.exec(b)?.[1]) - Number(REPLAY.exec(a)?.[1]))[0],
   catch: cause => new AcceptFailure({ operation: "moves gate replay", problem: String(cause) }),
 }), { every: "200 millis", within: "15 seconds", orElse: () => Effect.fail(new AcceptFailure({ operation: "moves gate replay", problem: `no replay written after match ${match}` })) });
+
+const matchStalls = (clients: readonly Client[], manifests: readonly string[], since: number) => Effect.try({
+  try: () => clients.map((client, slot) => readMapStalls(join(client.documents, "CustomMapData"), since, Number(REPLAY.exec(manifests[slot] ?? "")?.[1]))),
+  catch: cause => new AcceptFailure({ operation: "moves gate stalls", problem: String(cause) }),
+});
+
+const stallLines = (stalls: readonly (readonly MapStall[])[]) => stalls.flatMap((list, slot) => list.map(({ from, through, millis }) => `stall P${slot + 1} ${Math.round(millis)} ms over frames ${from}-${through}`));
 
 const hazardsLabel =(host: Client, view: Viewport) => capture(host, view).pipe(
   Effect.flatMap(frame => frameWords(host, frame, "light")),
@@ -213,7 +221,8 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
     const manifest = yield* newestReplay(data, ended, index + 1);
     const lines = readReplay(join(data, manifest));
     if (typeof lines === "string") return yield* new AcceptFailure({ operation: "moves gate replay", problem: lines });
-    return { manifest, lines, schedule, runs };
+    const stalls = yield* matchStalls(clients, [manifest, yield* newestReplay(join(guest.documents, "CustomMapData"), ended, index + 1)], picked);
+    return { manifest, lines, schedule, runs, stalls };
   });
   for (const [index, pair] of smokePairs().entries()) {
     const characters = pair.map(choice => PLAYABLE_CHARACTERS[choice] ?? Character.rifleman);
@@ -221,8 +230,8 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
     const name = `match-${String(index + 1).padStart(2, "0")}`;
     const invalid: string[] = [];
     for (let attempt = 1; ; attempt++) {
-      const { manifest, lines, schedule, runs } = yield* playMatch(index, pair, characters);
-      const judged = judgeSmoke(lines, schedule.flat());
+      const { manifest, lines, schedule, runs, stalls } = yield* playMatch(index, pair, characters);
+      const judged = judgeSmoke(lines, schedule.flat(), stalls);
       const measured = smokePace(lines, judged);
       const played = pace;
       if (measured !== undefined) pace = measured * played;
@@ -230,17 +239,17 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
       const settles = runs.map(run => run.map(({ settle }) => settle));
       const results = specialsSpot(settles, area);
       const failedSpots = results.filter(({ pass }) => !pass).map(({ step }) => step);
-      const frozen = freezeInvalid(verdict, failedSpots);
+      const frozen = disturbedSteps(verdict, failedSpots);
       const final = frozen.length === 0 || attempt === MATCH_ATTEMPTS;
       const stem = final ? name : `${name}-invalid-${attempt}`;
       yield* Effect.forEach(spotFrameFiles(stem, runs, failedSpots), ([file, bytes]) => save(file, bytes), { discard: true });
-      yield* save(`${stem}.txt`, matchRecord([`replay ${manifest}`, `fighters ${fighters.join(" vs ")}`, `attempt ${attempt}`, `pace played ${played.toFixed(4)} next ${pace.toFixed(4)}`, ...invalid], verdict, results, fighters, settles.flat()));
+      yield* save(`${stem}.txt`, matchRecord([`replay ${manifest}`, `fighters ${fighters.join(" vs ")}`, `attempt ${attempt}`, `pace played ${played.toFixed(4)} next ${pace.toFixed(4)}`, ...stallLines(stalls), ...invalid], verdict, results, fighters, settles.flat()));
       if (final) {
         verdicts.push({ fighters, verdict });
         spots.push({ fighters, results });
         break;
       }
-      invalid.push(`attempt ${attempt} invalid, a failure fell in a client freeze: ${frozen.join("; ")}`);
+      invalid.push(`attempt ${attempt} invalid, a failure fell in a client freeze or map stall: ${frozen.join("; ")}`);
     }
   }
   const all = mergeVerdicts(verdicts.map(({ verdict }) => verdict));

@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { preloadLines } from "wisp/scripts/wisp/preloadRecord";
 
 const DEFAULT_FOLDER = join(process.env.HOME ?? "", ".local/share/Steam/steamapps/compatdata/3516115571/pfx/drive_c/users/steamuser/Documents/Warcraft III/CustomMapData");
-const RATES_FILE = /^smashcraft-rates-(.+)-(\d+)\.txt$/;
+export const RATES_FILE = /^smashcraft-rates-(.+)-(\d+)\.txt$/;
 const GAP_FLAG_US = 250000;
 const SLOW_SIM = 55;
 const SLOW_CB = 55;

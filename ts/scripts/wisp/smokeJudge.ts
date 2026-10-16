@@ -6,7 +6,8 @@ import { traitMove } from "../../src/game/sim/identityTraits";
 import { normalName } from "../../src/game/sim/moveNames";
 import { fighterName } from "../../src/game/sim/heroes/registry";
 import { fighterAt, isActive } from "../../src/game/sim/roster";
-import { type MoveClass, SMOKE_BINDINGS, type SmokeStep, type SmokeTape, bindingSweep, keyName, tapeFrames } from "./smokeTape";
+import type { MapStall } from "./mapStalls";
+import { FRAME_MILLIS, type MoveClass, SMOKE_BINDINGS, type SmokeStep, type SmokeTape, bindingSweep, keyName, tapeFrames } from "./smokeTape";
 
 export const STEP_SLACK = 24;
 export const FREEZE_FRAMES = STEP_SLACK;
@@ -22,6 +23,7 @@ export interface StepResult {
   readonly pass: boolean;
   readonly reason: string;
   readonly lost?: number;
+  readonly stalled?: MapStall;
 }
 
 export interface FrozenStep {
@@ -102,7 +104,10 @@ function stepResult(slot: number, trace: SlotTrace, step: SmokeStep, anchor: num
   return result(step.name, "move", false, anchor === undefined ? "its keys never reached the game" : window.length === 0 ? `nothing started (${state})` : `started ${window.map((start) => start.label).join(", ")} (${state})`);
 }
 
-export function judgeSmoke(lines: readonly string[], plans: readonly SmokePlan[]): SmokeVerdict {
+const swallowedBy = (stalls: readonly MapStall[], step: SmokeStep, at: number): MapStall | undefined =>
+  stalls.find((stall) => step.presses.some((press) => at + press.at <= stall.through && at + press.at + press.hold >= stall.from && stall.millis >= press.hold * FRAME_MILLIS));
+
+export function judgeSmoke(lines: readonly string[], plans: readonly SmokePlan[], stalls: readonly (readonly MapStall[])[] = []): SmokeVerdict {
   const traces = new Map<number, SlotTrace>([...new Set(plans.map(({ slot }) => slot))].map((slot) => [slot, newTrace()]));
   let hazards: boolean | undefined;
   const replay = replayMatch(lines, (state, frame, rows) => {
@@ -146,7 +151,10 @@ export function judgeSmoke(lines: readonly string[], plans: readonly SmokePlan[]
       judged = true;
       const lost = carry + own;
       carry = 0;
-      results.push(!result.pass && lost > FREEZE_FRAMES ? { ...result, lost, reason: `${result.reason}, while the client froze and lost ${lost} frames` } : result);
+      const stalled = result.pass ? undefined : swallowedBy(stalls[slot] ?? [], step, at);
+      if (!result.pass && lost > FREEZE_FRAMES) results.push({ ...result, lost, reason: `${result.reason}, while the client froze and lost ${lost} frames` });
+      else if (stalled !== undefined) results.push({ ...result, stalled, reason: `${result.reason}, while the map stalled ${Math.round(stalled.millis)} ms over frames ${stalled.from}-${stalled.through}` });
+      else results.push(result);
     });
     carried.set(slot, judged ? 0 : carry);
     cursors.set(slot, Math.max(from, (expected ?? from) - STEP_SLACK));
@@ -154,8 +162,13 @@ export function judgeSmoke(lines: readonly string[], plans: readonly SmokePlan[]
   return { replay, results, frozen };
 }
 
-export function freezeInvalid({ results, frozen }: SmokeVerdict, spotFailures: readonly string[] = []): string[] {
-  const moves = results.filter(({ pass, lost }) => !pass && lost !== undefined).map(({ slot, fighter, step, lost }) => `P${slot + 1} ${fighter} ${step} lost ${lost} frames`);
+const disturbance = ({ lost, stalled }: StepResult): string | undefined => lost !== undefined ? `lost ${lost} frames` : stalled === undefined ? undefined : `stalled ${Math.round(stalled.millis)} ms`;
+
+export function disturbedSteps({ results, frozen }: SmokeVerdict, spotFailures: readonly string[] = []): string[] {
+  const moves = results.flatMap((result) => {
+    const why = disturbance(result);
+    return result.pass || why === undefined ? [] : [`P${result.slot + 1} ${result.fighter} ${result.step} ${why}`];
+  });
   const spots = spotFailures.flatMap((step) => frozen.filter((freeze) => freeze.step === step).map(({ slot, lost }) => `${step} spot lost ${lost} frames on P${slot + 1}`));
   return [...moves, ...spots];
 }

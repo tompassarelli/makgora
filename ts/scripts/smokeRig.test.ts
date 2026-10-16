@@ -5,7 +5,8 @@ import { Character } from "../src/game/sim/codes";
 import { PLAYABLE_CHARACTERS } from "../src/game/sim/heroes/registry";
 import { SMASHCRAFT_ACCEPT } from "./wisp/acceptChecks";
 import { GREEN_GATE_CHECKS, greenGateFailures } from "./wisp/greenBuilds";
-import { FREEZE_FRAMES, freezeInvalid, judgeSmoke, smokeLines, smokePace, smokeReceipt } from "./wisp/smokeJudge";
+import { FREEZE_FRAMES, disturbedSteps, judgeSmoke, smokeLines, smokePace, smokeReceipt } from "./wisp/smokeJudge";
+import { mapStalls } from "./wisp/mapStalls";
 import { rehearsal, rehearseSmoke, smokeApproaches } from "./wisp/smokeRehearsal";
 import { SMOKE_BINDINGS, bindingSweep, keyName, smokeSchedule, tapeFrames, xdotoolArgs } from "./wisp/smokeTape";
 import { type Settle, specialsReceipt, specialsSpot } from "./wisp/specialsSpot";
@@ -28,7 +29,7 @@ test("a key the map no longer binds fails that key and every move pressed with i
   expect(failed.some(({ step }) => step === "Ultimate")).toBe(true);
   expect(failed.some(({ step }) => step === "Jab")).toBe(false);
   expect(smokeReceipt(verdict, 2)).toEndWith("pass=0");
-  expect(freezeInvalid(verdict)).toEqual([]);
+  expect(disturbedSteps(verdict)).toEqual([]);
 });
 
 test("the green gate refuses a candidate whose move smoke failed, and the move gate demands the whole roster [k2 property]", () => {
@@ -68,7 +69,7 @@ test("a special whose effect is still drawn at the next rest fails the spot chec
 test("a native client stepping slower than the wall clock still starts every move, and the rig measures that pace from the replay and stretches its keys to match, sending every key edge without xdotool's own delay [k1 scenario]", () => {
   const pace = 59.5 / 60;
   const schedule = smokeSchedule(smokeApproaches(Character.rifleman, Character.demonHunter));
-  const paced = rehearsal(Character.rifleman, Character.demonHunter, SMOKE_BINDINGS, schedule, pace);
+  const paced = rehearsal(Character.rifleman, Character.demonHunter, SMOKE_BINDINGS, schedule, { rate: pace });
   expect(smokeLines(judgeSmoke(paced.lines, schedule.flat())).filter((line) => !line.startsWith("PASS"))).toEqual([]);
   expect(Math.abs((smokePace(paced.lines, judgeSmoke(paced.lines, schedule.flat())) ?? 0) - pace)).toBeLessThan(0.005);
   const sweep = bindingSweep();
@@ -85,26 +86,43 @@ test("a client freeze that swallows a special's keys fails that special as inval
   const steps = schedule[1]?.[0]?.steps ?? [];
   const away = steps.findIndex(({ name }) => name === "Side special away");
   const lost = 110;
-  const paced = rehearsal(Character.rifleman, Character.demonHunter, SMOKE_BINDINGS, schedule, 1, { segment: 1, at: tapeFrames(steps.slice(0, away)) + 70, frames: lost });
+  const paced = rehearsal(Character.rifleman, Character.demonHunter, SMOKE_BINDINGS, schedule, { freeze: { segment: 1, at: tapeFrames(steps.slice(0, away)) + 70, frames: lost } });
   const verdict = judgeSmoke(paced.lines, schedule.flat());
   const failed = verdict.results.filter(({ pass }) => !pass);
   expect(failed.map(({ step }) => step)).toEqual(["Side special away", "Side special away"]);
   expect(failed.every((result) => (result.lost ?? 0) > FREEZE_FRAMES)).toBe(true);
   expect(verdict.results.filter(({ step }) => step === "Up special" || step === "Ultimate").every(({ pass }) => pass)).toBe(true);
-  expect(freezeInvalid(verdict)).toHaveLength(2);
-  expect(freezeInvalid(verdict, ["Side special away"])).toHaveLength(4);
+  expect(disturbedSteps(verdict)).toHaveLength(2);
+  expect(disturbedSteps(verdict, ["Side special away"])).toHaveLength(4);
   expect(smokePace(paced.lines, verdict)).toBeUndefined();
   const keys = bindingSweep();
   const sweepOnly = schedule.slice(0, 1);
-  const swallowed = rehearsal(Character.rifleman, Character.demonHunter, SMOKE_BINDINGS, sweepOnly, 1, { segment: 0, at: tapeFrames(keys.slice(0, 10)) + 2, frames: 20 });
+  const swallowed = rehearsal(Character.rifleman, Character.demonHunter, SMOKE_BINDINGS, sweepOnly, { freeze: { segment: 0, at: tapeFrames(keys.slice(0, 10)) + 2, frames: 20 } });
   expect(smokePace(swallowed.lines, judgeSmoke(swallowed.lines, sweepOnly.flat()))).toBeUndefined();
 });
 
 test("a match played with stage hazards on fails its setup, so a hazard that interrupts a move never passes for the game's own failure [k1 scenario]", () => {
   const schedule = smokeSchedule(smokeApproaches(Character.rifleman, Character.demonHunter)).slice(0, 1);
-  const on = judgeSmoke(rehearsal(Character.rifleman, Character.demonHunter, SMOKE_BINDINGS, schedule, 1, undefined, true).lines, schedule.flat());
+  const on = judgeSmoke(rehearsal(Character.rifleman, Character.demonHunter, SMOKE_BINDINGS, schedule, { hazards: true }).lines, schedule.flat());
   expect(on.results.filter(({ pass }) => !pass).map(({ step }) => step)).toEqual(["stage hazards off"]);
   expect(smokeReceipt(on, 2)).toEndWith("pass=0");
   const off = judgeSmoke(rehearsal(Character.rifleman, Character.demonHunter, SMOKE_BINDINGS, schedule).lines, schedule.flat());
   expect(off.results.find(({ step }) => step === "stage hazards off")?.pass).toBe(true);
+});
+
+test("a map stall that swallows a key tap fails that key as invalid for the rerun, the same lost tap with no stall over it stays a plain failure, and the stalls come from the map's own rates lines for that replay [k1 scenario]", () => {
+  const sweepOnly = smokeSchedule(smokeApproaches(Character.rifleman, Character.demonHunter)).slice(0, 1);
+  const keys = bindingSweep();
+  const at = tapeFrames(keys.slice(0, 10));
+  const tapped = rehearsal(Character.rifleman, Character.demonHunter, SMOKE_BINDINGS, sweepOnly, { stall: { segment: 0, at: at - 2, frames: 12 } });
+  const start = (tapped.starts[0] ?? 0) + at;
+  const stalls = mapStalls([`r t=1000 cbgap=16000 m=7 f=${start - 40}`, `r t=2000 cbgap=190000 m=7 f=${start + 1}`, `r t=2000 cbgap=900000 m=8 f=${start + 300}`], 7);
+  expect(stalls).toEqual([{ from: start - 40, through: start + 13, millis: 190 }]);
+  const plain = judgeSmoke(tapped.lines, sweepOnly.flat());
+  const lost = `key ${keyName(keys[10]?.binding ?? 0)}`;
+  expect(new Set(plain.results.filter(({ pass }) => !pass).map(({ step }) => step))).toEqual(new Set([lost]));
+  expect(disturbedSteps(plain)).toEqual([]);
+  const judged = judgeSmoke(tapped.lines, sweepOnly.flat(), [stalls, stalls]);
+  expect(disturbedSteps(judged).length).toBeGreaterThan(0);
+  expect(disturbedSteps(judged).every((line) => line.includes(`${lost} stalled 190 ms`))).toBe(true);
 });

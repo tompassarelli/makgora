@@ -47,10 +47,17 @@ export function approachFrames(character: Character, slot: number): number {
 
 export const smokeApproaches = (first: Character, second: Character): [number, number] => [approachFrames(first, 0), approachFrames(second, 1)];
 
-export interface Freeze {
+export interface TapeSpan {
   readonly segment: number;
   readonly at: number;
   readonly frames: number;
+}
+
+export interface RehearsalOptions {
+  readonly rate?: number;
+  readonly freeze?: TapeSpan;
+  readonly stall?: TapeSpan;
+  readonly hazards?: boolean;
 }
 
 export interface Rehearsal {
@@ -58,7 +65,7 @@ export interface Rehearsal {
   readonly starts: number[];
 }
 
-export function rehearsal(first: Character, second: Character, bindings: KeyBindings, schedule: readonly SmokeSegment[], rate = 1, freeze?: Freeze, hazards = false): Rehearsal {
+export function rehearsal(first: Character, second: Character, bindings: KeyBindings, schedule: readonly SmokeSegment[], { rate = 1, freeze, stall, hazards = false }: RehearsalOptions = {}): Rehearsal {
   const tape = schedule.reduce((total, segment) => total + segmentFrames(segment) + BETWEEN_FRAMES, LEAD_FRAMES);
   const masks = [new Array<number>(tape).fill(0), new Array<number>(tape).fill(0)];
   let start = LEAD_FRAMES;
@@ -75,10 +82,13 @@ export function rehearsal(first: Character, second: Character, bindings: KeyBind
     return played < frozenAt ? played : played + skipped;
   };
   const frames = Math.ceil((tape - skipped) * rate);
-  const paced = masks.map((row) => Array.from({ length: frames }, (_, frame) => row[tapeAt(frame)] ?? 0));
+  const stalledAt = stall === undefined ? frames : Math.round(((starts[stall.segment] ?? tape) + stall.at) * rate);
+  const polledAfter = stalledAt + (stall?.frames ?? 0);
+  const polledAt = (frame: number) => (frame >= stalledAt && frame < polledAfter ? polledAfter : frame);
+  const paced = masks.map((row) => Array.from({ length: frames }, (_, frame) => row[tapeAt(polledAt(frame))] ?? 0));
   return { lines: recorded(first, second, frames, paced.map(keyboardRows), hazards), starts: starts.map((frame) => Math.round(frame * rate)) };
 }
 
 export function rehearseSmoke(first: Character, second: Character, bindings: KeyBindings = SMOKE_BINDINGS, schedule: readonly SmokeSegment[] = smokeSchedule(smokeApproaches(first, second)), rate = 1): SmokeVerdict {
-  return judgeSmoke(rehearsal(first, second, bindings, schedule, rate).lines, schedule.flat());
+  return judgeSmoke(rehearsal(first, second, bindings, schedule, { rate }).lines, schedule.flat());
 }
