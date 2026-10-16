@@ -45,6 +45,7 @@ const HOSTED = ["clean room", "kind tags and type-check ts", "Autoland suite cov
 const EVERY_PATH = ["ts/scripts/prePush.ts", "build-inputs/original-clips-static-lights/kobold", CUE_MODEL_RECORD];
 
 const stubbed = (paths: readonly string[], ran: string[], exitCode = (_: Check) => 0): Local => ({
+  hosted: false,
   cues: () => new Set([CUE_MODEL_RECORD]),
   changed: () => Effect.succeed(paths),
   head: Effect.succeed("c0ffee"),
@@ -93,6 +94,12 @@ test("input, pin and clip lanes cannot hand off to Autoland after a private-stor
     }, local).pipe(Effect.as("passed"), Effect.catchTag("PrePushRefusal", () => Effect.succeed("refused"))));
     expect(result).toBe("refused");
     expect(ran).toEqual(["private map-build inputs"]);
+    ran.length = 0;
+    await Effect.runPromise(prePush("HEAD c0ffee refs/heads/claude/land-store 0000000000000000000000000000000000000000\n", {
+      queue: Effect.succeed("autoland"), notice: Effect.void,
+      gate: () => Effect.die("Autoland owns the hosted farm gate"),
+    }, { ...local, hosted: true }));
+    expect(ran).toEqual([]);
   }
 });
 
