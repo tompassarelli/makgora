@@ -44,7 +44,7 @@ export function specialsSpot(runs: readonly (readonly Settle[])[], area: number)
   return pairs.filter(({ before }) => before.special).map(({ before, after }) => {
     if (!before.onTime || !after.onTime) return { step: before.step, pass: false, reason: "a settle frame was captured after the next press" };
     const excess = after.count - before.count;
-    return { step: before.step, pass: excess <= allowed, reason: `${excess} more bright play-area pixels at the next rest than before it (allowed ${Math.round(allowed)}, noise ${noise})` };
+    return { step: before.step, pass: excess <= allowed, reason: `excess=${excess} allowed=${Math.round(allowed)}; ${excess} more bright play-area pixels at the next rest than before it (allowed ${Math.round(allowed)}, noise ${noise})` };
   });
 }
 

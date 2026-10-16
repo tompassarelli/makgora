@@ -11,6 +11,8 @@ import { HERO_ROSTER, PLAYABLE_CHARACTERS } from "../../src/game/sim/heroes/regi
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { FLOATING_STAGE_CHECKS, FLOATING_STAGE_MAPS, STAGE_COMPOSITION_CHECKS, STAGE_COMPOSITION_MAPS, STAGE_ENTRY_CHECKS, STAGE_ENTRY_MAPS, STAGE_FOG_CHECKS } from "./stageCompositionChecks";
 
+import { neutralSpecialChecks } from "./neutralSpecialChecks";
+
 const inputs = join(homedir(), ".local/share/smashcraft-build-inputs");
 
 export interface SmashcraftMapProfile {
@@ -185,6 +187,7 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
       setup: [{ chat: "gate:bindings", client: "a" }],
       pass: [NO_ERRORS, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE bindings labels=\\d+ samples=(\\d+) passed=\\1 pass=1 remaps=none$", min: 1 }],
     },
+    ...neutralSpecialChecks(NO_ERRORS),
     {
       id: "gate-moves", closes: "smashcraft-dev#467", map: "gate-playable", session: "gate-moves",
       setup: [{ chat: "gate:moves", client: "a" }],
