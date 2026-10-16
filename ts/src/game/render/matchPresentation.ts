@@ -30,6 +30,7 @@ import { originalClip, originalClipNamed } from "../../generated/clips/fighterOr
 
 
 export const RESULTS_DELAY_FRAMES = 90;
+export const LEVEL_UP_FRAME = 12;
 
 const FACING_CAMERA = f32(-1.5707963705062866);
 
@@ -61,7 +62,6 @@ interface VictoryPose {
   readonly repeatVictory: boolean;
   readonly heldClip: FighterOriginalClip;
   readonly idleClip: FighterOriginalClip;
-  readonly burstFrame: number;
 }
 
 export class MatchPresentation {
@@ -272,7 +272,7 @@ export class MatchPresentation {
       this.resultFrames++;
       this.placeResultPoses();
       for (const [index, row] of this.resultView.rows.entries()) {
-        if (!row.winner || this.poses[row.slot]?.burstFrame !== this.resultFrames) continue;
+        if (!row.winner || this.resultFrames !== LEVEL_UP_FRAME) continue;
         this.resultBurst = true;
         const placement = resultFighterPlacement(this.resultStage, index, this.resultView.rows.length);
         const burst = AddSpecialEffect("Abilities\\Spells\\Other\\Levelup\\LevelupCaster.mdx", this.origin.x + placement.x, this.origin.y);
@@ -331,8 +331,7 @@ export class MatchPresentation {
       if (winnerClip === undefined || idleClip === undefined) continue;
       const readyIndex = originalClipNamed(character, "stand ready");
       const heldClip = readyIndex === undefined ? idleClip : originalClip(character, readyIndex) ?? idleClip;
-      this.poses[slot] = { character, model: undefined, modelPath: undefined, winnerClip, repeatVictory: victoryAnimation(character).includes("victory"), heldClip, idleClip,
-        burstFrame: R2I((winnerClip.endSeconds - winnerClip.startSeconds) * 60.0 + 0.5) };
+      this.poses[slot] = { character, model: undefined, modelPath: undefined, winnerClip, repeatVictory: victoryAnimation(character).includes("victory"), heldClip, idleClip };
     }
   }
 

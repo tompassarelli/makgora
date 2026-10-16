@@ -3,7 +3,7 @@ import { playedMoves } from "../../tools/animations/hd-models";
 import { originalClip, originalClipCount, originalClipNamed, originalClipNames } from "../src/generated/clips/fighterOriginalClipInfo";
 import { victoryAnimation } from "../src/game/presentation/matchAudio";
 import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/sim/heroes/registry";
-import { MatchPresentation } from "../src/game/render/matchPresentation";
+import { LEVEL_UP_FRAME, MatchPresentation } from "../src/game/render/matchPresentation";
 import { Phase, createMatchState } from "../src/game/lobby/lobbyState";
 import { createMatchTally, resultsView } from "../src/game/presentation/matchCues";
 import { Character } from "../src/game/sim/codes";
@@ -51,7 +51,7 @@ test("results playback shows full stock victories and casts once before holding 
         if (pose === undefined) throw new Error(`${name}: missing body`);
         expect(pose.timeScale).toBe(0);
         const elapsed = frame / 60;
-        expect(bursts() - burstsBefore, `${name}/${frame}: the level-up burst waits for the whole victory`).toBe(frame < Math.round(duration * 60) ? 0 : 1);
+        expect(bursts() - burstsBefore, `${name}/${frame}: the level-up burst plays early in the victory`).toBe(frame < LEVEL_UP_FRAME ? 0 : 1);
         if (victoryAnimation(character).includes("victory")) {
           expect(pose.animationElapsed).toBeGreaterThanOrEqual(clip.startSeconds);
           expect(pose.animationElapsed).toBeLessThanOrEqual(clip.endSeconds);
