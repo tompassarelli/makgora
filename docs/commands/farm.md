@@ -11,7 +11,9 @@
   branch, the place for scratch instrumentation, since Autoland lands every
   pushed `claude/` lane.
   A newer run of the same shape on the same line (main, the lane or the
-  scratch commit) cancels the older one, and every job first cancels its run
+  scratch commit) cancels the older one (each `--matchups` run is its own shape,
+  because GitHub refuses a run whose concurrency group holds a long pair list),
+  and every job first cancels its run
   when the commit has left main (or main reverted it) and its lane
   (smashcraft:ts/scripts/farmGuard.ts). Job timeouts sit about 1.5 times above
   the longest measured job.
