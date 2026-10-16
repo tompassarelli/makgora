@@ -1,5 +1,5 @@
 
-import { min } from "../core/numbers";
+import { max, min } from "../core/numbers";
 import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
 import { at } from "wisp/src/runtime/lookup";
@@ -8,7 +8,7 @@ import { finishDamageContacts, openDamageContacts, queueDamageContact } from "./
 import type { FighterMoves } from "./heroMoves";
 import { copyHitEffect, emptyHitEffect, type HitEffect } from "./hitRegions";
 import { advanceMash, clearMash } from "./mash";
-import { GRAB_HOLD_DISTANCE, GRAB_HOLD_MINIMUM_FRAMES, GRAB_RELEASE_STUN_FRAMES, PUMMEL_DAMAGE, grabActionDuration, grabContactFrame, pummelLimit } from "./moves";
+import { GRAB_HOLD_DISTANCE, GRAB_HOLD_MINIMUM_FRAMES, GRAB_RELEASE_STUN_FRAMES, PUMMEL_DAMAGE, grabActionDuration, grabContactFrame, PUMMEL_HOLD_COST } from "./moves";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import type { Fighter } from "./fighter";
 import { type Controls, type Roster, controlsAt, fighterAt, isActive } from "./roster";
@@ -162,7 +162,7 @@ function advanceGrab(world: Roster, ownerSlot: number, ownerInput: Readonly<Cont
   const throwAction = requestedThrow(owner, ownerInput);
   if (grab.action === GrabAction.hold) {
     if (throwAction !== GrabAction.none) beginGrabAction(owner, throwAction);
-    else if (ownerInput.attackPressed && grab.pummels < pummelLimit(owner.tuning.moves)) {
+    else if (ownerInput.attackPressed) {
       grab.pummels++;
       beginGrabAction(owner, GrabAction.pummel);
     }
@@ -172,10 +172,9 @@ function advanceGrab(world: Roster, ownerSlot: number, ownerInput: Readonly<Cont
       const next = throwAction !== GrabAction.none ? throwAction : grab.queuedThrow;
       grab.queuedThrow = GrabAction.none;
       if (next === GrabAction.none) {
-        escapeGrab(world, ownerSlot, targetSlot);
-        return;
-      }
-      beginGrabAction(owner, next);
+        grab.action = GrabAction.hold;
+        grab.frame = 0;
+      } else beginGrabAction(owner, next);
     } else {
       grab.action = targetSlot === undefined ? GrabAction.none : GrabAction.hold;
       grab.frame = 0;
@@ -190,6 +189,9 @@ function advanceGrab(world: Roster, ownerSlot: number, ownerInput: Readonly<Cont
     if (grab.action === GrabAction.pummel) {
       const hit = owner.tuning.moves?.throws[GrabAction.pummel]?.effect ?? PUMMEL_HIT;
       queueDamageContact(world, ownerSlot, targetSlot, hit, owner.facing, ContactKind.pummel, true, undefined);
+      const held = fighterAt(world, targetSlot).grab;
+      held.grabbedFrames = max(1, held.grabbedFrames - PUMMEL_HOLD_COST);
+      held.heldFrames += PUMMEL_HOLD_COST;
     }
     else releaseThrow(world, ownerSlot, targetSlot, targetInput);
   }

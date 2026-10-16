@@ -33,7 +33,6 @@ export const PEON_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack,
   smashMaxChargeFrames: 45,
   smashMaxDamageMultiplier: 1.25,
-  maxPummels: 1,
   hurtboxes: {
     stand: [BODY],
     attacks: {

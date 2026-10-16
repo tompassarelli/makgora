@@ -432,7 +432,6 @@ export const LICH_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack,
   smashMaxChargeFrames: 45,
   smashMaxDamageMultiplier: 1.25,
-  maxPummels: 2,
   hurtboxes: LICH_BODY,
   normals: {
     ...LICH_GROUND.normals,

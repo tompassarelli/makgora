@@ -5,7 +5,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { GrabAction } from "../sim/codes";
 import { fighterHurtboxes } from "../sim/hurtboxes";
-import { PUMMEL_CONTACT_FRAME, pummelLimit } from "../sim/moves";
+import { PUMMEL_CONTACT_FRAME } from "../sim/moves";
 import type { Fighter } from "../sim/fighter";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { FREEZE_TRAP_FREEZE_FRAMES } from "../sim/summons";
@@ -51,13 +51,13 @@ export function readEscapeMeter(world: Readonly<Roster>, slot: number, view: Esc
   } else {
     const ownerSlot = held.grab.owner;
     if (ownerSlot === undefined || held.grab.grabbedFrames <= 0) return;
-    const { grab, tuning } = fighterAt(world, ownerSlot);
+    const { grab } = fighterAt(world, ownerSlot);
     if (grab.action !== GrabAction.hold && grab.action !== GrabAction.pummel) return;
     view.remaining = held.grab.grabbedFrames;
     view.full = held.grab.grabbedFrames + held.grab.heldFrames;
     view.pummel = grab.action === GrabAction.pummel
       ? grab.frame < PUMMEL_CONTACT_FRAME ? PUMMEL_CONTACT_FRAME - grab.frame : -1
-      : grab.pummels < pummelLimit(tuning.moves) ? PUMMEL_CONTACT_FRAME : -1;
+      : PUMMEL_CONTACT_FRAME;
   }
   view.shown = true;
   view.x = held.motion.x;

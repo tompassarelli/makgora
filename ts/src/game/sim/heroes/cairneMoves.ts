@@ -48,7 +48,7 @@ const FORWARD_TILT = heroMove(14, 4, 29, 0, sweep(14, 170.0, [170.0, 115.0, 60.0
 export const NO_LAUNCH = { growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } as const;
 
 export const CAIRNE_MOVES: FighterMoves = {
-  dashAttack: AttackStyle.dashAttack, smashMaxChargeFrames: 45, smashMaxDamageMultiplier: 1.25, maxPummels: 1,
+  dashAttack: AttackStyle.dashAttack, smashMaxChargeFrames: 45, smashMaxDamageMultiplier: 1.25,
   hurtboxes: {
     stand: [BODY],
     attacks: {
@@ -105,7 +105,7 @@ export const CAIRNE_MOVES: FighterMoves = {
     [AttackStyle.grab]: heroMove(10, 3, 31, 0, [heroRegion(10, 12, c(30.0, 65.0, 98.0, 60.0), { damage: 0.0, ...NO_LAUNCH })]),
   },
   throws: {
-    [GrabAction.pummel]: { contactFrame: 60, totalFrames: 68, effect: { damage: 3.0, ...NO_LAUNCH } },
+    [GrabAction.pummel]: { contactFrame: 5, totalFrames: 12, effect: { damage: 3.0, ...NO_LAUNCH } },
     [GrabAction.throwForward]: { contactFrame: 19, totalFrames: 45, effect: cairneHit(8.86208438873291, "edge", 35) },
     [GrabAction.throwBack]: { contactFrame: 23, totalFrames: 54, effect: cairneHit(10.473372459411621, "kill", 40, -1) },
     [GrabAction.throwUp]: { contactFrame: 21, totalFrames: 32, effect: cairneHit(8.756999015808105, "juggle", 85) },

@@ -14,7 +14,7 @@ const paw = hurtPart(48.0, 34.0, 96.0, 34.0, 20.0);
 const down = { damage: 13.0, growth: 103.52999877929688, base: 24.0, launchX: 0.0, launchZ: -1.0, electric: false, element: HitElement.normal };
 
 export const THRALL_MOVES: FighterMoves = {
-  dashAttack: AttackStyle.dashAttack, smashMaxChargeFrames: 45, smashMaxDamageMultiplier: 1.25, maxPummels: 1,
+  dashAttack: AttackStyle.dashAttack, smashMaxChargeFrames: 45, smashMaxDamageMultiplier: 1.25,
   hurtboxes: {
     stand: [body, wolf],
     attacks: {
@@ -53,7 +53,7 @@ export const THRALL_MOVES: FighterMoves = {
     [AttackStyle.ledgeAttack]: normal(8, 4, 18, 0, capsule(20.0, 35.0, 102.0, 35.0, 14.0), 8.192000389099121, 40),
   },
   throws: {
-    [GrabAction.pummel]: { contactFrame: 60, totalFrames: 68, effect: thrallHit(3.072000026702881, 90, 0.0, 0.0) },
+    [GrabAction.pummel]: { contactFrame: 5, totalFrames: 12, effect: thrallHit(3.072000026702881, 90, 0.0, 0.0) },
     [GrabAction.throwForward]: { contactFrame: 14, totalFrames: 34, effect: thrallHit(8.192000389099121, 35, 88.73999786376953, 28.0) },
     [GrabAction.throwBack]: { contactFrame: 18, totalFrames: 40, effect: thrallHit(10.239999771118164, 40, 103.52999877929688, 30.0, true) },
     [GrabAction.throwUp]: { contactFrame: 15, totalFrames: 28, effect: thrallHit(7.168000221252441, 75, 83.80999755859375, 60.0, true) },

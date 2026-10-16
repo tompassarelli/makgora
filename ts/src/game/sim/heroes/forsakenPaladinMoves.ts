@@ -117,7 +117,6 @@ export const FORSAKEN_PALADIN_AUTHORING_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack,
   smashMaxChargeFrames: 45,
   smashMaxDamageMultiplier: 1.25,
-  maxPummels: 2,
   hurtboxes: FORSAKEN_PALADIN_HURTBOXES,
   normals: {
     ...FORSAKEN_PALADIN_GROUND.normals,

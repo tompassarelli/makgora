@@ -135,7 +135,6 @@ export function fighterMovesCanonical(moves: FighterMoves | undefined, prefix = 
     if (hit.manaSteal !== undefined) int(`${name}.manaSteal`, hit.manaSteal);
   };
   int("chargeFrames", moves.smashMaxChargeFrames);
-  int("maxPummels", moves.maxPummels ?? -1);
   real("chargeMultiplier", moves.smashMaxDamageMultiplier);
   for (let style = 0; style <= LAST_ATTACK_STYLE; style++) {
     const move = moves.normals[style];

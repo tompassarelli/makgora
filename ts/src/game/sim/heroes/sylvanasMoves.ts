@@ -67,7 +67,6 @@ export const SYLVANAS_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack,
   smashMaxChargeFrames: 45,
   smashMaxDamageMultiplier: 1.25,
-  maxPummels: 1,
   hurtboxes: { stand: SYLVANAS_STAND, attacks: limbPoses },
   throws: {
     [GrabAction.pummel]: { contactFrame: 60, totalFrames: 75, effect: { ...NOTHING, damage: 3.0 } },

@@ -335,16 +335,14 @@ export function grabHoldFrames(damage: number): number {
   return GRAB_HOLD_BASE_FRAMES + idiv(toInt(f32(damage * 7.0)), 4);
 }
 
-export const PUMMEL_CONTACT_FRAME = 60;
-export const PUMMEL_TOTAL_FRAMES = 68;
+export const PUMMEL_CONTACT_FRAME = 3;
+export const PUMMEL_TOTAL_FRAMES = 7;
+export const PUMMEL_HOLD_COST = 3;
 
 export const PUMMEL_DAMAGE = 3.0;
 export const GRAB_HOLD_DISTANCE = 50.0;
 
 
-export function pummelLimit(moves?: FighterMoves): number {
-  return min(1, moves?.maxPummels ?? 1);
-}
 
 
 export function grabContactFrame(action: GrabAction, moves?: FighterMoves): number {

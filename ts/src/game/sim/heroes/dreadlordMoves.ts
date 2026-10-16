@@ -262,7 +262,6 @@ export const DREADLORD_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack,
   smashMaxChargeFrames: 45,
   smashMaxDamageMultiplier: 1.25,
-  maxPummels: 2,
   normals: NORMALS,
   hurtboxes: attachedBodies(),
   throws: {

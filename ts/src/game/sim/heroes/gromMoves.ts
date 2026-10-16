@@ -10,7 +10,7 @@ const tilt = (z: number, angle: 25 | 35 | 55) => move(9, 3, 28, 0, [heroRegion(9
 const torso = hurtPart(0.0, 8.0, 0.0, 125.0, 24.0);
 const reach = (first: number, last: number, x: number, z: number) => [heroHurtPose(first, last, [torso, hurtPart(10.0, 60.0, x, z, 10.0)])];
 export const GROM_MOVES: FighterMoves = {
-  dashAttack: AttackStyle.dashAttack, smashMaxChargeFrames: 45, smashMaxDamageMultiplier: 1.25, maxPummels: 1,
+  dashAttack: AttackStyle.dashAttack, smashMaxChargeFrames: 45, smashMaxDamageMultiplier: 1.25,
   hurtboxes: { stand: [torso], crouch: [hurtPart(0.0, 8.0, 0.0, 75.0, 24.0)], attacks: {
     [AttackStyle.jab]: reach(2, 8, 36.0, 52.0), [AttackStyle.jab2]: reach(4, 10, 48.0, 55.0),
     [AttackStyle.jab3]: [hurtPose(0, 2, [hurtPart(5.0, 17.0, 5.0, 72.0, 31.0), hurtPart(-13.0, 109.0, -45.0, 157.0, 39.0)]), hurtPose(3, 5, [hurtPart(5.0, 17.0, 5.0, 72.0, 31.0), hurtPart(-13.0, 109.0, -53.0, 153.0, 39.0)]), hurtPose(6, 27, [hurtPart(9.0, 13.0, 21.0, 80.0, 59.0), hurtPart(-1.0, 109.0, -9.0, 147.0, 30.0)])],

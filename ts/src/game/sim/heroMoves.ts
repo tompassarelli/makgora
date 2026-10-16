@@ -87,7 +87,6 @@ export interface FighterMoves {
   readonly smashMaxChargeFrames: number;
   readonly smashMaxDamageMultiplier: number;
 
-  readonly maxPummels?: number | undefined;
 
   readonly hurtboxes?: FighterHurtboxes | undefined;
 }

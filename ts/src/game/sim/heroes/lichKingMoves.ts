@@ -114,7 +114,6 @@ export const LICH_KING_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack,
   smashMaxChargeFrames: 45,
   smashMaxDamageMultiplier: f32(1.3),
-  maxPummels: 2,
   hurtboxes: LICH_KING_BODY,
   normals: {
 

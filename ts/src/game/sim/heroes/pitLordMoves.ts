@@ -144,7 +144,6 @@ export const PIT_LORD_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack,
   smashMaxChargeFrames: 45,
   smashMaxDamageMultiplier: 1.25,
-  maxPummels: 2,
   hurtboxes: PIT_LORD_BODY,
   normals: {
 
