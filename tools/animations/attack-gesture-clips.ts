@@ -22,7 +22,7 @@ import { removeAttackSequence, selectedAttackPose } from "./remove-attack-sequen
 
 const PLAN: Readonly<Record<number, readonly HeroPose[]>> = {
   2: ["jab3"],
-  4: ["jab", "jab2", "upTilt", "upSmash", "neutralAir", "upAir", "backAir", "dashAttack", "forwardAir"],
+  4: ["jab", "jab2", "upTilt", "upSmash", "neutralAir", "upAir", "backAir", "dashAttack", "forwardAir", "downTilt"],
   5: ["jab3", "forwardTiltDown", "downTilt", "neutralAir", "backAir", "downSmash", "dashAttack", "forwardAir", "upSmash", "upAir", "upTilt", "forwardTiltUp", "neutralSpecial", "jab", "jab2", "forwardTilt", "forwardSmash", "sideSpecial", "ultimate"],
   6: ["forwardTiltDown", "downTilt", "backAir", "downSpecial", "forwardTilt", "forwardTiltUp", "upTilt", "forwardSmash", "upSmash", "downSmash", "dashAttack", "forwardAir", "upAir"],
   8: ["jab2", "jab3", "downTilt", "forwardSmash", "forwardAir", "backAir", "upAir", "upTilt", "neutralAir"],
@@ -432,7 +432,7 @@ for(const [id,poses]of Object.entries(PLAN)) {
   for(const node of [...model.Bones,...model.Helpers,...model.Attachments])if(node.Parent==null)node.Parent=root;
   model.Helpers.push(helper);model.Nodes.push(helper);model.PivotPoints.push(helper.PivotPoint);
   }
-  const hops=HOP[character]??{},hop:mdx.AnimVector|undefined=Object.keys(hops).length?{LineType:1,GlobalSeqId:-1,Keys:[]}:undefined;if(hop)helper.Translation=hop;
+  const hops=HOP[character]??{},hop:mdx.AnimVector|undefined=retainedHelper?.Translation??(Object.keys(hops).length?{LineType:1,GlobalSeqId:-1,Keys:[]}:undefined);if(hop)helper.Translation=hop;
   if (!retainedHelper) for(const sequence of source.Sequences)for(const Frame of sequence.Interval) {
     helper.Rotation?.Keys.push({Frame,Vector:new Float32Array([0,0,0,1])});
     hop?.Keys.push({Frame,Vector:new Float32Array([0,0,0])});
