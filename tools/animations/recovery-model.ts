@@ -93,6 +93,23 @@ export function pounceBaseModel(source: mdx.Model): mdx.Model | undefined {
   return model;
 }
 
+export function movementBaseModel(source: mdx.Model): mdx.Model | undefined {
+  const ids = new Set(source.Helpers.filter(n => n.Name === "Movement Motion" || n.Name === "Double Jump Motion").map(n => n.ObjectId));
+  if (ids.size === 0) return undefined;
+  ensure([...ids].every(id => id >= source.Nodes.length - ids.size), "Movement helpers must be the final nodes");
+  let first = source.Sequences.length;
+  while (first > 0 && /^(Movement |Jump Motion )/.test(source.Sequences[first - 1]!.Name)) first--;
+  const cutoff = source.Sequences[first]?.Interval[0];
+  const model = structuredClone(source);
+  model.Sequences = model.Sequences.slice(0, first);
+  model.Helpers = model.Helpers.filter(n => !ids.has(n.ObjectId));
+  model.Nodes = model.Nodes.filter(n => !ids.has(n.ObjectId));
+  model.PivotPoints = model.PivotPoints.slice(0, source.Nodes.length - ids.size);
+  for (const node of model.Nodes) if (node.Parent != null && ids.has(node.Parent)) node.Parent = null;
+  if (cutoff !== undefined) tracks(model, track => { if (!onGlobalClock(track)) track.Keys = track.Keys.filter(k => k.Frame < cutoff); });
+  return model;
+}
+
 export function jumpBaseModel(source: mdx.Model): mdx.Model | undefined {
   const first = source.Sequences.findIndex(s => s.Name.startsWith("Jump Motion "));
   if (first < 0) return undefined;

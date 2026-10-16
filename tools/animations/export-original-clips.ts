@@ -11,7 +11,7 @@
 import {join, resolve, relative} from 'node:path';
 import {isDeepStrictEqual} from 'node:util';
 import {generateMDX, model as mdx} from 'war3-model';
-import {appendedStrikeBaseModel, attackGestureBaseModel, swordGestureBaseModel, wardenFanBaseModel, damageBaseModel, downAirBaseModel, drillBaseModel, grabBaseModel, jumpBaseModel, locomotionBaseModel, pounceBaseModel, pitLordSpecialBaseModel, recoveryBaseModel} from './recovery-model';
+import {movementBaseModel, appendedStrikeBaseModel, attackGestureBaseModel, swordGestureBaseModel, wardenFanBaseModel, damageBaseModel, downAirBaseModel, drillBaseModel, grabBaseModel, jumpBaseModel, locomotionBaseModel, pounceBaseModel, pitLordSpecialBaseModel, recoveryBaseModel} from './recovery-model';
 import {seconds} from './asset-info';
 import {mkdirSync} from 'node:fs';
 import {ensure, hash, parseSource, encodeVerified, tracks, verifyPreservedBody, removeBodyEffects, originalBodyClip, splitStaticLights, staticLightGate, onGlobalClock} from './original-clips';
@@ -65,7 +65,7 @@ for (const [character, fighter] of fighters) {
 
 
 
-    const base = !reuse && keepUnchanged && retainedThin && retainedRecord ? appendedStrikeBaseModel(original) ?? attackGestureBaseModel(original) ?? swordGestureBaseModel(original) ?? locomotionBaseModel(original) ?? pounceBaseModel(original) ?? wardenFanBaseModel(original) ?? pitLordSpecialBaseModel(original) ?? jumpBaseModel(original) ?? downAirBaseModel(original) ?? grabBaseModel(original) ?? drillBaseModel(original) ?? damageBaseModel(original) ?? recoveryBaseModel(original) : undefined;
+    const base = !reuse && keepUnchanged && retainedThin && retainedRecord ? movementBaseModel(original) ?? appendedStrikeBaseModel(original) ?? attackGestureBaseModel(original) ?? swordGestureBaseModel(original) ?? locomotionBaseModel(original) ?? pounceBaseModel(original) ?? wardenFanBaseModel(original) ?? pitLordSpecialBaseModel(original) ?? jumpBaseModel(original) ?? downAirBaseModel(original) ?? grabBaseModel(original) ?? drillBaseModel(original) ?? damageBaseModel(original) ?? recoveryBaseModel(original) : undefined;
     const reusePrefix = base && hash(generateMDX(base)) === retainedRecord.sourceSha256 ? base.Sequences.length : 0;
     if (reusePrefix) console.log(`${fighter.name}: exact base SHA retained, exporting ${source.Sequences.length - reusePrefix} added clips`);
     const components = splitStaticLights(source);

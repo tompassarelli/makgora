@@ -286,6 +286,8 @@ export interface CrouchSample {
   readonly crouch: ScoreFrame;
   readonly clip: string;
   readonly kind: CrouchClipKind;
+  readonly standSeconds: number;
+  readonly crouchSeconds: number;
 }
 
 const CROUCH_HOLD_FRAMES = CROUCH_CLIP_FRAMES + 16;
@@ -308,13 +310,13 @@ export function sampleCrouch(model: DrawnModel, character: Character): CrouchSam
       advanceFighterPose(p, f, world, input, false, false, false, false);
       frame = capture(f, p);
     }
-    return { scored: pose(model, character, frame), clip: frame.clip };
+    return { scored: pose(model, character, frame), clip: frame.clip, seconds: timelineSeconds(character, frame) };
   };
   const stand = hold(false, 30);
   const crouch = hold(true, CROUCH_HOLD_FRAMES);
   const clip = clipLabel(character, crouch.clip);
   const kind = crouch.clip === stand.clip ? "none" : /crouch/i.test(clip) ? "crouch" : "other";
-  return { stand: stand.scored, crouch: crouch.scored, clip, kind };
+  return { stand: stand.scored, crouch: crouch.scored, clip, kind, standSeconds: stand.seconds, crouchSeconds: crouch.seconds };
 }
 
 
@@ -322,12 +324,29 @@ export interface LedgeSample {
   readonly stand: ScoreFrame;
   readonly hang: readonly ScoreFrame[];
   readonly parts: readonly Capsule[];
+  readonly standParts: readonly Capsule[];
   readonly clip: string;
   readonly kind: CrouchClipKind;
+  readonly hangSeconds: readonly number[];
 }
 
 const LEDGE_HOLD_FRAMES = 60;
 const LEDGE_SAMPLE_EVERY = 6;
+
+const hurtCapsules = (f: Fighter): Capsule[] => fighterHurtParts(f).map((part) => ({ x1: part.x1, z1: part.z1, x2: part.x2, z2: part.z2, radius: part.radius }));
+
+export function ledgeHangParts(character: Character): { readonly parts: readonly Capsule[]; readonly standParts: readonly Capsule[]; readonly standing: PoseFrame } {
+  const f = createFighter(character, 0.0, 1);
+  const world = createRoster(1, [f]);
+  const p = createFighterPose();
+  const input = neutralControls();
+  let standing = capture(f, p);
+  for (let tick = 0; tick < 30; tick++) { step(world, input); advanceFighterPose(p, f, world, input, false, false, false, false); standing = capture(f, p); }
+  const standParts = hurtCapsules(f);
+  if (!snapToLedge(world, 0, 0, 1)) throw new Error(`${fighterSlug(character)}: the sampled fighter catches the ledge`);
+  for (let tick = 1; tick <= LEDGE_HOLD_FRAMES; tick++) step(world, input);
+  return { parts: hurtCapsules(f), standParts, standing };
+}
 
 export function sampleLedgeHang(model: DrawnModel, character: Character): LedgeSample {
   const f = createFighter(character, 0.0, 1);
@@ -337,19 +356,20 @@ export function sampleLedgeHang(model: DrawnModel, character: Character): LedgeS
   const advance = () => { step(world, input); advanceFighterPose(p, f, world, input, false, false, false, false); return capture(f, p); };
   let standing = capture(f, p);
   for (let tick = 0; tick < 30; tick++) standing = advance();
+  const standParts = hurtCapsules(f);
   if (!snapToLedge(world, 0, 0, 1)) throw new Error(`${fighterSlug(character)}: the sampled fighter catches the ledge`);
-  const hang: ScoreFrame[] = [];
+  const hang: ScoreFrame[] = [], hangSeconds: number[] = [];
   let clipIndex: number | undefined;
   for (let tick = 1; tick <= LEDGE_HOLD_FRAMES; tick++) {
     const frame = advance();
     if (f.ledge.state !== LedgeState.hang) throw new Error(`${fighterSlug(character)}: still hanging on frame ${tick}`);
     clipIndex = frame.clip;
-    if (tick % LEDGE_SAMPLE_EVERY === 0) hang.push(pose(model, character, frame));
+    if (tick % LEDGE_SAMPLE_EVERY === 0) { hang.push(pose(model, character, frame)); hangSeconds.push(timelineSeconds(character, frame)); }
   }
   const clip = clipLabel(character, clipIndex);
   const kind = clipIndex === standing.clip ? "none" : /ledge|hang/i.test(clip) ? "crouch" : "other";
-  const parts = fighterHurtParts(f).map((part) => ({ x1: part.x1, z1: part.z1, x2: part.x2, z2: part.z2, radius: part.radius }));
-  return { stand: pose(model, character, standing), hang, parts, clip, kind };
+  const parts = hurtCapsules(f);
+  return { stand: pose(model, character, standing), hang, parts, standParts, clip, kind, hangSeconds };
 }
 
 
@@ -359,6 +379,8 @@ export interface JumpSample {
   readonly second: readonly ScoreFrame[];
   readonly firstClip: string;
   readonly secondClip: string;
+  readonly firstSeconds: readonly number[];
+  readonly secondSeconds: readonly number[];
 }
 
 const JUMP_PHASES = 16;
@@ -392,12 +414,14 @@ export function sampleJumps(model: DrawnModel, character: Character): JumpSample
   const remaining = f.jump.remaining;
   const second = rise();
   if (f.jump.remaining >= remaining) throw new Error(`${fighterSlug(character)}: the second jump spends a midair jump`);
-  const phased = (frames: readonly PoseFrame[]) => Array.from({ length: JUMP_PHASES }, (_, index) => {
+  const phases = (frames: readonly PoseFrame[]) => Array.from({ length: JUMP_PHASES }, (_, index) => {
     const frame = frames[Math.round(index * (frames.length - 1) / (JUMP_PHASES - 1))];
     if (frame === undefined) throw new Error("a phase lies within its rise");
-    return pose(model, character, frame);
+    return frame;
   });
-  return { stand: pose(model, character, standing), first: phased(first), second: phased(second),
+  const phased = (frames: readonly PoseFrame[]) => phases(frames).map((frame) => pose(model, character, frame));
+  const timeline = (frames: readonly PoseFrame[]) => phases(frames).map((frame) => timelineSeconds(character, frame));
+  return { stand: pose(model, character, standing), first: phased(first), second: phased(second), firstSeconds: timeline(first), secondSeconds: timeline(second),
     firstClip: clipLabel(character, first[Math.floor(first.length / 2)]?.clip), secondClip: clipLabel(character, second[Math.floor(second.length / 2)]?.clip) };
 }
 

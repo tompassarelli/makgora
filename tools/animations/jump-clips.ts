@@ -47,6 +47,7 @@ const STYLES: Readonly<Record<number, string>> = {
   [Character.kobold]: "back flip",
 };
 const FLIPS = new Set(["front flip", "back flip"]);
+const LEANS: Readonly<Record<string, number>> = { cannonball: 55, heave: 40, "wing beat": 40 };
 const SPINS = new Set(["twist", "twirl"]);
 const repairs = Object.entries(STYLES).map(([character, style]) =>
   ({ character: Number(character), poses: ["doubleJump"] as const, flip: FLIPS.has(style), style }));
@@ -212,7 +213,7 @@ for (const gesture of gestures) {
       const progress = Math.max(0, Math.min(1, (t - 0.1) / 0.8));
       const eased = progress * progress * (3 - 2 * progress);
       // A float rises upright; a bound rears back, then pitches forward over the mount.
-      const lean = gesture.style === "float" ? -6 * Math.sin(Math.PI * t) : gesture.style === "bound" ? -35 * Math.sin(2 * Math.PI * Math.min(1, t / 0.7)) * (t < 0.35 ? 1 : 0.45) : -18 * Math.sin(Math.PI * t);
+      const lean = gesture.style === "float" ? -6 * Math.sin(Math.PI * t) : gesture.style === "bound" ? -35 * Math.sin(2 * Math.PI * Math.min(1, t / 0.7)) * (t < 0.35 ? 1 : 0.45) : -(LEANS[gesture.style ?? ""] ?? 18) * Math.sin(Math.PI * t);
       const turn = gesture.flip ? (gesture.style === "back flip" ? -360 : 360) * eased : lean;
       const spin = (gesture.style === "twirl" ? 720 : 360) * eased * Math.PI / 360;
       helper.Rotation?.Keys.push({ Frame: start + Math.round(frame * 1000 / 60), Vector: SPINS.has(gesture.style ?? "") ? new Float32Array([0, 0, Math.sin(spin), Math.cos(spin)]) : pitch(new Float32Array([0, 0, 0, 1]), turn) });

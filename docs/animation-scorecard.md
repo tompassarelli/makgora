@@ -60,11 +60,15 @@ model space where the ledge corner sits 24 units forward and 90 up
 (`LEDGE_HANG_OUTSET`, `LEDGE_HANG_DEPTH`). Each column is the worst sampled
 frame: `grip`, the nearest drawn point to the corner over the standing
 height (at most 0.12: a hand, claw or weapon is at the ledge); `below`, the
-share of drawn points no higher than the corner (at least 0.85: the body
-hangs under it); `clear`, the share outside the stage wall (at least 0.9);
-and `fit`, the share inside the hang hurt parts (at least 0.75: the body
-stays in its hurtbox). Rifleman's natively accepted hang calibrates these
-initial values; they are Tom's to tune. Facing the stage is read on the strip.
+share of drawn points no higher than the corner (at least 0.89, 90% of
+Rifleman's 0.994: the body hangs under it); `clear`, the share outside the stage wall (at least 0.9);
+and `fit`, the share inside the hang hurt parts. `stand fit` is the share of
+the standing body inside its standing hurt parts, and the hang passes at
+`fit` of at least the smaller of 0.75 and `stand fit`: the hanging body stays
+in its hurtbox as well as the standing body does (weapons, wings and capes
+leave Cairne's standing body only 0.49 inside his). Rifleman's natively
+accepted hang calibrates these initial values; they are Tom's to tune.
+Facing the stage is read on the strip.
 
 `build/anim-score/LOOK-double-jump.tsv` compares a full hop's rise with the
 midair jump's rise, each resampled to 16 phases: `mean angle` is the mean

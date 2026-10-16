@@ -24,6 +24,17 @@ describe("ledge hang line", () => {
     const short = frame(column(4, 0, 60));
     expect(scoreLedgeHang(STAND, [short], CAPSULE, CORNER).grip).toBeGreaterThan(0.2);
   });
+
+  test("a hang that spills from its hurtbox passes only when the standing body spills as far [k2 property]", () => {
+    const spilling = frame([...column(4, 0, 84), ...column(-80, 0, 84), [23, 90]]);
+    const narrow = [{ x1: 0, z1: 20, x2: 0, z2: 80, radius: 30 }], wide = [{ x1: -40, z1: 20, x2: 0, z2: 80, radius: 60 }];
+    const tight = scoreLedgeHang(STAND, [spilling], narrow, CORNER, wide);
+    expect(tight.fit).toBeLessThan(0.75);
+    expect(tight.pass).toBe(false);
+    const loose = scoreLedgeHang(frame([...column(0, 0, 100), ...column(-80, 0, 100)]), [spilling], narrow, CORNER, narrow);
+    expect(loose.standFit).toBeLessThanOrEqual(tight.fit);
+    expect(loose.pass).toBe(true);
+  });
 });
 
 describe("double jump line", () => {

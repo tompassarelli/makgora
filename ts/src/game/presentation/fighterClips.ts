@@ -14,6 +14,7 @@ import { RECOVERY_CLIPS } from "./recoveryClipInfo";
 import { DRILL_CLIPS } from "./drillClipInfo";
 import { DOWN_AIR_CLIPS } from "./downAirClipInfo";
 import { JUMP_CLIPS } from "./jumpClipInfo";
+import { MOVEMENT_CLIPS } from "./movementClipInfo";
 import { BLADEMASTER_AUTHORED_CLIPS } from "./blademasterClipInfo";
 import { GRAB_CLIPS } from "./grabClipInfo";
 import { ROSTER_ATTACK_CLIPS } from "./rosterAttackClipInfo";
@@ -161,6 +162,10 @@ function recoveryTables(): Readonly<Record<number, HeroClipTable>> {
   for (const [character, jumps] of Object.entries(JUMP_CLIPS)) {
     const id = Number(character);
     tables[id] = { ...(tables[id] ?? ORIGINAL_CLIPS[id] ?? heroLook(id)?.clips ?? NO_CLIPS), ...jumps };
+  }
+  for (const [character, movement] of Object.entries(MOVEMENT_CLIPS)) {
+    const id = Number(character);
+    tables[id] = { ...(tables[id] ?? ORIGINAL_CLIPS[id] ?? heroLook(id)?.clips ?? NO_CLIPS), ...movement };
   }
   for (const [character, attacks] of Object.entries(ROSTER_ATTACK_CLIPS)) {
     const id = Number(character);

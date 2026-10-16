@@ -258,6 +258,9 @@ producer = "tools/animations/dreadlord-pounce-clips.ts"
 paths = ["ts/src/game/presentation/jumpClipInfo.ts"]
 producer = "tools/animations/jump-clips.ts"
 [[generated]]
+paths = ["ts/src/game/presentation/movementClipInfo.ts"]
+producer = "tools/animations/movement-clips.ts"
+[[generated]]
 paths = ["ts/src/game/presentation/drillClipInfo.ts"]
 producer = "tools/animations/drill-clips.ts"
 [[generated]]

@@ -18,8 +18,10 @@ export interface ModelAssetInfo {
 
 
 export function seconds(value: number): string {
-  const literal = Number.isInteger(value) ? value.toFixed(1) : String(value);
-  return Math.fround(value) === value ? literal : `f32(${literal})`;
+  if (Number.isInteger(value)) return value.toFixed(1);
+  if (Math.fround(value) !== value) return `f32(${value})`;
+  const shortest = [...Array(9).keys()].map((digits) => Number(value.toPrecision(digits + 1))).find((decimal) => Math.fround(decimal) === value) ?? value;
+  return shortest === value ? String(value) : `f32(${shortest})`;
 }
 
 export function typescriptAssetInfo(generator: string, models: readonly ModelAssetInfo[]): string {

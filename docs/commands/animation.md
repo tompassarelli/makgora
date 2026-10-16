@@ -29,6 +29,21 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   fighter's double jump in the style smashcraft:docs/design/animation-reference.md picks (Blademaster keeps his #230 flip) and retains other jump bindings; `--no-preview`
   skips silhouette sheets. Store the changed model family and refresh both body
   timelines and clip metadata before using the generated bindings.
+  `bun tools/animations/movement-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT --character ID --pose crouch|ledgeHang [--pose ...]`
+  authors a fighter's crouch or ledge hang on its shipped model through the
+  canonical rig (#40): each mapped joint turns about the side-view axis, a root
+  helper plants the ankles (or the lowest point of a legless body) on the floor
+  for the crouch and puts one wrist (Thrall: the wolf's front paws) on the ledge
+  corner for the hang, and a coordinate search over the joint angles keeps the
+  pose scoring best on `anim score`'s crouch or ledge line, measured against the
+  standing pose the sampler shows. A clip already named
+  for the pose is re-authored in place, and Illidan's Ledge Catch then eases into
+  the new hang over its first 60%; otherwise it appends `Movement POSE` and
+  binds it in the generated smashcraft:ts/src/game/presentation/movementClipInfo.ts;
+  run fighters one at a time, since each run rewrites that table. Every other clip stays
+  identical. Run it after the fighter's own generator, which rebuilds from stock,
+  and before `jump-clips.ts --character`; then store the family and run
+  `bun wisp inputs derive --fighter NAME`.
   `bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT`
   appends a distinct gesture for each Blademaster normal and his back throw,
   preserving the shipped plunge and double-jump flip.

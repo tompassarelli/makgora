@@ -19,4 +19,43 @@ export const JUMP_CLIPS = {
     jump: { index: 54, seconds: f32(0.4) },
     doubleJump: { index: 55, seconds: 0.5 },
   },
+  10: {
+    doubleJump: { index: 66, seconds: 0.5 },
+  },
+  11: {
+    doubleJump: { index: 64, seconds: 0.5 },
+  },
+  13: {
+    doubleJump: { index: 88, seconds: 0.5 },
+  },
+  14: {
+    doubleJump: { index: 90, seconds: 0.5 },
+  },
+  15: {
+    doubleJump: { index: 78, seconds: 0.5 },
+  },
+  16: {
+    doubleJump: { index: 96, seconds: 0.5 },
+  },
+  18: {
+    doubleJump: { index: 89, seconds: 0.5 },
+  },
+  19: {
+    doubleJump: { index: 98, seconds: 0.5 },
+  },
+  20: {
+    doubleJump: { index: 92, seconds: 0.5 },
+  },
+  21: {
+    doubleJump: { index: 91, seconds: 0.5 },
+  },
+  22: {
+    doubleJump: { index: 97, seconds: 0.5 },
+  },
+  24: {
+    doubleJump: { index: 89, seconds: 0.5 },
+  },
+  25: {
+    doubleJump: { index: 103, seconds: 0.5 },
+  },
 } as const satisfies Readonly<Record<number, HeroClipTable>>;
