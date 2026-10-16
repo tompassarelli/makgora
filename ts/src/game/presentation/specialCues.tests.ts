@@ -90,3 +90,9 @@ test("Thunder Clap's ring and Small Clap art shrink to 0.85x with the hitbox [k2
   assertTrue(small !== undefined && small !== "slot" && small !== "none");
   if (small !== undefined && small !== "slot" && small !== "none") assertNear(small.active.scale, f32(f32(0.85) * f32(0.3)), f32(0.001));
 });
+
+test("Cairne's special cues use no stock Bloodlust model, whose sound events play the Bloodlust cast [k2 property]", () => {
+  const loud = Object.values(HERO_CUES[Character.cairne] ?? {}).flatMap((move) => [move?.startup?.model, move?.active?.model])
+    .filter((model): model is string => model !== undefined && model.includes("\\Bloodlust\\"));
+  assertEquals(loud.join("\n"), "");
+});
