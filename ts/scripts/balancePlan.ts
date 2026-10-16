@@ -5,80 +5,30 @@ import { BunRuntime } from "@effect/platform-bun";
 import { Effect, Schema } from "effect";
 import { decoded, FarmFailure, run } from "wisp/scripts/wisp/farm";
 import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/sim/heroes/registry";
-import { readJobs, runnerAdmission, type Job } from "./farmAdmission";
-import { JOB_SECONDS, measuredSeconds, shardWork, type Work } from "./balanceShards";
+import { runnerAdmission } from "./farmAdmission";
+import { JOB_SECONDS, measuredSeconds, ofKind, shardWork, type Work } from "./balanceShards";
 
 const Timings = Schema.Record(Schema.String, Schema.Finite);
 const Runs = Schema.Struct({ workflow_runs: Schema.Array(Schema.Struct({ id: Schema.Finite })) });
-const Cpu = Schema.Struct({ cpuSeconds: Schema.Finite, pairs: Schema.Record(Schema.String, Schema.Finite) });
 const Artifacts = Schema.Struct({ artifacts: Schema.Array(Schema.Struct({ id: Schema.Finite, name: Schema.String, expired: Schema.Boolean, workflow_run: Schema.Struct({ id: Schema.Finite }) })) });
 
-function legacyTimings(pairs: readonly string[], slugs: readonly string[], jobs: readonly Job[]): Record<string, number> {
-  const seconds: Record<string, number> = {};
-  const groups = Math.ceil(pairs.length / 8);
-  for (const job of jobs) {
-    if (job.started_at === null || job.completed_at === null || (job.runner_name ?? "") === "" || job.conclusion !== "success") continue;
-    const elapsed = (Date.parse(job.completed_at) - Date.parse(job.started_at)) / 1000;
-    for (const kind of ["shard", "ceiling"]) {
-      if (!job.name.startsWith(`${kind} (`)) continue;
-      const first = pairs.findIndex((pair) => job.name.startsWith(`${kind} (${pair},`) || job.name === `${kind} (${pair})`);
-      if (first < 0) continue;
-      const group = pairs.filter((_, index) => index % groups === first);
-      for (const pair of group) seconds[`${kind}/${pair}`] = elapsed / Math.ceil(group.length / 4);
-    }
-    if (job.name.startsWith("probe (")) for (const fighter of job.name.slice(7, -1).split(",").filter((fighter) => slugs.includes(fighter))) seconds[`probe/${fighter}`] = elapsed;
-  }
-  return seconds;
-}
-
-const historicalTimings = (repo: string, pairs: readonly string[], slugs: readonly string[]) => Effect.acquireUseRelease(
+const timingSamples = (repo: string, keys: readonly string[]) => Effect.acquireUseRelease(
   Effect.sync(() => mkdtempSync(join(tmpdir(), "balance-timings-"))),
   (folder) => Effect.gen(function*() {
-    const history = yield* decoded(Runs, yield* run(["gh", "api", `repos/${repo}/actions/workflows/balance.yml/runs?status=completed&per_page=20`]));
-    for (const prior of history.workflow_runs) {
-      const target = join(folder, String(prior.id));
-      const cached = yield* run(["gh", "run", "download", String(prior.id), "-R", repo, "-n", "balance-timings", "-D", target]).pipe(Effect.as(true), Effect.orElseSucceed(() => false));
-      if (cached) {
-        const seconds = yield* decoded(Timings, readFileSync(join(target, "timings.json"), "utf8"));
-        if (pairs.every((pair) => seconds[`shard/${pair}`] !== undefined && seconds[`ceiling/${pair}`] !== undefined) && slugs.every((slug) => seconds[`probe/${slug}`] !== undefined)) return { source: prior.id, seconds };
-      }
-      const seconds = legacyTimings(pairs, slugs, yield* readJobs(repo, prior.id));
-      if (!pairs.every((pair) => seconds[`shard/${pair}`] !== undefined && seconds[`ceiling/${pair}`] !== undefined) || !slugs.every((slug) => seconds[`probe/${slug}`] !== undefined)) continue;
-      yield* run(["gh", "run", "download", String(prior.id), "-R", repo, "-p", "balance-ceiling-*", "-D", target]);
-      for (const directory of readdirSync(target)) for (const name of readdirSync(join(target, directory))) {
-        if (!name.endsWith(".json")) continue;
-        const data = yield* decoded(Cpu, readFileSync(join(target, directory, name), "utf8"));
-        const pair = (Object.keys(data.pairs)[0] ?? "").split("/").slice(1, 3).join(":");
-        if (pairs.includes(pair)) seconds[`ceiling/${pair}`] = data.cpuSeconds;
-      }
-      return { source: prior.id, seconds };
-    }
-    return yield* new FarmFailure({ problem: "No complete balance timing sample in the last twenty runs" });
-  }),
-  (folder) => Effect.sync(() => rmSync(folder, { recursive: true, force: true })),
-);
-
-const TIMING_ARTIFACT = /^balance-timings(-shard-[0-9]+)?$/;
-
-const fieldSamples = (repo: string, pairs: readonly string[]) => Effect.acquireUseRelease(
-  Effect.sync(() => mkdtempSync(join(tmpdir(), "balance-field-timings-"))),
-  (folder) => Effect.gen(function*() {
+    const balanceRuns = yield* decoded(Runs, yield* run(["gh", "api", `repos/${repo}/actions/workflows/balance.yml/runs?status=completed&per_page=30`]));
+    const named = yield* decoded(Artifacts, yield* run(["gh", "api", `repos/${repo}/actions/artifacts?name=balance-timings&per_page=30`]));
+    const runs = [...new Set([...balanceRuns.workflow_runs.map((prior) => prior.id), ...named.artifacts.filter((artifact) => !artifact.expired).map((artifact) => artifact.workflow_run.id)])].toSorted((a, b) => b - a);
     const samples: Record<string, number>[] = [];
     const covered = new Set<string>();
-    for (let page = 1; page <= 5 && !pairs.every((pair) => covered.has(pair)); page++) {
-      const listed = yield* decoded(Artifacts, yield* run(["gh", "api", `repos/${repo}/actions/artifacts?per_page=100&page=${page}`]));
-      for (const artifact of listed.artifacts.filter((artifact) => !artifact.expired && TIMING_ARTIFACT.test(artifact.name))) {
-        const target = join(folder, String(artifact.id));
-        if (!(yield* run(["gh", "run", "download", String(artifact.workflow_run.id), "-R", repo, "-n", artifact.name, "-D", target]).pipe(Effect.as(true), Effect.orElseSucceed(() => false)))) continue;
-        const sample: Record<string, number> = {};
-        for (const name of readdirSync(target).filter((file) => file.endsWith(".json"))) {
-          const seconds = yield* decoded(Timings, readFileSync(join(target, name), "utf8"));
-          for (const [key, value] of Object.entries(seconds)) if (key.startsWith("shard/")) sample[key.slice(6)] = value;
-        }
-        for (const pair of Object.keys(sample)) covered.add(pair);
-        if (Object.keys(sample).length > 0) samples.push(sample);
-      }
-      if (listed.artifacts.length < 100) break;
+    for (const id of runs) {
+      if (keys.every((key) => covered.has(key))) break;
+      const target = join(folder, String(id));
+      if (!(yield* run(["gh", "run", "download", String(id), "-R", repo, "-p", "balance-timings*", "-D", target]).pipe(Effect.as(true), Effect.orElseSucceed(() => false)))) continue;
+      const sample: Record<string, number> = {};
+      const files = readdirSync(target, { recursive: true, encoding: "utf8" }).filter((file) => file.endsWith(".json"));
+      for (const file of files) Object.assign(sample, yield* decoded(Timings, readFileSync(join(target, file), "utf8")));
+      for (const key of Object.keys(sample)) covered.add(key);
+      if (Object.keys(sample).length > 0) samples.push(sample);
     }
     return samples;
   }),
@@ -93,21 +43,23 @@ const main = Effect.gen(function*() {
   const requested = (process.env.MATCHUPS ?? "").split(",").filter(Boolean);
   if (requested.some((pair) => !allPairs.includes(pair))) return yield* new FarmFailure({ problem: "Unknown or reversed fighter matchup" });
   const pairs = requested.length === 0 ? allPairs : allPairs.filter((pair) => requested.includes(pair));
-  const { source, seconds } = yield* historicalTimings(repo, allPairs, slugs);
-  const measured = measuredSeconds(pairs, yield* fieldSamples(repo, pairs));
+  const samples = yield* timingSamples(repo, [...pairs.map((pair) => `shard/${pair}`), ...pairs.map((pair) => `ceiling/${pair}`), ...slugs.map((slug) => `probe/${slug}`)]);
+  const measured = measuredSeconds(pairs, ofKind(samples, "shard"));
+  const measuredCeiling = measuredSeconds(pairs, ofKind(samples, "ceiling"));
+  const measuredProbe = measuredSeconds(slugs, ofKind(samples, "probe"));
   const field: Work[] = pairs.map((pair) => ({ name: pair, seconds: (measured?.[pair] ?? JOB_SECONDS) * Number(process.env.PER_PAIR ?? 400) / 400 }));
   const partitioned = (name: string, duration: number): Work[] => {
     const count = Math.max(1, Math.ceil(duration / (JOB_SECONDS * 0.75)));
     return Array.from({ length: count }, (_, part) => ({ name: `${name}@${part}/${count}`, seconds: duration / count }));
   };
-  const ceiling = pairs.flatMap((pair) => partitioned(pair, seconds[`ceiling/${pair}`] ?? JOB_SECONDS));
-  const probe = slugs.flatMap((slug) => partitioned(slug, (seconds[`probe/${slug}`] ?? JOB_SECONDS) * Number(process.env.PROBE ?? 40) / 40));
+  const ceiling = pairs.flatMap((pair) => partitioned(pair, measuredCeiling?.[pair] ?? JOB_SECONDS));
+  const probe = slugs.flatMap((slug) => partitioned(slug, (measuredProbe?.[slug] ?? JOB_SECONDS) * Number(process.env.PROBE ?? 40) / 40));
   const fields = shardWork(field).map((group) => group.join(","));
   const ceilings = shardWork(ceiling).map((group) => group.join(","));
   const probes = Number(process.env.PROBE ?? 40) === 0 ? [] : shardWork(probe).map((group) => group.join(","));
   const admission = yield* runnerAdmission(repo, Number(process.env.GITHUB_RUN_ID));
-  console.error(`Timing source ${source}: ${pairs.length} pairs in ${fields.length} field jobs, ${ceilings.length} ceiling jobs and ${probes.length} probe jobs, predicted longest <= ${JOB_SECONDS}s`);
-  console.log(`parallel=${admission.parallel}\nadmission=${admission.measurement}; timings from ${source}\nshards=${JSON.stringify(fields)}\nceilings=${JSON.stringify(ceilings)}\nprobes=${JSON.stringify(probes)}\njobs=${fields.length}`);
+  console.error(`Timings from ${samples.length} measured artifacts: ${pairs.length} pairs in ${fields.length} field jobs, ${ceilings.length} ceiling jobs and ${probes.length} probe jobs, predicted longest <= ${JOB_SECONDS}s`);
+  console.log(`parallel=${admission.parallel}\nadmission=${admission.measurement}; timings from ${samples.length} measured artifacts\nshards=${JSON.stringify(fields)}\nceilings=${JSON.stringify(ceilings)}\nprobes=${JSON.stringify(probes)}\njobs=${fields.length}`);
 });
 
 if (import.meta.main) BunRuntime.runMain(main);

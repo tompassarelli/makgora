@@ -32,3 +32,7 @@ export function measuredSeconds(units: readonly string[], samples: readonly Read
   const slowest = Math.max(...all);
   return Object.fromEntries(units.map((unit) => [unit, samples.find((sample) => sample[unit] !== undefined)?.[unit] ?? slowest]));
 }
+
+export const ofKind = (samples: readonly Readonly<Record<string, number>>[], kind: string): Record<string, number>[] =>
+  samples.map((sample) => Object.fromEntries(Object.entries(sample).filter(([key]) => key.startsWith(`${kind}/`)).map(([key, value]) => [key.slice(kind.length + 1), value])))
+    .filter((sample) => Object.keys(sample).length > 0);

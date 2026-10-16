@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { JOB_SECONDS, RUNNER_CORES, WORST_MEASURED_SLOWDOWN, measuredSeconds, partitionWork, shardWork } from "../scripts/balanceShards";
+import { JOB_SECONDS, RUNNER_CORES, WORST_MEASURED_SLOWDOWN, measuredSeconds, ofKind, partitionWork, shardWork } from "../scripts/balanceShards";
 import { balanceTimeouts } from "../scripts/farmGuard";
 import { reserveP90, type Job } from "../scripts/farmAdmission";
 import { mergeProbeCounts } from "../scripts/cpuField";
@@ -72,4 +72,11 @@ test("every planned shard core still finishes inside the shard timeout when its 
       expect(Math.max(...cores) * WORST_MEASURED_SLOWDOWN).toBeLessThanOrEqual(timeout);
     }
   }
+});
+
+test("a timing kind with no measurement sizes at the full job budget instead of borrowing another kind's slowest measurement [k1 scenario]", () => {
+  const samples = [{ "shard/rifleman:illidan": 300, "probe/rifleman": 120 }, { "shard/illidan:lich": 447 }];
+  expect(measuredSeconds(["rifleman:illidan", "illidan:lich", "lich:warden"], ofKind(samples, "shard"))).toEqual({ "rifleman:illidan": 300, "illidan:lich": 447, "lich:warden": 447 });
+  expect(measuredSeconds(["rifleman:illidan"], ofKind(samples, "ceiling"))?.["rifleman:illidan"] ?? JOB_SECONDS).toBe(JOB_SECONDS);
+  expect(measuredSeconds(["rifleman", "illidan"], ofKind(samples, "probe"))).toEqual({ rifleman: 120, illidan: 120 });
 });
