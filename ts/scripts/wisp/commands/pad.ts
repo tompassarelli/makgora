@@ -59,7 +59,7 @@ import { clientState } from "../project";
 import { onHealthyClients, readClientsFile } from "../doctor";
 import { resolveTools } from "../nativeTools";
 import { DevCommandReceipt, nativeChatEntryReceipt } from "../boundary";
-import { currentChatEntry } from "../padChat";
+import { currentChatEntry, selectionChatBootstrapRequired } from "../padChat";
 import { devCommandReceiptFile } from "../../../src/game/core/gameFiles";
 import { Phase } from "../../../src/game/lobby/lobbyState";
 import { admitCaptures, captureLoad, requireCaptureLease, timingCheck, timingLease, timingScripts } from "../captureCapacity";
@@ -258,12 +258,17 @@ export function nativeChatReceipt(text: string) {
 
 const selectionChat = (session: NativeSession, text: string, timing: boolean) => setupCommand(session, text, Effect.gen(function*() {
   const path = join(session.data[0], nativeChatFile(session.build, 0));
-  const entry = tryIntegrity("read chat entry", session.clients[0].name, () => {
+  const readEntry = () => tryIntegrity("read chat entry", session.clients[0].name, () => {
     if (!existsSync(path)) return undefined;
-    const epoch = matchStart(session.logs()[0])?.epoch;
-    return epoch === undefined ? undefined : currentChatEntry(nativeChatEntryReceipt(readFileSync(path, "latin1")), statSync(path).mtimeMs, session.build, { epoch, sessionStartedMs: session.startedMs });
+    return currentChatEntry(nativeChatEntryReceipt(readFileSync(path, "latin1")), statSync(path).mtimeMs, session.build, session.startedMs);
   });
-  yield* openObservedChat(session.clients[0], entry, requireCaptureLease(timing).pipe(Effect.andThen(batch(session.clients[0], [{ kind: "wait", millis: 250 }, { kind: "keys", keys: ["Return"] }]).pipe(Effect.provide(ClientWatch.layer({ filePrefix: "smashcraft" })), Effect.mapError(fromDesktop))), Effect.asVoid)).pipe(Effect.mapError((cause) => cause instanceof IntegrityFailure ? cause : fromDesktop(cause)));
+  const pressReturn = requireCaptureLease(timing).pipe(Effect.andThen(batch(session.clients[0], [{ kind: "wait", millis: 250 }, { kind: "keys", keys: ["Return"] }]).pipe(Effect.provide(ClientWatch.layer({ filePrefix: "smashcraft" })), Effect.mapError(fromDesktop))), Effect.asVoid);
+  let entry = yield* Effect.suspend(readEntry);
+  if (selectionChatBootstrapRequired(entry)) {
+    yield* pressReturn;
+    entry = yield* pollUntil(Effect.suspend(readEntry), { every: "20 millis", within: "8 seconds", orElse: () => Effect.fail(new IntegrityFailure({ operation: "open selection chat", path, cause: "no fresh chat receipt after Return" })) });
+  }
+  if (entry !== undefined && !entry.open) yield* openObservedChat(session.clients[0], Effect.suspend(readEntry), pressReturn).pipe(Effect.mapError((cause) => cause instanceof IntegrityFailure ? cause : fromDesktop(cause)));
   yield* batch(session.clients[0], [{ kind: "text", text, delayMillis: 35 }, { kind: "keys", keys: ["Return"], settleMillis: 0 }]).pipe(Effect.provide(ClientWatch.layer({ filePrefix: "smashcraft" })), Effect.mapError(fromDesktop));
 }));
 

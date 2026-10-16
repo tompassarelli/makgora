@@ -10,7 +10,7 @@ import { smashcraftDoctor } from "../scripts/wisp/doctor";
 import { ACCEPT_IN_UNIT, acceptUnitCommand, inAcceptUnit } from "../scripts/wisp/commands/acceptUnit";
 import { privateDesktopUnitEnv } from "../scripts/wisp/commands/privateDesktopUnitEnv";
 import { nativeChatEntryReceipt } from "../scripts/wisp/boundary";
-import { currentChatEntry } from "../scripts/wisp/padChat";
+import { currentChatEntry, selectionChatBootstrapRequired } from "../scripts/wisp/padChat";
 import { pairHolders } from "../scripts/wisp/commands/pairGuard";
 import { claimPairAt } from "../scripts/wisp/commands/pairClaim";
 import { claimedLanPair } from "../scripts/wisp/commands/lan";
@@ -121,15 +121,17 @@ test("native units refuse Tom's normal display and missing private desktop conte
   expect(() => privateDesktopUnitEnv({ DISPLAY: ":0" })).toThrow("requires an active PRIVATE_DESKTOP_RUN");
 });
 
-test("pad chat receipts match the current game epoch even when written before the native session starts [k2 property]", () => {
-  const stale = nativeChatEntryReceipt('function PreloadFiles takes nothing returns nothing\ncall Preload( "SMASHCRAFT CHAT v=1 build=typescript-integrity slot=0 epoch=42 revision=7 available=1 open=0" )\nendfunction');
-  if (stale === undefined) throw new Error("the chat receipt did not parse");
-  expect(stale).toEqual({ build: "typescript-integrity", epoch: 42, revision: 7, available: "1", open: "0" });
-  const sessionStartedMs = 102;
-  expect(currentChatEntry(stale, sessionStartedMs - 1, "typescript-integrity", { epoch: 42, sessionStartedMs })).toEqual({ available: true, open: false, modified: 101 });
-  expect(currentChatEntry(stale, 101, "typescript-integrity", { epoch: 43, sessionStartedMs })).toBeUndefined();
-  expect(currentChatEntry({ ...stale, build: "typescript-dev" }, 102, "typescript-integrity", { epoch: 42, sessionStartedMs })).toBeUndefined();
-  expect(currentChatEntry(stale, 100, "typescript-integrity", { afterMs: 100 })).toBeUndefined();
+test("selection chat bootstraps from a fresh receipt after the runner starts [k2 property]", () => {
+  const before = nativeChatEntryReceipt('function PreloadFiles takes nothing returns nothing\ncall Preload( "SMASHCRAFT CHAT v=1 build=typescript-integrity slot=0 epoch=0 revision=1 available=1 open=0" )\nendfunction');
+  if (before === undefined) throw new Error("the selection chat receipt did not parse");
+  const sessionStartedMs = 101;
+  const stale = currentChatEntry(before, 100, "typescript-integrity", sessionStartedMs);
+  expect(stale).toBeUndefined();
+  expect(selectionChatBootstrapRequired(stale)).toBe(true);
+  const opened = currentChatEntry({ ...before, revision: 2, open: "1" }, 102, "typescript-integrity", sessionStartedMs);
+  expect(opened).toEqual({ available: true, open: true, modified: 102 });
+  expect(selectionChatBootstrapRequired(opened)).toBe(false);
+  expect(currentChatEntry({ ...before, build: "typescript-dev" }, 102, "typescript-integrity", sessionStartedMs)).toBeUndefined();
 });
 
 test("an accept already running on a pair blocks a second one, but not its own caller chain [k2 property]", () => {

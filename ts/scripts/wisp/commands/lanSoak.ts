@@ -94,7 +94,7 @@ export const lanSoak: Command = (args) => Effect.gen(function*() {
       const chatPath = join(dataDirectory(host.documents), nativeChatFile(INTEGRITY_BUILD.id, 0));
       const entry = attempt("read chat entry", () => {
         if (!existsSync(chatPath)) return undefined;
-        return currentChatEntry(nativeChatEntryReceipt(readFileSync(chatPath, "latin1")), statSync(chatPath).mtimeMs, INTEGRITY_BUILD.id, { afterMs: since });
+        return currentChatEntry(nativeChatEntryReceipt(readFileSync(chatPath, "latin1")), statSync(chatPath).mtimeMs, INTEGRITY_BUILD.id, since);
       });
       yield* openObservedChat(host, entry, batch(host, [{ kind: "keys", keys: ["Return"] }]).pipe(Effect.mapError((cause) => new NativeSoakFailure({ problem: cause.message }))));
       yield* batch(host, [{ kind: "text", text: "-dev soak", delayMillis: 35 }, { kind: "keys", keys: ["Return"], settleMillis: 0 }]);
