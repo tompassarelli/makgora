@@ -5,7 +5,7 @@ import { Character, SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import {
   CHAOS_STRIKE_AIR_FORM, CHAOS_STRIKE_FIRST, CHAOS_STRIKE_FORM, CHAOS_STRIKE_LAST, DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP,
-  DEMONHUNTER_WING_STARTUP, FEL_RUSH_FIRST, FLAME_CRASH_FORM, FLAME_CRASH_HANG_LAST, FEL_RUSH_LAST, FEL_RUSH_TELL_LAST, VENGEFUL_RETREAT_FORM, VENGEFUL_RETREAT_MOVE_LAST,
+  DEMONHUNTER_WING_STARTUP, FEL_RUSH_FIRST, FEL_RUSH_LAST, FEL_RUSH_TELL_LAST, VENGEFUL_RETREAT_FORM, VENGEFUL_RETREAT_MOVE_LAST,
 } from "../sim/specials";
 import { characterModelScale } from "./modelScale";
 
@@ -89,9 +89,8 @@ export function projectSpecialEffect(state: Readonly<SpecialEffectState>, fighte
   const felRush = special.action === SpecialAction.demonHunterFelRush;
   if (kind === STATIC_AURA) {
 
-    const immolate = special.action === SpecialAction.demonHunterImmolate && (special.form === 0
-      ? special.frame >= DEMONHUNTER_IMMOLATE_STARTUP && special.frame < DEMONHUNTER_IMMOLATE_STARTUP + DEMONHUNTER_IMMOLATE_ACTIVE
-      : special.form === FLAME_CRASH_FORM && special.frame >= 1 && special.frame <= FLAME_CRASH_HANG_LAST);
+    const immolate = special.action === SpecialAction.demonHunterImmolate
+      && special.frame >= DEMONHUNTER_IMMOLATE_STARTUP && special.frame < DEMONHUNTER_IMMOLATE_STARTUP + DEMONHUNTER_IMMOLATE_ACTIVE;
 
     const tell = felRush && special.form === 0 && special.frame >= 1 && special.frame <= FEL_RUSH_TELL_LAST;
     const chaos = felRush && (special.form === CHAOS_STRIKE_FORM || special.form === CHAOS_STRIKE_AIR_FORM)

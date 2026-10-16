@@ -96,13 +96,6 @@ export const DEMONHUNTER_IMMOLATE_DURATION = 27;
 
 
 
-export const FLAME_CRASH_FORM = 1;
-export const FLAME_CRASH_LANDING_FORM = 2;
-export const FLAME_CRASH_HANG_LAST = 4;
-export const FLAME_CRASH_FRAMES = 34;
-export const FLAME_CRASH_SPEED = 24.0;
-export const FLAME_CRASH_LANDING_FRAMES = 24;
-export const FLAME_CRASH_BURST_LAST = 3;
 
 
 
@@ -291,7 +284,6 @@ export function demonHunterGliding(f: Readonly<Fighter>): boolean {
   if (special.action === SpecialAction.demonHunterFelRush) {
     return special.form === 0 ? special.frame < FEL_RUSH_LAST : special.form === VENGEFUL_RETREAT_FORM && special.frame < VENGEFUL_RETREAT_MOVE_LAST;
   }
-  if (special.action === SpecialAction.demonHunterImmolate) return special.form === FLAME_CRASH_FORM;
   return special.action === SpecialAction.demonHunterWingAscent && special.form !== 0;
 }
 
@@ -299,21 +291,8 @@ export function demonHunterGliding(f: Readonly<Fighter>): boolean {
 
 
 
-function advanceFlameCrash(owner: Fighter): void {
-  const { special, motion } = owner;
-  if (special.form !== FLAME_CRASH_FORM) return;
-  if (motion.grounded) {
-    for (let entry = 0; entry < PARTICIPANT_CAPACITY; entry++) special.hitTargets[entry] = undefined;
-    special.form = FLAME_CRASH_LANDING_FORM;
-    special.frame = 1;
-    special.duration = FLAME_CRASH_LANDING_FRAMES;
-    special.lockFrames = FLAME_CRASH_LANDING_FRAMES - 1;
-    owner.attack.cooldown = FLAME_CRASH_LANDING_FRAMES - 1;
-    motion.vx = 0.0;
-    return;
-  }
-  motion.vx = 0.0;
-  motion.vz = special.frame < FLAME_CRASH_HANG_LAST ? 0.0 : -FLAME_CRASH_SPEED;
+function stallImmolate(owner: Fighter): void {
+  if (!owner.motion.grounded) owner.motion.vz = 0.0;
 }
 
 
@@ -443,15 +422,10 @@ function startDemonHunterSpecial(owner: Fighter, action: SpecialAction, moveX: n
     return true;
   }
   if (action === SpecialAction.demonHunterImmolate) {
-    const crash = !motion.grounded;
-    startSpecialAction(owner, action, crash ? FLAME_CRASH_FRAMES : DEMONHUNTER_IMMOLATE_DURATION, moveX);
+    startSpecialAction(owner, action, DEMONHUNTER_IMMOLATE_DURATION, moveX);
     special.cooldowns[action] = 24;
     special.hit = false;
-    if (crash) {
-      special.form = FLAME_CRASH_FORM;
-      motion.vx = 0.0;
-      motion.vz = 0.0;
-    }
+    stallImmolate(owner);
     return true;
   }
   if (action === SpecialAction.demonHunterFelRush) {
@@ -652,7 +626,7 @@ function advanceSpecialAction(owner: Fighter, stage: number, matchFrame: number,
   }
   if (special.action === SpecialAction.demonHunterWingAscent && special.form !== 0) glide(owner, input);
   if (special.action === SpecialAction.demonHunterFelRush) advanceFelRush(owner);
-  if (special.action === SpecialAction.demonHunterImmolate) advanceFlameCrash(owner);
+  if (special.action === SpecialAction.demonHunterImmolate) stallImmolate(owner);
   if (special.action === SpecialAction.demonHunterWingAscent && special.form === 0 && special.frame === DEMONHUNTER_WING_STARTUP) {
     motion.vz = special.ex ? 37.5 : 30.0;
     motion.vx = f32(f32(special.direction * 5.0) * (special.ex ? 1.25 : 1.0));
@@ -669,7 +643,7 @@ function advanceSpecialAction(owner: Fighter, stage: number, matchFrame: number,
     special.lockFrames = 0;
   }
   if (special.action === SpecialAction.demonHunterWingAscent && special.frame >= special.duration) endSpecialAction(owner, true);
-  if (special.action === SpecialAction.demonHunterImmolate && special.frame >= special.duration) endSpecialAction(owner, special.form === FLAME_CRASH_FORM);
+  if (special.action === SpecialAction.demonHunterImmolate && special.frame >= special.duration) endSpecialAction(owner, false);
 }
 
 const IMMOLATE_GROUND: Readonly<HitRegion> = {
@@ -696,27 +670,6 @@ function exDamageRegion(region: Readonly<HitRegion>): Readonly<HitRegion> {
 
 export const immolationRegion = (grounded: boolean, ex = false): Readonly<HitRegion> => (grounded ? ex ? IMMOLATE_GROUND_EX : IMMOLATE_GROUND : ex ? IMMOLATE_AIR_EX : IMMOLATE_AIR);
 
-
-const FLAME_CRASH_PLUNGE: Readonly<HitRegion> = {
-  minX: -60.0, maxX: 60.0, minZ: -120.0, maxZ: 20.0,
-  effect: { damage: 9.0, growth: 100.0, base: 26.0, launchX: 0.1736481785774231, launchZ: -0.9848077297210693, electric: false, element: HitElement.fire, manaDrain: 6 },
-  groundedEffect: { damage: 9.0, growth: 100.0, base: 30.0, launchX: 0.5, launchZ: 0.8660253882408142, electric: false, element: HitElement.fire, manaDrain: 6 },
-  window: 1,
-};
-const FLAME_CRASH_BURST: Readonly<HitRegion> = {
-  minX: -150.0, maxX: 150.0, minZ: -20.0, maxZ: 120.0,
-  effect: { damage: 8.0, growth: 95.0, base: 30.0, launchX: 0.4226182699203491, launchZ: 0.9063078165054321, electric: false, element: HitElement.fire, manaDrain: 6 },
-  window: 1,
-};
-const FLAME_CRASH_PLUNGE_EX = exDamageRegion(FLAME_CRASH_PLUNGE);
-const FLAME_CRASH_BURST_EX = exDamageRegion(FLAME_CRASH_BURST);
-
-
-export function flameCrashRegion(form: number, frame: number, ex = false): Readonly<HitRegion> {
-  if (form === FLAME_CRASH_FORM) return frame > FLAME_CRASH_HANG_LAST ? ex ? FLAME_CRASH_PLUNGE_EX : FLAME_CRASH_PLUNGE : NO_HIT_REGION;
-  if (form === FLAME_CRASH_LANDING_FORM) return frame <= FLAME_CRASH_BURST_LAST ? ex ? FLAME_CRASH_BURST_EX : FLAME_CRASH_BURST : NO_HIT_REGION;
-  return NO_HIT_REGION;
-}
 
 
 const GLIDE_SLASH: Readonly<HitRegion> = {
@@ -798,13 +751,6 @@ function demonHunterSpecialContact(owner: Fighter, targetSlot: number, target: F
   if (owner.character === Character.demonHunter && special.action === SpecialAction.demonHunterFelRush) return felRushContact(owner, targetSlot, target);
   if (owner.character === Character.demonHunter && special.action === SpecialAction.demonHunterWingAscent && special.form === DEMONHUNTER_GLIDE_SLASH_FORM) return glideSlashContact(owner, targetSlot, target);
   if (owner.character !== Character.demonHunter || special.action !== SpecialAction.demonHunterImmolate) return NO_HIT_REGION;
-  if (special.form !== 0) {
-    const crash = flameCrashRegion(special.form, special.frame, special.ex);
-    if (crash.window <= 0 || specialAlreadyHit(owner, targetSlot) || target.status.out || isIntangible(target)) return NO_HIT_REGION;
-    const x = f32(f32(target.motion.x - owner.motion.x) * owner.facing);
-    const z = f32(target.motion.z - owner.motion.z);
-    return x >= crash.minX && x <= crash.maxX && z >= crash.minZ && z <= crash.maxZ ? crash : NO_HIT_REGION;
-  }
   if (specialAlreadyHit(owner, targetSlot) || special.frame < DEMONHUNTER_IMMOLATE_STARTUP) return NO_HIT_REGION;
   if (special.frame >= DEMONHUNTER_IMMOLATE_STARTUP + DEMONHUNTER_IMMOLATE_ACTIVE || target.status.out || isIntangible(target)) return NO_HIT_REGION;
   const localX = f32(f32(target.motion.x - owner.motion.x) * owner.facing);

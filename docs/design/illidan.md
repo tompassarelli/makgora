@@ -188,8 +188,8 @@ smashcraft:ts/src/game/sim/projectiles.ts.
   lives here, and with Fel Rush in the air his recovery now has a high route
   (ascent and glide) and a level one (rush, then ascent).
 - **Immolate on the ground, jump-cancellable** (#128): the Warcraft III
-  Immolation as a shine, which Tom asked for. Kept. In the air it becomes
-  Flame Crash (below).
+  Immolation as a shine, which Tom asked for. Kept, and in the air it stalls
+  his fall like the shine (below).
 
 ## The raid boss across his normals (owner direction)
 
@@ -292,28 +292,26 @@ anyone near him punishes the windup. Alternatives: **B, Eye Blast as the
 ordinary neutral special** (rejected: Mana Burn is kept and is his drain
 identity); **C, a beam on every forward smash** (rejected: #379).
 
-### Down special in the air: Flame Crash (picked)
+### Down special in the air: Immolate (picked)
 
-Black Temple's Flame Crash leaves a blaze where he lands. On the ground,
-down special stays Immolate; in the air it is Flame Crash:
+Tom (17 Oct): in the air, Immolate nearly neutralizes his vertical momentum,
+as Fox's shine does in Melee. Down special in the air is Immolate, not Flame
+Crash:
 
-- Frames 1–4: he hangs (the tell, his fel aura flaring).
-- From frame 5: he plunges straight down at 24 a frame for up to 30 frames,
-  striking what he passes once: 9%, a spike (-80°) against airborne
-  targets, a 60° launch against grounded ones, drain 6.
-- Landing: a fel burst around him on its frames 1–3 (±150 wide, 120 high),
-  8% at 65°, drain 6; he recovers until frame 24 after landing (a shield
-  that blocked the burst still drops with more frames left than a jab's
-  startup).
-- Not landing by frame 34 leaves him helpless. No jump cancel.
+- The same timing as on the ground: startup 4, active 4, 27 in all,
+  jump-cancellable from frame 4.
+- Starting it zeroes his vertical speed, and every frame of it holds it at
+  zero, so he sinks only one frame of gravity a frame.
+- Its strike is the aerial Immolation: ±70 wide, 170 below him to 30 above,
+  9%, a spike, drain 6.
 
-Counterplay: the plunge is straight down, so a fighter not under him is
-safe and punishes the 24-frame landing; offstage it is a self-destruct; the
-4-frame hang is the cue. Alternatives: **B, keep the aerial Immolate spike
-with its jump cancel** (rejected by the owner's direction: Flame Crash is his
-down special in the air); **C, Agonizing Flames: a thrown fireball that
-burns over time** (rejected: a second ranged option beside Mana Burn, and
-damage over time without hitstun is Warden's poison, #126).
+Counterplay: he hangs in place for 27 frames unless he jumps out, so a
+fighter outside the flames punishes the stall; offstage the jump cancel
+spends his double jump. Alternatives: **B, Flame Crash: hang, plunge, burst
+on landing** (replaced by the owner's 17 Oct direction); **C, Agonizing
+Flames: a thrown fireball that burns over time** (rejected: a second ranged
+option beside Mana Burn, and damage over time without hitstun is Warden's
+poison, #126).
 
 ### Forward air: twin-glaive cross slash (picked, owner direction)
 
@@ -385,7 +383,6 @@ attackCues.ts and elementLooks.ts):
 | Fel Rush (frames 6–15) | Illidan's Metamorphosis missile trail |
 | Vengeful Retreat | Possession missile trailing the vault |
 | Chaos Strike (ground and air) | Moon Glaive whirl |
-| Flame Crash hang and plunge / landing burst | Breath of Fire missile / Volcano death |
 | Shear (forward tilt, all angles) | Demon Bolt impact where the glaive cuts |
 | Fel Lunge (forward smash) | Illidan's Metamorphosis missile trail |
 | Eye Blast windup / beam | Metamorphosis missile over his eyes and small green dragon flames along the floor / green dragon fire, each floor flame growing as the beam reaches it |

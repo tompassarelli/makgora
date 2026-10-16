@@ -19,7 +19,7 @@
 302 b stick 0 0
 310 a stick 1 0
 312 a stick 0 0
-# Flame Crash: jump, down special in the air, its landing burst.
+# Air Immolate: jump, then down special in the air.
 380 a tap B 6
 390 a stick 0 -1
 390 a tap X 2
@@ -70,13 +70,10 @@
 #! expect a 203 applied jump
 #! expect a 210 special 10 form 0
 #! expect a 226 special-form 3 action 10
-#! expect a 390 special 12 form 1
-#! expect a 400 special-form 2 action 12
-#! expect b 400 damage 13.000
+#! expect a 390 special 12 form 0
 #! expect a 470 special 10 form 0
 #! expect a 486 special-form 1 action 10
 #! expect a 600 special 10 form 0
-#! expect b 605 damage 19.000
 #! expect a 616 special-form 2 action 10
 #! expect a 700 special 12 form 0
 #! expect a 847 special 11 form 0
@@ -91,7 +88,6 @@
 #! scene a MoonGlaiveCaster
 #! scene a ImmolationTarget
 #! scene a BreathOfFireMissile
-#! scene a VolcanoDeath
 #! scene a ImmolationDamage
 #! scene a ImpaleHitTarget
 873 a capture

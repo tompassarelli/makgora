@@ -4,7 +4,7 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { AttackStyle, Character, SpecialAction } from "../sim/codes";
 import { createFighter } from "../sim/fighter";
-import { CHAOS_STRIKE_AIR_FORM, CHAOS_STRIKE_FORM, EYE_BLAST_FORM, FLAME_CRASH_FORM, FLAME_CRASH_LANDING_FORM, VENGEFUL_RETREAT_FORM } from "../sim/specials";
+import { CHAOS_STRIKE_AIR_FORM, CHAOS_STRIKE_FORM, EYE_BLAST_FORM, VENGEFUL_RETREAT_FORM } from "../sim/specials";
 import { ATTACK_CUES } from "./attackCues";
 import { MANA_DRAIN_LOOK, advanceDrainSeen, drainSeen } from "./elementLooks";
 import { type Cue, ORIGINAL_BRANCH_CUES, ORIGINAL_CUES } from "./specialCues";
@@ -47,10 +47,6 @@ test("every Illidan option's effect starts where its model already draws [k4 ref
   if (felRush !== undefined) cues.push(["Fel Rush tell", felRush.startup], ["Fel Rush", felRush.active]);
   for (const form of [VENGEFUL_RETREAT_FORM, CHAOS_STRIKE_FORM, CHAOS_STRIKE_AIR_FORM]) {
     const branch = ORIGINAL_BRANCH_CUES[SpecialAction.demonHunterFelRush]?.[form];
-    if (branch !== undefined) cues.push([`${branch.cues.spell} startup`, branch.cues.startup], [branch.cues.spell, branch.cues.active]);
-  }
-  for (const form of [FLAME_CRASH_FORM, FLAME_CRASH_LANDING_FORM]) {
-    const branch = ORIGINAL_BRANCH_CUES[SpecialAction.demonHunterImmolate]?.[form];
     if (branch !== undefined) cues.push([`${branch.cues.spell} startup`, branch.cues.startup], [branch.cues.spell, branch.cues.active]);
   }
   for (const entries of Object.values(ATTACK_CUES[Character.demonHunter] ?? {})) for (const { name, cue } of entries) cues.push([name, cue]);

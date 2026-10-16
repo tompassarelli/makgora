@@ -115,12 +115,6 @@ export function currentFeel(character: Character): FeelValues {
         for (const grounded of [false,true]) out[`special.immolate.${grounded}.${ex}`] = sample(specials.immolationRegion(grounded, ex).effect, specials.DEMONHUNTER_IMMOLATE_DURATION - specials.DEMONHUNTER_IMMOLATE_STARTUP, false);
       }
       out["special.glide"] = sample(specials.glideSlashRegion().effect, number("DEMONHUNTER_GLIDE_SLASH_FRAMES") - specials.DEMONHUNTER_GLIDE_SLASH_FIRST, false);
-      const flames: readonly (readonly [number,number,number])[] = [[specials.FLAME_CRASH_FORM, specials.FLAME_CRASH_HANG_LAST + 1, specials.FLAME_CRASH_FRAMES], [specials.FLAME_CRASH_LANDING_FORM, 1, specials.FLAME_CRASH_LANDING_FRAMES]];
-      for (const [form, frame, total] of flames) {
-        const hit = specials.flameCrashRegion(form, frame);
-        if (hit.effect.damage > 0) out[`special.flame.${form}`] = sample(hit.effect, total - frame, false);
-        if (hit.groundedEffect !== undefined) out[`special.flame.${form}.grounded`] = sample(hit.groundedEffect, total - frame, false);
-      }
     }
   }
   return out;

@@ -9,12 +9,11 @@ import { createReplaySnapshot } from "../src/game/replay/snapshot";
 import { copyFighterState } from "../src/generated/state/fighterState";
 import { Character, SpecialAction } from "../src/game/sim/codes";
 import { createFighter, type Fighter } from "../src/game/sim/fighter";
-import { NO_HIT_REGION } from "../src/game/sim/hitRegions";
 import { runningHeroSpecial } from "../src/game/sim/specials/engine";
 import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/sim/heroes/registry";
 import { setWorldMotionValue } from "../src/game/sim/motion";
 import { fighterAt } from "../src/game/sim/roster";
-import { flameCrashRegion } from "../src/game/sim/specials";
+import { DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP } from "../src/game/sim/specials";
 
 export const AERIAL_DOWN_SETUPS = [
   { name: "Rising", x: 100.0, z: 240.0, vz: 8.0 },
@@ -28,7 +27,7 @@ export const AERIAL_DOWN_FRAMES = 120;
 /** Each fighter's aerial down special, as the #448 lead approved it. */
 export const AERIAL_DOWN_CHOICES: Readonly<Record<number, string>> = {
   [Character.rifleman]: "Freeze Trap tossed in the air falls and arms on deck contact",
-  [Character.demonHunter]: "Flame Crash: stall, dive, burst on landing",
+  [Character.demonHunter]: "Immolate in the air, a shine-like stall that a jump cancels",
   [Character.blademaster]: "Mirror Image placed in the air, then a backward step",
   [Character.mountainKing]: "aerial Thunder Clap; lands into the grounded clap",
   [Character.warden]: "Fan of Knives, same fan in the air",
@@ -72,7 +71,7 @@ export interface AerialDownRow {
 /** Whether the special shows its hitbox or effect this frame. */
 export function aerialDownEffect(f: Readonly<Fighter>): boolean {
   const { special } = f;
-  if (special.action === SpecialAction.demonHunterImmolate) return flameCrashRegion(special.form, special.frame) !== NO_HIT_REGION;
+  if (special.action === SpecialAction.demonHunterImmolate) return special.frame >= DEMONHUNTER_IMMOLATE_STARTUP && special.frame < DEMONHUNTER_IMMOLATE_STARTUP + DEMONHUNTER_IMMOLATE_ACTIVE;
   const move = runningHeroSpecial(f);
   const during = (window: { readonly first: number; readonly last: number } | undefined): boolean =>
     window !== undefined && special.frame >= window.first && special.frame <= window.last;

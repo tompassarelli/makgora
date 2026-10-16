@@ -8,7 +8,7 @@ regenerates it; `test/aerial-down-specials.test.ts` fails on any dead input.
 Starts `(x, z, vz)`: Rising `(100, 240, +8)`, Falling `(100, 240, -4)`, Near
 ground `(100, 40, -1)`, Offstage `(900, 240, -4)`. A neutral opponent stands at
 x = -480. **S0/S1** is the down special's ground or air form; **A8** is
-Rifleman's Freeze Trap and **A12** Illidan's Flame Crash. **Wn** is the first
+Rifleman's Freeze Trap and **A12** Illidan's air Immolate. **Wn** is the first
 frame with a strike window, projectile, placement, trap, grab, guard or armor;
 **Ln/En** the first grounded frame and the first frame the special is over
 (— for none). A dead input is a refusal (**R**) or **W—**. An aerial down
@@ -18,7 +18,7 @@ cancelling.
 | Fighter | Aerial choice | Rising | Falling | Near ground | Offstage |
 |---|---|---|---|---|---|
 | Rifleman | Freeze Trap tossed in the air falls and arms on deck contact | A8 W22 L31/E38 | A8 W22 L13/E38 | A8 W22 L3/E38 | A8 W22 L—/E38 |
-| Illidan | Flame Crash: stall, dive, burst on landing | A12 W5 L15/E38 | A12 W5 L14/E37 | A12 W5 L5/E28 | A12 W5 L—/E34 |
+| Illidan | Immolate in the air, a shine-like stall that a jump cancels | A12 W4 L47/E27 | A12 W4 L45/E27 | A12 W4 L18/E27 | A12 W4 L—/E27 |
 | Blademaster | Mirror Image placed in the air, then a backward step | S1 W8 L34/E24 | S1 W8 L25/E24 | S1 W8 L3/E24 | S1 W8 L—/E24 |
 | Mountain King | aerial Thunder Clap; lands into the grounded clap | S1 W17 L27/E27 | S1 W52 L15/E81 | S1 W52 L3/E81 | S1 W17 L—/E53 |
 | Warden | Fan of Knives, same fan in the air | S1 W8 L27/E38 | S1 W8 L15/E38 | S1 W8 L3/E38 | S1 W8 L—/E38 |

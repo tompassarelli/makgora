@@ -1,3 +1,4 @@
+import { f32 } from "wisp/src/sim/f32";
 import { assertEquals, assertFalse, assertGreaterThan, assertLessThan, test } from "wisp/src/runtime/testing";
 import { type AttackBuffer, ATTACK_BUFFER_FRAMES, attackBuffer } from "../input/attackBuffer";
 import { type FrameControls, createFrameControls } from "../match/controls";
@@ -17,7 +18,7 @@ function frameControls(first: Controls, second: Controls, firstCommands: AttackB
   return controls;
 }
 
-test("an offstage Flame Crash spikes downward through the ordinary match step [k3 measure docs/design/illidan.md]", () => {
+test("an offstage air Immolate spikes downward through the ordinary match step [k3 measure docs/design/illidan.md]", () => {
   for (const side of [-1, 1] as const) {
     const game = createMatchState();
     game.phase = Phase.match;
@@ -52,4 +53,34 @@ test("an offstage Flame Crash spikes downward through the ordinary match step [k
     assertLessThan(second.motion.z, contactHeight);
     assertFalse(second.motion.grounded);
   }
+});
+
+test("Illidan's air Immolate nearly stops his fall like Fox's shine: over its frames he sinks under a tenth of a free fall [k3 measure docs/design/illidan.md]", () => {
+  const sink = (immolate: boolean): number => {
+    const game = createMatchState();
+    game.phase = Phase.match;
+    const first: Fighter = createFighter(Character.demonHunter, 0.0, 1);
+    const second: Fighter = createFighter(Character.demonHunter, 0.0, -1);
+    initializeSpikeScenario(first, second, 0, 1);
+    second.motion.x = f32(first.motion.x + 600.0);
+    first.motion.z = 900.0;
+    first.motion.vz = 0.0;
+    const world = createRoster(3, [first, second]);
+    const firstInput = neutralControls();
+    const commands = attackBuffer(ATTACK_BUFFER_FRAMES);
+    const step = (frame: number) => stepMatch(game, world, frameControls(firstInput, neutralControls(), commands, attackBuffer(ATTACK_BUFFER_FRAMES)), frame);
+    firstInput.specialPressed = immolate;
+    firstInput.specialZ = immolate ? -1 : 0;
+    firstInput.down = immolate;
+    step(1);
+    firstInput.specialPressed = false;
+    firstInput.specialZ = 0;
+    firstInput.down = false;
+    const start = first.motion.z;
+    for (let frame = 2; frame <= 20; frame++) step(frame);
+    return f32(start - first.motion.z);
+  };
+  const free = sink(false);
+  assertGreaterThan(free, 0.0);
+  assertLessThan(sink(true), f32(free / 10.0));
 });

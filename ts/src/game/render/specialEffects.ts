@@ -19,7 +19,7 @@ import { type SummonState, projectBear } from "../presentation/summonState";
 import { f32 } from "wisp/src/sim/f32";
 import { Character, HeroStatusKind, SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
-import { DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP, DEMONHUNTER_MANA_BURN_STARTUP, EYE_BLAST_FORM, FLAME_CRASH_BURST_LAST, FLAME_CRASH_LANDING_FORM } from "../sim/specials";
+import { DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP, DEMONHUNTER_MANA_BURN_STARTUP, EYE_BLAST_FORM } from "../sim/specials";
 import { EYE_BLAST_MARKS, eyeBlastMark } from "../presentation/eyeBlastMarker";
 import { type ParkedFlags, STOCK_MODELS, type WorldOrigin, facingYaw, parkOnce, placeEffect } from "./effects";
 import { beamSegment, runningHeroSpecial } from "../sim/specials/engine";
@@ -222,8 +222,7 @@ export class SpecialEffects {
 
       const immolating = action === SpecialAction.demonHunterImmolate;
 
-      const crashBurst = fighter.special.form === FLAME_CRASH_LANDING_FORM && frame <= FLAME_CRASH_BURST_LAST;
-      const striking = immolating && (fighter.special.form === 0 ? frame >= DEMONHUNTER_IMMOLATE_STARTUP && frame < DEMONHUNTER_IMMOLATE_STARTUP + DEMONHUNTER_IMMOLATE_ACTIVE : crashBurst);
+      const striking = immolating && frame >= DEMONHUNTER_IMMOLATE_STARTUP && frame < DEMONHUNTER_IMMOLATE_STARTUP + DEMONHUNTER_IMMOLATE_ACTIVE;
       this.presentImmolationSound(fighter, slot, entered && immolating, slot.previousSpecial === SpecialAction.demonHunterImmolate && !immolating);
       if (immolating) this.show(felFlames, index, FEL_FLAMES, fighter, 0.0, 25.0, striking ? f32(2.0) : f32(1.35));
       else this.park(felFlames, index, FEL_FLAMES);

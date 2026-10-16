@@ -1,7 +1,7 @@
 import { mutableProjectile } from "./fighterProjectiles";
 import { assertEquals, assertFalse, assertGreaterThan, assertTrue, test } from "wisp/src/runtime/testing";
 import { AttackStyle, Character, HeroStatusKind, LedgeState, SpecialAction } from "./codes";
-import { DEMONHUNTER_IMMOLATE_STARTUP, DEMONHUNTER_MANA_BURN_STARTUP, FLAME_CRASH_HANG_LAST, immolationRegion, startFighterSpecial, advanceSpecials } from "./specials";
+import { DEMONHUNTER_IMMOLATE_STARTUP, DEMONHUNTER_MANA_BURN_STARTUP, immolationRegion, startFighterSpecial, advanceSpecials } from "./specials";
 import { type Fighter, type Projectile, createFighter } from "./fighter";
 import { beginFighterAttack } from "./attacks";
 import { updateProjectiles } from "./projectiles";
@@ -27,7 +27,7 @@ test("two Demon Hunters whose Immolates start together on the ground or in the a
     assertTrue(startFighterSpecial(right, 0, 0, controls({ specialPressed: true, down: true, specialZ: -1 })));
     const world = reversed ? testWorld(right, left) : testWorld(left, right);
 
-    for (let tick = 1; tick <= (airborne ? FLAME_CRASH_HANG_LAST + 1 : DEMONHUNTER_IMMOLATE_STARTUP); tick++) advanceSpecials(world, 0, 0);
+    for (let tick = 1; tick <= DEMONHUNTER_IMMOLATE_STARTUP; tick++) advanceSpecials(world, 0, 0);
     const damage = immolationRegion(!airborne).effect.damage;
     assertEquals(left.status.damage, damage);
     assertEquals(right.status.damage, damage);

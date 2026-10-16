@@ -1450,18 +1450,6 @@
    "special.glide": {
     "advantage": -11,
     "killPercent": 119
-   },
-   "special.flame.1": {
-    "advantage": -23,
-    "killPercent": 274
-   },
-   "special.flame.1.grounded": {
-    "advantage": -23,
-    "killPercent": 119
-   },
-   "special.flame.2": {
-    "advantage": -18,
-    "killPercent": 156
    }
   }
  },

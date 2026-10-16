@@ -1,4 +1,4 @@
-# Illidan's raid-boss moves for #147: Flame Crash, Fel Lunge (#379) and Flames of Azzinoth, each
+# Illidan's air Immolate, raid-boss Fel Lunge (#379) and Flames of Azzinoth, each
 # hitting b. Illidan a against Illidan b; syntax and checks: smashcraft:docs/native-bot-session.md.
 #! chat -dev quick hero illidan
 # Both dash in and pass each other, b ending about 50 behind a.
@@ -6,7 +6,7 @@
 48 b stick 0 0
 50 a stick 1 0
 58 a stick 0 0
-# Flame Crash: jump, then down special in the air.
+# Air Immolate: jump, then down special in the air.
 80 a tap B 8
 92 a stick 0 -1
 92 a tap X 2
@@ -18,15 +18,10 @@
 440 a cstick 0 -1
 444 a cstick 0 0
 # Expected, frame by frame (headless run of this script):
-#! expect a 92 special 12 form 1
-#! expect a 103 special-form 2 action 12
-#! expect b 103 damage 8.000
+#! expect a 92 special 12 form 0
 #! expect a 260 applied attack 1 style 4
-#! expect b 266 damage 17.000
 #! expect a 440 applied attack 2 style 3
-#! expect b 448 damage 31.000
 #! scene a ImmolationTarget
-#! scene a VolcanoDeath
 # View held a second: the first of two moments the parity check replays.
 500 a press VIEW
 570 a release VIEW

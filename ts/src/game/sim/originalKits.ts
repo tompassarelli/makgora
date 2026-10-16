@@ -5,7 +5,7 @@ import { AttackStyle, SpecialAction } from "./codes";
 import type { NamedMove } from "./heroes/hero";
 import {
   CHAOS_STRIKE_AIR_FORM, CHAOS_STRIKE_FORM, DEMONHUNTER_GLIDE_FORM, DEMONHUNTER_GLIDE_SLASH_FORM, RIFLEMAN_SECOND_SHOT_FORM,
-  FLAME_CRASH_FORM, VENGEFUL_RETREAT_FORM,
+  VENGEFUL_RETREAT_FORM,
 } from "./specials";
 
 export interface OriginalSpecial extends NamedMove {
@@ -50,8 +50,7 @@ export const ORIGINAL_KITS: Readonly<Record<number, OriginalKit>> = {
         forms: [{ form: DEMONHUNTER_GLIDE_FORM, name: "Glide" }, { form: DEMONHUNTER_GLIDE_SLASH_FORM, name: "Wing Slash" }],
       },
       {
-        action: SpecialAction.demonHunterImmolate, name: "Immolate", description: "A burst of flame around him that a jump can cancel; in the air, plunge down in a Flame Crash.",
-        forms: [{ form: FLAME_CRASH_FORM, name: "Flame Crash" }],
+        action: SpecialAction.demonHunterImmolate, name: "Immolate", description: "A burst of flame around him that a jump can cancel; in the air it nearly stops his fall.",
       },
     ],
     jab: { name: "Warglaive Flurry", description: "Three quick glaive cuts on repeated jabs; the third launches." },
