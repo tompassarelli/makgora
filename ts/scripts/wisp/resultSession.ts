@@ -5,7 +5,7 @@ import { Phase } from "../../src/game/lobby/lobbyState";
 import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import type { MapBuild } from "../../src/game/session/build";
 import { type Character } from "../../src/game/sim/codes";
-import { fighterName } from "../../src/game/sim/heroes/registry";
+import { fighterKey, fighterName } from "../../src/game/sim/heroes/registry";
 import { SMASHCRAFT_HEADLESS } from "./headless";
 
 type HeadlessClient = Parameters<typeof captureScene>[0];
@@ -42,7 +42,7 @@ export async function createResultSession(winner: Character, loser: Character): 
       return result;
     };
     const pair = `${fighterName(winner)} beats ${fighterName(loser)}`;
-    client.run(() => applyDeveloperCommand(shell(), 0, `-dev quick pair ${fighterName(winner)} / ${fighterName(loser)}`));
+    client.run(() => applyDeveloperCommand(shell(), 0, `-dev quick pair ${fighterKey(winner)} / ${fighterKey(loser)}`));
     if (read(() => shell().game.phase) !== Phase.match) throw new Error(`${pair}: match did not start`);
     clients.frames(MATCH_FRAMES);
     client.run(() => {
