@@ -439,8 +439,8 @@ for(const [id,poses]of Object.entries(PLAN)) {
   }
   let cursor=Math.max(...source.Sequences.map(s=>s.Interval[1]))+100;
   const drawnFrames=[];bindings.push(`  ${id}: {`);
-  if (selectedPose) for (const [pose,clip] of Object.entries(ROSTER_ATTACK_CLIPS[only as keyof typeof ROSTER_ATTACK_CLIPS])) if (pose !== selectedPose) {
-    const index = source.Sequences.findIndex(sequence => sequence.Name === `Attack Gesture ${pose}`);
+  if (selectedPose) for (const [pose,clip] of Object.entries(ROSTER_ATTACK_CLIPS[only as keyof typeof ROSTER_ATTACK_CLIPS])) if (pose !== selectedPose && !/^(Air|FollowUp|FollowUpAir)$/.test(pose.startsWith(selectedPose) ? pose.slice(selectedPose.length) : "-")) {
+    const sequenceFor = (name: string) => source.Sequences.findIndex(sequence => sequence.Name === `Attack Gesture ${name}`), index = Math.max(sequenceFor(pose), sequenceFor(pose.replace(/(FollowUpAir|FollowUp|Air)$/, "")));
     bindings.push(`    ${pose}: { index: ${index < 0 ? clip.index : index}, seconds: ${seconds(authoredSeconds(clip.seconds))}${"aligned" in clip && clip.aligned ? ", aligned: true" : ""} },`);
   }
   for(const pose of poses) {
