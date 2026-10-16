@@ -1,0 +1,4 @@
+repository = "https://github.com/minicolder/mdl-exporter4"
+revision = "96e4371d31df6f5eba9859c29deef0ef552019f9"
+archived_ref = "refs/archive/lanes/blender5"
+store_hash = "47afc652baf3f5a4d0838384557de3592be3cf943a65fc15ff59363ecf905938"

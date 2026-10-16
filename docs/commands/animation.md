@@ -92,6 +92,10 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `blender --background --python tools/animations/strikes.py -- rifleman|illidan`.
   `SMASHCRAFT_ANIMATION_ASSETS=PRIVATE_DIR` selects the editable inputs;
   `SMASHCRAFT_STRIKE_CLIP='Attack Jab'` reauthors only the jab.
+  Run Blender commands inside `nix develop`; its shell pins Blender and sets
+  `WC3_MDL_ADDON` to the private exporter tree named by
+  `tools/animations/mdl-exporter4.pin`. Its archived source revision is recorded
+  in `tools/animations/mdl-exporter4.source`.
 
 - Thrall stock-rig animation authoring (from the repository root):
   `bun tools/animations/thrall-clips.ts STOCK_THRALL.mdx PRIVATE_OUTPUT [POSE...]` appends
