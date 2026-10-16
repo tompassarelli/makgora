@@ -1,7 +1,10 @@
+import { fitWardenBlade } from '../warden-blade-fit';
+
 export const character = 5;
 export const stockPath = 'war3.w3mod:_de.w3mod:units\\nightelf\\herowarden\\herowarden.mdx';
 export const fitScale = 0.81;
 export const limbScales = [['wings_C0_0_jnt', 0.72]] as const;
+export const definitiveFit = fitWardenBlade;
 
 // The Definitive limbs contain twist joints between the named Classic articulations.
 export const classic = {

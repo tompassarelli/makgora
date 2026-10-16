@@ -9,9 +9,6 @@ import { fighters } from '../../ts/scripts/heroModelSource';
 import { DEFINITIVE_FIGHTERS } from '../../ts/src/game/assets/definitiveFighters';
 import type { Character } from '../../ts/src/game/sim/codes';
 import { victoryAnimation } from '../../ts/src/game/presentation/matchAudio';
-import { fitWardenBlade } from './warden-blade-fit';
-
-const BLADE_FITS: Readonly<Record<number, typeof fitWardenBlade>> = { 5: fitWardenBlade };
 
 const normalize = (name: string) => name.replace(/\s+\d+$/, '').replaceAll(/\s+/g, '').toLowerCase();
 
@@ -119,7 +116,7 @@ export function fighterBodies(motion: mdx.Model, rig: FighterRig, stock: ArrayBu
     if (!DEFINITIVE_FIGHTERS.has(rig.character as Character)) return { classic, definitive: undefined };
     if (stock === undefined) throw new Error(`Fighter ${rig.character} needs its stock Definitive model`);
     const definitive = definitiveBody(motion, stock, rig, moves.definitive);
-    const fit = rig.definitiveFit ?? BLADE_FITS[rig.character];
+    const fit = rig.definitiveFit;
     if (fit === undefined) return { classic, definitive };
     const fitted = fit(motion, definitive.bytes);
     return { classic, definitive: { bytes: fitted.bytes, report: { ...definitive.report, definitiveFit: fitted.report } } };

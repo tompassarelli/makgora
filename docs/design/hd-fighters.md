@@ -118,9 +118,9 @@ Its 27 literal pairs are `Root → root`, `Bone_Chest → bone_chest`,
 `Bone_Tail1..4 → tail1..4`. Only three bone names are shared between the
 Classic and Definitive rigs; naming similarity is not a rig map.
 Definitive fingers, facial joints, twist bones, beard and skirt branches inherit
-the nearest mapped parent while keeping their reference pose.
-Weapons are independent
-targets, so they retain the authored hand-to-weapon relationship.
+the nearest mapped parent while keeping their reference pose. Weapons are
+independent targets, so fighter-specific Definitive postprocessors can preserve
+the mesh-local hand grip across every sampled frame while keeping weapon rotation.
 
 ## Conversion and the measured bound
 

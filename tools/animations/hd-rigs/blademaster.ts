@@ -1,3 +1,6 @@
+import { fitBlademasterGrip } from '../blademaster-grip-fit';
+import { model as mdx } from '../../../ts/scripts/clipNodes';
+
 export const character = 3;
 export const stockPath = 'war3.w3mod:_de.w3mod:units\\orc\\heroblademaster\\heroblademaster.mdx';
 export const fitScale = 0.862;
@@ -29,3 +32,4 @@ export const pairs: readonly (readonly [string, string])[] = [
     ['hip.R', 'leg_R0_0_jnt'], ['knee.R', 'leg_R0_2_jnt'], ['ankle.R', 'leg_R0_end_jnt'],
     ['weapon', 'Wep01_R0_0_jnt'],
 ];
+export const definitiveFit = (motion: mdx.Model, bytes: ArrayBuffer) => fitBlademasterGrip(motion, bytes, pairs);
