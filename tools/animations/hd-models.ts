@@ -9,15 +9,14 @@ import { fighters } from '../../ts/scripts/heroModelSource';
 import { DEFINITIVE_FIGHTERS } from '../../ts/src/game/assets/definitiveFighters';
 import type { Character } from '../../ts/src/game/sim/codes';
 import { victoryAnimation } from '../../ts/src/game/presentation/matchAudio';
-
-const normalize = (name: string) => name.replace(/\s+\d+$/, '').replaceAll(/\s+/g, '').toLowerCase();
+import { clipNames } from './clip-names';
 
 /** The sequence indices each body plays: the fighter's production clips and its results-screen victory pose. */
 export interface PlayedMoves { readonly classic: readonly number[]; readonly definitive: readonly number[] }
 export function playedMoves(character: number, motion: mdx.Model): PlayedMoves {
-    const victory = normalize(victoryAnimation(character));
+    const victory = clipNames(motion.Sequences).get(victoryAnimation(character));
     const played = new Set(flashableSequences(character, motion.Sequences).map(sequence => motion.Sequences.indexOf(sequence)));
-    motion.Sequences.forEach((sequence, index) => { if (normalize(sequence.Name) === victory) played.add(index); });
+    if (victory !== undefined) played.add(victory);
     const sorted = [...played].sort((a, b) => a - b);
     return { classic: sorted, definitive: sorted };
 }

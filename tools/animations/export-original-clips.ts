@@ -23,6 +23,7 @@ import {thinnedModel} from './thinned-source';
 import {fighterSlug} from '../../ts/src/game/sim/heroes/registry';
 import {CLIPS, CLIP_INDEX, clipFile, clipIndex, clipTypeFile, shardOrder} from './fighter-shards';
 import {writeGenerated} from '../../ts/scripts/wisp/modelFactsTable';
+import {clipNames} from './clip-names';
 
 const project = resolve(import.meta.dir, '../..');
 const option = (name: string) => { const index = process.argv.indexOf(name); return index < 0 ? undefined : process.argv[index + 1]; };
@@ -155,13 +156,7 @@ for (const [character, fighter] of fighters) {
     }
 
 
-    const names = new Map<string, number>();
-    source.Sequences.forEach((sequence, index) => names.set(sequence.Name.toLowerCase(), index));
-    source.Sequences.forEach((sequence, index) => {
-        const family = sequence.Name.toLowerCase().replace(/\s*-?\s*\d+$/, '').trim();
-        if (!names.has(family)) names.set(family, index);
-    });
-    moduleNames[character] = [...names].map(([name, index]) => `[${JSON.stringify(name)}, ${index}],`);
+    moduleNames[character] = [...clipNames(source.Sequences)].map(([name, index]) => `[${JSON.stringify(name)}, ${index}],`);
     ensure(hash(await Bun.file(join(assets, fighter.source)).arrayBuffer()) === sourceSha256, `${fighter.name}: source changed during export`);
     totalBytes += fighterBytes;
     if (reuse) unthinnedBytes = retainedRecord.unthinnedBytes;
