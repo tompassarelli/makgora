@@ -163,7 +163,6 @@ const THUNDER_CLAP_CUE: Cue = { ...cue("Abilities\\Spells\\Human\\Thunderclap\\T
 const SHADOW = cue("Abilities\\Spells\\Undead\\Curse\\CurseTarget.mdx", "hand", f32(0.7));
 const FROST = cue("Abilities\\Spells\\Undead\\ReplenishMana\\SpiritTouchTarget.mdx", "hand", f32(0.8));
 const ARCANE = cue("Abilities\\Spells\\Human\\DispelMagic\\DispelMagicTarget.mdx", "hand", 0.5);
-const HOLY = cue("Abilities\\Spells\\Human\\Heal\\HealTarget.mdx", "hand", f32(0.7));
 const VAMPIRIC = cue("Abilities\\Spells\\Undead\\UnholyFrenzy\\UnholyFrenzyTarget.mdx", "hand", f32(0.8));
 const KAEL_PHOENIX_CHARGE: MoveCues = { spell: "Phoenix", startup: cue("Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", "body", 0.5), active: cue("Doodads\\Cinematic\\TownBurningFireEmitter\\TownBurningFireEmitter.mdx", "body", f32(0.6)) };
 // The flight is the phoenix itself: Kael's body is replaced by it until the flight ends.
@@ -358,9 +357,9 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     down: { spell: "Frost Armor", startup: timed(cue(FROST_ARMOR_SHELL_MODEL, "body", 1.0), "birth", 0.0), active: timed(cue("Abilities\\Spells\\Undead\\FrostArmor\\FrostArmorDamage.mdx", "body", f32(1.2)), "birth", 0.0) },
   },
   [Character.forsakenPaladin]: {
-    neutral: { spell: "Cleansing Sword", startup: { ...HOLY, scale: f32(0.35) }, active: { ...timed(cue("Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", "hand", f32(0.15)), "birth", f32(0.2)), birth: { eachFrame: true } } },
-    side: { spell: "Righteous Fury", startup: timed(cue("Abilities\\Spells\\Human\\InnerFire\\InnerFireTarget.mdx", "body", f32(0.55)), "stand", f32(0.2)), active: { ...timed(cue("Abilities\\Spells\\Other\\Stampede\\StampedeMissileDeath.mdx", "hand", f32(0.2)), "birth", f32(0.2)), birth: { eachFrame: true, strike: 0 } } },
-    up: { spell: "Ascension", startup: { ...HOLY, scale: f32(0.35) }, active: { ...timed(cue("Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx", "hand", f32(0.12)), "birth", f32(0.2)), birth: { eachFrame: true, strike: 0 } } },
+    neutral: { spell: "Cleansing Sword", startup: { ...SHADOW, scale: f32(0.35) }, active: cue("Abilities\\Spells\\Undead\\UnholyFrenzy\\UnholyFrenzyTarget.mdx", "hand", f32(0.5)) },
+    side: { spell: "Righteous Fury", startup: { ...SHADOW, scale: f32(0.4) }, active: timed(cue("Abilities\\Spells\\Other\\Stampede\\StampedeMissileDeath.mdx", "hand", f32(0.2)), "birth", f32(0.2)) },
+    up: { spell: "Ascension", startup: { ...SHADOW, scale: f32(0.35) }, active: cue("Abilities\\Spells\\Undead\\Possession\\PossessionTarget.mdx", "body", f32(0.6)) },
     down: { spell: "Consecration", startup: { ...SHADOW, scale: f32(0.4) }, active: timed(cue("Abilities\\Spells\\Human\\InnerFire\\InnerFireTarget.mdx", "hand", f32(0.2)), "stand", f32(0.2)) },
   },
   [Character.dreadlord]: {
