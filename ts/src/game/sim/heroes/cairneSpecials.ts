@@ -8,14 +8,14 @@ import { NO_LAUNCH, cairneCapsule as c, cairneHit as hit, cairneHurtPose } from 
 const shockwave = (air: boolean): AuthoredSpecial => ({
   endFrame: 58, landingLag: air ? 24 : undefined,
   projectiles: [{ spawnFrame: 24, offsetX: 72.0, offsetZ: 36.0, velocityX: 13.0, velocityZ: 0.0,
-    life: 38, radius: 20.0, effect: hit(9.729999542236328, "edge", 35), reflectable: true, limit: 1,
+    life: 38, radius: 20.0, effect: hit(8.756999015808105, "edge", 35), reflectable: true, limit: 1,
     model: "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveMissile.mdx" }],
 });
 const GORE_HORNS = cairneHurtPose(8, 25, hurtPart(30.0, 80.0, 75.0, 70.0, 22.0));
 const gore = (air: boolean): AuthoredSpecial => ({
   endFrame: 58, hurt: GORE_HORNS,
   motion: [{ ...frames(12, 25), velocityX: air ? 8.0 : 10.0, velocityZ: 0.0, stopsAtBody: true }, { ...frames(26, 26), velocityX: 0.0, velocityZ: 0.0 }],
-  commandGrab: { ...frames(12, 24), strike: c(40.0, 62.0, 100.0, 48.0, 24.0), holdFrames: 20, effect: hit(13.0, "kill", 40), recovery: 22 },
+  commandGrab: { ...frames(12, 24), strike: c(40.0, 62.0, 100.0, 48.0, 24.0), holdFrames: 20, effect: hit(11.699999809265137, "kill", 40), recovery: 22 },
   ...(air ? { oncePerAirtime: true, helpless: true, landingLag: 24 } : {}),
 });
 const STOMP_RING: SpecialProjectile = {
@@ -25,9 +25,9 @@ const STOMP_RING: SpecialProjectile = {
 };
 const WAR_STOMP: AuthoredSpecial = {
   endFrame: 54, defensiveUse: true, armor: { ...frames(6, 19), maxDamage: 8.0 },
-  regions: [heroRegion(20, 23, c(0.0, 16.0, 106.0, 16.0, 24.0), hit(12.64900016784668, "launch", 80)),
-    heroRegion(20, 23, c(0.0, 16.0, -106.0, 16.0, 24.0), hit(12.64900016784668, "launch", 80, -1)),
-    heroRegion(20, 21, c(-50.0, 60.0, 50.0, 60.0, 34.0), hit(12.64900016784668, "launch", 85))],
+  regions: [heroRegion(20, 23, c(0.0, 16.0, 106.0, 16.0, 24.0), hit(11.384099960327148, "launch", 80)),
+    heroRegion(20, 23, c(0.0, 16.0, -106.0, 16.0, 24.0), hit(11.384099960327148, "launch", 80, -1)),
+    heroRegion(20, 21, c(-50.0, 60.0, 50.0, 60.0, 34.0), hit(11.384099960327148, "launch", 85))],
   projectiles: [STOMP_RING],
 };
 const lift = (): AuthoredSpecial => ({
@@ -35,7 +35,7 @@ const lift = (): AuthoredSpecial => ({
   motion: [{ ...frames(1, 10), velocityX: 0.0, velocityZ: 0.0 },
     { ...frames(11, 26), velocityX: 0.0, velocityZ: 20.0, driftSpeed: 10.0 },
     { ...frames(27, 32), velocityX: 0.0, velocityZ: 6.0, driftSpeed: 3.0 }],
-  regions: [heroRegion(11, 16, c(0.0, 95.0, 0.0, 200.0, 20.0), hit(8.756999969482422, "launch", 80))],
+  regions: [heroRegion(11, 16, c(0.0, 95.0, 0.0, 200.0, 20.0), hit(7.88129997253418, "launch", 80))],
 });
 
 export const CAIRNE_SPECIALS: FighterSpecials = {

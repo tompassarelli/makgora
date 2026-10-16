@@ -101,11 +101,13 @@ sweep("Wren Expert computers tech-chase and juggle more than one and a half time
   expect(expert.juggles * 2).toBeGreaterThan(rookie.juggles * 3);
 }, 300_000);
 
-test("a seeded Wren Expert Rifleman and Cairne match has more tech chases and juggles than the same Rookie match, 7 and 5 against 0 and 1 [k3 measure #388]", () => {
+test("eight seeded Wren Expert Rifleman and Cairne matches have more tech chases and juggles than the same Rookie matches, 11 and 4 against 9 and 1 [k3 measure #388]", () => {
   const expert: Advantage = { hits: 0, techChases: 0, juggles: 0 };
   const rookie: Advantage = { hits: 0, techChases: 0, juggles: 0 };
-  play(Character.rifleman, Character.cairne, "expert", 1, expert);
-  play(Character.rifleman, Character.cairne, "rookie", 1, rookie);
+  for (let seed = 1; seed <= 8; seed++) {
+    play(Character.rifleman, Character.cairne, "expert", seed, expert);
+    play(Character.rifleman, Character.cairne, "rookie", seed, rookie);
+  }
   expect(expert.techChases).toBeGreaterThan(rookie.techChases);
   expect(expert.juggles).toBeGreaterThan(rookie.juggles);
-});
+}, 120_000);
