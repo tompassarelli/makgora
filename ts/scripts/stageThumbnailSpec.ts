@@ -29,9 +29,16 @@ const HERO: HeroCamera = { rotation: 80.0, angleOfAttack: 340.0, distance: 1900.
 
 export const HERO_CAMERAS: Readonly<Partial<Record<StageTile, HeroCamera>>> = {
   0: { ...HERO, distance: 1700.0 },
+  2: { ...HERO },
+  3: { ...HERO },
+  4: { ...HERO },
+  6: { ...HERO },
+  7: { ...HERO },
+  10: { ...HERO },
   11: { ...HERO },
   12: { ...HERO },
   13: { ...HERO },
+  14: { ...HERO },
 };
 
 export const RENDERED_STAGES = STAGE_CATALOG.map((entry) => entry.id).filter((stage) => HERO_CAMERAS[stage] !== undefined);
