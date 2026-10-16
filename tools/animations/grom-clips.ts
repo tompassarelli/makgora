@@ -64,7 +64,7 @@ const normals: readonly [HeroPose, AttackStyle, Gesture, readonly [number, numbe
   ["forwardAir", AttackStyle.forwardAir, { ...forward, thigh: 25, leftThigh: -30 }, [82, 85]],
   ["backAir", AttackStyle.backAir, back, [-75, 85]],
   ["upAir", AttackStyle.upAir, { ...overhead, chest: -40, pelvis: -25 }, [0, 158]],
-  ["downAir", AttackStyle.downAir, { ...low, chest: 28, lean: -10, thigh: 40, leftThigh: -25 }, [25, 20]],
+  ["downAir", AttackStyle.downAir, { ...low, chest: 50, pelvis: 35, lean: -15, thigh: 40, leftThigh: -25 }, [25, 20]],
 ];
 const followThrough: Partial<Record<HeroPose, Gesture>> = {
   downSmash: { chest: 65, pelvis: 40, hand: 35 },
@@ -78,6 +78,7 @@ const bodyDrive: Partial<Record<HeroPose, Action["drive"]>> = {
   upSmash: { Bone_Chest: [0, 42], Bone_Root: [0, 45] },
   neutralAir: { Bone_Root: [22, -8] },
   upAir: { Bone_Root: [24, 32] },
+  downAir: { Bone_Root: [0, -20] },
 };
 for (const [pose, style, gesture, target] of normals) {
   const move = GROM_MOVES.normals[style]; ensure(move, `${pose}: missing timing`);
