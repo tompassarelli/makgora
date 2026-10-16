@@ -64,9 +64,9 @@ export const LICH_KING_SEQUENCES = {
   "Ledge Attack": { index: 59, frames: 40 },
   "Wall Jump": { index: 60, frames: 45 },
   "Wall Tech": { index: 61, frames: 31 },
-  "Special Neutral": { index: 62, frames: 44 },
+  "Special Neutral": { index: 62, frames: 56 },
   "Special Down": { index: 63, frames: 50 },
-  "Special Side": { index: 64, frames: 40 },
+  "Special Side": { index: 64, frames: 52 },
   "Special Up": { index: 65, frames: 46 },
   "Turn": { index: 66, frames: 8 },
   "Stop": { index: 67, frames: 8 },
@@ -98,4 +98,5 @@ export const LICH_KING_SEQUENCES = {
   "Paired Grab victimThrowUp": { index: 93, frames: 60 },
   "Paired Grab throwDown": { index: 94, frames: 60 },
   "Paired Grab victimThrowDown": { index: 95, frames: 60 },
+  "Attack Gesture forwardTiltDown": { index: 96, frames: 38 },
 } as const;

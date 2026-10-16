@@ -526,17 +526,17 @@ author('Wall Tech', {0: {**TUMBLE}, 5: {**TUCK, 'lean': 24, 'hand_L': (-40, 26, 
 
 
 
-reuse('Special Neutral', 'Spell Throw', zero(16), 44)
+reuse('Special Neutral', 'Spell Throw', zero(29), 56)
 
 DEFILE_WIND = {'step': (-6, 0), 'lean': -10, 'twist': -16, 'hand_R': (24, -32, 160), 'hand_L': (28, 16, 146), 'aim': 90}
 DEFILE_CAST = {'step': (10, -8), 'lean': 6, 'twist': 8, 'hand_R': (62, -28, 150), 'hand_L': (48, 12, 140), 'aim': -90, 'foot_L': (42, 14, 1)}
 author('Special Down', {0: {}, 9: DEFILE_WIND, 14: DEFILE_WIND, zero(20): DEFILE_CAST, 25: DEFILE_CAST,
                         33: {'step': (6, -10), 'lean': 16, 'hand_R': (34, -30, 114), 'hand_L': (32, 20, 106), 'aim': -65}, 46: {}, 50: {}}, copy_of='Spell Channel')
 
-author('Special Side', swing(zero(14), 4, 40,
+author('Special Side', swing(zero(26), 4, 52,
     wind={'step': (-6, 0), 'lean': -12, 'twist': -20, 'hand_L': (-6, 26, 140), 'hand_R': (-6, -32, 92), 'aim': 70},
     strike={'step': (12, -6), 'lean': 18, 'twist': 20, 'hand_L': (50, 14, 112), 'hand_R': (-10, -32, 90), 'aim': 60, 'foot_L': (40, 14, 1)},
-    follow={'step': (10, -4), 'lean': 14, 'twist': 14, 'hand_L': (44, 14, 106), 'hand_R': (-8, -32, 90), 'aim': 60, 'foot_L': (36, 14, 1)}))
+    follow={'step': (14, -6), 'lean': 22, 'twist': 22, 'hand_L': (62, 12, 100), 'hand_R': (-8, -32, 90), 'aim': 60, 'foot_L': (40, 14, 1)}))
 
 RISE = {'lean': -8, 'hand_R': (6, -26, 148), 'aim': 92, 'hand_L': (24, 30, 132), 'foot_R': (4, -16, 6), 'foot_L': (-4, 14, 6)}
 author('Special Up', {0: {}, 5: {'step': (0, -24), 'lean': 14, 'hand_R': (20, -30, 64), 'aim': -40, 'hand_L': (16, 24, 70)},
@@ -577,7 +577,7 @@ for name, sign in [('Get Up Roll Forward', 1), ('Get Up Roll Backward', -1)]:
 
 for name, frame in [('Attack Jab', 5), ('Attack Jab 2', 6), ('Attack Jab 3', 8), ('Forward Tilt', 10), ('Up Tilt', 9), ('Down Tilt', 8), ('Dash Attack', 11),
                     ('Forward Smash', 21), ('Up Smash', 17), ('Down Smash', 16), ('Aerial Neutral', 9), ('Aerial Forward', 13), ('Aerial Back', 10),
-                    ('Aerial Up', 9), ('Aerial Down', 17), ('Grab', 8), ('Get Up Attack', 16), ('Ledge Attack', 16), ('Special Neutral', 15), ('Special Side', 13)]:
+                    ('Aerial Up', 9), ('Aerial Down', 17), ('Grab', 8), ('Get Up Attack', 16), ('Ledge Attack', 16), ('Special Neutral', 28), ('Special Side', 25)]:
     rows = []
     for f in (0, frame):
         sample(bpy.data.actions[name], f)

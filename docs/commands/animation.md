@@ -165,9 +165,9 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   (smashcraft:docs/fighter-animation-work.md, "Goblin Tinker").
 
 - Lich King animation authoring (from the repository root):
-  `tools/animations/build-lichking.sh [PRIVATE_INPUTS] [IMMUTABLE_EXISTING_MODEL] [--replace NAME]`
+  `tools/animations/build-lichking.sh [PRIVATE_INPUTS] [IMMUTABLE_EXISTING_MODEL] [--replace NAME]...`
   authors clips through Blender; the optional existing model preserves shipped
-  sequences and appends only new clips; `--replace NAME` reauthors one existing clip at its same index and length (smashcraft:docs/fighter-animation-work.md).
+  sequences and appends only new clips; `--replace NAME`, repeatable, reauthors an existing clip at its same index, in place when its length is unchanged and otherwise after the last clip, dropping its old keys (smashcraft:docs/fighter-animation-work.md).
 
 - Derived fighter art (from ts/): `bun wisp inputs derive [--fighter NAME]... [--rebuild]`
   runs the clip export, both bodies and the white flashes below for each fighter, fighters in

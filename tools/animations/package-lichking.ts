@@ -16,8 +16,8 @@ if (!sourcePath || !authoredDir || !outPath) throw new Error("usage: package-lic
 const appendAt = process.argv.indexOf("--append-to");
 const appendTo = appendAt < 0 ? undefined : process.argv[appendAt + 1];
 if (appendAt >= 0 && appendTo === undefined) throw new Error("--append-to needs an existing model");
-const replaceAt = process.argv.indexOf("--replace");
-const replaceName = replaceAt < 0 ? undefined : process.argv[replaceAt + 1];
+const replaced = new Set(process.argv.flatMap((arg, index) => arg === "--replace" ? [process.argv[index + 1] ?? ""] : []));
+if (replaced.has("")) throw new Error("--replace needs a clip name");
 const model = parseMDX(await Bun.file(appendTo ?? sourcePath).arrayBuffer());
 const authored = parseMDL(await Bun.file(join(authoredDir, "LichKingFighter.mdl")).text());
 const clips: { readonly authored: readonly { readonly name: string; readonly source: string }[] } = await Bun.file(join(authoredDir, "clips.json")).json();
@@ -33,19 +33,26 @@ const byName = (name: string) => {
   return sequence;
 };
 
-const placed: { from: [number, number]; to: [number, number]; donor: [number, number]; replace?: boolean }[] = [];
+const placed: { from: [number, number]; to: [number, number]; donor: [number, number]; replace?: boolean; vacated?: [number, number] }[] = [];
 const GAP = 100;
 let cursor = Math.max(...model.Sequences.map((sequence) => sequence.Interval[1])) + GAP;
 for (const clip of clips.authored) {
   const existing = model.Sequences.find((sequence) => sequence.Name === clip.name);
-  if (appendTo !== undefined && existing !== undefined && clip.name !== replaceName) continue;
+  if (appendTo !== undefined && existing !== undefined && !replaced.has(clip.name)) continue;
   const sequence = authored.Sequences.find((candidate) => candidate.Name === clip.name);
   if (sequence === undefined) throw new Error(`authored export has no ${clip.name}`);
   const donor = byName(clip.source);
   const length = sequence.Interval[1] - sequence.Interval[0];
-  if (existing !== undefined && clip.name === replaceName) {
-    if (existing.Interval[1] - existing.Interval[0] !== length) throw new Error("replacement must preserve clip length");
-    placed.push({ from: [sequence.Interval[0], sequence.Interval[1]], to: [existing.Interval[0], existing.Interval[1]], donor: [donor.Interval[0], donor.Interval[1]], replace: true });
+  if (existing !== undefined && replaced.has(clip.name)) {
+    if (existing.Interval[1] - existing.Interval[0] === length) {
+      placed.push({ from: [sequence.Interval[0], sequence.Interval[1]], to: [existing.Interval[0], existing.Interval[1]], donor: [donor.Interval[0], donor.Interval[1]], replace: true });
+      continue;
+    }
+    const to: [number, number] = [cursor, cursor + length];
+    cursor += length + GAP;
+    placed.push({ from: [sequence.Interval[0], sequence.Interval[1]], to, donor: [donor.Interval[0], donor.Interval[1]], vacated: [existing.Interval[0], existing.Interval[1]] });
+    existing.Interval = new Uint32Array(to);
+    existing.NonLooping = sequence.NonLooping;
     continue;
   }
   const to: [number, number] = [cursor, cursor + length];
@@ -59,6 +66,8 @@ for (const clip of clips.authored) {
 }
 
 const within = (frame: number, [start, end]: readonly [number, number]) => frame >= start && frame <= end;
+const vacated = placed.flatMap((clip) => clip.vacated === undefined ? [] : [clip.vacated]);
+const occupied = (frame: number) => vacated.some((interval) => within(frame, interval));
 const scaled = (frame: number, from: readonly [number, number], to: readonly [number, number]) =>
   Math.round(to[0] + (frame - from[0]) * (to[1] - to[0]) / Math.max(1, from[1] - from[0]));
 
@@ -90,12 +99,14 @@ function thinned(run: Key[], tolerance: number): Key[] {
 const skeleton = new Set<Track>();
 for (const node of [...model.Bones, ...model.Helpers]) {
   const source = [...authored.Bones, ...authored.Helpers].find((candidate) => candidate.Name === node.Name || candidate.Name === `Bone_${node.Name}`);
+  if (source === undefined && model.Helpers.includes(node as never)) continue;
   if (source === undefined) throw new Error(`authored export lost node ${node.Name}`);
   for (const kind of ["Translation", "Rotation"] as const) {
     const track = node[kind] as unknown as Track | undefined;
     const keys = source[kind] as unknown as Track | undefined;
     if (track === undefined || keys === undefined) throw new Error(`${node.Name} ${kind} has no keyed track to extend`);
     skeleton.add(track);
+    track.Keys = track.Keys.filter((key) => !occupied(key.Frame));
     for (const { from, to, replace } of placed) {
       if (replace) track.Keys = track.Keys.filter((key) => !within(key.Frame, to));
       const run = keys.Keys.filter((key) => within(key.Frame, from)).map((key) => ({ ...key, Frame: to[0] + key.Frame - from[0] }));
@@ -115,6 +126,7 @@ const extend = (value: unknown, seen: Set<unknown>): void => {
   seen.add(value);
   if (isTrack(value)) {
     if (skeleton.has(value) || value.GlobalSeqId !== null && value.GlobalSeqId !== undefined && value.GlobalSeqId >= 0) return;
+    value.Keys = value.Keys.filter((key) => !occupied(key.Frame));
     const original = [...value.Keys];
     for (const { to, donor } of placed.filter((clip) => !clip.replace)) {
       for (const key of original) if (within(key.Frame, donor)) value.Keys.push({ ...key, Frame: scaled(key.Frame, donor, to) });
@@ -125,7 +137,7 @@ const extend = (value: unknown, seen: Set<unknown>): void => {
 };
 for (const [field, value] of Object.entries(model)) if (field !== "Sequences" && field !== "EventObjects") extend(value, new Set());
 for (const event of model.EventObjects) {
-  const frames = Array.from(event.EventTrack ?? []);
+  const frames = Array.from(event.EventTrack ?? []).filter((frame) => !occupied(frame));
   for (const { to, donor } of placed.filter((clip) => !clip.replace)) for (const frame of [...frames]) if (within(frame, donor)) frames.push(scaled(frame, donor, to));
   event.EventTrack = new Uint32Array(frames);
 }
