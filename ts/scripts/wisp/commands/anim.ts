@@ -22,6 +22,7 @@ import { runProcess } from "../../hostProcess";
 import { CROUCH_THRESHOLDS, DOUBLE_JUMP_THRESHOLDS, LEDGE_THRESHOLDS, type MoveScore, THRESHOLDS, scoreCrouch, scoreDoubleJump, scoreLedgeHang, scoreMove } from "../animScore";
 import { type CrouchClipKind, type Look, type SampledMove, gameplayPixelsPerUnit, loadBody, sampleCrouch, sampleFighter, sampleJumps, sampleLedgeHang } from "../animScoreSample";
 import { LEDGE_HANG_DEPTH, LEDGE_HANG_OUTSET } from "../../../src/game/sim/ledge";
+import { isMovementMove, MOVEMENT_CAPTIONS, movementSeconds } from "../animMovementRows";
 import { assetsView, readManifest } from "../buildInputs";
 import { headlessRender } from "../headlessRender";
 import { projectRoot } from "../project";
@@ -239,6 +240,8 @@ const score: Command = (args) => Effect.gen(function*() {
 
 const JUDGE_BATCH = 6;
 
+interface Strip { readonly fighter: string; readonly move: string; readonly seconds: readonly number[]; readonly heights: readonly number[]; readonly caption: string }
+
 
 const keyFrames = (row: Row) => [...new Set([0, row.score.keys.windup, row.score.keys.contact, row.frames.lastActive, row.score.keys.recovery, row.frames.end])].sort((a, b) => a - b);
 
@@ -311,10 +314,28 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
   const wanted = flags.get("--move");
   const fighters = yield* selectFighters(flags.get("--fighter") ?? (wanted === undefined ? undefined : [...new Set(wanted.map((move) => move.split(":")[0] ?? ""))]));
   const assets = flags.get("--assets")?.[0] ?? assetsView(yield* readManifest());
-  const { rows, samples } = yield* measure(fighters, look, assets);
+  const attackWanted = wanted?.filter((move) => !isMovementMove(move.split(":")[1] ?? ""));
+  const { rows, samples } = attackWanted !== undefined && attackWanted.length === 0 ? { rows: [], samples: new Map<string, SampledMove>() } : yield* measure(fighters, look, assets);
   const chosen = rows.filter((row) => wanted === undefined || wanted.includes(`${row.fighter}:${row.move}`));
-  if (chosen.length === 0) return yield* new UsageFailure({ problem: "no scored move matches" });
   const references = yield* readReferences;
+  const strips: Strip[] = [];
+  for (const row of chosen) {
+    const sampled = samples.get(`${row.fighter}/${row.move}`);
+    if (sampled === undefined) continue;
+    const reference = referenceFor(references, row.fighter, row.move);
+    const indices = keyFrames(row);
+    strips.push({ fighter: row.fighter, move: row.move, seconds: indices.map((index) => sampled.seconds[index] ?? 0), heights: indices.map((index) => sampled.heights[index] ?? 0),
+      caption: `Top row, ours: frames ${indices.join(", ")} (start, windup, contact on the first active frame ${row.frames.firstActive}, last active, recovery, end of ${row.frames.end}). Bottom row: ${reference === undefined ? "no reference animation on file; judge against the brief's standard" : `Melee ${reference.character.replaceAll("_", " ")}'s ${REFERENCE_ACTIONS[row.move]?.wiki} (hitbox view)`}.` });
+  }
+  for (const entry of wanted ?? []) {
+    const [slug = "", move = ""] = entry.split(":");
+    if (!isMovementMove(move)) continue;
+    const character = fighters.find((candidate) => fighterSlug(candidate) === slug);
+    if (character === undefined) continue;
+    const seconds = yield* attempt(`sample ${slug} ${move}`, async () => movementSeconds(move, await loadBody(assets, character, look), character));
+    strips.push({ fighter: slug, move, seconds, heights: seconds.map(() => 0), caption: `Top row, ours: ${MOVEMENT_CAPTIONS[move]}. No reference animation on file; judge against the brief's standard.` });
+  }
+  if (strips.length === 0) return yield* new UsageFailure({ problem: "no scored move matches" });
 
   const session = yield* Effect.acquireRelease(attempt("start the scene session", () => createStandaloneSession({ presentation: "pool-confirmed", script: "#! chat -dev quick" })), (open) => Effect.sync(() => open.close()));
   for (let frame = 0; frame < 60; frame++) session.step(NEUTRAL_INPUT);
@@ -325,30 +346,28 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
   extremeCamera(camera, FROZEN_THRONE_STAGE, MATCH_CAMERA_ASPECT, "far");
   const scenes: RenderScene[] = [];
   const frameIds = new Map<string, number[]>();
-  for (const row of chosen) {
-    const character = SELECTABLE_CHARACTERS.find((candidate) => fighterSlug(candidate) === row.fighter) ?? 0;
-    const clip = originalClip(character, 0), sampled = samples.get(`${row.fighter}/${row.move}`);
-    if (clip === undefined || sampled === undefined) continue;
+  for (const strip of strips) {
+    const character = SELECTABLE_CHARACTERS.find((candidate) => fighterSlug(candidate) === strip.fighter) ?? 0;
+    const clip = originalClip(character, 0);
+    if (clip === undefined) continue;
     const ids: number[] = [];
-    for (const index of keyFrames(row)) {
-      const frame = sampled.sample.frames[index];
-      if (frame === undefined) continue;
+    for (const [index, seconds] of strip.seconds.entries()) {
       const id = scenes.length;
       ids.push(id);
-      const z = FLOOR_HEIGHT + (sampled.heights[index] ?? 0);
+      const z = FLOOR_HEIGHT + (strip.heights[index] ?? 0);
       scenes.push({
         ...base, frame: id, units: [], ui: [], textTags: [],
         camera: { ...base.camera, x: 0, y: 0, fields: { ...base.camera.fields, CAMERA_FIELD_TARGET_DISTANCE: camera.distance, CAMERA_FIELD_ZOFFSET: z + 90, CAMERA_FIELD_FIELD_OF_VIEW: cameraFieldOfView(camera, MATCH_CAMERA_ASPECT) } },
-        effects: [{ ...bodyEffect, model: clip.modelPath, animation: "Stand", animationElapsed: sampled.seconds[index] ?? 0, animationClock: 0, timeScale: 0, x: 0, y: 0, z, yaw: 0, teamColor: 0, alpha: 255 }],
+        effects: [{ ...bodyEffect, model: clip.modelPath, animation: "Stand", animationElapsed: seconds, animationClock: 0, timeScale: 0, x: 0, y: 0, z, yaw: 0, teamColor: 0, alpha: 255 }],
       });
     }
-    frameIds.set(`${row.fighter}/${row.move}`, ids);
+    frameIds.set(`${strip.fighter}/${strip.move}`, ids);
   }
   const project = { ...headlessRender({ assets }), width: 1920, height: 1080 };
   yield* renderScenes(project, scenes, join(output, "frames"), look);
   const batches: string[][] = [];
   const size = JUDGE_BATCH;
-  for (const row of chosen) {
+  for (const row of strips) {
     const key = `${row.fighter}/${row.move}`;
     const ids = frameIds.get(key) ?? [];
     const crops = ids.map((id) => join(output, "frames", `p${base.client}-frame-${id}.png`));
@@ -372,15 +391,14 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
   const brief = yield* attempt("read the judge brief", () => Bun.file(join(projectRoot, "docs/animation-judge-brief.md")).text());
   for (const [index, batch] of batches.entries()) {
     const items = batch.map((key) => {
-      const row = chosen.find((candidate) => `${candidate.fighter}/${candidate.move}` === key);
-      const reference = referenceFor(references, row?.fighter ?? "", row?.move ?? "");
+      const strip = strips.find((candidate) => `${candidate.fighter}/${candidate.move}` === key);
       const [fighter = "", move = ""] = key.split("/");
-      return `- ${fighterName(SELECTABLE_CHARACTERS.find((candidate) => fighterSlug(candidate) === fighter) ?? 0)} (\`${fighter}\`), \`${move}\`: ${join(output, "moves", `${fighter}-${move}.png`)}\n  Top row, ours: frames ${row === undefined ? "" : keyFrames(row).join(", ")} (start, windup, contact on the first active frame ${row?.frames.firstActive}, last active, recovery, end of ${row?.frames.end}). Bottom row: ${reference === undefined ? "no reference animation on file; judge against the brief's standard" : `Melee ${reference.character.replaceAll("_", " ")}'s ${REFERENCE_ACTIONS[move]?.wiki} (hitbox view)`}.`;
+      return `- ${fighterName(SELECTABLE_CHARACTERS.find((candidate) => fighterSlug(candidate) === fighter) ?? 0)} (\`${fighter}\`), \`${move}\`: ${join(output, "moves", `${fighter}-${move}.png`)}\n  ${strip?.caption ?? ""}`;
     });
     const file = join(output, `batch-${index + 1}.md`);
     yield* attempt(`write ${file}`, () => Bun.write(file, `${brief}\n\n## Your moves (look: ${look})\n\n${items.join("\n")}\n\nWrite your scores to ${join(output, `scores-${index + 1}.jsonl`)}, one JSON line per move.\n`));
   }
-  yield* Console.log(`${chosen.length} moves in ${batches.length} batches: ${output}/batch-N.md; record with: bun wisp anim judge record ${output}/scores-*.jsonl`);
+  yield* Console.log(`${strips.length} moves in ${batches.length} batches: ${output}/batch-N.md; record with: bun wisp anim judge record ${output}/scores-*.jsonl`);
 }).pipe(Effect.scoped, Effect.provide(BunServices.layer));
 
 
