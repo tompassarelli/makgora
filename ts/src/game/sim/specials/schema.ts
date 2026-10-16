@@ -217,7 +217,7 @@ export interface SpecialPlacement {
   readonly offsetZ?: number | undefined;
 
   readonly keepExisting?: boolean | undefined;
-  readonly model?: { readonly path: string; readonly height: number; readonly alpha: number } | undefined;
+  readonly model?: { readonly path: string; readonly height: number; readonly alpha: number; readonly finished?: true } | undefined;
 
   readonly frame: number;
   readonly offsetX: number;

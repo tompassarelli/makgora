@@ -17,7 +17,7 @@ import { bindPrototype } from "../../platform/rebind";
 
 const PLACED_OBJECT_MODEL = "Units\\Orc\\SerpentWard\\SerpentWard.mdx";
 const MODEL_HEIGHT = 300.0;
-const DEFAULT_LOOK = { path: PLACED_OBJECT_MODEL, height: MODEL_HEIGHT, alpha: 255 };
+const DEFAULT_LOOK: { readonly path: string; readonly height: number; readonly alpha: number; readonly finished?: true } = { path: PLACED_OBJECT_MODEL, height: MODEL_HEIGHT, alpha: 255 };
 const ANIMALS = PACK_CAPACITY + 1;
 const BIRTH_SECONDS = 60.0;
 const DEATH_SECONDS = f32(2.333);
@@ -164,6 +164,7 @@ export class PlacedObjectEffects {
     const bear = placed === fighter.placed ? bearState(fighter) : undefined;
     if (spec.companion !== undefined) this.animate(model, slot, placed, bear);
     else if (spec.crumble !== undefined) this.build(model, slot, placed, spec.crumble, spec.fireAges[0] ?? 1);
+    else if (look.finished === true) this.build(model, slot, placed, 0, 0);
     BlzSetSpecialEffectScale(model, f32(spec.height / look.height * (bear === "CHARGING" ? 1.25 : 1.0)));
 
     const left = f32(Math.max(0.0, placed.durability) / spec.durability);

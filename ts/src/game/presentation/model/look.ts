@@ -10,7 +10,7 @@ export interface HeroLook {
 
   readonly portrait: string;
 
-  readonly placedModel?: { readonly path: string; readonly height: number; readonly alpha: number } | undefined;
+  readonly placedModel?: { readonly path: string; readonly height: number; readonly alpha: number; readonly finished?: true } | undefined;
 
   readonly clips: HeroClipTable;
 

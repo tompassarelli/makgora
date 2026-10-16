@@ -59,3 +59,29 @@ test("Peon's lumber and burrow place/pack lifecycle emits no explosion model or 
     expect(client.errors).toEqual([]);
   }
 });
+
+test("Peon's burrow stands finished from the frame it is placed, never in its construction animation [k1 scenario]", () => {
+  const client = headless.clients({ start: () => {}, install: () => {} }, [0]).client(0);
+  client.run(() => {
+    const match = testMatch(1, Character.peon), fighter = fighterAt(match.world, 0), input = match.inputs.inputs[0];
+    match.game.practice = true;
+    fighter.motion.x = 0;
+    const placed = new PlacedObjectEffects({ x: 0, y: 0, z: 0 });
+    placed.prepareFighter(0, Character.peon);
+    const animations = new Set<string>();
+    for (let frame = 1; frame <= 120; frame++) {
+      input.specialPressed = frame === 1;
+      input.specialX = 1;
+      if (input.specialPressed) fighter.mana.points = ROSTER_MANA.max;
+      executeNext(match);
+      client.draw(1 / 60);
+      placed.presentConfirmed(frame, fighter, 0);
+      placed.present(fighter, 0);
+      if (fighter.placed.life <= 0) continue;
+      for (const pose of client.effectPoses({ visibleOnly: true })) if (pose.model.includes("TrollBurrow") && pose.scale > 0) animations.add(String(pose.animation));
+    }
+    expect([...animations]).toEqual(["ANIM_TYPE_STAND"]);
+    placed.destroy();
+  });
+  expect(client.errors).toEqual([]);
+});
