@@ -65,7 +65,7 @@ interface Risen {
 interface Pool {
   readonly path: string;
   readonly drawn: string;
-
+  readonly defile: boolean;
   readonly effects: readonly number[];
   readonly boundaries: readonly (readonly number[])[];
   readonly fills: readonly (readonly number[])[];
@@ -169,7 +169,7 @@ export class ProjectilePresentation {
           boundaries.push(layers);
         }
       }
-      this.pools.push({ path, drawn, effects, boundaries, fills, raised });
+      this.pools.push({ path, drawn, defile: defilePool, effects, boundaries, fills, raised });
     });
     for (let index = 0; index < PROJECTILE_CAPACITY; index++) this.assigned.push(-1);
     this.clear();
@@ -370,7 +370,7 @@ export class ProjectilePresentation {
       const lichKing = fighter?.character === Character.lichKing;
       const risen = lichKing && pool?.path.includes("ImpaleHitTarget") === true;
       const tell = lichKing && pool?.path.includes("AnimateDeadTarget") === true;
-      const defile = lichKing && projectile?.spec?.pool !== undefined;
+      const defile = lichKing && pool?.defile === true;
       const born = projectile !== undefined && (this.serials[slot] !== projectile.serial || this.specs[slot] !== projectile.spec || !this.visible[slot]);
       const rebirth = projectile !== undefined && cue?.birth !== undefined && !paused && (born || (cue.birth.eachFrame && this.lives[slot] !== projectile.life));
       if (born && projectile !== undefined && !risen && !tell && !defile) {
@@ -471,9 +471,8 @@ export class ProjectilePresentation {
         if (boundary === undefined || boundarySlot === undefined || pose.dangerRadius <= 0.0) continue;
         taken[boundarySlot] = true;
         parked[boundarySlot] = false;
-        if (defile && layer > 0 && projectile?.spec?.pool !== undefined) {
-          const age = projectile.spec.life - projectile.life;
-          const pulseFrame = projectile.poolHits > 0 ? projectile.spec.pool.every - 1 - projectile.poolWait : age - (projectile.spec.activeFrom ?? 0);
+        if (defile && layer > 0) {
+          const pulseFrame = pose.poolSince;
           if (!pose.armed || pulseFrame < 0 || pulseFrame > 12) {
             taken[boundarySlot] = false;
             continue;
@@ -499,7 +498,7 @@ export class ProjectilePresentation {
           const frost = fighter?.character === Character.lich;
           if (defile && projectile?.spec?.pool !== undefined) {
             const age = projectile.spec.life - projectile.life;
-            const since = projectile.poolHits > 0 ? projectile.spec.pool.every - 1 - projectile.poolWait : age - (projectile.spec.activeFrom ?? 0);
+            const since = pose.poolSince;
             const flash = since >= 0 && since <= 12 ? 1.0 - since / 12 : 0.0;
             const glow = Math.min(1.0, f32(0.72) + f32(0.12) * sineTurns(age / 23) + f32(0.08) * sineTurns(age / 9) + 0.5 * flash);
             BlzSetSpecialEffectColor(boundary, Math.floor(255 * glow), Math.floor(255 * glow), 255);
