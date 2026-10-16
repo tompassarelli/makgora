@@ -50,9 +50,10 @@ const captureRows = (batch: Batch, out: string, dry: boolean) => Effect.gen(func
   const scripts: Batch["scripts"][number][] = [];
   for (const [index, script] of batch.scripts.entries()) {
     const source = yield* Schema.decodeEffect(Schema.fromJsonString(Manifest))(yield* read(script.path));
+    if (resolve(source.map) !== batch.map) return yield* new UsageFailure({ problem: `${script.path}: capture manifest names a different map` });
     for (const [fixtureIndex, fixture] of source.fixtures.entries()) {
       const path = resolve(out, batch.id, "manifests", `${index}-${fixtureIndex}.json`);
-      if (!dry) yield* save(path, { ...source, fixtures: [fixture] });
+      if (!dry) yield* save(path, { ...source, map: resolve(source.map), fixtures: [fixture] });
       scripts.push({ path, issues: script.issues });
     }
   }

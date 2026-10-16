@@ -1,5 +1,5 @@
 {
-  "map": "/tmp/native-fixture.w3x",
+  "map": "build/native-fixture.w3x",
   "mapSha256": "fixture-digest",
   "sourceRevision": "fixture-revision",
   "fixtures": [
