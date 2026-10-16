@@ -116,7 +116,10 @@ export function advanceWater(world: Roster, stage: number, matchFrame: number, h
       water.frames = 0;
       water.entries = 0;
     }
-    if (now && !water.inWater) water.entries++;
+    if (now && !water.inWater) {
+      water.entries++;
+      f.special.airtimeUses = 0;
+    }
     if (now) water.frames++;
     water.inWater = now;
 

@@ -174,3 +174,13 @@ test("every computer fighter in the water when the hydra's tell starts leaves it
     if (!struck || fighter.status.out || fighter.status.stocks !== 3) throw new Error(`computer ${character} from x ${x} at tide frame ${tideFrame}: struck ${struck}, out ${fighter.status.out}, stocks ${fighter.status.stocks}`);
   }
 });
+
+test("falling into the sea gives back every once-per-airtime special, so up special can recover from the water [k1 scenario]", () => {
+  const state = seaMatch(OPEN_SEA, f32(SEA_SURFACE_Z + 40.0));
+  const f = fighterAt(state.world, 0);
+  f.special.airtimeUses = 15;
+  let entered = false;
+  play(state, 1, 60, (_frame, fighter) => { if (fighter.water.inWater) entered = true; });
+  assertEquals(entered, true);
+  assertEquals(fighterAt(state.world, 0).special.airtimeUses, 0);
+});
