@@ -40,7 +40,7 @@ const source = parseMDX(originalBytes), model = structuredClone(source);
 ensure(source.Sequences.length === 16 && source.Bones.some(b => b.Name === "Bone_Hand_R"), "Expected original classic Grom Hellscream");
 const stand = source.Sequences[8]!;
 interface Gesture { chest?: number; pelvis?: number; arm?: number; elbow?: number; hand?: number; leftArm?: number; leftElbow?: number; head?: number; thigh?: number; knee?: number; leftThigh?: number; yaw?: number; lean?: number; }
-interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; hold?: boolean; air?: boolean; roll?: number; target?: readonly [number, number]; paired?: boolean; pain?: boolean; }
+interface Action { pose: HeroPose; frames: number; contact: number; lastActive?: number; gesture: Gesture; follow?: Gesture; followDistance?: number; drive?: Readonly<Partial<Record<"Bone_Root" | "Bone_Chest" | "Bone_Pelvis", readonly [number, number]>>>; hold?: boolean; air?: boolean; roll?: number; target?: readonly [number, number]; paired?: boolean; pain?: boolean; }
 const forward: Gesture = { chest: 15, pelvis: -8, arm: -95, elbow: 15, leftArm: -35, leftElbow: -20, head: -8, thigh: 12, leftThigh: -8 };
 const overhead: Gesture = { chest: -18, pelvis: 8, arm: -165, elbow: -10, leftArm: -140, head: -18, thigh: -12, leftThigh: 15 };
 const low: Gesture = { chest: 45, pelvis: 18, arm: -45, elbow: 15, leftArm: -60, head: -20, thigh: 45, knee: -55, leftThigh: -25 };
@@ -58,17 +58,30 @@ const normals: readonly [HeroPose, AttackStyle, Gesture, readonly [number, numbe
   ["downTilt", AttackStyle.downTilt, low, [75, 15]],
   ["dashAttack", AttackStyle.dashAttack, { ...forward, lean: 15 }, [80, 65]],
   ["forwardSmash", AttackStyle.forwardSmash, { ...forward, chest: 30, leftArm: -100 }, [85, 82]],
-  ["upSmash", AttackStyle.upSmash, { ...overhead, chest: -25 }, [0, 166]],
-  ["downSmash", AttackStyle.downSmash, { ...low, leftArm: 65, yaw: 25 }, [70, 20]],
-  ["neutralAir", AttackStyle.neutralAir, { ...cast, leftArm: 65, yaw: 65 }, [70, 80]],
+  ["upSmash", AttackStyle.upSmash, { ...overhead, chest: -45, pelvis: -30 }, [0, 166]],
+  ["downSmash", AttackStyle.downSmash, { ...low, chest: 60, pelvis: 35, leftArm: 65, yaw: 25 }, [70, 20]],
+  ["neutralAir", AttackStyle.neutralAir, { ...cast, chest: -30, pelvis: -25, leftArm: 65, yaw: 65 }, [70, 80]],
   ["forwardAir", AttackStyle.forwardAir, { ...forward, thigh: 25, leftThigh: -30 }, [82, 85]],
   ["backAir", AttackStyle.backAir, back, [-75, 85]],
-  ["upAir", AttackStyle.upAir, overhead, [0, 158]],
+  ["upAir", AttackStyle.upAir, { ...overhead, chest: -40, pelvis: -25 }, [0, 158]],
   ["downAir", AttackStyle.downAir, { ...low, chest: 28, lean: -10, thigh: 40, leftThigh: -25 }, [25, 20]],
 ];
+const followThrough: Partial<Record<HeroPose, Gesture>> = {
+  downSmash: { chest: 65, pelvis: 40, hand: 35 },
+  upSmash: { chest: -55, pelvis: -35, hand: -35 },
+  neutralAir: { chest: -40, pelvis: -32, yaw: 90, hand: -35 },
+  backAir: { chest: -25, pelvis: -20, yaw: 135, hand: 35 },
+  upAir: { chest: -50, pelvis: -30, hand: -35 },
+};
+const bodyDrive: Partial<Record<HeroPose, Action["drive"]>> = {
+  downSmash: { Bone_Root: [0, -12] },
+  upSmash: { Bone_Chest: [0, 42], Bone_Root: [0, 45] },
+  neutralAir: { Bone_Root: [22, -8] },
+  upAir: { Bone_Root: [24, 32] },
+};
 for (const [pose, style, gesture, target] of normals) {
   const move = GROM_MOVES.normals[style]; ensure(move, `${pose}: missing timing`);
-  actions.push({ pose, frames: move.totalFrames, contact: move.startupFrames, gesture, target, air: pose.endsWith("Air") });
+  actions.push({ pose, frames: move.totalFrames, contact: move.startupFrames, lastActive: Math.max(...move.regions.map(region => region.lastFrame)), gesture, follow: followThrough[pose], followDistance: pose === "backAir" ? 8 : undefined, drive: bodyDrive[pose], target, air: pose.endsWith("Air") });
 }
 const extra: readonly [HeroPose, number, number, Gesture][] = [
   ["crouch", 30, 8, brace], ["landing", 8, 2, brace], ["shield", 30, 5, { ...brace, leftArm: -105 }],
@@ -163,21 +176,33 @@ for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
   const name = ordinal < actions.length ? `Grom ${action.pose}` : `Grom Damage ${Math.floor((ordinal - actions.length) / 3)} ${(ordinal - actions.length) % 3}`;
   model.Sequences.push({ ...stand, Name: name, Interval: new Uint32Array([start, end]), NonLooping: true, MoveSpeed: 0, Rarity: 0,
     MinimumExtent: new Float32Array([-300, -300, -200]), MaximumExtent: new Float32Array([300, 300, 350]), BoundsRadius: 400 });
-  const phaseFrames = [...new Set([0, Math.max(1, action.contact - 3), action.contact, Math.min(action.frames - 1, action.contact + 4), action.frames,
+  const recoveryStart = Math.min(action.frames - 1, (action.lastActive ?? action.contact) + 1);
+  const followStart = Math.max(Math.min(action.frames - 1, action.contact + 4), recoveryStart);
+  const followEnd = Math.min(action.frames - 1, followStart + Math.max(3, Math.floor((action.frames - followStart) / 2)));
+  const followFrames = action.follow === undefined ? [] : Array.from({ length: followEnd - followStart + 1 }, (_, i) => followStart + i);
+  const recoveryFrames = action.follow === undefined ? [] : Array.from({ length: action.frames - recoveryStart }, (_, i) => recoveryStart + i);
+  const phaseFrames = [...new Set([0, Math.max(1, action.contact - 3), action.contact, followStart, ...followFrames, ...recoveryFrames, action.frames,
     ...(action.roll ? Array.from({ length: Math.ceil(action.frames / 3) }, (_, i) => i * 3) : []),
     ...(action.pose === "victimPummel" ? [action.contact - 1] : [])])].sort((a, b) => a - b);
-  const amount = (frame: number) => action.hold || action.pain ? 1 : action.pose === "victimPummel" && frame < action.contact ? 0 : action.pose === "knockdown" && frame >= action.contact ? 1 : frame === 0 || frame === action.frames ? 0 : frame < action.contact ? -0.3 : 1;
+  const amount = (frame: number) => action.hold || action.pain ? 1 : action.pose === "victimPummel" && frame < action.contact ? 0 : action.pose === "knockdown" && frame >= action.contact ? 1 : frame === 0 ? 0 : action.follow !== undefined && frame >= recoveryStart ? 1 - (frame - recoveryStart) / Math.max(1, action.frames - 1 - recoveryStart) : frame === action.frames ? 0 : frame < action.contact ? -0.3 : 1;
   tracks(model, (track, path) => {
     const donor = originals.get(path); if (!donor || globalClock(donor)) return;
-    const first = donor.Keys.find(k => k.Frame >= stand.Interval[0] && k.Frame <= stand.Interval[1]); if (!first) return;
-    const match = /^\.(Bones|Helpers)\.(\d+)\.Rotation$/.exec(path);
+    const match = /^\.(Bones|Helpers)\.(\d+)\.(Rotation|Translation)$/.exec(path);
+    const rotationTrack = match?.[3] === "Rotation";
     const node = match ? source[match[1] as "Bones" | "Helpers"][Number(match[2])] : undefined;
+    const drivenOffset = node?.Name === "Bone_Root" || node?.Name === "Bone_Chest" || node?.Name === "Bone_Pelvis" ? action.drive?.[node.Name] : undefined;
+    const first = donor.Keys.find(k => k.Frame >= stand.Interval[0] && k.Frame <= stand.Interval[1])
+      ?? (drivenOffset !== undefined && match?.[3] === "Translation"
+        ? donor.Keys.toSorted((a, b) => Math.abs(a.Frame - stand.Interval[0]) - Math.abs(b.Frame - stand.Interval[0]))[0]
+        : undefined);
+    if (!first) return;
     for (const frame of phaseFrames) {
       let Vector = first.Vector.slice();
-      if (node) { let [y, z] = joint(node.Name, action.gesture); y = node.Name === "Bone_Root" && action.roll ? frame / action.frames * 360 * action.roll : y * amount(frame);
+      if (node && match?.[3] === "Translation" && drivenOffset !== undefined) { Vector[0] = Vector[0]! + drivenOffset[0] * amount(frame); Vector[2] = Vector[2]! + drivenOffset[1] * amount(frame); }
+      if (node && match?.[3] === "Rotation") { const rawProgress = action.follow === undefined ? 0 : Math.max(0, Math.min(1, (frame - followStart) / Math.max(1, followEnd - followStart))); const progress = rawProgress * rawProgress * (3 - 2 * rawProgress); const gesture = action.follow === undefined ? action.gesture : Object.fromEntries(new Set([...Object.keys(action.gesture), ...Object.keys(action.follow)]).values().map(key => [key, (action.gesture[key as keyof Gesture] ?? 0) + ((action.follow![key as keyof Gesture] ?? 0) - (action.gesture[key as keyof Gesture] ?? 0)) * progress])) as Gesture; let [y, z] = joint(node.Name, gesture); y = node.Name === "Bone_Root" && action.roll ? frame / action.frames * 360 * action.roll : y * amount(frame);
         if (node.Name === "Bone_Root" && (action.pose === "getUp" || action.pose === "getUpAttack" || action.pose.startsWith("getUpRoll"))) y += 85 * Math.max(0, 1 - frame / action.contact);
         z *= amount(frame); Vector = rotated(first.Vector, y, z); }
-      const tangent = () => match || track.LineType === mdx.LineType.Bezier ? Vector.slice() : new Float32Array(Vector.length);
+      const tangent = () => rotationTrack || track.LineType === mdx.LineType.Bezier ? Vector.slice() : new Float32Array(Vector.length);
       track.Keys.push({ ...first, Frame: start + Math.round(frame * 1000 / 60), Vector, ...(first.InTan ? { InTan: tangent(), OutTan: tangent() } : {}) });
     }
   });
@@ -186,13 +211,35 @@ for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
     const arm = model.Nodes.find(n => n.Name === "Bone_Arm1_R")!, elbow = model.Nodes.find(n => n.Name === "Bone_Arm2_R")!, hand = model.Nodes.find(n => n.Name === "Bone_Hand_R")!, pivot = model.PivotPoints[hand.ObjectId]!;
     const donor = (n: mdx.Node) => source.Nodes[n.ObjectId]!.Rotation!.Keys.find(k => k.Frame >= stand.Interval[0] && k.Frame <= stand.Interval[1])!.Vector;
     const armBase = donor(arm), elbowBase = donor(elbow);
-    const set = (node: mdx.Node, base: ArrayLike<number>, y: number, z: number) => { for (const frame of phaseFrames) { const key = node.Rotation!.Keys.find(k => k.Frame === start + Math.round(frame * 1000 / 60))!; key.Vector = rotated(base, y * amount(frame), z * amount(frame)); if (key.InTan) { key.InTan = key.Vector.slice(); key.OutTan = key.Vector.slice(); } } };
+    const set = (node: mdx.Node, base: ArrayLike<number>, y: number, z: number, frames: readonly number[] = phaseFrames) => { for (const frame of frames) { const key = node.Rotation!.Keys.find(k => k.Frame === start + Math.round(frame * 1000 / 60))!; key.Vector = rotated(base, y * amount(frame), z * amount(frame)); if (key.InTan) { key.InTan = key.Vector.slice(); key.OutTan = key.Vector.slice(); } } };
     const angles = [0, 0, 0, 0];
     const loss = () => { set(arm, armBase, angles[0]!, angles[1]!); set(elbow, elbowBase, angles[2]!, angles[3]!); renderer.update(0); const matrix = data.nodes[hand.ObjectId].matrix; const x = matrix[0] * pivot[0]! + matrix[4] * pivot[1]! + matrix[8] * pivot[2]! + matrix[12], z = matrix[2] * pivot[0]! + matrix[6] * pivot[1]! + matrix[10] * pivot[2]! + matrix[14]; return (x - action.target![0]) ** 2 + (z - action.target![1]) ** 2; };
     for (let pass = 0; pass < 3; pass++) for (let dim = 0; dim < 4; dim++) { let best = Infinity, bestAngle = 0; for (let value = -180; value <= 180; value += pass === 0 ? 20 : 5) { angles[dim] = value; const distance = loss(); if (distance < best) { best = distance; bestAngle = value; } } angles[dim] = bestAngle; }
     loss();
+    if (action.follow !== undefined && followEnd > followStart && action.pose !== "backAir" && action.pose !== "neutralAir") {
+      const selected = action.pose === "upAir"
+        ? ["Bone_Arm1_L", "Bone_Arm2_L", "Bone_Hand_L"]
+        : action.pose === "downAir" ? ["Bone_Leg1_R", "Bone_Leg2_R", "Bone_Foot_R"]
+        : ["Bone_Arm1_R", "Bone_Arm2_R", "Bone_Hand_R"];
+      const nodes = selected.map(name => model.Nodes.find(n => n.Name === name)!);
+      const bases = nodes.map(node => source.Nodes[node.ObjectId]!.Rotation!.Keys.find(key => key.Frame >= stand.Interval[0] && key.Frame <= stand.Interval[1])!.Vector);
+      const controls = nodes.length === 3 && action.pose === "downAir" ? [0, 2, 4] : [0, 1, 2, 3];
+      const effector = nodes.at(-1)!, effectorPivot = model.PivotPoints[effector.ObjectId]!;
+      const position = (frame: number) => { data.frame = start + Math.round(frame * 1000 / 60); renderer.update(0); const m = data.nodes[effector.ObjectId].matrix; return [m[0] * effectorPivot[0]! + m[4] * effectorPivot[1]! + m[8] * effectorPivot[2]! + m[12], m[2] * effectorPivot[0]! + m[6] * effectorPivot[1]! + m[10] * effectorPivot[2]! + m[14]] as const; };
+      const previous = position(Math.max(0, action.contact - 1)), contactPoint = position(action.contact), dx = contactPoint[0] - previous[0], dz = contactPoint[1] - previous[1], length = Math.hypot(dx, dz) || 1;
+      const distance = action.followDistance ?? 24;
+      const targetPoint: readonly [number, number] = [contactPoint[0] + dx / length * distance, contactPoint[1] + dz / length * distance];
+      const followAngles = controls.length === 3
+        ? [action.gesture.thigh ?? 0, action.gesture.knee ?? 0, 0]
+        : selected[0] === "Bone_Arm1_R" ? [...angles] : nodes.slice(0, 2).flatMap(node => joint(node.Name, action.gesture));
+      const followStartAngles = [...followAngles];
+      const writeFollow = (frame: number, values: readonly number[]) => { for (let i = 0; i < nodes.length; i++) { const angleIndex = controls.length === 3 ? i : i * 2; const y = values[angleIndex] ?? 0, z = controls.length === 3 ? 0 : values[angleIndex + 1] ?? 0; const key = nodes[i]!.Rotation!.Keys.find(k => k.Frame === start + Math.round(frame * 1000 / 60))!; key.Vector = rotated(bases[i]!, y * amount(frame), z * amount(frame)); if (key.InTan) { key.InTan = key.Vector.slice(); key.OutTan = key.Vector.slice(); } } };
+      const followLoss = () => { writeFollow(followEnd, followAngles); const p = position(followEnd); return (p[0] - targetPoint[0]) ** 2 + (p[1] - targetPoint[1]) ** 2; };
+      for (let pass = 0; pass < 3; pass++) for (let dim = 0; dim < followAngles.length; dim++) { let best = Infinity, bestAngle = 0; for (let value = -180; value <= 180; value += pass === 0 ? 20 : 5) { followAngles[dim] = value; const distance = followLoss(); if (distance < best) { best = distance; bestAngle = value; } } followAngles[dim] = bestAngle; }
+      for (const frame of phaseFrames.filter(frame => frame >= followStart)) { const t = Math.max(0, Math.min(1, (frame - followStart) / (followEnd - followStart))), progress = t * t * (3 - 2 * t); const blended = followAngles.map((value, index) => followStartAngles[index]! + (value - followStartAngles[index]!) * progress); writeFollow(frame, blended); }
+    }
   }
-  const nativeSwing = ["jab", "downTilt", "dashAttack", "forwardTilt", "forwardTiltUp", "forwardTiltDown", "jab2", "forwardSmash", "forwardAir", "backAir", "sideSpecial", "sideSpecialAir", "downSpecial", "downSpecialAir", "neutralAir"].includes(action.pose);
+  const nativeSwing = ["jab", "downTilt", "dashAttack", "forwardTilt", "forwardTiltUp", "forwardTiltDown", "jab2", "forwardSmash", "forwardAir", "sideSpecial", "sideSpecialAir", "downSpecial", "downSpecialAir"].includes(action.pose);
   if (nativeSwing) {
     const overhead = ["upTilt", "upSmash", "upAir"].includes(action.pose);
     const heavy = ["forwardSmash", "forwardAir", "downSpecial", "downSpecialAir"].includes(action.pose);
