@@ -7,7 +7,10 @@ import { CROUCH_CLIP_FRAMES, advanceFighterPose, createFighterPose } from "../..
 import { extremeCamera } from "../../src/game/presentation/arenaCamera";
 import { characterModelScale } from "../../src/game/presentation/modelScale";
 import { beginFighterAttack, resolveAttacks } from "../../src/game/sim/attacks";
-import { AttackPhase, AttackStyle, Character, SpecialAction } from "../../src/game/sim/codes";
+import { AttackPhase, AttackStyle, Character, LedgeState, SpecialAction } from "../../src/game/sim/codes";
+import type { Capsule } from "../../src/game/sim/geometry/contactGeometry";
+import { fighterHurtParts } from "../../src/game/sim/hurtboxes";
+import { snapToLedge } from "../../src/game/sim/ledge";
 import { beginDamageContacts, finishDamageContacts } from "../../src/game/sim/contacts";
 import { type Fighter, createFighter } from "../../src/game/sim/fighter";
 import { advanceHeroStatus, runningHeroSpecial } from "../../src/game/sim/specials/engine";
@@ -310,6 +313,90 @@ export function sampleCrouch(model: DrawnModel, character: Character): CrouchSam
   const clip = clipLabel(character, crouch.clip);
   const kind = crouch.clip === stand.clip ? "none" : /crouch/i.test(clip) ? "crouch" : "other";
   return { stand: stand.scored, crouch: crouch.scored, clip, kind };
+}
+
+
+export interface LedgeSample {
+  readonly stand: ScoreFrame;
+  readonly hang: readonly ScoreFrame[];
+  readonly parts: readonly Capsule[];
+  readonly clip: string;
+  readonly kind: CrouchClipKind;
+}
+
+const LEDGE_HOLD_FRAMES = 60;
+const LEDGE_SAMPLE_EVERY = 6;
+
+export function sampleLedgeHang(model: DrawnModel, character: Character): LedgeSample {
+  const f = createFighter(character, 0.0, 1);
+  const world = createRoster(1, [f]);
+  const p = createFighterPose();
+  const input = neutralControls();
+  const advance = () => { step(world, input); advanceFighterPose(p, f, world, input, false, false, false, false); return capture(f, p); };
+  let standing = capture(f, p);
+  for (let tick = 0; tick < 30; tick++) standing = advance();
+  if (!snapToLedge(world, 0, 0, 1)) throw new Error(`${fighterSlug(character)}: the sampled fighter catches the ledge`);
+  const hang: ScoreFrame[] = [];
+  let clipIndex: number | undefined;
+  for (let tick = 1; tick <= LEDGE_HOLD_FRAMES; tick++) {
+    const frame = advance();
+    if (f.ledge.state !== LedgeState.hang) throw new Error(`${fighterSlug(character)}: still hanging on frame ${tick}`);
+    clipIndex = frame.clip;
+    if (tick % LEDGE_SAMPLE_EVERY === 0) hang.push(pose(model, character, frame));
+  }
+  const clip = clipLabel(character, clipIndex);
+  const kind = clipIndex === standing.clip ? "none" : /ledge|hang/i.test(clip) ? "crouch" : "other";
+  const parts = fighterHurtParts(f).map((part) => ({ x1: part.x1, z1: part.z1, x2: part.x2, z2: part.z2, radius: part.radius }));
+  return { stand: pose(model, character, standing), hang, parts, clip, kind };
+}
+
+
+export interface JumpSample {
+  readonly stand: ScoreFrame;
+  readonly first: readonly ScoreFrame[];
+  readonly second: readonly ScoreFrame[];
+  readonly firstClip: string;
+  readonly secondClip: string;
+}
+
+const JUMP_PHASES = 16;
+
+export function sampleJumps(model: DrawnModel, character: Character): JumpSample {
+  const f = createFighter(character, 0.0, 1);
+  const world = createRoster(1, [f]);
+  const p = createFighterPose();
+  const advance = (input: Readonly<Controls>) => {
+    const serial = f.jump.serial;
+    step(world, input);
+    advanceFighterPose(p, f, world, input, false, f.jump.serial !== serial, false, false);
+    return capture(f, p);
+  };
+  const neutral = neutralControls(), held = { ...neutralControls(), jumpHeld: true }, jump = { ...held, jumpPressed: true };
+  let standing = capture(f, p);
+  for (let tick = 0; tick < 30; tick++) standing = advance(neutral);
+  const rise = () => {
+    const frames: PoseFrame[] = [];
+    let input: Readonly<Controls> = jump;
+    for (let tick = 0; tick < LIMIT; tick++) {
+      const frame = advance(input);
+      input = held;
+      if (!f.motion.grounded && f.motion.vz > 0.0) frames.push(frame);
+      else if (frames.length > 0) break;
+    }
+    if (frames.length < 2) throw new Error(`${fighterSlug(character)}: the sampled jump rises`);
+    return frames;
+  };
+  const first = rise();
+  const remaining = f.jump.remaining;
+  const second = rise();
+  if (f.jump.remaining >= remaining) throw new Error(`${fighterSlug(character)}: the second jump spends a midair jump`);
+  const phased = (frames: readonly PoseFrame[]) => Array.from({ length: JUMP_PHASES }, (_, index) => {
+    const frame = frames[Math.round(index * (frames.length - 1) / (JUMP_PHASES - 1))];
+    if (frame === undefined) throw new Error("a phase lies within its rise");
+    return pose(model, character, frame);
+  });
+  return { stand: pose(model, character, standing), first: phased(first), second: phased(second),
+    firstClip: clipLabel(character, first[Math.floor(first.length / 2)]?.clip), secondClip: clipLabel(character, second[Math.floor(second.length / 2)]?.clip) };
 }
 
 

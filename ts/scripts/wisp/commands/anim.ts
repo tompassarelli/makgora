@@ -19,8 +19,9 @@ import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../../../src/ga
 import { createMatchCamera, MATCH_CAMERA_ASPECT } from "../../../src/game/sim/matchCamera";
 import { FROZEN_THRONE_STAGE } from "../../../src/game/sim/stage";
 import { runProcess } from "../../hostProcess";
-import { CROUCH_THRESHOLDS, type MoveScore, THRESHOLDS, scoreCrouch, scoreMove } from "../animScore";
-import { type CrouchClipKind, type Look, type SampledMove, gameplayPixelsPerUnit, loadBody, sampleCrouch, sampleFighter } from "../animScoreSample";
+import { CROUCH_THRESHOLDS, DOUBLE_JUMP_THRESHOLDS, LEDGE_THRESHOLDS, type MoveScore, THRESHOLDS, scoreCrouch, scoreDoubleJump, scoreLedgeHang, scoreMove } from "../animScore";
+import { type CrouchClipKind, type Look, type SampledMove, gameplayPixelsPerUnit, loadBody, sampleCrouch, sampleFighter, sampleJumps, sampleLedgeHang } from "../animScoreSample";
+import { LEDGE_HANG_DEPTH, LEDGE_HANG_OUTSET } from "../../../src/game/sim/ledge";
 import { assetsView, readManifest } from "../buildInputs";
 import { headlessRender } from "../headlessRender";
 import { projectRoot } from "../project";
@@ -194,18 +195,45 @@ const score: Command = (args) => Effect.gen(function*() {
   }
   yield* Console.log(`${rows.length} rows; ${relative(projectRoot, table)}`);
 
+  const movementTable = (kind: string, header: string, measured: readonly string[]) => Effect.gen(function*() {
+    const path = join(TABLE_DIRECTORY, `${look}-${kind}.tsv`);
+    const kept = yield* attempt(`read ${path}`, async () => (await Bun.file(path).exists()) ? (await Bun.file(path).text()).trim().split("\n").slice(1) : []);
+    const other = flags.has("--fighter") ? kept.filter((line) => !chosen.has(line.split("\t")[0] ?? "")) : [];
+    const sortedLines = [...other, ...measured].sort((a, b) => a.localeCompare(b));
+    yield* attempt(`write ${path}`, () => Bun.write(path, `${header}\n${sortedLines.join("\n")}\n`));
+    return relative(projectRoot, path);
+  });
+
   const crouches = yield* Effect.forEach(fighters, (character) => attempt(`crouch ${fighterSlug(character)}`, async () => {
     const { stand, crouch, clip, kind } = sampleCrouch(await loadBody(assets, character, look), character);
     return { fighter: fighterSlug(character), clip, kind, ...scoreCrouch(stand, crouch, gameplayPixelsPerUnit()) };
   }));
-  const crouchTable = join(TABLE_DIRECTORY, `${look}-crouch.tsv`);
-  const keptCrouch = yield* attempt(`read ${crouchTable}`, async () => (await Bun.file(crouchTable).exists()) ? (await Bun.file(crouchTable).text()).trim().split("\n").slice(1) : []);
-  const otherCrouch = flags.has("--fighter") ? keptCrouch.filter((line) => !chosen.has(line.split("\t")[0] ?? "")) : [];
-  const crouchLines = [...otherCrouch, ...crouches.map((row) => [row.fighter, crouchVerdict(row), row.clip, n3(row.heightRatio), n3(row.contrast)].join("\t"))].sort((a, b) => a.localeCompare(b));
-  yield* attempt(`write ${crouchTable}`, () => Bun.write(crouchTable, `fighter\tcrouch\tclip\theight ratio\tcontrast\n${crouchLines.join("\n")}\n`));
+  const crouchTable = yield* movementTable("crouch", "fighter\tcrouch\tclip\theight ratio\tcontrast", crouches.map((row) => [row.fighter, crouchVerdict(row), row.clip, n3(row.heightRatio), n3(row.contrast)].join("\t")));
   yield* Console.log(`\ncrouch (held crouch beside stand; pass: height ratio <= ${CROUCH_THRESHOLDS.height}, contrast >= ${CROUCH_THRESHOLDS.contrast}):`);
   for (const row of crouches) yield* Console.log(`${row.fighter.padEnd(22)} ${crouchVerdict(row).padEnd(9)} clip ${row.clip.padEnd(24)} height ${n3(row.heightRatio)} contrast ${n3(row.contrast)}`);
-  yield* Console.log(`${crouches.filter((row) => row.pass && row.kind === "crouch").length}/${crouches.length} crouches pass (no clip: standing pose is the crouch; *: another clip stands in for a crouch clip); ${relative(projectRoot, crouchTable)}`);
+  yield* Console.log(`${crouches.filter((row) => row.pass && row.kind === "crouch").length}/${crouches.length} crouches pass (no clip: standing pose is the crouch; *: another clip stands in for a crouch clip); ${crouchTable}`);
+
+  const corner = { x: LEDGE_HANG_OUTSET, z: LEDGE_HANG_DEPTH };
+  const ledges = yield* Effect.forEach(fighters, (character) => attempt(`ledge hang ${fighterSlug(character)}`, async () => {
+    const { stand, hang, parts, clip, kind } = sampleLedgeHang(await loadBody(assets, character, look), character);
+    return { fighter: fighterSlug(character), clip, kind, ...scoreLedgeHang(stand, hang, parts, corner) };
+  }));
+  const ledgeTable = yield* movementTable("ledge", "fighter\tledge hang\tclip\tgrip\tbelow\tclear\tfit", ledges.map((row) => [row.fighter, crouchVerdict(row), row.clip, n3(row.grip), n3(row.below), n3(row.clear), n3(row.fit)].join("\t")));
+  const l = LEDGE_THRESHOLDS;
+  yield* Console.log(`\nledge hang (grip: nearest drawn point to the ledge corner / stand height <= ${l.grip}; below the ledge >= ${l.below}; clear of the stage wall >= ${l.clear}; inside the hang hurtbox >= ${l.fit}; worst of ${10} hang frames):`);
+  for (const row of ledges) yield* Console.log(`${row.fighter.padEnd(22)} ${crouchVerdict(row).padEnd(9)} clip ${row.clip.padEnd(24)} grip ${n3(row.grip)} below ${n3(row.below)} clear ${n3(row.clear)} fit ${n3(row.fit)}`);
+  yield* Console.log(`${ledges.filter((row) => row.pass && row.kind === "crouch").length}/${ledges.length} ledge hangs pass (no clip: the standing pose hangs; *: a clip not named for the ledge stands in); ${ledgeTable}`);
+
+  const jumps = yield* Effect.forEach(fighters, (character) => attempt(`double jump ${fighterSlug(character)}`, async () => {
+    const body = await loadBody(assets, character, look);
+    const { stand, first, second, firstClip, secondClip } = sampleJumps(body, character);
+    return { fighter: fighterSlug(character), firstClip, secondClip, ...scoreDoubleJump(stand, first, second, body.nodes().map((node) => node.parent), gameplayPixelsPerUnit()) };
+  }));
+  const jumpTable = yield* movementTable("double-jump", "fighter\tdouble jump\tfirst clip\tdouble clip\tmean angle\tcontrast\tsegments", jumps.map((row) => [row.fighter, mark(row.pass), row.firstClip, row.secondClip, n(row.angle), n3(row.contrast), row.segments].join("\t")));
+  const d = DOUBLE_JUMP_THRESHOLDS;
+  yield* Console.log(`\ndouble jump (phase-aligned rises, side-view bone angle; pass: mean angle >= ${d.angle} degrees, contrast >= ${d.contrast}):`);
+  for (const row of jumps) yield* Console.log(`${row.fighter.padEnd(22)} ${mark(row.pass).padEnd(5)} ${row.firstClip.padEnd(22)} -> ${row.secondClip.padEnd(24)} angle ${n(row.angle).padStart(6)} contrast ${n3(row.contrast)} segments ${row.segments}`);
+  yield* Console.log(`${jumps.filter((row) => row.pass).length}/${jumps.length} double jumps pass; ${jumpTable}`);
 }).pipe(Effect.provide(BunServices.layer));
 
 

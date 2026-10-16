@@ -140,6 +140,80 @@ export function scoreCrouch(stand: ScoreFrame, crouch: ScoreFrame, pixelsPerUnit
 }
 
 
+export const LEDGE_THRESHOLDS = { grip: 0.12, below: 0.85, clear: 0.9, fit: 0.75 } as const;
+
+export interface LedgeScore { readonly pass: boolean; readonly grip: number; readonly below: number; readonly clear: number; readonly fit: number }
+
+interface LedgeCorner { readonly x: number; readonly z: number }
+interface LedgePart { readonly x1: number; readonly z1: number; readonly x2: number; readonly z2: number; readonly radius: number }
+
+function insideCapsule(part: LedgePart, x: number, z: number): boolean {
+  const dx = part.x2 - part.x1, dz = part.z2 - part.z1, length = dx * dx + dz * dz;
+  const t = length <= 0 ? 0 : Math.max(0, Math.min(1, ((x - part.x1) * dx + (z - part.z1) * dz) / length));
+  return Math.hypot(x - (part.x1 + t * dx), z - (part.z1 + t * dz)) <= part.radius;
+}
+
+export function scoreLedgeHang(stand: ScoreFrame, hang: readonly ScoreFrame[], parts: readonly LedgePart[], corner: LedgeCorner): LedgeScore {
+  const height = bodyHeight(stand), slack = 0.03 * height;
+  let grip = 0, below = 1, clear = 1, fit = 1;
+  for (const frame of hang) {
+    let nearest = Infinity, drawn = 0, under = 0, outside = 0, inside = 0;
+    for (let vertex = 0; vertex < frame.drawn.length; vertex++) {
+      if (frame.drawn[vertex] !== 1) continue;
+      const x = frame.vertices[vertex * 2] ?? 0, z = frame.vertices[vertex * 2 + 1] ?? 0;
+      drawn++;
+      nearest = Math.min(nearest, Math.hypot(x - corner.x, z - corner.z));
+      if (z <= corner.z + slack) under++;
+      if (!(x > corner.x + slack && z < corner.z - slack)) outside++;
+      if (parts.some((part) => insideCapsule(part, x, z))) inside++;
+    }
+    const share = (count: number) => drawn === 0 ? 0 : count / drawn;
+    grip = Math.max(grip, nearest / height);
+    below = Math.min(below, share(under));
+    clear = Math.min(clear, share(outside));
+    fit = Math.min(fit, share(inside));
+  }
+  const t = LEDGE_THRESHOLDS;
+  return { pass: hang.length > 0 && grip <= t.grip && below >= t.below && clear >= t.clear && fit >= t.fit, grip, below, clear, fit };
+}
+
+
+export const DOUBLE_JUMP_THRESHOLDS = { angle: 20, contrast: 0.2 } as const;
+
+export interface DoubleJumpScore { readonly pass: boolean; readonly angle: number; readonly contrast: number; readonly segments: number }
+
+const SHORTEST_SEGMENT = 0.04;
+
+function segmentAngle(frame: ScoreFrame, child: number, parent: number): number {
+  return Math.atan2((frame.nodes[child * 2 + 1] ?? 0) - (frame.nodes[parent * 2 + 1] ?? 0), (frame.nodes[child * 2] ?? 0) - (frame.nodes[parent * 2] ?? 0));
+}
+
+function segmentLength(frame: ScoreFrame, child: number, parent: number): number {
+  return Math.hypot((frame.nodes[child * 2] ?? 0) - (frame.nodes[parent * 2] ?? 0), (frame.nodes[child * 2 + 1] ?? 0) - (frame.nodes[parent * 2 + 1] ?? 0));
+}
+
+export function scoreDoubleJump(stand: ScoreFrame, first: readonly ScoreFrame[], second: readonly ScoreFrame[], parents: readonly (number | undefined)[], pixelsPerUnit: number): DoubleJumpScore {
+  const height = bodyHeight(stand), shortest = SHORTEST_SEGMENT * height;
+  let sum = 0, count = 0, contrast = 0;
+  const used = new Set<number>();
+  for (let phase = 0; phase < Math.min(first.length, second.length); phase++) {
+    const a = first[phase], b = second[phase];
+    if (a === undefined || b === undefined) continue;
+    parents.forEach((parent, child) => {
+      if (parent === undefined || segmentLength(a, child, parent) < shortest || segmentLength(b, child, parent) < shortest) return;
+      const turn = Math.abs(segmentAngle(a, child, parent) - segmentAngle(b, child, parent)) % (2 * Math.PI);
+      sum += Math.min(turn, 2 * Math.PI - turn) * 180 / Math.PI;
+      count++;
+      used.add(child);
+    });
+    contrast += 1 - maskIoU(silhouette(a, pixelsPerUnit, height * 1.6), silhouette(b, pixelsPerUnit, height * 1.6));
+  }
+  const phases = Math.min(first.length, second.length), angle = count === 0 ? 0 : sum / count;
+  contrast = phases === 0 ? 0 : contrast / phases;
+  return { pass: angle >= DOUBLE_JUMP_THRESHOLDS.angle && contrast >= DOUBLE_JUMP_THRESHOLDS.contrast, angle, contrast, segments: used.size };
+}
+
+
 export function meanVertexDistance(a: ScoreFrame, b: ScoreFrame): number {
   let sum = 0, count = 0;
   const vertices = Math.min(a.drawn.length, b.drawn.length);

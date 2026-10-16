@@ -53,6 +53,28 @@ fighter whose pose falls back to its stand, and `pass*`/`FAIL*` mark one that
 draws another clip (such as Spell Slam) as its crouch. Neither counts as a
 passing crouch.
 
+It writes `build/anim-score/LOOK-ledge.tsv` too: each fighter caught on the
+right ledge of stage 0 and held for 60 frames, sampled every sixth frame, in
+model space where the ledge corner sits 24 units forward and 90 up
+(`LEDGE_HANG_OUTSET`, `LEDGE_HANG_DEPTH`). Each column is the worst sampled
+frame: `grip`, the nearest drawn point to the corner over the standing
+height (at most 0.12: a hand, claw or weapon is at the ledge); `below`, the
+share of drawn points no higher than the corner (at least 0.85: the body
+hangs under it); `clear`, the share outside the stage wall (at least 0.9);
+and `fit`, the share inside the hang hurt parts (at least 0.75: the body
+stays in its hurtbox). Rifleman's natively accepted hang calibrates these
+initial values; they are Tom's to tune. Facing the stage is read on the strip.
+
+`build/anim-score/LOOK-double-jump.tsv` compares a full hop's rise with the
+midair jump's rise, each resampled to 16 phases: `mean angle` is the mean
+difference, in degrees, of every drawn bone segment's side-view direction
+(segments under 4% of standing height skipped), and `contrast` one minus the
+mean phase-paired silhouette IoU. A double jump passes at a mean angle of at
+least 20 degrees and a contrast of at least 0.2; Illidan's wing beat (24)
+and Lich's float (21) are the lowest styles that read as distinct, and the
+values are Tom's to tune. The cold reader on the Classic motion strip stays
+the bar.
+
 The silhouette centre is a visible mass proxy, rather than a physical
 mass-weighted centre. Missing limb names use body travel; the stored `limb`
 column makes this inspectable. The independent weight judgement catches
