@@ -37,11 +37,10 @@ look is tuned by hand.
   writes the Classic timeline body through the Classic mapping and the Definitive
   body through #362's `retargetHd`. Gameplay timing and boxes come from the
   simulation, so they are identical in both looks.
-- **Checks.** smashcraft:ts/test/canonical-rig.test.ts checks every mapping for
-  per-fighter fields only, and checks that editing one canonical move changes that
-  move in both exported bodies and no other move. Its per-fighter sweeps rebuild
-  all 26 shipped Classic bodies and all 26 converted Definitive bodies from canonical
-  motion, byte for byte against the published family.
+- **Checks.** smashcraft:tools/animations/timeline-models.ts is the one producer of
+  both bodies, so rerunning it on the pinned inputs leaves the published family
+  unchanged. A full map build fails when a fighter in `DEFINITIVE_FIGHTERS` has no
+  Definitive body, and white-flash fails instead of skipping it.
 
 Not yet done: sizing the gameplay boxes to the rig at Definitive proportions and
 fitting Classic to them.
@@ -57,7 +56,9 @@ exist only in `_de.w3mod`, so the earlier `_hd.w3mod` bodies drew solid team
 colours ([#334](https://github.com/tompassarelli/smashcraft/issues/334#issuecomment-6071233652)).
 Anub'arak's stock body names the base-only `ReplaceableTextures\TeamGlow\TeamGlow00`;
 its body names the same glow's Definitive copy, `Textures\TeamGlow0000.dds`.
-Classic (`hd=0`) ignores `_de.w3mod` and draws the Classic body.
+Classic (`hd=0`) ignores `_de.w3mod` and draws the Classic body. A fighter
+without a Definitive body has no `_de.w3mod` entry, so Definitive draws its root
+Classic body with the base-layer textures that body names.
 
 ## Rig correspondence
 
@@ -182,8 +183,8 @@ is unchanged: at every authored key time and sequence edge, the exported model's
 mapped joints are within **0.5 Warcraft units** and **0.5 degrees** of the
 transferred pose, after #314's thinning and #308's timeline export. Fail on an
 unmapped required joint, singular transform, non-finite sample, empty track or
-a body over 255 nodes. `bun tools/animations/hd-roster.ts PRIVATE_OUTPUT [CHARACTER...]`
-writes every fighter's bodies from its canonical motion: the Classic timeline body, and
+a body over 255 nodes. `bun tools/animations/timeline-models.ts PRIVATE_ASSETS PRIVATE_POOL FIGHTER`
+writes a fighter's bodies from its canonical motion: the Classic timeline body, and
 the Definitive body for each fighter in `DEFINITIVE_FIGHTERS`.
 
 ## Packaging and size

@@ -1,3 +1,5 @@
+import { model as mdx } from '../../../ts/scripts/clipNodes';
+import { generateModelMDX, parseModelMDX } from '../../../ts/scripts/mdxCodec';
 export const character = 22;
 export const stockPath = 'war3.w3mod:_de.w3mod:units\\orc\\Hellscream\\Hellscream.mdx';
 export const classic = {
@@ -30,3 +32,37 @@ export const pairs: readonly (readonly [string, string])[] = [
     ['Banner', 'flag_01_bind_jnt'], ['flag03', 'flag_02_bind_jnt'], ['flag02', 'flag_03_bind_jnt'], ['flag01', 'flag_04_bind_jnt'],
     ['Bone_Ponytai01', 'hair_tail_01_bind_jnt'], ['Bone_Ponytail', 'hair_tail_02_bind_jnt'],
 ];
+
+const UP_SMASH = 'Grom upSmash', TURRET_DEGREES = 30, RISE = 13;
+const UP_SMASH_KEYS: readonly (readonly [frame: number, amount: number])[] = [[0, 0], [10, -0.3], [13, 1], [17, 1], [42, 0]];
+
+const turned = (quaternion: ArrayLike<number>, degrees: number) => {
+    const half = degrees * Math.PI / 360, [x = 0, y = 0, z = 0, w = 1] = Array.from(quaternion), c = Math.cos(half), s = Math.sin(half);
+    const out = [c * x + s * z, c * y + s * w, c * z - s * x, c * w - s * y], length = Math.hypot(...out);
+    return new Float32Array(out.map(value => value / length));
+};
+
+export function definitiveFit(motion: mdx.Model, bytes: ArrayBuffer) {
+    const interval = motion.Sequences.find(sequence => sequence.Name === UP_SMASH)?.Interval;
+    if (interval === undefined) throw new Error(`Grom has no ${UP_SMASH} sequence`);
+    const [first = 0, last = 0] = interval, model = parseModelMDX(bytes);
+    const turret = model.Bones.find(node => node.Name === 'bone_turret'), chest = model.Bones.find(node => node.Name === 'bone_chest');
+    if (turret?.Rotation === undefined || turret.Translation === undefined || chest?.Rotation === undefined) throw new Error('Grom Definitive body has no animated bone_turret and bone_chest');
+    const outside = <K extends { Frame: number }>(keys: K[]) => keys.filter(key => key.Frame < first || key.Frame > last);
+    const held = <K extends { Frame: number }>(keys: readonly K[], time: number) => keys.filter(key => key.Frame <= time).at(-1)!;
+    const rotation = turret.Rotation.Keys.map(key => ({ ...key, Vector: key.Vector.slice() }));
+    const chestRotation = chest.Rotation.Keys.map(key => ({ ...key, Vector: key.Vector.slice() }));
+    const translation = turret.Translation.Keys.map(key => ({ ...key, Vector: key.Vector.slice() }));
+    turret.Rotation.Keys = outside(rotation); chest.Rotation.Keys = outside(chestRotation); turret.Translation.Keys = outside(translation);
+    for (const [frame, amount] of UP_SMASH_KEYS) {
+        const time = first + (frame === 13 ? Math.floor(frame * 1000 / 60) : Math.round(frame * 1000 / 60));
+        const root = held(rotation, time), rootVector = turned(root.Vector, TURRET_DEGREES * amount);
+        turret.Rotation.Keys.push({ ...root, Frame: time, Vector: rootVector, ...(root.InTan ? { InTan: rootVector.slice(), OutTan: rootVector.slice() } : {}) });
+        const pose = held(chestRotation, time), chestVector = turned(pose.Vector, 0);
+        chest.Rotation.Keys.push({ ...pose, Frame: time, Vector: chestVector, ...(pose.InTan ? { InTan: chestVector.slice(), OutTan: chestVector.slice() } : {}) });
+        const place = held(translation, time);
+        turret.Translation.Keys.push({ ...place, Frame: time, Vector: new Float32Array([place.Vector[0]!, place.Vector[1]!, place.Vector[2]! + RISE * amount]) });
+    }
+    for (const keys of [turret.Rotation.Keys, chest.Rotation.Keys, turret.Translation.Keys]) keys.sort((a, b) => a.Frame - b.Frame);
+    return { bytes: generateModelMDX(model), report: { upSmash: { turretDegrees: TURRET_DEGREES, rise: RISE } } };
+}

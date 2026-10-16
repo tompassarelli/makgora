@@ -30,6 +30,7 @@ import { PORTRAIT_QUALITY, encodeBlp, readTga } from "../blp";
 import { importedModelFile } from "../heroModelSource";
 import { CLIP_RECORDS, clipPoolFiles } from "../clipEvidence";
 import { importList } from "./importList";
+import { definitiveOverride } from "./definitiveBodies";
 import { PREVIEW_ENTRY, composePreview, encodePreview } from "../mapPreview";
 import { regenerateCommand } from "../stageThumbnailSpec";
 import { stageCardPath } from "./buildInputs";
@@ -119,7 +120,6 @@ export const ORIGINAL_CLIP_MODELS = [...new Set(Object.values(Character).flatMap
   const clips = Array.from({ length: originalClipCount(character) }, (_, index) => originalClip(character, index)?.modelPath ?? "");
   return light === undefined ? clips : [...clips, light];
 }))];
-
 
 const IMPORTED_HERO_MODELS = HERO_ROSTER.map(({ character }) => heroLook(character)!.model).filter((model) => importedModelFile(model) !== undefined);
 
@@ -323,13 +323,8 @@ export const importedAssets = (assets: string, summon: string, edition: MapEditi
   const clipFiles = (yield* tryMapSync("read clip records", clipEvidencePath, () => clipPoolFiles(clipDirectory))).filter((file) => ORIGINAL_CLIP_MODELS.includes(`war3mapImported\\${file}`));
   const classicBodies = clipFiles.map((filename) => imported(join(clipDirectory, "imports/war3mapImported"), filename));
   const classicWhites = generated.flat().filter(({ entry }) => Object.values(WHITE_FIGHTER_MODELS).includes(entry));
-  const classicOverrides = [...classicBodies, ...classicWhites].map(({ entry, source }) => {
-    const override = `_de.w3mod\\${entry}`;
-    const body = join(clipDirectory, "imports/_de.w3mod", entry.replaceAll("\\", "/"));
-    const authored = generated.flat().find((asset) => asset.entry === override)?.source;
-    return { entry: override, source: authored ?? (existsSync(body) ? body : source) };
-  });
-  const whiteOverrides = new Set(classicOverrides.map(({ entry }) => entry));
+  const definitiveOverrides = [...classicBodies, ...classicWhites].flatMap(({ entry }) => definitiveOverride(entry, generated.flat(), clipDirectory));
+  const whiteOverrides = new Set(definitiveOverrides.map(({ entry }) => entry));
   yield* requireListed(clipEvidencePath, clipFiles, ORIGINAL_CLIP_MODELS,
     `this assets folder's clip pool predates the checkout's clips. From the repository root, export a new pool from ${assets} ` +
     "with animation-assets and illidan-animation holding the packaged models fighterAssetInfo.ts and demonHunterAssetInfo.ts name: " +
@@ -357,7 +352,7 @@ export const importedAssets = (assets: string, summon: string, edition: MapEditi
     ...TOMB_WATERFALL_IMPORTS.map(({ entry, file }) => ({ entry, source: join(assets, "stage-assets", file) })),
     ...summonFiles.map((filename) => imported(join(summon, "imports/war3mapImported"), filename)),
     ...classicBodies,
-    ...classicOverrides,
+    ...definitiveOverrides,
   ];
   const selected = editionImports(entries, edition);
   const problem = importProblem(selected);

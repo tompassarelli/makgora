@@ -46,10 +46,11 @@ function drawnHeight(triangles: Float32Array, half: number): number {
 const LOOK_TOLERANCE = 0.1;
 
 const manifest = Effect.runSync(readManifest());
-const stored = pinHashes(manifest["original-clips-static-lights"]).every((hash) => existsSync(join(INPUTS_STORE, "original-clips-static-lights", hash)));
-const family = stored ? join(assetsView(manifest), "original-clips-static-lights") : undefined;
+const POOL = "original-clips-static-lights";
 test("every fighter's drawn Stand height fits its hurt capsule in both looks, and Definitive matches Classic or its capsule within 10% [k3 measure docs/design/hd-fighters.md]", async () => {
-  if (family === undefined) return;
+  if (!existsSync(INPUTS_STORE)) return;
+  expect(pinHashes(manifest[POOL]).filter((hash) => !existsSync(join(INPUTS_STORE, POOL, hash))), `pinned ${POOL} shards missing from ${INPUTS_STORE}`).toEqual([]);
+  const family = join(assetsView(manifest), POOL);
   const off: string[] = [];
   for (const character of SELECTABLE_CHARACTERS) {
     const frame = sampleState(character, false, 1);

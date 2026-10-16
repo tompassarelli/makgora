@@ -32,6 +32,18 @@ export function keepWhiteImports(pool: string, fighters: ReadonlySet<string>): v
   for (const fighter of readWhiteImports(pool).keys()) if (!fighters.has(fighter)) rmSync(join(pool, WHITE_LISTS, `${fighter}.txt`));
 }
 
+export function pruneFighterWhites(pool: string, fighter: string): void {
+  const listed = new Set(readWhiteImports(pool).get(fighter) ?? []);
+  const white = new RegExp(`^${fighter}White-[0-9a-f]{64}\\.mdx$`);
+  for (const directory of ["", DEFINITIVE]) {
+    if (!existsSync(join(pool, directory))) continue;
+    for (const file of readdirSync(join(pool, directory))) {
+      const path = directory === "" ? file : `${directory}/${file}`;
+      if (white.test(file) && !listed.has(path)) rmSync(join(pool, path));
+    }
+  }
+}
+
 export function pruneWhiteTextures(pool: string): void {
   const listed = new Set([...readWhiteImports(pool).values()].flat());
   for (const file of readdirSync(pool)) if (WHITE_TEXTURE.test(file) && !listed.has(file)) rmSync(join(pool, file));

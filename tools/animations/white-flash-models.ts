@@ -25,7 +25,7 @@ import { originalClip, originalClipCount } from "../../ts/src/generated/clips/fi
 import { DEFINITIVE_FIGHTERS } from "../../ts/src/game/assets/definitiveFighters";
 import type { Character } from "../../ts/src/game/sim/codes";
 import { fighterSlug } from "../../ts/src/game/sim/heroes/registry";
-import { keepWhiteImports, pruneWhiteTextures, writeWhiteImports } from "../../ts/scripts/whiteImports";
+import { keepWhiteImports, pruneFighterWhites, pruneWhiteTextures, writeWhiteImports } from "../../ts/scripts/whiteImports";
 import { WHITE_FACTS, WHITE_FACT_INDEX, WHITE_MODELS, WHITE_MODEL_INDEX, shardOrder, whiteFactsFile, whiteFactsIndex, whiteModelFile, whiteModelIndex } from "./fighter-shards";
 const DEFINITIVE_WHITE = "_de.w3mod";
 const DEFINITIVE_DECIMATION = { ratio: 0.5, error: 0.005 };
@@ -89,7 +89,7 @@ async function definitiveWhite(character: number, name: string, filename: string
   const body = originalClip(character, 0)?.modelPath;
   if (!DEFINITIVE_FIGHTERS.has(character as Character) || body === undefined || !body.includes("TimelineBody-")) return false;
   const source = join(assets, "original-clips-static-lights/imports/_de.w3mod", ...body.split("\\"));
-  if (!existsSync(source)) return false;
+  if (!existsSync(source)) throw new Error(`${name}: no Definitive body at ${source}; regenerate it with tools/animations/timeline-models.ts`);
   const model = parseModelMDX(await Bun.file(source).arrayBuffer());
   if (model.Sequences.length !== 1) throw new Error(`${name}: the Definitive body is not one timeline`);
   const clips = Array.from({ length: originalClipCount(character) }, (_, index) => {
@@ -149,6 +149,7 @@ if (definitiveOnly) {
     const filename = path.replace("war3mapImported\\", "");
     const definitive = await definitiveWhite(Number(character), fighter.name, filename);
     await writeWhiteImports(output, fighter.name, filename, definitive);
+    pruneFighterWhites(output, fighter.name);
     if (definitive) count++;
   }
   console.log(`${count} Definitive white bodies updated over the Definitive timeline bodies`);
@@ -224,6 +225,7 @@ for (const [character, fighter] of fighters.entries()) {
   await Bun.write(join(output, filename), bytes);
   paths[character] = `war3mapImported\\${filename}`;
   await writeWhiteImports(output, fighter.name, filename, await definitiveWhite(character, fighter.name, filename));
+  pruneFighterWhites(output, fighter.name);
   facts[`war3mapImported/${filename}`.toLowerCase()] = modelFacts(bytes);
 }
 if (selected === undefined) keepWhiteImports(output, new Set([...fighters.values()].map(fighter => fighter.name)));
