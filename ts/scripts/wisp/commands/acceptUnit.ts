@@ -5,6 +5,7 @@ import { ChildProcess } from "effect/process";
 import { AcceptFailure } from "wisp/scripts/wisp/accept";
 import { type Command } from "wisp/scripts/wisp/command";
 import { projectRoot } from "../project";
+import { ACCEPT_OUTER_PID } from "./pairGuard";
 
 export const ACCEPT_IN_UNIT = "SMASHCRAFT_ACCEPT_IN_UNIT";
 const WISP_PROGRAM = join(import.meta.dir, "../../wisp.ts");
@@ -12,7 +13,7 @@ const WISP_PROGRAM = join(import.meta.dir, "../../wisp.ts");
 /** Pool clients' processes are only readable from the user manager's own namespace, so a native accept runs there as a transient service. */
 export const acceptUnitCommand = (args: readonly string[], path: string, pid: number, runtime = process.execPath): readonly string[] => [
   "systemd-run", "--user", "--wait", "--pipe", "--collect", `--unit=smashcraft-accept-${pid}`,
-  `--working-directory=${projectRoot}`, `--setenv=PATH=${path}`, `--setenv=${ACCEPT_IN_UNIT}=1`,
+  `--working-directory=${projectRoot}`, `--setenv=PATH=${path}`, `--setenv=${ACCEPT_IN_UNIT}=1`, `--setenv=${ACCEPT_OUTER_PID}=${pid}`,
   "--", runtime, WISP_PROGRAM, "accept", ...args,
 ];
 

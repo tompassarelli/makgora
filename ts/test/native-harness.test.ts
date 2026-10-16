@@ -8,6 +8,7 @@ import { CURRENT_CANDIDATE, MAP_PROFILES } from "../scripts/wisp/acceptChecks";
 import { poolUnitCommand, poolUnitName, pairNeedsRestart } from "../scripts/wisp/commands/lanPoolUnit";
 import { smashcraftDoctor } from "../scripts/wisp/doctor";
 import { ACCEPT_IN_UNIT, acceptUnitCommand, inAcceptUnit } from "../scripts/wisp/commands/acceptUnit";
+import { pairHolders } from "../scripts/wisp/commands/pairGuard";
 import { gameFilesLayer } from "../scripts/wisp/project";
 import { NativeClientInvalid, NativeToolMissing, repairPackager, resolveTools, unresolvedLibraries, validateClients, withRuntimeTools } from "../scripts/wisp/nativeTools";
 
@@ -97,4 +98,17 @@ test("a native accept runs as a user service once, and a dry run or the service 
   expect(inAcceptUnit(["--pair", "0"], {})).toBe(true);
   expect(inAcceptUnit(["--pair", "0"], { [ACCEPT_IN_UNIT]: "1" })).toBe(false);
   expect(inAcceptUnit(["--dry-run"], {})).toBe(false);
+});
+
+test("an accept already running on a pair blocks a second one, but not its own caller chain [k2 property]", () => {
+  const rows = [
+    { pid: 10, ppid: 1, args: ["bun", "x/scripts/wisp.ts", "accept", "--only", "gate-moves", "--pair", "0"] },
+    { pid: 20, ppid: 1, args: ["bun", "x/scripts/wisp.ts", "accept", "--pair=0"] },
+    { pid: 30, ppid: 1, args: ["bun", "x/scripts/wisp.ts", "accept", "--pair", "1"] },
+    { pid: 40, ppid: 1, args: ["bun", "x/scripts/wisp.ts", "lan", "pool", "--pair", "0"] },
+    { pid: 50, ppid: 20, args: ["bun", "x/scripts/wisp.ts", "accept", "--pair", "0"] },
+  ];
+  expect(pairHolders(0, rows, [999])).toEqual([10, 20, 50]);
+  expect(pairHolders(0, rows, [50])).toEqual([10]);
+  expect(pairHolders(2, rows, [999])).toEqual([]);
 });

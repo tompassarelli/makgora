@@ -36,6 +36,7 @@ import { profileOptions } from "./map";
 import { checkClients, onHealthyClients, readClientsFile, smashcraftWatch } from "../doctor";
 import { restartDroppedPair } from "./lanPoolUnit";
 import { withAcceptUnit } from "./acceptUnit";
+import { liveProcesses, ownPids, pairHolders } from "./pairGuard";
 import { LAN_POOL_FILE, lanPairs, withTools } from "../padBatch";
 import { runProcess } from "../../hostProcess";
 import { platformLayer } from "wisp/scripts/platform/layer";
@@ -278,6 +279,11 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
   const { given, tools, candidate, profiles } = yield* prepareCandidate(args, only, dryRun);
   const suite = { ...SMASHCRAFT_ACCEPT, maps: profiles };
   const requested = yield* selectedPairs(args);
+  if (!dryRun) {
+    const rows = liveProcesses();
+    const held = requested.flatMap(id => pairHolders(Number(id), rows, ownPids(process.env)).map(pid => `pair ${id} (pid ${pid})`));
+    if (held.length > 0) return yield* new UsageFailure({ problem: `another accept already holds ${held.join(", ")}; wait for it or stop it first` });
+  }
   if (solo && requested.length !== 1) return yield* new UsageFailure({ problem: "--solo requires one --pair K; each client plays its own single-player game" });
   const id = requested.length === 1 ? Number(requested[0]) : undefined;
   const pair = id === undefined ? undefined : yield* Effect.try({
