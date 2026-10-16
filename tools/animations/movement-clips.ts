@@ -178,7 +178,7 @@ function keyRoot(slot: Slot, variant: Variant): void {
   const grip = highestGrip(posed, slot.index, 0, grips);
   replaceKeys(translation, slot, (frame) => {
     const [x, z] = slot.pose === "ledgeHang" ? ledgeGripOffset(posed, slot.index, frame / 60, grip, character) : [0, Math.max(standFloor - floor(posed, slot.index, frame / 60), standLowest - lowest(posed, slot.index, frame / 60))];
-    return new Float32Array([x, 0, z]);
+    return new Float32Array([x - (slot.pose === "ledgeHang" ? variant.back ?? 0 : 0), 0, z - (slot.pose === "ledgeHang" ? variant.drop ?? 0 : 0)]);
   });
 }
 

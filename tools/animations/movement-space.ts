@@ -5,6 +5,8 @@ export interface Variant {
   readonly fold: number;
   readonly lean: number;
   readonly squash?: number;
+  readonly drop?: number;
+  readonly back?: number;
   readonly parentFrame: boolean;
 }
 export type Pose = "crouch" | "ledgeHang";
