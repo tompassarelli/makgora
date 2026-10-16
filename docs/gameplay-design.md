@@ -685,7 +685,10 @@ airborne or grounded (smashcraft:ts/src/game/sim/specials.ts, `turnForSpecial`):
   Serpent Ward, Beastmaster's bear) starts the neutral special, turned to the
   stick, instead of nothing.
 
-Up and down specials keep their own aiming. Momentum is unchanged: no
+An up special faces the side pressed with it: up-back turns the fighter
+before the move starts (Tom, 16 Oct: "the usual expected behavior");
+straight up and up-forward keep the facing. Down specials keep their own
+aiming. Momentum is unchanged: no
 wavebounce. smashcraft:ts/src/game/sim/turnaroundSpecials.tests.ts holds the
 rule over all 13 selectable fighters.
 

@@ -8,6 +8,7 @@ import { controls } from "./testWorld";
 
 const back = controls({ direction: -1 });
 const neutralB = controls({ specialPressed: true });
+const upB = (x: number) => controls({ specialPressed: true, specialX: x, specialZ: 1 });
 
 interface Outcome { readonly facing: number; readonly action: number; readonly direction: number }
 
@@ -66,3 +67,14 @@ test("every fighter's airborne neutral special turns to a flick back within the 
   }
 });
 
+
+test("every fighter's up special turns to face an up-back press and keeps facing on up or up-forward, grounded and airborne [k3 measure docs/gameplay-design.md]", () => {
+  for (const character of SELECTABLE_CHARACTERS) for (const airborne of [false, true]) {
+    const where = `${name(character)} ${airborne ? "air" : "ground"} up special`;
+    for (const [x, facing] of [[-1, -1], [0, 1], [1, 1]] as const) {
+      const outcome = play(character, airborne, [upB(x)]);
+      assertEquals(outcome.action !== SpecialAction.none, true, `${where} stick x ${x}: no special started`);
+      assertEquals(outcome.facing, facing, `${where} stick x ${x}: facing`);
+    }
+  }
+});

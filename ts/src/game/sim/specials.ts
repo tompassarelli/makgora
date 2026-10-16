@@ -495,6 +495,7 @@ const neutralPress = neutralControls();
 
 
 function turnForSpecial(owner: Fighter, input: Readonly<Controls>): void {
+  if (input.specialZ > 0 && input.specialX !== 0) owner.facing = input.specialX < 0 ? -1 : 1;
   if (input.specialZ !== 0) return;
   const { motion } = owner;
   if (input.specialX !== 0) owner.facing = input.specialX < 0 ? -1 : 1;
