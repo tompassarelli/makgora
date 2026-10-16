@@ -133,7 +133,10 @@ export function installDamageLaunch(target: Fighter, knockback: number, directio
     if (meleeAtan2(-directionZ, Math.abs(directionX)) > GROUND_LAUNCH_BOUNCE_ANGLE) launchZ = -f32(launchZ * GROUND_LAUNCH_REBOUND);
   }
   launch.groundKnockbackX = motion.grounded ? launchX : 0.0;
-  if (!motion.grounded) target.jump.remaining = aerialJumps(target);
+  if (!motion.grounded) {
+    target.jump.remaining = aerialJumps(target);
+    target.special.airtimeUses = 0;
+  }
   if (launch.knockbackAge !== undefined && launch.knockbackAge >= KNOCKBACK_STACKING_FRAMES) {
     launch.knockbackX = mergeLaunchAxis(launch.knockbackX, launchX);
     launch.knockbackZ = mergeLaunchAxis(launch.knockbackZ, launchZ);
