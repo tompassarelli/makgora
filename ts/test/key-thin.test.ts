@@ -33,7 +33,7 @@ test("slope tangents leave no close-key translation segment past the jitter limi
 
 const RETIRED_TANGENT_POLICIES = ["slope"];
 
-const TANGENT_POLICY = { tangents: "slope-jitter", implementation: "c4add59e4dc0fef19431164813770439343f62621e5f32d8dadbfb32d9652741" };
+const TANGENT_POLICY = { tangents: "slope-jitter", implementation: "f156f64e807d1e92dac569cf9283c4e09d1ca9b7f660433595a712a758571223" };
 
 test("a thinKeys change renames KEY_BOUND's tangent policy, so export-original-clips --keep-unchanged re-exports every fighter instead of keeping keys the producer no longer makes [k3 measure docs/typescript.md]", () => {
   const implementation = new Bun.CryptoHasher("sha256").update(["keyThin.ts", "wisp/animJitter.ts"].map((file) => readFileSync(join(import.meta.dir, "../scripts", file), "utf8")).join("")).digest("hex");

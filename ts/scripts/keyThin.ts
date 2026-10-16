@@ -208,50 +208,107 @@ function setFrame(renderer: ModelRenderer, frame: number): void {
 }
 
 
-function rotationAngle(a: Float32Array, b: Float32Array): number | undefined {
-    const column = (m: Float32Array, c: number) => {
-        const length = Math.hypot(at(m, c * 4), at(m, c * 4 + 1), at(m, c * 4 + 2));
-        return length < 1e-4 ? undefined : [at(m, c * 4) / length, at(m, c * 4 + 1) / length, at(m, c * 4 + 2) / length];
-    };
-    const ra = [0, 1, 2].map(c => column(a, c)), rb = [0, 1, 2].map(c => column(b, c));
-    if (ra.some(c => c === undefined) || rb.some(c => c === undefined)) return undefined;
+const axesA = new Float64Array(9), axesB = new Float64Array(9);
+function unitColumns(m: Float32Array, axes: Float64Array): boolean {
+    for (let c = 0; c < 3; c++) {
+        const x = at(m, c * 4), y = at(m, c * 4 + 1), z = at(m, c * 4 + 2), length = Math.hypot(x, y, z);
+        if (length < 1e-4) return false;
+        axes[c * 3] = x / length; axes[c * 3 + 1] = y / length; axes[c * 3 + 2] = z / length;
+    }
+    return true;
+}
 
-    const r = (i: number, j: number) => (ra[i] ?? []).reduce((sum, x, k) => sum + x * at(rb[j] ?? [], k), 0);
+function rotationAngle(a: Float32Array, b: Float32Array): number | undefined {
+    const okA = unitColumns(a, axesA), okB = unitColumns(b, axesB);
+    if (!okA || !okB) return undefined;
+    const r = (i: number, j: number) => 0 + at(axesA, i * 3) * at(axesB, j * 3) + at(axesA, i * 3 + 1) * at(axesB, j * 3 + 1) + at(axesA, i * 3 + 2) * at(axesB, j * 3 + 2);
     const sin = Math.hypot(r(2, 1) - r(1, 2), r(0, 2) - r(2, 0), r(1, 0) - r(0, 1)) / 2;
     return Math.atan2(sin, (r(0, 0) + r(1, 1) + r(2, 2) - 1) / 2) * 180 / Math.PI;
 }
 
+const sameMatrix = (a: Float32Array, b: Float32Array) => {
+    for (let index = 0; index < 16; index++) if (a[index] !== b[index]) return false;
+    return true;
+};
 
-export function poseError(source: mdx.Model, candidate: mdx.Model): { maxPosition: number, maxRotationDegrees: number, samples: number, worst: string } {
-    const before = new ModelRenderer(source), after = new ModelRenderer(candidate);
+
+export interface SequenceError { readonly maxPosition: number, readonly maxRotationDegrees: number, readonly samples: number, readonly worstFrame: number, readonly worstNode: number }
+
+const sampleFrames = (source: mdx.Model) => {
     const frames = new Set<number>();
     transforms(source, track => { for (const key of track.Keys) frames.add(key.Frame); });
     const sorted = [...frames].sort((a, b) => a - b);
-    let maxPosition = 0, maxRotationDegrees = 0, samples = 0, worst = '';
-    const nodes = source.Nodes.filter(node => node != null);
-    source.Sequences.forEach((sequence, index) => {
+    return (sequence: mdx.Sequence) => {
         const [start, end] = [at(sequence.Interval, 0), at(sequence.Interval, 1)];
         const inside = [start, ...sorted.filter(frame => frame > start && frame < end), end];
-        const sample = inside.flatMap((frame, i) => i === 0 ? [frame] : [((inside[i - 1] ?? frame) + frame) / 2, frame]);
+        return inside.flatMap((frame, i) => i === 0 ? [frame] : [((inside[i - 1] ?? frame) + frame) / 2, frame]);
+    };
+};
+
+export function sequenceErrors(source: mdx.Model, candidate: mdx.Model, indices: readonly number[]): SequenceError[] {
+    const before = new ModelRenderer(source), after = new ModelRenderer(candidate), samplesOf = sampleFrames(source);
+    const nodes = source.Nodes.filter(node => node != null);
+    return indices.map(index => {
+        let maxPosition = 0, maxRotationDegrees = 0, samples = 0, worstFrame = 0, worstNode = -1;
         before.setSequence(index); after.setSequence(index);
-        for (const frame of sample) {
+        for (const frame of samplesOf(source.Sequences[index]!)) {
             setFrame(before, frame); setFrame(after, frame);
             const a = nodeMatrices(before), b = nodeMatrices(after);
-            for (const node of nodes) {
+            nodes.forEach((node, nodeIndex) => {
                 const ma = a[node.ObjectId]?.matrix, mb = b[node.ObjectId]?.matrix;
-                if (ma === undefined || mb === undefined) continue;
+                if (ma === undefined || mb === undefined || sameMatrix(ma, mb)) return;
                 const p = source.PivotPoints[node.ObjectId] ?? new Float32Array(3);
                 let squared = 0;
                 for (let row = 0; row < 3; row++) {
                     const d = (at(ma, row) - at(mb, row)) * at(p, 0) + (at(ma, 4 + row) - at(mb, 4 + row)) * at(p, 1) + (at(ma, 8 + row) - at(mb, 8 + row)) * at(p, 2) + at(ma, 12 + row) - at(mb, 12 + row);
                     squared += d * d;
                 }
-                if (Math.sqrt(squared) > maxPosition) worst = `${sequence.Name} @${frame} node ${node.Name}`;
+                if (Math.sqrt(squared) > maxPosition) { worstFrame = frame; worstNode = nodeIndex; }
                 maxPosition = Math.max(maxPosition, Math.sqrt(squared));
                 maxRotationDegrees = Math.max(maxRotationDegrees, rotationAngle(ma, mb) ?? 0);
-            }
+            });
             samples++;
         }
+        return { maxPosition, maxRotationDegrees, samples, worstFrame, worstNode };
+    });
+}
+
+const PARALLEL_POSE_WORK = 2_000_000;
+
+function parallelSequenceErrors(source: mdx.Model, candidate: mdx.Model, workers: number): SequenceError[] {
+    const samplesOf = sampleFrames(source), costs = source.Sequences.map(sequence => samplesOf(sequence).length);
+    const bins: number[][] = Array.from({ length: workers }, () => []), load = new Array<number>(workers).fill(0);
+    for (const index of costs.map((_, index) => index).sort((a, b) => at(costs, b) - at(costs, a) || a - b)) {
+        const bin = load.indexOf(Math.min(...load));
+        bins[bin]!.push(index); load[bin] = at(load, bin) + at(costs, index);
+    }
+    const results = new SharedArrayBuffer(source.Sequences.length * 3 * 8), counts = new SharedArrayBuffer(source.Sequences.length * 2 * 4), status = new SharedArrayBuffer(8), done = new Int32Array(status);
+    const threads = bins.filter(bin => bin.length > 0).map(indices => {
+        const thread = new Worker(new URL('./poseErrorWorker.ts', import.meta.url).href);
+        thread.postMessage({ source, candidate, indices, results, counts, status });
+        return thread;
+    });
+    try {
+        while (Atomics.load(done, 0) + Atomics.load(done, 1) < threads.length) Atomics.wait(done, 0, Atomics.load(done, 0), 1000);
+    } finally {
+        for (const thread of threads) thread.terminate();
+    }
+    if (Atomics.load(done, 1) > 0) throw new Error('A pose error worker failed');
+    const values = new Float64Array(results), integers = new Int32Array(counts);
+    return source.Sequences.map((_, index) => ({ maxPosition: at(values, index * 3), maxRotationDegrees: at(values, index * 3 + 1), worstFrame: at(values, index * 3 + 2), samples: at(integers, index * 2), worstNode: at(integers, index * 2 + 1) }));
+}
+
+export function poseError(source: mdx.Model, candidate: mdx.Model): { maxPosition: number, maxRotationDegrees: number, samples: number, worst: string } {
+    const nodes = source.Nodes.filter(node => node != null), samplesOf = sampleFrames(source);
+    const work = source.Sequences.reduce((sum, sequence) => sum + samplesOf(sequence).length, 0) * nodes.length;
+    const workers = Math.min(4, navigator.hardwareConcurrency, source.Sequences.length);
+    const errors = work >= PARALLEL_POSE_WORK && workers > 1 ? parallelSequenceErrors(source, candidate, workers) : sequenceErrors(source, candidate, source.Sequences.map((_, index) => index));
+    let maxPosition = 0, maxRotationDegrees = 0, samples = 0, worst = '';
+    errors.forEach((error, index) => {
+        if (error.maxPosition > maxPosition) worst = `${source.Sequences[index]!.Name} @${error.worstFrame} node ${nodes[error.worstNode]!.Name}`;
+        maxPosition = Math.max(maxPosition, error.maxPosition);
+        maxRotationDegrees = Math.max(maxRotationDegrees, error.maxRotationDegrees);
+        samples += error.samples;
     });
     return { maxPosition, maxRotationDegrees, samples, worst };
 }
