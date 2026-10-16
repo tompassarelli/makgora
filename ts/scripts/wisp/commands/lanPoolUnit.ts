@@ -10,6 +10,7 @@ import { agentSocket, readPool } from "wisp/scripts/wisp/lan/pool";
 import { pollUntil } from "../../hostPoll";
 import { runProcess } from "../../hostProcess";
 import { projectRoot } from "../project";
+import { privateDesktopUnitEnv } from "./privateDesktopUnitEnv";
 
 export const POOL_UNIT_PREFIX = "smashcraft-lan-pool";
 const FOREGROUND = "--foreground";
@@ -25,9 +26,10 @@ export const poolPairIds = (args: readonly string[]): readonly number[] => {
 export const poolUnitName = (ids: readonly number[]) => `${POOL_UNIT_PREFIX}-${ids.join("-")}`;
 
 /** The transient user unit that owns a pool: it outlives the caller's shell, tool limits and cgroup, and `lan stop` stops it. */
-export const poolUnitCommand = (args: readonly string[], path: string, runtime = process.execPath): readonly string[] => [
+export const poolUnitCommand = (args: readonly string[], path: string, runtime = process.execPath, env = process.env, readDisplay?: (run: string) => string): readonly string[] => [
   "systemd-run", "--user", "--collect", `--unit=${poolUnitName(poolPairIds(args))}`,
   `--working-directory=${projectRoot}`, `--setenv=PATH=${path}`,
+  ...privateDesktopUnitEnv(env, readDisplay),
   "--property=KillMode=control-group", "--property=TimeoutStopSec=180",
   "--", runtime, WISP_PROGRAM, "lan", "pool", ...args.filter((arg) => arg !== FOREGROUND), FOREGROUND,
 ];

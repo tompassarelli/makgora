@@ -8,6 +8,7 @@ import { CURRENT_CANDIDATE, MAP_PROFILES } from "../scripts/wisp/acceptChecks";
 import { poolUnitCommand, poolUnitName, pairNeedsRestart } from "../scripts/wisp/commands/lanPoolUnit";
 import { smashcraftDoctor } from "../scripts/wisp/doctor";
 import { ACCEPT_IN_UNIT, acceptUnitCommand, inAcceptUnit } from "../scripts/wisp/commands/acceptUnit";
+import { privateDesktopUnitEnv } from "../scripts/wisp/commands/privateDesktopUnitEnv";
 import { pairHolders } from "../scripts/wisp/commands/pairGuard";
 import { gameFilesLayer } from "../scripts/wisp/project";
 import { NativeClientInvalid, NativeToolMissing, repairPackager, resolveTools, unresolvedLibraries, validateClients, withRuntimeTools } from "../scripts/wisp/nativeTools";
@@ -60,9 +61,12 @@ test("the gate map defaults to the HEAD candidate, never a pinned build [k2 prop
 });
 
 test("the pool runs in a user unit that lan stop names, and a dropped client restarts its pair [k2 property]", () => {
-  const command = poolUnitCommand(["--pair", "3", "--pool-profile", "visual"], "/bin");
+  const env = { PRIVATE_DESKTOP_RUN: "/run/user/1000/private-desktop.unit-test" };
+  const command = poolUnitCommand(["--pair", "3", "--pool-profile", "visual"], "/bin", process.execPath, env, () => ":8\n");
   expect(command.slice(0, 3)).toEqual(["systemd-run", "--user", "--collect"]);
   expect(command).toContain(`--unit=${poolUnitName([3])}`);
+  expect(command).toContain(`--setenv=PRIVATE_DESKTOP_RUN=${env.PRIVATE_DESKTOP_RUN}`);
+  expect(command).toContain("--setenv=DISPLAY=:8");
   expect(command.at(-1)).toBe("--foreground");
   expect(pairNeedsRestart({ clients: [{ name: "a", pid: 1 }, { name: "b", pid: 2 }] })).toBe(false);
   expect(pairNeedsRestart({ clients: [{ name: "a", pid: 1 }, { name: "b" }] })).toBe(true);
@@ -91,13 +95,22 @@ test("installing a map into a fresh Documents folder creates Maps/00-Smashcraft/
 });
 
 test("a native accept runs as a user service once, and a dry run or the service itself runs in place [k2 property]", () => {
-  const command = acceptUnitCommand(["--only", "gate-moves", "--pair", "0"], "/bin", 7);
+  const env = { PRIVATE_DESKTOP_RUN: "/run/user/1000/private-desktop.unit-test" };
+  const command = acceptUnitCommand(["--only", "gate-moves", "--pair", "0"], "/bin", 7, process.execPath, env, () => ":9\n");
   expect(command.slice(0, 3)).toEqual(["systemd-run", "--user", "--wait"]);
   expect(command).toContain(`--setenv=${ACCEPT_IN_UNIT}=1`);
+  expect(command).toContain(`--setenv=PRIVATE_DESKTOP_RUN=${env.PRIVATE_DESKTOP_RUN}`);
+  expect(command).toContain("--setenv=DISPLAY=:9");
   expect(command.slice(command.indexOf("accept"))).toEqual(["accept", "--only", "gate-moves", "--pair", "0"]);
   expect(inAcceptUnit(["--pair", "0"], {})).toBe(true);
   expect(inAcceptUnit(["--pair", "0"], { [ACCEPT_IN_UNIT]: "1" })).toBe(false);
   expect(inAcceptUnit(["--dry-run"], {})).toBe(false);
+});
+
+test("native units refuse Tom's normal display and missing private desktop context [k2 property]", () => {
+  const run = "/run/user/1000/private-desktop.unit-test";
+  expect(() => privateDesktopUnitEnv({ PRIVATE_DESKTOP_RUN: run }, () => ":0\n")).toThrow("refusing non-private display :0");
+  expect(() => privateDesktopUnitEnv({ DISPLAY: ":0" })).toThrow("requires an active PRIVATE_DESKTOP_RUN");
 });
 
 test("an accept already running on a pair blocks a second one, but not its own caller chain [k2 property]", () => {
