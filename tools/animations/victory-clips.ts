@@ -6,6 +6,7 @@ import { DrawnModel, sheet, type PoseFrame } from '../../ts/scripts/wisp/hurtbox
 import { fighters } from '../../ts/scripts/heroModelSource';
 import { AttackPhase, Character } from '../../ts/src/game/sim/codes';
 import { ensure, onGlobalClock, tracks } from './original-clips';
+import { RAISED_FRAME, UPRIGHT_LIMIT_DEGREES, torsoLean } from '../../ts/scripts/wisp/victoryTorso';
 
 type Arms = 'rest' | 'low' | 'raised' | 'pumped';
 interface Beat { readonly frame: number; readonly arms: Arms; readonly chest: number; readonly head: number; readonly hop: number }
@@ -51,6 +52,7 @@ for (const character of characters) {
     ensure(stand !== undefined, `${fighter.name} has no Stand sequence`);
     const node = (wanted: string) => { const found = model.Nodes.find(candidate => candidate?.Name === wanted); ensure(found, `${fighter.name} has no ${wanted}; map its rig first`); return found; };
     const [chest, head, root] = [node('Bone_Chest'), node('Bone_Head'), node('Bone_Root')];
+    const spine = model.Nodes.find(candidate => candidate?.Name === 'Bone_Waist') ?? chest;
     const arms = SIDES.map(side => side.map(node));
     ensure(root.Translation, `${fighter.name}'s Bone_Root has no translation track`);
 
@@ -75,7 +77,7 @@ for (const character of characters) {
     });
     tracks(model, track => { if (!onGlobalClock(track)) track.Keys.sort((a, b) => a.Frame - b.Frame); });
     const rest = new Map<mdx.Node, Float32Array>();
-    for (const joint of [chest, head, ...arms.flat()]) {
+    for (const joint of new Set([chest, head, spine, ...arms.flat()])) {
         ensure(joint.Rotation, `${fighter.name}'s ${joint.Name} has no rotation track`);
         if (!joint.Rotation.Keys.some(key => key.Frame === time(0))) { for (const { frame } of CHEER) joint.Rotation.Keys.push({ Frame: time(frame), Vector: new Float32Array([0, 0, 0, 1]), ...(joint.Rotation.LineType >= mdx.LineType.Hermite ? { InTan: new Float32Array([0, 0, 0, 1]), OutTan: new Float32Array([0, 0, 0, 1]) } : {}) }); joint.Rotation.Keys.sort((a, b) => a.Frame - b.Frame); }
         rest.set(joint, joint.Rotation.Keys.find(key => key.Frame === time(0))!.Vector.slice() as Float32Array);
@@ -111,13 +113,27 @@ for (const character of characters) {
     const upright = held === undefined ? undefined : (() => { renderer.setSequence(source.Sequences.indexOf(stand)); data.frame = stand.Interval[0]!; renderer.update(0); return direction(held.hand, held.weapon); })();
     for (const beat of beats) {
         pose(chest, beat.frame, beat.chest); pose(head, beat.frame, beat.head);
+        if (beat.arms === 'raised' || beat.arms === 'pumped') {
+            const lean = () => torsoLean(model, index, time(beat.frame) - cutoff, renderer);
+            const known = solved.get('rear');
+            if (known !== undefined) pose(spine, beat.frame, known[0]! + (spine === chest ? beat.chest : 0));
+            else if (lean() > UPRIGHT_LIMIT_DEGREES) {
+                let best = Infinity, choice = 0;
+                for (const [step, span] of [[10, 120], [2, 10], [1, 2]] as const) {
+                    const centre = choice;
+                    for (let value = centre - span; value <= centre + span; value += step) { pose(spine, beat.frame, value + (spine === chest ? beat.chest : 0)); const tilt = lean(); if (tilt < best) { best = tilt; choice = value; } }
+                }
+                pose(spine, beat.frame, choice + (spine === chest ? beat.chest : 0));
+                solved.set('rear', [choice]);
+            }
+        }
         for (const [side, [shoulder, elbow, hand]] of arms.entries()) {
             if (beat.arms === 'rest') continue;
             const known = solved.get(`${beat.arms}${side}`);
             const angles = known ?? [0, 0, 0, 0];
             const apply = () => { pose(shoulder!, beat.frame, angles[0]!, angles[1]!); pose(elbow!, beat.frame, angles[2]!, angles[3]!); };
             if (known === undefined) {
-                const target = targets[beat.arms](shoulders[side]!, side);
+                const target = targets[beat.arms](solved.has('rear') ? (evaluate(beat.frame), pivot(shoulder!)) : shoulders[side]!, side);
                 const loss = () => { apply(); evaluate(beat.frame); const at = pivot(hand!); return Math.hypot(at[0]! - target[0]!, at[1]! - target[1]!, at[2]! - target[2]!); };
                 for (let pass = 0; pass < 4; pass++) for (let dimension = 0; dimension < 4; dimension++) {
                     let best = Infinity, choice = 0;
@@ -145,6 +161,8 @@ for (const character of characters) {
         }
     }
 
+    const raisedLean = torsoLean(model, index, Math.round(RAISED_FRAME * 1000 / 60), renderer);
+    ensure(raisedLean <= UPRIGHT_LIMIT_DEGREES, `${fighter.name}: the raised cheer leans ${raisedLean.toFixed(0)} degrees from upright; rear its spine before the arms`);
     const unplanted = new DrawnModel(generateMDX(model), 1);
     for (const beat of beats) {
         const body = unplanted.triangles(index, beat.frame / 60, 1);
@@ -171,5 +189,5 @@ for (const character of characters) {
     await Bun.write(join(family, basename(fighter.source)), bytes);
     const panels: PoseFrame[] = [1, -1].flatMap(facing => CHEER.map(({ frame }) => ({ frame, phase: AttackPhase.active, x: 0, z: 0, facing, parts: [], strikes: [], clip: index, seconds: frame / 60 })));
     await Bun.write(join(output, `${fighter.name}-victory.png`), sheet(name, drawn, panels, CHEER.length).png);
-    console.log(`VICTORY_CLIP ${fighter.name} sequence ${index} "${name}" ${FRAMES} frames, drawn body moves ${moved.toFixed(1)} of a ${height.toFixed(1)} reach; ${join(family, basename(fighter.source))}`);
+    console.log(`VICTORY_CLIP ${fighter.name} sequence ${index} "${name}" ${FRAMES} frames, drawn body moves ${moved.toFixed(1)} of a ${height.toFixed(1)} reach, raised torso ${raisedLean.toFixed(0)} degrees from upright${solved.has('rear') ? ` after rearing ${spine.Name} ${solved.get('rear')![0]} degrees` : ''}; ${join(family, basename(fighter.source))}`);
 }
