@@ -477,7 +477,7 @@ for(const [id,poses]of Object.entries(PLAN)) {
     const shadowLow = character === 9 && pose === "downTilt";
     const aligned = wardenWeaponPose(character,pose) || shadowLow || character === 5 && (pose === "neutralAir" || pose === "forwardAir");
     if (aligned) aimWeaponContact(model,index,start,contact,total,pose,shadowLow);
-    const binding=`{ index: ${index}, seconds: ${seconds((end-start)/1000)}${aligned?", aligned: true":""} }`;
+    const binding=`{ index: ${index}, seconds: ${seconds((end-start)/1000)}${aligned||character===5&&pose==="downSmash"?", aligned: true":""} }`;
     bindings.push(`    ${pose}: ${binding},`);
     if(special&&pose!=="ultimate"&&!NO_FORM_BINDINGS[character]?.includes(pose))for(const suffix of ["Air","FollowUp","FollowUpAir"])bindings.push(`    ${pose}${suffix}: ${binding},`);
     const moments=[Math.max(1,contact-3),contact,Math.min(total-1,contact+5)];
