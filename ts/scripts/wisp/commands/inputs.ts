@@ -3,13 +3,15 @@
 
 
 
+import { dirname } from "node:path";
 import { Effect } from "effect";
 import { type Command, UsageFailure, flagValues } from "wisp/scripts/wisp/command";
 import { MapBuildFailure } from "wisp/scripts/wisp/mapBuild";
 import { runAdmitted } from "../../heavyCapacity";
 import { buildFighterArt, planFighters } from "../fighterArt";
+import { DERIVE_LEASE_SECONDS, openPaths, pruneInputs } from "../inputsPrune";
 import { projectRoot } from "../project";
-import { FAMILIES, FAMILY_NAMES, type Family, MANIFEST, checkoutInputs, isSharded, readPins, storeFamily, storeShards, writePin, writeShardPins } from "../buildInputs";
+import { FAMILIES, FAMILY_NAMES, type Family, INPUTS_STORE, MANIFEST, checkoutInputs, isSharded, readPins, storeFamily, storeShards, writePin, writeShardPins } from "../buildInputs";
 
 const isFamily = (name: string): name is Family => name in FAMILIES;
 
@@ -50,7 +52,7 @@ const derive = (args: readonly string[]) => Effect.gen(function*() {
   const building = plans.filter((plan) => plan.cached < plan.keys.length).length;
   const capacity = building <= 2 ? { class: "moderate" as const, jobs: 2 } : { class: "heavy" as const, jobs: 6 };
   console.log(`${plans.length} fighters: ${steps} steps to run, ${plans.reduce((sum, plan) => sum + plan.cached, 0)} reused`);
-  if (building > 0) yield* Effect.promise(() => runAdmitted(capacity.class, "smashcraft:inputs-derive", 3600));
+  if (building > 0) yield* Effect.promise(() => runAdmitted(capacity.class, "smashcraft:inputs-derive", DERIVE_LEASE_SECONDS));
   yield* buildFighterArt(plans, manifest, assets, capacity.jobs);
   if (!check) return;
   const stale = yield* git("status", "--porcelain", "--", ...DERIVED_PATHS);
@@ -60,11 +62,25 @@ const derive = (args: readonly string[]) => Effect.gen(function*() {
   return yield* new MapBuildFailure({ operation: "check derived fighter art", path: MANIFEST, cause: `these committed outputs differ from what this checkout's producers derive; run bun wisp inputs derive --fighter NAME for each and commit the result:\n${stale}` });
 });
 
+const prune = (args: readonly string[]) => Effect.gen(function*() {
+  const scratch = flagValues(args, "scratch"), root = dirname(INPUTS_STORE);
+  if (args.length !== scratch.length * 2) return yield* new UsageFailure({ problem: "inputs prune takes [--scratch NAME]..." });
+  const worktrees = (yield* git("worktree", "list", "--porcelain")).split("\n").filter((line) => line.startsWith("worktree ")).map((line) => ({ path: line.slice("worktree ".length), reason: "holds a git worktree" }));
+  const { removed, refused } = yield* Effect.try({
+    try: () => pruneInputs(root, scratch, [...openPaths(), ...worktrees]),
+    catch: (cause) => new MapBuildFailure({ operation: "prune build inputs", path: root, cause: String(cause) }),
+  });
+  for (const path of removed) console.log(`removed ${path}`);
+  if (refused.length > 0) return yield* new MapBuildFailure({ operation: "prune build inputs", path: root, cause: refused.map(({ path, reason }) => `kept ${path}: it ${reason}`).join("\n") });
+  console.log(removed.length === 0 ? "nothing to prune" : `removed ${removed.length} folders`);
+});
+
 export const inputs: Command = (args) => Effect.gen(function*() {
   const [verb, ...rest] = args;
   const [family, source, ...extra] = rest;
   if (verb === "add" && family !== undefined && source !== undefined && extra.length === 0) return yield* add(family, source);
   if (verb === "derive") return yield* derive(rest);
+  if (verb === "prune") return yield* prune(rest);
   if (verb === "check" && rest.length === 0) {
     const paths = yield* checkoutInputs();
     console.log(`every family in ${MANIFEST} is stored and unchanged\n--assets ${paths.assets}`);
@@ -77,5 +93,5 @@ export const inputs: Command = (args) => Effect.gen(function*() {
     if (name === "base" || name === "container" || name === "assets" || name === "summon") return console.log(paths[name]);
     return yield* new UsageFailure({ problem: "inputs path takes base, container, assets or summon" });
   }
-  return yield* new UsageFailure({ problem: "inputs takes add FAMILY PATH | derive [--fighter NAME]... [--rebuild | --check] | check | path [base|container|assets|summon]" });
+  return yield* new UsageFailure({ problem: "inputs takes add FAMILY PATH | derive [--fighter NAME]... [--rebuild | --check] | prune [--scratch NAME]... | check | path [base|container|assets|summon]" });
 });

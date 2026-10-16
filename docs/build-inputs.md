@@ -90,6 +90,11 @@ code:
    any pin or generated file differs; pre-push runs it for each fighter whose
    pins, generated clips or whites, model facts or source family a landing changes
    (smashcraft:ts/scripts/wisp/fighterArtChanges.ts).
+   A derive that fails keeps its step logs in derive/run-*/ beside the store;
+   `bun wisp inputs prune [--scratch NAME]...` removes the runs older than the
+   derive lease, and each named scratch folder under the build-inputs root,
+   skipping any folder a process has open or a git worktree lives in and never
+   touching the store (smashcraft:ts/scripts/wisp/inputsPrune.ts).
 3. `bun wisp map build --profile playable --edition full --name NAME --out OUT.w3x` from the lane
    checks the change; commit build-inputs/FAMILY with the code that needs it and
    land it. Lanes that changed different families, or different fighters' shards
