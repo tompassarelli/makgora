@@ -115,18 +115,18 @@ function readKey(saved: string, offset: number): number | undefined {
 }
 
 
-function upgradeDefaults(bindings: KeyBindings, version: string): void {
+function upgradeToCurrentKeys(bindings: KeyBindings, version: string): void {
   const { keys } = bindings;
   if (keyFor(bindings, Action.exSpecial, 0) === code("X")) keys[slotIndex(Action.exSpecial, 0)] = EMPTY;
   if (keyFor(bindings, Action.rightTrigger, 1) === code("G")) keys[slotIndex(Action.rightTrigger, 1)] = EMPTY;
-  upgradeEarlierDefaults(bindings, version);
+  upgradeDefaults(bindings, version);
   if (keyFor(bindings, Action.exSpecial, 0) === undefined) {
     const ex = keyFor(bindings, Action.jump, 1) === code("9") ? code("0") : code("9");
     if (!keys.includes(ex)) rebind(bindings, Action.exSpecial, 0, ex);
   }
 }
 
-function upgradeEarlierDefaults(bindings: KeyBindings, version: string): void {
+function upgradeDefaults(bindings: KeyBindings, version: string): void {
   const { keys } = bindings;
   const free = (...candidates: number[]) => candidates.every((key) => !keys.includes(key));
   const first = (action: Action) => keyFor(bindings, action, 0);
@@ -179,7 +179,7 @@ export function decodeBindings(saved: string): KeyBindings | undefined {
     if (key !== SKIPPED_ON_LOAD && !bindSlot(keys, index, key)) return undefined;
   }
   const bindings = { keys };
-  if (version !== CURRENT_SAVE) upgradeDefaults(bindings, version);
+  if (version !== CURRENT_SAVE) upgradeToCurrentKeys(bindings, version);
   return bindings;
 }
 

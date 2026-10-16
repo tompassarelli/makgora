@@ -18,6 +18,7 @@ const STICK_DIGITAL = 7000;
 const C_STICK_DIGITAL = 11000;
 const TRIGGER_DIGITAL = 4000;
 const SHIELDS = bit(Action.leftTrigger) | bit(Action.rightTrigger);
+const SPECIALS = bit(Action.special) | bit(Action.exSpecial);
 
 
 export interface Pad {
@@ -82,8 +83,8 @@ function helperRow(previous: Pad, pad: Pad): InputRow {
     axisX: axisByte(x), axisZ: axisByte(up),
     triggerLeft: pad.trigger === true ? 255 : 0,
     triggerRight: pad.rightTrigger === true ? 255 : 0,
-    specialX: has(pressed, Action.special) || has(pressed, Action.exSpecial) ? beyond(x) : 0,
-    specialZ: has(pressed, Action.special) || has(pressed, Action.exSpecial) ? beyond(up) : 0,
+    specialX: (pressed & SPECIALS) !== 0 ? beyond(x) : 0,
+    specialZ: (pressed & SPECIALS) !== 0 ? beyond(up) : 0,
     dodgeX: (pressed & SHIELDS) !== 0 ? beyond(x) : 0,
     dodgeZ: (pressed & SHIELDS) !== 0 ? beyond(up) : 0,
     ledgeVertical: has(pressed, Action.moveUp) ? 1 : has(pressed, Action.moveDown) ? -1 : 0,
