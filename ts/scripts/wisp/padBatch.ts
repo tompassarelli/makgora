@@ -26,7 +26,7 @@ import { Clients } from "wisp/scripts/wisp/clients";
 import { HotReload } from "wisp/scripts/wisp/hotReload";
 import { MapBuild } from "wisp/scripts/wisp/mapBuild";
 import { readyAfter } from "./commands/fresh";
-import { captureLoad, requireCaptureLease, timingCheck } from "./captureCapacity";
+import { windowLoad } from "./quietWindow";
 import { buildProject, gameFilesLayer, sourceErrorsLayer } from "./project";
 import { INTEGRITY_BUILD } from "../../src/game/session/currentBuild";
 import { RESET_COMMAND } from "../../src/game/session/devSettings";
@@ -234,7 +234,6 @@ const prepare = (options: BatchOptions, native = false) => Effect.gen(function*(
     }),
     catch: (cause) => new UsageFailure({ problem: describeCause(cause) }),
   });
-  if (native) yield* requireCaptureLease(timingCheck(runs.map(({ steps }) => steps)));
 
 
   const references = new Map<string, Deferred.Deferred<{ code: number; seconds: number; ended: number }, IntegrityFailure>>();
@@ -308,7 +307,7 @@ export const padBatch = (options: NativeBatchOptions) => Effect.gen(function*() 
   const started = performance.now();
   mkdirSync(options.out, { recursive: true });
   const { runs, report, compareLater, reports, compares } = yield* prepare(options, true);
-  const quietWindow = captureLoad();
+  const quietWindow = yield* windowLoad;
   let next = 0;
   const worker = (pair: PadPair) => Effect.scoped(Effect.gen(function*() {
     let previous: Parameters<typeof needsNewGame>[0] = "none";

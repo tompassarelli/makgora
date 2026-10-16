@@ -148,15 +148,12 @@ change (presentation values, effects, menus, CPU tuning) hot-reloads into one
 running match with `bun wisp hot --data ... --watch` between captures; rebuild
 the map only for imports, object data or art. Each lane builds its own
 current-main map (about 90 s) unless one is already built for that commit;
-visual captures take no exclusive lease, timing checks do. Record captures per
+`native-capture` visual captures take no quiet session. Record captures per
 hour per lane in the status.
-A native `bun wisp pad` timing check (a script without a `capture` step) waits
-for an exclusive machine-capacity window before client input and keeps it
-through the whole batch (maximum 15 minutes).
-To run four timing lanes together, start their foreground batch runner inside
-one `machine-capacity run --class exclusive --timeout-seconds 900 -- ...`
-command; pad children reuse that window. Separate exclusive commands queue in turn.
-Each result records `load_average` and `capacity_lease` (#311).
+Every native `bun wisp pad` run is compared frame for frame, so it waits for
+machine-capacity's quiet native session before client input and keeps it
+through the whole command, captures or not (#69). Each result records
+`load_average` and `quiet_window`.
 The signed-in clones (B, C, D) cover Definitive captures and tests that need Battle.net
 itself: real netplay or latency, direct play, spectating, and as the
 updated install the pool is copied from. Do not start them for a Classic offline check;

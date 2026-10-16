@@ -62,7 +62,7 @@ import { DevCommandReceipt, nativeChatEntryReceipt } from "../boundary";
 import { currentChatEntry, selectionChatBootstrapRequired } from "../padChat";
 import { devCommandReceiptFile } from "../../../src/game/core/gameFiles";
 import { Phase } from "../../../src/game/lobby/lobbyState";
-import { admitCaptures, captureLoad, requireCaptureLease, timingCheck, timingLease, timingScripts } from "../captureCapacity";
+import { hostLoad, inQuietNativeWindow, windowLoad } from "../quietWindow";
 import { quickMatchHero, quickMatchStage, quickPainHero, quickRecoveryHero, quickOffstageHero } from "../../../src/game/session/devSettings";
 import { assertPairClaim } from "./pairClaim";
 import { pauseDraws } from "../pauseDraws";
@@ -150,7 +150,7 @@ const checkFirstEdge = (steps: readonly PadStep[], epochs: readonly [number, num
 });
 
 
-const finish = (out: string, scriptPath: string, build: string, epochs: readonly [number, number], sent: readonly SentEdge[], final: [string, string]) => Effect.gen(function*() {
+const finish = (out: string, scriptPath: string, build: string, epochs: readonly [number, number], sent: readonly SentEdge[], final: [string, string], load: Readonly<Record<string, unknown>>) => Effect.gen(function*() {
   const results = landEdges(sent, final).map((edge) => ({
     ...edge,
 
@@ -162,7 +162,7 @@ const finish = (out: string, scriptPath: string, build: string, epochs: readonly
   const stopped = final.flatMap((log, slot) => (/late kernel event|journal stopped/.test(log) ? [`helper ${slot}: ${/^wc3-journal: .*$/m.exec(log)?.[0] ?? "stopped"}`] : []));
   const off = results.filter((edge) => edge.frame !== edge.planned);
   const lateWrites = off.filter((edge) => edge.written !== edge.planned).length;
-  yield* tryIntegrity("write result", out, () => writeFileSync(join(out, "result.json"), json({ ...captureLoad(), script: scriptPath, build, frame_one_ns: epochs, match_starts: final.map(matchStart), edges: results, off_frame: off.length, written_late: lateWrites, helpers_stopped: stopped })));
+  yield* tryIntegrity("write result", out, () => writeFileSync(join(out, "result.json"), json({ ...load, script: scriptPath, build, frame_one_ns: epochs, match_starts: final.map(matchStart), edges: results, off_frame: off.length, written_late: lateWrites, helpers_stopped: stopped })));
   for (const edge of results) console.log(`line ${edge.line} ${edge.slot === 0 ? "a" : "b"} planned ${edge.planned} written ${edge.written} landed ${edge.frame} (${edge.confirmedBy}): ${edge.text}`);
   console.log(`${results.length} edges, ${off.length} off their frame (${lateWrites} of them written late)${stopped.length > 0 ? `; ${stopped.join("; ")}` : ""}; ${join(out, "result.json")}`);
   if (off.length > 0 || stopped.length > 0) return yield* new PadReplayFailure({ operation: "replay pad script", path: out, cause: `${off.length} edges off their frame, ${stopped.length} helpers stopped`, offFrame: off.length, helpersStopped: stopped.length });
@@ -264,13 +264,13 @@ export function nativeChatReceipt(text: string) {
 }
 
 
-const selectionChat = (session: NativeSession, text: string, timing: boolean) => setupCommand(session, text, Effect.gen(function*() {
+const selectionChat = (session: NativeSession, text: string) => setupCommand(session, text, Effect.gen(function*() {
   const path = join(session.data[0], nativeChatFile(session.build, 0));
   const readEntry = () => tryIntegrity("read chat entry", session.clients[0].name, () => {
     if (!existsSync(path)) return undefined;
     return currentChatEntry(nativeChatEntryReceipt(readFileSync(path, "latin1")), statSync(path).mtimeMs, session.build, session.startedMs);
   });
-  const pressReturn = requireCaptureLease(timing).pipe(Effect.andThen(batch(session.clients[0], [{ kind: "wait", millis: 250 }, { kind: "keys", keys: ["Return"] }]).pipe(Effect.provide(ClientWatch.layer({ filePrefix: "smashcraft" })), Effect.mapError(fromDesktop))), Effect.asVoid);
+  const pressReturn = batch(session.clients[0], [{ kind: "wait", millis: 250 }, { kind: "keys", keys: ["Return"] }]).pipe(Effect.provide(ClientWatch.layer({ filePrefix: "smashcraft" })), Effect.mapError(fromDesktop));
   let entry = yield* Effect.suspend(readEntry);
   if (selectionChatBootstrapRequired(entry)) {
     yield* pressReturn;
@@ -317,16 +317,16 @@ export const nativeScript = (session: NativeSession, options: PadOptions) => Eff
   {
     yield* Effect.sleep("1 second");
     const command = yield* tryIntegrity("prepare pad trace", scriptPath, () => padTraceCommand(captureToken === undefined ? chat : visualCaptureCommand(chat ?? "-dev trace", captureToken, steps), callbacks));
-    const setup = yield* Effect.exit(selectionChat(session, command, timingCheck([steps])));
+    const setup = yield* Effect.exit(selectionChat(session, command));
     if (setup._tag === "Failure") {
       const boundary = describeCause(setup.cause);
-      yield* tryIntegrity("write invalid setup", out, () => writeFileSync(join(out, "result.json"), json({ ...captureLoad(), status: "INVALID", script: scriptPath, build, invalid: [boundary], setup: { command: chat, clients: clients.map((client) => client.name), boundary }, edges: [] })));
+      const load = yield* windowLoad;
+      yield* tryIntegrity("write invalid setup", out, () => writeFileSync(join(out, "result.json"), json({ ...load, status: "INVALID", script: scriptPath, build, invalid: [boundary], setup: { command: chat, clients: clients.map((client) => client.name), boundary }, edges: [] })));
       console.log(`INVALID setup: ${boundary}; ${out}`);
       return "invalid" as const;
     }
     yield* tryIntegrity("write setup receipts", out, () => writeFileSync(join(out, "setup.json"), json({ command: chat, clients: setup.value, confirmed_monotonic_ns: monotonicNs() })));
   }
-  yield* requireCaptureLease(timingCheck([steps]));
   const epochs = yield* matchEpochs(logs, startedNs, out);
   const matchIds = logs().map((text) => matchStart(text)?.epoch ?? 0);
   const captures: Record<string, unknown>[] = [];
@@ -373,7 +373,7 @@ export const nativeScript = (session: NativeSession, options: PadOptions) => Eff
   yield* until(frameWriteNs(Math.max(...epochs), last + 30));
   yield* Fiber.joinAll(shots);
   if (captures.length > 0) yield* tryIntegrity("write captures", out, () => writeFileSync(join(out, "captures.json"), json(captures)));
-  const finished = yield* Effect.exit(finish(out, scriptPath, build, epochs, sent, logs()));
+  const finished = yield* Effect.exit(finish(out, scriptPath, build, epochs, sent, logs(), yield* windowLoad));
   yield* tryIntegrity("save script helper logs", out, () => logs().forEach((text, slot) => writeFileSync(join(out, `helper-${slot}.log`), text)));
   yield* collect(data, out, startedMs, callbacks);
   const invalid = [...captureFailures.sort((a, b) => a.frame - b.frame).map(({ message }) => message), ...invalidRun(clients.map((client) => client.name), clients.map((client) => client.documents), data, startedMs)];
@@ -519,7 +519,7 @@ export const headlessScript = (session: HeadlessSession, options: PadOptions) =>
   const sent = yield* scheduled(worker, { pads: [at(pads, 0), at(pads, 1)], epochs, edges });
   const last = steps.at(-1)?.frame ?? 0;
   yield* until(frameWriteNs(Math.max(...epochs), last + 30));
-  const finished = yield* Effect.exit(finish(out, scriptPath, build, epochs, sent, logs()));
+  const finished = yield* Effect.exit(finish(out, scriptPath, build, epochs, sent, logs(), hostLoad()));
   yield* collect(data, out, startedMs, callbacks);
   const errors = clients.clients.flatMap((client, index) => client.errors.slice(errorsBefore[index]).map((error) => `p${client.slot}: ${error}`));
   if (session.state.crashed !== undefined) errors.push(`headless clients stopped: ${describeCause(session.state.crashed)}`);
@@ -555,18 +555,9 @@ export const pad: Command = (args) => Effect.gen(function*() {
     } }),
     catch: (cause) => new UsageFailure({ problem: describeCause(cause) }),
   });
-  const { batchScripts } = yield* Effect.promise(() => import("../padBatch"));
-  const timingBatch = yield* Effect.sync(() => {
-    try {
-      return timingScripts(batchScripts(parsed.positionals));
-    } catch {
-      return true;
-    }
-  });
   if (parsed.values.headless !== true) {
     const clientsFile = parsed.values["clients-file"] ?? clientState;
     yield* Effect.try({ try: () => readClientsFile(clientsFile), catch: (cause) => new UsageFailure({ problem: `can't read the clients from ${clientsFile}: ${describeCause(cause)}` }) });
-    if (yield* admitCaptures(args, timingBatch)) return;
   }
   const { helper, out, chat, compare } = parsed.values;
   const clientsFile = parsed.values["clients-file"] ?? clientState;
@@ -581,7 +572,7 @@ export const pad: Command = (args) => Effect.gen(function*() {
 
   if (parsed.values.pairs !== undefined || (parsed.values.pair?.length ?? 0) > 0 || parsed.positionals.length > 1 || (parsed.positionals[0] !== undefined && existsSync(parsed.positionals[0]) && statSync(parsed.positionals[0]).isDirectory())) {
     const batch = scriptBatch(parsed.values, parsed.positionals);
-    return yield* (parsed.values.headless === true ? batch : timingLease(timingBatch, "smashcraft-pad", batch));
+    return yield* batch;
   }
   const isHeadless = parsed.values.headless === true;
   const build = parsed.values.build ?? (isHeadless ? INTEGRITY_BUILD.id : undefined);
@@ -618,7 +609,7 @@ export const pad: Command = (args) => Effect.gen(function*() {
       Effect.retry({ schedule: EffectSchedule.recurs(map === undefined ? 0 : Math.max(0, Math.ceil(retries))), while: (failure) => failure instanceof InvalidNativeRun }),
       Effect.catchIf((failure): failure is InvalidNativeRun => failure instanceof InvalidNativeRun, (failure) => Effect.fail(new IntegrityFailure({ operation: INVALID_RUN, path: out, cause: `desynced, rerun (${failure.attempts} attempt${failure.attempts === 1 ? "" : "s"}${map === undefined ? "; --map MAP.w3x reruns it automatically" : ""})` }))),
     );
-    return yield* timingLease(timingCheck([steps]), "smashcraft-pad", nativeRun);
+    return yield* inQuietNativeWindow("smashcraft-pad", nativeRun);
   }
   const ran = yield* Effect.exit(headless(options).pipe(step("headless pad script")));
   if (compare !== undefined) {
@@ -667,8 +658,8 @@ const scriptBatch = (values: { readonly [name: string]: string | boolean | reado
     catch: (cause) => new UsageFailure({ problem: describeCause(cause) }),
   });
   const scripts = yield* Effect.try({ try: () => batchScripts(positionals), catch: (cause) => new UsageFailure({ problem: describeCause(cause) }) });
-  return yield* padBatch({
+  return yield* inQuietNativeWindow("smashcraft-pad", padBatch({
     scripts, pairs, helper, build, out, map,
     retries: Number(text("retries") ?? "2"), freshEach: values["fresh-each"] === true, hot: values.hot === true, headlessJobs,
-  });
+  }));
 });
