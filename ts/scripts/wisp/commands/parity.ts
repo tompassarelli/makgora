@@ -21,7 +21,7 @@ import { corpus } from "../corpus";
 import { reconcileFourFighters } from "../../fourFighters";
 import { reconcilePlayable } from "../../playable";
 import { join } from "node:path";
-import { withQuietNativeCapacity } from "wisp/scripts/wisp/quietNativeCapacity";
+import { withQuietNativeCapacity } from "../../quietNativeCapacity";
 const Session = Schema.Struct({ four_fighters: Schema.optionalKey(Schema.Boolean), playable: Schema.optionalKey(Schema.Boolean) });
 const sessionResult = (directory: string) => Effect.gen(function*() {
   const path = join(directory, "capture.json");

@@ -17,7 +17,7 @@ import { gameFilesLayer } from "./wisp/project";
 import { Phase } from "../src/game/lobby/lobbyState";
 import { padScriptPreset } from "./integrity/padScript";
 import { platformLayer } from "wisp/scripts/platform/layer";
-import { withQuietNativeCapacity } from "wisp/scripts/wisp/quietNativeCapacity";
+import { withQuietNativeCapacity } from "./quietNativeCapacity";
 
 export function validatePadCutClients(clients: readonly Pick<Client, "name" | "documents" | "x11" | "wayland">[], entries: readonly ClientEntry[], appIds: ReadonlyMap<string, string>, pair: string) {
   const count = pair === "tom" ? 1 : 2;

@@ -39,7 +39,7 @@ import { platformLayer } from "wisp/scripts/platform/layer";
 import { sheetCanvas, putSheetFrame, writeSheet } from "./nativeCaptureSheet";
 import { nativeCaptureChunks } from "./nativeCaptureChunks";
 import { frameVerdict } from "./nativeCaptureVerdict";
-import { withQuietNativeCapacity } from "wisp/scripts/wisp/quietNativeCapacity";
+import { withQuietNativeCapacity } from "./quietNativeCapacity";
 
 export class CaptureFailure extends Schema.TaggedError<CaptureFailure>()("CaptureFailure", { problem: Schema.String }) {
   override get message(): string { return this.problem; }

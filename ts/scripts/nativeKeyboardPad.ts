@@ -11,7 +11,7 @@ import { monotonicNs } from "./integrity/linux";
 import { ABS_X, ABS_Y, BTN_START, BTN_SELECT, EV_ABS, EV_KEY } from "./integrity/linuxInput";
 import { frameWriteNs, padScriptPreset, parsePadScript, ruleFrame } from "./integrity/padScript";
 import { platformLayer } from "wisp/scripts/platform/layer";
-import { withQuietNativeCapacity } from "wisp/scripts/wisp/quietNativeCapacity";
+import { withQuietNativeCapacity } from "./quietNativeCapacity";
 
 export function keyboardPadPlan(script: string) {
   return parsePadScript(script).flatMap(step => {

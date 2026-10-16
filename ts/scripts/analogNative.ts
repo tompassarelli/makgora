@@ -10,7 +10,7 @@ import { loadClients, windowPid } from "wisp/scripts/warcraft/desktop";
 import { preloadLines } from "wisp/scripts/wisp/preloadRecord";
 import { padScriptPreset } from "./integrity/padScript";
 import { platformLayer } from "wisp/scripts/platform/layer";
-import { withQuietNativeCapacity } from "wisp/scripts/wisp/quietNativeCapacity";
+import { withQuietNativeCapacity } from "./quietNativeCapacity";
 
 export const calibrateCursor = (options: { args: readonly string[]; env: Record<string, string | undefined>; path: string; log: string; corner: string }) => Effect.scoped(Effect.gen(function*() {
     const { path, corner } = options;
