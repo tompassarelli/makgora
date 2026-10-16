@@ -40,7 +40,7 @@ const stampede = (spawnFrame: number): SpecialProjectile => ({
 });
 export const STAMPEDE = [stampede(2), stampede(5), stampede(8)];
 const SUMMON_BEAR: AuthoredSpecial = { endFrame: 49, groundOnly: true, placement: BEAR_PLACEMENT };
-const BEAR_COMMAND: AuthoredSpecial = { name: "Stampede", endFrame: 32, command: { frame: 4, order: CompanionOrder.lunge }, projectiles: STAMPEDE };
+const BEAR_COMMAND: AuthoredSpecial = { name: "Stampede", endFrame: 32, cooldownFrames: 360, command: { frame: 4, order: CompanionOrder.lunge }, projectiles: STAMPEDE };
 export const QUILL: SpecialProjectile = {
   spawnFrame: 0, offsetX: h(f32(0.4)), offsetZ: h(f32(0.45)),
   velocityX: h(f32(0.14)), velocityZ: 0.0, life: 24, radius: h(f32(0.12)),
