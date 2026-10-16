@@ -13,6 +13,7 @@ import { AttackPhase, Character } from "../../ts/src/game/sim/codes";
 import { seconds } from "./asset-info";
 import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
 import { fighters } from "../../ts/scripts/heroModelSource";
+import { ensureMotionHelper } from "../../ts/scripts/motionHelper";
 
 const [inputArg, outputArg, ...options] = process.argv.slice(2);
 const input = resolve(inputArg ?? ""), output = resolve(outputArg ?? "");
@@ -164,12 +165,7 @@ for (const gesture of gestures) {
   const body = before.triangles(source.Sequences.indexOf(stand), 0, 1);
   const heights = Array.from(body).filter((_, i) => i % 2 === 1);
   const centre = (Math.min(...heights) + Math.max(...heights)) / 2;
-  const root = model.Nodes.length;
-  const helper: mdx.Helper = { Name: selected ? "Double Jump Motion" : "Jump Motion", ObjectId: root, Parent: null, Flags: 0,
-    PivotPoint: new Float32Array([0, 0, centre]), Rotation: { LineType: 1, GlobalSeqId: -1, Keys: [] } };
-  for (const node of [...model.Bones, ...model.Helpers, ...model.Attachments]) if (node.Parent == null) node.Parent = root;
-  model.Helpers.push(helper); model.Nodes.push(helper); model.PivotPoints.push(helper.PivotPoint);
-  for (const sequence of source.Sequences) for (const Frame of sequence.Interval) helper.Rotation?.Keys.push({ Frame, Vector: new Float32Array([0, 0, 0, 1]) });
+  const helper = ensureMotionHelper(model, selected ? "Double Jump Motion" : "Jump Motion", [0, 0, centre], source.Sequences);
   const originals = new Map<string, mdx.AnimVector>(); tracks(source, (t, p) => originals.set(p, t));
   let cursor = Math.max(...source.Sequences.map(s => s.Interval[1])) + 100;
   bindings.push(`  ${gesture.character}: {`);

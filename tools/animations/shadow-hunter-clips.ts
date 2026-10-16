@@ -11,6 +11,8 @@ import { CHARGED_AIM_FRAMES } from "../../ts/src/game/sim/specials/schema";
 import { ROSTER_ATTACK_CLIPS } from "../../ts/src/game/presentation/rosterAttackClipInfo";
 import { JUMP_CLIPS } from "../../ts/src/game/presentation/jumpClipInfo";
 import { SHADOW_HUNTER_AUTHORED_CLIPS } from "../../ts/src/game/presentation/heroes/shadowHunterClipInfo";
+import { characterModelScale } from "../../ts/src/game/presentation/modelScale";
+import { LEDGE_HANG_DEPTH, LEDGE_HANG_OUTSET } from "../../ts/src/game/sim/ledge";
 import { seconds } from "./asset-info";
 import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
 
@@ -26,7 +28,7 @@ type End = "handL" | "handR" | "footL" | "footR";
 interface Phase { frame: number; gesture: Gesture; tip?: readonly [number, number] | readonly [number, number, number]; grip?: readonly [number, number]; reach?: readonly [End, number, number]; extraReach?: readonly [End, number, number]; follow?: boolean }
 interface Authored {
   pose: HeroPose; style?: AttackStyle; phases: readonly Phase[]; airborne?: boolean; frames?: number; looping?: boolean; forms?: readonly HeroPose[]; bind?: boolean;
-  ground?: "cloth" | "sole"; support?: "L" | "R"; contact?: number;
+  ground?: "cloth" | "sole" | "ledge"; support?: "L" | "R"; contact?: number;
 }
 const REACH: Readonly<Record<End, readonly [string, keyof Gesture, keyof Gesture, string, string]>> = {
   handL: ["Hand Left Ref ", "free", "freeElbow", "Bone_Arm1_L", "Bone_Arm2_L"], handR: ["Hand Right Ref ", "arm", "elbow", "Bone_Arm1_R", "Bone_Arm2_R"],
@@ -75,12 +77,12 @@ function jump(): Authored {
 
 function doubleJump(): Authored {
   return { pose: "doubleJump", frames: 30, airborne: true, phases: [
-    { frame: 0, gesture: FALL },
-    { frame: 3, gesture: { chest: 10, head: -18, arm: -205, elbow: 15, wrist: -60, free: -40, freeElbow: 40, frontHip: 11, frontKnee: 26, frontFoot: 10, backHip: -7, backKnee: 44, backFoot: 10, cloth: -50, clothTip: -20 } },
-    { frame: 8, gesture: { chest: 0, head: -12, arm: -205, elbow: 15, wrist: -60, free: -170, freeElbow: 5, frontHip: 111, frontKnee: -145, frontFoot: 45, backHip: 98, backKnee: -127, backFoot: 45, cloth: 15 } },
-    { frame: 14, gesture: { chest: 6, head: -8, arm: -205, elbow: 15, wrist: -60, free: -135, freeElbow: 15, frontHip: 81, frontKnee: -94, frontFoot: 30, backHip: 73, backKnee: -76, backFoot: 30, cloth: 0 } },
-    { frame: 20, gesture: { chest: 10, head: -5, arm: -205, elbow: 15, wrist: -60, free: -95, freeElbow: 25, frontHip: 61, frontKnee: -66, frontFoot: 20, backHip: 58, backKnee: -54, backFoot: 20, cloth: -20 } },
-    { frame: 30, gesture: FALL },
+    { frame: 0, gesture: { ...FALL, spin: 0 } },
+    { frame: 3, gesture: { spin: 50, chest: 10, head: -18, arm: -205, elbow: 15, wrist: -60, free: -40, freeElbow: 40, frontHip: 11, frontKnee: 26, frontFoot: 10, backHip: -7, backKnee: 44, backFoot: 10, cloth: -50, clothTip: -20 } },
+    { frame: 8, gesture: { spin: 140, chest: 0, head: -12, arm: -205, elbow: 15, wrist: -60, free: -170, freeElbow: 5, frontHip: 111, frontKnee: -145, frontFoot: 45, backHip: 98, backKnee: -127, backFoot: 45, cloth: 15 } },
+    { frame: 14, gesture: { spin: 230, chest: 6, head: -8, arm: -205, elbow: 15, wrist: -60, free: -135, freeElbow: 15, frontHip: 81, frontKnee: -94, frontFoot: 30, backHip: 73, backKnee: -76, backFoot: 30, cloth: 0 } },
+    { frame: 20, gesture: { spin: 300, chest: 10, head: -5, arm: -205, elbow: 15, wrist: -60, free: -95, freeElbow: 25, frontHip: 61, frontKnee: -66, frontFoot: 20, backHip: 58, backKnee: -54, backFoot: 20, cloth: -20 } },
+    { frame: 30, gesture: { ...FALL, spin: 360 } },
   ] };
 }
 
@@ -340,7 +342,26 @@ function captiveAction(pose: HeroPose, code: GrabAction, release: Gesture): Auth
     { frame: move.totalFrames, gesture: code === GrabAction.pummel ? { ...CAPTIVE } : { ...release, head: (release.head ?? 0) - 8 } },
   ] };
 }
+const CROUCH: Gesture = { lean: 56, chest: 0, chestTurn: -30, head: -70, pelvis: -60, arm: -131, elbow: 0, free: -85, freeElbow: -33,
+  frontHip: -15, frontKnee: 64, frontFoot: -27, backHip: 53, backKnee: 100, backFoot: -5 };
+function crouch(): Authored {
+  return { pose: "crouch", frames: 24, ground: "cloth", phases: [
+    { frame: 0, gesture: READY },
+    { frame: 6, gesture: CROUCH },
+    { frame: 24, gesture: CROUCH },
+  ] };
+}
+const HANG: Gesture = { lean: -8, chest: 14, head: -70, arm: -174, elbow: -9, free: -138, freeElbow: 60,
+  frontHip: -41, frontKnee: 0, frontFoot: 4, backHip: 30, backKnee: 4, backFoot: 39, pelvis: -10 };
+function ledgeHang(): Authored {
+  return { pose: "ledgeHang", frames: 60, ground: "ledge", looping: true, phases: [
+    { frame: 0, gesture: HANG },
+    { frame: 30, gesture: { ...HANG, chest: 16, frontKnee: 3, backKnee: 8 } },
+    { frame: 60, gesture: HANG },
+  ] };
+}
 const POSES: Readonly<Record<string, () => Authored>> = {
+  crouch, ledgeHang,
   grab: draped(grab), grabHold: draped(() => held("grabHold")), grabbed: draped(() => held("grabbed")),
   pummel: () => grabAction("pummel", GrabAction.pummel, { ...GRIP, lean: -8, chest: -12, head: -35 }, { ...GRIP, lean: 8, chest: 24, head: 38 }, [68, 72], [72, 72]),
   throwForward: () => grabAction("throwForward", GrabAction.throwForward, { ...GRIP, lean: -10, chest: -14, chestTurn: 24, step: -6 }, { ...GRIP, lean: 20, chest: 22, chestTurn: -18, step: 16, backKnee: 8 }, [38, 65], [112, 80]),
@@ -441,6 +462,22 @@ function settleFeet(index: number, start: number, frames: number) {
     const floor = Math.min(...feet.map(node => worldOf(node)[2]!)) - footRest;
     const key = rootKey(Frame);
     key.Vector = Float32Array.from(key.Vector, (v, i) => i === 2 ? v - floor : v);
+  }
+}
+
+function holdLedge(index: number, start: number, frames: number) {
+  const grips = ["Bone_Hand_L", "Bone_Hand_R"].map(named), scale = characterModelScale(Character.shadowHunter);
+  renderer.setSequence(index); data.frame = start; renderer.update(0);
+  const grip = grips.reduce((best, node) => worldOf(node)[2]! > worldOf(best)[2]! ? node : best);
+  const inverse = mat4.invert(mat4.create(), data.nodes[root.Parent!]!.matrix); ensure(inverse, "root parent transform is singular");
+  const zero = vec3.transformMat4(vec3.create(), vec3.create(), inverse);
+  for (let frame = 0; frame <= frames; frame++) {
+    const Frame = time(start, frame), key = rootKey(Frame);
+    for (let pass = 0; pass < 2; pass++) {
+      data.frame = Frame; renderer.update(0);
+      const at = worldOf(grip), delta = vec3.transformMat4(vec3.create(), vec3.fromValues(LEDGE_HANG_OUTSET / scale - at[0]!, 0, LEDGE_HANG_DEPTH / scale - at[2]!), inverse);
+      key.Vector = Float32Array.from(key.Vector, (value, axis) => value + delta[axis]! - zero[axis]!);
+    }
   }
 }
 
@@ -600,6 +637,7 @@ for (const pose of selected) {
   renderer.setSequence(index);
   aimTip(action, start);
   if (action.ground === "sole") reachAndStand(action, index, start, frames);
+  else if (action.ground === "ledge") holdLedge(index, start, frames);
   else if (action.ground === undefined && !action.airborne) settleFeet(index, start, frames);
   if (paired(pose) && !action.airborne) liftCloth(pose, action, index, start);
   if (paired(pose)) {
@@ -615,7 +653,7 @@ for (const pose of selected) {
       key.Vector = Float32Array.from(key.Vector, (value, axis) => value + inverse[8 + axis]! * Math.max(0, 1 - low));
     }
   }
-  for (const form of [pose, ...action.forms ?? []]) bindings.set(form, { index, seconds: (time(start, frames) - start) / 1000, aligned: true,
+  for (const form of [pose, ...action.forms ?? []]) bindings.set(form, { index, seconds: (time(start, frames) - start) / 1000, ...pose === "crouch" || pose === "ledgeHang" ? {} : { aligned: true },
     ...(action.contact === undefined ? {} : { contact: (time(start, action.contact) - start) / 1000 }) });
   authored.push({ action, index, frames });
 }

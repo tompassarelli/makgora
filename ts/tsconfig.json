@@ -47,6 +47,7 @@
     "test/voice-trace.test.ts",
     "test/aerial-down-specials.test.ts",
     "test/zero-to-death.test.ts",
+    "test/motion-helper.test.ts",
     "test/cpu-advantage.test.ts",
     "test/air-drift.test.ts",
     "test/cpu-field.test.ts",
