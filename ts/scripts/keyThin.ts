@@ -100,9 +100,11 @@ function levers(model: mdx.Model): Map<number, number> {
 }
 
 
-function thinTrack(track: mdx.AnimVector, quaternion: boolean, sequences: readonly mdx.Sequence[], tolerance: number): void {
+export interface ThinnableTrack { readonly track: mdx.AnimVector, readonly quaternion: boolean, readonly tolerance: number }
+
+export function keepMask({ track, quaternion, tolerance }: ThinnableTrack, sequences: readonly mdx.Sequence[]): boolean[] | undefined {
     const keys = track.Keys;
-    if (keys.length < 3) return;
+    if (keys.length < 3) return undefined;
     const keep = keys.map(() => true), ends: number[] = [];
     for (const sequence of sequences) {
         const start = at(sequence.Interval, 0), end = at(sequence.Interval, 1);
@@ -179,19 +181,29 @@ function thinTrack(track: mdx.AnimVector, quaternion: boolean, sequences: readon
         }
         start = end;
     }
-    track.Keys = keys.filter((_, index) => keep[index]);
+    return keep;
 }
 
-function thinned(source: mdx.Model, bound: KeyBound, scale: number): mdx.Model {
-    const model = structuredClone(source), lever = levers(model);
-    const radians = bound.rotationDegrees * Math.PI / 180;
+export function thinnableTracks(model: mdx.Model, bound: KeyBound, scale: number): ThinnableTrack[] {
+    const lever = levers(model), radians = bound.rotationDegrees * Math.PI / 180, tracks: ThinnableTrack[] = [];
     transforms(model, (track, node, channel) => {
         const reach = lever.get(node.ObjectId) ?? 0;
         const tolerance = scale * (channel === 'Translation' ? bound.position
             : channel === 'Rotation' ? Math.min(radians, bound.position / Math.max(reach, 1e-6))
             : bound.position / Math.max(reach, 1));
-        thinTrack(track, channel === 'Rotation', model.Sequences, tolerance);
+        tracks.push({ track, quaternion: channel === 'Rotation', tolerance });
     });
+    return tracks;
+}
+
+export const keyTracks = (model: mdx.Model): mdx.AnimVector[] => { const tracks: mdx.AnimVector[] = []; transforms(model, track => { tracks.push(track); }); return tracks; };
+
+function thinned(source: mdx.Model, bound: KeyBound, scale: number): mdx.Model {
+    const model = structuredClone(source);
+    for (const thinnable of thinnableTracks(model, bound, scale)) {
+        const keep = keepMask(thinnable, model.Sequences);
+        if (keep !== undefined) thinnable.track.Keys = thinnable.track.Keys.filter((_, index) => keep[index]);
+    }
     return model;
 }
 
@@ -275,49 +287,72 @@ export function sequenceErrors(source: mdx.Model, candidate: mdx.Model, indices:
 
 const PARALLEL_POSE_WORK = 2_000_000;
 
-interface PoseChecker { readonly errors: (candidate: mdx.Model) => SequenceError[], readonly close: () => void }
+export const THIN_STATUS = { cursor: 0, masked: 1, failed: 2, finished: 3 } as const;
 
-function workerChecker(source: mdx.Model, workers: number): PoseChecker {
+export interface ThinSetup { readonly source: mdx.Model, readonly bound: KeyBound, readonly indices: readonly number[], readonly workers: number, readonly order: readonly number[], readonly offsets: readonly number[], readonly masks: SharedArrayBuffer, readonly results: SharedArrayBuffer, readonly counts: SharedArrayBuffer, readonly status: SharedArrayBuffer }
+
+type PoseError = { maxPosition: number, maxRotationDegrees: number, samples: number, worst: string };
+
+interface Thinner { readonly attempt: (scale: number) => { readonly error: PoseError, readonly model: () => mdx.Model }, readonly close: () => void }
+
+function workerThinner(source: mdx.Model, bound: KeyBound, workers: number): Thinner {
     const samplesOf = sampleFrames(source), costs = source.Sequences.map(sequence => samplesOf(sequence).length);
     const bins: number[][] = Array.from({ length: workers }, () => []), load = new Array<number>(workers).fill(0);
     for (const index of costs.map((_, index) => index).sort((a, b) => at(costs, b) - at(costs, a) || a - b)) {
         const bin = load.indexOf(Math.min(...load));
         bins[bin]!.push(index); load[bin] = at(load, bin) + at(costs, index);
     }
-    const threads = bins.filter(bin => bin.length > 0).map(indices => {
-        const thread = new Worker(new URL('./poseErrorWorker.ts', import.meta.url).href);
-        thread.postMessage({ source });
-        return { thread, indices };
+    const tracks = keyTracks(source), offsets: number[] = [];
+    let total = 0;
+    for (const track of tracks) { offsets.push(total); total += track.Keys.length; }
+    const order = tracks.map((_, index) => index).sort((a, b) => tracks[b]!.Keys.length - tracks[a]!.Keys.length || a - b);
+    const masks = new SharedArrayBuffer(Math.max(total, 1)), results = new SharedArrayBuffer(source.Sequences.length * 3 * 8), counts = new SharedArrayBuffer(source.Sequences.length * 2 * 4), status = new SharedArrayBuffer(4 * 4);
+    const progress = new Int32Array(status), used = bins.filter(bin => bin.length > 0);
+    const threads = used.map(indices => {
+        const thread = new Worker(new URL('./keyThinWorker.ts', import.meta.url).href);
+        thread.postMessage({ source, bound, indices, workers: used.length, order, offsets, masks, results, counts, status } satisfies ThinSetup);
+        return thread;
     });
     return {
-        errors: candidate => {
-            const results = new SharedArrayBuffer(source.Sequences.length * 3 * 8), counts = new SharedArrayBuffer(source.Sequences.length * 2 * 4), status = new SharedArrayBuffer(8), done = new Int32Array(status);
-            for (const { thread, indices } of threads) thread.postMessage({ candidate, indices, results, counts, status });
-            while (Atomics.load(done, 0) + Atomics.load(done, 1) < threads.length) Atomics.wait(done, 0, Atomics.load(done, 0), 1000);
-            if (Atomics.load(done, 1) > 0) throw new Error('A pose error worker failed');
-            const values = new Float64Array(results), integers = new Int32Array(counts);
-            return source.Sequences.map((_, index) => ({ maxPosition: at(values, index * 3), maxRotationDegrees: at(values, index * 3 + 1), worstFrame: at(values, index * 3 + 2), samples: at(integers, index * 2), worstNode: at(integers, index * 2 + 1) }));
+        attempt: scale => {
+            progress.fill(0);
+            for (const thread of threads) thread.postMessage({ scale });
+            while (Atomics.load(progress, THIN_STATUS.finished) < threads.length) Atomics.wait(progress, THIN_STATUS.finished, Atomics.load(progress, THIN_STATUS.finished), 1000);
+            if (Atomics.load(progress, THIN_STATUS.failed) > 0) throw new Error('A key thinning worker failed');
+            const values = new Float64Array(results), integers = new Int32Array(counts), view = new Uint8Array(masks);
+            const errors = source.Sequences.map((_, index) => ({ maxPosition: at(values, index * 3), maxRotationDegrees: at(values, index * 3 + 1), worstFrame: at(values, index * 3 + 2), samples: at(integers, index * 2), worstNode: at(integers, index * 2 + 1) }));
+            return {
+                error: poseError(source, errors),
+                model: () => {
+                    const model = structuredClone(source);
+                    keyTracks(model).forEach((track, index) => {
+                        if (track.Keys.length >= 3) track.Keys = track.Keys.filter((_, key) => view[at(offsets, index) + key] === 1);
+                    });
+                    return model;
+                },
+            };
         },
-        close: () => { for (const { thread } of threads) thread.terminate(); },
+        close: () => { for (const thread of threads) thread.terminate(); },
     };
 }
 
-function poseChecker(source: mdx.Model): PoseChecker {
+function thinner(source: mdx.Model, bound: KeyBound): Thinner {
     const nodes = source.Nodes.filter(node => node != null), samplesOf = sampleFrames(source);
     const work = source.Sequences.reduce((sum, sequence) => sum + samplesOf(sequence).length, 0) * nodes.length;
     const workers = Math.min(4, navigator.hardwareConcurrency, source.Sequences.length);
-    if (work >= PARALLEL_POSE_WORK && workers > 1) return workerChecker(source, workers);
-    return { errors: candidate => sequenceErrors(source, candidate, source.Sequences.map((_, index) => index)), close: () => {} };
+    if (work >= PARALLEL_POSE_WORK && workers > 1) return workerThinner(source, bound, workers);
+    const all = source.Sequences.map((_, index) => index);
+    return {
+        attempt: scale => {
+            const model = thinned(source, bound, scale);
+            return { error: poseError(source, sequenceErrors(source, model, all)), model: () => model };
+        },
+        close: () => {},
+    };
 }
 
-export function poseError(source: mdx.Model, candidate: mdx.Model, checker?: PoseChecker): { maxPosition: number, maxRotationDegrees: number, samples: number, worst: string } {
-    const nodes = source.Nodes.filter(node => node != null), own = checker ?? poseChecker(source);
-    let errors: SequenceError[];
-    try {
-        errors = own.errors(candidate);
-    } finally {
-        if (checker === undefined) own.close();
-    }
+function poseError(source: mdx.Model, errors: readonly SequenceError[]): PoseError {
+    const nodes = source.Nodes.filter(node => node != null);
     let maxPosition = 0, maxRotationDegrees = 0, samples = 0, worst = '';
     errors.forEach((error, index) => {
         if (error.maxPosition > maxPosition) worst = `${source.Sequences[index]!.Name} @${error.worstFrame} node ${nodes[error.worstNode]!.Name}`;
@@ -390,15 +425,16 @@ export function slopeTangents(source: mdx.Model): mdx.Model {
 }
 
 export function thinKeys(original: mdx.Model, bound: KeyBound = KEY_BOUND): { model: mdx.Model, report: KeyThinReport } {
-    const source = slopeTangents(original), checker = poseChecker(source);
+    const source = slopeTangents(original), thin = thinner(source, bound);
     try {
         for (let scale = 0.5; scale > 0.01; scale *= 0.6) {
-            const model = thinned(source, bound, scale), error = poseError(source, model, checker);
-            if (error.maxPosition <= bound.position && error.maxRotationDegrees <= bound.rotationDegrees)
-                return { model, report: { keysBefore: keyCount(source), keysAfter: keyCount(model), ...error } };
+            const { error, model: accepted } = thin.attempt(scale);
+            if (error.maxPosition > bound.position || error.maxRotationDegrees > bound.rotationDegrees) continue;
+            const model = accepted();
+            return { model, report: { keysBefore: keyCount(source), keysAfter: keyCount(model), ...error } };
         }
     } finally {
-        checker.close();
+        thin.close();
     }
     return { model: structuredClone(source), report: { keysBefore: keyCount(source), keysAfter: keyCount(source), maxPosition: 0, maxRotationDegrees: 0, samples: 0, worst: '' } };
 }
