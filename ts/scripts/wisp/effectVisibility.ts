@@ -306,6 +306,30 @@ export function effectUses(): EffectUse[] {
 
 export interface EffectFinding extends EffectUse, EffectVerdict {}
 
+/** One reference use the check must judge as reported: flagged for its diagnosed cause when Tom's playtest saw nothing, visible when a capture showed it drawing. */
+export interface CalibrationCase { readonly expect: "flagged" | "visible"; readonly cause?: string; readonly evidence: string; readonly use: EffectUse }
+const CRUSHING_WAVE: EffectUse = { fighter: "cairne-bloodhoof", move: "neutral-special Shockwave projectile", kind: "projectile", model: "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveMissile.mdx", travels: true, anchored: "projectile", scale: Math.fround(0.3), lifetime: 38 / 60, anchor: "projectile", width: 0.75, height: 2, sequence: "stand", seconds: 0, timeScale: 1 };
+export const EFFECT_CALIBRATION: readonly CalibrationCase[] = [
+  { expect: "flagged", cause: "#365", evidence: "Tom saw no Breath of Fire flame in the 0.0.145 Classic playtest (c39ada1e5: 11 emitter births, none lingering)", use: cueUse("chen-stormstout", "neutral-special Breath of Fire active (0.0.145)", "special cue", { model: "Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireMissile.mdx", anchor: "breath", scale: Math.fround(0.4), sequence: "birth", seconds: 0, birth: { eachFrame: true, strike: 0, voices: 11 } }) },
+  { expect: "flagged", cause: "#484", evidence: "Tom saw nothing launch from Cairne's Shockwave in the 0.0.145 Classic playtest (e56c745be^: the travelling wave held at 0.2 s, time scale 0)", use: { ...CRUSHING_WAVE, move: "neutral-special Shockwave projectile (0.0.145)", seconds: Math.fround(0.2), timeScale: 0 } },
+  { expect: "visible", evidence: "#484: after e56c745be the Classic strip draws the wave on 37 of 37 live frames", use: CRUSHING_WAVE },
+  { expect: "visible", evidence: "native Classic 3.0.0.24268 capture effects-native-20261016 blademaster-cues frame 262", use: cueUse("blademaster", "neutral-special Wind Cutter startup", "special cue", { model: "Abilities\\Spells\\Other\\Tornado\\TornadoElementalSmall.mdx", anchor: "body", scale: Math.fround(0.4), sequence: "stand", seconds: Math.fround(0.2) }) },
+  { expect: "visible", evidence: "native Classic 3.0.0.24268 capture effects-native-20261016 blademaster-cues frame 278", use: { fighter: "blademaster", move: "neutral-special Wind Cutter projectile", kind: "projectile", model: "Abilities\\Weapons\\WingedSerpentMissile\\WingedSerpentMissile.mdx", travels: true, anchored: "projectile", scale: 1, lifetime: 0.4, anchor: "projectile", sequence: "stand", seconds: 0, timeScale: 1 } },
+  { expect: "visible", evidence: "native Classic 3.0.0.24268 capture effects-native-20261016 blademaster-cues frame 362", use: cueUse("blademaster", "down-special Mirror Image startup", "special cue", { model: "Abilities\\Spells\\Orc\\MirrorImage\\MirrorImageCaster.mdx", anchor: "body", scale: 1, sequence: "birth", seconds: Math.fround(0.2) }) },
+  { expect: "visible", evidence: "native Classic 3.0.0.24268 capture effects-native-20261016 blademaster-cues frames 452, 457 and 682", use: cueUse("blademaster", "up-special Rising Whirlwind active", "special cue", { model: "Abilities\\Spells\\NightElf\\Cyclone\\CycloneTarget.mdx", anchor: "body", scale: Math.fround(0.6), sequence: "stand", seconds: Math.fround(0.2) }) },
+];
+
+/** Refuses a judge that passes a reported-invisible reference, flags it for another cause, or flags a captured-visible one. */
+export function calibrationProblem(judged: readonly EffectFinding[]): string | undefined {
+  const missed = EFFECT_CALIBRATION.flatMap((reference, index) => {
+    const finding = judged[index];
+    return finding !== undefined && (finding.status === "visible") === (reference.expect === "visible") && finding.reason.includes(reference.cause ?? "") ? [] : [`${reference.use.fighter}/${reference.use.move} should be ${reference.expect}${reference.cause === undefined ? "" : ` for its cause ${reference.cause}`} (${reference.evidence}) but is ${finding?.status ?? "unjudged"}: ${finding?.reason ?? ""}`];
+  });
+  return missed.length === 0 ? undefined : `Classic effect check is uncalibrated: ${missed.join("; ")}`;
+}
+
+export const CALIBRATION_SUMMARY = `Classic calibration holds: flags ${EFFECT_CALIBRATION.filter(({ expect }) => expect === "flagged").map(({ use }) => `${use.fighter}/${use.move}`).join(" and ")}; passes ${EFFECT_CALIBRATION.filter(({ expect }) => expect === "visible").length} known-visible uses`;
+
 /** Reads each model and its textures once and extracts the judge's facts; null marks a model missing from the cache or unparseable. */
 export async function readModelFacts(read: (path: string) => Promise<Uint8Array | undefined>, models: readonly string[], reads = new Map<string, readonly string[]>()): Promise<Map<string, ModelFacts | null>> {
   const facts = new Map<string, ModelFacts | null>();
@@ -398,13 +422,14 @@ export const readEffectReport = Effect.fnUntraced(function*(root: string) {
   const reads = new Map<string, readonly string[]>();
   const uses = effectUses();
   const facts = yield* Effect.tryPromise({
-    try: () => readModelFacts(async (path) => { const bytes = await input(path); if (bytes !== undefined) hashes.set(path, createHash("sha256").update(bytes).digest("hex")); return bytes; }, uses.map(({ model }) => model), reads),
+    try: () => readModelFacts(async (path) => { const bytes = await input(path); if (bytes !== undefined) hashes.set(path, createHash("sha256").update(bytes).digest("hex")); return bytes; }, [...uses, ...EFFECT_CALIBRATION.map(({ use }) => use)].map(({ model }) => model), reads),
     catch: (cause) => new EffectCheckFailure({ problem: `Classic effect check: ${String(cause)}` }),
   });
   const findings = uses.map((use) => judgeUse(use, facts.get(use.model) ?? null));
+  const calibration = EFFECT_CALIBRATION.map(({ use }) => judgeUse(use, facts.get(use.model) ?? null));
   const provenance = createHash("sha256").update(info).update(JSON.stringify([...hashes].sort(([a], [b]) => a.localeCompare(b)))).digest("hex");
   const models = new Map([...reads].map(([model, paths]) => [model, createHash("sha256").update(JSON.stringify(paths.map((path) => [path, hashes.get(path) ?? ""]))).digest("hex")]));
-  return { cacheInfo: createHash("sha256").update(info).digest("hex"), provenance, cache: root, inputs: [...hashes], models, facts, findings };
+  return { cacheInfo: createHash("sha256").update(info).digest("hex"), provenance, cache: root, inputs: [...hashes], models, facts, findings, calibration };
 });
 
 if (import.meta.main) BunRuntime.runMain(Effect.gen(function*() {
@@ -415,5 +440,8 @@ if (import.meta.main) BunRuntime.runMain(Effect.gen(function*() {
   if (process.argv.includes("--json")) yield* Console.log(JSON.stringify(report, null, 2));
   else for (const finding of flagged) yield* Console.log(`${finding.fighter}\t${finding.move}\t${finding.status}\t${finding.model}\t${finding.reason}`);
   yield* Console.error(`${flagged.length} invisible/Unknown of ${report.findings.length} Classic effect uses (${new Set(report.findings.map(({ model }) => model)).size} models); MODEL-DATA visibility only`);
+  const uncalibrated = calibrationProblem(report.calibration);
+  if (uncalibrated !== undefined) return yield* new EffectCheckFailure({ problem: uncalibrated });
+  yield* Console.error(CALIBRATION_SUMMARY);
   if (report.findings.some(({ status }) => status === "invisible") && process.argv.includes("--strict")) return yield* new EffectCheckFailure({ problem: "invisible Classic effects refuse the gate; Unknown uses remain report debt" });
 }));

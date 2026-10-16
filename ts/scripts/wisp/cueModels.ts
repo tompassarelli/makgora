@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { effectUses, judgeUse, modelFactsKey, FACTS_VERSION, type EffectUse, type EffectFinding, type ModelFacts } from "./effectVisibility";
+import { effectUses, judgeUse, modelFactsKey, calibrationProblem, EFFECT_CALIBRATION, FACTS_VERSION, type EffectUse, type EffectFinding, type ModelFacts } from "./effectVisibility";
 import { fighterCueList, MISSING_CUE_MODEL } from "../../src/game/presentation/specialCues";
 import { allAttackCueModels } from "../../src/game/presentation/attackCues";
 import { DEFINITIVE_ACCENT_REDRAWS, DISJOINT_CUES } from "../../src/game/presentation/disjointCues";
@@ -94,4 +94,9 @@ export function effectRecordProblem(text: string, uses: readonly EffectUse[] = e
 export function effectRecordUnknowns(text: string, uses: readonly EffectUse[] = effectUses()): string[] {
   const judged = effectFindings(text, uses);
   return "problem" in judged ? [] : judged.findings.filter(({ status }) => status === "unknown").map((use) => `${use.fighter}\t${use.move}\tUnknown\t${use.model}\t${use.reason}`);
+}
+
+export function effectCalibrationProblem(text: string): string | undefined {
+  const judged = effectFindings(text, EFFECT_CALIBRATION.map(({ use }) => use));
+  return "problem" in judged ? judged.problem : calibrationProblem(judged.findings);
 }

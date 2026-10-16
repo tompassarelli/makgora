@@ -1,8 +1,8 @@
 import { join } from "node:path";
 import { Console, Effect } from "effect";
 import { BunRuntime } from "@effect/platform-bun";
-import { EffectCheckFailure, readEffectReport } from "./wisp/effectVisibility";
-import { CUE_MODEL_RECORD, cueModels, formatRecord, listedRedraws, parseRecord, recordProblem, redrawCandidates, formatEffectRecord, effectRecordProblem, effectRecordUnknowns, effectFindings } from "./wisp/cueModels";
+import { EffectCheckFailure, readEffectReport, CALIBRATION_SUMMARY, EFFECT_CALIBRATION } from "./wisp/effectVisibility";
+import { CUE_MODEL_RECORD, cueModels, formatRecord, listedRedraws, parseRecord, recordProblem, redrawCandidates, formatEffectRecord, effectRecordProblem, effectRecordUnknowns, effectFindings, effectCalibrationProblem } from "./wisp/cueModels";
 import { readScreenCaptures } from "./classicEffectScreen";
 import { screenReport, screenAcceptanceProblem } from "./wisp/classicEffectScreen";
 
@@ -23,11 +23,14 @@ BunRuntime.runMain(Effect.gen(function*() {
   if (process.argv.includes("--verdicts")) {
     const judged = effectFindings(text);
     for (const finding of "findings" in judged ? judged.findings : []) yield* Console.log(`${finding.fighter}\t${finding.move}\t${finding.model}\t${finding.status}\t${finding.reason.replace(/[\t\r\n]/g, " ")}`);
+    const calibration = effectFindings(text, EFFECT_CALIBRATION.map(({ use }) => use));
+    for (const [index, finding] of ("findings" in calibration ? calibration.findings : []).entries()) yield* Console.log(`calibration ${EFFECT_CALIBRATION[index]?.expect ?? ""}\t${finding.fighter}\t${finding.move}\t${finding.model}\t${finding.status}\t${finding.reason}`);
   }
-  const problem = recordProblem(models, candidates, listedRedraws(), parseRecord(text)) ?? effectRecordProblem(text);
+  const problem = recordProblem(models, candidates, listedRedraws(), parseRecord(text)) ?? effectRecordProblem(text) ?? effectCalibrationProblem(text);
   if (problem !== undefined) return yield* new EffectCheckFailure({ problem });
   const unknowns = effectRecordUnknowns(text);
   for (const finding of unknowns) yield* Console.log(finding);
+  yield* Console.log(CALIBRATION_SUMMARY);
   yield* Console.log(`cue models: ${models.length} cue models and ${candidates.length} accents or projectiles recorded in both looks; Classic effect report has ${unknowns.length} Unknown uses awaiting calibration; no missing/invisible uses; MODEL-DATA visibility only`);
   const screenAt = process.argv.indexOf("--screen-captures"), captures = screenAt < 0 ? undefined : process.argv[screenAt + 1];
   if (screenAt >= 0 && captures === undefined) return yield* new EffectCheckFailure({ problem: "--screen-captures needs the native capture pack JSON" });
