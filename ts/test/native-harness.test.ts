@@ -7,6 +7,7 @@ import { Effect } from "effect";
 import { CURRENT_CANDIDATE, MAP_PROFILES } from "../scripts/wisp/acceptChecks";
 import { poolUnitCommand, poolUnitName, pairNeedsRestart } from "../scripts/wisp/commands/lanPoolUnit";
 import { smashcraftDoctor } from "../scripts/wisp/doctor";
+import { ACCEPT_IN_UNIT, acceptUnitCommand, inAcceptUnit } from "../scripts/wisp/commands/acceptUnit";
 import { gameFilesLayer } from "../scripts/wisp/project";
 import { NativeClientInvalid, NativeToolMissing, repairPackager, resolveTools, unresolvedLibraries, validateClients, withRuntimeTools } from "../scripts/wisp/nativeTools";
 
@@ -86,4 +87,14 @@ test("installing a map into a fresh Documents folder creates Maps/00-Smashcraft/
   writeFileSync(map, "map");
   await Effect.runPromise(GameFiles.use((files) => files.installMap(documents, map)).pipe(Effect.provide(gameFilesLayer)));
   expect(existsSync(join(documents, "Maps/00-Smashcraft/tests/candidate.w3x"))).toBe(true);
+});
+
+test("a native accept runs as a user service once, and a dry run or the service itself runs in place [k2 property]", () => {
+  const command = acceptUnitCommand(["--only", "gate-moves", "--pair", "0"], "/bin", 7);
+  expect(command.slice(0, 3)).toEqual(["systemd-run", "--user", "--wait"]);
+  expect(command).toContain(`--setenv=${ACCEPT_IN_UNIT}=1`);
+  expect(command.slice(command.indexOf("accept"))).toEqual(["accept", "--only", "gate-moves", "--pair", "0"]);
+  expect(inAcceptUnit(["--pair", "0"], {})).toBe(true);
+  expect(inAcceptUnit(["--pair", "0"], { [ACCEPT_IN_UNIT]: "1" })).toBe(false);
+  expect(inAcceptUnit(["--dry-run"], {})).toBe(false);
 });

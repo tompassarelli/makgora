@@ -35,6 +35,7 @@ import { freshMatch, readyAfter, sendDevCommand } from "./fresh";
 import { profileOptions } from "./map";
 import { checkClients, onHealthyClients, readClientsFile, smashcraftWatch } from "../doctor";
 import { restartDroppedPair } from "./lanPoolUnit";
+import { withAcceptUnit } from "./acceptUnit";
 import { LAN_POOL_FILE, lanPairs, withTools } from "../padBatch";
 import { runProcess } from "../../hostProcess";
 import { platformLayer } from "wisp/scripts/platform/layer";
@@ -270,7 +271,7 @@ const usableClients = (args: readonly string[], tools: Readonly<Record<string, s
   return selected;
 });
 
-export const accept: Command = (rawArgs) => Effect.gen(function*() {
+const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
   const { clientsFile, args } = yield* Effect.try({ try: () => clientArguments(rawArgs), catch: (cause) => cause instanceof UsageFailure ? cause : new UsageFailure({ problem: String(cause) }) });
   const solo = args.includes("--solo");
   const dryRun = args.includes("--dry-run");
@@ -381,3 +382,5 @@ export const accept: Command = (rawArgs) => Effect.gen(function*() {
     Effect.onExit(() => bindCandidateReport(directory, candidate, selectedClients, identity, since)),
   ));
 });
+
+export const accept: Command = withAcceptUnit(acceptHere);
