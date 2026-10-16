@@ -41,6 +41,7 @@
     "scripts/**/*.ts",
     "codegen/**/*.ts",
     "plugins/**/*.ts",
+    "test/menu-journey.test.ts",
     "test/advantage-state.test.ts",
     "test/voice-trace.test.ts",
     "test/aerial-down-specials.test.ts",
