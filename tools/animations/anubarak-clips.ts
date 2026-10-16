@@ -33,7 +33,7 @@ if (source.Sequences.length > 17) {
 const model = structuredClone(source);
 ensure(source.Sequences.length === 17 && source.Helpers.some(b => b.Name === "Bone_ArmClawR"), "Expected original classic Crypt Lord");
 const stand = source.Sequences[0]!;
-interface Gesture { chest?: number; pelvis?: number; arm?: number; elbow?: number; hand?: number; leftArm?: number; leftElbow?: number; head?: number; thigh?: number; knee?: number; leftThigh?: number; yaw?: number; lean?: number; }
+interface Gesture { chest?: number; pelvis?: number; arm?: number; elbow?: number; wrist?: number; hand?: number; leftArm?: number; leftElbow?: number; leftWrist?: number; head?: number; thigh?: number; knee?: number; leftThigh?: number; yaw?: number; lean?: number; }
 interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; hold?: boolean; air?: boolean; roll?: number; target?: readonly [number, number]; paired?: boolean; pain?: boolean; }
 const forward: Gesture = { chest: 15, pelvis: -8, arm: -95, elbow: 15, leftArm: -35, leftElbow: -20, head: -8, thigh: 12, leftThigh: -8 };
 const overhead: Gesture = { chest: -18, pelvis: 8, arm: -165, elbow: -10, leftArm: -140, head: -18, thigh: -12, leftThigh: 15 };
@@ -68,15 +68,15 @@ const lunges: Partial<Record<HeroPose, Lunge>> = {
   downSpecial: { contact: 21, x: 26, back: 30, over: 0.4, ramp: 4 },
   ultimate: { contact: 16, x: 32, back: 16 },
 };
-interface Rake { contact: number; through: number; windup: Gesture; strike: Gesture; follow: Gesture; }
+interface Rake { contact: number; through: number; windup: Gesture; strike: Gesture; follow: Gesture; carry?: { frame: number; gesture: Gesture }; }
 const scythe = (chest: number, lean: number): Omit<Rake, "contact" | "through"> => ({
   windup: { chest: -22, pelvis: -15, lean: -12, arm: -190, elbow: 20, leftArm: -150 },
   strike: { chest, pelvis: 22, lean, arm: -100, elbow: 20, leftArm: -100 },
   follow: { chest: chest + 18, pelvis: 32, lean: lean + 6, arm: 100, elbow: 20, leftArm: 60 },
 });
 const rakes: Partial<Record<HeroPose, Rake>> = {
-  jab2: { contact: 7, through: 9, windup: { chest: -22, pelvis: -14, lean: -12, leftArm: -185, leftElbow: 20, arm: -65 }, strike: { chest: 30, pelvis: 22, lean: 14, leftArm: -100, leftElbow: 20, arm: -80 }, follow: { chest: 45, pelvis: 32, lean: 20, leftArm: 100, leftElbow: 20, arm: -95 } },
-  forwardSmash: { contact: 19, through: 22, ...scythe(35, 16) },
+  jab2: { contact: 7, through: 9, windup: { chest: -20, pelvis: -12, lean: -10, leftArm: -210, leftElbow: 70, leftWrist: 40, arm: -65, head: -15 }, strike: { chest: 25, pelvis: 15, lean: 10, leftArm: -230, leftElbow: 120, leftWrist: 40, arm: -80, head: 15 }, follow: { chest: 45, pelvis: 28, lean: 16, leftArm: -90, leftElbow: 110, leftWrist: 55, arm: -95, head: 15 }, carry: { frame: 15, gesture: { chest: 45, pelvis: 28, lean: 12, leftArm: 0, leftElbow: 0, leftWrist: 30, arm: -95, head: 10 } } },
+  forwardSmash: { contact: 19, through: 22, windup: { chest: -28, pelvis: -15, lean: -14, arm: -210, elbow: 70, wrist: 40, leftArm: -170, leftElbow: 50, head: -25 }, strike: { chest: 30, pelvis: 15, lean: 10, arm: -230, elbow: 120, wrist: 40, head: 15, leftArm: -150, leftElbow: 70 }, follow: { chest: 50, pelvis: 30, lean: 18, arm: -90, elbow: 110, wrist: 55, head: 15, leftArm: -120, leftElbow: 60 }, carry: { frame: 34, gesture: { chest: 50, pelvis: 30, lean: 12, arm: 0, elbow: 0, wrist: 30, head: 10, leftArm: -90, leftElbow: 50 } } },
   downSmash: { contact: 15, through: 20, windup: { chest: -20, pelvis: -15, lean: -12, arm: -185, elbow: 20, leftArm: 80 }, strike: { chest: 32, pelvis: 25, lean: 15, arm: -100, elbow: 20, leftArm: 0 }, follow: { chest: 50, pelvis: 35, lean: 20, arm: 100, elbow: 20, leftArm: -200 } },
   forwardAir: { contact: 12, through: 15, windup: { chest: -22, pelvis: -14, lean: -12, arm: -190, elbow: 20, leftArm: -80, thigh: 25, leftThigh: -25 }, strike: { chest: 30, pelvis: 24, lean: 14, arm: -100, elbow: 20, leftArm: -100, thigh: -20, leftThigh: 20 }, follow: { chest: 48, pelvis: 32, lean: 20, arm: 100, elbow: 20, leftArm: -120, thigh: -35, leftThigh: 35 } },
   backAir: { contact: 10, through: 13, windup: { chest: 22, pelvis: 15, lean: 12, arm: 190, elbow: 20, leftArm: 70 }, strike: { chest: -28, pelvis: -20, lean: -15, arm: 100, elbow: 20, leftArm: 100 }, follow: { chest: -45, pelvis: -30, lean: -20, arm: -100, elbow: 20, leftArm: -100 } },
@@ -194,9 +194,11 @@ function joint(name: string, g: Gesture): [number, number] {
   if (name === "Bone_Pelvis") return [g.pelvis ?? 0, 0];
   if (name === "Bone_Arm1R") return [(g.arm ?? 0) * 0.65, 0];
   if (name === "Bone_Arm2R") return [g.elbow ?? 0, 0];
+  if (name === "Bone_Arm3R") return [g.wrist ?? 0, 0];
   if (name === "Bone_ArmClawR") return [g.hand ?? 0, 0];
   if (name === "Bone_Arm1L") return [(g.leftArm ?? 0) * 0.65, 0];
   if (name === "Bone_Arm2L") return [g.leftElbow ?? 0, 0];
+  if (name === "Bone_Arm3L") return [g.leftWrist ?? 0, 0];
   if (name === "Bone_Head") return [g.head ?? 0, 0];
   if (name === "Bone_LFLeg09") return [g.thigh ?? 0, 0];
   if (name === "Bone_LFLeg13") return [g.leftThigh ?? 0, 0];
@@ -268,13 +270,14 @@ for (const [ordinal, action] of authoredActions.entries()) {
         }
       }
       if (node && rake) {
-        const poses = [rake.windup, rake.strike, rake.follow].map(g => { const [y, z] = joint(node.Name, g); return rotated(first.Vector, y, z); });
-        const cocked = Math.max(1, rake.contact - 3), released = Math.min(action.frames - 1, rake.through + 2);
+        const poses = [rake.windup, rake.strike, rake.follow, rake.carry?.gesture ?? rake.follow].map(g => { const [y, z] = joint(node.Name, g); return rotated(first.Vector, y, z); });
+        const cocked = Math.max(1, rake.contact - 3), carried = rake.carry?.frame ?? rake.through, released = Math.min(action.frames - 1, rake.carry ? carried : rake.through + 2);
         Vector = frame <= cocked ? blend(first.Vector, poses[0]!, frame / cocked)
           : frame <= rake.contact ? blend(poses[0]!, poses[1]!, (frame - cocked) / (rake.contact - cocked))
           : frame <= rake.through ? blend(poses[1]!, poses[2]!, (frame - rake.contact) / (rake.through - rake.contact))
-          : frame <= released ? poses[2]!.slice()
-          : blend(poses[2]!, first.Vector, Math.min(1, (frame - released) / (settled - released)));
+          : frame <= carried ? blend(poses[2]!, poses[3]!, (frame - rake.through) / (carried - rake.through))
+          : frame <= released ? poses[3]!.slice()
+          : blend(poses[3]!, first.Vector, Math.min(1, (frame - released) / (settled - released)));
       } else if (node && action.pose !== "sideSpecial") { let [y, z] = joint(node.Name, action.gesture); y = node.Name === "Bone_Root" && action.roll ? frame / action.frames * 360 * action.roll : y * amount(frame);
         if (node.Name === "Bone_Root" && (action.pose === "getUp" || action.pose === "getUpAttack" || action.pose.startsWith("getUpRoll"))) y += 85 * Math.max(0, 1 - frame / action.contact);
         z *= amount(frame); Vector = rotated(first.Vector, y, z); }

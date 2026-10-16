@@ -2015,12 +2015,12 @@ Original provisional values; F/A/R counts start at simulation frame zero. Volume
 
 | Input and move | F/A/R; landing | Damage | Gesture and purpose |
 |---|---|---:|---|
-| Jab — Royal Rebuke | 6/3/17 | 4 | Coiled lunge with a crossing right-claw rake; another tap scythes the left claw overhead and through (8/3/20, 6%) |
+| Jab — Royal Rebuke | 6/3/17 | 4 | Coiled lunge with a crossing right-claw rake; another tap hooks the left claw down over the target and rakes it under the shell (8/3/20, 6%) |
 | Forward tilt — Mandible Spear | 10/4/24 | 11 | Rearing pounce that rakes the pincers wide and low in front; angled forms chop overhead or rake ankles |
 | Up tilt — Crown Lift | 9/5/23 | 10 | Horn lifts prey into a juggle, narrow near the ground |
 | Down tilt — Grave Rake | 8/4/20 | 8 | Low claw scrape launches a tech chase |
 | Dash attack — King’s Advance | 12/5/28 | 12 | Coiled spring into a wide, low claw sweep |
-| Forward smash — Execution Tusk | 20/4/34 | 20 | Both claws reared overhead scythe down and through in front, with exposed recovery |
+| Forward smash — Execution Tusk | 20/4/34 | 20 | Claws reared overhead; one hooks down over the target, rakes to the floor and drags back under the shell, with exposed recovery |
 | Up smash — Crown of Spines | 17/5/31 | 18 | Raise both pincers above the shell |
 | Down smash — Crypt Sweep | 16/6/32 | 16 | Front sweep then rear sweep; one hit per target |
 | Neutral air — Carapace Wheel | 10/7/24; L18 | 10 | Broad shell twist clears nearby bodies |
