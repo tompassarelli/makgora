@@ -9,8 +9,7 @@ import { thinKeys } from '../../ts/scripts/keyThin';
 import { authoredMotion, fighterBodies, playedMoves } from './hd-models';
 import { FIGHTER_RIGS } from './hd-rigs';
 import { modelFacts } from '../../ts/node_modules/wisp/scripts/wisp/models';
-import { MODEL_FACTS } from '../../ts/scripts/wisp/modelFacts';
-import { writeModelFacts } from '../../ts/scripts/wisp/modelFactsTable';
+import { replaceModelFacts, writeGenerated } from '../../ts/scripts/wisp/modelFactsTable';
 import { DrawnModel } from '../../ts/scripts/wisp/hurtboxView';
 import { headlessRender } from '../../ts/scripts/wisp/headlessRender';
 import { fighterSlug } from '../../ts/src/game/sim/heroes/registry';
@@ -91,9 +90,7 @@ await Effect.runPromise(Effect.tryPromise({ try: async () => {
     const prefix = `modelPath: ${JSON.stringify(`war3mapImported\\${fighter.name}`).slice(0, -1)}`;
     metadata = metadata.split('\n').map(line => line.includes(`${prefix}OriginalClip`) || line.includes(`${prefix}TimelineBody`)
         ? line.replace(/modelPath: \"[^\"]+\"/, `modelPath: ${JSON.stringify(modelPath)}`).replace(/looping: (true|false)(?:, timeline: true)? \},$/, 'looping: $1, timeline: true },') : line).join('\n');
-    await Bun.write(metadataPath, metadata);
-    const facts = Object.fromEntries(Object.entries(MODEL_FACTS).filter(([path]) => !path.startsWith(`war3mapImported\\${fighter.name}OriginalClip`) && !path.startsWith(`war3mapImported\\${fighter.name}TimelineBody`)));
-    facts[`war3mapImported\\${filename}`] = modelFacts(new Uint8Array(bytes));
-    writeModelFacts(facts);
+    writeGenerated(metadataPath, metadata);
+    replaceModelFacts([`war3mapImported\\${fighter.name}OriginalClip`, `war3mapImported\\${fighter.name}TimelineBody`], { [`war3mapImported\\${filename}`]: modelFacts(new Uint8Array(bytes)) });
     console.log(`${fighter.name}: ${played.length}/${record.clips.length} played clips → one timeline; ${oldBytes} → ${record.bytes} raw bytes (${oldBytes - record.bytes} saved); ${bodies.definitive === undefined ? 'Classic body in both looks' : 'Definitive body under the same path in _de.w3mod'}.`);
 }, catch: cause => new Error('Timeline export failed', { cause }) }));

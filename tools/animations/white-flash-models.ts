@@ -11,9 +11,8 @@ import { IMPORTED_MODEL_FILES } from "../../ts/src/game/assets/importedModelInfo
 import { renumberNodes } from "../../ts/scripts/clipNodes";
 import { flashableSequences, preservesFlashKey, trimFlashTracks } from "./white-flash-keys";
 import { groundPlaneGeosets, removeGeosets } from "../../ts/scripts/groundPlanes";
-import { MODEL_FACTS } from "../../ts/scripts/wisp/modelFacts";
 import { whiteModelFactsTable } from "../../ts/scripts/wisp/whiteModelFactsTable";
-import { writeModelFacts } from "../../ts/scripts/wisp/modelFactsTable";
+import { readModelFacts, replaceModelFacts, writeGenerated, writeModelFacts } from "../../ts/scripts/wisp/modelFactsTable";
 import { WHITE_FIGHTER_MODELS } from "../../ts/src/generated/assets/whiteFighterModels";
 import { WHITE_MODEL_FACTS } from "../../ts/src/generated/assets/whiteModelFacts";
 import { thinKeys } from "../../ts/scripts/keyThin";
@@ -234,10 +233,11 @@ pruneWhiteTextures(output);
 for (const character of fighters.keys()) {
   if (selected !== undefined && character !== selected) continue;
   const path = paths[character]!, key = path.replaceAll("\\", "/").toLowerCase();
-  await Bun.write(join(WHITE_MODELS, `${fighterSlug(character)}.ts`), whiteModelFile(path));
-  await Bun.write(join(WHITE_FACTS, `${fighterSlug(character)}.ts`), whiteFactsFile({ [key]: facts[key]! }));
+  writeGenerated(join(WHITE_MODELS, `${fighterSlug(character)}.ts`), whiteModelFile(path));
+  writeGenerated(join(WHITE_FACTS, `${fighterSlug(character)}.ts`), whiteFactsFile({ [key]: facts[key]! }));
 }
-await Bun.write(WHITE_MODEL_INDEX, whiteModelIndex(shardOrder(WHITE_MODEL_INDEX, WHITE_MODELS, ".ts", fighters.keys())));
-await Bun.write(WHITE_FACT_INDEX, whiteFactsIndex(shardOrder(WHITE_FACT_INDEX, WHITE_FACTS, ".ts", fighters.keys())));
-writeModelFacts(whiteModelFactsTable(MODEL_FACTS, Object.values(paths), facts));
+writeGenerated(WHITE_MODEL_INDEX, whiteModelIndex(shardOrder(WHITE_MODEL_INDEX, WHITE_MODELS, ".ts", fighters.keys())));
+writeGenerated(WHITE_FACT_INDEX, whiteFactsIndex(shardOrder(WHITE_FACT_INDEX, WHITE_FACTS, ".ts", fighters.keys())));
+if (selected === undefined) writeModelFacts(whiteModelFactsTable(readModelFacts(), Object.values(paths), facts));
+else replaceModelFacts([`war3mapImported\\${fighters.get(selected)!.name}White-`], whiteModelFactsTable({}, [paths[selected]!], facts));
 console.log(`${selected === undefined ? Object.keys(paths).length : 1} white body models updated: original mesh and flashable animation keys retained on one seekable timeline, emitters/lights removed`);

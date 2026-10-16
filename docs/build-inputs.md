@@ -73,11 +73,19 @@ code:
 
 1. Produce the family into a folder of your lane (generators write
    build/FAMILY; `bun wisp inputs path assets` prints the current `--assets`
-   for tools that read it). For a clip pool, start from a writable copy of the
-   current one: `cp -rL "$(bun wisp inputs path assets)/original-clips-static-lights" NEW && chmod -R u+w NEW`,
-   then `bun tools/animations/export-original-clips.ts --assets "$(bun wisp inputs path assets)" --out NEW --keep-unchanged`.
+   for tools that read it). Fighter clips, bodies and white flashes are derived
+   instead: step 2's `bun wisp inputs derive` rebuilds them from the pinned sources.
 2. `bun wisp inputs add FAMILY DIR` (from smashcraft:ts/) stores it and writes
    its hash into your checkout's build-inputs/FAMILY.
+   `bun wisp inputs derive [--fighter NAME]...` (from smashcraft:ts/) runs each
+   fighter's clip export, timeline bodies and white flashes
+   (smashcraft:ts/scripts/wisp/fighterArt.ts), fighters in parallel under one
+   machine-capacity lease, and pins the fighters' original-clips-static-lights
+   and impact-assets shards and generated files. Each step is stored under
+   store/derived/STEP/KEY/, KEY hashing the fighter's source model, the step's
+   source files and lockfiles, the earlier step's key and, after the export, the
+   stock build and the hero-models and imported-models pins, so a run redoes only
+   the steps whose inputs changed. `--rebuild` ignores stored steps.
 3. `bun wisp map build --profile playable --edition full --name NAME --out OUT.w3x` from the lane
    checks the change; commit build-inputs/FAMILY with the code that needs it and
    land it. Lanes that changed different families, or different fighters' shards

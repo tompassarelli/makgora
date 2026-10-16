@@ -17,6 +17,46 @@ export function tracks(value: unknown, visit: (track: mdx.AnimVector, path: stri
 
 
 
+export function cloneModel<T>(value: T, keys: (track: mdx.AnimVector) => readonly mdx.AnimKeyframe[] = track => track.Keys): T {
+    const copies = new Map<object, unknown>();
+    const copy = (item: unknown): unknown => {
+        if (typeof item !== 'object' || item === null) return item;
+        const known = copies.get(item);
+        if (known !== undefined) return known;
+        if (ArrayBuffer.isView(item)) {
+            ensure(!(item instanceof DataView), 'Cannot copy a DataView');
+            const view = (item as unknown as Uint8Array).slice();
+            copies.set(item, view);
+            return view;
+        }
+        if (Array.isArray(item)) {
+            const array: unknown[] = new Array(item.length);
+            copies.set(item, array);
+            for (let index = 0; index < item.length; index++) if (index in item) array[index] = copy(item[index]);
+            return array;
+        }
+        ensure(Object.getPrototypeOf(item) === Object.prototype, 'Cannot copy a non-plain model object');
+        const object: Record<string, unknown> = {};
+        copies.set(item, object);
+        const kept = 'Keys' in item && Array.isArray(item.Keys) ? keys(item as mdx.AnimVector) : undefined;
+        for (const key of Object.keys(item)) object[key] = key === 'Keys' && kept !== undefined ? kept.map(copy) : copy((item as Record<string, unknown>)[key]);
+        return object;
+    };
+    return copy(value) as T;
+}
+
+const bodyTracks = new WeakMap<mdx.Model, ReadonlyMap<string, mdx.AnimVector>>();
+function sourceBodyTracks(source: mdx.Model): ReadonlyMap<string, mdx.AnimVector> {
+    const known = bodyTracks.get(source);
+    if (known !== undefined) return known;
+    const body = structuredClone(source);
+    removeBodyEffects(body);
+    const found = new Map<string, mdx.AnimVector>();
+    tracks(body, (track, path) => found.set(path, track));
+    bodyTracks.set(source, found);
+    return found;
+}
+
 export const onGlobalClock = (track: mdx.AnimVector) =>
     track.GlobalSeqId != null && track.GlobalSeqId !== -1 && track.GlobalSeqId !== 0xffffffff;
 
@@ -177,11 +217,13 @@ export function originalBodyClip(source: mdx.Model, sequenceIndex: number, mode:
         `Invalid original sequence index ${sequenceIndex}`);
     tracks(source, (track, path) => ensure(!onGlobalClock(track) || (track.GlobalSeqId ?? 0) < source.GlobalSequences.length,
         `${path}: names a missing global animation clock`));
-    const model = structuredClone(source);
+    const [start, end] = source.Sequences[sequenceIndex].Interval;
+    ensure(end >= start, `${source.Sequences[sequenceIndex].Name}: reversed source interval`);
+    const sourceKeys = new Map<string, number>();
+    tracks(source, (track, path) => sourceKeys.set(path, track.Keys.length));
+    const model = cloneModel(source, track => trimKeys && !onGlobalClock(track) ? track.Keys.filter(key => key.Frame >= start && key.Frame <= end) : track.Keys);
     const omittedEffects = removeBodyEffects(model);
     const sequence = model.Sequences[sequenceIndex];
-    const [start, end] = sequence.Interval;
-    ensure(end >= start, `${sequence.Name}: reversed source interval`);
     model.Sequences = [{...sequence, Name: 'Stand'}];
     for (const geoset of model.Geosets)
         geoset.Anims = [geoset.Anims[sequenceIndex] ?? bounds([geoset])];
@@ -189,13 +231,13 @@ export function originalBodyClip(source: mdx.Model, sequenceIndex: number, mode:
     const emptyTracks: string[] = [];
     const omittedEmptyTracks: string[] = [];
     tracks(model, (track, path) => {
-        const sourceKeyCount = track.Keys.length;
+        const sourceKeyCount = sourceKeys.get(path);
+        ensure(sourceKeyCount !== undefined, `${path}: track missing from the source`);
         ensure(!omitEmptyTracks || sourceKeyCount > 0, `${path}: source zero-key track requires explicit diagnostic or untrimmed-reference mode`);
-        originalKeys += track.Keys.length;
+        originalKeys += sourceKeyCount;
         trackCount++;
 
 
-        if (trimKeys && !onGlobalClock(track)) track.Keys = track.Keys.filter(key => key.Frame >= start && key.Frame <= end);
         retainedKeys += track.Keys.length;
         if (!track.Keys.length) emptyTracks.push(path);
         if (omitEmptyTracks && sourceKeyCount > 0 && !track.Keys.length) {
@@ -227,12 +269,10 @@ export function originalBodyClip(source: mdx.Model, sequenceIndex: number, mode:
 
 
     const expectedTracks = new Map<string, mdx.AnimVector>();
-    const bodySource = structuredClone(source);
-    removeBodyEffects(bodySource);
-    tracks(bodySource, (track, path) => {
+    for (const [path, track] of sourceBodyTracks(source)) {
         const Keys = trimKeys && !onGlobalClock(track) ? track.Keys.filter(key => key.Frame >= start && key.Frame <= end) : track.Keys;
         if (!omitEmptyTracks || Keys.length) expectedTracks.set(path, {...track, Keys});
-    });
+    }
     const retainedTracks = new Map<string, mdx.AnimVector>();
     tracks(model, (track, path) => retainedTracks.set(path, track));
     ensure(isDeepStrictEqual(retainedTracks, expectedTracks), 'Original clip changed retained animation channels');

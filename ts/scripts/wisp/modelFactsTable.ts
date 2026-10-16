@@ -2,7 +2,7 @@
 // measure different models never edit the same file (#401). Written by `bun wisp
 // view models`, tools/animations/white-flash-models.ts, timeline-models.ts and
 // tools/stage/package.ts through writeModelFacts; regenerate instead of editing.
-import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { ModelFacts } from "wisp/scripts/wisp/models";
 
@@ -25,6 +25,26 @@ export function readModelFacts(directory = MODEL_FACTS_DIRECTORY): Record<string
     facts[shard.model] = shard.facts;
   }
   return facts;
+}
+
+/** Replaces only the shards of models whose paths start with one of `owned`, so writers of different fighters never touch each other's files. */
+export function replaceModelFacts(owned: readonly string[], facts: Readonly<Record<string, ModelFacts>>, directory = MODEL_FACTS_DIRECTORY): void {
+  const prefixes = owned.map((model) => model.replace(/[^A-Za-z0-9._-]+/g, "_"));
+  for (const model of Object.keys(facts)) if (!owned.some((prefix) => model.startsWith(prefix))) throw new Error(`${model} is outside ${owned.join(", ")}`);
+  mkdirSync(directory, { recursive: true });
+  const wanted = new Map(Object.entries(facts).map(([model, entry]) => [modelFactsFile(model), `${JSON.stringify({ model, facts: entry })}\n`]));
+  for (const file of readdirSync(directory)) if (file.endsWith(".json") && prefixes.some((prefix) => file.startsWith(prefix)) && !wanted.has(file)) rmSync(join(directory, file));
+  for (const [file, text] of wanted) writeGenerated(join(directory, file), text);
+}
+
+/** Writes a generated file by rename, so a concurrent reader sees the old or the new text, never part of one. */
+export function writeGenerated(path: string, text: string): void {
+  let current: string | undefined;
+  try { current = readFileSync(path, "utf8"); } catch { current = undefined; }
+  if (current === text) return;
+  const staging = `${path}.${process.pid}.next`;
+  writeFileSync(staging, text);
+  renameSync(staging, path);
 }
 
 /** Makes the shards exactly `facts`: writes each changed model's file and removes the files of models no longer listed. */

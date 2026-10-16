@@ -67,9 +67,9 @@ export const FAMILIES = {
   "selection-assets": { produce: "bun tools/selection/build-art.ts (writes build/selection-assets)" },
   "fighter-renders": { produce: "bun scripts/fighterPortraits.ts PRIVATE_OUTPUT (from ts/; stores PRIVATE_OUTPUT/fighter-renders)" },
   "stage-assets": { produce: "bun tools/stage/package.ts (writes build/stage-assets)" },
-  "impact-assets": { produce: "bun tools/effects/package.ts, trap.ts and shield.ts (write build/impact-assets)", sharded: true },
+  "impact-assets": { produce: "bun tools/effects/package.ts, trap.ts and shield.ts (write build/impact-assets); fighter white flashes come from bun wisp inputs derive, which stores and pins them", sharded: true },
   "imported-models": { produce: "the community models smashcraft:ts/src/game/assets/importedModelInfo.ts lists, from their authors' downloads" },
-  "original-clips-static-lights": { produce: "cp -rL \"$(bun wisp inputs path assets)/original-clips-static-lights\" NEW && chmod -R u+w NEW && bun tools/animations/export-original-clips.ts --assets \"$(bun wisp inputs path assets)\" --out NEW --keep-unchanged (after adding the new fighter models' animation-assets or illidan-animation)", sharded: true },
+  "original-clips-static-lights": { produce: "bun wisp inputs derive, which stores and pins it (after adding the new fighter models' animation-assets or illidan-animation)", sharded: true },
   "hero-models": { produce: "the stock hero models extracted from the game's archives (smashcraft:ts/scripts/heroModelSource.ts)", sharded: true },
   "model-sounds": { produce: "bun tools/animations/export-model-sounds.ts --assets \"$(bun wisp inputs path assets)\" --sounds AnimSounds.slk --out NEW" },
 } as const satisfies Record<Family, { readonly file?: string; readonly produce: string; readonly sharded?: true }>;
@@ -94,7 +94,7 @@ export interface BuildInputPaths { readonly base: string; readonly container: st
 const failure = (operation: string, path: string, cause: string) => new MapBuildFailure({ operation, path, cause });
 
 
-function listFiles(root: string): string[] {
+export function listFiles(root: string): string[] {
   const files: string[] = [];
   const walk = (directory: string) => {
     for (const entry of readdirSync(directory)) {
@@ -132,7 +132,7 @@ export function removeTree(root: string): void {
   rmSync(root, { recursive: true, force: true });
 }
 
-function seal(root: string): void {
+export function seal(root: string): void {
   for (const entry of readdirSync(root, { withFileTypes: true })) {
     const path = join(root, entry.name);
     if (entry.isDirectory()) seal(path);

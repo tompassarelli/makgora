@@ -4,8 +4,10 @@
 
 
 import { Effect } from "effect";
-import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
+import { type Command, UsageFailure, flagValues } from "wisp/scripts/wisp/command";
 import { MapBuildFailure } from "wisp/scripts/wisp/mapBuild";
+import { runAdmitted } from "../../heavyCapacity";
+import { buildFighterArt, planFighters } from "../fighterArt";
 import { FAMILIES, FAMILY_NAMES, type Family, MANIFEST, checkoutInputs, isSharded, readPins, storeFamily, storeShards, writePin, writeShardPins } from "../buildInputs";
 
 const isFamily = (name: string): name is Family => name in FAMILIES;
@@ -27,10 +29,23 @@ const addShards = (family: Family, source: string) => Effect.gen(function*() {
   console.log(`${family}: ${Object.keys(shards).length} shards, changed ${changed.length === 0 ? "none" : changed.join(" ")}\nwrote them into ${MANIFEST}/${family}/; commit the change to build with it`);
 });
 
+const derive = (args: readonly string[]) => Effect.gen(function*() {
+  const names = flagValues(args, "fighter"), rebuild = args.includes("--rebuild");
+  if (args.length !== names.length * 2 + (rebuild ? 1 : 0)) return yield* new UsageFailure({ problem: "inputs derive takes [--fighter NAME]... [--rebuild]" });
+  const { manifest, assets, plans } = yield* planFighters(names, rebuild);
+  const steps = plans.reduce((sum, plan) => sum + plan.keys.length - plan.cached, 0);
+  const building = plans.filter((plan) => plan.cached < plan.keys.length).length;
+  const capacity = building <= 2 ? { class: "moderate" as const, jobs: 2 } : { class: "heavy" as const, jobs: 6 };
+  console.log(`${plans.length} fighters: ${steps} steps to run, ${plans.reduce((sum, plan) => sum + plan.cached, 0)} reused`);
+  if (building > 0) yield* Effect.promise(() => runAdmitted(capacity.class, "smashcraft:inputs-derive", 1800));
+  yield* buildFighterArt(plans, manifest, assets, capacity.jobs);
+});
+
 export const inputs: Command = (args) => Effect.gen(function*() {
   const [verb, ...rest] = args;
   const [family, source, ...extra] = rest;
   if (verb === "add" && family !== undefined && source !== undefined && extra.length === 0) return yield* add(family, source);
+  if (verb === "derive") return yield* derive(rest);
   if (verb === "check" && rest.length === 0) {
     const paths = yield* checkoutInputs();
     console.log(`every family in ${MANIFEST} is stored and unchanged\n--assets ${paths.assets}`);
@@ -43,5 +58,5 @@ export const inputs: Command = (args) => Effect.gen(function*() {
     if (name === "base" || name === "container" || name === "assets" || name === "summon") return console.log(paths[name]);
     return yield* new UsageFailure({ problem: "inputs path takes base, container, assets or summon" });
   }
-  return yield* new UsageFailure({ problem: "inputs takes add FAMILY PATH | check | path [base|container|assets|summon]" });
+  return yield* new UsageFailure({ problem: "inputs takes add FAMILY PATH | derive [--fighter NAME]... [--rebuild] | check | path [base|container|assets|summon]" });
 });

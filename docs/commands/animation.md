@@ -142,6 +142,11 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   authors clips through Blender; the optional existing model preserves shipped
   sequences and appends only new clips; `--replace NAME` reauthors one existing clip at its same index and length (smashcraft:docs/fighter-animation-work.md).
 
+- Derived fighter art (from ts/): `bun wisp inputs derive [--fighter NAME]... [--rebuild]`
+  runs the clip export, both bodies and the white flashes below for each fighter, fighters in
+  parallel, redoes only the steps whose inputs changed and pins the result
+  (smashcraft:docs/build-inputs.md, "Change art"). Run the single tools below to debug one step.
+
 - Both fighter bodies (from the repository root):
   `bun tools/animations/timeline-models.ts PRIVATE_ASSETS PRIVATE_POOL FIGHTER`
   writes the fighter's Classic timeline body from its canonical motion into a writable copy

@@ -63,8 +63,10 @@ export const checkCueModels = Effect.fnUntraced(function*(renderer: { readonly r
 });
 
 
+export const stockStorage = () => process.env.WC3_STORAGE ?? join(homedir(), ".local/share/Steam/steamapps/compatdata/3516115571/pfx/drive_c/Program Files (x86)/Warcraft III");
+
 export function headlessRender(options: RenderAssetOptions = {}) {
-  const storage = options.storage ?? process.env.WC3_STORAGE ?? join(homedir(), ".local/share/Steam/steamapps/compatdata/3516115571/pfx/drive_c/Program Files (x86)/Warcraft III");
+  const storage = options.storage ?? stockStorage();
   const manifestPath = options.manifest ?? process.env.WC3_ASSET_MANIFEST;
   const used = new Map<string, { readonly sha256: string; readonly bytes: number }>();
   let stockInfo: { readonly storage: string; readonly buildInfoSha256: string; readonly fields: Readonly<Record<string, string>> } | undefined;

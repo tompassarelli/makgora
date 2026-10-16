@@ -21,6 +21,7 @@ import {misplacedNodes} from '../../ts/scripts/clipNodes';
 import {KEY_BOUND, savedKeyBytes, thinKeys, type KeyThinReport} from '../../ts/scripts/keyThin';
 import {fighterSlug} from '../../ts/src/game/sim/heroes/registry';
 import {CLIPS, CLIP_INDEX, clipFile, clipIndex, clipTypeFile, shardOrder} from './fighter-shards';
+import {writeGenerated} from '../../ts/scripts/wisp/modelFactsTable';
 
 const project = resolve(import.meta.dir, '../..');
 const option = (name: string) => { const index = process.argv.indexOf(name); return index < 0 ? undefined : process.argv[index + 1]; };
@@ -172,10 +173,10 @@ for (const [character, fighter] of fighters) {
 }
 for (const [character, clips] of moduleClips.entries()) if (clips !== undefined) {
     const slug = fighterSlug(character);
-    await Bun.write(join(CLIPS, `${slug}.ts`), clipFile(fighters.get(character)!.name, clips, moduleNames[character]!, moduleLights[character] ?? undefined));
+    writeGenerated(join(CLIPS, `${slug}.ts`), clipFile(fighters.get(character)!.name, clips, moduleNames[character]!, moduleLights[character] ?? undefined));
 }
-await Bun.write(join(CLIPS, 'fighterOriginalClip.ts'), clipTypeFile());
-await Bun.write(CLIP_INDEX, clipIndex(shardOrder(CLIP_INDEX, CLIPS, '.ts', fighters.keys()), {...staticLightGate, seconds: seconds(staticLightGate.seconds)}));
+writeGenerated(join(CLIPS, 'fighterOriginalClip.ts'), clipTypeFile());
+writeGenerated(CLIP_INDEX, clipIndex(shardOrder(CLIP_INDEX, CLIPS, '.ts', fighters.keys()), {...staticLightGate, seconds: seconds(staticLightGate.seconds)}));
 if (!metadataOnly) {
     for (const record of records) writeClipRecord(output, record);
     if (only === undefined) keepClipRecords(output, new Set(records.map(record => record.fighter)));
