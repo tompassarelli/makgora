@@ -333,7 +333,7 @@ export const CLASSIC_ROUTES: readonly ClassicRoute[] = [
     fighter: C.medivh, boss: BossKind.archimonde,
     story: "The returned Guardian gathers Azeroth's divided champions at Hyjal to undo the ruin he once invited.",
     fights: [
-      fight(C.lich, 0, "Your book opened Dalaran to the Legion, Guardian. Your warnings come too late."),
+      fight(C.lich, 4, "Your book opened Dalaran to the Legion, Guardian. Your warnings come too late."),
       fight(C.jaina, 11, "I followed your warning west. Now show me why I should trust the Horde."),
       fight(C.thrall, 3, "You led us to Kalimdor, prophet. I will not lead my people into another trap."),
       fight([C.dreadlord, C.pitLord], 14, "Sargeras spoke through you once. The Legion has not forgotten its favourite door."),

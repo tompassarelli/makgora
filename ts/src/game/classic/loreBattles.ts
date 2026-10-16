@@ -95,7 +95,7 @@ export const LORE_BATTLES: readonly LoreBattle[] = [
     win: ko, minutes: 3, playerStocks: 2, opponentStocks: 2, speaker: "Muradin Bronzebeard", intro: "Leave it be, Arthas. Forget this business and lead your men home.",
   }),
   battle({
-    id: "dalaran", title: "The Siege of Dalaran", player: C.lich, against: [C.kaelthas], tier: "intermediate", stage: 0,
+    id: "dalaran", title: "The Siege of Dalaran", player: C.lich, against: [C.kaelthas], tier: "intermediate", stage: 4,
     win: survive, minutes: 2, playerStocks: 2, opponentStocks: 3, speaker: "Kel'Thuzad", intro: "Hold the circle until the Book of Medivh calls my master forth!",
   }),
   battle({
