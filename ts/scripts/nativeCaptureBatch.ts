@@ -141,7 +141,7 @@ const runChunk = (args: { readonly pair: number; readonly pool: PairPool; readon
   yield* Effect.try({ try: () => mkdirSync(rowOut, { recursive: true }), catch: cause => new CaptureBatchFailure({ problem: `create ${rowOut}: ${String(cause)}` }) });
   const run = Effect.acquireUseRelease(
     Effect.try({
-      try: () => Bun.spawn([process.execPath, "scripts/nativeCapture.ts", "run", "--clients-file", args.clientsFile, "--client", args.client, "--install", args.install, "--offline-build", args.build, "--manifest", args.row.manifest, "--out", rowOut, "--no-audio", "--minutes", String(args.minutes)], { cwd: tsDirectory, env: { ...process.env, WISP_QUIET_NATIVE_LEASE: "1" }, stdin: "ignore", stdout: "inherit", stderr: "inherit" }),
+      try: () => Bun.spawn([process.execPath, "scripts/nativeCapture.ts", "run", "--clients-file", args.clientsFile, "--client", args.client, "--install", args.install, "--offline-build", args.build, "--manifest", args.row.manifest, "--out", rowOut, "--no-audio", "--minutes", String(args.minutes)], { cwd: tsDirectory, stdin: "ignore", stdout: "inherit", stderr: "inherit" }),
       catch: cause => new CaptureBatchFailure({ problem: `start collector: ${String(cause)}` }),
     }),
     child => Effect.promise(() => child.exited).pipe(Effect.flatMap(code => code === 0 ? Effect.succeed({ kind: "complete" as const }) : Effect.fail(new CaptureBatchFailure({ problem: `collector exited ${code}` })))),

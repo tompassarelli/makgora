@@ -62,8 +62,7 @@ import { DevCommandReceipt, nativeChatEntryReceipt } from "../boundary";
 import { currentChatEntry } from "../padChat";
 import { devCommandReceiptFile } from "../../../src/game/core/gameFiles";
 import { Phase } from "../../../src/game/lobby/lobbyState";
-import { admitCaptures, captureLoad, requireCaptureLease, timingCheck, timingScripts } from "../captureCapacity";
-import { withQuietNativeCapacity } from "wisp/scripts/wisp/quietNativeCapacity";
+import { admitCaptures, captureLoad, requireCaptureLease, timingCheck, timingLease, timingScripts } from "../captureCapacity";
 import { quickMatchHero, quickMatchStage, quickPainHero, quickRecoveryHero, quickOffstageHero } from "../../../src/game/session/devSettings";
 import { assertPairClaim } from "./pairClaim";
 import { pauseDraws } from "../pauseDraws";
@@ -538,18 +537,18 @@ export const pad: Command = (args) => Effect.gen(function*() {
     } }),
     catch: (cause) => new UsageFailure({ problem: describeCause(cause) }),
   });
+  const { batchScripts } = yield* Effect.promise(() => import("../padBatch"));
+  const timingBatch = yield* Effect.sync(() => {
+    try {
+      return timingScripts(batchScripts(parsed.positionals));
+    } catch {
+      return true;
+    }
+  });
   if (parsed.values.headless !== true) {
     const clientsFile = parsed.values["clients-file"] ?? clientState;
     yield* Effect.try({ try: () => readClientsFile(clientsFile), catch: (cause) => new UsageFailure({ problem: `can't read the clients from ${clientsFile}: ${describeCause(cause)}` }) });
-    const { batchScripts } = yield* Effect.promise(() => import("../padBatch"));
-    const timing = yield* Effect.sync(() => {
-      try {
-        return timingScripts(batchScripts(parsed.positionals));
-      } catch {
-        return true;
-      }
-    });
-    if (yield* admitCaptures(args, timing)) return;
+    if (yield* admitCaptures(args, timingBatch)) return;
   }
   const { helper, out, chat, compare } = parsed.values;
   const clientsFile = parsed.values["clients-file"] ?? clientState;
@@ -564,7 +563,7 @@ export const pad: Command = (args) => Effect.gen(function*() {
 
   if (parsed.values.pairs !== undefined || (parsed.values.pair?.length ?? 0) > 0 || parsed.positionals.length > 1 || (parsed.positionals[0] !== undefined && existsSync(parsed.positionals[0]) && statSync(parsed.positionals[0]).isDirectory())) {
     const batch = scriptBatch(parsed.values, parsed.positionals);
-    return yield* (parsed.values.headless === true ? batch : withQuietNativeCapacity("smashcraft-pad", batch));
+    return yield* (parsed.values.headless === true ? batch : timingLease(timingBatch, "smashcraft-pad", batch));
   }
   const isHeadless = parsed.values.headless === true;
   const build = parsed.values.build ?? (isHeadless ? INTEGRITY_BUILD.id : undefined);
@@ -601,7 +600,7 @@ export const pad: Command = (args) => Effect.gen(function*() {
       Effect.retry({ schedule: EffectSchedule.recurs(map === undefined ? 0 : Math.max(0, Math.ceil(retries))), while: (failure) => failure instanceof InvalidNativeRun }),
       Effect.catchIf((failure): failure is InvalidNativeRun => failure instanceof InvalidNativeRun, (failure) => Effect.fail(new IntegrityFailure({ operation: INVALID_RUN, path: out, cause: `desynced, rerun (${failure.attempts} attempt${failure.attempts === 1 ? "" : "s"}${map === undefined ? "; --map MAP.w3x reruns it automatically" : ""})` }))),
     );
-    return yield* withQuietNativeCapacity("smashcraft-pad", nativeRun);
+    return yield* timingLease(timingCheck([steps]), "smashcraft-pad", nativeRun);
   }
   const ran = yield* Effect.exit(headless(options).pipe(step("headless pad script")));
   if (compare !== undefined) {

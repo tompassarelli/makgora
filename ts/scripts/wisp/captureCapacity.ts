@@ -7,6 +7,7 @@ import { ChildProcess } from "effect/process";
 import { capacityHelper } from "../heavyCapacity";
 import { IntegrityFailure } from "../integrity/evidence";
 import { type PadStep, parsePadScript } from "../integrity/padScript";
+import { withQuietNativeCapacity } from "wisp/scripts/wisp/quietNativeCapacity";
 
 const Lease = Schema.Struct({ id: Schema.String, class: Schema.String, owner: Schema.String, kind: Schema.String, expiresAt: Schema.NullOr(Schema.Finite) });
 
@@ -22,6 +23,10 @@ export function captureLease() {
 
 
 export const timingCheck = (scripts: readonly (readonly PadStep[])[]) => scripts.length === 0 || scripts.some((steps) => !steps.some((step) => step.kind === "capture"));
+
+
+export const timingLease = <A, E, R>(timing: boolean, owner: string, run: Effect.Effect<A, E, R>, quiet: typeof withQuietNativeCapacity = withQuietNativeCapacity): ReturnType<typeof withQuietNativeCapacity<A, E, R>> | Effect.Effect<A, E, R> =>
+  timing ? quiet(owner, run) : run;
 
 
 export const timingScripts = (paths: readonly string[]) => {
