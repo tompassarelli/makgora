@@ -208,7 +208,7 @@ const PHOENIX: Key[] = [
   { frame: 42, g: along(TUCK, DIVE, 0.15) },
   { frame: 46, g: DIVE, ease: "out" },
   { frame: 72, g: DIVE },
-  { frame: 77, g: { lean: -4, arm: 40, leftArm: 40, thigh: -20, knee: -30, leftThigh: 10 }, ease: "linear" },
+  { frame: 78, g: { lean: -6, arm: 60, leftArm: 60, thigh: -30, knee: -45, leftThigh: 15 }, ease: "linear" },
   { frame: 82, g: {}, ease: "linear" },
   { frame: 84, g: {} },
 ];
