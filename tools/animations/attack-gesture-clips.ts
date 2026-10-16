@@ -1,4 +1,3 @@
-import { floatVector } from './animVector';
 
 import { chmodSync, mkdirSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
@@ -295,7 +294,7 @@ function aimWeaponContact(model: mdx.Model, index: number, start: number, contac
         const sweep = SWEEP*(frame-contact)/3, shift = (scale: number) => lungeAxis.map((v,i) => v*(lunge(frame)-F)+across[i]!*sweep*scale);
         for (let iteration = 0; iteration < 12; iteration++) for (const node of arm.toReversed()) aim(node,hand,targetHand.map((v,i) => v+shift(0.5)[i]!));
         aim(hand,tip,targetTip.map((v,i) => v+shift(1.5)[i]!));
-        if (frame === contact+3 || frame === total) keys.forEach((key,i) => swept.set(solved[i]!, floatVector(key.Vector)));
+        if (frame === contact+3 || frame === total) keys.forEach((key,i) => swept.set(solved[i]!, new Float32Array(key.Vector)));
       } else {
         const from = swept.size ? swept : held, weight = frame < contact+3 ? 1 : Math.max(0,1-(frame-contact-3)/(total-contact-3));
         keys.forEach((key,i) => { key.Vector = blend(key.Vector, from.get(solved[i]!)!, weight); });
@@ -337,7 +336,7 @@ function aimWeaponContact(model: mdx.Model, index: number, start: number, contac
         handKey.Vector = unrolled.slice(); renderer.update(0);
         if (roll) { const h = position(hand), w = position(tip), axis = w.map((v,i) => v-h[i]!), n = Math.hypot(...axis); turn(hand, axis.map(v => v/n), roll*Math.PI/12); }
       }
-      keys.forEach((key,i) => held.set(solved[i]!, floatVector(key.Vector)));
+      keys.forEach((key,i) => held.set(solved[i]!, new Float32Array(key.Vector)));
     }
   }
   if (shadowLow) floorSolve(model, data, renderer, start, total, turnAt, named);
