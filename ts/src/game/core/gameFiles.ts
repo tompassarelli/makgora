@@ -6,7 +6,6 @@ export const MELEE_READY_FILE = "wc3-melee-ready.txt";
 export const INPUT_START_FILE = "wc3-melee-input-start.txt";
 export const INPUT_TRACE_FILE = "wc3-melee-input-trace.txt";
 export const INPUT_PREFLIGHT_FILE = "smashcraft-input-preflight.txt";
-export const inputPreflightLine = (build: string) => `SMASHCRAFT INPUT key=F24 build=${build}`;
 
 export const RESPONSE_TRACE_CALLBACKS = 4500;
 export const traceStartLine = (build: string) => `TRACE START ${build}`;

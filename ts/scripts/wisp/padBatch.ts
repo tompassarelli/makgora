@@ -38,7 +38,7 @@ import { compareRuns, comparisonSteps, scriptChat } from "../integrity/padParity
 import { parsePadScript } from "../integrity/padScript";
 import { onHealthyClients } from "./doctor";
 import { withRuntimeTools } from "./nativeTools";
-import { type PadOptions, type NativeSession, headlessScript, headlessSession, nativeChat, nativeScript, nativeSession } from "./commands/pad";
+import { type PadOptions, type NativeSession, headlessScript, headlessSession, nativeChat, nativeScript, nativeSession, verifySessionInput } from "./commands/pad";
 
 
 export interface PadPair {
@@ -323,7 +323,9 @@ export const padBatch = (options: NativeBatchOptions) => Effect.gen(function*() 
     const ensureSession = Effect.gen(function*() {
       if (session !== undefined) return session;
       if (gameScope === undefined) return yield* new IntegrityFailure({ operation: "start native session", path: pair.name, cause: "no game scope" });
-      session = yield* nativeSession(join(options.out, `${pair.name}-session-${gameNumber++}`), options.helper, build, pair.appIds, pair.clients).pipe(Scope.provide(gameScope));
+      const started = yield* nativeSession(join(options.out, `${pair.name}-session-${gameNumber++}`), options.helper, build, pair.appIds, pair.clients).pipe(Scope.provide(gameScope));
+      if (!hot) yield* verifySessionInput(started, pair.clients);
+      session = started;
       return session;
     });
 
@@ -331,11 +333,14 @@ export const padBatch = (options: NativeBatchOptions) => Effect.gen(function*() 
       if (services === undefined) return 0;
       if (warm !== undefined) yield* Fiber.join(warm);
       const current = yield* ensureSession;
+      const first = reloader === undefined;
       if (reloader === undefined) {
         if (gameScope === undefined) return yield* new IntegrityFailure({ operation: "hot reload", path: pair.name, cause: "no game scope" });
         reloader = yield* hotReloader(services, current.data).pipe(Scope.provide(gameScope));
       }
-      return yield* reloader.publish.pipe(Effect.mapError((cause) => new IntegrityFailure({ operation: "hot reload", path: pair.name, cause: cause.message })));
+      const version = yield* reloader.publish.pipe(Effect.mapError((cause) => new IntegrityFailure({ operation: "hot reload", path: pair.name, cause: cause.message })));
+      if (first) yield* verifySessionInput(current, pair.clients);
+      return version;
     });
     const timedReload = (made: ScriptReport, dir: string) => Effect.gen(function*() {
       if (!hot) return true;

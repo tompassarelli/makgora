@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { INPUT_PREFLIGHT_FILE, inputPreflightLine } from "../src/game/core/gameFiles";
-import { NATIVE_PREFLIGHT_KEY } from "../src/game/input/nativePreflight";
+import { INPUT_PREFLIGHT_FILE } from "../src/game/core/gameFiles";
+import { NATIVE_PREFLIGHT_KEY, inputPreflightLine } from "../src/game/input/nativePreflight";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { entryFor } from "./desync/journeys";
 import { testHeadless } from "./headless";

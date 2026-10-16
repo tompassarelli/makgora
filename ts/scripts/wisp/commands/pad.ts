@@ -227,10 +227,6 @@ export const nativeSession = (out: string, helper: string, build: string, appIds
   const loaded = yield* loadClients(clientsFile).pipe(Effect.mapError(fromDesktop));
   if (loaded.length !== 2) return yield* new IntegrityFailure({ operation: "load clients", path: clientsFile, cause: `${loaded.length} clients, need 2` });
   const clients = [at(loaded, 0), at(loaded, 1)] as const;
-  yield* Effect.forEach(clients, client => verifyNativeInput(client, build), { concurrency: "unbounded" }).pipe(
-    Effect.provide(Layer.merge(Clients.layer(clientsFile), GameFiles.layer())),
-    Effect.mapError(cause => new IntegrityFailure({ operation: "input preflight", path: clientsFile, cause })),
-  );
   yield* tryIntegrity("create session directory", out, () => mkdirSync(out, { recursive: true }));
   const data = [join(clients[0].documents, "CustomMapData"), join(clients[1].documents, "CustomMapData")] as const;
   const pads = [];
@@ -252,6 +248,11 @@ export const nativeSession = (out: string, helper: string, build: string, appIds
 });
 
 export type NativeSession = Effect.Success<ReturnType<typeof nativeSession>>;
+
+export const verifySessionInput = (session: NativeSession, clientsFile: string) => Effect.forEach(session.clients, client => verifyNativeInput(client, session.build), { concurrency: "unbounded", discard: true }).pipe(
+  Effect.provide(Layer.merge(Clients.layer(clientsFile), GameFiles.layer())),
+  Effect.mapError(cause => new IntegrityFailure({ operation: "input preflight", path: clientsFile, cause })),
+);
 
 const ChatReceipt = Schema.Struct({ epoch: Schema.FiniteFromString, revision: Schema.FiniteFromString, chat: Schema.FiniteFromString, chatState: Schema.FiniteFromString });
 
@@ -394,6 +395,7 @@ export const nativeScript = (session: NativeSession, options: PadOptions) => Eff
 
 export const native = (options: PadOptions, appIds: ReadonlyMap<string, string>, clientsFile: string = clientState) => Effect.scoped(Effect.gen(function*() {
   const session = yield* nativeSession(join(options.out, "session"), options.helper, options.build, appIds, clientsFile);
+  yield* verifySessionInput(session, clientsFile);
   return yield* nativeScript(session, options);
 }));
 

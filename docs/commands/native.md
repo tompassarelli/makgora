@@ -1,12 +1,16 @@
 # Native
 
-Native startup verifies private-window focus, observed pointer motion and a
-harmless F24 key in the map-written `smashcraft-input-preflight.txt`. The probe
-has a twelve-second deadline and names the failed display, focus, pointer or
-key-trace boundary. Pad batches probe after their initial hot reload and before
-starting helpers. The key receipt is local diagnostic output and changes no
-gameplay state. `scripts/wisp/nativeInput.ts` exports `verifyNativeInput` for
-native runners using the selected `Clients` and `GameFiles` services.
+Native startup verifies private-window focus, observed
+pointer motion and a harmless Scroll Lock key in the map-written
+`smashcraft-input-preflight.txt`. The probe has a twelve-second deadline
+and names the failed display, focus, pointer or key-trace boundary. Pad
+batches probe once per game, after its first hot reload when `--hot` is
+set, so the probe exercises the reloaded script. The key receipt is local
+diagnostic output and changes no gameplay state. Native clients never
+deliver F24 (0x87) to the map, so the probe uses Scroll Lock, which has
+one native keycode and no engine binding. `scripts/wisp/nativeInput.ts`
+exports `verifyNativeInput` for native runners using the selected `Clients`
+and `GameFiles` services.
 
 `bun wisp accept --dry-run --only 482-shield-energy` plans four held captures:
 shield down, full, mid and low. The acceptance driver sends

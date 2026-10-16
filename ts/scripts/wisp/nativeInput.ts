@@ -3,8 +3,8 @@ import { Effect } from "effect";
 import { type Client, Clients, DesktopFailure, waitFor } from "wisp/scripts/wisp/clients";
 import { GameFiles, dataDirectory } from "wisp/scripts/wisp/gameFiles";
 import { preloadLines } from "wisp/scripts/wisp/preloadRecord";
-import { INPUT_PREFLIGHT_FILE, inputPreflightLine } from "../../src/game/core/gameFiles";
-import { NATIVE_PREFLIGHT_KEY } from "../../src/game/input/nativePreflight";
+import { INPUT_PREFLIGHT_FILE } from "../../src/game/core/gameFiles";
+import { NATIVE_PREFLIGHT_KEY, inputPreflightLine } from "../../src/game/input/nativePreflight";
 
 export const verifyNativeInput = (client: Client, build: string) => Effect.gen(function*() {
   const clients = yield* Clients;
