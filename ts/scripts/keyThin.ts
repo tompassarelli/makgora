@@ -4,8 +4,10 @@
 
 
 
-import { ModelRenderer, model as mdx } from 'war3-model';
+import { model as mdx } from 'war3-model';
 import { JITTER_LIMITS, JITTER_SPAN_MS, segmentExcess } from './wisp/animJitter';
+import { type Channel, keyTracks, transforms } from './modelTracks';
+import { type SequenceError, sampleFrames, sequenceErrors } from './poseError';
 
 
 export const KEY_BOUND = { position: 0.5, rotationDegrees: 0.5, tangents: 'slope-jitter' } as const;
@@ -29,19 +31,6 @@ function keyAt(keys: readonly mdx.AnimKeyframe[], i: number): mdx.AnimKeyframe {
     if (key === undefined) throw new Error(`no key ${i}`);
     return key;
 }
-const channels = ['Translation', 'Rotation', 'Scaling'] as const;
-type Channel = typeof channels[number];
-
-
-function transforms(model: mdx.Model, visit: (track: mdx.AnimVector, node: mdx.Node, channel: Channel) => void): void {
-    for (const node of [...model.Bones, ...model.Helpers, ...model.Attachments, ...model.CollisionShapes]) for (const channel of channels) {
-        const animated = node[channel];
-        if (typeof animated !== 'object' || animated === null || !('Keys' in animated)) continue;
-        if (animated.GlobalSeqId != null && animated.GlobalSeqId !== -1 && animated.GlobalSeqId !== 0xffffffff) continue;
-        visit(animated, node, channel);
-    }
-}
-
 function slerp(a: Vec, b: Vec, t: number): number[] {
     let [bx, by, bz, bw] = [at(b, 0), at(b, 1), at(b, 2), at(b, 3)];
     let cos = at(a, 0) * bx + at(a, 1) * by + at(a, 2) * bz + at(a, 3) * bw;
@@ -196,7 +185,6 @@ export function thinnableTracks(model: mdx.Model, bound: KeyBound, scale: number
     return tracks;
 }
 
-export const keyTracks = (model: mdx.Model): mdx.AnimVector[] => { const tracks: mdx.AnimVector[] = []; transforms(model, track => { tracks.push(track); }); return tracks; };
 
 function thinned(source: mdx.Model, bound: KeyBound, scale: number): mdx.Model {
     const model = structuredClone(source);
@@ -205,84 +193,6 @@ function thinned(source: mdx.Model, bound: KeyBound, scale: number): mdx.Model {
         if (keep !== undefined) thinnable.track.Keys = thinnable.track.Keys.filter((_, index) => keep[index]);
     }
     return model;
-}
-
-function nodeMatrices(renderer: ModelRenderer): readonly { readonly matrix: Float32Array }[] {
-    const data: unknown = Reflect.get(renderer, 'rendererData');
-    const nodes: unknown = typeof data === 'object' && data !== null ? Reflect.get(data, 'nodes') : undefined;
-    if (!Array.isArray(nodes)) throw new Error('war3-model renderer has no posed nodes');
-    return nodes;
-}
-
-function setFrame(renderer: ModelRenderer, frame: number): void {
-    Reflect.set(Reflect.get(renderer, 'rendererData'), 'frame', frame);
-    renderer.update(0);
-}
-
-
-const axesA = new Float64Array(9), axesB = new Float64Array(9);
-function unitColumns(m: Float32Array, axes: Float64Array): boolean {
-    for (let c = 0; c < 3; c++) {
-        const x = at(m, c * 4), y = at(m, c * 4 + 1), z = at(m, c * 4 + 2), length = Math.hypot(x, y, z);
-        if (length < 1e-4) return false;
-        axes[c * 3] = x / length; axes[c * 3 + 1] = y / length; axes[c * 3 + 2] = z / length;
-    }
-    return true;
-}
-
-function rotationAngle(a: Float32Array, b: Float32Array): number | undefined {
-    const okA = unitColumns(a, axesA), okB = unitColumns(b, axesB);
-    if (!okA || !okB) return undefined;
-    const r = (i: number, j: number) => 0 + at(axesA, i * 3) * at(axesB, j * 3) + at(axesA, i * 3 + 1) * at(axesB, j * 3 + 1) + at(axesA, i * 3 + 2) * at(axesB, j * 3 + 2);
-    const sin = Math.hypot(r(2, 1) - r(1, 2), r(0, 2) - r(2, 0), r(1, 0) - r(0, 1)) / 2;
-    return Math.atan2(sin, (r(0, 0) + r(1, 1) + r(2, 2) - 1) / 2) * 180 / Math.PI;
-}
-
-const sameMatrix = (a: Float32Array, b: Float32Array) => {
-    for (let index = 0; index < 16; index++) if (a[index] !== b[index]) return false;
-    return true;
-};
-
-
-export interface SequenceError { readonly maxPosition: number, readonly maxRotationDegrees: number, readonly samples: number, readonly worstFrame: number, readonly worstNode: number }
-
-const sampleFrames = (source: mdx.Model) => {
-    const frames = new Set<number>();
-    transforms(source, track => { for (const key of track.Keys) frames.add(key.Frame); });
-    const sorted = [...frames].sort((a, b) => a - b);
-    return (sequence: mdx.Sequence) => {
-        const [start, end] = [at(sequence.Interval, 0), at(sequence.Interval, 1)];
-        const inside = [start, ...sorted.filter(frame => frame > start && frame < end), end];
-        return inside.flatMap((frame, i) => i === 0 ? [frame] : [((inside[i - 1] ?? frame) + frame) / 2, frame]);
-    };
-};
-
-export function sequenceErrors(source: mdx.Model, candidate: mdx.Model, indices: readonly number[]): SequenceError[] {
-    const before = new ModelRenderer(source), after = new ModelRenderer(candidate), samplesOf = sampleFrames(source);
-    const nodes = source.Nodes.filter(node => node != null);
-    return indices.map(index => {
-        let maxPosition = 0, maxRotationDegrees = 0, samples = 0, worstFrame = 0, worstNode = -1;
-        before.setSequence(index); after.setSequence(index);
-        for (const frame of samplesOf(source.Sequences[index]!)) {
-            setFrame(before, frame); setFrame(after, frame);
-            const a = nodeMatrices(before), b = nodeMatrices(after);
-            nodes.forEach((node, nodeIndex) => {
-                const ma = a[node.ObjectId]?.matrix, mb = b[node.ObjectId]?.matrix;
-                if (ma === undefined || mb === undefined || sameMatrix(ma, mb)) return;
-                const p = source.PivotPoints[node.ObjectId] ?? new Float32Array(3);
-                let squared = 0;
-                for (let row = 0; row < 3; row++) {
-                    const d = (at(ma, row) - at(mb, row)) * at(p, 0) + (at(ma, 4 + row) - at(mb, 4 + row)) * at(p, 1) + (at(ma, 8 + row) - at(mb, 8 + row)) * at(p, 2) + at(ma, 12 + row) - at(mb, 12 + row);
-                    squared += d * d;
-                }
-                if (Math.sqrt(squared) > maxPosition) { worstFrame = frame; worstNode = nodeIndex; }
-                maxPosition = Math.max(maxPosition, Math.sqrt(squared));
-                maxRotationDegrees = Math.max(maxRotationDegrees, rotationAngle(ma, mb) ?? 0);
-            });
-            samples++;
-        }
-        return { maxPosition, maxRotationDegrees, samples, worstFrame, worstNode };
-    });
 }
 
 const PARALLEL_POSE_WORK = 2_000_000;

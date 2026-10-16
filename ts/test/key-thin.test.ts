@@ -33,10 +33,10 @@ test("slope tangents leave no close-key translation segment past the jitter limi
 
 const RETIRED_TANGENT_POLICIES = ["slope"];
 
-const TANGENT_POLICY = { tangents: "slope-jitter", implementation: "d72ede12650c97bb35f5139cd11f9d110fed33cf437748f7e01c891d7510a675" };
+const TANGENT_POLICY = { tangents: "slope-jitter", implementation: "23471c25101024dc385e50a83db9bd742258b98ecdb80d6c803f21522f1c064f" };
 
 test("a thinKeys change renames KEY_BOUND's tangent policy, so export-original-clips --keep-unchanged re-exports every fighter instead of keeping keys the producer no longer makes [k3 measure docs/typescript.md]", () => {
-  const implementation = new Bun.CryptoHasher("sha256").update(["keyThin.ts", "wisp/animJitter.ts"].map((file) => readFileSync(join(import.meta.dir, "../scripts", file), "utf8")).join("")).digest("hex");
+  const implementation = new Bun.CryptoHasher("sha256").update(["keyThin.ts", "modelTracks.ts", "poseError.ts", "wisp/animJitter.ts"].map((file) => readFileSync(join(import.meta.dir, "../scripts", file), "utf8")).join("")).digest("hex");
   expect(RETIRED_TANGENT_POLICIES, "a retired tangent policy name came back").not.toContain(KEY_BOUND.tangents);
   expect({ tangents: KEY_BOUND.tangents, implementation }, "thinKeys changed: retire KEY_BOUND.tangents into RETIRED_TANGENT_POLICIES, name the new policy, and record it here").toEqual(TANGENT_POLICY);
 });

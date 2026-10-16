@@ -30,7 +30,7 @@ export class PrePushRefusal extends Schema.TaggedError<PrePushRefusal>()("PrePus
 export interface Check { readonly name: string; readonly directory: string; readonly args: readonly string[]; readonly fix?: string; readonly hosted: boolean; readonly inputs?: readonly string[]; readonly privateStore?: boolean }
 
 
-const ANIMATION_INPUTS = ["build-inputs/original-clips-static-lights/", "tools/animations/", "ts/scripts/keyThin.ts", "ts/scripts/wisp/animJitter.ts"];
+const ANIMATION_INPUTS = ["build-inputs/original-clips-static-lights/", "tools/animations/", "ts/scripts/keyThin.ts", "ts/scripts/modelTracks.ts", "ts/scripts/poseError.ts", "ts/scripts/wisp/animJitter.ts"];
 const MODEL_INPUTS = ["build-inputs/", "tools/animations/", "ts/src/game/assets/", "ts/src/generated/assets/", "ts/src/generated/stages/", "ts/src/game/presentation/", "ts/scripts/wisp/playerView.ts", "ts/scripts/wisp/model-facts/"];
 const MAP_INPUTS = [...MODEL_INPUTS, "ts/src/generated/clips/", "ts/scripts/prePush.ts", "ts/scripts/wisp/", "ts/wisp.lock", "ts/bun.lock", "ts/package.json", "ts/vendor/", "typescript-toolchain.lock"];
 
