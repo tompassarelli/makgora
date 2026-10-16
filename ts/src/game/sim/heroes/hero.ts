@@ -91,6 +91,7 @@ export interface HeroDefinition {
   readonly character: Character;
 
   readonly name: string;
+  readonly displayName?: string | undefined;
   readonly purpose: string;
   readonly weakness: string;
 

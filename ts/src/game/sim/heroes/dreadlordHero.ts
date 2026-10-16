@@ -9,6 +9,7 @@ import { DREADLORD_SPECIALS } from "./dreadlordSpecials";
 export const DREADLORD_HERO: HeroDefinition = {
   character: Character.dreadlord,
   name: "Dreadlord",
+  displayName: "Mal'Ganis",
   purpose: "Air movement, grabs, and close pressure",
   weakness: "Large hurtbox and no safe long-range approach",
   complete: true,

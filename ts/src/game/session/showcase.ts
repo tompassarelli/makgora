@@ -1,7 +1,7 @@
 import { parseDecimal } from "../netcode/journal/decimal";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots, isParticipantSlot } from "../input/participants";
 import type { Character } from "../sim/codes";
-import { SELECTABLE_CHARACTERS, fighterName } from "../sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterName, fighterKey } from "../sim/heroes/registry";
 
 export const SHOWCASE_COMMAND = "-dev showcase ";
 export const SHOWCASE_PAD_X: Readonly<Slots<number>> = [-450.0, -150.0, 150.0, 450.0];
@@ -35,7 +35,7 @@ export const showcaseMask = (pads: Readonly<ShowcasePads>): number =>
 
 function characterNamed(name: string): Character | undefined {
   const wanted = name.trim().toLowerCase();
-  for (const character of SELECTABLE_CHARACTERS) if (fighterName(character).toLowerCase() === wanted) return character;
+  for (const character of SELECTABLE_CHARACTERS) if (fighterKey(character).toLowerCase() === wanted) return character;
   return undefined;
 }
 

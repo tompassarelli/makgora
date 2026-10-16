@@ -9,6 +9,7 @@ import { WARDEN_SPECIALS } from "./wardenSpecials";
 export const WARDEN_HERO: HeroDefinition = {
   character: Character.warden,
   name: "Warden",
+  displayName: "Maiev Shadowsong",
   purpose: "Precision mobility and edge pressure",
   weakness: "Light body and punishable teleport endpoints",
   complete: true,

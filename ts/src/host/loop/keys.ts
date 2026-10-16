@@ -21,7 +21,7 @@ import { ROSTER_MANA } from "../../game/sim/mana";
 import { fighterAt, isActive } from "../../game/sim/roster";
 import { NO_LESSON, tutorialFinished } from "../../game/match/tutorial";
 import { METER_COMMAND, classicDevRequest, loreDevRequest, LORE_WIN_COMMAND, winLoreBattle, DESYNC_COMMAND, QUICK_CPU_STOCKS, RESET_COMMAND, QUICK_TRAINING_COMMAND, applyDevCommand, prepareQuickCpu, prepareQuickTraining, quickMatchCpuHero, quickMatchCpuProfile, quickMatchHero, quickMatchHitAreas, quickMatchStocks, quickMatchPair, quickPromoRequest, prepareQuickPromo, quickStageSettings, quickPainHero, quickRecoveryHero, quickOffstageHero } from "../../game/session/devSettings";
-import { fighterName } from "../../game/sim/heroes/registry";
+import { fighterName, fighterKey } from "../../game/sim/heroes/registry";
 import { endReplaySegment } from "./replays";
 import { devReceiptFile } from "../../game/session/journalFiles";
 import { applyFighterSetup } from "../../game/session/fighterSetup";
@@ -370,7 +370,7 @@ export function applyDeveloperCommand(s: ShellState, actor: number, original: st
     receipt = `dev: lore ${lore}`;
     startDevLore(s, lore);
   } else if (classic !== undefined) {
-    receipt = `dev: classic ${fighterName(classic.character)}${classic.boss ? " boss" : ""}`;
+    receipt = `dev: classic ${fighterKey(classic.character)}${classic.boss ? " boss" : ""}`;
     startDevClassic(s, classic.character, classic.boss);
   } else if (message.startsWith("-dev shield-energy ")) {
     const sample = SHIELD_ENERGY_SAMPLES.find(value => message === `-dev shield-energy ${value}`);
@@ -410,19 +410,19 @@ export function applyDeveloperCommand(s: ShellState, actor: number, original: st
     receipt = "dev: quick match";
     startQuickMatch(s, quickStage.stage, s.build.scenario, undefined, 1, quickStage);
   } else if (offstageHero !== undefined) {
-    receipt = `dev: quick offstage ${fighterName(offstageHero)}`;
+    receipt = `dev: quick offstage ${fighterKey(offstageHero)}`;
     startQuickMatch(s, 0, "up-special-recovery", offstageHero);
   } else if (recoveryHero !== undefined) {
-    receipt = `dev: quick recovery ${fighterName(recoveryHero)}`;
+    receipt = `dev: quick recovery ${fighterKey(recoveryHero)}`;
     startQuickMatch(s, 0, "knockdown", recoveryHero);
   } else if (painHero !== undefined) {
-    receipt = `dev: quick ${painHero.scenario} ${fighterName(painHero.character)}`;
+    receipt = `dev: quick ${painHero.scenario} ${fighterKey(painHero.character)}`;
     startQuickMatch(s, 0, painHero.scenario, painHero.character);
   } else if (quickPair !== undefined) {
-    receipt = `dev: quick match ${fighterName(quickPair[0])} / ${fighterName(quickPair[1])}`;
+    receipt = `dev: quick match ${fighterKey(quickPair[0])} / ${fighterKey(quickPair[1])}`;
     startQuickMatch(s, 0, s.build.scenario, quickPair);
   } else if (quickHero !== undefined) {
-    receipt = `dev: quick match ${fighterName(quickHero)}`;
+    receipt = `dev: quick match ${fighterKey(quickHero)}`;
     if (quickMatchHitAreas(message)) {
       setTraining(s.game, actor, true);
       setHitAreas(s.game, actor, true);

@@ -84,6 +84,11 @@ const ORIGINAL_NAMES: Readonly<Record<number, string>> = { [Character.rifleman]:
 
 
 export function fighterName(character: number): string {
+  const hero = heroDefinition(character);
+  return hero?.displayName ?? hero?.name ?? ORIGINAL_NAMES[character] ?? "Rifleman";
+}
+
+export function fighterKey(character: number): string {
   return heroDefinition(character)?.name ?? ORIGINAL_NAMES[character] ?? "Rifleman";
 }
 

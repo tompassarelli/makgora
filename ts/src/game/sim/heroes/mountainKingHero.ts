@@ -9,6 +9,7 @@ import { MOUNTAIN_KING_SPECIALS } from "./mountainKingSpecials";
 export const MOUNTAIN_KING_HERO: HeroDefinition = {
   character: Character.mountainKing,
   name: "Mountain King",
+  displayName: "Muradin Bronzebeard",
   purpose: "Compact heavy with hammer and axe",
   weakness: "Slow approach and limited air drift",
   complete: true,

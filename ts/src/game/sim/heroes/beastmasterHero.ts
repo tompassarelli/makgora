@@ -9,6 +9,7 @@ import { BEASTMASTER_SPECIALS } from "./beastmasterSpecials";
 export const BEASTMASTER_HERO: HeroDefinition = {
   character: Character.beastmaster,
   name: "Beastmaster",
+  displayName: "Rexxar",
   purpose: "Three-animal pack coordination",
   weakness: "Shared resources and punishable pet commands",
   jab: { name: "Twin Axes", description: "Both axe hilts, then a shoulder that shoves, on repeated jabs." },

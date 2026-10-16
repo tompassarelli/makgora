@@ -9,6 +9,7 @@ import { LICH_SPECIALS } from "./lichSpecials";
 export const LICH_HERO: HeroDefinition = {
   character: Character.lich,
   name: "Lich",
+  displayName: "Kel'Thuzad",
   purpose: "Deliberate projectile placement",
   weakness: "Frail body and slow attacks at close range",
   complete: true,
