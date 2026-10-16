@@ -43,16 +43,16 @@ orientation and depth. Their scales range from 2.0 to 3.5 instead of 3.0 to
 6.0, so the stage reads as a deck suspended over terrain rather than a deck
 wedged among enormous boulders.
 
-## Naxxramas: the floating citadel and its ruined approach
+## Naxxramas: the floating citadel over a ruined town
 
-The Necropolis remains the sole focal building on the right, at x 1450,
-y 6200 and scale 1.5. Its suspended silhouette identifies Naxxramas while
-leaving the middle of the sky clear. On the left, one scale-0.75 Ziggurat
-and a scale-2.0 obelisk describe a receding Scourge approach. A low glacier
-on the near right provides terrain rather than a second tower. The citadel
-and Ziggurat previously used scales 3.0 and 3.25; the smaller forms make
-their architecture an environment behind the match. No figure-shaped model
-or additional ambient effect is introduced.
+Tom, 17 Oct: the old Naxxramas stood on a frozen lake "for no reason". The
+Necropolis now floats (`flying`) at x 1500, y 6600, z 350 and scale 2.5,
+high over the right of the skyline, with nothing under it. A row of ten
+ruined Lordaeron town buildings (the Cityscape `_Ruined` models, own
+textures) stands on the floor at y 4100 to 4450 behind the deck, the
+glaciers survive only as a lowered row of Northrend peaks at y 5250 to 5450,
+the floor is a dark night ground (72, 80, 92) instead of icy water, and the
+fog turns aurora green (0.09375, 0.3125, 0.25).
 
 ## Hellfire: a portal across fractured ground
 

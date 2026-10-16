@@ -6,6 +6,10 @@ import { STAGE_TOMB_SEA_MODEL } from "../../generated/stages/terrainAssetInfo";
 const SPIRES = "Doodads\\Outland\\Rocks\\Outland_Spires\\Outland_Spires7.mdx";
 const GLACIER = "Doodads\\Icecrown\\Rocks\\Glacier\\Glacier0.mdx";
 const MOUND = "Doodads\\Barrens\\Rocks\\Barrens_Rocks\\Barrens_Rocks2.mdx";
+const RUINED_LARGE_0 = "Doodads\\Cityscape\\Structures\\CityBuildingLarge_0_Ruined\\CityBuildingLarge_0_Ruined.mdx";
+const RUINED_LARGE_45 = "Doodads\\Cityscape\\Structures\\CityBuildingLarge_45_Ruined\\CityBuildingLarge_45_Ruined.mdx";
+const RUINED_SMALL_45 = "Doodads\\Cityscape\\Structures\\CityBuildingSmall45_0_Ruined\\CityBuildingSmall45_0_Ruined.mdx";
+const RUINED_SMALL_90 = "Doodads\\Cityscape\\Structures\\CityBuildingSmall90_2_Ruined\\CityBuildingSmall90_2_Ruined.mdx";
 
 export const DUROTAR_SCENERY: StageScenery = {
   farZ: 13000.0,
@@ -35,32 +39,26 @@ export const DUROTAR_SCENERY: StageScenery = {
 export const NAXXRAMAS_SCENERY: StageScenery = {
   farZ: 20000.0,
   sky: STAGE_SKY_MODELS[4] ?? "",
-  fog: { start: 3300.0, end: 19000.0, red: 0.125, green: 0.25, blue: 0.3125 },
-  floor: { model: STAGE_TOMB_SEA_MODEL, z: -1300.0, color: [64, 104, 104] },
+  fog: { start: 3300.0, end: 19000.0, red: 0.09375, green: 0.3125, blue: 0.25 },
+  floor: { model: STAGE_TOMB_SEA_MODEL, z: -1300.0, color: [72, 80, 92] },
   pieces: [
-    { model: "buildings\\undead\\Necropolis\\Necropolis.mdx", x: 1900.0, y: 4600.0, z: 250.0, scale: 2.0, yaw: 250.0 },
-    { model: GLACIER, x: 1900.0, y: 4650.0, z: -1800.0, scale: 4.5, yaw: 180.0, matrixScale: [1.5, 1.0, 1.0] },
-    { model: GLACIER, x: -3850.0, y: 4500.0, z: -1635.0, scale: 5.0, yaw: 175.0, matrixScale: [2.25, 1.0, 1.0] },
-    { model: GLACIER, x: -2950.0, y: 4350.0, z: -1406.0, scale: 4.5, yaw: 195.0, matrixScale: [2.5, 1.0, 1.0] },
-    { model: GLACIER, x: -2100.0, y: 4400.0, z: -1485.0, scale: 5.5, yaw: 165.0, matrixScale: [2.0, 1.0, 0.75] },
-    { model: GLACIER, x: -1250.0, y: 4650.0, z: -1471.0, scale: 4.75, yaw: 205.0, matrixScale: [2.25, 1.0, 1.0] },
-    { model: GLACIER, x: -350.0, y: 4450.0, z: -1799.0, scale: 5.25, yaw: 185.0, matrixScale: [2.25, 1.0, 1.0] },
-    { model: GLACIER, x: 550.0, y: 4700.0, z: -1785.0, scale: 4.0, yaw: 160.0, matrixScale: [2.5, 1.0, 1.25] },
-    { model: GLACIER, x: 1400.0, y: 4300.0, z: -1878.0, scale: 6.5, yaw: 200.0, matrixScale: [1.75, 1.0, 0.75] },
-    { model: GLACIER, x: 1900.0, y: 4250.0, z: -1385.0, scale: 4.0, yaw: 185.0, matrixScale: [2.75, 1.0, 1.25] },
-    { model: GLACIER, x: 2700.0, y: 4500.0, z: -1536.0, scale: 6.0, yaw: 170.0, matrixScale: [2.0, 1.0, 0.75] },
-    { model: GLACIER, x: 3500.0, y: 4650.0, z: -1828.0, scale: 6.5, yaw: 190.0, matrixScale: [2.0, 1.0, 0.75] },
-    { model: GLACIER, x: 4000.0, y: 4350.0, z: -1728.0, scale: 6.5, yaw: 180.0, matrixScale: [1.75, 1.0, 0.75] },
-    { model: GLACIER, x: -3700.0, y: 5300.0, z: -1599.0, scale: 7.0, yaw: 180.0, matrixScale: [2.0, 1.0, 0.75] },
-    { model: GLACIER, x: -2300.0, y: 5400.0, z: -1842.0, scale: 8.0, yaw: 170.0, matrixScale: [1.75, 1.0, 0.75] },
-    { model: GLACIER, x: -900.0, y: 5250.0, z: -1478.0, scale: 6.5, yaw: 190.0, matrixScale: [2.25, 1.0, 0.75] },
-    { model: GLACIER, x: 700.0, y: 5450.0, z: -1963.0, scale: 8.5, yaw: 175.0, matrixScale: [1.75, 1.0, 0.75] },
-    { model: GLACIER, x: 2200.0, y: 5300.0, z: -1692.0, scale: 6.0, yaw: 200.0, matrixScale: [2.25, 1.0, 1.0] },
-    { model: GLACIER, x: 3600.0, y: 5400.0, z: -1321.0, scale: 9.5, yaw: 165.0, matrixScale: [2.0, 1.0, 0.5] },
-    { model: GLACIER, x: -3950.0, y: 4700.0, z: -2156.0, scale: 5.0, yaw: 185.0, matrixScale: [1.5, 1.0, 1.25] },
-    { model: GLACIER, x: -650.0, y: 4900.0, z: -1922.0, scale: 6.0, yaw: 175.0, matrixScale: [1.75, 1.0, 1.0] },
-    { model: GLACIER, x: 3300.0, y: 4000.0, z: -2400.0, scale: 5.5, yaw: 175.0, matrixScale: [1.75, 1.0, 1.25] },
-    { model: GLACIER, x: 3950.0, y: 4050.0, z: -2522.0, scale: 5.5, yaw: 170.0, matrixScale: [1.5, 1.0, 1.25] },
+    { model: "buildings\\undead\\Necropolis\\Necropolis.mdx", x: 1500.0, y: 6600.0, z: 350.0, scale: 2.5, yaw: 250.0, flying: true },
+    { model: RUINED_LARGE_45, x: -3900.0, y: 4100.0, z: -1300.0, scale: 2.8125, yaw: 35.0, matrixScale: [1.0, 1.0, 1.25] },
+    { model: RUINED_SMALL_45, x: -3000.0, y: 4350.0, z: -1300.0, scale: 3.1875, yaw: 96.0, matrixScale: [1.0, 1.0, 1.25] },
+    { model: RUINED_LARGE_0, x: -2100.0, y: 4150.0, z: -1300.0, scale: 3.0, yaw: 157.0, matrixScale: [1.0, 1.0, 1.25] },
+    { model: RUINED_SMALL_90, x: -1200.0, y: 4450.0, z: -1300.0, scale: 2.8125, yaw: 218.0, matrixScale: [1.0, 1.0, 1.25] },
+    { model: RUINED_LARGE_45, x: -300.0, y: 4200.0, z: -1300.0, scale: 3.0, yaw: 279.0, matrixScale: [1.0, 1.0, 1.25] },
+    { model: RUINED_SMALL_45, x: 600.0, y: 4400.0, z: -1300.0, scale: 3.1875, yaw: 340.0, matrixScale: [1.0, 1.0, 1.25] },
+    { model: RUINED_LARGE_0, x: 1500.0, y: 4100.0, z: -1300.0, scale: 2.8125, yaw: 41.0, matrixScale: [1.0, 1.0, 1.25] },
+    { model: RUINED_SMALL_90, x: 2400.0, y: 4350.0, z: -1300.0, scale: 3.1875, yaw: 102.0, matrixScale: [1.0, 1.0, 1.25] },
+    { model: RUINED_LARGE_45, x: 3200.0, y: 4150.0, z: -1300.0, scale: 3.0, yaw: 163.0, matrixScale: [1.0, 1.0, 1.25] },
+    { model: RUINED_SMALL_45, x: 4000.0, y: 4450.0, z: -1300.0, scale: 2.8125, yaw: 224.0, matrixScale: [1.0, 1.0, 1.25] },
+    { model: GLACIER, x: -3700.0, y: 5300.0, z: -2199.0, scale: 7.0, yaw: 180.0, matrixScale: [2.0, 1.0, 0.75] },
+    { model: GLACIER, x: -2300.0, y: 5400.0, z: -2442.0, scale: 8.0, yaw: 170.0, matrixScale: [1.75, 1.0, 0.75] },
+    { model: GLACIER, x: -900.0, y: 5250.0, z: -2078.0, scale: 6.5, yaw: 190.0, matrixScale: [2.25, 1.0, 0.75] },
+    { model: GLACIER, x: 700.0, y: 5450.0, z: -2563.0, scale: 8.5, yaw: 175.0, matrixScale: [1.75, 1.0, 0.75] },
+    { model: GLACIER, x: 2200.0, y: 5300.0, z: -2292.0, scale: 6.0, yaw: 200.0, matrixScale: [2.25, 1.0, 1.0] },
+    { model: GLACIER, x: 3600.0, y: 5400.0, z: -1921.0, scale: 9.5, yaw: 165.0, matrixScale: [2.0, 1.0, 0.5] },
   ],
 };
 
