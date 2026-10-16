@@ -53,6 +53,10 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `bun tools/animations/stand-captures.ts PRIVATE_OUTPUT` checks each selectable
   fighter's shipped timeline against its source geosets at every Stand/move frame
   and renders both-facing Stand frames in Classic and Definitive.
+  `bun tools/animations/victory-captures.ts PRIVATE_OUTPUT` (through the capacity helper) wins a
+  headless match with each selectable fighter, checks the winner's victory clip starts at its first
+  frame, prints each sampled pose and renders a six-frame Classic results-screen strip per winner,
+  with the UI (`classic`) and without it for cold readers (`classic-poses`).
   `bun tools/animations/grab-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--character ID]` appends
   coordinated expansion-hero reach, hold, pummel and four-direction holder/victim
   gestures or reauthors their existing indices. `--character` limits reauthoring

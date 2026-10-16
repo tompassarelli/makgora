@@ -30,7 +30,6 @@ import { originalClip, originalClipNamed } from "../../generated/clips/fighterOr
 
 
 export const RESULTS_DELAY_FRAMES = 90;
-const LEVEL_UP_FRAME = 12;
 
 const FACING_CAMERA = f32(-1.5707963705062866);
 
@@ -91,6 +90,7 @@ export class MatchPresentation {
   private readonly poses: (VictoryPose | undefined)[] = [];
   private readonly resultSounds: sound[] = [];
   private resultEffectsMuted = false;
+  private resultBurst = false;
   private pending: ResultsView | undefined;
   private delay = 0;
 
@@ -270,14 +270,13 @@ export class MatchPresentation {
     if (this.resultView !== undefined) {
       this.resultFrames++;
       this.placeResultPoses();
-      if (this.resultFrames === LEVEL_UP_FRAME) {
-        for (const [index, row] of this.resultView.rows.entries()) {
-          if (!row.winner) continue;
-          const placement = resultFighterPlacement(this.resultStage, index, this.resultView.rows.length);
-          const burst = AddSpecialEffect("Abilities\\Spells\\Other\\Levelup\\LevelupCaster.mdx", this.origin.x + placement.x, this.origin.y);
-          BlzSetSpecialEffectZ(burst, this.origin.z + placement.z);
-          DestroyEffect(burst);
-        }
+      for (const [index, row] of this.resultView.rows.entries()) {
+        if (!row.winner || this.poses[row.slot]?.burstFrame !== this.resultFrames) continue;
+        this.resultBurst = true;
+        const placement = resultFighterPlacement(this.resultStage, index, this.resultView.rows.length);
+        const burst = AddSpecialEffect("Abilities\\Spells\\Other\\Levelup\\LevelupCaster.mdx", this.origin.x + placement.x, this.origin.y);
+        BlzSetSpecialEffectZ(burst, this.origin.z + placement.z);
+        DestroyEffect(burst);
       }
     }
     if (this.pending === undefined) return false;
@@ -331,7 +330,8 @@ export class MatchPresentation {
       if (winnerClip === undefined || idleClip === undefined) continue;
       const readyIndex = originalClipNamed(character, "stand ready");
       const heldClip = readyIndex === undefined ? idleClip : originalClip(character, readyIndex) ?? idleClip;
-      this.poses[slot] = { character, model: undefined, modelPath: undefined, winnerClip, repeatVictory: victoryAnimation(character).includes("victory"), heldClip, idleClip };
+      this.poses[slot] = { character, model: undefined, modelPath: undefined, winnerClip, repeatVictory: victoryAnimation(character).includes("victory"), heldClip, idleClip,
+        burstFrame: R2I((winnerClip.endSeconds - winnerClip.startSeconds) * 60.0 + 0.5) };
     }
   }
 
@@ -377,7 +377,7 @@ export class MatchPresentation {
   hideResults(): void {
     for (const played of this.resultSounds) StopSound(played, false, true);
     this.resultSounds.length = 0;
-    if (this.resultView !== undefined && this.resultFrames >= LEVEL_UP_FRAME) {
+    if (this.resultBurst) {
       // A model's event sound outlives DestroyEffect, so the level-up burst's sound is cut through its volume groups.
       VolumeGroupSetVolume(SOUND_VOLUMEGROUP_SPELLS, 0.0);
       VolumeGroupSetVolume(SOUND_VOLUMEGROUP_COMBAT, 0.0);
@@ -386,6 +386,7 @@ export class MatchPresentation {
     this.pending = undefined;
     this.resultView = undefined;
     this.resultFrames = 0;
+    this.resultBurst = false;
     this.posing = undefined;
     BlzFrameSetVisible(this.panel, false);
     this.releasePoses();

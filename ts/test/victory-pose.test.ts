@@ -37,6 +37,8 @@ test("results playback shows full stock victories and casts once before holding 
       if (clip === undefined) throw new Error(`${name}: missing victory`);
       const duration = clip.endSeconds - clip.startSeconds;
       presentation.preparePoses(soloWorld(createFighter(character, 0, 1)));
+      const bursts = () => client.effectPoses().filter(pose => pose.model.includes("LevelupCaster")).length;
+      const burstsBefore = bursts();
       presentation.beginResults({ rows: [{ slot: 0, winner: true, text: name }], winner: character, winnerSlot: 0, x: 0, z: 0 }, 0);
       const drawn = () => client.effectPoses({ visibleOnly: true }).find(pose => pose.destroyed === undefined && pose.model === clip.modelPath);
       expect(drawn()?.animationElapsed, `${name}: clip begins at its first frame`).toBeCloseTo(clip.timeline === true ? clip.startSeconds : 0, 4);
@@ -49,6 +51,7 @@ test("results playback shows full stock victories and casts once before holding 
         if (pose === undefined) throw new Error(`${name}: missing body`);
         expect(pose.timeScale).toBe(0);
         const elapsed = frame / 60;
+        expect(bursts() - burstsBefore, `${name}/${frame}: the level-up burst waits for the whole victory`).toBe(frame < Math.round(duration * 60) ? 0 : 1);
         if (victoryAnimation(character).includes("victory")) {
           expect(pose.animationElapsed).toBeGreaterThanOrEqual(clip.startSeconds);
           expect(pose.animationElapsed).toBeLessThanOrEqual(clip.endSeconds);
