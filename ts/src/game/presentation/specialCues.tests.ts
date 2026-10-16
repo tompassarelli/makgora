@@ -98,8 +98,8 @@ test("Cairne's special cues use no stock Bloodlust model, whose sound events pla
 });
 
 test("Forsaken Paladin shows holy art only on Consecration, and no special re-spawns its art every frame [k2 property]", () => {
-  const holy = /\\Human\\(Heal|HolyBolt|Resurrect)\\|\\Consecration\\/;
+  const holy = (model: string) => ["\\Heal\\", "\\HolyBolt\\", "\\Resurrect\\", "\\Consecration\\"].some((part) => model.includes(part));
   const cues = HERO_CUES[Character.forsakenPaladin]!;
-  const loud = (["neutral", "side", "up"] as const).flatMap((slot) => [cues[slot].startup, cues[slot].active]).filter((cue) => holy.test(cue.model) || cue.birth?.eachFrame === true);
+  const loud = (["neutral", "side", "up"] as const).flatMap((slot) => [cues[slot].startup, cues[slot].active]).filter((cue) => holy(cue.model) || cue.birth?.eachFrame === true);
   assertEquals(loud.map((cue) => cue.model).join("\n"), "");
 });

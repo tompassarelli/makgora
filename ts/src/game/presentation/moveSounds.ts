@@ -44,6 +44,7 @@ interface SpecialSound {
 interface FighterSound {
   readonly weapon: Weapon;
   readonly swing?: readonly string[] | undefined;
+  readonly whoosh?: false | undefined;
   readonly effort?: readonly string[] | undefined;
   readonly strong: string;
   readonly specials: readonly [SpecialSound, SpecialSound, SpecialSound, SpecialSound];
@@ -80,7 +81,7 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
     specials: [s("ZigguratFrostMissileLaunch", "FrostNova"), s("DeathAndDecayTarget", "DeathAndDecayTarget"), s("DarkRitual", "LichMissile"), s("FrostArmor", "FrostBoltHit")],
   },
   [Character.forsakenPaladin]: {
-    weapon: Weapon.blade, strong: "MetalHeavySliceMetal",
+    weapon: Weapon.blade, whoosh: false, strong: "MetalHeavySliceMetal",
     specials: [s("DispelMagic", "MetalHeavySliceFlesh"), s("DivineShield", "MetalHeavySliceFlesh"), s("InnerFire", "MetalMediumSliceFlesh"), s(CONSECRATION_SOUND, "WoodLightBashFlesh", CONSECRATION_VOLUME)],
   },
   [Character.dreadlord]: {
@@ -220,7 +221,7 @@ function resolve(character: Character, move: number): MoveSound | undefined {
   const style = move;
   const tier = moveTier(character, style);
   const own = fighter.normals?.[style];
-  const perform = [layer([SWING_SOUND], at(TIER_SWING_VOLUME, tier), at(TIER_SWING_PITCH, tier))];
+  const perform = fighter.whoosh === false ? [] : [layer([SWING_SOUND], at(TIER_SWING_VOLUME, tier), at(TIER_SWING_PITCH, tier))];
   if (own?.perform !== undefined) perform.push(layer([own.perform], PERFORM_VOLUME));
   else if (fighter.swing !== undefined && tier !== SoundTier.small) perform.push(layer(fighter.swing, at(MODEL_SWING_VOLUME, tier)));
   const body = own?.hit ?? at(at(FLESH, weapon), tier);

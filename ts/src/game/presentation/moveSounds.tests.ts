@@ -127,7 +127,7 @@ test("Forsaken Paladin swings and hits with stock sword sounds and plays Consecr
     const labels = (layers: readonly { readonly sounds: readonly string[] }[] | undefined) => (layers ?? []).map((layer) => layer.sounds.join("|")).join("+");
     rows.push(`${move}: perform ${labels(row?.perform)} hit ${labels(row?.hit)} strong ${labels(row?.strong)} voice ${row?.voice === undefined ? "-" : "yes"}`);
     const hit = SWORD_HIT[move] ?? "missing";
-    expected.push(`${move}: perform ${PALADIN_PERFORM[move] ?? SWING_SOUND} hit ${hit} strong ${isSpecialMove(move) ? hit : "MetalHeavySliceFlesh"}+MetalHeavySliceMetal voice -`);
+    expected.push(`${move}: perform ${PALADIN_PERFORM[move] ?? ""} hit ${hit} strong ${isSpecialMove(move) ? hit : "MetalHeavySliceFlesh"}+MetalHeavySliceMetal voice -`);
     for (let serial = 0; serial < 6; serial++) {
       const performed: { file: string; volume: number }[] = [];
       const impacts: string[] = [];
