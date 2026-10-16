@@ -479,8 +479,8 @@ export class ProjectilePresentation {
           }
           BlzResetSpecialEffectMatrix(boundary);
           BlzSetSpecialEffectRoll(boundary, f32(Math.PI * 0.5));
-          BlzSetSpecialEffectPosition(boundary, this.origin.x + pose.x, this.origin.y - 12.0, this.origin.z + pose.z);
-          BlzSetSpecialEffectScale(boundary, f32(pose.dangerRadius / 180.0));
+          BlzSetSpecialEffectPosition(boundary, this.origin.x + pose.x, this.origin.y - 12.0, this.origin.z + pose.z + f32(pose.dangerRadius * f32(0.45)));
+          BlzSetSpecialEffectScale(boundary, f32(pose.dangerRadius / 720.0));
           BlzSetSpecialEffectColor(boundary, 155, 210, 255);
           BlzSetSpecialEffectAlpha(boundary, 255);
           if (!this.visible[boundarySlot]) BlzSetSpecialEffectAnimation(boundary, "birth");
