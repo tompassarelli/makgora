@@ -6,6 +6,10 @@ import { listFiles } from "../scripts/wisp/buildInputs";
 import { assembleFamily } from "../scripts/wisp/fighterArt";
 import { modelFactsFile, readModelFacts, replaceModelFacts } from "../scripts/wisp/modelFactsTable";
 import type { ModelFacts } from "wisp/scripts/wisp/models";
+import { parseMDL } from "war3-model";
+import { generateModelMDX, parseModelMDX } from "../scripts/mdxCodec";
+import { thinKeys } from "../scripts/keyThin";
+import { thinnedModel } from "../../tools/animations/thinned-source";
 
 const hex = (seed: string) => new Bun.CryptoHasher("sha256").update(seed).digest("hex");
 
@@ -51,6 +55,19 @@ test("replacing one fighter's model facts leaves every other model's facts file 
     expect(readModelFacts(work)).toEqual({ ...others, [model("LichTimelineBody2")]: facts(6) });
     for (const path of Object.keys(others)) expect(readFileSync(join(work, modelFactsFile(path)), "utf8")).toBe(before[modelFactsFile(path)]!);
     expect(() => replaceModelFacts(["war3mapImported\\LichWhite-"], { [model("PeonWhite")]: facts(7) }, work)).toThrow();
+  } finally {
+    rmSync(work, { recursive: true, force: true });
+  }
+});
+
+test("the shared thinned source parses a Definitive-format skinned model exactly as the producers' codec does, on a miss and on a hit [k2 property]", () => {
+  const work = mkdtempSync(join(tmpdir(), "thinned-source-"));
+  try {
+    const model = parseMDL('Version { FormatVersion 800, } Model "synthetic skinned" { BlendTime 0, MinimumExtent { 0, 0, 0 }, MaximumExtent { 1, 1, 0 }, BoundsRadius 1, } Sequences 1 { Anim "Stand" { Interval { 0, 1000 }, MinimumExtent { 0, 0, 0 }, MaximumExtent { 1, 1, 0 }, BoundsRadius 1, } } Textures 1 { Bitmap { Image "t.blp", } } Materials 1 { Material { Layer { FilterMode None, static TextureID 0, } } } Bone "root" { ObjectId 0, Translation 2 { Linear, 0: {0,0,0}, 1000: {0,0,1}, } } Bone "tip" { ObjectId 1, Parent 0, } Geoset { Vertices 3 { {0,0,0}, {1,0,0}, {0,1,0}, } Normals 3 { {0,0,1}, {0,0,1}, {0,0,1}, } TVertices 3 { {0,0}, {1,0}, {0,1}, } VertexGroup { 0, 0, 0, } Faces 1 3 { Triangles { {0,1,2}, } } Groups 1 1 { Matrices { 0 }, } MinimumExtent { 0, 0, 0 }, MaximumExtent { 1, 1, 0 }, BoundsRadius 1, MaterialID 0, }');
+    model.Version = 1800;
+    model.Geosets[0]!.SkinWeights = new Uint8Array([1, 0, 0, 0, 255, 0, 0, 0, 0, 1, 0, 0, 128, 127, 0, 0, 1, 0, 0, 0, 255, 0, 0, 0]);
+    const bytes = generateModelMDX(model), expected = thinKeys(parseModelMDX(bytes));
+    for (const pass of ["miss", "hit"]) expect(thinnedModel(bytes, work), pass).toEqual(expected);
   } finally {
     rmSync(work, { recursive: true, force: true });
   }
