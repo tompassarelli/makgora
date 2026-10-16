@@ -95,7 +95,7 @@ export function simultaneousPositive(tracks: readonly TrackFacts[], sequence: Wi
   return samples.some((frame) => tracks.every((track, index) => at(track, index, frame) > 0));
 }
 
-export const FACTS_VERSION = 1;
+export const FACTS_VERSION = 2;
 
 /** Extracts the judge's model facts; a texture counts only when it is not replaceable and the cache resolves it. */
 export function classicModelFacts(model: mdx.Model, textureResolves: (path: string) => boolean | undefined): ModelFacts {
@@ -105,10 +105,26 @@ export function classicModelFacts(model: mdx.Model, textureResolves: (path: stri
     if (image === undefined || (image.ReplaceableId ?? 0) > 0) return false;
     return textureResolves(image.Image) === true;
   };
+  const supportedScale = (track: mdx.AnimVector | null | undefined): boolean => {
+    if (track == null || track.Keys.length === 0) return true;
+    if (track.LineType > 1) return false;
+    const scales = track.Keys.map(({ Vector }) => Array.from(Vector));
+    return [0, 1, 2].every((axis) => {
+      let sign: number | undefined;
+      for (const scale of scales) {
+        const value = scale[axis];
+        if (value === undefined || !Number.isFinite(value) || value === 0) return false;
+        const nextSign = value < 0 ? -1 : 1;
+        if (track.LineType === 1 && sign !== undefined && sign !== nextSign) return false;
+        sign = nextSign;
+      }
+      return true;
+    });
+  };
   const supportedNode = (node: mdx.Model["Nodes"][number] | undefined, seen = new Set<number>()): boolean => {
     if (node === undefined || seen.has(node.ObjectId)) return false;
     seen.add(node.ObjectId);
-    if (node.Translation?.Keys.length || node.Rotation?.Keys.length || node.Scaling?.Keys.length || (node.Flags & 255) !== 0) return false;
+    if (!supportedScale(node.Scaling)) return false;
     return node.Parent == null || node.Parent === -1 || node.Parent === 0xffffffff || supportedNode(model.Nodes[node.Parent], seen);
   };
   const layers = (materialId: number | undefined): LayerFacts[] => ((materialId === undefined ? undefined : model.Materials[materialId])?.Layers ?? []).map((layer) => ({ alpha: trackFacts(layer.Alpha), texture: texture(typeof layer.TextureID === "number" ? layer.TextureID : undefined) }));
