@@ -253,7 +253,7 @@ export function unguarded(victim: Character, plan: Readonly<RecoveryPlan>): Outc
 export const EDGE_GUARD_SCENARIOS: Readonly<Record<number, EdgeGuardScenario>> = {
   [Character.rifleman]: { guarder: Character.rifleman, out: 162.0, z: -53.0, press: 6 },
   [Character.demonHunter]: { guarder: Character.demonHunter, out: 165.0, z: -20.0, press: 6 },
-  [Character.blademaster]: { guarder: Character.blademaster, out: 163.0, z: -68.0, press: 6 },
+  [Character.blademaster]: { guarder: Character.demonHunter, out: 120.0, z: -72.0, press: 6 },
   [Character.mountainKing]: { guarder: Character.mountainKing, out: 164.0, z: -68.0, press: 3 },
   [Character.warden]: { guarder: Character.warden, out: 163.0, z: -68.0, press: 9 },
   [Character.lich]: { guarder: Character.lich, out: 97.0, z: -84.0, press: 6 },
@@ -266,7 +266,7 @@ export const EDGE_GUARD_SCENARIOS: Readonly<Record<number, EdgeGuardScenario>> =
   [Character.thrall]: { guarder: Character.thrall, out: 165.0, z: -68.0, press: 3 },
   [Character.jaina]: { guarder: Character.jaina, out: 163.0, z: -68.0, press: 6 },
   [Character.sylvanas]: { guarder: Character.sylvanas, out: 163.0, z: -68.0, press: 3 },
-  [Character.cairne]: { guarder: Character.cairne, out: -7.0, z: 22.0, press: 19 },
+  [Character.cairne]: { guarder: Character.demonHunter, out: 86.0, z: -40.0, press: 6 },
   [Character.chen]: { guarder: Character.chen, out: 163.0, z: -68.0, press: 3 },
   [Character.peon]: { guarder: Character.peon, out: 97.0, z: -84.0, press: 6 },
   [Character.tinker]: { guarder: Character.tinker, out: 163.0, z: -68.0, press: 1 },
