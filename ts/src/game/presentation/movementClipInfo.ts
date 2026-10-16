@@ -9,6 +9,10 @@ export const MOVEMENT_CLIPS = {
     crouch: { index: 72, seconds: f32(0.4) },
     ledgeHang: { index: 73, seconds: 1.0 },
   },
+  4: {
+    crouch: { index: 77, seconds: f32(0.4) },
+    ledgeHang: { index: 78, seconds: 1.0 },
+  },
   5: {
     crouch: { index: 73, seconds: f32(0.4) },
     ledgeHang: { index: 74, seconds: 1.0 },

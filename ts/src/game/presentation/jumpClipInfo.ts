@@ -5,11 +5,17 @@ export const JUMP_CLIPS = {
   3: {
     doubleJump: { index: 55, seconds: 0.5 },
   },
+  4: {
+    doubleJump: { index: 79, seconds: 0.5 },
+  },
   5: {
     doubleJump: { index: 52, seconds: 0.5 },
   },
   6: {
     doubleJump: { index: 50, seconds: 0.5 },
+  },
+  7: {
+    doubleJump: { index: 109, seconds: 0.5 },
   },
   8: {
     jump: { index: 52, seconds: f32(0.4) },
@@ -51,6 +57,9 @@ export const JUMP_CLIPS = {
   },
   22: {
     doubleJump: { index: 97, seconds: 0.5 },
+  },
+  23: {
+    doubleJump: { index: 99, seconds: 0.5 },
   },
   24: {
     doubleJump: { index: 89, seconds: 0.5 },

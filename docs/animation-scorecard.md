@@ -62,11 +62,10 @@ frame: `grip`, the nearest drawn point to the corner over the standing
 height (at most 0.12: a hand, claw or weapon is at the ledge); `below`, the
 share of drawn points no higher than the corner (at least 0.89, 90% of
 Rifleman's 0.994: the body hangs under it); `clear`, the share outside the stage wall (at least 0.9);
-and `fit`, the share inside the hang hurt parts. `stand fit` is the share of
-the standing body inside its standing hurt parts, and the hang passes at
-`fit` of at least the smaller of 0.75 and `stand fit`: the hanging body stays
-in its hurtbox as well as the standing body does (weapons, wings and capes
-leave Cairne's standing body only 0.49 inside his). Rifleman's natively
+and `fit`, the share of the body at or below the corner that is inside the
+hang hurt parts (at least 0.6; Tom's gate 25). The grip above the corner is
+exempt: the sim hangs every fighter at one depth, and a short fighter's arms,
+head and weapon reach above its unchanged hang capsule to hold the lip. Rifleman's natively
 accepted hang calibrates these initial values; they are Tom's to tune.
 Facing the stage is read on the strip.
 

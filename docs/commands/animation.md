@@ -36,7 +36,13 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   for the crouch and puts one wrist (Thrall: the wolf's front paws) on the ledge
   corner for the hang, and a coordinate search over the joint angles keeps the
   pose scoring best on `anim score`'s crouch or ledge line, measured against the
-  standing pose the sampler shows. A clip already named
+  standing pose the sampler shows; a crouch also fails if it sinks any
+  non-weapon vertex below the stand's lowest. For a fighter with a Definitive body it then
+  refines that pose against the worse of the two looks, retargeting only the
+  stand and the authored clip onto the stock Definitive model
+  (smashcraft:tools/animations/movement-definitive.ts), and keeps the refinement
+  only when both looks pass, never trading a passing Classic line for a failing one. Pit Lord's tail and every legged body's fold are
+  searched for the hang as well. A clip already named
   for the pose is re-authored in place, and Illidan's Ledge Catch then eases into
   the new hang over its first 60%; otherwise it appends `Movement POSE` and
   binds it in the generated smashcraft:ts/src/game/presentation/movementClipInfo.ts;
@@ -44,9 +50,12 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   identical. Run it after the fighter's own generator, which rebuilds from stock,
   and before `jump-clips.ts --character`; then store the family and run
   `bun wisp inputs derive --fighter NAME`. A body the shared joints can't pose (Thrall's
-  mount, Goblin Tinker's backpack claws) keeps its own search space in
-  `tools/animations/movement-poses/FIGHTER.ts`: named bones, grip bones, and an optional
-  measure of the packaged Definitive body that the search must also pass.
+  mount, Goblin Tinker's backpack claws, Mountain King's left-hand hammer, Anub'arak's
+  carapace and squash) keeps its own search space in
+  `tools/animations/movement-poses/FIGHTER.ts`, usually the shared space of
+  smashcraft:tools/animations/movement-space.ts plus named bones, refined
+  against Definitive like every other space. A pose chosen by measurement rather
+  than search (Pit Lord's crouch, Chen's crouch and hang) is pinned in `PINNED`.
   `bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT`
   appends a distinct gesture for each Blademaster normal and his back throw,
   preserving the shipped plunge and double-jump flip.

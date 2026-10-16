@@ -140,9 +140,9 @@ export function scoreCrouch(stand: ScoreFrame, crouch: ScoreFrame, pixelsPerUnit
 }
 
 
-export const LEDGE_THRESHOLDS = { grip: 0.12, below: 0.89, clear: 0.9, fit: 0.75 } as const;
+export const LEDGE_THRESHOLDS = { grip: 0.12, below: 0.89, clear: 0.9, fit: 0.6 } as const;
 
-export interface LedgeScore { readonly pass: boolean; readonly grip: number; readonly below: number; readonly clear: number; readonly fit: number; readonly standFit: number }
+export interface LedgeScore { readonly pass: boolean; readonly grip: number; readonly below: number; readonly clear: number; readonly fit: number }
 
 interface LedgeCorner { readonly x: number; readonly z: number }
 interface LedgePart { readonly x1: number; readonly z1: number; readonly x2: number; readonly z2: number; readonly radius: number }
@@ -153,17 +153,17 @@ function insideCapsule(part: LedgePart, x: number, z: number): boolean {
   return Math.hypot(x - (part.x1 + t * dx), z - (part.z1 + t * dz)) <= part.radius;
 }
 
-function insideShare(frame: ScoreFrame, parts: readonly LedgePart[]): number {
+function insideShare(frame: ScoreFrame, parts: readonly LedgePart[], top: number): number {
   let drawn = 0, inside = 0;
   for (let vertex = 0; vertex < frame.drawn.length; vertex++) {
-    if (frame.drawn[vertex] !== 1) continue;
+    if (frame.drawn[vertex] !== 1 || (frame.vertices[vertex * 2 + 1] ?? 0) > top) continue;
     drawn++;
     if (parts.some((part) => insideCapsule(part, frame.vertices[vertex * 2] ?? 0, frame.vertices[vertex * 2 + 1] ?? 0))) inside++;
   }
   return drawn === 0 ? 0 : inside / drawn;
 }
 
-export function scoreLedgeHang(stand: ScoreFrame, hang: readonly ScoreFrame[], parts: readonly LedgePart[], corner: LedgeCorner, standParts: readonly LedgePart[] = parts): LedgeScore {
+export function scoreLedgeHang(stand: ScoreFrame, hang: readonly ScoreFrame[], parts: readonly LedgePart[], corner: LedgeCorner): LedgeScore {
   const height = bodyHeight(stand), slack = 0.03 * height;
   let grip = 0, below = 1, clear = 1, fit = 1;
   for (const frame of hang) {
@@ -180,10 +180,10 @@ export function scoreLedgeHang(stand: ScoreFrame, hang: readonly ScoreFrame[], p
     grip = Math.max(grip, nearest / height);
     below = Math.min(below, share(under));
     clear = Math.min(clear, share(outside));
-    fit = Math.min(fit, insideShare(frame, parts));
+    fit = Math.min(fit, insideShare(frame, parts, corner.z));
   }
-  const t = LEDGE_THRESHOLDS, standFit = insideShare(stand, standParts);
-  return { pass: hang.length > 0 && grip <= t.grip && below >= t.below && clear >= t.clear && fit >= Math.min(t.fit, standFit), grip, below, clear, fit, standFit };
+  const t = LEDGE_THRESHOLDS;
+  return { pass: hang.length > 0 && grip <= t.grip && below >= t.below && clear >= t.clear && fit >= t.fit, grip, below, clear, fit };
 }
 
 

@@ -324,7 +324,6 @@ export interface LedgeSample {
   readonly stand: ScoreFrame;
   readonly hang: readonly ScoreFrame[];
   readonly parts: readonly Capsule[];
-  readonly standParts: readonly Capsule[];
   readonly clip: string;
   readonly kind: CrouchClipKind;
   readonly hangSeconds: readonly number[];
@@ -335,17 +334,16 @@ const LEDGE_SAMPLE_EVERY = 6;
 
 const hurtCapsules = (f: Fighter): Capsule[] => fighterHurtParts(f).map((part) => ({ x1: part.x1, z1: part.z1, x2: part.x2, z2: part.z2, radius: part.radius }));
 
-export function ledgeHangParts(character: Character): { readonly parts: readonly Capsule[]; readonly standParts: readonly Capsule[]; readonly standing: PoseFrame } {
+export function ledgeHangParts(character: Character): { readonly parts: readonly Capsule[]; readonly standing: PoseFrame } {
   const f = createFighter(character, 0.0, 1);
   const world = createRoster(1, [f]);
   const p = createFighterPose();
   const input = neutralControls();
   let standing = capture(f, p);
   for (let tick = 0; tick < 30; tick++) { step(world, input); advanceFighterPose(p, f, world, input, false, false, false, false); standing = capture(f, p); }
-  const standParts = hurtCapsules(f);
   if (!snapToLedge(world, 0, 0, 1)) throw new Error(`${fighterSlug(character)}: the sampled fighter catches the ledge`);
   for (let tick = 1; tick <= LEDGE_HOLD_FRAMES; tick++) step(world, input);
-  return { parts: hurtCapsules(f), standParts, standing };
+  return { parts: hurtCapsules(f), standing };
 }
 
 export function sampleLedgeHang(model: DrawnModel, character: Character): LedgeSample {
@@ -356,7 +354,6 @@ export function sampleLedgeHang(model: DrawnModel, character: Character): LedgeS
   const advance = () => { step(world, input); advanceFighterPose(p, f, world, input, false, false, false, false); return capture(f, p); };
   let standing = capture(f, p);
   for (let tick = 0; tick < 30; tick++) standing = advance();
-  const standParts = hurtCapsules(f);
   if (!snapToLedge(world, 0, 0, 1)) throw new Error(`${fighterSlug(character)}: the sampled fighter catches the ledge`);
   const hang: ScoreFrame[] = [], hangSeconds: number[] = [];
   let clipIndex: number | undefined;
@@ -369,7 +366,7 @@ export function sampleLedgeHang(model: DrawnModel, character: Character): LedgeS
   const clip = clipLabel(character, clipIndex);
   const kind = clipIndex === standing.clip ? "none" : /ledge|hang/i.test(clip) ? "crouch" : "other";
   const parts = hurtCapsules(f);
-  return { stand: pose(model, character, standing), hang, parts, standParts, clip, kind, hangSeconds };
+  return { stand: pose(model, character, standing), hang, parts, clip, kind, hangSeconds };
 }
 
 

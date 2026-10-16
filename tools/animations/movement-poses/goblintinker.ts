@@ -1,10 +1,10 @@
-import type { Choice, Space } from "../movement-space";
+import { type Choice, type Pose, type Space, describe } from "../movement-space";
 
 const turn = [-150, -120, -90, -60, -30, 0, 30, 60, 90, 120, 150];
 export const GRIP_BONES = ["Bone_BackPack_Claw1Right", "Bone_BackPack_Claw2Right", "Bone_BackPack_Claw1Left", "Bone_BackPack_Claw2Left"];
 
 const hang = (c: Choice) => ({
-  name: Object.entries(c).map(([key, value]) => `${key} ${value}`).join(" "), fold: 30, lean: c.lean ?? 0, parentFrame: c.frame === 1,
+  name: describe(c), fold: 30, lean: c.lean ?? 0, parentFrame: c.frame === 1,
   angles: { shoulder: c.shoulder ?? 0, elbow: c.elbow ?? 0, chest: c.chest ?? 0, head: c.head ?? 0, hip: c.hip ?? 0, knee: c.knee ?? 0, ankle: -((c.hip ?? 0) + (c.knee ?? 0)) },
   bones: {
     Bone_BackPack_ArmRight1: c.packRight ?? 0, Bone_BackPack_ArmRight2: c.packElbowRight ?? 0, Bone_BackPack_ArmRight3: c.packWristRight ?? 0,
@@ -12,7 +12,7 @@ const hang = (c: Choice) => ({
   },
 });
 
-export const MOVEMENT_POSES: Partial<Record<"crouch" | "ledgeHang", Space>> = {
+export const MOVEMENT_POSES: Partial<Record<Pose, Space>> = {
   ledgeHang: {
     starts: [
       { frame: 0, shoulder: -90, elbow: 0, chest: 0, head: 0, hip: 20, knee: 40, lean: 0, packRight: 30, packElbowRight: 30, packWristRight: 0, packLeft: 30, packElbowLeft: 30, packWristLeft: 0 },

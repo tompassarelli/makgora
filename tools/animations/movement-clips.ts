@@ -3,6 +3,8 @@ import { dirname, join, relative, resolve } from "node:path";
 import { quat } from "gl-matrix";
 import { model as mdx } from "war3-model";
 import { FIGHTER_RIGS } from "./hd-rigs";
+import { type DefinitiveLook, definitiveLook, retargetedSequences } from "./movement-definitive";
+import { DEFINITIVE_FIGHTERS } from "../../ts/src/game/assets/definitiveFighters";
 import { highestGrip, ledgeGripOffset } from "./ledge-grip";
 import { DEMON_HUNTER_LEDGE_CATCH_INDEX } from "../../ts/src/game/presentation/demonHunterAssetInfo";
 import { clipFor } from "../../ts/src/game/presentation/fighterClips";
@@ -11,7 +13,7 @@ import type { HeroClip, HeroClipTable } from "../../ts/src/game/sim/heroes/hero"
 import { characterModelScale } from "../../ts/src/game/presentation/modelScale";
 import { generateModelMDX as generateMDX } from "../../ts/scripts/mdxCodec";
 import { fighters } from "../../ts/scripts/heroModelSource";
-import { type ScoreFrame, scoreCrouch, scoreLedgeHang, CROUCH_THRESHOLDS, LEDGE_THRESHOLDS } from "../../ts/scripts/wisp/animScore";
+import { type ScoreFrame, bodyHeight, scoreCrouch, scoreLedgeHang, CROUCH_THRESHOLDS, LEDGE_THRESHOLDS } from "../../ts/scripts/wisp/animScore";
 import { gameplayPixelsPerUnit, ledgeHangParts } from "../../ts/scripts/wisp/animScoreSample";
 import { DrawnModel, sheet } from "../../ts/scripts/wisp/hurtboxView";
 import { AttackPhase, Character } from "../../ts/src/game/sim/codes";
@@ -20,10 +22,9 @@ import { HurtState } from "../../ts/src/game/sim/hurtboxes";
 import { LEDGE_HANG_DEPTH, LEDGE_HANG_OUTSET } from "../../ts/src/game/sim/ledge";
 import { createRoster } from "../../ts/src/game/sim/roster";
 import { seconds } from "./asset-info";
-import type { Choice, Space, Variant } from "./movement-space";
+import { type Choice, type Pose, type Space, type Variant, describe, SPACES } from "./movement-space";
 import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
 
-type Pose = "crouch" | "ledgeHang";
 const [inputArg, outputArg, ...options] = process.argv.slice(2);
 const input = resolve(inputArg ?? ""), output = resolve(outputArg ?? "");
 const project = resolve(import.meta.dir, "../..");
@@ -41,30 +42,15 @@ const LEG_BONES: Readonly<Partial<Record<number, readonly (readonly [string, str
 };
 const PINNED: Readonly<Partial<Record<number, Readonly<Partial<Record<Pose, Choice>>>>>> = {
   [Character.pitLord]: { crouch: { frame: 0, hip: -80, knee: 110, chest: 80, shoulder: 10, elbow: -40, weapon: 0, pelvis: 20, squash: 0.15 } },
-  [Character.chen]: { ledgeHang: { frame: 0, shoulder: -207.5, elbow: 22.5, chest: 38, hip: -85, knee: 77.5, lean: 7.5, pelvis: -15, weapon: -45, head: -120 } },
+  [Character.chen]: { crouch: { frame: 1, hip: -80, knee: 110, chest: 80, shoulder: -30, elbow: -40, weapon: 0, head: 60 }, ledgeHang: { frame: 0, shoulder: -207.5, elbow: 22.5, chest: 38, hip: -85, knee: 77.5, lean: 7.5, pelvis: -15, weapon: -45, head: -120 } },
 };
 const FRAMES: Readonly<Record<Pose, number>> = { crouch: 24, ledgeHang: 60 };
 const LEDGE_CATCH_CLIPS: Readonly<Partial<Record<number, number>>> = { [Character.demonHunter]: DEMON_HUNTER_LEDGE_CATCH_INDEX };
 const CATCH_SETTLED = 0.6;
 const OWN_CLIP = /crouch|ledge ?hang/i;
 
-const describe = (choice: Choice) => Object.entries(choice).map(([key, value]) => `${key} ${value}`).join(" ");
 const OWN_FILE = `movement-poses/${fighter.name.toLowerCase()}`;
 const OWN: { readonly MOVEMENT_POSES?: Partial<Record<Pose, Space>>; readonly GRIP_BONES?: readonly string[] } = existsSync(join(import.meta.dir, `${OWN_FILE}.ts`)) ? await import(`./${OWN_FILE}`) : {};
-const SPACES: Readonly<Record<Pose, Space>> = {
-  crouch: {
-    starts: [{ frame: 0, hip: -80, knee: 110, chest: 35, shoulder: -30, elbow: -40, weapon: 0 }, { frame: 1, hip: -115, knee: 140, chest: 65, shoulder: -70, elbow: -80, weapon: -60 }],
-    options: { frame: [0, 1], hip: [-115, -100, -80, -60], knee: [80, 110, 140], chest: [20, 35, 50, 65, 80], shoulder: [-110, -70, -30, 10, 50], elbow: [-80, -40, 0, 40], weapon: [-60, 0, 60] },
-    variant: (c) => ({ name: describe(c), fold: 40 + (c.chest ?? 0) * 0.3, lean: c.lean ?? 0, squash: c.squash ?? 0, parentFrame: c.frame === 1,
-      angles: { hip: c.hip ?? 0, knee: c.knee ?? 0, ankle: -((c.hip ?? 0) + (c.knee ?? 0)), chest: c.chest ?? 0, head: c.head ?? -(c.chest ?? 0) * 0.6, shoulder: c.shoulder ?? 0, elbow: c.elbow ?? -40, weapon: c.weapon ?? 0, pelvis: c.pelvis ?? 0 } }),
-  },
-  ledgeHang: {
-    starts: [{ frame: 0, shoulder: -165, elbow: -20, chest: 5, hip: -30, knee: 60, lean: 0 }, { frame: 0, shoulder: -150, elbow: -60, chest: 25, hip: -100, knee: 140, lean: 0 }],
-    options: { frame: [0, 1], shoulder: [-200, -185, -170, -155, -140, -125], elbow: [-90, -60, -30, 0, 30], chest: [-15, 5, 25], hip: [-120, -100, -70, -40, -10, 20], knee: [0, 40, 80, 110, 140], lean: [-70, -50, -35, -20, -10, 0, 10, 20, 35, 50, 70] },
-    variant: (c) => ({ name: describe(c), fold: 30, lean: c.lean ?? 0, parentFrame: c.frame === 1,
-      angles: { shoulder: c.shoulder ?? 0, elbow: c.elbow ?? 0, chest: c.chest ?? 0, head: c.head ?? -15, hip: c.hip ?? 0, knee: c.knee ?? 0, ankle: -((c.hip ?? 0) + (c.knee ?? 0)), weapon: c.weapon ?? 0, pelvis: c.pelvis ?? 0 } }),
-  },
-};
 const neighbours = (values: readonly number[], at: number | undefined) => { const i = values.indexOf(at ?? NaN); return i < 0 ? values : [values[i - 1], values[i + 1]].filter((v): v is number => v !== undefined); };
 const mulberry32 = (seed: number) => () => { seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 const smooth = (t: number) => { const c = Math.max(0, Math.min(1, t)); return c * c * (3 - 2 * c); };
@@ -89,12 +75,17 @@ const floor = (drawn: DrawnModel, sequence: number, at: number) => {
   return Math.min(...ankles.map((id) => nodes[id * 2 + 1] ?? Infinity));
 };
 const standFloor = floor(before, standIndex, 0), standLowest = lowest(before, standIndex, 0);
-const { parts, standParts, standing } = ledgeHangParts(character);
+const { parts, standing } = ledgeHangParts(character);
 ensure(standing.clip !== undefined, `${fighter.name}: the sampled fighter shows no standing clip`);
 const standFrame: ScoreFrame = { frame: 0, ...new DrawnModel(generateMDX(source), scale).posed(standing.clip, standing.seconds, 1) };
 const standHeight = Math.max(...Array.from(standFrame.vertices).filter((_, i) => i % 2 === 1)) - Math.min(...Array.from(standFrame.vertices).filter((_, i) => i % 2 === 1));
 const headId = source.Nodes.find((n) => n.Name === rig.classic.head)?.ObjectId;
+const referenceStand = ((ready: number) => ready >= 0 ? ready : source.Sequences.findIndex((s) => /^Stand(?:\s*-?\s*\d+)?$/.test(s.Name)))(source.Sequences.findIndex((s) => /^Stand Ready(?:\s+\d+)?$/.test(s.Name)));
+const look = DEFINITIVE_FIGHTERS.has(character as Character) ? await definitiveLook(input, rig, fighter.name) : undefined;
 const jointOf = new Map(Object.entries(rig.classic).map(([joint, name]) => [name, joint]));
+const TAIL_BONES: Readonly<Partial<Record<number, readonly string[]>>> = { [Character.pitLord]: ["Bone Tail 03", "Bone Tail 04", "Bone Tail 05", "Bone Tail 06"] };
+const tailJoint = new Set(TAIL_BONES[character] ?? []);
+const searched = (options: Space["options"]) => Object.entries(options).filter(([key]) => (key !== "tail" || tailJoint.size > 0) && (key !== "fold" || (LEG_BONES[character] ?? []).length > 0));
 const legJoint = new Map((LEG_BONES[character] ?? []).flatMap(([hip, knee, toe]) => [[hip, 1], [knee, -2], [toe, 1]] as const));
 
 const helper: mdx.Helper = { Name: "Movement Motion", ObjectId: model.Nodes.length, Parent: null, Flags: 0, PivotPoint: new Float32Array(3),
@@ -141,7 +132,9 @@ function solveJoints(slot: Slot, variant: Variant): { readonly moved: readonly n
   const { pose, frames } = slot;
   const angle = (id: number, t: number) => {
     const name = model.Nodes[id]?.Name ?? "", joint = jointOf.get(name), fold = legJoint.get(name), own = variant.bones?.[name];
-    return own !== undefined ? own * amount(pose, t, "") : fold !== undefined ? fold * variant.fold * amount(pose, t, "") : joint === undefined ? 0 : (variant.angles[joint.split(".")[0] ?? ""] ?? 0) * amount(pose, t, joint);
+    if (own !== undefined) return own * amount(pose, t, "");
+    if (tailJoint.has(name)) return (variant.angles.tail ?? 0) * amount(pose, t, "");
+    return fold !== undefined ? fold * variant.fold * amount(pose, t, "") : joint === undefined ? 0 : (variant.angles[joint.split(".")[0] ?? ""] ?? 0) * amount(pose, t, joint);
   };
   const locals = Array.from({ length: frames + 1 }, (_, frame) => {
     const t = frame / frames, world = new Map<number, quat>(), local = new Map<number, quat>();
@@ -196,18 +189,48 @@ function author(slot: Slot, variant: Variant): number {
   return moved.length;
 }
 
-function shortfall(slot: Slot): { readonly value: number; readonly report: string } {
-  const drawn = new DrawnModel(generateMDX(model), scale);
-  const at = (frame: number): ScoreFrame => ({ frame, ...drawn.posed(slot.index, frame / 60, 1) });
-  if (slot.pose === "crouch") {
-    const s = scoreCrouch(standFrame, at(slot.frames), ppu);
-    return { value: Math.max(0, s.heightRatio - (CROUCH_THRESHOLDS.height - 0.1)) + Math.max(0, CROUCH_THRESHOLDS.contrast - s.contrast), report: `height ${s.heightRatio.toFixed(3)} contrast ${s.contrast.toFixed(3)}` };
+interface Shortfall { readonly value: number; readonly pass: boolean; readonly report: string }
+const SUNK_TOLERANCE = 0.005;
+const WEAPON_JOINTS = new Set(["weapon", "weapon.L"]);
+const bodyBottom = (frame: ScoreFrame, held: Uint8Array) => {
+  let bottom = Infinity;
+  for (let v = 0; v < frame.vertices.length / 2; v++) if (frame.drawn[v] !== 0 && held[v] !== 1) bottom = Math.min(bottom, frame.vertices[v * 2 + 1] ?? Infinity);
+  return bottom;
+};
+function poseShortfall(pose: Pose, stand: ScoreFrame, at: (frame: number) => ScoreFrame, frames: number, headroom: (frame: ScoreFrame) => number, held: Uint8Array): Shortfall {
+  if (pose === "crouch") {
+    const crouch = at(frames), s = scoreCrouch(stand, crouch, ppu), sunk = Math.max(0, bodyBottom(stand, held) - bodyBottom(crouch, held)) / bodyHeight(stand);
+    return { value: Math.max(0, s.heightRatio - (CROUCH_THRESHOLDS.height - 0.1)) + Math.max(0, CROUCH_THRESHOLDS.contrast - s.contrast) + 3 * Math.max(0, sunk - SUNK_TOLERANCE), pass: s.pass && sunk <= SUNK_TOLERANCE,
+      report: `height ${s.heightRatio.toFixed(3)} contrast ${s.contrast.toFixed(3)}${sunk > 0 ? ` sunk ${sunk.toFixed(3)}` : ""}` };
   }
   const t = LEDGE_THRESHOLDS;
-  const frames = Array.from({ length: 10 }, (_, i) => at(Math.round((i + 1) * slot.frames / 10)));
-  const s = scoreLedgeHang(standFrame, frames, parts, { x: LEDGE_HANG_OUTSET, z: LEDGE_HANG_DEPTH }, standParts);
-  const headroom = headId === undefined ? 0 : Math.max(...frames.map((f) => (f.nodes[headId * 2 + 1] ?? 0) - LEDGE_HANG_DEPTH)) / standHeight;
-  return { value: 3 * Math.max(0, headroom + 0.05) + Math.max(0, s.grip - t.grip) / t.grip + 3 * (Math.max(0, t.below + 0.06 - s.below) + Math.max(0, t.clear + 0.03 - s.clear) + Math.max(0, Math.min(t.fit, s.standFit) + 0.03 - s.fit)), report: `grip ${s.grip.toFixed(3)} below ${s.below.toFixed(3)} clear ${s.clear.toFixed(3)} fit ${s.fit.toFixed(3)}/${s.standFit.toFixed(3)}` };
+  const hang = Array.from({ length: 10 }, (_, i) => at(Math.round((i + 1) * frames / 10)));
+  const s = scoreLedgeHang(stand, hang, parts, { x: LEDGE_HANG_OUTSET, z: LEDGE_HANG_DEPTH });
+  return { value: 3 * Math.max(0, Math.max(...hang.map(headroom)) + 0.05) + Math.max(0, s.grip - t.grip) / t.grip + 3 * (Math.max(0, t.below + 0.06 - s.below) + Math.max(0, t.clear + 0.03 - s.clear) + Math.max(0, t.fit + 0.03 - s.fit)), pass: s.pass, report: `grip ${s.grip.toFixed(3)} below ${s.below.toFixed(3)} clear ${s.clear.toFixed(3)} fit ${s.fit.toFixed(3)}` };
+}
+
+function classicShortfall(slot: Slot): Shortfall {
+  const drawn = new DrawnModel(generateMDX(model), scale);
+  return poseShortfall(slot.pose, standFrame, (frame) => ({ frame, ...drawn.posed(slot.index, frame / 60, 1) }), slot.frames,
+    (frame) => headId === undefined ? -1 : ((frame.nodes[headId * 2 + 1] ?? 0) - LEDGE_HANG_DEPTH) / standHeight,
+    drawn.influencedBy(new Set(Object.entries(rig!.classic).flatMap(([joint, bone]) => WEAPON_JOINTS.has(joint) && bone !== undefined ? [bone] : []))));
+}
+
+function definitiveShortfall(slot: Slot, hd: DefinitiveLook): Shortfall {
+  ensure(standing.clip !== undefined, `${fighter!.name}: the sampled fighter shows no standing clip`);
+  const keep = [...new Set([referenceStand, standing.clip, slot.index])].sort((a, b) => a - b);
+  const drawn = new DrawnModel(retargetedSequences(model, rig!, hd, keep), scale);
+  const stand: ScoreFrame = { frame: 0, ...drawn.posed(keep.indexOf(standing.clip), standing.seconds, 1) };
+  return poseShortfall(slot.pose, stand, (frame) => ({ frame, ...drawn.posed(keep.indexOf(slot.index), frame / 60, 1) }), slot.frames, () => -1,
+    drawn.influencedBy(new Set(rig!.pairs.flatMap(([joint, bone]) => WEAPON_JOINTS.has(joint) ? [bone] : []))));
+}
+
+function shortfall(slot: Slot, classicBest: Shortfall | undefined): Shortfall {
+  const classic = classicShortfall(slot);
+  if (classicBest === undefined || look === undefined) return classic;
+  if (classicBest.pass ? !classic.pass : classic.value > classicBest.value + 1e-6) return { ...classic, value: 10 + classic.value };
+  const definitive = definitiveShortfall(slot, look);
+  return { value: Math.max(classic.value, definitive.value), pass: classic.pass && definitive.pass, report: `${classic.report}; definitive ${definitive.report}` };
 }
 
 let cursor = Math.max(...source.Sequences.map((s) => s.Interval[1])) + 100;
@@ -223,19 +246,18 @@ for (const pose of poses) {
       MinimumExtent: new Float32Array([-300, -300, -250]), MaximumExtent: new Float32Array([300, 300, 350]), BoundsRadius: 400 });
   }
   const space = OWN.MOVEMENT_POSES?.[pose] ?? SPACES[pose], pinned = PINNED[character]?.[pose];
-  const measure = () => { const base = shortfall(slot), more = space.extra?.({ assets: input, character, model, index: slot.index, frames: slot.frames }); return more === undefined ? base : { value: base.value + more.value, report: `${base.report}; ${more.report}` }; };
-  const evaluate = (choice: Choice) => { ensure(author(slot, space.variant(choice)) >= 3, `${fighter.name}: ${pose} moves fewer than three joints`); return { choice, ...measure() }; };
-  const descend = (start: Choice) => {
-    let found = evaluate(start);
-    for (let pass = 0; pass < (space.local ? 4 : 3); pass++) for (const [key, values] of Object.entries(space.options)) for (const value of space.local ? neighbours(values, found.choice[key]) : values) {
-      const tried = evaluate({ ...found.choice, [key]: value });
+  const evaluate = (choice: Choice, floor: Shortfall | undefined) => { ensure(author(slot, space.variant(choice)) >= 3, `${fighter.name}: ${pose} moves fewer than three joints`); return { choice, ...shortfall(slot, floor) }; };
+  const descend = (start: Choice, floor: Shortfall | undefined, coarse: number) => {
+    let found = evaluate(start, floor);
+    for (let pass = 0; pass < coarse + (space.local ? 1 : 0); pass++) for (const [key, values] of searched(space.options)) for (const value of space.local ? neighbours(values, found.choice[key]) : values) {
+      const tried = evaluate({ ...found.choice, [key]: value }, floor);
       if (tried.value < found.value - 1e-6) found = tried;
     }
-    for (let pass = 0; pass < 2; pass++) for (const [key, values] of Object.entries(space.options)) {
+    for (let pass = 0; pass < 2; pass++) for (const [key, values] of searched(space.options)) {
       const step = Math.min(...values.slice(1).map((value, index) => value - (values[index] ?? value))) / (2 * (pass + 1));
       if (!Number.isFinite(step) || key === "frame") continue;
       for (const value of [(found.choice[key] ?? 0) - step, (found.choice[key] ?? 0) + step]) {
-        const tried = evaluate({ ...found.choice, [key]: value });
+        const tried = evaluate({ ...found.choice, [key]: value }, floor);
         if (tried.value < found.value - 1e-6) found = tried;
       }
     }
@@ -243,12 +265,15 @@ for (const pose of poses) {
   };
   const random = mulberry32(character * 7919 + (pose === "crouch" ? 1 : 2));
   const scattered = Array.from({ length: space.randomStarts ?? 0 }, () => Object.fromEntries(Object.entries(space.options).map(([key, values]) => [key, values[Math.floor(random() * values.length)] ?? 0])));
-  const best = pinned ? evaluate(pinned) : [...space.starts, ...scattered].map(descend).reduce((a, b) => b.value < a.value - 1e-6 ? b : a);
+  const classicBest = pinned ? evaluate(pinned, undefined) : [...space.starts, ...scattered].map((start) => descend(start, undefined, 3)).reduce((a, b) => b.value < a.value - 1e-6 ? b : a);
+  const refined = look === undefined || pinned ? undefined : descend(classicBest.choice, classicBest, 1);
+  const floor = refined?.pass === true ? classicBest : undefined;
+  const best = floor === undefined ? classicBest : refined!;
   author(slot, space.variant(best.choice));
-  const written = measure();
+  const written = shortfall(slot, floor);
   ensure(Math.abs(written.value - best.value) < 1e-6, `${fighter.name}: ${pose} re-authored as ${written.report}, not the chosen ${best.report}`);
   slots.push(slot);
-  console.log(`MOVEMENT_CLIPS ${fighter.name} ${pose}: ${describe(best.choice)}; ${written.report}; ${replaced ? `re-authored clip ${slot.index} in place` : `bind ${pose}: { index: ${slot.index}, seconds: ${seconds(frames / 60)} }`}`);
+  console.log(`MOVEMENT_CLIPS ${fighter.name} ${pose}: ${describe(best.choice)}; ${written.report}${look !== undefined && floor === undefined ? `; definitive ${definitiveShortfall(slot, look).report}${pinned ? "" : " (fails, so Classic-only)"}` : ""}; ${replaced ? `re-authored clip ${slot.index} in place` : `bind ${pose}: { index: ${slot.index}, seconds: ${seconds(frames / 60)} }`}`);
 }
 
 function sampled(track: mdx.AnimVector, start: number, end: number, frame: number): Float32Array | undefined {

@@ -218,10 +218,10 @@ const score: Command = (args) => Effect.gen(function*() {
     const { stand, hang, parts, clip, kind } = sampleLedgeHang(await loadBody(assets, character, look), character);
     return { fighter: fighterSlug(character), clip, kind, ...scoreLedgeHang(stand, hang, parts, corner) };
   }));
-  const ledgeTable = yield* movementTable("ledge", "fighter\tledge hang\tclip\tgrip\tbelow\tclear\tfit\tstand fit", ledges.map((row) => [row.fighter, crouchVerdict(row), row.clip, n3(row.grip), n3(row.below), n3(row.clear), n3(row.fit), n3(row.standFit)].join("\t")));
+  const ledgeTable = yield* movementTable("ledge", "fighter\tledge hang\tclip\tgrip\tbelow\tclear\tfit", ledges.map((row) => [row.fighter, crouchVerdict(row), row.clip, n3(row.grip), n3(row.below), n3(row.clear), n3(row.fit)].join("\t")));
   const l = LEDGE_THRESHOLDS;
-  yield* Console.log(`\nledge hang (grip: nearest drawn point to the ledge corner / stand height <= ${l.grip}; below the ledge >= ${l.below}; clear of the stage wall >= ${l.clear}; inside the hang hurtbox >= the standing body in its own (at most ${l.fit}); worst of ${10} hang frames):`);
-  for (const row of ledges) yield* Console.log(`${row.fighter.padEnd(22)} ${crouchVerdict(row).padEnd(9)} clip ${row.clip.padEnd(24)} grip ${n3(row.grip)} below ${n3(row.below)} clear ${n3(row.clear)} fit ${n3(row.fit)}/${n3(row.standFit)}`);
+  yield* Console.log(`\nledge hang (grip: nearest drawn point to the ledge corner / stand height <= ${l.grip}; below the ledge >= ${l.below}; clear of the stage wall >= ${l.clear}; body below the ledge inside the hang hurtbox >= ${l.fit}; worst of ${10} hang frames):`);
+  for (const row of ledges) yield* Console.log(`${row.fighter.padEnd(22)} ${crouchVerdict(row).padEnd(9)} clip ${row.clip.padEnd(24)} grip ${n3(row.grip)} below ${n3(row.below)} clear ${n3(row.clear)} fit ${n3(row.fit)}`);
   yield* Console.log(`${ledges.filter((row) => row.pass && row.kind === "crouch").length}/${ledges.length} ledge hangs pass (no clip: the standing pose hangs; *: a clip not named for the ledge stands in); ${ledgeTable}`);
 
   const jumps = yield* Effect.forEach(fighters, (character) => attempt(`double jump ${fighterSlug(character)}`, async () => {
