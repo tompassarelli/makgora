@@ -13,6 +13,7 @@ import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import { Character } from "../../src/game/sim/codes";
 import { PLAYABLE_CHARACTERS, fighterName } from "../../src/game/sim/heroes/registry";
 import { RULE_BUTTONS } from "../../src/game/ui/ruleButtons";
+import { HAZARDS_BUTTON } from "../../src/game/ui/stageUi";
 import { pollUntil } from "../hostPoll";
 import { runProcess } from "../hostProcess";
 import { JournalMenu } from "./boundary";
@@ -28,6 +29,7 @@ const SEGMENT_GAP = "1 second";
 const MATCH_SETTLE = "6 seconds";
 const PAUSE_SETTLE = "1500 millis";
 const MATCH_ATTEMPTS = 3;
+const HAZARD_TRIES = 3;
 
 // A fresh private desktop's Xwayland drops the first XTEST motion.
 const POINTER_PRIME_ATTEMPTS = 3;
@@ -47,6 +49,28 @@ interface Viewport {
 const point = (viewport: Viewport, x: number, y: number) => ({
   x: Math.round(viewport.x + (viewport.width - viewport.height * 4 / 3) / 2 + x * viewport.height / 0.6),
   y: Math.round(viewport.y + viewport.height - y * viewport.height / 0.6),
+});
+
+const newestReplay = (data: string, since: number, match: number) => pollUntil(Effect.try({
+  try: () => readdirSync(data).filter(file => REPLAY.test(file) && statSync(join(data, file)).mtimeMs >= since).sort((a, b) => Number(REPLAY.exec(b)?.[1]) - Number(REPLAY.exec(a)?.[1]))[0],
+  catch: cause => new AcceptFailure({ operation: "moves gate replay", problem: String(cause) }),
+}), { every: "200 millis", within: "15 seconds", orElse: () => Effect.fail(new AcceptFailure({ operation: "moves gate replay", problem: `no replay written after match ${match}` })) });
+
+const hazardsLabel =(host: Client, view: Viewport) => capture(host, view).pipe(
+  Effect.flatMap(frame => frameWords(host, frame, "light")),
+  Effect.map(words => /hazards:?\s*(on|off)\b/i.exec(words.map(word => word.text).join(" "))?.[1]?.toLowerCase()),
+  Effect.mapError(fail("moves gate hazards")),
+);
+
+const turnHazardsOff = (host: Client, view: Viewport) => Effect.gen(function*() {
+  const toggle = point(view, HAZARDS_BUTTON.x + HAZARDS_BUTTON.width / 2, HAZARDS_BUTTON.y - HAZARDS_BUTTON.height / 2);
+  for (let attempt = 0; attempt < HAZARD_TRIES; attempt++) {
+    const label = yield* hazardsLabel(host, view);
+    if (label === "off") return;
+    if (label === "on") yield* click(host, toggle.x, toggle.y).pipe(Effect.mapError(fail("moves gate hazards")));
+    yield* Effect.sleep("400 millis");
+  }
+  return yield* new AcceptFailure({ operation: "moves gate hazards", problem: `the stage screen does not read "Hazards: Off" after ${HAZARD_TRIES} tries` });
 });
 
 export interface MovesGateReceipts {
@@ -69,7 +93,7 @@ const spotFrameFiles = (stem: string, runs: readonly (readonly SettleShot[])[], 
 }));
 
 function withSelection(judged: SmokeVerdict, fighters: readonly string[]): SmokeVerdict {
-  const seen = [0, 1].map(slot => judged.results.find(result => result.slot === slot)?.fighter ?? "none");
+  const seen = [0, 1].map(slot => judged.results.find(result => result.slot === slot && result.kind !== "setup")?.fighter ?? "none");
   return { ...judged, results: [{ slot: 0, fighter: seen.join(" vs "), step: "fighter selection", kind: "setup", pass: seen.join() === fighters.join(), reason: `wanted ${fighters.join(" vs ")}` }, ...judged.results] };
 }
 
@@ -153,6 +177,7 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
     yield* focus(host).pipe(Effect.mapError(fail("moves gate stage")));
     yield* tap(host, "y");
     yield* phase("STAGE", picked, 15);
+    yield* turnHazardsOff(host, hostView);
     const staged = yield* Clock.currentTimeMillis;
     yield* tap(host, "y");
     yield* phase("BLOCKED", staged, 30);
@@ -185,10 +210,7 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
     yield* Effect.sleep("300 millis");
     yield* tap(host, "n");
     yield* phase("CHARACTER", ended, 20);
-    const manifest = yield* pollUntil(Effect.try({
-      try: () => readdirSync(data).filter(file => REPLAY.test(file) && statSync(join(data, file)).mtimeMs >= ended).sort((a, b) => Number(REPLAY.exec(b)?.[1]) - Number(REPLAY.exec(a)?.[1]))[0],
-      catch: cause => new AcceptFailure({ operation: "moves gate replay", problem: String(cause) }),
-    }), { every: "200 millis", within: "15 seconds", orElse: () => Effect.fail(new AcceptFailure({ operation: "moves gate replay", problem: `no replay written after match ${index + 1}` })) });
+    const manifest = yield* newestReplay(data, ended, index + 1);
     const lines = readReplay(join(data, manifest));
     if (typeof lines === "string") return yield* new AcceptFailure({ operation: "moves gate replay", problem: lines });
     return { manifest, lines, schedule, runs };

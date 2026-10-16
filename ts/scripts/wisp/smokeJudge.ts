@@ -104,10 +104,12 @@ function stepResult(slot: number, trace: SlotTrace, step: SmokeStep, anchor: num
 
 export function judgeSmoke(lines: readonly string[], plans: readonly SmokePlan[]): SmokeVerdict {
   const traces = new Map<number, SlotTrace>([...new Set(plans.map(({ slot }) => slot))].map((slot) => [slot, newTrace()]));
+  let hazards: boolean | undefined;
   const replay = replayMatch(lines, (state, frame, rows) => {
+    hazards ??= state.match.hazards;
     for (const [slot, trace] of traces) if (isActive(state.world, slot)) traceFrame(trace, state, slot, frame, rows.rows[slot]?.held ?? 0);
   });
-  const results: StepResult[] = [];
+  const results: StepResult[] = [{ slot: 0, fighter: "match", step: "stage hazards off", kind: "setup", pass: hazards === false, reason: hazards === false ? "off" : "stage hazards were on, so a hazard can interrupt any move" }];
   const frozen: FrozenStep[] = [];
   const cursors = new Map<number, number>();
   const carried = new Map<number, number>();

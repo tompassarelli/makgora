@@ -99,3 +99,12 @@ test("a client freeze that swallows a special's keys fails that special as inval
   const swallowed = rehearsal(Character.rifleman, Character.demonHunter, SMOKE_BINDINGS, sweepOnly, 1, { segment: 0, at: tapeFrames(keys.slice(0, 10)) + 2, frames: 20 });
   expect(smokePace(swallowed.lines, judgeSmoke(swallowed.lines, sweepOnly.flat()))).toBeUndefined();
 });
+
+test("a match played with stage hazards on fails its setup, so a hazard that interrupts a move never passes for the game's own failure [k1 scenario]", () => {
+  const schedule = smokeSchedule(smokeApproaches(Character.rifleman, Character.demonHunter)).slice(0, 1);
+  const on = judgeSmoke(rehearsal(Character.rifleman, Character.demonHunter, SMOKE_BINDINGS, schedule, 1, undefined, true).lines, schedule.flat());
+  expect(on.results.filter(({ pass }) => !pass).map(({ step }) => step)).toEqual(["stage hazards off"]);
+  expect(smokeReceipt(on, 2)).toEndWith("pass=0");
+  const off = judgeSmoke(rehearsal(Character.rifleman, Character.demonHunter, SMOKE_BINDINGS, schedule).lines, schedule.flat());
+  expect(off.results.find(({ step }) => step === "stage hazards off")?.pass).toBe(true);
+});

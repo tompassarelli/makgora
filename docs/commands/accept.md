@@ -14,8 +14,9 @@
   each `shard-K/` are under the run's evidence folder. Declare
   a new native box there, next to the issue it closes, instead of a hand procedure.
   Move smoke (dev#467): `bun wisp accept --only gate-moves --pair K --map CANDIDATE.w3x`
-  turns on Training on the candidate, then plays every fighter pair from
-  fighter select: each standard keyboard key once, every normal, aerial and
+  turns on Training on the candidate and stage hazards off on each stage
+  screen (a match whose replay shows hazards on fails its setup), then plays
+  every fighter pair from fighter select: each standard keyboard key once, every normal, aerial and
   special after a training reset, and the ultimate after both fighters charge
   their mana. Each match ends from the pause menu, and its own replay is judged
   headless (smashcraft:ts/scripts/wisp/smokeJudge.ts): the replay must reach

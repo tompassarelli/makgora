@@ -49,11 +49,13 @@ export interface TapeScript {
   readonly first?: Fighter;
   readonly second?: Fighter;
   readonly training?: boolean;
+  readonly hazards?: boolean;
 }
 
 export function recordTapeReplay(frames: number, pauseAt: number, script: TapeScript = { rowAt: scriptedRow }): TapeReplay {
   const tape = createTapeWorld({ stocks: 3, humans: 2, ...(script.first === undefined ? {} : { first: script.first }), ...(script.second === undefined ? {} : { second: script.second }) });
   tape.live.match.training = script.training ?? false;
+  if (script.hazards !== undefined) tape.live.match.hazards = script.hazards;
   const { world, match, controls, runtime } = tape.live;
   const moment = createMomentRecorder();
   const recorder = createMatchReplayRecorder();

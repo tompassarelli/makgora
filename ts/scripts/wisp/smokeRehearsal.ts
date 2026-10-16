@@ -14,13 +14,14 @@ const BETWEEN_FRAMES = 60;
 const CONTACT_GAP = 80;
 const APPROACH_LIMIT = 240;
 
-function recorded(first: Character, second: Character, frames: number, rows: readonly (readonly InputRow[])[]): string[] {
+function recorded(first: Character, second: Character, frames: number, rows: readonly (readonly InputRow[])[], hazards = false): string[] {
   const idle = emptyInput();
   const tape = recordTapeReplay(frames, 0, {
     rowAt: (slot, frame) => rows[slot]?.[frame - 1] ?? idle,
     first: createFighter(first, matchSpawnX(0), 1),
     second: createFighter(second, matchSpawnX(1), -1),
     training: true,
+    hazards,
   });
   const header = parseReplayHeader(tape.manifest);
   if (typeof header === "string") throw new Error(header);
@@ -57,7 +58,7 @@ export interface Rehearsal {
   readonly starts: number[];
 }
 
-export function rehearsal(first: Character, second: Character, bindings: KeyBindings, schedule: readonly SmokeSegment[], rate = 1, freeze?: Freeze): Rehearsal {
+export function rehearsal(first: Character, second: Character, bindings: KeyBindings, schedule: readonly SmokeSegment[], rate = 1, freeze?: Freeze, hazards = false): Rehearsal {
   const tape = schedule.reduce((total, segment) => total + segmentFrames(segment) + BETWEEN_FRAMES, LEAD_FRAMES);
   const masks = [new Array<number>(tape).fill(0), new Array<number>(tape).fill(0)];
   let start = LEAD_FRAMES;
@@ -75,7 +76,7 @@ export function rehearsal(first: Character, second: Character, bindings: KeyBind
   };
   const frames = Math.ceil((tape - skipped) * rate);
   const paced = masks.map((row) => Array.from({ length: frames }, (_, frame) => row[tapeAt(frame)] ?? 0));
-  return { lines: recorded(first, second, frames, paced.map(keyboardRows)), starts: starts.map((frame) => Math.round(frame * rate)) };
+  return { lines: recorded(first, second, frames, paced.map(keyboardRows), hazards), starts: starts.map((frame) => Math.round(frame * rate)) };
 }
 
 export function rehearseSmoke(first: Character, second: Character, bindings: KeyBindings = SMOKE_BINDINGS, schedule: readonly SmokeSegment[] = smokeSchedule(smokeApproaches(first, second)), rate = 1): SmokeVerdict {
