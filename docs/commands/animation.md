@@ -43,7 +43,10 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   run fighters one at a time, since each run rewrites that table. Every other clip stays
   identical. Run it after the fighter's own generator, which rebuilds from stock,
   and before `jump-clips.ts --character`; then store the family and run
-  `bun wisp inputs derive --fighter NAME`.
+  `bun wisp inputs derive --fighter NAME`. A body the shared joints can't pose (Thrall's
+  mount, Goblin Tinker's backpack claws) keeps its own search space in
+  `tools/animations/movement-poses/FIGHTER.ts`: named bones, grip bones, and an optional
+  measure of the packaged Definitive body that the search must also pass.
   `bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT`
   appends a distinct gesture for each Blademaster normal and his back throw,
   preserving the shipped plunge and double-jump flip.

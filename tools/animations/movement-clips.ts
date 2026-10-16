@@ -1,4 +1,4 @@
-import { chmodSync, mkdirSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { quat } from "gl-matrix";
 import { model as mdx } from "war3-model";
@@ -20,6 +20,7 @@ import { HurtState } from "../../ts/src/game/sim/hurtboxes";
 import { LEDGE_HANG_DEPTH, LEDGE_HANG_OUTSET } from "../../ts/src/game/sim/ledge";
 import { createRoster } from "../../ts/src/game/sim/roster";
 import { seconds } from "./asset-info";
+import type { Choice, Space, Variant } from "./movement-space";
 import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
 
 type Pose = "crouch" | "ledgeHang";
@@ -47,10 +48,9 @@ const LEDGE_CATCH_CLIPS: Readonly<Partial<Record<number, number>>> = { [Characte
 const CATCH_SETTLED = 0.6;
 const OWN_CLIP = /crouch|ledge ?hang/i;
 
-interface Variant { readonly name: string; readonly angles: Readonly<Record<string, number>>; readonly fold: number; readonly lean: number; readonly squash?: number; readonly parentFrame: boolean }
-type Choice = Readonly<Record<string, number>>;
-interface Space { readonly starts: readonly Choice[]; readonly options: Readonly<Record<string, readonly number[]>>; readonly variant: (choice: Choice) => Variant }
 const describe = (choice: Choice) => Object.entries(choice).map(([key, value]) => `${key} ${value}`).join(" ");
+const OWN_FILE = `movement-poses/${fighter.name.toLowerCase()}`;
+const OWN: { readonly MOVEMENT_POSES?: Partial<Record<Pose, Space>>; readonly GRIP_BONES?: readonly string[] } = existsSync(join(import.meta.dir, `${OWN_FILE}.ts`)) ? await import(`./${OWN_FILE}`) : {};
 const SPACES: Readonly<Record<Pose, Space>> = {
   crouch: {
     starts: [{ frame: 0, hip: -80, knee: 110, chest: 35, shoulder: -30, elbow: -40, weapon: 0 }, { frame: 1, hip: -115, knee: 140, chest: 65, shoulder: -70, elbow: -80, weapon: -60 }],
@@ -65,6 +65,8 @@ const SPACES: Readonly<Record<Pose, Space>> = {
       angles: { shoulder: c.shoulder ?? 0, elbow: c.elbow ?? 0, chest: c.chest ?? 0, head: c.head ?? -15, hip: c.hip ?? 0, knee: c.knee ?? 0, ankle: -((c.hip ?? 0) + (c.knee ?? 0)), weapon: c.weapon ?? 0, pelvis: c.pelvis ?? 0 } }),
   },
 };
+const neighbours = (values: readonly number[], at: number | undefined) => { const i = values.indexOf(at ?? NaN); return i < 0 ? values : [values[i - 1], values[i + 1]].filter((v): v is number => v !== undefined); };
+const mulberry32 = (seed: number) => () => { seed = (seed + 0x6D2B79F5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 const smooth = (t: number) => { const c = Math.max(0, Math.min(1, t)); return c * c * (3 - 2 * c); };
 function amount(pose: Pose, t: number, joint: string): number {
   if (pose === "crouch") return smooth(t / 0.25);
@@ -108,7 +110,7 @@ const translation = helper.Translation!;
 const originals = new Map<string, mdx.AnimVector>(); tracks(source, (track, path) => originals.set(path, track));
 const gripNodes = (joints: readonly string[]) => joints.flatMap((joint) => { const name = rig.classic[joint]; const id = model.Nodes.findIndex((n) => n.Name === name); return name !== undefined && id >= 0 ? [id] : []; });
 const GRIP_BONES: Readonly<Partial<Record<number, readonly string[]>>> = { [Character.thrall]: ["Bone FrontL Toe", "Bone_Mesh48"] };
-const ownGrips = (GRIP_BONES[character] ?? []).map((name) => model.Nodes.findIndex((n) => n.Name === name)).filter((id) => id >= 0);
+const ownGrips = (OWN.GRIP_BONES ?? GRIP_BONES[character] ?? []).map((name) => model.Nodes.findIndex((n) => n.Name === name)).filter((id) => id >= 0);
 const grips = ownGrips.length > 0 ? ownGrips : gripNodes(["wrist.L", "wrist.R"]).length > 0 ? gripNodes(["wrist.L", "wrist.R"]) : gripNodes(["weapon", "weapon.L"]);
 ensure(grips.length > 0, `${fighter.name}: no hand or weapon joint to grip with`);
 const ms = (frame: number) => Math.round(frame * 1000 / 60);
@@ -138,8 +140,8 @@ function replaceKeys(track: mdx.AnimVector, slot: Pick<Slot, "start" | "frames">
 function solveJoints(slot: Slot, variant: Variant): { readonly moved: readonly number[]; readonly locals: readonly ReadonlyMap<number, quat>[] } {
   const { pose, frames } = slot;
   const angle = (id: number, t: number) => {
-    const name = model.Nodes[id]?.Name ?? "", joint = jointOf.get(name), fold = legJoint.get(name);
-    return fold !== undefined ? fold * variant.fold * amount(pose, t, "") : joint === undefined ? 0 : (variant.angles[joint.split(".")[0] ?? ""] ?? 0) * amount(pose, t, joint);
+    const name = model.Nodes[id]?.Name ?? "", joint = jointOf.get(name), fold = legJoint.get(name), own = variant.bones?.[name];
+    return own !== undefined ? own * amount(pose, t, "") : fold !== undefined ? fold * variant.fold * amount(pose, t, "") : joint === undefined ? 0 : (variant.angles[joint.split(".")[0] ?? ""] ?? 0) * amount(pose, t, joint);
   };
   const locals = Array.from({ length: frames + 1 }, (_, frame) => {
     const t = frame / frames, world = new Map<number, quat>(), local = new Map<number, quat>();
@@ -220,11 +222,12 @@ for (const pose of poses) {
     model.Sequences.push({ ...stand, Name: `Movement ${pose}`, Interval: new Uint32Array([slot.start, slot.start + ms(frames)]), NonLooping: pose === "crouch", MoveSpeed: 0, Rarity: 0,
       MinimumExtent: new Float32Array([-300, -300, -250]), MaximumExtent: new Float32Array([300, 300, 350]), BoundsRadius: 400 });
   }
-  const space = SPACES[pose], pinned = PINNED[character]?.[pose];
-  const evaluate = (choice: Choice) => { ensure(author(slot, space.variant(choice)) >= 3, `${fighter.name}: ${pose} moves fewer than three joints`); return { choice, ...shortfall(slot) }; };
+  const space = OWN.MOVEMENT_POSES?.[pose] ?? SPACES[pose], pinned = PINNED[character]?.[pose];
+  const measure = () => { const base = shortfall(slot), more = space.extra?.({ assets: input, character, model, index: slot.index, frames: slot.frames }); return more === undefined ? base : { value: base.value + more.value, report: `${base.report}; ${more.report}` }; };
+  const evaluate = (choice: Choice) => { ensure(author(slot, space.variant(choice)) >= 3, `${fighter.name}: ${pose} moves fewer than three joints`); return { choice, ...measure() }; };
   const descend = (start: Choice) => {
     let found = evaluate(start);
-    for (let pass = 0; pass < 3; pass++) for (const [key, values] of Object.entries(space.options)) for (const value of values) {
+    for (let pass = 0; pass < (space.local ? 4 : 3); pass++) for (const [key, values] of Object.entries(space.options)) for (const value of space.local ? neighbours(values, found.choice[key]) : values) {
       const tried = evaluate({ ...found.choice, [key]: value });
       if (tried.value < found.value - 1e-6) found = tried;
     }
@@ -238,9 +241,11 @@ for (const pose of poses) {
     }
     return found;
   };
-  const best = pinned ? evaluate(pinned) : space.starts.map(descend).reduce((a, b) => b.value < a.value - 1e-6 ? b : a);
+  const random = mulberry32(character * 7919 + (pose === "crouch" ? 1 : 2));
+  const scattered = Array.from({ length: space.randomStarts ?? 0 }, () => Object.fromEntries(Object.entries(space.options).map(([key, values]) => [key, values[Math.floor(random() * values.length)] ?? 0])));
+  const best = pinned ? evaluate(pinned) : [...space.starts, ...scattered].map(descend).reduce((a, b) => b.value < a.value - 1e-6 ? b : a);
   author(slot, space.variant(best.choice));
-  const written = shortfall(slot);
+  const written = measure();
   ensure(Math.abs(written.value - best.value) < 1e-6, `${fighter.name}: ${pose} re-authored as ${written.report}, not the chosen ${best.report}`);
   slots.push(slot);
   console.log(`MOVEMENT_CLIPS ${fighter.name} ${pose}: ${describe(best.choice)}; ${written.report}; ${replaced ? `re-authored clip ${slot.index} in place` : `bind ${pose}: { index: ${slot.index}, seconds: ${seconds(frames / 60)} }`}`);
