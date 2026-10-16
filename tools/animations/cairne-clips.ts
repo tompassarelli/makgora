@@ -90,9 +90,11 @@ const strikes: Partial<Record<HeroPose, Strike>> = {
     mid:[{frame:21,gesture:{chest:25,arm:-130,elbow:10,free:-120,freeElbow:20,pitch:4,hip:-45,knee:65,head:-12},target:[70,185]}],
     follow:{chest:-24,arm:-196,elbow:0,free:-150,freeElbow:40,pitch:-9,hip:10,knee:-6,head:-36},followAt:30,
     rest:{chest:-6,arm:-150,elbow:20,free:-60,freeElbow:30,pitch:-3,hip:4,knee:4,head:-14}},
-  downSmash:{prep:{chest:20,twist:30,arm:-150,elbow:30,free:-140,pitch:-4,hip:-30,knee:45},prepAt:16,
-    hit:sweep,aim:true,mid:[{frame:26,gesture:{...sweep,yaw:160,twist:0},target:[-148,10]}],
-    follow:{...sweep,yaw:180,twist:10},followAt:30,reach:[-158,8]},
+  downSmash:{prep:{chest:-18,arm:-160,elbow:20,free:-150,freeElbow:15,pitch:-8,leftHip:-88,rightHip:-62,leftKnee:92,rightKnee:84,head:-20},prepAt:11,
+    hit:{chest:36,arm:-62,elbow:5,free:-56,pitch:18,step:22,leftHip:-22,rightHip:-10,leftKnee:22,rightKnee:6,head:-14},aim:true,
+    mid:[{frame:24,gesture:{chest:-10,twist:-20,yaw:150,arm:-150,elbow:15,free:-140,pitch:-6,leftHip:-86,rightHip:-68,leftKnee:88,rightKnee:86,head:-16},target:[-70,70]},
+      {frame:28,gesture:{chest:42,twist:0,yaw:160,arm:-60,elbow:5,free:-54,pitch:20,step:22,leftHip:-24,rightHip:-12,leftKnee:24,rightKnee:8,head:-14},target:[-148,10]}],
+    follow:{chest:44,twist:10,yaw:180,arm:-58,elbow:5,free:-52,pitch:22,step:24,leftHip:-26,rightHip:-12,leftKnee:26,rightKnee:8,head:-12},followAt:34,reach:[-158,8]},
 };
 for (const [pose, style, gesture] of normals) {
   const move = CAIRNE_MOVES.normals[style]; ensure(move, `${pose}: missing timing`);

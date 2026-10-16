@@ -10,6 +10,7 @@ const STRENGTH = {
   launch: { growth: 84.83285522460938, base: 42.0 }, edge: { growth: 115.13031005859375, base: 22.0 },
   kill: { growth: 121.1897964477539, base: 24.0 }, juggle: { growth: 62.88150405883789, base: 50.0 },
   chase: { growth: 48.475921630859375, base: 75.0 },
+  stompFront: { growth: 100.0, base: 30.0 }, stompRear: { growth: 100.0, base: 20.0 },
 } as const;
 const DIRECTIONS = {
   25: [f32(0.906307787), f32(0.422618262)], 35: [f32(0.819152044), f32(0.573576436)],
@@ -62,7 +63,7 @@ export const CAIRNE_MOVES: FighterMoves = {
       [AttackStyle.dashAttack]: pose(14, 23, hurtPart(15.0, 60.0, 95.0, 75.0, 34.0)),
       [AttackStyle.forwardSmash]: pose(26, 34, arm(95.0, 100.0)),
       [AttackStyle.upSmash]: pose(23, 32, arm(15.0, 178.0)),
-      [AttackStyle.downSmash]: pairedPose(21, 24, 32, arm(85.0, 25.0), arm(-85.0, 25.0)),
+      [AttackStyle.downSmash]: pairedPose(19, 26, 32, arm(85.0, 25.0), arm(-85.0, 25.0)),
       [AttackStyle.neutralAir]: pairedPose(10, 13, 21, arm(82.0, 100.0), arm(-82.0, 100.0)),
       [AttackStyle.forwardAir]: pose(18, 26, arm(90.0, 90.0)),
       [AttackStyle.backAir]: pose(13, 20, arm(-86.0, 80.0)),
@@ -89,9 +90,9 @@ export const CAIRNE_MOVES: FighterMoves = {
       ...sweep(28, 145.0, [180.0, 120.0, 60.0, 10.0], 15.307236671447754, "kill"),
     ]),
     [AttackStyle.upSmash]: heroMove(25, 5, 39, 0, [strike(25, 29, c(0.0, 115.0, 0.0, 245.0, 20.0), 18.52981185913086, "kill", 85)]),
-    [AttackStyle.downSmash]: heroMove(23, 7, 40, 0, [
-      strike(23, 25, c(20.0, 20.0, 148.0, 10.0, 18.0), 15.307236671447754, "edge", 25),
-      strike(27, 29, c(-20.0, 20.0, -148.0, 10.0, 18.0), 15.307236671447754, "edge", 25, -1),
+    [AttackStyle.downSmash]: heroMove(19, 14, 13, 0, [
+      strike(19, 22, c(20.0, 20.0, 148.0, 10.0, 18.0), 18.0, "stompFront", 80),
+      strike(29, 32, c(-20.0, 20.0, -148.0, 10.0, 18.0), 16.0, "stompRear", 80, -1),
     ]),
     [AttackStyle.neutralAir]: heroMove(12, 7, 29, 22, [
       strike(12, 14, c(28.0, 75.0, 132.0, 95.0), 10.473372459411621, "poke", 50),

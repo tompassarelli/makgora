@@ -2114,6 +2114,10 @@ none of the current kits needs a replacement effect. Archer is removed by #339; 
 | Kael'thas | Sphere gestures and explicit spell choices | Ordinary-hit meter steal |
 | Murloc | Small visible body, quick claws and leap pressure | Ordinary-hit meter steal |
 
+| Cairne move | Gesture and purpose | Startup / active / recovery; damage and launch |
+| --- | --- | --- |
+| Down smash — Twin Stomp | Both feet up, a heavy front stomp, both feet up again, a heavy rear stomp; Captain Falcon's clock with Ganondorf's look (#84) | 19 / 14 / 13 (45 total, no separate tail); front frames 19–22 at 18%, 80°, base 30, growth 100, an upward pop-up; rear frames 29–32 at 16%, 80° behind him, base 20, growth 100; no set-knockback trap hit |
+
 Move healing restores its authored amount on a successful action, capped by
 current damage; it keeps no hidden per-stock bank. Peon's proposed burrow HP,
 ducking, peeking face and occupied-break hitstun belong to a future move change.

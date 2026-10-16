@@ -17,7 +17,6 @@ export const DRAWN_STRIDES: { readonly [character: number]: { readonly walk: { r
   13: { walk: { clip: 2, model: "units\\orc\\Thrall\\Thrall.mdl", speed: f32(213.345) }, run: { clip: 2, model: "units\\orc\\Thrall\\Thrall.mdl", speed: f32(213.345) } },
   14: { walk: { clip: 6, model: "units\\human\\Jaina\\Jaina.mdl", speed: f32(68.945) }, run: { clip: 6, model: "units\\human\\Jaina\\Jaina.mdl", speed: f32(68.945) } },
   15: { walk: { clip: 8, model: "Units\\Undead\\EvilSylvanas\\EvilSylvanas.mdl", speed: f32(165.056) }, run: { clip: 8, model: "Units\\Undead\\EvilSylvanas\\EvilSylvanas.mdl", speed: f32(165.056) } },
-  16: { walk: { clip: 3, model: "units\\orc\\HeroTaurenChieftain\\HeroTaurenChieftain.mdl", speed: f32(205.421) }, run: { clip: 3, model: "units\\orc\\HeroTaurenChieftain\\HeroTaurenChieftain.mdl", speed: f32(205.421) } },
   17: { walk: { clip: 0, model: "units\\creeps\\PandarenBrewmaster\\PandarenBrewmaster.mdl", speed: f32(267.430) }, run: { clip: 0, model: "units\\creeps\\PandarenBrewmaster\\PandarenBrewmaster.mdl", speed: f32(267.430) } },
   18: { walk: { clip: 1, model: "units\\orc\\Peon\\Peon.mdl", speed: f32(208.167) }, run: { clip: 1, model: "units\\orc\\Peon\\Peon.mdl", speed: f32(208.167) } },
   19: { walk: { clip: 0, model: "units\\creeps\\HeroTinker\\HeroTinker.mdl", speed: f32(142.838) }, run: { clip: 0, model: "units\\creeps\\HeroTinker\\HeroTinker.mdl", speed: f32(142.838) } },
@@ -28,4 +27,5 @@ export const DRAWN_STRIDES: { readonly [character: number]: { readonly walk: { r
   24: { walk: { clip: 7, model: "units\\nightelf\\Furion\\Furion.mdl", speed: f32(208.708) }, run: { clip: 7, model: "units\\nightelf\\Furion\\Furion.mdl", speed: f32(208.708) } },
   25: { walk: { clip: 1, model: "units\\creeps\\Medivh\\Medivh.mdl", speed: f32(188.981) }, run: { clip: 1, model: "units\\creeps\\Medivh\\Medivh.mdl", speed: f32(188.981) } },
   26: { walk: { clip: 1, model: "units\\creeps\\Kobold\\Kobold.mdl", speed: f32(70.069), alternates: { 93: f32(37.628) } }, run: { clip: 90, model: "units\\creeps\\Kobold\\Kobold.mdl", speed: f32(37.628), alternates: { 93: f32(37.628) } } },
+  16: { walk: { clip: 3, model: "units\\orc\\HeroTaurenChieftain\\HeroTaurenChieftain.mdl", speed: f32(205.421) }, run: { clip: 3, model: "units\\orc\\HeroTaurenChieftain\\HeroTaurenChieftain.mdl", speed: f32(205.421) } },
 };
