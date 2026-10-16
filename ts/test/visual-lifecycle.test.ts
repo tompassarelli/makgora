@@ -689,7 +689,7 @@ test("Chen's confirmed Classic flames fill the long cone, one per hit capsule ta
     for (const facing of [-1, 1]) for (const ex of [false, true]) {
       const chenMatch = testMatch(1, Character.chen), chen = fighterAt(chenMatch.world, 0), breathInput = chenMatch.inputs.inputs[0];
       chen.facing = facing;
-      breathInput.shield = ex;
+      breathInput.exPressed = ex;
       chenMatch.game.practice = true;
       chen.mana.points = ROSTER_MANA.max;
       const breath = new SpecialCueEffects(Character.chen, { x: 0, y: 0, z: 100 }, true);

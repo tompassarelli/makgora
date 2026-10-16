@@ -394,7 +394,7 @@ export function cueScenes(move: CueMove, graphics: Graphics): { readonly scenes:
       beginFighterAttack(world, 0, move.style, false);
     }
     const press = contextual ? { ...neutralControls(), getupAttackPressed: true } : move.ultimate === true ? { ...neutralControls(), specialPressed: true, ultimatePressed: true, attackHeld: true }
-      : move.special === undefined ? idle : { ...neutralControls(), specialPressed: true, specialX: move.special.x, specialZ: move.special.z, meter: move.ex === true };
+      : move.special === undefined ? idle : { ...neutralControls(), specialPressed: true, specialX: move.special.x, specialZ: move.special.z, exPressed: move.ex === true };
     const scenes: RenderScene[] = [];
     const poses: (readonly ParkPose[])[] = [];
     const expected = new Set<string>();

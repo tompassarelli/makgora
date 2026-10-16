@@ -50,7 +50,7 @@ for (const character of [Character.lich]) {
               const input = match.inputs.inputs[0];
               input.specialPressed = frame === 1;
               input.ultimatePressed = frame === 1 && entry.ultimate === true;
-              input.shield = ex && frame === 1;
+              input.exPressed = ex && frame === 1;
               input.specialX = facing * entry.x;
               input.specialZ = entry.z;
               executeNext(match);

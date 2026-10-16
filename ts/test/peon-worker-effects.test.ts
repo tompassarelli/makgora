@@ -31,7 +31,7 @@ test("Peon's lumber and burrow place/pack lifecycle emits no explosion model or 
         input.specialPressed = frame === 1 || frame === 100 || frame === 180 || frame === 360;
         input.specialX = frame >= 100 && frame < 360 ? 1 : 0;
         input.specialZ = frame >= 360 ? 1 : 0;
-        input.shield = ex && input.specialPressed;
+        input.exPressed = ex && input.specialPressed;
         if (input.specialPressed) fighter.mana.points = ROSTER_MANA.max;
         executeNext(match);
         client.draw(1 / 60);
