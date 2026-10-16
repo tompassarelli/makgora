@@ -12,10 +12,13 @@ export const KEY_DOWN = "shell.keyDown";
 export const KEY_UP = "shell.keyUp";
 export const KEY_START_DOWN = "shell.keyStartDown";
 export const KEY_START_UP = "shell.keyStartUp";
+export const KEY_PAUSE_DOWN = "shell.keyPauseDown";
+export const KEYBOARD_PAUSE = "shell.keyboardPause";
+export const KEYBOARD_PAUSE_PREFIX = "SC_KP";
 
 
 export const Key = {
-  enter: 0x0d, escape: 0x1b, g: 0x47, h: 0x48, j: 0x4a, k: 0x4b, n: 0x4e, r: 0x52, t: 0x54, u: 0x55, w: 0x57, y: 0x59, f1: 0x70, f2: 0x71,
+  backspace: 0x08, enter: 0x0d, escape: 0x1b, g: 0x47, h: 0x48, j: 0x4a, k: 0x4b, n: 0x4e, r: 0x52, t: 0x54, u: 0x55, w: 0x57, y: 0x59, f1: 0x70, f2: 0x71,
 } as const;
 
 export interface KeyEventPolicy {
@@ -61,7 +64,7 @@ function registerKeys(s: ShellState): void {
   const { keyEvents } = s;
   ensureKeyTriggerPair(keyEvents, () => CreateTrigger(), (down, up) => {
     for (let key = 1; key <= 255; key++) {
-      if (key === Key.y || key === Key.enter) continue;
+      if (key === Key.y || key === Key.enter || key === Key.backspace) continue;
       registerKey(s, down, key, true);
       registerKey(s, up, key, false);
       if (key === 0xbb) {

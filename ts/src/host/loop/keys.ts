@@ -164,7 +164,7 @@ function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = fal
   }
   if ((key === Key.y || key === Key.escape) && cancelRematchCountdown(s.game, slot)) return;
   if (key === Key.y) {
-    startDown(s, slot);
+    if (s.game.phase !== Phase.match) startDown(s, slot);
     return;
   }
   if (s.game.phase === Phase.match && s.session.paused) {

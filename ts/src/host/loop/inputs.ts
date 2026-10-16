@@ -1,4 +1,5 @@
 
+import { warcraftChatOpen } from "../../platform/editboxJournal";
 import { ACTION_ORDER, bit } from "../../game/input/actions";
 import { clearAttackBuffer } from "../../game/input/attackBuffer";
 import { resetKeys } from "../../game/input/keyboardCapture";
@@ -66,7 +67,7 @@ export function controlsAvailable(s: Readonly<ShellState>, slot: ParticipantSlot
 
 export function pollLocalKeys(s: Readonly<ShellState>): number {
   const slot = localSlot();
-  if (!isParticipantSlot(slot) || !BlzIsLocalClientActive() || !humanFighterActive(s.game, slot)) return 0;
+  if (!isParticipantSlot(slot) || !BlzIsLocalClientActive() || !humanFighterActive(s.game, slot) || (s.chatOpen ?? warcraftChatOpen)()) return 0;
   const { bindings } = s.participants[slot].bindings;
   const menuHeld = s.pauseKeysHeld;
   if (menuHeld !== undefined) {

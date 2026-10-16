@@ -255,6 +255,7 @@ export interface ShellState {
   trainingHints?: boolean;
   pauseSelection?: MatchState;
   pauseKeysHeld?: number[];
+  chatOpen?: () => boolean;
   menuPublication?: { phase: MenuPhase; ticks: number };
   readonly pad: NativePadCapture | undefined;
 

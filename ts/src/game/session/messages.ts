@@ -82,7 +82,8 @@ export function rulesSummary(game: Readonly<MatchState>): string {
   return game.automaticRematch ? `${matchRules}  ·  Automatic rematch` : matchRules;
 }
 
-export const pausedMessage = (start: StartControl) => `Paused — press ${start} to resume.`;
+const pauseControl = (start: StartControl) => (start === "Start" ? "Start" : "Backspace");
+export const pausedMessage = (start: StartControl) => `Paused — press ${pauseControl(start)} to resume.`;
 
 
 export function waitingMessage(slots: number): string {
@@ -101,8 +102,8 @@ export function matchHelp(game: Readonly<MatchState>, paused: boolean, start: St
     if (local.ledge.state === LedgeState.hang) return "Ledge: Up or toward stage to climb; Jump to leap; Shield to roll; Attack to strike.\nDown or away from stage lets go.";
   }
   if (!playing) return rematchStatus(game, start);
-  if (paused) return `PAUSED — Press ${start} to resume. Combat is frozen.${game.practice || game.endless || game.training ? "\nEscape: back to fighter selection." : ""}`;
-  return `${start}: pause. Tap Shield before a hard landing to tech; hold Left/Right for a tech roll.\nShield + Special: EX special (one bar segment).\nAttack + Special (A + X): Ultimate (full bar).\nShield then Left/Right: roll; Down: dodge.`;
+  if (paused) return `PAUSED — Press ${pauseControl(start)} to resume. Combat is frozen.${game.practice || game.endless || game.training ? "\nEscape: back to fighter selection." : ""}`;
+  return `${pauseControl(start)}: pause. Tap Shield before a hard landing to tech; hold Left/Right for a tech roll.\nEX special key + direction: EX special (one bar segment).\nAttack + Special (A + X): Ultimate (full bar).\nShield then Left/Right: roll; Down: dodge.`;
 }
 
 
