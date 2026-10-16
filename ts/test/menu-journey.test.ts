@@ -16,9 +16,8 @@ test("keyboard players choose fighters, release Start, choose a stage and reach 
     return values;
   };
   const phases = () => read(() => shell().game.phase);
-  const until = (label: string, done: () => boolean, frames: number) => {
+  const until = (done: () => boolean, frames: number) => {
     for (let frame = 0; frame < frames && !done(); frame++) clients.frames(1);
-    expect(done(), label).toBe(true);
   };
   const tap = (slot: number, key: number) => {
     clients.key(slot, key, 0, true);
@@ -37,7 +36,8 @@ test("keyboard players choose fighters, release Start, choose a stage and reach 
     expect(read(() => shell().participants[slot].keys.down[Key.r])).toEqual([false, false]);
   }
   tap(0, Key.y);
-  until("Y opens stage select on both clients", () => phases().every(phase => phase === Phase.stageMenu), 60);
+  until(() => phases().every(phase => phase === Phase.stageMenu), 60);
+  expect(phases(), "Y opens stage select on both clients").toEqual([Phase.stageMenu, Phase.stageMenu]);
   expect(read(() => shell().session.startHeld[0])).toEqual([false, false]);
   const beforeStage = read(() => shell().game.stageChoice);
   tap(0, Key.r);
@@ -45,8 +45,10 @@ test("keyboard players choose fighters, release Start, choose a stage and reach 
   const chosenStage = read(() => shell().game.stageChoice);
   expect(chosenStage[0]).toBe(chosenStage[1]);
   tap(0, Key.y);
-  until("released Y can start the match on both clients", () => phases().every(phase => phase === Phase.match), 120);
-  until("both players reach GO", () => read(() => holdingStart(shell().game)).every(held => !held), 240);
+  until(() => phases().every(phase => phase === Phase.match), 120);
+  expect(phases(), "released Y can start the match on both clients").toEqual([Phase.match, Phase.match]);
+  until(() => read(() => holdingStart(shell().game)).every(held => !held), 240);
+  expect(read(() => holdingStart(shell().game)), "both players reach GO").toEqual([false, false]);
   expect(read(() => shell().game.stageChoice)).toEqual(chosenStage);
   expect(read(() => shell().session.paused)).toEqual([false, false]);
   for (const client of clients.clients) {
