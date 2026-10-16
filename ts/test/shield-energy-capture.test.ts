@@ -6,18 +6,35 @@ import { shell } from "../src/host/loop/state";
 import { CURRENT_BUILD } from "../src/game/session/currentBuild";
 import { SHIELD_ENERGY_SAMPLES, SHIELD_ENERGY_SETUP } from "../src/game/session/shieldEnergyCapture";
 import { fighterAt } from "../src/game/sim/roster";
+import { Phase } from "../src/game/lobby/lobbyState";
 import { SHIELD_MAX } from "../src/game/sim/fighter";
+import { Key } from "../src/host/loop/keyEvents";
+import { devChatInput } from "../scripts/wisp/commands/fresh";
 
-test("shield acceptance holds down full mid and low frames with falling drawn radii [k1 scenario]", () => {
+const KEY_CODES: Readonly<Record<string, number>> = { Return: Key.enter, Escape: Key.escape };
+
+test("shield acceptance holds down full mid and low frames with falling drawn radii through the native chat input [k1 scenario]", () => {
   const runtime = installHeadless(SMASHCRAFT_HEADLESS);
   const clients = runtime.clients({ install: () => install(CURRENT_BUILD), start: () => startBuild(CURRENT_BUILD) }, [0, 1], { keepCalls: 0 });
   try {
+    const nativeChat = (text: string) => {
+      for (const action of devChatInput(text)) {
+        if (action.kind === "text") clients.chat(0, action.text);
+        else if (action.kind === "keys") for (const name of action.keys) {
+          const code = KEY_CODES[name];
+          if (code === undefined) throw new Error(`no key code for ${name}`);
+          clients.key(0, code, 0, true);
+          clients.key(0, code, 0, false);
+        } else throw new Error(`unexpected chat input ${action.kind}`);
+      }
+    };
     clients.start();
     clients.frames(30);
-    clients.chat(0, SHIELD_ENERGY_SETUP);
+    nativeChat(SHIELD_ENERGY_SETUP);
     const samples: { energy: number; radius: number }[] = [];
     for (const sample of SHIELD_ENERGY_SAMPLES) {
-      clients.chat(0, `-dev shield-energy ${sample}`);
+      nativeChat(`-dev shield-energy ${sample}`);
+      clients.client(0).run(() => expect(shell().game.phase, `${sample} chat keeps the match`).toBe(Phase.match));
       let held = false;
       for (let frame = 0; frame < 650 && !held; frame++) {
         clients.frames(1);

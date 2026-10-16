@@ -15,7 +15,7 @@ import { QUICK_MATCH_COMMAND } from "../../../src/game/session/devSettings";
 import { devCommandReceiptFile, MELEE_READY_FILE } from "../../../src/game/core/gameFiles";
 import { DevCommandReceipt, MeleeReady } from "../boundary";
 import type { MalformedGameFile } from "wisp/scripts/wisp/preloadRecord";
-import { type Client, Clients, type DesktopFailure, waitFor } from "wisp/scripts/wisp/clients";
+import { type Client, Clients, type DesktopFailure, type InputAction, waitFor } from "wisp/scripts/wisp/clients";
 import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
 import { GameFiles, dataDirectory, prepareHotFolders, readGameFile } from "wisp/scripts/wisp/gameFiles";
 import { checkPlayerView } from "wisp/scripts/wisp/playerView";
@@ -144,6 +144,12 @@ export const readyAfter = (client: Client, time: number, verifyInput = true) => 
 });
 
 
+export const devChatInput = (command: string): readonly InputAction[] => [
+  { kind: "keys", keys: ["Return"] },
+  { kind: "text", text: command },
+  { kind: "keys", keys: ["Return"] },
+];
+
 export const sendDevCommand = (command: string, clientName?: string) => Effect.gen(function*() {
   const clients = yield* Clients;
   const files = yield* GameFiles;
@@ -160,11 +166,7 @@ export const sendDevCommand = (command: string, clientName?: string) => Effect.g
     Effect.flatMap((old) => old === undefined ? Effect.void : files.remove(path)),
   ), { concurrency: "unbounded", discard: true }).pipe(step("clear old quick-match receipts"));
 
-  yield* clients.batch(host, [
-    { kind: "keys", keys: ["Escape", "Return"] },
-    { kind: "text", text: command },
-    { kind: "keys", keys: ["Return"] },
-  ]).pipe(step(`send ${command}`));
+  yield* clients.batch(host, devChatInput(command)).pipe(step(`send ${command}`));
 
   const waitReceipt = ({ client, path, slot }: typeof receipts[number]) => Effect.gen(function*() {
     let problem: MalformedGameFile | undefined;
