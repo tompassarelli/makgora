@@ -366,7 +366,7 @@ export function applyDeveloperCommand(s: ShellState, actor: number, original: st
     s.dev.shieldEnergyCapture = { sample, pending: true, lines: sample === "down" ? [] : s.dev.shieldEnergyCapture?.lines ?? [] };
     s.game.trainer.behaviour = sample === "down" ? PartnerBehaviour.stand : PartnerBehaviour.shield;
     s.session.paused = sample === "down";
-    pauseMatchPresentation(s, s.session.paused);
+    pauseMatchPresentation(s, s.session.paused, true);
     renderPersistentPresentation(s);
     receipt = `dev: shield energy ${sample}`;
   } else if (message === QUICK_TRAINING_COMMAND) {

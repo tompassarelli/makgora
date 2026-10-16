@@ -285,7 +285,7 @@ export function renderFighter(s: ShellState, slot: ParticipantSlot, pose: Readon
 }
 
 
-export function pauseMatchPresentation(s: ShellState, paused: boolean): void {
+export function pauseMatchPresentation(s: ShellState, paused: boolean, immediately = false): void {
   s.resumePresentationUntil = undefined;
   if (paused && s.game.phase === Phase.match) {
     const height = BlzGetLocalClientHeight();
@@ -297,7 +297,7 @@ export function pauseMatchPresentation(s: ShellState, paused: boolean): void {
     applyArenaCamera(s, s.camera, saved.aspect, ARENA_CAMERA.angleOfAttack, 0.0);
     renderUi(s);
   }
-  if (!paused && s.build.inputProfile !== "native-driver" && s.game.phase === Phase.match && typeof os === "object" && typeof os.clock === "function") {
+  if (!paused && !immediately && s.build.inputProfile !== "native-driver" && s.game.phase === Phase.match && typeof os === "object" && typeof os.clock === "function") {
     s.resumePresentationUntil = os.clock() + RESUME_PRESENTATION_SECONDS;
     return;
   }
