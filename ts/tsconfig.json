@@ -70,6 +70,7 @@
     "test/native-harness.test.ts",
     "test/census-pairs.test.ts",
     "test/dev-setup.test.ts",
+    "test/shield-energy-capture.test.ts",
     "test/native-plan.test.ts"
   ],
   "exclude": [

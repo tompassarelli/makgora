@@ -1,5 +1,17 @@
 # Native
 
+`bun wisp accept --dry-run --only 482-shield-energy` plans four held captures:
+shield down, full, mid and low. The acceptance driver sends
+`-dev shield-energy down|full|mid|low` after the training setup. The full,
+mid and low commands resume normal partner shield input until the requested
+energy is reached, then pause after drawing. Each capture has a
+`SMASHCRAFT SHIELD` receipt in `smashcraft-dev-shield-energy-pSLOT.txt`, naming
+the simulation frame, raised state, energy, and drawn centre/radius in stage
+coordinates. The receipt describes the draw parameters; judge the pixels too.
+Classic `raised=T` with no visible bubble is FAIL, never RECAPTURE.
+AI observation records in replay dumps retain default shield energy; only
+the live fighter state or these direct receipts measures shield drain.
+
 `bun wisp native-capture reel --out PRIVATE_DIR [--fighter SLUG] [--hold-ticks N]`
 prepares Classic motion-reel pad scripts from the current roster and authored
 normals, four ground specials and ultimate. Each fighter directory is one

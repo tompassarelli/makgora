@@ -1,3 +1,4 @@
+import { SHIELD_ENERGY_SETUP } from "../../src/game/session/shieldEnergyCapture";
 import { teamResultsCheck } from "./teamResultsCheck";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -52,6 +53,7 @@ export const MAP_PROFILES: Readonly<Record<string, SmashcraftMapProfile>> = {
   keyboard: { describe: "playable input (native-perf profile) rebuilt from this checkout, `-dev quick cpu wren expert` (Wren Expert, three stocks)", path: join(inputs, "keyboard-native-166-20261007/keyboard-native.w3x"), rebuild: "native-perf", quick: `${QUICK_CPU_COMMAND}wren expert` },
   underside: { describe: "development map built with scenario underside (smashcraft:docs/player-view.md), `-dev quick`", path: join(inputs, "stage-model-20261006/Smashcraft diagnostic underside.w3x"), quick: "-dev quick" },
   "cpu-startup": { describe: "development map rebuilt from this checkout, hosted with one lobby computer and left on fighter select", path: PRESENTATION, rebuild: "main", quick: "", computers: 1 },
+  "shield-energy": { describe: "development map rebuilt from this checkout, held shield-down/full/mid/low samples with drawn-state receipts", path: PRESENTATION, rebuild: "main", quick: SHIELD_ENERGY_SETUP },
   training: { describe: "development map rebuilt from this checkout, `-dev quick training` (a computer partner shielding at 40%, hit areas on)", path: PRESENTATION, rebuild: "main", quick: QUICK_TRAINING_COMMAND },
 
   ...Object.fromEntries(rankedStages.map(({ id, name }) => [stageProfile(name), {
@@ -473,11 +475,11 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
       look: "A second fresh down press drops player 1 through the platform again.",
     },
     {
-      id: "482-shield-energy", closes: "smashcraft-dev#482 box 3 (Classic)", map: "training", session: "482-shield",
-      setup: [{ chat: "-dev hit-areas off" }, { waitMs: 1000 }],
-      capture: [{ kind: "frames", name: "shield-full-to-low", client: "a", count: 30, everyMs: 500 }],
-      pass: [NO_IMPORT_FAILURES, NO_ERRORS],
-      look: "With hit areas off, the partner's drawn shield bubble stays centred on its body and shrinks as its energy falls; it reads as a shield at full, mid and low energy until it sits inside the body.",
+      id: "482-shield-energy", closes: "smashcraft-dev#482 box 3 (Classic)", map: "shield-energy", session: "482-shield",
+      setup: [{ chat: "-dev reset" }, { chat: SHIELD_ENERGY_SETUP }],
+      capture: [{ kind: "frames", name: "shield-down-full-mid-low", client: "a", count: 4 }],
+      pass: [NO_IMPORT_FAILURES, NO_ERRORS, ...["down", "full", "mid", "low"].map(sample => ({ kind: "receipt" as const, client: "a", pattern: `^SMASHCRAFT SHIELD sample=${sample} .* pass=1$`, min: 1, max: 1 }))],
+      look: "Four held frames in order: shield down, full, mid, low. Each frame has a SMASHCRAFT SHIELD receipt with frame, raised, energy, and centreX/centreZ/radius from the drawn pose. The partner holds its shield while energy drains naturally. Compare the bubble with the receipt geometry. Classic raised=T with no visible bubble is FAIL, never RECAPTURE.",
     },
     {
       id: "406-voice-trace", closes: "smashcraft-dev#406 box 4 (voice cap half)", map: "presentation", session: "406-voices",

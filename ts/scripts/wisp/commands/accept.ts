@@ -1,3 +1,4 @@
+import { withShieldEnergyCapture } from "../shieldEnergyCapture";
 
 
 
@@ -365,7 +366,7 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
     const validated = withSmokeCapture(controlled);
     smoke = validated;
     if (gate) return AcceptDriver.of({ ...validated.driver, start: (map, session) => map === "gate-playable" ? controlled.start(map, session) : validated.driver.start(map, session) });
-    return smoke.driver;
+    return withShieldEnergyCapture(smoke.driver);
   })).pipe(Layer.provide(liveDriver), Layer.provide(Layer.mergeAll(Clients.layer(selectedClients), gameFilesLayer, smashcraftWatch)), Layer.provide(platformLayer()));
   const shards = {
     flags: ["--pair", "--pairs"],

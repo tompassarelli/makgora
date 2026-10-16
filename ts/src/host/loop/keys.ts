@@ -1,3 +1,5 @@
+import { SHIELD_ENERGY_SAMPLES } from "../../game/session/shieldEnergyCapture";
+import { PartnerBehaviour } from "../../game/match/trainingState";
 import { startNativeSoak } from "../../platform/nativeSoak";
 import { cameraKey, returnPauseMenu, PAUSE_CAMERA_KEYS, pauseCameraKey } from "./pauseCamera";
 import { HIT_PRESENTATION_CASES } from "../../game/session/hitPresentationCases";
@@ -358,6 +360,15 @@ export function applyDeveloperCommand(s: ShellState, actor: number, original: st
   } else if (classic !== undefined) {
     receipt = `dev: classic ${fighterName(classic.character)}${classic.boss ? " boss" : ""}`;
     startDevClassic(s, classic.character, classic.boss);
+  } else if (message.startsWith("-dev shield-energy ")) {
+    const sample = SHIELD_ENERGY_SAMPLES.find(value => message === `-dev shield-energy ${value}`);
+    if (sample === undefined || !s.game.training || s.game.phase !== Phase.match) return;
+    s.dev.shieldEnergyCapture = { sample, pending: true, lines: sample === "down" ? [] : s.dev.shieldEnergyCapture?.lines ?? [] };
+    s.game.trainer.behaviour = sample === "down" ? PartnerBehaviour.stand : PartnerBehaviour.shield;
+    s.session.paused = sample === "down";
+    pauseMatchPresentation(s, s.session.paused);
+    renderPersistentPresentation(s);
+    receipt = `dev: shield energy ${sample}`;
   } else if (message === QUICK_TRAINING_COMMAND) {
     receipt = "dev: quick training";
     prepareQuickTraining(s.game);

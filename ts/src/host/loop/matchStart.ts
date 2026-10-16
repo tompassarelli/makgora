@@ -31,6 +31,7 @@ import { beginFighterRenderers, views } from "./ui";
 import { LASTING, drawStage, pauseMatchPresentation, renderPersistentPresentation, setStatus } from "./view";
 
 export function startMatch(s: ShellState, scenario: Scenario = s.build.scenario, stageSettings?: QuickStageSettings): void {
+  delete s.dev.shieldEnergyCapture;
 
   beginSessionMatch(s.sessionWins);
   publishMenu(s);
