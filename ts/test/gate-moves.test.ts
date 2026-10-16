@@ -45,3 +45,18 @@ test("isolated neutral checks keep the idle opponent quiet and use the gate rest
     expect(specialsSpot([runs[0]?.map(point => ({ ...point, count: 0 })) ?? []], playArea(before))[0]?.pass).toBe(true);
   }
 });
+
+test("both neutral specials start on the same frame in the shared rest window [k1 scenario]", () => {
+  const schedule = neutralSpecialSchedule("both");
+  const replay = rehearsal(Character.thrall, Character.jaina, SMOKE_BINDINGS, schedule);
+  const verdict = judgeSmoke(replay.lines, schedule.flat());
+  const moves = verdict.results.filter(result => result.kind === "move");
+  expect(moves.map(({ slot, pass }) => ({ slot, pass }))).toEqual([{ slot: 0, pass: true }, { slot: 1, pass: true }]);
+  expect(moves[0]?.reason).toMatch(/^frame \d+$/);
+  expect(moves[1]?.reason).toBe(moves[0]?.reason);
+  const points = schedule.flat().map(tape => settlePoints(tape.steps));
+  expect(points[0]).toEqual(settlePoints(neutralSpecialSchedule(0)[0]?.[0]?.steps ?? []));
+  expect(points[1]).toEqual(points[0]);
+  const idle = rehearsal(Character.thrall, Character.jaina, SMOKE_BINDINGS, neutralSpecialSchedule(0));
+  expect(judgeSmoke(idle.lines, schedule.flat()).results.find(result => result.slot === 1 && result.kind === "move")?.pass).toBe(false);
+});

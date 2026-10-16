@@ -127,7 +127,7 @@ const matchRecord =(header: readonly string[], verdict: SmokeVerdict, results: r
   ...settles.map(({ step, count, onTime }) => `settle ${step} bright=${count}${onTime ? "" : " late"}`),
 ].join("\n")}\n`;
 
-export const measureMovesGate = (clientsFile: string, directory: string, caster?: 0 | 1) => Effect.gen(function*() {
+export const measureMovesGate = (clientsFile: string, directory: string, caster?: 0 | 1 | "both") => Effect.gen(function*() {
   const clients = yield* loadClients(clientsFile).pipe(Effect.mapError(fail("moves gate clients")));
   const [host, guest] = clients;
   if (host === undefined || guest === undefined || clients.length !== 2) return yield* new AcceptFailure({ operation: "moves gate", problem: "requires the selected offline pair" });
@@ -216,7 +216,7 @@ export const measureMovesGate = (clientsFile: string, directory: string, caster?
     const runs: SettleShot[][] = [];
     for (const segment of schedule) {
       yield* Effect.forEach(segment.flatMap(({ slot }) => clients[slot] ?? []), client => focus(client).pipe(Effect.mapError(fail("moves gate focus"))), { discard: true });
-      const points = settlePoints(segment.find(tape => caster === undefined || tape.slot === caster)?.steps ?? []);
+      const points = settlePoints(segment.find(tape => caster === undefined || caster === "both" || tape.slot === caster)?.steps ?? []);
       const [, settles] = yield* Effect.all([
         Effect.forEach(segment, ({ slot, steps }) => {
           const client = clients[slot];
