@@ -167,3 +167,5 @@ export const native: Command = args => Effect.scoped(Effect.gen(function*() {
   if (positionals[0] !== "run" || file === undefined) return yield* new UsageFailure({ problem: "expected native plan or native run PLAN.json" });
   return yield* runNative(file, out, values);
 }).pipe(Effect.mapError(cause => cause instanceof UsageFailure ? cause : new UsageFailure({ problem: String(cause) })), Effect.provide(BunServices.layer)));
+
+export const nativeEntry = { usage: "native plan --boxes FILE.tsv --out PLAN.json | native run PLAN.json --out DIR [--pairs N | --pair K ...] [--dry-run]", load: async () => native };

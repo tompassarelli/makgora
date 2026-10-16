@@ -12,12 +12,13 @@ import { step, timingsLayer } from "wisp/scripts/wisp/timings";
 import { platformLayer } from "wisp/scripts/platform/layer";
 import { profiles } from "./wisp/profiles";
 import { releaseEntry } from "./wisp/commands/release";
+import { nativeEntry } from "./wisp/commands/native";
 
 const PROFILE = `[--profile ${profiles.join("|")}]`;
 
 const COMMANDS: Record<string, { readonly usage: string; readonly load: () => Promise<Command> }> = {
   release: releaseEntry,
-  native: { usage: "native plan --boxes FILE.tsv --out PLAN.json | native run PLAN.json --out DIR [--pairs N | --pair K ...] [--dry-run]", load: async () => (await import("./wisp/commands/native")).native },
+  native: nativeEntry,
   hot: { usage: `hot --data DIR [--data DIR ...] [--watch] ${PROFILE}`, load: async () => (await import("./wisp/commands/hot")).hot },
   map: { usage: "map build [--inputs-only | --name NAME --out OUT.w3x] [--base BASE.w3m] [--container MAP.w3x] [--assets DIR] [--summon DIR] [--packager PATH] [--edition classic|full] [--profile NAME] | map rebuild MAP.w3x [--profile NAME]", load: async () => (await import("./wisp/commands/map")).map },
   inputs: { usage: "inputs add FAMILY PATH | check | path [base|container|assets|summon]   (content-addressed private build inputs named by build-inputs/: docs/build-inputs.md)", load: async () => (await import("./wisp/commands/inputs")).inputs },
