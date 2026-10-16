@@ -112,3 +112,13 @@ test("an accept already running on a pair blocks a second one, but not its own c
   expect(pairHolders(0, rows, [50])).toEqual([10]);
   expect(pairHolders(2, rows, [999])).toEqual([]);
 });
+
+test("the service launcher an outer accept starts does not count as another accept [k2 property]", () => {
+  const rows = [
+    { pid: 100, ppid: 1, args: ["bun", "x/scripts/wisp.ts", "accept", "--only", "gate-moves", "--pair", "0"] },
+    { pid: 101, ppid: 100, args: ["systemd-run", "--user", "--wait", "--", "bun", "x/scripts/wisp.ts", "accept", "--pair", "0"] },
+    { pid: 200, ppid: 1, args: ["bun", "x/scripts/wisp.ts", "accept", "--pair", "0"] },
+  ];
+  expect(pairHolders(0, rows, [200, 100])).toEqual([]);
+  expect(pairHolders(0, rows, [200])).toEqual([100, 101]);
+});
