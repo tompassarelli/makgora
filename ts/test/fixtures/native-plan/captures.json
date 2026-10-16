@@ -1,0 +1,9 @@
+{
+  "map": "/tmp/native-fixture.w3x",
+  "mapSha256": "fixture-digest",
+  "sourceRevision": "fixture-revision",
+  "fixtures": [
+    { "name": "first", "frames": [10, 20] },
+    { "name": "second", "frames": [30, 40] }
+  ]
+}

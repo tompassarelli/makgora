@@ -15,6 +15,8 @@ test("native planning preserves every eligible issue without mixing execution co
       const matches = plan.batches.flatMap(batch => batch.scripts.filter(script => script.path === row.script && script.issues.includes(row.issue)).map(() => batch));
       const eligible = row.class !== "wisp-sufficient" && row.blockers === "" && row.script !== "none";
       expect(matches.length).toBe(eligible ? 1 : 0);
+      if (row.class === "wisp-sufficient") expect(plan.wisp).toContainEqual(row);
+      else if (!eligible) expect(plan.blocked).toContainEqual(row);
       for (const batch of matches) expect([batch.look, batch.clients, batch.map, batch.kind]).toEqual([row.look, row.clients, row.map, row.kind]);
     }
     for (const batch of plan.batches) expect(new Set(batch.scripts.map(script => script.path)).size).toBe(batch.scripts.length);
@@ -31,10 +33,16 @@ test("native dry run assigns visual scripts to both pairs before timing without 
     const run = Bun.spawnSync([process.execPath, "scripts/wisp.ts", "native", "run", plan, "--out", join(out, "run"), "--pairs", "2", "--dry-run"], { cwd: join(import.meta.dir, "..") });
     expect(run.exitCode).toBe(0);
     const lines = run.stdout.toString().split("\n").filter(line => line.startsWith("batch-"));
-    expect(lines.length).toBe(3);
+    expect(lines.length).toBe(5);
     expect(lines[0]).toContain("visual pair 0");
     expect(lines[1]).toContain("visual pair 1");
-    expect(lines[2]).toContain("timing pair 0");
+    expect(lines[0]).toContain("capture-a.pad");
+    expect(lines[1]).toContain("capture-b.pad");
+    expect(lines[2]).toContain("visual pair 0");
+    expect(lines[3]).toContain("visual pair 1");
+    expect(lines[2]).toContain("native-capture");
+    expect(lines[3]).toContain("native-capture");
+    expect(lines[4]).toContain("timing pair 0");
   } finally { rmSync(out, { recursive: true }); }
 });
 test("capture batches attach only to a live two-client pool independent of launcher exit [k1 scenario]", () => {

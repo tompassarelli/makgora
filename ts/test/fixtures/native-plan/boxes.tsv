@@ -1,7 +1,8 @@
 issue	title	class	look	clients	kind	map	script	blockers	parity_evidence
-10	shared capture	native-only	classic	pool	visual	/tmp/native-fixture.w3x	capture-a.pad		
-11	shared capture	native-only	classic	pool	visual	/tmp/native-fixture.w3x	capture-a.pad		
+10	shared capture	native-only	classic	pool	visual	/tmp/native-fixture.w3x	capture-a.pad		none
+11	shared capture	native-only	classic	pool	visual	/tmp/native-fixture.w3x	capture-a.pad		none
 12	second capture	wisp-plus-one-native-sample	classic	pool	visual	/tmp/native-fixture.w3x	capture-b.pad		parity/run-1
-13	timing	native-only	classic	pool	timing	/tmp/native-fixture.w3x	timing.pad		
+13	timing	native-only	classic	pool	timing	/tmp/native-fixture.w3x	timing.pad		none
 14	parity	wisp-sufficient	classic	pool	visual	/tmp/native-fixture.w3x	none		parity/run-2
-15	blocked	native-only	classic	pool	visual	/tmp/native-fixture.w3x	none	asset missing	
+15	blocked	native-only	classic	pool	visual	/tmp/native-fixture.w3x	none	asset missing	none
+16	manifest capture	native-only	classic	pool	visual	/tmp/native-fixture.w3x	test/fixtures/native-plan/captures.json		none

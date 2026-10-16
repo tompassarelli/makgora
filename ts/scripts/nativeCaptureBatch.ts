@@ -6,6 +6,7 @@ import { ChildProcess } from "effect/process";
 import { runProcess } from "./hostProcess";
 import { resolveTools, withRuntimeTools } from "./wisp/nativeTools";
 import { attachedPoolReady } from "./wisp/nativePool";
+import { pollUntil } from "./hostPoll";
 
 class CaptureBatchFailure extends Schema.TaggedError<CaptureBatchFailure>()("CaptureBatchFailure", { problem: Schema.String }) {
   override get message(): string { return this.problem; }
@@ -32,8 +33,7 @@ const tsDirectory = join(import.meta.dir, "..");
 const wispCommand = (args: readonly string[]) => runProcess(ChildProcess.make(process.execPath, ["scripts/wisp.ts", ...args], { cwd: tsDirectory }));
 
 const pairStatus = (pair: number) => wispCommand(["lan", "status", "--pair", String(pair)]).pipe(
-  Effect.flatMap(output => Effect.try({ try: () => JSON.parse(output) as unknown, catch: cause => new CaptureBatchFailure({ problem: `decode pair status: ${String(cause)}` }) })),
-  Effect.flatMap(status => Schema.decodeUnknownEffect(pairStatusSchema)(status)),
+  Effect.flatMap(output => Schema.decodeEffect(Schema.fromJsonString(pairStatusSchema))(output)),
   Effect.mapError(cause => new CaptureBatchFailure({ problem: String(cause) })),
 );
 
@@ -71,38 +71,22 @@ const poolScope = (pair: number, desktop: string, capacity: string) => Effect.ge
     }),
     stopPool,
   ).pipe(Scope.provide(scope));
-  const deadline = Date.now() + 150_000;
-  let ready: PairStatus | undefined;
-  while (Date.now() < deadline) {
-    if (child !== undefined && child.exitCode !== null) break;
-    const status = yield* pairStatus(pair).pipe(Effect.result);
-    if (status._tag === "Success" && status.success.clients.length === 2 && status.success.clients.every(client => client.pid !== undefined)) {
-      ready = status.success;
-      break;
-    }
-    yield* Effect.sleep("2 seconds");
-  }
-  if (ready === undefined) {
-    yield* Scope.close(scope, Exit.void);
-    return yield* new CaptureBatchFailure({ problem: `pair ${pair} did not recover two running clients` });
-  }
+  const ready = yield* pollUntil(Effect.gen(function*() {
+    if (child !== undefined && child.exitCode !== null) return yield* new CaptureBatchFailure({ problem: `pair ${pair} pool exited` });
+    const status = yield* pairStatus(pair).pipe(Effect.orElseSucceed(() => undefined));
+    return attachedPoolReady(status) ? status : undefined;
+  }), { every: "2 seconds", within: "150 seconds", orElse: () => Effect.fail(new CaptureBatchFailure({ problem: `pair ${pair} did not recover two running clients` })) });
   const tools = yield* resolveTools(["xdotool"]);
   const poolText = yield* Effect.try({ try: () => readFileSync(join(lanState, "pool.json"), "utf8"), catch: cause => new CaptureBatchFailure({ problem: String(cause) }) });
   const record = yield* Schema.decodeEffect(poolRecord)(poolText).pipe(Effect.mapError(cause => new CaptureBatchFailure({ problem: String(cause) })));
   const entry = record.pairs.find(entry => entry.id === pair);
   if (entry === undefined) return yield* new CaptureBatchFailure({ problem: "pair missing from pool.json" });
   const desktops = [entry.runs.a, entry.runs.b];
-  const windowDeadline = Date.now() + 120_000;
-  let windowsReady = false;
-  while (Date.now() < windowDeadline && (child === undefined || child.exitCode === null) && !windowsReady) {
+  yield* pollUntil(Effect.gen(function*() {
+    if (child !== undefined && child.exitCode !== null) return yield* new CaptureBatchFailure({ problem: `pair ${pair} pool exited` });
     const checks = yield* Effect.forEach(desktops, run => clientWindowExists(tools.xdotool ?? "xdotool", run), { concurrency: "unbounded" });
-    windowsReady = checks.every(Boolean);
-    if (!windowsReady) yield* Effect.sleep("2 seconds");
-  }
-  if (!windowsReady) {
-    yield* Scope.close(scope, Exit.void);
-    return yield* new CaptureBatchFailure({ problem: `pair ${pair} clients did not expose Warcraft windows` });
-  }
+    return checks.every(Boolean) ? true : undefined;
+  }), { every: "2 seconds", within: "120 seconds", orElse: () => Effect.fail(new CaptureBatchFailure({ problem: `pair ${pair} clients did not expose Warcraft windows` })) });
   console.log(`pair ${pair}: ${ready.clients.map(client => client.name).join(" and ")} running`);
   return { scope, child } satisfies PairPool;
 });
@@ -112,7 +96,7 @@ const closePool = (pool: PairPool) => Scope.close(pool.scope, Exit.void);
 const checkpointComplete = (out: string, row: { readonly name: string; readonly mapSha256: string; readonly frames: readonly number[] }, sourceRevision: string, double: boolean) => {
   const path = join(out, row.name, "checkpoint.json");
   if (!existsSync(path)) return false;
-  const decoded = Schema.decodeUnknownSync(checkpointSchema)(JSON.parse(readFileSync(path, "utf8")) as unknown);
+  const decoded = Schema.decodeSync(Schema.fromJsonString(checkpointSchema))(readFileSync(path, "utf8"));
   const expected = row.frames.length * (double ? 2 : 1);
   return decoded.mapSha256 === row.mapSha256 && decoded.sourceRevision === sourceRevision && decoded.captures.filter(capture => existsSync(join(out, row.name, capture.file)) && statSync(join(out, row.name, capture.file)).size > 0).length === expected;
 };
