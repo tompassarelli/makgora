@@ -42,7 +42,7 @@ await Effect.runPromise(Effect.gen(function*() {
         } finally { session.close(); }
     }
     const project = headlessRender({ assets });
-    const poses = scenes.map(scene => ({ ...scene, ui: [], textTags: [] }));
+    const poses = scenes.map(scene => ({ ...scene, ui: [], textTags: [], effects: scene.effects.filter(effect => !effect.model.includes('LevelupCaster')) }));
     for (const [directory, drawn] of [['classic', scenes], ['classic-poses', poses]] as const) {
         const images = yield* renderScenes(project, drawn, join(output, directory), 'classic');
         for (const image of images) ensure(image.notDrawn.length === 0, `${directory}/${image.frame}: ${image.notDrawn.join('; ')}`);
