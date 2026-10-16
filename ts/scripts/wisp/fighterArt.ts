@@ -1,5 +1,5 @@
-import { chmodSync, closeSync, constants, copyFileSync, existsSync, mkdirSync, mkdtempSync, openSync, readFileSync, readdirSync, symlinkSync } from "node:fs";
-import { dirname, join, relative } from "node:path";
+import { chmodSync, closeSync, constants, copyFileSync, existsSync, mkdirSync, mkdtempSync, openSync, readFileSync, readdirSync, rmSync, symlinkSync } from "node:fs";
+import { basename, dirname, join, relative } from "node:path";
 import { Effect } from "effect";
 import { MapBuildFailure } from "wisp/scripts/wisp/mapBuild";
 import { ImportGraph } from "wisp/scripts/wisp/importGraph";
@@ -10,7 +10,7 @@ import { pruneWhiteTextures } from "../whiteImports";
 import { type Family, INPUTS_STORE, type Manifest, assetsView, listFiles, publish, readManifest, removeTree, seal, storeShards, writeShardPins } from "./buildInputs";
 import { stockStorage } from "./headlessRender";
 import { shardFiles } from "./inputShards";
-import { MODEL_FACTS_DIRECTORY, writeGenerated } from "./modelFactsTable";
+import { MODEL_FACTS_DIRECTORY, modelFactsFile, writeGenerated } from "./modelFactsTable";
 import { projectRoot } from "./project";
 
 export const DERIVED_STORE = join(INPUTS_STORE, "derived");
@@ -187,6 +187,14 @@ export function assembleFamily(family: Family, base: string, rebuilt: ReadonlyMa
   if (family === FAMILY.impact) pruneWhiteTextures(staging);
 }
 
+const shippedModels = (files: Iterable<string>) => new Set([...files].filter((file) => file.endsWith(".mdx")).map((file) => `war3mapImported\\${basename(file)}`));
+
+export function removeDroppedModelFacts(before: Iterable<string>, after: Iterable<string>, directory = MODEL_FACTS_DIRECTORY): string[] {
+  const kept = shippedModels(after), dropped = [...shippedModels(before)].filter((model) => !kept.has(model)).sort();
+  for (const model of dropped) rmSync(join(directory, modelFactsFile(model)), { force: true });
+  return dropped;
+}
+
 export const buildFighterArt = (plans: readonly FighterPlan[], manifest: Manifest, assets: string, jobs: number) => Effect.gen(function*() {
   const root = yield* Effect.try({
     try: () => (mkdirSync(join(INPUTS_STORE, "..", "derive"), { recursive: true }), mkdtempSync(join(INPUTS_STORE, "..", "derive", "run-"))),
@@ -195,11 +203,14 @@ export const buildFighterArt = (plans: readonly FighterPlan[], manifest: Manifes
   const largestFirst = [...plans].sort((a, b) => b.sourceBytes - a.sourceBytes);
   const built = yield* Effect.forEach(largestFirst, (plan) => buildFighter(plan, assets, root).pipe(Effect.map((work) => ({ fighter: plan.fighter, work }))), { concurrency: jobs }).pipe(
     Effect.tapError(() => Effect.sync(() => console.error(`step logs kept in ${root}`))));
+  const rebuiltFiles: string[] = [], assembledFiles: string[] = [], rebuilt = new Set(built.map(({ fighter }) => fighter.slug));
   for (const output of ["pool", "impact"] as const) {
     const family = FAMILY[output], staging = join(root, `${family}.assembled`);
     const shards = yield* Effect.tryPromise({
       try: async () => {
+        for (const [shard, files] of shardFiles(family, join(assets, family), listFiles(join(assets, family)))) if (rebuilt.has(shard)) rebuiltFiles.push(...files);
         assembleFamily(family, join(assets, family), new Map(built.map(({ fighter, work }) => [fighter.slug, work[output]])), staging);
+        assembledFiles.push(...listFiles(staging));
         return storeShards(family, staging);
       },
       catch: (cause) => failure(`assemble ${family}`, staging, cause),
@@ -209,5 +220,7 @@ export const buildFighterArt = (plans: readonly FighterPlan[], manifest: Manifes
     yield* Effect.try({ try: () => writeShardPins(family, shards), catch: (cause) => failure("write build inputs", family, cause) });
     console.log(`${family}: ${Object.keys(shards).length} shards, changed ${changed.length === 0 ? "none" : changed.join(" ")}`);
   }
+  const dropped = yield* Effect.try({ try: () => removeDroppedModelFacts(rebuiltFiles, assembledFiles), catch: (cause) => failure("remove dropped model facts", MODEL_FACTS_DIRECTORY, cause) });
+  if (dropped.length > 0) console.log(`removed the facts of ${dropped.length} models no fighter ships: ${dropped.join(" ")}`);
   yield* Effect.sync(() => removeTree(root));
 });

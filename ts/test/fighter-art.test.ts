@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSyn
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { listFiles } from "../scripts/wisp/buildInputs";
-import { assembleFamily } from "../scripts/wisp/fighterArt";
+import { assembleFamily, removeDroppedModelFacts } from "../scripts/wisp/fighterArt";
 import { modelFactsFile, readModelFacts, replaceModelFacts } from "../scripts/wisp/modelFactsTable";
 import type { ModelFacts } from "wisp/scripts/wisp/models";
 import { parseMDL } from "war3-model";
@@ -70,5 +70,20 @@ test("the shared thinned source parses a Definitive-format skinned model exactly
     for (const pass of ["miss", "hit"]) expect(thinnedModel(bytes, work), pass).toEqual(expected);
   } finally {
     rmSync(work, { recursive: true, force: true });
+  }
+});
+
+test("derive removes the facts of a model its rebuilt shards dropped and keeps the facts of every model a family still ships or derive never made [k2 property]", () => {
+  const directory = mkdtempSync(join(tmpdir(), "fighter-facts-"));
+  try {
+    const body = (name: string) => `${name}-${hex(name)}.mdx`;
+    const dropped = body("ShadowHunterClassicFallbackBody"), kept = body("ShadowHunterTimelineBody"), moved = body("ShadowHunterWhite"), other = "RiflemanFighter-" + hex("rifleman") + ".mdx";
+    for (const model of [dropped, kept, moved, other]) writeFileSync(join(directory, modelFactsFile(`war3mapImported\\${model}`)), `{"model":"war3mapImported\\\\${model}"}\n`);
+    const before = [`imports/war3mapImported/${dropped}`, `imports/_de.w3mod/war3mapImported/${dropped}`, `imports/war3mapImported/${kept}`, `imports/war3mapImported/${moved}`, "original-clips-evidence.json"];
+    const after = [`imports/war3mapImported/${kept}`, `imports/_de.w3mod/war3mapImported/${kept}`, moved];
+    expect(removeDroppedModelFacts(before, after, directory)).toEqual([`war3mapImported\\${dropped}`]);
+    expect(readdirSync(directory).sort()).toEqual([kept, moved, other].map((model) => modelFactsFile(`war3mapImported\\${model}`)).sort());
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
   }
 });
