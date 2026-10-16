@@ -12,11 +12,11 @@ import { createFighter } from "../sim/fighter";
 import { createRoster, fighterAt } from "../sim/roster";
 import { PAIN_SCENARIOS, initializePainScenario } from "./painFixture";
 
-test("every pain scenario lands its height category on a victim already in its jab pose [blademaster's jab hurtbox rises above his stand] [k1 scenario]", () => {
-  for (const [index, scenario] of PAIN_SCENARIOS.entries()) {
+test("every pain scenario selects its height category during each failing fighter's jab [k1 scenario]", () => {
+  for (const character of [Character.anubarak, Character.blademaster, Character.lich, Character.pitLord]) for (const [index, scenario] of PAIN_SCENARIOS.entries()) {
     const game = createMatchState();
     game.phase = Phase.match;
-    const world = createRoster(3, [createFighter(Character.blademaster, -240.0, 1), createFighter(Character.blademaster, 240.0, -1)]);
+    const world = createRoster(3, [createFighter(character, -240.0, 1), createFighter(character, 240.0, -1)]);
     initializeMatchFighters(game, world);
     initializePainScenario(scenario, world);
     const controls = createBufferedFrameControls();

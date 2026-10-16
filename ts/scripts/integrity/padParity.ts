@@ -41,6 +41,21 @@ export function comparisonSteps(script: string, path = "pad script"): readonly P
   throw new Error(`${path}: pad replay comparison requires a replay export: hold VIEW for at least 60 frames (normally 70) and release it; append the hold after the last capture to preserve action frames`);
 }
 
+export const PAD_TRACE_MARGIN = 180;
+
+export function padTraceLength(script: string, steps: readonly PadStep[]): number {
+  const last = Math.max(0, ...steps.map(step => step.frame), ...parseExpectations(script).map(expectation => Math.max(expectation.from, expectation.to)));
+  const callbacks = last + PAD_TRACE_MARGIN;
+  if (!Number.isSafeInteger(callbacks) || callbacks > 2147483647) throw new Error("pad trace length exceeds the map callback range");
+  return callbacks;
+}
+
+export function padTraceCommand(command: string | undefined, callbacks: number): string {
+  const setup = (command ?? "-dev trace") + " |trace " + callbacks;
+  if (setup.length > 127) throw new Error("pad trace setup exceeds Warcraft chat limit of 127 characters; split this fixture");
+  return setup;
+}
+
 export const TRACE_FILE = "wc3-melee-input-trace.txt";
 export const REPRO_NAME = /^smashcraft-repro-p(\d)-f(\d+)-\d+\.txt$/;
 export const MATCH_REPLAY_NAME = /^smashcraft-replay-p[01]-\d+\.txt$/;

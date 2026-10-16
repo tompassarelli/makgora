@@ -7,7 +7,7 @@ import { ChildProcess, type ChildProcessSpawner } from "effect/process";
 import { PlayProblem } from "wisp/scripts/wisp/play";
 import { runProcess } from "./hostProcess";
 import { installPlaytest } from "./playtestBuild";
-import { type LandingDecision, PLAYABLE_FILE, costPrediction, landingDecision, verdictOf } from "./wisp/greenBuilds";
+import { type LandingDecision, PLAYABLE_FILE, costPrediction } from "./wisp/greenBuilds";
 import { writePlaytestChecklist } from "./wisp/playtestChecklist";
 import { TOM_EDITION } from "./wisp/currentPlaytest";
 import { projectRoot } from "./wisp/project";
@@ -26,7 +26,7 @@ export interface Installed {
 }
 
 export interface WatchSteps<R> {
-  readonly tip: Effect.Effect<string, PlayProblem, R>;
+  readonly tip: (previous: string | undefined) => Effect.Effect<string | undefined, PlayProblem, R>;
   readonly decision: (sha: string) => Effect.Effect<LandingDecision, PlayProblem, R>;
   readonly landedAt: (sha: string) => Effect.Effect<number, PlayProblem, R>;
   readonly build: (sha: string) => Effect.Effect<Installed, PlayProblem, R>;
@@ -56,13 +56,13 @@ export const buildLine = (finished: number, sha: string, { version, path }: Inst
   `${new Date(finished).toISOString()} ${sha} ${version} ${(buildMillis / 1000).toFixed(1)} ${(landToInstalledMillis / 1000).toFixed(1)} ${path}`;
 
 export const watchOnce = <R>(steps: WatchSteps<R>, files: WatchFiles) => Effect.gen(function*() {
-  const sha = yield* steps.tip;
-  if (attemptedShas(files).has(sha)) return undefined;
+  const previous = lines(files.log).at(-1)?.split(" ")[1];
+  const sha = yield* steps.tip(previous);
+  if (sha === undefined || attemptedShas(files).has(sha)) return undefined;
   const decision = yield* steps.decision(sha);
   if (decision === "wait") return undefined;
   yield* append(files.attempts, sha);
   if (decision === "red") return undefined;
-  const previous = lines(files.log).at(-1)?.split(" ")[1];
   const started = yield* Clock.currentTimeMillis;
   const installed = yield* steps.build(sha);
   const finished = yield* Clock.currentTimeMillis;
@@ -92,16 +92,33 @@ const git = (...args: readonly string[]) =>
     Effect.mapError((cause) => new PlayProblem({ problem: `git ${args[0]}: ${cause.message}` })),
   );
 
-const CiRuns = Schema.Array(Schema.Struct({ status: Schema.String, conclusion: Schema.String, createdAt: Schema.String }));
+export interface GreenRun {
+  readonly headSha: string;
+  readonly status: string;
+  readonly conclusion: string;
+}
+
+export const newestGreen = (commits: readonly string[], runs: readonly GreenRun[], previous: string | undefined): string | undefined => {
+  const boundary = previous === undefined ? commits.length : commits.indexOf(previous);
+  if (boundary < 0) return undefined;
+  const green = new Set(runs.filter(run => run.status === "completed" && run.conclusion === "success").map(run => run.headSha));
+  return commits.slice(0, boundary).find(sha => green.has(sha));
+};
+
+const CiRuns = Schema.Array(Schema.Struct({ headSha: Schema.String, status: Schema.String, conclusion: Schema.String }));
 const decodeCiRuns = Schema.decodeUnknownEffect(Schema.fromJsonString(CiRuns));
 
 export const hostSteps = (predictCost: boolean): WatchSteps<ChildProcessSpawner.ChildProcessSpawner> => ({
-  tip: git("fetch", "-q", "origin", "main").pipe(Effect.andThen(git("rev-parse", "origin/main"))),
-  decision: (sha) => runProcess(ChildProcess.make("gh", ["run", "list", "--workflow", "ci.yml", "--commit", sha, "--limit", "20", "--json", "status,conclusion,createdAt"], { cwd: projectRoot, stdin: "ignore" })).pipe(
-    Effect.mapError((cause) => new PlayProblem({ problem: `gh run list: ${cause.message}` })),
-    Effect.flatMap((text) => decodeCiRuns(text).pipe(Effect.mapError((cause) => new PlayProblem({ problem: cause.message })))),
-    Effect.map((runs) => landingDecision(verdictOf(runs))),
-  ),
+  tip: (previous) => Effect.gen(function*() {
+    yield* git("fetch", "-q", "origin", "main");
+    const commits = (yield* git("rev-list", "--first-parent", "origin/main")).split("\n");
+    const text = yield* runProcess(ChildProcess.make("gh", ["run", "list", "--workflow", "ci.yml", "--branch", "main", "--status", "success", "--limit", "100", "--json", "headSha,status,conclusion"], { cwd: projectRoot, stdin: "ignore" })).pipe(
+      Effect.mapError((cause) => new PlayProblem({ problem: `gh run list: ${cause.message}` })),
+    );
+    const runs = yield* decodeCiRuns(text).pipe(Effect.mapError((cause) => new PlayProblem({ problem: cause.message })));
+    return newestGreen(commits, runs, previous);
+  }),
+  decision: () => Effect.succeed("build"),
   landedAt: (sha) => git("show", "-s", "--format=%ct", sha).pipe(Effect.map((seconds) => Number(seconds) * 1000)),
   build: (sha) => installPlaytest(sha, predictCost, false, TOM_EDITION, true).pipe(Effect.flatMap(({ file, installed }) => {
     const version = PLAYABLE_FILE.exec(file)?.[1];

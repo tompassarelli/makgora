@@ -121,12 +121,12 @@ export function smokeSchedule(approaches: readonly [number, number]): readonly S
   ];
 }
 
-export function neutralSpecialSchedule(caster: 0 | 1): readonly SmokeSegment[] {
-  const neutral = smokeMoves(facingOf(caster)).find(step => step.expect?.kind === "special" && step.expect.move === "neutral");
+export function neutralSpecialSchedule(caster: 0 | 1 | "both"): readonly SmokeSegment[] {
+  const neutral = smokeMoves(facingOf(caster === "both" ? 0 : caster)).find(step => step.expect?.kind === "special" && step.expect.move === "neutral");
   if (neutral === undefined) throw new Error("neutral special missing from smoke moves");
   const steps = [rest(), neutral, rest()];
   const idle = steps.map(step => ({ name: step.name, frames: step.frames, presses: rest().presses, binding: key(Action.leftTrigger) }));
-  return [[{ slot: 0, steps: caster === 0 ? steps : idle }, { slot: 1, steps: caster === 1 ? steps : idle }]];
+  return [[{ slot: 0, steps: caster === "both" || caster === 0 ? steps : idle }, { slot: 1, steps: caster === "both" || caster === 1 ? steps : idle }]];
 }
 
 export interface SettlePoint {

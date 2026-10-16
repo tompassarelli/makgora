@@ -87,6 +87,7 @@ export interface InputTrace {
 
   ticks: number;
   pausedTicks: number;
+  limit: number | undefined;
   readonly capacity: number;
   readonly lines: string[];
   dropped: number;
@@ -119,7 +120,7 @@ const CLOCK_PERIOD = 1000.0;
 
 export function inputTrace(capacity: number): InputTrace {
   const trace: InputTrace = {
-    clock: CreateTimer(), clockPeriods: 0, startedAt: undefined, finishedAt: undefined, active: false, ticks: 0, pausedTicks: 0, capacity, lines: [], dropped: 0,
+    clock: CreateTimer(), clockPeriods: 0, startedAt: undefined, finishedAt: undefined, active: false, ticks: 0, pausedTicks: 0, limit: undefined, capacity, lines: [], dropped: 0,
     lastAxes: undefined, lastDodge: undefined, lastLandingLag: undefined, rawSyncEvents: 0, window: traceWindow(),
     echoes: Array.from({ length: ECHO_CAPACITY }, () => ({ epoch: -1, frame: undefined, callback: 0, seconds: 0.0 })),
     echoPending: 0,

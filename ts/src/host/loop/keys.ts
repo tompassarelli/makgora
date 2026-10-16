@@ -1,3 +1,6 @@
+import { SHIELD_ENERGY_SAMPLES } from "../../game/session/shieldEnergyCapture";
+import { PartnerBehaviour } from "../../game/match/trainingState";
+import { traceSetup } from "../../game/session/traceSettings";
 import { startNativeSoak } from "../../platform/nativeSoak";
 import { NATIVE_PREFLIGHT_KEY } from "../../game/input/nativePreflight";
 import { INPUT_PREFLIGHT_FILE, inputPreflightLine } from "../../game/core/gameFiles";
@@ -320,7 +323,10 @@ export function applyDeveloperCommand(s: ShellState, actor: number, original: st
     for (const slot of PARTICIPANT_SLOTS) s.hiddenFighters[slot] = undefined;
     pauseMatchPresentation(s, s.session.paused);
   }
-  const captured = s.build.responseProbe ? configureVisualCapture(original, localSlot()) : original;
+  const trace = traceSetup(original);
+  if (original === RESET_COMMAND) s.trace.limit = undefined;
+  if (s.build.responseProbe && trace.callbacks !== undefined) s.trace.limit = trace.callbacks;
+  const captured = s.build.responseProbe ? configureVisualCapture(trace.command, localSlot()) : trace.command;
   const cineOff = captured.endsWith(CINE_OFF_SUFFIX);
   if (cineOff || original === RESET_COMMAND) views(s).combat.cineFilter = !cineOff;
   const message = cineOff ? captured.substring(0, captured.length - CINE_OFF_SUFFIX.length) : captured;
@@ -351,6 +357,8 @@ export function applyDeveloperCommand(s: ShellState, actor: number, original: st
   const lore = loreDevRequest(message, LORE_BATTLES.length);
   if (fighterSetup !== undefined) {
     receipt = fighterSetup;
+  } else if (message === "-dev trace") {
+    receipt = "dev: trace";
   } else if (message === "-dev soak") {
     receipt = startNativeSoak(s) ? "dev: native soak four CPUs" : "dev: native soak requires an integrity map at selection";
   } else if (showcase !== undefined) {
@@ -364,6 +372,15 @@ export function applyDeveloperCommand(s: ShellState, actor: number, original: st
   } else if (classic !== undefined) {
     receipt = `dev: classic ${fighterName(classic.character)}${classic.boss ? " boss" : ""}`;
     startDevClassic(s, classic.character, classic.boss);
+  } else if (message.startsWith("-dev shield-energy ")) {
+    const sample = SHIELD_ENERGY_SAMPLES.find(value => message === `-dev shield-energy ${value}`);
+    if (sample === undefined || !s.game.training || s.game.phase !== Phase.match) return;
+    s.dev.shieldEnergyCapture = { sample, pending: true, lines: sample === "down" ? [] : s.dev.shieldEnergyCapture?.lines ?? [] };
+    s.game.trainer.behaviour = sample === "down" ? PartnerBehaviour.stand : PartnerBehaviour.shield;
+    s.session.paused = sample === "down";
+    pauseMatchPresentation(s, s.session.paused, true);
+    renderPersistentPresentation(s);
+    receipt = `dev: shield energy ${sample}`;
   } else if (message === QUICK_TRAINING_COMMAND) {
     receipt = "dev: quick training";
     prepareQuickTraining(s.game);

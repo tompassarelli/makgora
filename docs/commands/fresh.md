@@ -1,5 +1,10 @@
 # Fresh
 
+After a preceding match ends, fresh observes its score screen before waiting
+for the menus. It retries Escape up to three times, ten seconds apart and
+only while the score screen remains visible, then lets doctor recover a
+client that still cannot leave it.
+
 - Fresh match: `bun wisp fresh MAP.w3x [--rebuild] [--no-quick]` starts a new game, sends
   `-dev quick`, and waits until every signed-in client writes its receipt.
   A build whose fighter-selection record reads `CONSOLE off` (the playable

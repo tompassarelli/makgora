@@ -1,3 +1,4 @@
+import type { ShieldEnergyCapture } from "./shieldEnergyCapture";
 import { scheduleMatchItems } from "../match/centreItem";
 import { scheduleMeterDrops } from "../match/meterDrops";
 
@@ -24,6 +25,7 @@ import { SELECTABLE_CHARACTERS, fighterName } from "../sim/heroes/registry";
 import { isScenario, type Scenario } from "./build";
 
 export interface DevSettings {
+  shieldEnergyCapture?: ShieldEnergyCapture;
 
   stageChoice?: number | undefined;
   rollback: number;

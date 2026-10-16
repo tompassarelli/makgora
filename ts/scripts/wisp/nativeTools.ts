@@ -6,6 +6,7 @@ import { Effect, Schema } from "effect";
 import { ChildProcess } from "effect/process";
 import { runProcess } from "../hostProcess";
 import { projectRoot } from "./project";
+import { ensurePackager } from "wisp/scripts/wisp/mapBuild";
 
 export class NativeToolMissing extends Schema.TaggedError<NativeToolMissing>()("NativeToolMissing", {
   tools: Schema.Array(Schema.String), problem: Schema.String,
@@ -130,3 +131,5 @@ export const repairPackager = (packer = MAP_PACKER, ldd: (path: string) => Effec
   console.log(`map packager misses ${missing.join(", ")}; it will be recompiled against the current stormlib`);
   return true;
 });
+
+export const readyPackager = (packer = MAP_PACKER) => repairPackager(packer).pipe(Effect.andThen(ensurePackager(packer)));

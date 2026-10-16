@@ -15,7 +15,7 @@ interface ShieldPose {
 }
 
 
-const SHIELD_MODEL_RADIUS = 72.0;
+export const SHIELD_MODEL_RADIUS = 72.0;
 
 const HIDDEN: Readonly<ShieldPose> = { visible: false, x: 0.0, z: 0.0, scale: 0.0, red: 255, green: 255, blue: 255 };
 

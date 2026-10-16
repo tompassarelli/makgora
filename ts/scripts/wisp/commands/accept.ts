@@ -1,3 +1,4 @@
+import { withShieldEnergyCapture } from "../shieldEnergyCapture";
 
 
 
@@ -24,7 +25,7 @@ import { GameFiles } from "wisp/scripts/wisp/gameFiles";
 import { Phase } from "../../../src/game/lobby/lobbyState";
 import { MAP_PROFILES, SMASHCRAFT_ACCEPT, type SmashcraftMapProfile } from "../acceptChecks";
 import { currentPlaytest } from "../currentPlaytest";
-import { readClientEntries, repairPackager, resolveTools, validateClients } from "../nativeTools";
+import { readClientEntries, readyPackager, resolveTools, validateClients } from "../nativeTools";
 import { documentsFolder } from "wisp/scripts/warcraft/battleNet";
 import { PLAYTEST_PREFIX } from "./play";
 import { DevCommandReceipt } from "../boundary";
@@ -254,7 +255,7 @@ const prepareCandidate = (args: readonly string[], only: readonly string[], dryR
   const [given] = flagValues(args, "map");
   if (given !== undefined && !existsSync(given)) return yield* new UsageFailure({ problem: `no built map ${given}` });
   const tools = dryRun ? undefined : yield* resolveTools().pipe(Effect.mapError(nativeProblem));
-  if (!dryRun) yield* repairPackager();
+  if (!dryRun) yield* readyPackager().pipe(Effect.mapError(cause => new UsageFailure({ problem: describeCause(cause) })));
   const building = given === undefined && !dryRun && needsCandidate({ ...SMASHCRAFT_ACCEPT, maps: MAP_PROFILES }, only);
   const candidate = given ?? (building ? yield* headCandidate.pipe(Effect.mapError(cause => new UsageFailure({ problem: describeCause(cause) }))) : undefined);
   const profiles: Readonly<Record<string, SmashcraftMapProfile>> = given !== undefined
@@ -349,7 +350,7 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
         Effect.tap(receipt => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipt]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
       ) : text === "gate:start" ? measureStartGate(selectedClients, name, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), "gate-start-anywhere", name), controlled.start("gate-playable", "gate-start")).pipe(
         Effect.tap(receipt => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipt]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
-      ) : text === "gate:neutral-thrall" || text === "gate:neutral-jaina" ? measureMovesGate(selectedClients, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), text === "gate:neutral-thrall" ? "c4-thrall-neutral-special" : "c4-jaina-neutral-special", name), text === "gate:neutral-thrall" ? 0 : 1).pipe(
+      ) : text === "gate:neutral-thrall" || text === "gate:neutral-jaina" || text === "gate:neutral-both" ? measureMovesGate(selectedClients, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), `c4-${text.slice("gate:neutral-".length)}-neutral-special`, name), text === "gate:neutral-thrall" ? 0 : text === "gate:neutral-jaina" ? 1 : "both").pipe(
         Effect.tap(receipts => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipts.specials]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
       ) : text === "gate:moves" ? measureMovesGate(selectedClients, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), "gate-moves", name)).pipe(
         Effect.tap(receipts => Effect.sync(() => { measurements.set(name, [...(measurements.get(name) ?? []), receipts.moves]); specials.set(name, receipts.specials); })), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
@@ -365,7 +366,7 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
     const validated = withSmokeCapture(controlled);
     smoke = validated;
     if (gate) return AcceptDriver.of({ ...validated.driver, start: (map, session) => map === "gate-playable" ? controlled.start(map, session) : validated.driver.start(map, session) });
-    return smoke.driver;
+    return withShieldEnergyCapture(smoke.driver);
   })).pipe(Layer.provide(liveDriver), Layer.provide(Layer.mergeAll(Clients.layer(selectedClients), gameFilesLayer, smashcraftWatch)), Layer.provide(platformLayer()));
   const shards = {
     flags: ["--pair", "--pairs"],

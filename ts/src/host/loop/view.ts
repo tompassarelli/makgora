@@ -1,3 +1,6 @@
+import { shieldEnergyReady, shieldEnergyReceipt } from "../../game/session/shieldEnergyCapture";
+import { writeLines } from "wisp/src/platform/fileio";
+import { computerActive } from "../../game/lobby/lobbyState";
 
 import { itemBodyTint } from "../../game/presentation/itemLook";
 import { MATCH_HELP_BOX, MATCH_NOTICE_BOX } from "../../game/ui/hudLayout";
@@ -282,7 +285,7 @@ export function renderFighter(s: ShellState, slot: ParticipantSlot, pose: Readon
 }
 
 
-export function pauseMatchPresentation(s: ShellState, paused: boolean): void {
+export function pauseMatchPresentation(s: ShellState, paused: boolean, immediately = false): void {
   s.resumePresentationUntil = undefined;
   if (paused && s.game.phase === Phase.match) {
     const height = BlzGetLocalClientHeight();
@@ -294,7 +297,7 @@ export function pauseMatchPresentation(s: ShellState, paused: boolean): void {
     applyArenaCamera(s, s.camera, saved.aspect, ARENA_CAMERA.angleOfAttack, 0.0);
     renderUi(s);
   }
-  if (!paused && s.build.inputProfile !== "native-driver" && s.game.phase === Phase.match && typeof os === "object" && typeof os.clock === "function") {
+  if (!paused && !immediately && s.build.inputProfile !== "native-driver" && s.game.phase === Phase.match && typeof os === "object" && typeof os.clock === "function") {
     s.resumePresentationUntil = os.clock() + RESUME_PRESENTATION_SECONDS;
     return;
   }
@@ -475,6 +478,18 @@ export function renderPersistentPresentation(s: ShellState): void {
     renderers?.cues?.present(fighter, playing, s.session.paused);
     renderers?.hitAreas?.present(live);
   }
+  const capture = s.dev.shieldEnergyCapture;
+  if (capture?.pending && playing) {
+    const partner = PARTICIPANT_SLOTS.find(slot => computerActive(game, slot) && isActive(world, slot));
+    const fighter = partner === undefined ? undefined : fighterAt(world, partner);
+    if (fighter !== undefined && shieldEnergyReady(capture.sample, fighter, runtime.simulationFrame)) {
+      capture.pending = false;
+      s.session.paused = true;
+      pauseMatchPresentation(s, true);
+      capture.lines.push(shieldEnergyReceipt(capture.sample, fighter, runtime.simulationFrame));
+      writeLines(`smashcraft-dev-shield-energy-p${localSlot()}.txt`, capture.lines);
+    }
+  }
   concealFighters(s);
 }
 
@@ -562,7 +577,7 @@ export function renderUi(s: ShellState): void {
   const paused = game.phase === Phase.match && s.session.paused;
   if (paused && !menu.shown) menu.choice = 0;
   menu.shown = paused;
-  ui.pause.update(paused && s.pauseCamera?.using !== true, menu.choice, menu.title, game.training, s.trainingHints === true);
+  ui.pause.update(paused && s.pauseCamera?.using !== true && s.dev.shieldEnergyCapture?.pending !== false, menu.choice, menu.title, game.training, s.trainingHints === true);
   const local = localParticipantSlot(s);
   const localFighter = local !== undefined && s.participants[local].body !== undefined && isActive(s.world, local) ? fighterAt(s.world, local) : undefined;
   const showMatch = !paused && !pauseHudHidden(s) && !selecting && !(local !== undefined && ui.settings[local].isOpen());

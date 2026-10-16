@@ -18,6 +18,7 @@ export const LICH_GAMEPLAN: FighterGameplan = {
     { move: GameplanSpecial.side, near: h(f32(0.9)), far: h(f32(2.2)) },
     { move: GameplanSpecial.neutral, near: h(f32(1.2)), far: h(f32(4.0)) },
 
+    { move: AttackStyle.downTilt, near: h(f32(0.3)), far: h(f32(1.0)) },
     { move: AttackStyle.forwardSmash, near: h(f32(0.9)), far: h(f32(1.5)) },
   ],
 
