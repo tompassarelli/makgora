@@ -394,6 +394,17 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
       look: "player 1's bars near empty and, in some frames, blinking red; no rush starts on the refused press",
     },
     {
+      id: "c42-victory", closes: "smashcraft#7 C42N and smashcraft#31 box 4", map: "presentation", session: "c42-victory",
+      setup: [
+        { chat: "-dev reset" }, { chat: "-dev slots 1 2" }, { chat: "-dev fighter 2 Blademaster" },
+        { chat: "-dev auto-rematch off" }, { chat: "-dev time 10" }, { chat: "-dev quick pair Rifleman / Blademaster" },
+        { receipt: "^result frames=\\d+ winner=P2 timed-out=0 interrupted=0$", client: "a", seconds: 600 },
+      ],
+      capture: [{ kind: "frames", name: "victory-from-result", client: "a", count: 46, everyMs: 67 }],
+      pass: [NO_IMPORT_FAILURES, NO_ERRORS, { kind: "receipt", pattern: "^rules stocks=1 minutes=10$", client: "a", min: 1 }, { kind: "receipt", pattern: "^result frames=\\d+ winner=P2 timed-out=0 interrupted=0$", client: "a", min: 1 }],
+      look: "Classic: idle Rifleman loses one stock to computer Blademaster by KO. Capture immediately on the first result receipt, then at roughly four-frame intervals for three seconds. The GAME call and results panel reveal Blademaster playing his stock victory clip from its beginning, visibly different from Rifleman's clip. Judge the original strip and elapsed capture times; receipt polling and framebuffer reads can miss the first animation frame.",
+    },
+    {
       id: "c39-wren-match", closes: "smashcraft#7 C39N setup: the opening quick match's replay is written before the countdown check starts waiting", map: "presentation", session: "c39-countdown",
       setup: [
         { chat: "-dev reset" }, { chat: "-dev slots 1 0" }, { chat: "-dev auto-rematch on" }, { chat: `${QUICK_CPU_COMMAND}wren expert` },
