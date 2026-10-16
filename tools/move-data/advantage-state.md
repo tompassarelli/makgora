@@ -207,7 +207,7 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Pit Lord | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Pit Lord | medium | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Pit Lord | medium | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Pit Lord | medium | up throw | 1/1 | 1/1 KD in short hop, back air, out dash, dash attack | 1/1 in up special, out forward tilt | 1/1 in short hop, back air, out dash, dash attack |
+| Pit Lord | medium | up throw | 1/1 | 1/1 KD in short hop, back air, out dash, dash attack | 1/1 in up special, out forward tilt | 1/1 in up tilt, out dash, dash attack |
 | Pit Lord | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Pit Lord | heavy | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Pit Lord | heavy | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
@@ -363,7 +363,7 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Kobold | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Kobold | medium | forward throw | 0/0 | 0/0 | 0/0 | 0/0 |
 | Kobold | medium | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Kobold | medium | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in up smash, out dash, dash attack | 1/1 in forward smash, out short hop, forward air | 1/1 |
+| Kobold | medium | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in up smash, out dash, dash attack | 1/1 in up smash, out short hop, forward air | 1/1 |
 | Kobold | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Kobold | heavy | forward throw | 0/0 | 0/0 | 0/0 | 0/0 |
 | Kobold | heavy | back throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
