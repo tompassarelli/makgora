@@ -202,6 +202,21 @@ export class DrawnModel {
     return { vertices: Float32Array.from(vertices), drawn: Uint8Array.from(drawn), faces: Uint32Array.from(faces), nodes };
   }
 
+  influencedBy(names: ReadonlySet<string>): Uint8Array {
+    const nodes = new Set(this.model.Nodes.flatMap((node, id) => names.has(node?.Name ?? "") ? [id] : []));
+    const out: number[] = [];
+    for (const index of this.visible) {
+      const geoset = this.model.Geosets[index];
+      if (geoset === undefined) continue;
+      const skin = geoset.SkinWeights;
+      for (let vertex = 0; vertex < geoset.Vertices.length / 3; vertex++) {
+        const group = skin === undefined ? geoset.Groups[geoset.VertexGroup[vertex] ?? 0] ?? [] : Array.from(skin.subarray(vertex * 8, vertex * 8 + 4)).filter((_, influence) => (skin[vertex * 8 + 4 + influence] ?? 0) > 0);
+        out.push(group.some((node) => nodes.has(node)) ? 1 : 0);
+      }
+    }
+    return Uint8Array.from(out);
+  }
+
   sequenceStart(index: number): number | undefined {
     return this.model.Sequences[index]?.Interval[0];
   }

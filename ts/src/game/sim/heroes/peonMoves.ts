@@ -1,7 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle, GrabAction, HitElement } from "../codes";
 import type { HitEffect } from "../hitRegions";
-import { heroHurtPose, heroMove, heroRegion, jabStep, type FighterMoves, type MoveRegion, type StrikeCapsule, tipperMove } from "../heroMoves";
+import { cleanLate, heroHurtPose, heroMove, heroRegion, jabStep, type FighterMoves, type MoveRegion, type StrikeCapsule, tipper } from "../heroMoves";
 import { hurtPart, type HurtPart, type HurtPose } from "../hurtboxes";
 import { ANGLES } from "./authoring";
 import { groundHit } from "./groundNormals";
@@ -27,6 +27,7 @@ const reaching = (first: number, last: number, x: number, z: number): readonly H
 const arm = (first: number, last: number, shoulderX: number, shoulderZ: number, handX: number, handZ: number): HurtPose =>
   heroHurtPose(first, last, [BODY, hurtPart(shoulderX, shoulderZ, handX, handZ, 10.0)]);
 const tilt = (z: number) => heroMove(8, 3, 19, 0, swing(8, [[92.0, f32(z + 16.0)], [92.0, z], [84.0, f32(z - 16.0)]], 9.215999603271484, 40));
+const FORWARD_SMASH = peonHit(19.45599937438965, 40, 122.13999938964844, 28.0);
 
 export const PEON_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack,
@@ -64,29 +65,32 @@ export const PEON_MOVES: FighterMoves = {
     [AttackStyle.jab]: jabStep(heroMove(4, 2, 12, 0, swing(4, [[50.0, 48.0], [50.0, 42.0]], 3.072000026702881, 70, 44.32500076293945, 14.0))),
     [AttackStyle.jab2]: heroMove(6, 2, 18, 0, swing(6, [[62.0, 62.0], [62.0, 32.0]], 6.144000053405762, 40, 78.80000305175781, 22.0)),
     [AttackStyle.forwardTilt]: tilt(48.0),
-    [AttackStyle.forwardTiltUp]: tilt(72.0),
-    [AttackStyle.forwardTiltDown]: heroMove(8, 3, 19, 0, axe(8, [[24.0, 48.0, 46.0, 48.0, 8.0], [22.0, 47.0, 45.0, 47.0, 8.0], [19.0, 46.0, 43.0, 46.0, 8.0]],
+    [AttackStyle.forwardTiltUp]: heroMove(8, 3, 19, 0, axe(8, [[27.0, 61.0, 34.0, 90.0, 8.0], [21.0, 98.0, 25.0, 69.0, 8.0], [8.0, 105.0, 22.0, 76.0, 8.0]], peonHit(9.215999603271484, 40))),
+    [AttackStyle.forwardTiltDown]: heroMove(8, 3, 19, 0, axe(8, [[24.0, 48.0, 46.0, 48.0, 8.0], [22.0, 47.0, 45.0, 47.0, 8.0], [19.0, 46.0, 42.0, 46.0, 8.0]],
       peonHit(9.215999603271484, 40))),
     [AttackStyle.upTilt]: heroMove(7, 4, 20, 0, swing(7, [[45.0, 106.0], [15.0, 118.0], [-15.0, 118.0], [-36.0, 102.0]], 8.192000389099121, 85, 68.94999694824219, 40.0)),
     [AttackStyle.downTilt]: heroMove(6, 3, 19, 0, swing(6, [[74.0, 8.0], [74.0, 16.0], [66.0, 28.0]], 7.168000221252441, 70, 72.0, 45.0)),
     [AttackStyle.dashAttack]: heroMove(10, 4, 25, 0, swing(10, [[80.0, 38.0], [80.0, 42.0], [74.0, 48.0], [68.0, 50.0]], 10.239999771118164, 55), 34.0, true),
-    [AttackStyle.forwardSmash]: tipperMove(heroMove(22, 3, 35, 0, swing(22, [[110.0, 104.0], [128.0, 55.0], [116.0, 8.0]], 19.45599937438965, 40, 122.13999938964844, 28.0)), 0.25),
-    [AttackStyle.upSmash]: heroMove(17, 4, 31, 0, swing(17, [[34.0, 136.0], [10.0, 148.0], [-10.0, 148.0], [-34.0, 136.0]], 16.384000778198242, 90, 118.19999694824219, 26.0)),
+    [AttackStyle.forwardSmash]: heroMove(22, 3, 35, 0, [
+      ...tipper(axe(22, [[40.0, 52.0, 65.0, 68.0, 8.0], [34.0, 51.0, 61.0, 51.0, 8.0]], FORWARD_SMASH), 0.25),
+      ...cleanLate(axe(24, [[26.0, 40.0, 51.0, 37.0, 8.0]], FORWARD_SMASH), 0),
+    ]),
+    [AttackStyle.upSmash]: heroMove(17, 4, 31, 0, axe(17, [[-5.0, 121.0, 21.0, 98.0, 8.0], [-17.0, 107.0, 12.0, 96.0, 8.0], [-26.0, 86.0, 0.0, 94.0, 8.0], [-33.0, 66.0, -10.0, 91.0, 8.0]], peonHit(16.384000778198242, 90, 118.19999694824219, 26.0))),
     [AttackStyle.downSmash]: heroMove(18, 5, 32, 0, [
-      ...swing(18, [[100.0, 22.0], [100.0, 8.0], [90.0, 2.0]], 14.336000442504883, 25, 108.3499984741211, 26.0),
-      ...swing(21, [[-100.0, 20.0], [-100.0, 5.0]], 14.336000442504883, 25, 108.3499984741211, 26.0, true),
+      ...axe(18, [[11.0, 40.0, 26.0, 20.0, 8.0], [16.0, 41.0, 29.0, 19.0, 8.0], [20.0, 43.0, 30.0, 19.0, 8.0]], peonHit(14.336000442504883, 25, 108.3499984741211, 26.0)),
+      ...axe(21, [[-26.0, 20.0, -11.0, 40.0, 8.0], [-29.0, 19.0, -18.0, 43.0, 8.0]], peonHit(14.336000442504883, 25, 108.3499984741211, 26.0, true)),
     ]),
     [AttackStyle.neutralAir]: heroMove(6, 5, 21, 12, [
       ...swing(6, [[70.0, 40.0], [50.0, 78.0], [0.0, 98.0]], 9.215999603271484, 55),
       ...swing(9, [[-50.0, 78.0], [-70.0, 40.0]], 9.215999603271484, 55, 88.6500015258789, 22.0, true),
     ]),
-    [AttackStyle.forwardAir]: heroMove(11, 3, 25, 16, swing(11, [[92.0, 90.0], [102.0, 40.0], [88.0, -10.0]], 13.312000274658203, 40, 103.42500305175781, 24.0)),
-    [AttackStyle.backAir]: heroMove(9, 3, 24, 14, swing(9, [[-80.0, 48.0], [-80.0, 40.0], [-72.0, 34.0]], 11.263999938964844, 35, 103.42500305175781, 24.0, true)),
-    [AttackStyle.upAir]: heroMove(8, 3, 23, 12, swing(8, [[22.0, 122.0], [0.0, 130.0], [-22.0, 122.0]], 9.215999603271484, 85, 98.5, 24.0)),
-    [AttackStyle.downAir]: heroMove(14, 4, 28, 18, [heroRegion(14, 17, blade(10.0, 0.0, 10.0, -62.0),
-      { ...peonHit(13.312000274658203, 90, 98.5, 24.0), launchZ: -1.0 }, peonHit(13.312000274658203, 55, 98.5, 24.0))]),
-    [AttackStyle.getupAttack]: heroMove(17, 3, 30, 0, axe(17, [[39.0, 47.0, 39.0, 69.0, 8.0], [37.0, 45.0, 37.0, 72.0, 5.0], [1.0, 44.0, 1.0, 72.0, 5.0]], sharedHit(7.0, 75.0))),
-    [AttackStyle.ledgeAttack]: heroMove(17, 3, 21, 0, axe(17, [[32.0, 60.0, 32.0, 85.0, 8.0], [33.0, 51.0, 33.0, 79.0, 7.0], [36.0, 44.0, 36.0, 74.0, 5.0]], sharedHit(7.0, 20.0))),
+    [AttackStyle.forwardAir]: heroMove(11, 3, 25, 16, axe(11, [[39.0, 55.0, 65.0, 67.0, 8.0], [31.0, 51.0, 58.0, 51.0, 8.0], [23.0, 43.0, 49.0, 35.0, 8.0]], peonHit(13.312000274658203, 40, 103.42500305175781, 24.0))),
+    [AttackStyle.backAir]: heroMove(9, 3, 24, 14, axe(9, [[-57.0, 74.0, -35.0, 56.0, 8.0], [-61.0, 64.0, -34.0, 54.0, 8.0], [-57.0, 53.0, -32.0, 53.0, 8.0]], peonHit(11.263999938964844, 35, 103.42500305175781, 24.0, true))),
+    [AttackStyle.upAir]: heroMove(8, 3, 23, 12, axe(8, [[10.0, 107.0, 25.0, 80.0, 8.0], [-18.0, 91.0, 11.0, 84.0, 8.0], [-32.0, 57.0, -9.0, 82.0, 8.0]], peonHit(9.215999603271484, 85, 98.5, 24.0))),
+    [AttackStyle.downAir]: heroMove(14, 4, 28, 18, axe(14, [[16.0, 33.0, 24.0, 24.0, 8.0], [12.0, 32.0, 18.0, 22.0, 8.0], [9.0, 34.0, 15.0, 23.0, 8.0], [7.0, 35.0, 12.0, 24.0, 8.0]],
+      { ...peonHit(13.312000274658203, 90, 98.5, 24.0), launchZ: -1.0 }, peonHit(13.312000274658203, 55, 98.5, 24.0))),
+    [AttackStyle.getupAttack]: heroMove(17, 3, 30, 0, axe(17, [[39.0, 53.0, 39.0, 69.0, 8.0], [37.0, 50.0, 37.0, 72.0, 5.0], [1.0, 50.0, 1.0, 72.0, 5.0]], sharedHit(7.0, 75.0))),
+    [AttackStyle.ledgeAttack]: heroMove(17, 3, 21, 0, axe(17, [[32.0, 60.0, 32.0, 85.0, 8.0], [33.0, 51.0, 33.0, 79.0, 7.0], [36.0, 46.0, 36.0, 74.0, 5.0]], sharedHit(7.0, 20.0))),
     [AttackStyle.grab]: heroMove(8, 2, 25, 0, [heroRegion(8, 9, blade(18.0, 40.0, 48.0, 40.0, 10.0), peonHit(0.0, 90, 0.0, 0.0))]),
   },
   throws: {

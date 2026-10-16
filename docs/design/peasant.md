@@ -43,18 +43,18 @@ Every row links both its Warcraft source and its Smash design reference.
 | Input | Worker action and decision | F/A/R; damage; reach | Sources |
 |---|---|---|---|
 | Jab 1, 2 | Haft tap, then short chop; quick interruption, little reach | 4/2/12, 3%; 6/2/18, 6%; 58/70 | [Harvest](https://liquipedia.net/warcraft/Peon), [Villager jab](https://www.ssbwiki.com/Villager_(SSBU)#Moveset) |
-| Forward tilt, up/down angles | Lumber chop; angle selects head, waist or shin | 8/3/19; 9%; 100, down angle 54 (fitted to the drawn axe) | [Harvest](https://liquipedia.net/warcraft/Peon), [Timber axe](https://www.ssbwiki.com/Timber) |
+| Forward tilt, up/down angles | Lumber chop; angle selects head, waist or shin | 8/3/19; 9%; 100; up angle 42 ahead and 113 high, down angle 54 (angles fitted to the drawn axe) | [Harvest](https://liquipedia.net/warcraft/Peon), [Timber axe](https://www.ssbwiki.com/Timber) |
 | Up tilt | Lift the axe over one shoulder; juggle starter | 7/4/20; 8%; 126 high | [Harvest](https://liquipedia.net/warcraft/Peon), [G&W up tilt](https://www.ssbwiki.com/Mr._Game_%26_Watch_(SSBU)#Moveset) |
 | Down tilt | Dig under the feet; short launcher | 6/3/19; 7%; 82 | [Gold harvest](https://liquipedia.net/warcraft/Peon), [Villager down tilt](https://www.ssbwiki.com/Villager_(SSBU)#Moveset) |
 | Dash attack | Stumble forward behind the axe; punishable approach | 10/4/25; 10%; 88 | [Worker attack](https://liquipedia.net/warcraft/Peon), [Villager dash attack](https://www.ssbwiki.com/Villager_(SSBU)#Moveset) |
-| Forward smash | Overhead timber chop; strongest sideways finish | 22/3/35; 19%; 136 | [Lumber](https://liquipedia.net/warcraft/Peon), [Timber](https://www.ssbwiki.com/Timber) |
-| Up smash | Heave the axe overhead; narrow anti-air finish | 17/4/31; 16%; 156 high | [Harvest](https://liquipedia.net/warcraft/Peon), [G&W up smash](https://www.ssbwiki.com/Mr._Game_%26_Watch_(SSBU)#Moveset) |
-| Down smash | Chop the ground ahead, then behind; covers a roll | 18/5/32; 14%; 108 each side | [Harvest](https://liquipedia.net/warcraft/Peon), [G&W down smash](https://www.ssbwiki.com/Mr._Game_%26_Watch_(SSBU)#Moveset) |
+| Forward smash | Overhead timber chop; strongest sideways finish | 22/3/35; 19%; 73 | [Lumber](https://liquipedia.net/warcraft/Peon), [Timber](https://www.ssbwiki.com/Timber) |
+| Up smash | Hop and heave the axe overhead; narrow anti-air finish | 17/4/31; 16%; 129 high | [Harvest](https://liquipedia.net/warcraft/Peon), [G&W up smash](https://www.ssbwiki.com/Mr._Game_%26_Watch_(SSBU)#Moveset) |
+| Down smash | Chop the ground ahead, then behind; covers a roll | 18/5/32; 14%; 38 ahead, 37 behind | [Harvest](https://liquipedia.net/warcraft/Peon), [G&W down smash](https://www.ssbwiki.com/Mr._Game_%26_Watch_(SSBU)#Moveset) |
 | Neutral air | Flailing tool sweep; close escape with exposed hands | 6/5/21, L12; 9%; 78 | [Worker attack](https://liquipedia.net/warcraft/Peon), [Villager neutral air](https://www.ssbwiki.com/Villager_(SSBU)#Moveset) |
-| Forward air | Full downward axe chop; edge pressure | 11/3/25, L16; 13%; 110 | [Lumber](https://liquipedia.net/warcraft/Peon), [Timber](https://www.ssbwiki.com/Timber) |
-| Back air | Toss the lumber shoulder backward; horizontal shove | 9/3/24, L14; 11%; 88 behind | [Carry lumber](https://liquipedia.net/warcraft/Peon), [G&W back air](https://www.ssbwiki.com/Mr._Game_%26_Watch_(SSBU)#Moveset) |
-| Up air | Push the axe straight overhead; juggle follow-up | 8/3/23, L12; 9%; 138 high | [Harvest](https://liquipedia.net/warcraft/Peon), [Villager up air](https://www.ssbwiki.com/Villager_(SSBU)#Moveset) |
-| Down air | Axe-first fall; spike in air, upward launch on floor | 14/4/28, L18; 13%; 70 below | [Harvest](https://liquipedia.net/warcraft/Peon), [G&W down air](https://www.ssbwiki.com/Mr._Game_%26_Watch_(SSBU)#Moveset) |
+| Forward air | Full downward axe chop; edge pressure | 11/3/25, L16; 13%; 73 | [Lumber](https://liquipedia.net/warcraft/Peon), [Timber](https://www.ssbwiki.com/Timber) |
+| Back air | Turn and chop the axe behind; horizontal shove | 9/3/24, L14; 11%; 69 behind | [Carry lumber](https://liquipedia.net/warcraft/Peon), [G&W back air](https://www.ssbwiki.com/Mr._Game_%26_Watch_(SSBU)#Moveset) |
+| Up air | Push the axe straight overhead; juggle follow-up | 8/3/23, L12; 9%; 115 high | [Harvest](https://liquipedia.net/warcraft/Peon), [Villager up air](https://www.ssbwiki.com/Villager_(SSBU)#Moveset) |
+| Down air | Axe chopped down past the knees; spike in air, upward launch on floor | 14/4/28, L18; 13%; down to 14 above the feet | [Harvest](https://liquipedia.net/warcraft/Peon), [G&W down air](https://www.ssbwiki.com/Mr._Game_%26_Watch_(SSBU)#Moveset) |
 | Grab, pummel | Catch with free hand, bonk with haft | Grab 8/2/25, reach58; shared pummel f60/end68, 3%, max1 | [Worker tools](https://liquipedia.net/warcraft/Peon), [Villager grab](https://www.ssbwiki.com/Villager_(SSBU)#Moveset) |
 | Forward throw | Shove out of the worksite | f13/end34; 7%, 35 degrees | [Pillage](https://liquipedia.net/warcraft/Peon), [Villager forward throw](https://www.ssbwiki.com/Villager_(SSBU)#Moveset) |
 | Back throw | Shoulder heave behind | f16/end40; 8%, 40 degrees backward | [Carry lumber](https://liquipedia.net/warcraft/Peon), [Villager back throw](https://www.ssbwiki.com/Villager_(SSBU)#Moveset) |
@@ -62,6 +62,8 @@ Every row links both its Warcraft source and its Smash design reference.
 | Down throw | Drop the load; a tech chase, never a bury | f17/end42; 5%, 25 degrees | [Carry resources](https://liquipedia.net/warcraft/Peon), [Villager down throw](https://www.ssbwiki.com/Villager_(SSBU)#Moveset) |
 
 Hands remain inside exposed limb capsules; the axe blade alone is disjoint.
+Every tilt angle, smash, axe aerial, get-up and ledge attack keeps each active
+frame's region on the drawn axe in both looks (ts/test/peon-axe.test.ts, #520).
 Get-up and ledge attacks are Peon-local moves with the template's shared timing
 and hit effects, their regions fitted to the drawn axe: get-up reaches 47 ahead,
 ledge attack 41. No throw is designed as an inescapable loop: up throw permits a short
