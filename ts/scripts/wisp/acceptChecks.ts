@@ -194,7 +194,7 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
       pass: [NO_ERRORS, { kind: "receipt", client: "a", pattern: `^SMASHCRAFT GATE moves fighters=${PLAYABLE_CHARACTERS.length} moves=(\\d+) started=\\1 keys=(\\d+) live=\\2 replayed=1 pass=1$`, min: 1 }],
     },
     {
-      id: "gate-specials-spot", closes: "smashcraft-dev#467", map: "gate-playable", session: "gate-moves",
+      id: "gate-specials-spot", after: "gate-moves", closes: "smashcraft-dev#467", map: "gate-playable", session: "gate-moves",
       setup: [{ chat: "gate:specials", client: "a" }],
       pass: [NO_ERRORS, { kind: "receipt", client: "a", pattern: `^SMASHCRAFT GATE specials fighters=${PLAYABLE_CHARACTERS.length} checked=([1-9]\\d*) clear=\\1 pass=1$`, min: 1 }],
     },
