@@ -68,7 +68,7 @@ From ts/, `bun wisp help` lists commands and topics; `bun wisp help TOPIC` print
 - [Human input consistency](design/human-input-consistency.md): measured Melee input timing, precision, reaction and DI/SDI noise by rank, from 2,083 Slippi ranked games.
 - [Stages](design/stages.md): what Melee and Ultimate players pick and why, accepted variance and hazards, Warcraft places and built-in assets per race, and an evaluation of the draft stage list.
 - [Home stages](design/home-stages.md): every fighter's home stage from their Warcraft campaign, with the lore reason.
-- [Stage music](design/stage-music.md): each stage's stock Warcraft track, chosen for its home fighters, and the music the client ships.
+- [Stage music](design/stage-music.md): each stage's looping track, Tom's imported set, and the stock music the client ships.
 - [Water stage](design/water-stage.md): how Jungle Japes' river and Sandover Village's Lurker Shark work, with frame data and sources, and the Tomb of Sargeras tide and hydra built on them.
 - [Stock platforms](design/stock-platforms.md): building stage platforms from Warcraft's own models and textures: techniques, byte costs, limits per graphics mode, and which platforms each suits.
 - [Stage art](design/stage-art.md): research-based rules for stage backgrounds, skies and scenery: readable fight plane, symmetric decks with asymmetric dressing, depth bands, fog, motion budget, floating stages with no ground below, and the per-stage art checklist.

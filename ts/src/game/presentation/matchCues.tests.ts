@@ -1,5 +1,5 @@
 import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
-import { IMPORTED_MENU_MUSIC } from "../assets/importedMusicInfo";
+import { IMPORTED_MUSIC } from "../assets/importedMusicInfo";
 import { VERIFIED_STOCK_SOUNDS } from "../../generated/assets/stockSoundInfo";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
 import { executeNext, testMatch } from "../match/testMatch";
@@ -16,7 +16,7 @@ import {
 } from "./matchCues";
 import type { TestMatch } from "../match/testMatch";
 
-const verified = (path: string): boolean => VERIFIED_STOCK_SOUNDS[path] !== undefined || path === IMPORTED_MENU_MUSIC.path;
+const verified = (path: string): boolean => VERIFIED_STOCK_SOUNDS[path] !== undefined || IMPORTED_MUSIC.some(music => music.path === path);
 
 test("every match sound, theme and voice line is verified stock or approved imported media [k4 reference native]", () => {
   const stages = STAGE_CATALOG.map(stage => stage.id);

@@ -1,36 +1,36 @@
 # Stage music
 
-Each stage plays music from its own franchise
-(smashcraft:docs/design/match-flow.md). In Smashcraft that means a stock
-Warcraft III track chosen for the fighters who call the stage home
-(smashcraft:docs/design/home-stages.md). No music is imported: every track
-is already in the game, and the game's music volume applies to it. Tom
-asked for this on 8 Oct ([#271](https://github.com/tompassarelli/smashcraft/issues/271)).
+Each stage plays its own track, which loops until the results screen. Tom
+added ten tracks on 16 Oct 2026, one per selectable stage; they are imported
+into the map at 128 kbps (smashcraft:ts/src/game/assets/importedMusicInfo.ts,
+`IMPORTED_STAGE_MUSIC`), so the game's music volume still applies. The test
+stage keeps a stock track. Tom first asked for stage music on 8 Oct
+([#271](https://github.com/tompassarelli/smashcraft/issues/271)).
 
 The source of truth is `STAGE_MUSIC` in
 smashcraft:ts/src/game/presentation/matchAudio.ts. The match starts its
 stage's track with `PlayMusic`, which loops it until the results screen.
 smashcraft:ts/src/game/presentation/matchCues.tests.ts fails when a stage
-in the catalog has no track, when its track is not a stock path, or when two
-stages share one. smashcraft:tools/presentation/stock-sounds.ts checks each
-path against the installed game.
+in the catalog has no track, when its track is neither a stock path nor an
+imported one, or when two stages share one. smashcraft:tools/presentation/stock-sounds.ts
+checks each stock path against the installed game.
 
-| Stage | Id | Home fighters (faction) | Track | Why |
-| --- | --- | --- | --- | --- |
-| Sky Deck (test) | 0 | none | Human1 | The first RoC campaign theme, a neutral opener for practice. |
-| Frozen Throne | 2 | Lich King (Scourge) | LichKingTheme | Arthas's own theme as the Lich King, for his climb to the throne. |
-| Durotar Skies | 3 | Thrall, Blademaster, Shadow Hunter, Beastmaster, Cairne, Chen, Peon, Tinker (Horde) | OrcX1 | The TFT orc theme, the music of "The Founding of Durotar". |
-| Naxxramas | 4 | Lich, Sylvanas (Scourge, Forsaken) | NaxxramasWalking1 | The game's own Naxxramas music, written for the necropolis. |
-| Stratholme | 6 | Forsaken Paladin, Dreadlord (Alliance, Dreadlords) | ArthasTheme | The prince's theme, for the city where Arthas turned. |
-| Tomb of Sargeras | 7 | Warden (Sentinels) | NagaTheme | The naga hold the Broken Isles where Maiev chases Illidan. |
-| Nordrassil | 10 | Warden (Sentinels) | NightElf1 | The RoC night elf theme, for the Sentinels' defence of the World Tree. |
-| Gryphon Aerie | 11 | Rifleman, Jaina (Alliance) | HumanX1 | The TFT Alliance theme, for Jaina's expedition and its riflemen. |
-| Blackrock | 12 | Mountain King (Alliance) | Human3 | An Alliance campaign theme for the dwarves at the edge of Khaz Modan. |
-| Ahn'Qiraj | 13 | none | NightElf2 | The night elves sealed Ahn'Qiraj's ruins; their theme suits the ancient place. |
-| Hellfire Citadel | 14 | Illidan, Pit Lord, Kael'thas (Illidari, Legion) | IllidansTheme | Illidan's own theme, for his conquest of Magtheridon's citadel. |
+| Stage | Id | Track |
+| --- | --- | --- |
+| Sky Deck (test) | 0 | Human1 (stock) |
+| Frozen Throne | 2 | Citadel of Winter Kings |
+| Durotar Skies | 3 | Iron-Tusk Stomp |
+| Naxxramas | 4 | Iron Rites of the Spire |
+| Stratholme | 6 | Crown of Broken Kings |
+| Tomb of Sargeras | 7 | Throne of Shifting Stone |
+| Nordrassil | 10 | Bough and Blade |
+| Gryphon Aerie | 11 | Summit of the Steel Wing |
+| Blackrock | 12 | Molten Anvil Groove |
+| Ahn'Qiraj | 13 | Ritual of the Mandible |
+| Hellfire Citadel | 14 | Siege of the Iron Gate |
 
-Script paths are `Sound\Music\mp3Music\<Track>.flac`; the game resolves each
-to the `.mp3` or `.ogg` it stores. Menus play War3XMainScreen and a win plays
+Stock script paths are `Sound\Music\mp3Music\<Track>.flac`; the game resolves each
+to the `.mp3` or `.ogg` it stores. Menus play the imported Before the First Strike and a win plays
 the winner's race victory theme, as before.
 
 ## Stock music in the client

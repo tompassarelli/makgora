@@ -3,7 +3,7 @@
 
 import { at } from "wisp/src/runtime/lookup";
 import { floorMod } from "wisp/src/sim/intMath";
-import { IMPORTED_MENU_MUSIC } from "../assets/importedMusicInfo";
+import { IMPORTED_MENU_MUSIC, IMPORTED_STAGE_MUSIC } from "../assets/importedMusicInfo";
 import { Character } from "../sim/codes";
 import { type StageTile, selectableStage } from "../menu/stageCatalog";
 
@@ -67,16 +67,16 @@ export const MENU_MUSIC = IMPORTED_MENU_MUSIC.path;
 
 const STAGE_MUSIC: Readonly<Record<StageTile, string>> = {
   0: `${MUSIC}Human1.flac`,
-  2: `${MUSIC}LichKingTheme.flac`,
-  3: `${MUSIC}OrcX1.flac`,
-  4: `${MUSIC}NaxxramasWalking1.flac`,
-  6: `${MUSIC}ArthasTheme.flac`,
-  7: `${MUSIC}NagaTheme.flac`,
-  10: `${MUSIC}NightElf1.flac`,
-  11: `${MUSIC}HumanX1.flac`,
-  12: `${MUSIC}Human3.flac`,
-  13: `${MUSIC}NightElf2.flac`,
-  14: `${MUSIC}IllidansTheme.flac`,
+  2: IMPORTED_STAGE_MUSIC[2].path,
+  3: IMPORTED_STAGE_MUSIC[3].path,
+  4: IMPORTED_STAGE_MUSIC[4].path,
+  6: IMPORTED_STAGE_MUSIC[6].path,
+  7: IMPORTED_STAGE_MUSIC[7].path,
+  10: IMPORTED_STAGE_MUSIC[10].path,
+  11: IMPORTED_STAGE_MUSIC[11].path,
+  12: IMPORTED_STAGE_MUSIC[12].path,
+  13: IMPORTED_STAGE_MUSIC[13].path,
+  14: IMPORTED_STAGE_MUSIC[14].path,
 };
 
 

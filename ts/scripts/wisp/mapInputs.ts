@@ -13,7 +13,7 @@ import type { FighterOriginalClip } from "../../src/generated/clips/fighterOrigi
 import { originalClip, originalClipCount, originalLightPath } from "../../src/generated/clips/fighterOriginalClipInfo";
 import * as frostModels from "../../src/generated/assets/frostAssetInfo";
 import * as impactModels from "../../src/game/assets/impactAssetInfo";
-import { IMPORTED_MENU_MUSIC } from "../../src/game/assets/importedMusicInfo";
+import { IMPORTED_MUSIC } from "../../src/game/assets/importedMusicInfo";
 import { IMPORTED_MODEL_FILES } from "../../src/game/assets/importedModelInfo";
 import { type ModelSoundCue, fighterSoundCue, fighterSoundCueCount, modelSoundLabel } from "../../src/generated/assets/modelSoundInfo";
 import * as shieldModels from "../../src/generated/assets/shieldAssetInfo";
@@ -346,7 +346,7 @@ export const importedAssets = (assets: string, summon: string, edition: MapEditi
     ...["SmashcraftHUD.fdf", "SmashcraftHUD.toc", ...UI_FRAME_FILES].map((file) => imported(join(PROJECT, "tools/selection/art"), file)),
     CUE_GRAPHICS_DE,
 
-    { entry: IMPORTED_MENU_MUSIC.path, source: join(assets, "imported-models", IMPORTED_MENU_MUSIC.file) },
+    ...IMPORTED_MUSIC.map(({ path, file }) => ({ entry: path, source: join(assets, "imported-models", file) })),
     ...IMPORTED_MODEL_FILES.map(({ entry, file }) => ({ entry, source: join(assets, "imported-models", file) })),
     ...generated.flat().filter(({ entry }) => !whiteOverrides.has(entry)),
     ...TOMB_WATERFALL_IMPORTS.map(({ entry, file }) => ({ entry, source: join(assets, "stage-assets", file) })),
