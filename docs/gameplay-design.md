@@ -2194,7 +2194,7 @@ Expert field.
 | Murloc | Tide Spout | 6 | 0 | 18 | 435 / 400 | guided | 62 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 204/208 |
 | Grom Hellscream | Blood Leap | 7 | 0 | 27 | 383 / 334 | guided | 45 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 204/208 |
 | Kobold | Candle Escape | 6 | 0 | 18 | 404 / 350 | guided | 59 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 198/208 |
-| Malfurion Stormrage | Dream Ascent | 10 | 0 | 27 | 426 / 400 | guided | 60 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 205/208 |
+| Malfurion Stormrage | Dream Ascent | 10 | 0 | 30 | 457 / 424 | guided | 63 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 187/208 |
 | Medivh | Raven Flight | 9 | 0 | 21 | 373 / 460 | aimed (8-way, 8 frames) | 51 | read down air (offstage launch, KO at 40%), reaction aerial, projectile | 203/208 |
 | Anub'arak | Crypt Eruption | 9 | 0 | 20 | 399 / 403 | aimed (8-way, 8 frames) | 54 | read forward air (offstage launch, KO at 40%), reaction aerial, projectile | 198/208 |
 
