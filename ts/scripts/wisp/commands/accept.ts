@@ -24,7 +24,7 @@ import { GameFiles } from "wisp/scripts/wisp/gameFiles";
 import { Phase } from "../../../src/game/lobby/lobbyState";
 import { MAP_PROFILES, SMASHCRAFT_ACCEPT, type SmashcraftMapProfile } from "../acceptChecks";
 import { currentPlaytest } from "../currentPlaytest";
-import { readClientEntries, repairPackager, resolveTools, validateClients } from "../nativeTools";
+import { readClientEntries, readyPackager, resolveTools, validateClients } from "../nativeTools";
 import { documentsFolder } from "wisp/scripts/warcraft/battleNet";
 import { PLAYTEST_PREFIX } from "./play";
 import { DevCommandReceipt } from "../boundary";
@@ -254,7 +254,7 @@ const prepareCandidate = (args: readonly string[], only: readonly string[], dryR
   const [given] = flagValues(args, "map");
   if (given !== undefined && !existsSync(given)) return yield* new UsageFailure({ problem: `no built map ${given}` });
   const tools = dryRun ? undefined : yield* resolveTools().pipe(Effect.mapError(nativeProblem));
-  if (!dryRun) yield* repairPackager();
+  if (!dryRun) yield* readyPackager().pipe(Effect.mapError(cause => new UsageFailure({ problem: describeCause(cause) })));
   const building = given === undefined && !dryRun && needsCandidate({ ...SMASHCRAFT_ACCEPT, maps: MAP_PROFILES }, only);
   const candidate = given ?? (building ? yield* headCandidate.pipe(Effect.mapError(cause => new UsageFailure({ problem: describeCause(cause) }))) : undefined);
   const profiles: Readonly<Record<string, SmashcraftMapProfile>> = given !== undefined
