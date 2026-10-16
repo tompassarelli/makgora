@@ -13,9 +13,8 @@ export const BEASTMASTER_GAMEPLAN: FighterGameplan = {
     { move: GameplanSpecial.down, near: 180.0, far: 400.0 },
   ],
   approach: [
-
-    { via: "shoot", moves: [GameplanSpecial.down, GameplanSpecial.side, GameplanSpecial.up, GameplanSpecial.neutral], weight: 3 },
-    { via: "run", moves: [AttackStyle.forwardTilt, AttackStyle.downTilt, AttackStyle.grab], weight: 2 },
+    { via: "shoot", moves: [GameplanSpecial.down, GameplanSpecial.side, GameplanSpecial.up, GameplanSpecial.neutral], weight: 1 },
+    { via: "run", moves: [AttackStyle.forwardTilt, AttackStyle.downTilt, AttackStyle.grab], weight: 4 },
     { via: "jump", moves: [AttackStyle.neutralAir, AttackStyle.forwardAir], weight: 1 },
   ],
   defense: ["shield", "retreat", "spotDodge"],
