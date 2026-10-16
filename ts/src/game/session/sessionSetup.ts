@@ -19,7 +19,7 @@ import { parseDecimal } from "../netcode/journal/decimal";
 import { PARTICIPANT_SLOTS, isParticipantMask, isParticipantSlot } from "../input/participants";
 import {
   type MatchState, Phase, computerActive, cycleSlotMode, humanActive, humanFighterActive, selectCharacter, selectCpuCharacter, setAutomaticRematch,
-  setHitAreas, setItemsOn, setMeterDropsOn, setUltimatesOn, setPartnerDamage, setStocks, setTimeLimit, setTraining, stepTrainingSpeed, toggleItemKind,
+  setTeamBattle, cycleTeam, setHitAreas, setItemsOn, setMeterDropsOn, setUltimatesOn, setPartnerDamage, setStocks, setTimeLimit, setTraining, stepTrainingSpeed, toggleItemKind,
 } from "../lobby/lobbyState";
 import { selectableStage } from "../menu/stageCatalog";
 import { ITEM_WARNING_FRAMES } from "../match/centreItem";
@@ -64,7 +64,7 @@ function characterNamed(name: string): Character | undefined {
 
 
 function setSlots(game: MatchState, actor: number, humans: number, computers: number): boolean {
-  if (!isParticipantMask(humans) || (computers !== 0 && !isParticipantMask(computers)) || (humans & computers) !== 0) return false;
+  if ((humans !== 0 && !isParticipantMask(humans)) || (computers !== 0 && !isParticipantMask(computers)) || (humans & computers) !== 0) return false;
   for (const slot of PARTICIPANT_SLOTS) {
     const bit = 1 << slot;
     for (let cycle = 0; cycle < 3; cycle++) {
@@ -82,6 +82,22 @@ function setSlots(game: MatchState, actor: number, humans: number, computers: nu
 
 export function applySetupCommand(game: MatchState, actor: number, message: string): string | undefined {
   const refused = (what: string) => `dev: ${what} refused`;
+  if (message.startsWith("-dev teams ")) {
+    const value = message.substring(11);
+    if (value !== "on" && value !== "off") return refused("teams");
+    setTeamBattle(game, actor, value === "on");
+    return game.teamBattle === (value === "on") ? "dev: teams " + value : refused("teams");
+  }
+  if (message.startsWith("-dev team ")) {
+    const [playerText, teamText, extra] = message.substring(10).split(" ");
+    const player = integer(playerText ?? "");
+    const team = integer(teamText ?? "");
+    const slot = player === undefined ? -1 : player - 1;
+    if (!isParticipantSlot(slot) || team === undefined || team < 0 || team > 3 || extra !== undefined
+      || game.phase !== Phase.characterMenu || !game.teamBattle) return refused("team");
+    for (let step = 0; step < 4 && game.teamChoices[slot] !== team; step++) cycleTeam(game, actor, slot, 1);
+    return game.teamChoices[slot] === team ? "dev: player " + player + " team " + team : refused("team");
+  }
   if (message.startsWith(SLOTS_COMMAND)) {
     const [humansText, computersText, extra] = message.substring(SLOTS_COMMAND.length).split(" ");
     const humans = integer(humansText ?? "");

@@ -21,7 +21,7 @@ interface MutableReplayState {
 
 
 class ReplayHistoryPlayback implements RollbackPlayback {
-  private readonly history = new ReplayHistory();
+  private history = new ReplayHistory();
   private readonly playback = new ShadowInputPlayback();
   private state: MutableReplayState | undefined;
   private current: number | undefined;
@@ -77,6 +77,16 @@ class ReplayHistoryPlayback implements RollbackPlayback {
 
   confirmedState(epoch: number, frame: number, row: Readonly<MatchFrameInput>): Readonly<ReplayState> | undefined {
     return epoch === this.current ? this.history.stateAfter(epoch, frame, row) : undefined;
+  }
+
+  rebase(schedule: Parameters<RollbackPlayback["rebase"]>[0], epoch: number, frame: number): boolean {
+    if (epoch !== this.current || frame !== schedule.nextConfirmedFrame()) return false;
+    if (!schedule.rewindSpeculative(epoch, frame)) return false;
+    const history = new ReplayHistory();
+    if (!history.beginEpoch(epoch, frame, schedule.rollbackFrames())) return false;
+    this.history = history;
+    this.playback.forgetReconciliation();
+    return true;
   }
 
   visitWorlds(visit: (world: Roster) => void): void {

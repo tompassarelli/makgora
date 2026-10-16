@@ -169,3 +169,18 @@ Release names and permission follow the root AGENTS.md.
   Ordinary integrity maps retain chat startup. Native heap absence remains
   `n/a (no-collectgarbage)`; RSS uses elapsed >=600 seconds, slope <32 MiB/hour,
   and live-handle slope <=0.
+
+Developer setup uses the synchronized `-dev` chat channel in dev, integrity and
+native-driver builds. Player builds refuse it. Slots are 1–4; teams are 0–3.
+`-dev percent SLOT N` sets an active fighter to a whole percent from 0–999.
+`-dev candle SLOT LEVEL` sets Kobold's held candle to level 0–3 (with heat
+headroom for a one-second capture); `-dev candle SLOT drop` starts the ordinary
+loose-candle simulation, including kick, snuff, pickup and timed relight.
+These fighter commands require a running match. To apply them before frame 1,
+use one chat event such as
+`-dev setup quick hero kobold;percent 1 150;candle 1 3`.
+The setup command runs up to 32 non-nested commands in order.
+`-dev teams on` enables Team Battle at character select; `-dev team SLOT T`
+assigns the actor's fighter or a computer to a team through the lobby rules.
+`-dev slots 1 14` selects one human fighter and three computers;
+`-dev slots 0 15` selects four computers while connected humans operate the menus.
