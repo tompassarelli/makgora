@@ -58,7 +58,7 @@ export function tierSoundPaths(): string[] {
 
 
 export function tierHitPath(element: HitElement, tier: number, variant: number): string | undefined {
-  if (element !== HitElement.normal && element !== HitElement.slash && !(element === HitElement.holy && tier === SoundTier.large)) return undefined;
+  if (element !== HitElement.normal && element !== HitElement.slash && element !== HitElement.holy) return undefined;
   const files = at(element === HitElement.slash ? SLICE : BASH, tier);
   return at(files, imod(variant, files.length));
 }

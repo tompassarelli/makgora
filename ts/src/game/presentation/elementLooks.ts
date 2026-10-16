@@ -32,7 +32,7 @@ export const ELEMENT_LOOKS: { readonly [element in HitElement]: ElementLook } = 
   [HitElement.electric]: { victim: "Abilities\\Spells\\Orc\\Purge\\PurgeBuffTarget.mdx", victimScale: f32(0.8), sound: "LightningBolt", tint: { red: 180, green: 220, blue: 255 } },
   [HitElement.ice]: { victim: "Abilities\\Spells\\Other\\FrostDamage\\FrostDamage.mdx", victimScale: 1.0, sound: "FrostNova", tint: { red: 155, green: 210, blue: 255 } },
   [HitElement.dark]: { victim: "Abilities\\Spells\\Undead\\Curse\\CurseTarget.mdx", victimScale: 1.0, sound: "DeathCoil", tint: { red: 150, green: 110, blue: 190 } },
-  [HitElement.holy]: { victim: "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", victimScale: f32(0.6), sound: "HolyBolt", tint: { red: 255, green: 240, blue: 150 } },
+  [HitElement.holy]: { victim: "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", victimScale: f32(0.6), sound: undefined, tint: { red: 255, green: 240, blue: 150 } },
   [HitElement.poison]: { victim: "Abilities\\Weapons\\PoisonSting\\PoisonStingTarget.mdx", victimScale: f32(1.2), sound: "PoisonArrowHit", tint: { red: 150, green: 255, blue: 120 } },
   [HitElement.arcane]: { victim: "Abilities\\Spells\\NightElf\\ManaBurn\\ManaBurnTarget.mdx", victimScale: f32(0.8), sound: "ManaBurn", tint: { red: 200, green: 160, blue: 255 } },
 };

@@ -51,8 +51,6 @@ interface FighterSound {
   readonly normals?: { readonly [style: number]: { readonly perform?: string; readonly hit?: string } | undefined } | undefined;
 }
 
-export const CONSECRATION_SOUND = "HolyBolt";
-export const CONSECRATION_VOLUME = 70;
 const s = (perform: string | undefined, hit: string, performVolume?: number): SpecialSound => ({ perform, hit, performVolume });
 
 export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | undefined } = {
@@ -82,7 +80,7 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
   },
   [Character.forsakenPaladin]: {
     weapon: Weapon.blade, whoosh: false, strong: "MetalHeavySliceMetal",
-    specials: [s(undefined, "MetalHeavySliceFlesh"), s(undefined, "MetalHeavySliceFlesh"), s(undefined, "MetalMediumSliceFlesh"), s(CONSECRATION_SOUND, "WoodLightBashFlesh", CONSECRATION_VOLUME)],
+    specials: [s(undefined, "MetalHeavySliceFlesh"), s(undefined, "MetalHeavySliceFlesh"), s(undefined, "MetalMediumSliceFlesh"), s(undefined, "WoodLightBashFlesh")],
   },
   [Character.dreadlord]: {
     weapon: Weapon.claw, strong: "CarrionSwarmDamage",

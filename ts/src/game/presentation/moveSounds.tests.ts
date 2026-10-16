@@ -3,8 +3,8 @@ import { AttackStyle, Character } from "../sim/codes";
 import { SELECTABLE_CHARACTERS, fighterName } from "../sim/heroes/registry";
 import { VERIFIED_STOCK_SOUNDS } from "../../generated/assets/stockSoundInfo";
 import { HitElement } from "../sim/hitRegions";
-import { CONSECRATION_SOUND, CONSECRATION_VOLUME, isSpecialMove, moveSound, playHit, playPerform, playShieldHit, soundFiles, soundedMoves, specialMove } from "./moveSounds";
-import { SWING_SOUND } from "./moveTiers";
+import { isSpecialMove, moveSound, playHit, playPerform, playShieldHit, soundFiles, soundedMoves, specialMove } from "./moveSounds";
+import { SWING_SOUND, SoundTier, tierHitPath } from "./moveTiers";
 
 test("every move has weak, strong and shield audio and every configured sound exists in the installed game [k4 reference native]", () => {
   const missing: string[] = [];
@@ -112,14 +112,9 @@ const SWORD_HIT: { readonly [move: number]: string } = {
   [AttackStyle.upAir]: "MetalHeavySliceFlesh", [AttackStyle.downAir]: "MetalHeavySliceFlesh",
   [specialMove(0)]: "MetalHeavySliceFlesh", [specialMove(1)]: "MetalHeavySliceFlesh", [specialMove(2)]: "MetalMediumSliceFlesh", [specialMove(3)]: "WoodLightBashFlesh",
 };
-const PALADIN_PERFORM: { readonly [move: number]: string } = {
-  [specialMove(3)]: CONSECRATION_SOUND,
-};
-const CONSECRATION_VOLUME_BEFORE = 100;
-
-test("Forsaken Paladin swings and hits with stock sword sounds and plays Consecration's sound once per cast, quieter than before [k3 measure #216]", () => {
+test("Forsaken Paladin swings and hits with stock sword sounds and no move or holy hit plays the HolyBolt chime [k3 measure #216]", () => {
   const paladin = Character.forsakenPaladin;
-  const consecration = soundFiles(CONSECRATION_SOUND);
+  const chime = soundFiles("HolyBolt");
   const rows: string[] = [];
   const expected: string[] = [];
   for (const move of soundedMoves(paladin)) {
@@ -127,20 +122,15 @@ test("Forsaken Paladin swings and hits with stock sword sounds and plays Consecr
     const labels = (layers: readonly { readonly sounds: readonly string[] }[] | undefined) => (layers ?? []).map((layer) => layer.sounds.join("|")).join("+");
     rows.push(`${move}: perform ${labels(row?.perform)} hit ${labels(row?.hit)} strong ${labels(row?.strong)} voice ${row?.voice === undefined ? "-" : "yes"}`);
     const hit = SWORD_HIT[move] ?? "missing";
-    expected.push(`${move}: perform ${PALADIN_PERFORM[move] ?? ""} hit ${hit} strong ${isSpecialMove(move) ? hit : "MetalHeavySliceFlesh"}+MetalHeavySliceMetal voice -`);
+    expected.push(`${move}: perform  hit ${hit} strong ${isSpecialMove(move) ? hit : "MetalHeavySliceFlesh"}+MetalHeavySliceMetal voice -`);
     for (let serial = 0; serial < 6; serial++) {
-      const performed: { file: string; volume: number }[] = [];
-      const impacts: string[] = [];
-      playPerform(paladin, move, serial, (file, volume) => performed.push({ file, volume }));
-      playHit(paladin, move, false, HitElement.normal, serial, (file) => impacts.push(file));
-      playHit(paladin, move, true, HitElement.normal, serial, (file) => impacts.push(file));
-      playShieldHit(paladin, move, serial, (file) => impacts.push(file));
-      const casts = performed.filter((sound) => consecration.includes(sound.file));
-      assertEquals(casts.length, move === specialMove(3) ? 1 : 0, `${move} Consecration sounds per cast`);
-      for (const cast of casts) assertEquals(cast.volume < CONSECRATION_VOLUME_BEFORE, true, `${move} Consecration volume ${cast.volume}`);
-      assertEquals(impacts.some((file) => consecration.includes(file)), false, `${move} Consecration sound on impact`);
+      const played: string[] = [];
+      playPerform(paladin, move, serial, (file) => played.push(file));
+      for (const element of [HitElement.normal, HitElement.holy]) for (const strong of [false, true]) playHit(paladin, move, strong, element, serial, (file) => played.push(file));
+      playShieldHit(paladin, move, serial, (file) => played.push(file));
+      assertEquals(played.some((file) => chime.includes(file)), false, `${move} HolyBolt`);
     }
   }
   assertEquals(rows.join("\n"), expected.join("\n"));
-  assertEquals(CONSECRATION_VOLUME < CONSECRATION_VOLUME_BEFORE, true);
+  for (const tier of [SoundTier.small, SoundTier.medium, SoundTier.large]) assertEquals(tierHitPath(HitElement.holy, tier, 0) !== undefined, true, `holy tier ${tier}`);
 });
