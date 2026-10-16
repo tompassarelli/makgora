@@ -173,6 +173,7 @@ function label(parent: framehandle, name: string, x: number, y: number, width: n
 }
 
 
+const TAG_SCALE = f32(f32(0.01) / NATIVE_TEXT_BASE);
 const BOTTOM_BAR_TOP = f32(0.077);
 const BAR_COIN = f32(0.011);
 const BAR_GAP = f32(0.003);
@@ -916,7 +917,7 @@ export class SelectionPanel {
       setFrameText(frames.teamLabel, `${this.menuFocus?.kind === "team" && this.menuFocus.slot === slot ? "> " : ""}${TEAM_NAMES[game.teamChoices[slot]]}`);
       BlzFrameSetSize(frames.mode, game.teamBattle ? f32(0.078) : modeBox(slot).width, modeBox(slot).height);
       placeTopLeft(frames.tag, f32(cardX(slot) + (game.teamBattle ? f32(0.006) : f32(0.014))), f32(0.267));
-      BlzFrameSetSize(frames.tag, game.teamBattle ? f32(0.068) : f32(0.132), f32(0.019));
+      BlzFrameSetSize(frames.tag, f32((game.teamBattle ? f32(0.068) : f32(0.132)) / TAG_SCALE), f32(f32(0.019) / TAG_SCALE));
       const focused = this.menuFocus?.kind === "fighter" && this.menuFocus.slot === slot;
       setFrameText(frames.tag, active ? `${focused ? "> " : ""}${human ? "Player" : "CPU"}${focused ? " <" : ""}` : "Empty");
       BlzFrameSetEnable(frames.mode, canCycleSlotMode(game, participantId, slot));

@@ -247,3 +247,20 @@ test("Start answers clicks in one rectangle on character select and on stage sel
   expect(phases()).toEqual([Phase.match, Phase.match]);
   for (const client of clients.clients) expect(client.errors).toEqual([]);
 });
+
+test("every character card's Player, CPU or Empty label is centred over its card [k1 scenario]", () => {
+  const { clients } = menu();
+  clients.frames(4);
+  for (const client of clients.clients) {
+    const shown = client.frames.snapshot({ visibleOnly: true });
+    const tags = shown.filter(frame => frame.name.startsWith("MeleeTag") && frame.rectangle !== undefined);
+    expect(tags.length).toBeGreaterThanOrEqual(4);
+    for (const tag of tags) {
+      const card = shown.find(frame => frame.name === tag.name.replace("MeleeTag", "MeleeCard"));
+      const [tagLeft, , tagRight] = tag.rectangle!;
+      const [cardLeft, , cardRight] = card!.rectangle!;
+      expect((tagLeft + tagRight) / 2, tag.name).toBeCloseTo((cardLeft + cardRight) / 2, 3);
+    }
+    expect(client.errors).toEqual([]);
+  }
+});
