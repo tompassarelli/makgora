@@ -16,6 +16,7 @@ import { Console, Effect, Option, Schema } from "effect";
 import { issueTests, redTitle } from "./mainRed";
 import { effectPlaybackInputs } from "./wisp/effectVisibility";
 import { CUE_MODEL_RECORD, RECORD_COMMAND, touchesCueInputs } from "./wisp/cueModels";
+import { derivedStepCode } from "./wisp/fighterArt";
 import { changedFighters } from "./wisp/fighterArtChanges";
 
 const root = join(import.meta.dir, "../..");
@@ -63,7 +64,7 @@ export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = 
   const cueModels = touchesCueInputs(paths, cues);
   const mapInputs = paths.some((path) => MAP_INPUTS.some((input) => path === input || input.endsWith("/") && path.startsWith(input)));
   const suites = paths.some((path) => SUITE_INPUTS.includes(path));
-  const fighterArt = changedFighters(paths);
+  const fighterArt = changedFighters(paths, derivedStepCode());
   return [
     ...(paths.length > 0 ? [{ name: "clean room", directory: "ts", args: ["scripts/cleanRoom.ts"], fix: "follow wisp:docs/clean-room.md and the line above.", hosted: true }] : []),
     ...(ts ? [

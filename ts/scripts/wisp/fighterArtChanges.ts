@@ -4,16 +4,19 @@ import { fighters } from "../heroModelSource";
 const ROSTER = [...fighters].map(([character, { name, source }]) => ({ name, source, slug: fighterSlug(character) }));
 
 const SLUG_FILES = [
-  /^build-inputs\/(?:original-clips-static-lights|impact-assets|hero-models)\/([^/]+)$/,
+  /^build-inputs\/(?:original-clips-static-lights|impact-assets)\/([^/]+)$/,
   /^ts\/src\/generated\/clips\/([^/]+)\.ts$/,
   /^ts\/src\/generated\/assets\/white-(?:models|facts)\/([^/]+)\.ts$/,
 ];
 
 const FACTS_FILE = /^ts\/scripts\/wisp\/model-facts\/war3mapImported_([A-Za-z]+?)(?:TimelineBody|White|OriginalClip\d*|OriginalLight)-/;
 
-const WHOLE_SOURCE_FAMILY = /^build-inputs\/(animation-assets|illidan-animation|imported-models)$/;
+const WHOLE_SOURCE_FAMILY = /^build-inputs\/(animation-assets|illidan-animation)$/;
 
-export function changedFighters(paths: readonly string[]): string[] {
+const EVERY_KEY = /^build-inputs\/(?:hero-models(?:\/[^/]+)?|imported-models)$/;
+
+export function changedFighters(paths: readonly string[], stepCode: ReadonlySet<string>): string[] {
+  if (paths.some((path) => stepCode.has(path) || EVERY_KEY.test(path))) return ROSTER.map(({ slug }) => slug).sort();
   const slugs = new Set<string>();
   for (const path of paths) {
     const slug = SLUG_FILES.map((pattern) => pattern.exec(path)?.[1]).find((match) => match !== undefined);

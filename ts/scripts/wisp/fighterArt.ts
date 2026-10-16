@@ -48,12 +48,16 @@ const sha256 = (...parts: readonly (string | Uint8Array)[]) => {
 
 const failure = (operation: string, path: string, cause: unknown) => new MapBuildFailure({ operation, path, cause: cause instanceof Error ? cause.message : String(cause) });
 
-function codeDigest(tool: string): string {
+function stepCode(tool: string): string[] {
   const graph = new ImportGraph(projectRoot), entry = join(projectRoot, tool);
   graph.add([entry]);
   const files = [...graph.dependencies(entry)].map((path) => relative(projectRoot, path)).filter((path) => !GENERATED.some((pattern) => pattern.test(path)));
-  return sha256(...[...files, ...LOCKS].sort().flatMap((path) => [path, readFileSync(join(projectRoot, path))]));
+  return [...files, ...LOCKS].sort();
 }
+
+const codeDigest = (tool: string) => sha256(...stepCode(tool).flatMap((path) => [path, readFileSync(join(projectRoot, path))]));
+
+export const derivedStepCode = (): ReadonlySet<string> => new Set(STEPS.flatMap((step) => stepCode(step.tool)));
 
 const ownedFiles = (fighter: Fighter) => [`ts/src/generated/clips/${fighter.slug}.ts`, `ts/src/generated/assets/white-models/${fighter.slug}.ts`, `ts/src/generated/assets/white-facts/${fighter.slug}.ts`];
 

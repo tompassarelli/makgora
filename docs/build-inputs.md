@@ -88,7 +88,9 @@ code:
    the steps whose inputs changed. `--rebuild` ignores stored steps.
    `--check` derives into the committed checkout and fails, restoring it, when
    any pin or generated file differs; pre-push runs it for each fighter whose
-   pins, generated clips or whites, model facts or source family a landing changes
+   pins, generated clips or whites, model facts or source family a landing changes,
+   and for every fighter when it changes code the derive steps import or the
+   hero-models or imported-models pins, which feed every fighter's step keys
    (smashcraft:ts/scripts/wisp/fighterArtChanges.ts).
    A derive that fails keeps its step logs in derive/run-*/ beside the store;
    `bun wisp inputs prune [--scratch NAME]...` removes the runs older than the
