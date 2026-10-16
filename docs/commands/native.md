@@ -184,7 +184,8 @@ The setup command runs up to 32 non-nested commands in order.
 assigns the actor's fighter or a computer to a team through the lobby rules.
 `-dev slots 1 14` selects one human fighter and three computers;
 `-dev slots 0 15` selects four computers while connected humans operate the menus.
-# Native batch planner
+
+## Native batch planner
 
 Use `bun wisp native plan --boxes FILE.tsv --out PLAN.json`, then
 `bun wisp native run PLAN.json --out DIR [--pairs N] [--dry-run]` to union,

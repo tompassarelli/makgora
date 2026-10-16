@@ -21,16 +21,21 @@ model a larger pool without starting clients. Existing pair claims are respected
 
 Live pad execution uses `WISP_PAD_HELPER`, or `helper` in an optional
 `--executor-config FILE.json`, falling back to `build/tools/wc3-journal`.
-Capture execution requires `desktop`, `capacity`, and `install` in that config;
-`client` defaults to `a`. These are the existing capture batch's launcher and
+Capture execution requires `install` in that config, with `desktop` and
+`capacity` also required for offline pools; `client` defaults to `a`. These are the existing capture batch's launcher and
 installation arguments. A running service pool is attached through pair status;
 attached clients remain owned by the pool service. Capture tools resolve at run
-time, independently of the caller's PATH. The offline pool cannot run Definitive.
+time, independently of the caller's PATH. The offline pool cannot run Definitive. Explicit signed-in client sets use
+`fresh --profile native-capture --no-quick --clients-file FILE`, without touching
+the offline pool. Set `client` to a name in that client set.
 
-Maps already present are reused; missing maps build before use, with the next
-map built while the current batch runs. Pad batches compare headless results
+Maps already present are reused; missing pad maps build with the integrity
+profile before use, with the next map built under machine-capacity admission
+while the current batch runs. Capture maps must already match their manifests.
+Capture manifests split into fixture rows before sharding. Pad batches compare headless results
 while other scripts run and retain their own row checkpoints. Capture batches
 retain frame checkpoints. `plan-run.json` records batch start/end, assignments,
 scripts, verdicts and each issue's evidence directories. Successful batches
-resume when their plan identity and evidence remain present. Failed batches
+resume when their source revision, map/script contents, configuration and
+evidence files remain present. Failed batches
 re-enter the existing executors, which resume completed rows.

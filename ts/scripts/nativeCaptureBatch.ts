@@ -27,7 +27,7 @@ const pairStatusSchema = Schema.Struct({
   game: Schema.optional(Schema.Struct({ phase: Schema.String, players: Schema.Array(Schema.Struct({ label: Schema.String, connected: Schema.Boolean })) })),
 });
 type PairStatus = typeof pairStatusSchema.Type;
-type PairPool = { readonly scope: Scope.Closeable; readonly child: Bun.Subprocess | undefined };
+type PairPool = { readonly scope: Scope.Closeable; readonly child: Bun.Subprocess | undefined; readonly signedClients?: string };
 
 const tsDirectory = join(import.meta.dir, "..");
 const wispCommand = (args: readonly string[]) => runProcess(ChildProcess.make(process.execPath, ["scripts/wisp.ts", ...args], { cwd: tsDirectory }));
@@ -131,10 +131,10 @@ const runChunk = (args: { readonly pair: number; readonly pool: PairPool; readon
   ).pipe(
     Effect.catch(failure => Effect.succeed({ kind: "failed" as const, reason: failure.message })),
   );
-  const monitor = monitorDrop(args.pair, args.pool, args.row, args.sourceRevision, args.out, false).pipe(Effect.map(reason => ({ kind: "dropped" as const, reason })));
+  const monitor = args.pool.signedClients === undefined ? monitorDrop(args.pair, args.pool, args.row, args.sourceRevision, args.out, false).pipe(Effect.map(reason => ({ kind: "dropped" as const, reason }))) : Effect.never;
   const collector = yield* Effect.forkChild(run);
   yield* Effect.sleep("3 seconds");
-  const fresh = yield* wispCommand(["lan", "fresh", args.row.map, "--pair", String(args.pair), "--turn-ms", "60"]).pipe(Effect.result);
+  const fresh = yield* wispCommand(args.pool.signedClients === undefined ? ["lan", "fresh", args.row.map, "--pair", String(args.pair), "--turn-ms", "60"] : ["fresh", args.row.map, "--profile", "native-capture", "--no-quick", "--clients-file", args.pool.signedClients]).pipe(Effect.result);
   if (fresh._tag === "Failure") {
     yield* Fiber.interrupt(collector);
     return { kind: "failed" as const, reason: fresh.failure.message };
@@ -160,7 +160,9 @@ export const nativeCaptureBatch = (args: readonly string[]) => Effect.scoped(Eff
   const tools = yield* resolveTools();
   const runtimeClients = join(out, "runtime-clients.json");
   yield* Effect.try({ try: () => writeFileSync(runtimeClients, withRuntimeTools(readFileSync(clientsFile, "utf8"), tools)), catch: cause => new CaptureBatchFailure({ problem: String(cause) }) });
-  let pool = yield* poolScope(pair, desktop, capacity);
+  const currentScope = yield* Effect.scope;
+  const acquirePool = () => args.includes("--signed-in") ? Scope.fork(currentScope).pipe(Effect.map(scope => ({ scope, child: undefined, signedClients: runtimeClients } satisfies PairPool))) : poolScope(pair, desktop, capacity);
+  let pool: PairPool = yield* acquirePool();
   let completed = 0;
   for (const row of plan.rows) {
     const manifestText = yield* Effect.try({ try: () => readFileSync(row.manifest, "utf8"), catch: cause => new CaptureBatchFailure({ problem: `read ${row.manifest}: ${String(cause)}` }) });
@@ -184,7 +186,7 @@ export const nativeCaptureBatch = (args: readonly string[]) => Effect.scoped(Eff
         lastReason = result._tag === "Failure" ? String(result.failure) : result.success.kind === "complete" ? "capture process returned without a complete row" : result.success.reason;
         console.log(`row ${row.name}: ${lastReason}; restarting pair (${attempt}/4)`);
         yield* closePool(pool);
-        pool = yield* poolScope(pair, desktop, capacity);
+        pool = yield* acquirePool();
       }
     }
     if (!finished) return yield* new CaptureBatchFailure({ problem: `${row.name}: exhausted four capture attempts: ${lastReason}` });

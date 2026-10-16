@@ -82,8 +82,8 @@ const runShard = (batch: Batch, shard: ReturnType<typeof shardBatch>[number], ou
       }
       yield* save(subPath, { version: 1, sourceRevision: revision, rows });
     }
-    command = ["native-capture", "batch", "--plan", subPath, "--out", dir, "--pair", String(shard.pair), "--desktop", config.desktop ?? "", "--capacity", config.capacity ?? "", "--clients-file", batch.clients === "pool" ? join(state, `pair-${shard.pair}`, "clients.json") : batch.clients, "--client", config.client ?? "a", "--install", config.install ?? ""];
-    if (!dry && (config.desktop === undefined || config.capacity === undefined || config.install === undefined)) return yield* new UsageFailure({ problem: "capture batch needs --executor-config with desktop, capacity and install" });
+    command = ["native-capture", "batch", "--plan", subPath, "--out", dir, "--pair", String(shard.pair), "--desktop", config.desktop ?? "", "--capacity", config.capacity ?? "", "--clients-file", batch.clients === "pool" ? join(state, `pair-${shard.pair}`, "clients.json") : batch.clients, "--client", config.client ?? "a", "--install", config.install ?? "", ...(batch.clients === "pool" ? [] : ["--signed-in"])];
+    if (!dry && (config.install === undefined || batch.clients === "pool" && (config.desktop === undefined || config.capacity === undefined))) return yield* new UsageFailure({ problem: "capture batch needs --executor-config with install, plus desktop and capacity for offline pools" });
   }
   console.log(`${batch.id} ${batch.kind} pair ${shard.pair}: bun wisp ${command.map(arg => JSON.stringify(arg)).join(" ")}`);
   if (!dry) {
@@ -94,8 +94,9 @@ const runShard = (batch: Batch, shard: ReturnType<typeof shardBatch>[number], ou
 });
 const runNative = (file: string, out: string, values: NativeOptions) => Effect.gen(function*() {
   const plan = yield* decodePlan(yield* read(file));
+  if (plan.batches.length === 0) { console.log("no native batches to run"); return; }
   const dry = values["dry-run"] === true;
-  const pairs = yield* selectPairs(values, dry);
+  const pairs = plan.batches.every(batch => batch.clients !== "pool") ? [0] : yield* selectPairs(values, dry);
   const config: typeof Config.Type = values["executor-config"] === undefined ? {} : yield* Schema.decodeEffect(Schema.fromJsonString(Config))(yield* read(values["executor-config"]));
   const runPath = join(out, "plan-run.json");
   const record = existsSync(runPath) ? yield* Schema.decodeEffect(Schema.fromJsonString(Run))(yield* read(runPath)) : { batches: [] };
@@ -127,11 +128,14 @@ const runNative = (file: string, out: string, values: NativeOptions) => Effect.g
     }
     const start = new Date().toISOString();
     const evidence: Record<string, string[]> = {};
+    const row = { id: batch.id, identity, start, end: "", pairs: shards.map(shard => shard.pair), scripts: batch.scripts.map(script => script.path), verdict: "RUNNING", evidence };
+    if (!dry) { records.push(row); yield* save(runPath, { batches: records }); }
     const result = yield* Effect.forEach(shards, shard => Effect.gen(function*() {
       yield* runShard(batch, shard, out, config, dry, evidence);
     }), { concurrency: pairs.length || 1 }).pipe(Effect.result);
     if (!dry) {
-      records.push({ id: batch.id, identity, start, end: new Date().toISOString(), pairs: shards.map(shard => shard.pair), scripts: batch.scripts.map(script => script.path), verdict: result._tag === "Success" ? "PASS" : "FAIL", evidence });
+      row.end = new Date().toISOString();
+      row.verdict = result._tag === "Success" ? "PASS" : "FAIL";
       yield* save(runPath, { batches: records });
     }
     if (result._tag === "Failure") return yield* Effect.fail(result.failure);
