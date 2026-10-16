@@ -224,6 +224,7 @@ export class FighterPoolPresentation {
       alpha = body.alpha;
     }
     if (transformation.phase === "active" && transformation.cues?.active.replacesBody === true) alpha = 0;
+    if (fighter.status.condition === HeroStatusKind.hex && !fighter.status.out) alpha = 0;
     if (changed || this.red !== red || this.green !== green || this.blue !== blue) {
       BlzSetSpecialEffectColor(model, red, green, blue);
       this.red = red;

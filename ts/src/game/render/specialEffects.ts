@@ -39,6 +39,7 @@ interface SpecialSlot {
   readonly wingTrail: effect;
   readonly drainFlash: effect;
   readonly silence: effect;
+  readonly frog: effect;
   readonly siphon: lightning;
   siphonShown: boolean;
   readonly laser: lightning;
@@ -60,6 +61,8 @@ const FEL_FLAMES = 2;
 const MANA_HAND = 3;
 const WING_TRAIL = 4;
 const DRAIN_FLASH = 5;
+const FROG = 6;
+export const HEX_FROG_MODEL = "units\\critters\\Frog\\Frog.mdx";
 const SILENCE = 7;
 const EYE_BLAST = 8;
 const SLOT_EFFECTS = EYE_BLAST + EYE_BLAST_MARKS;
@@ -89,6 +92,7 @@ export class SpecialEffects {
       const wingTrail = AddSpecialEffect(IMPACT_DUST_MODEL, x, y);
       const drainFlash = AddSpecialEffect(IMPACT_TECH_MODEL, x, y);
       const silence = AddSpecialEffect(STOCK_MODELS.silenceTarget, x, y);
+      const frog = AddSpecialEffect(HEX_FROG_MODEL, x, y);
       const siphon = AddLightningEx(SIPHON_LIGHTNING, false, x, y, origin.z - 4096.0, x, y, origin.z - 4096.0);
       SetLightningColor(siphon, 1.0, 1.0, 1.0, 0.0);
       const laser = AddLightningEx(LASER_LIGHTNING, false, x, y, origin.z - 4096.0, x, y, origin.z - 4096.0);
@@ -100,7 +104,7 @@ export class SpecialEffects {
       BlzSetSpecialEffectTimeScale(drainFlash, 0.0);
       const immolationLoop = CreateSoundFromLabel(IMMOLATE_SOUNDS.loop, true, true, true, 10000, 10000);
       return {
-        bear, aura, felFlames, manaHand, wingTrail, drainFlash, silence, siphon, siphonShown: false, laser, laserShown: false, lastX: 0.0, lastZ: 0.0, eyeBlast, cursor, immolationLoop,
+        bear, aura, felFlames, manaHand, wingTrail, drainFlash, silence, frog, siphon, siphonShown: false, laser, laserShown: false, lastX: 0.0, lastZ: 0.0, eyeBlast, cursor, immolationLoop,
         previousSpecial: SpecialAction.none, previousSpecialFrame: 0,
       };
     });
@@ -122,6 +126,7 @@ export class SpecialEffects {
       this.park(slot.wingTrail, index, WING_TRAIL);
       this.park(slot.drainFlash, index, DRAIN_FLASH);
       this.park(slot.silence, index, SILENCE);
+      this.park(slot.frog, index, FROG);
       this.hideSiphon(slot);
       this.hideLaser(slot);
       this.parkEyeBlast(slot, index);
@@ -216,6 +221,10 @@ export class SpecialEffects {
     const { felFlames, manaHand } = slot;
     if (!fighter.status.out && fighter.status.condition === HeroStatusKind.silence) this.show(slot.silence, index, SILENCE, fighter, 0.0, 150.0, f32(0.7));
     else this.park(slot.silence, index, SILENCE);
+    if (!fighter.status.out && fighter.status.condition === HeroStatusKind.hex) {
+      this.show(slot.frog, index, FROG, fighter, 0.0, 0.0, f32(1.6));
+      BlzSetSpecialEffectYaw(slot.frog, facingYaw(fighter.facing));
+    } else this.park(slot.frog, index, FROG);
     if (fighter.character === Character.demonHunter && !fighter.status.out) {
       if (entered && action === SpecialAction.demonHunterImmolate) BlzSetSpecialEffectTime(felFlames, 0.0);
       else if (entered && action === SpecialAction.demonHunterManaBurn) BlzSetSpecialEffectTime(manaHand, 0.0);
@@ -355,7 +364,7 @@ export class SpecialEffects {
       this.releaseImmolationLoop(slot);
       KillSoundWhenDone(slot.immolationLoop);
       slot.bear.destroy();
-      for (const model of [slot.aura, slot.felFlames, slot.manaHand, slot.wingTrail, slot.drainFlash, slot.silence, ...slot.eyeBlast]) DestroyEffect(model);
+      for (const model of [slot.aura, slot.felFlames, slot.manaHand, slot.wingTrail, slot.drainFlash, slot.silence, slot.frog, ...slot.eyeBlast]) DestroyEffect(model);
       DestroyLightning(slot.siphon);
       DestroyLightning(slot.laser);
     }
