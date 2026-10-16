@@ -94,3 +94,19 @@ test("an aerial Rest falls asleep in the air and keeps sleeping after landing un
   assertEquals(landedAt > REST_SOUR_FRAME && landedAt < REST_END_FRAME, true, `landed asleep on frame ${landedAt}`);
   assertEquals(step, REST_END_FRAME - 1);
 });
+
+test("Peon's Burrow and Pack Up stop his slide on the spot [k2 property]", () => {
+  const peon = createFighter(Character.peon, 0.0, 1);
+  const { world } = duelPair(peon, createFighter(Character.rifleman, 900.0, -1));
+  const SIDE = controls({ specialPressed: true, specialX: 1, direction: 1 });
+  for (const [move, action] of [["Burrow", SpecialAction.heroSide], ["Pack Up", SpecialAction.heroSide]] as const) {
+    peon.motion.vx = peon.tuning.physics.runSpeed;
+    stepDuel(world, SIDE);
+    const x = peon.motion.x;
+    assertEquals(peon.special.action, action, move);
+    for (let tick = 0; tick < 60 && peon.special.action !== SpecialAction.none; tick++) {
+      stepDuel(world);
+      assertEquals(peon.motion.x, x, `${move} tick ${tick}`);
+    }
+  }
+});
