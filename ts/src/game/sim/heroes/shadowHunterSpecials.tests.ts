@@ -1,6 +1,6 @@
 import { assertEquals, assertGreaterThan, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
-import { Character } from "../codes";
+import { Character, SpecialAction } from "../codes";
 import { type Fighter, createFighter } from "../fighter";
 import { type Roster } from "../roster";
 import { controls } from "../testWorld";
@@ -45,4 +45,20 @@ test("replaying a ward from a restored snapshot reproduces every fighter field [
   run();
   assertEquals(firstFighterDifference(endOwner, owner, 3, 3), undefined);
   assertEquals(firstFighterDifference(endTarget, target, 3, 3), undefined);
+});
+
+test("Shadow Hunter's Serpent Ward and its recall stop his slide on the spot [k2 property]", () => {
+  const hunter = createFighter(Character.shadowHunter, 0.0, 1);
+  const { world } = duelPair(hunter, createFighter(Character.rifleman, 900.0, -1));
+  const SIDE = controls({ specialPressed: true, specialX: 1, direction: 1 });
+  for (const move of ["Serpent Ward", "Recall"]) {
+    hunter.motion.vx = hunter.tuning.physics.runSpeed;
+    stepDuel(world, SIDE);
+    const x = hunter.motion.x;
+    assertEquals(hunter.special.action, SpecialAction.heroSide, move);
+    for (let tick = 0; tick < 60 && hunter.special.action !== SpecialAction.none; tick++) {
+      stepDuel(world);
+      assertEquals(hunter.motion.x, x, `${move} tick ${tick}`);
+    }
+  }
 });

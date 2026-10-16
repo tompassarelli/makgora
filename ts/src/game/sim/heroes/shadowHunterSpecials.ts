@@ -87,8 +87,9 @@ const SERPENT_WARD: SpecialPlacement = {
 
 
 
-const SERPENT_WARD_CAST: AuthoredSpecial = { endFrame: 52, groundOnly: true, placement: SERPENT_WARD };
-const SERPENT_WARD_RECALL: AuthoredSpecial = { endFrame: 52, groundOnly: true, recall: true };
+const SERPENT_WARD_STOP = [{ ...frames(1, 52), velocityX: 0.0, velocityZ: 0.0 }];
+const SERPENT_WARD_CAST: AuthoredSpecial = { endFrame: 52, groundOnly: true, motion: SERPENT_WARD_STOP, placement: SERPENT_WARD };
+const SERPENT_WARD_RECALL: AuthoredSpecial = { endFrame: 52, groundOnly: true, recall: true, motion: SERPENT_WARD_STOP };
 
 export const SHADOW_HUNTER_SPECIALS: FighterSpecials = {
   neutral: withExKit({ name: "Spirit Glaive", description: "A glaive that flies out and back, pulling its target toward him on the return.", ground: spiritGlaive(false), air: spiritGlaive(true) }, { damage: 1.25 }),
