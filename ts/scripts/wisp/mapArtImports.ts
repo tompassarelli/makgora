@@ -5,7 +5,7 @@ import { Effect } from "effect";
 import { MapBuildFailure, type ArchiveEntry } from "wisp/scripts/wisp/mapBuild";
 import { PORTRAIT_QUALITY, encodeBlp, readTga } from "../blp";
 import { PREVIEW_ENTRY, PREVIEW_FILE, encodePreview } from "../mapPreview";
-import { LOADING_SCREEN_MODEL, LOADING_SCREEN_PICTURE, LOADING_SCREEN_STOCK_MODEL, loadingScreenTextures, retargetLoadingModel } from "../loadingScreen";
+import { LOADING_SCREEN_MODEL, LOADING_SCREEN_PICTURE, LOADING_SCREEN_STOCK_MODEL, classicModel, loadingScreenTextures, retargetLoadingModel } from "../loadingScreen";
 
 export const PREVIEW_CACHE = join(process.env.XDG_CACHE_HOME ?? join(homedir(), ".cache"), "smashcraft/map-preview");
 
@@ -24,7 +24,7 @@ export const mapArtImports = (assets: string) => Effect.gen(function*() {
   const folder = join(assets, "imported-models");
   const preview = yield* tryMapSync("encode map preview", join(folder, PREVIEW_FILE), () => encodePreview(readTga(readFileSync(join(folder, PREVIEW_FILE)))));
   const picture = yield* tryMapSync("read loading screen picture", folder, () => readTga(readFileSync(join(folder, LOADING_SCREEN_PICTURE))));
-  const model = yield* tryMapSync("retarget loading screen model", folder, () => retargetLoadingModel(readFileSync(join(folder, LOADING_SCREEN_STOCK_MODEL))));
+  const model = yield* tryMapSync("retarget loading screen model", folder, () => classicModel(retargetLoadingModel(readFileSync(join(folder, LOADING_SCREEN_STOCK_MODEL)))));
   const textures = yield* Effect.forEach(loadingScreenTextures(picture), ({ entry, image }) => cachedImport(entry, encodeBlp(image, PORTRAIT_QUALITY), "blp"));
   return [yield* cachedImport(PREVIEW_ENTRY, preview, "blp"), yield* cachedImport(LOADING_SCREEN_MODEL, model, "mdx"), ...textures];
 });

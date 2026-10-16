@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
+import { generateMDX, parseMDL, parseMDX } from "war3-model";
 import { encodePreview } from "../scripts/mapPreview";
-import { LOADING_SCREEN_CLEAR, retargetLoadingModel } from "../scripts/loadingScreen";
+import { LOADING_SCREEN_CLEAR, classicModel, retargetLoadingModel } from "../scripts/loadingScreen";
 
 function chunk(tag: string, body: Uint8Array): Uint8Array {
   const out = new Uint8Array(8 + body.length);
@@ -53,4 +54,34 @@ test("the lobby preview's palette reproduces every pixel of a 256-colour picture
   const many = new Uint8Array(257 * 4);
   for (let i = 0; i < 257; i++) many.set([i & 255, i >> 8, 0, 255], i * 4);
   expect(() => encodePreview({ width: 257, height: 1, data: many, alpha: false })).toThrow("at most 256 colours");
+});
+
+const REFORGED_MODEL = `Version { FormatVersion 1000, }
+Model "Probe" { NumGeosets 1, BlendTime 150, MinimumExtent { -1, -1, -1 }, MaximumExtent { 1, 1, 1 }, }
+Sequences 1 { Anim "Stand" { Interval { 0, 1000 }, NonLooping, MinimumExtent { -1, -1, -1 }, MaximumExtent { 1, 1, 1 }, BoundsRadius 1, } }
+Textures 2 { Bitmap { Image "war3mapImported\\\\A.blp", } Bitmap { Image "war3mapImported\\\\B.blp", } }
+Materials 2 { Material { Layer { FilterMode None, Unshaded, static TextureID 0, } } Material { Layer { FilterMode Blend, Unshaded, static TextureID 1, } } }
+Geoset {
+  Vertices 3 { { 0, 0, 0 }, { 1, 0, 0 }, { 0, 1, 0 }, }
+  Normals 3 { { 0, 0, 1 }, { 0, 0, 1 }, { 0, 0, 1 }, }
+  TVertices 3 { { 0, 0 }, { 1, 0 }, { 0, 1 }, }
+  VertexGroup { 0, 0, 0, }
+  Faces 1 3 { Triangles { { 0, 1, 2 }, } }
+  Groups 1 1 { Matrices { 0 }, }
+  MinimumExtent { 0, 0, 0 }, MaximumExtent { 1, 1, 0 }, BoundsRadius 1,
+  Anim { MinimumExtent { 0, 0, 0 }, MaximumExtent { 1, 1, 0 }, BoundsRadius 1, }
+  MaterialID 1,
+  SelectionGroup 0,
+}
+Bone "Root" { ObjectId 0, GeosetId 0, GeosetAnimId None, }
+PivotPoints 1 { { 0, 0, 0 }, }
+`;
+
+test("the loading model ships in the classic 800 format with its textures, materials and geometry unchanged [k2 property]", () => {
+  const source = parseMDL(REFORGED_MODEL);
+  const classic = parseMDX(classicModel(new Uint8Array(generateMDX(source))).buffer as ArrayBuffer);
+  expect(classic.Version).toBe(800);
+  expect(classic.Textures.map((texture) => texture.Image)).toEqual(source.Textures.map((texture) => texture.Image));
+  expect(classic.Materials.map((material) => material.Layers.map((layer) => [layer.FilterMode, layer.TextureID]))).toEqual(source.Materials.map((material) => material.Layers.map((layer) => [layer.FilterMode, layer.TextureID])));
+  expect([...(classic.Geosets[0]?.Vertices ?? [])]).toEqual([...(source.Geosets[0]?.Vertices ?? [])]);
 });

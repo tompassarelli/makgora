@@ -1,4 +1,6 @@
+import { generateMDX } from "war3-model";
 import type { Rgba } from "./blp";
+import { parseModelMDX } from "./mdxCodec";
 
 export const LOADING_SCREEN_MODEL = "war3mapImported\\SmashcraftLoading.mdx";
 export const LOADING_SCREEN_STOCK_MODEL = "TutorialBackground.mdx";
@@ -40,4 +42,10 @@ export function retargetLoadingModel(model: Uint8Array): Uint8Array {
     out.set(path, start);
   }
   return out;
+}
+
+export function classicModel(model: Uint8Array): Uint8Array {
+  const parsed = parseModelMDX(model.slice().buffer);
+  parsed.Version = 800;
+  return new Uint8Array(generateMDX(parsed));
 }
