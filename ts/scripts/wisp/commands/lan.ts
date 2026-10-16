@@ -1,7 +1,7 @@
 import { type Command } from "wisp/scripts/wisp/command";
 import { lan as frameworkLan } from "wisp/scripts/wisp/commands/lan";
 import { lanSoak } from "./lanSoak";
-import { withQuietNativeCapacity } from "../../quietNativeCapacity";
+import { withQuietNativeCapacity } from "wisp/scripts/wisp/quietNativeCapacity";
 import { poolStart, poolStop } from "./lanPoolUnit";
 
 export const lan: Command = (args) => {

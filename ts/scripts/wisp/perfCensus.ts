@@ -22,7 +22,7 @@ import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { CENSUS_PARTNER, CENSUS_STAGE } from "./census";
 import { stockLua } from "./luaRuntimes";
 import { tsDirectory } from "./project";
-import { ALLOCATION_JITTER_KB, PAIR_MARGIN, type PairWorst, comparePairs, isPairText, pairText, parsePairs } from "./perfPairs";
+import { PAIR_MARGIN, type PairWorst, comparePairs, isPairText, pairText, parsePairs } from "./perfPairs";
 
 
 export const CENSUS_LIMIT_MS = 2;
@@ -304,8 +304,8 @@ export const comparePairRuns = (runs: Command): Command => (args) => Effect.gen(
   const margin = Number(marginText);
   if (!(margin >= 0)) return yield* new UsageFailure({ problem: "perf compare takes an optional --threshold share, such as 0.05" });
   const regressions = yield* Effect.try({ try: () => comparePairs(parsePairs(fixtureText), parsePairs(runText), margin), catch: (cause) => new PerfFailure({ problem: describeCause(cause) }) });
-  if (regressions.length > 0) return yield* new PerfFailure({ problem: `fighter pairs' worst frames rise more than ${margin * 100}% (allocation also more than ${ALLOCATION_JITTER_KB} KB) over the fixture: ${regressions.join("; ")}` });
-  yield* Console.log(`every fighter pair's worst frame is within ${margin * 100}% of the fixture (allocation within ${margin * 100}% or ${ALLOCATION_JITTER_KB} KB)`);
+  if (regressions.length > 0) return yield* new PerfFailure({ problem: `fighter pairs' worst frames rise more than ${margin * 100}% over the fixture: ${regressions.join("; ")}` });
+  yield* Console.log(`every fighter pair's worst frame is within ${margin * 100}% of the fixture`);
 });
 
 export const profile = (project: PerfProject): Command => (args) => Effect.gen(function*() {
