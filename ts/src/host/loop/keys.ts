@@ -21,6 +21,8 @@ import { METER_COMMAND, classicDevRequest, loreDevRequest, LORE_WIN_COMMAND, win
 import { fighterName } from "../../game/sim/heroes/registry";
 import { endReplaySegment } from "./replays";
 import { devReceiptFile } from "../../game/session/journalFiles";
+import { applyFighterSetup } from "../../game/session/fighterSetup";
+import { prepareDevState, commitDevState } from "./devState";
 import { applySetupCommand } from "../../game/session/sessionSetup";
 import { pausedMessage } from "../../game/session/messages";
 import { captureBinding } from "../../game/ui/bindingSettings";
@@ -310,6 +312,7 @@ const CINE_OFF_SUFFIX = " |cine off";
 
 
 export function applyDeveloperCommand(s: ShellState, actor: number, original: string): void {
+  if (!s.build.devConsole) return;
   ownConfirmedState(s);
   if (original === RESET_COMMAND) {
     s.promoHudHidden = false;
@@ -321,6 +324,15 @@ export function applyDeveloperCommand(s: ShellState, actor: number, original: st
   const cineOff = captured.endsWith(CINE_OFF_SUFFIX);
   if (cineOff || original === RESET_COMMAND) views(s).combat.cineFilter = !cineOff;
   const message = cineOff ? captured.substring(0, captured.length - CINE_OFF_SUFFIX.length) : captured;
+  if (message.startsWith("-dev setup ")) {
+    const commands = message.substring(11).split(";");
+    if (commands.length > 32 || commands.some(command => command.length === 0 || command.startsWith("setup "))) return;
+    for (const command of commands) applyDeveloperCommand(s, actor, `-dev ${command}`);
+    return;
+  }
+  let fighterEdited = false;
+  const fighterSetup = applyFighterSetup(s.game, s.world, message, () => { prepareDevState(s); fighterEdited = true; });
+  if (fighterEdited) commitDevState(s);
   let receipt: string | undefined;
   const promo = quickPromoRequest(message);
   const quickStage = quickStageSettings(message);
@@ -337,7 +349,9 @@ export function applyDeveloperCommand(s: ShellState, actor: number, original: st
   if (setup === `dev: stage ${s.game.stageChoice}` && s.game.phase === Phase.characterMenu) s.dev.stageChoice = s.game.stageChoice;
   const classic = classicDevRequest(message);
   const lore = loreDevRequest(message, LORE_BATTLES.length);
-  if (message === "-dev soak") {
+  if (fighterSetup !== undefined) {
+    receipt = fighterSetup;
+  } else if (message === "-dev soak") {
     receipt = startNativeSoak(s) ? "dev: native soak four CPUs" : "dev: native soak requires an integrity map at selection";
   } else if (showcase !== undefined) {
     receipt = applyShowcaseCommand(s, showcase, () => applyDeveloperCommand(s, actor, RESET_COMMAND));

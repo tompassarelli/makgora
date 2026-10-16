@@ -138,15 +138,16 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   authors clips through Blender; the optional existing model preserves shipped
   sequences and appends only new clips; `--replace NAME` reauthors one existing clip at its same index and length (smashcraft:docs/fighter-animation-work.md).
 
-- Both fighter bodies from one canonical motion: `bun tools/animations/hd-roster.ts PRIVATE_OUTPUT [CHARACTER...]`
-  writes each fighter's Classic timeline body under `classic/` and, for fighters in
-  `DEFINITIVE_FIGHTERS`, its Definitive body, checked within 0.5 units / 0.5 degrees
-  (smashcraft:docs/design/hd-fighters.md, "Canonical rig").
-
-- Normal timeline body pilot (from the repository root):
-  `bun tools/animations/timeline-models.ts PRIVATE_ASSETS PRIVATE_POOL MountainKing`
-  combines Mountain King's normal mesh and keys into one seekable model in a writable copy
-  of `original-clips-static-lights` and refreshes its clip and model tables.
+- Both fighter bodies (from the repository root):
+  `bun tools/animations/timeline-models.ts PRIVATE_ASSETS PRIVATE_POOL FIGHTER`
+  writes the fighter's Classic timeline body from its canonical motion into a writable copy
+  of `original-clips-static-lights` and, for fighters in `DEFINITIVE_FIGHTERS`, its Definitive
+  body under the same path in `_de.w3mod`, checked within 0.5 units / 0.5 degrees
+  (smashcraft:docs/design/hd-fighters.md, "Canonical rig"). It removes the fighter's older
+  bodies and refreshes its clip table and timeline model facts; it compares every played pose
+  with the pool it reads, so export a fighter whose played clips changed with
+  `export-original-clips.ts --only FIGHTER` first. A map build fails when a fighter in
+  `DEFINITIVE_FIGHTERS` has no Definitive body.
   Store the family with `bun wisp inputs add original-clips-static-lights PRIVATE_POOL`.
 
 - Key jitter (from ts/): `bun wisp anim jitter [--fighter NAME]... [--graphics classic|definitive]...`

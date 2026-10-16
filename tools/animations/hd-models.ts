@@ -119,10 +119,10 @@ export function fighterBodies(motion: mdx.Model, rig: FighterRig, stock: ArrayBu
     if (!DEFINITIVE_FIGHTERS.has(rig.character as Character)) return { classic, definitive: undefined };
     if (stock === undefined) throw new Error(`Fighter ${rig.character} needs its stock Definitive model`);
     const definitive = definitiveBody(motion, stock, rig, moves.definitive);
-    const fitBlade = BLADE_FITS[rig.character];
-    if (fitBlade === undefined) return { classic, definitive };
-    const fitted = fitBlade(motion, definitive.bytes);
-    return { classic, definitive: { bytes: fitted.bytes, report: { ...definitive.report, weaponAttachment: fitted.report } } };
+    const fit = rig.definitiveFit ?? BLADE_FITS[rig.character];
+    if (fit === undefined) return { classic, definitive };
+    const fitted = fit(motion, definitive.bytes);
+    return { classic, definitive: { bytes: fitted.bytes, report: { ...definitive.report, definitiveFit: fitted.report } } };
 }
 
 /** Today's canonical motion source: the authored Classic model, mapped onto the rig. */

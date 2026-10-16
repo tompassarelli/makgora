@@ -18,7 +18,7 @@ const blade = (x1: number, z1: number, x2: number, z2: number, radius = KNIFE_RA
 
 const POISON: AppliedStatus = { kind: HeroStatusKind.poison, frames: 180, group: HeroStatusGroup.sleep, immunityFrames: 0, tick: { every: 60, damage: 1.0 } };
 const SHADOW_STRIKE: AuthoredSpecial = {
-  endFrame: 37,
+  endFrame: 57,
   projectiles: [{
     model: "Abilities\\Spells\\NightElf\\ShadowStrike\\ShadowStrikeMissile.mdx",
     spawnFrame: 16, offsetX: 30.0, offsetZ: 50.0, velocityX: f32(H * f32(0.11)), velocityZ: 0.0,

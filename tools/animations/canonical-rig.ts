@@ -32,8 +32,9 @@ export interface FighterRig extends RetargetOptions {
     readonly dropGeosets?: readonly number[];
     /** The stock Definitive body mirrored left to right, when it carries its weapon in the other hand than Classic. */
     readonly mirror?: boolean;
+    readonly definitiveFit?: (motion: mdx.Model, bytes: ArrayBuffer) => { readonly bytes: ArrayBuffer; readonly report: object };
 }
-export const RIG_FIELDS: ReadonlySet<string> = new Set(['character', 'fighter', 'stockPath', 'classic', 'pairs', 'fitScale', 'limbScales', 'visibilityPairs', 'alignRoot', 'heldProps', 'stockRestJoints', 'propTurns', 'dropGeosets', 'mirror']);
+export const RIG_FIELDS: ReadonlySet<string> = new Set(['character', 'fighter', 'stockPath', 'classic', 'pairs', 'fitScale', 'limbScales', 'visibilityPairs', 'alignRoot', 'heldProps', 'stockRestJoints', 'propTurns', 'dropGeosets', 'mirror', 'definitiveFit']);
 
 function renamed(model: mdx.Model, names: ReadonlyMap<string, string>): mdx.Model {
     const copy = structuredClone(model);

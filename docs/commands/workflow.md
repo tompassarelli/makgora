@@ -1,5 +1,11 @@
 # Workflow
 
+`bun wisp release tree` compares the release milestone with root #1 and all
+recursive sub-issues, including closed issues. `--fix` adds missing milestones
+and attaches outside issues when an epic label or issue link identifies one
+parent. Ambiguous parents are listed for the proxy and keep the check failing.
+The daily Release tree workflow checks this invariant; Autoland planning warns.
+
 Smashcraft is a platform fighter for Warcraft III, written in TypeScript and
 compiled to Lua with TypeScriptToLua. Wisp and Bun are the supported build,
 test and development tools. `smashcraft:typescript-toolchain.lock` pins Bun,

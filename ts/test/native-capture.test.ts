@@ -33,6 +33,11 @@ test("collector waits for the new game's matching status before certification or
   const build = join(import.meta.dir, "../build");
   mkdirSync(build, { recursive: true });
   const root = mkdtempSync(join(build, "native-capture-test-"));
+  const tool = join(root, "desktop-tool");
+  writeFileSync(tool, "fixture");
+  const toolKeys = ["WISP_GRIM", "WISP_XDOTOOL", "WISP_WLRCTL", "WISP_TESSERACT", "WISP_NSENTER"];
+  const toolEnvironment = toolKeys.map(key => [key, process.env[key]] as const);
+  for (const key of toolKeys) process.env[key] = tool;
   const start = 1700000000000;
   let now = start;
   const clock = spyOn(Date, "now").mockImplementation(() => now);
@@ -98,6 +103,9 @@ test("collector waits for the new game's matching status before certification or
     expect(idle.evidence.missed).toEqual(deadline.evidence.missed);
     expect(String(idle.exit)).toContain(`missed ${fixture}@${held}`);
   } finally {
+    for (const [key, value] of toolEnvironment) {
+      if (value === undefined) delete process.env[key]; else process.env[key] = value;
+    }
     boundary = undefined;
     clock.mockRestore();
     output.mockRestore();

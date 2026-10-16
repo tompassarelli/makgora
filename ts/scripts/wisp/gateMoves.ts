@@ -21,7 +21,7 @@ import { readReplay } from "./replayFiles";
 import { type MapStall, readMapStalls } from "./mapStalls";
 import { type SmokeVerdict, disturbedSteps, judgeSmoke, mergeVerdicts, smokeLines, smokePace, smokeReceipt } from "./smokeJudge";
 import { smokeApproaches } from "./smokeRehearsal";
-import { FRAME_MILLIS, RESET_LEAD, SETTLE_AT, type SettlePoint, settlePoints, smokeSchedule, xdotoolArgs } from "./smokeTape";
+import { FRAME_MILLIS, RESET_LEAD, SETTLE_AT, type SettlePoint, settlePoints, neutralSpecialSchedule, smokeSchedule, xdotoolArgs } from "./smokeTape";
 import { type Settle, type SpotResult, brightCount, playArea, specialsReceipt, specialsSpot } from "./specialsSpot";
 
 const fail = (operation: string) => (cause: { readonly message: string }) => new AcceptFailure({ operation, problem: cause.message });
@@ -31,6 +31,7 @@ const MATCH_SETTLE = "6 seconds";
 const PAUSE_SETTLE = "1500 millis";
 const MATCH_ATTEMPTS = 3;
 const HAZARD_TRIES = 3;
+const NEUTRAL_SPECIAL_PAIR = [PLAYABLE_CHARACTERS.indexOf(Character.thrall), PLAYABLE_CHARACTERS.indexOf(Character.jaina)] as const;
 
 // A fresh private desktop's Xwayland drops the first XTEST motion.
 const POINTER_PRIME_ATTEMPTS = 3;
@@ -126,7 +127,7 @@ const matchRecord =(header: readonly string[], verdict: SmokeVerdict, results: r
   ...settles.map(({ step, count, onTime }) => `settle ${step} bright=${count}${onTime ? "" : " late"}`),
 ].join("\n")}\n`;
 
-export const measureMovesGate = (clientsFile: string, directory: string) => Effect.gen(function*() {
+export const measureMovesGate = (clientsFile: string, directory: string, caster?: 0 | 1) => Effect.gen(function*() {
   const clients = yield* loadClients(clientsFile).pipe(Effect.mapError(fail("moves gate clients")));
   const [host, guest] = clients;
   if (host === undefined || guest === undefined || clients.length !== 2) return yield* new AcceptFailure({ operation: "moves gate", problem: "requires the selected offline pair" });
@@ -211,11 +212,11 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
       Effect.mapError(fail("moves gate match pixels")),
     ), { every: "200 millis", within: "30 seconds", orElse: () => Effect.fail(new AcceptFailure({ operation: "moves gate match", problem: "STAGE SELECT stays drawn after the start" })) });
     yield* Effect.sleep(MATCH_SETTLE);
-    const schedule = smokeSchedule(smokeApproaches(characters[0] ?? Character.rifleman, characters[1] ?? Character.rifleman));
+    const schedule = caster === undefined ? smokeSchedule(smokeApproaches(characters[0] ?? Character.rifleman, characters[1] ?? Character.rifleman)) : neutralSpecialSchedule(caster);
     const runs: SettleShot[][] = [];
     for (const segment of schedule) {
       yield* Effect.forEach(segment.flatMap(({ slot }) => clients[slot] ?? []), client => focus(client).pipe(Effect.mapError(fail("moves gate focus"))), { discard: true });
-      const points = settlePoints(segment[0]?.steps ?? []);
+      const points = settlePoints(segment.find(tape => caster === undefined || tape.slot === caster)?.steps ?? []);
       const [, settles] = yield* Effect.all([
         Effect.forEach(segment, ({ slot, steps }) => {
           const client = clients[slot];
@@ -240,7 +241,7 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
     const stalls = yield* matchStalls(clients, [manifest, yield* newestReplay(join(guest.documents, "CustomMapData"), picked, index + 1)], picked);
     return { manifest, lines, schedule, runs, stalls };
   });
-  for (const [index, pair] of smokePairs().entries()) {
+  for (const [index, pair] of (caster === undefined ? smokePairs() : [NEUTRAL_SPECIAL_PAIR]).entries()) {
     const characters = pair.map(choice => PLAYABLE_CHARACTERS[choice] ?? Character.rifleman);
     const fighters = characters.map(fighterName);
     const name = `match-${String(index + 1).padStart(2, "0")}`;
@@ -248,7 +249,7 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
     for (let attempt = 1; ; attempt++) {
       const { manifest, lines, schedule, runs, stalls } = yield* playMatch(index, pair, characters);
       const judged = judgeSmoke(lines, schedule.flat(), stalls);
-      const measured = smokePace(lines, judged);
+      const measured = caster === undefined ? smokePace(lines, judged) : undefined;
       const played = pace;
       if (measured !== undefined) pace = measured * played;
       const verdict = withSelection(judged, fighters);
@@ -258,7 +259,7 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
       const frozen = disturbedSteps(verdict, failedSpots);
       const final = frozen.length === 0 || attempt === MATCH_ATTEMPTS;
       const stem = final ? name : `${name}-invalid-${attempt}`;
-      yield* Effect.forEach(spotFrameFiles(stem, runs, failedSpots), ([file, bytes]) => save(file, bytes), { discard: true });
+      yield* Effect.forEach(spotFrameFiles(stem, runs, caster === undefined ? failedSpots : results.map(({ step }) => step)), ([file, bytes]) => save(file, bytes), { discard: true });
       yield* save(`${stem}.txt`, matchRecord([`replay ${manifest}`, `fighters ${fighters.join(" vs ")}`, `attempt ${attempt}`, `pace played ${played.toFixed(4)} next ${pace.toFixed(4)}`, ...stallLines(stalls), ...invalid], verdict, results, fighters, settles.flat()));
       if (final) {
         verdicts.push({ fighters, verdict });
@@ -274,5 +275,5 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
   const specials = specialsReceipt(roster, spots.flatMap(({ results }) => results));
   yield* save("report.txt", `${[text, ...smokeLines(all), specials, ...spots.flatMap(({ fighters, results }) => spotLines(fighters, results))].join("\n")}\n`);
   const modified = yield* Clock.currentTimeMillis;
-  return { moves: { name: "moves-gate", text, modified }, specials: { name: "specials-gate", text: specials, modified } } satisfies MovesGateReceipts;
+  return { moves: { name: "moves-gate", text, modified }, specials: { name: "specials-gate", text: caster === undefined ? specials : `${specials}\n${smokeReceipt(all, roster)}\n${spots.flatMap(({ results }) => results.map(({ reason }) => reason)).join("\n")}`, modified } } satisfies MovesGateReceipts;
 });

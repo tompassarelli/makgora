@@ -1,0 +1,12 @@
+#! chat -dev setup quick hero kobold;candle 1 drop;candle 2 drop
+120 a stick -1 0
+120 b stick 1 0
+120 a capture
+124 a capture
+128 a capture
+132 a capture
+136 a capture
+137 a stick 0 0
+137 b stick 0 0
+180 a press VIEW
+250 a release VIEW

@@ -1,1 +1,1 @@
-{"model":"Units\\Creeps\\HeroForsakenPaladin\\HeroForsakenPaladin.mdx","facts":{"geosets":5,"triangles":3424,"lights":0,"bounds":{"min":[-320,-320,-200],"max":[320,320,391.70599365234375]},"emitters":[]}}
+{"model":"Units\\Creeps\\HeroForsakenPaladin\\HeroForsakenPaladin.mdx","facts":{"geosets":5,"triangles":3424,"lights":0,"bounds":{"min":[-168.417,-140.388,-73.717],"max":[167.368,167.923,516.602]},"emitters":[{"kind":"popcorn","name":"Hero_Glow","whileShown":true,"onDeath":true,"visible":true,"rate":1,"lifespan":1}]}}

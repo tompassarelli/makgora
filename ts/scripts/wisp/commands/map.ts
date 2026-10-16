@@ -11,6 +11,7 @@ import { checkoutInputs } from "../buildInputs";
 import { repairPackager } from "../nativeTools";
 import { step } from "wisp/scripts/wisp/timings";
 import { glowFreeCaptureImports, decodeBuildOptions, editionImports, importedAssets, rebuildMap, type MapEdition } from "../mapInputs";
+import { requireDefinitiveBodies } from "../definitiveBodies";
 import { buildProject, gameFilesLayer, profileOption, projectRoot, sourceErrorsLayer } from "../project";
 import { describeMapSize, mapBudgetProblem, mapGrowthProblem, type MapSize, readMapBaseline, readTables, storedBytes, writeMapBaseline } from "../../mapSize";
 import { ensureGenerated } from "../../generated";
@@ -106,6 +107,7 @@ export const build: Command = (args) => Effect.gen(function*() {
       const declared = base !== undefined && container !== undefined && assets !== undefined && summon !== undefined
         ? { base, container, assets, summon }
         : yield* checkoutInputs().pipe(step("verify build inputs"));
+      if (edition === "full") yield* requireDefinitiveBodies(assets ?? declared.assets);
       const imported = yield* importedAssets(assets ?? declared.assets, summon ?? declared.summon, edition);
       const imports = capture ? yield* glowFreeCaptureImports(imported) : imported;
       const checked = yield* checkCueModels(headlessRender({ assets: assets ?? declared.assets, imports })).pipe(step("cue models resolved in both looks"));

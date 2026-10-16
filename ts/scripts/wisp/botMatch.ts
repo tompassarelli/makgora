@@ -93,6 +93,7 @@ export interface Game {
   phase: number;
   stockCount: number;
   timeLimitMinutes: number;
+  remainingFrames: number;
   computerMask: number;
   humanFighterMask: number;
   stageChoice: number;

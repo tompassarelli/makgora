@@ -51,6 +51,8 @@ function observe(before: FrameObservation, fighter: Readonly<Fighter>): void {
   before.shieldRaised = fighter.shield.raised;
   before.shieldTiltX = fighter.shield.tiltX;
   before.shieldTiltZ = fighter.shield.tiltZ;
+  before.surface = fighter.motion.surface;
+  before.dropConsumed = fighter.platform.dropConsumed;
 }
 
 const bit = (value: boolean) => (value ? "1" : "0");
@@ -82,6 +84,10 @@ function traceChanges(s: ShellState, slot: ParticipantSlot, before: Readonly<Fra
   if (before.breakState !== f.shield.breakState) traceParticipant(s, slot, `shield-break ${f.shield.breakState} z ${R2S(f.motion.z)} remaining ${R2S(f.shield.breakRemaining)}`);
   if (before.ledge !== f.ledge.state) traceParticipant(s, slot, `ledge ${f.ledge.state} x ${R2S(f.motion.x)} z ${R2S(f.motion.z)}`);
   if (before.jump !== f.jump.serial) traceParticipant(s, slot, `applied jump ${f.jump.serial} double ${bit(f.jump.isDouble)} z ${R2S(f.motion.z)}`);
+  if (!before.dropConsumed && f.platform.dropConsumed) {
+    if (f.motion.grounded && f.motion.surface !== undefined) traceParticipant(s, slot, `platform mount deck ${f.motion.surface}`);
+    else if (!f.motion.grounded && before.surface !== undefined) traceParticipant(s, slot, `platform drop deck ${before.surface}`);
+  }
   if (before.damage !== f.status.damage) traceParticipant(s, slot, `damage ${R2S(f.status.damage)} hitlag ${f.launch.hitlag} hitstun ${f.launch.hitstun} height ${f.visuals.hitHeight} strength ${f.visuals.hitStrength} clip ${s.runtime.poses[slot].clipIndex ?? -1}`);
   const influence = before.di !== f.launch.diSerial ? influenceOperands(f) : undefined;
   if (influence !== undefined) {

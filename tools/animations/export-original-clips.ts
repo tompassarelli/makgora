@@ -20,7 +20,7 @@ import {CLIP_PROVENANCE, keepClipRecords, readClipRecords, writeClipRecord} from
 import {misplacedNodes} from '../../ts/scripts/clipNodes';
 import {KEY_BOUND, savedKeyBytes, thinKeys, type KeyThinReport} from '../../ts/scripts/keyThin';
 import {fighterSlug} from '../../ts/src/game/sim/heroes/registry';
-import {CLIPS, CLIP_INDEX, KEY_THIN, KEY_THIN_INDEX, clipFile, clipIndex, clipTypeFile, keyThinFile, keyThinIndex, shardOrder} from './fighter-shards';
+import {CLIPS, CLIP_INDEX, clipFile, clipIndex, clipTypeFile, shardOrder} from './fighter-shards';
 
 const project = resolve(import.meta.dir, '../..');
 const option = (name: string) => { const index = process.argv.indexOf(name); return index < 0 ? undefined : process.argv[index + 1]; };
@@ -38,7 +38,7 @@ const retained = metadataOnly || keepUnchanged ? readClipRecords(output) : [];
 const moduleClips: string[][] = [], moduleNames: string[][] = [], moduleLights: (string | null)[] = [];
 const clipLiteral = (modelPath: string, interval: readonly number[], looping: boolean, timeline = false) =>
     `{ modelPath: ${JSON.stringify(modelPath)}, startSeconds: ${seconds(Number((interval[0] / 1000).toFixed(3)))}, endSeconds: ${seconds(Number((interval[1] / 1000).toFixed(3)))}, looping: ${looping}${timeline ? ", timeline: true" : ""} },`;
-const records = [], keyThinRows: string[] = [];
+const records = [];
 let totalBytes = 0, theoreticalFullSourceBytes = 0;
 const started = performance.now();
 for (const [character, fighter] of fighters) {
@@ -84,7 +84,7 @@ for (const [character, fighter] of fighters) {
     tracks(bodySource, (track, path) => sourceTracks.set(path, track));
     const trackFamilies = [...new Set([...sourceTracks.keys()].map(path => path.replace(/\.\d+/g, '.*')))];
     const omittedTrackFamilies = new Set<string>();
-    const untrimmedBytes = encodeVerified(originalBodyClip(components.body, 0, 'untrimmed-reference').model).byteLength;
+    const untrimmedBytes = reuse ? retainedRecord.untrimmedSelectedBodyBytes : encodeVerified(originalBodyClip(components.body, 0, 'untrimmed-reference').model).byteLength;
     theoreticalFullSourceBytes += bytes.byteLength * source.Sequences.length;
     const clips = [];
     let fighterBytes = light?.bytes ?? 0, unthinnedBytes = light?.bytes ?? 0;
@@ -162,24 +162,20 @@ for (const [character, fighter] of fighters) {
     moduleNames[character] = [...names].map(([name, index]) => `[${JSON.stringify(name)}, ${index}],`);
     ensure(hash(await Bun.file(join(assets, fighter.source)).arrayBuffer()) === sourceSha256, `${fighter.name}: source changed during export`);
     totalBytes += fighterBytes;
+    if (reuse) unthinnedBytes = retainedRecord.unthinnedBytes;
     records.push({fighter: fighter.name, source: fighter.source, sourceSha256, sourceBytes: bytes.byteLength,
         untrimmedSelectedBodyBytes: untrimmedBytes, bytes: fighterBytes, unthinnedBytes, keyThin: {bound: KEY_BOUND, report: thin.report}, trackFamilies,
         omittedTrackFamilies: reuse ? retainedRecord.omittedTrackFamilies : [...omittedTrackFamilies], light, clips});
-    if (reuse) unthinnedBytes = retainedRecord.unthinnedBytes;
     const r = thin.report;
-    keyThinRows[character] = [fighter.name, r.keysBefore, r.keysAfter, unthinnedBytes, fighterBytes, r.maxPosition.toFixed(4), r.maxRotationDegrees.toFixed(4)].join('\t');
     console.log(`${fighter.name}: keys ${r.keysBefore} -> ${r.keysAfter}, ${unthinnedBytes - fighterBytes} bytes saved (${unthinnedBytes} -> ${fighterBytes}), max ${r.maxPosition.toFixed(3)} units, ${r.maxRotationDegrees.toFixed(3)} deg`);
     console.log(`${fighter.name}: ${clips.length} clips, ${fighterBytes} bytes; ${reuse ? 'retained source/clip hashes' : 'exact original-key and MDX checks'} PASS`);
 }
-// Each exported fighter's clips and key-thinning row go to its own files; the indexes change only when a fighter is added.
 for (const [character, clips] of moduleClips.entries()) if (clips !== undefined) {
     const slug = fighterSlug(character);
     await Bun.write(join(CLIPS, `${slug}.ts`), clipFile(fighters.get(character)!.name, clips, moduleNames[character]!, moduleLights[character] ?? undefined));
-    await Bun.write(join(KEY_THIN, `${slug}.tsv`), keyThinFile(keyThinRows[character]!));
 }
 await Bun.write(join(CLIPS, 'fighterOriginalClip.ts'), clipTypeFile());
 await Bun.write(CLIP_INDEX, clipIndex(shardOrder(CLIP_INDEX, CLIPS, '.ts', fighters.keys()), {...staticLightGate, seconds: seconds(staticLightGate.seconds)}));
-await Bun.write(KEY_THIN_INDEX, keyThinIndex(shardOrder(KEY_THIN_INDEX, KEY_THIN, '.tsv', fighters.keys())));
 if (!metadataOnly) {
     for (const record of records) writeClipRecord(output, record);
     if (only === undefined) keepClipRecords(output, new Set(records.map(record => record.fighter)));

@@ -8,10 +8,11 @@ import { playBunHandleBaseline } from "./soak/handles";
 // fighter body (unit) per fighter of the last match, so fighter selection after the first match is the baseline.
 // `bun wisp soak handles` plays the same scenario over 20 rematches in both looks in Bun and Lua32 (#409).
 const MATCH_AND_REMATCH_FRAME_BOUND = 7_000;
+const FIXED_MATCH_FRAMES = 1_800;
 
 // The match and rematch are deterministic: the bound is on frames stepped, and the wall timeout below only catches a hang.
 function matchAndRematch(look: Look): void {
-  const run = playBunHandleBaseline(look, 2);
+  const run = playBunHandleBaseline(look, 2, FIXED_MATCH_FRAMES);
   const [first = [], rematch = []] = run.afterMatches;
   console.log(`p1 ${look} live handles at fighter selection: before ${JSON.stringify(run.cold[0])}, after the match ${JSON.stringify(first[0])}, after the rematch ${JSON.stringify(rematch[0])}`);
 

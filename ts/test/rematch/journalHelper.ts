@@ -7,7 +7,11 @@
 
 
 
-import type { Lockstep } from "wisp/src/headless/lockstep";
+import type { HeadlessClient } from "wisp/src/headless/client";
+interface JournalClients {
+  readonly frame: number;
+  readonly clients: readonly (Pick<HeadlessClient, "slot" | "files" | "published"> & { readonly frames: Pick<HeadlessClient["frames"], "named" | "shown"> })[];
+}
 import { Action, bit } from "../../src/game/input/actions";
 import { type InputRow, inputRow } from "../../src/game/input/inputRow";
 import { encodeInputMessage, encodePacket, inputPacket } from "../../src/game/input/wire";
@@ -106,7 +110,7 @@ export class JournalHelpers {
 
   bursts = false;
 
-  clock: ((clients: Lockstep) => number) | undefined = undefined;
+  clock: ((clients: JournalClients) => number) | undefined = undefined;
 
 
 
@@ -152,7 +156,7 @@ export class JournalHelpers {
   }
 
 
-  service(clients: Lockstep): void {
+  service(clients: JournalClients): void {
     const now = this.clock?.(clients) ?? clients.frame;
     this.typed.clear();
     for (const client of clients.clients) {

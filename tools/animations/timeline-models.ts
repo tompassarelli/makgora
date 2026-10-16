@@ -1,18 +1,21 @@
 import { join, relative, resolve } from 'node:path';
+import { existsSync, readdirSync } from 'node:fs';
 import { unlink } from 'node:fs/promises';
 import { Effect } from 'effect';
-import { encodeVerified, hash, parseSource, tracks } from './original-clips';
+import { hash, parseSource, tracks } from './original-clips';
 import { fighters } from '../../ts/scripts/heroModelSource';
-import { timelineBody } from './timeline-body';
 import { checkTimelineGeosets } from './timeline-geosets';
 import { thinKeys } from '../../ts/scripts/keyThin';
-import { playedMoves } from './hd-models';
+import { authoredMotion, fighterBodies, playedMoves } from './hd-models';
+import { FIGHTER_RIGS } from './hd-rigs';
 import { modelFacts } from '../../ts/node_modules/wisp/scripts/wisp/models';
 import { MODEL_FACTS } from '../../ts/scripts/wisp/modelFacts';
 import { writeModelFacts } from '../../ts/scripts/wisp/modelFactsTable';
 import { DrawnModel } from '../../ts/scripts/wisp/hurtboxView';
+import { headlessRender } from '../../ts/scripts/wisp/headlessRender';
 import { fighterSlug } from '../../ts/src/game/sim/heroes/registry';
-import { heroLook } from '../../ts/src/game/roster/looks';
+import { DEFINITIVE_FIGHTERS } from '../../ts/src/game/assets/definitiveFighters';
+import type { Character } from '../../ts/src/game/sim/codes';
 import { CLIPS } from './fighter-shards';
 import { readClipRecords, writeClipRecord } from '../../ts/scripts/clipEvidence';
 
@@ -20,13 +23,30 @@ const [assetsArg, outputArg, fighterName] = process.argv.slice(2);
 if (assetsArg === undefined || outputArg === undefined || fighterName === undefined) throw new Error('usage: bun tools/animations/timeline-models.ts PRIVATE_ASSETS PRIVATE_POOL FIGHTER');
 const assets = resolve(assetsArg), output = resolve(outputArg);
 if (!relative(resolve(import.meta.dir, '../..'), output).startsWith('..')) throw new Error('Timeline bodies stay in private storage');
-const fighter = [...fighters.values()].find(fighter => fighter.name === fighterName);
-if (fighter === undefined) throw new Error(`Unknown fighter ${fighterName}`);
-await Effect.runPromise(Effect.tryPromise({ try: async () => {
+const character = [...fighters].find(([, fighter]) => fighter.name === fighterName)?.[0];
+if (character === undefined) throw new Error(`Unknown fighter ${fighterName}`);
+const fighter = fighters.get(character)!, rig = FIGHTER_RIGS.get(character);
+if (rig === undefined) throw new Error(`${fighter.name} has no canonical rig in hd-rigs`);
 
-    const source = thinKeys(parseSource(await Bun.file(join(assets, fighter.source)).arrayBuffer())).model;
-    const played = playedMoves([...fighters].find(([, item]) => item === fighter)![0], source).classic.map(index => source.Sequences[index]!);
-    const bytes = encodeVerified(timelineBody(source, played));
+async function stockDefinitive(): Promise<ArrayBuffer | undefined> {
+    if (!DEFINITIVE_FIGHTERS.has(character as Character)) return undefined;
+    const stockName = (rig!.stockPath ?? '').replace(/^war3\.w3mod:_de\.w3mod:/, '').replaceAll('/', '\\');
+    const resolved = await headlessRender({ assets, imports: [] }).resolveAsset(stockName, 'definitive');
+    if (resolved.bytes === undefined || resolved.selected?.layer !== '_de.w3mod') throw new Error(`${fighter.name}: no stock Definitive ${stockName}`);
+    return resolved.bytes.slice().buffer;
+}
+
+async function removeOtherBodies(directory: string, kept: string): Promise<void> {
+    if (!existsSync(directory)) return;
+    for (const file of readdirSync(directory)) if (file.startsWith(`${fighter.name}TimelineBody-`) && file !== kept) await unlink(join(directory, file));
+}
+
+await Effect.runPromise(Effect.tryPromise({ try: async () => {
+    const authored = await Bun.file(join(assets, fighter.source)).arrayBuffer();
+    const source = thinKeys(parseSource(authored)).model;
+    const played = playedMoves(character, source).classic.map(index => source.Sequences[index]!);
+    const bodies = fighterBodies(authoredMotion(authored, rig), rig, await stockDefinitive());
+    const bytes = bodies.classic;
     const geosets = checkTimelineGeosets(source, parseSource(bytes), played);
     console.log(`TIMELINE_GEOSETS_PASS ${fighter.name}: ${JSON.stringify(geosets)}`);
     tracks(parseSource(bytes), (track, path) => {
@@ -52,7 +72,9 @@ await Effect.runPromise(Effect.tryPromise({ try: async () => {
     }
     console.log(`HEADLESS_TIMELINE_POSES_PASS ${fighter.name}: ${played.length} clips, ${samples} both-facing frame samples, max ${maximumDifference} world units versus clip pool`);
     const sha256 = hash(bytes), filename = `${fighter.name}TimelineBody-${sha256}.mdx`;
-    await Bun.write(join(output, 'imports/war3mapImported', filename), bytes);
+    const classicDirectory = join(output, 'imports/war3mapImported'), definitiveDirectory = join(output, 'imports/_de.w3mod/war3mapImported');
+    await Bun.write(join(classicDirectory, filename), bytes);
+    if (bodies.definitive !== undefined) await Bun.write(join(definitiveDirectory, filename), bodies.definitive.bytes);
     const record = readClipRecords(output).find((record: { fighter: string }) => record.fighter === fighter.name);
     if (record === undefined) throw new Error(`No original clips for ${fighter.name}`);
     const oldBytes = record.bytes;
@@ -60,8 +82,9 @@ await Effect.runPromise(Effect.tryPromise({ try: async () => {
     record.clips = record.clips.map((clip: object) => ({ ...clip, filename, modelPath: `war3mapImported\\${filename}`, sha256, bytes: bytes.byteLength, timeline: true }));
     record.bytes = bytes.byteLength + (record.light?.bytes ?? 0);
     writeClipRecord(output, record);
-    for (const replaced of replacedFiles) if (replaced !== filename) await unlink(join(output, 'imports/war3mapImported', replaced));
-    const character = [...fighters].find(([, item]) => item === fighter)![0];
+    for (const replaced of replacedFiles) if (replaced !== filename) await unlink(join(classicDirectory, replaced));
+    await removeOtherBodies(classicDirectory, filename);
+    await removeOtherBodies(definitiveDirectory, bodies.definitive === undefined ? '' : filename);
     const metadataPath = join(CLIPS, `${fighterSlug(character)}.ts`);
     const modelPath = `war3mapImported\\${filename}`;
     let metadata = await Bun.file(metadataPath).text();
@@ -71,8 +94,6 @@ await Effect.runPromise(Effect.tryPromise({ try: async () => {
     await Bun.write(metadataPath, metadata);
     const facts = Object.fromEntries(Object.entries(MODEL_FACTS).filter(([path]) => !path.startsWith(`war3mapImported\\${fighter.name}OriginalClip`) && !path.startsWith(`war3mapImported\\${fighter.name}TimelineBody`)));
     facts[`war3mapImported\\${filename}`] = modelFacts(new Uint8Array(bytes));
-    const look = heroLook(character);
-    if (look !== undefined) facts[look.model] = modelFacts(new Uint8Array(await Bun.file(join(assets, fighter.source)).arrayBuffer()));
     writeModelFacts(facts);
-    console.log(`${fighter.name}: ${played.length}/${record.clips.length} played clips → one timeline; ${oldBytes} → ${record.bytes} raw bytes (${oldBytes - record.bytes} saved). Original materials, geometry, lights and sound-cue intervals preserved.`);
+    console.log(`${fighter.name}: ${played.length}/${record.clips.length} played clips → one timeline; ${oldBytes} → ${record.bytes} raw bytes (${oldBytes - record.bytes} saved); ${bodies.definitive === undefined ? 'Classic body in both looks' : 'Definitive body under the same path in _de.w3mod'}.`);
 }, catch: cause => new Error('Timeline export failed', { cause }) }));

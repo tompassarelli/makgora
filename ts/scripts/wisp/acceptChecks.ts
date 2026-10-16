@@ -1,7 +1,4 @@
-
-
-
-
+import { teamResultsCheck } from "./teamResultsCheck";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import type { AcceptSuite, NativeCheck, Rule } from "wisp/scripts/wisp/accept";
@@ -10,6 +7,8 @@ import { HIT_PRESENTATION_CASES } from "../../src/game/session/hitPresentationCa
 import { HERO_ROSTER, PLAYABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { FLOATING_STAGE_CHECKS, FLOATING_STAGE_MAPS, STAGE_COMPOSITION_CHECKS, STAGE_COMPOSITION_MAPS, STAGE_ENTRY_CHECKS, STAGE_ENTRY_MAPS, STAGE_FOG_CHECKS } from "./stageCompositionChecks";
+
+import { neutralSpecialChecks } from "./neutralSpecialChecks";
 
 const inputs = join(homedir(), ".local/share/smashcraft-build-inputs");
 
@@ -47,6 +46,7 @@ export const MAP_PROFILES: Readonly<Record<string, SmashcraftMapProfile>> = {
   "slash-unlit": { describe: "integrity map built at f9d0fbf3, slash hit spark without its contact light", path: join(inputs, "particles-192-20261008/before.w3x"), quick: "-dev quick" },
   "slash-lit": { describe: "integrity map built with the slash hit spark's contact light", path: join(inputs, "particles-192-20261008/after.w3x"), quick: "-dev quick" },
   presentation: { describe: "development map rebuilt from this checkout, `-dev quick` (Illidan and Rifleman idle on the default stage)", path: PRESENTATION, rebuild: "main", quick: "-dev quick" },
+  "team-results": { describe: "development map rebuilt from this checkout, left at fighter select for the four-computer team setup", path: PRESENTATION, rebuild: "main", quick: "" },
 
 
   keyboard: { describe: "playable input (native-perf profile) rebuilt from this checkout, `-dev quick cpu wren expert` (Wren Expert, three stocks)", path: join(inputs, "keyboard-native-166-20261007/keyboard-native.w3x"), rebuild: "native-perf", quick: `${QUICK_CPU_COMMAND}wren expert` },
@@ -185,6 +185,7 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
       setup: [{ chat: "gate:bindings", client: "a" }],
       pass: [NO_ERRORS, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE bindings labels=\\d+ samples=(\\d+) passed=\\1 pass=1 remaps=none$", min: 1 }],
     },
+    ...neutralSpecialChecks(NO_ERRORS),
     {
       id: "gate-moves", closes: "smashcraft-dev#467", map: "gate-playable", session: "gate-moves",
       setup: [{ chat: "gate:moves", client: "a" }],
@@ -394,6 +395,17 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
       look: "player 1's bars near empty and, in some frames, blinking red; no rush starts on the refused press",
     },
     {
+      id: "c42-victory", closes: "smashcraft#7 C42N and smashcraft#31 box 4", map: "presentation", session: "c42-victory",
+      setup: [
+        { chat: "-dev reset" }, { chat: "-dev slots 1 2" }, { chat: "-dev fighter 2 Blademaster" },
+        { chat: "-dev auto-rematch off" }, { chat: "-dev time 10" }, { chat: "-dev quick pair Rifleman / Blademaster" },
+        { receipt: "^result frames=\\d+ winner=P2 timed-out=0 interrupted=0$", client: "a", seconds: 600 },
+      ],
+      capture: [{ kind: "frames", name: "victory-from-result", client: "a", count: 46, everyMs: 67 }],
+      pass: [NO_IMPORT_FAILURES, NO_ERRORS, { kind: "receipt", pattern: "^rules stocks=1 minutes=10$", client: "a", min: 1 }, { kind: "receipt", pattern: "^result frames=\\d+ winner=P2 timed-out=0 interrupted=0$", client: "a", min: 1 }],
+      look: "Classic: idle Rifleman loses one stock to computer Blademaster by KO. Capture immediately on the first result receipt, then at roughly four-frame intervals for three seconds. The GAME call and results panel reveal Blademaster playing his stock victory clip from its beginning, visibly different from Rifleman's clip. Judge the original strip and elapsed capture times; receipt polling and framebuffer reads can miss the first animation frame.",
+    },
+    {
       id: "c39-wren-match", closes: "smashcraft#7 C39N setup: the opening quick match's replay is written before the countdown check starts waiting", map: "presentation", session: "c39-countdown",
       setup: [
         { chat: "-dev reset" }, { chat: "-dev slots 1 0" }, { chat: "-dev auto-rematch on" }, { chat: `${QUICK_CPU_COMMAND}wren expert` },
@@ -404,10 +416,11 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
     {
       id: "c39-rematch-countdown", closes: "smashcraft#7 C39N and the E1 countdown box", map: "presentation", session: "c39-countdown",
       setup: [{ receipt: "^parts [0-9]+$", client: "a", seconds: 600 }],
-      capture: [{ kind: "frames", name: "rematch-countdown", client: "a", count: 40, everyMs: 125 }, { kind: "frames", name: "startup-countdown", client: "a", count: 100, everyMs: 50 }],
+      capture: [{ kind: "frames", name: "countdown", client: "a", count: 200, everyMs: 50 }],
       pass: [NO_IMPORT_FAILURES, NO_ERRORS],
       look: "After the first match ends, the rematch seconds 5 to 1 and then the next match's 3, 2, 1, GO! each appear centred on the stage, popping in and fading out; the next match's fighters stay held until GO!.",
     },
+    teamResultsCheck([NO_IMPORT_FAILURES, NO_ERRORS, DEV_RECEIPT]),
     {
       id: "c46-second-match", closes: "smashcraft#7 C46 setup: the second Wren match ends", map: "presentation", session: "c39-countdown",
       setup: [{ receipt: "^parts [0-9]+$", client: "a", seconds: 600 }],

@@ -1,0 +1,29 @@
+#! chat -dev quick hero kobold
+30 a stick 1 0
+30 b stick -1 0
+30 a capture
+34 a capture
+38 a capture
+42 a capture
+46 a capture
+47 a stick 0 0
+47 b stick 0 0
+110 a stick -1 0
+110 b stick 1 0
+110 a capture
+114 a capture
+118 a capture
+122 a capture
+126 a capture
+127 a stick 0 0
+127 b stick 0 0
+180 a press VIEW
+250 a release VIEW
+#! expect a 30 ground action 1 facing 1 dash-frame 1
+#! expect b 30 ground action 1 facing -1 dash-frame 1
+#! expect a 43 ground action 2 facing 1 dash-frame 14
+#! expect b 43 ground action 2 facing -1 dash-frame 14
+#! expect a 110 ground action 1 facing -1 dash-frame 1
+#! expect b 110 ground action 1 facing 1 dash-frame 1
+#! expect a 123 ground action 2 facing -1 dash-frame 14
+#! expect b 123 ground action 2 facing 1 dash-frame 14

@@ -712,6 +712,11 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.13
+      - name: Check release tree
+        working-directory: ts
+        run: |
+          bun install --frozen-lockfile
+          bun wisp release tree || echo "::warning title=Release tree drift::Release milestone and root #1 differ or could not be checked; see check output"
       - env:
           RETRY: ${{ inputs.branch }}
         run: |

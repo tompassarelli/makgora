@@ -6,8 +6,8 @@ import { Character } from "../sim/codes";
  */
 export const DEFINITIVE_FIGHTERS: ReadonlySet<Character> = new Set([
   Character.rifleman, Character.demonHunter, Character.blademaster, Character.warden,
-  Character.forsakenPaladin, Character.dreadlord, Character.shadowHunter, Character.pitLord, Character.thrall,
-  Character.sylvanas, Character.cairne, Character.chen, Character.peon, Character.tinker, Character.kaelthas,
-  Character.murloc, Character.grom, Character.anubarak, Character.medivh, Character.kobold,
+  Character.dreadlord, Character.shadowHunter, Character.pitLord, Character.thrall,
+  Character.sylvanas, Character.cairne, Character.chen, Character.peon, Character.kaelthas,
+  Character.murloc, Character.grom, Character.medivh, Character.kobold,
   Character.mountainKing, Character.lich, Character.beastmaster, Character.jaina, Character.malfurion, Character.lichKing,
 ]);

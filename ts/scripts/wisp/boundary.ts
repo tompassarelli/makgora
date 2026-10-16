@@ -213,12 +213,13 @@ export const decodeWrittenGameFile = (name: string, path: string, text: string) 
 
 export interface NativeChatEntryReceipt {
   readonly build: string;
+  readonly epoch: number;
   readonly revision: number;
   readonly available: "0" | "1";
   readonly open: "0" | "1";
 }
 
-const ChatEntryReceipt = Schema.Struct({ build: Schema.NonEmptyString, revision: Schema.FiniteFromString, available: Schema.Literals(["0", "1"]), open: Schema.Literals(["0", "1"]) });
+const ChatEntryReceipt = Schema.Struct({ build: Schema.NonEmptyString, epoch: Schema.FiniteFromString, revision: Schema.FiniteFromString, available: Schema.Literals(["0", "1"]), open: Schema.Literals(["0", "1"]) });
 
 export function nativeChatEntryReceipt(text: string): NativeChatEntryReceipt | undefined {
   const line = preloadLines(text)?.find((line) => line.startsWith("SMASHCRAFT CHAT v=1 "));

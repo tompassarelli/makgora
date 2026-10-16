@@ -3,7 +3,7 @@ import { frames, type AuthoredSpecial, type FighterSpecials } from "../specials/
 import { medivhHit } from "./medivhMoves";
 
 const omen = (ex: boolean): AuthoredSpecial => ({
-  endFrame: 40, landingLag: 18,
+  endFrame: 60, landingLag: 18,
   projectiles: [{ spawnFrame: 12, offsetX: 40.0, offsetZ: 55.0,
     velocityX: ex ? 11.0 : 8.0, velocityZ: 0.0, life: 40, radius: ex ? 40.0 : 32.0,
     effect: medivhHit(ex ? 14.090401649475098 : 10.567800521850586, 80, 50.66062545776367, 50.0), reflectable: true, limit: 1,

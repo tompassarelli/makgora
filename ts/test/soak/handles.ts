@@ -15,7 +15,7 @@ export interface LookBaseline extends HandleBaseline {
 }
 
 /** Plays smashcraft:ts/scripts/wisp/handleBaseline.ts's scenario for `matches` matches in `look` on the integrity build in Bun. */
-export function playBunHandleBaseline(look: Look, matches: number): LookBaseline {
+export function playBunHandleBaseline(look: Look, matches: number, matchFrames?: number): LookBaseline {
   const declarations = readNativeDeclarations();
   const reads: number[] = [];
   const headless = installHeadless({ ...SMASHCRAFT_HEADLESS, natives: lookNatives(look, reads) }, declarations);
@@ -28,7 +28,7 @@ export function playBunHandleBaseline(look: Look, matches: number): LookBaseline
       });
       if (game === undefined) throw new Error(`p${client.slot} has no shell`);
       return game;
-    });
+    }, { matchFrames });
     return { ...baseline, slots: clients.clients.map((client) => client.slot), reads, errors: clients.clients.flatMap((client) => client.errors.map((error) => `p${client.slot + 1}: ${error}`)) };
   } finally {
     headless.restore();

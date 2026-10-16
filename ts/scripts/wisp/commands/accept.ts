@@ -301,7 +301,7 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
   });
   if (pair !== undefined && clientsFile !== clientState) return yield* new UsageFailure({ problem: "--clients-file and --pair select different clients; give one" });
   const selectedClients = yield* usableClients(args, tools, pair?.clients ?? clientsFile, pair !== undefined);
-  const gate = selectChecks(suite, only).checks.some(check => check.id.startsWith("gate-"));
+  const gate = selectChecks(suite, only).checks.some(check => check.map === "gate-playable");
   const identity = candidate === undefined || !gate || args.includes("--dry-run") ? undefined : yield* candidateIdentity(candidate, selectedClients);
   const names = clientNames(selectedClients);
   const withoutMap = args.filter((arg, index) => arg !== "--solo" && arg !== "--map" && !arg.startsWith("--map=") && args[index - 1] !== "--map");
@@ -349,6 +349,8 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
         Effect.tap(receipt => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipt]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
       ) : text === "gate:start" ? measureStartGate(selectedClients, name, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), "gate-start-anywhere", name), controlled.start("gate-playable", "gate-start")).pipe(
         Effect.tap(receipt => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipt]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
+      ) : text === "gate:neutral-thrall" || text === "gate:neutral-jaina" ? measureMovesGate(selectedClients, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), text === "gate:neutral-thrall" ? "c4-thrall-neutral-special" : "c4-jaina-neutral-special", name), text === "gate:neutral-thrall" ? 0 : 1).pipe(
+        Effect.tap(receipts => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipts.specials]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
       ) : text === "gate:moves" ? measureMovesGate(selectedClients, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), "gate-moves", name)).pipe(
         Effect.tap(receipts => Effect.sync(() => { measurements.set(name, [...(measurements.get(name) ?? []), receipts.moves]); specials.set(name, receipts.specials); })), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
       ) : text === "gate:specials" ? Effect.gen(function*() {
