@@ -102,6 +102,7 @@ export function arenaFraming(stage: number, left: number, right: number, bottom:
 }
 
 export const RESULTS_CAMERA_FRAMES = 30;
+export const RESULT_MARGIN = 120.0;
 
 export function resultFighterPlacement(stage: number, index: number, count: number): { readonly x: number; readonly z: number } {
   const centre = (mainDeckLeft(stage) + mainDeckRight(stage)) / 2.0;
@@ -110,11 +111,12 @@ export function resultFighterPlacement(stage: number, index: number, count: numb
   return { x, z: mainDeckZAt(stage, x) };
 }
 
-export function resultCamera(camera: MatchCamera, stage: number, aspect: number, frame: number): void {
+export function resultCamera(camera: MatchCamera, stage: number, aspect: number, frame: number, count: number): void {
   const goal = createMatchCamera();
   goal.x = (mainDeckLeft(stage) + mainDeckRight(stage)) / 2.0;
   goal.z = mainDeckZAt(stage, goal.x) + 80.0;
-  goal.distance = 750.0;
+  const reach = count > 1 ? resultFighterPlacement(stage, count - 1, count).x - goal.x + RESULT_MARGIN : 0.0;
+  goal.distance = Math.max(750.0, reach / (0.2679491937160492 * aspect));
   goal.tangent = 0.2679491937160492;
   camera.distance = Math.min(camera.distance, 950.0);
   if (frame >= RESULTS_CAMERA_FRAMES - 1) {

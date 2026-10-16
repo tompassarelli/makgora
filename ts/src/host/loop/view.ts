@@ -525,7 +525,7 @@ export function lockArenaCamera(s: ShellState): void {
   if (game.phase !== Phase.result && !game.camera.initialized) advanceMatchCamera(s.camera, world, game.stageChoice);
   const height = BlzGetLocalClientHeight();
   const aspect = height > 0 ? I2R(BlzGetLocalClientWidth()) / I2R(height) : 16.0 / 9.0;
-  if (game.phase === Phase.result) resultCamera(s.camera, game.stageChoice, aspect, views(s).match.resultFrames);
+  if (game.phase === Phase.result) resultCamera(s.camera, game.stageChoice, aspect, views(s).match.resultFrames, PARTICIPANT_SLOTS.filter(slot => isActive(world, slot)).length);
   else if (s.session.paused && s.pauseCamera !== undefined) advancePauseCamera(s, aspect);
   else localCamera(s.camera, game.camera.initialized ? game.camera : s.camera, game.stageChoice, aspect);
   if (game.phase !== Phase.result && s.viewExtreme !== undefined) extremeCamera(s.camera, game.stageChoice, aspect, s.viewExtreme);
