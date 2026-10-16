@@ -23,38 +23,47 @@ export function registerKey(s: Readonly<ShellState>, trigger: trigger, key: numb
   }
 }
 
-function registerKeys(s: ShellState, escapeOnly: boolean): void {
-  const { keyEvents } = s;
-  if (keyEvents.down !== undefined || keyEvents.up !== undefined) {
-    if (keyEvents.escapeOnly === escapeOnly) return;
-    removeKeyEvents(s);
+export function syncKeyEventTriggers<T>(events: { down: T | undefined; up: T | undefined; enabled: boolean; escapeOnly: boolean }, enabled: boolean, escapeOnly: boolean, create: () => T, register: (down: T, up: T) => void, setEnabled: (trigger: T, enabled: boolean) => void): void {
+  if (events.down === undefined || events.up === undefined) {
+    const down = create();
+    const up = create();
+    register(down, up);
+    events.down = down;
+    events.up = up;
+    events.enabled = true;
   }
-  const down = CreateTrigger();
-  const up = CreateTrigger();
-  for (let key = 1; key <= 255; key++) {
-
-    const pauseKey = pauseCameraKey(key) || key === Key.escape || key === Key.f2 || key === 0x26 || key === 0x28 || key === 32 || key === 69 || key === Key.n || key === Key.u;
-    if (key === Key.y || key === Key.enter || (escapeOnly && !pauseKey)) continue;
-    registerKey(s, down, key, true);
-    registerKey(s, up, key, false);
-    if (key === 0xbb) {
-      registerKey(s, down, key, true, 1);
-      registerKey(s, up, key, false, 1);
-    }
-  }
-  TriggerAddAction(down, trampoline(KEY_DOWN));
-  TriggerAddAction(up, trampoline(KEY_UP));
-  keyEvents.down = down;
-  keyEvents.up = up;
-  keyEvents.escapeOnly = escapeOnly;
+  events.escapeOnly = escapeOnly;
+  if (events.enabled === enabled) return;
+  const down = events.down;
+  const up = events.up;
+  if (down === undefined || up === undefined) return;
+  setEnabled(down, enabled);
+  setEnabled(up, enabled);
+  events.enabled = enabled;
 }
 
-export function removeKeyEvents(s: ShellState): void {
+function registerKeys(s: ShellState, enabled: boolean, escapeOnly: boolean): void {
   const { keyEvents } = s;
-  if (keyEvents.down !== undefined) DestroyTrigger(keyEvents.down);
-  if (keyEvents.up !== undefined) DestroyTrigger(keyEvents.up);
-  keyEvents.down = undefined;
-  keyEvents.up = undefined;
+  syncKeyEventTriggers(keyEvents, enabled, escapeOnly, () => CreateTrigger(), (down, up) => {
+    for (let key = 1; key <= 255; key++) {
+      if (key === Key.y || key === Key.enter) continue;
+      registerKey(s, down, key, true);
+      registerKey(s, up, key, false);
+      if (key === 0xbb) {
+        registerKey(s, down, key, true, 1);
+        registerKey(s, up, key, false, 1);
+      }
+    }
+    TriggerAddAction(down, trampoline(KEY_DOWN));
+    TriggerAddAction(up, trampoline(KEY_UP));
+  }, (trigger, enabled) => { if (enabled) EnableTrigger(trigger); else DisableTrigger(trigger); });
+}
+
+export function disableKeyEvents(s: ShellState): void {
+  const { keyEvents } = s;
+  if (keyEvents.down !== undefined) DisableTrigger(keyEvents.down);
+  if (keyEvents.up !== undefined) DisableTrigger(keyEvents.up);
+  keyEvents.enabled = false;
 }
 
 
@@ -64,6 +73,11 @@ export function removeKeyEvents(s: ShellState): void {
 
 export function syncKeyEvents(s: ShellState): void {
   const rollbackMatch = activeRollback(s) !== undefined && s.game.phase === Phase.match;
-  if (rollbackMatch && !s.session.paused) removeKeyEvents(s);
-  else registerKeys(s, s.session.paused || s.pauseMenu?.title === true);
+  const enabled = !rollbackMatch || s.session.paused;
+  const escapeOnly = s.session.paused || s.pauseMenu?.title === true;
+  registerKeys(s, enabled, escapeOnly);
+}
+
+export function acceptsKeyEvent(key: number, escapeOnly: boolean): boolean {
+  return !escapeOnly || pauseCameraKey(key) || key === Key.escape || key === Key.f2 || key === 0x26 || key === 0x28 || key === 32 || key === 69 || key === Key.n || key === Key.u;
 }

@@ -29,7 +29,7 @@ import { callbackMatchTick } from "./frame";
 import { clearAllInputs, clearParticipantInputs, currentHumanMask } from "./inputs";
 import { INPUT_PREFIX, journalEpoch, publishMenu, serviceJournalEnd } from "./journal";
 import * as journalPause from "./journalPause";
-import { KEY_DOWN, KEY_UP, Key, registerKey, removeKeyEvents, syncKeyEvents } from "./keyEvents";
+import { KEY_DOWN, KEY_UP, Key, registerKey, disableKeyEvents, syncKeyEvents } from "./keyEvents";
 import { onDevCommand, onDeveloperRestart, onDeveloperTrace, onKeyDown, onKeyUp, onProbeExport, onProbeStart, selectPauseMenu } from "./keys";
 import { panelActions, serviceAutomaticRematch, startingSelection } from "./menus";
 import { PLAYER_FILE_RECEIVED, bindingFiles, playerFileReceived, playerFilesOwnerLeft, startPlayerFiles } from "./playerFiles";
@@ -249,7 +249,7 @@ function playerLeft(s: ShellState): void {
     }
     view.announce(s, "A player left. Choose the next match.");
   }
-  removeKeyEvents(s);
+  disableKeyEvents(s);
   syncKeyEvents(s);
 }
 
