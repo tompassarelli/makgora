@@ -2015,18 +2015,18 @@ Original provisional values; F/A/R counts start at simulation frame zero. Volume
 
 | Input and move | F/A/R; landing | Damage | Gesture and purpose |
 |---|---|---:|---|
-| Jab — Royal Rebuke | 6/3/17 | 4 | Short left tusk jab; another tap delivers the right tusk (8/3/20, 6%) |
-| Forward tilt — Mandible Spear | 10/4/24 | 11 | Long front pincer thrust; angled forms aim high or rake ankles |
+| Jab — Royal Rebuke | 6/3/17 | 4 | Coiled lunge with a crossing right-claw rake; another tap scythes the left claw overhead and through (8/3/20, 6%) |
+| Forward tilt — Mandible Spear | 10/4/24 | 11 | Rearing pounce that rakes the pincers wide and low in front; angled forms chop overhead or rake ankles |
 | Up tilt — Crown Lift | 9/5/23 | 10 | Horn lifts prey into a juggle, narrow near the ground |
 | Down tilt — Grave Rake | 8/4/20 | 8 | Low claw scrape launches a tech chase |
-| Dash attack — King’s Advance | 12/5/28 | 12 | Planted forelegs and a committed horn shove |
-| Forward smash — Execution Tusk | 20/4/34 | 20 | Huge forward stab with exposed recovery |
+| Dash attack — King’s Advance | 12/5/28 | 12 | Coiled spring into a wide, low claw sweep |
+| Forward smash — Execution Tusk | 20/4/34 | 20 | Both claws reared overhead scythe down and through in front, with exposed recovery |
 | Up smash — Crown of Spines | 17/5/31 | 18 | Raise both pincers above the shell |
 | Down smash — Crypt Sweep | 16/6/32 | 16 | Front sweep then rear sweep; one hit per target |
 | Neutral air — Carapace Wheel | 10/7/24; L18 | 10 | Broad shell twist clears nearby bodies |
-| Forward air — Royal Skewer | 13/4/27; L20 | 13 | Heavy forward tusk thrust |
-| Back air — Hindclaw | 11/4/27; L20 | 14 | Rear legs kick behind the shell |
-| Up air — Horn of the King | 9/4/23; L16 | 10 | Pointed vertical crown poke |
+| Forward air — Royal Skewer | 13/4/27; L20 | 13 | Claw raised overhead scythes forward and down through the target |
+| Back air — Hindclaw | 11/4/27; L20 | 14 | Shell drives backward as the claws rake through behind it |
+| Up air — Horn of the King | 9/4/23; L16 | 10 | Coiled rise that lifts both claws in a rising overhead rake |
 | Down air — Tombstone | 17/4/30; L24 | 15 | Head-first downward shell strike; airborne spike |
 
 ### Four specials and EX

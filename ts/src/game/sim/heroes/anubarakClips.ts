@@ -13,7 +13,7 @@ export const ANUBARAK_CLIPS = { idle: ANUBARAK_FALLBACK, walk: { index: 2, secon
   downTilt: { index: 23, seconds: f32(0.517), aligned: true },
   dashAttack: { index: 24, seconds: f32(0.733), aligned: true },
   forwardSmash: { index: 25, seconds: f32(0.95), aligned: true },
-  upSmash: { index: 26, seconds: f32(0.867), aligned: true },
+  upSmash: { index: 26, seconds: f32(1.167), aligned: true },
   downSmash: { index: 27, seconds: f32(0.883), aligned: true },
   neutralAir: { index: 28, seconds: f32(0.667), aligned: true },
   forwardAir: { index: 29, seconds: f32(0.717), aligned: true },

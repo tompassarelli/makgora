@@ -17,10 +17,11 @@ fighter can act), so line 2 measures the transition the game draws.
    contact. A limb carrying that point is found by its hand/foot attachment;
    its shoulder/hip travel divided by tip travel measures body share. Also
    measure how far the filled silhouette's centre shifts toward the strike.
-   A limb strike (a kick, listed per fighter in `LIMB_STRIKES` in
-   `ts/scripts/wisp/animScoreSample.ts`, whose struck point rides a leg) is
-   scored on limb drive instead of body share: the foot's travel toward the
-   strike from windup to contact, as a fraction of body height. The class's
+   A limb strike (a kick or claw rake, listed per fighter in `LIMB_STRIKES` in
+   `ts/scripts/wisp/animScoreSample.ts`, whose struck point rides a leg or a
+   claw arm) is scored on limb drive instead of body share: the foot's or
+   claw's travel toward the strike from windup to contact, as a fraction of
+   body height. The class's
    mass shift still applies, and the cold reader (line 5) stays the bar.
 2. **Return:** mean drawn-vertex error from ready on the final move frame,
    largest single-frame change from end lag through two following frames,
@@ -122,6 +123,12 @@ weapon-strike rule calibrated on weapon tilts; a snap kick turns from the hip,
 so its hip barely travels and its body share sits near .1. The .50 line is
 calibrated on Shadow Hunter's six kicks, each named a kick by a cold reader:
 limb drive .89–1.24 in Classic and .69–.93 in Definitive.
+Anub'arak's claw rakes (his forward and down tilts, dash attack, and forward,
+back and down air) use the same rule: a rake swings the claw from the shoulder
+as a kick swings the foot from the hip, and the claw's own swing through
+at least 90° (#43) carries most of the tip's travel, so his shoulder cannot
+reach the tilt line's .90 body share. His up tilt, smashes, other aerials and
+specials, up special included, are carried by the body and keep body share.
 
 Jab weight uses Lich King's second jab; smash weight/return use Malfurion's
 down smash; tilt weight uses Mountain King's angled up tilt and Thrall's

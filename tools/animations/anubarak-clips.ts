@@ -59,12 +59,37 @@ const lunges: Partial<Record<HeroPose, Lunge>> = {
   upSmash: { contact: 17, z: 48, back: 24 },
   downSmash: { contact: 15, x: 10, back: 6 },
   neutralAir: { contact: 9, x: 12, back: 6 },
-  backAir: { contact: 10, x: -12, back: 6 },
+  forwardAir: { contact: 12, x: 20, back: 10 },
+  backAir: { contact: 10, x: -70, back: 35 },
+  dashAttack: { contact: 11, x: 40, back: 20 },
   downAir: { contact: 16, z: -12, back: 6 },
   neutralSpecial: { contact: 17, x: 32, back: 16, over: 0.4, ramp: 8 },
-  upSpecial: { contact: 8, z: 34, back: 0 },
+  upSpecial: { contact: 8, z: 34, back: 24 },
   downSpecial: { contact: 21, x: 26, back: 30, over: 0.4, ramp: 4 },
   ultimate: { contact: 16, x: 32, back: 16 },
+};
+interface Rake { contact: number; through: number; windup: Gesture; strike: Gesture; follow: Gesture; }
+const scythe = (chest: number, lean: number): Omit<Rake, "contact" | "through"> => ({
+  windup: { chest: -22, pelvis: -15, lean: -12, arm: -190, elbow: 20, leftArm: -150 },
+  strike: { chest, pelvis: 22, lean, arm: -100, elbow: 20, leftArm: -100 },
+  follow: { chest: chest + 18, pelvis: 32, lean: lean + 6, arm: 100, elbow: 20, leftArm: 60 },
+});
+const rakes: Partial<Record<HeroPose, Rake>> = {
+  jab2: { contact: 7, through: 9, windup: { chest: -22, pelvis: -14, lean: -12, leftArm: -185, leftElbow: 20, arm: -65 }, strike: { chest: 30, pelvis: 22, lean: 14, leftArm: -100, leftElbow: 20, arm: -80 }, follow: { chest: 45, pelvis: 32, lean: 20, leftArm: 100, leftElbow: 20, arm: -95 } },
+  forwardSmash: { contact: 19, through: 22, ...scythe(35, 16) },
+  downSmash: { contact: 15, through: 20, windup: { chest: -20, pelvis: -15, lean: -12, arm: -185, elbow: 20, leftArm: 80 }, strike: { chest: 32, pelvis: 25, lean: 15, arm: -100, elbow: 20, leftArm: 0 }, follow: { chest: 50, pelvis: 35, lean: 20, arm: 100, elbow: 20, leftArm: -200 } },
+  forwardAir: { contact: 12, through: 15, windup: { chest: -22, pelvis: -14, lean: -12, arm: -190, elbow: 20, leftArm: -80, thigh: 25, leftThigh: -25 }, strike: { chest: 30, pelvis: 24, lean: 14, arm: -100, elbow: 20, leftArm: -100, thigh: -20, leftThigh: 20 }, follow: { chest: 48, pelvis: 32, lean: 20, arm: 100, elbow: 20, leftArm: -120, thigh: -35, leftThigh: 35 } },
+  backAir: { contact: 10, through: 13, windup: { chest: 22, pelvis: 15, lean: 12, arm: 190, elbow: 20, leftArm: 70 }, strike: { chest: -28, pelvis: -20, lean: -15, arm: 100, elbow: 20, leftArm: 100 }, follow: { chest: -45, pelvis: -30, lean: -20, arm: -100, elbow: 20, leftArm: -100 } },
+  neutralSpecial: { contact: 18, through: 26, ...scythe(35, 15) },
+  neutralSpecialAir: { contact: 18, through: 26, ...scythe(35, 15) },
+  downSpecial: { contact: 21, through: 31, ...scythe(35, 15) },
+  downSpecialAir: { contact: 21, through: 31, ...scythe(35, 15) },
+  ultimate: { contact: 17, through: 25, ...scythe(33, 14) },
+};
+const swings: Partial<Record<HeroPose, readonly [windup: number, follow: number]>> = {
+  upSpecial: [0.8, 1],
+  upSpecialAir: [0.8, 1],
+  downAir: [0.6, 1.3],
 };
 const lungeAt = (lunge: Lunge, frame: number, frames: number) => {
   const over = lunge.over ?? 0.25, drive = lunge.x ?? lunge.z ?? 0, reach = Math.abs(drive), sign = Math.sign(drive);
@@ -200,11 +225,12 @@ for (const [ordinal, action] of authoredActions.entries()) {
   const name = !action.pain ? `Anubarak ${action.pose}` : `Anubarak Damage ${Math.floor((ordinal - actions.length) / 3)} ${(ordinal - actions.length) % 3}`;
   model.Sequences.push({ ...stand, Name: name, Interval: new Uint32Array([start, end]), NonLooping: true, MoveSpeed: 0, Rarity: 0,
     MinimumExtent: new Float32Array([-300, -300, -200]), MaximumExtent: new Float32Array([300, 300, 350]), BoundsRadius: 400 });
-  const groundGesture = groundGestures.has(action.pose), lunge = lunges[action.pose], settled = action.pose.startsWith("downSpecial") ? action.frames - 2 : action.frames;
+  const rake = rakes[action.pose], groundGesture = groundGestures.has(action.pose) && rake === undefined, lunge = lunges[action.pose], settled = action.pose.startsWith("downSpecial") ? action.frames - 2 : action.frames;
   const phaseFrames = [...new Set([...(action.pose === "sideSpecial" || action.pose === "upAir" || groundGesture || lunge ? Array.from({length: action.frames + 1}, (_, i) => i) : []), 0, Math.max(1, action.contact - 3), action.contact, Math.min(action.frames - 1, action.contact + 4), action.frames,
     ...(action.roll ? Array.from({ length: Math.ceil(action.frames / 3) }, (_, i) => i * 3) : []),
     ...(action.pose === "victimPummel" ? [action.contact - 1] : [])])].sort((a, b) => a - b);
-  const keyed = (frame: number) => action.hold || action.pain ? 1 : action.pose === "victimPummel" && frame < action.contact ? 0 : action.pose === "knockdown" && frame >= action.contact ? 1 : frame === 0 || frame >= settled ? 0 : frame < action.contact ? -0.3 : 1;
+  const [windup, follow] = swings[action.pose] ?? [0.3, 1];
+  const keyed = (frame: number) => action.hold || action.pain ? 1 : action.pose === "victimPummel" && frame < action.contact ? 0 : action.pose === "knockdown" && frame >= action.contact ? 1 : frame === 0 || frame >= settled ? 0 : frame < action.contact ? -windup : frame > action.contact ? follow : 1;
   const sparse = [0, Math.max(1, action.contact - 3), action.contact, Math.min(action.frames - 1, action.contact + 4), settled, ...(settled < action.frames ? [action.frames] : [])];
   const amount = (frame: number) => {
     if (!lunge || groundGesture || sparse.includes(frame)) return keyed(frame);
@@ -241,7 +267,15 @@ for (const [ordinal, action] of authoredActions.entries()) {
           if (alpha) Vector = new Float32Array([source.GeosetAnims[Number(alpha[1])]!.GeosetId < 3 ? 1 : 0]);
         }
       }
-      if (node && action.pose !== "sideSpecial") { let [y, z] = joint(node.Name, action.gesture); y = node.Name === "Bone_Root" && action.roll ? frame / action.frames * 360 * action.roll : y * amount(frame);
+      if (node && rake) {
+        const poses = [rake.windup, rake.strike, rake.follow].map(g => { const [y, z] = joint(node.Name, g); return rotated(first.Vector, y, z); });
+        const cocked = Math.max(1, rake.contact - 3), released = Math.min(action.frames - 1, rake.through + 2);
+        Vector = frame <= cocked ? blend(first.Vector, poses[0]!, frame / cocked)
+          : frame <= rake.contact ? blend(poses[0]!, poses[1]!, (frame - cocked) / (rake.contact - cocked))
+          : frame <= rake.through ? blend(poses[1]!, poses[2]!, (frame - rake.contact) / (rake.through - rake.contact))
+          : frame <= released ? poses[2]!.slice()
+          : blend(poses[2]!, first.Vector, Math.min(1, (frame - released) / (settled - released)));
+      } else if (node && action.pose !== "sideSpecial") { let [y, z] = joint(node.Name, action.gesture); y = node.Name === "Bone_Root" && action.roll ? frame / action.frames * 360 * action.roll : y * amount(frame);
         if (node.Name === "Bone_Root" && (action.pose === "getUp" || action.pose === "getUpAttack" || action.pose.startsWith("getUpRoll"))) y += 85 * Math.max(0, 1 - frame / action.contact);
         z *= amount(frame); Vector = rotated(first.Vector, y, z); }
       if (node && action.pose === "upAir") {
@@ -417,23 +451,26 @@ mkdirSync(output, { recursive: true }); await Bun.write(join(output, "herocryptl
 
 const finalDrawn = new DrawnModel(bytes, 0.55);
 const distance = (a: Float32Array, b: Float32Array) => { ensure(a.length === b.length && a.length > 0, "Missing drawn body"); let maximum = 0; for (let i = 0; i < a.length; i += 2) maximum = Math.max(maximum, Math.hypot(a[i]! - b[i]!, a[i + 1]! - b[i + 1]!)); return maximum; };
-const shoulder = model.Nodes.find(node => node.Name === "Bone_Arm1R")!, tip = model.Attachments.find(node => node.Name.startsWith("Hand Right Ref"))!;
+const claws = (["R", "L"] as const).map(side => ({ side, shoulder: model.Nodes.find(node => node.Name === `Bone_Arm1${side}`)!, tip: model.Attachments.find(node => node.Name.startsWith(`Hand ${side === "R" ? "Right" : "Left"} Ref`))! }));
 const position = (node: mdx.Node) => { const matrix = posed.nodes[node.ObjectId]!.matrix, pivot = model.PivotPoints[node.ObjectId]!; return [0, 1, 2].map(axis => matrix[axis]! * pivot[0]! + matrix[axis + 4]! * pivot[1]! + matrix[axis + 8]! * pivot[2]! + matrix[axis + 12]!); };
 const attackPoses = new Set(["jab", "jab2", "forwardTilt", "forwardTiltUp", "forwardTiltDown", "upTilt", "downTilt", "dashAttack", "forwardSmash", "upSmash", "downSmash", "neutralAir", "forwardAir", "backAir", "upAir", "downAir", "neutralSpecial", "neutralSpecialAir", "sideSpecial", "sideSpecialAir", "upSpecial", "upSpecialAir", "downSpecial", "downSpecialAir", "ultimate"]);
 const tipArcs = authoredActions.flatMap((action, ordinal) => {
   if (!attackPoses.has(action.pose)) return [];
   const index = source.Sequences.length + ordinal, sequence = model.Sequences[index]!;
   renderer.setSequence(index);
-  let previous: number | undefined, degrees = 0;
-  for (let frame = 0; frame <= action.frames; frame++) {
-    posed.frame = sequence.Interval[0]! + Math.round(frame * 1000 / 60); renderer.update(0);
-    const origin = position(shoulder), endpoint = position(tip), angle = Math.atan2(endpoint[2]! - origin[2]!, endpoint[0]! - origin[0]!);
-    if (previous !== undefined) degrees += Math.abs(Math.atan2(Math.sin(angle - previous), Math.cos(angle - previous))) * 180 / Math.PI;
-    previous = angle;
-  }
-  return [{ move: action.pose, degrees: Number(degrees.toFixed(1)) }];
+  const swept = claws.map(({ side, shoulder, tip }) => {
+    let previous: number | undefined, turned = 0, least = 0, most = 0;
+    for (let frame = 0; frame <= Math.min(action.frames, action.contact + 6); frame++) {
+      posed.frame = sequence.Interval[0]! + Math.round(frame * 1000 / 60); renderer.update(0);
+      const origin = position(shoulder), endpoint = position(tip), angle = Math.atan2(endpoint[2]! - origin[2]!, endpoint[0]! - origin[0]!);
+      if (previous !== undefined) turned += Math.atan2(Math.sin(angle - previous), Math.cos(angle - previous)) * 180 / Math.PI;
+      previous = angle; least = Math.min(least, turned); most = Math.max(most, turned);
+    }
+    return { claw: side, degrees: Number((most - least).toFixed(1)) };
+  });
+  return [{ move: action.pose, ...swept.toSorted((a, b) => b.degrees - a.degrees)[0]! }];
 });
-ensure(tipArcs.every(row => row.degrees >= 90), `Anubarak tip arc below 90 degrees: ${tipArcs.filter(row => row.degrees < 90).map(row => `${row.move} ${row.degrees}`).join(", ")}`);
+ensure(tipArcs.every(row => row.degrees >= 90), `Anubarak claw arc below 90 degrees: ${tipArcs.filter(row => row.degrees < 90).map(row => `${row.move} ${row.degrees}`).join(", ")}`);
 let measured = 0;
 for (const [i, action] of authoredActions.entries()) {
   const index = source.Sequences.length + i;
@@ -451,4 +488,4 @@ for (const [i, action] of authoredActions.entries()) {
 await Bun.write(join(output, "anubarak-clips.json"), JSON.stringify({ stockSequences: source.Sequences.length, appended: records.length, measuredBothFacings: measured, tipArcs, records }, null, 2) + "\n");
 
 console.log(`ANUBARAK_CLIPS_PASS ${records.length} authored clips; ${source.Sequences.length} stock sequences retained; ${measured} both-facing sheets; private output ${output}`);
-console.log(`HEADLESS_TIP_ARCS_DEGREES ${tipArcs.map(row => `${row.move}=${row.degrees}`).join(" ")}`);
+console.log(`HEADLESS_TIP_ARCS_DEGREES ${tipArcs.map(row => `${row.move}=${row.degrees}${row.claw}`).join(" ")}`);

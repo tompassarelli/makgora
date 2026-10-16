@@ -312,6 +312,11 @@ export function strikingLimb(skeleton: ScoreSkeleton, frames: readonly ScoreFram
 }
 
 
+export function lineOneRule(limbStrike: boolean, limb: ScoreLimb | undefined): "body" | "limb" {
+  return limbStrike && (limb?.name.startsWith("leg ") === true || limb?.name.startsWith("arm ") === true) ? "limb" : "body";
+}
+
+
 export function scoreMove(sample: MoveSample, thresholds: ClassThresholds): MoveScore {
   const { frames, moveFrames, ready, skeleton } = sample;
   const height = bodyHeight(ready);
@@ -354,7 +359,7 @@ export function scoreMove(sample: MoveSample, thresholds: ClassThresholds): Move
     return found;
   };
   const massShift = (along(maskCentroid(mask(contact), sample.pixelsPerUnit)) - along(maskCentroid(mask(windup), sample.pixelsPerUnit))) / height;
-  const rule = sample.limbStrike && limb?.name.startsWith("leg ") === true ? "limb" : "body";
+  const rule = lineOneRule(sample.limbStrike, limb);
   const limbDrive = Math.max(0, tipTravel / height);
   const line1: LineOne = {
     pass: (rule === "limb" ? limbDrive >= LIMB_STRIKE.limbDrive : bodyShare >= thresholds.bodyShare) && massShift >= thresholds.massShift,

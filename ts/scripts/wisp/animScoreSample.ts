@@ -69,6 +69,7 @@ const CHEST = [/^bone_chest/i, /^chest$/i, /^bone neck$/i, /^bone_neck$/i, /^spi
 const LIMBS: readonly (readonly [string, string, string])[] = [
   ["arm", "^bone_arm1_?{S}$", "^bone_hand_?{S}$"],
   ["arm", "^bone_upperarm{S}$", "^bone_hand{S}$"],
+  ["arm", "^bone_arm1{S}$", "^bone_armclaw{S}$"],
   ["arm", "^bone rider {S} arm$", "^bone rider {S} wrist$"],
   ["arm", "^{S}shoulder$", "^{S}hand$"],
   ["arm", "^arm_{S}0_0_jnt$", "^arm_{S}0_end_jnt$"],
@@ -84,6 +85,7 @@ const LIMBS: readonly (readonly [string, string, string])[] = [
 
 export const LIMB_STRIKES: Readonly<Record<string, readonly string[]>> = {
   "shadow-hunter": ["forward-tilt", "forward-tilt-up", "forward-tilt-down", "up-tilt", "down-tilt", "dash-attack"],
+  "anub'arak": ["forward-tilt", "forward-tilt-up", "forward-tilt-down", "down-tilt", "dash-attack", "forward-air", "back-air", "down-air"],
 };
 
 export const SKELETON_EXCEPTIONS: Readonly<Record<string, { readonly pelvis?: string; readonly chest?: string; readonly limbs?: readonly { readonly name: string; readonly root: string; readonly end: string }[] }>> = {};
@@ -272,7 +274,7 @@ export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, charac
   if (ready === undefined) return undefined;
   return {
     move: entry.move, endFrame: moveFrames - 1, seconds: frames.map((frame) => timelineSeconds(character, frame)), heights: frames.map((frame) => frame.z),
-    sample: { moveClass: "special", limbStrike: false, frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, strike, pixelsPerUnit },
+    sample: { moveClass: "special", limbStrike: LIMB_STRIKES[fighterSlug(character)]?.includes(entry.move) === true, frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, strike, pixelsPerUnit },
   };
 }
 
