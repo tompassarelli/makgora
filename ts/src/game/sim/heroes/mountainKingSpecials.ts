@@ -79,12 +79,12 @@ const WAVES = (spawnFrame: number) => [wave(spawnFrame, 1), wave(spawnFrame, -1)
 
 const CLAP: AuthoredSpecial = { name: "Small Clap", endFrame: 28, regions: ring(4, 9.72620964050293) };
 
-const THUNDER_CLAP: AuthoredSpecial = { endFrame: 32, regions: ring(4, 12.968278884887695), projectiles: WAVES(4) };
+const THUNDER_CLAP: AuthoredSpecial = { endFrame: 32, regions: ring(4, 12.0), projectiles: WAVES(4) };
 
 const HOLD: AuthoredSpecial = { endFrame: 1 };
 const CHARGED_CLAP: AuthoredSpecial = {
   endFrame: 81,
-  regions: ring(53, 12.968278884887695),
+  regions: ring(53, 12.0),
   projectiles: WAVES(53),
   followUps: [
     { window: frames(10, 29), special: CLAP },

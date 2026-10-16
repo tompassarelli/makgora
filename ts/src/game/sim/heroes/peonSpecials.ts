@@ -41,8 +41,8 @@ export const REST_LYING_FRAME = 45;
 const REST: AuthoredSpecial = {
   endFrame: REST_END_FRAME, confirmOnly: true,
   regions: [
-    heroRegion(REST_SWEET_FIRST, REST_SWEET_LAST, { x1: 0.0, z1: 50.0, x2: 0.0, z2: 50.0, radius: 30.0 }, peonHit(20.479999542236328, 90, 118.19999694824219, 80.0)),
-    heroRegion(REST_SOUR_FRAME, REST_SOUR_FRAME, { x1: 0.0, z1: 50.0, x2: 0.0, z2: 50.0, radius: 40.0 }, peonHit(10.239999771118164, 85, 54.17499923706055, 50.0)),
+    heroRegion(REST_SWEET_FIRST, REST_SWEET_LAST, { x1: 0.0, z1: 50.0, x2: 0.0, z2: 50.0, radius: 30.0 }, peonHit(12.0, 90, 118.19999694824219, 80.0)),
+    heroRegion(REST_SOUR_FRAME, REST_SOUR_FRAME, { x1: 0.0, z1: 50.0, x2: 0.0, z2: 50.0, radius: 40.0 }, peonHit(6.0, 85, 54.17499923706055, 50.0)),
   ],
   hurt: [hurtPose(REST_LYING_FRAME, REST_END_FRAME, [hurtPart(0.0, 18.0, 52.0, 18.0, 18.0)])],
 };

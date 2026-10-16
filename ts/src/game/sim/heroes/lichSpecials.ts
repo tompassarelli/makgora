@@ -61,7 +61,7 @@ const DEATH_AND_DECAY: AuthoredSpecial = {
   endFrame: 50,
   landingLag: AIR_LANDING_LAG,
   hurt: LICH_DECAY_BODY,
-  projectiles: [decayStrike(23, 62, 6.23394775390625, "POKE", 80), decayStrike(63, 90, 11.221104621887207, "LAUNCH", 70)],
+  projectiles: [decayStrike(23, 62, 6.23394775390625, "POKE", 80), decayStrike(63, 90, 8.0, "LAUNCH", 70)],
 };
 
 const ASCENT_FRAMES = 25;

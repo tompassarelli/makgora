@@ -121,7 +121,7 @@ export const ANUBARAK_MOVES: FighterMoves = {
     [AttackStyle.downTilt]: heroMove(8, 4, 20, 0, [heroRegion(8, 11, claw(30.0, 12.0, 120.0, 12.0), anubarakHit(9.910080909729004, 70, 58.45515060424805, 36.0))]),
     [AttackStyle.dashAttack]: heroMove(12, 5, 28, 0, [heroRegion(12, 16, claw(32.0, 44.0, 115.0, 50.0, 21.0), anubarakHit(14.865119934082031, 55))], 42.0, true),
     [AttackStyle.forwardSmash]: tipperMove(heroMove(20, 4, 34, 0, [heroRegion(20, 23, claw(32.0, 65.0, 153.0, 65.0, 18.0), anubarakHit(24.77519989013672, 40, 53.95859909057617, 36.0))]), 0.25),
-    [AttackStyle.upSmash]: heroMove(17, 5, 31, 0, [heroRegion(17, 21, claw(-22.0, 104.0, 25.0, 172.0, 27.0), anubarakHit(22.297679901123047, 90, 98.92410278320312, 32.0))]),
+    [AttackStyle.upSmash]: heroMove(17, 5, 49, 0, [heroRegion(17, 21, claw(-22.0, 104.0, 25.0, 172.0, 27.0), anubarakHit(22.297679901123047, 90, 98.92410278320312, 32.0))]),
     [AttackStyle.downSmash]: heroMove(16, 6, 32, 0, [
       heroRegion(16, 18, claw(28.0, 14.0, 134.0, 14.0, 18.0), anubarakHit(19.820161819458008, 25, 94.42755126953125, 32.0)),
       heroRegion(19, 21, claw(-28.0, 14.0, -134.0, 14.0, 18.0), anubarakHit(19.820161819458008, 25, 94.42755126953125, 32.0, true)),
