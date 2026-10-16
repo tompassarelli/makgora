@@ -163,7 +163,7 @@ test("render, lockfile and producer edits keep the Classic record valid; a chang
     expect(check()).toBe(`Classic effect record is missing or stale: no model facts for 1 newly used models; from ts/ on a machine with the exact24268 cache run ${RECORD_COMMAND} and commit the record: ${STOCK_MODELS.silenceTarget.replace("SilenceTarget", "SilenceLaneTarget")} (${silenced.map((use) => `${use.fighter}/${use.move}`).join(", ")})`);
     expect(uses.filter(({ model }) => /^war3mapImported[\\/]/i.test(model) && !/-[0-9a-f]{64}\.mdx$/i.test(model)).map(({ model }) => model).filter((model) => !IMPORTED_MODEL_FILES.some(({ entry }) => entry === model))).toEqual([]);
     edit("build-inputs/imported-models", readFileSync(join(repo, "build-inputs/imported-models"), "utf8").trim(), "f".repeat(64));
-    expect(check()).toContain(`@${"f".repeat(64)} (grom-hellscream/`);
+    expect(check()).toContain(`@${"f".repeat(64)} (cairne-bloodhoof/`);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }
