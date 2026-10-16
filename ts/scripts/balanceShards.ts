@@ -23,3 +23,10 @@ export function partitionWork(given: string | undefined): () => boolean {
   let index = 0;
   return () => index++ % count === part;
 }
+
+export function measuredSeconds(units: readonly string[], samples: readonly Readonly<Record<string, number>>[]): Record<string, number> | undefined {
+  const all = samples.flatMap((sample) => Object.values(sample));
+  if (all.length === 0) return undefined;
+  const slowest = Math.max(...all);
+  return Object.fromEntries(units.map((unit) => [unit, samples.find((sample) => sample[unit] !== undefined)?.[unit] ?? slowest]));
+}

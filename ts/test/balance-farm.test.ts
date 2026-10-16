@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { JOB_SECONDS, RUNNER_CORES, partitionWork, shardWork } from "../scripts/balanceShards";
+import { JOB_SECONDS, RUNNER_CORES, measuredSeconds, partitionWork, shardWork } from "../scripts/balanceShards";
 import { reserveP90, type Job } from "../scripts/farmAdmission";
 import { mergeProbeCounts } from "../scripts/cpuField";
 
@@ -37,4 +37,21 @@ test("split spam probes combine decisive wins and all matches before calculating
   expect(mergeProbeCounts(rows).get("test")).toEqual({ move: "special", winRate: 9 / 20, matches: 22 });
   expect(mergeProbeCounts([...rows].reverse())).toEqual(mergeProbeCounts(rows));
   expect(() => mergeProbeCounts([...rows, { fighter: "test", move: "other", wins: 1, losses: 0, matches: 1 }])).toThrow("different moves");
+});
+
+test("field sizing takes each pair's newest measured seconds and never sizes an unmeasured pair below the slowest measured one [k2 property]", () => {
+  expect(measuredSeconds(["a:b"], [])).toBeUndefined();
+  let seed = 777;
+  const next = () => { seed = (Math.imul(seed, 1664525) + 1013904223) | 0; return seed >>> 0; };
+  for (let trial = 0; trial < 100; trial++) {
+    const units = Array.from({ length: 2 + (next() % 30) }, (_, index) => `u${index}`);
+    const samples = Array.from({ length: 1 + (next() % 4) }, () => Object.fromEntries(units.filter(() => next() % 3 === 0).map((unit) => [unit, 1 + (next() % 900)])));
+    const measured = measuredSeconds(units, samples);
+    const all = samples.flatMap((sample) => Object.values(sample));
+    if (all.length === 0) { expect(measured).toBeUndefined(); continue; }
+    for (const unit of units) {
+      const newest = samples.find((sample) => sample[unit] !== undefined)?.[unit];
+      expect(measured?.[unit]).toBe(newest ?? Math.max(...all));
+    }
+  }
 });

@@ -6,11 +6,12 @@ import { Effect, Schema } from "effect";
 import { decoded, FarmFailure, run } from "wisp/scripts/wisp/farm";
 import { SELECTABLE_CHARACTERS, fighterSlug } from "../src/game/sim/heroes/registry";
 import { readJobs, runnerAdmission, type Job } from "./farmAdmission";
-import { JOB_SECONDS, shardWork, type Work } from "./balanceShards";
+import { JOB_SECONDS, measuredSeconds, shardWork, type Work } from "./balanceShards";
 
 const Timings = Schema.Record(Schema.String, Schema.Finite);
 const Runs = Schema.Struct({ workflow_runs: Schema.Array(Schema.Struct({ id: Schema.Finite })) });
 const Cpu = Schema.Struct({ cpuSeconds: Schema.Finite, pairs: Schema.Record(Schema.String, Schema.Finite) });
+const Artifacts = Schema.Struct({ artifacts: Schema.Array(Schema.Struct({ id: Schema.Finite, name: Schema.String, expired: Schema.Boolean, workflow_run: Schema.Struct({ id: Schema.Finite }) })) });
 
 function legacyTimings(pairs: readonly string[], slugs: readonly string[], jobs: readonly Job[]): Record<string, number> {
   const seconds: Record<string, number> = {};
@@ -57,6 +58,33 @@ const historicalTimings = (repo: string, pairs: readonly string[], slugs: readon
   (folder) => Effect.sync(() => rmSync(folder, { recursive: true, force: true })),
 );
 
+const TIMING_ARTIFACT = /^balance-(shard-)?timings(-[0-9]+)?$/;
+
+const fieldSamples = (repo: string, pairs: readonly string[]) => Effect.acquireUseRelease(
+  Effect.sync(() => mkdtempSync(join(tmpdir(), "balance-field-timings-"))),
+  (folder) => Effect.gen(function*() {
+    const samples: Record<string, number>[] = [];
+    const covered = new Set<string>();
+    for (let page = 1; page <= 5 && !pairs.every((pair) => covered.has(pair)); page++) {
+      const listed = yield* decoded(Artifacts, yield* run(["gh", "api", `repos/${repo}/actions/artifacts?per_page=100&page=${page}`]));
+      for (const artifact of listed.artifacts.filter((artifact) => !artifact.expired && TIMING_ARTIFACT.test(artifact.name))) {
+        const target = join(folder, String(artifact.id));
+        if (!(yield* run(["gh", "run", "download", String(artifact.workflow_run.id), "-R", repo, "-n", artifact.name, "-D", target]).pipe(Effect.as(true), Effect.orElseSucceed(() => false)))) continue;
+        const sample: Record<string, number> = {};
+        for (const name of readdirSync(target).filter((file) => file.endsWith(".json"))) {
+          const seconds = yield* decoded(Timings, readFileSync(join(target, name), "utf8"));
+          for (const [key, value] of Object.entries(seconds)) if (key.startsWith("shard/")) sample[key.slice(6)] = value;
+        }
+        for (const pair of Object.keys(sample)) covered.add(pair);
+        if (Object.keys(sample).length > 0) samples.push(sample);
+      }
+      if (listed.artifacts.length < 100) break;
+    }
+    return samples;
+  }),
+  (folder) => Effect.sync(() => rmSync(folder, { recursive: true, force: true })),
+);
+
 const main = Effect.gen(function*() {
   const repo = process.env.GITHUB_REPOSITORY;
   if (repo === undefined) return yield* new FarmFailure({ problem: "balancePlan needs GITHUB_REPOSITORY" });
@@ -66,7 +94,8 @@ const main = Effect.gen(function*() {
   if (requested.some((pair) => !allPairs.includes(pair))) return yield* new FarmFailure({ problem: "Unknown or reversed fighter matchup" });
   const pairs = requested.length === 0 ? allPairs : allPairs.filter((pair) => requested.includes(pair));
   const { source, seconds } = yield* historicalTimings(repo, allPairs, slugs);
-  const field: Work[] = pairs.map((pair) => ({ name: pair, seconds: (seconds[`shard/${pair}`] ?? JOB_SECONDS) * Number(process.env.PER_PAIR ?? 400) / 400 }));
+  const measured = measuredSeconds(pairs, yield* fieldSamples(repo, pairs));
+  const field: Work[] = pairs.map((pair) => ({ name: pair, seconds: (measured?.[pair] ?? JOB_SECONDS) * Number(process.env.PER_PAIR ?? 400) / 400 }));
   const partitioned = (name: string, duration: number): Work[] => {
     const count = Math.max(1, Math.ceil(duration / (JOB_SECONDS * 0.75)));
     return Array.from({ length: count }, (_, part) => ({ name: `${name}@${part}/${count}`, seconds: duration / count }));

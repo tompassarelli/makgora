@@ -165,6 +165,14 @@ jobs:
           name: balance-shard-${{ strategy.job-index }}
           path: ts/shards/*.json
           retention-days: 3
+      - name: Record this shard's measured work for the next balance plan
+        working-directory: ts
+        run: bun scripts/balanceTimings.ts > shard-timings.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: balance-shard-timings-${{ strategy.job-index }}
+          path: ts/shard-timings.json
+          retention-days: 30
 
   merge:
     needs: [plan, shard]
