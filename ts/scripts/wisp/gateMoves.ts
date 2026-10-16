@@ -35,8 +35,8 @@ const HAZARD_TRIES = 3;
 // A fresh private desktop's Xwayland drops the first XTEST motion.
 const POINTER_PRIME_ATTEMPTS = 3;
 
-export const isReplayWrittenDuringMatch = (file: string, modified: number, started: number, returnedToMenu: number): boolean =>
-  REPLAY.test(file) && modified >= started && modified <= returnedToMenu;
+export const isReplayFromMatch = (file: string, modified: number, started: number): boolean =>
+  REPLAY.test(file) && modified >= started;
 
 const spotLines = (fighters: readonly string[], results: readonly SpotResult[]) => results.map(({ step, pass, reason }) => `${pass ? "PASS" : "FAIL"} ${fighters.join(" vs ")} ${step}: ${reason}`);
 
@@ -55,8 +55,8 @@ const point = (viewport: Viewport, x: number, y: number) => ({
   y: Math.round(viewport.y + viewport.height - y * viewport.height / 0.6),
 });
 
-const newestReplay = (data: string, started: number, returnedToMenu: number, match: number) => pollUntil(Effect.try({
-  try: () => readdirSync(data).filter(file => isReplayWrittenDuringMatch(file, statSync(join(data, file)).mtimeMs, started, returnedToMenu)).sort((a, b) => Number(REPLAY.exec(b)?.[1]) - Number(REPLAY.exec(a)?.[1]))[0],
+const newestReplay = (data: string, started: number, match: number) => pollUntil(Effect.try({
+  try: () => readdirSync(data).filter(file => isReplayFromMatch(file, statSync(join(data, file)).mtimeMs, started)).sort((a, b) => Number(REPLAY.exec(b)?.[1]) - Number(REPLAY.exec(a)?.[1]))[0],
   catch: cause => new AcceptFailure({ operation: "moves gate replay", problem: String(cause) }),
 }), { every: "200 millis", within: "15 seconds", orElse: () => Effect.fail(new AcceptFailure({ operation: "moves gate replay", problem: `no replay written after match ${match}` })) });
 
@@ -223,10 +223,10 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
     yield* Effect.sleep("300 millis");
     yield* tap(host, "n");
     yield* phase("CHARACTER", ended, 20);
-    const manifest = yield* newestReplay(data, picked, ended, index + 1);
+    const manifest = yield* newestReplay(data, picked, index + 1);
     const lines = readReplay(join(data, manifest));
     if (typeof lines === "string") return yield* new AcceptFailure({ operation: "moves gate replay", problem: lines });
-    const stalls = yield* matchStalls(clients, [manifest, yield* newestReplay(join(guest.documents, "CustomMapData"), picked, ended, index + 1)], picked);
+    const stalls = yield* matchStalls(clients, [manifest, yield* newestReplay(join(guest.documents, "CustomMapData"), picked, index + 1)], picked);
     return { manifest, lines, schedule, runs, stalls };
   });
   for (const [index, pair] of smokePairs().entries()) {
