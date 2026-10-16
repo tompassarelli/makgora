@@ -13,6 +13,11 @@
   once, one process per pair, with each map built once; the merged report and
   each `shard-K/` are under the run's evidence folder. Declare
   a new native box there, next to the issue it closes, instead of a hand procedure.
+  Development-map profiles rebuild the script into the newest complete
+  `native-acceptance-YYYYMMDD` set under smashcraft-build-inputs (its
+  presentation .w3x and .w3x.base.lua). When accept reports that the map
+  does not carry a model, build a new dated set with `bun wisp map build
+  --profile main` rather than overwriting an old one.
   Move smoke (dev#467): `bun wisp accept --only gate-moves --pair K --map CANDIDATE.w3x`
   turns on Training on the candidate and stage hazards off on each stage
   screen (a match whose replay shows hazards on fails its setup), then plays

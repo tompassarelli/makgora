@@ -8,8 +8,8 @@ import { HIT_PRESENTATION_CASES } from "../../src/game/session/hitPresentationCa
 import { HERO_ROSTER, PLAYABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { FLOATING_STAGE_CHECKS, FLOATING_STAGE_MAPS, STAGE_COMPOSITION_CHECKS, STAGE_COMPOSITION_MAPS, STAGE_ENTRY_CHECKS, STAGE_ENTRY_MAPS, STAGE_FOG_CHECKS } from "./stageCompositionChecks";
-
 import { neutralSpecialChecks } from "./neutralSpecialChecks";
+import { newestPresentation } from "./presentationInputs";
 
 const inputs = join(homedir(), ".local/share/smashcraft-build-inputs");
 
@@ -25,7 +25,7 @@ export interface SmashcraftMapProfile {
 }
 
 
-const PRESENTATION = join(inputs, "native-acceptance-20261006/Smashcraft diagnostic native presentation.w3x");
+const PRESENTATION = newestPresentation(inputs);
 const LIGHTING = join(inputs, "visuals-170-20261007/Smashcraft diagnostic stage lighting.w3x");
 
 const heroes = HERO_ROSTER.filter(({ complete }) => complete);
