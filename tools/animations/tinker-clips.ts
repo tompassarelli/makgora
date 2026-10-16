@@ -1,3 +1,4 @@
+import { NO_GLOBAL_SEQ, floatVector } from './animVector';
 
 
 import { mkdirSync } from "node:fs";
@@ -108,7 +109,7 @@ const source=parseSource(await Bun.file(input).arrayBuffer()), model=structuredC
 ensure(source.Sequences.length===23,"Tinker authoring requires the unmodified classic 23-sequence model");
 const helperId=model.Nodes.length;
 const motion:mdx.Helper={Name:"Tinker Floor Motion",ObjectId:helperId,Parent:null,Flags:0,
-  PivotPoint:new Float32Array([0,0,0]),Translation:{LineType:1,GlobalSeqId:null,Keys:[]}};
+  PivotPoint:new Float32Array([0,0,0]),Translation:{LineType:1,GlobalSeqId: NO_GLOBAL_SEQ,Keys:[]}};
 for(const node of [...model.Bones,...model.Helpers,...model.Attachments,...model.CollisionShapes])if(node.Parent==null)node.Parent=helperId;
 model.Helpers.push(motion);model.Nodes.push(motion);model.PivotPoints.push(motion.PivotPoint);
 for(const sequence of source.Sequences)for(const Frame of sequence.Interval)
@@ -120,14 +121,14 @@ function sample(track: mdx.AnimVector, sequence: number, progress=0): Float32Arr
   const frame=seq.Interval[0]!+(seq.Interval[1]!-seq.Interval[0]!)*progress;
   const a=keys.findLast(k=>k.Frame<=frame)??keys[0]!, b=keys.find(k=>k.Frame>=frame)??keys.at(-1)!;
   if(track.LineType===0||a.Frame===b.Frame) return a.Vector.slice();
-  const t=(frame-a.Frame)/(b.Frame-a.Frame), sign=a.Vector.length===4&&a.Vector.reduce((sum,v,i)=>sum+v*b.Vector[i]!,0)<0?-1:1;
+  const t=(frame-a.Frame)/(b.Frame-a.Frame), sign=a.Vector.length===4&&floatVector(a.Vector).reduce((sum,v,i)=>sum+v*b.Vector[i]!,0)<0?-1:1;
   const vector=Float32Array.from(a.Vector,(v,i)=>v*(1-t)+b.Vector[i]!*sign*t);
   if(vector.length===4){ const length=Math.hypot(...vector); for(let i=0;i<4;i++)vector[i]/=length; } return vector;
 }
 function shapeAt(action:Action,frame:number):Shape {
   const a=action.phases.findLast(p=>p.frame<=frame)??action.phases[0]!,b=action.phases.find(p=>p.frame>=frame)??action.phases.at(-1)!;
   const t=a.frame===b.frame?0:(frame-a.frame)/(b.frame-a.frame);
-  return Object.fromEntries(["chest","head","right","left","elbow","legs","knees","root","yaw","height"].map(k=>[k,((a as Record<string,number>)[k]??0)*(1-t)+((b as Record<string,number>)[k]??0)*t]));
+  return Object.fromEntries(["chest","head","right","left","elbow","legs","knees","root","yaw","height"].map(k=>[k,(a[k as keyof Shape]??0)*(1-t)+(b[k as keyof Shape]??0)*t]));
 }
 function rotate(q:Float32Array|Int32Array,degrees:number,axis=1):Float32Array {
   const r=[0,0,0,Math.cos(degrees*Math.PI/360)];r[axis]=Math.sin(degrees*Math.PI/360);

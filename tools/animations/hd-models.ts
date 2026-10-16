@@ -1,3 +1,4 @@
+import { NO_INDEX } from './animVector';
 import { model as mdx } from '../../ts/scripts/clipNodes';
 import { checkBodySkin, checkRetarget, generateHdBody, parseHdBody, retargetHd } from './hd-retarget';
 import { canonicalMotion, classicSkeleton, rigNode, type FighterRig } from './canonical-rig';
@@ -13,7 +14,7 @@ import { clipNames } from './clip-names';
 
 /** The sequence indices each body plays: the fighter's production clips and its results-screen victory pose. */
 export interface PlayedMoves { readonly classic: readonly number[]; readonly definitive: readonly number[] }
-export function playedMoves(character: number, motion: mdx.Model): PlayedMoves {
+export function playedMoves(character: Character, motion: mdx.Model): PlayedMoves {
     const victory = clipNames(motion.Sequences).get(victoryAnimation(character));
     const played = new Set(flashableSequences(character, motion.Sequences).map(sequence => motion.Sequences.indexOf(sequence)));
     if (victory !== undefined) played.add(victory);
@@ -55,8 +56,8 @@ export function stockBody(stock: ArrayBuffer, rig: FighterRig): mdx.Model {
         const kept = hd.Geosets.map((_, index) => index).filter(index => !dropped.has(index));
         const animations = hd.GeosetAnims.map((_, index) => index).filter(index => kept.includes(hd.GeosetAnims[index].GeosetId));
         for (const bone of hd.Bones) {
-            bone.GeosetId = bone.GeosetId == null || !kept.includes(bone.GeosetId) ? null : kept.indexOf(bone.GeosetId);
-            bone.GeosetAnimId = bone.GeosetAnimId == null || !animations.includes(bone.GeosetAnimId) ? null : animations.indexOf(bone.GeosetAnimId);
+            bone.GeosetId = bone.GeosetId == null || !kept.includes(bone.GeosetId) ? NO_INDEX : kept.indexOf(bone.GeosetId);
+            bone.GeosetAnimId = bone.GeosetAnimId == null || !animations.includes(bone.GeosetAnimId) ? NO_INDEX : animations.indexOf(bone.GeosetAnimId);
         }
         hd.GeosetAnims = animations.map(index => ({ ...hd.GeosetAnims[index], GeosetId: kept.indexOf(hd.GeosetAnims[index].GeosetId) }));
         hd.Geosets = kept.map(index => hd.Geosets[index]);

@@ -17,7 +17,7 @@ for (const family of ["animation-assets", "illidan-animation", "hero-models", "i
   chmodSync(join(output, family), 0o755);
 }
 
-function pitch(q: Float32Array | Int32Array, degrees: number): Float32Array {
+function pitch(q: Float32Array | Int32Array, degrees: number): Float32Array<ArrayBuffer> {
   const s = Math.sin(degrees * Math.PI / 360), c = Math.cos(degrees * Math.PI / 360);
   const [x = 0, y = 0, z = 0, w = 1] = q;
   return new Float32Array([c * x + s * z, c * y + s * w, c * z - s * x, c * w - s * y]);

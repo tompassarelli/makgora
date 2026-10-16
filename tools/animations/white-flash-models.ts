@@ -33,7 +33,7 @@ const [assetsArg, outputArg, option, characterArg] = process.argv.slice(2);
 const definitiveOnly = option === "--definitive";
 if (assetsArg === undefined || outputArg === undefined || (option !== undefined && !definitiveOnly && (option !== "--character" || characterArg === undefined))) throw new Error("usage: bun tools/animations/white-flash-models.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--character ID | --definitive]");
 const selected = characterArg === undefined ? undefined : Number(characterArg);
-if (selected !== undefined && (!Number.isInteger(selected) || !fighters.has(selected))) throw new Error("Choose a fighter number from the roster");
+if (selected !== undefined && (!Number.isInteger(selected) || !fighters.has(selected as Character))) throw new Error("Choose a fighter number from the roster");
 const assets = resolve(assetsArg), output = resolve(outputArg);
 if (!relative(resolve(import.meta.dir, "../.."), output).startsWith("..")) throw new Error("White fighter models must stay in private storage");
 const hash = (bytes: Uint8Array) => new Bun.CryptoHasher("sha256").update(bytes).digest("hex");
@@ -51,7 +51,7 @@ async function whiteTexture(path: string, graphics: "classic" | "definitive" = "
   const bytes = await sourceAssets.readAsset(path, graphics);
   if (bytes === undefined) throw new Error(`Missing body texture ${path}`);
   let pixels: { width: number; height: number; data: Uint8Array | Uint8ClampedArray };
-  if (String.fromCharCode(...bytes.subarray(0, 3)) === "BLP") pixels = getBLPImageData(decodeBLP(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength)), 0);
+  if (String.fromCharCode(...bytes.subarray(0, 3)) === "BLP") pixels = getBLPImageData(decodeBLP(bytes.slice().buffer), 0);
   else if (bytes[0] === 137 && bytes[1] === 80) pixels = PNG.sync.read(Buffer.from(bytes));
   else {
     const convert = Bun.spawn(["magick", path.toLowerCase().endsWith(".tga") ? "tga:-" : "-", "png:-"], { stdin: bytes, stdout: "pipe", stderr: "pipe" });
@@ -106,11 +106,11 @@ async function definitiveWhite(character: number, name: string, filename: string
     material.Layers.every(layer => layer.FilterMode === mdx.FilterMode.Additive || layer.FilterMode === mdx.FilterMode.AddAlpha)
       || material.Layers.some(layer => typeof layer.TextureID === "number" && model.Textures[layer.TextureID]?.ReplaceableId === 2)
       ? [index] : []));
-  const solid = model.Textures.push({ Image: `war3mapImported\\${textureName}`, ReplaceableId: 0, Flags: 0 }) - 1;
+  const solid = model.Textures.push({ Image: `war3mapImported\\${textureName}`, ReplaceableId: 0, Flags: 0 as mdx.TextureFlags }) - 1;
   const whiteDiffuse = new Map<number, number>();
   for (const material of model.Materials) {
     for (const layer of material.Layers) {
-      layer.Shading = (layer.Shading | mdx.LayerShading.Unshaded) & ~mdx.LayerShading.NoDepthSet;
+      layer.Shading = ((layer.Shading ?? 0) | mdx.LayerShading.Unshaded) & ~mdx.LayerShading.NoDepthSet;
       if (layer.FilterMode === mdx.FilterMode.Transparent || layer.FilterMode === mdx.FilterMode.None) layer.FilterMode = mdx.FilterMode.Blend;
       if (typeof layer.TextureID === "number") {
         const diffuse = layer.TextureID;
@@ -143,7 +143,7 @@ async function definitiveWhite(character: number, name: string, filename: string
 if (definitiveOnly) {
   let count = 0;
   for (const [character, path] of Object.entries(WHITE_FIGHTER_MODELS)) {
-    const fighter = fighters.get(Number(character));
+    const fighter = fighters.get(Number(character) as Character);
     if (fighter === undefined) throw new Error(`No roster fighter ${character}`);
     const filename = path.replace("war3mapImported\\", "");
     const definitive = await definitiveWhite(Number(character), fighter.name, filename);
@@ -178,7 +178,7 @@ for (const [character, fighter] of fighters.entries()) {
       ? [index] : []));
   for (const material of model.Materials) {
     for (const layer of material.Layers) {
-      layer.Shading = (layer.Shading | mdx.LayerShading.Unshaded) & ~mdx.LayerShading.NoDepthSet;
+      layer.Shading = ((layer.Shading ?? 0) | mdx.LayerShading.Unshaded) & ~mdx.LayerShading.NoDepthSet;
       // Blend only: a Transparent layer alpha-tests out at alpha 190, and a None layer draws the copy before the body, which then paints over it.
       if (layer.FilterMode === mdx.FilterMode.Transparent || layer.FilterMode === mdx.FilterMode.None) layer.FilterMode = mdx.FilterMode.Blend;
     }
@@ -239,5 +239,5 @@ for (const character of fighters.keys()) {
 writeGenerated(WHITE_MODEL_INDEX, whiteModelIndex(shardOrder(WHITE_MODEL_INDEX, WHITE_MODELS, ".ts", fighters.keys())));
 writeGenerated(WHITE_FACT_INDEX, whiteFactsIndex(shardOrder(WHITE_FACT_INDEX, WHITE_FACTS, ".ts", fighters.keys())));
 if (selected === undefined) writeModelFacts(whiteModelFactsTable(readModelFacts(), Object.values(paths), facts));
-else replaceModelFacts([`war3mapImported\\${fighters.get(selected)!.name}White-`], whiteModelFactsTable({}, [paths[selected]!], facts));
+else replaceModelFacts([`war3mapImported\\${fighters.get(selected as Character)!.name}White-`], whiteModelFactsTable({}, [paths[selected]!], facts));
 console.log(`${selected === undefined ? Object.keys(paths).length : 1} white body models updated: original mesh and flashable animation keys retained on one seekable timeline, emitters/lights removed`);

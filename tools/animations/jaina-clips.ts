@@ -1,3 +1,4 @@
+import { NO_GLOBAL_SEQ, type KeyVector } from './animVector';
 
 
 import { mkdirSync } from "node:fs";
@@ -72,7 +73,7 @@ function aimArm(index:number,start:number,action:Action,phases:readonly Phase[],
  const sample=start+Math.round(action.contact*1000/60);data.frame=sample;
  const base=(n:mdx.Node)=>source.Nodes[n.ObjectId]?.Rotation?.Keys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1])?.Vector??new Float32Array([0,0,0,1]);
  const key=(n:mdx.Node,frame:number)=>n.Rotation!.Keys.find(k=>k.Frame===start+Math.round(frame*1000/60))!;
- const set=(n:mdx.Node,frame:number,q:Float32Array)=>{const k=key(n,frame);k.Vector=q;if(k.InTan){k.InTan=q.slice();k.OutTan=q.slice();}};
+ const set=(n:mdx.Node,frame:number,q:KeyVector)=>{const k=key(n,frame);k.Vector=q;if(k.InTan){k.InTan=q.slice();k.OutTan=q.slice();}};
  const point=(n:mdx.Node):Point=>{const p=model.PivotPoints[n.ObjectId]!,m=data.nodes[n.ObjectId].matrix;return [m[0]*p[0]+m[4]*p[1]+m[8]*p[2]+m[12],m[1]*p[0]+m[5]*p[1]+m[9]*p[2]+m[13],m[2]*p[0]+m[6]*p[1]+m[10]*p[2]+m[14]];};
  const armBase=base(arm),elbowBase=base(elbow),handBase=base(hand),angles=[left?action.gesture.leftArm??0:action.gesture.arm??0,0,left?0:action.gesture.wrist??0,0];set(hand,action.contact,handBase.slice());
  const loss=()=>{set(arm,action.contact,rotated(armBase,angles[0]!,angles[1]!));set(elbow,action.contact,rotated(elbowBase,angles[2]!,angles[3]!));renderer.update(0);const p=point(hand);return p.reduce((sum,v,i)=>sum+(v-target[i]!)**2,0);};
@@ -142,7 +143,7 @@ for(const [ordinal,action]of [...actions,...damageActions].entries()){
  if(["downSpecial","downSpecialAir"].includes(action.pose))aimArm(index,start,action,phases,true,[35,12,32]);
 
  const center=model.Nodes.find(b=>b.Name==="Bone_RootArchDruid");ensure(center,"No Jaina root");
- if(!center.Translation)center.Translation={LineType:1,GlobalSeqId:null,Keys:source.Sequences.flatMap(s=>Array.from(s.Interval).map(Frame=>({Frame,Vector:new Float32Array([0,0,0])})))};
+ if(!center.Translation)center.Translation={LineType:1,GlobalSeqId: NO_GLOBAL_SEQ,Keys:source.Sequences.flatMap(s=>Array.from(s.Interval).map(Frame=>({Frame,Vector:new Float32Array([0,0,0])})))};
  const beforeKeys=center.Translation.Keys.filter(k=>k.Frame<start);
  const drawn=new DrawnModel(generateMDX(model),1);
  const translations:mdx.AnimKeyframe[]=[];

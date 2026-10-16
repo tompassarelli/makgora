@@ -1,3 +1,4 @@
+import { floatVector } from './animVector';
 import { chmodSync, mkdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { generateMDX, ModelRenderer, model as mdx } from "war3-model";
@@ -381,11 +382,11 @@ const POSES: Readonly<Record<string, () => Authored>> = {
   forwardTiltUp: kicked(() => sideKick("forwardTiltUp", AttackStyle.forwardTiltUp, [30, 80], [74, 108], [82, 120], -26, [34, 72], [30, 40], 2.5)),
 };
 
-function rotation(base: ArrayLike<number>, pitch: number, yaw = 0, roll = 0): Float32Array {
+function rotation(base: ArrayLike<number>, pitch: number, yaw = 0, roll = 0): Float32Array<ArrayBuffer> {
   const q = quat.create(); quat.rotateY(q, q, pitch * Math.PI / 180); quat.rotateZ(q, q, yaw * Math.PI / 180); quat.rotateX(q, q, roll * Math.PI / 180);
   quat.multiply(q, q, Float32Array.from(base)); quat.normalize(q, q); return new Float32Array(q);
 }
-function depthTurn(base: ArrayLike<number>, parent: ArrayLike<number>, degrees: number, world = 1): Float32Array {
+function depthTurn(base: ArrayLike<number>, parent: ArrayLike<number>, degrees: number, world = 1): Float32Array<ArrayBuffer> {
   const axis = [0, 1, 2].map(i => parent[i * 4 + world]! / Math.hypot(parent[i * 4]!, parent[i * 4 + 1]!, parent[i * 4 + 2]!)), n = Math.hypot(...axis);
   const q = quat.setAxisAngle(quat.create(), axis.map(v => v / n) as [number, number, number], degrees * Math.PI / 180);
   quat.multiply(q, q, Float32Array.from(base)); quat.normalize(q, q); return new Float32Array(q);
@@ -619,7 +620,7 @@ for (const pose of selected) {
     let previous: Float32Array | undefined;
     for (const phase of action.phases) {
       const [pitch, yaw, roll] = node ? joint(node.Name, phase.gesture) : [0, 0, 0];
-      const Vector = node ? rotation(first.Vector, pitch, yaw, roll) : first.Vector.slice();
+      const Vector = node ? rotation(first.Vector, pitch, yaw, roll) : floatVector(first.Vector);
       if (node && previous && Vector.reduce((sum, v, i) => sum + v * previous![i]!, 0) < 0) Vector.forEach((v, i) => { Vector[i] = -v; });
       previous = Vector;
       const tangent = () => match || track.LineType === mdx.LineType.Bezier ? Vector.slice() : new Float32Array(Vector.length);

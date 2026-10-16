@@ -18,7 +18,7 @@ const expectationsOnly = process.argv.includes("--expectations-only");
 mkdirSync(output, { recursive: true });
 const throws = [GrabAction.throwForward, GrabAction.throwBack, GrabAction.throwUp, GrabAction.throwDown] as const;
 const names = ["forward", "back", "up", "down"] as const;
-function play(character: number, targetCharacter: number, holder: number, runFrames: number, action?: GrabAction, required = true) {
+function play(character: Character, targetCharacter: Character, holder: number, runFrames: number, action?: GrabAction, required = true) {
   const game = createMatchState();
   game.phase = Phase.match;
   const world = createRoster(3, [createFighter(holder === 0 ? character : targetCharacter, matchSpawnX(0), 1), createFighter(holder === 1 ? character : targetCharacter, matchSpawnX(1), -1)]);

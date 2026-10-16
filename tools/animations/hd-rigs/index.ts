@@ -1,3 +1,4 @@
+import type { Character } from "../../../ts/src/game/sim/codes";
 import type { FighterRig } from '../canonical-rig';
 import * as rifleman from './rifleman';
 import * as illidan from './illidan';
@@ -27,7 +28,7 @@ import * as medivh from './medivh';
 import * as kobold from './kobold';
 
 /** Every fighter's Classic and Definitive mappings onto the canonical rig, by character (#366). */
-export const FIGHTER_RIGS: ReadonlyMap<number, FighterRig> = new Map([
+export const FIGHTER_RIGS: ReadonlyMap<Character, FighterRig> = new Map([
     rifleman, illidan, blademaster, mountainking, warden, lich, forsakenpaladin, dreadlord, shadowhunter, pitlord, beastmaster, lichking, thrall,
     jaina, sylvanas, cairne, chen, peon, tinker, kaelthas, murloc, grom, anubarak, malfurion, medivh, kobold,
 ].map(rig => [rig.character, rig as FighterRig]));

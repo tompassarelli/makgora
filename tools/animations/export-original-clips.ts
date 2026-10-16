@@ -1,3 +1,4 @@
+import type { Character } from "../../ts/src/game/sim/codes";
 
 
 
@@ -169,7 +170,7 @@ for (const [character, fighter] of fighters) {
 }
 for (const [character, clips] of moduleClips.entries()) if (clips !== undefined) {
     const slug = fighterSlug(character);
-    writeGenerated(join(CLIPS, `${slug}.ts`), clipFile(fighters.get(character)!.name, clips, moduleNames[character]!, moduleLights[character] ?? undefined));
+    writeGenerated(join(CLIPS, `${slug}.ts`), clipFile(fighters.get(character as Character)!.name, clips, moduleNames[character]!, moduleLights[character] ?? undefined));
 }
 writeGenerated(join(CLIPS, 'fighterOriginalClip.ts'), clipTypeFile());
 writeGenerated(CLIP_INDEX, clipIndex(shardOrder(CLIP_INDEX, CLIPS, '.ts', fighters.keys()), {...staticLightGate, seconds: seconds(staticLightGate.seconds)}));

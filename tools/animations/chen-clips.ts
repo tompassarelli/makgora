@@ -1,3 +1,4 @@
+import { NO_GLOBAL_SEQ } from './animVector';
 
 
 import { mkdirSync } from "node:fs";
@@ -135,7 +136,7 @@ for (let height = 0; height < 3; height++) for (let strength = 0; strength < 3; 
   for (const key of Object.keys(gesture) as (keyof Gesture)[]) gesture[key] = (gesture[key] ?? 0) * gain;
   damage.push({pose: "damageGround", frames: 24, contact: 1, hold: true, gesture});
 }
-function rotated(q: ArrayLike<number>, pitch: number, yaw = 0): Float32Array {
+function rotated(q: ArrayLike<number>, pitch: number, yaw = 0): Float32Array<ArrayBuffer> {
   const y = pitch * Math.PI / 360, z = yaw * Math.PI / 360;
   const a = [-Math.sin(y) * Math.sin(z), Math.sin(y) * Math.cos(z), Math.cos(y) * Math.sin(z), Math.cos(y) * Math.cos(z)];
   const [x = 0, v = 0, w = 0, s = 1] = Array.from(q);
@@ -214,7 +215,7 @@ for (const [ordinal, action] of [...actions, ...damage].entries()) {
   const shortHand = ["jab", "jab3", "upTilt", "dashAttack"].includes(action.pose);
   if (shortHand) {
     const arm=model.Helpers.find(n=>n.Name==="Bone_Arm1_R");ensure(arm,"Chen keg arm missing");
-    if (!arm.Scaling) arm.Scaling={LineType:mdx.LineType.Linear,GlobalSeqId:null,
+    if (!arm.Scaling) arm.Scaling={LineType:mdx.LineType.Linear,GlobalSeqId: NO_GLOBAL_SEQ,
       Keys:source.Sequences.flatMap(s=>Array.from(s.Interval).map(Frame=>({Frame,Vector:new Float32Array([1,1,1])})))};
     for(const frame of phaseFrames){
       const activeEnd=action.contact+(action.active??4)-1;
@@ -228,7 +229,7 @@ for (const [ordinal, action] of [...actions, ...damage].entries()) {
   };
   const extendedLeg = footTargets[action.pose] ? model.Helpers.find(n=>n.Name===(action.pose==="backAir"?"Bone_Leg1_R":"Bone_Leg1_L")) : undefined;
   if (extendedLeg) {
-    if (!extendedLeg.Scaling) extendedLeg.Scaling = {LineType: mdx.LineType.Linear, GlobalSeqId: null,
+    if (!extendedLeg.Scaling) extendedLeg.Scaling = {LineType: mdx.LineType.Linear, GlobalSeqId: NO_GLOBAL_SEQ,
       Keys: source.Sequences.flatMap(s=>Array.from(s.Interval).map(Frame=>({Frame,Vector:new Float32Array([1,1,1])})))};
     for(const frame of phaseFrames){
       const activeEnd=action.contact+(action.active??4)-1;
@@ -252,12 +253,12 @@ for (const [ordinal, action] of [...actions, ...damage].entries()) {
         if(afterFrame!==undefined&&frame<afterFrame)continue;
         const activeEnd=action.contact+(action.active??4)-1;
         const amount=onlyFrame!==undefined||action.hold?1:frame===0||frame===action.frames?0:frame<action.contact?-0.3:frame<=activeEnd?1:Math.max(0,(action.frames-frame)/(action.frames-activeEnd));
-        const key=node.Rotation!.Keys.find(k=>k.Frame===start+Math.round(frame*1000/60))!;
+        const key=node!.Rotation!.Keys.find(k=>k.Frame===start+Math.round(frame*1000/60))!;
         key.Vector=rotated(bases[part]!,angles[part*2]!*amount,angles[part*2+1]!*amount);
         if(key.InTan){key.InTan=key.Vector.slice();key.OutTan=key.Vector.slice();}
       }
     }
-    function loss(){set();renderer.update(0);const a=data.nodes[endpoint.ObjectId].matrix;
+    function loss(){set();renderer.update(0);const a=data.nodes[endpoint!.ObjectId].matrix;
       const x=a[0]*pivot[0]+a[4]*pivot[1]+a[8]*pivot[2]+a[12], y=a[1]*pivot[0]+a[5]*pivot[1]+a[9]*pivot[2]+a[13], z=a[2]*pivot[0]+a[6]*pivot[1]+a[10]*pivot[2]+a[14];
       return (x-target[0])**2+(z-target[1])**2+y*y*0.02;
     }
@@ -277,7 +278,7 @@ for (const [ordinal, action] of [...actions, ...damage].entries()) {
   const footTarget=footTargets[action.pose];if(footTarget)fit(action.pose==="backAir"?["Bone_Leg1_R","Bone_Leg2_R","Bone_Foot_R"]:["Bone_Leg1_L","Bone_Leg2_L","Bone_Foot_L"],footTarget);
   if(action.rear)fit(["Bone_Arm1_L","Bone_Arm2_L","Bone Rope"],[-105,action.pose==="downSmash"?26:40],action.contact+3);
   const root = model.Helpers.find(n => n.Name === "Bone_Root"); ensure(root, "Chen root missing");
-  if (!root.Translation) root.Translation = {LineType: mdx.LineType.Linear, GlobalSeqId: null,
+  if (!root.Translation) root.Translation = {LineType: mdx.LineType.Linear, GlobalSeqId: NO_GLOBAL_SEQ,
     Keys: source.Sequences.flatMap(s => Array.from(s.Interval).map(Frame => ({Frame, Vector: new Float32Array([0,0,0])})))};
   if (!action.air) {
     const drawn = new DrawnModel(generateMDX(model), 1);

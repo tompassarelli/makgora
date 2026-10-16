@@ -1,3 +1,4 @@
+import type { Character } from "../src/game/sim/codes";
 import { IMPORTED_MODEL_FILES } from "../src/game/assets/importedModelInfo";
 import { HERO_ROSTER } from "../src/game/sim/heroes/registry";
 import { heroLook } from "../src/game/roster/looks";
@@ -18,7 +19,7 @@ export function heroModelSource(model: string): string {
   return imported !== undefined ? `imported-models/${imported}` : `hero-models/${stockModelPath(model).split("/").at(-1) ?? ""}`;
 }
 
-export const fighters: ReadonlyMap<number, { readonly name: string; readonly source: string; readonly stock?: string }> = new Map([
+export const fighters: ReadonlyMap<Character, { readonly name: string; readonly source: string; readonly stock?: string }> = new Map([
   [1, { name: "Rifleman", source: "animation-assets/RiflemanFighter.mdx" }],
   [2, { name: "Illidan", source: "illidan-animation/DemonHunterFighter.mdx" }],
   ...HERO_ROSTER.toSorted((a, b) => a.character - b.character).map((hero) => [hero.character, {

@@ -228,7 +228,7 @@ for (let height=0;height<3;height++) for (let strength=0;strength<3;strength++) 
     : {head:-50*gain,chest:-28*gain,arm:42*gain,free:55*gain,hip:15*gain,knee:22*gain};
   damageActions.push({pose:"damageGround",frames:24,contact:0,gesture,hold:true,damage:true});
 }
-function rotation(base: ArrayLike<number>, pitch:number, yaw=0): Float32Array {
+function rotation(base: ArrayLike<number>, pitch:number, yaw=0): Float32Array<ArrayBuffer> {
   const q=quat.create(); quat.rotateY(q,q,pitch*Math.PI/180); quat.rotateZ(q,q,yaw*Math.PI/180);
   quat.multiply(q,q,Float32Array.from(base)); quat.normalize(q,q); return new Float32Array(q);
 }

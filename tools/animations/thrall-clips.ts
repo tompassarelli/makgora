@@ -1,3 +1,4 @@
+import { NO_GLOBAL_SEQ } from './animVector';
 
 
 import { mkdirSync } from "node:fs";
@@ -93,7 +94,7 @@ for(const [ordinal,action]of [...actions,...damageActions].entries()){
  tracks(model,track=>{if(!onGlobalClock(track))track.Keys.sort((a,b)=>a.Frame-b.Frame);});
 
  const center=model.Nodes.find(b=>b.Name==="Bone Center");ensure(center,"No mount root");
- if(!center.Translation)center.Translation={LineType:1,GlobalSeqId:null,Keys:source.Sequences.flatMap(s=>Array.from(s.Interval).map(Frame=>({Frame,Vector:new Float32Array([0,0,0])})))};
+ if(!center.Translation)center.Translation={LineType:1,GlobalSeqId: NO_GLOBAL_SEQ,Keys:source.Sequences.flatMap(s=>Array.from(s.Interval).map(Frame=>({Frame,Vector:new Float32Array([0,0,0])})))};
  if (["jab","jab2","forwardTilt","forwardTiltUp","forwardTiltDown","upTilt","downTilt","dashAttack","forwardSmash","upSmash","downSmash","neutralAir","forwardAir","backAir","upAir","downAir","throwForward","throwBack","throwUp","throwDown"].includes(action.pose)) {
   const headContact = ["jab","jab2","forwardTilt"].includes(action.pose);
   const target = action.pose === "jab" ? [45,70] : action.pose === "jab2" ? [50,72] : action.pose === "forwardTilt" ? [92,75] : action.pose.includes("Up") || action.pose.startsWith("up") ? [5,180] : action.pose==="downAir" ? [20,105] : action.pose.includes("Down") || action.pose.startsWith("down") ? [30,110] : action.pose.includes("Back") || action.pose.startsWith("back") ? [-65,135] : [60,130];

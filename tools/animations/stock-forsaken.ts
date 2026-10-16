@@ -43,7 +43,7 @@ export function checkStockGeosets(stock: mdx.Model, model: mdx.Model, sequences:
     const stand = stock.Sequences.findIndex(sequence => /^Stand(?:\s+\d+)?$/.test(sequence.Name));
     if (stand < 0) throw new Error('Stock model has no Stand');
     reference.setSequence(stand); stockData.frame = stock.Sequences[stand].Interval[0]; reference.update(0);
-    const required = stock.Geosets.flatMap((geoset, index) => stock.Materials[geoset.MaterialID].Layers.some(layer => layer.FilterMode <= 2)
+    const required = stock.Geosets.flatMap((geoset, index) => stock.Materials[geoset.MaterialID].Layers.some(layer => layer.FilterMode !== undefined && layer.FilterMode <= 2)
         && stockData.geosetAlpha[index] > 0 ? [index] : []);
     for (const index of required) {
         const original = stock.Geosets[index], actual = model.Geosets[index];

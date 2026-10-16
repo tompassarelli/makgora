@@ -14,7 +14,7 @@ function visibility(model: mdx.Model) {
         renderer.setFrame(frame);
         const opacity: number = alpha.call(renderer, geoset);
         const material = model.Materials[model.Geosets[geoset].MaterialID];
-        return opacity > 0 && material.Layers.some(layer => layer.FilterMode <= 2 && value.call(interpolation, layer.Alpha, 1) > 0);
+        return opacity > 0 && material.Layers.some(layer => layer.FilterMode !== undefined && layer.FilterMode <= 2 && value.call(interpolation, layer.Alpha, 1) > 0);
     };
 }
 

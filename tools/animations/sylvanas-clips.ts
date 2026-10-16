@@ -105,7 +105,7 @@ function poseAt(action: Action, frame: number): Gesture {
   const t = a.at === b.at ? 0 : (frame - a.at) / (b.at - a.at);
   return Object.fromEntries([...new Set([...Object.keys(a.pose), ...Object.keys(b.pose)])].map(k => [k, (a.pose[k as keyof Gesture] ?? 0) * (1-t) + (b.pose[k as keyof Gesture] ?? 0) * t]));
 }
-function rotate(q: Float32Array | Int32Array, pitch: number, yaw = 0): Float32Array {
+function rotate(q: Float32Array | Int32Array, pitch: number, yaw = 0): Float32Array<ArrayBuffer> {
   const y = pitch * Math.PI / 360, z = yaw * Math.PI / 360;
   const a = [-Math.sin(y)*Math.sin(z), Math.sin(y)*Math.cos(z), Math.cos(y)*Math.sin(z), Math.cos(y)*Math.cos(z)];
   const [x=0,v=0,w=0,s=1] = q;

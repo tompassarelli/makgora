@@ -27,19 +27,19 @@ const normalDonors: readonly [HeroPose, AttackStyle, number][] = [
     ["upAir", AttackStyle.upAir, 5], ["downAir", AttackStyle.downAir, 27],
 ];
 
-function valueAt(track: mdx.AnimVector, first: number, last: number, frame: number, rotation: boolean): Float32Array {
+function valueAt(track: mdx.AnimVector, first: number, last: number, frame: number, rotation: boolean): Float32Array<ArrayBuffer> {
     ensure(track.LineType === mdx.LineType.Linear, "Stock weapon donors require their canonical linear interpolation");
     const keys = track.Keys.filter(key => key.Frame >= first && key.Frame <= last);
     ensure(keys.length > 0, "Donor track is empty");
     const left = [...keys].reverse().find(key => key.Frame <= frame) ?? keys[0]!;
     const right = keys.find(key => key.Frame >= frame) ?? keys[keys.length - 1]!;
-    if (left === right || track.LineType === mdx.LineType.DontInterp) return Float32Array.from(left.Vector);
+    if (left === right) return Float32Array.from(left.Vector);
     const t = (frame - left.Frame) / (right.Frame - left.Frame);
     if (rotation) return Float32Array.from(quat.slerp(quat.create(), Float32Array.from(left.Vector), Float32Array.from(right.Vector), t));
     return Float32Array.from(left.Vector, (v, i) => v + (right.Vector[i]! - v) * t);
 }
 
-function corrected(base: Float32Array, angles: readonly number[]): Float32Array {
+function corrected(base: Float32Array, angles: readonly number[]): Float32Array<ArrayBuffer> {
     const q = quat.create();
     quat.rotateY(q, q, angles[0]! * Math.PI / 180);
     quat.rotateZ(q, q, angles[1]! * Math.PI / 180);

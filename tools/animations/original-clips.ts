@@ -1,3 +1,4 @@
+import { NO_GLOBAL_SEQ } from './animVector';
 import { parseModelMDX as parseMDX, generateModelMDX as generateMDX } from '../../ts/scripts/mdxCodec';
 
 
@@ -60,7 +61,7 @@ function sourceBodyTracks(source: mdx.Model): ReadonlyMap<string, mdx.AnimVector
 export const onGlobalClock = (track: mdx.AnimVector) =>
     track.GlobalSeqId != null && track.GlobalSeqId !== -1 && track.GlobalSeqId !== 0xffffffff;
 
-export function bounds(items: mdx.GeosetAnimInfo[]) {
+export function bounds(items: readonly mdx.GeosetAnimInfo[]) {
     ensure(items.length > 0, 'Cannot union empty extents');
     return {
         MinimumExtent: new Float32Array([0, 1, 2].map(i => Math.min(...items.map(x => x.MinimumExtent[i])))),
@@ -200,7 +201,7 @@ export function splitStaticLights(source: mdx.Model): {body: mdx.Model, lights: 
     lights.PivotPoints = lights.Lights.map(light => structuredClone(source.PivotPoints[light.ObjectId]));
     lights.Lights.forEach((light, id) => {
         light.ObjectId = id;
-        light.Visibility = {LineType: mdx.LineType.DontInterp, GlobalSeqId: null, Keys: [
+        light.Visibility = {LineType: mdx.LineType.DontInterp, GlobalSeqId: NO_GLOBAL_SEQ, Keys: [
             ...staticLightGate.activeInterval.map(Frame => ({Frame, Vector: new Float32Array([1])})),
             ...staticLightGate.inactiveInterval.map(Frame => ({Frame, Vector: new Float32Array([0])})),
         ]};

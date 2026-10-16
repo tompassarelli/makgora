@@ -25,7 +25,7 @@ const gestures = [
   {character:Character.pitLord,name:"Four Hooves",chest:-15,wrist:0,arm:-70,knee:0},
   {character:Character.beastmaster,name:"Twin Axe Drop",chest:35,wrist:90,arm:-15,knee:65},
 ];
-function pitch(q: Float32Array | Int32Array, degrees: number): Float32Array {
+function pitch(q: Float32Array | Int32Array, degrees: number): Float32Array<ArrayBuffer> {
   const s=Math.sin(degrees*Math.PI/360),c=Math.cos(degrees*Math.PI/360),[x=0,y=0,z=0,w=1]=q;
   const v=new Float32Array([c*x+s*z,c*y+s*w,c*z-s*x,c*w-s*y]);
   const norm=Math.hypot(...v);for(let i=0;i<v.length;i++)v[i]=v[i]!/norm;return v;

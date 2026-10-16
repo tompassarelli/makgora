@@ -1,4 +1,5 @@
-import { mat4, quat, vec3 } from '../../ts/node_modules/gl-matrix';
+import { NO_GLOBAL_SEQ } from './animVector';
+import { mat4, quat, vec3 } from 'gl-matrix';
 import { ModelRenderer } from '../../ts/node_modules/war3-model';
 import { model as mdx } from '../../ts/scripts/clipNodes';
 import { originalClip } from '../../ts/src/generated/clips/fighterOriginalClipInfo';
@@ -8,7 +9,7 @@ import { ensure } from './original-clips';
 import { generateHdBody, parseHdBody } from './hd-retarget';
 
 type Pose = { frame: number; nodes: { matrix: mat4 }[] };
-type Point = Float32Array;
+type Point = vec3;
 type Capsule = { a: { ObjectId: number }; b: { ObjectId: number }; radius: number };
 
 function distance(a: Point, b: Point): number { return vec3.distance(a, b); }
@@ -145,7 +146,7 @@ export function fitBlademasterGrip(motion: mdx.Model, bytes: ArrayBuffer, pairs:
         }
     }
     ensure(translations.size > 0, 'Blademaster Definitive grip fit produced no keys');
-    weapon.Translation = { LineType: mdx.LineType.Linear, GlobalSeqId: null, Keys: [...translations].toSorted(([a], [b]) => a - b).map(([Frame, Vector]) => ({ Frame, Vector })) };
-    weapon.Rotation = { LineType: mdx.LineType.Linear, GlobalSeqId: null, Keys: [...rotations].toSorted(([a], [b]) => a - b).map(([Frame, Vector]) => ({ Frame, Vector })) };
+    weapon.Translation = { LineType: mdx.LineType.Linear, GlobalSeqId: NO_GLOBAL_SEQ, Keys: [...translations].toSorted(([a], [b]) => a - b).map(([Frame, Vector]) => ({ Frame, Vector })) };
+    weapon.Rotation = { LineType: mdx.LineType.Linear, GlobalSeqId: NO_GLOBAL_SEQ, Keys: [...rotations].toSorted(([a], [b]) => a - b).map(([Frame, Vector]) => ({ Frame, Vector })) };
     return { bytes: generateHdBody(model), report: { sequences: motion.Sequences.length, samples, keys: translations.size, maxGapBefore: maxGap, maxTranslation, maxRotation, unresolved } };
 }

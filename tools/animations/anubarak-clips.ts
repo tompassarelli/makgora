@@ -1,3 +1,4 @@
+import { floatVector } from './animVector';
 
 import { mkdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
@@ -206,7 +207,7 @@ function joint(name: string, g: Gesture): [number, number] {
   if (name === "Bone_Root") return [g.lean ?? 0, 0];
   return [0, 0];
 }
-function blend(from: ArrayLike<number>, to: ArrayLike<number>, weight: number): Float32Array {
+function blend(from: ArrayLike<number>, to: ArrayLike<number>, weight: number): Float32Array<ArrayBuffer> {
   let dot = 0; for (let i = 0; i < 4; i++) dot += from[i]! * to[i]!;
   const sign = dot < 0 ? -1 : 1;
   const vector = Array.from({ length: 4 }, (_, i) => from[i]! * (1 - weight) + sign * to[i]! * weight);
@@ -327,7 +328,7 @@ for (const [ordinal, action] of authoredActions.entries()) {
       const chain = ["Bone_Arm1R", "Bone_Arm2R", "Bone_Arm3R"].map(name => [...model.Bones, ...model.Helpers].find(n => n.Name === name)!);
       for (const node of chain) if (!rotations.includes(node)) {
         rotations.push(node); base.push(node.Rotation!.Keys.find(k => k.Frame === at(0))!.Vector.slice());
-        const vector = node.Rotation!.Keys.find(k => k.Frame === at(action.contact))!.Vector.slice(); contact.push(vector); preparation.push(base.at(-1)!);
+        const vector = floatVector(node.Rotation!.Keys.find(k => k.Frame === at(action.contact))!.Vector); contact.push(vector); preparation.push(floatVector(base.at(-1)!));
       }
       rotations.forEach((node, i) => { const key = node.Rotation!.Keys.find(k => k.Frame === at(action.contact))!; key.Vector = contact[i]!.slice(); if (key.InTan) { key.InTan = key.Vector.slice(); key.OutTan = key.Vector.slice(); } });
       const renderer = new ModelRenderer(model); renderer.setSequence(index);

@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "lib": ["ESNext"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noEmitOnError": true,
+    "incremental": true,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "rootDir": "..",
+    "outDir": "build/typecheck-tools",
+    "tsBuildInfoFile": "build/typecheck-tools.tsbuildinfo",
+    "skipLibCheck": true,
+    "types": ["bun", "lua-types/5.3"],
+    "paths": {
+      "war3-model": ["./node_modules/wisp/vendor/war3-model.d.mts"],
+      "gl-matrix": ["./node_modules/gl-matrix/index.d.ts"],
+      "meshoptimizer": ["./node_modules/meshoptimizer/index.module.d.ts"],
+      "effect": ["./node_modules/effect/dist/index.d.ts"],
+      "@effect/platform-bun": ["./node_modules/@effect/platform-bun/dist/index.d.ts"]
+    }
+  },
+  "files": ["node_modules/wisp/src/natives/warcraft.d.ts"],
+  "include": ["../tools/animations/**/*.ts"]
+}

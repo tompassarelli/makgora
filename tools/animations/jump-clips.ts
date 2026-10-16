@@ -17,7 +17,7 @@ import { ensureMotionHelper } from "../../ts/scripts/motionHelper";
 
 const [inputArg, outputArg, ...options] = process.argv.slice(2);
 const input = resolve(inputArg ?? ""), output = resolve(outputArg ?? "");
-const only = Number(options[options.indexOf("--character") + 1]);
+const only = Number(options[options.indexOf("--character") + 1]) as Character;
 const selected = options.includes("--character");
 const preview = !options.includes("--no-preview");
 const project = resolve(import.meta.dir, "../..");
@@ -51,8 +51,8 @@ const FLIPS = new Set(["front flip", "back flip"]);
 const LEANS: Readonly<Record<string, number>> = { cannonball: 55, heave: 40, "wing beat": 40 };
 const SPINS = new Set(["twist", "twirl"]);
 const repairs = Object.entries(STYLES).map(([character, style]) =>
-  ({ character: Number(character), poses: ["doubleJump"] as const, flip: FLIPS.has(style), style }));
-const gestures: readonly { character: number; poses: readonly ("jump" | "doubleJump")[]; flip: boolean; style?: string }[] = selected ? repairs.filter(g => g.character === only) : legacy;
+  ({ character: Number(character) as Character, poses: ["doubleJump"] as const, flip: FLIPS.has(style), style }));
+const gestures: readonly { character: Character; poses: readonly ("jump" | "doubleJump")[]; flip: boolean; style?: string }[] = selected ? repairs.filter(g => g.character === only) : legacy;
 ensure(gestures.length > 0, "Select an authored double-jump fighter");
 const tables: Record<number, HeroClipTable> = { ...JUMP_CLIPS };
 function jointPitch(joint: string, style: string, t: number): number {
@@ -138,7 +138,7 @@ function jointPitch(joint: string, style: string, t: number): number {
   }
   return 0;
 }
-function pitch(q: Float32Array | Int32Array, degrees: number): Float32Array {
+function pitch(q: Float32Array | Int32Array, degrees: number): Float32Array<ArrayBuffer> {
   const s = Math.sin(degrees * Math.PI / 360), c = Math.cos(degrees * Math.PI / 360);
   const [x = 0, y = 0, z = 0, w = 1] = q;
   return new Float32Array([c*x+s*z, c*y+s*w, c*z-s*x, c*w-s*y]);

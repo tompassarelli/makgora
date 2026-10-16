@@ -1,3 +1,4 @@
+import type { Character } from "../../ts/src/game/sim/codes";
 import { model as mdx } from '../../ts/scripts/clipNodes';
 import type { RetargetOptions } from './hd-retarget';
 
@@ -22,7 +23,7 @@ export const isLegJoint = (name: string) => /^@(hip|knee|ankle|toe)\.[LR]$/.test
  * no move, sequence or frame appears in it, so every move reaches both bodies through the same mapping.
  */
 export interface FighterRig extends RetargetOptions {
-    readonly character: number;
+    readonly character: Character;
     readonly stockPath?: string;
     /** Classic skeleton → rig: the Classic node that carries each humanoid joint. */
     readonly classic: Readonly<Partial<Record<HumanoidJoint, string>>>;

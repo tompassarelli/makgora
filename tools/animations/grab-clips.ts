@@ -13,7 +13,7 @@ import { fighters } from "../../ts/scripts/heroModelSource";
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
 const characterAt = process.argv.indexOf("--character");
 const selectedCharacter = characterAt < 0 ? undefined : Number(process.argv[characterAt + 1]);
-ensure(selectedCharacter === undefined || Number.isInteger(selectedCharacter) && selectedCharacter >= 3 && fighters.has(selectedCharacter),
+ensure(selectedCharacter === undefined || Number.isInteger(selectedCharacter) && selectedCharacter >= 3 && fighters.has(selectedCharacter as Character),
   "--character takes an expansion fighter's character code");
 const project = resolve(import.meta.dir, "../..");
 ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/grab-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--character ID]");
@@ -55,7 +55,7 @@ function blend(a: Gesture, b: Gesture, t: number): Gesture {
   const v = (key: keyof Gesture) => a[key] * (1 - t) + b[key] * t;
   return { chest: v("chest"), head: v("head"), grip: v("grip"), elbow: v("elbow"), free: v("free"), knee: v("knee"), twist: v("twist") };
 }
-function phasesFor(action: Action, character: number): readonly { readonly at: number; readonly pose: Gesture }[] {
+function phasesFor(action: Action, character: Character): readonly { readonly at: number; readonly pose: Gesture }[] {
   const moves = heroDefinition(character)?.moves;
   const duration = attackDurationFramesForGrounding(AttackStyle.grab, true, moves);
   const contact = action.pose === "grab" ? attackStartupFrames(AttackStyle.grab, moves) / duration : 0.5;
@@ -66,14 +66,14 @@ function phasesFor(action: Action, character: number): readonly { readonly at: n
   const contactPose = character === Character.lichKing && action.pose === "grab" ? gesture(action.contact, { chest: 18 }) : action.contact;
   return [{ at: 0, pose: action.first }, { at: coil, pose: action.coil }, { at: contact, pose: contactPose }, { at: activeEnd, pose: contactPose }, { at: 1, pose: action.last }];
 }
-function at(action: Action, character: number, t: number): Gesture {
+function at(action: Action, character: Character, t: number): Gesture {
   if (action.hold) return action.first;
   const phases = phasesFor(action, character);
   const a = phases.findLast(p => p.at <= t), b = phases.find(p => p.at >= t);
   ensure(a && b, "Gesture sample outside its phases");
   return blend(a.pose, b.pose, a.at === b.at ? 0 : (t - a.at) / (b.at - a.at));
 }
-function rotate(q: Float32Array | Int32Array, pitch: number, yaw = 0): Float32Array {
+function rotate(q: Float32Array | Int32Array, pitch: number, yaw = 0): Float32Array<ArrayBuffer> {
   const y = pitch * Math.PI / 360, z = yaw * Math.PI / 360;
   const a = [-Math.sin(y) * Math.sin(z), Math.sin(y) * Math.cos(z), Math.cos(y) * Math.sin(z), Math.cos(y) * Math.cos(z)];
   const [x = 0, v = 0, w = 0, s = 1] = q;

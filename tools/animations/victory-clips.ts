@@ -23,13 +23,13 @@ const BOUNCE: Readonly<Record<number, number>> = { 18: 0.4, 50: 0.35, 72: 0.35 }
 const SIDES = [['Bone_Arm1_R', 'Bone_Arm2_R', 'Bone_Hand_R'], ['Bone_Arm1_L', 'Bone_Arm2_L', 'Bone_Hand_L']] as const;
 
 const args = process.argv.slice(2);
-const characters = args.flatMap((arg, index) => args[index - 1] === '--character' ? [Number(arg)] : []);
+const characters = args.flatMap((arg, index) => args[index - 1] === '--character' ? [Number(arg) as Character] : []);
 const [assetsArg, outputArg] = args.filter((arg, index) => !arg.startsWith('--') && args[index - 1] !== '--character');
 ensure(assetsArg && outputArg && characters.length > 0, 'usage: bun tools/animations/victory-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT --character ID [--character ID...]');
 const [assets, output] = [resolve(assetsArg), resolve(outputArg)];
 ensure(relative(resolve(import.meta.dir, '../..'), output).startsWith('..'), 'Victory clips stay private');
 
-function rotated(q: ArrayLike<number>, y: number, z = 0): Float32Array {
+function rotated(q: ArrayLike<number>, y: number, z = 0): Float32Array<ArrayBuffer> {
     const a = y * Math.PI / 360, b = z * Math.PI / 360;
     const [i, j, k, l] = [-Math.sin(a) * Math.sin(b), Math.sin(a) * Math.cos(b), Math.cos(a) * Math.sin(b), Math.cos(a) * Math.cos(b)];
     const [x = 0, v = 0, w = 0, t = 1] = Array.from(q);

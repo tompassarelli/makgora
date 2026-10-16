@@ -1,10 +1,12 @@
+import { type KeyVector } from './animVector';
 
 import { mkdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { isDeepStrictEqual } from "node:util";
 import { generateMDX, parseMDX, ModelRenderer, model as mdx } from "war3-model";
 import type { PoseFrame } from "../../ts/scripts/wisp/hurtboxView";
-import { AttackStyle, AttackPhase, GrabAction } from "../../ts/src/game/sim/codes";
+import { AttackStyle, AttackPhase, GrabAction, type Character } from "../../ts/src/game/sim/codes";
+import type { DrawnStride } from "../../ts/scripts/wisp/drawnMotion";
 import type { HeroPose } from "../../ts/src/game/sim/heroes/hero";
 import { seconds } from "./asset-info";
 import { measureDrawnReach } from "../../ts/scripts/wisp/drawnReach";
@@ -20,7 +22,7 @@ async function writeStride(bytes: ArrayBuffer) {
   const { drawnStrideSource, measureDrawnStride } = await import("../../ts/scripts/wisp/drawnMotion");
   const { DRAWN_STRIDES } = await import("../../ts/src/game/presentation/drawnStrideInfo");
   const { Character } = await import("../../ts/src/game/sim/codes");
-  const strides = Object.entries(DRAWN_STRIDES).flatMap(([character, data]) => data ? (["walk", "run"] as const).map(motion => ({ character: Number(character) as typeof Character.grom, motion, ...data[motion] })) : []).filter(row => row.character !== Character.grom);
+  const strides: DrawnStride[] = Object.entries(DRAWN_STRIDES).flatMap(([character, data]) => data ? (["walk", "run"] as const).map(motion => ({ character: Number(character) as Character, motion, ...data[motion] })) : []).filter(row => row.character !== Character.grom);
   for (const motion of ["walk", "run"] as const) strides.push(measureDrawnStride(bytes, new DrawnModel(bytes, 1), Character.grom, motion, "units\\orc\\Hellscream\\Hellscream.mdl"));
   await Bun.write(new URL("../../ts/src/game/presentation/drawnStrideInfo.ts", import.meta.url), drawnStrideSource(strides.sort((a, b) => a.character - b.character)));
 }
@@ -165,7 +167,7 @@ function joint(name: string, g: Gesture): [number, number] {
   if (name === "Bone_Root") return [g.lean ?? 0, 0];
   return [0, 0];
 }
-const flatTangent = (track: mdx.AnimVector, vector: Float32Array, path: string) => path.endsWith(".Rotation") || track.LineType === mdx.LineType.Bezier ? vector.slice() : new Float32Array(vector.length);
+const flatTangent = (track: mdx.AnimVector, vector: KeyVector, path: string) => path.endsWith(".Rotation") || track.LineType === mdx.LineType.Bezier ? vector.slice() : new Float32Array(vector.length);
 const originals = new Map<string, mdx.AnimVector>(); tracks(source, (t, p) => originals.set(p, t));
 let cursor = Math.max(...source.Sequences.map(s => s.Interval[1])) + 100;
 const cutoff = cursor, bindings: string[] = [], damageBindings: string[] = [];
@@ -303,7 +305,7 @@ for (const [ordinal, action] of actions.entries()) if (/^victim(Pummel|Throw)/.t
 }
 const normalReach = [];
 let tiltForward = 0;
-for (const style of [AttackStyle.upTilt]) {
+for (const style of [AttackStyle.upTilt] as readonly AttackStyle[]) {
   const ordinal = normals.findIndex(normal => normal[1] === style), action = actions[ordinal]!;
   const index = source.Sequences.length + ordinal, [start, end] = model.Sequences[index]!.Interval;
   const root = model.Nodes.find(node => node.Name === "Bone_Root")!, chest = model.Nodes.find(node => node.Name === "Bone_Chest")!;

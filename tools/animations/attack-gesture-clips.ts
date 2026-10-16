@@ -1,3 +1,4 @@
+import { floatVector } from './animVector';
 
 import { chmodSync, mkdirSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
@@ -48,7 +49,7 @@ const CONTACT: Readonly<Record<string, readonly number[]>> = {
   upAir: [-42, -155, -110, -32, 55, -60, 80, -8], downSpecial: [28, -88, -88, 70, -20, -20, 32, 0],
 };
 
-function rotate(q: Float32Array | Int32Array, degrees: number, axis = 1): Float32Array {
+function rotate(q: Float32Array | Int32Array, degrees: number, axis = 1): Float32Array<ArrayBuffer> {
   const v = [0, 0, 0]; v[axis] = Math.sin(degrees * Math.PI / 360);
   const [a=0,b=0,c=0]=v,d=Math.cos(degrees*Math.PI/360),[x=0,y=0,z=0,w=1]=q;
   const out=new Float32Array([d*x+a*w+b*z-c*y,d*y-a*z+b*w+c*x,d*z+a*y-b*x+c*w,d*w-a*x-b*y-c*z]);
@@ -115,7 +116,7 @@ function joint(name: string, pose: HeroPose, character: number): number {
 }
 
 
-function blend(from: ArrayLike<number>, to: ArrayLike<number>, weight: number): Float32Array {
+function blend(from: ArrayLike<number>, to: ArrayLike<number>, weight: number): Float32Array<ArrayBuffer> {
   let dot = 0; for (let i = 0; i < 4; i++) dot += from[i]!*to[i]!;
   const sign = dot < 0 ? -1 : 1, vector = new Float32Array(4); for (let i = 0; i < 4; i++) vector[i] = from[i]!*(1-weight)+sign*to[i]!*weight;
   const norm = Math.hypot(...vector); return vector.map(v => v/norm);
@@ -294,7 +295,7 @@ function aimWeaponContact(model: mdx.Model, index: number, start: number, contac
         const sweep = SWEEP*(frame-contact)/3, shift = (scale: number) => lungeAxis.map((v,i) => v*(lunge(frame)-F)+across[i]!*sweep*scale);
         for (let iteration = 0; iteration < 12; iteration++) for (const node of arm.toReversed()) aim(node,hand,targetHand.map((v,i) => v+shift(0.5)[i]!));
         aim(hand,tip,targetTip.map((v,i) => v+shift(1.5)[i]!));
-        if (frame === contact+3 || frame === total) keys.forEach((key,i) => swept.set(solved[i]!, key.Vector.slice()));
+        if (frame === contact+3 || frame === total) keys.forEach((key,i) => swept.set(solved[i]!, floatVector(key.Vector)));
       } else {
         const from = swept.size ? swept : held, weight = frame < contact+3 ? 1 : Math.max(0,1-(frame-contact-3)/(total-contact-3));
         keys.forEach((key,i) => { key.Vector = blend(key.Vector, from.get(solved[i]!)!, weight); });
@@ -336,7 +337,7 @@ function aimWeaponContact(model: mdx.Model, index: number, start: number, contac
         handKey.Vector = unrolled.slice(); renderer.update(0);
         if (roll) { const h = position(hand), w = position(tip), axis = w.map((v,i) => v-h[i]!), n = Math.hypot(...axis); turn(hand, axis.map(v => v/n), roll*Math.PI/12); }
       }
-      keys.forEach((key,i) => held.set(solved[i]!, key.Vector.slice()));
+      keys.forEach((key,i) => held.set(solved[i]!, floatVector(key.Vector)));
     }
   }
   if (shadowLow) floorSolve(model, data, renderer, start, total, turnAt, named);

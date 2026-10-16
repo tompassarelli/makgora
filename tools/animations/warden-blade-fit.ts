@@ -1,4 +1,4 @@
-import { mat4, quat, vec3 } from '../../ts/node_modules/gl-matrix';
+import { mat4, quat, vec3 } from 'gl-matrix';
 import { ModelRenderer, model as mdx } from '../../ts/scripts/clipNodes';
 import { generateHdBody, parseHdBody } from './hd-retarget';
 import { AttackStyle } from '../../ts/src/game/sim/codes';
@@ -106,7 +106,7 @@ export function fitWardenBlade(motion: mdx.Model, bytes: ArrayBuffer) {
             mat4.scale(fitted, fitted, [scale, scale, scale]);
             mat4.translate(fitted, fitted, vec3.negate(vec3.create(), pivot));
             mat4.multiply(fitted, fitted, matrix);
-            const parentInverse = mat4.invert(mat4.create(), state.nodes[weapon.Parent].matrix);
+            const parentInverse = mat4.invert(mat4.create(), state.nodes[weapon.Parent!].matrix);
             if (parentInverse === null) throw new Error('Warden blade parent is singular');
             const local = mat4.multiply(mat4.create(), parentInverse, fitted), p = weapon.PivotPoint;
             const translation = new Float32Array([0, 1, 2].map(axis => local[axis + 12] - p[axis]
@@ -122,7 +122,7 @@ export function fitWardenBlade(motion: mdx.Model, bytes: ArrayBuffer) {
             for (let frame = Math.floor(before); frame <= Math.ceil(after); frame++) {
                 const mix = (frame - before) / (after - before);
                 overrides.set(frame, {
-                    Translation: vec3.lerp(vec3.create(), a.Translation, b.Translation, mix),
+                    Translation: new Float32Array(vec3.lerp(vec3.create(), a.Translation, b.Translation, mix)),
                     Rotation: quat.normalize(quat.create(), quat.slerp(quat.create(), a.Rotation, b.Rotation, mix)),
                     Scaling: vec3.lerp(vec3.create(), a.Scaling, b.Scaling, mix),
                 });

@@ -27,7 +27,7 @@ export function thinnedModel(sourceBytes: ArrayBuffer, store = THINNED_STORE): {
     const thin = thinKeys(parseModelMDX(sourceBytes));
     mkdirSync(dirname(path), { recursive: true });
     const staging = `${path}.${process.pid}.next`;
-    writeFileSync(staging, serialize(thin));
+    writeFileSync(staging, new Uint8Array(serialize(thin)));
     chmodSync(staging, 0o444);
     renameSync(staging, path);
     return thin;

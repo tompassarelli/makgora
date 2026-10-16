@@ -1,3 +1,4 @@
+import { NO_GLOBAL_SEQ } from './animVector';
 import { model as mdx, renumberNodes } from '../../ts/scripts/clipNodes';
 import { heroGlowGeosets, removeGeosets } from '../../ts/scripts/groundPlanes';
 import { bounds, onGlobalClock, removeBodyEffects, splitStaticLights, tracks, verifyPreservedBody } from './original-clips';
@@ -30,7 +31,7 @@ function preserveNonunitHolds(source: mdx.Model, model: mdx.Model, sequences: re
         if (rotation.LineType !== mdx.LineType.Linear) throw new Error(`${original.Name}: unsupported nonunit rotation hold interpolation`);
         const identity = new Float32Array([0, 0, 0, 1]);
         const unitScale = new Float32Array([1, 1, 1]);
-        const step = (vector: Float32Array): mdx.AnimVector => ({ LineType: mdx.LineType.DontInterp, GlobalSeqId: null, Keys: [{ Frame: 0, Vector: vector }] });
+        const step = (vector: Float32Array): mdx.AnimVector => ({ LineType: mdx.LineType.DontInterp, GlobalSeqId: NO_GLOBAL_SEQ, Keys: [{ Frame: 0, Vector: vector }] });
         const axisTrack = step(identity), scaleTrack = step(unitScale), inverseTrack = step(identity);
         for (const { start, end, vector: q } of nonunit) {
             const [x, y, z, w] = q;

@@ -26,11 +26,11 @@ for (const node of model.Nodes) if (node.Parent == null) node.Parent = root;
 model.Helpers.push(helper); model.Nodes.push(helper); model.PivotPoints.push(helper.PivotPoint);
 for (const sequence of source.Sequences) for (const Frame of sequence.Interval) helper.Rotation?.Keys.push({ Frame, Vector: new Float32Array([0, 0, 0, 1]) });
 const originals = new Map<string, mdx.AnimVector>(); tracks(source, (t, p) => originals.set(p, t));
-function rotation(x: number, y: number): Float32Array {
+function rotation(x: number, y: number): Float32Array<ArrayBuffer> {
   const a = x * Math.PI / 360, b = y * Math.PI / 360;
   return new Float32Array([Math.sin(a)*Math.cos(b), Math.cos(a)*Math.sin(b), Math.sin(a)*Math.sin(b), Math.cos(a)*Math.cos(b)]);
 }
-function pitch(q: Float32Array | Int32Array, degrees: number): Float32Array {
+function pitch(q: Float32Array | Int32Array, degrees: number): Float32Array<ArrayBuffer> {
   const s = Math.sin(degrees*Math.PI/360), c = Math.cos(degrees*Math.PI/360), [x=0,y=0,z=0,w=1]=q;
   return new Float32Array([c*x+s*z,c*y+s*w,c*z-s*x,c*w-s*y]);
 }

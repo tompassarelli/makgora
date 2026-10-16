@@ -43,7 +43,7 @@ function degrees(name: string, pose: Pose): number {
   return pose[part] ?? 0;
 }
 
-function pitch(q: Float32Array | Int32Array, angle: number): Float32Array {
+function pitch(q: Float32Array | Int32Array, angle: number): Float32Array<ArrayBuffer> {
   const s = Math.sin(angle * Math.PI / 360), c = Math.cos(angle * Math.PI / 360);
   const [x = 0, y = 0, z = 0, w = 1] = q;
   const v = new Float32Array([c*x+s*z, c*y+s*w, c*z-s*x, c*w-s*y]);

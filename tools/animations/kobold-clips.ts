@@ -1,3 +1,4 @@
+import { NO_GLOBAL_SEQ } from './animVector';
 import { mkdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { isDeepStrictEqual } from "node:util";
@@ -225,7 +226,7 @@ for (const pose of ["run", "dash", "bareIdle", "bareRun", "sideSpecial", "sideSp
   cursor = end + 100;
 }
 const candle = model.Nodes.find(n => n.Name === "Candle")!;
-if (actions.some(a => a.bare) && !candle.Scaling) candle.Scaling = { LineType: mdx.LineType.DontInterp, GlobalSeqId: null,
+if (actions.some(a => a.bare) && !candle.Scaling) candle.Scaling = { LineType: mdx.LineType.DontInterp, GlobalSeqId: NO_GLOBAL_SEQ,
   Keys: source.Sequences.flatMap(s => Array.from(s.Interval).map(Frame => ({ Frame, Vector: new Float32Array([1, 1, 1]) }))) };
 
 function rotated(q: ArrayLike<number>, y: number, z = 0) {
@@ -313,7 +314,7 @@ for (const action of actions) {
     for (const Frame of [start, end]) candle.Scaling.Keys.push({ Frame, Vector: new Float32Array(3) });
     candle.Scaling.Keys.sort((a, b) => a.Frame - b.Frame);
     const flame = model.ParticleEmitters2.find(n => n.Name === "BlizParticle01");
-    ensure(flame?.Visibility, "Bare Kobold needs flame visibility");
+    ensure(flame?.Visibility && typeof flame.Visibility !== "number", "Bare Kobold needs flame visibility");
     ensure(!globalClock(flame.Visibility), "Kobold flame visibility uses a global clock");
     flame.Visibility.Keys = flame.Visibility.Keys.filter(k => k.Frame < start || k.Frame > end);
     for (const Frame of [start, end]) flame.Visibility.Keys.push({ Frame, Vector: new Float32Array([0]),

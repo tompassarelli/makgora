@@ -33,7 +33,7 @@ const roll = (sign: number, down = false): readonly Phase[] => [
   { at: 0.86, roll: sign * 350, tuck: 0.18 },
   { at: 1, roll: sign * 360, tuck: 0 },
 ];
-function actions(character: number): Action[] {
+function actions(character: Character): Action[] {
   const transitions: Action[] = [
     { pose: "turn", frames: 8, phases: [{ at: 0, yaw: 180 }, { at: 0.4, yaw: 110, lean: -15 }, { at: 1, yaw: 0 }] },
     { pose: "stop", frames: 8, phases: [{ at: 0, lean: -20 }, { at: 0.4, lean: -25, tuck: 0.12 }, { at: 1 }] },
@@ -65,7 +65,7 @@ function phaseAt(phases: readonly Phase[], t: number): Required<Omit<Phase, "at"
   const v = (key: keyof Omit<Phase, "at">) => (a[key] ?? 0) * (1 - blend) + (b[key] ?? 0) * blend;
   return { roll: v("roll"), yaw: v("yaw"), lean: v("lean"), tuck: v("tuck"), height: v("height") };
 }
-function quaternion(y: number, z: number): Float32Array {
+function quaternion(y: number, z: number): Float32Array<ArrayBuffer> {
   const a = y * Math.PI / 360, b = z * Math.PI / 360;
   return new Float32Array([-Math.sin(a) * Math.sin(b), Math.sin(a) * Math.cos(b), Math.cos(a) * Math.sin(b), Math.cos(a) * Math.cos(b)]);
 }

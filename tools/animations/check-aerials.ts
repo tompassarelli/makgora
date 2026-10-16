@@ -51,14 +51,14 @@ for(const fighter of ['Rifleman']) {
   const keys=(track:any)=>track?.Keys?.filter((k:any)=>k.Frame>=s.Interval[0]&&k.Frame<=s.Interval[1])??[];
   ensure(keys(root.Translation).length===0,`${name} root translation`);
   for(const bone of [...model.Bones,...model.Helpers]) ensure(keys(bone.Rotation).length>0,`${name} missing bone ${bone.Name}`);
-
+ }
 
 
  function tracks(m:any,s:any) {
   const result:any={};
   for(const collection of ['Bones','Helpers','GeosetAnims']) for(const node of m[collection]??[]) {
    const fields:any={};
-   for(const [field,value] of Object.entries(node)) if(value && typeof value==='object' && 'Keys' in value) {
+   for(const [field,value] of Object.entries(node as Record<string,unknown>)) if(value && typeof value==='object' && 'Keys' in value) {
     const track=value as any;
     fields[field]={InterpolationType:track.InterpolationType,GlobalSeqId:track.GlobalSeqId,Keys:track.Keys.filter((k:any)=>k.Frame>=s.Interval[0]&&k.Frame<=s.Interval[1]).map((k:any)=>({...k,Frame:k.Frame-s.Interval[0]}))};
    }

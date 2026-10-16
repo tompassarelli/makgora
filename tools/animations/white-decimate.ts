@@ -45,7 +45,7 @@ function simplifyGeoset(geoset: mdx.Geoset, { ratio, error, lockBorder = false }
 /** A light white silhouette: one level of detail, no hidden geosets, simplified meshes, and keys only on nodes that move drawn vertices. */
 export function decimateWhiteBody(model: mdx.Model, decimation: Decimation): void {
   const animations = new Map(model.GeosetAnims.map(animation => [animation.GeosetId, animation]));
-  removeGeosets(model, new Set(model.Geosets.flatMap((geoset, index) => geoset.LevelOfDetail > 0 || hiddenThroughout(animations.get(index)) ? [index] : [])));
+  removeGeosets(model, new Set(model.Geosets.flatMap((geoset, index) => (geoset.LevelOfDetail ?? 0) > 0 || hiddenThroughout(animations.get(index)) ? [index] : [])));
   for (const geoset of model.Geosets) simplifyGeoset(geoset, decimation);
   pruneLinearKeys(model);
   const parents = new Map(model.Nodes.filter(node => node !== undefined).map(node => [node.ObjectId, node.Parent]));

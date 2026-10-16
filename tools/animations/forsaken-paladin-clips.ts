@@ -1,3 +1,4 @@
+import { NO_GLOBAL_SEQ } from './animVector';
 
 import { mkdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
@@ -30,7 +31,7 @@ const project = resolve(import.meta.dir, "../..");
 ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/forsaken-paladin-clips.ts STOCK_FORSAKEN_PALADIN.mdx PRIVATE_OUTPUT");
 const source = parseHdBody(await Bun.file(input).arrayBuffer());
 const glowIds=new Set((source.ParticleEmitterPopcorns??[]).map(node=>node.ObjectId));
-ensure(source.Nodes.every(node=>node===undefined||!glowIds.has(node.Parent)),"Forsaken body depends on its hero glow");
+ensure(source.Nodes.every(node=>node===undefined||node.Parent==null||!glowIds.has(node.Parent)),"Forsaken body depends on its hero glow");
 if (!replacing) {
   if(source.ParticleEmitterPopcorns!==undefined)source.ParticleEmitterPopcorns=[];
   for(const id of glowIds)delete source.Nodes[id];renumberNodes(source);
@@ -76,7 +77,7 @@ for (const [pose, style, gesture] of normals) {
   const move = FORSAKEN_PALADIN_MOVES.normals[style]; ensure(move, `${pose}: missing timing`);
   const first = move.startupFrames;
   const sweeping = ["forwardTilt","forwardTiltUp","forwardTiltDown","forwardSmash","forwardAir","backAir","upTilt","downSmash","neutralAir"].includes(pose);
-  const phases:Phase[]|undefined = pose === "dashAttack" ? DASH_KEYS : sweeping ? move.regions.map(region => ({frame: region.firstFrame, target:[region.hit.strike!.x2/1.2,region.hit.strike!.z2/1.2],gesture: {...gesture,
+  const phases:readonly Phase[]|undefined = pose === "dashAttack" ? DASH_KEYS : sweeping ? move.regions.map(region => ({frame: region.firstFrame, target:[region.hit.strike!.x2/1.2,region.hit.strike!.z2/1.2],gesture: {...gesture,
     arm: (gesture.arm ?? 0) + ((region.hit.strike?.z2??0) > 130 ? -45 : (region.hit.strike?.z2??0) < 40 ? 45 : 0),
     yaw: (region.hit.strike?.x2??0) < 0 ? 145 : 0,
     chest: (gesture.chest ?? 0) + ((region.hit.strike?.z2??0) < 40 ? 20 : -8) }})) : undefined;
@@ -136,7 +137,7 @@ if (replacing) {
   actions.splice(0, actions.length, ...actions.filter(action => selectedPoses.includes(action.pose)));
   damageActions.length = 0;
 }
-function rotation(base: ArrayLike<number>, pitch:number, yaw=0,roll=0): Float32Array {
+function rotation(base: ArrayLike<number>, pitch:number, yaw=0,roll=0): Float32Array<ArrayBuffer> {
   const q=quat.create(); quat.rotateY(q,q,pitch*Math.PI/180); quat.rotateZ(q,q,yaw*Math.PI/180);quat.rotateX(q,q,roll*Math.PI/180);
   quat.multiply(q,q,Float32Array.from(base)); quat.normalize(q,q); return new Float32Array(q);
 }
@@ -157,7 +158,7 @@ const evaluate=(index:number,frame:number)=>{render.setSequence(index);data.fram
 evaluate(1,0);
 const handRest=mat4.clone(data.nodes[hand.ObjectId].matrix),axeRest=mat4.clone(data.nodes[weapon.ObjectId].matrix),offset=mat4.create();
 ensure(mat4.invert(offset,handRest),"Hand's stock pose is singular"); mat4.multiply(offset,offset,axeRest);
-if (!replacing || main.Translation === undefined) main.Translation = { LineType: mdx.LineType.Linear, GlobalSeqId: null, Keys: [] };
+if (!replacing || main.Translation === undefined) main.Translation = { LineType: mdx.LineType.Linear, GlobalSeqId: NO_GLOBAL_SEQ, Keys: [] };
 const weaponRef=model.Nodes.find(n=>n.Name==="Weapon Ref")!,weaponPivot=model.PivotPoints[weaponRef.ObjectId]!;
 const weaponPoint=vec3.fromValues(weaponPivot[0]!,weaponPivot[1]!,weaponPivot[2]!);vec3.transformMat4(weaponPoint,weaponPoint,data.nodes[weaponRef.ObjectId].matrix);
 const inverseHand=mat4.create();ensure(mat4.invert(inverseHand,handRest),"Hand pose is singular");vec3.transformMat4(weaponPoint,weaponPoint,inverseHand);

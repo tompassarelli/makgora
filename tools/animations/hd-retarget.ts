@@ -1,4 +1,5 @@
-import { mat4, quat, vec3 } from '../../ts/node_modules/gl-matrix';
+import { NO_GLOBAL_SEQ, NO_INDEX } from './animVector';
+import { mat4, quat, vec3 } from 'gl-matrix';
 import { ModelRenderer, model as mdx, parseMDX, generateMDX } from '../../ts/scripts/clipNodes';
 import { skinChunks } from '../../ts/scripts/mdxCodec';
 import { tracks, onGlobalClock } from './original-clips';
@@ -64,7 +65,7 @@ function appendTransform(node: mdx.Node, matrix: mat4, frame: number): void {
     const translation = new Float32Array([0, 1, 2].map(axis => matrix[12 + axis] - pivot[axis]
         + matrix[axis] * pivot[0] + matrix[axis + 4] * pivot[1] + matrix[axis + 8] * pivot[2]));
     for (const [kind, vector] of [['Translation', translation], ['Rotation', rotation], ['Scaling', scaling]] as const) {
-        node[kind] ??= { LineType: mdx.LineType.Linear, GlobalSeqId: null, Keys: [] };
+        node[kind] ??= { LineType: mdx.LineType.Linear, GlobalSeqId: NO_GLOBAL_SEQ, Keys: [] };
         node[kind].Keys.push({ Frame: frame, Vector: new Float32Array(vector) });
     }
 }
@@ -431,7 +432,7 @@ export function transferMotion(source: mdx.Model, hd: mdx.Model, registration: R
         const ObjectId = model.Nodes.length;
         const node: mdx.Bone = {
             Name: `Body ${original.Name}`, ObjectId, Parent: parent, Flags: original.Flags,
-            PivotPoint: new Float32Array(original.PivotPoint), GeosetId: null, GeosetAnimId: null,
+            PivotPoint: new Float32Array(original.PivotPoint), GeosetId: NO_INDEX, GeosetAnimId: NO_INDEX,
         };
         for (const kind of ['Translation', 'Rotation', 'Scaling'] as const) {
             const track = original[kind];

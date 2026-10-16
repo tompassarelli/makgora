@@ -1,3 +1,5 @@
+import type { HumanoidJoint } from "./canonical-rig";
+import { NO_GLOBAL_SEQ, type KeyVector } from './animVector';
 import { chmodSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { quat } from "gl-matrix";
@@ -28,7 +30,7 @@ import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./or
 const [inputArg, outputArg, ...options] = process.argv.slice(2);
 const input = resolve(inputArg ?? ""), output = resolve(outputArg ?? "");
 const project = resolve(import.meta.dir, "../..");
-const character = Number(options[options.indexOf("--character") + 1]);
+const character = Number(options[options.indexOf("--character") + 1]) as Character;
 const poses = options.flatMap((option, index) => option === "--pose" ? [options[index + 1] as Pose] : []);
 ensure(inputArg && outputArg && relative(project, output).startsWith("..") && options.includes("--character") && poses.length > 0 && poses.every((pose) => pose === "crouch" || pose === "ledgeHang"),
   "usage: bun tools/animations/movement-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT --character ID --pose crouch|ledgeHang [--pose ...]");
@@ -68,7 +70,7 @@ const scale = characterModelScale(character), ppu = gameplayPixelsPerUnit();
 const before = new DrawnModel(generateMDX(source), 1);
 const standIndex = source.Sequences.indexOf(stand);
 const lowest = (drawn: DrawnModel, sequence: number, at: number) => Math.min(...Array.from(drawn.triangles(sequence, at, 1)).filter((_, i) => i % 2 === 1));
-const ankles = ["ankle.L", "ankle.R"].flatMap((joint) => { const id = source.Nodes.findIndex((n) => n.Name === rig.classic[joint]); return rig.classic[joint] !== undefined && id >= 0 ? [source.Nodes[id]!.ObjectId] : []; });
+const ankles = (["ankle.L", "ankle.R"] as const).flatMap((joint) => { const id = source.Nodes.findIndex((n) => n.Name === rig.classic[joint]); return rig.classic[joint] !== undefined && id >= 0 ? [source.Nodes[id]!.ObjectId] : []; });
 const floor = (drawn: DrawnModel, sequence: number, at: number) => {
   if (ankles.length === 0) return lowest(drawn, sequence, at);
   const nodes = drawn.posed(sequence, at, 1).nodes;
@@ -89,7 +91,7 @@ const searched = (options: Space["options"]) => Object.entries(options).filter((
 const legJoint = new Map((LEG_BONES[character] ?? []).flatMap(([hip, knee, toe]) => [[hip, 1], [knee, -2], [toe, 1]] as const));
 
 const helper: mdx.Helper = { Name: "Movement Motion", ObjectId: model.Nodes.length, Parent: null, Flags: 0, PivotPoint: new Float32Array(3),
-  Translation: { LineType: mdx.LineType.Linear, GlobalSeqId: null, Keys: [] }, Rotation: { LineType: mdx.LineType.Linear, GlobalSeqId: null, Keys: [] } };
+  Translation: { LineType: mdx.LineType.Linear, GlobalSeqId: NO_GLOBAL_SEQ, Keys: [] }, Rotation: { LineType: mdx.LineType.Linear, GlobalSeqId: NO_GLOBAL_SEQ, Keys: [] } };
 for (const node of [...model.Bones, ...model.Helpers, ...model.Attachments]) if (node.Parent == null) node.Parent = helper.ObjectId;
 model.Helpers.push(helper); model.Nodes.push(helper); model.PivotPoints.push(helper.PivotPoint);
 for (const sequence of source.Sequences) for (const Frame of sequence.Interval) {
@@ -99,7 +101,7 @@ for (const sequence of source.Sequences) for (const Frame of sequence.Interval) 
 const rotation = helper.Rotation!;
 const translation = helper.Translation!;
 const originals = new Map<string, mdx.AnimVector>(); tracks(source, (track, path) => originals.set(path, track));
-const gripNodes = (joints: readonly string[]) => joints.flatMap((joint) => { const name = rig.classic[joint]; const id = model.Nodes.findIndex((n) => n.Name === name); return name !== undefined && id >= 0 ? [id] : []; });
+const gripNodes = (joints: readonly HumanoidJoint[]) => joints.flatMap((joint) => { const name = rig.classic[joint]; const id = model.Nodes.findIndex((n) => n.Name === name); return name !== undefined && id >= 0 ? [id] : []; });
 const GRIP_BONES: Readonly<Partial<Record<number, readonly string[]>>> = { [Character.thrall]: ["Bone FrontL Toe", "Bone_Mesh48"] };
 const ownGrips = (OWN.GRIP_BONES ?? GRIP_BONES[character] ?? []).map((name) => model.Nodes.findIndex((n) => n.Name === name)).filter((id) => id >= 0);
 const grips = ownGrips.length > 0 ? ownGrips : gripNodes(["wrist.L", "wrist.R"]).length > 0 ? gripNodes(["wrist.L", "wrist.R"]) : gripNodes(["weapon", "weapon.L"]);
@@ -118,7 +120,7 @@ const order = source.Nodes.map((node) => node.ObjectId).sort((a, b) => depth(a) 
 const lateral = (degrees: number) => quat.setAxisAngle(quat.create(), [0, 1, 0], degrees * Math.PI / 180);
 
 interface Slot { readonly pose: Pose; readonly index: number; readonly start: number; readonly frames: number; readonly replaced: boolean }
-function replaceKeys(track: mdx.AnimVector, slot: Pick<Slot, "start" | "frames">, value: (frame: number) => Float32Array, template?: mdx.AnimKeyframe): void {
+function replaceKeys(track: mdx.AnimVector, slot: Pick<Slot, "start" | "frames">, value: (frame: number) => KeyVector, template?: mdx.AnimKeyframe): void {
   const end = slot.start + ms(slot.frames);
   track.Keys = track.Keys.filter((k) => k.Frame < slot.start || k.Frame > end);
   for (let frame = 0; frame <= slot.frames; frame++) {
@@ -164,13 +166,13 @@ function keyJoints(slot: Slot, moved: readonly number[], locals: readonly Readon
   for (const node of [...model.Bones, ...model.Helpers]) {
     const id = node.ObjectId, path = rotationPath.get(id);
     if (path === undefined || (!moved.includes(id) && node.Rotation === undefined) || (originals.get(path)?.Keys.length ?? 0) > 0) continue;
-    node.Rotation ??= { LineType: mdx.LineType.Linear, GlobalSeqId: null, Keys: source.Sequences.flatMap((s) => Array.from(s.Interval, (Frame) => ({ Frame, Vector: new Float32Array([0, 0, 0, 1]) }))) };
+    node.Rotation ??= { LineType: mdx.LineType.Linear, GlobalSeqId: NO_GLOBAL_SEQ, Keys: source.Sequences.flatMap((s) => Array.from(s.Interval, (Frame) => ({ Frame, Vector: new Float32Array([0, 0, 0, 1]) }))) };
     replaceKeys(node.Rotation, slot, (frame) => new Float32Array(turned(id, frame) ?? [0, 0, 0, 1]));
   }
 }
 
 function keyRoot(slot: Slot, variant: Variant): void {
-  if (variant.squash) helper.Scaling ??= { LineType: mdx.LineType.Linear, GlobalSeqId: null, Keys: source.Sequences.flatMap((s) => Array.from(s.Interval, (Frame) => ({ Frame, Vector: new Float32Array([1, 1, 1]) }))) };
+  if (variant.squash) helper.Scaling ??= { LineType: mdx.LineType.Linear, GlobalSeqId: NO_GLOBAL_SEQ, Keys: source.Sequences.flatMap((s) => Array.from(s.Interval, (Frame) => ({ Frame, Vector: new Float32Array([1, 1, 1]) }))) };
   if (helper.Scaling) replaceKeys(helper.Scaling, slot, (frame) => new Float32Array([1, 1, 1 - (variant.squash ?? 0) * amount(slot.pose, frame / slot.frames, "")]));
   replaceKeys(rotation, slot, (frame) => new Float32Array(lateral(variant.lean * amount(slot.pose, frame / slot.frames, ""))));
   replaceKeys(translation, slot, () => new Float32Array(3));
@@ -282,12 +284,12 @@ function sampled(track: mdx.AnimVector, start: number, end: number, frame: numbe
   if (a === undefined || b === undefined) return undefined;
   return blend(a.Vector, b.Vector, b.Frame === a.Frame ? 0 : (frame - a.Frame) / (b.Frame - a.Frame));
 }
-function blend(from: ArrayLike<number>, to: ArrayLike<number>, weight: number): Float32Array {
+function blend(from: ArrayLike<number>, to: ArrayLike<number>, weight: number): Float32Array<ArrayBuffer> {
   if (from.length === 4) return new Float32Array(quat.slerp(quat.create(), Float32Array.from(from) as unknown as quat, Float32Array.from(to) as unknown as quat, weight));
   return from.length === 3 ? Float32Array.from(from, (v, i) => v + ((to[i] ?? v) - v) * weight) : Float32Array.from(weight < 1 ? from : to);
 }
 function easeIntoHang(catchIndex: number, hang: Slot): void {
-  const sequence = model.Sequences[catchIndex]; ensure(sequence, `${fighter.name}: no ledge catch clip ${catchIndex}`);
+  const sequence = model.Sequences[catchIndex]; ensure(sequence, `${fighter?.name}: no ledge catch clip ${catchIndex}`);
   const [start = 0, end = 0] = sequence.Interval, span = { start, frames: Math.round((end - start) * 60 / 1000) };
   tracks(model, (track) => {
     const target = onGlobalClock(track) ? undefined : track.Keys.find((k) => k.Frame === hang.start); if (!target) return;
