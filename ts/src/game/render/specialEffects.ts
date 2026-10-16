@@ -43,6 +43,7 @@ interface SpecialSlot {
   readonly siphon: lightning;
   siphonShown: boolean;
   readonly laser: lightning;
+  readonly chain: lightning;
   laserShown: boolean;
   lastX: number;
   lastZ: number;
@@ -69,6 +70,7 @@ const SLOT_EFFECTS = EYE_BLAST + EYE_BLAST_MARKS;
 /** Warcraft's Drain Mana lightning, the Blood Mage's own Siphon Mana beam. */
 const SIPHON_LIGHTNING = "DRAM";
 const LASER_LIGHTNING = "AFOD";
+const CHAIN_LIGHTNING = "CLPB";
 
 export class SpecialEffects {
   private readonly slots: readonly SpecialSlot[];
@@ -97,6 +99,8 @@ export class SpecialEffects {
       SetLightningColor(siphon, 1.0, 1.0, 1.0, 0.0);
       const laser = AddLightningEx(LASER_LIGHTNING, false, x, y, origin.z - 4096.0, x, y, origin.z - 4096.0);
       SetLightningColor(laser, 1.0, 1.0, 1.0, 0.0);
+      const chain = AddLightningEx(CHAIN_LIGHTNING, false, x, y, origin.z - 4096.0, x, y, origin.z - 4096.0);
+      SetLightningColor(chain, 1.0, 1.0, 1.0, 0.0);
       const eyeBlast: effect[] = [];
       for (let mark = 0; mark < EYE_BLAST_MARKS; mark++) eyeBlast.push(AddSpecialEffect(STOCK_MODELS.greenDragonMissile, x, y));
       BlzSetSpecialEffectTimeScale(aura, 0.0);
@@ -104,7 +108,7 @@ export class SpecialEffects {
       BlzSetSpecialEffectTimeScale(drainFlash, 0.0);
       const immolationLoop = CreateSoundFromLabel(IMMOLATE_SOUNDS.loop, true, true, true, 10000, 10000);
       return {
-        bear, aura, felFlames, manaHand, wingTrail, drainFlash, silence, frog, siphon, siphonShown: false, laser, laserShown: false, lastX: 0.0, lastZ: 0.0, eyeBlast, cursor, immolationLoop,
+        bear, aura, felFlames, manaHand, wingTrail, drainFlash, silence, frog, siphon, siphonShown: false, laser, chain, laserShown: false, lastX: 0.0, lastZ: 0.0, eyeBlast, cursor, immolationLoop,
         previousSpecial: SpecialAction.none, previousSpecialFrame: 0,
       };
     });
@@ -291,6 +295,7 @@ export class SpecialEffects {
   private hideLaser(slot: SpecialSlot): void {
     if (!slot.laserShown) return;
     SetLightningColor(slot.laser, 1.0, 1.0, 1.0, 0.0);
+    SetLightningColor(slot.chain, 1.0, 1.0, 1.0, 0.0);
     slot.laserShown = false;
   }
 
@@ -303,8 +308,11 @@ export class SpecialEffects {
     }
     const line = beamSegment(this.beamLine, fighter, beam, region.strike.radius);
     const { x, z } = this.origin;
-    MoveLightningEx(effects.laser, false, x + line.x1, this.front, z + line.z1, x + line.x2, this.front, z + line.z2);
-    SetLightningColor(effects.laser, 1.0, f32(0.3), f32(0.15), 1.0);
+    const shown = beam.chain === true ? effects.chain : effects.laser;
+    SetLightningColor(beam.chain === true ? effects.laser : effects.chain, 1.0, 1.0, 1.0, 0.0);
+    MoveLightningEx(shown, false, x + line.x1, this.front, z + line.z1, x + line.x2, this.front, z + line.z2);
+    if (beam.chain === true) SetLightningColor(shown, 1.0, 1.0, 1.0, 1.0);
+    else SetLightningColor(shown, 1.0, f32(0.3), f32(0.15), 1.0);
     effects.laserShown = true;
   }
 
@@ -367,6 +375,7 @@ export class SpecialEffects {
       for (const model of [slot.aura, slot.felFlames, slot.manaHand, slot.wingTrail, slot.drainFlash, slot.silence, slot.frog, ...slot.eyeBlast]) DestroyEffect(model);
       DestroyLightning(slot.siphon);
       DestroyLightning(slot.laser);
+      DestroyLightning(slot.chain);
     }
   }
 }

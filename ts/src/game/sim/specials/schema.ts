@@ -176,6 +176,7 @@ export interface SpecialBeam {
   readonly originZ: number;
   readonly range: number;
   readonly track: number;
+  readonly chain?: true | undefined;
 }
 
 export interface SpecialArmor extends FrameWindow {

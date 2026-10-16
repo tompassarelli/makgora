@@ -38,7 +38,6 @@ test("command heroes' projectile EX casts and air forms deal 25% more through bo
     [Character.lichKing, SpecialSlot.neutral, true],
     [Character.lichKing, SpecialSlot.side, false],
     [Character.lichKing, SpecialSlot.side, true],
-    [Character.thrall, SpecialSlot.neutral, false],
     [Character.thrall, SpecialSlot.side, true],
     [Character.jaina, SpecialSlot.neutral, true],
     [Character.jaina, SpecialSlot.side, false],
