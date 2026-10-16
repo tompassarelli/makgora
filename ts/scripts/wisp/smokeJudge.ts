@@ -10,6 +10,7 @@ import { type MoveClass, SMOKE_BINDINGS, type SmokeStep, type SmokeTape, binding
 
 export const STEP_SLACK = 24;
 export const FREEZE_FRAMES = STEP_SLACK;
+export const PACE_GAP_FRAMES = 3;
 
 export type SmokePlan = SmokeTape;
 
@@ -176,7 +177,8 @@ export const mergeVerdicts = (verdicts: readonly SmokeVerdict[]): SmokeVerdict =
   frozen: verdicts.flatMap(({ frozen }) => frozen),
 });
 
-export function smokePace(lines: readonly string[], sweep: readonly SmokeStep[] = bindingSweep()): number | undefined {
+export function smokePace(lines: readonly string[], { results, frozen }: Pick<SmokeVerdict, "results" | "frozen">, sweep: readonly SmokeStep[] = bindingSweep()): number | undefined {
+  if (frozen.length > 0 || results.some(({ kind, pass }) => kind === "binding" && !pass)) return undefined;
   const rises: number[] = [];
   let previous = 0;
   replayMatch(lines, (_state, frame, rows) => {
@@ -187,5 +189,8 @@ export function smokePace(lines: readonly string[], sweep: readonly SmokeStep[] 
   const first = rises[0];
   const last = rises[sweep.length - 1];
   const tape = tapeFrames(sweep.slice(0, -1));
-  return first === undefined || last === undefined || tape === 0 ? undefined : (last - first) / tape;
+  if (first === undefined || last === undefined || tape === 0) return undefined;
+  const pace = (last - first) / tape;
+  const steady = sweep.slice(0, -1).every((step, index) => Math.abs((rises[index + 1] ?? 0) - (rises[index] ?? 0) - step.frames * pace) <= PACE_GAP_FRAMES);
+  return steady ? pace : undefined;
 }

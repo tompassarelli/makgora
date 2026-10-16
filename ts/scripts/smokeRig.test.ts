@@ -70,7 +70,7 @@ test("a native client stepping slower than the wall clock still starts every mov
   const schedule = smokeSchedule(smokeApproaches(Character.rifleman, Character.demonHunter));
   const paced = rehearsal(Character.rifleman, Character.demonHunter, SMOKE_BINDINGS, schedule, pace);
   expect(smokeLines(judgeSmoke(paced.lines, schedule.flat())).filter((line) => !line.startsWith("PASS"))).toEqual([]);
-  expect(Math.abs((smokePace(paced.lines) ?? 0) - pace)).toBeLessThan(0.005);
+  expect(Math.abs((smokePace(paced.lines, judgeSmoke(paced.lines, schedule.flat())) ?? 0) - pace)).toBeLessThan(0.005);
   const sweep = bindingSweep();
   const args = xdotoolArgs(sweep, pace);
   const slept = (list: readonly string[]) => list.reduce((total, arg, index) => (list[index - 1] === "sleep" ? total + Number(arg) : total), 0);
@@ -80,7 +80,7 @@ test("a native client stepping slower than the wall clock still starts every mov
   expect(edges.every((edge) => edge === "--delay 0")).toBe(true);
 });
 
-test("a client freeze that swallows a special's keys fails that special as invalid for the rerun, and the steps after it are still judged on their own keys [k1 scenario]", () => {
+test("a client freeze that swallows a special's keys fails that special as invalid for the rerun, the steps after it are still judged on their own keys, and the match's pace is not trusted [k1 scenario]", () => {
   const schedule = smokeSchedule(smokeApproaches(Character.rifleman, Character.demonHunter));
   const steps = schedule[1]?.[0]?.steps ?? [];
   const away = steps.findIndex(({ name }) => name === "Side special away");
@@ -93,4 +93,9 @@ test("a client freeze that swallows a special's keys fails that special as inval
   expect(verdict.results.filter(({ step }) => step === "Up special" || step === "Ultimate").every(({ pass }) => pass)).toBe(true);
   expect(freezeInvalid(verdict)).toHaveLength(2);
   expect(freezeInvalid(verdict, ["Side special away"])).toHaveLength(4);
+  expect(smokePace(paced.lines, verdict)).toBeUndefined();
+  const keys = bindingSweep();
+  const sweepOnly = schedule.slice(0, 1);
+  const swallowed = rehearsal(Character.rifleman, Character.demonHunter, SMOKE_BINDINGS, sweepOnly, 1, { segment: 0, at: tapeFrames(keys.slice(0, 10)) + 2, frames: 20 });
+  expect(smokePace(swallowed.lines, judgeSmoke(swallowed.lines, sweepOnly.flat()))).toBeUndefined();
 });

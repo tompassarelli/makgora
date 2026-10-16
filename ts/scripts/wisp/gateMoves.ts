@@ -201,7 +201,7 @@ export const measureMovesGate = (clientsFile: string, directory: string) => Effe
     for (let attempt = 1; ; attempt++) {
       const { manifest, lines, schedule, runs } = yield* playMatch(index, pair, characters);
       const judged = judgeSmoke(lines, schedule.flat());
-      const measured = smokePace(lines);
+      const measured = smokePace(lines, judged);
       const played = pace;
       if (measured !== undefined) pace = measured * played;
       const verdict = withSelection(judged, fighters);
