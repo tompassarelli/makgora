@@ -32,7 +32,7 @@ import { fighterHideCommand, hideFighter } from "./fighterCloak";
 import { clearCapturedInputs } from "./inputs";
 import { journalEpoch, journalIdentity } from "./journal";
 import { chatBusy, requestPause } from "./journalPause";
-import { Key, syncKeyEvents } from "./keyEvents";
+import { Key, keyEventAllowed, syncKeyEvents } from "./keyEvents";
 import { startBodyFit } from "./bodyFit";
 import { startAgencyFixture } from "./agencyFixture";
 import { applyShowcaseCommand } from "./showcase";
@@ -139,9 +139,10 @@ export function selectPauseMenu(s: ShellState, actor: number, choice: number): v
   } else exitPausedMatch(s, choice === 2);
 }
 
-function participantKeyDown(s: ShellState, slot: ParticipantSlot): void {
+function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = false): void {
   if (!humanActive(s.game, slot)) return;
   const key = GetHandleId(BlzGetTriggerPlayerKey());
+  if (!startKey && !keyEventAllowed(s.keyEvents, key)) return;
   if (journalOwnsKey(s, slot, key)) return;
   if (s.trace.active) s.trace.window.keyDown[slot]++;
   traceParticipant(s, slot, `received down ${key}`);
@@ -209,9 +210,10 @@ function participantKeyDown(s: ShellState, slot: ParticipantSlot): void {
   } else if (action === Action.special) back(s, slot);
 }
 
-function participantKeyUp(s: ShellState, slot: ParticipantSlot): void {
+function participantKeyUp(s: ShellState, slot: ParticipantSlot, startKey = false): void {
   if (!humanActive(s.game, slot)) return;
   const key = GetHandleId(BlzGetTriggerPlayerKey());
+  if (!startKey && !keyEventAllowed(s.keyEvents, key)) return;
 
   if (key === Key.n && s.pauseMenu?.title) s.titleAwaitRelease = false;
 
@@ -248,6 +250,16 @@ export function onKeyDown(s: ShellState): void {
 export function onKeyUp(s: ShellState): void {
   const slot = triggerSlot();
   if (slot !== undefined) participantKeyUp(s, slot);
+}
+
+export function onStartKeyDown(s: ShellState): void {
+  const slot = triggerSlot();
+  if (slot !== undefined) participantKeyDown(s, slot, true);
+}
+
+export function onStartKeyUp(s: ShellState): void {
+  const slot = triggerSlot();
+  if (slot !== undefined) participantKeyUp(s, slot, true);
 }
 
 

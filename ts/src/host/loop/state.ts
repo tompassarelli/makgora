@@ -242,7 +242,7 @@ export const replayRecording = (): ReplayRecording => ({ recorder: createMatchRe
 interface KeyEvents {
   down: trigger | undefined;
   up: trigger | undefined;
-
+  enabled: boolean;
   escapeOnly: boolean;
 }
 
@@ -415,7 +415,7 @@ export function createShellState(build: MapBuild, setup: ShellSetup): ShellState
     trace: inputTrace(build.responseProbe || build.inputProfile === "native-driver" ? 2048 : 256),
     probe: createResponseProbe(build.id),
     rollback: isShadow(input) ? rollback(input, setup.playback, setup.editbox) : undefined,
-    keyEvents: { down: undefined, up: undefined, escapeOnly: false }, readyMarkerWritten: false, restartRequested: false,
+    keyEvents: { down: undefined, up: undefined, enabled: true, escapeOnly: false }, readyMarkerWritten: false, restartRequested: false,
     diagnostic: createReplaySnapshot(), moment: momentSaves(), replay: replayRecording(),
   };
 

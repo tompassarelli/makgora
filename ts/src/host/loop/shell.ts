@@ -29,8 +29,8 @@ import { callbackMatchTick } from "./frame";
 import { clearAllInputs, clearParticipantInputs, currentHumanMask } from "./inputs";
 import { INPUT_PREFIX, journalEpoch, publishMenu, serviceJournalEnd } from "./journal";
 import * as journalPause from "./journalPause";
-import { KEY_DOWN, KEY_UP, Key, registerKey, removeKeyEvents, syncKeyEvents } from "./keyEvents";
-import { onDevCommand, onDeveloperRestart, onDeveloperTrace, onKeyDown, onKeyUp, onProbeExport, onProbeStart, selectPauseMenu } from "./keys";
+import { KEY_DOWN, KEY_UP, KEY_START_DOWN, KEY_START_UP, Key, registerKey, syncKeyEvents } from "./keyEvents";
+import { onDevCommand, onDeveloperRestart, onDeveloperTrace, onKeyDown, onKeyUp, onStartKeyDown, onStartKeyUp, onProbeExport, onProbeStart, selectPauseMenu } from "./keys";
 import { panelActions, serviceAutomaticRematch, startingSelection } from "./menus";
 import { PLAYER_FILE_RECEIVED, bindingFiles, playerFileReceived, playerFilesOwnerLeft, startPlayerFiles } from "./playerFiles";
 import { PLAYTEST, PLAYTEST_PREFIX, playtestRequested, readPlaytestRequest, servicePlaytestRequest } from "./playtest";
@@ -249,7 +249,6 @@ function playerLeft(s: ShellState): void {
     }
     view.announce(s, "A player left. Choose the next match.");
   }
-  removeKeyEvents(s);
   syncKeyEvents(s);
 }
 
@@ -282,8 +281,8 @@ function createTriggers(s: ShellState): void {
   const startUp = CreateTrigger();
   registerKey(s, startDown, Key.y, true);
   registerKey(s, startUp, Key.y, false);
-  TriggerAddAction(startDown, trampoline(KEY_DOWN));
-  TriggerAddAction(startUp, trampoline(KEY_UP));
+  TriggerAddAction(startDown, trampoline(KEY_START_DOWN));
+  TriggerAddAction(startUp, trampoline(KEY_START_UP));
   const moment = CreateTrigger();
   registerKey(s, moment, Key.k, true);
   TriggerAddAction(moment, trampoline(SAVE_MOMENT));
@@ -407,6 +406,8 @@ export function installShell(): void {
   on(DRAW_EVENT, drawBetweenFrames);
   on(KEY_DOWN, withShell(onKeyDown));
   on(KEY_UP, withShell(onKeyUp));
+  on(KEY_START_DOWN, withShell(onStartKeyDown));
+  on(KEY_START_UP, withShell(onStartKeyUp));
   on(INPUT, withShell(receiveInput));
   on(netDelay.DELAY_RECEIVED, withShell(s => { if (s.rollback !== undefined) netDelay.receiveDelayProposal(s.rollback.net); }));
   on(CONTROL_ACK, withShell(journalPause.receiveControlAckEvent));
