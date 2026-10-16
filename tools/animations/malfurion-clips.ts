@@ -122,7 +122,7 @@ for(const [ordinal,action]of [...actions,...damageActions].entries()){
  const name=ordinal<actions.length?`Malfurion ${action.pose}`:`Malfurion Damage ${Math.floor((ordinal-actions.length)/3)} ${((ordinal-actions.length)%3)}`;
  model.Sequences.push({...stand,Name:name,Interval:new Uint32Array([start,end]),NonLooping:true,MoveSpeed:0,Rarity:0,MinimumExtent:new Float32Array([-300,-300,-200]),MaximumExtent:new Float32Array([300,300,350]),BoundsRadius:400});
  const reverse=action.pose==="downSmash"?action.contact+3:action.pose==="getUpAttack"?action.contact+2:undefined;
- const phaseFrames=[...new Set([0,Math.max(1,action.contact-3),action.contact,Math.min(action.frames-1,action.contact+4),action.frames,...action.roll?[0.25,0.5,0.75].map(p=>Math.round(action.frames*p)):[],...reverse?[reverse]:[]])].sort((a,b)=>a-b);
+ const phaseFrames=[...new Set([0,Math.max(1,action.contact-3),action.contact,Math.min(action.frames-1,action.contact+4),action.frames,...action.roll?[0.25,0.5,0.75].map(p=>Math.round(action.frames*p)):[],...reverse?[reverse]:[],...action.pose.startsWith("neutralSpecial")?[action.frames-12]:[]])].sort((a,b)=>a-b);
  const phases=phaseFrames.map(frame=>({frame,amount:action.hold?1:action.roll?Math.sin(Math.PI*frame/action.frames):frame===0||frame===action.frames?0:frame===Math.max(1,action.contact-3)?-0.3:1}));
  tracks(model,(track,path)=>{
   const donor=originals.get(path);if(!donor||onGlobalClock(donor))return;let first=donor.Keys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1]);
