@@ -190,7 +190,7 @@ export function assembleFamily(family: Family, base: string, rebuilt: ReadonlyMa
 const shippedModels = (files: Iterable<string>) => new Set([...files].filter((file) => file.endsWith(".mdx")).map((file) => `war3mapImported\\${basename(file)}`));
 
 export function removeDroppedModelFacts(before: Iterable<string>, after: Iterable<string>, directory = MODEL_FACTS_DIRECTORY): string[] {
-  const kept = shippedModels(after), dropped = [...shippedModels(before)].filter((model) => !kept.has(model)).sort();
+  const kept = shippedModels(after), dropped = [...shippedModels(before)].filter((model) => !kept.has(model) && existsSync(join(directory, modelFactsFile(model)))).sort();
   for (const model of dropped) rmSync(join(directory, modelFactsFile(model)), { force: true });
   return dropped;
 }
