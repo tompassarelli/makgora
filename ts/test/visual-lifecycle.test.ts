@@ -469,9 +469,8 @@ test("combat effects: rollback, pause/resume and rematch neither replay nor reta
     expect(shownFlames()).toEqual([]);
     confirm(s, 0);
     confirm(s, 1);
-    const candleModels = new Set(CANDLE_FLAMES.slice(1).map(level => level.model));
-    const liveCandles = () => client.effectPoses().filter(pose => candleModels.has(pose.model) && !looseHandles.has(pose.handle) && pose.destroyed === undefined).length;
-    expect(liveCandles()).toBe(0);
+    const liveOf = (handles: readonly effect[]) => handles.filter(model => { const pose = effectPoses(client).get(model); return pose !== undefined && pose.destroyed === undefined; }).length;
+    expect(liveOf(flames)).toBe(0);
     expect(looseEffects.every(model => effectPoses(client).get(model)?.destroyed !== undefined)).toBe(true);
     expect(requestStageSelect(s.game, 0)).toBe(true);
     expect(startAtGo(s.game, 0)).toBe(true);
@@ -479,7 +478,8 @@ test("combat effects: rollback, pause/resume and rematch neither replay nor reta
     const rematched = candleEffects();
     expect([...visible(client, looseHandles)].length).toBe(0);
     expect(rematched).toHaveLength(CANDLE_FLAMES.length);
-    expect(liveCandles()).toBe(candleModels.size);
+    expect(liveOf(rematched)).toBe(rematched.length);
+    expect(liveOf(flames)).toBe(0);
     expect(rematched.filter(model => { const pose = effectPoses(client).get(model); return pose !== undefined && !hidden(pose); }).length).toBeLessThanOrEqual(1);
   });
   expect(client.errors).toEqual([]);

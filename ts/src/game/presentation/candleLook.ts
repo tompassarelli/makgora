@@ -5,11 +5,14 @@ interface FlameLevel {
   readonly scale: number;
 }
 
+// Immolation keeps its particles in model space, so a moving candle leaves no fire trail.
+export const CANDLE_FLAME_MODEL = "Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedTarget.mdx";
+
 export const CANDLE_FLAMES: readonly FlameLevel[] = [
-  { model: "Abilities\\Spells\\Human\\FlameStrike\\FlameStrikeEmbers.mdx", scale: f32(0.35) },
-  { model: "Environment\\SmallBuildingFire\\SmallBuildingFire2.mdx", scale: f32(0.25) },
-  { model: "Environment\\SmallBuildingFire\\SmallBuildingFire0.mdx", scale: f32(0.35) },
-  { model: "Environment\\LargeBuildingFire\\LargeBuildingFire1.mdx", scale: f32(0.3) },
+  { model: CANDLE_FLAME_MODEL, scale: f32(0.15) },
+  { model: CANDLE_FLAME_MODEL, scale: f32(0.22) },
+  { model: CANDLE_FLAME_MODEL, scale: f32(0.3) },
+  { model: CANDLE_FLAME_MODEL, scale: f32(0.38) },
 ];
 
 export const CANDLE_SMOKE: FlameLevel = {
