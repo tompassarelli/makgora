@@ -5,7 +5,8 @@ import { Effect, Exit, Fiber, Schema, Scope } from "effect";
 import { ChildProcess } from "effect/process";
 import { runProcess } from "./hostProcess";
 import { resolveTools, withRuntimeTools } from "./wisp/nativeTools";
-import { attachedPoolReady } from "./wisp/nativePool";
+import { attachedPoolReady, attachExistingPool } from "./wisp/nativePool";
+import { processIsAlive } from "./wisp/commands/pairClaim";
 import { pollUntil } from "./hostPoll";
 
 class CaptureBatchFailure extends Schema.TaggedError<CaptureBatchFailure>()("CaptureBatchFailure", { problem: Schema.String }) {
@@ -64,7 +65,11 @@ const stopPool = (child: Bun.Subprocess) => Effect.gen(function*() {
 const poolScope = (pair: number, desktop: string, capacity: string) => Effect.gen(function*() {
   const scope = yield* Scope.fork(yield* Effect.scope);
   const existing = yield* pairStatus(pair).pipe(Effect.orElseSucceed(() => undefined));
-  const child = attachedPoolReady(existing) ? undefined : yield* Effect.acquireRelease(
+  const holder = yield* Effect.try({ try: () => {
+    const path = join(lanState, `pair-${pair}`, "pool.pid");
+    return existsSync(path) ? Number(readFileSync(path, "utf8").trim()) : 0;
+  }, catch: cause => new CaptureBatchFailure({ problem: String(cause) }) });
+  const child = attachExistingPool(existing, Number.isInteger(holder) && holder > 1 && processIsAlive(holder)) ? undefined : yield* Effect.acquireRelease(
     Effect.try({
       try: () => Bun.spawn([process.execPath, "scripts/wisp.ts", "lan", "pool", "--foreground", "--pair", String(pair), "--pool-profile", "visual", "--desktop", desktop, "--capacity", capacity], { cwd: tsDirectory, stdin: "ignore", stdout: "inherit", stderr: "inherit" }),
       catch: cause => new CaptureBatchFailure({ problem: `start pair ${pair} pool: ${String(cause)}` }),

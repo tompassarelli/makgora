@@ -3,7 +3,7 @@ import { readFileSync, mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { parseBoxes, planBoxes, type Box } from "../scripts/wisp/nativePlan";
-import { attachedPoolReady } from "../scripts/wisp/nativePool";
+import { attachedPoolReady, attachExistingPool } from "../scripts/wisp/nativePool";
 const fixture = join(import.meta.dir, "fixtures/native-plan/boxes.tsv");
 test("native planning preserves every eligible issue without mixing execution contexts [k2 property]", () => {
   let seed = 8791;
@@ -45,7 +45,11 @@ test("native dry run assigns visual scripts to both pairs before timing without 
     expect(lines[4]).toContain("timing pair 0");
   } finally { rmSync(out, { recursive: true }); }
 });
-test("capture batches attach only to a live two-client pool independent of launcher exit [k1 scenario]", () => {
+test("capture batches recognise service ownership while client readiness recovers [k1 scenario]", () => {
+  expect(attachExistingPool(undefined, true)).toBe(true);
+  expect(attachExistingPool({ clients: [{ pid: 101 }] }, true)).toBe(true);
+  expect(attachExistingPool(undefined, false)).toBe(false);
+  expect(attachExistingPool({ clients: [{ pid: 101 }, { pid: 102 }] }, false)).toBe(true);
   expect(attachedPoolReady({ clients: [{ pid: 101 }, { pid: 102 }] })).toBe(true);
   for (const status of [undefined, { clients: [] }, { clients: [{ pid: 101 }] }, { clients: [{ pid: 101 }, {}] }, { clients: [{ pid: 0 }, { pid: 102 }] }]) expect(attachedPoolReady(status)).toBe(false);
 });
