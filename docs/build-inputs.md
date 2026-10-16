@@ -88,6 +88,13 @@ code:
    through smashcraft:ts/scripts/mergeGenerated.ts, which `bun install` (from ts/)
    registers in the repository's git config (#401).
 
+`bun wisp map build --profile playable --edition classic --inputs-only` runs
+the build's private input, import and cue resolution checks without compiling
+or packing a map. The landing hook runs this locally when build inputs, pins,
+generated clips or their build tooling change. It rechecks the private store
+on every push; source-only cached results cannot hide a missing body. Hosted
+runners omit this check because they have no private store.
+
 `bun wisp inputs check` verifies every family of the checkout's manifest.
 Never edit a stored folder; a build reports an edit in place with the command
 that regenerates the family.

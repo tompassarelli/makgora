@@ -38,6 +38,11 @@ investigation.
 
 Every push runs the pre-push gate (smashcraft:.githooks/pre-push, enabled for
 the repository with `git config core.hooksPath .githooks`; safe-push runs it):
+the local private-store map input check for build-input, pin, generated clip
+and build tooling changes (`bun scripts/wisp.ts map build --profile playable
+--edition classic --inputs-only` from ts/). It runs the build's input, import
+and cue checks before Autoland hand-off, with no source-only cache; hosted
+runners omit it because they have no private store. The other checks are
 the clean-room check (smashcraft:ts/scripts/cleanRoom.ts: no game files or
 copied game scripts outside smashcraft:clean-room-allowlist.tsv; wisp:docs/clean-room.md),
 `bun run check` (the kind-tag refusal of test titles, smashcraft:ts/scripts/oracleTagsCheck.ts,

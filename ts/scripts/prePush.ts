@@ -26,11 +26,12 @@ export class PrePushRefusal extends Schema.TaggedError<PrePushRefusal>()("PrePus
   }
 }
 
-export interface Check { readonly name: string; readonly directory: string; readonly args: readonly string[]; readonly fix?: string; readonly hosted: boolean; readonly inputs?: readonly string[] }
+export interface Check { readonly name: string; readonly directory: string; readonly args: readonly string[]; readonly fix?: string; readonly hosted: boolean; readonly inputs?: readonly string[]; readonly privateStore?: boolean }
 
 
 const ANIMATION_INPUTS = ["build-inputs/original-clips-static-lights/", "tools/animations/", "ts/scripts/keyThin.ts", "ts/scripts/wisp/animJitter.ts"];
 const MODEL_INPUTS = ["build-inputs/", "tools/animations/", "ts/src/game/assets/", "ts/src/generated/assets/", "ts/src/generated/stages/", "ts/src/game/presentation/", "ts/scripts/wisp/playerView.ts", "ts/scripts/wisp/model-facts/"];
+const MAP_INPUTS = [...MODEL_INPUTS, "ts/src/generated/clips/", "ts/scripts/prePush.ts", "ts/scripts/wisp/", "ts/wisp.lock", "ts/bun.lock", "ts/package.json", "ts/vendor/", "typescript-toolchain.lock"];
 
 
 const CUE_CHECK = "ts/scripts/cueModels.ts";
@@ -59,6 +60,7 @@ export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = 
   const animation = paths.some((path) => ANIMATION_INPUTS.some((input) => path === input || input.endsWith("/") && path.startsWith(input)));
   const models = paths.some((path) => MODEL_INPUTS.some((input) => path === input || input.endsWith("/") && path.startsWith(input)));
   const cueModels = touchesCueInputs(paths, cues);
+  const mapInputs = paths.some((path) => MAP_INPUTS.some((input) => path === input || input.endsWith("/") && path.startsWith(input)));
   const suites = paths.some((path) => SUITE_INPUTS.includes(path));
   return [
     ...(paths.length > 0 ? [{ name: "clean room", directory: "ts", args: ["scripts/cleanRoom.ts"], fix: "follow wisp:docs/clean-room.md and the line above.", hosted: true }] : []),
@@ -68,6 +70,7 @@ export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = 
     ...(suites ? [
       { name: "Autoland suite covers the farm suite", directory: "ts", args: ["scripts/suiteParity.ts"], fix: "give Autoland's suite every farm-test job and input, since safe-push hands a lane to Autoland without its own farm run (smashcraft:docs/ci.md, \"Autoland\").", hosted: true },
     ] : []),
+    ...(mapInputs ? [{ name: "private map-build inputs", directory: "ts", args: ["scripts/wisp.ts", "map", "build", "--profile", "playable", "--edition", "classic", "--inputs-only"], fix: "regenerate and store the missing inputs before landing (smashcraft:docs/build-inputs.md).", hosted: false, privateStore: true }] : []),
     ...(models ? [
       { name: "generated models stored", directory: "ts", args: ["scripts/storedModels.ts"], fix: "store the regenerated family (smashcraft:docs/build-inputs.md, \"Change art\").", hosted: false, inputs: ["build-inputs", "tools/animations", ...SCRIPT_INPUTS] },
     ] : []),
@@ -193,7 +196,7 @@ export const laptop: Local = {
 };
 
 export const runChecks = (checks: readonly Check[], local: Local) => Effect.forEach(checks, (check) => Effect.gen(function*() {
-  const key = yield* local.key(check);
+  const key = check.privateStore ? Option.none<string>() : yield* local.key(check);
   if (Option.isSome(key) && (yield* local.cache.has(key.value))) return yield* Console.error(`pre-push: ${check.name} passed before on these inputs (cache ${key.value.slice(0, 12)})`);
   const started = performance.now();
   const child = yield* local.runner(check);
@@ -242,7 +245,7 @@ export const prePush = (input: string, landing: { readonly gate: typeof farmGate
     return commit === undefined || remote === undefined || ZERO.test(commit) || remoteRef?.startsWith("refs/tags/") ? [] : [{ commit, remoteRef, remote }];
   });
   const paths = [...new Set((yield* Effect.forEach(pushed, ({ commit, remote }) => local.changed(commit, remote))).flat())];
-  const selected = checksFor(paths, cueInputs());
+  const selected = checksFor(paths, cueInputs()).filter((check) => !(check.privateStore && process.env.GITHUB_ACTIONS === "true"));
   const toMain = pushed.some(({ remoteRef }) => remoteRef === "refs/heads/main");
   const handsOff = pushed.some(({ remoteRef }) => remoteRef === "refs/heads/main" || remoteRef?.startsWith(HAND_OFF) === true);
   const lands = handsOff ? autolandLands(yield* landing.queue, paths) : false;
@@ -250,7 +253,7 @@ export const prePush = (input: string, landing: { readonly gate: typeof farmGate
   const deferred = lands ? selected.filter(({ hosted }) => hosted) : [];
   if (checks.length === 0 && !toMain) return;
   const head = yield* local.head;
-  const dirty = checks.length === 0 ? "" : yield* local.dirty([...new Set(checks.map(({ directory }) => directory))]);
+  const dirty = checks.length === 0 ? "" : yield* local.dirty(checks.some(({ privateStore }) => privateStore) ? ["."] : [...new Set(checks.map(({ directory }) => directory))]);
   if (pushed.some(({ commit }) => commit !== head) || dirty !== "") {
     return yield* new PrePushRefusal({ problem: `pre-push: the checks read the working tree, so push the clean checked-out commit (HEAD ${head.slice(0, 12)}).\n${dirty}` });
   }

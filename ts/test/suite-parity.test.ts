@@ -40,7 +40,7 @@ test("a main push Autoland lands waits for no farm run, and a direct main push s
   expect(await gated("")).toEqual([head]);
 });
 
-const LOCAL_ONLY = ["generated models stored", "animation jitter [k3 measure #479]"];
+const LOCAL_ONLY = ["private map-build inputs", "generated models stored", "animation jitter [k3 measure #479]"];
 const HOSTED = ["clean room", "kind tags and type-check ts", "Autoland suite covers the farm suite", "cue models recorded in both looks"];
 const EVERY_PATH = ["ts/scripts/prePush.ts", "build-inputs/original-clips-static-lights/kobold", CUE_MODEL_RECORD];
 
@@ -76,6 +76,23 @@ test("Autoland's build pushes each candidate through the pre-push hook, and a --
   const gap = [`Autoland's build no longer pushes the candidate with the pre-push hook (${HOOKED_PUSH} after git config core.hooksPath .githooks), so the checks safe-push leaves to it never run`];
   expect(hookGaps(rewritten((run) => run.replaceAll(HOOKED_PUSH, 'git push --no-verify origin "HEAD:refs/heads/$scratch"')))).toEqual(gap);
   expect(hookGaps(rewritten((run) => run.replaceAll("git config core.hooksPath .githooks", "true")))).toEqual(gap);
+});
+
+test("input, pin and clip lanes cannot hand off to Autoland after a private-store failure, even with a cached source pass [k1 scenario]", async () => {
+  for (const path of ["build-inputs/original-clips-static-lights/kobold", "ts/wisp.lock", "typescript-toolchain.lock", "ts/src/generated/clips/kobold.ts"]) {
+    const ran: string[] = [];
+    const local: Local = {
+      ...stubbed([path], ran, (check) => check.privateStore ? 1 : 0),
+      key: () => Effect.succeedSome("previous-source-pass"),
+      cache: { has: () => Effect.succeed(true), record: () => Effect.void },
+    };
+    const result = await Effect.runPromise(prePush("HEAD c0ffee refs/heads/claude/land-store 0000000000000000000000000000000000000000\n", {
+      queue: Effect.succeed("autoland"), notice: Effect.void,
+      gate: () => Effect.die("must refuse before landing"),
+    }, local).pipe(Effect.as("passed"), Effect.catchTag("PrePushRefusal", () => Effect.succeed("refused"))));
+    expect(result).toBe("refused");
+    expect(ran).toEqual(["private map-build inputs"]);
+  }
 });
 
 test("a passed check is skipped while its input tree and bun.lock stay the same, a failure is never cached, and a changed input runs it again [k5 boundary pre-push-cache]", async () => {
