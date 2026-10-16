@@ -9,6 +9,7 @@ import { CEILING_SPEC } from "./balance";
 import { ceilingTable, readCeilingPlans, type CeilingRow } from "./ceiling";
 import { FIELD_STAGES, playCpuField, playCpuMatch } from "./cpuField";
 import { runAdmitted } from "./heavyCapacity";
+import { partitionWork } from "./balanceShards";
 
 const Count = Schema.Struct({ wins: Schema.Finite, losses: Schema.Finite, ties: Schema.Finite, played: Schema.Finite });
 const Data = Schema.Struct({ cpuSeconds: Schema.Finite, counts: Schema.Record(Schema.String, Count), pairs: Schema.Record(Schema.String, Schema.Finite) });
@@ -50,7 +51,7 @@ export function ceilingRows(data: Data): CeilingRow[] {
 }
 
 if (import.meta.main) await Effect.runPromise(Effect.gen(function*() {
-  const {values}=yield* Effect.try({try:()=>parseArgs({args:process.argv.slice(2),options:{pairs:{type:"string"},json:{type:"string"},merge:{type:"string"},baseline:{type:"string"},report:{type:"string"},depth:{type:"string"}}}),catch:cause=>new CeilingFailure({problem:String(cause)})});
+  const {values}=yield* Effect.try({try:()=>parseArgs({args:process.argv.slice(2),options:{pairs:{type:"string"},json:{type:"string"},merge:{type:"string"},baseline:{type:"string"},report:{type:"string"},depth:{type:"string"},partition:{type:"string"}}}),catch:cause=>new CeilingFailure({problem:String(cause)})});
   const data=fresh();
   const merge = values.merge;
   if(merge!==undefined){
@@ -69,19 +70,21 @@ if (import.meta.main) await Effect.runPromise(Effect.gen(function*() {
     yield* Effect.promise(()=>runAdmitted("moderate","smashcraft:cpuCeiling",3600));
     yield* Effect.try({try:()=>{
       const before=process.cpuUsage();
+      const owns=partitionWork(values.partition);
       const plans=readCeilingPlans();
       const named=(slug:string)=>{const c=selectableCharacterBySlug(slug);if(c===undefined)throw Error(`Unknown fighter ${slug}`);return c;};
       const pairs=(values.pairs??"").split(",").filter(Boolean).map(pair=>{const [a,b]=pair.split(":");if(a===undefined||b===undefined)throw Error(pair);return [named(a),named(b)] as const;});
       for(const pair of pairs){
-        for(const id of CPU_OPPONENT_IDS.filter(id=>id!=="wren"))add(data,playCpuField({pairs:[pair],opponents:[id,id],perPair:CEILING_SPEC.panelPerPair,seeds:100}),id);
+        for(const id of CPU_OPPONENT_IDS.filter(id=>id!=="wren"))if(owns())add(data,playCpuField({pairs:[pair],opponents:[id,id],perPair:CEILING_SPEC.panelPerPair,seeds:100}),id);
         const expert=cpuSkill("wren","expert");
         const modes: readonly [string,CeilingMode][]=[["execution","execution"],["judgment","judgment"],["ceiling-expert","ceiling"],["advanced","expert"]];
         for(const [kind,mode] of modes)for(const slot of [0,1] as const){
+          if(!owns())continue;
           const skill=kind==="advanced"?cpuSkill("wren","advanced"):ceilingSkill(expert,mode);
           const records=playCpuField({pairs:[pair],skills:slot===0?[skill,undefined]:[undefined,skill],perPair:CEILING_SPEC.finalPerPair,seeds:100});
           add(data,records,kind,slot);
         }
-        const ceiling=ceilingSkill(expert,"ceiling");add(data,playCpuField({pairs:[pair],skills:[ceiling,ceiling],perPair:CEILING_SPEC.finalPerPair,seeds:100}),"ceiling-field");
+        const ceiling=ceilingSkill(expert,"ceiling");if(owns())add(data,playCpuField({pairs:[pair],skills:[ceiling,ceiling],perPair:CEILING_SPEC.finalPerPair,seeds:100}),"ceiling-field");
         console.error(`Measured ${pair.map(fighterSlug).join(":")}`);
       }
       for(const slug of (values.depth??"").split(",").filter(Boolean)){
@@ -89,6 +92,7 @@ if (import.meta.main) await Effect.runPromise(Effect.gen(function*() {
         const basic=ceilingSkill(cpuSkill("wren","expert"),"basic",plan.basicMoves);
         const stages=Object.keys(FIELD_STAGES);
         for(let trial=0;trial<CEILING_SPEC.depthMatches;trial++){
+          if(!owns())continue;
           const slot=trial%2===0?0:1;
           const stage=stages[Math.floor(trial/2)%stages.length];
           if(stage===undefined)throw Error("No ceiling stages");

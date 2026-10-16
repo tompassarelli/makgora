@@ -11,16 +11,27 @@
   branch, the place for scratch instrumentation, since Autoland lands every
   pushed `claude/` lane.
   A newer run of the same shape on the same line (main, the lane or the
-  scratch commit) cancels the older one, and every job first cancels its run
+  scratch commit) cancels the older one (each `--matchups` run is its own shape,
+  because GitHub refuses a run whose concurrency group holds a long pair list),
+  and every job first cancels its run
   when the commit has left main (or main reverted it) and its lane
   (smashcraft:ts/scripts/farmGuard.ts). Job timeouts sit about 1.5 times above
   the longest measured job.
   `bun wisp farm balance [--ref REF] [--lane NAME] [--wait]` plays the
   balance gate's computer field (Wren Expert, 400 a pair; `--opponent`, `--tier`,
   `--per-pair`, `--seeds`) on GitHub's free hosted runners, a `cpuField
-  --pairs` process a core, eight pairs a job and at most 8 jobs at once (the
-  account runs 40 jobs at once (GitHub Pro); wisp:docs/ci.md, "Runner capacity and
-  waiting"), then each fighter's spam probe (its top damage move only,
+  --pairs` process a core. The plan measures running hosted jobs across the
+  owner's recently active public repositories and reserves the time-weighted
+  p90 concurrent hosted jobs from the latest ten completed Autoland runs per
+  repository. Its matrix admits `40 - busy - reserve` jobs and refuses when
+  no slots remain. The measurement is printed in the plan and the command's
+  final report. The account runs 40 jobs at once (GitHub Pro; wisp:docs/ci.md,
+  "Runner capacity and waiting"). Work is packed across four cores by measured
+  CPU time into jobs of at most 15 predicted minutes. Long ceiling panels and
+  spam probes are partitioned without changing their matches, seeds or verdicts;
+  the `balance-timings` artifact supplies the next full-roster plan. Until one
+  exists, the plan reads the previous full field's job durations and ceiling
+  CPU records. The field is followed by each fighter's spam probe (its top damage move only,
   `--probe N` matches a pair, 40 by default, 0 to skip), and with `--wait`
   prints the verdicts, the field table and the damage-by-move, play-style,
   openings-per-kill and balance-score tables (smashcraft:docs/design/balance.md).

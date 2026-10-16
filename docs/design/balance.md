@@ -418,6 +418,12 @@ Lich 42.6%, Kobold 42.8%, Forsaken Paladin 43.4%, Cairne 44.9%, Grom 58.2%,
 Warden 58.5%, Rifleman 71.4%. Dreadlord fell with more damage, so his gap is
 not damage.
 
+16 Oct 2026 (#10, 35–65% scope). The full field on bd796adcb5 put Cairne at
+71.7% with Shockwave at 28% of his moves started (profile 2–12%). His
+gameplan's shoot approach weight drops from 2 to 1 and his run approach rises
+from 2 to 3, and every Cairne damage literal is scaled ×0.9 with his strength
+growths ×1.11, on top of the factors above.
+
 ## Player panel and equal skill ceilings (#358)
 
 Every fighter targets a 45–55% mean over all six Expert personalities, with

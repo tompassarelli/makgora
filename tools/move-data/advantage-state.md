@@ -274,11 +274,11 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Sylvanas Windrunner | heavy | up throw | 1/1 | 1/1 in dash, dash attack, out forward smash | 1/1 KD in short hop, back air, out forward smash | 2/1 |
 | Sylvanas Windrunner | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Cairne Bloodhoof | light | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Cairne Bloodhoof | light | up throw | 1/1 in up tilt, out down tilt | 1/1 in up tilt, out dash, dash attack | 1/1 KD in up special, out down tilt | 1/1 in short hop, back air, out forward tilt |
+| Cairne Bloodhoof | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Cairne Bloodhoof | light | up throw | 1/1 | 1/1 KD in up tilt, out dash, dash attack | 1/1 KD in up special, out down tilt | 1/1 in short hop, back air, out forward tilt |
 | Cairne Bloodhoof | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | medium | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Cairne Bloodhoof | medium | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
+| Cairne Bloodhoof | medium | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | medium | up throw | 1/1 in forward tilt, out down tilt | 1/1 in down tilt, out dash, dash attack | 1/1 KD in up special, out down tilt | 1/1 in down special, out dash, dash attack |
 | Cairne Bloodhoof | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | heavy | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |

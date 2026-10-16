@@ -1,4 +1,5 @@
 import { stageBounds } from "../src/game/sim/stageBounds";
+import { partitionWork } from "./balanceShards";
 import { WORLD_UNITS_PER_MELEE_UNIT } from "../src/game/sim/tuning";
 
 
@@ -1248,7 +1249,7 @@ export function balanceTables(summaries: readonly FighterSummary[], probes: Read
 
 
 function probeResults(files: readonly string[]): Map<string, { move: string; winRate: number; matches: number }> {
-  const out = new Map<string, { move: string; winRate: number; matches: number }>();
+  const rows: { fighter: string; move: string; wins: number; losses: number; matches: number }[] = [];
   for (const file of files) {
     const parsed: unknown = JSON.parse(readFileSync(file, "utf8"));
     if (!isFieldFile(parsed)) throw new Error(`${file} holds no cpuField --json probe`);
@@ -1256,10 +1257,20 @@ function probeResults(files: readonly string[]): Map<string, { move: string; win
     for (const [fighter, move] of Object.entries(options.spam ?? {})) {
       const summary = summaries.find((s) => s.fighter === fighter);
       if (summary === undefined || move === undefined) continue;
-      out.set(fighter, { move: moveName(move), winRate: summary.winRate, matches: summary.matches });
+      rows.push({ fighter, move: moveName(move), wins: summary.wins, losses: summary.losses, matches: summary.matches });
     }
   }
-  return out;
+  return mergeProbeCounts(rows);
+}
+
+export function mergeProbeCounts(rows: readonly { fighter: string; move: string; wins: number; losses: number; matches: number }[]): Map<string, { move: string; winRate: number; matches: number }> {
+  const totals = new Map<string, { move: string; wins: number; losses: number; matches: number }>();
+  for (const row of rows) {
+    const before = totals.get(row.fighter) ?? { move: row.move, wins: 0, losses: 0, matches: 0 };
+    if (before.move !== row.move) throw new Error(`${row.fighter}: probe shards used different moves`);
+    totals.set(row.fighter, { move: row.move, wins: before.wins + row.wins, losses: before.losses + row.losses, matches: before.matches + row.matches });
+  }
+  return new Map([...totals].map(([fighter, row]) => [fighter, { move: row.move, winRate: row.wins + row.losses === 0 ? Number.NaN : row.wins / (row.wins + row.losses), matches: row.matches }]));
 }
 
 
@@ -1285,7 +1296,7 @@ if (import.meta.main) {
   const { values } = parseArgs({
     args: process.argv.slice(2),
     options: { variants: { type: "string" }, "per-pair": { type: "string" }, seeds: { type: "string" }, "seed-offset": { type: "string" }, opponents: { type: "string" }, tiers: { type: "string" }, stocks: { type: "string" }, minutes: { type: "string" }, json: { type: "string" }, merge: { type: "string" }, fighters: { type: "string" }, pairs: { type: "string" },
-      "probe-fighter": { type: "string" }, from: { type: "string" }, probe: { type: "string" }, "ledge-rule": { type: "string" } },
+      "probe-fighter": { type: "string" }, from: { type: "string" }, probe: { type: "string" }, "ledge-rule": { type: "string" }, partition: { type: "string" } },
     strict: true,
   });
   const fighterNamed = (slug: string) => {
@@ -1305,7 +1316,9 @@ if (import.meta.main) {
     if (move === undefined) throw new Error(`${values.from} has no top damage move for ${fighterSlug(probeFighter)}`);
     spam = { [fighterSlug(probeFighter)]: move };
   }
-  const probePairs = probeFighter === undefined ? undefined : SELECTABLE_CHARACTERS.filter((other) => other !== probeFighter).map((other) => [probeFighter, other] as const);
+  const owns = partitionWork(values.partition);
+  if (values.partition !== undefined && probeFighter === undefined) throw new Error("--partition requires --probe-fighter");
+  const probePairs = probeFighter === undefined ? undefined : SELECTABLE_CHARACTERS.filter((other) => other !== probeFighter).map((other) => [probeFighter, other] as const).filter(() => owns());
   const pairs = probePairs ?? values.pairs?.split(",").map((pair) => {
     const [a, b, extra] = pair.split(":");
     if (a === undefined || b === undefined || extra !== undefined || a === b) throw new Error(`--pairs takes pairs of different fighters, like illidan:rifleman; not ${pair}`);
@@ -1343,6 +1356,7 @@ if (import.meta.main) {
     await runAdmitted("moderate", "smashcraft:cpuField", 3600);
   }
   const started = performance.now();
+  const cpuBefore = process.cpuUsage();
   let reported = 0;
 
   const merged = values.merge?.split(",").flatMap(shardRecords);
@@ -1363,5 +1377,6 @@ if (import.meta.main) {
   console.log(ledgePlayLines(records).join("\n"));
   console.log("");
   console.log(balanceTables(summaries, probeResults(values.probe?.split(",").filter(Boolean) ?? []), readProfiles()));
-  if (values.json !== undefined) writeFileSync(values.json, `${JSON.stringify({ options, summaries, records }, null, 1)}\n`);
+  const cpuUsed = process.cpuUsage(cpuBefore);
+  if (values.json !== undefined) writeFileSync(values.json, `${JSON.stringify({ options, summaries, records, cpuSeconds: (cpuUsed.user + cpuUsed.system) / 1e6 }, null, 1)}\n`);
 }

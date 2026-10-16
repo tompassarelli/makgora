@@ -33,7 +33,7 @@ function cairneVersus(gap: number, character: Character): { world: Roster; owner
   return duelPair(createFighter(Character.cairne, 0.0, 1), createFighter(character, gap, -1));
 }
 
-test("Bloodhoof Gore catches a shielding foe, holds 20 frames and launches forward with 13 damage [k1 scenario]", () => {
+test("Bloodhoof Gore catches a shielding foe, holds 20 frames and launches forward with 11.7 damage [k1 scenario]", () => {
   const { world, owner, target } = cairneVersus(H, Character.rifleman);
   for (let tick = 0; tick < 10; tick++) stepDuel(world, controls(), SHIELD);
   assertTrue(target.shield.raised);
@@ -54,7 +54,7 @@ test("Bloodhoof Gore catches a shielding foe, holds 20 frames and launches forwa
   assertTrue(caught >= GORE.first && caught <= GORE.last);
   assertEquals(GORE.holdFrames, 20);
   assertEquals(thrownAt, caught + GORE.holdFrames);
-  assertEquals(target.status.damage, 13.0);
+  assertEquals(target.status.damage, 11.699999809265137);
   for (let tick = 0; tick < 40; tick++) stepDuel(world);
   assertTrue(target.motion.x > owner.motion.x + H);
 });
