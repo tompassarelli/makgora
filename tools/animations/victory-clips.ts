@@ -4,7 +4,7 @@ import { isDeepStrictEqual } from 'node:util';
 import { generateMDX, parseMDX, ModelRenderer, model as mdx } from 'war3-model';
 import { DrawnModel, sheet, type PoseFrame } from '../../ts/scripts/wisp/hurtboxView';
 import { fighters } from '../../ts/scripts/heroModelSource';
-import { AttackPhase } from '../../ts/src/game/sim/codes';
+import { AttackPhase, Character } from '../../ts/src/game/sim/codes';
 import { ensure, onGlobalClock, tracks } from './original-clips';
 
 type Arms = 'rest' | 'low' | 'raised' | 'pumped';
@@ -17,6 +17,8 @@ const CHEER: readonly Beat[] = [
     { frame: 90, arms: 'rest', chest: 0, head: 0, hop: 0 },
 ];
 const FRAMES = 90;
+const BOUNCING: ReadonlySet<number> = new Set([Character.murloc]);
+const BOUNCE: Readonly<Record<number, number>> = { 18: 0.4, 50: 0.35, 72: 0.35 };
 const SIDES = [['Bone_Arm1_R', 'Bone_Arm2_R', 'Bone_Hand_R'], ['Bone_Arm1_L', 'Bone_Arm2_L', 'Bone_Hand_L']] as const;
 
 const args = process.argv.slice(2);
@@ -41,7 +43,9 @@ for (const character of characters) {
     ensure(fighter !== undefined, `No fighter ${character}`);
     const name = `${fighter.name} Victory`;
     const source = parseMDX(await Bun.file(join(assets, fighter.source)).arrayBuffer()), model = structuredClone(source);
-    ensure(!source.Sequences.some(sequence => sequence.Name === name), `${name} already exists; author from the model before it`);
+    const existing = source.Sequences.findIndex(sequence => sequence.Name === name);
+    const bouncing = BOUNCING.has(character);
+    const beats = CHEER.map(beat => bouncing ? { ...beat, hop: BOUNCE[beat.frame] ?? 0 } : beat);
     const idle = (sequence: mdx.Sequence) => /^stand(\s*-?\s*1)?$/.test(sequence.Name.trim().toLowerCase());
     const stand = source.Sequences.find(sequence => sequence.Name.trim().toLowerCase() === 'stand') ?? source.Sequences.find(idle);
     ensure(stand !== undefined, `${fighter.name} has no Stand sequence`);
@@ -50,10 +54,13 @@ for (const character of characters) {
     const arms = SIDES.map(side => side.map(node));
     ensure(root.Translation, `${fighter.name}'s Bone_Root has no translation track`);
 
-    const cutoff = Math.max(...source.Sequences.map(sequence => sequence.Interval[1]!)) + 100;
-    const index = model.Sequences.length, end = cutoff + Math.round(FRAMES * 1000 / 60);
+    const cutoff = existing >= 0 ? source.Sequences[existing]!.Interval[0]! : Math.max(...source.Sequences.map(sequence => sequence.Interval[1]!)) + 100;
+    const index = existing >= 0 ? existing : model.Sequences.length, end = cutoff + Math.round(FRAMES * 1000 / 60);
+    ensure(existing < 0 || source.Sequences[existing]!.Interval[1] === end, `${name} has a different length; reauthor it at its own length`);
     const time = (frame: number) => cutoff + Math.round(frame * 1000 / 60);
-    model.Sequences.push({ ...stand, Name: name, Interval: new Uint32Array([cutoff, end]), NonLooping: false, MoveSpeed: 0, Rarity: 0,
+    const inside = (key: { readonly Frame: number }) => key.Frame >= cutoff && key.Frame <= end;
+    if (existing >= 0) tracks(model, track => { if (!onGlobalClock(track)) track.Keys = track.Keys.filter(key => !inside(key)); });
+    else model.Sequences.push({ ...stand, Name: name, Interval: new Uint32Array([cutoff, end]), NonLooping: false, MoveSpeed: 0, Rarity: 0,
         MinimumExtent: new Float32Array([-300, -300, -200]), MaximumExtent: new Float32Array([300, 300, 400]), BoundsRadius: 450 });
     const originals = new Map<string, mdx.AnimVector>();
     tracks(source, (track, path) => originals.set(path, track));
@@ -66,10 +73,11 @@ for (const character of characters) {
         for (const { frame } of CHEER) track.Keys.push({ ...first, Frame: time(frame), Vector: first.Vector.slice(),
             ...(first.InTan ? { InTan: rotation ? first.Vector.slice() : new Float32Array(first.Vector.length), OutTan: rotation ? first.Vector.slice() : new Float32Array(first.Vector.length) } : {}) });
     });
+    tracks(model, track => { if (!onGlobalClock(track)) track.Keys.sort((a, b) => a.Frame - b.Frame); });
     const rest = new Map<mdx.Node, Float32Array>();
     for (const joint of [chest, head, ...arms.flat()]) {
         ensure(joint.Rotation, `${fighter.name}'s ${joint.Name} has no rotation track`);
-        if (!joint.Rotation.Keys.some(key => key.Frame === time(0))) for (const { frame } of CHEER) joint.Rotation.Keys.push({ Frame: time(frame), Vector: new Float32Array([0, 0, 0, 1]), ...(joint.Rotation.LineType >= mdx.LineType.Hermite ? { InTan: new Float32Array([0, 0, 0, 1]), OutTan: new Float32Array([0, 0, 0, 1]) } : {}) });
+        if (!joint.Rotation.Keys.some(key => key.Frame === time(0))) { for (const { frame } of CHEER) joint.Rotation.Keys.push({ Frame: time(frame), Vector: new Float32Array([0, 0, 0, 1]), ...(joint.Rotation.LineType >= mdx.LineType.Hermite ? { InTan: new Float32Array([0, 0, 0, 1]), OutTan: new Float32Array([0, 0, 0, 1]) } : {}) }); joint.Rotation.Keys.sort((a, b) => a.Frame - b.Frame); }
         rest.set(joint, joint.Rotation.Keys.find(key => key.Frame === time(0))!.Vector.slice() as Float32Array);
     }
     const pose = (joint: mdx.Node, frame: number, y: number, z = 0) => {
@@ -93,11 +101,15 @@ for (const character of characters) {
     const outward = (shoulder: readonly number[], side: number, share: number) => centre + Math.sign(shoulder[1]! - centre) * (Math.abs(shoulder[1]! - centre) + reach[side]! * share);
     const targets: Record<Exclude<Arms, 'rest'>, (shoulder: readonly number[], side: number) => readonly number[]> = {
         low: (shoulder, side) => [shoulder[0]!, outward(shoulder, side, 0.25), shoulder[2]! - reach[side]! * 0.9],
-        raised: (shoulder, side) => [shoulder[0]!, outward(shoulder, side, 0.25), shoulder[2]! + reach[side]! * 0.92],
+        raised: (shoulder, side) => [shoulder[0]!, outward(shoulder, side, bouncing ? 0.5 : 0.25), shoulder[2]! + reach[side]! * 0.92],
         pumped: (shoulder, side) => [shoulder[0]!, outward(shoulder, side, 0.55), shoulder[2]! + reach[side]! * 0.55],
     };
     const solved = new Map<string, number[]>();
-    for (const beat of CHEER) {
+    const below = (child: mdx.Node, ancestor: mdx.Node): boolean => { let at: mdx.Node | undefined = child; while (at !== undefined && at.Parent != null && at.Parent !== -1) { if (at.Parent === ancestor.ObjectId) return true; at = model.Nodes[at.Parent]; } return false; };
+    const held = bouncing ? arms.flatMap(([, , hand], side) => model.Nodes.filter(candidate => candidate !== undefined && /^weapon ref$/i.test(candidate.Name.trim()) && below(candidate, hand!)).map(weapon => ({ side, hand: hand!, weapon }))).at(0) : undefined;
+    const direction = (from: mdx.Node, to: mdx.Node) => { const [a, b] = [pivot(from), pivot(to)]; const d = [0, 1, 2].map(i => b[i]! - a[i]!); const length = Math.hypot(...d); return d.map(v => v / length); };
+    const upright = held === undefined ? undefined : (() => { renderer.setSequence(source.Sequences.indexOf(stand)); data.frame = stand.Interval[0]!; renderer.update(0); return direction(held.hand, held.weapon); })();
+    for (const beat of beats) {
         pose(chest, beat.frame, beat.chest); pose(head, beat.frame, beat.head);
         for (const [side, [shoulder, elbow, hand]] of arms.entries()) {
             if (beat.arms === 'rest') continue;
@@ -116,11 +128,25 @@ for (const character of characters) {
                 solved.set(`${beat.arms}${side}`, angles);
             }
             apply();
+            if (held !== undefined && upright !== undefined && held.side === side) {
+                const known = solved.get(`${beat.arms}grip`), grip = known ?? [0, 0];
+                const turn = () => { pose(held.hand, beat.frame, grip[0]!, grip[1]!); evaluate(beat.frame); const now = direction(held.hand, held.weapon); return now[0]! * upright[0]! + now[1]! * upright[1]! + now[2]! * upright[2]!; };
+                if (known === undefined) {
+                    for (let pass = 0; pass < 3; pass++) for (let dimension = 0; dimension < 2; dimension++) {
+                        let best = -Infinity, choice = 0;
+                        for (let value = -180; value <= 180; value += pass === 0 ? 15 : pass === 1 ? 5 : 1) { grip[dimension] = value; const alignment = turn(); if (alignment > best) { best = alignment; choice = value; } }
+                        grip[dimension] = choice;
+                    }
+                    ensure(turn() > 0.9, `${fighter.name}: ${beat.arms} grip keeps the weapon only ${turn().toFixed(2)} upright`);
+                    solved.set(`${beat.arms}grip`, grip);
+                }
+                turn();
+            }
         }
     }
 
     const unplanted = new DrawnModel(generateMDX(model), 1);
-    for (const beat of CHEER) {
+    for (const beat of beats) {
         const body = unplanted.triangles(index, beat.frame / 60, 1);
         let lowest = Infinity;
         for (let i = 1; i < body.length; i += 2) lowest = Math.min(lowest, body[i]!);
@@ -130,10 +156,8 @@ for (const character of characters) {
         if (key.InTan) { key.InTan = root.Translation.LineType === mdx.LineType.Bezier ? key.Vector.slice() : new Float32Array(3); key.OutTan = key.InTan.slice(); }
     }
 
-    const stripped = structuredClone(model);
-    stripped.Sequences = stripped.Sequences.slice(0, source.Sequences.length);
-    tracks(stripped, track => { if (!onGlobalClock(track)) track.Keys = track.Keys.filter(key => key.Frame < cutoff); });
-    ensure(isDeepStrictEqual(stripped, source), `${fighter.name}: the cheer changed an original sequence`);
+    const outside = (value: mdx.Model) => { const copy = structuredClone(value); copy.Sequences = copy.Sequences.filter((_, at) => at !== index); tracks(copy, track => { if (!onGlobalClock(track)) track.Keys = track.Keys.filter(key => !inside(key)); }); return copy; };
+    ensure(isDeepStrictEqual(outside(model), outside(source)), `${fighter.name}: the cheer changed another sequence`);
     const bytes = generateMDX(model), decoded = parseMDX(bytes);
     ensure(isDeepStrictEqual(parseMDX(generateMDX(decoded)), decoded), `${fighter.name}: MDX round trip changed the model`);
 
