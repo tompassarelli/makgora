@@ -40,7 +40,7 @@ test("a main push Autoland lands waits for no farm run, and a direct main push s
   expect(await gated("")).toEqual([head]);
 });
 
-const LOCAL_ONLY = ["private map-build inputs", "generated models stored", "animation jitter [k3 measure #479]"];
+const LOCAL_ONLY = ["private map-build inputs", "generated models stored", "fighter art reproduces (kobold)", "animation jitter [k3 measure #479]"];
 const HOSTED = ["clean room", "kind tags and type-check ts", "Autoland suite covers the farm suite", "cue models recorded in both looks"];
 const EVERY_PATH = ["ts/scripts/prePush.ts", "build-inputs/original-clips-static-lights/kobold", CUE_MODEL_RECORD];
 
