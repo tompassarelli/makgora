@@ -16,7 +16,7 @@ import { SHOWCASE_PAD_X } from "../../game/session/showcase";
 import type { FighterAgency } from "../../game/presentation/fighterAgency";
 import type { FrameControls } from "../../game/match/controls";
 import type { PacingAndPresentation } from "../../game/match/pacingAndPresentation";
-import { type MatchState, Phase, remainingSeconds, stageClock, timedMatch } from "../../game/lobby/lobbyState";
+import { type MatchState, Phase, ResultPick, remainingSeconds, resultChoicesOpen, stageClock, timedMatch } from "../../game/lobby/lobbyState";
 import { fighterOffscreen, fitFighterFrames } from "../../game/presentation/fighterFraming";
 import { arenaFarZ, ARENA_CAMERA, FLOOR_HEIGHT, cameraFieldOfView, cameraPoint, extremeCamera, finalCamera, localCamera, resultCamera } from "../../game/presentation/arenaCamera";
 
@@ -606,7 +606,7 @@ export function renderUi(s: ShellState): void {
   const waiting = game.phase === Phase.match ? activeRollback(s)?.waitingFor ?? 0 : 0;
   BlzFrameSetVisible(notice, showMatch && (waiting !== 0 || (game.phase === Phase.result && !ui.match.resultsShown())));
   if (!selecting) {
-    if (game.phase === Phase.result) ui.match.showResultHelp(`${resultNotice(game, s.status.text)}\n${matchHelp(game, s.session.paused, startControl(s), localFighter, false)}`);
+    if (game.phase === Phase.result) ui.results.update(resultNotice(game, s.status.text).replace("\n", "  ·  "), matchHelp(game, s.session.paused, startControl(s), localFighter, false), resultChoicesOpen(game) && local !== undefined ? s.resultFocus?.[local] ?? ResultPick.characters : undefined);
     BlzFrameSetText(help, matchHelp(game, s.session.paused, startControl(s), localFighter, game.phase === Phase.match));
     probeWaiting(s.probe, waiting, localSlot());
     BlzFrameSetText(notice, game.phase === Phase.result ? resultNotice(game, s.status.text) : waiting !== 0 ? waitingMessage(waiting) : "");

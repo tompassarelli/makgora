@@ -22,6 +22,9 @@ import { PARTNER_BEHAVIOURS, PARTNER_DAMAGE_MAX, PARTNER_DAMAGE_STEP, PARTNER_ES
 
 export const Phase = { characterMenu: 0, stageMenu: 1, match: 2, result: 3 } as const;
 export type Phase = (typeof Phase)[keyof typeof Phase];
+export const ResultPick = { rematch: 0, newStage: 1, characters: 2 } as const;
+export type ResultPick = (typeof ResultPick)[keyof typeof ResultPick];
+export const RESULT_PICKS = 3;
 export const MATCH_TICKS_PER_SECOND = 60;
 
 export const CLASSIC_TIER_DEFAULT = 1;
@@ -36,6 +39,7 @@ export interface MatchState {
   readonly cpuResolvedOpponents: Slots<CpuOpponentId>;
   readonly characterReadiness: Slots<boolean>;
   readonly rematchReadiness: Slots<boolean>;
+  readonly resultPicks: Slots<ResultPick>;
   departedMask: number;
   interrupted: boolean;
 
@@ -99,6 +103,7 @@ export function createMatchState(): MatchState {
     cpuTiers: [CPU_TIER_DEFAULT, CPU_TIER_DEFAULT, CPU_TIER_DEFAULT, CPU_TIER_DEFAULT],
     cpuResolvedOpponents: [CPU_OPPONENT_DEFAULT, CPU_OPPONENT_DEFAULT, CPU_OPPONENT_DEFAULT, CPU_OPPONENT_DEFAULT],
     characterReadiness: [false, false, false, false], rematchReadiness: [false, false, false, false],
+    resultPicks: [ResultPick.characters, ResultPick.characters, ResultPick.characters, ResultPick.characters],
     teamBattle: false, friendlyFire: false, teamChoices: [0, 1, 0, 1],
     departedMask: 0, interrupted: false, humanMask: 1, humanFighterMask: 1, humanCount: 1, computerMask: 0,
     stageChoice: 2, hazards: true, stageResolved: false, stagePool: createStagePool(), winner: undefined, stockCount: 3, timeLimitMinutes: 7, endless: false, automaticRematch: false, rematchCountdown: 0,
@@ -247,6 +252,7 @@ export function copyMatchState(target: MatchState, source: Readonly<MatchState>)
     target.cpuResolvedOpponents[slot] = source.cpuResolvedOpponents[slot];
     target.characterReadiness[slot] = source.characterReadiness[slot];
     target.rematchReadiness[slot] = source.rematchReadiness[slot];
+    target.resultPicks[slot] = source.resultPicks[slot];
   }
 }
 
@@ -603,12 +609,23 @@ export function tickRematchCountdown(game: MatchState): boolean {
   return true;
 }
 
-export function confirmRematch(game: MatchState, slot: number): boolean {
+export const resultChoicesOpen = (game: Readonly<MatchState>): boolean => game.phase === Phase.result && !game.run.active && game.rematchCountdown === 0;
+
+export function confirmRematch(game: MatchState, slot: number, pick: ResultPick = ResultPick.characters): boolean {
   if (game.phase !== Phase.result || !isParticipantSlot(slot) || !humanPresent(game, slot)) return false;
   game.rematchReadiness[slot] = true;
-  if (PARTICIPANT_SLOTS.some(participant => humanPresent(game, participant) && !game.rematchReadiness[participant])) return false;
+  game.resultPicks[slot] = pick;
+  const present = PARTICIPANT_SLOTS.filter(participant => humanPresent(game, participant));
+  if (present.some(participant => !game.rematchReadiness[participant])) return false;
+  const agreed = present.every(participant => game.resultPicks[participant] === pick) ? pick : ResultPick.characters;
   game.rematchReadiness.fill(false);
-  game.phase = Phase.characterMenu;
+  game.resultPicks.fill(ResultPick.characters);
+  if (agreed === ResultPick.rematch && allCharactersReady(game) && game.stageResolved) beginMatch(game);
+  else if (agreed === ResultPick.newStage && allCharactersReady(game)) {
+    game.stageChoice = RANDOM_STAGE;
+    game.stageResolved = false;
+    game.phase = Phase.stageMenu;
+  } else game.phase = Phase.characterMenu;
   return true;
 }
 

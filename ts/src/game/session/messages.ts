@@ -40,7 +40,7 @@ function rematchStatus(game: Readonly<MatchState>, start: StartControl): string 
   if (game.rematchCountdown > 0) return "Press any button to stop the rematch.";
   const present = PARTICIPANT_SLOTS.filter(slot => humanPresent(game, slot));
   const ready = present.filter(slot => game.rematchReadiness[slot]);
-  return `Press ${confirmControl(start)} when ready (${ready.length} of ${present.length})`;
+  return `Arrows, movement keys or mouse: choose  ·  ${confirmControl(start)}: confirm (${ready.length} of ${present.length})`;
 }
 
 

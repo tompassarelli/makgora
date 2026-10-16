@@ -31,7 +31,7 @@ test("every fighter's Classic body carries its results-screen victory pose and n
 test("results playback shows full stock victories and casts once before holding ready [k5 boundary results-animation]", () => {
   const client = headless.clients({ start: () => {}, install: () => {} }, [0]).client(0);
   client.run(() => {
-    const presentation = new MatchPresentation({ x: 0, y: 0, z: 0 });
+    const presentation = new MatchPresentation({ x: 0, y: 0, z: 0 }, { show: () => undefined, hide: () => undefined });
     for (const character of SELECTABLE_CHARACTERS) {
       const name = fighterName(character);
       const clipIndex = originalClipNamed(character, victoryAnimation(character));

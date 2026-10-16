@@ -3,9 +3,11 @@ import type { QuickStageSettings } from "../../game/session/devSettings";
 
 
 
+import { floorMod } from "wisp/src/sim/intMath";
+import { Action } from "../../game/input/actions";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, isParticipantSlot } from "../../game/input/participants";
 import {
-  Phase, changeStagePoolMode, changeStagePoolStage, canChooseComputer, cancelRematchCountdown, firstHumanSlot, characterFor, confirmRematch, cycleSlotMode, humanActive, recallCharacter,
+  Phase, RESULT_PICKS, ResultPick, resultChoicesOpen, changeStagePoolMode, changeStagePoolStage, canChooseComputer, cancelRematchCountdown, firstHumanSlot, characterFor, confirmRematch, cycleSlotMode, humanActive, recallCharacter,
   setTeamBattle, setFriendlyFire, cycleTeam, requestStageSelect, requestStart, setAutomaticRematch, setCpuOpponent, setCpuTier, setEndless, setHitAreas, setPartnerDamage, setTraining, cycleMatchMode, stepClassicTier, stepLoreBattle, setItemsOn, setUltimatesOn, toggleItemKind, stepPartnerBehaviour,
   stepPartnerEscape, stepPartnerTech, stepTrainingSpeed, setTutorialLesson, tickRematchCountdown,
   returnToCharacters, selectCharacter, selectCpuCharacter, selectStage, setHazards, setMeterDropsOn, setStocks, setTimeLimit, updateConnectedHumans,
@@ -49,6 +51,25 @@ export function choose(s: ShellState, slot: ParticipantSlot, direction: -1 | 1):
     selectCharacter(s.game, slot, nextMatchCharacter(s.game, characterFor(s.game, slot), direction));
     makePreview(s);
   } else if (s.game.phase === Phase.stageMenu) selectStage(s.game, slot, nextStage(s.game.stageChoice, direction));
+  else if (resultChoicesOpen(s.game)) stepResultFocus(s, slot, direction);
+}
+
+export function stepResultFocus(s: ShellState, slot: ParticipantSlot, direction: number): void {
+  const focus = s.resultFocus ??= [ResultPick.characters, ResultPick.characters, ResultPick.characters, ResultPick.characters];
+  focus[slot] = floorMod((focus[slot] ?? ResultPick.characters) + direction, RESULT_PICKS);
+}
+
+export function resultKey(s: ShellState, slot: ParticipantSlot, key: number, action: Action | undefined): boolean {
+  const step = key === 0x25 || key === 0x26 || action === Action.moveLeft || action === Action.moveUp ? -1 : key === 0x27 || key === 0x28 || action === Action.moveRight || action === Action.moveDown ? 1 : 0;
+  if (step === 0 || !resultChoicesOpen(s.game)) return false;
+  stepResultFocus(s, slot, step);
+  return true;
+}
+
+export function pickResult(s: ShellState, actor: number, choice: number): void {
+  if (!isParticipantSlot(actor) || !resultChoicesOpen(s.game)) return;
+  stepResultFocus(s, actor, choice - (s.resultFocus?.[actor] ?? ResultPick.characters));
+  confirm(s, actor);
 }
 
 
@@ -103,10 +124,15 @@ export function confirm(s: ShellState, slot: ParticipantSlot): void {
     }
   } else if (game.phase === Phase.result) {
     if (cancelRematchCountdown(game, slot)) return;
-    if (!confirmRematch(game, slot)) return;
+    const pick = s.resultFocus?.[slot] ?? ResultPick.characters;
+    if (pick !== ResultPick.rematch && pick !== ResultPick.newStage && pick !== ResultPick.characters) return;
+    if (!confirmRematch(game, slot, pick)) return;
+    s.resultFocus = undefined;
     updateConnectedHumans(game, currentHumanMask(game.departedMask));
     setStatus(s, "", 0.0);
-    makePreview(s);
+    const next = s.game.phase as Phase;
+    if (next === Phase.match) startMatch(s);
+    else makePreview(s);
   }
 }
 

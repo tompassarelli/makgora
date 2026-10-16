@@ -64,6 +64,11 @@ interface VictoryPose {
   readonly idleClip: FighterOriginalClip;
 }
 
+export interface ResultsDisplay {
+  show(rows: ResultsView["rows"]): void;
+  hide(): void;
+}
+
 export class MatchPresentation {
 
   itemObservation = createItemCueObservation();
@@ -81,13 +86,7 @@ export class MatchPresentation {
   private music: string | undefined;
   private readonly voices: (sound | undefined)[] = [];
   private readonly sounds = new SoundBank();
-  private readonly panel: framehandle;
-  private readonly backing: framehandle;
-  private readonly help: framehandle;
-  private readonly helpScale: number;
-  private readonly title: framehandle;
   private readonly countdown: framehandle;
-  private readonly lines: readonly framehandle[];
   private readonly poses: (VictoryPose | undefined)[] = [];
   private readonly resultSounds: sound[] = [];
   private resultEffectsMuted = false;
@@ -100,7 +99,7 @@ export class MatchPresentation {
   private resultStage = 0;
   private resultView: ResultsView | undefined;
 
-  constructor(private readonly origin: Readonly<WorldOrigin>) {
+  constructor(private readonly origin: Readonly<WorldOrigin>, private readonly banner: ResultsDisplay) {
     SetSoundDuration(this.hoverSound, GetSoundFileDuration(cueSound(MatchCue.hover)));
     SetSoundVolume(this.hoverSound, 70);
     for (const path of presentationSoundPaths(SELECTABLE_CHARACTERS, STAGE_CATALOG.map(stage => stage.id))) Preload(path);
@@ -112,29 +111,6 @@ export class MatchPresentation {
     BlzFrameSetLevel(this.countdown, 10);
     BlzFrameSetEnable(this.countdown, false);
     BlzFrameSetVisible(this.countdown, false);
-    this.panel = createBackdrop("MatchResultsPanel", parent, 0);
-    BlzFrameSetAbsPoint(this.panel, FRAMEPOINT_TOPRIGHT, f32(0.79), f32(0.52));
-    BlzFrameSetSize(this.panel, f32(0.36), f32(0.13) + PARTICIPANT_CAPACITY * f32(0.04));
-    BlzFrameSetEnable(this.panel, false);
-    this.backing = styleMenuPanel(this.panel, "MatchResultsPanel");
-    this.title = createText("MatchResultsTitle", this.panel, 0);
-    const titleScale = sizeText(this.title, MENU_STYLE.titleSize, f32(0.33), f32(0.03));
-    BlzFrameSetPoint(this.title, FRAMEPOINT_TOP, this.panel, FRAMEPOINT_TOP, 0.0, f32(f32(-0.012) / titleScale));
-    BlzFrameSetTextAlignment(this.title, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_CENTER);
-    const lines: framehandle[] = [];
-    for (let index = 0; index < PARTICIPANT_CAPACITY; index++) {
-      const line = createText(`MatchResultsLine${I2S(index)}`, this.panel, 0);
-      const scale = sizeText(line, MENU_STYLE.bodySize, f32(f32(0.336) - 2 * MENU_STYLE.bodyInset), f32(0.036));
-      BlzFrameSetPoint(line, FRAMEPOINT_TOPLEFT, this.backing, FRAMEPOINT_TOPLEFT, f32(MENU_STYLE.bodyInset / scale), f32(f32(f32(-0.04) - index * f32(0.04)) / scale));
-      BlzFrameSetTextAlignment(line, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT);
-      lines.push(line);
-    }
-    this.lines = lines;
-    this.help = createText("MatchResultsHelp", this.panel, 0);
-    this.helpScale = sizeText(this.help, MENU_STYLE.bodySize, f32(f32(0.336) - 2 * MENU_STYLE.bodyInset), f32(0.06));
-    BlzFrameSetTextAlignment(this.help, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_LEFT);
-    BlzFrameSetEnable(this.help, false);
-    BlzFrameSetVisible(this.panel, false);
   }
 
   private playFile(path: string): sound | undefined {
@@ -293,15 +269,7 @@ export class MatchPresentation {
 
   private showResults(view: ResultsView): void {
     const { winner } = view;
-    BlzFrameSetText(this.title, `${MENU_STYLE.gold}${winner === undefined ? "No contest" : "Results"}|r`);
-    BlzFrameSetSize(this.panel, f32(0.36), f32(f32(0.13) + view.rows.length * f32(0.04)));
-    BlzFrameSetPoint(this.help, FRAMEPOINT_TOPLEFT, this.backing, FRAMEPOINT_TOPLEFT, f32(MENU_STYLE.bodyInset / this.helpScale), f32(f32(f32(-0.04) - view.rows.length * f32(0.04)) / this.helpScale));
-    for (let index = 0; index < this.lines.length; index++) {
-      const row = view.rows[index];
-      BlzFrameSetVisible(at(this.lines, index), row !== undefined);
-      BlzFrameSetText(at(this.lines, index), row === undefined ? "" : `${row.winner ? MENU_STYLE.gold : MENU_STYLE.text}${row.text}|r`);
-    }
-    BlzFrameSetVisible(this.panel, true);
+    this.banner.show(view.rows);
     this.music = undefined;
     StopMusic(true);
     const theme = victoryMusic(winner);
@@ -314,9 +282,6 @@ export class MatchPresentation {
     this.posing = view.rows[0]?.slot;
   }
 
-  showResultHelp(text: string): void {
-    BlzFrameSetText(this.help, `${MENU_STYLE.text}${text.replace(". Press", ".\nPress")}|r`);
-  }
 
   preparePoses(world: Readonly<Roster>): void {
     this.releasePoses();
@@ -388,7 +353,7 @@ export class MatchPresentation {
     this.resultFrames = 0;
     this.resultBurst = false;
     this.posing = undefined;
-    BlzFrameSetVisible(this.panel, false);
+    this.banner.hide();
     this.releasePoses();
   }
 

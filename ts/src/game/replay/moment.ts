@@ -18,7 +18,7 @@ import { settleBotMemoryChecksums } from "../match/botPerception";
 import { padDecimal } from "../netcode/journal/decimal";
 import { type MatchFrameInput, captureFrame, captureNetworkFrame, createMatchFrameInput, executeMatchFrame } from "../match/frameInput";
 import type { PacingAndPresentation } from "../match/pacingAndPresentation";
-import { type MatchState, computerActive } from "../lobby/lobbyState";
+import { type MatchState, ResultPick, computerActive } from "../lobby/lobbyState";
 import { type MapBuild, type Scenario, isScenario, isShadow } from "../session/build";
 import { produceScenarioComputerInput } from "../session/scenarios";
 import { type Fighter, placedObject, PROJECTILE_CAPACITY } from "../sim/fighter";
@@ -427,7 +427,7 @@ function rebindAuthoredKit(fighter: Fighter): void {
 export function savedState(record: Readonly<Record<string, unknown>>): ReplayState | undefined {
   const { mask, fighters, match, commands, runtime } = record;
   if (typeof mask !== "number" || !isList(fighters) || !isMatch(match) || !isCommands(commands) || !isRuntime(runtime)) return undefined;
-  const loadedMatch: MatchState = { ...match, teamBattle: match.teamBattle ?? false, friendlyFire: match.friendlyFire ?? false, teamChoices: match.teamChoices ?? [0, 1, 0, 1] };
+  const loadedMatch: MatchState = { ...match, teamBattle: match.teamBattle ?? false, friendlyFire: match.friendlyFire ?? false, teamChoices: match.teamChoices ?? [0, 1, 0, 1], resultPicks: match.resultPicks ?? [ResultPick.characters, ResultPick.characters, ResultPick.characters, ResultPick.characters] };
   const world = createRoster(mask);
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;

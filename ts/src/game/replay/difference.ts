@@ -21,7 +21,7 @@ import { firstItemsDifference } from "../match/items";
 import { firstMeterDropsDifference } from "../match/meterDrops";
 import { firstBotMemoryDifference, sameBotMemory } from "../match/botPerception";
 import { botStrategyValues, sameBotStrategy } from "../match/botStrategy";
-import type { MatchState } from "../lobby/lobbyState";
+import { type MatchState, ResultPick } from "../lobby/lobbyState";
 import { sameControls } from "../sim/roster";
 import { sameFighterState } from "../../generated/state/fighterState";
 import type { ReplayState } from "./snapshot";
@@ -462,6 +462,7 @@ function firstMatchDifference(e: Readonly<MatchState>, a: Readonly<MatchState>):
     if (e.characterChoices[slot] !== a.characterChoices[slot]) return `match.slot${slot}.character`;
     if (e.characterReadiness[slot] !== a.characterReadiness[slot]) return `match.slot${slot}.ready`;
     if (e.rematchReadiness[slot] !== a.rematchReadiness[slot]) return `match.slot${slot}.rematch`;
+    if (e.rematchReadiness[slot] && e.resultPicks[slot] !== a.resultPicks[slot]) return `match.slot${slot}.resultPick`;
     if (e.cpuOpponents[slot] !== a.cpuOpponents[slot]) return `match.slot${slot}.cpuOpponent`;
     if (e.cpuTiers[slot] !== a.cpuTiers[slot]) return `match.slot${slot}.cpuTier`;
     if (e.cpuResolvedOpponents[slot] !== a.cpuResolvedOpponents[slot]) return `match.slot${slot}.cpuResolvedOpponent`;

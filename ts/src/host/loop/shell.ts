@@ -32,7 +32,7 @@ import * as journalPause from "./journalPause";
 import { KEY_DOWN, KEY_UP, KEY_START_DOWN, KEY_START_UP, KEY_PAUSE_DOWN, KEYBOARD_PAUSE, KEYBOARD_PAUSE_PREFIX, Key, registerKey, syncKeyEvents } from "./keyEvents";
 import { onKeyboardPause, onPauseKeyDown } from "./keyboardPause";
 import { onDevCommand, onDeveloperRestart, onDeveloperTrace, onKeyDown, onKeyUp, onStartKeyDown, onStartKeyUp, onProbeExport, onProbeStart, selectPauseMenu } from "./keys";
-import { panelActions, serviceAutomaticRematch, startingSelection } from "./menus";
+import { panelActions, pickResult, serviceAutomaticRematch, startingSelection } from "./menus";
 import { PLAYER_FILE_RECEIVED, bindingFiles, playerFileReceived, playerFilesOwnerLeft, startPlayerFiles } from "./playerFiles";
 import { PLAYTEST, PLAYTEST_PREFIX, playtestRequested, readPlaytestRequest, servicePlaytestRequest } from "./playtest";
 import { STAGE_READY, cancelStageLoad, serviceStageLoad, stageReadyEvent } from "./stageLoad";
@@ -356,6 +356,7 @@ function initialize(): void {
   copyMatchState(s.game, startingSelection(build.scenario));
   s.startingChoicesReady = s.game.computerMask === 0;
   createUi(s, panelActions(), (choice, clicker) => selectPauseMenu(s, GetPlayerId(clicker), choice));
+  s.ui?.results.bindActions((choice, clicker) => pickResult(s, GetPlayerId(clicker), choice));
   preloadStageAssets(s);
   view.drawStage(s);
   CameraSetSmoothingFactor(0.0);
@@ -435,7 +436,10 @@ export function installShell(): void {
   on(PLAYTEST, withShell(playtestRequested));
   on(STAGE_READY, withShell(stageReadyEvent));
   const s = shellState();
-  if (s?.ui !== undefined) recreateUi(s, panelActions(), (choice, clicker) => selectPauseMenu(s, GetPlayerId(clicker), choice));
+  if (s?.ui !== undefined) {
+    recreateUi(s, panelActions(), (choice, clicker) => selectPauseMenu(s, GetPlayerId(clicker), choice));
+    s.ui?.results.bindActions((choice, clicker) => pickResult(s, GetPlayerId(clicker), choice));
+  }
 
   if (s !== undefined && s.moment === undefined) s.moment = momentSaves();
   if (s !== undefined && s.replay === undefined) s.replay = replayRecording();

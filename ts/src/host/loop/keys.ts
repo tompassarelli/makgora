@@ -45,7 +45,7 @@ import { startAgencyFixture } from "./agencyFixture";
 import { applyShowcaseCommand } from "./showcase";
 import { showcaseRequest } from "../../game/session/showcase";
 import { clearVisualCapture, configureVisualCapture } from "../../game/session/visualCapture";
-import { back, choose, confirm, openSettingsScreen, resetToStartingSelection, startDevClassic, startDevLore, startQuickMatch } from "./menus";
+import { back, choose, confirm, openSettingsScreen, resultKey, resetToStartingSelection, startDevClassic, startDevLore, startQuickMatch } from "./menus";
 import { LORE_BATTLES } from "../../game/classic/loreBattles";
 import { makePreview } from "./preview";
 import { exportProbe, probeIntegrity, probeRecording, startProbe } from "./responseProbe";
@@ -204,6 +204,7 @@ function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = fal
   }
   if (game.phase === Phase.match && (s.session.paused || activeRollback(s) !== undefined)) return;
   const action = pressKey(keys, key, bindings.bindings);
+  if (resultKey(s, slot, key, action)) return;
   if (action === undefined) return;
   if (cancelRematchCountdown(game, slot)) return;
   participant.lastInputAction = action;

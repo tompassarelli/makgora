@@ -27,7 +27,8 @@ import { OffscreenBubble } from "../../game/ui/offscreenBubble";
 import { ManaBar } from "../../game/ui/manaBar";
 import { MANA_BAR_HEIGHT_PX } from "../../game/ui/plateLayout";
 import { unitsForPixels } from "../../game/ui/portraitFrames";
-import { gameUi } from "../../game/ui/frames";
+import { ButtonClicks, gameUi } from "../../game/ui/frames";
+import { ResultsBanner } from "../../game/ui/resultsBanner";
 import { type SelectionActions, SelectionPanel } from "../../game/ui/selectionUi";
 import { type SettingsActions, SettingsPanel } from "../../game/ui/settingsUi";
 import { type StageActions, StagePanel } from "../../game/ui/stageUi";
@@ -77,6 +78,7 @@ export interface UiObjects {
   sounds: ModelSoundSink;
 
   match: MatchPresentation;
+  results: ResultsBanner;
 
   elements: ElementEffects;
 
@@ -115,7 +117,9 @@ function menuControls(s: Readonly<ShellState>): MenuControls {
 export function createUi(s: ShellState, actions: PanelActions, selectPause: (choice: number, clicker: player) => void): UiObjects {
   const controls = menuControls(s);
   let combat: CombatEffects;
+  const results = new ResultsBanner();
   const ui: UiObjects = {
+    results,
     pause: new PauseMenu(selectPause),
     items: new ItemPresentation(s.origin),
     drops: new MeterDropPresentation(s.origin),
@@ -134,7 +138,7 @@ export function createUi(s: ShellState, actions: PanelActions, selectPause: (cho
     special: new SpecialEffects(s.origin),
     fighters: [undefined, undefined, undefined, undefined],
     sounds: modelSoundPresentation(s.origin, combat.sounds),
-    match: new MatchPresentation(s.origin),
+    match: new MatchPresentation(s.origin, results),
     elements: new ElementEffects(s.origin),
     classic: new ClassicPresentation(s.origin),
   };
@@ -240,7 +244,13 @@ export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (c
   }
 
   const retained: { readonly match?: MatchPresentation } = ui;
-  if (retained.match === undefined) ui.match = new MatchPresentation(s.origin);
+  const retainedResults: { readonly results?: ResultsBanner } = ui;
+  if (retainedResults.results === undefined) ui.results = new ResultsBanner();
+  else {
+    bindPrototype(ui.results, ResultsBanner.prototype);
+    bindPrototype(ui.results.clicks, ButtonClicks.prototype);
+  }
+  if (retained.match === undefined) ui.match = new MatchPresentation(s.origin, ui.results);
   else bindPrototype(ui.match, MatchPresentation.prototype);
 
   const retainedElements: { readonly elements?: { readonly drains?: readonly effect[] } } = ui;

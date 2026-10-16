@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { testHeadless } from "./headless";
 import type { HeadlessClient } from "wisp/src/headless/client";
-import { Phase } from "../src/game/lobby/lobbyState";
+import { Phase, ResultPick } from "../src/game/lobby/lobbyState";
 import { install, start } from "../src/host/entries/playableMain";
 import { Key } from "../src/host/loop/keyEvents";
 import { shell } from "../src/host/loop/state";
@@ -12,6 +12,7 @@ import { PLAYABLE_CHARACTERS } from "../src/game/sim/heroes/registry";
 import { START_BUTTON } from "../src/game/ui/selectionLayout";
 import { RULE_BUTTONS } from "../src/game/ui/ruleButtons";
 import { TEAM_NAMES } from "../src/game/sim/teams";
+import { BUTTON_WIDTH, CHOICE_HEIGHT, CHOICE_TOP, choiceLeft } from "../src/game/ui/resultsBanner";
 import { pixelX, pixelY } from "../src/game/menu/pointer";
 import { f32 } from "wisp/src/sim/f32";
 
@@ -293,4 +294,38 @@ test("with Team Battle on every fighting card wears its team's colour and shows 
     }
     expect(client.errors).toEqual([]);
   }
+});
+
+test("on the results banner arrows and movement keys move each player's choice and clicking New stage for both players opens stage select [k1 scenario]", () => {
+  const { clients } = menu();
+  for (const client of clients.clients) client.run(() => {
+    const s = shell();
+    s.game.phase = Phase.result;
+    s.game.matchFrame = 600;
+    s.game.characterReadiness[0] = true;
+    s.game.characterReadiness[1] = true;
+    s.ui?.results.show([{ slot: 0, winner: true, text: "P1" }, { slot: 1, winner: false, text: "P2" }]);
+  });
+  clients.frames(2);
+  const focus = (slot: number) => {
+    let value: number | undefined;
+    clients.client(0).run(() => { value = shell().resultFocus?.[slot]; });
+    return value;
+  };
+  clients.press(0, Key.r);
+  clients.frames(1);
+  expect(focus(0)).toBe(ResultPick.rematch);
+  clients.press(0, 0x27);
+  clients.frames(1);
+  expect(focus(0)).toBe(ResultPick.newStage);
+  clients.press(0, 0x25);
+  clients.press(0, Key.w);
+  clients.frames(1);
+  expect(focus(0)).toBe(ResultPick.characters);
+  const x = f32(choiceLeft(ResultPick.newStage) + BUTTON_WIDTH / 2);
+  const y = f32(CHOICE_TOP - CHOICE_HEIGHT / 2);
+  for (const slot of [0, 1]) expect(clients.click(slot, x, y)).toBe(true);
+  clients.frames(2);
+  for (const client of clients.clients) client.run(() => { expect(shell().game.phase).toBe(Phase.stageMenu); });
+  for (const client of clients.clients) expect(client.errors).toEqual([]);
 });
