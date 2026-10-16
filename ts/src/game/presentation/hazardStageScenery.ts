@@ -76,18 +76,18 @@ export const GRYPHON_SCENERY: StageScenery = {
   floor: { model: STAGE_TOMB_SEA_MODEL, z: -1300.0, color: [96, 128, 136] },
   pieces: [
 
-    { model: "Buildings\\Human\\GryphonAviary\\GryphonAviary.mdx", x: 2300.0, y: 4500.0, z: -150.0, scale: 1.25, yaw: 215.0 },
-    { model: "Doodads\\Barrens\\Rocks\\Barrens_Rocks\\Barrens_Rocks2.mdx", x: 2550.0, y: 4500.0, z: -3650.0, scale: f32(10.8), yaw: 252.0, matrixScale: [1.0, 1.0, f32(4.114)] },
+    { model: "Buildings\\Human\\GryphonAviary\\GryphonAviary.mdx", x: 0.0, y: 5050.0, z: 45.0, scale: f32(2.2), yaw: 270.0 },
+    { model: "Doodads\\Barrens\\Rocks\\Barrens_Rocks\\Barrens_Rocks2.mdx", x: 0.0, y: 4500.0, z: -1656.0, scale: f32(10.8), yaw: 180.0, matrixScale: [3.0, 3.0, 2.0] },
     { model: "Doodads\\Barrens\\Rocks\\Barrens_Rocks\\Barrens_Rocks0.mdx", x: -2050.0, y: 3200.0, z: -2475.0, scale: 3.5, yaw: 35.0, matrixScale: [1.0, 1.0, f32(5.138)] },
     { model: "Doodads\\Barrens\\Rocks\\Barrens_Rocks\\Barrens_Rocks0.mdx", x: -550.0, y: 5200.0, z: -3505.0, scale: f32(5.05), yaw: 110.0, matrixScale: [1.0, 1.0, f32(6.005)] },
     { model: MOUND, x: -4000.0, y: 5000.0, z: -1500.0, scale: 13.0, yaw: 200.0, matrixScale: [2.5, 1.0, 1.25] },
     { model: MOUND, x: -3100.0, y: 5300.0, z: -1350.0, scale: 14.0, yaw: 175.0, matrixScale: [2.5, 1.0, 1.25] },
     { model: MOUND, x: -2150.0, y: 5100.0, z: -1450.0, scale: 12.5, yaw: 190.0, matrixScale: [2.5, 1.0, 1.25] },
-    { model: MOUND, x: -1250.0, y: 5400.0, z: -1250.0, scale: 14.5, yaw: 165.0, matrixScale: [2.5, 1.0, 1.25] },
+    { model: MOUND, x: -1250.0, y: 5400.0, z: -1400.0, scale: 14.5, yaw: 165.0, matrixScale: [2.5, 1.0, 1.25] },
     { model: MOUND, x: -300.0, y: 5150.0, z: -1350.0, scale: 11.0, yaw: 205.0, matrixScale: [2.5, 1.0, 1.25] },
     { model: MOUND, x: 650.0, y: 5450.0, z: -1300.0, scale: 14.0, yaw: 180.0, matrixScale: [2.5, 1.0, 1.25] },
     { model: MOUND, x: 1500.0, y: 5200.0, z: -1400.0, scale: 11.5, yaw: 195.0, matrixScale: [2.5, 1.0, 1.25] },
-    { model: MOUND, x: 3300.0, y: 5300.0, z: -1250.0, scale: 11.0, yaw: 170.0, matrixScale: [2.5, 1.0, 1.25] },
+    { model: MOUND, x: 3300.0, y: 5300.0, z: -1400.0, scale: 11.0, yaw: 170.0, matrixScale: [2.5, 1.0, 1.25] },
     { model: MOUND, x: 4000.0, y: 5000.0, z: -1550.0, scale: 10.0, yaw: 185.0, matrixScale: [2.5, 1.0, 1.25] },
   ],
 };

@@ -27,7 +27,8 @@ export const DUROTAR_SCENERY: StageScenery = {
     { model: SPIRES, x: -3500.0, y: 4100.0, z: -1459.0, scale: 1.75, yaw: 30.0, matrixScale: [1.5, 1.0, 2.75] },
     { model: SPIRES, x: 3600.0, y: 4200.0, z: -1524.0, scale: 2.25, yaw: 330.0, matrixScale: [1.5, 1.0, 2.25] },
     { model: "buildings\\orc\\WatchTower\\WatchTower.mdx", x: -2300.0, y: 4600.0, z: 60.0, scale: 3.0, yaw: 300.0 },
-    { model: "buildings\\orc\\TrollBurrow\\TrollBurrow.mdl", x: 1150.0, y: 4700.0, z: 95.0, scale: 3.25, yaw: 230.0 },
+    { model: "buildings\\orc\\WatchTower\\WatchTower.mdx", x: 1150.0, y: 4700.0, z: 95.0, scale: 3.0, yaw: 255.0 },
+    { model: "buildings\\orc\\WatchTower\\WatchTower.mdx", x: 3000.0, y: 4550.0, z: 66.0, scale: 2.75, yaw: 285.0 },
   ],
 };
 
