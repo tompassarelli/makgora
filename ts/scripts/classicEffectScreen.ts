@@ -4,7 +4,7 @@ import { BunRuntime } from "@effect/platform-bun";
 import { Console, Effect, Schema } from "effect";
 import { decodePpm } from "wisp/scripts/wisp/frameProbe";
 import { decodePng } from "wisp/scripts/wisp/fidelity/image";
-import { frameStamp } from "./nativeCapture";
+import { frameStamp } from "./nativeCaptureVerdict";
 import { effectSourceDigest } from "./wisp/effectVisibility";
 import { measureFootprint, screenReport, screenAcceptanceProblem, type ScreenSample } from "./wisp/classicEffectScreen";
 

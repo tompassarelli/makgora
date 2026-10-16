@@ -6,7 +6,7 @@ import { ChildProcess } from "effect/process";
 import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
 import { runProcess } from "../../hostProcess";
 import { decodePpm, encodePpm, type Frame } from "wisp/scripts/wisp/frameProbe";
-import { frameStamp } from "../../nativeCapture";
+import { frameStamp } from "../../nativeCaptureVerdict";
 import { projectRoot } from "../project";
 const Line = Schema.Struct({ name: Schema.NonEmptyString, metric: Schema.Literals(["pixels", "stamp", "contrast"]), frames: Schema.Array(Schema.Int), baseline: Schema.optionalKey(Schema.Int), region: Schema.optionalKey(Schema.Tuple([Schema.Finite, Schema.Finite, Schema.Finite, Schema.Finite])), min: Schema.optionalKey(Schema.Finite), max: Schema.optionalKey(Schema.Finite), tolerance: Schema.optionalKey(Schema.Finite), borderline: Schema.optionalKey(Schema.Finite), mask: Schema.optionalKey(Schema.NonEmptyString), field: Schema.optionalKey(Schema.Literals(["absDL", "dE00", "localDL"])) });
 interface Sample { readonly frame: number; readonly value: number; readonly stamped: boolean }

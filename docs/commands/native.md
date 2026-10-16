@@ -66,6 +66,15 @@ back exactly what was drawn (receipt `dev: fighter SLOT hidden|shown`).
   PAD|DIR...` plays the scripts headlessly on the map's schedule and checks
   each `#! cue FROM[-TO] NAME: sound=… effect=… tint=b shake=b recoil=b` line
   against the held capture frames, without a Warcraft client.
+- Offline Classic capture batches can use `bun scripts/nativeCapture.ts chunks
+  --out DIR PAD|DIR...` to build a separate map per row and write
+  `capture-batch.json`. Run it with `bun scripts/nativeCapture.ts batch --plan
+  DIR/capture-batch.json --out OUT --pair K --desktop PRIVATE_DESKTOP_SH
+  --capacity MACHINE_CAPACITY_HELPER --clients-file FILE --client NAME
+  --install DIR`. Each row writes an atomic checkpoint keyed by its map hash
+  and source revision. On a dropped client or incomplete row, `batch` restarts
+  the offline pair and resumes from the first frame missing from that row's
+  checkpoint.
 - Native silhouettes (wisp#125): a capture script with `#! silhouette a|b
   FIGHTER MOVE [WIDTHxHEIGHT]` (default 1920x1080) holds each capture frame
   twice, the fighter shown and then hidden by `-dev hide fighter SLOT`, with

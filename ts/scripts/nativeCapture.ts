@@ -19,7 +19,8 @@
 
 
 
-import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, statfsSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, statSync, statfsSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { basename, dirname, join } from "node:path";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Effect, Layer, Schema } from "effect";
@@ -30,14 +31,16 @@ import { type Frame, decodePpm, encodePpm } from "wisp/scripts/wisp/frameProbe";
 import { preloadLines } from "wisp/scripts/wisp/preloadRecord";
 import { dataDirectory } from "wisp/scripts/wisp/gameFiles";
 import { parsePadScript } from "./integrity/padScript";
-import { STAMP_CELL, STAMP_CELLS, type Stamp, type StampCell, type StampVerdict, readStamp, stampVerdict } from "../src/game/core/drawnStamp";
+import { STAMP_CELL } from "../src/game/core/drawnStamp";
 import { CAPTURE_STATUS_FILE } from "../src/game/core/gameFiles";
 import { CAPTURE_FIXTURES, type CaptureFixture, SILHOUETTE_HIDDEN_FRAME, type Silhouette } from "../src/platform/captureFixtures";
 import { encodePng } from "./wisp/hurtboxView";
 import { platformLayer } from "wisp/scripts/platform/layer";
 import { sheetCanvas, putSheetFrame, writeSheet } from "./nativeCaptureSheet";
+import { nativeCaptureChunks } from "./nativeCaptureChunks";
+import { frameVerdict } from "./nativeCaptureVerdict";
 
-class CaptureFailure extends Schema.TaggedError<CaptureFailure>()("CaptureFailure", { problem: Schema.String }) {
+export class CaptureFailure extends Schema.TaggedError<CaptureFailure>()("CaptureFailure", { problem: Schema.String }) {
   override get message(): string { return this.problem; }
 }
 const fail = (problem: string): never => { throw new CaptureFailure({ problem }); };
@@ -106,96 +109,18 @@ const build = (args: readonly string[]) => Effect.gen(function*() {
   );
   if (code !== 0) return yield* new CaptureFailure({ problem: `map build exited ${code}` });
   const manifest = `${out.replace(/\.w3x$/, "")}.captures.json`;
-  yield* attempt("write the manifest", () => writeFileSync(manifest, `${JSON.stringify({ map: out, fixtures: fixtures.map(({ script: _, ...fixture }) => fixture) }, null, 2)}\n`));
+  const sourceRevision = yield* runProcess(ChildProcess.make("git", ["rev-parse", "HEAD"], { cwd: join(import.meta.dir, "..") })).pipe(Effect.mapError(failure => new CaptureFailure({ problem: failure.message })));
+  const mapSha256 = createHash("sha256").update(readFileSync(out)).digest("hex");
+  yield* attempt("write the manifest", () => writeFileSync(manifest, `${JSON.stringify({ map: out, mapSha256, sourceRevision, fixtures: fixtures.map(({ script: _, ...fixture }) => fixture) }, null, 2)}\n`));
   console.log(`built ${out}: ${fixtures.length} scripts, ${fixtures.reduce((total, fixture) => total + fixture.frames.length, 0)} captures; manifest ${manifest}`);
 });
 
-
-
-
-
-
-function colourClass(red: number, green: number, blue: number): StampCell | "unclear" {
-  if (red - Math.max(green, blue) > 60) return "one";
-  if (blue - Math.max(red, green) > 60) return "zero";
-  if (green - Math.max(red, blue) > 60) return "guard";
-  return "unclear";
-}
-
-
-function cellAt(frame: Frame, x: number, y: number): StampCell | "unclear" {
-  let red = 0;
-  let green = 0;
-  let blue = 0;
-  let count = 0;
-  for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
-    const px = Math.round(x) + dx;
-    const py = Math.round(y) + dy;
-    if (px < 0 || py < 0 || px >= frame.width || py >= frame.height) return "unclear";
-    const offset = (py * frame.width + px) * 3;
-    red += frame.rgb[offset] ?? 0;
-    green += frame.rgb[offset + 1] ?? 0;
-    blue += frame.rgb[offset + 2] ?? 0;
-    count++;
-  }
-  return colourClass(red / count, green / count, blue / count);
-}
-
-
-function stampAlong(frame: Frame, y: number, start: number, end: number) {
-  const side = (end - start + 1) / STAMP_CELLS;
-  const middle = y + side / 2;
-  const cells: (StampCell | "unclear")[] = [];
-  for (let index = 0; index < STAMP_CELLS; index++) cells.push(cellAt(frame, start + (index + 0.5) * side, middle));
-  return readStamp(cells);
-}
-
-
-
-
-
-
-function stampInRows(frame: Frame, rows: readonly number[]): Stamp | undefined {
-  for (const y of rows) {
-    const runs: { start: number; end: number }[] = [];
-    for (let x = 0; x < frame.width; x++) {
-      const offset = (y * frame.width + x) * 3;
-      if (colourClass(frame.rgb[offset] ?? 0, frame.rgb[offset + 1] ?? 0, frame.rgb[offset + 2] ?? 0) !== "guard") continue;
-      const last = runs[runs.length - 1];
-      if (last !== undefined && last.end === x - 1) last.end = x;
-      else runs.push({ start: x, end: x });
-    }
-    for (const left of runs) for (const right of runs) {
-      const side = (right.end - left.start + 1) / STAMP_CELLS;
-      if (right.start <= left.end || side < 3) continue;
-      const fits = (run: { start: number; end: number }) => Math.abs(run.end - run.start + 1 - side) <= Math.max(2, side * 0.3);
-      if (!fits(left) || !fits(right)) continue;
-
-      const above = ((y - 1) * frame.width + left.start) * 3;
-      if (y > 0 && colourClass(frame.rgb[above] ?? 0, frame.rgb[above + 1] ?? 0, frame.rgb[above + 2] ?? 0) === "guard") continue;
-      const stamp = stampAlong(frame, y, left.start, right.end);
-      if (stamp !== undefined) return stamp;
-    }
-  }
-  return undefined;
-}
-
-
-export function frameVerdict(frame: Frame): StampVerdict {
-  const half = Math.floor(frame.height / 2);
-  const top = Array.from({ length: half }, (_, index) => index);
-  const bottom = Array.from({ length: frame.height - half }, (_, index) => frame.height - 1 - index);
-  return stampVerdict(stampInRows(frame, top), stampInRows(frame, bottom));
-}
-
-
-export function frameStamp(frame: Frame): Stamp | undefined {
-  const verdict = frameVerdict(frame);
-  return "keep" in verdict ? verdict.keep : undefined;
-}
-
 const SilhouetteRow = Schema.Struct({ slot: Schema.Finite, fighter: Schema.String, move: Schema.String, width: Schema.Finite, height: Schema.Finite });
-const Manifest = Schema.fromJsonString(Schema.Struct({ map: Schema.String, fixtures: Schema.Array(Schema.Struct({ name: Schema.String, frames: Schema.Array(Schema.Finite), reel: Schema.optionalKey(Schema.Struct({ fighter: Schema.String, row: Schema.String, slot: Schema.String, facing: Schema.Literals(["right", "left"]) })), silhouette: Schema.optional(SilhouetteRow) })) }));
+const FixtureRecord = Schema.Struct({ name: Schema.String, frames: Schema.Array(Schema.Finite), reel: Schema.optionalKey(Schema.Struct({ fighter: Schema.String, row: Schema.String, slot: Schema.String, facing: Schema.Literals(["right", "left"]) })), silhouette: Schema.optional(SilhouetteRow) });
+const Manifest = Schema.fromJsonString(Schema.Struct({ map: Schema.String, mapSha256: Schema.optionalKey(Schema.String), sourceRevision: Schema.optionalKey(Schema.String), fixtures: Schema.Array(FixtureRecord) }));
+const CaptureRecord = Schema.Struct({ fixture: Schema.String, frame: Schema.Finite, phase: Schema.Literals(["held", "shown", "hidden"]), file: Schema.String, capturedMs: Schema.Finite, width: Schema.Finite, height: Schema.Finite });
+const Checkpoint = Schema.fromJsonString(Schema.Struct({ version: Schema.Literals([1]), mapSha256: Schema.String, sourceRevision: Schema.String, captures: Schema.Array(CaptureRecord) }));
+const BatchPlan = Schema.fromJsonString(Schema.Struct({ version: Schema.Literals([1]), sourceRevision: Schema.String, rows: Schema.Array(Schema.Struct({ name: Schema.String, map: Schema.String, manifest: Schema.String, mapSha256: Schema.String, frames: Schema.Array(Schema.Finite) })) }));
 
 export function heldCapture(fixture: { readonly frames: readonly number[]; readonly silhouette?: unknown }, stampFrame: number): { readonly frame: number; readonly phase: "held" | "shown" | "hidden" } | undefined {
   if (fixture.silhouette === undefined) return fixture.frames.includes(stampFrame) ? { frame: stampFrame, phase: "held" } : undefined;
@@ -294,7 +219,7 @@ const readBinding = (args: readonly string[]) => Effect.gen(function*() {
 
 const buildCheck = (args: readonly string[]) => readBinding(args).pipe(Effect.tap(binding => Effect.sync(() => console.log(JSON.stringify(binding)))));
 
-const runCaptures = (args: readonly string[]) => Effect.scoped(Effect.gen(function*() {
+export const runCaptures = (args: readonly string[]) => Effect.scoped(Effect.gen(function*() {
   const clientsFile = option(args, "--clients-file");
   const clientName = option(args, "--client");
   const manifestPath = option(args, "--manifest");
@@ -319,18 +244,39 @@ const runCaptures = (args: readonly string[]) => Effect.scoped(Effect.gen(functi
   const binding = yield* readBinding(args);
   console.log(`build: installed ${binding.installed}, live ${binding.live}`);
   yield* attempt("create the result folder", () => mkdirSync(out, { recursive: true }));
+  const resumable = manifest.mapSha256 !== undefined && manifest.sourceRevision !== undefined;
+  const actualMapSha256 = existsSync(manifest.map) ? createHash("sha256").update(readFileSync(manifest.map)).digest("hex") : undefined;
+  if (manifest.mapSha256 !== undefined && manifest.mapSha256 !== actualMapSha256) return yield* new CaptureFailure({ problem: `${manifest.map}: map hash differs from its capture manifest` });
+  const mapSha256 = actualMapSha256 ?? "unknown";
+  const sourceRevision = manifest.sourceRevision ?? "unknown";
+  const checkpointPath = join(out, "checkpoint.json");
   const statusPath = join(dataDirectory(client.documents), CAPTURE_STATUS_FILE);
   const started = Date.now();
   const audio = sheets || args.includes("--no-audio") ? undefined : yield* recordAudio(option(args, "--audio-sink") ?? `wisp-online-${client.name}`, join(out, "audio.wav"), started);
   const wanted = manifest.fixtures.reduce((total, fixture) => total + fixture.frames.length * (fixture.silhouette === undefined ? 1 : 2), 0);
   const saved = new Map<string, { fixture: string; frame: number; phase: "held" | "shown" | "hidden"; file: string; capturedMs: number; width: number; height: number }>();
+  if (resumable && existsSync(checkpointPath)) {
+    const checkpoint = yield* Schema.decodeEffect(Checkpoint)(yield* attempt("read capture checkpoint", () => readFileSync(checkpointPath, "utf8"))).pipe(Effect.mapError(cause => new CaptureFailure({ problem: `${checkpointPath}: ${String(cause)}` })));
+    if (checkpoint.mapSha256 !== mapSha256 || checkpoint.sourceRevision !== sourceRevision) return yield* new CaptureFailure({ problem: `${checkpointPath}: map identity changed; start a new row output` });
+    for (const capture of checkpoint.captures) {
+      const file = join(out, capture.file);
+      if (!existsSync(file) || statSync(file).size === 0) continue;
+      saved.set(`${capture.fixture}/${capture.frame}/${capture.phase}`, capture);
+    }
+    console.log(`resuming ${saved.size}/${wanted} saved frames for ${manifest.fixtures.map(fixture => fixture.name).join(",")}`);
+  }
   const log: { ms: number; captureMs: number; stamp: string }[] = [];
   let lastScript = 0;
   let idleSince = Date.now();
   let lastStatus = "";
+  let sawFinalScript = false;
+  let captureDone = false;
   while (saved.size < wanted && Date.now() - started < minutes * 60000) {
     const status = existsSync(statusPath) && statSync(statusPath).mtimeMs >= started ? preloadLines(readFileSync(statusPath, "latin1"))?.[0] ?? "" : "";
     if (status !== lastStatus) { lastStatus = status; console.log(status); }
+    const finalFixture = manifest.fixtures.at(-1);
+    if (finalFixture !== undefined && status === `CAPTURE SCRIPT ${manifest.fixtures.length} ${finalFixture.name}`) sawFinalScript = true;
+    if (sawFinalScript && status === `CAPTURE DONE ${manifest.fixtures.length}`) captureDone = true;
     const before = Date.now();
     const whole = yield* capture(client).pipe(Effect.mapError(failure => new CaptureFailure({ problem: `${failure.operation}: ${failure.cause}` })));
     const shot = crop === undefined || sheets ? whole : cropFrame(whole, crop);
@@ -355,10 +301,15 @@ const runCaptures = (args: readonly string[]) => Effect.scoped(Effect.gen(functi
         }
       });
       saved.set(key, { fixture: fixture.name, frame: held.frame, phase: held.phase, file, capturedMs: before - started, width: whole.width, height: whole.height });
+      if (resumable) yield* attempt("checkpoint captured frame", () => {
+        const temporary = `${checkpointPath}.tmp`;
+        writeFileSync(temporary, `${JSON.stringify({ version: 1, mapSha256, sourceRevision, captures: [...saved.values()] }, null, 1)}\n`);
+        renameSync(temporary, checkpointPath);
+      });
       idleSince = Date.now();
       console.log(`captured ${fixture.name} ${held.frame}${held.phase === "held" ? "" : ` ${held.phase}`} (${saved.size}/${wanted})`);
     }
-    if (lastScript >= manifest.fixtures.length && Date.now() - idleSince > 30000) break;
+    if ((resumable ? captureDone : lastScript >= manifest.fixtures.length) && Date.now() - idleSince > 30000) break;
   }
   const phases = (fixture: { readonly silhouette?: unknown }) => fixture.silhouette === undefined ? ["held"] as const : ["shown", "hidden"] as const;
   const missed = manifest.fixtures.flatMap(fixture => fixture.frames.flatMap(frame => phases(fixture).filter(phase => !saved.has(`${fixture.name}/${frame}/${phase}`)).map(phase => ({ fixture: fixture.name, frame, phase }))));
@@ -465,7 +416,10 @@ const compare = (args: readonly string[]) => Effect.gen(function*() {
 
 export function nativeCapture(argv: readonly string[]) {
   const [verb, ...args] = argv;
-  const program = verb === "reel" ? reel(args) : verb === "build" ? build(args) : verb === "plan" ? plan(args) : verb === "run" ? runCaptures(args) : verb === "compare" ? compare(args) : verb === "build-check" ? buildCheck(args) : Effect.fail(new CaptureFailure({ problem: "usage: nativeCapture.ts reel|build|plan|run|compare|build-check ..." }));
-  return program.pipe(Effect.provide(Layer.merge(BunServices.layer, platformLayer())));
+  const normalize = <A, E, R>(effect: Effect.Effect<A, E, R>): Effect.Effect<A, CaptureFailure, R> => effect.pipe(Effect.mapError(failure => failure instanceof CaptureFailure ? failure : new CaptureFailure({ problem: String(failure) })));
+  const program = verb === "reel" ? normalize(reel(args)) : verb === "build" ? normalize(build(args)) : verb === "chunks" ? normalize(nativeCaptureChunks(args, build, fixtureOf)) : verb === "plan" ? normalize(plan(args)) : verb === "run" ? normalize(runCaptures(args)) : verb === "batch" ? normalize(Effect.promise(() => import("./nativeCaptureBatch")).pipe(Effect.flatMap(module => module.nativeCaptureBatch(args)))) : verb === "compare" ? normalize(compare(args)) : verb === "build-check" ? normalize(buildCheck(args)) : Effect.fail(new CaptureFailure({ problem: "usage: nativeCapture.ts reel|build|chunks|plan|run|batch|compare|build-check ..." }));
+  return program.pipe(
+    Effect.provide(Layer.merge(BunServices.layer, platformLayer())),
+  );
 }
 if (import.meta.main) BunRuntime.runMain(nativeCapture(Bun.argv.slice(2)));
