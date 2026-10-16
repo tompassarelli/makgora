@@ -10,7 +10,7 @@
 
 import { basename, join } from "node:path";
 import { Clock, Console, Effect, Layer, Schedule } from "effect";
-import { MENU_SECONDS } from "wisp/scripts/wisp/lobby";
+import { leaveScoreScreen, MENU_SECONDS } from "wisp/scripts/wisp/lobby";
 import { QUICK_MATCH_COMMAND } from "../../../src/game/session/devSettings";
 import { devCommandReceiptFile, MELEE_READY_FILE } from "../../../src/game/core/gameFiles";
 import { DevCommandReceipt, MeleeReady } from "../boundary";
@@ -93,6 +93,8 @@ export const freshMatch = (map: string) => Effect.scoped(Effect.gen(function*() 
     if (state.kind === "lobby") return;
     yield* Effect.sleep("2 seconds");
     yield* clients.keys(client, "Escape");
+    yield* waitForState(client, inState("menus", "results"), { what: "the menus or score screen", seconds: MENU_SECONDS });
+    yield* leaveScoreScreen(client, clients.keys(client, "Escape"));
     yield* Console.log(`${client.name}: waiting for the menus (up to ${MENU_SECONDS} s)`);
     yield* waitForState(client, inState("menus"), { what: "the menus", seconds: MENU_SECONDS });
   }).pipe(step(`${client.name} at the menus`));
