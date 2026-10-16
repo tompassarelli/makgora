@@ -16,7 +16,9 @@
   and every job first cancels its run
   when the commit has left main (or main reverted it) and its lane
   (smashcraft:ts/scripts/farmGuard.ts). Job timeouts sit about 1.5 times above
-  the longest measured job.
+  the longest measured job; Balance packs each runner core to 750 s from
+  each pair's newest measured seconds and gives shards 45 minutes, because a
+  pair's time moved up to 3.31 times between commits.
   `bun wisp farm balance [--ref REF] [--lane NAME] [--wait]` plays the
   balance gate's computer field (Wren Expert, 400 a pair; `--opponent`, `--tier`,
   `--per-pair`, `--seeds`) on GitHub's free hosted runners, a `cpuField

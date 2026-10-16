@@ -1,4 +1,6 @@
-export const JOB_SECONDS = 15 * 60;
+export const JOB_SECONDS = 750;
+export const SHARD_TIMEOUT_MINUTES = 45;
+export const WORST_MEASURED_SLOWDOWN = 3.31;
 export const RUNNER_CORES = 4;
 
 export interface Work { readonly name: string; readonly seconds: number }

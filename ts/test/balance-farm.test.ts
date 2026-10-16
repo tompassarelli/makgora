@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
-import { JOB_SECONDS, RUNNER_CORES, measuredSeconds, partitionWork, shardWork } from "../scripts/balanceShards";
+import { JOB_SECONDS, RUNNER_CORES, WORST_MEASURED_SLOWDOWN, measuredSeconds, partitionWork, shardWork } from "../scripts/balanceShards";
+import { balanceTimeouts } from "../scripts/farmGuard";
 import { reserveP90, type Job } from "../scripts/farmAdmission";
 import { mergeProbeCounts } from "../scripts/cpuField";
 
@@ -52,6 +53,23 @@ test("field sizing takes each pair's newest measured seconds and never sizes an 
     for (const unit of units) {
       const newest = samples.find((sample) => sample[unit] !== undefined)?.[unit];
       expect(measured?.[unit]).toBe(newest ?? Math.max(...all));
+    }
+  }
+});
+
+test("every planned shard core still finishes inside the shard timeout when its pairs run 3.31 times slower, the worst measured cross-commit slowdown [k2 property]", () => {
+  const timeout = balanceTimeouts(400, 40).shard * 60;
+  let seed = 4242;
+  for (let trial = 0; trial < 100; trial++) {
+    const units = Array.from({ length: 1 + (trial % 60) }, (_, index) => {
+      seed = (Math.imul(seed, 1664525) + 1013904223) | 0;
+      return { name: String(index), seconds: 1 + ((seed >>> 0) % JOB_SECONDS) };
+    });
+    const times = new Map(units.map((unit) => [unit.name, unit.seconds]));
+    for (const group of shardWork(units)) {
+      const cores = Array.from({ length: RUNNER_CORES }, () => 0);
+      for (const name of [...group].sort((a, b) => (times.get(b) ?? 0) - (times.get(a) ?? 0))) { const core = cores.indexOf(Math.min(...cores)); cores[core] = (cores[core] ?? 0) + (times.get(name) ?? 0); }
+      expect(Math.max(...cores) * WORST_MEASURED_SLOWDOWN).toBeLessThanOrEqual(timeout);
     }
   }
 });

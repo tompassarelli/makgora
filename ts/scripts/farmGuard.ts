@@ -1,7 +1,7 @@
 import { parseArgs } from "node:util";
 import { Console, Effect, Schema } from "effect";
 import { captureProcess } from "wisp/scripts/wisp/hostProcess";
-import { JOB_SECONDS } from "./balanceShards";
+import { SHARD_TIMEOUT_MINUTES } from "./balanceShards";
 
 export type FarmWorkflow = "balance" | "playtest" | "memory" | "perf" | "pads" | "tiers" | "test";
 export const FARM_WORKFLOWS: readonly FarmWorkflow[] = ["balance", "playtest", "memory", "perf", "pads", "tiers", "test"];
@@ -65,7 +65,7 @@ export function admit(facts: Facts & { readonly autoland: AutolandStatus | undef
 }
 
 export function balanceTimeouts(perPair: number, probe: number): { readonly shard: number; readonly probe: number } {
-  const minutes = Math.ceil(JOB_SECONDS * 1.5 / 60);
+  const minutes = SHARD_TIMEOUT_MINUTES;
   return { shard: Math.max(minutes, Math.ceil((15 * perPair) / 400)), probe: Math.max(minutes, Math.ceil((25 * probe) / 40)) };
 }
 
