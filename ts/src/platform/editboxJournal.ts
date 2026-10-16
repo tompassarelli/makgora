@@ -48,6 +48,7 @@ export class EditboxIngress {
   private readonly chat: framehandle | undefined;
   private session: EditboxSession | undefined;
   private observedChat: boolean | undefined;
+  private chatEpoch: number | undefined;
   private chatRevision = 0;
 
   constructor() {
@@ -110,12 +111,14 @@ export class EditboxIngress {
   }
 
 
-  publishChat(build: string, slot: number): void {
+  publishChat(build: string, slot: number, epoch: number | undefined): void {
+    if (epoch === undefined) return;
     const open = this.chatOpen();
-    if (this.observedChat === open) return;
+    if (this.observedChat === open && this.chatEpoch === epoch) return;
     this.observedChat = open;
+    this.chatEpoch = epoch;
     this.chatRevision++;
-    writeLine(nativeChatFile(build, slot), `SMASHCRAFT CHAT v=1 build=${build} slot=${slot} revision=${this.chatRevision} available=${this.chat !== undefined ? 1 : 0} open=${open ? 1 : 0}`);
+    writeLine(nativeChatFile(build, slot), `SMASHCRAFT CHAT v=1 build=${build} slot=${slot} epoch=${epoch} revision=${this.chatRevision} available=${this.chat !== undefined ? 1 : 0} open=${open ? 1 : 0}`);
   }
 
 

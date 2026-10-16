@@ -108,7 +108,7 @@ function gameTick(s: ShellState): void {
   servicePauseCameraControls(s);
   editbox?.tick();
   const chatSlot = s.build.devConsole ? localParticipantSlot(s) : undefined;
-  if (chatSlot !== undefined) editbox?.publishChat(s.build.id, chatSlot);
+  if (chatSlot !== undefined) editbox?.publishChat(s.build.id, chatSlot, epoch?.rollback.epoch);
   if (epoch !== undefined) {
     journalPause.serviceChat(s, epoch.rollback, epoch.journal);
     journalPause.servicePauseRequest(s, epoch.rollback, epoch.journal);

@@ -121,13 +121,15 @@ test("native units refuse Tom's normal display and missing private desktop conte
   expect(() => privateDesktopUnitEnv({ DISPLAY: ":0" })).toThrow("requires an active PRIVATE_DESKTOP_RUN");
 });
 
-test("pad chat receipts reject stale files and files from another map build [k2 property]", () => {
-  const stale = nativeChatEntryReceipt('function PreloadFiles takes nothing returns nothing\ncall Preload( "SMASHCRAFT CHAT v=1 build=typescript-integrity slot=0 revision=7 available=1 open=0" )\nendfunction');
+test("pad chat receipts match the current game epoch even when written before the native session starts [k2 property]", () => {
+  const stale = nativeChatEntryReceipt('function PreloadFiles takes nothing returns nothing\ncall Preload( "SMASHCRAFT CHAT v=1 build=typescript-integrity slot=0 epoch=42 revision=7 available=1 open=0" )\nendfunction');
   if (stale === undefined) throw new Error("the chat receipt did not parse");
-  expect(stale).toEqual({ build: "typescript-integrity", revision: 7, available: "1", open: "0" });
-  expect(currentChatEntry(stale, 100, "typescript-integrity", 101)).toBeUndefined();
-  expect(currentChatEntry({ ...stale, build: "typescript-dev" }, 102, "typescript-integrity", 101)).toBeUndefined();
-  expect(currentChatEntry(stale, 102, "typescript-integrity", 101)).toEqual({ available: true, open: false, modified: 102 });
+  expect(stale).toEqual({ build: "typescript-integrity", epoch: 42, revision: 7, available: "1", open: "0" });
+  const sessionStartedMs = 102;
+  expect(currentChatEntry(stale, sessionStartedMs - 1, "typescript-integrity", { epoch: 42, sessionStartedMs })).toEqual({ available: true, open: false, modified: 101 });
+  expect(currentChatEntry(stale, 101, "typescript-integrity", { epoch: 43, sessionStartedMs })).toBeUndefined();
+  expect(currentChatEntry({ ...stale, build: "typescript-dev" }, 102, "typescript-integrity", { epoch: 42, sessionStartedMs })).toBeUndefined();
+  expect(currentChatEntry(stale, 100, "typescript-integrity", { afterMs: 100 })).toBeUndefined();
 });
 
 test("an accept already running on a pair blocks a second one, but not its own caller chain [k2 property]", () => {

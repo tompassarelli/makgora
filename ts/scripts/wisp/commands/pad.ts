@@ -260,7 +260,8 @@ const selectionChat = (session: NativeSession, text: string, timing: boolean) =>
   const path = join(session.data[0], nativeChatFile(session.build, 0));
   const entry = tryIntegrity("read chat entry", session.clients[0].name, () => {
     if (!existsSync(path)) return undefined;
-    return currentChatEntry(nativeChatEntryReceipt(readFileSync(path, "latin1")), statSync(path).mtimeMs, session.build, session.startedMs);
+    const epoch = matchStart(session.logs()[0])?.epoch;
+    return epoch === undefined ? undefined : currentChatEntry(nativeChatEntryReceipt(readFileSync(path, "latin1")), statSync(path).mtimeMs, session.build, { epoch, sessionStartedMs: session.startedMs });
   });
   yield* openObservedChat(session.clients[0], entry, requireCaptureLease(timing).pipe(Effect.andThen(batch(session.clients[0], [{ kind: "wait", millis: 250 }, { kind: "keys", keys: ["Return"] }]).pipe(Effect.provide(ClientWatch.layer({ filePrefix: "smashcraft" })), Effect.mapError(fromDesktop))), Effect.asVoid)).pipe(Effect.mapError((cause) => cause instanceof IntegrityFailure ? cause : fromDesktop(cause)));
   yield* batch(session.clients[0], [{ kind: "text", text, delayMillis: 35 }, { kind: "keys", keys: ["Return"], settleMillis: 0 }]).pipe(Effect.provide(ClientWatch.layer({ filePrefix: "smashcraft" })), Effect.mapError(fromDesktop));
