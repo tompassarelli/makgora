@@ -32,7 +32,7 @@ import { fighterHideCommand, hideFighter } from "./fighterCloak";
 import { clearCapturedInputs } from "./inputs";
 import { journalEpoch, journalIdentity } from "./journal";
 import { chatBusy, requestPause } from "./journalPause";
-import { Key, acceptsKeyEvent, syncKeyEvents } from "./keyEvents";
+import { Key, syncKeyEvents } from "./keyEvents";
 import { startBodyFit } from "./bodyFit";
 import { startAgencyFixture } from "./agencyFixture";
 import { applyShowcaseCommand } from "./showcase";
@@ -142,7 +142,6 @@ export function selectPauseMenu(s: ShellState, actor: number, choice: number): v
 function participantKeyDown(s: ShellState, slot: ParticipantSlot): void {
   if (!humanActive(s.game, slot)) return;
   const key = GetHandleId(BlzGetTriggerPlayerKey());
-  if (!acceptsKeyEvent(key, s.keyEvents.escapeOnly)) return;
   if (journalOwnsKey(s, slot, key)) return;
   if (s.trace.active) s.trace.window.keyDown[slot]++;
   traceParticipant(s, slot, `received down ${key}`);
@@ -213,7 +212,6 @@ function participantKeyDown(s: ShellState, slot: ParticipantSlot): void {
 function participantKeyUp(s: ShellState, slot: ParticipantSlot): void {
   if (!humanActive(s.game, slot)) return;
   const key = GetHandleId(BlzGetTriggerPlayerKey());
-  if (!acceptsKeyEvent(key, s.keyEvents.escapeOnly)) return;
 
   if (key === Key.n && s.pauseMenu?.title) s.titleAwaitRelease = false;
 

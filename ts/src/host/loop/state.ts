@@ -244,7 +244,6 @@ interface KeyEvents {
   up: trigger | undefined;
 
   escapeOnly: boolean;
-  enabled: boolean;
 }
 
 export interface ShellState {
@@ -416,7 +415,7 @@ export function createShellState(build: MapBuild, setup: ShellSetup): ShellState
     trace: inputTrace(build.responseProbe || build.inputProfile === "native-driver" ? 2048 : 256),
     probe: createResponseProbe(build.id),
     rollback: isShadow(input) ? rollback(input, setup.playback, setup.editbox) : undefined,
-    keyEvents: { down: undefined, up: undefined, escapeOnly: false, enabled: false }, readyMarkerWritten: false, restartRequested: false,
+    keyEvents: { down: undefined, up: undefined, escapeOnly: false }, readyMarkerWritten: false, restartRequested: false,
     diagnostic: createReplaySnapshot(), moment: momentSaves(), replay: replayRecording(),
   };
 
