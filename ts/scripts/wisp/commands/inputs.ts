@@ -3,7 +3,7 @@
 
 
 
-import { dirname } from "node:path";
+import { dirname, join } from "node:path";
 import { Effect } from "effect";
 import { type Command, UsageFailure, flagValues } from "wisp/scripts/wisp/command";
 import { MapBuildFailure } from "wisp/scripts/wisp/mapBuild";
@@ -11,6 +11,9 @@ import { runAdmitted } from "../../heavyCapacity";
 import { buildFighterArt, planFighters } from "../fighterArt";
 import { DERIVE_LEASE_SECONDS, openPaths, pruneInputs } from "../inputsPrune";
 import { projectRoot } from "../project";
+import { HERO_STRIKE_MOMENTS } from "../../../src/game/presentation/heroStrikeMomentInfo";
+import { measureStrikeMoments, staleStrikeFighters } from "../strikeMoments";
+import { heroModelSource } from "../../heroModelSource";
 import { FAMILIES, FAMILY_NAMES, type Family, INPUTS_STORE, MANIFEST, checkoutInputs, isSharded, readPins, storeFamily, storeShards, writePin, writeShardPins } from "../buildInputs";
 
 const isFamily = (name: string): name is Family => name in FAMILIES;
@@ -55,7 +58,18 @@ const derive = (args: readonly string[]) => Effect.gen(function*() {
   if (building > 0) yield* Effect.promise(() => runAdmitted(capacity.class, "smashcraft:inputs-derive", DERIVE_LEASE_SECONDS));
   yield* buildFighterArt(plans, manifest, assets, capacity.jobs);
   if (!check) return;
+  const characters = plans.map(({ fighter }) => fighter.character);
+  const measured = yield* Effect.tryPromise({
+    try: () => measureStrikeMoments((model) => Bun.file(join(assets, heroModelSource(model))).arrayBuffer(), new Set(characters)),
+    catch: (cause) => new MapBuildFailure({ operation: "measure strike moments", path: assets, cause }),
+  });
+  const staleStrikes = plans.filter(({ fighter }) => staleStrikeFighters(measured, HERO_STRIKE_MOMENTS, [fighter.character]).length > 0).map(({ fighter }) => fighter.slug);
   const stale = yield* git("status", "--porcelain", "--", ...DERIVED_PATHS);
+  if (staleStrikes.length > 0) {
+    yield* git("checkout", "--", ...DERIVED_PATHS);
+    yield* git("clean", "-fq", "--", ...DERIVED_PATHS);
+    return yield* new MapBuildFailure({ operation: "check strike moments", path: "ts/src/game/presentation/heroStrikeMomentInfo.ts", cause: `the committed strike table differs from what ${staleStrikes.join(", ")} measure from their committed models; run bun wisp view strikes --assets "$(bun wisp inputs path assets)" and commit the table` });
+  }
   if (stale === "") return console.log(`${plans.length} fighters reproduce their committed pins and generated files from this checkout's producers`);
   yield* git("checkout", "--", ...DERIVED_PATHS);
   yield* git("clean", "-fq", "--", ...DERIVED_PATHS);

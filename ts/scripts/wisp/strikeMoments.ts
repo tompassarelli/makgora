@@ -58,9 +58,10 @@ function measure(drawn: DrawnModel, character: number, style: number, clip: numb
 }
 
 
-export async function measureStrikeMoments(modelBytes: (model: string) => Promise<ArrayBuffer>): Promise<StrikeMoment[]> {
+export async function measureStrikeMoments(modelBytes: (model: string) => Promise<ArrayBuffer>, only?: ReadonlySet<number>): Promise<StrikeMoment[]> {
   const moments: StrikeMoment[] = [];
   for (const hero of HERO_ROSTER) {
+    if (only !== undefined && !only.has(hero.character)) continue;
     const bytes = await modelBytes(heroLook(hero.character)!.model);
     const sequences = parseMDX(bytes).Sequences;
     const drawn = new DrawnModel(bytes, 1.0);
@@ -110,4 +111,26 @@ export function strikeMomentSource(moments: readonly StrikeMoment[]): string {
     "};",
     "",
   ].join("\n");
+}
+
+export interface CommittedStrike {
+  readonly clip: number;
+  readonly seconds: number;
+  readonly end: number;
+}
+
+export type CommittedStrikes = { readonly [character: number]: { readonly [style: number]: CommittedStrike | undefined } | undefined };
+
+const SAME_SECOND = 0.0005;
+
+export function staleStrikeFighters(measured: readonly StrikeMoment[], committed: CommittedStrikes, characters: readonly number[]): number[] {
+  return characters.filter((character) => {
+    const rows = measured.filter((moment) => moment.character === character);
+    const held = committed[character] ?? {};
+    return rows.length !== Object.values(held).filter((row) => row !== undefined).length
+      || rows.some(({ style, clip, seconds, end }) => {
+        const row = held[style];
+        return row === undefined || row.clip !== clip || Math.abs(row.seconds - seconds) > SAME_SECOND || Math.abs(row.end - end) > SAME_SECOND;
+      });
+  });
 }

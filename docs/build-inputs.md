@@ -91,7 +91,10 @@ code:
    pins, generated clips or whites, model facts or source family a landing changes,
    and for every fighter when it changes code the derive steps import or the
    hero-models or imported-models pins, which feed every fighter's step keys
-   (smashcraft:ts/scripts/wisp/fighterArtChanges.ts).
+   (smashcraft:ts/scripts/wisp/fighterArtChanges.ts). It also measures each
+   checked fighter's strike moments from its committed model and fails when
+   `heroStrikeMomentInfo.ts` holds different rows for him; regenerate them with
+   `bun wisp view strikes --assets "$(bun wisp inputs path assets)"`.
    A derive that fails keeps its step logs in derive/run-*/ beside the store;
    `bun wisp inputs prune [--scratch NAME]...` removes the runs older than the
    derive lease, and each named scratch folder under the build-inputs root,
