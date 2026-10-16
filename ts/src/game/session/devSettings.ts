@@ -221,7 +221,8 @@ export function prepareQuickMatch(game: MatchState, stage = 0, character?: Chara
   }
   setStocks(game, first, stocks);
   if (!requestStageSelect(game, first)) return false;
-  selectStage(game, first, stage);
+  game.stageChoice = stage;
+  game.stageResolved = false;
   if (!requestStart(game, first)) return false;
 
   game.startHold = 0;
