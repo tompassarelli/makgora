@@ -58,11 +58,14 @@ permissions:
 jobs:
   plan:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     outputs:
       sha: ${{ steps.plan.outputs.sha }}
       shards: ${{ steps.plan.outputs.shards }}
       jobs: ${{ steps.plan.outputs.jobs }}
+      ceilings: ${{ steps.plan.outputs.ceilings }}
+      parallel: ${{ steps.plan.outputs.parallel }}
+      admission: ${{ steps.plan.outputs.admission }}
       probes: ${{ steps.plan.outputs.probes }}
       shard-timeout: ${{ steps.plan.outputs.shard-timeout }}
       probe-timeout: ${{ steps.plan.outputs.probe-timeout }}
@@ -84,11 +87,10 @@ jobs:
         run: |
           git fetch -q --depth 1 origin "$GITHUB_SHA" && git checkout -q FETCH_HEAD -- scripts/farmGuard.ts
           bun scripts/farmGuard.ts --workflow balance --sha "$(git rev-parse HEAD)" --lane "$LANE"
-      # Eight pairs a job (two for each of a hosted runner's four cores), dealt
-      # round-robin so each fighter's pairs spread over the jobs.
       - id: plan
         working-directory: ts
         env:
+          GH_TOKEN: ${{ github.token }}
           MATCHUPS: ${{ inputs.matchups }}
           PER_PAIR: ${{ inputs.per-pair }}
           PROBE: ${{ inputs.probe }}
@@ -97,21 +99,7 @@ jobs:
           echo "background-runner=$background" >> "$GITHUB_OUTPUT"
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
           bun scripts/farmGuard.ts --per-pair "$PER_PAIR" --probe "$PROBE" >> "$GITHUB_OUTPUT"
-          bun -e '
-            import { SELECTABLE_CHARACTERS, fighterSlug } from "./src/game/sim/heroes/registry";
-            const slugs = SELECTABLE_CHARACTERS.map(fighterSlug);
-            const allPairs = slugs.flatMap((a, index) => slugs.slice(index + 1).map((b) => `${a}:${b}`));
-            const requested = (process.env.MATCHUPS ?? "").split(",").filter(Boolean);
-            if (requested.some((pair) => !allPairs.includes(pair))) throw new Error("Unknown or reversed fighter matchup");
-            const pairs = requested.length === 0 ? allPairs : allPairs.filter((pair) => requested.includes(pair));
-            const jobs = Math.ceil(pairs.length / 8);
-            const shards = Array.from({ length: jobs }, (_, job) => pairs.filter((_, index) => index % jobs === job).join(","));
-            // The spam probe: four fighters a job, one a core.
-            const probeJobs = Math.ceil(slugs.length / 4);
-            const probes = Array.from({ length: probeJobs }, (_, job) => slugs.filter((_, index) => index % probeJobs === job).join(","));
-            console.log(`shards=${JSON.stringify(shards)}\njobs=${jobs}\nprobes=${JSON.stringify(probes)}`);
-            console.error(`${pairs.length} pairs of ${slugs.length} fighters in ${jobs} jobs`);
-          ' >> "$GITHUB_OUTPUT"
+          bun scripts/balancePlan.ts >> "$GITHUB_OUTPUT"
 
   shard:
     needs: plan
@@ -119,9 +107,7 @@ jobs:
     timeout-minutes: ${{ fromJSON(needs.plan.outputs.shard-timeout) }}
     strategy:
       fail-fast: true
-      # The account runs 20 jobs at once across every repository, first come
-      # first served: a full field holds 8, so other runs start meanwhile.
-      max-parallel: 8
+      max-parallel: ${{ fromJSON(needs.plan.outputs.parallel) }}
       matrix:
         pairs: ${{ fromJSON(needs.plan.outputs.shards) }}
     steps:
@@ -225,7 +211,7 @@ jobs:
     timeout-minutes: ${{ fromJSON(needs.plan.outputs.probe-timeout) }}
     strategy:
       fail-fast: true
-      max-parallel: 6
+      max-parallel: ${{ fromJSON(needs.plan.outputs.parallel) }}
       matrix:
         fighters: ${{ fromJSON(needs.plan.outputs.probes) }}
     steps:
@@ -276,8 +262,10 @@ jobs:
         run: |
           mkdir -p probes
           printf '%s' "$FIGHTERS" | tr ',' '\0' | xargs -0 -P "$(nproc)" -I{} sh -c '
-            name=$(printf "%s" "$1" | tr -c "A-Za-z0-9-" _)
-            bun scripts/cpuField.ts --probe-fighter "$1" --from balance/field.json --opponents "$OPPONENT,$OPPONENT" --tiers "$TIER,$TIER" --per-pair "$PROBE" --seeds "$SEEDS" --json "probes/$name.json" > "probes/$name.log" 2>&1 \
+            name=$(printf "%s" "$1" | tr "@/" "__")
+            fighter=${1%@*}
+            part=${1#*@}
+            bun scripts/cpuField.ts --probe-fighter "$fighter" --partition "$part" --from balance/field.json --opponents "$OPPONENT,$OPPONENT" --tiers "$TIER,$TIER" --per-pair "$PROBE" --seeds "$SEEDS" --json "probes/$name.json" > "probes/$name.log" 2>&1 \
               || { echo "::error::spam probe $1 failed"; cat "probes/$name.log"; exit 1; }
             grep -m1 "computer matches" "probes/$name.log" | cut -c1-90
           ' sh '{}'
@@ -287,16 +275,39 @@ jobs:
           path: ts/probes/*.json
           retention-days: 3
 
-  ceiling:
+  ceiling-plan:
     needs: [plan, merge, probe]
     if: ${{ always() && needs.merge.result == 'success' && needs.probe.result != 'failure' && needs.probe.result != 'cancelled' && inputs.matchups == '' && inputs.opponent == 'wren' && inputs.tier == 'expert' && fromJSON(inputs.per-pair) >= 400 }}
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 10
+    outputs:
+      parallel: ${{ steps.admit.outputs.parallel }}
+      admission: ${{ steps.admit.outputs.admission }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.plan.outputs.sha }}
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.13
+      - run: bun install --frozen-lockfile
+        working-directory: ts
+      - id: admit
+        working-directory: ts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bun scripts/farmAdmission.ts >> "$GITHUB_OUTPUT"
+
+  ceiling:
+    needs: [plan, ceiling-plan]
+    if: ${{ always() && needs.ceiling-plan.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
     strategy:
       fail-fast: true
-      max-parallel: 8
+      max-parallel: ${{ fromJSON(needs.ceiling-plan.outputs.parallel) }}
       matrix:
-        pairs: ${{ fromJSON(needs.plan.outputs.shards) }}
+        pairs: ${{ fromJSON(needs.plan.outputs.ceilings) }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -322,11 +333,13 @@ jobs:
         run: |
           mkdir -p ceiling
           printf '%s' "$PAIRS" | tr ',' '\0' | xargs -0 -P "$(nproc)" -I{} sh -c '
-            name=$(printf "%s" "$1" | tr -c "A-Za-z0-9-" _)
+            name=$(printf "%s" "$1" | tr ":@/" "___")
+            pair=${1%@*}
+            part=${1#*@}
             depth=""
-            case "$1" in rifleman:*) depth=${1#*:} ;; esac
-            case "$1" in rifleman:illidan) depth="$depth,rifleman" ;; esac
-            bun scripts/cpuCeiling.ts --pairs "$1" --depth "$depth" --json "ceiling/$name.json" > "ceiling/$name.log" 2>&1 \
+            case "$pair" in rifleman:*) depth=${pair#*:} ;; esac
+            case "$pair" in rifleman:illidan) depth="$depth,rifleman" ;; esac
+            bun scripts/cpuCeiling.ts --pairs "$pair" --partition "$part" --depth "$depth" --json "ceiling/$name.json" > "ceiling/$name.log" 2>&1 \
               || { cat "ceiling/$name.log"; exit 1; }
           ' sh '{}'
       - uses: actions/upload-artifact@v4
@@ -336,7 +349,7 @@ jobs:
           retention-days: 3
 
   verdict:
-    needs: [plan, shard, merge, probe, ceiling]
+    needs: [plan, shard, merge, probe, ceiling-plan, ceiling]
     if: ${{ always() && needs.merge.result == 'success' && needs.probe.result != 'failure' && needs.probe.result != 'cancelled' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -396,6 +409,9 @@ jobs:
           {
             echo "# Balance at ${SHA:0:10}"
             echo
+            echo "${{ needs.plan.outputs.admission }}"
+            echo "${{ needs.ceiling-plan.outputs.admission }}"
+            echo
             echo "**${verdict}**"
             echo
             echo "$OPPONENT $TIER, $PER_PAIR a pair, $(ls shards/*.json | wc -l) pairs in ${{ needs.plan.outputs.jobs }} jobs; spam probe $PROBE a pair for $(ls probes/*.json 2>/dev/null | wc -l) fighters; $((wall / 60)) min $((wall % 60)) s from the run's start to the verdict."
@@ -415,6 +431,14 @@ jobs:
             ts/balance/field.md
             ts/balance/field.json
             ts/balance/ceiling.md
+          retention-days: 30
+      - name: Record measured work for the next balance plan
+        working-directory: ts
+        run: bun scripts/balanceTimings.ts > timings.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: balance-timings
+          path: ts/timings.json
           retention-days: 30
       - name: Check the required balance gate
         if: ${{ inputs.matchups == '' && inputs.opponent == 'wren' && inputs.tier == 'expert' && fromJSON(inputs.per-pair) >= 400 }}
