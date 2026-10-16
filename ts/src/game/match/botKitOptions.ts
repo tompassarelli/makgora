@@ -384,7 +384,7 @@ export function pressKitOption(f: Readonly<Fighter>, target: Readonly<Fighter>, 
       if (free && ready && motion.grounded && target.motion.grounded && toward === f.facing && gap >= EYE_BLAST_NEAR && gap <= EYE_BLAST_FAR && exSpecialAffordable(f) && affords(f, SpecialAction.demonHunterManaBurn)
         && Math.abs(f32(target.motion.z - motion.z)) <= 40.0 && takes(skill, floorDiv(frame, 30), f.character * 7 + 24) && botChoice(floorDiv(frame, 30), f.character * 7 + 25, 3) === 0) {
         pressSlot(input, SpecialSlot.neutral, 0);
-        input.shield = true;
+        input.exPressed = true;
         return true;
       }
 

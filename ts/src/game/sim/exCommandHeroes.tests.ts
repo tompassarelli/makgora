@@ -21,7 +21,7 @@ function scene(character: Character) {
 
 function cast(owner: Fighter, world: Roster, slot: number, ex: boolean): void {
   const input = controls({ specialPressed: true, specialX: slot === SpecialSlot.side ? 1 : 0,
-    specialZ: slot === SpecialSlot.up ? 1 : slot === SpecialSlot.down ? -1 : 0, shield: ex });
+    specialZ: slot === SpecialSlot.up ? 1 : slot === SpecialSlot.down ? -1 : 0, exPressed: ex });
   assertTrue(startFighterSpecial(owner, 0, 0, input, world));
   assertEquals(owner.special.ex, ex);
 }

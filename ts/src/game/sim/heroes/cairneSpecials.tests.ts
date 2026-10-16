@@ -150,7 +150,7 @@ test("War Stomp's ring spawns on f20, never hits, and draws at the regions' reac
     while (runningAction(owner) !== SpecialAction.none) stepDuel(world);
     const wave = owner.projectiles.findIndex((shot) => shot.life > 0);
     assertTrue(wave >= 0);
-    stepDuel(world, ex ? controls({ ...DOWN, shield: true }) : DOWN);
+    stepDuel(world, ex ? controls({ ...DOWN, exPressed: true }) : DOWN);
     assertEquals(owner.special.action, SpecialAction.heroDown);
     assertEquals(owner.special.ex, ex);
     let drawn = 0;

@@ -41,12 +41,12 @@ const AIR_LANDING_LAG = 20;
 
 const blastProjectile = (radius: number, damage: number, status: AppliedStatus | undefined): SpecialProjectile => ({
   model: "Abilities\\Weapons\\FrostWyrmMissile\\FrostWyrmMissile.mdx",
-  spawnFrame: 16, offsetX: 50.0, offsetZ: CHEST, velocityX: h(f32(0.08)), velocityZ: 0.0,
+  spawnFrame: 19, offsetX: 50.0, offsetZ: CHEST, velocityX: h(f32(0.08)), velocityZ: 0.0,
   life: 36, radius, effect: hit(damage, "POKE", 40), reflectable: true, limit: 1, status,
 });
 const HOWLING_BLAST = blastProjectile(h(f32(0.22)), 6.0, undefined);
 const howlingBlast = (projectile: SpecialProjectile, landingLag: number | undefined): AuthoredSpecial => ({
-  endFrame: 44,
+  endFrame: 47,
   hurt: HOWLING_BODY,
   landingLag,
   projectiles: [projectile],
@@ -66,13 +66,13 @@ const CARRIED: AppliedStatus = { kind: HeroStatusKind.carried, frames: 80, group
 
 const valkyrProjectile = (speed: number): SpecialProjectile => ({
   model: VALKYR_MODEL,
-  spawnFrame: 14, offsetX: 40.0, offsetZ: f32(CHEST + 10.0), velocityX: speed, velocityZ: 0.0,
+  spawnFrame: 17, offsetX: 40.0, offsetZ: f32(CHEST + 10.0), velocityX: speed, velocityZ: 0.0,
   life: 40, radius: h(f32(0.2)), effect: { damage: 4.0, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false, element: HitElement.dark },
   reflectable: true, limit: 1, status: CARRIED,
 });
 const VALKYR = valkyrProjectile(5.0);
 const shadowguard = (projectile: SpecialProjectile, landingLag: number | undefined): AuthoredSpecial => ({
-  endFrame: 40,
+  endFrame: 43,
   landingLag,
   projectiles: [projectile],
 });

@@ -52,8 +52,9 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   destination.sdiZ = row.sdiZ;
   destination.cStickX = (has(held, Action.smashRight) ? 1 : 0) - (has(held, Action.smashLeft) ? 1 : 0);
   destination.cStickZ = (has(held, Action.smashUp) ? 1 : 0) - (has(held, Action.smashDown) ? 1 : 0);
-  destination.specialPressed = has(pressed, Action.special);
-  destination.ultimatePressed = (destination.specialPressed && has(held | pressed, Action.attack)) || (has(pressed, Action.attack) && has(held, Action.special));
+  destination.exPressed = has(pressed, Action.exSpecial);
+  destination.specialPressed = has(pressed, Action.special) || destination.exPressed;
+  destination.ultimatePressed = (has(pressed, Action.special) && has(held | pressed, Action.attack)) || (has(pressed, Action.attack) && has(held, Action.special));
   destination.specialX = destination.specialPressed && !(has(held, Action.walk) && row.specialZ === 0) ? row.specialX : 0;
   destination.specialZ = destination.specialPressed ? row.specialZ : 0;
   destination.down = has(held, Action.moveDown);
@@ -72,7 +73,6 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   destination.shortHopPressed = has(pressed, Action.shortHop);
   destination.jumpPressed = has(pressed, Action.jump) || destination.shortHopPressed;
   destination.jumpHeld = has(held, Action.jump);
-  destination.meter = has(held, Action.meter);
   destination.techPressed = destination.shieldPressed;
   const airborne = (fighter.jump.squat > 0 || !fighter.motion.grounded) && fighter.ledge.state === LedgeState.none;
   const tiltDodge = !destination.shieldPressed && airborne && destination.shieldTriggerActive && has(pressed, Action.walk) && ((held | pressed) & SMASHES) === 0;

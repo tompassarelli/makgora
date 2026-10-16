@@ -329,7 +329,7 @@ export function upgradeThreatenedSpecial(fighter: Readonly<Fighter>, target: Rea
     || target.attack.style === undefined || Math.abs(f32(target.motion.x - fighter.motion.x)) > 140.0
     || Math.abs(f32(target.motion.z - fighter.motion.z)) > 140.0 || !exSpecialAffordable(fighter)) return;
   if (fighter.character === Character.demonHunter && input.specialX === 0 && input.specialZ === 0) return;
-  input.shield = true;
+  input.exPressed = true;
 }
 
 /** Half a second: a computer that idles stands still this long. */

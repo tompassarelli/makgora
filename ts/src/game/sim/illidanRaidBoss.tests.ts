@@ -12,7 +12,7 @@ import { ROSTER_MANA } from "./mana";
 import { duel } from "./testDuel";
 import { controls } from "./testWorld";
 
-const EYE_BLAST_PRESS = controls({ specialPressed: true, shield: true, shieldStrength: 1.0 });
+const EYE_BLAST_PRESS = controls({ specialPressed: true, exPressed: true });
 
 test("Fel Lunge's full-charge reach stays inside the roster's forward smash band [k3 measure #379]", () => {
   const out = emptyHitRegion();

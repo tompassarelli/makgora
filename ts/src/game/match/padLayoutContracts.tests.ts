@@ -72,12 +72,13 @@ test("holding the tilt button with a direction walks and attack tilts, where the
   assertEquals(fighter.attack.style, AttackStyle.forwardTilt);
 });
 
-test("Meter + Special and Shield + Special each spend one EX segment, Special alone spends none [k3 measure #382]", () => {
-  for (const [hold, spent] of [[{ meter: true }, true], [{ trigger: true }, true], [{}, false]] as const) {
+test("the EX special button spends one EX segment; Shield + Special and Special alone spend none [k3 measure #382]", () => {
+  for (const [hold, spent] of [[{ exSpecial: true }, true], [{ trigger: true }, false], [{}, false]] as const) {
     const { run, fighter } = padRun();
     fighter.mana.points = ROSTER_MANA.max;
-    for (let frame = 0; frame < 4; frame++) playPads(run, hold, {});
-    playPads(run, { ...hold, special: true }, {});
+    const button = "exSpecial" in hold;
+    for (let frame = 0; frame < 4; frame++) playPads(run, button ? {} : hold, {});
+    playPads(run, button ? hold : { ...hold, special: true }, {});
     assertEquals(fighter.mana.points, spent ? ROSTER_MANA.max - ROSTER_MANA.exCost : ROSTER_MANA.max);
   }
 });

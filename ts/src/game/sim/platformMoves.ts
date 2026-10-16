@@ -7,7 +7,7 @@ import { type Fighter, PLATFORM_DROP_INPUT_WINDOW } from "./fighter";
 import { setWorldMotionValue, totalVelocityZ } from "./motion";
 import type { Controls } from "./roster";
 import { surfaceCount, surfaceLeft, surfacePass, surfaceRight, surfaceZ } from "./stage";
-import { stickZ } from "./stick";
+import { stickX, stickZ } from "./stick";
 import { bodyTop } from "./surfaces";
 import { cancelAttack } from "./transitions";
 import { clearDash } from "./groundMovement";
@@ -49,7 +49,7 @@ function ascentDeck(f: Readonly<Fighter>, stage: number, matchFrame: number): nu
 
 export function mountPlatform(f: Fighter, stage: number, matchFrame: number, input: Readonly<Controls>): boolean {
   if (f.motion.grounded || f.launch.hitstun > 0 || f.launch.hitlag > 0 || totalVelocityZ(f) <= 0
-    || stickZ(input) > -STICK_DEADZONE || isAerialAttack(f.attack.style) || f.dodge.airDodging
+    || stickZ(input) > -STICK_DEADZONE || Math.abs(stickX(input)) > STICK_DEADZONE || isAerialAttack(f.attack.style) || f.dodge.airDodging
     || f.special.action !== SpecialAction.none || f.special.fall) return false;
   const deck = ascentDeck(f, stage, matchFrame);
   if (deck === undefined) return false;

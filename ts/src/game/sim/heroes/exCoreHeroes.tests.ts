@@ -15,7 +15,7 @@ function cast(character: Character, slot: SpecialSlot, form: SpecialForm, ex: bo
   const fighter = createFighter(character, 0.0, 1);
   fighter.motion.grounded = true;
   fighter.mana.points = 100;
-  const input = controls({ specialPressed: true, shield: ex, specialX: slot === SpecialSlot.side ? 1 : 0,
+  const input = controls({ specialPressed: true, exPressed: ex, specialX: slot === SpecialSlot.side ? 1 : 0,
     specialZ: slot === SpecialSlot.up ? 1 : slot === SpecialSlot.down ? -1 : 0 });
   assertTrue(startFighterSpecial(fighter, 0, 0, input));
   assertEquals(fighter.special.action, SpecialAction.heroNeutral + slot);

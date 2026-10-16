@@ -31,7 +31,7 @@ test("Cairne short-hop Shockwave lands during startup and keeps grounded spawn a
       stepDuel(air.world, controls({ jumpPressed: true, shortHopPressed: true }));
       for (let tick = 1; tick < 11; tick++) stepDuel(air.world);
       assertEquals(air.owner.motion.grounded, false);
-      const press = controls({ specialPressed: true, shield: ex });
+      const press = controls({ specialPressed: true, exPressed: ex });
       stepDuel(air.world, press);
       stepDuel(grounded.world, press);
       assertEquals(air.owner.special.form, SpecialForm.air);

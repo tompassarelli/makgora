@@ -85,7 +85,7 @@ test("a hero special keeps the variant latched at entry while the live variant d
     for (let variant = 0; variant <= variants.length; variant++) {
       const { world, owner } = pair(600.0);
       owner.tuning = { ...owner.tuning, specials: { ...KIT, side: kit } };
-      const input = controls({ specialPressed: true, specialX: 1, shield: ex });
+      const input = controls({ specialPressed: true, specialX: 1, exPressed: ex });
       stepDuel(world, input);
       assertEquals(owner.special.ex, ex);
       enterHeroSpecial(owner, { slot: SpecialSlot.side, form: SpecialForm.ground, variant }, input);

@@ -21,7 +21,7 @@ function special(character: Character, side: boolean, mana: number, ex: boolean)
   const world = testWorld(f, createFighter(Character.rifleman, 900.0, -1));
   f.motion.grounded = true;
   f.mana.points = mana;
-  const input = controls({ specialPressed: true, specialX: side ? 1 : 0, shield: ex, shieldPressed: ex, airDodgePressed: ex, groundDodgePressed: ex });
+  const input = controls({ specialPressed: true, specialX: side ? 1 : 0, exPressed: ex });
   advanceFighterMotion(world, 0, 0, 0, input, 0.0);
   const started = startFighterSpecial(f, 0, 0, input, world);
   return { f, world, started };
@@ -120,7 +120,7 @@ test("EX state and spent armor restore exactly, reset on a stock while spent met
       upDown.motion.surface = 0;
       upDown.mana.points = 100;
       testWorld(upDown, createFighter(Character.rifleman, 900.0, -1));
-      startFighterSpecial(upDown, 0, 0, controls({ specialPressed: true, specialZ: direction, shield: true }));
+      startFighterSpecial(upDown, 0, 0, controls({ specialPressed: true, specialZ: direction, exPressed: true }));
       assertTrue(upDown.special.ex);
       assertEquals(upDown.mana.points, 67);
     }

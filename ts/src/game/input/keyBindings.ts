@@ -50,7 +50,7 @@ export function presetBindings(preset: BindingPreset): KeyBindings {
   bind(Action.special, code("U"));
   bind(Action.grab, code("O"));
   bind(Action.leftTrigger, code("Q"));
-  bind(Action.rightTrigger, code(custom ? "8" : "7"), code("G"));
+  bind(Action.rightTrigger, code(custom ? "8" : "7"));
   bind(Action.smashLeft, code("B"), SLASH);
   bind(Action.smashRight, code("M"));
   bind(Action.smashUp, code("J"));
@@ -58,7 +58,7 @@ export function presetBindings(preset: BindingPreset): KeyBindings {
   bind(Action.walk, code("P"));
   bind(Action.lightShield, code("A"));
   bind(Action.shortHop, code("I"));
-  bind(Action.meter, code("X"));
+  bind(Action.exSpecial, code(custom ? "0" : "9"));
   return { keys };
 }
 
@@ -92,8 +92,8 @@ export function rebind(bindings: KeyBindings, action: Action, slot: KeySlot, key
 
 
 
-const CURRENT_SAVE = "K9";
-const SAVED_SLOTS: Readonly<Record<string, number>> = { K1: 28, K2: 30, K3: 30, K4: KEY_SLOT_COUNT - 2, K5: KEY_SLOT_COUNT - 2, K6: KEY_SLOT_COUNT, K7: KEY_SLOT_COUNT, K8: KEY_SLOT_COUNT, [CURRENT_SAVE]: KEY_SLOT_COUNT };
+const CURRENT_SAVE = "KA";
+const SAVED_SLOTS: Readonly<Record<string, number>> = { K1: 28, K2: 30, K3: 30, K4: KEY_SLOT_COUNT - 2, K5: KEY_SLOT_COUNT - 2, K6: KEY_SLOT_COUNT, K7: KEY_SLOT_COUNT, K8: KEY_SLOT_COUNT, K9: KEY_SLOT_COUNT, [CURRENT_SAVE]: KEY_SLOT_COUNT };
 const DIGITS = "0123456789";
 const SAVED_KEY_DIGITS = 3;
 const SKIPPED_ON_LOAD = code("Y");
@@ -117,16 +117,26 @@ function readKey(saved: string, offset: number): number | undefined {
 
 function upgradeDefaults(bindings: KeyBindings, version: string): void {
   const { keys } = bindings;
+  if (keyFor(bindings, Action.exSpecial, 0) === code("X")) keys[slotIndex(Action.exSpecial, 0)] = EMPTY;
+  if (keyFor(bindings, Action.rightTrigger, 1) === code("G")) keys[slotIndex(Action.rightTrigger, 1)] = EMPTY;
+  upgradeEarlierDefaults(bindings, version);
+  if (keyFor(bindings, Action.exSpecial, 0) === undefined) {
+    const ex = keyFor(bindings, Action.jump, 1) === code("9") ? code("0") : code("9");
+    if (!keys.includes(ex)) rebind(bindings, Action.exSpecial, 0, ex);
+  }
+}
+
+function upgradeEarlierDefaults(bindings: KeyBindings, version: string): void {
+  const { keys } = bindings;
   const free = (...candidates: number[]) => candidates.every((key) => !keys.includes(key));
   const first = (action: Action) => keyFor(bindings, action, 0);
+  if (version === "K9") return;
   if (version === "K8") {
     if (first(Action.smashDown) === code("J") && free(code("H"))) rebind(bindings, Action.smashDown, 0, code("H"));
     if (first(Action.smashUp) === code("0") && free(code("J"))) rebind(bindings, Action.smashUp, 0, code("J"));
     return;
   }
   if (keyFor(bindings, Action.lightShield, 1) === undefined && free(code("T"))) rebind(bindings, Action.lightShield, 1, code("T"));
-  if (keyFor(bindings, Action.rightTrigger, 1) === undefined && free(code("G"))) rebind(bindings, Action.rightTrigger, 1, code("G"));
-  if (keyFor(bindings, Action.meter, 0) === undefined && free(code("X"))) rebind(bindings, Action.meter, 0, code("X"));
   if (first(Action.shortHop) === undefined) {
     const hop = first(Action.jump) === code("I") ? code("Z") : code("I");
     if (free(hop)) rebind(bindings, Action.shortHop, 0, hop);
@@ -193,7 +203,7 @@ export const ACTION_LABELS: Readonly<Record<Action, string>> = {
   [Action.walk]: "Tilt",
   [Action.lightShield]: "Light shield",
   [Action.shortHop]: "Short hop (LB in the tom pad layout)",
-  [Action.meter]: "Meter: + Special for EX (RB in the tom pad layout)",
+  [Action.exSpecial]: "EX special",
 };
 
 export function keyLabel(key: number | undefined): string {

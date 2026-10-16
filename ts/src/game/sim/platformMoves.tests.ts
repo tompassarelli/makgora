@@ -55,6 +55,17 @@ test("rising without down or during any aerial passes through; down past deadzon
     }
   }
 });
+
+test("rising with down-left or down-right passes through a platform so a waveland can follow [k2 property]", () => {
+  for (const character of SELECTABLE_CHARACTERS) {
+    for (const side of [-1, 1]) {
+      for (const input of [controls({ down: true, verticalDirection: -1, direction: side }), controls({ diStickValid: true, diStickX: f32(side * 0.7), diStickZ: f32(-0.7), down: true })]) {
+        const f = risingUnder(character); step(f, input);
+        assertFalse(f.motion.grounded); assertGreaterThan(f.motion.vz, 0);
+      }
+    }
+  }
+});
 test("keyboard and analog down-mount hold crouch, allow next-frame down tilt and down-B, and drop only on a fresh hard press [k3 measure #392]", () => {
   for (const input of HARD_DOWN) {
     for (const action of ["tilt", "special"] as const) {

@@ -3,7 +3,7 @@ import { testHeadless } from "./headless";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { start, install } from "../src/platform/main";
 import { shell } from "../src/host/loop/state";
-import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterName, fighterKey } from "../src/game/sim/heroes/registry";
 import { fighterAt } from "../src/game/sim/roster";
 import { SpecialSlot } from "../src/game/sim/specials/schema";
 import { startFighterSpecial } from "../src/game/sim/specials";
@@ -22,7 +22,7 @@ const fourExSpecials = (character: (typeof SELECTABLE_CHARACTERS)[number]): void
   for (const slot of [SpecialSlot.neutral, SpecialSlot.side, SpecialSlot.up, SpecialSlot.down]) {
     clients.chat(0, "-dev reset");
     clients.frames(1);
-    clients.chat(0, `-dev quick hero ${fighterName(character)}`);
+    clients.chat(0, `-dev quick hero ${fighterKey(character)}`);
     clients.frames(5);
     let duration = 0;
     const fighters = clients.clients.map(client => {
@@ -32,7 +32,7 @@ const fourExSpecials = (character: (typeof SELECTABLE_CHARACTERS)[number]): void
         const owner = fighterAt(world, 0);
         expect(owner.character).toBe(character);
         owner.mana.points = 100;
-        expect(startFighterSpecial(owner, 0, 0, controls({ specialPressed: true, shield: true,
+        expect(startFighterSpecial(owner, 0, 0, controls({ specialPressed: true, exPressed: true,
           specialX: slot === SpecialSlot.side ? 1 : 0,
           specialZ: slot === SpecialSlot.up ? 1 : slot === SpecialSlot.down ? -1 : 0 }), world), `${fighterName(character)}:${slot}`).toBe(true);
         expect(owner.special.ex).toBe(true);

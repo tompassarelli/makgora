@@ -9,9 +9,9 @@ controller is optional: the Smashcraft controller helper turns its buttons
 and sticks into the same keys. The default controls already match the helper;
 if you saved Custom controls earlier, press F1, choose QWERTY and Save.
 The default Melee layout uses A to
-attack, B for specials, X/Y to jump and RB to grab; Tom's layout uses A to
-attack, X for specials, Y to jump, B to grab, LB to short hop and RB + X for
-an EX special. In both layouts, either trigger shields or air-dodges and
+attack, B for specials, X/Y to jump, RB to grab and LB for an EX special;
+Tom's layout uses A to attack, X for specials, Y to jump, B to grab, LB to
+short hop and RB for an EX special. In both layouts, either trigger shields or air-dodges and
 Start pauses. The current prototype includes character and stage
 selection, 26 fighters, a bot opponent, floating platforms, blast zones,
 stocks, rematches, and configurable controls.
@@ -122,12 +122,14 @@ drop consumes that press: held down never fast-falls. Return toward neutral
 (or release the key), then press down again to fast-fall.
 N with a direction performs a smash, or a tilt while walking. B (or /) is
 C-stick left; H is down; J is up; M is right. C-stick down-air preserves
-normal aerial momentum. QWERTY uses 7 for right trigger and 8 for the
-alternate jump key. A gives light shield; T and 0 are unbound by default.
+normal aerial momentum. QWERTY uses 7 for right trigger, 8 for the alternate jump key and 9 for
+EX special; Custom uses 8, 9 and 0. A gives light shield; T is unbound by
+default.
 
 Specials use U with a direction; every fighter's specials and
-ultimate are listed by name in the [move list](move-list.md). Shield + U is
-the EX form, costing one of the super bar's three segments. At a full bar,
+ultimate are listed by name in the [move list](move-list.md). The EX special
+key (9 on QWERTY, 0 on Custom) with a direction casts that special's EX
+form, costing one of the super bar's three segments. At a full bar,
 N + U together (A + B in Melee or A + X in Tom's controller layout) is the fighter's ultimate; the
 Ultimates rule at fighter selection turns them off.
 

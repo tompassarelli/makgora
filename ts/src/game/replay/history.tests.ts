@@ -484,8 +484,8 @@ function scopedAgainstWhole(mode: "auto" | "force", jabberX: number, blastAt?: n
       actual[1].held = floorMod(frame, 12) < 2 ? bit(Action.attack) : 0;
       actual[1].pressed = floorMod(frame, 12) === 0 ? bit(Action.attack) : 0;
     } else {
-      actual[1].held = frame === blastAt ? bit(Action.rightTrigger) : 0;
-      actual[1].pressed = frame === blastAt ? bit(Action.special) : 0;
+      actual[1].held = frame === blastAt ? bit(Action.exSpecial) : 0;
+      actual[1].pressed = frame === blastAt ? bit(Action.exSpecial) : 0;
     }
     return actual;
   };

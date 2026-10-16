@@ -190,7 +190,7 @@ test("each fighter's ultimate is answered by its defence on startup and leaves t
   assertEquals(failures.join("; "), "");
 });
 
-const EX = controls({ specialPressed: true, shield: true, shieldPressed: true, airDodgePressed: true, groundDodgePressed: true });
+const EX = controls({ specialPressed: true, exPressed: true });
 
 test("Cairne centre ankh burst and arrival replay per frame, including a displaced-anchor fault [k1 scenario]", () => {
   for (const { stage, facing, answer } of [

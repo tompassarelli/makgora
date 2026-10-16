@@ -32,7 +32,7 @@ export interface Pad {
   readonly rightTrigger?: boolean;
   readonly tilt?: boolean;
   readonly shortHop?: boolean;
-  readonly meter?: boolean;
+  readonly exSpecial?: boolean;
   readonly rightStickTilts?: boolean;
 }
 
@@ -51,7 +51,7 @@ function heldActions(pad: Pad): number {
   if (pad.jump === true) held |= bit(Action.jump);
   if (pad.tilt === true) held |= bit(Action.walk);
   if (pad.shortHop === true) held |= bit(Action.shortHop);
-  if (pad.meter === true) held |= bit(Action.meter);
+  if (pad.exSpecial === true) held |= bit(Action.exSpecial);
   if (x < -STICK_DIGITAL) held |= bit(Action.moveLeft);
   if (x > STICK_DIGITAL) held |= bit(Action.moveRight);
   if (up < -STICK_DIGITAL) held |= bit(Action.moveDown);
@@ -82,8 +82,8 @@ function helperRow(previous: Pad, pad: Pad): InputRow {
     axisX: axisByte(x), axisZ: axisByte(up),
     triggerLeft: pad.trigger === true ? 255 : 0,
     triggerRight: pad.rightTrigger === true ? 255 : 0,
-    specialX: has(pressed, Action.special) ? beyond(x) : 0,
-    specialZ: has(pressed, Action.special) ? beyond(up) : 0,
+    specialX: has(pressed, Action.special) || has(pressed, Action.exSpecial) ? beyond(x) : 0,
+    specialZ: has(pressed, Action.special) || has(pressed, Action.exSpecial) ? beyond(up) : 0,
     dodgeX: (pressed & SHIELDS) !== 0 ? beyond(x) : 0,
     dodgeZ: (pressed & SHIELDS) !== 0 ? beyond(up) : 0,
     ledgeVertical: has(pressed, Action.moveUp) ? 1 : has(pressed, Action.moveDown) ? -1 : 0,

@@ -49,7 +49,7 @@ test("Chen's long fire hits a distant fighter once through the whole attack with
       target.motion.z = owner.motion.z;
       target.motion.vx = 0.0;
       target.motion.vz = 0.0;
-      stepDuel(world, frame === 1 ? controls({ specialPressed: true, shield: ex }) : controls());
+      stepDuel(world, frame === 1 ? controls({ specialPressed: true, exPressed: ex }) : controls());
       if (target.status.damage > damage) {
         hits++;
         assertTrue(owner.special.frame >= 12 && owner.special.frame <= 23);
