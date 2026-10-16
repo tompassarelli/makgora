@@ -11,6 +11,7 @@ import { ClientWatch } from "wisp/scripts/wisp/watch";
 import { openObservedChat } from "wisp/scripts/wisp/chatSetup";
 import { preloadLines } from "wisp/scripts/wisp/preloadRecord";
 import { nativeChatEntryReceipt } from "../boundary";
+import { currentChatEntry } from "../padChat";
 import { onHealthyClients } from "../doctor";
 import { pollUntil } from "../../hostPoll";
 import { NATIVE_SOAK_FILE, nativeChatFile } from "../../../src/game/core/gameFiles";
@@ -90,9 +91,8 @@ export const lanSoak: Command = (args) => Effect.gen(function*() {
     if (!diagnosticStart) {
       const chatPath = join(dataDirectory(host.documents), nativeChatFile(INTEGRITY_BUILD.id, 0));
       const entry = attempt("read chat entry", () => {
-        if (!existsSync(chatPath) || statSync(chatPath).mtimeMs < since) return undefined;
-        const receipt = nativeChatEntryReceipt(readFileSync(chatPath, "latin1"));
-        return receipt === undefined ? undefined : { available: receipt.available === "1", open: receipt.open === "1", modified: statSync(chatPath).mtimeMs };
+        if (!existsSync(chatPath)) return undefined;
+        return currentChatEntry(nativeChatEntryReceipt(readFileSync(chatPath, "latin1")), statSync(chatPath).mtimeMs, INTEGRITY_BUILD.id, since);
       });
       yield* openObservedChat(host, entry, batch(host, [{ kind: "keys", keys: ["Return"] }]).pipe(Effect.mapError((cause) => new NativeSoakFailure({ problem: cause.message }))));
       yield* batch(host, [{ kind: "text", text: "-dev soak", delayMillis: 35 }, { kind: "keys", keys: ["Return"], settleMillis: 0 }]);

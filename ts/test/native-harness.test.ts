@@ -9,6 +9,8 @@ import { poolUnitCommand, poolUnitName, pairNeedsRestart } from "../scripts/wisp
 import { smashcraftDoctor } from "../scripts/wisp/doctor";
 import { ACCEPT_IN_UNIT, acceptUnitCommand, inAcceptUnit } from "../scripts/wisp/commands/acceptUnit";
 import { privateDesktopUnitEnv } from "../scripts/wisp/commands/privateDesktopUnitEnv";
+import { nativeChatEntryReceipt } from "../scripts/wisp/boundary";
+import { currentChatEntry } from "../scripts/wisp/padChat";
 import { pairHolders } from "../scripts/wisp/commands/pairGuard";
 import { gameFilesLayer } from "../scripts/wisp/project";
 import { NativeClientInvalid, NativeToolMissing, repairPackager, resolveTools, unresolvedLibraries, validateClients, withRuntimeTools } from "../scripts/wisp/nativeTools";
@@ -111,6 +113,15 @@ test("native units refuse Tom's normal display and missing private desktop conte
   const run = "/run/user/1000/private-desktop.unit-test";
   expect(() => privateDesktopUnitEnv({ PRIVATE_DESKTOP_RUN: run }, () => ":0\n")).toThrow("refusing non-private display :0");
   expect(() => privateDesktopUnitEnv({ DISPLAY: ":0" })).toThrow("requires an active PRIVATE_DESKTOP_RUN");
+});
+
+test("pad chat receipts reject stale files and files from another map build [k2 property]", () => {
+  const stale = nativeChatEntryReceipt('function PreloadFiles takes nothing returns nothing\ncall Preload( "SMASHCRAFT CHAT v=1 build=typescript-integrity slot=0 revision=7 available=1 open=0" )\nendfunction');
+  if (stale === undefined) throw new Error("the chat receipt did not parse");
+  expect(stale).toEqual({ build: "typescript-integrity", revision: 7, available: "1", open: "0" });
+  expect(currentChatEntry(stale, 100, "typescript-integrity", 101)).toBeUndefined();
+  expect(currentChatEntry({ ...stale, build: "typescript-dev" }, 102, "typescript-integrity", 101)).toBeUndefined();
+  expect(currentChatEntry(stale, 102, "typescript-integrity", 101)).toEqual({ available: true, open: false, modified: 102 });
 });
 
 test("an accept already running on a pair blocks a second one, but not its own caller chain [k2 property]", () => {

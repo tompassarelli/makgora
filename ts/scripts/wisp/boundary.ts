@@ -211,9 +211,16 @@ export const decodeWrittenGameFile = (name: string, path: string, text: string) 
   return kind === undefined ? Effect.void : kind.decode(path, text).pipe(Effect.asVoid);
 };
 
-const ChatEntryReceipt = Schema.Struct({ revision: Schema.FiniteFromString, available: Schema.Literals(["0", "1"]), open: Schema.Literals(["0", "1"]) });
+export interface NativeChatEntryReceipt {
+  readonly build: string;
+  readonly revision: number;
+  readonly available: "0" | "1";
+  readonly open: "0" | "1";
+}
 
-export function nativeChatEntryReceipt(text: string) {
+const ChatEntryReceipt = Schema.Struct({ build: Schema.NonEmptyString, revision: Schema.FiniteFromString, available: Schema.Literals(["0", "1"]), open: Schema.Literals(["0", "1"]) });
+
+export function nativeChatEntryReceipt(text: string): NativeChatEntryReceipt | undefined {
   const line = preloadLines(text)?.find((line) => line.startsWith("SMASHCRAFT CHAT v=1 "));
   if (line === undefined) return undefined;
   return Option.getOrUndefined(Schema.decodeUnknownOption(ChatEntryReceipt)(Object.fromEntries(line.split(" ").map((field) => field.split("=")))));
