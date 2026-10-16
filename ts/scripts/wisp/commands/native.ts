@@ -131,15 +131,13 @@ const runNative = (file: string, out: string, values: NativeOptions) => Effect.g
     const evidence: Record<string, string[]> = {};
     const row = { id: batch.id, identity, start, end: "", pairs: shards.map(shard => shard.pair), scripts: batch.scripts.map(script => script.path), verdict: "RUNNING", evidence };
     if (!dry) { records.push(row); yield* save(runPath, { batches: records }); }
-    const result = yield* Effect.forEach(shards, shard => Effect.gen(function*() {
-      yield* runShard(batch, shard, out, config, dry, evidence);
-    }), { concurrency: pairs.length || 1 }).pipe(Effect.result);
+    const result = yield* Effect.forEach(shards, shard => runShard(batch, shard, out, config, dry, evidence), { concurrency: pairs.length || 1 }).pipe(Effect.result);
     if (!dry) {
       row.end = new Date().toISOString();
       row.verdict = result._tag === "Success" ? "PASS" : "FAIL";
       yield* save(runPath, { batches: records });
     }
-    if (result._tag === "Failure") return yield* Effect.fail(result.failure);
+    if (result._tag === "Failure") return yield* result.failure;
   }
 });
 export const native: Command = args => Effect.scoped(Effect.gen(function*() {
