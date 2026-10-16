@@ -265,6 +265,12 @@ const LIFT_DECK = moving(130.0, -330.0, 120.0, 0, [
   { frames: 90, x: -330.0, z: 300.0 },
   { frames: 120, x: -330.0, z: 120.0 },
 ]);
+const CENTRE_LIFT_DECK = moving(130.0, 0.0, 120.0, 0, [
+  { frames: 90, x: 0.0, z: 120.0 },
+  { frames: 120, x: 0.0, z: 300.0 },
+  { frames: 90, x: 0.0, z: 300.0 },
+  { frames: 120, x: 0.0, z: 120.0 },
+]);
 
 
 
@@ -310,7 +316,7 @@ function stageDecks(stage: number): readonly Deck[] {
   return stage >= 0 && stage < STAGE_DECKS.length ? at(STAGE_DECKS, stage) : NO_DECKS;
 }
 const CARRIED_DECKS = [MAIN_DECK, CARRIED_DECK, at(GRYPHON_DECKS, 1), at(GRYPHON_DECKS, 2)];
-const TIMED_DECKS = [MAIN_DECK, LIFT_DECK];
+const TIMED_DECKS = [MAIN_DECK, CENTRE_LIFT_DECK];
 const SLOPED_DECKS = [SLOPED_MAIN_DECK];
 
 

@@ -589,7 +589,7 @@ smashcraft:ts/src/game/sim/stageBounds.ts).
 | Naxxramas | Town and City | a 260 lift from 120 to 300 on the left, a 240 looping 150 to 270 on the right |
 | Hellfire Citadel | Pokémon Stadium | two 180 at 150 (0.80; 0.35) |
 | Blackrock | Hollow Bastion | one 360 at 150 (0.80; 0.35), static, over the swinging cannon |
-| Ahn'Qiraj | Final Destination with a timed lift | the 260 lift from 120 to 300 only |
+| Ahn'Qiraj | Final Destination with a timed lift | the 260 lift from 120 to 300 at the centre only |
 | Sky Deck (test) | Final Destination | none |
 
 Blackrock was a second Battlefield; it now holds one static forge platform,

@@ -13,7 +13,7 @@ for (const [stage, period] of [[CARRIED_TEST_STAGE, 400], [TIMED_TEST_STAGE, 420
     live.match.phase = Phase.match; live.match.stageChoice = stage;
     live.match.humanMask = 3; live.match.humanFighterMask = 3;
     const first = fighterAt(live.world, 0);
-    first.motion.surface = 1; first.motion.x = stage === CARRIED_TEST_STAGE ? -210.0 : -330.0;
+    first.motion.surface = 1; first.motion.x = stage === CARRIED_TEST_STAGE ? -210.0 : 0.0;
     first.motion.z = surfaceZAt(stage, 1, 0, first.motion.x);
     fighterAt(live.world, 1).motion.x = 0.0;
     copyReplayState(saved, live);
