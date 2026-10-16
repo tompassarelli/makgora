@@ -61,6 +61,7 @@ interface VictoryPose {
   readonly repeatVictory: boolean;
   readonly heldClip: FighterOriginalClip;
   readonly idleClip: FighterOriginalClip;
+  readonly burstFrame: number;
 }
 
 export class MatchPresentation {
