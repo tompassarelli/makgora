@@ -12,6 +12,8 @@ import { privateDesktopUnitEnv } from "../scripts/wisp/commands/privateDesktopUn
 import { nativeChatEntryReceipt } from "../scripts/wisp/boundary";
 import { currentChatEntry } from "../scripts/wisp/padChat";
 import { pairHolders } from "../scripts/wisp/commands/pairGuard";
+import { claimPairAt } from "../scripts/wisp/commands/pairClaim";
+import { claimedLanPair } from "../scripts/wisp/commands/lan";
 import { gameFilesLayer } from "../scripts/wisp/project";
 import { NativeClientInvalid, NativeToolMissing, repairPackager, resolveTools, unresolvedLibraries, validateClients, withRuntimeTools } from "../scripts/wisp/nativeTools";
 
@@ -63,13 +65,16 @@ test("the gate map defaults to the HEAD candidate, never a pinned build [k2 prop
 });
 
 test("the pool runs in a user unit that lan stop names, and a dropped client restarts its pair [k2 property]", () => {
-  const env = { PRIVATE_DESKTOP_RUN: "/run/user/1000/private-desktop.unit-test" };
-  const command = poolUnitCommand(["--pair", "3", "--pool-profile", "visual"], "/bin", process.execPath, env, () => ":8\n");
+  const env = { PRIVATE_DESKTOP_RUN: "/run/user/1000/private-desktop.unit-test", NORTH_FLEET_SESSION: "fleet-native-harness" };
+  const command = poolUnitCommand(["--pair", "3", "--pool-profile", "visual", "--owner", env.NORTH_FLEET_SESSION], "/bin", process.execPath, env, () => ":8\n");
   expect(command.slice(0, 3)).toEqual(["systemd-run", "--user", "--collect"]);
   expect(command).toContain(`--unit=${poolUnitName([3])}`);
   expect(command).toContain(`--setenv=PRIVATE_DESKTOP_RUN=${env.PRIVATE_DESKTOP_RUN}`);
+  expect(command).toContain(`--setenv=NORTH_FLEET_SESSION=${env.NORTH_FLEET_SESSION}`);
   expect(command).toContain("--setenv=DISPLAY=:8");
   expect(command.at(-1)).toBe("--foreground");
+  expect(command).toContain("--owner");
+  expect(command).toContain(env.NORTH_FLEET_SESSION);
   expect(pairNeedsRestart({ clients: [{ name: "a", pid: 1 }, { name: "b", pid: 2 }] })).toBe(false);
   expect(pairNeedsRestart({ clients: [{ name: "a", pid: 1 }, { name: "b" }] })).toBe(true);
   expect(pairNeedsRestart(undefined)).toBe(true);
@@ -97,10 +102,11 @@ test("installing a map into a fresh Documents folder creates Maps/00-Smashcraft/
 });
 
 test("a native accept runs as a user service once, and a dry run or the service itself runs in place [k2 property]", () => {
-  const env = { PRIVATE_DESKTOP_RUN: "/run/user/1000/private-desktop.unit-test" };
+  const env = { PRIVATE_DESKTOP_RUN: "/run/user/1000/private-desktop.unit-test", NORTH_FLEET_SESSION: "fleet-native-harness" };
   const command = acceptUnitCommand(["--only", "gate-moves", "--pair", "0"], "/bin", 7, process.execPath, env, () => ":9\n");
   expect(command.slice(0, 3)).toEqual(["systemd-run", "--user", "--wait"]);
   expect(command).toContain(`--setenv=${ACCEPT_IN_UNIT}=1`);
+  expect(command).toContain(`--setenv=NORTH_FLEET_SESSION=${env.NORTH_FLEET_SESSION}`);
   expect(command).toContain(`--setenv=PRIVATE_DESKTOP_RUN=${env.PRIVATE_DESKTOP_RUN}`);
   expect(command).toContain("--setenv=DISPLAY=:9");
   expect(command.slice(command.indexOf("accept"))).toEqual(["accept", "--only", "gate-moves", "--pair", "0"]);
@@ -145,4 +151,23 @@ test("the service launcher an outer accept starts does not count as another acce
   ];
   expect(pairHolders(0, rows, [200, 100])).toEqual([]);
   expect(pairHolders(0, rows, [200])).toEqual([100, 101]);
+});
+
+test("a live pair claim names its holder and lan fresh always requires pair zero [k1 scenario]", () => {
+  const path = join(here, "pair-claim.json");
+  claimPairAt(path, 0, "PAIR-LOCK", "fleet-pair-lock", 1234, () => true, () => undefined);
+  expect(() => claimPairAt(path, 0, "SMOKE", "fleet-smoke", 2345, () => true, () => undefined)).toThrow("pair 0 is held by PAIR-LOCK (fleet session fleet-pair-lock, pid 1234)");
+  expect(claimedLanPair(["fresh", "MAP.w3x"])).toBe(0);
+  expect(claimedLanPair(["fresh", "MAP.w3x", "--pair", "0"])).toBe(0);
+  expect(claimedLanPair(["fresh", "MAP.w3x", "--pair=1"])).toBe(1);
+  expect(claimedLanPair(["pool", "--pair", "0"])).toBeUndefined();
+});
+
+test("a dead pair owner can be replaced and the takeover is recorded [k1 scenario]", () => {
+  const path = join(here, "dead-pair-claim.json");
+  const events: string[] = [];
+  claimPairAt(path, 0, "OLD-LANE", "fleet-old", 1234, () => true, () => undefined);
+  const taken = claimPairAt(path, 0, "NEW-LANE", "fleet-new", 2345, () => false, line => events.push(line));
+  expect(taken).toEqual({ pair: 0, owner: "NEW-LANE", session: "fleet-new", pid: 2345 });
+  expect(events).toEqual(["pair 0: taking over dead claim from OLD-LANE (fleet session fleet-old, pid 1234)"]);
 });

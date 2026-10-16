@@ -22,3 +22,13 @@ clone-a only through its launch.sh.
   asks. Run two pairs by default and add one only while the capacity helper's
   `protectedCpuSomeAvg10` stays under 20 (three pairs read 22-31 under normal
   agent load).
+
+Pair 0's pool unit owns `~/.local/state/wisp/lan/pair-0/claim.json` for its
+fleet session. `NORTH_FLEET_SESSION` names that session; `--owner NAME` names
+the lane in the claim. `lan fresh`, `accept`, native pair pad scripts and
+capture batches refuse pair 0 unless this live claim belongs to their session.
+To label an already-running pool explicitly, run
+`bun wisp lan claim --pair 0 --owner NAME`. `bun wisp lan stop --pair 0` or
+`bun wisp lan release --pair 0` stops the pool and releases the claim. A live
+claim from another session refuses with its owner, session and PID; a claim
+whose pool process exited can be taken over and reports that takeover.

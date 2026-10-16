@@ -37,6 +37,7 @@ import { checkClients, onHealthyClients, readClientsFile, smashcraftWatch } from
 import { restartDroppedPair } from "./lanPoolUnit";
 import { withAcceptUnit } from "./acceptUnit";
 import { liveProcesses, ownPids, pairHolders } from "./pairGuard";
+import { assertPairClaim } from "./pairClaim";
 import { LAN_POOL_FILE, lanPairs, withTools } from "../padBatch";
 import { runProcess } from "../../hostProcess";
 import { platformLayer } from "wisp/scripts/platform/layer";
@@ -279,6 +280,10 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
   const { given, tools, candidate, profiles } = yield* prepareCandidate(args, only, dryRun);
   const suite = { ...SMASHCRAFT_ACCEPT, maps: profiles };
   const requested = yield* selectedPairs(args);
+  if (!dryRun && requested.includes("0")) yield* Effect.try({
+    try: () => assertPairClaim(0, process.env["NORTH_FLEET_SESSION"] ?? ""),
+    catch: cause => new UsageFailure({ problem: String(cause) }),
+  });
   if (!dryRun) {
     const rows = liveProcesses();
     const held = requested.flatMap(id => pairHolders(Number(id), rows, ownPids(process.env)).map(pid => `pair ${id} (pid ${pid})`));

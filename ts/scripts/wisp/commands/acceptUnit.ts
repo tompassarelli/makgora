@@ -15,6 +15,7 @@ const WISP_PROGRAM = join(import.meta.dir, "../../wisp.ts");
 export const acceptUnitCommand = (args: readonly string[], path: string, pid: number, runtime = process.execPath, env = process.env, readDisplay?: (run: string) => string): readonly string[] => [
   "systemd-run", "--user", "--wait", "--pipe", "--collect", `--unit=smashcraft-accept-${pid}`,
   `--working-directory=${projectRoot}`, `--setenv=PATH=${path}`, `--setenv=${ACCEPT_IN_UNIT}=1`, `--setenv=${ACCEPT_OUTER_PID}=${pid}`,
+  ...(env["NORTH_FLEET_SESSION"] === undefined ? [] : [`--setenv=NORTH_FLEET_SESSION=${env["NORTH_FLEET_SESSION"]}`]),
   ...privateDesktopUnitEnv(env, readDisplay),
   "--", runtime, WISP_PROGRAM, "accept", ...args,
 ];
