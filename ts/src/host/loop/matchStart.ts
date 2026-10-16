@@ -28,6 +28,7 @@ import { makePreview } from "./preview";
 import { beginRollbackEpoch } from "./rollback";
 import type { ShellState } from "./state";
 import { beginFighterRenderers, views } from "./ui";
+import { findWarcraftChat } from "../../platform/editboxJournal";
 import { LASTING, drawStage, pauseMatchPresentation, renderPersistentPresentation, setStatus } from "./view";
 
 export function startMatch(s: ShellState, scenario: Scenario = s.build.scenario, stageSettings?: QuickStageSettings): void {
@@ -50,6 +51,7 @@ export function startMatch(s: ShellState, scenario: Scenario = s.build.scenario,
   clearBotMemory(s.runtime.botMemory);
   for (const strategy of s.runtime.botStrategies) clearBotStrategy(strategy);
   makePreview(s);
+  s.chatFrame ??= findWarcraftChat();
   initializeMatchFighters(s.game, s.world);
 
 

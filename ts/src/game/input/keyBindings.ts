@@ -28,7 +28,7 @@ const code = (character: string) => character.charCodeAt(0);
 
 
 
-const RESERVED_KEYS: readonly number[] = [13, 27, 75, 89, 112, 116, 117, 118];
+const RESERVED_KEYS: readonly number[] = [8, 13, 27, 75, 89, 112, 116, 117, 118];
 
 export function slotIndex(action: Action, slot: KeySlot): number {
   return action * 2 + slot;

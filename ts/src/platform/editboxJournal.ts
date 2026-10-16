@@ -23,7 +23,8 @@ function isChatEntry(frame: framehandle): boolean {
 
 function chatEntry(gameUi: framehandle): framehandle | undefined {
   let found: framehandle | undefined;
-  for (let index = 0; index < BlzFrameGetChildrenCount(gameUi); index++) {
+  const count = BlzFrameGetChildrenCount(gameUi);
+  for (let index = 0; index < count; index++) {
     const candidate = BlzFrameGetChild(gameUi, index);
     if (!isChatEntry(candidate)) continue;
     if (found !== undefined) return undefined;
@@ -32,9 +33,12 @@ function chatEntry(gameUi: framehandle): framehandle | undefined {
   return found;
 }
 
-export function warcraftChatOpen(): boolean {
-  const chat = chatEntry(BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0));
-  return chat !== undefined && BlzFrameIsVisible(chat);
+export function findWarcraftChat(): framehandle | false {
+  return chatEntry(BlzGetOriginFrame(ORIGIN_FRAME_GAME_UI, 0)) ?? false;
+}
+
+export function warcraftChatOpen(chat: framehandle | false | undefined): boolean {
+  return chat !== undefined && chat !== false && BlzFrameIsVisible(chat);
 }
 
 
