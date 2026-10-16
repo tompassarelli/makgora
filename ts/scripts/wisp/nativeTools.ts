@@ -78,15 +78,6 @@ export const resolveTools = (names: readonly string[] = Object.keys(NATIVE_TOOLS
   return found as Readonly<Record<string, string>>;
 });
 
-/** The map packer and client launcher accept starts clients with; each names itself when absent. */
-export const requireLauncherTools = (launcher: string | undefined, packer = MAP_PACKER) => Effect.gen(function*() {
-  const missing = [
-    ...(existsSync(packer) ? [] : [`map packer (${packer}; build it with the project's tool build)`]),
-    ...(launcher !== undefined && !existsSync(launcher) ? [`client launcher (${launcher})`] : []),
-  ];
-  if (missing.length > 0) return yield* new NativeToolMissing({ tools: missing, problem: "missing before any client is started" });
-});
-
 const KNOWN_PREFIX = /^(clone-[a-d]|lan\d+[ab])$/;
 
 /** The Wine prefix folder a client's Documents path lives in. */
