@@ -3,7 +3,7 @@ import { parseDecimal } from "../netcode/journal/decimal";
 import type { MapBuild } from "./build";
 
 export function traceSetup(command: string): { readonly command: string; readonly callbacks: number | undefined } {
-  const marker = command.lastIndexOf(" |trace ");
+  const marker = command.indexOf(" |trace ");
   if (marker < 0) return { command, callbacks: undefined };
   const callbacks = parseDecimal(command.substring(marker + 8));
   if (callbacks === undefined || callbacks < 1) return { command, callbacks: undefined };
