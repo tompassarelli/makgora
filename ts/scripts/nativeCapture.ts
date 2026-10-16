@@ -26,6 +26,7 @@ import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Effect, Layer, Schema } from "effect";
 import { ChildProcess } from "effect/process";
 import { runProcess } from "./hostProcess";
+import { resolveTools, withRuntimeTools } from "./wisp/nativeTools";
 import { capture, loadClients } from "wisp/scripts/warcraft/desktop";
 import { type Frame, decodePpm, encodePpm } from "wisp/scripts/wisp/frameProbe";
 import { preloadLines } from "wisp/scripts/wisp/preloadRecord";
@@ -239,7 +240,13 @@ export const runCaptures = (args: readonly string[]) => Effect.scoped(Effect.gen
   if (sheets && (crop === undefined || effectCrop === undefined || !effectCrop.every(Number.isInteger) || manifest.fixtures.some(row => row.reel === undefined) || new Set(manifest.fixtures.map(row => row.reel?.fighter)).size !== 1)) return yield* new CaptureFailure({ problem: "--sheets needs one fighter's reel manifest, --crop X,Y,W,H excluding HUD/labels and --effect-crop X,Y,W,H excluding the body" });
   if (sheets && (manifest.fixtures.length > 63 || manifest.fixtures.some(row => row.frames.length !== 8) || new Set(manifest.fixtures.map(row => row.reel?.row)).size !== manifest.fixtures.length)) return yield* new CaptureFailure({ problem: "a sheet needs at most 63 unique rows with eight frames each" });
   const canvas = sheets ? sheetCanvas(manifest.fixtures.map(row => ({ row: row.reel?.row ?? "", frames: row.frames }))) : undefined;
-  const client = (yield* loadClients(clientsFile).pipe(Effect.mapError(failure => new CaptureFailure({ problem: `${failure.operation}: ${failure.cause}` })))).find(row => row.name === clientName);
+  const tools = yield* resolveTools().pipe(Effect.mapError(cause => new CaptureFailure({ problem: String(cause) })));
+  const runtimeClients = join(out, "runtime-clients.json");
+  yield* attempt("resolve capture client tools", () => {
+    mkdirSync(out, { recursive: true });
+    writeFileSync(runtimeClients, withRuntimeTools(readFileSync(clientsFile, "utf8"), tools));
+  });
+  const client = (yield* loadClients(runtimeClients).pipe(Effect.mapError(failure => new CaptureFailure({ problem: `${failure.operation}: ${failure.cause}` })))).find(row => row.name === clientName);
   if (client === undefined) return yield* new CaptureFailure({ problem: `${clientName} isn't in ${clientsFile}` });
   const binding = yield* readBinding(args);
   console.log(`build: installed ${binding.installed}, live ${binding.live}`);
