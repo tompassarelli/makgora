@@ -1,5 +1,13 @@
 # Native
 
+Native startup verifies private-window focus, observed pointer motion and a
+harmless F24 key in the map-written `smashcraft-input-preflight.txt`. The probe
+has a twelve-second deadline and names the failed display, focus, pointer or
+key-trace boundary. Pad batches probe after their initial hot reload and before
+starting helpers. The key receipt is local diagnostic output and changes no
+gameplay state. `scripts/wisp/nativeInput.ts` exports `verifyNativeInput` for
+native runners using the selected `Clients` and `GameFiles` services.
+
 `bun wisp native-capture reel --out PRIVATE_DIR [--fighter SLUG] [--hold-ticks N]`
 prepares Classic motion-reel pad scripts from the current roster and authored
 normals, four ground specials and ultimate. Each fighter directory is one

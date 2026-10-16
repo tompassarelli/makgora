@@ -28,6 +28,7 @@ import { clientArguments } from "./client";
 import { freshFrames, smashcraftPlayerView } from "../playerView";
 import { profileOptions } from "./map";
 import { onHealthyClients } from "../doctor";
+import { verifyNativeInput } from "../nativeInput";
 
 
 const gamePassword = () => Array.from(crypto.getRandomValues(new Uint8Array(6)), (byte) => (byte % 36).toString(36)).join("");
@@ -123,7 +124,7 @@ export const freshMatch = (map: string) => Effect.scoped(Effect.gen(function*() 
 }));
 
 
-export const readyAfter = (client: Client, time: number) => Effect.gen(function*() {
+export const readyAfter = (client: Client, time: number, verifyInput = true) => Effect.gen(function*() {
   let problem: MalformedGameFile | undefined;
   const path = join(dataDirectory(client.documents), MELEE_READY_FILE);
   const ready = readGameFile(path, MeleeReady).pipe(
@@ -133,9 +134,11 @@ export const readyAfter = (client: Client, time: number) => Effect.gen(function*
       return undefined;
     })),
   );
-  return yield* waitFor(client, "character selection", 60, ready).pipe(
+  const result = yield* waitFor(client, "character selection", 60, ready).pipe(
     Effect.catchTag("DesktopFailure", (timeout): Effect.Effect<never, DesktopFailure | MalformedGameFile> => (problem === undefined ? Effect.fail(timeout) : Effect.fail(problem))),
   );
+  if (verifyInput) yield* verifyNativeInput(client, result.build);
+  return result;
 });
 
 

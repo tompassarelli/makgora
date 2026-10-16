@@ -22,6 +22,7 @@ import { spawnLogged } from "wisp/scripts/wisp/hostProcess";
 import { preloadLines } from "wisp/scripts/wisp/preloadRecord";
 import { UsageFailure, describeCause } from "wisp/scripts/wisp/command";
 import { loadClients } from "wisp/scripts/warcraft/desktop";
+import { Clients } from "wisp/scripts/wisp/clients";
 import { HotReload } from "wisp/scripts/wisp/hotReload";
 import { MapBuild } from "wisp/scripts/wisp/mapBuild";
 import { readyAfter } from "./commands/fresh";
@@ -129,7 +130,7 @@ const newGame = (pair: PadPair, map: string, log: string) => Effect.gen(function
     const started = Date.now();
     yield* wisp(args, `${log}.${attempt++}`);
     const clients = yield* loadClients(pair.clients).pipe(Effect.mapError((cause) => new IntegrityFailure({ operation: "binding-ready clients", path: pair.name, cause })));
-    yield* Effect.forEach(clients, (client) => readyAfter(client, started), { concurrency: "unbounded" }).pipe(Effect.provide(gameFilesLayer), Effect.mapError((cause) => new IntegrityFailure({ operation: "binding-ready receipt", path: pair.name, cause })));
+    yield* Effect.forEach(clients, (client) => readyAfter(client, started, false), { concurrency: "unbounded" }).pipe(Effect.provide(Layer.merge(gameFilesLayer, Clients.layer(pair.clients))), Effect.mapError((cause) => new IntegrityFailure({ operation: "binding-ready receipt", path: pair.name, cause })));
   })).pipe(Effect.retry({ schedule: Schedule.recurs(1), while: (failure) => failure._tag === "BatchProcessFailure" }), Effect.mapError((cause) => new IntegrityFailure({ operation: "start a new game", path: map, cause })));
 });
 

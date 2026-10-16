@@ -1,4 +1,6 @@
 import { startNativeSoak } from "../../platform/nativeSoak";
+import { NATIVE_PREFLIGHT_KEY } from "../../game/input/nativePreflight";
+import { INPUT_PREFLIGHT_FILE, inputPreflightLine } from "../../game/core/gameFiles";
 import { cameraKey, returnPauseMenu, PAUSE_CAMERA_KEYS, pauseCameraKey } from "./pauseCamera";
 import { HIT_PRESENTATION_CASES } from "../../game/session/hitPresentationCases";
 import { createImpactEvents } from "../../game/presentation/impactEvents";
@@ -244,6 +246,10 @@ function triggerSlot(): ParticipantSlot | undefined {
 
 export function onKeyDown(s: ShellState): void {
   const slot = triggerSlot();
+  if (GetHandleId(BlzGetTriggerPlayerKey()) === NATIVE_PREFLIGHT_KEY.code) {
+    if (slot === localSlot()) writeLines(INPUT_PREFLIGHT_FILE, [inputPreflightLine(s.build.id)]);
+    return;
+  }
   if (slot !== undefined) participantKeyDown(s, slot);
 }
 

@@ -22,7 +22,7 @@ import { copyFileSync, existsSync, mkdirSync, openSync, readFileSync, readdirSyn
 import { join } from "node:path";
 import { parseArgs } from "node:util";
 import { BunServices } from "@effect/platform-bun";
-import { Effect, Fiber, Option, Schedule as EffectSchedule, Schema } from "effect";
+import { Effect, Fiber, Layer, Option, Schedule as EffectSchedule, Schema } from "effect";
 import { ChildProcess } from "effect/process";
 import { pollUntil } from "../../hostPoll";
 import { linePreloadFile, preloadLines } from "wisp/scripts/wisp/preloadRecord";
@@ -69,6 +69,9 @@ import { assertPairClaim } from "./pairClaim";
 import { pauseDraws } from "../pauseDraws";
 import { platformLayer } from "wisp/scripts/platform/layer";
 import type { Platform } from "wisp/scripts/platform/services";
+import { Clients } from "wisp/scripts/wisp/clients";
+import { GameFiles } from "wisp/scripts/wisp/gameFiles";
+import { verifyNativeInput } from "../nativeInput";
 
 type DevReceipt = Effect.Success<ReturnType<typeof DevCommandReceipt.decode>>;
 
@@ -225,6 +228,10 @@ export const nativeSession = (out: string, helper: string, build: string, appIds
   const loaded = yield* loadClients(clientsFile).pipe(Effect.mapError(fromDesktop));
   if (loaded.length !== 2) return yield* new IntegrityFailure({ operation: "load clients", path: clientsFile, cause: `${loaded.length} clients, need 2` });
   const clients = [at(loaded, 0), at(loaded, 1)] as const;
+  yield* Effect.forEach(clients, client => verifyNativeInput(client, build), { concurrency: "unbounded" }).pipe(
+    Effect.provide(Layer.merge(Clients.layer(clientsFile), GameFiles.layer())),
+    Effect.mapError(cause => new IntegrityFailure({ operation: "input preflight", path: clientsFile, cause })),
+  );
   yield* tryIntegrity("create session directory", out, () => mkdirSync(out, { recursive: true }));
   const data = [join(clients[0].documents, "CustomMapData"), join(clients[1].documents, "CustomMapData")] as const;
   const pads = [];
