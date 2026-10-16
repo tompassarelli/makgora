@@ -17,7 +17,6 @@
     "paths": {
       "war3-model": ["./node_modules/wisp/vendor/war3-model.d.mts"],
       "gl-matrix": ["./node_modules/gl-matrix/index.d.ts"],
-      "meshoptimizer": ["./node_modules/meshoptimizer/index.module.d.ts"],
       "effect": ["./node_modules/effect/dist/index.d.ts"],
       "@effect/platform-bun": ["./node_modules/@effect/platform-bun/dist/index.d.ts"]
     }
