@@ -16,6 +16,7 @@ import { Console, Effect, Option, Schema } from "effect";
 import { issueTests, redTitle } from "./mainRed";
 import { effectPlaybackInputs } from "./wisp/effectVisibility";
 import { CUE_MODEL_RECORD, RECORD_COMMAND, touchesCueInputs } from "./wisp/cueModels";
+import { changedFighters } from "./wisp/fighterArtChanges";
 
 const root = join(import.meta.dir, "../..");
 const ZERO = /^0+$/;
@@ -62,6 +63,7 @@ export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = 
   const cueModels = touchesCueInputs(paths, cues);
   const mapInputs = paths.some((path) => MAP_INPUTS.some((input) => path === input || input.endsWith("/") && path.startsWith(input)));
   const suites = paths.some((path) => SUITE_INPUTS.includes(path));
+  const fighterArt = changedFighters(paths);
   return [
     ...(paths.length > 0 ? [{ name: "clean room", directory: "ts", args: ["scripts/cleanRoom.ts"], fix: "follow wisp:docs/clean-room.md and the line above.", hosted: true }] : []),
     ...(ts ? [
@@ -76,6 +78,9 @@ export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = 
     ] : []),
     ...(cueModels ? [
       { name: "cue models recorded in both looks", directory: "ts", args: ["scripts/cueModels.ts"], fix: `list each Definitive redraw after reviewing it, or record new models with ${RECORD_COMMAND} from ts/ (smashcraft:docs/commands/workflow.md).`, hosted: true },
+    ] : []),
+    ...(fighterArt.length > 0 ? [
+      { name: `fighter art reproduces (${fighterArt.join(", ")})`, directory: "ts", args: ["scripts/wisp.ts", "inputs", "derive", "--check", ...fighterArt.flatMap((slug) => ["--fighter", slug])], fix: "derive the listed fighters from this landing's producers and commit their pins and generated files (smashcraft:docs/build-inputs.md, \"Change art\").", hosted: false, privateStore: true },
     ] : []),
     ...(animation ? [
       { name: "animation jitter [k3 measure #479]", directory: "ts", args: ["scripts/wisp.ts", "anim", "jitter"], fix: "regenerate the clip pool through thinKeys so close Hermite keys carry slopes (smashcraft:docs/commands/animation.md).", hosted: false, inputs: ["build-inputs", "tools/animations", ...SCRIPT_INPUTS] },

@@ -86,6 +86,10 @@ code:
    source files and lockfiles, the earlier step's key and, after the export, the
    stock build and the hero-models and imported-models pins, so a run redoes only
    the steps whose inputs changed. `--rebuild` ignores stored steps.
+   `--check` derives into the committed checkout and fails, restoring it, when
+   any pin or generated file differs; pre-push runs it for each fighter whose
+   pins, generated clips or whites, model facts or source family a landing changes
+   (smashcraft:ts/scripts/wisp/fighterArtChanges.ts).
 3. `bun wisp map build --profile playable --edition full --name NAME --out OUT.w3x` from the lane
    checks the change; commit build-inputs/FAMILY with the code that needs it and
    land it. Lanes that changed different families, or different fighters' shards

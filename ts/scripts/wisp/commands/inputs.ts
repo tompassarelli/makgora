@@ -8,6 +8,7 @@ import { type Command, UsageFailure, flagValues } from "wisp/scripts/wisp/comman
 import { MapBuildFailure } from "wisp/scripts/wisp/mapBuild";
 import { runAdmitted } from "../../heavyCapacity";
 import { buildFighterArt, planFighters } from "../fighterArt";
+import { projectRoot } from "../project";
 import { FAMILIES, FAMILY_NAMES, type Family, MANIFEST, checkoutInputs, isSharded, readPins, storeFamily, storeShards, writePin, writeShardPins } from "../buildInputs";
 
 const isFamily = (name: string): name is Family => name in FAMILIES;
@@ -29,9 +30,21 @@ const addShards = (family: Family, source: string) => Effect.gen(function*() {
   console.log(`${family}: ${Object.keys(shards).length} shards, changed ${changed.length === 0 ? "none" : changed.join(" ")}\nwrote them into ${MANIFEST}/${family}/; commit the change to build with it`);
 });
 
+const DERIVED_PATHS = ["build-inputs/original-clips-static-lights", "build-inputs/impact-assets", "ts/src/generated/clips", "ts/src/generated/assets", "ts/scripts/wisp/model-facts"];
+
+const git = (...args: string[]) => Effect.try({
+  try: () => {
+    const child = Bun.spawnSync(["git", ...args], { cwd: projectRoot, stdout: "pipe", stderr: "pipe" });
+    if (child.exitCode !== 0) throw new Error(child.stderr.toString().trim());
+    return child.stdout.toString().trim();
+  },
+  catch: (cause) => new MapBuildFailure({ operation: `git ${args[0]}`, path: projectRoot, cause: String(cause) }),
+});
+
 const derive = (args: readonly string[]) => Effect.gen(function*() {
-  const names = flagValues(args, "fighter"), rebuild = args.includes("--rebuild");
-  if (args.length !== names.length * 2 + (rebuild ? 1 : 0)) return yield* new UsageFailure({ problem: "inputs derive takes [--fighter NAME]... [--rebuild]" });
+  const names = flagValues(args, "fighter"), rebuild = args.includes("--rebuild"), check = args.includes("--check");
+  if (args.length !== names.length * 2 + (rebuild ? 1 : 0) + (check ? 1 : 0) || (rebuild && check)) return yield* new UsageFailure({ problem: "inputs derive takes [--fighter NAME]... [--rebuild | --check]" });
+  if (check && (yield* git("status", "--porcelain", "--", ...DERIVED_PATHS)) !== "") return yield* new UsageFailure({ problem: `inputs derive --check needs ${DERIVED_PATHS.join(", ")} committed` });
   const { manifest, assets, plans } = yield* planFighters(names, rebuild);
   const steps = plans.reduce((sum, plan) => sum + plan.keys.length - plan.cached, 0);
   const building = plans.filter((plan) => plan.cached < plan.keys.length).length;
@@ -39,6 +52,12 @@ const derive = (args: readonly string[]) => Effect.gen(function*() {
   console.log(`${plans.length} fighters: ${steps} steps to run, ${plans.reduce((sum, plan) => sum + plan.cached, 0)} reused`);
   if (building > 0) yield* Effect.promise(() => runAdmitted(capacity.class, "smashcraft:inputs-derive", 3600));
   yield* buildFighterArt(plans, manifest, assets, capacity.jobs);
+  if (!check) return;
+  const stale = yield* git("status", "--porcelain", "--", ...DERIVED_PATHS);
+  if (stale === "") return console.log(`${plans.length} fighters reproduce their committed pins and generated files from this checkout's producers`);
+  yield* git("checkout", "--", ...DERIVED_PATHS);
+  yield* git("clean", "-fq", "--", ...DERIVED_PATHS);
+  return yield* new MapBuildFailure({ operation: "check derived fighter art", path: MANIFEST, cause: `these committed outputs differ from what this checkout's producers derive; run bun wisp inputs derive --fighter NAME for each and commit the result:\n${stale}` });
 });
 
 export const inputs: Command = (args) => Effect.gen(function*() {
@@ -58,5 +77,5 @@ export const inputs: Command = (args) => Effect.gen(function*() {
     if (name === "base" || name === "container" || name === "assets" || name === "summon") return console.log(paths[name]);
     return yield* new UsageFailure({ problem: "inputs path takes base, container, assets or summon" });
   }
-  return yield* new UsageFailure({ problem: "inputs takes add FAMILY PATH | derive [--fighter NAME]... [--rebuild] | check | path [base|container|assets|summon]" });
+  return yield* new UsageFailure({ problem: "inputs takes add FAMILY PATH | derive [--fighter NAME]... [--rebuild | --check] | check | path [base|container|assets|summon]" });
 });

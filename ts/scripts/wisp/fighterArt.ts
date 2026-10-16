@@ -125,9 +125,10 @@ export const planFighters = (names: readonly string[], rebuild: boolean) => Effe
   const manifest = yield* readManifest();
   const assets = yield* Effect.try({ try: () => assetsView(manifest), catch: (cause) => failure("link assets", INPUTS_STORE, cause) });
   const roster = [...fighters].map(([character, { name, source }]) => ({ character, name, source, slug: fighterSlug(character) }));
-  const unknown = names.filter((name) => !roster.some((fighter) => fighter.name === name));
+  const named = (fighter: Fighter, name: string) => fighter.name === name || fighter.slug === name;
+  const unknown = names.filter((name) => !roster.some((fighter) => named(fighter, name)));
   if (unknown.length > 0) return yield* failure("choose fighters", names.join(","), `unknown fighters ${unknown.join(", ")}; choose from ${roster.map(({ name }) => name).join(", ")}`);
-  const chosen = names.length === 0 ? roster : roster.filter((fighter) => names.includes(fighter.name));
+  const chosen = names.length === 0 ? roster : roster.filter((fighter) => names.some((name) => named(fighter, name)));
   const code = STEPS.map((step) => codeDigest(step.tool));
   const stock = yield* Effect.try({ try: () => readFileSync(join(stockStorage(), ".build.info")), catch: (cause) => failure("read stock build info", stockStorage(), cause) });
   const external = sha256(stock, JSON.stringify(manifest["hero-models"]), JSON.stringify(manifest["imported-models"]));
