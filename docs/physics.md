@@ -1916,18 +1916,18 @@ moves faster than its walk speed, then by traction, as in Melee
 (https://www.ssbwiki.com/Traction). Dash, run, run brake, turn-run, attacks,
 shield, jump squat and knockback brake by traction alone
 (`restingTraction`, smashcraft:ts/src/game/sim/groundMovement.ts). With the
-3.4 air dodge (2.91 units a frame at landing) a wavedash, whole slide,
+air dodge at Melee's 3.1 (2.65 units a frame at landing) a wavedash, whole slide,
 measured in the headless sim:
 
-| Hero (traction, walk) | Wavedash before | Wavedash now | Run brake before | Run brake now |
+| Hero (traction, walk) | Wavedash before (3.4 dodge) | Wavedash now | Run brake before | Run brake now |
 | --- | ---: | ---: | ---: | ---: |
-| Jaina (0.03, 0.80) | 54.4 | 76.7 | 7.0 | 19.6 |
-| Malfurion (0.04, 1.31) | 54.4 | 63.9 | 19.4 | 39.6 |
-| Murloc (0.055, 1.60) | 54.4 | 51.4 | 31.9 | 46.9 |
-| Blademaster (0.06, 1.60) | 54.4 | 47.3 | 31.6 | 42.6 |
-| Chen (0.065, 1.16) | 54.4 | 38.6 | 15.2 | 18.9 |
-| Thrall (0.07, 1.09) | 54.4 | 34.9 | 13.2 | 15.2 |
-| Cairne (0.08, 1.08) | 54.4 | 31.0 | 13.1 | 13.1 |
+| Jaina (0.03, 0.80) | 54.4 | 65.3 | 7.0 | 19.6 |
+| Malfurion (0.04, 1.31) | 54.4 | 55.8 | 19.4 | 39.6 |
+| Murloc (0.055, 1.60) | 54.4 | 44.3 | 31.9 | 46.9 |
+| Blademaster (0.06, 1.60) | 54.4 | 41.0 | 31.6 | 42.6 |
+| Chen (0.065, 1.16) | 54.4 | 33.0 | 15.2 | 18.9 |
+| Thrall (0.07, 1.09) | 54.4 | 29.9 | 13.2 | 15.2 |
+| Cairne (0.08, 1.08) | 54.4 | 26.8 | 13.1 | 13.1 |
 
 Before, every fighter slid 54.4 units on a wavedash. The doubling alone would
 have cut that to 29-35; the lower traction spread keeps the median near the
@@ -2464,8 +2464,8 @@ measured Melee values.
 The owner's digital controls (smashcraft:docs/gameplay-design.md, "Controls"):
 a horizontal-only air dodge uses an angle
 of 18 degrees below horizontal for either fighter, mirrored for left/right.
-Its initial vector uses 3.4 Melee units (20.4 world units), deliberately about
-9.7% faster than Melee's 3.1 (#347), before the unchanged 0.9 air-dodge decay.
+Its initial vector uses Melee's 3.1 Melee units (18.6 world units); #347's
+3.4 made platform wavelands slide too far (Tom, 17 Oct). Decay is Melee's 0.9.
 The 10-frame landing lag and intangibility are unchanged; the slide brakes by the fighter's own traction, doubled above its walk speed ([Ground traction by fighter](#ground-traction-by-fighter)). This is the default,
 with no modifier or toggle. Explicit up/down/diagonal input retains its
 previous direction and normalized speed; neutral retains zero initial velocity.

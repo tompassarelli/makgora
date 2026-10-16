@@ -56,7 +56,7 @@ test("a diagonal air dodge displaces both axes with the same decayed vector [k3 
     fighter.motion.z = 300.0;
     beginAirDodge(fighter, 1, direction);
     const input = controls();
-    let displacement = 12.982479095458984;
+    let displacement = 11.836965560913086;
     let distance = 0.0;
     for (let frame = 1; frame <= 29; frame++) {
       advanceSolo(fighter, 0, input, 0.0);

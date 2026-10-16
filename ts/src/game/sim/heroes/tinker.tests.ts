@@ -84,7 +84,7 @@ test("Laser tracks a foe faster than any tech roll but an air dodge outruns it [
     }
   }
   assertEquals(BEAM.track >= f32(fastestRoll * f32(1.2)), true, `track ${BEAM.track} vs fastest tech roll ${fastestRoll}`);
-  assertEquals(BEAM.track < melee(f32(3.4)), true, "an air dodge opens faster than the aim turns");
+  assertEquals(BEAM.track < melee(f32(3.1)), true, "an air dodge opens faster than the aim turns");
   for (const facing of [1, -1]) {
     const rising = laserContact(160, 0.0, facing, 0.0, 9.0);
     assertEquals(rising >= 20 && rising <= 27, true, `a foe rising 9 units a frame is hit, on ${rising}`);

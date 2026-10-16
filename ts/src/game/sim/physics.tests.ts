@@ -789,14 +789,14 @@ test("a retail aerial fast fall requires down at most three frames before descen
   }
 });
 
-test("a stronger aerial dodge keeps retail decay for every digital direction [k3 measure docs/physics.md]", () => {
+test("Melee's aerial dodge keeps retail decay for every digital direction [k3 measure docs/physics.md]", () => {
   for (const horizontal of [-1, 0, 1]) {
     for (const vertical of [-1, 0, 1]) {
       const f = airborneFalco();
       const input = controls();
       beginAirDodge(f, horizontal, vertical);
-      const launchX = horizontal * (vertical === 0 ? f32(20.399999618530273) : f32(14.424978256225586));
-      const launchZ = vertical * (horizontal === 0 ? f32(20.399999618530273) : f32(14.424978256225586));
+      const launchX = horizontal * (vertical === 0 ? f32(18.599998474121094) : f32(13.15218448638916));
+      const launchZ = vertical * (horizontal === 0 ? f32(18.599998474121094) : f32(13.15218448638916));
       assertNear(f.motion.vx, launchX, f32(0.00001));
       assertNear(f.motion.vz, launchZ, f32(0.00001));
 
@@ -848,7 +848,7 @@ test("outside a jump-squat buffer every digital air dodge is collinear with its 
   }
 });
 
-test("a stronger aerial dodge resumes gravity and drift on tick thirty [k3 measure docs/physics.md]", () => {
+test("Melee's aerial dodge resumes gravity and drift on tick thirty [k3 measure docs/physics.md]", () => {
   for (const mode of [0, 1, 2]) {
     for (const steer of [-1, 0, 1]) {
       const f = airborneFalco();
@@ -860,10 +860,10 @@ test("a stronger aerial dodge resumes gravity and drift on tick thirty [k3 measu
       }
       const directionZ = mode === 1 ? 1 : -1;
 
-      const beforeX = mode === 0 ? 0.0 : 20.618309020996094;
-      const beforeZ = mode === 0 ? 50.0 : mode === 1 ? 70.61831665039062 : 29.381690979003906;
-      const beforeVX = mode === 0 ? 0.0 : 0.6794346570968628;
-      const beforeVZ = mode === 0 ? 0.0 : f32(directionZ * 0.6794346570968628);
+      const beforeX = mode === 0 ? 0.0 : 18.799043655395508;
+      const beforeZ = mode === 0 ? 50.0 : mode === 1 ? 68.79904174804688 : 31.20094871520996;
+      const beforeVX = mode === 0 ? 0.0 : 0.6194844245910645;
+      const beforeVZ = mode === 0 ? 0.0 : f32(directionZ * 0.6194844245910645);
       assertNear(f.motion.x, melee(beforeX), f32(0.00001));
       assertNear(f.motion.z, melee(beforeZ), f32(0.00001));
       assertNear(f.motion.vx, beforeVX, f32(0.00001));

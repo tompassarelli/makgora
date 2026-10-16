@@ -649,7 +649,7 @@ checks that every oracle departure names a row here.
 | Horizontal air dodge | The dodge goes where the stick points | – | A horizontal-only digital air dodge angles 18° below horizontal, mirrored, by default and with no toggle | Owner-selected control (30 Sep); the shallow angle keeps horizontal momentum into the landing | – |
 | Fast fall | A fresh stick down, diagonals included | – | Down with neutral horizontal input only; down-left and down-right keep drifting | Owner-selected control, 30 Sep | – |
 | Air dodge | Directional; ends in helpless fall (FallSpecial) until landing | Ultimate: one directional air dodge per airtime, no helpless fall, refreshed on landing, ledge grab and being hit ([SmashWiki](https://www.ssbwiki.com/Air_dodge)). Rivals of Aether 2: the dodge ends in an ordinary fall ([workshop](https://rivals2.com/workshop/?p=389)) | Once per airtime, ending actionable; refreshed on landing, ledge catch and being hit; spends no jump. Direction and the momentum carried through landing are unchanged | Owner decision, 6 Oct: the air dodge works as in Smash | #100 |
-| Air dodge speed | 3.1 Melee units per frame; 0.9 decay | – | 3.4 Melee units per frame, about 9.7% faster; 0.9 decay, 10-frame landing lag, intangibility and per-fighter traction retained | Owner playtest, 9 Oct: slightly stronger air dodges and wavedashes | #347 |
+| Air dodge speed | 3.1 Melee units per frame; 0.9 decay | – | 3.1 Melee units per frame, as Melee (#347's 3.4 slid platform wavelands off, 17 Oct); 0.9 decay, 10-frame landing lag, intangibility and per-fighter traction retained | Owner playtest, 9 Oct: slightly stronger air dodges and wavedashes | #347 |
 | Ground traction | 0.025-0.1 by fighter; doubled above walk speed while standing or landing ([case study](design/melee/movement.md#ground-movement)) | – | Melee's doubling rule; heroes 0.03-0.08 by body type, median 0.06, with fast runners no lower than 0.055 ([traction](physics.md#ground-traction-by-fighter)) | Owner direction, 15 Oct: ground friction closer to Melee, with more slide so moonwalks and wavedashes are stronger | – |
 | Shield release lag | 15 frames (GuardOff) | Ultimate: 11 frames | 11 frames; the 8-frame minimum hold and direct shield grab/jump bypass are unchanged | Owner decision, 6 Oct: Melee's lag makes dropping shield almost never worth it; dropping shield should be a real alternative to jumping into an aerial or rolling out of shield. Ultimate's value is the starting point; tune if it still goes unused | #100 |
 | Dodge timing | Per fighter | – | One shared profile: spot dodge 22 frames, intangible 2–15; rolls 31, intangible 4–19; air dodge 49, intangible 4–29, landing 10 | Owner's common frame-data profile | – |
@@ -872,7 +872,7 @@ Factory moved from side to down special unchanged. The numbers and why:
   fastest roster tech roll averages 9.09 units a frame while it moves (Warden,
   forward), and 11 is 1.2 times that, so the aim is waiting where a roll ends
   when its 34 intangible frames run out: a tech chase. An air dodge opens at
-  20.4 units a frame (Melee's 3.4) with frames 4–29 intangible, so it outruns
+  18.6 units a frame (Melee's 3.1) with frames 4–29 intangible, so it outruns
   the aim and passes through the beam: in the air the Laser forces the dodge
   rather than winning outright. Rolling behind him or leaving range escapes.
 - **Aim bound, 60 units ahead of the arm.** The aim never comes closer than

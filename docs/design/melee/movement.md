@@ -1,10 +1,11 @@
 # Movement
 
-Smashcraft deliberately uses a stronger air dodge than this Melee reference
-(#347): 3.4 Melee units per frame rather than 3.1, about 9.7% faster.
-Decay stays 0.9, landing lag stays 10 frames, and intangibility is unchanged.
-Airborne dodge travel increases with the launch speed; a wavedash carries
-that faster landing velocity into the fighter's traction, doubled above its
+Smashcraft's air dodge matches this Melee reference: 3.1 Melee units per
+frame. #347 raised it to 3.4; Tom found platform wavelands slid off too far
+(17 Oct), so it is back at 3.1. Decay stays 0.9, landing lag stays 10
+frames, and intangibility is unchanged.
+A wavedash carries
+its landing velocity into the fighter's traction, doubled above its
 walk speed as below. Smashcraft's heroes span traction 0.03-0.08
 (smashcraft:docs/physics.md, "Ground traction by fighter").
 

@@ -11,7 +11,7 @@ import { clearDownState } from "./transitions";
 import { melee } from "./tuning";
 
 
-const AIR_DODGE_SPEED = melee(f32(3.4));
+const AIR_DODGE_SPEED = melee(f32(3.1));
 export const AIR_DODGE_DECAY = 0.8999999761581421;
 
 const AIR_DODGE_DECAY_FRAMES = 29;
