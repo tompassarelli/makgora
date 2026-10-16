@@ -6,10 +6,24 @@ import { model as mdx } from "war3-model";
 
 
 
-// Fighters draw as special effects with no player colour, so team glow (replaceable texture 2) renders as white planes (#477).
 export function teamGlowGeosets(model: mdx.Model): Set<number> {
     return new Set(model.Geosets.flatMap((geoset, index) => (model.Materials[geoset.MaterialID] as mdx.Material).Layers
         .some(layer => typeof layer.TextureID === 'number' && model.Textures[layer.TextureID]?.ReplaceableId === 2) ? [index] : []));
+}
+
+const HERO_GLOW_FLOOR_AREA = 2000;
+
+// A fighter drawn as a special effect shows its hero glow's floor quads as white planes, while weapon team glow keeps its colour (#477, smashcraft#3).
+export function heroGlowGeosets(model: mdx.Model): Set<number> {
+    return new Set([...teamGlowGeosets(model)].filter(index => {
+        const { Vertices: vertices, Faces: faces } = model.Geosets[index];
+        for (let face = 0; face < faces.length; face += 3) {
+            const [a, b, c] = [faces[face], faces[face + 1], faces[face + 2]].map(vertex => vertex * 3);
+            const floorArea = Math.abs((vertices[b] - vertices[a]) * (vertices[c + 1] - vertices[a + 1]) - (vertices[c] - vertices[a]) * (vertices[b + 1] - vertices[a + 1])) / 2;
+            if (floorArea >= HERO_GLOW_FLOOR_AREA) return true;
+        }
+        return false;
+    }));
 }
 
 export function groundPlaneGeosets(model: mdx.Model): number[] {

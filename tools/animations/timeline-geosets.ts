@@ -1,6 +1,6 @@
 import { isDeepStrictEqual } from 'node:util';
 import { ModelRenderer, model as mdx } from '../../ts/scripts/clipNodes';
-import { teamGlowGeosets } from '../../ts/scripts/groundPlanes';
+import { heroGlowGeosets } from '../../ts/scripts/groundPlanes';
 
 function visibility(model: mdx.Model) {
     const renderer = new ModelRenderer(model);
@@ -19,7 +19,7 @@ function visibility(model: mdx.Model) {
 }
 
 export function checkTimelineGeosets(source: mdx.Model, body: mdx.Model, sequences: readonly mdx.Sequence[]) {
-    const dropped = teamGlowGeosets(source);
+    const dropped = heroGlowGeosets(source);
     const kept = source.Geosets.flatMap((_, index) => dropped.has(index) ? [] : [index]);
     if (body.Geosets.length !== kept.length) throw new Error(`Timeline body has ${body.Geosets.length} geosets, expected ${kept.length}`);
     for (const [place, index] of kept.entries()) {
