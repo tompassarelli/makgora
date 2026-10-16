@@ -10,6 +10,7 @@ import { loadClients, windowPid } from "wisp/scripts/warcraft/desktop";
 import { preloadLines } from "wisp/scripts/wisp/preloadRecord";
 import { padScriptPreset } from "./integrity/padScript";
 import { platformLayer } from "wisp/scripts/platform/layer";
+import { withQuietNativeCapacity } from "wisp/scripts/wisp/quietNativeCapacity";
 
 export const calibrateCursor = (options: { args: readonly string[]; env: Record<string, string | undefined>; path: string; log: string; corner: string }) => Effect.scoped(Effect.gen(function*() {
     const { path, corner } = options;
@@ -156,4 +157,7 @@ class AnalogFailure extends Schema.TaggedError<AnalogFailure>()("AnalogFailure",
   override get message() { return this.problem; }
 }
 const analogFailure = (cause: unknown) => new AnalogFailure({ problem: cause instanceof Error ? cause.message : String(cause) });
-if (import.meta.main) BunRuntime.runMain(Effect.scoped(analogNative).pipe(Effect.catchDefect(cause => Effect.fail(analogFailure(cause))), Effect.provide(Layer.merge(BunServices.layer, platformLayer()))));
+if (import.meta.main) {
+  const program = Bun.argv.includes("--plan") ? analogNative : withQuietNativeCapacity("smashcraft-analogNative", analogNative);
+  BunRuntime.runMain(Effect.scoped(program).pipe(Effect.catchDefect(cause => Effect.fail(analogFailure(cause))), Effect.provide(Layer.merge(BunServices.layer, platformLayer()))));
+}

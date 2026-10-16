@@ -17,6 +17,7 @@ import { gameFilesLayer } from "./wisp/project";
 import { Phase } from "../src/game/lobby/lobbyState";
 import { padScriptPreset } from "./integrity/padScript";
 import { platformLayer } from "wisp/scripts/platform/layer";
+import { withQuietNativeCapacity } from "wisp/scripts/wisp/quietNativeCapacity";
 
 export function validatePadCutClients(clients: readonly Pick<Client, "name" | "documents" | "x11" | "wayland">[], entries: readonly ClientEntry[], appIds: ReadonlyMap<string, string>, pair: string) {
   const count = pair === "tom" ? 1 : 2;
@@ -236,4 +237,7 @@ class PadCutFailure extends Schema.TaggedError<PadCutFailure>()("PadCutFailure",
 }
 const padCutFailure = (cause: unknown) => new PadCutFailure({ problem: cause instanceof Error ? cause.message : String(cause) });
 
-if (import.meta.main) BunRuntime.runMain(Effect.scoped(padCut).pipe(Effect.catchDefect(cause => Effect.fail(padCutFailure(cause))), Effect.provide(Layer.merge(BunServices.layer, platformLayer()))));
+if (import.meta.main) {
+  const program = Bun.argv.includes("--plan") ? padCut : withQuietNativeCapacity("smashcraft-nativePadCut233", padCut);
+  BunRuntime.runMain(Effect.scoped(program).pipe(Effect.catchDefect(cause => Effect.fail(padCutFailure(cause))), Effect.provide(Layer.merge(BunServices.layer, platformLayer()))));
+}

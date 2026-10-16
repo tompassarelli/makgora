@@ -21,6 +21,7 @@ import { corpus } from "../corpus";
 import { reconcileFourFighters } from "../../fourFighters";
 import { reconcilePlayable } from "../../playable";
 import { join } from "node:path";
+import { withQuietNativeCapacity } from "wisp/scripts/wisp/quietNativeCapacity";
 const Session = Schema.Struct({ four_fighters: Schema.optionalKey(Schema.Boolean), playable: Schema.optionalKey(Schema.Boolean) });
 const sessionResult = (directory: string) => Effect.gen(function*() {
   const path = join(directory, "capture.json");
@@ -64,11 +65,11 @@ export const parity: Command = ([mode, ...args]) => {
 export const integrity: Command = ([mode, ...args]) => {
   switch (mode) {
     case "capture":
-      if (args.includes("--screen")) return Effect.try({
+      if (args.includes("--screen")) return withQuietNativeCapacity("smashcraft-integrity-capture", Effect.try({
         try: () => screenCaptureArguments(args),
         catch: cause => new IntegrityFailure({ operation: "parse screen capture arguments", path: "wisp integrity capture --screen", cause }),
-      }).pipe(Effect.flatMap(captureScreen), step("native screen acquisition sample"));
-      return Effect.try({
+      }).pipe(Effect.flatMap(captureScreen), step("native screen acquisition sample")));
+      return withQuietNativeCapacity("smashcraft-integrity-capture", Effect.try({
         try: () => parseCaptureArguments(args),
         catch: (cause) => new IntegrityFailure({ operation: "parse capture arguments", path: "wisp integrity capture", cause: describeCause(cause) }),
       }).pipe(
@@ -76,7 +77,7 @@ export const integrity: Command = ([mode, ...args]) => {
 
         Effect.flatMap((options) => onHealthyClients(captureMatches(options), { retry: false, ...(options.clients === undefined ? {} : { clientsFile: options.clients }) })),
         step("native input-integrity capture"),
-      );
+      ));
     case "result": {
       const [directory, ...rest] = args;
       if (directory === undefined || rest.length > 0) return Effect.fail(new UsageFailure({ problem: "integrity result takes one capture directory" }));

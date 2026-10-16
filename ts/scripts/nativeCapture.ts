@@ -39,6 +39,7 @@ import { platformLayer } from "wisp/scripts/platform/layer";
 import { sheetCanvas, putSheetFrame, writeSheet } from "./nativeCaptureSheet";
 import { nativeCaptureChunks } from "./nativeCaptureChunks";
 import { frameVerdict } from "./nativeCaptureVerdict";
+import { withQuietNativeCapacity } from "wisp/scripts/wisp/quietNativeCapacity";
 
 export class CaptureFailure extends Schema.TaggedError<CaptureFailure>()("CaptureFailure", { problem: Schema.String }) {
   override get message(): string { return this.problem; }
@@ -422,4 +423,12 @@ export function nativeCapture(argv: readonly string[]) {
     Effect.provide(Layer.merge(BunServices.layer, platformLayer())),
   );
 }
-if (import.meta.main) BunRuntime.runMain(nativeCapture(Bun.argv.slice(2)));
+if (import.meta.main) {
+  const args = Bun.argv.slice(2);
+  const nativeRun = args[0] === "run" || args[0] === "batch";
+  const program = nativeCapture(args);
+  const lease = nativeRun && process.env["WISP_QUIET_NATIVE_LEASE"] !== "1"
+    ? withQuietNativeCapacity("smashcraft-nativeCapture", program)
+    : program;
+  BunRuntime.runMain(lease);
+}

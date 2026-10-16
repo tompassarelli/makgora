@@ -62,6 +62,7 @@ import { DevCommandReceipt, nativeChatEntryReceipt } from "../boundary";
 import { devCommandReceiptFile } from "../../../src/game/core/gameFiles";
 import { Phase } from "../../../src/game/lobby/lobbyState";
 import { admitCaptures, captureLoad, requireCaptureLease, timingCheck, timingScripts } from "../captureCapacity";
+import { withQuietNativeCapacity } from "wisp/scripts/wisp/quietNativeCapacity";
 import { quickMatchHero, quickMatchStage, quickPainHero, quickRecoveryHero, quickOffstageHero } from "../../../src/game/session/devSettings";
 import { pauseDraws } from "../pauseDraws";
 import { platformLayer } from "wisp/scripts/platform/layer";
@@ -557,7 +558,10 @@ export const pad: Command = (args) => Effect.gen(function*() {
   if (renderFrames !== undefined && (parsed.values.render === undefined || renderFrames.length === 0 || renderFrames.some((frame) => !Number.isInteger(frame) || frame < 0))) return yield* new UsageFailure({ problem: "--frames takes comma-separated whole frame numbers and needs --render DIR" });
   if (parsed.values.render !== undefined && (parsed.values.headless !== true || parsed.values.pairs !== undefined || (parsed.values.pair?.length ?? 0) > 0 || parsed.positionals.length !== 1 || parsed.positionals[0] === undefined || !existsSync(parsed.positionals[0]) || statSync(parsed.positionals[0]).isDirectory())) return yield* new UsageFailure({ problem: "pad --render DIR takes one existing script with --headless" });
 
-  if (parsed.values.pairs !== undefined || (parsed.values.pair?.length ?? 0) > 0 || parsed.positionals.length > 1 || (parsed.positionals[0] !== undefined && existsSync(parsed.positionals[0]) && statSync(parsed.positionals[0]).isDirectory())) return yield* scriptBatch(parsed.values, parsed.positionals);
+  if (parsed.values.pairs !== undefined || (parsed.values.pair?.length ?? 0) > 0 || parsed.positionals.length > 1 || (parsed.positionals[0] !== undefined && existsSync(parsed.positionals[0]) && statSync(parsed.positionals[0]).isDirectory())) {
+    const batch = scriptBatch(parsed.values, parsed.positionals);
+    return yield* (parsed.values.headless === true ? batch : withQuietNativeCapacity("smashcraft-pad", batch));
+  }
   const isHeadless = parsed.values.headless === true;
   const build = parsed.values.build ?? (isHeadless ? INTEGRITY_BUILD.id : undefined);
   const [scriptPath] = parsed.positionals;
@@ -580,7 +584,7 @@ export const pad: Command = (args) => Effect.gen(function*() {
     const retries = Number(parsed.values.retries ?? "3");
     const map = parsed.values.map;
     let attempt = 0;
-    return yield* Effect.gen(function*() {
+    const nativeRun = Effect.gen(function*() {
       if (attempt > 0 && map !== undefined) {
         console.log(`rerun ${attempt} of ${retries}`);
         yield* freshGame(map, clientsFile);
@@ -593,6 +597,7 @@ export const pad: Command = (args) => Effect.gen(function*() {
       Effect.retry({ schedule: EffectSchedule.recurs(map === undefined ? 0 : Math.max(0, Math.ceil(retries))), while: (failure) => failure instanceof InvalidNativeRun }),
       Effect.catchIf((failure): failure is InvalidNativeRun => failure instanceof InvalidNativeRun, (failure) => Effect.fail(new IntegrityFailure({ operation: INVALID_RUN, path: out, cause: `desynced, rerun (${failure.attempts} attempt${failure.attempts === 1 ? "" : "s"}${map === undefined ? "; --map MAP.w3x reruns it automatically" : ""})` }))),
     );
+    return yield* withQuietNativeCapacity("smashcraft-pad", nativeRun);
   }
   const ran = yield* Effect.exit(headless(options).pipe(step("headless pad script")));
   if (compare !== undefined) {
