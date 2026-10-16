@@ -45,7 +45,7 @@ test("shield acceptance holds down full mid and low frames with falling drawn ra
         expect(fighterAt(shell().world, 2).shield.energy).toBe(energy);
       });
     }
-    expect(samples[0]?.energy).toBeGreaterThanOrEqual(SHIELD_MAX - 1);
+    expect(samples[0]?.energy).toBe(SHIELD_MAX);
     expect(samples[1]?.energy).toBeLessThan(samples[0]?.energy ?? 0);
     expect(samples[2]?.energy).toBeLessThanOrEqual(SHIELD_MAX / 12);
     expect(samples[2]?.radius).toBeLessThan(samples[1]?.radius ?? 0);
