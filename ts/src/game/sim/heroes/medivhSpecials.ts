@@ -10,7 +10,7 @@ const omen = (ex: boolean): AuthoredSpecial => ({
     model: "Abilities\\Weapons\\PriestMissile\\PriestMissile.mdl" }],
 });
 const vanish = (ex: boolean, retreat: boolean): AuthoredSpecial => ({
-  endFrame: 38, landingLag: 20, intangible: frames(9, 10), defensiveUse: retreat,
+  endFrame: 38, landingLag: 20, intangible: frames(9, 10), defensiveUse: retreat, helplessOnMiss: true,
   motion: [{ ...frames(1, 9), velocityX: 0.0, velocityZ: 0.0 },
     { ...frames(10, 10), velocityX: retreat ? (ex ? -160.0 : -120.0) : (ex ? 250.0 : 180.0), velocityZ: 0.0, throughEdge: true },
     { ...frames(11, 38), velocityX: 0.0, velocityZ: 0.0 }],

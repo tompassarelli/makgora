@@ -330,6 +330,8 @@ export interface AuthoredSpecial {
 
   readonly helpless?: boolean | undefined;
 
+  readonly helplessOnMiss?: boolean | undefined;
+
   readonly landingLag?: number | undefined;
 
   readonly aimFrames?: number | undefined;

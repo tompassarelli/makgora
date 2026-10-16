@@ -639,7 +639,7 @@ export function heroMotionHolds(f: Readonly<Fighter>): boolean {
 
 
 function endHeroSpecial(f: Fighter, move: Readonly<AuthoredSpecial>): void {
-  if (move.helpless === true && !f.motion.grounded) {
+  if ((move.helpless === true || (move.helplessOnMiss === true && !f.special.hit)) && !f.motion.grounded) {
     f.special.fall = true;
     f.jump.remaining = 0;
   }
