@@ -64,9 +64,11 @@ const matchStalls = (clients: readonly Client[], manifests: readonly string[], s
 
 const stallLines = (stalls: readonly (readonly MapStall[])[]) => stalls.flatMap((list, slot) => list.map(({ from, through, millis }) => `stall P${slot + 1} ${Math.round(millis)} ms over frames ${from}-${through}`));
 
-const hazardsLabel =(host: Client, view: Viewport) => capture(host, view).pipe(
+export const readHazards = (words: readonly string[]) => /\bhaz[a-z]*:?\s+(on|off)\b/i.exec(words.join(" "))?.[1]?.toLowerCase();
+
+const hazardsLabel = (host: Client, view: Viewport) => capture(host, view).pipe(
   Effect.flatMap(frame => frameWords(host, frame, "light")),
-  Effect.map(words => /hazards:?\s*(on|off)\b/i.exec(words.map(word => word.text).join(" "))?.[1]?.toLowerCase()),
+  Effect.map(words => readHazards(words.map(word => word.text))),
   Effect.mapError(fail("moves gate hazards")),
 );
 

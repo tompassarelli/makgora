@@ -6,6 +6,7 @@ import { PLAYABLE_CHARACTERS } from "../src/game/sim/heroes/registry";
 import { SMASHCRAFT_ACCEPT } from "./wisp/acceptChecks";
 import { GREEN_GATE_CHECKS, greenGateFailures } from "./wisp/greenBuilds";
 import { FREEZE_FRAMES, disturbedSteps, judgeSmoke, smokeLines, smokePace, smokeReceipt } from "./wisp/smokeJudge";
+import { readHazards } from "./wisp/gateMoves";
 import { mapStalls } from "./wisp/mapStalls";
 import { rehearsal, rehearseSmoke, smokeApproaches } from "./wisp/smokeRehearsal";
 import { SMOKE_BINDINGS, bindingSweep, keyName, smokeSchedule, tapeFrames, xdotoolArgs } from "./wisp/smokeTape";
@@ -125,4 +126,11 @@ test("a map stall that swallows a key tap fails that key as invalid for the reru
   const judged = judgeSmoke(tapped.lines, sweepOnly.flat(), [stalls, stalls]);
   expect(disturbedSteps(judged).length).toBeGreaterThan(0);
   expect(disturbedSteps(judged).every((line) => line.includes(`${lost} stalled 190 ms`))).toBe(true);
+});
+
+test("the move gate reads the stage screen's hazards toggle from Tesseract's words, the clipped 'Hazar Off' it reads natively included, and never from the drops toggle beside it [k2 property]", () => {
+  const native = ["BACK", "TO", "FIGHTERS", "Hazar", "Off", "—", "Drops:", "On", "START", "MATCH"];
+  expect(readHazards(native)).toBe("off");
+  expect(readHazards(["Hazards:", "On", "Drops:", "Off"])).toBe("on");
+  expect(readHazards(["BACK", "TO", "FIGHTERS", "Drops:", "On"])).toBeUndefined();
 });
