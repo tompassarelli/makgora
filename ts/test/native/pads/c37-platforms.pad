@@ -1,0 +1,20 @@
+#! chat -dev quick stage 2
+58 a stick 0 -1
+60 a tap B 8
+75 a capture
+100 a capture
+105 a stick 0 0
+125 a stick 0 -1
+127 a stick 0 0
+150 a capture
+200 a stick 0 -1
+202 a tap B 8
+240 a capture
+245 a stick 0 0
+265 a stick 0 -1
+267 a stick 0 0
+300 a capture
+600 a press VIEW
+670 a release VIEW
+#! expect a 65 applied jump 1 double 0 z 24.600
+#! expect a 207 applied jump 2 double 0 z 24.600
