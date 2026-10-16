@@ -200,12 +200,12 @@ for (const [ordinal, action] of authoredActions.entries()) {
   const name = !action.pain ? `Anubarak ${action.pose}` : `Anubarak Damage ${Math.floor((ordinal - actions.length) / 3)} ${(ordinal - actions.length) % 3}`;
   model.Sequences.push({ ...stand, Name: name, Interval: new Uint32Array([start, end]), NonLooping: true, MoveSpeed: 0, Rarity: 0,
     MinimumExtent: new Float32Array([-300, -300, -200]), MaximumExtent: new Float32Array([300, 300, 350]), BoundsRadius: 400 });
-  const groundGesture = groundGestures.has(action.pose), lunge = lunges[action.pose];
+  const groundGesture = groundGestures.has(action.pose), lunge = lunges[action.pose], settled = action.pose.startsWith("downSpecial") ? action.frames - 2 : action.frames;
   const phaseFrames = [...new Set([...(action.pose === "sideSpecial" || action.pose === "upAir" || groundGesture || lunge ? Array.from({length: action.frames + 1}, (_, i) => i) : []), 0, Math.max(1, action.contact - 3), action.contact, Math.min(action.frames - 1, action.contact + 4), action.frames,
     ...(action.roll ? Array.from({ length: Math.ceil(action.frames / 3) }, (_, i) => i * 3) : []),
     ...(action.pose === "victimPummel" ? [action.contact - 1] : [])])].sort((a, b) => a - b);
-  const keyed = (frame: number) => action.hold || action.pain ? 1 : action.pose === "victimPummel" && frame < action.contact ? 0 : action.pose === "knockdown" && frame >= action.contact ? 1 : frame === 0 || frame === action.frames ? 0 : frame < action.contact ? -0.3 : 1;
-  const sparse = [0, Math.max(1, action.contact - 3), action.contact, Math.min(action.frames - 1, action.contact + 4), action.frames];
+  const keyed = (frame: number) => action.hold || action.pain ? 1 : action.pose === "victimPummel" && frame < action.contact ? 0 : action.pose === "knockdown" && frame >= action.contact ? 1 : frame === 0 || frame >= settled ? 0 : frame < action.contact ? -0.3 : 1;
+  const sparse = [0, Math.max(1, action.contact - 3), action.contact, Math.min(action.frames - 1, action.contact + 4), settled, ...(settled < action.frames ? [action.frames] : [])];
   const amount = (frame: number) => {
     if (!lunge || groundGesture || sparse.includes(frame)) return keyed(frame);
     const after = sparse.findIndex(f => f > frame), from = sparse[after - 1]!, to = sparse[after]!;
@@ -355,7 +355,7 @@ for (const [ordinal, action] of authoredActions.entries()) {
   }
   if (lunge) for (const frame of phaseFrames) {
     const key = root.Translation.Keys.find(k => k.Frame === start + Math.round(frame * 1000 / 60))!;
-    key.Vector[lunge.x === undefined ? 2 : 0] += lungeAt(lunge, frame, action.frames);
+    key.Vector[lunge.x === undefined ? 2 : 0] += lungeAt(lunge, frame, settled);
     if (key.InTan) { key.InTan = root.Translation.LineType === mdx.LineType.Bezier ? key.Vector.slice() : new Float32Array(3); key.OutTan = key.InTan.slice(); }
   }
   const victim = /^victim(Pummel|Throw)/.test(action.pose);
