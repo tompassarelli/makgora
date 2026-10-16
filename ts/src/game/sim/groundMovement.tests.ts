@@ -17,7 +17,7 @@ import { createFighter, type Fighter } from "./fighter";
 import { fighterAt } from "./roster";
 import { createReferenceFighter } from "./referenceRig";
 import { DASH_FLICK_SAMPLES } from "./stickZones";
-import { advanceSolo, controls, withPhysics } from "./testWorld";
+import { advanceSolo, controls, soloWorld, testBeginAttacks, withPhysics } from "./testWorld";
 import {
   type GroundMovementRules,
   INITIAL_DASH_FRAMES,
@@ -313,4 +313,19 @@ test("an analog moonwalk keeps the dash and its facing while velocity reverses, 
   const slick = moonwalkSlide(traction);
   assertTrue(grippy.reversed && slick.reversed);
   assertTrue(slick.backward > grippy.backward && grippy.backward > 0);
+});
+
+test("a forward smash on initial dash frames 1-3 stops the dash slide dead and a later smash request gives the dash attack [k1 scenario]", () => {
+  for (const frame of [1, 2, 3, 4]) {
+    const fighter = groundActionFighter(0.0, 1, NTSC_FOX_GROUND_MOVEMENT_RULES, GroundAction.dash, frame, 1, f32(1.5));
+    const world = soloWorld(fighter);
+    testBeginAttacks(world, AttackStyle.forwardSmash, undefined);
+    if (frame <= 3) {
+      assertEquals(fighter.attack.style, AttackStyle.forwardSmash, `frame ${frame} style`);
+      assertEquals(fighter.motion.vx, 0.0, `frame ${frame} speed`);
+      const x = fighter.motion.x;
+      advanceSolo(fighter, 0, controls(), 0.0);
+      assertEquals(fighter.motion.x, x, `frame ${frame} slide`);
+    } else assertTrue(fighter.attack.style !== AttackStyle.forwardSmash);
+  }
 });

@@ -176,8 +176,10 @@ export function beginFighterAttack(world: Roster, slot: number, style: AttackSty
   const aerial = isAerialAttack(action);
   if (((groundAttack && grounded) || action === AttackStyle.shot || (aerial && !grounded)) && canStartAttackStyle(fighter, action)) {
     const pivot = action === AttackStyle.grab && fighter.ground.action === GroundAction.turnRun;
+    const dashSmash = action === AttackStyle.forwardSmash && grounded && fighter.ground.action === GroundAction.dash;
     beginAttack(fighter, pivot ? DASH_GRAB_REQUEST : action, mayCharge);
     fighter.attack.pivotGrab = pivot;
+    if (dashSmash) fighter.motion.vx = 0.0;
   }
 }
 
