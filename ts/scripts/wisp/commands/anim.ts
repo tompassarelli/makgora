@@ -22,7 +22,7 @@ import { runProcess } from "../../hostProcess";
 import { CROUCH_THRESHOLDS, DOUBLE_JUMP_THRESHOLDS, LEDGE_THRESHOLDS, type MoveScore, THRESHOLDS, scoreCrouch, scoreDoubleJump, scoreLedgeHang, scoreMove } from "../animScore";
 import { type CrouchClipKind, type Look, type SampledMove, gameplayPixelsPerUnit, loadBody, sampleCrouch, sampleFighter, sampleJumps, sampleLedgeHang } from "../animScoreSample";
 import { LEDGE_HANG_DEPTH, LEDGE_HANG_OUTSET } from "../../../src/game/sim/ledge";
-import { isMovementMove, MOVEMENT_CAPTIONS, movementSeconds } from "../animMovementRows";
+import { answerKey, type ColdStrip, coldReadBatch, coldReadBatches, isMovementMove, type MovementMove, movementSeconds, stripId } from "../animMovementRows";
 import { assetsView, readManifest } from "../buildInputs";
 import { headlessRender } from "../headlessRender";
 import { projectRoot } from "../project";
@@ -240,7 +240,7 @@ const score: Command = (args) => Effect.gen(function*() {
 
 const JUDGE_BATCH = 6;
 
-interface Strip { readonly fighter: string; readonly move: string; readonly seconds: readonly number[]; readonly heights: readonly number[]; readonly caption: string }
+interface Strip { readonly fighter: string; readonly move: string; readonly seconds: readonly number[]; readonly heights: readonly number[]; readonly caption: string; readonly movement: boolean }
 
 
 const keyFrames = (row: Row) => [...new Set([0, row.score.keys.windup, row.score.keys.contact, row.frames.lastActive, row.score.keys.recovery, row.frames.end])].sort((a, b) => a - b);
@@ -325,7 +325,7 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
     const reference = referenceFor(references, row.fighter, row.move);
     const indices = keyFrames(row);
     strips.push({ fighter: row.fighter, move: row.move, seconds: indices.map((index) => sampled.seconds[index] ?? 0), heights: indices.map((index) => sampled.heights[index] ?? 0),
-      caption: `Top row, ours: frames ${indices.join(", ")} (start, windup, contact on the first active frame ${row.frames.firstActive}, last active, recovery, end of ${row.frames.end}). Bottom row: ${reference === undefined ? "no reference animation on file; judge against the brief's standard" : `Melee ${reference.character.replaceAll("_", " ")}'s ${REFERENCE_ACTIONS[row.move]?.wiki} (hitbox view)`}.` });
+      caption: `Top row, ours: frames ${indices.join(", ")} (start, windup, contact on the first active frame ${row.frames.firstActive}, last active, recovery, end of ${row.frames.end}). Bottom row: ${reference === undefined ? "no reference animation on file; judge against the brief's standard" : `Melee ${reference.character.replaceAll("_", " ")}'s ${REFERENCE_ACTIONS[row.move]?.wiki} (hitbox view)`}.`, movement: false });
   }
   for (const entry of wanted ?? []) {
     const [slug = "", move = ""] = entry.split(":");
@@ -333,7 +333,7 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
     const character = fighters.find((candidate) => fighterSlug(candidate) === slug);
     if (character === undefined) continue;
     const seconds = yield* attempt(`sample ${slug} ${move}`, async () => movementSeconds(move, await loadBody(assets, character, look), character));
-    strips.push({ fighter: slug, move, seconds, heights: seconds.map(() => 0), caption: `Top row, ours: ${MOVEMENT_CAPTIONS[move]}. No reference animation on file; judge against the brief's standard.` });
+    strips.push({ fighter: slug, move, seconds, heights: seconds.map(() => 0), caption: "", movement: true });
   }
   if (strips.length === 0) return yield* new UsageFailure({ problem: "no scored move matches" });
 
@@ -367,10 +367,18 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
   yield* renderScenes(project, scenes, join(output, "frames"), look);
   const batches: string[][] = [];
   const size = JUDGE_BATCH;
+  const cold: ColdStrip[] = [];
   for (const row of strips) {
     const key = `${row.fighter}/${row.move}`;
     const ids = frameIds.get(key) ?? [];
     const crops = ids.map((id) => join(output, "frames", `p${base.client}-frame-${id}.png`));
+    if (row.movement) {
+      const id = stripId(look, row.fighter, row.move), anonymous = join(output, "moves", `strip-${id}.png`);
+      mkdirSync(join(output, "moves"), { recursive: true });
+      yield* runProcess(ChildProcess.make("magick", [...crops.flatMap((crop) => ["(", crop, "-gravity", "center", "-crop", "480x360+0-60", "+repage", ")"]), "+append", anonymous]));
+      cold.push({ id, fighter: row.fighter, move: row.move as MovementMove, path: anonymous });
+      continue;
+    }
     const ours = join(output, "moves", `${row.fighter}-${row.move}-ours.png`);
     mkdirSync(join(output, "moves"), { recursive: true });
 
@@ -389,6 +397,13 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
     if (batch === undefined || batch.length >= size) batches.push([key]); else batch.push(key);
   }
   const brief = yield* attempt("read the judge brief", () => Bun.file(join(projectRoot, "docs/animation-judge-brief.md")).text());
+  const coldBrief = yield* attempt("read the cold-read brief", () => Bun.file(join(projectRoot, "docs/animation-cold-read-brief.md")).text());
+  const keyFile = `${output}-key.tsv`;
+  if (cold.length > 0) yield* attempt(`write ${keyFile}`, () => Bun.write(keyFile, answerKey(look, cold)));
+  for (const [index, batch] of coldReadBatches(cold).entries()) {
+    const file = join(output, `cold-${index + 1}.md`);
+    yield* attempt(`write ${file}`, () => Bun.write(file, coldReadBatch(coldBrief, look, batch, join(output, `cold-answers-${index + 1}.jsonl`))));
+  }
   for (const [index, batch] of batches.entries()) {
     const items = batch.map((key) => {
       const strip = strips.find((candidate) => `${candidate.fighter}/${candidate.move}` === key);
@@ -398,7 +413,7 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
     const file = join(output, `batch-${index + 1}.md`);
     yield* attempt(`write ${file}`, () => Bun.write(file, `${brief}\n\n## Your moves (look: ${look})\n\n${items.join("\n")}\n\nWrite your scores to ${join(output, `scores-${index + 1}.jsonl`)}, one JSON line per move.\n`));
   }
-  yield* Console.log(`${strips.length} moves in ${batches.length} batches: ${output}/batch-N.md; record with: bun wisp anim judge record ${output}/scores-*.jsonl`);
+  yield* Console.log(`${strips.length} moves (${cold.length} cold reads, key ${keyFile}), ${batches.length} scored batches: ${output}/batch-N.md; record with: bun wisp anim judge record ${output}/scores-*.jsonl`);
 }).pipe(Effect.scoped, Effect.provide(BunServices.layer));
 
 

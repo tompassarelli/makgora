@@ -20,8 +20,26 @@ export function movementSeconds(move: MovementMove, model: DrawnModel, character
   return doubleJumpSeconds(sampleJumps(model, character));
 }
 
-export const MOVEMENT_CAPTIONS: Readonly<Record<MovementMove, string>> = {
-  "crouch": "frames: standing, then the held crouch",
-  "ledge-hang": "frames: the hang across its first second, left to right",
-  "double-jump": "frames: the second jump's rise, left to right",
+
+export const MOVEMENT_EXPECTED: Readonly<Record<MovementMove, string>> = {
+  "crouch": "a crouch: a visibly lower silhouette than standing, held",
+  "ledge-hang": "a ledge hang: hands or weapon at the ledge, body below it, facing the stage",
+  "double-jump": "a double jump in a named style, such as a twist or flip, distinct from the first jump",
 };
+
+const COLD_READ_BATCH = 9;
+
+export const stripId = (look: string, fighter: string, move: string) => new Bun.CryptoHasher("sha256").update(`${look}/${fighter}/${move}`).digest("hex").slice(0, 8);
+
+export interface ColdStrip { readonly id: string; readonly fighter: string; readonly move: MovementMove; readonly path: string }
+
+export const coldReadBatches = (strips: readonly ColdStrip[]) => {
+  const shuffled = [...strips].sort((a, b) => a.id.localeCompare(b.id));
+  return Array.from({ length: Math.ceil(shuffled.length / COLD_READ_BATCH) }, (_, index) => shuffled.slice(index * COLD_READ_BATCH, (index + 1) * COLD_READ_BATCH));
+};
+
+export const coldReadBatch = (brief: string, look: string, batch: readonly ColdStrip[], answers: string) =>
+  `${brief}\n\n## Your strips (look: ${look})\n\n${batch.map((strip) => `- \`${strip.id}\`: ${strip.path}`).join("\n")}\n\nWrite your answers to ${answers}, one JSON line per strip.\n`;
+
+export const answerKey = (look: string, strips: readonly ColdStrip[]) =>
+  `${["look", "strip", "fighter", "move", "expected"].join("\t")}\n${strips.map((strip) => [look, strip.id, strip.fighter, strip.move, MOVEMENT_EXPECTED[strip.move]].join("\t")).join("\n")}\n`;
