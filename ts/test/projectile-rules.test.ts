@@ -35,6 +35,7 @@ const DEPARTURES: Readonly<Record<string, string>> = {
   "Beastmaster down special rule 2": SUMMON_SHOT,
   "Jaina Proudmoore down special rule 2": SUMMON_SHOT,
   "Goblin Tinker down special rule 2": SUMMON_SHOT,
+  "Shadow Hunter side special rule 2": SUMMON_SHOT,
 };
 
 const FIGHTERS: readonly { readonly character: Character; readonly name: string }[] = [

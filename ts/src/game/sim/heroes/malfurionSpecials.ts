@@ -23,7 +23,7 @@ const stag = (air: boolean): AuthoredSpecial => ({
 });
 const ASCENT: AuthoredSpecial = {
   endFrame: 40, landingLag: 24, oncePerAirtime: true, helpless: true,
-  motion: [{ ...frames(10, 23), velocityX: 5.5, velocityZ: 24.0, driftSpeed: 2.0 }],
+  motion: [{ ...frames(10, 23), velocityX: 5.5, velocityZ: 23.25, driftSpeed: 2.0 }],
   regions: [heroRegion(10, 23, { x1: -20.0, z1: 50.0, x2: 20.0, z2: 125.0, radius: 18.0 }, malfurionHit(7.0, 80, 75.0, 24.0))],
 };
 const BRANCH: SpecialProjectile = {
