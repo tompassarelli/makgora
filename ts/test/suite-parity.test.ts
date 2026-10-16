@@ -45,6 +45,7 @@ const HOSTED = ["clean room", "kind tags and type-check ts", "Autoland suite cov
 const EVERY_PATH = ["ts/scripts/prePush.ts", "build-inputs/original-clips-static-lights/kobold", CUE_MODEL_RECORD];
 
 const stubbed = (paths: readonly string[], ran: string[], exitCode = (_: Check) => 0): Local => ({
+  cues: () => new Set(),
   changed: () => Effect.succeed(paths),
   head: Effect.succeed("c0ffee"),
   dirty: () => Effect.succeed(""),

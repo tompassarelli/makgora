@@ -154,6 +154,7 @@ const changedPaths = (local: string, remote: string) => Effect.gen(function*() {
 export interface CheckRun { readonly exitCode: number; readonly stdout: string; readonly stderr: string }
 
 export interface Local {
+  readonly cues: () => ReadonlySet<string>;
   readonly changed: (local: string, remote: string) => Effect.Effect<readonly string[], PrePushRefusal>;
   readonly head: Effect.Effect<string, PrePushRefusal>;
   readonly dirty: (directories: readonly string[]) => Effect.Effect<string, PrePushRefusal>;
@@ -187,6 +188,7 @@ const runCheck = (check: Check) => Effect.gen(function*() {
 });
 
 export const laptop: Local = {
+  cues: cueInputs,
   changed: changedPaths,
   head: git("rev-parse", "HEAD"),
   dirty: (directories) => git("status", "--porcelain", "--", ...directories),
@@ -245,7 +247,7 @@ export const prePush = (input: string, landing: { readonly gate: typeof farmGate
     return commit === undefined || remote === undefined || ZERO.test(commit) || remoteRef?.startsWith("refs/tags/") ? [] : [{ commit, remoteRef, remote }];
   });
   const paths = [...new Set((yield* Effect.forEach(pushed, ({ commit, remote }) => local.changed(commit, remote))).flat())];
-  const selected = checksFor(paths, cueInputs()).filter((check) => !(check.privateStore && process.env.GITHUB_ACTIONS === "true"));
+  const selected = checksFor(paths, local.cues()).filter((check) => !(check.privateStore && process.env.GITHUB_ACTIONS === "true"));
   const toMain = pushed.some(({ remoteRef }) => remoteRef === "refs/heads/main");
   const handsOff = pushed.some(({ remoteRef }) => remoteRef === "refs/heads/main" || remoteRef?.startsWith(HAND_OFF) === true);
   const lands = handsOff ? autolandLands(yield* landing.queue, paths) : false;
