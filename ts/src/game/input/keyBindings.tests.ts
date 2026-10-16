@@ -3,13 +3,13 @@ import { ACTION_ORDER, Action } from "./actions";
 import { actionFor, decodeBindings, encodeBindings, keyFor, presetBindings, slotIndex, type BindingPreset } from "./keyBindings";
 
 const OLD_SAVES: readonly (readonly [string, number])[] = [["K1", 28], ["K2", 30], ["K3", 30], ["K4", 34], ["K5", 34], ["K6", 36], ["K7", 36]];
-const UPGRADES: readonly (readonly [Action, 0 | 1, number])[] = [[Action.shortHop, 0, "I".charCodeAt(0)]];
+const UPGRADES: readonly (readonly [Action, 0 | 1, number])[] = [[Action.shortHop, 0, "I".charCodeAt(0)], [Action.rightTrigger, 1, "G".charCodeAt(0)], [Action.exSpecial, 1, "X".charCodeAt(0)]];
 
 function oldSave(version: string, slots: number, keys: readonly number[]): string {
   return version + keys.slice(0, slots).map((key) => String(key).padStart(3, "0")).join("");
 }
 
-test("upgrading any older saved binding set gives short hop I when free, and never takes a key the player bound elsewhere [k2 property]", () => {
+test("upgrading any older saved binding set gives short hop I, the right trigger G and EX special X when free, and never takes a key the player bound elsewhere [k2 property]", () => {
   for (const preset of ["standard", "custom"] as BindingPreset[]) {
     for (const [action, upgradeSlot, key] of UPGRADES) {
       assertEquals(actionFor(presetBindings(preset), key), action, `${preset} defaults`);
@@ -25,6 +25,7 @@ test("upgrading any older saved binding set gives short hop I when free, and nev
             const index = slotIndex(owner, slot);
             if (index >= slots || index === slotIndex(action, upgradeSlot) || (owner === action && upgradeSlot === 0)) continue;
             if (action === Action.shortHop && owner === Action.jump && slot === 0) continue;
+            if (action === Action.exSpecial && owner === Action.exSpecial) continue;
             const keys = defaults.slice();
             keys[index] = key;
             const decoded = decodeBindings(oldSave(version, slots, keys));
@@ -50,7 +51,7 @@ test("saved default upgrades preserve every customized slot and leave current sa
     legacy[slotIndex(Action.lightShield, 0)] = (preset === "custom" ? "0" : "9").charCodeAt(0);
     legacy[slotIndex(Action.lightShield, 1)] = "T".charCodeAt(0);
     legacy[slotIndex(Action.exSpecial, 0)] = "X".charCodeAt(0);
-    legacy[slotIndex(Action.rightTrigger, 1)] = "G".charCodeAt(0);
+    legacy[slotIndex(Action.exSpecial, 1)] = 0;
     for (const [version, slots] of OLD_SAVES) {
       const decoded = decodeBindings(oldSave(version, slots, legacy));
       assertEquals(decoded === undefined ? "invalid" : encodeBindings(decoded), encodeBindings(current), `${preset} ${version} defaults`);
@@ -70,7 +71,7 @@ test("saved default upgrades preserve every customized slot and leave current sa
     previous[slotIndex(Action.smashUp, 0)] = "0".charCodeAt(0);
     previous[slotIndex(Action.smashDown, 0)] = "J".charCodeAt(0);
     previous[slotIndex(Action.exSpecial, 0)] = "X".charCodeAt(0);
-    previous[slotIndex(Action.rightTrigger, 1)] = "G".charCodeAt(0);
+    previous[slotIndex(Action.exSpecial, 1)] = 0;
     const upgradedPrevious = decodeBindings(oldSave("K8", previous.length, previous));
     assertEquals(upgradedPrevious === undefined ? "invalid" : encodeBindings(upgradedPrevious), encodeBindings(current), `${preset} K8 defaults`);
     for (let index = 0; index < previous.length; index++) {
@@ -85,8 +86,8 @@ test("saved default upgrades preserve every customized slot and leave current sa
     const decodedCurrent = decodeBindings(encodeBindings(savedCurrent));
     assertEquals(decodedCurrent === undefined ? "invalid" : encodeBindings(decodedCurrent), encodeBindings(savedCurrent), `${preset} current save`);
     assertEquals(actionFor(current, (preset === "custom" ? "0" : "9").charCodeAt(0)), Action.exSpecial, `${preset} EX special key`);
-    assertEquals(actionFor(current, "X".charCodeAt(0)), undefined, `${preset} X unbound`);
-    assertEquals(actionFor(current, "G".charCodeAt(0)), undefined, `${preset} G unbound`);
+    assertEquals(actionFor(current, "X".charCodeAt(0)), Action.exSpecial, `${preset} X is the pad EX key`);
+    assertEquals(actionFor(current, "G".charCodeAt(0)), Action.rightTrigger, `${preset} G is the pad right shield key`);
     assertEquals(actionFor(current, "T".charCodeAt(0)), undefined, `${preset} T unbound`);
   }
 });

@@ -59,7 +59,7 @@ test("rising without down or during any aerial passes through; down past deadzon
 test("rising with down-left or down-right passes through a platform so a waveland can follow [k2 property]", () => {
   for (const character of SELECTABLE_CHARACTERS) {
     for (const side of [-1, 1]) {
-      for (const input of [controls({ down: true, verticalDirection: -1, direction: side }), controls({ diStickValid: true, diStickX: f32(side * 0.7), diStickZ: f32(-0.7), down: true })]) {
+      for (const input of [controls({ down: true, verticalDirection: -1, direction: side }), controls({ diStickValid: true, diStickX: side * f32(0.7), diStickZ: f32(-0.7), down: true })]) {
         const f = risingUnder(character); step(f, input);
         assertFalse(f.motion.grounded); assertGreaterThan(f.motion.vz, 0);
       }

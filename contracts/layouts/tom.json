@@ -48,8 +48,8 @@
       "press": "key",
       "key": "x",
       "code": 88,
-      "action": "meter",
-      "label": "Meter"
+      "action": "exSpecial",
+      "label": "EX special"
     },
     {
       "control": "lt",

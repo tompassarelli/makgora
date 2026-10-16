@@ -44,6 +44,14 @@
       "label": "Grab"
     },
     {
+      "control": "lb",
+      "press": "key",
+      "key": "x",
+      "code": 88,
+      "action": "exSpecial",
+      "label": "EX special"
+    },
+    {
       "control": "lt",
       "press": "key",
       "key": "q",

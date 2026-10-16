@@ -69,7 +69,7 @@
       "bit": 16
     },
     {
-      "name": "meter",
+      "name": "exSpecial",
       "bit": 17
     }
   ],
@@ -195,14 +195,20 @@
       "slot": 0
     },
     {
+      "key": "9",
+      "code": 57,
+      "action": "exSpecial",
+      "slot": 0
+    },
+    {
       "key": "x",
       "code": 88,
-      "action": "meter",
-      "slot": 0
+      "action": "exSpecial",
+      "slot": 1
     }
   ],
   "savedBindings": {
-    "version": "K9",
+    "version": "KA",
     "slots": {
       "K1": 28,
       "K2": 30,
@@ -212,7 +218,8 @@
       "K6": 36,
       "K7": 36,
       "K8": 36,
-      "K9": 36
+      "K9": 36,
+      "KA": 36
     },
     "keyDigits": 3,
     "empty": 0,

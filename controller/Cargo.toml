@@ -8,7 +8,7 @@ license = "MIT"
 description = "Smashcraft's plug-in for padbridge: the map's session and journal helper (wc3-journal)"
 
 [dependencies]
-padbridge = { git = "https://github.com/tompassarelli/padbridge", rev = "8b69ce5f959cae8fbe511ffed06a08720ac11634" }
+padbridge = { git = "https://github.com/tompassarelli/padbridge", rev = "c7969baaf309ac1f5dcad87a096f97c8eeeee2b8" }
 
 [build-dependencies]
 serde_json = "1.0"

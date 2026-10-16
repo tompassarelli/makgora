@@ -50,7 +50,7 @@ export function presetBindings(preset: BindingPreset): KeyBindings {
   bind(Action.special, code("U"));
   bind(Action.grab, code("O"));
   bind(Action.leftTrigger, code("Q"));
-  bind(Action.rightTrigger, code(custom ? "8" : "7"));
+  bind(Action.rightTrigger, code(custom ? "8" : "7"), code("G"));
   bind(Action.smashLeft, code("B"), SLASH);
   bind(Action.smashRight, code("M"));
   bind(Action.smashUp, code("J"));
@@ -58,7 +58,7 @@ export function presetBindings(preset: BindingPreset): KeyBindings {
   bind(Action.walk, code("P"));
   bind(Action.lightShield, code("A"));
   bind(Action.shortHop, code("I"));
-  bind(Action.exSpecial, code(custom ? "0" : "9"));
+  bind(Action.exSpecial, code(custom ? "0" : "9"), code("X"));
   return { keys };
 }
 
@@ -117,8 +117,10 @@ function readKey(saved: string, offset: number): number | undefined {
 
 function upgradeToCurrentKeys(bindings: KeyBindings, version: string): void {
   const { keys } = bindings;
-  if (keyFor(bindings, Action.exSpecial, 0) === code("X")) keys[slotIndex(Action.exSpecial, 0)] = EMPTY;
-  if (keyFor(bindings, Action.rightTrigger, 1) === code("G")) keys[slotIndex(Action.rightTrigger, 1)] = EMPTY;
+  if (keyFor(bindings, Action.exSpecial, 0) === code("X") && keyFor(bindings, Action.exSpecial, 1) === undefined) {
+    keys[slotIndex(Action.exSpecial, 0)] = EMPTY;
+    keys[slotIndex(Action.exSpecial, 1)] = code("X");
+  }
   upgradeDefaults(bindings, version);
   if (keyFor(bindings, Action.exSpecial, 0) === undefined) {
     const ex = keyFor(bindings, Action.jump, 1) === code("9") ? code("0") : code("9");
@@ -137,6 +139,8 @@ function upgradeDefaults(bindings: KeyBindings, version: string): void {
     return;
   }
   if (keyFor(bindings, Action.lightShield, 1) === undefined && free(code("T"))) rebind(bindings, Action.lightShield, 1, code("T"));
+  if (keyFor(bindings, Action.rightTrigger, 1) === undefined && free(code("G"))) rebind(bindings, Action.rightTrigger, 1, code("G"));
+  if (keyFor(bindings, Action.exSpecial, 1) === undefined && free(code("X"))) rebind(bindings, Action.exSpecial, 1, code("X"));
   if (first(Action.shortHop) === undefined) {
     const hop = first(Action.jump) === code("I") ? code("Z") : code("I");
     if (free(hop)) rebind(bindings, Action.shortHop, 0, hop);
