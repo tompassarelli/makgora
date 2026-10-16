@@ -76,3 +76,23 @@ export function tileAt(grid: RosterGrid, x: number, y: number): RosterTile | und
   }
   return undefined;
 }
+
+
+export function nearestTile(grid: RosterGrid, x: number, y: number): RosterTile | undefined {
+  const hit = tileAt(grid, x, y);
+  if (hit !== undefined) return hit;
+  if (x < grid.left || x > grid.left + grid.columns * grid.cellWidth || y > grid.top || y < grid.top - grid.rows * grid.cellHeight) return undefined;
+  let nearest: RosterTile | undefined;
+  let best = 0;
+  for (let tile = 0; tile < grid.count; tile++) {
+    const rect = cellRect(grid, tile);
+    const dx = x < rect.left ? rect.left - x : x > rect.right ? x - rect.right : 0;
+    const dy = y > rect.top ? y - rect.top : y < rect.bottom ? rect.bottom - y : 0;
+    const distance = dx * dx + dy * dy;
+    if (nearest === undefined || distance < best) {
+      nearest = tile;
+      best = distance;
+    }
+  }
+  return nearest;
+}

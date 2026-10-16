@@ -5,7 +5,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_CAPACITY, participantActive } from "../input/participants";
-import { type RosterGrid, type RosterTile, cellRect, tileAt } from "./selectionGrid";
+import { type RosterGrid, type RosterTile, cellRect, nearestTile, tileAt } from "./selectionGrid";
 
 export type { RosterTile };
 
@@ -126,7 +126,8 @@ export function updateSelectionDrag(drag: SelectionDrag, roster: Readonly<Roster
   if (down && !drag.down) {
     drag.dragging = pickUp(drag, roster, x, y);
   } else if (!down && drag.down) {
-    if (drag.dragging !== undefined && drag.hover !== undefined) placement = { slot: drag.dragging, tile: drag.hover };
+    const tile = nearestTile(roster.grid, x, y);
+    if (drag.dragging !== undefined && tile !== undefined) placement = { slot: drag.dragging, tile };
     drag.dragging = undefined;
   }
   drag.down = down;
