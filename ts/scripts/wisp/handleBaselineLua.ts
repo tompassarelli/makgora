@@ -21,9 +21,9 @@ const reads: number[] = [];
 const clients = luaLockstep({ filePrefix: "smashcraft", localNatives: SMASHCRAFT_LOCAL_NATIVES, intentionalNoops: SMASHCRAFT_NOOPS, natives: lookNatives(chosen, reads) }, readFile(bundlePath), declarationsText, undefined, syncDelivery(MEASURED_BATTLE_NET, 7));
 // compactEmulator hands back and clears each client's errors so far.
 const errors: string[] = [];
-const run = playHandleBaseline(clients, functions, matches, gameOf, (client, released) => {
+const run = playHandleBaseline(clients, functions, matches, gameOf, { compact: (client, released) => {
   for (const error of compactEmulator(client, released)) errors.push(`p${client.slot + 1}: ${error}`);
-});
+} });
 const slots = clients.clients.map((client) => client.slot);
 const problems = [...handleProblems(run, slots), ...errors];
 clients.clients.forEach((client, index) => {

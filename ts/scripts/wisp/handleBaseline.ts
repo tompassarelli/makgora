@@ -85,13 +85,19 @@ export function handleProblems(baseline: HandleBaseline, slots: readonly number[
 }
 
 
+interface HandleBaselineOptions {
+  readonly compact?: (this: void, client: HeadlessClient, released: ReadonlySet<number>) => void;
+  readonly matchFrames?: number | undefined;
+}
+
 /**
  * Plays `matches` four-computer matches on one stage from fighter selection and back, counting every client's
  * live handles of each kind before the first and after each. `gameOf` reads a client's shell game state;
  * `compact`, after each count, drops what the emulator keeps of each client's released handles and calls so
  * a long run's memory stays flat.
  */
-export function playHandleBaseline(clients: Lockstep, functions: readonly (readonly [string, string, number])[], matches: number, gameOf: (this: void, client: HeadlessClient) => Game, compact?: (this: void, client: HeadlessClient, released: ReadonlySet<number>) => void): HandleBaseline {
+export function playHandleBaseline(clients: Lockstep, functions: readonly (readonly [string, string, number])[], matches: number, gameOf: (this: void, client: HeadlessClient) => Game, options: HandleBaselineOptions = {}): HandleBaseline {
+  const compact = options.compact;
   const censuses = clients.clients.map(client => new HandleCensus(client, functions));
   const host = clients.client(0);
   const live = () => censuses.map(census => census.counts());
@@ -131,6 +137,9 @@ export function playHandleBaseline(clients: Lockstep, functions: readonly (reado
     choose(true);
     clients.press(0, Key.y);
     until("the match", 600, () => gameOf(host).phase === Phase.match);
+    if (options.matchFrames !== undefined) {
+      for (const client of clients.clients) gameOf(client).remainingFrames = options.matchFrames;
+    }
     until("the result", 2 * 3600, () => gameOf(host).phase === Phase.result);
     until("fighter selection", 20 * 60, () => gameOf(host).phase === Phase.characterMenu, (frame) => {
       if (floorMod(frame, 30) === 0) clients.press(floorMod(floorDiv(frame, 30), 2), Key.y);
