@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import { generateMDX, parseMDL, parseMDX } from "war3-model";
-import { encodePreview } from "../scripts/mapPreview";
+import { NO_MINIMAP_MARKERS, encodePreview } from "../scripts/mapPreview";
+import { decodeMinimapMarkers } from "wisp/scripts/wisp/mapPreview";
 import { LOADING_SCREEN_CLEAR, classicModel, retargetLoadingModel } from "../scripts/loadingScreen";
 
 function chunk(tag: string, body: Uint8Array): Uint8Array {
@@ -84,4 +85,8 @@ test("the loading model ships in the classic 800 format with its textures, mater
   expect(classic.Textures.map((texture) => texture.Image)).toEqual(source.Textures.map((texture) => texture.Image));
   expect(classic.Materials.map((material) => material.Layers.map((layer) => [layer.FilterMode, layer.TextureID]))).toEqual(source.Materials.map((material) => material.Layers.map((layer) => [layer.FilterMode, layer.TextureID])));
   expect([...(classic.Geosets[0]?.Vertices ?? [])]).toEqual([...(source.Geosets[0]?.Vertices ?? [])]);
+});
+
+test("the lobby minimap carries no start-location markers over the preview art [k2 property]", () => {
+  expect(decodeMinimapMarkers(NO_MINIMAP_MARKERS)).toEqual([]);
 });

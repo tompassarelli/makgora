@@ -2,6 +2,8 @@ import type { Rgba } from "./blp";
 
 export const PREVIEW_ENTRY = "war3mapMap.blp";
 export const PREVIEW_FILE = "SmashcraftByTompasPreview.tga";
+export const MINIMAP_MARKERS_ENTRY = "war3map.mmp";
+export const NO_MINIMAP_MARKERS = new Uint8Array(8);
 
 const PALETTE = 156;
 const PIXELS = PALETTE + 1024;
