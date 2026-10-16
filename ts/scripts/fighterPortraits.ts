@@ -15,7 +15,7 @@ import { captureScene, renderScenes, type RenderScene } from 'wisp/scripts/wisp/
 import { createStandaloneSession, NEUTRAL_INPUT } from './wisp/standalone';
 import { headlessRender } from './wisp/headlessRender';
 import { assetsView, readManifest } from './wisp/buildInputs';
-import { PORTRAIT_KINDS, type PortraitKind, RENDERED_FIGHTERS, fighterName, fighterRenderName } from '../src/game/sim/heroes/registry';
+import { PORTRAIT_KINDS, type PortraitKind, RENDERED_FIGHTERS, fighterKey, fighterName, fighterRenderName } from '../src/game/sim/heroes/registry';
 import { fighterPortrait } from '../src/game/roster/looks';
 import { PARTICIPANT_SLOTS } from '../src/game/input/participants';
 import { CARD_TEXTURE_PX, TILE_TEXTURE_PX } from '../src/game/ui/portraitFrames';
@@ -536,7 +536,7 @@ await Effect.runPromise(Effect.gen(function*() {
   symlinkSync(join(stored, 'fighter-renders', 'de'), join(assets, 'fighter-renders', 'de'));
   const captured = new Map<number, RenderScene>();
   for (const character of fighters) {
-    const name = fighterName(character);
+    const name = fighterKey(character);
     const session = yield* Effect.tryPromise({ try: () => createStandaloneSession({ presentation: 'pool-confirmed', script: `#! chat -dev quick pair ${name} / ${name}` }), catch: (cause) => new PortraitFailure({ problem: `${name}: match setup failed: ${String(cause)}` }) });
     try {
       for (let frame = 0; frame < 90; frame++) session.step(NEUTRAL_INPUT);

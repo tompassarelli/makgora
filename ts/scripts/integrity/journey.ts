@@ -8,7 +8,7 @@ import { Context, Effect } from "effect";
 import { RULE_BUTTONS } from "../../src/game/ui/ruleButtons";
 import { STAGE_CATALOG } from "../../src/game/menu/stageCatalog";
 import { Character } from "../../src/game/sim/codes";
-import { fighterName } from "../../src/game/sim/heroes/registry";
+import { fighterKey } from "../../src/game/sim/heroes/registry";
 import { MATCH_TICKS_PER_SECOND, START_HOLD_FRAMES } from "../../src/game/lobby/lobbyState";
 import type { Region } from "wisp/scripts/warcraft/desktop";
 import { openObservedChat } from "wisp/scripts/wisp/chatSetup";
@@ -428,7 +428,7 @@ function setupSteps(context: ChatSteps) {
     if (commands) {
 
       for (const [player, character] of BOT_COMPUTERS.slice(0, options.botFour === true ? 2 : 1)) {
-        yield* command(`-dev fighter ${player} ${fighterName(character)}`, { characters: new RegExp(`^(?:\\d+,){${player - 1}}${character}(?:,|$)`) });
+        yield* command(`-dev fighter ${player} ${fighterKey(character)}`, { characters: new RegExp(`^(?:\\d+,){${player - 1}}${character}(?:,|$)`) });
       }
       yield* command(`-dev stage ${BOT_STAGE}`, { stage: BOT_STAGE });
     }

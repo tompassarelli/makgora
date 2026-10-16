@@ -24,7 +24,7 @@ import {
 import { selectableStage } from "../menu/stageCatalog";
 import { ITEM_WARNING_FRAMES } from "../match/centreItem";
 import { type Character, ItemKind, itemBit } from "../sim/codes";
-import { SELECTABLE_CHARACTERS, fighterName, fighterKey } from "../sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterKey } from "../sim/heroes/registry";
 
 export const SLOTS_COMMAND = "-dev slots ";
 export const FIGHTER_COMMAND = "-dev fighter ";
@@ -115,7 +115,7 @@ export function applySetupCommand(game: MatchState, actor: number, message: stri
     if (computerActive(game, slot)) selectCpuCharacter(game, actor, slot, character);
     else if (slot === actor) selectCharacter(game, slot, character);
     if (game.characterChoices[slot] !== character || !game.characterReadiness[slot]) return refused("fighter");
-    return `dev: player ${player} plays ${fighterName(character)}`;
+    return `dev: player ${player} plays ${fighterKey(character)}`;
   }
   if (message.startsWith(STOCKS_COMMAND)) {
     const count = integer(message.substring(STOCKS_COMMAND.length));

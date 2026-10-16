@@ -138,11 +138,12 @@ interface CardFrames {
 const portraitTexture = (choice: number | undefined, tile: boolean, slot?: number) => fighterPortrait(choice ?? Character.rifleman, tile ? "Tile" : "Card", slot);
 const nameText = (choice: number | undefined) => fighterName(choice ?? Character.rifleman);
 const TILE_NAMES: Readonly<Partial<Record<Character, string>>> = {
-  [Character.mountainKing]: "Mtn King",
+  [Character.mountainKing]: "Muradin",
   [Character.forsakenPaladin]: "Paladin",
   [Character.shadowHunter]: "S. Hunter",
   [Character.blademaster]: "Blade",
-  [Character.beastmaster]: "Beast",
+  [Character.beastmaster]: "Rexxar",
+  [Character.warden]: "Maiev",
   [Character.jaina]: "Jaina",
   [Character.sylvanas]: "Sylvanas",
   [Character.cairne]: "Cairne",

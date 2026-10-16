@@ -1,7 +1,7 @@
 import { parseDecimal } from "../netcode/journal/decimal";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots, isParticipantSlot } from "../input/participants";
 import type { Character } from "../sim/codes";
-import { SELECTABLE_CHARACTERS, fighterName, fighterKey } from "../sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterKey } from "../sim/heroes/registry";
 
 export const SHOWCASE_COMMAND = "-dev showcase ";
 export const SHOWCASE_PAD_X: Readonly<Slots<number>> = [-450.0, -150.0, 150.0, 450.0];
@@ -71,7 +71,7 @@ export function showcaseRequest(message: string): ShowcaseRequest | undefined {
   return character === undefined ? { kind: "invalid" } : { kind: "spawn", slot, character };
 }
 
-const padName = (character: Character): string => fighterName(character).toLowerCase();
+const padName = (character: Character): string => fighterKey(character).toLowerCase();
 
 export function showcasePadsReceipt(pads: Readonly<ShowcasePads>): string {
   const filled: string[] = [];

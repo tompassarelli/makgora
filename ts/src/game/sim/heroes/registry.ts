@@ -114,7 +114,7 @@ export function nextSelectableCharacter(current: number | undefined, direction: 
 export const RENDERED_FIGHTERS: readonly Character[] = SELECTABLE_CHARACTERS;
 
 
-export const fighterRenderName = (character: number): string => fighterName(character).split(" ").join("");
+export const fighterRenderName = (character: number): string => fighterKey(character).split(" ").join("");
 
 
 
