@@ -8,7 +8,7 @@ import { NO_LAUNCH, cairneCapsule as c, cairneHit as hit, cairneHurtPose } from 
 const shockwave = (air: boolean): AuthoredSpecial => ({
   endFrame: 58, landingLag: air ? 24 : undefined,
   projectiles: [{ spawnFrame: 24, offsetX: 72.0, offsetZ: 36.0, velocityX: 13.0, velocityZ: 0.0,
-    life: 38, radius: 20.0, effect: hit(6.0, "edge", 35), reflectable: true, limit: 1,
+    life: 38, radius: 20.0, effect: hit(9.729999542236328, "edge", 35), reflectable: true, limit: 1,
     model: "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveMissile.mdx" }],
 });
 const GORE_HORNS = cairneHurtPose(8, 25, hurtPart(30.0, 80.0, 75.0, 70.0, 22.0));
@@ -25,9 +25,9 @@ const STOMP_RING: SpecialProjectile = {
 };
 const WAR_STOMP: AuthoredSpecial = {
   endFrame: 74, defensiveUse: true, armor: { ...frames(6, 19), maxDamage: 8.0 },
-  regions: [heroRegion(20, 23, c(0.0, 16.0, 106.0, 16.0, 24.0), hit(8.0, "launch", 80)),
-    heroRegion(20, 23, c(0.0, 16.0, -106.0, 16.0, 24.0), hit(8.0, "launch", 80, -1)),
-    heroRegion(20, 21, c(-50.0, 60.0, 50.0, 60.0, 34.0), hit(8.0, "launch", 85))],
+  regions: [heroRegion(20, 23, c(0.0, 16.0, 106.0, 16.0, 24.0), hit(12.64900016784668, "launch", 80)),
+    heroRegion(20, 23, c(0.0, 16.0, -106.0, 16.0, 24.0), hit(12.64900016784668, "launch", 80, -1)),
+    heroRegion(20, 21, c(-50.0, 60.0, 50.0, 60.0, 34.0), hit(12.64900016784668, "launch", 85))],
   projectiles: [STOMP_RING],
 };
 const lift = (): AuthoredSpecial => ({
