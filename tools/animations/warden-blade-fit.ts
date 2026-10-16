@@ -12,11 +12,14 @@ function addNairBladeTrail(model: mdx.Model, motion: mdx.Model, weapon: mdx.Node
     const start = sequence.Interval[0] + Math.round(move.startupFrames * 1000 / 60);
     const end = start + Math.round(move.activeFrames * 1000 / 60);
     const objectId = model.Nodes.length;
+    const material = structuredClone(model.Materials[0]);
+    material.Layers = [{ ...material.Layers[0], FilterMode: mdx.FilterMode.Additive, Shading: 1, TextureID: 0 }];
+    const materialId = model.Materials.push(material) - 1;
     const trail: mdx.RibbonEmitter = {
         Name: 'WardenNeutralAirBladeTrail', ObjectId: objectId, Parent: weapon.ObjectId, Flags: 0,
         PivotPoint: new Float32Array([0, 0, 0]), HeightAbove: 4.5, HeightBelow: 4.5,
         Alpha: 0.9, Color: new Float32Array([1, 0.34, 0.08]), LifeSpan: 0.035,
-        TextureSlot: 0, EmissionRate: 120, Rows: 1, Columns: 1, MaterialID: 2, Gravity: 0,
+        TextureSlot: 0, EmissionRate: 120, Rows: 1, Columns: 1, MaterialID: materialId, Gravity: 0,
         Visibility: { LineType: mdx.LineType.DontInterp, Keys: [
             { Frame: sequence.Interval[0], Vector: new Float32Array([0]) },
             { Frame: start, Vector: new Float32Array([0]) },

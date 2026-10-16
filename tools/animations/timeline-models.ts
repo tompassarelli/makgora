@@ -18,6 +18,7 @@ import { DEFINITIVE_FIGHTERS } from '../../ts/src/game/assets/definitiveFighters
 import type { Character } from '../../ts/src/game/sim/codes';
 import { CLIPS } from './fighter-shards';
 import { readClipRecords, writeClipRecord } from '../../ts/scripts/clipEvidence';
+import { checkMaterialReferences } from './material-references';
 
 const [assetsArg, outputArg, fighterName] = process.argv.slice(2);
 if (assetsArg === undefined || outputArg === undefined || fighterName === undefined) throw new Error('usage: bun tools/animations/timeline-models.ts PRIVATE_ASSETS PRIVATE_POOL FIGHTER');
@@ -47,6 +48,8 @@ await Effect.runPromise(Effect.tryPromise({ try: async () => {
     const played = playedMoves(character, source).classic.map(index => source.Sequences[index]!);
     const bodies = fighterBodies(authoredMotion(authored, rig), rig, await stockDefinitive(), undefined, canonicalMotion(source, rig));
     const bytes = bodies.classic;
+    checkMaterialReferences(`${fighter.name} classic`, parseSource(bytes));
+    if (bodies.definitive !== undefined) checkMaterialReferences(`${fighter.name} Definitive`, parseSource(bodies.definitive.bytes));
     const geosets = checkTimelineGeosets(source, parseSource(bytes), played);
     console.log(`TIMELINE_GEOSETS_PASS ${fighter.name}: ${JSON.stringify(geosets)}`);
     tracks(parseSource(bytes), (track, path) => {
