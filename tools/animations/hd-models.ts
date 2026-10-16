@@ -23,9 +23,9 @@ export function playedMoves(character: number, motion: mdx.Model): PlayedMoves {
 }
 const selected = (model: mdx.Model, indices: readonly number[]) => model.Sequences.filter((_, index) => indices.includes(index));
 
-/** One fighter's Classic timeline body, generated from its canonical motion through the Classic mapping. */
-export function classicBody(motion: mdx.Model, rig: FighterRig, played: readonly number[]): ArrayBuffer {
-    const thinned = thinKeys(classicSkeleton(motion, rig)).model;
+/** One fighter's Classic timeline body, generated from its canonical motion through the Classic mapping; `thinnedMotion` is that motion already through thinKeys, which ignores node names. */
+export function classicBody(motion: mdx.Model, rig: FighterRig, played: readonly number[], thinnedMotion?: mdx.Model): ArrayBuffer {
+    const thinned = thinnedMotion === undefined ? thinKeys(classicSkeleton(motion, rig)).model : classicSkeleton(thinnedMotion, rig);
     return encodeVerified(timelineBody(thinned, selected(thinned, played)));
 }
 
@@ -111,8 +111,8 @@ export function definitiveBody(motion: mdx.Model, stock: ArrayBuffer, rig: Fight
  * Both looks' bodies from one canonical motion (#366). A fighter without an approved Definitive body draws its
  * Classic body in Definitive too, so `definitive` is undefined.
  */
-export function fighterBodies(motion: mdx.Model, rig: FighterRig, stock: ArrayBuffer | undefined, moves = playedMoves(rig.character, motion)) {
-    const classic = classicBody(motion, rig, moves.classic);
+export function fighterBodies(motion: mdx.Model, rig: FighterRig, stock: ArrayBuffer | undefined, moves = playedMoves(rig.character, motion), thinnedMotion?: mdx.Model) {
+    const classic = classicBody(motion, rig, moves.classic, thinnedMotion);
     if (!DEFINITIVE_FIGHTERS.has(rig.character as Character)) return { classic, definitive: undefined };
     if (stock === undefined) throw new Error(`Fighter ${rig.character} needs its stock Definitive model`);
     const definitive = definitiveBody(motion, stock, rig, moves.definitive);

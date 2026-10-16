@@ -8,6 +8,7 @@ import { checkTimelineGeosets } from './timeline-geosets';
 import { thinnedModel } from './thinned-source';
 import { authoredMotion, fighterBodies, playedMoves } from './hd-models';
 import { FIGHTER_RIGS } from './hd-rigs';
+import { canonicalMotion } from './canonical-rig';
 import { modelFacts } from '../../ts/node_modules/wisp/scripts/wisp/models';
 import { replaceModelFacts, writeGenerated } from '../../ts/scripts/wisp/modelFactsTable';
 import { DrawnModel } from '../../ts/scripts/wisp/hurtboxView';
@@ -44,7 +45,7 @@ await Effect.runPromise(Effect.tryPromise({ try: async () => {
     const authored = await Bun.file(join(assets, fighter.source)).arrayBuffer();
     const source = thinnedModel(authored).model;
     const played = playedMoves(character, source).classic.map(index => source.Sequences[index]!);
-    const bodies = fighterBodies(authoredMotion(authored, rig), rig, await stockDefinitive());
+    const bodies = fighterBodies(authoredMotion(authored, rig), rig, await stockDefinitive(), undefined, canonicalMotion(source, rig));
     const bytes = bodies.classic;
     const geosets = checkTimelineGeosets(source, parseSource(bytes), played);
     console.log(`TIMELINE_GEOSETS_PASS ${fighter.name}: ${JSON.stringify(geosets)}`);
