@@ -27,7 +27,7 @@ const CUE_SOUNDS: readonly (readonly string[])[] = [
   ["Sound\\Interface\\BattleNetTick.flac"],
   ["Sound\\Interface\\BattleNetTick.flac"],
   ["Sound\\Interface\\BattleNetTick.flac"],
-  ["Sound\\Interface\\GameFound.flac"],
+  ["Sound\\Interface\\BattleNetTick.flac"],
   ["Sound\\Cinematics\\BellTollAlliance.flac"],
   ["Sound\\Cinematics\\BellTollAlliance.flac"],
   ["Sound\\Interface\\BattleNetDeath1.flac"],

@@ -1,7 +1,9 @@
 import type { MapDeclaration } from "wisp/scripts/mapInfo";
+import { LOADING_SCREEN_MODEL } from "./loadingScreen";
 
 export const SMASHCRAFT_MAP = {
   author: "Tompas",
+  loadingScreenModel: LOADING_SCREEN_MODEL,
 
   description: "Warcraft heroes in a platform fight for up to four. Credits: The Lich King model by Kwaliti (Hive Workshop).",
   suggestedPlayers: "1-4",

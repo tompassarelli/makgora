@@ -31,7 +31,7 @@ import { importedModelFile } from "../heroModelSource";
 import { CLIP_RECORDS, clipPoolFiles } from "../clipEvidence";
 import { importList } from "./importList";
 import { definitiveOverride } from "./definitiveBodies";
-import { PREVIEW_ENTRY, composePreview, encodePreview } from "../mapPreview";
+import { PREVIEW_CACHE, mapArtImports } from "./mapArtImports";
 import { regenerateCommand } from "../stageThumbnailSpec";
 import { stageCardPath } from "./buildInputs";
 import { buildProject, projectRoot as PROJECT } from "./project";
@@ -255,16 +255,6 @@ const portraitImports = (assets: string, edition: MapEdition) => Effect.forEach(
 );
 
 
-export const previewImport = (assets: string) => Effect.gen(function*() {
-  const renders = join(assets, "fighter-renders");
-  const blp = yield* tryMapSync("compose map preview", renders, () => encodePreview(composePreview((file) => readTga(readFileSync(join(renders, file))))));
-  const source = join(PREVIEW_CACHE, `${new Bun.CryptoHasher("sha256").update(blp).digest("hex")}.blp`);
-  if (!(yield* tryMapPromise("check preview cache", source, () => Bun.file(source).exists()))) {
-    yield* tryMapPromise("write map preview", source, () => Bun.write(source, blp));
-  }
-  return { entry: PREVIEW_ENTRY, source } satisfies ArchiveEntry;
-});
-
 export const glowFreeCaptureImports = Effect.fnUntraced(function*(imports: readonly ArchiveEntry[]) {
   const bodies = new Set(Object.values(Character).flatMap((character) =>
     Array.from({ length: originalClipCount(character) }, (_, index) => originalClip(character, index))
@@ -287,7 +277,6 @@ export const glowFreeCaptureImports = Effect.fnUntraced(function*(imports: reado
   }));
 });
 
-const PREVIEW_CACHE = join(process.env.XDG_CACHE_HOME ?? join(homedir(), ".cache"), "smashcraft/map-preview");
 
 const StageCards = Schema.Struct({ stages: Schema.Array(Schema.Struct({ stage: Schema.Finite, file: Schema.String, sha256: Schema.String })) });
 
@@ -340,7 +329,7 @@ export const importedAssets = (assets: string, summon: string, edition: MapEditi
     ...SELECTION_TEXTURES.map((texture) => imported(join(assets, "selection-assets"), `${texture}.tga`)),
     { entry: "_de.w3mod\\war3mapImported\\SelectionHandPinch.tga", source: join(assets, "selection-assets/_de.w3mod/SelectionHandPinch.tga") },
     ...(yield* portraitImports(assets, edition)),
-    yield* previewImport(assets),
+    ...(yield* mapArtImports(assets)),
 
     ...(yield* stageCardImports),
     ...["SmashcraftHUD.fdf", "SmashcraftHUD.toc", ...UI_FRAME_FILES].map((file) => imported(join(PROJECT, "tools/selection/art"), file)),
