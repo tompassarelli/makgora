@@ -16,7 +16,7 @@ const chainRegion = (): MoveRegion => {
   return { ...region, hit: { ...region.hit, minZ: CHAIN_ORIGIN_Z - CHAIN_RANGE - CHAIN_RADIUS, maxZ: CHAIN_ORIGIN_Z + CHAIN_RANGE + CHAIN_RADIUS } };
 };
 const CHAIN_LIGHTNING: AuthoredSpecial = {
-  endFrame: 58, beam: { originX: CHAIN_ORIGIN_X, originZ: CHAIN_ORIGIN_Z, range: CHAIN_RANGE, track: 8.0, chain: true },
+  endFrame: 58, beam: { originX: CHAIN_ORIGIN_X, originZ: CHAIN_ORIGIN_Z, range: CHAIN_RANGE, track: 0.0, chain: true },
   regions: [chainRegion()], landingLag: 18,
 };
 const wolf = (spawnFrame: number, air: boolean): SpecialProjectile => ({
@@ -35,7 +35,7 @@ const DOOMHAMMER_SLAM: AuthoredSpecial = {
   };
 
 export const THRALL_SPECIALS: FighterSpecials = {
-  neutral: withExKit({ name: "Chain Lightning", description: "Call down a crackling bolt of lightning that tracks the nearest foe in front of him at long range; shield or jump it on reaction and punish the slow cast.", ground: CHAIN_LIGHTNING }, { damage: 1.25 }),
+  neutral: withExKit({ name: "Chain Lightning", description: "Call down a crackling bolt of lightning at where the nearest foe in front of him stood when he began; it does not follow them, so jump or shield it and punish the slow cast.", ground: CHAIN_LIGHTNING }, { damage: 1.25 }),
   side: withExKit({ name: "Feral Spirit", description: "Send two spirit wolves running low, one after the other.", ground: wolves(false), air: wolves(true) }, { damage: 1.25 }),
   up: withExKit({ name: "Far Sight", description: "Let the spirits guide a rising leap; steer toward the ledge, then fall helpless.", ground: sight(f32(3.1)) }, { travel: 1.25 }),
   down: withExKit({ name: "Doomhammer Slam", description: "Slam the ground on both sides to launch nearby foes; a jump clears it.", ground: DOOMHAMMER_SLAM, air: { ...DOOMHAMMER_SLAM, groundOnly: false, landingLag: 20 } }, { reach: 1.25 }),
