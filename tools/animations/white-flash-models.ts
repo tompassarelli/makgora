@@ -1,7 +1,7 @@
 import { join, relative, resolve } from "node:path";
 import { isDeepStrictEqual } from "node:util";
 import { decodeBLP, getBLPImageData, model as mdx } from "war3-model";
-import { generateModelMDX, parseModelMDX } from "../../ts/scripts/mdxCodec";
+import { generateModelMDX, parseModelMDX, skinChunks } from "../../ts/scripts/mdxCodec";
 import { PNG } from "pngjs";
 import { onGlobalClock, removeBodyEffects, tracks } from "./original-clips";
 import { fighters } from "../../ts/scripts/heroModelSource";
@@ -15,7 +15,7 @@ import { whiteModelFactsTable } from "../../ts/scripts/wisp/whiteModelFactsTable
 import { readModelFacts, replaceModelFacts, writeGenerated, writeModelFacts } from "../../ts/scripts/wisp/modelFactsTable";
 import { WHITE_FIGHTER_MODELS } from "../../ts/src/generated/assets/whiteFighterModels";
 import { WHITE_MODEL_FACTS } from "../../ts/src/generated/assets/whiteModelFacts";
-import { thinKeys } from "../../ts/scripts/keyThin";
+import { thinnedModel } from "./thinned-source";
 import { timelineBody } from "./timeline-body";
 import { existsSync } from "node:fs";
 import { MeshoptSimplifier } from "meshoptimizer";
@@ -161,7 +161,7 @@ for (const [character, fighter] of fighters.entries()) {
   const previous = paths[character];
   if (previous !== undefined) delete facts[previous.replaceAll("\\", "/").toLowerCase()];
   const source = await Bun.file(join(assets, fighter.source)).arrayBuffer();
-  const thinned = thinKeys(parseModelMDX(source)).model;
+  const thinned = thinnedModel(skinChunks(source, false)).model;
   const original = timelineBody(thinned, flashableSequences(character, thinned.Sequences));
   const model = structuredClone(original);
   const sequence = model.Sequences[0];

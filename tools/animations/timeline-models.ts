@@ -5,7 +5,7 @@ import { Effect } from 'effect';
 import { hash, parseSource, tracks } from './original-clips';
 import { fighters } from '../../ts/scripts/heroModelSource';
 import { checkTimelineGeosets } from './timeline-geosets';
-import { thinKeys } from '../../ts/scripts/keyThin';
+import { thinnedModel } from './thinned-source';
 import { authoredMotion, fighterBodies, playedMoves } from './hd-models';
 import { FIGHTER_RIGS } from './hd-rigs';
 import { modelFacts } from '../../ts/node_modules/wisp/scripts/wisp/models';
@@ -42,7 +42,7 @@ async function removeOtherBodies(directory: string, kept: string): Promise<void>
 
 await Effect.runPromise(Effect.tryPromise({ try: async () => {
     const authored = await Bun.file(join(assets, fighter.source)).arrayBuffer();
-    const source = thinKeys(parseSource(authored)).model;
+    const source = thinnedModel(authored).model;
     const played = playedMoves(character, source).classic.map(index => source.Sequences[index]!);
     const bodies = fighterBodies(authoredMotion(authored, rig), rig, await stockDefinitive());
     const bytes = bodies.classic;

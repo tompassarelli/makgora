@@ -37,7 +37,7 @@ const derive = (args: readonly string[]) => Effect.gen(function*() {
   const building = plans.filter((plan) => plan.cached < plan.keys.length).length;
   const capacity = building <= 2 ? { class: "moderate" as const, jobs: 2 } : { class: "heavy" as const, jobs: 6 };
   console.log(`${plans.length} fighters: ${steps} steps to run, ${plans.reduce((sum, plan) => sum + plan.cached, 0)} reused`);
-  if (building > 0) yield* Effect.promise(() => runAdmitted(capacity.class, "smashcraft:inputs-derive", 1800));
+  if (building > 0) yield* Effect.promise(() => runAdmitted(capacity.class, "smashcraft:inputs-derive", 3600));
   yield* buildFighterArt(plans, manifest, assets, capacity.jobs);
 });
 

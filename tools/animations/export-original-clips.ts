@@ -18,7 +18,8 @@ import {ensure, hash, parseSource, encodeVerified, tracks, verifyPreservedBody, 
 import {fighters} from '../../ts/scripts/heroModelSource';
 import {CLIP_PROVENANCE, keepClipRecords, readClipRecords, writeClipRecord} from '../../ts/scripts/clipEvidence';
 import {misplacedNodes} from '../../ts/scripts/clipNodes';
-import {KEY_BOUND, savedKeyBytes, thinKeys, type KeyThinReport} from '../../ts/scripts/keyThin';
+import {KEY_BOUND, savedKeyBytes, type KeyThinReport} from '../../ts/scripts/keyThin';
+import {thinnedModel} from './thinned-source';
 import {fighterSlug} from '../../ts/src/game/sim/heroes/registry';
 import {CLIPS, CLIP_INDEX, clipFile, clipIndex, clipTypeFile, shardOrder} from './fighter-shards';
 import {writeGenerated} from '../../ts/scripts/wisp/modelFactsTable';
@@ -58,7 +59,7 @@ for (const [character, fighter] of fighters) {
     if (metadataOnly) ensure(retainedRecord?.sourceSha256 === sourceSha256 && retainedThin, `${fighter.name}: retained clips have a different source or key bound`);
     const reuse = metadataOnly || (keepUnchanged && retainedThin && retainedRecord?.sourceSha256 === sourceSha256);
 
-    const thin = reuse ? {model: original, report: retainedRecord.keyThin.report as KeyThinReport} : thinKeys(original);
+    const thin = reuse ? {model: original, report: retainedRecord.keyThin.report as KeyThinReport} : thinnedModel(bytes);
     const source = thin.model;
 
 
