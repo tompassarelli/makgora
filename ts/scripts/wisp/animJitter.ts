@@ -22,9 +22,7 @@ export const JITTER_SPAN_MS = 50;
 /** A moving segment may ease past its keys by this share of their distance; a hold (equal keys) may not leave its value. */
 export const SPAN_ALLOWANCE = 0.5;
 
-export const JITTER_EXEMPTIONS: ReadonlyMap<string, string> = new Map([
-  ["classic:warden", "smashcraft#440: Warden's neutral-air spin fails warden-blade-fit (41.67°/65.02° of 300°) on main c39ada1e5, so its body cannot be regenerated until #440's fix lands"],
-]);
+export const JITTER_EXEMPTIONS: ReadonlyMap<string, string> = new Map();
 
 const STEPS = 8;
 
@@ -53,7 +51,7 @@ function curve(a: number, outTan: number, inTan: number, b: number, t: number, t
 }
 
 /** How far a curved key segment leaves its keys: vectors past the span of their two keys, rotations off the arc between them. */
-function segmentExcess(left: mdx.AnimKeyframe, right: mdx.AnimKeyframe, type: mdx.LineType, rotation: boolean): number {
+export function segmentExcess(left: mdx.AnimKeyframe, right: mdx.AnimKeyframe, type: mdx.LineType, rotation: boolean): number {
   const a = left.Vector, b = right.Vector, outTan = left.OutTan ?? a, inTan = right.InTan ?? b;
   let worst = 0;
   for (let step = 1; step < STEPS; step++) {

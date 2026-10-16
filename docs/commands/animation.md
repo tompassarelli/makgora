@@ -151,8 +151,12 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
 
 - Key jitter (from ts/): `bun wisp anim jitter [--fighter NAME]... [--graphics classic|definitive]...`
   fails when a curved key segment between keys at most 50 ms apart leaves its keys (#479);
-  pre-push runs it when the clip pool or its tools change. `thinKeys` writes clamped slopes
-  for generator-broken handles and flat handles on held axes, so regenerating through it fixes
+  pre-push runs it when the clip pool or its tools change. The 1.0-unit translation limit is
+  calibrated on Shadow Hunter's 0.0.145 bodies (smashcraft#4): his 14 shaking clips, forward smash
+  and angled-up forward tilt among them, scored 1.10 to 6.23, and his 54 clean clips, stock ones
+  included, at most 0.59. `thinKeys` writes clamped slopes
+  for generator-broken handles, and for every key of a close-key segment that would still leave
+  its keys past the limit, and flat handles on held axes, so regenerating through it fixes
   an offender. `JITTER_EXEMPTIONS` in smashcraft:ts/scripts/wisp/animJitter.ts names a fighter
   that cannot yet be regenerated, with its issue; the check fails once that fighter stops jittering.
 

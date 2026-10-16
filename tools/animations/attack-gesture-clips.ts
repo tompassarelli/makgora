@@ -346,7 +346,7 @@ function aimWeaponContact(model: mdx.Model, index: number, start: number, contac
     for (let frame = anticipation; frame <= total; frame++) {
       const key = root.Translation?.Keys.find(k => k.Frame === start + Math.round(frame*1000/60)); ensure(key, "Bone_Root: missing lift key");
       const weight = frame <= contact ? (frame-anticipation)/(contact-anticipation) : frame < contact+3 ? 1 : Math.max(0,1-(frame-contact-3)/(total-contact-3));
-      key.Vector = key.Vector.map((v,i) => i === 2 ? v+2*weight : v);
+      key.Vector = key.Vector.map((v,i) => i === 2 ? v+2*weight : v); if (key.InTan) { key.InTan = key.Vector.slice(); key.OutTan = key.Vector.slice(); }
     }
   }
 }

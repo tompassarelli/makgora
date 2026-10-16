@@ -5,7 +5,7 @@
 
 
 import { ModelRenderer, model as mdx } from 'war3-model';
-import { JITTER_SPAN_MS } from './wisp/animJitter';
+import { JITTER_LIMITS, JITTER_SPAN_MS, segmentExcess } from './wisp/animJitter';
 
 
 export const KEY_BOUND = { position: 0.5, rotationDegrees: 0.5, tangents: 'slope' } as const;
@@ -265,7 +265,7 @@ const keyCount = (model: mdx.Model) => { let count = 0; transforms(model, track 
 
 const sameVector = (a: Vec | undefined, b: Vec) => a !== undefined && a.length === b.length && Array.from(b).every((value, axis) => a[axis] === value);
 
-/** Translation and scale keys with a generator's broken handles (Hermite tangents repeating the value, Bezier handles at the origin) get clamped Catmull-Rom slopes, flat at holds and clip ends; an axis held between close keys gets flat handles. */
+/** Translation and scale keys with a generator's broken handles (Hermite tangents repeating the value, Bezier handles at the origin, or any handles that carry a close-key segment past the jitter limit) get clamped Catmull-Rom slopes, flat at holds and clip ends; an axis held between close keys gets flat handles. */
 export function slopeTangents(source: mdx.Model): mdx.Model {
     const model = structuredClone(source);
     const sequenceOf = (frame: number) => model.Sequences.findIndex(sequence => frame >= at(sequence.Interval, 0) && frame <= at(sequence.Interval, 1));
@@ -277,8 +277,8 @@ export function slopeTangents(source: mdx.Model): mdx.Model {
             const broken = bezier ? new Float32Array(key.Vector.length) : key.Vector;
             return sameVector(key.InTan, broken) && sameVector(key.OutTan, broken) && Array.from(key.Vector).some(value => value !== 0);
         });
-        keys.forEach((key, index) => {
-            if (!repaired[index]) return;
+        const repair = (index: number) => {
+            const key = keys[index]!;
             const sequence = sequenceOf(key.Frame), previous = keys[index - 1], next = keys[index + 1];
             const inTan = new Float32Array(key.Vector.length), outTan = new Float32Array(key.Vector.length);
             if (previous !== undefined && next !== undefined && sequence >= 0 && sequenceOf(previous.Frame) === sequence && sequenceOf(next.Frame) === sequence) {
@@ -292,7 +292,18 @@ export function slopeTangents(source: mdx.Model): mdx.Model {
             }
             key.InTan = bezier ? inTan.map((slope, axis) => at(key.Vector, axis) - slope / 3) : inTan;
             key.OutTan = bezier ? outTan.map((slope, axis) => at(key.Vector, axis) + slope / 3) : outTan;
-        });
+        };
+        keys.forEach((_key, index) => { if (repaired[index]) repair(index); });
+        const limit = channel === 'Translation' ? JITTER_LIMITS.translation : JITTER_LIMITS.scaling;
+        for (let changed = true; changed;) {
+            changed = false;
+            for (let index = 1; index < keys.length; index++) {
+                const left = keys[index - 1]!, right = keys[index]!;
+                if (repaired[index - 1] && repaired[index] || right.Frame - left.Frame > JITTER_SPAN_MS || right.Frame === left.Frame) continue;
+                if (segmentExcess(left, right, track.LineType, false) <= limit) continue;
+                for (const end of [index - 1, index]) if (!repaired[end]) { repaired[end] = true; repair(end); changed = true; }
+            }
+        }
         for (let index = 1; index < keys.length; index++) {
             const left = keys[index - 1]!, right = keys[index]!;
             if (right.Frame - left.Frame > JITTER_SPAN_MS || left.OutTan === undefined || right.InTan === undefined) continue;
