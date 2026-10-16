@@ -63,11 +63,11 @@ test("Summon Bear places Bear on frame 29 and ends on 49, its startup cue throug
   assertEquals(ended, 49);
 });
 
-test("Beastmaster Hawk Lift rises 380–520 and reaches 600–900, its free route at least 240 on each axis; Hawk survives the helpless fall [k3 measure #335]", () => {
+test("Beastmaster Hawk Lift rises 330–390 and reaches 580–660, its free route at least 240 on each axis; Hawk survives the helpless fall [k3 measure #335]", () => {
   for (const mana of [100, 10]) {
     const route = upSpecialRoute(Character.beastmaster, mana);
-    assertTrue(route.rise >= 380.0 && route.rise <= 520.0);
-    assertTrue(route.reach >= 600.0 && route.reach <= 900.0);
+    assertTrue(route.rise >= 330.0 && route.rise <= 390.0);
+    assertTrue(route.reach >= 580.0 && route.reach <= 660.0);
     const { world, owner } = pair();
     owner.motion.grounded = false;
     owner.motion.surface = undefined;
