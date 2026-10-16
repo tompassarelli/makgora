@@ -60,7 +60,7 @@ const normals: readonly [HeroPose, AttackStyle, Gesture, readonly [number, numbe
   ["forwardSmash", AttackStyle.forwardSmash, { ...forward, chest: 30, leftArm: -100 }, [85, 82]],
   ["upSmash", AttackStyle.upSmash, { ...overhead, chest: -45, pelvis: -30 }, [0, 166]],
   ["downSmash", AttackStyle.downSmash, { ...low, chest: 60, pelvis: 35, leftArm: 65, yaw: 25 }, [70, 20]],
-  ["neutralAir", AttackStyle.neutralAir, { ...cast, chest: -30, pelvis: -25, leftArm: 65, yaw: 65 }, [70, 80]],
+  ["neutralAir", AttackStyle.neutralAir, { ...cast, leftArm: 65, yaw: 65 }, [70, 80]],
   ["forwardAir", AttackStyle.forwardAir, { ...forward, thigh: 25, leftThigh: -30 }, [82, 85]],
   ["backAir", AttackStyle.backAir, back, [-75, 85]],
   ["upAir", AttackStyle.upAir, { ...overhead, chest: -40, pelvis: -25 }, [0, 158]],
@@ -69,14 +69,12 @@ const normals: readonly [HeroPose, AttackStyle, Gesture, readonly [number, numbe
 const followThrough: Partial<Record<HeroPose, Gesture>> = {
   downSmash: { chest: 65, pelvis: 40, hand: 35 },
   upSmash: { chest: -55, pelvis: -35, hand: -35 },
-  neutralAir: { chest: -40, pelvis: -32, yaw: 90, hand: -35 },
   backAir: { chest: -25, pelvis: -20, yaw: 135, hand: 35 },
   upAir: { chest: -50, pelvis: -30, hand: -35 },
 };
 const bodyDrive: Partial<Record<HeroPose, Action["drive"]>> = {
   downSmash: { Bone_Root: [0, -12] },
   upSmash: { Bone_Chest: [0, 42], Bone_Root: [0, 45] },
-  neutralAir: { Bone_Root: [22, -8] },
   upAir: { Bone_Root: [24, 32] },
   downAir: { Bone_Root: [0, -20] },
 };
@@ -240,7 +238,7 @@ for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
       for (const frame of phaseFrames.filter(frame => frame >= followStart)) { const t = Math.max(0, Math.min(1, (frame - followStart) / (followEnd - followStart))), progress = t * t * (3 - 2 * t); const blended = followAngles.map((value, index) => followStartAngles[index]! + (value - followStartAngles[index]!) * progress); writeFollow(frame, blended); }
     }
   }
-  const nativeSwing = ["jab", "downTilt", "dashAttack", "forwardTilt", "forwardTiltUp", "forwardTiltDown", "jab2", "forwardSmash", "forwardAir", "sideSpecial", "sideSpecialAir", "downSpecial", "downSpecialAir"].includes(action.pose);
+  const nativeSwing = ["jab", "downTilt", "dashAttack", "forwardTilt", "forwardTiltUp", "forwardTiltDown", "jab2", "forwardSmash", "forwardAir", "sideSpecial", "sideSpecialAir", "downSpecial", "downSpecialAir", "neutralAir"].includes(action.pose);
   if (nativeSwing) {
     const overhead = ["upTilt", "upSmash", "upAir"].includes(action.pose);
     const heavy = ["forwardSmash", "forwardAir", "downSpecial", "downSpecialAir"].includes(action.pose);
