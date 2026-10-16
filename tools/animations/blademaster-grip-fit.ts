@@ -1,5 +1,5 @@
 import { NO_GLOBAL_SEQ } from './animVector';
-import { mat4, quat, vec3 } from 'gl-matrix';
+import { mat4, quat, vec3 } from '../../ts/node_modules/gl-matrix';
 import { ModelRenderer } from '../../ts/node_modules/war3-model';
 import { model as mdx } from '../../ts/scripts/clipNodes';
 import { originalClip } from '../../ts/src/generated/clips/fighterOriginalClipInfo';

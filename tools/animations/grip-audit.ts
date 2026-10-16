@@ -1,6 +1,6 @@
 import { mkdirSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
-import { mat4, vec3 } from 'gl-matrix';
+import { mat4, vec3 } from '../../ts/node_modules/gl-matrix';
 import { ModelRenderer } from '../../ts/node_modules/war3-model';
 import { originalClip } from '../../ts/src/generated/clips/fighterOriginalClipInfo';
 import { Character } from '../../ts/src/game/sim/codes';

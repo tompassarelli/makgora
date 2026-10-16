@@ -1,7 +1,7 @@
 import { NO_GLOBAL_SEQ } from './animVector';
 
 import { mkdirSync } from "node:fs";
-import { mat4, quat, vec3 } from "gl-matrix";
+import { mat4, quat, vec3 } from "../../ts/node_modules/gl-matrix";
 import { join, relative, resolve } from "node:path";
 import { generateMDX, ModelRenderer, model as mdx } from "war3-model";
 import { DrawnModel, sheet } from "../../ts/scripts/wisp/hurtboxView";

@@ -1,5 +1,5 @@
 import { NO_GLOBAL_SEQ, NO_INDEX } from './animVector';
-import { mat4, quat, vec3 } from 'gl-matrix';
+import { mat4, quat, vec3 } from '../../ts/node_modules/gl-matrix';
 import { ModelRenderer, model as mdx, parseMDX, generateMDX } from '../../ts/scripts/clipNodes';
 import { skinChunks } from '../../ts/scripts/mdxCodec';
 import { tracks, onGlobalClock } from './original-clips';
