@@ -1,1 +1,0 @@
-{"model":"Objects\\InventoryItems\\Rune\\Rune.mdx","facts":{"geosets":6,"triangles":66,"lights":0,"bounds":{"min":[-48.81,-60.063,18.111],"max":[59.857,56.93,102.06]},"emitters":[{"kind":"particle","name":"BlizParticle03","whileShown":true,"onDeath":false,"visible":true,"rate":18,"lifespan":0.7,"reach":[{"min":[-33.959,-40.454,-15.065],"max":[43.961,37.466,99.605]}]}]}}

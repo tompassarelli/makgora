@@ -1,2 +1,0 @@
-[test]
-preload = ["./test/host-natives.ts", "./test/testCost.ts"]

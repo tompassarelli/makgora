@@ -1,1 +1,0 @@
-{"model":"Abilities\\Spells\\Orc\\Voodoo\\VoodooAuraTarget.mdx","facts":{"geosets":0,"triangles":0,"lights":0,"emitters":[{"kind":"particle","name":"BlizParticle04","whileShown":true,"onDeath":false,"visible":true,"rate":8,"lifespan":1.5,"reach":[{"min":[55.264,53.935,54.177],"max":[-52.336,-53.665,54.177]}]}]}}

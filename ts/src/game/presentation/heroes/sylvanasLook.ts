@@ -1,8 +1,0 @@
-import { SYLVANAS_CLIPS, SYLVANAS_FALLBACK_CLIP, SYLVANAS_PAIN_CLIPS } from "./sylvanasClips";
-import type { HeroLook } from "../model/look";
-
-export const sylvanasLook: HeroLook = {
-  model: "Units\\Undead\\EvilSylvanas\\EvilSylvanas.mdl", objectId: 0x6d667379,
-  portrait: "ReplaceableTextures\\CommandButtons\\BTNBansheeRanger.blp",
-  clips: SYLVANAS_CLIPS, fallback: SYLVANAS_FALLBACK_CLIP, damageClips: SYLVANAS_PAIN_CLIPS,
-};

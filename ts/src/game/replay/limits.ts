@@ -1,5 +1,0 @@
-
-export const REPLAY_HISTORY_CAPACITY = 64;
-
-
-export const REPLAY_MAX_CORRECTION_FRAMES = 24;
