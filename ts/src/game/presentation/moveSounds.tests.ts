@@ -113,7 +113,7 @@ const SWORD_HIT: { readonly [move: number]: string } = {
   [specialMove(0)]: "MetalHeavySliceFlesh", [specialMove(1)]: "MetalHeavySliceFlesh", [specialMove(2)]: "MetalMediumSliceFlesh", [specialMove(3)]: "WoodLightBashFlesh",
 };
 const PALADIN_PERFORM: { readonly [move: number]: string } = {
-  [specialMove(0)]: "DispelMagic", [specialMove(1)]: "DivineShield", [specialMove(2)]: "InnerFire", [specialMove(3)]: CONSECRATION_SOUND,
+  [specialMove(3)]: CONSECRATION_SOUND,
 };
 const CONSECRATION_VOLUME_BEFORE = 100;
 

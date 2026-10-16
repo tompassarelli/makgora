@@ -82,7 +82,7 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
   },
   [Character.forsakenPaladin]: {
     weapon: Weapon.blade, whoosh: false, strong: "MetalHeavySliceMetal",
-    specials: [s("DispelMagic", "MetalHeavySliceFlesh"), s("DivineShield", "MetalHeavySliceFlesh"), s("InnerFire", "MetalMediumSliceFlesh"), s(CONSECRATION_SOUND, "WoodLightBashFlesh", CONSECRATION_VOLUME)],
+    specials: [s(undefined, "MetalHeavySliceFlesh"), s(undefined, "MetalHeavySliceFlesh"), s(undefined, "MetalMediumSliceFlesh"), s(CONSECRATION_SOUND, "WoodLightBashFlesh", CONSECRATION_VOLUME)],
   },
   [Character.dreadlord]: {
     weapon: Weapon.claw, strong: "CarrionSwarmDamage",
