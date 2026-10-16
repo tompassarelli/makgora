@@ -4,12 +4,26 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
 import { PlayProblem } from "wisp/scripts/wisp/play";
-import { type WatchSteps, watchOnce } from "./tomBuildWatch";
+import { type WatchSteps, newestGreen, watchOnce } from "./tomBuildWatch";
 import { playableMapBuild } from "./wisp/currentPlaytest";
 import { PLAYTEST_PREFIX } from "./wisp/commands/play";
 import { PLAYABLE_FILE, PREDICT_COST, type Verdict, costPrediction, installName, landingDecision, verdictOf } from "./wisp/greenBuilds";
 
 const sha = (letter: string) => letter.repeat(40);
+
+test("recorded main runs select the green ancestor behind pending and cancelled tips without rolling back [k1 scenario]", () => {
+  const commits = [sha("a"), sha("b"), sha("c"), sha("d")];
+  const runs = [
+    { headSha: sha("a"), status: "in_progress", conclusion: "" },
+    { headSha: sha("b"), status: "completed", conclusion: "cancelled" },
+    { headSha: sha("c"), status: "completed", conclusion: "success" },
+    { headSha: sha("d"), status: "completed", conclusion: "success" },
+    { headSha: sha("e"), status: "completed", conclusion: "success" },
+  ];
+  expect(newestGreen(commits, runs, undefined)).toBe(sha("c"));
+  expect(newestGreen(commits, runs, sha("d"))).toBe(sha("c"));
+  for (const previous of [sha("a"), sha("b"), sha("c"), sha("e")]) expect(newestGreen(commits, runs, previous)).toBeUndefined();
+});
 
 test("tips landing during a build coalesce into one build of the newest, and no sha builds twice, across restarts and failures [k2 property]", async () => {
   const root = mkdtempSync(join(tmpdir(), "smashcraft-tom-build-"));
@@ -19,7 +33,7 @@ test("tips landing during a build coalesce into one build of the newest, and no 
     const built: string[] = [];
     const landing: Record<string, readonly string[]> = { [sha("a")]: [sha("b"), sha("c")] };
     const steps: WatchSteps<never> = {
-      tip: Effect.sync(() => remote),
+      tip: () => Effect.sync(() => remote),
       decision: () => Effect.succeed("build"),
       landedAt: () => Effect.succeed(0),
       notes: () => Effect.succeed("notes.md"),
@@ -68,7 +82,7 @@ test("a red commit is never built, a pending one waits and builds once its run s
     const noted: string[] = [];
     let current = sha("a");
     const steps: WatchSteps<never> = {
-      tip: Effect.sync(() => current),
+      tip: () => Effect.sync(() => current),
       decision: () => Effect.succeed(landingDecision(verdict)),
       landedAt: () => Effect.succeed(0),
       notes: (version, revision, previous) => Effect.sync(() => { noted.push(`${version} ${revision} ${previous}`); return "notes.md"; }),

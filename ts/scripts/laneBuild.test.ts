@@ -81,7 +81,7 @@ test("the main build that lands a lane removes that lane's map and no other [k2 
     let tip = "a".repeat(40);
     const ranges: (string | undefined)[] = [];
     const steps: WatchSteps<never> = {
-      tip: Effect.sync(() => tip),
+      tip: () => Effect.sync(() => tip),
       decision: () => Effect.succeed("build"),
       landedAt: () => Effect.succeed(0),
       notes: () => Effect.succeed("notes.md"),
