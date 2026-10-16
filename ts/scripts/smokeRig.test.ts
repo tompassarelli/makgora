@@ -1,4 +1,7 @@
-import { expect, test } from "bun:test";
+import { expect, test as bunTest } from "bun:test";
+import { steppedFrames } from "../src/game/match/frameCount";
+import { BUN_TEST_CEILING_FRAMES } from "./testCost";
+import { TEST_TIMEOUT_MS } from "./testWorkers";
 import { Action } from "../src/game/input/actions";
 import { keyFor, presetBindings, slotIndex } from "../src/game/input/keyBindings";
 import { Character } from "../src/game/sim/codes";
@@ -11,6 +14,14 @@ import { mapStalls } from "./wisp/mapStalls";
 import { rehearsal, rehearseSmoke, smokeApproaches } from "./wisp/smokeRehearsal";
 import { SMOKE_BINDINGS, bindingSweep, keyName, smokeSchedule, tapeFrames, xdotoolArgs } from "./wisp/smokeTape";
 import { type Settle, specialsReceipt, specialsSpot } from "./wisp/specialsSpot";
+
+const test = (name: string, run: () => void): void => {
+  bunTest(name, () => {
+    const start = steppedFrames.count;
+    run();
+    expect(steppedFrames.count - start).toBeLessThanOrEqual(BUN_TEST_CEILING_FRAMES);
+  }, TEST_TIMEOUT_MS);
+};
 
 test("the smoke tape starts every move, the ultimate included, and reaches every standard key for both fighters of a pair [k1 scenario]", () => {
   const verdict = rehearseSmoke(Character.rifleman, Character.demonHunter);
