@@ -275,34 +275,49 @@ export function sequenceErrors(source: mdx.Model, candidate: mdx.Model, indices:
 
 const PARALLEL_POSE_WORK = 2_000_000;
 
-function parallelSequenceErrors(source: mdx.Model, candidate: mdx.Model, workers: number): SequenceError[] {
+interface PoseChecker { readonly errors: (candidate: mdx.Model) => SequenceError[], readonly close: () => void }
+
+function workerChecker(source: mdx.Model, workers: number): PoseChecker {
     const samplesOf = sampleFrames(source), costs = source.Sequences.map(sequence => samplesOf(sequence).length);
     const bins: number[][] = Array.from({ length: workers }, () => []), load = new Array<number>(workers).fill(0);
     for (const index of costs.map((_, index) => index).sort((a, b) => at(costs, b) - at(costs, a) || a - b)) {
         const bin = load.indexOf(Math.min(...load));
         bins[bin]!.push(index); load[bin] = at(load, bin) + at(costs, index);
     }
-    const results = new SharedArrayBuffer(source.Sequences.length * 3 * 8), counts = new SharedArrayBuffer(source.Sequences.length * 2 * 4), status = new SharedArrayBuffer(8), done = new Int32Array(status);
     const threads = bins.filter(bin => bin.length > 0).map(indices => {
         const thread = new Worker(new URL('./poseErrorWorker.ts', import.meta.url).href);
-        thread.postMessage({ source, candidate, indices, results, counts, status });
-        return thread;
+        thread.postMessage({ source });
+        return { thread, indices };
     });
-    try {
-        while (Atomics.load(done, 0) + Atomics.load(done, 1) < threads.length) Atomics.wait(done, 0, Atomics.load(done, 0), 1000);
-    } finally {
-        for (const thread of threads) thread.terminate();
-    }
-    if (Atomics.load(done, 1) > 0) throw new Error('A pose error worker failed');
-    const values = new Float64Array(results), integers = new Int32Array(counts);
-    return source.Sequences.map((_, index) => ({ maxPosition: at(values, index * 3), maxRotationDegrees: at(values, index * 3 + 1), worstFrame: at(values, index * 3 + 2), samples: at(integers, index * 2), worstNode: at(integers, index * 2 + 1) }));
+    return {
+        errors: candidate => {
+            const results = new SharedArrayBuffer(source.Sequences.length * 3 * 8), counts = new SharedArrayBuffer(source.Sequences.length * 2 * 4), status = new SharedArrayBuffer(8), done = new Int32Array(status);
+            for (const { thread, indices } of threads) thread.postMessage({ candidate, indices, results, counts, status });
+            while (Atomics.load(done, 0) + Atomics.load(done, 1) < threads.length) Atomics.wait(done, 0, Atomics.load(done, 0), 1000);
+            if (Atomics.load(done, 1) > 0) throw new Error('A pose error worker failed');
+            const values = new Float64Array(results), integers = new Int32Array(counts);
+            return source.Sequences.map((_, index) => ({ maxPosition: at(values, index * 3), maxRotationDegrees: at(values, index * 3 + 1), worstFrame: at(values, index * 3 + 2), samples: at(integers, index * 2), worstNode: at(integers, index * 2 + 1) }));
+        },
+        close: () => { for (const { thread } of threads) thread.terminate(); },
+    };
 }
 
-export function poseError(source: mdx.Model, candidate: mdx.Model): { maxPosition: number, maxRotationDegrees: number, samples: number, worst: string } {
+function poseChecker(source: mdx.Model): PoseChecker {
     const nodes = source.Nodes.filter(node => node != null), samplesOf = sampleFrames(source);
     const work = source.Sequences.reduce((sum, sequence) => sum + samplesOf(sequence).length, 0) * nodes.length;
     const workers = Math.min(4, navigator.hardwareConcurrency, source.Sequences.length);
-    const errors = work >= PARALLEL_POSE_WORK && workers > 1 ? parallelSequenceErrors(source, candidate, workers) : sequenceErrors(source, candidate, source.Sequences.map((_, index) => index));
+    if (work >= PARALLEL_POSE_WORK && workers > 1) return workerChecker(source, workers);
+    return { errors: candidate => sequenceErrors(source, candidate, source.Sequences.map((_, index) => index)), close: () => {} };
+}
+
+export function poseError(source: mdx.Model, candidate: mdx.Model, checker?: PoseChecker): { maxPosition: number, maxRotationDegrees: number, samples: number, worst: string } {
+    const nodes = source.Nodes.filter(node => node != null), own = checker ?? poseChecker(source);
+    let errors: SequenceError[];
+    try {
+        errors = own.errors(candidate);
+    } finally {
+        if (checker === undefined) own.close();
+    }
     let maxPosition = 0, maxRotationDegrees = 0, samples = 0, worst = '';
     errors.forEach((error, index) => {
         if (error.maxPosition > maxPosition) worst = `${source.Sequences[index]!.Name} @${error.worstFrame} node ${nodes[error.worstNode]!.Name}`;
@@ -375,11 +390,15 @@ export function slopeTangents(source: mdx.Model): mdx.Model {
 }
 
 export function thinKeys(original: mdx.Model, bound: KeyBound = KEY_BOUND): { model: mdx.Model, report: KeyThinReport } {
-    const source = slopeTangents(original);
-    for (let scale = 0.5; scale > 0.01; scale *= 0.6) {
-        const model = thinned(source, bound, scale), error = poseError(source, model);
-        if (error.maxPosition <= bound.position && error.maxRotationDegrees <= bound.rotationDegrees)
-            return { model, report: { keysBefore: keyCount(source), keysAfter: keyCount(model), ...error } };
+    const source = slopeTangents(original), checker = poseChecker(source);
+    try {
+        for (let scale = 0.5; scale > 0.01; scale *= 0.6) {
+            const model = thinned(source, bound, scale), error = poseError(source, model, checker);
+            if (error.maxPosition <= bound.position && error.maxRotationDegrees <= bound.rotationDegrees)
+                return { model, report: { keysBefore: keyCount(source), keysAfter: keyCount(model), ...error } };
+        }
+    } finally {
+        checker.close();
     }
     return { model: structuredClone(source), report: { keysBefore: keyCount(source), keysAfter: keyCount(source), maxPosition: 0, maxRotationDegrees: 0, samples: 0, worst: '' } };
 }

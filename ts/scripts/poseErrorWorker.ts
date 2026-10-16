@@ -3,9 +3,18 @@ import { sequenceErrors } from './keyThin';
 
 declare const self: Worker;
 
-self.onmessage = (event: MessageEvent<{ source: mdx.Model, candidate: mdx.Model, indices: readonly number[], results: SharedArrayBuffer, counts: SharedArrayBuffer, status: SharedArrayBuffer }>) => {
-    const { source, candidate, indices, results, counts, status } = event.data, done = new Int32Array(status);
+type Check = { candidate: mdx.Model, indices: readonly number[], results: SharedArrayBuffer, counts: SharedArrayBuffer, status: SharedArrayBuffer };
+
+let source: mdx.Model | undefined;
+
+self.onmessage = (event: MessageEvent<{ source: mdx.Model } | Check>) => {
+    if ('source' in event.data) {
+        source = event.data.source;
+        return;
+    }
+    const { candidate, indices, results, counts, status } = event.data, done = new Int32Array(status);
     try {
+        if (source === undefined) throw new Error('A pose error worker got a candidate before its source');
         const values = new Float64Array(results), integers = new Int32Array(counts);
         sequenceErrors(source, candidate, indices).forEach((error, position) => {
             const index = indices[position]!;
