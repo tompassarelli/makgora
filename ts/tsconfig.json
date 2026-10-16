@@ -69,7 +69,8 @@
     "test/effect-visibility.test.ts",
     "test/native-harness.test.ts",
     "test/census-pairs.test.ts",
-    "test/dev-setup.test.ts"
+    "test/dev-setup.test.ts",
+    "test/native-plan.test.ts"
   ],
   "exclude": [
     "src/platform/**",

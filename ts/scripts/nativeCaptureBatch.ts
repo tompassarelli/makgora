@@ -1,8 +1,11 @@
-import { existsSync, mkdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { homedir } from "node:os";
 import { join } from "node:path";
 import { Effect, Exit, Fiber, Schema, Scope } from "effect";
 import { ChildProcess } from "effect/process";
 import { runProcess } from "./hostProcess";
+import { resolveTools, withRuntimeTools } from "./wisp/nativeTools";
+import { attachedPoolReady } from "./wisp/nativePool";
 
 class CaptureBatchFailure extends Schema.TaggedError<CaptureBatchFailure>()("CaptureBatchFailure", { problem: Schema.String }) {
   override get message(): string { return this.problem; }
@@ -16,13 +19,14 @@ const option = (args: readonly string[], name: string) => {
 const rowManifest = Schema.fromJsonString(Schema.Struct({ map: Schema.String, mapSha256: Schema.String, sourceRevision: Schema.String, fixtures: Schema.Array(Schema.Struct({ name: Schema.String, frames: Schema.Array(Schema.Finite), silhouette: Schema.optional(Schema.Struct({ slot: Schema.Finite, fighter: Schema.String, move: Schema.String, width: Schema.Finite, height: Schema.Finite })) })) }));
 const planSchema = Schema.fromJsonString(Schema.Struct({ version: Schema.Literals([1]), sourceRevision: Schema.String, rows: Schema.Array(Schema.Struct({ name: Schema.String, map: Schema.String, manifest: Schema.String, mapSha256: Schema.String, frames: Schema.Array(Schema.Finite) })) }));
 const checkpointSchema = Schema.Struct({ version: Schema.Literals([1]), mapSha256: Schema.String, sourceRevision: Schema.String, captures: Schema.Array(Schema.Struct({ fixture: Schema.String, frame: Schema.Finite, phase: Schema.String, file: Schema.String, width: Schema.Finite, height: Schema.Finite })) });
-const pairClientsSchema = Schema.fromJsonString(Schema.Struct({ tools: Schema.Struct({ xdotool: Schema.String }) }));
+const poolRecord = Schema.fromJsonString(Schema.Struct({ pairs: Schema.Array(Schema.Struct({ id: Schema.Int, runs: Schema.Struct({ a: Schema.String, b: Schema.String }) })) }));
+const lanState = join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/state"), "wisp/lan");
 const pairStatusSchema = Schema.Struct({
   clients: Schema.Array(Schema.Struct({ name: Schema.String, pid: Schema.optionalKey(Schema.Finite) })),
   game: Schema.optional(Schema.Struct({ phase: Schema.String, players: Schema.Array(Schema.Struct({ label: Schema.String, connected: Schema.Boolean })) })),
 });
 type PairStatus = typeof pairStatusSchema.Type;
-type PairPool = { readonly scope: Scope.Closeable; readonly child: Bun.Subprocess };
+type PairPool = { readonly scope: Scope.Closeable; readonly child: Bun.Subprocess | undefined };
 
 const tsDirectory = join(import.meta.dir, "..");
 const wispCommand = (args: readonly string[]) => runProcess(ChildProcess.make(process.execPath, ["scripts/wisp.ts", ...args], { cwd: tsDirectory }));
@@ -59,9 +63,10 @@ const stopPool = (child: Bun.Subprocess) => Effect.gen(function*() {
 
 const poolScope = (pair: number, desktop: string, capacity: string) => Effect.gen(function*() {
   const scope = yield* Scope.fork(yield* Effect.scope);
-  const child = yield* Effect.acquireRelease(
+  const existing = yield* pairStatus(pair).pipe(Effect.orElseSucceed(() => undefined));
+  const child = attachedPoolReady(existing) ? undefined : yield* Effect.acquireRelease(
     Effect.try({
-      try: () => Bun.spawn([process.execPath, "scripts/wisp.ts", "lan", "pool", "--pair", String(pair), "--pool-profile", "visual", "--desktop", desktop, "--capacity", capacity], { cwd: tsDirectory, stdin: "ignore", stdout: "inherit", stderr: "inherit" }),
+      try: () => Bun.spawn([process.execPath, "scripts/wisp.ts", "lan", "pool", "--foreground", "--pair", String(pair), "--pool-profile", "visual", "--desktop", desktop, "--capacity", capacity], { cwd: tsDirectory, stdin: "ignore", stdout: "inherit", stderr: "inherit" }),
       catch: cause => new CaptureBatchFailure({ problem: `start pair ${pair} pool: ${String(cause)}` }),
     }),
     stopPool,
@@ -69,7 +74,7 @@ const poolScope = (pair: number, desktop: string, capacity: string) => Effect.ge
   const deadline = Date.now() + 150_000;
   let ready: PairStatus | undefined;
   while (Date.now() < deadline) {
-    if (child.exitCode !== null) break;
+    if (child !== undefined && child.exitCode !== null) break;
     const status = yield* pairStatus(pair).pipe(Effect.result);
     if (status._tag === "Success" && status.success.clients.length === 2 && status.success.clients.every(client => client.pid !== undefined)) {
       ready = status.success;
@@ -81,23 +86,16 @@ const poolScope = (pair: number, desktop: string, capacity: string) => Effect.ge
     yield* Scope.close(scope, Exit.void);
     return yield* new CaptureBatchFailure({ problem: `pair ${pair} did not recover two running clients` });
   }
-  const pairClientsFile = join("/home/tom/.local/state/wisp/lan", `pair-${pair}`, "clients.json");
-  const pairClientsText = yield* Effect.try({ try: () => readFileSync(pairClientsFile, "utf8"), catch: cause => new CaptureBatchFailure({ problem: `read ${pairClientsFile}: ${String(cause)}` }) });
-  const pairClients = yield* Schema.decodeEffect(pairClientsSchema)(pairClientsText).pipe(Effect.mapError(cause => new CaptureBatchFailure({ problem: `decode ${pairClientsFile}: ${String(cause)}` })));
-  const desktops = yield* Effect.try({
-    try: () => {
-      const directory = join("/home/tom/.local/state/wisp/lan", `pair-${pair}`);
-      const desktopA = /^Run: (.+)$/m.exec(readFileSync(join(directory, "desktop-a.out"), "utf8"))?.[1];
-      const desktopB = readFileSync(join(directory, "desktop-b.run"), "utf8").trim();
-      if (desktopA === undefined || desktopB === "") throw new Error("private desktop run paths are missing");
-      return [desktopA, desktopB];
-    },
-    catch: cause => new CaptureBatchFailure({ problem: `read pair ${pair} private desktops: ${String(cause)}` }),
-  });
+  const tools = yield* resolveTools(["xdotool"]);
+  const poolText = yield* Effect.try({ try: () => readFileSync(join(lanState, "pool.json"), "utf8"), catch: cause => new CaptureBatchFailure({ problem: String(cause) }) });
+  const record = yield* Schema.decodeEffect(poolRecord)(poolText).pipe(Effect.mapError(cause => new CaptureBatchFailure({ problem: String(cause) })));
+  const entry = record.pairs.find(entry => entry.id === pair);
+  if (entry === undefined) return yield* new CaptureBatchFailure({ problem: "pair missing from pool.json" });
+  const desktops = [entry.runs.a, entry.runs.b];
   const windowDeadline = Date.now() + 120_000;
   let windowsReady = false;
-  while (Date.now() < windowDeadline && child.exitCode === null && !windowsReady) {
-    const checks = yield* Effect.forEach(desktops, run => clientWindowExists(pairClients.tools.xdotool, run), { concurrency: "unbounded" });
+  while (Date.now() < windowDeadline && (child === undefined || child.exitCode === null) && !windowsReady) {
+    const checks = yield* Effect.forEach(desktops, run => clientWindowExists(tools.xdotool ?? "xdotool", run), { concurrency: "unbounded" });
     windowsReady = checks.every(Boolean);
     if (!windowsReady) yield* Effect.sleep("2 seconds");
   }
@@ -122,7 +120,7 @@ const checkpointComplete = (out: string, row: { readonly name: string; readonly 
 const monitorDrop = (pair: number, pool: PairPool, row: { readonly name: string; readonly mapSha256: string; readonly frames: readonly number[] }, sourceRevision: string, out: string, double: boolean) => Effect.gen(function*() {
   while (true) {
     yield* Effect.sleep("2 seconds");
-    if (pool.child.exitCode !== null) return `pair ${pair} pool exited`;
+    if (pool.child !== undefined && pool.child.exitCode !== null) return `pair ${pair} pool exited`;
     const status = yield* pairStatus(pair).pipe(Effect.result);
     if (status._tag === "Failure") return `pair ${pair} status failed: ${String(status.failure)}`;
     if (status.success.clients.length !== 2 || status.success.clients.some(client => client.pid === undefined)) return `pair ${pair} has a dropped client process`;
@@ -175,6 +173,9 @@ export const nativeCaptureBatch = (args: readonly string[]) => Effect.scoped(Eff
   const planText = yield* Effect.try({ try: () => readFileSync(planPath, "utf8"), catch: cause => new CaptureBatchFailure({ problem: `read ${planPath}: ${String(cause)}` }) });
   const plan = yield* Schema.decodeEffect(planSchema)(planText).pipe(Effect.mapError(cause => new CaptureBatchFailure({ problem: `decode ${planPath}: ${String(cause)}` })));
   yield* Effect.try({ try: () => mkdirSync(out, { recursive: true }), catch: cause => new CaptureBatchFailure({ problem: `create ${out}: ${String(cause)}` }) });
+  const tools = yield* resolveTools();
+  const runtimeClients = join(out, "runtime-clients.json");
+  yield* Effect.try({ try: () => writeFileSync(runtimeClients, withRuntimeTools(readFileSync(clientsFile, "utf8"), tools)), catch: cause => new CaptureBatchFailure({ problem: String(cause) }) });
   let pool = yield* poolScope(pair, desktop, capacity);
   let completed = 0;
   for (const row of plan.rows) {
@@ -190,7 +191,7 @@ export const nativeCaptureBatch = (args: readonly string[]) => Effect.scoped(Eff
     let finished = false;
     let lastReason = "capture incomplete";
     for (let attempt = 1; attempt <= 4 && !finished; attempt++) {
-      const result = yield* runChunk({ pair, pool, row, out, sourceRevision: plan.sourceRevision, clientsFile, client, install, build, minutes }).pipe(Effect.result);
+      const result = yield* runChunk({ pair, pool, row, out, sourceRevision: plan.sourceRevision, clientsFile: runtimeClients, client, install, build, minutes }).pipe(Effect.result);
       if (result._tag === "Success" && result.success.kind === "complete" && (yield* chunkComplete(out, row, plan.sourceRevision, double))) {
         finished = true;
         completed++;
@@ -204,7 +205,7 @@ export const nativeCaptureBatch = (args: readonly string[]) => Effect.scoped(Eff
     }
     if (!finished) return yield* new CaptureBatchFailure({ problem: `${row.name}: exhausted four capture attempts: ${lastReason}` });
   }
-  yield* wispCommand(["lan", "end", "--pair", String(pair)]).pipe(Effect.ignore);
+  if (pool.child !== undefined) yield* wispCommand(["lan", "end", "--pair", String(pair)]).pipe(Effect.ignore);
   yield* closePool(pool);
   console.log(`batch complete: ${completed}/${plan.rows.length} rows`);
 }));

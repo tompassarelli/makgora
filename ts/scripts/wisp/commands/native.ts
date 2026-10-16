@@ -14,7 +14,7 @@ const read = (path: string) => attempt(() => readFileSync(path, "utf8"));
 const save = (path: string, value: unknown) => attempt(() => { mkdirSync(resolve(path, ".."), { recursive: true }); writeFileSync(path, `${JSON.stringify(value, null, 2)}\n`); });
 const Config = Schema.Struct({ helper: Schema.optional(Schema.String), desktop: Schema.optional(Schema.String), capacity: Schema.optional(Schema.String), install: Schema.optional(Schema.String), client: Schema.optional(Schema.String) });
 const Pool = Schema.Struct({ pairs: Schema.Array(Schema.Struct({ id: Schema.Int })) });
-const Manifest = Schema.Struct({ map: Schema.String, mapSha256: Schema.String, sourceRevision: Schema.String, fixtures: Schema.Array(Schema.Struct({ name: Schema.String, frames: Schema.Array(Schema.Finite) })) });
+const Manifest = Schema.Struct({ map: Schema.String, mapSha256: Schema.String, sourceRevision: Schema.String, fixtures: Schema.Array(Schema.Struct({ name: Schema.String, frames: Schema.Array(Schema.Finite), silhouette: Schema.optional(Schema.Struct({ slot: Schema.Finite, fighter: Schema.String, move: Schema.String, width: Schema.Finite, height: Schema.Finite })), reel: Schema.optional(Schema.Struct({ fighter: Schema.String, row: Schema.String, slot: Schema.String, facing: Schema.Literals(["right", "left"]) })) })) });
 const RunRow = Schema.Struct({ id: Schema.String, identity: Schema.String, start: Schema.String, end: Schema.String, pairs: Schema.Array(Schema.Int), scripts: Schema.Array(Schema.String), verdict: Schema.String, evidence: Schema.Record(Schema.String, Schema.Array(Schema.String)) });
 const Run = Schema.Struct({ batches: Schema.Array(RunRow) });
 const decodePlan = (text: string) => Schema.decodeEffect(Schema.fromJsonString(Plan))(text);
@@ -89,9 +89,10 @@ export const native: Command = args => Effect.scoped(Effect.gen(function*() {
             if (source.map !== batch.map || revision !== undefined && revision !== source.sourceRevision) return yield* new UsageFailure({ problem: "capture manifests disagree with batch map or revision" });
             revision = source.sourceRevision;
             for (const [fixtureIndex, fixture] of source.fixtures.entries()) {
-              const name = `${scriptIndex}-${fixtureIndex}-${fixture.name}`;
-              const manifest = join(dir, `${name}.json`);
-              yield* save(manifest, { ...source, fixtures: [{ ...fixture, name }] });
+              const name = fixture.name;
+              if (rows.some(row => row.name === name)) return yield* new UsageFailure({ problem: `duplicate capture fixture ${name}` });
+              const manifest = join(dir, `${scriptIndex}-${fixtureIndex}.json`);
+              yield* save(manifest, { ...source, fixtures: [fixture] });
               rows.push({ ...fixture, name, map: source.map, mapSha256: source.mapSha256, manifest });
             }
           }
