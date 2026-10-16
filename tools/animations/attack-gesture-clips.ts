@@ -18,6 +18,7 @@ import { seconds } from "./asset-info";
 import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
 import { fighters } from "../../ts/scripts/heroModelSource";
 import { attackGestureBaseModel } from "./recovery-model";
+import { removeAttackSequence, selectedAttackPose } from "./remove-attack-sequence";
 
 const PLAN: Readonly<Record<number, readonly HeroPose[]>> = {
   2: ["jab3"],
@@ -399,7 +400,7 @@ function floorSolve(model: mdx.Model, data: { frame: number; nodes: { matrix: Fl
 
 const [inputArg,outputArg,...options]=process.argv.slice(2),input=resolve(inputArg??""),output=resolve(outputArg??""),project=resolve(import.meta.dir,"../..");
 const only=options[0]==="--character"?Number(options[1]):undefined;
-const selectedPose = options.includes("--pose") ? options[options.indexOf("--pose") + 1] as HeroPose : undefined;
+const { pose: selectedPose, replace: replacePose } = selectedAttackPose(options) as { readonly pose: HeroPose | undefined; readonly replace: boolean };
 ensure(selectedPose === undefined || only !== undefined, "--pose requires --character");
 ensure(input&&output&&relative(project,output).startsWith(".."),"usage: bun tools/animations/attack-gesture-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT");
 mkdirSync(output,{recursive:true});
@@ -418,8 +419,10 @@ for(const [id,poses]of Object.entries(PLAN)) {
 
   const published=parseSource(await Bun.file(join(input,f.source)).arrayBuffer()),base=selectedPose ? undefined : attackGestureBaseModel(published);
   const source=base?parseSource(generateMDX(base)):published;
+  const existingPoseIndex = selectedPose === undefined ? -1 : source.Sequences.findIndex(s=>s.Name === `Attack Gesture ${selectedPose}`);
+  ensure(selectedPose === undefined || (replacePose ? existingPoseIndex >= 0 : existingPoseIndex < 0), `${f.name}: selected gesture ${replacePose ? "is missing" : "already exists"}`);
+  if (replacePose) removeAttackSequence(source, `Attack Gesture ${selectedPose}`);
   ensure(selectedPose !== undefined || !source.Sequences.some(s=>s.Name.startsWith("Attack Gesture ")),`${f.name}: input already has roster gestures`);
-  ensure(selectedPose === undefined || !source.Sequences.some(s=>s.Name === `Attack Gesture ${selectedPose}`), `${f.name}: selected gesture already exists`);
   const model=structuredClone(source),stand=source.Sequences.find(s=>/^stand ready$/i.test(s.Name))??source.Sequences.find(s=>/^stand(?:\s*-?\s*1)?$/i.test(s.Name));
   ensure(stand,`${f.name}: missing stand`);
   const before=new DrawnModel(generateMDX(source),1),originals=new Map<string,mdx.AnimVector>(); tracks(source,(t,p)=>originals.set(p,t));
@@ -436,7 +439,10 @@ for(const [id,poses]of Object.entries(PLAN)) {
   }
   let cursor=Math.max(...source.Sequences.map(s=>s.Interval[1]))+100;
   const drawnFrames=[];bindings.push(`  ${id}: {`);
-  if (selectedPose) for (const [pose,clip] of Object.entries(ROSTER_ATTACK_CLIPS[only as keyof typeof ROSTER_ATTACK_CLIPS])) if (pose !== selectedPose) bindings.push(`    ${pose}: { index: ${clip.index}, seconds: ${seconds(authoredSeconds(clip.seconds))}${"aligned" in clip && clip.aligned ? ", aligned: true" : ""} },`);
+  if (selectedPose) for (const [pose,clip] of Object.entries(ROSTER_ATTACK_CLIPS[only as keyof typeof ROSTER_ATTACK_CLIPS])) if (pose !== selectedPose) {
+    const index = source.Sequences.findIndex(sequence => sequence.Name === `Attack Gesture ${pose}`);
+    bindings.push(`    ${pose}: { index: ${index < 0 ? clip.index : index}, seconds: ${seconds(authoredSeconds(clip.seconds))}${"aligned" in clip && clip.aligned ? ", aligned: true" : ""} },`);
+  }
   for(const pose of poses) {
     if (selectedPose && pose !== selectedPose) continue;
     const special=pose==="ultimate"?FIGHTER_ULTIMATES[character]:pose==="downSpecial"?heroDefinition(character)?.specials?.down.ground:pose==="neutralSpecial"?heroDefinition(character)?.specials?.neutral.ground:pose==="sideSpecial"?heroDefinition(character)?.specials?.side.ground:undefined;
@@ -486,7 +492,7 @@ for(const [id,poses]of Object.entries(PLAN)) {
   }
   const target=join(output,f.source);mkdirSync(dirname(target),{recursive:true});await Bun.write(target,bytes);chmodSync(target,0o644);
   await Bun.write(join(output,`${f.name}-attack-gestures.png`),sheet(f.name,new DrawnModel(bytes,characterModelScale(character)),drawnFrames,6).png);
-  console.log(`ATTACK_GESTURES_PASS ${f.name}: ${poses.length} gestures, ${source.Sequences.length} old clips preserved`);
+  console.log(`ATTACK_GESTURES_PASS ${f.name}: ${poses.length} gestures, ${source.Sequences.length} source clips preserved${replacePose?", selected clip replaced":""}`);
 }
 
 function byFighter(lines:readonly string[]):string[]{const blocks:string[][]=[];for(const line of lines){if(/^  \d+: \{$/.test(line))blocks.push([]);blocks.at(-1)?.push(line);}return blocks.sort((a,b)=>parseInt(a[0]??"")-parseInt(b[0]??"")).flat();}
