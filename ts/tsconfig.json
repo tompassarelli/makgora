@@ -65,7 +65,8 @@
     "test/text-match.test.ts",
     "test/warden-spin.test.ts",
     "test/effect-visibility.test.ts",
-    "test/native-harness.test.ts"
+    "test/native-harness.test.ts",
+    "test/census-pairs.test.ts"
   ],
   "exclude": [
     "src/platform/**",

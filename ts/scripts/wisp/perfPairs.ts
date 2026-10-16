@@ -9,6 +9,9 @@ export interface PairWorst {
 
 export const PAIR_MARGIN = 0.1;
 
+// A bundle change that leaves a frame's code alone still moves its allocation, by up to 9.3 KB on smashcraft#26's replays, so smaller rises are not attributable.
+export const ALLOCATION_JITTER_KB = 10;
+
 const LINE = /^pair\t([^\t]+)\tinstructions=(\d+)\talloc-kb=(\d+(?:\.\d+)?)$/;
 
 export const pairText = (pairs: readonly PairWorst[]): string =>
@@ -24,7 +27,7 @@ export function parsePairs(text: string): PairWorst[] {
   });
 }
 
-// Names every pair of `run` whose worst frame rises more than `margin` over the fixture's, and every
+// Names every pair of `run` whose worst frame rises more than `margin` (and, for allocation, the jitter) over the fixture's, and every
 // pair the fixture lacks; pairs the run did not measure are not judged.
 export function comparePairs(fixture: readonly PairWorst[], run: readonly PairWorst[], margin = PAIR_MARGIN): string[] {
   const known = new Map(fixture.map((row) => [row.pair, row]));
@@ -34,7 +37,7 @@ export function comparePairs(fixture: readonly PairWorst[], run: readonly PairWo
     if (before === undefined) return [`${row.pair} has no fixture row`];
     const problems: string[] = [];
     if (row.instructions > before.instructions * (1 + margin)) problems.push(`${row.pair} worst-frame instructions ${before.instructions} -> ${row.instructions} (${percent(before.instructions, row.instructions)})`);
-    if (row.allocatedKb > before.allocatedKb * (1 + margin)) problems.push(`${row.pair} worst-frame allocation ${before.allocatedKb.toFixed(1)} -> ${row.allocatedKb.toFixed(1)} KB (${percent(before.allocatedKb, row.allocatedKb)})`);
+    if (row.allocatedKb > Math.max(before.allocatedKb * (1 + margin), before.allocatedKb + ALLOCATION_JITTER_KB)) problems.push(`${row.pair} worst-frame allocation ${before.allocatedKb.toFixed(1)} -> ${row.allocatedKb.toFixed(1)} KB (${percent(before.allocatedKb, row.allocatedKb)})`);
     return problems;
   });
 }
