@@ -8,7 +8,7 @@ import { ModelRenderer, model as mdx } from 'war3-model';
 import { JITTER_LIMITS, JITTER_SPAN_MS, segmentExcess } from './wisp/animJitter';
 
 
-export const KEY_BOUND = { position: 0.5, rotationDegrees: 0.5, tangents: 'slope' } as const;
+export const KEY_BOUND = { position: 0.5, rotationDegrees: 0.5, tangents: 'slope-jitter' } as const;
 export type KeyBound = { readonly position: number, readonly rotationDegrees: number };
 
 export interface KeyThinReport {

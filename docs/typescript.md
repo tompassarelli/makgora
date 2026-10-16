@@ -743,7 +743,9 @@ fighter's static light and their evidence to `--out` outside the checkout, and
 writes each exported fighter's own smashcraft:ts/src/generated/clips/<slug>.ts (its
 index changes only when a fighter is added); with `--metadata-only` it checks retained clips against the current sources and
 writes only those files; with `--keep-unchanged` it keeps `--out`'s retained
-clips for fighters whose source is unchanged and exports the rest. Heroes'
+clips for fighters whose source and key bound (smashcraft:ts/scripts/keyThin.ts KEY_BOUND) are unchanged and
+exports the rest; a change to thinKeys renames KEY_BOUND's tangent policy, or the kept
+clips no longer match what timeline-models makes. Heroes'
 sources are their stock classic models under `--assets`'s hero-models, which
 `--extractor CASC_EXTRACT --storage WARCRAFT_DIR` extracts when missing; a
 track on a global animation clock (the heroes' blinks) keeps all its keys. smashcraft:tools/animations/export-model-sounds.ts
