@@ -15,14 +15,16 @@ const HERO_GLOW_FLOOR_AREA = 2000;
 
 // A fighter drawn as a special effect shows its hero glow's floor quads as white planes, while weapon team glow keeps its colour (#477, smashcraft#3).
 export function heroGlowGeosets(model: mdx.Model): Set<number> {
-    return new Set([...teamGlowGeosets(model)].filter(index => {
-        const { Vertices: vertices, Faces: faces } = model.Geosets[index];
-        for (let face = 0; face < faces.length; face += 3) {
-            const [a, b, c] = [faces[face], faces[face + 1], faces[face + 2]].map(vertex => vertex * 3);
-            const floorArea = Math.abs((vertices[b] - vertices[a]) * (vertices[c + 1] - vertices[a + 1]) - (vertices[c] - vertices[a]) * (vertices[b + 1] - vertices[a + 1])) / 2;
-            if (floorArea >= HERO_GLOW_FLOOR_AREA) return true;
+    const glow = teamGlowGeosets(model);
+    return new Set(model.Geosets.flatMap((geoset, index) => {
+        if (!glow.has(index)) return [];
+        const vertex = (corner: number, axis: number) => geoset.Vertices[corner * 3 + axis] ?? 0;
+        for (let face = 0; face < geoset.Faces.length; face += 3) {
+            const [a, b, c] = [0, 1, 2].map(offset => geoset.Faces[face + offset] ?? 0) as [number, number, number];
+            const floorArea = Math.abs((vertex(b, 0) - vertex(a, 0)) * (vertex(c, 1) - vertex(a, 1)) - (vertex(c, 0) - vertex(a, 0)) * (vertex(b, 1) - vertex(a, 1))) / 2;
+            if (floorArea >= HERO_GLOW_FLOOR_AREA) return [index];
         }
-        return false;
+        return [];
     }));
 }
 
