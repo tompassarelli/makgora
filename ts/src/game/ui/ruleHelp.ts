@@ -13,7 +13,7 @@ export const RULE_HELP_HEIGHT = f32(0.046);
 const ITEM_SECONDS = ITEM_BUFF_FRAMES / 60;
 
 const MATCH_HELP = {
-  teamBattle: "Team Battle: choose each fighter’s red, blue, green or yellow team. At least two teams must join; the last team standing wins.",
+  teamBattle: "Team Battle: choose each fighter’s red, blue, teal or purple team. At least two teams must join; the last team standing wins.",
   fewerStocks: "Stocks: how many times each fighter can be knocked off the stage before they lose.",
   moreStocks: "Stocks: how many times each fighter can be knocked off the stage before they lose.",
   lessTime: "Time limit: the match ends when it runs out. Lower it to “No time limit” to play until stocks run out.",

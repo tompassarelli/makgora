@@ -357,7 +357,7 @@ export class SelectionPanel {
       const teamArea = teamSettingsBox(slot);
       const team = hotspot(root, teamArea.x, teamArea.y, teamArea.width, teamArea.height);
       this.clicks.add(team, { kind: "team", slot }, undefined, "native");
-      const teamLabel = label(team, `MeleeTeam${name}`, teamArea.x, f32(0.267), teamArea.width, f32(0.019), f32(0.01));
+      const teamLabel = label(root, `MeleeTeam${name}`, teamArea.x, f32(0.267), teamArea.width, f32(0.019), f32(0.01));
       const portrait = art(root, `MeleePortrait${name}`, portraitTexture(Character.demonHunter, false, slot), x + f32(0.029), f32(0.245), f32(0.102), f32(0.102));
       const name_ = label(root, `MeleeName${name}`, x + f32(0.008), f32(0.102), f32(0.144), f32(0.019), f32(0.011));
       const wins = createSessionWinsFrames(root, name, f32(x + f32(0.054)), BOTTOM_BAR_TOP);
@@ -909,8 +909,7 @@ export class SelectionPanel {
       const choice = characterFor(game, slot);
       const teamsShown = game.teamBattle && active;
       const color = teamsShown ? teamColor(game.teamChoices[slot]) : slotColor(slot);
-      BlzFrameSetTexture(frames.card, `war3mapImported\\SelectionCard${teamsShown ? "Gray" : active ? color.name : "Gray"}.tga`, 0, true);
-      BlzFrameSetVertexColor(frames.card, teamsShown ? color.rgb | -16777216 : -1);
+      BlzFrameSetTexture(frames.card, `war3mapImported\\SelectionCard${active ? color.name : "Gray"}.tga`, 0, true);
       BlzFrameSetVisible(frames.team, teamsShown);
       BlzFrameSetVisible(frames.teamLabel, teamsShown);
       BlzFrameSetEnable(frames.team, teamsShown && (slot === participantId && human || canChooseComputer(game, participantId, slot)));

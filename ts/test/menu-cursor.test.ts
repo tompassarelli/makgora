@@ -10,6 +10,8 @@ import { cellRect, rosterGrid } from "../src/game/menu/selectionGrid";
 import { cardX } from "../src/game/menu/selectionDrag";
 import { PLAYABLE_CHARACTERS } from "../src/game/sim/heroes/registry";
 import { START_BUTTON } from "../src/game/ui/selectionLayout";
+import { RULE_BUTTONS } from "../src/game/ui/ruleButtons";
+import { TEAM_NAMES } from "../src/game/sim/teams";
 import { pixelX, pixelY } from "../src/game/menu/pointer";
 import { f32 } from "wisp/src/sim/f32";
 
@@ -260,6 +262,34 @@ test("every character card's Player, CPU or Empty label is centred over its card
       const [tagLeft, , tagRight] = tag.rectangle!;
       const [cardLeft, , cardRight] = card!.rectangle!;
       expect((tagLeft + tagRight) / 2, tag.name).toBeCloseTo((cardLeft + cardRight) / 2, 3);
+    }
+    expect(client.errors).toEqual([]);
+  }
+});
+
+test("with Team Battle on every fighting card wears its team's colour and shows its team name [k1 scenario]", () => {
+  const { clients } = menu();
+  const rule = RULE_BUTTONS.teamBattle;
+  expect(clients.click(0, f32(rule.x + rule.width / 2), f32(rule.y - rule.height / 2))).toBe(true);
+  clients.frames(4);
+  for (const client of clients.clients) {
+    let teams: number[] = [];
+    client.run(() => { teams = [...shell().game.teamChoices]; expect(shell().game.teamBattle).toBe(true); });
+    const all = client.frames.snapshot();
+    const byId = new Map(all.map(frame => [frame.handle.id, frame]));
+    const shown = (id: number | undefined): boolean => {
+      for (let frame = id === undefined ? undefined : byId.get(id); frame !== undefined; frame = frame.parentId === undefined ? undefined : byId.get(frame.parentId)) {
+        if (!frame.visible || frame.alpha <= 0) return false;
+      }
+      return true;
+    };
+    for (const slot of [0, 1]) {
+      const team = TEAM_NAMES[teams[slot]!]!;
+      const card = all.find(frame => frame.name === `MeleeCard${client.slot}_${slot}`)!;
+      const label = all.find(frame => frame.name === `MeleeTeam${client.slot}_${slot}`)!;
+      expect(card.texture, `card ${slot}`).toBe(`war3mapImported\\SelectionCard${team}.tga`);
+      expect(shown(label.handle.id), `team label ${slot}`).toBe(true);
+      expect(label.text.replace("> ", "")).toBe(team);
     }
     expect(client.errors).toEqual([]);
   }

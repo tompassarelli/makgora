@@ -41,5 +41,5 @@ export function slotColor(slot: number): PlayerColor {
 }
 
 export function teamColor(team: Team): PlayerColor {
-  return slotColor(team === 2 ? 6 : team === 3 ? 4 : team);
+  return slotColor(team);
 }
