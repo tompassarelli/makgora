@@ -18,3 +18,8 @@
 670 a release VIEW
 #! expect a 65 applied jump 1 double 0 z 24.600
 #! expect a 207 applied jump 2 double 0 z 24.600
+#! expect a 65-85 platform mount deck 1
+#! absent a 68-104 platform drop deck 1
+#! expect a 125 platform drop deck 1
+#! expect a 207-225 platform mount deck 1
+#! expect a 265 platform drop deck 1
