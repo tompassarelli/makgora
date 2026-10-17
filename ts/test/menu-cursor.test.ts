@@ -347,3 +347,27 @@ test("the controls screen clicks through invisible plain buttons, never Warcraft
   }
   for (const client of clients.clients) expect(client.errors).toEqual([]);
 });
+
+test("the results screen shows Warcraft's own cursor and a click on each choice selects it [k1 scenario]", () => {
+  const { clients, watches } = menu();
+  for (const client of clients.clients) client.run(() => {
+    const s = shell();
+    s.game.phase = Phase.result;
+    s.game.matchFrame = 600;
+    s.game.characterReadiness[0] = true;
+    s.game.characterReadiness[1] = true;
+    s.ui?.results.show([{ slot: 0, winner: true, text: "P1" }, { slot: 1, winner: false, text: "P2" }]);
+  });
+  clients.frames(5);
+  for (const seen of watches) expect(seen.cursor.at(-1)).toBe(true);
+  const y = f32(CHOICE_TOP - CHOICE_HEIGHT / 2);
+  for (const pick of [ResultPick.rematch, ResultPick.newStage, ResultPick.characters]) {
+    const x = f32(choiceLeft(pick) + BUTTON_WIDTH / 2);
+    expect(clients.click(0, x, y)).toBe(true);
+    clients.frames(2);
+    let focus: number | undefined;
+    clients.client(0).run(() => { focus = shell().resultFocus?.[0]; });
+    expect(focus).toBe(pick);
+  }
+  for (const client of clients.clients) expect(client.errors).toEqual([]);
+});
