@@ -30,7 +30,7 @@ const alternating = (low: Arms): readonly Beat[] => [
     { frame: 90, arms: 'rest', chest: 0, head: 0, hop: 0 },
 ];
 const PUMPS: Readonly<Record<number, { readonly low: Arms; readonly hop: number }>> = {
-    [Character.warden]: { low: 'pumped', hop: 1 }, [Character.lich]: { low: 'pumped', hop: 1 }, [Character.sylvanas]: { low: 'pumped', hop: 0.4 }, [Character.tinker]: { low: 'pumped', hop: 1 },
+    [Character.lich]: { low: 'pumped', hop: 1 }, [Character.tinker]: { low: 'pumped', hop: 1 },
     [Character.shadowHunter]: { low: 'pumped', hop: 1 }, [Character.chen]: { low: 'pumped', hop: 1 }, [Character.kobold]: { low: 'pumped', hop: 1 },
 };
 const BOUNCE: Readonly<Record<number, Readonly<Record<number, number>>>> = {
