@@ -635,7 +635,7 @@ From smashcraft:ts/:
   the numeric corpus, in that stock Lua32 and in one whose raw float `+ - *`
   round toward zero. `LUA` and `TOWARD_ZERO_LUA` name them; unset, each is
   Wisp's pinned build, made once per user in ~/.cache/wisp/lua32
-  (wisp:scripts/wisp/lua32.ts). The corpus includes `f32(a + b)`, `f32(a - b)` and `f32(a * b)`
+  (wisp:host/compile/lua32.ts). The corpus includes `f32(a + b)`, `f32(a - b)` and `f32(a * b)`
   as the compiler emits them.
 - `GAME_SOAK=1 bun test test/game.test.ts`: the long `*.soak.ts` scenarios,
   such as the 100000-frame replay tape, which the default suite leaves out.

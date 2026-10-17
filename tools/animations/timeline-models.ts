@@ -8,7 +8,7 @@ import { thinnedModel } from './thinned-source';
 import { authoredMotion, fighterBodies, playedMoves } from './hd-models';
 import { FIGHTER_RIGS } from './hd-rigs';
 import { canonicalMotion } from './canonical-rig';
-import { modelFacts } from '../../ts/node_modules/wisp/scripts/wisp/models';
+import { modelFacts } from '../../ts/node_modules/wisp/host/models/models';
 import { replaceModelFacts, writeGenerated } from '../../ts/scripts/wisp/modelFactsTable';
 import { DrawnModel } from '../../ts/scripts/wisp/drawnModel';
 import { renderAssetStore } from '../../ts/scripts/wisp/renderAssetStore';

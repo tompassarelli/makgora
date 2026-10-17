@@ -2,7 +2,7 @@
 // one fighter rewrites only that file, and a small index lists the fighters and changes only when one gains a file.
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import type { ModelFacts } from '../../ts/node_modules/wisp/scripts/wisp/models';
+import type { ModelFacts } from '../../ts/node_modules/wisp/host/models/models';
 import { fighterArt } from '../../ts/src/generated/fighterArtData';
 
 const ts = resolve(import.meta.dir, '../../ts');

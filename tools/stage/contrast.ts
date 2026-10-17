@@ -1,5 +1,5 @@
 import { $ } from "bun";
-import { decodePpm, type Frame } from "../../ts/node_modules/wisp/scripts/wisp/frameProbe";
+import { decodePpm, type Frame } from "../../ts/node_modules/wisp/host/scene/frameProbe";
 
 async function load(path: string): Promise<Frame> {
   const native = decodePpm(await Bun.file(path).bytes());
@@ -88,8 +88,8 @@ async function stockLightCheck(args: readonly string[]): Promise<number> {
   const named = (rest[0] === "--out" ? rest.slice(2) : rest).map(Number);
   const scale = half ? 2 : 1;
   const { Effect } = await import("../../ts/node_modules/effect/dist/index.js");
-  const { installHeadless } = await import("../../ts/node_modules/wisp/scripts/wisp/headless");
-  const { captureScene, renderScenes } = await import("../../ts/node_modules/wisp/scripts/wisp/headlessRender");
+  const { installHeadless } = await import("../../ts/node_modules/wisp/host/headless/headless");
+  const { captureScene, renderScenes } = await import("../../ts/node_modules/wisp/host/render/headlessRender");
   const { SMASHCRAFT_HEADLESS } = await import("../../ts/scripts/wisp/headless");
   const { headlessRender } = await import("../../ts/scripts/wisp/headlessRender");
   const { start, install } = await import("../../ts/src/host/entries/devMain");

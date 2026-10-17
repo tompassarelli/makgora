@@ -42,7 +42,7 @@ let archive: string;
     yield* run(["git", "-C", gitSource, "archive", "--format=tar", `--output=${sourceArchive}`, revision]);
     yield* run(["tar", "-xf", sourceArchive, "-C", source]);
     yield* run([process.execPath, "install", "--frozen-lockfile"], source);
-    yield* run([process.execPath, "scripts/package.ts", resolve(project, archive)], source);
+    yield* run([process.execPath, "host/toolchain/package.ts", resolve(project, archive)], source);
   }
 }
 const packagePath = resolve(project, "package.json");

@@ -9,7 +9,7 @@ import { stagePointLightMdl, stagePointLightModelFile } from "../../ts/scripts/s
 import { packageLiquids } from "./liquids";
 import { packageSkies } from "./skies";
 import { platformDeckFaces, texturedDeckMdl } from "../../ts/scripts/stageMaterials";
-import { modelFacts } from "../../ts/node_modules/wisp/scripts/wisp/models";
+import { modelFacts } from "../../ts/node_modules/wisp/host/models/models";
 import { MODEL_FACTS } from "../../ts/scripts/wisp/modelFacts";
 import { roundedFacts, writeModelFacts } from "../../ts/scripts/wisp/modelFactsTable";
 

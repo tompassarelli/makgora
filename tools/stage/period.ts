@@ -1,4 +1,4 @@
-import { decodePpm, type Frame } from "../../ts/node_modules/wisp/scripts/wisp/frameProbe";
+import { decodePpm, type Frame } from "../../ts/node_modules/wisp/host/scene/frameProbe";
 
 type Box = readonly [x0: number, y0: number, x1: number, y1: number];
 type Columns = readonly [x0: number, x1: number];

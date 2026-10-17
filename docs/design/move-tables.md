@@ -401,13 +401,13 @@ From `ts/`:
 
 ```sh
 bun install
-LUA=$(bun node_modules/wisp/scripts/wisp/lua32.ts stock)   # builds the stock Lua32
+LUA=$(bun node_modules/wisp/host/compile/lua32.ts stock)   # builds the stock Lua32
 LUA=$LUA bun wisp perf playable-bot-four                    # whole-frame instructions and KB
 LUA=$LUA bun wisp perf census --fighter rifleman --functions
 LUA=$LUA bun wisp perf census --fighter chen-stormstout --functions
 LUA=$LUA bun wisp perf census --fighter mountain-king --functions
 LUA=$LUA bun wisp perf bot-mountain-king --samples          # a whole match with Mountain King
-LUA=$LUA TOWARD_ZERO_LUA=$(bun node_modules/wisp/scripts/wisp/lua32.ts toward-zero) bun wisp parity tapes
+LUA=$LUA TOWARD_ZERO_LUA=$(bun node_modules/wisp/host/compile/lua32.ts toward-zero) bun wisp parity tapes
 # locals and instructions per module: a 32-bit luac (make posix MYCFLAGS=-DLUA_32BITS
 # in the same Lua 5.3.6 source) listing build/perf.lua
 luac -p -l build/perf.lua

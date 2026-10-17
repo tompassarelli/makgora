@@ -73,7 +73,7 @@ had earlier high-watermark events.
 
 ## LAN pool profiles
 
-`bun wisp lan pool --pool-profile parity|visual` (wisp:scripts/wisp/lan/pool.ts
+`bun wisp lan pool --pool-profile parity|visual` (wisp:host/lan/pool.ts
 `PROFILES`):
 
 - `parity`: 800×600, every quality setting lowest, Classic models, sound off,

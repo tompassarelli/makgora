@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Canonical TypeScript-only map build. `wisp map build`
-# (wisp:scripts/wisp/mapBuild.ts) does the work; this script
+# (wisp:host/compile/mapBuild.ts) does the work; this script
 # supplies its private asset inputs and map packager.
 set -euo pipefail
 

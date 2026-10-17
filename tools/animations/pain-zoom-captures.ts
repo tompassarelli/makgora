@@ -1,7 +1,7 @@
 import { readdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { Cause, Effect } from "effect";
-import { captureScene, renderScenes, type RenderScene } from "../../ts/node_modules/wisp/scripts/wisp/headlessRender";
+import { captureScene, renderScenes, type RenderScene } from "../../ts/node_modules/wisp/host/render/headlessRender";
 import { createStandaloneSession, NEUTRAL_INPUT } from "../../ts/scripts/wisp/standalone";
 import { headlessRender } from "../../ts/scripts/wisp/headlessRender";
 import { assetsView, readManifest } from "../../ts/scripts/wisp/buildInputs";

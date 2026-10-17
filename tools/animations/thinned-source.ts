@@ -1,7 +1,7 @@
 import { chmodSync, existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { deserialize, serialize } from 'bun:jsc';
-import { ImportGraph } from '../../ts/node_modules/wisp/scripts/wisp/importGraph';
+import { ImportGraph } from '../../ts/node_modules/wisp/host/dev/importGraph';
 import { INPUTS_STORE } from '../../ts/scripts/wisp/buildInputs';
 import type { model as mdx } from '../../ts/scripts/clipNodes';
 import { parseModelMDX } from '../../ts/scripts/mdxCodec';

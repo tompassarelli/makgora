@@ -42,7 +42,7 @@ if (!relative(resolve(import.meta.dir, '../..'), output).startsWith('..')) throw
 /** Drawn size; the crops read a 1024 px render, so this supersamples the renderer's unantialiased edges. */
 const DRAWN = 2048;
 const RESOLUTION = 1024;
-/** The renderer's clear colour (wisp:scripts/wisp/browser/headlessRender.ts), keyed out as the background. */
+/** The renderer's clear colour (wisp:host/browser/headlessRender.ts), keyed out as the background. */
 const CLEAR = [10, 15, 23];
 /** The camera looks level along +y, so the face, turned toward it, is seen from its own height. */
 const ROTATION = 90;

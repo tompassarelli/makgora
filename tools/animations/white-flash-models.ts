@@ -4,7 +4,7 @@ import { decodeBLP, getBLPImageData, model as mdx } from "war3-model";
 import { generateModelMDX, parseModelMDX } from "../../ts/scripts/mdxCodec";
 import { PNG } from "pngjs";
 import { onGlobalClock, removeBodyEffects, tracks } from "./original-clips";
-import { modelFacts } from "../../ts/node_modules/wisp/scripts/wisp/models";
+import { modelFacts } from "../../ts/node_modules/wisp/host/models/models";
 import { renderAssetStore } from "../../ts/scripts/wisp/renderAssetStore";
 import { IMPORTED_MODEL_FILES } from "../../ts/src/game/assets/importedModelInfo";
 import { renumberNodes } from "../../ts/scripts/clipNodes";
