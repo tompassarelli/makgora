@@ -429,6 +429,19 @@ the smallest growth that keeps every kill percent within 15% without
 gaining one; up throw keeps its first-pass values, because its juggle growth carries his
 DI mix-up against the heavy target.
 
+17 Oct 2026 (#46). Lich King's 25 pairs on 4df269f4bf (Balance run
+38987502563) measured 25%. With Howling Blast's and Val'kyr Shadowguard's
+casts back at 19 and 17 frames (diagnosis only; Tom asked for the long
+casts, so they stay) the same pairs measured 35%. Neither armor through the
+casts, a faster and wider gust nor fewer close casts recovered it: the
+casts cost time, not hits. Every Lich King damage literal is scaled ×1.24 to the nearest quarter
+point (down smash ×1.1, forward smash's sweet spot ×1.21) with his strength
+growths ×0.85, the window that keeps every kill percent within 15%; his
+tilts, smashes, dash attack, third jab and grab recover 3 frames sooner
+and his aerials land 3 frames sooner, inside the ±3-frame bound; and both
+casts carry armor through 8 damage from frame 10. His 25 pairs at 200 a
+pair measured 43%.
+
 ## Player panel and equal skill ceilings (#358)
 
 Every fighter targets a 45–55% mean over all six Expert personalities, with

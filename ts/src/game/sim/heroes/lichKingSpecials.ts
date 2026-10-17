@@ -44,10 +44,11 @@ const blastProjectile = (radius: number, damage: number, status: AppliedStatus |
   spawnFrame: 28, offsetX: 50.0, offsetZ: CHEST, velocityX: h(f32(0.08)), velocityZ: 0.0,
   life: 36, radius, effect: hit(damage, "POKE", 40), reflectable: true, limit: 1, status,
 });
-const HOWLING_BLAST = blastProjectile(h(f32(0.22)), 6.0, undefined);
+const HOWLING_BLAST = blastProjectile(h(f32(0.22)), 7.5, undefined);
 const howlingBlast = (projectile: SpecialProjectile, landingLag: number | undefined): AuthoredSpecial => ({
   endFrame: 56,
   hurt: HOWLING_BODY,
+  armor: { ...frames(10, 28), maxDamage: 8.0 },
   landingLag,
   projectiles: [projectile],
 });
@@ -67,12 +68,13 @@ const CARRIED: AppliedStatus = { kind: HeroStatusKind.carried, frames: 80, group
 const valkyrProjectile = (speed: number): SpecialProjectile => ({
   model: VALKYR_MODEL,
   spawnFrame: 26, offsetX: 40.0, offsetZ: f32(CHEST + 10.0), velocityX: speed, velocityZ: 0.0,
-  life: 40, radius: h(f32(0.2)), effect: { damage: 4.0, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false, element: HitElement.dark },
+  life: 40, radius: h(f32(0.2)), effect: { damage: 5.0, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false, element: HitElement.dark },
   reflectable: true, limit: 1, status: CARRIED,
 });
 const VALKYR = valkyrProjectile(5.0);
 const shadowguard = (projectile: SpecialProjectile, landingLag: number | undefined): AuthoredSpecial => ({
   endFrame: 52,
+  armor: { ...frames(10, 26), maxDamage: 8.0 },
   landingLag,
   projectiles: [projectile],
 });
@@ -89,7 +91,7 @@ function ascension(height: number, steer: number): AuthoredSpecial {
     endFrame: 46,
     facesStick: true,
     motion: [{ ...frames(8, 30), velocityX: 0.0, velocityZ: f32(h(height) / ASCENT_FRAMES), driftSpeed: f32(h(steer) / ASCENT_FRAMES) }],
-    regions: [heroRegion(8, 30, capsule(0.0, 50.0, 0.0, 110.0, 62.0), hit(9.0, "LAUNCH", 80))],
+    regions: [heroRegion(8, 30, capsule(0.0, 50.0, 0.0, 110.0, 62.0), hit(11.25, "LAUNCH", 80))],
     oncePerAirtime: true,
     helpless: true,
   };
@@ -107,7 +109,7 @@ const DEFILE_POOL: SpecialProjectile = {
   modelRadius: 1223.0,
   spawnFrame: 20, offsetX: h(f32(0.6)), offsetZ: 6.0, velocityX: 0.0, velocityZ: 0.0,
   life: 180, activeFrom: 18, radius: h(f32(0.3)),
-  effect: { damage: 2.0, growth: 30.0, base: 30.0, launchX: f32(0.173648178), launchZ: f32(0.984807753), electric: false, element: HitElement.dark },
+  effect: { damage: 2.5, growth: 30.0, base: 30.0, launchX: f32(0.173648178), launchZ: f32(0.984807753), electric: false, element: HitElement.dark },
   reflectable: false, limit: 1, needsLineOfSight: true,
   pool: { every: 36, growth: 6.0, maxRadius: h(f32(0.6)) },
 };
