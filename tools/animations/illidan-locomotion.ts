@@ -2,7 +2,7 @@
 import { chmodSync, cpSync, mkdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { generateMDL, generateMDX, parseMDL, parseMDX, type model as mdx } from "war3-model";
-import { DrawnModel } from "../../ts/scripts/wisp/hurtboxView";
+import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
 import { ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
 
 const [assets, authored, output] = process.argv.slice(2).map(p => resolve(p));

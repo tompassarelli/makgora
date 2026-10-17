@@ -1,11 +1,10 @@
 import { basename } from "node:path";
-import { fighterSlug } from "../../src/game/sim/heroes/registry";
-import { fighters } from "../heroModelSource";
 import { readWhiteImports } from "../whiteImports";
+import { FIGHTER_ART, fighterArt } from "../../src/generated/fighterArtData";
 
 export const SHARED_SHARD = "shared";
 
-const ROSTER = [...fighters].map(([character, { name, source }]) => ({ name, source, shard: fighterSlug(character) })).sort((a, b) => b.name.length - a.name.length);
+const ROSTER = [...FIGHTER_ART].map(([character, { name, source }]) => ({ name, source, shard: fighterArt(character).slug })).sort((a, b) => b.name.length - a.name.length);
 
 const namedOwner = (file: string) => ROSTER.find(({ name }) => file.startsWith(name) && /^[A-Z0-9._-]/.test(file.slice(name.length)))?.shard;
 

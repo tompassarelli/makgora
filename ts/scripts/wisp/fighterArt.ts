@@ -8,7 +8,7 @@ import { fighters } from "../heroModelSource";
 import { stopBunProcess } from "../hostProcess";
 import { pruneWhiteTextures } from "../whiteImports";
 import { type Family, INPUTS_STORE, type Manifest, assetsView, listFiles, publish, readManifest, removeTree, seal, storeShards, writeShardPins } from "./buildInputs";
-import { stockStorage } from "./headlessRender";
+import { stockStorage } from "./renderAssetStore";
 import { shardFiles } from "./inputShards";
 import { MODEL_FACTS_DIRECTORY, modelFactsFile, writeGenerated } from "./modelFactsTable";
 import { projectRoot } from "./project";

@@ -1,6 +1,7 @@
 import { mkdirSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { DrawnModel, sampleAttack, sheet } from "../../ts/scripts/wisp/hurtboxView";
+import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
+import { sampleAttack, sheet } from "../../ts/scripts/wisp/hurtboxView";
 import { clipFor } from "../../ts/src/game/presentation/fighterClips";
 import { characterModelScale } from "../../ts/src/game/presentation/modelScale";
 import { AttackStyle } from "../../ts/src/game/sim/codes";

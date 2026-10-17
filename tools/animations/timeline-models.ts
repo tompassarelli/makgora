@@ -3,7 +3,6 @@ import { existsSync, readdirSync } from 'node:fs';
 import { unlink } from 'node:fs/promises';
 import { Effect } from 'effect';
 import { hash, parseSource, tracks } from './original-clips';
-import { fighters } from '../../ts/scripts/heroModelSource';
 import { checkTimelineGeosets } from './timeline-geosets';
 import { thinnedModel } from './thinned-source';
 import { authoredMotion, fighterBodies, playedMoves } from './hd-models';
@@ -11,28 +10,28 @@ import { FIGHTER_RIGS } from './hd-rigs';
 import { canonicalMotion } from './canonical-rig';
 import { modelFacts } from '../../ts/node_modules/wisp/scripts/wisp/models';
 import { replaceModelFacts, writeGenerated } from '../../ts/scripts/wisp/modelFactsTable';
-import { DrawnModel } from '../../ts/scripts/wisp/hurtboxView';
-import { headlessRender } from '../../ts/scripts/wisp/headlessRender';
-import { fighterSlug } from '../../ts/src/game/sim/heroes/registry';
+import { DrawnModel } from '../../ts/scripts/wisp/drawnModel';
+import { renderAssetStore } from '../../ts/scripts/wisp/renderAssetStore';
 import { DEFINITIVE_FIGHTERS } from '../../ts/src/game/assets/definitiveFighters';
 import type { Character } from '../../ts/src/game/sim/codes';
 import { CLIPS } from './fighter-shards';
 import { readClipRecords, writeClipRecord } from '../../ts/scripts/clipEvidence';
 import { checkMaterialReferences } from './material-references';
+import { FIGHTER_ART, fighterArt } from '../../ts/src/generated/fighterArtData';
 
 const [assetsArg, outputArg, fighterName] = process.argv.slice(2);
 if (assetsArg === undefined || outputArg === undefined || fighterName === undefined) throw new Error('usage: bun tools/animations/timeline-models.ts PRIVATE_ASSETS PRIVATE_POOL FIGHTER');
 const assets = resolve(assetsArg), output = resolve(outputArg);
 if (!relative(resolve(import.meta.dir, '../..'), output).startsWith('..')) throw new Error('Timeline bodies stay in private storage');
-const character = [...fighters].find(([, fighter]) => fighter.name === fighterName)?.[0];
+const character = [...FIGHTER_ART].find(([, fighter]) => fighter.name === fighterName)?.[0];
 if (character === undefined) throw new Error(`Unknown fighter ${fighterName}`);
-const fighter = fighters.get(character)!, rig = FIGHTER_RIGS.get(character);
+const fighter = FIGHTER_ART.get(character)!, rig = FIGHTER_RIGS.get(character);
 if (rig === undefined) throw new Error(`${fighter.name} has no canonical rig in hd-rigs`);
 
 async function stockDefinitive(): Promise<ArrayBuffer | undefined> {
     if (!DEFINITIVE_FIGHTERS.has(character as Character)) return undefined;
     const stockName = (rig!.stockPath ?? '').replace(/^war3\.w3mod:_de\.w3mod:/, '').replaceAll('/', '\\');
-    const resolved = await headlessRender({ assets, imports: [] }).resolveAsset(stockName, 'definitive');
+    const resolved = await renderAssetStore({ assets, imports: [] }).resolveAsset(stockName, 'definitive');
     if (resolved.bytes === undefined || resolved.selected?.layer !== '_de.w3mod') throw new Error(`${fighter.name}: no stock Definitive ${stockName}`);
     return resolved.bytes.slice().buffer;
 }
@@ -88,7 +87,7 @@ await Effect.runPromise(Effect.tryPromise({ try: async () => {
     for (const replaced of replacedFiles) if (replaced !== filename) await unlink(join(classicDirectory, replaced));
     await removeOtherBodies(classicDirectory, filename);
     await removeOtherBodies(definitiveDirectory, bodies.definitive === undefined ? '' : filename);
-    const metadataPath = join(CLIPS, `${fighterSlug(character)}.ts`);
+    const metadataPath = join(CLIPS, `${fighterArt(character).slug}.ts`);
     const modelPath = `war3mapImported\\${filename}`;
     let metadata = await Bun.file(metadataPath).text();
     const prefix = `modelPath: ${JSON.stringify(`war3mapImported\\${fighter.name}`).slice(0, -1)}`;

@@ -1,7 +1,7 @@
 import { LEDGE_HANG_DEPTH, LEDGE_HANG_OUTSET } from "../../src/game/sim/ledge";
 import type { Character } from "../../src/game/sim/codes";
 import { type CrouchSample, type JumpSample, type LedgeSample, sampleCrouch, sampleJumps, sampleLedgeHang } from "./animScoreSample";
-import type { DrawnModel } from "./hurtboxView";
+import type { DrawnModel } from "./drawnModel";
 
 export const MOVEMENT_MOVES = ["crouch", "ledge-hang", "double-jump"] as const;
 export type MovementMove = (typeof MOVEMENT_MOVES)[number];

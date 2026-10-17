@@ -6,7 +6,8 @@
 
 import { AttackPhase, AttackStyle, Character } from "../../src/game/sim/codes";
 import { HERO_ROSTER } from "../../src/game/sim/heroes/registry";
-import { type DrawnModel, type PoseFrame, sampleAttack } from "./hurtboxView";
+import { type DrawnModel } from "./drawnModel";
+import { type PoseFrame, sampleAttack } from "./hurtboxView";
 
 
 const CHEST = 50.0;

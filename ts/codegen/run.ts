@@ -1,11 +1,13 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
 import { CONTROLLER_CONTRACT_PATH, controllerContractText, padLayoutProducers } from "./controllerContract";
+import * as fighterArtData from "./fighterArtData";
 import * as fighterState from "./fighterState";
 
 const root = resolve(import.meta.dir, "..");
 const producers = [
   { output: fighterState.output, render: fighterState.renderFighterState },
+  { output: fighterArtData.output, render: fighterArtData.renderFighterArtData },
   { output: relative(root, CONTROLLER_CONTRACT_PATH), render: controllerContractText },
   ...padLayoutProducers.map(({ path, render }) => ({ output: relative(root, path), render })),
 ];

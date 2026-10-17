@@ -16,15 +16,14 @@ import {movementBaseModel, appendedStrikeBaseModel, attackGestureBaseModel, swor
 import {seconds} from './asset-info';
 import {mkdirSync} from 'node:fs';
 import {ensure, hash, parseSource, encodeVerified, tracks, verifyPreservedBody, removeBodyEffects, originalBodyClip, splitStaticLights, staticLightGate, onGlobalClock} from './original-clips';
-import {fighters} from '../../ts/scripts/heroModelSource';
 import {CLIP_PROVENANCE, keepClipRecords, readClipRecords, writeClipRecord} from '../../ts/scripts/clipEvidence';
 import {misplacedNodes} from '../../ts/scripts/clipNodes';
 import {KEY_BOUND, savedKeyBytes, type KeyThinReport} from '../../ts/scripts/keyThin';
 import {thinnedModel} from './thinned-source';
-import {fighterSlug} from '../../ts/src/game/sim/heroes/registry';
 import {CLIPS, CLIP_INDEX, clipFile, clipIndex, clipTypeFile, shardOrder} from './fighter-shards';
 import {writeGenerated} from '../../ts/scripts/wisp/modelFactsTable';
 import {clipNames} from './clip-names';
+import { FIGHTER_ART, fighterArt } from '../../ts/src/generated/fighterArtData';
 
 const project = resolve(import.meta.dir, '../..');
 const option = (name: string) => { const index = process.argv.indexOf(name); return index < 0 ? undefined : process.argv[index + 1]; };
@@ -47,7 +46,7 @@ const reusableBase = (model: mdx.Model) => { for (const derive of reusableBases)
 const records = [];
 let totalBytes = 0, theoreticalFullSourceBytes = 0;
 const started = performance.now();
-for (const [character, fighter] of fighters) {
+for (const [character, fighter] of FIGHTER_ART) {
     if (only !== undefined && !only.includes(fighter.name)) continue;
     const sourcePath = join(assets, fighter.source);
     if (fighter.stock !== undefined && !await Bun.file(sourcePath).exists()) {
@@ -171,11 +170,11 @@ for (const [character, fighter] of fighters) {
     console.log(`${fighter.name}: ${clips.length} clips, ${fighterBytes} bytes; ${reuse ? 'retained source/clip hashes' : 'exact original-key and MDX checks'} PASS`);
 }
 for (const [character, clips] of moduleClips.entries()) if (clips !== undefined) {
-    const slug = fighterSlug(character);
-    writeGenerated(join(CLIPS, `${slug}.ts`), clipFile(fighters.get(character as Character)!.name, clips, moduleNames[character]!, moduleLights[character] ?? undefined));
+    const slug = fighterArt(character).slug;
+    writeGenerated(join(CLIPS, `${slug}.ts`), clipFile(FIGHTER_ART.get(character)!.name, clips, moduleNames[character]!, moduleLights[character] ?? undefined));
 }
 writeGenerated(join(CLIPS, 'fighterOriginalClip.ts'), clipTypeFile());
-writeGenerated(CLIP_INDEX, clipIndex(shardOrder(CLIP_INDEX, CLIPS, '.ts', fighters.keys()), {...staticLightGate, seconds: seconds(staticLightGate.seconds)}));
+writeGenerated(CLIP_INDEX, clipIndex(shardOrder(CLIP_INDEX, CLIPS, '.ts', FIGHTER_ART.keys()), {...staticLightGate, seconds: seconds(staticLightGate.seconds)}));
 if (!metadataOnly) {
     for (const record of records) writeClipRecord(output, record);
     if (only === undefined) keepClipRecords(output, new Set(records.map(record => record.fighter)));

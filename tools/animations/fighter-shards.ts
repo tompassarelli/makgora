@@ -3,7 +3,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import type { ModelFacts } from '../../ts/node_modules/wisp/scripts/wisp/models';
-import { fighterSlug } from '../../ts/src/game/sim/heroes/registry';
+import { fighterArt } from '../../ts/src/generated/fighterArtData';
 
 const ts = resolve(import.meta.dir, '../../ts');
 export const CLIPS = join(ts, 'src/generated/clips');
@@ -21,10 +21,10 @@ export const shardName = (slug: string) => slug.replaceAll('\'', '').replace(/-(
 
 /** The fighters an index lists: the ones it already lists, then any other fighter whose file exists, by character number. */
 export function shardOrder(index: string, directory: string, extension: string, characters: Iterable<number>): number[] {
-    const bySlug = new Map([...characters].map(character => [fighterSlug(character), character]));
+    const bySlug = new Map([...characters].map(character => [fighterArt(character).slug, character]));
     const text = existsSync(index) ? readFileSync(index, 'utf8') : '';
     const listed = [...text.matchAll(/^(?:import \* as \w+ from "\.\/(?:[\w-]+\/)?|  ")([^"/]+)"[;,]$/gm)].map(match => bySlug.get(match[1]!));
-    const present = [...bySlug.values()].filter(character => existsSync(join(directory, `${fighterSlug(character)}${extension}`)));
+    const present = [...bySlug.values()].filter(character => existsSync(join(directory, `${fighterArt(character).slug}${extension}`)));
     return [...new Set([...listed.filter(character => character !== undefined && present.includes(character)), ...present])] as number[];
 }
 
@@ -62,7 +62,7 @@ export function clipIndex(characters: readonly number[], gate: {activeAnimation:
         '// Each fighter\'s clips are in its own file, which a re-export rewrites alone; this index changes only when a fighter is added.',
         ...gate.seconds.includes('f32(') ? ['import { f32 } from "wisp/src/sim/f32";'] : [],
         'import type { FighterOriginalClip } from "./fighterOriginalClip";',
-        ...characters.map(character => `import * as ${shardName(fighterSlug(character))} from "./${fighterSlug(character)}";`),
+        ...characters.map(character => `import * as ${shardName(fighterArt(character).slug)} from "./${fighterArt(character).slug}";`),
         '',
         '/** The light model\'s animation while its fighter is shown, and while hidden. */',
         `export const ORIGINAL_LIGHT_ACTIVE_ANIMATION = ${JSON.stringify(gate.activeAnimation)};`,
@@ -77,7 +77,7 @@ export function clipIndex(characters: readonly number[], gate: {activeAnimation:
         '',
         '/** Each character\'s clips by original sequence index, sequence names and light model. */',
         'const FIGHTERS: Readonly<Record<number, FighterClips>> = {',
-        ...characters.map(character => `  ${character}: ${shardName(fighterSlug(character))},`),
+        ...characters.map(character => `  ${character}: ${shardName(fighterArt(character).slug)},`),
         '};',
         '',
         '/** Clips 0 to count - 1 exist for this character. */',
@@ -114,9 +114,9 @@ export const whiteModelFile = (path: string) => `${WHITE_PRODUCER}\nexport const
 export function whiteModelIndex(characters: readonly number[]): string {
     return [WHITE_PRODUCER,
         '// Each fighter\'s white body is in white-models/<slug>.ts, which a re-export rewrites alone; this index changes only when a fighter is added.',
-        ...characters.map(character => `import * as ${shardName(fighterSlug(character))} from "./white-models/${fighterSlug(character)}";`),
+        ...characters.map(character => `import * as ${shardName(fighterArt(character).slug)} from "./white-models/${fighterArt(character).slug}";`),
         'export const WHITE_FIGHTER_MODELS: Readonly<Record<number, string>> = {',
-        ...characters.map(character => `  ${character}: ${shardName(fighterSlug(character))}.whiteModel,`),
+        ...characters.map(character => `  ${character}: ${shardName(fighterArt(character).slug)}.whiteModel,`),
         '};',
     ].join('\n') + '\n';
 }
@@ -130,9 +130,9 @@ export function whiteFactsIndex(characters: readonly number[]): string {
     return [WHITE_PRODUCER,
         '// Each fighter\'s white body facts are in white-facts/<slug>.ts, which a re-export rewrites alone; this index changes only when a fighter is added.',
         'import type { ModelFacts } from "wisp/scripts/wisp/models";',
-        ...characters.map(character => `import * as ${shardName(fighterSlug(character))} from "./white-facts/${fighterSlug(character)}";`),
+        ...characters.map(character => `import * as ${shardName(fighterArt(character).slug)} from "./white-facts/${fighterArt(character).slug}";`),
         'export const WHITE_MODEL_FACTS: Readonly<Record<string, ModelFacts>> = {',
-        ...characters.map(character => `  ...${shardName(fighterSlug(character))}.whiteModelFacts,`),
+        ...characters.map(character => `  ...${shardName(fighterArt(character).slug)}.whiteModelFacts,`),
         '};',
     ].join('\n') + '\n';
 }

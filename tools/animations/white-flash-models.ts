@@ -4,9 +4,8 @@ import { decodeBLP, getBLPImageData, model as mdx } from "war3-model";
 import { generateModelMDX, parseModelMDX } from "../../ts/scripts/mdxCodec";
 import { PNG } from "pngjs";
 import { onGlobalClock, removeBodyEffects, tracks } from "./original-clips";
-import { fighters } from "../../ts/scripts/heroModelSource";
 import { modelFacts } from "../../ts/node_modules/wisp/scripts/wisp/models";
-import { headlessRender } from "../../ts/scripts/wisp/headlessRender";
+import { renderAssetStore } from "../../ts/scripts/wisp/renderAssetStore";
 import { IMPORTED_MODEL_FILES } from "../../ts/src/game/assets/importedModelInfo";
 import { renumberNodes } from "../../ts/scripts/clipNodes";
 import { flashableSequences, preservesFlashKey, trimFlashTracks } from "./white-flash-keys";
@@ -23,9 +22,9 @@ import { decimateWhiteBody, roundGeometry } from "./white-decimate";
 import { originalClip, originalClipCount } from "../../ts/src/generated/clips/fighterOriginalClipInfo";
 import { DEFINITIVE_FIGHTERS } from "../../ts/src/game/assets/definitiveFighters";
 import type { Character } from "../../ts/src/game/sim/codes";
-import { fighterSlug } from "../../ts/src/game/sim/heroes/registry";
 import { keepWhiteImports, pruneFighterWhites, pruneWhiteTextures, writeWhiteImports } from "../../ts/scripts/whiteImports";
 import { WHITE_FACTS, WHITE_FACT_INDEX, WHITE_MODELS, WHITE_MODEL_INDEX, shardOrder, whiteFactsFile, whiteFactsIndex, whiteModelFile, whiteModelIndex } from "./fighter-shards";
+import { FIGHTER_ART, fighterArt } from "../../ts/src/generated/fighterArtData";
 const DEFINITIVE_WHITE = "_de.w3mod";
 const DEFINITIVE_DECIMATION = { ratio: 0.5, error: 0.005 };
 
@@ -33,7 +32,7 @@ const [assetsArg, outputArg, option, characterArg] = process.argv.slice(2);
 const definitiveOnly = option === "--definitive";
 if (assetsArg === undefined || outputArg === undefined || (option !== undefined && !definitiveOnly && (option !== "--character" || characterArg === undefined))) throw new Error("usage: bun tools/animations/white-flash-models.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--character ID | --definitive]");
 const selected = characterArg === undefined ? undefined : Number(characterArg);
-if (selected !== undefined && (!Number.isInteger(selected) || !fighters.has(selected as Character))) throw new Error("Choose a fighter number from the roster");
+if (selected !== undefined && (!Number.isInteger(selected) || !FIGHTER_ART.has(selected))) throw new Error("Choose a fighter number from the roster");
 const assets = resolve(assetsArg), output = resolve(outputArg);
 if (!relative(resolve(import.meta.dir, "../.."), output).startsWith("..")) throw new Error("White fighter models must stay in private storage");
 const hash = (bytes: Uint8Array) => new Bun.CryptoHasher("sha256").update(bytes).digest("hex");
@@ -43,7 +42,7 @@ texture.fill(255, 18);
 const textureName = `FighterWhite-${hash(texture)}.tga`;
 await Bun.write(join(output, textureName), texture);
 const paths: Record<number, string> = selected === undefined && !definitiveOnly ? {} : { ...WHITE_FIGHTER_MODELS };
-const sourceAssets = headlessRender({ assets, imports: IMPORTED_MODEL_FILES.map(({ entry, file }) => ({ entry, source: join(assets, "imported-models", file) })) });
+const sourceAssets = renderAssetStore({ assets, imports: IMPORTED_MODEL_FILES.map(({ entry, file }) => ({ entry, source: join(assets, "imported-models", file) })) });
 const whiteTextures = new Map<string, string>();
 async function whiteTexture(path: string, graphics: "classic" | "definitive" = "classic"): Promise<string> {
   const known = whiteTextures.get(`${graphics}:${path}`);
@@ -143,7 +142,7 @@ async function definitiveWhite(character: number, name: string, filename: string
 if (definitiveOnly) {
   let count = 0;
   for (const [character, path] of Object.entries(WHITE_FIGHTER_MODELS)) {
-    const fighter = fighters.get(Number(character) as Character);
+    const fighter = FIGHTER_ART.get(Number(character));
     if (fighter === undefined) throw new Error(`No roster fighter ${character}`);
     const filename = path.replace("war3mapImported\\", "");
     const definitive = await definitiveWhite(Number(character), fighter.name, filename);
@@ -156,7 +155,7 @@ if (definitiveOnly) {
   process.exit(0);
 }
 const facts: Record<string, ReturnType<typeof modelFacts>> = selected === undefined ? {} : { ...WHITE_MODEL_FACTS };
-for (const [character, fighter] of fighters.entries()) {
+for (const [character, fighter] of FIGHTER_ART.entries()) {
   if (selected !== undefined && character !== selected) continue;
   const previous = paths[character];
   if (previous !== undefined) delete facts[previous.replaceAll("\\", "/").toLowerCase()];
@@ -227,17 +226,17 @@ for (const [character, fighter] of fighters.entries()) {
   pruneFighterWhites(output, fighter.name);
   facts[`war3mapImported/${filename}`.toLowerCase()] = modelFacts(bytes);
 }
-if (selected === undefined) keepWhiteImports(output, new Set([...fighters.values()].map(fighter => fighter.name)));
+if (selected === undefined) keepWhiteImports(output, new Set([...FIGHTER_ART.values()].map(fighter => fighter.name)));
 pruneWhiteTextures(output);
-// Only the fighters exported here get new white model and facts files; the indexes change only when a fighter is added.
-for (const character of fighters.keys()) {
+// Only the FIGHTER_ART exported here get new white model and facts files; the indexes change only when a fighter is added.
+for (const character of FIGHTER_ART.keys()) {
   if (selected !== undefined && character !== selected) continue;
   const path = paths[character]!, key = path.replaceAll("\\", "/").toLowerCase();
-  writeGenerated(join(WHITE_MODELS, `${fighterSlug(character)}.ts`), whiteModelFile(path));
-  writeGenerated(join(WHITE_FACTS, `${fighterSlug(character)}.ts`), whiteFactsFile({ [key]: facts[key]! }));
+  writeGenerated(join(WHITE_MODELS, `${fighterArt(character).slug}.ts`), whiteModelFile(path));
+  writeGenerated(join(WHITE_FACTS, `${fighterArt(character).slug}.ts`), whiteFactsFile({ [key]: facts[key]! }));
 }
-writeGenerated(WHITE_MODEL_INDEX, whiteModelIndex(shardOrder(WHITE_MODEL_INDEX, WHITE_MODELS, ".ts", fighters.keys())));
-writeGenerated(WHITE_FACT_INDEX, whiteFactsIndex(shardOrder(WHITE_FACT_INDEX, WHITE_FACTS, ".ts", fighters.keys())));
+writeGenerated(WHITE_MODEL_INDEX, whiteModelIndex(shardOrder(WHITE_MODEL_INDEX, WHITE_MODELS, ".ts", FIGHTER_ART.keys())));
+writeGenerated(WHITE_FACT_INDEX, whiteFactsIndex(shardOrder(WHITE_FACT_INDEX, WHITE_FACTS, ".ts", FIGHTER_ART.keys())));
 if (selected === undefined) writeModelFacts(whiteModelFactsTable(readModelFacts(), Object.values(paths), facts));
-else replaceModelFacts([`war3mapImported\\${fighters.get(selected as Character)!.name}White-`], whiteModelFactsTable({}, [paths[selected]!], facts));
+else replaceModelFacts([`war3mapImported\\${FIGHTER_ART.get(selected)!.name}White-`], whiteModelFactsTable({}, [paths[selected]!], facts));
 console.log(`${selected === undefined ? Object.keys(paths).length : 1} white body models updated: original mesh and flashable animation keys retained on one seekable timeline, emitters/lights removed`);

@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test';
 import { lineOneRule } from '../scripts/wisp/animScore';
 import { LIMB_STRIKES, skeletonOf } from '../scripts/wisp/animScoreSample';
-import type { DrawnModel } from '../scripts/wisp/hurtboxView';
+import type { DrawnModel } from '../scripts/wisp/drawnModel';
 import { Character } from '../src/game/sim/codes';
 
 test("Anub'arak's claw rakes ride his Bone_Arm1 to Bone_ArmClaw chain and score line 1 on limb drive [k3 measure docs/animation-scorecard.md]", () => {

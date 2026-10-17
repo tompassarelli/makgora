@@ -34,7 +34,13 @@ test("pre-push derives exactly the changed fighters with --check on the private 
   const kobold = derive(["build-inputs/original-clips-static-lights/kobold", "ts/src/generated/clips/kobold.ts"]);
   expect(kobold?.args).toEqual(["scripts/wisp.ts", "inputs", "derive", "--check", "--fighter", "kobold"]);
   expect(kobold?.privateStore).toBe(true);
-  expect(derive(["ts/src/game/presentation/heroes/wardenClipTable.ts"])?.args.filter((arg) => arg !== "--fighter").slice(4)).toEqual(everyone);
+  expect(derive(["ts/src/generated/fighterArtData.ts"])?.args.filter((arg) => arg !== "--fighter").slice(4)).toEqual(everyone);
   expect(derive(["docs/ci.md"])).toBeUndefined();
   expect(derivedStepCode().has("tools/animations/export-original-clips.ts")).toBe(true);
+});
+
+test("the derive steps read game rules only through the generated fighter art data and a few small tables, so a gameplay change outside them invalidates no fighter [k2 property]", () => {
+  const game = [...derivedStepCode()].filter((path) => path.startsWith("ts/src/game/")).sort();
+  expect(game).toEqual(["ts/src/game/assets/definitiveFighters.ts", "ts/src/game/assets/importedModelInfo.ts", "ts/src/game/presentation/modelScale.ts", "ts/src/game/sim/codes.ts", "ts/src/game/sim/heroes/wardenSpin.ts"]);
+  expect(derivedStepCode().has("ts/src/generated/fighterArtData.ts")).toBe(true);
 });

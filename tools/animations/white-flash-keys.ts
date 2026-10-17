@@ -1,61 +1,22 @@
 import { model as mdx } from "../../ts/scripts/clipNodes";
 import { isDeepStrictEqual } from "node:util";
-import { characterClips, illidanSmashClips, namedClips, specialClip } from "../../ts/src/game/presentation/fighterClips";
-import { contactDamageClips } from "../../ts/src/game/presentation/damagePose";
-import { heroLook } from "../../ts/src/game/roster/looks";
-import * as illidan from "../../ts/src/game/presentation/demonHunterAssetInfo";
-import { AttackStyle, Character, SpecialAction } from "../../ts/src/game/sim/codes";
+import { Character } from "../../ts/src/game/sim/codes";
+import { FIGHTER_ART } from "../../ts/src/generated/fighterArtData";
 import { onGlobalClock } from "./original-clips";
 import { originalClipNamed } from "../../ts/src/generated/clips/fighterOriginalClipInfo";
 
 export function flashableSequences(character: number, sequences: readonly mdx.Sequence[]): mdx.Sequence[] {
-
-  const indices = new Set(namedClips(characterClips(character)).map(clip => clip.index));
-  for (const clip of namedClips(characterClips(character))) if (clip.classicStartup !== undefined) indices.add(clip.classicStartup.index);
-  for (const clip of contactDamageClips(character) ?? []) indices.add(clip.index);
-  const fallback = heroLook(character)?.fallback;
-  if (fallback !== undefined) indices.add(fallback.index);
+  const art = FIGHTER_ART.get(character);
+  if (art === undefined) throw new Error(`no fighter art for character ${character}`);
+  const indices = new Set(art.flashClips);
   for (const name of character === Character.demonHunter ? ["stand", "stand ready", "stand hit"] : ["stand", "stand ready", "stand hit", "walk"]) {
     const index = originalClipNamed(character, name);
     if (index !== undefined) indices.add(index);
   }
-  if (character <= Character.demonHunter) {
-    const actions = character === Character.rifleman
-        ? [SpecialAction.riflemanBlaster, SpecialAction.riflemanBear, SpecialAction.riflemanTrap, SpecialAction.riflemanRecovery]
-        : [SpecialAction.demonHunterManaBurn, SpecialAction.demonHunterFelRush, SpecialAction.demonHunterWingAscent, SpecialAction.demonHunterImmolate];
-    for (const action of actions) for (const grounded of [false, true]) {
-      indices.add(specialClip(character, action, grounded, !grounded).index);
-    }
-    if (character !== Character.demonHunter) {
-      const attack = originalClipNamed(character, "attack");
-      if (attack !== undefined) indices.add(attack);
-    } else {
-
-      for (const index of [
-        illidan.DEMON_HUNTER_KO_INDEX, illidan.DEMON_HUNTER_LEDGE_CATCH_INDEX,
-        illidan.DEMON_HUNTER_SHIELD_BREAK_INDEX, illidan.DEMON_HUNTER_DOWN_WAIT_INDEX,
-        illidan.DEMON_HUNTER_GRAB_ESCAPE_INDEX, illidan.DEMON_HUNTER_AIR_DODGE_INDEX,
-        illidan.DEMON_HUNTER_JUMP_SQUAT_INDEX, illidan.DEMON_HUNTER_LAND_INDEX,
-        illidan.DEMON_HUNTER_LAND_SPECIAL_INDEX, illidan.DEMON_HUNTER_SHIELD_RAISE_INDEX,
-        illidan.DEMON_HUNTER_SHIELD_HOLD_INDEX, illidan.DEMON_HUNTER_SHIELD_RELEASE_INDEX,
-        illidan.DEMON_HUNTER_RESPAWN_INDEX, illidan.DEMON_HUNTER_LEDGE_JUMP_INDEX,
-        illidan.DEMON_HUNTER_TECH_NEUTRAL_INDEX, illidan.DEMON_HUNTER_TECH_FORWARD_INDEX,
-        illidan.DEMON_HUNTER_TECH_BACK_INDEX, illidan.DEMON_HUNTER_GET_UP_ROLL_FORWARD_INDEX,
-        illidan.DEMON_HUNTER_GET_UP_ROLL_BACK_INDEX, illidan.DEMON_HUNTER_WALK_FORWARD_INDEX,
-        illidan.DEMON_HUNTER_RUN_FORWARD_INDEX, illidan.DEMON_HUNTER_INITIAL_DASH_BURST_INDEX,
-        illidan.DEMON_HUNTER_TURNAROUND_INDEX, illidan.DEMON_HUNTER_STOP_INDEX,
-        illidan.DEMON_HUNTER_CROUCH_INDEX, illidan.DEMON_HUNTER_FAST_FALL_INDEX,
-        illidan.DEMON_HUNTER_FALL_INDEX, illidan.DEMON_HUNTER_COMBAT_IDLE_INDEX,
-      ]) indices.add(index);
-      for (const style of [AttackStyle.forwardSmash, AttackStyle.upSmash, AttackStyle.downSmash]) {
-        const clips = illidanSmashClips(style);
-        indices.add(clips.charge.index);
-        indices.add(clips.release.index);
-      }
-    }
+  if (character < Character.demonHunter) {
+    const attack = originalClipNamed(character, "attack");
+    if (attack !== undefined) indices.add(attack);
   }
-  const grab = heroLook(character)?.commandGrab;
-  if (grab !== undefined) for (const clip of [grab.travel, grab.hold, grab.recovery]) indices.add(clip.index);
   return sequences.filter((sequence, index) => indices.has(index));
 }
 

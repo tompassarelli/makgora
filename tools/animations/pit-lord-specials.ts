@@ -1,7 +1,8 @@
 import { chmodSync, cpSync, mkdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { generateMDX, model as mdx } from "war3-model";
-import { DrawnModel, type PoseFrame, sheet } from "../../ts/scripts/wisp/hurtboxView";
+import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
+import { type PoseFrame, sheet } from "../../ts/scripts/wisp/hurtboxView";
 import { characterModelScale } from "../../ts/src/game/presentation/modelScale";
 import { AttackPhase, Character } from "../../ts/src/game/sim/codes";
 import { PIT_LORD_SPECIALS } from "../../ts/src/game/sim/heroes/pitLordSpecials";

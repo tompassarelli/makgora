@@ -9,7 +9,8 @@ import { beginDownState } from "../../src/game/sim/transitions";
 import { advanceFighterPose, createFighterPose } from "../../src/game/presentation/fighterPose";
 import { groundLocomotionClip } from "../../src/game/presentation/fighterLocomotion";
 import { IllidanLocomotion } from "../../src/game/presentation/illidanMotion";
-import { type PoseFrame, DrawnModel, capture } from "./hurtboxView";
+import { DrawnModel } from "./drawnModel";
+import { type PoseFrame, capture } from "./hurtboxView";
 
 export const MOTION_STATES = ["walk", "dash", "run", "turn", "brake", "jump-squat", "roll-forward", "roll-back", "spot-dodge", "air-dodge", "tech", "tech-forward", "tech-back", "get-up", "get-up-forward", "get-up-back", "get-up-attack", "ledge-get-up", "ledge-roll", "ledge-attack"] as const;
 export type MotionState = (typeof MOTION_STATES)[number];

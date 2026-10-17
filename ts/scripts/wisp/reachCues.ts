@@ -1,7 +1,8 @@
 import { AttackPhase, AttackStyle, Character } from "../../src/game/sim/codes";
 import { createFighter } from "../../src/game/sim/fighter";
 import { authoredHitRegionCount } from "../../src/game/sim/hitRegions";
-import { type DrawnModel, sampleAttack } from "./hurtboxView";
+import { type DrawnModel } from "./drawnModel";
+import { sampleAttack } from "./hurtboxView";
 
 
 export const BODY_HEIGHT = 132.0;

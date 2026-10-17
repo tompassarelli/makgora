@@ -5,7 +5,7 @@ import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { FIGHTER_OBJECTS } from "../src/game/objectData";
 import { Character } from "../src/game/sim/codes";
-import { DrawnModel } from "./wisp/hurtboxView";
+import { DrawnModel } from "./wisp/drawnModel";
 import { headlessRender } from "./wisp/headlessRender";
 
 const LOOKS = ["classic", "definitive"] as const;

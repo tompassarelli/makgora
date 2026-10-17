@@ -3,7 +3,7 @@
 import { chmodSync, cpSync, lstatSync, mkdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { generateMDX, model as mdx } from "war3-model";
-import { DrawnModel } from "../../ts/scripts/wisp/hurtboxView";
+import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
 import { Character } from "../../ts/src/game/sim/codes";
 import { authoredPhysics } from "../../ts/src/game/sim/tuning";
 import { seconds } from "./asset-info";

@@ -10,7 +10,7 @@ import { SPECIAL_KEY } from "../../src/game/presentation/heroStrikeMomentKeys";
 import { SPECIAL_SLOTS } from "../../src/game/presentation/projectileArt";
 import { AttackStyle } from "../../src/game/sim/codes";
 import { HERO_ROSTER } from "../../src/game/sim/heroes/registry";
-import { DrawnModel } from "./hurtboxView";
+import { DrawnModel } from "./drawnModel";
 import { heroLook } from "../../src/game/roster/looks";
 
 

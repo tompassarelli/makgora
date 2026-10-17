@@ -1,6 +1,7 @@
 
 import { join, resolve } from "node:path";
-import { DrawnModel, capture, sheet } from "../../ts/scripts/wisp/hurtboxView";
+import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
+import { capture, sheet } from "../../ts/scripts/wisp/hurtboxView";
 import { advanceFighterPose, createFighterPose } from "../../ts/src/game/presentation/fighterPose";
 import { characterModelScale } from "../../ts/src/game/presentation/modelScale";
 import { Character, SpecialAction } from "../../ts/src/game/sim/codes";

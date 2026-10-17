@@ -2,7 +2,7 @@
 import { chmodSync, cpSync, mkdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { generateMDX, model as mdx } from "war3-model";
-import { DrawnModel } from "../../ts/scripts/wisp/hurtboxView";
+import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
 import { Character, AttackStyle } from "../../ts/src/game/sim/codes";
 import { heroDefinition } from "../../ts/src/game/sim/heroes/registry";
 import { seconds } from "./asset-info";

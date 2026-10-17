@@ -1,8 +1,8 @@
-
 import { chmodSync, mkdirSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { generateMDX, ModelRenderer, model as mdx } from "war3-model";
-import { DrawnModel, sampleAttack, sheet } from "../../ts/scripts/wisp/hurtboxView";
+import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
+import { sampleAttack, sheet } from "../../ts/scripts/wisp/hurtboxView";
 import { characterModelScale } from "../../ts/src/game/presentation/modelScale";
 import { AttackPhase, AttackStyle, type Character } from "../../ts/src/game/sim/codes";
 import { createFighter } from "../../ts/src/game/sim/fighter";

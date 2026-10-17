@@ -1,4 +1,4 @@
-import type { DrawnModel } from "../../ts/scripts/wisp/hurtboxView";
+import type { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
 import { characterModelScale } from "../../ts/src/game/presentation/modelScale";
 import type { Character } from "../../ts/src/game/sim/codes";
 import { LEDGE_HANG_DEPTH, LEDGE_HANG_OUTSET } from "../../ts/src/game/sim/ledge";

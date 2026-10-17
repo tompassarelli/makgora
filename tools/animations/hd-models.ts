@@ -6,16 +6,15 @@ import { timelineBody } from './timeline-body';
 import { flashableSequences } from './white-flash-keys';
 import { slopeTangents, thinKeys } from '../../ts/scripts/keyThin';
 import { encodeVerified, parseSource } from './original-clips';
-import { fighters } from '../../ts/scripts/heroModelSource';
 import { DEFINITIVE_FIGHTERS } from '../../ts/src/game/assets/definitiveFighters';
 import type { Character } from '../../ts/src/game/sim/codes';
-import { victoryAnimation } from '../../ts/src/game/presentation/matchAudio';
 import { clipNames } from './clip-names';
+import { FIGHTER_ART, fighterArt } from '../../ts/src/generated/fighterArtData';
 
 /** The sequence indices each body plays: the fighter's production clips and its results-screen victory pose. */
 export interface PlayedMoves { readonly classic: readonly number[]; readonly definitive: readonly number[] }
 export function playedMoves(character: Character, motion: mdx.Model): PlayedMoves {
-    const victory = clipNames(motion.Sequences).get(victoryAnimation(character));
+    const victory = clipNames(motion.Sequences).get(fighterArt(character).victory);
     const played = new Set(flashableSequences(character, motion.Sequences).map(sequence => motion.Sequences.indexOf(sequence)));
     if (victory !== undefined) played.add(victory);
     const sorted = [...played].sort((a, b) => a - b);
@@ -31,7 +30,7 @@ export function classicBody(motion: mdx.Model, rig: FighterRig, played: readonly
 
 /** The stock Definitive body as a fighter's rig uses it: mirrored to its striking hand and without unshown meshes. */
 export function stockBody(stock: ArrayBuffer, rig: FighterRig): mdx.Model {
-    const fighter = fighters.get(rig.character) ?? { name: `Fighter ${rig.character}` };
+    const fighter = FIGHTER_ART.get(rig.character) ?? { name: `Fighter ${rig.character}` };
     const hd = parseHdBody(stock);
     if (rig.mirror === true) {
         for (const node of hd.Nodes) {
@@ -68,7 +67,7 @@ export function stockBody(stock: ArrayBuffer, rig: FighterRig): mdx.Model {
 /** One fighter's Definitive timeline body, generated from its canonical motion onto the stock Definitive model. */
 export function definitiveBody(motion: mdx.Model, stock: ArrayBuffer, rig: FighterRig, played: readonly number[]) {
     const character = rig.character;
-    const fighter = fighters.get(character) ?? { name: `Fighter ${character}` };
+    const fighter = FIGHTER_ART.get(character) ?? { name: `Fighter ${character}` };
     const hd = stockBody(stock, rig);
     // The Crypt Lord names a base-only glow; Definitive has the same stock art under this path (#346).
     for (const texture of hd.Textures) if (texture.Image.replaceAll('\\', '/').replace(/\.(blp|tif|dds|tga)$/i, '').toLowerCase() === 'replaceabletextures/teamglow/teamglow00') texture.Image = 'Textures\\TeamGlow0000.dds';

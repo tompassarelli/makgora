@@ -1,7 +1,8 @@
 import { chmodSync, cpSync, mkdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { generateMDX, model as mdx } from "war3-model";
-import { DrawnModel, sheet } from "../../ts/scripts/wisp/hurtboxView";
+import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
+import { sheet } from "../../ts/scripts/wisp/hurtboxView";
 import { AttackPhase, Character } from "../../ts/src/game/sim/codes";
 import { seconds } from "./asset-info";
 import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";

@@ -24,7 +24,8 @@ import { advanceSpecials, startFighterSpecial } from "../../src/game/sim/special
 import { FROZEN_THRONE_STAGE } from "../../src/game/sim/stage";
 import { advanceFighter } from "../../src/game/sim/step";
 import type { MoveClass, MoveSample, ScoreFrame, ScoreSkeleton } from "./animScore";
-import { capture, DrawnModel, type PoseFrame } from "./hurtboxView";
+import { DrawnModel } from "./drawnModel";
+import { capture, type PoseFrame } from "./hurtboxView";
 
 export type Look = "classic" | "definitive";
 

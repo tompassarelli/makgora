@@ -1,7 +1,7 @@
 import { chmodSync } from "node:fs";
 import { relative, resolve } from "node:path";
 import { generateMDX, parseMDL, model as mdx } from "war3-model";
-import { DrawnModel } from "../../ts/scripts/wisp/hurtboxView";
+import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
 import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./original-clips";
 
 const NODE_LISTS = ["Bones", "Helpers", "Attachments", "Lights", "ParticleEmitters", "ParticleEmitters2", "ParticleEmitterPopcorns", "RibbonEmitters", "EventObjects", "CollisionShapes"] as const;
