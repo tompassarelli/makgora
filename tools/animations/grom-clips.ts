@@ -304,8 +304,7 @@ for (const [ordinal, action] of actions.entries()) if (/^victim(Pummel|Throw)/.t
   records[ordinal]!.frames = 60; records[ordinal]!.contact = 30;
 }
 const normalReach = [];
-let tiltForward = 0;
-for (const style of [AttackStyle.upTilt] as readonly AttackStyle[]) {
+for (const style of [AttackStyle.upTilt]) {
   const ordinal = normals.findIndex(normal => normal[1] === style), action = actions[ordinal]!;
   const index = source.Sequences.length + ordinal, [start, end] = model.Sequences[index]!.Interval;
   const root = model.Nodes.find(node => node.Name === "Bone_Root")!, chest = model.Nodes.find(node => node.Name === "Bone_Chest")!;
@@ -344,10 +343,7 @@ for (const style of [AttackStyle.upTilt] as readonly AttackStyle[]) {
         }
         const row = measureDrawnReach(new DrawnModel(generateMDX(model), characterModelScale(22)), 22, style);
         if (row.swing < 30 || row.peakFrame < row.firstActive - slack || row.peakFrame > row.lastActive + slack) continue;
-        if (style === AttackStyle.forwardTilt && row.forward < 70) continue;
-        if ((style === AttackStyle.jab || style === AttackStyle.jab2) && row.forward >= tiltForward) continue;
         selected = row;
-        if (style === AttackStyle.forwardTilt) tiltForward = row.forward;
         normalReach.push({ style, activeRoot, activeChest, recoilRoot, ...row });
         console.log(`GROM_NORMAL_REACH_PASS ${style} ${JSON.stringify(normalReach.at(-1))}`);
         break selection;
