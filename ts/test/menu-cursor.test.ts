@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { testHeadless } from "./headless";
+import { LEFT_KEY, RIGHT_KEY, testHeadless } from "./headless";
 import type { HeadlessClient } from "wisp/src/headless/client";
 import { Phase, ResultPick } from "../src/game/lobby/lobbyState";
 import { install, start } from "../src/host/entries/playableMain";
@@ -10,6 +10,7 @@ import { cellRect, rosterGrid } from "../src/game/menu/selectionGrid";
 import { cardX } from "../src/game/menu/selectionDrag";
 import { PLAYABLE_CHARACTERS } from "../src/game/sim/heroes/registry";
 import { START_BUTTON } from "../src/game/ui/selectionLayout";
+import { PICKER_DONE } from "../src/game/ui/settingsUi";
 import { RULE_BUTTONS } from "../src/game/ui/ruleButtons";
 import { TEAM_NAMES } from "../src/game/sim/teams";
 import { BUTTON_WIDTH, CHOICE_HEIGHT, CHOICE_TOP, choiceLeft } from "../src/game/ui/resultsBanner";
@@ -31,12 +32,15 @@ interface Watch {
   confirm: unknown;
   frames: Map<string, unknown>;
   plainButtons: { frame: unknown; events: unknown[] }[];
+  settingsDialogs: number;
+  settingsHits: number;
 }
 
 function watch(client: HeadlessClient): Watch {
-  const seen: Watch = { cursor: [], warps: 0, hand: undefined, handShown: false, stageDialogs: [], selectionDialogs: [], text: new Map(), confirm: undefined, frames: new Map(), plainButtons: [] };
+  const seen: Watch = { cursor: [], warps: 0, hand: undefined, handShown: false, stageDialogs: [], selectionDialogs: [], text: new Map(), confirm: undefined, frames: new Map(), plainButtons: [], settingsDialogs: 0, settingsHits: 0 };
   const { natives } = client;
   const stageParents = new Set<unknown>();
+  const settingsParents = new Set<unknown>();
   const create = natives.BlzCreateFrameByType as Native;
   natives.BlzCreateFrameByType = (...args: unknown[]) => {
     const frame = create(...args);
@@ -44,6 +48,8 @@ function watch(client: HeadlessClient): Watch {
     if (args[1] === "MeleeStageRoot" || args[1] === "MeleeStagePoolRoot") stageParents.add(frame);
     if (args[1] === `MeleeConfirmLabel${client.slot}`) seen.confirm = frame;
     seen.frames.set(String(args[1]), frame);
+    if (String(args[1]).startsWith("MeleeSettingsRoot")) settingsParents.add(frame);
+    if (args[0] === "BUTTON" && /^MeleeSettings\w*Hit/.test(String(args[1]))) seen.settingsHits++;
     if (args[0] === "BUTTON" && /^Melee(Tile|Mode|Settings)Button/.test(String(args[1]))) seen.plainButtons.push({ frame, events: [] });
     if (args[3] === "ScriptDialogButton" && String(args[1]).startsWith("MeleeMoves")) seen.selectionDialogs.push({ frame, events: [] });
     return frame;
@@ -51,6 +57,7 @@ function watch(client: HeadlessClient): Watch {
   const dialog = natives.BlzCreateFrame as Native;
   natives.BlzCreateFrame = (...args: unknown[]) => {
     const frame = dialog(...args);
+    if (args[0] === "ScriptDialogButton" && settingsParents.has(args[1])) seen.settingsDialogs++;
     if (args[0] === "ScriptDialogButton") (stageParents.has(args[1]) ? seen.stageDialogs : seen.selectionDialogs).push({ frame, events: [] });
     return frame;
   };
@@ -98,6 +105,8 @@ function menu() {
   };
   clients.start();
   clients.frames(30);
+  for (const slot of [0, 1]) expect(clients.click(slot, f32(PICKER_DONE.x + f32(PICKER_DONE.width / 2)), f32(PICKER_DONE.y - f32(PICKER_DONE.height / 2)))).toBe(true);
+  clients.frames(2);
   for (const slot of [0, 1]) expect(clients.click(slot, f32(0.49), f32(0.2975))).toBe(true);
   clients.frames(2);
   return { clients, watches, phases, point };
@@ -188,7 +197,7 @@ test("fighter tiles register no hover events and a resting pointer still lights 
 test("entering stage select avoids cursor-displacing dialog hover events and cursor toggles, leaves a pointer inside Start, and moves one outside it once [k1 scenario]", () => {
   const { clients, watches, phases, point } = menu();
   const centre = { x: START_BUTTON.x + START_BUTTON.width / 2, y: START_BUTTON.y - START_BUTTON.height / 2 };
-  for (const slot of [0, 1]) clients.press(slot, Key.r);
+  for (const slot of [0, 1]) clients.press(slot, RIGHT_KEY);
   clients.frames(10);
   point(AWAY.x, AWAY.y);
   clients.frames(5);
@@ -227,7 +236,7 @@ test("Start answers clicks in one rectangle on character select and on stage sel
   const top = START_BUTTON.y;
   const bottom = f32(START_BUTTON.y - START_BUTTON.height);
   const middle = f32(START_BUTTON.y - START_BUTTON.height / 2);
-  for (const slot of [0, 1]) clients.press(slot, Key.r);
+  for (const slot of [0, 1]) clients.press(slot, RIGHT_KEY);
   clients.frames(10);
 
   const outside = [[left - 0.01, middle], [right + 0.005, middle], [f32(left + START_BUTTON.width / 2), top + 0.001], [f32(left + START_BUTTON.width / 2), bottom - 0.003]] as const;
@@ -312,14 +321,14 @@ test("on the results banner arrows and movement keys move each player's choice a
     clients.client(0).run(() => { value = shell().resultFocus?.[slot]; });
     return value;
   };
-  clients.press(0, Key.r);
+  clients.press(0, RIGHT_KEY);
   clients.frames(1);
   expect(focus(0)).toBe(ResultPick.rematch);
   clients.press(0, 0x27);
   clients.frames(1);
   expect(focus(0)).toBe(ResultPick.newStage);
   clients.press(0, 0x25);
-  clients.press(0, Key.w);
+  clients.press(0, LEFT_KEY);
   clients.frames(1);
   expect(focus(0)).toBe(ResultPick.characters);
   const x = f32(choiceLeft(ResultPick.newStage) + BUTTON_WIDTH / 2);
@@ -327,5 +336,14 @@ test("on the results banner arrows and movement keys move each player's choice a
   for (const slot of [0, 1]) expect(clients.click(slot, x, y)).toBe(true);
   clients.frames(2);
   for (const client of clients.clients) client.run(() => { expect(shell().game.phase).toBe(Phase.stageMenu); });
+  for (const client of clients.clients) expect(client.errors).toEqual([]);
+});
+
+test("the controls screen clicks through invisible plain buttons, never Warcraft dialog buttons that draw over its key caps and hide the cursor [k1 scenario]", () => {
+  const { clients, watches } = menu();
+  for (const seen of watches) {
+    expect(seen.settingsDialogs).toBe(0);
+    expect(seen.settingsHits).toBeGreaterThan(40);
+  }
   for (const client of clients.clients) expect(client.errors).toEqual([]);
 });

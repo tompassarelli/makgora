@@ -226,7 +226,9 @@ export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (c
       ui.selections[slot] = new SelectionPanel(actions.selection, slot, menuControls(s));
     } else ui.selections[slot].bindActions(actions.selection);
     bindPrototype(ui.settings[slot], SettingsPanel.prototype);
-    ui.settings[slot].bindActions(actions.settings);
+    const retainedSettings: { readonly root?: framehandle } = ui.settings[slot];
+    if (retainedSettings.root === undefined) ui.settings[slot] = new SettingsPanel(s.participants[slot].bindings, actions.settings, slot);
+    else ui.settings[slot].bindActions(actions.settings);
   }
   bindPrototype(ui.stage, StagePanel.prototype);
   ui.stage.bindActions(actions.stage);

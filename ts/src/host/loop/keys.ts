@@ -12,6 +12,7 @@ import { emitImpacts } from "../../game/presentation/impactState";
 
 import { Action } from "../../game/input/actions";
 import { sampleKeys } from "../../game/input/keyboardCapture";
+import { menuAction, pauseMenuKeys } from "../../game/input/keyBindings";
 import { isCarrierKey } from "../../game/netcode/journal/keyboard";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, isParticipantSlot } from "../../game/input/participants";
 import { heldActions, keyDown, pressKey, releaseKey } from "../../game/input/playerKeys";
@@ -28,7 +29,7 @@ import { applyFighterSetup } from "../../game/session/fighterSetup";
 import { prepareDevState, commitDevState } from "./devState";
 import { applySetupCommand } from "../../game/session/sessionSetup";
 import { pausedMessage } from "../../game/session/messages";
-import { captureBinding } from "../../game/ui/bindingSettings";
+import { cancelBindingCapture, captureBinding } from "../../game/ui/bindingSettings";
 import { writeLines } from "wisp/src/platform/fileio";
 import { confirmedChecksum, startInputTrace, traceParticipant } from "./diagnostics";
 import { probeFrameCostClock } from "./frameCost";
@@ -45,7 +46,7 @@ import { startAgencyFixture } from "./agencyFixture";
 import { applyShowcaseCommand } from "./showcase";
 import { showcaseRequest } from "../../game/session/showcase";
 import { clearVisualCapture, configureVisualCapture } from "../../game/session/visualCapture";
-import { back, choose, confirm, openSettingsScreen, resultKey, resetToStartingSelection, startDevClassic, startDevLore, startQuickMatch } from "./menus";
+import { back, choose, confirm, journalMenuKey, openSettingsScreen, resultKey, resetToStartingSelection, startDevClassic, startDevLore, startQuickMatch } from "./menus";
 import { LORE_BATTLES } from "../../game/classic/loreBattles";
 import { makePreview } from "./preview";
 import { exportProbe, probeIntegrity, probeRecording, startProbe } from "./responseProbe";
@@ -73,7 +74,7 @@ export function startDown(s: ShellState, slot: ParticipantSlot): void {
   const playing = s.game.phase === Phase.match;
   if (epoch?.journal.editbox !== undefined && chatBusy(epoch.journal)) return;
   if (epoch !== undefined && playing && epoch.journal.barrier.request !== undefined) return;
-  if (s.session.paused) s.pauseKeysHeld = [0x26, 0x28, 32, 69, Key.n, Key.u, ...PAUSE_CAMERA_KEYS].filter(key => BlzIsKeyPressed(ConvertOsKeyType(key)));
+  if (s.session.paused) s.pauseKeysHeld = [...pauseMenuKeys(s.participants[slot].bindings.bindings), ...PAUSE_CAMERA_KEYS].filter(key => BlzIsKeyPressed(ConvertOsKeyType(key)));
   const deferred = epoch !== undefined && playing;
   const consumed = !s.session.startHeld[slot] && views(s).selections[slot].consumeStart();
   const action = startKeyDown(s.session, slot, s.game.phase, consumed || views(s).settings[slot].isOpen(), deferred);
@@ -89,28 +90,6 @@ export function startDown(s: ShellState, slot: ParticipantSlot): void {
   } else if (action === "confirm") confirm(s, slot);
 }
 
-
-function journalMenuKey(s: ShellState, slot: ParticipantSlot, key: number): boolean {
-  const action = key === Key.w ? Action.moveLeft : key === Key.r ? Action.moveRight : key === 32 ? Action.moveUp : key === 69 ? Action.moveDown : key === Key.n ? Action.attack : key === Key.u ? Action.special : undefined;
-  if (action !== undefined) {
-    pressKey(s.participants[slot].keys, key, s.participants[slot].bindings.bindings);
-    if (views(s).selections[slot].menuAction(action)) return true;
-  }
-  if ((key === Key.w || key === Key.r || key === Key.n || key === Key.u) && cancelRematchCountdown(s.game, slot)) return true;
-  if (key === Key.w || key === Key.r) choose(s, slot, key === Key.w ? -1 : 1);
-  else if (key === Key.n) {
-    if (s.game.phase !== Phase.characterMenu) confirm(s, slot);
-    else {
-      cancelPendingPlaytest();
-      selectCharacter(s.game, slot, characterFor(s.game, slot) ?? 0);
-      makePreview(s);
-    }
-  } else if (key === Key.u) {
-    if (s.game.phase === Phase.characterMenu) recallCharacter(s.game, slot, slot);
-    else back(s, slot);
-  } else return false;
-  return true;
-}
 
 function exitPausedMatch(s: ShellState, title: boolean): void {
   ownConfirmedState(s);
@@ -149,7 +128,7 @@ export function selectPauseMenu(s: ShellState, actor: number, choice: number): v
 function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = false): void {
   if (!humanActive(s.game, slot)) return;
   const key = GetHandleId(BlzGetTriggerPlayerKey());
-  if (!startKey && !keyEventAllowed(s.keyEvents, key)) return;
+  if (!startKey && !keyEventAllowed(s.keyEvents, key, s.participants[slot].bindings.bindings)) return;
   if (journalOwnsKey(s, slot, key)) return;
   if (s.trace.active) s.trace.window.keyDown[slot]++;
   traceParticipant(s, slot, `received down ${key}`);
@@ -157,8 +136,9 @@ function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = fal
   const { keys, bindings } = participant;
   const settings = views(s).settings[slot];
   if (key < 0 || key > 255 || keyDown(keys, key)) return;
-  if (s.pauseMenu?.title && (key === Key.n || key === Key.y)) {
-    if (key === Key.n && s.titleAwaitRelease) return;
+  const menu = menuAction(bindings.bindings, key);
+  if (s.pauseMenu?.title && (menu === Action.attack || key === Key.y)) {
+    if (menu === Action.attack && s.titleAwaitRelease) return;
     s.pauseMenu.title = false;
     return;
   }
@@ -173,21 +153,26 @@ function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = fal
       return;
     }
     if (GetTriggerPlayer() === GetLocalPlayer()) returnPauseMenu(s);
-    const menu = s.pauseMenu ??= { choice: 0, shown: true, title: false };
+    const pause = s.pauseMenu ??= { choice: 0, shown: true, title: false };
     if (key === Key.f2 && s.game.training) s.trainingHints = !s.trainingHints;
-    else if (key === 0x26 || key === 32) menu.choice = menu.choice === 0 ? 2 : menu.choice - 1;
-    else if (key === 0x28 || key === 69) menu.choice = menu.choice === 2 ? 0 : menu.choice + 1;
-    else if (key === Key.escape || key === Key.u) exitPausedMatch(s, false);
-    else if (key === Key.n) {
-      selectPauseMenu(s, slot, menu.choice);
+    else if (menu === Action.moveUp) pause.choice = pause.choice === 0 ? 2 : pause.choice - 1;
+    else if (menu === Action.moveDown) pause.choice = pause.choice === 2 ? 0 : pause.choice + 1;
+    else if (key === Key.escape || menu === Action.special) exitPausedMatch(s, false);
+    else if (menu === Action.attack) {
+      selectPauseMenu(s, slot, pause.choice);
     }
     return;
   }
+  if (key === Key.escape && bindings.capture !== undefined) {
+    cancelBindingCapture(bindings);
+    return;
+  }
+  if (key === Key.escape) settings.dismissOffer();
   if (key === Key.escape && settings.isOpen()) {
     settings.close();
     return;
   }
-  if (settings.isOpen()) {
+  if (settings.isOpen() || bindings.capture !== undefined) {
     captureBinding(bindings, key);
     return;
   }
@@ -221,9 +206,9 @@ function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = fal
 function participantKeyUp(s: ShellState, slot: ParticipantSlot, startKey = false): void {
   if (!humanActive(s.game, slot)) return;
   const key = GetHandleId(BlzGetTriggerPlayerKey());
-  if (!startKey && !keyEventAllowed(s.keyEvents, key)) return;
+  if (!startKey && !keyEventAllowed(s.keyEvents, key, s.participants[slot].bindings.bindings)) return;
 
-  if (key === Key.n && s.pauseMenu?.title) s.titleAwaitRelease = false;
+  if (s.pauseMenu?.title && menuAction(s.participants[slot].bindings.bindings, key) === Action.attack) s.titleAwaitRelease = false;
 
   if (key === Key.y) {
     startKeyUp(s.session, slot);

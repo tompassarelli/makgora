@@ -4,6 +4,8 @@
 import { PARTICIPANT_SLOTS } from "../../game/input/participants";
 import { Phase, humanActive } from "../../game/lobby/lobbyState";
 import { trampoline } from "wisp/src/platform/dispatch";
+import { Action } from "../../game/input/actions";
+import { type KeyBindings, menuAction } from "../../game/input/keyBindings";
 import { type ShellState, activeRollback } from "./state";
 
 import { pauseCameraKey } from "./pauseCamera";
@@ -47,10 +49,11 @@ export function syncKeyEventPolicy(policy: KeyEventPolicy, rollbackMatch: boolea
   policy.escapeOnly = paused || title;
 }
 
-export function keyEventAllowed(policy: Readonly<KeyEventPolicy>, key: number): boolean {
+export function keyEventAllowed(policy: Readonly<KeyEventPolicy>, key: number, bindings: Readonly<KeyBindings>): boolean {
   if (!policy.enabled) return false;
   if (!policy.escapeOnly) return true;
-  return pauseCameraKey(key) || key === Key.escape || key === Key.f2 || key === 0x26 || key === 0x28 || key === 32 || key === 69 || key === Key.n || key === Key.u;
+  const menu = menuAction(bindings, key);
+  return pauseCameraKey(key) || key === Key.escape || key === Key.f2 || (menu !== undefined && menu !== Action.moveLeft && menu !== Action.moveRight);
 }
 
 

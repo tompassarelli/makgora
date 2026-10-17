@@ -17,6 +17,8 @@ import { PREDICTED_HEADLESS } from "../scripts/wisp/headless";
 import { JournalHelpers } from "./rematch/journalHelper";
 import { expectSynchronized, shows, value } from "./rematch/playableMatch";
 import { sweep } from "./sweep";
+import { PICKER_DONE } from "../src/game/ui/settingsUi";
+import { f32 } from "wisp/src/sim/f32";
 const headless = testHeadless(PREDICTED_HEADLESS);
 function session(endless = false, hazardsOff = false, dropsOff = false) {
   const clients = headless.clients({ start: () => startBuild(INTEGRITY_BUILD), install }, [0, 1], { delivery: syncDelivery(MEASURED_BATTLE_NET, 74), keepCalls: 64 });
@@ -34,6 +36,8 @@ function session(endless = false, hazardsOff = false, dropsOff = false) {
     frames(1);
   };
   clients.start(); frames(30);
+  for (const actor of [0, 1]) expect(clients.click(actor, f32(PICKER_DONE.x + f32(PICKER_DONE.width / 2)), f32(PICKER_DONE.y - f32(PICKER_DONE.height / 2)))).toBe(true);
+  frames(2);
   click("fewerStocks"); click("fewerStocks", 0);
   for (let i = 0; i < 7; i++) click("lessTime");
   for (const client of clients.clients) expect(value(client, () => shell().game.timeLimitMinutes)).toBe(0);

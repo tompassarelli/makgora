@@ -21,6 +21,8 @@ import { matchRecordFile, replayFile, replayPartFile } from "../src/game/core/ga
 import { install, startBuild } from "../src/platform/main";
 import { Key } from "../src/host/loop/keyEvents";
 import { shell } from "../src/host/loop/state";
+import { Action } from "../src/game/input/actions";
+import { DEFAULT_PRESET, keyFor, presetBindings } from "../src/game/input/keyBindings";
 import { PREDICTED_HEADLESS } from "../scripts/wisp/headless";
 import { replayInLua } from "../scripts/wisp/commands/replay";
 import { readReplay } from "../scripts/wisp/replayFiles";
@@ -44,7 +46,9 @@ function joinedReplay(client: HeadlessClient, serial: number): string[] {
 }
 
 
-const KEYS = { left: 0x57, right: 0x52, jump: 0x5a, attack: 0x4e, special: 0x55, grab: 0x4f, shield: 0x51 } as const;
+const DEFAULT_KEYS = presetBindings(DEFAULT_PRESET);
+const bound = (action: Action): number => keyFor(DEFAULT_KEYS, action, 0) ?? 0;
+const KEYS = { left: bound(Action.moveLeft), right: bound(Action.moveRight), jump: 0x5a, attack: bound(Action.attack), special: bound(Action.special), grab: bound(Action.grab), shield: bound(Action.leftTrigger) } as const;
 
 const TAPS = [KEYS.jump, KEYS.attack, KEYS.special, KEYS.grab, KEYS.shield, KEYS.attack];
 
