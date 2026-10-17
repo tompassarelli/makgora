@@ -379,6 +379,7 @@ export interface JumpSample {
   readonly secondClip: string;
   readonly firstSeconds: readonly number[];
   readonly secondSeconds: readonly number[];
+  readonly secondHeights: readonly number[];
 }
 
 const JUMP_PHASES = 16;
@@ -419,7 +420,7 @@ export function sampleJumps(model: DrawnModel, character: Character): JumpSample
   });
   const phased = (frames: readonly PoseFrame[]) => phases(frames).map((frame) => pose(model, character, frame));
   const timeline = (frames: readonly PoseFrame[]) => phases(frames).map((frame) => timelineSeconds(character, frame));
-  return { stand: pose(model, character, standing), first: phased(first), second: phased(second), firstSeconds: timeline(first), secondSeconds: timeline(second),
+  return { stand: pose(model, character, standing), first: phased(first), second: phased(second), firstSeconds: timeline(first), secondSeconds: timeline(second), secondHeights: phases(second).map((frame) => frame.z),
     firstClip: clipLabel(character, first[Math.floor(first.length / 2)]?.clip), secondClip: clipLabel(character, second[Math.floor(second.length / 2)]?.clip) };
 }
 

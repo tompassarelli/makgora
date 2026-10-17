@@ -11,14 +11,17 @@ export const isMovementMove = (move: string): move is MovementMove => (MOVEMENT_
 const spread = (values: readonly number[], count: number) =>
   Array.from({ length: Math.min(count, values.length) }, (_, index) => values[Math.round(index * (values.length - 1) / Math.max(1, Math.min(count, values.length) - 1))] ?? 0);
 
-export const crouchSeconds = (sample: CrouchSample) => [sample.standSeconds, sample.crouchSeconds];
-export const ledgeSeconds = (sample: LedgeSample) => spread(sample.hangSeconds, 4);
-export const doubleJumpSeconds = (sample: JumpSample) => spread(sample.secondSeconds, 6);
+export interface MovementFrames { readonly seconds: readonly number[]; readonly heights: readonly number[] }
 
-export function movementSeconds(move: MovementMove, model: DrawnModel, character: Character): readonly number[] {
-  if (move === "crouch") return crouchSeconds(sampleCrouch(model, character));
-  if (move === "ledge-hang") return ledgeSeconds(sampleLedgeHang(model, character));
-  return doubleJumpSeconds(sampleJumps(model, character));
+const grounded = (seconds: readonly number[]): MovementFrames => ({ seconds, heights: seconds.map(() => 0) });
+export const crouchFrames = (sample: CrouchSample) => grounded([sample.standSeconds, sample.crouchSeconds]);
+export const ledgeFrames = (sample: LedgeSample) => grounded(spread(sample.hangSeconds, 4));
+export const doubleJumpFrames = (sample: JumpSample): MovementFrames => ({ seconds: spread(sample.secondSeconds, 6), heights: spread(sample.secondHeights, 6) });
+
+export function movementFrames(move: MovementMove, model: DrawnModel, character: Character): MovementFrames {
+  if (move === "crouch") return crouchFrames(sampleCrouch(model, character));
+  if (move === "ledge-hang") return ledgeFrames(sampleLedgeHang(model, character));
+  return doubleJumpFrames(sampleJumps(model, character));
 }
 
 
@@ -33,6 +36,11 @@ export const stageShape = (move: MovementMove, pixelsPerUnit: number): StageShap
   if (move !== "ledge-hang") return { kind: "floor", y: FRAME_HEIGHT / 2 + FOCUS_RISE * pixelsPerUnit };
   const corner = ledgeCorner();
   return { kind: "corner", x: FRAME_WIDTH / 2 + corner.x * pixelsPerUnit, y: FRAME_HEIGHT / 2 + (FOCUS_RISE - corner.z) * pixelsPerUnit };
+};
+
+export const movementCrop = (heights: readonly number[], pixelsPerUnit: number) => {
+  const rise = 2 * Math.ceil(Math.max(0, ...heights) * pixelsPerUnit / 2);
+  return `480x${360 + rise}+0-${60 + rise / 2}`;
 };
 
 export const stageDrawArgs = (shape: StageShape): readonly string[] => [

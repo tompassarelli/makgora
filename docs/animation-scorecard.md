@@ -92,7 +92,9 @@ five lines, including an independent judgement, in each supported look.
 renders batches; `--move FIGHTER:MOVE` selects particular moves. It accepts
 the scoring command's graphics and asset flags. The camera follows each
 pose's height while preserving gameplay scale, so flight does not crop the
-body out of its strip. Read `docs/animation-judge-brief.md` in a fresh judge
+body out of its strip; a movement strip (crouch, ledge hang, double jump)
+instead holds the camera on the drawn floor and grows upward so a jump shows
+its real height above it. Read `docs/animation-judge-brief.md` in a fresh judge
 context and write its requested JSONL. `bun wisp anim judge record
 PRIVATE_DIR/scores-*.jsonl` validates and stores numerical judgements in
 `tools/move-data/anim-score/judge.jsonl`. Reference pixels stay outside Git.

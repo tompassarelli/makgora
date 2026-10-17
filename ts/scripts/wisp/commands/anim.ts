@@ -21,7 +21,7 @@ import { FROZEN_THRONE_STAGE } from "../../../src/game/sim/stage";
 import { runProcess } from "../../hostProcess";
 import { CROUCH_THRESHOLDS, DOUBLE_JUMP_THRESHOLDS, LEDGE_THRESHOLDS, type MoveScore, THRESHOLDS, scoreCrouch, scoreDoubleJump, scoreLedgeHang, scoreMove } from "../animScore";
 import { type CrouchClipKind, type Look, type SampledMove, gameplayPixelsPerUnit, loadBody, sampleCrouch, sampleFighter, sampleJumps, sampleLedgeHang } from "../animScoreSample";
-import { answerKey, type ColdStrip, coldReadBatch, coldReadBatches, isMovementMove, ledgeCorner, type MovementMove, movementSeconds, stageDrawArgs, stageShape, stripId } from "../animMovementRows";
+import { answerKey, type ColdStrip, coldReadBatch, coldReadBatches, isMovementMove, ledgeCorner, type MovementMove, movementCrop, movementFrames, stageDrawArgs, stageShape, stripId } from "../animMovementRows";
 import { assetsView, readManifest } from "../buildInputs";
 import { headlessRender } from "../headlessRender";
 import { projectRoot } from "../project";
@@ -331,8 +331,8 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
     if (!isMovementMove(move)) continue;
     const character = fighters.find((candidate) => fighterSlug(candidate) === slug);
     if (character === undefined) continue;
-    const seconds = yield* attempt(`sample ${slug} ${move}`, async () => movementSeconds(move, await loadBody(assets, character, look), character));
-    strips.push({ fighter: slug, move, seconds, heights: seconds.map(() => 0), caption: "", movement: true });
+    const { seconds, heights } = yield* attempt(`sample ${slug} ${move}`, async () => movementFrames(move, await loadBody(assets, character, look), character));
+    strips.push({ fighter: slug, move, seconds, heights, caption: "", movement: true });
   }
   if (strips.length === 0) return yield* new UsageFailure({ problem: "no scored move matches" });
 
@@ -356,7 +356,7 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
       const z = FLOOR_HEIGHT + (strip.heights[index] ?? 0);
       scenes.push({
         ...base, frame: id, units: [], ui: [], textTags: [],
-        camera: { ...base.camera, x: 0, y: 0, fields: { ...base.camera.fields, CAMERA_FIELD_TARGET_DISTANCE: camera.distance, CAMERA_FIELD_ZOFFSET: z + 90, CAMERA_FIELD_FIELD_OF_VIEW: cameraFieldOfView(camera, MATCH_CAMERA_ASPECT) } },
+        camera: { ...base.camera, x: 0, y: 0, fields: { ...base.camera.fields, CAMERA_FIELD_TARGET_DISTANCE: camera.distance, CAMERA_FIELD_ZOFFSET: (strip.movement ? FLOOR_HEIGHT : z) + 90, CAMERA_FIELD_FIELD_OF_VIEW: cameraFieldOfView(camera, MATCH_CAMERA_ASPECT) } },
         effects: [{ ...bodyEffect, model: clip.modelPath, animation: "Stand", animationElapsed: seconds, animationClock: 0, timeScale: 0, x: 0, y: 0, z, yaw: 0, teamColor: 0, alpha: 255 }],
       });
     }
@@ -374,8 +374,8 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
     if (row.movement) {
       const id = stripId(look, row.fighter, row.move), anonymous = join(output, "moves", `strip-${id}.png`);
       mkdirSync(join(output, "moves"), { recursive: true });
-      const stage = stageDrawArgs(stageShape(row.move as MovementMove, gameplayPixelsPerUnit()));
-      yield* runProcess(ChildProcess.make("magick", [...crops.flatMap((crop) => ["(", crop, ...stage, "-gravity", "center", "-crop", "480x360+0-60", "+repage", ")"]), "+append", anonymous]));
+      const stage = stageDrawArgs(stageShape(row.move as MovementMove, gameplayPixelsPerUnit())), window = movementCrop(row.heights, gameplayPixelsPerUnit());
+      yield* runProcess(ChildProcess.make("magick", [...crops.flatMap((crop) => ["(", crop, ...stage, "-gravity", "center", "-crop", window, "+repage", ")"]), "+append", anonymous]));
       cold.push({ id, fighter: row.fighter, move: row.move as MovementMove, path: anonymous });
       continue;
     }
