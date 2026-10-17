@@ -463,7 +463,7 @@ The individual hero sections below specify all attacks. Their counterplay descri
 | Up tilt — Rising Crescent | 7/5/20 | 8 | M, 90, LAUNCH | Arc above and slightly behind; weak directly low in front |
 | Down tilt — Ankle Cut | 7/3/17 | 6 | L, 75, LINK | Low thin sweep; a starter rather than a kill move |
 | Dash attack — Advancing Slash | 10/4/26 | 10 | L, 45, LAUNCH | Moves 0.55H forward during startup; cannot pass through shield |
-| Forward smash — Execution Cut | 17/3/32 | 15 inner, 19 outer | XL, 40, KILL | Large horizontal cut; outer 0.20H is sweetspot |
+| Forward smash — Execution Cut | 17/3/32 | 13 inner, 17 outer | XL, 40, KILL growth, base 30 | Large horizontal cut; outer 0.20H is sweetspot |
 | Up smash — Sky Splitter | 15/4/30 | 16 | L, 90, KILL | Narrow vertical blade with no broad ground scoop |
 | Down smash — Low Circle | 14/6/31 | 14 | L, 25, EDGE | Low sword sweep in front on frames 14–16, then behind on 17–19; one hit total per target |
 | Neutral air — Blade Wheel | 7/9/17; L12 | 3 + 6 | M, 50, POKE | Two quick arcing cuts ([multi-hit](aerials.md)): a wide pull-in link, then a tighter launcher |
@@ -535,7 +535,7 @@ Expert gameplan: Time dash-dancing, sword confirms and aerial routes into the ri
 
 ### Signature strong/weak move (#389)
 
-Forward smash, split by position: strong hit sweetspot, frames 17-19, 18.1%; weak hit sourspot, frames 17-19, 14.3%. Critical Strike at the katana's tip: the duelist who spaces to the tip kills.
+Forward smash, split by position: strong hit sweetspot, frames 17-19, 17% at base 30; weak hit sourspot, frames 17-19, 13% at base 30 (Tom, 17 Oct: he struggled to kill, so the tip now kills nearly as early as Mountain King's smash). Critical Strike at the katana's tip: the duelist who spaces to the tip kills.
 The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-weak-hits-389) and every split in the [move list](../move-list.md).
 
 
