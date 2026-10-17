@@ -299,14 +299,18 @@ export const nativeChat = (session: NativeSession, text: string) => setupCommand
 }));
 
 
+const RUN_OUTPUT = /^(trace-[ab]\.txt|scene-[ab]\.txt|result\.json|captures\.json|frame-\d+-\w+(-drawn-\d+)?\.ppm)$/;
+
+const preparePadDirectory = (out: string) => tryIntegrity("create pad directory", out, () => {
+  mkdirSync(out, { recursive: true });
+  for (const name of readdirSync(out)) if (RUN_OUTPUT.test(name) || REPRO_NAME.test(name)) rmSync(join(out, name));
+});
+
 export const nativeScript = (session: NativeSession, options: PadOptions) => Effect.scoped(Effect.gen(function*() {
   const { scriptPath, steps, build, out, chat } = options;
   const callbacks = yield* tryIntegrity("derive pad trace", scriptPath, () => padTraceLength(readFileSync(scriptPath, "utf8"), steps));
   const { clients, data, pads } = session;
-  yield* tryIntegrity("create pad directory", out, () => {
-    mkdirSync(out, { recursive: true });
-    for (const name of readdirSync(out)) if (/^(trace-[ab]\.txt|scene-[ab]\.txt|result\.json|captures\.json|frame-\d+-\w+(-drawn-\d+)?\.ppm)$/.test(name) || REPRO_NAME.test(name)) rmSync(join(out, name));
-  });
+  yield* preparePadDirectory(out);
   const startedMs = Date.now();
   const startedNs = monotonicNs();
   const captureToken = chat !== undefined && steps.some(step => step.kind === "capture") ? visualCaptureToken(startedMs) : undefined;
@@ -497,7 +501,7 @@ export type HeadlessSession = Effect.Success<ReturnType<typeof headlessSession>>
 export const headlessScript = (session: HeadlessSession, options: PadOptions) => Effect.gen(function*() {
   const { scriptPath, steps, build, out, chat } = options;
   const callbacks = yield* tryIntegrity("derive pad trace", scriptPath, () => padTraceLength(readFileSync(scriptPath, "utf8"), steps));
-  yield* tryIntegrity("create pad directory", out, () => mkdirSync(out, { recursive: true }));
+  yield* preparePadDirectory(out);
   const { clients, pads, worker, data } = session;
   const startedMs = Date.now();
   const startedNs = monotonicNs();
