@@ -1,11 +1,12 @@
 # #182: repeated close shields teach a forecast; a late grab and surprise
 # jump change the pattern. Native/headless compare includes read commitments,
 # bounded habits and delayed observations in the confirmed match state.
-#! chat -dev quick cpu wren expert
-# Headless reference (hosted headless pads at 975133cd): the level-9 computer's
+#! chat -dev quick cpu wren expert hero Illidan
+# Headless reference, Illidan computer on main: the level-9 computer's
 # first two hits on the approaching human, on their frames:
-#! expect a 64 damage 12.753
-#! expect a 185 damage 25.507
+# 6ff360c3a7 (#279 move variety) moved them from 64 and 185: b9cce3e1ed holds both, 6ff360c3a7 does not.
+#! expect a 82 damage 16.579
+#! expect a 145 damage 21.579
 60 a stick 1 0
 100 a stick 0 0
 120 a press LB
