@@ -173,8 +173,8 @@ mirror-symmetric, so unlike Jungle Japes the current alternates, on a
   and as Smashcraft's wind already does (smashcraft:docs/stage-hazards.md).
   Hitstun and hitlag don't stop it; it moves fighters only.
 - **Strength.** A quarter of Japes' 3.0 mu: from the ledge a floating fighter
-  reaches the side blast line (±1,562.6) in 201 frames (3.3 s), from under the
-  deck's centre in 326 (5.4 s). Swimming against it at 3.6 still loses 1.2 a
+  reaches the side blast line (±1,442.6) in 176 frames (2.9 s), from under the
+  deck's centre in 301 (5.0 s). Swimming against it at 3.6 still loses 1.2 a
   frame, so swimming only buys time; swimming with it doubles the speed.
 - **Learnable.** The tide changes every ten seconds of match time: it runs
   right in the first ten seconds of every twenty and left in the second,

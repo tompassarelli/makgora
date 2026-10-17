@@ -2,7 +2,7 @@
 
 
 import { f32 } from "wisp/src/sim/f32";
-import { mainDeckLeft, mainDeckRight } from "./stage";
+import { TOMB_OF_SARGERAS_STAGE, mainDeckLeft, mainDeckRight } from "./stage";
 import { melee } from "./tuning";
 
 export interface StageRegion {
@@ -26,11 +26,13 @@ function makeBounds(stage: number): { readonly camera: StageRegion; readonly bla
 
 const FINAL_DESTINATION = makeBounds(0);
 
+const TOMB_OF_SARGERAS = { camera: FINAL_DESTINATION.camera, blast: region(0, 226.0, -140.0, 188.0) };
+
 const BATTLEFIELD = {
   camera: region(0, 200.0, -59.0, 170.0, 68.4000015258789),
   blast: region(0, 280.0, -136.0, 250.0, 68.4000015258789),
 };
 
 export function stageBounds(stage: number): { readonly camera: StageRegion; readonly blast: StageRegion } {
-  return stage === 2 ? BATTLEFIELD : FINAL_DESTINATION;
+  return stage === 2 ? BATTLEFIELD : stage === TOMB_OF_SARGERAS_STAGE ? TOMB_OF_SARGERAS : FINAL_DESTINATION;
 }
