@@ -31,8 +31,8 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   timelines and clip metadata before using the generated bindings.
   `bun tools/animations/movement-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT --character ID --pose crouch|ledgeHang [--pose ...]`
   authors a fighter's crouch or ledge hang on its shipped model through the
-  canonical rig (#40): each mapped joint turns about the side-view axis, a root
-  helper plants the ankles (or the lowest point of a legless body) on the floor
+  canonical rig (#40): each mapped joint turns about the side-view axis, one root
+  helper, reused by every later run rather than nested again, plants the ankles (or the lowest point of a legless body) on the floor
   for the crouch and puts one wrist (Thrall: the wolf's front paws) on the ledge
   corner for the hang, and a coordinate search over the joint angles keeps the
   pose scoring best on `anim score`'s crouch or ledge line, measured against the
@@ -53,7 +53,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   and before `jump-clips.ts --character`; then store the family and run
   `bun wisp inputs derive --fighter NAME`. A body the shared joints can't pose (Thrall's
   mount, Goblin Tinker's backpack claws, Mountain King's left-hand hammer, Anub'arak's
-  carapace and squash) keeps its own search space in
+  carapace and squash, Sylvanas's dress, which sinks into the deck unless she squashes) keeps its own search space in
   `tools/animations/movement-poses/FIGHTER.ts`, usually the shared space of
   smashcraft:tools/animations/movement-space.ts plus named bones, refined
   against Definitive like every other space. A pose chosen by measurement rather

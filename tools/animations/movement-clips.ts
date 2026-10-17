@@ -90,13 +90,16 @@ const tailJoint = new Set(TAIL_BONES[character] ?? []);
 const searched = (options: Space["options"]) => Object.entries(options).filter(([key]) => (key !== "tail" || tailJoint.size > 0) && (key !== "fold" || (LEG_BONES[character] ?? []).length > 0));
 const legJoint = new Map((LEG_BONES[character] ?? []).flatMap(([hip, knee, toe]) => [[hip, 1], [knee, -2], [toe, 1]] as const));
 
-const helper: mdx.Helper = { Name: "Movement Motion", ObjectId: model.Nodes.length, Parent: null, Flags: 0, PivotPoint: new Float32Array(3),
+const rootHelper = model.Helpers.find((node) => node.Name === "Movement Motion" && node.Parent == null && node.Translation !== undefined && node.Rotation !== undefined);
+const helper: mdx.Helper = rootHelper ?? { Name: "Movement Motion", ObjectId: model.Nodes.length, Parent: null, Flags: 0, PivotPoint: new Float32Array(3),
   Translation: { LineType: mdx.LineType.Linear, GlobalSeqId: NO_GLOBAL_SEQ, Keys: [] }, Rotation: { LineType: mdx.LineType.Linear, GlobalSeqId: NO_GLOBAL_SEQ, Keys: [] } };
-for (const node of [...model.Bones, ...model.Helpers, ...model.Attachments]) if (node.Parent == null) node.Parent = helper.ObjectId;
-model.Helpers.push(helper); model.Nodes.push(helper); model.PivotPoints.push(helper.PivotPoint);
-for (const sequence of source.Sequences) for (const Frame of sequence.Interval) {
-  helper.Translation!.Keys.push({ Frame, Vector: new Float32Array(3) });
-  helper.Rotation!.Keys.push({ Frame, Vector: new Float32Array([0, 0, 0, 1]) });
+if (rootHelper === undefined) {
+  for (const node of [...model.Bones, ...model.Helpers, ...model.Attachments]) if (node.Parent == null) node.Parent = helper.ObjectId;
+  model.Helpers.push(helper); model.Nodes.push(helper); model.PivotPoints.push(helper.PivotPoint);
+  for (const sequence of source.Sequences) for (const Frame of sequence.Interval) {
+    helper.Translation!.Keys.push({ Frame, Vector: new Float32Array(3) });
+    helper.Rotation!.Keys.push({ Frame, Vector: new Float32Array([0, 0, 0, 1]) });
+  }
 }
 const rotation = helper.Rotation!;
 const translation = helper.Translation!;
