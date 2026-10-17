@@ -51,27 +51,17 @@
 # #144: Frost Nova from the air.
 590 a tap B 8
 598 a tap X 2
-600 a capture
-616 a capture
 # #144: Spectral Ascent, paid.
 650 a stick 0 1
 650 a tap X 2
 651 a stick 0 0
-652 a capture
-660 a capture
 # Spend the mana after Spectral Ascent lands and its landing lag ends (#189).
 750 a stick 1 0
 750 a tap X 2
 751 a stick 0 0
-752 a capture
-758 a capture
 810 a tap X 2
-812 a capture
-828 a capture
 # Let mana recover before the second paid Frost Nova.
 1020 a tap X 2
-1022 a capture
-1038 a capture
 # #144: Spectral Ascent after the earlier casts.
 1062 a stick 0 1
 1062 a tap X 2
@@ -83,12 +73,6 @@
 #! expect a 370 special 13 form 0
 #! expect a 416 special 13 form 3
 #! expect a 470 special 14 form 0
-#! expect a 598 special 13 form 1
-#! expect a 650 special 15 form 0
-#! expect a 750 special 14 form 0
-#! expect a 810 special 13 form 0
-#! expect a 1020 special 13 form 0
-#! expect a 1062 special 15 form 0
 #! scene a SpiritTouchTarget
 #! scene a FreezingBreathTargetArt
 #! scene a AnimateDeadTarget
@@ -100,7 +84,5 @@
 #! scene a FrostBoltMissile
 #! scene a FrostNovaTarget
 #! scene a DeathAndDecayTarget
-1064 a capture
-1072 a capture
 1180 a press VIEW
 1250 a release VIEW

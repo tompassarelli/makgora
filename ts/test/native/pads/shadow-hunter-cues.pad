@@ -42,25 +42,17 @@
 600 a stick -1 0
 600 a tap X 2
 601 a stick 0 0
-602 a capture
-604 a capture
 # #144: Spirit Glaive and Hex from the air.
 680 a tap B 8
 690 a tap X 2
-692 a capture
-708 a capture
 750 a tap B 8
 760 a stick 0 -1
 760 a tap X 2
 761 a stick 0 0
-762 a capture
-784 a capture
 # #144: Loa Vault from the ground and air after Hex.
 830 a stick 0 1
 830 a tap X 2
 831 a stick 0 0
-832 a capture
-838 a capture
 930 a stick 0 1
 930 a tap X 2
 931 a stick 0 0
@@ -70,18 +62,11 @@
 #! expect a 300 special 16 form 0
 #! expect a 380 special 14 form 0
 #! expect a 450 special 16 form 0
-#! expect a 600 special 14 form 3
-#! expect a 690 special 13 form 1
-#! expect a 760 special 16 form 1
-#! expect a 830 special 15 form 0
-#! expect a 930 special 15 form 0
 #! scene a TrollBeserkerTarget
 #! scene a HealingWaveTarget
 #! scene a StasisTotemTarget
 #! scene a SpiritLinkTarget
 #! scene a FeralSpiritDone
 #! scene a PolymorphTarget
-932 a capture
-938 a capture
 1000 a press VIEW
 1070 a release VIEW

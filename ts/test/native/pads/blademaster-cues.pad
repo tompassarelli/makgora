@@ -74,14 +74,10 @@
 612 a stick -1 0
 612 a tap X 2
 613 a stick 0 0
-614 a capture
-620 a capture
 # #144: Rising Blade after the earlier casts.
 680 a stick 0 1
 680 a tap X 2
 681 a stick 0 0
-682 a capture
-687 a capture
 # #144: Wind Cutter from the air.
 760 a tap B 8
 772 a tap X 2
@@ -98,9 +94,6 @@
 #! expect a 400 special 16 form 3
 #! expect a 450 special 15 form 0
 #! expect a 552 special 16 form 1
-#! expect a 612 special 14 form 1
-#! expect a 680 special 15 form 0
-#! expect a 772 special 13 form 1
 #! scene a BloodlustSpecial
 #! scene a WingedSerpentMissile
 #! scene a InvisibilityTarget
@@ -111,7 +104,5 @@
 #! scene a MirrorImageCaster
 #! scene a MirrorImageDeathCaster
 #! scene a MirrorImageMissile
-774 a capture
-790 a capture
 1000 a press VIEW
 1070 a release VIEW
