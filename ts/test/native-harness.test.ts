@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
 import { CURRENT_CANDIDATE, MAP_PROFILES } from "../scripts/wisp/acceptChecks";
-import { poolUnitCommand, poolUnitName, pairNeedsRestart } from "../scripts/wisp/commands/lanPoolUnit";
+import { poolUnitCommand, poolUnitName, pairNeedsRestart, userManager } from "../scripts/wisp/commands/lanPoolUnit";
 import { smashcraftDoctor } from "../scripts/wisp/doctor";
 import { NATIVE_IN_UNIT, inNativeUnit, nativeUnitCommand } from "../scripts/wisp/commands/nativeUnit";
 import { drivesClients } from "../scripts/wisp/commands/pad";
@@ -65,9 +65,15 @@ test("the gate map defaults to the HEAD candidate, never a pinned build [k2 prop
   expect(JSON.stringify(MAP_PROFILES["gate-playable"])).not.toContain("0.0.133");
 });
 
-test("the pool runs in a user unit that lan stop names, and a dropped client restarts its pair [k2 property]", () => {
-  const env = { PRIVATE_DESKTOP_RUN: "/run/user/1000/private-desktop.unit-test", NORTH_FLEET_SESSION: "fleet-native-harness" };
-  const command = poolUnitCommand(["--pair", "3", "--pool-profile", "visual", "--owner", env.NORTH_FLEET_SESSION], "/bin", process.execPath, env, () => ":8\n");
+test("the pool runs in a user unit that lan stop names, on the user manager's bus even from a private desktop, and a dropped client restarts its pair [k2 property]", () => {
+  const env = { PRIVATE_DESKTOP_RUN: "/run/user/1000/private-desktop.unit-test", NORTH_FLEET_SESSION: "fleet-native-harness", XDG_RUNTIME_DIR: "/run/user/1000/private-desktop.unit-test/runtime", DBUS_SESSION_BUS_ADDRESS: "unix:path=/run/user/1000/private-desktop.unit-test/dbus-private" };
+  const command = poolUnitCommand(["--pair", "3", "--pool-profile", "visual", "--owner", env.NORTH_FLEET_SESSION], "/bin", 1000, process.execPath, env, () => ":8\n");
+  expect(command).toContain("--setenv=XDG_RUNTIME_DIR=/run/user/1000");
+  expect(command).toContain("--setenv=DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus");
+  expect(command.some((arg) => arg.includes("private-desktop.unit-test/runtime") || arg.includes("dbus-private"))).toBe(false);
+  for (const call of [userManager(command[0] ?? "", command.slice(1), 1000), userManager("systemctl", ["--user", "is-active", poolUnitName([3])], 1000)]) {
+    expect(call.options).toMatchObject({ env: { XDG_RUNTIME_DIR: "/run/user/1000", DBUS_SESSION_BUS_ADDRESS: "unix:path=/run/user/1000/bus" }, extendEnv: true });
+  }
   expect(command.slice(0, 3)).toEqual(["systemd-run", "--user", "--collect"]);
   expect(command).toContain(`--unit=${poolUnitName([3])}`);
   expect(command).toContain(`--setenv=PRIVATE_DESKTOP_RUN=${env.PRIVATE_DESKTOP_RUN}`);

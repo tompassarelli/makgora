@@ -10,6 +10,7 @@ import { agentSocket, readPool } from "wisp/scripts/wisp/lan/pool";
 import { pollUntil } from "../../hostPoll";
 import { runProcess } from "../../hostProcess";
 import { projectRoot } from "../project";
+import { userSessionEnv } from "./nativeUnit";
 import { privateDesktopUnitEnv } from "./privateDesktopUnitEnv";
 import { claimPair, processIsAlive, readPairClaim, releasePair } from "./pairClaim";
 
@@ -27,16 +28,23 @@ export const poolPairIds = (args: readonly string[]): readonly number[] => {
 export const poolUnitName = (ids: readonly number[]) => `${POOL_UNIT_PREFIX}-${ids.join("-")}`;
 
 /** The transient user unit that owns a pool: it outlives the caller's shell, tool limits and cgroup, and `lan stop` stops it. */
-export const poolUnitCommand = (args: readonly string[], path: string, runtime = process.execPath, env = process.env, readDisplay?: (run: string) => string): readonly string[] => [
+export const poolUnitCommand = (args: readonly string[], path: string, uid: number, runtime = process.execPath, env = process.env, readDisplay?: (run: string) => string): readonly string[] => [
   "systemd-run", "--user", "--collect", `--unit=${poolUnitName(poolPairIds(args))}`,
   `--working-directory=${projectRoot}`, `--setenv=PATH=${path}`,
+  ...Object.entries(userSessionEnv(uid)).map(([name, value]) => `--setenv=${name}=${value}`),
   ...privateDesktopUnitEnv(env, readDisplay),
   ...(env["NORTH_FLEET_SESSION"] === undefined ? [] : [`--setenv=NORTH_FLEET_SESSION=${env["NORTH_FLEET_SESSION"]}`]),
   "--property=KillMode=control-group", "--property=TimeoutStopSec=180",
   "--", runtime, WISP_PROGRAM, "lan", "pool", ...args.filter((arg) => arg !== FOREGROUND), FOREGROUND,
 ];
 
-const unitActive = (unit: string) => runProcess(ChildProcess.make("systemctl", ["--user", "is-active", unit], { stdin: "ignore" })).pipe(
+const currentUid = () => process.getuid?.() ?? 0;
+
+/** A call on the user manager, on its own runtime dir and bus, never the caller's: inside a private desktop those name the desktop's private ones. */
+export const userManager = (program: string, args: readonly string[], uid = currentUid()) =>
+  ChildProcess.make(program, args, { env: userSessionEnv(uid), extendEnv: true, stdin: "ignore" });
+
+const unitActive = (unit: string) => runProcess(userManager("systemctl", ["--user", "is-active", unit])).pipe(
   Effect.map((state) => state === "active"), Effect.orElseSucceed(() => false),
 );
 
@@ -75,8 +83,8 @@ export const poolStart: Command = (args) => {
       const claim = ids.includes(0) ? readPairClaim(0) : undefined;
       return yield* new UsageFailure({ problem: claim === undefined ? `${unit} is already running; stop it with \`bun wisp lan stop\`` : `pair 0 is held by ${claim.owner} (fleet session ${claim.session}, pid ${claim.pid})` });
     }
-    const [program = "", ...rest] = poolUnitCommand(ownedArgs, unitPath());
-    yield* runProcess(ChildProcess.make(program, rest, { stdin: "ignore" })).pipe(Effect.mapError((cause) => new LanFailure({ problem: `start ${unit}: ${cause.message}` })));
+    const [program = "", ...rest] = poolUnitCommand(ownedArgs, unitPath(), currentUid());
+    yield* runProcess(userManager(program, rest)).pipe(Effect.mapError((cause) => new LanFailure({ problem: `start ${unit}: ${cause.message}` })));
     yield* pollUntil(Effect.gen(function*() {
       if (!(yield* unitActive(unit))) return yield* new LanFailure({ problem: `${unit} stopped before its pairs were up; see \`journalctl --user -u ${unit}\`` });
       return ids.every((id) => existsSync(agentSocket(id))) ? true : undefined;
@@ -87,7 +95,7 @@ export const poolStart: Command = (args) => {
 
 export const poolStop: Command = (args) => Effect.gen(function*() {
   const ids = flagValues(args, "pair").map(Number);
-  const listed = yield* runProcess(ChildProcess.make("systemctl", ["--user", "list-units", "--plain", "--no-legend", "--all", `${POOL_UNIT_PREFIX}-*.service`], { stdin: "ignore" })).pipe(Effect.orElseSucceed(() => ""));
+  const listed = yield* runProcess(userManager("systemctl", ["--user", "list-units", "--plain", "--no-legend", "--all", `${POOL_UNIT_PREFIX}-*.service`])).pipe(Effect.orElseSucceed(() => ""));
   const units = listed.split("\n").flatMap((line) => /^(\S+)\.service/.exec(line.trim())?.[1] ?? []).filter((unit) => ids.length === 0 || ids.some((id) => unit.split("-").slice(3).map(Number).includes(id)));
   if (units.length === 0) return yield* Console.log("no pool unit is running");
   for (const unit of units) {
@@ -98,7 +106,7 @@ export const poolStop: Command = (args) => Effect.gen(function*() {
         return yield* new LanFailure({ problem: `pair ${id} is held by ${claim.owner} (fleet session ${claim.session}, pid ${claim.pid})` });
       }
     }
-    yield* runProcess(ChildProcess.make("systemctl", ["--user", "stop", unit], { stdin: "ignore" })).pipe(Effect.mapError((cause) => new LanFailure({ problem: `stop ${unit}: ${cause.message}` })));
+    yield* runProcess(userManager("systemctl", ["--user", "stop", unit])).pipe(Effect.mapError((cause) => new LanFailure({ problem: `stop ${unit}: ${cause.message}` })));
     for (const id of pairIds) yield* Effect.try({ try: () => releasePair(id, process.env["NORTH_FLEET_SESSION"] ?? ""), catch: cause => new LanFailure({ problem: String(cause) }) });
     yield* Console.log(`stopped ${unit}`);
   }

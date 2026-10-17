@@ -2,10 +2,9 @@ import { type Command, UsageFailure, flagValues } from "wisp/scripts/wisp/comman
 import { lan as frameworkLan } from "wisp/scripts/wisp/commands/lan";
 import { lanSoak } from "./lanSoak";
 import { withQuietNativeCapacity } from "wisp/scripts/wisp/quietNativeCapacity";
-import { poolStart, poolStop } from "./lanPoolUnit";
+import { poolStart, poolStop, userManager } from "./lanPoolUnit";
 import { assertPairClaim, claimPair, releasePair } from "./pairClaim";
 import { Effect } from "effect";
-import { ChildProcess } from "effect/process";
 import { runProcess } from "../../hostProcess";
 import { BunServices } from "@effect/platform-bun";
 
@@ -16,7 +15,7 @@ const claim = (args: readonly string[]) => Effect.gen(function*() {
   const session = process.env["NORTH_FLEET_SESSION"] ?? "";
   if (pairText === undefined || !/^\d+$/.test(pairText) || owner === undefined) return yield* new UsageFailure({ problem: "claim requires --pair N --owner NAME" });
   const unit = `smashcraft-lan-pool-${pair}`;
-  const pidText = yield* runProcess(ChildProcess.make("systemctl", ["--user", "show", unit, "--property=MainPID", "--value"], { stdin: "ignore" })).pipe(Effect.mapError(cause => new UsageFailure({ problem: `read ${unit} owner: ${cause.message}` })));
+  const pidText = yield* runProcess(userManager("systemctl", ["--user", "show", unit, "--property=MainPID", "--value"])).pipe(Effect.mapError(cause => new UsageFailure({ problem: `read ${unit} owner: ${cause.message}` })));
   const pid = Number(pidText.trim());
   if (!Number.isInteger(pid) || pid <= 1) return yield* new UsageFailure({ problem: `pair ${pair} has no active pool unit ${unit}` });
   yield* Effect.try({ try: () => claimPair(pair, owner, session, pid), catch: cause => new UsageFailure({ problem: String(cause) }) });

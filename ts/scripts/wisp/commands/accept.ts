@@ -47,6 +47,7 @@ import { measureCursorGate } from "../gateCursor";
 import { measureStartGate } from "../gateStart";
 import { measureBindingsGate } from "../gateBindings";
 import { measureMovesGate } from "../gateMoves";
+import { measureResultsGate } from "../gateResults";
 
 const ReportMetadata = Schema.fromJsonString(Schema.Record(Schema.String, Schema.Unknown));
 
@@ -352,6 +353,8 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
         Effect.tap(receipt => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipt]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
       ) : text === "gate:neutral-thrall" || text === "gate:neutral-jaina" || text === "gate:neutral-both" ? measureMovesGate(selectedClients, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), `c4-${text.slice("gate:neutral-".length)}-neutral-special`, name), text === "gate:neutral-thrall" ? 0 : text === "gate:neutral-jaina" ? 1 : "both").pipe(
         Effect.tap(receipts => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipts.specials]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
+      ) : text === "gate:results" ? measureResultsGate(selectedClients, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), "gate-results-rematch", name)).pipe(
+        Effect.tap(receipt => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipt]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
       ) : text === "gate:moves" ? measureMovesGate(selectedClients, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), "gate-moves", name)).pipe(
         Effect.tap(receipts => Effect.sync(() => { measurements.set(name, [...(measurements.get(name) ?? []), receipts.moves]); specials.set(name, receipts.specials); })), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
       ) : text === "gate:specials" ? Effect.gen(function*() {
