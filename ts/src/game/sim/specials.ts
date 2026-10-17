@@ -29,7 +29,7 @@ import { advanceCompanion } from "./companions";
 import { RIFLEMAN_BEAR_LIFETIME, advanceBear, recordSpecialHit, specialAlreadyHit, canStartFreezeTrap, startFreezeTrap } from "./summons";
 import { at } from "wisp/src/runtime/lookup";
 import { travelBeforeBodies } from "./travelStop";
-import { advanceHeroSpecial, followUpOnContact, chargedAimX, enterUltimate, chargedAimZ, chooseHeroSpecial, enterHeroSpecial, followUpHeroSpecial, heroRegionOrigin, heroSpecialContact, heroStrikeMeetsShield, isHeroSpecialAction, relocateHeroSpecial, runningHeroSpecial, resolveHeroGuards, steerHeroSpecial, stopHeroMotionAtBodies } from "./specials/engine";
+import { advanceHeroSpecial, followUpOnContact, chargedAimX, enterUltimate, chargedAimZ, holdHoveringUltimate, chooseHeroSpecial, enterHeroSpecial, followUpHeroSpecial, heroRegionOrigin, heroSpecialContact, heroStrikeMeetsShield, isHeroSpecialAction, relocateHeroSpecial, runningHeroSpecial, resolveHeroGuards, steerHeroSpecial, stopHeroMotionAtBodies } from "./specials/engine";
 
 
 export const DEMONHUNTER_MANA_BURN_STARTUP = 16;
@@ -537,6 +537,7 @@ export function startUltimate(owner: Fighter, input: Readonly<Controls>): boolea
   startSpecialAction(owner, SpecialAction.heroUltimate, ultimate.endFrame, owner.facing);
   spendMana(owner, ROSTER_MANA.max);
   enterUltimate(owner, input);
+  holdHoveringUltimate(owner);
   return true;
 }
 

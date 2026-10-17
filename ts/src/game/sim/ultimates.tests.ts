@@ -22,6 +22,7 @@ import { type Controls, copyControls, createRoster } from "./roster";
 import { controls } from "./testWorld";
 import { FIGHTER_ULTIMATES, ULTIMATE_REACH } from "./ultimates";
 import type { AuthoredSpecial } from "./specials/schema";
+import { firstThreat } from "./specials/engine";
 import { firstStateDifference } from "../replay/difference";
 import { stateChecksum } from "../replay/canonical";
 import { type ReplayState, copyReplayState, createReplaySnapshot } from "../replay/snapshot";
@@ -128,17 +129,6 @@ function ultimateOf(character: Character): AuthoredSpecial {
   return move;
 }
 
-/** The first frame an ultimate can strike: a region, a striking projectile or summon, a grab or a guard. */
-export function firstThreat(move: Readonly<AuthoredSpecial>): number {
-  let first = move.endFrame;
-  for (const region of move.regions ?? []) first = Math.min(first, region.firstFrame + 1);
-  for (const shot of move.projectiles ?? []) if (shot.effect.damage > 0.0 || shot.expiresInto !== undefined) first = Math.min(first, shot.spawnFrame + (shot.expiresInto !== undefined && shot.effect.damage === 0.0 ? shot.life : 0));
-  if (move.placement !== undefined) first = Math.min(first, move.placement.frame + (move.placement.fireAges[0] ?? 0));
-  if (move.commandGrab !== undefined) first = Math.min(first, move.commandGrab.first);
-  if (move.guard !== undefined) first = move.guard.last;
-  return first;
-}
-
 function play(scenario: Readonly<Scenario>, facing: number, defend: boolean): Bout {
   const b = bout(scenario, facing);
   const base = b.target.motion.z;
@@ -190,6 +180,96 @@ test("each fighter's ultimate is answered by its defence on startup and leaves t
   assertEquals(failures.join("; "), "");
 });
 
+
+const GROUND_ONLY_ULTIMATES: readonly Character[] = [
+  Character.blademaster, Character.beastmaster, Character.thrall, Character.peon, Character.murloc, Character.anubarak,
+  Character.chen, Character.tinker, Character.kobold,
+];
+
+function airborneBout(scenario: Readonly<Scenario>, facing: number, height: number, gap = 900.0): Bout {
+  const b = bout(scenario, facing, Character.blademaster, gap);
+  const { motion } = b.owner;
+  motion.grounded = false;
+  motion.surface = undefined;
+  motion.z = f32(mainDeckZAt(0, motion.x) + height);
+  motion.vx = f32(facing * 3.0);
+  motion.vz = 2.0;
+  motion.fastFalling = true;
+  b.owner.jump.remaining = 1;
+  return b;
+}
+
+test("an airborne press starts every ultimate except the floor sweeps, which refuse and keep the bar (#98) [k3 measure #98]", () => {
+  const failures: string[] = [];
+  for (const scenario of ULTIMATE_SCENARIOS) for (const facing of [-1, 1]) {
+    const b = airborneBout(scenario, facing, 150.0);
+    b.step(ULTIMATE);
+    const refuses = GROUND_ONLY_ULTIMATES.includes(scenario.character);
+    const started = b.owner.special.action === SpecialAction.heroUltimate;
+    if (started === refuses || b.owner.mana.points !== (refuses ? ROSTER_MANA.max : 0)) failures.push(`${name(scenario.character)} ${facing}: started=${started} mana=${b.owner.mana.points}`);
+  }
+  assertEquals(failures.join("; "), "");
+});
+
+test("an airborne ultimate holds its caster in place through startup, then falls normally with no helpless state and keeps the air jump (#98) [k1 scenario]", () => {
+  const failures: string[] = [];
+  let airborneAtEnd = 0;
+  for (const scenario of ULTIMATE_SCENARIOS) for (const facing of [-1, 1]) {
+    if (GROUND_ONLY_ULTIMATES.includes(scenario.character)) continue;
+    const b = airborneBout(scenario, facing, 400.0);
+    const move = ultimateOf(scenario.character);
+    const threat = firstThreat(move);
+    b.step(ULTIMATE);
+    const { x, z } = b.owner.motion;
+    const label = `${name(scenario.character)} ${facing}`;
+    let fell = false;
+    for (let tick = 1; b.owner.special.action === SpecialAction.heroUltimate && tick <= move.endFrame + 30; tick++) {
+      b.step();
+      const frame = b.owner.special.frame;
+      if (b.owner.special.action !== SpecialAction.heroUltimate) break;
+      if (frame < threat && (b.owner.motion.x !== x || b.owner.motion.z !== z)) failures.push(`${label}: moved at f${frame}`);
+      if (frame >= threat && b.owner.motion.z < z) fell = true;
+      if (frame >= threat && b.owner.motion.fastFalling) failures.push(`${label}: fast-falls after startup`);
+      if (b.owner.special.fall) failures.push(`${label}: helpless at f${frame}`);
+    }
+    if (!fell && scenario.character !== Character.cairne) failures.push(`${label}: never fell`);
+    if (!b.owner.motion.grounded) {
+      airborneAtEnd++;
+      if (b.owner.special.fall || b.owner.jump.remaining !== 1) failures.push(`${label}: ended helpless=${b.owner.special.fall} jumps=${b.owner.jump.remaining}`);
+    }
+  }
+  assertEquals([...new Set(failures)].join("; "), "");
+  assertGreaterThan(airborneAtEnd, 0);
+});
+
+test("Dark Portal's eruption and Light's Judgment's last pulse strike at their drawn mark after earlier hits, cast standing or from the air (#98) [k1 scenario]", () => {
+  const failures: string[] = [];
+  for (const character of [Character.medivh, Character.forsakenPaladin]) for (const facing of [-1, 1]) for (const height of [0.0, 300.0]) {
+    const scenario = ULTIMATE_SCENARIOS.find((entry) => entry.character === character);
+    if (scenario === undefined) throw new Error(`no scenario for ${name(character)}`);
+    const b = height > 0.0 ? airborneBout(scenario, facing, height, scenario.x) : bout(scenario, facing);
+    const aloft = f32(b.owner.motion.z);
+    const pin = (): void => {
+      if (height <= 0.0 || b.target.launch.hitstun > 0 || b.target.launch.hitlag > 0) return;
+      b.target.motion.grounded = false;
+      b.target.motion.surface = undefined;
+      b.target.motion.z = aloft;
+      b.target.motion.vz = 0.0;
+    };
+    const last = Math.max(...(ultimateOf(character).regions ?? []).map((region) => region.firstFrame + 1));
+    const struck: number[] = [];
+    pin();
+    b.step(ULTIMATE);
+    for (let tick = 0; tick < 120 && b.owner.special.action === SpecialAction.heroUltimate; tick++) {
+      pin();
+      const before = b.target.status.damage;
+      b.step();
+      if (b.target.status.damage > before) struck.push(b.owner.special.frame);
+    }
+    if (struck.length < 2 || !struck.includes(last)) failures.push(`${name(character)} ${facing} height ${height}: struck at ${struck.join(",")}, last region f${last}`);
+  }
+  assertEquals(failures.join("; "), "");
+});
 const EX = controls({ specialPressed: true, exPressed: true });
 
 test("Cairne centre ankh burst and arrival replay per frame, including a displaced-anchor fault [k1 scenario]", () => {

@@ -49,7 +49,7 @@ function shot(spawnFrame: number, offsetX: number, offsetZ: number, velocityX: n
 const AIMED_HIT = hit(24.0, 30, 95.0, 40.0);
 const AIMED_IMPACT: SpecialProjectile = { ...mark("Abilities\\Weapons\\Bolt\\BoltImpact.mdx", 0, 12, 0.0), radius: 26.0, effect: AIMED_HIT };
 const RIFLEMAN: AuthoredSpecial = {
-  name: "Aimed Shot", endFrame: 70, groundOnly: true,
+  name: "Aimed Shot", endFrame: 70,
   projectiles: [
     mark("Abilities\\Spells\\Human\\ManaFlare\\ManaFlareTarget.mdx", 4, 32, 60.0, 50.0),
     { ...shot(36, 50.0, 50.0, 60.0, 0.0, 30, 26.0, AIMED_HIT, "Abilities\\Weapons\\CannonTowerMissile\\CannonTowerMissile.mdx"), burstInto: AIMED_IMPACT },
@@ -57,7 +57,7 @@ const RIFLEMAN: AuthoredSpecial = {
 };
 
 const ILLIDAN: AuthoredSpecial = {
-  name: "Metamorphosis", endFrame: 50, groundOnly: true,
+  name: "Metamorphosis", endFrame: 50,
   projectiles: [mark("Objects\\Spawnmodels\\Demon\\DemonLargeDeathExplode\\DemonLargeDeathExplode.mdx", 2, 30, 0.0), mark("Abilities\\Spells\\NightElf\\Immolation\\ImmolationTarget.mdx", 2, 30, 0.0)],
   regions: [heroRegion(31, 33, capsule(-160.0, 60.0, 160.0, 60.0, 70.0), hit(12.0, 70, 80.0, 45.0, HitElement.fire))],
   buff: { frame: 31, kind: ItemKind.speed, frames: 480 },
@@ -91,14 +91,14 @@ const BLADEMASTER: AuthoredSpecial = {
 };
 
 const MOUNTAIN_KING: AuthoredSpecial = {
-  name: "Avatar", endFrame: 50, groundOnly: true,
+  name: "Avatar", endFrame: 50,
   projectiles: [mark("Abilities\\Spells\\Human\\Avatar\\AvatarCaster.mdx", 16, 34, 0.0), mark("Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdx", 33, 14, 0.0)],
   regions: [heroRegion(33, 35, capsule(-180.0, 30.0, 180.0, 30.0, 50.0), hit(8.25, 75, 75.0, 40.0))],
   buff: { frame: 33, kind: ItemKind.heavy, frames: 600 },
 };
 
 const WARDEN: AuthoredSpecial = {
-  name: "Vengeance", endFrame: 40, groundOnly: true,
+  name: "Vengeance", endFrame: 40,
   placement: {
     frame: 22, offsetX: -60.0, radius: 40.0, height: 140.0, durability: 30.0, life: 90, fireAges: [2, 17, 32, 47],
     shot: shot(0, 40.0, 50.0, 18.0, 0.0, 50, 26.0, hit(5.0, 40, 60.0, 30.0, HitElement.slash), "Abilities\\Weapons\\SpiritOfVengeanceMissile\\SpiritOfVengeanceMissile.mdx"),
@@ -114,22 +114,24 @@ const LICH: AuthoredSpecial = {
   ],
 };
 
+const JUDGMENT_CIRCLE = mark("Abilities\\Spells\\Other\\Consecration\\Consecration.mdx", 2, 76, 220.0);
 const FORSAKEN_PALADIN: AuthoredSpecial = {
-  name: "Light's Judgment", endFrame: 70, groundOnly: true,
+  name: "Light's Judgment", endFrame: 70,
   projectiles: [
-    mark("Abilities\\Spells\\Other\\Consecration\\Consecration.mdx", 2, 62, 220.0),
+    JUDGMENT_CIRCLE,
     mark("Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx", 34, 14, 220.0),
   ],
   regions: [
-    heroRegion(40, 42, capsule(220.0, 20.0, 220.0, 150.0, 100.0), hit(18.0, 75, 90.0, 45.0, HitElement.holy)),
-    heroRegion(52, 52, capsule(110.0, 10.0, 330.0, 10.0, 25.0), hit(4.0, 80, 30.0, 30.0, HitElement.holy)),
-    heroRegion(64, 64, capsule(110.0, 10.0, 330.0, 10.0, 25.0), hit(4.0, 80, 30.0, 30.0, HitElement.holy)),
+    heroRegion(40, 42, capsule(0.0, 20.0, 0.0, 150.0, 100.0), hit(18.0, 75, 90.0, 45.0, HitElement.holy)),
+    heroRegion(52, 52, capsule(-110.0, 10.0, 110.0, 10.0, 25.0), hit(4.0, 80, 30.0, 30.0, HitElement.holy)),
+    heroRegion(64, 64, capsule(-110.0, 10.0, 110.0, 10.0, 25.0), hit(4.0, 80, 30.0, 30.0, HitElement.holy)),
   ],
+  regionOrigin: JUDGMENT_CIRCLE,
   rehits: [52, 64],
 };
 
 const DREADLORD: AuthoredSpecial = {
-  name: "Inferno", endFrame: 56, groundOnly: true,
+  name: "Inferno", endFrame: 56,
   projectiles: [
     mark("Abilities\\Spells\\Human\\MarkOfChaos\\MarkOfChaosTarget.mdx", 4, 36, 260.0),
     { ...mark("Abilities\\Weapons\\DemolisherFireMissile\\DemolisherFireMissile.mdx", 28, 12, 260.0, 600.0), velocityZ: -48.0 },
@@ -145,7 +147,7 @@ const VOODOO_END = 105;
 const VOODOO_WARD_FRAME = 16;
 const voodooBolt = (effect: HitEffect): SpecialProjectile => shot(0, 30.0, 50.0, 14.0, 0.0, 24, 26.0, effect, VOODOO_BOLT);
 const SHADOW_HUNTER: AuthoredSpecial = {
-  name: "Big Bad Voodoo", endFrame: VOODOO_END, groundOnly: true,
+  name: "Big Bad Voodoo", endFrame: VOODOO_END,
   projectiles: [{ ...mark(VOODOO_AURA, 2, VOODOO_END - 2, 0.0), cancelOnInterrupt: true }],
   placement: {
     frame: VOODOO_WARD_FRAME, slot: 1, offsetX: 140.0, radius: 30.0, height: 130.0, durability: 1.0, life: VOODOO_END - VOODOO_WARD_FRAME + 1,
@@ -159,7 +161,7 @@ const SHADOW_HUNTER: AuthoredSpecial = {
 
 const DOOM: AppliedStatus = { kind: HeroStatusKind.poison, frames: 180, group: HeroStatusGroup.sleep, immunityFrames: 0, tick: { every: 15, damage: 1.0 } };
 const PIT_LORD: AuthoredSpecial = {
-  name: "Doom", endFrame: 60, groundOnly: true,
+  name: "Doom", endFrame: 60,
   projectiles: [mark("Abilities\\Spells\\Undead\\Curse\\CurseTarget.mdx", 1, 18, 60.0, 80.0)],
   commandGrab: { ...frames(19, 22), strike: capsule(30.0, 60.0, 130.0, 60.0, 40.0), holdFrames: 30, effect: hit(10.0, 45, 85.0, 45.0, HitElement.fire), recovery: 30, status: DOOM },
 };
@@ -176,7 +178,7 @@ const BEASTMASTER: AuthoredSpecial = {
 
 const RISEN = shot(0, 0.0, 40.0, 0.0, 0.0, 4, 90.0, hit(15.0, 85, 90.0, 45.0, HitElement.dark), "Abilities\\Spells\\Undead\\Impale\\ImpaleHitTarget.mdx");
 const LICH_KING: AuthoredSpecial = {
-  name: "Animate Dead", endFrame: 64, groundOnly: true,
+  name: "Animate Dead", endFrame: 64,
   projectiles: [mark("Abilities\\Spells\\Undead\\AnimateDead\\AnimateDeadTarget.mdx", 2, 38, 0.0, 0.0, true, RISEN)],
 };
 
@@ -193,7 +195,7 @@ const ray = (spawnFrame: number, velocityX: number, velocityZ: number, effect: H
   shot(spawnFrame, 40.0, 90.0, velocityX, velocityZ, 15, 30.0, effect, "Abilities\\Spells\\Other\\FrostBolt\\FrostBoltMissile.mdx");
 const GLANCE = hit(5.0, 30, 30.0, 25.0, HitElement.ice);
 const JAINA: AuthoredSpecial = {
-  name: "Glacial Ray", endFrame: 80, groundOnly: true,
+  name: "Glacial Ray", endFrame: 80,
   projectiles: [
     mark("Abilities\\Spells\\Undead\\FreezingBreath\\FreezingBreathTargetArt.mdx", 2, 22, 40.0, 90.0),
     ray(25, f32(28.284271), f32(28.284271), GLANCE),
@@ -238,7 +240,7 @@ const CAIRNE_ANKH: SpecialProjectile = {
   ...mark("Abilities\\Spells\\Orc\\Reincarnation\\ReincarnationTarget.mdx", 1, 36, 0.0), atStageCentre: true, cancelOnInterrupt: true,
 };
 const CAIRNE: AuthoredSpecial = {
-  name: "Reincarnation", endFrame: 50, groundOnly: true,
+  name: "Reincarnation", endFrame: 50,
   projectiles: [
     CAIRNE_ANKH,
     { ...mark("Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx", 25, 10, 0.0), atStageCentre: true, cancelOnInterrupt: true },
@@ -294,7 +296,7 @@ const TINKER: AuthoredSpecial = {
 const GRAVITY_RING = "Abilities\\Spells\\Human\\MassTeleport\\MassTeleportTarget.mdx";
 const GRAVITY_LIFT = "Abilities\\Spells\\NightElf\\Cyclone\\CycloneTarget.mdx";
 const KAELTHAS: AuthoredSpecial = {
-  name: "Gravity Lapse", endFrame: 60, groundOnly: true,
+  name: "Gravity Lapse", endFrame: 60,
   projectiles: [
     ...[-260.0, 0.0, 260.0].map((offsetX) => mark(GRAVITY_RING, 2, 27, offsetX)),
     ...[-180.0, 0.0, 180.0].map((offsetX) => mark(GRAVITY_LIFT, 29, 24, offsetX)),
@@ -320,7 +322,7 @@ const part = (x1: number, z1: number, x2: number, z2: number, radius: number): H
 const pose = (firstFrame: number, lastFrame: number, parts: readonly HurtPart[]): HurtPose => ({ firstFrame, lastFrame, parts });
 
 const GROM: AuthoredSpecial = {
-  name: "Blood of Mannoroth", endFrame: 70, groundOnly: true,
+  name: "Blood of Mannoroth", endFrame: 70,
   projectiles: [mark("Abilities\\Spells\\Orc\\Bloodlust\\BloodlustTarget.mdx", 1, 16, 0.0)],
   motion: [{ ...frames(17, 40), velocityX: 22.0, velocityZ: 0.0 }, { ...frames(41, 41), velocityX: 0.0, velocityZ: 0.0 }],
   commandGrab: { ...frames(17, 40), strike: capsule(20.0, 50.0, 70.0, 50.0, 40.0), holdFrames: 30, effect: hit(11.5, 40, 90.0, 45.0, HitElement.slash), recovery: 24 },
@@ -351,15 +353,17 @@ const MALFURION: AuthoredSpecial = {
 };
 
 const PULL = [25, 37, 49] as const;
+const DARK_PORTAL = mark("Abilities\\Spells\\Demon\\DarkPortal\\DarkPortalTarget.mdx", 2, 78, 240.0);
 const MEDIVH: AuthoredSpecial = {
-  name: "The Dark Portal", endFrame: 70, groundOnly: true,
-  projectiles: [mark("Abilities\\Spells\\Demon\\DarkPortal\\DarkPortalTarget.mdx", 2, 62, 240.0)],
+  name: "The Dark Portal", endFrame: 70,
+  projectiles: [DARK_PORTAL],
+  regionOrigin: DARK_PORTAL,
   regions: [
     ...PULL.flatMap((first): MoveRegion[] => [
-      heroRegion(first, first, capsule(40.0, 50.0, 200.0, 50.0, 80.0), hit(1.0, 25, 0.0, 30.0, HitElement.dark)),
-      heroRegion(first, first, capsule(280.0, 50.0, 440.0, 50.0, 80.0), hit(1.0, 25, 0.0, 30.0, HitElement.dark, true)),
+      heroRegion(first, first, capsule(-200.0, 50.0, -40.0, 50.0, 80.0), hit(1.0, 25, 0.0, 30.0, HitElement.dark)),
+      heroRegion(first, first, capsule(40.0, 50.0, 200.0, 50.0, 80.0), hit(1.0, 25, 0.0, 30.0, HitElement.dark, true)),
     ]),
-    heroRegion(64, 66, capsule(240.0, 20.0, 240.0, 120.0, 110.0), hit(12.0, 60, 90.0, 45.0, HitElement.dark)),
+    heroRegion(64, 66, capsule(0.0, 20.0, 0.0, 120.0, 110.0), hit(12.0, 60, 90.0, 45.0, HitElement.dark)),
   ],
   rehits: [...PULL, 64],
 };

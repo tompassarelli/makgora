@@ -394,7 +394,7 @@ function decide(game: Readonly<MatchState>, world: Roster, runtime: BotRuntime, 
   const pressing = pressCorner(fighter, target, stage, skill);
   // An idle stretch stands where it is: no approach, no attack.
   if (!pressing && botChance(floorDiv(frame, IDLE_FRAMES), slot * 17 + fighter.character, skill.idle, 100)) return;
-  if (skill.basicMoves === undefined && !game.ultimatesOff && pressUltimate(fighter, target, skill, frame, input)) return;
+  if (skill.basicMoves === undefined && !game.ultimatesOff && pressUltimate(fighter, target, stage, skill, frame, input)) return;
   if (skill.basicMoves === undefined && pressKitOption(fighter, target, stage, skill, frame, delay <= 0, input, commands)) {
     if (input.specialPressed || input.attackHeld) runtime.botAttackDelays[slot] = f32(f32(skill.attackPause + botChoice(frame, fighter.attack.serial, skill.attackSpread)) * TICK);
     return;

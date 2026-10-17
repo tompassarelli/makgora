@@ -528,6 +528,7 @@ export function heroMotionPassesPlatforms(f: Readonly<Fighter>): boolean {
 
 function applyMotion(f: Fighter, move: Readonly<AuthoredSpecial>, frame: number, input: Readonly<Controls> | undefined, world: Roster | undefined): void {
   const { motion, special } = f;
+  holdHoveringUltimate(f);
   if (special.grabFrame > 0 && move.commandGrab !== undefined) return;
   for (const segment of move.motion ?? []) {
     if (frame < segment.first || frame > segment.last) continue;
@@ -630,9 +631,33 @@ function placeOne(f: Fighter, spec: Readonly<SpecialPlacement>, slot: number, si
 
 
 
+/** The first frame an ultimate can strike: a region, a striking projectile or summon, a grab or a guard. */
+export function firstThreat(move: Readonly<AuthoredSpecial>): number {
+  let first = move.endFrame;
+  for (const region of move.regions ?? []) first = min(first, region.firstFrame + 1);
+  for (const shot of move.projectiles ?? []) if (shot.effect.damage > 0.0 || shot.expiresInto !== undefined) first = min(first, shot.spawnFrame + (shot.expiresInto !== undefined && shot.effect.damage === 0.0 ? shot.life : 0));
+  if (move.placement !== undefined) first = min(first, move.placement.frame + (move.placement.fireAges[0] ?? 0));
+  if (move.commandGrab !== undefined) first = min(first, move.commandGrab.first);
+  if (move.guard !== undefined) first = move.guard.last;
+  return first;
+}
+
+function ultimateHovers(f: Readonly<Fighter>): boolean {
+  const move = f.special.action === SpecialAction.heroUltimate && f.special.form < FOLLOW_UP_FORM ? f.tuning.ultimate : undefined;
+  return move !== undefined && move.groundOnly !== true && !f.motion.grounded && f.special.frame < firstThreat(move);
+}
+
+export function holdHoveringUltimate(f: Fighter): void {
+  if (!ultimateHovers(f)) return;
+  f.motion.vx = 0.0;
+  f.motion.vz = 0.0;
+}
+
+
 export function heroMotionHolds(f: Readonly<Fighter>): boolean {
   const move = runningHeroSpecial(f);
   if (move === undefined) return false;
+  if (ultimateHovers(f)) return true;
   for (const segment of move.motion ?? []) if (f.special.frame >= segment.first && f.special.frame <= segment.last) return true;
   return false;
 }

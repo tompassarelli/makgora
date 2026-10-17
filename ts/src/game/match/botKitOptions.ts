@@ -326,12 +326,12 @@ function orbTowardTarget(f: Readonly<Fighter>, target: Readonly<Fighter>) {
 
 
 
-export function pressUltimate(f: Readonly<Fighter>, target: Readonly<Fighter>, skill: CpuSkill, frame: number, input: Controls): boolean {
+export function pressUltimate(f: Readonly<Fighter>, target: Readonly<Fighter>, stage: number, skill: CpuSkill, frame: number, input: Controls): boolean {
   const reach = ULTIMATE_REACH[f.character];
   const move = f.tuning.ultimate;
   if (reach === undefined || move === undefined || reach.far <= 0.0 || skill.tier === "rookie" || skill.kitTenths <= 0) return false;
   if (f.mana.points < ROSTER_MANA.max || !canAttack(f) || f.special.action !== SpecialAction.none || f.launch.hitstun > 0) return false;
-  if (move.groundOnly === true && !f.motion.grounded) return false;
+  if (!f.motion.grounded && (move.groundOnly === true || f.motion.x < mainDeckLeft(stage) || f.motion.x > mainDeckRight(stage))) return false;
   const dx = f32(target.motion.x - f.motion.x);
   const gap = Math.abs(dx);
   const rise = f32(target.motion.z - f.motion.z);
