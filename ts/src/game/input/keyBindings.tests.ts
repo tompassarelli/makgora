@@ -1,6 +1,6 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { ACTION_ORDER, Action } from "./actions";
-import { BINDING_PRESETS, DEFAULT_PRESET, actionFor, decodeBindings, encodeBindings, keyFor, menuAction, pauseMenuKeys, presetBindings, presetOf, slotIndex, type BindingPreset } from "./keyBindings";
+import { actionFor, decodeBindings, encodeBindings, keyFor, presetBindings, slotIndex, type BindingPreset } from "./keyBindings";
 
 const OLD_SAVES: readonly (readonly [string, number])[] = [["K1", 28], ["K2", 30], ["K3", 30], ["K4", 34], ["K5", 34], ["K6", 36], ["K7", 36]];
 const UPGRADES: readonly (readonly [Action, 0 | 1, number])[] = [[Action.shortHop, 0, "I".charCodeAt(0)], [Action.rightTrigger, 1, "G".charCodeAt(0)], [Action.exSpecial, 1, "X".charCodeAt(0)]];
@@ -89,53 +89,5 @@ test("saved default upgrades preserve every customized slot and leave current sa
     assertEquals(actionFor(current, "X".charCodeAt(0)), Action.exSpecial, `${preset} X is the pad EX key`);
     assertEquals(actionFor(current, "G".charCodeAt(0)), Action.rightTrigger, `${preset} G is the pad right shield key`);
     assertEquals(actionFor(current, "T".charCodeAt(0)), undefined, `${preset} T unbound`);
-  }
-});
-
-const key = (character: string): number => character.charCodeAt(0);
-
-test("a new player starts on ESDF: E S D F move, A full shield, Q light shield, Space and Z jump, and the right hand keeps Hitbox's keys [k3 measure #101]", () => {
-  const esdf = presetBindings(DEFAULT_PRESET);
-  const expected: readonly (readonly [number, Action])[] = [
-    [key("E"), Action.moveUp], [key("S"), Action.moveLeft], [key("D"), Action.moveDown], [key("F"), Action.moveRight],
-    [key("A"), Action.leftTrigger], [key("Q"), Action.lightShield], [32, Action.jump], [key("Z"), Action.jump],
-  ];
-  for (const [bound, action] of expected) assertEquals(actionFor(esdf, bound), action, `ESDF ${String.fromCharCode(bound)}`);
-  assertEquals(keyFor(esdf, Action.jump, 0), 32, "Space is ESDF's first jump key");
-  const hitbox = presetBindings("standard");
-  const leftHand: readonly Action[] = [Action.moveLeft, Action.moveRight, Action.moveDown, Action.moveUp, Action.jump, Action.leftTrigger, Action.lightShield];
-  for (const action of ACTION_ORDER) {
-    if (leftHand.includes(action)) continue;
-    for (const slot of [0, 1] as const) assertEquals(keyFor(esdf, action, slot), keyFor(hitbox, action, slot), `right hand action ${action} slot ${slot}`);
-  }
-  assertEquals(keyFor(hitbox, Action.moveUp, 0), 32, "Hitbox keeps up on Space");
-});
-
-test("menus read each preset's own direction, attack and special keys plus the arrows, and a pause holds back only its own menu keys [k2 property]", () => {
-  const menuActions: readonly Action[] = [Action.moveLeft, Action.moveRight, Action.moveUp, Action.moveDown, Action.attack, Action.special];
-  const arrows: readonly (readonly [number, Action])[] = [[0x25, Action.moveLeft], [0x26, Action.moveUp], [0x27, Action.moveRight], [0x28, Action.moveDown]];
-  for (const preset of BINDING_PRESETS) {
-    const bindings = presetBindings(preset);
-    for (const [arrow, action] of arrows) assertEquals(menuAction(bindings, arrow), action, `${preset} arrow ${arrow}`);
-    const held = pauseMenuKeys(bindings);
-    for (const bound of bindings.keys) {
-      if (bound === 0) continue;
-      const action = actionFor(bindings, bound);
-      const expected = action !== undefined && menuActions.includes(action) ? action : undefined;
-      assertEquals(menuAction(bindings, bound), expected, `${preset} key ${bound}`);
-      assertEquals(held.includes(bound), expected !== undefined && expected !== Action.moveLeft && expected !== Action.moveRight, `${preset} held pause key ${bound}`);
-    }
-  }
-});
-
-test("the picker names the preset whose every slot is loaded, and none once any one slot moves [k2 property]", () => {
-  for (const preset of BINDING_PRESETS) {
-    const bindings = presetBindings(preset);
-    assertEquals(presetOf(bindings), preset, `${preset} itself`);
-    for (let index = 0; index < bindings.keys.length; index++) {
-      const moved = { keys: bindings.keys.slice() };
-      moved.keys[index] = moved.keys[index] === 0 ? key("T") : 0;
-      assertEquals(presetOf(moved), undefined, `${preset} slot ${index} moved`);
-    }
   }
 });

@@ -16,7 +16,7 @@ import { SHOWCASE_PAD_X } from "../../game/session/showcase";
 import type { FighterAgency } from "../../game/presentation/fighterAgency";
 import type { FrameControls } from "../../game/match/controls";
 import type { PacingAndPresentation } from "../../game/match/pacingAndPresentation";
-import { type MatchState, Phase, ResultPick, humanActive, remainingSeconds, resultChoicesOpen, stageClock, timedMatch } from "../../game/lobby/lobbyState";
+import { type MatchState, Phase, ResultPick, remainingSeconds, resultChoicesOpen, stageClock, timedMatch } from "../../game/lobby/lobbyState";
 import { fighterOffscreen, fitFighterFrames } from "../../game/presentation/fighterFraming";
 import { arenaFarZ, ARENA_CAMERA, FLOOR_HEIGHT, cameraFieldOfView, cameraPoint, extremeCamera, finalCamera, localCamera, resultCamera } from "../../game/presentation/arenaCamera";
 
@@ -577,9 +577,8 @@ export function renderUi(s: ShellState): void {
   const paused = game.phase === Phase.match && s.session.paused;
   if (paused && !menu.shown) menu.choice = 0;
   menu.shown = paused;
+  ui.pause.update(paused && s.pauseCamera?.using !== true && s.dev.shieldEnergyCapture?.pending !== false, menu.choice, menu.title, game.training, s.trainingHints === true);
   const local = localParticipantSlot(s);
-  const localKeys = s.participants[local ?? 0].bindings.bindings;
-  ui.pause.update(paused && s.pauseCamera?.using !== true && s.dev.shieldEnergyCapture?.pending !== false, menu.choice, menu.title, localKeys, game.training, s.trainingHints === true);
   const localFighter = local !== undefined && s.participants[local].body !== undefined && isActive(s.world, local) ? fighterAt(s.world, local) : undefined;
   const showMatch = !paused && !pauseHudHidden(s) && !selecting && !(local !== undefined && ui.settings[local].isOpen());
   for (const slot of PARTICIPANT_SLOTS) {
@@ -593,11 +592,11 @@ export function renderUi(s: ShellState): void {
     }
     ui.selections[slot].menuBindings(s.participants[slot].bindings.bindings);
     ui.selections[slot].update(game, s.startingChoicesReady === false, menu.title || ui.settings[slot].isOpen(), selecting || paused || menu.title || ui.settings[slot].isOpen(), s.sessionWins.counts);
-    ui.settings[slot].update(game.phase === Phase.characterMenu && !menu.title && s.startingChoicesReady !== false && humanActive(game, slot));
+    ui.settings[slot].update();
   }
   ui.clock.update(showMatch && game.phase === Phase.match && timedMatch(game), remainingSeconds(game));
   ui.match.presentCountdown(game, showMatch);
-  ui.training.update(showMatch && game.training && game.phase === Phase.match, game.trainer, localKeys);
+  ui.training.update(showMatch && game.training && game.phase === Phase.match, game.trainer);
   ui.classic?.updateCard(game);
   const cleared = game.lore && game.phase === Phase.result && game.run.active && game.run.cleared ? game.run.current : undefined;
   if (cleared !== undefined && localSlot() === game.run.player) loreClears().mark(cleared.id);

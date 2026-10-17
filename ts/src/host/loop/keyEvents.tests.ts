@@ -3,9 +3,6 @@ import { createMatchControls, startKeyDown, startKeyUp } from "../../game/match/
 import { PLAYABLE_CHARACTERS } from "../../game/sim/heroes/registry";
 import { Phase, createMatchState, requestStageSelect, returnToCharacters, selectCharacter, selectStage, setParticipants, unreadyCharacter } from "../../game/lobby/lobbyState";
 import { Key, ensureKeyTriggerPair, keyEventAllowed, syncKeyEventPolicy } from "./keyEvents";
-import { presetBindings } from "../../game/input/keyBindings";
-
-const hitbox = presetBindings("standard");
 
 test("character selection, start and stage keys keep one registration pair across menu cycles [k2 property]", () => {
   const state = createMatchState();
@@ -24,20 +21,20 @@ test("character selection, start and stage keys keep one registration pair acros
   for (let cycle = 0; cycle < 20; cycle++) {
     ensureTriggers();
     syncKeyEventPolicy(policy, false, false, false);
-    assertEquals(keyEventAllowed(policy, Key.w, hitbox), true);
+    assertEquals(keyEventAllowed(policy, Key.w), true);
     selectCharacter(state, 0, first);
     selectCharacter(state, 1, second);
     assertEquals(startKeyDown(controls, 0, state.phase, false), "confirm");
     startKeyUp(controls, 0);
     assertEquals(requestStageSelect(state, 0), true);
     assertEquals(state.phase, Phase.stageMenu);
-    assertEquals(keyEventAllowed(policy, Key.n, hitbox), true);
+    assertEquals(keyEventAllowed(policy, Key.n), true);
     selectStage(state, 0, state.stageChoice);
     syncKeyEventPolicy(policy, false, true, false);
-    assertEquals(keyEventAllowed(policy, Key.escape, hitbox), true);
-    assertEquals(keyEventAllowed(policy, Key.w, hitbox), false);
+    assertEquals(keyEventAllowed(policy, Key.escape), true);
+    assertEquals(keyEventAllowed(policy, Key.w), false);
     syncKeyEventPolicy(policy, true, false, false);
-    assertEquals(keyEventAllowed(policy, Key.w, hitbox), false);
+    assertEquals(keyEventAllowed(policy, Key.w), false);
     returnToCharacters(state, 0);
     unreadyCharacter(state, 0);
     unreadyCharacter(state, 1);

@@ -11,8 +11,6 @@ import type { Lockstep } from "wisp/src/headless/lockstep";
 import type { PerfMeasure } from "wisp/src/headless/luaPerf";
 import { Phase, type MatchState } from "../../src/game/lobby/lobbyState";
 import { Character } from "../../src/game/sim/codes";
-import { Action } from "../../src/game/input/actions";
-import { DEFAULT_PRESET, keyFor, presetBindings } from "../../src/game/input/keyBindings";
 import { canAttack } from "../../src/game/sim/conditions";
 import type { Roster } from "../../src/game/sim/roster";
 import { fighterAt } from "../../src/game/sim/roster";
@@ -22,12 +20,9 @@ import { PartnerBehaviour } from "../../src/game/match/trainingState";
 declare function print(this: void, ...values: unknown[]): void;
 
 
-const DEFAULT_KEYS = presetBindings(DEFAULT_PRESET);
-const bound = (action: Action): number => keyFor(DEFAULT_KEYS, action, 0) ?? 0;
 const KEY = {
-  left: bound(Action.moveLeft), right: bound(Action.moveRight), down: bound(Action.moveDown), up: bound(Action.moveUp), jump: bound(Action.shortHop),
-  attack: bound(Action.attack), special: bound(Action.special), grab: bound(Action.grab), shieldLeft: bound(Action.leftTrigger), shieldRight: bound(Action.rightTrigger),
-  cLeft: bound(Action.smashLeft), cRight: bound(Action.smashRight), cUp: bound(Action.smashUp), cDown: bound(Action.smashDown), walk: bound(Action.walk),
+  left: 0x57, right: 0x52, down: 0x45, up: 0x20, jump: 0x49, attack: 0x4e, special: 0x55, grab: 0x4f,
+  shieldLeft: 0x51, shieldRight: 0x37, cLeft: 0x42, cRight: 0x4d, cUp: 0x4a, cDown: 0x48, walk: 0x50,
 } as const;
 
 

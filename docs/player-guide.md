@@ -6,8 +6,8 @@ put it in the Warcraft III Maps folder
 and open it from Custom Games. Public 0.1 uses the Classic look. Set Graphics
 to Classic and restart Warcraft III after changing it. A
 controller is optional: the Smashcraft controller helper turns its buttons
-and sticks into the Hitbox keys, so pad players choose Hitbox when the Controls
-screen first appears (or later with F1); it saves straight away.
+and sticks into the same keys. The default controls already match the helper;
+if you saved Custom controls earlier, press F1, choose QWERTY and Save.
 The default Melee layout uses A to
 attack, B for specials, X/Y to jump, RB to grab and LB for an EX special;
 Tom's layout uses A to attack, X for specials, Y to jump, B to grab, LB to
@@ -57,9 +57,7 @@ fighter keeps the usual hit and ice colours inside the halo.
 
 ## Menus and controls
 
-Mouse buttons and your left/right keys (S/F on ESDF, W/R on Hitbox) + N select a
-fighter or stage; U goes back. Menus always follow your own bindings, and the
-arrow keys work too. Drag a
+Mouse buttons and W/R + N select a fighter or stage; U goes back. Drag a
 character chip from the active player card onto the roster. New Match retains
 selections. Y confirms character/stage selection and chooses the next match after
 a result. Backspace pauses or resumes an active match (Start on a controller); while
@@ -67,20 +65,16 @@ the Warcraft chat box is open, typing never pauses, moves or attacks. Pausing fr
 match time while keeping input handling live. Enter is reserved for Warcraft
 chat.
 
-At fighter selection, up/down (E/D on ESDF, Space/E on Hitbox) moves focus
-between fighter cards and CPU Opponent settings. Left/right changes the focused
-fighter; N opens focused settings. Inside the panel, up/down visits Opponent,
-Difficulty and Done; left/right changes the value. N advances to the next row or chooses Done, and U or Close returns
+At fighter selection, Space/E moves focus between fighter cards and CPU
+Opponent settings. W/R changes the focused fighter; N opens focused settings.
+Inside the panel, Space/E visits Opponent, Difficulty and Done; W/R changes
+the value. N advances to the next row or chooses Done, and U or Close returns
 to Opponent settings while retaining choices. Start closes the panel; release
 and press it again to continue. Controller menus use the left stick to move
 the pointer, A to choose and B to go back. The panel shows your current control bindings.
 
-The first time the map runs, the Controls screen opens before anything else;
-F1 opens it again before a match. Pick a layout at the top: ESDF (recommended
-if you're new), Hitbox (Space = up, the leverless controller style) or Custom.
-Picking one saves it. Below, the keyboard lights every bound key with its
-action; click a lit key, press the key you want instead, then Save. Escape
-cancels a rebind, and Done closes the screen. Saved controls load automatically on the next map
+F1 opens Controls before a match. Choose QWERTY or Custom, click either key
+slot to rebind it, then Save. Saved controls load automatically on the next map
 start. Type -save in chat to save your current controls and delay, or -load to
 bring back your saved ones. Y (Start), Backspace (Pause) and K (save a moment) are reserved; F6 and F7
 remain reserved for Warcraft shortcuts. Ctrl+T starts a developer input trace.
@@ -90,12 +84,9 @@ last ten seconds of the match are saved for a bug report on your computer, in
 Warcraft III's CustomMapData folder as smashcraft-repro-*.txt, and "Moment
 saved" appears. The match goes on undisturbed.
 
-ESDF, the default, uses S/F to move, E to aim up, D to fast-fall or drop
-through platforms, Space/Z to jump, A to shield or air-dodge, Q for light
-shield, O to grab, N to attack, and U for a special. Hitbox moves with W/R,
-aims up with Space and down with E, jumps with Z/8 and shields with Q (light
-shield A). Custom is Hitbox with Z/9 to jump and Q/8 to shield. Shield + N or O
-grabs. While holding an
+The Custom preset uses W/R to move, Z/9 to jump, Space to aim up, E to
+fast-fall or drop through platforms, Q/8 to shield or air-dodge, O to grab, N
+to attack, and U for a special. Shield + N or O grabs. While holding an
 opponent, tap N to pummel once or a movement/C-stick direction to throw forward,
 backward, up, or down; after the pummel, throw or the opponent goes free. Mash
 action buttons and alternate movement directions to escape a grab; holding one
@@ -132,12 +123,13 @@ drop consumes that press: held down never fast-falls. Return toward neutral
 (or release the key), then press down again to fast-fall.
 N with a direction performs a smash, or a tilt while walking. B (or /) is
 C-stick left; H is down; J is up; M is right. C-stick down-air preserves
-normal aerial momentum. ESDF and Hitbox use 7 (or G) for right trigger and 9
-(or X) for EX special; Custom uses 8 and 0. T is unbound by default.
+normal aerial momentum. QWERTY uses 7 for right trigger, 8 for the alternate jump key and 9 for
+EX special; Custom uses 8, 9 and 0. A gives light shield; T is unbound by
+default.
 
 Specials use U with a direction; every fighter's specials and
 ultimate are listed by name in the [move list](move-list.md). The EX special
-key (9 on ESDF and Hitbox, 0 on Custom) with a direction casts that special's EX
+key (9 on QWERTY, 0 on Custom) with a direction casts that special's EX
 form, costing one of the super bar's three segments. At a full bar,
 N + U together (A + B in Melee or A + X in Tom's controller layout) is the fighter's ultimate; the
 Ultimates rule at fighter selection turns them off.

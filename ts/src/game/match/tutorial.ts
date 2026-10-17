@@ -6,8 +6,6 @@
 import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS, type Slots, participantActive } from "../input/participants";
-import { Action } from "../input/actions";
-import { type KeyBindings, keyNames } from "../input/keyBindings";
 import { GroundAction, SpecialAction } from "../sim/codes";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { PartnerBehaviour, PartnerEscape, PartnerTech, type TrainingState } from "./trainingState";
@@ -22,7 +20,7 @@ export type LessonAction = (typeof LessonAction)[keyof typeof LessonAction];
 
 export interface Lesson {
   readonly name: string;
-  readonly instruction: (key: (action: Action) => string) => string;
+  readonly instruction: string;
 
   readonly counted: string;
   readonly action: LessonAction;
@@ -32,14 +30,14 @@ export interface Lesson {
 }
 
 export const LESSONS: readonly Lesson[] = [
-  { name: "Move and dash", instruction: key => `Push left or right (${key(Action.moveLeft)} or ${key(Action.moveRight)}) to walk. Tap it quickly to dash.`, counted: "Dashes", action: LessonAction.dash, goal: 3, partnerDamage: 0 },
-  { name: "Jump and double jump", instruction: key => `Press jump (${key(Action.jump)}), then press it again in the air to jump a second time. ${key(Action.shortHop)}, or LB in the tom pad layout, always short hops, even held.`, counted: "Double jumps", action: LessonAction.doubleJump, goal: 3, partnerDamage: 0 },
-  { name: "Attacks", instruction: key => `Walk up to your partner and press attack (${key(Action.attack)}). Hold a direction to change the attack.`, counted: "Hits", action: LessonAction.hit, goal: 5, partnerDamage: 0 },
-  { name: "Specials", instruction: key => `Press special (${key(Action.special)}); hold a direction to change the move. Specials are free. Shield + Special: EX special (one bar segment). Attack + Special (A + X): Ultimate (full bar).`, counted: "Specials", action: LessonAction.special, goal: 3, partnerDamage: 0 },
-  { name: "Shield and dodge", instruction: key => `${key(Action.leftTrigger)}: full shield; ${key(Action.lightShield)}: light shield. Shield + left/right rolls; down dodges. Tap Shield before landing to tech; hold left/right to tech roll.`, counted: "Dodges", action: LessonAction.dodge, goal: 3, partnerDamage: 0 },
-  { name: "Grab and throw", instruction: key => `Stand next to your partner and press grab (${key(Action.grab)}). Then push a direction to throw.`, counted: "Throws", action: LessonAction.throw, goal: 2, partnerDamage: 0 },
-  { name: "Get back to the ledge", instruction: () => "Jump off, then double jump and up special to the ledge. Up/toward stage climbs; Jump leaps; Shield rolls; Attack strikes; Down/away lets go.", counted: "Ledge grabs", action: LessonAction.ledge, goal: 2, partnerDamage: 0 },
-  { name: "Knock out your partner", instruction: () => "Your partner is badly hurt. Hit it hard to knock it off the screen.", counted: "Knockouts", action: LessonAction.knockout, goal: 1, partnerDamage: 150 },
+  { name: "Move and dash", instruction: "Push left or right to walk. Tap it quickly to dash.", counted: "Dashes", action: LessonAction.dash, goal: 3, partnerDamage: 0 },
+  { name: "Jump and double jump", instruction: "Press jump, then press it again in the air to jump a second time. I, or LB in the tom pad layout, always short hops, even held.", counted: "Double jumps", action: LessonAction.doubleJump, goal: 3, partnerDamage: 0 },
+  { name: "Attacks", instruction: "Walk up to your partner and press attack. Hold a direction to change the attack.", counted: "Hits", action: LessonAction.hit, goal: 5, partnerDamage: 0 },
+  { name: "Specials", instruction: "Press special; hold a direction to change the move. Specials are free. Shield + Special: EX special (one bar segment). Attack + Special (A + X): Ultimate (full bar).", counted: "Specials", action: LessonAction.special, goal: 3, partnerDamage: 0 },
+  { name: "Shield and dodge", instruction: "Q: full shield; A: light shield. Shield + left/right rolls; down dodges. Tap Shield before landing to tech; hold left/right to tech roll.", counted: "Dodges", action: LessonAction.dodge, goal: 3, partnerDamage: 0 },
+  { name: "Grab and throw", instruction: "Stand next to your partner and press grab. Then push a direction to throw.", counted: "Throws", action: LessonAction.throw, goal: 2, partnerDamage: 0 },
+  { name: "Get back to the ledge", instruction: "Jump off, then double jump and up special to the ledge. Up/toward stage climbs; Jump leaps; Shield rolls; Attack strikes; Down/away lets go.", counted: "Ledge grabs", action: LessonAction.ledge, goal: 2, partnerDamage: 0 },
+  { name: "Knock out your partner", instruction: "Your partner is badly hurt. Hit it hard to knock it off the screen.", counted: "Knockouts", action: LessonAction.knockout, goal: 1, partnerDamage: 150 },
 ];
 
 
@@ -127,13 +125,13 @@ export function advanceTutorial(state: TrainingState, world: Roster, playerMask:
 }
 
 
-export function tutorialText(state: Readonly<TrainingState>, bindings: Readonly<KeyBindings>): string {
+export function tutorialText(state: Readonly<TrainingState>): string {
   if (tutorialFinished(state)) return "Tutorial complete!\nYou know the basics. Pause and press Escape to go back to fighter selection.";
   const lesson = LESSONS[state.lesson];
   if (lesson === undefined) return "";
   const heading = `Lesson ${state.lesson + 1} of ${LESSONS.length}: ${lesson.name}`;
   if (state.lessonCheer > 0) return `${heading}\nWell done!${state.lesson + 1 < LESSONS.length ? " Next lesson coming up." : ""}`;
-  return `${heading}\n${lesson.instruction(action => keyNames(bindings, action))}\n${lesson.counted}: ${state.lessonCount} / ${lesson.goal}`;
+  return `${heading}\n${lesson.instruction}\n${lesson.counted}: ${state.lessonCount} / ${lesson.goal}`;
 }
 
 

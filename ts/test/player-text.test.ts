@@ -5,7 +5,7 @@
 
 
 import { expect, test } from "bun:test";
-import { LEFT_KEY, RIGHT_KEY, testHeadless } from "./headless";
+import { testHeadless } from "./headless";
 import type { HeadlessClient } from "wisp/src/headless/client";
 import type { Lockstep } from "wisp/src/headless/lockstep";
 import { Phase, characterReady, holdingStart } from "../src/game/lobby/lobbyState";
@@ -164,7 +164,7 @@ test("all-ready controller Start advances selection and enters the match without
   const clients = headless.clients({ install: installPlayable, start: startPlayable });
   clients.start();
   clients.frames(30);
-  for (const slot of [0, 1]) clients.press(slot, RIGHT_KEY);
+  for (const slot of [0, 1]) clients.press(slot, Key.r);
   clients.frames(10);
   const publication = (phase: string) => clients.everywhere(() => expect(shell().menuPublication?.phase).toBe(phase));
   publication("CHARACTER");
@@ -257,7 +257,7 @@ test("the playable build keeps selection chips and cursor on their screen and sh
     }
   }
 
-  for (const slot of [0, 1]) clients.press(slot, RIGHT_KEY);
+  for (const slot of [0, 1]) clients.press(slot, Key.r);
   frames(10);
   const chipSize = readyChipSize(rosterGrid(PLAYABLE_CHARACTERS.length));
   for (const { client, view } of records) {
@@ -278,7 +278,7 @@ test("the playable build keeps selection chips and cursor on their screen and sh
   expect(phases()).toEqual([Phase.match, Phase.match]);
   for (let frame = 0; frame < 240 && clients.clients.some((client) => { let held = true; client.run(() => { held = holdingStart(shell().game); }); return held; }); frame++) frames(1);
 
-  for (const client of clients.clients) client.key(0, LEFT_KEY, 0, true);
+  for (const client of clients.clients) client.key(0, Key.w, 0, true);
   for (let frame = 0; frame < 1200 && !phases().every((phase) => phase === Phase.result); frame++) frames(1);
   expect(phases()).toEqual([Phase.result, Phase.result]);
   frames(RESULTS_DELAY_FRAMES + 1);

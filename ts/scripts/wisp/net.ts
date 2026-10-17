@@ -8,7 +8,7 @@ import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import type { MapBuild } from "../../src/game/session/build";
 import { PREDICTED_HEADLESS } from "./headless";
 import { heldKeys } from "./standalone";
-import { DEFAULT_PRESET, actionFor, presetBindings } from "../../src/game/input/keyBindings";
+import { actionFor, presetBindings } from "../../src/game/input/keyBindings";
 
 const SETUP_FRAME = 30;
 const BUTTONS: Readonly<Record<string, string>> = { A: "attack", X: "special", B: "jump", Y: "jump", LB: "walk", TL: "walk", RB: "grab", TR: "grab", START: "start", VIEW: "view" };
@@ -210,7 +210,7 @@ function netcodeStats() {
   };
 }
 
-const BINDINGS = presetBindings(DEFAULT_PRESET);
+const BINDINGS = presetBindings("standard");
 
 /** Every scripted key press during the match: the row it was captured into, the frame that row was assigned, the tick the local view first ran it, and every row received from each slot (wisp#112). */
 function pressStats(slot: number) {

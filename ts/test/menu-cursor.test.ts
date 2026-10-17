@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { LEFT_KEY, RIGHT_KEY, testHeadless } from "./headless";
+import { testHeadless } from "./headless";
 import type { HeadlessClient } from "wisp/src/headless/client";
 import { Phase, ResultPick } from "../src/game/lobby/lobbyState";
 import { install, start } from "../src/host/entries/playableMain";
@@ -10,7 +10,6 @@ import { cellRect, rosterGrid } from "../src/game/menu/selectionGrid";
 import { cardX } from "../src/game/menu/selectionDrag";
 import { PLAYABLE_CHARACTERS } from "../src/game/sim/heroes/registry";
 import { START_BUTTON } from "../src/game/ui/selectionLayout";
-import { PICKER_DONE } from "../src/game/ui/settingsUi";
 import { RULE_BUTTONS } from "../src/game/ui/ruleButtons";
 import { TEAM_NAMES } from "../src/game/sim/teams";
 import { BUTTON_WIDTH, CHOICE_HEIGHT, CHOICE_TOP, choiceLeft } from "../src/game/ui/resultsBanner";
@@ -99,8 +98,6 @@ function menu() {
   };
   clients.start();
   clients.frames(30);
-  for (const slot of [0, 1]) expect(clients.click(slot, f32(PICKER_DONE.x + f32(PICKER_DONE.width / 2)), f32(PICKER_DONE.y - f32(PICKER_DONE.height / 2)))).toBe(true);
-  clients.frames(2);
   for (const slot of [0, 1]) expect(clients.click(slot, f32(0.49), f32(0.2975))).toBe(true);
   clients.frames(2);
   return { clients, watches, phases, point };
@@ -191,7 +188,7 @@ test("fighter tiles register no hover events and a resting pointer still lights 
 test("entering stage select avoids cursor-displacing dialog hover events and cursor toggles, leaves a pointer inside Start, and moves one outside it once [k1 scenario]", () => {
   const { clients, watches, phases, point } = menu();
   const centre = { x: START_BUTTON.x + START_BUTTON.width / 2, y: START_BUTTON.y - START_BUTTON.height / 2 };
-  for (const slot of [0, 1]) clients.press(slot, RIGHT_KEY);
+  for (const slot of [0, 1]) clients.press(slot, Key.r);
   clients.frames(10);
   point(AWAY.x, AWAY.y);
   clients.frames(5);
@@ -230,7 +227,7 @@ test("Start answers clicks in one rectangle on character select and on stage sel
   const top = START_BUTTON.y;
   const bottom = f32(START_BUTTON.y - START_BUTTON.height);
   const middle = f32(START_BUTTON.y - START_BUTTON.height / 2);
-  for (const slot of [0, 1]) clients.press(slot, RIGHT_KEY);
+  for (const slot of [0, 1]) clients.press(slot, Key.r);
   clients.frames(10);
 
   const outside = [[left - 0.01, middle], [right + 0.005, middle], [f32(left + START_BUTTON.width / 2), top + 0.001], [f32(left + START_BUTTON.width / 2), bottom - 0.003]] as const;
@@ -315,14 +312,14 @@ test("on the results banner arrows and movement keys move each player's choice a
     clients.client(0).run(() => { value = shell().resultFocus?.[slot]; });
     return value;
   };
-  clients.press(0, RIGHT_KEY);
+  clients.press(0, Key.r);
   clients.frames(1);
   expect(focus(0)).toBe(ResultPick.rematch);
   clients.press(0, 0x27);
   clients.frames(1);
   expect(focus(0)).toBe(ResultPick.newStage);
   clients.press(0, 0x25);
-  clients.press(0, LEFT_KEY);
+  clients.press(0, Key.w);
   clients.frames(1);
   expect(focus(0)).toBe(ResultPick.characters);
   const x = f32(choiceLeft(ResultPick.newStage) + BUTTON_WIDTH / 2);

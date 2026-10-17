@@ -11,7 +11,6 @@ import type { PerfMeasure } from "wisp/src/headless/luaPerf";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { at } from "wisp/src/runtime/lookup";
 import { Action, bit } from "../../src/game/input/actions";
-import { DEFAULT_PRESET, keyFor, presetBindings } from "../../src/game/input/keyBindings";
 import { type InputRow, inputRow } from "../../src/game/input/inputRow";
 import { Phase } from "../../src/game/lobby/lobbyState";
 import type { MapBuild } from "../../src/game/session/build";
@@ -72,14 +71,12 @@ function botBeatRow(frame: number): InputRow {
 }
 
 
-const DEFAULT_KEYS = presetBindings(DEFAULT_PRESET);
-const bound = (action: Action): number => keyFor(DEFAULT_KEYS, action, 0) ?? 0;
-const KEY_ATTACK = bound(Action.attack);
-const KEY_JUMP = bound(Action.shortHop);
-const KEY_SPECIAL = bound(Action.special);
-const KEY_SHIELD = bound(Action.leftTrigger);
-const KEY_LEFT = bound(Action.moveLeft);
-export const KEY_RIGHT = bound(Action.moveRight);
+const KEY_ATTACK = 0x4e;
+const KEY_JUMP = 0x49;
+const KEY_SPECIAL = 0x55;
+const KEY_SHIELD = 0x51;
+const KEY_LEFT = 0x57;
+export const KEY_RIGHT = 0x52;
 const TAP_KEYS = [KEY_ATTACK, KEY_JUMP, KEY_SPECIAL];
 
 

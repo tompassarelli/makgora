@@ -5,8 +5,6 @@ import type { QuickStageSettings } from "../../game/session/devSettings";
 
 import { floorMod } from "wisp/src/sim/intMath";
 import { Action } from "../../game/input/actions";
-import { menuAction } from "../../game/input/keyBindings";
-import { pressKey } from "../../game/input/playerKeys";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, isParticipantSlot } from "../../game/input/participants";
 import {
   Phase, RESULT_PICKS, ResultPick, resultChoicesOpen, changeStagePoolMode, changeStagePoolStage, canChooseComputer, cancelRematchCountdown, firstHumanSlot, characterFor, confirmRematch, cycleSlotMode, humanActive, recallCharacter,
@@ -399,28 +397,4 @@ export function resetToStartingSelection(s: ShellState): void {
   }
   setStatus(s, "", 0.0);
   makePreview(s);
-}
-
-export function journalMenuKey(s: ShellState, slot: ParticipantSlot, key: number): boolean {
-  const { bindings } = s.participants[slot].bindings;
-  const action = menuAction(bindings, key);
-  if (action !== undefined) {
-    pressKey(s.participants[slot].keys, key, bindings);
-    if (views(s).selections[slot].menuAction(action)) return true;
-  }
-  const sideways = action === Action.moveLeft || action === Action.moveRight;
-  if ((sideways || action === Action.attack || action === Action.special) && cancelRematchCountdown(s.game, slot)) return true;
-  if (sideways) choose(s, slot, action === Action.moveLeft ? -1 : 1);
-  else if (action === Action.attack) {
-    if (s.game.phase !== Phase.characterMenu) confirm(s, slot);
-    else {
-      cancelPendingPlaytest();
-      selectCharacter(s.game, slot, characterFor(s.game, slot) ?? 0);
-      makePreview(s);
-    }
-  } else if (action === Action.special) {
-    if (s.game.phase === Phase.characterMenu) recallCharacter(s.game, slot, slot);
-    else back(s, slot);
-  } else return false;
-  return true;
 }

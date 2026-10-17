@@ -2,8 +2,6 @@ import { f32 } from "wisp/src/sim/f32";
 import { bindPrototype } from "../../platform/rebind";
 import { ButtonClicks, consoleUi, createBackdrop, createText, placeTopLeft, sizeText, styleMenuPanel } from "./frames";
 import { MENU_STYLE } from "./hudLayout";
-import { Action } from "../input/actions";
-import { type KeyBindings, keyNames } from "../input/keyBindings";
 
 export class PauseMenu {
   private readonly root: framehandle;
@@ -72,7 +70,7 @@ export class PauseMenu {
     }
   }
 
-  update(paused: boolean, choice: number, title: boolean, bindings: Readonly<KeyBindings>, training = false, hints = false): void {
+  update(paused: boolean, choice: number, title: boolean, training = false, hints = false): void {
     BlzFrameSetVisible(this.root, paused || title);
     if (!paused && !title) return;
     BlzFrameSetText(this.heading, `${MENU_STYLE.gold}${title ? "Smashcraft" : "Paused"}|r`);
@@ -95,7 +93,7 @@ export class PauseMenu {
     BlzFrameSetText(this.help, `${MENU_STYLE.text}${title ? "A / Start / Click: Play" : "Stick / arrows: choose · A: select · Click: select\nStart / Y: resume · Escape: character select"}|r`);
     BlzFrameSetVisible(this.controlsTitle, !title);
     BlzFrameSetVisible(this.controls, !title);
-    BlzFrameSetText(this.controls, MENU_STYLE.text + `${keyNames(bindings, Action.leftTrigger)}: full shield · ${keyNames(bindings, Action.lightShield)}: light shield · ${keyNames(bindings, Action.walk)}: tilt · ${keyNames(bindings, Action.shortHop)}: short hop · ${keyNames(bindings, Action.exSpecial)}: meter\n`
+    BlzFrameSetText(this.controls, MENU_STYLE.text + "Q: full shield · A: light shield · P: tilt · I: short hop · X: meter\n"
       + "Shield just before landing: tech (hold left/right to roll)\n"
       + "Shield + Special: EX (one bar) · Attack + Special: Ultimate (full bar)\n"
       + "Shield + left/right: roll · Shield + down: dodge\n"

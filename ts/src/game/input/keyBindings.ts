@@ -17,25 +17,11 @@ export interface KeyBindings {
 }
 
 
-export type BindingPreset = "esdf" | "standard" | "custom";
-
-export const DEFAULT_PRESET: BindingPreset = "esdf";
-
-export const BINDING_PRESETS: readonly BindingPreset[] = ["esdf", "standard", "custom"];
-
-export const PRESET_NAMES: Readonly<Record<BindingPreset, string>> = { esdf: "ESDF", standard: "Hitbox (Space = up)", custom: "Custom" };
-
-export const PRESET_HINTS: Readonly<Record<BindingPreset, string>> = {
-  esdf: "Recommended if you're new",
-  standard: "Leverless controller style",
-  custom: "Hitbox with 9 jump, 8 shield and 0 EX",
-};
+export type BindingPreset = "standard" | "custom";
 
 const EMPTY = 0;
 const SPACE = 32;
 const SEMICOLON = 186;
-const COMMA = 188;
-const PERIOD = 190;
 const SLASH = 191;
 
 const code = (character: string) => character.charCodeAt(0);
@@ -50,29 +36,27 @@ export function slotIndex(action: Action, slot: KeySlot): number {
 
 export function presetBindings(preset: BindingPreset): KeyBindings {
   const custom = preset === "custom";
-  const esdf = preset === "esdf";
   const keys: number[] = [];
   const bind = (action: Action, first: number, second = EMPTY) => {
     keys[slotIndex(action, 0)] = first;
     keys[slotIndex(action, 1)] = second;
   };
-  bind(Action.moveLeft, code(esdf ? "S" : "W"));
-  bind(Action.moveRight, code(esdf ? "F" : "R"));
-  bind(Action.moveDown, code(esdf ? "D" : "E"));
-  bind(Action.moveUp, esdf ? code("E") : SPACE);
-  if (esdf) bind(Action.jump, SPACE, code("Z"));
-  else bind(Action.jump, code("Z"), code(custom ? "9" : "8"));
+  bind(Action.moveLeft, code("W"));
+  bind(Action.moveRight, code("R"));
+  bind(Action.moveDown, code("E"));
+  bind(Action.moveUp, SPACE);
+  bind(Action.jump, code("Z"), code(custom ? "9" : "8"));
   bind(Action.attack, code("N"));
   bind(Action.special, code("U"));
   bind(Action.grab, code("O"));
-  bind(Action.leftTrigger, code(esdf ? "A" : "Q"));
+  bind(Action.leftTrigger, code("Q"));
   bind(Action.rightTrigger, code(custom ? "8" : "7"), code("G"));
   bind(Action.smashLeft, code("B"), SLASH);
   bind(Action.smashRight, code("M"));
   bind(Action.smashUp, code("J"));
   bind(Action.smashDown, code("H"));
   bind(Action.walk, code("P"));
-  bind(Action.lightShield, code(esdf ? "Q" : "A"));
+  bind(Action.lightShield, code("A"));
   bind(Action.shortHop, code("I"));
   bind(Action.exSpecial, code(custom ? "0" : "9"), code("X"));
   return { keys };
@@ -86,33 +70,6 @@ export function keyFor({ keys }: Readonly<KeyBindings>, action: Action, slot: Ke
 export function actionFor({ keys }: Readonly<KeyBindings>, key: number): Action | undefined {
   const index = key === EMPTY ? -1 : keys.indexOf(key);
   return index < 0 ? undefined : ACTION_ORDER[floorDiv(index, 2)];
-}
-
-export function presetOf({ keys }: Readonly<KeyBindings>): BindingPreset | undefined {
-  return BINDING_PRESETS.find((preset) => presetBindings(preset).keys.every((key, index) => keys[index] === key));
-}
-
-const ARROWS: readonly (readonly [number, Action])[] = [[0x25, Action.moveLeft], [0x26, Action.moveUp], [0x27, Action.moveRight], [0x28, Action.moveDown]];
-const MENU_ACTIONS: readonly Action[] = [Action.moveLeft, Action.moveRight, Action.moveUp, Action.moveDown, Action.attack, Action.special];
-
-export function menuAction(bindings: Readonly<KeyBindings>, key: number): Action | undefined {
-  const arrow = ARROWS.find(([arrowKey]) => arrowKey === key);
-  if (arrow !== undefined) return arrow[1];
-  const action = actionFor(bindings, key);
-  return action !== undefined && MENU_ACTIONS.includes(action) ? action : undefined;
-}
-
-const PAUSE_MENU_ACTIONS: readonly Action[] = [Action.moveUp, Action.moveDown, Action.attack, Action.special];
-
-export function pauseMenuKeys(bindings: Readonly<KeyBindings>): number[] {
-  const keys = [0x26, 0x28];
-  for (const action of PAUSE_MENU_ACTIONS) {
-    for (const slot of [0, 1] as const) {
-      const key = keyFor(bindings, action, slot);
-      if (key !== undefined) keys.push(key);
-    }
-  }
-  return keys;
 }
 
 
@@ -253,41 +210,11 @@ export const ACTION_LABELS: Readonly<Record<Action, string>> = {
   [Action.exSpecial]: "EX special",
 };
 
-export const ACTION_KEY_LABELS: Readonly<Record<Action, string>> = {
-  [Action.moveLeft]: "Left",
-  [Action.moveRight]: "Right",
-  [Action.moveDown]: "Down",
-  [Action.moveUp]: "Up",
-  [Action.jump]: "Jump",
-  [Action.attack]: "Attack",
-  [Action.special]: "Special",
-  [Action.grab]: "Grab",
-  [Action.leftTrigger]: "Shield",
-  [Action.rightTrigger]: "Shield R",
-  [Action.smashLeft]: "Smash L",
-  [Action.smashRight]: "Smash R",
-  [Action.smashUp]: "Smash U",
-  [Action.smashDown]: "Smash D",
-  [Action.walk]: "Tilt",
-  [Action.lightShield]: "Light sh.",
-  [Action.shortHop]: "Hop",
-  [Action.exSpecial]: "EX",
-};
-
 export function keyLabel(key: number | undefined): string {
   if (key === undefined) return "—";
   if (key === SPACE) return "SPACE";
   if (key === SLASH) return "/";
   if (key === SEMICOLON) return ";";
-  if (key === COMMA) return ",";
-  if (key === PERIOD) return ".";
   if ((key >= code("A") && key <= code("Z")) || (key >= code("0") && key <= code("9"))) return String.fromCharCode(key);
   return `KEY ${key}`;
-}
-
-export function keyNames(bindings: Readonly<KeyBindings>, action: Action): string {
-  const first = keyFor(bindings, action, 0);
-  const second = keyFor(bindings, action, 1);
-  if (first === undefined || second === undefined) return keyLabel(first ?? second);
-  return `${keyLabel(first)}/${keyLabel(second)}`;
 }

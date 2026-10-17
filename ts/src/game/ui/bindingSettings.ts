@@ -6,16 +6,12 @@ import type { Action } from "../input/actions";
 import {
   ACTION_LABELS,
   type BindingPreset,
-  DEFAULT_PRESET,
-  PRESET_NAMES,
   type KeyBindings,
   type KeySlot,
   decodeBindings,
   encodeBindings,
   presetBindings,
-  actionFor,
   rebind,
-  slotIndex,
 } from "../input/keyBindings";
 import { AUTO_DELAY, type DelayChoice, MAX_FIXED_DELAY } from "../netcode/delayPolicy";
 
@@ -53,7 +49,7 @@ export interface BindingSettings {
 }
 
 export function createBindingSettings(owner: number, persistence: BindingPersistence): BindingSettings {
-  return { owner, persistence, bindings: presetBindings(DEFAULT_PRESET), delay: AUTO_DELAY, ready: false, capture: undefined, revision: 0, message: "Loading controls..." };
+  return { owner, persistence, bindings: presetBindings("standard"), delay: AUTO_DELAY, ready: false, capture: undefined, revision: 0, message: "Loading controls..." };
 }
 
 
@@ -80,7 +76,7 @@ export function chooseDelay(settings: BindingSettings, delay: DelayChoice): void
 }
 
 export function initializeBindingSettings(settings: BindingSettings): void {
-  settings.bindings = presetBindings(DEFAULT_PRESET);
+  settings.bindings = presetBindings("standard");
   settings.delay = AUTO_DELAY;
   settings.persistence.load(settings.owner, (result) => {
     const stored = result.kind === "loaded" ? decodeDelay(result.encoded) : undefined;
@@ -90,8 +86,8 @@ export function initializeBindingSettings(settings: BindingSettings): void {
       settings.bindings = saved;
       settings.message = "Saved controls loaded.";
     } else {
-      settings.bindings = presetBindings(DEFAULT_PRESET);
-      settings.message = result.kind === "loaded" ? `Saved controls were invalid; using ${PRESET_NAMES[DEFAULT_PRESET]} defaults.` : `${PRESET_NAMES[DEFAULT_PRESET]} controls ready.`;
+      settings.bindings = presetBindings("standard");
+      settings.message = result.kind === "loaded" ? "Saved controls were invalid; using QWERTY defaults." : "QWERTY controls ready.";
     }
     settings.revision++;
     settings.ready = true;
@@ -118,7 +114,7 @@ export function loadSavedBindings(settings: BindingSettings, done: (message: str
 
 
 export function useDefaultBindings(settings: BindingSettings): void {
-  settings.bindings = presetBindings(DEFAULT_PRESET);
+  settings.bindings = presetBindings("standard");
   settings.delay = AUTO_DELAY;
   settings.ready = true;
   settings.revision++;
@@ -129,7 +125,7 @@ export function applyBindingPreset(settings: BindingSettings, preset: BindingPre
   settings.bindings = presetBindings(preset);
   settings.revision++;
   settings.capture = undefined;
-  settings.message = `${PRESET_NAMES[preset]} controls selected.`;
+  settings.message = preset === "custom" ? "Custom controls selected." : "QWERTY controls selected.";
 }
 
 export function beginBindingCapture(settings: BindingSettings, action: Action, slot: KeySlot): void {
@@ -161,21 +157,4 @@ export function saveBindingSettings(settings: BindingSettings): void {
 
 export function cancelBindingCapture(settings: BindingSettings): void {
   settings.capture = undefined;
-}
-
-export function pickBindingPreset(settings: BindingSettings, preset: BindingPreset): void {
-  if (!settings.ready) return;
-  applyBindingPreset(settings, preset);
-  saveBindingSettings(settings);
-  settings.message = `${PRESET_NAMES[preset]} controls saved.`;
-}
-
-export function beginKeyCapture(settings: BindingSettings, key: number): void {
-  const index = key === 0 ? -1 : settings.bindings.keys.indexOf(key);
-  if (index < 0) {
-    if (settings.ready) settings.message = "That key does nothing yet. Click a lit key to move its action.";
-    return;
-  }
-  const action = actionFor(settings.bindings, key);
-  if (action !== undefined) beginBindingCapture(settings, action, index === slotIndex(action, 0) ? 0 : 1);
 }

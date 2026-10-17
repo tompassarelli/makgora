@@ -41,10 +41,7 @@ export function startMatch(s: ShellState, scenario: Scenario = s.build.scenario,
 
   setStatus(s, s.game.startHold === 0 ? "GO!" : "", s.game.startHold === 0 ? 1.0 : 0.0);
   const ui = views(s);
-  for (const slot of PARTICIPANT_SLOTS) {
-    if (ui.settings[slot].isOpen()) ui.settings[slot].close();
-    else ui.settings[slot].dismissOffer();
-  }
+  for (const slot of PARTICIPANT_SLOTS) if (ui.settings[slot].isOpen()) ui.settings[slot].close();
   clearAllInputs(s);
   s.runtime.simulationFrame = 0;
   clearPresentationHistory(s.runtime);

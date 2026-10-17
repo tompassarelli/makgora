@@ -39,7 +39,6 @@ export const SMASHCRAFT_LOCAL_NATIVES: LocalNatives = {
   BlzFrameSetText: "changes an existing frame's text on this client",
   BlzFrameSetTexture: "changes an existing frame's texture on this client",
   BlzFrameSetVertexColor: "tints an existing frame on this client",
-  BlzFrameSetAlpha: "fades an existing frame on this client",
   BlzFrameSetAbsPoint: "moves an existing frame on this client",
   BlzFrameSetSize: "sizes an existing frame on this client",
   BlzFrameSetTextAlignment: "aligns an existing frame's text on this client",

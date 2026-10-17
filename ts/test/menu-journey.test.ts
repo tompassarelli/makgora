@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { RIGHT_KEY, testHeadless } from "./headless";
+import { testHeadless } from "./headless";
 import { Phase, holdingStart } from "../src/game/lobby/lobbyState";
 import { install, start } from "../src/host/entries/playableMain";
 import { Key } from "../src/host/loop/keyEvents";
@@ -30,17 +30,17 @@ test("keyboard players choose fighters, release Start, choose a stage and reach 
   expect(phases()).toEqual([Phase.characterMenu, Phase.characterMenu]);
   for (const slot of [0, 1] as const) {
     const before = read(() => shell().game.characterChoices[slot]);
-    tap(slot, RIGHT_KEY);
+    tap(slot, Key.r);
     expect(read(() => shell().game.characterChoices[slot])).not.toEqual(before);
     expect(read(() => shell().game.characterReadiness[slot])).toEqual([true, true]);
-    expect(read(() => shell().participants[slot].keys.down[RIGHT_KEY])).toEqual([false, false]);
+    expect(read(() => shell().participants[slot].keys.down[Key.r])).toEqual([false, false]);
   }
   tap(0, Key.y);
   until(() => phases().every(phase => phase === Phase.stageMenu), 60);
   expect(phases(), "Y opens stage select on both clients").toEqual([Phase.stageMenu, Phase.stageMenu]);
   expect(read(() => shell().session.startHeld[0])).toEqual([false, false]);
   const beforeStage = read(() => shell().game.stageChoice);
-  tap(0, RIGHT_KEY);
+  tap(0, Key.r);
   expect(read(() => shell().game.stageChoice)).not.toEqual(beforeStage);
   const chosenStage = read(() => shell().game.stageChoice);
   expect(chosenStage[0]).toBe(chosenStage[1]);
