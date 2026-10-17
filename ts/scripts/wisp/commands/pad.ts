@@ -65,6 +65,7 @@ import { Phase } from "../../../src/game/lobby/lobbyState";
 import { hostLoad, inQuietNativeWindow, windowLoad } from "../quietWindow";
 import { quickMatchHero, quickMatchStage, quickPainHero, quickRecoveryHero, quickOffstageHero } from "../../../src/game/session/devSettings";
 import { assertPairClaim } from "./pairClaim";
+import { withNativeUnit } from "./nativeUnit";
 import { pauseDraws } from "../pauseDraws";
 import { platformLayer } from "wisp/scripts/platform/layer";
 import type { Platform } from "wisp/scripts/platform/services";
@@ -544,7 +545,7 @@ const headless = (options: PadOptions) => Effect.gen(function*() {
   return result;
 });
 
-export const pad: Command = (args) => Effect.gen(function*() {
+const pad: Command = (args) => Effect.gen(function*() {
   const parsed = yield* Effect.try({
     try: () => parseArgs({ args: [...args], allowPositionals: true, options: {
       helper: { type: "string" }, build: { type: "string" }, out: { type: "string" }, chat: { type: "string" }, "app-id": { type: "string", multiple: true },
@@ -625,6 +626,9 @@ export const pad: Command = (args) => Effect.gen(function*() {
   if (!report.passed) return yield* new IntegrityFailure({ operation: "pad expectations", path: out, cause: "the script's expectations don't hold headless" });
 });
 
+export const drivesClients = (rawArgs: readonly string[]) => !rawArgs.includes("--headless") && !rawArgs.includes("--help") && !rawArgs.includes("-h");
+
+export const padCommand: Command = withNativeUnit("pad", drivesClients, pad);
 
 const scriptBatch = (values: { readonly [name: string]: string | boolean | readonly string[] | undefined }, positionals: readonly string[]) => Effect.gen(function*() {
   const text = (name: string) => (typeof values[name] === "string" ? values[name] : undefined);

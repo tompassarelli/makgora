@@ -6,7 +6,7 @@ export interface ProcessRow {
   readonly args: readonly string[];
 }
 
-export const ACCEPT_OUTER_PID = "SMASHCRAFT_ACCEPT_OUTER_PID";
+export const NATIVE_OUTER_PID = "SMASHCRAFT_NATIVE_OUTER_PID";
 
 const pairsOf = (args: readonly string[]): readonly string[] => args.flatMap((arg, index) =>
   arg === "--pair" ? [args[index + 1] ?? ""] : arg.startsWith("--pair=") ? [arg.slice("--pair=".length)] : []);
@@ -41,4 +41,4 @@ export const liveProcesses = (): readonly ProcessRow[] => readdirSync("/proc").f
 });
 
 export const ownPids = (env: Readonly<Record<string, string | undefined>>): readonly number[] =>
-  [process.pid, Number(env[ACCEPT_OUTER_PID] ?? "")].filter((pid) => Number.isInteger(pid) && pid > 0);
+  [process.pid, Number(env[NATIVE_OUTER_PID] ?? "")].filter((pid) => Number.isInteger(pid) && pid > 0);

@@ -36,7 +36,7 @@ import { freshMatch, readyAfter, sendDevCommand } from "./fresh";
 import { profileOptions } from "./map";
 import { checkClients, onHealthyClients, readClientsFile, smashcraftWatch } from "../doctor";
 import { restartDroppedPair } from "./lanPoolUnit";
-import { withAcceptUnit } from "./acceptUnit";
+import { withNativeUnit } from "./nativeUnit";
 import { liveProcesses, ownPids, pairHolders } from "./pairGuard";
 import { assertPairClaim } from "./pairClaim";
 import { LAN_POOL_FILE, lanPairs, withTools } from "../padBatch";
@@ -396,4 +396,4 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
   ));
 });
 
-export const accept: Command = withAcceptUnit(acceptHere);
+export const accept: Command = withNativeUnit("accept", (rawArgs) => !rawArgs.includes("--dry-run"), acceptHere);

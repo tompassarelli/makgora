@@ -7,7 +7,8 @@ import { Effect } from "effect";
 import { CURRENT_CANDIDATE, MAP_PROFILES } from "../scripts/wisp/acceptChecks";
 import { poolUnitCommand, poolUnitName, pairNeedsRestart } from "../scripts/wisp/commands/lanPoolUnit";
 import { smashcraftDoctor } from "../scripts/wisp/doctor";
-import { ACCEPT_IN_UNIT, acceptUnitCommand, inAcceptUnit } from "../scripts/wisp/commands/acceptUnit";
+import { NATIVE_IN_UNIT, inNativeUnit, nativeUnitCommand } from "../scripts/wisp/commands/nativeUnit";
+import { drivesClients } from "../scripts/wisp/commands/pad";
 import { privateDesktopUnitEnv } from "../scripts/wisp/commands/privateDesktopUnitEnv";
 import { nativeChatEntryReceipt } from "../scripts/wisp/boundary";
 import { currentChatEntry, selectionChatBootstrapRequired } from "../scripts/wisp/padChat";
@@ -101,18 +102,28 @@ test("installing a map into a fresh Documents folder creates Maps/00-Smashcraft/
   expect(existsSync(join(documents, "Maps/00-Smashcraft/tests/candidate.w3x"))).toBe(true);
 });
 
-test("a native accept runs as a user service once, and a dry run or the service itself runs in place [k2 property]", () => {
-  const env = { PRIVATE_DESKTOP_RUN: "/run/user/1000/private-desktop.unit-test", NORTH_FLEET_SESSION: "fleet-native-harness" };
-  const command = acceptUnitCommand(["--only", "gate-moves", "--pair", "0"], "/bin", 7, process.execPath, env, () => ":9\n");
-  expect(command.slice(0, 3)).toEqual(["systemd-run", "--user", "--wait"]);
-  expect(command).toContain(`--setenv=${ACCEPT_IN_UNIT}=1`);
-  expect(command).toContain(`--setenv=NORTH_FLEET_SESSION=${env.NORTH_FLEET_SESSION}`);
-  expect(command).toContain(`--setenv=PRIVATE_DESKTOP_RUN=${env.PRIVATE_DESKTOP_RUN}`);
-  expect(command).toContain("--setenv=DISPLAY=:9");
-  expect(command.slice(command.indexOf("accept"))).toEqual(["accept", "--only", "gate-moves", "--pair", "0"]);
-  expect(inAcceptUnit(["--pair", "0"], {})).toBe(true);
-  expect(inAcceptUnit(["--pair", "0"], { [ACCEPT_IN_UNIT]: "1" })).toBe(false);
-  expect(inAcceptUnit(["--dry-run"], {})).toBe(false);
+test("native accept and pad runs execute as a user service on the private display and the user manager's bus, even when called from inside a private desktop [k2 property]", () => {
+  const env = {
+    PRIVATE_DESKTOP_RUN: "/run/user/1000/private-desktop.unit-test", NORTH_FLEET_SESSION: "fleet-native-harness",
+    XDG_RUNTIME_DIR: "/run/user/1000/private-desktop.unit-test/runtime", DBUS_SESSION_BUS_ADDRESS: "unix:path=/tmp/dbus-private",
+  };
+  for (const [name, args] of [["accept", ["--only", "gate-moves", "--pair", "0"]], ["pad", ["test/native/pads/448/lich.pad", "--pair", "0"]]] as const) {
+    const command = nativeUnitCommand(name, args, "/bin", 7, 1000, process.execPath, env, () => ":9\n");
+    expect(command.slice(0, 3)).toEqual(["systemd-run", "--user", "--wait"]);
+    expect(command).toContain(`--unit=smashcraft-${name}-7`);
+    expect(command).toContain(`--setenv=${NATIVE_IN_UNIT}=1`);
+    expect(command).toContain(`--setenv=NORTH_FLEET_SESSION=${env.NORTH_FLEET_SESSION}`);
+    expect(command).toContain(`--setenv=PRIVATE_DESKTOP_RUN=${env.PRIVATE_DESKTOP_RUN}`);
+    expect(command).toContain("--setenv=DISPLAY=:9");
+    expect(command).toContain("--setenv=XDG_RUNTIME_DIR=/run/user/1000");
+    expect(command).toContain("--setenv=DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus");
+    expect(command.some((arg) => arg.includes("private-desktop.unit-test/runtime") || arg.includes("dbus-private"))).toBe(false);
+    expect(command.slice(command.indexOf(name))).toEqual([name, ...args]);
+  }
+  expect(inNativeUnit({})).toBe(false);
+  expect(inNativeUnit({ [NATIVE_IN_UNIT]: "1" })).toBe(true);
+  expect(drivesClients(["lich.pad", "--pair", "0"])).toBe(true);
+  expect(drivesClients(["lich.pad", "--headless"])).toBe(false);
 });
 
 test("native units refuse Tom's normal display and missing private desktop context [k2 property]", () => {
