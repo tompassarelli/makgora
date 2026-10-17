@@ -147,12 +147,15 @@ for (const [pose, key, gesture, contact] of [
 ] as const) {
   const special = CAIRNE_SPECIALS[key]; ensure(special, `${pose}: missing special`);
   for (const air of [false,true]) { const form = air ? special.air ?? special.ground : special.ground;
-    const charge: Gesture = {...brace,chest:10,arm:-85,elbow:25,free:-65,freeElbow:20,hip:-45,knee:70,lean:-12,yaw:-12,head:10};
-    const wound: Gesture = {...charge,chest:-28,arm:-155,elbow:55,free:-110,hip:-65,knee:95,lean:-18,yaw:-28};
+    const gather: Gesture = {...brace,chest:32,arm:35,elbow:20,free:-30,freeElbow:15,hip:-55,knee:85,lean:6,yaw:-20,head:-10};
+    const lift: Gesture = {...brace,chest:24,arm:95,elbow:25,free:-45,freeElbow:15,hip:-58,knee:88,lean:2,yaw:-24,head:-4};
+    const overhead: Gesture = {...brace,chest:4,arm:145,elbow:35,free:-85,freeElbow:20,hip:-58,knee:88,lean:-8,yaw:-26,head:6};
+    const wound: Gesture = {...brace,chest:-28,arm:-155,elbow:55,free:-110,freeElbow:20,hip:-65,knee:95,lean:-18,yaw:-28,head:10};
+    const coiled: Gesture = {...wound,chest:-38,arm:-172,elbow:65,free:-125,hip:-70,knee:100,lean:-24,yaw:-34,head:18};
     actions.push({pose:(air?`${pose}Air`:pose) as HeroPose,frames:form.endFrame,contact,gesture,air:air||key==="up",...key==="down"?{stock:9,stockFrom:200,stockHit:567,settleFrom:form.endFrame-9}:{},
-      first:key==="neutral"?charge:undefined,
+      first:key==="neutral"?gather:undefined,
       phases:key==="neutral"?[
-        {frame:1,gesture:charge},{frame:3,gesture:blend(charge,wound,0.2)},{frame:12,gesture:blend(charge,wound,0.6)},{frame:contact-1,gesture:wound},
+        {frame:1,gesture:gather},{frame:3,gesture:gather},{frame:6,gesture:lift},{frame:10,gesture:overhead},{frame:14,gesture:wound},{frame:contact-1,gesture:coiled},
         {frame:contact,gesture},{frame:contact+4,gesture},
       ]:undefined}); }
 }
