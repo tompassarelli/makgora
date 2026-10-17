@@ -219,11 +219,18 @@ export function removeDroppedModelFacts(before: Iterable<string>, after: Iterabl
   return dropped;
 }
 
-function scratchCheckout(directory: string): void {
-  const listed = Bun.spawnSync(["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard"], { cwd: projectRoot, stdout: "pipe", stderr: "pipe" });
-  if (listed.exitCode !== 0) throw new Error(listed.stderr.toString().trim());
+const checkoutFiles = Effect.try({
+  try: () => {
+    const listed = Bun.spawnSync(["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard"], { cwd: projectRoot, stdout: "pipe", stderr: "pipe" });
+    if (listed.exitCode !== 0) throw new Error(listed.stderr.toString().trim());
+    return listed.stdout.toString().split("\0").filter((path) => path !== "" && existsSync(join(projectRoot, path)));
+  },
+  catch: (cause) => failure("list the checkout", projectRoot, cause),
+});
+
+function scratchCheckout(directory: string, files: readonly string[]): void {
   const made = new Set<string>();
-  for (const path of listed.stdout.toString().split("\0").filter((path) => path !== "" && existsSync(join(projectRoot, path)))) {
+  for (const path of files) {
     const to = join(directory, path);
     if (!made.has(dirname(to))) made.add((mkdirSync(dirname(to), { recursive: true }), dirname(to)));
     copyFileSync(join(projectRoot, path), to, constants.COPYFILE_FICLONE);
@@ -248,7 +255,8 @@ export const buildFighterArt = (plans: readonly FighterPlan[], manifest: Manifes
     catch: (cause) => failure("stage fighter art", INPUTS_STORE, cause),
   });
   const checkout = join(root, "checkout");
-  yield* Effect.try({ try: () => scratchCheckout(checkout), catch: (cause) => failure("copy the checkout", checkout, cause) });
+  const files = yield* checkoutFiles;
+  yield* Effect.try({ try: () => scratchCheckout(checkout, files), catch: (cause) => failure("copy the checkout", checkout, cause) });
   const largestFirst = [...plans].sort((a, b) => b.sourceBytes - a.sourceBytes);
   const built = yield* Effect.forEach(largestFirst, (plan) => buildFighter(plan, manifest, assets, root, checkout).pipe(Effect.map((work) => ({ fighter: plan.fighter, work }))), { concurrency: jobs }).pipe(
     Effect.tapError(() => Effect.sync(() => console.error(`step logs kept in ${root}`))));
