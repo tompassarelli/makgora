@@ -269,7 +269,7 @@ export const pinHashes = (pin: Pin): string[] => typeof pin === "string" ? [pin]
 const pinNames = (family: Family, pin: Pin): string[] =>
   typeof pin === "string" ? [`${family} ${pin}\n`] : Object.entries(pin).sort(([a], [b]) => a.localeCompare(b)).map(([shard, hash]) => `${family}/${shard} ${hash}\n`);
 
-function mergeShards(shards: readonly string[], target: string): void {
+export function mergeShards(shards: readonly string[], target: string): void {
   for (const shard of shards) for (const path of listFiles(shard)) {
     const [from, to] = [join(shard, path), join(target, path)];
     if (existsSync(to)) {

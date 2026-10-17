@@ -1,7 +1,10 @@
 import { expect, test } from "bun:test";
 import { fighterSlug } from "../src/game/sim/heroes/registry";
 import { fighters } from "../scripts/heroModelSource";
-import { derivedStepCode } from "../scripts/wisp/fighterArt";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
+import { DERIVED_PATHS, derivedDifferences, derivedStepCode } from "../scripts/wisp/fighterArt";
 import { changedFighters } from "../scripts/wisp/fighterArtChanges";
 import { checksFor } from "../scripts/prePush";
 
@@ -14,7 +17,9 @@ test("a landing checks a fighter whenever an input of its derive-step keys chang
     const owned = [
       `build-inputs/original-clips-static-lights/${slug}`,
       `build-inputs/impact-assets/${slug}`,
+      `build-inputs/hero-models/${slug}`,
       `ts/src/generated/clips/${slug}.ts`,
+      `ts/src/generated/fighter-art/${slug}.ts`,
       `ts/src/generated/assets/white-models/${slug}.ts`,
       `ts/src/generated/assets/white-facts/${slug}.ts`,
       `ts/scripts/wisp/model-facts/war3mapImported_${name}TimelineBody-${"0".repeat(64)}.mdx.00000000.json`,
@@ -22,7 +27,7 @@ test("a landing checks a fighter whenever an input of its derive-step keys chang
     ];
     for (const path of owned) expect(changedFighters([path], STEP_CODE), path).toEqual([slug]);
   }
-  for (const path of [...STEP_CODE, "build-inputs/hero-models/warden", "build-inputs/imported-models"]) expect(changedFighters([path], STEP_CODE), path).toEqual(everyone);
+  for (const path of [...STEP_CODE, "build-inputs/hero-models/shared", "build-inputs/hero-models", "build-inputs/imported-models"]) expect(changedFighters([path], STEP_CODE), path).toEqual(everyone);
   expect(changedFighters(["ts/src/game/sim/heroes/peonMoves.ts", "build-inputs/original-clips-static-lights/shared", "build-inputs/stage-assets", "docs/build-inputs.md"], STEP_CODE)).toEqual([]);
   for (const family of ["animation-assets", "illidan-animation"]) {
     expect(changedFighters([`build-inputs/${family}`], STEP_CODE)).toEqual(roster.filter(({ source }) => source.startsWith(`${family}/`)).map(({ slug }) => slug).sort());
@@ -35,6 +40,7 @@ test("pre-push derives exactly the changed fighters with --check on the private 
   expect(kobold?.args).toEqual(["scripts/wisp.ts", "inputs", "derive", "--check", "--fighter", "kobold"]);
   expect(kobold?.privateStore).toBe(true);
   expect(derive(["ts/src/generated/fighterArtData.ts"])?.args.filter((arg) => arg !== "--fighter").slice(4)).toEqual(everyone);
+  expect(derive(["ts/src/generated/fighter-art/kobold.ts"])?.args).toEqual(kobold?.args);
   expect(derive(["docs/ci.md"])).toBeUndefined();
   expect(derivedStepCode().has("tools/animations/export-original-clips.ts")).toBe(true);
 });
@@ -43,4 +49,22 @@ test("the derive steps read game rules only through the generated fighter art da
   const game = [...derivedStepCode()].filter((path) => path.startsWith("ts/src/game/")).sort();
   expect(game).toEqual(["ts/src/game/assets/definitiveFighters.ts", "ts/src/game/assets/importedModelInfo.ts", "ts/src/game/presentation/modelScale.ts", "ts/src/game/sim/codes.ts", "ts/src/game/sim/heroes/wardenSpin.ts"]);
   expect(derivedStepCode().has("ts/src/generated/fighterArtData.ts")).toBe(true);
+  expect([...derivedStepCode()].filter((path) => path.startsWith("ts/src/generated/fighter-art/"))).toEqual([]);
+});
+
+test("a derive check reports where its scratch checkout differs from the target without writing it, and a derive writes exactly those differences [k2 property]", () => {
+  const root = mkdtempSync(join(tmpdir(), "derived-differences-"));
+  const write = (base: string, path: string, text: string) => (mkdirSync(dirname(join(root, base, path)), { recursive: true }), writeFileSync(join(root, base, path), text));
+  const [pins, clips, facts] = [`${DERIVED_PATHS[0]}/kobold`, `${DERIVED_PATHS[2]}/kobold.ts`, `${DERIVED_PATHS[4]}/old.json`];
+  write("target", pins, "old"), write("target", clips, "same"), write("target", facts, "dropped"), write("target", "ts/src/game/rules.ts", "kept");
+  write("scratch", pins, "new"), write("scratch", clips, "same"), write("scratch", "ts/src/game/rules.ts", "edited");
+  try {
+    expect(derivedDifferences(join(root, "scratch"), join(root, "target"), false)).toEqual([pins, facts].sort());
+    expect(readFileSync(join(root, "target", pins), "utf8")).toBe("old");
+    expect(derivedDifferences(join(root, "scratch"), join(root, "target"), true)).toEqual([pins, facts].sort());
+    expect(derivedDifferences(join(root, "scratch"), join(root, "target"), false)).toEqual([]);
+    expect(readFileSync(join(root, "target", "ts/src/game/rules.ts"), "utf8")).toBe("kept");
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });

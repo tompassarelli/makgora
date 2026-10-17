@@ -9,12 +9,13 @@ import { encodeVerified, parseSource } from './original-clips';
 import { DEFINITIVE_FIGHTERS } from '../../ts/src/game/assets/definitiveFighters';
 import type { Character } from '../../ts/src/game/sim/codes';
 import { clipNames } from './clip-names';
-import { FIGHTER_ART, fighterArt } from '../../ts/src/generated/fighterArtData';
+import { FIGHTER_ART } from '../../ts/src/generated/fighterArtData';
+import { fighterRules } from './fighter-rules';
 
 /** The sequence indices each body plays: the fighter's production clips and its results-screen victory pose. */
 export interface PlayedMoves { readonly classic: readonly number[]; readonly definitive: readonly number[] }
 export function playedMoves(character: Character, motion: mdx.Model): PlayedMoves {
-    const victory = clipNames(motion.Sequences).get(fighterArt(character).victory);
+    const victory = clipNames(motion.Sequences).get(fighterRules(character).victory);
     const played = new Set(flashableSequences(character, motion.Sequences).map(sequence => motion.Sequences.indexOf(sequence)));
     if (victory !== undefined) played.add(victory);
     const sorted = [...played].sort((a, b) => a - b);

@@ -81,14 +81,19 @@ code:
    fighter's clip export, timeline bodies and white flashes
    (smashcraft:ts/scripts/wisp/fighterArt.ts), fighters in parallel under one
    machine-capacity lease, and pins the fighters' original-clips-static-lights
-   and impact-assets shards and generated files. Each step is stored under
-   store/derived/STEP/KEY/, KEY hashing the fighter's source model, the step's
-   source files and lockfiles, the earlier step's key and, after the export, the
-   stock build and the hero-models and imported-models pins, so a run redoes only
-   the steps whose inputs changed. `--rebuild` ignores stored steps.
-   `--check` derives into the committed checkout and fails, restoring it, when
-   any pin or generated file differs; pre-push runs it for each fighter whose
-   pins, generated clips or whites, model facts or source family a landing changes,
+   and impact-assets shards and generated files. It first regenerates each
+   fighter's rules (victory pose, flash clips, Warden's blade timing) into
+   ts/src/generated/fighter-art/SLUG.ts, so a lane that changes a fighter's clip
+   tables needs no separate `bun run generate`. Each step is stored under
+   store/derived/STEP/KEY/, KEY hashing the fighter's source model and rules
+   file, the step's source files and lockfiles, the earlier step's key and, after
+   the export, the stock build and the hero-models and imported-models pins, so a
+   run redoes only the steps whose inputs changed. `--rebuild` ignores stored steps.
+   The steps run in a scratch copy of the checkout, and only the derive writes
+   their differences back; `--check` writes nothing and fails, listing them, when
+   any pin or generated file differs or a fighter's rules drift from the game
+   data. Pre-push runs it for each fighter whose pins, rules, generated clips or
+   whites, model facts or source family a landing changes,
    and for every fighter when it changes code the derive steps import or the
    hero-models or imported-models pins, which feed every fighter's step keys
    (smashcraft:ts/scripts/wisp/fighterArtChanges.ts). It also measures each

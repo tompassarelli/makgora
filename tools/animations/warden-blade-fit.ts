@@ -1,12 +1,19 @@
 import { mat4, quat, vec3 } from '../../ts/node_modules/gl-matrix';
 import { ModelRenderer, model as mdx } from '../../ts/scripts/clipNodes';
 import { generateHdBody, parseHdBody } from './hd-retarget';
-import { WARDEN_BLADE } from '../../ts/src/generated/fighterArtData';
+import { Character } from '../../ts/src/game/sim/codes';
+import { fighterRules } from './fighter-rules';
 import { WARDEN_SPIN_PIVOT_Z, wardenSpinTipDegrees } from '../../ts/src/game/sim/heroes/wardenSpin';
+
+function wardenBlade() {
+    const blade = fighterRules(Character.warden).blade;
+    if (blade === undefined) throw new Error('Warden has no blade timing in its fighter rules');
+    return blade;
+}
 
 function addNairBladeTrail(model: mdx.Model, motion: mdx.Model, weapon: mdx.Node) {
     const sequence = motion.Sequences.find(item => item.Name === 'Attack Gesture neutralAir');
-    const move = WARDEN_BLADE.neutralAir;
+    const move = wardenBlade().neutralAir;
     if (sequence === undefined || move === undefined) throw new Error('Warden neutral-air trail timing is missing');
     const start = sequence.Interval[0] + Math.round(move.startupFrames * 1000 / 60);
     const end = start + Math.round(move.activeFrames * 1000 / 60);
@@ -49,7 +56,7 @@ export function fitWardenBlade(motion: mdx.Model, bytes: ArrayBuffer) {
         const sequence = motion.Sequences[index];
         if (sequence === undefined) throw new Error(`Warden ${name} is missing`);
         const [start, end] = sequence.Interval;
-        const move = WARDEN_BLADE[name];
+        const move = wardenBlade()[name];
         if (move === undefined) throw new Error(`Warden ${name} timing is missing`);
         const activeEnd = move.startupFrames + move.activeFrames, total = (end - start) * 60 / 1000;
         const strikes = move.strikes;
@@ -148,7 +155,7 @@ export function fitWardenBlade(motion: mdx.Model, bytes: ArrayBuffer) {
         if (pelvis === undefined || head === undefined) throw new Error('Warden visible body axis is missing');
         const sequence = motion.Sequences.findIndex(item => item.Name === 'Attack Gesture neutralAir');
         const start = motion.Sequences[sequence]?.Interval[0];
-        const move = WARDEN_BLADE.neutralAir;
+        const move = wardenBlade().neutralAir;
         if (start === undefined || move === undefined) throw new Error('Warden neutral air body timing is missing');
         const drawn = new ModelRenderer(body);
         drawn.setSequence(body === motion ? sequence : 0);

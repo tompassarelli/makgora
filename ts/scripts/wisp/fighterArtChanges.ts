@@ -4,8 +4,9 @@ import { fighters } from "../heroModelSource";
 const ROSTER = [...fighters].map(([character, { name, source }]) => ({ name, source, slug: fighterSlug(character) }));
 
 const SLUG_FILES = [
-  /^build-inputs\/(?:original-clips-static-lights|impact-assets)\/([^/]+)$/,
+  /^build-inputs\/(?:original-clips-static-lights|impact-assets|hero-models)\/([^/]+)$/,
   /^ts\/src\/generated\/clips\/([^/]+)\.ts$/,
+  /^ts\/src\/generated\/fighter-art\/([^/]+)\.ts$/,
   /^ts\/src\/generated\/assets\/white-(?:models|facts)\/([^/]+)\.ts$/,
 ];
 
@@ -13,7 +14,7 @@ const FACTS_FILE = /^ts\/scripts\/wisp\/model-facts\/war3mapImported_([A-Za-z]+?
 
 const WHOLE_SOURCE_FAMILY = /^build-inputs\/(animation-assets|illidan-animation)$/;
 
-const EVERY_KEY = /^build-inputs\/(?:hero-models(?:\/[^/]+)?|imported-models)$/;
+const EVERY_KEY = /^build-inputs\/(?:hero-models(?:\/shared)?|imported-models)$/;
 
 export function changedFighters(paths: readonly string[], stepCode: ReadonlySet<string>): string[] {
   if (paths.some((path) => stepCode.has(path) || EVERY_KEY.test(path))) return ROSTER.map(({ slug }) => slug).sort();

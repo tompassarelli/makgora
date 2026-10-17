@@ -1,14 +1,12 @@
 import { model as mdx } from "../../ts/scripts/clipNodes";
 import { isDeepStrictEqual } from "node:util";
 import { Character } from "../../ts/src/game/sim/codes";
-import { FIGHTER_ART } from "../../ts/src/generated/fighterArtData";
+import { fighterRules } from "./fighter-rules";
 import { onGlobalClock } from "./original-clips";
 import { originalClipNamed } from "../../ts/src/generated/clips/fighterOriginalClipInfo";
 
 export function flashableSequences(character: number, sequences: readonly mdx.Sequence[]): mdx.Sequence[] {
-  const art = FIGHTER_ART.get(character);
-  if (art === undefined) throw new Error(`no fighter art for character ${character}`);
-  const indices = new Set(art.flashClips);
+  const indices = new Set(fighterRules(character).flashClips);
   for (const name of character === Character.demonHunter ? ["stand", "stand ready", "stand hit"] : ["stand", "stand ready", "stand hit", "walk"]) {
     const index = originalClipNamed(character, name);
     if (index !== undefined) indices.add(index);

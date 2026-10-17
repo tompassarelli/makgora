@@ -1,33 +1,19 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, relative, resolve } from "node:path";
+import { relative } from "node:path";
 import { CONTROLLER_CONTRACT_PATH, controllerContractText, padLayoutProducers } from "./controllerContract";
 import * as fighterArtData from "./fighterArtData";
 import * as fighterState from "./fighterState";
+import { syncGenerated, tsRoot } from "./sync";
 
-const root = resolve(import.meta.dir, "..");
 const producers = [
   { output: fighterState.output, render: fighterState.renderFighterState },
-  { output: fighterArtData.output, render: fighterArtData.renderFighterArtData },
-  { output: relative(root, CONTROLLER_CONTRACT_PATH), render: controllerContractText },
-  ...padLayoutProducers.map(({ path, render }) => ({ output: relative(root, path), render })),
+  ...fighterArtData.producers(),
+  { output: relative(tsRoot, CONTROLLER_CONTRACT_PATH), render: controllerContractText },
+  ...padLayoutProducers.map(({ path, render }) => ({ output: relative(tsRoot, path), render })),
 ];
 const check = process.argv.includes("--check");
-const drifted: string[] = [];
-for (const producer of producers) {
-  const path = resolve(root, producer.output);
-  const text = producer.render();
-  const current = existsSync(path) ? readFileSync(path, "utf8") : undefined;
-  if (current === text) continue;
-  const shown = relative(resolve(root, ".."), path);
-  if (check) {
-    drifted.push(shown);
-    continue;
-  }
-  mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, text);
-  console.log(`wrote ${shown}`);
-}
-if (drifted.length > 0) {
+const drifted = syncGenerated(producers, [fighterArtData.rulesDirectory], check);
+if (check && drifted.length > 0) {
   console.error(`generated files drift from their producers; run \`bun run generate\` in ts/: ${drifted.join(", ")}`);
   process.exit(1);
 }
+for (const path of drifted) console.log(`wrote ${path}`);
