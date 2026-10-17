@@ -45,9 +45,11 @@
 630 b shield 0
 # b runs off; Frost Nova again, and the second press bursts it in place on b and chills b. a2539b0b70 and 42c1835943
 # lengthened Frost Nova to 41 frames, so the second press comes at 702, after the cast (trace: run 39009305845).
+# A run released at 661 or later now slides b off the stage before the burst, and one released at 655 or earlier
+# meets the orb first (#110: run 39025833021's replay, re-run with each release), so b lets go at 658.
 640 b stick 1 0
+658 b stick 0 0
 660 a tap X 2
-664 b stick 0 0
 702 a tap X 2
 # Expected, frame by frame (headless run of this script):
 # Death and Decay strikes b twice: 6.234% from its frame 30, 8% from its frame 70.
@@ -69,12 +71,11 @@
 #! absent b 400-519 damage
 # Frost Nova into the shield: no hit.
 #! expect a 520 special 13 form 0
-#! absent b 521-707 damage
-# Frost Nova's second press (recall form) bursts the orb: b takes the burst's 10, not the orb's 9, and is chilled.
+#! absent b 521-710 damage
+# Frost Nova's second press (recall form) bursts the orb: b takes the burst's 12.468, not the orb's 11.221, and is chilled.
 #! expect a 660 special 13 form 0
 #! expect a 702 special 13 form 3
-# The burst no longer strikes b (smashcraft#110); this line stays as recorded until that is settled.
-#! expect b 708 damage 34.000
+#! expect b 711 damage 39.170
 #! scene a DeathAndDecayTarget
 #! scene a FrostArmorDamage
 #! scene a DarkRitualTarget

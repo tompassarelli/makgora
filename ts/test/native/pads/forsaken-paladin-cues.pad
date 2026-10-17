@@ -58,10 +58,14 @@
 995 a stick 0 1
 995 a tap X 2
 996 a stick 0 0
-# Expected, frame by frame (headless run of this script): a's shield takes three forward tilts unhurt,
-# the fourth lands with Sacred Aura ready, then every grounded/air form starts.
+# Expected, frame by frame (headless run of this script): a's shield takes the first forward tilt unhurt. Held since 60,
+# it has worn to 30.6 of 60 by 155, so the second tilt's sword passes over the bubble onto a's head: a strike that
+# touches only an exposed hurtbox is a normal hit (8a823d80d9, docs/gameplay-design.md "Shield geometry", #482;
+# trace: run 39009305845). It knocks a out of reach of the third and fourth; then every grounded/air form starts.
 # Cleansing Sword cleanses poison/slow without healing.
-#! absent a 60-260 damage
+#! absent a 60-154 damage
+#! expect a 155 damage 10.800
+#! absent a 156-260 damage
 # #249: the 0.80 multiplier makes the 12-damage forward tilt deal 9.6.
 #! expect a 300 special 16 form 0
 #! expect a 345 special 13 form 0
