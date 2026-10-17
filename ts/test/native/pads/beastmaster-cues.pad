@@ -1,9 +1,11 @@
 # Beastmaster's native cue check, updated for the accepted #215 pack kit.
 # Design 8423ac38, kit fa500819, damage a7fdfa77; full pack forms: 215/pack.pad.
 # Beastmaster a against Beastmaster b; syntax and checks: smashcraft:docs/native-bot-session.md.
-# A side special from standing starts a dash too, so each one slides its caster about 120.
+# A side special from standing starts a dash too, so each one slides its caster about 151 (7bc2877cdb).
 #! chat -dev quick hero beastmaster
-# b dashes right and summons its bear, then commands it right and left.
+# b dashes right and summons its bear, then commands it right; the command's 360-frame cooldown
+# (5d2f3ee9b3) refuses a second one, so b runs back left from 185 to 200 instead, keeping
+# the fight clear of the right edge, where Bear's kill-class maul (3c18b4ff6e) would carry b off.
 40 b stick 1 0
 42 b stick 0 0
 # a summons Quilbeast, then commands its volley from the air.
@@ -24,28 +26,29 @@
 130 b stick 1 0
 130 b tap X 2
 131 b stick 0 0
-# a summons its bear, then runs up to b with the bear following.
+# a summons its bear, then runs up to b with the bear following, stopping on 236.
 165 a stick 1 0
 165 a tap X 2
 166 a stick 0 0
 167 a capture
 185 b stick -1 0
-185 b tap X 2
-186 b stick 0 0
 195 a capture
+200 b stick 0 0
 225 a stick 1 0
-250 a stick 0 0
-# a jabs, then commands Stampede: the two lizards spawn on command frames 12 and 20.
+236 a stick 0 0
+# a jabs; the jab holds him through 330, so he commands Stampede from standing on 332,
+# not mid-dash: from a run, 7bc2877cdb's traction slides him off the right edge.
+# The three lizards spawn on command frames 2, 5 and 8 (3c18b4ff6e); two reach b, on 333
+# and 336, for 0.5 each (c2f55b27bf), and the Bear's 10-damage maul lands on 349.
 310 a tap A 2
 314 a capture
-315 a stick 1 0
-330 a tap X 2
-334 a tap X 2
-336 a stick 0 0
+332 a stick 1 0
+332 a tap X 2
+333 a stick 0 0
 336 a capture
 338 a capture
 349 a capture
-# This volley press is early: Stampede still runs through frame 361.
+# This volley press is early: Stampede still runs through frame 363.
 360 a stick 0 -1
 360 a tap X 2
 361 a stick 0 0
@@ -53,9 +56,7 @@
 364 a capture
 # a runs left and throws Wild Axes; the second press cannot replace live axes.
 390 a stick -1 0
-# b climbs back from the ledge, summons Hawk, then commands its grounded dives.
-400 b stick 0 1
-402 b stick 0 0
+# b lands back on stage after the maul, summons Hawk, then commands its grounded dives.
 415 a stick 0 0
 430 a tap X 2
 432 a capture
@@ -102,20 +103,18 @@
 1070 b tap X 2
 1071 b stick 0 0
 # Authored expectations: recall form 3 commands a living animal; Hawk requires ground.
-# Stampede starts on 330, so its frame-12/20 lizards contact on 341/349.
-# Each deals f32(4 * 0.9): 3.600, then 7.200 total, with hitlag 4 and hitstun 13.
-# Stampede ends on 330+32-1=361; Wild Axes ends on 430+35-1=464.
+# Stampede starts on 332 and ends on 332+32-1=363; Wild Axes ends on 430+35-1=464.
 #! expect a 50 special 16 form 0
 #! expect b 60 special 14 form 0
 #! expect a 106 special 16 form 3
 #! expect b 130 special 14 form 3
 #! expect a 165 special 14 form 0
-#! expect b 185 special 14 form 3
-#! expect a 330 special 14 form 3
-#! expect b 341 damage 3.600 hitlag 4 hitstun 13
-#! expect b 349 damage 7.200 hitlag 4 hitstun 13
+#! expect a 332 special 14 form 3
+#! expect b 333 damage 3.391 hitlag 3 hitstun 14
+#! expect b 336 damage 3.891 hitlag 3 hitstun 14
+#! expect b 349 damage 13.891 hitlag 6 hitstun 28
 #! absent a 360-361 special 16
-#! expect a 361 special 0 form 3
+#! expect a 363 special 0 form 3
 #! expect a 430 special 13 form 0
 #! expect a 464 special 0 form 0
 #! absent a 486-487 special 13
@@ -129,9 +128,7 @@
 #! expect b 980 special 15 form 3
 #! scene a BloodlustTarget
 #! scene a AxeMissile
-#! scene a RejuvenationTarget
-#! scene a HarpyMissile
-#! scene a EnsnareMissile
+#! scene a MirrorImageCaster
+#! scene a DruidoftheTalonMissile
 #! scene a StampedeMissile
-#! scene a CommandAuraTarget
 #! scene a QuillSprayMissile
