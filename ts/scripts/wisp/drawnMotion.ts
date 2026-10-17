@@ -166,7 +166,7 @@ export function drawnStrideSource(rows: readonly DrawnStride[]): string {
     'import { f32 } from "wisp/src/sim/f32";',
     "/** Drawn foot travel in world units per second at 1x clip speed (#171). */",
     "export const DRAWN_STRIDES: { readonly [character: number]: { readonly walk: { readonly clip: number; readonly model: string; readonly speed: number; readonly alternates?: Readonly<Record<number, number>> }; readonly run: { readonly clip: number; readonly model: string; readonly speed: number; readonly alternates?: Readonly<Record<number, number>> } } | undefined } = {",
-    ...[...new Set(rows.map((row) => row.character))].map((character) => `  ${character}: { ${rows.filter((row) => row.character === character).map((row) => `${row.motion}: { clip: ${row.clip}, model: ${JSON.stringify(row.model)}, speed: f32(${row.speed.toFixed(3)})${row.alternates === undefined ? "" : `, alternates: { ${Object.entries(row.alternates).map(([clip, speed]) => `${clip}: f32(${speed.toFixed(3)})`).join(", ")} }`} }`).join(", ")} },`),
+    ...[...new Set(rows.map((row) => row.character))].sort((a, b) => a - b).map((character) => `  ${character}: { ${rows.filter((row) => row.character === character).map((row) => `${row.motion}: { clip: ${row.clip}, model: ${JSON.stringify(row.model)}, speed: f32(${row.speed.toFixed(3)})${row.alternates === undefined ? "" : `, alternates: { ${Object.entries(row.alternates).map(([clip, speed]) => `${clip}: f32(${speed.toFixed(3)})`).join(", ")} }`} }`).join(", ")} },`),
     "};", "",
   ].join("\n");
 }
