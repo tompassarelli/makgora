@@ -192,16 +192,16 @@ const VICTORY_ANIMATIONS: Readonly<Record<Character, string>> = {
   [Character.jaina]: "stand victory",
   [Character.sylvanas]: "spell",
   [Character.cairne]: "stand victory",
-  [Character.chen]: "stand - 2",
+  [Character.chen]: "chenstormstout victory",
   [Character.peon]: "peon victory",
   [Character.tinker]: "spell three",
-  [Character.kaelthas]: "spell",
+  [Character.kaelthas]: "kaelthassunstrider victory",
   [Character.murloc]: "murloc victory",
   [Character.grom]: "stand victory",
   [Character.anubarak]: "spell",
   [Character.malfurion]: "spell",
-  [Character.medivh]: "stand talk fourth",
-  [Character.kobold]: "stand - 2",
+  [Character.medivh]: "medivh victory",
+  [Character.kobold]: "kobold victory",
 };
 
 export const victoryAnimation = (character: Character): string => VICTORY_ANIMATIONS[character];
