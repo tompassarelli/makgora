@@ -1,6 +1,11 @@
 import { expect, test } from 'bun:test';
-import { answerKey, coldReadBatch, coldReadBatches, crouchSeconds, doubleJumpSeconds, ledgeSeconds, stripId } from '../scripts/wisp/animMovementRows';
+import { answerKey, coldReadBatch, coldReadBatches, crouchSeconds, doubleJumpSeconds, ledgeCorner, ledgeSeconds, stageDrawArgs, stageShape, stripId } from '../scripts/wisp/animMovementRows';
 import type { CrouchSample, JumpSample, LedgeSample } from '../scripts/wisp/animScoreSample';
+import { Character } from '../src/game/sim/codes';
+import { createFighter } from '../src/game/sim/fighter';
+import { snapToLedge } from '../src/game/sim/ledge';
+import { createRoster } from '../src/game/sim/roster';
+import { mainDeckRight, mainDeckZ } from '../src/game/sim/stage';
 
 const crouch = { standSeconds: 0.5, crouchSeconds: 2.25 } as CrouchSample;
 const ledge = { hangSeconds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] } as LedgeSample;
@@ -20,4 +25,16 @@ test('a cold-read batch names no fighter or pose, and the answer key alone maps 
   const key = answerKey('classic', strips).split('\n');
   expect(key[0]).toBe('look\tstrip\tfighter\tmove\texpected');
   for (const strip of strips) expect(key.some((line) => line.startsWith(`classic\t${strip.id}\tgrom-hellscream\t${strip.move}\t`))).toBe(true);
+});
+
+test('a ledge-hang strip draws the stage corner where the sim hangs the fighter from it, and a crouch or jump strip draws the floor under the feet [k2 property]', () => {
+  const f = createFighter(Character.grom, 0.0, 1);
+  expect(snapToLedge(createRoster(1, [f]), 0, 0, 1)).toBe(true);
+  const sim = { x: Math.abs(f.motion.x - mainDeckRight(0)), z: mainDeckZ(0) - f.motion.z };
+  expect(ledgeCorner()).toEqual(sim);
+  const ppu = 0.5;
+  expect(stageShape('ledge-hang', ppu)).toEqual({ kind: 'corner', x: 960 + sim.x * ppu, y: 540 + (90 - sim.z) * ppu });
+  expect(stageShape('crouch', ppu)).toEqual({ kind: 'floor', y: 540 + 90 * ppu });
+  expect(stageShape('double-jump', ppu)).toEqual(stageShape('crouch', ppu));
+  expect(stageDrawArgs(stageShape('ledge-hang', ppu)).join(' ')).toContain(`rectangle ${(960 + sim.x * ppu).toFixed(1)},`);
 });

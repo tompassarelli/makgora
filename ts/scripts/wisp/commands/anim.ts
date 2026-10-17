@@ -21,8 +21,7 @@ import { FROZEN_THRONE_STAGE } from "../../../src/game/sim/stage";
 import { runProcess } from "../../hostProcess";
 import { CROUCH_THRESHOLDS, DOUBLE_JUMP_THRESHOLDS, LEDGE_THRESHOLDS, type MoveScore, THRESHOLDS, scoreCrouch, scoreDoubleJump, scoreLedgeHang, scoreMove } from "../animScore";
 import { type CrouchClipKind, type Look, type SampledMove, gameplayPixelsPerUnit, loadBody, sampleCrouch, sampleFighter, sampleJumps, sampleLedgeHang } from "../animScoreSample";
-import { LEDGE_HANG_DEPTH, LEDGE_HANG_OUTSET } from "../../../src/game/sim/ledge";
-import { answerKey, type ColdStrip, coldReadBatch, coldReadBatches, isMovementMove, type MovementMove, movementSeconds, stripId } from "../animMovementRows";
+import { answerKey, type ColdStrip, coldReadBatch, coldReadBatches, isMovementMove, ledgeCorner, type MovementMove, movementSeconds, stageDrawArgs, stageShape, stripId } from "../animMovementRows";
 import { assetsView, readManifest } from "../buildInputs";
 import { headlessRender } from "../headlessRender";
 import { projectRoot } from "../project";
@@ -214,7 +213,7 @@ const score: Command = (args) => Effect.gen(function*() {
   for (const row of crouches) yield* Console.log(`${row.fighter.padEnd(22)} ${crouchVerdict(row).padEnd(9)} clip ${row.clip.padEnd(24)} height ${n3(row.heightRatio)} contrast ${n3(row.contrast)}`);
   yield* Console.log(`${crouches.filter((row) => row.pass && row.kind === "crouch").length}/${crouches.length} crouches pass (no clip: standing pose is the crouch; *: another clip stands in for a crouch clip); ${crouchTable}`);
 
-  const corner = { x: LEDGE_HANG_OUTSET, z: LEDGE_HANG_DEPTH };
+  const corner = ledgeCorner();
   const ledges = yield* Effect.forEach(fighters, (character) => attempt(`ledge hang ${fighterSlug(character)}`, async () => {
     const { stand, hang, parts, clip, kind } = sampleLedgeHang(await loadBody(assets, character, look), character);
     return { fighter: fighterSlug(character), clip, kind, ...scoreLedgeHang(stand, hang, parts, corner) };
@@ -375,7 +374,8 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
     if (row.movement) {
       const id = stripId(look, row.fighter, row.move), anonymous = join(output, "moves", `strip-${id}.png`);
       mkdirSync(join(output, "moves"), { recursive: true });
-      yield* runProcess(ChildProcess.make("magick", [...crops.flatMap((crop) => ["(", crop, "-gravity", "center", "-crop", "480x360+0-60", "+repage", ")"]), "+append", anonymous]));
+      const stage = stageDrawArgs(stageShape(row.move as MovementMove, gameplayPixelsPerUnit()));
+      yield* runProcess(ChildProcess.make("magick", [...crops.flatMap((crop) => ["(", crop, ...stage, "-gravity", "center", "-crop", "480x360+0-60", "+repage", ")"]), "+append", anonymous]));
       cold.push({ id, fighter: row.fighter, move: row.move as MovementMove, path: anonymous });
       continue;
     }

@@ -10,8 +10,10 @@ you write changes the animation.
 Each strip is one image: a single fighter drawn left to right by the game's
 renderer at the gameplay camera's widest framing (the smallest a fighter
 appears in a match), cropped but not enlarged. The frames are in time order.
-No stage, ledge or floor is drawn. The fighter faces right unless the
-pose turns it.
+A flat grey stage edge is drawn behind the frames: either a floor with the
+fighter standing above it, or a stage corner (a top surface and a vertical
+wall) at the right of the fighter. The fighter faces right unless the pose
+turns it.
 
 Judge the body's silhouette and motion only: not textures, lighting or model
 detail.
@@ -19,8 +21,8 @@ detail.
 ## Answer for each strip
 
 Name what you see, in your own words, before you consider what it might be
-meant to be. Then say where the body is relative to a ledge you imagine at the
-highest point of the held pose, if the pose reads as a hang.
+meant to be. Then say where the body is relative to the drawn stage corner, if the pose
+reads as a hang.
 
 Write one JSON line per strip with these keys:
 

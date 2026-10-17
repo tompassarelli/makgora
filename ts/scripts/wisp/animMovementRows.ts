@@ -1,3 +1,4 @@
+import { LEDGE_HANG_DEPTH, LEDGE_HANG_OUTSET } from "../../src/game/sim/ledge";
 import type { Character } from "../../src/game/sim/codes";
 import { type CrouchSample, type JumpSample, type LedgeSample, sampleCrouch, sampleJumps, sampleLedgeHang } from "./animScoreSample";
 import type { DrawnModel } from "./hurtboxView";
@@ -20,6 +21,24 @@ export function movementSeconds(move: MovementMove, model: DrawnModel, character
   return doubleJumpSeconds(sampleJumps(model, character));
 }
 
+
+export const ledgeCorner = () => ({ x: LEDGE_HANG_OUTSET, z: LEDGE_HANG_DEPTH });
+
+const STAGE_COLOUR = "#8a8a8a";
+const FRAME_WIDTH = 1920, FRAME_HEIGHT = 1080, FOCUS_RISE = 90;
+
+export type StageShape = { readonly kind: "floor"; readonly y: number } | { readonly kind: "corner"; readonly x: number; readonly y: number };
+
+export const stageShape = (move: MovementMove, pixelsPerUnit: number): StageShape => {
+  if (move !== "ledge-hang") return { kind: "floor", y: FRAME_HEIGHT / 2 + FOCUS_RISE * pixelsPerUnit };
+  const corner = ledgeCorner();
+  return { kind: "corner", x: FRAME_WIDTH / 2 + corner.x * pixelsPerUnit, y: FRAME_HEIGHT / 2 + (FOCUS_RISE - corner.z) * pixelsPerUnit };
+};
+
+export const stageDrawArgs = (shape: StageShape): readonly string[] => [
+  "-gravity", "NorthWest", "-fill", STAGE_COLOUR,
+  "-draw", `rectangle ${(shape.kind === "floor" ? 0 : shape.x).toFixed(1)},${shape.y.toFixed(1)} ${FRAME_WIDTH},${FRAME_HEIGHT}`,
+];
 
 export const MOVEMENT_EXPECTED: Readonly<Record<MovementMove, string>> = {
   "crouch": "a crouch: a visibly lower silhouette than standing, held",
