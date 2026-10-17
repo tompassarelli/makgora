@@ -101,6 +101,7 @@ export const clips: readonly FighterOriginalClip[] = [
   { modelPath: "war3mapImported\\CairneBloodhoofTimelineBody-80831f47ba8d6eb6e26f82a5bb6c63ac3c7d0ebfa1a437419e12440a26dc3250.mdx", startSeconds: f32(180.05), endSeconds: f32(180.383), looping: false, timeline: true },
   { modelPath: "war3mapImported\\CairneBloodhoofTimelineBody-80831f47ba8d6eb6e26f82a5bb6c63ac3c7d0ebfa1a437419e12440a26dc3250.mdx", startSeconds: f32(180.483), endSeconds: f32(181.016), looping: false, timeline: true },
   { modelPath: "war3mapImported\\CairneBloodhoofTimelineBody-80831f47ba8d6eb6e26f82a5bb6c63ac3c7d0ebfa1a437419e12440a26dc3250.mdx", startSeconds: f32(186.616), endSeconds: f32(187.116), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\CairneBloodhoofTimelineBody-80831f47ba8d6eb6e26f82a5bb6c63ac3c7d0ebfa1a437419e12440a26dc3250.mdx", startSeconds: f32(187.216), endSeconds: f32(188.716), looping: true, timeline: true },
 ];
 
 export const names: ReadonlyMap<string, number> = new Map<string, number>([
@@ -201,6 +202,7 @@ export const names: ReadonlyMap<string, number> = new Map<string, number>([
   ["cairne gore hold", 94],
   ["cairne gore recovery", 95],
   ["jump motion doublejump", 96],
+  ["cairnebloodhoof victory", 97],
   ["stand", 0],
   ["attack", 5],
   ["cairne pain 0", 84],

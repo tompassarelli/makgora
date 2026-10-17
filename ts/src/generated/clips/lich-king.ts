@@ -101,6 +101,7 @@ export const clips: readonly FighterOriginalClip[] = [
   { modelPath: "war3mapImported\\LichKingTimelineBody-8d50d06a7d1ec51053085de2b18f85c538018438cb5501114d80661f87a8f574.mdx", startSeconds: f32(89.403), endSeconds: f32(90.403), looping: false, timeline: true },
   { modelPath: "war3mapImported\\LichKingTimelineBody-8d50d06a7d1ec51053085de2b18f85c538018438cb5501114d80661f87a8f574.mdx", startSeconds: f32(90.503), endSeconds: f32(91.503), looping: false, timeline: true },
   { modelPath: "war3mapImported\\LichKingTimelineBody-8d50d06a7d1ec51053085de2b18f85c538018438cb5501114d80661f87a8f574.mdx", startSeconds: f32(91.603), endSeconds: f32(92.236), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\LichKingTimelineBody-8d50d06a7d1ec51053085de2b18f85c538018438cb5501114d80661f87a8f574.mdx", startSeconds: f32(94.337), endSeconds: f32(95.837), looping: true, timeline: true },
 ];
 
 export const names: ReadonlyMap<string, number> = new Map<string, number>([
@@ -201,6 +202,7 @@ export const names: ReadonlyMap<string, number> = new Map<string, number>([
   ["paired grab throwdown", 94],
   ["paired grab victimthrowdown", 95],
   ["attack gesture forwardtiltdown", 96],
+  ["lichking victory", 97],
   ["stand", 0],
   ["attack", 4],
 ]);

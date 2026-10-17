@@ -104,6 +104,7 @@ export const clips: readonly FighterOriginalClip[] = [
   { modelPath: "war3mapImported\\AnubarakTimelineBody-c8da776284f2a5266a8b3f924e9ac929f3c82edac3a37e1e46f5930eee30b09a.mdx", startSeconds: f32(120.94), endSeconds: f32(121.34), looping: false, timeline: true },
   { modelPath: "war3mapImported\\AnubarakTimelineBody-c8da776284f2a5266a8b3f924e9ac929f3c82edac3a37e1e46f5930eee30b09a.mdx", startSeconds: f32(126.94), endSeconds: f32(127.94), looping: false, timeline: true },
   { modelPath: "war3mapImported\\AnubarakTimelineBody-c8da776284f2a5266a8b3f924e9ac929f3c82edac3a37e1e46f5930eee30b09a.mdx", startSeconds: f32(128.04), endSeconds: f32(128.54), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\AnubarakTimelineBody-c8da776284f2a5266a8b3f924e9ac929f3c82edac3a37e1e46f5930eee30b09a.mdx", startSeconds: f32(128.64), endSeconds: f32(130.14), looping: true, timeline: true },
 ];
 
 export const names: ReadonlyMap<string, number> = new Map<string, number>([
@@ -207,6 +208,7 @@ export const names: ReadonlyMap<string, number> = new Map<string, number>([
   ["anubarak damage 2 2", 97],
   ["anubarak ultimate", 98],
   ["jump motion doublejump", 99],
+  ["anubarak victory", 100],
   ["anubarak damage 0", 89],
   ["anubarak damage 1", 92],
   ["anubarak damage 2", 95],

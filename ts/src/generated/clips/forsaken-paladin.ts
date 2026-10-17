@@ -114,6 +114,7 @@ export const clips: readonly FighterOriginalClip[] = [
   { modelPath: "war3mapImported\\ForsakenPaladinTimelineBody-cbc3de987368041c1e654af892049a9be8cfc92aed1e7dc3f64464084688ae6a.mdx", startSeconds: f32(98.15), endSeconds: f32(98.55), looping: true, timeline: true },
   { modelPath: "war3mapImported\\ForsakenPaladinTimelineBody-cbc3de987368041c1e654af892049a9be8cfc92aed1e7dc3f64464084688ae6a.mdx", startSeconds: f32(98.65), endSeconds: f32(99.05), looping: true, timeline: true },
   { modelPath: "war3mapImported\\ForsakenPaladinTimelineBody-cbc3de987368041c1e654af892049a9be8cfc92aed1e7dc3f64464084688ae6a.mdx", startSeconds: f32(104.65), endSeconds: f32(105.15), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\ForsakenPaladinTimelineBody-cbc3de987368041c1e654af892049a9be8cfc92aed1e7dc3f64464084688ae6a.mdx", startSeconds: 105.25, endSeconds: 106.75, looping: true, timeline: true },
 ];
 
 export const names: ReadonlyMap<string, number> = new Map<string, number>([
@@ -227,6 +228,7 @@ export const names: ReadonlyMap<string, number> = new Map<string, number>([
   ["forsaken paladin pain 2 1", 107],
   ["forsaken paladin pain 2 2", 108],
   ["jump motion doublejump", 109],
+  ["forsakenpaladin victory", 110],
   ["stand", 1],
   ["stand ready", 4],
   ["attack", 5],

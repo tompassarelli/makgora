@@ -103,6 +103,7 @@ export const clips: readonly FighterOriginalClip[] = [
   { modelPath: "war3mapImported\\GoblinTinkerTimelineBody-ea8e63f1afbd4afb17e7a1dcd75173ddfe033a0910d7b09cf568b0352f3cd4c2.mdx", startSeconds: f32(154.016), endSeconds: f32(155.016), looping: false, timeline: true },
   { modelPath: "war3mapImported\\GoblinTinkerTimelineBody-ea8e63f1afbd4afb17e7a1dcd75173ddfe033a0910d7b09cf568b0352f3cd4c2.mdx", startSeconds: f32(149.216), endSeconds: f32(149.516), looping: false, timeline: true },
   { modelPath: "war3mapImported\\GoblinTinkerTimelineBody-ea8e63f1afbd4afb17e7a1dcd75173ddfe033a0910d7b09cf568b0352f3cd4c2.mdx", startSeconds: f32(155.116), endSeconds: f32(155.616), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\GoblinTinkerTimelineBody-ea8e63f1afbd4afb17e7a1dcd75173ddfe033a0910d7b09cf568b0352f3cd4c2.mdx", startSeconds: f32(155.716), endSeconds: f32(157.216), looping: true, timeline: true },
 ];
 
 export const names: ReadonlyMap<string, number> = new Map<string, number>([
@@ -205,6 +206,7 @@ export const names: ReadonlyMap<string, number> = new Map<string, number>([
   ["tinker victimthrowdown", 96],
   ["tinker damageshield", 97],
   ["jump motion doublejump", 98],
+  ["goblintinker victory", 99],
   ["attack", 5],
   ["attack alternate", 16],
 ]);

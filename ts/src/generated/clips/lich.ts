@@ -70,6 +70,7 @@ export const clips: readonly FighterOriginalClip[] = [
   { modelPath: "war3mapImported\\LichTimelineBody-496045d38a7fa8590c3096327ff5f2aba4cf0ec6813d95f2a29b9c765077b632.mdx", startSeconds: f32(87.119), endSeconds: f32(87.686), looping: false, timeline: true },
   { modelPath: "war3mapImported\\LichTimelineBody-496045d38a7fa8590c3096327ff5f2aba4cf0ec6813d95f2a29b9c765077b632.mdx", startSeconds: f32(87.786), endSeconds: f32(88.186), looping: false, timeline: true },
   { modelPath: "war3mapImported\\LichTimelineBody-496045d38a7fa8590c3096327ff5f2aba4cf0ec6813d95f2a29b9c765077b632.mdx", startSeconds: f32(88.286), endSeconds: f32(89.286), looping: true, timeline: true },
+  { modelPath: "war3mapImported\\LichTimelineBody-496045d38a7fa8590c3096327ff5f2aba4cf0ec6813d95f2a29b9c765077b632.mdx", startSeconds: f32(89.386), endSeconds: f32(90.886), looping: true, timeline: true },
 ];
 
 export const names: ReadonlyMap<string, number> = new Map<string, number>([
@@ -139,6 +140,7 @@ export const names: ReadonlyMap<string, number> = new Map<string, number>([
   ["attack gesture upair", 63],
   ["movement crouch", 64],
   ["movement ledgehang", 65],
+  ["lich victory", 66],
 ]);
 
 export const light: string | undefined = undefined;

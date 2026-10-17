@@ -81,6 +81,7 @@ export const clips: readonly FighterOriginalClip[] = [
   { modelPath: "war3mapImported\\RiflemanTimelineBody-d330c6062f954b83bde5faac5101f6764dac84591b33226a2f819aef7a3c4c64.mdx", startSeconds: f32(160.24), endSeconds: f32(161.99), looping: false, timeline: true },
   { modelPath: "war3mapImported\\RiflemanTimelineBody-d330c6062f954b83bde5faac5101f6764dac84591b33226a2f819aef7a3c4c64.mdx", startSeconds: f32(162.09), endSeconds: f32(163.84), looping: false, timeline: true },
   { modelPath: "war3mapImported\\RiflemanTimelineBody-d330c6062f954b83bde5faac5101f6764dac84591b33226a2f819aef7a3c4c64.mdx", startSeconds: f32(163.94), endSeconds: f32(164.34), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\RiflemanTimelineBody-d330c6062f954b83bde5faac5101f6764dac84591b33226a2f819aef7a3c4c64.mdx", startSeconds: f32(164.44), endSeconds: f32(165.94), looping: true, timeline: true },
 ];
 
 export const names: ReadonlyMap<string, number> = new Map<string, number>([
@@ -161,6 +162,7 @@ export const names: ReadonlyMap<string, number> = new Map<string, number>([
   ["up smash", 74],
   ["down smash", 75],
   ["movement crouch", 76],
+  ["rifleman victory", 77],
 ]);
 
 export const light: string | undefined = undefined;

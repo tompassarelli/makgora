@@ -83,6 +83,7 @@ export const clips: readonly FighterOriginalClip[] = [
   { modelPath: "war3mapImported\\SylvanasWindrunnerTimelineBody-d2f406e2747a76a3ab34d823abc79afb7785b4de730a8bb181315d3645312f46.mdx", startSeconds: f32(116.053), endSeconds: f32(116.453), looping: false, timeline: true },
   { modelPath: "war3mapImported\\SylvanasWindrunnerTimelineBody-d2f406e2747a76a3ab34d823abc79afb7785b4de730a8bb181315d3645312f46.mdx", startSeconds: f32(116.553), endSeconds: f32(116.953), looping: false, timeline: true },
   { modelPath: "war3mapImported\\SylvanasWindrunnerTimelineBody-d2f406e2747a76a3ab34d823abc79afb7785b4de730a8bb181315d3645312f46.mdx", startSeconds: f32(118.153), endSeconds: f32(118.653), looping: false, timeline: true },
+  { modelPath: "war3mapImported\\SylvanasWindrunnerTimelineBody-d2f406e2747a76a3ab34d823abc79afb7785b4de730a8bb181315d3645312f46.mdx", startSeconds: f32(118.753), endSeconds: f32(120.253), looping: true, timeline: true },
 ];
 
 export const names: ReadonlyMap<string, number> = new Map<string, number>([
@@ -165,6 +166,7 @@ export const names: ReadonlyMap<string, number> = new Map<string, number>([
   ["sylvanas pain21", 76],
   ["sylvanas pain22", 77],
   ["jump motion doublejump", 78],
+  ["sylvanaswindrunner victory", 79],
   ["attack", 6],
   ["sylvanas pain", 69],
 ]);
