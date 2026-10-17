@@ -19,8 +19,10 @@ const CHEER: readonly Beat[] = [
     { frame: 90, arms: 'rest', chest: 0, head: 0, hop: 0 },
 ];
 const FRAMES = 90;
-const BOUNCING: ReadonlySet<number> = new Set([Character.murloc]);
-const BOUNCE: Readonly<Record<number, number>> = { 18: 0.4, 50: 0.35, 72: 0.35 };
+const BOUNCE: Readonly<Record<number, Readonly<Record<number, number>>>> = {
+    [Character.murloc]: { 18: 0.4, 50: 0.35, 72: 0.35 },
+    [Character.kobold]: { 18: 0.6, 28: 0.45, 40: 0.55, 50: 0.6, 62: 0.55, 72: 0.6 },
+};
 const SIDES = [['Bone_Arm1_R', 'Bone_Arm2_R', 'Bone_Hand_R'], ['Bone_Arm1_L', 'Bone_Arm2_L', 'Bone_Hand_L']] as const;
 
 const args = process.argv.slice(2);
@@ -47,8 +49,8 @@ for (const character of characters) {
     const name = `${fighter.name} Victory`;
     const source = parseMDX(await Bun.file(join(assets, fighter.source)).arrayBuffer()), model = structuredClone(source);
     const existing = source.Sequences.findIndex(sequence => sequence.Name === name);
-    const bouncing = BOUNCING.has(character);
-    const beats = CHEER.map(beat => bouncing ? { ...beat, hop: BOUNCE[beat.frame] ?? 0 } : beat);
+    const hops = BOUNCE[character], bouncing = hops !== undefined;
+    const beats = CHEER.map(beat => bouncing ? { ...beat, hop: hops?.[beat.frame] ?? 0 } : beat);
     const idle = (sequence: mdx.Sequence) => /^stand(\s*-?\s*1)?$/.test(sequence.Name.trim().toLowerCase());
     const stand = source.Sequences.find(sequence => sequence.Name.trim().toLowerCase() === 'stand') ?? source.Sequences.find(idle);
     ensure(stand !== undefined, `${fighter.name} has no Stand sequence`);
@@ -117,16 +119,20 @@ for (const character of characters) {
         pose(chest, beat.frame, beat.chest); pose(head, beat.frame, beat.head);
         if (beat.arms === 'raised' || beat.arms === 'pumped') {
             const lean = () => torsoLean(model, index, time(beat.frame) - cutoff, renderer);
+            const rear = (value: number, axis: number) => { const own = spine === chest ? beat.chest : 0; pose(spine, beat.frame, axis === 0 ? value + own : own, axis === 1 ? value : 0, axis === 2 ? value : 0); };
             const known = solved.get('rear');
-            if (known !== undefined) pose(spine, beat.frame, known[0]! + (spine === chest ? beat.chest : 0));
+            if (known !== undefined) rear(known[0]!, known[1]!);
             else if (lean() > UPRIGHT_LIMIT_DEGREES) {
-                let best = Infinity, choice = 0;
-                for (const [step, span] of [[10, 120], [2, 10], [1, 2]] as const) {
-                    const centre = choice;
-                    for (let value = centre - span; value <= centre + span; value += step) { pose(spine, beat.frame, value + (spine === chest ? beat.chest : 0)); const tilt = lean(); if (tilt < best) { best = tilt; choice = value; } }
+                let best = Infinity, choice = 0, about = 0;
+                for (const axis of [0, 1, 2]) {
+                    let centre = 0;
+                    for (const [step, span] of [[10, 120], [2, 10], [1, 2]] as const) {
+                        const from = centre;
+                        for (let value = from - span; value <= from + span; value += step) { rear(value, axis); const tilt = lean(); if (tilt < best) { best = tilt; choice = value; about = axis; } if (about === axis && value === choice) centre = value; }
+                    }
                 }
-                pose(spine, beat.frame, choice + (spine === chest ? beat.chest : 0));
-                solved.set('rear', [choice]);
+                rear(choice, about);
+                solved.set('rear', [choice, about]);
             }
         }
         for (const [side, [shoulder, elbow, hand]] of arms.entries()) {

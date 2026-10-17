@@ -201,7 +201,7 @@ const VICTORY_ANIMATIONS: Readonly<Record<Character, string>> = {
   [Character.anubarak]: "spell",
   [Character.malfurion]: "spell",
   [Character.medivh]: "medivh victory",
-  [Character.kobold]: "stand - 2",
+  [Character.kobold]: "kobold victory",
 };
 
 export const victoryAnimation = (character: Character): string => VICTORY_ANIMATIONS[character];
