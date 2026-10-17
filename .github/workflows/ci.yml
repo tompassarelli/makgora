@@ -28,7 +28,7 @@ jobs:
   smoke:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     permissions:
       contents: read
       actions: read
@@ -48,8 +48,12 @@ jobs:
         if: ${{ !cancelled() }}
         run: PERF_LOOK=definitive bun wisp perf playable-bot-four --samples --out build/playable-bot-four-definitive.perf && bun wisp perf budget build/playable-bot-four-definitive.perf
         working-directory: ts
-      - name: frame cost within 5% of the previous landed main
-        if: ${{ !cancelled() && hashFiles('ts/build/playable-bot-four.perf') != '' }}
+      - name: four fighters on the fixed key tape
+        if: ${{ !cancelled() }}
+        run: bun wisp perf playable-human-four --samples --out build/playable-human-four.perf
+        working-directory: ts
+      - name: fixed-tape frame cost within 5% of the previous landed main
+        if: ${{ !cancelled() && hashFiles('ts/build/playable-human-four.perf') != '' }}
         working-directory: ts
         env:
           GH_TOKEN: ${{ github.token }}
@@ -58,15 +62,15 @@ jobs:
           for run in $(gh run list --workflow ci.yml --branch main --event workflow_dispatch --status completed -L 20 --json databaseId -q '.[].databaseId'); do
             [ "$run" != "$GITHUB_RUN_ID" ] || continue
             rm -rf build/previous
-            gh run download "$run" -n main-perf -D build/previous 2>/dev/null && break
+            gh run download "$run" -n main-perf -D build/previous 2>/dev/null && [ -f build/previous/playable-human-four.perf ] && break
           done
-          if [ ! -f build/previous/playable-bot-four.perf ]; then
-            echo "::warning::no earlier main perf artifact; this run's becomes the reference"
+          if [ ! -f build/previous/playable-human-four.perf ]; then
+            echo "::warning::no earlier main fixed-tape perf artifact; this run's becomes the reference"
             exit 0
           fi
           previous=$(cat build/previous/sha)
           echo "comparing with main $previous"
-          bun wisp perf compare build/previous/playable-bot-four.perf build/playable-bot-four.perf && exit 0
+          bun wisp perf compare build/previous/playable-human-four.perf build/playable-human-four.perf && exit 0
           rises=$(git log --format='%h%x09%(trailers:key=Perf-Rise,valueonly,separator=%x20)' "$previous..HEAD" | awk -F'\t' 'length($2) >= 10')
           if [ -n "$rises" ]; then
             echo "::warning::frame cost rose more than 5% since $previous; accepted by Perf-Rise: trailers"
@@ -75,7 +79,7 @@ jobs:
           fi
           exit 1
       - if: ${{ !cancelled() && hashFiles('ts/build/playable-bot-four.perf') != '' }}
-        run: mkdir -p build/main-perf && cp build/playable-bot-four.perf build/main-perf/ && git rev-parse HEAD > build/main-perf/sha
+        run: mkdir -p build/main-perf && cp build/playable-bot-four.perf build/main-perf/ && { [ ! -f build/playable-human-four.perf ] || cp build/playable-human-four.perf build/main-perf/; } && git rev-parse HEAD > build/main-perf/sha
         working-directory: ts
       - if: ${{ !cancelled() && hashFiles('ts/build/playable-bot-four.perf') != '' }}
         uses: actions/upload-artifact@v4

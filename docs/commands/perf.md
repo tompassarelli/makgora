@@ -9,8 +9,13 @@ The #168 budget gates p99 ≤ 10 ms and worst ≤ 14 ms; CI measures Classic wit
   allocation or typing stall (worst 1% mean). Landing gate (#48):
   each change must hold `playable-bot-four` to the Classic budget below, and
   Definitive's when a render path changes (smashcraft:.github/workflows/farm-test.yml);
-  after landing, main's smoke run compares it with the previous landed main's
-  `main-perf` artifact and reports a 5% rise as main red. A commit whose message
+  after landing, main's smoke run plays `playable-human-four`, all four
+  fighters on the fixed key tape of smashcraft:ts/scripts/wisp/botMatch.ts
+  with no computer deciding, compares it with the previous landed main's
+  `main-perf` artifact and reports a 5% rise as main red. The bot match is
+  not compared: a gameplay change moves what its computers choose, and so
+  its worst frames, as e066ee2f61's dash smash moved p1's top 1% mean
+  +5.2% while the fixed tape moved under 0.01% (smashcraft#54). A commit whose message
   carries a `Perf-Rise: <reason>` trailer stating why accepts an intended rise;
   the absolute budget still applies, nothing is re-recorded, and the smoke
   run's summary lists every accepted use.

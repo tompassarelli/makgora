@@ -399,8 +399,9 @@ bot-four are the native bot session's match with the integrity build:
 both players' helpers journal the session's pad beats, computer Illidan (and
 Archer), Battle.net's measured sync latency, counted from the match's first
 frame (smashcraft:ts/scripts/wisp/botMatch.ts). playable-bot-four plays bot-four with the playable build, which has no
-input trace, scene report or frame meter; after each landing CI compares it with
-the previous landed main's run (#48). `bun wisp perf compare A B`
+input trace, scene report or frame meter; playable-human-four plays all four
+fighters from the same fixed key tape, with no computer deciding, and after
+each landing CI compares it with the previous landed main's run (#48, #54). `bun wisp perf compare A B`
 fails when B's instructions, calls, allocation, predicted cost or typing
 stall rise beyond 5% (instructions and typing stall at their mean over the
 worst 1% of frames, never one worst frame, #394); `bun wisp headless --cost` adds the quick
