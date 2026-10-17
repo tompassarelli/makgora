@@ -36,8 +36,10 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   for the crouch and puts one wrist (Thrall: the wolf's front paws) on the ledge
   corner for the hang, and a coordinate search over the joint angles keeps the
   pose scoring best on `anim score`'s crouch or ledge line, measured against the
-  standing pose the sampler shows; a crouch also fails if it sinks any
-  non-weapon vertex below the stand's lowest. For a fighter with a Definitive body it then
+  standing pose the sampler shows; a crouch keeps its chest within 40 degrees of upright,
+  so it lowers by bending the legs rather than tipping into a lunge, and fails if it
+  sinks a non-weapon vertex more than 3% of its height below the stand's lowest
+  (a robe or tabard hem may dip into the deck). For a fighter with a Definitive body it then
   refines that pose against the worse of the two looks, retargeting only the
   stand and the authored clip onto the stock Definitive model
   (smashcraft:tools/animations/movement-definitive.ts), and keeps the refinement
@@ -55,7 +57,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `tools/animations/movement-poses/FIGHTER.ts`, usually the shared space of
   smashcraft:tools/animations/movement-space.ts plus named bones, refined
   against Definitive like every other space. A pose chosen by measurement rather
-  than search (Pit Lord's crouch, Chen's crouch and hang) is pinned in `PINNED`.
+  than search (Chen's hang) is pinned in `PINNED`.
   `bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT`
   appends a distinct gesture for each Blademaster normal and his back throw,
   preserving the shipped plunge and double-jump flip.
