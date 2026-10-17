@@ -593,7 +593,7 @@ function advanceSpecialAction(owner: Fighter, stage: number, matchFrame: number,
   if (isHeroSpecialAction(special.action)) followUpOnContact(owner);
   special.frame++;
   if (isHeroSpecialAction(special.action)) {
-    advanceHeroSpecial(owner, stage, input, world);
+    advanceHeroSpecial(owner, stage, input, world, matchFrame);
     return;
   }
   const shotSerial = owner.attack.serial + 1;

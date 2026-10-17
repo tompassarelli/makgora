@@ -394,6 +394,17 @@ export function surfaceLine(stage: number, index: number): GroundLine | undefine
 }
 
 
+export function floorBelow(stage: number, frame: number, x: number, z: number): number | undefined {
+  let floor: number | undefined;
+  for (let index = 0; index < surfaceCount(stage); index++) {
+    if (x < surfaceLeft(stage, index, frame) || x > surfaceRight(stage, index, frame)) continue;
+    const top = surfaceZAt(stage, index, frame, x);
+    if (top <= z && (floor === undefined || top > floor)) floor = top;
+  }
+  return floor;
+}
+
+
 export function surfaceZAt(stage: number, index: number, frame: number, x: number): number {
   const deck = at(decks(stage), index);
   if (deck.kind !== "fixed") return poseAt(deck, frame).z;

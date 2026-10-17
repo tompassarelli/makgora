@@ -42,6 +42,8 @@ function mark(model: string, spawnFrame: number, life: number, offsetX: number, 
   };
 }
 
+const ON_FLOOR = { dropsToFloor: true } as const;
+
 function shot(spawnFrame: number, offsetX: number, offsetZ: number, velocityX: number, velocityZ: number, life: number, radius: number, effect: HitEffect, model: string): SpecialProjectile {
   return { model, spawnFrame, offsetX, offsetZ, velocityX, velocityZ, life, radius, effect, reflectable: false, limit: 4 };
 }
@@ -114,12 +116,12 @@ const LICH: AuthoredSpecial = {
   ],
 };
 
-const JUDGMENT_CIRCLE = mark("Abilities\\Spells\\Other\\Consecration\\Consecration.mdx", 2, 76, 220.0);
+const JUDGMENT_CIRCLE = { ...mark("Abilities\\Spells\\Other\\Consecration\\Consecration.mdx", 2, 75, 220.0), ...ON_FLOOR };
 const FORSAKEN_PALADIN: AuthoredSpecial = {
   name: "Light's Judgment", endFrame: 70,
   projectiles: [
     JUDGMENT_CIRCLE,
-    mark("Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx", 34, 14, 220.0),
+    { ...mark("Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx", 34, 14, 220.0), ...ON_FLOOR },
   ],
   regions: [
     heroRegion(40, 42, capsule(0.0, 20.0, 0.0, 150.0, 100.0), hit(18.0, 75, 90.0, 45.0, HitElement.holy)),
@@ -130,14 +132,16 @@ const FORSAKEN_PALADIN: AuthoredSpecial = {
   rehits: [52, 64],
 };
 
+const INFERNO_CRASH = { ...mark("Abilities\\Spells\\Other\\Incinerate\\FireLordDeathExplode.mdx", 40, 14, 260.0), ...ON_FLOOR };
 const DREADLORD: AuthoredSpecial = {
   name: "Inferno", endFrame: 56,
   projectiles: [
-    mark("Abilities\\Spells\\Human\\MarkOfChaos\\MarkOfChaosTarget.mdx", 4, 36, 260.0),
-    { ...mark("Abilities\\Weapons\\DemolisherFireMissile\\DemolisherFireMissile.mdx", 28, 12, 260.0, 600.0), velocityZ: -48.0 },
-    mark("Abilities\\Spells\\Other\\Incinerate\\FireLordDeathExplode.mdx", 40, 14, 260.0),
+    { ...mark("Abilities\\Spells\\Human\\MarkOfChaos\\MarkOfChaosTarget.mdx", 4, 36, 260.0), ...ON_FLOOR },
+    { ...mark("Abilities\\Weapons\\DemolisherFireMissile\\DemolisherFireMissile.mdx", 28, 12, 260.0, 600.0), velocityZ: -48.0, ...ON_FLOOR },
+    INFERNO_CRASH,
   ],
-  regions: [heroRegion(40, 42, capsule(260.0, 20.0, 260.0, 120.0, 100.0), hit(14.0, 80, 90.0, 45.0, HitElement.fire))],
+  regions: [heroRegion(40, 42, capsule(0.0, 20.0, 0.0, 120.0, 100.0), hit(14.0, 80, 90.0, 45.0, HitElement.fire))],
+  regionOrigin: INFERNO_CRASH,
 };
 
 const VOODOO_AURA = "Abilities\\Spells\\Orc\\Voodoo\\VoodooAura.mdx";
@@ -353,7 +357,7 @@ const MALFURION: AuthoredSpecial = {
 };
 
 const PULL = [25, 37, 49] as const;
-const DARK_PORTAL = mark("Abilities\\Spells\\Demon\\DarkPortal\\DarkPortalTarget.mdx", 2, 78, 240.0);
+const DARK_PORTAL = { ...mark("Abilities\\Spells\\Demon\\DarkPortal\\DarkPortalTarget.mdx", 2, 77, 240.0), ...ON_FLOOR };
 const MEDIVH: AuthoredSpecial = {
   name: "The Dark Portal", endFrame: 70,
   projectiles: [DARK_PORTAL],

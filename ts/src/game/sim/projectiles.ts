@@ -14,6 +14,7 @@ import { type Fighter, PROJECTILE_CAPACITY, type Projectile } from "./fighter";
 import { mutableProjectile } from "./fighterProjectiles";
 import { type HitEffect, HitElement, copyHitEffect, emptyHitEffect } from "./hitRegions";
 import type { SpecialProjectile } from "./specials/schema";
+import { agesWithMove } from "./specials/engine";
 import { capsulesIntersect, emptyCapsule, hurtCapsule, placeCapsule, segmentBoxesOverlap } from "./geometry/contactGeometry";
 import { RIFLEMAN_BLASTER_GROUND_DAMAGE_MULTIPLIER, attackDamage } from "./moves";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
@@ -505,7 +506,7 @@ export function updateProjectiles(world: Roster, stage?: number, matchFrame = 0)
     let index = -1;
     for (const before of owner.projectiles) {
       index++;
-      if (before.life <= 0 || before.newlyReflected) continue;
+      if (before.life <= 0 || before.newlyReflected || agesWithMove(owner, before)) continue;
       const projectile = mutableProjectile(owner, index);
       selected.reflector = false;
       selected.shield = false;

@@ -29,7 +29,7 @@ import { type ReplayState, copyReplayState, createReplaySnapshot } from "../repl
 import { isIntangible } from "./conditions";
 import { spawnProjectileMotion } from "./projectiles";
 import { clearSpecialOnStock } from "./transitions";
-import { mainDeckLeft, mainDeckRight, mainDeckZAt, SLOPE_TEST_STAGE } from "./stage";
+import { mainDeckLeft, mainDeckRight, mainDeckZAt, SLOPE_TEST_STAGE, surfaceLeft, surfaceZAt } from "./stage";
 
 /** How each ultimate is met in its recorded scenario (docs/design/ultimates.md). */
 type Defence = "shield" | "spotDodge" | "ground";
@@ -127,6 +127,12 @@ function ultimateOf(character: Character): AuthoredSpecial {
   const move = FIGHTER_ULTIMATES[character];
   if (move === undefined) throw new Error(`no ultimate for ${character}`);
   return move;
+}
+
+function scenarioOf(character: Character): Scenario {
+  const scenario = ULTIMATE_SCENARIOS.find((entry) => entry.character === character);
+  if (scenario === undefined) throw new Error(`no scenario for ${character}`);
+  return scenario;
 }
 
 function play(scenario: Readonly<Scenario>, facing: number, defend: boolean): Bout {
@@ -232,7 +238,7 @@ test("an airborne ultimate holds its caster in place through startup, then falls
       if (frame >= threat && b.owner.motion.fastFalling) failures.push(`${label}: fast-falls after startup`);
       if (b.owner.special.fall) failures.push(`${label}: helpless at f${frame}`);
     }
-    if (!fell && scenario.character !== Character.cairne) failures.push(`${label}: never fell`);
+    if (!fell) failures.push(`${label}: never fell`);
     if (!b.owner.motion.grounded) {
       airborneAtEnd++;
       if (b.owner.special.fall || b.owner.jump.remaining !== 1) failures.push(`${label}: ended helpless=${b.owner.special.fall} jumps=${b.owner.jump.remaining}`);
@@ -242,33 +248,155 @@ test("an airborne ultimate holds its caster in place through startup, then falls
   assertGreaterThan(airborneAtEnd, 0);
 });
 
-test("Dark Portal's eruption and Light's Judgment's last pulse strike at their drawn mark after earlier hits, cast standing or from the air (#98) [k1 scenario]", () => {
+test("Dark Portal, Light's Judgment and Inferno draw their marks on the floor below an air cast and strike a grounded foe there after earlier hits, cast standing or from the air (#98) [k1 scenario]", () => {
   const failures: string[] = [];
-  for (const character of [Character.medivh, Character.forsakenPaladin]) for (const facing of [-1, 1]) for (const height of [0.0, 300.0]) {
-    const scenario = ULTIMATE_SCENARIOS.find((entry) => entry.character === character);
-    if (scenario === undefined) throw new Error(`no scenario for ${name(character)}`);
+  const groundFall: Record<number, number | undefined> = {};
+  for (const character of [Character.medivh, Character.forsakenPaladin, Character.dreadlord]) for (const facing of [-1, 1]) for (const height of [0.0, 300.0]) {
+    const scenario = scenarioOf(character);
+    const move = ultimateOf(character);
     const b = height > 0.0 ? airborneBout(scenario, facing, height, scenario.x) : bout(scenario, facing);
-    const aloft = f32(b.owner.motion.z);
-    const pin = (): void => {
-      if (height <= 0.0 || b.target.launch.hitstun > 0 || b.target.launch.hitlag > 0) return;
-      b.target.motion.grounded = false;
-      b.target.motion.surface = undefined;
-      b.target.motion.z = aloft;
-      b.target.motion.vz = 0.0;
-    };
-    const last = Math.max(...(ultimateOf(character).regions ?? []).map((region) => region.firstFrame + 1));
+    const label = `${name(character)} ${facing} height ${height}`;
+    const last = Math.max(...(move.regions ?? []).map((region) => region.firstFrame + 1));
     const struck: number[] = [];
-    pin();
+    let lowestFall: number | undefined;
     b.step(ULTIMATE);
     for (let tick = 0; tick < 120 && b.owner.special.action === SpecialAction.heroUltimate; tick++) {
-      pin();
       const before = b.target.status.damage;
       b.step();
       if (b.target.status.damage > before) struck.push(b.owner.special.frame);
+      for (const projectile of b.owner.projectiles) {
+        const spec = projectile.spec;
+        if (projectile.life <= 0 || spec === undefined || !(move.projectiles ?? []).includes(spec)) continue;
+        const floor = mainDeckZAt(0, projectile.x);
+        if (spec.velocityZ < 0.0) lowestFall = Math.min(lowestFall ?? projectile.z, projectile.z);
+        else if (f32(projectile.z - spec.offsetZ) !== floor) failures.push(`${label}: mark at ${projectile.z} over the floor at ${floor} on f${b.owner.special.frame}`);
+      }
     }
-    if (struck.length < 2 || !struck.includes(last)) failures.push(`${name(character)} ${facing} height ${height}: struck at ${struck.join(",")}, last region f${last}`);
+    if (!struck.includes(last) || (character !== Character.dreadlord && struck.length < 2)) failures.push(`${label}: struck at ${struck.join(",")}, last region f${last}`);
+    if (character === Character.dreadlord && height <= 0.0) groundFall[facing] = lowestFall;
+    if (character === Character.dreadlord && (lowestFall === undefined || lowestFall !== groundFall[facing])) failures.push(`${label}: meteor bottomed out at ${lowestFall}, ${groundFall[facing]} on a ground cast`);
+  }
+  assertEquals([...new Set(failures)].join("; "), "");
+});
+
+test("an air cast draws its mark on the highest floor under it at or below the caster: a platform, the deck beneath one, or the caster's height over the void (#98) [k1 scenario]", () => {
+  const stage = 1;
+  const platform = 2;
+  const scenario = scenarioOf(Character.medivh);
+  const portalSpec = ultimateOf(Character.medivh).regionOrigin;
+  const offset = portalSpec?.offsetX ?? 0.0;
+  const overPlatform = f32(f32(surfaceLeft(stage, platform, 0) + 30.0) - offset);
+  const overVoid = f32(f32(mainDeckRight(stage) + 90.0) - offset);
+  const platformTop = surfaceZAt(stage, platform, 0, f32(overPlatform + offset));
+  const failures: string[] = [];
+  for (const { x, height, floor } of [
+    { x: overPlatform, height: f32(platformTop + 130.0), floor: platformTop },
+    { x: overPlatform, height: f32(platformTop - 70.0), floor: mainDeckZAt(stage, f32(overPlatform + offset)) },
+    { x: overVoid, height: 300.0, floor: undefined },
+  ]) {
+    const b = airborneBout(scenario, 1, height, 1100.0);
+    b.game.stageChoice = stage;
+    b.owner.motion.x = x;
+    b.owner.motion.z = height;
+    b.owner.motion.vx = 0.0;
+    b.owner.motion.vz = 0.0;
+    b.step(ULTIMATE);
+    const aloft = b.owner.motion.z;
+    b.step();
+    const portal = b.owner.projectiles.find((projectile) => projectile.life > 0 && projectile.spec === portalSpec);
+    const expected = floor ?? aloft;
+    if (portal?.z !== expected) failures.push(`cast at ${x}/${height}: portal at ${portal?.x}/${portal?.z}, expected z ${expected}`);
   }
   assertEquals(failures.join("; "), "");
+});
+
+test("each drawn-mark ultimate's effects outlive its last strike and are gone within 12 frames of it, with or without hitlag before it, cast standing or from the air [k3 measure docs/design/ultimates.md]", () => {
+  const failures: string[] = [];
+  for (const character of [Character.medivh, Character.forsakenPaladin, Character.dreadlord]) for (const near of [false, true]) for (const height of [0.0, 300.0]) {
+    const scenario = scenarioOf(character);
+    const move = ultimateOf(character);
+    const gap = near ? scenario.x : 1100.0;
+    const b = height > 0.0 ? airborneBout(scenario, 1, height, gap) : bout(scenario, 1, Character.blademaster, gap);
+    const label = `${name(character)} ${near ? "near" : "alone"} height ${height}`;
+    const lastActive = Math.max(...(move.regions ?? []).map((region) => region.lastFrame + 1));
+    const specs = move.projectiles ?? [];
+    let lastActiveTick = 0;
+    let anchoredAtLast = false;
+    let paused = 0;
+    let goneTick = 0;
+    b.step(ULTIMATE);
+    for (let tick = 1; tick <= 160 && goneTick === 0; tick++) {
+      b.step();
+      if (b.owner.launch.hitlag > 0 && b.owner.special.frame < lastActive) paused++;
+      if (b.owner.special.action === SpecialAction.heroUltimate && b.owner.special.frame === lastActive) {
+        lastActiveTick = tick;
+        anchoredAtLast = b.owner.projectiles.some((projectile) => projectile.life > 0 && projectile.spec === move.regionOrigin);
+      }
+      if (lastActiveTick > 0 && !b.owner.projectiles.some((projectile) => projectile.life > 0 && projectile.spec !== undefined && specs.includes(projectile.spec))) goneTick = tick;
+    }
+    if (near && paused === 0) failures.push(`${label}: no hitlag before the last strike`);
+    if (!anchoredAtLast) failures.push(`${label}: mark gone by the last active frame f${lastActive}`);
+    if (goneTick === 0 || goneTick - lastActiveTick > 12) failures.push(`${label}: effects gone ${goneTick - lastActiveTick} frames after the last active frame`);
+  }
+  assertEquals(failures.join("; "), "");
+});
+
+const AIR_PORTAL_SAVE = 12;
+const AIR_PORTAL_TICKS = 90;
+
+function airPortalState(): ReplayState {
+  const owner = createFighter(Character.medivh, -120.0, 1);
+  const foe = createFighter(Character.blademaster, 120.0, -1);
+  const match = createMatchState();
+  match.phase = Phase.match;
+  match.timeLimitMinutes = 0;
+  const state: ReplayState = { world: createRoster(3, [owner, foe]), match, controls: createFrameControls(), runtime: createPacingAndPresentation() };
+  for (let frame = 1; frame <= 8; frame++) {
+    const row = createMatchFrameInput();
+    assertTrue(captureFrame(row, frame, 3, state.controls, state.runtime));
+    assertTrue(executeMatchFrame(row, match, state.world, state.controls, state.runtime, frame));
+  }
+  owner.mana.points = ROSTER_MANA.max;
+  owner.motion.grounded = false;
+  owner.motion.surface = undefined;
+  owner.motion.z = f32(mainDeckZAt(0, owner.motion.x) + 300.0);
+  owner.motion.vx = 0.0;
+  owner.motion.vz = 0.0;
+  return state;
+}
+
+function stepAirPortal(state: ReplayState, tick: number, foe: Readonly<Controls>): void {
+  copyControls(state.controls.inputs[0], tick === 1 ? ULTIMATE : controls());
+  copyControls(state.controls.inputs[1], foe);
+  const row = createMatchFrameInput();
+  assertTrue(captureFrame(row, tick + 8, 3, state.controls, state.runtime));
+  assertTrue(executeMatchFrame(row, state.match, state.world, state.controls, state.runtime, tick + 8));
+}
+
+test("an air Dark Portal restored mid-hover after a mispredicted foe jump replays to the straight run's checksum on every frame (#98) [k1 scenario]", () => {
+  const truth = airPortalState();
+  const checksums: string[] = [];
+  for (let tick = 1; tick <= AIR_PORTAL_TICKS; tick++) {
+    stepAirPortal(truth, tick, controls());
+    checksums.push(String(stateChecksum(truth)));
+  }
+  assertGreaterThan(fighterAt(truth.world, 1).status.damage, 0.0);
+  const live = airPortalState();
+  for (let tick = 1; tick <= AIR_PORTAL_SAVE; tick++) stepAirPortal(live, tick, controls());
+  const caster = fighterAt(live.world, 0);
+  assertTrue(caster.special.action === SpecialAction.heroUltimate && !caster.motion.grounded && caster.special.frame < firstThreat(ultimateOf(Character.medivh)));
+  const saved = createReplaySnapshot();
+  copyReplayState(saved, live);
+  for (let tick = AIR_PORTAL_SAVE + 1; tick <= AIR_PORTAL_SAVE + 40; tick++) stepAirPortal(live, tick, controls({ jumpPressed: true, jumpHeld: true, direction: 1 }));
+  assertTrue(String(stateChecksum(live)) !== checksums[AIR_PORTAL_SAVE + 39]);
+  copyReplayState(live, saved);
+  const failures: string[] = [];
+  for (let tick = AIR_PORTAL_SAVE + 1; tick <= AIR_PORTAL_TICKS; tick++) {
+    stepAirPortal(live, tick, controls());
+    if (String(stateChecksum(live)) !== checksums[tick - 1]) failures.push(`f${tick}`);
+  }
+  assertEquals(failures.join(","), "");
+  assertEquals(firstStateDifference(truth, live), undefined);
 });
 const EX = controls({ specialPressed: true, exPressed: true });
 

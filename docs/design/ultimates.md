@@ -30,7 +30,7 @@ Smashcraft takes the Street Fighter half and refuses the Smash half.
 | Telegraph | Every ultimate shows its area, line or target before its first active frame. Startup is at least 16 frames. |
 | Counterplay | Each can be shielded or dodged on its startup frames, or escaped by movement, and leaves the user punishable on a whiff. |
 | Payoff | Strong, never a guaranteed stock: none kills from 0%. Below 100%, an ultimate and its true follow-ups stay within #83's 30% (gameplay-design.md, "Combo structure"). |
-| Air | An airborne press starts every ultimate but the floor-bound ones below; the caster holds in place until the move's first threat, then falls normally: no helpless state, air jump kept. Bladestorm, Stampede, Earthquake, Tower Rush, Mrglglgl Stampede and Locust Swarm run along the floor from the caster's feet, and Storm, Earth and Fire, Robo-Goblin Overdrive and You No Take Candle! strike, walk or dig from where he stands, so they refuse in the air (#98). |
+| Air | An airborne press starts every ultimate but the floor-bound ones below; the caster holds in place until the move's first threat, then falls normally: no helpless state, air jump kept. The Dark Portal, Light's Judgment and Inferno draw their marks on the highest floor beneath the mark's spot at or below the caster, and strike there; over the void the mark stays at the caster's height. Bladestorm, Stampede, Earthquake, Tower Rush, Mrglglgl Stampede and Locust Swarm run along the floor from the caster's feet, and Storm, Earth and Fire, Robo-Goblin Overdrive and You No Take Candle! strike, walk or dig from where he stands, so they refuse in the air (#98). |
 | Off rule | "Ultimates off" removes the input; the match rule is part of replay state. |
 | Effects | Each ultimate's models count as one effect group under #380's budget: gone within 12 frames after its last active frame. Tower Rush's towers are active until they crumble, and their 30-frame Death animation is the exception Tom asked for. |
 
@@ -73,7 +73,7 @@ Frames count from the input frame (frame 1 is the first frame after it).
 | Warden | air | **Vengeance** · Warcraft III Warden ultimate, Avatar of Vengeance (tier 1) | Raises her blade; the Avatar rises behind her, f1–24 | The Avatar stands for 90 frames (30 durability) and throws four spectral glaives straight ahead at f24/39/54/69, 18 a frame, 5% each, 40°. She is free at f40 | Break the Avatar, jump or shield the glaives; punish her through f40 | The jailer's ghostly enforcer | Avatar of Vengeance / Spirit of Vengeance units, glaive missile |
 | Lich | air | **Frost Wyrm** · Sapphiron, Kel'Thuzad's frost wyrm in Naxxramas (tier 2: Death and Decay, his WC3 ultimate, is already his side special) | Lifts his arms; a wyrm cry and a frost line at body height, f1–30 | f31 a frost wyrm sweeps across from behind him, 28 a frame at body height (centre 95, radius 45); 16%, 60°, chills | Jump or shield it, or interrupt the startup; he is locked until f60 | The undead sky over Naxxramas; a single chilling sweep alongside Murloc's low swarm | Frost Wyrm missile (the wyrm unit needs a model-facts row), FreezingBreath |
 | Forsaken Paladin | air | **Light's Judgment** · WoW Paladin's Light's Hammer (tier 2: Resurrection raises only allies) | Sword raised to the sky; a golden circle marks 220 ahead, f1–28 | f40 the holy judgment lands there, radius 110: 18%, 75°, base 45, growth 90; consecrated pulses at f52 and f64 hit grounded foes for 4% | Leave the circle, shield, jump the pulses; punish him through f70 | Holy ground is his whole plan | HolyBolt, Resurrect and Consecration effects |
-| Dreadlord | air | **Inferno** · Warcraft III Dreadlord ultimate (tier 1) | Points; a burning mark 260 ahead, f1–20 | A burning meteor falls from f28; f40 it crashes onto the mark, radius 100: 14%, 80° | Leave the mark, shield the crash; punish him through f56 | The classic summon of a demon lord | Mark of Chaos, Demolisher fire missile, Firelord explosion |
+| Dreadlord | air | **Inferno** · Warcraft III Dreadlord ultimate (tier 1) | Points; a burning mark 260 ahead, f1–20 (from the air, on the floor below) | A burning meteor falls from f28; f40 it crashes onto the mark and strikes there, radius 100: 14%, 80° | Leave the mark, shield the crash; punish him through f56 | The classic summon of a demon lord | Mark of Chaos, Demolisher fire missile, Firelord explosion |
 | Shadow Hunter | air | **Big Bad Voodoo** · Warcraft III Shadow Hunter ultimate (tier 1), faithful (#483) | Dances (Stand Channel) on a voodoo aura from f2; two Serpent Wards rise at ±140 on f16 | Each ward fires outward from its own side: 4% bolts at f22/37/52, then an 8% launcher at f67 (45°, base 45, growth 85); at most 20% from one side. He is hittable throughout; nothing breaks the wards while he dances. Total 105 | Hit the dancer: it ends the dance and sinks both wards; or shield the bolts; punish from f91 | BBV protects everyone but the Shadow Hunter | Serpent Ward, Serpent Ward missile; Command Aura stands in for VoodooAura until its model facts are confirmed |
 | Pit Lord | air | **Doom** · Warcraft III Pit Lord ultimate (tier 1) | Clawed hand reaches back, green glyph flashes, f1–18 | f19–22 command grab, reach 130, beats shield; holds 30 frames, 10% then flings at 45°; Doom burns 12% over 3 s | Spot dodge, jump, roll or hit him first; a whiff ends at f60 | The doom-bringer's curse, close and brutal | Doom target effect, Doom Guard sound |
 | Beastmaster | ground only | **Stampede** · Warcraft III Beastmaster ultimate (tier 1) | Raises his axes and roars; dust behind him, f1–24 | His pack charges past: Quilbeast low (f25), Bear mid (f40), Hawk high (f55), 22 a frame across the stage, 9% each | Each at a different height: jump the Quilbeast, shield the Bear, stay low under the Hawk; shield all three | His own three pets, as a stampede | Quilbeast, bear and hawk units, Stampede missile dust |
@@ -106,10 +106,14 @@ Frames count from the input frame (frame 1 is the first frame after it).
   no damage, its first threat is at least frame 16 and its user stays
   committed at least 16 frames past it. Six `ultimate-*` parity tapes replay
   ultimates with rollbacks in Bun and both Lua32 modes.
-- The Dark Portal, Light's Judgment and Reincarnation strike at their drawn
-  mark (`regionOrigin`), so a cast from the air lands where it telegraphed
-  after the caster falls; each mark outlives its last strike by the frames
-  hitlag can add.
+- The Dark Portal, Light's Judgment, Inferno and Reincarnation strike at
+  their drawn mark (`regionOrigin`), so a cast from the air lands where it
+  telegraphed after the caster falls. An air cast drops the Portal, Judgment
+  and Inferno marks (`dropsToFloor`) to the highest floor under the mark at
+  or below the caster (`floorBelow`), keeping the caster's height over the
+  void; a ground cast draws them at the caster's feet. A `regionOrigin`
+  mark ages on the move's clock, holding while hitlag pauses its owner, and
+  every effect of the three is gone 12 frames after the last active frame.
 - Computer fighters press it at a full bar when the target is inside the
   move's authored reach (ULTIMATE_REACH), as often as their kit options;
   Rookie never does, Lich presses it at a target in the air within 600, a

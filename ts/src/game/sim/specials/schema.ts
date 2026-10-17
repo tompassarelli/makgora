@@ -160,6 +160,8 @@ export interface SpecialProjectile {
 
   readonly atStageCentre?: boolean | undefined;
 
+  readonly dropsToFloor?: boolean | undefined;
+
   /** What this becomes where it ends when its life runs out or it strikes. */
   readonly expiresInto?: SpecialProjectile | undefined;
 
