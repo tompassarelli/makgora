@@ -14,7 +14,7 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Illidan | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in down smash; tech away dash grab, forward throw, dash, dash attack; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
 | Illidan | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in down smash; tech away dash grab, forward throw, dash, dash attack; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 60% → up tilt against 5/5 DI |
 | Illidan | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in up smash; tech away short hop, forward air; missed tech down smash; trap short hop, forward air covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 5/5 DI |
-| Blademaster | light | yes | yes | yes | yes | yes | forward throw at 60%: tech in place dash grab, back throw, dash, dash attack; tech in down smash; tech away dash grab, back throw, dash, dash attack; missed tech dash grab, back throw, dash, dash attack; trap dash grab, back throw, dash, dash attack covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
+| Blademaster | light | yes | yes | yes | yes | yes | forward throw at 60%: tech in place dash grab, back throw, dash, dash attack; tech in forward smash; tech away dash grab, back throw, dash, dash attack; missed tech dash grab, back throw, dash, dash attack; trap dash grab, back throw, dash, dash attack covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
 | Blademaster | medium | yes | yes | yes | yes | yes | forward throw at 60%: tech in place dash grab, back throw, dash grab, back throw, dash, dash attack; tech in full hop in place, forward air, dash, dash attack; tech away dash grab, back throw, dash, dash attack; missed tech short hop, forward air; trap dash grab, back throw, dash grab, back throw, dash, dash attack covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
 | Blademaster | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place dash, dash attack; tech in forward smash; tech away dash, dash attack; missed tech dash, dash attack; trap dash, dash attack covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 5/5 DI |
 | Muradin Bronzebeard | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward tilt; tech in up smash, up smash, up smash; tech away dash grab, back throw; missed tech forward tilt; trap forward tilt covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
@@ -119,15 +119,15 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Illidan | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Blademaster | light | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Blademaster | light | back throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
-| Blademaster | light | up throw | 1/1 in short hop, back air, out forward tilt | 1/1 KD | 1/1 KD in down smash, out forward smash | 1/1 in up smash, out forward smash |
+| Blademaster | light | up throw | 1/1 in short hop, back air, out forward tilt | 1/1 KD | 1/1 | 1/1 in up smash, out forward smash |
 | Blademaster | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Blademaster | medium | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Blademaster | medium | back throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
-| Blademaster | medium | up throw | 1/1 in down smash, out forward tilt | 1/1 KD | 1/1 KD in down smash, out forward smash | 1/1 in up smash, out forward smash |
+| Blademaster | medium | up throw | 1/1 in down smash, out forward tilt | 1/1 KD | 1/1 | 1/1 in up smash, out forward smash |
 | Blademaster | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Blademaster | heavy | forward throw | 0/0 | 0/0 | 0/0 | 1/0 |
 | Blademaster | heavy | back throw | 0/0 | 0/0 | 0/0 | 0/0 |
-| Blademaster | heavy | up throw | 1/1 in short hop, back air, out forward tilt | 1/1 KD | 1/1 KD | 2/1 in up smash, out forward smash |
+| Blademaster | heavy | up throw | 1/1 in short hop, back air, out forward tilt | 1/1 KD | 1/1 KD | 2/1 |
 | Blademaster | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Muradin Bronzebeard | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Muradin Bronzebeard | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
