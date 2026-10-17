@@ -13,6 +13,8 @@ import { resolveRenderAsset, type AssetLocation, type AssetLayer, type Graphics,
 
 export const key = (path: string) => path.replaceAll("\\", "/").toLowerCase().replace(/\.mdl$/, ".mdx");
 const PRIVATE = join(homedir(), ".local/share/smashcraft-render-assets");
+const NOT_IN_STORAGE = "open asset failed: 2";
+const ABSENT_SUFFIX = ".absent";
 
 
 class RenderAssetFailure extends Schema.TaggedError<RenderAssetFailure>()("RenderAssetFailure", { problem: Schema.String }) {
@@ -103,13 +105,14 @@ export function renderAssetStore(options: RenderAssetOptions = {}, mapImports?: 
   const succeeds = (program: string, args: readonly string[]) => {
     const output = args.at(-1);
     if (output === undefined) return Effect.succeed(false);
-    const temp = temporary(output);
-    return runProcess(ChildProcess.make(program, [...args.slice(0, -1), temp], { stdin: "ignore" })).pipe(
+    const temp = temporary(output), absent = `${output}${ABSENT_SUFFIX}`;
+    const extract = runProcess(ChildProcess.make(program, [...args.slice(0, -1), temp], { stdin: "ignore" })).pipe(
       Effect.flatMap(() => read(temp)),
       Effect.flatMap((bytes) => bytes === undefined ? Effect.succeed(false) : attempt(`move ${temp}`, () => (renameSync(temp, output), true))),
-      Effect.catchTag("ProcessFailure", () => Effect.succeed(false)),
+      Effect.catchTag("ProcessFailure", (failure) => failure.problem.endsWith(NOT_IN_STORAGE) ? attempt(`mark ${absent}`, () => (writeFileSync(absent, ""), false)) : Effect.succeed(false)),
       Effect.ensuring(Effect.sync(() => rmSync(temp, { force: true }))),
       Effect.flatMap((moved) => moved ? Effect.succeed(true) : read(output).pipe(Effect.map((bytes) => bytes !== undefined))));
+    return attempt(`read ${absent}`, () => Bun.file(absent).exists()).pipe(Effect.flatMap((known) => known ? Effect.succeed(false) : extract));
   };
 
   const stockLayer = (normalized: string, layer: AssetLayer) => Effect.gen(function*() {
