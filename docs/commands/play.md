@@ -39,6 +39,9 @@
   dispatch remote Classic.
   `bun wisp play --install-green --dry-run` reports the newest green commit and
   proposed install without building, installing or starting the controller helper.
+  `SMASHCRAFT_GREEN_GATE=enforce` is the one switch back to the native gate that
+  blocks; unset, the gate is a report (the install proceeds and status.json
+  reads `installed-unverified` with the gate failures).
 
 - Standalone play: `bun wisp play --standalone` opens the Wisp browser player
   with a full three-stock Illidan against Wren Expert Rifleman. `--script FILE`

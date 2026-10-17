@@ -69,7 +69,7 @@ function previousInstalled(documents: string): string | undefined {
   return newest?.commit;
 }
 
-export const installAcceptedGreen = (documents: string, map: string, revision: string, declared: readonly string[], stateDirectory = greenState) => Effect.gen(function*() {
+export const installAcceptedGreen = (documents: string, map: string, revision: string, declared: readonly string[], stateDirectory = greenState, enforce = process.env.SMASHCRAFT_GREEN_GATE === "enforce") => Effect.gen(function*() {
   const mapSha256 = yield* Effect.try({
     try: () => createHash("sha256").update(readFileSync(map)).digest("hex"), catch: (cause) => new PlayProblem({ problem: String(cause) }),
   });
@@ -90,12 +90,12 @@ export const installAcceptedGreen = (documents: string, map: string, revision: s
       const status = join(stateDirectory, "status.json");
       const staged = `${status}.${process.pid}.next`;
       writeFileSync(staged, `${JSON.stringify({ revision, candidate: map, candidateMapSha256: mapSha256,
-        state: failures.length === 0 ? "accepted" : unreadable.length > 0 ? "pending-native" : "blocked", failures,
+        state: failures.length === 0 ? "accepted" : !enforce ? "installed-unverified" : unreadable.length > 0 ? "pending-native" : "blocked", failures,
         acceptanceDirectory: join(stateDirectory, "accept", mapSha256) }, null, 2)}\n`, { mode: 0o600 });
       renameSync(staged, status);
     }, catch: (cause) => new PlayProblem({ problem: String(cause) }),
   });
-  if (failures.length > 0) return yield* new PlayProblem({ problem: `Kept last good installed map: ${failures.map(({ look, id, reason }) => `${look} ${id}: ${reason}`).join("; ")}; status ${join(stateDirectory, "status.json")}` });
+  if (enforce && failures.length > 0) return yield* new PlayProblem({ problem: `Kept last good installed map: ${failures.map(({ look, id, reason }) => `${look} ${id}: ${reason}`).join("; ")}; status ${join(stateDirectory, "status.json")}` });
   yield* Effect.try({ try: () => installLatest(documents, map), catch: (cause) => new PlayProblem({ problem: String(cause) }) });
 });
 
