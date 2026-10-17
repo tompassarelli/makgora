@@ -57,13 +57,13 @@
 #! expect a 640 special 6 form 0
 #! expect a 663 special-form 1 action 6
 #! scene a GyroCopterImpact
-#! scene a FlyingMachineMissile
+# 9c2c45a1b0 fires the blaster as a cannon shot; 19aa417b9d gave Frost Trap its own art (FrostTrap) for BlizzardTarget; 35ac1e29eb bursts a mortar at Recoil Shot's feet for FireLordDeathExplode.
+#! scene a CannonTowerMissile
 #! scene a RoarTarget
 #! scene a FeralSpiritTarget
-#! scene a BlizzardTarget
 #! scene a FrostTrap
 #! scene a FlakTarget
-#! scene a FireLordDeathExplode
+#! scene a MortarMissile
 #! scene a SteamTankImpact
 665 a capture
 1000 a press VIEW

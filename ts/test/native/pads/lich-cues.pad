@@ -74,14 +74,15 @@
 #! expect a 416 special 13 form 3
 #! expect a 470 special 14 form 0
 #! scene a SpiritTouchTarget
-#! scene a FreezingBreathTargetArt
+# dee88e288d (restored by 2aad05b064) draws Frost Nova's active cue as FrostDamage for FreezingBreathTargetArt; a4d6c36ba4 opens Frost Armor with its
+# FrostArmorTarget shell for DarkRitualCaster; 71732a0b8f dropped the Lich's FrostBoltMissile reach flare (trace: run 39009305845).
+#! scene a FrostDamage
 #! scene a AnimateDeadTarget
 #! scene a UnsummonTarget
-#! scene a DarkRitualCaster
+#! scene a FrostArmorTarget
 #! scene a FrostArmorDamage
 #! scene a BreathOfFrostTarget
 #! scene a DarkRitualTarget
-#! scene a FrostBoltMissile
 #! scene a FrostNovaTarget
 #! scene a DeathAndDecayTarget
 1180 a press VIEW

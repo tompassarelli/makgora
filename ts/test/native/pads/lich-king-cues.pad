@@ -59,12 +59,12 @@
 #! expect a 800 special 15 form 0
 #! scene a DarkRitualCaster
 #! scene a FreezingBreathMissile
-#! scene a CurseTarget
+# 47ea0fa17d (#491) gave Val'kyr Shadowguard CrippleTarget for CurseTarget; db4eafa206 (#491) grounds Defile in UnholyAura for DeathAndDecayTarget and DarkPortalTarget (trace: run 39009305845).
+#! scene a CrippleTarget
 #! scene a FrostNovaTarget
-#! scene a DeathAndDecayTarget
+#! scene a UnholyAura
 #! scene a FrostWyrmMissile
 #! scene a Banshee
-#! scene a DarkPortalTarget
 802 a capture
 808 a capture
 1000 a press VIEW

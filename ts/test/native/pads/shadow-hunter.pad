@@ -1,6 +1,6 @@
 # #133 Shadow Hunter's native check by parity: Hex refuses b's attacks, grabs and specials while b
 # mashes, which shortens it but never below its floor; immunity and a shield stop the next Hex; a hexed
-# b still jumps and uses up special; exhausted mana refuses the final Hex; Spirit Glaive hits b
+# b still jumps and uses up special; a fifth Hex casts with no mana to spend; Spirit Glaive hits b
 # after its dodge ends. Shadow Hunter a against Shadow Hunter b; syntax and checks: smashcraft:docs/native-bot-session.md.
 #! chat -dev quick hero shadow hunter
 # Both dash in, close.
@@ -62,6 +62,9 @@
 530 b stick 1 0
 532 b stick 0 0
 570 a release VIEW
+# Shadow Hunter's grippier traction (7bc2877cdb) leaves a 40 further back, so a walks in before the glaive (variant run 39025469042).
+600 a stick 0.6 0
+620 a stick 0 0
 # Spirit Glaive: b's dodge protects frames 663-676; the outgoing 6% hit lands at 677,
 # before the projectile's return at age 22 (frame 679).
 640 a tap X 2
@@ -69,34 +72,38 @@
 662 b stick 0 -1
 663 b stick 0 0
 665 b shield 0
-# Four 25-mana Hexes and the 1/sec floor leave 7 mana: the final Hex is refused.
+# A fifth Hex.
 # b waits until the same original attack frame.
 700 a stick 0 -1
 700 a tap X 2
 701 a stick 0 0
 793 b tap A 2
 #! expect a 60 special 16 form 0
-#! expect b 88 damage 2.000
-#! absent b 89-125 applied attack
-#! absent b 89-125 special
-#! absent b 89-125 grab-hold
-#! expect b 126 applied attack 1 style 0
+# Hex lands 5 frames sooner since 7bc2877cdb (traction) and 1e934c1718 and db647159a5 (dash and run caps): probe run
+# 39024739714 with those neutralised restores 88. 8cd9c77933 (#414) set Hex to 1.751 (trace: run 39009305845).
+#! expect b 83 damage 1.751
+#! absent b 84-121 applied attack
+#! absent b 84-121 special
+#! absent b 84-121 grab-hold
+#! expect b 122 applied attack 1 style 0
 #! expect a 200 special 16 form 0
-#! expect b 231 damage 4.000
-#! expect b 241 applied attack 3 style 0
+# Waking 4 frames sooner, b chains its mash into jabs 2 and 3, so the next attack is its fourth.
+#! expect b 231 damage 3.502
+#! expect b 241 applied attack 4 style 0
 #! expect a 290 special 16 form 0
 #! absent b 291-433 damage
 #! expect a 400 special 16 form 0
-#! expect b 434 damage 6.000
+#! expect b 435 damage 5.254
 #! expect b 449 applied jump 1 double 0
 #! expect b 452 special 15 form 0
 #! expect a 640 special 13 form 0
 #! absent b 641-676 damage
-#! expect b 677 damage 12.000
-#! absent a 700-701 special
+#! expect b 677 damage 10.507
+# 6d19e1fa60 and 3956288f97 (#335) replaced mana with the super meter, so the fifth Hex casts; it misses b, who is out of its reach.
+#! expect a 700 special 16 form 0
 #! absent b 700-792 damage
 #! absent b 739-792 applied attack
-#! expect b 793 applied attack 6 style 0
+#! expect b 793 applied attack 7 style 0
 #! scene a PolymorphTarget
 #! scene a ShadowHunterMissile
 #! scene a WitchDoctorMissile

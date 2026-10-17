@@ -23,7 +23,8 @@
 # 8cd9c77933 (#414 post-RC tune) set the closing glaive fling to 3.502 (trace: run 39006853648).
 #! expect b 151 damage 11.502
 #! scene a ShadowHunterMissile
-#! scene a CleaveDamageTarget
+# 82f4b95547 (#82) draws slash sparks as the authored ImpactHit burst, since CleaveDamageTarget drew nothing standalone (trace: run 39009305845).
+#! scene a ImpactHit
 # View held a second, twice: the moments the parity check replays.
 500 a press VIEW
 570 a release VIEW

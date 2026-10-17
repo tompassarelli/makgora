@@ -94,11 +94,13 @@
 #! expect a 400 special 16 form 3
 #! expect a 450 special 15 form 0
 #! expect a 552 special 16 form 1
-#! scene a BloodlustSpecial
+# 339199a792 (#499) gives Blademaster wind tells, not Bloodlust or Mark of Chaos: Wind Cutter gathers TornadoElementalSmall for
+# BloodlustSpecial, and Backstab strikes with BloodImpact for MarkOfChaosTarget (trace: run 39009305845).
+#! scene a TornadoElementalSmall
 #! scene a WingedSerpentMissile
 #! scene a InvisibilityTarget
 #! scene a SunderingBlades
-#! scene a MarkOfChaosTarget
+#! scene a BloodImpact
 #! scene a SpiritWalkerChange
 #! scene a CycloneTarget
 #! scene a MirrorImageCaster

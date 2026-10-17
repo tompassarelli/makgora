@@ -35,7 +35,8 @@
 #! expect b 240 damage 15.647
 #! expect b 245 damage 17.647
 #! scene a SunderingBlades
-#! scene a CleaveDamageTarget
+# 82f4b95547 (#82) draws slash sparks as the authored ImpactHit burst, since CleaveDamageTarget drew nothing standalone (trace: run 39009305845).
+#! scene a ImpactHit
 # View held a second, twice: the moments the parity check replays.
 500 a press VIEW
 570 a release VIEW

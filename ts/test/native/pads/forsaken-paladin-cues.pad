@@ -74,7 +74,8 @@
 #! scene a HolyBoltSpecialArt
 #! scene a InnerFireTarget
 #! scene a StampedeMissileDeath
-#! scene a ResurrectTarget
+# b8ff0f16c5 opens Ascension with one undead burst, PossessionTarget, for ResurrectTarget (trace: run 39009305845).
+#! scene a PossessionTarget
 #! scene a Consecration
 997 a capture
 1003 a capture

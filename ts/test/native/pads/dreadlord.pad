@@ -7,12 +7,14 @@
 # a dashes in, inside Sleep's reach.
 40 a stick 1 0
 42 a stick 0 0
-# Sleep on b just as b hops: an airborne Sleep, 24 frames; b attacks right after it.
+# Sleep on b just as b hops: an airborne Sleep, 24 frames; b attacks right after it. Sleep lands 5 frames sooner
+# since 7bc2877cdb (traction), 1e934c1718 and db647159a5 (dash and run caps) and ba47335a18 (fitted stand)
+# (probe run 39024739714 with those neutralised restores 110), so b hops 5 frames sooner too.
 60 a stick 0 -1
 60 a tap X 2
 61 a stick 0 0
-106 b tap B 2
-136 b tap A 2
+101 b tap B 2
+131 b tap A 2
 # Sleep into b's held shield: no hit.
 160 a stick 0 -1
 160 a tap X 2
@@ -48,18 +50,18 @@
 777 b tap A 2
 781 b tap A 2
 #! expect a 60 special 16 form 0
-#! expect b 110 damage 1.810
-#! expect b 136 applied attack 1 style 0
+#! expect b 105 damage 1.810
+#! expect b 131 applied attack 1 style 0
 #! expect a 160 special 16 form 0
-#! absent b 161-379 damage
+#! absent b 161-374 damage
 #! expect a 330 special 16 form 0
-#! expect b 380 damage 3.620
-#! absent b 381-483 applied attack
+#! expect b 375 damage 3.620
+#! absent b 376-483 applied attack
 #! expect b 484 applied attack 2 style 0
 #! expect a 670 special 16 form 0
-#! expect b 720 damage 5.430
-#! absent b 721-755 applied attack
-#! expect b 757 applied attack 3 style 0
+#! expect b 715 damage 5.430
+#! absent b 716-752 applied attack
+#! expect b 753 applied attack 3 style 0
 #! scene a SleepSpecialArt
 #! scene a VoidWalkerMissile
 1000 a press VIEW

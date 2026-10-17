@@ -51,11 +51,14 @@
 #! expect b 235 applied jump
 #! absent b 111-330 damage
 #! expect a 340 special 10 form 0
-#! expect a 372 special 0 form 0 action-frame 0 x 50.719
+# #482's per-fighter shields (9d81faac91, f2fd55307f) are larger, so the rush into b's shield stops sooner and the next rush,
+# starting closer, also hits b at 477: probe run 39025304908 on the old 45/60 shields restores 372 x 50.719 and 606 (trace: run 39009305845).
+#! expect a 368 special 0 form 0 action-frame 0 x 4.319
 #! expect a 470 special 10 form 0
 #! expect a 486 special-form 1 action 10
 #! expect a 600 special 10 form 0
-#! expect b 606 damage 11.000
+#! expect b 477 damage 11.000
+#! expect b 611 damage 17.000
 #! expect a 616 special-form 2 action 10
 #! expect a 720 special 12 form 0
 #! expect a 725 special 0

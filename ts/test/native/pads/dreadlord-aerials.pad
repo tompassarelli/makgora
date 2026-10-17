@@ -20,7 +20,8 @@
 #! expect b 132 damage 6.000
 # 1ed1f22499 (#414 step 3) set neutral air's closing hit to 7.894 (trace: run 39006853648).
 #! expect b 139 damage 13.894
-#! scene a CleaveDamageTarget
+# 82f4b95547 (#82) draws slash sparks as the authored ImpactHit burst, since CleaveDamageTarget drew nothing standalone (trace: run 39009305845).
+#! scene a ImpactHit
 # View held a second, twice: the moments the parity check replays.
 500 a press VIEW
 570 a release VIEW

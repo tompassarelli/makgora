@@ -1,9 +1,9 @@
 # Warden's native checks by parity: #126 the mark and Shadow Pursuit.
 # Warden a against Warden b; syntax and checks: smashcraft:docs/native-bot-session.md.
 #! chat -dev quick hero warden
-# b dashes in to about 280 away, within Shadow Pursuit's reach.
+# b dashes in to about 280 away, within Shadow Pursuit's reach; eda5e178f2 made Maiev grippier, so b holds the dash 3 frames (variant run 39025469042).
 40 b stick -1 0
-42 b stick 0 0
+43 b stick 0 0
 # Counterplay: b's held shield takes Shadow Strike, so no mark.
 50 b shield 1
 60 a tap X 2
@@ -29,15 +29,17 @@
 #! expect a 60 special 13 form 0
 #! absent b 60-199 damage
 #! expect a 200 special 13 form 0
-#! expect b 229 damage 5.000
-#! expect b 289 damage 6.000 hitlag 0 hitstun 0
+# 1ed1f22499 (#414 step 3) set Shadow Strike to 3.816 and Pursuit to 7.633; the lighter hits shorten hitlag, so Pursuit ends a frame sooner.
+#! expect b 229 damage 3.816
+#! expect b 289 damage 4.816 hitlag 0 hitstun 0
 #! expect a 290 special 14 form 4
-#! expect b 307 damage 16.000
-#! expect a 334 special 0 form 4 action-frame 0 x 137.240
+#! expect b 307 damage 12.449
+#! expect a 333 special 0 form 4 action-frame 0 x 133.715
 #! expect a 440 special 14 form 0
-#! expect b 450 damage 26.000
+#! expect b 450 damage 20.082
 #! expect a 600 special 16 form 0
-#! expect b 608 damage 33.000
-#! expect b 668 damage 34.000 hitlag 0 hitstun 0
+# 6c432ce445 made Fan of Knives a frame-one shine for 6.106, so it hits on 600 and poisons from there.
+#! expect b 600 damage 26.188
+#! expect b 660 damage 27.188 hitlag 0 hitstun 0
 1000 a press VIEW
 1070 a release VIEW

@@ -1,8 +1,8 @@
 # Warden a against Warden b; syntax and checks: smashcraft:docs/native-bot-session.md.
 #! chat -dev quick hero warden
-# Both dash in, close.
+# Both dash in, close; eda5e178f2 made Maiev grippier, so b holds the dash 6 frames (variant run 39025469042).
 40 b stick -1 0
-42 b stick 0 0
+46 b stick 0 0
 50 a stick 1 0
 52 a stick 0 0
 100 a tap B 4
@@ -94,12 +94,12 @@
 #! expect a 106 applied jump 2 double 1
 #! expect a 110 applied attack 1 style 13
 # Startup and active cues of each special and the marked branch and Shadow Strike's missile.
-#! scene a CrippleTarget
+# 9efc3aa6f6 (#144) opens her specials with CurseTarget for CrippleTarget; e97e7930e9 marks Shadow Pursuit with ShadowStrike.mdx for PossessionTarget (trace: run 39009305845).
+#! scene a CurseTarget
 #! scene a ShadowStrike.mdx
 #! scene a PoisonStingTarget
 #! scene a ShadowStrikeMissile
 #! scene a GlaiveMissileTarget
-#! scene a PossessionTarget
 #! scene a FanOfKnivesCaster
 #! scene a BlinkCaster
 868 a capture

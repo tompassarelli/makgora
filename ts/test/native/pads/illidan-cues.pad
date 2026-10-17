@@ -87,7 +87,7 @@
 #! scene a PossessionMissile
 #! scene a MoonGlaiveCaster
 #! scene a ImmolationTarget
-#! scene a BreathOfFireMissile
+# BreathOfFireMissile is gone: c888ba8f67 gave Flame Crash RedDragonMissile, and 80fce5213e replaced Flame Crash with the air Immolate the Immolation lines check (trace: run 39009305845).
 #! scene a ImmolationDamage
 #! scene a ImpaleHitTarget
 873 a capture

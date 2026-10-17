@@ -63,7 +63,8 @@
 #! expect a 380 special 14 form 0
 #! expect a 450 special 16 form 0
 #! scene a TrollBeserkerTarget
-#! scene a HealingWaveTarget
+# 9d8f328ae0 draws Spirit Glaive's active cue as ShadowHunterMissile for HealingWaveTarget (trace: run 39009305845).
+#! scene a ShadowHunterMissile
 #! scene a StasisTotemTarget
 #! scene a SpiritLinkTarget
 #! scene a FeralSpiritDone

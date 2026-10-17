@@ -81,10 +81,11 @@
 # Cleaving Attack: the Charge on b's shield counts first; the 6 jab second; the 7 chop cleaves for 10.
 # Startup and active cues of each special, falling fire, and the cleave on b.
 #! scene a DeathCoilSpecialArt
-#! scene a FlameStrike1
+# 8b0dd9715b (#486) gave Pit Lord his own demon art: Rain of Fire draws RainOfFireTarget for FlameStrike1, Abyssal Leap DoomDeath for FlameStrikeEmbers, Ruin Charge hoof dust (ImpactDust) for 587a7bd402's BreathOfFireDamage swap (trace: run 39009305845).
+#! scene a RainOfFireTarget
 #! scene a DemolisherFireMissile
-#! scene a BreathOfFireDamage
-#! scene a FlameStrikeEmbers
+#! scene a ImpactDust
+#! scene a DoomDeath
 #! scene a HowlCaster
 868 a capture
 885 a capture
