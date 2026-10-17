@@ -1,10 +1,10 @@
 # #152 drills and multi-hit aerials: Warden's up air (3 kicks) and Falling Knives. Warden a against Warden b; syntax and checks: smashcraft:docs/native-bot-session.md.
 #! chat -dev quick hero warden
-# Both dash in, close.
+# Both dash in, close; eda5e178f2 made Maiev grippier, so both hold the dash 3 frames (variant run 39025737993).
 40 b stick -1 0
-42 b stick 0 0
+43 b stick 0 0
 50 a stick 1 0
-52 a stick 0 0
+53 a stick 0 0
 # Up air under b, which jumped first.
 94 b tap B 8
 100 a tap B 8
@@ -29,13 +29,15 @@
 #! expect a 213 applied attack 2 style 16
 #! expect b 117 damage 2.000
 #! expect b 122 damage 4.000
-#! expect b 127 damage 9.000
-#! expect b 219 damage 11.000
-#! expect b 223 damage 13.000
-#! expect b 227 damage 15.000
-#! expect b 231 damage 18.000
+# 1ed1f22499 (#414 step 3) set the third kick to 3.816 and the Falling Knives to 1.527 three times, then 2.290.
+#! expect b 127 damage 7.816
+#! expect b 219 damage 9.343
+#! expect b 223 damage 10.869
+#! expect b 227 damage 12.396
+#! expect b 231 damage 14.686
 #! scene a FanOfKnivesMissile
-#! scene a CleaveDamageTarget
+# 82f4b95547 (#82) draws slash sparks as the authored ImpactHit burst, since CleaveDamageTarget drew nothing standalone (trace: run 39009305845).
+#! scene a ImpactHit
 # View held a second, twice: the moments the parity check replays.
 500 a press VIEW
 570 a release VIEW
