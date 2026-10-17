@@ -27,12 +27,13 @@
 #! expect a 118 applied attack 1 style 12
 #! expect a 216 applied attack 2 style 16
 #! expect b 124 damage 3.000
-#! expect b 133 damage 8.730
-#! expect b 225 damage 10.730
-#! expect b 230 damage 12.730
-#! expect b 235 damage 14.730
-#! expect b 240 damage 16.730
-#! expect b 245 damage 18.730
+# 8cd9c77933 (#414 post-RC tune) set neutral air's closing hit to 4.647 (trace: run 39006853648).
+#! expect b 133 damage 7.647
+#! expect b 225 damage 9.647
+#! expect b 230 damage 11.647
+#! expect b 235 damage 13.647
+#! expect b 240 damage 15.647
+#! expect b 245 damage 17.647
 #! scene a SunderingBlades
 #! scene a CleaveDamageTarget
 # View held a second, twice: the moments the parity check replays.

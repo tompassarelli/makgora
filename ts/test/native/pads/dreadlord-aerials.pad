@@ -18,7 +18,8 @@
 #! expect a 120 applied attack 1 style 12
 #! expect b 126 damage 3.000
 #! expect b 132 damage 6.000
-#! expect b 139 damage 12.335
+# 1ed1f22499 (#414 step 3) set neutral air's closing hit to 7.894 (trace: run 39006853648).
+#! expect b 139 damage 13.894
 #! scene a CleaveDamageTarget
 # View held a second, twice: the moments the parity check replays.
 500 a press VIEW

@@ -21,7 +21,8 @@
 #! expect b 120 damage 2.000
 #! expect b 126 damage 4.000
 #! expect b 132 damage 6.000
-#! expect b 138 damage 10.000
+# 1ed1f22499 (#414 step 3) set the closing burst to 4.987 (trace: run 39006853648).
+#! expect b 138 damage 10.987
 #! scene a FrostNovaTarget
 #! scene a FrostDamage
 # View held a second, twice: the moments the parity check replays.

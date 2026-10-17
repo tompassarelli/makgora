@@ -18,10 +18,11 @@
 341 a stick 0 0
 351 a capture
 #! expect a 60 special 14 form 0
-# #249: the 0.80 multiplier applies to Righteous Fury (14) and Cleansing Sword (13).
-#! expect b 74 damage 11.200
+# #249: the 0.80 multiplier applies to Righteous Fury (14) and Cleansing Sword (13);
+# c5a0118651 (Oct 10 retune) set their bases to 17.109 and 15.887 (trace: run 39006853648).
+#! expect b 74 damage 13.687
 #! expect a 170 special 13 form 0
-#! expect b 183 damage 21.600
+#! expect b 183 damage 26.397
 #! expect a 270 special 16 form 0
 #! expect a 340 special 15 form 0
 #! scene a HolyBoltSpecialArt

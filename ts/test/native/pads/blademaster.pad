@@ -34,7 +34,8 @@
 #! expect a 200 special 16 form 0
 # #333 (cb83c0780) slows b's entry dash; #338 (8a9eb0218) pushes their
 # overlapping bodies apart before Mirror Image leaves its 132-unit step.
-#! expect a 223 special 0 form 0 action-frame 0 x -216.196
+# 7bc2877cdb's per-hero traction moves this stop: probe run 39008307513 with it neutralised keeps -216.196 (trace: run 39007977184).
+#! expect a 223 special 0 form 0 action-frame 0 x -196.636
 #! expect a 260 special 16 form 3
 #! expect b 267 damage 21.010
 #! expect a 650 special 16 form 3

@@ -20,7 +20,8 @@
 #! expect b 136 damage 4.000
 #! expect b 141 damage 6.000
 #! expect b 146 damage 8.000
-#! expect b 151 damage 12.000
+# 8cd9c77933 (#414 post-RC tune) set the closing glaive fling to 3.502 (trace: run 39006853648).
+#! expect b 151 damage 11.502
 #! scene a ShadowHunterMissile
 #! scene a CleaveDamageTarget
 # View held a second, twice: the moments the parity check replays.

@@ -49,10 +49,11 @@
 664 b stick 0 0
 699 a tap X 2
 # Expected, frame by frame (headless run of this script):
-# Death and Decay strikes b twice: 5% from its frame 30, 9% from its frame 70.
+# Death and Decay strikes b twice: 6.234% from its frame 30, 8% from its frame 70.
+# 1ed1f22499 (#414 step 3) set the first strike and Dark Ritual's burst to 6.234; b7e069cbae cut the second strike to 8 (trace: run 39006853648).
 #! expect a 70 special 14 form 0
-#! expect b 99 damage 5.000
-#! expect b 139 damage 14.000
+#! expect b 99 damage 6.234
+#! expect b 139 damage 14.234
 # Frost Armor takes the jab's reaction (damage, no hitstun) and chills b (checksums).
 #! expect a 195 special 16 form 0
 #! expect b 222 applied attack 1 style 0
@@ -60,10 +61,10 @@
 # Dark Ritual (down special's recall form) shatters the second shell: its burst strikes b; +30 mana (checksums).
 #! expect a 270 special 16 form 0
 #! expect a 320 special 16 form 3
-#! expect b 325 damage 19.000
+#! expect b 325 damage 20.468
 # The second Death and Decay strikes once; b has walked out before the second strike.
 #! expect a 370 special 14 form 0
-#! expect b 399 damage 24.000
+#! expect b 399 damage 26.702
 #! absent b 400-519 damage
 # Frost Nova into the shield: no hit.
 #! expect a 520 special 13 form 0
