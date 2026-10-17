@@ -108,7 +108,8 @@ test("native accept and pad runs execute as a user service on the private displa
     XDG_RUNTIME_DIR: "/run/user/1000/private-desktop.unit-test/runtime", DBUS_SESSION_BUS_ADDRESS: "unix:path=/tmp/dbus-private",
   };
   for (const [name, args] of [["accept", ["--only", "gate-moves", "--pair", "0"]], ["pad", ["test/native/pads/448/lich.pad", "--pair", "0"]]] as const) {
-    const command = nativeUnitCommand(name, args, "/bin", 7, 1000, process.execPath, env, () => ":9\n");
+    const command = nativeUnitCommand(name, args, "/bin", 7, 1000, "/home/tom/code/smashcraft/main/ts", process.execPath, env, () => ":9\n");
+    expect(command).toContain("--working-directory=/home/tom/code/smashcraft/main/ts");
     expect(command.slice(0, 3)).toEqual(["systemd-run", "--user", "--wait"]);
     expect(command).toContain(`--unit=smashcraft-${name}-7`);
     expect(command).toContain(`--setenv=${NATIVE_IN_UNIT}=1`);
