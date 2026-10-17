@@ -29,9 +29,10 @@ ensure(assetsArg && outputArg && characters.length > 0, 'usage: bun tools/animat
 const [assets, output] = [resolve(assetsArg), resolve(outputArg)];
 ensure(relative(resolve(import.meta.dir, '../..'), output).startsWith('..'), 'Victory clips stay private');
 
-function rotated(q: ArrayLike<number>, y: number, z = 0): Float32Array<ArrayBuffer> {
-    const a = y * Math.PI / 360, b = z * Math.PI / 360;
-    const [i, j, k, l] = [-Math.sin(a) * Math.sin(b), Math.sin(a) * Math.cos(b), Math.cos(a) * Math.sin(b), Math.cos(a) * Math.cos(b)];
+function rotated(q: ArrayLike<number>, y: number, z = 0, roll = 0): Float32Array<ArrayBuffer> {
+    const a = y * Math.PI / 360, b = z * Math.PI / 360, c = roll * Math.PI / 360;
+    const [yi, yj, yk, yl] = [-Math.sin(a) * Math.sin(b), Math.sin(a) * Math.cos(b), Math.cos(a) * Math.sin(b), Math.cos(a) * Math.cos(b)];
+    const [i, j, k, l] = [yl * Math.sin(c) + yi * Math.cos(c), yj * Math.cos(c) - yk * Math.sin(c), yk * Math.cos(c) + yj * Math.sin(c), yl * Math.cos(c) - yi * Math.sin(c)];
     const [x = 0, v = 0, w = 0, t = 1] = Array.from(q);
     const out = [l * x + i * t + j * w - k * v, l * v - i * w + j * t + k * x, l * w + i * v - j * x + k * t, l * t - i * x - j * v - k * w];
     const length = Math.hypot(...out);
@@ -82,9 +83,9 @@ for (const character of characters) {
         if (!joint.Rotation.Keys.some(key => key.Frame === time(0))) { for (const { frame } of CHEER) joint.Rotation.Keys.push({ Frame: time(frame), Vector: new Float32Array([0, 0, 0, 1]), ...(joint.Rotation.LineType >= mdx.LineType.Hermite ? { InTan: new Float32Array([0, 0, 0, 1]), OutTan: new Float32Array([0, 0, 0, 1]) } : {}) }); joint.Rotation.Keys.sort((a, b) => a.Frame - b.Frame); }
         rest.set(joint, joint.Rotation.Keys.find(key => key.Frame === time(0))!.Vector.slice() as Float32Array);
     }
-    const pose = (joint: mdx.Node, frame: number, y: number, z = 0) => {
+    const pose = (joint: mdx.Node, frame: number, y: number, z = 0, roll = 0) => {
         const key = joint.Rotation!.Keys.find(candidate => candidate.Frame === time(frame))!;
-        key.Vector = rotated(rest.get(joint)!, y, z);
+        key.Vector = rotated(rest.get(joint)!, y, z, roll);
         if (key.InTan) { key.InTan = key.Vector.slice(); key.OutTan = key.Vector.slice(); }
     };
 
@@ -130,16 +131,24 @@ for (const character of characters) {
         for (const [side, [shoulder, elbow, hand]] of arms.entries()) {
             if (beat.arms === 'rest') continue;
             const known = solved.get(`${beat.arms}${side}`);
-            const angles = known ?? [0, 0, 0, 0];
-            const apply = () => { pose(shoulder!, beat.frame, angles[0]!, angles[1]!); pose(elbow!, beat.frame, angles[2]!, angles[3]!); };
+            const angles = known ?? [0, 0, 0, 0, 0];
+            const apply = () => { pose(shoulder!, beat.frame, angles[0]!, angles[1]!, angles[4]!); pose(elbow!, beat.frame, angles[2]!, angles[3]!); };
             if (known === undefined) {
                 const target = targets[beat.arms](solved.has('rear') ? (evaluate(beat.frame), pivot(shoulder!)) : shoulders[side]!, side);
                 const loss = () => { apply(); evaluate(beat.frame); const at = pivot(hand!); return Math.hypot(at[0]! - target[0]!, at[1]! - target[1]!, at[2]! - target[2]!); };
-                for (let pass = 0; pass < 4; pass++) for (let dimension = 0; dimension < 4; dimension++) {
+                const descend = (dimensions: number) => { for (let pass = 0; pass < 4; pass++) for (let dimension = 0; dimension < dimensions; dimension++) {
                     let best = Infinity, choice = 0;
                     for (let value = -180; value <= 180; value += pass === 0 ? 20 : pass === 1 ? 5 : 2) { angles[dimension] = value; const distance = loss(); if (distance < best) { best = distance; choice = value; } }
                     angles[dimension] = choice;
+                } return loss(); };
+                let best = descend(4), kept = angles.slice();
+                for (const start of [[-90, 0, 0, 0, 0], [90, 0, 0, 0, 0], [180, 0, 0, 0, 0], [0, 90, 0, 0, 0], [0, -90, 0, 0, 0], [0, 0, 0, 0, 90], [0, 0, 0, 0, -90], [180, 0, 0, 0, 90], [-180, 0, 0, 0, -90]]) {
+                    if (best < reach[side]! * 0.25) break;
+                    angles.splice(0, 5, ...start);
+                    const attempt = descend(5);
+                    if (attempt < best) { best = attempt; kept = angles.slice(); }
                 }
+                angles.splice(0, 5, ...kept);
                 ensure(loss() < reach[side]! * 0.25, `${fighter.name}: ${beat.arms} hand ${side} misses its target by ${loss().toFixed(1)} of a ${reach[side]!.toFixed(1)} reach`);
                 solved.set(`${beat.arms}${side}`, angles);
             }

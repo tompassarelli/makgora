@@ -42,6 +42,8 @@ const retained = metadataOnly || keepUnchanged ? readClipRecords(output) : [];
 const moduleClips: string[][] = [], moduleNames: string[][] = [], moduleLights: (string | null)[] = [];
 const clipLiteral = (modelPath: string, interval: readonly number[], looping: boolean, timeline = false) =>
     `{ modelPath: ${JSON.stringify(modelPath)}, startSeconds: ${seconds(Number((interval[0] / 1000).toFixed(3)))}, endSeconds: ${seconds(Number((interval[1] / 1000).toFixed(3)))}, looping: ${looping}${timeline ? ", timeline: true" : ""} },`;
+const reusableBases: readonly ((model: mdx.Model) => mdx.Model | undefined)[] = [movementBaseModel, appendedStrikeBaseModel, attackGestureBaseModel, swordGestureBaseModel, locomotionBaseModel, pounceBaseModel, wardenFanBaseModel, pitLordSpecialBaseModel, jumpBaseModel, downAirBaseModel, grabBaseModel, drillBaseModel, damageBaseModel, recoveryBaseModel];
+const reusableBase = (model: mdx.Model) => { for (const derive of reusableBases) { try { const base = derive(model); if (base !== undefined) return base; } catch { continue; } } return undefined; };
 const records = [];
 let totalBytes = 0, theoreticalFullSourceBytes = 0;
 const started = performance.now();
@@ -66,7 +68,7 @@ for (const [character, fighter] of fighters) {
 
 
 
-    const base = !reuse && keepUnchanged && retainedThin && retainedRecord ? movementBaseModel(original) ?? appendedStrikeBaseModel(original) ?? attackGestureBaseModel(original) ?? swordGestureBaseModel(original) ?? locomotionBaseModel(original) ?? pounceBaseModel(original) ?? wardenFanBaseModel(original) ?? pitLordSpecialBaseModel(original) ?? jumpBaseModel(original) ?? downAirBaseModel(original) ?? grabBaseModel(original) ?? drillBaseModel(original) ?? damageBaseModel(original) ?? recoveryBaseModel(original) : undefined;
+    const base = !reuse && keepUnchanged && retainedThin && retainedRecord ? reusableBase(original) : undefined;
     const reusePrefix = base && hash(generateMDX(base)) === retainedRecord.sourceSha256 ? base.Sequences.length : 0;
     if (reusePrefix) console.log(`${fighter.name}: exact base SHA retained, exporting ${source.Sequences.length - reusePrefix} added clips`);
     const components = splitStaticLights(source);
