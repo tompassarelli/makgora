@@ -353,7 +353,7 @@ function crouch(): Authored {
     { frame: 24, gesture: CROUCH },
   ] };
 }
-const HANG: Gesture = { lean: -8, chest: 14, head: -70, arm: -174, elbow: -9, free: -138, freeElbow: 60,
+const HANG: Gesture = { lean: -8, chest: 14, head: -70, arm: -150, elbow: -9, free: -138, freeElbow: 60,
   frontHip: -41, frontKnee: 0, frontFoot: 4, backHip: 30, backKnee: 4, backFoot: 39, pelvis: -10 };
 function ledgeHang(): Authored {
   return { pose: "ledgeHang", frames: 60, ground: "ledge", looping: true, phases: [
