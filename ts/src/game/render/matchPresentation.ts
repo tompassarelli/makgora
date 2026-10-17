@@ -27,6 +27,8 @@ import { SoundBank, SoundKind } from "./soundBank";
 import { resultFighterPlacement } from "../presentation/arenaCamera";
 import type { FighterOriginalClip } from "../../generated/clips/fighterOriginalClip";
 import { originalClip, originalClipNamed } from "../../generated/clips/fighterOriginalClipInfo";
+import { clipFor } from "../presentation/fighterClips";
+import { resultPoseAt, type ResultClips } from "../presentation/resultPose";
 
 
 export const RESULTS_DELAY_FRAMES = 90;
@@ -58,10 +60,7 @@ interface VictoryPose {
   readonly character: Character;
   model: effect | undefined;
   modelPath: string | undefined;
-  readonly winnerClip: FighterOriginalClip;
-  readonly repeatVictory: boolean;
-  readonly heldClip: FighterOriginalClip;
-  readonly idleClip: FighterOriginalClip;
+  readonly clips: ResultClips;
 }
 
 export interface ResultsDisplay {
@@ -296,7 +295,8 @@ export class MatchPresentation {
       if (winnerClip === undefined || idleClip === undefined) continue;
       const readyIndex = originalClipNamed(character, "stand ready");
       const heldClip = readyIndex === undefined ? idleClip : originalClip(character, readyIndex) ?? idleClip;
-      this.poses[slot] = { character, model: undefined, modelPath: undefined, winnerClip, repeatVictory: victoryAnimation(character).includes("victory"), heldClip, idleClip };
+      const defeatedClip = originalClip(character, clipFor(character, "knockdown").index) ?? idleClip;
+      this.poses[slot] = { character, model: undefined, modelPath: undefined, clips: { winnerClip, repeatVictory: victoryAnimation(character).includes("victory"), heldClip, defeatedClip } };
     }
   }
 
@@ -306,10 +306,7 @@ export class MatchPresentation {
     for (const [index, row] of view.rows.entries()) {
       const pose = this.poses[row.slot];
       if (pose === undefined) continue;
-      const winning = row.winner;
-      let seconds = I2R(this.resultFrames) / 60.0;
-      const holding = winning && !pose.repeatVictory && seconds >= pose.winnerClip.endSeconds - pose.winnerClip.startSeconds;
-      const clip = winning ? holding ? pose.heldClip : pose.winnerClip : pose.idleClip;
+      const { clip, time } = resultPoseAt(pose.clips, row.winner, I2R(this.resultFrames) / 60.0);
       if (pose.model !== undefined && pose.modelPath !== clip.modelPath) {
         DestroyEffect(pose.model);
         pose.model = undefined;
@@ -328,10 +325,7 @@ export class MatchPresentation {
       BlzSetSpecialEffectPosition(model, this.origin.x + placement.x, this.origin.y, this.origin.z + placement.z);
       BlzSetSpecialEffectYaw(model, FACING_CAMERA);
       BlzSetSpecialEffectScale(model, characterModelScale(pose.character));
-      const duration = clip.endSeconds - clip.startSeconds;
-      if (holding || duration <= 0.0) seconds = 0.0;
-      else if (!winning || pose.repeatVictory) seconds -= I2R(R2I(seconds / duration)) * duration;
-      BlzSetSpecialEffectTime(model, (clip.timeline === true ? clip.startSeconds : 0.0) + seconds);
+      BlzSetSpecialEffectTime(model, time);
     }
   }
 
