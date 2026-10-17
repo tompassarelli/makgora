@@ -5,6 +5,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { type TrainingState, copyTrainingState, createTrainingState } from "../match/trainingState";
 import { trainingReadout } from "../session/messages";
 import { tutorialOn, tutorialText } from "../match/tutorial";
+import type { KeyBindings } from "../input/keyBindings";
 import { createBackdrop, createText, gameUi, placeTopLeft } from "./frames";
 import { MENU_FONT, PANEL_TEXTURE } from "./hudLayout";
 import { TRAINING_READOUT_BOX, TRAINING_READOUT_PANEL, TRAINING_READOUT_PANEL_ALPHA } from "./hudLayout";
@@ -41,7 +42,7 @@ export class TrainingReadout {
     BlzDestroyFrame(this.panel);
   }
 
-  update(visible: boolean, state: Readonly<TrainingState>): void {
+  update(visible: boolean, state: Readonly<TrainingState>, bindings: Readonly<KeyBindings>): void {
     if (!visible) {
       BlzFrameSetVisible(this.panel, false);
       return;
@@ -55,7 +56,7 @@ export class TrainingReadout {
       copyTrainingState(last, state);
       this.built = true;
 
-      const text = tutorialOn(state) ? tutorialText(state) : trainingReadout(state);
+      const text = tutorialOn(state) ? tutorialText(state, bindings) : trainingReadout(state);
       this.empty = text === "";
       BlzFrameSetText(this.label, text);
     }

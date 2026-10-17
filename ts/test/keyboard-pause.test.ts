@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { testHeadless } from "./headless";
+import { RIGHT_KEY, testHeadless } from "./headless";
 import { Phase, holdingStart } from "../src/game/lobby/lobbyState";
 import { install, start } from "../src/host/entries/playableMain";
 import { Key } from "../src/host/loop/keyEvents";
@@ -29,15 +29,15 @@ test("in a match Backspace pauses and resumes both clients, Y does not, and typi
   const x = () => read(() => fighterAt(shell().world, 0).motion.x);
   const walk = () => {
     const before = x();
-    clients.key(0, Key.r, 0, true);
+    clients.key(0, RIGHT_KEY, 0, true);
     clients.frames(20);
-    clients.key(0, Key.r, 0, false);
+    clients.key(0, RIGHT_KEY, 0, false);
     clients.frames(20);
     return x()[0] !== before[0];
   };
   clients.start();
   clients.frames(30);
-  for (const slot of [0, 1] as const) tap(slot, Key.r);
+  for (const slot of [0, 1] as const) tap(slot, RIGHT_KEY);
   tap(0, Key.y);
   until(() => read(() => shell().game.phase).every(phase => phase === Phase.stageMenu), 60);
   tap(0, Key.y);

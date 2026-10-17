@@ -6,7 +6,7 @@ import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
 import { RenderFailure } from "wisp/scripts/wisp/headlessRender";
 import { installHeadless } from "wisp/scripts/wisp/headless";
 import { Action } from "../../src/game/input/actions";
-import { keyFor, presetBindings } from "../../src/game/input/keyBindings";
+import { DEFAULT_PRESET, keyFor, presetBindings } from "../../src/game/input/keyBindings";
 import { Phase } from "../../src/game/lobby/lobbyState";
 import { Character } from "../../src/game/sim/codes";
 import { NATIVE_DRIVER_BUILD, PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
@@ -22,7 +22,7 @@ const ACTIONS: Readonly<Record<string, Action>> = {
   smashLeft: Action.smashLeft, smashRight: Action.smashRight,
   smashUp: Action.smashUp, smashDown: Action.smashDown,
 };
-const BINDINGS = presetBindings("standard");
+const BINDINGS = presetBindings(DEFAULT_PRESET);
 export const NEUTRAL_INPUT: StandaloneInput = { buttons: [], axisX: 0, axisY: 0 };
 
 export function heldKeys(input: StandaloneInput): Set<number> {
