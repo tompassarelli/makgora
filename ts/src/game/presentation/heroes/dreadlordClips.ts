@@ -29,6 +29,7 @@ export const DREADLORD_SEQUENCES = {
   walk: clip(5, "Walk", 1.0),
   spellSlam: clip(6, "Spell Slam", 2.0),
   death: clip(7, "Death", f32(2.333)),
+  kneel: clip(7, "Death", 0.25),
   dissipate: clip(8, "Dissipate", f32(3.333)),
   attack1: clip(9, "Attack - 1", f32(1.1)),
   attack2: clip(10, "Attack - 2", f32(1.1)),
@@ -47,7 +48,7 @@ export function dreadlordClipTable(kit: KitNormals): HeroClipTable {
     wallJump: s.rearUp, wallTech: s.spellSlam,
     spotDodge: s.standReady, rollForward: s.walk, rollBackward: s.walk,
     damageGround: s.standReady, damageAir: s.standReady, damageTumble: s.death, damageShield: s.standReady,
-    knockdown: s.death, downDamage: s.death, getUp: s.standReady, getUpAttack: s.attack2,
+    knockdown: s.kneel, downDamage: s.kneel, getUp: s.standReady, getUpAttack: s.attack2,
     ledgeHang: s.standReady, ledgeClimb: s.spellSlam, ledgeRoll: s.walk, ledgeAttack: s.attack2,
 
 

@@ -295,8 +295,9 @@ export class MatchPresentation {
       if (winnerClip === undefined || idleClip === undefined) continue;
       const readyIndex = originalClipNamed(character, "stand ready");
       const heldClip = readyIndex === undefined ? idleClip : originalClip(character, readyIndex) ?? idleClip;
-      const defeatedClip = originalClip(character, clipFor(character, "knockdown").index) ?? idleClip;
-      this.poses[slot] = { character, model: undefined, modelPath: undefined, clips: { winnerClip, repeatVictory: victoryAnimation(character).includes("victory"), heldClip, defeatedClip } };
+      const defeated = clipFor(character, "knockdown");
+      const defeatedClip = originalClip(character, defeated.index) ?? idleClip;
+      this.poses[slot] = { character, model: undefined, modelPath: undefined, clips: { winnerClip, repeatVictory: victoryAnimation(character).includes("victory"), heldClip, defeatedClip, defeatedSeconds: defeated.seconds } };
     }
   }
 

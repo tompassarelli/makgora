@@ -17,6 +17,8 @@ const SPELL = sequence(7, f32(1.5));
 
 const DEATH = sequence(8, f32(1.667));
 
+const COLLAPSE = sequence(8, 0.5);
+
 const DISSIPATE = sequence(9, 2);
 
 export function lichLook(kit: KitNormals): HeroLook {
@@ -36,7 +38,7 @@ export function lichLook(kit: KitNormals): HeroLook {
       forwardSmash: SPELL, upSmash: SPELL, downSmash: SPELL,
       neutralAir: CHANNEL, forwardAir: SPELL, upAir: SPELL, downAir: SPELL,
       ledgeHang: STAND_READY, ledgeClimb: WALK, ledgeRoll: WALK,
-      knockdown: DEATH, downDamage: DEATH, getUp: STAND_READY,
+      knockdown: COLLAPSE, downDamage: COLLAPSE, getUp: STAND_READY,
       rollForward: WALK, rollBackward: WALK, spotDodge: CHANNEL,
       jump: STAND_READY, doubleJump: CHANNEL, fallSpecial: CHANNEL,
 
