@@ -143,7 +143,7 @@ for (const character of characters) {
                     angles[dimension] = choice;
                 } return loss(); };
                 let best = descend(4), kept = angles.slice();
-                for (const start of [[-90, 0, 0, 0, 0], [90, 0, 0, 0, 0], [180, 0, 0, 0, 0], [0, 90, 0, 0, 0], [0, -90, 0, 0, 0], [0, 0, 0, 0, 90], [0, 0, 0, 0, -90], [180, 0, 0, 0, 90], [-180, 0, 0, 0, -90]]) {
+                for (const start of [[0, 0, 0, 0, 0], [-90, 0, 0, 0, 0], [90, 0, 0, 0, 0], [180, 0, 0, 0, 0], [0, 90, 0, 0, 0], [0, -90, 0, 0, 0], [0, 0, 0, 0, 90], [0, 0, 0, 0, -90], [180, 0, 0, 0, 90], [-180, 0, 0, 0, -90]]) {
                     if (best < reach[side]! * 0.25) break;
                     angles.splice(0, 5, ...start);
                     const attempt = descend(5);
