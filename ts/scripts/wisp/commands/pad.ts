@@ -24,6 +24,7 @@ import { parseArgs } from "node:util";
 import { BunServices } from "@effect/platform-bun";
 import { Effect, Fiber, Layer, Option, Schedule as EffectSchedule, Schema } from "effect";
 import { ChildProcess } from "effect/process";
+import type { Subprocess } from "bun";
 import { pollUntil } from "../../hostPoll";
 import { linePreloadFile, preloadLines } from "wisp/scripts/wisp/preloadRecord";
 import { at } from "wisp/src/runtime/lookup";
@@ -126,9 +127,25 @@ const until = (targetNs: number) => Effect.gen(function*() {
 });
 
 
-const matchEpochs = (logs: () => [string, string], startedNs: number, out: string) => pollUntil(tryIntegrity("wait for match start", out, () => {
-    const starts = logs().map(matchStart);
-    return starts.every((start) => start !== undefined && start.epochNs > startedNs) ? [starts[0]?.frameOneNs ?? 0, starts[1]?.frameOneNs ?? 0] as const : undefined;
+interface HelperProcesses {
+  readonly helpers: readonly Pick<Subprocess, "exitCode" | "signalCode">[];
+  readonly logs: () => [string, string];
+}
+
+const exitedHelper = (session: HelperProcesses) => {
+  const slot = session.helpers.findIndex((helper) => helper.exitCode !== null || helper.signalCode !== null);
+  if (slot < 0) return undefined;
+  const helper = at(session.helpers, slot);
+  return `helper ${slot} exited (${helper.exitCode ?? helper.signalCode}): ${session.logs()[slot]?.trimEnd().split("\n").at(-1) ?? ""}`;
+};
+
+const matchEpochs = (session: HelperProcesses, logs: () => [string, string], startedNs: number, out: string) => pollUntil(Effect.suspend(() => {
+    const exited = exitedHelper(session);
+    if (exited !== undefined) return Effect.fail(new IntegrityFailure({ operation: "wait for match start", path: out, cause: exited }));
+    return tryIntegrity("wait for match start", out, () => {
+      const starts = logs().map(matchStart);
+      return starts.every((start) => start !== undefined && start.epochNs > startedNs) ? [starts[0]?.frameOneNs ?? 0, starts[1]?.frameOneNs ?? 0] as const : undefined;
+    });
   }), { every: "20 millis", within: "60 seconds", orElse: () => Effect.fail(new IntegrityFailure({ operation: "wait for match start", path: out, cause: "a helper reported no match start within 60 s" })) });
 
 export class PadReplayFailure extends Schema.TaggedError<PadReplayFailure>()("PadReplayFailure", {
@@ -231,6 +248,7 @@ export const nativeSession = (out: string, helper: string, build: string, appIds
   yield* tryIntegrity("create session directory", out, () => mkdirSync(out, { recursive: true }));
   const data = [join(clients[0].documents, "CustomMapData"), join(clients[1].documents, "CustomMapData")] as const;
   const pads = [];
+  const helpers: Subprocess[] = [];
   for (const slot of SLOTS) {
     const client = clients[slot];
     const appId = appIds.get(client.name);
@@ -238,14 +256,14 @@ export const nativeSession = (out: string, helper: string, build: string, appIds
     const pid = yield* gameProcess(client, false);
     const device = yield* openPad([...PAD_BUTTONS, BTN_SELECT]);
     pads.push(device);
-    yield* startHelper([
+    helpers.push(yield* startHelper([
       helper, "--follow-matches", ...padScriptPreset(), "--build", build, "--slot", String(slot), "--device", device.device, "--out", at(data, slot),
       "--editbox-display", client.x11.DISPLAY ?? "", "--x11-window", client.window, "--pid", String(pid), "--private-wlr-app-id", appId, "--trace",
-    ], { ...Bun.env, ...client.x11, ...client.wayland }, join(out, `helper-${slot}.log`));
+    ], { ...Bun.env, ...client.x11, ...client.wayland }, join(out, `helper-${slot}.log`)));
   }
   const log = (slot: number) => readFileSync(join(out, `helper-${slot}.log`), "utf8");
   const logs = (): [string, string] => [log(SLOTS[0]), log(SLOTS[1])];
-  return { clients, data, pads, build, logs, startedMs };
+  return { clients, data, pads, helpers, build, logs, startedMs };
 });
 
 export type NativeSession = Effect.Success<ReturnType<typeof nativeSession>>;
@@ -332,7 +350,7 @@ export const nativeScript = (session: NativeSession, options: PadOptions) => Eff
     }
     yield* tryIntegrity("write setup receipts", out, () => writeFileSync(join(out, "setup.json"), json({ command: chat, clients: setup.value, confirmed_monotonic_ns: monotonicNs() })));
   }
-  const epochs = yield* matchEpochs(logs, startedNs, out);
+  const epochs = yield* matchEpochs(session, logs, startedNs, out);
   const matchIds = logs().map((text) => matchStart(text)?.epoch ?? 0);
   const captures: Record<string, unknown>[] = [];
   const captureFailures: { frame: number; message: string }[] = [];
@@ -460,14 +478,15 @@ export const headlessSession = (dir: string, helper: string, build: string, afte
   const data = [join(dir, "client-0", "CustomMapData"), join(dir, "client-1", "CustomMapData")] as const;
   const typed = new Map<number, TypedInput>();
   const pads: Pad[] = [];
+  const helpers: Subprocess[] = [];
   for (const slot of SLOTS) {
     const textPath = join(dir, `typed-${slot}.txt`);
     typed.set(slot, yield* Effect.acquireRelease(tryIntegrity("open typed text", textPath, () => typedFile(textPath)), (input) => Effect.sync(input.close)));
     const device = yield* openPad([...PAD_BUTTONS, BTN_SELECT]);
     pads.push(device);
-    yield* startHelper([
+    helpers.push(yield* startHelper([
       helper, "--follow-matches", ...padScriptPreset(), "--build", build, "--slot", String(slot), "--device", device.device, "--out", at(data, slot), "--text-out", textPath, "--trace",
-    ], Bun.env, join(dir, `helper-${slot}.log`));
+    ], Bun.env, join(dir, `helper-${slot}.log`)));
   }
   const worker = yield* scheduleThread;
 
@@ -492,7 +511,7 @@ export const headlessSession = (dir: string, helper: string, build: string, afte
     })),
   ));
   const log = (slot: number) => readFileSync(join(dir, `helper-${slot}.log`), "utf8");
-  return { dir, build, data, pads, worker, clients, state, startPressesMs, logs: (): [string, string] => [log(SLOTS[0]), log(SLOTS[1])] };
+  return { dir, build, data, pads, helpers, worker, clients, state, startPressesMs, logs: (): [string, string] => [log(SLOTS[0]), log(SLOTS[1])] };
 });
 
 export type HeadlessSession = Effect.Success<ReturnType<typeof headlessSession>>;
@@ -517,7 +536,7 @@ export const headlessScript = (session: HeadlessSession, options: PadOptions) =>
     yield* Effect.sleep("1 second");
     clients.chat(0, command);
   }
-  const epochs = yield* matchEpochs(logs, startedNs, out);
+  const epochs = yield* matchEpochs(session, logs, startedNs, out);
   yield* checkFirstEdge(steps, epochs, scriptPath);
   const edges: ScheduledEdge[] = steps.flatMap((item) => item.kind === "edge" ? item.edges.map((edge) => ({ slot: item.slot, frame: item.frame, edge, line: item.line, text: item.text })) : []);
   for (const edge of edges) if (edge.text.endsWith("press START")) session.startPressesMs.push(frameWriteNs(epochs[edge.slot], edge.frame) / 1e6);
