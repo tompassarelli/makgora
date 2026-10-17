@@ -20,16 +20,16 @@ import { type Fighter, createFighter, placedObject } from "./fighter";
 import { ROSTER_MANA } from "./mana";
 import { type Controls, copyControls, createRoster } from "./roster";
 import { controls } from "./testWorld";
-import { FIGHTER_ULTIMATES, ULTIMATE_REACH } from "./ultimates";
-import type { AuthoredSpecial } from "./specials/schema";
-import { firstThreat } from "./specials/engine";
+import { FIGHTER_ULTIMATES, KOBOLD_BURROW_FIRST, KOBOLD_BURROW_LAST, ULTIMATE_REACH } from "./ultimates";
+import { type AuthoredSpecial, Relocation } from "./specials/schema";
+import { airHoldEnd, firstThreat } from "./specials/engine";
 import { firstStateDifference } from "../replay/difference";
 import { stateChecksum } from "../replay/canonical";
 import { type ReplayState, copyReplayState, createReplaySnapshot } from "../replay/snapshot";
 import { isIntangible } from "./conditions";
 import { spawnProjectileMotion } from "./projectiles";
 import { clearSpecialOnStock } from "./transitions";
-import { mainDeckLeft, mainDeckRight, mainDeckZAt, SLOPE_TEST_STAGE, surfaceLeft, surfaceZAt } from "./stage";
+import { floorBelow, mainDeckLeft, mainDeckRight, mainDeckZAt, SLOPE_TEST_STAGE, surfaceLeft, surfaceZAt } from "./stage";
 
 /** How each ultimate is met in its recorded scenario (docs/design/ultimates.md). */
 type Defence = "shield" | "spotDodge" | "ground";
@@ -189,7 +189,6 @@ test("each fighter's ultimate is answered by its defence on startup and leaves t
 
 const GROUND_ONLY_ULTIMATES: readonly Character[] = [
   Character.blademaster, Character.beastmaster, Character.thrall, Character.peon, Character.murloc, Character.anubarak,
-  Character.chen, Character.tinker, Character.kobold,
 ];
 
 function airborneBout(scenario: Readonly<Scenario>, facing: number, height: number, gap = 900.0): Bout {
@@ -224,7 +223,7 @@ test("an airborne ultimate holds its caster in place through startup, then falls
     if (GROUND_ONLY_ULTIMATES.includes(scenario.character)) continue;
     const b = airborneBout(scenario, facing, 400.0);
     const move = ultimateOf(scenario.character);
-    const threat = firstThreat(move);
+    const threat = Math.min(airHoldEnd(move), ...(move.motion ?? []).filter((segment) => segment.relocate === Relocation.floorBelow).map((segment) => segment.first));
     b.step(ULTIMATE);
     const { x, z } = b.owner.motion;
     const label = `${name(scenario.character)} ${facing}`;
@@ -1001,4 +1000,99 @@ test("Tower Rush: a forward smash breaks a rising tower, which crumbles at once 
     assertTrue(broken.crumbleTick > 0 && broken.crumbleTick < 60);
     assertGreaterThan(broken.total, 0);
   }
+});
+
+function refusedOverVoid(character: Character, facing: number): boolean {
+  const b = airborneBout(scenarioOf(character), facing, 150.0);
+  b.owner.motion.x = f32(mainDeckRight(0) + 300.0);
+  b.step(ULTIMATE);
+  return b.owner.special.action !== SpecialAction.heroUltimate && b.owner.mana.points === ROSTER_MANA.max;
+}
+
+test("Storm, Earth and Fire cast in the air holds Chen through his last strike, so each spirit strikes where it was drawn at his height (#98) [k1 scenario]", () => {
+  const regions = ultimateOf(Character.chen).regions ?? [];
+  const failures: string[] = [];
+  for (const facing of [-1, 1]) for (const [index, gap] of [[0, 100.0], [1, 220.0], [2, -240.0]] as const) {
+    const region = regions[index];
+    if (region === undefined) throw new Error(`Chen has no strike ${index}`);
+    const b = airborneBout(scenarioOf(Character.chen), facing, 300.0, gap);
+    b.step(ULTIMATE);
+    const { x, z } = b.owner.motion;
+    let struck = -1;
+    let inPlace = false;
+    for (let tick = 0; tick < 90 && struck < 0 && b.owner.special.action === SpecialAction.heroUltimate; tick++) {
+      if (b.target.launch.hitstun <= 0 && b.target.launch.hitlag <= 0) {
+        b.target.motion.grounded = false;
+        b.target.motion.surface = undefined;
+        b.target.motion.z = z;
+        b.target.motion.vz = 0.0;
+      }
+      const before = b.target.status.damage;
+      b.step();
+      if (b.target.status.damage <= before) continue;
+      struck = b.owner.special.frame;
+      inPlace = b.owner.motion.x === x && b.owner.motion.z === z;
+    }
+    if (struck !== region.firstFrame + 1 || !inPlace) failures.push(`facing ${facing} gap ${gap}: struck f${struck} (strike f${region.firstFrame + 1}) in place ${inPlace}`);
+  }
+  assertEquals(failures.join("; "), "");
+});
+
+test("Robo-Goblin Overdrive cast in the air drops the robot to the floor beneath Tinker, where it walks to a grounded foe, and refuses over the void (#98) [k1 scenario]", () => {
+  const robot = ultimateOf(Character.tinker).projectiles?.[0];
+  if (robot === undefined) throw new Error("no robot");
+  const scenario = scenarioOf(Character.tinker);
+  const failures: string[] = [];
+  for (const facing of [-1, 1]) {
+    const b = airborneBout(scenario, facing, 150.0, scenario.x);
+    b.step(ULTIMATE);
+    const floor = f32(mainDeckZAt(0, b.owner.motion.x) + robot.offsetZ);
+    let walked: number | undefined;
+    for (let tick = 0; tick < 120 && b.target.status.damage === 0.0; tick++) {
+      b.step();
+      const shot = b.owner.projectiles.find((projectile) => projectile.life > 0 && projectile.spec === robot);
+      if (walked === undefined && shot !== undefined) walked = shot.z;
+    }
+    if (walked !== floor || !(b.target.status.damage > 0.0)) failures.push(`facing ${facing}: robot at z ${walked} (floor ${floor}), foe ${b.target.status.damage}%`);
+    const ledge = airborneBout(scenario, facing, 150.0);
+    ledge.owner.motion.x = f32(facing * (mainDeckRight(0) - 20.0));
+    ledge.step(ULTIMATE);
+    const deck = f32(mainDeckZAt(0, ledge.owner.motion.x) + robot.offsetZ);
+    let pastLedge: number | undefined;
+    for (let tick = 0; tick < 30 && pastLedge === undefined; tick++) {
+      ledge.step();
+      pastLedge = ledge.owner.projectiles.find((projectile) => projectile.life > 0 && projectile.spec === robot)?.z;
+    }
+    if (pastLedge !== deck) failures.push(`facing ${facing}: robot past the ledge at z ${pastLedge} (deck ${deck})`);
+    if (!refusedOverVoid(Character.tinker, facing)) failures.push(`facing ${facing}: started over the void`);
+  }
+  assertEquals(failures.join("; "), "");
+});
+
+test("You No Take Candle! cast in the air dives into the floor beneath the Kobold and burrows along it to erupt under a grounded foe, and refuses over the void (#98) [k1 scenario]", () => {
+  const dust = ultimateOf(Character.kobold).projectiles?.[0];
+  if (dust === undefined) throw new Error("no dust");
+  const scenario = scenarioOf(Character.kobold);
+  const failures: string[] = [];
+  for (const stage of [0, SLOPE_TEST_STAGE]) for (const facing of [-1, 1]) {
+    const b = airborneBout(scenario, facing, 150.0, scenario.x);
+    b.game.stageChoice = stage;
+    b.owner.motion.z = f32(mainDeckZAt(stage, b.owner.motion.x) + 150.0);
+    b.target.motion.z = mainDeckZAt(stage, b.target.motion.x);
+    b.step(ULTIMATE);
+    const floor = floorBelow(stage, 0, b.owner.motion.x, b.owner.motion.z);
+    let dustZ: number | undefined;
+    let buried = true;
+    for (let tick = 0; tick < 120 && b.owner.special.action === SpecialAction.heroUltimate; tick++) {
+      b.step();
+      const { motion, special } = b.owner;
+      const mark = b.owner.projectiles.find((projectile) => projectile.life > 0 && projectile.spec === dust);
+      if (dustZ === undefined && mark !== undefined) dustZ = mark.z;
+      const onFloor = motion.grounded && motion.surface !== undefined && motion.z === surfaceZAt(stage, motion.surface, 0, motion.x);
+      if (special.frame >= KOBOLD_BURROW_FIRST && special.frame <= KOBOLD_BURROW_LAST && (!onFloor || b.owner.landing.lag > 0)) buried = false;
+    }
+    if (dustZ !== floor || !buried || !(b.target.status.damage > 0.0)) failures.push(`stage ${stage} facing ${facing}: dust at z ${dustZ} (floor ${floor}), buried ${buried}, foe ${b.target.status.damage}%`);
+    if (stage === 0 && !refusedOverVoid(Character.kobold, facing)) failures.push(`facing ${facing}: started over the void`);
+  }
+  assertEquals(failures.join("; "), "");
 });

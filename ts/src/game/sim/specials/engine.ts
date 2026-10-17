@@ -13,7 +13,7 @@ import { specialVariant } from "../heroes/koboldCandle";
 import { mutableProjectile } from "../fighterProjectiles";
 import { canAttack, inGrabContext, isIntangible } from "../conditions";
 import { type Fighter, type Projectile, placedObject } from "../fighter";
-import { type FighterSpecials, type AuthoredSpecial, CompanionMode, CompanionOrder, type SpecialFollowUp, type SpecialGuard, type SpecialKit, type SpecialBeam, type SpecialPlacement, type SpecialProjectile, FOLLOW_UP_FORM, FollowUpInput, Relocation, SpecialForm, SpecialSlot, specialForm, specialKit, ultimateForm } from "./schema";
+import { type FighterSpecials, type AuthoredSpecial, CompanionMode, CompanionOrder, type SpecialFollowUp, type SpecialGuard, type SpecialKit, type SpecialBeam, type SpecialMotion, type SpecialPlacement, type SpecialProjectile, FOLLOW_UP_FORM, FollowUpInput, Relocation, SpecialForm, SpecialSlot, specialForm, specialKit, ultimateForm } from "./schema";
 import { type HitRegion, NO_HIT_REGION, authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../hitRegions";
 import { type Controls, type Roster, fighterAt, isActive } from "../roster";
 import { travelBeforeBodies } from "../travelStop";
@@ -24,7 +24,8 @@ import { shieldCenterX, shieldCenterZ } from "../shieldTilt";
 import { type Capsule, attackCapsule, emptyCapsule, placeCapsule, segmentBoxesOverlap } from "../geometry/contactGeometry";
 import { HurtContact, strikeHurtContact } from "../hurtboxes";
 import { PARTICIPANT_CAPACITY } from "../../input/participants";
-import { floorBelow, mainDeckLeft, mainDeckRight, mainDeckZAt, solidSurfaceAt, solidSurfaceCount } from "../stage";
+import { floorBelow, floorSurfaceBelow, mainDeckLeft, mainDeckRight, mainDeckZAt, solidSurfaceAt, solidSurfaceCount, surfaceZAt } from "../stage";
+import { clearMotionValue, setWorldMotionValue } from "../motion";
 import { currentTraits } from "../identityTraits";
 import { squareRoot } from "../warcraftMath";
 
@@ -292,7 +293,8 @@ function nearestFoe(world: Roster | undefined, owner: Readonly<Fighter>): Fighte
 
 function markBaseZ(owner: Readonly<Fighter>, spec: Readonly<SpecialProjectile>, stage: number, matchFrame: number, x: number): number {
   if (spec.dropsToFloor !== true || owner.motion.grounded) return owner.motion.z;
-  return floorBelow(stage, matchFrame, x, owner.motion.z) ?? owner.motion.z;
+  const pastLedge = runningHeroSpecial(owner)?.needsFloorBelow === true ? floorBelow(stage, matchFrame, owner.motion.x, owner.motion.z) : undefined;
+  return floorBelow(stage, matchFrame, x, owner.motion.z) ?? pastLedge ?? owner.motion.z;
 }
 
 function spawnHeroProjectile(owner: Fighter, spec: Readonly<SpecialProjectile>, serial: number, stage: number, matchFrame: number, world?: Roster): void {
@@ -647,9 +649,13 @@ export function firstThreat(move: Readonly<AuthoredSpecial>): number {
   return first;
 }
 
+export function airHoldEnd(move: Readonly<AuthoredSpecial>): number {
+  return move.airHoldFrames ?? firstThreat(move);
+}
+
 function ultimateHovers(f: Readonly<Fighter>): boolean {
   const move = f.special.action === SpecialAction.heroUltimate && f.special.form < FOLLOW_UP_FORM ? f.tuning.ultimate : undefined;
-  return move !== undefined && move.groundOnly !== true && !f.motion.grounded && f.special.frame < firstThreat(move);
+  return move !== undefined && move.groundOnly !== true && !f.motion.grounded && f.special.frame < airHoldEnd(move);
 }
 
 export function holdHoveringUltimate(f: Fighter): void {
@@ -960,34 +966,56 @@ const BEHIND_MARK = 60.0;
 
 
 
-export function relocateHeroSpecial(world: Roster, slot: number): void {
+function settleOnFloorBelow(f: Fighter, stage: number, matchFrame: number): void {
+  const { motion } = f;
+  const floor = motion.grounded ? undefined : floorSurfaceBelow(stage, matchFrame, motion.x, motion.z);
+  if (floor === undefined) return;
+  motion.grounded = true;
+  motion.surface = floor;
+  motion.z = surfaceZAt(stage, floor, matchFrame, motion.x);
+  motion.vz = 0.0;
+  motion.fastFalling = false;
+  setWorldMotionValue(motion.meleeZ, motion.z);
+  clearMotionValue(motion.meleeVelocityZ);
+}
+
+function moveToRelocation(world: Roster, f: Fighter, segment: Readonly<SpecialMotion>): boolean {
+  if (segment.relocateProjectile !== undefined) {
+    const anchor = projectileAnchor(f, segment.relocateProjectile);
+    if (anchor === undefined) return false;
+    f.motion.x = anchor.x;
+    f.motion.z = anchor.z;
+  } else if (segment.relocate === Relocation.placed) {
+    const { placed } = f;
+    if (placed.life <= 0) return false;
+    f.motion.x = placed.x;
+    f.motion.z = placed.z;
+    f.facing = placed.direction;
+    placed.life = 0;
+  } else {
+
+    const target = markedTarget(world, f, segment.relocateReach ?? 0.0);
+    if (target === undefined) return false;
+    const back = target.facing < 0 ? 1 : -1;
+    f.motion.x = f32(target.motion.x + f32(back * BEHIND_MARK));
+    f.motion.z = target.motion.z;
+    f.facing = -back;
+    target.status.poisonFrames = 0;
+  }
+  return true;
+}
+
+export function relocateHeroSpecial(world: Roster, slot: number, stage: number, matchFrame: number): void {
   const f = fighterAt(world, slot);
   const move = runningHeroSpecial(f);
   if (move?.motion === undefined) return;
   for (const segment of move.motion) {
     if ((segment.relocate === undefined && segment.relocateProjectile === undefined) || f.special.frame !== segment.first) continue;
-    if (segment.relocateProjectile !== undefined) {
-      const anchor = projectileAnchor(f, segment.relocateProjectile);
-      if (anchor === undefined) return;
-      f.motion.x = anchor.x;
-      f.motion.z = anchor.z;
-    } else if (segment.relocate === Relocation.placed) {
-      const { placed } = f;
-      if (placed.life <= 0) return;
-      f.motion.x = placed.x;
-      f.motion.z = placed.z;
-      f.facing = placed.direction;
-      placed.life = 0;
-    } else {
-
-      const target = markedTarget(world, f, segment.relocateReach ?? 0.0);
-      if (target === undefined) return;
-      const back = target.facing < 0 ? 1 : -1;
-      f.motion.x = f32(target.motion.x + f32(back * BEHIND_MARK));
-      f.motion.z = target.motion.z;
-      f.facing = -back;
-      target.status.poisonFrames = 0;
+    if (segment.relocate === Relocation.floorBelow) {
+      settleOnFloorBelow(f, stage, matchFrame);
+      return;
     }
+    if (!moveToRelocation(world, f, segment)) return;
     f.motion.vx = 0.0;
     f.motion.vz = 0.0;
     f.motion.grounded = false;

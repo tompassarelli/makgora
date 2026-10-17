@@ -2,7 +2,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { Character, HeroStatusGroup, HeroStatusKind, HitElement, ItemKind } from "./codes";
 import { CHILL } from "./chill";
 import { heroRegion, type MoveRegion, type StrikeCapsule } from "./heroMoves";
-import { FollowUpInput, frames, type AuthoredSpecial, type SpecialProjectile } from "./specials/schema";
+import { FollowUpInput, Relocation, frames, type AuthoredSpecial, type SpecialProjectile } from "./specials/schema";
 import type { AppliedStatus } from "./heroStatus";
 import type { HitEffect } from "./hitRegions";
 import { type HurtPart, type HurtPose, hurtPart, hurtPose } from "./hurtboxes";
@@ -259,7 +259,7 @@ const CAIRNE: AuthoredSpecial = {
 
 const SPIRIT = "units\\creeps\\PandarenBrewmaster\\PandarenBrewmaster.mdl";
 const CHEN: AuthoredSpecial = {
-  name: "Storm, Earth and Fire", endFrame: 64, groundOnly: true,
+  name: "Storm, Earth and Fire", endFrame: 64, airHoldFrames: 50,
   projectiles: [
     mark(SPIRIT, 2, 22, 40.0),
     mark(SPIRIT, 10, 26, 220.0),
@@ -293,8 +293,8 @@ const PEON: AuthoredSpecial = {
 
 const OVERDRIVE_BLAST = shot(0, 0.0, 30.0, 0.0, 0.0, 4, 150.0, hit(18.0, 55, 90.0, 45.0, HitElement.fire), "Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx");
 const TINKER: AuthoredSpecial = {
-  name: "Robo-Goblin Overdrive", endFrame: 50, groundOnly: true,
-  projectiles: [{ ...shot(20, 60.0, 30.0, 6.0, 0.0, 60, 40.0, hit(3.0, 30, 20.0, 30.0), "Units\\Creeps\\HeroTinkerRobot\\HeroTinkerRobot.mdl"), expiresInto: OVERDRIVE_BLAST }],
+  name: "Robo-Goblin Overdrive", endFrame: 50, needsFloorBelow: true,
+  projectiles: [{ ...shot(20, 60.0, 30.0, 6.0, 0.0, 60, 40.0, hit(3.0, 30, 20.0, 30.0), "Units\\Creeps\\HeroTinkerRobot\\HeroTinkerRobot.mdl"), expiresInto: OVERDRIVE_BLAST, ...ON_FLOOR }],
 };
 
 const GRAVITY_RING = "Abilities\\Spells\\Human\\MassTeleport\\MassTeleportTarget.mdx";
@@ -376,10 +376,10 @@ export const KOBOLD_BURROW_FIRST = 15;
 export const KOBOLD_BURROW_LAST = 54;
 
 const KOBOLD: AuthoredSpecial = {
-  name: "You No Take Candle!", endFrame: 85, groundOnly: true,
+  name: "You No Take Candle!", endFrame: 85, needsFloorBelow: true,
   intangible: frames(8, 54),
-  projectiles: [mark("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", 8, 12, 0.0)],
-  motion: [{ ...frames(KOBOLD_BURROW_FIRST, KOBOLD_BURROW_LAST), velocityX: 10.0, velocityZ: 0.0, driftSpeed: 6.0, stopsAtBody: true }, { ...frames(55, 58), velocityX: 0.0, velocityZ: 12.0 }],
+  projectiles: [{ ...mark("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", 8, 12, 0.0), ...ON_FLOOR }],
+  motion: [{ ...frames(KOBOLD_BURROW_FIRST, KOBOLD_BURROW_LAST), velocityX: 10.0, velocityZ: 0.0, driftSpeed: 6.0, stopsAtBody: true, relocate: Relocation.floorBelow }, { ...frames(55, 58), velocityX: 0.0, velocityZ: 12.0 }],
   regions: [heroRegion(55, 58, capsule(20.0, 0.0, 20.0, 120.0, 50.0), hit(16.0, 85, 85.0, 45.0))],
 };
 

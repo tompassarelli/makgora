@@ -394,14 +394,22 @@ export function surfaceLine(stage: number, index: number): GroundLine | undefine
 }
 
 
-export function floorBelow(stage: number, frame: number, x: number, z: number): number | undefined {
-  let floor: number | undefined;
+export function floorSurfaceBelow(stage: number, frame: number, x: number, z: number): number | undefined {
+  let found: number | undefined;
+  let floor = 0.0;
   for (let index = 0; index < surfaceCount(stage); index++) {
     if (x < surfaceLeft(stage, index, frame) || x > surfaceRight(stage, index, frame)) continue;
     const top = surfaceZAt(stage, index, frame, x);
-    if (top <= z && (floor === undefined || top > floor)) floor = top;
+    if (top > z || (found !== undefined && top <= floor)) continue;
+    found = index;
+    floor = top;
   }
-  return floor;
+  return found;
+}
+
+export function floorBelow(stage: number, frame: number, x: number, z: number): number | undefined {
+  const index = floorSurfaceBelow(stage, frame, x, z);
+  return index === undefined ? undefined : surfaceZAt(stage, index, frame, x);
 }
 
 

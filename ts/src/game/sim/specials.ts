@@ -24,7 +24,7 @@ import { observeActionDecision } from "./observations";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { spawnBlasterShot, spawnProjectileMotion } from "./projectiles";
 import { type Controls, type Roster, copyControls, fighterAt, isActive, neutralControls } from "./roster";
-import { surfaceZAt } from "./stage";
+import { floorBelow, surfaceZAt } from "./stage";
 import { advanceCompanion } from "./companions";
 import { RIFLEMAN_BEAR_LIFETIME, advanceBear, recordSpecialHit, specialAlreadyHit, canStartFreezeTrap, startFreezeTrap } from "./summons";
 import { at } from "wisp/src/runtime/lookup";
@@ -516,10 +516,10 @@ function replaceableForUltimate(owner: Readonly<Fighter>): boolean {
 }
 
 /** Starts the ultimate at a full bar; anything else leaves the press to the ordinary special. */
-export function startUltimate(owner: Fighter, input: Readonly<Controls>): boolean {
+export function startUltimate(owner: Fighter, input: Readonly<Controls>, stage: number, matchFrame: number): boolean {
   const ultimate = owner.tuning.ultimate;
   if (!input.ultimatePressed || ultimate === undefined || owner.mana.points < ROSTER_MANA.max) return false;
-  if (ultimate.groundOnly === true && !owner.motion.grounded) return false;
+  if (!owner.motion.grounded && (ultimate.groundOnly === true || (ultimate.needsFloorBelow === true && floorBelow(stage, matchFrame, owner.motion.x, owner.motion.z) === undefined))) return false;
   if (!replaceableForUltimate(owner)) return false;
   const { special } = owner;
   if (special.action !== SpecialAction.none) {
@@ -544,7 +544,7 @@ export function startUltimate(owner: Fighter, input: Readonly<Controls>): boolea
 
 export function startFighterSpecial(owner: Fighter, stage: number, matchFrame: number, input: Readonly<Controls>, world?: Roster): boolean {
   steerHeroSpecial(owner, input);
-  if (startUltimate(owner, input)) return true;
+  if (startUltimate(owner, input, stage, matchFrame)) return true;
   if (owner.special.action === SpecialAction.heroUltimate) return false;
   if (owner.tuning.specials !== undefined && isHeroSpecialAction(owner.special.action)) return followUpHeroSpecial(owner, input);
   if (!input.specialPressed) return false;
@@ -776,7 +776,7 @@ export function advanceSpecials(world: Roster, stage: number, matchFrame: number
   for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
     if (!isActive(world, slot)) continue;
     advanceSpecialAction(fighterAt(world, slot), stage, matchFrame, inputs?.[slot], world);
-    relocateHeroSpecial(world, slot);
+    relocateHeroSpecial(world, slot, stage, matchFrame);
     stopFelRushAtShields(world, slot);
     stopHeroMotionAtBodies(world, slot);
     advanceHeroCommandGrab(world, slot);

@@ -25,7 +25,7 @@ import {
   FEL_RUSH_BRANCH_FIRST, FEL_RUSH_BRANCH_LAST, FEL_RUSH_SPEED, FEL_RUSH_FIRST, FEL_RUSH_LAST, DEMONHUNTER_GLIDE_FIRST, DEMONHUNTER_GLIDE_FORM, DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP, DEMONHUNTER_WING_DURATION,
   RIFLEMAN_RECOVERY_STARTUP_FRAMES, RIFLEMAN_SECOND_SHOT_FIRST, RIFLEMAN_SECOND_SHOT_FORM, RIFLEMAN_SECOND_SHOT_LAST,
 } from "../sim/specials";
-import { mainDeckLeft, mainDeckRight, mainDeckZ } from "../sim/stage";
+import { floorBelow, mainDeckLeft, mainDeckRight, mainDeckZ } from "../sim/stage";
 import { safeAt, steerOnGround } from "./botFooting";
 import { HeroSpecialUse, heroSpecialUse, startableForm, strikeMeets } from "./botHeroKit";
 import { aheadX, moveReachAhead } from "./botMoves";
@@ -326,15 +326,23 @@ function orbTowardTarget(f: Readonly<Fighter>, target: Readonly<Fighter>) {
 
 
 
-export function pressUltimate(f: Readonly<Fighter>, target: Readonly<Fighter>, stage: number, skill: CpuSkill, frame: number, input: Controls): boolean {
+function ultimateBaseZ(f: Readonly<Fighter>, move: Readonly<AuthoredSpecial>, stage: number, stageFrame: number): number | undefined {
+  if (f.motion.grounded) return f.motion.z;
+  if (move.groundOnly === true || f.motion.x < mainDeckLeft(stage) || f.motion.x > mainDeckRight(stage)) return undefined;
+  if (move.needsFloorBelow !== true) return f.motion.z;
+  return floorBelow(stage, stageFrame, f.motion.x, f.motion.z);
+}
+
+export function pressUltimate(f: Readonly<Fighter>, target: Readonly<Fighter>, stage: number, stageFrame: number, skill: CpuSkill, frame: number, input: Controls): boolean {
   const reach = ULTIMATE_REACH[f.character];
   const move = f.tuning.ultimate;
   if (reach === undefined || move === undefined || reach.far <= 0.0 || skill.tier === "rookie" || skill.kitTenths <= 0) return false;
   if (f.mana.points < ROSTER_MANA.max || !canAttack(f) || f.special.action !== SpecialAction.none || f.launch.hitstun > 0) return false;
-  if (!f.motion.grounded && (move.groundOnly === true || f.motion.x < mainDeckLeft(stage) || f.motion.x > mainDeckRight(stage))) return false;
+  const base = ultimateBaseZ(f, move, stage, stageFrame);
+  if (base === undefined) return false;
   const dx = f32(target.motion.x - f.motion.x);
   const gap = Math.abs(dx);
-  const rise = f32(target.motion.z - f.motion.z);
+  const rise = f32(target.motion.z - base);
   const aloft = f.character === Character.lich ? !target.motion.grounded && rise >= 90.0 && rise <= 220.0 : Math.abs(rise) <= 80.0;
   if (gap < reach.near || gap > reach.far || !aloft || target.shield.raised || target.status.out) return false;
   if (!takes(skill, floorDiv(frame, 20), f.character * 7 + 40)) return false;

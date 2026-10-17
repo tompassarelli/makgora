@@ -27,7 +27,7 @@ export const FollowUpInput = { special: 0, attack: 1, shield: 2, contact: 3 } as
 export type FollowUpInput = (typeof FollowUpInput)[keyof typeof FollowUpInput];
 
 
-export const Relocation = { placed: 1, behindMark: 2 } as const;
+export const Relocation = { placed: 1, behindMark: 2, floorBelow: 3 } as const;
 export type Relocation = (typeof Relocation)[keyof typeof Relocation];
 
 
@@ -328,6 +328,10 @@ export interface AuthoredSpecial {
   readonly confirmOnly?: boolean | undefined;
 
   readonly groundOnly?: boolean | undefined;
+
+  readonly needsFloorBelow?: true | undefined;
+
+  readonly airHoldFrames?: number | undefined;
 
   readonly oncePerAirtime?: boolean | undefined;
 
