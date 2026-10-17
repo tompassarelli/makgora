@@ -1,5 +1,4 @@
 import { Action } from "./actions";
-import type { KeySlot } from "./keyBindings";
 
 // Control names are padbridge's serde snake_case names for SDL positions with Xbox labels.
 export type PadControl =
@@ -21,7 +20,6 @@ export const PAUSE_KEY = "Y".charCodeAt(0);
 export interface PadBinding {
   readonly control: PadControl;
   readonly action: Action | typeof PAUSE;
-  readonly slot: KeySlot;
   readonly label: string;
   readonly when?: { readonly setting: PadSetting; readonly value: string };
 }
@@ -32,13 +30,13 @@ export interface PadLayout {
   readonly bindings: readonly PadBinding[];
 }
 
-const bind = (control: PadControl, action: PadBinding["action"], label: string, slot: KeySlot = 0): PadBinding => ({ control, action, slot, label });
+const bind = (control: PadControl, action: PadBinding["action"], label: string): PadBinding => ({ control, action, label });
 const when = (setting: PadSetting, value: string, binding: PadBinding): PadBinding => ({ ...binding, when: { setting, value } });
 
 const shields: readonly PadBinding[] = [
   when("leftShield", "full", bind("lt", Action.leftTrigger, "Shield")),
   when("leftShield", "light", bind("lt", Action.lightShield, "Light shield")),
-  when("rightShield", "full", bind("rt", Action.rightTrigger, "Right shield", 1)),
+  when("rightShield", "full", bind("rt", Action.rightTrigger, "Right shield")),
   when("rightShield", "light", bind("rt", Action.lightShield, "Light shield")),
 ];
 
@@ -66,7 +64,7 @@ export const PAD_LAYOUTS: readonly PadLayout[] = [
     label: "Melee",
     bindings: [
       bind("a", Action.attack, "Attack"), bind("b", Action.special, "Special"), bind("x", Action.jump, "Jump"), bind("y", Action.jump, "Jump"),
-      bind("rb", Action.grab, "Grab"), bind("lb", Action.exSpecial, "EX special", 1), ...shared,
+      bind("rb", Action.grab, "Grab"), bind("lb", Action.exSpecial, "EX special"), ...shared,
     ],
   },
   {
@@ -74,7 +72,7 @@ export const PAD_LAYOUTS: readonly PadLayout[] = [
     label: "Z jump",
     bindings: [
       bind("a", Action.attack, "Attack"), bind("b", Action.special, "Special"), bind("x", Action.grab, "Grab"), bind("y", Action.jump, "Jump"),
-      bind("rb", Action.jump, "Jump"), bind("lb", Action.exSpecial, "EX special", 1), ...shared,
+      bind("rb", Action.jump, "Jump"), bind("lb", Action.exSpecial, "EX special"), ...shared,
     ],
   },
   {
@@ -82,7 +80,7 @@ export const PAD_LAYOUTS: readonly PadLayout[] = [
     label: "Tom",
     bindings: [
       bind("a", Action.attack, "Attack"), bind("b", Action.grab, "Grab"), bind("x", Action.special, "Special"), bind("y", Action.jump, "Jump"),
-      bind("lb", Action.shortHop, "Short hop"), bind("rb", Action.exSpecial, "EX special", 1), ...shared,
+      bind("lb", Action.shortHop, "Short hop"), bind("rb", Action.exSpecial, "EX special"), ...shared,
     ],
   },
 ];

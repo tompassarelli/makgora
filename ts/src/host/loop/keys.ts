@@ -4,7 +4,7 @@ import { traceSetup } from "../../game/session/traceSettings";
 import { startNativeSoak } from "../../platform/nativeSoak";
 import { NATIVE_PREFLIGHT_KEY, inputPreflightLine } from "../../game/input/nativePreflight";
 import { INPUT_PREFLIGHT_FILE } from "../../game/core/gameFiles";
-import { cameraKey, returnPauseMenu, PAUSE_CAMERA_KEYS, pauseCameraKey } from "./pauseCamera";
+import { cameraKey, returnPauseMenu, pauseCameraKey, pauseHeldKeys } from "./pauseCamera";
 import { HIT_PRESENTATION_CASES } from "../../game/session/hitPresentationCases";
 import { createImpactEvents } from "../../game/presentation/impactEvents";
 import { emitImpacts } from "../../game/presentation/impactState";
@@ -12,7 +12,7 @@ import { emitImpacts } from "../../game/presentation/impactState";
 
 import { Action } from "../../game/input/actions";
 import { sampleKeys } from "../../game/input/keyboardCapture";
-import { menuAction, pauseMenuKeys } from "../../game/input/keyBindings";
+import { menuAction } from "../../game/input/keyBindings";
 import { isCarrierKey } from "../../game/netcode/journal/keyboard";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, isParticipantSlot } from "../../game/input/participants";
 import { heldActions, keyDown, pressKey, releaseKey } from "../../game/input/playerKeys";
@@ -74,7 +74,7 @@ export function startDown(s: ShellState, slot: ParticipantSlot): void {
   const playing = s.game.phase === Phase.match;
   if (epoch?.journal.editbox !== undefined && chatBusy(epoch.journal)) return;
   if (epoch !== undefined && playing && epoch.journal.barrier.request !== undefined) return;
-  if (s.session.paused) s.pauseKeysHeld = [...pauseMenuKeys(s.participants[slot].bindings.bindings), ...PAUSE_CAMERA_KEYS].filter(key => BlzIsKeyPressed(ConvertOsKeyType(key)));
+  if (s.session.paused) s.pauseKeysHeld = pauseHeldKeys(s.participants[slot].bindings.bindings).filter(key => BlzIsKeyPressed(ConvertOsKeyType(key)));
   const deferred = epoch !== undefined && playing;
   const consumed = !s.session.startHeld[slot] && views(s).selections[slot].consumeStart();
   const action = startKeyDown(s.session, slot, s.game.phase, consumed || views(s).settings[slot].isOpen(), deferred);

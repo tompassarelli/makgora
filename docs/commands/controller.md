@@ -9,6 +9,6 @@
   the unit isn't installed. The service finds Warcraft III on :0, the pad and
   any Smashcraft session by itself, so a map opened from Custom Games plays
   on the controller: a keyboard build (the playable one) gets the pad as the
-  map's standard keys, a journal build (integrity) a journal helper
+  map's pad keys (contracts/controller.json padKeys), a journal build (integrity) a journal helper
   (smashcraft:controller/README.md). The
   controller is optional: the keyboard is the baseline.

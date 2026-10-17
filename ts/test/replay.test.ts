@@ -48,7 +48,7 @@ function joinedReplay(client: HeadlessClient, serial: number): string[] {
 
 const DEFAULT_KEYS = presetBindings(DEFAULT_PRESET);
 const bound = (action: Action): number => keyFor(DEFAULT_KEYS, action, 0) ?? 0;
-const KEYS = { left: bound(Action.moveLeft), right: bound(Action.moveRight), jump: 0x5a, attack: bound(Action.attack), special: bound(Action.special), grab: bound(Action.grab), shield: bound(Action.leftTrigger) } as const;
+const KEYS = { left: bound(Action.moveLeft), right: bound(Action.moveRight), jump: keyFor(DEFAULT_KEYS, Action.jump, 1) ?? 0, attack: bound(Action.attack), special: bound(Action.special), grab: bound(Action.grab), shield: bound(Action.leftTrigger) } as const;
 
 const TAPS = [KEYS.jump, KEYS.attack, KEYS.special, KEYS.grab, KEYS.shield, KEYS.attack];
 

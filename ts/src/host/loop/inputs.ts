@@ -3,7 +3,8 @@ import { warcraftChatOpen } from "../../platform/editboxJournal";
 import { ACTION_ORDER, bit } from "../../game/input/actions";
 import { clearAttackBuffer } from "../../game/input/attackBuffer";
 import { resetKeys } from "../../game/input/keyboardCapture";
-import { keyFor } from "../../game/input/keyBindings";
+import { actionFor, keyFor } from "../../game/input/keyBindings";
+import { PAD_LAYER } from "../../game/input/padKeys";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, isParticipantSlot, participantActive } from "../../game/input/participants";
 import { clearKeys } from "../../game/input/playerKeys";
 import { endReplaySegment } from "./replays";
@@ -80,6 +81,9 @@ export function pollLocalKeys(s: Readonly<ShellState>): number {
   let held = 0;
   for (const action of ACTION_ORDER) {
     if (pressed(keyFor(bindings, action, 0)) || pressed(keyFor(bindings, action, 1))) held |= bit(action);
+  }
+  for (const { action, code } of PAD_LAYER) {
+    if (pressed(code) && actionFor(bindings, code) === undefined) held |= bit(action);
   }
   return held;
 }

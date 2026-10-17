@@ -2,6 +2,7 @@ import { ACTION_ORDER, Action } from "./actions";
 import { type DirectionalInput, clearDirections, directionOf, neutralDirections, updateDirections } from "./directionalInput";
 import type { Direction } from "./inputRow";
 import { type KeyBindings, actionFor, keyFor } from "./keyBindings";
+import { padLayerAction } from "./padKeys";
 
 const KEY_CODES = 256;
 
@@ -15,12 +16,13 @@ export interface PlayerKeys {
 
   heldFirst: number;
   heldSecond: number;
+  heldPad: number;
 
   readonly directions: DirectionalInput;
 }
 
 export function playerKeys(): PlayerKeys {
-  return { down: Array.from({ length: KEY_CODES }, () => false), heldFirst: 0, heldSecond: 0, directions: neutralDirections() };
+  return { down: Array.from({ length: KEY_CODES }, () => false), heldFirst: 0, heldSecond: 0, heldPad: 0, directions: neutralDirections() };
 }
 
 const isKeyCode = (key: number) => key >= 0 && key < KEY_CODES;
@@ -29,8 +31,8 @@ export function keyDown({ down }: Readonly<PlayerKeys>, key: number): boolean {
   return isKeyCode(key) && down[key] === true;
 }
 
-export function actionHeld({ heldFirst, heldSecond }: Readonly<PlayerKeys>, action: Action): boolean {
-  return ((heldFirst | heldSecond) & (1 << action)) !== 0;
+export function actionHeld({ heldFirst, heldSecond, heldPad }: Readonly<PlayerKeys>, action: Action): boolean {
+  return ((heldFirst | heldSecond | heldPad) & (1 << action)) !== 0;
 }
 
 
@@ -51,10 +53,12 @@ export function directionZ(keys: Readonly<PlayerKeys>): Direction {
 }
 
 function holdSlot(keys: PlayerKeys, key: number, bindings: Readonly<KeyBindings>, held: boolean): Action | undefined {
-  const action = actionFor(bindings, key);
+  const bound = actionFor(bindings, key);
+  const action = bound ?? padLayerAction(key);
   if (action === undefined) return undefined;
   const slot = 1 << action;
-  if (keyFor(bindings, action, 0) === key) keys.heldFirst = held ? keys.heldFirst | slot : keys.heldFirst & ~slot;
+  if (bound === undefined) keys.heldPad = held ? keys.heldPad | slot : keys.heldPad & ~slot;
+  else if (keyFor(bindings, action, 0) === key) keys.heldFirst = held ? keys.heldFirst | slot : keys.heldFirst & ~slot;
   else keys.heldSecond = held ? keys.heldSecond | slot : keys.heldSecond & ~slot;
   updateDirections(keys.directions, directionX(keys), directionZ(keys));
   return action;
@@ -78,5 +82,6 @@ export function clearKeys(keys: PlayerKeys): void {
   keys.down.fill(false);
   keys.heldFirst = 0;
   keys.heldSecond = 0;
+  keys.heldPad = 0;
   clearDirections(keys.directions);
 }

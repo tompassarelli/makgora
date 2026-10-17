@@ -6,56 +6,56 @@
     {
       "control": "a",
       "press": "key",
-      "key": "n",
-      "code": 78,
+      "key": "c",
+      "code": 67,
       "action": "attack",
       "label": "Attack"
     },
     {
       "control": "b",
       "press": "key",
-      "key": "u",
-      "code": 85,
+      "key": "v",
+      "code": 86,
       "action": "special",
       "label": "Special"
     },
     {
       "control": "x",
       "press": "key",
-      "key": "o",
-      "code": 79,
+      "key": "2",
+      "code": 50,
       "action": "grab",
       "label": "Grab"
     },
     {
       "control": "y",
       "press": "key",
-      "key": "z",
-      "code": 90,
+      "key": "t",
+      "code": 84,
       "action": "jump",
       "label": "Jump"
     },
     {
       "control": "rb",
       "press": "key",
-      "key": "z",
-      "code": 90,
+      "key": "t",
+      "code": 84,
       "action": "jump",
       "label": "Jump"
     },
     {
       "control": "lb",
       "press": "key",
-      "key": "x",
-      "code": 88,
+      "key": "`",
+      "code": 192,
       "action": "exSpecial",
       "label": "EX special"
     },
     {
       "control": "lt",
       "press": "key",
-      "key": "q",
-      "code": 81,
+      "key": "3",
+      "code": 51,
       "action": "leftTrigger",
       "label": "Shield",
       "when": {
@@ -66,8 +66,8 @@
     {
       "control": "lt",
       "press": "key",
-      "key": "a",
-      "code": 65,
+      "key": "5",
+      "code": 53,
       "action": "lightShield",
       "label": "Light shield",
       "when": {
@@ -78,8 +78,8 @@
     {
       "control": "rt",
       "press": "key",
-      "key": "g",
-      "code": 71,
+      "key": "4",
+      "code": 52,
       "action": "rightTrigger",
       "label": "Right shield",
       "when": {
@@ -90,8 +90,8 @@
     {
       "control": "rt",
       "press": "key",
-      "key": "a",
-      "code": 65,
+      "key": "5",
+      "code": 53,
       "action": "lightShield",
       "label": "Light shield",
       "when": {
@@ -110,40 +110,40 @@
     {
       "control": "left_left",
       "press": "key",
-      "key": "w",
-      "code": 87,
+      "key": "[",
+      "code": 219,
       "action": "moveLeft",
       "label": "Move left"
     },
     {
       "control": "left_right",
       "press": "key",
-      "key": "r",
-      "code": 82,
+      "key": "]",
+      "code": 221,
       "action": "moveRight",
       "label": "Move right"
     },
     {
       "control": "left_down",
       "press": "key",
-      "key": "e",
-      "code": 69,
+      "key": "'",
+      "code": 222,
       "action": "moveDown",
       "label": "Crouch / fast fall"
     },
     {
       "control": "left_up",
       "press": "key",
-      "key": "space",
-      "code": 32,
+      "key": ";",
+      "code": 186,
       "action": "moveUp",
       "label": "Up (aim, up special)"
     },
     {
       "control": "right_up",
       "press": "key",
-      "key": "j",
-      "code": 74,
+      "key": "-",
+      "code": 189,
       "action": "smashUp",
       "label": "Up smash",
       "when": {
@@ -154,8 +154,8 @@
     {
       "control": "right_up",
       "press": "key",
-      "key": "j",
-      "code": 74,
+      "key": "-",
+      "code": 189,
       "action": "smashUp",
       "label": "Up tilt / up air",
       "when": {
@@ -166,8 +166,8 @@
     {
       "control": "right_down",
       "press": "key",
-      "key": "h",
-      "code": 72,
+      "key": "\\",
+      "code": 220,
       "action": "smashDown",
       "label": "Down smash",
       "when": {
@@ -178,8 +178,8 @@
     {
       "control": "right_down",
       "press": "key",
-      "key": "h",
-      "code": 72,
+      "key": "\\",
+      "code": 220,
       "action": "smashDown",
       "label": "Down tilt / down air",
       "when": {
@@ -190,8 +190,8 @@
     {
       "control": "right_left",
       "press": "key",
-      "key": "b",
-      "code": 66,
+      "key": ",",
+      "code": 188,
       "action": "smashLeft",
       "label": "Smash left",
       "when": {
@@ -202,8 +202,8 @@
     {
       "control": "right_left",
       "press": "key",
-      "key": "b",
-      "code": 66,
+      "key": ",",
+      "code": 188,
       "action": "smashLeft",
       "label": "Tilt left / air left",
       "when": {
@@ -214,8 +214,8 @@
     {
       "control": "right_right",
       "press": "key",
-      "key": "m",
-      "code": 77,
+      "key": ".",
+      "code": 190,
       "action": "smashRight",
       "label": "Smash right",
       "when": {
@@ -226,8 +226,8 @@
     {
       "control": "right_right",
       "press": "key",
-      "key": "m",
-      "code": 77,
+      "key": ".",
+      "code": 190,
       "action": "smashRight",
       "label": "Tilt right / air right",
       "when": {

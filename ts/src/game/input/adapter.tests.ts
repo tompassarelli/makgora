@@ -54,10 +54,10 @@ test("I hold lengths match quick-release jump height and takeoff frame, even wit
   }
 });
 
-test("LT and keyboard A in both presets raise the lightest shield, larger and weaker than RT [k4 reference docs/melee-analog-shield.md]", () => {
+test("LT and each preset's light shield key (0 on ESDF and Hitbox, A on Custom) raise the lightest shield, larger and weaker than RT [k4 reference docs/melee-analog-shield.md]", () => {
   const lightRows = [assertDefined(inputRow({ held: maskOf(Action.leftTrigger), pressed: maskOf(Action.leftTrigger), triggerLeft: 77 }))];
-  for (const preset of ["standard", "custom"] as const) {
-    const action = assertDefined(actionFor(presetBindings(preset), 65));
+  for (const [preset, key] of [["esdf", 48], ["standard", 48], ["custom", 65]] as const) {
+    const action = assertDefined(actionFor(presetBindings(preset), key));
     assertEquals(action, Action.lightShield);
     const capture = keyboardCapture();
     assertTrue(sampleKeys(capture, maskOf(action)));

@@ -8,6 +8,7 @@ import { ACTION_COUNT, Action, bit } from "../../src/game/input/actions";
 import { type AttackBuffer, attackBuffer } from "../../src/game/input/attackBuffer";
 import { commitEdges, keyboardCapture, sampleKeys } from "../../src/game/input/keyboardCapture";
 import { actionFor, keyLabel, presetBindings } from "../../src/game/input/keyBindings";
+import { padLayerKey } from "../../src/game/input/padKeys";
 import { TAPE_HEADER, decodeTape } from "../../src/game/replay/tape";
 import { type TapeSession, createTapeSession, performTapeOperation } from "../../src/game/replay/tapeRunner";
 import { Character } from "../../src/game/sim/codes";
@@ -23,12 +24,17 @@ for (const key of bindings.keys) {
   const action = actionFor(bindings, key);
   if (key !== 0 && action !== undefined) SOURCES.set(keyLabel(key), action);
 }
+const padSource = (action: Action): string => {
+  const source = keyLabel(padLayerKey(action).code);
+  SOURCES.set(source, action);
+  return source;
+};
 const STICK_JUMP = "stick-up";
 SOURCES.set(STICK_JUMP, Action.jump);
 
-const LEFT = "W", RIGHT = "R", DOWN = "E", UP = "SPACE", JUMP = "Z", JUMP_ALT = "8", ATTACK = "N", SPECIAL = "U",
-  GRAB = "O", SHIELD_LEFT = "Q", SHIELD_RIGHT = "7", SHIELD_RIGHT_ALT = "G", LIGHT_SHIELD = "A", C_LEFT = "B", C_LEFT_ALT = "/", C_RIGHT = "M", C_UP = "J",
-  C_DOWN = "H", WALK = "P", SHORT_HOP = "I", EX = "9", EX_ALT = "X";
+const LEFT = "W", RIGHT = "R", DOWN = "E", UP = "SPACE", JUMP = "8", JUMP_ALT = padSource(Action.jump), ATTACK = "N", SPECIAL = "U",
+  GRAB = "O", SHIELD_LEFT = "Q", SHIELD_RIGHT = "7", SHIELD_RIGHT_ALT = padSource(Action.rightTrigger), LIGHT_SHIELD = "0", C_LEFT = "B", C_LEFT_ALT = padSource(Action.smashLeft), C_RIGHT = "M", C_UP = "J",
+  C_DOWN = "H", WALK = "P", SHORT_HOP = "I", EX = "9", EX_ALT = padSource(Action.exSpecial);
 
 
 const TOWARD = "toward", AWAY = "away";

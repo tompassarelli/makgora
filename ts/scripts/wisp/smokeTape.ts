@@ -24,8 +24,8 @@ export interface SmokeStep {
   readonly expect?: MoveClass;
 }
 
-const key = (action: Action, second = false): number => {
-  const bound = keyFor(SMOKE_BINDINGS, action, second ? 1 : 0);
+const key = (action: Action): number => {
+  const bound = keyFor(SMOKE_BINDINGS, action, 0);
   if (bound === undefined) throw new Error(`the standard preset binds no key to action ${action}`);
   return bound;
 };
@@ -77,7 +77,7 @@ const rest = (): SmokeStep => afterReset("rest", [], 0);
 const ultimate = (): SmokeStep[] => [afterReset("Ultimate", [tap([key(Action.attack), key(Action.special)])], SPECIAL_TAIL, special("ultimate")), rest()];
 
 export function bindingSweep(): SmokeStep[] {
-  const jumps = [key(Action.jump), key(Action.jump, true), key(Action.shortHop)];
+  const jumps = [key(Action.jump), key(Action.shortHop)];
   return SMOKE_BINDINGS.keys.filter((bound) => bound !== 0).map((bound): SmokeStep => ({ name: `binding ${keyName(bound)}`, presses: [tap([bound], 6)], frames: jumps.includes(bound) ? 60 : 30, binding: bound }));
 }
 

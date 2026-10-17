@@ -3,7 +3,10 @@ import { createMatchControls, startKeyDown, startKeyUp } from "../../game/match/
 import { PLAYABLE_CHARACTERS } from "../../game/sim/heroes/registry";
 import { Phase, createMatchState, requestStageSelect, returnToCharacters, selectCharacter, selectStage, setParticipants, unreadyCharacter } from "../../game/lobby/lobbyState";
 import { Key, ensureKeyTriggerPair, keyEventAllowed, syncKeyEventPolicy } from "./keyEvents";
-import { presetBindings } from "../../game/input/keyBindings";
+import { BINDING_PRESETS, presetBindings } from "../../game/input/keyBindings";
+import { Action } from "../../game/input/actions";
+import { PAD_LAYER } from "../../game/input/padKeys";
+import { PAUSE_CAMERA_KEYS, pauseHeldKeys } from "./pauseCamera";
 
 const hitbox = presetBindings("standard");
 
@@ -47,4 +50,20 @@ test("character selection, start and stage keys keep one registration pair acros
   assertEquals(registrations, 1);
   assertEquals(triggers.down, 0);
   assertEquals(triggers.up, 1);
+});
+
+test("while paused every camera key moves the camera on each preset, and a pad jump held across resume is not held back [k2 property]", () => {
+  const policy = { enabled: true, escapeOnly: false };
+  syncKeyEventPolicy(policy, true, true, false);
+  const jump = PAD_LAYER.find(({ action }) => action === Action.jump)!.code;
+  for (const preset of BINDING_PRESETS) {
+    const bindings = presetBindings(preset);
+    const held = pauseHeldKeys(bindings);
+    for (const key of PAUSE_CAMERA_KEYS) {
+      assertEquals(keyEventAllowed(policy, key, bindings), true, `${preset} paused camera key ${key}`);
+      assertEquals(held.includes(key), true, `${preset} held camera key ${key}`);
+    }
+    assertEquals(PAUSE_CAMERA_KEYS.includes(jump), false, "the pad jump key is not a camera key");
+    assertEquals(held.includes(jump), false, `${preset} holds the pad jump key across resume`);
+  }
 });

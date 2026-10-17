@@ -1,6 +1,7 @@
 import { resolve } from "node:path";
 import { ACTION_ORDER, Action } from "../src/game/input/actions";
-import { SAVED_BINDING_FORMAT, keyFor, keyLabel, presetBindings } from "../src/game/input/keyBindings";
+import { SAVED_BINDING_FORMAT, keyLabel } from "../src/game/input/keyBindings";
+import { PAD_LAYER, padLayerKey } from "../src/game/input/padKeys";
 import { PAD_LAYOUTS, PAUSE, PAUSE_KEY, type PadBinding, type PadLayout } from "../src/game/input/padLayouts";
 import { PAD_ACTIVE_KEY, PAD_AXIS_LEVELS, PAD_KEYS, PAD_PRESENT_KEY, PAD_TRIGGER_LEVELS, cursorWorldPacket, decodePad } from "../src/game/input/padCapture";
 import { DASH_STICK_THRESHOLD, STICK_DEADZONE, TAP_JUMP_STICK_THRESHOLD, TRIGGER_FULL_LEVEL, TRIGGER_PRESS_LEVEL } from "../src/game/sim/stickZones";
@@ -24,15 +25,7 @@ const actionName = (action: Action): string => {
   return entry[0];
 };
 
-function standardKeys() {
-  const { keys } = presetBindings("standard");
-  return keys.flatMap((code, index) => code === SAVED_BINDING_FORMAT.empty ? [] : [{
-    key: keyLabel(code).toLowerCase(),
-    code,
-    action: actionName(ACTION_ORDER[Math.floor(index / 2)] ?? -1 as Action),
-    slot: index % 2,
-  }]);
-}
+const padKeys = () => PAD_LAYER.map(({ key, code, action }) => ({ key, code, action: actionName(action) }));
 
 type PadField = "axisX" | "axisZ" | "triggerLeft" | "triggerRight";
 
@@ -64,7 +57,7 @@ function cursorPacket() {
 export function controllerContract() {
   return {
     actions: ACTION_ORDER.map((action) => ({ name: actionName(action), bit: action })),
-    standardKeys: standardKeys(),
+    padKeys: padKeys(),
     savedBindings: SAVED_BINDING_FORMAT,
     padPacket: {
       axisLevels: PAD_AXIS_LEVELS,
@@ -88,12 +81,11 @@ export function controllerContract() {
 export const controllerContractText = (): string => `${JSON.stringify(controllerContract(), null, 2)}\n`;
 
 function layoutRow(binding: PadBinding) {
-  const code = binding.action === PAUSE ? PAUSE_KEY : keyFor(presetBindings("standard"), binding.action, binding.slot);
-  if (code === undefined) throw new Error(`${binding.control} binds an action with no standard key`);
+  const { key, code } = binding.action === PAUSE ? { key: keyLabel(PAUSE_KEY).toLowerCase(), code: PAUSE_KEY } : padLayerKey(binding.action);
   return {
     control: binding.control,
     press: "key",
-    key: keyLabel(code).toLowerCase(),
+    key,
     code,
     action: binding.action === PAUSE ? PAUSE : actionName(binding.action),
     label: binding.label,

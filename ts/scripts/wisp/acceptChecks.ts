@@ -423,7 +423,7 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
     })),
     {
       id: "c37-mount", closes: "smashcraft#10 C37N", map: "presentation", session: "c37-platforms",
-      setup: [{ chat: "-dev reset" }, { chat: "-dev slots 3 0" }, { chat: "-dev quick stage 2" }, { waitMs: 4000 }, { keys: ["z"], client: "a" }],
+      setup: [{ chat: "-dev reset" }, { chat: "-dev slots 3 0" }, { chat: "-dev quick stage 2" }, { waitMs: 4000 }, { keys: ["t"], client: "a" }],
       capture: [{ kind: "frames", name: "mount", client: "a", count: 16, everyMs: 100 }],
       pass: [NO_IMPORT_FAILURES, NO_ERRORS],
       look: "On Frozen Throne player 1 jumps, rises through the platform above and lands on it with the ordinary landing puff.",
@@ -437,7 +437,7 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
     },
     {
       id: "c37-remount", closes: "smashcraft#10 C37N", map: "presentation", session: "c37-platforms",
-      setup: [{ waitMs: 1500 }, { keys: ["z"], client: "a" }],
+      setup: [{ waitMs: 1500 }, { keys: ["t"], client: "a" }],
       capture: [{ kind: "frames", name: "remount", client: "a", count: 16, everyMs: 100 }],
       pass: [NO_IMPORT_FAILURES, NO_ERRORS],
       look: "Player 1 jumps back up through the platform and lands on it again.",

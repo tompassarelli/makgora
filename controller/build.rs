@@ -19,10 +19,10 @@ fn main() {
         action_bits.push((name, bit));
         out += &format!("pub const {}: u32 = 1 << {bit};\n", constant(name));
     }
-    out += "pub const STANDARD_KEYS: &[(&str, u32)] = &[\n";
-    for key in contract["standardKeys"].as_array().expect("standardKeys") {
+    out += "pub const PAD_KEYS: &[(&str, u32)] = &[\n";
+    for key in contract["padKeys"].as_array().expect("padKeys") {
         let action = key["action"].as_str().expect("key action");
-        assert!(action_bits.iter().any(|(name, _)| *name == action), "standard key names unknown action {action}");
+        assert!(action_bits.iter().any(|(name, _)| *name == action), "pad key names unknown action {action}");
         out += &format!("    ({:?}, {}),\n", key["key"].as_str().expect("key"), constant(action));
     }
     out += "];\n";

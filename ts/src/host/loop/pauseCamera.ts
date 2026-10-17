@@ -5,6 +5,7 @@ import { stageBounds } from "../../game/sim/stageBounds";
 import { surfaceLeft, surfaceRight, surfaceZ } from "../../game/sim/stage";
 import { Phase, stageClock } from "../../game/lobby/lobbyState";
 import type { ShellState } from "./state";
+import { type KeyBindings, pauseMenuKeys } from "../../game/input/keyBindings";
 
 export interface PauseCamera {
   readonly saved: MatchCamera;
@@ -17,6 +18,7 @@ export interface PauseCamera {
 
 export const PAUSE_CAMERA_KEYS = [0x49, 0x4a, 0x4b, 0x4c, 0xbb, 0xbd, 0x6b, 0x6d, 0x4f, 0x50, 0x48];
 export const pauseCameraKey = (key: number): boolean => PAUSE_CAMERA_KEYS.includes(key);
+export const pauseHeldKeys = (bindings: Readonly<KeyBindings>): number[] => [...pauseMenuKeys(bindings), ...PAUSE_CAMERA_KEYS];
 export const pauseHudHidden = (s: Readonly<ShellState>): boolean => (s.build.devConsole && s.promoHudHidden === true) || (s.session.paused && s.pauseCamera?.hideHud === true);
 
 export function beginPauseCamera(s: ShellState, aspect: number): void {

@@ -3,7 +3,8 @@ import { readFileSync } from "node:fs";
 import { Schema } from "effect";
 import { CONTROLLER_CONTRACT_PATH, controllerContractText, padLayoutProducers } from "../codegen/controllerContract";
 import { Action } from "../src/game/input/actions";
-import { actionFor, decodeBindings, presetBindings, slotIndex } from "../src/game/input/keyBindings";
+import { decodeBindings, inputAction, presetBindings, slotIndex } from "../src/game/input/keyBindings";
+import { PAD_LAYER } from "../src/game/input/padKeys";
 import { PAD_LAYOUTS, PAD_SETTINGS, type PadSetting } from "../src/game/input/padLayouts";
 
 const Rows = Schema.Array(Schema.Struct({ key: Schema.String, action: Schema.String, label: Schema.String }));
@@ -31,9 +32,9 @@ test("contracts/controller.json is the controller contract the TS sources produc
   expect(JSON.parse(readFileSync(CONTROLLER_CONTRACT_PATH, "utf8"))).toEqual(JSON.parse(controllerContractText()));
 });
 
-test("upstream pad keys reach labelled actions in defaults and sanitized K1 upgrades [k2 property]", () => {
+test("upstream pad keys reach labelled actions in every preset and sanitized K1 upgrades [k2 property]", () => {
   const rows = process.env.WC3_BINDING_ROWS === undefined
-    ? [{ key: "i", action: "shortHop", label: "Short hop" }]
+    ? PAD_LAYER.map(({ key, action }) => ({ key, action: Object.entries(Action).find(([, bit]) => bit === action)?.[0] ?? "", label: key }))
     : Schema.decodeUnknownSync(Rows)(JSON.parse(process.env.WC3_BINDING_ROWS));
   const legacy = [87, 0, 82, 0, 69, 0, 32, 0, 73, 57, 78, 0, 85, 0, 79, 0, 81, 0, 56, 0, 66, 191, 77, 0, 74, 0, 72, 0];
   const failures = new Set<string>();
@@ -47,14 +48,14 @@ test("upstream pad keys reach labelled actions in defaults and sanitized K1 upgr
     const upgraded = decodeBindings(saved);
     expect(upgraded).toBeDefined();
     if (upgraded === undefined) throw new Error("sanitized K1 fixture rejected");
-    for (const [name, bindings] of [["standard", presetBindings("standard")], ["custom", presetBindings("custom")], ["K1", upgraded]] as const) {
+    for (const [name, bindings] of [["esdf", presetBindings("esdf")], ["standard", presetBindings("standard")], ["custom", presetBindings("custom")], ["K1", upgraded]] as const) {
       for (const row of rows) {
         if (row.action === "start") continue;
         const expected = actionsOf(row.action);
         if (expected === undefined) throw new Error(`unknown contract map action ${row.action}`);
-        const key = row.key === "space" ? 32 : row.key.toUpperCase().charCodeAt(0);
+        const key = PAD_LAYER.find((pad) => pad.key === row.key)?.code ?? (row.key === "space" ? 32 : row.key.toUpperCase().charCodeAt(0));
         if (name === "K1" && key === slots[secondary]) continue;
-        const actual = actionFor(bindings, key);
+        const actual = inputAction(bindings, key);
         if (actual === undefined || !expected.includes(actual)) failures.add(`${name} ${row.label} key ${row.key}: got ${actual}, expected ${row.action}`);
       }
     }

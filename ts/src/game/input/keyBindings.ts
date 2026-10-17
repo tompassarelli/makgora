@@ -1,5 +1,6 @@
 import { ACTION_COUNT, ACTION_ORDER, Action } from "./actions";
 import { floorDiv } from "wisp/src/sim/intMath";
+import { padLayerAction, padLayerKey } from "./padKeys";
 
 export type KeySlot = 0 | 1;
 
@@ -60,22 +61,50 @@ export function presetBindings(preset: BindingPreset): KeyBindings {
   bind(Action.moveRight, code(esdf ? "F" : "R"));
   bind(Action.moveDown, code(esdf ? "D" : "E"));
   bind(Action.moveUp, esdf ? code("E") : SPACE);
-  if (esdf) bind(Action.jump, SPACE, code("Z"));
-  else bind(Action.jump, code("Z"), code(custom ? "9" : "8"));
+  if (esdf) bind(Action.jump, SPACE, code("8"));
+  else if (custom) bind(Action.jump, code("Z"), code("9"));
+  else bind(Action.jump, code("8"));
   bind(Action.attack, code("N"));
   bind(Action.special, code("U"));
   bind(Action.grab, code("O"));
   bind(Action.leftTrigger, code(esdf ? "A" : "Q"));
-  bind(Action.rightTrigger, code(custom ? "8" : "7"), code("G"));
-  bind(Action.smashLeft, code("B"), SLASH);
+  if (custom) bind(Action.rightTrigger, code("8"), code("G"));
+  else bind(Action.rightTrigger, code("7"));
+  bind(Action.smashLeft, code("B"), custom ? SLASH : EMPTY);
   bind(Action.smashRight, code("M"));
   bind(Action.smashUp, code("J"));
   bind(Action.smashDown, code("H"));
   bind(Action.walk, code("P"));
-  bind(Action.lightShield, code(esdf ? "Q" : "A"));
+  bind(Action.lightShield, code(custom ? "A" : "0"));
   bind(Action.shortHop, code("I"));
-  bind(Action.exSpecial, code(custom ? "0" : "9"), code("X"));
+  if (custom) bind(Action.exSpecial, code("0"), code("X"));
+  else bind(Action.exSpecial, code("9"));
   return { keys };
+}
+
+export function previousPresetKeys(preset: "esdf" | "standard"): number[] {
+  const keys = presetBindings(preset).keys.slice();
+  const esdf = preset === "esdf";
+  const bind = (action: Action, first: number, second: number) => {
+    keys[slotIndex(action, 0)] = first;
+    keys[slotIndex(action, 1)] = second;
+  };
+  bind(Action.jump, esdf ? SPACE : code("Z"), code(esdf ? "Z" : "8"));
+  bind(Action.rightTrigger, code("7"), code("G"));
+  bind(Action.smashLeft, code("B"), SLASH);
+  bind(Action.lightShield, code(esdf ? "Q" : "A"), EMPTY);
+  bind(Action.exSpecial, code("9"), code("X"));
+  return keys;
+}
+
+function replacePreviousPreset(bindings: KeyBindings): void {
+  for (const preset of ["esdf", "standard"] as const) {
+    const previous = previousPresetKeys(preset);
+    if (previous.every((key, index) => bindings.keys[index] === key)) {
+      bindings.keys = presetBindings(preset).keys;
+      return;
+    }
+  }
 }
 
 export function keyFor({ keys }: Readonly<KeyBindings>, action: Action, slot: KeySlot): number | undefined {
@@ -88,6 +117,10 @@ export function actionFor({ keys }: Readonly<KeyBindings>, key: number): Action 
   return index < 0 ? undefined : ACTION_ORDER[floorDiv(index, 2)];
 }
 
+export function inputAction(bindings: Readonly<KeyBindings>, key: number): Action | undefined {
+  return actionFor(bindings, key) ?? padLayerAction(key);
+}
+
 export function presetOf({ keys }: Readonly<KeyBindings>): BindingPreset | undefined {
   return BINDING_PRESETS.find((preset) => presetBindings(preset).keys.every((key, index) => keys[index] === key));
 }
@@ -98,7 +131,7 @@ const MENU_ACTIONS: readonly Action[] = [Action.moveLeft, Action.moveRight, Acti
 export function menuAction(bindings: Readonly<KeyBindings>, key: number): Action | undefined {
   const arrow = ARROWS.find(([arrowKey]) => arrowKey === key);
   if (arrow !== undefined) return arrow[1];
-  const action = actionFor(bindings, key);
+  const action = inputAction(bindings, key);
   return action !== undefined && MENU_ACTIONS.includes(action) ? action : undefined;
 }
 
@@ -111,6 +144,8 @@ export function pauseMenuKeys(bindings: Readonly<KeyBindings>): number[] {
       const key = keyFor(bindings, action, slot);
       if (key !== undefined) keys.push(key);
     }
+    const pad = padLayerKey(action).code;
+    if (actionFor(bindings, pad) === undefined) keys.push(pad);
   }
   return keys;
 }
@@ -135,8 +170,8 @@ export function rebind(bindings: KeyBindings, action: Action, slot: KeySlot, key
 
 
 
-const CURRENT_SAVE = "KA";
-const SAVED_SLOTS: Readonly<Record<string, number>> = { K1: 28, K2: 30, K3: 30, K4: KEY_SLOT_COUNT - 2, K5: KEY_SLOT_COUNT - 2, K6: KEY_SLOT_COUNT, K7: KEY_SLOT_COUNT, K8: KEY_SLOT_COUNT, K9: KEY_SLOT_COUNT, [CURRENT_SAVE]: KEY_SLOT_COUNT };
+const CURRENT_SAVE = "KB";
+const SAVED_SLOTS: Readonly<Record<string, number>> = { K1: 28, K2: 30, K3: 30, K4: KEY_SLOT_COUNT - 2, K5: KEY_SLOT_COUNT - 2, K6: KEY_SLOT_COUNT, K7: KEY_SLOT_COUNT, K8: KEY_SLOT_COUNT, K9: KEY_SLOT_COUNT, KA: KEY_SLOT_COUNT, [CURRENT_SAVE]: KEY_SLOT_COUNT };
 const DIGITS = "0123456789";
 const SAVED_KEY_DIGITS = 3;
 const SKIPPED_ON_LOAD = code("Y");
@@ -159,6 +194,11 @@ function readKey(saved: string, offset: number): number | undefined {
 
 
 function upgradeToCurrentKeys(bindings: KeyBindings, version: string): void {
+  if (version !== "KA") upgradeToPreviousKeys(bindings, version);
+  replacePreviousPreset(bindings);
+}
+
+function upgradeToPreviousKeys(bindings: KeyBindings, version: string): void {
   const { keys } = bindings;
   if (keyFor(bindings, Action.exSpecial, 0) === code("X") && keyFor(bindings, Action.exSpecial, 1) === undefined) {
     keys[slotIndex(Action.exSpecial, 0)] = EMPTY;

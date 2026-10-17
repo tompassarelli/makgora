@@ -1299,6 +1299,10 @@ mod linux {
         Ok(menu_phase(&contents, build, epoch, slot))
     }
 
+    fn pad_key(action: u32) -> &'static str {
+        PAD_KEYS.iter().find(|&&(_, bit)| bit == action).map(|&(key, _)| key).expect("the map's pad layer names every action")
+    }
+
     fn menu_buttons(physical: State, start: bool) -> u32 {
         let (_, y) = melee_stick(physical.x, physical.y);
         let vertical = if y < 0 { MOVE_UP } else if y > 0 { MOVE_DOWN } else { 0 };
@@ -1341,12 +1345,7 @@ mod linux {
             }
             // A physical event changes only one mapped menu control.
             match pressed {
-                MOVE_LEFT => Some("w"),
-                MOVE_RIGHT => Some("r"),
-                MOVE_UP => Some(" "),
-                MOVE_DOWN => Some("e"),
-                ATTACK => Some("n"),
-                SPECIAL => Some("u"),
+                MOVE_LEFT | MOVE_RIGHT | MOVE_UP | MOVE_DOWN | ATTACK | SPECIAL => Some(pad_key(pressed)),
                 0x8000_0000 => Some("y"),
                 _ => None,
             }
@@ -1382,7 +1381,7 @@ mod linux {
             let pressed = buttons & !self.buttons;
             self.buttons = buttons;
             let mut keys = String::new();
-            for (bit, key) in [(1 << 0, 'n'), (1 << 2, 'u'), (1 << 5, 'h'), (1 << 8, ' '), (1 << 9, 'e')] {
+            for (bit, key) in [(1 << 0, 'c'), (1 << 2, 'v'), (1 << 5, 'h'), (1 << 8, ';'), (1 << 9, '\'')] {
                 if pressed & bit != 0 { keys.push(key); }
             }
             if moving && now_ns >= self.next_motion_ns {
@@ -1423,9 +1422,9 @@ mod linux {
                 now += if sample(&mut seed) % 3 == 0 { 33_333_334 } else { u128::from(sample(&mut seed) % 50_000_000) };
                 let (x, y) = melee_stick(physical.cx, physical.cy);
                 let (_, menu_y) = melee_stick(physical.x, physical.y);
-                let buttons: Vec<char> = [(physical.sources & 1 != 0, 'n'), (physical.sources & 4 != 0, 'u'), (physical.sources & 32 != 0, 'h'), (menu_y < 0, ' '), (menu_y > 0, 'e')]
+                let buttons: Vec<char> = [(physical.sources & 1 != 0, 'c'), (physical.sources & 4 != 0, 'v'), (physical.sources & 32 != 0, 'h'), (menu_y < 0, ';'), (menu_y > 0, '\'')]
                     .into_iter().filter(|(down, _)| *down).map(|(_, key)| key).collect();
-                let held: u32 = buttons.iter().map(|key| 1 << "nuh e".find(*key).unwrap()).sum();
+                let held: u32 = buttons.iter().map(|key| 1 << "cvh;'".find(*key).unwrap()).sum();
                 let motion: String = [(x < 0, 'j'), (x > 0, 'l'), (y < 0, 'i'), (y > 0, 'k'), (physical.lt > TRIGGER_PRESS_LEVEL, '-'), (physical.rt > TRIGGER_PRESS_LEVEL, '='), (physical.sources & 16 != 0, 'o'), (physical.sources & 2 != 0, 'p')]
                     .into_iter().filter(|(down, _)| *down).map(|(_, key)| key).collect();
                 let expected = if !active {
@@ -1436,7 +1435,7 @@ mod linux {
                     armed = held == 0 && motion.is_empty();
                     String::new()
                 } else {
-                    let mut keys: String = buttons.iter().filter(|key| previous & 1 << "nuh e".find(**key).unwrap() == 0).collect();
+                    let mut keys: String = buttons.iter().filter(|key| previous & 1 << "cvh;'".find(**key).unwrap() == 0).collect();
                     if !motion.is_empty() && now >= next_motion {
                         next_motion = now + 33_333_334;
                         keys += &motion;
@@ -1478,7 +1477,7 @@ mod linux {
                 } else if input.start_only {
                     (pressed == 1 << 31).then_some("y")
                 } else {
-                    [(MOVE_LEFT, "w"), (MOVE_RIGHT, "r"), (MOVE_UP, " "), (MOVE_DOWN, "e"), (ATTACK, "n"), (SPECIAL, "u"), (1 << 31, "y")]
+                    [(MOVE_LEFT, "["), (MOVE_RIGHT, "]"), (MOVE_UP, ";"), (MOVE_DOWN, "'"), (ATTACK, "c"), (SPECIAL, "v"), (1 << 31, "y")]
                         .into_iter().find(|(bit, _)| pressed == *bit).map(|(_, key)| key)
                 };
                 assert_eq!(input.press(physical, after, start, start_after, at), expected, "run {run}: {physical:?} -> {after:?}");
@@ -2304,10 +2303,10 @@ mod linux {
                     Control::Lt => LT_SOURCE, Control::Rt => RT_SOURCE, _ => return None,
                 };
                 let Press::Key(key) = binding.press else { return None };
-                let &(_, action) = STANDARD_KEYS.iter().find(|(name, _)| *name == key.as_str())?;
+                let &(_, action) = PAD_KEYS.iter().find(|(name, _)| *name == key.as_str())?;
                 let action = match action {
                     ATTACK | SPECIAL | JUMP | SHORT_HOP | GRAB | WALK => action,
-                    LEFT_TRIGGER | RIGHT_TRIGGER | LIGHT_SHIELD if source == LT_SOURCE && key != "g" => LEFT_TRIGGER,
+                    LEFT_TRIGGER | RIGHT_TRIGGER | LIGHT_SHIELD if source == LT_SOURCE && action != RIGHT_TRIGGER => LEFT_TRIGGER,
                     LEFT_TRIGGER | RIGHT_TRIGGER | LIGHT_SHIELD => RIGHT_TRIGGER,
                     _ => return None,
                 };
@@ -3852,7 +3851,7 @@ mod linux {
         input.rearm(12_000_000, false, true);
         assert!(input.accepts(&ranges, timed_button(13_000_000, true), false, true).unwrap());
         menu.observe(Some(MenuPhase::Character), State::default(), false, 12_000_000);
-        assert_eq!(menu.press(State::default(), held, false, false, 13_000_000), Some("n"));
+        assert_eq!(menu.press(State::default(), held, false, false, 13_000_000), Some("c"));
         let start_down = evdev::InputEvent::new(evdev::EventType::KEY.0, Key::BTN_START.0, 1);
         assert!(pause_request_wire(&start_down, &mut false, 7, 3, true, false, !recovery.ready, 168).is_some());
         // Recovery of neutral state also permits the first genuinely new tap.

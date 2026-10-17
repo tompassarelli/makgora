@@ -43,7 +43,7 @@ fn contract() -> &'static [Preset] {
                 for key in &keys {
                     map_rows.push(serde_json::json!({ "preset": pad_preset.name(), "control": binding.control.name(), "key": key, "label": binding.action, "action": action }));
                 }
-                if right_stick == RightStick::Tilt && matches!(binding.control, Control::RightLeft | Control::RightRight | Control::RightUp | Control::RightDown) { keys.push("p".into()); }
+                if right_stick == RightStick::Tilt && matches!(binding.control, Control::RightLeft | Control::RightRight | Control::RightUp | Control::RightDown) { keys.push(padbridge::model::pad_key::TILT.to_string()); }
                 fight.insert(binding.control, keys);
             }
             let menus = padbridge::service::any_map::menu_bindings(true).into_iter()

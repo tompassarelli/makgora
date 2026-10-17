@@ -73,142 +73,100 @@
       "bit": 17
     }
   ],
-  "standardKeys": [
+  "padKeys": [
     {
-      "key": "w",
-      "code": 87,
-      "action": "moveLeft",
-      "slot": 0
+      "key": "c",
+      "code": 67,
+      "action": "attack"
     },
     {
-      "key": "r",
-      "code": 82,
-      "action": "moveRight",
-      "slot": 0
+      "key": "v",
+      "code": 86,
+      "action": "special"
     },
     {
-      "key": "e",
-      "code": 69,
-      "action": "moveDown",
-      "slot": 0
+      "key": "t",
+      "code": 84,
+      "action": "jump"
     },
     {
-      "key": "space",
-      "code": 32,
-      "action": "moveUp",
-      "slot": 0
+      "key": "1",
+      "code": 49,
+      "action": "shortHop"
     },
     {
-      "key": "z",
-      "code": 90,
-      "action": "jump",
-      "slot": 0
+      "key": "2",
+      "code": 50,
+      "action": "grab"
     },
     {
-      "key": "8",
-      "code": 56,
-      "action": "jump",
-      "slot": 1
+      "key": "3",
+      "code": 51,
+      "action": "leftTrigger"
     },
     {
-      "key": "n",
-      "code": 78,
-      "action": "attack",
-      "slot": 0
+      "key": "4",
+      "code": 52,
+      "action": "rightTrigger"
     },
     {
-      "key": "u",
-      "code": 85,
-      "action": "special",
-      "slot": 0
+      "key": "5",
+      "code": 53,
+      "action": "lightShield"
     },
     {
-      "key": "o",
-      "code": 79,
-      "action": "grab",
-      "slot": 0
+      "key": "6",
+      "code": 54,
+      "action": "walk"
     },
     {
-      "key": "q",
-      "code": 81,
-      "action": "leftTrigger",
-      "slot": 0
+      "key": "`",
+      "code": 192,
+      "action": "exSpecial"
     },
     {
-      "key": "7",
-      "code": 55,
-      "action": "rightTrigger",
-      "slot": 0
+      "key": "[",
+      "code": 219,
+      "action": "moveLeft"
     },
     {
-      "key": "g",
-      "code": 71,
-      "action": "rightTrigger",
-      "slot": 1
+      "key": "]",
+      "code": 221,
+      "action": "moveRight"
     },
     {
-      "key": "b",
-      "code": 66,
-      "action": "smashLeft",
-      "slot": 0
+      "key": ";",
+      "code": 186,
+      "action": "moveUp"
     },
     {
-      "key": "/",
-      "code": 191,
-      "action": "smashLeft",
-      "slot": 1
+      "key": "'",
+      "code": 222,
+      "action": "moveDown"
     },
     {
-      "key": "m",
-      "code": 77,
-      "action": "smashRight",
-      "slot": 0
+      "key": ",",
+      "code": 188,
+      "action": "smashLeft"
     },
     {
-      "key": "j",
-      "code": 74,
-      "action": "smashUp",
-      "slot": 0
+      "key": ".",
+      "code": 190,
+      "action": "smashRight"
     },
     {
-      "key": "h",
-      "code": 72,
-      "action": "smashDown",
-      "slot": 0
+      "key": "-",
+      "code": 189,
+      "action": "smashUp"
     },
     {
-      "key": "p",
-      "code": 80,
-      "action": "walk",
-      "slot": 0
-    },
-    {
-      "key": "a",
-      "code": 65,
-      "action": "lightShield",
-      "slot": 0
-    },
-    {
-      "key": "i",
-      "code": 73,
-      "action": "shortHop",
-      "slot": 0
-    },
-    {
-      "key": "9",
-      "code": 57,
-      "action": "exSpecial",
-      "slot": 0
-    },
-    {
-      "key": "x",
-      "code": 88,
-      "action": "exSpecial",
-      "slot": 1
+      "key": "\\",
+      "code": 220,
+      "action": "smashDown"
     }
   ],
   "savedBindings": {
-    "version": "KA",
+    "version": "KB",
     "slots": {
       "K1": 28,
       "K2": 30,
@@ -219,7 +177,8 @@
       "K7": 36,
       "K8": 36,
       "K9": 36,
-      "KA": 36
+      "KA": 36,
+      "KB": 36
     },
     "keyDigits": 3,
     "empty": 0,
