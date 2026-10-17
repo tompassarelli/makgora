@@ -2016,13 +2016,13 @@ Original provisional values; F/A/R counts start at simulation frame zero. Volume
 | Input and move | F/A/R; landing | Damage | Gesture and purpose |
 |---|---|---:|---|
 | Jab — Royal Rebuke | 6/3/17 | 4 | Coiled lunge with a crossing right-claw rake; another tap hooks the left claw down over the target and rakes it under the shell (8/3/20, 6%) |
-| Forward tilt — Mandible Spear | 10/4/24 | 11 | Rearing pounce that rakes the pincers wide and low in front; angled forms chop overhead or rake ankles |
+| Forward tilt — Mandible Spear | 10/4/24 | 11 | Rearing pounce that rakes the pincers wide and low in front; angled forms chop overhead or hook down to rake ankles |
 | Up tilt — Crown Lift | 9/5/23 | 10 | Horn lifts prey into a juggle, narrow near the ground |
-| Down tilt — Grave Rake | 8/4/20 | 8 | Low claw scrape launches a tech chase |
+| Down tilt — Grave Rake | 8/4/20 | 8 | Claw hooks down from above the head onto the floor in front and rakes back under him; launches a tech chase |
 | Dash attack — King’s Advance | 12/5/28 | 12 | Coiled spring into a wide, low claw sweep |
 | Forward smash — Execution Tusk | 20/4/34 | 20 | Claws reared overhead; one hooks down over the target, rakes to the floor and drags back under the shell, with exposed recovery |
 | Up smash — Crown of Spines | 17/5/31 | 18 | Raise both pincers above the shell |
-| Down smash — Crypt Sweep | 16/6/32 | 16 | Front sweep then rear sweep; one hit per target |
+| Down smash — Crypt Sweep | 16/6/32 | 16 | Both claws reared overhead; the right hooks down in front, then the left rakes behind; one hit per target |
 | Neutral air — Carapace Wheel | 10/7/24; L18 | 10 | Broad shell twist clears nearby bodies |
 | Forward air — Royal Skewer | 13/4/27; L20 | 13 | Claw raised overhead scythes forward and down through the target |
 | Back air — Hindclaw | 11/4/27; L20 | 14 | Shell drives backward as the claws rake through behind it |
