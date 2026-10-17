@@ -277,12 +277,13 @@ test("Cairne centre ankh burst and arrival replay per frame, including a displac
     { stage: 0, facing: 1, answer: "hit" },
     { stage: SLOPE_TEST_STAGE, facing: -1, answer: "shield" },
     { stage: SLOPE_TEST_STAGE, facing: 1, answer: "leave" },
+    { stage: 0, facing: 1, answer: "wide" },
   ]) {
     const move = ultimateOf(Character.cairne);
     const ankhSpec = move.regionOrigin;
     assertTrue(ankhSpec !== undefined);
     const owner = createFighter(Character.cairne, facing * -450.0, facing);
-    const inside = createFighter(Character.blademaster, answer === "leave" ? 250.0 : 50.0, -facing);
+    const inside = createFighter(Character.blademaster, answer === "leave" ? 250.0 : answer === "wide" ? -190.0 : 50.0, answer === "wide" ? 1 : -facing);
     const outside = createFighter(Character.rifleman, 350.0, -1);
     const match = createMatchState();
     match.phase = Phase.match;
@@ -350,9 +351,9 @@ test("Cairne centre ankh burst and arrival replay per frame, including a displac
       }
     }
     assertEquals(firstBurst, 25, recorded.join("\n"));
-    assertEquals(firstHit, answer === "hit" ? 25 : 0, recorded.join("\n"));
-    assertEquals(hits, answer === "hit" ? 1 : 0, recorded.join("\n"));
-    assertEquals(arrival, answer === "hit" ? 32 : answer === "shield" ? 32 : 26, recorded.join("\n"));
+    assertEquals(firstHit, answer === "hit" || answer === "wide" ? 25 : 0, recorded.join("\n"));
+    assertEquals(hits, answer === "hit" || answer === "wide" ? 1 : 0, recorded.join("\n"));
+    assertEquals(arrival, answer === "hit" || answer === "wide" || answer === "shield" ? 32 : 26, recorded.join("\n"));
     assertEquals(protectedFrames, 6, recorded.join("\n"));
     copyReplayState(replay, saved);
     const shifted = fighterAt(replay.world, 0).projectiles.find((projectile) => projectile.life > 0 && projectile.spec === ankhSpec);
