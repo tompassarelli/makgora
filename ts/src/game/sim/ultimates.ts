@@ -247,7 +247,7 @@ const CAIRNE: AuthoredSpecial = {
     { ...mark("Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdx", 25, 10, 0.0), atStageCentre: true, cancelOnInterrupt: true },
   ],
   regionOrigin: CAIRNE_ANKH,
-  regions: [heroRegion(25, 27, capsule(-150.0, 50.0, 150.0, 50.0, 60.0), hit(12.0, 85, 60.0, 55.0, HitElement.holy))],
+  regions: [heroRegion(25, 27, capsule(-140.0, 50.0, 140.0, 50.0, 50.0), hit(12.0, 85, 60.0, 55.0, HitElement.holy))],
   motion: [{ ...frames(26, 26), velocityX: 0.0, velocityZ: 0.0, relocateProjectile: CAIRNE_ANKH }],
   // The engine primes intangibility one frame ahead, so arrival protection starts at teleport frame 26.
   intangible: frames(27, 31),
