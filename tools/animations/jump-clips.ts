@@ -39,20 +39,20 @@ const legacy = [
 // Blademaster keeps the #230 front flip authored by blademaster-clips.ts.
 const STYLES: Readonly<Record<number, string>> = {
   [Character.rifleman]: "cannonball", [Character.demonHunter]: "wing beat", [Character.mountainKing]: "cannonball",
-  [Character.warden]: "back flip", [Character.lich]: "float", [Character.forsakenPaladin]: "knee lift",
+  [Character.warden]: "back flip", [Character.lich]: "float", [Character.forsakenPaladin]: "front flip",
   [Character.dreadlord]: "wing beat", [Character.pitLord]: "heave",
-  [Character.beastmaster]: "knee lift", [Character.lichKing]: "float", [Character.thrall]: "bound",
-  [Character.jaina]: "twirl", [Character.sylvanas]: "back flip", [Character.cairne]: "knee lift",
+  [Character.beastmaster]: "back flip", [Character.lichKing]: "float", [Character.thrall]: "front flip",
+  [Character.jaina]: "back flip", [Character.sylvanas]: "back flip", [Character.cairne]: "knee lift",
   [Character.chen]: "cannonball", [Character.peon]: "scramble", [Character.tinker]: "heave",
   [Character.kaelthas]: "float", [Character.murloc]: "front flip", [Character.grom]: "front flip",
-  [Character.anubarak]: "heave", [Character.malfurion]: "twirl", [Character.medivh]: "wing beat",
+  [Character.anubarak]: "heave", [Character.malfurion]: "front flip", [Character.medivh]: "cannonball",
   [Character.kobold]: "back flip",
 };
-const FLIPS = new Set(["front flip", "back flip"]);
+const TURNS: Readonly<Record<string, number>> = { "front flip": 360, "back flip": -360, cannonball: 360, scramble: 360, float: -360 };
 const LEANS: Readonly<Record<string, number>> = { cannonball: 55, heave: 40, "wing beat": 40 };
 const SPINS = new Set(["twist", "twirl"]);
 const repairs = Object.entries(STYLES).map(([character, style]) =>
-  ({ character: Number(character) as Character, poses: ["doubleJump"] as const, flip: FLIPS.has(style), style }));
+  ({ character: Number(character) as Character, poses: ["doubleJump"] as const, flip: style in TURNS, style }));
 const gestures: readonly { character: Character; poses: readonly ("jump" | "doubleJump")[]; flip: boolean; style?: string }[] = selected ? repairs.filter(g => g.character === only) : legacy;
 ensure(gestures.length > 0, "Select an authored double-jump fighter");
 const tables: Record<number, HeroClipTable> = { ...JUMP_CLIPS };
@@ -211,7 +211,7 @@ for (const gesture of gestures) {
       const eased = progress * progress * (3 - 2 * progress);
       // A float rises upright; a bound rears back, then pitches forward over the mount.
       const lean = gesture.style === "float" ? -6 * Math.sin(Math.PI * t) : gesture.style === "bound" ? -35 * Math.sin(2 * Math.PI * Math.min(1, t / 0.7)) * (t < 0.35 ? 1 : 0.45) : -(LEANS[gesture.style ?? ""] ?? 18) * Math.sin(Math.PI * t);
-      const turn = gesture.flip ? (gesture.style === "back flip" ? -360 : 360) * eased : lean;
+      const turn = gesture.flip ? (TURNS[gesture.style ?? ""] ?? 360) * eased : lean;
       const spin = (gesture.style === "twirl" ? 720 : 360) * eased * Math.PI / 360;
       helper.Rotation?.Keys.push({ Frame: start + Math.round(frame * 1000 / 60), Vector: SPINS.has(gesture.style ?? "") ? new Float32Array([0, 0, Math.sin(spin), Math.cos(spin)]) : pitch(new Float32Array([0, 0, 0, 1]), turn) });
     }

@@ -118,35 +118,40 @@ Smashcraft's crouch clip enters quickly and holds the low pose.
 **Double jump.** The midair jump must differ from the first jump in
 silhouette. Flips suit acrobats; heavy, armoured or mounted bodies tuck,
 heave or bound; winged and floating bodies beat or rise; casters twirl.
+A style that does not turn the body in side view (a knee lift, a float, a
+twirl about the long axis, a wing beat, a scramble or a bound) read as a
+plain rise to cold readers at gameplay zoom (#40), so a cannonball, a
+scramble and a float now somersault, and the fighters whose gesture still
+read as a plain rise take a flip.
 Jump physics and counts are unchanged; only the body's gesture differs.
 
 | Fighter | Double jump | Why |
 | --- | --- | --- |
-| Rifleman | cannonball | A stocky dwarf with a long rifle: a compact tuck reads at his size. |
+| Rifleman | cannonball | A stocky dwarf with a long rifle: a compact tuck that rolls once forward reads at his size. |
 | Illidan | wing beat | His demon wings carry him; the arms sweep down with them. |
 | Blademaster | front flip | Keeps the #230 flip: a swordsman's acrobatics. |
-| Mountain King | cannonball | Heavy dwarf in plate: curls round his hammer, no acrobatics. |
+| Mountain King | cannonball | Heavy dwarf in plate: curls round his hammer and rolls once forward. |
 | Warden | back flip | A nimble assassin; the cloak trails a backward somersault, unlike Blademaster's forward one. |
-| Lich | float | He has no legs and levitates: arms spread and robes trail as he rises. |
-| Forsaken Paladin | knee lift | An armoured knight steps up off the air, sword raised, like a heavy's hop. |
+| Lich | float | He has no legs and levitates: arms spread and robes trail as he turns once backward. |
+| Forsaken Paladin | front flip | An undead knight past caring for his armour's weight: a full forward flip, sword out. |
 | Dreadlord | wing beat | Bat wings: a strong downward beat with the cloak. |
 | Shadow Hunter | twist | Voodoo dancer: a corkscrew turn about his body's long axis. |
 | Pit Lord | heave | A huge demon: a whole-body heave with arms thrown up, no flip. |
-| Beastmaster | knee lift | A rugged hunter: knees drive up with axes spread. |
-| Lich King | float | Regal and armoured: arms and cloak spread in a slow, rising lift. |
-| Thrall | bound | Rides a wolf: the mount arches into a second leap, the rider's hammer up. |
-| Jaina | twirl | A mage's spin about her long axis, robes flaring. |
+| Beastmaster | back flip | A rugged hunter: a back flip with axes spread. |
+| Lich King | float | Regal and armoured: arms and cloak spread as he turns once slowly backward. |
+| Thrall | front flip | Rides a wolf: mount and rider somersault forward, hammer up. |
+| Jaina | back flip | A light mage: a back flip with robes flaring. |
 | Sylvanas | back flip | An agile ranger; a backward somersault keeps her bow clear. |
 | Cairne | knee lift | A giant tauren: knees drive up under his totem, no flip. |
-| Chen | cannonball | Round brewmaster: a tight rolling tuck, keg and all. |
-| Peon | scramble | Comic worker: legs pedal and arms flail to climb the air. |
+| Chen | cannonball | Round brewmaster: a tight tuck that rolls once forward, keg and all. |
+| Peon | scramble | Comic worker: legs pedal and arms flail as he tumbles once forward. |
 | Goblin Tinker | heave | His claw pack thrusts him up: legs dangle and the body tilts forward. |
-| Kael'thas | float | Vain prince: arms spread like the phoenix's wings in a poised lift. |
+| Kael'thas | float | Vain prince: arms spread like the phoenix's wings as he turns once backward. |
 | Murloc | front flip | Small, wet and bouncy: a quick tumbling flip. |
 | Grom | front flip | Reckless berserker: the axe leads a forward somersault. |
 | Anub'arak | heave | An insect lord: carapace pitches up and claws splay; no humanoid flip. |
-| Malfurion | twirl | A druid's turn about his staff, antlers and robe sweeping. |
-| Medivh | wing beat | The raven shapeshifter: arms beat like wings. |
+| Malfurion | front flip | A druid's forward flip over his staff, antlers and robe sweeping. |
+| Medivh | cannonball | The raven shapeshifter: he tucks like a diving bird and rolls once forward. |
 | Kobold | back flip | Small and scrappy: a quick backward tumble, candle held high. |
 
 ## Warcraft III rig and sequence boundary
