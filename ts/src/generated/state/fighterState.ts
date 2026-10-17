@@ -29,6 +29,7 @@ function copyFighterProjectiles(target: Fighter, source: Readonly<Fighter>): voi
     to.poolHits = from.poolHits;
     to.poolWait = from.poolWait;
     to.spec = from.spec;
+    to.surface = from.surface;
   }
 }
 
@@ -415,7 +416,7 @@ function sameFighterProjectiles(target: Readonly<Fighter>, source: Readonly<Figh
     const a = targets[index++];
     if (a === undefined) return false;
     if (a === b) continue;
-    if (a.life !== b.life || a.serial !== b.serial || a.kind !== b.kind || a.direction !== b.direction || a.visualFamily !== b.visualFamily || a.newlyReflected !== b.newlyReflected || a.exReach !== b.exReach || a.poolHits !== b.poolHits || a.poolWait !== b.poolWait || a.spec !== b.spec) return false;
+    if (a.life !== b.life || a.serial !== b.serial || a.kind !== b.kind || a.direction !== b.direction || a.visualFamily !== b.visualFamily || a.newlyReflected !== b.newlyReflected || a.exReach !== b.exReach || a.poolHits !== b.poolHits || a.poolWait !== b.poolWait || a.spec !== b.spec || a.surface !== b.surface) return false;
     if (!sameReal(a.x, b.x) || !sameReal(a.z, b.z) || !sameReal(a.velocityX, b.velocityX) || !sameReal(a.velocityZ, b.velocityZ) || !sameReal(a.damageMultiplier, b.damageMultiplier)) return false;
   }
   return true;
@@ -1265,5 +1266,9 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) {
     const projectile = at(fighter.projectiles, i);
     if (projectile.spec !== undefined) sink.text(kits.projectileSpec(projectile.spec, `${prefix}.projectileSpec[${i}]`));
+  }
+  for (let i = 0; i < PROJECTILE_CAPACITY; i++) {
+    const projectile = at(fighter.projectiles, i);
+    if (projectile.surface !== undefined) sink.int(prefix, `projectileSurface[${i}]`, projectile.surface ?? -1);
   }
 }

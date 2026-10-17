@@ -24,7 +24,7 @@ import { shieldCenterX, shieldCenterZ } from "../shieldTilt";
 import { type Capsule, attackCapsule, emptyCapsule, placeCapsule, segmentBoxesOverlap } from "../geometry/contactGeometry";
 import { HurtContact, strikeHurtContact } from "../hurtboxes";
 import { PARTICIPANT_CAPACITY } from "../../input/participants";
-import { floorBelow, floorSurfaceBelow, mainDeckLeft, mainDeckRight, mainDeckZAt, solidSurfaceAt, solidSurfaceCount, surfaceZAt } from "../stage";
+import { floorBelow, floorSurfaceBelow, mainDeckLeft, mainDeckRight, mainDeckZAt, solidSurfaceAt, solidSurfaceCount, surfaceMoves, surfaceZAt } from "../stage";
 import { clearMotionValue, setWorldMotionValue } from "../motion";
 import { currentTraits } from "../identityTraits";
 import { squareRoot } from "../warcraftMath";
@@ -297,6 +297,17 @@ function markBaseZ(owner: Readonly<Fighter>, spec: Readonly<SpecialProjectile>, 
   return floorBelow(stage, matchFrame, x, owner.motion.z) ?? pastLedge ?? owner.motion.z;
 }
 
+function neverStrikes(spec: Readonly<SpecialProjectile>): boolean {
+  return (spec.activeFrom ?? 0) > spec.life;
+}
+
+function riddenDeck(spec: Readonly<SpecialProjectile>, drawn: Readonly<Projectile> | undefined, stage: number, matchFrame: number, x: number, z: number): number | undefined {
+  if (drawn !== undefined) return drawn.surface;
+  if (spec.dropsToFloor !== true || !neverStrikes(spec)) return undefined;
+  const surface = floorSurfaceBelow(stage, matchFrame, x, z);
+  return surface !== undefined && surfaceMoves(stage, surface) && surfaceZAt(stage, surface, matchFrame, x) === z ? surface : undefined;
+}
+
 function projectileAnchor(owner: Readonly<Fighter>, spec: Readonly<SpecialProjectile> | undefined): Readonly<Projectile> | undefined {
   if (spec === undefined) return undefined;
   for (const projectile of owner.projectiles) if (projectile.life > 0 && projectile.spec === spec) return projectile;
@@ -312,11 +323,11 @@ function spawnHeroProjectile(owner: Fighter, spec: Readonly<SpecialProjectile>, 
   const z = drawn !== undefined ? f32(drawn.z + spec.offsetZ) : spec.atStageCentre === true ? f32(mainDeckZAt(stage, x) + spec.offsetZ) : foe !== undefined ? f32(foe.motion.z + spec.offsetZ) : f32(markBaseZ(owner, spec, stage, matchFrame, x) + spec.offsetZ);
   if (spec.needsLineOfSight === true && !clearLine(stage, owner.motion.x, z, x, z)) return;
   const up = owner.special.aimZ > 0 && spec.upVelocityX !== undefined;
-  spawnHeroProjectileAt(owner, spec, x, z, owner.facing, up, serial);
+  spawnHeroProjectileAt(owner, spec, x, z, owner.facing, up, serial, riddenDeck(spec, drawn, stage, matchFrame, x, z));
 }
 
 
-export function spawnHeroProjectileAt(owner: Fighter, spec: Readonly<SpecialProjectile>, x: number, z: number, facing: number, up: boolean, serial: number): void {
+export function spawnHeroProjectileAt(owner: Fighter, spec: Readonly<SpecialProjectile>, x: number, z: number, facing: number, up: boolean, serial: number, surface?: number): void {
   let index = -1;
   for (const before of owner.projectiles) {
     index++;
@@ -339,6 +350,7 @@ export function spawnHeroProjectileAt(owner: Fighter, spec: Readonly<SpecialProj
     projectile.exReach = false;
     projectile.poolHits = 0;
     projectile.poolWait = 0;
+    projectile.surface = surface;
     projectile.life = spec.life;
     return;
   }
@@ -804,7 +816,7 @@ const strike = emptyCapsule();
 
 export function agesWithMove(owner: Readonly<Fighter>, projectile: Readonly<Projectile>): boolean {
   const spec = projectile.spec;
-  if (owner.launch.hitlag <= 0 || owner.special.action !== SpecialAction.heroUltimate || spec === undefined || (spec.activeFrom ?? 0) <= spec.life) return false;
+  if (owner.launch.hitlag <= 0 || owner.special.action !== SpecialAction.heroUltimate || spec === undefined || !neverStrikes(spec)) return false;
   return runningHeroSpecial(owner)?.projectiles?.includes(spec) === true;
 }
 

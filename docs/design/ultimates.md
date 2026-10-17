@@ -113,11 +113,11 @@ Frames count from the input frame (frame 1 is the first frame after it).
   or below the caster (`floorBelow`), keeping the caster's height over the
   void; a ground cast draws them at the caster's feet. Inferno's meteor and
   crash and Judgment's f34 flash are drawn at the move's first mark
-  (`atMark`), so each move telegraphs, falls and strikes at one spot. That
-  spot stays where it was drawn: on a moving deck the deck travels under it,
-  so a strike can land above, below or beside a foe the deck has carried (on
-  Ahn'Qiraj's rising lift, Judgment's f52 and f64 pulses miss a foe standing
-  on the lift, while Inferno's crash still reaches it). An ultimate's drawn
+  (`atMark`), so each move telegraphs, falls and strikes at one spot. A
+  floor mark drawn on a moving deck rides it, carrying the marks drawn at it
+  and the strikes anchored there, so on Ahn'Qiraj's rising lift Judgment's
+  f52 and f64 pulses hit a foe standing on the lift in the circle (#113); a
+  mark drawn beside the deck stays where it was drawn. An ultimate's drawn
   marks age on the move's clock, holding while hitlag pauses its owner, so
   Chen's spirits stand until they strike and Banshee Form's trail keeps
   the path she flew whether or not hitlag paused her (9 pieces after a

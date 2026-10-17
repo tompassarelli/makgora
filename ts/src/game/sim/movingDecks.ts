@@ -4,7 +4,7 @@ import { PARTICIPANT_CAPACITY } from "../input/participants";
 import type { Fighter } from "./fighter";
 import { moveMeleeX, setWorldMotionValue } from "./motion";
 import { type Roster, fighterAt, isActive } from "./roster";
-import { surfaceCount, surfaceMoves, surfaceShiftX, surfaceZ } from "./stage";
+import { surfaceCount, surfaceMoves, surfaceShiftX, surfaceShiftZ, surfaceZ } from "./stage";
 
 function carryFighter(f: Fighter, deck: number, shiftX: number, z: number): void {
   const { motion } = f;
@@ -27,6 +27,14 @@ function carrySummons(f: Fighter, deck: number, shiftX: number, z: number): void
   }
 }
 
+function carryMarks(f: Fighter, deck: number, shiftX: number, shiftZ: number): void {
+  for (const projectile of f.projectiles) {
+    if (projectile.life <= 0 || projectile.surface !== deck) continue;
+    projectile.x = f32(projectile.x + shiftX);
+    projectile.z = f32(projectile.z + shiftZ);
+  }
+}
+
 
 
 
@@ -39,12 +47,14 @@ export function carryOnMovingDecks(world: Roster, stage: number, matchFrame: num
   for (let deck = 1; deck < surfaceCount(stage); deck++) {
     if (!surfaceMoves(stage, deck)) continue;
     const shiftX = surfaceShiftX(stage, deck, matchFrame);
+    const shiftZ = surfaceShiftZ(stage, deck, matchFrame);
     const z = surfaceZ(stage, deck, matchFrame);
     for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
       if (!isActive(world, slot)) continue;
       const f = fighterAt(world, slot);
       carryFighter(f, deck, shiftX, z);
       carrySummons(f, deck, shiftX, z);
+      carryMarks(f, deck, shiftX, shiftZ);
     }
   }
 }

@@ -167,6 +167,7 @@ export function clearSpecialOnStock(f: Fighter): void {
     projectile.newlyReflected = false;
     projectile.exReach = false;
     projectile.spec = undefined;
+    projectile.surface = undefined;
   }
   special.form = 0;
   special.variant = 0;

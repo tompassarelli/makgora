@@ -127,7 +127,7 @@ export const FIGHTER_SAME_ORDER: Readonly<Record<string, readonly string[]>> = {
   mana: ["points"],
   candle: ["heat", "state", "lit", "x", "z", "vx", "vz", "surface", "timer", "away", "guard", "struck[]", "specialStruck", "dropSerial", "snuffSerial", "returnSerial"],
   pack: ["length", "life", "age", "x", "z", "direction", "durability", "serial", "spec", "struck[]", "specialStruck", "mode", "modeFrame", "apart", "bitten", "surface"],
-  projectiles: ["life", "serial", "kind", "direction", "visualFamily", "newlyReflected", "exReach", "poolHits", "poolWait", "spec", "x", "z", "velocityX", "velocityZ", "damageMultiplier"],
+  projectiles: ["life", "serial", "kind", "direction", "visualFamily", "newlyReflected", "exReach", "poolHits", "poolWait", "spec", "surface", "x", "z", "velocityX", "velocityZ", "damageMultiplier"],
 };
 
 // Rows run in canonical emit order, the byte-stable stateHash order; influence operands (WeakMap) and PACK_SPARES stay outside the snapshot.
@@ -519,4 +519,5 @@ export const FIGHTER_FIELDS: readonly FighterFieldRow[] = [
   { path: "status.poisonEvery", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "poisonEvery", writer: "int", when: ["poison"] }, diff: "poisonEvery", respawn: { respawn: "0", helper: "clearHeroStatus" } },
   { path: "status.poisonDamage", type: "real", init: "0.0", copy: "plain", same: "signedZero", canon: { name: "poisonDamage", writer: "real", when: ["poison"] }, diff: "poisonDamage", respawn: { respawn: "0.0", helper: "clearHeroStatus" } },
   { path: "projectiles[].spec", type: "optionalRef", init: "undefined", copy: "plain", same: "plain", canon: { name: "projectileSpec[${i}]", writer: "specText", when: ["defined"], kit: "projectileSpec" }, diff: "projectileSpec[${i}]", respawn: { blast: "undefined", helper: "clearSpecialOnStock", respawn: "undefined" } },
+  { path: "projectiles[].surface", type: "optionalInt", init: "undefined", copy: "plain", same: "plain", canon: { name: "projectileSurface[${i}]", writer: "optionalInt", when: ["defined"] }, diff: "projectileSurface[${i}]", respawn: { blast: "undefined", helper: "clearSpecialOnStock", respawn: "undefined" } },
 ];

@@ -291,6 +291,8 @@ export interface Projectile {
   poolWait: number;
 
   spec: SpecialProjectile | undefined;
+
+  surface: number | undefined;
 }
 
 
@@ -584,6 +586,7 @@ function emptyProjectile(): Projectile {
     poolHits: 0,
     poolWait: 0,
     spec: undefined,
+    surface: undefined,
   };
 }
 

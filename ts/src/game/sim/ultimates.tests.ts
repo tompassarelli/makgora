@@ -29,7 +29,7 @@ import { type ReplayState, copyReplayState, createReplaySnapshot } from "../repl
 import { isIntangible } from "./conditions";
 import { spawnProjectileMotion } from "./projectiles";
 import { clearSpecialOnStock } from "./transitions";
-import { floorBelow, floorSurfaceBelow, mainDeckLeft, mainDeckRight, mainDeckZAt, SLOPE_TEST_STAGE, surfaceLeft, surfaceZAt, TIMED_TEST_STAGE } from "./stage";
+import { floorBelow, floorSurfaceBelow, mainDeckLeft, mainDeckRight, mainDeckZAt, SLOPE_TEST_STAGE, surfaceLeft, surfaceRight, surfaceZAt, TIMED_TEST_STAGE } from "./stage";
 
 /** How each ultimate is met in its recorded scenario (docs/design/ultimates.md). */
 type Defence = "shield" | "spotDodge" | "ground";
@@ -326,7 +326,7 @@ test("an air cast draws its mark on the highest floor under it at or below the c
   assertEquals(failures.join("; "), "");
 });
 
-test("on a rising lift Inferno, Light's Judgment and the Dark Portal draw every mark at the first, which lies on the lift where it stood that frame, cast standing on the lift or from the air (#98) [k1 scenario]", () => {
+test("on a rising lift Inferno, Light's Judgment and the Dark Portal draw every mark at the first, which rides the lift for its whole life when drawn on it and stays where it was drawn beside it, cast standing on the lift or from the air (#98, #113) [k1 scenario]", () => {
   const failures: string[] = [];
   for (const character of [Character.dreadlord, Character.forsakenPaladin, Character.medivh]) for (const facing of [-1, 1]) for (const air of [false, true]) {
     const scenario = scenarioOf(character);
@@ -338,7 +338,7 @@ test("on a rising lift Inferno, Light's Judgment and the Dark Portal draw every 
     b.game.matchFrame = LIFT_RISING;
     const clock = (): number => stageClock(b.game);
     const { motion } = b.owner;
-    motion.x = air ? f32(-facing * f32(first.offsetX - 40.0)) : f32(-facing * 100.0);
+    motion.x = air ? f32(-facing * f32(first.offsetX - 40.0)) : f32(-facing * Math.min(f32(first.offsetX - 120.0), 120.0));
     standOnFloor(b.owner, TIMED_TEST_STAGE, clock());
     if (air) {
       motion.grounded = false;
@@ -347,27 +347,70 @@ test("on a rising lift Inferno, Light's Judgment and the Dark Portal draw every 
     }
     const label = `${name(character)} ${facing} ${air ? "air" : "standing"}`;
     const seen = new Set<SpecialProjectile>();
-    let drawn: { readonly x: number; readonly z: number } | undefined;
+    let drawn: { readonly x: number; readonly z: number; readonly onLift: boolean } | undefined;
+    const anchor = (): { readonly x: number; readonly z: number } | undefined =>
+      drawn === undefined ? undefined : { x: drawn.x, z: drawn.onLift ? surfaceZAt(TIMED_TEST_STAGE, LIFT, clock(), drawn.x) : drawn.z };
     b.step(ULTIMATE);
     for (let tick = 0; tick < 90 && b.owner.special.action === SpecialAction.heroUltimate; tick++) {
       b.step();
+      const mark = b.owner.projectiles.find((projectile) => projectile.life > 0 && projectile.spec === first);
+      if (mark !== undefined && drawn === undefined) {
+        const lift = surfaceZAt(TIMED_TEST_STAGE, LIFT, clock(), mark.x);
+        if (mark.z !== lift) failures.push(`${label}: first mark at z ${mark.z}, lift at ${lift} on f${b.owner.special.frame}`);
+        drawn = { x: mark.x, z: mark.z, onLift: mark.x >= surfaceLeft(TIMED_TEST_STAGE, LIFT, clock()) && mark.x <= surfaceRight(TIMED_TEST_STAGE, LIFT, clock()) };
+      }
+      const expected = anchor();
+      if (mark !== undefined && (mark.x !== expected?.x || mark.z !== expected.z)) failures.push(`${label}: f${b.owner.special.frame} first mark at ${mark.x}/${mark.z}, expected ${expected?.x}/${expected?.z}`);
       for (const projectile of b.owner.projectiles) {
         const spec = projectile.spec;
-        if (projectile.life <= 0 || spec === undefined || !specs.includes(spec) || seen.has(spec)) continue;
+        if (projectile.life <= 0 || spec === undefined || spec === first || !specs.includes(spec)) continue;
         seen.add(spec);
         const age = spec.life - projectile.life;
-        if (spec === first) {
-          drawn = { x: projectile.x, z: projectile.z };
-          const lift = surfaceZAt(TIMED_TEST_STAGE, LIFT, clock(), projectile.x);
-          if (projectile.z !== lift) failures.push(`${label}: first mark at z ${projectile.z}, lift at ${lift} on f${b.owner.special.frame}`);
-          continue;
-        }
-        const x = drawn === undefined ? undefined : f32(drawn.x + f32(facing * spec.offsetX));
-        const z = drawn === undefined ? undefined : f32(f32(drawn.z + spec.offsetZ) + f32(spec.velocityZ * age));
+        const x = expected === undefined ? undefined : f32(expected.x + f32(facing * spec.offsetX));
+        const z = expected === undefined ? undefined : f32(f32(expected.z + spec.offsetZ) + f32(spec.velocityZ * age));
         if (projectile.x !== x || projectile.z !== z) failures.push(`${label}: f${b.owner.special.frame} mark at ${projectile.x}/${projectile.z}, drawn at ${x}/${z}`);
       }
     }
-    if (seen.size !== specs.length) failures.push(`${label}: drew ${seen.size} of ${specs.length} marks`);
+    if (drawn === undefined) failures.push(`${label}: never drew the first mark`);
+    else if (drawn.onLift !== (air || character !== Character.dreadlord)) failures.push(`${label}: first mark ${drawn.onLift ? "on" : "beside"} the lift at x ${drawn.x}`);
+    if (seen.size !== specs.length - 1) failures.push(`${label}: drew ${seen.size} of ${specs.length - 1} marks at the first`);
+  }
+  assertEquals(failures.join("; "), "");
+});
+
+test("on a rising lift Light's Judgment's circle rides the lift, so its f52 and f64 pulses hit a foe standing on the lift in the circle, cast standing on the lift or from the air (#113) [k1 scenario]", () => {
+  const failures: string[] = [];
+  const circleSpec = ultimateOf(Character.forsakenPaladin).regionOrigin;
+  for (const facing of [-1, 1]) for (const air of [false, true]) for (const pulse of [52, 64]) {
+    const b = bout(scenarioOf(Character.forsakenPaladin), facing, Character.blademaster, 1100.0);
+    b.game.stageChoice = TIMED_TEST_STAGE;
+    b.game.matchFrame = LIFT_RISING;
+    const clock = (): number => stageClock(b.game);
+    const { motion } = b.owner;
+    motion.x = air ? f32(-facing * 180.0) : f32(-facing * 100.0);
+    standOnFloor(b.owner, TIMED_TEST_STAGE, clock());
+    if (air) {
+      motion.grounded = false;
+      motion.surface = undefined;
+      motion.z = f32(motion.z + 200.0);
+    }
+    const label = `${facing} ${air ? "air" : "standing"} f${pulse}`;
+    let hitAt = 0;
+    let damage = 0.0;
+    b.step(ULTIMATE);
+    for (let tick = 0; tick < 90 && b.owner.special.action === SpecialAction.heroUltimate; tick++) {
+      if (b.owner.special.frame === pulse - 6) {
+        const circle = b.owner.projectiles.find((projectile) => projectile.life > 0 && projectile.spec === circleSpec);
+        if (circle === undefined) break;
+        b.target.motion.x = circle.x;
+        standOnFloor(b.target, TIMED_TEST_STAGE, clock());
+        if (b.target.motion.surface !== LIFT) failures.push(`${label}: foe not on the lift at x ${circle.x}`);
+        damage = b.target.status.damage;
+      }
+      b.step();
+      if (hitAt === 0 && b.target.status.damage > damage) hitAt = b.owner.special.frame;
+    }
+    if (hitAt !== pulse) failures.push(`${label}: foe on the lift first hit at f${hitAt}`);
   }
   assertEquals(failures.join("; "), "");
 });

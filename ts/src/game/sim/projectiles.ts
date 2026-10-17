@@ -62,6 +62,7 @@ export function spawnProjectileMotion(owner: Fighter, kind: ProjectileKind, velo
     projectile.damageMultiplier = damageMultiplier;
     projectile.newlyReflected = false;
     projectile.exReach = kind === ProjectileKind.manaBurn && owner.special.ex;
+    projectile.surface = undefined;
     projectile.x = f32(owner.motion.x + f32(direction * BLASTER_PROJECTILE_SPAWN_OFFSET));
     projectile.z = f32(owner.motion.z + height);
     projectile.life = lifetime;
@@ -194,6 +195,7 @@ function reflectProjectile(target: Fighter, source: Projectile): boolean {
     reflected.exReach = source.exReach;
     reflected.poolHits = 0;
     reflected.poolWait = 0;
+    reflected.surface = undefined;
     source.life = 0;
     target.visuals.shieldReflect++;
     target.visuals.shieldElectric = source.kind === ProjectileKind.manaBurn;
