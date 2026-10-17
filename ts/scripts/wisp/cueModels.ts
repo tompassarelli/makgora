@@ -10,7 +10,7 @@ import { CANDLE_FLAMES, CANDLE_SMOKE } from "../../src/game/presentation/candleL
 export type Look = "same" | "redrawn";
 
 export const CUE_MODEL_RECORD = "ts/scripts/wisp/cue-models.tsv";
-export const RECORD_COMMAND = "bun scripts/cueModels.ts --record --stock-cache DIRECTORY";
+export const RECORD_COMMAND = "bun scripts/cueModels.ts --record";
 
 export const cueModels = () => [...new Set([...Object.values(Character).flatMap(character => fighterCueList(character).map(cue => cue.model)), ...allAttackCueModels(), ...allProjectileModels(), ...CANDLE_FLAMES.map(flame => flame.model), CANDLE_SMOKE.model, MISSING_CUE_MODEL])];
 
@@ -62,7 +62,7 @@ type RecordedFacts = { readonly problem: string } | { readonly facts: ReadonlyMa
 export function recordedFacts(text: string): RecordedFacts {
   const headers = text.split("\n").filter((line) => line.startsWith("classic-facts\t")).map((line) => line.split("\t"));
   const header = headers[0];
-  if (headers.length !== 1 || header?.[1] !== String(FACTS_VERSION) || !/^[0-9a-f]{64}$/.test(header[2] ?? "")) return { problem: `Classic effect record is missing or stale: it holds no model facts from extractor version ${FACTS_VERSION}; from ts/ on a machine with the exact24268 cache run ${RECORD_COMMAND} and commit the record` };
+  if (headers.length !== 1 || header?.[1] !== String(FACTS_VERSION) || !/^[0-9a-f]{64}$/.test(header[2] ?? "")) return { problem: `Classic effect record is missing or stale: it holds no model facts from extractor version ${FACTS_VERSION}; from ts/ on a machine with the Warcraft III 3.0.0.24268 install run ${RECORD_COMMAND} and commit the record` };
   const facts = new Map<string, ModelFacts | null>();
   let edited = 0;
   for (const line of factRows(text)) {
@@ -79,7 +79,7 @@ export function effectFindings(text: string, uses: readonly EffectUse[] = effect
   const unrecorded = uses.filter((use) => !recorded.facts.has(modelFactsKey(use.model)));
   if (unrecorded.length > 0) {
     const models = [...new Set(unrecorded.map((use) => modelFactsKey(use.model)))];
-    return { problem: `Classic effect record is missing or stale: no model facts for ${models.length} newly used models; from ts/ on a machine with the exact24268 cache run ${RECORD_COMMAND} and commit the record: ${models.map((model) => `${model} (${unrecorded.filter((use) => modelFactsKey(use.model) === model).map((use) => `${use.fighter}/${use.move}`).join(", ")})`).join("; ")}` };
+    return { problem: `Classic effect record is missing or stale: no model facts for ${models.length} newly used models; from ts/ on a machine with the Warcraft III 3.0.0.24268 install run ${RECORD_COMMAND} and commit the record: ${models.map((model) => `${model} (${unrecorded.filter((use) => modelFactsKey(use.model) === model).map((use) => `${use.fighter}/${use.move}`).join(", ")})`).join("; ")}` };
   }
   return { findings: uses.map((use) => judgeUse(use, recorded.facts.get(modelFactsKey(use.model)) ?? null)) };
 }

@@ -10,7 +10,7 @@ test("a Classic effect record conflict refuses the lane with the re-record comma
     expect(resolution.resolve).toBe(false);
     if (resolution.resolve) continue;
     expect(resolution.why).toContain(RECORD);
-    expect(resolution.why).toContain("bun scripts/cueModels.ts --record --stock-cache DIRECTORY");
+    expect(resolution.why).toContain("bun scripts/cueModels.ts --record from ts/");
   }
   const reports = resolveConflicts(GENERATED_REPORTS.map((path) => ({ path })));
   expect(reports.resolve && reports.reports).toEqual(GENERATED_REPORTS);

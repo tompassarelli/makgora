@@ -25,6 +25,7 @@ import { CANDLE_FLAMES, CANDLE_SMOKE } from "../../src/game/presentation/candleL
 import { characterModelScale } from "../../src/game/presentation/modelScale";
 import { IMPACT_DUST_MODEL, IMPACT_ROLL_MODEL, IMPACT_TECH_MODEL, IMPACT_DEFILE_MODEL } from "../../src/game/assets/impactAssetInfo";
 import { headlessRender } from "./headlessRender";
+import { readStockBuild, stockStorage, type RenderAssetOptions } from "./renderAssetStore";
 import { heroLook } from "../../src/game/roster/looks";
 
 /** How one move shows one model in Classic: the sequence and seek it plays, its time scale, and whether its anchor travels. */
@@ -358,25 +359,6 @@ export async function checkEffects(read: (path: string) => Promise<Uint8Array | 
   return uses.map((use) => judgeUse(use, facts.get(use.model) ?? null));
 }
 
-export function stockCacheReader(root: string): (path: string) => Promise<Uint8Array | undefined> {
-  if (!existsSync(join(root, "build-info.json"))) throw new Error("--stock-cache must name one exact Classic build cache with build-info.json");
-  return async (path) => {
-    const key = path.replaceAll("\\", "/").toLowerCase().replace(/\.mdl$/, ".mdx");
-    const names = /\.(blp|tga|dds|png)$/.test(key) ? [".dds", ".png", ".blp", ".tga"].map((ext) => key.replace(/\.[^.]+$/, ext)) : [key];
-    for (const name of names) {
-      const file = join(root, name);
-      if (existsSync(file)) return new Uint8Array(await Bun.file(file).arrayBuffer());
-    }
-    return undefined;
-  };
-}
-
-/** Reads stock files from the cache and the map's own imports through the headless renderer. */
-export function classicReader(stock: (path: string) => Promise<Uint8Array | undefined>): (path: string) => Promise<Uint8Array | undefined> {
-  let render: ReturnType<typeof headlessRender> | undefined;
-  return async (path) => (await stock(path)) ?? (/^war3mapImported[\\/]/i.test(path) ? (render ??= headlessRender()).readAsset(path, "classic") : undefined);
-}
-
 export const EFFECT_PLAYBACK_INPUTS = ["ts/scripts/wisp/effectVisibility.ts", "ts/scripts/cueModels.ts", "ts/scripts/wisp/cueModels.ts", "ts/scripts/prePush.ts", "ts/src/host/loop/view.ts", "ts/src/game/presentation/specialCues.ts", "ts/src/game/presentation/attackCues.ts", "ts/src/game/presentation/projectileArt.ts", "ts/src/game/presentation/projectilePose.ts", "ts/wisp.lock", "ts/bun.lock", "ts/package.json", "typescript-toolchain.lock", "ts/src/game/render/specialCueEffects.ts", "ts/src/game/render/projectilePresentation.ts", "ts/src/game/render/hitAreaEffects.ts", "ts/src/game/render/specialEffects.ts", "ts/src/game/render/combatEffects.ts", "ts/src/game/render/placedObjectEffects.ts", "ts/src/game/render/summonPresentation.ts", "build-inputs/"];
 export function effectPlaybackInputs(root = join(import.meta.dir, "../../..")): string[] {
   const transpiler = new Bun.Transpiler({ loader: "ts" });
@@ -412,30 +394,34 @@ export function effectSourceDigest(root = join(import.meta.dir, "../../..")): st
 export class EffectCheckFailure extends Schema.TaggedError<EffectCheckFailure>()("EffectCheckFailure", { problem: Schema.String }) {
   override get message(): string { return this.problem; }
 }
-const CacheInfo = Schema.Struct({ fields: Schema.Struct({ Version: Schema.String }) });
-export const readEffectReport = Effect.fnUntraced(function*(root: string) {
-  const info = yield* Effect.tryPromise({ try: () => Bun.file(join(root, "build-info.json")).text(), catch: (cause) => new EffectCheckFailure({ problem: `Classic cache: ${String(cause)}` }) });
-  const decoded = yield* Schema.decodeEffect(Schema.fromJsonString(CacheInfo))(info);
-  if (decoded.fields.Version !== "3.0.0.24268") return yield* new EffectCheckFailure({ problem: `Classic calibration needs 3.0.0.24268, got ${decoded.fields.Version}` });
-  const input = classicReader(stockCacheReader(root));
+// Facts read only whether a texture exists, and each cache stores a texture in its own decoded form.
+const TEXTURE = /\.(blp|tga|dds|png|tif)$/i;
+
+/** Reads every Classic effect model from the Warcraft III install's storage, extracting what no render has cached yet, so the facts depend on the build alone. */
+export const readEffectReport = Effect.fnUntraced(function*(options: RenderAssetOptions = {}) {
+  const build = yield* readStockBuild(options.storage ?? stockStorage()).pipe(Effect.mapError((failure) => new EffectCheckFailure({ problem: `Classic stock: ${failure.message}` })));
+  const { Version: version, "Build Key": buildKey } = build.fields;
+  if (version !== "3.0.0.24268" || buildKey === undefined || buildKey === "") return yield* new EffectCheckFailure({ problem: `Classic calibration needs one 3.0.0.24268 build, got ${version ?? "none"} in ${build.storage}` });
+  const info = `${version}\t${buildKey}`;
+  const store = headlessRender({ ...options, strict: true });
+  const input = (path: string) => store.readAsset(path, "classic");
   const hashes = new Map<string, string>();
   const reads = new Map<string, readonly string[]>();
   const uses = effectUses();
   const facts = yield* Effect.tryPromise({
-    try: () => readModelFacts(async (path) => { const bytes = await input(path); if (bytes !== undefined) hashes.set(path, createHash("sha256").update(bytes).digest("hex")); return bytes; }, [...uses, ...EFFECT_CALIBRATION.map(({ use }) => use)].map(({ model }) => model), reads),
+    try: () => readModelFacts(async (path) => { const bytes = await input(path); if (bytes !== undefined) hashes.set(path, TEXTURE.test(path) ? "present" : createHash("sha256").update(bytes).digest("hex")); return bytes; }, [...uses, ...EFFECT_CALIBRATION.map(({ use }) => use)].map(({ model }) => model), reads),
     catch: (cause) => new EffectCheckFailure({ problem: `Classic effect check: ${String(cause)}` }),
   });
   const findings = uses.map((use) => judgeUse(use, facts.get(use.model) ?? null));
   const calibration = EFFECT_CALIBRATION.map(({ use }) => judgeUse(use, facts.get(use.model) ?? null));
   const provenance = createHash("sha256").update(info).update(JSON.stringify([...hashes].sort(([a], [b]) => a.localeCompare(b)))).digest("hex");
   const models = new Map([...reads].map(([model, paths]) => [model, createHash("sha256").update(JSON.stringify(paths.map((path) => [path, hashes.get(path) ?? ""]))).digest("hex")]));
-  return { cacheInfo: createHash("sha256").update(info).digest("hex"), provenance, cache: root, inputs: [...hashes], models, facts, findings, calibration };
+  return { cacheInfo: createHash("sha256").update(info).digest("hex"), provenance, storage: build.storage, inputs: [...hashes], models, facts, findings, calibration };
 });
 
 if (import.meta.main) BunRuntime.runMain(Effect.gen(function*() {
-  const at = process.argv.indexOf("--stock-cache"), root = at < 0 ? process.env.CLASSIC_EFFECT_CACHE : process.argv[at + 1];
-  if (root === undefined) return yield* new EffectCheckFailure({ problem: "name one exact 24268 cache with --stock-cache DIRECTORY or CLASSIC_EFFECT_CACHE" });
-  const report = yield* readEffectReport(root);
+  const at = process.argv.indexOf("--storage"), storage = at < 0 ? undefined : process.argv[at + 1];
+  const report = yield* readEffectReport(storage === undefined ? {} : { storage });
   const flagged = report.findings.filter(({ status }) => status !== "visible");
   if (process.argv.includes("--json")) yield* Console.log(JSON.stringify(report, null, 2));
   else for (const finding of flagged) yield* Console.log(`${finding.fighter}\t${finding.move}\t${finding.status}\t${finding.model}\t${finding.reason}`);

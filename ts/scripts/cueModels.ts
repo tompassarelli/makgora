@@ -11,11 +11,10 @@ const models = cueModels(), candidates = redrawCandidates();
 
 BunRuntime.runMain(Effect.gen(function*() {
   if (process.argv.includes("--record")) {
-    const at = process.argv.indexOf("--stock-cache"), cache = at < 0 ? process.env.CLASSIC_EFFECT_CACHE : process.argv[at + 1];
-    if (cache === undefined) return yield* new EffectCheckFailure({ problem: "--record needs one exact24268 --stock-cache DIRECTORY" });
+    const at = process.argv.indexOf("--storage"), storage = at < 0 ? undefined : process.argv[at + 1];
     const { cueModelLooks } = yield* Effect.promise(() => import("./wisp/headlessRender"));
     const looks = yield* cueModelLooks();
-    const report = yield* readEffectReport(cache);
+    const report = yield* readEffectReport(storage === undefined ? {} : { storage });
     yield* Effect.tryPromise({ try: () => Bun.write(record, formatRecord(looks) + formatEffectRecord(report)), catch: (cause) => new EffectCheckFailure({ problem: `write cue record: ${String(cause)}` }) });
     yield* Console.log(`cue models: recorded ${looks.size} models and Classic facts for ${report.facts.size} models in ${CUE_MODEL_RECORD}`);
   }

@@ -125,7 +125,7 @@ test("two lanes' Classic model facts merge row by row; changed uses are rejudged
   expect(merged.conflicts).toBe(0);
   expect(effectRecordProblem(merged.text, both)).toBeUndefined();
   expect(merged.text.split("\n").filter((line) => line.startsWith("classic-model\t")).length).toBe(new Set(both.map(({ model }) => model)).size);
-  for (const [lane, list, added] of [[laneA, both, addedB], [laneB, both, addedA]] as const) expect(effectRecordProblem(record(lane), list)).toBe(`Classic effect record is missing or stale: no model facts for 1 newly used models; from ts/ on a machine with the exact24268 cache run ${RECORD_COMMAND} and commit the record: ${added.model} (${added.fighter}/${added.move})`);
+  for (const [lane, list, added] of [[laneA, both, addedB], [laneB, both, addedA]] as const) expect(effectRecordProblem(record(lane), list)).toBe(`Classic effect record is missing or stale: no model facts for 1 newly used models; from ts/ on a machine with the Warcraft III 3.0.0.24268 install run ${RECORD_COMMAND} and commit the record: ${added.model} (${added.fighter}/${added.move})`);
   expect(effectRecordProblem(record(uses), laneB.map((use, index) => index === changed ? { ...use, alpha: 0 } : use).filter((use) => use !== addedB))).toBe(`Classic effects: 1 invisible uses refuse the gate: ${uses[changed]?.fighter}/${uses[changed]?.move}`);
 });
 
@@ -160,7 +160,7 @@ test("render, lockfile and producer edits keep the Classic record valid; a chang
     edit("ts/src/game/render/effects.ts", '"Abilities\\\\Spells\\\\Other\\\\Silence\\\\SilenceTarget.mdx"', '"Abilities\\\\Spells\\\\Other\\\\Silence\\\\SilenceLaneTarget.mdx"');
     const silenced = uses.filter((use) => use.model === STOCK_MODELS.silenceTarget && use.kind === "presentation effect");
     expect(silenced.length).toBe(1);
-    expect(check()).toBe(`Classic effect record is missing or stale: no model facts for 1 newly used models; from ts/ on a machine with the exact24268 cache run ${RECORD_COMMAND} and commit the record: ${STOCK_MODELS.silenceTarget.replace("SilenceTarget", "SilenceLaneTarget")} (${silenced.map((use) => `${use.fighter}/${use.move}`).join(", ")})`);
+    expect(check()).toBe(`Classic effect record is missing or stale: no model facts for 1 newly used models; from ts/ on a machine with the Warcraft III 3.0.0.24268 install run ${RECORD_COMMAND} and commit the record: ${STOCK_MODELS.silenceTarget.replace("SilenceTarget", "SilenceLaneTarget")} (${silenced.map((use) => `${use.fighter}/${use.move}`).join(", ")})`);
     expect(uses.filter(({ model }) => /^war3mapImported[\\/]/i.test(model) && !/-[0-9a-f]{64}\.mdx$/i.test(model)).map(({ model }) => model).filter((model) => !IMPORTED_MODEL_FILES.some(({ entry }) => entry === model))).toEqual([]);
     edit("build-inputs/imported-models", readFileSync(join(repo, "build-inputs/imported-models"), "utf8").trim(), "f".repeat(64));
     expect(check()).toContain(`@${"f".repeat(64)} (cairne-bloodhoof/`);

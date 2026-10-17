@@ -231,7 +231,7 @@ export function mergeFamily({ base, ours, theirs }: FamilySides): { readonly tre
 
 export function resolveConflicts(conflicts: readonly Conflict[]): Resolution {
   const recorded = conflicts.filter(({ path }) => CACHE_RECORDS.includes(path)).map(({ path }) => path);
-  if (recorded.length > 0) return { resolve: false, why: `${recorded.join(" ")} is recorded from the private Classic cache that Autoland's runners don't hold, so Autoland keeps neither side; rebase the lane onto main, run bun scripts/cueModels.ts --record --stock-cache DIRECTORY from ts/ on the landing machine, and push again` };
+  if (recorded.length > 0) return { resolve: false, why: `${recorded.join(" ")} is recorded from the Warcraft III install that Autoland's runners don't hold, so Autoland keeps neither side; rebase the lane onto main, run bun scripts/cueModels.ts --record from ts/ on the landing machine, and push again` };
   const source = conflicts.filter(({ path }) => pinFamily(path) === undefined && !GENERATED_REPORTS.includes(path)).map(({ path }) => path);
   if (source.length > 0) return { resolve: false, why: `${source.join(" ")} ${source.length === 1 ? "is" : "are"} not generated; Autoland never resolves source` };
   const pins: { path: string; tree: Tree; hash: string }[] = [];

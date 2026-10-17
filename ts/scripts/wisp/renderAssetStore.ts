@@ -7,7 +7,7 @@ import { Effect, Schema } from "effect";
 import { ChildProcess } from "effect/process";
 import { FIGHTER_ART } from "../../src/generated/fighterArtData";
 import { INPUTS_STORE, type Manifest, assetsView, readManifest } from "./buildInputs";
-import { runProcess } from "../hostProcess";
+import { ProcessFailure, runProcess } from "../hostProcess";
 import { POST_PROCESSING_FILE } from "../postProcessing";
 import { resolveRenderAsset, type AssetLocation, type AssetLayer, type Graphics, type ResolvedRenderAsset } from "wisp/scripts/wisp/renderAssets";
 
@@ -15,6 +15,7 @@ export const key = (path: string) => path.replaceAll("\\", "/").toLowerCase().re
 const PRIVATE = join(homedir(), ".local/share/smashcraft-render-assets");
 const NOT_IN_STORAGE = "open asset failed: 2";
 const ABSENT_SUFFIX = ".absent";
+const EXTRACT_TIMEOUT = "60 seconds";
 
 
 class RenderAssetFailure extends Schema.TaggedError<RenderAssetFailure>()("RenderAssetFailure", { problem: Schema.String }) {
@@ -31,6 +32,13 @@ export interface RenderAssetOptions {
   readonly textures?: string;
   readonly cache?: string;
   readonly manifest?: string;
+  readonly strict?: boolean;
+}
+
+export interface StockBuild {
+  readonly storage: string;
+  readonly buildInfoSha256: string;
+  readonly fields: Readonly<Record<string, string>>;
 }
 
 export type MapImports = readonly { readonly entry: string; readonly source: string }[];
@@ -45,6 +53,13 @@ const read = (path: string) => attempt(`read ${path}`, async () => {
   if (!await file.exists()) return undefined;
   const bytes = await file.bytes();
   return bytes.length > 0 ? bytes : undefined;
+});
+
+export const readStockBuild = (storage: string) => attempt("read the stock build info", async (): Promise<StockBuild> => {
+  const info = await Bun.file(join(storage, ".build.info")).text();
+  const lines = info.trim().split(/\r?\n/), headers = (lines[0] ?? "").split("|").map((name) => name.split("!")[0] ?? name);
+  const rows = lines.slice(1).map((line) => Object.fromEntries(line.split("|").map((value, index) => [headers[index] ?? String(index), value])));
+  return { storage, buildInfoSha256: createHash("sha256").update(info).digest("hex"), fields: rows.find((row) => row.Active === "1") ?? rows[0] ?? {} };
 });
 
 const findExtractor = (options: RenderAssetOptions) => options.extractor ?? process.env.CASC_EXTRACTOR ?? Bun.which("casc-extract")
@@ -67,15 +82,12 @@ export function renderAssetStore(options: RenderAssetOptions = {}, mapImports?: 
   const storage = options.storage ?? stockStorage();
   const manifestPath = options.manifest ?? process.env.WC3_ASSET_MANIFEST;
   const used = new Map<string, { readonly sha256: string; readonly bytes: number }>();
-  let stockInfo: { readonly storage: string; readonly buildInfoSha256: string; readonly fields: Readonly<Record<string, string>> } | undefined;
+  let stockInfo: StockBuild | undefined;
   let temporaries = 0;
   const temporary = (target: string) => `${target}.${process.pid}.${++temporaries}.tmp`;
 
-  const stockCache = Effect.runSync(Effect.cached(attempt("read the stock build info", async () => {
-    const info = await Bun.file(join(storage, ".build.info")).text();
-    const lines = info.trim().split(/\r?\n/), headers = (lines[0] ?? "").split("|").map((name) => name.split("!")[0] ?? name);
-    const rows = lines.slice(1).map((line) => Object.fromEntries(line.split("|").map((value, index) => [headers[index] ?? String(index), value])));
-    stockInfo = { storage, buildInfoSha256: createHash("sha256").update(info).digest("hex"), fields: rows.find((row) => row.Active === "1") ?? rows[0] ?? {} };
+  const stockCache = Effect.runSync(Effect.cached(readStockBuild(storage).pipe(Effect.flatMap((build) => attempt("open the stock cache", () => {
+    stockInfo = build;
     const directory = join(options.cache ?? PRIVATE, "stock", stockInfo.buildInfoSha256);
     mkdirSync(directory, { recursive: true });
     const buildInfo = join(directory, "build-info.json"), temp = temporary(buildInfo);
@@ -86,7 +98,7 @@ export function renderAssetStore(options: RenderAssetOptions = {}, mapImports?: 
       rmSync(temp, { force: true });
     }
     return directory;
-  })));
+  })))));
   const stockFallback = new Set<string>();
   const sources = Effect.runSync(Effect.cached(mapSources(options, mapImports, stockFallback)));
   let extractedTextures: Map<string, string> | undefined;
@@ -107,9 +119,11 @@ export function renderAssetStore(options: RenderAssetOptions = {}, mapImports?: 
     if (output === undefined) return Effect.succeed(false);
     const temp = temporary(output), absent = `${output}${ABSENT_SUFFIX}`;
     const extract = runProcess(ChildProcess.make(program, [...args.slice(0, -1), temp], { stdin: "ignore" })).pipe(
+      Effect.timeoutOrElse({ duration: EXTRACT_TIMEOUT, orElse: () => Effect.fail(new ProcessFailure({ command: program, problem: `no result within ${EXTRACT_TIMEOUT}` })) }),
       Effect.flatMap(() => read(temp)),
       Effect.flatMap((bytes) => bytes === undefined ? Effect.succeed(false) : attempt(`move ${temp}`, () => (renameSync(temp, output), true))),
-      Effect.catchTag("ProcessFailure", (failure) => failure.problem.endsWith(NOT_IN_STORAGE) ? attempt(`mark ${absent}`, () => (writeFileSync(absent, ""), false)) : Effect.succeed(false)),
+      Effect.catchTag("ProcessFailure", (failure) => failure.problem.endsWith(NOT_IN_STORAGE) ? attempt(`mark ${absent}`, () => (writeFileSync(absent, ""), false))
+        : options.strict === true ? Effect.fail(new RenderAssetFailure({ problem: `extract ${args.at(-2) ?? output}: ${failure.problem}` })) : Effect.succeed(false)),
       Effect.ensuring(Effect.sync(() => rmSync(temp, { force: true }))),
       Effect.flatMap((moved) => moved ? Effect.succeed(true) : read(output).pipe(Effect.map((bytes) => bytes !== undefined))));
     return attempt(`read ${absent}`, () => Bun.file(absent).exists()).pipe(Effect.flatMap((known) => known ? Effect.succeed(false) : extract));
