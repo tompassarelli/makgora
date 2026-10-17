@@ -726,7 +726,7 @@ function eyeBlastBeam(): Readonly<HitRegion>[] {
   for (let frame = EYE_BLAST_FIRST; frame <= EYE_BLAST_LAST; frame++) {
     beam.push({
       minX: 25.0, maxX: f32(EYE_BLAST_NEAR + f32(EYE_BLAST_SWEEP * (frame - EYE_BLAST_FIRST))), minZ: -60.0, maxZ: 45.0,
-      effect: { damage: 13.0, growth: 90.0, base: 24.0, launchX: 0.8660253882408142, launchZ: 0.5, electric: false, element: HitElement.fire, manaDrain: 10 },
+      effect: { damage: 12.0, growth: 75.0, base: 24.0, launchX: 0.8660253882408142, launchZ: 0.5, electric: false, element: HitElement.fire, manaDrain: 10 },
       window: 1,
     });
   }

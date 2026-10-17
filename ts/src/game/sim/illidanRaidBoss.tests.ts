@@ -51,7 +51,7 @@ test("Eye Blast: a grounded EX neutral special spending one meter segment, with 
   }
   assertEquals(d.target.status.damage, 0.0);
   d.run(EYE_BLAST_LAST - EYE_BLAST_WINDUP);
-  assertEquals(d.target.status.damage, 13.0);
+  assertEquals(d.target.status.damage, 12.0);
   assertEquals(EYE_BLAST_REACH, 645.0);
 
   const empty = duel(420.0);

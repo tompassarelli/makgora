@@ -442,6 +442,15 @@ and his aerials land 3 frames sooner, inside the ±3-frame bound; and both
 casts carry armor through 8 damage from frame 10. His 25 pairs at 200 a
 pair measured 43%.
 
+17 Oct 2026 (#46). Illidan's air Immolate stall (80fce5213e) and the
+up-special refresh on a hit (63a0655a38) cut his stocks lost over 3 s after
+a hit from 33% to 15%, and his 25 pairs on 4df269f4bf (Balance run
+38987519354) measured 71%, with Eye Blast at 32% of his kills. Both
+mechanics stay as Tom asked. Eye Blast drops from 13% with growth 90 and
+base 24 to 12% with growth 75 and base 24; up smash's growth from 100 to
+94, Azzinoth's glaives from 14% to 13% and forward tilt from 9% to 8%, each
+kill percent within 15%. His 25 pairs at 200 a pair measured 62%.
+
 ## Player panel and equal skill ceilings (#358)
 
 Every fighter targets a 45–55% mean over all six Expert personalities, with

@@ -108,17 +108,17 @@ const DEMON_HUNTER_REGIONS: { readonly [style: number]: Readonly<HitRegion> } = 
   [AttackStyle.jab]: region(0.0, 92.0, -55.0, 105.0, 5.0, 100.0, 18.0, DIAGONAL_UNIT, DIAGONAL_UNIT),
   [AttackStyle.jab2]: region(0.0, 96.0, -50.0, 100.0, 4.0, 30.0, 22.0, 0.3420201539993286, 0.9396926164627075),
   [AttackStyle.jab3]: region(0.0, 110.0, -50.0, 110.0, 6.0, 95.0, 22.0, 0.7660444378852844, 0.6427876353263855),
-  [AttackStyle.upSmash]: region(-105.0, 105.0, -30.0, 195.0, 15.0, 100.0, 20.0, DIAGONAL_UNIT, DIAGONAL_UNIT),
+  [AttackStyle.upSmash]: region(-105.0, 105.0, -30.0, 195.0, 15.0, 94.0, 20.0, DIAGONAL_UNIT, DIAGONAL_UNIT),
   [AttackStyle.downSmash]: region(-105.0, 105.0, -195.0, 45.0, 15.0, 100.0, 20.0, DIAGONAL_UNIT, DIAGONAL_UNIT),
   [AttackStyle.forwardSmash]: region(25.0, 120.0, -75.0, 105.0, 10.0, 85.0, 20.0, DIAGONAL_UNIT, DIAGONAL_UNIT),
 
   [AttackStyle.demonHunterDashAttack]: region(0.0, 150.0, -70.0, 115.0, 9.0, 95.0, 20.0, 0.5, 0.8660253882408142),
 
-  [AttackStyle.forwardTilt]: region(0.0, 135.0, -80.0, 95.0, 9.0, 80.0, 20.0, 0.9063078165054321, 0.4226182699203491),
+  [AttackStyle.forwardTilt]: region(0.0, 135.0, -80.0, 95.0, 8.0, 80.0, 20.0, 0.9063078165054321, 0.4226182699203491),
   [AttackStyle.upTilt]: region(0.0, 125.0, -30.0, 185.0, 8.0, 105.0, 18.0, 0.25, 0.968245804309845),
   [AttackStyle.downTilt]: region(-115.0, 115.0, -145.0, 40.0, 7.0, 90.0, 16.0, DIAGONAL_UNIT, 0.30000001192092896),
-  [AttackStyle.forwardTiltUp]: region(0.0, 135.0, -30.0, 145.0, 9.0, 80.0, 20.0, 0.8799999952316284, 0.47999998927116394),
-  [AttackStyle.forwardTiltDown]: region(0.0, 135.0, -145.0, 5.0, 9.0, 80.0, 20.0, 0.8799999952316284, -0.47999998927116394),
+  [AttackStyle.forwardTiltUp]: region(0.0, 135.0, -30.0, 145.0, 8.0, 80.0, 20.0, 0.8799999952316284, 0.47999998927116394),
+  [AttackStyle.forwardTiltDown]: region(0.0, 135.0, -145.0, 5.0, 8.0, 80.0, 20.0, 0.8799999952316284, -0.47999998927116394),
   [AttackStyle.neutralAir]: region(-115.0, 115.0, -45.0, 100.0, 7.0, 95.0, 16.0, DIAGONAL_UNIT, DIAGONAL_UNIT),
   [AttackStyle.forwardAir]: region(0.0, 175.0, -55.0, 115.0, 6.0, 85.0, 18.0, 0.9399999976158142, 0.3400000035762787),
   [AttackStyle.backAir]: region(-175.0, 0.0, -55.0, 115.0, 6.0, 85.0, 18.0, -0.9399999976158142, 0.3400000035762787),
@@ -134,7 +134,7 @@ const FORWARD_AIR_LINK = region(0.0, 175.0, -55.0, 115.0, 2.0, 10.0, 30.0, -0.25
 const FORWARD_AIR_LAUNCH = region(0.0, 150.0, -40.0, 110.0, 3.0, 85.0, 18.0, 0.7660444378852844, 0.6427876353263855, 2);
 const NEUTRAL_AIR_CLEAN = { ...DEMON_HUNTER_REGIONS[AttackStyle.neutralAir] ?? NO_HIT_REGION, effect: strongHit((DEMON_HUNTER_REGIONS[AttackStyle.neutralAir] ?? NO_HIT_REGION).effect) };
 const NEUTRAL_AIR_LATE = { ...NEUTRAL_AIR_CLEAN, effect: weakHit(NEUTRAL_AIR_CLEAN.effect) };
-const AZZINOTH_GLAIVES = { ...region(-190.0, 190.0, -60.0, 60.0, 14.0, 95.0, 22.0, 0.258819043636322, 0.9659258127212524), effect: downSmashHit(region(-190.0, 190.0, -60.0, 60.0, 14.0, 95.0, 22.0, 0.258819043636322, 0.9659258127212524).effect) };
+const AZZINOTH_GLAIVES = { ...region(-190.0, 190.0, -60.0, 60.0, 13.0, 95.0, 22.0, 0.258819043636322, 0.9659258127212524), effect: downSmashHit(region(-190.0, 190.0, -60.0, 60.0, 13.0, 95.0, 22.0, 0.258819043636322, 0.9659258127212524).effect) };
 
 const AZZINOTH_FLAMES = { ...region(-190.0, 190.0, -30.0, 170.0, 3.0, 20.0, 30.0, 0.08715574443340302, 0.9961947202682495), effect: downSmashHit(region(-190.0, 190.0, -30.0, 170.0, 3.0, 20.0, 30.0, 0.08715574443340302, 0.9961947202682495).effect) };
 
