@@ -1,7 +1,7 @@
 # Play current Smashcraft
 
-Players download the map from [Hive Workshop](https://www.hiveworkshop.com/)
-(the link is a placeholder until the Smashcraft upload is available). Put it
+Players download the map from [Hive Workshop](https://www.hiveworkshop.com/threads/smashcraft-0-1-0.375492/).
+Put it
 in the Warcraft III Maps folder and open it from Custom Games. The GitHub
 repositories contain code only; maps are distributed on Hive Workshop.
 

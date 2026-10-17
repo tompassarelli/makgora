@@ -1,8 +1,8 @@
 # Player guide
 
 Requires Warcraft III 3.0 and a keyboard; nothing else to install. Download
-the map from [Hive Workshop](https://www.hiveworkshop.com/) (placeholder until
-the Smashcraft upload is available), put it in the Warcraft III Maps folder
+the map from [Hive Workshop](https://www.hiveworkshop.com/threads/smashcraft-0-1-0.375492/),
+put it in the Warcraft III Maps folder
 and open it from Custom Games. Public 0.1 uses the Classic look. Set Graphics
 to Classic and restart Warcraft III after changing it. A
 controller is optional: the Smashcraft controller helper turns its buttons

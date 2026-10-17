@@ -12,8 +12,7 @@ Warcraft III is still a great platform for custom games, and Melee's movement an
 combat remain the model for the platform fighter. Smashcraft brings that
 depth to Warcraft III's heroes, with the rollback netcode that online play needs.
 
-Download the map from [Hive Workshop](https://www.hiveworkshop.com/)
-(the link is a placeholder until the Smashcraft upload is available).
+Download the map from [Hive Workshop](https://www.hiveworkshop.com/threads/smashcraft-0-1-0.375492/).
 How to play: [player guide](docs/player-guide.md).
 The GitHub repositories contain code only; maps are distributed on Hive Workshop,
 not committed to Git or attached to GitHub releases.
