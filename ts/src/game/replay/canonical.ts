@@ -375,7 +375,7 @@ export function fighterSpecialsCanonical(specials: Readonly<FighterSpecials> | u
   return result.join("");
 }
 
-function specialMoveCanonical(move: Readonly<AuthoredSpecial>, name: string): string {
+export function specialMoveCanonical(move: Readonly<AuthoredSpecial>, name: string): string {
   const result: string[] = [];
   if (move.ex !== undefined) result.push(specialMoveCanonical(move.ex, `${name}.ex`));
   const variants = move.variants ?? [];

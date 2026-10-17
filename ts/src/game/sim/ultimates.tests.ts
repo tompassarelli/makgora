@@ -13,7 +13,7 @@ import { fighterAt, isActive, neutralControls } from "./roster";
 import { f32 } from "wisp/src/sim/f32";
 import { ATTACK_BUFFER_FRAMES, type AttackBuffer, attackBuffer, queueAttack } from "../input/attackBuffer";
 import { createFrameControls } from "../match/controls";
-import { Phase, createMatchState } from "../lobby/lobbyState";
+import { Phase, createMatchState, stageClock } from "../lobby/lobbyState";
 import { stepMatch } from "../match/step";
 import { AttackStyle, Character, ProjectileKind, SpecialAction } from "./codes";
 import { type Fighter, createFighter, placedObject } from "./fighter";
@@ -21,7 +21,7 @@ import { ROSTER_MANA } from "./mana";
 import { type Controls, copyControls, createRoster } from "./roster";
 import { controls } from "./testWorld";
 import { FIGHTER_ULTIMATES, KOBOLD_BURROW_FIRST, KOBOLD_BURROW_LAST, ULTIMATE_REACH } from "./ultimates";
-import { type AuthoredSpecial, Relocation } from "./specials/schema";
+import { type AuthoredSpecial, Relocation, type SpecialProjectile } from "./specials/schema";
 import { airHoldEnd, firstThreat } from "./specials/engine";
 import { firstStateDifference } from "../replay/difference";
 import { stateChecksum } from "../replay/canonical";
@@ -29,7 +29,7 @@ import { type ReplayState, copyReplayState, createReplaySnapshot } from "../repl
 import { isIntangible } from "./conditions";
 import { spawnProjectileMotion } from "./projectiles";
 import { clearSpecialOnStock } from "./transitions";
-import { floorBelow, mainDeckLeft, mainDeckRight, mainDeckZAt, SLOPE_TEST_STAGE, surfaceLeft, surfaceZAt } from "./stage";
+import { floorBelow, floorSurfaceBelow, mainDeckLeft, mainDeckRight, mainDeckZAt, SLOPE_TEST_STAGE, surfaceLeft, surfaceZAt, TIMED_TEST_STAGE } from "./stage";
 
 /** How each ultimate is met in its recorded scenario (docs/design/ultimates.md). */
 type Defence = "shield" | "spotDodge" | "ground";
@@ -79,20 +79,22 @@ const ULTIMATE = controls({ specialPressed: true, ultimatePressed: true, attackH
 interface Bout {
   readonly owner: Fighter;
   readonly target: Fighter;
+  readonly bystander: Fighter | undefined;
   readonly step: (this: void, first?: Readonly<Controls>, second?: Readonly<Controls>) => void;
   readonly commands: readonly AttackBuffer[];
   readonly frame: () => number;
   readonly game: ReturnType<typeof createMatchState>;
 }
 
-function bout(scenario: Readonly<Scenario>, facing: number, target: Character = Character.blademaster, x = scenario.x, off = false): Bout {
+function bout(scenario: Readonly<Scenario>, facing: number, target: Character = Character.blademaster, x = scenario.x, off = false, bystanderGap?: number): Bout {
   const game = createMatchState();
   game.phase = Phase.match;
   game.ultimatesOff = off;
   const owner = createFighter(scenario.character, f32(-x * facing * 0.5), facing);
   const victim = createFighter(target, f32(x * facing * 0.5), -facing);
+  const bystander = bystanderGap === undefined ? undefined : createFighter(Character.blademaster, f32(owner.motion.x + f32(facing * bystanderGap)), -facing);
   owner.mana.points = ROSTER_MANA.max;
-  const world = createRoster(3, [owner, victim]);
+  const world = createRoster(bystander === undefined ? 3 : 7, bystander === undefined ? [owner, victim] : [owner, victim, bystander]);
   const commands = [attackBuffer(ATTACK_BUFFER_FRAMES), attackBuffer(ATTACK_BUFFER_FRAMES)];
   let frame = 0;
   const step = (first = controls(), second = controls()): void => {
@@ -111,7 +113,7 @@ function bout(scenario: Readonly<Scenario>, facing: number, target: Character = 
     victim.motion.surface = undefined;
     victim.motion.z = f32(victim.motion.z + scenario.z);
   }
-  return { owner, target: victim, step, commands, frame: () => frame, game };
+  return { owner, target: victim, bystander, step, commands, frame: () => frame, game };
 }
 
 /** Holds an airborne target where it was put, as a jumper at its apex would be. */
@@ -191,8 +193,8 @@ const GROUND_ONLY_ULTIMATES: readonly Character[] = [
   Character.blademaster, Character.beastmaster, Character.thrall, Character.peon, Character.murloc, Character.anubarak,
 ];
 
-function airborneBout(scenario: Readonly<Scenario>, facing: number, height: number, gap = 900.0): Bout {
-  const b = bout(scenario, facing, Character.blademaster, gap);
+function airborneBout(scenario: Readonly<Scenario>, facing: number, height: number, gap = 900.0, bystanderGap?: number): Bout {
+  const b = bout(scenario, facing, Character.blademaster, gap, false, bystanderGap);
   const { motion } = b.owner;
   motion.grounded = false;
   motion.surface = undefined;
@@ -202,6 +204,21 @@ function airborneBout(scenario: Readonly<Scenario>, facing: number, height: numb
   motion.fastFalling = true;
   b.owner.jump.remaining = 1;
   return b;
+}
+
+const LIFT = 1;
+const LIFT_RISING = 95;
+const LIFT_RAISED = 215;
+const SKY = 100000.0;
+
+function standOnFloor(f: Fighter, stage: number, clock: number, ceiling = SKY): void {
+  const surface = floorSurfaceBelow(stage, clock, f.motion.x, ceiling);
+  if (surface === undefined) throw new Error(`no floor under ${f.motion.x} on stage ${stage}`);
+  f.motion.grounded = true;
+  f.motion.surface = surface;
+  f.motion.z = surfaceZAt(stage, surface, clock, f.motion.x);
+  f.motion.vx = 0.0;
+  f.motion.vz = 0.0;
 }
 
 test("an airborne press starts every ultimate except the floor sweeps, which refuse and keep the bar (#98) [k3 measure #98]", () => {
@@ -309,27 +326,82 @@ test("an air cast draws its mark on the highest floor under it at or below the c
   assertEquals(failures.join("; "), "");
 });
 
-test("each drawn-mark ultimate's effects outlive its last strike and are gone within 12 frames of it, with or without hitlag before it, cast standing or from the air [k3 measure docs/design/ultimates.md]", () => {
+test("on a rising lift Inferno, Light's Judgment and the Dark Portal draw every mark at the first, which lies on the lift where it stood that frame, cast standing on the lift or from the air (#98) [k1 scenario]", () => {
   const failures: string[] = [];
-  for (const character of [Character.medivh, Character.forsakenPaladin, Character.dreadlord]) for (const near of [false, true]) for (const height of [0.0, 300.0]) {
+  for (const character of [Character.dreadlord, Character.forsakenPaladin, Character.medivh]) for (const facing of [-1, 1]) for (const air of [false, true]) {
+    const scenario = scenarioOf(character);
+    const specs = ultimateOf(character).projectiles ?? [];
+    const first = specs[0];
+    if (first === undefined) throw new Error(`no mark for ${name(character)}`);
+    const b = bout(scenario, facing, Character.blademaster, 1100.0);
+    b.game.stageChoice = TIMED_TEST_STAGE;
+    b.game.matchFrame = LIFT_RISING;
+    const clock = (): number => stageClock(b.game);
+    const { motion } = b.owner;
+    motion.x = air ? f32(-facing * f32(first.offsetX - 40.0)) : f32(-facing * 100.0);
+    standOnFloor(b.owner, TIMED_TEST_STAGE, clock());
+    if (air) {
+      motion.grounded = false;
+      motion.surface = undefined;
+      motion.z = f32(motion.z + 200.0);
+    }
+    const label = `${name(character)} ${facing} ${air ? "air" : "standing"}`;
+    const seen = new Set<SpecialProjectile>();
+    let drawn: { readonly x: number; readonly z: number } | undefined;
+    b.step(ULTIMATE);
+    for (let tick = 0; tick < 90 && b.owner.special.action === SpecialAction.heroUltimate; tick++) {
+      b.step();
+      for (const projectile of b.owner.projectiles) {
+        const spec = projectile.spec;
+        if (projectile.life <= 0 || spec === undefined || !specs.includes(spec) || seen.has(spec)) continue;
+        seen.add(spec);
+        const age = spec.life - projectile.life;
+        if (spec === first) {
+          drawn = { x: projectile.x, z: projectile.z };
+          const lift = surfaceZAt(TIMED_TEST_STAGE, LIFT, clock(), projectile.x);
+          if (projectile.z !== lift) failures.push(`${label}: first mark at z ${projectile.z}, lift at ${lift} on f${b.owner.special.frame}`);
+          continue;
+        }
+        const x = drawn === undefined ? undefined : f32(drawn.x + f32(facing * spec.offsetX));
+        const z = drawn === undefined ? undefined : f32(f32(drawn.z + spec.offsetZ) + f32(spec.velocityZ * age));
+        if (projectile.x !== x || projectile.z !== z) failures.push(`${label}: f${b.owner.special.frame} mark at ${projectile.x}/${projectile.z}, drawn at ${x}/${z}`);
+      }
+    }
+    if (seen.size !== specs.length) failures.push(`${label}: drew ${seen.size} of ${specs.length} marks`);
+  }
+  assertEquals(failures.join("; "), "");
+});
+
+test("each drawn-mark ultimate's marks stand through its strikes and its effects are gone within 12 frames of the last, with or without hitlag before it, cast standing or from the air [k3 measure docs/design/ultimates.md]", () => {
+  const failures: string[] = [];
+  for (const character of [Character.medivh, Character.forsakenPaladin, Character.dreadlord, Character.chen]) for (const near of [false, true]) for (const height of [0.0, 300.0]) {
     const scenario = scenarioOf(character);
     const move = ultimateOf(character);
     const gap = near ? scenario.x : 1100.0;
     const b = height > 0.0 ? airborneBout(scenario, 1, height, gap) : bout(scenario, 1, Character.blademaster, gap);
     const label = `${name(character)} ${near ? "near" : "alone"} height ${height}`;
-    const lastActive = Math.max(...(move.regions ?? []).map((region) => region.lastFrame + 1));
+    const regions = move.regions ?? [];
+    const lastActive = Math.max(...regions.map((region) => region.lastFrame + 1));
     const specs = move.projectiles ?? [];
+    const strikeMark = (index: number): SpecialProjectile | undefined => character === Character.chen ? specs[index] : move.regionOrigin;
+    const standing = (spec: SpecialProjectile | undefined): boolean => b.owner.projectiles.some((projectile) => projectile.life > 0 && projectile.spec === spec);
+    const aloft = character === Character.chen && height > 0.0 ? b.owner.motion.z : undefined;
     let lastActiveTick = 0;
-    let anchoredAtLast = false;
+    let anchoredAtLast = move.regionOrigin === undefined;
     let paused = 0;
     let goneTick = 0;
     b.step(ULTIMATE);
     for (let tick = 1; tick <= 160 && goneTick === 0; tick++) {
+      if (aloft !== undefined) hover(b, aloft, aloft);
       b.step();
       if (b.owner.launch.hitlag > 0 && b.owner.special.frame < lastActive) paused++;
-      if (b.owner.special.action === SpecialAction.heroUltimate && b.owner.special.frame === lastActive) {
+      const running = b.owner.special.action === SpecialAction.heroUltimate;
+      for (const [index, region] of regions.entries()) {
+        if (running && b.owner.special.frame === region.firstFrame + 1 && !standing(strikeMark(index))) failures.push(`${label}: strike ${index} at f${region.firstFrame + 1} without its mark`);
+      }
+      if (running && b.owner.special.frame === lastActive) {
         lastActiveTick = tick;
-        anchoredAtLast = b.owner.projectiles.some((projectile) => projectile.life > 0 && projectile.spec === move.regionOrigin);
+        if (move.regionOrigin !== undefined) anchoredAtLast = standing(move.regionOrigin);
       }
       if (lastActiveTick > 0 && !b.owner.projectiles.some((projectile) => projectile.life > 0 && projectile.spec !== undefined && specs.includes(projectile.spec))) goneTick = tick;
     }
@@ -337,7 +409,7 @@ test("each drawn-mark ultimate's effects outlive its last strike and are gone wi
     if (!anchoredAtLast) failures.push(`${label}: mark gone by the last active frame f${lastActive}`);
     if (goneTick === 0 || goneTick - lastActiveTick > 12) failures.push(`${label}: effects gone ${goneTick - lastActiveTick} frames after the last active frame`);
   }
-  assertEquals(failures.join("; "), "");
+  assertEquals([...new Set(failures)].join("; "), "");
 });
 
 const AIR_PORTAL_SAVE = 12;
@@ -1009,31 +1081,42 @@ function refusedOverVoid(character: Character, facing: number): boolean {
   return b.owner.special.action !== SpecialAction.heroUltimate && b.owner.mana.points === ROSTER_MANA.max;
 }
 
-test("Storm, Earth and Fire cast in the air holds Chen through his last strike, so each spirit strikes where it was drawn at his height (#98) [k1 scenario]", () => {
-  const regions = ultimateOf(Character.chen).regions ?? [];
+test("Storm, Earth and Fire cast in the air holds Chen through his last strike, so each spirit strikes where it was drawn at his height and still stands there after Earth's hitlag (#98) [k1 scenario]", () => {
+  const move = ultimateOf(Character.chen);
+  const regions = move.regions ?? [];
+  const spirits = move.projectiles ?? [];
   const failures: string[] = [];
-  for (const facing of [-1, 1]) for (const [index, gap] of [[0, 100.0], [1, 220.0], [2, -240.0]] as const) {
+  for (const facing of [-1, 1]) for (const [index, gap, earthStruck] of [[0, 100.0, undefined], [1, 220.0, undefined], [2, -240.0, undefined], [1, 220.0, 100.0], [2, -240.0, 100.0]] as const) {
     const region = regions[index];
     if (region === undefined) throw new Error(`Chen has no strike ${index}`);
-    const b = airborneBout(scenarioOf(Character.chen), facing, 300.0, gap);
+    const b = airborneBout(scenarioOf(Character.chen), facing, 300.0, gap, earthStruck);
     b.step(ULTIMATE);
     const { x, z } = b.owner.motion;
     let struck = -1;
     let inPlace = false;
+    let standing = false;
+    let paused = false;
     for (let tick = 0; tick < 90 && struck < 0 && b.owner.special.action === SpecialAction.heroUltimate; tick++) {
-      if (b.target.launch.hitstun <= 0 && b.target.launch.hitlag <= 0) {
-        b.target.motion.grounded = false;
-        b.target.motion.surface = undefined;
-        b.target.motion.z = z;
-        b.target.motion.vz = 0.0;
+      for (const foe of [b.target, b.bystander]) {
+        if (foe === undefined || foe.launch.hitstun > 0 || foe.launch.hitlag > 0) continue;
+        foe.motion.grounded = false;
+        foe.motion.surface = undefined;
+        foe.motion.z = z;
+        foe.motion.vz = 0.0;
       }
       const before = b.target.status.damage;
       b.step();
-      if (b.target.status.damage <= before) continue;
+      if (b.target.status.damage <= before) {
+        if (b.owner.launch.hitlag > 0) paused = true;
+        continue;
+      }
       struck = b.owner.special.frame;
       inPlace = b.owner.motion.x === x && b.owner.motion.z === z;
+      standing = b.owner.projectiles.some((projectile) => projectile.life > 0 && projectile.spec === spirits[index]);
     }
-    if (struck !== region.firstFrame + 1 || !inPlace) failures.push(`facing ${facing} gap ${gap}: struck f${struck} (strike f${region.firstFrame + 1}) in place ${inPlace}`);
+    if (struck !== region.firstFrame + 1 || !inPlace || !standing || (earthStruck !== undefined && !paused)) {
+      failures.push(`facing ${facing} gap ${gap} earth-struck ${earthStruck}: struck f${struck} (strike f${region.firstFrame + 1}) in place ${inPlace}, spirit standing ${standing}, hitlag before ${paused}`);
+    }
   }
   assertEquals(failures.join("; "), "");
 });
@@ -1069,30 +1152,114 @@ test("Robo-Goblin Overdrive cast in the air drops the robot to the floor beneath
   assertEquals(failures.join("; "), "");
 });
 
-test("You No Take Candle! cast in the air dives into the floor beneath the Kobold and burrows along it to erupt under a grounded foe, and refuses over the void (#98) [k1 scenario]", () => {
+test("You No Take Candle! cast in the air dives into the floor beneath the Kobold and burrows along it to erupt under a grounded foe, on a rising lift or beneath a raised one too, and refuses over the void (#98) [k1 scenario]", () => {
   const dust = ultimateOf(Character.kobold).projectiles?.[0];
   if (dust === undefined) throw new Error("no dust");
   const scenario = scenarioOf(Character.kobold);
   const failures: string[] = [];
-  for (const stage of [0, SLOPE_TEST_STAGE]) for (const facing of [-1, 1]) {
+  for (const { stage, start, ceiling } of [
+    { stage: 0, start: undefined, ceiling: SKY },
+    { stage: SLOPE_TEST_STAGE, start: undefined, ceiling: SKY },
+    { stage: TIMED_TEST_STAGE, start: LIFT_RISING, ceiling: SKY },
+    { stage: TIMED_TEST_STAGE, start: LIFT_RAISED, ceiling: 100.0 },
+  ]) for (const facing of [-1, 1]) {
     const b = airborneBout(scenario, facing, 150.0, scenario.x);
     b.game.stageChoice = stage;
-    b.owner.motion.z = f32(mainDeckZAt(stage, b.owner.motion.x) + 150.0);
-    b.target.motion.z = mainDeckZAt(stage, b.target.motion.x);
+    if (start !== undefined) b.game.matchFrame = start;
+    const clock = (): number => stageClock(b.game);
+    standOnFloor(b.target, stage, clock(), ceiling);
+    b.owner.motion.z = f32((floorBelow(stage, clock(), b.owner.motion.x, ceiling) ?? 0.0) + 150.0);
     b.step(ULTIMATE);
-    const floor = floorBelow(stage, 0, b.owner.motion.x, b.owner.motion.z);
     let dustZ: number | undefined;
+    let floor: number | undefined;
     let buried = true;
     for (let tick = 0; tick < 120 && b.owner.special.action === SpecialAction.heroUltimate; tick++) {
       b.step();
       const { motion, special } = b.owner;
       const mark = b.owner.projectiles.find((projectile) => projectile.life > 0 && projectile.spec === dust);
-      if (dustZ === undefined && mark !== undefined) dustZ = mark.z;
-      const onFloor = motion.grounded && motion.surface !== undefined && motion.z === surfaceZAt(stage, motion.surface, 0, motion.x);
+      if (dustZ === undefined && mark !== undefined) {
+        dustZ = mark.z;
+        floor = floorBelow(stage, clock(), mark.x, motion.z);
+      }
+      const onFloor = motion.grounded && motion.surface !== undefined && motion.z === surfaceZAt(stage, motion.surface, clock(), motion.x);
       if (special.frame >= KOBOLD_BURROW_FIRST && special.frame <= KOBOLD_BURROW_LAST && (!onFloor || b.owner.landing.lag > 0)) buried = false;
     }
-    if (dustZ !== floor || !buried || !(b.target.status.damage > 0.0)) failures.push(`stage ${stage} facing ${facing}: dust at z ${dustZ} (floor ${floor}), buried ${buried}, foe ${b.target.status.damage}%`);
+    if (dustZ === undefined || dustZ !== floor || !buried || !(b.target.status.damage > 0.0)) failures.push(`stage ${stage} from ${start} facing ${facing}: dust at z ${dustZ} (floor ${floor}), buried ${buried}, foe ${b.target.status.damage}%`);
     if (stage === 0 && !refusedOverVoid(Character.kobold, facing)) failures.push(`facing ${facing}: started over the void`);
   }
   assertEquals(failures.join("; "), "");
+});
+
+test("a computer Goblin Tinker or Kobold in the air over a raised lift aims its ultimate from the lift beneath it and presses it at a foe standing there before the lift comes down (#98) [k1 scenario]", () => {
+  const failures: string[] = [];
+  for (const character of [Character.tinker, Character.kobold]) for (const facing of [-1, 1]) {
+    const me = createFighter(character, f32(-facing * 70.0), facing);
+    const foe = createFighter(Character.blademaster, f32(facing * 80.0), -facing);
+    const world = createRoster(3, [me, foe]);
+    const match = createMatchState();
+    match.phase = Phase.match;
+    match.stageChoice = TIMED_TEST_STAGE;
+    match.timeLimitMinutes = 0;
+    match.cpuOpponents[0] = "wren";
+    match.cpuResolvedOpponents[0] = "wren";
+    match.cpuTiers[0] = "expert";
+    const produced = createFrameControls();
+    const executed = createFrameControls();
+    const runtime = createPacingAndPresentation();
+    const row = createMatchFrameInput();
+    let pressed = false;
+    const raised = surfaceZAt(TIMED_TEST_STAGE, LIFT, LIFT_RAISED, 0.0);
+    for (let n = 0; n < 240 && !pressed && (n <= 8 || surfaceZAt(TIMED_TEST_STAGE, LIFT, stageClock(match), 0.0) === raised); n++) {
+      const frame = runtime.simulationFrame + 1;
+      if (n === 8) match.matchFrame = LIFT_RAISED;
+      if (n >= 8) {
+        me.mana.points = ROSTER_MANA.max;
+        standOnFloor(foe, TIMED_TEST_STAGE, stageClock(match));
+        standOnFloor(me, TIMED_TEST_STAGE, stageClock(match));
+        me.motion.grounded = false;
+        me.motion.surface = undefined;
+        me.motion.z = f32(me.motion.z + 120.0);
+      }
+      for (const slot of [0, 1] as const) {
+        copyControls(produced.inputs[slot], neutralControls());
+        clearAttackBuffer(produced.commands[slot]);
+      }
+      produceComputerInput(match, world, runtime, 0, frame, produced.inputs[0], produced.commands[0]);
+      captureFrame(row, frame, world.mask, produced, runtime);
+      executeMatchFrame(row, match, world, executed, runtime, frame);
+      pressed = produced.inputs[0].ultimatePressed;
+    }
+    if (!pressed) failures.push(`${name(character)} ${facing}: never pressed over the lift at ${surfaceZAt(TIMED_TEST_STAGE, LIFT, stageClock(match), me.motion.x)}`);
+  }
+  assertEquals(failures.join("; "), "");
+});
+
+test("Blood of Mannoroth caught in the air holds Grom and the foe at his height through the whole hold, past the charge's stop at f41, then flings the foe and Grom falls (#98) [k1 scenario]", () => {
+  const move = ultimateOf(Character.grom);
+  const grab = move.commandGrab;
+  const stop = move.motion?.[1]?.first;
+  if (grab === undefined || stop === undefined) throw new Error("Grom's ultimate has no grab or stop");
+  const failures: string[] = [];
+  for (const facing of [-1, 1]) {
+    const b = airborneBout(scenarioOf(Character.grom), facing, 300.0, 400.0);
+    b.step(ULTIMATE);
+    const z = b.owner.motion.z;
+    const label = `facing ${facing}`;
+    let caught = 0;
+    let fell = false;
+    for (let tick = 0; tick < 120 && b.owner.special.action === SpecialAction.heroUltimate; tick++) {
+      if (caught === 0) hover(b, z, z);
+      b.step();
+      const { special, motion } = b.owner;
+      if (special.action !== SpecialAction.heroUltimate) break;
+      if (caught === 0) caught = special.grabFrame;
+      const held = caught > 0 && special.frame < caught + grab.holdFrames;
+      if (held && (motion.z !== z || b.target.motion.z !== z || b.target.grab.owner !== 0)) failures.push(`${label}: f${special.frame} Grom at ${motion.z}, foe at ${b.target.motion.z} (held from ${z}), latched ${b.target.grab.owner === 0}`);
+      if (caught > 0 && !held && motion.z < z) fell = true;
+      if (special.fall) failures.push(`${label}: helpless at f${special.frame}`);
+    }
+    if (caught === 0 || caught + grab.holdFrames <= stop) failures.push(`${label}: caught at f${caught}, hold ends by f${stop}`);
+    if (b.target.status.damage !== grab.effect.damage || !fell) failures.push(`${label}: foe took ${b.target.status.damage}%, Grom fell ${fell}`);
+  }
+  assertEquals([...new Set(failures)].join("; "), "");
 });

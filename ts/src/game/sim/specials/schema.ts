@@ -162,6 +162,9 @@ export interface SpecialProjectile {
 
   readonly dropsToFloor?: boolean | undefined;
 
+  /** Spawns at the move's live mark of this spec, offset from it, and not at all once that mark is gone. */
+  readonly atMark?: SpecialProjectile | undefined;
+
   /** What this becomes where it ends when its life runs out or it strikes. */
   readonly expiresInto?: SpecialProjectile | undefined;
 

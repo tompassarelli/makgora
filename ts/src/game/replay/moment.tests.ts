@@ -14,6 +14,7 @@ import { computerActive, humanFighterActive, setParticipants } from "../lobby/lo
 import { produceScenarioComputerInput } from "../session/scenarios";
 import { Character } from "../sim/codes";
 import { type Fighter, createFighter } from "../sim/fighter";
+import { ROSTER_MANA } from "../sim/mana";
 import { fighterAt, isActive } from "../sim/roster";
 import { canonicalState, stateChecksum } from "./canonical";
 import { MOMENT_FRAMES, beginMomentFrame, beginMomentSave, continueMomentSave, createMomentRecorder, inspectRepro, momentFrameRan, recordMomentRow, replayRepro } from "./moment";
@@ -131,3 +132,21 @@ function frostNovaRow(slot: number, frame: number): InputRow {
 
 test("moment: a Frost Nova burst replays from the moment's snapshot to the match's checksum [k1 scenario]", () =>
   roundTrip(false, 120, frostNovaRow, { first: createFighter(Character.lich, -240.0, 1), second: createFighter(Character.lich, 600.0, -1) }));
+
+
+const INFERNO_PRESS = 100;
+
+function infernoRow(slot: number, frame: number): InputRow {
+  const press = slot === 0 && frame === INFERNO_PRESS;
+  const attack = slot === 0 && frame >= INFERNO_PRESS - 1 && frame <= INFERNO_PRESS ? bit(Action.attack) : 0;
+  return assertDefined(inputRow({ held: attack, pressed: (press ? bit(Action.special) : 0) | (frame === INFERNO_PRESS - 1 ? attack : 0), released: 0, axisX: 0 }), "row");
+}
+
+function infernoFighters(): { first: Fighter; second: Fighter } {
+  const first = createFighter(Character.dreadlord, -130.0, 1);
+  first.mana.points = ROSTER_MANA.max;
+  return { first, second: createFighter(Character.blademaster, 130.0, -1) };
+}
+
+test("moment: an Inferno caught mid-move by the moment's snapshot spawns its meteor and crash at the decoded mark and replays to the match's checksum (#98) [k1 scenario]", () =>
+  roundTrip(false, 839, infernoRow, infernoFighters()));

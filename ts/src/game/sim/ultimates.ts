@@ -121,7 +121,7 @@ const FORSAKEN_PALADIN: AuthoredSpecial = {
   name: "Light's Judgment", endFrame: 70,
   projectiles: [
     JUDGMENT_CIRCLE,
-    { ...mark("Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx", 34, 14, 220.0), ...ON_FLOOR },
+    { ...mark("Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx", 34, 14, 0.0), atMark: JUDGMENT_CIRCLE },
   ],
   regions: [
     heroRegion(40, 42, capsule(0.0, 20.0, 0.0, 150.0, 100.0), hit(18.0, 75, 90.0, 45.0, HitElement.holy)),
@@ -132,12 +132,13 @@ const FORSAKEN_PALADIN: AuthoredSpecial = {
   rehits: [52, 64],
 };
 
-const INFERNO_CRASH = { ...mark("Abilities\\Spells\\Other\\Incinerate\\FireLordDeathExplode.mdx", 40, 14, 260.0), ...ON_FLOOR };
+const INFERNO_MARK = { ...mark("Abilities\\Spells\\Human\\MarkOfChaos\\MarkOfChaosTarget.mdx", 4, 37, 260.0), ...ON_FLOOR };
+const INFERNO_CRASH = { ...mark("Abilities\\Spells\\Other\\Incinerate\\FireLordDeathExplode.mdx", 40, 14, 0.0), atMark: INFERNO_MARK };
 const DREADLORD: AuthoredSpecial = {
   name: "Inferno", endFrame: 56,
   projectiles: [
-    { ...mark("Abilities\\Spells\\Human\\MarkOfChaos\\MarkOfChaosTarget.mdx", 4, 36, 260.0), ...ON_FLOOR },
-    { ...mark("Abilities\\Weapons\\DemolisherFireMissile\\DemolisherFireMissile.mdx", 28, 12, 260.0, 600.0), velocityZ: -48.0, ...ON_FLOOR },
+    INFERNO_MARK,
+    { ...mark("Abilities\\Weapons\\DemolisherFireMissile\\DemolisherFireMissile.mdx", 28, 12, 0.0, 600.0), velocityZ: -48.0, atMark: INFERNO_MARK },
     INFERNO_CRASH,
   ],
   regions: [heroRegion(40, 42, capsule(0.0, 20.0, 0.0, 120.0, 100.0), hit(14.0, 80, 90.0, 45.0, HitElement.fire))],

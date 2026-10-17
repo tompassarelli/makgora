@@ -297,11 +297,19 @@ function markBaseZ(owner: Readonly<Fighter>, spec: Readonly<SpecialProjectile>, 
   return floorBelow(stage, matchFrame, x, owner.motion.z) ?? pastLedge ?? owner.motion.z;
 }
 
+function projectileAnchor(owner: Readonly<Fighter>, spec: Readonly<SpecialProjectile> | undefined): Readonly<Projectile> | undefined {
+  if (spec === undefined) return undefined;
+  for (const projectile of owner.projectiles) if (projectile.life > 0 && projectile.spec === spec) return projectile;
+  return undefined;
+}
+
 function spawnHeroProjectile(owner: Fighter, spec: Readonly<SpecialProjectile>, serial: number, stage: number, matchFrame: number, world?: Roster): void {
+  const drawn = projectileAnchor(owner, spec.atMark);
+  if (spec.atMark !== undefined && drawn === undefined) return;
   const foe = spec.atFoe === true ? nearestFoe(world, owner) : undefined;
   const centreX = f32(f32(mainDeckLeft(stage) + mainDeckRight(stage)) * 0.5);
-  const x = spec.atStageCentre === true ? centreX : foe !== undefined ? foe.motion.x : f32(owner.motion.x + f32(owner.facing * spec.offsetX));
-  const z = spec.atStageCentre === true ? f32(mainDeckZAt(stage, x) + spec.offsetZ) : foe !== undefined ? f32(foe.motion.z + spec.offsetZ) : f32(markBaseZ(owner, spec, stage, matchFrame, x) + spec.offsetZ);
+  const x = drawn !== undefined ? f32(drawn.x + f32(owner.facing * spec.offsetX)) : spec.atStageCentre === true ? centreX : foe !== undefined ? foe.motion.x : f32(owner.motion.x + f32(owner.facing * spec.offsetX));
+  const z = drawn !== undefined ? f32(drawn.z + spec.offsetZ) : spec.atStageCentre === true ? f32(mainDeckZAt(stage, x) + spec.offsetZ) : foe !== undefined ? f32(foe.motion.z + spec.offsetZ) : f32(markBaseZ(owner, spec, stage, matchFrame, x) + spec.offsetZ);
   if (spec.needsLineOfSight === true && !clearLine(stage, owner.motion.x, z, x, z)) return;
   const up = owner.special.aimZ > 0 && spec.upVelocityX !== undefined;
   spawnHeroProjectileAt(owner, spec, x, z, owner.facing, up, serial);
@@ -794,14 +802,10 @@ export function landHeroSpecial(f: Fighter): boolean {
 
 const strike = emptyCapsule();
 
-function projectileAnchor(owner: Readonly<Fighter>, spec: Readonly<SpecialProjectile> | undefined): Readonly<Projectile> | undefined {
-  if (spec === undefined) return undefined;
-  for (const projectile of owner.projectiles) if (projectile.life > 0 && projectile.spec === spec) return projectile;
-  return undefined;
-}
-
 export function agesWithMove(owner: Readonly<Fighter>, projectile: Readonly<Projectile>): boolean {
-  return owner.launch.hitlag > 0 && projectile.spec !== undefined && projectile.spec === runningHeroSpecial(owner)?.regionOrigin;
+  const spec = projectile.spec;
+  if (owner.launch.hitlag <= 0 || owner.special.action !== SpecialAction.heroUltimate || spec === undefined || (spec.activeFrom ?? 0) <= spec.life) return false;
+  return runningHeroSpecial(owner)?.projectiles?.includes(spec) === true;
 }
 
 export function heroRegionOrigin(owner: Readonly<Fighter>): { readonly x: number; readonly z: number } {

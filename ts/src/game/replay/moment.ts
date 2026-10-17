@@ -27,7 +27,7 @@ import { initializeInfluenceOperands } from "../sim/influenceOperands";
 import type { AuthoredSpecial, FighterSpecials, SpecialPlacement, SpecialProjectile } from "../sim/specials/schema";
 import { type Roster, createRoster, fighterAt, isActive } from "../sim/roster";
 import { authoredTuning } from "../sim/tuning";
-import { canonicalState, fighterSpecialsCanonical, specialPlacementCanonical, specialProjectileCanonical, stateChecksum } from "./canonical";
+import { canonicalState, fighterSpecialsCanonical, specialMoveCanonical, specialPlacementCanonical, specialProjectileCanonical, stateChecksum } from "./canonical";
 import { type ReplayState, captureReplaySnapshot, copyReplayState, createReplaySnapshot } from "./snapshot";
 
 
@@ -370,7 +370,7 @@ function isCommands(value: unknown): value is Slots<AttackBuffer> {
 }
 
 
-function authoredParts(specials: Readonly<FighterSpecials>, projectiles: Map<string, SpecialProjectile>, placements: Map<string, SpecialPlacement>): void {
+function authoredParts(moves: readonly AuthoredSpecial[], projectiles: Map<string, SpecialProjectile>, placements: Map<string, SpecialPlacement>): void {
   const projectile = (spec: SpecialProjectile | undefined) => {
     if (spec === undefined) return;
     projectiles.set(specialProjectileCanonical(spec, ""), spec);
@@ -390,12 +390,7 @@ function authoredParts(specials: Readonly<FighterSpecials>, projectiles: Map<str
     }
     for (const followUp of special.followUps ?? []) move(followUp.special);
   };
-  for (const kit of [specials.neutral, specials.side, specials.up, specials.down]) {
-    move(kit.ground);
-    move(kit.air);
-    move(kit.recall);
-    move(kit.marked?.special);
-  }
+  for (const special of moves) move(special);
 }
 
 
@@ -406,12 +401,29 @@ function authoredParts(specials: Readonly<FighterSpecials>, projectiles: Map<str
 
 
 function rebindAuthoredKit(fighter: Fighter): void {
-  const authored = authoredTuning(fighter.character).specials;
-  if (authored === undefined || fighterSpecialsCanonical(fighter.tuning.specials) !== fighterSpecialsCanonical(authored)) return;
-  fighter.tuning.specials = authored;
+  const { specials, ultimate } = authoredTuning(fighter.character);
+  const moves: AuthoredSpecial[] = [];
+  const add = (move: AuthoredSpecial | undefined): void => {
+    if (move !== undefined) moves.push(move);
+  };
+  if (specials !== undefined && fighterSpecialsCanonical(fighter.tuning.specials) === fighterSpecialsCanonical(specials)) {
+    fighter.tuning.specials = specials;
+    for (const kit of [specials.neutral, specials.side, specials.up, specials.down]) {
+      add(kit.ground);
+      add(kit.air);
+      add(kit.recall);
+      add(kit.marked?.special);
+    }
+  }
+  const decoded = fighter.tuning.ultimate;
+  if (ultimate !== undefined && decoded !== undefined && specialMoveCanonical(decoded, "ultimate") === specialMoveCanonical(ultimate, "ultimate")) {
+    fighter.tuning.ultimate = ultimate;
+    add(ultimate);
+  }
+  if (moves.length === 0) return;
   const projectiles = new Map<string, SpecialProjectile>();
   const placements = new Map<string, SpecialPlacement>();
-  authoredParts(authored, projectiles, placements);
+  authoredParts(moves, projectiles, placements);
   for (let i = 0; i < PROJECTILE_CAPACITY; i++) {
     const live = at(fighter.projectiles, i);
     if (live.spec !== undefined) mutableProjectile(fighter, i).spec = projectiles.get(specialProjectileCanonical(live.spec, "")) ?? live.spec;
