@@ -15,7 +15,8 @@ import { characterModelScale } from "../../ts/src/game/presentation/modelScale";
 if (process.argv.includes("--bootstrap")) {
  await Bun.write(new URL("../../ts/src/game/sim/heroes/gromClips.ts", import.meta.url), '// Generated bootstrap by tools/animations/grom-clips.ts.\nimport type { HeroClip, HeroClipTable } from "./hero";\nexport const GROM_MODEL_FILE = "units\\\\orc\\\\Hellscream\\\\Hellscream.mdl";\nexport const GROM_FALLBACK: HeroClip = { index: 8, seconds: 1.0 };\nexport const GROM_CLIPS: HeroClipTable = { idle: GROM_FALLBACK };\nexport const GROM_DAMAGE_CLIPS: readonly HeroClip[] = [];\n'); process.exit(0);
 }
-const { DrawnModel, sheet } = await import("../../ts/scripts/wisp/hurtboxView");
+const { DrawnModel } = await import("../../ts/scripts/wisp/drawnModel");
+const { sheet } = await import("../../ts/scripts/wisp/hurtboxView");
 const { GROM_MOVES } = await import("../../ts/src/game/sim/heroes/gromMoves");
 const { GROM_SPECIALS } = await import("../../ts/src/game/sim/heroes/gromSpecials");
 async function writeStride(bytes: ArrayBuffer) {

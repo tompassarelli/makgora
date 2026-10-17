@@ -21,7 +21,7 @@ const metadata = join(project, "ts/src/game/presentation/grabClipInfo.ts");
 
 
 if (!await Bun.file(metadata).exists()) await Bun.write(metadata, 'import type { HeroClipTable } from "../sim/heroes/hero";\nexport const GRAB_CLIPS: Readonly<Record<number, HeroClipTable>> = {};\n');
-const { DrawnModel } = await import("../../ts/scripts/wisp/hurtboxView");
+const { DrawnModel } = await import("../../ts/scripts/wisp/drawnModel");
 mkdirSync(output, { recursive: true });
 for (const family of ["hero-models", "imported-models"]) {
   ensure(lstatSync(join(output, family), { throwIfNoEntry: false })?.isSymbolicLink() !== true, `${family}: output must be a private real directory`);

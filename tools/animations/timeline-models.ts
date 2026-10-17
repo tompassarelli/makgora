@@ -23,7 +23,7 @@ const [assetsArg, outputArg, fighterName] = process.argv.slice(2);
 if (assetsArg === undefined || outputArg === undefined || fighterName === undefined) throw new Error('usage: bun tools/animations/timeline-models.ts PRIVATE_ASSETS PRIVATE_POOL FIGHTER');
 const assets = resolve(assetsArg), output = resolve(outputArg);
 if (!relative(resolve(import.meta.dir, '../..'), output).startsWith('..')) throw new Error('Timeline bodies stay in private storage');
-const character = [...FIGHTER_ART].find(([, fighter]) => fighter.name === fighterName)?.[0];
+const character = [...FIGHTER_ART].find(([, fighter]) => fighter.name === fighterName)?.[0] as Character | undefined;
 if (character === undefined) throw new Error(`Unknown fighter ${fighterName}`);
 const fighter = FIGHTER_ART.get(character)!, rig = FIGHTER_RIGS.get(character);
 if (rig === undefined) throw new Error(`${fighter.name} has no canonical rig in hd-rigs`);
