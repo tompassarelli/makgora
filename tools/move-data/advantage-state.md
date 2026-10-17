@@ -107,11 +107,11 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Rifleman | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Illidan | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Illidan | light | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Illidan | light | up throw | 1/1 | 1/1 KD in up smash, out down smash | 1/1 KD in up smash, out down smash | 1/1 in up smash, out down smash |
+| Illidan | light | up throw | 1/1 | 1/1 KD in up smash, out down smash | 1/1 KD in up smash, out down smash | 1/1 KD in up smash, out down smash |
 | Illidan | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Illidan | medium | forward throw | 0/0 | 1/1 in down smash, out dash, dash attack | 0/0 KD | 0/0 KD |
 | Illidan | medium | back throw | 0/0 | 1/1 in down smash, out dash, dash attack | 0/0 KD | 0/0 KD |
-| Illidan | medium | up throw | 1/1 in up smash, out down smash | 1/1 KD in up smash, out down smash | 1/1 KD in up smash, out down smash | 1/1 in up smash, out down smash |
+| Illidan | medium | up throw | 1/1 in up smash, out down smash | 1/1 KD in up smash, out down smash | 1/1 KD in up smash, out down smash | 1/1 KD in up smash, out down smash |
 | Illidan | medium | down throw | 0/0 KD | 0/0 KD | 0/0 | 0/0 KD |
 | Illidan | heavy | forward throw | 0/0 | 1/1 | 1/1 | 0/0 KD |
 | Illidan | heavy | back throw | 0/0 | 1/1 | 1/1 | 0/0 KD |
