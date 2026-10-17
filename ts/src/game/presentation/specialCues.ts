@@ -343,7 +343,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
     neutral: { spell: "Shadow Strike", startup: cue("Abilities\\Spells\\NightElf\\ShadowStrike\\ShadowStrike.mdx", "hand", f32(0.7)), active: timed(cue("Abilities\\Weapons\\PoisonSting\\PoisonStingTarget.mdx", "hand", 1.0), "stand", 0.0) },
     side: { spell: "Shadow Pursuit", startup: SHADOW, active: cue("Abilities\\Weapons\\GlaiveMissile\\GlaiveMissileTarget.mdx", "ahead", 1.0) },
     up: { spell: "Blink", startup: SHADOW, active: cue("Abilities\\Spells\\NightElf\\Blink\\BlinkCaster.mdx", "body", f32(0.6)) },
-    down: { spell: "Fan of Knives", startup: SHADOW, active: cue("Abilities\\Spells\\NightElf\\FanOfKnives\\FanOfKnivesCaster.mdx", "body", f32(0.13)) },
+    down: { spell: "Fan of Knives", startup: SHADOW, active: cue("Abilities\\Spells\\NightElf\\FanOfKnives\\FanOfKnivesCaster.mdx", "body", f32(0.6)) },
   },
   [Character.lich]: {
     neutral: { spell: "Frost Nova", startup: FROST, active: timed(cue("Abilities\\Spells\\Other\\FrostDamage\\FrostDamage.mdx", "hand", 0.5), "stand", 0.0) },

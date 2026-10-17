@@ -24,6 +24,9 @@ Fan of Knives copies that shape:
 - EX: 25% more reach, as before.
 
 It looks like the stock cast: Warcraft's FanOfKnivesCaster effect at scale
-0.13, so its knives stop near the hit area instead of flying about 750 units
-as the stock model does at full size. Warden plays her stock Spell animation.
+0.6, so its knives stop about 450 units out instead of flying about 750 units
+as the stock model does at full size. Tom (17 Oct playtest) saw nothing at the
+first scale, 0.13: `bun wisp view cues --move warden:down-special` measured 9
+pixels at most, against 213 at 0.6, shown from the hit frame through frame 17.
+Warden plays her stock Spell animation.
 The earlier seven-ray custom knife pose code never drew in-game and is gone.
