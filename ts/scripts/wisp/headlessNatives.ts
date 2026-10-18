@@ -65,8 +65,4 @@ export const smashcraftNativeBehavior = (_client?: unknown, look: "classic" | "d
   GetLocationX: () => 0,
   GetLocationY: () => 0,
   GetLocationZ: () => 0,
-
-  BlzGetMouseScreenPosX: () => 0,
-  BlzGetMouseScreenPosY: () => 0,
-  BlzIsMouseButtonPressed: () => false,
 });
