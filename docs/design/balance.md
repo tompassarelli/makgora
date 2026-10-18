@@ -463,9 +463,11 @@ under 0.85 of the strong one. Lich King's forward smash drops from
 25.5/21 to 23.5/19.5 and Frostmourne Sweep from 15 to 14. Beastmaster's and
 Grom's forward tilts, dash attacks and forward smashes and Beastmaster's
 back air deal 10% more. Peon's forward tilts and dash attack deal 10% more
-and his forward smash 5%; his dash attack and forward smash recover 3 frames
-sooner, and his down tilt, up smash and forward and back throws gain about
-1%. Malfurion, at 66-70% in the lane runs, drops forward smash from 17 to
+and his forward smash 5%. A second Peon step (dash attack and forward smash
+recovering 3 frames sooner, down tilt, up smash and both throws about 1%
+stronger) was reverted: on recorded playtest seed 43 it let Peon chain
+ultimate, grab, down air and jab against Kael'thas with no escape (#119).
+Malfurion, at 66-70% in the lane runs, drops forward smash from 17 to
 16, recovers 3 frames later from it, and his dash check drops from 10 to
 9.25. Every changed kill percent stays within 15% of the fixed baseline and
 every change inside its ±25% and ±3-frame bounds.
