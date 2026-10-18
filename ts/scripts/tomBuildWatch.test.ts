@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
 import { PlayProblem } from "wisp/scripts/wisp/play";
-import { type WatchSteps, newestGreen, watchOnce } from "./tomBuildWatch";
+import { type WatchSteps, newestGreen, watch, watchOnce } from "./tomBuildWatch";
 import { playableMapBuild } from "./wisp/currentPlaytest";
 import { PLAYTEST_PREFIX } from "./wisp/project";
 import { PLAYABLE_FILE, PREDICT_COST, type Verdict, costPrediction, installName, landingDecision, verdictOf } from "./wisp/greenBuilds";
@@ -119,4 +119,33 @@ test("only a succeeded CI run is green; a failed one is red and anything else wa
 test("Tom's playable build names the map with the short commit [k2 property]", () => {
   expect(installName("0.0.263", sha("a"))).toBe("Smashcraft 0.0.263 aaaaaaa");
   expect(PLAYABLE_FILE.test(`${installName("0.0.263", sha("a"))}.w3x`)).toBe(true);
+});
+
+test("the watcher keeps polling while it runs main's tip and returns, unbuilt, once origin/main moves past it [k2 property]", async () => {
+  const root = mkdtempSync(join(tmpdir(), "smashcraft-tom-build-"));
+  try {
+    const files = { log: join(root, "tom-build.log"), attempts: join(root, "attempted") };
+    const built: string[] = [];
+    let remote = sha("a");
+    const steps: WatchSteps<never> = {
+      tip: () => Effect.sync(() => remote),
+      decision: () => Effect.succeed("build"),
+      landedAt: () => Effect.succeed(0),
+      notes: () => Effect.succeed("notes.md"),
+      build: (revision) => Effect.sync(() => { built.push(revision); return { version: "0.1.1 aaaaaaa", path: join(root, "Smashcraft 0.1.1 aaaaaaa.w3x") }; }),
+    };
+    const checks: boolean[] = [];
+    const current = (answers: boolean[]) => Effect.sync(() => { const answer = answers.shift() ?? false; checks.push(answer); return answer; });
+    await Effect.runPromise(watch(steps, files, current([false]), 0));
+    expect(built).toEqual([]);
+    await Effect.runPromise(watch(steps, files, current([true, true, false]), 0));
+    expect(built).toEqual([sha("a")]);
+    remote = sha("b");
+    await Effect.runPromise(watch(steps, files, current([false]), 0));
+    expect(built).toEqual([sha("a")]);
+    expect(checks).toEqual([false, true, true, false, false]);
+    expect(readFileSync(files.log, "utf8").trim().split(" ").slice(1, 3)).toEqual([sha("a"), "0.1.1-aaaaaaa"]);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });

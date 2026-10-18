@@ -18,8 +18,9 @@ To install and start the unit:
     systemctl --user daemon-reload
     systemctl --user enable --now smashcraft-tom-build.service
 
-`systemctl --user restart smashcraft-tom-build.service` picks up a newer
-watcher. To stop it, and keep it from starting at login:
+The watcher exits as soon as `origin/main` moves past the commit it runs
+from, and `Restart=always` starts it again on the new tip, so every build is
+named and installed by the newest watcher code. To stop it, and keep it from starting at login:
 
     systemctl --user disable --now smashcraft-tom-build.service
 

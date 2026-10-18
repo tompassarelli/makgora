@@ -2,7 +2,7 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
-import { Clock, Effect, Schedule, Schema } from "effect";
+import { Clock, type Duration, Effect, Schema } from "effect";
 import { ChildProcess, type ChildProcessSpawner } from "effect/process";
 import { PlayProblem } from "wisp/scripts/wisp/play";
 import { runProcess } from "./hostProcess";
@@ -48,7 +48,7 @@ const append = (path: string, line: string) => Effect.try({
 });
 
 export const buildLine = (finished: number, sha: string, { version, path }: Installed, buildMillis: number, landToInstalledMillis: number) =>
-  `${new Date(finished).toISOString()} ${sha} ${version} ${(buildMillis / 1000).toFixed(1)} ${(landToInstalledMillis / 1000).toFixed(1)} ${path}`;
+  `${new Date(finished).toISOString()} ${sha} ${version.replaceAll(" ", "-")} ${(buildMillis / 1000).toFixed(1)} ${(landToInstalledMillis / 1000).toFixed(1)} ${path}`;
 
 export const watchOnce = <R>(steps: WatchSteps<R>, files: WatchFiles) => Effect.gen(function*() {
   const previous = lines(files.log).at(-1)?.split(" ")[1];
@@ -71,11 +71,21 @@ export const watchOnce = <R>(steps: WatchSteps<R>, files: WatchFiles) => Effect.
   return line;
 });
 
-export const watch = <R>(steps: WatchSteps<R>, files: WatchFiles) => watchOnce(steps, files).pipe(
-  Effect.tap((line) => Effect.sync(() => { if (line !== undefined) console.log(line); })),
-  Effect.catch(({ problem }) => Effect.sync(() => console.error(`Tom build failed: ${problem}`))),
-  Effect.repeat(Schedule.spaced(POLL)),
-);
+export const watch = <R>(steps: WatchSteps<R>, files: WatchFiles, current: Effect.Effect<boolean, never, R>, poll: Duration.Input = POLL) => Effect.gen(function*() {
+  while (yield* current) {
+    const line = yield* watchOnce(steps, files).pipe(
+      Effect.catch(({ problem }) => Effect.sync(() => { console.error(`Tom build failed: ${problem}`); return undefined; })),
+    );
+    if (line !== undefined) console.log(line);
+    yield* Effect.sleep(poll);
+  }
+  console.log("origin/main has moved past this watcher's commit; exiting so the service restarts on the new tip");
+});
+
+export const watcherCurrent = Effect.gen(function*() {
+  yield* git("fetch", "-q", "origin", "main");
+  return (yield* git("rev-parse", "HEAD")) === (yield* git("rev-parse", "origin/main"));
+}).pipe(Effect.orElseSucceed(() => true));
 
 const git = (...args: readonly string[]) =>
   runProcess(ChildProcess.make("git", args, { cwd: projectRoot, stdin: "ignore" })).pipe(
@@ -121,5 +131,5 @@ export const hostSteps = (predictCost: boolean): WatchSteps<ChildProcessSpawner.
 if (import.meta.main) {
   const { predict, args } = costPrediction(process.argv.slice(2));
   if (args.length > 0) throw new Error("tomBuildWatch takes only --predict-cost");
-  BunRuntime.runMain(watch(hostSteps(predict), { log: TOM_BUILD_LOG, attempts: TOM_BUILD_ATTEMPTS }).pipe(Effect.provide(BunServices.layer)));
+  BunRuntime.runMain(watch(hostSteps(predict), { log: TOM_BUILD_LOG, attempts: TOM_BUILD_ATTEMPTS }, watcherCurrent).pipe(Effect.provide(BunServices.layer)));
 }
