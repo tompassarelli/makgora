@@ -31,9 +31,9 @@
     {
       "stage": 4,
       "file": "StageCardNaxxramas.blp",
-      "inputs": "d159ff9ae50b91df3e2ecc0a63b53d07736b9081b47a0b00a061b887deb0cc91",
-      "sha256": "33bdffff29a7061b3e8da4f3481a967ce9d07132fa6dc54dd2bde3c2a44dafc9",
-      "bytes": 76110
+      "inputs": "ef1fcb06ae5d66433bdb91323103efd98a025ed54c41c515ad5cbadade25e793",
+      "sha256": "1d39812556d777939b9eb1564e93e6a92f7e25b42439aae8f4797c5e0a0d9e54",
+      "bytes": 104355
     },
     {
       "stage": 14,

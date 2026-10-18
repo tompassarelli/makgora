@@ -3,7 +3,7 @@ import type { MapDeclaration } from "wisp/scripts/mapInfo";
 export const SMASHCRAFT_MAP = {
   author: "Tompas",
 
-  description: "Warcraft heroes in a platform fight for up to four. Community: tompassarelli.github.io/smashcraft. Credits: The Lich King model by Kwaliti (Hive Workshop).",
+  description: "Warcraft heroes in a platform fight for up to four. Community: tompassarelli.github.io/smashcraft. Credits: The Lich King model by Kwaliti and the Undead Walls Pack by Kuzakani (Hive Workshop).",
   suggestedPlayers: "1-4",
   players: [
     { id: 0, name: "Player 1" },

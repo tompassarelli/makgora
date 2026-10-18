@@ -81,6 +81,11 @@ The [Lich King model by Kwaliti](https://www.hiveworkshop.com/threads/the-lich-k
 and require credit to Kwaliti and Hive Workshop as the original source.
 [Model credits and source terms](docs/design/roster.md#credits) record the details.
 
+The Scourge wall behind Naxxramas is the
+[Undead Walls Pack by Kuzakani](https://www.hiveworkshop.com/threads/undead-walls-pack.369286/)
+(Hive Workshop), an original model tagged open source, used with credit to
+Kuzakani and Hive Workshop.
+
 ## License
 
 Smashcraft is released under the [MIT License](LICENSE). The vendored Effect

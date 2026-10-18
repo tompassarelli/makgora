@@ -64,3 +64,25 @@ export function groundTexel(x: number, y: number): Rgba {
   const level = Math.round(255 * (0.86 + 0.07 * broad + 0.03 * grain));
   return [level, level, level, 255];
 }
+
+export const PLAGUE_TEXTURE_SIZE = 128;
+export const PLAGUE_GLOW = { color: [170, 255, 70] as const, crest: 0.7 };
+
+function plagueField(x: number, y: number): number {
+  const u = x * 2 * Math.PI / PLAGUE_TEXTURE_SIZE;
+  const v = y * 2 * Math.PI / PLAGUE_TEXTURE_SIZE;
+  const warp = 1.4 * Math.sin(2 * u + 3 * v) + 0.9 * Math.sin(5 * v - u);
+  const swirl = Math.sin(3 * u + 2 * v + warp) * Math.sin(4 * v - 2 * u + 0.8 * warp);
+  const blobs = Math.sin(7 * u + 1.5 * Math.sin(3 * v)) * Math.sin(6 * v + 1.5 * Math.sin(4 * u));
+  return 0.5 + 0.32 * swirl + 0.18 * blobs;
+}
+
+export function plagueTexel(x: number, y: number): Rgba {
+  const r = Math.min(1, Math.max(0, plagueField(x, y)));
+  return [Math.round(16 + 58 * r * r), Math.round(52 + 120 * r * r), Math.round(10 + 22 * r * r), 255];
+}
+
+export function plagueGlowTexel(x: number, y: number): Rgba {
+  const strength = Math.min(1, Math.max(0, (plagueField(x, y) - PLAGUE_GLOW.crest) / (1 - PLAGUE_GLOW.crest)));
+  return [PLAGUE_GLOW.color[0], PLAGUE_GLOW.color[1], PLAGUE_GLOW.color[2], Math.round(255 * strength)];
+}

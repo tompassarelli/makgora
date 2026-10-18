@@ -1,17 +1,27 @@
 import { f32 } from "wisp/src/sim/f32";
 import { STAGE_SKY_MODELS } from "../../generated/stages/stageSkyInfo";
 import type { StageScenery } from "./stageScenery";
-import { STAGE_GROUND_MODEL } from "../../generated/stages/terrainAssetInfo";
+import { STAGE_GROUND_MODEL, STAGE_PLAGUE_MODEL } from "../../generated/stages/terrainAssetInfo";
+import { SCOURGE_WALL_MODEL } from "../assets/importedModelInfo";
 
 const SPIRES = "Doodads\\Outland\\Rocks\\Outland_Spires\\Outland_Spires7.mdx";
 const ZEPPELIN = "Units\\Creeps\\GoblinZeppelin\\GoblinZeppelin.mdx";
 const MOUND = "Doodads\\Barrens\\Rocks\\Barrens_Rocks\\Barrens_Rocks2.mdx";
-const NECROPOLIS = "buildings\\undead\\Necropolis\\Necropolis.mdx";
-const ZIGGURAT = "buildings\\undead\\Ziggurat\\Ziggurat.mdx";
-const SLAUGHTERHOUSE = "buildings\\undead\\Slaughterhouse\\Slaughterhouse.mdx";
-const BONEYARD = "buildings\\undead\\Boneyard\\Boneyard.mdx";
-const GRAVEYARD = "buildings\\undead\\Graveyard\\Graveyard.mdx";
-const TEMPLE = "buildings\\undead\\TempleOfTheDamned\\TempleOfTheDamned.mdx";
+const GATE = "Doodads\\Icecrown\\Terrain\\IceCrownGate\\IceCrownGate.mdx";
+const ARCHWAY = "Doodads\\Dungeon\\Structures\\DungeonArchway1\\DungeonArchway1.mdx";
+const PORTCULLIS = "Doodads\\Dungeon\\Structures\\PorticulisWall0_\\PorticulisWall0_0.mdx";
+const PILLAR = "Doodads\\Icecrown\\Props\\IceCrownPillar\\IceCrownPillar0.mdx";
+const RUNE_OBELISK = "Doodads\\Northrend\\Props\\NorthrendObilisk\\NorthrendObilisk.mdx";
+const CRYPT = "buildings\\undead\\TombOfRelics\\TombOfRelics.mdx";
+const SARCOPHAGUS = "Doodads\\Northrend\\Structures\\NorthrendCrypt\\NorthrendCrypt.mdx";
+const CAGE = "Doodads\\LordaeronSummer\\Props\\CageEmpty\\CageEmpty.mdx";
+const IRON_MAIDEN = "Doodads\\Dungeon\\Props\\IronMaiden\\IronMaiden.mdx";
+const TORTURE_TABLE = "Doodads\\Dungeon\\Props\\TortureTable\\TortureTable.mdx";
+const RUBBLE = "Doodads\\Icecrown\\Structures\\Icecrown_Rubble\\Icecrown_Rubble0.mdx";
+const ROCK = "Doodads\\Dungeon\\Rocks\\DungeonRock\\DungeonRock3.mdx";
+const COLUMN = "Doodads\\Northrend\\Props\\NorthrendBrokenColumn\\NorthrendBrokenColumn0.mdx";
+const GEYSER = "Doodads\\Icecrown\\Water\\BubbleGeyserSteam\\BubbleGeyserSteam.mdx";
+const FIRE = "Environment\\UndeadBuildingFire\\UndeadLargeBuildingFire1.mdx";
 const PLAGUE_CLOUD = "Abilities\\Spells\\Undead\\PlagueCloud\\PlagueCloudCaster.mdx";
 
 export const DUROTAR_SCENERY: StageScenery = {
@@ -69,45 +79,56 @@ export const DUROTAR_SCENERY: StageScenery = {
 export const NAXXRAMAS_SCENERY: StageScenery = {
   farZ: 20000.0,
   sky: STAGE_SKY_MODELS[4] ?? "",
-  fog: { start: 3300.0, end: 19000.0, red: 0.09375, green: 0.3125, blue: 0.25 },
-  floor: { model: STAGE_GROUND_MODEL, z: -1300.0, color: [34, 38, 26] },
+  fog: { start: 3300.0, end: 10000.0, red: 0.15625, green: 0.21875, blue: 0.1875 },
+  floor: { model: STAGE_PLAGUE_MODEL, z: -1300.0, color: [132, 150, 128] },
   pieces: [
-    { model: NECROPOLIS, x: 1500.0, y: 6600.0, z: 350.0, scale: 2.5, yaw: 250.0, flying: true },
-    { model: ZIGGURAT, x: -3800.0, y: 4150.0, z: -1700.0, scale: 5.0, yaw: 10.0 },
-    { model: GRAVEYARD, x: -2900.0, y: 4400.0, z: -1700.0, scale: 4.0, yaw: 290.0 },
-    { model: SLAUGHTERHOUSE, x: -2000.0, y: 4200.0, z: -1700.0, scale: 4.5, yaw: 250.0 },
-    { model: TEMPLE, x: -1100.0, y: 4450.0, z: -1700.0, scale: 4.0, yaw: 218.0 },
-    { model: ZIGGURAT, x: -250.0, y: 4250.0, z: -1700.0, scale: 4.25, yaw: 350.0 },
-    { model: BONEYARD, x: 650.0, y: 4400.0, z: -1700.0, scale: 4.0, yaw: 300.0 },
-    { model: ZIGGURAT, x: 1500.0, y: 4100.0, z: -1700.0, scale: 3.25, yaw: 20.0 },
-    { model: GRAVEYARD, x: 2400.0, y: 4350.0, z: -1700.0, scale: 3.0, yaw: 240.0 },
-    { model: TEMPLE, x: 3300.0, y: 4150.0, z: -1700.0, scale: 5.25, yaw: 280.0 },
-    { model: BONEYARD, x: 4000.0, y: 4450.0, z: -1700.0, scale: 3.0, yaw: 330.0 },
-    { model: PLAGUE_CLOUD, x: -2000.0, y: 4200.0, z: -1000.0, scale: 3.0, yaw: 0.0 },
-    { model: PLAGUE_CLOUD, x: 2400.0, y: 4350.0, z: -1050.0, scale: 2.5, yaw: 0.0 },
-    { model: SLAUGHTERHOUSE, x: -3000.0, y: 5450.0, z: -1900.0, scale: 5.5, yaw: 120.0 },
-    { model: ZIGGURAT, x: 2800.0, y: 5500.0, z: -1900.0, scale: 6.0, yaw: 340.0 },
-    { model: "Doodads\\Underground\\Rocks\\UndergoundRock\\UndergoundRock4.mdx", x: -3600.0, y: 1450.0, z: -1400.0, scale: 5.25, yaw: 20.0, matrixScale: [1.75, 1.0, 1.25], color: [124, 114, 134] },
-    { model: "Doodads\\Underground\\Rocks\\UndergoundRock\\UndergoundRock0.mdx", x: -2500.0, y: 1650.0, z: -1400.0, scale: 8.25, yaw: 160.0, matrixScale: [1.25, 1.0, 1.25], color: [124, 114, 134] },
-    { model: "Doodads\\Underground\\Rocks\\UndergoundRock\\UndergoundRock4.mdx", x: -1400.0, y: 1500.0, z: -1400.0, scale: 4.25, yaw: 250.0, matrixScale: [2.0, 1.0, 1.25], color: [124, 114, 134] },
-    { model: "Doodads\\Underground\\Rocks\\UndergoundRock\\UndergoundRock0.mdx", x: -300.0, y: 1700.0, z: -1400.0, scale: 6.75, yaw: 80.0, matrixScale: [1.5, 1.0, 1.25], color: [124, 114, 134] },
-    { model: "Doodads\\Underground\\Rocks\\UndergoundRock\\UndergoundRock4.mdx", x: 800.0, y: 1550.0, z: -1400.0, scale: 4.25, yaw: 310.0, matrixScale: [2.0, 1.0, 1.25], color: [124, 114, 134] },
-    { model: "Doodads\\Underground\\Rocks\\UndergoundRock\\UndergoundRock0.mdx", x: 1900.0, y: 1600.0, z: -1400.0, scale: 8.0, yaw: 200.0, matrixScale: [1.25, 1.0, 1.25], color: [124, 114, 134] },
-    { model: "Doodads\\Underground\\Rocks\\UndergoundRock\\UndergoundRock4.mdx", x: 3000.0, y: 1450.0, z: -1400.0, scale: 5.0, yaw: 120.0, matrixScale: [1.75, 1.0, 1.25], color: [124, 114, 134] },
-    { model: "Doodads\\Underground\\Rocks\\UndergoundRock\\UndergoundRock0.mdx", x: 4000.0, y: 1650.0, z: -1400.0, scale: 9.25, yaw: 340.0, matrixScale: [1.0, 0.875, 1.25], color: [124, 114, 134] },
-    { model: "Doodads\\Underground\\Rocks\\UndergoundRock\\UndergoundRock0.mdx", x: -4000.0, y: 2600.0, z: -1400.0, scale: 10.75, yaw: 190.0, matrixScale: [1.0, 0.75, 1.25], color: [160, 150, 172] },
-    { model: "Doodads\\Underground\\Rocks\\UndergoundRock\\UndergoundRock4.mdx", x: -2800.0, y: 2900.0, z: -1400.0, scale: 5.75, yaw: 40.0, matrixScale: [1.75, 1.0, 1.25], color: [160, 150, 172] },
-    { model: "Doodads\\Underground\\Rocks\\UndergoundRock\\UndergoundRock0.mdx", x: -1500.0, y: 2700.0, z: -1400.0, scale: 8.75, yaw: 300.0, matrixScale: [1.25, 1.0, 1.25], color: [160, 150, 172] },
-    { model: "Doodads\\Underground\\Rocks\\UndergoundRock\\UndergoundRock4.mdx", x: -200.0, y: 3000.0, z: -1400.0, scale: 4.75, yaw: 130.0, matrixScale: [2.25, 1.0, 1.25], color: [160, 150, 172] },
-    { model: "Doodads\\Underground\\Rocks\\UndergoundRock\\UndergoundRock0.mdx", x: 1100.0, y: 2800.0, z: -1400.0, scale: 9.0, yaw: 220.0, matrixScale: [1.25, 0.875, 1.25], color: [160, 150, 172] },
-    { model: "Doodads\\Underground\\Rocks\\UndergoundRock\\UndergoundRock4.mdx", x: 2400.0, y: 2650.0, z: -1400.0, scale: 6.0, yaw: 70.0, matrixScale: [1.75, 1.0, 1.25], color: [160, 150, 172] },
-    { model: "Doodads\\Underground\\Rocks\\UndergoundRock\\UndergoundRock0.mdx", x: 3500.0, y: 2950.0, z: -1400.0, scale: 10.75, yaw: 260.0, matrixScale: [1.0, 0.75, 1.25], color: [160, 150, 172] },
-    { model: "Doodads\\LordaeronSummer\\Structures\\FarmScorched\\FarmScorched.mdx", x: -2900.0, y: 2200.0, z: -1150.0, scale: 3.5, yaw: 200.0 },
-    { model: "Doodads\\LordaeronSummer\\Structures\\BarnScorched\\BarnScorched.mdx", x: -1700.0, y: 2400.0, z: -1150.0, scale: 2.5, yaw: 250.0 },
-    { model: "Doodads\\LordaeronSummer\\Structures\\WindMillBurned\\WindMillBurned.mdx", x: 2000.0, y: 2300.0, z: -1150.0, scale: 3.0, yaw: 230.0 },
-    { model: "Doodads\\LordaeronSummer\\Structures\\TowerScorched\\TowerScorched.mdx", x: 3300.0, y: 2100.0, z: -1180.0, scale: 4.0, yaw: 300.0 },
-    { model: "Doodads\\Northrend\\Props\\NorthrendTombstone\\NorthrendTombstone0.mdx", x: 1200.0, y: 2000.0, z: -1400.0, scale: 5.0, yaw: 260.0 },
-    { model: "Doodads\\Northrend\\Props\\NorthrendTombstone\\NorthrendTombstone0.mdx", x: -3800.0, y: 2000.0, z: -1400.0, scale: 6.0, yaw: 200.0 },
+    { model: ARCHWAY, x: 2300.0, y: 5400.0, z: -1300.0, scale: 3.5, yaw: 270.0, matrixScale: [1.0, 1.0, 1.375], color: [72, 64, 88] },
+    { model: GATE, x: 2300.0, y: 5800.0, z: -1300.0, scale: 3.75, yaw: 90.0, matrixScale: [1.0, 1.0, 1.25], color: [66, 58, 80] },
+    { model: ARCHWAY, x: -2700.0, y: 5000.0, z: -1300.0, scale: 4.25, yaw: 90.0, matrixScale: [1.0, 1.0, 1.125], color: [72, 64, 88] },
+    { model: ARCHWAY, x: -200.0, y: 6100.0, z: -1300.0, scale: 3.0, yaw: 270.0, matrixScale: [1.0, 1.0, 1.75], color: [68, 60, 84] },
+    { model: SCOURGE_WALL_MODEL, x: -5150.0, y: 6700.0, z: -1300.0, scale: 8.0, yaw: 0.0, color: [112, 102, 126] },
+    { model: SCOURGE_WALL_MODEL, x: -4250.0, y: 6700.0, z: -1300.0, scale: 8.0, yaw: 0.0, color: [112, 102, 126] },
+    { model: SCOURGE_WALL_MODEL, x: -3350.0, y: 6700.0, z: -1300.0, scale: 8.0, yaw: 0.0, color: [112, 102, 126] },
+    { model: SCOURGE_WALL_MODEL, x: -2450.0, y: 6700.0, z: -1300.0, scale: 8.0, yaw: 0.0, color: [112, 102, 126] },
+    { model: SCOURGE_WALL_MODEL, x: -1550.0, y: 6700.0, z: -1300.0, scale: 8.0, yaw: 0.0, color: [112, 102, 126] },
+    { model: SCOURGE_WALL_MODEL, x: -650.0, y: 6700.0, z: -1300.0, scale: 8.0, yaw: 0.0, color: [112, 102, 126] },
+    { model: SCOURGE_WALL_MODEL, x: 250.0, y: 6700.0, z: -1300.0, scale: 8.0, yaw: 0.0, color: [112, 102, 126] },
+    { model: SCOURGE_WALL_MODEL, x: 1150.0, y: 6700.0, z: -1300.0, scale: 8.0, yaw: 0.0, color: [112, 102, 126] },
+    { model: SCOURGE_WALL_MODEL, x: 2050.0, y: 6700.0, z: -1300.0, scale: 8.0, yaw: 0.0, color: [112, 102, 126] },
+    { model: SCOURGE_WALL_MODEL, x: 2950.0, y: 6700.0, z: -1300.0, scale: 8.0, yaw: 0.0, color: [112, 102, 126] },
+    { model: SCOURGE_WALL_MODEL, x: 3850.0, y: 6700.0, z: -1300.0, scale: 8.0, yaw: 0.0, color: [112, 102, 126] },
+    { model: SCOURGE_WALL_MODEL, x: 4750.0, y: 6700.0, z: -1300.0, scale: 8.0, yaw: 0.0, color: [112, 102, 126] },
+    { model: SCOURGE_WALL_MODEL, x: 5650.0, y: 6700.0, z: -1300.0, scale: 8.0, yaw: 0.0, color: [112, 102, 126] },
+    { model: PILLAR, x: -3300.0, y: 3600.0, z: -1300.0, scale: 7.0, yaw: 40.0, matrixScale: [1.0, 1.0, 2.5], color: [78, 70, 96] },
+    { model: PILLAR, x: 3100.0, y: 3200.0, z: -1300.0, scale: 9.5, yaw: 300.0, matrixScale: [1.0, 1.0, 1.875], color: [78, 70, 96] },
+    { model: RUNE_OBELISK, x: -900.0, y: 4200.0, z: -1300.0, scale: 5.0, yaw: 200.0 },
+    { model: CRYPT, x: -1700.0, y: 4600.0, z: -1300.0, scale: 3.25, yaw: 260.0, color: [76, 68, 92] },
+    { model: PLAGUE_CLOUD, x: -2300.0, y: 3200.0, z: -1250.0, scale: 3.0, yaw: 0.0 },
+    { model: PLAGUE_CLOUD, x: 900.0, y: 3900.0, z: -1250.0, scale: 2.5, yaw: 0.0 },
+    { model: PLAGUE_CLOUD, x: 2700.0, y: 2600.0, z: -1250.0, scale: 2.0, yaw: 0.0 },
+    { model: GEYSER, x: -900.0, y: 3400.0, z: -1300.0, scale: 2.0, yaw: 0.0 },
+    { model: GEYSER, x: 1700.0, y: 3100.0, z: -1300.0, scale: 1.5, yaw: 0.0 },
+    { model: RUBBLE, x: -3600.0, y: 1450.0, z: -1400.0, scale: 6.0, yaw: 20.0, matrixScale: [1.5, 1.0, 1.75], color: [60, 54, 70] },
+    { model: ROCK, x: -2500.0, y: 1650.0, z: -1400.0, scale: 4.5, yaw: 160.0, matrixScale: [1.25, 1.0, 1.25], color: [60, 54, 70] },
+    { model: RUBBLE, x: -1400.0, y: 1500.0, z: -1400.0, scale: 5.0, yaw: 250.0, matrixScale: [1.75, 1.0, 1.75], color: [60, 54, 70] },
+    { model: ROCK, x: -300.0, y: 1700.0, z: -1400.0, scale: 3.75, yaw: 80.0, matrixScale: [1.5, 1.0, 1.375], color: [60, 54, 70] },
+    { model: RUBBLE, x: 800.0, y: 1550.0, z: -1400.0, scale: 5.0, yaw: 310.0, matrixScale: [1.75, 1.0, 1.75], color: [60, 54, 70] },
+    { model: ROCK, x: 1900.0, y: 1600.0, z: -1400.0, scale: 4.5, yaw: 200.0, matrixScale: [1.25, 1.0, 1.25], color: [60, 54, 70] },
+    { model: RUBBLE, x: 3000.0, y: 1450.0, z: -1400.0, scale: 6.0, yaw: 120.0, matrixScale: [1.5, 1.0, 1.75], color: [60, 54, 70] },
+    { model: ROCK, x: 4000.0, y: 1650.0, z: -1400.0, scale: 5.0, yaw: 340.0, matrixScale: [1.0, 1.0, 1.25], color: [60, 54, 70] },
+    { model: PORTCULLIS, x: -3700.0, y: 2700.0, z: -1750.0, scale: 6.0, yaw: 95.0, color: [100, 92, 116] },
+    { model: COLUMN, x: -2500.0, y: 2900.0, z: -1400.0, scale: 5.0, yaw: 40.0, matrixScale: [1.0, 1.0, 1.25], color: [100, 92, 116] },
+    { model: PORTCULLIS, x: -1300.0, y: 2650.0, z: -1800.0, scale: 5.0, yaw: 85.0, color: [100, 92, 116] },
+    { model: RUBBLE, x: -200.0, y: 3000.0, z: -1400.0, scale: 6.0, yaw: 130.0, matrixScale: [1.75, 1.0, 2.5], color: [100, 92, 116] },
+    { model: PORTCULLIS, x: 1000.0, y: 2800.0, z: -1900.0, scale: 6.5, yaw: 90.0, color: [100, 92, 116] },
+    { model: COLUMN, x: 2200.0, y: 2650.0, z: -1400.0, scale: 3.75, yaw: 220.0, matrixScale: [1.0, 1.0, 1.75], color: [100, 92, 116] },
+    { model: PORTCULLIS, x: 3500.0, y: 2950.0, z: -2100.0, scale: 8.0, yaw: 265.0, color: [100, 92, 116] },
+    { model: CAGE, x: -2900.0, y: 2200.0, z: -1300.0, scale: 4.5, yaw: 200.0 },
+    { model: IRON_MAIDEN, x: -1800.0, y: 2300.0, z: -1300.0, scale: 7.0, yaw: 250.0 },
+    { model: FIRE, x: -650.0, y: 2250.0, z: -1300.0, scale: 1.5, yaw: 0.0 },
+    { model: SARCOPHAGUS, x: 1500.0, y: 2100.0, z: -1300.0, scale: 3.5, yaw: 230.0, color: [112, 104, 126] },
+    { model: TORTURE_TABLE, x: 2600.0, y: 2350.0, z: -1300.0, scale: 5.0, yaw: 300.0 },
+    { model: RUNE_OBELISK, x: 3500.0, y: 2150.0, z: -1300.0, scale: 4.0, yaw: 150.0 },
   ],
 };
 

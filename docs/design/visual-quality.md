@@ -257,7 +257,7 @@ unshaded materials; the three stock skies preserve their stock animation.
 | Nordrassil | 236,246,232 / 136,178,172; 1 | Stock FelwoodSky aurora | 5,500–11,000; 0.25,0.5,0.375 |
 | Gryphon Aerie | 255,248,226 / 164,182,220; 0.2 | Original mountain sky | 5,500–11,500; 0.25,0.375,0.5 |
 | Durotar Skies | 255,226,180 / 190,152,134; 0.3 | Original dusty sky | 5,000–11,000; 0.75,0.5,0.25 |
-| Naxxramas | 255,255,255 / 180,156,196; 2 | Original dark slate sky (horizon 30,46,54) | 5,000–11,000; 0.25,0.5,0.625 |
+| Naxxramas | 255,255,255 / 180,156,196; 2 | Original ribbed violet vault over a green-lit horizon (40,58,42) | 3,300–10,000; 0.15625,0.21875,0.1875 |
 | Hellfire Citadel | 255,222,224 / 192,240,160; 1.25 | Stock Outland_Sky | 5,000–11,000; 0.25,0.5,0.125 |
 | Blackrock | 255,248,232 / 170,124,112; 1.2 | Original forge sky | 5,000–10,000; 0.5,0.125,0.0625 |
 | Ahn'Qiraj | 230,236,255 / 150,162,204; 0.3 (approved #267) | Original sandstone sky | 5,000–10,000; 0.75,0.625,0.375 |
@@ -497,13 +497,12 @@ Per stage (backdrop facts from [Per-stage recommendations](#per-stage-recommenda
 | Ahn'Qiraj (13) | bright sandstone; light at 0.5 | Dusk-ochre height fog below the deck | — |
 | Hellfire (14) | dark haze *(guess)* | Fel-green omni lights from imported effects; bloom on fel fire. Outland_Sky is a stock Classic sky | — |
 
-Naxxramas's sky horizon is dark slate, RGB (30, 46, 54), and its white key and violet fill shine at 2.0 so fighters stand off it (#296). Naxxramas's row is in place (#296). NX-1's cold plague-green omni light
-frames NX-3's lone necropolis at (1450, 6000, -900), with radius 1400,
+Naxxramas is indoors (Tom, 18 Oct): its sky is a ribbed vault, dark violet above a green-lit horizon (40, 58, 42), and its white key and violet fill shine at 2.0 so fighters stand off it (#296). NX-1's cold plague-green omni light
+stands at NX-3's Scourge gate under the right-hand arch, (2300, 5200, 300), with radius 1400,
 intensity 0.875 and no flicker. Its reach ends 4400 units behind the fighter
-volume; the one shadow caster adds depth around the citadel. NX-1's teal fog
-starts at 5000 and ends at 11000, preserving the clear fighting plane.
-Classic keeps the stock Necropolis and ruined approach and draws no model omni
-light. The authored light-only model is 756 bytes: stock green spell effects
+volume; the one shadow caster adds depth around the gate. NX-1's dark green-grey fog
+starts at 3300 and ends at 10000, preserving the clear fighting plane.
+Classic draws no model omni light. The authored light-only model is 756 bytes: stock green spell effects
 add particles and geometry, so none supplies this steady isolated glow. No
 stock art is imported.
 

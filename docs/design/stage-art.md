@@ -251,7 +251,8 @@ from the floor (smashcraft:ts/src/game/presentation/stageScenery.ts).
     its real swimming height and covers its sunken ruin bases. Only Tomb of
     Sargeras has water (Tom, 18 Oct); every other stage's floor far below is
     its own ground (the opaque stage ground model, tinted ice, forest, rock,
-    red earth, blight, sand or ash) or Blackrock's lava. Matches draw
+    red earth, sand or ash), Blackrock's lava or Naxxramas's glowing plague
+    slime, its pit of death (Tom, 18 Oct). Matches draw
     no terrain. Background pieces that would
     stand on the ground fade into that atmosphere before their bases show,
     so nothing beneath the deck reads as a place to land, at either camera
@@ -267,6 +268,8 @@ from the floor (smashcraft:ts/src/game/presentation/stageScenery.ts).
 12. **The sky is one smooth gradient; the horizon sits at or below the deck.**
     The brightest region and the busiest clouds stay out of the deck's height
     band; the lower sky is the abyss colour the atmosphere fades to.
+    Naxxramas is indoors: its sky is a ribbed vault, dark violet a few
+    degrees above a green-lit horizon, so the hall reads as closed.
 13. **Hazards are deterministic and trackable** (Tom, 8 Oct, #274). A stage
     hazard's position, timing and effect are a fixed function of the match
     clock and the fighters' own state and actions, never of a random draw.
@@ -348,12 +351,71 @@ lit value and stay darker than the lit backdrop above the deck.
   dusk. Palette: rust, ochre, dusk orange. Near: dark red mounds and spires.
   Valley: Barrens acacia trees and two tall rock pillars. Mid ridge: lighter
   red mounds and spires. Far: the mesa chain with its Orc watchtowers.
-- **Naxxramas: the Eastern Plaguelands.** Kel'Thuzad's necropolis over the
-  blighted farmland near Stratholme. Palette: olive, ash, plague green.
-  Near: blighted dark rock. Valley: the burned Lordaeron farmsteads (a
-  scorched farm, barn and tower and the burned windmill) and tombstones.
-  Mid ridge: sickly olive rock. Far: the Scourge's ziggurats, temples and
-  slaughterhouses on the blight, and the floating necropolis.
+- **Naxxramas: inside the necropolis, over the plague pit** (Tom, 18 Oct:
+  "a stage that looks like its inside naxxramus rather than outside it",
+  over a "green poison pit of death instead of water"). Palette: glowing
+  acid-green slime against violet-grey stone and blackened iron, a dark
+  purple vault above. Floor: the generated plague slime (`STAGE_PLAGUE_MODEL`),
+  dark green with bright lime veins that drift and pulse, never water.
+  Near: dark broken masonry rising from the slime. Valley: the Scourge's
+  dungeon furniture on the pit's edge (an iron maiden, a cage, a torture
+  table, a sarcophagus crypt, a rune obelisk and a green plague fire). Mid
+  ridge: iron portcullis grates and broken columns of the pit's retaining
+  wall. Far: a back wall of tall Gothic archways, the Scourge gate under the
+  right-hand arch, a tomb of relics and a rune obelisk on the left; two
+  massive Scourge pillars rise out of the frame at its edges, and the sky is
+  a ribbed vault, dark purple above a green glow, so no open sky shows.
+  Plague clouds and bubbling vents hang over the slime.
+
+  Research (18 Oct, about 30 minutes of web search; screenshots were
+  design reference only, none downloaded or shipped). Written sources
+  describe Naxxramas's layout and fights more than its look:
+  [Naxxramas (original)](https://warcraft.wiki.gg/wiki/Naxxramas_(original))
+  says "a steady stream of toxic slime flows through" the Construct Quarter
+  and names slime tunnels in the Outer Ring;
+  [Thaddius](https://warcraft.wiki.gg/wiki/Thaddius) is "a vast laboratory
+  filled with all kinds of strange machinery" with "electric discharges and
+  lightning painting the walls with jagged shadows";
+  [Heigan](https://warcraft.wiki.gg/wiki/Heigan) fights on a raised platform
+  over an erupting floor ([Icy Veins](https://icy-veins.com/wotlk-classic/heigan-the-unclean-encounter-guide-strategy-abilities-loot));
+  [Grobbulus](https://warcraft.wiki.gg/wiki/Grobbulus) leaves expanding
+  slime pools and Patchwerk's hall runs beside a slime river
+  ([Warcraft Tavern](https://warcrafttavern.com/wotlk/guides/patchwerk-10),
+  [Engadget, Construct Quarter](https://www.engadget.com/2009-01-10-ready-check-guide-to-naxxramas-construct-quarter-part-1.html));
+  [Kel'Thuzad's chamber](https://warcraft.wiki.gg/wiki/Kel%27Thuzad_(tactics))
+  is a round room of seven alcoves; and the
+  [necropolis](https://warcraft.wiki.gg/wiki/Necropolis) is a nerubian
+  ziggurat raised by the Lich King. From those and from the raid as players
+  know it (2006 and 2008 share the interior): the rooms are dark, lit from
+  below by acid-green slime channels and pools and by green braziers and
+  runes, never warm light; stone is cool purple-grey under blackened iron
+  with bronze spikes; pointed Gothic arches and ribbed vaults, heavy spiked
+  pillars, iron grates, chains, cages and coffins fill the walls. The three
+  elements a player recognises, and what stands in for each in Classic:
+  1. **The glowing green slime below**: the generated plague slime floor,
+     `PlagueCloudCaster` mist and `BubbleGeyserSteam` vents over it, the
+     green `UndeadLargeBuildingFire1` brazier fire and the green-runed
+     `NorthrendObilisk`.
+  2. **Dark Gothic stone vaulting**: `Doodads\Dungeon\Structures\DungeonArchway1`
+     stretched upward into tall arches, the `IceCrownGate` Scourge gate, a
+     continuous back wall of spiked Scourge battlements (Kuzakani's
+     [Undead Walls Pack](https://www.hiveworkshop.com/threads/undead-walls-pack.369286/)
+     from Hive Workshop, see [credits](roster.md#credits)), the
+     ribbed-vault sky and `Icecrown_Rubble`, `DungeonRock` and
+     `NorthrendBrokenColumn` masonry, all tinted violet-grey.
+  3. **Spiked Scourge iron and the dungeon furniture**: `IceCrownPillar`
+     columns, `PorticulisWall0_` iron grates, `IronMaiden`, `CageEmpty`,
+     `TortureTable`, the `NorthrendCrypt` sarcophagus and the
+     `TombOfRelics`.
+  The Undercity tileset's Naxx pieces (`NaxxArch`, `NaxxPillar`,
+  `NaxxWall_A`, `PlagueCauldron`, `CeilingChain`, `Coffin_Wooden`) would
+  fit better but are absent from the Classic 3.0.0.24268 archives (0 bytes
+  when resolved), so none is used. Hive Workshop (searched 18 October 2026)
+  offers no SD pointed-arch, Naxx wall or plague-pool model that is not
+  ripped: its Naxxramas raid interior and Forsaken walls are World of
+  Warcraft exports, and its undead doodad and plague cauldron packs are
+  Reforged HD. Only the Undead Walls Pack met the bar (original, MDX 800,
+  Classic textures only).
 - **Hellfire Citadel: Hellfire Peninsula.** Outland's shattered red waste.
   Palette: red-brown rock, black char, fel green. Near: dark Outland boulders
   and a broken spire. Valley: an Outland rock arch. Mid ridge: lighter rubble
@@ -499,7 +561,7 @@ it a distant landmark rather than a foreground wall. The Frozen Throne's
 | Nordrassil | Dream Land's identifiable tree plus Fountain's cool well accents: smaller World Tree on the left, two asymmetrically placed low wells, one right crag. **The Felwood aurora sky is preserved exactly.** |
 | Gryphon Aerie | Battlefield's airy skyline: a small distant right aviary, two different low crags form a descending left ridge, a desaturated blue cloud field leaves space around the carried platform. |
 | Durotar Skies | Northern Cave and Rivals Fire Capital's low skyline: uneven mesa chain with one small watchtower; warm dusty horizon and dusky upper sky. |
-| Naxxramas | Final Destination's quiet field and Battlefield's distant structures: one distant necropolis, small low Scourge ruins, slate-to-teal atmosphere. |
+| Naxxramas | Brinstar's dark enclosed cavern over a glowing basin: a closed Scourge hall of tall arches and spiked pillars under a dark violet vault, over green plague slime. |
 | Hellfire Citadel | Northern Cave's separated rock planes and Rivals' recessed scenery: one distant gate, descending rock field, restrained green haze beneath violet upper sky. |
 | Blackrock | Brinstar's charcoal upper cavern and warm lower basin: original smoke-grey/rust sky replaces red winter clouds; right basalt landmark counterweighted by a lower left crag. Fire accents are 1.25–1.5 scale below the deck, and the small cart gives industrial scale. |
 | Ahn'Qiraj | Battlefield's asymmetric architectural skyline: distant left obelisk at scale 4.5, lower right broken arch at scale 4, recessed fallen wall and low stones. Sand horizon and desaturated mauve zenith separate the gold deck edge from sky. |

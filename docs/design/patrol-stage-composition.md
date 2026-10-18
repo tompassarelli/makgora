@@ -45,29 +45,29 @@ wedged among enormous boulders. Beneath the deck (stage art rule 16), a red
 near ridge of mounds and spires rises from the canyon floor at y 1,450–1,700,
 acacia trees and two tall rock pillars stand in the valley behind it, and a
 lighter ridge of mounds and spires at y 2,600–3,000 leads back to the mesas.
-In round 2 of the art pass (stage art rules 17 and 18) an orc village (a
-barracks, a spirit lodge and a burrow) and a low red rock fill the canyon
-floor under the deck's centre. Red rock is Durotar's alone.
 
-## Naxxramas: the necropolis over the Plaguelands
+## Naxxramas: inside the necropolis, over the plague pit
 
-Naxxramas is Kel'Thuzad's floating Scourge citadel, a former nerubian
-ziggurat that hangs over the Eastern Plaguelands near Stratholme (Tom, 18 Oct:
-make it lore accurate, and no water beneath a stage that floats). The
-Necropolis floats (`flying`) at x 1500, y 6600, z 350 and scale 2.5, high
-over the right of the skyline, with nothing under it; its plague-green slime
-falls are the stage's glow. Far below, the Scourge's base stands on blighted
-Plaguelands ground (the stage ground, tinted 34, 38, 26 so it fades into
-the abyss): three ziggurats, two graveyards, two boneyards, two Temples of
-the Damned and the slaughterhouse at z -1700. Two plague clouds hang over the
-slaughterhouse and the graveyard, and a farther slaughterhouse and ziggurat
-stand in the far band. The Northrend glaciers and the icy sea are gone. The
-fog stays aurora green (0.09375, 0.3125, 0.25). Nearer the deck (stage art
-rule 16), a ridge of blighted olive rock rises at y 1,450–1,700; behind it the
-burned Lordaeron farmsteads of the Plaguelands (a scorched farm, barn and
-tower, the burned windmill) and two tombstones stand in the valley, before a
-lighter ridge at y 2,600–3,000. Both ridges are blighted Underground rock
-tinted bruise-violet, not mossy Lordaeron rock (stage art rule 17).
+Tom (18 Oct) moved the fight inside Kel'Thuzad's necropolis, over a "green
+poison pit of death instead of water", in the look of World of Warcraft's
+Naxxramas raid (research and model mapping: [stage art](stage-art.md),
+Naxxramas's art target). The floor far below the deck is the generated
+plague slime (`STAGE_PLAGUE_MODEL`, z -1300): dark green with lime veins
+under a drifting, pulsing additive glow. Plague clouds and bubbling vents
+hang over it. Nearer the deck (stage art rule 16), a ridge of dark broken
+masonry rises from the slime at y 1,450–1,700; on the pit's rim behind it
+stand an iron maiden, a cage, a green plague fire, a sarcophagus crypt, a
+torture table and a rune obelisk; a lighter ring of iron portcullis grates
+and broken columns forms the pit's retaining wall at y 2,600–3,000. Two
+massive spiked Scourge pillars rise out of the top of the frame at its
+edges. The back wall is three tall Gothic archways at y 5,000–6,100, the
+Scourge gate standing under the right-hand arch as the landmark, with a
+tomb of relics and a rune obelisk before the left arch. Behind the arches a
+continuous wall of spiked Scourge battlements (Kuzakani's Undead Walls
+Pack from Hive Workshop) closes the hall at y 6,700. The sky is a dark
+violet ribbed vault over a green glow at the horizon, so no open sky shows;
+the fog is a dark green-grey (0.15625, 0.21875, 0.1875). The necropolis
+exterior, the Plaguelands' ziggurats, temples and farmsteads are gone.
 
 ## Hellfire: a portal across fractured ground
 

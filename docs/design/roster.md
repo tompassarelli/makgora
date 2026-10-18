@@ -447,6 +447,24 @@ and Hive Workshop as the original source. The relevant terms are:
 The map description credits Kwaliti and Hive Workshop; the repositories keep
 these assets outside Git in private build inputs.
 
+Stages also import one community model:
+
+- The [Undead Walls Pack by Kuzakani](https://www.hiveworkshop.com/threads/undead-walls-pack.369286/)
+  (Hive Workshop, approved 8 December 2025): `UndeadWalls.mdx`, imported
+  as `war3mapImported\UndeadWalls.mdx` for Naxxramas's back wall. It is an
+  MDX 800 model built in Retera Model Studio from Warcraft III's own Classic
+  textures, with no texture of its own and no World of Warcraft geometry.
+
+Source terms read on 18 October 2026: the resource is tagged "Open Source"
+(free to use and modify) and asks nothing beyond Hive Workshop's usual
+credit to the author. The page also carries Hive's "Contains External
+Material" tag without naming the material; the model itself references only
+Warcraft III textures, and the page's one outside picture is an Icecrown
+Citadel reference image. Our copy changes one texture path of the birth and
+death dust emitter, `Textures\Clouds8x8.blp`, absent from the Classic
+3.0.0.24268 archives, to `Textures\Dust3x.blp`. The map
+description credits Kuzakani and Hive Workshop.
+
 The individual hero sections below specify all attacks. Their counterplay descriptions are acceptance goals to test, not claims established by these numbers.
 
 ## Blademaster

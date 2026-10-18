@@ -272,14 +272,14 @@ Rubric:
 
 ### Naxxramas (4), Town and City layout
 
-Lich and Sylvanas's home: Kel'Thuzad's floating necropolis.
+Lich and Sylvanas's home: inside Kel'Thuzad's necropolis, over a pit of plague slime.
 
 | Item | Reference | Take |
 | --- | --- | --- |
-| NX-1 | Ultimate Midgar, `u272-midgar.jpg` | **Lighting and palette**: a lit industrial slab with red beacons at its edges against a dark teal skyline. In Warcraft: black-iron and Scourge stone deck, plague-green lights at the ledges, slate-to-teal sky. |
+| NX-1 | Ultimate Midgar, `u272-midgar.jpg` | **Lighting and palette**: a lit industrial slab with red beacons at its edges against a dark backdrop. In Warcraft: black-iron and Scourge stone deck, plague-green lights at the ledges, a dark violet vault over a green-lit hall. |
 | NX-2 | Ultimate Lylat Cruise, `u272-lylat-cruise.jpg` | **Silhouette**: a bright-edged hull against near-black space; the stage body is a built object. In Warcraft: the body is a stepped iron ziggurat, edges lit. |
-| NX-3 | Ultimate Hollow Bastion, `u272-hollow-bastion.jpg` | **Landmark**: one castle silhouette framed by cliffs in a V, hazy. In Warcraft: the Necropolis alone, fogged, on the right third. |
-| NX-4 | Tom, 18 Oct; Kel'Thuzad's Naxxramas over the Eastern Plaguelands | **Lore**: the floating Scourge necropolis over blighted Plaguelands near Stratholme. In Warcraft: Undead ziggurats, slaughterhouse, boneyards, graveyards and temple on blighted ground far below, plague clouds, no water or Northrend ice. |
+| NX-3 | Ultimate Hollow Bastion, `u272-hollow-bastion.jpg` | **Landmark**: one built silhouette framed in a V, hazy. In Warcraft: the Scourge gate under the right-hand Gothic arch of the back wall, fogged, on the right third. |
+| NX-4 | Tom, 18 Oct; WoW's Naxxramas raid interior (research in [stage art](stage-art.md#art-targets-the-depth-pass-18-oct)) | **Lore**: the fight is inside the necropolis, over a glowing green plague pit, never outside it and never over water. In Warcraft: the generated plague slime floor with plague clouds and bubbling vents; a back wall of tall Gothic archways before a continuous spiked Scourge battlement wall, under a ribbed violet vault; spiked Scourge pillars at the frame's edges; iron portcullis grates and broken columns around the pit; an iron maiden, cage, torture table, sarcophagus crypt, rune obelisks and green fire on its rim. No open sky, no buildings outside, no farmsteads. |
 
 Material set:
 
@@ -297,9 +297,9 @@ Rubric:
 - S1, S2, S3, S4, S5, S6.
 - NX-a: green light marks both ledges and the ends of both moving platforms (NX-1).
 - NX-b: the body shows three steps in its outline (NX-2).
-- NX-c: the Necropolis is visible at the far extreme on the right third and is the only building taller than the deck on screen (NX-3).
+- NX-c: the Scourge gate under its arch is visible at the far extreme on the right third (NX-3).
 - NX-d: the two moving platforms are told apart by hue or tint (NX-1).
-- NX-e: below the deck are Scourge buildings on blighted ground under plague green, never water (NX-4).
+- NX-e: below the deck is glowing green plague slime, never water, and the backdrop reads as a closed hall: arches and pillars against a dark vault, no open sky (NX-4).
 
 ### Hellfire Citadel (14), Pokémon Stadium layout
 

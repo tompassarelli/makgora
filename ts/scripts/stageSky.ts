@@ -1,13 +1,13 @@
 
 
 type Color = readonly [number, number, number];
-interface StageSky { readonly stage: number; readonly theme: string; readonly zenith: Color; readonly horizon: Color; readonly nadir: Color; readonly cloud: number }
+interface StageSky { readonly stage: number; readonly theme: string; readonly zenith: Color; readonly horizon: Color; readonly nadir: Color; readonly cloud: number; readonly ribs?: number }
 export const STAGE_SKIES: readonly StageSky[] = [
   { stage: 0, theme: "Sky", zenith: [42, 72, 116], horizon: [125, 157, 178], nadir: [20, 28, 43], cloud: 8 },
   { stage: 2, theme: "Icecrown", zenith: [24, 39, 69], horizon: [85, 125, 158], nadir: [18, 27, 44], cloud: 12 },
   { stage: 11, theme: "Gryphon", zenith: [50, 77, 112], horizon: [150, 173, 182], nadir: [31, 42, 58], cloud: 14 },
   { stage: 3, theme: "Durotar", zenith: [73, 55, 63], horizon: [175, 128, 86], nadir: [38, 30, 32], cloud: 10 },
-  { stage: 4, theme: "Naxxramas", zenith: [19, 33, 48], horizon: [30, 46, 54], nadir: [16, 28, 34], cloud: 8 },
+  { stage: 4, theme: "Naxxramas", zenith: [24, 16, 32], horizon: [40, 58, 42], nadir: [30, 62, 30], cloud: 0, ribs: 24 },
   { stage: 14, theme: "Hellfire", zenith: [27, 24, 42], horizon: [32, 42, 34], nadir: [23, 30, 26], cloud: 6 },
   { stage: 12, theme: "Blackrock", zenith: [20, 18, 22], horizon: [46, 22, 10], nadir: [128, 76, 46], cloud: 7 },
   { stage: 6, theme: "Stratholme", zenith: [28, 24, 32], horizon: [36, 30, 30], nadir: [18, 16, 20], cloud: 6 },
@@ -24,10 +24,13 @@ export function stageSkyTexture(sky: StageSky) {
     const elevation = 1 - 2 * y / (height - 1);
     const from = elevation >= 0 ? sky.horizon : sky.nadir;
     const to = elevation >= 0 ? sky.zenith : sky.horizon;
-    const mix = elevation >= 0 ? Math.pow(elevation, 0.65) : Math.pow(1 + elevation, 2);
+    const mix = elevation >= 0 ? sky.ribs === undefined ? Math.pow(elevation, 0.65) : Math.min(1, elevation / 0.07) : Math.pow(1 + elevation, 2);
     const angle = x / width * Math.PI * 2;
     const cloud = sky.cloud * Math.pow(Math.max(0, Math.sin(angle * 3 + elevation * 18) * Math.cos(angle * 2 - elevation * 7)), 3) * Math.max(0, elevation);
-    const color = from.map((channel, i) => Math.round(channel * (1 - mix) + (to[i] ?? channel) * mix + cloud));
+    const phase = sky.ribs === undefined ? 0.5 : (x / width * sky.ribs) % 1;
+    const rib = Math.min(phase, 1 - phase);
+    const vault = sky.ribs === undefined || elevation < -0.05 ? 0 : rib < 0.08 ? 9 * (1 - rib / 0.08) : rib < 0.14 ? -5 : 0;
+    const color = from.map((channel, i) => Math.round(channel * (1 - mix) + (to[i] ?? channel) * mix + cloud + vault));
     bytes.set([color[2] ?? 0, color[1] ?? 0, color[0] ?? 0, 255], 18 + (y * width + x) * 4);
   }
   return { bytes, name: `StageSky-${hash(bytes)}.tga` };
