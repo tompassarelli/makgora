@@ -93,7 +93,7 @@ jobs:
           if [ -f farm-timings.json ]; then
             jq '.lua |= with_entries(select(.key | (startswith("check: ") or startswith("parity corpus: ") or . == "stack-trace profile TypeScript frames") | not))' farm-timings.json > plan-timings.json
           fi
-          bun node_modules/wisp/scripts/wisp/farmShards.ts plan --timings plan-timings.json --bun "$BUN_SHARDS" --lua $((LUA_JOBS * LUA_PER_JOB)) $(bun scripts/test.ts --units) > plan.json
+          bun "$(ls node_modules/wisp/host/farm/farmShards.ts node_modules/wisp/scripts/wisp/farmShards.ts 2>/dev/null | head -1)" plan --timings plan-timings.json --bun "$BUN_SHARDS" --lua $((LUA_JOBS * LUA_PER_JOB)) $(bun scripts/test.ts --units) > plan.json
           [ -z "$BASE" ] || [[ "$BASE" =~ ^[0-9a-f]{40}$ ]]
           jq -n --arg sha "$(git rev-parse HEAD)" --arg tree "$(git rev-parse 'HEAD^{tree}')" --arg base "$BASE" \
             --argjson runId "$GITHUB_RUN_ID" --argjson runAttempt "$GITHUB_RUN_ATTEMPT" \
@@ -157,7 +157,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/wisp/lua32
-          key: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/*.h') }}
+          key: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/host/compile/lua32.ts', 'ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/*.h') }}
       - uses: actions/download-artifact@v4
         with:
           name: farm-test-plan
@@ -179,10 +179,10 @@ jobs:
           mkdir -p build/junit build/junit-sweeps
           TEST_JUNIT_DIR=build/junit bun scripts/test.ts $files
           code=$?
-          bun node_modules/wisp/scripts/wisp/farmShards.ts junit --shard ${{ matrix.shard }} --exit-code "$code" build/junit/*.xml > result.json
+          bun "$(ls node_modules/wisp/host/farm/farmShards.ts node_modules/wisp/scripts/wisp/farmShards.ts 2>/dev/null | head -1)" junit --shard ${{ matrix.shard }} --exit-code "$code" build/junit/*.xml > result.json
           SWEEPS=1 TEST_JUNIT_DIR=build/junit-sweeps bun scripts/test.ts $files
           sweeps=$?
-          bun node_modules/wisp/scripts/wisp/farmShards.ts junit --shard ${{ matrix.shard }} --exit-code "$sweeps" build/junit-sweeps/*.xml > result-sweeps.json
+          bun "$(ls node_modules/wisp/host/farm/farmShards.ts node_modules/wisp/scripts/wisp/farmShards.ts 2>/dev/null | head -1)" junit --shard ${{ matrix.shard }} --exit-code "$sweeps" build/junit-sweeps/*.xml > result-sweeps.json
           [ "$code" = 0 ] && exit "$sweeps"
           exit "$code"
       - if: ${{ !cancelled() }}
@@ -235,7 +235,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/wisp/lua32
-          key: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/*.h') }}
+          key: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/host/compile/lua32.ts', 'ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/*.h') }}
       - uses: actions/download-artifact@v4
         with:
           name: farm-test-plan
@@ -258,13 +258,13 @@ jobs:
         working-directory: ts
         timeout-minutes: 20
         run: |
-          LUA=$(bun node_modules/wisp/scripts/wisp/lua32.ts stock)
+          LUA=$(bun "$(ls node_modules/wisp/host/compile/lua32.ts node_modules/wisp/scripts/wisp/lua32.ts 2>/dev/null | head -1)" stock)
           set +e
-          bun node_modules/wisp/scripts/wisp/farmShards.ts lua-plan plan.json > build/lua-plan.tsv
+          bun "$(ls node_modules/wisp/host/farm/farmShards.ts node_modules/wisp/scripts/wisp/farmShards.ts 2>/dev/null | head -1)" lua-plan plan.json > build/lua-plan.tsv
           count=$((LUA_JOBS * LUA_PER_JOB))
           # A failing test's result names the module that registers it.
           result() {
-            bun node_modules/wisp/scripts/wisp/farmShards.ts lua --shard "$1" --exit-code "$2" "$3" \
+            bun "$(ls node_modules/wisp/host/farm/farmShards.ts node_modules/wisp/scripts/wisp/farmShards.ts 2>/dev/null | head -1)" lua --shard "$1" --exit-code "$2" "$3" \
               | jq --rawfile costs "$4" '($costs | split("\n") | map(split("\t") | select(length > 3) | {key: (.[3:] | join("\t")), value: .[0]}) | from_entries) as $modules
                   | .tests |= map(if .status == "fail" then .name = "\($modules[.unit] // "unknown module"): \(.name)" else . end)'
           }
@@ -365,8 +365,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/wisp/lua32
-          key: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/*.h') }}-${{ matrix.group }}
-          restore-keys: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/*.h') }}
+          key: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/host/compile/lua32.ts', 'ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/*.h') }}-${{ matrix.group }}
+          restore-keys: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/host/compile/lua32.ts', 'ts/node_modules/wisp/scripts/wisp/lua32.ts', 'ts/node_modules/wisp/native/*.h') }}
       - if: steps.scope.outputs.run == 'true'
         name: Run the ${{ matrix.group }} checks
         working-directory: ts
@@ -420,7 +420,7 @@ jobs:
               fi
               check "every selectable computer fighter is active" bun scripts/cpuCoverage.ts ;;
           esac
-          bun node_modules/wisp/scripts/wisp/farmShards.ts lua --shard 0 --exit-code "$failed" build/checks.tsv > "result-check-$GROUP.json"
+          bun "$(ls node_modules/wisp/host/farm/farmShards.ts node_modules/wisp/scripts/wisp/farmShards.ts 2>/dev/null | head -1)" lua --shard 0 --exit-code "$failed" build/checks.tsv > "result-check-$GROUP.json"
           exit "$failed"
       - if: ${{ !cancelled() && steps.scope.outputs.run == 'true' }}
         uses: actions/upload-artifact@v4
@@ -476,7 +476,7 @@ jobs:
             [ -n "$(find farm \( -name "result-check-$group.json" -o -name "skipped-check-$group.txt" \))" ] || echo "check group $group neither ran nor was filtered out: it left no result" >> problems.txt
           done
           [ "$PLAN_RESULT" = success ] || echo "the plan job ended $PLAN_RESULT, so no shard ran: see its log" >> problems.txt
-          bun node_modules/wisp/scripts/wisp/farmShards.ts merge --plan farm/farm-test-plan/plan.json --timings farm-timings.json --out summary.json $(find farm -name 'result*.json') 2> merge.log
+          bun "$(ls node_modules/wisp/host/farm/farmShards.ts node_modules/wisp/scripts/wisp/farmShards.ts 2>/dev/null | head -1)" merge --plan farm/farm-test-plan/plan.json --timings farm-timings.json --out summary.json $(find farm -name 'result*.json') 2> merge.log
           merged=$?
           cat merge.log
           if [ "$merged" != 0 ]; then
