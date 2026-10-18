@@ -53,7 +53,7 @@ describes the three phases. Landing figures are the automatic final lag.
 | Down smash | Wolf swipes front then back; covers a roll with commitment | 14/6/30 | 16.25; 25° outward | — |
 | Neutral air | Compact hammer/body turn; stops a close approach | 8/5/20 | 8; 50° | 14 |
 | Forward air | Hammer across the front; spacing and edge guard | 13/3/25 | 12; 45° | 18 |
-| Back air | Reverse hammer hook; heavier rear finisher | 11/3/25 | 13; 35° backward | 17 |
+| Back air | Ghost Wolf back-kick with the hind legs, then a reverse hammer hook behind him (#95); the kick's set knockback keeps the foe in hitstun for the hammer, which is the rear finisher | 8/12/24: kick 8–10, hammer 17–19; 43 total | Kick 6; 45° backward, set knockback (base 30, no growth); hammer 12; 35° backward | 17 |
 | Up air | Hammer held high; follows up tilt or up throw | 8/4/20 | 9; 85° | 13 |
 | Down air | Wolf's forward paw presses down; meteor only in air | 14/4/28 | 13; down, grounded 55° | 20 |
 | Grab / pummel | Reach from saddle and one hammer-butt check | 8/2/24 | 0 / shared 3 | — |

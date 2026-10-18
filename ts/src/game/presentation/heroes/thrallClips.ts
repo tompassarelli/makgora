@@ -17,7 +17,7 @@ export const THRALL_CLIPS = { idle: THRALL_FALLBACK, walk: { index: 2, seconds: 
   downSmash: { index: 17, seconds: f32(0.85), aligned: true },
   neutralAir: { index: 18, seconds: f32(0.533), aligned: true },
   forwardAir: { index: 19, seconds: f32(0.667), aligned: true },
-  backAir: { index: 20, seconds: f32(0.633), aligned: true },
+  backAir: { index: 20, seconds: f32(0.717), aligned: true },
   upAir: { index: 21, seconds: f32(0.517), aligned: true },
   downAir: { index: 22, seconds: 0.75, aligned: true },
   crouch: { index: 23, seconds: 0.5, aligned: true },

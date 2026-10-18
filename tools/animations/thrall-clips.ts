@@ -22,13 +22,22 @@ ensure(source.Sequences.length === 7 && source.Bones.some(b => b.Name === "Hamme
 const stand = source.Sequences[0]!;
 const hero = heroDefinition(Character.thrall); ensure(hero, "Register Thrall before exporting his clips");
 interface Gesture { chest?: number; waist?: number; arm?: number; wrist?: number; leftArm?: number; head?: number; wolf?: number; neck?: number; front?: number; back?: number; yaw?: number; lean?: number; }
-interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; hold?: boolean; air?: boolean; roll?: number; pain?: boolean; }
+interface Key { frame: number; gesture: Gesture; ik: number; }
+interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; hold?: boolean; air?: boolean; roll?: number; pain?: boolean; keys?: readonly Key[]; reach?: number; }
 const forward: Gesture = {chest:20,waist:-10,arm:-95,wrist:35,leftArm:-35,head:-10,neck:-8,front:15};
 const overhead: Gesture = {chest:-18,waist:10,arm:-165,wrist:25,leftArm:-65,head:-15,wolf:-8,front:-30,back:15};
 const low: Gesture = {chest:10,waist:5,arm:-25,wrist:0,leftArm:-35,head:-15,wolf:5,neck:10,front:-55,back:15};
 const back: Gesture = {chest:-15,waist:-20,arm:55,wrist:35,leftArm:-40,head:15,yaw:150,neck:-10};
 const cast: Gesture = {chest:-20,waist:8,arm:-115,wrist:20,leftArm:-120,head:-20,neck:-10,front:-10};
 const brace: Gesture = {chest:35,waist:10,arm:-45,wrist:25,leftArm:-60,head:-20,wolf:6,front:35,back:35};
+const kickReady: Gesture = {chest:10,waist:-5,arm:-150,wrist:20,leftArm:-40,head:20,yaw:40,wolf:6,neck:-10,front:20,back:-80};
+const kick: Gesture = {chest:15,waist:-5,arm:-160,wrist:25,leftArm:-45,head:25,yaw:60,wolf:-12,neck:15,front:-20,back:95};
+const hammerReady: Gesture = {chest:-25,waist:10,arm:-170,wrist:30,leftArm:-50,head:20,yaw:120,lean:5,front:5,back:-15};
+const hammerFollow: Gesture = {...back,chest:-10,yaw:158,lean:-3};
+const backAirKeys = (kickAt: number, hammerAt: number, frames: number): Key[] => [
+ {frame:0,gesture:{},ik:0}, {frame:kickAt-4,gesture:kickReady,ik:0}, {frame:kickAt,gesture:kick,ik:0}, {frame:kickAt+1,gesture:{...kick,back:120,wolf:-18},ik:0},
+ {frame:hammerAt-3,gesture:hammerReady,ik:0}, {frame:hammerAt,gesture:back,ik:1}, {frame:hammerAt+3,gesture:hammerFollow,ik:1.05}, {frame:frames-2,gesture:{},ik:0}, {frame:frames,gesture:{},ik:0},
+];
 const headAnticipation: Partial<Record<HeroPose, number>> = { jab: 30, jab2: 30, forwardTilt: 15, forwardTiltDown: 45, downTilt: 45, dashAttack: 75 };
 const actions: Action[] = [];
 const normals: readonly [HeroPose, AttackStyle, Gesture][] = [
@@ -38,7 +47,7 @@ const normals: readonly [HeroPose, AttackStyle, Gesture][] = [
  ["forwardSmash",AttackStyle.forwardSmash,{...forward,chest:35,waist:-20,arm:-115,wrist:60}], ["upSmash",AttackStyle.upSmash,{...overhead,chest:-30,arm:-175}], ["downSmash",AttackStyle.downSmash,{...low,chest:70,yaw:45}],
  ["neutralAir",AttackStyle.neutralAir,{...forward,yaw:70}], ["forwardAir",AttackStyle.forwardAir,{...forward,wolf:12}], ["backAir",AttackStyle.backAir,back], ["upAir",AttackStyle.upAir,overhead], ["downAir",AttackStyle.downAir,{...low,front:-65,neck:15}],
 ];
-for (const [pose,style,gesture] of normals) { const move=hero.moves.normals[style];ensure(move,`${pose}: missing move timing`); actions.push({pose,frames:move.totalFrames,contact:move.startupFrames,gesture,air:pose.endsWith("Air")}); }
+for (const [pose,style,gesture] of normals) { const move=hero.moves.normals[style];ensure(move,`${pose}: missing move timing`); const [kickRegion,hammerRegion]=move.regions; const beats=pose==="backAir"&&kickRegion&&hammerRegion?{keys:backAirKeys(kickRegion.firstFrame,hammerRegion.firstFrame,move.totalFrames),reach:hammerRegion.firstFrame}:{}; actions.push({pose,frames:move.totalFrames,contact:move.startupFrames,gesture,air:pose.endsWith("Air"),...beats}); }
 const extra: readonly [HeroPose,number,number,Gesture][] = [
  ["crouch",30,12,brace],["landing",8,2,brace],["shield",30,8,{...brace,leftArm:-100}],["airDodge",49,4,{...brace,lean:-25}], ["smashCharge",30,8,{...overhead,arm:-100}],["dizzy",60,25,{chest:-15,head:30,arm:20,leftArm:15,neck:15}],
  ["turn",8,4,{yaw:140,chest:-12,neck:-15}], ["stop",8,3,{...brace,lean:-18}], ["jumpSquat",5,4,{...brace,wolf:12,front:55,back:55}],
@@ -66,7 +75,8 @@ const retainedFile=Bun.file(join(output,"thrall.mdx"));
 const retained=await retainedFile.exists()?parseSource(await retainedFile.arrayBuffer()):undefined;
 ensure(replacements.length === 0 || retained !== undefined, "Replacing clips needs the existing thrall.mdx in PRIVATE_OUTPUT");
 let cursor=Math.max(...(retained?.Sequences??source.Sequences).map(s=>s.Interval[1]))+100;
-const bindings:string[]=[],damageBindings:string[]=[], records:unknown[]=[];
+interface Binding { pose: HeroPose|undefined; index: number; victimContact: boolean; }
+const bindings:Binding[]=[],damageBindings:Binding[]=[], records:unknown[]=[];
 const damageActions:Action[]=[];
 for(let height=0;height<3;height++)for(let strength=0;strength<3;strength++){const gain=[0.45,0.8,1.2][strength]!;damageActions.push({pose:"damageGround",frames:24,contact:3,hold:true,pain:true,gesture:height===0?{front:65*gain,back:55*gain,wolf:18*gain,waist:25*gain,chest:25*gain,head:-15*gain}:height===1?{chest:55*gain,waist:-25*gain,arm:30*gain,leftArm:35*gain,wolf:8*gain}:{head:-45*gain,chest:-35*gain,arm:45*gain,leftArm:55*gain,neck:-15*gain}});}
 for(const [ordinal,action]of [...actions,...damageActions].entries()){
@@ -80,13 +90,13 @@ for(const [ordinal,action]of [...actions,...damageActions].entries()){
  if(!reuse)cursor=end+100;
  model.Sequences.push({...stand,Name:name,Interval:new Uint32Array([start,end]),NonLooping:true,MoveSpeed:0,Rarity:0,MinimumExtent:new Float32Array([-300,-300,-200]),MaximumExtent:new Float32Array([300,300,350]),BoundsRadius:400});
  const phaseFrames=[0,Math.max(1,action.contact-3),action.contact,Math.min(action.frames-1,action.contact+4),action.frames];
- const phases=phaseFrames.map((frame,i)=>({frame,amount:action.pain?1:i===0?0:i===1?-0.3:i===4?(action.hold?1:0):1}));
+ const phases=action.keys?action.keys.map(k=>({frame:k.frame,amount:1,gesture:k.gesture,ik:k.ik})):phaseFrames.map((frame,i)=>{const amount=action.pain?1:i===0?0:i===1?-0.3:i===4?(action.hold?1:0):1;return {frame,amount,gesture:action.gesture,ik:amount};});
  tracks(model,(track,path)=>{
   const donor=originals.get(path);if(!donor||onGlobalClock(donor))return;let first=donor.Keys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1]);
   if(!first && /^\.(Bones|Helpers)\.\d+\.(Rotation|Translation|Scaling)$/.test(path)){const Vector=new Float32Array(path.endsWith("Rotation")?[0,0,0,1]:path.endsWith("Scaling")?[1,1,1]:[0,0,0]);first={Frame:stand.Interval[0],Vector,...track.LineType>1?{InTan:Vector.slice(),OutTan:Vector.slice()}: {}};}
   if(!first)return;
   const match=/^\.(Bones|Helpers)\.(\d+)\.Rotation$/.exec(path),node=match?source[match[1] as "Bones"|"Helpers"][Number(match[2])]:undefined;
-  for(const {frame,amount}of phases){let Vector=first.Vector.slice();if(node){let[y,z]=joint(node.Name,action.gesture);if(node.Name==="Bone Center"&&action.roll)y=frame/action.frames*360*action.roll;else y*=amount;z*=amount;Vector=rotated(first.Vector,y,z);}
+  for(const {frame,amount,gesture}of phases){let Vector=first.Vector.slice();if(node){let[y,z]=joint(node.Name,gesture);if(node.Name==="Bone Center"&&action.roll)y=frame/action.frames*360*action.roll;else y*=amount;z*=amount;Vector=rotated(first.Vector,y,z);}
    if(node?.Name==="Bone Wolf Head"&&frame===phaseFrames[1]&&headAnticipation[action.pose]!==undefined)Vector=rotated(Vector,headAnticipation[action.pose]!);
    const tangent=()=>match||track.LineType===mdx.LineType.Bezier?Vector.slice():new Float32Array(Vector.length);
    track.Keys.push({...first,Frame:start+Math.round(frame*1000/60),Vector,...first.InTan?{InTan:tangent(),OutTan:tangent()}: {}});
@@ -100,14 +110,14 @@ for(const [ordinal,action]of [...actions,...damageActions].entries()){
   const headContact = ["jab","jab2","forwardTilt"].includes(action.pose);
   const target = action.pose === "jab" ? [45,70] : action.pose === "jab2" ? [50,72] : action.pose === "forwardTilt" ? [92,75] : action.pose.includes("Up") || action.pose.startsWith("up") ? [5,180] : action.pose==="downAir" ? [20,105] : action.pose.includes("Down") || action.pose.startsWith("down") ? [30,110] : action.pose.includes("Back") || action.pose.startsWith("back") ? [-65,135] : [60,130];
 
-  const renderer = new ModelRenderer(model), data = Reflect.get(renderer,"rendererData");renderer.setSequence(index);data.frame=start+Math.round(action.contact*1000/60);
+  const renderer = new ModelRenderer(model), data = Reflect.get(renderer,"rendererData");renderer.setSequence(index);data.frame=start+Math.round((action.reach??action.contact)*1000/60);
   const arm=model.Nodes.find(n=>n.Name==="Bone Rider R Arm")!,wrist=model.Nodes.find(n=>n.Name==="Bone Rider R Wrist")!,weapon=model.Nodes.find(n=>n.Name==="Weapon Ref")!,pivot=model.PivotPoints[weapon.ObjectId]!;
   const donor=(n:mdx.Model["Nodes"][number])=>source.Nodes[n.ObjectId]!.Rotation!.Keys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1])!.Vector;
   const armBase=donor(arm),wristBase=donor(wrist);
   const hammer=model.Nodes.find(n=>n.Name==="Hammer")!;
   const head=source.Geosets.filter(g=>source.Materials[g.MaterialID]!.Layers.some(layer=>Number(layer.FilterMode)<=2)).flatMap(g=>Array.from({length:g.Vertices.length/3},(_,i)=>i).filter(i=>g.Groups[g.VertexGroup[i]!]!.includes(hammer.ObjectId)&&g.Vertices[i*3]!>=0).map(i=>[g.Vertices[i*3]!,g.Vertices[i*3+1]!,g.Vertices[i*3+2]!]));
   const contactPoint=headContact?head[0]!.map((_,i)=>(Math.min(...head.map(p=>p[i]!))+Math.max(...head.map(p=>p[i]!)))/2):pivot;
-  const set=(n:mdx.Model["Nodes"][number],base:ArrayLike<number>,y:number,z:number)=>{ for(const {frame,amount}of phases) {const key=n.Rotation!.Keys.find(k=>k.Frame===start+Math.round(frame*1000/60))!;key.Vector=rotated(base,y*amount,z*amount);if(key.InTan){key.InTan=key.Vector.slice();key.OutTan=key.Vector.slice();}} };
+  const set=(n:mdx.Model["Nodes"][number],base:ArrayLike<number>,y:number,z:number)=>{ for(const {frame,ik}of phases) {if(action.keys&&ik===0)continue;const key=n.Rotation!.Keys.find(k=>k.Frame===start+Math.round(frame*1000/60))!;key.Vector=rotated(base,y*ik,z*ik);if(key.InTan){key.InTan=key.Vector.slice();key.OutTan=key.Vector.slice();}} };
   let angles=[0,0,0,0];
   const loss=()=>{set(arm,armBase,angles[0]!,angles[1]!);set(wrist,wristBase,angles[2]!,angles[3]!);renderer.update(0);const mat=data.nodes[headContact?hammer.ObjectId:weapon.ObjectId].matrix;const x=mat[0]*contactPoint[0]!+mat[4]*contactPoint[1]!+mat[8]*contactPoint[2]!+mat[12],z=mat[2]*contactPoint[0]!+mat[6]*contactPoint[1]!+mat[10]*contactPoint[2]!+mat[14];return (x-target[0]!)**2+(z-target[1]!)**2;};
   for(let pass=0;pass<4;pass++)for(let dim=0;dim<4;dim++){let best=Infinity,bestAngle=0;for(let value=-180;value<=180;value+=pass<2?15:5){angles[dim]=value;const distance=loss();if(distance<best){best=distance;bestAngle=value;}}angles[dim]=bestAngle;}
@@ -127,8 +137,7 @@ for(const [ordinal,action]of [...actions,...damageActions].entries()){
  for(const {frame}of phases){const triangle=drawn.triangles(index,frame/60,1);let lowest=Infinity;for(let i=1;i<triangle.length;i+=2)lowest=Math.min(lowest,triangle[i]!);const old=center.Translation.Keys.find(k=>k.Frame===start+Math.round(frame*1000/60));translations.push({Frame:start+Math.round(frame*1000/60),Vector:new Float32Array([old?.Vector[0]??0,old?.Vector[1]??0,(old?.Vector[2]??0)-(action.air?0:lowest)]),...(center.Translation.LineType>1?{InTan:new Float32Array([0,0,0]),OutTan:new Float32Array([0,0,0])}:{})});}
  center.Translation.Keys=[...beforeKeys,...translations];
  const victimContact=/^victim(Pummel|Throw)/.test(action.pose);
- const binding=`{ index: ${index}, seconds: ${seconds(victimContact?1:(end-start)/1000)}, aligned: true${victimContact?", contact: 0.5":""} }`;
- if(ordinal<actions.length)bindings.push(`  ${action.pose}: ${binding},`);else damageBindings.push(`  ${binding},`);
+ (ordinal<actions.length?bindings:damageBindings).push({pose:ordinal<actions.length?action.pose:undefined,index,victimContact});
  records.push({pose:name,index,frames:victimContact?60:action.frames,contact:victimContact?30:action.contact});
 }
 
@@ -144,15 +153,17 @@ tracks(model,track=>{if(!onGlobalClock(track))track.Keys.sort((a,b)=>a.Frame-b.F
 if (retained && replacements.length > 0) {
  const intervals = replacements.map(pose => { const ordinal = actions.findIndex(action => action.pose === pose); const index=ordinal >= 0 ? source.Sequences.length+ordinal : model.Sequences.findIndex(sequence => sequence.Name === pose && sequence.Name.startsWith("Thrall Damage ")); ensure(index >= source.Sequences.length, `Unknown replacement: ${pose}`); const previous=retained.Sequences[index]!.Interval,sequence=model.Sequences[index]!;retained.Sequences[index]=sequence;return {previous,next:sequence.Interval}; });
  const generated = new Map<string,mdx.AnimVector>(); tracks(model,(track,path)=>generated.set(path,track));
- tracks(retained,(track,path)=>{ if(onGlobalClock(track))return; const replacement=generated.get(path); ensure(replacement, `Missing replacement track ${path}`); const inside=(frame:number,which:"previous"|"next")=>intervals.some(interval=>frame>=interval[which][0]!&&frame<=interval[which][1]!); track.Keys=[...track.Keys.filter(key=>!inside(key.Frame,"previous")),...replacement.Keys.filter(key=>inside(key.Frame,"next"))].sort((a,b)=>a.Frame-b.Frame); });
+ tracks(retained,(track,path)=>{ if(onGlobalClock(track))return; const replacement=generated.get(path); const inside=(frame:number,which:"previous"|"next")=>intervals.some(interval=>frame>=interval[which][0]!&&frame<=interval[which][1]!); if(!replacement){ensure(path.startsWith(".Helpers."),`Missing replacement track ${path}`);const moved=intervals.flatMap(({previous,next})=>track.Keys.filter(key=>key.Frame>=previous[0]!&&key.Frame<=previous[1]!).map(key=>({...key,Frame:next[0]!+Math.round((key.Frame-previous[0]!)/Math.max(1,previous[1]!-previous[0]!)*(next[1]!-next[0]!))})));track.Keys=[...track.Keys.filter(key=>!inside(key.Frame,"previous")),...moved].sort((a,b)=>a.Frame-b.Frame);return;} track.Keys=[...track.Keys.filter(key=>!inside(key.Frame,"previous")),...replacement.Keys.filter(key=>inside(key.Frame,"next"))].sort((a,b)=>a.Frame-b.Frame); });
 }
-const bytes=encodeVerified(parseSource(generateMDX(replacements.length > 0 ? retained! : model)));mkdirSync(output,{recursive:true});await Bun.write(join(output,"thrall.mdx"),bytes);
+const shipped=replacements.length > 0 ? retained! : model;
+const bound=(row:Binding)=>{const [first=0,last=0]=Array.from(shipped.Sequences[row.index]!.Interval);const binding=`{ index: ${row.index}, seconds: ${seconds(row.victimContact?1:(last-first)/1000)}, aligned: true${row.victimContact?", contact: 0.5":""} }`;return row.pose===undefined?`  ${binding},`:`  ${row.pose}: ${binding},`;};
+const bytes=encodeVerified(parseSource(generateMDX(shipped)));mkdirSync(output,{recursive:true});await Bun.write(join(output,"thrall.mdx"),bytes);
 if(replacements.length === 0 || replacements.some(pose=>!pose.startsWith("Thrall Damage ")))await Bun.write(join(project,"ts/src/game/presentation/heroes/thrallClips.ts"),[
  "// Generated by tools/animations/thrall-clips.ts from the stock classic Thrall rig.",'import { f32 } from "wisp/src/sim/f32";', 'import type { HeroClip, HeroClipTable } from "../../sim/heroes/hero";',
  'export const THRALL_MODEL_FILE = "units\\\\orc\\\\Thrall\\\\Thrall.mdl";',
  'export const THRALL_FALLBACK: HeroClip = { index: 0, seconds: f32(1.367) };',
- 'export const THRALL_CLIPS = { idle: THRALL_FALLBACK, walk: { index: 2, seconds: f32(0.9) }, dash: { index: 2, seconds: f32(0.9) }, run: { index: 2, seconds: f32(0.9) }, ko: { index: 5, seconds: f32(2.667) },',...bindings,'} as const satisfies HeroClipTable;',
- 'export const THRALL_DAMAGE_CLIPS: readonly HeroClip[] = [',...damageBindings,'];',"",
+ 'export const THRALL_CLIPS = { idle: THRALL_FALLBACK, walk: { index: 2, seconds: f32(0.9) }, dash: { index: 2, seconds: f32(0.9) }, run: { index: 2, seconds: f32(0.9) }, ko: { index: 5, seconds: f32(2.667) },',...bindings.map(bound),'} as const satisfies HeroClipTable;',
+ 'export const THRALL_DAMAGE_CLIPS: readonly HeroClip[] = [',...damageBindings.map(bound),'];',"",
 ].join("\n"));
 const finalDrawn=new DrawnModel(bytes,1.0);
 const painPoses=damageActions.map((_,ordinal)=>finalDrawn.triangles(source.Sequences.length+actions.length+ordinal,0,1));
@@ -160,5 +171,5 @@ for(let a=0;a<painPoses.length;a++)for(let b=a+1;b<painPoses.length;b++)ensure(p
 const strides=Object.entries(DRAWN_STRIDES).flatMap(([character,data])=>data?(["walk","run"] as const).map(motion=>({character:Number(character) as Character,motion,...data[motion]})):[]).filter(row=>row.character!==Character.thrall);
 for(const motion of ["walk","run"] as const)strides.push(measureDrawnStride(bytes,finalDrawn,Character.thrall,motion,"units\\orc\\Thrall\\Thrall.mdl"));
 await Bun.write(join(project,"ts/src/game/presentation/drawnStrideInfo.ts"),drawnStrideSource(strides.sort((a,b)=>a.character-b.character)));
-for(const pose of ["jab","jab2","forwardTilt","forwardTiltDown","upTilt","downTilt","dashAttack","backAir","downAir","neutralSpecial","sideSpecial","upSpecial","downSpecial","rollForward","throwForward","throwBack","throwUp","throwDown"]){const i=actions.findIndex(a=>a.pose===pose),action=actions[i]!;const sequence=source.Sequences.length+i;const panels:PoseFrame[]=[1,-1].flatMap(facing=>[0,Math.max(1,action.contact-3),action.contact,action.contact+4,action.frames].map(frame=>({frame,phase:frame<action.contact?AttackPhase.startup:frame<=action.contact+4?AttackPhase.active:AttackPhase.recovery,x:0,z:0,facing,parts:[],strikes:[],clip:sequence,seconds:Math.min(action.frames,frame)/60})));await Bun.write(join(output,`${pose}.png`),sheet(`Thrall ${pose}`,finalDrawn,panels,5).png);}
+for(const pose of ["jab","jab2","forwardTilt","forwardTiltDown","upTilt","downTilt","dashAttack","backAir","downAir","neutralSpecial","sideSpecial","upSpecial","downSpecial","rollForward","throwForward","throwBack","throwUp","throwDown"]){const i=actions.findIndex(a=>a.pose===pose),action=actions[i]!;const sequence=source.Sequences.length+i;const panels:PoseFrame[]=[1,-1].flatMap(facing=>(action.keys?.map(key=>key.frame)??[0,Math.max(1,action.contact-3),action.contact,action.contact+4,action.frames]).map(frame=>({frame,phase:frame<action.contact?AttackPhase.startup:frame<=action.contact+4?AttackPhase.active:AttackPhase.recovery,x:0,z:0,facing,parts:[],strikes:[],clip:sequence,seconds:Math.min(action.frames,frame)/60})));await Bun.write(join(output,`${pose}.png`),sheet(`Thrall ${pose}`,finalDrawn,panels,panels.length/2).png);}
 await Bun.write(join(output,"thrall-clips.json"),JSON.stringify({stockSequences:source.Sequences.length,appended:records.length,records},null,2)+"\n");console.log(`THRALL_CLIPS_PASS ${records.length} authored clips; ${source.Sequences.length} stock sequences retained; private output ${output}`);
