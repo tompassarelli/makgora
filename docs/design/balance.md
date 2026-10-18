@@ -455,9 +455,11 @@ kill percent within 15%. His 25 pairs at 200 a pair measured 62%.
 893751939b (run 39015787000, 77 decisive matches a fighter) put Peon at 29%,
 Beastmaster 32%, Grom 34%, Lich King 69% and Blademaster 73%, with
 Blademaster's forward smash taking 62% of his KOs and Lich King's 56%.
-Blademaster keeps his forward smash kill power (Tom, 17 Oct) but it, his
-down tilt and his dash attack recover 2-3 frames later, and his forward
-tilt and dash attack tips drop 10%. Lich King's forward smash drops from
+Blademaster keeps his forward smash kill power (Tom, 17 Oct) but it
+recovers 3 frames later and his dash attack 2, and his forward tilt tip
+drops 10%. His down tilt keeps its recovery, so its tip stays out of reach
+on shield (#151), and his dash attack tip its damage, so its weak hit stays
+under 0.85 of the strong one. Lich King's forward smash drops from
 25.5/21 to 23.5/19.5 and Frostmourne Sweep from 15 to 14. Beastmaster's and
 Grom's forward tilts, dash attacks and forward smashes and Beastmaster's
 back air deal 10% more. Peon's forward tilts and dash attack deal 10% more

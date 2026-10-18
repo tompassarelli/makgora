@@ -98,10 +98,10 @@ export const BLADEMASTER_GROUND: GroundKit = {
     [AttackStyle.upTilt]: heroMove(6, 5, 18, 0, swing(6, [
       [41.0, 116.0, 160.0, 122.0], [26.0, 136.0, 98.0, 230.0], [-2.0, 150.0, -19.0, 268.0], [-34.0, 145.0, -133.0, 210.0], [-49.0, 122.0, -168.0, 121.0],
     ], 6.0, groundHit(6.484450340270996, 85, 66.85000610351562, 38.0, BM))),
-    [AttackStyle.downTilt]: heroMove(6, 2, 13, 0, tipped(6, [[18.0, 10.0, 152.0, 8.0], [18.0, 6.0, 152.0, 4.0]], 6.0, 26.0,
+    [AttackStyle.downTilt]: heroMove(6, 2, 10, 0, tipped(6, [[18.0, 10.0, 152.0, 8.0], [18.0, 6.0, 152.0, 4.0]], 6.0, 26.0,
       groundHit(7.410800457000732, 20, 57.30000305175781, 18.0, BM), groundHit(4.631750106811523, 20, 57.30000305175781, 18.0, BM))),
     [AttackStyle.dashAttack]: heroMove(9, 4, 24, 0, tipped(9, [[18.0, 60.0, 145.0, 50.0], [18.0, 50.0, 145.0, 40.0], [18.0, 40.0, 145.0, 30.0], [18.0, 30.0, 145.0, 22.0]], 6.0, 26.0,
-      groundHit(8.337150573730469, 30, 95.5, 24.0, BM), groundHit(7.410800457000732, 40, 71.625, 18.0, BM)), 92.0, true),
+      groundHit(9.263500213623047, 30, 95.5, 24.0, BM), groundHit(7.410800457000732, 40, 71.625, 18.0, BM)), 92.0, true),
   },
   reaches: {
     [AttackStyle.jab]: [40.0, 72.0], [AttackStyle.jab2]: [42.0, 70.0], [AttackStyle.forwardTilt]: [48.0, 66.0], [AttackStyle.forwardTiltUp]: [48.0, 66.0], [AttackStyle.forwardTiltDown]: [48.0, 66.0],

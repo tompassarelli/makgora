@@ -461,8 +461,8 @@ The individual hero sections below specify all attacks. Their counterplay descri
 | Jab — Hilt Check | 4/2/13 | 3 | S, 35, POKE | Quick pommel strike; no sword-length disjoint |
 | Forward tilt — Measuring Cut | 8/3/19 | 8 inner, 9 outer | L, 35, POKE | Outer final 0.20H of blade rewards spacing |
 | Up tilt — Rising Crescent | 7/5/20 | 8 | M, 90, LAUNCH | Arc above and slightly behind; weak directly low in front |
-| Down tilt — Ankle Cut | 7/3/20 | 6 | L, 75, LINK | Low thin sweep; a starter rather than a kill move |
-| Dash attack — Advancing Slash | 10/4/28 | 9 | L, 45, LAUNCH | Moves 0.55H forward during startup; cannot pass through shield |
+| Down tilt — Ankle Cut | 7/3/17 | 6 | L, 75, LINK | Low thin sweep; a starter rather than a kill move |
+| Dash attack — Advancing Slash | 10/4/28 | 10 | L, 45, LAUNCH | Moves 0.55H forward during startup; cannot pass through shield |
 | Forward smash — Execution Cut | 17/3/35 | 13 inner, 17 outer | XL, 40, KILL growth, base 30 | Large horizontal cut; outer 0.20H is sweetspot |
 | Up smash — Sky Splitter | 15/4/30 | 16 | L, 90, KILL | Narrow vertical blade with no broad ground scoop |
 | Down smash — Low Circle | 14/6/31 | 14 | L, 25, EDGE | Low sword sweep in front on frames 14–16, then behind on 17–19; one hit total per target |
