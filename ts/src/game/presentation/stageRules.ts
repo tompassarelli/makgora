@@ -149,3 +149,31 @@ export function depthProblems(name: string, pieces: readonly SceneryPiece[], flo
   if (!rising.some((piece) => piece.x >= NEAR_BAND_SIDE)) problems.push(`${name}: no near-band terrain rises out of the floor right of the deck`);
   return problems;
 }
+
+export const MOSSY_ROCKS = ["\\LordaeronSummer\\Rocks\\", "\\Ruins\\Rocks\\Ruins_", "\\Felwood\\Rocks\\", "\\Ashenvale\\Rocks\\"] as const;
+
+export function paletteProblems(name: string, pieces: readonly SceneryPiece[], green: boolean): readonly string[] {
+  if (green) return [];
+  return pieces.filter((piece) => MOSSY_ROCKS.some((family) => piece.model.includes(family))).map((piece) => `${name}: mossy ${piece.model} at x ${piece.x}, y ${piece.y}`);
+}
+
+export const SKYLINE_FROM = 4000;
+
+export function skylineRock(pieces: readonly SceneryPiece[]): string | undefined {
+  const counts = new Map<string, number>();
+  for (const piece of pieces) if (piece.y >= SKYLINE_FROM && /\\Rocks\\|RockChunks|\\StageCrag/.test(piece.model)) counts.set(piece.model, (counts.get(piece.model) ?? 0) + 1);
+  return [...counts].sort((a, b) => (b[1] !== a[1] ? b[1] - a[1] : a[0] < b[0] ? -1 : 1))[0]?.[0];
+}
+
+export function skylineProblems(stages: readonly { readonly name: string; readonly pieces: readonly SceneryPiece[] }[]): readonly string[] {
+  const owners = new Map<string, string>();
+  const problems: string[] = [];
+  for (const { name, pieces } of stages) {
+    const rock = skylineRock(pieces);
+    if (rock === undefined) continue;
+    const owner = owners.get(rock);
+    if (owner !== undefined) problems.push(`${name}: raises its skyline from ${owner}'s ${rock}`);
+    else owners.set(rock, name);
+  }
+  return problems;
+}

@@ -2,8 +2,8 @@ import { f32 } from "wisp/src/sim/f32";
 import type { StageScenery } from "./stageScenery";
 import { STAGE_SKY_MODELS } from "../../generated/stages/stageSkyInfo";
 import { STAGE_GROUND_MODEL, STAGE_LAVA_MODEL } from "../../generated/stages/terrainAssetInfo";
+import { STAGE_CRAG_CRAG_MODEL, STAGE_CRAG_KNOLL_MODEL, STAGE_CRAG_PEAK_MODEL } from "../../generated/stages/cragAssetInfo";
 
-const MOUND = "Doodads\\Barrens\\Rocks\\Barrens_Rocks\\Barrens_Rocks2.mdx";
 const SPIRE = "Doodads\\Felwood\\Rocks\\Felwood_Spires\\Felwood_Spires0.mdx";
 const BACK = "Doodads\\Ruins\\Rocks\\Ruins_Spires\\Ruins_Spires0.mdx";
 const ASHEN_MOUND = "Doodads\\Ashenvale\\Rocks\\AshenRock\\AshenRock2.mdx";
@@ -23,6 +23,9 @@ const DUNE_SPIRE = "Doodads\\Barrens\\Rocks\\Barrens_Spires\\Barrens_Spires2.mdx
 const LOW_SPIRE = "Doodads\\Barrens\\Rocks\\Barrens_Spires\\Barrens_Spires1.mdx";
 const SAND = [250, 240, 222] as const;
 const PALE_SAND = [255, 250, 238] as const;
+const GRANITE_NEAR = [150, 156, 162] as const;
+const GRANITE_MID = [190, 196, 204] as const;
+const GRANITE_FAR = [220, 226, 234] as const;
 
 export const NORDRASSIL_SCENERY: StageScenery = {
   farZ: 13000.0,
@@ -98,40 +101,42 @@ export const GRYPHON_SCENERY: StageScenery = {
 
   fog: { start: 5000.0, end: 9000.0, red: 0.5, green: 0.625, blue: 0.75 },
   heightFog: { start: 5000.0, end: 9000.0, density: 0.25, heightStart: -1800.0, heightEnd: -500.0, maxDensity: 0.5, drawOverSky: true },
-  floor: { model: STAGE_GROUND_MODEL, z: -1300.0, color: [40, 46, 44] },
+  floor: { model: STAGE_GROUND_MODEL, z: -1300.0, color: [46, 66, 40] },
   pieces: [
 
-    { model: "Buildings\\Human\\GryphonAviary\\GryphonAviary.mdx", x: 0.0, y: 5050.0, z: 45.0, scale: f32(2.2), yaw: 270.0 },
-    { model: "Doodads\\Barrens\\Rocks\\Barrens_Rocks\\Barrens_Rocks2.mdx", x: 0.0, y: 4500.0, z: -1656.0, scale: f32(10.8), yaw: 180.0, matrixScale: [3.0, 3.0, 2.0] },
-    { model: "Doodads\\Barrens\\Rocks\\Barrens_Rocks\\Barrens_Rocks0.mdx", x: -2050.0, y: 3200.0, z: -2475.0, scale: 3.5, yaw: 35.0, matrixScale: [1.0, 1.0, f32(5.138)] },
-    { model: "Doodads\\Barrens\\Rocks\\Barrens_Rocks\\Barrens_Rocks0.mdx", x: -550.0, y: 5200.0, z: -3505.0, scale: f32(5.05), yaw: 110.0, matrixScale: [1.0, 1.0, f32(6.005)] },
-    { model: MOUND, x: -4000.0, y: 5000.0, z: -1500.0, scale: 13.0, yaw: 200.0, matrixScale: [2.5, 1.0, 1.25] },
-    { model: MOUND, x: -3100.0, y: 5300.0, z: -1350.0, scale: 14.0, yaw: 175.0, matrixScale: [2.5, 1.0, 1.25] },
-    { model: MOUND, x: -2150.0, y: 5100.0, z: -1450.0, scale: 12.5, yaw: 190.0, matrixScale: [2.5, 1.0, 1.25] },
-    { model: MOUND, x: -1250.0, y: 5400.0, z: -1400.0, scale: 14.5, yaw: 165.0, matrixScale: [2.5, 1.0, 1.25] },
-    { model: MOUND, x: -300.0, y: 5150.0, z: -1350.0, scale: 11.0, yaw: 205.0, matrixScale: [2.5, 1.0, 1.25] },
-    { model: MOUND, x: 650.0, y: 5450.0, z: -1300.0, scale: 14.0, yaw: 180.0, matrixScale: [2.5, 1.0, 1.25] },
-    { model: MOUND, x: 1500.0, y: 5200.0, z: -1400.0, scale: 11.5, yaw: 195.0, matrixScale: [2.5, 1.0, 1.25] },
-    { model: MOUND, x: 3300.0, y: 5300.0, z: -1400.0, scale: 11.0, yaw: 170.0, matrixScale: [2.5, 1.0, 1.25] },
-    { model: MOUND, x: 4000.0, y: 5000.0, z: -1550.0, scale: 10.0, yaw: 185.0, matrixScale: [2.5, 1.0, 1.25] },
-    { model: "Doodads\\LordaeronSummer\\Rocks\\Lords_Rock\\Lords_Rock4.mdx", x: -3600.0, y: 1450.0, z: -1400.0, scale: 5.25, yaw: 20.0, matrixScale: [1.75, 1.0, 1.25], color: [110, 116, 112] },
-    { model: "Doodads\\LordaeronSummer\\Rocks\\Lords_Rock\\Lords_Rock0.mdx", x: -2500.0, y: 1650.0, z: -1400.0, scale: 8.25, yaw: 160.0, matrixScale: [1.25, 1.0, 1.25], color: [110, 116, 112] },
-    { model: "Doodads\\LordaeronSummer\\Rocks\\Lords_Rock\\Lords_Rock4.mdx", x: -1400.0, y: 1500.0, z: -1400.0, scale: 4.25, yaw: 250.0, matrixScale: [2.0, 1.0, 1.25], color: [110, 116, 112] },
-    { model: "Doodads\\LordaeronSummer\\Rocks\\Lords_Rock\\Lords_Rock0.mdx", x: -300.0, y: 1700.0, z: -1400.0, scale: 6.75, yaw: 80.0, matrixScale: [1.5, 1.0, 1.25], color: [110, 116, 112] },
-    { model: "Doodads\\LordaeronSummer\\Rocks\\Lords_Rock\\Lords_Rock4.mdx", x: 800.0, y: 1550.0, z: -1400.0, scale: 4.25, yaw: 310.0, matrixScale: [2.0, 1.0, 1.25], color: [110, 116, 112] },
-    { model: "Doodads\\LordaeronSummer\\Rocks\\Lords_Rock\\Lords_Rock0.mdx", x: 1900.0, y: 1600.0, z: -1400.0, scale: 8.0, yaw: 200.0, matrixScale: [1.25, 1.0, 1.25], color: [110, 116, 112] },
-    { model: "Doodads\\LordaeronSummer\\Rocks\\Lords_Rock\\Lords_Rock4.mdx", x: 3000.0, y: 1450.0, z: -1400.0, scale: 5.0, yaw: 120.0, matrixScale: [1.75, 1.0, 1.25], color: [110, 116, 112] },
-    { model: "Doodads\\LordaeronSummer\\Rocks\\Lords_Rock\\Lords_Rock0.mdx", x: 4000.0, y: 1650.0, z: -1400.0, scale: 9.25, yaw: 340.0, matrixScale: [1.0, 0.875, 1.25], color: [110, 116, 112] },
-    { model: "Doodads\\LordaeronSummer\\Rocks\\Lords_Rock\\Lords_Rock0.mdx", x: -4000.0, y: 2600.0, z: -1400.0, scale: 10.75, yaw: 190.0, matrixScale: [1.0, 0.75, 1.25], color: [150, 160, 156] },
-    { model: "Doodads\\LordaeronSummer\\Rocks\\Lords_Rock\\Lords_Rock4.mdx", x: -2800.0, y: 2900.0, z: -1400.0, scale: 5.75, yaw: 40.0, matrixScale: [1.75, 1.0, 1.25], color: [150, 160, 156] },
-    { model: "Doodads\\LordaeronSummer\\Rocks\\Lords_Rock\\Lords_Rock0.mdx", x: -1500.0, y: 2700.0, z: -1400.0, scale: 8.75, yaw: 300.0, matrixScale: [1.25, 1.0, 1.25], color: [150, 160, 156] },
-    { model: "Doodads\\LordaeronSummer\\Rocks\\Lords_Rock\\Lords_Rock4.mdx", x: -200.0, y: 3000.0, z: -1400.0, scale: 4.75, yaw: 130.0, matrixScale: [2.25, 1.0, 1.25], color: [150, 160, 156] },
-    { model: "Doodads\\LordaeronSummer\\Rocks\\Lords_Rock\\Lords_Rock0.mdx", x: 1100.0, y: 2800.0, z: -1400.0, scale: 9.0, yaw: 220.0, matrixScale: [1.25, 0.875, 1.25], color: [150, 160, 156] },
-    { model: "Doodads\\LordaeronSummer\\Rocks\\Lords_Rock\\Lords_Rock4.mdx", x: 2400.0, y: 2650.0, z: -1400.0, scale: 6.0, yaw: 70.0, matrixScale: [1.75, 1.0, 1.25], color: [150, 160, 156] },
-    { model: "Doodads\\LordaeronSummer\\Rocks\\Lords_Rock\\Lords_Rock0.mdx", x: 3500.0, y: 2950.0, z: -1400.0, scale: 10.75, yaw: 260.0, matrixScale: [1.0, 0.75, 1.25], color: [150, 160, 156] },
-    { model: "Doodads\\LordaeronSummer\\Structures\\LRockArch\\LRockArch.mdx", x: -2700.0, y: 2200.0, z: -1400.0, scale: 2.25, yaw: 95.0 },
-    { model: "Doodads\\LordaeronSummer\\Structures\\LRockArch\\LRockArch.mdx", x: 3100.0, y: 2350.0, z: -1400.0, scale: 1.75, yaw: 60.0 },
-    { model: "Doodads\\LordaeronSummer\\Rocks\\Lords_Rock\\Lords_Rock4.mdx", x: -1800.0, y: 3600.0, z: -1400.0, scale: 6.0, yaw: 130.0, matrixScale: [2.0, 1.0, 1.0] },
+    { model: "Buildings\\Human\\GryphonAviary\\GryphonAviary.mdx", x: 0.0, y: 5050.0, z: -450.0, scale: f32(2.6), yaw: 270.0 },
+    { model: STAGE_CRAG_CRAG_MODEL, x: 0.0, y: 4900.0, z: -1400.0, scale: 1.0, yaw: 180.0, matrixScale: [17.5, 18.0, 3.75], color: GRANITE_FAR },
+    { model: "Buildings\\Human\\GryphonAviary\\GryphonAviary.mdx", x: -2300.0, y: 4600.0, z: -845.0, scale: f32(1.4), yaw: 320.0 },
+    { model: STAGE_CRAG_KNOLL_MODEL, x: -2300.0, y: 4600.0, z: -1400.0, scale: 1.0, yaw: 200.0, matrixScale: [11.0, 7.0, 4.25], color: GRANITE_FAR },
+    { model: STAGE_CRAG_PEAK_MODEL, x: -3650.0, y: 5200.0, z: -1400.0, scale: 1.0, yaw: 170.0, matrixScale: [13.5, 9.0, 5.75], color: GRANITE_FAR },
+    { model: STAGE_CRAG_CRAG_MODEL, x: -1350.0, y: 5600.0, z: -1400.0, scale: 1.0, yaw: 150.0, matrixScale: [10.0, 7.0, 4.5], color: GRANITE_FAR },
+    { model: "Buildings\\Human\\Blacksmith\\Blacksmith.mdx", x: 1550.0, y: 5800.0, z: -830.0, scale: 2.0, yaw: 250.0 },
+    { model: STAGE_CRAG_KNOLL_MODEL, x: 1550.0, y: 5800.0, z: -1400.0, scale: 1.0, yaw: 20.0, matrixScale: [13.0, 8.0, 4.25], color: GRANITE_FAR },
+    { model: STAGE_CRAG_CRAG_MODEL, x: 2750.0, y: 5000.0, z: -1400.0, scale: 1.0, yaw: 210.0, matrixScale: [11.0, 8.0, 7.0], color: GRANITE_FAR },
+    { model: STAGE_CRAG_PEAK_MODEL, x: 3950.0, y: 4500.0, z: -1400.0, scale: 1.0, yaw: 120.0, matrixScale: [12.0, 8.0, 4.0], color: GRANITE_FAR },
+    { model: STAGE_CRAG_CRAG_MODEL, x: -2300.0, y: 8000.0, z: -1400.0, scale: 1.0, yaw: 160.0, matrixScale: [14.0, 14.0, 8.75], color: GRANITE_FAR },
+    { model: STAGE_CRAG_PEAK_MODEL, x: 2600.0, y: 8800.0, z: -1400.0, scale: 1.0, yaw: 200.0, matrixScale: [21.0, 15.0, 8.5], color: GRANITE_FAR },
+    { model: STAGE_CRAG_CRAG_MODEL, x: 5200.0, y: 7400.0, z: -1400.0, scale: 1.0, yaw: 90.0, matrixScale: [14.0, 11.0, 7.0], color: GRANITE_FAR },
+    { model: STAGE_CRAG_KNOLL_MODEL, x: 300.0, y: 7600.0, z: -1400.0, scale: 1.0, yaw: 60.0, matrixScale: [22.0, 14.0, 9.0], color: GRANITE_FAR },
+    { model: STAGE_CRAG_KNOLL_MODEL, x: -2050.0, y: 3200.0, z: -1400.0, scale: 1.0, yaw: 35.0, matrixScale: [3.5, 3.5, 3.0], color: GRANITE_NEAR },
+    { model: STAGE_CRAG_CRAG_MODEL, x: -3600.0, y: 1450.0, z: -1400.0, scale: 1.0, yaw: 20.0, matrixScale: [8.0, 4.5, 2.75], color: GRANITE_NEAR },
+    { model: STAGE_CRAG_KNOLL_MODEL, x: -2500.0, y: 1650.0, z: -1400.0, scale: 1.0, yaw: 160.0, matrixScale: [9.0, 7.25, 5.5], color: GRANITE_NEAR },
+    { model: STAGE_CRAG_CRAG_MODEL, x: -1400.0, y: 1500.0, z: -1400.0, scale: 1.0, yaw: 250.0, matrixScale: [7.5, 3.75, 2.5], color: GRANITE_NEAR },
+    { model: STAGE_CRAG_KNOLL_MODEL, x: -300.0, y: 1700.0, z: -1400.0, scale: 1.0, yaw: 80.0, matrixScale: [8.75, 6.0, 5.25], color: GRANITE_NEAR },
+    { model: STAGE_CRAG_CRAG_MODEL, x: 800.0, y: 1550.0, z: -1400.0, scale: 1.0, yaw: 310.0, matrixScale: [7.5, 3.75, 2.5], color: GRANITE_NEAR },
+    { model: STAGE_CRAG_KNOLL_MODEL, x: 1900.0, y: 1600.0, z: -1400.0, scale: 1.0, yaw: 200.0, matrixScale: [8.75, 7.0, 5.5], color: GRANITE_NEAR },
+    { model: STAGE_CRAG_CRAG_MODEL, x: 3000.0, y: 1450.0, z: -1400.0, scale: 1.0, yaw: 120.0, matrixScale: [7.75, 4.5, 2.75], color: GRANITE_NEAR },
+    { model: STAGE_CRAG_KNOLL_MODEL, x: 4000.0, y: 1650.0, z: -1400.0, scale: 1.0, yaw: 340.0, matrixScale: [8.0, 7.0, 5.75], color: GRANITE_NEAR },
+    { model: STAGE_CRAG_KNOLL_MODEL, x: -4000.0, y: 2600.0, z: -1400.0, scale: 1.0, yaw: 190.0, matrixScale: [10.75, 8.0, 7.25], color: GRANITE_MID },
+    { model: STAGE_CRAG_CRAG_MODEL, x: -2800.0, y: 2900.0, z: -1400.0, scale: 1.0, yaw: 40.0, matrixScale: [10.0, 5.75, 3.75], color: GRANITE_MID },
+    { model: STAGE_CRAG_KNOLL_MODEL, x: -1500.0, y: 2700.0, z: -1400.0, scale: 1.0, yaw: 300.0, matrixScale: [11.0, 8.75, 6.75], color: GRANITE_MID },
+    { model: STAGE_CRAG_CRAG_MODEL, x: -200.0, y: 3000.0, z: -1400.0, scale: 1.0, yaw: 130.0, matrixScale: [10.75, 4.75, 3.5], color: GRANITE_MID },
+    { model: STAGE_CRAG_KNOLL_MODEL, x: 1100.0, y: 2800.0, z: -1400.0, scale: 1.0, yaw: 220.0, matrixScale: [11.25, 8.0, 7.0], color: GRANITE_MID },
+    { model: STAGE_CRAG_CRAG_MODEL, x: 2400.0, y: 2650.0, z: -1400.0, scale: 1.0, yaw: 70.0, matrixScale: [10.5, 6.0, 3.75], color: GRANITE_MID },
+    { model: STAGE_CRAG_KNOLL_MODEL, x: 3500.0, y: 2950.0, z: -1400.0, scale: 1.0, yaw: 260.0, matrixScale: [10.75, 8.0, 7.25], color: GRANITE_MID },
+    { model: "Doodads\\LordaeronSummer\\Structures\\LRockArch\\LRockArch.mdx", x: -2700.0, y: 2200.0, z: -1400.0, scale: 2.25, yaw: 95.0, color: GRANITE_MID },
+    { model: "Doodads\\LordaeronSummer\\Structures\\LRockArch\\LRockArch.mdx", x: 3100.0, y: 2350.0, z: -1400.0, scale: 1.75, yaw: 60.0, color: GRANITE_MID },
+    { model: STAGE_CRAG_CRAG_MODEL, x: -1800.0, y: 3600.0, z: -1400.0, scale: 1.0, yaw: 130.0, matrixScale: [12.0, 6.0, 3.0], color: GRANITE_MID },
   ],
 };
 

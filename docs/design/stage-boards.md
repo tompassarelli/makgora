@@ -147,7 +147,8 @@ mask for contrast.
   is in the stage's palette, with mossy rock only on Nordrassil and Tomb of
   Sargeras; red rock belongs to Durotar alone; each stage raises its
   skyline from its own rock (stage art rules 17 and 18).
-  Judged at both extremes; Gryphon Aerie does not meet it until round 3.
+  smashcraft:ts/src/game/presentation/stageScenery.tests.ts enforces the
+  rock rules; the skyline is judged at both extremes.
 
 ## Boards
 
@@ -234,7 +235,7 @@ Topology: flat lip, a step in, then a lower shell (Pokémon Stadium), stepped tw
 
 Rubric:
 
-- S1, S2, S3, S4, S5.
+- S1, S2, S3, S4, S5, S6.
 - GA-a: the deck top reads as cut stone blocks and the body as rougher rock, with a visible step in the silhouette (GA-2).
 - GA-b: a gold line runs the deck's full front edge, unbroken from ledge to ledge (GA-3).
 - GA-c: the carried platform's material differs in hue from the static platforms (GA-2).

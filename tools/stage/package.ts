@@ -8,6 +8,7 @@ import { STAGE_POINT_LIGHTS } from "../../ts/src/game/assets/stagePointLights";
 import { stagePointLightMdl, stagePointLightModelFile } from "../../ts/scripts/stageLight";
 import { packageLiquids } from "./liquids";
 import { packageSkies } from "./skies";
+import { packageCrags } from "./crags";
 import { platformDeckFaces, texturedDeckMdl } from "../../ts/scripts/stageMaterials";
 import { modelFacts } from "../../ts/node_modules/wisp/host/models/models";
 import { MODEL_FACTS } from "../../ts/scripts/wisp/modelFacts";
@@ -117,10 +118,11 @@ export const STAGE_MAIN_DECK_MODEL = ${JSON.stringify(`war3mapImported\\${import
 `);
 console.log(`Stage decks: ${STAGE_DECK_PALETTES.length} palettes; slab bounds x=[-50,50], z=[-54,0]; main decks from each stage's collision outline`);
 const liquidNames = await packageLiquids(output);
+const cragNames = await packageCrags(output);
 
 
-const deckFacts = Object.fromEntries(Object.entries(MODEL_FACTS).filter(([model]) => !model.startsWith("war3mapImported\\StageDeck-") && !model.startsWith("war3mapImported\\StageMainDeck-") && !model.startsWith("war3mapImported\\StageTombWater-") && !model.startsWith("war3mapImported\\StageTombSea-") && !model.startsWith("war3mapImported\\StageGround-")));
-for (const name of [...imports.filter(name => name.startsWith("StageDeck-") || name.startsWith("StageMainDeck-")), ...liquidNames.filter(name => /^Stage(Tomb(Water|Sea)|Ground)-.*\.mdx$/.test(name))]) {
+const deckFacts = Object.fromEntries(Object.entries(MODEL_FACTS).filter(([model]) => !model.startsWith("war3mapImported\\StageDeck-") && !model.startsWith("war3mapImported\\StageMainDeck-") && !model.startsWith("war3mapImported\\StageTombWater-") && !model.startsWith("war3mapImported\\StageTombSea-") && !model.startsWith("war3mapImported\\StageGround-") && !model.startsWith("war3mapImported\\StageCrag")));
+for (const name of [...imports.filter(name => name.startsWith("StageDeck-") || name.startsWith("StageMainDeck-")), ...liquidNames.filter(name => /^Stage(Tomb(Water|Sea)|Ground)-.*\.mdx$/.test(name)), ...cragNames]) {
     deckFacts[`war3mapImported\\${name}`] = roundedFacts(modelFacts(await Bun.file(join(output, name)).bytes()));
 }
 writeModelFacts(deckFacts);
@@ -175,4 +177,4 @@ for (const { stage, theme, lights } of STAGE_POINT_LIGHTS) {
 }
 await Bun.write(infoPath, `${await Bun.file(infoPath).text()}/** Each stage's backdrop omni light models, in the order of its lights in stagePointLights.ts. */\nexport const STAGE_POINT_LIGHT_MODELS: Readonly<Record<number, readonly string[]>> = {\n${pointLights.join("\n")}\n};\n`);
 const skyNames = await packageSkies(output);
-await Bun.write(join(output, "imports.txt"), `${[...new Set([...imports, snowName, ...pointLightNames, ...skyNames, ...liquidNames])].join("\n")}\n`);
+await Bun.write(join(output, "imports.txt"), `${[...new Set([...imports, snowName, ...pointLightNames, ...skyNames, ...liquidNames, ...cragNames])].join("\n")}\n`);

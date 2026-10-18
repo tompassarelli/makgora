@@ -4,9 +4,9 @@ import { STAGE_GROUND_MODEL, STAGE_LAVA_MODEL, STAGE_PLAGUE_MODEL, STAGE_SEA_MOD
 import { hiddenBelow, stageScenery, terrainPieces } from "./stageScenery";
 import { driftPose } from "./driftingScenery";
 import { max, min } from "../core/numbers";
-import { depthProblems, fogProblems, mirrorProblems } from "./stageRules";
+import { depthProblems, fogProblems, mirrorProblems, paletteProblems, skylineProblems } from "./stageRules";
 import { platformParts } from "./stockPlatforms";
-import { PATTERNED_DECKS_STAGE, TOMB_OF_SARGERAS_STAGE, surfaceCount } from "../sim/stage";
+import { PATTERNED_DECKS_STAGE, TOMB_OF_SARGERAS_STAGE, WIND_TEST_STAGE, surfaceCount } from "../sim/stage";
 
 
 
@@ -88,4 +88,14 @@ test("every drifting piece crosses behind the fight from beyond one side of the 
       }
     }
   }
+});
+
+test("mossy rock stands only on the green stages, Nordrassil and Tomb of Sargeras [k2 property]", () => {
+  for (const { id, name } of STAGE_CATALOG) {
+    assertEquals(paletteProblems(name, stageScenery(id).pieces, id === WIND_TEST_STAGE || id === TOMB_OF_SARGERAS_STAGE).join("\n"), "");
+  }
+});
+
+test("no two stages raise their skyline from the same rock [k2 property]", () => {
+  assertEquals(skylineProblems(STAGE_CATALOG.map(({ id, name }) => ({ name, pieces: stageScenery(id).pieces }))).join("\n"), "");
 });

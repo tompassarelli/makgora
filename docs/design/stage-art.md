@@ -319,8 +319,12 @@ from the floor (smashcraft:ts/src/game/presentation/stageScenery.ts).
 18. **Each stage its own skyline.** The rock a stage raises most in its
     backdrop (`y` ≥ 4,000) is its own: no two stages share it, so no stage
     borrows another's skyline.
-    Gryphon Aerie meets neither yet: it keeps the depth pass's red mounds
-    and mossy rock until its own granite lands in round 3.
+    `paletteProblems` and `skylineProblems` in
+    smashcraft:ts/src/game/presentation/stageRules.ts enforce both. Bare
+    grey granite comes from the generated crags
+    (smashcraft:tools/stage/crags.ts): original peak, crag and knoll meshes
+    wrapped in the stock Lordaeron rock-chunk granite, with no particle
+    emitters, tinted grey on Gryphon Aerie.
 
 ### Art targets: the depth pass (18 Oct)
 
@@ -450,17 +454,19 @@ where the change judged better than the depth pass; Frozen Throne,
 Nordrassil, Blackrock and Hellfire keep their depth-pass look. Rules 17 and
 18 hold the result.
 
-- **Gryphon Aerie: Aerie Peak** (round 3; Gryphon keeps its depth-pass look
-  until then). Palette: bare grey granite, green valley
+- **Gryphon Aerie: Aerie Peak** (round 3). Palette: bare grey granite, green valley
   floor, cool blue haze; no red rock and no moss. Skyline: one peak
   under the aviary in the centre, a tall crag at the left edge and a
   shoulder at the right, low knolls between them so the far granite peaks
   and the sky show through. Wildhammer buildings on the knolls: a second
   gryphon roost on the left, the forge on the right. Near and mid: the
-  grey Lordaeron rock chunks, tinted pale; two natural snow arches in the
+  generated granite crags and knolls, dark near and paler mid, the
+  backdrop tinted cool blue; two natural rock arches tinted grey in the
   valley.
 - **Durotar Skies.** Palette: rust and ochre; red rock belongs to Durotar
-  alone. Keeps the depth pass's mound skyline and watchtowers. Valley: an
+  alone. Keeps the depth pass's mound skyline and watchtowers, its heights
+  varied (round 3): taller mounds at the edges, the centre lowered so the
+  sky opens behind the fight and the right watchtower stands clear. Valley: an
   orc village (a barracks, a spirit lodge, a burrow) and a low red rock
   fill the floor under the deck's centre.
 - **Naxxramas.** Palette: ash, bruise-violet rock, plague green; the near
