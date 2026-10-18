@@ -8,7 +8,7 @@ import { ChildProcess } from "effect/process";
 import { INPUTS_STORE, type Manifest, assetsView, readManifest } from "./buildInputs";
 import { ProcessFailure, runProcess } from "../hostProcess";
 import { POST_PROCESSING_FILE } from "../postProcessing";
-import { resolveRenderAsset, type AssetLocation, type AssetLayer, type Graphics, type ResolvedRenderAsset } from "wisp/scripts/wisp/renderAssets";
+import { resolveRenderAsset, type Graphics, type ResolvedRenderAsset } from "wisp/scripts/wisp/renderAssets";
 
 export const key = (path: string) => path.replaceAll("\\", "/").toLowerCase().replace(/\.mdl$/, ".mdx");
 const PRIVATE = join(homedir(), ".local/share/smashcraft-render-assets");
@@ -121,24 +121,6 @@ export function renderAssetStore(options: RenderAssetOptions = {}, mapImports?: 
     return attempt(`read ${absent}`, () => Bun.file(absent).exists()).pipe(Effect.flatMap((known) => known ? Effect.succeed(false) : extract));
   };
 
-  const stockLayer = (normalized: string, layer: AssetLayer) => Effect.gen(function*() {
-    const directory = join(yield* stockCache, layer);
-    const texture = /\.(blp|tga|png|dds|tif)$/.test(normalized);
-    const target = texture ? normalized.replace(/\.[^.]+$/, ".png") : normalized;
-    const cached = yield* read(join(directory, target));
-    if (cached !== undefined) return cached;
-    const extractor = findExtractor(options);
-    if (extractor === null || extractor === undefined) return yield* new RenderAssetFailure({ problem: `stock asset ${normalized} needs CASC_EXTRACTOR (smashcraft-tools extract-animation-assets builds it)` });
-    mkdirSync(dirname(join(directory, target)), { recursive: true });
-    if (!texture) return (yield* succeeds(extractor, [storage, `war3.w3mod:${layer}:${normalized}`, join(directory, target)])) ? yield* read(join(directory, target)) : undefined;
-    const dds = join(directory, normalized.replace(/\.[^.]+$/, ".dds"));
-    if (!(yield* succeeds(extractor, [storage, `war3.w3mod:${layer}:${normalized.replace(/\.[^.]+$/, ".dds")}`, dds]))) {
-      const blp = join(directory, normalized.replace(/\.[^.]+$/, ".blp"));
-      return (yield* succeeds(extractor, [storage, `war3.w3mod:${layer}:${normalized.replace(/\.[^.]+$/, ".blp")}`, blp])) ? yield* read(blp) : undefined;
-    }
-    yield* convertTexture(dds, join(directory, target));
-    return yield* read(join(directory, target));
-  });
   const stockClassic = (path: string) => Effect.gen(function*() {
     const normalized = key(path);
     if (normalized.split("/").some((part) => part === "..") || normalized.startsWith("/")) return yield* new RenderAssetFailure({ problem: `invalid map asset path: ${path}` });
@@ -178,8 +160,8 @@ export function renderAssetStore(options: RenderAssetOptions = {}, mapImports?: 
     yield* convertTexture(dds, png);
     return yield* read(png);
   });
-  const resolveAsset = (path: string, graphics: Graphics = "classic", body?: AssetLocation): Promise<ResolvedRenderAsset> => {
-    const normalized = `${graphics}:${body?.source ?? ""}:${body?.layer ?? ""}:${key(path)}`;
+  const resolveAsset = (path: string, graphics: Graphics = "classic"): Promise<ResolvedRenderAsset> => {
+    const normalized = `${graphics}:${key(path)}`;
     let promise = pending.get(normalized);
     const resolveMap = (entry: string) => Effect.gen(function*() {
       const imported = yield* sources;
@@ -200,9 +182,9 @@ export function renderAssetStore(options: RenderAssetOptions = {}, mapImports?: 
     });
     const readers = {
       map: (entry: string) => Effect.runPromise(resolveMap(entry).pipe(Effect.provide(BunServices.layer))),
-      stock: (entry: string, layer: AssetLayer) => Effect.runPromise((layer === "base" ? stockClassic(entry) : stockLayer(key(entry), layer)).pipe(Effect.provide(BunServices.layer))),
+      stock: (entry: string) => Effect.runPromise(stockClassic(entry).pipe(Effect.provide(BunServices.layer))),
     };
-    if (promise === undefined) pending.set(normalized, promise = Effect.runPromise(resolveRenderAsset(readers, path, graphics, body)).then((result) => {
+    if (promise === undefined) pending.set(normalized, promise = Effect.runPromise(resolveRenderAsset(readers, path, graphics)).then((result) => {
       const { bytes } = result;
       if (bytes !== undefined && manifestPath !== undefined) {
         used.set(normalized, { sha256: createHash("sha256").update(bytes).digest("hex"), bytes: bytes.length });
