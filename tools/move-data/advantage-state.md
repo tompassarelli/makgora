@@ -71,9 +71,9 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Murloc | light | yes | yes | yes | yes | yes | forward throw at 60%: tech in place dash grab, back throw; tech in forward smash; tech away dash grab, back throw; missed tech dash grab, back throw; trap dash grab, back throw covers tech in place, missed tech | up throw at 20% → up air against 4/5 DI |
 | Murloc | medium | yes | yes | yes | yes | yes | back throw at 40%: tech in place dash grab, back throw, dash grab, back throw; tech in forward smash; tech away dash grab, down throw; missed tech dash grab, back throw, dash grab, back throw; trap dash grab, back throw, dash grab, back throw covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Murloc | heavy | yes | yes | yes | yes | yes | back throw at 60%: tech in place dash grab, back throw; tech in short hop +4, down air, short hop, down air, forward smash; tech away dash grab, back throw; missed tech dash grab, back throw; trap dash grab, back throw covers tech in place, tech away, missed tech | up throw at 60% → up air against 5/5 DI |
-| Grom Hellscream | light | yes | yes | yes | yes | yes | back throw at 20%: tech in place dash grab, back throw, dash grab, back throw; tech in short hop, down special; tech away dash grab, up throw, short hop, down special; missed tech dash grab, back throw, dash grab, back throw; trap dash grab, back throw, dash grab, back throw covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Grom Hellscream | medium | yes | yes | yes | yes | yes | back throw at 20%: tech in place dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack; tech in short hop, down special; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack; missed tech dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack; trap dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack covers tech in place, tech in, missed tech | up throw at 40% → up air against 4/5 DI |
-| Grom Hellscream | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place side special; tech in down special; tech away dash grab, up throw, short hop, down special; missed tech side special; trap dash grab, up throw, short hop, down special covers tech in place, tech in, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Grom Hellscream | light | yes | yes | yes | yes | yes | back throw at 20%: tech in place dash grab, back throw, dash grab, back throw; tech in short hop, down special; tech away dash grab, up throw, forward smash; missed tech dash grab, back throw, dash grab, back throw; trap dash grab, back throw, dash grab, back throw covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Grom Hellscream | medium | yes | yes | yes | yes | yes | back throw at 20%: tech in place dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack, dash grab, back throw; tech in short hop, down special; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack, dash grab, back throw; missed tech dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack, dash grab, back throw; trap dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack, dash grab, back throw covers tech in place, tech in, missed tech | up throw at 40% → up air against 4/5 DI |
+| Grom Hellscream | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place side special; tech in forward smash; tech away dash grab, up throw, forward smash; missed tech side special; trap dash grab, up throw, forward smash covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Kobold | light | yes | yes | yes | yes | yes | forward throw at 60%: tech in place dash grab, back throw; tech in forward smash; tech away dash grab, up throw, forward smash; missed tech dash grab, back throw; trap dash grab, back throw covers tech in place, missed tech | up throw at 20% → up air against 4/5 DI |
 | Kobold | medium | yes | yes | yes | yes | yes | back throw at 40%: tech in place dash grab, back throw, dash grab, back throw; tech in forward smash; tech away dash grab, down throw; missed tech dash grab, back throw, dash grab, back throw; trap dash grab, back throw, dash grab, back throw covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Kobold | heavy | yes | yes | yes | yes | yes | back throw at 60%: tech in place dash grab, back throw, dash grab, back throw; tech in full hop, down air, short hop, forward air, side special, up smash, full hop, up special; tech away dash grab, back throw, dash grab, back throw; missed tech dash grab, back throw, dash grab, back throw; trap dash grab, back throw, dash grab, back throw covers tech in place, missed tech | up throw at 20% → up air against 5/5 DI |
@@ -227,11 +227,11 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Rexxar | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Lich King | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Lich King | light | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Lich King | light | up throw | 1/1 | 1/1 KD | 1/0 KD | 1/1 in up tilt, out forward tilt |
+| Lich King | light | up throw | 1/1 | 1/1 KD | 1/0 KD | 1/1 KD in up tilt, out forward tilt |
 | Lich King | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Lich King | medium | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Lich King | medium | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Lich King | medium | up throw | 1/1 in up special, out down tilt | 1/1 KD | 1/1 in up special, out down tilt | 1/1 in up tilt, out forward tilt |
+| Lich King | medium | up throw | 1/1 in up special, out down tilt | 1/1 KD | 1/1 in up special, out down tilt | 1/1 KD in up tilt, out forward tilt |
 | Lich King | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Lich King | heavy | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Lich King | heavy | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
@@ -305,7 +305,7 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Peon | medium | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Peon | medium | up throw | 1/1 in down special, out dash, dash attack | 1/1 in down special, out dash, dash attack | 1/1 in up smash, out short hop, down special | 1/1 in down special, out dash, dash attack |
 | Peon | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Peon | heavy | forward throw | 0/0 | 0/0 | 0/0 | 0/0 |
+| Peon | heavy | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Peon | heavy | back throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Peon | heavy | up throw | 1/1 in down special, out short hop, down special | 1/1 in down special, out short hop, down special | 1/1 in up smash, out short hop, down special | 1/1 in up smash, out short hop, down special |
 | Peon | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
@@ -347,15 +347,15 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Murloc | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Grom Hellscream | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Grom Hellscream | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Grom Hellscream | light | up throw | 1/0 | 1/1 in side special, out down smash | 1/1 in short hop, back air, out down special | 1/1 in side special, out down special |
+| Grom Hellscream | light | up throw | 1/0 | 1/1 in forward tilt, out down smash | 1/1 in short hop, back air, out down special | 1/1 in dash, dash attack, out down special |
 | Grom Hellscream | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Grom Hellscream | medium | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Grom Hellscream | medium | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Grom Hellscream | medium | up throw | 1/1 | 1/1 in side special, out forward smash | 1/1 in short hop, back air, out down special | 1/1 in side special, out down special |
+| Grom Hellscream | medium | up throw | 1/1 | 1/1 in forward tilt, out forward smash | 1/1 in short hop, back air, out down special | 1/1 in dash, dash attack, out down special |
 | Grom Hellscream | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Grom Hellscream | heavy | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Grom Hellscream | heavy | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Grom Hellscream | heavy | up throw | 1/0 | 1/1 in side special, out down smash | 1/1 KD in short hop, back air, out down special | 1/1 in short hop, back air, out down special |
+| Grom Hellscream | heavy | up throw | 1/0 | 1/1 in forward tilt, out down smash | 1/1 in short hop, back air, out forward smash | 1/1 in short hop, back air, out down special |
 | Grom Hellscream | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Kobold | light | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Kobold | light | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |

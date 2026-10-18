@@ -451,6 +451,23 @@ base 24 to 12% with growth 75 and base 24; up smash's growth from 100 to
 94, Azzinoth's glaives from 14% to 13% and forward tilt from 9% to 8%, each
 kill percent within 15%. His 25 pairs at 200 a pair measured 62%.
 
+18 Oct 2026 (#45, 35–65% playtester band). The nightly playtest on
+893751939b (run 39015787000, 77 decisive matches a fighter) put Peon at 29%,
+Beastmaster 32%, Grom 34%, Lich King 69% and Blademaster 73%, with
+Blademaster's forward smash taking 62% of his KOs and Lich King's 56%.
+Blademaster keeps his forward smash kill power (Tom, 17 Oct) but it, his
+down tilt and his dash attack recover 2-3 frames later, and his forward
+tilt and dash attack tips drop 10%. Lich King's forward smash drops from
+25.5/21 to 23.5/19.5 and Frostmourne Sweep from 15 to 14. Beastmaster's and
+Grom's forward tilts, dash attacks and forward smashes and Beastmaster's
+back air deal 10% more. Peon's forward tilts and dash attack deal 10% more
+and his forward smash 5%; his dash attack and forward smash recover 3 frames
+sooner, and his down tilt, up smash and forward and back throws gain about
+1%. Malfurion, at 66-70% in the lane runs, drops forward smash from 17 to
+16, recovers 3 frames later from it, and his dash check drops from 10 to
+9.25. Every changed kill percent stays within 15% of the fixed baseline and
+every change inside its ±25% and ±3-frame bounds.
+
 ## Player panel and equal skill ceilings (#358)
 
 Every fighter targets a 45–55% mean over all six Expert personalities, with

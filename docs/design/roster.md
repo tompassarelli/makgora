@@ -20,7 +20,7 @@ art provide his Classic and Definitive presentation.
 
 **Normals:** two dismissive staff jabs (5-frame startup, 3/4 damage), angled
 staff pokes (9, 8), upward branch lift (8, 7), low root sweep (7, 6), shoulder-led
-dash check (11, 10). Forward smash plants a long branch (19, 17), up smash
+dash check (11, 9.25). Forward smash plants a long branch (19, 16, recovering 37 frames), up smash
 raises the canopy (18, 16), down smash sweeps roots front then back (17, 13).
 Neutral air circles the staff (8, 8); forward/back air push it away (12/9,
 12/11); up air lifts it (10, 11); down air plants its tip below him (16, 12).
@@ -82,7 +82,7 @@ All move designs and numbers below are proposals, not existing implementation fa
 
 ### Signature strong/weak move (#389)
 
-Forward smash, split by position: strong hit sweetspot, frames 19-21, 17%; weak hit sourspot, frames 19-21, 11.9%. Wrath bursts at the staff's tip, so the druid kills at range.
+Forward smash, split by position: strong hit sweetspot, frames 19-21, 16%; weak hit sourspot, frames 19-21, 11.2%. Wrath bursts at the staff's tip, so the druid kills at range.
 The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-weak-hits-389) and every split in the [move list](../move-list.md).
 
 ## Scope and priorities
@@ -459,11 +459,11 @@ The individual hero sections below specify all attacks. Their counterplay descri
 | Input and move | F/A/R and landing | Damage | Reach and launch | Behavior |
 | --- | --- | --- | --- | --- |
 | Jab — Hilt Check | 4/2/13 | 3 | S, 35, POKE | Quick pommel strike; no sword-length disjoint |
-| Forward tilt — Measuring Cut | 8/3/19 | 8 inner, 10 outer | L, 35, POKE | Outer final 0.20H of blade rewards spacing |
+| Forward tilt — Measuring Cut | 8/3/19 | 8 inner, 9 outer | L, 35, POKE | Outer final 0.20H of blade rewards spacing |
 | Up tilt — Rising Crescent | 7/5/20 | 8 | M, 90, LAUNCH | Arc above and slightly behind; weak directly low in front |
-| Down tilt — Ankle Cut | 7/3/17 | 6 | L, 75, LINK | Low thin sweep; a starter rather than a kill move |
-| Dash attack — Advancing Slash | 10/4/26 | 10 | L, 45, LAUNCH | Moves 0.55H forward during startup; cannot pass through shield |
-| Forward smash — Execution Cut | 17/3/32 | 13 inner, 17 outer | XL, 40, KILL growth, base 30 | Large horizontal cut; outer 0.20H is sweetspot |
+| Down tilt — Ankle Cut | 7/3/20 | 6 | L, 75, LINK | Low thin sweep; a starter rather than a kill move |
+| Dash attack — Advancing Slash | 10/4/28 | 9 | L, 45, LAUNCH | Moves 0.55H forward during startup; cannot pass through shield |
+| Forward smash — Execution Cut | 17/3/35 | 13 inner, 17 outer | XL, 40, KILL growth, base 30 | Large horizontal cut; outer 0.20H is sweetspot |
 | Up smash — Sky Splitter | 15/4/30 | 16 | L, 90, KILL | Narrow vertical blade with no broad ground scoop |
 | Down smash — Low Circle | 14/6/31 | 14 | L, 25, EDGE | Low sword sweep in front on frames 14–16, then behind on 17–19; one hit total per target |
 | Neutral air — Blade Wheel | 7/9/17; L12 | 3 + 6 | M, 50, POKE | Two quick arcing cuts ([multi-hit](aerials.md)): a wide pull-in link, then a tighter launcher |
@@ -1329,16 +1329,16 @@ Standing grab 9/2/27, reach 0.65H, short tail coil. No dragging or moving hold. 
 | Input and move | F/A/R and landing | Damage | Reach and launch | Behavior |
 | --- | --- | --- | --- | --- |
 | Jab — Axe Hilt | 5/2/15 | 4 | S, 35, POKE | Short hit |
-| Forward tilt — Broad Axe | 10/3/23 | 11 | L, 35, EDGE | Weapon head disjoint |
+| Forward tilt — Broad Axe | 10/3/23 | 12 | L, 35, EDGE | Weapon head disjoint |
 | Up tilt — Antler Lift | 9/4/23 | 9 | M, 85, LAUNCH | Axe rises above shoulder |
 | Down tilt — Low Chop | 8/3/20 | 7 | M, 65, LINK | Short axe sweep |
-| Dash attack — Hunter’s Shoulder | 11/5/28 | 12 | M, 45, LAUNCH | Body advance 0.5H |
-| Forward smash — Twin Axe Hew | 21/4/36 | 20 | L, 40, KILL | Both axes strike as one action |
+| Dash attack — Hunter’s Shoulder | 11/5/28 | 13 | M, 45, LAUNCH | Body advance 0.5H |
+| Forward smash — Twin Axe Hew | 21/4/36 | 22 | L, 40, KILL | Both axes strike as one action |
 | Up smash — Hunting Horns | 18/5/33 | 17 | L, 85, KILL | Twin upward arcs |
 | Down smash — Clearing Sweep | 17/6/34 | 15 | L, 25, EDGE | Front then back |
 | Neutral air — Axe Circle | 8/6/23; L15 | 10 | M, 50, POKE | One hit around torso |
 | Forward air — Overhand Chop | 13/4/28; L18 | 14 | L, 40, KILL | Slow weapon arc |
-| Back air — Hunter’s Boot | 9/3/24; L14 | 11 | M, 35, EDGE | Exposed leg |
+| Back air — Hunter’s Boot | 9/3/24; L14 | 12 | M, 35, EDGE | Exposed leg |
 | Up air — Axe Lift | 8/4/23; L14 | 9 | M, 85, LAUNCH | Narrow above |
 | Down air — Downward Hew | 16/4/32; L22 | 13 | M, 270, SPIKE | No forced descent |
 
@@ -1486,11 +1486,11 @@ above; damage and launch classes are provisional. The move list
 | Move | F/A/R | Damage | Reach | Notes |
 | --- | --- | --- | --- | --- |
 | Jab, Pommel and Rake | 6/3/13, 7/3/16, 9/3/23 | 3, 3, 5 | 0.6H, 0.8H, 1.1H | A three-step chain (#163) ending in a Frostmourne thrust |
-| Forward tilt, Frostmourne Sweep | 11/4/24 | 12 | 1.35H | From his shoulder to the floor: not angled |
+| Forward tilt, Frostmourne Sweep | 11/4/24 | 14 | 1.35H | From his shoulder to the floor: not angled |
 | Up tilt, Overhead Reap | 10/5/23 | 11 | arc to 1.45H | Covers behind him |
 | Down tilt, Frozen Ground | 9/4/22 | 6 + 6 | 1.1H front, 0.9H back | Front, then behind: the two-sided sweep |
 | Dash attack | 12/4/30 | 11 | 1.1H | Travels 40 in startup, stops at a body |
-| Forward smash, Frostmourne Cleave | 22/4/38 | 21 tip, 17 inner | 1.35H | The tip sweetspot |
+| Forward smash, Frostmourne Cleave | 22/4/38 | 23.5 tip, 19.5 inner | 1.35H | The tip sweetspot |
 | Up smash, Remorseless Winter | 18/8/38 | 15, then 10 | 0.72H all round | A burst around him, then a weaker gust |
 | Down smash, Quake | 17/6/40 | 14 + 14 | 1.1H each side | Front f17-19, back f20-22 |
 | Neutral air | 10/8/24, land 16 | 11 + 11 | 1.1H | Front then back |
@@ -1572,7 +1572,7 @@ Expert gameplan: Combine ground control, grabs and sword confirms into planned f
 
 ### Signature strong/weak move (#389)
 
-Forward smash, split by position: strong hit sweetspot, frames 22-25, 21%; weak hit sourspot, frames 22-25, 17%. Frostmourne's point: the king kills at the end of the blade.
+Forward smash, split by position: strong hit sweetspot, frames 22-25, 23.5%; weak hit sourspot, frames 22-25, 19.5%. Frostmourne's point: the king kills at the end of the blade.
 The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-weak-hits-389) and every split in the [move list](../move-list.md).
 
 
@@ -1931,11 +1931,11 @@ his edge-guard weakness.
 | Input | Action and decision | Startup / active / total | Damage |
 |---|---|---|---|
 | Jab, jab 2 | Hilt check, then a short axe chop; keep a close foe honest | 4/2/14; 6/2/20 | 3; 6 |
-| Forward tilt, angled | Gorehowl chop, with the chosen high or low contact | 9/3/28 | 11 |
+| Forward tilt, angled | Gorehowl chop, with the chosen high or low contact | 9/3/28 | 12 |
 | Up tilt | Haul the axe overhead to start a juggle | 8/4/26 | 9 |
 | Down tilt | Low haft sweep; a launcher into a chase | 7/3/24 | 8 |
-| Dash attack | Shoulder-first entry; shield stops its reward | 9/5/32 | 11 |
-| Forward smash | Planted execution chop; punish the long miss | 18/4/46 | 20 |
+| Dash attack | Shoulder-first entry; shield stops its reward | 9/5/32 | 12 |
+| Forward smash | Planted execution chop; punish the long miss | 18/4/46 | 22 |
 | Up smash | Two-handed rising axe swing | 14/4/42 | 17 |
 | Down smash | Low front-and-back sweep | 15/6/44 | 16 |
 | Neutral air | Broad turning axe cut | 8/6/28, landing 16 | 10 |
