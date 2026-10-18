@@ -403,14 +403,14 @@ Each now has one role:
 | Fighter | Role | F/A/R | Slide | Damage | Launch | Inspired by |
 | --- | --- | --- | --- | --- | --- | --- |
 | Warden | Fast, low commitment | 5/3/18 | 0.40H | 7 | 50, 70/24 | Sheik and Fox dash attacks (frames 4–6) |
-| Blademaster | Sliding long poke | 9/4/22 | 0.70H | 8 inner, 10 tip | 30, 100/24 | Marth dash attack |
-| Mountain King | Launcher, body only | 11/5/26 | 0.60H | 12 | 75, 95/30 | Donkey Kong dash attack |
+| Blademaster | Sliding long poke | 9/4/22 | 0.70H | 8.5 strong, 7 tip | 30, 100/24 | Marth dash attack |
+| Mountain King | Launcher, body only | 11/5/26 | 0.60H | 13.75 | 75, 95/30 | Donkey Kong dash attack |
 | Dreadlord | Cross-up | 7/4/24 | 1.00H, passes through | 9 | 60, 90/22, front then back | Ultimate's pass-through dash attacks |
 | Shadow Hunter | Multi-hit | 8/9/20 | 0.50H | 3 + 3 + 5 | last hit 45, 100/22 | Kirby's and Luigi's multi-hit dash attacks |
-| Forsaken Paladin | Heavy, pushes off shield | 12/3/20 | 0.35H | 12 | 30, 100/26 | Ganondorf dash attack |
+| Forsaken Paladin | Heavy, pushes off shield | 12/3/20 | 0.35H | 14.75 | 30, 100/26 | Ganondorf dash attack |
 | Lich | Hovering low glide | 10/6/22 | 0.80H | 8 | 25, 90/30 | Mewtwo dash attack (slow, lingering) |
-| Rifleman | Rifle lunge | 9/3/25 | 0.50H | 11 | 40, 114/22 | Falco dash attack |
-| Pit Lord | Kill charge, no armor | 15/6/34 | 0.30H | 16 | 40, 110/26 | Ganondorf and Bowser dash attacks |
+| Rifleman | Rifle lunge | 11/3/26 | 0.50H | 8.25 | 40, 114/22 | Falco dash attack |
+| Pit Lord | Kill charge, no armor | 15/6/32 | 0.30H | 16 | 40, 110/26 | Ganondorf and Bowser dash attacks |
 | Beastmaster | Heaves the victim behind him | 11/5/28 | 0.50H | 12 | 135, 95/20 | Ultimate's reverse-launch dash attacks |
 
 A dash attack is A with the stick back at neutral during a dash; A with the

@@ -44,9 +44,9 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Lich King | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in up smash; tech away dash grab, back throw; missed tech down smash; trap down smash covers tech in place, missed tech | up throw at 0% → up tilt against 5/5 DI |
 | Lich King | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, forward air; tech in forward smash; tech away dash grab, back throw; missed tech short hop, forward air; trap short hop, forward air covers tech in place, missed tech | up throw at 60% → up tilt against 4/5 DI |
 | Lich King | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away full hop, forward air; missed tech down smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 20% → up tilt against 5/5 DI |
-| Thrall | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down air; tech in forward smash; tech away dash grab, back throw; missed tech short hop, down air; trap short hop, down air covers tech in place, missed tech | up throw at 40% → up air against 4/5 DI |
-| Thrall | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down air; tech in down smash; tech away dash grab, back throw; missed tech short hop, down air; trap short hop, down air covers tech in place, missed tech | up throw at 60% → up air against 4/5 DI |
-| Thrall | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away full hop, down air; missed tech down smash; trap full hop, down air covers tech in place, tech away, missed tech | up throw at 20% → up tilt against 4/5 DI |
+| Thrall | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place dash, dash attack; tech in forward smash; tech away dash grab, back throw; missed tech dash, dash attack; trap dash, dash attack covers tech in place, missed tech | up throw at 40% → up air against 4/5 DI |
+| Thrall | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place dash, dash attack; tech in down smash; tech away dash grab, back throw; missed tech dash, dash attack; trap dash, dash attack covers tech in place, missed tech | up throw at 60% → up air against 4/5 DI |
+| Thrall | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away dash, dash attack; missed tech down smash; trap dash, dash attack covers tech in place, tech away, missed tech | up throw at 20% → up tilt against 4/5 DI |
 | Jaina Proudmoore | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away neutral special; missed tech forward smash; trap neutral special covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Jaina Proudmoore | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away neutral special; missed tech forward smash; trap neutral special covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Jaina Proudmoore | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away full hop, forward air; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 40% → up air against 5/5 DI |
@@ -67,7 +67,7 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Goblin Tinker | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away dash, dash attack; missed tech down smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 40% → up air against 5/5 DI |
 | Kael'thas Sunstrider | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in down smash; tech away full hop, forward air; missed tech forward smash; trap down smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Kael'thas Sunstrider | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Kael'thas Sunstrider | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away short hop, neutral special, jab; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Kael'thas Sunstrider | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in up smash; tech away short hop, neutral special, jab; missed tech forward smash; trap short hop, neutral special, jab covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Murloc | light | yes | yes | yes | yes | yes | forward throw at 60%: tech in place dash grab, back throw; tech in forward smash; tech away dash grab, back throw; missed tech dash grab, back throw; trap dash grab, back throw covers tech in place, missed tech | up throw at 20% → up air against 4/5 DI |
 | Murloc | medium | yes | yes | yes | yes | yes | back throw at 40%: tech in place dash grab, back throw, dash grab, back throw; tech in forward smash; tech away dash grab, down throw; missed tech dash grab, back throw, dash grab, back throw; trap dash grab, back throw, dash grab, back throw covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Murloc | heavy | yes | yes | yes | yes | yes | back throw at 60%: tech in place dash grab, back throw; tech in short hop +4, down air, short hop, down air, forward smash; tech away dash grab, back throw; missed tech dash grab, back throw; trap dash grab, back throw covers tech in place, tech away, missed tech | up throw at 60% → up air against 5/5 DI |
@@ -101,8 +101,8 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Rifleman | medium | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Rifleman | medium | up throw | 1/1 | 1/1 KD | 1/1 | 1/1 in forward smash, out up smash |
 | Rifleman | medium | down throw | 0/0 KD | 0/0 KD | 0/0 | 0/0 |
-| Rifleman | heavy | forward throw | 1/1 | 1/1 | 1/1 KD in forward smash, out dash, dash attack | 0/0 KD |
-| Rifleman | heavy | back throw | 0/0 | 1/1 | 1/1 | 0/0 KD |
+| Rifleman | heavy | forward throw | 1/1 | 1/1 | 1/1 in forward smash, out forward tilt | 0/0 KD |
+| Rifleman | heavy | back throw | 0/0 | 1/1 | 0/0 | 0/0 KD |
 | Rifleman | heavy | up throw | 1/1 | 1/1 KD | 1/1 KD | 1/1 KD |
 | Rifleman | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Illidan | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
@@ -227,11 +227,11 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Rexxar | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Lich King | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Lich King | light | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Lich King | light | up throw | 1/1 | 1/1 KD | 1/0 KD | 1/1 KD in up tilt, out forward tilt |
+| Lich King | light | up throw | 1/1 | 1/1 KD | 1/0 KD | 1/1 in up tilt, out forward tilt |
 | Lich King | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Lich King | medium | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Lich King | medium | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Lich King | medium | up throw | 1/1 in up special, out down tilt | 1/1 KD | 1/1 in up special, out down tilt | 1/1 KD in up tilt, out forward tilt |
+| Lich King | medium | up throw | 1/1 in up special, out down tilt | 1/1 KD | 1/1 in up special, out down tilt | 1/1 in up tilt, out forward tilt |
 | Lich King | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Lich King | heavy | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Lich King | heavy | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
@@ -239,15 +239,15 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Lich King | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Thrall | light | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Thrall | light | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Thrall | light | up throw | 1/1 | 1/1 KD in forward tilt, out down smash | 1/1 in forward tilt, out forward smash | 1/1 in dash, dash attack, out forward smash |
+| Thrall | light | up throw | 1/1 | 1/1 KD in forward tilt, out down smash | 1/1 in dash, dash attack, out forward smash | 1/1 in dash, dash attack, out forward smash |
 | Thrall | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Thrall | medium | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Thrall | medium | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Thrall | medium | up throw | 1/1 | 1/1 KD in forward tilt, out down smash | 1/1 in forward tilt, out forward smash | 1/1 in dash, dash attack, out forward smash |
+| Thrall | medium | up throw | 1/1 | 1/1 KD in dash, dash attack, out down smash | 1/1 in dash, dash attack, out forward smash | 1/1 in dash, dash attack, out forward smash |
 | Thrall | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 |
 | Thrall | heavy | forward throw | 0/0 | 0/0 | 0/0 | 0/0 |
 | Thrall | heavy | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Thrall | heavy | up throw | 1/1 | 1/1 in forward tilt, out down smash | 1/1 KD in forward tilt, out down smash | 1/1 in forward tilt, out forward smash |
+| Thrall | heavy | up throw | 1/1 | 1/1 in forward tilt, out down smash | 1/1 KD in dash, dash attack, out down smash | 1/1 in dash, dash attack, out forward smash |
 | Thrall | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Jaina Proudmoore | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Jaina Proudmoore | light | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
@@ -279,7 +279,7 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Cairne Bloodhoof | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | medium | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | medium | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Cairne Bloodhoof | medium | up throw | 1/1 in forward tilt, out down tilt | 1/1 KD in down tilt, out dash, dash attack | 1/1 KD in up special, out down tilt | 1/1 in down special, out dash, dash attack |
+| Cairne Bloodhoof | medium | up throw | 1/1 in forward tilt, out down tilt | 1/1 KD in down tilt, out dash, dash attack | 1/1 KD in up special, out down tilt | 1/1 in forward tilt, out dash, dash attack |
 | Cairne Bloodhoof | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | heavy | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Cairne Bloodhoof | heavy | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
