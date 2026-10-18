@@ -42,6 +42,7 @@
     "codegen/**/*.ts",
     "plugins/**/*.ts",
     "test/menu-journey.test.ts",
+    "test/anim-judge-identity.test.ts",
     "test/release-tree.test.ts",
     "test/advantage-state.test.ts",
     "test/voice-trace.test.ts",

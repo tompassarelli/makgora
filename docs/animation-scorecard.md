@@ -97,7 +97,7 @@ instead holds the camera on the drawn floor and grows upward so a jump shows
 its real height above it. Read `docs/animation-judge-brief.md` in a fresh judge
 context and write its requested JSONL. `bun wisp anim judge record
 PRIVATE_DIR/scores-*.jsonl` validates and stores numerical judgements in
-`tools/move-data/anim-score/judge.jsonl`. Reference pixels stay outside Git.
+`tools/move-data/anim-score/judge.jsonl`, each tagged with the identity of the clip it judged: a digest of the key-frame poses `prepare` rendered, written to PRIVATE_DIR/clips.json and attached by `record`. Line 5 averages only the judgements whose identity matches the clip the scorecard samples now, so a re-authored move drops its old clip's scores; judgements recorded before identities existed count only while no judgement of that move names a clip (#95). Reference pixels stay outside Git.
 
 ## Thresholds
 

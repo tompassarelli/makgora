@@ -22,6 +22,7 @@ import { runProcess } from "../../hostProcess";
 import { CROUCH_THRESHOLDS, DOUBLE_JUMP_THRESHOLDS, LEDGE_THRESHOLDS, type MoveScore, THRESHOLDS, scoreCrouch, scoreDoubleJump, scoreLedgeHang, scoreMove } from "../animScore";
 import { type CrouchClipKind, type Look, type SampledMove, gameplayPixelsPerUnit, loadBody, sampleCrouch, sampleFighter, sampleJumps, sampleLedgeHang } from "../animScoreSample";
 import { answerKey, type ColdStrip, coldReadBatch, coldReadBatches, isMovementMove, ledgeCorner, type MovementMove, movementCrop, movementFrames, stageDrawArgs, stageShape, stripId } from "../animMovementRows";
+import { clipIdentity, currentJudgements, judgementKey, withPreparedClips, writePreparedClips } from "../animJudgeIdentity";
 import { assetsView, readManifest } from "../buildInputs";
 import { headlessRender } from "../headlessRender";
 import { projectRoot } from "../project";
@@ -69,6 +70,7 @@ const JudgeLine = Schema.Int.check(Schema.isBetween({ minimum: 1, maximum: 5 }))
 export const JudgeScore = Schema.Struct({
   look: Schema.Literals(["classic", "definitive"]), fighter: Schema.NonEmptyString, move: Schema.NonEmptyString, judge: Schema.NonEmptyString,
   readability: JudgeLine, weight: JudgeLine, anticipation: JudgeLine, followThrough: JudgeLine, character: JudgeLine, note: Schema.String,
+  clip: Schema.optional(Schema.String),
 });
 export type JudgeScore = typeof JudgeScore.Type;
 const JUDGE_LINES = ["readability", "weight", "anticipation", "followThrough", "character"] as const;
@@ -93,6 +95,7 @@ interface Row {
   readonly moveClass: string;
   readonly score: MoveScore;
   readonly frames: { readonly firstActive: number; readonly lastActive: number; readonly end: number };
+  readonly clip: string;
   readonly judged: { readonly count: number; readonly lowest: number; readonly means: readonly number[] } | undefined;
   readonly reference: ReturnType<typeof meleeTiming>;
 }
@@ -149,11 +152,13 @@ const measure = (fighters: readonly Character[], look: Look, assets: string) => 
     for (const sampled of moves) {
       const { sample } = sampled;
       const score = yield* Effect.try({ try: () => scoreMove(sample, THRESHOLDS[sample.moveClass]), catch: (cause) => new AnimFailure({ problem: `${fighter} ${sampled.move}: ${String(cause)}` }) });
-      const own = judged.filter((entry) => entry.look === look && entry.fighter === fighter && entry.move === sampled.move);
+      const frames = { firstActive: sample.firstActive, lastActive: sample.lastActive, end: sampled.endFrame };
+      const clip = clipIdentity(keyFrames({ score, frames }).map((index) => sample.frames[index]));
+      const own = currentJudgements(judged.filter((entry) => entry.look === look && entry.fighter === fighter && entry.move === sampled.move), clip);
       const means = JUDGE_LINES.map((line) => own.reduce((sum, entry) => sum + entry[line], 0) / Math.max(1, own.length));
       rows.push({
         fighter, move: sampled.move, moveClass: sample.moveClass, score,
-        frames: { firstActive: sample.firstActive, lastActive: sample.lastActive, end: sampled.endFrame },
+        frames, clip,
         judged: own.length === 0 ? undefined : { count: own.length, lowest: Math.min(...means), means },
         reference: meleeTiming(records, fighter, sampled.move),
       });
@@ -242,7 +247,7 @@ const JUDGE_BATCH = 6;
 interface Strip { readonly fighter: string; readonly move: string; readonly seconds: readonly number[]; readonly heights: readonly number[]; readonly caption: string; readonly movement: boolean }
 
 
-const keyFrames = (row: Row) => [...new Set([0, row.score.keys.windup, row.score.keys.contact, row.frames.lastActive, row.score.keys.recovery, row.frames.end])].sort((a, b) => a - b);
+const keyFrames = (row: Pick<Row, "score" | "frames">) => [...new Set([0, row.score.keys.windup, row.score.keys.contact, row.frames.lastActive, row.score.keys.recovery, row.frames.end])].sort((a, b) => a - b);
 
 const ReferenceEntry = Schema.Struct({ file: Schema.String, source: Schema.String, character: Schema.String, move: Schema.String });
 const ReferenceManifest = Schema.fromJsonString(Schema.Record(Schema.String, ReferenceEntry));
@@ -316,6 +321,7 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
   const attackWanted = wanted?.filter((move) => !isMovementMove(move.split(":")[1] ?? ""));
   const { rows, samples } = attackWanted !== undefined && attackWanted.length === 0 ? { rows: [], samples: new Map<string, SampledMove>() } : yield* measure(fighters, look, assets);
   const chosen = rows.filter((row) => wanted === undefined || wanted.includes(`${row.fighter}:${row.move}`));
+  yield* attempt(`write the clip identities in ${output}`, () => writePreparedClips(output, look, Object.fromEntries(chosen.map((row) => [`${row.fighter}/${row.move}`, row.clip]))));
   const references = yield* readReferences;
   const strips: Strip[] = [];
   for (const row of chosen) {
@@ -420,13 +426,16 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
 const record = (files: readonly string[]) => Effect.gen(function*() {
   if (files.length === 0) return yield* new UsageFailure({ problem: "anim judge record SCORES.jsonl..." });
   const entries: JudgeScore[] = [];
-  for (const file of files) entries.push(...(yield* decodeLines(JudgeScore, file)));
+  for (const file of files) {
+    const judged = yield* decodeLines(JudgeScore, file);
+    entries.push(...(yield* attempt(`read the clip identities beside ${file}`, () => withPreparedClips(judged, file))));
+  }
   const known = new Set(SELECTABLE_CHARACTERS.map(fighterSlug));
   const unknown = entries.filter((entry) => !known.has(entry.fighter) || REFERENCE_ACTIONS[entry.move] === undefined);
   if (unknown.length > 0) return yield* new AnimFailure({ problem: `unknown fighter or move: ${unknown.map((entry) => `${entry.fighter}/${entry.move}`).join(", ")}` });
   const old = yield* decodeLines(JudgeScore, JUDGE_FILE);
-  const seen = new Set(old.map((entry) => `${entry.look}/${entry.fighter}/${entry.move}/${entry.judge}`));
-  const added = entries.filter((entry) => !seen.has(`${entry.look}/${entry.fighter}/${entry.move}/${entry.judge}`));
+  const seen = new Set(old.map(judgementKey));
+  const added = entries.filter((entry) => !seen.has(judgementKey(entry)));
   yield* attempt(`write ${JUDGE_FILE}`, async () => {
     mkdirSync(SCORE_DIRECTORY, { recursive: true });
     const text = (await Bun.file(JUDGE_FILE).exists()) ? await Bun.file(JUDGE_FILE).text() : "";
