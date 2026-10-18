@@ -4,7 +4,7 @@ Every move and every Tom-facing build meets this bar whether or not its issue sa
 
 | # | Every move | How the gate checks it |
 | --- | --- | --- |
-| 1 | Every special shows a visible effect at game zoom, in both looks, unless it declares a body-only exemption. Its model path resolves (stock in the game data, or imported into the map), and a particle effect advances in time. | Headless property A5; native contact sheet E |
+| 1 | Every special shows a visible effect at game zoom, unless it declares a body-only exemption. Its model path resolves (stock in the game data, or imported into the map), and a particle effect advances in time. | Headless property A5; native contact sheet E |
 | 2 | The body drives the motion: a special plays a body animation or pose change, not effects alone. | Headless property A3; contact sheet E |
 | 3 | Mirror symmetry: facing left and facing right give the same hitboxes, active frames and effects, mirrored. | Headless property A1; left and right contact sheets E |
 | 4 | Effects despawn within their declared lifetime; nothing lingers after the move ends. | Headless property A2; native C4; native gate-specials-spot (dev#467) |

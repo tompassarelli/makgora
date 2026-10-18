@@ -123,8 +123,8 @@ burst and is removed; the bolt is a small travelling missile that is gone
 when it bursts or after 34 frames. Nothing sits on the stage after the hit.
 This replaces his old travelling ground flame.
 
-**Banish.** WC3's ethereal state is shown as the green, translucent body in
-both looks and the slow; its cost is the loss of normals and the
+**Banish.** WC3's ethereal state is shown as the green, translucent body and
+the slow; its cost is the loss of normals and the
 extra damage from Kael's specials. It shares the silence immunity group, so
 Shadow Hunter's Hex or Sylvanas's Silence cannot chain into it.
 

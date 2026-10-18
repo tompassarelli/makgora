@@ -10,8 +10,8 @@ indexed in [Warcraft features since Reforged](warcraft-features.md).
 ## Filled match frames (#360)
 
 At most 10% of the pixels below the stage's horizon may show only the sky or
-backdrop in each near and far match view, at 16:9 and 64:27, in Classic and
-Definitive. Scenery, the deck's body and water count as scene coverage.
+backdrop in each near and far match view, at 16:9 and 64:27, in Classic.
+Scenery, the deck's body and water count as scene coverage.
 Measure with `bun tools/stage/layout.ts --empty SKY.png FRAME.png HORIZON_ROW_FRACTION`;
 `EMPTY_BACKDROP_LIMIT` is 10. The matched sky-only image keeps the same camera,
 sky, lighting and fog, with scene objects and UI removed. The measurement ends
@@ -62,20 +62,15 @@ Smashcraft capture has shown yet; *(guess)* marks an inference.
 ## The renderer is fixed
 
 A map ships data and a Lua script; it can't ship shaders or change the
-pipeline. 3.0 has three graphics modes, picked by the player (War3Preferences
-`[Misc] hd`, 0 Classic, 1 Reforged, 2 Definitive Edition; Definitive replaced
-2.0's Classic HD): Classic draws the root asset set with fixed-function
-lighting, Reforged and Definitive draw `_hd.w3mod` and `_de.w3mod` assets with
-physically based materials (diffuse, normal, ORM, emissive, team colour,
-environment map), image-based lighting, shadow maps and point lights
-([Blizzard's 3.0.0.24268 patch notes](https://us.forums.blizzard.com/en/warcraft3/t/warcraft-iii-reforged-forsaken-kingdom-patch-notes/38400),
-[Hive 3.0 thread](https://www.hiveworkshop.com/threads/warcraft-3-reforged-forsaken-kingdom-expansion-and-major-updates.374111/)).
+pipeline. Smashcraft targets Classic, the graphics mode the player picks with
+War3Preferences `[Misc] hd` = 0: it draws the root asset set with
+fixed-function lighting
+([Blizzard's 3.0.0.24268 patch notes](https://us.forums.blizzard.com/en/warcraft3/t/warcraft-iii-reforged-forsaken-kingdom-patch-notes/38400)).
 The map can't read or choose the mode. Everything below is the set of inputs
-those fixed pipelines take. The pool clients run 3.0.1.24342 as of 8 Oct
+that fixed pipeline takes. The pool clients run 3.0.1.24342 as of 8 Oct
 (their `.build.info`); the native names below are unchanged from 3.0.0.
 
-Record the graphics mode in each capture. A client preference is evidence of
-the selected mode, not evidence that an individual imported model uses PBR.
+Record the graphics mode in each capture.
 
 ## The levers
 
@@ -83,32 +78,28 @@ Native names are from 3.0.0.24268's common.j (wisp:src/natives/warcraft.d.ts).
 "On 3.0" says what a Smashcraft native capture or file read has shown; the
 measurements are in [Measured on 3.0](#measured-on-30-under-wine).
 
-| Lever | Natives | What it changes | Modes | On 3.0 under Wine |
-| --- | --- | --- | --- | --- |
-| Lighting model | `SetDayNightModels(terrain, unit)` | The directional key light, its colour and the ambient fill for terrain and for every unit and effect, sampled at the time of day | all; each mode loads its own stock model, an imported one is the same file in every mode | **Measured**: an authored stage light lifts fighter L\* by 8–13 against stock on four stages; the decks and sky barely move |
-| Shadow strength | none | No field for it in the MDX 800 light record (smashcraft:ts/scripts/stageLight.ts writes all of them) | — | Version-1800 light records carry 24 bytes the decoder doesn't read; whether they hold shadow settings is unknown *(guess: they might)* |
-| Time of day | `SetTimeOfDay`, `SetTimeOfDayScale(0)` | Where the lighting model is sampled; the shell freezes noon (smashcraft:ts/src/host/loop/shell.ts) | all | Source only; the authored lights are constant over the day, so the frozen hour can't move them |
-| Distance fog | `SetTerrainFogEx(style, start, end, density, r, g, b)` | Linear (0), exponential (1) or exponential-squared (2) fog over terrain, units and effects | all | In use (linear, density 0) on every stage; no separate fog measurement |
-| 3.0 fog | `SetTerrainFogExV`, `BlzSetTerrainFog{Style,ZStart,ZEnd,Density,HeightStart,HeightEnd,LinearStart,LinearEnd,MaxLinearDensity,DrawOverSky,Color}`, styles 3–5 | Height fog, a density cap and fog drawn over the sky | per PN3 all, with HD fog | **Unmeasured**; `-dev fogv` and the `192-*-linear\|height` checks exist, no run yet |
-| Sky | `SetSkyModel`, `BlzShowSkyBox` | The sky dome model; hiding it leaves the clear colour | all; HD-only stock skies are blank in Classic | **Measured**: authored skies fill 76–96% of the top band on all nine #178 stages; hidden, the empty screen reads rgb(4,4,4) |
-| Terrain | `BlzShowTerrain` | Hides all terrain | all | Called on every stage draw since #191; no native capture of it yet |
-| Weather | `AddWeatherEffect(rect, id)` | Particle weather emitted 768 above the terrain | all; Snowflakes is HD-only | Source only: it falls below the arena, which stands 1,800 above the ground ([stages](stages.md#what-the-clients-can-show)); Frozen Throne's snow is an authored model instead |
-| Ubersplats | `CreateUbersplat` | Terrain decals | all | Source only: terrain-only, and the terrain is hidden, so unusable |
-| Effect colour and alpha | `BlzSetSpecialEffectColor`, `BlzSetSpecialEffectAlpha`, `BlzSetSpecialEffectColorByPlayer`, `SetUnitVertexColor` | Multiplies a model's vertex colour; fades it | all | In use (7, 15, 2 and 1 source files under ts/src); no lighting-specific measurement |
-| Effect models | `AddSpecialEffect` with stock or imported MDX | Additive and emissive-looking layers, particle emitters, ribbons, and in HD modes the model's own point lights | all; point lights in HD modes only, unlimited in HD since 3.0, capped in Classic | Ribbons and emitters in use (their model facts: [render visibility](../../evidence/render-visibility-20261006/README.md)); the tech-contact omni light is **unmeasured** |
-| Lightning | `AddLightningEx` | Textured beams between two points | all | In use in 1 file; nothing measured |
-| Cinematic filter | `SetCineFilter*`, `DisplayCineFilter` | A full-screen textured overlay, local per player | all | Unused. It covers fighters and backdrop alike, so it can't separate them *(guess)* |
-| Depth of field | `CAMERA_FIELD_DEPTH_OF_FIELD_DISTANCE`, `…_SCALE`, `CameraSetFocalDistance` | A full-screen blur by distance | HD | Unused, **unmeasured** |
-| HD water | `SetHDWaterParams*`, `BlzSetHDWater*` | HD water's colour, opacity, reflectivity, emissivity, waves | HD modes | Unusable: water is terrain, and the terrain is hidden |
-| Point-light shadows | `BlzSetMinShadowCastingPointLightCount` | How many model point lights cast shadows | HD modes | Unused, **unmeasured** |
-| Lighting editor, omni lights | World Editor 3.0 (`war3map.w3l`, imported DNC models) | The map's own terrain and unit DNC models; map-placed omni lights and shadow-casting omni lights | HD modes; placed once per map, not per stage | Unused; file format in [Lighting editor output](#lighting-editor-output-war3mapw3l) |
-| Map post-processing | World Editor 3.0 (`war3mapPostProcessing.txt`) | Ambient occlusion, bloom, portrait bloom, tone-map exposure and normal-map strength for the whole map | HD *(guess)* | Shipped (#288, smashcraft:ts/scripts/postProcessing.ts): bloom above 0.9 and contact-shadow ASSAO; fields in [Map-level post-processing](#map-level-post-processing-what-the-editor-writes); no native changes them |
-| HD materials | stock asset paths | Reforged and Definitive draw the HD PBR copy of a stock path | HD | **Measured** availability: all 25 stock scenery and sky paths resolve in all three modes; the HD draw itself is unmeasured |
+| Lever | Natives | What it changes | On 3.0 under Wine |
+| --- | --- | --- | --- |
+| Lighting model | `SetDayNightModels(terrain, unit)` | The directional key light, its colour and the ambient fill for terrain and for every unit and effect, sampled at the time of day | **Measured**: an authored stage light lifts fighter L\* by 8–13 against stock on four stages; the decks and sky barely move |
+| Shadow strength | none | No field for it in the MDX 800 light record (smashcraft:ts/scripts/stageLight.ts writes all of them) | Version-1800 light records carry 24 bytes the decoder doesn't read; whether they hold shadow settings is unknown *(guess: they might)* |
+| Time of day | `SetTimeOfDay`, `SetTimeOfDayScale(0)` | Where the lighting model is sampled; the shell freezes noon (smashcraft:ts/src/host/loop/shell.ts) | Source only; the authored lights are constant over the day, so the frozen hour can't move them |
+| Distance fog | `SetTerrainFogEx(style, start, end, density, r, g, b)` | Linear (0), exponential (1) or exponential-squared (2) fog over terrain, units and effects | In use (linear, density 0) on every stage; no separate fog measurement |
+| 3.0 fog | `SetTerrainFogExV`, `BlzSetTerrainFog{Style,ZStart,ZEnd,Density,HeightStart,HeightEnd,LinearStart,LinearEnd,MaxLinearDensity,DrawOverSky,Color}`, styles 3–5 | Height fog, a density cap and fog drawn over the sky | **Unmeasured**; `-dev fogv` and the `192-*-linear\|height` checks exist, no run yet |
+| Sky | `SetSkyModel`, `BlzShowSkyBox` | The sky dome model; hiding it leaves the clear colour. A stock sky with no Classic copy is blank | **Measured**: authored skies fill 76–96% of the top band on all nine #178 stages; hidden, the empty screen reads rgb(4,4,4) |
+| Terrain | `BlzShowTerrain` | Hides all terrain | Called on every stage draw since #191; no native capture of it yet |
+| Weather | `AddWeatherEffect(rect, id)` | Particle weather emitted 768 above the terrain | Source only: it falls below the arena, which stands 1,800 above the ground ([stages](stages.md#what-the-clients-can-show)); Frozen Throne's snow is an authored model instead |
+| Ubersplats | `CreateUbersplat` | Terrain decals | Source only: terrain-only, and the terrain is hidden, so unusable |
+| Effect colour and alpha | `BlzSetSpecialEffectColor`, `BlzSetSpecialEffectAlpha`, `BlzSetSpecialEffectColorByPlayer`, `SetUnitVertexColor` | Multiplies a model's vertex colour; fades it | In use (7, 15, 2 and 1 source files under ts/src); no lighting-specific measurement |
+| Effect models | `AddSpecialEffect` with stock or imported MDX | Additive and emissive-looking layers, particle emitters and ribbons; a model's own point lights don't draw in Classic | Ribbons and emitters in use (their model facts: [render visibility](../../evidence/render-visibility-20261006/README.md)); the tech-contact omni light is **unmeasured** |
+| Lightning | `AddLightningEx` | Textured beams between two points | In use in 1 file; nothing measured |
+| Cinematic filter | `SetCineFilter*`, `DisplayCineFilter` | A full-screen textured overlay, local per player | Unused. It covers fighters and backdrop alike, so it can't separate them *(guess)* |
+| Lighting editor | World Editor 3.0 (`war3map.w3l`, imported DNC models) | The map's own terrain and unit DNC models, chosen once per map, not per stage | Unused; file format in [Lighting editor output](#lighting-editor-output-war3mapw3l) |
+| Map post-processing | World Editor 3.0 (`war3mapPostProcessing.txt`) | Ambient occlusion, bloom, portrait bloom, tone-map exposure and normal-map strength for the whole map | Shipped (#288, smashcraft:ts/scripts/postProcessing.ts): bloom above 0.9 and contact-shadow ASSAO; fields in [Map-level post-processing](#map-level-post-processing-what-the-editor-writes); no native changes them; *(guess)* Classic draws neither |
 
 ### What is impossible
 
 Not available to a map: custom shaders or materials beyond what MDX layers
-and HD material slots express, replacing the renderer, colour LUTs, bloom or
+and material slots express, replacing the renderer, colour LUTs, bloom or
 exposure from script, creating or moving omni lights at run time (except by
 placing effects whose models carry lights), driving PopcornFX particles, and
 reading or choosing the player's graphics mode or options
@@ -133,50 +124,42 @@ same paused fighter scene with `-dev lighting stock` and `-dev lighting stage`.
 
 [POLAT G's HD maps](https://www.hiveworkshop.com/threads/playable-nerubian-%E2%80%93-high-elf-%E2%80%93-naga-races-reforged-hd-only.332605/)
 are explicitly HD-only; their 3.0 map listings use hundreds of megabytes of
-content. That approach permits HD-only scenery and race models, but cannot
-serve Smashcraft's Classic fallback. Keeping stock paths lets Warcraft choose
-the appropriate installed variant instead.
+content. That approach permits HD-only scenery and race models, which a
+Classic map can't draw.
 
 [Quenching Mod's 3.0 compatibility reports](https://www.hiveworkshop.com/threads/quenching-mod.331686/post-3738850)
 describe replacement object shaders crashing after loading and replacement
 post-processing glitching. It modifies the client, so its shader screenshots
 do not establish a renderer feature that an ordinary map can distribute.
-Smashcraft uses map lighting, atmosphere and the installed graphics variants;
+Smashcraft uses map lighting, atmosphere and the installed Classic assets;
 it does not require that client modification.
 
 ### Assets and graphics modes
 
-A stock path resolves per mode: `Doodads\Cinematic\FrozenThrone\FrozenThrone.mdx`
-draws the classic model in Classic and its HD remake in Reforged and
-Definitive. The installed 3.0.0.24268 CASC audit resolves all 21 distinct stock
-scenery models and all four distinct skies in Classic, Reforged and Definitive
-(25 normalized paths; `.mdl` and `.mdx` aliases counted once). Frozen Throne
-is 80,057 bytes in Classic and 8,074,270 in Reforged; glacier models carry
-diffuse, normal, ORM and emissive texture slots in the HD files. Byte counts
-and texture slots establish asset availability, not successful native drawing.
+A stock path resolves in the Classic root asset set:
+`Doodads\Cinematic\FrozenThrone\FrozenThrone.mdx` draws the classic model. The
+installed 3.0.0.24268 CASC audit resolves all 21 distinct stock scenery models
+and all four distinct skies in Classic (25 normalized paths; `.mdl` and `.mdx`
+aliases counted once). Frozen Throne is 80,057 bytes in Classic. Byte counts
+establish asset availability, not successful native drawing.
 The recorded numerical audit is
 smashcraft:evidence/visual-assets-20261007/asset-summary.json. Some models'
 new light-node data exceeds the current `war3-model` decoder; their successful
 extraction and byte count remain observed, while their material slots are
 not claimed from that decoder.
-CASC names these as
-`war3.w3mod:PATH` and `war3.w3mod:_hd.w3mod:PATH`; Definitive replacements live
-under `war3.w3mod:_de.w3mod:PATH` and absent overrides fall back to installed
-shared assets. Verify presence with the existing CASC extractor, and record
-the byte counts separately from native draw evidence. HD clients resolve
-their PBR scenery from these stock paths. Imported models
-(war3mapImported\, the decks, the skies, fighters' clip pools, impact
-effects, the stage lights) draw the same file in every mode with classic
-materials. The stock lighting models are different files per mode (below);
-an imported lighting model is not replaced in HD modes.
+CASC names these as `war3.w3mod:PATH`. Verify presence with the existing CASC
+extractor, and record the byte counts separately from native draw evidence.
+Imported models (war3mapImported\, the decks, the skies, fighters' clip pools,
+impact effects, the stage lights) draw their own files with classic materials.
+The stock lighting model is a Classic file (below); an imported lighting model
+replaces it.
 
 Ten stages draw an authored sky sphere (smashcraft:ts/src/generated/stages/stageSkyInfo.ts,
-generated by smashcraft:tools/stage/skies.ts), imported and so the same in
-every mode; Nordrassil keeps the stock FelwoodSky for its aurora
+generated by smashcraft:tools/stage/skies.ts), imported. Nordrassil keeps the stock FelwoodSky for its aurora
 ([stage art](stage-art.md#authored-compositions-and-visual-references)).
-The HD-only stock skies (IcecrownGlacierSky, NorthrendSky, AshenvaleSky,
-BarrensSky, and the Definitive-only NaxxNightSky, UndercitySky, ArcaneSky)
-show nothing in Classic, so no stage uses them.
+Stock skies with no Classic copy (IcecrownGlacierSky, NorthrendSky, AshenvaleSky,
+BarrensSky, NaxxNightSky, UndercitySky, ArcaneSky) show nothing in Classic, so
+no stage uses them.
 
 ### Lighting models
 
@@ -187,16 +170,10 @@ model lights units and special effects, so on Smashcraft's floating arena the
 unit model lights both the fighters and the scenery. The decks are unshaded
 and ignore it; so is the sky.
 
-The stock Lordaeron unit light is a different file in each mode (read from
-3.0.1.24342's storage, smashcraft:evidence/stage-lighting-20261008/):
-
-| Mode | Noon key colour (RGB) | Noon key intensity | Noon fill |
-| --- | --- | --- | --- |
-| Classic | (0.996, 0.996, 0.996) | static, not decoded | (0.84, 0.84, 0.98) |
-| Reforged | (0.839, 0.839, 0.980) | 0.92 | static, not decoded |
-| Definitive | (1.0, 1.0, 1.0) | 1.0 | static, not decoded |
-
-Classic's night key and fill are (0.31, 0.53, 0.80). All three are MDX
+The stock Lordaeron unit light, read from 3.0.1.24342's storage
+(smashcraft:evidence/stage-lighting-20261008/), has a noon key colour of
+(0.996, 0.996, 0.996) at a static intensity that is not decoded and a noon fill
+of (0.84, 0.84, 0.98). Its night key and fill are (0.31, 0.53, 0.80). It is MDX
 version 1800, whose light records `war3-model` 4.0.1 rejects; the tracks
 were read by their chunk tags.
 
@@ -213,8 +190,8 @@ a deliberately darker light needs Tom's sign-off.
 
 `bun tools/stage/contrast.ts --stock-light [--out DIR] [STAGE...]` from
 smashcraft's root (about two minutes a stage, serial, local Warcraft storage)
-draws each stage's near and far views for both clients in Classic and
-Definitive with Wisp, and fails when the fighters' mean L\* falls below the
+draws each stage's near and far views for both clients in Classic with
+Wisp, and fails when the fighters' mean L\* falls below the
 same frame under the stock light at one decimal. It also prints each view's
 contrast row against the stock look (stock light, stock scenery colours) and
 the empty-backdrop share at horizon row 1/3, and fails when a full stage's view
@@ -255,7 +232,7 @@ smashcraft:ts/src/game/assets/stageLighting.tests.ts enforces them:
 Rules 2 and 3 hold fighters bright. The measurement below shows that is only
 right where the backdrop behind the fighters is darker than they are.
 
-### Chosen stage atmosphere (Classic and Definitive)
+### Chosen stage atmosphere
 
 The selectable stage chooses its own sky and fog colour, with distance fog
 starting at least 3,300 units away from the camera and ending beyond that
@@ -268,11 +245,10 @@ smashcraft:ts/src/game/presentation/stageScenery.tests.ts; the camera-specific
 fighter clearance check remains in smashcraft:ts/test/player-view.test.ts.
 
 The light rows live in `stageLighting.ts`; sky and fog are selected by
-`stageScenery.ts`. Both modes use the same stage choice and authored DNC
-model. Stock scene paths resolve to the player's Classic or Definitive art.
-Classic retains distance fog where the client does not draw height fog or
-model omni lights. The original imported skies use unshaded materials in
-both modes; the three stock skies preserve their stock animation.
+`stageScenery.ts`. The stage choice uses the authored DNC model. Stock scene
+paths resolve to Classic art. Classic retains distance fog where the client
+does not draw height fog or model omni lights. The original imported skies use
+unshaded materials; the three stock skies preserve their stock animation.
 
 | Stage | Key / fill RGB; intensity | Sky | Distance fog start–end; RGB |
 | --- | --- | --- | --- |
@@ -289,8 +265,7 @@ both modes; the three stock skies preserve their stock animation.
 | Tomb of Sargeras | 226,244,255 / 130,176,180; 1 | Original tide sky | 5,000–11,000; 0.25,0.4375,0.46875 |
 
 Nordrassil, Gryphon Aerie and Tomb additionally use the below-deck height
-fog described in their stage sections. Blackrock, Hellfire, Naxxramas and
-Stratholme carry distant model lights in Definitive. The stage-specific
+fog described in their stage sections. The stage-specific
 capture comparisons decide fighter contrast; this table describes the
 chosen settings and does not replace those comparisons.
 
@@ -336,38 +311,25 @@ How a map uses a newer feature safely:
    take the same branch, which they do when they run the same build. No
    native returns the patch number: `VersionGet` reports only Reign of Chaos
    or Frozen Throne (common.j).
-2. **Graphics-mode features: build in a fallback, because the map can't
-   detect the mode.** Most new presentation is mode-dependent.
-   - A stock path resolves per mode ([Assets and graphics modes](#assets-and-graphics-modes)).
-   - A map can ship its own per-mode copies. Blizzard's Silverpine Sprint
-     scenario imports `_DE.w3mod\terrainart\…` files beside its root files,
-     so Definitive loads the `_DE` copy and the other modes load the root
-     one. *(guess)* `_HD.w3mod\` works the same way for Reforged, as it does
-     in stock storage. **Unmeasured** in Smashcraft. With this, a stage light
-     could carry Definitive-tuned values while Classic keeps today's.
-   - HD-only effects (point lights, depth of field, AO, bloom) only add to the
-     picture. The Classic draw without them must already read.
-   - Requiring a mode: the w3i graphics-modes field is 3 in Smashcraft's base.
-     Both Forsaken Kingdom scenario maps set it to 4 and use Definitive-only
-     art. *(guess)* The field is a bitmask: 1 Classic, 2 Reforged,
-     4 Definitive. What the client does when the player's mode isn't
-     supported is **unmeasured**. Don't require a mode: Mac players report
-     that Definitive can't be selected
-     ([forum](https://us.forums.blizzard.com/en/warcraft3/t/cant-select-definitive-graphics/38432)).
+2. **Graphics-mode features: use only what Classic draws.** The map can't
+   detect the mode, and Smashcraft targets Classic.
+   - A stock path resolves per mode ([Assets and graphics modes](#assets-and-graphics-modes));
+     use only paths with a Classic copy.
+   - Effects only other graphics modes draw (point lights, depth of field, AO,
+     bloom) add nothing in Classic. The Classic draw must already read.
 3. **Player options are the player's.** Point Light Shadows, Water,
    Environment Shadows, Ambient Occlusion and Supersampling can't be turned on
    by a map. The old pool pair 2 baseline (7 Oct) disabled those settings.
-   Wisp's `capture-classic` and `capture-definitive` profiles now set
+   Wisp's `capture-classic` profile now sets
    `lightingquality=2`, `texquality=1`, `shadowquality=2`,
-   `pointlightshadowquality=2`, `waterquality=2` and `assao=1`; each records
+   `pointlightshadowquality=2`, `waterquality=2` and `assao=1`; it records
    its graphics mode (wisp:docs/lan.md, "Profiles"). #287's first box used
-   those profiles on 3.0.1; its complete stage baseline still needs the
+   that profile on 3.0.1; its complete stage baseline still needs the
    stock/mask/stage sets.
 
-   Wisp's headless Classic and Definitive profiles are separate from these
-   native client preferences. At Wisp `1383a934`, both draw day/night light,
-   fog, sky and sun shadows. Definitive also draws model point lights, PBR
-   materials, point-light shadows, ambient occlusion and bloom. Water and
+   Wisp's headless Classic profile is separate from these
+   native client preferences. At Wisp `1383a934`, it draws day/night light,
+   fog, sky and sun shadows. Water and
    height-fog falloff still require native captures. A requested unsupported
    lever fails `--look` before drawing; an image with a model named in
    `render.json`'s `notDrawn` cannot tick a complete visual capture box
@@ -384,11 +346,11 @@ From PN301 (art, world editor and bug fix lists):
 | Change | Effect on Smashcraft |
 | --- | --- |
 | Ambient Occlusion is a player option again (`assao` in War3Preferences); it "may result in reduced performance" and no longer affects terrain or close-up cinematic shots | When a player turns it on, AO darkens the creases on fighters and scenery. A map tunes it through its post-processing file (below). Hidden terrain makes the terrain exclusion moot |
-| Daytime lighting on Lordaeron Summer biomes is 10% dimmer | This may move the stock baseline `-dev lighting stock` uses (DNCLordaeron). *(guess)* The Reforged noon key intensity of 0.92 read from 3.0.1 may already be the dimmed value. Re-capture stock baselines on 3.0.1. Authored stage lights are imported and don't change |
+| Daytime lighting on Lordaeron Summer biomes is 10% dimmer | This may move the stock baseline `-dev lighting stock` uses (DNCLordaeron). Re-capture stock baselines on 3.0.1. Authored stage lights are imported and don't change |
 | About 35 spell effects retuned (Blizzard, Divine Shield, Starfall, Death Coil, Breath of Fire, Banish and others); Pandaren Brewmaster and Orc Grunt reanimated; tint or scale changed on turtles, wildkin, golems and wolves | Re-take reference captures of any stock effect used as a hit or special effect. Chen's private model comes from the stock Brewmaster rig, so re-check his clips against 3.0.1 *(guess: extracted before 3.0.1)* |
-| `Doodads\Terrain\CliffDoodad\Waterfall\WaterfallNoMist` added | A waterfall without its mist cloud. HD and Definitive only: storage has no Classic copy |
+| `Doodads\Terrain\CliffDoodad\Waterfall\WaterfallNoMist` added | A waterfall without its mist cloud. Storage has no Classic copy |
 | Aura effects tilt to the terrain angle; Lordaeron short grass overhauled | No effect: the terrain is hidden and the floor is flat |
-| Dynamic portrait animation in Definitive; better lip sync | No effect: Smashcraft draws renders, not unit portraits ([fighter portraits](fighter-portraits.md)) |
+| Dynamic portrait animation; better lip sync | No effect: Smashcraft draws renders, not unit portraits ([fighter portraits](fighter-portraits.md)) |
 | Fixes for imported assets: custom assets and test-map textures load, model paths with periods load, geosets with vertices but no faces no longer crash, item lights no longer stay after pickup, the post-processing dialog keeps its sliders, a second open map keeps its lighting | Imported art behaves as it did in 2.0 |
 
 **Natives: none new for presentation.** The 3.0.1 common.j, read from storage,
@@ -433,8 +395,8 @@ than stock. It is the only one of the 369 non-Classic stock maps in 3.0.1.24342
 only the keys it changes.
 
 So bloom, tone-map exposure and AO strength are map-wide. One file serves
-every stage, and no native changes it during a match. *(guess)* They apply in
-HD modes only, since Classic has no bloom or ASSAO pass, and the player's AO
+every stage, and no native changes it during a match. *(guess)* Classic has no bloom or
+ASSAO pass, so they may draw nothing there, and the player's AO
 option gates ASSAO. Whether `[Bloom] Enabled=1` in a map turns bloom on, now
 that the player's Bloom option is gone, is **unmeasured**. It is the largest
 untested lever for glowing hit sparks and fel or arcane stages.
@@ -455,67 +417,37 @@ Silverpine also imports `OmniLightCar.mdx`, `OmniLightLantern.mdx` and
 light-carrying models, the same mechanism as an effect with a light, which
 script can create at run time (the tech-contact and slash sparks).
 
-Blizzard's Definitive campaign lighting models, decoded from storage the way
-[the stock light](#lighting-models) was (colours RGB; KLAC key colour, KLAI
-key intensity, KLBC fill colour, KLBI fill intensity):
+### Forsaken Kingdom art in Classic storage
 
-| Model (Definitive only) | Noon key | Noon fill | Notes |
-| --- | --- | --- | --- |
-| `Environment\DNC\DNCCampaign\Act2OutdoorDNC` | (1.0, 0.93, 0.80) at intensity 3.6 | (0.6, 0.6, 0.6) at about 0.93 | dawn key (1.0, 0.42, 0.16); a second light at most 0.065 |
-| `…\CloudyDNC` | (0.75, 0.75, 0.73) at 1.6–1.8 | (0.76, 0.76, 0.76) | the same timeline as Act2Outdoor, desaturated |
-| `…\DNCUndercityFinal` | (0.09, 0.11, 0.26) at 0.05 | — | a grey second light at intensity 0: nearly unlit, so the scene's light comes from placed point lights |
-| `Environment\DNC\DNCLordaeron\DNCLordaeronUnit` (stock, for comparison) | (1.0, 1.0, 1.0) at 1.0 | — | Reforged's copy: 0.92 |
+`.mdx` counts under the Classic root in the installed 3.0.1.24342 storage, by
+prefix:
 
-Definitive lighting is authored at high dynamic range, with key intensities
-up to 3.6. Smashcraft's lights cap intensity at 1 (stage light rule 5).
-*(guess)* Classic clamps lit colour, so a light tuned for Definitive needs its
-own `_DE.w3mod` copy rather than one light for every mode.
+| Set | Classic | Contents |
+| --- | --- | --- |
+| `Doodads\Undercity` | 0 | sewer pipes, walls, arches, path tiles, lanterns, banners, alchemy sets, bones, coffins, ceiling chains, gates, pillars, Naxx decor and `NaxxramasBeam` |
+| `Doodads\LordaeronFall` | 0 | Lordaeron City spire, dome, main gate and walls, the Andorhal, Brill and Strahnbrad clock towers, Hearthglen Abbey, Strahnbrad trees and a lion statue, many with `_destroyed` variants |
+| `Environment\Foliage\LordaeronFall` | 0 | fall grass |
+| `Doodads\Cityscape` | 96 | city props; *(guess)* partly new in 3.0 |
+| `Units\Forsaken` | 0 | campaign heroes and Forsaken units |
+| `Units\Creeps\HeroForsakenPaladin` | 2 | the tavern hero; Smashcraft's Forsaken Paladin is built on it |
+| UndercitySky, NaxxNightSky, ArcaneSky | 0 | skies |
+| LordaeronFallSky, Outland_Sky | 1 | stock skies |
+| `WaterfallNoMist` | 0 | 3.0.1 |
 
-### Forsaken Kingdom art: what exists in which mode
-
-`.mdx` counts in the installed 3.0.1.24342 storage by prefix (root is Classic,
-`_hd` Reforged, `_de` Definitive):
-
-| Set | Classic | Reforged | Definitive | Contents |
-| --- | --- | --- | --- | --- |
-| `Doodads\Undercity` | 0 | 39 | 228 | Reforged: sewer pipes, walls, arches, path tiles. Definitive adds lanterns, banners, alchemy sets, bones, coffins, ceiling chains, gates, pillars, Naxx decor and `NaxxramasBeam` |
-| `Doodads\LordaeronFall` | 0 | 35 | 41 | Lordaeron City spire, dome, main gate and walls, the Andorhal, Brill and Strahnbrad clock towers, Hearthglen Abbey, Strahnbrad trees and a lion statue, many with `_destroyed` variants |
-| `Environment\Foliage\LordaeronFall` | 0 | 10 | 10 | fall grass |
-| `Doodads\Cityscape` | 96 | 141 | 186 | city props; *(guess)* partly new in 3.0 |
-| `Units\Forsaken` | 0 | 0 | 31 | campaign heroes and Forsaken units |
-| `Units\Creeps\HeroForsakenPaladin` | 2 | 2 | 2 | the tavern hero; Smashcraft's Forsaken Paladin is built on it |
-| UndercitySky, NaxxNightSky, ArcaneSky | 0 | 0 | 1 each | Definitive-only skies |
-| LordaeronFallSky, Outland_Sky | 1 | 1 | 1 | in every mode |
-| `WaterfallNoMist` | 0 | 1 | 1 | 3.0.1 |
-| Campaign lighting models (above) | 0 | 0 | 1 each | — |
-
-A stock path the player's mode lacks draws nothing, as with the HD-only skies.
-Map makers report the same for the new models, which are "locked to one
-graphics mode and invisible in the others"
-([forum](https://us.forums.blizzard.com/en/warcraft3/t/newmodelsshouldusedeversion-onallgraphicsforcustommaps/39520)).
+A stock path Classic lacks draws nothing, as with the skies above, so no stage
+uses Forsaken Kingdom art that has no Classic copy.
 The [Hive 3.0 bugs thread](https://www.hiveworkshop.com/threads/warcraft-iii-3-0-bugs-issues.374131/)
 reports these 3.0 rendering defects:
 
-- some rocks draw as shrubs in Definitive;
-- Replaceable ID 1 textures flicker in Definitive and Reforged;
 - glows and fires draw below units;
 - some new models ignore `BlzSetSpecialEffectYaw`;
 - older-format models lose their portrait omni lights.
-
-`NaxxramasBeam` carries a PopcornFX emitter (a `CORN` chunk), so script
-can't drive its particles. The Undercity lanterns carry no light (no `LITE`
-chunk), which matches the Hive report that their light "will have 0".
-
-Forsaken Kingdom art can go on a stage only as garnish whose absence in
-Classic, and often in Reforged, still reads. Whether a stage may look richer
-in Definitive than in Classic is Tom's product decision.
 
 ### What Blizzard's 3.0.1 maps do with the levers
 
 From the Lua and w3i of the two standalone scenarios
 (`Maps\ForsakenKingdom\Scenario\(1)SilverpineSprint.w3x` and
-`(1)ForgottenHollow.w3x`, saved by builds 24329 and 24324, graphics-modes
-field 4):
+`(1)ForgottenHollow.w3x`, saved by builds 24329 and 24324):
 
 - **Silverpine Sprint:**
   - imported terrain and unit lighting models, swapped per shot (seven
@@ -533,64 +465,55 @@ field 4):
   `SetHDWaterParamsEx`, the ASSAO override above and a local cinematic
   filter.
 
-The depth-of-field flash runs only for the local player and creates no
-handles, so it can't desync. *(guess)* It also blurs the fighters, so it
+The filter flash runs only for the local player and creates no
+handles, so it can't desync. *(guess)* It also covers the fighters, so it
 suits KOs and the heaviest hits, not ordinary contact.
 
 ### Levers worth using, per stage
 
-For every stage first: the profile, baseline and map-wide rows (G1–G4). Each
+For every stage first: the profile, baseline and map-wide rows (G1–G3). Each
 row is written to open as an issue. Its check runs on a capture profile that
 turns on Environment Shadows, Point Light Shadows and AO and records the mode.
 
 | # | Lever | Done when |
 | --- | --- | --- |
-| G1 | A visual capture profile (shadows, point-light shadows and AO on, mode recorded), then re-capture the stock/mask/stage triple of every stage on 3.0.1 in Classic and Definitive | 11 stages × 2 modes of triples exist, each recording its mode |
-| G2 | `war3mapPostProcessing.txt`: bloom on with a high threshold, so only additive sparks and emissive accents bloom, and a tighter ASSAO for fighter contact shadows (Forgotten Hollow uses radius 6, multiplier 3) | Reforged and Definitive captures of `-dev effects 12` show bloom on the sparks, and fighter ΔE00 against the ring falls on no stage |
-| G3 | Definitive copies of the stage lights at `_DE.w3mod\war3mapImported\StageLight-*.mdx` with high-range intensities; Classic and Reforged keep the current files | A Definitive capture shows the copy loaded (a distinct test colour), and contrast holds on the four measured stages |
-| G4 | KO punctuation: a local depth-of-field pulse and cinematic-filter flash on KO only, after Silverpine's pattern | A native KO capture shows the pulse, and the two clients' checksums stay equal over a full match |
+| G1 | A visual capture profile (shadows, point-light shadows and AO on, mode recorded), then re-capture the stock/mask/stage triple of every stage on 3.0.1 in Classic | 11 stages of triples exist, each recording its mode |
+| G2 | `war3mapPostProcessing.txt`: bloom on with a high threshold, so only additive sparks and emissive accents bloom, and a tighter ASSAO for fighter contact shadows (Forgotten Hollow uses radius 6, multiplier 3) | A capture of `-dev effects 12` shows bloom on the sparks, and fighter ΔE00 against the ring falls on no stage |
+| G3 | KO punctuation: a local cinematic-filter flash on KO only, after Silverpine's pattern | A native KO capture shows the flash, and the two clients' checksums stay equal over a full match |
 
 Per stage (backdrop facts from [Per-stage recommendations](#per-stage-recommendations)):
 
 | Stage | Backdrop | 3.0.1 / Forsaken Kingdom levers worth using | Skip |
 | --- | --- | --- | --- |
-| Sky Deck (0) | neutral; #178 ΔE00 22.8 | The control for G1–G3: capture it first in both supported modes, AO on and off | Forsaken Kingdom art |
-| Frozen Throne (2) | bright ring (L\* 52–54); contrast falls | Height fog (style 3) in deep blue below the deck with a `MaxLinearDensity` cap, to darken the bright lower band instead of dimming the fighters. `DrawOverSky` to pull the sky's horizon into the same tint. Bloom (G2) on the ice's emissive layers | NorthrendSky and IcecrownGlacierSky (HD-only); weather |
+| Sky Deck (0) | neutral; #178 ΔE00 22.8 | The control for G1–G3: capture it first, AO on and off | Forsaken Kingdom art |
+| Frozen Throne (2) | bright ring (L\* 52–54); contrast falls | Height fog (style 3) in deep blue below the deck with a `MaxLinearDensity` cap, to darken the bright lower band instead of dimming the fighters. `DrawOverSky` to pull the sky's horizon into the same tint. Bloom (G2) on the ice's emissive layers | NorthrendSky and IcecrownGlacierSky (no Classic copy); weather |
 | Durotar (3) | bright ring; contrast falls | Height fog in warm dust below the deck. The bloom threshold must leave sunlit sandstone unbloomed | Forsaken Kingdom art |
-| Naxxramas (4) | dark ring (L\* 31–33); contrast rises | A cold green omni light from an imported effect by the necropolis (unlimited in HD) with `BlzSetMinShadowCastingPointLightCount(1)`. Undercity and Naxx decor (`naxxdeco0/1`, ceiling chains, Forsaken banners) only as Definitive garnish | NaxxNightSky (Definitive only, one sky slot); DNCUndercityFinal (too dark for fighters) |
-| Stratholme (6) | not yet captured | Compare LordaeronFallSky (stock in every mode) with the authored sky. The fall city art (spire, gate, clock towers, Hearthglen Abbey, `_destroyed` variants) exists only in Reforged and Definitive: use it only if Tom accepts a richer HD backdrop. Distant fires as light-carrying effects | — |
-| Tomb of Sargeras (7) | not yet captured | `WaterfallNoMist` for the distant waterfall in HD, only with a Classic stock waterfall in its place, so it can't cover the backdrop with mist. Teal height fog over the tide floor | HD water (the terrain is hidden) |
+| Naxxramas (4) | dark ring (L\* 31–33); contrast rises | A cold green omni light from an imported effect by the necropolis with `BlzSetMinShadowCastingPointLightCount(1)` | Undercity and Naxx decor (`naxxdeco0/1`, ceiling chains, Forsaken banners) and NaxxNightSky (no Classic copy) |
+| Stratholme (6) | not yet captured | Compare LordaeronFallSky (stock) with the authored sky. Distant fires as light-carrying effects | The fall city art (spire, gate, clock towers, Hearthglen Abbey, `_destroyed` variants; no Classic copy) |
+| Tomb of Sargeras (7) | not yet captured | Teal height fog over the tide floor | `WaterfallNoMist` (no Classic copy); water (the terrain is hidden) |
 | Nordrassil (10) | stock FelwoodSky aurora | Bloom (G2) on the aurora and wisp emissives; teal-green height fog below the deck | — |
 | Gryphon Aerie (11) | pale clouds *(guess)* | GA-4: desaturated blue height fog darkening the cloud field below the deck. Style 3, start/end 5,500/11,500, density 0.25, height -1,800 to -500 relative to the deck origin, cap 0.5, drawn over sky. RGB (0.25, 0.375, 0.5); Classic keeps that tint in distance fog beyond the fight. Existing sky and daylight preserve the airy skyline and Alliance deck accents (GA-1, GA-3) | — |
 | Blackrock (12) | lowest #178 ΔE00 (21.2) | Forge-fire effects carrying warm omni lights, one shadow-casting; bloom on lava; the G2 ASSAO for fighter contact shadows. Check it first | — |
-| Ahn'Qiraj (13) | bright sandstone; light at 0.5 | Dusk-ochre height fog below the deck; the G3 Definitive light copy | — |
-| Hellfire (14) | dark haze *(guess)* | Fel-green omni lights from imported effects; bloom on fel fire. Outland_Sky is available in every mode | — |
+| Ahn'Qiraj (13) | bright sandstone; light at 0.5 | Dusk-ochre height fog below the deck | — |
+| Hellfire (14) | dark haze *(guess)* | Fel-green omni lights from imported effects; bloom on fel fire. Outland_Sky is a stock Classic sky | — |
 
 Naxxramas's sky horizon is dark slate, RGB (30, 46, 54), and its white key and violet fill shine at 2.0 so fighters stand off it (#296). Naxxramas's row is in place (#296). NX-1's cold plague-green omni light
 frames NX-3's lone necropolis at (1450, 6000, -900), with radius 1400,
 intensity 0.875 and no flicker. Its reach ends 4400 units behind the fighter
 volume; the one shadow caster adds depth around the citadel. NX-1's teal fog
 starts at 5000 and ends at 11000, preserving the clear fighting plane.
-One half-scale stock `NaxxDeco0` at (1700, 5900, -1250) is low Definitive-only
-garnish. Classic and Reforged keep the stock Necropolis and ruined approach
-when that prop is absent; Classic also draws no model omni light. The authored
-light-only model is 756 bytes: stock green spell effects add particles and
-geometry, while Undercity lanterns have no light, so neither supplies this
-steady isolated glow. No stock art is imported.
+Classic keeps the stock Necropolis and ruined approach and draws no model omni
+light. The authored light-only model is 756 bytes: stock green spell effects
+add particles and geometry, so none supplies this steady isolated glow. No
+stock art is imported.
 
 Tomb's TS-2 hall uses a dark teal sky horizon, RGB (28, 48, 52), behind the
 bright tide floor. Its row is in place (#298), following TS-1/TS-2: teal height fog uses
 style 3, distance 5,000–11,000, density 0.25, heights −1,800 to −100 relative
 to the arena, maximum opacity 0.375 and leaves the sky clear. Classic retains
-the existing teal linear fog. TS-c keeps the waterfall on the left: two native
-stock `WaterfallNoMist` copies override the ordinary waterfall only under
-`_hd.w3mod` and `_de.w3mod`; Classic uses its installed ordinary waterfall.
-The private stage-assets files `TombWaterfallHD.mdx` and `TombWaterfallDE.mdx`
-are 124,468 bytes each. Preserve these two stock files when regenerating
-stage-assets, or re-extract the HD/DE `WaterfallNoMist.mdx` paths with
-`tools/animations/casc-extract.cpp`. The ordinary stock waterfall is misty;
-the new model is missing in Classic. The three native mode captures decide
-whether the mode-specific map overrides draw as intended.
+the existing teal linear fog. TS-c keeps the waterfall on the left with
+Classic's installed ordinary stock waterfall, which is misty; `WaterfallNoMist`
+has no Classic copy.
 
 Blackrock's row is in place (#292). Its two forge fires carry light-only
 omni models (smashcraft:ts/src/game/assets/stagePointLights.ts): warm orange,
@@ -605,7 +528,7 @@ the body stays under the stock bloom threshold of 0.72, so the map-wide bloom
 smashcraft:ts/test/stage-model.test.ts checks these rules.
 
 Hellfire's #293 choices follow HF-2/HF-3 in `stage-boards.md`: stock
-`Outland_Sky` in all modes, green linear haze beginning at 5,000, and two
+`Outland_Sky`, green linear haze beginning at 5,000, and two
 small stock Immolation flames beside the distant gate and the right rock.
 Their additive fel accents use #288's map-wide bloom in HD; Classic retains
 the stock flames and sky. Two light-only omni models add green to the rocks
@@ -649,8 +572,8 @@ What this shows:
   unshaded decks and sky, as the source says.
 - The lift is brighter than stock even though the Frozen Throne key
   (226, 240, 255) and fill (150, 172, 220) are dimmer than Classic's noon.
-  *(Guess)* the captures ran in Reforged, whose stock key is 0.92 × (0.84,
-  0.84, 0.98); the authored key is intensity 1. Recording the mode settles it.
+The authored key is intensity 1. The run did not record its graphics mode;
+recording it would settle the cause.
 - Where the backdrop is brighter than the fighters (ring L\* 48–63: Frozen
   Throne, Durotar, Ahn'Qiraj), lifting the fighters moves them toward the
   background and both contrast numbers fall. Where it is darker (Naxxramas,
@@ -682,17 +605,16 @@ geometry; the old linear fog distances and colour remain the fallback fields.
 NO-4's only luminous scenery accents are the two stock Moon Wells; no wisp
 or extra point light is added. The existing silver key (236, 246, 232) and
 teal fill (136, 178, 172) retain their intensity of 1. No new imports.
-The #287 batch must establish the three-mode draw, aurora bloom, rubric,
+The #287 batch must establish the draw, aurora bloom, rubric,
 fighter contrast and frame cost before #294 closes.
 
 ### Not yet measured on 3.0
 
 - 3.0 fog: height fog, `MaxLinearDensity`, `DrawOverSky` and styles 3–5.
 - `BlzShowTerrain(false)` at both camera extremes (the #191 batch).
-- The HD draw of stock scenery, and the Classic draw of everything (no
+- The Classic draw of everything (no
   capture names its mode).
-- Shadows under authored lights; the tech-contact omni light; depth of field;
-  point-light shadows.
+- Shadows under authored lights; the tech-contact omni light.
 
 ## Per-stage recommendations
 
@@ -719,7 +641,7 @@ right. Re-capture the stock/mask/stage triple after every change.
 | Gryphon Aerie (11) | 255, 248, 226 / 164, 182, 220 | authored | no mask capture | Capture; *(guess)* its pale cloud field behaves like Frozen Throne |
 | Blackrock (12) | 255, 216, 176 / 170, 124, 112 | authored | stock and stage failed | Capture; lowest #178 ΔE00 (21.2), so check it first |
 | Ahn'Qiraj (13) | 230, 236, 255 / 150, 162, 204 at intensity 0.3 (approved #267) | authored | At intensity 1, the former warm key reduced contrast (abs ΔL 33.5 → 22.9, 14.6 → 3.8) | Use #267's cool-key comparisons; the frozen #287 table below predates that fix |
-| Hellfire (14) | 255, 222, 224 / 192, 240, 160 at intensity 1.25 (#293) | authored | at 1, far abs ΔL 5.3 and 5.0 | Classic passes; Definitive stock capture lacks the HD RaysOfLight texture |
+| Hellfire (14) | 255, 222, 224 / 192, 240, 160 at intensity 1.25 (#293) | authored | at 1, far abs ΔL 5.3 and 5.0 | Classic passes |
 
 The other levers, for every stage:
 
@@ -728,15 +650,15 @@ The other levers, for every stage:
   stage only when those captures show the bases fade and fighter contrast
   holds.
 - **Sky**: keep the authored spheres and Nordrassil's FelwoodSky; they draw
-  in every mode. Don't use HD-only stock skies.
-- **Materials**: keep stock scenery paths so HD clients draw the PBR copies;
-  imported decks, skies and fighters stay SD in every mode. Capture one
-  stage in Classic and Reforged before claiming either draw.
+  in Classic. Don't use stock skies with no Classic copy.
+- **Materials**: keep stock scenery paths so Classic draws its installed copies;
+  imported decks, skies and fighters keep classic materials. Capture one
+  stage in Classic before claiming the draw.
 - **Per object**: hit and contact readability comes from effect models,
   colour and alpha (#82); measure the tech-contact light with `-dev effects
-  12` in HD before adding lights elsewhere.
+  12` before adding lights elsewhere.
 - **Not used**: weather and ubersplats (below the arena or on hidden
-  terrain), HD water (no terrain water), cinematic filter and depth of field
+  terrain), water (no terrain water) and the cinematic filter
   (whole-screen, can't separate fighters from backdrop *(guess)*).
 
 ## White body flash: can the engine do it? (#308)
@@ -771,26 +693,26 @@ draws model files only, ignores material alpha, and models neither buffs
 nor player-colour textures, so brightness is computed from the blend rules
 and left to the native plan.
 
-| Candidate | Classic / Reforged / Definitive | On and off on the frame | How white | Side effects | Cost | Verdict |
-| --- | --- | --- | --- | --- | --- | --- |
-| `SetUnitVertexColor`, `BlzSetSpecialEffectColor`, `UNIT_IF_TINTING_COLOR_*` | all | yes | none: multiplies by at most 1 | none | none | no. Values above 255 are a native question (step 4 below) *(guess: stored as a byte, so they wrap)* |
-| `BlzSetSpecialEffectAlpha` | all | yes | none: fades only | none | none | no |
-| Ethereal: `Aetl` added and removed, or Banish `AHbn` cast by a hidden dummy | units only; Classic draws a translucent tinted ghost *(guess: greenish, not white)*; HD Spirit Walker uses a separate ethereal model, so the HD look is unknown | `Aetl` add and remove *(guess: same frame)*; Banish needs an order and a cast, so at least a frame late on, and removing its buff is immediate | unmeasured; no constant or vertex colour can push a tint past 1 | ethereal flags (no attacks, physical immunity, ×1.66 magic damage) on a Warcraft unit the sim ignores; Banish plays its buff art and sound | the body must be a unit, which can't seek to an exact pose, or a unit copy, which is the copy again | no |
-| Invulnerability (`SetUnitInvulnerable`, `Avul`), Divine Shield `AHds` | all | Avul yes; Divine Shield is a cast | none: Avul has no look (bodies already call `SetUnitInvulnerable(true)`); Divine Shield attaches a gold bubble model, not a white body | Divine Shield art and sound | units only | no |
-| Hero glow (`AllowHeroGlowOnUnit`), team glow (`BlzShowUnitTeamGlow`) | all | yes | none: a coloured decal under the unit, not on the body | none | units only | no |
-| Skins: `BlzSetUnitSkin`, `BlzCreateUnitWithSkin` | all | swap is immediate *(guess: restarts the animation)* | only as white as the swapped-in model; no stock fighter has a white model | units only | the white model must still ship | no |
-| Cinematic filter, model omni lights, map post-processing | all; lights HD only | filter yes; post-processing is per map | the filter covers the whole screen; a light brightens everything near it, not one body | — | — | no |
-| Second timeline in the body model: a white layer keyed visible on a mirrored half (t + T), or an alternate sequence picked with `BlzSpecialEffectAddSubAnimation` | all | yes: same effect, same time seek | as the copy, or whiter | none | every bone and helper key twice again (97% of the copies' bytes), so it saves at most about 1 MB (mesh and white textures); three flash levels need three halves | no |
-| **Player-colour overlay**: one unshaded Additive layer on each body material whose texture is replaceable ID 2 (team glow); the map imports ReplaceableTextures\TeamGlow files that are black for the slot colours and grey 220, 100, 190 for three unused colours, and a white TeamColor file for those three. Flash on: `BlzSetSpecialEffectColorByPlayer(body, Player(q))` for the level's player q; off: `Player(slot)` | Classic expected; Reforged and Definitive unknown: whether HD honours imported team-colour textures on a classic-material model | expected yes: the call sets the effect's own state, as alpha does | `min(255, B + g)`: at g = 220 every pixel reaches at least the copy's 234 for B = 100, and saturates to 255 for B ≥ 35 | team-colour patches turn white during a flash (wanted); stock team-glow cards on bodies go dark unless baked to fixed textures; alpha-cutout geometry (hair, cloth fringes) shows solid overlay unless the layer skips those materials; slot colours on the HUD and cards are unaffected (they use TeamColor files, not TeamGlow) | removes 19.31 MB; adds one layer per body material (the 21 models' materials are 0.06 MB raw in all) and about ten tiny textures; one extra additive pass over each visible body all the time | **test natively** |
+| Candidate | On and off on the frame | How white | Side effects | Cost | Verdict |
+| --- | --- | --- | --- | --- | --- |
+| `SetUnitVertexColor`, `BlzSetSpecialEffectColor`, `UNIT_IF_TINTING_COLOR_*` | yes | none: multiplies by at most 1 | none | none | no. Values above 255 are a native question (step 4 below) *(guess: stored as a byte, so they wrap)* |
+| `BlzSetSpecialEffectAlpha` | yes | none: fades only | none | none | no |
+| Ethereal: `Aetl` added and removed, or Banish `AHbn` cast by a hidden dummy | `Aetl` add and remove *(guess: same frame)*; Banish needs an order and a cast, so at least a frame late on, and removing its buff is immediate | unmeasured; Classic draws a translucent tinted ghost *(guess: greenish, not white)*; no constant or vertex colour can push a tint past 1 | ethereal flags (no attacks, physical immunity, ×1.66 magic damage) on a Warcraft unit the sim ignores; Banish plays its buff art and sound | the body must be a unit, which can't seek to an exact pose, or a unit copy, which is the copy again | no |
+| Invulnerability (`SetUnitInvulnerable`, `Avul`), Divine Shield `AHds` | Avul yes; Divine Shield is a cast | none: Avul has no look (bodies already call `SetUnitInvulnerable(true)`); Divine Shield attaches a gold bubble model, not a white body | Divine Shield art and sound | units only | no |
+| Hero glow (`AllowHeroGlowOnUnit`), team glow (`BlzShowUnitTeamGlow`) | yes | none: a coloured decal under the unit, not on the body | none | units only | no |
+| Skins: `BlzSetUnitSkin`, `BlzCreateUnitWithSkin` | swap is immediate *(guess: restarts the animation)* | only as white as the swapped-in model; no stock fighter has a white model | units only | the white model must still ship | no |
+| Cinematic filter, model omni lights, map post-processing | filter yes; post-processing is per map | the filter covers the whole screen; a light brightens everything near it, not one body | — | — | no |
+| Second timeline in the body model: a white layer keyed visible on a mirrored half (t + T), or an alternate sequence picked with `BlzSpecialEffectAddSubAnimation` | yes: same effect, same time seek | as the copy, or whiter | none | every bone and helper key twice again (97% of the copies' bytes), so it saves at most about 1 MB (mesh and white textures); three flash levels need three halves | no |
+| **Player-colour overlay**: one unshaded Additive layer on each body material whose texture is replaceable ID 2 (team glow); the map imports ReplaceableTextures\TeamGlow files that are black for the slot colours and grey 220, 100, 190 for three unused colours, and a white TeamColor file for those three. Flash on: `BlzSetSpecialEffectColorByPlayer(body, Player(q))` for the level's player q; off: `Player(slot)` | expected yes: the call sets the effect's own state, as alpha does | `min(255, B + g)`: at g = 220 every pixel reaches at least the copy's 234 for B = 100, and saturates to 255 for B ≥ 35 | team-colour patches turn white during a flash (wanted); stock team-glow cards on bodies go dark unless baked to fixed textures; alpha-cutout geometry (hair, cloth fringes) shows solid overlay unless the layer skips those materials; slot colours on the HUD and cards are unaffected (they use TeamColor files, not TeamGlow) | removes 19.31 MB; adds one layer per body material (the 21 models' materials are 0.06 MB raw in all) and about ten tiny textures; one extra additive pass over each visible body all the time | **test natively** |
 
 **Recommendation: keep the copies, and test the player-colour overlay
 natively.** No engine feature, buff or native brightens a body to white:
 everything Warcraft offers multiplies or fades, belongs to units the
 fighters aren't, or lands off the frame. The one candidate that can replace
 the copies is a model change driven by the effect's player colour. If one
-native capture in each of the three modes shows it on and off on the frame
-and at least as white as the copy, it replaces the white models; if HD
-ignores the imported textures, keep the copies, trimmed to flashable poses
+native Classic capture shows it on and off on the frame
+and at least as white as the copy, it replaces the white models; if it
+fails, keep the copies, trimmed to flashable poses
 ([map size](map-size.md)). The capture plan is on #308.
 
 ## Effect budget (#380)
@@ -820,26 +742,17 @@ therefore park with `parkCue`, which runs their clock at
 within the fade. A slow stock spell plays faster while shown through the
 cue's `timeScale` (Flames of Azzinoth 2, Rain of Fire 1.5).
 
-`bun wisp view cues [--move FIGHTER:MOVE]... [--graphics classic|definitive]`
+`bun wisp view cues [--move FIGHTER:MOVE]...`
 (ts/scripts/wisp/cueBudget.ts) plays every attack cue and special through the
 real simulation and cue/projectile renderers, renders each frame's effects
 alone in Wisp, counts pixels differing from an empty frame, adds parked
 particle tails from the classic model's emitter lifespans, and fails any move
-over budget. Definitive pixels undercount: Wisp cannot draw Popcorn emitters,
-which 110 of 112 moves use there, so the Definitive rows rely on the particle
-tails and the Classic coverage. The ten cue models Definitive draws only as
-Popcorn (`DEFINITIVE_CUE_EMITTERS`) run without clock controls and are born
-per cast and destroyed a second later; they now park when their window ends,
-and their Popcorn particle lives stay unmeasured. A Popcorn emitter draws
-nothing on its birth frame, so an attack cue may start earlier in Definitive
-(`definitiveFromActive`): Flames of Azzinoth is FireLordDeathExplode born on
-active frame 1 instead of 3, and on clone-c it drew 6,883 / 4,945 / 3,781 new
-fire pixels at frames 72 / 74 / 76 against Classic's 2,724 / 4,415 / 4,846.
+over budget.
 
 The check also plays Blademaster's forward smash strong and weak hit through
 the real impact renderer (rows `blademaster:forwardSmash-strong-spark` and
 `-weak-spark`) and adds the spark's mean drawn colour, damage, hitlag and hit
-sound. On 10 Oct 2026, both looks: strong 18.1%, 12 hitlag frames on both
+sound. On 10 Oct 2026: strong 18.1%, 12 hitlag frames on both
 bodies, MetalHeavySlice at volume 127, gold star covering 0.6-0.7% for 7-8
 frames; weak 14.3%, 7 hitlag frames, MetalLightSlice at 110, white-blue star
 covering 0.2% for 7 frames. Both sit well inside the 4% and 12-frame limits.
@@ -855,14 +768,8 @@ down, 8.3% to 2.9%), Chain Lightning 0.5 (Thrall, 11.6% to 3.0%), Frost Nova
 
 The check also plays a meter drop (#385) as `meter-drop:telegraph-and-orb`:
 three seconds of telegraph, then the orb, measured for coverage only (a drop
-stays until taken). Definitive draws the drop with mesh models Wisp can render,
-since its MassTeleportTarget and FrostWyrmMissile are Popcorn only there. On
-10 Oct 2026, near camera at 640x360, Classic marker (MassTeleportTarget, 0.45)
-0.81% and orb (FrostWyrmMissile, 0.8) 1.20%; Definitive marker (AneuTarget's
-arrow, 2.5) 0.89% and orb (the Rune item, 2.0) 1.12%. Definitive variants
-tried: GlowingRunes (Popcorn, undrawn) with Rune 1.0 (0.25%), AneuTarget 1.5
-(0.33%) with Rune 2.0 (1.03%), and SelectionCircle 2.0 (0.04%) with Rune 1.5
-(0.61%).
+stays until taken). On 10 Oct 2026, near camera at 640x360, Classic marker
+(MassTeleportTarget, 0.45) 0.81% and orb (FrostWyrmMissile, 0.8) 1.20%.
 
 ## How the numbers are taken
 
@@ -888,7 +795,6 @@ particle emitters. Wait 13 seconds before capturing the mask: the stage snow's
 longest authored particle lifetime is 12 seconds. Restore with
 `-dev backdrop on`; switch only the light while the fighters stay paused.
 Use one mask for the stock/stage pair, keeping sky, fog, camera and pose fixed.
-An actual Classic and Definitive draw is needed for the asset fallback claim.
 
 ### Unpaused comparison with shadows and post-processing
 
@@ -899,8 +805,8 @@ the same near/far camera and fighter pose. Both clients receive the view
 and lighting commands. There is no pause menu over the scene.
 
 The requested look is `day-night-light,fog,sky,shadows,point-lights,pbr,`
-`point-light-shadows,ambient-occlusion,bloom`. Both modes draw sun shadows;
-Definitive records ambient occlusion and bloom on. Water and height-fog
+`point-light-shadows,ambient-occlusion,bloom`. Classic draws sun shadows.
+Water and height-fog
 falloff remain outside this renderer's supported look. Terrain is hidden
 on these stages. Frozen's masks use `18868a54` (the same baseline source
 with the landed `4354a6e1d` snow-parking fix), retaining every stock and
@@ -909,36 +815,22 @@ stage frame. Its parked snow no longer reaches any arena camera.
 Each cell is stock → stage **|ΔL| / ΔE00**, measured with
 `tools/stage/contrast.ts`. Client 0 is 1920×1080; client 1 is 2560×1080.
 
-| Stage / mode | Near / client 0 | Near / client 1 | Far / client 0 | Far / client 1 | Drawing result |
+| Stage | Near / client 0 | Near / client 1 | Far / client 0 | Far / client 1 | Drawing result |
 | --- | --- | --- | --- | --- | --- |
-| Sky Deck / Classic | 2.7 / 11.5 → 8.3 / 13.8 | 4.3 / 11.9 → 9.7 / 14.6 | 1.5 / 9.3 → 10.1 / 13.3 | 10.5 / 12.7 → 2.1 / 7.6 | captured |
-| Sky Deck / Definitive | 7.8 / 14.6 → 12.1 / 16.9 | 11.8 / 17.3 → 16.2 / 19.9 | 7.0 / 12.4 → 16.3 / 18.5 | 8.6 / 13.3 → 5.4 / 10.6 | captured |
-| Frozen Throne / Classic | 3.1 / 8.9 → 5.6 / 9.6 | 4.2 / 9.2 → 6.8 / 10.2 | 6.3 / 9.5 → 9.3 / 11.3 | 5.3 / 8.5 → 8.9 / 10.6 | captured |
-| Frozen Throne / Definitive | 9.2 / 11.3 → 12.7 / 13.6 | 13.7 / 14.0 → 16.6 / 16.2 | 9.9 / 11.9 → 15.3 / 15.6 | 8.7 / 10.8 → 15.0 / 15.6 | IceTorch particles not drawn |
-| Durotar / Classic | 4.1 / 31.7 → 1.5 / 31.1 | 5.1 / 31.6 → 0.5 / 30.8 | 3.9 / 26.5 → 4.4 / 24.8 | 7.1 / 26.4 → 18.3 / 27.4 | captured |
-| Durotar / Definitive | 8.0 / 31.6 → 7.6 / 31.5 | 11.3 / 31.6 → 11.2 / 31.6 | 7.8 / 27.4 → 7.2 / 26.8 | 8.0 / 24.6 → 10.1 / 25.0 | captured |
-| Naxxramas / Classic | 10.9 / 17.5 → 14.0 / 18.9 | 11.4 / 17.5 → 14.4 / 18.9 | 11.5 / 17.2 → 16.2 / 20.3 | 3.6 / 13.5 → 10.5 / 17.2 | captured |
-| Naxxramas / Definitive | 13.4 / 16.8 → 15.7 / 17.3 | 15.6 / 17.6 → 17.3 / 17.8 | 12.3 / 17.6 → 19.8 / 21.5 | 0.2 / 16.1 → 12.7 / 17.9 | Necropolis particles not drawn |
-| Stratholme / Classic | 4.6 / 22.9 → 7.4 / 23.2 | 3.8 / 22.7 → 6.6 / 22.9 | 5.8 / 18.4 → 10.5 / 19.3 | 19.5 / 31.4 → 12.7 / 26.3 | captured |
-| Stratholme / Definitive | not captured | not captured | not captured | not captured | RaysOfLight texture missing |
-| Tomb of Sargeras / Classic | 6.0 / 23.0 → 10.0 / 23.6 | 6.2 / 23.5 → 10.1 / 24.2 | 1.8 / 23.9 → 7.7 / 24.0 | 7.2 / 20.4 → 1.9 / 16.6 | captured; Hydra facts missing at this source |
-| Tomb of Sargeras / Definitive | 11.1 / 25.2 → 15.0 / 26.7 | 12.3 / 27.2 → 16.4 / 28.7 | 3.8 / 25.7 → 13.0 / 27.2 | 5.2 / 21.3 → 6.8 / 18.5 | captured; Hydra facts missing at this source |
-| Nordrassil / Classic | 21.8 / 32.9 → 26.1 / 34.0 | 21.1 / 33.2 → 25.3 / 34.2 | 5.5 / 28.2 → 1.0 / 26.1 | 3.6 / 24.8 → 5.7 / 22.5 | captured |
-| Nordrassil / Definitive | not captured | not captured | not captured | not captured | RaysOfLight texture missing |
-| Gryphon Aerie / Classic | 2.4 / 18.6 → 4.0 / 19.1 | 4.9 / 18.8 → 1.5 / 18.5 | 3.5 / 16.7 → 13.3 / 21.1 | 11.9 / 16.9 → 25.2 / 25.4 | captured |
-| Gryphon Aerie / Definitive | 9.7 / 21.5 → 8.8 / 21.2 | 14.5 / 24.6 → 13.9 / 24.3 | 3.0 / 19.0 → 1.5 / 18.9 | 9.2 / 16.9 → 14.8 / 18.8 | captured |
-| Blackrock / Classic | 9.2 / 25.8 → 13.0 / 25.7 | 11.1 / 25.9 → 14.8 / 26.0 | 5.8 / 15.8 → 12.0 / 14.9 | 4.5 / 13.1 → 12.4 / 11.8 | captured |
-| Blackrock / Definitive | 9.4 / 26.2 → 13.1 / 26.6 | 12.6 / 26.4 → 16.5 / 27.0 | 2.4 / 10.6 → 1.6 / 9.2 | 4.4 / 10.8 → 2.9 / 8.2 | FireTrapUp / FirePillarMedium particles not drawn |
-| Ahn'Qiraj / Classic | 4.2 / 30.7 → 2.2 / 29.4 | 5.5 / 30.6 → 3.4 / 29.3 | 2.2 / 28.2 → 4.9 / 25.5 | 13.0 / 28.9 → 16.4 / 26.5 | captured |
-| Ahn'Qiraj / Definitive | 11.1 / 32.2 → 12.3 / 32.3 | 14.4 / 33.1 → 15.8 / 33.4 | 3.6 / 29.9 → 6.6 / 28.9 | 12.1 / 28.2 → 8.0 / 24.9 | captured |
-| Hellfire / Classic | 10.1 / 32.4 → 13.8 / 32.3 | 12.4 / 32.5 → 15.9 / 32.6 | 5.3 / 28.9 → 11.3 / 27.3 | 5.0 / 26.9 → 13.5 / 26.7 | captured |
-| Hellfire / Definitive | not captured | not captured | not captured | not captured | RaysOfLight texture missing |
+| Sky Deck | 2.7 / 11.5 → 8.3 / 13.8 | 4.3 / 11.9 → 9.7 / 14.6 | 1.5 / 9.3 → 10.1 / 13.3 | 10.5 / 12.7 → 2.1 / 7.6 | captured |
+| Frozen Throne | 3.1 / 8.9 → 5.6 / 9.6 | 4.2 / 9.2 → 6.8 / 10.2 | 6.3 / 9.5 → 9.3 / 11.3 | 5.3 / 8.5 → 8.9 / 10.6 | captured |
+| Durotar | 4.1 / 31.7 → 1.5 / 31.1 | 5.1 / 31.6 → 0.5 / 30.8 | 3.9 / 26.5 → 4.4 / 24.8 | 7.1 / 26.4 → 18.3 / 27.4 | captured |
+| Naxxramas | 10.9 / 17.5 → 14.0 / 18.9 | 11.4 / 17.5 → 14.4 / 18.9 | 11.5 / 17.2 → 16.2 / 20.3 | 3.6 / 13.5 → 10.5 / 17.2 | captured |
+| Stratholme | 4.6 / 22.9 → 7.4 / 23.2 | 3.8 / 22.7 → 6.6 / 22.9 | 5.8 / 18.4 → 10.5 / 19.3 | 19.5 / 31.4 → 12.7 / 26.3 | captured |
+| Tomb of Sargeras | 6.0 / 23.0 → 10.0 / 23.6 | 6.2 / 23.5 → 10.1 / 24.2 | 1.8 / 23.9 → 7.7 / 24.0 | 7.2 / 20.4 → 1.9 / 16.6 | captured; Hydra facts missing at this source |
+| Nordrassil | 21.8 / 32.9 → 26.1 / 34.0 | 21.1 / 33.2 → 25.3 / 34.2 | 5.5 / 28.2 → 1.0 / 26.1 | 3.6 / 24.8 → 5.7 / 22.5 | captured |
+| Gryphon Aerie | 2.4 / 18.6 → 4.0 / 19.1 | 4.9 / 18.8 → 1.5 / 18.5 | 3.5 / 16.7 → 13.3 / 21.1 | 11.9 / 16.9 → 25.2 / 25.4 | captured |
+| Blackrock | 9.2 / 25.8 → 13.0 / 25.7 | 11.1 / 25.9 → 14.8 / 26.0 | 5.8 / 15.8 → 12.0 / 14.9 | 4.5 / 13.1 → 12.4 / 11.8 | captured |
+| Ahn'Qiraj | 4.2 / 30.7 → 2.2 / 29.4 | 5.5 / 30.6 → 3.4 / 29.3 | 2.2 / 28.2 → 4.9 / 25.5 | 13.0 / 28.9 → 16.4 / 26.5 | captured |
+| Hellfire | 10.1 / 32.4 → 13.8 / 32.3 | 12.4 / 32.5 → 15.9 / 32.6 | 5.3 / 28.9 → 11.3 / 27.3 | 5.0 / 26.9 → 13.5 / 26.7 | captured |
 
-45 of 76 measured rows keep both contrast values at reported precision;
-31 fall, and 12 rows cannot be measured because the texture failure
-prevented a stock or stage image. The drawing failures preserve their saved
-scene and error log. Particle omissions and missing textures require a
-complete Definitive reference before #287's full capture box can pass.
+25 of 44 measured rows keep both contrast values at reported precision;
+19 fall.
 
 The mask deliberately hides decks, so its ordinary match scene check still
 reports missing decks; this is not an ordinary match pass. The frozen Tomb
@@ -949,7 +841,7 @@ workers' later lighting and composition fixes have their own comparisons.
 ### 3.0.1 headless comparison reference
 
 The earlier #287 producer at Smashcraft `5e8ef374` and Wisp `9b821201` uses
-Warcraft 3.0.1.24342 assets, Classic and Definitive, and separate stock/mask/stage
+Warcraft 3.0.1.24342 assets in Classic, and separate stock/mask/stage
 journeys drawn at frame 410. It pauses at frame 345 (holding match frame 315)
 and fixes the near or far camera before the pause. These views differ from
 the earlier `view off` comparisons. `--look day-night-light,fog,sky` records
@@ -967,12 +859,8 @@ Hellfire's saved reference for both clients, measured with
 | --- | --- | --- | --- |
 | Classic / near / 0 | 5.4 / 9.4 | 5.6 / 9.3 | no |
 | Classic / far / 0 | 5.3 / 8.6 | 6.1 / 8.2 | no |
-| Definitive / near / 0 | 5.2 / 7.6 | 6.2 / 7.4 | no |
-| Definitive / far / 0 | 4.5 / 3.9 | 5.3 / 4.0 | yes |
 | Classic / near / 1 | 4.7 / 9.8 | 5.0 / 9.8 | yes |
 | Classic / far / 1 | 5.5 / 8.1 | 6.6 / 8.5 | yes |
-| Definitive / near / 1 | 5.2 / 7.2 | 6.3 / 7.0 | no |
-| Definitive / far / 1 | 4.3 / 2.7 | 4.3 / 2.7 | yes |
 
 Wisp deliberately models different screen widths: client 0 uses 1920×1080,
 client 1 uses 2560×1080 (wisp:src/headless/lockstep.ts). Both receive chat
@@ -990,10 +878,6 @@ Ahn'Qiraj at the same frozen build, before the fighter-only tint correction:
 | Classic / far / 0 | 2.6 / 7.8 | 1.3 / 7.4 | no |
 | Classic / near / 1 | 4.1 / 8.5 | 3.6 / 8.7 | no |
 | Classic / far / 1 | 1.2 / 6.4 | 0.3 / 5.7 | no |
-| Definitive / near / 0 | 3.3 / 7.0 | 3.5 / 6.7 | no |
-| Definitive / far / 0 | 2.7 / 3.7 | 3.0 / 3.6 | no |
-| Definitive / near / 1 | 3.6 / 6.8 | 4.0 / 6.6 | no |
-| Definitive / far / 1 | 5.2 / 3.4 | 5.1 / 3.4 | no |
 
 Blackrock at the same build, before the right-crag placement correction:
 
@@ -1003,10 +887,6 @@ Blackrock at the same build, before the right-crag placement correction:
 | Classic / far / 0 | 16.3 / 14.9 | 17.6 / 16.1 | yes |
 | Classic / near / 1 | 5.4 / 8.1 | 5.1 / 8.2 | no |
 | Classic / far / 1 | 14.9 / 15.2 | 16.7 / 16.8 | yes |
-| Definitive / near / 0 | 4.2 / 6.2 | 5.2 / 6.0 | no |
-| Definitive / far / 0 | 5.1 / 3.9 | 6.7 / 6.0 | yes |
-| Definitive / near / 1 | 4.8 / 5.9 | 5.8 / 6.0 | yes |
-| Definitive / far / 1 | 5.6 / 6.4 | 7.9 / 9.3 | yes |
 
 Sky Deck's control at the same build:
 
@@ -1016,10 +896,6 @@ Sky Deck's control at the same build:
 | Classic / far / 0 | 3.2 / 3.6 | 4.2 / 3.5 | no |
 | Classic / near / 1 | 3.7 / 6.0 | 4.1 / 5.9 | no |
 | Classic / far / 1 | 1.6 / 2.8 | 3.1 / 2.7 | no |
-| Definitive / near / 0 | 3.2 / 5.0 | 4.4 / 4.9 | no |
-| Definitive / far / 0 | 3.7 / 2.8 | 4.5 / 3.2 | yes |
-| Definitive / near / 1 | 3.8 / 4.7 | 4.9 / 4.7 | yes |
-| Definitive / far / 1 | 4.2 / 2.8 | 4.2 / 2.8 | yes |
 
 Frozen Throne at the same build:
 
@@ -1029,28 +905,19 @@ Frozen Throne at the same build:
 | Classic / far / 0 | 4.5 / 5.2 | 4.8 / 5.3 | yes |
 | Classic / near / 1 | 3.7 / 6.2 | 3.8 / 6.1 | no |
 | Classic / far / 1 | 4.6 / 5.0 | 4.9 / 5.0 | yes |
-| Definitive / near / 0 | 3.7 / 5.3 | 4.5 / 5.3 | yes |
-| Definitive / near / 1 | 4.0 / 5.0 | 4.9 / 5.0 | yes |
-| Definitive / far / 0 | render timed out | 2.9 / 2.2 | not graded |
-| Definitive / far / 1 | render timed out | 4.5 / 3.1 | not graded |
-
-Three concurrent Definitive renders reached Wisp's two-minute render limit.
-Serializing only the failed cases recovered the near stock and stage frames;
-far stock still timed out. Preserve the passed frames and repair that render
-path before grading the far pair.
 
 The shared stage batch keeps the original `170-*` contrast checks and `191-*`
 camera extremes in one hosted game. `192-*-linear|height` retains the same
 paused far view before and after a 3.0 height-fog candidate; its values remain
 development-only until those native captures establish how the height range
-fades the prop bases. Run it in Classic and Reforged and record the per-stage
+fades the prop bases. Run it in Classic and record the per-stage
 result rather than inferring drawing from native calls.
 
 The authored tech-contact spark retains its additive SD geometry and adds a
 small blue omni light, radius 320, fading from intensity 0.55 to zero in 180 ms.
 It is part of the same pooled model, so parking the spark also parks its light.
-HD modes can draw that contact light through their point-light renderer;
-Classic retains the spark geometry. Compare `-dev effects 12` at the same
+Classic draws the spark geometry and not that light.
+Compare `-dev effects 12` at the same
 50 ms capture intervals in the retained unlit and lit maps before claiming
 improved contact readability. The model adds no script calls per frame.
 
@@ -1076,43 +943,12 @@ against the existing right-third ruined cathedral: the stock
 `LordaeronFallSky` and a brighter horizon (168, 84, 52) put the far-view
 backdrop near L* 34, too close to the fighters. The stage key and fill run at
 intensity 1.2. The dusk fog stays at
-5,000–11,000 with RGB (0.5, 0.28125, 0.1875). A destroyed Androhal clock tower
-in the far city band adds a stock HD silhouette; Classic keeps the cathedral,
-gate and ruined halls because the tower has no Classic copy.
+5,000–11,000 with RGB (0.5, 0.28125, 0.1875). The far city band keeps the
+cathedral, gate and ruined halls; the destroyed Androhal clock tower has no
+Classic copy and is not used.
 
 ST-1 places two warm omni lights on the existing town fires, with radii 1,100
 and 900; both stop at least 1,550 units behind the fighting band. Their slow
 1,600/2,100 ms loops follow stage-art rule 8. One casts shadows. The models
 reuse Blackrock's two shipped light-only models: zero new imported bytes.
-The native stock tower is 1,428,524 bytes in Reforged storage, not a map import.
 ST-2's roofs and brick surfaces are the separate #276 material work.
-
-## Who sees which mode (patch 3.0.1, Oct 2026)
-
-Which graphics modes each kind of player can select. "Confirmed" means a
-source below states it; "guess" means none does.
-
-- Free Battle.net account: unconfirmed. No source says which modes a free
-  account can select.
-- Classic owner (Reign of Chaos or The Frozen Throne): unconfirmed for
-  Definitive and Reforged. The guess is Classic.
-- Reforged owner: confirmed. Classic, Reforged and Definitive are all
-  selectable. Definitive is free to Reforged owners and needs the 3.0 Reforged
-  client.
-- Forsaken Kingdom owner: confirmed that the campaign needs the purchase and
-  that campaign progress carries across modes. Definitive does not need the
-  purchase. By inference, the selectable modes match a Reforged owner's
-  (guess).
-- Lobbies: confirmed that players on different modes can share a multiplayer
-  game. No source covers custom-map lobbies.
-- Custom maps (guess): a map that uses visuals missing from another mode may
-  look different there or be unusable (Hive Workshop bug list, unverified).
-
-Sources:
-
-- Blizzard's 3.0.0 (Sep 12) and 3.0.1 (Oct 7) patch notes:
-  https://us.forums.blizzard.com/en/warcraft3/t/warcraft-iii-reforged-forsaken-kingdom-patch-notes/38400
-- Outputlag (Sep 12):
-  https://outputlag.com/news/warcraft-iii-reforgeds-definitive-edition-graphics-mode-is-free-for-reforged-owners/
-- Master of Warcraft (Sep 16):
-  https://www.masterofwarcraft.net/2026/09/warcraft-3-patch-3-0-forsaken-kingdom-campaign.html

@@ -686,8 +686,7 @@ Blender step as `blender --background --python-exit-code 1 --python FILE`:
 6. `bun tools/animations/package-illidan.ts` encodes the model and regenerates
    smashcraft:ts/src/game/presentation/demonHunterAssetInfo.ts.
 
-smashcraft:ts/scripts/fighterPortraits.ts renders every fighter's Classic and
-Definitive portraits into `PRIVATE_OUTPUT/fighter-renders/`
+smashcraft:ts/scripts/fighterPortraits.ts renders every fighter's portraits into `PRIVATE_OUTPUT/fighter-renders/`
 (smashcraft:docs/design/fighter-portraits.md), and
 smashcraft:tools/selection/build-art.ts renders the selection and HUD textures
 from smashcraft:tools/selection/art/ into smashcraft:build/selection-assets/,

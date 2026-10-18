@@ -32,7 +32,7 @@ ice floe, its top on the walking line, with nothing hung beneath it: the
 Icecrown rock and saronite rubble #290 hung under each floe read as grey rock
 in Classic and were removed (Tom's 0.0.192 playtest, finding #9 in #563).
 All three use North_IceFloe3 at yaw 0 or 180, the only floe and turn that
-spans the deck in both classic and HD, squashed to 0.19 of its height. Under
+spans the deck, squashed to 0.19 of its height. Under
 the side decks everything stays within 25 units of the walking line, above a
 standing fighter's head. Imports: none.
 
@@ -42,9 +42,7 @@ Measured on 8 Oct 2026 with headless renders of Frozen Throne at the near
 (frame 160) and far (frame 260) camera extremes, the method of
 smashcraft:evidence/stages191-20261008/result.md; raw record in
 smashcraft:evidence/platforms290-20261008/result.md. Byte costs are the
-classic model files in Warcraft 3.0.1's CASC storage; Reforged and
-Definitive sizes are their `_hd.w3mod` / `_de.w3mod` files, which the
-extractor returned with identical bytes for every model below.
+classic model files in Warcraft 3.0.1's CASC storage.
 
 | Technique | Render (private) | Map bytes | Limits | Suits |
 | --- | --- | --- | --- | --- |
@@ -55,26 +53,13 @@ extractor returned with identical bytes for every model below.
 | Replaceable-texture swap on a stock model | `t3` (top platform) | 4,840 B (RoughCliffDoodadCollapse0 copied with its cliff slot pointed at `TerrainArt\Icecrown\Ice_Cliff1`) | A special effect can't set a model's replaceable texture, and destructables, which can, stand on the ground, not at arena height. So the swap is a copied classic model with the texture path changed: a few KB, but it draws the classic file in every mode (no HD materials) and the renderer can't show replaceable-texture slot 11 on an unmodified model. | Stone or cliff-bodied decks: Blackrock basalt, Qiraji sandstone, Scourge stone (each tileset's `*_Cliff0/1`) |
 | Cliff and terrain pieces | `t3` | 4,840 B (same copy) | Cliff doodads are one-sided: they show only from their front, so the yaw must face the camera (270 here, 90 drew nothing). Unmodified they take the map's cliff texture through slot 11. | Thick-bodied platforms and ledges |
 | Stock materials matched to the theme | `final` | 0 | Picking from what exists: Icecrown has ice (Ice_Natural01, NorthrendNatural03) and saronite-dark structure textures (Ice_Strucures); a theme with no stock material needs a swap above. | Every stage: [stage-art](stage-art.md) rule 10's themes |
-| A stock bridge as a platform | `t2` (left) | 0 | IceBridge (18,916 B classic, 1,052,218 B HD) turned a quarter and scaled 0.3: its railings and dark end faces make it read as a box from the arena camera; rejected for Frozen Throne. | A stage that wants a walkway with rails (Stratholme, Durotar's timber) |
+| A stock bridge as a platform | `t2` (left) | 0 | IceBridge (18,916 B) turned a quarter and scaled 0.3: its railings and dark end faces make it read as a box from the arena camera; rejected for Frozen Throne. | A stage that wants a walkway with rails (Stratholme, Durotar's timber) |
 
-## Classic, Reforged and Definitive
+## Classic models
 
-- Stock paths resolve per mode: Classic draws the classic file, Reforged and
-  Definitive the HD file at the same path, with diffuse, normal and ORM
-  textures (Ice_Rock0: 3,460 B classic, 113,210 B HD). These cost the map
-  nothing in any mode.
-- HD geometry can differ a lot. Ice_Rock0's HD top is z 121 against classic
-  107, Icecrown_Rubble0's 82 against 79. The HD floes are lumpy icebergs, not
-  flat floes: North_IceFloe3 is z -76 to 61 in HD against -22 to 31 classic,
-  and North_IceFloe2's HD long axis is y, not x (x -115 to 29). At its #290
-  scale the HD floe stood 22 units above the walking line and hung 90 below,
-  into the fighters' space under the side decks (#322). Their files carry a
-  camera chunk the `war3-model` decoder can't read, so the test keeps their
-  MODL extents, read straight from the `_hd.w3mod` files, beside the
-  classic model facts.
-- A copied (swapped) model draws its classic geometry and classic texture in
-  every mode, so it looks flatter beside HD stock parts.
-- The headless renderer draws classic models only.
+Smashcraft draws the classic stock files, which cost the map nothing. A copied
+(swapped) model draws its classic geometry and classic texture. The headless
+renderer draws classic models only.
 
 ## Choosing for a stage
 

@@ -19,10 +19,9 @@ comparing common.j across releases ([Luashine/jass-history](https://github.com/L
 is the release with new lighting, fog, water and graphics script access;
 2.0.x changed the renderer and assets without new natives.
 
-Graphics modes: 3.0 offers Classic, Reforged and Definitive Edition
-(Definitive replaced 2.0's Classic HD); the player picks, and a map can
-neither read nor choose it ([visual quality](visual-quality.md#the-renderer-is-fixed)).
-"HD" below means Reforged and Definitive.
+Graphics modes: Smashcraft supports Classic only. The player picks the mode and a
+map can neither read nor choose it ([visual quality](visual-quality.md#the-renderer-is-fixed)).
+"HD" below marks features of the HD renderer, which Smashcraft does not target.
 
 ## 3.0.1 (October 2026): renderer and asset corrections
 
@@ -37,8 +36,7 @@ below still apply.
 | Ambient Occlusion option restored | player option; map post-processing configuration | extra graphics cost; capture profiles record AO explicitly |
 | Lordaeron Summer daytime lighting dimmed by 10% | stock day/night models | stock contrast baselines must use 3.0.1; authored models retain their values |
 | Stock spell effects retuned; Brewmaster and Grunt reanimated | existing model paths | captures of those effects and animations must name the client build |
-| `WaterfallNoMist` asset | HD / Definitive model path; no Classic copy | use a Classic stock waterfall when needed; no map-script emitter controls |
-| Definitive portrait animation and lip sync improved | native unit portraits | Smashcraft uses rendered portraits |
+| `WaterfallNoMist` asset | HD model path; no Classic copy | use a Classic stock waterfall when needed; no map-script emitter controls |
 | Imported assets, model paths containing periods, item-light cleanup and editor lighting/post-processing fixes | existing imports and editor fields | removes engine defects; no new per-frame script calls |
 
 ## Smashcraft application by stage
@@ -49,8 +47,8 @@ its scenery modules, and `ts/src/game/assets/stageLighting.ts` /
 fog. Height fog uses `SetTerrainFogExV(3, ...)`, a maximum-density cap and the
 listed draw-over-sky choice. Point lights are model lights, with one shadow
 caster per lit stage; the shell requests that minimum through
-`BlzSetMinShadowCastingPointLightCount`. Classic and Definitive are the
-supported player modes. Stage capture and performance results belong in
+`BlzSetMinShadowCastingPointLightCount`. Classic is the
+supported player mode. Stage capture and performance results belong in
 [#192](https://github.com/tompassarelli/smashcraft/issues/192).
 
 | Stage | Sky | Shipped 3.0 feature application |
@@ -74,8 +72,8 @@ the sky. The shell resets the fog cap, draw-over-sky and shadow-light minimum
 between stages so a previous scene does not leave its settings behind.
 
 Slash contact sparks use the existing authored Hit model with a warm-white
-omni light: radius 380, intensity 0.9 → 0.35 → 0 over 140 ms. This uses 3.0's
-uncapped HD model lights and adds 204 bytes to the existing model, with no
+omni light: radius 380, intensity 0.9 → 0.35 → 0 over 140 ms. This is a light inside the
+existing model and adds 204 bytes to the existing model, with no
 additional file or per-frame script call. The Classic spark geometry is
 retained. Native before/after captures determine the readability improvement;
 the unchanged #168 gate is p99 ≤10 ms and worst ≤14 ms.
@@ -85,7 +83,7 @@ PopcornFX emitters, and fails a render naming unsupported emitters
 ([wisp#83](https://github.com/tompassarelli/wisp/issues/83)). That failure is
 useful evidence of the missing draw; it is not a particle-fidelity pass.
 Height-fog appearance, point-light shadows and the slash light still need
-the corresponding Classic/Definitive captures when no matched native
+the corresponding Classic captures when no matched native
 reference exists.
 
 ## 3.0.0 Forsaken Kingdom (September 2026): the priority features

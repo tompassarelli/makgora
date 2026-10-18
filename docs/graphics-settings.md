@@ -26,7 +26,7 @@ wisp:docs/lan.md ("Profiles"), one active script, one setting changed at a time.
 
 | Setting (`War3Preferences` key) | Values | CPU per client | GPU per client | Visual impact on what Smashcraft reads |
 |---|---|---|---|---|
-| Graphics mode (`[Misc] hd`) | 0 Classic, 1 Reforged, 2 Definitive | Unmeasured | Unmeasured | Load-bearing for visual checks: Reforged/Definitive draw HD fighters, PBR lighting and point lights; Classic loses stage lighting (#170). Parity runs read no pixels. |
+| Graphics mode (`[Misc] hd`) | 0 Classic | Unmeasured | Unmeasured | Smashcraft supports Classic only; Classic loses the HD stage lighting (#170). Parity runs read no pixels. |
 | Window/render size (`reswidth`, `resheight`) | any | Unmeasured | Unmeasured | Load-bearing below 1280×720: the HUD and hit sparks become hard to read. |
 | Frame cap (`maxfps`, `backgroundmaxfps`) | 1–… | Quick idle fixture: 60 fps 106–108%; 40 fps 81% | 60 fps 1.67–1.70%; 40 fps 1.15–1.17% | The simulation is a fixed 60 Hz; above 60 only presentation changes (smashcraft:docs/high-refresh.md). The 40 fps sample has no completed pad-parity or visual-check result; retain the 60 fps default. |
 | Texture quality (`texquality`) | 0–2 | Unmeasured | Unmeasured | Medium (1) keeps fighter detail readable at match zoom. |
@@ -86,13 +86,13 @@ had earlier high-watermark events.
 
 ## Recommended player settings
 
-Smashcraft's own reading needs Reforged or Definitive mode, medium textures,
+Smashcraft's own reading needs Classic mode, medium textures,
 high lighting and vertical sync off; everything else buys scenery, not
 legibility, and can go to its lowest:
 
 | Setting | Recommended |
 |---|---|
-| Graphics mode | Reforged or Definitive |
+| Graphics mode | Classic |
 | Texture quality | Medium |
 | Lighting quality | High |
 | Environment shadows, point-light shadows, foliage, water | Off / lowest |
@@ -104,4 +104,4 @@ legibility, and can go to its lowest:
 each one only when the player's file has no value for it, so a setting the
 player chose is never replaced (wisp:docs/display-settings.md).
 
-`wisp play` explicitly chooses Reforged (`[Misc] hd=1`) and disables Ambient Occlusion (`[Video] assao=0`) on Warcraft 3.0.1. It omits the removed Bloom, Portrait Bloom, Particles and Spells settings. Sound checks name the selected mode: Definitive Edition uses Classic sounds.
+`wisp play` explicitly chooses Reforged (`[Misc] hd=1`) and disables Ambient Occlusion (`[Video] assao=0`) on Warcraft 3.0.1. It omits the removed Bloom, Portrait Bloom, Particles and Spells settings.

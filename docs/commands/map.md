@@ -5,8 +5,8 @@
   names (`--base`, `--container`, `--assets`, `--summon` override one);
   `bun wisp map rebuild MAP.w3x` replaces only its script.
   Both commands resolve every special, attack, contact-accent and projectile
-  cue model in Classic and Definitive through the renderer's real asset resolver.
-  A missing path in either look fails the build before replacing the map.
+  cue model through the renderer's real asset resolver.
+  A missing path fails the build before replacing the map.
   `--profile playable --predict-cost` also writes predicted Lua cost and its
   raw samples beside the map (`.lua-cost.json` and `.lua-cost.perf`); see
   [workflow](workflow.md) for the calibration scope and fixture comparison.

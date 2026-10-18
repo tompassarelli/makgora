@@ -12,7 +12,7 @@
   `view reachcues --assets DIR` rewrites which normals show a reach flare: an
   active hit region more than 0.15 body heights (132 u) past the drawn Classic
   body and weapon swept over the active frames (#481);
-  `view cues [--move FIGHTER:MOVE]... [--graphics classic|definitive]` renders
+  `view cues [--move FIGHTER:MOVE]...` renders
   every attack and special cue in Wisp and fails any move over the effect budget
   (smashcraft:docs/design/visual-quality.md, "Effect budget").
 - Classic effect visibility: `cd ts && bun scripts/wisp/effectVisibility.ts [--storage WC3_INSTALL] [--json] [--strict]`

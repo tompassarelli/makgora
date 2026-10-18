@@ -30,42 +30,33 @@ gives its page's own date.
 - **Frame cost** is the number of script calls per frame. GPU cost is
   **unmeasured** unless a section says otherwise; it is checked against #168's
   budget (visual-quality, "How the numbers are taken").
-- **Modes** gives what each graphics mode draws: C = Classic, R = Reforged,
-  D = Definitive. The sequence names and lengths come from the Classic
-  `war3.w3mod:` files and the Reforged `_hd.w3mod:` files.
+- Sequence names and lengths come from the Classic `war3.w3mod:` files.
 - *(guess)* marks an inference that nothing has confirmed.
-
-A map can't detect the graphics mode. So a trick that seeks an animation by
-time only works when the sequence has the same length in every mode. Each
-section records where it does.
 
 ## The techniques at a glance
 
 ★ marks the five picks for the Tomb of Sargeras showcase (#299), explained in
 [The five for the Tomb](#the-five-for-the-tomb-of-sargeras).
 
-| # | Technique | Bytes | Modes | Best Smashcraft use |
-| --- | --- | --- | --- | --- |
-| 1 ★ | Stock animation driven by the match clock | 0 | C R D (lengths must match) | The Temple of Tides rising; the sea level following the tide |
-| 2 ★ | A current that runs backwards: signed time scale | 0 | C R D | Foam and falls that reverse with the tide |
-| 3 ★ | Scheduled lighting: a timed light model driven by the time of day | ~1.5 KB a light | C R D | The light shifts at the tide's turn |
-| 4 ★ | Stock models switched between states as lighting cues | 0 | C R D | The Tomb's glyphs flare during the slack |
-| 5 | Height fog changed during play | 0 | C R D (HD fog) | A teal haze lying on the tide floor |
-| 6 | A sky swapped or cross-faded at a moment | 0 to ~10 KB | C R D | The final stock, sudden death |
-| 7 ★ | Stock Rays of Light | 0 to ~2 KB | C R D | Light shafts through the water |
-| 8 | Stock models that carry their own lights | 0 to ~0.7 KB | split by mode | Eye of Sargeras glow, braziers |
-| 9 | Landmarks built from stock pieces | 0 | C R D | A tomb front built from gate, pillars and spires |
-| 10 | Pieces darkened to silhouettes, with lit accents | 0 | C R D | The far band on every stage |
-| 11 | Stock models with replaced textures and team colour | 0 to ~0.1 KB | C R D (ID 1 flickers in HD) | Naga teal accents; per-stage reskins |
-| 12 | See-through copies: afterimages and fake reflections | 0 | C R D | The temple mirrored under the sea; dash trails |
-| 13 | Full-screen tint and flash | 0 | C R D | KO flash; the hydra's strike |
-| 14 | Depth-of-field pulse | 0 | R D | Heaviest hits and KOs |
-| 15 | Camera shake | 0 | C R D | The hydra's lunge; Blackrock eruptions |
-| 16 | A model drawn on the screen: SPRITE frame | 0 | C R D | Stage intro card; screen-edge bubbles |
-| 17 | Images as floating marks and contact shadows | 0 | C R D *(guess)* | Fighter shadows on the tide surface |
-| 18 | Lightning beams as set dressing | 0 | C R D | A beam from the Eye of Sargeras; chains |
-| 19 | One-mode copies at stock and `_DE` paths | per file | per mode | A Definitive-tuned stage light |
-| 20 | Map post-processing: bloom, contact shadows | ~0.3 KB | R D *(guess)* | Bloom on sparks, the Eye and the fel stages |
+| # | Technique | Bytes | Best Smashcraft use |
+| --- | --- | --- | --- |
+| 1 ★ | Stock animation driven by the match clock | 0 | The Temple of Tides rising; the sea level following the tide |
+| 2 ★ | A current that runs backwards: signed time scale | 0 | Foam and falls that reverse with the tide |
+| 3 ★ | Scheduled lighting: a timed light model driven by the time of day | ~1.5 KB a light | The light shifts at the tide's turn |
+| 4 ★ | Stock models switched between states as lighting cues | 0 | The Tomb's glyphs flare during the slack |
+| 5 | Height fog changed during play | 0 | A teal haze lying on the tide floor |
+| 6 | A sky swapped or cross-faded at a moment | 0 to ~10 KB | The final stock, sudden death |
+| 7 ★ | Stock Rays of Light | 0 to ~2 KB | Light shafts through the water |
+| 8 | Stock models that carry their own lights | 0 to ~0.7 KB | Eye of Sargeras glow |
+| 9 | Landmarks built from stock pieces | 0 | A tomb front built from gate, pillars and spires |
+| 10 | Pieces darkened to silhouettes, with lit accents | 0 | The far band on every stage |
+| 11 | Stock models with replaced textures and team colour | 0 to ~0.1 KB | Naga teal accents; per-stage reskins |
+| 12 | See-through copies: afterimages and fake reflections | 0 | The temple mirrored under the sea; dash trails |
+| 13 | Full-screen tint and flash | 0 | KO flash; the hydra's strike |
+| 14 | Camera shake | 0 | The hydra's lunge; Blackrock eruptions |
+| 15 | A model drawn on the screen: SPRITE frame | 0 | Stage intro card; screen-edge bubbles |
+| 16 | Images as floating marks and contact shadows | 0 | Fighter shadows on the tide surface |
+| 17 | Lightning beams as set dressing | 0 | A beam from the Eye of Sargeras; chains |
 
 ## The techniques
 
@@ -89,22 +80,15 @@ section records where it does.
   clips.
 - **Stock assets that suit it, read from 3.0.1.24342:**
   - `Buildings\Naga\TempleOfTides\TempleOfTides`: Birth runs 0–60,000 ms in
-    both Classic (73,901 bytes) and Reforged (3.4 MB), so a seek by time is
-    mode-safe. *(guess)* Birth is the temple rising out of the sea, as Naga
+    Classic (73,901 bytes). *(guess)* Birth is the temple rising out of the sea, as Naga
     buildings do when they are built.
   - `Doodads\Cinematic\RisingWaterDoodad`: Stand Alternate 3 s, Stand 5 s and
-    Stand Upgrade 5 s in both modes. That's three water states. *(guess)* They
+    Stand Upgrade 5 s. That's three water states. *(guess)* They
     are the low, rising and high levels from the TFT cinematics.
-  - `RisingWaterWideDoodad`: the first two states, also the same in both
-    modes.
+  - `RisingWaterWideDoodad`: the first two states.
 - **Bytes:** 0.
 - **Frame cost:** one call per seeked piece on frames where its value
   changes.
-- **Modes:**
-  - C R D only where the lengths match: the Temple's Birth and both
-    rising-water doodads.
-  - Eye of Sargeras doesn't qualify: its Stand is 1.3 s in Classic and 8.3 s
-    in Reforged.
 - **Suits:** Tomb of Sargeras.
   - The Temple of Tides rises out of the far sea over the first minute of a
     match. It is a one-off reveal on a third of the frame, slow enough for
@@ -135,9 +119,6 @@ section records where it does.
 - **Bytes:** 0.
 - **Frame cost:** one call per piece on each turn (four a 20 s cycle), or
   one per frame across the 60-frame slack while easing.
-- **Modes:** C R D. HD copies swap emitters for PopcornFX (a `CORN` chunk in
-  `_hd` CrushingWaveMissile), and the map can't drive those particles. Only
-  the mesh and texture follow the scale *(guess)*.
 - **Suits:** the Tomb's tide. The surface flow visibly stops and reverses
   during each slack, which is the telegraph water-stage.md asks for, drawn by
   the water itself. The same trick suits wind stages: banners and smoke
@@ -175,8 +156,8 @@ section records where it does.
 - **Bytes:** ~1.5 KB a timed light (Blizzard's are 1,468; Smashcraft's
   constant ones are 744).
 - **Frame cost:** one call a frame during a ramp, none otherwise.
-- **Modes:** C R D. An imported light is the same file in every mode. Classic
-  clamps bright values *(guess)*, so keys stay within rule 5's intensity 1.
+- **Classic limit:** Classic clamps bright values *(guess)*, so keys stay within
+  rule 5's intensity 1.
 - **Suits:**
   - Tomb: the light breathes at each turn.
   - Every stage: a deliberate dimming for the last stock or sudden death,
@@ -204,13 +185,10 @@ section records where it does.
   - the 3.0 `BlzSetSpecialEffectAnimation(e, "Stand Alternate")`.
 
   The stock `Doodads\Cinematic\GlowingRunes\GlowingRunes0` has Birth, Stand,
-  Stand Alternate and Death in both Classic and Reforged (Classic Stand 3 s,
-  Stand Alternate 3 s). *(guess)* Stand Alternate is the brighter state.
-  Playing by animation type keeps it mode-safe even though the HD names carry
-  a " 1" suffix.
+  Stand Alternate and Death (Stand 3 s, Stand Alternate 3 s).
+  *(guess)* Stand Alternate is the brighter state.
 - **Bytes:** 0.
 - **Frame cost:** one call per piece per change.
-- **Modes:** C R D.
 - **Suits:**
   - Tomb: runes on the ruins flare to Stand Alternate for each slack and fall
     back as the tide runs. This is Blizzard's own Tomb vocabulary.
@@ -224,7 +202,7 @@ section records where it does.
     That is style 3 (height fog), a blue-grey colour and
     `BlzSetTerrainFogDrawOverSky(true)`, set again in each of its nine
     `SetTerrainFogExV` calls.
-  - **The 3.0 Reforged `nightelfx03`:** opens with
+  - **The 3.0 `nightelfx03`:** opens with
     `SetTerrainFogExV(0, 1000, 8000, …)` and
     `BlzSetTerrainFogMaxLinearDensity(1.0)`.
   - **`undeadx07a` and `undeadx07c`:** switch to `LordaeronWinterSkyRed` and
@@ -238,8 +216,8 @@ section records where it does.
   turn. The list of fields is in visual-quality, "The levers".
 - **Bytes:** 0.
 - **Frame cost:** one to three calls a frame while tweening.
-- **Modes:** C R D per the 3.0 notes, **unmeasured** in Smashcraft (the
-  `192-*-linear|height` checks).
+- **Status:** **unmeasured** in Smashcraft (the `192-*-linear|height`
+  checks).
 - **Suits:**
   - Tomb: a teal fog lying just above the tide floor, thickening a little in
     each slack.
@@ -266,8 +244,8 @@ section records where it does.
 - **Bytes:** 0 for a stock sky. About 10 KB for one more authored sky
   *(guess, from one 256×128 texture)*.
 - **Frame cost:** none for a cut; two calls a frame while fading.
-- **Modes:** C R D for authored and root skies. The HD-only stock skies are
-  blank in Classic (visual-quality).
+- **Skies:** use authored and root skies. Stock skies that exist only in the
+  HD asset set are blank in Classic (visual-quality).
 - **Suits:** the last stock or sudden death on any stage. Nordrassil's aurora
   can deepen for a finale. Keep rule 12: the horizon stays at or below the
   deck.
@@ -280,8 +258,7 @@ section records where it does.
       `ReplaceableTextures\Weather\RaysOfLight`, height 200, 64 particles,
       velocity −300, additive;
     - `LRma` "Rays of Moonlight".
-  - The texture exists in every mode: 5,616 bytes Classic, 87,536 bytes
-    Reforged and Definitive (`textures\raysoflight.dds`).
+  - The texture is 5,616 bytes (`textures\raysoflight.dds`).
   - The [HD Terraining Contest #1 results](https://www.hiveworkshop.com/threads/hd-terraining-contest-1-results.348648/)
     (19 Apr 2023) show the risk. The judge found Sapprine's green light beam
     "too strong and too overt", and wanted shadows to guide the eye instead.
@@ -291,8 +268,7 @@ section records where it does.
     below the play.
   - **Native first:** a few tall additive planes in Smashcraft's own stage
     package, textured with the stock
-    `ReplaceableTextures\Weather\RaysOfLight` path. The texture costs nothing
-    and draws its HD copy in HD.
+    `ReplaceableTextures\Weather\RaysOfLight` path. The texture costs nothing.
   - Alternatively, a map-imported `TerrainArt\Weather.slk` row with a larger
     height. CryoniC's
     [custom weather article](http://www.wc3c.net/showthread.php?t=67949) is
@@ -301,7 +277,6 @@ section records where it does.
     (read 8 Oct 2026). *(guess)* A map's import overrides the slk.
 - **Bytes:** ~1–2 KB for the planes *(guess)*, 0 for the texture.
 - **Frame cost:** none.
-- **Modes:** C R D.
 - **Suits:** Tomb: shafts of pale light slanting down through the sea in the
   far band, so the tide floor reads as underwater. Keep them dim (the judge's
   warning) and behind the fighting volume (rule 1). Gryphon Aerie can take
@@ -314,26 +289,16 @@ section records where it does.
     (736 bytes: one `LITE`, Stand 1 s) and `OmniLightWithDeath.mdx`. Forgotten
     Hollow imports `omnicustom13/14` and `omnilightorange5`. These are placed
     point lights.
-  - The 3.0 notes add "Unlimited lights in HD" and shadow-casting omni lights
-    ([Hive 3.0 thread](https://www.hiveworkshop.com/threads/warcraft-3-reforged-forsaken-kingdom-expansion-and-major-updates.374111/),
-    12 Sep 2026).
-- **Stock assets that carry lights, read from 3.0.1.24342 (by mode):**
-  - `Doodads\Cinematic\EyeOfSargeras`: a `LITE` in Classic, but only a
-    PopcornFX `CORN` in Reforged.
+- **Stock assets that carry lights, read from 3.0.1.24342:**
+  - `Doodads\Cinematic\EyeOfSargeras`: a `LITE` in Classic.
   - `Doodads\Cinematic\LightningBolt`: a `LITE` in Classic.
-  - `Doodads\Ruins\Props\Brazier\Brazier0`: no light in Classic, a `LITE` in
-    Reforged.
 
-  Which stock models carry lights is a per-mode accident. Treat the light as
-  garnish.
+  Few stock models carry lights. Treat the light as garnish.
 - **How:** `AddSpecialEffect` with the stock path, or Smashcraft's own small
   light model (the tech-contact and slash sparks already carry one;
   visual-quality, "How the numbers are taken").
-  `BlzSetMinShadowCastingPointLightCount(1)` lets one of them cast shadows in
-  HD.
 - **Bytes:** 0 stock, about 0.7 KB authored.
-- **Frame cost:** none in script. HD GPU cost is **unmeasured**.
-- **Modes:** split by mode, as listed above.
+- **Frame cost:** none in script. GPU cost is **unmeasured**.
 - **Suits:**
   - Tomb: the Eye of Sargeras as a small accent on the temple side, green and
     glowing.
@@ -354,8 +319,7 @@ section records where it does.
     rule 11).
   - Go further: compose one landmark from several stock models overlapped
     and turned with `BlzSetSpecialEffectOrientation`. For example:
-    - `Doodads\Cinematic\SargerasGate` (39.5 KB Classic, 1.26 MB Reforged,
-      with Stand Hit and Death Alternate states);
+    - `Doodads\Cinematic\SargerasGate` (39.5 KB, with Stand Hit and Death Alternate states);
     - `Doodads\Ruins\Props\RuinsPillar`;
     - `Ruins_Spires`;
     - coral.
@@ -364,7 +328,6 @@ section records where it does.
   - The model-facts and player-view checks still apply to each piece.
 - **Bytes:** 0.
 - **Frame cost:** none in script, one more draw per piece.
-- **Modes:** C R D. HD copies are megabytes of memory, not download.
 - **Suits:**
   - Tomb: the Tomb's own front as the focal landmark on a third of the frame,
     with the Temple of Tides as its counterweight.
@@ -384,7 +347,6 @@ section records where it does.
   - Leave colour only on the one lit accent per side.
 - **Bytes:** 0.
 - **Frame cost:** one call at stage draw.
-- **Modes:** C R D. In HD the multiply darkens the PBR base colour *(guess)*.
 - **Suits:** every stage's depth bands (stage-art rules 4 and 6). It is the
   cheapest fix for the bright-backdrop stages, where contrast fell.
 
@@ -409,15 +371,12 @@ section records where it does.
     Replaceable Texture File, created with the 3.0
     `BlzCreateDestructableZWithSkinPitchRollColor`. 3.0 also added doodad
     team colour (`SetDoodadColor`, `BlzSetSingleDoodadColor`; warcraft-features).
-  - The [3.0 bugs thread](https://www.hiveworkshop.com/threads/warcraft-iii-3-0-bugs-issues.374131/)
-    reports that ID 1 textures flicker in Reforged and Definitive.
 - **Bytes:** 0 for team colour. About 0.1 KB per destructable row
   *(guess)*.
 - **Frame cost:** none.
-- **Modes:** C R D, with the ID 1 flicker in HD.
 - **Suits:** Naga teal on stock pieces that have team-colour parts, so the
   Tomb's dressing shares a hue without a texture import. Per-stage reskins of
-  one stock rock or wall. Check a capture before relying on ID 1 in HD.
+  one stock rock or wall.
 
 ### 12. See-through copies: afterimages and fake reflections
 
@@ -435,7 +394,6 @@ section records where it does.
 - **Bytes:** 0.
 - **Frame cost:** none for a reflection; one call a frame per copy for a
   moving afterimage.
-- **Modes:** C R D.
 - **Suits:**
   - Tomb: the far temple and tomb front mirrored in the sea, wavering behind
     the surface ripples.
@@ -457,37 +415,16 @@ section records where it does.
     SpecialPow, SpecialSplat and Panda-n-Cub (`ReplaceableTextures\CameraMasks\`).
   - `SetCineFilterStartUV`/`EndUV` with `SetCineFilterDuration` move the mask
     across the screen.
-  - Reforged and Definitive blend the filter in linear light and draw nothing
-    below alpha 4: White_Mask at alpha 4 still lifts a black deck to about 37
-    luma, so an alpha fade to 0 ends in a step. The KO flash holds alpha 8 and
-    fades the filter colour to black instead (#289).
 - **Bytes:** 0.
 - **Frame cost:** about six calls per flash.
-- **Modes:** C R D.
 - **Suits:**
-  - KO punctuation (visual-quality G4).
+  - KO punctuation (visual-quality G3).
   - A short IceFilter flash for a freeze hit.
   - A brief HazeAndFog pulse as the hydra strikes.
   - Never more than three flashes a second (WCAG, stage-art). The overlay
     covers fighters too, so it suits moments, not ambience.
 
-### 14. Depth-of-field pulse
-
-- **Examples:**
-  - Silverpine Sprint raises the depth-of-field scale by 15 × √damage, up to
-    50, over 0.15 s, then lets it fall over 0.6 s.
-  - The Reforged `human03` sets `CameraSetFocalDistance(181)` for its "Grain"
-    cinematic and clears it with `CameraSetDepthOfFieldScale(0)` on the way
-    out. The campaign has 19 focal-distance and 18 scale calls.
-- **How:** `CameraSetFocalDistance` and `CameraSetDepthOfFieldScale` for the
-  local player, eased back to 0.
-- **Bytes:** 0.
-- **Frame cost:** one or two calls a frame across the pulse.
-- **Modes:** R D only. Classic draws nothing, so the KO must still read
-  without it.
-- **Suits:** the heaviest hits and KOs, together with technique 13.
-
-### 15. Camera shake
+### 14. Camera shake
 
 - **Examples:**
   - 31 of the 96 Reforged campaign maps shake the camera through the
@@ -511,11 +448,10 @@ section records where it does.
 - **Bytes:** 0.
 - **Frame cost:** none for native noise; the offset is part of the existing
   camera call.
-- **Modes:** C R D.
 - **Suits:** the hydra's lunge, Blackrock eruptions and the heaviest KOs.
   Keep it short and rare (stage-art, "Motion and flashes").
 
-### 16. A model drawn on the screen: SPRITE frame
+### 15. A model drawn on the screen: SPRITE frame
 
 - **Examples:**
   - Rigborn's ["UI: Adding Sprite"](https://www.hiveworkshop.com/threads/ui-adding-sprite.321423/)
@@ -528,14 +464,13 @@ section records where it does.
   stage light. It is local presentation and makes no game handles.
 - **Bytes:** 0 for a stock model.
 - **Frame cost:** none, unless the frame is animated.
-- **Modes:** C R D.
 - **Suits:**
   - A stage intro card with the stage's emblem model.
   - Bubbles or a caustic shimmer at the screen's lower edge on the Tomb.
   - A KO burst drawn over everything.
   - Keep the fighting area clear (rule 1).
 
-### 17. Images as floating marks and contact shadows
+### 16. Images as floating marks and contact shadows
 
 - **Examples:**
   - Antares's
@@ -553,12 +488,11 @@ section records where it does.
     `BlzShowTerrain(false)`. **Unmeasured:** one capture settles it.
 - **Bytes:** 0.
 - **Frame cost:** one position call a frame per fighter.
-- **Modes:** C R D *(guess)*.
 - **Suits:** fighter drop shadows on the tide surface and on the decks, which
   help readability when fighters float above the water. The hydra's dark ring
   as an image instead of a model.
 
-### 18. Lightning beams as set dressing
+### 17. Lightning beams as set dressing
 
 - **Examples:**
   - Silverpine Sprint calls `AddLightning` 12 times and `AddLightningEx` 6.
@@ -575,43 +509,10 @@ section records where it does.
 - **Bytes:** 0.
 - **Frame cost:** none for a still beam; `MoveLightningEx` once a frame for a
   moving one.
-- **Modes:** C R D.
 - **Suits:**
   - Tomb: a faint green beam from the Eye of Sargeras up into the sky, far
     behind the deck.
   - Gryphon Aerie and Stratholme: ropes and chains between pieces.
-
-### 19. One-mode copies at stock and `_DE` paths
-
-- **Example:** Silverpine Sprint imports files at stock paths:
-  - `Doodads\Barrens\Plants\Cactus\Cactus0.mdx`, `Doodads\Undercity\Props\Bones\Bones0–9.mdx`
-    and others, replacing the stock model for that map only;
-  - `_DE.w3mod\terrainart\…` textures, which only Definitive loads.
-- **How:** Already designed as visual-quality G3: a Definitive copy of a stage
-  light at `_DE.w3mod\war3mapImported\StageLight-*.mdx`, with
-  high-dynamic-range values. Classic and Reforged keep today's file.
-- **Bytes:** the copy's size, 744 bytes for a light.
-- **Frame cost:** none.
-- **Modes:** per mode by design. `_HD.w3mod\` for Reforged is a *(guess)*.
-- **Suits:** the showcase's goal that every mode look deliberate, starting
-  with the Tomb's light.
-
-### 20. Map post-processing: bloom and contact shadows
-
-- **Example:** Forgotten Hollow ships `[ASSAO] Radius=6, ShadowMultiplier=3`
-  in `war3mapPostProcessing.txt` (visual-quality, "Map-level
-  post-processing"). The 3.0 editor added "a post processing tool to apply
-  post-processing effects at map level"
-  ([Hive 3.0 thread](https://www.hiveworkshop.com/threads/warcraft-3-reforged-forsaken-kingdom-expansion-and-major-updates.374111/),
-  12 Sep 2026).
-- **How:** One file for the whole map. Turn bloom on with a high threshold so
-  only additive sparks and emissive accents bloom (G2).
-- **Bytes:** ~0.3 KB.
-- **Frame cost:** HD GPU only, **unmeasured**.
-- **Modes:** R D *(guess)*. Whether a map can turn bloom on now that the
-  player option is gone is **unmeasured**.
-- **Suits:** the Eye of Sargeras, hit sparks, and the fel and arcane stages.
-  It is map-wide, so one setting must suit every stage.
 
 ## The five for the Tomb of Sargeras
 
@@ -619,7 +520,7 @@ The Tomb's idea (#299, water-stage.md) is the tide: a current that runs right
 for ten seconds and then left, with a one-second slack before each turn.
 These five tricks make the stage itself perform that clock. Each moment is a
 fixed function of the match frame, so it is learnable, replay-identical and
-safe under rollback. They cost nothing in Classic except one ~1.5 KB light,
+safe under rollback. They cost nothing except one ~1.5 KB light,
 and each needs a single native capture to confirm.
 
 1. **A current that runs backwards (technique 2).** The best telegraph is the
@@ -636,13 +537,13 @@ and each needs a single native capture to confirm.
    Stand, Stand Alternate and Death. Using the same stock runes on
    Smashcraft's ruins turns each slack into a recognisable Tomb moment.
 4. **The Temple of Tides rises (technique 1).** Its stock Birth animation is
-   exactly 60 seconds in both Classic and Reforged, so seeking it from the
-   match clock is safe in every mode. A landmark that slowly rises out of the
+   exactly 60 seconds in Classic, so seeking it from the
+   match clock is safe. A landmark that slowly rises out of the
    sea during the first minute is the moment no one expects from Warcraft.
    *(guess: what Birth shows; one capture confirms it.)* The rising-water
    doodad's three states can follow the tide the same way.
 5. **Light shafts through the sea (technique 7).** The stock Rays of Light
-   texture exists in every mode. A few dim additive planes in the far band
+   texture costs nothing. A few dim additive planes in the far band
    turn the tide floor into an underwater scene, at almost no cost. Keep them
    softer than the HD Terraining Contest judge's "too strong" beam.
 
@@ -673,8 +574,7 @@ Read 8 Oct 2026 unless noted.
     `human03`, `undeadx07a` and `undeadx07c`;
   - `TerrainArt\Weather.slk`;
   - `Splats\LightningData.slk`;
-  - the model sequence tables named above, Classic `war3.w3mod:` and Reforged
-    `_hd.w3mod:`.
+  - the model sequence tables named above, Classic `war3.w3mod:`.
 - **Hive Workshop:**
   - [Custom Day/Night Light Environments](https://www.hiveworkshop.com/threads/custom-day-night-light-enviroments.274081/), 29 Dec 2015;
   - [HD Terraining Contest #1](https://www.hiveworkshop.com/threads/hd-terraining-contest-1-place-of-cult.347193/), 25 Jan–25 Mar 2023, and its [results](https://www.hiveworkshop.com/threads/hd-terraining-contest-1-results.348648/), 19 Apr 2023;

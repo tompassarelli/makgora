@@ -3,8 +3,7 @@
 From `ts/`, `bun wisp anim score` samples the shipped Classic timeline bodies,
 writes `build/anim-score/classic.tsv` (a report, not tracked), and prints the worst 40 moves
 and a summary for every fighter. `--fighter F` limits a run to a fighter slug;
-`--graphics definitive` scores the Definitive bodies; `--assets PRIVATE_DIR`
-uses another packaged asset view. A limited run replaces that fighter's rows.
+`--assets PRIVATE_DIR` uses another packaged asset view. A limited run replaces that fighter's rows.
 
 Each row measures the mesh at the exact animation time chosen by production
 pose selection while the simulation plays the move. Distances are fractions
@@ -41,8 +40,7 @@ fighter can act), so line 2 measures the transition the game draws.
    and character independently. Every judged line must be at least 4/5.
    An unjudged move has no passing line 5.
 
-`anim score` also writes `build/anim-score/classic-crouch.tsv` and
-`build/anim-score/definitive-crouch.tsv`: each fighter's crouch pose-contrast
+`anim score` also writes `build/anim-score/classic-crouch.tsv`: each fighter's crouch pose-contrast
 line (#376). It holds down for 40 frames (the 24-frame crouch clip, then its held
 last frame) after 30 standing frames, then compares the drawn crouch with the
 drawn stand: the height ratio of the two bodies and one minus their silhouette
@@ -127,7 +125,7 @@ Limb strikes need limb drive ≥ .50 in place of body share. Body share is a
 weapon-strike rule calibrated on weapon tilts; a snap kick turns from the hip,
 so its hip barely travels and its body share sits near .1. The .50 line is
 calibrated on Shadow Hunter's six kicks, each named a kick by a cold reader:
-limb drive .89–1.24 in Classic and .69–.93 in Definitive.
+limb drive .89–1.24.
 Anub'arak's claw rakes (his forward and down tilts, dash attack, and forward,
 back and down air) use the same rule: a rake swings the claw from the shoulder
 as a kick swings the foot from the hip, and the claw's own swing through

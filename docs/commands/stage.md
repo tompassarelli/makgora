@@ -26,8 +26,7 @@
   and searches their product: `fogStart`, `fogEnd`, `fogColor` ([r,g,b] 0–1),
   `tint` ([r,g,b]), `tintScale`, `depth` (y offset of every piece), `scale`
   (multiplier), `lightKey`, `lightAmbient`, `lightIntensity`, and
-  `pieces: {"INDEX": {x, y, z, scale}}`, plus `modes` (default classic and
-  definitive), `clients` (default [0]) and `finalists` (1 or 2). Model choice
+  `pieces: {"INDEX": {x, y, z, scale}}`, plus `clients` (default [0]) and `finalists` (1 or 2). Model choice
   stays a human step; with no spec it sweeps fog end and tint scale. The
   rules live in smashcraft:ts/src/game/presentation/stageRules.ts and
   smashcraft:ts/scripts/stageViewRules.ts, shared with the stage tests.

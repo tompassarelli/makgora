@@ -227,7 +227,7 @@ None is added in this pass.
 Headless Wisp records every map sound call with its frame, volume and pitch.
 `bun wisp headless ... --sound-cues FILE --json` checks that each move's
 sounds fire on their frames, but it cannot judge how they sound. The listening
-check is a later native batch: one clip per fighter in both looks, each a jab
+check is a later native batch: one clip per fighter, each a jab
 chain, a forward tilt, a forward smash and each special against a target and a
 shield, for Tom to spot-check. Labels whose sound was chosen from its name
 alone are first in line: the model attack sounds and the specials' casts.

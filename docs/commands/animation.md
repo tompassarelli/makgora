@@ -39,11 +39,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   standing pose the sampler shows; a crouch keeps its chest within 40 degrees of upright,
   so it lowers by bending the legs rather than tipping into a lunge, and fails if it
   sinks a non-weapon vertex more than 3% of its height below the stand's lowest
-  (a robe or tabard hem may dip into the deck). For a fighter with a Definitive body it then
-  refines that pose against the worse of the two looks, retargeting only the
-  stand and the authored clip onto the stock Definitive model
-  (smashcraft:tools/animations/movement-definitive.ts), and keeps the refinement
-  only when both looks pass, never trading a passing Classic line for a failing one. Pit Lord's tail and every legged body's fold are
+  (a robe or tabard hem may dip into the deck). Pit Lord's tail and every legged body's fold are
   searched for the hang as well. A clip already named
   for the pose is re-authored in place, and Illidan's Ledge Catch then eases into
   the new hang over its first 60%; otherwise it appends `Movement POSE` and
@@ -55,8 +51,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   mount, Goblin Tinker's backpack claws, Mountain King's left-hand hammer, Anub'arak's
   carapace and squash, Sylvanas's dress, which sinks into the deck unless she squashes) keeps its own search space in
   `tools/animations/movement-poses/FIGHTER.ts`, usually the shared space of
-  smashcraft:tools/animations/movement-space.ts plus named bones, refined
-  against Definitive like every other space. A pose chosen by measurement rather
+  smashcraft:tools/animations/movement-space.ts plus named bones. A pose chosen by measurement rather
   than search (Chen's hang) is pinned in `PINNED`.
   `bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT`
   appends a distinct gesture for each Blademaster normal and his back throw,
@@ -78,10 +73,10 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `bun tools/animations/pain-zoom-captures.ts PRIVATE_OUTPUT [FIGHTER_SLUG...]` plays the
   #181 nine-category scripts at gameplay zoom, checks each contact's category and clip,
   counts each fighter's drawn pool bodies every frame (two only inside a pose blend),
-  renders held and recovery frames in Classic and Definitive, and prints a per-fighter table.
+  renders held and recovery frames in Classic, and prints a per-fighter table.
   `bun tools/animations/stand-captures.ts PRIVATE_OUTPUT` checks each selectable
   fighter's shipped timeline against its source geosets at every Stand/move frame
-  and renders both-facing Stand frames in Classic and Definitive.
+  and renders both-facing Stand frames in Classic.
   `bun tools/animations/victory-captures.ts PRIVATE_OUTPUT` (through the capacity helper) wins a
   headless match with each selectable fighter, checks the winner's victory clip starts at its first
   frame, prints each sampled pose and renders a six-frame Classic results-screen strip per winner,
@@ -92,11 +87,9 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   to one expansion fighter (smashcraft:docs/fighter-animation-work.md).
   `bun tools/animations/pit-lord-specials.ts PRIVATE_ASSETS PRIVATE_OUTPUT`
   authors Pit Lord's four special gestures while preserving all earlier clips.
-  `bun tools/animations/kaelthas-clips.ts STOCK_BLOOD_MAGE.mdx PRIVATE_OUTPUT [--look definitive]`
+  `bun tools/animations/kaelthas-clips.ts STOCK_BLOOD_MAGE.mdx PRIVATE_OUTPUT`
   appends Kael’thas’s normal, special, paired throw, recovery and nine pain
   gestures, preserves all eleven stock sequences, and writes both-facing sheets.
-  `--look definitive` applies the Definitive recovery overrides (robe and cape
-  add travel) to a model that is only the input for the Definitive body transfer.
   `bun tools/animations/murloc-clips.ts STOCK_MURLOC.mdx PRIVATE_OUTPUT` appends the
   Murloc's normal, special, paired throw, recovery and nine pain gestures to the
   stock Tiderunner, preserves its nine sequences and writes both-facing sheets;
@@ -176,19 +169,16 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   parallel, redoes only the steps whose inputs changed and pins the result
   (smashcraft:docs/build-inputs.md, "Change art"). Run the single tools below to debug one step.
 
-- Both fighter bodies (from the repository root):
+- Fighter body (from the repository root):
   `bun tools/animations/timeline-models.ts PRIVATE_ASSETS PRIVATE_POOL FIGHTER`
   writes the fighter's Classic timeline body from its canonical motion into a writable copy
-  of `original-clips-static-lights` and, for fighters in `DEFINITIVE_FIGHTERS`, its Definitive
-  body under the same path in `_de.w3mod`, checked within 0.5 units / 0.5 degrees
-  (smashcraft:docs/design/hd-fighters.md, "Canonical rig"). It removes the fighter's older
+  of `original-clips-static-lights`. It removes the fighter's older
   bodies and refreshes its clip table and timeline model facts; it compares every played pose
   with the pool it reads, so export a fighter whose played clips changed with
-  `export-original-clips.ts --only FIGHTER` first. A map build fails when a fighter in
-  `DEFINITIVE_FIGHTERS` has no Definitive body.
+  `export-original-clips.ts --only FIGHTER` first.
   Store the family with `bun wisp inputs add original-clips-static-lights PRIVATE_POOL`.
 
-- Key jitter (from ts/): `bun wisp anim jitter [--fighter NAME]... [--graphics classic|definitive]...`
+- Key jitter (from ts/): `bun wisp anim jitter [--fighter NAME]...`
   fails when a curved key segment between keys at most 50 ms apart leaves its keys (#479);
   pre-push runs it when the clip pool or its tools change. The 1.0-unit translation limit is
   calibrated on Shadow Hunter's 0.0.145 bodies (smashcraft#4): his 14 shaking clips, forward smash
@@ -200,8 +190,8 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   that cannot yet be regenerated, with its issue; the check fails once that fighter stops jittering.
 
 - White body flashes (from the repository root):
-  `bun tools/animations/white-flash-models.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--character ID | --definitive]`
-  authors white body-only copies with the original meshes and keys for selectable gameplay poses, removing unused sequences, repeated constant keys, glow cards and team-glow ground planes for charge and heavy-hit flashes (the pre-push stored-model check fails a white copy that keeps a ground plane, #346); store PRIVATE_OUTPUT as `impact-assets`, which lists each fighter's white bodies and the textures they draw in white-flash-imports/NAME.txt and drops textures no list names. Each fighter whose Definitive body ships (`DEFINITIVE_FIGHTERS`, #366) also gets a light white copy of that body under the same path in `_de.w3mod`, so Definitive flashes the drawn body (#378): level of detail 0 only, hidden geosets dropped, meshes halved with meshoptimizer, keys kept only on nodes that move drawn vertices, near-linear keys pruned, and vertices, normals, tangents, texture coordinates and key values rounded to 10 mantissa bits so they compress (the engine still shades the copy, so flattening those attributes darkens it). The flash draws 8 units toward the camera and shrinks to keep the body's on-screen silhouette without z-fighting; `--definitive` rebuilds only those, and a map build fails when a shipped Definitive body has none or a fighter drawing Classic in Definitive has one.
+  `bun tools/animations/white-flash-models.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--character ID]`
+  authors white body-only copies with the original meshes and keys for selectable gameplay poses, removing unused sequences, repeated constant keys, glow cards and team-glow ground planes for charge and heavy-hit flashes (the pre-push stored-model check fails a white copy that keeps a ground plane, #346); store PRIVATE_OUTPUT as `impact-assets`, which lists each fighter's white bodies and the textures they draw in white-flash-imports/NAME.txt and drops textures no list names. The flash draws 8 units toward the camera and shrinks to keep the body's on-screen silhouette without z-fighting.
   `--character` refreshes one fighter in an existing PRIVATE_OUTPUT family and its own files in smashcraft:ts/src/generated/assets/white-models/ and white-facts/ (named by fighter slug; the indexes change only when a fighter is added).
 
 - Sylvanas animation authoring (from the repository root):
@@ -242,6 +232,6 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   and refresh the clip pool (smashcraft:docs/fighter-animation-work.md).
 
 Fighter portraits: `bun scripts/fighterPortraits.ts PRIVATE_OUTPUT` (from ts/, through the
-capacity helper) renders the Classic and Definitive portrait sets, neutral and the four slot
+capacity helper) renders the Classic portrait set, neutral and the four slot
 outfits, with Wisp's headless renderer; store PRIVATE_OUTPUT/fighter-renders as `fighter-renders`.
 See smashcraft:docs/design/fighter-portraits.md.

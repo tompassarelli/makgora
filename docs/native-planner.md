@@ -25,7 +25,7 @@ Capture execution requires `install` in that config, with `desktop` and
 `capacity` also required for offline pools; `client` defaults to `a`. These are the existing capture batch's launcher and
 installation arguments. A running service pool is attached through pair status;
 attached clients remain owned by the pool service. Capture tools resolve at run
-time, independently of the caller's PATH. The offline pool cannot run Definitive. Explicit signed-in client sets use
+time, independently of the caller's PATH. Explicit signed-in client sets use
 `fresh --profile native-capture --no-quick --clients-file FILE`, without touching
 the offline pool. Set `client` to a name in that client set.
 

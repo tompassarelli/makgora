@@ -63,7 +63,7 @@ Every row links both its Warcraft source and its Smash design reference.
 
 Hands remain inside exposed limb capsules; the axe blade alone is disjoint.
 Every tilt angle, smash, axe aerial, get-up and ledge attack keeps each active
-frame's region on the drawn axe in both looks (ts/test/peon-axe.test.ts, #520).
+frame's region on the drawn axe (ts/test/peon-axe.test.ts, #520).
 Get-up and ledge attacks are Peon-local moves with the template's shared timing
 and hit effects, their regions fitted to the drawn axe: get-up reaches 47 ahead,
 ledge attack 41. No throw is designed as an inescapable loop: up throw permits a short

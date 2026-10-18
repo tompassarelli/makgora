@@ -16,7 +16,7 @@ client that still cannot leave it.
   `-dev quick promo stage N pair FIRST / SECOND` starts two Wren Expert computers over three stocks with match HUD, hints and developer receipts hidden (for example `-dev quick promo stage 0 pair rifleman / illidan`). `-dev reset` restores the normal UI.
   `-dev quick stage N [lighting stock|stage] [backdrop on|off] [view near|far|off] [fog on|off]`
   applies the stage look before the first match draw, avoiding midmatch chat.
-  Classic and Definitive use the same setup; omitted options keep current defaults.
+  Omitted options keep current defaults.
   Ending any quick-start command with ` |cine off` hides the KO wash's cine filter in that match (local presentation; `-dev reset` restores it), for wisp#75's cine on/off fidelity captures.
   `-dev classic NAME` starts that fighter's Classic run and `-dev classic boss NAME` its boss battle (smashcraft:docs/design/classic-mode.md).
   `-dev lore N` starts Lore Battle N (1-20, smashcraft:ts/src/game/classic/loreBattles.ts) for the first player.

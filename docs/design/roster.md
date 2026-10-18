@@ -2,7 +2,7 @@
 
 Tom’s roster decision (9 October 2026, #339): 21 fighters remain. Every fighter needs a strong, pointed personality: funny, annoying, menacing, heroic, or something equally specific. Never flat or generic. The roster holds at 26 fighters, Melee’s size, until every fighter feels good. The only planned additions are [Grom Hellscream (#340)](https://github.com/tompassarelli/smashcraft/issues/340), [Anub’arak (#341)](https://github.com/tompassarelli/smashcraft/issues/341), [Malfurion (#342)](https://github.com/tompassarelli/smashcraft/issues/342), [Medivh (#343)](https://github.com/tompassarelli/smashcraft/issues/343), and [Kobold (#344)](https://github.com/tompassarelli/smashcraft/issues/344). No further additions are planned.
 
-Smashcraft supports Classic and Definitive graphics. Each player chooses their look; moves, timing, hitboxes, hurtboxes and match results are identical across both. Reforged is dropped from the plans. **Definitive is the first-class look and Classic the fallback** ([#366](https://github.com/tompassarelli/smashcraft/issues/366)): every move is stored once on a canonical rig, and both bodies are generated from it. Because the boxes are shared, each Definitive body must visibly fill the same hurt capsules as Classic and put its hitting weapon or limb inside the same hit regions on active frames. One per-fighter flag, `DEFINITIVE_FIGHTERS` (smashcraft:ts/src/game/assets/definitiveFighters.ts), lists the fighters whose Definitive body passed; every other fighter takes its Classic body in both looks until the converter improves ([hd-fighters.md](hd-fighters.md#definitive-approval)).
+We explored Definitive Edition models, found they differ widely from the Classic models (for example, Sylvanas's Definitive body is about 55% wider than her Classic one, so shared animations and hurtboxes would need rescaling), and the game focuses on the Classic models.
 
 ## Malfurion Stormrage (#342)
 
@@ -16,7 +16,7 @@ free; a full universal super bar empowers anyone's next special, including his.
 **Body:** weight 94, run 10.8 units/frame, air 5.7 units/frame, standing hurt
 capsule endpoints at heights 4 and 101.2, radius 24. Slow feet and a tall exposed body make failed setup
 punishable. Stock campaign Malfurion, Keeper spells and Force of Nature treant
-art provide his Classic and Definitive presentation.
+art provide his presentation.
 
 **Normals:** two dismissive staff jabs (5-frame startup, 3/4 damage), angled
 staff pokes (9, 8), upward branch lift (8, 7), low root sweep (7, 6), shoulder-led
@@ -120,7 +120,7 @@ Murloc's sustained claw pressure, Kobold pokes, ducks underneath a reply and
 punishes a missed swing. His candle is his second resource: every hit he lands
 makes it burn brighter and his specials grow with it, and a strong hit knocks it
 out of his hands. Use the stock Kobold creep body, portrait, voice and fire/dirt
-effects in Classic and Definitive.
+effects.
 
 Body: weight 1.00, walk 8.64, run 12.402 and dash 10.755 world units/frame,
 air 0.918, width 0.78, height 0.66. That is about 10% slower than his first
@@ -393,8 +393,7 @@ all read the one value in smashcraft:ts/src/game/presentation/modelScale.ts;
 smashcraft:ts/test/model-scale.test.ts pins draw scale = stock scale × the
 factor for every fighter. Hurt capsules follow the drawn body:
 smashcraft:ts/test/drawn-size.test.ts holds each drawn head within 0.9-1.3 of
-its capsule's top, in Classic and Definitive, and each Definitive body within 10%
-of Classic or of its capsule top (smashcraft:docs/design/hd-fighters.md).
+its capsule's top.
 
 | Fighter | Stock unit | Stock model scale | Draw scale | Before #162 |
 | --- | --- | ---: | ---: | ---: |
@@ -905,11 +904,9 @@ in forsakenPaladinMoves.ts; this revision changes Forsaken Paladin specials and 
 
 Presentation uses Blizzard's 3.0.1 Classic Forsaken body, head and sword.
 The stock game path is `Units\\Creeps\\HeroForsakenPaladin\\HeroForsakenPaladin.mdx`.
-In the installed archive, Classic is
-`war3.w3mod:units/creeps/heroforsakenpaladin/heroforsakenpaladin.mdx`;
-Definitive is
-`war3.w3mod:_de.w3mod:units/creeps/heroforsakenpaladin/heroforsakenpaladin.mdx`.
-Public 0.1 ships Classic; Definitive variants remain private. The fighter's
+In the installed archive, it is
+`war3.w3mod:units/creeps/heroforsakenpaladin/heroforsakenpaladin.mdx`.
+The fighter's
 source path is `Units\\Creeps\\HeroForsakenPaladin\\HeroForsakenPaladin.mdx`,
 selecting private `hero-models/heroforsakenpaladin.mdx`. Match and victory bodies
 use our authored clips pooled from that stock rig, retaining our weapon marker
@@ -1998,7 +1995,7 @@ Expert gameplan: Time war-cry pressure, rush confirms and leap routes into axe k
 
 Stock campaign Grom model, textures, portrait, cries and Orc spell effects
 are the first inputs. Authored clips reshape that stock rig to make each
-contact point readable in Classic and Definitive; no third-party model.
+contact point readable; no third-party model.
 
 ### Signature strong/weak move (#389)
 
@@ -2174,7 +2171,7 @@ share 35–55%, approach 20–40%, ranged 10–25%, special 20–40%. Signature 
 Vanishing Act's punishable arrival; no move should exceed 40% of total damage,
 and single-move spam should win at most 45%. Explosive openings come from down
 tilt/up throw into an aerial chase. Stock campaign Medivh and raven model,
-Warcraft spell art and voice only; Classic and Definitive share combat data.
+Warcraft spell art and voice only.
 
 ```balance-profile
 fighter: medivh

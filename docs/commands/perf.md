@@ -1,14 +1,14 @@
 # Perf
 
-The #168 budget gates p99 ≤ 10 ms and worst ≤ 14 ms; CI measures Classic with `bun wisp perf playable-bot-four --samples --out CLASSIC.perf` and Definitive with `PERF_LOOK=definitive bun wisp perf playable-bot-four --samples --out DEFINITIVE.perf`, then runs `bun wisp perf budget` on each file.
+The #168 budget gates p99 ≤ 10 ms and worst ≤ 14 ms; CI measures Classic with `bun wisp perf playable-bot-four --samples --out CLASSIC.perf`, then runs `bun wisp perf budget` on it.
 
 - Frame cost: `LUA=<32-bit lua> bun wisp perf [quick-match|bot|bot-four|playable-bot-four|playable-duel|playable-human-four]`
   plays a run in 32-bit Lua and prints each client's predicted Warcraft cost
   per frame (p50, p95, worst, typing stall); `bun wisp perf compare A B` fails
   on a 5% rise in instructions (mean or worst 1% mean), predicted cost,
   allocation or typing stall (worst 1% mean). Landing gate (#48):
-  each change must hold `playable-bot-four` to the Classic budget below, and
-  Definitive's when a render path changes (smashcraft:.github/workflows/farm-test.yml);
+  each change must hold `playable-bot-four` to the Classic budget below
+  (smashcraft:.github/workflows/farm-test.yml);
   after landing, main's smoke run plays `playable-human-four`, all four
   fighters on the fixed key tape of smashcraft:ts/scripts/wisp/botMatch.ts
   with no computer deciding, compares it with the previous landed main's

@@ -1,6 +1,6 @@
 # Animation sources: stock sequences versus authored clips
 
-Author fighter animation for Classic and Definitive only. Each player may choose their look, while the same moves, animation timing, hitboxes and hurtboxes govern both. Reforged conversion is dropped from the plans.
+Author fighter animation for the Classic models only.
 
 Which of each fighter's moves plays a sequence its Warcraft model already has
 ("stock") and which plays a clip authored for Smashcraft, with the verdict of

@@ -9,8 +9,7 @@ TS-d rubric remain the reference for judging the result.
 Other stages must match that deliberate relationship between materials,
 lighting and silhouette: three distinct deck materials, themed platforms,
 three receding scenery bands, an immediately recognisable landmark and small
-accents that follow the stage's clock. Stock assets come first. Classic and
-Definitive must each compose a complete scene, with visible ledges and fighter
+accents that follow the stage's clock. Stock assets come first. Classic must compose a complete scene, with visible ledges and fighter
 contrast at both camera extremes. Bloom, shadows or fog earn their place by
 supporting that scene, and each stage keeps its frame and motion budgets.
 

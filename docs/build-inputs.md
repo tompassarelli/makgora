@@ -58,13 +58,11 @@ with, one file per family, so a commit fixes its art exactly as it fixes its cod
 ## Public and private packages
 
 `bun wisp map build --profile playable --name NAME --out OUT.w3x` defaults
-to `--edition classic`: the public package omits every `_hd.w3mod` and
-`_de.w3mod` import. Other profiles default to `--edition full`, and
-`bun wisp play` explicitly builds a full private playable map. Use
-`--edition full` with the playable profile to check both looks during private
-development. The inputs stay intact for either edition. Rebuilds preserve
+to `--edition classic`: the public package omits every `_hd.w3mod`
+import. Other profiles default to `--edition full`, and
+`bun wisp play` explicitly builds a full private playable map. The inputs stay intact for either edition. Rebuilds preserve
 the existing archive's edition. A Classic build rejects a base or container
-that already carries HD/DE entries; the sealed inputs contain none.
+that already carries HD entries; the sealed inputs contain none.
 
 ## Change art
 

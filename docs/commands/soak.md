@@ -22,16 +22,15 @@
   representative reference paths: compare the full shape union between a
   warm-up high and a later rise to identify the retaining lifecycle.
   `bun wisp soak handles [--rematches N]` plays smashcraft:ts/scripts/wisp/handleBaseline.ts's
-  four-computer match and 20 rematches (N) through fighter selection in each look, Classic and
-  Definitive, in Bun (smashcraft:ts/test/soak/handles.ts) and on the compiled integrity build in
-  32-bit Lua, all four runs at once (#409). After every match each live Warcraft handle kind at
+  four-computer match and 20 rematches (N) through fighter selection in Bun (smashcraft:ts/test/soak/handles.ts) and on the compiled integrity build in
+  32-bit Lua, both runs at once (#409). After every match each live Warcraft handle kind at
   fighter selection must equal its menu baseline: the kinds the first match adds and the menu keeps
   (effects and frames of the stage-loading cover, one fighter body per fighter) equal their counts
   after the first match, every other kind (sounds, timers, triggers, ...) the cold menu's. It prints
-  each client's counts before, after the first match and after the last rematch per look, and fails
-  naming the kind and match that differ. 21 matches a look exceed both suites' per-test ceilings;
-  smashcraft:ts/test/handle-baseline.test.ts keeps the match and one rematch in each look.
-  It takes about 20 minutes on four cores (Bun 2.5, Lua32 20 a look) and each Lua run holds
+  each client's counts before, after the first match and after the last rematch, and fails
+  naming the kind and match that differ. 21 matches exceed both suites' per-test ceilings;
+  smashcraft:ts/test/handle-baseline.test.ts keeps the match and one rematch.
+  It takes about 20 minutes on four cores (Bun 2.5, Lua32 20) and each Lua run holds
   about 1.4 GB, compacting the emulator after every match.
   Native handles are checked separately: their emulator-owned record identities
   are excluded from map tables because Warcraft exposes them as opaque handles.

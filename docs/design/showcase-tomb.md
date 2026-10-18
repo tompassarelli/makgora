@@ -3,8 +3,7 @@
 The mood is a drowned sanctuary still breathing beneath the sea: turquoise
 light, coral-gold masonry and one immense, dark Naga temple. The fighters stand
 on the brightest strip of stone. The ruin behind them feels ancient and alive,
-without competing with their silhouettes. Classic and Definitive share this
-composition and the same match clock.
+without competing with their silhouettes.
 
 ## The first ten seconds
 
@@ -35,13 +34,12 @@ composition and the same match clock.
 | Glyph flare | Stock Naga rune states make the one-second slack readable; survey technique 4, Blizzard's nightelfx03 Tomb | A fixed function of match frame, with no new gameplay effect |
 | Temple animation | Keep the temple visible in Stand first; survey technique 1 proposes a later clock-scrubbed rise | Its stock 60-second Birth hides the body; a rise requires a capture before adopting it |
 | Light shafts | Sparse, soft stock Rays of Light in the far band; survey technique 7 | Quieter than the deck and absent from the fighting lane |
-| Bloom and ambient occlusion | Restrained bloom on water and gold accents; occlusion separates carved brackets; TS-2 and survey technique 20 | Add after the renderer controls land; Classic remains deliberate without them |
 | Point-light shadows | Soft depth under the ruin brackets; TS-3 | Use the renderer's existing shadow controls and retain frame budget |
 | Music and KO flash | Music holds the underwater mood; a KO briefly punctuates it | Use the existing stage music and combat flash rather than another stage effect |
 
 The current Classic pass uses existing stock assets, existing height fog and
 the shipped light models. It begins with composition at actual gameplay zoom.
 Each further lever earns its place through the same TS-a through TS-d and
-S1 through S3 rubric in [stage boards](stage-boards.md), with Classic and
-Definitive captures at both camera extremes. The showcase becomes the bar for
+S1 through S3 rubric in [stage boards](stage-boards.md), with Classic
+captures at both camera extremes. The showcase becomes the bar for
 other stages after those captures have been judged and their gaps resolved.

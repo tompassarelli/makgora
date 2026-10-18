@@ -67,7 +67,7 @@ weapon models, white flash, agency halo, shield and dizzy stars without
 touching the sim, stage, other fighters or HUD; `-dev show fighter SLOT` puts
 back exactly what was drawn (receipt `dev: fighter SLOT hidden|shown`).
 
-- One-client Definitive look captures (signed-in clone b, c or d):
+- One-client captures:
   `bun scripts/nativeCapture.ts build --out MAP.w3x --control PAD|DIR...` bakes
   the scripts and their `capture` frames into a native-capture map that plays
   both pads itself and holds each capture frame with the fighters' animations
@@ -108,8 +108,8 @@ back exactly what was drawn (receipt `dev: fighter SLOT hidden|shown`).
   `FIXTURE/silhouette.json` (match frames, slot, fighter, move, resolution) for
   Wisp's `silhouetteBounds(shown, hidden)`; `run` refuses a capture of another
   size. The default scenario is smashcraft:ts/test/native/captures/wisp125-warden-nair.pad
-  (Warden's neutral air, 10 held frames); build and run it as above on a
-  Definitive clone (clone-c, clone-d or account b), never Tom's install.
+  (Warden's neutral air, 10 held frames); build and run it as above, never on
+  Tom's install.
 
 Automated native match/rematch tests use one stock by default. A named workload
 may use more stocks or a longer timer only when its required sample needs it;
@@ -119,9 +119,7 @@ Keep ordinary combat completion intact; do not force a win to shorten a test.
 Frame acceptance follows the root AGENTS.md budget.
 
 Never touch Tom’s install; run account a only as clone-a through its
-launch.sh, which yields to Tom’s game. Pick clients by the required look: the
-offline LAN pool is Classic only; Definitive checks use the signed-in pairs
-clone-c+clone-b and clone-a+clone-d (wisp:docs/lan.md). The offline pool remains the default for Classic pad parity,
+launch.sh, which yields to Tom’s game. The offline LAN pool is the default for pad parity,
 captures, `accept` checks and desync hunts.
 
 Wisp gives every verdict that is a number from the map's code (wisp#75 M5):
@@ -141,7 +139,7 @@ the gate's bounds. The laptop runs only product proofs requested in the real
 game (60 fps on Tom's machine, the trailer, a listening clip). New Done-when
 boxes follow the same line.
 
-Native checks use one worker per available client (signed-in b, c, d for Definitive;
+Native checks use one worker per available client (signed-in b, c, d;
 clone-a only through its launch.sh), sharing the visual queue; pairs are only for
 sync, netplay and EX checks. A TypeScript-only
 change (presentation values, effects, menus, CPU tuning) hot-reloads into one
@@ -154,9 +152,9 @@ Every native `bun wisp pad` run is compared frame for frame, so it waits for
 machine-capacity's quiet native session before client input and keeps it
 through the whole command, captures or not (#69). Each result records
 `load_average` and `quiet_window`.
-The signed-in clones (B, C, D) cover Definitive captures and tests that need Battle.net
+The signed-in clones (B, C, D) cover tests that need Battle.net
 itself: real netplay or latency, direct play, spectating, and as the
-updated install the pool is copied from. Do not start them for a Classic offline check;
+updated install the pool is copied from. Do not start them for an offline check;
 preserve an already signed-in client at its menu for the next client worker.
 A run during which a client wrote a desync report or
 crashed is invalid; rerun it.

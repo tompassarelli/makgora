@@ -280,8 +280,8 @@ determinism checks does not establish stage legality.
 ### What the clients can show
 
 The test clients run classic graphics (War3Preferences.txt `hd=0`), which load
-the game's root asset set; Reforged-only assets live under `_hd.w3mod` and a
-newer `_de.w3mod` set and are absent in classic. Below, every asset is in the
+the game's root asset set; HD assets live under `_hd.w3mod` and are absent in
+classic. Below, every asset is in the
 classic set unless marked **HD**. Paths come from the game's own listings:
 Doodads.slk with doodadskins.txt, DestructableData.slk, Weather.slk,
 WorldEditData.txt's sky list, and the CASC file list.
