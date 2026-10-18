@@ -1,6 +1,6 @@
 import { f32 } from "wisp/src/sim/f32";
 
-import { STAGE_TOMB_SEA_MODEL } from "../../generated/stages/terrainAssetInfo";
+import { STAGE_GROUND_MODEL } from "../../generated/stages/terrainAssetInfo";
 import { STAGE_SKY_MODELS } from "../../generated/stages/stageSkyInfo";
 import type { StageScenery } from "./stageScenery";
 
@@ -12,7 +12,7 @@ export const STRATHOLME_SCENERY: StageScenery = {
   farZ: 13000.0,
   sky: STAGE_SKY_MODELS[6] ?? "",
   fog: { start: 3300.0, end: 9500.0, red: 0.03125, green: 0.03125, blue: 0.0390625 },
-  floor: { model: STAGE_TOMB_SEA_MODEL, z: -1300.0, color: [104, 51, 42] },
+  floor: { model: STAGE_GROUND_MODEL, z: -1300.0, color: [36, 24, 20] },
   pieces: [
     { model: "Doodads\\Cityscape\\Structures\\CityBuildingLarge_45_Ruined\\CityBuildingLarge_45_Ruined.mdx", x: -3900.0, y: 4000.0, z: -1300.0, scale: 2.8125, yaw: 15.0, matrixScale: [1.0, 1.0, 1.25] },
     { model: "Doodads\\Cityscape\\Structures\\CityBuildingSmall45_0_Ruined\\CityBuildingSmall45_0_Ruined.mdx", x: -3040.0, y: 4220.0, z: -1300.0, scale: 3.1875, yaw: 76.0, matrixScale: [1.0, 1.0, 1.25] },
@@ -36,6 +36,8 @@ export const STRATHOLME_SCENERY: StageScenery = {
     { model: "Doodads\\Cityscape\\Structures\\CityBuildingSmall135_1_Ruined\\CityBuildingSmall135_1_Ruined.mdx", x: 2450.0, y: 3300.0, z: -1300.0, scale: 2.0625, yaw: 160.0 },
     { model: TOWN_FIRE, x: -1280.0, y: 4300.0, z: -200.0, scale: 1.75, yaw: 0.0 },
     { model: TOWN_FIRE, x: 2160.0, y: 4500.0, z: -150.0, scale: 1.5, yaw: 90.0 },
+    { model: TOWN_FIRE, x: -2600.0, y: 4300.0, z: -1300.0, scale: 2.0, yaw: 45.0 },
+    { model: TOWN_FIRE, x: 850.0, y: 4300.0, z: -1300.0, scale: 1.5, yaw: 135.0 },
     { model: "Doodads\\LordaeronFall\\Structures\\AndrohalClockTower_Destroyed\\AndrohalClockTower_Destroyed.mdx", x: -1600.0, y: 7600.0, z: -1800.0, scale: 2.0, yaw: 270.0 },
     { model: "Doodads\\Barrens\\Rocks\\Barrens_Rocks\\Barrens_Rocks2.mdx", x: -1600.0, y: 7600.0, z: -4000.0, scale: 10.0, yaw: 110.0, matrixScale: [1.0, 1.0, f32(2.797)] },
   ],
@@ -56,7 +58,6 @@ export const TOMB_OF_SARGERAS_SCENERY: StageScenery = {
     { model: "Doodads\\Ruins\\Structures\\SRuinArch\\SRuinArch.mdx", x: 0.0, y: 4500.0, z: -2150.0, scale: 6.25, yaw: 270.0, matrixScale: [0.5, 2.0, 1.0] },
     { model: "Doodads\\Ruins\\Structures\\SRuinArch\\SRuinArch.mdx", x: 4000.0, y: 4500.0, z: -1400.0, scale: 4.0, yaw: 85.0, matrixScale: [0.5, 2.0, 1.0] },
     { model: "Doodads\\Ruins\\Rocks\\Ruins_Rock\\Ruins_Rock0.mdx", x: 1500.0, y: 4600.0, z: -5150.0, scale: 17.0, yaw: 287.0, matrixScale: [1.0, 1.0, 2.0] },
-    // TS-c: the waterfall stays on the left; HD imports replace only its misty model, keeping Classic stock.
     { model: "Doodads\\Terrain\\CliffDoodad\\Waterfall\\Waterfall.mdx", x: -2200.0, y: 3600.0, z: -2200.0, scale: 5.0, yaw: 270.0, matrixScale: [1.0, 1.0, 2.5] },
     { model: "Doodads\\Ruins\\Structures\\SRuinArch\\SRuinArch.mdx", x: -1800.0, y: 3500.0, z: -900.0, scale: 4.0, yaw: 15.0 },
     { model: "Doodads\\Ruins\\Rocks\\Ruins_Rock\\Ruins_Rock0.mdx", x: -3100.0, y: 3900.0, z: -5300.0, scale: 16.0, yaw: 52.0, matrixScale: [1.0, 1.0, 2.0] },

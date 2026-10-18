@@ -248,7 +248,10 @@ from the floor (smashcraft:ts/src/game/presentation/stageScenery.ts).
 11. **The deck sits in a world** (Tom's 9 Oct playtest, #360). Water, cliffs or
     structure fill the space beneath and beside the deck; no background
     surface is presented as another place to land. Tomb's opaque sea sits at
-    its real swimming height and covers its sunken ruin bases. Matches draw
+    its real swimming height and covers its sunken ruin bases. Only Tomb of
+    Sargeras has water (Tom, 18 Oct); every other stage's floor far below is
+    its own ground (the opaque stage ground model, tinted ice, forest, rock,
+    red earth, blight, sand or ash) or Blackrock's lava. Matches draw
     no terrain. Background pieces that would
     stand on the ground fade into that atmosphere before their bases show,
     so nothing beneath the deck reads as a place to land, at either camera

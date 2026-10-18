@@ -1,12 +1,12 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
-import { STAGE_LAVA_MODEL, STAGE_SEA_MODEL, STAGE_TOMB_SEA_MODEL } from "../../generated/stages/terrainAssetInfo";
+import { STAGE_GROUND_MODEL, STAGE_LAVA_MODEL, STAGE_SEA_MODEL, STAGE_TOMB_SEA_MODEL, STAGE_TOMB_WATER_MODEL } from "../../generated/stages/terrainAssetInfo";
 import { stageScenery, terrainPieces } from "./stageScenery";
 import { driftPose } from "./driftingScenery";
 import { max, min } from "../core/numbers";
 import { fogProblems, mirrorProblems } from "./stageRules";
 import { platformParts } from "./stockPlatforms";
-import { surfaceCount } from "../sim/stage";
+import { TOMB_OF_SARGERAS_STAGE, surfaceCount } from "../sim/stage";
 
 
 
@@ -54,10 +54,12 @@ test("every stock-built platform draws only its walking piece, with no rock or r
   }
 });
 
-test("the space below every stage's platforms is Tomb's sea or lava, never the stretched zigzag sea plane [k2 property]", () => {
+test("the space below every stage's platforms is ground or lava, never the stretched zigzag sea plane, and only Tomb of Sargeras draws water [k2 property]", () => {
   for (const { id, name } of STAGE_CATALOG) {
     const floor = stageScenery(id).floor;
-    if (floor !== undefined) assertEquals(floor.model === STAGE_TOMB_SEA_MODEL || floor.model === STAGE_LAVA_MODEL, true, `${name}: floor ${floor.model}`);
+    if (floor !== undefined) assertEquals(floor.model === STAGE_GROUND_MODEL || floor.model === STAGE_LAVA_MODEL, true, `${name}: floor ${floor.model}`);
+    const water = [...terrainPieces(id), ...stageScenery(id).pieces].some(({ model }) => model === STAGE_TOMB_SEA_MODEL || model === STAGE_TOMB_WATER_MODEL);
+    assertEquals(water, id === TOMB_OF_SARGERAS_STAGE, `${name}: water beneath the deck is ${water}`);
     for (const piece of terrainPieces(id)) assertEquals(piece.model === STAGE_SEA_MODEL, false, `${name}: draws the zigzag sea plane`);
   }
 });

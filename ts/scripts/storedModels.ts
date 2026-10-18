@@ -7,7 +7,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { Console, Effect } from "effect";
 import { FAMILY_NAMES, INPUTS_STORE, MANIFEST, assetsView, readManifest, regenerate } from "./wisp/buildInputs";
-import { GENERATED_MODELS, TOMB_WATERFALL_IMPORTS, missingModels } from "./wisp/mapInputs";
+import { GENERATED_MODELS, missingModels } from "./wisp/mapInputs";
 import { importList } from "./wisp/importList";
 import { parseModelMDX } from "./mdxCodec";
 import { WHITE_FIGHTER_MODELS } from "../src/generated/assets/whiteFighterModels";
@@ -42,9 +42,6 @@ const program = Effect.gen(function*() {
     else if (absent.length > 0) problems.push(`${family} ${pin(family)}: ${absent.join(", ")} missing; ${remedy}`);
   }
 
-  const stage = join(assets, "stage-assets");
-  const waterfalls = TOMB_WATERFALL_IMPORTS.map(({ file }) => file).filter((file) => !existsSync(join(stage, file)));
-  if (waterfalls.length > 0) problems.push(`stage-assets ${pin("stage-assets")}: ${waterfalls.join(", ")} missing; add the new deck files to a copy of the stored family instead of storing build/stage-assets alone`);
   const impact = join(assets, "impact-assets");
   for (const model of Object.values(WHITE_FIGHTER_MODELS)) {
     const path = join(impact, model.replace(/^war3mapImported\\/, ""));

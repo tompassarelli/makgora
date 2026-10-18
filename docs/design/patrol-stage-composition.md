@@ -43,16 +43,20 @@ orientation and depth. Their scales range from 2.0 to 3.5 instead of 3.0 to
 6.0, so the stage reads as a deck suspended over terrain rather than a deck
 wedged among enormous boulders.
 
-## Naxxramas: the floating citadel over a ruined town
+## Naxxramas: the necropolis over the Plaguelands
 
-Tom, 17 Oct: the old Naxxramas stood on a frozen lake "for no reason". The
-Necropolis now floats (`flying`) at x 1500, y 6600, z 350 and scale 2.5,
-high over the right of the skyline, with nothing under it. A row of ten
-ruined Lordaeron town buildings (the Cityscape `_Ruined` models, own
-textures) stands on the floor at y 4100 to 4450 behind the deck, the
-glaciers survive only as a lowered row of Northrend peaks at y 5250 to 5450,
-the floor is a dark night ground (72, 80, 92) instead of icy water, and the
-fog turns aurora green (0.09375, 0.3125, 0.25).
+Naxxramas is Kel'Thuzad's floating Scourge citadel, a former nerubian
+ziggurat that hangs over the Eastern Plaguelands near Stratholme (Tom, 18 Oct:
+make it lore accurate, and no water beneath a stage that floats). The
+Necropolis floats (`flying`) at x 1500, y 6600, z 350 and scale 2.5, high
+over the right of the skyline, with nothing under it; its plague-green slime
+falls are the stage's glow. Far below, the Scourge's base stands on blighted
+Plaguelands ground (the stage ground, tinted 34, 38, 26 so it fades into
+the abyss): three ziggurats, two graveyards, two boneyards, two Temples of
+the Damned and the slaughterhouse at z -1700. Two plague clouds hang over the
+slaughterhouse and the graveyard, and a farther slaughterhouse and ziggurat
+stand in the far band. The Northrend glaciers and the icy sea are gone. The
+fog stays aurora green (0.09375, 0.3125, 0.25).
 
 ## Hellfire: a portal across fractured ground
 

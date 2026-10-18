@@ -1,7 +1,7 @@
 
 
 import { f32 } from "wisp/src/sim/f32";
-import { STAGE_TOMB_WATER_MODEL, STAGE_TOMB_SEA_MODEL, STAGE_LAVA_MODEL } from "../../generated/stages/terrainAssetInfo";
+import { STAGE_TOMB_WATER_MODEL, STAGE_TOMB_SEA_MODEL, STAGE_LAVA_MODEL, STAGE_GROUND_MODEL } from "../../generated/stages/terrainAssetInfo";
 import { LAVA_CENTER_X, LAVA_HALF_WIDTH } from "../sim/lava";
 import { SEA_SURFACE_Z } from "../sim/stageHazards";
 import { STAGE_POINT_LIGHT_MODELS, STAGE_SNOW_MODEL } from "../../generated/stages/stageAssetInfo";
@@ -65,7 +65,7 @@ const FROZEN_THRONE: StageScenery = {
   sky: STAGE_SKY_MODELS[2] ?? "",
 
   fog: { start: 5000.0, end: 11000.0, red: 0.375, green: 0.625, blue: 0.875 },
-  floor: { model: STAGE_TOMB_SEA_MODEL, z: -1300.0, color: [176, 208, 232] },
+  floor: { model: STAGE_GROUND_MODEL, z: -1300.0, color: [56, 72, 92] },
   pieces: [
     { model: "Doodads\\Cinematic\\FrozenThrone\\FrozenThrone.mdx", x: 1900.0, y: 6500.0, z: -1300.0, scale: 0.5, yaw: 250.0 },
     { model: "Doodads\\Icecrown\\Rocks\\Glacier\\Glacier0.mdx", x: -3300.0, y: 2200.0, z: -1300.0, scale: 2.5, yaw: 185.0, matrixScale: [2.5, 1.0, 0.875] },

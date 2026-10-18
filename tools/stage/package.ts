@@ -119,8 +119,8 @@ console.log(`Stage decks: ${STAGE_DECK_PALETTES.length} palettes; slab bounds x=
 const liquidNames = await packageLiquids(output);
 
 
-const deckFacts = Object.fromEntries(Object.entries(MODEL_FACTS).filter(([model]) => !model.startsWith("war3mapImported\\StageDeck-") && !model.startsWith("war3mapImported\\StageMainDeck-") && !model.startsWith("war3mapImported\\StageTombWater-") && !model.startsWith("war3mapImported\\StageTombSea-")));
-for (const name of [...imports.filter(name => name.startsWith("StageDeck-") || name.startsWith("StageMainDeck-")), ...liquidNames.filter(name => /^StageTomb(Water|Sea)-.*\.mdx$/.test(name))]) {
+const deckFacts = Object.fromEntries(Object.entries(MODEL_FACTS).filter(([model]) => !model.startsWith("war3mapImported\\StageDeck-") && !model.startsWith("war3mapImported\\StageMainDeck-") && !model.startsWith("war3mapImported\\StageTombWater-") && !model.startsWith("war3mapImported\\StageTombSea-") && !model.startsWith("war3mapImported\\StageGround-")));
+for (const name of [...imports.filter(name => name.startsWith("StageDeck-") || name.startsWith("StageMainDeck-")), ...liquidNames.filter(name => /^Stage(Tomb(Water|Sea)|Ground)-.*\.mdx$/.test(name))]) {
     deckFacts[`war3mapImported\\${name}`] = roundedFacts(modelFacts(await Bun.file(join(output, name)).bytes()));
 }
 writeModelFacts(deckFacts);

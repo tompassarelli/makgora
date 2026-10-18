@@ -53,3 +53,14 @@ export function liquidTga(texel: (x: number, y: number) => Rgba, size = LIQUID_T
   }
   return texture;
 }
+
+export const GROUND_TEXTURE_SIZE = 128;
+
+export function groundTexel(x: number, y: number): Rgba {
+  const u = x * 2 * Math.PI / GROUND_TEXTURE_SIZE;
+  const v = y * 2 * Math.PI / GROUND_TEXTURE_SIZE;
+  const broad = Math.sin(2 * u + 1.5 * Math.sin(v)) * Math.sin(v + 1.2 * Math.sin(2 * u));
+  const grain = Math.sin(9 * u + 5 * v + 2 * Math.sin(3 * v)) * Math.sin(7 * v - 4 * u + 1.5 * Math.sin(2 * u));
+  const level = Math.round(255 * (0.86 + 0.07 * broad + 0.03 * grain));
+  return [level, level, level, 255];
+}

@@ -116,7 +116,7 @@ limits in smashcraft:ts/src/game/assets/stagePalette.tests.ts. The
 
 ## Shared rubric lines
 
-Every stage's rubric starts with these three. Captures are one native batch
+Every stage's rubric starts with these four. Captures are one native batch
 at both camera extremes (`-dev view near|far`), with the `-dev backdrop off`
 mask for contrast.
 
@@ -131,6 +131,10 @@ mask for contrast.
   platform each show a visible repeating texture pattern (not a flat fill),
   in the stage's set below, and no face of deck or platform is the neutral
   slate (136, 151, 157) within 10 per channel, except on Sky Deck.
+- **S4 Water only in the tide** (Tom, 18 Oct). No stage but Tomb of
+  Sargeras shows water beneath or around its deck; the floor far below is
+  the place's own ground or Blackrock's lava.
+  smashcraft:ts/src/game/presentation/stageScenery.tests.ts enforces it.
 
 ## Boards
 
@@ -157,7 +161,7 @@ Topology: the existing thin lip over a long taper to a narrow keel (stages.md, M
 
 Rubric:
 
-- S1, S2, S3.
+- S1, S2, S3, S4.
 - FT-a: the deck top shows rune bricks, the body dark blocks; the edge band is the brightest horizontal line of the deck in a grayscale copy of the frame (FT-3).
 - FT-b: the keel ends in one point below the deck centre's third, not a flat bottom (FT-1).
 - FT-c: the Frozen Throne massif is visible at the far extreme on the right third and is lighter and less saturated than the deck (FT-2).
@@ -187,7 +191,7 @@ Topology: the deep rounded bowl, like a root mass, with an uneven lower edge (NO
 
 Rubric:
 
-- S1, S2, S3.
+- S1, S2, S3, S4.
 - NO-a: the deck top reads green, the edge as a different (teal or vine-dark) band, the body brown-grey (NO-1).
 - NO-b: the World Tree is visible at the far extreme, on the left third, and is the only shape taller than the deck's height above the horizon (NO-2).
 - NO-c: the FelwoodSky aurora covers at least 50% of the top 40% of the frame (NO-4; checklist A).
@@ -217,7 +221,7 @@ Topology: flat lip, a step in, then a lower shell (Pokémon Stadium), stepped tw
 
 Rubric:
 
-- S1, S2, S3.
+- S1, S2, S3, S4.
 - GA-a: the deck top reads as cut stone blocks and the body as rougher rock, with a visible step in the silhouette (GA-2).
 - GA-b: a gold line runs the deck's full front edge, unbroken from ledge to ledge (GA-3).
 - GA-c: the carried platform's material differs in hue from the static platforms (GA-2).
@@ -247,7 +251,7 @@ Topology: the floating spire, a thin rim undercut to a deep point (DU-2's strata
 
 Rubric:
 
-- S1, S2, S3.
+- S1, S2, S3, S4.
 - DU-a: the deck top reads red-brown earth, the edge as timber, the drifting platform as timber distinct from the top (DU-1).
 - DU-b: the body shows horizontal banding and narrows to one point (DU-2).
 - DU-c: the watchtower is visible at the far extreme on the left third, standing on its mesa (DU-2).
@@ -262,6 +266,7 @@ Lich and Sylvanas's home: Kel'Thuzad's floating necropolis.
 | NX-1 | Ultimate Midgar, `u272-midgar.jpg` | **Lighting and palette**: a lit industrial slab with red beacons at its edges against a dark teal skyline. In Warcraft: black-iron and Scourge stone deck, plague-green lights at the ledges, slate-to-teal sky. |
 | NX-2 | Ultimate Lylat Cruise, `u272-lylat-cruise.jpg` | **Silhouette**: a bright-edged hull against near-black space; the stage body is a built object. In Warcraft: the body is a stepped iron ziggurat, edges lit. |
 | NX-3 | Ultimate Hollow Bastion, `u272-hollow-bastion.jpg` | **Landmark**: one castle silhouette framed by cliffs in a V, hazy. In Warcraft: the Necropolis alone, fogged, on the right third. |
+| NX-4 | Tom, 18 Oct; Kel'Thuzad's Naxxramas over the Eastern Plaguelands | **Lore**: the floating Scourge necropolis over blighted Plaguelands near Stratholme. In Warcraft: Undead ziggurats, slaughterhouse, boneyards, graveyards and temple on blighted ground far below, plague clouds, no water or Northrend ice. |
 
 Material set:
 
@@ -276,11 +281,12 @@ Topology: the inverted ziggurat, three steps in (NX-2).
 
 Rubric:
 
-- S1, S2, S3.
+- S1, S2, S3, S4.
 - NX-a: green light marks both ledges and the ends of both moving platforms (NX-1).
 - NX-b: the body shows three steps in its outline (NX-2).
 - NX-c: the Necropolis is visible at the far extreme on the right third and is the only building taller than the deck on screen (NX-3).
 - NX-d: the two moving platforms are told apart by hue or tint (NX-1).
+- NX-e: below the deck are Scourge buildings on blighted ground under plague green, never water (NX-4).
 
 ### Hellfire Citadel (14), Pokémon Stadium layout
 
@@ -305,7 +311,7 @@ Topology: the heavy slab, tall straight walls and a broad blunt base (HF-1).
 
 Rubric:
 
-- S1, S2, S3.
+- S1, S2, S3, S4.
 - HF-a: a green line runs the deck's front edge, ledge to ledge (HF-1).
 - HF-b: the deck shows only red-brown, black and green hues; no blue or gold face (HF-2).
 - HF-c: the Demon Gate is visible at the far extreme on the left third, inside haze that is lower in contrast than the deck (HF-3).
@@ -334,7 +340,7 @@ Topology: the forge anvil, with walls and an underside like every stage; the can
 
 Rubric:
 
-- S1, S2, S3.
+- S1, S2, S3, S4.
 - BR-a: the molten lip is the brightest horizontal line on screen, and nothing brighter sits behind either ledge (BR-1).
 - BR-b: the forge platform's material differs from the main deck's top (BR-2).
 - BR-c: the upper third of the frame is darker than the lower half of the backdrop (BR-1).
@@ -363,7 +369,7 @@ Topology: the temple, an even trapezoid taper (AQ-2).
 
 Rubric:
 
-- S1, S2, S3.
+- S1, S2, S3, S4.
 - AQ-a: the deck's body shows larger bricks than its top, and the lip is a gold band (AQ-1, AQ-2).
 - AQ-b: the backdrop band behind the deck has a mean L\* below the fighters' lit side (AQ-3, #267).
 - AQ-c: the obelisk is visible at the far extreme on the left third (AQ-1).
@@ -392,7 +398,7 @@ Topology: cobbled slopes, as the stage has; the body a foundation wall with one 
 
 Rubric:
 
-- S1, S2, S3.
+- S1, S2, S3, S4.
 - ST-a: the deck top reads as cobbles, the platforms as roofs, in different hues (ST-2).
 - ST-b: the cathedral is visible at the far extreme on the right third against a sky brighter near the horizon than at the deck's height band (ST-3).
 - ST-c: the only warm light sources are the town fires, none directly behind a ledge (ST-1).
@@ -421,7 +427,7 @@ Topology: the two end platforms overhang the ledges on visible ruin brackets (TS
 
 Rubric:
 
-- S1, S2, S3.
+- S1, S2, S3, S4.
 - TS-a: the tide floor is the brightest surface of the deck; the Temple of Tides is darker (TS-2).
 - TS-b: the end platforms read as carved brick, unlike the deck top (TS-3).
 - TS-c: the Temple of Tides is visible at the far extreme on the right third and the waterfall on the left (TS-1).
