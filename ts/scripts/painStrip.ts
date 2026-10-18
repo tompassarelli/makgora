@@ -1,6 +1,8 @@
 import { join } from "node:path";
 import { mkdir } from "node:fs/promises";
 import { Effect, Schema } from "effect";
+import { ChildProcess } from "effect/process";
+import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { installHeadless, playHeadless } from "wisp/scripts/wisp/headless";
 import { type RenderScene, captureScene, renderScenes } from "wisp/scripts/wisp/headlessRender";
 import { parseGraphics } from "wisp/scripts/wisp/graphicsProfiles";
@@ -17,6 +19,7 @@ import * as platformMain from "../src/platform/main";
 import { headlessRender } from "./wisp/headlessRender";
 import { smashcraftNativeBehavior } from "./wisp/headlessNatives";
 import { RETURNING_PLAYER_FILES } from "./selectStrip";
+import { runProcess } from "./hostProcess";
 import { shellState } from "../src/host/loop/state";
 import { fighterAt } from "../src/game/sim/roster";
 
@@ -108,11 +111,6 @@ export function victimCrop(scene: RenderScene, screen: { readonly width: number;
 
 const slug = (name: string) => name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
-function run(command: readonly string[]): string | undefined {
-  const done = Bun.spawnSync([...command]);
-  return done.exitCode === 0 ? undefined : `${command[0]}: ${done.stderr.toString()}`;
-}
-
 export const painStrip = (args: readonly string[]) => Effect.gen(function*() {
   const [out] = args;
   const flag = (name: string) => { const at = args.indexOf(name); return at < 0 ? undefined : args[at + 1]; };
@@ -128,7 +126,7 @@ export const painStrip = (args: readonly string[]) => Effect.gen(function*() {
   const drawn = shots.flatMap((shot, id) => shot.first === undefined || shot.held === undefined ? [] : [{ shot, id, first: { ...shot.first, matchFrame: id * 2 }, held: { ...shot.held, matchFrame: id * 2 + 1 } }]);
   const raw = join(out, "raw");
   yield* renderScenes({ ...headlessRender(), ...screen }, drawn.flatMap(({ first, held }) => [first, held]), raw, graphics);
-  const font = Bun.spawnSync(["fc-match", "-f", "%{file}", "sans"]).stdout.toString();
+  const font = yield* runProcess(ChildProcess.make("fc-match", ["-f", "%{file}", "sans"], { stdin: "ignore" }));
   const sheets: string[] = [];
   for (const character of characters) {
     const name = fighterKey(character);
@@ -141,14 +139,12 @@ export const painStrip = (args: readonly string[]) => Effect.gen(function*() {
       for (const [moment, scene] of [["first", first], ["held", held]] as const) {
         const crop = victimCrop(scene, screen);
         const tile = join(dir, `${shot.category}-${moment}.png`);
-        const problem = run(["magick", join(raw, `p0-match-${scene.matchFrame}.png`), "-crop", `${crop.width}x${crop.height}+${crop.x}+${crop.y}`, "+repage", "-resize", "420x350!", tile]);
-        if (problem !== undefined) return yield* new PainStripFailure({ problem });
+        yield* runProcess(ChildProcess.make("magick", [join(raw, `p0-match-${scene.matchFrame}.png`), "-crop", `${crop.width}x${crop.height}+${crop.x}+${crop.y}`, "+repage", "-resize", "420x350!", tile], { stdin: "ignore" }));
         tiles.push("-label", `${shot.category} ${moment} (frame ${scene.frame})`, tile);
       }
     }
     const sheet = join(out, `${slug(name)}-${graphics}.png`);
-    const problem = run(["montage", "-font", font, "-pointsize", "18", "-title", `${name} - ${graphics} - nine reactions, first pain frame and held frame`, ...tiles, "-tile", "6x3", "-geometry", "+4+4", sheet]);
-    if (problem !== undefined) return yield* new PainStripFailure({ problem });
+    yield* runProcess(ChildProcess.make("montage", ["-font", font, "-pointsize", "18", "-title", `${name} - ${graphics} - nine reactions, first pain frame and held frame`, ...tiles, "-tile", "6x3", "-geometry", "+4+4", sheet], { stdin: "ignore" }));
     sheets.push(sheet);
   }
   yield* Effect.promise(() => Bun.write(join(out, "shots.json"), JSON.stringify({ graphics, screen, shots: shots.map(({ first, held, ...shot }) => ({ ...shot, firstFrame: first?.frame, heldFrame: held?.frame })) }, null, 2) + "\n"));
@@ -156,4 +152,4 @@ export const painStrip = (args: readonly string[]) => Effect.gen(function*() {
   if (missed.length > 0) return yield* new PainStripFailure({ problem: `${missed.length} categories never showed their pain clip` });
 });
 
-if (import.meta.main) await Effect.runPromise(painStrip(Bun.argv.slice(2)));
+if (import.meta.main) BunRuntime.runMain(painStrip(Bun.argv.slice(2)).pipe(Effect.provide(BunServices.layer)));
