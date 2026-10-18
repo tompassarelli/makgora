@@ -47,7 +47,7 @@ const SLEEP_ORB: AuthoredSpecial = {
 
 
 const POUNCE_GRAB: StrikeCapsule = { x1: 14.0, z1: 40.0, x2: f32(h(f32(0.45)) - 12.0), z2: 40.0, radius: 12.0 };
-const POUNCE_BITE = dreadlordHit(12.461036682128906, "EDGE", 40);
+const POUNCE_BITE = dreadlordHit(11.75, "EDGE", 40);
 const POUNCE_BODY = [
   hurtPose(7, 9, [hurtPart(8.0, 60.0, 8.0, 60.0, 45.0), hurtPart(18.0, 132.0, 18.0, 132.0, 45.0), hurtPart(40.0, 182.0, 40.0, 182.0, 21.0), hurtPart(8.0, 60.0, 18.0, 132.0, 8.0), hurtPart(18.0, 132.0, 40.0, 182.0, 8.0)]),
   hurtPose(10, 12, [hurtPart(9.0, 48.0, 9.0, 48.0, 45.0), hurtPart(20.0, 120.0, 20.0, 120.0, 45.0), hurtPart(35.0, 175.0, 35.0, 175.0, 21.0), hurtPart(9.0, 48.0, 20.0, 120.0, 8.0), hurtPart(20.0, 120.0, 35.0, 175.0, 8.0)]),

@@ -101,7 +101,7 @@ export const BLADEMASTER_GROUND: GroundKit = {
     [AttackStyle.downTilt]: heroMove(6, 2, 10, 0, tipped(6, [[18.0, 10.0, 152.0, 8.0], [18.0, 6.0, 152.0, 4.0]], 6.0, 26.0,
       groundHit(7.410800457000732, 20, 57.30000305175781, 18.0, BM), groundHit(4.631750106811523, 20, 57.30000305175781, 18.0, BM))),
     [AttackStyle.dashAttack]: heroMove(9, 4, 24, 0, tipped(9, [[18.0, 60.0, 145.0, 50.0], [18.0, 50.0, 145.0, 40.0], [18.0, 40.0, 145.0, 30.0], [18.0, 30.0, 145.0, 22.0]], 6.0, 26.0,
-      groundHit(9.263500213623047, 30, 95.5, 24.0, BM), groundHit(7.410800457000732, 40, 71.625, 18.0, BM)), 92.0, true),
+      groundHit(8.5, 30, 95.5, 24.0, BM), groundHit(7.0, 40, 71.625, 18.0, BM)), 92.0, true),
   },
   reaches: {
     [AttackStyle.jab]: [40.0, 72.0], [AttackStyle.jab2]: [42.0, 70.0], [AttackStyle.forwardTilt]: [48.0, 66.0], [AttackStyle.forwardTiltUp]: [48.0, 66.0], [AttackStyle.forwardTiltDown]: [48.0, 66.0],
@@ -113,7 +113,7 @@ export const BLADEMASTER_GROUND: GroundKit = {
 
 
 const MK = HitElement.normal;
-const mkHook = (angle: Angle) => groundHit(13.25999927520752, angle, f32(88.4), 25.0, MK);
+const mkHook = (angle: Angle) => groundHit(13.75, angle, f32(88.4), 25.0, MK);
 export const MOUNTAIN_KING_GROUND: GroundKit = {
   normals: {
     [AttackStyle.jab]: jabStep(heroMove(5, 2, 16, 0, swing(5, [[18.0, 40.0, 70.0, 42.0], [18.0, 42.0, 70.0, 38.0]], 12.0, groundHit(5.524999618530273, 30, 60.77499771118164, 16.0, MK)))),
@@ -127,7 +127,7 @@ export const MOUNTAIN_KING_GROUND: GroundKit = {
       groundHit(11.049999237060547, 85, 77.3499984741211, 10.0, MK))),
 
 
-    [AttackStyle.dashAttack]: heroMove(11, 5, 26, 0, [held(11, 15, [4.0, 12.0, 4.0, 65.0], 24.0, groundHit(13.25999927520752, 75, 104.9749984741211, 30.0, MK))], 79.0, true),
+    [AttackStyle.dashAttack]: heroMove(11, 5, 26, 0, [held(11, 15, [4.0, 12.0, 4.0, 65.0], 24.0, groundHit(13.75, 75, 104.9749984741211, 30.0, MK))], 79.0, true),
   },
   reaches: {
     [AttackStyle.jab]: [40.0, 42.0], [AttackStyle.jab2]: [42.0, 46.0], [AttackStyle.forwardTilt]: [46.0, 52.0], [AttackStyle.forwardTiltUp]: [42.0, 72.0], [AttackStyle.forwardTiltDown]: [44.0, 34.0],
@@ -189,12 +189,12 @@ export const FORSAKEN_PALADIN_GROUND: GroundKit = {
   normals: {
     [AttackStyle.jab]: jabStep(heroMove(5, 3, 15, 0, swing(5, [[24.0, 64.0, 62.0, 60.0], [24.0, 64.0, 62.0, 60.0], [24.0, 62.0, 58.0, 58.0]], 10.0, groundHit(4.0, 20, 40.0, 24.0, FORSAKEN_PALADIN)))),
     [AttackStyle.jab2]: heroMove(6, 3, 18, 0, swing(6, [[24.0, 60.0, 70.0, 58.0], [24.0, 58.0, 72.0, 54.0], [24.0, 56.0, 66.0, 50.0]], 10.0, groundHit(6.0, 30, 90.0, 26.0, FORSAKEN_PALADIN))),
-    ...unangled(heroMove(11, 3, 24, 0, swing(11, [[20.0, 100.0, 120.0, 140.0], [20.0, 70.0, 159.0, 60.0], [20.0, 40.0, 140.0, 8.0]], 12.0, groundHit(13.5, 35, 100.0, 25.0, FORSAKEN_PALADIN)))),
+    ...unangled(heroMove(11, 3, 24, 0, swing(11, [[20.0, 100.0, 120.0, 140.0], [20.0, 70.0, 159.0, 60.0], [20.0, 40.0, 140.0, 8.0]], 12.0, groundHit(14.75, 35, 100.0, 25.0, FORSAKEN_PALADIN)))),
     [AttackStyle.upTilt]: heroMove(10, 4, 22, 0, swing(10, [[20.0, 90.0, 70.0, 136.0], [12.0, 100.0, 30.0, 160.0], [4.0, 106.0, -10.0, 160.0], [-6.0, 100.0, -34.0, 138.0]], 14.0,
       groundHit(12.0, 85, 105.0, 28.0, FORSAKEN_PALADIN))),
     [AttackStyle.downTilt]: heroMove(9, 3, 20, 0, swing(9, [[14.0, 10.0, 124.0, 10.0], [14.0, 8.0, 124.0, 6.0], [14.0, 6.0, 110.0, 2.0]], 8.0, groundHit(9.0, 10, 40.0, 72.0, FORSAKEN_PALADIN))),
     [AttackStyle.dashAttack]: heroMove(12, 3, 20, 0, swing(12, [[20.0, 90.0, 120.0, 60.0], [20.0, 60.0, 125.0, 20.0], [20.0, 40.0, 115.0, 6.0]], 12.0,
-      groundHit(13.5, 30, 100.0, 26.0, FORSAKEN_PALADIN)), 46.0, true),
+      groundHit(14.75, 30, 100.0, 26.0, FORSAKEN_PALADIN)), 46.0, true),
   },
   reaches: {
     [AttackStyle.forwardTilt]: [48.0, 64.0], [AttackStyle.forwardTiltUp]: [48.0, 64.0], [AttackStyle.forwardTiltDown]: [48.0, 64.0],
@@ -232,7 +232,7 @@ export const DREADLORD_GROUND: GroundKit = {
 
 const SH = HitElement.slash;
 const thrust = (ends: readonly (readonly [number, number, number])[], angle: Angle) =>
-  swing(9, ends.map(([z1, x, z]): Segment => [20.0, z1, x, z]), 7.0, groundHit(11.0, angle, 75.0, 18.0, SH));
+  swing(9, ends.map(([z1, x, z]): Segment => [20.0, z1, x, z]), 7.0, groundHit(11.75, angle, 75.0, 18.0, SH));
 const spin = (damage: number, angle: Angle, growth: number, base: number) => groundHit(damage, angle, growth, base, SH);
 export const SHADOW_HUNTER_GROUND: GroundKit = {
   normals: {
@@ -245,7 +245,7 @@ export const SHADOW_HUNTER_GROUND: GroundKit = {
     [AttackStyle.upTilt]: heroMove(7, 5, 19, 0, swing(7, [
       [-40.0, 120.0, 60.0, 135.0], [-55.0, 128.0, 55.0, 128.0], [-60.0, 135.0, 40.0, 120.0], [-55.0, 128.0, 55.0, 128.0], [-40.0, 120.0, 60.0, 135.0],
     ], 9.0, groundHit(6.929999828338623, 80, 95.0, 20.0, SH))),
-    [AttackStyle.downTilt]: heroMove(7, 2, 16, 0, swing(7, [[18.0, 12.0, 145.0, -20.0], [18.0, 10.0, 145.0, -26.0]], 7.0, groundHit(7.920000076293945, 30, 70.0, 22.0, SH))),
+    [AttackStyle.downTilt]: heroMove(7, 2, 16, 0, swing(7, [[18.0, 12.0, 145.0, -20.0], [18.0, 10.0, 145.0, -26.0]], 7.0, groundHit(8.5, 30, 70.0, 22.0, SH))),
     [AttackStyle.dashAttack]: heroMove(8, 9, 20, 0, [
       held(8, 10, [20.0, 30.0, 100.0, 60.0], 7.0, spin(2.9700000286102295, 0, 15.0, 25.0), 1),
       held(11, 13, [20.0, 60.0, 100.0, 30.0], 7.0, spin(2.9700000286102295, 0, 15.0, 25.0), 2),
@@ -275,8 +275,8 @@ export const RIFLEMAN_GROUND: GroundKit = {
       groundHit(7.440000057220459, 90, 74.4000015258789, 26.0, RIFLE))),
     [AttackStyle.downTilt]: heroMove(7, 3, 22, 0, swing(7, [[14.0, 10.0, 108.0, 10.0], [14.0, 8.0, 108.0, 6.0], [14.0, 6.0, 100.0, 2.0]], 10.0,
       groundHit(9.300000190734863, 80, 41.85000228881836, 50.0, RIFLE))),
-    [AttackStyle.dashAttack]: heroMove(9, 3, 28, 0, swing(9, [[18.0, 50.0, 140.0, 52.0], [18.0, 50.0, 140.0, 50.0], [18.0, 48.0, 130.0, 48.0]], 10.0,
-      groundHit(10.230000495910645, 40, 106.02000427246094, 22.0, RIFLE)), 66.0, true),
+    [AttackStyle.dashAttack]: heroMove(11, 3, 26, 0, swing(11, [[18.0, 50.0, 140.0, 52.0], [18.0, 50.0, 140.0, 50.0], [18.0, 48.0, 130.0, 48.0]], 10.0,
+      groundHit(8.25, 40, 114.0, 22.0, RIFLE)), 66.0, true),
   },
   reaches: {},
 };

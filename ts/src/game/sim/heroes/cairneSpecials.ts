@@ -15,7 +15,7 @@ const GORE_HORNS = cairneHurtPose(8, 25, hurtPart(30.0, 80.0, 75.0, 70.0, 22.0))
 const gore = (air: boolean): AuthoredSpecial => ({
   endFrame: 58, hurt: GORE_HORNS,
   motion: [{ ...frames(12, 25), velocityX: air ? 8.0 : 10.0, velocityZ: 0.0, stopsAtBody: true }, { ...frames(26, 26), velocityX: 0.0, velocityZ: 0.0 }],
-  commandGrab: { ...frames(12, 24), strike: c(40.0, 62.0, 100.0, 48.0, 24.0), holdFrames: 20, effect: hit(10.763999938964844, "kill", 40), recovery: 22 },
+  commandGrab: { ...frames(12, 24), strike: c(40.0, 62.0, 100.0, 48.0, 24.0), holdFrames: 20, effect: hit(10.25, "kill", 40), recovery: 22 },
   ...(air ? { oncePerAirtime: true, helpless: true, landingLag: 24 } : {}),
 });
 const STOMP_RING: SpecialProjectile = {
@@ -25,9 +25,9 @@ const STOMP_RING: SpecialProjectile = {
 };
 const WAR_STOMP: AuthoredSpecial = {
   endFrame: 54, defensiveUse: true, armor: { ...frames(6, 19), maxDamage: 8.0 },
-  regions: [heroRegion(20, 23, c(0.0, 16.0, 106.0, 16.0, 24.0), hit(10.473372459411621, "launch", 80)),
-    heroRegion(20, 23, c(0.0, 16.0, -106.0, 16.0, 24.0), hit(10.473372459411621, "launch", 80, -1)),
-    heroRegion(20, 21, c(-50.0, 60.0, 50.0, 60.0, 34.0), hit(10.473372459411621, "launch", 85))],
+  regions: [heroRegion(20, 23, c(0.0, 16.0, 106.0, 16.0, 24.0), hit(9.75, "launch", 80)),
+    heroRegion(20, 23, c(0.0, 16.0, -106.0, 16.0, 24.0), hit(9.75, "launch", 80, -1)),
+    heroRegion(20, 21, c(-50.0, 60.0, 50.0, 60.0, 34.0), hit(9.75, "launch", 85))],
   projectiles: [STOMP_RING],
 };
 const lift = (): AuthoredSpecial => ({

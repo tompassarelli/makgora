@@ -138,7 +138,7 @@ const PIT_LORD_BODY: FighterHurtboxes = {
 
 const NO_LAUNCH = { growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } as const;
 
-const CLEAVING_SWEEP = heroMove(13, 4, 35, 0, cleave(13, [150.0, 100.0, 50.0, 10.0], XL, hit(14.43239974975586, "EDGE", 35)));
+const CLEAVING_SWEEP = heroMove(13, 4, 33, 0, cleave(13, [150.0, 100.0, 50.0, 10.0], XL, hit(14.43239974975586, "EDGE", 35)));
 
 export const PIT_LORD_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack,
@@ -179,7 +179,7 @@ export const PIT_LORD_MOVES: FighterMoves = {
 
     ], hit(12.027000427246094, "EDGE", 340, 1.0, HitElement.normal))),
 
-    [AttackStyle.dashAttack]: heroMove(15, 6, 34, 0, path(15, [
+    [AttackStyle.dashAttack]: heroMove(15, 6, 32, 0, path(15, [
       capsule(20.0, 60.0, f32(L - 30.0), 60.0, 30.0),
       capsule(20.0, 60.0, f32(L - 30.0), 58.0, 30.0),
       capsule(20.0, 58.0, f32(L - 30.0), 56.0, 30.0),

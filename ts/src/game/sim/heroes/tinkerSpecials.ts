@@ -8,7 +8,7 @@ import { claw, tinkerHit } from "./tinkerMoves";
 const rocket = (spawnFrame: number): SpecialProjectile => ({
   model: "Abilities\\Weapons\\RocketMissile\\RocketMissile.mdl",
   spawnFrame, offsetX: 35.0, offsetZ: 45.0, velocityX: 10.0, velocityZ: 2.0,
-  gravity: f32(0.12), life: 44, radius: 15.0, effect: tinkerHit(3.427246570587158, "poke", 55, 1.0, HitElement.fire),
+  gravity: f32(0.12), life: 44, radius: 15.0, effect: tinkerHit(3.75, "poke", 55, 1.0, HitElement.fire),
   reflectable: true, limit: 3,
 });
 const rockets = (air: boolean): AuthoredSpecial => ({ endFrame: 43, projectiles: [rocket(14), rocket(20), rocket(26)], landingLag: air ? 20 : undefined });
