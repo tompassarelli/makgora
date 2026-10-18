@@ -47,7 +47,7 @@ title carry the same name). Installing a main build (`play`, `playtest:build`,
 the Tom build watcher, `play --install-green`) removes everything else in the
 folder. X.Y.Z follows the release tags: a build of main takes the next patch
 number after the newest `vX.Y.Z` tag reachable from its commit (`git describe
---tags --match 'v[0-9]*.[0-9]*.[0-9]*' --exclude 'v*-*'`) or after every version already built or installed,
+--tags --match 'v[0-9]*.[0-9]*.[0-9]*' --exclude 'v*-*'`) or after every version of that tag's X.Y already built or installed (other lines' numbers, such as the old 0.0.N and 0.5.N builds, are ignored),
 whichever is higher, so the first build after v0.1.0 is 0.1.1 and then 0.1.2.
 The commit a release tag points at keeps the tag's version, and rebuilding the
 same commit keeps its number. At

@@ -31,6 +31,13 @@ test("after the v0.1.0 tag the next builds are 0.1.1 then 0.1.2 and a revision k
     expect(playVersion(builds, library, second, after)).toBe("0.1.2");
     expect(playVersion(builds, library, "e".repeat(40), after)).toBe("0.1.3");
     expect(playVersion(builds, library, "f".repeat(40), tagged)).toBe("0.1.0");
+
+    writeFileSync(join(library, "Smashcraft 0.5.4 9999999.w3x"), "stale");
+    writeFileSync(join(builds, `${"9".repeat(40)}.version`), "0.0.402\n");
+    expect(playVersion(builds, library, "e".repeat(40), after)).toBe("0.1.3");
+    expect(playVersion(builds, library, "9".repeat(40), after)).toBe("0.1.3");
+    writeFileSync(join(builds, `${"8".repeat(40)}.version`), "0.1.0\n");
+    expect(playVersion(builds, library, "8".repeat(40), after)).toBe("0.1.3");
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

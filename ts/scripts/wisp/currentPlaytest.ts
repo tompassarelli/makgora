@@ -67,15 +67,15 @@ export function playVersion(directory: string, library: string, revision: string
     });
   };
   const reserved = (path: string) => existsSync(path) ? parse(readFileSync(path, "utf8")) : [];
+  const inLine = (version: Triple) => release === undefined || (version[0] === release.version[0] && version[1] === release.version[1] && version[2] > release.version[2]);
   if (release?.atTag === true) return release.version.join(".");
-  const [own] = [...reserved(reservation(directory, revision)), ...numbered(join(directory, revision))];
+  const [own] = [...reserved(reservation(directory, revision)), ...numbered(join(directory, revision))].filter(inLine);
   if (own !== undefined) return own.join(".");
   const entries = existsSync(directory) ? readdirSync(directory).map((entry) => join(directory, entry)) : [];
   const seen = [
     ...[library, ...entries].flatMap(numbered),
     ...entries.filter((entry) => entry.endsWith(".version")).flatMap(reserved),
-    ...(release === undefined ? [] : [release.version]),
-  ];
+  ].filter(inLine).concat(release === undefined ? [] : [release.version]);
   const [major, minor, patch] = seen.reduce(newer, [0, 0, 0] as Triple);
   return `${major}.${minor}.${patch + 1}`;
 }
@@ -211,7 +211,8 @@ export const currentPlaytest = (library: string, { revision: wanted, named = fal
   const { revision, controller, mainCheckout } = yield* (wanted === undefined ? resolveMain : resolveRevision(wanted));
   const version = yield* reserveVersion(library, revision);
   const final = join(builds, edition === "full" ? revision : `${revision}-${edition}`);
-  const built = builtMap(final);
+  const found = builtMap(final);
+  const built = found !== undefined && PLAYABLE_FILE.exec(found)?.[1] === version ? found : undefined;
   const title = built !== undefined ? built.slice(0, -".w3x".length) : named ? installName(version, revision) : `Smashcraft ${version}`;
   const map = { folder: "00-Smashcraft", file: `${title}.w3x`, title, source: join(final, `${title}.w3x`) };
   const helper = helperPath(controller);
