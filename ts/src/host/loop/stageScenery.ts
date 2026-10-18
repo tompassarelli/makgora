@@ -1,7 +1,9 @@
 import { preloadModels, preloadSkies } from "../../game/presentation/stagePreload";
-import { pointLightPieces, STOCK_TERRAIN_LIGHT, STOCK_UNIT_LIGHT, placedPieces, shadowCastingLights, stageScenery } from "../../game/presentation/stageScenery";
+import { driftingPieces, pointLightPieces, STOCK_TERRAIN_LIGHT, STOCK_UNIT_LIGHT, placedPieces, shadowCastingLights, stageScenery, type SceneryPiece } from "../../game/presentation/stageScenery";
+import { driftPose, type DriftingPiece } from "../../game/presentation/driftingScenery";
 import { hideEffect } from "../../game/render/effects";
-import type { ShellState } from "./state";
+import type { ShellState, StageDrifter } from "./state";
+import { clockSeconds } from "./trace";
 import { arenaFogOffset, arenaFogEnd, cameraZOverride } from "../../game/presentation/arenaCamera";
 
 function updateStageFog(s: ShellState): void {
@@ -32,8 +34,36 @@ function drawStageFog(s: ShellState): void {
 }
 
 
+function addPiece(s: ShellState, piece: Readonly<SceneryPiece>, animation: animtype): effect {
+  const x = s.origin.x + piece.x;
+  const y = s.origin.y + piece.y;
+  const effect = AddSpecialEffect(piece.model, x, y);
+  BlzSetSpecialEffectPosition(effect, x, y, s.origin.z + piece.z);
+  BlzSetSpecialEffectScale(effect, piece.scale);
+  if (piece.color !== undefined) BlzSetSpecialEffectColor(effect, piece.color[0], piece.color[1], piece.color[2]);
+  BlzSetSpecialEffectYaw(effect, piece.yaw * (Math.PI / 180.0));
+  if (piece.matrixScale !== undefined) BlzSetSpecialEffectMatrixScale(effect, piece.matrixScale[0], piece.matrixScale[1], piece.matrixScale[2]);
+  BlzPlaySpecialEffect(effect, animation);
+  return effect;
+}
+
+function addDrifter(s: ShellState, piece: Readonly<DriftingPiece>): StageDrifter {
+  const pose = driftPose(piece, clockSeconds(s.trace));
+  const effect = addPiece(s, { ...piece, x: pose.x, z: pose.z, yaw: 0.0 }, ANIM_TYPE_WALK);
+  BlzSetSpecialEffectYaw(effect, pose.yaw);
+  return { effect, piece };
+}
+
+export function presentDrifters(s: ShellState): void {
+  const seconds = clockSeconds(s.trace);
+  for (const { effect, piece } of s.stageDrifters) {
+    const pose = driftPose(piece, seconds);
+    BlzSetSpecialEffectPosition(effect, s.origin.x + pose.x, s.origin.y + piece.y, s.origin.z + pose.z);
+  }
+}
+
 export function drawStageScenery(s: ShellState): void {
-  for (const effect of s.stageScenery ?? []) {
+  for (const effect of [...(s.stageScenery ?? []), ...s.stageDrifters.map(drifter => drifter.effect)]) {
 
     hideEffect(effect, s.origin);
     DestroyEffect(effect);
@@ -49,21 +79,8 @@ export function drawStageScenery(s: ShellState): void {
   const shadows = shadowCastingLights(s.game.stageChoice);
   if (shadows > 0 || s.shadowLightsRaised) BlzSetMinShadowCastingPointLightCount(shadows);
   s.shadowLightsRaised = shadows > 0;
-  const effects: effect[] = [];
-  for (const piece of placedPieces(s.game.stageChoice)) {
-    const x = s.origin.x + piece.x;
-    const y = s.origin.y + piece.y;
-    const effect = AddSpecialEffect(piece.model, x, y);
-    BlzSetSpecialEffectPosition(effect, x, y, s.origin.z + piece.z);
-    BlzSetSpecialEffectScale(effect, piece.scale);
-    if (piece.color !== undefined) BlzSetSpecialEffectColor(effect, piece.color[0], piece.color[1], piece.color[2]);
-    BlzSetSpecialEffectYaw(effect, piece.yaw * (Math.PI / 180.0));
-    if (piece.matrixScale !== undefined) BlzSetSpecialEffectMatrixScale(effect, piece.matrixScale[0], piece.matrixScale[1], piece.matrixScale[2]);
-
-    BlzPlaySpecialEffect(effect, ANIM_TYPE_STAND);
-    effects.push(effect);
-  }
-  s.stageScenery = effects;
+  s.stageScenery = placedPieces(s.game.stageChoice).map(piece => addPiece(s, piece, ANIM_TYPE_STAND));
+  s.stageDrifters = driftingPieces(s.game.stageChoice).map(piece => addDrifter(s, piece));
 }
 
 
@@ -100,6 +117,11 @@ export function showBackdrop(s: ShellState, visible: boolean): void {
       }
     }
   }
+  for (const { effect, piece } of s.stageDrifters) {
+    if (visible) BlzSetSpecialEffectScale(effect, piece.scale);
+    else hideEffect(effect, s.origin);
+  }
+  if (visible) presentDrifters(s);
   for (const deck of [...s.stageDecks, ...s.stageDeckParts]) BlzSetSpecialEffectAlpha(deck, alpha);
   showStageFog(s, visible);
 }

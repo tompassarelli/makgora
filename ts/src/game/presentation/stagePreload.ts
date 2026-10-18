@@ -44,6 +44,7 @@ export function stageModels(stage: number): string[] {
   if (hasLava(stage)) models.push(STAGE_LAVA_MODEL);
   if (hasTide(stage)) models.push(HYDRA_CREST_MODEL, HYDRA_RING_MODEL);
   for (const piece of placedPieces(stage)) models.push(piece.model);
+  for (const piece of stageScenery(stage).drifters ?? []) models.push(piece.model);
   if (stageEdgeLight(stage, 0, 0) !== undefined) models.push(STAGE_EDGE_LIGHT_MODEL);
   return models;
 }

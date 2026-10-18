@@ -46,7 +46,7 @@ import { concealFighter, concealFighters } from "./fighterCloak";
 import { type ShellState, type StatusFrames, activeRollback, localSlot, playsOnKeyboard } from "./state";
 import { type UiObjects, pauseEffects, views } from "./ui";
 import { loreClears } from "../../game/classic/loreClears";
-import { drawStageScenery } from "./stageScenery";
+import { drawStageScenery, presentDrifters } from "./stageScenery";
 import { probeCamera, probeWaiting } from "./responseProbe";
 import { clockSeconds } from "./trace";
 
@@ -426,6 +426,7 @@ export function renderPersistentPresentation(s: ShellState): void {
   }
   presentLava(s, drawn, matchFrame);
   presentWind(s, drawn, matchFrame);
+  presentDrifters(s);
   for (const slot of PARTICIPANT_SLOTS) {
     const ring = s.stageHydra?.[slot * 2];
     const crest = s.stageHydra?.[slot * 2 + 1];

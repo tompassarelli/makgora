@@ -5,6 +5,7 @@ import { STAGE_TOMB_SEA_MODEL } from "../../generated/stages/terrainAssetInfo";
 
 const SPIRES = "Doodads\\Outland\\Rocks\\Outland_Spires\\Outland_Spires7.mdx";
 const GLACIER = "Doodads\\Icecrown\\Rocks\\Glacier\\Glacier0.mdx";
+const ZEPPELIN = "Units\\Creeps\\GoblinZeppelin\\GoblinZeppelin.mdx";
 const MOUND = "Doodads\\Barrens\\Rocks\\Barrens_Rocks\\Barrens_Rocks2.mdx";
 const RUINED_LARGE_0 = "Doodads\\Cityscape\\Structures\\CityBuildingLarge_0_Ruined\\CityBuildingLarge_0_Ruined.mdx";
 const RUINED_LARGE_45 = "Doodads\\Cityscape\\Structures\\CityBuildingLarge_45_Ruined\\CityBuildingLarge_45_Ruined.mdx";
@@ -16,6 +17,9 @@ export const DUROTAR_SCENERY: StageScenery = {
   sky: STAGE_SKY_MODELS[3] ?? "",
   fog: { start: 5000.0, end: 11000.0, red: 0.75, green: 0.5, blue: 0.25 },
   floor: { model: STAGE_TOMB_SEA_MODEL, z: -1300.0, color: [168, 140, 120] },
+  drifters: [
+    { model: ZEPPELIN, fromX: -7000.0, toX: 7000.0, y: 5600.0, z: 800.0, bob: 40.0, bobs: 6.0, scale: 2.5, seconds: 50.0, offset: 0.25 },
+  ],
   pieces: [
 
     { model: MOUND, x: -4000.0, y: 4500.0, z: -1608.0, scale: 12.0, yaw: 195.0, matrixScale: [2.5, 1.0, 1.75] },

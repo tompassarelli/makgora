@@ -29,6 +29,7 @@ import type { JournalInputSource } from "../../game/netcode/journal/source";
 import { DEFAULT_BATCH, OutgoingInput } from "../../game/netcode/journal/transport";
 import { PENDING_CAPACITY, ShadowInputSchedule } from "../../game/netcode/shadowSchedule";
 import type { WorldOrigin } from "../../game/render/effects";
+import type { DriftingPiece } from "../../game/presentation/driftingScenery";
 import { type ModelSoundCursor, ORIGINAL_MODEL_SOUNDS, createModelSoundCursor } from "../../game/render/modelSounds";
 import { type MomentRecorder, createMomentRecorder, keepMomentEnd } from "../../game/replay/moment";
 import { type MatchReplayRecorder, createMatchReplayRecorder } from "../../game/replay/matchReplay";
@@ -50,6 +51,11 @@ import type { UiObjects } from "./ui";
 import type { NativePadCapture } from "./analogPad";
 import type { HiddenFighter } from "./fighterCloak";
 
+
+export interface StageDrifter {
+  readonly effect: effect;
+  readonly piece: Readonly<DriftingPiece>;
+}
 
 export interface FighterBody {
   readonly unit: unit;
@@ -297,6 +303,7 @@ export interface ShellState {
   stageWind: effect[];
   stageHydra?: effect[];
   stageScenery: effect[] | undefined;
+  stageDrifters: StageDrifter[];
   stageFogHidden?: boolean;
   stageFogOverride?: true | undefined;
   shadowLightsRaised: boolean;
@@ -414,7 +421,7 @@ export function createShellState(build: MapBuild, setup: ShellSetup): ShellState
     produced: createFrameControls(), runtime: createPacingAndPresentation(), sessionWins: createSessionWins(), session: createMatchControls(),
     frameInput: createMatchFrameInput(),
     participants: [participant(0, persistence), participant(1, persistence), participant(2, persistence), participant(3, persistence)],
-    status: { text: "", seconds: 0.0 }, frames: setup.frames, stageDecks: [], stageDeckParts: [], drawnStage: 0, stageCannon: undefined, stageLava: undefined, stageWind: [], stageScenery: undefined, shadowLightsRaised: false, viewExtreme: undefined, hiddenFighters: [undefined, undefined, undefined, undefined], showcase: createShowcasePads(), showcaseFocus: undefined, showcaseMarkers: [], ui: undefined,
+    status: { text: "", seconds: 0.0 }, frames: setup.frames, stageDecks: [], stageDeckParts: [], drawnStage: 0, stageCannon: undefined, stageLava: undefined, stageWind: [], stageScenery: undefined, stageDrifters: [], shadowLightsRaised: false, viewExtreme: undefined, hiddenFighters: [undefined, undefined, undefined, undefined], showcase: createShowcasePads(), showcaseFocus: undefined, showcaseMarkers: [], ui: undefined,
     sounds: createModelSoundCursor(ORIGINAL_MODEL_SOUNDS),
     dev: { rollback: isShadow(input) ? input.rollback : 6, delay: isShadow(input) ? input.delay : 3, batch: DEFAULT_BATCH, rematchSeconds: REMATCH_COUNTDOWN_SECONDS }, devReceipts: 0,
     trace: inputTrace(build.responseProbe || build.inputProfile === "native-driver" ? 2048 : 256),

@@ -13,6 +13,7 @@ import { STAGE_SKY_MODELS } from "../../generated/stages/stageSkyInfo";
 import { AHNQIRAJ_SCENERY, BLACKROCK_SCENERY, GRYPHON_SCENERY, NORDRASSIL_SCENERY } from "./hazardStageScenery";
 import { STRATHOLME_SCENERY, TOMB_OF_SARGERAS_SCENERY } from "./homeStageScenery";
 import { DUROTAR_SCENERY, HELLFIRE_SCENERY, NAXXRAMAS_SCENERY } from "./patrolStageScenery";
+import type { DriftingPiece } from "./driftingScenery";
 import { CANNON_TEST_STAGE, CARRIED_TEST_STAGE, DRIFTING_DECK_STAGE, FROZEN_THRONE_STAGE, HELLFIRE_STAGE, PATTERNED_DECKS_STAGE, STRATHOLME_STAGE, TIMED_TEST_STAGE, TOMB_OF_SARGERAS_STAGE, WIND_TEST_STAGE } from "../sim/stage";
 
 export interface SceneryPiece {
@@ -32,6 +33,7 @@ export interface StageScenery {
   readonly farZ: number;
   readonly sky: string;
   readonly pieces: readonly SceneryPiece[];
+  readonly drifters?: readonly DriftingPiece[];
   /** The pieces' colour under the stock light, before the stage's mood (sceneryColor). */
   readonly tint?: readonly [number, number, number];
   readonly fog?: { readonly start: number; readonly end: number; readonly red: number; readonly green: number; readonly blue: number };
@@ -156,4 +158,9 @@ export function placedPieces(stage: number, mood = true): readonly SceneryPiece[
     return { ...piece, color: mood ? sceneryColor(stage, color) : color };
   });
   return [...pieces, ...terrainPieces(stage), ...pointLightPieces(stage)];
+}
+
+export function driftingPieces(stage: number): readonly DriftingPiece[] {
+  const scenery = stageScenery(stage);
+  return (scenery.drifters ?? []).map(piece => ({ ...piece, color: sceneryColor(stage, scenery.tint ?? [255, 255, 255]) }));
 }

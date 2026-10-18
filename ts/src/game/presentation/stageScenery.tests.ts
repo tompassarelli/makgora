@@ -2,6 +2,8 @@ import { assertEquals, test } from "wisp/src/runtime/testing";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
 import { STAGE_LAVA_MODEL, STAGE_SEA_MODEL, STAGE_TOMB_SEA_MODEL } from "../../generated/stages/terrainAssetInfo";
 import { stageScenery, terrainPieces } from "./stageScenery";
+import { driftPose } from "./driftingScenery";
+import { max, min } from "../core/numbers";
 import { fogProblems, mirrorProblems } from "./stageRules";
 import { platformParts } from "./stockPlatforms";
 import { surfaceCount } from "../sim/stage";
@@ -57,5 +59,24 @@ test("the space below every stage's platforms is Tomb's sea or lava, never the s
     const floor = stageScenery(id).floor;
     if (floor !== undefined) assertEquals(floor.model === STAGE_TOMB_SEA_MODEL || floor.model === STAGE_LAVA_MODEL, true, `${name}: floor ${floor.model}`);
     for (const piece of terrainPieces(id)) assertEquals(piece.model === STAGE_SEA_MODEL, false, `${name}: draws the zigzag sea plane`);
+  }
+});
+
+test("every drifting piece crosses behind the fight from beyond one side of the scenery to beyond the other, and loops [k2 property]", () => {
+  for (const { id, name } of STAGE_CATALOG) {
+    const { pieces, drifters } = stageScenery(id);
+    const edge = pieces.reduce((widest, piece) => max(widest, Math.abs(piece.x)), 0.0);
+    for (const drifter of drifters ?? []) {
+      const label = `${name}: ${drifter.model}`;
+      assertEquals(drifter.y > 0.0 && drifter.fromX * drifter.toX < 0.0, true, `${label} does not cross behind the fight`);
+      assertEquals(min(Math.abs(drifter.fromX), Math.abs(drifter.toX)) > edge, true, `${label} turns inside the scenery band`);
+      for (let step = 0; step < 64; step++) {
+        const seconds = (step * drifter.seconds) / 16;
+        const x = driftPose(drifter, seconds).x;
+        const next = driftPose(drifter, seconds + drifter.seconds).x;
+        assertEquals(Math.abs(next - x) < 1.0, true, `${label} at ${seconds} s: ${x} then ${next} a loop later`);
+        assertEquals(x >= min(drifter.fromX, drifter.toX) && x <= max(drifter.fromX, drifter.toX), true, `${label} at ${seconds} s leaves its path at ${x}`);
+      }
+    }
   }
 });
