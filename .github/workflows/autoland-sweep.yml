@@ -166,6 +166,13 @@ jobs:
           fetch-depth: 0
           filter: blob:none
       - if: steps.lanes.outputs.any == 'true'
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.13
+      - if: steps.lanes.outputs.any == 'true'
+        run: bun install --frozen-lockfile
+        working-directory: ts
+      - if: steps.lanes.outputs.any == 'true'
         run: |
           set -euo pipefail
           git fetch -q --filter=blob:none origin main '+refs/heads/claude/*:refs/remotes/origin/claude/*'
@@ -174,8 +181,7 @@ jobs:
             gh api --paginate "repos/$GH_REPO/actions/workflows/$workflow/runs?status=$state&per_page=100" \
               --jq '.workflow_runs[] | {head_branch, title: .display_title, status}'
           done; done | jq -s . > "$RUNNER_TEMP/superseded-runs.json"
-          source ts/scripts/autoland-superseded.sh
-          superseded "$main" "$RUNNER_TEMP/lanes.tsv" "$RUNNER_TEMP/superseded-runs.json" > "$RUNNER_TEMP/superseded.tsv"
+          bun ts/scripts/autolandSuperseded.ts "$main" "$RUNNER_TEMP/lanes.tsv" "$RUNNER_TEMP/superseded-runs.json" > "$RUNNER_TEMP/superseded.tsv"
           while IFS=$'\t' read -r -u 3 branch tip why issues; do
             git push -q --force-with-lease="refs/heads/$branch:$tip" origin ":refs/heads/$branch" || { echo "::warning::$branch moved: kept it"; continue; }
             echo "\`$branch\` failed and is superseded ($why): deleted it" >> "$GITHUB_STEP_SUMMARY"

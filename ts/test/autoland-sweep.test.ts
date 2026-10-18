@@ -314,22 +314,22 @@ test("supersession selects exactly clean main-tree-equal lanes or separately rep
     const rows: { branch: string; state: string; failed: string; pushed: string }[] = [];
     const runs: { workflow: string; head_branch: string; title: string; status: string }[] = [];
     for (const round of rounds) {
-      for (const kind of ["identical", "partial", "conflict", "empty", "inflight", "farm-inflight", "replaced", "unreplaced", "completed"]) {
+      for (const kind of ["identical", "partial", "conflict", "empty", "inflight", "farm-inflight", "replaced", "unreplaced", "untested", "early", "completed"]) {
         const branch = kind === "farm-inflight" ? `claude/land-identical-${round.index}-2` : `claude/land-${kind}-${round.index}`;
-        const issue = 1000 + round.index * 10 + ["identical", "partial", "conflict", "empty", "inflight", "farm-inflight", "replaced", "unreplaced", "completed"].indexOf(kind);
+        const issue = 1000 + round.index * 20 + ["identical", "partial", "conflict", "empty", "inflight", "farm-inflight", "replaced", "unreplaced", "untested", "early", "completed"].indexOf(kind);
         const files: [string, string][] = kind === "empty" ? [] : [[`file-${round.index}`, kind === "conflict" ? round.other : round.main]];
-        if (["partial", "replaced", "unreplaced"].includes(kind)) files.push([`novel-${kind}-${round.index}`, round.other]);
+        if (["partial", "replaced", "unreplaced", "untested", "early"].includes(kind)) files.push([`novel-${kind}-${round.index}`, round.other]);
         let tip = commit(branch, base, files, `generated ${next(1_000_000)}\n\nRefs #${issue}`);
         for (let count = next(3); count > 0; count--) tip = commit(branch, tip, [], `empty commit ${next(1_000_000)}`);
-        rows.push({ branch, state: ["replaced", "unreplaced"].includes(kind) ? "FAILURE" : ["NONE", "SUCCESS", "FAILURE", "PENDING"][next(4)] ?? "NONE", failed: "2026-10-12T00:00:00Z", pushed: "2026-10-11T00:00:00Z" });
+        rows.push({ branch, state: ["replaced", "unreplaced", "untested", "early"].includes(kind) ? "FAILURE" : ["NONE", "SUCCESS", "FAILURE", "PENDING"][next(4)] ?? "NONE", failed: "2026-10-12T00:00:00Z", pushed: "2026-10-11T00:00:00Z" });
         if (["identical", "empty", "replaced", "completed"].includes(kind)) expected.push(branch);
         if (kind === "inflight") runs.push({ workflow: "autoland.yml", head_branch: round.index % 2 === 0 ? branch : "main", title: `Autoland test ${next(3)} ${branch} dummy-sha`, status: ["requested", "pending", "waiting", "queued", "in_progress"][round.index % 5] ?? "in_progress" });
         if (kind === "farm-inflight") runs.push({ workflow: "farm-test.yml", head_branch: "main", title: `Farm test ${branch} t${round.index}`, status: ["requested", "pending", "waiting", "queued", "in_progress"][round.index % 5] ?? "in_progress" });
         if (kind === "completed") runs.push({ workflow: "autoland.yml", head_branch: branch, title: `Autoland test 0 ${branch} dummy-sha`, status: "completed" });
-        if (["replaced", "unreplaced"].includes(kind)) {
+        if (["replaced", "unreplaced", "untested", "early"].includes(kind)) {
           const newer = `claude/land-newer-${kind}-${round.index}`;
           commit(newer, base, [[`newer-${kind}-${round.index}`, round.other]], `new attempt\n\nRefs #${issue}`);
-          rows.push({ branch: newer, state: kind === "replaced" ? "SUCCESS" : "FAILURE", failed: "2026-10-12T00:00:00Z", pushed: "2026-10-13T00:00:00Z" });
+          rows.push({ branch: newer, state: { replaced: "SUCCESS", untested: "NONE", early: "SUCCESS" }[kind] ?? "FAILURE", failed: kind === "untested" ? "" : "2026-10-12T00:00:00Z", pushed: kind === "early" ? "2026-10-11T00:00:00Z" : "2026-10-13T00:00:00Z" });
         }
       }
     }
@@ -340,11 +340,11 @@ test("supersession selects exactly clean main-tree-equal lanes or separately rep
     writeFileSync(lanes, rows.map((row) => `${row.branch}\t${tips.get(row.branch)}\t${row.state}\t${row.failed}\t${row.pushed}\n`).join(""));
     writeFileSync(active, JSON.stringify(runs));
     const workflow = readFileSync(resolve(import.meta.dir, "../../.github/workflows/autoland-sweep.yml"), "utf8");
-    const guard = workflow.slice(workflow.indexOf('          main=$(git rev-parse origin/main)\n') + '          main=$(git rev-parse origin/main)\n'.length, workflow.indexOf("          source ts/scripts/autoland-superseded.sh"));
+    const guard = workflow.slice(workflow.indexOf('          main=$(git rev-parse origin/main)\n') + '          main=$(git rev-parse origin/main)\n'.length, workflow.indexOf("          bun ts/scripts/autolandSuperseded.ts"));
     const select = (): string[] => command(["bash", "-euo", "pipefail", "-c", `RUNNER_TEMP="$PWD"; GH_REPO=property/repository; RUNS="$3"
       gh() { local endpoint="$3"; local workflow="\${endpoint#*/workflows/}"; workflow="\${workflow%%/*}"; local status="\${endpoint#*status=}"; status="\${status%%&*}"; jq -c --arg workflow "$workflow" --arg status "$status" '.[] | select(.workflow == $workflow and .status == $status) | {head_branch, title, status}' "$RUNS"; }
       ${guard}
-      source "$1"; superseded main "$2" "$RUNNER_TEMP/superseded-runs.json"`, "superseded", resolve(import.meta.dir, "../scripts/autoland-superseded.sh"), lanes, active]).split("\n").filter(Boolean).map((line) => line.split("\t")[0] ?? "").sort();
+      "${process.execPath}" "$1" main "$2" "$RUNNER_TEMP/superseded-runs.json"`, "superseded", resolve(import.meta.dir, "../scripts/autolandSuperseded.ts"), lanes, active]).split("\n").filter(Boolean).map((line) => line.split("\t")[0] ?? "").sort();
     expect(select()).toEqual(expected.sort());
     writeFileSync(active, JSON.stringify([...runs, { workflow: "autoland.yml", head_branch: "main", title: "Autoland train", status: "in_progress" }]));
     expect(select()).toEqual([]);

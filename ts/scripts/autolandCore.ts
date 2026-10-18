@@ -254,6 +254,26 @@ export const flaggedLanes = (bodies: readonly string[], lanes: readonly Lane[]):
 const ISSUE_REF = /\b(?:refs|fixes|closes)[: ]+(?:(?:tompassarelli\/)?smashcraft)?#(\d+)/gi;
 export const issueRefs = (messages: string): readonly number[] => [...new Set([...messages.matchAll(ISSUE_REF)].map(([, number = ""]) => Number(number)))].toSorted((a, b) => a - b);
 
+export interface RunSummary { readonly head_branch: string | null; readonly title: string; readonly status: string }
+export interface PushedLane { readonly branch: string; readonly tip: string; readonly state: string; readonly failed: string; readonly pushed: string; readonly issues: readonly number[] }
+export interface Superseded { readonly branch: string; readonly tip: string; readonly why: string; readonly issues: readonly number[] }
+
+export function heldLanes(runs: readonly RunSummary[]): ReadonlySet<string> | "all" {
+  const open = runs.filter((run) => run.status !== "completed");
+  if (open.some((run) => run.title === TRAIN_TITLE)) return "all";
+  return new Set(open.flatMap((run) => [run.head_branch ?? "", ...run.title.split(" ")]).filter((name) => name.startsWith("claude/")));
+}
+
+export function supersededLanes(lanes: readonly PushedLane[], held: ReadonlySet<string>, unchanged: (lane: PushedLane) => boolean): Superseded[] {
+  const replaces = (failed: PushedLane, other: PushedLane): boolean =>
+    other.state !== "FAILURE" && other.state !== "NONE" && other.pushed > failed.failed && other.issues.some((issue) => failed.issues.includes(issue));
+  return lanes.filter((lane) => !held.has(lane.branch)).flatMap((lane) => {
+    const replacement = lane.state === "FAILURE" ? lanes.find((other) => replaces(lane, other)) : undefined;
+    const why = unchanged(lane) ? "merging it leaves main's tree unchanged" : replacement === undefined ? undefined : `\`${replacement.branch}\`, pushed after it failed, refs the same issue`;
+    return why === undefined ? [] : [{ branch: lane.branch, tip: lane.tip, why, issues: lane.issues }];
+  });
+}
+
 export type BoxNeed = "native" | "tom" | "definitive";
 export interface Box { readonly line: number; readonly text: string; readonly done: boolean; readonly check?: string; readonly needs?: BoxNeed }
 
