@@ -195,9 +195,9 @@ from the floor (smashcraft:ts/src/game/presentation/stageScenery.ts).
    its depth), not directly behind the main deck, where the fighters spend
    most of the match. The opposite side gets a counterweight of a different
    kind and size, not a copy.
-4. **Three depth bands, uneven per side.** Near band (y 2,000–3,000): low,
-   dark silhouettes below the deck line that frame the stage. Mid band
-   (y 3,000–4,500): the supporting props. Far band (y 4,500–7,000): the
+4. **Three depth bands, uneven per side.** Near band (y 1,200–2,500): low
+   ridges below the deck line that frame the stage (rule 16). Mid band
+   (y 2,500–4,500): the supporting props. Far band (y 4,500–7,000): the
    landmark, softened by fog. Each side holds a different count and mix.
 5. **Keep the deck's silhouette clean.** Nothing tall and bright sits directly
    behind the main deck's ledges or the platforms' ends; ledges must read
@@ -290,6 +290,80 @@ from the floor (smashcraft:ts/src/game/presentation/stageScenery.ts).
     materials from the stage's set in [stage boards](stage-boards.md); the
     edge reads as its own band, distinct from top and body, in grayscale, and each
     platform's material differs from the deck top.
+16. **Depth beneath the deck** (Tom, 18 Oct: "do a proper art pass" after the
+    flat ground plane read as plain). Every stage stands terrain in three
+    bands by depth `y`: near (1,200–2,500), mid (2,500–4,500) and far
+    (4,500–8,000), at least three pieces in each, and at least four near-band
+    pieces rise out of the floor, on both sides of the deck. The near band is a broken ridge
+    of the place's own rock at y 1,450–1,700, tinted to about two thirds of
+    its lit value so it stands out from the dark floor, whose tops stay
+    460–720 units below the deck (lowest under the deck's centre), so at the
+    far extreme it fills the bottom of the frame without reaching the deck's
+    underside; a second, lighter ridge stands at y 2,600–3,000 with tops
+    300–560 below the deck,
+    and the place's props (ruins, wells, farms, pillars, trees) stand in the
+    valley between them at y 2,000–2,400. Jagged tops, not flat ones, so no
+    ridge reads as a place to land. The floor plane shows only in the gaps
+    and fades into the fog behind them. `depthProblems` in
+    smashcraft:ts/src/game/presentation/stageRules.ts and
+    smashcraft:ts/src/game/presentation/stageScenery.tests.ts enforce the
+    bands and the near ridge.
+
+### Art targets: the depth pass (18 Oct)
+
+One paragraph per stage, written before building and kept as the target;
+"near", "valley", "mid ridge" and "far" are rule 16's bands. Built, the
+near ridges came out lighter than "dark" below: dark ridges vanished against
+the dark floor in the first renders, so they are tinted to about two thirds of
+lit value and stay darker than the lit backdrop above the deck.
+
+- **Frozen Throne: Icecrown Glacier.** Arthas's citadel on the glacier at the
+  top of the world. Palette: steel blue, pale ice, black saronite. Near:
+  black ice claws and glacier shards, nearly silhouettes. Valley: the
+  Scourge's Icecrown pillars and obelisks standing in the snow. Mid ridge:
+  pale snow drifts and glacier steps falling away under blue fog. Far: the
+  Frozen Throne massif on the right third, a snow ridge and a glacier spur
+  softened by fog.
+- **Nordrassil: the summit of Mount Hyjal.** The World Tree above the
+  Ashenvale slopes, under the Felwood aurora. Palette: moss green, teal,
+  violet sky. Near: dark mossy boulders of the mountainside. Valley: two
+  Moon Wells glowing teal, a broken night elf column, ruin blocks, an
+  obelisk and a rock arch. Mid ridge: lighter moss boulders. Far: the World
+  Tree and the Felwood spires ridge.
+- **Gryphon Aerie: Aerie Peak in the Hinterlands.** Wildhammer crags above a
+  cloud valley. Palette: grey granite, cool blue-green haze. Near: dark
+  granite boulders. Valley: two natural rock arches. Mid ridge: lighter
+  granite crags. Far: the aviary on its mesa and the mountain chain in haze.
+- **Durotar Skies: the red canyons of Durotar.** Thrall's new homeland at
+  dusk. Palette: rust, ochre, dusk orange. Near: dark red mounds and spires.
+  Valley: Barrens acacia trees and two tall rock pillars. Mid ridge: lighter
+  red mounds and spires. Far: the mesa chain with its Orc watchtowers.
+- **Naxxramas: the Eastern Plaguelands.** Kel'Thuzad's necropolis over the
+  blighted farmland near Stratholme. Palette: olive, ash, plague green.
+  Near: blighted dark rock. Valley: the burned Lordaeron farmsteads (a
+  scorched farm, barn and tower and the burned windmill) and tombstones.
+  Mid ridge: sickly olive rock. Far: the Scourge's ziggurats, temples and
+  slaughterhouses on the blight, and the floating necropolis.
+- **Hellfire Citadel: Hellfire Peninsula.** Outland's shattered red waste.
+  Palette: red-brown rock, black char, fel green. Near: dark Outland boulders
+  and a broken spire. Valley: an Outland rock arch. Mid ridge: lighter rubble
+  and boulders. Far: the red spire field under green haze.
+- **Blackrock: the molten depths of Blackrock Mountain.** Palette: charcoal,
+  rust, lava orange. Near: black boulders and stalagmites rising from the
+  lava. Mid ridge: lighter stalagmites in front of the magma rocks. Far: the
+  basalt spire field and its landmark crag; the lava keeps the floor.
+- **Ahn'Qiraj: the gates of the Qiraji temple in Silithus.** Palette: ochre
+  sand, sandstone, mauve sky. Near: dark sandstone boulders. Valley: broken
+  Qiraji pillars and a fallen archway. Mid ridge: pale sandstone and rubble.
+  Far: the ruined spires, the gate and the obelisks.
+- **Stratholme: the burning city.** Palette: brown-black brick, slate, warm
+  fire. Near: dark rubble heaps. Valley: broken columns and a fire burning
+  in the ruins. Mid ridge: lighter rubble and ruined house foundations.
+  Far: the burning streets, the city wall and the cathedral.
+- **Tomb of Sargeras: the Broken Isles shore.** Palette: teal sea, coral,
+  green stone. It keeps its sea: near, a broken Naga pillar, coral and a
+  rock standing in the tide; mid, a coral arch; far, the Temple of Tides and
+  the waterfall.
 
 ### Art checklist
 

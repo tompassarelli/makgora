@@ -1,10 +1,10 @@
 import { assertEquals, test } from "wisp/src/runtime/testing";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
 import { STAGE_GROUND_MODEL, STAGE_LAVA_MODEL, STAGE_SEA_MODEL, STAGE_TOMB_SEA_MODEL, STAGE_TOMB_WATER_MODEL } from "../../generated/stages/terrainAssetInfo";
-import { stageScenery, terrainPieces } from "./stageScenery";
+import { hiddenBelow, stageScenery, terrainPieces } from "./stageScenery";
 import { driftPose } from "./driftingScenery";
 import { max, min } from "../core/numbers";
-import { fogProblems, mirrorProblems } from "./stageRules";
+import { depthProblems, fogProblems, mirrorProblems } from "./stageRules";
 import { platformParts } from "./stockPlatforms";
 import { TOMB_OF_SARGERAS_STAGE, surfaceCount } from "../sim/stage";
 
@@ -62,6 +62,10 @@ test("the space below every stage's platforms is ground or lava, never the stret
     assertEquals(water, id === TOMB_OF_SARGERAS_STAGE, `${name}: water beneath the deck is ${water}`);
     for (const piece of terrainPieces(id)) assertEquals(piece.model === STAGE_SEA_MODEL, false, `${name}: draws the zigzag sea plane`);
   }
+});
+
+test("every stage stands terrain in its near, mid and far bands, and its near band rises out of the floor on both sides of the deck [k2 property]", () => {
+  for (const { id, name } of STAGE_CATALOG) assertEquals(depthProblems(name, stageScenery(id).pieces, hiddenBelow(id)).join("\n"), "");
 });
 
 test("every drifting piece crosses behind the fight from beyond one side of the scenery to beyond the other, and loops [k2 property]", () => {

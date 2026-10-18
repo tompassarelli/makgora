@@ -41,7 +41,10 @@ smaller right shelf lies farther back at y 3300. A low right mesa at y 6200
 continues the canyon across the horizon. Repeated rocks differ in size,
 orientation and depth. Their scales range from 2.0 to 3.5 instead of 3.0 to
 6.0, so the stage reads as a deck suspended over terrain rather than a deck
-wedged among enormous boulders.
+wedged among enormous boulders. Beneath the deck (stage art rule 16), a red
+near ridge of mounds and spires rises from the canyon floor at y 1,450–1,700,
+acacia trees and two tall rock pillars stand in the valley behind it, and a
+lighter ridge of mounds and spires at y 2,600–3,000 leads back to the mesas.
 
 ## Naxxramas: the necropolis over the Plaguelands
 
@@ -56,7 +59,11 @@ the abyss): three ziggurats, two graveyards, two boneyards, two Temples of
 the Damned and the slaughterhouse at z -1700. Two plague clouds hang over the
 slaughterhouse and the graveyard, and a farther slaughterhouse and ziggurat
 stand in the far band. The Northrend glaciers and the icy sea are gone. The
-fog stays aurora green (0.09375, 0.3125, 0.25).
+fog stays aurora green (0.09375, 0.3125, 0.25). Nearer the deck (stage art
+rule 16), a ridge of blighted olive rock rises at y 1,450–1,700; behind it the
+burned Lordaeron farmsteads of the Plaguelands (a scorched farm, barn and
+tower, the burned windmill) and two tombstones stand in the valley, before a
+lighter olive ridge at y 2,600–3,000.
 
 ## Hellfire: a portal across fractured ground
 
@@ -67,7 +74,10 @@ rise farther back on the right, at y 5400 and 6200, progressing from scale
 1.5 to 0.75. This makes a directional broken landscape rather than a pair
 of looming rocks above the deck. The near fire trap is removed: its broad
 particle plume competed with the portal and the moving platforms. The gate
-itself already carries the stage's magical activity.
+itself already carries the stage's magical activity. Beneath the deck
+(stage art rule 16), a near ridge of red Outland spires and boulders rises at
+y 1,450–1,700, an Outland rock arch stands in the valley, and a lighter ridge
+of rubble and boulders at y 2,600–3,000 leads back to the spire field.
 
 ## Composition constraints
 
@@ -81,6 +91,7 @@ The figure ban and asymmetry constraints are enforced by
 smashcraft:ts/src/game/presentation/stageScenery.tests.ts.
 
 All selected models already have measured facts in
-smashcraft:ts/scripts/wisp/model-facts/. These changes require no new model
-imports or generated textures. Stage fog remains at its declared settings;
+smashcraft:ts/scripts/wisp/model-facts/; the depth pass (18 Oct) measured
+its new stock Classic models there. These changes require no model imports or
+generated textures. Stage fog remains at its declared settings;
 lighting and fog tuning are separate from this composition.

@@ -126,3 +126,26 @@ export function groundProblems(name: string, pieces: readonly SceneryPiece[], bo
   }
   return problems;
 }
+
+export const DEPTH_BANDS = [
+  { band: "near", from: 1200, to: 2500 },
+  { band: "mid", from: 2500, to: 4500 },
+  { band: "far", from: 4500, to: 8000 },
+] as const;
+export const DEPTH_BAND_PIECES = 3;
+export const NEAR_BAND_SIDE = 1500;
+export const NEAR_RIDGE_PIECES = 4;
+
+export function depthProblems(name: string, pieces: readonly SceneryPiece[], floor: number | undefined): readonly string[] {
+  const problems: string[] = [];
+  for (const { band, from, to } of DEPTH_BANDS) {
+    const count = pieces.filter((piece) => piece.y >= from && piece.y < to).length;
+    if (count < DEPTH_BAND_PIECES) problems.push(`${name}: ${count} pieces in the ${band} band (y ${from}..${to})`);
+  }
+  const near = DEPTH_BANDS[0];
+  const rising = pieces.filter((piece) => piece.y >= near.from && piece.y < near.to && floor !== undefined && piece.z <= floor && piece.flying !== true);
+  if (rising.length < NEAR_RIDGE_PIECES) problems.push(`${name}: ${rising.length} near-band pieces rise out of the floor`);
+  if (!rising.some((piece) => piece.x <= -NEAR_BAND_SIDE)) problems.push(`${name}: no near-band terrain rises out of the floor left of the deck`);
+  if (!rising.some((piece) => piece.x >= NEAR_BAND_SIDE)) problems.push(`${name}: no near-band terrain rises out of the floor right of the deck`);
+  return problems;
+}
