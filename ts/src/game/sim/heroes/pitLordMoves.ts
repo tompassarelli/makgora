@@ -58,7 +58,7 @@ const PIT_LORD_BODY: FighterHurtboxes = {
       hurtPose(0, 31, [hurtPart(-42.0, 30.0, 32.0, 103.0, 56.0)]),
     ],
     [AttackStyle.forwardTilt]: [
-      hurtPose(0, 50, [hurtPart(-22.0, 54.0, 6.0, 113.0, 75.0)]),
+      hurtPose(0, 48, [hurtPart(-22.0, 54.0, 6.0, 113.0, 75.0)]),
     ],
     [AttackStyle.forwardTiltUp]: [
       hurtPose(0, 8, [hurtPart(-24.0, 30.0, 7.0, 122.0, 73.0)]),
@@ -66,7 +66,7 @@ const PIT_LORD_BODY: FighterHurtboxes = {
       hurtPose(18, 26, [hurtPart(-28.0, 54.0, 51.0, 122.0, 73.0)]),
       hurtPose(27, 35, [hurtPart(-32.0, 58.0, 51.0, 114.0, 73.0)]),
       hurtPose(36, 44, [hurtPart(-38.0, 56.0, 51.0, 116.0, 73.0)]),
-      hurtPose(45, 50, [hurtPart(-32.0, 40.0, 27.0, 100.0, 65.0)]),
+      hurtPose(45, 48, [hurtPart(-32.0, 40.0, 27.0, 100.0, 65.0)]),
     ],
     [AttackStyle.forwardTiltDown]: [
       hurtPose(0, 8, [hurtPart(-24.0, 30.0, 7.0, 122.0, 73.0)]),
@@ -74,7 +74,7 @@ const PIT_LORD_BODY: FighterHurtboxes = {
       hurtPose(18, 26, [hurtPart(-28.0, 54.0, 51.0, 122.0, 73.0)]),
       hurtPose(27, 35, [hurtPart(-32.0, 58.0, 51.0, 114.0, 73.0)]),
       hurtPose(36, 44, [hurtPart(-36.0, 56.0, 51.0, 114.0, 73.0)]),
-      hurtPose(45, 50, [hurtPart(-32.0, 39.0, 31.0, 98.0, 65.0)]),
+      hurtPose(45, 48, [hurtPart(-32.0, 39.0, 31.0, 98.0, 65.0)]),
     ],
     [AttackStyle.upTilt]: [
       hurtPose(0, 42, [hurtPart(-22.0, 39.0, 22.0, 113.0, 75.0)]),
@@ -86,7 +86,7 @@ const PIT_LORD_BODY: FighterHurtboxes = {
       hurtPose(25, 35, [hurtPart(-48.0, 24.0, 47.0, 110.0, 49.0)]),
     ],
     [AttackStyle.dashAttack]: [
-      hurtPose(0, 53, [hurtPart(-40.0, 20.0, 40.0, 111.0, 48.0)]),
+      hurtPose(0, 51, [hurtPart(-40.0, 20.0, 40.0, 111.0, 48.0)]),
     ],
     [AttackStyle.forwardSmash]: [
       hurtPose(0, 11, [hurtPart(-48.0, 14.0, 16.0, 95.0, 50.0)]),
