@@ -16,6 +16,6 @@ test("every model the player-view scene names has measured facts, refreshed by `
 test("the scene the gate reads names every stock model path the game source spawns, so the suite and the gate see one list [k1 scenario]", () => {
   const named = new Set(SMASHCRAFT_SCENE.kinds.flatMap((kind) => kind.models).map(key));
   const source = sourceNamedModels();
-  expect(source).toContain("Abilities\\Spells\\Other\\Aneu\\AneuTarget.mdx");
+  expect(source).toContain("Abilities\\Weapons\\FrostWyrmMissile\\FrostWyrmMissile.mdx");
   expect(source.filter((model) => !named.has(key(model)))).toEqual([]);
 });
