@@ -56,7 +56,7 @@ const summary = ({ status, conclusion, createdAt }: RunSummary): RunSummary => (
 
 function installedBuilds(documents: string) {
   const root = join(documents, "Maps/00-Smashcraft");
-  return [root, join(root, "older")].flatMap((folder) => existsSync(folder) ? readdirSync(folder) : [])
+  return (existsSync(root) ? readdirSync(root) : [])
     .flatMap((file) => parseInstalled(file) ?? []);
 }
 

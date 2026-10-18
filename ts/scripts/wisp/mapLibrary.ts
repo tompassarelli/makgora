@@ -1,43 +1,52 @@
-import { copyFileSync, existsSync, mkdirSync, readdirSync, renameSync } from "node:fs";
-import { basename, join } from "node:path";
-import { LANE_FILE, PLAYABLE_FILE, PLAYTEST_COST_SUFFIXES, pruneTargets } from "./greenBuilds";
+import { copyFileSync, existsSync, mkdirSync, readdirSync, renameSync, rmSync } from "node:fs";
+import { basename, isAbsolute, join, relative, resolve } from "node:path";
+import { documentsFolder } from "wisp/scripts/warcraft/battleNet";
+import { PLAYABLE_FILE } from "./greenBuilds";
+import { PLAYTEST_PREFIX } from "./project";
 
+export const LIBRARY_FOLDER = "Maps/00-Smashcraft";
 
-const PLAYABLE = PLAYABLE_FILE;
+export const library = (documents: string) => {
+  if (!isAbsolute(documents)) throw new Error(`documents folder must be absolute: ${JSON.stringify(documents)}`);
+  return join(documents, LIBRARY_FOLDER);
+};
 
+export const tomsLibrary = () => library(documentsFolder(PLAYTEST_PREFIX));
 
-export function installLatest(documents: string, map: string): void {
-  const root = join(documents, "Maps/00-Smashcraft");
-  const older = join(root, "older");
-  const tests = join(root, "tests");
-  for (const dir of [root, older, tests]) mkdirSync(dir, { recursive: true });
+export const insideTomsLibrary = (path: string) => {
+  const from = relative(tomsLibrary(), resolve(path));
+  return from === "" || (!from.startsWith("..") && !isAbsolute(from));
+};
+
+function place(documents: string, map: string): { root: string; name: string } {
+  const root = library(documents);
+  mkdirSync(root, { recursive: true });
   const name = basename(map);
-  if (!PLAYABLE.test(name)) throw new Error(`not a playable map: ${name}`);
-
   const staged = join(root, `${name}.${process.pid}.next`);
   copyFileSync(map, staged);
   renameSync(staged, join(root, name));
-  for (const suffix of PLAYTEST_COST_SUFFIXES) {
-    if (existsSync(`${map}${suffix}`)) copyFileSync(`${map}${suffix}`, join(root, `${name}${suffix}`));
-  }
-  for (const entry of pruneTargets(readdirSync(root), name)) {
-    const target = join(older, entry);
-    if (!existsSync(target)) {
-      renameSync(join(root, entry), target);
-      for (const suffix of PLAYTEST_COST_SUFFIXES) {
-        if (existsSync(join(root, `${entry}${suffix}`))) renameSync(join(root, `${entry}${suffix}`), `${target}${suffix}`);
-      }
-    }
-  }
-  for (const entry of readdirSync(root).filter((entry) => !LANE_FILE.test(entry) && /\b(?:diagnostic|integrity|probe|test)\b.*\.w3x$/i.test(entry))) {
-    const target = join(tests, entry);
-    if (!existsSync(target)) renameSync(join(root, entry), target);
-  }
+  return { root, name };
 }
 
+const remove = (root: string, entries: readonly string[]) => {
+  for (const entry of entries) rmSync(join(root, entry), { recursive: true, force: true });
+};
+
+export function installLatest(documents: string, map: string): void {
+  if (!PLAYABLE_FILE.test(basename(map))) throw new Error(`not a playable map: ${basename(map)}`);
+  const { root, name } = place(documents, map);
+  remove(root, readdirSync(root).filter((entry) => entry !== name));
+}
+
+export function installTryout(documents: string, map: string): string {
+  if (PLAYABLE_FILE.test(basename(map))) throw new Error(`a main build installs through installLatest: ${basename(map)}`);
+  const { root, name } = place(documents, map);
+  remove(root, readdirSync(root).filter((entry) => entry !== name && !PLAYABLE_FILE.test(entry)));
+  return join(root, name);
+}
 
 export function newestPlayable(documents: string): string | undefined {
-  const root = join(documents, "Maps/00-Smashcraft");
+  const root = library(documents);
   if (!existsSync(root)) return undefined;
-  return readdirSync(root).filter((entry) => PLAYABLE.test(entry)).sort((a, b) => b.localeCompare(a, undefined, { numeric: true }))[0];
+  return readdirSync(root).filter((entry) => PLAYABLE_FILE.test(entry)).sort((a, b) => b.localeCompare(a, undefined, { numeric: true }))[0];
 }

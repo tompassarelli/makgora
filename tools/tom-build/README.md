@@ -31,6 +31,6 @@ Land time is the commit's committer time. A failed build is in
 recorded in `~/.local/state/smashcraft/tom-build/attempted`, so it never builds
 a sha twice, even after a failure or restart.
 
-After each install, the watcher removes `Smashcraft 0.0.N-LANE.w3x` lane maps
-(`bun scripts/laneBuild.ts`, smashcraft:docs/play.md) of lanes that landed in
-the commits since its previous build.
+Each install replaces the previous build in Maps/00-Smashcraft and removes any
+`Smashcraft 0.0.N-LANE.w3x` lane map (`bun scripts/laneBuild.ts --install`,
+smashcraft:docs/play.md).

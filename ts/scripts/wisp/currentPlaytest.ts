@@ -56,7 +56,7 @@ export function playVersion(directory: string, library: string, revision: string
   if (own !== undefined) return own.join(".");
   const entries = existsSync(directory) ? readdirSync(directory).map((entry) => join(directory, entry)) : [];
   const seen = [
-    ...[library, join(library, "older"), ...entries].flatMap(numbered),
+    ...[library, ...entries].flatMap(numbered),
     ...entries.filter((entry) => entry.endsWith(".version")).flatMap(reserved),
   ];
   const [major, minor, patch] = seen.reduce((best, next) => (next[0] - best[0] || next[1] - best[1] || next[2] - best[2]) > 0 ? next : best, [0, 0, 0] as const);

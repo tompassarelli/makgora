@@ -16,8 +16,8 @@ import { readJoinCode } from "../joinCode";
 import { newestPlayable } from "../mapLibrary";
 import { retailFolder, setUpMenuPage } from "../menuPageSetup";
 import { hostMatch, joinMatch } from "../online";
-import { clientState, gameFilesLayer } from "../project";
-import { PLAYTEST, PLAYTEST_PREFIX } from "./play";
+import { PLAYTEST_PREFIX, clientState, gameFilesLayer } from "../project";
+import { PLAYTEST } from "./play";
 
 interface Install {
   readonly prefix: string;

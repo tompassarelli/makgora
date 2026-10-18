@@ -61,7 +61,7 @@ test("exact native report boundary keeps installed map through injected gate fai
     expect(existsSync(candidate)).toBe(false);
     expect((await install())._tag).toBe("Success");
     expect(readFileSync(candidate, "utf8")).toBe("exact candidate bytes");
-    expect(readFileSync(previous, "utf8")).toBe("last good map");
+    expect(existsSync(previous)).toBe(false);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

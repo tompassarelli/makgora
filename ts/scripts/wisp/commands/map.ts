@@ -21,6 +21,7 @@ import { POST_PROCESSING_FILE } from "../../postProcessing";
 import { checkCueModels, headlessRender } from "../headlessRender";
 import { writePlaytestCost } from "../playtestCost";
 import { PREDICT_COST, costPrediction } from "../greenBuilds";
+import { insideTomsLibrary } from "../mapLibrary";
 
 
 export const profileOptions = (args: readonly string[]) => Effect.gen(function*() {
@@ -92,6 +93,8 @@ const checkMapSize = (out: string, imports: readonly ArchiveEntry[], bounded: bo
   if (problem !== undefined) return yield* new MapBuildFailure({ operation: "check map size", path: out, cause: problem });
 });
 
+const tomsLibraryOut = (path: string) => new UsageFailure({ problem: `${path} is in Tom's Maps/00-Smashcraft, which holds only installed builds; build to a private folder` });
+
 export const build: Command = (args) => Effect.gen(function*() {
   const { predict, args: buildArgs } = costPrediction(args);
   const inputsOnly = buildArgs.includes("--inputs-only");
@@ -104,6 +107,7 @@ export const build: Command = (args) => Effect.gen(function*() {
     Effect.flatMap((options) => Effect.gen(function*() {
       yield* Effect.sync(ensureGenerated);
       const { base, container, assets, summon, packager, edition, ...map } = options;
+      if (insideTomsLibrary(map.out)) return yield* tomsLibraryOut(map.out);
       const declared = base !== undefined && container !== undefined && assets !== undefined && summon !== undefined
         ? { base, container, assets, summon }
         : yield* checkoutInputs().pipe(step("verify build inputs"));
@@ -124,6 +128,7 @@ export const rebuild: Command = (args) => Effect.gen(function*() {
   const options = yield* profileOptions(args);
   const [map, ...rest] = options.args;
   if (map === undefined || rest.length > 0) return yield* new UsageFailure({ problem: "rebuild takes one map" });
+  if (insideTomsLibrary(map)) return yield* tomsLibraryOut(map);
   return yield* rebuildMap(map).pipe(Effect.provide(options.services));
 });
 

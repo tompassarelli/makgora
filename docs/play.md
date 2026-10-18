@@ -41,15 +41,18 @@ against a computer. The match plays on the keyboard; a pad the service finds
 presses the same keys, and without one play says "keyboard" and goes on. It reuses the signed-in Battle.net launcher and never signs
 in, logs out or switches accounts.
 
-Maps/00-Smashcraft holds the newest version, `Smashcraft 0.0.N`, the two
-versions before it, older/, and tests/. Each new build of main takes the next
-number after every version already built or in the folder; rebuilding the same
-commit keeps its number. The file and in-game title carry the same name; a build installed by
-`bun wisp play --install-green` adds its short commit, `Smashcraft 0.0.N abc1234`
-(smashcraft:docs/commands/play.md). A
-one-off build is named after the version it tests, `Smashcraft 0.0.N test K`,
-and lives in tests/. Experimental builds use `wisp fresh`, captures or `wisp accept` and
-install under tests/; they do not change what `play` launches.
+Maps/00-Smashcraft holds one file, the newest installed main build
+`Smashcraft 0.0.N abc1234.w3x` (version and short commit; the file and in-game
+title carry the same name). Installing a main build (`play`, `playtest:build`,
+the Tom build watcher, `play --install-green`) removes everything else in the
+folder. Each new build of main takes the next number after every version
+already built or installed; rebuilding the same commit keeps its number. At
+most one lane or test build for Tom to try sits beside it (lane builds below,
+`play --lobby-only MAP.w3x`); it replaces any earlier one and goes when the next
+main build installs. Test, integrity, capture and diagnostic builds go to a
+private folder or a pool client, never this one: `wisp map build` and
+`wisp map rebuild` refuse a path inside it, and the pool clients' map installer
+refuses Tom's documents folder.
 
 The play build checks the build inputs, cue models, package and map size,
 and skips the Lua cost prediction; `bun run playtest:build --predict-cost` adds it (smashcraft:docs/commands/workflow.md).
@@ -84,7 +87,8 @@ version numbering and revision locks as `play`, under `Nice=10` and idle I/O.
 Commits that land during a build are not built one by one: the next build is
 of the newest tip. A sha is built once, even after a failure or a restart
 (`~/.local/state/smashcraft/tom-build/attempted`). A new build gets a new
-`Smashcraft 0.0.N` file and never replaces an existing one.
+`Smashcraft 0.0.N abc1234` file and replaces the previous build and any lane
+build.
 
 Start it (once, from the main checkout):
 
@@ -107,16 +111,17 @@ are in `journalctl --user -u smashcraft-tom-build`.
 From a lane's worktree, `cd ts && bun scripts/laneBuild.ts` runs `bun run check`
 and the lane's own tests (test files changed since its merge base with
 origin/main, uncommitted ones included), then builds the lane's working tree
-with the play build (no Lua prediction) and installs it under
-Maps/00-Smashcraft as `Smashcraft 0.0.N-LANE.w3x`. 0.0.N is the version main's
+with the play build (no Lua prediction) as `Smashcraft 0.0.N-LANE.w3x` in
+`~/.local/state/smashcraft/lane-builds/LANE/`, which holds only that lane's
+newest build. `--install` also installs it in Tom's Maps/00-Smashcraft for him
+to try. 0.0.N is the version main's
 next build would take; LANE is the branch's last segment without `land-`
 (`claude/land-cairne-air-924c72aef489` installs
 `Smashcraft 0.0.N-cairne-air-924c72aef489.w3x`); `--lane BRANCH` names it
-explicitly. A lane build replaces that lane's previous map and leaves every
-other file alone; builds of one lane wait for each other. Main's numbering and
-pruning ignore lane maps. When the watcher installs a main build, it removes
-the maps of every lane whose `Autoland-Lane` trailer is among the commits since
-its previous build.
+explicitly. An installed lane map replaces any other lane or test map in the
+folder and leaves the main build alone; builds of one lane wait for each other.
+Main's numbering ignores lane maps, and the next main build to install removes
+the lane map.
 
 ## The desktop client
 

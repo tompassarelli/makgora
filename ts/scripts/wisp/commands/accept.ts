@@ -27,10 +27,9 @@ import { MAP_PROFILES, SMASHCRAFT_ACCEPT, type SmashcraftMapProfile } from "../a
 import { currentPlaytest } from "../currentPlaytest";
 import { readClientEntries, readyPackager, resolveTools, validateClients } from "../nativeTools";
 import { documentsFolder } from "wisp/scripts/warcraft/battleNet";
-import { PLAYTEST_PREFIX } from "./play";
 import { DevCommandReceipt } from "../boundary";
 import { rebuildMap } from "../mapInputs";
-import { clientState, gameFilesLayer, projectRoot } from "../project";
+import { PLAYTEST_PREFIX, clientState, gameFilesLayer, projectRoot } from "../project";
 import { clientArguments } from "./client";
 import { freshMatch, readyAfter, sendDevCommand } from "./fresh";
 import { profileOptions } from "./map";

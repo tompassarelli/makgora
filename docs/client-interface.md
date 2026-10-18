@@ -42,10 +42,13 @@ Both are Warcraft Preload files; each stored line is one `call Preload( "…" )`
 
 ## Maps (run time)
 
-Maps/00-Smashcraft in the Warcraft III documents folder holds the installed
-builds (smashcraft:docs/play.md). The current map is the highest
-`Smashcraft 0.0.N.w3x` directly in that folder; older/ and tests/ are not
-current. Each map's `war3map.lua` carries its source version in the
+Maps/00-Smashcraft in the Warcraft III documents folder holds one installed
+main build, `Smashcraft 0.0.N abc1234.w3x`, the current map
+(smashcraft:docs/play.md). Installing a main build removes every other file
+there. At most one lane or test build Tom asked to try (`Smashcraft
+0.0.N-LANE.w3x`, or the map `play --lobby-only` was given) sits beside it; it
+replaces any earlier one and goes when the next main build installs. Test,
+integrity and diagnostic builds stay in private folders or pool clients. Each map's `war3map.lua` carries its source version in the
 `game.shell.sourceVersion` module, so a client finds the map for a replay's
 version in any Maps folder (Download included).
 

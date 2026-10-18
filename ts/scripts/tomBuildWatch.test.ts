@@ -6,7 +6,7 @@ import { Effect } from "effect";
 import { PlayProblem } from "wisp/scripts/wisp/play";
 import { type WatchSteps, newestGreen, watchOnce } from "./tomBuildWatch";
 import { playableMapBuild } from "./wisp/currentPlaytest";
-import { PLAYTEST_PREFIX } from "./wisp/commands/play";
+import { PLAYTEST_PREFIX } from "./wisp/project";
 import { PLAYABLE_FILE, PREDICT_COST, type Verdict, costPrediction, installName, landingDecision, verdictOf } from "./wisp/greenBuilds";
 
 const sha = (letter: string) => letter.repeat(40);
@@ -37,7 +37,6 @@ test("tips landing during a build coalesce into one build of the newest, and no 
       decision: () => Effect.succeed("build"),
       landedAt: () => Effect.succeed(0),
       notes: () => Effect.succeed("notes.md"),
-      retire: () => Effect.succeed([]),
       build: (revision) => Effect.gen(function*() {
         built.push(revision);
         for (const next of landing[revision] ?? []) remote = next;
@@ -86,7 +85,6 @@ test("a red commit is never built, a pending one waits and builds once its run s
       decision: () => Effect.succeed(landingDecision(verdict)),
       landedAt: () => Effect.succeed(0),
       notes: (version, revision, previous) => Effect.sync(() => { noted.push(`${version} ${revision} ${previous}`); return "notes.md"; }),
-      retire: () => Effect.succeed([]),
       build: (revision) => Effect.sync(() => { built.push(revision); return { version: "0.0.1", path: join(root, "Smashcraft 0.0.1 aaaaaaa.w3x") }; }),
     };
     const tick = () => Effect.runPromise(watchOnce(steps, files));

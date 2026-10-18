@@ -1,9 +1,10 @@
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { homedir } from "node:os";
-import { Effect } from "effect";
+import { Effect, Layer } from "effect";
 import { UsageFailure } from "wisp/scripts/wisp/command";
 import type { BuildProject } from "wisp/scripts/wisp/mapBuild";
-import { GameFiles } from "wisp/scripts/wisp/gameFiles";
+import { GameFileFailure, GameFiles } from "wisp/scripts/wisp/gameFiles";
+import { documentsFolder } from "wisp/scripts/warcraft/battleNet";
 import { SourceErrors } from "wisp/scripts/wisp/sourceErrors";
 import { bundleConfig } from "./bundleConfigs";
 import { type Profile, profiles } from "./profiles";
@@ -11,6 +12,7 @@ import { type Profile, profiles } from "./profiles";
 export const tsDirectory = join(import.meta.dir, "../..");
 export const projectRoot = join(tsDirectory, "..");
 export const clientState = join(homedir(), ".local/state/smashcraft/clients.json");
+export const PLAYTEST_PREFIX = join(homedir(), ".local/share/Steam/steamapps/compatdata/3516115571/pfx");
 export const sourceMapDirectory = join(tsDirectory, "build/source-maps");
 
 
@@ -38,5 +40,14 @@ export const profileOption = (args: readonly string[]) => Effect.gen(function*()
   return { profile, args: index < 0 ? [...args] : [...args.slice(0, index), ...args.slice(index + 2)] };
 });
 
-export const gameFilesLayer = GameFiles.layer({ mapFolder: "Maps/00-Smashcraft/tests", replacedMaps: "Maps/00-Smashcraft/tests", preserveMaps: true });
+export const gameFilesLayer = Layer.effect(GameFiles, Effect.gen(function*() {
+  const files = yield* GameFiles;
+  const tom = resolve(documentsFolder(PLAYTEST_PREFIX));
+  return GameFiles.of({
+    ...files,
+    installMap: (documents, map) => resolve(documents) === tom
+      ? Effect.fail(new GameFileFailure({ operation: "install map", path: documents, cause: "Tom's Maps/00-Smashcraft takes only main builds and one lane build to try; run tests on a pool client" }))
+      : files.installMap(documents, map),
+  });
+})).pipe(Layer.provide(GameFiles.layer({ mapFolder: "Maps/00-Smashcraft/tests", replacedMaps: "Maps/00-Smashcraft/tests", preserveMaps: true })));
 export const sourceErrorsLayer = SourceErrors.layer({ sourceMapDirectory, filePrefix: "smashcraft" });

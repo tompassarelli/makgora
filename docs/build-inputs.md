@@ -138,7 +138,14 @@ the other poses keep their existing SVG sources. Store the generated
   belong to the agent running those clients; Wisp writes game files through
   per-process temporaries.
 - The controller launcher link and the owner's Maps/00-Smashcraft are replaced
-  through per-process temporaries (`NAME.PID.next`), renamed in.
+  through per-process temporaries (`NAME.PID.next`), renamed in. Installing a
+  main build there removes every other file, so it holds one main build and at
+  most one lane build to try (smashcraft:docs/play.md).
+- Lane, test, integrity and diagnostic builds go to a private folder: a
+  per-run temporary removed after the run, a new folder under
+  ~/.local/share/smashcraft-build-inputs/, or the lane cache
+  ~/.local/state/smashcraft/lane-builds/ (one build per lane). `wisp map build`
+  and `wisp map rebuild` refuse a path inside the owner's Maps/00-Smashcraft.
 - The LAN pool's pool.json and clients.json have one writer, the running
   `wisp lan pool`.
 - ts/build/ and build/ are per checkout: run one build at a time in a lane.

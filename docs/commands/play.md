@@ -2,9 +2,9 @@
 
 - Playtest: `bun wisp play` builds current main (once per revision, however
   many plays start together) and goes from Tom's desktop to a match against a computer
-  (smashcraft:docs/play.md). Experiments use `fresh`, captures or `accept`,
-  with maps under Maps/00-Smashcraft/tests; play preserves two prior versions
-  beside the latest correctly titled build and archives the rest under older/.
+  (smashcraft:docs/play.md). Experiments use `fresh`, captures or `accept` on
+  pool clients and never install in Tom's Maps/00-Smashcraft; play installs
+  the build as `Smashcraft 0.0.N SHORTSHA` and removes every other file there.
   The playable build plays on the keyboard alone, through Warcraft's own
   local keyboard sampling with two-frame delay and rollback (#60/#166);
   play starts no helper and never needs one.
@@ -22,7 +22,7 @@
   commit or matching tree, or whose Autoland status explicitly names that landed
   commit, and, if it isn't installed yet, builds it once with the play build
   path and installs it as `Smashcraft 0.0.N SHORTSHA` under Maps/00-Smashcraft,
-  moving all but the two prior versions to older/. CI/farm green only stages
+  removing the previous build and any lane build. CI/farm green only stages
   the candidate outside Maps; installation also requires every declared `gate-*`
   check to have verdict `pass` in Classic on its exact bytes.
   Native owners run `bun wisp accept --only gate-* --map CANDIDATE --out DIR`

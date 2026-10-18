@@ -20,12 +20,13 @@ import { CPU_OPPONENT_DEFAULT, CPU_TIER_DEFAULT, type CpuOpponentChoice, type Cp
 import { playtestRequest } from "../../../src/game/session/playtest";
 import { MeleeReady, PLAYTEST_GO_FILE, PLAYTEST_REQUEST_FILE, playtestReceiptFile } from "../boundary";
 import { MELEE_READY_FILE } from "../../../src/game/core/gameFiles";
-import { clientState, gameFilesLayer } from "../project";
+import { PLAYTEST_PREFIX, clientState, gameFilesLayer } from "../project";
 import { accountField, smashcraftWatch } from "../doctor";
 import { currentPlaytest } from "../currentPlaytest";
 import { lobbyController, optionalController } from "../controllerService";
 import { pollUntil } from "../../hostPoll";
-import { installLatest } from "../mapLibrary";
+import { installLatest, installTryout, tomsLibrary } from "../mapLibrary";
+import { PLAYABLE_FILE } from "../greenBuilds";
 import { reserveStatus } from "../playtestReserve";
 import type { Command } from "wisp/scripts/wisp/command";
 import { PLAYABLE_BUILD } from "../../../src/game/session/currentBuild";
@@ -44,9 +45,6 @@ interface Playtest {
 
   readonly menuReportPort: number;
 }
-
-
-export const PLAYTEST_PREFIX = join(homedir(), ".local/share/Steam/steamapps/compatdata/3516115571/pfx");
 
 
 export const PLAYTEST: Omit<Playtest, "map" | "helper"> = {
@@ -237,8 +235,9 @@ export const play: Command = (args) => Effect.gen(function*() {
     const requested = maps[0];
     if (maps.length > 1 || (requested !== undefined && (!/\.w3x$/i.test(requested) || requested.startsWith("--")))) return yield* new PlayProblem({ problem: "use play --lobby-only [MAP.w3x]" });
     const current = requested === undefined
-      ? yield* currentPlaytest(join(documentsFolder(PLAYTEST_PREFIX), "Maps/00-Smashcraft"))
+      ? yield* currentPlaytest(tomsLibrary(), { named: true })
       : { map: { folder: "00-Smashcraft", file: basename(requested), title: basename(requested, ".w3x"), source: resolve(requested) }, helper: undefined };
+    yield* Effect.try({ try: () => (PLAYABLE_FILE.test(current.map.file) ? installLatest : installTryout)(documentsFolder(PLAYTEST_PREFIX), current.map.source), catch: (cause) => new PlayProblem({ problem: String(cause) }) });
     const normal = playtest({ ...PLAYTEST, ...current });
     const declaration: PlayDeclaration<GameFiles> = {
       ...normal,
@@ -260,7 +259,7 @@ export const play: Command = (args) => Effect.gen(function*() {
     return yield* installGreen(documentsFolder(PLAYTEST_PREFIX), args.includes("--dry-run"));
   }
   yield* signInTom;
-  const current = yield* currentPlaytest(join(documentsFolder(PLAYTEST_PREFIX), "Maps/00-Smashcraft"));
+  const current = yield* currentPlaytest(tomsLibrary(), { named: true });
   const declaration = playtest({ ...PLAYTEST, ...current });
   yield* Effect.try({ try: () => installLatest(documentsFolder(declaration.prefix), current.map.source), catch: (cause) => new PlayProblem({ problem: String(cause) }) });
   return yield* makePlay(declaration, gameFilesLayer, tools, smashcraftWatch.pipe(Layer.provide(platformLayer())))(args);
