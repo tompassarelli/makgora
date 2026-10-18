@@ -62,7 +62,7 @@ export const FAMILIES = {
   base: { file: "base.w3m", produce: "the private base map Melee_Prototype_Base.w3m (smashcraft:docs/development-loop.md)" },
   container: { file: "container.w3x", produce: "the private asset container map (a built Smashcraft map carrying the stock imports)" },
   summon: { produce: "the private summon clip export (summon-clips-evidence.json and imports/war3mapImported/)" },
-  "animation-assets": { produce: "bash tools/animations/build-assets.sh (writes build/animation-assets)" },
+  "animation-assets": { produce: "tools/smashcraft-tools/target/release/smashcraft-tools build-animation-assets (writes build/animation-assets)" },
   "illidan-animation": { produce: "bun tools/animations/package-illidan.ts (writes build/illidan-animation)" },
   "selection-assets": { produce: "bun tools/selection/build-art.ts (writes build/selection-assets)" },
   "fighter-renders": { produce: "bun scripts/fighterPortraits.ts PRIVATE_OUTPUT (from ts/; stores PRIVATE_OUTPUT/fighter-renders)" },

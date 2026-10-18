@@ -136,7 +136,7 @@ export function renderAssetStore(options: RenderAssetOptions = {}, mapImports?: 
     const cached = yield* read(join(directory, target));
     if (cached !== undefined) return cached;
     const extractor = findExtractor(options);
-    if (extractor === null || extractor === undefined) return yield* new RenderAssetFailure({ problem: `stock asset ${normalized} needs CASC_EXTRACTOR (tools/animations/extract.sh builds it)` });
+    if (extractor === null || extractor === undefined) return yield* new RenderAssetFailure({ problem: `stock asset ${normalized} needs CASC_EXTRACTOR (smashcraft-tools extract-animation-assets builds it)` });
     mkdirSync(dirname(join(directory, target)), { recursive: true });
     if (!texture) return (yield* succeeds(extractor, [storage, `war3.w3mod:${layer}:${normalized}`, join(directory, target)])) ? yield* read(join(directory, target)) : undefined;
     const dds = join(directory, normalized.replace(/\.[^.]+$/, ".dds"));
@@ -168,7 +168,7 @@ export function renderAssetStore(options: RenderAssetOptions = {}, mapImports?: 
     const cached = yield* read(cache);
     if (cached !== undefined) return cached;
     const extractor = findExtractor(options);
-    if (extractor === null || extractor === undefined) return yield* new RenderAssetFailure({ problem: `stock asset ${path} needs CASC_EXTRACTOR (tools/animations/extract.sh builds it)` });
+    if (extractor === null || extractor === undefined) return yield* new RenderAssetFailure({ problem: `stock asset ${path} needs CASC_EXTRACTOR (smashcraft-tools extract-animation-assets builds it)` });
     mkdirSync(dirname(cache), { recursive: true });
     if (yield* succeeds(extractor, [storage, `war3.w3mod:${normalized}`, cache])) return yield* read(cache);
     if (/\.(flac|wav|ogg|mp3)$/.test(normalized)) {

@@ -9,7 +9,7 @@ every attempted layer and the map or stock path selected for each asset.
 Asset paths come from this checkout's immutable
 `build-inputs/`. Stock textures come from `WC3_TEXTURES`, or are extracted
 with `CASC_EXTRACTOR` and `WC3_STORAGE`. The extractor
-is built by `tools/animations/extract.sh`; DDS textures are converted with
+is built by `smashcraft-tools extract-animation-assets`; DDS textures are converted with
 ImageMagick (`magick` on version 7, `convert` on version 6). Ubuntu CI
 installs its `imagemagick` package before running the stock-texture tests.
 Extracted assets stay in
@@ -92,7 +92,7 @@ effect destroyed in view whose death animation emits. It reads:
   fails the check:
 
   ```sh
-  # The CascLib extractor, as smashcraft:tools/animations/extract.sh builds it:
+  # The CascLib extractor, as `smashcraft-tools extract-animation-assets` builds it:
   nix shell nixpkgs#gcc --command g++ -O2 -I CASCLIB/src tools/animations/casc-extract.cpp CASCLIB/build/libcasc.a -pthread -o build/animation-assets/casc-extract
   cd ts && bun wisp view models --assets ASSETS --summon ASSETS/summon-original-clips \
     --extractor ../build/animation-assets/casc-extract --storage "WARCRAFT_III_DIR"

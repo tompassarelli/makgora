@@ -1,0 +1,37 @@
+name: Tools
+
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore: ["farm/**"]
+    paths:
+      - "tools/smashcraft-tools/**"
+      - "tools/wc3-procedures/**"
+      - ".github/workflows/tools.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  host-tools:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: tools/smashcraft-tools
+    steps:
+      - uses: actions/checkout@v5
+      - name: Pinned Rust toolchain
+        run: rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: tools/smashcraft-tools
+      - run: cargo clippy --locked --all-targets -- -D warnings
+      - run: cargo test --locked

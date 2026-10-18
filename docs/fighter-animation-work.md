@@ -602,7 +602,7 @@ art direction. No assets have been copied from the archive into the map.
 Run from ~/code/smashcraft/worktrees/test-loop:
 
 ```bash
-nix shell nixpkgs#gcc nixpkgs#bun --command bash /home/tom/code/smashcraft/worktrees/test-loop/tools/animations/extract.sh
+nix shell nixpkgs#gcc nixpkgs#bun --command tools/smashcraft-tools/target/release/smashcraft-tools extract-animation-assets
 ```
 
 Requires ImageMagick on PATH and the built CascLib static library below.
@@ -671,7 +671,7 @@ Its pool exporter strips only this three-clip suffix to reuse exact older clips.
 Illidan's package is regenerated in order from the repository root. Run each
 Blender step as `blender --background --python-exit-code 1 --python FILE`:
 
-1. smashcraft:tools/animations/extract-demonhunter.sh extracts the installed
+1. `smashcraft-tools extract-demonhunter` extracts the installed
    Demon Hunter model and textures to smashcraft:build/illidan-assets/ with
    the CascLib setup above.
 2. smashcraft:tools/animations/import-demonhunter.py saves the editable scene.
@@ -697,7 +697,7 @@ The map build imports both from its `--assets` directory.
 ## Build and play the first authored jab
 
 ```bash
-nix shell nixpkgs#gcc nixpkgs#bun --command bash /home/tom/code/smashcraft/worktrees/test-loop/tools/animations/build-assets.sh
+nix shell nixpkgs#gcc nixpkgs#bun --command tools/smashcraft-tools/target/release/smashcraft-tools build-animation-assets
 ```
 
 This extracts local game assets, imports a fresh Archer scene, authors jab,
@@ -1241,7 +1241,7 @@ From smashcraft:ts/ in your lane:
 
 The Lich King (#167) is drawn by Kwaliti's Hive model (LichKing2.mdx, kept with
 the private build inputs), which has only thirteen stock sequences.
-`tools/animations/build-lichking.sh [INPUTS]` authors the rest:
+`smashcraft-tools build-lichking [INPUTS]` authors the rest:
 smashcraft:tools/animations/lichking.py imports the model into Blender at 60
 frames a second, so clip frame N is attack frame N, and keys every missing action
 on its skeleton. It uses the same scheme as strikes.py: body lean, twist, hip
@@ -1283,7 +1283,7 @@ start from Death's lying pose. Travel remains in the simulation, so the clips
 stay centered on the fighter. The original Stand Ready pose and textures are
 retained for the portraits.
 For additive clips, pass the immutable shipped model as the second argument
-to smashcraft:tools/animations/build-lichking.sh; its packager's
+to `smashcraft-tools build-lichking`; its packager's
 `--append-to EXISTING.mdx` retains the existing sequences and their tracks,
 then appends only new names. This avoids Blender's millisecond interval
 rounding changing previously shipped clips as the export grows.

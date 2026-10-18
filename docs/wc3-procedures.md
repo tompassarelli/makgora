@@ -1,6 +1,6 @@
 # Fast state-labeled Warcraft procedures
 
-Use `tools/wc3-procedure` to run a short, named input chain against an existing
+Use `smashcraft-tools wc3-procedure` (smashcraft:tools/smashcraft-tools) to run a short, named input chain against an existing
 private Warcraft session. It groups inputs that do not need an inspection
 between them into one XTEST client call; focus and the private run identity are
 checked at the boundary. That can remove repeated tool round trips in a
@@ -11,7 +11,7 @@ Example, from a shell with `xdotool` available:
 
 ```sh
 nix shell nixpkgs#xdotool --command \
-  tools/wc3-procedure /run/user/1000/private-desktop.RUN match-running export-ui-service
+  tools/smashcraft-tools/target/release/smashcraft-tools wc3-procedure /run/user/1000/private-desktop.RUN match-running export-ui-service
 ```
 
 Use the exact run directory printed by the canonical private-desktop launcher.
@@ -34,7 +34,7 @@ that the export happened.
 Validate a recipe without opening a display or sending input:
 
 ```sh
-tools/wc3-procedure --validate match-running export-ui-service
+tools/smashcraft-tools/target/release/smashcraft-tools wc3-procedure --validate match-running export-ui-service
 ```
 
 Recipe files in `tools/wc3-procedures/*.chain` support `tap KEY MS`,

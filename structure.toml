@@ -176,6 +176,12 @@ responsibility = "bun wisp verbs, landing bots, sim analysis harnesses, codegen 
 may_use = ["host", "classic", "session", "ui", "render", "presentation", "fighter-look", "replay", "netcode", "match", "lobby", "roster", "ai", "snapshot", "sim", "fighter-kit", "input", "core", "generated"]
 
 [[module]]
+name = "host-tools"
+paths = ["tools/smashcraft-tools/**"]
+responsibility = "smashcraft-tools (Rust): Warcraft III menu observation and input procedures, and the animation asset extractors."
+may_use = []
+
+[[module]]
 name = "tools"
 thresholds = { function_lines = 150, function_complexity = 30 }
 paths = ["tools/**", "references/**"]
@@ -308,4 +314,4 @@ producer = "ts/scripts/releaseRoster.ts"
 
 [ignore]
 paths = ["repos/**", "evidence/**", "ts/vendor/**", "ts/node_modules/**", "**/fixtures/**", "ts/test/corpus/**", "ts/test/native/pads/**",
-         "ts/scripts/wisp/model-facts/**", "controller/target/**", "tools/slippi/node_modules/**", "ts/src/game/ui/opponentSettingsFrames.ts"]
+         "ts/scripts/wisp/model-facts/**", "controller/target/**", "tools/smashcraft-tools/target/**", "tools/slippi/node_modules/**", "ts/src/game/ui/opponentSettingsFrames.ts"]

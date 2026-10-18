@@ -1,6 +1,6 @@
 # Fast menu observation
 
-`smashcraft:tools/wc3-screen-state` classifies an existing disk capture of the
+`smashcraft-tools wc3-screen-state` (smashcraft:tools/smashcraft-tools) classifies an existing disk capture of the
 English Warcraft III 3.0.0.24268 menu at 2560×1440. It reads three compact text
 regions in one OCR pass and returns `main-menu`, `single-player`, `create-game`,
 `disconnected`, or `unknown`. Unknown and unsupported geometry return nonzero.
@@ -8,7 +8,7 @@ The disconnect label takes precedence over any underlying menu.
 
 ```sh
 nix shell nixpkgs#tesseract nixpkgs#imagemagick --command \
-  ~/code/smashcraft/worktrees/wc3-screen-speed-20261003/tools/wc3-screen-state \
+  tools/smashcraft-tools/target/release/smashcraft-tools wc3-screen-state \
   /absolute/path/to/fresh-capture.png
 ```
 
@@ -19,7 +19,7 @@ running. These are recognition hints for these four menu screens, not a general
 UI oracle. Other resolutions, languages, unexpected dialogs and menu revisions
 remain unverified; stop on unknown rather than guessing a procedure.
 
-The implementation is a shell adapter to ImageMagick and Tesseract. It preserves
+The implementation (smashcraft:tools/smashcraft-tools/src/screen_state.rs) pipes ImageMagick into Tesseract. It preserves
 the earlier bright-text threshold (red >170, green >150) and PSM 11, but masks
 only label regions. OCR is limited to one OpenMP thread in both benchmark modes.
 The `full` second argument provides the otherwise equivalent full-frame baseline.
@@ -28,7 +28,7 @@ The `full` second argument provides the otherwise equivalent full-frame baseline
 
 ```sh
 nix shell nixpkgs#tesseract nixpkgs#imagemagick --command \
-  ~/code/smashcraft/worktrees/wc3-screen-speed-20261003/tools/bench-wc3-screen-state \
+  tools/smashcraft-tools/target/release/smashcraft-tools bench-wc3-screen-state \
   ~/code/smashcraft/worktrees/test-loop/build/two-clients/competitive-integrity-20261003/native-bridge-recovery
 ```
 
@@ -60,7 +60,7 @@ The native map-entry boundary remains unresolved independently of this result.
 
 ## Wait for an observed menu
 
-`smashcraft:tools/wc3-wait-state RUN_DIR EXPECTED_STATE TIMEOUT_SECONDS` replaces
+`smashcraft-tools wc3-wait-state RUN_DIR EXPECTED_STATE TIMEOUT_SECONDS` replaces
 a guessed readiness sleep with periodic observation. It accepts the exact live
 private run directory, one of `main-menu`, `single-player`, `create-game`, and a
 1–120 second timeout. It resolves the canonical private-desktop launcher through
@@ -75,7 +75,7 @@ Captures remain in the private run's unique `wait-state.*` directory for review.
 
 ```sh
 nix shell nixpkgs#tesseract nixpkgs#imagemagick --command \
-  ~/code/smashcraft/worktrees/wc3-screen-speed-20261003/tools/wc3-wait-state \
+  tools/smashcraft-tools/target/release/smashcraft-tools wc3-wait-state \
   /run/user/1000/private-desktop.EXACT_RUN create-game 15
 ```
 
