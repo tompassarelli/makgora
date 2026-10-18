@@ -38,7 +38,7 @@ export const STRATHOLME_SCENERY: StageScenery = {
     { model: TOWN_FIRE, x: 2160.0, y: 4500.0, z: -150.0, scale: 1.5, yaw: 90.0 },
     { model: TOWN_FIRE, x: -2600.0, y: 4300.0, z: -1300.0, scale: 2.0, yaw: 45.0 },
     { model: TOWN_FIRE, x: 850.0, y: 4300.0, z: -1300.0, scale: 1.5, yaw: 135.0 },
-    { model: "Doodads\\LordaeronFall\\Structures\\AndrohalClockTower_Destroyed\\AndrohalClockTower_Destroyed.mdx", x: -1600.0, y: 7600.0, z: -1800.0, scale: 2.0, yaw: 270.0 },
+    { model: "Doodads\\Cityscape\\Structures\\CityBuildingLarge_0_Ruined\\CityBuildingLarge_0_Ruined.mdx", x: -1600.0, y: 7600.0, z: -1800.0, scale: 3.0, yaw: 270.0 },
     { model: "Doodads\\Barrens\\Rocks\\Barrens_Rocks\\Barrens_Rocks2.mdx", x: -1600.0, y: 7600.0, z: -4000.0, scale: 10.0, yaw: 110.0, matrixScale: [1.0, 1.0, f32(2.797)] },
   ],
 };

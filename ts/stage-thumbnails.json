@@ -3,72 +3,72 @@
     {
       "stage": 2,
       "file": "StageCardFrozenThrone.blp",
-      "inputs": "5f2fdbd1f28df54abfefdacb79c4be5965a9a4550528fa350e843b07535f7015",
-      "sha256": "eef526a8285dc80a80e4be7c1ad6d4b12cef340de6ce3969f919f39a39612ad0",
-      "bytes": 98330
+      "inputs": "24de6042e6590efd8c5ad261761095167341a2febec1b439d8d9890c18b7efe4",
+      "sha256": "4ece5955fc2087b1f29e2b78edbe7035ff5def456c0471dcbb1d887e93982bd8",
+      "bytes": 63587
     },
     {
       "stage": 10,
       "file": "StageCardNordrassil.blp",
-      "inputs": "3ed65b72a095ca655e72d7f2e88a85423885f212ee9b6f34c03ec19cc1c2e6dd",
-      "sha256": "2e89c0e1e980f70e8861ba44ac0ef9d784cd6cd856b0e4e0ed7e9e66bcc78e85",
-      "bytes": 104822
+      "inputs": "d51d7ea7e4481090d2e5cfce7a84e1407ea11a66ab1990ea7c2e574b03626a22",
+      "sha256": "d69808f681ac3531fe6cfe9544378d8d2e60fd4d042dd69c545869c433e4d1ce",
+      "bytes": 87733
     },
     {
       "stage": 11,
       "file": "StageCardGryphon.blp",
-      "inputs": "22527e16caa90dcb03d2858fa2648abfa4432f58b79ef75ce86e202b889bc365",
-      "sha256": "dd033c7425c105b40ea60f74c4addc72eefbc753ec6ef264653a1a9dde2c10f6",
-      "bytes": 97679
+      "inputs": "a088af405d0a1517b2e894318c84865f7441beec7ca5faead579a6986643ec04",
+      "sha256": "1451ff1b4fa8b9f7149222b281a07e13551175fbda9e7683eb29bbad0d2fbb45",
+      "bytes": 69104
     },
     {
       "stage": 3,
       "file": "StageCardDurotar.blp",
-      "inputs": "586d436d46fa84123b6386d75914290d6de0e6f41fc57eb9daa8e496ea00b01a",
-      "sha256": "05bf2ac75e3ffeb19f8739ff7c99e7fad5554202644caf0ae3a7f0ffdc497cb6",
-      "bytes": 101719
+      "inputs": "d137ef224aa6ee3213e50b19945cc05d201f577315c074167ed5c79740c4c6fb",
+      "sha256": "7dca03580816199f81506568667e7065c04cc42c163d863f147cafad0170ca9c",
+      "bytes": 69403
     },
     {
       "stage": 4,
       "file": "StageCardNaxxramas.blp",
-      "inputs": "b0ad2792a9514b72902938eccd6a6d919f8967fde135a7d067c48399dacbfc1d",
-      "sha256": "32075355a56ff5147eb6822da9e20405fe348feca9af18a0ac174be79d3d184f",
-      "bytes": 94056
+      "inputs": "8e42ecbf5bfcb9431d8740b15c9127f32ede22bc8eb04ee7e68b1bdaa4fc2acc",
+      "sha256": "699a9d916a4147511f521a34814fe528c80d27ee5210a8f5d0f85c8d967e208c",
+      "bytes": 52013
     },
     {
       "stage": 14,
       "file": "StageCardHellfire.blp",
-      "inputs": "6461d8c7ec616db58a04e46c79d6e3ae3e9e31aff9a3efe1d3104da0e1480de5",
-      "sha256": "8e9536b805e1bfce9881a1f74ed8835ad5caf53de7f2b6a9d616e846647182d7",
-      "bytes": 52990
+      "inputs": "c4ee2e2444ad5738978c4b0ccf984262a0089fa95552dd3da475b4b4980f0ce0",
+      "sha256": "b10df4e76db107ad8a66bfa46d9b67ea52276921eb5a06f468ecddbe6a2bb819",
+      "bytes": 41919
     },
     {
       "stage": 12,
       "file": "StageCardBlackrock.blp",
       "inputs": "a5af770aaf9f6c5466adc9551b1c4f586017edaa279f94cd985379512aecd370",
-      "sha256": "7f5ab73bd9f2e6279929bbad2daed82187b84092984d90d9ee27e410116bc559",
-      "bytes": 51395
+      "sha256": "e2e3cb098f0289eccda8f0fa79f2f65f4957d2f9b0270741d14d5ff0271e6a06",
+      "bytes": 53550
     },
     {
       "stage": 13,
       "file": "StageCardAhnQiraj.blp",
-      "inputs": "c2f8eb60c8e6acb74fd3df39f6bd5f357abf6c7476d0c52779d2b673db038e88",
-      "sha256": "3ed6b4dbe76f0324cf9293948bcd51f17f325579517db0e1c86c3d24312fe087",
-      "bytes": 93031
+      "inputs": "e690720766daceaa887933857a2c20416b44a625dcafde5a7115f7465ad366c7",
+      "sha256": "01f5a15fc385850acc99da92b666f2fabd533d5b37fe2d9ae43d66d6ffc11170",
+      "bytes": 88820
     },
     {
       "stage": 6,
       "file": "StageCardStratholme.blp",
-      "inputs": "4a889da9cedde06207c3fa2607e425389b01389d420d334b12e75887446b1c42",
-      "sha256": "168e72b5d38197e479861392636ea86e1f199cc8120c9c7a2d2466957aec0e25",
-      "bytes": 83755
+      "inputs": "3c3f544485799beeb0e3dd913fe0fbbfab16e661fe96e9310c6a69ff3f8c8ce9",
+      "sha256": "c19ea44e1808c712bedeacf80379cb50fa799485321d58a2277198016ac13ebf",
+      "bytes": 67181
     },
     {
       "stage": 7,
       "file": "StageCardTomb.blp",
       "inputs": "2a7c952b3e958cfc100e7e6aa998ee65e452ecf9c8926005ec331c3c34c50cbf",
-      "sha256": "b9d58d9bb111a4704696ada52d6e42d9c6fe118760e3bf6aaeb83d0bda269c3e",
-      "bytes": 73865
+      "sha256": "d2ec1b4789c680a836b5d07d34f894359f212736a19b9f918f4f46132c3b3c6c",
+      "bytes": 75280
     }
   ]
 }
