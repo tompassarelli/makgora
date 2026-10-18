@@ -227,21 +227,6 @@ function sideKick(pose: HeroPose, style: AttackStyle, chamber: readonly [number,
     { frame: total, gesture: READY },
   ] };
 }
-function angledKick(): Authored {
-  const { contact, total } = timing(AttackStyle.forwardTiltUp);
-  const brace = (k: number): Gesture => ({ ...still(1), free: 50 + 90 * k, freeElbow: -30 - 40 * k, lean: -14 * k, chest: -12 * k, head: 10 * k, frontKnee: 14 * k, drop: -4 * k });
-  return { pose: "forwardTiltUp", style: AttackStyle.forwardTiltUp, support: "L", anatomical: true, phases: [
-    { frame: 0, gesture: READY },
-    { frame: contact - 6, gesture: { ...brace(0), lean: 4, drop: -6, frontKnee: 18, backKnee: -50, step: -3 }, reach: ["footR", -18, 12] },
-    { frame: contact - 2, gesture: { ...brace(0.7), backKnee: -130, step: 9 }, reach: ["footR", 25, 54] },
-    { frame: contact, gesture: { ...brace(1), backKnee: 0, step: 24 }, reach: ["footR", 66, 86] },
-    { frame: contact + 2, gesture: { ...brace(1.05), backKnee: 0, step: 28 }, reach: ["footR", 86, 98] },
-    { frame: contact + 4, gesture: { ...brace(0.9), backKnee: -110, step: 22 }, reach: ["footR", 40, 60] },
-    { frame: contact + 11, gesture: { ...brace(0.5), backKnee: -90, step: 14 }, reach: ["footR", 18, 26] },
-    { frame: contact + 17, gesture: { ...brace(0.2), backKnee: -20, step: 5 }, reach: ["footR", -3, 7] },
-    { frame: total, gesture: READY },
-  ] };
-}
 function upTilt(): Authored {
   const { contact, total } = timing(AttackStyle.upTilt);
   return { pose: "upTilt", style: AttackStyle.upTilt, support: "L", phases: [
@@ -395,7 +380,7 @@ const POSES: Readonly<Record<string, () => Authored>> = {
   forwardTiltDown: kicked(() => kick("forwardTiltDown", AttackStyle.forwardTiltDown, [76, 26], -8, [80, 24], -30, -8)),
   downTilt: kicked(downTilt), jab: kicked(jab), upTilt: kicked(upTilt), dashAttack: kicked(dashAttack),
   forwardTilt: kicked(() => sideKick("forwardTilt", AttackStyle.forwardTilt, [34, 64], [88, 60], [100, 61], -8, [66, 41])),
-  forwardTiltUp: kicked(angledKick),
+  forwardTiltUp: kicked(() => sideKick("forwardTiltUp", AttackStyle.forwardTiltUp, [30, 80], [74, 108], [82, 120], -26, [34, 72], [30, 40], 2.5)),
 };
 
 function rotation(base: ArrayLike<number>, pitch: number, yaw = 0, roll = 0): Float32Array<ArrayBuffer> {
