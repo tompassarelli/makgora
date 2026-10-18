@@ -7,6 +7,7 @@ import { encodePacket, inputPacket } from "../../game/input/wire";
 import { humanActive, humanFighterActive } from "../../game/lobby/lobbyState";
 import { PARTICIPANT_SLOTS } from "../../game/input/participants";
 import { type ShellState, localSlot } from "./state";
+import { osKeyDown } from "../../platform/osKeys";
 
 export const PAD_MOUSE = "shell.padMouse";
 
@@ -20,7 +21,7 @@ export interface NativePadCapture {
   readonly mouse: string[];
 }
 
-const pressed = (key: number) => BlzIsKeyPressed(ConvertOsKeyType(key));
+const pressed = osKeyDown;
 
 
 export function createPadTriggers(s: ShellState): void {

@@ -12,6 +12,7 @@ import { humanFighterActive, humanPresent } from "../../game/lobby/lobbyState";
 import { type ShellState, keepShellMomentEnd, localSlot } from "./state";
 import { settingsOpen } from "./ui";
 import { ownConfirmedState } from "./confirmedState";
+import { osKeyDown } from "../../platform/osKeys";
 
 
 export function currentHumanMask(departed: number): number {
@@ -74,10 +75,10 @@ export function pollLocalKeys(s: Readonly<ShellState>): number {
   if (menuHeld !== undefined) {
     for (let index = menuHeld.length - 1; index >= 0; index--) {
       const key = menuHeld[index];
-      if (key !== undefined && !BlzIsKeyPressed(ConvertOsKeyType(key))) menuHeld.splice(index, 1);
+      if (key !== undefined && !osKeyDown(key)) menuHeld.splice(index, 1);
     }
   }
-  const pressed = (key: number | undefined) => key !== undefined && !menuHeld?.includes(key) && BlzIsKeyPressed(ConvertOsKeyType(key));
+  const pressed = (key: number | undefined) => key !== undefined && !menuHeld?.includes(key) && osKeyDown(key);
   let held = 0;
   for (const action of ACTION_ORDER) {
     if (pressed(keyFor(bindings, action, 0)) || pressed(keyFor(bindings, action, 1))) held |= bit(action);

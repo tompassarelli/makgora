@@ -54,6 +54,7 @@ import { type ShellState, activeRollback, cancelPendingPlaytest, keepShellMoment
 import { clearMatchEffects, views } from "./ui";
 import { ownConfirmedState } from "./confirmedState";
 import { LASTING, pauseMatchPresentation, renderFighter, renderPersistentPresentation, setStatus } from "./view";
+import { osKeyDown } from "../../platform/osKeys";
 
 
 function journalOwnsKey(s: ShellState, slot: ParticipantSlot, key: number): boolean {
@@ -74,7 +75,7 @@ export function startDown(s: ShellState, slot: ParticipantSlot): void {
   const playing = s.game.phase === Phase.match;
   if (epoch?.journal.editbox !== undefined && chatBusy(epoch.journal)) return;
   if (epoch !== undefined && playing && epoch.journal.barrier.request !== undefined) return;
-  if (s.session.paused) s.pauseKeysHeld = pauseHeldKeys(s.participants[slot].bindings.bindings).filter(key => BlzIsKeyPressed(ConvertOsKeyType(key)));
+  if (s.session.paused) s.pauseKeysHeld = pauseHeldKeys(s.participants[slot].bindings.bindings).filter(key => osKeyDown(key));
   const deferred = epoch !== undefined && playing;
   const consumed = !s.session.startHeld[slot] && views(s).selections[slot].consumeStart();
   const action = startKeyDown(s.session, slot, s.game.phase, consumed || views(s).settings[slot].isOpen(), deferred);

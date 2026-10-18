@@ -3,8 +3,9 @@
 
 import { CARRIER_KEYS, COMMIT_KEY, type KeyboardMailbox, decodeChunk } from "../game/netcode/journal/keyboard";
 import { writeLine } from "wisp/src/platform/fileio";
+import { osKeyDown } from "./osKeys";
 
-const isDown = (key: number) => BlzIsKeyPressed(ConvertOsKeyType(key));
+const isDown = osKeyDown;
 
 function acknowledge(mailbox: KeyboardMailbox): void {
   const { name, line } = mailbox.receipt();
