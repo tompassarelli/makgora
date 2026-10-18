@@ -26,10 +26,9 @@ import { Phase } from "../../../src/game/lobby/lobbyState";
 import { MAP_PROFILES, SMASHCRAFT_ACCEPT, type SmashcraftMapProfile } from "../acceptChecks";
 import { currentPlaytest } from "../currentPlaytest";
 import { readClientEntries, readyPackager, resolveTools, validateClients } from "../nativeTools";
-import { documentsFolder } from "wisp/scripts/warcraft/battleNet";
 import { DevCommandReceipt } from "../boundary";
 import { rebuildMap } from "../mapInputs";
-import { PLAYTEST_PREFIX, clientState, gameFilesLayer, projectRoot } from "../project";
+import { clientState, gameFilesLayer, projectRoot } from "../project";
 import { clientArguments } from "./client";
 import { freshMatch, readyAfter, sendDevCommand } from "./fresh";
 import { profileOptions } from "./map";
@@ -242,7 +241,7 @@ export const runShard = (pair: string, ids: readonly string[], directory: string
 
 const headCandidate = Effect.gen(function*() {
   const revision = yield* runProcess(ChildProcess.make("git", ["rev-parse", "HEAD"], { cwd: projectRoot, stdin: "ignore" })).pipe(Effect.provide(BunServices.layer));
-  const { map } = yield* currentPlaytest(join(documentsFolder(PLAYTEST_PREFIX), "Maps/00-Smashcraft"), { revision, helper: false, edition: "classic" });
+  const { map } = yield* currentPlaytest({ revision, helper: false, edition: "classic" });
   console.log(`candidate: ${map.title} built from HEAD ${revision.slice(0, 12)}`);
   return map.source;
 });

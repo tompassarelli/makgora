@@ -7,7 +7,7 @@ import { ChildProcess, type ChildProcessSpawner } from "effect/process";
 import { PlayProblem } from "wisp/scripts/wisp/play";
 import { runProcess } from "./hostProcess";
 import { installPlaytest } from "./playtestBuild";
-import { type LandingDecision, PLAYABLE_FILE, costPrediction } from "./wisp/greenBuilds";
+import { type LandingDecision, buildLabel, costPrediction } from "./wisp/greenBuilds";
 import { writePlaytestChecklist } from "./wisp/playtestChecklist";
 import { TOM_EDITION } from "./wisp/currentPlaytest";
 import { projectRoot } from "./wisp/project";
@@ -111,8 +111,8 @@ export const hostSteps = (predictCost: boolean): WatchSteps<ChildProcessSpawner.
   }),
   decision: () => Effect.succeed("build"),
   landedAt: (sha) => git("show", "-s", "--format=%ct", sha).pipe(Effect.map((seconds) => Number(seconds) * 1000)),
-  build: (sha) => installPlaytest(sha, predictCost, false, TOM_EDITION, true).pipe(Effect.flatMap(({ file, installed }) => {
-    const version = PLAYABLE_FILE.exec(file)?.[1];
+  build: (sha) => installPlaytest(sha, predictCost, false, TOM_EDITION).pipe(Effect.flatMap(({ file, installed }) => {
+    const version = buildLabel(file);
     return version === undefined ? Effect.fail(new PlayProblem({ problem: `not a playable map: ${file}` })) : Effect.succeed({ version, path: installed });
   })),
   notes: writePlaytestChecklist,

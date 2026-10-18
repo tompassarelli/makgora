@@ -5,7 +5,6 @@ import { join } from "node:path";
 import { Effect } from "effect";
 import { PlayProblem } from "wisp/scripts/wisp/play";
 import { type LaneSteps, laneBuild, laneTests } from "./laneBuild";
-import { playVersion } from "./wisp/currentPlaytest";
 import { LANE_FILE, PLAYABLE_FILE } from "./wisp/greenBuilds";
 import { laneMapTitle, laneSlug } from "./wisp/laneMaps";
 import { installLatest } from "./wisp/mapLibrary";
@@ -13,7 +12,7 @@ import { installLatest } from "./wisp/mapLibrary";
 const CAIRNE = "claude/land-cairne-air-924c72aef489";
 const FLAKE = "claude/land-fix-test-flake-0123456789ab";
 
-test("a lane map is named Smashcraft <version>-<lane>, one installed lane map replaces any other, and main numbering ignores it [k2 property]", async () => {
+test("a lane map is named Smashcraft <version>-<lane>, one installed lane map replaces any other, and none is taken for a main build [k2 property]", async () => {
   const root = mkdtempSync(join(tmpdir(), "smashcraft-lane-build-"));
   try {
     const documents = join(root, "documents");
@@ -52,7 +51,6 @@ test("a lane map is named Smashcraft <version>-<lane>, one installed lane map re
     expect(existsSync(join(maps, "Smashcraft 0.0.8-cairne-air-924c72aef489.w3x"))).toBe(true);
 
     for (const name of listed().filter((entry) => LANE_FILE.test(entry))) expect(PLAYABLE_FILE.test(name)).toBe(false);
-    expect(playVersion(join(root, "play-current"), maps, "a".repeat(40))).toBe("0.0.7");
     const main = join(root, "Smashcraft 0.0.7 bbbbbbb.w3x");
     writeFileSync(main, "main 7");
     installLatest(documents, main);

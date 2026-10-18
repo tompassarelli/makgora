@@ -45,12 +45,13 @@ Maps/00-Smashcraft holds one file, the newest installed main build
 `Smashcraft X.Y.Z abc1234.w3x` (version and short commit; the file and in-game
 title carry the same name). Installing a main build (`play`, `playtest:build`,
 the Tom build watcher, `play --install-green`) removes everything else in the
-folder. X.Y.Z follows the release tags: a build of main takes the next patch
-number after the newest `vX.Y.Z` tag reachable from its commit (`git describe
---tags --match 'v[0-9]*.[0-9]*.[0-9]*' --exclude 'v*-*'`) or after every version of that tag's X.Y already built or installed (other lines' numbers, such as the old 0.0.N and 0.5.N builds, are ignored),
-whichever is higher, so the first build after v0.1.0 is 0.1.1 and then 0.1.2.
-The commit a release tag points at keeps the tag's version, and rebuilding the
-same commit keeps its number. At
+folder. Only releases are public, so X.Y.Z is the next release, never a build
+counter: the patch after the newest `vX.Y.Z` tag reachable from the commit
+(`git describe --tags --match 'v[0-9]*.[0-9]*.[0-9]*' --exclude 'v*-*'`),
+and the short commit tells development builds apart, so every build after
+v0.1.0 is `Smashcraft 0.1.1 abc1234`. When Tom calls a release candidate, a
+`v0.1.1-rc.N` tag on its commit names the build `Smashcraft 0.1.1 RC-N`
+(the highest N), and the `v0.1.1` release tag names it `Smashcraft 0.1.1`. At
 most one lane or test build for Tom to try sits beside it (lane builds below,
 `play --lobby-only MAP.w3x`); it replaces any earlier one and goes when the next
 main build installs. Test, integrity, capture and diagnostic builds go to a
@@ -118,8 +119,7 @@ origin/main, uncommitted ones included), then builds the lane's working tree
 with the play build (no Lua prediction) as `Smashcraft X.Y.Z-LANE.w3x` in
 `~/.local/state/smashcraft/lane-builds/LANE/`, which holds only that lane's
 newest build. `--install` also installs it in Tom's Maps/00-Smashcraft for him
-to try. X.Y.Z is the version main's
-next build would take; LANE is the branch's last segment without `land-`
+to try. X.Y.Z is the next release; LANE is the branch's last segment without `land-`
 (`claude/land-cairne-air-924c72aef489` installs
 `Smashcraft X.Y.Z-cairne-air-924c72aef489.w3x`); `--lane BRANCH` names it
 explicitly. An installed lane map replaces any other lane or test map in the

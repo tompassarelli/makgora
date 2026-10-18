@@ -117,7 +117,7 @@ export function playtestChecklist(input: ChecklistInput): string {
 }
 
 export const handoffs = join(homedir(), ".local/state/agents/handoffs");
-export const checklistPath = (version: string, directory = handoffs) => join(directory, `playtest-${version}.md`);
+export const checklistPath = (version: string, directory = handoffs) => join(directory, `playtest-${version.replaceAll(" ", "-")}.md`);
 
 const REPO = "repos/tompassarelli/smashcraft";
 const problem = (cause: { readonly message: string }) => new PlayProblem({ problem: cause.message });

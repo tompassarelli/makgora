@@ -25,7 +25,7 @@ import { accountField, smashcraftWatch } from "../doctor";
 import { currentPlaytest } from "../currentPlaytest";
 import { lobbyController, optionalController } from "../controllerService";
 import { pollUntil } from "../../hostPoll";
-import { installLatest, installTryout, tomsLibrary } from "../mapLibrary";
+import { installLatest, installTryout } from "../mapLibrary";
 import { PLAYABLE_FILE } from "../greenBuilds";
 import { reserveStatus } from "../playtestReserve";
 import type { Command } from "wisp/scripts/wisp/command";
@@ -235,7 +235,7 @@ export const play: Command = (args) => Effect.gen(function*() {
     const requested = maps[0];
     if (maps.length > 1 || (requested !== undefined && (!/\.w3x$/i.test(requested) || requested.startsWith("--")))) return yield* new PlayProblem({ problem: "use play --lobby-only [MAP.w3x]" });
     const current = requested === undefined
-      ? yield* currentPlaytest(tomsLibrary(), { named: true })
+      ? yield* currentPlaytest()
       : { map: { folder: "00-Smashcraft", file: basename(requested), title: basename(requested, ".w3x"), source: resolve(requested) }, helper: undefined };
     yield* Effect.try({ try: () => (PLAYABLE_FILE.test(current.map.file) ? installLatest : installTryout)(documentsFolder(PLAYTEST_PREFIX), current.map.source), catch: (cause) => new PlayProblem({ problem: String(cause) }) });
     const normal = playtest({ ...PLAYTEST, ...current });
@@ -259,7 +259,7 @@ export const play: Command = (args) => Effect.gen(function*() {
     return yield* installGreen(documentsFolder(PLAYTEST_PREFIX), args.includes("--dry-run"));
   }
   yield* signInTom;
-  const current = yield* currentPlaytest(tomsLibrary(), { named: true });
+  const current = yield* currentPlaytest();
   const declaration = playtest({ ...PLAYTEST, ...current });
   yield* Effect.try({ try: () => installLatest(documentsFolder(declaration.prefix), current.map.source), catch: (cause) => new PlayProblem({ problem: String(cause) }) });
   return yield* makePlay(declaration, gameFilesLayer, tools, smashcraftWatch.pipe(Layer.provide(platformLayer())))(args);

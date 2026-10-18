@@ -3,7 +3,7 @@
 
 
 
-import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, renameSync, rmSync } from "node:fs";
 import { homedir } from "node:os";
 import { join, dirname } from "node:path";
 import { BunServices } from "@effect/platform-bun";
@@ -14,7 +14,7 @@ import { runProcess } from "../hostProcess";
 import { buildOnce } from "./buildInputs";
 import { capacityHelper } from "../heavyCapacity";
 import { withLock } from "./fileLock";
-import { PLAYABLE_FILE, PREDICT_COST, installName } from "./greenBuilds";
+import { PREDICT_COST, installName } from "./greenBuilds";
 import { projectRoot } from "./project";
 
 const inputsRoot = join(homedir(), ".local/share/smashcraft-build-inputs");
@@ -33,74 +33,36 @@ const capture = (cwd: string, [program = "", ...args]: readonly string[]) =>
 const tryPlay = <A>(run: () => A) => Effect.try({ try: run, catch: playProblem });
 
 
-const reservation = (directory: string, revision: string) => join(directory, `${revision}.version`);
-
-
-
-
-
-type Triple = readonly [number, number, number];
-
-export interface Release {
-  readonly version: Triple;
-  readonly atTag: boolean;
+export function releaseTarget(described: string | undefined): string | undefined {
+  const match = /^v(\d+)\.(\d+)\.(\d+)(-\d+-g[0-9a-f]+)?$/.exec(described?.trim() ?? "");
+  if (match === null) return undefined;
+  return `${match[1]}.${match[2]}.${Number(match[3]) + (match[4] === undefined ? 0 : 1)}`;
 }
 
-export function parseRelease(described: string): Release | undefined {
-  const text = described.trim();
-  const match = /^v(\d+)\.(\d+)\.(\d+)(-\d+-g[0-9a-f]+)?$/.exec(text);
-  return match === null ? undefined : { version: [Number(match[1]), Number(match[2]), Number(match[3])], atTag: match[4] === undefined };
+export function buildName(tags: readonly string[], target: string, revision: string): string {
+  if (tags.includes(`v${target}`)) return `Smashcraft ${target}`;
+  const candidates = tags.flatMap((tag) => {
+    const [version, number = ""] = tag.slice(1).split("-rc.");
+    return tag.startsWith("v") && version === target && /^\d+$/.test(number) ? [Number(number)] : [];
+  });
+  if (candidates.length > 0) return `Smashcraft ${target} RC-${Math.max(...candidates)}`;
+  return installName(target, revision);
 }
 
-const newer = (best: Triple, next: Triple) => (next[0] - best[0] || next[1] - best[1] || next[2] - best[2]) > 0 ? next : best;
+const tagsAt = (revision: string) =>
+  capture(projectRoot, ["git", "tag", "--points-at", revision]).pipe(Effect.map((text) => (text ?? "").split("\n").map((tag) => tag.trim()).filter((tag) => tag !== "")));
 
-export function playVersion(directory: string, library: string, revision: string, release?: Release): string {
-  const parse = (text: string): Triple[] => {
-    const match = /^(\d+)\.(\d+)\.(\d+)$/.exec(text.trim());
-    return match === null ? [] : [[Number(match[1]), Number(match[2]), Number(match[3])]];
-  };
-  const numbered = (folder: string): Triple[] => {
-    if (statSync(folder, { throwIfNoEntry: false })?.isDirectory() !== true) return [];
-    return readdirSync(folder).flatMap((entry) => {
-      const version = PLAYABLE_FILE.exec(entry)?.[1];
-      return version === undefined ? [] : parse(version);
-    });
-  };
-  const reserved = (path: string) => existsSync(path) ? parse(readFileSync(path, "utf8")) : [];
-  const inLine = (version: Triple) => release === undefined || (version[0] === release.version[0] && version[1] === release.version[1] && version[2] > release.version[2]);
-  if (release?.atTag === true) return release.version.join(".");
-  const [own] = [...reserved(reservation(directory, revision)), ...numbered(join(directory, revision))].filter(inLine);
-  if (own !== undefined) return own.join(".");
-  const entries = existsSync(directory) ? readdirSync(directory).map((entry) => join(directory, entry)) : [];
-  const seen = [
-    ...[library, ...entries].flatMap(numbered),
-    ...entries.filter((entry) => entry.endsWith(".version")).flatMap(reserved),
-  ].filter(inLine).concat(release === undefined ? [] : [release.version]);
-  const [major, minor, patch] = seen.reduce(newer, [0, 0, 0] as Triple);
-  return `${major}.${minor}.${patch + 1}`;
-}
+/** The release `revision` builds toward: its own vX.Y.Z tag, else the patch after the newest one it descends from. */
+export const playTarget = (revision: string) => Effect.gen(function*() {
+  const target = releaseTarget(yield* capture(projectRoot, ["git", "describe", "--tags", "--match", "v[0-9]*.[0-9]*.[0-9]*", "--exclude", "v*-*", revision]));
+  if (target === undefined) return yield* playProblem(new Error(`no vX.Y.Z release tag is reachable from ${revision.slice(0, 12)}`));
+  return target;
+}).pipe(Effect.provide(BunServices.layer));
 
-const releaseOf = (revision: string) =>
-  capture(projectRoot, ["git", "describe", "--tags", "--match", "v[0-9]*.[0-9]*.[0-9]*", "--exclude", "v*-*", revision]).pipe(Effect.map((text) => text === undefined ? undefined : parseRelease(text)));
-
-/** The version play would number a build of `revision`, without reserving it. */
-export const nextPlayVersion = (library: string, revision: string) =>
-  releaseOf(revision).pipe(Effect.map((release) => playVersion(builds, library, revision, release)), Effect.provide(BunServices.layer));
-
-const reserveVersion = (library: string, revision: string) => withLock(join(locks, "play-version.lock"), "Waiting for another play build to number its map",
-  Effect.gen(function*() {
-    const release = yield* releaseOf(revision);
-    return yield* tryPlay(() => {
-      const version = playVersion(builds, library, revision, release);
-      const path = reservation(builds, revision);
-      if (!existsSync(path) || readFileSync(path, "utf8").trim() !== version) {
-        mkdirSync(builds, { recursive: true });
-        writeFileSync(`${path}.${process.pid}.next`, `${version}\n`);
-        renameSync(`${path}.${process.pid}.next`, path);
-      }
-      return version;
-    });
-  }));
+export const playName = (revision: string) => Effect.gen(function*() {
+  const target = yield* playTarget(revision);
+  return buildName(yield* tagsAt(revision), target, revision);
+}).pipe(Effect.provide(BunServices.layer));
 
 
 const mainCheckoutOf = Effect.gen(function*() {
@@ -192,7 +154,6 @@ export const currentHelper = Effect.gen(function*() {
 
 export interface PlaytestOptions {
   readonly revision?: string;
-  readonly named?: boolean;
   readonly helper?: boolean;
   readonly predictCost?: boolean;
   readonly edition?: Edition;
@@ -204,16 +165,10 @@ export const TOM_EDITION: Edition = "classic";
 export const playableMapBuild = (title: string, out: string, predictCost = false, edition: Edition = "full") =>
   ["bun", "wisp", "map", "build", "--profile", "playable", "--edition", edition, "--name", title, "--out", out, ...(predictCost ? [PREDICT_COST] : [])];
 
-const builtMap = (folder: string): string | undefined =>
-  existsSync(folder) ? readdirSync(folder).find((entry) => PLAYABLE_FILE.test(entry)) : undefined;
-
-export const currentPlaytest = (library: string, { revision: wanted, named = false, helper: wantsHelper = true, predictCost = false, edition = "full" }: PlaytestOptions = {}) => Effect.gen(function*() {
+export const currentPlaytest = ({ revision: wanted, helper: wantsHelper = true, predictCost = false, edition = "full" }: PlaytestOptions = {}) => Effect.gen(function*() {
   const { revision, controller, mainCheckout } = yield* (wanted === undefined ? resolveMain : resolveRevision(wanted));
-  const version = yield* reserveVersion(library, revision);
+  const title = yield* playName(revision);
   const final = join(builds, edition === "full" ? revision : `${revision}-${edition}`);
-  const found = builtMap(final);
-  const built = found !== undefined && PLAYABLE_FILE.exec(found)?.[1] === version ? found : undefined;
-  const title = built !== undefined ? built.slice(0, -".w3x".length) : named ? installName(version, revision) : `Smashcraft ${version}`;
   const map = { folder: "00-Smashcraft", file: `${title}.w3x`, title, source: join(final, `${title}.w3x`) };
   const helper = helperPath(controller);
   yield* buildOnce(revisionLock(revision), final, (folder) => existsSync(join(folder, map.file)), `Waiting for another build of ${title}`, (staging) => Effect.gen(function*() {

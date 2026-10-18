@@ -7,9 +7,9 @@ import { Effect, Schema } from "effect";
 import { ChildProcess } from "effect/process";
 import { PlayProblem } from "wisp/scripts/wisp/play";
 import { runProcess } from "../hostProcess";
-import { currentPlaytest, nextPlayVersion } from "./currentPlaytest";
+import { currentPlaytest, playName } from "./currentPlaytest";
 import { SMASHCRAFT_ACCEPT } from "./acceptChecks";
-import { GREEN_GATE_LOOKS, greenGateFailures, type GreenGateReport, type Candidate, type RunSummary, PLAYABLE_FILE, farmVerdict, isGreen, parseInstalled, pickGreen, verdictOf } from "./greenBuilds";
+import { GREEN_GATE_LOOKS, greenGateFailures, type GreenGateReport, type Candidate, type RunSummary, buildLabel, farmVerdict, isGreen, parseInstalled, pickGreen, verdictOf } from "./greenBuilds";
 import { installLatest } from "./mapLibrary";
 import { checklistPath, writePlaytestChecklist } from "./playtestChecklist";
 import { projectRoot } from "./project";
@@ -132,7 +132,7 @@ export const installGreen = (documents: string, dryRun = false) => Effect.gen(fu
   const pick = pickGreen(considered, installed);
   if (dryRun) {
     console.log(`Dry run: newest green main ${considered.find(isGreen)?.sha ?? "none"}; ${pick === undefined ? "no install (already installed, newer installed, or no green commit)" : `would stage ${pick.sha}; install requires exact candidate gate-* PASS in Classic`}`);
-    if (pick !== undefined) console.log(`Dry run: would write playtest checklist ${checklistPath(yield* nextPlayVersion(join(documents, "Maps/00-Smashcraft"), pick.sha))} for ${previousInstalled(documents) ?? `${pick.sha.slice(0, 7)}^`}..${pick.sha.slice(0, 7)}`);
+    if (pick !== undefined) console.log(`Dry run: would write playtest checklist ${checklistPath(buildLabel(`${yield* playName(pick.sha)}.w3x`) ?? pick.sha)} for ${previousInstalled(documents) ?? `${pick.sha.slice(0, 7)}^`}..${pick.sha.slice(0, 7)}`);
     return;
   }
 
@@ -144,12 +144,12 @@ export const installGreen = (documents: string, dryRun = false) => Effect.gen(fu
   }
 
   const previous = previousInstalled(documents);
-  const { map } = yield* currentPlaytest(join(documents, "Maps/00-Smashcraft"), { revision: pick.sha, named: true, helper: false });
+  const { map } = yield* currentPlaytest({ revision: pick.sha, helper: false });
   yield* installAcceptedGreen(documents, map.source, pick.sha, SMASHCRAFT_ACCEPT.checks.filter(({ id }) => id.startsWith("gate-")).map(({ id }) => id));
   console.log(`Installed ${map.title} under Maps/${map.folder}`);
-  const version = PLAYABLE_FILE.exec(map.file)?.[1];
-  if (version !== undefined) {
-    yield* writePlaytestChecklist(version, pick.sha, previous).pipe(
+  const label = buildLabel(map.file);
+  if (label !== undefined) {
+    yield* writePlaytestChecklist(label, pick.sha, previous).pipe(
       Effect.map((path) => console.log(`Playtest checklist ${path}`)),
       Effect.catch(({ problem }) => Effect.sync(() => console.warn(`Playtest checklist not written: ${problem}`))),
     );

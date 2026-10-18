@@ -1,44 +1,23 @@
 import { expect, test } from "bun:test";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { parseRelease, playVersion } from "./wisp/currentPlaytest";
+import { buildName, releaseTarget } from "./wisp/currentPlaytest";
+import { PLAYABLE_FILE, buildLabel } from "./wisp/greenBuilds";
 
-test("after the v0.1.0 tag the next builds are 0.1.1 then 0.1.2 and a revision keeps its reserved number [k1 scenario]", () => {
-  const root = mkdtempSync(join(tmpdir(), "smashcraft-play-version-"));
-  try {
-    const builds = join(root, "play-current");
-    const library = join(root, "Maps/00-Smashcraft");
-    mkdirSync(builds, { recursive: true });
-    mkdirSync(library, { recursive: true });
-    writeFileSync(join(library, "Smashcraft 0.0.401 aaaaaaa.w3x"), "old");
-    const tagged = parseRelease("v0.1.0");
-    const after = parseRelease("v0.1.0-3-g0123abc");
-    expect(tagged).toEqual({ version: [0, 1, 0], atTag: true });
-    expect(after).toEqual({ version: [0, 1, 0], atTag: false });
-    expect(parseRelease("v0.1.0-rc1")).toBeUndefined();
+test("every build after v0.1.0 is Smashcraft 0.1.1 plus its commit until an rc tag names it RC-N and the v0.1.1 tag names it 0.1.1 [k1 scenario]", () => {
+  const first = "b".repeat(40);
+  const second = "c".repeat(40);
+  expect(releaseTarget("v0.1.0")).toBe("0.1.0");
+  expect(releaseTarget("v0.1.0-3-g0123abc\n")).toBe("0.1.1");
+  expect(releaseTarget("v0.1.0-rc1")).toBeUndefined();
+  expect(releaseTarget(undefined)).toBeUndefined();
 
-    const first = "b".repeat(40);
-    const second = "c".repeat(40);
-    expect(playVersion(builds, library, "d".repeat(40), undefined)).toBe("0.0.402");
-    expect(playVersion(builds, library, first, after)).toBe("0.1.1");
-    writeFileSync(join(builds, `${first}.version`), "0.1.1\n");
-    writeFileSync(join(library, "Smashcraft 0.1.1 bbbbbbb.w3x"), "first");
-    expect(playVersion(builds, library, second, after)).toBe("0.1.2");
-    writeFileSync(join(builds, `${second}.version`), "0.1.2\n");
-    writeFileSync(join(library, "Smashcraft 0.1.2 ccccccc.w3x"), "second");
-    expect(playVersion(builds, library, first, after)).toBe("0.1.1");
-    expect(playVersion(builds, library, second, after)).toBe("0.1.2");
-    expect(playVersion(builds, library, "e".repeat(40), after)).toBe("0.1.3");
-    expect(playVersion(builds, library, "f".repeat(40), tagged)).toBe("0.1.0");
+  expect(buildName([], "0.1.1", first)).toBe("Smashcraft 0.1.1 bbbbbbb");
+  expect(buildName([], "0.1.1", second)).toBe("Smashcraft 0.1.1 ccccccc");
+  expect(buildName(["v0.1.1-rc.1", "v0.1.1-rc.2"], "0.1.1", first)).toBe("Smashcraft 0.1.1 RC-2");
+  expect(buildName(["v0.1.2-rc.1", "v0.1.1-rc.x"], "0.1.1", first)).toBe("Smashcraft 0.1.1 bbbbbbb");
+  expect(buildName(["v0.1.1-rc.3", "v0.1.1"], "0.1.1", first)).toBe("Smashcraft 0.1.1");
+  expect(buildName(["v0.1.0"], "0.1.0", first)).toBe("Smashcraft 0.1.0");
 
-    writeFileSync(join(library, "Smashcraft 0.5.4 9999999.w3x"), "stale");
-    writeFileSync(join(builds, `${"9".repeat(40)}.version`), "0.0.402\n");
-    expect(playVersion(builds, library, "e".repeat(40), after)).toBe("0.1.3");
-    expect(playVersion(builds, library, "9".repeat(40), after)).toBe("0.1.3");
-    writeFileSync(join(builds, `${"8".repeat(40)}.version`), "0.1.0\n");
-    expect(playVersion(builds, library, "8".repeat(40), after)).toBe("0.1.3");
-  } finally {
-    rmSync(root, { recursive: true, force: true });
-  }
+  for (const name of ["Smashcraft 0.1.1 bbbbbbb", "Smashcraft 0.1.1 RC-2", "Smashcraft 0.1.1"]) expect(PLAYABLE_FILE.exec(`${name}.w3x`)).not.toBeNull();
+  expect(PLAYABLE_FILE.exec("Smashcraft 0.1.1-cairne-air.w3x")).toBeNull();
+  expect(buildLabel("Smashcraft 0.1.1 RC-2.w3x")).toBe("0.1.1 RC-2");
 });
