@@ -17,6 +17,7 @@ import { IMPORTED_MUSIC } from "../../src/game/assets/importedMusicInfo";
 import { IMPORTED_MODEL_FILES } from "../../src/game/assets/importedModelInfo";
 import { type ModelSoundCue, fighterSoundCue, fighterSoundCueCount, modelSoundLabel } from "../../src/generated/assets/modelSoundInfo";
 import * as shieldModels from "../../src/generated/assets/shieldAssetInfo";
+import * as candleModels from "../../src/generated/assets/candleAssetInfo";
 import { STAGE_WATER_MODEL, STAGE_LAVA_MODEL, STAGE_SEA_MODEL, STAGE_TOMB_WATER_MODEL, STAGE_TOMB_SEA_MODEL } from "../../src/generated/stages/terrainAssetInfo";
 import { STAGE_DECK_MODELS, STAGE_POINT_LIGHT_MODELS, STAGE_SNOW_MODEL } from "../../src/generated/stages/stageAssetInfo";
 import { DEMON_HUNTER_MODEL_FILE } from "../../src/game/presentation/demonHunterAssetInfo";
@@ -106,6 +107,7 @@ export const GENERATED_MODELS: readonly { readonly list: string; readonly genera
   { list: "impact-assets/imports.txt", generator: "tools/effects/package.ts", models: Object.values(impactModels) },
   { list: "impact-assets/frost-imports.txt", generator: "tools/effects/trap.ts", models: Object.values(frostModels) },
   { list: "impact-assets/shield-imports.txt", generator: "tools/effects/shield.ts", models: Object.values(shieldModels) },
+  { list: "impact-assets/candle-imports.txt", generator: "tools/effects/candle.ts", models: Object.values(candleModels) },
 ];
 
 

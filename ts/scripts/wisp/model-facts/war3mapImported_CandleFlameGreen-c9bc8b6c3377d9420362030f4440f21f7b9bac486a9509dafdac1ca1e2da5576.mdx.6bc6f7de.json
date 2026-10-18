@@ -1,0 +1,1 @@
+{"model":"war3mapImported\\CandleFlameGreen-c9bc8b6c3377d9420362030f4440f21f7b9bac486a9509dafdac1ca1e2da5576.mdx","facts":{"geosets":0,"triangles":0,"lights":0,"emitters":[{"kind":"particle","name":"Flame","whileShown":true,"onDeath":false,"visible":true,"rate":40,"lifespan":0.42,"reach":[{"min":[-24.836,-24.836,-24.836],"max":[24.836,24.836,24.836]}]}]}}

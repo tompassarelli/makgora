@@ -21,7 +21,7 @@ import { DEFINITIVE_CUE_EMITTERS } from "../../src/game/presentation/cueEmitterI
 import { impactModel, impactAnimation, impactStartSeconds, impactModelScale } from "../../src/game/presentation/hitPresentation";
 import { IMPACT_KIND_COUNT } from "../../src/game/presentation/impactState";
 import { STOCK_MODELS } from "../../src/game/render/effects";
-import { CANDLE_FLAMES, CANDLE_SMOKE } from "../../src/game/presentation/candleLook";
+import { CANDLE_FLAME_MODELS, CANDLE_FLAME_SCALES, CANDLE_SMOKE } from "../../src/game/presentation/candleLook";
 import { characterModelScale } from "../../src/game/presentation/modelScale";
 import { IMPACT_DUST_MODEL, IMPACT_ROLL_MODEL, IMPACT_TECH_MODEL, IMPACT_DEFILE_MODEL } from "../../src/game/assets/impactAssetInfo";
 import { headlessRender } from "./headlessRender";
@@ -294,7 +294,7 @@ export function effectUses(): EffectUse[] {
   for (const [move, model] of [["Fel Rush aura", IMPACT_ROLL_MODEL], ["Immolate flames", STOCK_MODELS.immolationTarget], ["Mana Burn hand", STOCK_MODELS.manaBurnTarget], ["Wing Ascent trail", IMPACT_DUST_MODEL], ["Mana Burn drain flash", IMPACT_TECH_MODEL], ["silence status", STOCK_MODELS.silenceTarget], ["Eye Blast marks", STOCK_MODELS.greenDragonMissile]] as const) uses.push(supplemental(fighterSlug(Character.demonHunter), move, model, "specialEffects producer playback requires an observed frame trace"));
   for (const [move, model] of [["raised skeleton", "Units\\Undead\\Skeleton\\Skeleton.mdx"], ["raised burst", "Abilities\\Spells\\Undead\\RaiseSkeletonWarrior\\RaiseSkeleton.mdx"], ["Defile boundary", IMPACT_DEFILE_MODEL], ["Defile frost", "Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdx"]] as const) uses.push(supplemental(fighterSlug(Character.lichKing), move, model, "projectilePresentation supplemental playback is unmodeled"));
   uses.push(supplemental(fighterSlug(Character.lich), "Death and Decay ground", IMPACT_DEFILE_MODEL, "projectilePresentation supplemental playback is unmodeled"));
-  for (const [level, flame] of CANDLE_FLAMES.entries()) for (const anchor of ["head", "loose"]) uses.push({ fighter: fighterSlug(Character.kobold), move: `candle ${anchor} level ${level}`, kind: "presentation effect", model: flame.model, sequence: undefined, seconds: 0, timeScale: 1, travels: anchor === "loose", anchored: anchor === "loose" ? "projectile" : "fighter", anchor, scale: flame.scale * characterModelScale(Character.kobold) });
+  for (const model of CANDLE_FLAME_MODELS) for (const [level, levelScale] of CANDLE_FLAME_SCALES.entries()) for (const anchor of ["head", "loose"]) uses.push({ fighter: fighterSlug(Character.kobold), move: `candle ${anchor} level ${level}`, kind: "presentation effect", model, sequence: undefined, seconds: 0, timeScale: 1, travels: anchor === "loose", anchored: anchor === "loose" ? "projectile" : "fighter", anchor, scale: levelScale * characterModelScale(Character.kobold) });
   uses.push({ fighter: fighterSlug(Character.kobold), move: "candle snuffed", kind: "presentation effect", model: CANDLE_SMOKE.model, sequence: undefined, seconds: 0, timeScale: 1, travels: true, anchored: "projectile", anchor: "loose", scale: CANDLE_SMOKE.scale * characterModelScale(Character.kobold) });
   const seen = new Set<string>();
   return uses.filter((use) => {

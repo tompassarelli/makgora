@@ -1,7 +1,3 @@
-
-import { CANDLE_FLAMES, CANDLE_FLAME_MODEL } from "./candleLook";
-
-
 import { assertEquals, assertNear, assertTrue, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { HERO_REFERENCE_HEIGHT } from "../sim/heroMoves";
@@ -103,8 +99,4 @@ test("Forsaken Paladin shows holy art only on Consecration, and no special re-sp
   const cues = HERO_CUES[Character.forsakenPaladin]!;
   const loud = (["neutral", "side", "up"] as const).flatMap((slot) => [cues[slot].startup, cues[slot].active]).filter((cue) => holy(cue.model) || cue.birth?.eachFrame === true);
   assertEquals(loud.map((cue) => cue.model).join("\n"), "");
-});
-
-test("every lit candle level draws the model-space Immolation flame, so a moving Kobold leaves no fire trail [k2 property]", () => {
-  assertEquals(CANDLE_FLAMES.filter((level) => level.model !== CANDLE_FLAME_MODEL).map((level) => level.model).join("\n"), "");
 });

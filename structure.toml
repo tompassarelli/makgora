@@ -205,10 +205,13 @@ producer = "tools/animations/export-model-sounds.ts"
 paths = ["ts/src/game/assets/impactAssetInfo.ts"]
 producer = "tools/effects/package.ts"
 [[generated]]
-paths = ["ts/src/game/assets/shieldAssetInfo.ts"]
+paths = ["ts/src/generated/assets/shieldAssetInfo.ts"]
 producer = "tools/effects/shield.ts"
 [[generated]]
-paths = ["ts/src/game/assets/frostAssetInfo.ts"]
+paths = ["ts/src/generated/assets/candleAssetInfo.ts"]
+producer = "tools/effects/candle.ts"
+[[generated]]
+paths = ["ts/src/generated/assets/frostAssetInfo.ts"]
 producer = "tools/effects/trap.ts"
 [[generated]]
 paths = ["ts/src/game/assets/stageAssetInfo.ts", "ts/src/game/assets/stageSkyInfo.ts", "ts/src/game/assets/terrainAssetInfo.ts"]

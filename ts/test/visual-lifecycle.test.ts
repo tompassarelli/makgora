@@ -11,7 +11,7 @@ import { ROSTER_MANA } from "../src/game/sim/mana";
 import { IMPACT_HIT_MODEL } from "../src/game/assets/impactAssetInfo";
 import { PROJECTILE_DRAW_OFFSETS } from "../src/game/presentation/projectileArt";
 import { AttackStyle, CandleState, Character, HeroStatusKind, SpecialAction } from "../src/game/sim/codes";
-import { CANDLE_FLAMES, CANDLE_SMOKE } from "../src/game/presentation/candleLook";
+import { CANDLE_FLAME_MODELS, CANDLE_FLAME_SCALES, CANDLE_SMOKE } from "../src/game/presentation/candleLook";
 import { dropCandle, snuffCandle } from "../src/game/sim/heroes/koboldCandle";
 import { FIGHTER_ULTIMATES } from "../src/game/sim/ultimates";
 import { SELECTABLE_CHARACTERS, heroDefinition } from "../src/game/sim/heroes/registry";
@@ -356,8 +356,8 @@ test("combat effects: rollback, pause/resume and rematch neither replay nor reta
     const candleEffects = (): effect[] => {
       const into: effect[] = [];
       s.ui?.fighters[0]?.candle?.drawnEffects(into);
-      for (const model of into.slice(CANDLE_FLAMES.length)) looseHandles.add(model);
-      return into.slice(0, CANDLE_FLAMES.length);
+      for (const model of into.slice(CANDLE_FLAME_MODELS.length)) looseHandles.add(model);
+      return into.slice(0, CANDLE_FLAME_MODELS.length);
     };
     const flames = candleEffects();
     const looseEffects = [...looseHandles];
@@ -369,7 +369,7 @@ test("combat effects: rollback, pause/resume and rematch neither replay nor reta
       expect(pose?.z).toBe(s.origin.z + kobold.candle.z);
       return pose;
     };
-    expect(flames).toHaveLength(CANDLE_FLAMES.length);
+    expect(flames).toHaveLength(CANDLE_FLAME_MODELS.length);
     expect(s.ui?.fighters[1]?.candle).toBeUndefined();
     const shownFlames = () => flames.filter(model => { const pose = effectPoses(client).get(model); return pose !== undefined && !hidden(pose); });
     const kobold = fighterAt(s.world, 0);
@@ -390,7 +390,8 @@ test("combat effects: rollback, pause/resume and rematch neither replay nor reta
     candleStep(true);
     kobold.candle.heat = 300;
     candleStep();
-    expect(shownFlames()).toEqual([flames[3]]);
+    expect(shownFlames()).toEqual([flames[0]]);
+    expect(effectPoses(client).get(flames[0])?.scale).toBe(CANDLE_FLAME_SCALES[3]! * characterModelScale(Character.kobold));
     expect(hiddenInView(client)).toEqual([]);
     const candleCorrected = createMatchFrameInput();
     expect(captureFrame(candleCorrected, 2, s.world.mask, createFrameControls(), s.runtime)).toBe(true);
@@ -401,6 +402,7 @@ test("combat effects: rollback, pause/resume and rematch neither replay nor reta
     expect(kobold.candle.heat).toBeLessThan(75);
     renderPersistentPresentation(s);
     expect(shownFlames()).toEqual([flames[0]]);
+    expect(effectPoses(client).get(flames[0])?.scale).toBe(CANDLE_FLAME_SCALES[0]! * characterModelScale(Character.kobold));
     expect(hiddenInView(client)).toEqual([]);
     s.session.paused = true;
     pauseMatchPresentation(s, true);
@@ -417,7 +419,7 @@ test("combat effects: rollback, pause/resume and rematch neither replay nor reta
     candleStep();
     expect(shownFlames()).toEqual([]);
     expect(shownLoose()).toEqual([looseEffects[0]]);
-    expect(loosePose(looseEffects[0] as effect)?.scale).toBe(CANDLE_FLAMES[0]!.scale * characterModelScale(Character.kobold));
+    expect(loosePose(looseEffects[0] as effect)?.scale).toBe(CANDLE_FLAME_SCALES[0]! * characterModelScale(Character.kobold));
     s.session.paused = true;
     pauseMatchPresentation(s, true);
     renderPersistentPresentation(s);
@@ -429,7 +431,7 @@ test("combat effects: rollback, pause/resume and rematch neither replay nor reta
     expect(effectPoses(client).get(looseEffects[0])?.timeScale).toBe(1);
     snuffCandle(kobold);
     candleStep();
-    const smoke = looseEffects[CANDLE_FLAMES.length] as effect;
+    const smoke = looseEffects[CANDLE_FLAME_MODELS.length] as effect;
     expect(shownLoose()).toEqual([smoke]);
     expect(shownFlames()).toEqual([]);
     expect(loosePose(smoke)?.model).toBe(CANDLE_SMOKE.model);
@@ -477,7 +479,7 @@ test("combat effects: rollback, pause/resume and rematch neither replay nor reta
     startMatch(s);
     const rematched = candleEffects();
     expect([...visible(client, looseHandles)].length).toBe(0);
-    expect(rematched).toHaveLength(CANDLE_FLAMES.length);
+    expect(rematched).toHaveLength(CANDLE_FLAME_MODELS.length);
     expect(liveOf(rematched)).toBe(rematched.length);
     expect(liveOf(flames)).toBe(0);
     expect(rematched.filter(model => { const pose = effectPoses(client).get(model); return pose !== undefined && !hidden(pose); }).length).toBeLessThanOrEqual(1);
