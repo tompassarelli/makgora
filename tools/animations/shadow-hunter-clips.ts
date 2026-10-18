@@ -30,7 +30,7 @@ type End = "handL" | "handR" | "footL" | "footR";
 interface Phase { frame: number; gesture: Gesture; tip?: readonly [number, number] | readonly [number, number, number]; grip?: readonly [number, number]; reach?: readonly [End, number, number]; extraReach?: readonly [End, number, number]; follow?: boolean }
 interface Authored {
   pose: HeroPose; style?: AttackStyle; phases: readonly Phase[]; airborne?: boolean; frames?: number; looping?: boolean; forms?: readonly HeroPose[]; bind?: boolean;
-  ground?: "cloth" | "sole" | "ledge"; support?: "L" | "R"; contact?: number;
+  ground?: "cloth" | "sole" | "ledge"; support?: "L" | "R"; contact?: number; anatomical?: boolean;
 }
 const REACH: Readonly<Record<End, readonly [string, keyof Gesture, keyof Gesture, string, string]>> = {
   handL: ["Hand Left Ref ", "free", "freeElbow", "Bone_Arm1_L", "Bone_Arm2_L"], handR: ["Hand Right Ref ", "arm", "elbow", "Bone_Arm1_R", "Bone_Arm2_R"],
@@ -88,26 +88,26 @@ function doubleJump(): Authored {
   ] };
 }
 
+const RECOVERY_TIP = (k: number) => [182 - 120 * k + 10 * Math.sin(Math.PI * k), 22 + 12 * k + 48 * Math.sin(Math.PI * k)] as const;
 function forwardSmash(): Authored {
   const move = SHADOW_HUNTER_MOVES.normals[AttackStyle.forwardSmash]!;
-  const contact = move.startupFrames, total = move.totalFrames;
-  const coil: Gesture = { lean: -14, chest: -26, chestTurn: -40, head: 22, pelvis: -8, arm: -210, elbow: 40, wrist: -20, free: 25, freeElbow: 40, beard: 12,
-    frontHip: -14, frontKnee: 12, backHip: 26, backKnee: 42, drop: -10, lunge: -22 };
-  const strike = (arm: number, drop: number, lunge: number, lean: number): Gesture => ({ lean, chest: 12, chestTurn: 22, head: -12, pelvis: 8, arm, elbow: 0, wrist: 10,
-    free: 30, freeElbow: 30, beard: -20, frontHip: -72, frontKnee: 72, backHip: 46, backKnee: 14, drop, lunge });
-  const held = strike(-80, -24, 30, 20), risen: Gesture = { ...strike(-60, -14, 16, 8), frontHip: -36, frontKnee: 34, backHip: 22, backKnee: 12, chestTurn: 8 };
-  return { pose: "forwardSmash", style: AttackStyle.forwardSmash, ground: "cloth", phases: [
+  const contact = move.startupFrames, total = move.totalFrames, lag = total - 8 - (contact + 2);
+  const coil: Gesture = { lean: -20, chest: -26, chestTurn: -40, head: 22, arm: -210, elbow: 40, wrist: -20, free: 25, freeElbow: 40, beard: 12, lunge: -13 };
+  const strike = (arm: number, lean: number, lunge: number): Gesture => ({ lean, chest: 12, chestTurn: 22, head: -12, arm, elbow: 0, wrist: 10,
+    free: -40, freeElbow: 20, beard: -20, lunge });
+  const held = strike(-90, 21, 24), rest: Gesture = { chest: 3, arm: -20, elbow: 10 };
+  const back = ["footR", -7, 5] as const, front = (x: number, z = 5) => ["footL", x, z] as const;
+  const stepBack = (k: number) => k < 0.5 ? front(32) : front(32 - 37 * (k - 0.5) / 0.5, 5 + 10 * Math.sin(Math.PI * (k - 0.5) / 0.5));
+  return { pose: "forwardSmash", style: AttackStyle.forwardSmash, anatomical: true, phases: [
     { frame: 0, gesture: READY },
-    { frame: 5, gesture: { ...coil, lean: -5, chest: -8, chestTurn: -12, frontHip: -6, frontKnee: 6, backHip: 10, backKnee: 16, lunge: -8, drop: -4 }, tip: [-20, 175] },
-    { frame: contact - 7, gesture: coil, tip: [-115, 175] },
-    { frame: contact - 1, gesture: { ...coil, chest: -32, chestTurn: -46, lean: -16, lunge: -24 }, tip: [-125, 160] },
-    { frame: contact, gesture: strike(-150, -24, 34, 20), tip: [150, 100] },
-    { frame: contact + 1, gesture: strike(-110, -28, 38, 24), tip: [160, 50] },
-    { frame: contact + 2, gesture: held, tip: [155, 14] },
-    ...[0.15, 0.4, 0.6, 0.8].map(k => ({ frame: contact + 2 + Math.round(17 * k), gesture: blend(held, risen, k), tip: [155 - 50 * k, 14 + 31 * k] as const, follow: true })),
-    { frame: contact + 19, gesture: risen, tip: [105, 45], follow: true },
-    { frame: contact + 25, gesture: { ...strike(-50, -7, 8, 4), frontHip: -20, frontKnee: 18, backHip: 12, backKnee: 8, chestTurn: 4 }, tip: [80, 70], follow: true },
-    { frame: total - 3, gesture: { chest: 3, arm: -20, elbow: 10, frontHip: -6, frontKnee: 6, backHip: 6, backKnee: 6, drop: -2, lunge: 3 } },
+    { frame: 5, gesture: { ...coil, lean: -6, chest: -8, chestTurn: -12, lunge: -3 }, tip: [-20, 175], reach: front(-5), extraReach: back },
+    { frame: contact - 7, gesture: coil, tip: [-115, 175], reach: front(-3, 20), extraReach: back },
+    { frame: contact - 1, gesture: { ...coil, chest: -30, chestTurn: -56, lean: -20, lunge: 0 }, tip: [-120, 165], reach: front(22, 11), extraReach: back },
+    { frame: contact, gesture: strike(-150, 18, 22), tip: [150, 100], reach: front(32), extraReach: back },
+    { frame: contact + 1, gesture: strike(-110, 22, 25), tip: [186, 60], reach: front(32), extraReach: back },
+    { frame: contact + 2, gesture: held, tip: [182, 22], reach: front(32), extraReach: back },
+    ...[0.2, 0.4, 0.55, 0.7, 0.85].map(k => ({ frame: contact + 2 + Math.round(lag * k), gesture: blend(held, rest, k), tip: RECOVERY_TIP(k), follow: true, reach: stepBack(k), extraReach: back })),
+    { frame: total - 7, gesture: rest, tip: [63, 35], follow: true, reach: front(-5), extraReach: back },
     { frame: total, gesture: READY },
   ] };
 }
@@ -224,6 +224,21 @@ function sideKick(pose: HeroPose, style: AttackStyle, chamber: readonly [number,
     { frame: contact + 2, gesture: { ...still(1), lean: lean * 1.05, chest: lean * 0.45, head: -lean * 0.4, backKnee: 0, step: 9 * stride }, reach: ["footR", through[0], through[1]] },
     { frame: contact + 3, gesture: { ...still(1), lean: lean * 0.95, chest: lean * 0.4, head: -lean * 0.35, backKnee: 30, step: 8 * stride }, reach: ["footR", back[0], back[1]] },
     { frame: contact + 8, gesture: { ...still(1), lean: lean * 0.5, chest: lean * 0.2, backKnee: 120, step: 6 * stride }, reach: ["footR", fold[0], fold[1]] },
+    { frame: total, gesture: READY },
+  ] };
+}
+function angledKick(): Authored {
+  const { contact, total } = timing(AttackStyle.forwardTiltUp);
+  const brace = (k: number): Gesture => ({ ...still(1), free: 50 + 90 * k, freeElbow: -30 - 40 * k, lean: -14 * k, chest: -12 * k, head: 10 * k, frontKnee: 14 * k, drop: -4 * k });
+  return { pose: "forwardTiltUp", style: AttackStyle.forwardTiltUp, support: "L", anatomical: true, phases: [
+    { frame: 0, gesture: READY },
+    { frame: contact - 6, gesture: { ...brace(0), lean: 4, drop: -6, frontKnee: 18, backKnee: -50, step: -3 }, reach: ["footR", -18, 12] },
+    { frame: contact - 2, gesture: { ...brace(0.7), backKnee: -130, step: 9 }, reach: ["footR", 25, 54] },
+    { frame: contact, gesture: { ...brace(1), backKnee: 0, step: 24 }, reach: ["footR", 66, 86] },
+    { frame: contact + 2, gesture: { ...brace(1.05), backKnee: 0, step: 28 }, reach: ["footR", 86, 98] },
+    { frame: contact + 4, gesture: { ...brace(0.9), backKnee: -110, step: 22 }, reach: ["footR", 40, 60] },
+    { frame: contact + 11, gesture: { ...brace(0.5), backKnee: -90, step: 14 }, reach: ["footR", 18, 26] },
+    { frame: contact + 17, gesture: { ...brace(0.2), backKnee: -20, step: 5 }, reach: ["footR", -3, 7] },
     { frame: total, gesture: READY },
   ] };
 }
@@ -375,12 +390,12 @@ const POSES: Readonly<Record<string, () => Authored>> = {
   victimThrowBack: () => captiveAction("victimThrowBack", GrabAction.throwBack, { ...CAPTIVE, lean: 50, chest: 32, head: -32, free: -145, frontHip: -64, frontKnee: 90, backHip: -30, backKnee: 70 }),
   victimThrowUp: () => captiveAction("victimThrowUp", GrabAction.throwUp, { ...CAPTIVE, lean: -24, chest: -20, head: 24, free: -155, freeElbow: 10, frontHip: -66, frontKnee: 95, backHip: -40, backKnee: 80 }),
   victimThrowDown: () => captiveAction("victimThrowDown", GrabAction.throwDown, { ...CAPTIVE, lean: 72, chest: 36, head: -28, free: -90, frontHip: -70, frontKnee: 100, backHip: -45, backKnee: 80 }),
-  neutralSpecial, jump, doubleJump, forwardSmash, downSmash, upSpecial, fallSpecial,
+  neutralSpecial, jump, doubleJump, forwardSmash: kicked(forwardSmash), downSmash, upSpecial, fallSpecial,
   backAir: draped(backAir), neutralAir: draped(neutralAir), downAir: draped(downAir),
   forwardTiltDown: kicked(() => kick("forwardTiltDown", AttackStyle.forwardTiltDown, [76, 26], -8, [80, 24], -30, -8)),
   downTilt: kicked(downTilt), jab: kicked(jab), upTilt: kicked(upTilt), dashAttack: kicked(dashAttack),
   forwardTilt: kicked(() => sideKick("forwardTilt", AttackStyle.forwardTilt, [34, 64], [88, 60], [100, 61], -8, [66, 41])),
-  forwardTiltUp: kicked(() => sideKick("forwardTiltUp", AttackStyle.forwardTiltUp, [30, 80], [74, 108], [82, 120], -26, [34, 72], [30, 40], 2.5)),
+  forwardTiltUp: kicked(angledKick),
 };
 
 function rotation(base: ArrayLike<number>, pitch: number, yaw = 0, roll = 0): Float32Array<ArrayBuffer> {
@@ -541,11 +556,31 @@ function aimTip(action: Authored, start: number) {
   }
 }
 
+interface LegRule { readonly exhaustive: boolean; allows(knee: number): boolean; cost(hip: number, knee: number, tuck: number): number; keep(hip: number, knee: number, tuck: number): void }
+const looseLeg = (preferred: number): LegRule => ({ exhaustive: false, allows: () => true, cost: (_hip, knee) => 0.002 * (knee - preferred) ** 2, keep: () => {} });
+function legRules(action: Authored, supportFoot: mdx.Node | undefined, floorLevel: number) {
+  const height = () => supportFoot === undefined ? 0 : worldOf(supportFoot)[2]! - (soleZ() - floorLevel);
+  const rest = height(), solved = new Map<End, readonly [number, number, number]>();
+  return (phase: Phase, end: End, effector: mdx.Node, preferred: number): LegRule => {
+    if (!action.anatomical || !end.startsWith("foot")) return looseLeg(preferred);
+    const planted = supportFoot !== undefined && supportFoot !== effector && ![phase.reach, phase.extraReach].some(r => r && named(REACH[r[0]][0]) === supportFoot);
+    const prior = solved.get(end);
+    return {
+      exhaustive: true,
+      allows: knee => knee >= -170 && knee <= 0,
+      cost: (hip, knee, tuck) => 0.01 * (knee - preferred) ** 2 + 0.02 * tuck ** 2 + (planted ? 8 * Math.max(0, height() - rest) ** 2 : 0)
+        + (prior ? 0.01 * ((hip - prior[0]) ** 2 + (knee - prior[1]) ** 2) + 0.2 * (tuck - prior[2]) ** 2 : 0),
+      keep: (hip, knee, tuck) => { solved.set(end, [hip, knee, tuck]); },
+    };
+  };
+}
+
 function reachAndStand(action: Authored, index: number, start: number, frames: number) {
   const floorLevel = paired(action.pose) ? 0 : soleRest;
   const supportFoot = action.support === undefined ? undefined : named(REACH[action.support === "L" ? "footL" : "footR"][0]);
   data.frame = start; renderer.setSequence(index); renderer.update(0);
   const supportRest = supportFoot === undefined ? 0 : worldOf(supportFoot)[0]!;
+  const legRule = legRules(action, supportFoot, floorLevel);
   const settled = (p: vec3, phase: Phase) => {
     const floor = Math.min(action.airborne ? 0 : Infinity, soleZ() - floorLevel);
     const shift = supportFoot === undefined ? 0 : supportRest + (phase.gesture.step ?? 0) - worldOf(supportFoot)[0]!;
@@ -555,9 +590,11 @@ function reachAndStand(action: Authored, index: number, start: number, frames: n
     const [end, x, z] = reach, [ref, upperField, lowerField, upperName, lowerName] = REACH[end], effector = named(ref), at = time(start, phase.frame);
     const keys = [named(upperName), named(lowerName)].map(n => n.Rotation!.Keys.find(k => k.Frame === at)!), bases = [named(upperName), named(lowerName)].map(baseOf);
     const preferred = phase.gesture[lowerField] ?? 0;
+    const rule = legRule(phase, end, effector, preferred);
     let best = [phase.gesture[upperField] ?? 0, preferred], score = Infinity;
     let tuck = 0, bestTuck = 0;
     const trial = (a: number, b: number) => {
+      if (!rule.allows(b)) return;
       data.frame = at;
       [a, b].forEach((angle, i) => {
         const node = [named(upperName), named(lowerName)][i]!, key = keys[i]!; key.Vector = bases[i]!.slice(); renderer.update(0);
@@ -566,14 +603,14 @@ function reachAndStand(action: Authored, index: number, start: number, frames: n
         if (key.InTan) { key.InTan = key.Vector.slice(); key.OutTan = key.Vector.slice(); }
         renderer.update(0);
       });
-      const [px, pz] = settled(worldOf(effector), phase), value = (px! - x) ** 2 + (pz! - z) ** 2 + 0.002 * (b - preferred) ** 2;
+      const [px, pz] = settled(worldOf(effector), phase), value = (px! - x) ** 2 + (pz! - z) ** 2 + rule.cost(a, b, tuck);
       if (value < score) { score = value; best = [a, b]; bestTuck = tuck; }
     };
-    for (const t of end.startsWith("foot") ? [0, -20, 20, -40, 40, -60, 60] : [0]) { if (score < 16) break; tuck = t; for (let a = -180; a < 180; a += 10) for (let b = -170; b <= 170; b += 10) trial(a, b); }
+    for (const t of end.startsWith("foot") ? [0, -20, 20, -40, 40, -60, 60] : [0]) { if (!rule.exhaustive && score < 16) break; tuck = t; for (let a = -180; a < 180; a += 10) for (let b = -170; b <= 170; b += 10) trial(a, b); }
     tuck = bestTuck;
     for (const step of [4, 2, 1]) { const [a0, b0] = best; for (let a = a0! - 3 * step; a <= a0! + 3 * step; a += step) for (let b = b0! - 3 * step; b <= b0! + 3 * step; b += step) trial(a, b); }
     trial(best[0]!, best[1]!);
-    phase.gesture[upperField] = best[0]; phase.gesture[lowerField] = best[1];
+    phase.gesture[upperField] = best[0]; phase.gesture[lowerField] = best[1]; rule.keep(best[0]!, best[1]!, bestTuck);
   }
   for (let frame = 0; frame <= frames; frame++) {
     const Frame = time(start, frame);
