@@ -68,13 +68,13 @@ export const PEON_MOVES: FighterMoves = {
     [AttackStyle.forwardTiltDown]: heroMove(8, 3, 19, 0, axe(8, [[24.0, 48.0, 46.0, 48.0, 8.0], [22.0, 47.0, 45.0, 47.0, 8.0], [19.0, 46.0, 42.0, 46.0, 8.0]],
       peonHit(10.239999771118164, 40))),
     [AttackStyle.upTilt]: heroMove(7, 4, 20, 0, swing(7, [[45.0, 106.0], [15.0, 118.0], [-15.0, 118.0], [-36.0, 102.0]], 8.192000389099121, 85, 68.94999694824219, 40.0)),
-    [AttackStyle.downTilt]: heroMove(6, 3, 19, 0, swing(6, [[74.0, 8.0], [74.0, 16.0], [66.0, 28.0]], 7.168000221252441, 70, 72.0, 45.0)),
-    [AttackStyle.dashAttack]: heroMove(10, 4, 43, 0, swing(10, [[80.0, 38.0], [80.0, 42.0], [74.0, 48.0], [68.0, 50.0]], 11.263999938964844, 55), 34.0, true),
-    [AttackStyle.forwardSmash]: heroMove(22, 3, 35, 0, [
+    [AttackStyle.downTilt]: heroMove(6, 3, 19, 0, swing(6, [[74.0, 8.0], [74.0, 16.0], [66.0, 28.0]], 7.5, 70, 72.0, 45.0)),
+    [AttackStyle.dashAttack]: heroMove(10, 4, 40, 0, swing(10, [[80.0, 38.0], [80.0, 42.0], [74.0, 48.0], [68.0, 50.0]], 11.263999938964844, 55), 34.0, true),
+    [AttackStyle.forwardSmash]: heroMove(22, 3, 32, 0, [
       ...tipper(axe(22, [[40.0, 52.0, 65.0, 68.0, 8.0], [34.0, 51.0, 61.0, 51.0, 8.0]], FORWARD_SMASH), 0.25),
       ...cleanLate(axe(24, [[26.0, 40.0, 51.0, 37.0, 8.0]], FORWARD_SMASH), 0),
     ]),
-    [AttackStyle.upSmash]: heroMove(17, 4, 31, 0, axe(17, [[-5.0, 121.0, 21.0, 98.0, 8.0], [-17.0, 107.0, 12.0, 96.0, 8.0], [-26.0, 86.0, 0.0, 94.0, 8.0], [-33.0, 66.0, -10.0, 91.0, 8.0]], peonHit(16.384000778198242, 90, 118.19999694824219, 26.0))),
+    [AttackStyle.upSmash]: heroMove(17, 4, 31, 0, axe(17, [[-5.0, 121.0, 21.0, 98.0, 8.0], [-17.0, 107.0, 12.0, 96.0, 8.0], [-26.0, 86.0, 0.0, 94.0, 8.0], [-33.0, 66.0, -10.0, 91.0, 8.0]], peonHit(17.5, 90, 118.19999694824219, 26.0))),
     [AttackStyle.downSmash]: heroMove(18, 5, 32, 0, [
       ...axe(18, [[11.0, 40.0, 26.0, 20.0, 8.0], [16.0, 41.0, 29.0, 19.0, 8.0], [20.0, 43.0, 30.0, 19.0, 8.0]], peonHit(14.336000442504883, 25, 108.3499984741211, 26.0)),
       ...axe(21, [[-26.0, 20.0, -11.0, 40.0, 8.0], [-29.0, 19.0, -18.0, 43.0, 8.0]], peonHit(14.336000442504883, 25, 108.3499984741211, 26.0, true)),
@@ -94,8 +94,8 @@ export const PEON_MOVES: FighterMoves = {
   },
   throws: {
     [GrabAction.pummel]: { contactFrame: 60, totalFrames: 68, effect: peonHit(3.072000026702881, 90, 0.0, 0.0) },
-    [GrabAction.throwForward]: { contactFrame: 13, totalFrames: 34, effect: peonHit(7.168000221252441, 35, 103.42500305175781, 22.0) },
-    [GrabAction.throwBack]: { contactFrame: 16, totalFrames: 40, effect: peonHit(8.192000389099121, 40, 108.3499984741211, 22.0, true) },
+    [GrabAction.throwForward]: { contactFrame: 13, totalFrames: 34, effect: peonHit(8.0, 35, 103.42500305175781, 22.0) },
+    [GrabAction.throwBack]: { contactFrame: 16, totalFrames: 40, effect: peonHit(9.0, 40, 108.3499984741211, 22.0, true) },
     [GrabAction.throwUp]: { contactFrame: 12, totalFrames: 22, effect: peonHit(6.144000053405762, 85, 54.17499923706055, 50.0) },
     [GrabAction.throwDown]: { contactFrame: 17, totalFrames: 42, effect: peonHit(5.119999885559082, 25, 39.400001525878906, 75.0) },
   },
