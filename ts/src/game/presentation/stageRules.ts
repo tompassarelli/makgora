@@ -159,9 +159,11 @@ export function paletteProblems(name: string, pieces: readonly SceneryPiece[], g
 
 export const SKYLINE_FROM = 4000;
 
+export const SKYLINE_ROCKS = ["\\Rocks\\", "RockChunks", "\\StageCrag"] as const;
+
 export function skylineRock(pieces: readonly SceneryPiece[]): string | undefined {
   const counts = new Map<string, number>();
-  for (const piece of pieces) if (piece.y >= SKYLINE_FROM && /\\Rocks\\|RockChunks|\\StageCrag/.test(piece.model)) counts.set(piece.model, (counts.get(piece.model) ?? 0) + 1);
+  for (const piece of pieces) if (piece.y >= SKYLINE_FROM && SKYLINE_ROCKS.some((family) => piece.model.includes(family))) counts.set(piece.model, (counts.get(piece.model) ?? 0) + 1);
   return [...counts].sort((a, b) => (b[1] !== a[1] ? b[1] - a[1] : a[0] < b[0] ? -1 : 1))[0]?.[0];
 }
 
