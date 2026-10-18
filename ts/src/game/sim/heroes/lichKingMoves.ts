@@ -108,7 +108,7 @@ const LICH_KING_BODY: FighterHurtboxes = {
 const NO_LAUNCH = { growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } as const;
 
 
-const FROSTMOURNE_SWEEP = heroMove(11, 4, 21, 0, sweep(11, [150.0, 106.0, 60.0, 16.0], XL, hit(15.0, "EDGE", 35)));
+const FROSTMOURNE_SWEEP = heroMove(11, 4, 21, 0, sweep(11, [150.0, 106.0, 60.0, 16.0], XL, hit(14.0, "EDGE", 35)));
 
 export const LICH_KING_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack,
@@ -164,8 +164,8 @@ export const LICH_KING_MOVES: FighterMoves = {
 
     [AttackStyle.forwardSmash]: { ...heroMove(22, 4, 35, 0, [
       ...[130.0, 96.0, 60.0, 16.0].map((z, index) => heroRegion(22 + index, 22 + index,
-        capsule(f32(XL - 46.0), z, f32(XL - 12.0), f32(z - 10.0), 14.0), strongHit(hit(25.5, "KILL", 40)))),
-      ...sweep(22, [130.0, 96.0, 60.0, 16.0], f32(XL - 40.0), hit(21.0, "KILL", 40)),
+        capsule(f32(XL - 46.0), z, f32(XL - 12.0), f32(z - 10.0), 14.0), strongHit(hit(23.5, "KILL", 40)))),
+      ...sweep(22, [130.0, 96.0, 60.0, 16.0], f32(XL - 40.0), hit(19.5, "KILL", 40)),
     ]), inspiredBy: "Frostmourne's overhead strike (Warcraft III cinematic)" },
 
     [AttackStyle.upSmash]: { ...heroMove(18, 8, 35, 0, [

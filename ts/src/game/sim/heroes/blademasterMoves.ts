@@ -258,7 +258,7 @@ const BODY: FighterHurtboxes = {
 export const BLADEMASTER_MOVES: FighterMoves = {
   normals: {
     ...BLADEMASTER_GROUND.normals,
-    [AttackStyle.forwardSmash]: heroMove(17, 3, 32, 0, cut(17, [58.0, 45.0, 32.0], XL, { ...hit(13.0, "KILL", 40), base: 30.0 }, { ...hit(17.0, "KILL", 40), base: 30.0 })),
+    [AttackStyle.forwardSmash]: heroMove(17, 3, 35, 0, cut(17, [58.0, 45.0, 32.0], XL, { ...hit(13.0, "KILL", 40), base: 30.0 }, { ...hit(17.0, "KILL", 40), base: 30.0 })),
     [AttackStyle.upSmash]: heroMove(15, 4, 30, 0, path(15, [
       capsule(16.0, 38.0, 24.0, f32(L - BLADE_RADIUS)),
       capsule(8.0, 38.0, 12.0, f32(L - BLADE_RADIUS)),

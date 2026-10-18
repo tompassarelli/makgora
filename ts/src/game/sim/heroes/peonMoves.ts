@@ -26,8 +26,8 @@ const reaching = (first: number, last: number, x: number, z: number): readonly H
 };
 const arm = (first: number, last: number, shoulderX: number, shoulderZ: number, handX: number, handZ: number): HurtPose =>
   heroHurtPose(first, last, [BODY, hurtPart(shoulderX, shoulderZ, handX, handZ, 10.0)]);
-const tilt = (z: number) => heroMove(8, 3, 19, 0, swing(8, [[92.0, f32(z + 16.0)], [92.0, z], [84.0, f32(z - 16.0)]], 9.215999603271484, 40));
-const FORWARD_SMASH = peonHit(19.45599937438965, 40, 122.13999938964844, 28.0);
+const tilt = (z: number) => heroMove(8, 3, 19, 0, swing(8, [[92.0, f32(z + 16.0)], [92.0, z], [84.0, f32(z - 16.0)]], 10.239999771118164, 40));
+const FORWARD_SMASH = peonHit(20.479999542236328, 40, 122.13999938964844, 28.0);
 
 export const PEON_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack,
@@ -64,12 +64,12 @@ export const PEON_MOVES: FighterMoves = {
     [AttackStyle.jab]: jabStep(heroMove(4, 2, 12, 0, swing(4, [[50.0, 48.0], [50.0, 42.0]], 3.072000026702881, 70, 44.32500076293945, 14.0))),
     [AttackStyle.jab2]: heroMove(6, 2, 18, 0, swing(6, [[62.0, 62.0], [62.0, 32.0]], 6.144000053405762, 40, 78.80000305175781, 22.0)),
     [AttackStyle.forwardTilt]: tilt(48.0),
-    [AttackStyle.forwardTiltUp]: heroMove(8, 3, 19, 0, axe(8, [[27.0, 61.0, 34.0, 90.0, 8.0], [21.0, 98.0, 25.0, 69.0, 8.0], [8.0, 105.0, 22.0, 76.0, 8.0]], peonHit(9.215999603271484, 40))),
+    [AttackStyle.forwardTiltUp]: heroMove(8, 3, 19, 0, axe(8, [[27.0, 61.0, 34.0, 90.0, 8.0], [21.0, 98.0, 25.0, 69.0, 8.0], [8.0, 105.0, 22.0, 76.0, 8.0]], peonHit(10.239999771118164, 40))),
     [AttackStyle.forwardTiltDown]: heroMove(8, 3, 19, 0, axe(8, [[24.0, 48.0, 46.0, 48.0, 8.0], [22.0, 47.0, 45.0, 47.0, 8.0], [19.0, 46.0, 42.0, 46.0, 8.0]],
-      peonHit(9.215999603271484, 40))),
+      peonHit(10.239999771118164, 40))),
     [AttackStyle.upTilt]: heroMove(7, 4, 20, 0, swing(7, [[45.0, 106.0], [15.0, 118.0], [-15.0, 118.0], [-36.0, 102.0]], 8.192000389099121, 85, 68.94999694824219, 40.0)),
     [AttackStyle.downTilt]: heroMove(6, 3, 19, 0, swing(6, [[74.0, 8.0], [74.0, 16.0], [66.0, 28.0]], 7.168000221252441, 70, 72.0, 45.0)),
-    [AttackStyle.dashAttack]: heroMove(10, 4, 43, 0, swing(10, [[80.0, 38.0], [80.0, 42.0], [74.0, 48.0], [68.0, 50.0]], 10.239999771118164, 55), 34.0, true),
+    [AttackStyle.dashAttack]: heroMove(10, 4, 43, 0, swing(10, [[80.0, 38.0], [80.0, 42.0], [74.0, 48.0], [68.0, 50.0]], 11.263999938964844, 55), 34.0, true),
     [AttackStyle.forwardSmash]: heroMove(22, 3, 35, 0, [
       ...tipper(axe(22, [[40.0, 52.0, 65.0, 68.0, 8.0], [34.0, 51.0, 61.0, 51.0, 8.0]], FORWARD_SMASH), 0.25),
       ...cleanLate(axe(24, [[26.0, 40.0, 51.0, 37.0, 8.0]], FORWARD_SMASH), 0),

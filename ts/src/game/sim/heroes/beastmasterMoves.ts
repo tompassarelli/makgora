@@ -107,9 +107,9 @@ export const BEASTMASTER_MOVES: FighterMoves = {
       capsule(10.0, 40.0, f32(S + 4.0), 46.0, 14.0),
     ], hit(4.336845397949219, "POKE", 40, 1.0, HitElement.normal))),
 
-    [AttackStyle.forwardTilt]: heroMove(10, 3, 23, 0, chop(10, [75.0, 50.0, 28.0], L, hit(7.950883388519287, "EDGE", 35))),
-    [AttackStyle.forwardTiltUp]: heroMove(10, 3, 23, 0, chop(10, [115.0, 135.0, 150.0], L, hit(7.950883388519287, "EDGE", 50))),
-    [AttackStyle.forwardTiltDown]: heroMove(10, 3, 23, 0, chop(10, [10.0, -10.0, -30.0], L, hit(7.950883388519287, "EDGE", 20))),
+    [AttackStyle.forwardTilt]: heroMove(10, 3, 23, 0, chop(10, [75.0, 50.0, 28.0], L, hit(8.7459716796875, "EDGE", 35))),
+    [AttackStyle.forwardTiltUp]: heroMove(10, 3, 23, 0, chop(10, [115.0, 135.0, 150.0], L, hit(8.7459716796875, "EDGE", 50))),
+    [AttackStyle.forwardTiltDown]: heroMove(10, 3, 23, 0, chop(10, [10.0, -10.0, -30.0], L, hit(8.7459716796875, "EDGE", 20))),
 
     [AttackStyle.upTilt]: heroMove(9, 4, 23, 0, path(9, [
       capsule(25.0, 70.0, 55.0, 105.0),
@@ -132,9 +132,9 @@ export const BEASTMASTER_MOVES: FighterMoves = {
       capsule(10.0, 54.0, f32(M - 22.0), 56.0, 22.0),
       capsule(10.0, 52.0, f32(M - 24.0), 54.0, 20.0),
       capsule(10.0, 50.0, f32(M - 26.0), 52.0, 18.0),
-    ], hit(8.673690795898438, "LAUNCH", 45, -1.0, HitElement.normal)), f32(HERO_REFERENCE_HEIGHT * f32(0.5))),
+    ], hit(9.541059494018555, "LAUNCH", 45, -1.0, HitElement.normal)), f32(HERO_REFERENCE_HEIGHT * f32(0.5))),
 
-    [AttackStyle.forwardSmash]: tipperMove(heroMove(21, 4, 36, 0, chop(21, [120.0, 85.0, 50.0, 20.0], L, hit(14.456151962280273, "KILL", 40))), 0.25),
+    [AttackStyle.forwardSmash]: tipperMove(heroMove(21, 4, 36, 0, chop(21, [120.0, 85.0, 50.0, 20.0], L, hit(15.901766777038574, "KILL", 40))), 0.25),
 
     [AttackStyle.upSmash]: heroMove(18, 5, 33, 0, path(18, [
       capsule(30.0, 80.0, 55.0, f32(L - 10.0)),
@@ -176,7 +176,7 @@ export const BEASTMASTER_MOVES: FighterMoves = {
       capsule(-12.0, 28.0, -f32(M - 12.0), 30.0, 12.0),
       capsule(-12.0, 32.0, -f32(M - 12.0), 40.0, 12.0),
       capsule(-12.0, 34.0, -f32(M - 12.0), 50.0, 12.0),
-    ], hit(7.950883388519287, "EDGE", 35, -1.0, HitElement.normal))),
+    ], hit(8.7459716796875, "EDGE", 35, -1.0, HitElement.normal))),
 
     [AttackStyle.upAir]: heroMove(8, 4, 23, 14, path(8, [
       capsule(8.0, 80.0, 14.0, f32(M + 45.0)),

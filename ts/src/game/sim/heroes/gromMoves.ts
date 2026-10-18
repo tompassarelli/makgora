@@ -6,7 +6,7 @@ import { hurtPart, hurtPose } from "../hurtboxes";
 export const gromHit = (damage: number, angle: 25 | 35 | 40 | 55 | 70 | 75 | 80 | 90, growth = 89.18675994873047, base = 19.799999237060547, behind = false) => groundHit(damage, angle, growth, base, HitElement.slash, behind);
 const axe = (x1: number, z1: number, x2: number, z2: number, radius = 12.0): StrikeCapsule => ({ x1, z1, x2, z2, radius });
 const move = (first: number, active: number, total: number, landing: number, regions: Parameters<typeof heroMove>[4], travel?: number, stops?: boolean) => heroMove(first, active, total - first + 1 - active, landing, regions, travel, stops);
-const tilt = (z: number, angle: 25 | 35 | 55) => move(9, 3, 28, 0, [heroRegion(9, 11, axe(24.0, 55.0, 139.0, z), gromHit(7.965143203735352, angle))]);
+const tilt = (z: number, angle: 25 | 35 | 55) => move(9, 3, 28, 0, [heroRegion(9, 11, axe(24.0, 55.0, 139.0, z), gromHit(8.76165771484375, angle))]);
 const torso = hurtPart(0.0, 8.0, 0.0, 125.0, 24.0);
 const reach = (first: number, last: number, x: number, z: number) => [heroHurtPose(first, last, [torso, hurtPart(10.0, 60.0, x, z, 10.0)])];
 export const GROM_MOVES: FighterMoves = {
@@ -27,8 +27,8 @@ export const GROM_MOVES: FighterMoves = {
     [AttackStyle.forwardTilt]: tilt(55.0, 35), [AttackStyle.forwardTiltUp]: tilt(96.0, 55), [AttackStyle.forwardTiltDown]: tilt(18.0, 25),
     [AttackStyle.upTilt]: move(8, 4, 26, 0, [heroRegion(8, 11, axe(60.0, 119.0, 6.0, 144.0, 14.0), gromHit(6.516936302185059, 90, 94.76093292236328, 23.399999618530273))]),
     [AttackStyle.downTilt]: move(7, 3, 24, 0, [heroRegion(7, 9, axe(18.0, 12.0, 96.0, 12.0), gromHit(5.792831897735596, 80, 78.03841400146484, 30.600000381469727))]),
-    [AttackStyle.dashAttack]: move(9, 5, 32, 0, [heroRegion(9, 13, axe(16.0, 46.0, 133.0, 62.0, 18.0), gromHit(7.965143203735352, 55))], 52.0, true),
-    [AttackStyle.forwardSmash]: tipperMove(move(18, 4, 46, 0, [heroRegion(18, 21, axe(24.0, 90.0, 132.0, 40.0), gromHit(14.48207950592041, 35, 124.86146545410156, 25.200000762939453))]), 0.30000001192092896),
+    [AttackStyle.dashAttack]: move(9, 5, 32, 0, [heroRegion(9, 13, axe(16.0, 46.0, 133.0, 62.0, 18.0), gromHit(8.76165771484375, 55))], 52.0, true),
+    [AttackStyle.forwardSmash]: tipperMove(move(18, 4, 46, 0, [heroRegion(18, 21, axe(24.0, 90.0, 132.0, 40.0), gromHit(15.930286407470703, 35, 124.86146545410156, 25.200000762939453))]), 0.30000001192092896),
     [AttackStyle.upSmash]: move(14, 4, 42, 0, [heroRegion(14, 17, axe(0.0, 60.0, 0.0, 160.0, 16.0), gromHit(12.309768676757812, 90, 120.4021224975586, 25.200000762939453))]),
     [AttackStyle.downSmash]: move(15, 6, 44, 0, [heroRegion(15, 17, axe(18.0, 12.0, 112.0, 12.0), gromHit(11.585663795471191, 25, 120.4021224975586, 25.200000762939453)), heroRegion(18, 20, axe(-18.0, 12.0, -112.0, 12.0), gromHit(11.585663795471191, 25, 120.4021224975586, 25.200000762939453, true))]),
     [AttackStyle.neutralAir]: move(8, 6, 28, 16, [heroRegion(8, 13, axe(-62.0, 54.0, 62.0, 54.0, 24.0), gromHit(7.241039752960205, 55))]),
