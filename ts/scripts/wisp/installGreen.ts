@@ -132,7 +132,7 @@ export const installGreen = (documents: string, dryRun = false) => Effect.gen(fu
   const pick = pickGreen(considered, installed);
   if (dryRun) {
     console.log(`Dry run: newest green main ${considered.find(isGreen)?.sha ?? "none"}; ${pick === undefined ? "no install (already installed, newer installed, or no green commit)" : `would stage ${pick.sha}; install requires exact candidate gate-* PASS in Classic`}`);
-    if (pick !== undefined) console.log(`Dry run: would write playtest checklist ${checklistPath(nextPlayVersion(join(documents, "Maps/00-Smashcraft"), pick.sha))} for ${previousInstalled(documents) ?? `${pick.sha.slice(0, 7)}^`}..${pick.sha.slice(0, 7)}`);
+    if (pick !== undefined) console.log(`Dry run: would write playtest checklist ${checklistPath(yield* nextPlayVersion(join(documents, "Maps/00-Smashcraft"), pick.sha))} for ${previousInstalled(documents) ?? `${pick.sha.slice(0, 7)}^`}..${pick.sha.slice(0, 7)}`);
     return;
   }
 

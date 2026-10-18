@@ -39,12 +39,27 @@ const reservation = (directory: string, revision: string) => join(directory, `${
 
 
 
-export function playVersion(directory: string, library: string, revision: string): string {
-  const parse = (text: string) => {
-    const match = /^(0)\.(0)\.(\d+)$/.exec(text.trim());
-    return match === null ? [] : [[Number(match[1]), Number(match[2]), Number(match[3])] as const];
+type Triple = readonly [number, number, number];
+
+export interface Release {
+  readonly version: Triple;
+  readonly atTag: boolean;
+}
+
+export function parseRelease(described: string): Release | undefined {
+  const text = described.trim();
+  const match = /^v(\d+)\.(\d+)\.(\d+)(-\d+-g[0-9a-f]+)?$/.exec(text);
+  return match === null ? undefined : { version: [Number(match[1]), Number(match[2]), Number(match[3])], atTag: match[4] === undefined };
+}
+
+const newer = (best: Triple, next: Triple) => (next[0] - best[0] || next[1] - best[1] || next[2] - best[2]) > 0 ? next : best;
+
+export function playVersion(directory: string, library: string, revision: string, release?: Release): string {
+  const parse = (text: string): Triple[] => {
+    const match = /^(\d+)\.(\d+)\.(\d+)$/.exec(text.trim());
+    return match === null ? [] : [[Number(match[1]), Number(match[2]), Number(match[3])]];
   };
-  const numbered = (folder: string): (readonly [number, number, number])[] => {
+  const numbered = (folder: string): Triple[] => {
     if (statSync(folder, { throwIfNoEntry: false })?.isDirectory() !== true) return [];
     return readdirSync(folder).flatMap((entry) => {
       const version = PLAYABLE_FILE.exec(entry)?.[1];
@@ -52,30 +67,39 @@ export function playVersion(directory: string, library: string, revision: string
     });
   };
   const reserved = (path: string) => existsSync(path) ? parse(readFileSync(path, "utf8")) : [];
+  if (release?.atTag === true) return release.version.join(".");
   const [own] = [...reserved(reservation(directory, revision)), ...numbered(join(directory, revision))];
   if (own !== undefined) return own.join(".");
   const entries = existsSync(directory) ? readdirSync(directory).map((entry) => join(directory, entry)) : [];
   const seen = [
     ...[library, ...entries].flatMap(numbered),
     ...entries.filter((entry) => entry.endsWith(".version")).flatMap(reserved),
+    ...(release === undefined ? [] : [release.version]),
   ];
-  const [major, minor, patch] = seen.reduce((best, next) => (next[0] - best[0] || next[1] - best[1] || next[2] - best[2]) > 0 ? next : best, [0, 0, 0] as const);
+  const [major, minor, patch] = seen.reduce(newer, [0, 0, 0] as Triple);
   return `${major}.${minor}.${patch + 1}`;
 }
 
+const releaseOf = (revision: string) =>
+  capture(projectRoot, ["git", "describe", "--tags", "--match", "v[0-9]*.[0-9]*.[0-9]*", "--exclude", "v*-*", revision]).pipe(Effect.map((text) => text === undefined ? undefined : parseRelease(text)));
+
 /** The version play would number a build of `revision`, without reserving it. */
-export const nextPlayVersion = (library: string, revision: string) => playVersion(builds, library, revision);
+export const nextPlayVersion = (library: string, revision: string) =>
+  releaseOf(revision).pipe(Effect.map((release) => playVersion(builds, library, revision, release)), Effect.provide(BunServices.layer));
 
 const reserveVersion = (library: string, revision: string) => withLock(join(locks, "play-version.lock"), "Waiting for another play build to number its map",
-  tryPlay(() => {
-    const version = playVersion(builds, library, revision);
-    const path = reservation(builds, revision);
-    if (!existsSync(path) || readFileSync(path, "utf8").trim() !== version) {
-      mkdirSync(builds, { recursive: true });
-      writeFileSync(`${path}.${process.pid}.next`, `${version}\n`);
-      renameSync(`${path}.${process.pid}.next`, path);
-    }
-    return version;
+  Effect.gen(function*() {
+    const release = yield* releaseOf(revision);
+    return yield* tryPlay(() => {
+      const version = playVersion(builds, library, revision, release);
+      const path = reservation(builds, revision);
+      if (!existsSync(path) || readFileSync(path, "utf8").trim() !== version) {
+        mkdirSync(builds, { recursive: true });
+        writeFileSync(`${path}.${process.pid}.next`, `${version}\n`);
+        renameSync(`${path}.${process.pid}.next`, path);
+      }
+      return version;
+    });
   }));
 
 

@@ -37,7 +37,7 @@ export interface ChecklistInput {
 }
 
 export const NOTES_LABELS = ["playtest-notes", "tom-notes"] as const;
-const TOMS_NOTE = /\bTom\b,? ?\(?\s*(?:\d{1,2} (?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)|0\.0\.\d+)/;
+const TOMS_NOTE = /\bTom\b,? ?\(?\s*(?:\d{1,2} (?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)|\d+\.\d+\.\d+)/;
 const TOMS_QUOTE = new RegExp(`${TOMS_NOTE.source}[^\\n"]{0,80}"`);
 
 /** Issue numbers a commit refers to: `Refs/Fixes/Closes smashcraft#N` or `#N` trailers, and a `(#N)` subject suffix. */

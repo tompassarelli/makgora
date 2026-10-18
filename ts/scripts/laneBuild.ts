@@ -67,7 +67,7 @@ const hostSteps: LaneSteps<ChildProcessSpawner.ChildProcessSpawner> = {
     if (game.length > 0) yield* run("the lane's game tests", ["bun", "test", "test/game.test.ts"], { GAME_MODULES: game.join(",") });
     if (host.length + game.length === 0) console.log("The lane changes no test files");
   }),
-  version: git("rev-parse", "HEAD").pipe(Effect.map((head) => nextPlayVersion(tomsLibrary(), head))),
+  version: git("rev-parse", "HEAD").pipe(Effect.flatMap((head) => nextPlayVersion(tomsLibrary(), head))),
   build: (title, out) => run("the lane map build", playableMapBuild(title, out, false, TOM_EDITION)),
 };
 

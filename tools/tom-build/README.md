@@ -32,5 +32,5 @@ recorded in `~/.local/state/smashcraft/tom-build/attempted`, so it never builds
 a sha twice, even after a failure or restart.
 
 Each install replaces the previous build in Maps/00-Smashcraft and removes any
-`Smashcraft 0.0.N-LANE.w3x` lane map (`bun scripts/laneBuild.ts --install`,
+`Smashcraft X.Y.Z-LANE.w3x` lane map (`bun scripts/laneBuild.ts --install`,
 smashcraft:docs/play.md).

@@ -42,11 +42,15 @@ presses the same keys, and without one play says "keyboard" and goes on. It reus
 in, logs out or switches accounts.
 
 Maps/00-Smashcraft holds one file, the newest installed main build
-`Smashcraft 0.0.N abc1234.w3x` (version and short commit; the file and in-game
+`Smashcraft X.Y.Z abc1234.w3x` (version and short commit; the file and in-game
 title carry the same name). Installing a main build (`play`, `playtest:build`,
 the Tom build watcher, `play --install-green`) removes everything else in the
-folder. Each new build of main takes the next number after every version
-already built or installed; rebuilding the same commit keeps its number. At
+folder. X.Y.Z follows the release tags: a build of main takes the next patch
+number after the newest `vX.Y.Z` tag reachable from its commit (`git describe
+--tags --match 'v[0-9]*.[0-9]*.[0-9]*' --exclude 'v*-*'`) or after every version already built or installed,
+whichever is higher, so the first build after v0.1.0 is 0.1.1 and then 0.1.2.
+The commit a release tag points at keeps the tag's version, and rebuilding the
+same commit keeps its number. At
 most one lane or test build for Tom to try sits beside it (lane builds below,
 `play --lobby-only MAP.w3x`); it replaces any earlier one and goes when the next
 main build installs. Test, integrity, capture and diagnostic builds go to a
@@ -87,7 +91,7 @@ version numbering and revision locks as `play`, under `Nice=10` and idle I/O.
 Commits that land during a build are not built one by one: the next build is
 of the newest tip. A sha is built once, even after a failure or a restart
 (`~/.local/state/smashcraft/tom-build/attempted`). A new build gets a new
-`Smashcraft 0.0.N abc1234` file and replaces the previous build and any lane
+`Smashcraft X.Y.Z abc1234` file and replaces the previous build and any lane
 build.
 
 Start it (once, from the main checkout):
@@ -111,13 +115,13 @@ are in `journalctl --user -u smashcraft-tom-build`.
 From a lane's worktree, `cd ts && bun scripts/laneBuild.ts` runs `bun run check`
 and the lane's own tests (test files changed since its merge base with
 origin/main, uncommitted ones included), then builds the lane's working tree
-with the play build (no Lua prediction) as `Smashcraft 0.0.N-LANE.w3x` in
+with the play build (no Lua prediction) as `Smashcraft X.Y.Z-LANE.w3x` in
 `~/.local/state/smashcraft/lane-builds/LANE/`, which holds only that lane's
 newest build. `--install` also installs it in Tom's Maps/00-Smashcraft for him
-to try. 0.0.N is the version main's
+to try. X.Y.Z is the version main's
 next build would take; LANE is the branch's last segment without `land-`
 (`claude/land-cairne-air-924c72aef489` installs
-`Smashcraft 0.0.N-cairne-air-924c72aef489.w3x`); `--lane BRANCH` names it
+`Smashcraft X.Y.Z-cairne-air-924c72aef489.w3x`); `--lane BRANCH` names it
 explicitly. An installed lane map replaces any other lane or test map in the
 folder and leaves the main build alone; builds of one lane wait for each other.
 Main's numbering ignores lane maps, and the next main build to install removes
