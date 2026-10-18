@@ -5,8 +5,6 @@ import { ChildProcess } from "effect/process";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { installHeadless, playHeadless } from "wisp/scripts/wisp/headless";
 import { type RenderScene, captureScene, renderScenes } from "wisp/scripts/wisp/headlessRender";
-import { parseGraphics } from "wisp/scripts/wisp/graphicsProfiles";
-import type { Graphics } from "wisp/scripts/wisp/renderAssets";
 import type { MapEntry } from "wisp/src/headless/client";
 import { SELECTABLE_CHARACTERS, fighterKey } from "../src/game/sim/heroes/registry";
 import { contactDamageClips } from "../src/game/presentation/damagePose";
@@ -25,7 +23,7 @@ import { fighterAt } from "../src/game/sim/roster";
 
 class PainStripFailure extends Schema.TaggedError<PainStripFailure>()("PainStripFailure", { problem: Schema.String }) {}
 
-const USAGE = "usage: bun scripts/painStrip.ts OUT_DIR [--graphics classic|definitive] [--resolution WxH] [--fighters NAME,NAME...]";
+const USAGE = "usage: bun scripts/painStrip.ts OUT_DIR [--resolution WxH] [--fighters NAME,NAME...]";
 const CHAT_FRAME = 30;
 const FIRST_OBSERVED = 40;
 const HELD_FRAMES = 14;
@@ -47,8 +45,8 @@ export function playerBuildEntry(): MapEntry {
   return { install: () => platformMain.install(build), start: () => platformMain.startBuild(build) };
 }
 
-export function painShots(entry: MapEntry, characters: readonly number[], screen: { readonly width: number; readonly height: number }, graphics: Graphics): PainShot[] {
-  const runtime = installHeadless({ ...PREDICTED_HEADLESS, natives: (client) => smashcraftNativeBehavior(client, graphics) });
+export function painShots(entry: MapEntry, characters: readonly number[], screen: { readonly width: number; readonly height: number }): PainShot[] {
+  const runtime = installHeadless({ ...PREDICTED_HEADLESS, natives: smashcraftNativeBehavior });
   const files = { read: (name: string) => RETURNING_PLAYER_FILES[name], written: () => undefined };
   const shots: PainShot[] = [];
   const frames = Array.from({ length: LAST_OBSERVED - FIRST_OBSERVED + 1 }, (_, step) => FIRST_OBSERVED + step);
@@ -118,15 +116,14 @@ export const painStrip = (args: readonly string[]) => Effect.gen(function*() {
   if (out === undefined || out.startsWith("--")) return yield* new PainStripFailure({ problem: USAGE });
   const [width = 1280, height = 720] = (flag("--resolution") ?? "1280x720").split("x").map(Number);
   const screen = { width, height };
-  const graphics = parseGraphics(flag("--graphics") ?? "classic");
   const wanted = flag("--fighters")?.split(",");
   const characters = SELECTABLE_CHARACTERS.filter((character) => wanted === undefined || wanted.includes(fighterKey(character)));
-  const shots = painShots(playerBuildEntry(), characters, screen, graphics);
+  const shots = painShots(playerBuildEntry(), characters, screen);
   const missed = shots.filter((shot) => shot.first === undefined || shot.held === undefined);
   for (const shot of missed) yield* Effect.logError(`${shot.fighter} ${shot.category}: clip ${shot.expectedClip} never shown between frames ${FIRST_OBSERVED} and ${LAST_OBSERVED}`);
   const drawn = shots.flatMap((shot, id) => shot.first === undefined || shot.held === undefined ? [] : [{ shot, id, first: { ...shot.first, matchFrame: id * 2 }, held: { ...shot.held, matchFrame: id * 2 + 1 } }]);
   const raw = join(out, "raw");
-  yield* renderScenes({ ...headlessRender(), ...screen }, drawn.flatMap(({ first, held }) => [first, held]), raw, graphics);
+  yield* renderScenes({ ...headlessRender(), ...screen }, drawn.flatMap(({ first, held }) => [first, held]), raw);
   const font = yield* runProcess(ChildProcess.make("fc-match", ["-f", "%{file}", "sans"], { stdin: "ignore" }));
   const sheets: string[] = [];
   for (const character of characters) {
@@ -144,11 +141,11 @@ export const painStrip = (args: readonly string[]) => Effect.gen(function*() {
         tiles.push("-label", `${shot.category} ${moment} (frame ${scene.frame})`, tile);
       }
     }
-    const sheet = join(out, `${slug(name)}-${graphics}.png`);
-    yield* runProcess(ChildProcess.make("montage", ["-font", font, "-pointsize", "18", "-title", `${name} - ${graphics} - nine reactions, first pain frame and held frame`, ...tiles, "-tile", "6x3", "-geometry", "+4+4", sheet], { stdin: "ignore" }));
+    const sheet = join(out, `${slug(name)}.png`);
+    yield* runProcess(ChildProcess.make("montage", ["-font", font, "-pointsize", "18", "-title", `${name} - nine reactions, first pain frame and held frame`, ...tiles, "-tile", "6x3", "-geometry", "+4+4", sheet], { stdin: "ignore" }));
     sheets.push(sheet);
   }
-  yield* Effect.promise(() => Bun.write(join(out, "shots.json"), JSON.stringify({ graphics, screen, shots: shots.map(({ first, held, ...shot }) => ({ ...shot, firstFrame: first?.frame, heldFrame: held?.frame })) }, null, 2) + "\n"));
+  yield* Effect.promise(() => Bun.write(join(out, "shots.json"), JSON.stringify({ screen, shots: shots.map(({ first, held, ...shot }) => ({ ...shot, firstFrame: first?.frame, heldFrame: held?.frame })) }, null, 2) + "\n"));
   yield* Effect.log(`${drawn.length}/${shots.length} categories, ${sheets.length} sheets in ${out}`);
   if (missed.length > 0) return yield* new PainStripFailure({ problem: `${missed.length} categories never showed their pain clip` });
 });

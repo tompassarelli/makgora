@@ -3,7 +3,6 @@ import { join } from "node:path";
 import { parseModelMDX } from "./mdxCodec";
 
 export const WHITE_LISTS = "white-flash-imports";
-const DEFINITIVE = "_de.w3mod";
 const IMPORTED = "war3mapImported\\";
 const WHITE_TEXTURE = /^FighterWhite-[0-9a-f]{64}\.tga$/;
 
@@ -12,11 +11,10 @@ async function drawnTextures(path: string): Promise<string[]> {
   return model.Textures.flatMap(({ Image }) => Image?.startsWith(IMPORTED) ? [Image.slice(IMPORTED.length)] : []);
 }
 
-export async function writeWhiteImports(pool: string, fighter: string, filename: string, definitive: boolean): Promise<void> {
+export async function writeWhiteImports(pool: string, fighter: string, filename: string): Promise<void> {
   const files: string[] = [];
   const add = (...paths: string[]) => { for (const path of paths) if (!files.includes(path)) files.push(path); };
   add(...await drawnTextures(join(pool, filename)), filename);
-  if (definitive) add(...await drawnTextures(join(pool, DEFINITIVE, filename)), `${DEFINITIVE}/${filename}`);
   mkdirSync(join(pool, WHITE_LISTS), { recursive: true });
   await Bun.write(join(pool, WHITE_LISTS, `${fighter}.txt`), `${files.join("\n")}\n`);
 }
@@ -35,13 +33,7 @@ export function keepWhiteImports(pool: string, fighters: ReadonlySet<string>): v
 export function pruneFighterWhites(pool: string, fighter: string): void {
   const listed = new Set(readWhiteImports(pool).get(fighter) ?? []);
   const white = new RegExp(`^${fighter}White-[0-9a-f]{64}\\.mdx$`);
-  for (const directory of ["", DEFINITIVE]) {
-    if (!existsSync(join(pool, directory))) continue;
-    for (const file of readdirSync(join(pool, directory))) {
-      const path = directory === "" ? file : `${directory}/${file}`;
-      if (white.test(file) && !listed.has(path)) rmSync(join(pool, path));
-    }
-  }
+  for (const file of readdirSync(pool)) if (white.test(file) && !listed.has(file)) rmSync(join(pool, file));
 }
 
 export function pruneWhiteTextures(pool: string): void {

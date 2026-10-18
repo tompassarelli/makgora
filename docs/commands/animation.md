@@ -165,7 +165,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   sequences and appends only new clips; `--replace NAME`, repeatable, reauthors an existing clip at its same index, in place when its length is unchanged and otherwise after the last clip, dropping its old keys (smashcraft:docs/fighter-animation-work.md).
 
 - Derived fighter art (from ts/): `bun wisp inputs derive [--fighter NAME]... [--rebuild]`
-  runs the clip export, both bodies and the white flashes below for each fighter, fighters in
+  runs the clip export, the timeline body and the white flashes below for each fighter, fighters in
   parallel, redoes only the steps whose inputs changed and pins the result
   (smashcraft:docs/build-inputs.md, "Change art"). Run the single tools below to debug one step.
 

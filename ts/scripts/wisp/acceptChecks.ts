@@ -39,7 +39,6 @@ export const CURRENT_CANDIDATE = "current-candidate";
 export const MAP_PROFILES: Readonly<Record<string, SmashcraftMapProfile>> = {
   "gate-playable": { describe: "exact playable candidate, with ordinary selection and input", path: CURRENT_CANDIDATE, quick: "" },
   outfits: { describe: "four-colour portrait candidate, red Illidan and blue Rifleman", path: join(inputs, "slot-outfits-161-20261007/Smashcraft diagnostic slot portrait outfits.w3x"), quick: "-dev quick" },
-  "portraits-363": { describe: "Classic and Definitive portraits built for #363", path: join(homedir(), ".local/state/smashcraft/portraits-363-codex/Smashcraft-363-select-art.w3x"), quick: "-dev quick" },
   ...STAGE_COMPOSITION_MAPS,
   ...STAGE_ENTRY_MAPS,
   ...FLOATING_STAGE_MAPS,
@@ -166,7 +165,7 @@ const slashLightChecks: NativeCheck[] = (["before", "after"] as const).map((phas
   setup: [{ chat: "-dev reset" }, { chat: "-dev quick" }, { chat: "-dev view off" }, { waitMs: 5000 }, { chat: "-dev effects 4" }, { receipt: "^SMASHCRAFT DEV v=1 ", seconds: 4 }],
   capture: [{ kind: "frames", name: "contact", client: "a", count: 6, everyMs: 25 }, { kind: "reading", name: "label", pattern: "dev: effects 4 (\\S+ \\S+)" }],
   pass: [NO_IMPORT_FAILURES, NO_ERRORS, DEV_RECEIPT, { kind: "reading", name: "label", pattern: "ImpactHit- MetalLightSliceFlesh1", orLook: true }],
-  look: `Slash hit ${phase}: the same chest-height spark at 25 ms intervals over its 150 ms life. After must light the nearer fighter's surface warm white and fade by 140 ms in Reforged/Definitive; Classic shows the identical spark with no light. Record graphics mode and native frame cost against the #168 budget.`,
+  look: `Slash hit ${phase}: the same chest-height spark at 25 ms intervals over its 150 ms life. After must light the nearer fighter's surface warm white and fade by 140 ms in Reforged; Classic shows the identical spark with no light. Record graphics mode and native frame cost against the #168 budget.`,
 }));
 
 export const SMASHCRAFT_ACCEPT: AcceptSuite = {
@@ -233,16 +232,6 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
       capture: [{ kind: "frames", name: "grid-and-picked-cards", client: "a" }],
       pass: [NO_IMPORT_FAILURES, NO_ERRORS],
       look: "The roster grid stays neutral; picked player cards show red Illidan and blue Rifleman clothing.",
-    },
-    {
-      id: "363-select-art", closes: "smashcraft#363 box 4", map: "portraits-363",
-      setup: [
-        { chat: "-dev reset" }, { chat: "-dev fighter 1 Illidan", client: "a" }, { chat: "-dev fighter 2 Forsaken Paladin", client: "b" },
-        { waitMs: 1500 },
-      ],
-      capture: [{ kind: "frames", name: "grid-and-picked-cards", client: "a" }],
-      pass: [NO_IMPORT_FAILURES, NO_ERRORS],
-      look: "Capture Classic on the Classic pair and Definitive on signed-in clones B/C/D set to Definitive. The Definitive grid tiles and player cards show the Definitive bodies (Illidan's Definitive armour, Forsaken's Definitive plate) and differ from the Classic frames; Forsaken, Murloc and Kobold tiles show the fighter in both.",
     },
     ...(["a", "b"] as const).map((client): NativeCheck => ({
       id: `174-defile-${client}`,

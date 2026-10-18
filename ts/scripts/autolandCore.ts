@@ -274,12 +274,12 @@ export function supersededLanes(lanes: readonly PushedLane[], held: ReadonlySet<
   });
 }
 
-export type BoxNeed = "native" | "tom" | "definitive";
+export type BoxNeed = "native" | "tom";
 export interface Box { readonly line: number; readonly text: string; readonly done: boolean; readonly check?: string; readonly needs?: BoxNeed }
 
 const BOX = /^(\s*[-*] \[)([ xX])(\] )(.*)$/;
 const CHECK = /\bcheck: `([^`]+)`\s*\.?\s*$/;
-const NEED = /\[(native|tom|definitive)\]/i;
+const NEED = /\[(native|tom)\]/i;
 
 export const boxes = (body: string): readonly Box[] => body.split("\n").flatMap((line, index) => {
   const match = BOX.exec(line);
@@ -294,7 +294,7 @@ export const pendingChecks = (body: string): readonly string[] => [...new Set(bo
 
 export interface Autoclose { readonly body: string; readonly close: boolean; readonly comment?: string; readonly marker: string }
 
-const NEEDS_LABEL: Record<BoxNeed, string> = { native: "needs a native capture", tom: "needs Tom", definitive: "needs a Definitive capture" };
+const NEEDS_LABEL: Record<BoxNeed, string> = { native: "needs a native capture", tom: "needs Tom" };
 const summary = (box: Box): string => box.text.replace(CHECK, "").trim().slice(0, 160);
 
 export function autoclose(body: string, passed: ReadonlyMap<string, boolean>, sha: string): Autoclose {
@@ -311,7 +311,7 @@ export function autoclose(body: string, passed: ReadonlyMap<string, boolean>, sh
     ticked.length > 0 ? [`Ticked by auto-close after ${sha} landed:`, ...ticked.map((box) => `- ${summary(box)} (\`${box.check}\` passed)`)] : [],
     failed.length > 0 ? ["Checks that didn't pass on this main stay open:", ...failed.map((box) => `- ${summary(box)} (\`${box.check}\` ${passed.has(box.check ?? "") ? "failed" : "didn't run"})`)] : [],
     waiting.length > 0 ? ["Left open for a person:", ...waiting.map((box) => `- ${summary(box)} (${NEEDS_LABEL[box.needs ?? "tom"]})`)] : [],
-    unchecked.length > 0 ? ["Left open with no declared check (end the box with check: `COMMAND`, or tag it [native], [tom] or [definitive]):", ...unchecked.map((box) => `- ${summary(box)}`)] : [],
+    unchecked.length > 0 ? ["Left open with no declared check (end the box with check: `COMMAND`, or tag it [native] or [tom]):", ...unchecked.map((box) => `- ${summary(box)}`)] : [],
   ].filter((section) => section.length > 0);
   const marker = `<!-- auto-close ${new Bun.CryptoHasher("sha256").update(JSON.stringify([close, ticked, open])).digest("hex").slice(0, 16)} -->`;
   const declared = all.some((box) => box.check !== undefined || box.needs !== undefined);

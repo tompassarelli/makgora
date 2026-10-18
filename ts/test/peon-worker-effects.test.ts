@@ -14,10 +14,9 @@ const headless = testHeadless(SMASHCRAFT_HEADLESS);
 const explosion = "Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx";
 
 test("Peon's lumber and burrow place/pack lifecycle emits no explosion model or audio, while Worksite Launch keeps its blast (#563) [k1 scenario]", () => {
-  for (const definitive of [false, true]) for (const ex of [false, true]) {
+  for (const ex of [false, true]) {
     const client = headless.clients({ start: () => {}, install: () => {} }, [0]).client(0);
     client.run(() => {
-      globalThis.__smashcraftCueDefinitive = definitive;
       const match = testMatch(1, Character.peon), fighter = fighterAt(match.world, 0), input = match.inputs.inputs[0];
       match.game.practice = true;
       fighter.motion.x = 0;

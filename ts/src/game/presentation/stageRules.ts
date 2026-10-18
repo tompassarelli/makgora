@@ -66,7 +66,7 @@ export interface ModelBox { readonly min: readonly [number, number, number]; rea
 export type BoundsOf = (model: string) => ModelBox | undefined;
 interface Placed { readonly left: number; readonly right: number; readonly front: number; readonly back: number; readonly bottom: number; readonly top: number }
 
-// Lowest of the classic and Definitive mesh tops: a structure resting on one of these rocks touches it in both looks.
+// Each rock's mesh top: a structure resting on one of these rocks touches it.
 export const SUPPORT_TOPS: Readonly<Record<string, number>> = {
   "Doodads\\Barrens\\Rocks\\Barrens_Rocks\\Barrens_Rocks0.mdx": 38,
   "Doodads\\Barrens\\Rocks\\Barrens_Rocks\\Barrens_Rocks2.mdx": 79,

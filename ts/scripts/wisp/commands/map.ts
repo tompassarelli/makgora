@@ -11,7 +11,6 @@ import { checkoutInputs } from "../buildInputs";
 import { repairPackager } from "../nativeTools";
 import { step } from "wisp/scripts/wisp/timings";
 import { glowFreeCaptureImports, decodeBuildOptions, editionImports, importedAssets, rebuildMap, type MapEdition } from "../mapInputs";
-import { requireDefinitiveBodies } from "../definitiveBodies";
 import { buildProject, gameFilesLayer, profileOption, projectRoot, sourceErrorsLayer } from "../project";
 import { describeMapSize, mapBudgetProblem, mapGrowthProblem, type MapSize, readMapBaseline, readTables, storedBytes, writeMapBaseline } from "../../mapSize";
 import { ensureGenerated } from "../../generated";
@@ -78,8 +77,8 @@ const checkMapSize = (out: string, imports: readonly ArchiveEntry[], bounded: bo
   const size = yield* measureMap(out, imports);
   const entries = [...size.imports.keys()].map((entry) => ({ entry, source: out }));
   const overrides = entries.length - editionImports(entries, "classic").length;
-  yield* Console.log(`${edition} package: ${imports.length} declared imports, ${overrides} HD/DE archive entries`);
-  if (edition === "classic" && overrides > 0) return yield* new MapBuildFailure({ operation: "check Classic package", path: out, cause: "the base or container carries HD/DE entries; use the sealed build inputs" });
+  yield* Console.log(`${edition} package: ${imports.length} declared imports, ${overrides} HD archive entries`);
+  if (edition === "classic" && overrides > 0) return yield* new MapBuildFailure({ operation: "check Classic package", path: out, cause: "the base or container carries HD entries; use the sealed build inputs" });
   yield* Console.log(describeMapSize(size));
   const budgetProblem = mapBudgetProblem(size);
   if (budgetProblem !== undefined) return yield* new MapBuildFailure({ operation: "check map size", path: out, cause: budgetProblem });
@@ -111,11 +110,10 @@ export const build: Command = (args) => Effect.gen(function*() {
       const declared = base !== undefined && container !== undefined && assets !== undefined && summon !== undefined
         ? { base, container, assets, summon }
         : yield* checkoutInputs().pipe(step("verify build inputs"));
-      if (edition === "full") yield* requireDefinitiveBodies(assets ?? declared.assets);
       const imported = yield* importedAssets(assets ?? declared.assets, summon ?? declared.summon, edition);
       const imports = capture ? yield* glowFreeCaptureImports(imported) : imported;
-      const checked = yield* checkCueModels(headlessRender({ assets: assets ?? declared.assets, imports })).pipe(step("cue models resolved in both looks"));
-      yield* Console.log(`${checked} cue model/look resolutions passed`);
+      const checked = yield* checkCueModels(headlessRender({ assets: assets ?? declared.assets, imports })).pipe(step("cue models resolved"));
+      yield* Console.log(`${checked} cue model resolutions passed`);
       if (inputsOnly) return yield* Console.log("map-build inputs passed; compilation and packaging skipped");
       yield* MapBuild.use((maps) => maps.build({ ...map, base: base ?? declared.base, container: container ?? declared.container, ...(packager === undefined ? {} : { packager }), declaration: SMASHCRAFT_MAP, imports, objectData: generatedFiles() })).pipe(Effect.andThen(checkMapSize(map.out, imports, bounded, edition)));
       if (predict) yield* writePlaytestCost(map.out).pipe(step("predict playtest Lua cost"));

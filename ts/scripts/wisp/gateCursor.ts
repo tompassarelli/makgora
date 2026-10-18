@@ -31,7 +31,7 @@ const CURSOR_DRAW_ATTEMPTS = 6;
 const POINTER_MOVE_ATTEMPTS = 3;
 const margined = (left: number, top: number, width: number, height: number): UiRect => ({ left: left - COVER_MARGIN, top: top + COVER_MARGIN, width: width + 2 * COVER_MARGIN, height: height + 2 * COVER_MARGIN });
 
-const cursorPixels = (frame: Frame, texture: Rgba, x: number, y: number, pinching: boolean) => texturePixels(frame, texture, handLeft(x, false, pinching), handTop(y, false, pinching), HAND_WIDTH, HAND_HEIGHT);
+const cursorPixels = (frame: Frame, texture: Rgba, x: number, y: number, pinching: boolean) => texturePixels(frame, texture, handLeft(x, pinching), handTop(y, pinching), HAND_WIDTH, HAND_HEIGHT);
 
 export const measureCursorGate = (clientsFile: string, name: string, directory: string) => Effect.gen(function*() {
   const clients = yield* loadClients(clientsFile).pipe(Effect.mapError(fail("cursor gate clients")));
@@ -92,7 +92,7 @@ export const measureCursorGate = (clientsFile: string, name: string, directory: 
     const { pinched, hand } = drawn;
     const error = hand?.error;
     const size = readyChipSize(grid);
-    const pointerCover = phase === "carrying" ? margined(handLeft(x, false, true), handTop(y, false, true), HAND_WIDTH, HAND_HEIGHT) : margined(x + stock.left, y + stock.top, stock.width, stock.height);
+    const pointerCover = phase === "carrying" ? margined(handLeft(x, true), handTop(y, true), HAND_WIDTH, HAND_HEIGHT) : margined(x + stock.left, y + stock.top, stock.width, stock.height);
     const chipError = phase === "carrying" ? textureError(pixels, texture.chip, carriedChipLeft(x, size), carriedChipTop(y, size), size, size, pointerCover)
       : phase === "after-drop" ? textureError(pixels, texture.chip, chipX(grid, 0, 0), chipY(grid, 0, 0), size, size, pointerCover)
       : phase === "before-pick" ? textureError(pixels, texture.chip, parkedChipLeft(0, size), parkedChipTop(size), size, size, pointerCover) : undefined;

@@ -4,20 +4,18 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 import { parseModelMDX } from "wisp/scripts/wisp/models";
 import { BunServices } from "@effect/platform-bun";
-import { Effect, Schema } from "effect";
+import { Effect } from "effect";
 import { ChildProcess } from "effect/process";
 import { runProcess } from "../hostProcess";
 import { installHeadless } from "wisp/scripts/wisp/headless";
-import { captureScene, renderScenes, type DrawnPose, type PopcornEmitterPose, type RenderScene } from "wisp/scripts/wisp/headlessRender";
-import type { Graphics } from "wisp/scripts/wisp/graphicsProfiles";
+import { captureScene, renderScenes, type DrawnPose, type RenderScene } from "wisp/scripts/wisp/headlessRender";
 import { SMASHCRAFT_HEADLESS } from "./headless";
 import { headlessRender } from "./headlessRender";
 import { DISJOINT_CUES, disjointNormals } from "../../src/game/presentation/disjointCues";
 import { ATTACK_CUES } from "../../src/game/presentation/attackCues";
 import { arenaFarZ, ARENA_CAMERA, FLOOR_HEIGHT, PLAYABLE_BOUNDS, cameraFieldOfView, extremeCamera } from "../../src/game/presentation/arenaCamera";
-import { ACTIVE_CUE_FRAMES, type Cue, ORIGINAL_ACTIONS, ORIGINAL_BRANCH_CUES, specialCueState } from "../../src/game/presentation/specialCues";
+import { ACTIVE_CUE_FRAMES, ORIGINAL_ACTIONS, ORIGINAL_BRANCH_CUES, specialCueState } from "../../src/game/presentation/specialCues";
 import { FOLLOW_UP_FORM, SpecialForm, specialForm, specialKit } from "../../src/game/sim/specials/schema";
-import { DEFINITIVE_CUE_EMITTERS } from "../../src/game/presentation/cueEmitterInfo";
 import { SpecialCueEffects } from "../../src/game/render/specialCueEffects";
 import { SpecialEffects } from "../../src/game/render/specialEffects";
 import { FrostEffects } from "../../src/game/render/frostEffects";
@@ -85,7 +83,6 @@ export interface CueMove {
 
 export interface CueMeasurement {
   readonly move: string;
-  readonly graphics: Graphics;
   readonly lastDanger: number;
   readonly firstShown: number;
   readonly lastShown: number;
@@ -97,7 +94,6 @@ export interface CueMeasurement {
   readonly colour?: readonly number[];
   readonly feedback?: string;
   readonly models?: readonly CueModelPixels[];
-  readonly popcornPresence: readonly CuePopcornPresence[];
 }
 
 export interface CueModelPixels {
@@ -107,33 +103,7 @@ export interface CueModelPixels {
   readonly popcorn: boolean;
   readonly sampledFrames: readonly number[];
   readonly present: boolean;
-  readonly popcornPresence: readonly CuePopcornPresence[];
 }
-
-export interface CuePopcornPresence {
-  readonly frame: number;
-  readonly emitters: readonly PopcornEmitterPose[];
-}
-
-const emitterReport = Schema.Struct({
-  unsupportedEmitters: Schema.Array(Schema.Struct({
-    model: Schema.String, handle: Schema.Finite, emitter: Schema.String, effect: Schema.String,
-    position: Schema.Tuple([Schema.Finite, Schema.Finite, Schema.Finite]),
-    scale: Schema.Tuple([Schema.Finite, Schema.Finite, Schema.Finite]),
-    kind: Schema.String, visible: Schema.Boolean,
-  })),
-});
-
-export function visiblePopcornEmitters(report: typeof emitterReport.Type, model?: string): readonly PopcornEmitterPose[] {
-  return report.unsupportedEmitters.filter(emitter => emitter.kind === "popcorn" && emitter.visible
-    && (model === undefined || emitter.model.replaceAll("\\", "/").toLowerCase().replace(/\.mdl$/, ".mdx") === model.replaceAll("\\", "/").toLowerCase().replace(/\.mdl$/, ".mdx"))
-    && emitter.position.every(Number.isFinite) && emitter.scale.every(value => Number.isFinite(value) && value > 0));
-}
-
-export const cuePopcornPresence = (path: string, frame: number, model?: string) => Effect.gen(function*() {
-  const report = yield* Effect.promise(() => Bun.file(path).text()).pipe(Effect.flatMap(Schema.decodeUnknownEffect(Schema.fromJsonString(emitterReport))));
-  return { frame, emitters: visiblePopcornEmitters(report, model) };
-});
 
 interface ParkPose { readonly handle: number; readonly model: string; readonly shown: boolean; readonly timeScale: number }
 
@@ -154,12 +124,11 @@ async function worldParticleLife(model: string): Promise<number> {
 // ParticleEmitter2's ModelSpace flag (MDX format).
 const MODEL_SPACE = 0x80000;
 
-async function particleTails(poses: readonly (readonly ParkPose[])[], graphics: Graphics): Promise<number> {
+async function particleTails(poses: readonly (readonly ParkPose[])[]): Promise<number> {
   let last = -1;
   for (let frame = 1; frame < poses.length; frame++) for (const pose of poses[frame] ?? []) {
     const before = poses[frame - 1]?.find((candidate) => candidate.handle === pose.handle);
-    // Definitive draws these as Popcorn, whose particle lives the classic emitters don't describe.
-    if (before?.shown !== true || pose.shown || graphics === "definitive" && DEFINITIVE_CUE_EMITTERS[pose.model] === true) continue;
+    if (before?.shown !== true || pose.shown) continue;
     const life = await worldParticleLife(pose.model);
     if (life <= 0) continue;
     last = Math.max(last, pose.timeScale <= 0 ? Number.POSITIVE_INFINITY : frame - 1 + Math.ceil(life * 60 / pose.timeScale));
@@ -227,7 +196,7 @@ function sparkEffect(character: Character, style: AttackStyle, strong: boolean):
   throw new Error(`${fighterSlug(character)} style ${style} has no ${strong ? "strong" : "weak"} hit`);
 }
 
-export function sparkScenes(move: CueMove, graphics: Graphics): { readonly scenes: RenderScene[]; readonly poses: (readonly ParkPose[])[]; readonly lastDanger: number; readonly empty: RenderScene; readonly feedback: string } {
+export function sparkScenes(move: CueMove): { readonly scenes: RenderScene[]; readonly poses: (readonly ParkPose[])[]; readonly lastDanger: number; readonly empty: RenderScene; readonly feedback: string } {
   if (move.style === undefined) throw new Error("a spark row names its move");
   const attacker = createFighter(move.character, -60.0, 1);
   const victim = createFighter(Character.rifleman, 0.0, -1);
@@ -243,10 +212,7 @@ export function sparkScenes(move: CueMove, graphics: Graphics): { readonly scene
   const sounds: string[] = [];
   presentImpactSounds(events, (sound, _x, _z, volume) => { sounds.push(`${sound.split("\\").at(-1)} volume ${volume}`); });
   const feedback = `damage ${effect.damage.toFixed(1)}%, hitlag ${victim.launch.hitlagFrames} victim/${attacker.launch.hitlag} attacker, tier ${events.tier}, sound ${sounds.join(" + ") || "none"}`;
-  const runtime = installHeadless({ ...SMASHCRAFT_HEADLESS, natives: (client) => ({
-    ...SMASHCRAFT_HEADLESS.natives?.(client),
-    GetLocalizedString: (key: string) => key === "SMASHCRAFT_CUE_GRAPHICS" ? graphics : key,
-  }) });
+  const runtime = installHeadless(SMASHCRAFT_HEADLESS);
   try {
     const clients = runtime.clients({ install() {}, start() {} }, [0]);
     const client = clients.client(0);
@@ -321,11 +287,8 @@ function aimNear(x: number, z: number): void {
   SetCameraPosition(x, PLAYABLE_BOUNDS.centreY);
 }
 
-function dropScenes(graphics: Graphics): ReturnType<typeof cueScenes> {
-  const runtime = installHeadless({ ...SMASHCRAFT_HEADLESS, natives: (client) => ({
-    ...SMASHCRAFT_HEADLESS.natives?.(client),
-    GetLocalizedString: (key: string) => key === "SMASHCRAFT_CUE_GRAPHICS" ? graphics : key,
-  }) });
+function dropScenes(): ReturnType<typeof cueScenes> {
+  const runtime = installHeadless(SMASHCRAFT_HEADLESS);
   try {
     const clients = runtime.clients({ install() {}, start() {} }, [0]);
     const client = clients.client(0);
@@ -359,11 +322,8 @@ function dropScenes(graphics: Graphics): ReturnType<typeof cueScenes> {
   } finally { runtime.restore(); }
 }
 
-function candleScenes(heat: number, graphics: Graphics): ReturnType<typeof cueScenes> {
-  const runtime = installHeadless({ ...SMASHCRAFT_HEADLESS, natives: (client) => ({
-    ...SMASHCRAFT_HEADLESS.natives?.(client),
-    GetLocalizedString: (key: string) => key === "SMASHCRAFT_CUE_GRAPHICS" ? graphics : key,
-  }) });
+function candleScenes(heat: number): ReturnType<typeof cueScenes> {
+  const runtime = installHeadless(SMASHCRAFT_HEADLESS);
   try {
     const clients = runtime.clients({ install() {}, start() {} }, [0]);
     const client = clients.client(0);
@@ -389,14 +349,11 @@ function candleScenes(heat: number, graphics: Graphics): ReturnType<typeof cueSc
   } finally { runtime.restore(); }
 }
 
-export function cueScenes(move: CueMove, graphics: Graphics): { readonly scenes: RenderScene[]; readonly poses: (readonly ParkPose[])[]; readonly lastDanger: number; readonly empty: RenderScene; readonly feedback?: string; readonly expected?: readonly string[] } {
-  if (move.drop === true) return dropScenes(graphics);
-  if (move.spark !== undefined) return sparkScenes(move, graphics);
-  if (move.candleHeat !== undefined) return candleScenes(move.candleHeat, graphics);
-  const runtime = installHeadless({ ...SMASHCRAFT_HEADLESS, natives: (client) => ({
-    ...SMASHCRAFT_HEADLESS.natives?.(client),
-    GetLocalizedString: (key: string) => key === "SMASHCRAFT_CUE_GRAPHICS" ? graphics : key,
-  }) });
+export function cueScenes(move: CueMove): { readonly scenes: RenderScene[]; readonly poses: (readonly ParkPose[])[]; readonly lastDanger: number; readonly empty: RenderScene; readonly feedback?: string; readonly expected?: readonly string[] } {
+  if (move.drop === true) return dropScenes();
+  if (move.spark !== undefined) return sparkScenes(move);
+  if (move.candleHeat !== undefined) return candleScenes(move.candleHeat);
+  const runtime = installHeadless(SMASHCRAFT_HEADLESS);
   try {
     const clients = runtime.clients({ install() {}, start() {} }, [0]);
     const client = clients.client(0);
@@ -404,7 +361,6 @@ export function cueScenes(move: CueMove, graphics: Graphics): { readonly scenes:
     const origin = { x: 0.0, y: PLAYABLE_BOUNDS.centreY, z: FLOOR_HEIGHT };
     let cues: SpecialCueEffects | undefined, shots: ProjectilePresentation | undefined, specials: SpecialEffects | undefined, frost: FrostEffects | undefined, placed: PlacedObjectEffects | undefined;
     client.run(() => {
-      globalThis.__smashcraftCueDefinitive = undefined;
       cues = new SpecialCueEffects(move.character, origin, true);
       specials = new SpecialEffects(origin);
       frost = new FrostEffects(origin);
@@ -434,7 +390,6 @@ export function cueScenes(move: CueMove, graphics: Graphics): { readonly scenes:
     const poses: (readonly ParkPose[])[] = [];
     const expected = new Set<string>();
     if (move.style !== undefined && disjointNormals(f).includes(move.style)) expected.add(DISJOINT_CUES[move.character]?.model ?? "");
-    const look = (cue: Cue) => (graphics === "definitive" ? cue.definitive ?? cue : cue);
     let lastDanger = -1, ended = -1, lastLive = 0;
     let empty: RenderScene | undefined;
     for (let tick = 0; tick < LIMIT; tick++) {
@@ -442,7 +397,7 @@ export function cueScenes(move: CueMove, graphics: Graphics): { readonly scenes:
       if (tick === 0 && move.form !== undefined && f.special.action !== SpecialAction.none && f.special.form !== move.form) enterForm(f, move.form);
       const cueState = specialCueState(f);
       if (move.special !== undefined && cueState.cues !== undefined && cueState.phase !== "none") {
-        const cue = look(cueState.phase === "startup" ? cueState.cues.startup : cueState.cues.active);
+        const cue = cueState.phase === "startup" ? cueState.cues.startup : cueState.cues.active;
         if (cue.drawn !== true) expected.add(cue.model);
       }
       const running = move.style !== undefined ? f.attack.style === move.style : f.special.action !== SpecialAction.none;
@@ -479,7 +434,7 @@ export function cueScenes(move: CueMove, graphics: Graphics): { readonly scenes:
 }
 
 /** Renders each special form's cue and missile models alone against the same frame with no effects, so a model's own pixels are counted. */
-const measureModels = (sampled: readonly { readonly move: CueMove; readonly index: number; readonly scenes: readonly RenderScene[]; readonly expected?: readonly string[] }[], graphics: Graphics, directory: string) => Effect.gen(function*() {
+const measureModels = (sampled: readonly { readonly move: CueMove; readonly index: number; readonly scenes: readonly RenderScene[]; readonly expected?: readonly string[] }[], directory: string) => Effect.gen(function*() {
   const project = { ...headlessRender(), width: WIDTH, height: HEIGHT };
   const renders: RenderScene[] = [];
   const baselines = new Set<number>();
@@ -504,24 +459,19 @@ const measureModels = (sampled: readonly { readonly move: CueMove; readonly inde
   }
   const undrawn = new Set<string>();
   for (let first = 0; first < renders.length; first += RENDER_BATCH) {
-    yield* renderScenes(project, renders.slice(first, first + RENDER_BATCH), directory, graphics).pipe(Effect.catchTag("RenderFailure", (failure) => Effect.sync(() => {
+    yield* renderScenes(project, renders.slice(first, first + RENDER_BATCH), directory, "classic").pipe(Effect.catchTag("RenderFailure", (failure) => Effect.sync(() => {
       for (const line of String(failure.cause).split("\n")) undrawn.add(line.replace(/^.*?: /, ""));
     })));
   }
   const rows = new Map<number, CueModelPixels[]>();
   for (const { index, model, frames, pairs, sampledFrames } of plans) {
     let pixels = 0;
-    const popcornPresence: CuePopcornPresence[] = [];
-    for (const [sample, [shot, base]] of pairs.entries()) {
-      if (graphics === "definitive") {
-        const presence = yield* cuePopcornPresence(join(directory, `p0-frame-${shot}.json`), sampledFrames[sample] ?? -1, model);
-        if (presence.emitters.length > 0) popcornPresence.push(presence);
-      }
+    for (const [shot, base] of pairs) {
       const drawn = drawnPixels(yield* rgba(join(directory, `p0-frame-${base}.png`)), yield* rgba(join(directory, `p0-frame-${shot}.png`)));
       pixels = Math.max(pixels, Math.round(drawn.share * WIDTH * HEIGHT));
     }
     const popcorn = [...undrawn].some((line) => line.toLowerCase().includes(modelKey(model)));
-    rows.set(index, [...rows.get(index) ?? [], { model, pixels, frames, popcorn, sampledFrames, present: pixels > 0 || popcornPresence.length > 0, popcornPresence }]);
+    rows.set(index, [...rows.get(index) ?? [], { model, pixels, frames, popcorn, sampledFrames, present: pixels > 0 }]);
   }
   return rows;
 });
@@ -549,8 +499,8 @@ const rgba = (path: string) => Effect.gen(function*() {
   return yield* Effect.promise(() => Bun.file(raw).bytes());
 }).pipe(Effect.provide(BunServices.layer));
 
-export const measureCueMoves = (moves: readonly CueMove[], graphics: Graphics, directory: string) => Effect.gen(function*() {
-  const sampled = moves.map((move, index) => ({ move, index, ...cueScenes(move, graphics) })).filter(({ scenes }) => scenes.length > 0);
+export const measureCueMoves = (moves: readonly CueMove[], directory: string) => Effect.gen(function*() {
+  const sampled = moves.map((move, index) => ({ move, index, ...cueScenes(move) })).filter(({ scenes }) => scenes.length > 0);
   const empty = sampled[0]?.empty;
   if (empty === undefined) return [];
   const frameOf = (index: number, tick: number) => (index + 1) * 1000 + tick;
@@ -559,29 +509,23 @@ export const measureCueMoves = (moves: readonly CueMove[], graphics: Graphics, d
   const undrawn = new Set<string>();
   // Wisp stops one render call after five minutes.
   for (let first = 0; first <= drawn.length; first += RENDER_BATCH) {
-    yield* renderScenes(project, [empty, ...drawn.slice(first, first + RENDER_BATCH)], directory, graphics).pipe(Effect.catchTag("RenderFailure", (failure) => Effect.sync(() => {
+    yield* renderScenes(project, [empty, ...drawn.slice(first, first + RENDER_BATCH)], directory, "classic").pipe(Effect.catchTag("RenderFailure", (failure) => Effect.sync(() => {
       for (const line of String(failure.cause).split("\n")) undrawn.add(line.replace(/^.*?: /, ""));
     })));
   }
   const blank = yield* rgba(join(directory, "p0-frame--1.png"));
-  const modelRows = yield* measureModels(sampled, graphics, directory);
+  const modelRows = yield* measureModels(sampled, directory);
   const results: CueMeasurement[] = [];
   for (const { move, index, scenes, poses, lastDanger, feedback } of sampled) {
     const shares: number[] = [];
     const colours: (readonly number[])[] = [];
-    const popcornPresence: CuePopcornPresence[] = [];
     for (const scene of scenes) {
       const pixels = scene.effects.length === 0 ? { share: 0, colour: [0, 0, 0] } : drawnPixels(blank, yield* rgba(join(directory, `p0-frame-${frameOf(index, scene.frame)}.png`)));
-      if (graphics === "definitive" && scene.effects.length > 0) {
-        const presence = yield* cuePopcornPresence(join(directory, `p0-frame-${frameOf(index, scene.frame)}.json`), scene.frame);
-        if (presence.emitters.length > 0) popcornPresence.push(presence);
-      }
       shares.push(pixels.share);
       colours.push(pixels.colour);
     }
-    const presentFrames = new Set(popcornPresence.map(({ frame }) => frame));
-    const shown = shares.flatMap((share, tick) => share >= SHOWN_SHARE || presentFrames.has(tick) ? [tick] : []);
-    const tail = yield* Effect.promise(() => particleTails(poses, graphics));
+    const shown = shares.flatMap((share, tick) => share >= SHOWN_SHARE ? [tick] : []);
+    const tail = yield* Effect.promise(() => particleTails(poses));
     const firstShown = shown[0] ?? -1, lastShown = Math.max(shown.at(-1) ?? -1, tail);
     const linger = lastShown < 0 ? 0 : Math.max(0, lastShown - Math.max(lastDanger, 0));
     const coverage = Math.max(0, ...shares);
@@ -592,10 +536,10 @@ export const measureCueMoves = (moves: readonly CueMove[], graphics: Graphics, d
     ];
     const models = new Set(scenes.flatMap(({ effects }) => effects.map(({ model }) => model)));
     const popcorn = [...undrawn].filter((line) => [...models].some((model) => line.startsWith(model)));
-    results.push({ move: move.name, graphics, lastDanger, firstShown, lastShown, linger, coverage, widest, over, popcorn: popcorn.length > 0,
+    results.push({ move: move.name, lastDanger, firstShown, lastShown, linger, coverage, widest, over, popcorn: popcorn.length > 0,
       ...(move.spark === undefined ? {} : { colour: colours[shares.indexOf(coverage)] ?? [0, 0, 0], feedback }),
-      models: modelRows.get(index) ?? [], popcornPresence });
+      models: modelRows.get(index) ?? [] });
   }
-  yield* Effect.promise(() => Bun.write(join(directory, "cue-measurements.json"), JSON.stringify({ graphics, selectors: moves.map(move => move.name), uncovered: moves.filter(move => !sampled.some(row => row.move === move)).map(move => move.name), rows: results }, null, 2)));
+  yield* Effect.promise(() => Bun.write(join(directory, "cue-measurements.json"), JSON.stringify({ selectors: moves.map(move => move.name), uncovered: moves.filter(move => !sampled.some(row => row.move === move)).map(move => move.name), rows: results }, null, 2)));
   return results;
 });

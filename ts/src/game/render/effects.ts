@@ -22,8 +22,6 @@ export const STOCK_MODELS = {
   greenDragonMissile: "Abilities\\Weapons\\GreenDragonMissile\\GreenDragonMissile.mdx",
   massTeleportTarget: "Abilities\\Spells\\Human\\MassTeleport\\MassTeleportTarget.mdx",
   frostWyrmMissile: "Abilities\\Weapons\\FrostWyrmMissile\\FrostWyrmMissile.mdx",
-  definitiveDropMarker: "Abilities\\Spells\\Other\\Aneu\\AneuTarget.mdx",
-  definitiveDropOrb: "Objects\\InventoryItems\\Rune\\Rune.mdx",
 } as const;
 
 const HALF_TURN = f32(3.141592654);

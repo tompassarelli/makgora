@@ -5,7 +5,7 @@ detached worktree `~/code/smashcraft/worktrees/tom-build-watch/ts`, which it mov
 to `origin/main` on each start, under `Nice=10` and idle I/O. Every 30 s it fetches
 `origin/main`; when the tip is a commit it has not built, it builds that tip's
 Classic playable map (the edition Tom plays, about 47 MB; `wisp play` keeps the
-private full HD/DE build) with the play build path, without the optional controller helper,
+private full HD build) with the play build path, without the optional controller helper,
 and installs it under Maps/00-Smashcraft (smashcraft:docs/play.md); `wisp play`
 builds the helper when Tom starts a controller session. Commits that land during a build
 are skipped for the newest tip. Between landings it only fetches.

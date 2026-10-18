@@ -60,7 +60,7 @@ test("replacing one fighter's model facts leaves every other model's facts file 
   }
 });
 
-test("the shared thinned source parses a Definitive-format skinned model exactly as the producers' codec does, on a miss and on a hit [k2 property]", () => {
+test("the shared thinned source parses an HD-format skinned model exactly as the producers' codec does, on a miss and on a hit [k2 property]", () => {
   const work = mkdtempSync(join(tmpdir(), "thinned-source-"));
   try {
     const model = parseMDL('Version { FormatVersion 800, } Model "synthetic skinned" { BlendTime 0, MinimumExtent { 0, 0, 0 }, MaximumExtent { 1, 1, 0 }, BoundsRadius 1, } Sequences 1 { Anim "Stand" { Interval { 0, 1000 }, MinimumExtent { 0, 0, 0 }, MaximumExtent { 1, 1, 0 }, BoundsRadius 1, } } Textures 1 { Bitmap { Image "t.blp", } } Materials 1 { Material { Layer { FilterMode None, static TextureID 0, } } } Bone "root" { ObjectId 0, Translation 2 { Linear, 0: {0,0,0}, 1000: {0,0,1}, } } Bone "tip" { ObjectId 1, Parent 0, } Geoset { Vertices 3 { {0,0,0}, {1,0,0}, {0,1,0}, } Normals 3 { {0,0,1}, {0,0,1}, {0,0,1}, } TVertices 3 { {0,0}, {1,0}, {0,1}, } VertexGroup { 0, 0, 0, } Faces 1 3 { Triangles { {0,1,2}, } } Groups 1 1 { Matrices { 0 }, } MinimumExtent { 0, 0, 0 }, MaximumExtent { 1, 1, 0 }, BoundsRadius 1, MaterialID 0, }');
@@ -79,8 +79,8 @@ test("derive removes the facts of a model its rebuilt shards dropped and keeps t
     const body = (name: string) => `${name}-${hex(name)}.mdx`;
     const dropped = body("ShadowHunterClassicFallbackBody"), kept = body("ShadowHunterTimelineBody"), moved = body("ShadowHunterWhite"), other = "RiflemanFighter-" + hex("rifleman") + ".mdx", unmeasured = body("ShadowHunterOldBody");
     for (const model of [dropped, kept, moved, other]) writeFileSync(join(directory, modelFactsFile(`war3mapImported\\${model}`)), `{"model":"war3mapImported\\\\${model}"}\n`);
-    const before = [`imports/war3mapImported/${dropped}`, `imports/_de.w3mod/war3mapImported/${dropped}`, `imports/war3mapImported/${kept}`, `imports/war3mapImported/${moved}`, `imports/war3mapImported/${unmeasured}`, "original-clips-evidence.json"];
-    const after = [`imports/war3mapImported/${kept}`, `imports/_de.w3mod/war3mapImported/${kept}`, moved];
+    const before = [`imports/war3mapImported/${dropped}`, `imports/_hd.w3mod/war3mapImported/${dropped}`, `imports/war3mapImported/${kept}`, `imports/war3mapImported/${moved}`, `imports/war3mapImported/${unmeasured}`, "original-clips-evidence.json"];
+    const after = [`imports/war3mapImported/${kept}`, `imports/_hd.w3mod/war3mapImported/${kept}`, moved];
     expect(removeDroppedModelFacts(before, after, directory)).toEqual([`war3mapImported\\${dropped}`]);
     expect(readdirSync(directory).sort()).toEqual([kept, moved, other].map((model) => modelFactsFile(`war3mapImported\\${model}`)).sort());
   } finally {

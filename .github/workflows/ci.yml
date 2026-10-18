@@ -44,10 +44,6 @@ jobs:
       - name: four-fighter p99 <= 10 ms and worst <= 14 ms in Classic
         run: bun wisp perf playable-bot-four --samples --out build/playable-bot-four.perf && bun wisp perf budget build/playable-bot-four.perf
         working-directory: ts
-      - name: four-fighter p99 <= 10 ms and worst <= 14 ms in Definitive
-        if: ${{ !cancelled() }}
-        run: PERF_LOOK=definitive bun wisp perf playable-bot-four --samples --out build/playable-bot-four-definitive.perf && bun wisp perf budget build/playable-bot-four-definitive.perf
-        working-directory: ts
       - name: four fighters on the fixed key tape
         if: ${{ !cancelled() }}
         run: bun wisp perf playable-human-four --samples --out build/playable-human-four.perf
@@ -162,7 +158,7 @@ jobs:
         working-directory: ts
       - name: perf target (#168)
         if: ${{ !cancelled() && hashFiles('ts/build/playable-bot-four.perf') != '' }}
-        run: bun wisp perf budget build/playable-bot-four.perf && PERF_LOOK=definitive bun wisp perf playable-bot-four --samples --out build/playable-bot-four-definitive.perf && bun wisp perf budget build/playable-bot-four-definitive.perf
+        run: bun wisp perf budget build/playable-bot-four.perf
         working-directory: ts
       # This commit's p95 frame cost, allocation and map script size, in the job summary and log (`grep commit-metrics`).
       - if: ${{ !cancelled() }}

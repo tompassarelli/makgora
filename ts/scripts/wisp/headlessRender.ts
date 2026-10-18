@@ -6,31 +6,21 @@ import { assetsView, readManifest, wholeFamily } from "./buildInputs";
 import { importedAssets } from "./mapInputs";
 import { storedPortraits } from "../portraitParts";
 import { MapBuildFailure } from "wisp/scripts/wisp/mapBuild";
-import { type Look, cueModels, listedRedraws, redrawCandidates, redrawProblem, unlistedRedraws } from "./cueModels";
+import { cueModels } from "./cueModels";
 import type { Graphics, ResolvedRenderAsset } from "wisp/scripts/wisp/renderAssets";
 import { type RenderAssetOptions, renderAssetStore } from "./renderAssetStore";
 
-export const cueModelLooks = Effect.fnUntraced(function*(renderer: { readonly resolveAsset: (path: string, graphics: Graphics) => Promise<ResolvedRenderAsset> } = headlessRender(), models: readonly string[] = [...new Set([...cueModels(), ...redrawCandidates()])]) {
+export const checkCueModels = Effect.fnUntraced(function*(renderer: { readonly resolveAsset: (path: string, graphics: Graphics) => Promise<ResolvedRenderAsset> } = headlessRender(), models: readonly string[] = cueModels()) {
   const missing: string[] = [];
-  const looks = new Map<string, Look>();
   for (const model of models) {
-    const [classic, definitive] = yield* Effect.tryPromise({
-      try: () => Promise.all([renderer.resolveAsset(model, "classic"), renderer.resolveAsset(model, "definitive")]),
+    const resolved = yield* Effect.tryPromise({
+      try: () => renderer.resolveAsset(model, "classic"),
       catch: cause => new MapBuildFailure({ operation: "resolve cue model", path: model, cause }),
     });
-    for (const [graphics, resolved] of [["classic", classic], ["definitive", definitive]] as const) if (resolved.bytes === undefined || resolved.bytes.length === 0) missing.push(`${graphics}: ${model}`);
-    if (classic.bytes !== undefined && definitive.bytes !== undefined) looks.set(model, Buffer.from(classic.bytes).equals(Buffer.from(definitive.bytes)) ? "same" : "redrawn");
+    if (resolved.bytes === undefined || resolved.bytes.length === 0) missing.push(model);
   }
-  if (missing.length > 0) return yield* new MapBuildFailure({ operation: "check cue models", path: "Classic and Definitive", cause: missing.join("; ") });
-  return looks;
-});
-
-export const checkCueModels = Effect.fnUntraced(function*(renderer: { readonly resolveAsset: (path: string, graphics: Graphics) => Promise<ResolvedRenderAsset> } = headlessRender(), models: readonly string[] = cueModels()) {
-  const candidates = redrawCandidates();
-  const looks = yield* cueModelLooks(renderer, [...new Set([...models, ...candidates])]);
-  const redrawn = unlistedRedraws(candidates, listedRedraws(), looks);
-  if (redrawn.length > 0) return yield* new MapBuildFailure({ operation: "check Definitive redraws", path: "src/game/presentation", cause: redrawProblem(redrawn) });
-  return models.length * 2;
+  if (missing.length > 0) return yield* new MapBuildFailure({ operation: "check cue models", path: "Classic", cause: missing.join("; ") });
+  return models.length;
 });
 
 

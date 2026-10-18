@@ -50,7 +50,7 @@ test("exact native report boundary keeps installed map through injected gate fai
     save();
     await blocked();
     reports[0]!.results.push(result);
-    reports[0]!.graphicsLook = "definitive";
+    reports[0]!.graphicsLook = "hd";
     save();
     await blocked();
     reports[0]!.graphicsLook = "classic";

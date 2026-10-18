@@ -37,7 +37,8 @@ await Effect.runPromise(Effect.gen(function*() {
         } finally { session.close(); }
     }
     const project = headlessRender({ assets });
-    for (const graphics of ['classic', 'definitive'] as const) {
+    {
+        const graphics = 'classic';
         const images = yield* renderScenes(project, scenes, join(output, graphics), graphics);
         for (const image of images) ensure(image.notDrawn.length === 0, `${graphics}/${image.frame}: ${image.notDrawn.join('; ')}`);
         console.log(`STAND_FRAMES_PASS ${graphics}: ${images.length} fighters, ${images.length * 2} both-facing bodies`);

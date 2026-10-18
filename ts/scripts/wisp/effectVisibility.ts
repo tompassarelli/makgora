@@ -17,7 +17,7 @@ import { ACCENT_SECONDS, ACCENT_SEQUENCE } from "../../src/game/render/hitAreaEf
 import { FIGHTER_ULTIMATES } from "../../src/game/sim/ultimates";
 import { summonClip, summonClipCount, SUMMON_BEAR } from "../../src/game/presentation/summonClipInfo";
 import type { AuthoredSpecial, SpecialProjectile } from "../../src/game/sim/specials/schema";
-import { DEFINITIVE_CUE_EMITTERS } from "../../src/game/presentation/cueEmitterInfo";
+import { POPCORN_CUE_MODELS } from "../../src/game/presentation/cueEmitterInfo";
 import { impactModel, impactAnimation, impactStartSeconds, impactModelScale } from "../../src/game/presentation/hitPresentation";
 import { IMPACT_KIND_COUNT } from "../../src/game/presentation/impactState";
 import { STOCK_MODELS } from "../../src/game/render/effects";
@@ -210,7 +210,7 @@ export const effectVisibility = (model: mdx.Model, use: Parameters<typeof effect
 const slotMove = (slot: string) => `${slot}-special`;
 
 function cueUse(fighter: string, move: string, kind: EffectUse["kind"], cue: Cue): EffectUse {
-  const popcorn = kind !== "contact accent" && DEFINITIVE_CUE_EMITTERS[cue.model] === true;
+  const popcorn = kind !== "contact accent" && POPCORN_CUE_MODELS[cue.model] === true;
   return { fighter, move, kind, model: cue.model, scale: cue.scale, scaleEnd: popcorn ? undefined : cue.scaleEnd, alpha: popcorn || kind === "contact accent" ? 255 : cue.alpha ?? 255, lifetime: popcorn ? 1 : undefined, anchor: cue.anchor, sequence: popcorn && cue.birth !== undefined ? "birth" : cue.sequence ?? (kind === "contact accent" ? ACCENT_SEQUENCE : undefined), seconds: popcorn && cue.birth !== undefined ? 0 : cue.seconds ?? (kind === "contact accent" ? ACCENT_SECONDS : 0), timeScale: popcorn ? 1 : cue.timeScale ?? (kind === "contact accent" ? 0 : 1), travels: false, anchored: "fighter", ...(popcorn ? { playbackUnknown: cue.birth?.lingerFrames === undefined ? "confirmed emitter births are hidden by predicted cue phase; active-window coverage is unverified (#365/#496)" : "confirmed emitter births retain a bounded phase handoff; native active-window coverage is unverified (#365/#496)" } : {}) };
 }
 

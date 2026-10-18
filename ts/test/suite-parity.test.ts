@@ -41,7 +41,7 @@ test("a main push Autoland lands waits for no farm run, and a direct main push s
 });
 
 const LOCAL_ONLY = ["private map-build inputs", "generated models stored", "fighter art reproduces (kobold)", "animation jitter [k3 measure #479]"];
-const HOSTED = ["clean room", "kind tags and type-check ts", "Autoland suite covers the farm suite", "cue models recorded in both looks"];
+const HOSTED = ["clean room", "kind tags and type-check ts", "Autoland suite covers the farm suite", "cue models and Classic effect record"];
 const EVERY_PATH = ["ts/scripts/prePush.ts", "build-inputs/original-clips-static-lights/kobold", CUE_MODEL_RECORD];
 
 const stubbed = (paths: readonly string[], ran: string[], exitCode = (_: Check) => 0): Local => ({

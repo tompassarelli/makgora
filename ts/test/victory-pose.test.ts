@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { playedMoves } from "../../tools/animations/hd-models";
+import { playedMoves } from "../../tools/animations/fighter-bodies";
 import { flashableSequences } from "../../tools/animations/white-flash-keys";
 import { originalClip, originalClipCount, originalClipNamed, originalClipNames } from "../src/generated/clips/fighterOriginalClipInfo";
 import { victoryAnimation } from "../src/game/presentation/matchAudio";
@@ -24,7 +24,7 @@ test("every fighter's Classic body carries its results-screen victory pose and n
     const victory = originalClipNamed(character, victoryAnimation(character));
     expect(victory, `${fighterName(character)} has no victory clip`).toBeDefined();
     const flashable = new Set(flashableSequences(character, motion.Sequences).map((sequence) => motion.Sequences.indexOf(sequence)));
-    expect(playedMoves(character, motion).classic.filter((index) => !flashable.has(index)), fighterName(character)).toEqual(flashable.has(victory as number) ? [] : [victory as number]);
+    expect(playedMoves(character, motion).filter((index) => !flashable.has(index)), fighterName(character)).toEqual(flashable.has(victory as number) ? [] : [victory as number]);
   }
 });
 

@@ -1,5 +1,4 @@
 import { type SessionWinsFrames, createSessionWinsFrames, presentSessionWinsFrames } from "./sessionWinsFrames";
-import { definitiveCues } from "../render/specialCueEffects";
 import { nextMatchCharacter, selectableMatchCharacter } from "../lobby/lobbyState";
 import { RULE_BUTTONS, RULE_HEIGHT, type RuleBox, type TrainingSetting, cpuSettingsBox, teamSettingsBox } from "./ruleButtons";
 import { RULE_HELP_HEIGHT, RULE_HELP_WIDTH, hoveredRule, ruleHelp, visibleRuleGroups } from "./ruleHelp";
@@ -772,7 +771,7 @@ export class SelectionPanel {
 
   private showHand(shown: boolean, x: number, y: number): void {
     BlzFrameSetVisible(this.hand, shown);
-    if (shown) placeTopLeft(this.hand, handLeft(x, definitiveCues(), true), handTop(y, definitiveCues(), true));
+    if (shown) placeTopLeft(this.hand, handLeft(x, true), handTop(y, true));
     const enabled = !shown && this.menuCursorAllowed;
     // Warcraft shows its cursor again on its own (a frame click), so the hidden state is asserted every update; the shown state is sent once.
     if (!enabled || this.cursorEnabled !== true) BlzEnableCursor(enabled);

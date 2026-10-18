@@ -33,10 +33,8 @@ test("no two moves or branches show the same startup and active pair, nor the sa
     [...fighterMoveCues(character), ...fighterBranchCues(character)].forEach((move, slot) => {
       const id = `${character}:${slot} ${move.spell}`;
       for (const phase of [move.startup, move.active]) {
-        for (const cue of [phase, phase.definitive ?? phase]) {
-          const signature = SIGNATURE_CUE_OWNERS.find(({ model }) => model === cue.model);
-          if (signature !== undefined) assertTrue(character === signature.owner || signature.sharedWith.includes(character));
-        }
+        const signature = SIGNATURE_CUE_OWNERS.find(({ model }) => model === phase.model);
+        if (signature !== undefined) assertTrue(character === signature.owner || signature.sharedWith.includes(character));
       }
       const pair = `${move.startup.model}|${move.active.model}`;
       assertEquals(pairs.get(pair), undefined, `${id} pair`);

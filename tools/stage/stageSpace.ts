@@ -22,7 +22,6 @@ export interface SearchSpec {
   readonly lightAmbient?: readonly Rgb[];
   readonly lightIntensity?: readonly number[];
   readonly pieces?: Readonly<Record<string, PieceAxes>>;
-  readonly modes?: readonly ("classic" | "definitive")[];
   readonly clients?: readonly number[];
   readonly finalists?: number;
 }

@@ -117,7 +117,6 @@ export class CombatEffects {
     }
     for (let i = 0; i < KO_BODY_COUNT; i++) {
       const character = at(SELECTABLE_CHARACTERS, floorMod(i, KO_FIGHTERS));
-      // The match body's hit clip where it plays from a timeline, so Definitive draws its _de.w3mod body.
       const index = originalClipNamed(character, "stand hit");
       const clip = index === undefined ? undefined : originalClip(character, index);
       const timeline = clip?.timeline === true ? clip : undefined;

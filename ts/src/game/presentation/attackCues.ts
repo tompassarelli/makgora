@@ -20,8 +20,6 @@ const cue = (model: string, scale: number): Cue => ({ model, anchor: "body", sca
 export interface AttackCue {
   readonly name: string;
   readonly fromActive: number;
-  // Definitive Popcorn emitters ignore time seeks and draw nothing on their birth frame, so their cue can be born earlier.
-  readonly definitiveFromActive?: number | undefined;
   readonly cue: Cue;
 }
 
@@ -82,7 +80,7 @@ export interface AttackCueState {
 const scratch: HitRegion = emptyHitRegion();
 
 
-export function attackCueState(fighter: Readonly<Fighter>, out: AttackCueState, definitive = false): AttackCueState {
+export function attackCueState(fighter: Readonly<Fighter>, out: AttackCueState): AttackCueState {
   out.cue = undefined;
   const { style, frame, smashChargeFrames } = fighter.attack;
   if (style === undefined || fighter.status.out) return out;
@@ -97,7 +95,7 @@ export function attackCueState(fighter: Readonly<Fighter>, out: AttackCueState, 
     let chosen = 0;
     for (let entry = 0; entry < cues.length; entry++) {
       const each = cues[entry];
-      if (((definitive ? each?.definitiveFromActive : undefined) ?? each?.fromActive ?? 0) <= activeFrame) chosen = entry;
+      if ((each?.fromActive ?? 0) <= activeFrame) chosen = entry;
     }
     out.cue = cues[chosen]?.cue;
     out.x = f32(f32(region.minX + region.maxX) * 0.5);
@@ -121,10 +119,7 @@ export function allAttackCueModels(): readonly string[] {
   const models: string[] = [];
   for (const { model } of Object.values(DISJOINT_CUES)) if (!models.includes(model)) models.push(model);
   for (const character of [ Character.rifleman, Character.demonHunter, ...HERO_ROSTER.map((hero) => hero.character)]) {
-    for (const { model, definitive } of fighterAttackCues(character)) {
-      if (!models.includes(model)) models.push(model);
-      if (definitive !== undefined && !models.includes(definitive.model)) models.push(definitive.model);
-    }
+    for (const { model } of fighterAttackCues(character)) if (!models.includes(model)) models.push(model);
   }
   return models;
 }

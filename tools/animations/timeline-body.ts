@@ -63,7 +63,7 @@ function preserveNonunitHolds(source: mdx.Model, model: mdx.Model, sequences: re
             track.Keys.sort((a, b) => a.Frame - b.Frame);
             const id = model.PivotPoints.length;
             const node: mdx.Node = { Name: `${bone.Name} hold ${suffix}`, ObjectId: id, Parent: parent, Flags: 0, PivotPoint: new Float32Array(bone.PivotPoint), [property]: track };
-            // HD and Definitive skin the moved vertices only when the final node is a bone.
+            // HD skins the moved vertices only when the final node is a bone.
 
             if (suffix === 'inverse') model.Bones.push({ ...node, GeosetId: bone.GeosetId, GeosetAnimId: bone.GeosetAnimId });
             else model.Helpers.push(node);

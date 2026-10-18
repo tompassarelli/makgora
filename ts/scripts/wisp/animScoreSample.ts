@@ -27,7 +27,6 @@ import type { MoveClass, MoveSample, ScoreFrame, ScoreSkeleton } from "./animSco
 import { DrawnModel } from "./drawnModel";
 import { capture, type PoseFrame } from "./hurtboxView";
 
-export type Look = "classic" | "definitive";
 
 
 export const SCORED_NORMALS: readonly { readonly move: string; readonly style: AttackStyle; readonly moveClass: MoveClass; readonly aerial: boolean }[] = [
@@ -104,20 +103,16 @@ export function gameplayPixelsPerUnit(): number {
 }
 
 
-export function bodyPath(assets: string, character: Character, look: Look): { readonly classic: string; readonly definitive: string } {
+export function bodyPath(assets: string, character: Character): string {
   const clip = originalClip(character, 0);
   if (clip === undefined) throw new Error(`${fighterSlug(character)} has no clip table`);
   const relative = clip.modelPath.replaceAll("\\", "/");
   const root = join(assets, "original-clips-static-lights/imports");
-  void look;
-  return { classic: join(root, relative), definitive: join(root, "_de.w3mod", relative) };
+  return join(root, relative);
 }
 
-export async function loadBody(assets: string, character: Character, look: Look): Promise<DrawnModel> {
-  const paths = bodyPath(assets, character, look);
-
-  const path = look === "definitive" && await Bun.file(paths.definitive).exists() ? paths.definitive : paths.classic;
-  return new DrawnModel(await Bun.file(path).arrayBuffer(), characterModelScale(character));
+export async function loadBody(assets: string, character: Character): Promise<DrawnModel> {
+  return new DrawnModel(await Bun.file(bodyPath(assets, character)).arrayBuffer(), characterModelScale(character));
 }
 
 export function skeletonOf(model: DrawnModel, character: Character): ScoreSkeleton {

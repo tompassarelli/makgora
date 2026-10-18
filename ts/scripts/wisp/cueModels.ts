@@ -2,45 +2,14 @@ import { createHash } from "node:crypto";
 import { effectUses, judgeUse, modelFactsKey, calibrationProblem, EFFECT_CALIBRATION, FACTS_VERSION, type EffectUse, type EffectFinding, type ModelFacts } from "./effectVisibility";
 import { fighterCueList, MISSING_CUE_MODEL } from "../../src/game/presentation/specialCues";
 import { allAttackCueModels } from "../../src/game/presentation/attackCues";
-import { DEFINITIVE_ACCENT_REDRAWS, DISJOINT_CUES } from "../../src/game/presentation/disjointCues";
-import { DEFINITIVE_PROJECTILE_REDRAWS, allProjectileModels } from "../../src/game/presentation/projectileArt";
+import { allProjectileModels } from "../../src/game/presentation/projectileArt";
 import { Character } from "../../src/game/sim/codes";
 import { CANDLE_FLAME_MODELS, CANDLE_SMOKE } from "../../src/game/presentation/candleLook";
-
-export type Look = "same" | "redrawn";
 
 export const CUE_MODEL_RECORD = "ts/scripts/wisp/cue-models.tsv";
 export const RECORD_COMMAND = "bun scripts/cueModels.ts --record";
 
 export const cueModels = () => [...new Set([...Object.values(Character).flatMap(character => fighterCueList(character).map(cue => cue.model)), ...allAttackCueModels(), ...allProjectileModels(), ...CANDLE_FLAME_MODELS, CANDLE_SMOKE.model, MISSING_CUE_MODEL])];
-
-export const redrawCandidates = () => [...new Set([...Object.values(DISJOINT_CUES).map(cue => cue.model), ...allProjectileModels()])];
-
-export const listedRedraws = (): { readonly [model: string]: string } => ({ ...DEFINITIVE_ACCENT_REDRAWS, ...DEFINITIVE_PROJECTILE_REDRAWS });
-
-export function unlistedRedraws(candidates: readonly string[], listed: { readonly [model: string]: string }, looks: ReadonlyMap<string, Look>): string[] {
-  return candidates.filter(model => listed[model] === undefined && looks.get(model) === "redrawn");
-}
-
-export const redrawProblem = (redrawn: readonly string[]) => `Definitive redraws these contact accents or projectiles as different models; review each in Definitive and list it in DEFINITIVE_ACCENT_REDRAWS (disjointCues.ts) or DEFINITIVE_PROJECTILE_REDRAWS (projectileArt.ts), or choose another: ${redrawn.join("; ")}`;
-
-export function recordProblem(models: readonly string[], candidates: readonly string[], listed: { readonly [model: string]: string }, looks: ReadonlyMap<string, Look>): string | undefined {
-  const unrecorded = [...new Set([...models, ...candidates])].filter(model => !looks.has(model));
-  if (unrecorded.length > 0) return `No Classic and Definitive check is recorded in ${CUE_MODEL_RECORD} for these cue, accent or projectile models; from ts/ on a machine with the render-asset cache run ${RECORD_COMMAND} and commit the record: ${unrecorded.join("; ")}`;
-  const redrawn = unlistedRedraws(candidates, listed, looks);
-  return redrawn.length > 0 ? redrawProblem(redrawn) : undefined;
-}
-
-export function parseRecord(text: string): Map<string, Look> {
-  return new Map(text.split("\n").flatMap(line => {
-    const [look, model] = line.split("\t");
-    return (look === "same" || look === "redrawn") && model !== undefined && model.length > 0 ? [[model, look] as const] : [];
-  }));
-}
-
-export function formatRecord(looks: ReadonlyMap<string, Look>): string {
-  return [...looks].sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).map(([model, look]) => `${look}\t${model}\n`).join("");
-}
 
 export function touchesCueInputs(paths: readonly string[], inputs: ReadonlySet<string>): boolean {
   return paths.some(path => inputs.has(path) || [...inputs].some(input => input.endsWith("/") && path.startsWith(input)));

@@ -47,7 +47,7 @@ test("pre-push derives exactly the changed fighters with --check on the private 
 
 test("the derive steps read game rules only through the generated fighter art data and a few small tables, so a gameplay change outside them invalidates no fighter [k2 property]", () => {
   const game = [...derivedStepCode()].filter((path) => path.startsWith("ts/src/game/")).sort();
-  expect(game).toEqual(["ts/src/game/assets/definitiveFighters.ts", "ts/src/game/assets/importedModelInfo.ts", "ts/src/game/presentation/modelScale.ts", "ts/src/game/sim/codes.ts", "ts/src/game/sim/heroes/wardenSpin.ts"]);
+  expect(game).toEqual(["ts/src/game/assets/importedModelInfo.ts", "ts/src/game/sim/codes.ts"]);
   expect(derivedStepCode().has("ts/src/generated/fighterArtData.ts")).toBe(true);
   expect([...derivedStepCode()].filter((path) => path.startsWith("ts/src/generated/fighter-art/"))).toEqual([]);
 });

@@ -27,8 +27,7 @@ declare const arg: Readonly<Record<number, string | undefined>>;
 
 const [bundle, declarations, run = "quick-match", framesText = "1800", samples] = [arg[1], arg[2], arg[3], arg[4], arg[5]];
 if (bundle === undefined || declarations === undefined) throw new Error("usage: lua perf.lua MAP_LUA WARCRAFT_D_TS [RUN [FRAMES [samples]]]");
-const look = os.getenv("PERF_LOOK") === "definitive" ? "definitive" : "classic";
-const map = { filePrefix: "smashcraft", localNatives: SMASHCRAFT_LOCAL_NATIVES, intentionalNoops: SMASHCRAFT_NOOPS, natives: () => smashcraftNativeBehavior(undefined, look) };
+const map = { filePrefix: "smashcraft", localNatives: SMASHCRAFT_LOCAL_NATIVES, intentionalNoops: SMASHCRAFT_NOOPS, natives: () => smashcraftNativeBehavior() };
 const options = { samples: samples === "samples" };
 const computer = SELECTABLE_CHARACTERS.find((character) => run === `bot-${fighterSlug(character)}`);
 const humans = run === "playable-duel" ? HUMAN_DUEL : run === "playable-human-four" ? HUMAN_FOUR : undefined;

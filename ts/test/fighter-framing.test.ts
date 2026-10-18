@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { STAGE_CATALOG } from "../src/game/menu/stageCatalog";
 import { cameraPoint, extremeCamera, localCamera } from "../src/game/presentation/arenaCamera";
-import { CLOSEST_BODY_SHARE, FRAMING_MARGIN, fitFighterFrames, lookFrame } from "../src/game/presentation/fighterFraming";
+import { CLOSEST_BODY_SHARE, FRAMING_MARGIN, fitFighterFrames, bodyFrame } from "../src/game/presentation/fighterFraming";
 import { Character } from "../src/game/sim/codes";
 import { createFighter } from "../src/game/sim/fighter";
 import { advanceMatchCamera, createMatchCamera } from "../src/game/sim/matchCamera";
@@ -10,7 +10,6 @@ import { stageBounds } from "../src/game/sim/stageBounds";
 
 const ASPECTS = [16 / 9, 16 / 10, 4 / 3] as const;
 const ZOOMS = ["played", "near", "far"] as const;
-const LOOKS = ["classic", "definitive"] as const;
 const HEAD_ROOM = 0.03;
 const POSITIONS_PER_STAGE = 3;
 const STAGE_WIDTH_SLACK = 80;
@@ -27,10 +26,10 @@ function framings(visit: (framed: Framed) => void): { changedState: number } {
     const region = stageBounds(stage).camera;
     for (let sample = 0; sample < POSITIONS_PER_STAGE; sample++) {
       const placed = [a, b].map((character) => {
-        const classic = lookFrame(character, "classic"), definitive = lookFrame(character, "definitive");
-        const half = Math.max(-classic.left, classic.right, -definitive.left, definitive.right) + FRAMING_MARGIN.side + STAGE_WIDTH_SLACK;
+        const body = bodyFrame(character);
+        const half = Math.max(-body.left, body.right) + FRAMING_MARGIN.side + STAGE_WIDTH_SLACK;
         const fighter = createFighter(character, region.left + half + (region.right - region.left - 2 * half) * random(), random() < 0.5 ? -1 : 1);
-        fighter.motion.z = region.bottom + (region.top - Math.max(classic.top, definitive.top) - FRAMING_MARGIN.top - region.bottom) * random();
+        fighter.motion.z = region.bottom + (region.top - body.top - FRAMING_MARGIN.top - region.bottom) * random();
         return fighter;
       });
       const world = createRoster(3, placed);
@@ -50,20 +49,20 @@ function framings(visit: (framed: Framed) => void): { changedState: number } {
   return { changedState };
 }
 
-test("within the stage's zoom limit every fighter pair's whole body and head room stay in view under the closest-zoom height share, in both looks at 16:9, 16:10 and 4:3, close and far, without touching match state [k2 property]", () => {
+test("within the stage's zoom limit every fighter pair's whole body and head room stay in view under the closest-zoom height share at 16:9, 16:10 and 4:3, close and far, without touching match state [k2 property]", () => {
   const failures: string[] = [];
   let checked = 0, limited = 0;
   const { changedState } = framings(({ stage, aspect, zoom, held, camera, placed }) => {
     if (!held) { limited++; return; }
-    for (const look of LOOKS) for (const fighter of placed) {
-      const bounds = lookFrame(fighter.character, look);
+    for (const fighter of placed) {
+      const bounds = bodyFrame(fighter.character);
       const { x, z } = fighter.motion;
       const left = x + (fighter.facing > 0 ? bounds.left : -bounds.right), right = x + (fighter.facing > 0 ? bounds.right : -bounds.left);
       const low = cameraPoint(camera, aspect, left, z + bounds.bottom), lowRight = cameraPoint(camera, aspect, right, z + bounds.bottom);
       const head = cameraPoint(camera, aspect, left, z + bounds.top), headRight = cameraPoint(camera, aspect, right, z + bounds.top);
       checked++;
       const inside = [low, lowRight, head, headRight].every((point) => point.column >= 0 && point.column <= 1 && point.row <= 1 + 1e-9) && Math.min(head.row, headRight.row) >= HEAD_ROOM && low.row - head.row <= CLOSEST_BODY_SHARE + 1e-9;
-      if (!inside && failures.length < 10) failures.push(`${fighter.character} ${look} on stage ${stage} at (${x.toFixed(0)}, ${z.toFixed(0)}), aspect ${aspect.toFixed(2)}, ${zoom}: head row ${head.row.toFixed(3)}, columns ${low.column.toFixed(3)}..${lowRight.column.toFixed(3)}, feet row ${low.row.toFixed(3)}`);
+      if (!inside && failures.length < 10) failures.push(`${fighter.character} on stage ${stage} at (${x.toFixed(0)}, ${z.toFixed(0)}), aspect ${aspect.toFixed(2)}, ${zoom}: head row ${head.row.toFixed(3)}, columns ${low.column.toFixed(3)}..${lowRight.column.toFixed(3)}, feet row ${low.row.toFixed(3)}`);
     }
   });
   expect(failures).toEqual([]);

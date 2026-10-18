@@ -58,7 +58,8 @@ for (const { candidate, problems } of checked.filter(row => row.problems.length 
 
 const empty = new Map<number, Record<string, number>>(survivors.map(({ candidate }) => [candidate.index, {}]));
 const views: string[] = [];
-for (const mode of spec.modes ?? ["classic", "definitive"]) for (const client of spec.clients ?? [0]) {
+const mode = "classic";
+for (const client of spec.clients ?? [0]) {
   const directory = `${out}/${stageId}-${mode}-p${client}`;
   const own = scenes.filter(({ scene }) => scene.client === client);
   const fogs = [...new Map(survivors.map(({ candidate }) => [fogKey(candidate.scenery.fog), candidate.scenery.fog])).entries()];

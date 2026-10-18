@@ -31,7 +31,6 @@ import { PORTRAIT_QUALITY, encodeBlp, readTga } from "../blp";
 import { importedModelFile } from "../heroModelSource";
 import { CLIP_RECORDS, clipPoolFiles } from "../clipEvidence";
 import { importList } from "./importList";
-import { definitiveOverride } from "./definitiveBodies";
 import { PREVIEW_CACHE, mapArtImports } from "./mapArtImports";
 import { regenerateCommand } from "../stageThumbnailSpec";
 import { stageCardPath } from "./buildInputs";
@@ -48,7 +47,6 @@ const EMPTY_MODEL = "the map script names an empty model path";
 
 export const TOMB_WATERFALL_IMPORTS = [
   { entry: "_hd.w3mod\\Doodads\\Terrain\\CliffDoodad\\Waterfall\\Waterfall.mdx", file: "TombWaterfallHD.mdx" },
-  { entry: "_de.w3mod\\Doodads\\Terrain\\CliffDoodad\\Waterfall\\Waterfall.mdx", file: "TombWaterfallDE.mdx" },
 ] as const;
 const BuildOptions = Schema.Struct({
   edition: Schema.optional(Schema.Literals(["classic", "full"])),
@@ -69,7 +67,7 @@ type BuildOptions = typeof BuildOptions.Type;
 export type MapEdition = "classic" | "full";
 
 export const editionImports = (imports: readonly ArchiveEntry[], edition: MapEdition): readonly ArchiveEntry[] =>
-  edition === "full" ? imports : imports.filter(({ entry }) => !/^_(hd|de)\.w3mod[\\/]/i.test(entry));
+  edition === "full" ? imports : imports.filter(({ entry }) => !/^_hd\.w3mod[\\/]/i.test(entry));
 
 export const decodeBuildOptions = (args: readonly string[], defaultEdition: MapEdition = "full") => {
   const pairs = Object.fromEntries(args.flatMap((arg, index) => arg.startsWith("--") && args[index + 1] !== undefined ? [[arg.slice(2), args[index + 1]]] : []));
@@ -199,8 +197,7 @@ const carriedModels = (map: string, packager: string, models: readonly string[] 
 }));
 
 
-const UI_FRAME_FILES = [...UI_FRAMES.flatMap(({ definition }) => [`${definition.name}.fdf`, `${definition.name}.toc`]), "CueGraphics.toc", "CueGraphics.fdf"];
-const CUE_GRAPHICS_DE = { entry: "_de.w3mod\\war3mapImported\\CueGraphics.fdf", source: join(PROJECT, "tools/selection/art/CueGraphicsDE.fdf") };
+const UI_FRAME_FILES = UI_FRAMES.flatMap(({ definition }) => [`${definition.name}.fdf`, `${definition.name}.toc`]);
 
 
 
@@ -208,22 +205,18 @@ const CUE_GRAPHICS_DE = { entry: "_de.w3mod\\war3mapImported\\CueGraphics.fdf", 
 
 export const rebuildMap = (map: string) => Effect.gen(function*() {
   const packager = buildProject().packager;
-  const carried = yield* carriedModels(map, packager).pipe(step("script models carried"));
+  yield* carriedModels(map, packager).pipe(step("script models carried"));
   return yield* checkCueModels().pipe(
-    step("cue models resolved in both looks"),
+    step("cue models resolved"),
     Effect.andThen(MapBuild.use((maps) => maps.rebuild(map))),
     Effect.andThen(Effect.forEach(UI_FRAME_FILES, (file) => {
       const { entry, source } = imported(join(PROJECT, "tools/selection/art"), file);
       return runProcess(`replace ${entry}`, map, [packager, "replace", map, source, entry]);
     }, { discard: true })),
-    Effect.andThen(carried.has(CUE_GRAPHICS_DE.entry.toLowerCase())
-      ? runProcess("replace Definitive cue graphics", map, [packager, "replace", map, CUE_GRAPHICS_DE.source, CUE_GRAPHICS_DE.entry])
-      : Effect.void),
     step("menu frames replaced"),
   );
 });
 
-const DEFINITIVE_PREFIX = "_de.w3mod/";
 const imported = (directory: string, file: string): ArchiveEntry => ({ entry: `war3mapImported\\${file}`, source: join(directory, file) });
 
 
@@ -237,15 +230,10 @@ const PORTRAIT_CACHE = join(process.env.XDG_CACHE_HOME ?? join(homedir(), ".cach
 export const MAP_PORTRAITS: readonly string[] = RENDERED_FIGHTERS.flatMap((character) => PORTRAIT_KINDS.flatMap((kind) =>
   [...(kind === "Tile" ? [undefined] : []), ...PARTICIPANT_SLOTS].map((slot) => fighterPortrait(character, kind, slot))));
 
-/**
- * Each portrait twice: the Classic render at its path, and the Definitive render
- * (fighter-renders/de/) under _de.w3mod at the same path, which Definitive reads
- * first and Classic ignores, as the fighter bodies do (docs/design/hd-fighters.md).
- */
-const portraitImports = (assets: string, edition: MapEdition) => Effect.forEach(
-  MAP_PORTRAITS.flatMap((path): { entry: string; folder: readonly string[] }[] => [{ entry: path, folder: [] }, ...(edition === "full" ? [{ entry: `_de.w3mod\\${path}`, folder: ["de"] }] : [])]),
-  ({ entry, folder }) => Effect.gen(function*() {
-    const source = join(assets, "fighter-renders", ...folder, entry.replace(/^.*war3mapImported\\/, "").replace(/\.blp$/, ".tga"));
+const portraitImports = (assets: string) => Effect.forEach(
+  MAP_PORTRAITS,
+  (entry) => Effect.gen(function*() {
+    const source = join(assets, "fighter-renders", entry.replace(/^.*war3mapImported\\/, "").replace(/\.blp$/, ".tga"));
     const bytes = yield* tryMapPromise("read portrait", source, () => Bun.file(source).bytes());
     const encoded = join(PORTRAIT_CACHE, `${new Bun.CryptoHasher("sha256").update(bytes).digest("hex")}-q${PORTRAIT_QUALITY}.blp`);
     if (!(yield* tryMapPromise("check portrait cache", encoded, () => Bun.file(encoded).exists()))) {
@@ -262,7 +250,7 @@ export const glowFreeCaptureImports = Effect.fnUntraced(function*(imports: reado
     Array.from({ length: originalClipCount(character) }, (_, index) => originalClip(character, index))
       .flatMap((clip) => clip?.timeline ? [clip.modelPath] : [])));
   return yield* Effect.forEach(imports, (imported) => Effect.gen(function*() {
-    if (!bodies.has(imported.entry.replace(/^_(hd|de)\.w3mod\\/, ""))) return imported;
+    if (!bodies.has(imported.entry.replace(/^_hd\.w3mod\\/, ""))) return imported;
     const bytes = yield* tryMapPromise("read capture body", imported.source, () => Bun.file(imported.source).arrayBuffer());
     const model = yield* tryMapSync("decode capture body", imported.source, () => parseModelMDX(bytes));
     const removed = teamGlowGeosets(model);
@@ -302,8 +290,7 @@ export const importedAssets = (assets: string, summon: string, edition: MapEditi
     const path = join(assets, list);
     const files = yield* importLines(path);
     yield* requireListed(path, files, models, `package them with ${generator}`);
-    return files.filter((file) => !file.toLowerCase().endsWith(".mdx") || models.includes(`war3mapImported\\${file.replace(DEFINITIVE_PREFIX, "")}`)).map((file) =>
-      file.startsWith(DEFINITIVE_PREFIX) ? { entry: `_de.w3mod\\war3mapImported\\${file.slice(DEFINITIVE_PREFIX.length)}`, source: join(dirname(path), file) } : imported(dirname(path), file));
+    return files.filter((file) => !file.toLowerCase().endsWith(".mdx") || models.includes(`war3mapImported\\${file}`)).map((file) => imported(dirname(path), file));
   }));
   const evidencePath = join(summon, "summon-clips-evidence.json");
   const evidence = yield* readJson(SummonEvidence, evidencePath);
@@ -313,9 +300,6 @@ export const importedAssets = (assets: string, summon: string, edition: MapEditi
   const clipEvidencePath = join(clipDirectory, CLIP_RECORDS);
   const clipFiles = (yield* tryMapSync("read clip records", clipEvidencePath, () => clipPoolFiles(clipDirectory))).filter((file) => ORIGINAL_CLIP_MODELS.includes(`war3mapImported\\${file}`));
   const classicBodies = clipFiles.map((filename) => imported(join(clipDirectory, "imports/war3mapImported"), filename));
-  const classicWhites = generated.flat().filter(({ entry }) => Object.values(WHITE_FIGHTER_MODELS).includes(entry));
-  const definitiveOverrides = [...classicBodies, ...classicWhites].flatMap(({ entry }) => definitiveOverride(entry, generated.flat(), clipDirectory));
-  const whiteOverrides = new Set(definitiveOverrides.map(({ entry }) => entry));
   yield* requireListed(clipEvidencePath, clipFiles, ORIGINAL_CLIP_MODELS,
     `this assets folder's clip pool predates the checkout's clips. From the repository root, export a new pool from ${assets} ` +
     "with animation-assets and illidan-animation holding the packaged models fighterAssetInfo.ts and demonHunterAssetInfo.ts name: " +
@@ -329,21 +313,18 @@ export const importedAssets = (assets: string, summon: string, edition: MapEditi
     { entry: RIFLEMAN_MODEL_FILE, source: join(assets, "animation-assets/RiflemanFighter.mdx") },
     { entry: DEMON_HUNTER_MODEL_FILE, source: join(assets, "illidan-animation/DemonHunterFighter.mdx") },
     ...SELECTION_TEXTURES.map((texture) => imported(join(assets, "selection-assets"), `${texture}.tga`)),
-    { entry: "_de.w3mod\\war3mapImported\\SelectionHandPinch.tga", source: join(assets, "selection-assets/_de.w3mod/SelectionHandPinch.tga") },
-    ...(yield* portraitImports(assets, edition)),
+    ...(yield* portraitImports(assets)),
     ...(yield* mapArtImports(assets)),
 
     ...(yield* stageCardImports),
     ...["SmashcraftHUD.fdf", "SmashcraftHUD.toc", ...UI_FRAME_FILES].map((file) => imported(join(PROJECT, "tools/selection/art"), file)),
-    CUE_GRAPHICS_DE,
 
     ...IMPORTED_MUSIC.map(({ path, file }) => ({ entry: path, source: join(assets, "imported-models", file) })),
     ...IMPORTED_MODEL_FILES.map(({ entry, file }) => ({ entry, source: join(assets, "imported-models", file) })),
-    ...generated.flat().filter(({ entry }) => !whiteOverrides.has(entry)),
+    ...generated.flat(),
     ...TOMB_WATERFALL_IMPORTS.map(({ entry, file }) => ({ entry, source: join(assets, "stage-assets", file) })),
     ...summonFiles.map((filename) => imported(join(summon, "imports/war3mapImported"), filename)),
     ...classicBodies,
-    ...definitiveOverrides,
   ];
   const selected = editionImports(entries, edition);
   const problem = importProblem(selected);

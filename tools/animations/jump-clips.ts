@@ -1,7 +1,7 @@
 
 import { chmodSync, cpSync, mkdirSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
-import { FIGHTER_RIGS } from "./hd-rigs";
+import { FIGHTER_RIGS } from "./rigs";
 import { JUMP_CLIPS } from "../../ts/src/game/presentation/jumpClipInfo";
 import { clipFor } from "../../ts/src/game/presentation/fighterClips";
 import type { HeroClipTable } from "../../ts/src/game/sim/heroes/hero";

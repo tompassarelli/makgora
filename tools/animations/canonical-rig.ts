@@ -1,11 +1,10 @@
 import type { Character } from "../../ts/src/game/sim/codes";
 import { model as mdx } from '../../ts/scripts/clipNodes';
-import type { RetargetOptions } from './hd-retarget';
 
 const SIDES = ['L', 'R'] as const;
 const LIMB = ['clavicle', 'shoulder', 'elbow', 'wrist', 'hip', 'knee', 'ankle', 'toe'] as const;
 
-/** The neutral humanoid rig every fighter's motion is stored on (smashcraft:docs/design/hd-fighters.md, #366). */
+/** The neutral humanoid rig every fighter's motion is stored on (#366). */
 export const HUMANOID_JOINTS = [
     'root', 'pelvis', 'chest', 'neck', 'head',
     ...SIDES.flatMap(side => LIMB.map(joint => `${joint}.${side}` as const)),
@@ -16,26 +15,13 @@ const HUMANOID = new Set<string>(HUMANOID_JOINTS);
 
 /** A rig joint's node name in canonical motion; the prefix keeps it apart from a source node of the same name. */
 export const rigNode = (joint: string) => HUMANOID.has(joint) ? `@${joint}` : joint;
-export const isLegJoint = (name: string) => /^@(hip|knee|ankle|toe)\.[LR]$/.test(name);
 
-/**
- * One fighter's two body mappings onto the rig. A rig module exports these fields and nothing else:
- * no move, sequence or frame appears in it, so every move reaches both bodies through the same mapping.
- */
-export interface FighterRig extends RetargetOptions {
+/** One fighter's Classic body mapping onto the rig: no move, sequence or frame appears in it. */
+export interface FighterRig {
     readonly character: Character;
-    readonly stockPath?: string;
     /** Classic skeleton → rig: the Classic node that carries each humanoid joint. */
     readonly classic: Readonly<Partial<Record<HumanoidJoint, string>>>;
-    /** Rig → Definitive skeleton: a humanoid joint, or one of the fighter's own secondary joints, and the Definitive bone it drives. */
-    readonly pairs: readonly (readonly [string, string])[];
-    /** Stock Definitive meshes the fighter never shows, such as a mount it walks without; textures nothing else draws go too. */
-    readonly dropGeosets?: readonly number[];
-    /** The stock Definitive body mirrored left to right, when it carries its weapon in the other hand than Classic. */
-    readonly mirror?: boolean;
-    readonly definitiveFit?: (motion: mdx.Model, bytes: ArrayBuffer) => { readonly bytes: ArrayBuffer; readonly report: object };
 }
-export const RIG_FIELDS: ReadonlySet<string> = new Set(['character', 'fighter', 'stockPath', 'classic', 'pairs', 'fitScale', 'limbScales', 'visibilityPairs', 'alignRoot', 'heldProps', 'stockRestJoints', 'propTurns', 'dropGeosets', 'mirror', 'definitiveFit']);
 
 function renamed(model: mdx.Model, names: ReadonlyMap<string, string>): mdx.Model {
     const copy = structuredClone(model);
@@ -59,8 +45,7 @@ function classicNames(model: mdx.Model, rig: FighterRig): Map<string, string> {
 
 /**
  * A fighter's canonical motion: its authored moves on the rig. Humanoid joints take their `rigNode` names, the fighter's
- * other animated nodes are its own secondary joints, and the mesh is the reference silhouette the bodies plant and
- * fit against. Today's Classic animations are its first source.
+ * other animated nodes are its own secondary joints. Today's Classic animations are its source.
  */
 export function canonicalMotion(authored: mdx.Model, rig: FighterRig): mdx.Model {
     return renamed(authored, classicNames(authored, rig));

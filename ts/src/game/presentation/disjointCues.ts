@@ -45,13 +45,6 @@ export const DISJOINT_CUES: { readonly [character: number]: Cue } = {
 
 const FORSAKEN_SWORD_NORMALS: readonly AttackStyle[] = Object.values(AttackStyle).filter(style => forsakenPaladinSwordAttack(Character.forsakenPaladin, style));
 
-export const DEFINITIVE_ACCENT_REDRAWS: { readonly [model: string]: string } = {
-  "Abilities\\Spells\\NightElf\\FanOfKnives\\FanOfKnivesMissile.mdx": "Popcorn knife",
-  "Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx": "Popcorn holy light",
-  "Abilities\\Spells\\Other\\FrostDamage\\FrostDamage.mdx": "Popcorn frost burst",
-  "Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedDamage.mdx": "Popcorn red flame",
-};
-
 
 export function disjointNormals(fighter: Readonly<Fighter>): readonly AttackStyle[] {
   if (fighter.character === Character.forsakenPaladin) return FORSAKEN_SWORD_NORMALS;

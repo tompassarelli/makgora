@@ -1,12 +1,9 @@
-// Renders every fighter's portrait pose through Wisp's headless renderer, once in
-// Classic and once in Definitive, from the body the match draws in each mode
-// (the Definitive body resolves under _de.w3mod, docs/design/hd-fighters.md).
-// Both sets share one camera, light and pose, so only the graphics mode differs.
-// Usage: bun scripts/fighterPortraits.ts PRIVATE_OUTPUT [--only NAME,...] [--graphics classic|definitive] [--orientation]
+// Renders every fighter's portrait pose through Wisp's headless renderer from the
+// Classic body the match draws.
+// Usage: bun scripts/fighterPortraits.ts PRIVATE_OUTPUT [--only NAME,...] [--orientation]
 // --orientation only checks each portrait pose draws its head upright, without rendering.
-// Writes the raw 1024 px renders to PRIVATE_OUTPUT/{classic,definitive}/ and the
-// map's portraits to PRIVATE_OUTPUT/fighter-renders/ (Classic) and its de/
-// folder (Definitive), with each Classic Bust's Wisp portrait receipt in
+// Writes the raw 1024 px renders to PRIVATE_OUTPUT/classic/ and the map's portraits
+// to PRIVATE_OUTPUT/fighter-renders/, with each Bust's Wisp portrait receipt in
 // fighter-renders/receipts/: store that folder as the fighter-renders family.
 import { mkdirSync, readdirSync, renameSync, rmSync, symlinkSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
@@ -32,9 +29,6 @@ import { RECEIPTS, resolvedParts, type PortraitReceipt } from './portraitParts';
 const [outputArg] = process.argv.slice(2);
 const only = process.argv.includes('--only') ? process.argv[process.argv.indexOf('--only') + 1]?.split(',') : undefined;
 const orientationOnly = process.argv.includes('--orientation');
-const graphicsArg = process.argv.includes('--graphics') ? process.argv[process.argv.indexOf('--graphics') + 1] : undefined;
-if (graphicsArg !== undefined && graphicsArg !== 'classic' && graphicsArg !== 'definitive') throw new Error('--graphics must be classic or definitive');
-const graphicsModes: readonly ('classic' | 'definitive')[] = graphicsArg === undefined ? ['classic', 'definitive'] : [graphicsArg];
 if (outputArg === undefined) throw new Error('usage: bun scripts/fighterPortraits.ts PRIVATE_OUTPUT [--only NAME,...]');
 const output = resolve(outputArg);
 if (!relative(resolve(import.meta.dir, '../..'), output).startsWith('..')) throw new Error('Renders stay outside the repository');
@@ -263,32 +257,14 @@ interface Portrait { readonly elapsed: number; readonly yaw: number; readonly an
  * (the head bone's local up axis points down on screen, so the upright check reverses it).
  */
 interface Correction { readonly rest?: boolean; readonly turn?: number; readonly elapsed?: number; readonly angle?: number; readonly zoom?: number; readonly level?: boolean; readonly lift?: number; readonly body?: boolean; readonly flipped?: boolean; readonly shift?: readonly [number, number]; readonly bones?: Readonly<Record<string, readonly [number, number, number]>> }
-const CORRECTIONS: Readonly<Record<'classic' | 'definitive', Readonly<Record<string, Correction>>>> = {
-  classic: {
-    "Anub'arak": { zoom: 0.6, angle: -30 },
-    Lich: { lift: 1.3, zoom: 1.2 },
-    Murloc: { zoom: 1.2, shift: [0.14, 0] },
-    PitLord: { lift: 1.3 },
-    MalfurionStormrage: { lift: 1.3 },
-  },
-  definitive: {
-    MountainKing: { level: true, zoom: 1.5 },
-    Illidan: { level: true, zoom: 1.5, turn: 25 },
-    Kobold: { rest: true, zoom: 1.5 },
-    Rifleman: { zoom: 1.5, turn: 25 },
-    Warden: { zoom: 1.5, turn: 25 },
-    ShadowHunter: { level: true, zoom: 1.5 },
-    "Kael'thasSunstrider": { angle: 15, turn: 30 },
-    CairneBloodhoof: { elapsed: 30.5, angle: 20, zoom: 1.5 },
-    "Anub'arak": { flipped: true },
-    Lich: { zoom: 1.2 },
-    LichKing: { turn: 150, zoom: 1.5 },
-    JainaProudmoore: { zoom: 1.2 },
-    MalfurionStormrage: { zoom: 2.2, shift: [0, 0.5] },
-    Murloc: { rest: true, body: true, zoom: 0.7, shift: [0.3, 1.6], bones: { bone_head: [0, -20, 0] } },
-  },
+const CORRECTIONS: Readonly<Record<string, Correction>> = {
+  "Anub'arak": { zoom: 0.6, angle: -30 },
+  Lich: { lift: 1.3, zoom: 1.2 },
+  Murloc: { zoom: 1.2, shift: [0.14, 0] },
+  PitLord: { lift: 1.3 },
+  MalfurionStormrage: { lift: 1.3 },
 };
-const correctionOf = (graphics: 'classic' | 'definitive', character: number): Correction => CORRECTIONS[graphics][fighterRenderName(character)] ?? {};
+const correctionOf = (character: number): Correction => CORRECTIONS[fighterRenderName(character)] ?? {};
 
 type Vector = [number, number, number];
 /** A node matrix's linear part (w 0) or affine map (w 1) applied to v. */
@@ -302,15 +278,14 @@ const mean = (points: readonly (readonly number[])[]): Vector => {
 };
 type Posed = ReturnType<ReturnType<typeof posedAt>['pose']>;
 
-/** Joints that sit on a face: Classic eyes, jaws and face bones, Definitive's ffx and bind joints. */
+/** Joints that sit on a face: eyes, jaws and face bones. */
 const FACE_JOINT = /(^|[_ ])(nose|eyes?|jaw|face)(?![a-z])/i;
 
 /**
  * The head: the head bone (or, where the named one carries no face joints, the
- * sibling joint beside it that does, as on Definitive's bind rigs; without a
- * named one, the face joints' most common parent), the joints beneath it, and
- * the vertices bound mostly to it or its direct children (Classic face meshes,
- * Definitive jaws and eyes; deeper chains carry beards, cloth and plumes), with
+ * sibling joint beside it that does; without a named one, the face joints' most
+ * common parent), the joints beneath it, and the vertices bound mostly to it or
+ * its direct children (face meshes; deeper chains carry beards, cloth and plumes), with
  * each vertex's bone weights.
  */
 function headOf(model: Model) {
@@ -341,16 +316,12 @@ function headOf(model: Model) {
   return { head, joints: below, vertices };
 }
 
-/** Definitive's eyeball joints, by side (the model's left is +y). */
-const EYE = { L: /^(ffx_eye_L0_eye_jnt|L_eye_bind_jnt)$/i, R: /^(ffx_eye_R0_eye_jnt|R_eye_bind_jnt)$/i };
 /** Head meshes with fewer vertices than this can't place a face. */
 const HEAD_VERTICES = 50;
 
 /**
- * The face's heading where the body is drawn, radians about z from +x. With a
- * pair of eyeballs (Definitive rigs, whose bind poses aren't all level), level
- * and square to the posed line across them. Otherwise the bind pose's level
- * head-bone-to-nose (else eyes, else the head mesh's forward-most tenth;
+ * The face's heading where the body is drawn, radians about z from +x: the bind
+ * pose's level head-bone-to-nose (else eyes, else the head mesh's forward-most tenth;
  * Warcraft models face +x) direction, turned by the bone carrying most of the
  * head mesh.
  */
@@ -358,21 +329,18 @@ function headingOf(model: Model, head: NonNullable<ReturnType<typeof headOf>>): 
   const pivot = (id: number) => Array.from(model.PivotPoints[id] ?? [0, 0, 0]);
   const at = (state: Posed, ids: readonly number[]) => { const points = ids.flatMap((id) => { const matrix = state.nodes[id]?.matrix; return matrix === undefined ? [] : [apply(matrix, pivot(id), 1)]; }); return points.length === ids.length ? mean(points) : undefined; };
   const joints = (pattern: RegExp) => head.joints.filter((joint) => pattern.test(joint.name)).map((joint) => joint.id);
-  const left = joints(EYE.L), right = joints(EYE.R);
   const level = (from: readonly number[], to: readonly number[]) => { const dx = item(to, 0) - item(from, 0), dy = item(to, 1) - item(from, 1); return Math.hypot(dx, dy) > 1e-3 ? [dx, dy, 0] : undefined; };
-  const eyes = left.length > 0 && right.length > 0;
-  const named = eyes ? [...left, ...right] : ([/nose/i, /eye/i].map((pattern) => joints(pattern)).find((found) => found.length > 0) ?? []);
+  const named = [/nose/i, /eye/i].map((pattern) => joints(pattern)).find((found) => found.length > 0) ?? [];
   const front = head.vertices.map((vertex) => vertex.position).sort((a, b) => b[0] - a[0]).slice(0, Math.ceil(head.vertices.length / 10));
   const bind = (named.length > 0 ? level(pivot(head.head), mean(named.map(pivot))) : undefined)
     ?? (head.vertices.length >= HEAD_VERTICES ? level(mean(head.vertices.map((vertex) => vertex.position)), mean(front)) : undefined);
   if (bind === undefined) return undefined;
   const load = new Map<number, number>();
   for (const vertex of head.vertices) for (const [bone, weight] of vertex.weights) load.set(bone, (load.get(bone) ?? 0) + weight);
-  const carrier = eyes ? head.head : [...load].reduce<[number, number]>((best, entry) => entry[1] > best[1] ? entry : best, [head.head, 0])[0];
+  const carrier = [...load].reduce<[number, number]>((best, entry) => entry[1] > best[1] ? entry : best, [head.head, 0])[0];
   const face = (state: Posed) => { const matrix = state.nodes[carrier]?.matrix; return matrix === undefined ? undefined : apply(matrix, bind, 0); };
   return {
     heading: (state) => {
-      if (eyes) { const l = at(state, left), r = at(state, right); return l === undefined || r === undefined ? undefined : Math.atan2(r[0] - l[0], l[1] - r[1]); }
       const posed = face(state); return posed === undefined ? undefined : Math.atan2(posed[1], posed[0]);
     },
     pitch: (state) => { const posed = face(state); return posed === undefined ? undefined : Math.atan2(posed[2], Math.hypot(posed[0], posed[1])); },
@@ -485,11 +453,6 @@ const TILE_BACKGROUND = ['-size', `${TILE_TEXTURE_PX}x${TILE_TEXTURE_PX}`, 'radi
 const BUST_FADE = 'min(min(1, (1 - j / h) / 0.3), min(i / (w * 0.1), (w - i) / (w * 0.1)))';
 const STOCK_FADE = 'max(0, min(1, (0.5 - hypot(i / w - 0.5, j / h - 0.5)) / 0.1))';
 const fadeAlpha = (mask: string) => ['(', '+clone', '-alpha', 'extract', '(', '+clone', '-fx', mask, ')', '-compose', 'multiply', '-composite', ')', '-compose', 'CopyOpacity', '-composite'];
-/**
- * Definitive's physically lit bodies fall mostly into shadow under the match's
- * side light; a gamma lift brings them to the Classic set's brightness.
- */
-const DEFINITIVE_LIFT = 1.4;
 const TGA = ['-depth', '8', '-compress', 'none'];
 
 /**
@@ -526,14 +489,13 @@ function crops(raw: string, directory: string, name: string, suffix: string, kin
 
 await Effect.runPromise(Effect.gen(function*() {
   const stored = assetsView(yield* readManifest());
-  // The renderer reads every map import, the Definitive portraits included, before
+  // The renderer reads every map import, the portraits included, before
   // they exist: a private overlay of the inputs stands the stored portraits in for them.
   const assets = join(output, 'inputs');
   rmSync(assets, { recursive: true, force: true });
   mkdirSync(join(assets, 'fighter-renders'), { recursive: true });
   for (const family of readdirSync(stored)) if (family !== 'fighter-renders') symlinkSync(join(stored, family), join(assets, family));
-  for (const file of readdirSync(join(stored, 'fighter-renders'))) if (file !== 'de') symlinkSync(join(stored, 'fighter-renders', file), join(assets, 'fighter-renders', file));
-  symlinkSync(join(stored, 'fighter-renders', 'de'), join(assets, 'fighter-renders', 'de'));
+  for (const file of readdirSync(join(stored, 'fighter-renders'))) symlinkSync(join(stored, 'fighter-renders', file), join(assets, 'fighter-renders', file));
   const captured = new Map<number, RenderScene>();
   for (const character of fighters) {
     const name = fighterKey(character);
@@ -550,7 +512,7 @@ await Effect.runPromise(Effect.gen(function*() {
       const pass = LIGHT_PASSES.find((candidate) => lightPath(candidate) === args[0]);
       if (pass !== undefined) return { requested: args[0], graphics: args[1] ?? 'classic', attempts: [], selected: { source: 'project' as const, layer: 'base' as const, path: args[0] }, bytes: new TextEncoder().encode(portraitLightMdl(pass)) };
       const body = bodies.get(args[0].toLowerCase());
-      const correction = body === undefined ? {} : correctionOf(args[1] === 'definitive' ? 'definitive' : 'classic', body);
+      const correction = body === undefined ? {} : correctionOf(body);
       const resolved = await stock.resolveAsset(...args);
       if (body === undefined || resolved.bytes === undefined) return resolved;
       const posed = args[1] === 'classic' && CLASSIC_REST_POSE.includes(body) ? restPose(resolved.bytes) : correction.rest === true ? bindPose(resolved.bytes) : resolved.bytes;
@@ -558,13 +520,13 @@ await Effect.runPromise(Effect.gen(function*() {
     } };
   const wide0 = { x: 0, z: 120, height: 700 };
   const upsideDown: string[] = [];
-  for (const graphics of graphicsModes) {
+  for (const graphics of ['classic'] as const) {
     const directory = join(output, graphics);
     const poses = new Map<number, Portrait>();
     for (const character of fighters) {
       const body = at(portraitScene(required(captured.get(character), 'scene'), character, wide0, 0).effects, 0);
       const bytes = (yield* Effect.promise(() => project.resolveAsset(body.model, graphics))).bytes;
-      const correction = correctionOf(graphics, character);
+      const correction = correctionOf(character);
       const found = bytes === undefined || correction.body === true ? undefined : portraitPose(bytes, character, body.animation, body.animationElapsed, correction);
       const pose = found ?? { elapsed: correction.elapsed ?? body.animationElapsed, yaw: FACE_AZIMUTH + (correction.turn ?? 0) * Math.PI / 180, angle: correction.angle ?? ANGLE, zoom: correction.zoom ?? 1, lift: correction.lift ?? 1, body: correction.body === true };
       poses.set(character, pose);
@@ -575,7 +537,7 @@ await Effect.runPromise(Effect.gen(function*() {
       for (const character of fighters) for (const variant of VARIANTS.keys()) {
         const scene = portraitScene(required(captured.get(character), 'scene'), character, wide0, variant, poses.get(character)), body = at(scene.effects, 0);
         const bytes = (yield* Effect.promise(() => project.resolveAsset(body.model, graphics))).bytes;
-        const found = bytes === undefined || required(poses.get(character), 'pose').body ? undefined : headBox(bytes, scene, wide0.height, correctionOf(graphics, character).flipped);
+        const found = bytes === undefined || required(poses.get(character), 'pose').body ? undefined : headBox(bytes, scene, wide0.height, correctionOf(character).flipped);
         if (found !== undefined && !found.upright) upsideDown.push(`${graphics} ${fighterRenderName(character)}${at(VARIANTS, variant).suffix}`);
       }
       continue;
@@ -602,25 +564,22 @@ await Effect.runPromise(Effect.gen(function*() {
       images = yield* renderScenes(project, fitted.map((scene) => lit(scene, pass)), join(directory, `fitted-${pass.name}`), graphics);
       passes[pass.name] = join(directory, `fitted-${pass.name}`);
     }
-    const portraits = join(output, 'fighter-renders', ...(graphics === 'definitive' ? ['de'] : []));
+    const portraits = join(output, 'fighter-renders');
     mkdirSync(portraits, { recursive: true });
-    const linear = graphics === 'definitive';
-    const gammaOf = (character: number) => (linear ? DEFINITIVE_LIFT : 1) * required(poses.get(character), 'pose').lift;
+    const gammaOf = (character: number) => required(poses.get(character), 'pose').lift;
     const draw = function*(frame: number, image: string, weights: readonly number[], gamma: number, into: string, kinds?: readonly PortraitKind[]) {
       const character = Math.floor(frame / VARIANTS.length), variant = frame % VARIANTS.length;
       const name = fighterRenderName(character), suffix = at(VARIANTS, variant).suffix;
       const raw = join(directory, `${name}${suffix}.png`);
-      // Classic lights in display space and Definitive in linear space, so each sums its passes where its shader adds them.
-      const space = linear ? ['-colorspace', 'RGB'] : [];
-      const summed = LIGHT_PASSES.flatMap((pass, index) => ['(', join(required(passes[pass.name], 'pass'), image), '-alpha', 'off', ...space, '-evaluate', 'multiply', String(weights[index] ?? 0), ')', ...(index === 0 ? [] : ['-compose', 'plus', '-composite'])]);
+      const summed = LIGHT_PASSES.flatMap((pass, index) => ['(', join(required(passes[pass.name], 'pass'), image), '-alpha', 'off', '-evaluate', 'multiply', String(weights[index] ?? 0), ')', ...(index === 0 ? [] : ['-compose', 'plus', '-composite'])]);
       const masks = LIGHT_PASSES.flatMap((pass, index) => ['(', join(required(passes[pass.name], 'pass'), image), '-alpha', 'off', '-fill', 'white', '+opaque', `rgb(${CLEAR.join(',')})`, '-fill', 'black', '-opaque', `rgb(${CLEAR.join(',')})`, ')', ...(index === 0 ? [] : ['-compose', 'lighten', '-composite'])]);
-      run(['magick', ...summed, ...(linear ? ['-colorspace', 'sRGB'] : []), ...(gamma === 1 ? [] : ['-gamma', String(gamma)]), '(', ...masks, ')', '-compose', 'CopyOpacity', '-composite', '-resize', `${RESOLUTION}x${RESOLUTION}`, `PNG32:${raw}.tmp`]);
+      run(['magick', ...summed, ...(gamma === 1 ? [] : ['-gamma', String(gamma)]), '(', ...masks, ')', '-compose', 'CopyOpacity', '-composite', '-resize', `${RESOLUTION}x${RESOLUTION}`, `PNG32:${raw}.tmp`]);
       renameSync(`${raw}.tmp`, raw);
       // The grid keeps the neutral tile; the slot outfits carry every kind (MAP_PORTRAITS).
       const scene = required(scenes.get(frame), 'scene'), body = at(scene.effects, 0);
       const bytes = (yield* Effect.promise(() => project.resolveAsset(body.model, graphics))).bytes;
       const kept = kinds ?? (variant === 0 ? ['Tile'] : PORTRAIT_KINDS);
-      const cut = crops(raw, into, name, suffix, kept, bytes === undefined || required(poses.get(character), 'pose').body ? undefined : headBox(bytes, scene, required(heights.get(character), 'height'), correctionOf(graphics, character).flipped), required(poses.get(character), 'pose').zoom, correctionOf(graphics, character).shift);
+      const cut = crops(raw, into, name, suffix, kept, bytes === undefined || required(poses.get(character), 'pose').body ? undefined : headBox(bytes, scene, required(heights.get(character), 'height'), correctionOf(character).flipped), required(poses.get(character), 'pose').zoom, correctionOf(character).shift);
       if (!cut.upright) upsideDown.push(`${graphics} ${name}${suffix}`);
       if (graphics === 'classic' && into === portraits && kept.includes('Bust') && bytes !== undefined) {
         const nodes = new Set(parseMDX(bytes.slice().buffer).Nodes.flatMap((node) => node === undefined ? [] : [node.Name]));
@@ -651,7 +610,7 @@ await Effect.runPromise(Effect.gen(function*() {
         yield* draw(frame, image, LIGHT_PASSES.map((_, other) => other === index ? 1 : 0), 1, into, ['Bust']);
         busts.push(yield* bustPixels(join(into, `FighterBust${name}P1.tga`)));
       }
-      const lightAt = (weights: readonly number[], scale: number) => lightOf(combine(busts, weights.map((weight) => weight * scale), linear, gammaOf(character)));
+      const lightAt = (weights: readonly number[], scale: number) => lightOf(combine(busts, weights.map((weight) => weight * scale), gammaOf(character)));
       const options = LIGHT_VARIANTS.map((light) => {
         const weights = LIGHT_PASSES.map((pass) => light.weights[pass.name]);
         const scale = exposureFor((value) => lightAt(weights, value).mean);
@@ -666,6 +625,6 @@ await Effect.runPromise(Effect.gen(function*() {
       console.log(`${graphics}: ${yield* draw(frame, image, required(lighting.get(character), 'lighting'), gammaOf(character), portraits)}`);
     }
   }
-  if (orientationOnly && upsideDown.length === 0) console.log(`upright: ${fighters.length} fighters in ${graphicsModes.join(", ")}`);
+  if (orientationOnly && upsideDown.length === 0) console.log(`upright: ${fighters.length} fighters`);
   if (upsideDown.length > 0) { console.log(`FAIL head drawn upside down: ${[...new Set(upsideDown)].join(', ')}`); process.exitCode = 1; }
 }));

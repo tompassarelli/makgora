@@ -8,7 +8,6 @@ import { Effect } from "effect";
 import { INPUTS_STORE, assetsView, pinHashes, readManifest } from "../scripts/wisp/buildInputs";
 import { DrawnModel } from "../scripts/wisp/drawnModel";
 import { sampleState } from "../scripts/wisp/hurtboxView";
-import { DEFINITIVE_FIGHTERS } from "../src/game/assets/definitiveFighters";
 import { originalClip } from "../src/generated/clips/fighterOriginalClipInfo";
 import { characterModelScale } from "../src/game/presentation/modelScale";
 import { Character } from "../src/game/sim/codes";
@@ -44,11 +43,9 @@ function drawnHeight(triangles: Float32Array, half: number): number {
 }
 
 
-const LOOK_TOLERANCE = 0.1;
-
 const manifest = Effect.runSync(readManifest());
 const POOL = "original-clips-static-lights";
-test("every fighter's drawn Stand height fits its hurt capsule in both looks, and Definitive matches Classic or its capsule within 10% [k3 measure docs/design/hd-fighters.md]", async () => {
+test("every fighter's drawn Stand height fits its hurt capsule [k3 measure docs/design/hurtbox-legibility.md]", async () => {
   const pinned = pinHashes(manifest[POOL]);
   const missing = pinned.filter((hash) => !existsSync(join(INPUTS_STORE, POOL, hash)));
   if (missing.length === pinned.length) return;
@@ -64,14 +61,8 @@ test("every fighter's drawn Stand height fits its hurt capsule in both looks, an
     const body = (originalClip(character, 0)?.modelPath ?? "").split("\\");
     const height = async (path: string) => drawnHeight(new DrawnModel(await Bun.file(path).arrayBuffer(), characterModelScale(character)).triangles(0, clip.startSeconds + frame.seconds, 1), half);
     const classic = await height(join(family, "imports", ...body));
-    const definitive = DEFINITIVE_FIGHTERS.has(character) ? await height(join(family, "imports", "_de.w3mod", ...body)) : classic;
-    for (const [look, drawn] of [["classic", classic], ["definitive", definitive]] as const) {
-      const ratio = drawn / hurt;
-      if (ratio < LOWEST || (ratio > HIGHEST && DEPARTURES[character] === undefined)) off.push(`${fighterSlug(character)} ${look}: drawn ${drawn.toFixed(0)} is ${ratio.toFixed(2)} of its hurt top ${hurt.toFixed(0)}`);
-    }
-    if (Math.abs(definitive / classic - 1) > LOOK_TOLERANCE && Math.abs(definitive / hurt - 1) > LOOK_TOLERANCE) {
-      off.push(`${fighterSlug(character)}: Definitive draws ${definitive.toFixed(0)}, ${(definitive / classic).toFixed(2)} of Classic's ${classic.toFixed(0)} and ${(definitive / hurt).toFixed(2)} of its hurt top`);
-    }
+    const ratio = classic / hurt;
+    if (ratio < LOWEST || (ratio > HIGHEST && DEPARTURES[character] === undefined)) off.push(`${fighterSlug(character)}: drawn ${classic.toFixed(0)} is ${ratio.toFixed(2)} of its hurt top ${hurt.toFixed(0)}`);
   }
   expect(off).toEqual([]);
 }, 60_000);

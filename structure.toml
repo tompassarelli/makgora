@@ -119,7 +119,7 @@ name = "fighter-look"
 paths = ["ts/src/game/fighters/*/look.ts", "ts/src/game/fighters/*/cues.ts", "ts/src/game/fighters/*/sounds.ts", "ts/src/game/stages/*/look.ts",
          "ts/src/game/presentation/model/**", "ts/src/game/presentation/heroes/**", "ts/src/game/sim/heroes/*Clips.ts",
          "ts/src/game/assets/stageLighting.ts", "ts/src/game/assets/stagePalette.ts", "ts/src/game/assets/stagePointLights.ts",
-         "ts/src/game/assets/definitiveFighters.ts", "ts/src/game/assets/importedModelInfo.ts"]
+         "ts/src/game/assets/importedModelInfo.ts"]
 responsibility = "One fighter's or stage's look (model, clip binding, cues, sounds, scale, labels) and the presentation types."
 may_use = ["fighter-kit", "core", "generated"]
 

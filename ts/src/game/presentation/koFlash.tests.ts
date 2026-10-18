@@ -77,7 +77,7 @@ test("the KO flash peaks at Silverpine's caps after the blow's hitlag and turns 
 const GAMMA = f32(2.2);
 
 
-// Native captures (#289): both looks draw nothing below alpha 4, and Reforged and Definitive blend in linear light.
+// Native captures (#289): both looks draw nothing below alpha 4, and Reforged blends in linear light.
 function washedLuma(scene: number, alpha: number, colour: number, reforged: boolean): number {
   const a = alpha < 4 ? 0 : alpha / 255;
   if (!reforged) return scene + (colour - scene) * a;

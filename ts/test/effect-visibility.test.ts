@@ -112,8 +112,7 @@ test("re-recording one model's changed Classic facts rewrites only its row [k1 s
 
 test("two lanes' Classic model facts merge row by row; changed uses are rejudged without a record change and only newly used models refuse [k1 scenario]", () => {
   const uses = effectUses();
-  const looks = (list: readonly EffectUse[]) => [...new Set(list.map(({ model }) => model))].sort().map((model) => `same\t${model}\n`).join("");
-  const record = (list: readonly EffectUse[]) => looks(list) + factsRecord(list.map(({ model }) => model));
+  const record = (list: readonly EffectUse[]) => factsRecord(list.map(({ model }) => model));
   const changed = uses.findIndex((use) => use.kind === "impact");
   const addedA: EffectUse = { ...uses[0] as EffectUse, move: "lane a move", model: "Abilities\\Spells\\Other\\LaneA\\LaneA.mdx" };
   const addedB: EffectUse = { ...uses[0] as EffectUse, move: "lane b move", model: "Abilities\\Spells\\Other\\LaneB\\LaneB.mdx" };

@@ -19,10 +19,7 @@ const NAMES = new Map(Object.entries(AttackStyle).map(([name, style]) => [style,
 
 const AERIALS: readonly AttackStyle[] = [AttackStyle.forwardAir, AttackStyle.backAir, AttackStyle.upAir, AttackStyle.downAir];
 
-const AXE_NODES: Readonly<Record<"classic" | "definitive", ReadonlySet<string>>> = {
-  classic: new Set(["axehandle"]),
-  definitive: new Set(["Wep01_L0_0_jnt"]),
-};
+const AXE_NODES: ReadonlySet<string> = new Set(["axehandle"]);
 
 /** How far one active frame's strike capsules reach past the drawn axe's bounds, in units; at most 0 means every capsule lies on the axe. */
 function pastAxe(model: DrawnModel, axe: Uint8Array, frame: PoseFrame): number {
@@ -47,20 +44,18 @@ function pastAxe(model: DrawnModel, axe: Uint8Array, frame: PoseFrame): number {
 const manifest = Effect.runSync(readManifest());
 const stored = pinHashes(manifest["original-clips-static-lights"]).every((hash) => existsSync(join(INPUTS_STORE, "original-clips-static-lights", hash)));
 const family = stored ? join(assetsView(manifest), "original-clips-static-lights") : undefined;
-test("every active frame of Peon's 11 axe normals keeps its strike capsules on the drawn axe in both looks [k3 measure #520]", async () => {
+test("every active frame of Peon's 11 axe normals keeps its strike capsules on the drawn axe [k3 measure #520]", async () => {
   if (family === undefined) return;
   const body = (originalClip(Character.peon, 0)?.modelPath ?? "").split("\\");
   const off: string[] = [];
-  for (const look of ["classic", "definitive"] as const) {
-    const path = join(family, "imports", ...(look === "definitive" ? ["_de.w3mod"] : []), ...body);
-    const model = new DrawnModel(await Bun.file(path).arrayBuffer(), characterModelScale(Character.peon));
-    const axe = model.influencedBy(AXE_NODES[look]);
-    for (const style of PEON_AXE_NORMALS) {
-      const frames = sampleAttack(Character.peon, style, 1, AERIALS.includes(style)).filter((frame) => frame.phase === AttackPhase.active && frame.strikes.length > 0);
-      const past = frames.map((frame) => pastAxe(model, axe, frame));
-      const worst = Math.max(...past);
-      if (!(worst <= 0.0)) off.push(`${look} ${NAMES.get(style)}: ${past.map((value) => value.toFixed(1)).join(" ")} past the axe on active frames ${frames.map((frame) => frame.frame).join(" ")}`);
-    }
+  const path = join(family, "imports", ...body);
+  const model = new DrawnModel(await Bun.file(path).arrayBuffer(), characterModelScale(Character.peon));
+  const axe = model.influencedBy(AXE_NODES);
+  for (const style of PEON_AXE_NORMALS) {
+    const frames = sampleAttack(Character.peon, style, 1, AERIALS.includes(style)).filter((frame) => frame.phase === AttackPhase.active && frame.strikes.length > 0);
+    const past = frames.map((frame) => pastAxe(model, axe, frame));
+    const worst = Math.max(...past);
+    if (!(worst <= 0.0)) off.push(`${NAMES.get(style)}: ${past.map((value) => value.toFixed(1)).join(" ")} past the axe on active frames ${frames.map((frame) => frame.frame).join(" ")}`);
   }
   expect(off).toEqual([]);
 }, 60_000);

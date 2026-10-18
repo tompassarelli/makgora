@@ -65,8 +65,7 @@ test("Illidan's down smash spawns only its warglaive effect, no Flame Strike or 
   assertEquals(cues.length, 1, "down smash has one effect");
   for (const { name, cue } of cues) {
     assertEquals(cue.model, "Abilities\\Weapons\\DemonHunterMissile\\DemonHunterMissile.mdx", `${name} is the warglaive missile`);
-    assertEquals(cue.definitive, undefined, `${name} has no Definitive replacement`);
-    assertEquals(isFire(cue.model) || isFire(cue.definitive?.model), false, `${name} draws no fire`);
+    assertEquals(isFire(cue.model), false, `${name} draws no fire`);
   }
 });
 

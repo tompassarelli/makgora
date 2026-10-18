@@ -55,7 +55,6 @@ BunRuntime.runMain(Effect.gen(function*() {
     if (pose === 'Pinch') {
       for (const [directory, bounds, visible, offset, canvas] of [
         [output, '29x27!', '25x27+2+0', '2x4', '32x32'],
-        [join(output, '_de.w3mod'), '100x121!', '84x118+9+3', '22x3', '128x128'],
       ] as const) {
         yield* Effect.try({ try: () => mkdirSync(directory, { recursive: true }), catch: ioFailure });
         yield* run(['magick', join(source, 'wc3-pinching-hand.png'), '-crop', '1315x1085+33+33', '+repage', '-resize', bounds, '-crop', visible, '+repage', '-resize', bounds, '-background', 'none', '-gravity', 'northwest', '-splice', offset, '-extent', canvas, '-depth', '8', `TGA:${join(directory, 'SelectionHandPinch.tga')}`]);

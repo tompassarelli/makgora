@@ -1,5 +1,5 @@
 // Judges how evenly the portraits are lit: each fighter's head-and-shoulders
-// bust (FighterBust*P1, the crop the tiles share) in Classic and Definitive.
+// bust (FighterBust*P1, the crop the tiles share).
 // Usage: bun scripts/portraitLight.ts [FIGHTER_RENDERS]  (default: the stored fighter-renders family)
 import { join } from 'node:path';
 import { Effect, Schema } from 'effect';
@@ -48,22 +48,19 @@ export function judgeColour(colours: ReadonlyMap<string, Colour>): string[] {
     ? [`${name}: washed out; saturation ${colour.saturation.toFixed(3)}, contrast ${colour.contrast.toFixed(1)} below roster floors ${(saturation * 0.7).toFixed(3)}, ${(contrast * 0.7).toFixed(1)}`] : []);
 }
 
-const toLinear = Array.from({ length: 256 }, (_, value) => { const c = value / 255; return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; });
-const toDisplay = (c: number) => c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055;
-
 /**
- * Light passes summed with weights where the renderer adds its lights (display
- * values in Classic, linear in Definitive), then lifted by gamma (out = in^(1/gamma)).
+ * Light passes summed with weights in display values, where the renderer adds its
+ * lights, then lifted by gamma (out = in^(1/gamma)).
  */
-export function combine(passes: readonly Uint8Array[], weights: readonly number[], linear: boolean, gamma: number): Uint8Array {
+export function combine(passes: readonly Uint8Array[], weights: readonly number[], gamma: number): Uint8Array {
   const first = passes[0];
   if (first === undefined) throw new Error('no light passes');
   const out = new Uint8Array(first.length);
   for (let at = 0; at < first.length; at += 4) {
     for (let channel = 0; channel < 3; channel++) {
       let sum = 0;
-      passes.forEach((pass, index) => { const value = pass[at + channel] ?? 0; sum += (weights[index] ?? 0) * (linear ? (toLinear[value] ?? 0) : value / 255); });
-      const shown = Math.min(1, Math.max(0, linear ? toDisplay(Math.min(1, sum)) : sum));
+      passes.forEach((pass, index) => { const value = pass[at + channel] ?? 0; sum += (weights[index] ?? 0) * value / 255; });
+      const shown = Math.min(1, Math.max(0, sum));
       out[at + channel] = Math.round(255 * shown ** (1 / gamma));
     }
     out[at + 3] = passes.reduce((alpha, pass) => Math.max(alpha, pass[at + 3] ?? 0), 0);
@@ -146,31 +143,31 @@ export const pixels = (path: string): Effect.Effect<Uint8Array, PixelsFailure> =
 });
 export const bustPixels = pixels;
 
-const portrait = (renders: string, look: 'classic' | 'definitive', kind: string, name: string) => join(renders, ...(look === 'definitive' ? ['de'] : []), `Fighter${kind}${name}P1.tga`);
+const portrait = (renders: string, kind: string, name: string) => join(renders, `Fighter${kind}${name}P1.tga`);
 
-export const lookLights = (renders: string, look: 'classic' | 'definitive', names = RENDERED_FIGHTERS.map(fighterRenderName)): Effect.Effect<Map<string, Light>, PixelsFailure> =>
-  Effect.forEach(names, (name) => Effect.map(pixels(portrait(renders, look, 'Bust', name)), (bytes) => [name, lightOf(bytes)] as const)).pipe(Effect.map((entries) => new Map(entries)));
+export const lookLights = (renders: string, names = RENDERED_FIGHTERS.map(fighterRenderName)): Effect.Effect<Map<string, Light>, PixelsFailure> =>
+  Effect.forEach(names, (name) => Effect.map(pixels(portrait(renders, 'Bust', name)), (bytes) => [name, lightOf(bytes)] as const)).pipe(Effect.map((entries) => new Map(entries)));
 
 if (import.meta.main) {
   const exitCode = await Effect.runPromise(Effect.gen(function* () {
     const renders = process.argv[2] ?? join(assetsView(yield* readManifest()), 'fighter-renders');
     const problems = judgePreview();
-    for (const look of ['classic', 'definitive'] as const) {
-      const lights = yield* lookLights(renders, look);
+    {
+      const lights = yield* lookLights(renders);
       const colours = yield* Effect.forEach(RENDERED_FIGHTERS, (character) => Effect.gen(function* () {
         const name = fighterRenderName(character);
-        const tile = join(renders, ...(look === 'definitive' ? ['de'] : []), `FighterTile${name}.tga`);
-        return [name, colourOf(yield* pixels(tile), yield* pixels(portrait(renders, look, 'Bust', name)))] as const;
+        const tile = join(renders, `FighterTile${name}.tga`);
+        return [name, colourOf(yield* pixels(tile), yield* pixels(portrait(renders, 'Bust', name)))] as const;
       }));
-      if (look === 'classic') problems.push(...judgeColour(new Map(colours)).map((problem) => `${look} ${problem}`));
+      problems.push(...judgeColour(new Map(colours)));
       for (const [name, { mean, lit }] of lights) {
-        const card = placementOf(yield* pixels(portrait(renders, look, 'Card', name)), CARD_TEXTURE_PX), chip = placementOf(yield* pixels(portrait(renders, look, 'Bust', name)), TILE_TEXTURE_PX);
-        console.log(`${look} ${name}: mean ${mean.toFixed(1)} lit ${lit.toFixed(2)}; card centre ${(card.box.x + card.box.w / 2).toFixed(3)},${(card.box.y + card.box.h / 2).toFixed(3)} fill ${Math.max(card.box.w, card.box.h).toFixed(2)}; chip centroid ${chip.centroid.x.toFixed(2)} cover ${chip.cover.toFixed(2)}`);
-        problems.push(...[...judgeCard(name, card), ...judgeChip(name, chip)].map((problem) => `${look} ${problem}`));
+        const card = placementOf(yield* pixels(portrait(renders, 'Card', name)), CARD_TEXTURE_PX), chip = placementOf(yield* pixels(portrait(renders, 'Bust', name)), TILE_TEXTURE_PX);
+        console.log(`${name}: mean ${mean.toFixed(1)} lit ${lit.toFixed(2)}; card centre ${(card.box.x + card.box.w / 2).toFixed(3)},${(card.box.y + card.box.h / 2).toFixed(3)} fill ${Math.max(card.box.w, card.box.h).toFixed(2)}; chip centroid ${chip.centroid.x.toFixed(2)} cover ${chip.cover.toFixed(2)}`);
+        problems.push(...judgeCard(name, card), ...judgeChip(name, chip));
       }
       const means = [...lights.values()].map((light) => light.mean);
-      console.log(`${look}: ${lights.size} fighters, mean ${Math.min(...means).toFixed(1)}-${Math.max(...means).toFixed(1)}, spread ${(Math.max(...means) / Math.min(...means)).toFixed(2)}, lit from ${Math.min(...[...lights.values()].map((light) => light.lit)).toFixed(2)}`);
-      problems.push(...judge(lights).map((problem) => `${look} ${problem}`));
+      console.log(`${lights.size} fighters, mean ${Math.min(...means).toFixed(1)}-${Math.max(...means).toFixed(1)}, spread ${(Math.max(...means) / Math.min(...means)).toFixed(2)}, lit from ${Math.min(...[...lights.values()].map((light) => light.lit)).toFixed(2)}`);
+      problems.push(...judge(lights));
     }
     for (const problem of problems) console.log(`FAIL ${problem}`);
     return problems.length > 0 ? 1 : 0;

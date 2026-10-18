@@ -304,7 +304,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      LOOK: '^(ts/src/game/(render|presentation|assets|ui|menu)/|ts/src/game/objectData\.ts$|ts/src/platform/|ts/src/host/|ts/scripts/wisp/|ts/plugins/|ts/vendor/|ts/(package\.json|bun\.lock|wisp\.lock|tsconfig[^/]*\.json)$|typescript-toolchain\.lock$|build-inputs/|tools/(animations|effects|presentation|selection|stage)/|\.github/workflows/farm-test\.yml$)'
       LUA_BUILD: '^(ts/(src|plugins|vendor)/|ts/(package\.json|bun\.lock|wisp\.lock|tsconfig[^/]*\.json)$|typescript-toolchain\.lock$|build-inputs/|\.github/workflows/farm-test\.yml$)'
       PARITY_ONLY: '^ts/(scripts/|codegen/|test/(tapes|replay|host-natives))'
       COMPILER_ONLY: '^ts/scripts/(compiler-benchmark|hostProcess)\.ts$'
@@ -312,7 +311,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: [perf, perf-definitive, parity, corpus]
+        group: [perf, parity, corpus]
     name: ${{ matrix.group }}
     steps:
       - uses: actions/checkout@v4
@@ -336,7 +335,6 @@ jobs:
           run=true
           if [ -n "$base" ]; then
             case "$GROUP" in
-              perf-definitive) grep -qE "$LOOK" "$RUNNER_TEMP/changed" || run=false ;;
               parity) grep -qE "$LUA_BUILD|$PARITY_ONLY" "$RUNNER_TEMP/changed" || run=false ;;
             esac
           fi
@@ -401,8 +399,6 @@ jobs:
               if [ -f build/playable-bot-four.perf ]; then
                 bun scripts/commitMetrics.ts build/playable-bot-four.perf build/playable.lua | tee -a "$GITHUB_STEP_SUMMARY"
               fi ;;
-            perf-definitive)
-              check "four-fighter p99 <= 10 ms and worst <= 14 ms in Definitive" sh -c 'PERF_LOOK=definitive bun wisp perf playable-bot-four --samples --out build/playable-bot-four-definitive.perf && bun wisp perf budget build/playable-bot-four-definitive.perf' ;;
             parity)
               # Tapes and the numeric corpus in stock Lua32 and in one whose raw float + - * round toward zero must equal Bun (wisp:docs/headless.md#raw-float-rounding).
               check "parity tapes and numeric" sh -c 'bun wisp parity tapes && bun wisp parity numeric'
@@ -472,7 +468,7 @@ jobs:
           zero='{"passed":0,"failed":0,"skipped":0,"shards":0,"slowestShardSeconds":0}'
           fallback "$zero" '"the merge step did not finish: see its log"'
           : > problems.txt
-          for group in perf perf-definitive parity corpus; do
+          for group in perf parity corpus; do
             [ -n "$(find farm \( -name "result-check-$group.json" -o -name "skipped-check-$group.txt" \))" ] || echo "check group $group neither ran nor was filtered out: it left no result" >> problems.txt
           done
           [ "$PLAN_RESULT" = success ] || echo "the plan job ended $PLAN_RESULT, so no shard ran: see its log" >> problems.txt

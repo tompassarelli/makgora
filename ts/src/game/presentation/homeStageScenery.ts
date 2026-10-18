@@ -56,7 +56,7 @@ export const TOMB_OF_SARGERAS_SCENERY: StageScenery = {
     { model: "Doodads\\Ruins\\Structures\\SRuinArch\\SRuinArch.mdx", x: 0.0, y: 4500.0, z: -2150.0, scale: 6.25, yaw: 270.0, matrixScale: [0.5, 2.0, 1.0] },
     { model: "Doodads\\Ruins\\Structures\\SRuinArch\\SRuinArch.mdx", x: 4000.0, y: 4500.0, z: -1400.0, scale: 4.0, yaw: 85.0, matrixScale: [0.5, 2.0, 1.0] },
     { model: "Doodads\\Ruins\\Rocks\\Ruins_Rock\\Ruins_Rock0.mdx", x: 1500.0, y: 4600.0, z: -5150.0, scale: 17.0, yaw: 287.0, matrixScale: [1.0, 1.0, 2.0] },
-    // TS-c: the waterfall stays on the left; HD/DE imports replace only its misty model, keeping Classic stock.
+    // TS-c: the waterfall stays on the left; HD imports replace only its misty model, keeping Classic stock.
     { model: "Doodads\\Terrain\\CliffDoodad\\Waterfall\\Waterfall.mdx", x: -2200.0, y: 3600.0, z: -2200.0, scale: 5.0, yaw: 270.0, matrixScale: [1.0, 1.0, 2.5] },
     { model: "Doodads\\Ruins\\Structures\\SRuinArch\\SRuinArch.mdx", x: -1800.0, y: 3500.0, z: -900.0, scale: 4.0, yaw: 15.0 },
     { model: "Doodads\\Ruins\\Rocks\\Ruins_Rock\\Ruins_Rock0.mdx", x: -3100.0, y: 3900.0, z: -5300.0, scale: 16.0, yaw: 52.0, matrixScale: [1.0, 1.0, 2.0] },

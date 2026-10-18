@@ -5,7 +5,7 @@ const random = (seed: number) => () => { seed = (seed * 1103515245 + 12345) % 2 
 const pick = <T>(next: () => number, items: readonly T[]): T => items[Math.floor(next() * items.length)] as T;
 
 const CHECKS = ["bun test a", "bun wisp view b", "false", "grep -q x ../y"];
-const TAGS = ["", "", " [native]", " [Tom]", " [definitive]"];
+const TAGS = ["", "", " [native]", " [Tom]"];
 
 function body(next: () => number): string {
   return Array.from({ length: Math.floor(next() * 8) }, (_, index) => {

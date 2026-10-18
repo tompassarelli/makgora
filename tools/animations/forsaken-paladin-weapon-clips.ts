@@ -4,7 +4,7 @@ import { Effect, Schema } from "effect";
 import { BunRuntime } from "@effect/platform-bun";
 import { ModelRenderer, model as mdx } from "war3-model";
 import { mat4, quat, vec3 } from "gl-matrix";
-import { generateHdBody, parseHdBody } from "./hd-retarget";
+import { generateHdBody, parseHdBody } from "./hd-body";
 import { tracks, onGlobalClock, ensure } from "./original-clips";
 import { renumberNodes } from "../../ts/scripts/clipNodes";
 import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";

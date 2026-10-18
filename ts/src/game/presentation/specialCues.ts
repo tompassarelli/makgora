@@ -101,7 +101,6 @@ export interface Cue {
 
   readonly replacesBody?: boolean | undefined;
   readonly rebirthFrames?: number | undefined;
-  readonly definitive?: Cue | undefined;
 }
 
 
@@ -232,31 +231,7 @@ export const HERO_CUES: { readonly [character: number]: { readonly [slot in Spec
       { x: -97.75504302978516, z: 177.99998474121094 },
       { x: -97.75504302978516, z: 178.06654357910156 },
       { x: -97.75504302978516, z: 178.1291961669922 },
-    ], definitive: { model: "Abilities\\Spells\\Human\\ManaFlare\\ManaFlareTarget.mdx", anchor: "hand", scale: 2.0, sequence: "stand", seconds: f32(0.2), scaleEnd: 2.5, scaleFrames: 23, timeScale: 0.0, depth: 180.0, yaw: 0.0, anchorFrames: [
-      { x: -67.9131088256836, z: 125.99826049804688 },
-      { x: -67.9131088256836, z: 126.03534698486328 },
-      { x: -67.9131088256836, z: 126.07475280761719 },
-      { x: -64.76042175292969, z: 141.172119140625 },
-      { x: -59.49678039550781, z: 152.7886199951172 },
-      { x: -52.29387283325195, z: 161.06788635253906 },
-      { x: -53.38129425048828, z: 158.2254180908203 },
-      { x: -54.62268829345703, z: 153.97389221191406 },
-      { x: -56.12906265258789, z: 156.4182891845703 },
-      { x: -57.76899719238281, z: 159.51947021484375 },
-      { x: -59.267677307128906, z: 161.93260192871094 },
-      { x: -60.895755767822266, z: 162.69654846191406 },
-      { x: -62.41767501831055, z: 160.8631134033203 },
-      { x: -63.61881637573242, z: 157.06552124023438 },
-      { x: -69.67378997802734, z: 158.88551330566406 },
-      { x: -75.69843292236328, z: 160.1758270263672 },
-      { x: -81.31090545654297, z: 161.07192993164062 },
-      { x: -87.18086242675781, z: 161.68270874023438 },
-      { x: -92.92227935791016, z: 161.94064331054688 },
-      { x: -98.17941284179688, z: 161.8619842529297 },
-      { x: -103.5793228149414, z: 161.43994140625 },
-      { x: -103.5793228149414, z: 161.5065155029297 },
-      { x: -103.5793228149414, z: 161.5691680908203 },
-    ] } }, active: drawn("Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveMissile.mdx", "ahead") },
+    ] }, active: drawn("Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveMissile.mdx", "ahead") },
     side: { spell: "Bloodhoof Gore", startup: cue("Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx", "feet", f32(0.35)), active: cue("Objects\\Spawnmodels\\Demon\\DemonLargeDeathExplode\\DemonLargeDeathExplode.mdx", "ahead", f32(0.6)) },
     up: { spell: "Spirit Lift", startup: QUIET_BEAST, active: cue("Abilities\\Spells\\Orc\\CommandAura\\CommandAura.mdx", "feet", f32(0.7)) },
     down: { spell: "War Stomp", startup: QUIET_BEAST, active: cue("Abilities\\Spells\\Orc\\CommandAura\\CommandAuraTarget.mdx", "body", f32(0.5)) },

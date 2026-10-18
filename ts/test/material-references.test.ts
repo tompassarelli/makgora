@@ -12,6 +12,6 @@ const body = (ribbonMaterial: number) => ({
 test('a timeline body whose ribbon points past its material list is refused, one whose ribbon holds a material is not [k2 property]', () => {
   expect(danglingMaterials(body(0))).toEqual([]);
   expect(danglingMaterials(body(2))).toEqual(['trail material 2']);
-  expect(() => checkMaterialReferences('Warden Definitive', body(2))).toThrow('trail material 2 past its 1 materials');
-  expect(() => checkMaterialReferences('Warden Definitive', body(0))).not.toThrow();
+  expect(() => checkMaterialReferences('Warden', body(2))).toThrow('trail material 2 past its 1 materials');
+  expect(() => checkMaterialReferences('Warden', body(0))).not.toThrow();
 });

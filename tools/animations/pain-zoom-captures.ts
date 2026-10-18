@@ -67,7 +67,8 @@ await Effect.runPromise(Effect.gen(function*() {
       }
     } finally { session.close(); }
     for (const scene of scenes) row.distance.add(Math.round(Number(scene.camera.fields.CAMERA_FIELD_TARGET_DISTANCE)));
-    for (const graphics of ["classic", "definitive"] as const) {
+    {
+      const graphics = "classic";
       const rendered = yield* Effect.exit(renderScenes(project, scenes, join(output, graphics, name), graphics));
       if (rendered._tag === "Failure") {
         const lines = Cause.pretty(rendered.cause).split("\n").filter(line => / frame \d+: /.test(line) && !/^\s*at /.test(line));

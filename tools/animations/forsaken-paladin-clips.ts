@@ -4,7 +4,7 @@ import { mkdirSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { ModelRenderer, model as mdx } from "war3-model";
 import { isDeepStrictEqual } from "node:util";
-import { generateHdBody, parseHdBody } from "./hd-retarget";
+import { generateHdBody, parseHdBody } from "./hd-body";
 import { mat4, quat, vec3 } from "gl-matrix";
 import { DrawnModel } from "../../ts/scripts/wisp/drawnModel";
 import { sheet, type PoseFrame } from "../../ts/scripts/wisp/hurtboxView";

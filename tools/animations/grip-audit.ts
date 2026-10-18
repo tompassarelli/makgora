@@ -5,7 +5,7 @@ import { ModelRenderer } from '../../ts/node_modules/war3-model';
 import { originalClip } from '../../ts/src/generated/clips/fighterOriginalClipInfo';
 import { Character } from '../../ts/src/game/sim/codes';
 import { characterModelScale } from '../../ts/src/game/presentation/modelScale';
-import { FIGHTER_RIGS } from './hd-rigs';
+import { FIGHTER_RIGS } from './rigs';
 import { parseSource } from './original-clips';
 import { fighters } from '../../ts/scripts/heroModelSource';
 
@@ -45,9 +45,8 @@ function segmentDistance(a: Point, b: Point, c: Point, d: Point): number {
 function nodePosition(model: ReturnType<typeof parseSource>, data: RendererSample, node: NonNullable<ReturnType<typeof nodeNamed>>, scale: number): Point {
   return mul(transform(model.PivotPoints[node.ObjectId]!, data.nodes[node.ObjectId]!.matrix), scale);
 }
-function bodyNode(rig: (typeof FIGHTER_RIGS extends ReadonlyMap<number, infer V> ? V : never), joint: RigJoint, look: string) {
-  const name = look === 'classic' ? rig.classic[joint] : rig.pairs.find(pair => pair[0] === joint)?.[1];
-  return name;
+function bodyNode(rig: (typeof FIGHTER_RIGS extends ReadonlyMap<number, infer V> ? V : never), joint: RigJoint) {
+  return rig.classic[joint];
 }
 function verticesForNode(model: ReturnType<typeof parseSource>, objectId: number): Point[] {
   const weighted: { point: Point; weight: number }[] = [];
@@ -76,14 +75,13 @@ for (const [character, rig] of FIGHTER_RIGS) {
   const calibrationClip = clips[readyIndex]?.clip ?? clips[0]?.clip;
   if (calibrationClip === undefined) throw new Error(`${fighter.name}: no calibration clip`);
   const scale = characterModelScale(character as Character);
-  for (const look of ['classic', 'definitive'] as const) {
+  {
+    const look = 'classic';
     const firstClip = clips.find(entry => entry.clip !== undefined)?.clip;
     if (firstClip === undefined) throw new Error(`${fighter.name}/${look}: no shipped clips`);
     const bodyPath = firstClip.modelPath.replaceAll('\\', '/');
     const imports = join(assets, 'original-clips-static-lights', 'imports');
-    const classicPath = join(imports, bodyPath);
-    const definitivePath = join(imports, '_de.w3mod', bodyPath);
-    const modelPath = look === 'definitive' && await Bun.file(definitivePath).exists() ? definitivePath : classicPath;
+    const modelPath = join(imports, bodyPath);
     const model = parseSource(await Bun.file(modelPath).arrayBuffer());
     const renderer = new ModelRenderer(model);
     renderer.setSequence(0);
@@ -94,10 +92,10 @@ for (const [character, rig] of FIGHTER_RIGS) {
       ['pelvis', 'chest', 0.22], ['head', 'head', 0.12], ['hip.L', 'knee.L', 0.16], ['knee.L', 'ankle.L', 0.13], ['hip.R', 'knee.R', 0.16], ['knee.R', 'ankle.R', 0.13],
     ];
     for (const [aJoint, bJoint, factor] of jointPairs) {
-      const aName = bodyNode(rig, aJoint, look), bName = bodyNode(rig, bJoint, look);
+      const aName = bodyNode(rig, aJoint), bName = bodyNode(rig, bJoint);
       const a = aName === undefined ? undefined : nodeNamed(model, aName), b = bName === undefined ? undefined : nodeNamed(model, bName);
       if (a === undefined || b === undefined) continue;
-      const chestName = bodyNode(rig, 'chest', look), chest = chestName === undefined ? undefined : nodeNamed(model, chestName);
+      const chestName = bodyNode(rig, 'chest'), chest = chestName === undefined ? undefined : nodeNamed(model, chestName);
       if (aJoint === bJoint && chest === undefined) continue;
       const length = aJoint === bJoint ? distance(nodePosition(model, data, a, scale), nodePosition(model, data, chest!, scale)) : distance(nodePosition(model, data, a, scale), nodePosition(model, data, b, scale));
       capsules.push({ name: `${aJoint}-${bJoint}`, a, b, radius: Math.max(3, Math.min(22, length * factor)) });
@@ -105,10 +103,10 @@ for (const [character, rig] of FIGHTER_RIGS) {
     const weapons = [];
     seek(calibrationClip.startSeconds);
     for (const joint of weaponJoints) {
-      const weaponName = bodyNode(rig, joint, look), handJoints: readonly RigJoint[] = ['wrist.R', 'wrist.L'];
+      const weaponName = bodyNode(rig, joint), handJoints: readonly RigJoint[] = ['wrist.R', 'wrist.L'];
       const weapon = weaponName === undefined ? undefined : nodeNamed(model, weaponName);
       const hand = handJoints.map(handJoint => {
-        const name = bodyNode(rig, handJoint, look);
+        const name = bodyNode(rig, handJoint);
         return name === undefined ? undefined : nodeNamed(model, name);
       }).filter((node): node is NonNullable<typeof node> => node !== undefined).sort((a, b) => distance(nodePosition(model, data, a, scale), nodePosition(model, data, weapon!, scale)) - distance(nodePosition(model, data, b, scale), nodePosition(model, data, weapon!, scale)))[0];
       if (weapon === undefined || hand === undefined) { unavailable.push(`${fighter.name}/${look}/${joint}: missing weapon or wrist node`); continue; }

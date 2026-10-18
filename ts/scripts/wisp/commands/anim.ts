@@ -20,7 +20,7 @@ import { createMatchCamera, MATCH_CAMERA_ASPECT } from "../../../src/game/sim/ma
 import { FROZEN_THRONE_STAGE } from "../../../src/game/sim/stage";
 import { runProcess } from "../../hostProcess";
 import { CROUCH_THRESHOLDS, DOUBLE_JUMP_THRESHOLDS, LEDGE_THRESHOLDS, type MoveScore, THRESHOLDS, scoreCrouch, scoreDoubleJump, scoreLedgeHang, scoreMove } from "../animScore";
-import { type CrouchClipKind, type Look, type SampledMove, gameplayPixelsPerUnit, loadBody, sampleCrouch, sampleFighter, sampleJumps, sampleLedgeHang } from "../animScoreSample";
+import { type CrouchClipKind, type SampledMove, gameplayPixelsPerUnit, loadBody, sampleCrouch, sampleFighter, sampleJumps, sampleLedgeHang } from "../animScoreSample";
 import { answerKey, type ColdStrip, coldReadBatch, coldReadBatches, isMovementMove, ledgeCorner, type MovementMove, movementCrop, movementFrames, stageDrawArgs, stageShape, stripId } from "../animMovementRows";
 import { clipIdentity, currentJudgements, judgementKey, withPreparedClips, writePreparedClips } from "../animJudgeIdentity";
 import { assetsView, readManifest } from "../buildInputs";
@@ -68,7 +68,7 @@ const attempt = <A>(problem: string, run: () => Promise<A> | A) =>
 
 const JudgeLine = Schema.Int.check(Schema.isBetween({ minimum: 1, maximum: 5 }));
 export const JudgeScore = Schema.Struct({
-  look: Schema.Literals(["classic", "definitive"]), fighter: Schema.NonEmptyString, move: Schema.NonEmptyString, judge: Schema.NonEmptyString,
+  look: Schema.Literal("classic"), fighter: Schema.NonEmptyString, move: Schema.NonEmptyString, judge: Schema.NonEmptyString,
   readability: JudgeLine, weight: JudgeLine, anticipation: JudgeLine, followThrough: JudgeLine, character: JudgeLine, note: Schema.String,
   clip: Schema.optional(Schema.String),
 });
@@ -141,20 +141,20 @@ const selectFighters = (names: readonly string[] | undefined) => Effect.gen(func
 });
 
 
-const measure = (fighters: readonly Character[], look: Look, assets: string) => Effect.gen(function*() {
+const measure = (fighters: readonly Character[], assets: string) => Effect.gen(function*() {
   const judged = yield* decodeLines(JudgeScore, JUDGE_FILE);
   const records = yield* decodeLines(MeleeRecord, join(projectRoot, "references/melee-frame-data/records.jsonl"));
   const rows: Row[] = [];
   const samples = new Map<string, SampledMove>();
   for (const character of fighters) {
     const fighter = fighterSlug(character);
-    const moves = yield* attempt(`sample ${fighter}`, async () => sampleFighter(await loadBody(assets, character, look), character));
+    const moves = yield* attempt(`sample ${fighter}`, async () => sampleFighter(await loadBody(assets, character), character));
     for (const sampled of moves) {
       const { sample } = sampled;
       const score = yield* Effect.try({ try: () => scoreMove(sample, THRESHOLDS[sample.moveClass]), catch: (cause) => new AnimFailure({ problem: `${fighter} ${sampled.move}: ${String(cause)}` }) });
       const frames = { firstActive: sample.firstActive, lastActive: sample.lastActive, end: sampled.endFrame };
       const clip = clipIdentity(keyFrames({ score, frames }).map((index) => sample.frames[index]));
-      const own = currentJudgements(judged.filter((entry) => entry.look === look && entry.fighter === fighter && entry.move === sampled.move), clip);
+      const own = currentJudgements(judged.filter((entry) => entry.fighter === fighter && entry.move === sampled.move), clip);
       const means = JUDGE_LINES.map((line) => own.reduce((sum, entry) => sum + entry[line], 0) / Math.max(1, own.length));
       rows.push({
         fighter, move: sampled.move, moveClass: sample.moveClass, score,
@@ -169,12 +169,12 @@ const measure = (fighters: readonly Character[], look: Look, assets: string) => 
 });
 
 const score: Command = (args) => Effect.gen(function*() {
-  const flags = parseFlags(args, ["--fighter", "--graphics", "--assets"]);
-  const look = flags?.get("--graphics")?.[0] ?? "classic";
-  if (flags === undefined || (look !== "classic" && look !== "definitive")) return yield* new UsageFailure({ problem: "anim score [--fighter F]... [--graphics classic|definitive] [--assets DIR]" });
+  const flags = parseFlags(args, ["--fighter", "--assets"]);
+  const look = "classic";
+  if (flags === undefined) return yield* new UsageFailure({ problem: "anim score [--fighter F]... [--assets DIR]" });
   const fighters = yield* selectFighters(flags.get("--fighter"));
   const assets = flags.get("--assets")?.[0] ?? assetsView(yield* readManifest());
-  const { rows } = yield* measure(fighters, look, assets);
+  const { rows } = yield* measure(fighters, assets);
 
   const table = join(TABLE_DIRECTORY, `${look}.tsv`);
   const kept = yield* attempt(`read ${table}`, async () => (await Bun.file(table).exists()) ? (await Bun.file(table).text()).trim().split("\n").slice(1) : []);
@@ -210,7 +210,7 @@ const score: Command = (args) => Effect.gen(function*() {
   });
 
   const crouches = yield* Effect.forEach(fighters, (character) => attempt(`crouch ${fighterSlug(character)}`, async () => {
-    const { stand, crouch, clip, kind } = sampleCrouch(await loadBody(assets, character, look), character);
+    const { stand, crouch, clip, kind } = sampleCrouch(await loadBody(assets, character), character);
     return { fighter: fighterSlug(character), clip, kind, ...scoreCrouch(stand, crouch, gameplayPixelsPerUnit()) };
   }));
   const crouchTable = yield* movementTable("crouch", "fighter\tcrouch\tclip\theight ratio\tcontrast", crouches.map((row) => [row.fighter, crouchVerdict(row), row.clip, n3(row.heightRatio), n3(row.contrast)].join("\t")));
@@ -220,7 +220,7 @@ const score: Command = (args) => Effect.gen(function*() {
 
   const corner = ledgeCorner();
   const ledges = yield* Effect.forEach(fighters, (character) => attempt(`ledge hang ${fighterSlug(character)}`, async () => {
-    const { stand, hang, parts, clip, kind } = sampleLedgeHang(await loadBody(assets, character, look), character);
+    const { stand, hang, parts, clip, kind } = sampleLedgeHang(await loadBody(assets, character), character);
     return { fighter: fighterSlug(character), clip, kind, ...scoreLedgeHang(stand, hang, parts, corner) };
   }));
   const ledgeTable = yield* movementTable("ledge", "fighter\tledge hang\tclip\tgrip\tbelow\tclear\tfit", ledges.map((row) => [row.fighter, crouchVerdict(row), row.clip, n3(row.grip), n3(row.below), n3(row.clear), n3(row.fit)].join("\t")));
@@ -230,7 +230,7 @@ const score: Command = (args) => Effect.gen(function*() {
   yield* Console.log(`${ledges.filter((row) => row.pass && row.kind === "crouch").length}/${ledges.length} ledge hangs pass (no clip: the standing pose hangs; *: a clip not named for the ledge stands in); ${ledgeTable}`);
 
   const jumps = yield* Effect.forEach(fighters, (character) => attempt(`double jump ${fighterSlug(character)}`, async () => {
-    const body = await loadBody(assets, character, look);
+    const body = await loadBody(assets, character);
     const { stand, first, second, firstClip, secondClip } = sampleJumps(body, character);
     return { fighter: fighterSlug(character), firstClip, secondClip, ...scoreDoubleJump(stand, first, second, body.nodes().map((node) => node.parent), gameplayPixelsPerUnit()) };
   }));
@@ -310,16 +310,16 @@ const fetchReferences = Effect.gen(function*() {
 
 
 const prepare = (args: readonly string[]) => Effect.gen(function*() {
-  const flags = parseFlags(args, ["--fighter", "--move", "--graphics", "--out", "--assets"]);
-  const out = flags?.get("--out")?.[0], look = flags?.get("--graphics")?.[0] ?? "classic";
-  if (flags === undefined || out === undefined || (look !== "classic" && look !== "definitive")) return yield* new UsageFailure({ problem: "anim judge prepare --out PRIVATE_DIR [--fighter F]... [--move FIGHTER:MOVE]... [--graphics classic|definitive]" });
+  const flags = parseFlags(args, ["--fighter", "--move", "--out", "--assets"]);
+  const out = flags?.get("--out")?.[0], look = "classic";
+  if (flags === undefined || out === undefined) return yield* new UsageFailure({ problem: "anim judge prepare --out PRIVATE_DIR [--fighter F]... [--move FIGHTER:MOVE]..." });
   const output = resolve(out);
   if (!relative(projectRoot, output).startsWith("..")) return yield* new UsageFailure({ problem: "judge renders stay outside the repository (their references are private)" });
   const wanted = flags.get("--move");
   const fighters = yield* selectFighters(flags.get("--fighter") ?? (wanted === undefined ? undefined : [...new Set(wanted.map((move) => move.split(":")[0] ?? ""))]));
   const assets = flags.get("--assets")?.[0] ?? assetsView(yield* readManifest());
   const attackWanted = wanted?.filter((move) => !isMovementMove(move.split(":")[1] ?? ""));
-  const { rows, samples } = attackWanted !== undefined && attackWanted.length === 0 ? { rows: [], samples: new Map<string, SampledMove>() } : yield* measure(fighters, look, assets);
+  const { rows, samples } = attackWanted !== undefined && attackWanted.length === 0 ? { rows: [], samples: new Map<string, SampledMove>() } : yield* measure(fighters, assets);
   const chosen = rows.filter((row) => wanted === undefined || wanted.includes(`${row.fighter}:${row.move}`));
   yield* attempt(`write the clip identities in ${output}`, () => writePreparedClips(output, look, Object.fromEntries(chosen.map((row) => [`${row.fighter}/${row.move}`, row.clip]))));
   const references = yield* readReferences;
@@ -337,7 +337,7 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
     if (!isMovementMove(move)) continue;
     const character = fighters.find((candidate) => fighterSlug(candidate) === slug);
     if (character === undefined) continue;
-    const { seconds, heights } = yield* attempt(`sample ${slug} ${move}`, async () => movementFrames(move, await loadBody(assets, character, look), character));
+    const { seconds, heights } = yield* attempt(`sample ${slug} ${move}`, async () => movementFrames(move, await loadBody(assets, character), character));
     strips.push({ fighter: slug, move, seconds, heights, caption: "", movement: true });
   }
   if (strips.length === 0) return yield* new UsageFailure({ problem: "no scored move matches" });
@@ -445,9 +445,8 @@ const record = (files: readonly string[]) => Effect.gen(function*() {
 }).pipe(Effect.provide(BunServices.layer));
 
 const jitter: Command = (args) => Effect.gen(function*() {
-  const flags = parseFlags(args, ["--fighter", "--graphics", "--assets"]);
-  const looks = flags?.get("--graphics") ?? ["classic", "definitive"];
-  if (flags === undefined || looks.some((look) => look !== "classic" && look !== "definitive")) return yield* new UsageFailure({ problem: "anim jitter [--fighter F]... [--graphics classic|definitive]... [--assets DIR]" });
+  const flags = parseFlags(args, ["--fighter", "--assets"]);
+  if (flags === undefined) return yield* new UsageFailure({ problem: "anim jitter [--fighter F]... [--assets DIR]" });
   const fighters = yield* selectFighters(flags.get("--fighter"));
   const assets = flags.get("--assets")?.[0] ?? assetsView(yield* readManifest());
   const root = join(assets, "original-clips-static-lights/imports");
@@ -456,16 +455,15 @@ const jitter: Command = (args) => Effect.gen(function*() {
   const exempt = new Map<string, number>();
   const measuredBodies = new Set<string>();
   let clips = 0;
-  for (const look of looks) for (const character of fighters) {
+  for (const character of fighters) {
     const names = new Map([...originalClipNames(character)].map(([name, index]) => [index, name] as const));
     for (let index = 0; index < originalClipCount(character); index++) {
       const clip = originalClip(character, index);
       if (clip === undefined) continue;
       const relativePath = clip.modelPath.replaceAll("\\", "/");
-      const usesDefinitive = look === "definitive" && existsSync(join(root, "_de.w3mod", relativePath));
-      const own = usesDefinitive ? join(root, "_de.w3mod", relativePath) : join(root, relativePath);
+      const own = join(root, relativePath);
       if (!existsSync(own)) continue;
-      const body = `${usesDefinitive ? "definitive" : "classic"}:${fighterSlug(character)}`;
+      const body = `classic:${fighterSlug(character)}`;
       let model = models.get(own);
       if (model === undefined) {
         model = yield* attempt(`read ${own}`, async () => parseMDX(await Bun.file(own).arrayBuffer()));
@@ -478,7 +476,7 @@ const jitter: Command = (args) => Effect.gen(function*() {
       if (!jitters(measured)) continue;
       const worst = measured.worst;
       if (JITTER_EXEMPTIONS.has(body)) { exempt.set(body, (exempt.get(body) ?? 0) + 1); continue; }
-      offenders.push(`${look}\t${fighterSlug(character)}\t${names.get(index) ?? index}\t${measured.translation.toFixed(2)}\t${measured.scaling.toFixed(3)}\t${measured.rotation.toFixed(1)}\t${worst === undefined ? "" : `${worst.node} ${worst.property} @${worst.frame}`}`);
+      offenders.push(`classic\t${fighterSlug(character)}\t${names.get(index) ?? index}\t${measured.translation.toFixed(2)}\t${measured.scaling.toFixed(3)}\t${measured.rotation.toFixed(1)}\t${worst === undefined ? "" : `${worst.node} ${worst.property} @${worst.frame}`}`);
     }
   }
   yield* Console.log(["look\tfighter\tsequence\ttranslation\tscaling\trotation\tworst", ...offenders].join("\n"));
@@ -495,5 +493,5 @@ export const anim: Command = ([mode, verb, ...rest]) => {
   if (mode === "judge" && verb === "fetch") return fetchReferences.pipe(Effect.provide(BunServices.layer));
   if (mode === "judge" && verb === "prepare") return prepare(rest);
   if (mode === "judge" && verb === "record") return record(rest);
-  return Effect.fail(new UsageFailure({ problem: "anim score [--fighter F]... [--graphics classic|definitive] | anim jitter [--fighter F]... [--graphics classic|definitive]... | anim judge fetch | anim judge prepare --out PRIVATE_DIR [--fighter F]... [--move FIGHTER:MOVE]... | anim judge record SCORES.jsonl..." }));
+  return Effect.fail(new UsageFailure({ problem: "anim score [--fighter F]... | anim jitter [--fighter F]... | anim judge fetch | anim judge prepare --out PRIVATE_DIR [--fighter F]... [--move FIGHTER:MOVE]... | anim judge record SCORES.jsonl..." }));
 };

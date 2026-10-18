@@ -5,14 +5,12 @@ import { Effect } from 'effect';
 import { hash, parseSource, tracks } from './original-clips';
 import { checkTimelineGeosets } from './timeline-geosets';
 import { thinnedModel } from './thinned-source';
-import { authoredMotion, fighterBodies, playedMoves } from './hd-models';
-import { FIGHTER_RIGS } from './hd-rigs';
+import { authoredMotion, classicBody, playedMoves } from './fighter-bodies';
+import { FIGHTER_RIGS } from './rigs';
 import { canonicalMotion } from './canonical-rig';
 import { modelFacts } from '../../ts/node_modules/wisp/host/models/models';
 import { replaceModelFacts, writeGenerated } from '../../ts/scripts/wisp/modelFactsTable';
 import { DrawnModel } from '../../ts/scripts/wisp/drawnModel';
-import { renderAssetStore } from '../../ts/scripts/wisp/renderAssetStore';
-import { DEFINITIVE_FIGHTERS } from '../../ts/src/game/assets/definitiveFighters';
 import type { Character } from '../../ts/src/game/sim/codes';
 import { CLIPS } from './fighter-shards';
 import { readClipRecords, writeClipRecord } from '../../ts/scripts/clipEvidence';
@@ -26,15 +24,7 @@ if (!relative(resolve(import.meta.dir, '../..'), output).startsWith('..')) throw
 const character = [...FIGHTER_ART].find(([, fighter]) => fighter.name === fighterName)?.[0] as Character | undefined;
 if (character === undefined) throw new Error(`Unknown fighter ${fighterName}`);
 const fighter = FIGHTER_ART.get(character)!, rig = FIGHTER_RIGS.get(character);
-if (rig === undefined) throw new Error(`${fighter.name} has no canonical rig in hd-rigs`);
-
-async function stockDefinitive(): Promise<ArrayBuffer | undefined> {
-    if (!DEFINITIVE_FIGHTERS.has(character as Character)) return undefined;
-    const stockName = (rig!.stockPath ?? '').replace(/^war3\.w3mod:_de\.w3mod:/, '').replaceAll('/', '\\');
-    const resolved = await renderAssetStore({ assets, imports: [] }).resolveAsset(stockName, 'definitive');
-    if (resolved.bytes === undefined || resolved.selected?.layer !== '_de.w3mod') throw new Error(`${fighter.name}: no stock Definitive ${stockName}`);
-    return resolved.bytes.slice().buffer;
-}
+if (rig === undefined) throw new Error(`${fighter.name} has no canonical rig in rigs`);
 
 async function removeOtherBodies(directory: string, kept: string): Promise<void> {
     if (!existsSync(directory)) return;
@@ -44,11 +34,10 @@ async function removeOtherBodies(directory: string, kept: string): Promise<void>
 await Effect.runPromise(Effect.tryPromise({ try: async () => {
     const authored = await Bun.file(join(assets, fighter.source)).arrayBuffer();
     const source = thinnedModel(authored).model;
-    const played = playedMoves(character, source).classic.map(index => source.Sequences[index]!);
-    const bodies = fighterBodies(authoredMotion(authored, rig), rig, await stockDefinitive(), undefined, canonicalMotion(source, rig));
-    const bytes = bodies.classic;
+    const played = playedMoves(character, source).map(index => source.Sequences[index]!);
+    const motion = authoredMotion(authored, rig);
+    const bytes = classicBody(motion, rig, playedMoves(character, motion), canonicalMotion(source, rig));
     checkMaterialReferences(`${fighter.name} classic`, parseSource(bytes));
-    if (bodies.definitive !== undefined) checkMaterialReferences(`${fighter.name} Definitive`, parseSource(bodies.definitive.bytes));
     const geosets = checkTimelineGeosets(source, parseSource(bytes), played);
     console.log(`TIMELINE_GEOSETS_PASS ${fighter.name}: ${JSON.stringify(geosets)}`);
     tracks(parseSource(bytes), (track, path) => {
@@ -74,9 +63,8 @@ await Effect.runPromise(Effect.tryPromise({ try: async () => {
     }
     console.log(`HEADLESS_TIMELINE_POSES_PASS ${fighter.name}: ${played.length} clips, ${samples} both-facing frame samples, max ${maximumDifference} world units versus clip pool`);
     const sha256 = hash(bytes), filename = `${fighter.name}TimelineBody-${sha256}.mdx`;
-    const classicDirectory = join(output, 'imports/war3mapImported'), definitiveDirectory = join(output, 'imports/_de.w3mod/war3mapImported');
+    const classicDirectory = join(output, 'imports/war3mapImported');
     await Bun.write(join(classicDirectory, filename), bytes);
-    if (bodies.definitive !== undefined) await Bun.write(join(definitiveDirectory, filename), bodies.definitive.bytes);
     const record = readClipRecords(output).find((record: { fighter: string }) => record.fighter === fighter.name);
     if (record === undefined) throw new Error(`No original clips for ${fighter.name}`);
     const oldBytes = record.bytes;
@@ -86,7 +74,6 @@ await Effect.runPromise(Effect.tryPromise({ try: async () => {
     writeClipRecord(output, record);
     for (const replaced of replacedFiles) if (replaced !== filename) await unlink(join(classicDirectory, replaced));
     await removeOtherBodies(classicDirectory, filename);
-    await removeOtherBodies(definitiveDirectory, bodies.definitive === undefined ? '' : filename);
     const metadataPath = join(CLIPS, `${fighterArt(character).slug}.ts`);
     const modelPath = `war3mapImported\\${filename}`;
     let metadata = await Bun.file(metadataPath).text();
@@ -95,5 +82,5 @@ await Effect.runPromise(Effect.tryPromise({ try: async () => {
         ? line.replace(/modelPath: \"[^\"]+\"/, `modelPath: ${JSON.stringify(modelPath)}`).replace(/looping: (true|false)(?:, timeline: true)? \},$/, 'looping: $1, timeline: true },') : line).join('\n');
     writeGenerated(metadataPath, metadata);
     replaceModelFacts([`war3mapImported\\${fighter.name}OriginalClip`, `war3mapImported\\${fighter.name}TimelineBody`], { [`war3mapImported\\${filename}`]: modelFacts(new Uint8Array(bytes)) });
-    console.log(`${fighter.name}: ${played.length}/${record.clips.length} played clips → one timeline; ${oldBytes} → ${record.bytes} raw bytes (${oldBytes - record.bytes} saved); ${bodies.definitive === undefined ? 'Classic body in both looks' : 'Definitive body under the same path in _de.w3mod'}.`);
+    console.log(`${fighter.name}: ${played.length}/${record.clips.length} played clips → one timeline; ${oldBytes} → ${record.bytes} raw bytes (${oldBytes - record.bytes} saved).`);
 }, catch: cause => new Error('Timeline export failed', { cause }) }));

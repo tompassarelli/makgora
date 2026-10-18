@@ -31,7 +31,6 @@ for (const character of [Character.lich]) {
         for (const facing of [-1, 1]) {
           const client = headless.clients({ start: () => {}, install: () => {} }, [0]).client(0);
           client.run(() => {
-            globalThis.__smashcraftCueDefinitive = false;
             const match = testMatch(1, character), fighter = fighterAt(match.world, 0);
             match.game.practice = true;
             fighter.motion.x = 0;

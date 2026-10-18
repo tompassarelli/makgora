@@ -1,5 +1,5 @@
 // Usage: WC3_STORAGE=CLIENT_INSTALL bun scripts/fighterViewBounds.ts
-// Measures each fighter's drawn body, the clip pool the map ships, in model units, over its Stand clips in both looks and
+// Measures each fighter's drawn body, the clip pool the map ships, in model units, over its Stand clips and
 // rewrites src/game/presentation/fighterViewBounds.ts, which the match camera frames.
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -9,7 +9,6 @@ import { originalClip, originalClipNames } from "../src/generated/clips/fighterO
 import { DrawnModel } from "./wisp/drawnModel";
 import { headlessRender } from "./wisp/headlessRender";
 
-const LOOKS = ["classic", "definitive"] as const;
 const SAMPLES = 12;
 const STAND = /^stand(\s*-?\s*\d+)?$/i;
 
@@ -17,42 +16,38 @@ const renderer = headlessRender();
 const rows: string[] = [];
 for (const [name, character] of Object.entries(Character)) {
   const object = FIGHTER_OBJECTS[character];
-  const looks: string[] = [];
-  for (const look of LOOKS) {
-    const clips = [...new Set([...originalClipNames(character)].flatMap(([clipName, index]) => STAND.test(clipName.trim()) ? [index] : []))].flatMap((index) => {
-      const clip = originalClip(character, index);
-      return clip === undefined ? [] : [clip];
-    });
-    if (clips.length === 0) throw new Error(`${object.name}: no Stand clip in its clip pool`);
-    let left = Infinity, right = -Infinity, bottom = Infinity, top = -Infinity;
-    const layers = new Set<string>();
-    for (const clip of clips) {
-      const { bytes, selected } = await renderer.resolveAsset(clip.modelPath, look);
-      if (bytes === undefined) throw new Error(`${object.name}: the map ships no ${look} body at ${clip.modelPath}`);
-      layers.add(selected?.layer ?? "?");
-      const model = new DrawnModel(bytes.slice().buffer, 1.0);
-      let sequence = 0;
-      while (model.sequenceName(sequence) !== undefined && !STAND.test((model.sequenceName(sequence) ?? "").trim())) sequence++;
-      if (model.sequenceName(sequence) === undefined) throw new Error(`${object.name}: ${look} body ${clip.modelPath} has no Stand sequence`);
-      const start = clip.timeline === true ? clip.startSeconds : 0, length = clip.endSeconds - clip.startSeconds;
-      for (let sample = 0; sample < SAMPLES; sample++) {
-        const { vertices, drawn } = model.posed(sequence, start + length * sample / SAMPLES, 1);
-        for (let vertex = 0; vertex < drawn.length; vertex++) {
-          if (drawn[vertex] !== 1) continue;
-          const x = vertices[vertex * 2] ?? 0, z = vertices[vertex * 2 + 1] ?? 0;
-          left = Math.min(left, x); right = Math.max(right, x); bottom = Math.min(bottom, z); top = Math.max(top, z);
-        }
+  const clips = [...new Set([...originalClipNames(character)].flatMap(([clipName, index]) => STAND.test(clipName.trim()) ? [index] : []))].flatMap((index) => {
+    const clip = originalClip(character, index);
+    return clip === undefined ? [] : [clip];
+  });
+  if (clips.length === 0) throw new Error(`${object.name}: no Stand clip in its clip pool`);
+  let left = Infinity, right = -Infinity, bottom = Infinity, top = -Infinity;
+  const layers = new Set<string>();
+  for (const clip of clips) {
+    const { bytes, selected } = await renderer.resolveAsset(clip.modelPath);
+    if (bytes === undefined) throw new Error(`${object.name}: the map ships no body at ${clip.modelPath}`);
+    layers.add(selected?.layer ?? "?");
+    const model = new DrawnModel(bytes.slice().buffer, 1.0);
+    let sequence = 0;
+    while (model.sequenceName(sequence) !== undefined && !STAND.test((model.sequenceName(sequence) ?? "").trim())) sequence++;
+    if (model.sequenceName(sequence) === undefined) throw new Error(`${object.name}: body ${clip.modelPath} has no Stand sequence`);
+    const start = clip.timeline === true ? clip.startSeconds : 0, length = clip.endSeconds - clip.startSeconds;
+    for (let sample = 0; sample < SAMPLES; sample++) {
+      const { vertices, drawn } = model.posed(sequence, start + length * sample / SAMPLES, 1);
+      for (let vertex = 0; vertex < drawn.length; vertex++) {
+        if (drawn[vertex] !== 1) continue;
+        const x = vertices[vertex * 2] ?? 0, z = vertices[vertex * 2 + 1] ?? 0;
+        left = Math.min(left, x); right = Math.max(right, x); bottom = Math.min(bottom, z); top = Math.max(top, z);
       }
     }
-    const round = (value: number) => Math.round(value);
-    looks.push(`${look}: { left: ${round(left)}, right: ${round(right)}, bottom: ${round(bottom)}, top: ${round(top)} }`);
-    console.log(`${object.name.padEnd(22)} ${look.padEnd(10)} ${[...layers].join("+")} left ${round(left)} right ${round(right)} bottom ${round(bottom)} top ${round(top)}`);
   }
-  rows.push(`  [Character.${name}]: { ${looks.join(", ")} },`);
+  const round = (value: number) => Math.round(value);
+  rows.push(`  [Character.${name}]: { left: ${round(left)}, right: ${round(right)}, bottom: ${round(bottom)}, top: ${round(top)} },`);
+  console.log(`${object.name.padEnd(22)} ${[...layers].join("+")} left ${round(left)} right ${round(right)} bottom ${round(bottom)} top ${round(top)}`);
 }
 
 const out = join(import.meta.dir, "../src/game/presentation/fighterViewBounds.ts");
-writeFileSync(out, `// Generated by \`bun scripts/fighterViewBounds.ts\` from each look's shipped body over its Stand clips in model units (the camera applies characterModelScale); regenerate after a body or model change.
+writeFileSync(out, `// Generated by \`bun scripts/fighterViewBounds.ts\` from each fighter's shipped body over its Stand clips in model units (the camera applies characterModelScale); regenerate after a body or model change.
 import { Character } from "../sim/codes";
 
 export interface ViewBounds {
@@ -62,7 +57,7 @@ export interface ViewBounds {
   readonly top: number;
 }
 
-export const FIGHTER_VIEW_BOUNDS: Readonly<Record<Character, { readonly classic: ViewBounds; readonly definitive: ViewBounds }>> = {
+export const FIGHTER_VIEW_BOUNDS: Readonly<Record<Character, ViewBounds>> = {
 ${rows.join("\n")}
 };
 `);

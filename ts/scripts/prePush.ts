@@ -78,7 +78,7 @@ export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = 
       { name: "generated models stored", directory: "ts", args: ["scripts/storedModels.ts"], fix: "store the regenerated family (smashcraft:docs/build-inputs.md, \"Change art\").", hosted: false, inputs: ["build-inputs", "tools/animations", ...SCRIPT_INPUTS] },
     ] : []),
     ...(cueModels ? [
-      { name: "cue models recorded in both looks", directory: "ts", args: ["scripts/cueModels.ts"], fix: `list each Definitive redraw after reviewing it, or record new models with ${RECORD_COMMAND} from ts/ (smashcraft:docs/commands/workflow.md).`, hosted: true },
+      { name: "cue models and Classic effect record", directory: "ts", args: ["scripts/cueModels.ts"], fix: `record new models with ${RECORD_COMMAND} from ts/ (smashcraft:docs/commands/workflow.md).`, hosted: true },
     ] : []),
     ...(fighterArt.length > 0 ? [
       { name: `fighter art reproduces (${fighterArt.join(", ")})`, directory: "ts", args: ["scripts/wisp.ts", "inputs", "derive", "--check", ...fighterArt.flatMap((slug) => ["--fighter", slug])], fix: "derive the listed fighters from this landing's producers and commit their pins and generated files (smashcraft:docs/build-inputs.md, \"Change art\").", hosted: false, privateStore: true },

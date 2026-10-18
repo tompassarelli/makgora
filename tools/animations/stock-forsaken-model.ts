@@ -1,7 +1,7 @@
 import { resolve, relative } from 'node:path';
 import { Effect } from 'effect';
 import { parseMDX } from '../../ts/scripts/clipNodes';
-import { generateHdBody, parseHdBody } from './hd-retarget';
+import { generateHdBody, parseHdBody } from './hd-body';
 import { flashableSequences } from './white-flash-keys';
 import { tracks } from './original-clips';
 import { checkStockGeosets, restoreStockForsaken } from './stock-forsaken';

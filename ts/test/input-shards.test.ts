@@ -22,8 +22,8 @@ test("two lanes that repack different fighters store disjoint shards, and the vi
     const white = (fighter: string, version: string) => `${fighter}White-${hex(fighter + version)}.mdx`;
     const base = {
       [white("Kobold", "1")]: "kobold 1", [white("Peon", "1")]: "peon 1", [texture]: "shared white texture",
-      [`_de.w3mod/${white("Kobold", "1")}`]: "kobold definitive 1", "ImpactHit.mdl": "effect", "imports.txt": "ImpactHit.mdl\n",
-      "white-flash-imports/Kobold.txt": `${texture}\n${white("Kobold", "1")}\n_de.w3mod/${white("Kobold", "1")}\n`,
+      "ImpactHit.mdl": "effect", "imports.txt": "ImpactHit.mdl\n",
+      "white-flash-imports/Kobold.txt": `${texture}\n${white("Kobold", "1")}\n`,
       "white-flash-imports/Peon.txt": `${texture}\n${white("Peon", "1")}\n`,
     };
     const lane = (name: string, edit: (files: Record<string, string>) => void) => {
@@ -37,7 +37,7 @@ test("two lanes that repack different fighters store disjoint shards, and the vi
       delete files[white("Kobold", "1")];
       files[white("Kobold", "2")] = "kobold 2";
       files[koboldTexture] = "kobold white texture";
-      files["white-flash-imports/Kobold.txt"] = `${texture}\n${koboldTexture}\n${white("Kobold", "2")}\n_de.w3mod/${white("Kobold", "1")}\n`;
+      files["white-flash-imports/Kobold.txt"] = `${texture}\n${koboldTexture}\n${white("Kobold", "2")}\n`;
     });
     const peon = await lane("peon", (files) => {
       delete files[white("Peon", "1")];

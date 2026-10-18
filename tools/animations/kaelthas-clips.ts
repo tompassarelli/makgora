@@ -20,10 +20,10 @@ function tracks(value: unknown, visit: (track: mdx.AnimVector, path: string) => 
   for (const [key, child] of Object.entries(value)) if (key !== "Nodes") tracks(child, visit, `${path}.${key}`);
 }
 const globalClock = (track: mdx.AnimVector) => track.GlobalSeqId != null && track.GlobalSeqId !== -1 && track.GlobalSeqId !== 0xffffffff;
-const args = process.argv.slice(2), lookAt = args.indexOf("--look"), look = lookAt >= 0 ? args.splice(lookAt, 2)[1] : "classic";
+const args = process.argv.slice(2);
 const [input, output] = args.map(p => resolve(p));
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith("..") && (look === "classic" || look === "definitive"), "usage: bun tools/animations/kaelthas-clips.ts STOCK_BLOOD_MAGE.mdx PRIVATE_OUTPUT [--look classic|definitive]");
+ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/kaelthas-clips.ts STOCK_BLOOD_MAGE.mdx PRIVATE_OUTPUT");
 const originalBytes = await Bun.file(input).arrayBuffer();
 const source = parseMDX(originalBytes), model = structuredClone(source);
 ensure(source.Sequences.length === 11 && source.Bones.some(b => b.Name === "Bone_Hand_R"), "Expected original classic Blood Mage");
@@ -125,25 +125,6 @@ const RAW_STRIKES: Partial<Record<HeroPose, Strike>> = {
 const OVERSHOOT: Partial<Record<HeroPose, number>> = { jab: 2, jab2: 4, forwardTilt: 3, forwardTiltUp: 4.5, forwardTiltDown: 4.5, upTilt: 3, downTilt: 3, dashAttack: 3,
   forwardSmash: 0.5, upSmash: 1, downSmash: 1, neutralAir: 1, forwardAir: 1, backAir: 1, upAir: 1, downAir: 1, neutralSpecial: 1.1, sideSpecial: 1.1, downSpecial: 1.3 };
 const COUNTER: Partial<Record<HeroPose, number>> = { jab: 1.2 };
-const DEFINITIVE: Partial<Record<HeroPose, { w?: Gesture; c?: Gesture; o?: Gesture; r?: Gesture; mid?: number; late?: number; lead?: number; overshoot?: number; counter?: number }>> = {
-  jab: { counter: 1.294, o: { tx: 14.8 }, r: { tx: -1.4, lean: -5.5 } },
-  jab2: { c: { tx: 16 }, o: { tx: 19 } },
-  upTilt: { c: { tz: 14 }, o: { tz: 24 } },
-  forwardSmash: { mid: 0.633, c: { arm: -78, leftArm: -78 }, o: { arm: -98, leftArm: -98 }, r: { tx: -1.1, lean: 1.9, arm: -38.7 }, overshoot: 1.194 },
-  upSmash: { late: 1, mid: 0.807, overshoot: 0.949, o: { tz: 13.5, lean: -23.4 }, r: { lean: 3.9, chest: 15.1, arm: -8.1, leftArm: -32.3 } },
-  downSmash: { mid: 0.803, o: { lean: 24.5 } },
-  neutralAir: { mid: 0.5, lead: undefined, c: { lean: 24, arm: -45, elbow: 0 }, o: { tx: 33, tz: -4, lean: 22, arm: -60 },
-    r: { tx: 14, tz: 0, lean: 8, thigh: 0, knee: 0, leftThigh: 0, leftKnee: 0, arm: -30, leftArm: 30 } },
-  upAir: { late: 1, mid: 0.69, o: { tz: 13.1, lean: -19.2 }, r: { tz: -0.8, lean: 3, leftArm: -115.3, knee: -35.6, leftThigh: -12.6, leftKnee: -25 } },
-  downAir: { r: { lean: 0.7, thigh: -25, knee: -21.7, leftThigh: -25, leftKnee: -28.5, arm: -45, leftArm: -26.5 } },
-  downSpecial: { w: { arm: -85 }, c: { arm: -85 }, o: { arm: -88 } },
-};
-if (look === "definitive") for (const [pose, t] of Object.entries(DEFINITIVE) as [HeroPose, NonNullable<typeof DEFINITIVE[HeroPose]>][]) {
-  const base = RAW_STRIKES[pose]!, { w, c, o, r, overshoot: _, counter: __, ...scalars } = t;
-  RAW_STRIKES[pose] = { ...base, ...scalars, w: { ...base.w, ...w }, c: { ...base.c, ...c }, o: { ...base.o, ...o }, r: { ...base.r, ...r } };
-  if (t.overshoot !== undefined) OVERSHOOT[pose] = t.overshoot;
-  if (t.counter !== undefined) COUNTER[pose] = t.counter;
-}
 const STRIKES: Partial<Record<HeroPose, Strike>> = Object.fromEntries(Object.entries(RAW_STRIKES).map(([pose, strike]) => {
   const o = { ...along(strike.c, strike.o, OVERSHOOT[pose as HeroPose] ?? 1), arm: strike.o.arm, elbow: strike.o.elbow, leftArm: strike.o.leftArm, leftElbow: strike.o.leftElbow }, counter = COUNTER[pose as HeroPose] ?? 1;
   return [pose, { ...strike, o, r: along(along({}, o, 0.5), strike.r, counter) }];
@@ -350,7 +331,7 @@ ensure(isDeepStrictEqual(stripped, source), "Authored suffix changed original bo
 const bytes = generateMDX(model), decoded = parseMDX(bytes);
 ensure(isDeepStrictEqual(parseMDX(generateMDX(decoded)), decoded), "MDX round trip changed model");
 mkdirSync(output, { recursive: true }); await Bun.write(join(output, "herobloodelf.mdx"), bytes);
-if (look === "classic") await Bun.write(join(project, "ts/src/game/sim/heroes/kaelthasClips.ts"), [
+await Bun.write(join(project, "ts/src/game/sim/heroes/kaelthasClips.ts"), [
   "",
   'import { f32 } from "wisp/src/sim/f32";', 'import type { HeroClip, HeroClipTable } from "./hero";',
   'export const KAELTHAS_MODEL_FILE = "units\\\\human\\\\HeroBloodElf\\\\HeroBloodElf.mdl";',

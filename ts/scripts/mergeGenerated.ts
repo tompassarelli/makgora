@@ -24,7 +24,7 @@ const parseLines = (kind: Exclude<Kind, "json">, source: string): Entry[] => {
     if (kind === "tsv") return { key: index === 0 ? "\u0001header" : text.split("\t")[0] ?? text, text };
     if (kind === "record") {
       const [row = text, name] = text.split("\t");
-      return { key: row === "classic-model" ? `model\u0001${name}` : row === "same" || row === "redrawn" ? `look\u0001${name}` : `\u0001${row}`, text };
+      return { key: row === "classic-model" ? `model\u0001${name}` : `\u0001${row}`, text };
     }
     if (kind === "facts") {
       const name = /^\s*("(?:[^"\\]|\\.)*"):/.exec(text)?.[1];

@@ -55,9 +55,7 @@ test("the render store serves a fighter's stock unit path only from stock storag
     writeFileSync(body, "timeline body");
     const entry = "war3mapImported\\DreadlordTimelineBody-0.mdx";
     const store = renderAssetStore({ storage, extractor, cache: join(root, "cache"), assets, imports: [{ entry, source: body }] });
-    for (const { model } of art) for (const look of ["classic", "definitive"] as const) {
-      expect(new TextDecoder().decode((await store.resolveAsset(model ?? "", look)).bytes ?? new Uint8Array())).not.toBe("authored source");
-    }
+    for (const { model } of art) expect(new TextDecoder().decode((await store.resolveAsset(model ?? "")).bytes ?? new Uint8Array())).not.toBe("authored source");
     expect(new TextDecoder().decode(await store.readAsset(entry))).toBe("timeline body");
   } finally {
     rmSync(root, { recursive: true, force: true });

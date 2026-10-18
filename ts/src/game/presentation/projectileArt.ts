@@ -1,4 +1,3 @@
-import { GROM_BLOODLUST_MODEL } from "../assets/importedModelInfo";
 import { f32 } from "wisp/src/sim/f32";
 import { imod } from "wisp/src/sim/intMath";
 
@@ -134,7 +133,7 @@ export const PROJECTILE_DRAW_CUES: { readonly [model: string]: { readonly scale:
   "Abilities\\Spells\\Undead\\Possession\\PossessionMissile.mdx": { scale: 0.5 },
 };
 
-export const PROJECTILE_DRAW_OFFSETS: { readonly [model: string]: { readonly x: number; readonly z: number; readonly roll?: number | undefined; readonly sequence?: string | undefined; readonly reseek?: boolean | undefined; readonly seconds?: number | undefined; readonly width?: number | undefined; readonly height?: number | undefined; readonly fill?: readonly { readonly x: number; readonly z: number }[] | undefined; readonly loopFrames?: number | undefined; readonly disc?: readonly [number, number, number] | undefined; readonly discVertical?: boolean | undefined } | undefined } = {
+export const PROJECTILE_DRAW_OFFSETS: { readonly [model: string]: { readonly x: number; readonly z: number; readonly roll?: number | undefined; readonly sequence?: string | undefined; readonly reseek?: boolean | undefined; readonly seconds?: number | undefined; readonly width?: number | undefined; readonly height?: number | undefined; readonly loopFrames?: number | undefined; readonly disc?: readonly [number, number, number] | undefined; readonly discVertical?: boolean | undefined } | undefined } = {
   "Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget.mdx": { x: 0.0, z: 0.0, sequence: "birth", disc: [155, 225, 255], discVertical: true },
   "Abilities\\Spells\\Other\\Consecration\\Consecration.mdx": { x: 0.0, z: 0.0, disc: [255, 215, 115] },
   "Abilities\\Weapons\\ShadowHunterMissile\\ShadowHunterMissile.mdx": { x: 0.0, z: 0.0, roll: f32(1.570796327) },
@@ -144,7 +143,7 @@ export const PROJECTILE_DRAW_OFFSETS: { readonly [model: string]: { readonly x: 
   "Abilities\\Spells\\Human\\Avatar\\AvatarCaster.mdx": { x: 0.0, z: 0.0, sequence: "spell" },
   "Units\\Undead\\Locust\\Locust.mdx": { x: 0.0, z: 0.0, sequence: "walk" },
   "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx": { x: 0.0, z: f32(-59.4), loopFrames: 12, disc: [150, 70, 230] },
-  "Abilities\\Spells\\Undead\\Impale\\ImpaleHitTarget.mdx": { x: 0.0, z: -25.0, width: 1.5, height: 1.25, fill: [{ x: f32(-4.0 / 9.0), z: f32(-4.0 / 9.0) }, { x: f32(-4.0 / 9.0), z: f32(4.0 / 9.0) }, { x: f32(4.0 / 9.0), z: f32(-4.0 / 9.0) }, { x: f32(4.0 / 9.0), z: f32(4.0 / 9.0) }] },
+  "Abilities\\Spells\\Undead\\Impale\\ImpaleHitTarget.mdx": { x: 0.0, z: -25.0, width: 1.5, height: 1.25 },
 };
 
 
@@ -152,105 +151,3 @@ export function restartsStationaryField(model: string, age: number, born: boolea
   const loop = PROJECTILE_DRAW_OFFSETS[model]?.loopFrames;
   return born || (loop !== undefined && imod(age, loop) === 0);
 }
-
-
-export const DEFINITIVE_ULTIMATE_MODELS: { readonly [character: number]: { readonly [model: string]: string | undefined } | undefined } = {
-  [Character.cairne]: { "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveMissile.mdx": "Abilities\\Spells\\Human\\ManaFlare\\ManaFlareMissile.mdx" },
-  [Character.forsakenPaladin]: { "Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx": "Abilities\\Weapons\\PriestMissile\\PriestMissile.mdl" },
-  [Character.pitLord]: { "Abilities\\Spells\\Undead\\Curse\\CurseTarget.mdx": "Abilities\\Weapons\\VoidWalkerMissile\\VoidWalkerMissile.mdx" },
-  [Character.sylvanas]: { "Abilities\\Weapons\\BansheeMissile\\BansheeMissile.mdx": "Units\\Undead\\Banshee\\Banshee.mdx" },
-  [Character.kaelthas]: { "Abilities\\Spells\\Human\\MassTeleport\\MassTeleportTarget.mdx": "Abilities\\Weapons\\SorceressMissile\\SorceressMissile.mdx" },
-  [Character.grom]: { "Abilities\\Spells\\Orc\\Bloodlust\\BloodlustTarget.mdx": "Abilities\\Spells\\Orc\\TrollBerserk\\TrollBeserkerTarget.mdx" },
-  [Character.medivh]: { "Abilities\\Spells\\Demon\\DarkPortal\\DarkPortalTarget.mdx": "Abilities\\Spells\\NightElf\\Cyclone\\CycloneTarget.mdx" },
-};
-
-
-export const DEFINITIVE_PROJECTILE_REDRAWS: { readonly [model: string]: string } = {
-  "Abilities\\Spells\\Demon\\DarkPortal\\DarkPortalTarget.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Human\\Avatar\\AvatarCaster.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Human\\FlameStrike\\FlameStrike1.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Human\\MarkOfChaos\\MarkOfChaosTarget.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Human\\MassTeleport\\MassTeleportTarget.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Human\\StormBolt\\StormBoltMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\NightElf\\Cyclone\\CycloneTarget.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\NightElf\\EntanglingRoots\\EntanglingRootsTarget.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\NightElf\\Immolation\\ImmolationTarget.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\NightElf\\ShadowStrike\\ShadowStrikeMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\NightElf\\TargetArtLumber\\TargetArtLumber.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\NightElf\\Tranquility\\TranquilityTarget.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Orc\\AncestralSpirit\\AncestralSpiritCaster.mdx": "HD redraw, Definitive look not yet reviewed",
-  [GROM_BLOODLUST_MODEL]: "Bloodlust visual with sound event keys removed in both looks",
-  "Abilities\\Spells\\Orc\\Bloodlust\\BloodlustTarget.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Orc\\EarthQuake\\EarthquakeTarget.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Orc\\Ensnare\\EnsnareMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Orc\\Reincarnation\\ReincarnationTarget.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Orc\\Shockwave\\ShockwaveMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Orc\\Voodoo\\VoodooAura.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Orc\\Voodoo\\VoodooAuraTarget.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Other\\BlackArrow\\BlackArrowMissile.mdl": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireDamage.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Other\\BreathOfFrost\\BreathOfFrostTarget.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Other\\Consecration\\Consecration.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Other\\FrostBolt\\FrostBoltMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Other\\Incinerate\\FireLordDeathExplode.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Other\\Monsoon\\MonsoonBoltTarget.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Other\\Stampede\\StampedeMissileDeath.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Other\\Stampede\\StampedeMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Other\\StrongDrink\\BrewmasterMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Other\\Tornado\\TornadoElementalSmall.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Undead\\AnimateDead\\AnimateDeadTarget.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Undead\\CarrionSwarm\\CarrionSwarmMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Undead\\Curse\\CurseTarget.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Undead\\DeathAndDecay\\DeathAndDecayTarget.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Undead\\FrostNova\\FrostNovaTarget.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Undead\\Impale\\ImpaleHitTarget.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Undead\\Impale\\ImpaleMissTarget.mdl": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Undead\\UnholyAura\\UnholyAura.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Undead\\Possession\\PossessionCaster.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Spells\\Undead\\Possession\\PossessionMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Weapons\\Axe\\AxeMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Weapons\\Bolt\\BoltImpact.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Weapons\\BansheeMissile\\BansheeMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Weapons\\CannonTowerMissile\\CannonTowerMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Weapons\\DemolisherFireMissile\\DemolisherFireMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Weapons\\DemonHunterMissile\\DemonHunterMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Weapons\\FarseerMissile\\FarseerMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Weapons\\FireBallMissile\\FireBallMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Weapons\\FrostWyrmMissile\\FrostWyrmMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Weapons\\HunterMissile\\HunterMissile.mdl": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Weapons\\KeeperGroveMissile\\KeeperGroveMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Weapons\\LichMissile\\LichMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Weapons\\Mortar\\MortarMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Weapons\\PhoenixMissile\\Phoenix_Missile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Weapons\\PriestMissile\\PriestMissile.mdl": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Weapons\\QuillSprayMissile\\QuillSprayMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Weapons\\RocketMissile\\RocketMissile.mdl": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Weapons\\SpiritOfVengeanceMissile\\SpiritOfVengeanceMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Weapons\\SerpentWardMissile\\SerpentWardMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Weapons\\GuardTowerMissile\\GuardTowerMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Weapons\\ShadowHunterMissile\\ShadowHunterMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Weapons\\SorceressMissile\\SorceressMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Weapons\\WaterElementalMissile\\WaterElementalMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Abilities\\Weapons\\WitchDoctorMissile\\WitchDoctorMissile.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Objects\\InventoryItems\\BundleofLumber\\BundleofLumber.mdx": "HD redraw, Definitive look not yet reviewed",
-  "units\\creeps\\GrizzlyBear\\GrizzlyBear.mdl": "HD redraw, Definitive look not yet reviewed",
-  "Units\\Creeps\\HeroTinkerRobot\\HeroTinkerRobot.mdl": "HD redraw, Definitive look not yet reviewed",
-  "units\\creeps\\Murloc\\Murloc.mdl": "HD redraw, Definitive look not yet reviewed",
-  "units\\creeps\\PandarenBrewmaster\\PandarenBrewmaster.mdl": "HD redraw, Definitive look not yet reviewed",
-  "units\\creeps\\QuillBeast\\QuillBeast.mdl": "HD redraw, Definitive look not yet reviewed",
-  "units\\creeps\\WarEagle\\WarEagle.mdl": "HD redraw, Definitive look not yet reviewed",
-  "Objects\\Spawnmodels\\Demon\\DemonLargeDeathExplode\\DemonLargeDeathExplode.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Units\\NightElf\\Wisp\\Wisp.mdx": "HD redraw, Definitive look not yet reviewed",
-  "units\\orc\\SpiritWolf\\SpiritWolf.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Units\\Undead\\Banshee\\Banshee.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Units\\Undead\\Locust\\Locust.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Units\\Undead\\PlagueCloud\\PlagueCloud.mdx": "HD redraw, Definitive look not yet reviewed",
-  "Units\\Undead\\Scarab\\Scarab.mdl": "HD redraw, Definitive look not yet reviewed",
-};

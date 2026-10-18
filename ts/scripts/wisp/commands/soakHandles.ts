@@ -32,11 +32,10 @@ const run = (name: string, command: string, args: readonly string[]) => Effect.s
   Effect.catch((cause) => Effect.succeed({ name, output: "", problem: describeCause(cause) })),
 );
 
-// handleBaseline.ts's LOOKS and SOAK_MATCHES; that module is map code, so the host command restates them.
-const LOOKS = ["classic", "definitive"] as const;
+// handleBaseline.ts's SOAK_MATCHES; that module is map code, so the host command restates it.
 const SOAK_MATCHES = 21;
 
-// smashcraft:ts/scripts/wisp/handleBaseline.ts's scenario, the first match and 20 rematches in each look, in Bun and on the
+// smashcraft:ts/scripts/wisp/handleBaseline.ts's scenario, the first match and 20 rematches, in Bun and on the
 // compiled integrity build in 32-bit Lua: over the suites' per-test ceilings, so it runs here (#409).
 export const soakHandles: Command = (args) => Effect.gen(function*() {
   const parsed = yield* Effect.try({
@@ -51,10 +50,10 @@ export const soakHandles: Command = (args) => Effect.gen(function*() {
   const lua = yield* stockLua.pipe(Effect.mapError((problem) => new HandleSoakFailure({ problem })));
   const declarations = join(tsDirectory, "node_modules/wisp/src/natives/warcraft.d.ts");
   const rematches = `${matches - 1} rematches`;
-  const runs = yield* Effect.all(LOOKS.flatMap((look) => [
-    run(`${look} in Bun, ${rematches}`, process.execPath, [join(tsDirectory, "test/soak/handles.ts"), look, String(matches)]),
-    run(`${look} in 32-bit Lua, ${rematches}`, lua, [join(tsDirectory, "build/handles.lua"), integrity.bundlePath, declarations, look, String(matches)]),
-  ]), { concurrency: "unbounded" });
+  const runs = yield* Effect.all([
+    run(`Bun, ${rematches}`, process.execPath, [join(tsDirectory, "test/soak/handles.ts"), String(matches)]),
+    run(`32-bit Lua, ${rematches}`, lua, [join(tsDirectory, "build/handles.lua"), integrity.bundlePath, declarations, String(matches)]),
+  ], { concurrency: "unbounded" });
   const failed: string[] = [];
   for (const { name, output, problem } of runs) {
     yield* Console.log(`${name}:\n${output.trimEnd()}`);

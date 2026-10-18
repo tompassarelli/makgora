@@ -1,8 +1,6 @@
 import { Effect, Schema } from "effect";
 import { installHeadless, loadMapEntry, playHeadless } from "wisp/scripts/wisp/headless";
 import { type RenderScene, captureScene, renderScenes } from "wisp/scripts/wisp/headlessRender";
-import { parseGraphics } from "wisp/scripts/wisp/graphicsProfiles";
-import type { Graphics } from "wisp/scripts/wisp/renderAssets";
 import type { Journey } from "wisp/src/headless/journey";
 import type { MapEntry } from "wisp/src/headless/client";
 import { SMASHCRAFT_JOURNEYS } from "./wisp/journeys";
@@ -13,10 +11,10 @@ export const RETURNING_PLAYER_FILES: Readonly<Record<string, readonly string[]>>
 
 class SelectStripFailure extends Schema.TaggedError<SelectStripFailure>()("SelectStripFailure", { problem: Schema.String }) {}
 
-const USAGE = "usage: bun scripts/selectStrip.ts JOURNEY.json OUT_DIR --frames N... [--graphics classic|definitive] [--resolution WxH]";
+const USAGE = "usage: bun scripts/selectStrip.ts JOURNEY.json OUT_DIR --frames N... [--resolution WxH]";
 
-export function selectScenes(entry: MapEntry, journey: Journey, frames: readonly number[], screen: { readonly width: number; readonly height: number }, graphics: Graphics): RenderScene[] {
-  const runtime = installHeadless({ ...SMASHCRAFT_JOURNEYS.map, natives: (client) => smashcraftNativeBehavior(client, graphics) });
+export function selectScenes(entry: MapEntry, journey: Journey, frames: readonly number[], screen: { readonly width: number; readonly height: number }): RenderScene[] {
+  const runtime = installHeadless({ ...SMASHCRAFT_JOURNEYS.map, natives: smashcraftNativeBehavior });
   const scenes: RenderScene[] = [];
   try {
     const files = { read: (name: string) => RETURNING_PLAYER_FILES[name], written: () => undefined };
@@ -39,11 +37,10 @@ export const selectStrip = (args: readonly string[]) => Effect.gen(function*() {
   if (journeyPath === undefined || out === undefined || frames.length === 0) return yield* new SelectStripFailure({ problem: USAGE });
   const [width = 1280, height = 720] = (flag("--resolution") ?? "1280x720").split("x").map(Number);
   const screen = { width, height };
-  const graphics = parseGraphics(flag("--graphics") ?? "classic");
   const journey = (yield* Effect.promise(() => Bun.file(journeyPath).json())) as Journey;
   const entry = yield* Effect.promise(() => loadMapEntry(SMASHCRAFT_JOURNEYS.entry));
-  const scenes = selectScenes(entry, journey, frames, screen, graphics);
-  const rendered = yield* renderScenes({ ...headlessRender(), ...screen }, scenes, out, graphics);
+  const scenes = selectScenes(entry, journey, frames, screen);
+  const rendered = yield* renderScenes({ ...headlessRender(), ...screen }, scenes, out, "classic");
   yield* Effect.log(`${rendered.length} frames rendered to ${out}`);
 });
 

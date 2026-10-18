@@ -4,7 +4,7 @@ import { Character } from "../src/game/sim/codes";
 
 test("each of the nine pain commands shows the struck fighter in its own contact clip, read from the simulation, on the first and held frames, drawn once by the map's own timeline body with no pose dissolve, and framed by the crop [k1 scenario]", () => {
   const screen = { width: 1280, height: 720 };
-  const shots = painShots(playerBuildEntry(), [Character.dreadlord], screen, "classic");
+  const shots = painShots(playerBuildEntry(), [Character.dreadlord], screen);
   expect(shots.map((shot) => shot.category)).toEqual(["low-small", "low-medium", "low-large", "middle-small", "middle-medium", "middle-large", "high-small", "high-medium", "high-large"]);
   expect(new Set(shots.map((shot) => shot.expectedClip)).size).toBe(9);
   for (const shot of shots) {

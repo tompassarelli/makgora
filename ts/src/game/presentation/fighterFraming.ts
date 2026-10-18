@@ -14,16 +14,16 @@ const HUD_SHARE = 0.4399999976158142;
 export const FRAMING_MARGIN = { top: 80.0, bottom: 100.0, side: 15.0 } as const;
 export const CLOSEST_BODY_SHARE = 0.30000001192092896;
 
-export function lookFrame(character: Character, look: "classic" | "definitive"): ViewBounds {
-  const bounds = FIGHTER_VIEW_BOUNDS[character][look];
+export function bodyFrame(character: Character): ViewBounds {
+  const bounds = FIGHTER_VIEW_BOUNDS[character];
   const scale = characterModelScale(character);
   return { left: bounds.left * scale, right: bounds.right * scale, bottom: bounds.bottom * scale, top: bounds.top * scale };
 }
 
 function frameOf(character: Character): ViewBounds {
-  const classic = lookFrame(character, "classic"), definitive = lookFrame(character, "definitive");
-  const half = Math.max(-classic.left, classic.right, -definitive.left, definitive.right);
-  return { left: -half, right: half, bottom: Math.min(classic.bottom, definitive.bottom), top: Math.max(classic.top, definitive.top) };
+  const body = bodyFrame(character);
+  const half = Math.max(-body.left, body.right);
+  return { left: -half, right: half, bottom: body.bottom, top: body.top };
 }
 
 const FRAMES: readonly ViewBounds[] = (() => {

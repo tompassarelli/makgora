@@ -16,21 +16,12 @@ import { WHITE_FIGHTER_MODELS } from "../../ts/src/generated/assets/whiteFighter
 import { WHITE_MODEL_FACTS } from "../../ts/src/generated/assets/whiteModelFacts";
 import { thinnedModel } from "./thinned-source";
 import { timelineBody } from "./timeline-body";
-import { existsSync } from "node:fs";
-import { MeshoptSimplifier } from "meshoptimizer";
-import { decimateWhiteBody, roundGeometry } from "./white-decimate";
-import { originalClip, originalClipCount } from "../../ts/src/generated/clips/fighterOriginalClipInfo";
-import { DEFINITIVE_FIGHTERS } from "../../ts/src/game/assets/definitiveFighters";
-import type { Character } from "../../ts/src/game/sim/codes";
 import { keepWhiteImports, pruneFighterWhites, pruneWhiteTextures, writeWhiteImports } from "../../ts/scripts/whiteImports";
 import { WHITE_FACTS, WHITE_FACT_INDEX, WHITE_MODELS, WHITE_MODEL_INDEX, shardOrder, whiteFactsFile, whiteFactsIndex, whiteModelFile, whiteModelIndex } from "./fighter-shards";
 import { FIGHTER_ART, fighterArt } from "../../ts/src/generated/fighterArtData";
-const DEFINITIVE_WHITE = "_de.w3mod";
-const DEFINITIVE_DECIMATION = { ratio: 0.5, error: 0.005 };
 
 const [assetsArg, outputArg, option, characterArg] = process.argv.slice(2);
-const definitiveOnly = option === "--definitive";
-if (assetsArg === undefined || outputArg === undefined || (option !== undefined && !definitiveOnly && (option !== "--character" || characterArg === undefined))) throw new Error("usage: bun tools/animations/white-flash-models.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--character ID | --definitive]");
+if (assetsArg === undefined || outputArg === undefined || (option !== undefined && (option !== "--character" || characterArg === undefined))) throw new Error("usage: bun tools/animations/white-flash-models.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--character ID]");
 const selected = characterArg === undefined ? undefined : Number(characterArg);
 if (selected !== undefined && (!Number.isInteger(selected) || !FIGHTER_ART.has(selected))) throw new Error("Choose a fighter number from the roster");
 const assets = resolve(assetsArg), output = resolve(outputArg);
@@ -41,13 +32,13 @@ texture[2] = 2; texture[12] = 2; texture[14] = 2; texture[16] = 32; texture[17] 
 texture.fill(255, 18);
 const textureName = `FighterWhite-${hash(texture)}.tga`;
 await Bun.write(join(output, textureName), texture);
-const paths: Record<number, string> = selected === undefined && !definitiveOnly ? {} : { ...WHITE_FIGHTER_MODELS };
+const paths: Record<number, string> = selected === undefined ? {} : { ...WHITE_FIGHTER_MODELS };
 const sourceAssets = renderAssetStore({ assets, imports: IMPORTED_MODEL_FILES.map(({ entry, file }) => ({ entry, source: join(assets, "imported-models", file) })) });
 const whiteTextures = new Map<string, string>();
-async function whiteTexture(path: string, graphics: "classic" | "definitive" = "classic"): Promise<string> {
-  const known = whiteTextures.get(`${graphics}:${path}`);
+async function whiteTexture(path: string): Promise<string> {
+  const known = whiteTextures.get(path);
   if (known !== undefined) return known;
-  const bytes = await sourceAssets.readAsset(path, graphics);
+  const bytes = await sourceAssets.readAsset(path);
   if (bytes === undefined) throw new Error(`Missing body texture ${path}`);
   let pixels: { width: number; height: number; data: Uint8Array | Uint8ClampedArray };
   if (String.fromCharCode(...bytes.subarray(0, 3)) === "BLP") pixels = getBLPImageData(decodeBLP(bytes.slice().buffer), 0);
@@ -58,16 +49,7 @@ async function whiteTexture(path: string, graphics: "classic" | "definitive" = "
     if (await convert.exited !== 0) throw new Error(`Cannot read ${path}: ${await new Response(convert.stderr).text()}`);
     pixels = PNG.sync.read(Buffer.from(converted));
   }
-  if (graphics === "definitive") {
-    let opaque = true;
-    for (let pixel = 0; pixel < pixels.width * pixels.height && opaque; pixel++) opaque = pixels.data[pixel * 4 + 3] === 255;
-    if (opaque) {
-      whiteTextures.set(`${graphics}:${path}`, `war3mapImported\\${textureName}`);
-      return `war3mapImported\\${textureName}`;
-    }
-  }
-  const step = graphics === "definitive" ? Math.max(1, Math.ceil(Math.max(pixels.width, pixels.height) / 256)) : 1;
-  const width = Math.ceil(pixels.width / step), height = Math.ceil(pixels.height / step);
+  const width = pixels.width, height = pixels.height;
   const white = new Uint8Array(18 + width * height * 4);
   white[2] = 2; white[16] = 32; white[17] = 0x28;
   const header = new DataView(white.buffer);
@@ -75,84 +57,13 @@ async function whiteTexture(path: string, graphics: "classic" | "definitive" = "
   for (let row = 0; row < height; row++) for (let column = 0; column < width; column++) {
     const pixel = row * width + column;
     white.fill(255, 18 + pixel * 4, 21 + pixel * 4);
-    white[21 + pixel * 4] = pixels.data[(row * step * pixels.width + column * step) * 4 + 3];
+    white[21 + pixel * 4] = pixels.data[(row * pixels.width + column) * 4 + 3];
   }
   const name = `FighterWhite-${hash(white)}.tga`;
   await Bun.write(join(output, name), white);
   const imported = `war3mapImported\\${name}`;
-  whiteTextures.set(`${graphics}:${path}`, imported);
+  whiteTextures.set(path, imported);
   return imported;
-}
-async function definitiveWhite(character: number, name: string, filename: string): Promise<boolean> {
-  const body = originalClip(character, 0)?.modelPath;
-  if (!DEFINITIVE_FIGHTERS.has(character as Character) || body === undefined || !body.includes("TimelineBody-")) return false;
-  const source = join(assets, "original-clips-static-lights/imports/_de.w3mod", ...body.split("\\"));
-  if (!existsSync(source)) throw new Error(`${name}: no Definitive body at ${source}; regenerate it with tools/animations/timeline-models.ts`);
-  const model = parseModelMDX(await Bun.file(source).arrayBuffer());
-  if (model.Sequences.length !== 1) throw new Error(`${name}: the Definitive body is not one timeline`);
-  const clips = Array.from({ length: originalClipCount(character) }, (_, index) => {
-    const clip = originalClip(character, index);
-    if (clip === undefined) throw new Error(`${name}: clip ${index} is missing`);
-    return { ...model.Sequences[0]!, Interval: new Uint32Array([Math.round(clip.startSeconds * 1000), Math.round(clip.endSeconds * 1000)]) };
-  });
-  trimFlashTracks(model, flashableSequences(character, clips));
-  removeBodyEffects(model);
-  model.Lights = [];
-  await MeshoptSimplifier.ready;
-  decimateWhiteBody(model, DEFINITIVE_DECIMATION);
-  const geosets = model.Geosets.length;
-  const effectMaterials = new Set(model.Materials.flatMap((material, index) =>
-    material.Layers.every(layer => layer.FilterMode === mdx.FilterMode.Additive || layer.FilterMode === mdx.FilterMode.AddAlpha)
-      || material.Layers.some(layer => typeof layer.TextureID === "number" && model.Textures[layer.TextureID]?.ReplaceableId === 2)
-      ? [index] : []));
-  const solid = model.Textures.push({ Image: `war3mapImported\\${textureName}`, ReplaceableId: 0, Flags: 0 as mdx.TextureFlags }) - 1;
-  const whiteDiffuse = new Map<number, number>();
-  for (const material of model.Materials) {
-    for (const layer of material.Layers) {
-      layer.Shading = ((layer.Shading ?? 0) | mdx.LayerShading.Unshaded) & ~mdx.LayerShading.NoDepthSet;
-      if (layer.FilterMode === mdx.FilterMode.Transparent || layer.FilterMode === mdx.FilterMode.None) layer.FilterMode = mdx.FilterMode.Blend;
-      if (typeof layer.TextureID === "number") {
-        const diffuse = layer.TextureID;
-        let white = whiteDiffuse.get(diffuse);
-        if (white === undefined) {
-          const texture = model.Textures[diffuse];
-          white = texture?.Image ? model.Textures.push({ ...texture, Image: await whiteTexture(texture.Image, "definitive"), ReplaceableId: 0 }) - 1 : solid;
-          whiteDiffuse.set(diffuse, white);
-        }
-        layer.TextureID = white;
-      }
-      if (layer.EmissiveTextureID !== undefined) layer.EmissiveTextureID = solid;
-      if (layer.TeamColorTextureID !== undefined) layer.TeamColorTextureID = solid;
-    }
-  }
-  for (const geoset of model.GeosetAnims) { geoset.Color = new Float32Array([1, 1, 1]); geoset.Flags &= ~mdx.GeosetAnimFlags.Color; }
-  roundGeometry(model);
-  const effectGeosets = new Set(model.Geosets.flatMap((geoset, index) => effectMaterials.has(geoset.MaterialID) ? [index] : []));
-  removeGeosets(model, effectGeosets);
-  renumberNodes(model);
-  const bytes = new Uint8Array(generateModelMDX(model));
-  const decoded = parseModelMDX(bytes.buffer);
-  if (decoded.Sequences.length !== 1 || decoded.Geosets.length !== geosets - effectGeosets.size) throw new Error(`${name}: Definitive white overlay changed geometry`);
-  tracks(decoded, (track, path) => { if (track.Keys.length === 0) throw new Error(`${name}: Definitive white overlay left ${path} without keys`); });
-  const planes = groundPlaneGeosets(decoded);
-  if (planes.length > 0) throw new Error(`${name}: Definitive white overlay kept ground plane geosets ${planes.join(", ")}`);
-  await Bun.write(join(output, DEFINITIVE_WHITE, filename), bytes);
-  return true;
-}
-if (definitiveOnly) {
-  let count = 0;
-  for (const [character, path] of Object.entries(WHITE_FIGHTER_MODELS)) {
-    const fighter = FIGHTER_ART.get(Number(character));
-    if (fighter === undefined) throw new Error(`No roster fighter ${character}`);
-    const filename = path.replace("war3mapImported\\", "");
-    const definitive = await definitiveWhite(Number(character), fighter.name, filename);
-    await writeWhiteImports(output, fighter.name, filename, definitive);
-    pruneFighterWhites(output, fighter.name);
-    if (definitive) count++;
-  }
-  console.log(`${count} Definitive white bodies updated over the Definitive timeline bodies`);
-  pruneWhiteTextures(output);
-  process.exit(0);
 }
 const facts: Record<string, ReturnType<typeof modelFacts>> = selected === undefined ? {} : { ...WHITE_MODEL_FACTS };
 for (const [character, fighter] of FIGHTER_ART.entries()) {
@@ -222,7 +133,7 @@ for (const [character, fighter] of FIGHTER_ART.entries()) {
   const filename = `${fighter.name}White-${hash(bytes)}.mdx`;
   await Bun.write(join(output, filename), bytes);
   paths[character] = `war3mapImported\\${filename}`;
-  await writeWhiteImports(output, fighter.name, filename, await definitiveWhite(character, fighter.name, filename));
+  await writeWhiteImports(output, fighter.name, filename);
   pruneFighterWhites(output, fighter.name);
   facts[`war3mapImported/${filename}`.toLowerCase()] = modelFacts(bytes);
 }

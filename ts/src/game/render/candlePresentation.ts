@@ -6,11 +6,9 @@ import { CandleState } from "../sim/codes";
 import { fighterPoseFacing } from "../sim/conditions";
 import type { Fighter } from "../sim/fighter";
 import { candleLevel, candleLoose } from "../sim/heroes/koboldCandle";
-import { definitiveCues } from "./specialCueEffects";
 import { facingYaw, hideEffect, placeEffect, type WorldOrigin } from "./effects";
 
-const CLASSIC_TIP = { x: 8.0, z: 74.0 };
-const DEFINITIVE_TIP = { x: 8.0, z: 74.0 };
+const TIP = { x: 8.0, z: 74.0 };
 const LOOSE = CANDLE_FLAME_MODELS.length;
 const SMOKE = LOOSE * 2;
 
@@ -23,7 +21,6 @@ function candleEffectIndex(fighter: Readonly<Fighter> | undefined, frame: number
 export class CandlePresentation {
   private readonly flames: effect[] = [];
   private readonly placement = { x: 0.0, z: 0.0 };
-  private readonly tip = definitiveCues() ? DEFINITIVE_TIP : CLASSIC_TIP;
   private shown = -1;
   private paused = false;
 
@@ -46,7 +43,7 @@ export class CandlePresentation {
     if (candleLoose(fighter)) placeEffect(model, this.origin.x + fighter.candle.x, this.origin.y, this.origin.z + fighter.candle.z);
     else {
       fitFighterPlacement(this.placement, fighter, stage);
-      placeEffect(model, this.origin.x + this.placement.x + this.tip.x * scale * facing, this.origin.y, this.origin.z + this.placement.z + this.tip.z * scale);
+      placeEffect(model, this.origin.x + this.placement.x + TIP.x * scale * facing, this.origin.y, this.origin.z + this.placement.z + TIP.z * scale);
     }
     BlzSetSpecialEffectYaw(model, facingYaw(facing));
     BlzSetSpecialEffectScale(model, (index === SMOKE ? CANDLE_SMOKE.scale : at(CANDLE_FLAME_SCALES, candleLevel(fighter))) * scale);

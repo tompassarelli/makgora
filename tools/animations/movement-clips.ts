@@ -4,9 +4,7 @@ import { chmodSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { quat } from "gl-matrix";
 import { model as mdx } from "war3-model";
-import { FIGHTER_RIGS } from "./hd-rigs";
-import { type DefinitiveLook, definitiveLook, retargetedSequences } from "./movement-definitive";
-import { DEFINITIVE_FIGHTERS } from "../../ts/src/game/assets/definitiveFighters";
+import { FIGHTER_RIGS } from "./rigs";
 import { highestGrip, ledgeGripOffset } from "./ledge-grip";
 import { DEMON_HUNTER_LEDGE_CATCH_INDEX } from "../../ts/src/game/presentation/demonHunterAssetInfo";
 import { clipFor } from "../../ts/src/game/presentation/fighterClips";
@@ -82,8 +80,6 @@ ensure(standing.clip !== undefined, `${fighter.name}: the sampled fighter shows 
 const standFrame: ScoreFrame = { frame: 0, ...new DrawnModel(generateMDX(source), scale).posed(standing.clip, standing.seconds, 1) };
 const standHeight = Math.max(...Array.from(standFrame.vertices).filter((_, i) => i % 2 === 1)) - Math.min(...Array.from(standFrame.vertices).filter((_, i) => i % 2 === 1));
 const headId = source.Nodes.find((n) => n.Name === rig.classic.head)?.ObjectId;
-const referenceStand = ((ready: number) => ready >= 0 ? ready : source.Sequences.findIndex((s) => /^Stand(?:\s*-?\s*\d+)?$/.test(s.Name)))(source.Sequences.findIndex((s) => /^Stand Ready(?:\s+\d+)?$/.test(s.Name)));
-const look = DEFINITIVE_FIGHTERS.has(character as Character) ? await definitiveLook(input, rig, fighter.name) : undefined;
 const jointOf = new Map(Object.entries(rig.classic).map(([joint, name]) => [name, joint]));
 const TAIL_BONES: Readonly<Partial<Record<number, readonly string[]>>> = { [Character.pitLord]: ["Bone Tail 03", "Bone Tail 04", "Bone Tail 05", "Bone Tail 06"] };
 const tailJoint = new Set(TAIL_BONES[character] ?? []);
@@ -221,23 +217,6 @@ function classicShortfall(slot: Slot): Shortfall {
     drawn.influencedBy(new Set(Object.entries(rig!.classic).flatMap(([joint, bone]) => WEAPON_JOINTS.has(joint) && bone !== undefined ? [bone] : []))));
 }
 
-function definitiveShortfall(slot: Slot, hd: DefinitiveLook): Shortfall {
-  ensure(standing.clip !== undefined, `${fighter!.name}: the sampled fighter shows no standing clip`);
-  const keep = [...new Set([referenceStand, standing.clip, slot.index])].sort((a, b) => a - b);
-  const drawn = new DrawnModel(retargetedSequences(model, rig!, hd, keep), scale);
-  const stand: ScoreFrame = { frame: 0, ...drawn.posed(keep.indexOf(standing.clip), standing.seconds, 1) };
-  return poseShortfall(slot.pose, stand, (frame) => ({ frame, ...drawn.posed(keep.indexOf(slot.index), frame / 60, 1) }), slot.frames, () => -1,
-    drawn.influencedBy(new Set(rig!.pairs.flatMap(([joint, bone]) => WEAPON_JOINTS.has(joint) ? [bone] : []))));
-}
-
-function shortfall(slot: Slot, classicBest: Shortfall | undefined): Shortfall {
-  const classic = classicShortfall(slot);
-  if (classicBest === undefined || look === undefined) return classic;
-  if (classicBest.pass ? !classic.pass : classic.value > classicBest.value + 1e-6) return { ...classic, value: 10 + classic.value };
-  const definitive = definitiveShortfall(slot, look);
-  return { value: Math.max(classic.value, definitive.value), pass: classic.pass && definitive.pass, report: `${classic.report}; definitive ${definitive.report}` };
-}
-
 let cursor = Math.max(...source.Sequences.map((s) => s.Interval[1])) + 100;
 const slots: Slot[] = [];
 for (const pose of poses) {
@@ -251,18 +230,18 @@ for (const pose of poses) {
       MinimumExtent: new Float32Array([-300, -300, -250]), MaximumExtent: new Float32Array([300, 300, 350]), BoundsRadius: 400 });
   }
   const space = OWN.MOVEMENT_POSES?.[pose] ?? SPACES[pose], pinned = PINNED[character]?.[pose];
-  const evaluate = (choice: Choice, floor: Shortfall | undefined) => { ensure(author(slot, space.variant(choice)) >= 3, `${fighter.name}: ${pose} moves fewer than three joints`); return { choice, ...shortfall(slot, floor) }; };
-  const descend = (start: Choice, floor: Shortfall | undefined, coarse: number) => {
-    let found = evaluate(start, floor);
+  const evaluate = (choice: Choice) => { ensure(author(slot, space.variant(choice)) >= 3, `${fighter.name}: ${pose} moves fewer than three joints`); return { choice, ...classicShortfall(slot) }; };
+  const descend = (start: Choice, coarse: number) => {
+    let found = evaluate(start);
     for (let pass = 0; pass < coarse + (space.local ? 1 : 0); pass++) for (const [key, values] of searched(space.options)) for (const value of space.local ? neighbours(values, found.choice[key]) : values) {
-      const tried = evaluate({ ...found.choice, [key]: value }, floor);
+      const tried = evaluate({ ...found.choice, [key]: value });
       if (tried.value < found.value - 1e-6) found = tried;
     }
     for (let pass = 0; pass < 2; pass++) for (const [key, values] of searched(space.options)) {
       const step = Math.min(...values.slice(1).map((value, index) => value - (values[index] ?? value))) / (2 * (pass + 1));
       if (!Number.isFinite(step) || key === "frame") continue;
       for (const value of [(found.choice[key] ?? 0) - step, (found.choice[key] ?? 0) + step]) {
-        const tried = evaluate({ ...found.choice, [key]: value }, floor);
+        const tried = evaluate({ ...found.choice, [key]: value });
         if (tried.value < found.value - 1e-6) found = tried;
       }
     }
@@ -270,15 +249,12 @@ for (const pose of poses) {
   };
   const random = mulberry32(character * 7919 + (pose === "crouch" ? 1 : 2));
   const scattered = Array.from({ length: space.randomStarts ?? 0 }, () => Object.fromEntries(Object.entries(space.options).map(([key, values]) => [key, values[Math.floor(random() * values.length)] ?? 0])));
-  const classicBest = pinned ? evaluate(pinned, undefined) : [...space.starts, ...scattered].map((start) => descend(start, undefined, 3)).reduce((a, b) => b.value < a.value - 1e-6 ? b : a);
-  const refined = look === undefined || pinned ? undefined : descend(classicBest.choice, classicBest, 1);
-  const floor = refined?.pass === true ? classicBest : undefined;
-  const best = floor === undefined ? classicBest : refined!;
+  const best = pinned ? evaluate(pinned) : [...space.starts, ...scattered].map((start) => descend(start, 3)).reduce((a, b) => b.value < a.value - 1e-6 ? b : a);
   author(slot, space.variant(best.choice));
-  const written = shortfall(slot, floor);
+  const written = classicShortfall(slot);
   ensure(Math.abs(written.value - best.value) < 1e-6, `${fighter.name}: ${pose} re-authored as ${written.report}, not the chosen ${best.report}`);
   slots.push(slot);
-  console.log(`MOVEMENT_CLIPS ${fighter.name} ${pose}: ${describe(best.choice)}; ${written.report}${look !== undefined && floor === undefined ? `; definitive ${definitiveShortfall(slot, look).report}${pinned ? "" : " (fails, so Classic-only)"}` : ""}; ${replaced ? `re-authored clip ${slot.index} in place` : `bind ${pose}: { index: ${slot.index}, seconds: ${seconds(frames / 60)} }`}`);
+  console.log(`MOVEMENT_CLIPS ${fighter.name} ${pose}: ${describe(best.choice)}; ${written.report}; ${replaced ? `re-authored clip ${slot.index} in place` : `bind ${pose}: { index: ${slot.index}, seconds: ${seconds(frames / 60)} }`}`);
 }
 
 function sampled(track: mdx.AnimVector, start: number, end: number, frame: number): Float32Array | undefined {

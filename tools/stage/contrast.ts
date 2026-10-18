@@ -122,7 +122,8 @@ async function stockLightCheck(args: readonly string[]): Promise<number> {
     const stock = new Map<string, readonly number[]>();
     const moody = placedPieces(stage, true), plain = placedPieces(stage, false);
     moody.forEach((piece, index) => { const base = plain[index]?.color; if (base !== undefined) stock.set(key(piece.model, piece.color), base); });
-    for (const mode of ["classic", "definitive"] as const) for (const client of [0, 1]) {
+    const mode = "classic";
+    for (const client of [0, 1]) {
       const directory = `${out}/${stage}-${mode}-p${client}`;
       const captures = scenes.filter(scene => scene.client === client).flatMap(scene => {
         const common = { ...scene, ui: [], textTags: [], filter: undefined };

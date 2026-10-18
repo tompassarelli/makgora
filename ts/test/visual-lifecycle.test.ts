@@ -560,7 +560,6 @@ test("Classic Cairne's Shockwave draws a playing wave on its projectile for the 
     const client = clients.clients[0];
     if (client === undefined) throw new Error("missing host client");
     client.run(() => {
-      globalThis.__smashcraftCueDefinitive = false;
       const s = shell();
       selectCharacter(s.game, 0, Character.cairne);
       selectCharacter(s.game, 1, Character.cairne);
@@ -689,7 +688,6 @@ test("Mirror Image matches its owning fighter colour across repeated casts, expi
 test("Chen's confirmed Classic flames fill the long cone, one per hit capsule tapered by its width, in both facings and EX through their linger [k1 scenario]", () => {
   const client = headless.clients({ start: () => {}, install: () => {} }, [0]).client(0);
   client.run(() => {
-    globalThis.__smashcraftCueDefinitive = false;
     for (const facing of [-1, 1]) for (const ex of [false, true]) {
       const chenMatch = testMatch(1, Character.chen), chen = fighterAt(chenMatch.world, 0), breathInput = chenMatch.inputs.inputs[0];
       chen.facing = facing;

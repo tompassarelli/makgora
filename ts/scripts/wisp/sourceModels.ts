@@ -4,7 +4,7 @@ import { join } from "node:path";
 
 const SOURCE_ROOT = join(import.meta.dir, "../../src/game");
 const PATH_LITERAL = /"([A-Za-z0-9_ ]+(?:\\\\[A-Za-z0-9_ .-]+)+\.(?:mdx|mdl))"/g;
-const IMPORTED_PREFIXES = ["war3mapimported\\", "_de.w3mod\\", "_hd.w3mod\\"];
+const IMPORTED_PREFIXES = ["war3mapimported\\", "_hd.w3mod\\"];
 
 export function sourceNamedModels(root = SOURCE_ROOT): readonly string[] {
   const found = new Set<string>();
