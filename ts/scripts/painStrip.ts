@@ -63,6 +63,7 @@ export function painShots(entry: MapEntry, characters: readonly number[], screen
         let first: RenderScene | undefined;
         let held: RenderScene | undefined;
         let holding = true;
+        let pending: RenderScene | undefined;
         const journey = { frames: LAST_OBSERVED + 1, events: [...QUIET_ARENA.map((chat, step) => ({ frame: CHAT_FRAME - 10 + step, player: 0, chat })), { frame: CHAT_FRAME, player: 0, chat: `-dev pain ${height} ${strength} ${fighterKey(character)}` }] };
         const lockstep = runtime.clients(entry, [0, 1], { keepCalls: 1, screen, files: () => files });
         const painFrames = new Map<number, boolean>();
@@ -84,7 +85,7 @@ export function painShots(entry: MapEntry, characters: readonly number[], screen
           if (hitFrame === undefined || !holding) return;
           if (!shown) { holding = false; return; }
           if (frame === hitFrame + settle) first = captureScene(client);
-          if (frame >= hitFrame + settle && frame <= hitFrame + settle + HELD_FRAMES) held = captureScene(client);
+          if (frame >= hitFrame + settle && frame <= hitFrame + settle + HELD_FRAMES) { held = pending; pending = captureScene(client); }
         } });
         shots.push({ fighter: fighterKey(character), category: `${height}-${strength}`, expectedClip, hitFrame, first, held });
       }
