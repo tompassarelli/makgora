@@ -40,6 +40,7 @@ import { characterModelScale } from "../src/game/presentation/modelScale";
 import { facingYaw } from "../src/game/render/effects";
 import { f32 } from "wisp/src/sim/f32";
 import { heroLook } from "../src/game/roster/looks";
+import { originalClip, originalClipCount } from "../src/generated/clips/fighterOriginalClipInfo";
 
 const headless = testHeadless(SMASHCRAFT_HEADLESS);
 
@@ -191,7 +192,8 @@ test("combat effects: rollback, pause/resume and rematch neither replay nor reta
     expect(startAtGo(s.game, 0)).toBe(true);
     startMatch(s);
     s.game.timeLimitMinutes = 0;
-    const handles = new Set([...effectPoses(client)].filter(([, pose]) => hidden(pose)).map(([handle]) => handle));
+    const bodies = new Set(Object.values(Character).flatMap((character) => Array.from({ length: originalClipCount(character) }, (_, index) => originalClip(character, index)?.modelPath)));
+    const handles = new Set([...effectPoses(client)].filter(([, pose]) => hidden(pose) && !bodies.has(pose.model)).map(([handle]) => handle));
     expect(hiddenInView(client)).toEqual([]);
     const initialAllocations = client.log.filter(({ name }) => name === "AddSpecialEffect").length;
     const history = new ReplayHistory();

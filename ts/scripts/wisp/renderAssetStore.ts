@@ -5,7 +5,6 @@ import { dirname, join } from "node:path";
 import { BunServices } from "@effect/platform-bun";
 import { Effect, Schema } from "effect";
 import { ChildProcess } from "effect/process";
-import { FIGHTER_ART } from "../../src/generated/fighterArtData";
 import { INPUTS_STORE, type Manifest, assetsView, readManifest } from "./buildInputs";
 import { ProcessFailure, runProcess } from "../hostProcess";
 import { POST_PROCESSING_FILE } from "../postProcessing";
@@ -65,17 +64,11 @@ export const readStockBuild = (storage: string) => attempt("read the stock build
 const findExtractor = (options: RenderAssetOptions) => options.extractor ?? process.env.CASC_EXTRACTOR ?? Bun.which("casc-extract")
       ?? Array.from(new Bun.Glob("*/build/animation-assets/casc-extract").scanSync({ cwd: dirname(INPUTS_STORE), absolute: true }))[0];
 
-const mapSources = (options: RenderAssetOptions, mapImports: ((assets: string, manifest: Manifest) => Effect.Effect<MapImports, { readonly message: string }>) | undefined, stockFallback: Set<string>) => Effect.gen(function*() {
+const mapSources = (options: RenderAssetOptions, mapImports: ((assets: string, manifest: Manifest) => Effect.Effect<MapImports, { readonly message: string }>) | undefined) => Effect.gen(function*() {
   const manifest = yield* readManifest();
   const assets = options.assets ?? assetsView(manifest);
   const imports = options.imports ?? (mapImports === undefined ? yield* new RenderAssetFailure({ problem: "no map imports given" }) : yield* mapImports(assets, manifest));
-  const paths = new Map(imports.map(({ entry, source }) => [key(entry), source]));
-  for (const { model, source, stock } of FIGHTER_ART.values()) {
-    if (model === undefined || paths.has(key(model))) continue;
-    paths.set(key(model), join(assets, source));
-    if (stock !== undefined) stockFallback.add(key(model));
-  }
-  return paths;
+  return new Map(imports.map(({ entry, source }) => [key(entry), source]));
 }).pipe(Effect.mapError((cause) => cause instanceof RenderAssetFailure ? cause : new RenderAssetFailure({ problem: `read the map's imports: ${cause.message}` })));
 
 export function renderAssetStore(options: RenderAssetOptions = {}, mapImports?: (assets: string, manifest: Manifest) => Effect.Effect<MapImports, { readonly message: string }>) {
@@ -99,8 +92,7 @@ export function renderAssetStore(options: RenderAssetOptions = {}, mapImports?: 
     }
     return directory;
   })))));
-  const stockFallback = new Set<string>();
-  const sources = Effect.runSync(Effect.cached(mapSources(options, mapImports, stockFallback)));
+  const sources = Effect.runSync(Effect.cached(mapSources(options, mapImports)));
   let extractedTextures: Map<string, string> | undefined;
   const pending = new Map<string, Promise<ResolvedRenderAsset>>();
   const convertTexture = (source: string, target: string) => Effect.gen(function*() {
@@ -194,7 +186,6 @@ export function renderAssetStore(options: RenderAssetOptions = {}, mapImports?: 
       const name = key(entry);
 
       if (name === key(POST_PROCESSING_FILE.entry)) return POST_PROCESSING_FILE.contents;
-      if (graphics !== "classic" && stockFallback.has(name)) return undefined;
       const source = imported.get(name);
       if (source === undefined) return undefined;
       const bytes = yield* read(source);
