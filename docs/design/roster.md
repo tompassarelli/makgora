@@ -462,7 +462,7 @@ The individual hero sections below specify all attacks. Their counterplay descri
 | Forward tilt — Measuring Cut | 8/3/19 | 8 inner, 9 outer | L, 35, POKE | Outer final 0.20H of blade rewards spacing |
 | Up tilt — Rising Crescent | 7/5/20 | 8 | M, 90, LAUNCH | Arc above and slightly behind; weak directly low in front |
 | Down tilt — Ankle Cut | 7/3/17 | 6 | L, 75, LINK | Low thin sweep; a starter rather than a kill move |
-| Dash attack — Advancing Slash | 10/4/28 | 10 | L, 45, LAUNCH | Moves 0.55H forward during startup; cannot pass through shield |
+| Dash attack — Advancing Slash | 10/4/28 | 8.5 strong, 7 tip | L, 45, LAUNCH | Moves 0.55H forward during startup; cannot pass through shield |
 | Forward smash — Execution Cut | 17/3/35 | 13 inner, 17 outer | XL, 40, KILL growth, base 30 | Large horizontal cut; outer 0.20H is sweetspot |
 | Up smash — Sky Splitter | 15/4/30 | 16 | L, 90, KILL | Narrow vertical blade with no broad ground scoop |
 | Down smash — Low Circle | 14/6/31 | 14 | L, 25, EDGE | Low sword sweep in front on frames 14–16, then behind on 17–19; one hit total per target |
@@ -477,7 +477,7 @@ The individual hero sections below specify all attacks. Their counterplay descri
 | Input | Proposed move and behavior | Timing and cost |
 | --- | --- | --- |
 | Neutral B | **Wind Cutter:** short traveling blade wave. 6 damage, POKE at 35 degrees; speed 0.14H/frame, life 24 frames, radius 0.16H. Reflectable; only one owned wave at a time. | Spawn f18, action ends f40; 0 mana |
-| Side B | **Wind Walk** (#124, smashcraft:docs/design/kit-review-1.md): a 7-frame fade, then a 2.2H walk that passes bodies and stops at a raised shield. In f10–31 an attack press is **Backstab**, a slash for 12 damage at 40 degrees, EDGE, toward the held stick (back turns him: the cross-up); a special press steps out; nothing recovers. No invisibility or invulnerability. In air once per airtime, then helpless. | Walk f8–31, end f44; Backstab active f6–8 of its press, end f30; step out ends 8 frames after its press; 18 mana |
+| Side B | **Wind Walk** (#124, smashcraft:docs/design/kit-review-1.md): a 7-frame fade, then a 2.2H walk that passes bodies and stops at a raised shield. In f10–31 an attack press is **Backstab**, a slash for 8.5 damage at 40 degrees, EDGE, toward the held stick (back turns him: the cross-up); a special press steps out; nothing recovers. No invisibility or invulnerability. In air once per airtime, then helpless. | Walk f8–31, end f44; Backstab active f6–8 of its press, end f30; step out ends 8 frames after its press; 18 mana |
 | Up B | **Rising Whirlwind:** sword extended through a charged spin dash, in the chosen direction, meeting the [#252 long-route recovery band](../gameplay-design.md#recovery-and-edgeguarding); one hit for 9 damage at 80 degrees, LAUNCH. No intangibility. Mana-free version meets the 240-unit route floor with no attack. | Aim f1–8, hit f9–14, dash f9–22, stop f23, then helpless; 15 mana |
 | Down B | **Mirror Image** (#124): after a visible tell, an image stays where he stood (one hit of any kind shatters it; 150 frames) and he steps 1.0H back (down with a side turns him to that side first). Down special while the image stands **swaps**: he takes the image's place facing its way and slashes for 10 damage at 40 degrees, EDGE. The image never attacks; no intangibility. | Image and step f8, end f24, 15 mana; swap f6, slash f8–10, end f30, free |
 
@@ -548,10 +548,10 @@ The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-wea
 | Input and move | F/A/R and landing | Damage | Reach and launch | Behavior |
 | --- | --- | --- | --- | --- |
 | Jab — Hammer Butt | 5/2/15 | 4 | S, 35, POKE | Short body check with hammer hilt |
-| Forward tilt — Axe Hook | 9/3/21 | 10 | M, 35, EDGE | Wide frontal chop with exposed hand |
+| Forward tilt — Axe Hook | 9/3/21 | 13.75 | M, 35, EDGE | Wide frontal chop with exposed hand |
 | Up tilt — Hammer Lift | 8/4/22 | 9 | M, 90, LAUNCH | Head-level scoop, limited rear reach |
 | Down tilt — Boot and Axe | 7/3/18 | 7 | S, 70, LINK | Low kick; no trip RNG |
-| Dash attack — Dwarf Charge | 11/5/28 | 12 | M, 40, LAUNCH | Body hitbox; completely tradeable |
+| Dash attack — Dwarf Charge | 11/5/28 | 13.75 | M, 40, LAUNCH | Body hitbox; completely tradeable |
 | Forward smash — Mountain Breaker | 20/3/36 | 21 | L, 40, KILL | Heavy overhead hammer; head is sweetspot, handle 16 damage |
 | Up smash — Twin Lift | 17/5/32 | 17 | M, 85, KILL | Axe and hammer form one hit above |
 | Down smash — Stone Sweep | 16/6/34 | 16 | M, 25, EDGE | Front then back, one hit per target |
@@ -956,7 +956,7 @@ then ledge-oriented Ascension for recovery. Coverage counts all four specials.
 | Input | Proposed move and behavior | Timing and cost |
 | --- | --- | --- |
 | Neutral B | **Carrion Swarm:** a short bat cloud moving at 0.09H/frame for 32 frames, radius 0.25H. One hit for 7 damage, POKE at 40 degrees. Reflectable as one projectile, one cloud active. | Spawn f20, end f45; 5 mana |
-| Side B | **Vampiric Pounce** (#237): fast horizontal corkscrew with bats trailing, ground and air. Travels 2.24H across 16 frames, stopping short of bodies/shields; 0.45H bite catch f17–19. Catch releases after 16 frames for 10.00025 damage, EDGE at 40 degrees, then 28 recovery. | Catch f17–19; whiff R34; 20 mana | Bite heals 4%, at most 12 a stock. Air form is once per airtime and ends helpless. |
+| Side B | **Vampiric Pounce** (#237): fast horizontal corkscrew with bats trailing, ground and air. Travels 2.24H across 16 frames, stopping short of bodies/shields; 0.45H bite catch f17–19. Catch releases after 16 frames for 11.75 damage, EDGE at 40 degrees, then 28 recovery. | Catch f17–19; whiff R34; 20 mana | Bite heals 4%, at most 12 a stock. Air form is once per airtime and ends helpless. |
 | Up B | **Bat Ascension:** steerable rising curve up to 2.0H high and 0.8H across, no hitbox. Visible bat-body hurtbox throughout; no intangibility. Free version 1.4H height and 0.3H across. | Movement f9–32, then helpless; 15 mana |
 | Down B | **Sleep** (#132): visibly slow projectile, speed 0.06H/frame, life 50, radius 0.18H, one active and reflectable. Body hit deals 2 damage and 100 frames of sleep (24 if the target is airborne); the sleeper keeps velocity/gravity, cannot act, mashes out with the grab and freeze rule (8 frames a press or new stick direction, never before frame 24) and wakes on the next damaging hit. Then 240-frame sleep immunity. Shield blocks it. No bonus damage on waking. | Spawn f26, end f58; 25 mana |
 
@@ -1024,9 +1024,9 @@ The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-wea
 | Input and move | F/A/R and landing | Damage | Reach and launch | Behavior |
 | --- | --- | --- | --- | --- |
 | Jab — Glaive Handle | 5/2/14 | 3 | S, 35, POKE | Quick close check |
-| Forward tilt — Crescent Chop | 9/3/21 | 9 | L, 35, POKE | Long glaive front cut |
+| Forward tilt — Crescent Chop | 9/3/21 | 11.75 | L, 35, POKE | Long glaive front cut |
 | Up tilt — Totem Lift | 8/4/21 | 8 | M, 85, LAUNCH | Weapon shaft above |
-| Down tilt — Low Crescent | 7/3/19 | 6 | M, 70, LINK | Low safe-distance poke, modest stun |
+| Down tilt — Low Crescent | 7/3/19 | 8.5 | M, 70, LINK | Low safe-distance poke, modest stun |
 | Dash attack — Jungle Slash | 10/4/27 | 10 | M, 50, LAUNCH | Forward slicing step |
 | Forward smash — Spirit Cleaver | 19/3/34 | 18 | L, 40, KILL | Full glaive arc |
 | Up smash — Loa’s Reach | 17/4/31 | 15 | L, 90, KILL | Spirit outline marks real vertical hitbox |
@@ -1104,10 +1104,10 @@ The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-wea
 | Input and move | F/A/R and landing | Damage | Reach and launch | Behavior |
 | --- | --- | --- | --- | --- |
 | Jab — Haft Check | 7/3/19 | 6 | M, 35, POKE | Slow close-range jab |
-| Forward tilt — Cleaving Sweep | 13/4/35 | 12 | XL, 35, EDGE | Main space claim; blade disjoint only |
+| Forward tilt — Cleaving Sweep | 13/4/33 | 12 | XL, 35, EDGE | Main space claim; blade disjoint only |
 | Up tilt — Horn and Cleaver | 12/5/27 | 12 | L, 85, LAUNCH | Broad overhead arc with weak low front |
 | Down tilt — Front Hoof | 10/3/24 | 9 | M, 65, LINK | Exposed hoof attack |
-| Dash attack — Demonic Bulk | 15/6/34 | 16 | L, 40, EDGE | Body charge, no armor |
+| Dash attack — Demonic Bulk | 15/6/32 | 16 | L, 40, EDGE | Body charge, no armor |
 | Forward smash — Annihilating Cleave | 27/4/43 | 25 head, 19 inner | XL, 40, KILL | Longest commitment, cleaver tip sweetspot |
 | Up smash — Abyssal Lift | 24/5/39 | 22 | XL, 85, KILL | Tall slow anti-air |
 | Down smash — Rear and Front Stomp | 22/7/41 | 19 | L, 25, EDGE | Front f22–24, rear f26–28; one hit total |
@@ -1191,11 +1191,11 @@ away from the edge.
 | Input and move | F/A/R and landing | Damage | Reach and launch | Behavior |
 | --- | --- | --- | --- | --- |
 | Jab — Wrench Tap | 5/2/15 | 4 | S, 35, POKE | Short wrench hit |
-| Forward tilt — Piston Arm | 10/3/24 | 10 | L, 35, POKE | Disjointed metal tip; extension visibly retracts |
+| Forward tilt — Piston Arm | 10/3/24 | 7.5 | L, 35, POKE | Disjointed metal tip; extension visibly retracts |
 | Up tilt — Gear Lift | 9/4/23 | 8 | M, 85, LAUNCH | Mechanical arm above head |
 | Down tilt — Low Spanner | 7/3/20 | 6 | M, 65, LINK | Thin ground poke |
-| Dash attack — Wheel Ram | 11/5/28 | 11 | M, 45, LAUNCH | Body collision, not armored |
-| Forward smash — Hydraulic Punch | 21/3/37 | 20 | XL, 35, KILL | Slow long piston; handle 14 damage |
+| Dash attack — Wheel Ram | 11/5/28 | 9.375 | M, 45, LAUNCH | Body collision, not armored |
+| Forward smash — Hydraulic Punch | 21/3/37 | 15.75 | XL, 35, KILL | Slow long piston; handle 11 damage |
 | Up smash — Spring Hammer | 18/4/33 | 17 | L, 90, KILL | Strong vertical tool |
 | Down smash — Dual Pistons | 17/5/35 | 14 | L, 25, EDGE | Front/rear extensions, one hit |
 | Neutral air — Gear Spin | 8/6/23; L15 | 9 | M, 50, POKE | Attached machinery circle |
@@ -1486,11 +1486,11 @@ above; damage and launch classes are provisional. The move list
 | Move | F/A/R | Damage | Reach | Notes |
 | --- | --- | --- | --- | --- |
 | Jab, Pommel and Rake | 6/3/13, 7/3/16, 9/3/23 | 3, 3, 5 | 0.6H, 0.8H, 1.1H | A three-step chain (#163) ending in a Frostmourne thrust |
-| Forward tilt, Frostmourne Sweep | 11/4/24 | 14 | 1.35H | From his shoulder to the floor: not angled |
+| Forward tilt, Frostmourne Sweep | 11/4/24 | 15 | 1.35H | From his shoulder to the floor: not angled |
 | Up tilt, Overhead Reap | 10/5/23 | 11 | arc to 1.45H | Covers behind him |
 | Down tilt, Frozen Ground | 9/4/22 | 6 + 6 | 1.1H front, 0.9H back | Front, then behind: the two-sided sweep |
 | Dash attack | 12/4/30 | 11 | 1.1H | Travels 40 in startup, stops at a body |
-| Forward smash, Frostmourne Cleave | 22/4/38 | 23.5 tip, 19.5 inner | 1.35H | The tip sweetspot |
+| Forward smash, Frostmourne Cleave | 22/4/38 | 24.75 tip, 20.5 inner | 1.35H | The tip sweetspot |
 | Up smash, Remorseless Winter | 18/8/38 | 15, then 10 | 0.72H all round | A burst around him, then a weaker gust |
 | Down smash, Quake | 17/6/40 | 14 + 14 | 1.1H each side | Front f17-19, back f20-22 |
 | Neutral air | 10/8/24, land 16 | 11 + 11 | 1.1H | Front then back |
@@ -1572,7 +1572,7 @@ Expert gameplan: Combine ground control, grabs and sword confirms into planned f
 
 ### Signature strong/weak move (#389)
 
-Forward smash, split by position: strong hit sweetspot, frames 22-25, 23.5%; weak hit sourspot, frames 22-25, 19.5%. Frostmourne's point: the king kills at the end of the blade.
+Forward smash, split by position: strong hit sweetspot, frames 22-25, 24.75%; weak hit sourspot, frames 22-25, 20.5%. Frostmourne's point: the king kills at the end of the blade.
 The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-weak-hits-389) and every split in the [move list](../move-list.md).
 
 

@@ -472,6 +472,32 @@ Malfurion, at 66-70% in the lane runs, drops forward smash from 17 to
 9.25. Every changed kill percent stays within 15% of the fixed baseline and
 every change inside its ±25% and ±3-frame bounds.
 
+18 Oct 2026 (#45 pass 2, 45–55% Wren field). The Wren Expert field on
+31cc0b9e96 (Balance run 39091849148, 400 a pair) put Rifleman at 65% with
+his dash attack at 25% of his damage and its spam probe winning 81%,
+Blademaster 64%, Kael'thas 63% (forward smash 60% of his KOs), Illidan 61%,
+Cairne 57% and Dreadlord 56%; Lich King 36%, Goblin Tinker 37%, Forsaken
+Paladin 40%, Thrall and Shadow Hunter 43%, Pit Lord 44% and Mountain King
+45%. Rifleman's dash attack starts 2 frames later (first active 11, total
+unchanged) and deals 8.25 instead of 10.23 with growth 114, so it kills at
+100% instead of 88%. Blademaster's dash attack drops to 8.5/7 (the tip stays
+under 0.85 of the strong hit) and Backstab to 8.5 with growth 116; his
+forward smash is unchanged. Kael'thas's forward smash deals 15.5 instead of
+17.35 with growth 108 and recovers 2 frames later; his dash attack deals 9.
+Cairne's War Stomp (9.75) and Dreadlord's pounce bite
+(11.75) deal about 6% less. Lich King's forward smash comes partly back,
+24.75/20.5, Frostmourne Sweep goes to 15 and his dash attack's growth to 88.
+Goblin Tinker's forward tilts (7.5), dash attack (9.375), forward smash
+(15.75) and rockets (3.75), Forsaken Paladin's forward tilt and dash attack
+(14.75), Thrall's forward tilts (13.25), down tilt (9.75) and dash attack
+(13.75), Shadow Hunter's forward tilts (11.75) and down tilt (8.5), and
+Mountain King's forward tilts and dash attack (13.75) deal more; Pit Lord's
+forward tilt and dash attack recover 2 frames sooner. Tinker's laser keeps
+6.85, since any more gives it a kill below 300%, and Forsaken Paladin's
+Righteous Fury keeps its damage, since its EX would kill earlier than the
+15% bound. Every changed kill percent stays within 15% of the fixed baseline
+and every change inside its ±25% and ±3-frame bounds.
+
 ## Player panel and equal skill ceilings (#358)
 
 Every fighter targets a 45–55% mean over all six Expert personalities, with
