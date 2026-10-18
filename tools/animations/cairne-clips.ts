@@ -29,17 +29,17 @@ ensure(input && output && relative(project, output).startsWith(".."), "usage: bu
 const source = parseSource(await Bun.file(input).arrayBuffer()), model = structuredClone(source);
 ensure(source.Sequences.length === 12 && source.Nodes.some(n => n.Name === "Bone_Axe_Free"), "Expected classic Tauren Chieftain");
 const stand = source.Sequences[4]!, idleSequence = source.Sequences[0]!;
-interface Gesture { chest?: number; twist?: number; head?: number; arm?: number; elbow?: number; free?: number; freeElbow?: number; hip?: number; knee?: number; lean?: number; yaw?: number; leftHip?: number; rightHip?: number; leftKnee?: number; rightKnee?: number; step?: number; pitch?: number }
+interface Gesture { chest?: number; twist?: number; head?: number; arm?: number; elbow?: number; free?: number; freeElbow?: number; hip?: number; knee?: number; lean?: number; yaw?: number; leftHip?: number; rightHip?: number; leftKnee?: number; rightKnee?: number; step?: number; pitch?: number; rise?: number }
 interface Phase { frame: number; gesture: Gesture; target?: readonly [number,number]; idle?: boolean }
 interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; stock?: number; stockHit?: number; prepTravel?: number; hold?: boolean; air?: boolean; roll?: number; first?: Gesture; phases?: readonly Phase[]; target?: readonly [number, number]; damage?: boolean; beats?: readonly Phase[]; gore?: "travel" | "hold" | "recovery"; settleFrom?: number; stockFrom?: number }
-interface Strike { prep: Gesture; hit: Gesture; follow: Gesture; prepAt?: number; followAt?: number; settle?: number; rest?: Gesture; restTarget?: readonly [number,number]; prepTarget?: readonly [number,number]; hitTarget?: readonly [number,number]; mid?: readonly Phase[]; aim?: boolean; reach?: readonly [number,number] }
+interface Strike { prep: Gesture; hit: Gesture; follow: Gesture; prepAt?: number; followAt?: number; settle?: number; rest?: Gesture; restTarget?: readonly [number,number]; prepTarget?: readonly [number,number]; hitTarget?: readonly [number,number]; mid?: readonly Phase[]; aim?: boolean; reach?: readonly [number,number]; air?: boolean }
 const strikeBeats=(move:{startupFrames:number;totalFrames:number;regions:readonly {firstFrame:number;lastFrame:number;hit:{strike?:{x2:number;z2:number}}}[]},s:Strike):Phase[]=>{
   const contact=move.startupFrames,end=move.totalFrames,lastActive=Math.max(...move.regions.map(r=>r.lastFrame));
   const followAt=s.followAt??Math.min(end-4,lastActive+2),settleAt=Math.round(followAt+(end-followAt)*(s.settle??0.55));
   const strike=move.regions[0]!.hit.strike!;
   return [{frame:0,gesture:ready},{frame:s.prepAt??Math.max(1,contact-Math.max(2,Math.round(contact*0.3))),gesture:s.prep,target:s.prepTarget},
     {frame:contact,gesture:s.hit,target:s.hitTarget??(s.aim?[strike.x2,strike.z2]:undefined)},...(s.mid??[]),{frame:followAt,gesture:s.follow,target:s.reach},
-    {frame:settleAt,gesture:s.rest??blend(s.follow,ready,0.62),target:s.restTarget},{frame:end-1,gesture:ready,idle:true},{frame:end,gesture:ready,idle:true}].sort((a,b)=>a.frame-b.frame);
+    {frame:settleAt,gesture:s.rest??blend(s.follow,ready,0.62),target:s.restTarget},{frame:end-1,gesture:ready,idle:!s.air},{frame:end,gesture:ready,idle:!s.air}].sort((a,b)=>a.frame-b.frame);
 };
 const blend=(a:Gesture,b:Gesture,t:number):Gesture=>Object.fromEntries([...new Set([...Object.keys(a),...Object.keys(b)])].map(k=>[k,(a[k as keyof Gesture]??0)*(1-t)+(b[k as keyof Gesture]??0)*t]));
 const ready: Gesture = {};
@@ -96,11 +96,17 @@ const strikes: Partial<Record<HeroPose, Strike>> = {
     mid:[{frame:24,gesture:{chest:-10,twist:-20,yaw:150,arm:-150,elbow:15,free:-140,pitch:-6,leftHip:-86,rightHip:-68,leftKnee:88,rightKnee:86,head:-16},target:[-70,70]},
       {frame:28,gesture:{chest:42,twist:0,yaw:160,arm:-60,elbow:5,free:-54,pitch:20,step:22,leftHip:-24,rightHip:-12,leftKnee:24,rightKnee:8,head:-14},target:[-148,10]}],
     follow:{chest:44,twist:10,yaw:180,arm:-58,elbow:5,free:-52,pitch:22,step:24,leftHip:-26,rightHip:-12,leftKnee:26,rightKnee:8,head:-12},followAt:34,reach:[-158,8]},
+  downAir:{prep:{chest:24,arm:-35,elbow:40,free:-40,freeElbow:35,pitch:-6,leftHip:-104,rightHip:-96,leftKnee:118,rightKnee:112,head:16,rise:16},prepAt:10,
+    hit:{chest:14,arm:-70,elbow:15,free:-60,freeElbow:20,pitch:-4,leftHip:12,rightHip:6,leftKnee:2,rightKnee:0,head:26,rise:-14},hitTarget:[70,95],
+    mid:[{frame:18,gesture:{chest:28,arm:-30,elbow:45,free:-35,freeElbow:40,pitch:-8,leftHip:-110,rightHip:-102,leftKnee:124,rightKnee:118,head:18,rise:22}},
+      {frame:23,gesture:{chest:18,arm:-60,elbow:12,free:-50,freeElbow:18,pitch:-4,leftHip:12,rightHip:6,leftKnee:0,rightKnee:0,head:28,rise:-46},target:[75,80]}],
+    follow:{chest:14,arm:-56,elbow:20,free:-52,freeElbow:25,pitch:-2,leftHip:2,rightHip:0,leftKnee:8,rightKnee:6,head:20,rise:-30},followAt:26,reach:[75,75],settle:0.5,
+    rest:{chest:7,arm:-30,elbow:12,free:-28,freeElbow:12,leftHip:-2,rightHip:-1,leftKnee:8,rightKnee:6,head:10,rise:-18}},
 };
 for (const [pose, style, gesture] of normals) {
   const move = CAIRNE_MOVES.normals[style]; ensure(move, `${pose}: missing timing`);
   const strike = strikes[pose];
-  if (strike) { actions.push({pose,frames:move.totalFrames,contact:move.startupFrames,gesture:strike.hit,beats:strikeBeats(move,strike)}); continue; }
+  if (strike) { actions.push({pose,frames:move.totalFrames,contact:move.startupFrames,gesture:strike.hit,beats:strikeBeats(move,{...strike,air:pose.endsWith("Air")}),air:pose.endsWith("Air")}); continue; }
   const first = move.startupFrames;
   const sweeping = ["forwardTilt","forwardTiltUp","forwardTiltDown","forwardSmash","forwardAir","backAir","upTilt","downSmash","neutralAir"].includes(pose);
   const phases:Phase[]|undefined = sweeping ? move.regions.map(region => ({frame: region.firstFrame, target:[region.hit.strike!.x2,region.hit.strike!.z2],gesture: {...gesture,
@@ -351,6 +357,11 @@ for (const [ordinal,action] of [...actions,...damageActions,...goreActions].entr
       const Frame=start+Math.round(frame*1000/60),w=idleWeight(frame),Vector=mainDonor.Vector.map((v,i)=>v*(1-w)+mainIdle.Vector[i]!*w);Vector[2]=Vector[2]!-floor;
       if(action.beats)Vector[0]=Vector[0]!+along(action.beats,frame,p=>p.gesture.step??0);
       if(action.prepTravel&&frame<action.contact){const wind=Math.max(1,action.contact-3);Vector[0]=Vector[0]!-action.prepTravel*(frame<=wind?frame/wind:(action.contact-frame)/(action.contact-wind));}
+      const key={Frame,Vector,...rootTrack.LineType>1?{InTan:new Float32Array(3),OutTan:new Float32Array(3)}:{}};
+      const previous=rootTrack.Keys.find(k=>k.Frame===Frame);if(previous)Object.assign(previous,key);else rootTrack.Keys.push(key);}
+    rootTrack.Keys.sort((a,b)=>a.Frame-b.Frame);}
+  else if(action.beats?.some(b=>b.gesture.rise!==undefined)){const mainDonor=source.Nodes[main.ObjectId]!.Translation!.Keys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1])!;
+    for(let frame=0;frame<=action.frames;frame++){const Frame=start+Math.round(frame*1000/60),Vector=mainDonor.Vector.slice();Vector[2]=Vector[2]!+along(action.beats,frame,p=>p.gesture.rise??0);
       const key={Frame,Vector,...rootTrack.LineType>1?{InTan:new Float32Array(3),OutTan:new Float32Array(3)}:{}};
       const previous=rootTrack.Keys.find(k=>k.Frame===Frame);if(previous)Object.assign(previous,key);else rootTrack.Keys.push(key);}
     rootTrack.Keys.sort((a,b)=>a.Frame-b.Frame);}

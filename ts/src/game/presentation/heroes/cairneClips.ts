@@ -18,7 +18,7 @@ export const CAIRNE_CLIPS = { idle: { index: 0, seconds: f32(2.667) }, walk: { i
   forwardAir: { index: 24, seconds: f32(0.983), aligned: true },
   backAir: { index: 25, seconds: f32(0.8), aligned: true },
   upAir: { index: 26, seconds: f32(0.717), aligned: true },
-  downAir: { index: 27, seconds: f32(1.05), aligned: true },
+  downAir: { index: 27, seconds: f32(0.983), aligned: true },
   crouch: { index: 28, seconds: 0.5, aligned: true },
   landing: { index: 29, seconds: f32(0.133), aligned: true },
   shield: { index: 30, seconds: 0.5, aligned: true },

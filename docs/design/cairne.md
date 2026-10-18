@@ -57,7 +57,7 @@ link names a relationship, not copied frame data or geometry.
 | Forward air | 20/4/36/L26; 19 damage; descending totem wall, outward launch. | [Totem][wc] | [Bowser's forward wall][bowser] |
 | Back air | 15/4/30/L22; 16 damage; rearward totem strike. | [Totem][wc] | [K. Rool's committed rear attack][krool] |
 | Up air | 12/4/28/L20; 13 damage; narrow horn rise; horns are hittable. | [Tauren body][wc] | [Bowser's overhead head strike][bowser] |
-| Down air | 21/5/38/L28; 18 damage; totem downward, meteor in air and 55-degree launch on ground. | [War Stomp/totem][wc] | [K. Rool's deliberate downward strike][krool] |
+| Down air, Hoof Stomp | 21/7/32/L28; both legs drawn up through f18, then a two-hoof stomp. Clean f21–23: 18 damage, base 40, growth 100, 270-degree meteor in the air and 55-degree launch on the ground. Late f24–27: 12 damage, base 20, growth 80, 55-degree pop up and away. Melee Captain Falcon and Ganondorf hit on f16–20 for 16% and 22% at 270 degrees with base 40/50 and growth 100, interruptible from f38 with 24/35 landing lag; Cairne keeps 5 frames of extra startup for his weight, splits the 7 active frames into a clean meteor and a weaker late hit, and lands between them at L28 (#96). | [War Stomp][wc] | [Captain Falcon][falcondair] and [Ganondorf][ganondair] down airs |
 | Grab | 10/3/31; short free-hand reach; shared shield grab and escape. | [Tauren strength][wc] | [Bowser's close grab][bowser] |
 | Pummel | Shared contact f60, end f68; 3 damage; at most one pummel, escapable by mashing. | [Totem haft][wc] | [Heavyweight local pummel][bowser] |
 | Forward throw | Contact f19, end f45; 11 damage at 35 degrees; stage control. | [Tauren strength][wc] | [Bowser's outward toss][bowser] |
@@ -115,6 +115,8 @@ the ledge.
 [eruption]: https://www.ssbwiki.com/Eruption
 [slap]: https://www.ssbwiki.com/Hand_Slap
 [ganon]: https://www.ssbwiki.com/Flame_Choke
+[falcondair]: https://www.ssbwiki.com/Captain_Falcon_(SSBM)/Down_aerial
+[ganondair]: https://www.ssbwiki.com/Ganondorf_(SSBM)/Down_aerial
 
 ## Play-style profile
 

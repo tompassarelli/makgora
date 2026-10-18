@@ -11,6 +11,7 @@ const STRENGTH = {
   kill: { growth: 121.1897964477539, base: 24.0 }, juggle: { growth: 62.88150405883789, base: 50.0 },
   chase: { growth: 48.475921630859375, base: 75.0 },
   stompFront: { growth: 100.0, base: 30.0 }, stompRear: { growth: 100.0, base: 20.0 },
+  stompMeteor: { growth: 100.0, base: 40.0 }, stompLate: { growth: 80.0, base: 20.0 },
 } as const;
 const DIRECTIONS = {
   25: [f32(0.906307787), f32(0.422618262)], 35: [f32(0.819152044), f32(0.573576436)],
@@ -68,7 +69,7 @@ export const CAIRNE_MOVES: FighterMoves = {
       [AttackStyle.forwardAir]: pose(18, 26, arm(90.0, 90.0)),
       [AttackStyle.backAir]: pose(13, 20, arm(-86.0, 80.0)),
       [AttackStyle.upAir]: pose(10, 18, hurtPart(0.0, 120.0, 0.0, 188.0, 22.0)),
-      [AttackStyle.downAir]: pose(19, 28, arm(10.0, 15.0)),
+      [AttackStyle.downAir]: pose(21, 27, arm(10.0, 15.0)),
       [AttackStyle.grab]: pose(8, 15, arm(96.0, 62.0)),
     },
   },
@@ -102,7 +103,10 @@ export const CAIRNE_MOVES: FighterMoves = {
     [AttackStyle.forwardAir]: heroMove(20, 4, 36, 26, sweep(20, 175.0, [165.0, 110.0, 55.0, 0.0], 15.307236671447754, "kill")),
     [AttackStyle.backAir]: heroMove(15, 4, 30, 22, sweep(15, 155.0, [120.0, 90.0, 60.0, 30.0], 12.890304565429688, "edge", -1)),
     [AttackStyle.upAir]: heroMove(12, 4, 28, 20, [strike(12, 15, c(0.0, 125.0, 0.0, 194.0, 20.0), 10.473372459411621, "launch", 85)]),
-    [AttackStyle.downAir]: heroMove(21, 5, 38, 28, [heroRegion(21, 25, c(0.0, 30.0, 0.0, -80.0, 20.0), cairneHit(14.501592636108398, "kill", 270), cairneHit(14.501592636108398, "kill", 55))]),
+    [AttackStyle.downAir]: heroMove(21, 7, 32, 28, [
+      heroRegion(21, 23, c(0.0, 30.0, 0.0, -80.0, 20.0), cairneHit(18.0, "stompMeteor", 270), cairneHit(18.0, "stompMeteor", 55)),
+      strike(24, 27, c(0.0, 30.0, 0.0, -80.0, 18.0), 12.0, "stompLate", 55),
+    ]),
     [AttackStyle.grab]: heroMove(10, 3, 31, 0, [heroRegion(10, 12, c(30.0, 65.0, 98.0, 60.0), { damage: 0.0, ...NO_LAUNCH })]),
   },
   throws: {
