@@ -49,7 +49,11 @@ Dreadlord and Warden had no stage from their campaigns.
 Both stages are selectable. Stratholme uses cobbled slopes and three rooftop
 platforms before a ruined cathedral, city gate and distant fires, above
 ridges of rubble and ruined foundations with a fire burning among broken
-columns (stage art rule 16). Tomb of
+columns (stage art rule 16); beneath the deck, ruined houses, an archway and
+the fountain stand around two fires, and the skyline is the ruined city's
+rooftops and a broken colonnade with a blaze among them (rule 18). Tomb of
 Sargeras uses two overhanging end platforms, a shallow tide floor, distant
-Naga temple and waterfall. Each has its own quiet sky, light and deck palette;
+Naga temple and waterfall, a Naga tidal guardian and broken archways of
+the sunken temple, and the Broken Isles'
+green peaks in the far haze. Each has its own quiet sky, light and deck palette;
 background pieces remain behind the fight and the lower sky stays a void.

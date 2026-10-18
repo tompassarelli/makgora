@@ -7,10 +7,6 @@ const MOUND = "Doodads\\Barrens\\Rocks\\Barrens_Rocks\\Barrens_Rocks2.mdx";
 const SPIRE = "Doodads\\Felwood\\Rocks\\Felwood_Spires\\Felwood_Spires0.mdx";
 const BACK = "Doodads\\Ruins\\Rocks\\Ruins_Spires\\Ruins_Spires0.mdx";
 const ASHEN_MOUND = "Doodads\\Ashenvale\\Rocks\\AshenRock\\AshenRock2.mdx";
-const SPIRE0 = "Doodads\\Ruins\\Rocks\\Ruins_Spires\\Ruins_Spires0.mdx";
-const SPIRE2 = "Doodads\\Ruins\\Rocks\\Ruins_Spires\\Ruins_Spires2.mdx";
-const GATE = "Doodads\\Ruins\\Structures\\RuinsArchway45_\\RuinsArchway45_0.mdx";
-const OBELISK = "Doodads\\Ruins\\Props\\RuinsObelisk\\RuinsObelisk1.mdx";
 const SPIRES0 = "Doodads\\Outland\\Rocks\\Outland_Spires\\Outland_Spires0.mdx";
 const SPIRES2 = "Doodads\\Outland\\Rocks\\Outland_Spires\\Outland_Spires2.mdx";
 const SPIRES7 = "Doodads\\Outland\\Rocks\\Outland_Spires\\Outland_Spires7.mdx";
@@ -19,6 +15,14 @@ const BASALT = "Doodads\\Barrens\\Rocks\\Barrens_Rocks\\Barrens_Rocks0.mdx";
 const MAGMA = "Doodads\\Outland\\Rocks\\Outland_MagmaRock\\Outland_MagmaRock0.mdx";
 const TRAP = "Doodads\\Cinematic\\FireTrapUp\\FireTrapUp.mdx";
 const PILLAR = "Doodads\\Cinematic\\FirePillarMedium\\FirePillarMedium.mdx";
+const OBELISK = "Doodads\\Ruins\\Props\\RuinsObelisk\\RuinsObelisk1.mdx";
+const QIRAJI_GATE = "Doodads\\Ruins\\Structures\\SRuinArch\\SRuinArch.mdx";
+const ZIGGURAT = "buildings\\other\\NerubianZiggurat\\NerubianZiggurat.mdx";
+const MESA_SPIRE = "Doodads\\Barrens\\Rocks\\Barrens_Spires\\Barrens_Spires0.mdx";
+const DUNE_SPIRE = "Doodads\\Barrens\\Rocks\\Barrens_Spires\\Barrens_Spires2.mdx";
+const LOW_SPIRE = "Doodads\\Barrens\\Rocks\\Barrens_Spires\\Barrens_Spires1.mdx";
+const SAND = [250, 240, 222] as const;
+const PALE_SAND = [255, 250, 238] as const;
 
 export const NORDRASSIL_SCENERY: StageScenery = {
   farZ: 13000.0,
@@ -189,52 +193,39 @@ export const AHNQIRAJ_SCENERY: StageScenery = {
   farZ: 17000.0,
   sky: STAGE_SKY_MODELS[13] ?? "",
   fog: { start: 8000.0, end: 16000.0, red: 0.75, green: 0.625, blue: 0.375 },
-  floor: { model: STAGE_GROUND_MODEL, z: -1300.0, color: [80, 66, 44] },
+  floor: { model: STAGE_GROUND_MODEL, z: -1300.0, color: [112, 92, 60] },
   pieces: [
-    { model: SPIRE0, x: -4000.0, y: 4450.0, z: -1808.0, scale: 4.0, yaw: 190.0, matrixScale: [2.5, 1.0, 1.5] },
-    { model: SPIRE2, x: -3650.0, y: 4300.0, z: -1549.0, scale: 4.5, yaw: 170.0, matrixScale: [2.5, 1.0, 1.5] },
-    { model: SPIRE0, x: -3000.0, y: 4600.0, z: -1815.0, scale: 4.25, yaw: 200.0, matrixScale: [2.5, 1.0, 1.5] },
-    { model: SPIRE2, x: -2400.0, y: 4350.0, z: -1732.0, scale: 5.0, yaw: 175.0, matrixScale: [2.25, 1.0, 1.5] },
-    { model: SPIRE0, x: -1700.0, y: 4650.0, z: -1451.0, scale: 3.75, yaw: 185.0, matrixScale: [2.5, 1.0, 1.5] },
-    { model: SPIRE2, x: -1050.0, y: 4400.0, z: -1566.0, scale: 4.75, yaw: 160.0, matrixScale: [2.25, 1.0, 1.5] },
-    { model: SPIRE0, x: -400.0, y: 4700.0, z: -1551.0, scale: 4.5, yaw: 195.0, matrixScale: [2.5, 1.0, 1.25] },
-    { model: SPIRE2, x: 250.0, y: 4300.0, z: -1627.0, scale: 4.0, yaw: 180.0, matrixScale: [2.75, 1.0, 1.75] },
-    { model: SPIRE0, x: 900.0, y: 4550.0, z: -1765.0, scale: 4.25, yaw: 205.0, matrixScale: [2.5, 1.0, 1.5] },
-    { model: SPIRE2, x: 1550.0, y: 4400.0, z: -1632.0, scale: 5.0, yaw: 170.0, matrixScale: [2.25, 1.0, 1.5] },
-    { model: SPIRE0, x: 2200.0, y: 4650.0, z: -1444.0, scale: 3.5, yaw: 165.0, matrixScale: [2.75, 1.0, 1.5] },
-    { model: SPIRE2, x: 2850.0, y: 4350.0, z: -1713.0, scale: 4.25, yaw: 190.0, matrixScale: [2.5, 1.0, 1.75] },
-    { model: SPIRE0, x: 3500.0, y: 4500.0, z: -1632.0, scale: 4.75, yaw: 175.0, matrixScale: [2.25, 1.0, 1.25] },
-    { model: SPIRE2, x: 4000.0, y: 4500.0, z: -1585.0, scale: 5.75, yaw: 200.0, matrixScale: [2.5, 1.0, 1.25] },
-    { model: SPIRE2, x: -2625.0, y: 5100.0, z: -1499.0, scale: 4.5, yaw: 205.0, matrixScale: [2.75, 1.0, 1.5] },
-    { model: SPIRE0, x: -2000.0, y: 5100.0, z: -1849.0, scale: 5.5, yaw: 195.0, matrixScale: [2.75, 1.0, 1.0] },
-    { model: SPIRE0, x: -1350.0, y: 5050.0, z: -1640.0, scale: 4.0, yaw: 200.0, matrixScale: [2.75, 1.0, 1.25] },
-    { model: SPIRE2, x: -750.0, y: 4950.0, z: -1688.0, scale: 5.5, yaw: 185.0, matrixScale: [2.75, 1.0, 1.25] },
-    { model: SPIRE0, x: -75.0, y: 5100.0, z: -1671.0, scale: 4.25, yaw: 185.0, matrixScale: [2.75, 1.0, 1.25] },
-    { model: SPIRE0, x: 575.0, y: 5300.0, z: -1640.0, scale: 4.0, yaw: 200.0, matrixScale: [2.75, 1.0, 1.25] },
-    { model: SPIRE0, x: 1175.0, y: 5100.0, z: -1799.0, scale: 5.5, yaw: 195.0, matrixScale: [2.75, 1.0, 1.0] },
-    { model: SPIRE2, x: 1875.0, y: 5000.0, z: -1616.0, scale: 4.75, yaw: 180.0, matrixScale: [2.75, 1.0, 1.5] },
-    { model: SPIRE0, x: 2575.0, y: 5000.0, z: -1801.0, scale: 4.5, yaw: 165.0, matrixScale: [2.75, 1.0, 1.25] },
-    { model: GATE, x: -1900.0, y: 3900.0, z: -1551.0, scale: 2.25, yaw: 200.0, matrixScale: [1.0, 1.0, 1.25] },
+
+    { model: QIRAJI_GATE, x: -700.0, y: 4800.0, z: -1330.0, scale: 4.5, yaw: 90.0, matrixScale: [1.0, f32(0.7), 1.0], color: SAND },
     { model: OBELISK, x: 1500.0, y: 4000.0, z: -1451.0, scale: 3.0, yaw: 300.0, matrixScale: [1.0, 1.0, 3.0] },
     { model: OBELISK, x: 2150.0, y: 4100.0, z: -1579.0, scale: 2.5, yaw: 330.0, matrixScale: [1.0, 1.0, 3.5] },
-    { model: "Doodads\\Ruins\\Rocks\\Ruins_Rock\\Ruins_Rock3.mdx", x: -3600.0, y: 1450.0, z: -1400.0, scale: 6.25, yaw: 20.0, matrixScale: [2.0, 1.0, 1.25], color: [150, 120, 84] },
-    { model: "Doodads\\Ruins\\Rocks\\Ruins_Rock\\Ruins_Rock7.mdx", x: -2500.0, y: 1650.0, z: -1400.0, scale: 3.75, yaw: 160.0, matrixScale: [3.25, 1.0, 1.25], color: [150, 120, 84] },
-    { model: "Doodads\\Ruins\\Rocks\\Ruins_Rock\\Ruins_Rock3.mdx", x: -1400.0, y: 1500.0, z: -1400.0, scale: 5.0, yaw: 250.0, matrixScale: [2.5, 1.0, 1.25], color: [150, 120, 84] },
-    { model: "Doodads\\Ruins\\Rocks\\Ruins_Rock\\Ruins_Rock7.mdx", x: -300.0, y: 1700.0, z: -1400.0, scale: 3.0, yaw: 80.0, matrixScale: [4.0, 1.0, 1.25], color: [150, 120, 84] },
-    { model: "Doodads\\Ruins\\Rocks\\Ruins_Rock\\Ruins_Rock3.mdx", x: 800.0, y: 1550.0, z: -1400.0, scale: 5.0, yaw: 310.0, matrixScale: [2.5, 1.0, 1.25], color: [150, 120, 84] },
-    { model: "Doodads\\Ruins\\Rocks\\Ruins_Rock\\Ruins_Rock7.mdx", x: 1900.0, y: 1600.0, z: -1400.0, scale: 3.75, yaw: 200.0, matrixScale: [3.25, 1.0, 1.25], color: [150, 120, 84] },
-    { model: "Doodads\\Ruins\\Rocks\\Ruins_Rock\\Ruins_Rock3.mdx", x: 3000.0, y: 1450.0, z: -1400.0, scale: 6.0, yaw: 120.0, matrixScale: [2.0, 1.0, 1.25], color: [150, 120, 84] },
-    { model: "Doodads\\Ruins\\Rocks\\Ruins_Rock\\Ruins_Rock7.mdx", x: 4000.0, y: 1650.0, z: -1400.0, scale: 4.25, yaw: 340.0, matrixScale: [2.75, 1.0, 1.25], color: [150, 120, 84] },
-    { model: "Doodads\\Ruins\\Rocks\\Ruins_Rock\\Ruins_Rock7.mdx", x: -4000.0, y: 2600.0, z: -1400.0, scale: 5.0, yaw: 190.0, matrixScale: [2.75, 1.0, 1.25], color: [200, 170, 120] },
-    { model: "Doodads\\Ruins\\Rocks\\CliffRubble_Single\\CliffRubble_Single0.mdx", x: -2800.0, y: 2900.0, z: -1400.0, scale: 3.75, yaw: 40.0, matrixScale: [2.5, 1.0, 1.25], color: [200, 170, 120] },
-    { model: "Doodads\\Ruins\\Rocks\\Ruins_Rock\\Ruins_Rock7.mdx", x: -1500.0, y: 2700.0, z: -1400.0, scale: 4.25, yaw: 300.0, matrixScale: [3.25, 1.0, 1.25], color: [200, 170, 120] },
-    { model: "Doodads\\Ruins\\Rocks\\CliffRubble_Single\\CliffRubble_Single0.mdx", x: -200.0, y: 3000.0, z: -1400.0, scale: 3.0, yaw: 130.0, matrixScale: [3.25, 1.0, 1.25], color: [200, 170, 120] },
-    { model: "Doodads\\Ruins\\Rocks\\Ruins_Rock\\Ruins_Rock7.mdx", x: 1100.0, y: 2800.0, z: -1400.0, scale: 4.25, yaw: 220.0, matrixScale: [3.25, 1.0, 1.25], color: [200, 170, 120] },
-    { model: "Doodads\\Ruins\\Rocks\\CliffRubble_Single\\CliffRubble_Single0.mdx", x: 2400.0, y: 2650.0, z: -1400.0, scale: 3.75, yaw: 70.0, matrixScale: [2.5, 1.0, 1.25], color: [200, 170, 120] },
-    { model: "Doodads\\Ruins\\Rocks\\Ruins_Rock\\Ruins_Rock7.mdx", x: 3500.0, y: 2950.0, z: -1400.0, scale: 5.0, yaw: 260.0, matrixScale: [2.75, 1.0, 1.25], color: [200, 170, 120] },
-    { model: "Doodads\\Ruins\\Props\\RuinsPillar\\RuinsPillar0.mdx", x: -2800.0, y: 2100.0, z: -1400.0, scale: 5.0, yaw: 30.0 },
-    { model: "Doodads\\Ruins\\Props\\RuinsPillar\\RuinsPillar3.mdx", x: -3350.0, y: 2350.0, z: -1400.0, scale: 6.0, yaw: 110.0 },
-    { model: "Doodads\\Ruins\\Structures\\RuinsArchwayBroken00\\RuinsArchwayBroken00.mdx", x: 2400.0, y: 2300.0, z: -1350.0, scale: 2.25, yaw: 95.0 },
-    { model: "Doodads\\Ruins\\Props\\RuinsPillar\\RuinsPillar0.mdx", x: 3500.0, y: 2000.0, z: -1400.0, scale: 4.25, yaw: 200.0 },
+    { model: ZIGGURAT, x: -2600.0, y: 4700.0, z: -1300.0, scale: 1.0, yaw: 250.0, matrixScale: [5.5, 5.5, 5.5], color: SAND },
+    { model: ZIGGURAT, x: 1300.0, y: 5300.0, z: -1300.0, scale: 1.0, yaw: 290.0, matrixScale: [6.5, 6.5, 6.5], color: SAND },
+    { model: "Doodads\\Ruins\\Structures\\SRuinArch45\\SRuinArch45.mdx", x: 2650.0, y: 4400.0, z: -1330.0, scale: 3.0, yaw: 200.0, color: SAND },
+    { model: MESA_SPIRE, x: -3900.0, y: 4400.0, z: -1500.0, scale: 3.5, yaw: 190.0, matrixScale: [1.5, 1.0, 1.5], color: SAND },
+    { model: MESA_SPIRE, x: 3900.0, y: 4900.0, z: -1500.0, scale: 4.5, yaw: 20.0, matrixScale: [1.5, 1.0, 1.25], color: SAND },
+    { model: LOW_SPIRE, x: 2050.0, y: 5700.0, z: -1500.0, scale: 3.0, yaw: 300.0, matrixScale: [2.0, 1.0, 1.0], color: SAND },
+    { model: LOW_SPIRE, x: -2700.0, y: 8500.0, z: -1500.0, scale: 7.0, yaw: 60.0, matrixScale: [2.0, 1.0, 1.0], color: PALE_SAND },
+    { model: MESA_SPIRE, x: 1800.0, y: 9000.0, z: -1500.0, scale: 6.0, yaw: 230.0, matrixScale: [2.0, 1.0, 0.75], color: PALE_SAND },
+    { model: ZIGGURAT, x: -300.0, y: 8800.0, z: -1500.0, scale: 1.0, yaw: 270.0, matrixScale: [7.0, 7.0, 7.0], color: PALE_SAND },
+    { model: DUNE_SPIRE, x: -3600.0, y: 1450.0, z: -1400.0, scale: 2.5, yaw: 20.0, matrixScale: [1.5, 1.0, 1.125], color: SAND },
+    { model: LOW_SPIRE, x: -2500.0, y: 1650.0, z: -1400.0, scale: 2.5, yaw: 160.0, matrixScale: [1.75, 1.0, 1.0], color: SAND },
+    { model: DUNE_SPIRE, x: -1400.0, y: 1500.0, z: -1400.0, scale: 2.5, yaw: 250.0, matrixScale: [1.5, 1.0, 1.0], color: SAND },
+    { model: LOW_SPIRE, x: -300.0, y: 1700.0, z: -1400.0, scale: 2.5, yaw: 80.0, matrixScale: [1.75, 1.0, 0.875], color: SAND },
+    { model: DUNE_SPIRE, x: 800.0, y: 1550.0, z: -1400.0, scale: 2.5, yaw: 310.0, matrixScale: [1.5, 1.0, 1.0], color: SAND },
+    { model: LOW_SPIRE, x: 1900.0, y: 1600.0, z: -1400.0, scale: 2.5, yaw: 200.0, matrixScale: [1.75, 1.0, 1.0], color: SAND },
+    { model: DUNE_SPIRE, x: 3000.0, y: 1450.0, z: -1400.0, scale: 2.5, yaw: 120.0, matrixScale: [1.5, 1.0, 1.0], color: SAND },
+    { model: LOW_SPIRE, x: 4000.0, y: 1650.0, z: -1400.0, scale: 2.5, yaw: 340.0, matrixScale: [1.75, 1.0, 1.0], color: SAND },
+    { model: "Doodads\\Ruins\\Rocks\\CliffRubble_Single\\CliffRubble_Single0.mdx", x: -4000.0, y: 2600.0, z: -1400.0, scale: 3.5, yaw: 190.0, matrixScale: [2.75, 1.0, 1.25], color: [200, 170, 120] },
+    { model: "Doodads\\Ruins\\Rocks\\CliffRubble_Single\\CliffRubble_Single0.mdx", x: -2800.0, y: 2900.0, z: -1400.0, scale: 3.5, yaw: 40.0, matrixScale: [2.75, 1.0, 1.25], color: [200, 170, 120] },
+    { model: "Doodads\\Ruins\\Rocks\\CliffRubble_Single\\CliffRubble_Single0.mdx", x: -1500.0, y: 2700.0, z: -1400.0, scale: 3.5, yaw: 300.0, matrixScale: [2.75, 1.0, 1.25], color: [200, 170, 120] },
+    { model: "Doodads\\Ruins\\Rocks\\CliffRubble_Single\\CliffRubble_Single0.mdx", x: -200.0, y: 3000.0, z: -1400.0, scale: 3.5, yaw: 130.0, matrixScale: [2.75, 1.0, 1.25], color: [200, 170, 120] },
+    { model: "Doodads\\Ruins\\Rocks\\CliffRubble_Single\\CliffRubble_Single0.mdx", x: 1100.0, y: 2800.0, z: -1400.0, scale: 3.5, yaw: 220.0, matrixScale: [2.75, 1.0, 1.25], color: [200, 170, 120] },
+    { model: "Doodads\\Ruins\\Rocks\\CliffRubble_Single\\CliffRubble_Single0.mdx", x: 2400.0, y: 2650.0, z: -1400.0, scale: 3.5, yaw: 70.0, matrixScale: [2.75, 1.0, 1.25], color: [200, 170, 120] },
+    { model: "Doodads\\Ruins\\Rocks\\CliffRubble_Single\\CliffRubble_Single0.mdx", x: 3500.0, y: 2950.0, z: -1400.0, scale: 3.5, yaw: 260.0, matrixScale: [2.75, 1.0, 1.25], color: [200, 170, 120] },
+    { model: "Doodads\\Ruins\\Structures\\RuinsArchwayBroken450\\RuinsArchwayBroken450.mdx", x: -2800.0, y: 2150.0, z: -1350.0, scale: 2.0, yaw: 30.0, color: SAND },
+    { model: "Doodads\\Barrens\\Plants\\Cactus\\Cactus2.mdx", x: -3350.0, y: 2350.0, z: -1400.0, scale: 4.0, yaw: 110.0 },
+    { model: "Doodads\\Ruins\\Structures\\RuinsArchwayBroken00\\RuinsArchwayBroken00.mdx", x: 2400.0, y: 2300.0, z: -1350.0, scale: 2.25, yaw: 95.0, color: SAND },
+    { model: "Doodads\\Barrens\\Plants\\Cactus\\Cactus0.mdx", x: 3500.0, y: 2000.0, z: -1400.0, scale: 4.5, yaw: 200.0 },
   ],
 };

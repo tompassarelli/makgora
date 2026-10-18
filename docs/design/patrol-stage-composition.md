@@ -45,6 +45,9 @@ wedged among enormous boulders. Beneath the deck (stage art rule 16), a red
 near ridge of mounds and spires rises from the canyon floor at y 1,450–1,700,
 acacia trees and two tall rock pillars stand in the valley behind it, and a
 lighter ridge of mounds and spires at y 2,600–3,000 leads back to the mesas.
+In round 2 of the art pass (stage art rules 17 and 18) an orc village (a
+barracks, a spirit lodge and a burrow) and a low red rock fill the canyon
+floor under the deck's centre. Red rock is Durotar's alone.
 
 ## Naxxramas: the necropolis over the Plaguelands
 
@@ -63,7 +66,8 @@ fog stays aurora green (0.09375, 0.3125, 0.25). Nearer the deck (stage art
 rule 16), a ridge of blighted olive rock rises at y 1,450–1,700; behind it the
 burned Lordaeron farmsteads of the Plaguelands (a scorched farm, barn and
 tower, the burned windmill) and two tombstones stand in the valley, before a
-lighter olive ridge at y 2,600–3,000.
+lighter ridge at y 2,600–3,000. Both ridges are blighted Underground rock
+tinted bruise-violet, not mossy Lordaeron rock (stage art rule 17).
 
 ## Hellfire: a portal across fractured ground
 

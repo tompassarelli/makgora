@@ -308,6 +308,16 @@ from the floor (smashcraft:ts/src/game/presentation/stageScenery.ts).
     smashcraft:ts/src/game/presentation/stageRules.ts and
     smashcraft:ts/src/game/presentation/stageScenery.tests.ts enforce the
     bands and the near ridge.
+17. **Rock in the stage's palette** (round 2 of the art pass, 18 Oct). Mossy
+    rock (the Lordaeron, Ruins, Felwood and Ashenvale rock and spires) stands
+    only on the stages whose palette is green: Nordrassil and Tomb of
+    Sargeras. Every other stage chooses rock whose texture already carries
+    its palette, then tints it; a tint never has to fight the texture.
+18. **Each stage its own skyline.** The rock a stage raises most in its
+    backdrop (`y` ≥ 4,000) is its own: no two stages share it, so no stage
+    borrows another's skyline.
+    Gryphon Aerie meets neither yet: it keeps the depth pass's red mounds
+    and mossy rock until its own granite lands in round 3.
 
 ### Art targets: the depth pass (18 Oct)
 
@@ -364,6 +374,51 @@ lit value and stay darker than the lit backdrop above the deck.
   green stone. It keeps its sea: near, a broken Naga pillar, coral and a
   rock standing in the tide; mid, a coral arch; far, the Temple of Tides and
   the waterfall.
+
+### Art targets: the palette and skyline pass (18 Oct, round 2)
+
+The depth pass gave every stage its bands, but review found four faults:
+grey-green mossy boulders under stages whose palette has no moss (Gryphon
+Aerie, Naxxramas, Ahn'Qiraj, whose backdrop was green mossy spires too);
+Gryphon Aerie and Durotar raised the same red Barrens mound wall; one tall
+rock band filled the top of the frame on Gryphon, Durotar, Hellfire and
+Ahn'Qiraj; and Stratholme's middle, Durotar's centre and Tomb were thin.
+These targets replace the depth-pass paragraphs where they differ, and only
+where the change judged better than the depth pass; Frozen Throne,
+Nordrassil, Blackrock and Hellfire keep their depth-pass look. Rules 17 and
+18 hold the result.
+
+- **Gryphon Aerie: Aerie Peak** (round 3; Gryphon keeps its depth-pass look
+  until then). Palette: bare grey granite, green valley
+  floor, cool blue haze; no red rock and no moss. Skyline: one peak
+  under the aviary in the centre, a tall crag at the left edge and a
+  shoulder at the right, low knolls between them so the far granite peaks
+  and the sky show through. Wildhammer buildings on the knolls: a second
+  gryphon roost on the left, the forge on the right. Near and mid: the
+  grey Lordaeron rock chunks, tinted pale; two natural snow arches in the
+  valley.
+- **Durotar Skies.** Palette: rust and ochre; red rock belongs to Durotar
+  alone. Keeps the depth pass's mound skyline and watchtowers. Valley: an
+  orc village (a barracks, a spirit lodge, a burrow) and a low red rock
+  fill the floor under the deck's centre.
+- **Naxxramas.** Palette: ash, bruise-violet rock, plague green; the near
+  and mid ridges are blighted Underground rock tinted violet-grey, not moss.
+- **Ahn'Qiraj.** Palette: sand, sandstone, gold; no green rock anywhere.
+  Skyline: the sandstone gate left of centre, two insect-built Qiraji
+  ziggurats beside it, the gold obelisks right of centre, sandstone mesas
+  only at the edges with open desert between them, and pale far mesas and
+  a third ziggurat in the haze. Near: layered sandstone tinted sand; mid:
+  sand-tinted rubble. Valley: broken archways and desert cacti.
+  No statues: figures are creatures under the no-creatures rule.
+- **Stratholme.** Skyline: the ruined city's rooftops and a broken
+  colonnade at varied heights with fires among them and dark hills beyond,
+  no rock spires. Below the deck: ruined houses, an archway, the fountain
+  and a small house around two fires, so the middle reads lit and full.
+- **Tomb of Sargeras.** Keeps its sea. Adds the sunken temple (a Naga tidal
+  guardian tower rising from the water on the left and broken archways in
+  the far water) and the Broken Isles silhouette, low green peaks in the
+  far haze. Nothing new stands in the water near the deck, where a pillar
+  top reads as a ledge.
 
 ### Art checklist
 

@@ -4,8 +4,9 @@ import { STAGE_GROUND_MODEL } from "../../generated/stages/terrainAssetInfo";
 import { STAGE_SKY_MODELS } from "../../generated/stages/stageSkyInfo";
 import type { StageScenery } from "./stageScenery";
 
-const SPIRES = "Doodads\\Outland\\Rocks\\Outland_Spires\\Outland_Spires7.mdx";
+const HILL = "Doodads\\Underground\\Rocks\\UndergoundRock\\UndergoundRock3.mdx";
 const TOWN_FIRE = "Doodads\\Cinematic\\TownBurningFireEmitter\\TownBurningFireEmitter.mdx";
+const ISLE_PEAK = "Doodads\\Ruins\\Rocks\\Ruins_Spires\\Ruins_Spires0.mdx";
 
 
 export const STRATHOLME_SCENERY: StageScenery = {
@@ -24,13 +25,6 @@ export const STRATHOLME_SCENERY: StageScenery = {
     { model: "Doodads\\Cityscape\\Structures\\CityBuildingSmall90_2_Ruined\\CityBuildingSmall90_2_Ruined.mdx", x: 2120.0, y: 4220.0, z: -1300.0, scale: 3.1875, yaw: 82.0, matrixScale: [1.0, 1.0, 1.25] },
     { model: "Doodads\\Cityscape\\Structures\\CityBuildingLarge_45_Ruined\\CityBuildingLarge_45_Ruined.mdx", x: 2980.0, y: 4440.0, z: -1300.0, scale: 3.0, yaw: 143.0, matrixScale: [1.0, 1.0, 1.25] },
     { model: "Doodads\\Cityscape\\Structures\\CityBuildingSmall45_0_Ruined\\CityBuildingSmall45_0_Ruined.mdx", x: 3880.0, y: 4000.0, z: -1300.0, scale: 2.8125, yaw: 204.0, matrixScale: [1.0, 1.0, 1.25] },
-    { model: SPIRES, x: -3550.0, y: 5300.0, z: -1271.0, scale: 3.0, yaw: 0.0, matrixScale: [2.0, 1.0, 1.25] },
-    { model: SPIRES, x: -2400.0, y: 5550.0, z: -1502.0, scale: 3.75, yaw: 53.0, matrixScale: [2.0, 1.0, 1.25] },
-    { model: SPIRES, x: -1100.0, y: 5300.0, z: -1171.0, scale: 3.0, yaw: 106.0, matrixScale: [2.0, 1.0, 1.25] },
-    { model: SPIRES, x: 300.0, y: 5550.0, z: -1271.0, scale: 3.75, yaw: 159.0, matrixScale: [2.0, 1.0, 1.0] },
-    { model: SPIRES, x: 1600.0, y: 5300.0, z: -1416.0, scale: 3.0, yaw: 212.0, matrixScale: [2.0, 1.0, 1.5] },
-    { model: SPIRES, x: 2900.0, y: 5550.0, z: -1171.0, scale: 3.75, yaw: 265.0, matrixScale: [2.0, 1.0, 1.0] },
-    { model: SPIRES, x: 4000.0, y: 5300.0, z: -1271.0, scale: 3.0, yaw: 318.0, matrixScale: [2.0, 1.0, 1.25] },
     { model: "Doodads\\Cityscape\\Structures\\CathedralRuined\\CathedralRuined.mdx", x: 1500.0, y: 4900.0, z: -1300.0, scale: 4.0, yaw: 250.0 },
     { model: "Doodads\\Cityscape\\Structures\\CityWallEntrance\\CityWallEntrance.mdx", x: -1900.0, y: 3500.0, z: -1350.0, scale: 2.5, yaw: 285.0 },
     { model: "Doodads\\Cityscape\\Structures\\CityBuildingSmall135_1_Ruined\\CityBuildingSmall135_1_Ruined.mdx", x: 2450.0, y: 3300.0, z: -1300.0, scale: 2.0625, yaw: 160.0 },
@@ -41,13 +35,13 @@ export const STRATHOLME_SCENERY: StageScenery = {
     { model: "Doodads\\Cityscape\\Structures\\CityBuildingLarge_0_Ruined\\CityBuildingLarge_0_Ruined.mdx", x: -1600.0, y: 7600.0, z: -1800.0, scale: 3.0, yaw: 270.0 },
     { model: "Doodads\\Barrens\\Rocks\\Barrens_Rocks\\Barrens_Rocks2.mdx", x: -1600.0, y: 7600.0, z: -4000.0, scale: 10.0, yaw: 110.0, matrixScale: [1.0, 1.0, f32(2.797)] },
     { model: "Doodads\\Ruins\\Rocks\\CliffRubble_Single\\CliffRubble_Single0.mdx", x: -3600.0, y: 1450.0, z: -1400.0, scale: 3.25, yaw: 20.0, matrixScale: [2.5, 1.0, 1.25], color: [150, 116, 100] },
-    { model: "Doodads\\LordaeronSummer\\Rocks\\Lords_Rock\\Lords_Rock4.mdx", x: -2500.0, y: 1650.0, z: -1400.0, scale: 4.75, yaw: 160.0, matrixScale: [1.75, 1.0, 1.25], color: [150, 116, 100] },
+    { model: "Doodads\\Dungeon\\Rocks\\DungeonRock\\DungeonRock4.mdx", x: -2500.0, y: 1650.0, z: -1400.0, scale: 4.75, yaw: 160.0, matrixScale: [1.75, 1.0, 1.25], color: [150, 116, 100] },
     { model: "Doodads\\Ruins\\Rocks\\CliffRubble_Single\\CliffRubble_Single0.mdx", x: -1400.0, y: 1500.0, z: -1400.0, scale: 2.75, yaw: 250.0, matrixScale: [3.0, 1.0, 1.25], color: [150, 116, 100] },
-    { model: "Doodads\\LordaeronSummer\\Rocks\\Lords_Rock\\Lords_Rock4.mdx", x: -300.0, y: 1700.0, z: -1400.0, scale: 4.0, yaw: 80.0, matrixScale: [2.25, 1.0, 1.25], color: [150, 116, 100] },
+    { model: "Doodads\\Dungeon\\Rocks\\DungeonRock\\DungeonRock4.mdx", x: -300.0, y: 1700.0, z: -1400.0, scale: 4.0, yaw: 80.0, matrixScale: [2.25, 1.0, 1.25], color: [150, 116, 100] },
     { model: "Doodads\\Ruins\\Rocks\\CliffRubble_Single\\CliffRubble_Single0.mdx", x: 800.0, y: 1550.0, z: -1400.0, scale: 2.5, yaw: 310.0, matrixScale: [3.25, 1.0, 1.25], color: [150, 116, 100] },
-    { model: "Doodads\\LordaeronSummer\\Rocks\\Lords_Rock\\Lords_Rock4.mdx", x: 1900.0, y: 1600.0, z: -1400.0, scale: 4.5, yaw: 200.0, matrixScale: [2.0, 1.0, 1.25], color: [150, 116, 100] },
+    { model: "Doodads\\Dungeon\\Rocks\\DungeonRock\\DungeonRock4.mdx", x: 1900.0, y: 1600.0, z: -1400.0, scale: 4.5, yaw: 200.0, matrixScale: [2.0, 1.0, 1.25], color: [150, 116, 100] },
     { model: "Doodads\\Ruins\\Rocks\\CliffRubble_Single\\CliffRubble_Single0.mdx", x: 3000.0, y: 1450.0, z: -1400.0, scale: 3.25, yaw: 120.0, matrixScale: [2.5, 1.0, 1.25], color: [150, 116, 100] },
-    { model: "Doodads\\LordaeronSummer\\Rocks\\Lords_Rock\\Lords_Rock4.mdx", x: 4000.0, y: 1650.0, z: -1400.0, scale: 5.5, yaw: 340.0, matrixScale: [1.5, 1.0, 1.25], color: [150, 116, 100] },
+    { model: "Doodads\\Dungeon\\Rocks\\DungeonRock\\DungeonRock4.mdx", x: 4000.0, y: 1650.0, z: -1400.0, scale: 5.5, yaw: 340.0, matrixScale: [1.5, 1.0, 1.25], color: [150, 116, 100] },
     { model: "Doodads\\Ruins\\Rocks\\CliffRubble_Single\\CliffRubble_Single0.mdx", x: -4000.0, y: 2600.0, z: -1400.0, scale: 4.0, yaw: 190.0, matrixScale: [2.25, 1.0, 1.25], color: [180, 146, 128] },
     { model: "Doodads\\Cityscape\\Structures\\CityBuildingLarge_0_BaseRuin\\CityBuildingLarge_0_BaseRuin.mdx", x: -2800.0, y: 2900.0, z: -1400.0, scale: 2.75, yaw: 40.0, matrixScale: [1.25, 1.0, 1.25], color: [180, 146, 128] },
     { model: "Doodads\\Ruins\\Rocks\\CliffRubble_Single\\CliffRubble_Single0.mdx", x: -1500.0, y: 2700.0, z: -1400.0, scale: 3.25, yaw: 300.0, matrixScale: [3.0, 1.0, 1.25], color: [180, 146, 128] },
@@ -58,6 +52,23 @@ export const STRATHOLME_SCENERY: StageScenery = {
     { model: "Doodads\\Cityscape\\Structures\\City_ColumnSingle1_Ruined\\City_ColumnSingle1_Ruined.mdx", x: -2700.0, y: 2100.0, z: -1400.0, scale: 4.0, yaw: 30.0 },
     { model: "Doodads\\Cityscape\\Structures\\City_ColumnSingle1_Ruined\\City_ColumnSingle1_Ruined.mdx", x: 2500.0, y: 2300.0, z: -1400.0, scale: 3.0, yaw: 90.0 },
     { model: "Doodads\\Cinematic\\TownBurningFireEmitter\\TownBurningFireEmitter.mdx", x: -3300.0, y: 2700.0, z: -1300.0, scale: 1.25, yaw: 30.0 },
+    { model: "Doodads\\Cityscape\\Structures\\CityBuildingLarge_90_Ruined\\CityBuildingLarge_90_Ruined.mdx", x: -3700.0, y: 6000.0, z: -1300.0, scale: 4.5, yaw: 200.0 },
+    { model: "Doodads\\Cityscape\\Structures\\CityBuildingSmall0_2_Ruined\\CityBuildingSmall0_2_Ruined.mdx", x: -2600.0, y: 5800.0, z: -1300.0, scale: 4.5, yaw: 110.0 },
+    { model: "Doodads\\Cityscape\\Structures\\City_ColumnSemiCircle_Ruined\\City_ColumnSemiCircle_Ruined.mdx", x: -1500.0, y: 6400.0, z: -1300.0, scale: 3.5, yaw: 270.0 },
+    { model: "Doodads\\Cityscape\\Structures\\CityBuildingSmall135_2_Ruined\\CityBuildingSmall135_2_Ruined.mdx", x: -400.0, y: 5700.0, z: -1300.0, scale: 3.5, yaw: 40.0 },
+    { model: "Doodads\\Cityscape\\Structures\\CityBuildingLarge_135_Ruined\\CityBuildingLarge_135_Ruined.mdx", x: 3000.0, y: 6100.0, z: -1300.0, scale: 4.5, yaw: 300.0 },
+    { model: "Doodads\\Cityscape\\Structures\\CityBuildingSmall90_1_Ruined\\CityBuildingSmall90_1_Ruined.mdx", x: 4000.0, y: 5700.0, z: -1300.0, scale: 5.0, yaw: 160.0 },
+    { model: TOWN_FIRE, x: -2000.0, y: 6000.0, z: -1300.0, scale: 3.0, yaw: 20.0 },
+    { model: TOWN_FIRE, x: 3500.0, y: 6300.0, z: -1300.0, scale: 2.5, yaw: 200.0 },
+    { model: HILL, x: -1000.0, y: 7800.0, z: -1500.0, scale: 18.0, yaw: 30.0, matrixScale: [2.0, 1.0, 1.0], color: [110, 86, 76] },
+    { model: HILL, x: 2600.0, y: 8000.0, z: -1500.0, scale: 20.0, yaw: 250.0, matrixScale: [1.75, 1.0, 1.0], color: [110, 86, 76] },
+    { model: "Doodads\\Cityscape\\Structures\\CityBuildingLarge_135_Ruined\\CityBuildingLarge_135_Ruined.mdx", x: -700.0, y: 3200.0, z: -1300.0, scale: 2.5, yaw: 70.0 },
+    { model: "Doodads\\Cityscape\\Structures\\CityBuildingLarge_90_Ruined\\CityBuildingLarge_90_Ruined.mdx", x: 750.0, y: 3000.0, z: -1300.0, scale: 2.25, yaw: 230.0 },
+    { model: "Doodads\\Cityscape\\Structures\\Archway1_Ruined\\Archway1_Ruined.mdx", x: -100.0, y: 2400.0, z: -1300.0, scale: 1.75, yaw: 90.0 },
+    { model: "Doodads\\Cityscape\\Props\\FountainRuined\\FountainRuined.mdx", x: 1300.0, y: 2200.0, z: -1300.0, scale: 3.0, yaw: 0.0 },
+    { model: "Doodads\\Cityscape\\Structures\\CityBuildingSmall90_1_Ruined\\CityBuildingSmall90_1_Ruined.mdx", x: -1500.0, y: 2300.0, z: -1300.0, scale: 2.0, yaw: 250.0 },
+    { model: TOWN_FIRE, x: 300.0, y: 2700.0, z: -1300.0, scale: 1.25, yaw: 60.0 },
+    { model: TOWN_FIRE, x: -1000.0, y: 2900.0, z: -1300.0, scale: 1.0, yaw: 150.0 },
   ],
 };
 
@@ -89,5 +100,11 @@ export const TOMB_OF_SARGERAS_SCENERY: StageScenery = {
     { model: "Doodads\\Ruins\\Water\\Coral\\Coral5.mdx", x: 2600.0, y: 2000.0, z: -560.0, scale: 2.0, yaw: 200.0 },
     { model: "Doodads\\Ruins\\Rocks\\Ruins_Rock\\Ruins_Rock7.mdx", x: 3700.0, y: 1700.0, z: -600.0, scale: 2.25, yaw: 300.0 },
     { model: "Doodads\\Ruins\\Water\\CoralArch\\CoralArch0.mdx", x: -800.0, y: 3300.0, z: -700.0, scale: 1.25, yaw: 95.0 },
+    { model: "Buildings\\Naga\\TidalGuardian\\TidalGuardian.mdx", x: -3100.0, y: 4600.0, z: -700.0, scale: 3.0, yaw: 250.0 },
+    { model: "Doodads\\Ruins\\Structures\\SRuinArch45\\SRuinArch45.mdx", x: -500.0, y: 5300.0, z: -900.0, scale: 3.5, yaw: 300.0 },
+    { model: "Doodads\\Ruins\\Structures\\RuinsArchwayBroken450\\RuinsArchwayBroken450.mdx", x: 3300.0, y: 5100.0, z: -900.0, scale: 3.0, yaw: 30.0 },
+    { model: ISLE_PEAK, x: -2600.0, y: 7400.0, z: -1000.0, scale: 6.0, yaw: 30.0, matrixScale: [2.0, 1.0, 1.0] },
+    { model: ISLE_PEAK, x: 3600.0, y: 7800.0, z: -1000.0, scale: 5.5, yaw: 200.0, matrixScale: [1.5, 1.0, 1.0] },
+    { model: ISLE_PEAK, x: 900.0, y: 8400.0, z: -1000.0, scale: 5.0, yaw: 120.0, matrixScale: [3.0, 1.0, 0.75] },
   ],
 };
