@@ -77,7 +77,8 @@
     "test/native-plan.test.ts",
     "test/pad-trace.test.ts",
     "test/balance-farm.test.ts",
-    "test/workflow-artifacts.test.ts"
+    "test/workflow-artifacts.test.ts",
+  "test/pain-strip.test.ts"
   ],
   "exclude": [
     "src/platform/**",
