@@ -15,7 +15,7 @@ function picture(squares: readonly number[]): Uint8Array {
   return rgb;
 }
 
-test("rendered steps of a fighter drawn 0, 1 and 2 simulation frames apart read back as those frame counts, and its lag as zero [k1 fixture]", () => {
+test("rendered steps of a fighter drawn 0, 1 and 2 simulation frames apart read back as those frame counts, and its lag as zero [k1 scenario]", () => {
   const drawnFrames = [0, 1, 1, 3, 4, 4, 6, 7, 7, 9, 10, 10, 12, 13, 13, 15];
   const world = (f: number) => ({ 0: { x: 100 + 40 * f, z: 0 }, 1: { x: 1400, z: 0 } });
   const toScreen = (x: number) => 4 + x / 20;
