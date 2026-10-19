@@ -33,6 +33,9 @@ const PUMPS: Readonly<Record<number, { readonly low: Arms; readonly hop: number 
     [Character.lich]: { low: 'pumped', hop: 1 }, [Character.tinker]: { low: 'pumped', hop: 1 },
     [Character.shadowHunter]: { low: 'pumped', hop: 1 }, [Character.chen]: { low: 'pumped', hop: 1 }, [Character.kobold]: { low: 'pumped', hop: 1 },
 };
+const HANGING: Readonly<Record<number, readonly string[]>> = {
+    [Character.warden]: ['Mesh06', 'Mesh45', 'Mesh46', 'Mesh05'],
+};
 const BOUNCE: Readonly<Record<number, Readonly<Record<number, number>>>> = {
     [Character.murloc]: { 18: 0.4, 50: 0.35, 72: 0.35 },
     [Character.kobold]: { 18: 0.6, 28: 0.45, 40: 0.55, 50: 0.6, 62: 0.55, 72: 0.6 },
@@ -211,9 +214,22 @@ for (const character of characters) {
         ensure(offset, `${fighter.name}: the stand hand pose is singular`);
         return { node, hand: arms[side]![2]!, offset: mat4.multiply(offset, offset, data.nodes[node.ObjectId].matrix) };
     });
+    const hanging = (HANGING[character] ?? []).map(name => {
+        const node = model.Nodes.find(candidate => candidate?.Name === name);
+        ensure(node?.Rotation && node.Parent != null && node.Parent !== -1, `${fighter.name}: ${name} has no parent or rotation track to hang from`);
+        renderer.setSequence(source.Sequences.indexOf(stand)); data.frame = stand.Interval[0]; renderer.update(0);
+        return { node, parent: node.Parent, rest: mat4.getRotation(quat.create(), data.nodes[node.ObjectId].matrix) };
+    });
     const follow = () => {
         for (const beat of beats) {
             evaluate(beat.frame);
+            for (const { node, parent, rest } of hanging) {
+                const q = quat.multiply(quat.create(), quat.invert(quat.create(), mat4.getRotation(quat.create(), data.nodes[parent].matrix)), rest);
+                const key = node.Rotation!.Keys.find(candidate => candidate.Frame === time(beat.frame));
+                ensure(key, `${fighter.name}: ${node.Name} key ${beat.frame} missing`);
+                key.Vector = new Float32Array(quat.normalize(q, q));
+                if (key.InTan) { key.InTan = key.Vector.slice(); key.OutTan = key.Vector.slice(); }
+            }
             for (const { node, hand, offset } of carried) {
                 const world = mat4.multiply(mat4.create(), data.nodes[hand.ObjectId].matrix, offset);
                 const parent = node.Parent == null || node.Parent === -1 ? undefined : data.nodes[node.Parent];
