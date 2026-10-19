@@ -72,7 +72,7 @@ import { Character, ItemKind, itemBit } from "../sim/codes";
 import { TILE_PORTRAIT_SLOT, cardPortrait, tilePortrait } from "./portraitFrames";
 import { TEAM_NAMES } from "../sim/teams";
 import { slotColor, teamColor } from "./slotColors";
-import { type TutorialButton, type TutorialMenuFrames, createTutorialMenu, markTutorialSeen, offersTutorial, showTutorialLesson, tutorialSeen } from "./tutorialMenu";
+import { type TutorialButton, type TutorialMenuFrames, createTutorialMenu, markTutorialSeen, offersTutorial, showTutorialLesson, tutorialAvailable, tutorialSeen } from "./tutorialMenu";
 import { ButtonClicks, type MenuControls, bindSyncHandler, consoleUi, coverScreen, createBackdrop, createSyncTrigger, createText, gameUi, highlightText, placeTopLeft, setFrameText, sizeText } from "./frames";
 
 
@@ -491,7 +491,6 @@ export class SelectionPanel {
     });
     this.tutorial = createTutorialMenu(gameUi(), root, suffix, (frame, target) => this.clicks.add(frame, target,
       target.kind === "tutorialOpen" ? "Tutorial" : target.kind === "tutorialStart" ? "Start tutorial" : target.kind === "tutorialClose" ? "Not now" : target.direction < 0 ? "−" : "+", "native"));
-    partnerFrames.push(this.tutorial.open);
     this.trainingFrames = partnerFrames;
     const { easierClassic, harderClassic } = RULE_BUTTONS;
     this.classicTierValue = label(root, `MeleeClassicTier${suffix}`, easierClassic.x + easierClassic.width, easierClassic.y, harderClassic.x - easierClassic.x - easierClassic.width, RULE_HEIGHT, f32(0.011));
@@ -841,6 +840,7 @@ export class SelectionPanel {
       if (offersTutorial(game, this.isSeen())) this.tutorialOpen = true;
     }
     BlzFrameSetVisible(this.tutorial.root, visible && this.tutorialOpen && !cpuOpen && !this.movesOpen);
+    BlzFrameSetVisible(this.tutorial.open, tutorialAvailable(game));
     BlzFrameSetVisible(this.cpuRoot, cpuOpen);
     BlzFrameSetVisible(this.root, visible);
     BlzFrameSetVisible(this.backdrop, visible || (loading && game.phase === Phase.characterMenu && humanActive(game, participantId)));

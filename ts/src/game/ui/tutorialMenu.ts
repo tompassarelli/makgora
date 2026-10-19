@@ -56,7 +56,7 @@ export function createTutorialMenu(owner: framehandle, rules: framehandle, suffi
   add(button(root, f32(0.23), f32(0.315), f32(0.16), f32(0.035), "Start tutorial"), { kind: "tutorialStart" });
   add(button(root, f32(0.41), f32(0.315), f32(0.16), f32(0.035), "Not now"), { kind: "tutorialClose" });
   BlzFrameSetVisible(root, false);
-  const open = add(button(rules, f32(0.24), f32(0.519), f32(0.105), f32(0.027), "Tutorial"), { kind: "tutorialOpen" });
+  const open = add(button(rules, f32(0.05), f32(0.475), f32(0.09), f32(0.027), "Tutorial"), { kind: "tutorialOpen" });
   return { root, lesson, open };
 }
 
@@ -75,4 +75,6 @@ export function markTutorialSeen(): void {
 }
 
 
-export const offersTutorial = (game: Readonly<MatchState>, seen: boolean): boolean => !seen && humanCount(game) === 1;
+export const tutorialAvailable = (game: Readonly<MatchState>): boolean => humanCount(game) === 1;
+
+export const offersTutorial = (game: Readonly<MatchState>, seen: boolean): boolean => !seen && tutorialAvailable(game);

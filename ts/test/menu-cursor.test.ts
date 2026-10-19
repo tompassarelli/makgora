@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { LEFT_KEY, RIGHT_KEY, testHeadless } from "./headless";
 import type { HeadlessClient } from "wisp/src/headless/client";
-import { Phase, ResultPick, setParticipants } from "../src/game/lobby/lobbyState";
+import { Phase, ResultPick, setParticipants, setTraining } from "../src/game/lobby/lobbyState";
 import { install, start } from "../src/host/entries/playableMain";
 import { Key } from "../src/host/loop/keyEvents";
 import { shell } from "../src/host/loop/state";
@@ -316,6 +316,37 @@ test("each CPU card's chip names its own slot, P3 and P4, not P2 [k1 scenario]",
     }
     expect(client.errors).toEqual([]);
   }
+});
+
+test("a player alone sees the Tutorial button beside the fighter grid in Versus and Training, clear of every other control, and two humans do not [k1 scenario]", () => {
+  const { clients } = menu();
+  const client = clients.clients[0]!;
+  const layout = () => {
+    const all = client.frames.snapshot();
+    const byId = new Map(all.map(frame => [frame.handle.id, frame]));
+    const shown = (id: number | undefined): boolean => {
+      for (let frame = id === undefined ? undefined : byId.get(id); frame !== undefined; frame = frame.parentId === undefined ? undefined : byId.get(frame.parentId)) {
+        if (!frame.visible || frame.alpha <= 0) return false;
+      }
+      return true;
+    };
+    const controls = all.filter(frame => shown(frame.handle.id) && frame.rectangle !== undefined && (frame.name === "ScriptDialogButton" || /^Melee(Settings|Tile)Button/.test(frame.name)));
+    return { tutorial: controls.find(frame => frame.text === "Tutorial"), others: controls.filter(frame => frame.text !== "Tutorial") };
+  };
+  expect(layout().tutorial).toBeUndefined();
+  for (const training of [false, true]) {
+    client.run(() => { setParticipants(shell().game, 1, 2); setTraining(shell().game, 0, training); });
+    clients.frames(4);
+    const { tutorial, others } = layout();
+    expect(tutorial, `training ${training}`).toBeDefined();
+    const [left, top, right, bottom] = tutorial!.rectangle!;
+    for (const other of others) {
+      const [otherLeft, otherTop, otherRight, otherBottom] = other.rectangle!;
+      const overlaps = left < otherRight && otherLeft < right && bottom < otherTop && otherBottom < top;
+      expect(overlaps, `Tutorial overlaps ${other.name} "${other.text}" with training ${training}`).toBe(false);
+    }
+  }
+  expect(client.errors).toEqual([]);
 });
 
 test("the results banner opens with New stage highlighted, arrows and movement keys move each player's choice and clicking New stage for both players opens stage select [k1 scenario]", () => {
