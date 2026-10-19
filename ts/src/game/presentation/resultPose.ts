@@ -5,8 +5,7 @@ export interface ResultClips {
   readonly winnerClip: FighterOriginalClip;
   readonly repeatVictory: boolean;
   readonly heldClip: FighterOriginalClip;
-  readonly defeatedClip: FighterOriginalClip;
-  readonly defeatedSeconds: number;
+  readonly standClip: FighterOriginalClip;
 }
 
 export interface ResultPose {
@@ -14,16 +13,16 @@ export interface ResultPose {
   readonly time: number;
 }
 
-const HELD_FRAME_SECONDS = 1.0 / 60.0;
-
 const modelTime = (clip: FighterOriginalClip, seconds: number): number => (clip.timeline === true ? clip.startSeconds : 0.0) + seconds;
 
-/** What a results-screen fighter shows `seconds` into the results: the winner plays its victory from the start, then loops it or holds ready; the loser holds its knockdown where a downed fighter rests in play. */
+const looped = (clip: FighterOriginalClip, seconds: number): ResultPose => {
+  const duration = clip.endSeconds - clip.startSeconds;
+  return { clip, time: modelTime(clip, duration <= 0.0 ? 0.0 : floorMod(seconds, duration)) };
+};
+
+/** What a results-screen fighter shows `seconds` into the results: the winner plays its victory from the start, then loops it or holds ready; the loser stands in its idle stand. */
 export function resultPoseAt(clips: ResultClips, winning: boolean, seconds: number): ResultPose {
-  if (!winning) {
-    const clip = clips.defeatedClip;
-    return { clip, time: modelTime(clip, Math.max(0.0, Math.min(clips.defeatedSeconds, clip.endSeconds - clip.startSeconds - HELD_FRAME_SECONDS))) };
-  }
+  if (!winning) return looped(clips.standClip, seconds);
   const holding = !clips.repeatVictory && seconds >= clips.winnerClip.endSeconds - clips.winnerClip.startSeconds;
   const clip = holding ? clips.heldClip : clips.winnerClip;
   const duration = clip.endSeconds - clip.startSeconds;
