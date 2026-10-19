@@ -6,7 +6,7 @@ import { LAVA_CENTER_X, LAVA_HALF_WIDTH } from "../sim/lava";
 import { SEA_SURFACE_Z } from "../sim/stageHazards";
 import { STAGE_POINT_LIGHT_MODELS, STAGE_SNOW_MODEL } from "../../generated/stages/stageAssetInfo";
 import { STAGE_LIGHTS, type StageLight } from "../assets/stageLighting";
-import { min } from "../core/numbers";
+import { max, min } from "../core/numbers";
 import { toInt } from "wisp/src/sim/binary32";
 import { STAGE_POINT_LIGHTS } from "../assets/stagePointLights";
 import { STAGE_SKY_MODELS } from "../../generated/stages/stageSkyInfo";
@@ -184,4 +184,17 @@ export function placedPieces(stage: number, mood = true): readonly SceneryPiece[
 export function driftingPieces(stage: number): readonly DriftingPiece[] {
   const scenery = stageScenery(stage);
   return (scenery.drifters ?? []).map(piece => ({ ...piece, color: sceneryColor(stage, scenery.tint ?? [255, 255, 255]) }));
+}
+
+export interface DrawnScale {
+  readonly scale: number;
+  readonly matrixScale: readonly [number, number, number] | undefined;
+}
+
+/** Warcraft culls an effect by its model's extents times its scale and ignores the matrix scale, so a stretch past 1 moves into the scale. */
+export function drawnScale(piece: Readonly<Pick<SceneryPiece, "scale" | "matrixScale">>): DrawnScale {
+  const matrix = piece.matrixScale;
+  if (matrix === undefined) return { scale: piece.scale, matrixScale: undefined };
+  const widest = max(max(Math.abs(matrix[0]), Math.abs(matrix[1])), max(Math.abs(matrix[2]), 1.0));
+  return { scale: f32(piece.scale * widest), matrixScale: [f32(matrix[0] / widest), f32(matrix[1] / widest), f32(matrix[2] / widest)] };
 }

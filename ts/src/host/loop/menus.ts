@@ -9,7 +9,7 @@ import { menuAction } from "../../game/input/keyBindings";
 import { pressKey } from "../../game/input/playerKeys";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, isParticipantSlot } from "../../game/input/participants";
 import {
-  Phase, RESULT_PICKS, ResultPick, resultChoicesOpen, changeStagePoolMode, changeStagePoolStage, canChooseComputer, cancelRematchCountdown, firstHumanSlot, characterFor, confirmRematch, cycleSlotMode, humanActive, recallCharacter,
+  DEFAULT_RESULT_PICK, Phase, RESULT_PICKS, ResultPick, resultChoicesOpen, changeStagePoolMode, changeStagePoolStage, canChooseComputer, cancelRematchCountdown, firstHumanSlot, characterFor, confirmRematch, cycleSlotMode, humanActive, recallCharacter,
   setTeamBattle, setFriendlyFire, cycleTeam, requestStageSelect, requestStart, setAutomaticRematch, setCpuOpponent, setCpuTier, setEndless, setHitAreas, setPartnerDamage, setTraining, cycleMatchMode, stepClassicTier, stepLoreBattle, setItemsOn, setUltimatesOn, toggleItemKind, stepPartnerBehaviour,
   stepPartnerEscape, stepPartnerTech, stepTrainingSpeed, setTutorialLesson, tickRematchCountdown,
   returnToCharacters, selectCharacter, selectCpuCharacter, selectStage, setHazards, setMeterDropsOn, setStocks, setTimeLimit, updateConnectedHumans,
@@ -57,8 +57,8 @@ export function choose(s: ShellState, slot: ParticipantSlot, direction: -1 | 1):
 }
 
 export function stepResultFocus(s: ShellState, slot: ParticipantSlot, direction: number): void {
-  const focus = s.resultFocus ??= [ResultPick.characters, ResultPick.characters, ResultPick.characters, ResultPick.characters];
-  focus[slot] = floorMod((focus[slot] ?? ResultPick.characters) + direction, RESULT_PICKS);
+  const focus = s.resultFocus ??= [DEFAULT_RESULT_PICK, DEFAULT_RESULT_PICK, DEFAULT_RESULT_PICK, DEFAULT_RESULT_PICK];
+  focus[slot] = floorMod((focus[slot] ?? DEFAULT_RESULT_PICK) + direction, RESULT_PICKS);
 }
 
 export function resultKey(s: ShellState, slot: ParticipantSlot, key: number, action: Action | undefined): boolean {
@@ -70,7 +70,7 @@ export function resultKey(s: ShellState, slot: ParticipantSlot, key: number, act
 
 export function pickResult(s: ShellState, actor: number, choice: number): void {
   if (!isParticipantSlot(actor) || !resultChoicesOpen(s.game)) return;
-  stepResultFocus(s, actor, choice - (s.resultFocus?.[actor] ?? ResultPick.characters));
+  stepResultFocus(s, actor, choice - (s.resultFocus?.[actor] ?? DEFAULT_RESULT_PICK));
   confirm(s, actor);
 }
 
@@ -126,7 +126,7 @@ export function confirm(s: ShellState, slot: ParticipantSlot): void {
     }
   } else if (game.phase === Phase.result) {
     if (cancelRematchCountdown(game, slot)) return;
-    const pick = s.resultFocus?.[slot] ?? ResultPick.characters;
+    const pick = s.resultFocus?.[slot] ?? DEFAULT_RESULT_PICK;
     if (pick !== ResultPick.rematch && pick !== ResultPick.newStage && pick !== ResultPick.characters) return;
     if (!confirmRematch(game, slot, pick)) return;
     s.resultFocus = undefined;

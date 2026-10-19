@@ -305,8 +305,8 @@ test("with Team Battle on every fighting card wears its team's colour and shows 
   }
 });
 
-test("on the results banner arrows and movement keys move each player's choice and clicking New stage for both players opens stage select [k1 scenario]", () => {
-  const { clients } = menu();
+test("the results banner opens with New stage highlighted, arrows and movement keys move each player's choice and clicking New stage for both players opens stage select [k1 scenario]", () => {
+  const { clients, watches } = menu();
   for (const client of clients.clients) client.run(() => {
     const s = shell();
     s.game.phase = Phase.result;
@@ -321,16 +321,21 @@ test("on the results banner arrows and movement keys move each player's choice a
     clients.client(0).run(() => { value = shell().resultFocus?.[slot]; });
     return value;
   };
+  for (const seen of watches) {
+    const highlighted = [...seen.text.values()].filter(text => /> (Rematch|New stage|Character select) </.test(text));
+    expect(highlighted.length).toBe(1);
+    expect(highlighted[0]).toContain("> New stage <");
+  }
   clients.press(0, RIGHT_KEY);
   clients.frames(1);
-  expect(focus(0)).toBe(ResultPick.rematch);
+  expect(focus(0)).toBe(ResultPick.characters);
   clients.press(0, 0x27);
   clients.frames(1);
-  expect(focus(0)).toBe(ResultPick.newStage);
+  expect(focus(0)).toBe(ResultPick.rematch);
   clients.press(0, 0x25);
   clients.press(0, LEFT_KEY);
   clients.frames(1);
-  expect(focus(0)).toBe(ResultPick.characters);
+  expect(focus(0)).toBe(ResultPick.newStage);
   const x = f32(choiceLeft(ResultPick.newStage) + BUTTON_WIDTH / 2);
   const y = f32(CHOICE_TOP - CHOICE_HEIGHT / 2);
   for (const slot of [0, 1]) expect(clients.click(slot, x, y)).toBe(true);

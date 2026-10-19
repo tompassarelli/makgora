@@ -523,6 +523,24 @@ eye, which sits about 1,700 units in front of the fighting plane at the far
 extreme, so a piece deeper than about y 6,300 is not drawn there (headless
 render, 8 Oct, #193).
 
+Two culls hide a whole piece at once, so a piece near either one pops in
+and out as the camera zooms with the fighters' spread:
+
+- **View cull.** Warcraft skips an effect whose model extents, times its
+  scale, fall outside the view, and the matrix scale does not enlarge those
+  extents. A crag stretched 17.5 times by `matrixScale` at scale 1 was culled
+  as a 250-unit rock around its origin, so it vanished whenever that origin
+  left the frame while most of its stretched mesh was still on screen
+  (Gryphon Aerie's near granite, Tom's 0.1.1 4850170 playtest). Authors keep
+  writing `matrixScale` freely: `drawnScale` in
+  smashcraft:ts/src/game/presentation/stageScenery.ts moves any stretch past
+  1 into the scale, so the culled extents always enclose the drawn mesh.
+- **Far cull.** A piece whose origin is farther from the eye than the
+  camera's far clip is not drawn (wisp:docs/headless.md, "Far cull"), so
+  every origin stays inside `arenaFarZ` across the zoom range.
+
+smashcraft:ts/test/scenery-culling.test.ts checks both for every stage.
+
 ## Authored compositions and visual references
 
 Actual reference screenshots are retained in

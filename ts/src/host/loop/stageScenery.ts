@@ -1,5 +1,5 @@
 import { preloadModels, preloadSkies } from "../../game/presentation/stagePreload";
-import { driftingPieces, pointLightPieces, STOCK_TERRAIN_LIGHT, STOCK_UNIT_LIGHT, placedPieces, shadowCastingLights, stageScenery, type SceneryPiece } from "../../game/presentation/stageScenery";
+import { drawnScale, driftingPieces, pointLightPieces, STOCK_TERRAIN_LIGHT, STOCK_UNIT_LIGHT, placedPieces, shadowCastingLights, stageScenery, type SceneryPiece } from "../../game/presentation/stageScenery";
 import { driftPose, type DriftingPiece } from "../../game/presentation/driftingScenery";
 import { hideEffect } from "../../game/render/effects";
 import type { ShellState, StageDrifter } from "./state";
@@ -39,10 +39,11 @@ function addPiece(s: ShellState, piece: Readonly<SceneryPiece>, animation: animt
   const y = s.origin.y + piece.y;
   const effect = AddSpecialEffect(piece.model, x, y);
   BlzSetSpecialEffectPosition(effect, x, y, s.origin.z + piece.z);
-  BlzSetSpecialEffectScale(effect, piece.scale);
+  const drawn = drawnScale(piece);
+  BlzSetSpecialEffectScale(effect, drawn.scale);
   if (piece.color !== undefined) BlzSetSpecialEffectColor(effect, piece.color[0], piece.color[1], piece.color[2]);
   BlzSetSpecialEffectYaw(effect, piece.yaw * (Math.PI / 180.0));
-  if (piece.matrixScale !== undefined) BlzSetSpecialEffectMatrixScale(effect, piece.matrixScale[0], piece.matrixScale[1], piece.matrixScale[2]);
+  if (drawn.matrixScale !== undefined) BlzSetSpecialEffectMatrixScale(effect, drawn.matrixScale[0], drawn.matrixScale[1], drawn.matrixScale[2]);
   BlzPlaySpecialEffect(effect, animation);
   return effect;
 }
@@ -108,12 +109,13 @@ export function showBackdrop(s: ShellState, visible: boolean): void {
     if (!visible || piece === undefined) hideEffect(effect, s.origin);
     else {
       BlzSetSpecialEffectPosition(effect, s.origin.x + piece.x, s.origin.y + piece.y, s.origin.z + piece.z);
-      BlzSetSpecialEffectScale(effect, piece.scale);
+      const drawn = drawnScale(piece);
+      BlzSetSpecialEffectScale(effect, drawn.scale);
 
-      if (piece.matrixScale !== undefined) {
+      if (drawn.matrixScale !== undefined) {
         BlzResetSpecialEffectMatrix(effect);
         BlzSetSpecialEffectYaw(effect, piece.yaw * (Math.PI / 180.0));
-        BlzSetSpecialEffectMatrixScale(effect, piece.matrixScale[0], piece.matrixScale[1], piece.matrixScale[2]);
+        BlzSetSpecialEffectMatrixScale(effect, drawn.matrixScale[0], drawn.matrixScale[1], drawn.matrixScale[2]);
       }
     }
   }

@@ -16,7 +16,7 @@ import { SHOWCASE_PAD_X } from "../../game/session/showcase";
 import type { FighterAgency } from "../../game/presentation/fighterAgency";
 import type { FrameControls } from "../../game/match/controls";
 import type { PacingAndPresentation } from "../../game/match/pacingAndPresentation";
-import { type MatchState, Phase, ResultPick, humanActive, remainingSeconds, resultChoicesOpen, stageClock, timedMatch } from "../../game/lobby/lobbyState";
+import { type MatchState, DEFAULT_RESULT_PICK, Phase, humanActive, remainingSeconds, resultChoicesOpen, stageClock, timedMatch } from "../../game/lobby/lobbyState";
 import { fighterOffscreen, fitFighterFrames } from "../../game/presentation/fighterFraming";
 import { arenaFarZ, ARENA_CAMERA, FLOOR_HEIGHT, cameraFieldOfView, cameraPoint, extremeCamera, finalCamera, localCamera, resultCamera } from "../../game/presentation/arenaCamera";
 
@@ -31,7 +31,7 @@ import { FIGHTER_PHASE_ALPHA, hideEffect } from "../../game/render/effects";
 import { FRAME_SECONDS, type FighterPose } from "../../game/presentation/fighterPose";
 import { CANNON_MODEL, HYDRA_CREST_MODEL, HYDRA_RING_MODEL, PLATFORM_CUE_FRAMES, WIND_STREAK_COUNT, WIND_STREAK_MODEL, framesUntilPlatformMoves, hydraWarningX, hydraStrikeZ, lavaLook, windStreak } from "../../game/presentation/stageHazards";
 import { escapeMeterView, readEscapeMeter } from "../../game/presentation/escapeMeter";
-import { lavaPiece } from "../../game/presentation/stageScenery";
+import { drawnScale, lavaPiece } from "../../game/presentation/stageScenery";
 import { hasLava, lavaSide } from "../../game/sim/lava";
 import type { Fighter } from "../../game/sim/fighter";
 import { journalIngress } from "../../game/session/build";
@@ -187,7 +187,9 @@ export function drawStage(s: ShellState): void {
     const piece = lavaPiece(lavaSide(stageFrame));
     s.stageLava = AddSpecialEffect(piece.model, origin.x + piece.x, origin.y + piece.y);
     BlzSetSpecialEffectPosition(s.stageLava, origin.x + piece.x, origin.y + piece.y, origin.z + piece.z);
-    if (piece.matrixScale !== undefined) BlzSetSpecialEffectMatrixScale(s.stageLava, piece.matrixScale[0], piece.matrixScale[1], piece.matrixScale[2]);
+    const drawn = drawnScale(piece);
+    BlzSetSpecialEffectScale(s.stageLava, drawn.scale);
+    if (drawn.matrixScale !== undefined) BlzSetSpecialEffectMatrixScale(s.stageLava, drawn.matrixScale[0], drawn.matrixScale[1], drawn.matrixScale[2]);
     BlzPlaySpecialEffect(s.stageLava, ANIM_TYPE_STAND);
     presentLava(s, stage, stageFrame);
   }
@@ -608,7 +610,7 @@ export function renderUi(s: ShellState): void {
   const waiting = game.phase === Phase.match ? activeRollback(s)?.waitingFor ?? 0 : 0;
   BlzFrameSetVisible(notice, showMatch && (waiting !== 0 || (game.phase === Phase.result && !ui.match.resultsShown())));
   if (!selecting) {
-    if (game.phase === Phase.result) ui.results.update(resultNotice(game, s.status.text).replace("\n", "  ·  "), matchHelp(game, s.session.paused, startControl(s), localFighter, false), resultChoicesOpen(game) && local !== undefined ? s.resultFocus?.[local] ?? ResultPick.characters : undefined);
+    if (game.phase === Phase.result) ui.results.update(resultNotice(game, s.status.text).replace("\n", "  ·  "), matchHelp(game, s.session.paused, startControl(s), localFighter, false), resultChoicesOpen(game) && local !== undefined ? s.resultFocus?.[local] ?? DEFAULT_RESULT_PICK : undefined);
     BlzFrameSetText(help, matchHelp(game, s.session.paused, startControl(s), localFighter, game.phase === Phase.match));
     probeWaiting(s.probe, waiting, localSlot());
     BlzFrameSetText(notice, game.phase === Phase.result ? resultNotice(game, s.status.text) : waiting !== 0 ? waitingMessage(waiting) : "");

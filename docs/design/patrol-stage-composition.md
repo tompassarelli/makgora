@@ -45,6 +45,10 @@ wedged among enormous boulders. Beneath the deck (stage art rule 16), a red
 near ridge of mounds and spires rises from the canyon floor at y 1,450–1,700,
 acacia trees and two tall rock pillars stand in the valley behind it, and a
 lighter ridge of mounds and spires at y 2,600–3,000 leads back to the mesas.
+The central watchtower (x 1150) stands on the summit of the mound at x 500,
+y 4475, whose peak sits under it; its lowest leg meets the rock and the
+others sink into the slope, because a tower placed over a mound's origin
+hangs above the falling rock face (Tom, 0.1.1 4850170 playtest).
 
 ## Naxxramas: inside the necropolis, over the plague pit
 

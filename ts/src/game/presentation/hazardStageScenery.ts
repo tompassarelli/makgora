@@ -106,7 +106,6 @@ export const GRYPHON_SCENERY: StageScenery = {
 
     { model: "Buildings\\Human\\GryphonAviary\\GryphonAviary.mdx", x: 0.0, y: 5050.0, z: -450.0, scale: f32(2.6), yaw: 270.0 },
     { model: STAGE_CRAG_CRAG_MODEL, x: 0.0, y: 4900.0, z: -1400.0, scale: 1.0, yaw: 180.0, matrixScale: [17.5, 18.0, 3.75], color: GRANITE_FAR },
-    { model: "Buildings\\Human\\GryphonAviary\\GryphonAviary.mdx", x: -2300.0, y: 4600.0, z: -845.0, scale: f32(1.4), yaw: 320.0 },
     { model: STAGE_CRAG_KNOLL_MODEL, x: -2300.0, y: 4600.0, z: -1400.0, scale: 1.0, yaw: 200.0, matrixScale: [11.0, 7.0, 4.25], color: GRANITE_FAR },
     { model: STAGE_CRAG_PEAK_MODEL, x: -3650.0, y: 5200.0, z: -1400.0, scale: 1.0, yaw: 170.0, matrixScale: [13.5, 9.0, 5.75], color: GRANITE_FAR },
     { model: STAGE_CRAG_CRAG_MODEL, x: -1350.0, y: 5600.0, z: -1400.0, scale: 1.0, yaw: 150.0, matrixScale: [10.0, 7.0, 4.5], color: GRANITE_FAR },
