@@ -29,6 +29,7 @@ import { shell } from "../src/host/loop/state";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { JournalHelpers } from "./rematch/journalHelper";
 import { sweep } from "./sweep";
+import { passStartControls } from "../scripts/wisp/startControls";
 
 
 const BEATS: readonly (readonly [mask: number, held: number, press: RowFields])[] = [
@@ -249,6 +250,9 @@ sweep("#60: every local press starts in the presser's next prediction unless a r
 
   clients.start();
   for (let frame = 0; frame < 30; frame++) tick();
+  passStartControls(clients, (count) => {
+    for (let frame = 0; frame < count; frame++) tick();
+  });
   for (const [slot, character] of [[2, Character.demonHunter], [3, Character.rifleman]] as const) {
     for (let click = 0; click < 2; click++) clients.everywhere(() => panelActions().selection.cycleMode(0, slot));
     clients.everywhere(() => panelActions().selection.selectCpuChoice(0, slot, character));
