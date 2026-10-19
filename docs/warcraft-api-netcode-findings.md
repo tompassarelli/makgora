@@ -418,6 +418,13 @@ frames, the confirmed and speculative limits it had before. A sender may admit
 `FUTURE_LIMIT` = 128 frames past its confirmed frame (64 before): while catching
 up at 6 frames a callback, the rows between admission and confirmation (a
 message every 6 callbacks, then the echo) exceeded 64 and held admission.
+A receiver takes a row up to `FUTURE_LIMIT` past K, never past its own
+confirmed frame: K is common and never ahead of the sender's confirmed frame,
+so every client accepts every admitted row alike. Measured from the
+receiver's own confirmed frame, a client that came out of three 2 s stalls
+behind refused rows its peer had already admitted (`tooFarAhead`), the ledgers
+parted, and the match froze on network seeds 11 and 14 of
+smashcraft:ts/test/local-start.test.ts.
 smashcraft:ts/test/lag-recovery.test.ts stalls both games, then one, for 2 s
 in a two-client playable match with a computer fighter and #26's dense taps:
 both clients are back to their pre-stall lag within 47 callbacks (0.78 s),

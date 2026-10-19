@@ -5,16 +5,23 @@ import { type InputRow, emptyInput, sameInput } from "../input/inputRow";
 import { PARTICIPANT_CAPACITY, isParticipantMask, participantActive } from "../input/participants";
 import { INPUT_LAST_FRAME, type InputPacket, decodePacket } from "../input/wire";
 import { FrameRing } from "./frameRing";
+import { REPLAY_HISTORY_CAPACITY } from "../replay/limits";
 import { at } from "wisp/src/runtime/lookup";
 
-export const LEDGER_CAPACITY = 256;
 /**
- * How far past the last consumed frame a row may arrive, and so how many
- * frames a sender may admit before it confirms them. Catching up after a stall
+ * How far past K a row may arrive, and so how many frames a sender may admit
+ * past its own confirmed frame, which K never trails. Catching up after a stall
  * keeps about 18 callbacks of rows between admission and confirmation: the
- * wait for the next message and the echo.
+ * wait for the next message and the echo. K is common, so every client takes
+ * or refuses a row alike however far its own confirmation lags (#60).
  */
 export const FUTURE_LIMIT = 128;
+/**
+ * Retained history, then K at most FUTURE_LIMIT past a participant's own
+ * confirmed frame, then rows FUTURE_LIMIT past K: an admissible row always
+ * has room, so storage never depends on how far this client has confirmed.
+ */
+export const LEDGER_CAPACITY = REPLAY_HISTORY_CAPACITY + 2 * FUTURE_LIMIT;
 
 /** What became of a synchronized packet. Only "accepted" changes the ledger. */
 export type Receipt =
@@ -179,7 +186,7 @@ export class InputLedger {
 
   private check(sender: number, frame: number, row: Readonly<InputRow>): Receipt {
     if (frame < this.retainedFrom) return "outOfHistory";
-    if (frame - this.consumed > FUTURE_LIMIT) return "tooFarAhead";
+    if (frame - this.known > FUTURE_LIMIT) return "tooFarAhead";
     if (frame - this.retainedFrom >= LEDGER_CAPACITY) return "storageFull";
     const ring = at(this.senders, sender);
     const stored = ring.row(frame);
