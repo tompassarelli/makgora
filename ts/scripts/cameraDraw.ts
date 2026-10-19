@@ -22,9 +22,9 @@ const VideoMetadata = Schema.Struct({
   frames: Schema.Array(Schema.Struct({ best_effort_timestamp_time: Schema.String })),
 });
 
-interface Marker { readonly x: number; readonly y: number; readonly pixels: number }
-interface CapturedFrame { readonly index: number; readonly seconds: number; readonly marker: Marker | undefined }
-interface Callback {
+export interface Marker { readonly x: number; readonly y: number; readonly pixels: number }
+export interface CapturedFrame { readonly index: number; readonly seconds: number; readonly marker: Marker | undefined }
+export interface Callback {
   readonly row: number;
   entryMs?: number;
   confirmedBefore?: number;
@@ -40,9 +40,10 @@ interface Callback {
 
 export function cameraMarker(rgb: Uint8Array, width: number, height: number): Marker | undefined {
   const scale = height / 0.6;
+  const left = Math.max(0, Math.floor((width - 0.8 * scale) / 2));
   let count = 0, sumX = 0, sumY = 0;
   for (let y = 0; y < Math.min(height, Math.ceil(0.065 * scale)); y++) {
-    for (let x = Math.max(0, Math.floor(0.035 * scale)); x < Math.min(width, Math.ceil(0.16 * scale)); x++) {
+    for (let x = left + Math.max(0, Math.floor(0.035 * scale)); x < Math.min(width, left + Math.ceil(0.16 * scale)); x++) {
       const offset = (y * width + x) * 3;
       const red = rgb[offset] ?? 0, green = rgb[offset + 1] ?? 0, blue = rgb[offset + 2] ?? 0;
       if (red >= 220 && blue >= 220 && green <= 60) { count++; sumX += x; sumY += y; }
@@ -51,7 +52,7 @@ export function cameraMarker(rgb: Uint8Array, width: number, height: number): Ma
   return count < 2 ? undefined : { x: sumX / count, y: sumY / count, pixels: count };
 }
 
-function distribution(values: readonly number[]) {
+export function distribution(values: readonly number[]) {
   const sorted = [...values].sort((a, b) => a - b);
   const percentile = (fraction: number) => sorted[Math.max(0, Math.ceil(sorted.length * fraction) - 1)] ?? null;
   return { samples: values.length, p50: percentile(0.5), p95: percentile(0.95), p99: percentile(0.99), max: percentile(1) };
@@ -84,7 +85,7 @@ function addPageLines(rows: Map<number, Callback>, lines: readonly string[]): vo
   }
 }
 
-const callbacks = (directory: string, slot: number, run: number) => Effect.gen(function*() {
+export const callbacks = (directory: string, slot: number, run: number) => Effect.gen(function*() {
   const rows = new Map<number, Callback>();
   const glob = new Bun.Glob(`**/*smashcraft-response-p${slot}-run${run}-page*.txt`);
   let pages = 0;
@@ -98,7 +99,9 @@ const callbacks = (directory: string, slot: number, run: number) => Effect.gen(f
   return rows;
 });
 
-const videoFrames = (video: string, viewport: readonly number[]) => Effect.gen(function*() {
+export type FrameVisitor = (rgb: Uint8Array, index: number, width: number, height: number) => void;
+
+export const videoFrames = (video: string, viewport: readonly number[], visit?: FrameVisitor) => Effect.gen(function*() {
   const probe = yield* runProcess(ChildProcess.make("ffprobe", ["-v", "error", "-select_streams", "v:0", "-show_frames", "-show_streams",
     "-show_entries", "stream=width,height:frame=best_effort_timestamp_time", "-of", "json", video]));
   const metadata = yield* Schema.decodeEffect(Schema.fromJsonString(VideoMetadata))(probe).pipe(Effect.mapError(failure));
@@ -124,6 +127,7 @@ const videoFrames = (video: string, viewport: readonly number[]) => Effect.gen(f
           const timestamp = metadata.frames[frames.length]?.best_effort_timestamp_time;
           const seconds = Number(timestamp);
           if (timestamp === undefined || !Number.isFinite(seconds)) throw Error(`Missing timestamp for decoded frame ${frames.length}`);
+          visit?.(bytes, frames.length, width, height);
           frames.push({ index: frames.length, seconds, marker: cameraMarker(bytes, width, height) });
           filled = 0;
         }
@@ -136,6 +140,48 @@ const videoFrames = (video: string, viewport: readonly number[]) => Effect.gen(f
     return { width, height, frames };
   }));
 }).pipe(Effect.catchTag("PlatformError", (cause) => Effect.fail(failure(cause))));
+
+export interface MatchedFrame extends CapturedFrame {
+  readonly row: number;
+  readonly matchFrame: number | undefined;
+  readonly advance: number | undefined;
+  readonly callback: Callback;
+}
+
+
+export function joinMarkers(frames: readonly CapturedFrame[], rows: ReadonlyMap<number, Callback>, height: number): MatchedFrame[] {
+  const marked = frames.filter(frame => frame.marker !== undefined);
+  if (marked.length === 0) throw Error("No response marker in the retained video viewport");
+  const originX = Math.min(...marked.map(frame => frame.marker?.x ?? Infinity));
+  const originY = Math.min(...marked.map(frame => frame.marker?.y ?? Infinity));
+  const scale = height / 0.6;
+  const cells = marked.map(frame => {
+    const column = Math.round(((frame.marker?.x ?? originX) - originX) / (0.0032 * scale));
+    const line = Math.round(((frame.marker?.y ?? originY) - originY) / (0.01 * scale));
+    if (column < 0 || column > 31 || line < 0 || line > 3) throw Error(`Marker outside grid on video frame ${frame.index}`);
+    return column + line * 32;
+  });
+  const counts: number[] = [];
+  cells.forEach((cell, k) => { const before = counts[k - 1]; counts.push(before === undefined ? cell : before + ((cell - before % 128 + 128) % 128)); });
+  const lastRow = Math.max(...rows.keys());
+  const shift = lastRow - (counts.at(-1) ?? 0);
+  const firstRow = (counts[0] ?? 0) + shift;
+  if (firstRow > 1) throw Error("Video started too late to identify the first response row");
+  const exported = counts.findIndex(count => count + shift === lastRow);
+  const start = marked.findIndex((_, k) => (counts[k] ?? 0) + shift >= 0);
+  const first = marked[start];
+  if (first === undefined) throw Error("No response marker in the retained video viewport");
+  let previousFrame: number | undefined;
+  return marked.slice(start, exported < 0 ? marked.length : exported + 1).map((frame, k) => {
+    const row = (counts[start + k] ?? 0) + shift;
+    const callback = rows.get(row);
+    if (callback === undefined) throw Error(`Video marker row ${row} has no exported response row`);
+    const matchFrame = callback.frame ?? callback.predictedAfter ?? callback.confirmedAfter;
+    const advance = previousFrame === undefined || matchFrame === undefined ? undefined : matchFrame - previousFrame;
+    previousFrame = matchFrame;
+    return { ...frame, seconds: frame.seconds - first.seconds, row, matchFrame, advance, callback };
+  }).filter(frame => frame.seconds <= 60);
+}
 
 const main = Effect.gen(function*() {
   const { values } = yield* Effect.try({
@@ -151,32 +197,7 @@ const main = Effect.gen(function*() {
   const out = values.out;
   const rows = yield* callbacks(values.pages, Number(values.slot), Number(values.run));
   const video = yield* videoFrames(values.video, values.viewport?.split(",").map(Number) ?? []);
-  const marked = video.frames.filter(frame => frame.marker !== undefined);
-  const first = marked[0];
-  if (first === undefined) return yield* new CameraDrawFailure({ problem: "No response marker in the retained video viewport" });
-  const originX = Math.min(...marked.map(frame => frame.marker?.x ?? Infinity));
-  const originY = Math.min(...marked.map(frame => frame.marker?.y ?? Infinity));
-  const scale = video.height / 0.6;
-  let lastRow: number | undefined;
-  let previousFrame: number | undefined;
-  const matched = yield* Effect.try({
-    try: () => marked.map(frame => {
-      const column = Math.round(((frame.marker?.x ?? originX) - originX) / (0.0032 * scale));
-      const line = Math.round(((frame.marker?.y ?? originY) - originY) / (0.01 * scale));
-      if (column < 0 || column > 31 || line < 0 || line > 3) throw Error(`Marker outside grid on video frame ${frame.index}`);
-      const cell = column + line * 32;
-      const row = lastRow === undefined ? cell : lastRow + ((cell - lastRow % 128 + 128) % 128);
-      if (lastRow === undefined && row > 1) throw Error("Video started too late to identify the first response row");
-      lastRow = row;
-      const callback = rows.get(row);
-      if (callback === undefined) throw Error(`Video marker row ${row} has no exported response row`);
-      const matchFrame = callback.frame ?? callback.predictedAfter ?? callback.confirmedAfter;
-      const advance = previousFrame === undefined || matchFrame === undefined ? undefined : matchFrame - previousFrame;
-      previousFrame = matchFrame;
-      return { ...frame, seconds: frame.seconds - first.seconds, row, matchFrame, advance, callback };
-    }).filter(frame => frame.seconds <= 60),
-    catch: failure,
-  });
+  const matched = yield* Effect.try({ try: () => joinMarkers(video.frames, rows, video.height), catch: failure });
   const intervals = matched.slice(1).map((frame, index) => (frame.seconds - (matched[index]?.seconds ?? frame.seconds)) * 1000);
   const duration = matched.at(-1)?.seconds ?? 0;
   const report = {

@@ -125,11 +125,30 @@ map and rendered-frame capture before choosing the playable default.
 reads each video's original presentation timestamp and decodes the probe's
 magenta 128-cell marker, joining each captured frame to its exported A/B/P/Q
 row. `--viewport X,Y,W,H` crops a whole-output recording to the exact game
-window; `--slot` and `--run` select the response export. Start the recorder
-before Ctrl+G so row zero identifies the beginning. The reader reports retained
+window; `--slot` and `--run` select the response export. The marker sits
+in the 4:3 UI area, which a widescreen window centres. Native-input maps draw
+it from their per-epoch recording too, so the reader counts rows back from the
+frozen marker after Ctrl+H, which is the export's last row: start the recorder
+before Ctrl+G and stop it after Ctrl+H. The reader reports retained
 frame intervals, held match frames and multiple match-frame advances, and
 writes the matched timeline for pixel analysis. It deliberately leaves drawn
 camera measurement unset: callback camera fields alone cannot establish it.
+
+`bun scripts/stepEvenness.ts --video PRIVATE.mkv --pages DATA_DIR --out PRIVATE_DIR
+--viewport X,Y,W,H [--run N --fighters 0,1 --projection FILE]` measures fighter
+steps in pixels on the same join (smashcraft:ts/scripts/stepEvenness.ts). With
+`-dev view far` holding the camera still, it subtracts a temporal-median
+background, takes each fighter's foreground centroid near its projected `P`
+position and divides each rendered frame's step by that fighter's projected
+per-frame velocity, so steps read in simulation frames. Pixel-identical
+captured frames are compositor repeats, not rendered frames, and are skipped.
+A run without `--projection` fits the world-to-screen projection and each
+facing direction's centroid offset, and writes them to `projection.json`; fit
+it with smooth drawing off, where the drawn position is `P[f]`, and pass it
+to the smooth-drawing run, whose lag (P[f] − drawn)/(P[f] − P[f−1]) then
+reads added latency in frames. `--camera` instead measures the background's
+horizontal shift per rendered frame against the `Q` local camera's per-frame
+motion, and the engine camera's lag behind that request.
 
 For the private compositor, `wf-recorder --no-damage --codec libx264rgb
 --codec-param preset=ultrafast --codec-param crf=0 --pixel-format rgb24
@@ -154,3 +173,17 @@ smashcraft:ts/test/high-refresh.test.ts checks that every confirmed checksum
 of a quick match played in one- and two-frame bursts matches with drawing on
 and off. Players' builds keep it off until a native capture shows even
 fighter steps within 0.5 ms a burst and one frame of added latency.
+
+The first such capture (19 October 2026, signed-in clones on Battle.net,
+1280×720 Classic at a 60 fps cap on a 60 Hz private output, native-input map)
+kept it off. The game rendered about 42 distinct frames a second, near the
+40 bursts a second. With drawing off, 13% of rendered frames held the
+simulation frame and 40% and 41% advanced it by one and two; with it on,
+pixel steps narrowed (interquartile range 0.95 against 1.37 simulation frames,
+median 1.75). Drawing cost about 0.53 ms a burst in seconds with a running
+fighter (0.4–0.68 ms; 0.1–0.3 ms standing), because every 1/1024 s callback in
+a burst repositions every moving effect. The pixel lag was too noisy to bound.
+In the same session, with the match camera and smooth drawing on,
+`-dev camera-smooth on` did not even the background's steps (interquartile
+range 0.88 against 0.79 simulation frames off) and moved the engine camera's
+median lag behind its request from 1.0 to 1.9 frames, so it stays off.
