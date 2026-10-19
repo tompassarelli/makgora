@@ -296,7 +296,9 @@ transport (wisp#110) both call it.
   that choice fixed.
 - **Lobby agreement:** each player sees the other's request on character
   select. The match uses the higher request, so nobody plays below what they
-  asked for. When the agreed delay is 8 frames (133 ms) or more, the lobby
+  asked for. The line leads with the match delay and who set it, then each
+  player's request and echo, e.g. `Input delay 16 frames, set by P3 · P1 2
+  (83 ms) · P2 fixed 9 (283 ms) · P3 16 (583 ms)`, so four players fit one row. When the agreed delay is 8 frames (133 ms) or more, the lobby
   warns: "Input delay of 8+ frames: this connection will feel sluggish".
 - **Auto, online:** the higher of a ping target and an error-corrected value,
   capped at 16.

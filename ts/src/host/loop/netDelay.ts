@@ -99,11 +99,11 @@ export function lobbyDelayText(net: Readonly<NetDelay>, game: Readonly<MatchStat
       deciders++;
     }
     const echo = at(net.slotEchoMs, slot);
-    const shown = online && echo >= 0 ? ` · echo ${I2S(echo)} ms` : "";
-    parts.push(`P${I2S(slot + 1)} ${choice === AUTO_DELAY ? `Auto (${I2S(request)})` : I2S(request)}${shown}`);
+    const shown = online && echo >= 0 ? ` (${I2S(echo)} ms)` : "";
+    parts.push(`P${I2S(slot + 1)} ${choice === AUTO_DELAY ? "" : "fixed "}${I2S(request)}${shown}`);
   }
-  const setBy = online && deciders === 1 ? ` · delay set by P${I2S(decider + 1)}'s ${at(choices, decider) === AUTO_DELAY ? "connection" : "choice"}` : "";
-  const line = `Input delay: ${parts.join(", ")} → ${I2S(agreed)} frames${setBy}`;
+  const setBy = online && deciders === 1 ? `, set by P${I2S(decider + 1)}` : "";
+  const line = `Input delay ${I2S(agreed)} frames${setBy} · ${parts.join(" · ")}`;
   return highDelay(agreed) ? `${line}\n|cffff4040Input delay of ${I2S(HIGH_DELAY_FRAMES)}+ frames: this connection will feel sluggish|r` : line;
 }
 

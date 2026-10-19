@@ -14,12 +14,13 @@ import { testHeadless } from "./headless";
 const headless = testHeadless(SMASHCRAFT_HEADLESS);
 
 const BUILD: MapBuild = { ...PLAYABLE_BUILD, id: "typescript-lobby-echo", devConsole: true };
-const HUMANS = [0, 1, 2];
-const ECHO_MS = [100, 300, 600];
+const HUMANS = [0, 1, 2, 3];
+const ECHO_MS = [100, 300, 600, 200];
 const LOBBY_FRAMES = 900;
 const TOLERANCE_MS = 34;
+const ONE_ROW_CHARS = 106;
 
-test("three clients on 100, 300 and 600 ms links each show every player's echo within 34 ms in Character select, name the slowest slot as setting the delay, and send one delay message a second [k1 scenario]", () => {
+test("four clients on 100, 300, 600 and 200 ms links each show every player's echo within 34 ms in Character select on one row of at most 106 characters, name the slowest slot as setting the delay, and send one delay message a second [k1 scenario]", () => {
   const sends = new Map<number, number[]>();
   let frameNow = 0;
   const delivery: SyncDelivery = {
@@ -50,11 +51,12 @@ test("three clients on 100, 300 and 600 ms links each show every player's echo w
   const slowest = ECHO_MS.indexOf(Math.max(...ECHO_MS));
   for (const text of panels) {
     for (const slot of HUMANS) {
-      const shown = new RegExp(`P${slot + 1} [^,→]*· echo (\\d+) ms`).exec(text);
+      const shown = new RegExp(`P${slot + 1} (?:fixed )?\\d+ \\((\\d+) ms\\)`).exec(text);
       expect(shown, text).not.toBeNull();
       expect(Math.abs(Number(shown?.[1]) - (ECHO_MS[slot] ?? 0)), text).toBeLessThanOrEqual(TOLERANCE_MS);
     }
-    expect(text).toContain(`delay set by P${slowest + 1}'s connection`);
+    expect(text).toContain(`, set by P${slowest + 1} ·`);
+    expect(text.split("\n")[0]?.length ?? 0, text).toBeLessThanOrEqual(ONE_ROW_CHARS);
   }
   for (const slot of HUMANS) {
     const frames = (sends.get(slot) ?? []).filter(frame => frame >= from);
