@@ -125,13 +125,14 @@ fn generated_fighter_inputs_follow_the_models_shipped_contract_rows() {
                 let (pad, _) = input(control, magnitude);
                 let mut driver = Driver::keys_for(&preset.settings, padbridge::pad_ingress::Route::Digital);
                 let mut out = Desktop::default();
-                driver.step(&InputView::default(), true, 0.0, &mut out).unwrap();
-                driver.step(&pad, true, 0.0, &mut out).unwrap();
+                let start = std::time::Instant::now();
+                driver.step(&InputView::default(), true, 0.0, start, &mut out).unwrap();
+                driver.step(&pad, true, 0.0, start, &mut out).unwrap();
                 let wanted = outputs.iter().cloned().collect::<BTreeSet<_>>();
                 if out.held != wanted {
                     failures.insert(format!("{} {control:?}: keys {:?}, contract {wanted:?}", preset.name, out.held));
                 }
-                driver.step(&InputView::default(), true, 0.0, &mut out).unwrap();
+                driver.step(&InputView::default(), true, 0.0, start + padbridge::MIN_HOLD, &mut out).unwrap();
                 assert!(out.held.is_empty(), "{} {control:?}: keys remain at neutral", preset.name);
             }
             eprintln!("{} {control:?}: {cases} generated contract cases", preset.name);
@@ -162,12 +163,12 @@ fn generated_menus_follow_shipped_rows_and_start_is_independent_of_cursor_positi
                 let position = [f64::from(random(&mut seed) % 3840), f64::from(random(&mut seed) % 2160)];
                 let mut out = Desktop { cursor: position, ..Desktop::default() };
                 let mut driver = Driver::menu(MenuCurve::for_window_width(1888.0), true);
-                driver.step(&InputView::default(), true, 0.0, &mut out).unwrap();
-                driver.step(&pad, true, 0.01, &mut out).unwrap();
+                driver.step(&InputView::default(), true, 0.0, std::time::Instant::now(), &mut out).unwrap();
+                driver.step(&pad, true, 0.01, std::time::Instant::now(), &mut out).unwrap();
                 let wanted = outputs.iter().filter(|key| key.as_str() != "pointer").cloned().collect::<BTreeSet<_>>();
                 assert_eq!(out.held, wanted, "{} {control:?}: menu contract", preset.name);
                 assert_eq!(out.cursor != position, outputs.iter().any(|key| key == "pointer"), "{control:?}: pointer contract");
-                driver.step(&InputView::default(), true, 0.0, &mut out).unwrap();
+                driver.step(&InputView::default(), true, 0.0, std::time::Instant::now(), &mut out).unwrap();
                 assert!(out.held.is_empty());
                 if control == Control::Start {
                     for phase in [MenuPhase::Character, MenuPhase::Cpu, MenuPhase::Stage, MenuPhase::Result] {

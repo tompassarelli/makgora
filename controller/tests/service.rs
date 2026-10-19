@@ -198,7 +198,7 @@ fn a_private_pad_script_drives_the_published_menu_pointer() {
     let mut driver = Driver::menu(curve, true);
     let mut pointing = true;
     assert!(gate.eligible().unwrap(), "assigned client is not focused");
-    driver.step(&InputView::default(), true, 0.0, &mut out).unwrap();
+    driver.step(&InputView::default(), true, 0.0, std::time::Instant::now(), &mut out).unwrap();
     let result = (|| -> Result<(), String> {
         for line in script.lines().filter(|line| !line.trim().is_empty() && !line.starts_with('#')) {
             let row = line.split_whitespace().map(str::parse::<i32>).collect::<Result<Vec<_>, _>>().map_err(|e| e.to_string())?;
@@ -220,7 +220,7 @@ fn a_private_pad_script_drives_the_published_menu_pointer() {
                     pointing = next;
                 }
                 let now = Instant::now();
-                driver.step(&pad, gate.eligible()?, now.duration_since(stepped).as_secs_f32(), &mut out)?;
+                driver.step(&pad, gate.eligible()?, now.duration_since(stepped).as_secs_f32(), now, &mut out)?;
                 stepped = now;
                 thread::sleep(Duration::from_millis(10));
             }

@@ -344,11 +344,11 @@ mod tests {
         let mut driver = Driver::menu(MenuCurve::for_window_width(1888.0), true);
         let mut output = Recorded::default();
         let mut pad = InputView::default();
-        driver.step(&pad, true, 0.0, &mut output).unwrap();
+        driver.step(&pad, true, 0.0, std::time::Instant::now(), &mut output).unwrap();
         pad.press(Button::Start, true);
-        driver.step(&pad, true, 0.0, &mut output).unwrap();
+        driver.step(&pad, true, 0.0, std::time::Instant::now(), &mut output).unwrap();
         pad.press(Button::Start, false);
-        driver.step(&pad, true, 0.0, &mut output).unwrap();
+        driver.step(&pad, true, 0.0, std::time::Instant::now(), &mut output).unwrap();
         assert_eq!(output.0, [("y".into(), true), ("y".into(), false)]);
         profile.tracker.observe(documents, Menu { phase: "BLOCKED".into(), modified: now, ..menu("b", 0, 2, 0) });
         assert!(!profile.pointer_menu());
