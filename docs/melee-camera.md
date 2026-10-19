@@ -60,7 +60,7 @@ matchCamera.ts runs steps 1–7 once per match frame in deterministic state,
 with Melee heights at six world units a Melee unit: box 198 forward, 54 back,
 96 up, 54 down around a point 60 above the feet; extents ease by 3 × the
 subject ratio a frame (0.5 Melee units before scaling); interest 9–18% and
-eye 27% a frame, the follow speed reading the larger side of the subject box;
+zoom 14% a frame, the follow speed reading the larger side of the subject box;
 eye distance 498–6000. Corner and underside limits shape the goal before
 easing (step 6), so reaching a limit eases in. Deliberate differences:
 
@@ -73,17 +73,26 @@ easing (step 6), so reaching a limit eases in. Deliberate differences:
   above the HUD. Our view is therefore height-bound in neutral where Melee's
   4:3 view is usually width-bound, so a jump zooms out a little more than in
   Melee.
+- **Slower zoom.** The eye distance eases 14% a frame, not Melee's 27%. Our
+  height-bound fit turns every jump on a platform into a zoom, so at 27% four
+  fighters made the view zoom more and reverse more often than Melee's
+  (`--players 4`: zoom p95 3.3% vs 2.3% of the view a frame, travel 59% vs 49%
+  a second, 108 vs 57 snap frames). At 14% four-player zoom travels 49% a
+  second, p95 2.6%, 29 snap frames, and live fighters leave the view in about
+  the same number of frames (871 vs 836).
 - **Final clamp.** After easing, the view is clamped into the camera range
   once more, so no eased frame ever shows past it (#80's blast-zone rule).
 - **No quakes.** Hits keep the camera steady (smashcraft:docs/gameplay-design.md).
 
 ## Measuring camera movement
 
-`bun scripts/cameraFeel.ts` (from ts/) plays six fixed computer matches and
+`bun scripts/cameraFeel.ts` (from ts/) plays six fixed computer 1v1 matches, or
+three four-player ones with `--players 4`, and
 reports, for our camera and for a reference port of steps 1–7 driven by the
 same fighter paths, the pan and zoom per frame as fractions of the view,
 the change of that velocity per frame, frames that jump more than 3% (pan) or
-6% (zoom), travel a second and direction reversals a second. On these
+6% (zoom), travel a second, direction reversals a second and our frames with a
+live fighter outside the view. On these
 matches before #110 our camera matched Melee's in typical movement (pan p95
 1.5% vs 1.4% of the view a frame, zoom p95 3.2% vs 2.5%) but snapped when a
 limit or the deck underside was reached (up to 24% of the view in one frame

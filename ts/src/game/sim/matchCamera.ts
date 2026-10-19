@@ -318,7 +318,7 @@ export function advanceMatchCamera(camera: MatchCamera, world: Readonly<Roster>,
   }
   camera.x = camera.initialized ? ease(camera.x, goal.x, rate) : goal.x;
   camera.z = camera.initialized ? ease(camera.z, goal.z, rate) : goal.z;
-  camera.distance = camera.initialized ? ease(camera.distance, goal.distance, 0.27000001072883606) : goal.distance;
+  camera.distance = camera.initialized ? ease(camera.distance, goal.distance, 0.14000000059604645) : goal.distance;
   camera.initialized = true;
 
   limitCamera(camera, bounds, MATCH_CAMERA_ASPECT, blast.bottom);

@@ -22,18 +22,26 @@ import { MATCH_TICKS_PER_SECOND, Phase, createMatchState, setParticipants } from
 import { initializeMatchFighters, matchSpawnX } from "../src/game/match/step";
 import { createFighter } from "../src/game/sim/fighter";
 import { selectableCharacterBySlug } from "../src/game/sim/heroes/registry";
-import { MATCH_CAMERA_ASPECT } from "../src/game/sim/matchCamera";
+import { MATCH_CAMERA_ASPECT, outsideCamera } from "../src/game/sim/matchCamera";
 import { copyControls, createRoster, fighterAt, isActive, neutralControls, type Roster } from "../src/game/sim/roster";
 import { stageBounds } from "../src/game/sim/stageBounds";
 
 
-export const CAMERA_SCENARIOS: readonly { readonly a: string; readonly b: string; readonly stage: number; readonly shift: number }[] = [
-  { a: "illidan", b: "blademaster", stage: 0, shift: 0.0 },
-  { a: "rifleman", b: "mountain-king", stage: 0, shift: -60.0 },
-  { a: "illidan", b: "forsaken-paladin", stage: 1, shift: 0.0 },
-  { a: "warden", b: "lich", stage: 1, shift: 60.0 },
-  { a: "dreadlord", b: "shadow-hunter", stage: 2, shift: 0.0 },
-  { a: "blademaster", b: "illidan", stage: 2, shift: -60.0 },
+interface CameraScenario { readonly fighters: readonly string[]; readonly stage: number; readonly shift: number }
+
+export const CAMERA_SCENARIOS: readonly CameraScenario[] = [
+  { fighters: ["illidan", "blademaster"], stage: 0, shift: 0.0 },
+  { fighters: ["rifleman", "mountain-king"], stage: 0, shift: -60.0 },
+  { fighters: ["illidan", "forsaken-paladin"], stage: 1, shift: 0.0 },
+  { fighters: ["warden", "lich"], stage: 1, shift: 60.0 },
+  { fighters: ["dreadlord", "shadow-hunter"], stage: 2, shift: 0.0 },
+  { fighters: ["blademaster", "illidan"], stage: 2, shift: -60.0 },
+];
+
+export const FOUR_PLAYER_CAMERA_SCENARIOS: readonly CameraScenario[] = [
+  { fighters: ["illidan", "blademaster", "rifleman", "mountain-king"], stage: 0, shift: 0.0 },
+  { fighters: ["warden", "lich", "forsaken-paladin", "shadow-hunter"], stage: 1, shift: 0.0 },
+  { fighters: ["dreadlord", "illidan", "blademaster", "warden"], stage: 2, shift: 0.0 },
 ];
 
 const NEUTRAL = neutralControls();
@@ -126,8 +134,8 @@ class MeleeCamera {
   }
 }
 
-interface Samples { pan: number[]; zoom: number[]; jerk: number[]; reversals: [number, number, number]; frames: number }
-const samples = (): Samples => ({ pan: [], zoom: [], jerk: [], reversals: [0, 0, 0], frames: 0 });
+interface Samples { pan: number[]; zoom: number[]; jerk: number[]; reversals: [number, number, number]; frames: number; offscreen: number }
+const samples = (): Samples => ({ pan: [], zoom: [], jerk: [], reversals: [0, 0, 0], frames: 0, offscreen: 0 });
 
 
 function observe(into: Samples, before: View, now: View, last: [number, number, number], velocity: [number, number, number]): void {
@@ -147,20 +155,22 @@ function observe(into: Samples, before: View, now: View, last: [number, number, 
   into.frames++;
 }
 
-function playScenario(scenario: (typeof CAMERA_SCENARIOS)[number], ours: Samples, melee: Samples): void {
-  const a = selectableCharacterBySlug(scenario.a);
-  const b = selectableCharacterBySlug(scenario.b);
-  if (a === undefined || b === undefined) throw new Error(`unknown fighter in ${scenario.a} ${scenario.b}`);
+function playScenario(scenario: CameraScenario, ours: Samples, melee: Samples): void {
+  const characters = scenario.fighters.map((slug) => {
+    const character = selectableCharacterBySlug(slug);
+    if (character === undefined) throw new Error(`unknown fighter ${slug}`);
+    return character;
+  });
+  const mask = (1 << characters.length) - 1;
   const match = createMatchState();
-  setParticipants(match, 0, 3);
-  match.characterChoices[0] = a;
-  match.characterChoices[1] = b;
+  setParticipants(match, 0, mask);
+  characters.forEach((character, slot) => { match.characterChoices[slot] = character; });
   match.stageChoice = scenario.stage;
   match.stockCount = 2;
   match.timeLimitMinutes = 1;
   match.remainingFrames = 60 * MATCH_TICKS_PER_SECOND;
   match.phase = Phase.match;
-  const world = createRoster(3, [createFighter(a, f32(matchSpawnX(0) + scenario.shift), 1), createFighter(b, f32(matchSpawnX(1) + scenario.shift), -1)]);
+  const world = createRoster(mask, characters.map((character, slot) => createFighter(character, f32(matchSpawnX(slot) + scenario.shift), matchSpawnX(slot) < 0.0 ? 1 : -1)));
   const controls = createFrameControls();
   const produced = createFrameControls();
   const runtime = createPacingAndPresentation();
@@ -179,7 +189,7 @@ function playScenario(scenario: (typeof CAMERA_SCENARIOS)[number], ours: Samples
     for (const slot of PARTICIPANT_SLOTS) {
       copyControls(produced.inputs[slot], NEUTRAL);
       clearAttackBuffer(produced.commands[slot]);
-      if (slot <= 1) produceComputerInput(match, world, runtime, slot, frame, produced.inputs[slot], produced.commands[slot]);
+      if (slot < characters.length) produceComputerInput(match, world, runtime, slot, frame, produced.inputs[slot], produced.commands[slot]);
     }
     if (!captureFrame(row, frame, world.mask, produced, runtime)) throw new Error(`capture refused frame ${frame}`);
     if (!executeMatchFrame(row, match, world, controls, runtime, frame)) throw new Error(`execution refused frame ${frame}`);
@@ -189,6 +199,7 @@ function playScenario(scenario: (typeof CAMERA_SCENARIOS)[number], ours: Samples
     const oursView = { x: camera.x, z: camera.z, distance: camera.distance, width: height * MATCH_CAMERA_ASPECT, height };
     if (previous !== undefined) {
       observe(ours, previous.ours, oursView, lastOurs, velocityOurs);
+      if (PARTICIPANT_SLOTS.some((slot) => isActive(world, slot) && !fighterAt(world, slot).status.out && outsideCamera(camera, fighterAt(world, slot).motion.x, f32(fighterAt(world, slot).motion.z + 60.0)))) ours.offscreen++;
       observe(melee, previous.melee, meleeView, lastMelee, velocityMelee);
     }
     previous = { ours: oursView, melee: meleeView };
@@ -208,6 +219,7 @@ function summarize(from: Samples) {
     zoom: [quantile(zoom, 0.5), quantile(zoom, 0.95), quantile(zoom, 0.99), zoom.at(-1) ?? 0],
     jerk: [quantile(jerk, 0.5), quantile(jerk, 0.95), quantile(jerk, 0.99), jerk.at(-1) ?? 0],
     snaps: from.pan.filter((value) => value > 0.03).length + from.zoom.filter((value) => value > 0.06).length,
+    offscreen: from.offscreen,
     panTravel: perSecond(from.pan.reduce((sum, value) => sum + value, 0)),
     zoomTravel: perSecond(from.zoom.reduce((sum, value) => sum + value, 0)),
     reversals: from.reversals.map(perSecond),
@@ -215,22 +227,23 @@ function summarize(from: Samples) {
 }
 
 
-export function measureCameraFeel() {
+export function measureCameraFeel(scenarios: readonly CameraScenario[] = CAMERA_SCENARIOS) {
   const ours = samples();
   const melee = samples();
-  for (const scenario of CAMERA_SCENARIOS) playScenario(scenario, ours, melee);
+  for (const scenario of scenarios) playScenario(scenario, ours, melee);
   return { ours: summarize(ours), melee: summarize(melee) };
 }
 
 if (import.meta.main) {
-  const { values } = parseArgs({ options: { json: { type: "string" } } });
-  const result = measureCameraFeel();
+  const { values } = parseArgs({ options: { json: { type: "string" }, players: { type: "string" } } });
+  const scenarios = values.players === "4" ? FOUR_PLAYER_CAMERA_SCENARIOS : CAMERA_SCENARIOS;
+  const result = measureCameraFeel(scenarios);
   const percent = (values: readonly number[]) => values.map((value) => `${(value * 100).toFixed(2)}%`).join(" / ");
-  console.log(`${result.ours.frames} frames over ${CAMERA_SCENARIOS.length} computer matches`);
+  console.log(`${result.ours.frames} frames over ${scenarios.length} computer matches`);
   for (const [name, view] of [["ours ", result.ours], ["melee", result.melee]] as const) {
     console.log(`${name} pan/frame p50/p95/p99/max ${percent(view.pan)}; zoom/frame ${percent(view.zoom)}`);
     console.log(`${name} velocity change/frame p50/p95/p99/max ${percent(view.jerk)}; snap frames (pan > 3% or zoom > 6%) ${view.snaps}`);
-    console.log(`${name} travel/s pan ${(view.panTravel * 100).toFixed(1)}% zoom ${(view.zoomTravel * 100).toFixed(1)}%; reversals/s x/z/zoom ${view.reversals.map((n) => n.toFixed(2)).join(" / ")}`);
+    console.log(`${name} travel/s pan ${(view.panTravel * 100).toFixed(1)}% zoom ${(view.zoomTravel * 100).toFixed(1)}%; offscreen frames ${view.offscreen}; reversals/s x/z/zoom ${view.reversals.map((n) => n.toFixed(2)).join(" / ")}`);
   }
   if (values.json !== undefined) writeFileSync(values.json, JSON.stringify(result, null, 2));
 }
