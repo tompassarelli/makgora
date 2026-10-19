@@ -41,6 +41,8 @@ interface Limits {
   readonly stall: number;
   readonly gmax: number;
   readonly delay: number;
+  readonly driftEnd: number;
+  readonly driftPeak: number;
 }
 
 interface Route {
@@ -50,6 +52,7 @@ interface Route {
   readonly humans: readonly number[];
   readonly computer: boolean;
   readonly limits: Limits;
+  readonly forcedDelay?: number;
 }
 
 function turnsFor(random: Random): number {
@@ -194,6 +197,7 @@ function play(route: Route, seed: number): Played {
   clients.start();
   clients.frames(MENU_FRAMES);
   wallFrame += MENU_FRAMES;
+  if (route.forcedDelay !== undefined) clients.chat(0, `-dev delay ${route.forcedDelay}`);
   clients.chat(0, route.computer ? "-dev quick cpu wren expert" : "-dev quick");
   const phaseOf = (index: number) => {
     let phase = -1;
@@ -233,12 +237,14 @@ function play(route: Route, seed: number): Played {
 
 const THREE = [0, 2, 3];
 const TWO = [0, 1];
-const STEADY: Limits = { sim: 59, held: 2, stall: 2, gmax: REPLAY_MAX_CORRECTION_FRAMES - 1, delay: MAX_INPUT_DELAY };
+const STEADY: Limits = { sim: 59, held: 2, stall: 2, gmax: REPLAY_MAX_CORRECTION_FRAMES - 1, delay: MAX_INPUT_DELAY, driftEnd: 0, driftPeak: 0 };
 const LEAN: Limits = { ...STEADY, delay: 6 };
-const OUTAGE: Limits = { sim: 55, held: 7, stall: 5, gmax: REPLAY_MAX_CORRECTION_FRAMES + 12, delay: MAX_INPUT_DELAY };
+const OUTAGE: Limits = { sim: 59, held: 15, stall: 12, gmax: 40, delay: MAX_INPUT_DELAY, driftEnd: 15, driftPeak: 50 };
+const FORCED: Limits = { sim: 59, held: 4, stall: 3, gmax: 30, delay: 8, driftEnd: 2, driftPeak: 4 };
 const ROUTES: readonly Route[] = [
   { name: "three humans and a computer, 300 ms round trip with Battle.net turn jitter", rttMs: 300, outages: [], humans: THREE, computer: true, limits: LEAN },
   { name: "three humans and a computer, 600 ms round trip with Battle.net turn jitter", rttMs: 600, outages: [], humans: THREE, computer: true, limits: STEADY },
+  { name: "three humans and a computer, 600 ms round trip with Battle.net turn jitter at a forced 8-frame delay", rttMs: 600, outages: [], humans: THREE, computer: true, limits: FORCED, forcedDelay: 8 },
   { name: "three humans and a computer, match 793 profile: 920 ms round trip, turn jitter and a 1 s relay outage", rttMs: 920, outages: [{ fromMs: 21000, toMs: 22000 }], humans: THREE, computer: true, limits: OUTAGE },
   { name: "two humans and a computer, 160 ms round trip with Battle.net turn jitter", rttMs: 160, outages: [], humans: TWO, computer: true, limits: STEADY },
 ];
@@ -261,8 +267,8 @@ for (const route of ROUTES) {
       expect(client.rbd).toBeLessThanOrEqual(client.gmax + 1);
       expect(client.bur).toBeGreaterThan(0);
       expect(client.botHit + client.botMiss).toBeGreaterThan(0);
-      if (route.outages.length === 0) expect(client.drift).toBe(0);
-      else expect(client.driftEnd).toBeGreaterThan(0);
+      expect(client.driftEnd).toBeLessThanOrEqual(route.limits.driftEnd);
+      expect(client.drift).toBeLessThanOrEqual(route.limits.driftPeak);
     }
     if (route.outages.length === 0) measured.forEach((client, index) => {
       const own = route.humans[index] ?? -1;

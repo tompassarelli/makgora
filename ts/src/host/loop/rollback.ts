@@ -22,7 +22,7 @@ import { MatchLifecycle } from "../../game/netcode/journal/lifecycle";
 import { JournalInputSource } from "../../game/netcode/journal/source";
 import { captureReplaySnapshot, restoreReplaySnapshot } from "../../game/replay/snapshot";
 import { pacedStop, resetPauseBarrier, settlePace, stopFrame } from "../../game/session/pauseBarrier";
-import { confirmedBudget, repairBudget, speculativeBudget } from "../../game/session/playback";
+import { confirmedBudget, keyboardCatchesUp, repairBudget, speculativeBudget } from "../../game/session/playback";
 import { REPAIR_WHOLE_COST } from "../../game/replay/history";
 import { queueLocalRows } from "../../game/session/localInput";
 import { applyFrame } from "./frame";
@@ -83,6 +83,7 @@ export function beginRollbackEpoch(s: ShellState, rollback: Rollback): boolean {
   rollback.predictionHeld = false;
   rollback.knownBefore = 0;
   rollback.repairedFrames = 0;
+  rollback.epochCallbacks = 0;
   speculative.world.mask = s.world.mask;
   captureReplaySnapshot(rollback.seed, s.world, s.game, s.controls, s.runtime);
   restoreReplaySnapshot(rollback.seed, speculative.world, speculative.game, speculative.controls, speculative.runtime);
@@ -288,6 +289,7 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
     noteWaiting(rollback, 0, 0);
     return;
   }
+  rollback.epochCallbacks++;
   if (journal?.editbox !== undefined && journal.lifecycle?.started() !== true) {
     noteWaiting(rollback, s.game.humanMask & ~journal.readyMask, START_NOTICE_CALLBACKS);
     return;
@@ -346,7 +348,11 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
     const paced = journal === undefined ? undefined : resumePresentationHeld(s) ? journal.barrier.paced : pacedStop(journal.barrier);
     const speculativeStop = stopAt === undefined ? paced : paced === undefined ? stopAt : Math.min(stopAt, paced);
     const presentationStop = s.build.responseProbe ? visualCaptureStopBefore(slot, speculativeStop) : speculativeStop;
-    const advanced = rollback.playback.catchUp(schedule, epoch, slot, speculative, speculativeBudget(journal !== undefined), presentationStop, observeSpeculativeFrame);
+    let advanced = rollback.playback.catchUp(schedule, epoch, slot, speculative, speculativeBudget(journal !== undefined), presentationStop, observeSpeculativeFrame);
+    if (advanced && keyboard !== undefined && schedule.speculativeFrame() > before && keyboardCatchesUp(schedule.speculativeFrame(), rollback.epochCallbacks, schedule.rollbackFrames(), schedule.remoteThrough(slot))) {
+      captureKeyboard(s, rollback, keyboard);
+      advanced = rollback.playback.catchUp(schedule, epoch, slot, speculative, 1, presentationStop, observeSpeculativeFrame);
+    }
     const after = schedule.speculativeFrame();
     if (journal !== undefined) settlePace(journal.barrier, after);
     const halted = schedule.windowHalted(slot);
