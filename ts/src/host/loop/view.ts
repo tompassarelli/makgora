@@ -456,7 +456,7 @@ export function renderPersistentPresentation(s: ShellState): void {
   for (const slot of PARTICIPANT_SLOTS) {
     const fighter = isActive(world, slot) ? fighterAt(world, slot) : undefined;
     const renderers = ui.fighters[slot];
-    if (game.phase === Phase.result) {
+    if (s.game.phase === Phase.result) {
       const body = s.participants[slot].body;
       if (body !== undefined) ShowUnit(body.unit, false);
     }
