@@ -11,11 +11,13 @@ import { Phase } from "../src/game/lobby/lobbyState";
 import type { MapBuild } from "../src/game/session/build";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
 import { MAX_INPUT_DELAY } from "../src/game/netcode/fixedSchedule";
+import { DEFAULT_DELAY } from "../src/game/netcode/delayPolicy";
 import { REPLAY_MAX_CORRECTION_FRAMES } from "../src/game/replay/limits";
 import { install, startBuild } from "../src/platform/main";
 import { confirmedChecksum } from "../src/host/loop/diagnostics";
-import { installSessionRates } from "../src/host/loop/sessionRates";
-import { shellState } from "../src/host/loop/state";
+import { POP_UNITS } from "../src/host/loop/netDelay";
+import { RATES_RECORD_CHARS, installSessionRates } from "../src/host/loop/sessionRates";
+import { activeRollback, shellState } from "../src/host/loop/state";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { parseSessionRates } from "../scripts/wisp/sessionRates";
 import { testHeadless } from "./headless";
@@ -41,8 +43,11 @@ interface Limits {
   readonly stall: number;
   readonly gmax: number;
   readonly delay: number;
+  readonly minDelay: number;
   readonly driftEnd: number;
   readonly driftPeak: number;
+  readonly popP50: number;
+  readonly popP95: number;
 }
 
 interface Route {
@@ -136,6 +141,10 @@ interface Pacing {
   readonly rb: number;
   readonly rbf: number;
   readonly rbd: number;
+  readonly pop: number;
+  readonly popOver: number;
+  readonly popP50: number;
+  readonly popP95: number;
   readonly bur: number;
   readonly hrun: number;
   readonly drift: number;
@@ -149,7 +158,17 @@ interface Pacing {
 const mean = (values: readonly number[]): number => values.reduce((sum, value) => sum + value, 0) / Math.max(1, values.length);
 const tenths = (value: number): number => Math.round(value * 10) / 10;
 
-function pacing(lines: readonly string[], senders: readonly number[]): Pacing {
+function quantile(counts: readonly number[], percent: number): number {
+  const total = counts.reduce((sum, count) => sum + count, 0);
+  let seen = 0;
+  for (let pop = 0; pop < counts.length; pop++) {
+    seen += counts[pop] ?? 0;
+    if (seen * 100 >= total * percent) return pop;
+  }
+  return -1;
+}
+
+function pacing(lines: readonly string[], senders: readonly number[], pops: readonly number[]): Pacing {
   const match = parseSessionRates(lines).seconds.filter(second => second.ph === Phase.match).slice(2, -1);
   const field = (name: string) => match.map(second => second[name] ?? 0);
   const present = (name: string) => match.flatMap(second => second[name] === undefined ? [] : [second[name] ?? 0]);
@@ -172,6 +191,10 @@ function pacing(lines: readonly string[], senders: readonly number[]): Pacing {
     rb: tenths(mean(field("rb"))),
     rbf: tenths(mean(field("rbf"))),
     rbd: Math.max(...field("rbd"), -1),
+    pop: Math.max(...field("pop"), -1),
+    popOver: tenths(mean(field("popOver"))),
+    popP50: quantile(pops, 50),
+    popP95: quantile(pops, 95),
     bur: tenths(mean(field("bur"))),
     hrun: Math.max(...field("hrun"), -1),
     drift: Math.max(...field("drift"), -1),
@@ -230,27 +253,39 @@ function play(route: Route, seed: number): Played {
   const measured = HUMANS.map((slot, index) => {
     const files = clients.clients[index]?.files ?? new Map<string, string[]>();
     const lines = [...files.entries()].filter(([name]) => name.startsWith("smashcraft-rates-")).sort(([a], [b]) => a.localeCompare(b)).flatMap(([, rows]) => rows);
-    return pacing(lines, HUMANS.filter(other => other !== slot));
+    for (const line of lines) expect(line.length).toBeLessThanOrEqual(RATES_RECORD_CHARS);
+    let pops: readonly number[] = [];
+    clients.clients[index]?.run(() => {
+      const s = shellState();
+      pops = [...(s === undefined ? [] : activeRollback(s)?.net.popCounts ?? [])];
+    });
+    return pacing(lines, HUMANS.filter(other => other !== slot), pops);
   });
   return { clients: measured, baseMs: new Map([...delivery.senders].map(([sender, state]) => [sender, state.baseMs])) };
 }
 
+const POP_P50_UNITS = 2;
+const POP_P95_UNITS = 250;
+const OUTAGE_POP_P95_UNITS = 600;
+const FORCED_POP_P50_UNITS = 30;
 const THREE = [0, 2, 3];
 const TWO = [0, 1];
-const STEADY: Limits = { sim: 59, held: 2, stall: 2, gmax: REPLAY_MAX_CORRECTION_FRAMES - 1, delay: MAX_INPUT_DELAY, driftEnd: 0, driftPeak: 0 };
-const LEAN: Limits = { ...STEADY, delay: 6 };
-const OUTAGE: Limits = { sim: 59, held: 15, stall: 12, gmax: 40, delay: MAX_INPUT_DELAY, driftEnd: 15, driftPeak: 50 };
-const FORCED: Limits = { sim: 59, held: 4, stall: 3, gmax: 30, delay: 8, driftEnd: 2, driftPeak: 4 };
+const STEADY: Limits = { sim: 59, held: 2, stall: 2, gmax: REPLAY_MAX_CORRECTION_FRAMES - 1, delay: MAX_INPUT_DELAY, minDelay: DEFAULT_DELAY, driftEnd: 0, driftPeak: 0, popP50: POP_P50_UNITS, popP95: POP_P95_UNITS };
+const LEAN: Limits = { ...STEADY, delay: 6, minDelay: 6 };
+const DUEL: Limits = { ...STEADY, delay: 5, minDelay: 5 };
+const OUTAGE: Limits = { sim: 59, held: 15, stall: 12, gmax: 40, delay: MAX_INPUT_DELAY, minDelay: DEFAULT_DELAY, driftEnd: 15, driftPeak: 50, popP50: POP_P50_UNITS, popP95: OUTAGE_POP_P95_UNITS };
+const FORCED: Limits = { sim: 59, held: 4, stall: 3, gmax: 30, delay: 8, minDelay: 8, driftEnd: 2, driftPeak: 4, popP50: FORCED_POP_P50_UNITS, popP95: OUTAGE_POP_P95_UNITS };
 const ROUTES: readonly Route[] = [
   { name: "three humans and a computer, 300 ms round trip with Battle.net turn jitter", rttMs: 300, outages: [], humans: THREE, computer: true, limits: LEAN },
   { name: "three humans and a computer, 600 ms round trip with Battle.net turn jitter", rttMs: 600, outages: [], humans: THREE, computer: true, limits: STEADY },
   { name: "three humans and a computer, 600 ms round trip with Battle.net turn jitter at a forced 8-frame delay", rttMs: 600, outages: [], humans: THREE, computer: true, limits: FORCED, forcedDelay: 8 },
   { name: "three humans and a computer, match 793 profile: 920 ms round trip, turn jitter and a 1 s relay outage", rttMs: 920, outages: [{ fromMs: 21000, toMs: 22000 }], humans: THREE, computer: true, limits: OUTAGE },
   { name: "two humans and a computer, 160 ms round trip with Battle.net turn jitter", rttMs: 160, outages: [], humans: TWO, computer: true, limits: STEADY },
+  { name: "two humans and a computer, 300 ms round trip with Battle.net turn jitter", rttMs: 300, outages: [], humans: TWO, computer: true, limits: DUEL },
 ];
 
 for (const route of ROUTES) {
-  sweep(`${route.name}: the recorded match-793 inputs keep Auto delay, and sim, holds, stalls and peak gap per second, within the route's limits, with each sender's lateness following its link and no drift without an outage [k3 measure #14]`, () => {
+  sweep(`${route.name}: the recorded match-793 inputs keep Auto delay, sim, holds, stalls, peak gap and median and p95 correction pop within the route's limits, with each sender's lateness following its link and no drift without an outage [k3 measure #14]`, () => {
     const played = play(route, 793);
     const measured = played.clients;
     measured.forEach((client, index) => console.log(`online pacing ${route.name}, human ${route.humans[index]}: ${JSON.stringify(client)}`));
@@ -261,6 +296,7 @@ for (const route of ROUTES) {
       expect(client.stall).toBeLessThanOrEqual(route.limits.stall);
       expect(client.gmax).toBeLessThanOrEqual(route.limits.gmax);
       expect(client.delay).toBeLessThanOrEqual(route.limits.delay);
+      expect(client.delay).toBeGreaterThanOrEqual(route.limits.minDelay);
       expect(client.sf).toBe(0);
       expect(client.echo).toBeGreaterThan(0);
       expect(client.rb).toBeGreaterThan(0);
@@ -269,6 +305,9 @@ for (const route of ROUTES) {
       expect(client.botHit + client.botMiss).toBeGreaterThan(0);
       expect(client.driftEnd).toBeLessThanOrEqual(route.limits.driftEnd);
       expect(client.drift).toBeLessThanOrEqual(route.limits.driftPeak);
+      expect(client.pop).toBeGreaterThan(POP_UNITS);
+      expect(client.popP50).toBeLessThanOrEqual(route.limits.popP50);
+      expect(client.popP95).toBeLessThanOrEqual(route.limits.popP95);
     }
     if (route.outages.length === 0) measured.forEach((client, index) => {
       const own = route.humans[index] ?? -1;

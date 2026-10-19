@@ -12,7 +12,7 @@ const MIN_MATCH_SECONDS = 20;
 
 export type Fields = Record<string, number>;
 
-const PAIRS: Record<string, readonly [string, string]> = { echo: ["echo", "echoMax"], bot: ["botHit", "botMiss"] };
+const PAIRS: Record<string, readonly [string, string]> = { echo: ["echo", "echoMax"], bot: ["botHit", "botMiss"], pop: ["pop", "popOver"] };
 
 export interface SessionRateLines {
   readonly header: string | undefined;
@@ -57,6 +57,11 @@ export function parseSessionRates(lines: readonly string[]): SessionRateLines {
     const words = line.split(" ");
     if (words[0] === "smashcraft-rates") header = line;
     else if (words[0] === "r") seconds.push(fields(words.slice(1)));
+    else if (/^r\d+$/.test(words[0] ?? "")) {
+      const part = fields(words.slice(1));
+      const last = seconds.at(-1);
+      if (last !== undefined && last.t === part.t) Object.assign(last, part);
+    }
     else if (words[0] === "c") counts.push(fields(words.slice(1)));
     else if (words[0] === "e") events.push(line.slice(2));
     else if (words[0] === "l" || words[0] === "s") live.push(words.slice(2).join(" "));
@@ -115,7 +120,7 @@ function minuteRow(minute: Minute, previousEnd: number): string {
     `cb/s ${fixed(sum(seconds, "cb") / span)} game/real ${fixed(sum(seconds, "cb") / span / 60, 2)} (min ${seconds.length === 0 ? "-" : Math.min(...seconds.map(row => row.cb ?? 0))})`,
     `sim/s ${fixed(sum(seconds, "sim") / span)} spec/s ${fixed(sum(seconds, "spec") / span)} conf/s ${fixed(sum(seconds, "conf") / span)} spec/cb ${fixed(sum(seconds, "spec") / Math.max(1, sum(seconds, "cb")), 2)}`,
     `held ${fixed(100 * sum(seconds, "held") / Math.max(1, matchTicks), 0)}% stall ${fixed(100 * sum(seconds, "stall") / Math.max(1, matchTicks), 0)}% gap ${fixed(sum(seconds, "gap") / Math.max(1, seconds.length))}/${most(seconds, "gmax")}`,
-    `rollback/s ${fixed(sum(seconds, "rb") / span)} replayed/s ${fixed(sum(seconds, "rbf") / span)} deepest ${most(seconds, "rbd")} echo ${fixed(mean(seconds.filter(row => (row.echoMax ?? 0) > 0), "echo"))}/${most(seconds, "echoMax")} late ${senderLate(seconds)} bursts/s ${fixed(sum(seconds, "bur") / span)} held run ${most(seconds, "hrun")} drift ${seconds.at(-1)?.drift ?? "-"} bot reuse ${sum(seconds, "botHit")}/${sum(seconds, "botHit") + sum(seconds, "botMiss")} heap growth KB/s ${fixed(sum(seconds, "alloc") / span)} failed sends ${sum(seconds, "sf")}`,
+    `rollback/s ${fixed(sum(seconds, "rb") / span)} replayed/s ${fixed(sum(seconds, "rbf") / span)} deepest ${most(seconds, "rbd")} pop ${most(seconds, "pop")} over 20/s ${fixed(sum(seconds, "popOver") / span)} echo ${fixed(mean(seconds.filter(row => (row.echoMax ?? 0) > 0), "echo"))}/${most(seconds, "echoMax")} late ${senderLate(seconds)} bursts/s ${fixed(sum(seconds, "bur") / span)} held run ${most(seconds, "hrun")} drift ${seconds.at(-1)?.drift ?? "-"} bot reuse ${sum(seconds, "botHit")}/${sum(seconds, "botHit") + sum(seconds, "botMiss")} heap growth KB/s ${fixed(sum(seconds, "alloc") / span)} failed sends ${sum(seconds, "sf")}`,
     `lua ms/s ${fixed(sum(seconds, "lua") / 1000 / span)} tick us ${fixed(sum(seconds, "tk") / Math.max(1, seconds.length), 0)}/${most(seconds, "tkmax")}`,
     `draw/s ${fixed(sum(seconds, "dr") / span)} ev/s ${fixed(sum(seconds, "ev") / span)} send/s ${fixed(sum(seconds, "send") / span)} recv/s ${fixed(sum(seconds, "recv") / span)} own echo/s ${fixed(sum(seconds, "rown") / span)} window ${seconds.at(-1)?.win ?? "-"} f ${seconds.at(-1)?.f ?? "-"} cf ${seconds.at(-1)?.cf ?? "-"} kn ${seconds.at(-1)?.kn ?? "-"}`,
     `live ${live} kreg ${last.kreg ?? "?"} reg ${last.reg ?? "?"} act ${last.act ?? "?"} hid ${last.hid ?? "?"} heapKb ${last.heap ?? "?"}`,

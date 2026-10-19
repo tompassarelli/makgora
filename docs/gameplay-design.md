@@ -310,9 +310,13 @@ transport (wisp#110) both call it.
     carries the safety margin, so the target is the least delay that should
     play clean. On the relay harness a two-deviation guard, inflated by the
     few menu pings before the first match, chose 12-15 frames at 300 ms,
-    where 4 already played 60 frames a second with no holds. R, the rollback budget, is 8 frames, a third of the
-    24-frame window. The target rises above 2 only past 2 + R = 10 one-way
-    frames (about 333 ms round trip), so ordinary connections keep 2 frames.
+    where 4 already played 60 frames a second with no holds. R, the rollback
+    budget, depends on the human count, which every client sees alike, so the
+    delay stays universal within a match: 6 frames with two humans, one under
+    Slippi's `ROLLBACK_MAX_FRAMES`, and 8 with three or more, GGPO's
+    `MAX_PREDICTION_FRAMES` (see *Choosing R*). The target rises above 2 only
+    past 2 + R one-way frames (about 270 ms round trip in a duel, 333 ms in a
+    group), so ordinary connections keep 2 frames.
     It raises at once but lowers only when one more frame of round trip
     would still allow the lower value, so jitter cannot flip it back and
     forth.
@@ -335,6 +339,30 @@ transport (wisp#110) both call it.
     third of rows deep, none held), and a clean second needing every row
     within R never ran 30 seconds even at 300 ms, so the value could only
     rise.
+  - *Choosing R (19 Oct 2026):* R was swept over 5, 6, 7, 8 and 10 on the
+    relay harness (match 793's inputs, three jitter seeds) with correction
+    pop: the largest distance, in world units, that a landed correction moved
+    any fighter (the rates `pop` field). Most corrections move nobody (median
+    0 to 1 unit); the tail is what shows. The threshold is a p95 pop of at
+    most 200 units: the 160 ms duel already sits at the 2-frame floor, where
+    no R changes the delay, and shows a p95 of 151 to 166 (204 to 217 at
+    worst), so an R that stays under 200 adds no pop that the least possible
+    delay doesn't already cost. Two humans at 300 and 450 ms: R 6 gives p95
+    145 and 123 at Auto 5 to 7 and 9 to 12 frames; R 7 gives 209 and 164
+    one frame lower; R 8 gives 224 and 196 with the median rising to 2 to 5
+    units. Three humans at 300 and 600 ms: R 8 gives 175 and 144 at Auto 4
+    to 6 and 14 to 15; R 10 gives 192 and 212 with the median off 0. So a
+    duel uses R 6 and three or more humans R 8. Slippi's 7 and GGPO's 8 cap
+    how late any row may arrive, while R is subtracted from the smoothed mean
+    trip, and Battle.net's turn waits put the latest rows 9 to 10 frames past
+    the mean (gmax 17 at a mean gap of 10 at 160 ms), so a duel needs an R
+    below Slippi's cap. In a group the slowest link sets the shared delay
+    and the faster pairs run with spare frames, which is why GGPO's 8 still
+    fits. Holds, stalls and sim were the same at every R (60 sim frames a
+    second, no holds); replayed frames rise about 6 a second per frame of R.
+    The harness locks Auto at 5 for the 300 ms duel and 6 for 300 ms with
+    three humans, a median pop of at most 2 and a p95 of at most 250 per
+    client.
 - **When delay changes:** only at match start, on the epoch every client
   begins together, from requests already exchanged through the synchronized
   channel. It never changes mid-exchange.
@@ -360,8 +388,8 @@ Prior art, read from source on 9 Oct 2026:
   (backends/p2p.cpp). Smashcraft slows more gently: one frame a second at most.
 - Slippi: `ROLLBACK_MAX_FRAMES 7` (project-slippi/Ishiiruka
   Source/Core/Core/Slippi/SlippiNetplay.h). Players pick delay frames, 2 by
-  default, and rollback absorbs the rest. R = 7 follows Slippi; GGPO's 8 is
-  one frame more.
+  default, and rollback absorbs the rest. A duel's R = 6 sits one under Slippi;
+  a group's 8 follows GGPO.
 - Rivals of Aether 2 (SnapNet) shows input and prediction frames on screen.
   Players set input frames, or the netcode adapts delay to the connection
   (edgegap.com, "Rivals of Aether 2 – How is its online experience is so

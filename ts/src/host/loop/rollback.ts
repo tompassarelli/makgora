@@ -38,7 +38,7 @@ import { holdPresentedCapture } from "./visualCapture";
 import { visualCaptureStopBefore } from "../../game/session/visualCapture";
 import { samplePad } from "../../game/input/padCapture";
 import { pollPad, recordPadRow } from "./analogPad";
-import { beginNetEpoch, matchDelay, noteDepth, noteReceived, noteSent, requestFor } from "./netDelay";
+import { beginNetEpoch, matchDelay, noteDepth, notePop, notePopBefore, noteReceived, noteSent, requestFor } from "./netDelay";
 
 
 const STALL_NOTICE_CALLBACKS = 20;
@@ -295,6 +295,8 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
     return;
   }
   const stopAt = journal === undefined ? undefined : stopFrame(journal.barrier);
+  const pendingBefore = rollback.playback.pendingRepair(epoch);
+  notePopBefore(rollback.net, speculative.world);
   const slot = localSlot();
   const reconciled = rollback.playback.reconcile(schedule, epoch, slot, speculative);
   if (reconciled === "rejected") {
@@ -327,6 +329,7 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
     return;
   }
   rollback.repairedFrames = repaired;
+  if ((reconciled !== "unchanged" || pendingBefore !== undefined) && rollback.playback.pendingRepair(epoch) === undefined) notePop(rollback.net, speculative.world);
   let steps = 0;
   while (s.game.phase === Phase.match && schedule.mayAdvanceConfirmed() && schedule.nextConfirmedFrame() <= known && steps < confirmSteps && (stopAt === undefined || schedule.nextConfirmedFrame() < stopAt)) {
     if (!stepConfirmed(s, rollback)) {

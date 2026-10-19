@@ -24,6 +24,8 @@ const TOP_EFFECTS = 6;
 const TOP_SOUNDS = 3;
 const MAX_NAME = 20;
 const BURST_IDLE_US = 2000;
+// Warcraft III cuts each Preload string at 259 characters, so every rates record stays within this.
+export const RATES_RECORD_CHARS = 250;
 
 interface Second {
   ticks: number;
@@ -276,7 +278,7 @@ function heapGrowth(rates: SessionRates): number {
   return grown;
 }
 
-function rateLine(rates: SessionRates, now: number): string {
+function rateTokens(rates: SessionRates): string[] {
   const s = shellState();
   const second = rates.second;
   const gap = second.gapSamples === 0 ? 0 : idiv(second.gap, second.gapSamples);
@@ -286,7 +288,21 @@ function rateLine(rates: SessionRates, now: number): string {
   const rollback = s === undefined ? undefined : activeRollback(s);
   const frame = s === undefined ? -1 : rollback?.schedule.speculativeFrame() ?? s.runtime.simulationFrame;
   const window = rollback === undefined ? "" : ` cf=${rollback.schedule.nextConfirmedFrame()} kn=${rollback.schedule.knownThrough()} win=${rollback.window} dl=${rollback.delay} ping=${smoothedRttMs(rollback.net.estimate)} drift=${rates.drift} ${botLine(rates, rollback)} ${takeNetRates(rollback.net)}`;
-  return `r t=${elapsedMs(rates, now)} cb=${second.ticks} dr=${second.draws} ev=${second.events} sim=${second.sim} spec=${second.spec} conf=${second.conf} held=${second.held} stall=${second.stalled} gap=${gap} gmax=${second.gapMax} lua=${microseconds(second.lua)} tk=${tick} tkmax=${microseconds(second.tickMax)} send=${second.sends} recv=${second.received} rown=${second.receivedOwn} pz=${second.paused} pt=${second.pauses} pm=${second.menus} cbgap=${microseconds(second.tickGap)} bur=${second.bursts} hrun=${second.heldRun} sf=${second.sendFailed} alloc=${heapGrowth(rates)} ${gameSpeed()} ph=${phase} m=${match} f=${frame}${window}`;
+  return `cb=${second.ticks} dr=${second.draws} ev=${second.events} sim=${second.sim} spec=${second.spec} conf=${second.conf} held=${second.held} stall=${second.stalled} gap=${gap} gmax=${second.gapMax} lua=${microseconds(second.lua)} tk=${tick} tkmax=${microseconds(second.tickMax)} send=${second.sends} recv=${second.received} rown=${second.receivedOwn} pz=${second.paused} pt=${second.pauses} pm=${second.menus} cbgap=${microseconds(second.tickGap)} bur=${second.bursts} hrun=${second.heldRun} sf=${second.sendFailed} alloc=${heapGrowth(rates)} ${gameSpeed()} ph=${phase} m=${match} f=${frame}${window}`.split(" ");
+}
+
+export function rateRecords(time: number, tokens: readonly string[]): string[] {
+  const records: string[] = [];
+  let record = `r t=${time}`;
+  for (const token of tokens) {
+    if (record.length + 1 + token.length > RATES_RECORD_CHARS) {
+      records.push(record);
+      record = `r${records.length + 1} t=${time}`;
+    }
+    record += ` ${token}`;
+  }
+  records.push(record);
+  return records;
 }
 
 function countLine(rates: SessionRates, now: number): string {
@@ -360,7 +376,7 @@ function flush(rates: SessionRates, now: number): void {
 
 function closeSecond(rates: SessionRates, now: number): void {
   rates.seconds++;
-  rates.lines.push(rateLine(rates, now));
+  rates.lines.push(...rateRecords(elapsedMs(rates, now), rateTokens(rates)));
   rates.second = emptySecond();
   rates.secondStarted = now;
   if (floorMod(rates.seconds, FLUSH_SECONDS) === 0) flush(rates, now);

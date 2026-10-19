@@ -5,12 +5,13 @@ import { PARTICIPANT_SLOTS } from "../../game/input/participants";
 import { type MatchState, humanActive } from "../../game/lobby/lobbyState";
 import {
   AUTO_DELAY, DEFAULT_DELAY, type DelayCorrection, type DelayPolicy, HIGH_DELAY_FRAMES, type RttEstimate, agreedDelay, connectionPoor, correctDelay, correctedDelay,
-  delayCorrection, delayPolicy, expectedRollback, highDelay, nextDelay, observeRtt, requestedDelay, rttEstimate, smoothedRttMs,
+  MAX_FIXED_DELAY, delayCorrection, delayPolicy, expectedRollback, highDelay, nextDelay, observeRtt, requestedDelay, rollbackBudget, rttEstimate, smoothedRttMs,
 } from "../../game/netcode/delayPolicy";
 import { type FixedDelay, isFixedDelay } from "../../game/netcode/fixedSchedule";
 import { PENDING_CAPACITY } from "../../game/netcode/shadowSchedule";
 import { createText, gameUi, placeTopLeft } from "../../game/ui/frames";
 import { at } from "wisp/src/runtime/lookup";
+import { type Roster, isActive } from "../../game/sim/roster";
 
 export const DELAY_PREFIX = "SC_DY";
 export const DELAY_RECEIVED = "shell.delayProposal";
@@ -18,9 +19,11 @@ const PING_MARK = "p";
 const DELAY_MARK = "d";
 const ECHO_MARK = "e";
 const SECOND = 60;
+export const POP_UNITS = 20;
+const POP_BUCKETS = 1024;
 
 export interface NetDelay {
-  readonly policy: DelayPolicy;
+  policy: DelayPolicy;
   readonly estimate: RttEstimate;
   readonly sentTicks: number[];
   readonly proposals: number[];
@@ -41,6 +44,11 @@ export interface NetDelay {
   corrections: number;
   replayed: number;
   deepest: number;
+  readonly popX: number[];
+  readonly popZ: number[];
+  readonly popCounts: number[];
+  popMax: number;
+  popOver: number;
   readonly correction: DelayCorrection;
   readonly second: { held: number; arrivals: number; deep: number };
   pingDelay: number;
@@ -53,6 +61,7 @@ export function createNetDelay(window: number): NetDelay {
     proposals: [DEFAULT_DELAY, DEFAULT_DELAY, DEFAULT_DELAY, DEFAULT_DELAY], slotEchoMs: [-1, -1, -1, -1], depths: Array.from({ length: window + 2 }, () => 0), ticks: 0, proposed: DEFAULT_DELAY, depth: 0, shownDepth: 0,
     indicator: undefined, shownText: "", arrivals: [0, 0, 0, 0], lateSum: [0, 0, 0, 0], lateMax: [0, 0, 0, 0],
     echoes: 0, echoSum: 0, echoMax: 0, corrections: 0, replayed: 0, deepest: 0,
+    popX: [0, 0, 0, 0], popZ: [0, 0, 0, 0], popCounts: Array.from({ length: POP_BUCKETS }, () => 0), popMax: 0, popOver: 0,
   };
 }
 
@@ -182,6 +191,8 @@ function resetArrivals(net: NetDelay): void {
   net.corrections = 0;
   net.replayed = 0;
   net.deepest = 0;
+  net.popMax = 0;
+  net.popOver = 0;
 }
 
 export function noteReceived(net: NetDelay, sender: number, own: boolean, frame: number, speculative: number): void {
@@ -210,7 +221,7 @@ export function takeNetRates(net: NetDelay): string {
     total += arrivals;
     senders.push(`P${slot + 1}:${meanOf(at(net.lateSum, slot), arrivals)}/${at(net.lateMax, slot)}`);
   }
-  const text = `arr=${total} lt=${senders.length === 0 ? "-" : senders.join(",")} echo=${meanOf(net.echoSum, net.echoes)}/${net.echoMax} rb=${net.corrections} rbf=${net.replayed} rbd=${net.deepest}`;
+  const text = `arr=${total} lt=${senders.length === 0 ? "-" : senders.join(",")} echo=${meanOf(net.echoSum, net.echoes)}/${net.echoMax} rb=${net.corrections} rbf=${net.replayed} rbd=${net.deepest} pop=${net.popMax}/${net.popOver}`;
   resetArrivals(net);
   return text;
 }
@@ -224,7 +235,33 @@ export function noteDepth(net: NetDelay, depth: number): void {
   net.depths[bucket] = at(net.depths, bucket) + 1;
 }
 
-function proposeDelay(net: NetDelay, online: boolean, active: boolean, inMatch: boolean, delay: number): void {
+export function notePopBefore(net: NetDelay, world: Readonly<Roster>): void {
+  for (let slot = 0; slot < net.popX.length; slot++) {
+    const motion = world.fighters[slot]?.motion;
+    net.popX[slot] = motion === undefined ? 0 : motion.x;
+    net.popZ[slot] = motion === undefined ? 0 : motion.z;
+  }
+}
+
+export function notePop(net: NetDelay, world: Readonly<Roster>): void {
+  let pop = 0;
+  for (let slot = 0; slot < net.popX.length; slot++) {
+    const motion = world.fighters[slot]?.motion;
+    if (motion === undefined || !isActive(world, slot)) continue;
+    const dx = motion.x - at(net.popX, slot);
+    const dz = motion.z - at(net.popZ, slot);
+    pop = Math.max(pop, Math.floor(Math.sqrt(dx * dx + dz * dz)));
+  }
+  net.popMax = Math.max(net.popMax, pop);
+  if (pop > POP_UNITS) net.popOver++;
+  const bucket = Math.min(pop, net.popCounts.length - 1);
+  net.popCounts[bucket] = at(net.popCounts, bucket) + 1;
+}
+
+function proposeDelay(net: NetDelay, players: number, active: boolean, inMatch: boolean, delay: number): void {
+  const online = players > 1;
+  const budget = rollbackBudget(players);
+  if (!inMatch && budget !== net.policy.budget) net.policy = delayPolicy(net.policy.window, MAX_FIXED_DELAY, budget);
   if (online && inMatch) correctDelay(net.policy, net.correction, delay, net.second);
   resetSecond(net);
   if (!active) return;
@@ -246,7 +283,7 @@ export function serviceNetDelay(net: NetDelay, game: Readonly<MatchState>, local
     BlzFrameSetVisible(net.indicator, false);
   }
   const online = isOnline(game);
-  proposeDelay(net, online, online && humanActive(game, local), inMatch, delay);
+  proposeDelay(net, humans(game), online && humanActive(game, local), inMatch, delay);
   net.shownDepth = net.depth;
   net.depth = 0;
   const poor = connectionPoor(net.policy, net.estimate, delay);
