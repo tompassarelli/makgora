@@ -5,6 +5,7 @@
 
 import { f32 } from "wisp/src/sim/f32";
 import { readChunks, writeChunks } from "wisp/src/platform/fileio";
+import { type MatchState, humanCount } from "../lobby/lobbyState";
 import { LESSONS, lessonChoiceText } from "../match/tutorial";
 import { MENU_FONT, PANEL_TEXTURE } from "./hudLayout";
 import { createBackdrop, createText, placeTopLeft } from "./frames";
@@ -72,3 +73,6 @@ export function tutorialSeen(): boolean {
 export function markTutorialSeen(): void {
   writeChunks(SEEN_FILE, [SEEN]);
 }
+
+
+export const offersTutorial = (game: Readonly<MatchState>, seen: boolean): boolean => !seen && humanCount(game) === 1;

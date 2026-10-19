@@ -120,6 +120,11 @@ export const humanActive = (game: Readonly<MatchState>, slot: number): boolean =
   const mask = game.humanMask;
   return mask > 0 && mask < 16 && slot >= 0 && slot < 4 && (mask & (1 << slot)) !== 0;
 };
+export function humanCount(game: Readonly<MatchState>): number {
+  let count = 0;
+  for (const slot of PARTICIPANT_SLOTS) if (humanActive(game, slot)) count++;
+  return count;
+}
 export const humanPresent = (game: Readonly<MatchState>, slot: number): boolean => humanActive(game, slot) && !participantActive(game.departedMask, slot);
 export const humanFighterActive = (game: Readonly<MatchState>, slot: number): boolean => {
   const mask = game.humanFighterMask;

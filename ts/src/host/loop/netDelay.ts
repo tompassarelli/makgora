@@ -2,7 +2,7 @@ import { trampoline } from "wisp/src/platform/dispatch";
 import { f32 } from "wisp/src/sim/f32";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS } from "../../game/input/participants";
-import { type MatchState, humanActive } from "../../game/lobby/lobbyState";
+import { type MatchState, humanActive, humanCount } from "../../game/lobby/lobbyState";
 import {
   AUTO_DELAY, DEFAULT_DELAY, type DelayCorrection, type DelayPolicy, HIGH_DELAY_FRAMES, type RttEstimate, agreedDelay, connectionPoor, correctDelay, correctedDelay,
   MAX_FIXED_DELAY, delayCorrection, delayPolicy, expectedRollback, highDelay, nextDelay, observeRtt, requestedDelay, rollbackBudget, rttEstimate, smoothedRttMs,
@@ -65,13 +65,7 @@ export function createNetDelay(window: number): NetDelay {
   };
 }
 
-function humans(game: Readonly<MatchState>): number {
-  let count = 0;
-  for (const slot of PARTICIPANT_SLOTS) if (humanActive(game, slot)) count++;
-  return count;
-}
-
-export const isOnline = (game: Readonly<MatchState>): boolean => humans(game) > 1;
+export const isOnline = (game: Readonly<MatchState>): boolean => humanCount(game) > 1;
 
 export function requestFor(net: Readonly<NetDelay>, game: Readonly<MatchState>, slot: number, choice: number): number {
   return requestedDelay(choice, isOnline(game) ? at(net.proposals, slot) : DEFAULT_DELAY);
@@ -283,7 +277,7 @@ export function serviceNetDelay(net: NetDelay, game: Readonly<MatchState>, local
     BlzFrameSetVisible(net.indicator, false);
   }
   const online = isOnline(game);
-  proposeDelay(net, humans(game), online && humanActive(game, local), inMatch, delay);
+  proposeDelay(net, humanCount(game), online && humanActive(game, local), inMatch, delay);
   net.shownDepth = net.depth;
   net.depth = 0;
   const poor = connectionPoor(net.policy, net.estimate, delay);

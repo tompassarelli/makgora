@@ -72,7 +72,7 @@ import { Character, ItemKind, itemBit } from "../sim/codes";
 import { TILE_PORTRAIT_SLOT, cardPortrait, tilePortrait } from "./portraitFrames";
 import { TEAM_NAMES } from "../sim/teams";
 import { slotColor, teamColor } from "./slotColors";
-import { type TutorialButton, type TutorialMenuFrames, createTutorialMenu, markTutorialSeen, showTutorialLesson, tutorialSeen } from "./tutorialMenu";
+import { type TutorialButton, type TutorialMenuFrames, createTutorialMenu, markTutorialSeen, offersTutorial, showTutorialLesson, tutorialSeen } from "./tutorialMenu";
 import { ButtonClicks, type MenuControls, bindSyncHandler, consoleUi, coverScreen, createBackdrop, createSyncTrigger, createText, gameUi, highlightText, placeTopLeft, setFrameText, sizeText } from "./frames";
 
 
@@ -838,7 +838,7 @@ export class SelectionPanel {
     if (game.phase === Phase.match) this.markSeen();
     if (visible && !this.tutorialOffered) {
       this.tutorialOffered = true;
-      if (!this.isSeen()) this.tutorialOpen = true;
+      if (offersTutorial(game, this.isSeen())) this.tutorialOpen = true;
     }
     BlzFrameSetVisible(this.tutorial.root, visible && this.tutorialOpen && !cpuOpen && !this.movesOpen);
     BlzFrameSetVisible(this.cpuRoot, cpuOpen);

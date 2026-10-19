@@ -12,7 +12,7 @@ import { GroundAction, SpecialAction } from "../sim/codes";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { PartnerBehaviour, PartnerEscape, PartnerTech, type TrainingState } from "./trainingState";
 import {
-  type MatchState, Phase, characterFor, computerActive, cycleSlotMode, firstHumanSlot, humanFighterActive, humanPresent, requestStageSelect, selectCharacter, selectStage,
+  type MatchState, Phase, characterFor, computerActive, cycleSlotMode, firstHumanSlot, humanCount, humanFighterActive, humanPresent, requestStageSelect, selectCharacter, selectStage,
   setTraining, setTutorialLesson,
 } from "../lobby/lobbyState";
 
@@ -160,7 +160,7 @@ export const TUTORIAL_STAGE = 0;
 
 export function prepareTutorial(game: MatchState, slot: number): boolean {
   const first = firstHumanSlot(game);
-  if (first === undefined || game.phase !== Phase.characterMenu || !humanPresent(game, slot)) return false;
+  if (first === undefined || game.phase !== Phase.characterMenu || !humanPresent(game, slot) || humanCount(game) > 1) return false;
   if (!PARTICIPANT_SLOTS.some(other => computerActive(game, other))) {
     const partner = PARTICIPANT_SLOTS.find(other => !humanFighterActive(game, other) && !computerActive(game, other));
 
