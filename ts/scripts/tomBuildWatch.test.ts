@@ -4,25 +4,19 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
 import { PlayProblem } from "wisp/scripts/wisp/play";
-import { type WatchSteps, newestGreen, watch, watchOnce } from "./tomBuildWatch";
+import { type WatchSteps, newerTip, watch, watchOnce } from "./tomBuildWatch";
 import { playableMapBuild } from "./wisp/currentPlaytest";
 import { PLAYTEST_PREFIX } from "./wisp/project";
 import { PLAYABLE_FILE, PREDICT_COST, type Verdict, costPrediction, installName, landingDecision, verdictOf } from "./wisp/greenBuilds";
 
 const sha = (letter: string) => letter.repeat(40);
 
-test("recorded main runs select the green ancestor behind pending and cancelled tips without rolling back [k1 scenario]", () => {
+test("a landed tip builds at once with no CI wait, older and unknown shas never roll it back [k1 scenario]", () => {
   const commits = [sha("a"), sha("b"), sha("c"), sha("d")];
-  const runs = [
-    { headSha: sha("a"), status: "in_progress", conclusion: "" },
-    { headSha: sha("b"), status: "completed", conclusion: "cancelled" },
-    { headSha: sha("c"), status: "completed", conclusion: "success" },
-    { headSha: sha("d"), status: "completed", conclusion: "success" },
-    { headSha: sha("e"), status: "completed", conclusion: "success" },
-  ];
-  expect(newestGreen(commits, runs, undefined)).toBe(sha("c"));
-  expect(newestGreen(commits, runs, sha("d"))).toBe(sha("c"));
-  for (const previous of [sha("a"), sha("b"), sha("c"), sha("e")]) expect(newestGreen(commits, runs, previous)).toBeUndefined();
+  expect(newerTip(commits, undefined)).toBe(sha("a"));
+  for (const previous of [sha("b"), sha("d")]) expect(newerTip(commits, previous)).toBe(sha("a"));
+  for (const previous of [sha("a"), sha("e")]) expect(newerTip(commits, previous)).toBeUndefined();
+  expect(newerTip([], undefined)).toBeUndefined();
 });
 
 test("tips landing during a build coalesce into one build of the newest, and no sha builds twice, across restarts and failures [k2 property]", async () => {

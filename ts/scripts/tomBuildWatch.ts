@@ -2,7 +2,7 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
-import { Clock, type Duration, Effect, Schema } from "effect";
+import { Clock, type Duration, Effect } from "effect";
 import { ChildProcess, type ChildProcessSpawner } from "effect/process";
 import { PlayProblem } from "wisp/scripts/wisp/play";
 import { runProcess } from "./hostProcess";
@@ -14,7 +14,7 @@ import { projectRoot } from "./wisp/project";
 
 export const TOM_BUILD_LOG = join(homedir(), ".local/state/agents/handoffs/tom-build.log");
 export const TOM_BUILD_ATTEMPTS = join(homedir(), ".local/state/smashcraft/tom-build/attempted");
-const POLL = "30 seconds";
+const POLL = "10 seconds";
 
 export interface Installed {
   readonly version: string;
@@ -93,31 +93,17 @@ const git = (...args: readonly string[]) =>
     Effect.mapError((cause) => new PlayProblem({ problem: `git ${args[0]}: ${cause.message}` })),
   );
 
-export interface GreenRun {
-  readonly headSha: string;
-  readonly status: string;
-  readonly conclusion: string;
-}
-
-export const newestGreen = (commits: readonly string[], runs: readonly GreenRun[], previous: string | undefined): string | undefined => {
-  const boundary = previous === undefined ? commits.length : commits.indexOf(previous);
-  if (boundary < 0) return undefined;
-  const green = new Set(runs.filter(run => run.status === "completed" && run.conclusion === "success").map(run => run.headSha));
-  return commits.slice(0, boundary).find(sha => green.has(sha));
+export const newerTip = (commits: readonly string[], previous: string | undefined): string | undefined => {
+  const tip = commits[0];
+  if (tip === undefined || tip === previous) return undefined;
+  return previous === undefined || commits.includes(previous) ? tip : undefined;
 };
-
-const CiRuns = Schema.Array(Schema.Struct({ headSha: Schema.String, status: Schema.String, conclusion: Schema.String }));
-const decodeCiRuns = Schema.decodeUnknownEffect(Schema.fromJsonString(CiRuns));
 
 export const hostSteps = (predictCost: boolean): WatchSteps<ChildProcessSpawner.ChildProcessSpawner> => ({
   tip: (previous) => Effect.gen(function*() {
     yield* git("fetch", "-q", "origin", "main");
     const commits = (yield* git("rev-list", "--first-parent", "origin/main")).split("\n");
-    const text = yield* runProcess(ChildProcess.make("gh", ["run", "list", "--workflow", "ci.yml", "--branch", "main", "--status", "success", "--limit", "100", "--json", "headSha,status,conclusion"], { cwd: projectRoot, stdin: "ignore" })).pipe(
-      Effect.mapError((cause) => new PlayProblem({ problem: `gh run list: ${cause.message}` })),
-    );
-    const runs = yield* decodeCiRuns(text).pipe(Effect.mapError((cause) => new PlayProblem({ problem: cause.message })));
-    return newestGreen(commits, runs, previous);
+    return newerTip(commits, previous);
   }),
   decision: () => Effect.succeed("build"),
   landedAt: (sha) => git("show", "-s", "--format=%ct", sha).pipe(Effect.map((seconds) => Number(seconds) * 1000)),

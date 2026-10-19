@@ -86,7 +86,7 @@ the first shared-cache fill took 4m32s and a second worktree reused it in
 
 The Tom build watcher (smashcraft:tools/tom-build/) builds each new tip of
 main and installs it under Maps/00-Smashcraft, as `bun run playtest:build`
-does, without opening the lobby. It fetches origin/main every 30 s; when main
+does, without opening the lobby. It fetches origin/main every 10 s; when main
 moved to a commit it has not built, it builds that commit with the same
 version numbering and revision locks as `play`, under `Nice=10` and idle I/O.
 Commits that land during a build are not built one by one: the next build is
