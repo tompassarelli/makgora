@@ -389,7 +389,7 @@ export class SelectionPanel {
     BlzFrameSetTextAlignment(settingsLabel, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
     this.settingsLabel = settingsLabel;
     setFrameText(settingsLabel, `${MENU_STYLE.gold}Controls (F1)|r`);
-    this.delayLine = label(root, `MeleeDelayLine${suffix}`, f32(0.36), f32(0.6), f32(0.42), f32(0.03), f32(0.010));
+    this.delayLine = label(root, `MeleeDelayLine${suffix}`, f32(0.36), f32(0.6), f32(0.42), f32(0.045), f32(0.010));
     BlzFrameSetTextAlignment(this.delayLine, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_RIGHT);
     art(root, `MeleeMovesArt${suffix}`, "war3mapImported\\SelectionAction.tga", MOVES_BOX.x, MOVES_BOX.y, MOVES_BOX.width, MOVES_BOX.height);
     this.movesLabel = label(root, `MeleeMovesLabel${suffix}`, f32(0.324), f32(0.039), f32(0.168), f32(0.028), f32(0.011));
