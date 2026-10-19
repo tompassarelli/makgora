@@ -1,9 +1,9 @@
 {
   "devDependencies": {
-    "@effect/platform-bun": "4.0.2",
+    "@effect/platform-bun": "4.0.3",
     "@effect/tsgo": "0.48.1",
     "@types/bun": "1.4.2",
-    "effect": "4.0.2",
+    "effect": "4.0.3",
     "lua-types": "2.14.1",
     "source-map": "0.7.6",
     "typescript": "6.0.2",
@@ -32,6 +32,6 @@
     "parity": "bun wisp parity numeric"
   },
   "overrides": {
-    "@effect/platform-node-shared": "4.0.2"
+    "@effect/platform-node-shared": "4.0.3"
   }
 }
