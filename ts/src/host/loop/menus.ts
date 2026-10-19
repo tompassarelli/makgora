@@ -424,3 +424,18 @@ export function journalMenuKey(s: ShellState, slot: ParticipantSlot, key: number
   } else return false;
   return true;
 }
+
+
+const ALL_GREETED = 15;
+
+export function openControlsFirst(s: ShellState): void {
+  if (s.game.phase !== Phase.characterMenu) s.controlsGreeted = ALL_GREETED;
+  if (s.game.phase !== Phase.characterMenu || s.startingChoicesReady === false || stageLoading(s)) return;
+  for (const slot of PARTICIPANT_SLOTS) {
+    const greeted = s.controlsGreeted ?? 0;
+    const bit = 1 << slot;
+    if ((greeted & bit) !== 0 || !humanActive(s.game, slot) || !s.participants[slot].bindings.ready) continue;
+    s.controlsGreeted = greeted | bit;
+    openSettingsScreen(s, slot);
+  }
+}

@@ -14,6 +14,7 @@ import { type ShellState, shellState } from "../src/host/loop/state";
 import { confirmedChecksum } from "../src/host/loop/diagnostics";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { entryFor } from "./desync/journeys";
+import { passStartControls } from "../scripts/wisp/startControls";
 
 const headless = testHeadless(SMASHCRAFT_HEADLESS);
 
@@ -61,6 +62,7 @@ function started(disk: Disk): Lockstep {
   clients.start();
   clients.frames(60);
   for (let index = 0; index < 2; index++) expect(shellOf(clients, index).participants[0].bindings.ready).toBe(true);
+  passStartControls(clients);
   return clients;
 }
 
@@ -94,7 +96,7 @@ test("-save writes the local scheme and -load brings it back through the synced 
 
   const second = started(disk);
   expect(encodedEverywhere(second, 0)).toEqual([custom, custom]);
-  expect(shellOf(second, 0).participants[0].bindings.message).toBe("Saved controls loaded.");
+  expect(shellOf(second, 0).participants[0].bindings.message).toBe("Saved profile loaded. Press Done to choose a fighter.");
   everyone(second, s => applyBindingPreset(s.participants[0].bindings, "standard"));
   const standard = encodedEverywhere(second, 0)[0] ?? "";
   second.chat(0, "-save");

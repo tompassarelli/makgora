@@ -38,6 +38,8 @@ interface BindingCapture {
   readonly slot: KeySlot;
 }
 
+export type SavedProfile = "unknown" | "saved" | "none" | "unavailable";
+
 export interface BindingSettings {
   readonly owner: number;
   readonly persistence: BindingPersistence;
@@ -45,6 +47,8 @@ export interface BindingSettings {
   delay: DelayChoice;
 
   ready: boolean;
+  profile: SavedProfile;
+  fromProfile: boolean;
   capture: BindingCapture | undefined;
 
   revision: number;
@@ -53,7 +57,7 @@ export interface BindingSettings {
 }
 
 export function createBindingSettings(owner: number, persistence: BindingPersistence): BindingSettings {
-  return { owner, persistence, bindings: presetBindings(DEFAULT_PRESET), delay: AUTO_DELAY, ready: false, capture: undefined, revision: 0, message: "Loading controls..." };
+  return { owner, persistence, bindings: presetBindings(DEFAULT_PRESET), delay: AUTO_DELAY, ready: false, profile: "unknown", fromProfile: false, capture: undefined, revision: 0, message: "Loading controls..." };
 }
 
 
@@ -88,10 +92,14 @@ export function initializeBindingSettings(settings: BindingSettings): void {
     if (stored !== undefined && saved !== undefined) settings.delay = stored.delay;
     if (saved !== undefined) {
       settings.bindings = saved;
-      settings.message = "Saved controls loaded.";
+      settings.profile = "saved";
+      settings.fromProfile = true;
+      settings.message = "Saved profile loaded. Press Done to choose a fighter.";
     } else {
       settings.bindings = presetBindings(DEFAULT_PRESET);
-      settings.message = result.kind === "loaded" ? `Saved controls were invalid; using ${PRESET_NAMES[DEFAULT_PRESET]} defaults.` : `${PRESET_NAMES[DEFAULT_PRESET]} controls ready.`;
+      settings.profile = result.kind === "unavailable" ? "unavailable" : "none";
+      settings.fromProfile = false;
+      settings.message = result.kind === "loaded" ? `Saved controls were invalid; using ${PRESET_NAMES[DEFAULT_PRESET]} defaults.` : `${PRESET_NAMES[DEFAULT_PRESET]} controls ready. Pick a layout, then press Done.`;
     }
     settings.revision++;
     settings.ready = true;
@@ -108,8 +116,11 @@ export function loadSavedBindings(settings: BindingSettings, done: (message: str
       settings.delay = stored.delay;
       settings.capture = undefined;
       settings.revision++;
+      settings.profile = "saved";
+      settings.fromProfile = true;
       settings.message = "Saved controls loaded.";
     } else {
+      if (result.kind === "empty") settings.profile = "none";
       settings.message = result.kind === "loaded" ? "Saved controls were invalid; kept current controls." : result.kind === "empty" ? "No saved controls yet. Type -save to keep these." : "Saved controls are unavailable.";
     }
     done(settings.message);
@@ -128,6 +139,7 @@ export function applyBindingPreset(settings: BindingSettings, preset: BindingPre
   if (!settings.ready) return;
   settings.bindings = presetBindings(preset);
   settings.revision++;
+  settings.fromProfile = false;
   settings.capture = undefined;
   settings.message = `${PRESET_NAMES[preset]} controls selected.`;
 }
@@ -145,6 +157,7 @@ export function captureBinding(settings: BindingSettings, key: number): boolean 
   if (rebind(settings.bindings, capture.action, capture.slot, key)) {
     settings.capture = undefined;
     settings.revision++;
+    settings.fromProfile = false;
     settings.message = "Binding updated.";
   } else {
     settings.message = "That key is reserved or already assigned. Press another key.";
@@ -156,6 +169,8 @@ export function saveBindingSettings(settings: BindingSettings): void {
   if (!settings.ready) return;
   settings.capture = undefined;
   settings.persistence.save(settings.owner, encodeSettings(settings));
+  settings.profile = "saved";
+  settings.fromProfile = true;
   settings.message = "Controls saved for next time.";
 }
 
@@ -167,7 +182,8 @@ export function pickBindingPreset(settings: BindingSettings, preset: BindingPres
   if (!settings.ready) return;
   applyBindingPreset(settings, preset);
   saveBindingSettings(settings);
-  settings.message = `${PRESET_NAMES[preset]} controls saved.`;
+  settings.fromProfile = false;
+  settings.message = `${PRESET_NAMES[preset]} controls saved as your profile.`;
 }
 
 export function beginKeyCapture(settings: BindingSettings, key: number): void {
@@ -178,4 +194,15 @@ export function beginKeyCapture(settings: BindingSettings, key: number): void {
   }
   const action = actionFor(settings.bindings, key);
   if (action !== undefined) beginBindingCapture(settings, action, index === slotIndex(action, 0) ? 0 : 1);
+}
+
+export const NO_SAVED_PROFILE = "No saved profile";
+
+export function loadProfile(settings: BindingSettings): void {
+  if (!settings.ready) return;
+  if (settings.profile !== "saved") {
+    settings.message = settings.profile === "unavailable" ? "Saved controls are unavailable." : `${NO_SAVED_PROFILE} yet. Pick a layout or set your keys, then Save.`;
+    return;
+  }
+  loadSavedBindings(settings, () => undefined);
 }

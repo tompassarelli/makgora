@@ -7,7 +7,7 @@ and open it from Custom Games. Public 0.1 uses the Classic look. Set Graphics
 to Classic and restart Warcraft III after changing it. A
 controller is optional: the Smashcraft controller helper turns its buttons
 and sticks into its own pad keys, which work with any Controls layout, so
-pad players keep whichever layout they like (F1 changes it; it saves straight away).
+pad players keep whichever layout they like (the Controls screen that opens each game, or F1, changes it; it saves straight away).
 The default Melee layout uses A to
 attack, B for specials, X/Y to jump, RB to grab and LB for an EX special;
 Tom's layout uses A to attack, X for specials, Y to jump, B to grab, LB to
@@ -75,15 +75,23 @@ to Opponent settings while retaining choices. Start closes the panel; release
 and press it again to continue. Controller menus use the left stick to move
 the pointer, A to choose and B to go back. The panel shows your current control bindings.
 
-The first time the map runs, the Controls screen opens before anything else;
-F1 opens it again before a match. Pick a layout at the top: ESDF (recommended
-if you're new), Hitbox (Space = up, the leverless controller style) or Custom.
-Picking one saves it. Below, the keyboard lights every bound key with its
+Every game opens on the Controls screen, one for each player, before fighter
+select. Pick a layout at the top: ESDF (recommended if you're new), Hitbox
+(Space = up, the leverless controller style) or Custom; picking one saves it as
+your profile. Load profile brings back your saved setup: when you have one it
+is already loaded and selected, and the screen says so; without one the button
+reads "No saved profile". Below, the keyboard lights every bound key with its
 action; click a lit key, press the key you want instead, then Save. Escape
-cancels a rebind, and Done closes the screen. Saved controls load automatically on the next map
-start. Type -save in chat to save your current controls and delay, or -load to
+cancels a rebind. Done (or Escape) closes the screen and goes on to fighter
+select; each player confirms their own. F1 opens it again before a match.
+Type -save in chat to save your current controls and delay, or -load to
 bring back your saved ones. Y (Start), Backspace (Pause) and K (save a moment) are reserved; F6 and F7
 remain reserved for Warcraft shortcuts. Ctrl+T starts a developer input trace.
+
+Help: type -help (or -commands) in chat for every player command, one line
+each, or press F9 for the quest log's Controls (your current layout and how to
+change it), How to play (stocks, shield, recovery) and Commands entries. A
+line at the start of each game says so.
 
 Saw something wrong? Press K, or hold View on a controller for a second: the
 last ten seconds of the match are saved for a bug report on your computer, in

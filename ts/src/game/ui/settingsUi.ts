@@ -1,5 +1,4 @@
 import { f32 } from "wisp/src/sim/f32";
-import { readChunks, writeChunks } from "wisp/src/platform/fileio";
 import { bindPrototype } from "../../platform/rebind";
 import { ACTION_KEY_LABELS, BINDING_PRESETS, type BindingPreset, PRESET_HINTS, PRESET_NAMES, actionFor, encodeBindings, keyLabel, presetOf } from "../input/keyBindings";
 import {
@@ -7,6 +6,8 @@ import {
   beginKeyCapture,
   cancelBindingCapture,
   chooseDelay,
+  loadProfile,
+  NO_SAVED_PROFILE,
   pickBindingPreset,
   saveBindingSettings,
 } from "./bindingSettings";
@@ -21,7 +22,7 @@ export interface SettingsActions {
   recalibrate(participantId: number): void;
 }
 
-type SettingsButton = { kind: "preset"; preset: BindingPreset } | { kind: "save" } | { kind: "close" } | { kind: "delay" } | { kind: "recalibrate" } | { kind: "key"; key: number };
+type SettingsButton = { kind: "preset"; preset: BindingPreset } | { kind: "profile" } | { kind: "save" } | { kind: "close" } | { kind: "delay" } | { kind: "recalibrate" } | { kind: "key"; key: number };
 
 interface KeyButton {
   readonly key: number;
@@ -29,10 +30,11 @@ interface KeyButton {
   readonly action: framehandle;
 }
 
-const SEEN_FILE = "SmashcraftControls.pld";
-const SEEN = "seen";
 export const PICKER_DONE = { x: f32(0.23), y: f32(0.155), width: f32(0.105), height: f32(0.032) } as const;
 const BUTTON_TEXTURE = "war3mapImported\\SelectionAction.tga";
+const PRESET_STEP = f32(0.148);
+const PRESET_WIDTH = f32(0.142);
+export const LOAD_PROFILE = { x: f32(0.564), y: f32(0.548), width: PRESET_WIDTH, height: f32(0.034) } as const;
 const DIM_KEY = 105;
 const LIT_KEY = 255;
 
@@ -46,10 +48,8 @@ export class SettingsPanel {
   private readonly presets: readonly (readonly [BindingPreset, framehandle])[];
   private readonly keys: readonly KeyButton[];
   private readonly clicks: ButtonClicks<SettingsButton>;
+  private readonly profileButton: framehandle;
   private open = false;
-  private offered = false;
-  private offerChecked = false;
-  private seen: boolean | undefined;
   private lastSignature = "";
   private readonly local: boolean;
 
@@ -100,7 +100,8 @@ export class SettingsPanel {
     };
     BlzFrameSetText(line("MeleeSettingsTitle", f32(0.12), f32(0.578), f32(0.3), f32(0.026), f32(0.016)), `${MENU_STYLE.gold}CONTROLS|r`);
     this.presets = BINDING_PRESETS.map((preset, index): readonly [BindingPreset, framehandle] =>
-      [preset, button(`MeleeSettingsPreset${I2S(index)}`, f32(0.12) + index * f32(0.2), f32(0.548), f32(0.19), f32(0.034), PRESET_NAMES[preset], { kind: "preset", preset }).label]);
+      [preset, button(`MeleeSettingsPreset${I2S(index)}`, f32(0.12) + index * PRESET_STEP, f32(0.548), PRESET_WIDTH, f32(0.034), PRESET_NAMES[preset], { kind: "preset", preset }).label]);
+    this.profileButton = button("MeleeSettingsProfile", LOAD_PROFILE.x, LOAD_PROFILE.y, LOAD_PROFILE.width, LOAD_PROFILE.height, NO_SAVED_PROFILE, { kind: "profile" }).label;
     this.hint = line("MeleeSettingsHint", f32(0.12), f32(0.51), f32(0.6), f32(0.018));
     this.help = line("MeleeSettingsHelp", f32(0.12), f32(0.489), f32(0.6), f32(0.018), f32(0.0095));
     this.keys = keyboardCaps(f32(0.12), f32(0.465)).map(({ key, x, y, width }): KeyButton => {
@@ -138,6 +139,7 @@ export class SettingsPanel {
     if (clicker !== Player(this.participantId)) return;
     const { settings } = this;
     if (button.kind === "preset") pickBindingPreset(settings, button.preset);
+    else if (button.kind === "profile") loadProfile(settings);
     else if (button.kind === "save") saveBindingSettings(settings);
     else if (button.kind === "close") this.close();
     else if (button.kind === "delay") chooseDelay(settings, settings.delay >= MAX_FIXED_DELAY ? AUTO_DELAY : settings.delay + 1);
@@ -154,49 +156,24 @@ export class SettingsPanel {
     if (!this.settings.ready) return;
     this.open = true;
     this.lastSignature = "";
-    this.update(false);
+    this.update();
   }
 
 
   close(): void {
     this.open = false;
-    this.dismissOffer();
+    cancelBindingCapture(this.settings);
     BlzFrameSetVisible(this.root, false);
     this.actions.closeSettings(this.participantId);
   }
 
 
-  dismissOffer(): void {
-    cancelBindingCapture(this.settings);
-    if (!this.offered) return;
-    this.offered = false;
-    BlzFrameSetVisible(this.root, this.open);
-    this.markSeen();
-  }
-
-  private markSeen(): void {
-    if (!this.local || this.isSeen()) return;
-    this.seen = true;
-    writeChunks(SEEN_FILE, [SEEN]);
-  }
-
-  private isSeen(): boolean {
-    this.seen ??= readChunks(SEEN_FILE).join("") === SEEN;
-    return this.seen;
-  }
-
-
-  update(offerable: boolean): void {
-    if (!this.local) return;
+  update(): void {
+    if (!this.local || !this.open) return;
     const { settings } = this;
-    if (offerable && settings.ready && !this.offerChecked) {
-      this.offerChecked = true;
-      this.offered = !this.isSeen();
-    }
-    if (!this.open && !this.offered) return;
     const { capture } = settings;
     const info = this.actions.delayInfo(this.participantId);
-    const signature = `${encodeBindings(settings.bindings)}${settings.message}${capture === undefined ? "-" : I2S(capture.action * 2 + capture.slot)}${I2S(settings.delay)}${info}`;
+    const signature = `${encodeBindings(settings.bindings)}${settings.message}${settings.profile}${settings.fromProfile ? "p" : "-"}${capture === undefined ? "-" : I2S(capture.action * 2 + capture.slot)}${I2S(settings.delay)}${info}`;
     if (signature === this.lastSignature) return;
     this.lastSignature = signature;
     BlzFrameSetVisible(this.root, true);
@@ -207,9 +184,10 @@ export class SettingsPanel {
   private renderHeader(info: string): void {
     const { settings } = this;
     const { capture } = settings;
-    const selected = presetOf(settings.bindings);
+    const selected = settings.fromProfile ? undefined : presetOf(settings.bindings);
     for (const [preset, frame] of this.presets) setFrameText(frame, preset === selected ? `${MENU_STYLE.gold}${PRESET_NAMES[preset]}|r` : PRESET_NAMES[preset]);
-    BlzFrameSetText(this.hint, selected === undefined ? "Your own keys. Save to keep them." : `${MENU_STYLE.gold}${PRESET_HINTS[selected]}|r`);
+    setFrameText(this.profileButton, settings.profile !== "saved" ? `|cff808080${NO_SAVED_PROFILE}|r` : settings.fromProfile ? `${MENU_STYLE.gold}Load profile|r` : "Load profile");
+    BlzFrameSetText(this.hint, settings.fromProfile ? `${MENU_STYLE.gold}Your saved profile is selected.|r` : selected === undefined ? "Your own keys. Save to keep them." : `${MENU_STYLE.gold}${PRESET_HINTS[selected]}|r`);
     BlzFrameSetText(this.help, capture === undefined ? "Click a lit key, then press the key you want for that action." : "Press the new key for the flashing action. Escape cancels.");
     setFrameText(this.delayButton, settings.delay === AUTO_DELAY ? "Delay: Auto" : `Delay: ${I2S(settings.delay)} frames`);
     BlzFrameSetText(this.delayInfo, info);

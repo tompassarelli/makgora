@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { passStartControls } from "../scripts/wisp/startControls";
 import { RIGHT_KEY, testHeadless } from "./headless";
 import { Phase, holdingStart } from "../src/game/lobby/lobbyState";
 import { install, start } from "../src/host/entries/playableMain";
@@ -27,6 +28,7 @@ test("keyboard players choose fighters, release Start, choose a stage and reach 
   };
   clients.start();
   clients.frames(30);
+  passStartControls(clients);
   expect(phases()).toEqual([Phase.characterMenu, Phase.characterMenu]);
   for (const slot of [0, 1] as const) {
     const before = read(() => shell().game.characterChoices[slot]);

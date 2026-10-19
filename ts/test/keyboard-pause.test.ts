@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { passStartControls } from "../scripts/wisp/startControls";
 import { RIGHT_KEY, testHeadless } from "./headless";
 import { Phase, holdingStart } from "../src/game/lobby/lobbyState";
 import { install, start } from "../src/host/entries/playableMain";
@@ -37,6 +38,7 @@ test("in a match Backspace pauses and resumes both clients, Y does not, and typi
   };
   clients.start();
   clients.frames(30);
+  passStartControls(clients);
   for (const slot of [0, 1] as const) tap(slot, RIGHT_KEY);
   tap(0, Key.y);
   until(() => read(() => shell().game.phase).every(phase => phase === Phase.stageMenu), 60);

@@ -168,7 +168,6 @@ function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = fal
     cancelBindingCapture(bindings);
     return;
   }
-  if (key === Key.escape) settings.dismissOffer();
   if (key === Key.escape && settings.isOpen()) {
     settings.close();
     return;

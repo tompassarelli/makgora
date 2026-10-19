@@ -7,7 +7,7 @@ import { SMASHCRAFT_JOURNEYS } from "./wisp/journeys";
 import { headlessRender } from "./wisp/headlessRender";
 import { smashcraftNativeBehavior } from "./wisp/headlessNatives";
 
-export const RETURNING_PLAYER_FILES: Readonly<Record<string, readonly string[]>> = { "SmashcraftTutorial.pld": ["seen"], "SmashcraftControls.pld": ["seen"] };
+export const RETURNING_PLAYER_FILES: Readonly<Record<string, readonly string[]>> = { "SmashcraftTutorial.pld": ["seen"] };
 
 class SelectStripFailure extends Schema.TaggedError<SelectStripFailure>()("SelectStripFailure", { problem: Schema.String }) {}
 

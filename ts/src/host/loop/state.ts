@@ -269,6 +269,7 @@ export interface ShellState {
 
   menuFrames?: number;
   startingChoicesReady?: boolean;
+  controlsGreeted?: number;
   readonly camera: MatchCamera;
   cameraTween?: boolean;
 

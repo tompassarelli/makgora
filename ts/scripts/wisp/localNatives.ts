@@ -54,6 +54,7 @@ export const SMASHCRAFT_LOCAL_NATIVES: LocalNatives = {
   S2I: "pure conversion",
   StringLength: "pure string measure, for the selection bar's local layout",
   ConvertOsKeyType: "pure conversion, for the local keys the keyboard polls",
+  QuestSetDescription: "shows this client's own controls in its F9 Controls entry",
 };
 
 

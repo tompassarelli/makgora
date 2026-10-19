@@ -596,7 +596,7 @@ export function renderUi(s: ShellState): void {
     }
     ui.selections[slot].menuBindings(s.participants[slot].bindings.bindings);
     ui.selections[slot].update(game, s.startingChoicesReady === false, menu.title || ui.settings[slot].isOpen(), selecting || game.phase === Phase.result || paused || menu.title || ui.settings[slot].isOpen(), s.sessionWins.counts);
-    ui.settings[slot].update(game.phase === Phase.characterMenu && !menu.title && s.startingChoicesReady !== false && humanActive(game, slot));
+    ui.settings[slot].update();
   }
   ui.clock.update(showMatch && game.phase === Phase.match && timedMatch(game), remainingSeconds(game));
   ui.match.presentCountdown(game, showMatch);

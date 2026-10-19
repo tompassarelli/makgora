@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { passStartControls } from "../scripts/wisp/startControls";
 import { testHeadless } from "./headless";
 import { PREDICTED_HEADLESS } from "../scripts/wisp/headless";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
@@ -47,6 +48,7 @@ function menu() {
   clients.frames(1);
   for (let frame = 0; frame < 120 && !value(clients.client(0), () => shell().startingChoicesReady); frame++) clients.frames(1);
   const host = clients.client(0);
+  passStartControls(clients);
   expect(value(host, () => shell().game.phase)).toBe(Phase.characterMenu);
   expect(value(host, () => shell().startingChoicesReady)).toBe(true);
   const point = (x: number, y: number, down: boolean) => {

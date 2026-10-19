@@ -1,3 +1,4 @@
+import { passStartControls } from "../../scripts/wisp/startControls";
 
 
 
@@ -164,6 +165,7 @@ export function beginMatch(clients: Lockstep, match: SoakMatch, frame: () => voi
     if (!done()) throw new Error(`${what} not reached`);
   };
   frames(30);
+  passStartControls(clients, frames);
   for (const client of clients.clients) clients.press(client.slot, Key.n);
   frames(5);
   clients.clients.forEach(({ slot }) => {

@@ -32,12 +32,13 @@ import * as journalPause from "./journalPause";
 import { KEY_DOWN, KEY_UP, KEY_START_DOWN, KEY_START_UP, KEY_PAUSE_DOWN, KEYBOARD_PAUSE, KEYBOARD_PAUSE_PREFIX, Key, registerKey, syncKeyEvents } from "./keyEvents";
 import { onKeyboardPause, onPauseKeyDown } from "./keyboardPause";
 import { onDevCommand, onDeveloperRestart, onDeveloperTrace, onKeyDown, onKeyUp, onStartKeyDown, onStartKeyUp, onProbeExport, onProbeStart, selectPauseMenu } from "./keys";
-import { panelActions, pickResult, serviceAutomaticRematch, startingSelection } from "./menus";
+import { openControlsFirst, panelActions, pickResult, serviceAutomaticRematch, startingSelection } from "./menus";
 import { PLAYER_FILE_RECEIVED, bindingFiles, playerFileReceived, playerFilesOwnerLeft, startPlayerFiles } from "./playerFiles";
 import { PLAYTEST, PLAYTEST_PREFIX, playtestRequested, readPlaytestRequest, servicePlaytestRequest } from "./playtest";
 import { STAGE_READY, cancelStageLoad, serviceStageLoad, stageReadyEvent } from "./stageLoad";
 import { STAGE_READY_PREFIX } from "../../game/session/stageLoad";
 import { makePreview } from "./preview";
+import { HELP_EVENT, helpCommand, serviceHelp, startHelp } from "./help";
 import { preloadStageAssets } from "./stageScenery";
 import * as probe from "./responseProbe";
 import { checksumRow, delayRow, receiveInput, rollbackTick } from "./rollback";
@@ -158,6 +159,8 @@ function gameTick(s: ShellState): void {
     editbox.updatePauseHint(s.session.paused, barrier.request !== undefined, pausing(barrier), pauseHudHidden(s));
   }
   if (s.game.phase === Phase.characterMenu || s.game.phase === Phase.stageMenu) s.menuFrames = ((s.menuFrames ?? 0) + 1) & 1048575;
+  openControlsFirst(s);
+  serviceHelp(s);
   servicePlaytestRequest(s);
   serviceStageLoad(s);
   if (s.game.phase === Phase.result) serviceAutomaticRematch(s);
@@ -357,7 +360,6 @@ function initialize(): void {
   s.startingChoicesReady = s.game.computerMask === 0;
   createUi(s, panelActions(), (choice, clicker) => selectPauseMenu(s, GetPlayerId(clicker), choice));
   s.ui?.results.bindActions((choice, clicker) => pickResult(s, GetPlayerId(clicker), choice));
-  preloadStageAssets(s);
   view.drawStage(s);
   CameraSetSmoothingFactor(0.0);
   SetTimeOfDay(12.0);
@@ -367,6 +369,7 @@ function initialize(): void {
   view.lockArenaCamera(s);
   view.renderUi(s);
   createTriggers(s);
+  startHelp(s);
   readPlaytestRequest(s);
   readMatchIndex();
   for (const participant of s.participants) {
@@ -424,6 +427,7 @@ export function installShell(): void {
   on(EDITBOX_ENTER, withShell(journalPause.chatEntered));
   on(DEV_COMMAND, withShell(onDevCommand));
   on(CONTROLS_COMMAND, withShell(controlsCommand));
+  on(HELP_EVENT, helpCommand);
   on(PLAYER_LEFT, withShell(playerLeft));
   on(RESTART, withShell(onDeveloperRestart));
   on(TRACE, withShell(onDeveloperTrace));
@@ -452,5 +456,6 @@ export function installShell(): void {
 
 export function startShell(build: MapBuild, playback: RollbackPlayback): void {
   globalThis.__smashcraftShellStart = { build, playback };
+  preloadStageAssets(worldOrigin());
   TimerStart(CreateTimer(), 0.0, false, trampoline(INIT));
 }

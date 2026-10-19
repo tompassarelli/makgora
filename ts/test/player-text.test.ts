@@ -5,6 +5,7 @@
 
 
 import { expect, test } from "bun:test";
+import { passStartControls } from "../scripts/wisp/startControls";
 import { LEFT_KEY, RIGHT_KEY, testHeadless } from "./headless";
 import type { HeadlessClient } from "wisp/src/headless/client";
 import type { Lockstep } from "wisp/src/headless/lockstep";
@@ -142,6 +143,14 @@ class FrameView {
     return (this.frames.get(upper[common])?.level ?? 0) > (this.frames.get(lower[common])?.level ?? 0);
   }
 
+  clickNamed(clients: Lockstep, client: HeadlessClient, name: string): void {
+    const found = [...this.frames].find(([handle, frame]) => frame.name === name && this.shown(handle));
+    if (found === undefined) throw new Error(`Missing visible button: ${name}`);
+    const id = (client.natives.GetHandleId as Native)(found[0]);
+    if (typeof id !== "number") throw new Error(`Missing frame id: ${name}`);
+    for (const other of clients.clients) other.frameEvent(client.slot, id, other.natives.FRAMEEVENT_CONTROL_CLICK);
+  }
+
   clickText(client: HeadlessClient, text: string): void {
     const found = [...this.frames].find(([handle, frame]) => frame.text === text && this.shown(handle));
     if (found === undefined) throw new Error(`Missing visible button: ${text}`);
@@ -164,6 +173,7 @@ test("all-ready controller Start advances selection and enters the match without
   const clients = headless.clients({ install: installPlayable, start: startPlayable });
   clients.start();
   clients.frames(30);
+  passStartControls(clients);
   for (const slot of [0, 1]) clients.press(slot, RIGHT_KEY);
   clients.frames(10);
   const publication = (phase: string) => clients.everywhere(() => expect(shell().menuPublication?.phase).toBe(phase));
@@ -214,6 +224,8 @@ test("the playable build keeps selection chips and cursor on their screen and sh
 
   clients.start();
   frames(30);
+  for (const { client, view } of records) view.clickNamed(clients, client, `MeleeSettingsCloseHit${client.slot}`);
+  frames(2);
   for (const { client, view } of records) view.clickText(client, "Not now");
   const grid = rosterGrid(PLAYABLE_CHARACTERS.length);
   const point = (x: number, y: number, down: boolean, carrying?: boolean) => {

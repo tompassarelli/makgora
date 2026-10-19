@@ -55,9 +55,36 @@ export const SMASHCRAFT_NOOPS: IntentionalNoops = {
   SetCineFilterEndColor: "the KO flash's screen filter is local presentation; headless checks do not render the screen",
   SetCineFilterDuration: "the KO flash's screen filter is local presentation; headless checks do not render the screen",
   DisplayCineFilter: "the KO flash's screen filter is local presentation; headless checks do not render the screen",
+  CreateQuest: "the F9 help entries are Warcraft's quest log; tests read their logged titles and descriptions",
+  QuestSetIconPath: "the F9 help entry icons are Warcraft quest-log art that headless checks do not render",
+  QuestSetRequired: "the F9 help entries only sort into the quest log's two columns, which headless checks do not render",
+  QuestSetDiscovered: "the F9 help entries are always shown in Warcraft's quest log, which headless checks do not render",
+  QuestSetCompleted: "the F9 help entries are never completed; the quest log is not rendered headless",
 };
 
-export const smashcraftNativeBehavior = (_client?: unknown) => ({
+export interface QuestEntry {
+  title: string;
+  description: string;
+}
+
+const questLogs = new WeakMap<object, Map<unknown, QuestEntry>>();
+
+export function questLog(client: object): readonly QuestEntry[] {
+  return [...(questLogs.get(client)?.values() ?? [])];
+}
+
+function questEntry(client: unknown, entry: unknown): QuestEntry | undefined {
+  if (typeof client !== "object" || client === null) return undefined;
+  const log = questLogs.get(client) ?? new Map<unknown, QuestEntry>();
+  questLogs.set(client, log);
+  const found = log.get(entry) ?? { title: "", description: "" };
+  log.set(entry, found);
+  return found;
+}
+
+export const smashcraftNativeBehavior = (client?: unknown) => ({
+  QuestSetTitle: (entry: unknown, title: string) => { const found = questEntry(client, entry); if (found !== undefined) found.title = title; },
+  QuestSetDescription: (entry: unknown, description: string) => { const found = questEntry(client, entry); if (found !== undefined) found.description = description; },
   PanCameraToTimed: (x: number, y: number) => SetCameraPosition(x, y),
 
   GetLocationX: () => 0,

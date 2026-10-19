@@ -2,6 +2,7 @@
 
 
 import { expect } from "bun:test";
+import { passStartControls } from "../../scripts/wisp/startControls";
 import type { HeadlessRuntime } from "wisp/scripts/wisp/headless";
 import { MEASURED_BATTLE_NET, syncDelivery } from "wisp/src/headless/syncChannel";
 import type { HeadlessClient } from "wisp/src/headless/client";
@@ -47,6 +48,7 @@ export function startPlayableMatch(headless: HeadlessRuntime, helpers: JournalHe
   };
   clients.start();
   frames(30);
+  passStartControls(clients, frames);
   for (const slot of [0, 1]) clients.press(slot, Key.n);
   frames(5);
   if (withComputer) {

@@ -1,3 +1,4 @@
+import { passStartControls } from "./startControls";
 
 
 
@@ -124,6 +125,7 @@ const choose = (lineup: number, automaticRematch: boolean) => {
 clients.start();
 for (const client of clients.clients) for (const error of client.errors) print(`start p${client.slot}: ${error}`);
 for (let index = 0; index < (nativeSequence ? 359 : 30); index++) frame();
+passStartControls(clients, count => { for (let index = 0; index < count; index++) frame(); });
 if (nativeSequence) {
   nativeStart = clients.frame;
   clients.chat(0, "-dev soak");

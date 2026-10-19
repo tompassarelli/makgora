@@ -1,3 +1,4 @@
+import { passStartControls } from "./startControls";
 import type { HeadlessClient } from "wisp/src/headless/client";
 import type { Lockstep } from "wisp/src/headless/lockstep";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
@@ -105,6 +106,7 @@ export function playHandleBaseline(clients: Lockstep, functions: readonly (reado
 
   clients.start();
   clients.frames(30);
+  passStartControls(clients);
   choose(false);
   clients.frames(60);
   const cold = live();

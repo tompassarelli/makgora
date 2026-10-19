@@ -85,11 +85,11 @@ export function drawStageScenery(s: ShellState): void {
 }
 
 
-export function preloadStageAssets(s: ShellState): void {
-  const { x, y } = s.origin;
+export function preloadStageAssets(origin: Readonly<{ x: number; y: number; z: number }>): void {
+  const { x, y } = origin;
   for (const model of preloadModels()) {
     const effect = AddSpecialEffect(model, x, y);
-    hideEffect(effect, s.origin);
+    hideEffect(effect, origin);
     DestroyEffect(effect);
   }
   for (const sky of preloadSkies()) SetSkyModel(sky);

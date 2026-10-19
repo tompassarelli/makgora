@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { passStartControls } from "../scripts/wisp/startControls";
 import { testHeadless } from "./headless";
 import { PREDICTED_HEADLESS } from "../scripts/wisp/headless";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
@@ -56,6 +57,7 @@ test("CPU startup waits for synchronized bindings, varies by delivery frame and 
     }
     const choice = PLAYABLE_CHARACTERS.find(character => character !== expected.characterChoices[2]);
     if (choice === undefined) throw new Error("the roster needs two fighters");
+    passStartControls(clients);
     clients.everywhere(() => panelActions().selection.selectCpuChoice(0, 2, choice));
     clients.frames(60);
     for (const client of clients.clients) expect(value(client, () => shell().game.characterChoices[2])).toBe(choice);
