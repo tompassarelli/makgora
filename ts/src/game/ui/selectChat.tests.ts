@@ -2,7 +2,7 @@ import { assertEquals, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { SELECT_CHAT_LINES, SELECT_CHAT_SECONDS, addChat, ageChat, chatName, chatText, createChatLog } from "./selectChat";
 
-test("select chat keeps the newest lines, drops each after its time, and names players without their BattleTag number [k1 property]", () => {
+test("select chat keeps the newest lines, drops each after its time, and names players without their BattleTag number [k2 property]", () => {
   const log = createChatLog();
   for (let i = 0; i < SELECT_CHAT_LINES + 2; i++) addChat(log, 0, "Tom#1234", `line ${i}`);
   assertEquals(log.lines.length, SELECT_CHAT_LINES);
