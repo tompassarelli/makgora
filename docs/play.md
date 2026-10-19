@@ -44,14 +44,14 @@ in, logs out or switches accounts.
 Maps/00-Smashcraft has two folders. releases/ keeps every release build
 `Smashcraft X.Y.Z.w3x`; no install ever removes one, and online hosting picks the
 newest of them. dev/ holds the newest installed main build
-`Smashcraft X.Y.Z abc1234.w3x` (version and short commit; the file and in-game
+`Smashcraft X.Y.Z-dev abc1234.w3x` (version and short commit; the file and in-game
 title carry the same name). Installing a main build (`play`, `playtest:build`,
 the Tom build watcher, `play --install-green`) removes everything else in dev/;
 a build of a release-tagged commit goes to releases/ instead and removes nothing. Only releases are public, so X.Y.Z is the next release, never a build
 counter: the patch after the newest `vX.Y.Z` tag reachable from the commit
 (`git describe --tags --match 'v[0-9]*.[0-9]*.[0-9]*' --exclude 'v*-*'`),
 and the short commit tells development builds apart, so every build after
-v0.1.0 is `Smashcraft 0.1.1 abc1234`. When Tom calls a release candidate, a
+v0.1.0 is `Smashcraft 0.1.1-dev abc1234`. When Tom calls a release candidate, a
 `v0.1.1-rc.N` tag on its commit names the build `Smashcraft 0.1.1 RC-N`
 (the highest N), and the `v0.1.1` release tag names it `Smashcraft 0.1.1`. At
 most one lane or test build for Tom to try sits beside the dev build (lane builds below,
@@ -94,7 +94,7 @@ version numbering and revision locks as `play`, under `Nice=10` and idle I/O.
 Commits that land during a build are not built one by one: the next build is
 of the newest tip. A sha is built once, even after a failure or a restart
 (`~/.local/state/smashcraft/tom-build/attempted`). A new build gets a new
-`Smashcraft X.Y.Z abc1234` file in dev/ and replaces the previous build and any
+`Smashcraft X.Y.Z-dev abc1234` file in dev/ and replaces the previous build and any
 lane build there; releases/ is left alone.
 
 Each install is held to two speed budgets: the build within 20 s and the

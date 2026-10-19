@@ -44,7 +44,7 @@ Both are Warcraft Preload files; each stored line is one `call Preload( "…" )`
 
 Maps/00-Smashcraft in the Warcraft III documents folder has releases/, every
 release build `Smashcraft X.Y.Z.w3x`, never removed, and dev/, one installed
-main build `Smashcraft X.Y.Z abc1234.w3x` (smashcraft:docs/play.md).
+main build `Smashcraft X.Y.Z-dev abc1234.w3x` (smashcraft:docs/play.md).
 Installing a main build removes every other file in dev/. At most one lane or test build Tom asked to try (`Smashcraft
 X.Y.Z-LANE.w3x`, or the map `play --lobby-only` was given) sits beside it; it
 replaces any earlier one and goes when the next main build installs. Test,

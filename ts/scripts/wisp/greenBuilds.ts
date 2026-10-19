@@ -17,7 +17,7 @@ export const PREDICT_COST = "--predict-cost";
 export const costPrediction = (args: readonly string[]) => ({ predict: args.includes(PREDICT_COST), args: args.filter((arg) => arg !== PREDICT_COST) });
 
 export const LANE_FILE = /^Smashcraft (\d+\.\d+\.\d+)-([a-z0-9]+(?:-[a-z0-9]+)*)\.w3x$/;
-export const PLAYABLE_FILE = /^Smashcraft (\d+\.\d+\.\d+)(?: ([0-9a-f]{7,40})| RC-\d+)?\.w3x$/;
+export const PLAYABLE_FILE = /^Smashcraft (\d+\.\d+\.\d+)(?:-dev ([0-9a-f]{7,40})| RC-\d+)?\.w3x$/;
 export const buildLabel = (file: string) => PLAYABLE_FILE.test(file) ? file.slice("Smashcraft ".length, -".w3x".length) : undefined;
 
 
@@ -50,7 +50,7 @@ export function farmVerdict(sha: string, tree: string, exact: Verdict, statuses:
 }
 
 export function installName(version: string, sha: string): string {
-  return `Smashcraft ${version} ${sha.slice(0, SHORT_COMMIT)}`;
+  return `Smashcraft ${version}-dev ${sha.slice(0, SHORT_COMMIT)}`;
 }
 
 export interface Installed {

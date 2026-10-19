@@ -14,9 +14,9 @@ test("exact native report boundary keeps installed map through injected gate fai
     const library = join(documents, "Maps/00-Smashcraft/dev");
     const state = join(root, "state");
     mkdirSync(library, { recursive: true });
-    const previous = join(library, "Smashcraft 0.0.133 9f0b248.w3x");
+    const previous = join(library, "Smashcraft 0.0.133-dev 9f0b248.w3x");
     writeFileSync(previous, "last good map");
-    const map = join(root, "Smashcraft 0.0.134 aaaaaaa.w3x");
+    const map = join(root, "Smashcraft 0.0.134-dev aaaaaaa.w3x");
     writeFileSync(map, "exact candidate bytes");
     const hash = createHash("sha256").update(readFileSync(map)).digest("hex");
     const reports = GREEN_GATE_LOOKS.map(graphicsLook => ({ candidateMapSha256: hash, graphicsLook: String(graphicsLook),
@@ -27,7 +27,7 @@ test("exact native report boundary keeps installed map through injected gate fai
       writeFileSync(join(folder, "report.json"), JSON.stringify(report));
     });
     const install = () => Effect.runPromise(installAcceptedGreen(documents, map, "a".repeat(40), GREEN_GATE_CHECKS, state, true).pipe(Effect.result));
-    const candidate = join(library, "Smashcraft 0.0.134 aaaaaaa.w3x");
+    const candidate = join(library, "Smashcraft 0.0.134-dev aaaaaaa.w3x");
     const blocked = async () => {
       expect((await install())._tag).toBe("Failure");
       expect(existsSync(candidate)).toBe(false);
@@ -79,9 +79,9 @@ test("unset switch defaults to report mode and SMASHCRAFT_GREEN_GATE=enforce res
   try {
     const documents = join(root, "documents");
     mkdirSync(join(documents, "Maps/00-Smashcraft/dev"), { recursive: true });
-    const map = join(root, "Smashcraft 0.0.135 ccccccc.w3x");
+    const map = join(root, "Smashcraft 0.0.135-dev ccccccc.w3x");
     writeFileSync(map, "exact candidate bytes");
-    const installed = join(documents, "Maps/00-Smashcraft/dev", "Smashcraft 0.0.135 ccccccc.w3x");
+    const installed = join(documents, "Maps/00-Smashcraft/dev", "Smashcraft 0.0.135-dev ccccccc.w3x");
     Reflect.deleteProperty(process.env, "SMASHCRAFT_GREEN_GATE");
     const unset = await Effect.runPromise(installAcceptedGreen(documents, map, "c".repeat(40), GREEN_GATE_CHECKS, join(root, "state")).pipe(Effect.result));
     expect(unset._tag).toBe("Success");
@@ -110,9 +110,9 @@ test("report mode installs a green main whose native gate report is missing and 
     const library = join(documents, "Maps/00-Smashcraft/dev");
     const state = join(root, "state");
     mkdirSync(library, { recursive: true });
-    const map = join(root, "Smashcraft 0.0.135 bbbbbbb.w3x");
+    const map = join(root, "Smashcraft 0.0.135-dev bbbbbbb.w3x");
     writeFileSync(map, "exact candidate bytes");
-    const installed = join(library, "Smashcraft 0.0.135 bbbbbbb.w3x");
+    const installed = join(library, "Smashcraft 0.0.135-dev bbbbbbb.w3x");
     const enforced = await Effect.runPromise(installAcceptedGreen(documents, map, "b".repeat(40), GREEN_GATE_CHECKS, state, true).pipe(Effect.result));
     expect(enforced._tag).toBe("Failure");
     expect(existsSync(installed)).toBe(false);

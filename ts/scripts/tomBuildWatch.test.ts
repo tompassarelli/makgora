@@ -33,7 +33,7 @@ test("a landing over its build or landing-to-Maps budget is reported, and one wi
       landedAt: () => Effect.sync(() => Date.now() - landedAgo),
       notes: () => Effect.succeed("notes.md"),
       budget: (_, problem) => Effect.sync(() => { reports.push(problem); }),
-      build: () => Effect.succeed({ version: "Smashcraft 0.1.1 aaaaaaa", path: "Maps/x.w3x" }),
+      build: () => Effect.succeed({ version: "Smashcraft 0.1.1-dev aaaaaaa", path: "Maps/x.w3x" }),
     });
     await Effect.runPromise(watchOnce(steps(600_000), files));
     await Effect.runPromise(watchOnce(steps(1_000), files));
@@ -106,7 +106,7 @@ test("a red commit is never built, a pending one waits and builds once its run s
       landedAt: () => Effect.succeed(0),
       notes: (version, revision, previous) => Effect.sync(() => { noted.push(`${version} ${revision} ${previous}`); return "notes.md"; }),
       budget: () => Effect.void,
-      build: (revision) => Effect.sync(() => { built.push(revision); return { version: "0.0.1", path: join(root, "Smashcraft 0.0.1 aaaaaaa.w3x") }; }),
+      build: (revision) => Effect.sync(() => { built.push(revision); return { version: "0.0.1", path: join(root, "Smashcraft 0.0.1-dev aaaaaaa.w3x") }; }),
     };
     const tick = () => Effect.runPromise(watchOnce(steps, files));
     await tick();
@@ -138,7 +138,7 @@ test("only a succeeded CI run is green; a failed one is red and anything else wa
 });
 
 test("Tom's playable build names the map with the short commit [k2 property]", () => {
-  expect(installName("0.0.263", sha("a"))).toBe("Smashcraft 0.0.263 aaaaaaa");
+  expect(installName("0.0.263", sha("a"))).toBe("Smashcraft 0.0.263-dev aaaaaaa");
   expect(PLAYABLE_FILE.test(`${installName("0.0.263", sha("a"))}.w3x`)).toBe(true);
 });
 
@@ -154,7 +154,7 @@ test("the watcher keeps polling while it runs main's tip and returns, unbuilt, o
       landedAt: () => Effect.succeed(0),
       notes: () => Effect.succeed("notes.md"),
       budget: () => Effect.void,
-      build: (revision) => Effect.sync(() => { built.push(revision); return { version: "0.1.1 aaaaaaa", path: join(root, "Smashcraft 0.1.1 aaaaaaa.w3x") }; }),
+      build: (revision) => Effect.sync(() => { built.push(revision); return { version: "0.1.1-dev aaaaaaa", path: join(root, "Smashcraft 0.1.1-dev aaaaaaa.w3x") }; }),
     };
     const checks: boolean[] = [];
     const current = (answers: boolean[]) => Effect.sync(() => { const answer = answers.shift() ?? false; checks.push(answer); return answer; });
@@ -166,7 +166,7 @@ test("the watcher keeps polling while it runs main's tip and returns, unbuilt, o
     await Effect.runPromise(watch(steps, files, current([false]), 0));
     expect(built).toEqual([sha("a")]);
     expect(checks).toEqual([false, true, true, false, false]);
-    expect(readFileSync(files.log, "utf8").trim().split(" ").slice(1, 3)).toEqual([sha("a"), "0.1.1-aaaaaaa"]);
+    expect(readFileSync(files.log, "utf8").trim().split(" ").slice(1, 3)).toEqual([sha("a"), "0.1.1-dev-aaaaaaa"]);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

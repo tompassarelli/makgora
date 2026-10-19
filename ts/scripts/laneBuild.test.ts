@@ -19,7 +19,7 @@ test("a lane map is named Smashcraft <version>-<lane>, one installed lane map re
     const maps = join(documents, "Maps/00-Smashcraft/dev");
     const staging = join(root, "staging");
     mkdirSync(maps, { recursive: true });
-    writeFileSync(join(maps, "Smashcraft 0.0.6 aaaaaaa.w3x"), "main 6");
+    writeFileSync(join(maps, "Smashcraft 0.0.6-dev aaaaaaa.w3x"), "main 6");
     expect(laneSlug(CAIRNE)).toBe("cairne-air-924c72aef489");
     expect(laneSlug("claude/Fix_Test Flake")).toBe("fix-test-flake");
     expect(laneMapTitle("0.0.7", laneSlug(CAIRNE))).toBe("Smashcraft 0.0.7-cairne-air-924c72aef489");
@@ -37,11 +37,11 @@ test("a lane map is named Smashcraft <version>-<lane>, one installed lane map re
 
     await build(CAIRNE);
     await build(FLAKE);
-    expect(listed()).toEqual(["Smashcraft 0.0.6 aaaaaaa.w3x", "Smashcraft 0.0.7-fix-test-flake-0123456789ab.w3x"]);
+    expect(listed()).toEqual(["Smashcraft 0.0.6-dev aaaaaaa.w3x", "Smashcraft 0.0.7-fix-test-flake-0123456789ab.w3x"]);
     version = "0.0.8";
     const replaced = await build(CAIRNE);
     expect(replaced._tag).toBe("Success");
-    expect(listed()).toEqual(["Smashcraft 0.0.6 aaaaaaa.w3x", "Smashcraft 0.0.8-cairne-air-924c72aef489.w3x"]);
+    expect(listed()).toEqual(["Smashcraft 0.0.6-dev aaaaaaa.w3x", "Smashcraft 0.0.8-cairne-air-924c72aef489.w3x"]);
     expect(readFileSync(join(maps, "Smashcraft 0.0.8-cairne-air-924c72aef489.w3x"), "utf8")).toBe("Smashcraft 0.0.8-cairne-air-924c72aef489");
 
     passing = false;
@@ -51,10 +51,10 @@ test("a lane map is named Smashcraft <version>-<lane>, one installed lane map re
     expect(existsSync(join(maps, "Smashcraft 0.0.8-cairne-air-924c72aef489.w3x"))).toBe(true);
 
     for (const name of listed().filter((entry) => LANE_FILE.test(entry))) expect(PLAYABLE_FILE.test(name)).toBe(false);
-    const main = join(root, "Smashcraft 0.0.7 bbbbbbb.w3x");
+    const main = join(root, "Smashcraft 0.0.7-dev bbbbbbb.w3x");
     writeFileSync(main, "main 7");
     installLatest(documents, main);
-    expect(listed()).toEqual(["Smashcraft 0.0.7 bbbbbbb.w3x"]);
+    expect(listed()).toEqual(["Smashcraft 0.0.7-dev bbbbbbb.w3x"]);
 
     expect(laneTests(["scripts/laneBuild.test.ts", "src/game/sim/mathTables.tests.ts", "scripts/gone.test.ts", "scripts/laneBuild.ts"]))
       .toEqual({ host: ["scripts/laneBuild.test.ts"], game: ["game/sim/mathTables.tests.ts"] });
