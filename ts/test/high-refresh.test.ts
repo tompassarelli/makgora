@@ -1,4 +1,4 @@
-import { expect } from "bun:test";
+import { expect, test } from "bun:test";
 import { testHeadless } from "./headless";
 import { install, start } from "../src/platform/main";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
@@ -41,6 +41,34 @@ function quickMatch(drawing: boolean): { checksums: string[][]; smoothed: number
   const drawnPositions = clients.clients[0]?.log.filter(({ name }) => name === "BlzSetSpecialEffectPosition").length ?? 0;
   return { checksums, smoothed, drawnPositions };
 }
+
+const SAME_INSTANT_DRAWS = 20;
+
+function positionsSet(clients: ReturnType<typeof headless.clients>): number {
+  return clients.clients[0]?.log.filter(({ name }) => name === "BlzSetSpecialEffectPosition").length ?? 0;
+}
+
+test("draw callbacks within a quarter frame of the last draw place no effect, so a burst of 1/1024 s callbacks redraws moving effects a few times instead of every callback [k1 scenario]", () => {
+  const clients = headless.clients({ start, install });
+  clients.start();
+  clients.frames(30);
+  clients.chat(0, "-dev quick cpu wren expert");
+  clients.everywhere(() => drawAtBurstTime(true));
+  clients.frames(120);
+  clients.everywhere(drawBetweenFrames);
+  const once = positionsSet(clients);
+  for (let draw = 0; draw < SAME_INSTANT_DRAWS; draw++) clients.everywhere(drawBetweenFrames);
+  expect(positionsSet(clients)).toBe(once);
+  clients.frames(1);
+  const framed = positionsSet(clients);
+  clients.everywhere(drawBetweenFrames);
+  let smoothing = false;
+  clients.clients[0]?.run(() => {
+    smoothing = effectMotion().smoothing;
+  });
+  expect(smoothing).toBe(true);
+  expect(positionsSet(clients)).toBeGreaterThan(framed);
+});
 
 sweep("drawing each burst at its game time leaves every confirmed checksum unchanged [k1 scenario]", () => {
   const plain = quickMatch(false);

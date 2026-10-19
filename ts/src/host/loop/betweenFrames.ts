@@ -11,6 +11,8 @@ const SMOOTHING_FRAMES = 1.5;
 
 const AVERAGE_WEIGHT = 0.125;
 
+const DRAW_STEP = 0.25;
+
 interface BetweenFrames {
 
   tick: timer | undefined;
@@ -18,6 +20,7 @@ interface BetweenFrames {
   drawsSinceTick: number;
 
   drawsPerTick: number;
+  drawnAlpha: number;
 }
 
 declare global {
@@ -25,7 +28,7 @@ declare global {
 }
 
 function state(): BetweenFrames {
-  return (globalThis.__smashcraftBetweenFrames ??= { tick: undefined, drawing: false, drawsSinceTick: 0, drawsPerTick: 0.0 });
+  return (globalThis.__smashcraftBetweenFrames ??= { tick: undefined, drawing: false, drawsSinceTick: 0, drawsPerTick: 0.0, drawnAlpha: -1.0 });
 }
 
 
@@ -51,6 +54,7 @@ export function beginPresentedFrame(moving: boolean): void {
   if (!motion.tracking) return;
   frames.drawsPerTick += (frames.drawsSinceTick - frames.drawsPerTick) * AVERAGE_WEIGHT;
   frames.drawsSinceTick = 0;
+  frames.drawnAlpha = -1.0;
   motion.smoothing = moving && frames.drawsPerTick >= SMOOTHING_FRAMES;
   motion.beginFrame();
 }
@@ -62,5 +66,8 @@ export function drawBetweenFrames(): void {
   const { tick } = frames;
   if (tick === undefined) return;
   const ticks = TimerGetElapsed(tick) / FRAME_SECONDS;
-  effectMotion().draw(ticks - Math.floor(ticks));
+  const alpha = ticks - Math.floor(ticks);
+  if (alpha >= frames.drawnAlpha && alpha < frames.drawnAlpha + DRAW_STEP) return;
+  frames.drawnAlpha = alpha;
+  effectMotion().draw(alpha);
 }
