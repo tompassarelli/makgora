@@ -42,7 +42,7 @@ export const KO_SCREEN_FRAMES = 100;
 const PI = f32(3.141592654);
 const HALF_PI = f32(1.570796327);
 
-interface ImpactPose {
+export interface ImpactPose {
   visible: boolean;
   alpha: number;
   scale: number;
@@ -333,7 +333,7 @@ const travel = (velocity: number, age: number): number => f32(f32(velocity * age
 const HIDDEN_IMPACT: Readonly<ImpactPose> = { visible: false, alpha: 0, scale: 0.0, x: 0.0, z: 0.0, pitch: 0.0 };
 
 
-export function projectImpact(state: Readonly<ImpactState>, i: number): Readonly<ImpactPose> {
+export function projectImpact(state: Readonly<ImpactState>, i: number, out?: ImpactPose): Readonly<ImpactPose> {
   if (i < 0 || i >= IMPACT_COUNT) return HIDDEN_IMPACT;
   const age = state.ages[i];
   const kind = idiv(i, IMPACTS_PER_KIND);
@@ -343,14 +343,7 @@ export function projectImpact(state: Readonly<ImpactState>, i: number): Readonly
   const drift = at(state.drift, i);
   if (kind === IMPACT_STAR_KO) {
     const sparkle = f32(f32((age - KO_STAR_FLIGHT_FRAMES) * 1.0) / (KO_STAR_FRAMES - KO_STAR_FLIGHT_FRAMES));
-    return {
-      visible: true,
-      alpha: toInt(f32(255 * f32(1.0 - sparkle))),
-      scale: f32(f32(0.6) + sparkle),
-      x: f32(originX + drift * 75),
-      z: f32(originZ + 180.0),
-      pitch: 0.0,
-    };
+    return impactPose(out, toInt(f32(255 * f32(1.0 - sparkle))), f32(f32(0.6) + sparkle), f32(originX + drift * 75), f32(originZ + 180.0), 0.0);
   }
   const strength = at(state.strength, i);
   const progress = f32(f32(age * 1.0) / impactLifetime(kind));
@@ -359,15 +352,20 @@ export function projectImpact(state: Readonly<ImpactState>, i: number): Readonly
   else if (kind === IMPACT_MISSED_TECH) scale = f32(f32(0.7) + f32(progress * 0.5));
   const fade = f32(1.0 - progress);
   const opacity = kind === IMPACT_DUST ? f32(220 * strength) : 255.0;
-  return {
-    visible: true,
-    // Stock particles ignore alpha; keep live slots drawn until parked.
-    alpha: max(1, toInt(f32(f32(opacity * fade) * fade))),
-    scale: f32(scale * strength),
-    x: f32(originX + travel(drift, age)),
-    z: f32(f32(originZ + travel(at(state.driftZ, i), age)) + (kind === IMPACT_DUST ? f32(progress * 9) : 0.0)),
-    pitch: at(state.pitch, i),
-  };
+  // Stock particles ignore alpha; keep live slots drawn until parked.
+  return impactPose(out, max(1, toInt(f32(f32(opacity * fade) * fade))), f32(scale * strength), f32(originX + travel(drift, age)),
+    f32(f32(originZ + travel(at(state.driftZ, i), age)) + (kind === IMPACT_DUST ? f32(progress * 9) : 0.0)), at(state.pitch, i));
+}
+
+function impactPose(out: ImpactPose | undefined, alpha: number, scale: number, x: number, z: number, pitch: number): ImpactPose {
+  if (out === undefined) return { visible: true, alpha, scale, x, z, pitch };
+  out.visible = true;
+  out.alpha = alpha;
+  out.scale = scale;
+  out.x = x;
+  out.z = z;
+  out.pitch = pitch;
+  return out;
 }
 
 

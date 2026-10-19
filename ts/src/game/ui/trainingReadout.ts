@@ -20,6 +20,7 @@ export class TrainingReadout {
   private built = false;
 
   private empty = true;
+  private panelShown = false;
 
   constructor() {
     this.panel = createBackdrop("TrainingReadoutPanel", gameUi(), 892);
@@ -44,7 +45,7 @@ export class TrainingReadout {
 
   update(visible: boolean, state: Readonly<TrainingState>, bindings: Readonly<KeyBindings>): void {
     if (!visible) {
-      BlzFrameSetVisible(this.panel, false);
+      this.showPanel(false);
       return;
     }
     const last = this.shown;
@@ -60,6 +61,12 @@ export class TrainingReadout {
       this.empty = text === "";
       BlzFrameSetText(this.label, text);
     }
-    BlzFrameSetVisible(this.panel, !this.empty);
+    this.showPanel(!this.empty);
+  }
+
+  private showPanel(shown: boolean): void {
+    if (shown === this.panelShown) return;
+    this.panelShown = shown;
+    BlzFrameSetVisible(this.panel, shown);
   }
 }

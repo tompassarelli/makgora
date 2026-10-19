@@ -572,6 +572,10 @@ export function lockArenaCamera(s: ShellState): void {
 }
 
 
+const shownMessages: { frames: object | undefined; helpVisible: boolean | undefined; noticeVisible: boolean | undefined; help: string | undefined; notice: string | undefined } = {
+  frames: undefined, helpVisible: undefined, noticeVisible: undefined, help: undefined, notice: undefined,
+};
+
 export function renderUi(s: ShellState): void {
   if (resumePresentationHeld(s)) return;
   const { game } = s;
@@ -606,15 +610,38 @@ export function renderUi(s: ShellState): void {
   const cleared = game.lore && game.phase === Phase.result && game.run.active && game.run.cleared ? game.run.current : undefined;
   if (cleared !== undefined && localSlot() === game.run.player) loreClears().mark(cleared.id);
   const { help, notice } = s.frames;
+  if (shownMessages.frames !== s.frames) {
+    shownMessages.frames = s.frames;
+    shownMessages.helpVisible = undefined;
+    shownMessages.noticeVisible = undefined;
+    shownMessages.help = undefined;
+    shownMessages.notice = undefined;
+  }
   const teaching = game.phase === Phase.match && game.training && s.trainingHints === true && !paused;
-  BlzFrameSetVisible(help, showMatch && teaching);
+  const helpVisible = showMatch && teaching;
+  if (shownMessages.helpVisible !== helpVisible) {
+    shownMessages.helpVisible = helpVisible;
+    BlzFrameSetVisible(help, helpVisible);
+  }
   const waiting = game.phase === Phase.match ? activeRollback(s)?.waitingFor ?? 0 : 0;
-  BlzFrameSetVisible(notice, showMatch && (waiting !== 0 || (game.phase === Phase.result && !ui.match.resultsShown())));
+  const noticeVisible = showMatch && (waiting !== 0 || (game.phase === Phase.result && !ui.match.resultsShown()));
+  if (shownMessages.noticeVisible !== noticeVisible) {
+    shownMessages.noticeVisible = noticeVisible;
+    BlzFrameSetVisible(notice, noticeVisible);
+  }
   if (!selecting) {
     if (game.phase === Phase.result) ui.results.update(resultNotice(game, s.status.text).replace("\n", "  ·  "), matchHelp(game, s.session.paused, startControl(s), localFighter, false), resultChoicesOpen(game) && local !== undefined ? s.resultFocus?.[local] ?? DEFAULT_RESULT_PICK : undefined);
-    BlzFrameSetText(help, matchHelp(game, s.session.paused, startControl(s), localFighter, game.phase === Phase.match));
+    const helpText = matchHelp(game, s.session.paused, startControl(s), localFighter, game.phase === Phase.match);
+    if (shownMessages.help !== helpText) {
+      shownMessages.help = helpText;
+      BlzFrameSetText(help, helpText);
+    }
     probeWaiting(s.probe, waiting, localSlot());
-    BlzFrameSetText(notice, game.phase === Phase.result ? resultNotice(game, s.status.text) : waiting !== 0 ? waitingMessage(waiting) : "");
+    const noticeText = game.phase === Phase.result ? resultNotice(game, s.status.text) : waiting !== 0 ? waitingMessage(waiting) : "";
+    if (shownMessages.notice !== noticeText) {
+      shownMessages.notice = noticeText;
+      BlzFrameSetText(notice, noticeText);
+    }
   }
   ui.stage.update(game);
 }

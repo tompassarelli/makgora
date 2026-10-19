@@ -7,7 +7,7 @@ import { writeLines } from "wisp/src/platform/fileio";
 import { settleNextObservation } from "../../game/match/botPerception";
 import {
   ReplayBegin, beginMatchReplayFrame, continueMatchReplay, endMatchReplaySegment,
-  finishMatchReplay, matchReplayDone, matchReplayFrameRan, replayManifestLines, replayPartLines, takeMatchReplayPart,
+  finishMatchReplay, matchReplayDone, matchReplayFrameRan, observationsNeededFrom, replayManifestLines, replayPartLines, takeMatchReplayPart,
 } from "../../game/replay/matchReplay";
 import { momentInput } from "../../game/replay/moment";
 import { sourceVersion } from "../../game/shell/sourceVersion";
@@ -55,7 +55,7 @@ export function endReplaySegment(s: ShellState): void {
 export function serviceReplay(s: ShellState): void {
   const { recorder } = s.replay;
   if (!recorder.open) return;
-  settleNextObservation(s.runtime.botMemory);
+  settleNextObservation(s.runtime.botMemory, observationsNeededFrom(recorder));
   continueMatchReplay(recorder);
   if (matchReplayDone(recorder, s.game)) finishReplay(s);
   else writePart(s, false);

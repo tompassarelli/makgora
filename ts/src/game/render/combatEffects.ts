@@ -6,6 +6,7 @@ import {
   IMPACT_CHARGE,
   IMPACT_COUNT,
   IMPACT_GRAB,
+  IMPACT_KIND_COUNT,
   IMPACT_LEDGE_CATCH,
   IMPACT_LEDGE_RECOVERY,
   IMPACT_READY,
@@ -13,6 +14,7 @@ import {
   IMPACT_STAR_KO,
   IMPACT_THROW,
   IMPACTS_PER_KIND,
+  type ImpactPose,
   type ImpactState,
   advanceImpacts,
   clearImpactState,
@@ -94,6 +96,10 @@ export class CombatEffects {
   private koParked: (boolean | undefined)[] | undefined;
 
   private parked: ParkedFlags | undefined;
+
+  private readonly busyKinds: boolean[] = [];
+
+  private readonly pose: ImpactPose = { visible: false, alpha: 0, scale: 0.0, x: 0.0, z: 0.0, pitch: 0.0 };
 
   readonly x: number;
   readonly y: number;
@@ -244,34 +250,56 @@ export class CombatEffects {
     const shownAges = (this.shownAges ??= []);
     const parked = (this.parked ??= []);
     const count = this.impacts.length;
-    for (let i = 0; i < count; i++) {
-      const model = this.impacts[i];
-      if (model === undefined) continue;
-      const kind = floorDiv(i, IMPACTS_PER_KIND);
-      const source = kind === IMPACT_STAR_KO || kind === IMPACT_SCREEN_KO ? confirmed : state;
-      const age = source.ages[i];
-
-      const pose = playing && age !== undefined ? projectImpact(source, i) : undefined;
-      if (pose === undefined || !pose.visible) {
-
-        if (parked[i] !== true && (this.lateLive === 0 || this.late?.ages[i] === undefined)) parkOnce(model, this, parked, i);
-        shownAges[i] = undefined;
-        this.shownEmissions[i] = undefined;
-        continue;
-      }
-
-
-      const last = shownAges[i];
-      if (last !== undefined && age !== undefined && age < last) hideEffect(model, this);
-      if (last === undefined || age !== undefined && age < last) {
-        BlzSetSpecialEffectAnimation(model, impactAnimation(kind));
-        BlzSetSpecialEffectTime(model, impactStartSeconds(kind));
-      }
-      shownAges[i] = age;
-      if (age !== undefined) this.drawn(i, kind, frame - age);
-      this.place(model, i, kind, pose, source.strength[i] ?? 0.0);
+    const busyKinds = this.busyKinds;
+    for (let kind = 0; kind < IMPACT_KIND_COUNT; kind++) {
+      const first = kind * IMPACTS_PER_KIND;
+      if (first >= count) break;
+      if (busyKinds[kind] !== true && state.occupied[kind] === 0 && confirmed.occupied[kind] === 0) continue;
+      const last = Math.min(count, first + IMPACTS_PER_KIND);
+      for (let i = first; i < last; i++) this.presentImpact(i, kind, state, frame, confirmed, playing, shownAges, parked);
+      let busy = false;
+      for (let i = first; i < last; i++) if (parked[i] !== true || shownAges[i] !== undefined || this.shownEmissions[i] !== undefined) busy = true;
+      busyKinds[kind] = busy;
     }
     if (this.lateLive > 0) this.presentLate(state, frame, playing);
+    this.presentKo(frame, confirmed, playing, parked);
+  }
+
+  private presentImpact(i: number, kind: number, state: Readonly<ImpactState>, frame: number, confirmed: Readonly<ImpactState>, playing: boolean, shownAges: (number | undefined)[], parked: ParkedFlags): void {
+    const model = this.impacts[i];
+    if (model === undefined || this.idleImpact(i, state, confirmed, shownAges, parked)) return;
+    const source = kind === IMPACT_STAR_KO || kind === IMPACT_SCREEN_KO ? confirmed : state;
+    const age = source.ages[i];
+
+    const pose = playing && age !== undefined ? projectImpact(source, i, this.pose) : undefined;
+    if (pose === undefined || !pose.visible) {
+
+      if (parked[i] !== true && (this.lateLive === 0 || this.late?.ages[i] === undefined)) parkOnce(model, this, parked, i);
+      shownAges[i] = undefined;
+      this.shownEmissions[i] = undefined;
+      return;
+    }
+
+    this.showImpact(model, i, kind, age, frame, shownAges);
+    this.place(model, i, kind, pose, source.strength[i] ?? 0.0);
+  }
+
+  private idleImpact(i: number, state: Readonly<ImpactState>, confirmed: Readonly<ImpactState>, shownAges: readonly (number | undefined)[], parked: ParkedFlags): boolean {
+    return parked[i] === true && state.ages[i] === undefined && confirmed.ages[i] === undefined && shownAges[i] === undefined && this.shownEmissions[i] === undefined;
+  }
+
+  private showImpact(model: effect, i: number, kind: number, age: number | undefined, frame: number, shownAges: (number | undefined)[]): void {
+    const last = shownAges[i];
+    if (last !== undefined && age !== undefined && age < last) hideEffect(model, this);
+    if (last === undefined || age !== undefined && age < last) {
+      BlzSetSpecialEffectAnimation(model, impactAnimation(kind));
+      BlzSetSpecialEffectTime(model, impactStartSeconds(kind));
+    }
+    shownAges[i] = age;
+    if (age !== undefined) this.drawn(i, kind, frame - age);
+  }
+
+  private presentKo(frame: number, confirmed: Readonly<ImpactState>, playing: boolean, parked: ParkedFlags): void {
     this.presentKoFlash(frame, playing);
     const koParked = (this.koParked ??= []);
     for (let i = 0; i < this.koBodies.length; i++) {
@@ -318,6 +346,7 @@ export class CombatEffects {
   private place(model: effect, i: number, kind: number, pose: ReturnType<typeof projectImpact>, strength: number): void {
     const parked = (this.parked ??= []);
     parked[i] = false;
+    this.busyKinds[kind] = true;
     this.tint(model, i, kind, strength);
 
     const depth = kind === IMPACT_STAR_KO ? STAR_KO_DEPTH
@@ -371,7 +400,7 @@ export class CombatEffects {
           BlzSetSpecialEffectAnimation(model, impactAnimation(kind));
           BlzSetSpecialEffectTime(model, impactStartSeconds(kind));
         }
-        this.place(model, i, kind, projectImpact(late, i), late.strength[i] ?? 0.0);
+        this.place(model, i, kind, projectImpact(late, i, this.pose), late.strength[i] ?? 0.0);
       }
     }
     if (advance) advanceImpacts(late);

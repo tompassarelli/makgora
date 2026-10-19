@@ -14,7 +14,7 @@ import { INPUT_ROW_NUMBERS, type InputRow, emptyInput, loadInputNumbers, storeIn
 import { PARTICIPANT_SLOTS, type ParticipantInputs, type Slots, participantActive } from "../input/participants";
 import { type FrameControls, createFrameControls } from "../match/controls";
 import { type SavedBotStrategy, restoredBotStrategy, savedBotStrategy } from "../match/botStrategy";
-import { settleBotMemoryChecksums } from "../match/botPerception";
+import { settleBotMemoryChecksums, settleObservations } from "../match/botPerception";
 import { padDecimal } from "../netcode/journal/decimal";
 import { type MatchFrameInput, captureFrame, captureNetworkFrame, createMatchFrameInput, executeMatchFrame } from "../match/frameInput";
 import type { PacingAndPresentation } from "../match/pacingAndPresentation";
@@ -315,9 +315,23 @@ interface SavedMoment {
 
 
 
+const MOMENT_OBSERVATIONS_PER_CALLBACK = 4;
+
+function momentSaveState(recorder: Readonly<MomentRecorder>, step: number): Readonly<ReplayState> | undefined {
+  const save = recorder.save;
+  if (save === undefined) return undefined;
+  if (step === 0) return recorder.saveEnd;
+  if (step === 1) return recorder.saveStart;
+  const checkpoint = step - 2;
+  return checkpoint < save.checkpoints.length ? at(recorder.snapshots, at(save.checkpoints, checkpoint)) : recorder.saveStart;
+}
+
+
 export function continueMomentSave(recorder: MomentRecorder, scratch: ReplayState): SavedMoment | undefined {
   const { save } = recorder;
   if (save === undefined) return undefined;
+  const pending = momentSaveState(recorder, save.step);
+  if (pending !== undefined && !settleObservations(pending.runtime.botMemory, MOMENT_OBSERVATIONS_PER_CALLBACK)) return undefined;
   const step = save.step++;
   const checkpoint = step - 2;
   if (step === 0) save.checksum = checksumOf(scratch, recorder.saveEnd);

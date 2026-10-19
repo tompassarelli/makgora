@@ -174,6 +174,7 @@ export class SpecialCueEffects {
     let z = 0.0;
     let key = 0;
     let cueName = "normal attack";
+    let attackNamed = false;
     let strikeScale = 1.0;
     if (fighter !== undefined && playing) {
       const special = specialCueState(fighter);
@@ -188,7 +189,7 @@ export class SpecialCueEffects {
       } else {
         const attack = attackCueState(fighter, this.attack);
         cue = attack.cue;
-        for (const entries of Object.values(ATTACK_CUES[this.character] ?? {})) for (const entry of entries ?? []) if (entry.cue === cue) cueName = entry.name;
+        attackNamed = true;
         if (cue !== undefined && cue.anchor === "overhead") {
           x = 0.0;
           z = CUE_ANCHORS.overhead.z * this.scale;
@@ -220,6 +221,7 @@ export class SpecialCueEffects {
       BlzSetSpecialEffectScale(this.missing, 1.5 * this.scale);
       BlzSetSpecialEffectColor(this.missing, 255, 0, 255);
       BlzSetSpecialEffectAlpha(this.missing, 255);
+      if (attackNamed) for (const entries of Object.values(ATTACK_CUES[this.character] ?? {})) for (const entry of entries ?? []) if (entry.cue === cue) cueName = entry.name;
       const identity = `${cueName}: ${cue.model}`;
       if (this.reported[identity] !== true) {
         this.reported[identity] = true;

@@ -15,7 +15,7 @@
 import { at } from "wisp/src/runtime/lookup";
 import { lineTokens, parseRecord, recordTokens } from "wisp/src/runtime/recordText";
 import { type Repro, type ReproResult, reproLines } from "wisp/src/runtime/repro";
-import { floorMod } from "wisp/src/sim/intMath";
+import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { type FrameControls, createFrameControls } from "../match/controls";
 import { createMatchFrameInput } from "../match/frameInput";
@@ -27,7 +27,7 @@ import { Character } from "../sim/codes";
 import { type Fighter } from "../sim/fighter";
 import { authoredTuning } from "../sim/tuning";
 import { botStrategyValues } from "../match/botStrategy";
-import { settleObservationChecksum } from "../match/botPerception";
+import { BOT_HISTORY_FRAMES, settleObservationChecksum, settleObservations } from "../match/botPerception";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import {
   type FrameRows, type FrameScratch, KEYED_BY_ACTION, type MomentInput, type MomentRecorder, ROW_FRAMES, SNAPSHOT_FRAMES,
@@ -45,6 +45,10 @@ export const CHECKPOINT_FRAMES = SNAPSHOT_FRAMES;
 export const PART_LINES = 48;
 
 const STATE_TOKENS_PER_CALLBACK = 32;
+
+const OBSERVATIONS_PER_CALLBACK = 4;
+
+const OBSERVATION_FRAME_MARGIN = 2;
 
 const STATE_PIECE_DEPTH = 2;
 
@@ -274,6 +278,7 @@ export interface MatchReplayRecorder {
 
   readonly checkpointState: ReplayState;
   checkpoint: PendingCheckpoint | undefined;
+  ending: PendingEnding | undefined;
 
   scanned: number;
 
@@ -307,6 +312,12 @@ interface PendingFold {
 
 interface PendingCheckpoint extends PendingFold {
   readonly frame: number;
+}
+
+
+interface PendingEnding {
+  readonly frame: number;
+  readonly boundary: boolean;
 }
 
 function beginFold(world: Readonly<Roster>): PendingFold {
@@ -348,7 +359,7 @@ function stepFold(fold: PendingFold, world: Readonly<Roster>): boolean {
 export function createMatchReplayRecorder(): MatchReplayRecorder {
   return {
     open: false, segmentStart: 0, encoded: 0, last: 0, ended: false, checksum: "",
-    start: createReplaySnapshot(), scratch: createReplaySnapshot(), checkpointState: createReplaySnapshot(), checkpoint: undefined,
+    start: createReplaySnapshot(), scratch: createReplaySnapshot(), checkpointState: createReplaySnapshot(), checkpoint: undefined, ending: undefined,
     scanned: 0, runs: [], runIndex: 0, runCount: 0, text: undefined, digests: [], lines: [], parts: 0, failed: false,
   };
 }
@@ -401,6 +412,7 @@ function continueStateText(recorder: MatchReplayRecorder, budget: number): void 
 
 
 function beginSegment(recorder: MatchReplayRecorder, start: number, world: Readonly<Roster>, match: Readonly<MatchState>, controls: Readonly<FrameControls>, runtime: Readonly<PacingAndPresentation>): void {
+  finishEnding(recorder);
   finishStateText(recorder);
   finishCheckpoint(recorder);
   captureReplaySnapshot(recorder.start, world, match, controls, runtime);
@@ -496,6 +508,29 @@ function finishCheckpoint(recorder: MatchReplayRecorder): void {
 }
 
 
+function stepEnding(recorder: MatchReplayRecorder, budget: number): boolean {
+  const ending = recorder.ending;
+  if (ending === undefined) return false;
+  const { world, match, runtime } = recorder.scratch;
+  if (!settleObservations(runtime.botMemory, budget)) return true;
+  recorder.ending = undefined;
+  recorder.checksum = replayChecksum(world, match, runtime);
+  if (!ending.boundary) recorder.lines.push(`checkpoint ${ending.frame} ${recorder.checksum}`);
+  return false;
+}
+
+
+function finishEnding(recorder: MatchReplayRecorder): void {
+  while (stepEnding(recorder, Number.MAX_SAFE_INTEGER));
+}
+
+
+export function observationsNeededFrom(recorder: Readonly<MatchReplayRecorder>): number {
+  const next = recorder.checkpoint?.frame ?? recorder.segmentStart + (floorDiv(recorder.last - recorder.segmentStart, CHECKPOINT_FRAMES) + 1) * CHECKPOINT_FRAMES;
+  return next - BOT_HISTORY_FRAMES - OBSERVATION_FRAME_MARGIN;
+}
+
+
 
 
 
@@ -527,24 +562,26 @@ export function endMatchReplaySegment(recorder: MatchReplayRecorder, moment: Rea
   recorder.ended = true;
   finishCheckpoint(recorder);
   if (!encodeRows(recorder, moment, recorder.last)) recorder.failed = true;
-  recorder.checksum = checksumVia(recorder.scratch, { world, match, controls, runtime });
-  if (recorder.last > recorder.segmentStart && floorMod(recorder.last - recorder.segmentStart, CHECKPOINT_FRAMES) === 0) return;
-  recorder.lines.push(`checkpoint ${recorder.last} ${recorder.checksum}`);
+  copyReplayState(recorder.scratch, { world, match, controls, runtime });
+  recorder.ending = { frame: recorder.last, boundary: recorder.last > recorder.segmentStart && floorMod(recorder.last - recorder.segmentStart, CHECKPOINT_FRAMES) === 0 };
 }
 
 
 export function continueMatchReplay(recorder: MatchReplayRecorder): void {
   stepCheckpoint(recorder);
+  stepEnding(recorder, OBSERVATIONS_PER_CALLBACK);
   continueStateText(recorder, STATE_TOKENS_PER_CALLBACK);
 }
 
 
 export function matchReplayDone(recorder: Readonly<MatchReplayRecorder>, match: Readonly<MatchState>): boolean {
-  return recorder.open && recorder.text === undefined && match.phase !== Phase.match;
+  return recorder.open && recorder.text === undefined && recorder.ending === undefined && match.phase !== Phase.match;
 }
 
 
 export function takeMatchReplayPart(recorder: MatchReplayRecorder, all: boolean): readonly string[] | undefined {
+  if (all) finishEnding(recorder);
+  else if (recorder.ending !== undefined) return undefined;
   if (recorder.lines.length === 0 || (!all && recorder.lines.length < PART_LINES)) return undefined;
 
   if (all) finishStateText(recorder);
@@ -562,6 +599,7 @@ export function takeMatchReplayPart(recorder: MatchReplayRecorder, all: boolean)
 export function finishMatchReplay(recorder: MatchReplayRecorder, moment: Readonly<MomentRecorder>, world: Readonly<Roster>, match: Readonly<MatchState>, controls: Readonly<FrameControls>, runtime: Readonly<PacingAndPresentation>): { readonly frame: number; readonly checksum: string } | undefined {
   if (!recorder.open) return undefined;
   endMatchReplaySegment(recorder, moment, world, match, controls, runtime);
+  finishEnding(recorder);
   finishStateText(recorder);
   recorder.open = false;
   return recorder.failed || recorder.last === 0 ? undefined : { frame: recorder.last, checksum: recorder.checksum };

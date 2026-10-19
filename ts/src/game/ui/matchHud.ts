@@ -22,6 +22,8 @@ export function plateManaSlot(position: number, count: number): { readonly left:
 
 export class MatchClock {
   private readonly label: framehandle;
+  private shownVisible = false;
+  private shownSeconds: number | undefined;
 
   constructor() {
     this.label = createText("MatchClock", gameUi(), 890);
@@ -38,7 +40,12 @@ export class MatchClock {
   }
 
   update(visible: boolean, seconds: number): void {
-    BlzFrameSetVisible(this.label, visible);
+    if (this.shownVisible !== visible) {
+      this.shownVisible = visible;
+      BlzFrameSetVisible(this.label, visible);
+    }
+    if (this.shownSeconds === seconds) return;
+    this.shownSeconds = seconds;
     const remainder = imod(seconds, 60);
     BlzFrameSetText(this.label, `${I2S(idiv(seconds, 60))}:${remainder < 10 ? "0" : ""}${I2S(remainder)}`);
   }
@@ -63,6 +70,7 @@ export class FighterHud {
   private shownVisible: boolean | undefined;
   private shownDamage: string | undefined;
   private shownTenths: string | undefined;
+  private shownDamageValue: number | undefined;
   private shownStocks: number | undefined;
 
   private left = 0.0;
@@ -155,15 +163,18 @@ export class FighterHud {
       for (const icon of this.stocks) BlzFrameSetTexture(icon, fighterPortrait(character, "Stock", this.slot), 0, true);
     }
     this.shake(visible, damage);
-    const shownDamage = damageWhole(damage);
-    if (this.shownDamage !== shownDamage) {
-      this.shownDamage = shownDamage;
-      BlzFrameSetText(this.damage, shownDamage);
-    }
-    const shownTenths = damageTenths(damage);
-    if (this.shownTenths !== shownTenths) {
-      this.shownTenths = shownTenths;
-      BlzFrameSetText(this.tenths, shownTenths);
+    if (this.shownDamageValue !== damage) {
+      this.shownDamageValue = damage;
+      const shownDamage = damageWhole(damage);
+      if (this.shownDamage !== shownDamage) {
+        this.shownDamage = shownDamage;
+        BlzFrameSetText(this.damage, shownDamage);
+      }
+      const shownTenths = damageTenths(damage);
+      if (this.shownTenths !== shownTenths) {
+        this.shownTenths = shownTenths;
+        BlzFrameSetText(this.tenths, shownTenths);
+      }
     }
     const shownStocks = visible ? stocks : 0;
     const previous = this.shownStocks;

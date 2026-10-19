@@ -638,13 +638,24 @@ export function settleObservationChecksum(sample: BotObservationFrame): void {
   sample.checksumSecond = checksumSecond;
 }
 
-/** Settles one waiting sample per callback, including callbacks waiting for remote input. */
-export function settleNextObservation(memory: Readonly<BotMemory>): void {
+/** Settles one waiting sample from `firstFrame` on per callback, including callbacks waiting for remote input. */
+export function settleNextObservation(memory: Readonly<BotMemory>, firstFrame: number): void {
   for (const sample of memory.history) {
-    if (sample.checksumFirst !== UNSETTLED) continue;
+    if (sample.checksumFirst !== UNSETTLED || sample.frame < firstFrame) continue;
     settleObservationChecksum(sample);
     return;
   }
+}
+
+export function settleObservations(memory: Readonly<BotMemory>, budget: number): boolean {
+  let left = budget;
+  for (const sample of memory.history) {
+    if (sample.checksumFirst !== UNSETTLED) continue;
+    if (left <= 0) return false;
+    settleObservationChecksum(sample);
+    left--;
+  }
+  return true;
 }
 
 /** Settles every retained sample's checksum, before a memory is written out as text. */
