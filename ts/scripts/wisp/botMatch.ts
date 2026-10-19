@@ -132,7 +132,7 @@ function wobbled(row: InputRow, frame: number): InputRow {
   return { ...row, axisZ: floorMod(frame, 2) };
 }
 
-export function playBotMatch(clients: Lockstep, match: BotMatch, frames: number, measure: PerfMeasure, build: MapBuild = INTEGRITY_BUILD): { problems: number; lines: string[] } {
+export function playBotMatch(clients: Lockstep, match: BotMatch, frames: number, measure: PerfMeasure, build: MapBuild = INTEGRITY_BUILD, played?: () => void): { problems: number; lines: string[] } {
   const keyboard = build.input.kind !== "journal";
   const helpers = new JournalHelpers(build.id, true);
   helpers.rows = match.everyRowChanges === true ? (_slot, frame) => wobbled(botBeatRow(frame), frame) : (_slot, frame) => botBeatRow(frame);
@@ -175,7 +175,10 @@ export function playBotMatch(clients: Lockstep, match: BotMatch, frames: number,
   const frame = () => {
     pressBeat();
     clients.frames(1);
-    if (beating) scanHandles();
+    if (beating) {
+      scanHandles();
+      played?.();
+    }
     clients.clients.forEach((player, index) => {
       const tap = tapped[index] ?? 0;
       if (tap === 0) return;

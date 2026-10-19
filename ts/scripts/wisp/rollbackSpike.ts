@@ -10,6 +10,8 @@ export interface LagSpikes {
 
 export const DEEP_ROLLBACK_SPIKES: LagSpikes = { first: 240, period: 301, hold: 40 };
 
+export const DEEP_ROLLBACK_DEPTHS: readonly number[] = [24, 24, 24, 23];
+
 export function lagSpikeDelivery(base: SyncDelivery, spikes: LagSpikes, senders: number): SyncDelivery {
   const last = new Map<number, number>();
   return {
@@ -25,15 +27,31 @@ export function lagSpikeDelivery(base: SyncDelivery, spikes: LagSpikes, senders:
   };
 }
 
-interface DepthShell { readonly rollback?: { readonly window: number; readonly net: { readonly depths: readonly number[] } } }
+interface DepthShell {
+  readonly rollback?: {
+    readonly window: number;
+    readonly net: { readonly depths: readonly number[] };
+    readonly schedule: { knownThrough(): number; nextConfirmedFrame(): number };
+  };
+}
 
 const hasRollback = (shell: unknown): shell is DepthShell => typeof shell === "object" && shell !== null && "rollback" in shell;
 
-export function deepestRollback(client: HeadlessClient): { readonly window: number; readonly deepest: number; readonly corrections: number } | undefined {
+function rollbackOf(client: HeadlessClient): DepthShell["rollback"] {
   let shell: unknown = client.natives.__smashcraftShell;
   if (!hasRollback(shell)) client.run(() => { shell = globalThis.__smashcraftShell; });
-  if (!hasRollback(shell) || shell.rollback === undefined) return undefined;
-  const { depths } = shell.rollback.net;
+  return hasRollback(shell) ? shell.rollback : undefined;
+}
+
+export function confirmedLag(client: HeadlessClient): number | undefined {
+  const rollback = rollbackOf(client);
+  return rollback === undefined ? undefined : rollback.schedule.knownThrough() - rollback.schedule.nextConfirmedFrame() + 1;
+}
+
+export function deepestRollback(client: HeadlessClient): { readonly window: number; readonly deepest: number; readonly corrections: number } | undefined {
+  const rollback = rollbackOf(client);
+  if (rollback === undefined) return undefined;
+  const { depths } = rollback.net;
   let deepest = 0;
   let corrections = 0;
   for (let depth = 0; depth < depths.length; depth++) {
@@ -41,5 +59,5 @@ export function deepestRollback(client: HeadlessClient): { readonly window: numb
     corrections += count;
     if (count > 0) deepest = depth;
   }
-  return { window: shell.rollback.window, deepest, corrections };
+  return { window: rollback.window, deepest, corrections };
 }

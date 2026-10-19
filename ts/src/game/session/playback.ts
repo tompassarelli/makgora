@@ -116,7 +116,7 @@ export function repairBudget(speculative: number, depth: number): { readonly fra
 
 
 
-export const confirmedBudget = (confirmable: number): number => (confirmable > 2 * CATCH_UP_FRAMES ? CATCH_UP_FRAMES : 3);
+export const confirmedBudget = (confirmable: number, journal: boolean): number => (journal && confirmable > 2 * CATCH_UP_FRAMES ? CATCH_UP_FRAMES : 3);
 
 
 

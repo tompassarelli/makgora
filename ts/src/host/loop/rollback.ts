@@ -315,7 +315,7 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
     probeIntegrity(probe, `rollback ${epoch} ${depth}`);
   }
   const confirmable = Math.min(schedule.confirmedFrame(), known);
-  const confirmSteps = confirmedBudget(confirmable - schedule.nextConfirmedFrame() + 1);
+  const confirmSteps = confirmedBudget(confirmable - schedule.nextConfirmedFrame() + 1, journal !== undefined);
 
 
 
