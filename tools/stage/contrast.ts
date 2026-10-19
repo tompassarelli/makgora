@@ -37,7 +37,27 @@ function de2000([l1, a1, b1]: Lab, [l2, a2, b2]: Lab): number {
 
 export interface ContrastRow { readonly frame: string; readonly fighterL: number; readonly ringL: number; readonly absDL: number; readonly dE00: number; readonly frameL: number; readonly localDL: number }
 
-export async function measure(maskPath: string, frames: readonly string[]): Promise<{ readonly summary: string; readonly rows: readonly ContrastRow[] }> {
+interface Silhouettes { readonly width: number; readonly height: number; readonly fighter: Uint8Array; readonly fighters: readonly Uint8Array[]; readonly summary: string }
+
+function dilation(src: Uint8Array, width: number, height: number, r: number): Uint8Array {
+  const out = new Uint8Array(src.length);
+  for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) { if (!src[y * width + x]) continue; for (let dy = Math.max(-r, -y); dy <= r && y + dy < height; dy++) out.fill(1, (y + dy) * width + Math.max(0, x - r), (y + dy) * width + Math.min(width, x + r + 1)); }
+  return out;
+}
+
+function components(on: Uint8Array, width: number, height: number): { readonly label: Int32Array; readonly sizes: number[] } {
+  const label = new Int32Array(width * height).fill(-1); const sizes: number[] = [];
+  for (let i = 0; i < on.length; i++) {
+    if (!on[i] || label[i] !== -1) continue;
+    const id = sizes.length; let size = 0; const stack = [i]; label[i] = id;
+    while (stack.length) { const p = stack.pop()!; size++; const px = p % width, py = (p - px) / width;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) { const nx = px + dx, ny = py + dy; if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue; const n = ny * width + nx; if (on[n] && label[n] === -1) { label[n] = id; stack.push(n); } } }
+    sizes.push(size);
+  }
+  return { label, sizes };
+}
+
+async function silhouettes(maskPath: string): Promise<Silhouettes> {
   const mask = await load(maskPath);
   const { width, height } = mask;
   const counts = new Map<number, number>();
@@ -49,20 +69,23 @@ export async function measure(maskPath: string, frames: readonly string[]): Prom
     const i = y * width + x; const [r, g, b] = [mask.rgb[i * 3]!, mask.rgb[i * 3 + 1]!, mask.rgb[i * 3 + 2]!];
     if (Math.abs(r - er) + Math.abs(g - eg) + Math.abs(b - eb) > 40) on[i] = 1;
   }
-  const label = new Int32Array(width * height).fill(-1); const sizes: number[] = [];
-  for (let i = 0; i < on.length; i++) {
-    if (!on[i] || label[i] !== -1) continue;
-    const id = sizes.length; let size = 0; const stack = [i]; label[i] = id;
-    while (stack.length) { const p = stack.pop()!; size++; const px = p % width, py = (p - px) / width;
-      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]] as const) { const nx = px + dx, ny = py + dy; if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue; const n = ny * width + nx; if (on[n] && label[n] === -1) { label[n] = id; stack.push(n); } } }
-    sizes.push(size);
-  }
+  const { label, sizes } = components(on, width, height);
   if (sizes.length === 0) throw new Error(`${maskPath}: no fighter silhouette found`);
   const minimum = Math.max(...sizes) * 0.25;
   const fighter = new Uint8Array(width * height);
   for (let i = 0; i < on.length; i++) if (label[i]! >= 0 && sizes[label[i]!]! >= minimum) fighter[i] = 1;
-  const dilate = (src: Uint8Array, r: number) => { const out = new Uint8Array(src.length); for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) { if (!src[y * width + x]) continue; for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) { const nx = x + dx, ny = y + dy; if (nx >= 0 && ny >= 0 && nx < width && ny < height) out[ny * width + nx] = 1; } } return out; };
-  const inner = dilate(fighter, 4), outer = dilate(fighter, 18);
+  const grouped = components(dilation(fighter, width, height, Math.max(2, Math.round(height / 180))), width, height);
+  const fighters = grouped.sizes.map(() => new Uint8Array(width * height));
+  const left = grouped.sizes.map(() => width);
+  for (let i = 0; i < fighter.length; i++) if (fighter[i]) { const id = grouped.label[i]!; fighters[id]![i] = 1; left[id] = Math.min(left[id]!, i % width); }
+  const order = fighters.map((_, id) => id).sort((a, b) => left[a]! - left[b]!);
+  let fighterCount = 0; for (const v of fighter) fighterCount += v;
+  return { width, height, fighter, fighters: order.map(id => fighters[id]!), summary: `mask ${maskPath}: empty rgb(${er},${eg},${eb}), fighters ${fighterCount} px in ${sizes.filter(s => s >= minimum).length} blobs` };
+}
+
+export async function measure(maskPath: string, frames: readonly string[]): Promise<{ readonly summary: string; readonly rows: readonly ContrastRow[] }> {
+  const { width, height, fighter, summary } = await silhouettes(maskPath);
+  const inner = dilation(fighter, width, height, 4), outer = dilation(fighter, width, height, 18);
   let fighterCount = 0; for (const v of fighter) fighterCount += v;
   const rows: ContrastRow[] = [];
   for (const path of frames) {
@@ -73,7 +96,35 @@ export async function measure(maskPath: string, frames: readonly string[]): Prom
     let local = 0; for (let i = 0; i < width * height; i++) if (fighter[i]) local += Math.abs(lab(image.rgb[i * 3]!, image.rgb[i * 3 + 1]!, image.rgb[i * 3 + 2]!)[0] - ring[0]);
     rows.push({ frame: path.split("/").pop() ?? path, fighterL: f[0], ringL: ring[0], absDL: Math.abs(f[0] - ring[0]), dE00: de2000(f, ring), frameL: all[0], localDL: local / fighterCount });
   }
-  return { summary: `mask ${maskPath}: empty rgb(${er},${eg},${eb}), fighters ${fighterCount} px in ${sizes.filter(s => s >= minimum).length} blobs`, rows };
+  return { summary, rows };
+}
+
+export const SEPARATION_LIMIT = 0;
+const SEPARATION_FIGHTERS = 2;
+
+export interface SeparationRow { readonly fighter: number; readonly pixels: number; readonly fighterBand: readonly [number, number]; readonly backdropBand: readonly [number, number]; readonly gap: number }
+
+const quantile = (sorted: Float32Array, q: number) => sorted[Math.min(sorted.length - 1, Math.floor(q * sorted.length))]!;
+
+export async function separation(maskPath: string, scenePath: string, backdropPath: string): Promise<readonly SeparationRow[]> {
+  const { width, height, fighters } = await silhouettes(maskPath);
+  const [scene, backdrop] = await Promise.all([load(scenePath), load(backdropPath)]);
+  for (const [path, image] of [[scenePath, scene], [backdropPath, backdrop]] as const) if (image.width !== width || image.height !== height) throw new Error(`${path}: mask and frame dimensions differ`);
+  const lightness = (image: Frame, i: number) => lab(image.rgb[i * 3]!, image.rgb[i * 3 + 1]!, image.rgb[i * 3 + 2]!)[0];
+  const sizes = fighters.map(body => body.reduce((sum, v) => sum + v, 0));
+  const pair = fighters.map((_, id) => id).sort((x, y) => sizes[y]! - sizes[x]!).slice(0, SEPARATION_FIGHTERS).sort((x, y) => x - y);
+  return pair.map((id, fighter) => {
+    const body = fighters[id]!;
+    let top = height, bottom = 0, pixels = 0;
+    for (let i = 0; i < body.length; i++) if (body[i]) { const y = (i - (i % width)) / width; top = Math.min(top, y); bottom = Math.max(bottom, y); pixels++; }
+    const around = dilation(body, width, height, Math.ceil((bottom - top + 1) / 2));
+    const own: number[] = [], behind: number[] = [];
+    for (let i = 0; i < body.length; i++) { if (body[i]) own.push(lightness(scene, i)); if (around[i]) behind.push(lightness(backdrop, i)); }
+    const f = Float32Array.from(own).sort(), b = Float32Array.from(behind).sort();
+    const fighterBand = [quantile(f, 0.25), quantile(f, 0.75)] as const, backdropBand = [quantile(b, 0.25), quantile(b, 0.75)] as const;
+    const gap = quantile(f, 0.5) >= quantile(b, 0.5) ? fighterBand[0] - backdropBand[1] : backdropBand[0] - fighterBand[1];
+    return { fighter, pixels, fighterBand, backdropBand, gap };
+  });
 }
 
 const STOCK_LIGHT = { terrain: "Environment\\DNC\\DNCLordaeron\\DNCLordaeronTerrain\\DNCLordaeronTerrain.mdl", unit: "Environment\\DNC\\DNCLordaeron\\DNCLordaeronUnit\\DNCLordaeronUnit.mdl" };
@@ -160,10 +211,27 @@ async function stockLightCheck(args: readonly string[]): Promise<number> {
   return failed === 0 && empty === 0 ? 0 : 1;
 }
 
+async function separationCheck(paths: readonly string[]): Promise<number> {
+  if (paths.length === 0 || paths.length % 3 !== 0) throw new Error("usage: bun tools/stage/contrast.ts --separation MASK.png SCENE.png BACKDROP.png [MASK.png SCENE.png BACKDROP.png...]");
+  console.log("scene\tfighter\tpixels\tfighter L* P25-P75\tbackdrop L* P25-P75\tgap");
+  let worst = Infinity;
+  for (let index = 0; index < paths.length; index += 3) {
+    const [mask, scene, backdrop] = [paths[index]!, paths[index + 1]!, paths[index + 2]!];
+    for (const row of await separation(mask, scene, backdrop)) {
+      worst = Math.min(worst, row.gap);
+      console.log(`${scene}\t${row.fighter}\t${row.pixels}\t${row.fighterBand.map(v => v.toFixed(1)).join("-")}\t${row.backdropBand.map(v => v.toFixed(1)).join("-")}\t${row.gap.toFixed(1)}`);
+    }
+  }
+  const pass = Number(worst.toFixed(1)) >= SEPARATION_LIMIT;
+  console.log(`${pass ? "PASS" : "FAIL"}: worst fighter band gap ${worst.toFixed(1)} L* (limit ${SEPARATION_LIMIT})`);
+  return pass ? 0 : 1;
+}
+
 if (import.meta.main) {
   const [first, ...rest] = Bun.argv.slice(2);
   if (first === "--stock-light") process.exit(await stockLightCheck(rest));
-  if (first === undefined || rest.length === 0) throw new Error("usage: bun tools/stage/contrast.ts MASK.png FRAME.png... | --stock-light [--half] [--out DIR] [STAGE...]");
+  if (first === "--separation") process.exit(await separationCheck(rest));
+  if (first === undefined || rest.length === 0) throw new Error("usage: bun tools/stage/contrast.ts MASK.png FRAME.png... | --stock-light [--half] [--out DIR] [STAGE...] | --separation MASK.png SCENE.png BACKDROP.png...");
   const { summary, rows } = await measure(first, rest);
   console.log(summary);
   console.log("frame\tfighterL\tringL\tabsDL\tdE00\tframeL\tlocalDL");

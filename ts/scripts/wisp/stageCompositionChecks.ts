@@ -102,3 +102,33 @@ export const STAGE_FOG_CHECKS: readonly NativeCheck[] = STAGE_CATALOG.flatMap(({
     look: `${name}: compare the same paused far camera under authored distance fog and 3.0 height fog. Record which bases fade below the deck, whether sky and fighters retain their colours, and the graphics mode. The height parameters are a native tuning candidate, not the default profile.`,
   }));
 });
+
+export const SEPARATION_PAIR = "Shadow Hunter / Chen Stormstout";
+
+export const FIGHTER_SEPARATION_CHECKS: readonly NativeCheck[] = STAGE_CATALOG.flatMap(({ id, name }): NativeCheck[] => (["near", "far"] as const).flatMap((extreme): NativeCheck[] => {
+  const shared = { closes: "fighter band separation (visual-quality.md)", map: "floating-stages", session: "floating-stages" };
+  const frames = (name: string) => [{ kind: "frames", name, client: "a" }, { kind: "frames", name, client: "b" }] as const;
+  return [
+    {
+      ...shared, id: `sep-${id}-${extreme}-scene`,
+      setup: [
+        ...(extreme === "near" ? [{ chat: "-dev reset" }, { chat: "-dev items off" }, { chat: "-dev drops off" }, { chat: "-dev hazards off" }, { chat: `-dev quick stage ${id} pair ${SEPARATION_PAIR}` }, { waitMs: 5000 }, { keys: ["BackSpace"], client: "a" }] : [{ chat: "-dev backdrop on" }]),
+        { chat: `-dev view ${extreme}` }, { keys: ["h"], client: "a" }, { waitMs: 20000 },
+      ],
+      capture: [...frames("scene")], pass: [...entryRules(id)],
+      look: `${name}, ${extreme} camera: Shadow Hunter (darkest) and Chen (warmest) paused on the deck.`,
+    },
+    {
+      ...shared, id: `sep-${id}-${extreme}-backdrop`,
+      setup: [{ chat: "-dev hide fighter 0" }, { chat: "-dev hide fighter 1" }, { keys: ["h"], client: "a" }, { waitMs: 20000 }],
+      capture: [...frames("backdrop")], pass: [{ kind: "receipt", pattern: "^error \\d+ in ", max: 0 }],
+      look: `${name}, ${extreme} camera: the same paused scene with both fighters hidden.`,
+    },
+    {
+      ...shared, id: `sep-${id}-${extreme}-mask`,
+      setup: [{ chat: "-dev show fighter 0" }, { chat: "-dev show fighter 1" }, { chat: "-dev backdrop off" }, { waitMs: 13000 }],
+      capture: [...frames("mask")], pass: [{ kind: "receipt", pattern: "^error \\d+ in ", max: 0 }],
+      look: `${name}, ${extreme} camera: the same paused fighters alone; run \`bun tools/stage/contrast.ts --separation MASK SCENE BACKDROP\`.`,
+    },
+  ];
+}));

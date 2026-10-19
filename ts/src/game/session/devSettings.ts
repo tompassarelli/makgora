@@ -100,16 +100,21 @@ export interface QuickStageSettings {
   view?: "near" | "far" | "off";
 
   fog?: "on" | "off";
+  pair?: readonly [Character, Character];
 }
 
 export function quickStageSettings(message: string): QuickStageSettings | undefined {
   if (message === QUICK_MATCH_COMMAND) return { stage: 0 };
   if (message === FROZEN_THRONE_QUICK_COMMAND) return { stage: 2 };
   if (!message.startsWith("-dev quick stage ")) return undefined;
-  const words = message.substring(17).split(" ");
+  const at = message.indexOf(" pair ");
+  const pair = at < 0 ? undefined : quickMatchPair(`-dev quick pair ${message.substring(at + 6)}`);
+  if (at >= 0 && pair === undefined) return undefined;
+  const words = message.substring(17, at < 0 ? message.length : at).split(" ");
   const stage = commandInteger(words[0] ?? "");
   if (stage === undefined || !selectableStage(stage)) return undefined;
   const settings: QuickStageSettings = { stage };
+  if (pair !== undefined) settings.pair = pair;
   for (let index = 1; index < words.length; index += 2) {
     const option = words[index];
     const value = words[index + 1];

@@ -11,6 +11,13 @@
   maps expose `-dev view near|far|off` for those framings and
   `-dev fogv STYLE ZSTART ZEND DENSITY HEIGHTSTART HEIGHTEND LINEARSTART LINEAREND R G B OVER_SKY`
   for the existing 3.0 fog comparison; these affect only local presentation.
+- Fighter band separation: `bun wisp accept --only 'sep-*' --pair K --map MAP`
+  captures, per stage and camera extreme, Shadow Hunter and Chen paused
+  (`-dev quick stage N pair A / B`, BackSpace pause, H hides the pause menu),
+  the same scene with both fighters hidden, and the fighters alone. From the
+  repository root, `bun tools/stage/contrast.ts --separation MASK SCENE BACKDROP...`
+  prints each fighter's L\* band against the backdrop behind it and fails
+  below `SEPARATION_LIMIT` (smashcraft:docs/design/visual-quality.md).
 
 - Stage search: from the repository root, through the capacity helper,
   `bun tools/stage/search.ts STAGE [SPEC.json] [--out DIR]` captures the

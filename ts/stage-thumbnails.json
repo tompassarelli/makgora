@@ -59,9 +59,9 @@
     {
       "stage": 6,
       "file": "StageCardStratholme.blp",
-      "inputs": "15ccd3295e266fdd83b66ed40ffbcb53522d74e312714f0be456d85d472d6015",
-      "sha256": "b0a8bd80a9308cff15dda8ba04bfd99138fb7c9b5d31efba6e47174c83f60ddc",
-      "bytes": 91349
+      "inputs": "a607c695058c0aab3160d8ec6aa1955ad2ff31020296e182a8e77e4a7fe08147",
+      "sha256": "461db81548bf21c39a86c14e31f3a237f188bb194c5e6825ee74f1a5a40491e0",
+      "bytes": 67228
     },
     {
       "stage": 7,

@@ -532,6 +532,7 @@ export function lockArenaCamera(s: ShellState): void {
   else if (s.session.paused && s.pauseCamera !== undefined) advancePauseCamera(s, aspect);
   else localCamera(s.camera, game.camera.initialized ? game.camera : s.camera, game.stageChoice, aspect);
   if (game.phase !== Phase.result && s.viewExtreme !== undefined) extremeCamera(s.camera, game.stageChoice, aspect, s.viewExtreme);
+  if (s.viewExtreme !== undefined) ClearTextMessages();
   if (game.phase !== Phase.result && s.showcaseFocus !== undefined) s.camera.x = SHOWCASE_PAD_X[s.showcaseFocus];
   if (game.phase !== Phase.result && s.showcaseFocus === undefined && (!s.session.paused || s.pauseCamera === undefined)) fitFighterFrames(s.camera, world, game.stageChoice, aspect);
   const { x: centerX, y: centerY } = s.origin;

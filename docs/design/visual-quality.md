@@ -261,7 +261,7 @@ unshaded materials; the three stock skies preserve their stock animation.
 | Hellfire Citadel | 255,222,224 / 192,240,160; 1.25 | Stock Outland_Sky | 5,000–11,000; 0.25,0.5,0.125 |
 | Blackrock | 255,248,232 / 170,124,112; 1.2 | Original forge sky | 5,000–10,000; 0.5,0.125,0.0625 |
 | Ahn'Qiraj | 230,236,255 / 150,162,204; 0.3 (approved #267) | Original sandstone sky | 5,000–10,000; 0.75,0.625,0.375 |
-| Stratholme | 255,214,180 / 170,140,150; 1 | Stock LordaeronFallSky | 5,000–11,000; 0.5,0.28125,0.1875 |
+| Stratholme | 236,240,255 / 160,168,196; 1.15 | Stock LordaeronFallSky | 3,300–7,000; 0.25,0.265625,0.3125 (cool smoke) |
 | Tomb of Sargeras | 226,244,255 / 130,176,180; 1 | Original tide sky | 5,000–11,000; 0.25,0.4375,0.46875 |
 
 Nordrassil, Gryphon Aerie and Tomb additionally use the below-deck height
@@ -591,6 +591,62 @@ Ahn'Qiraj 27.4, Hellfire 25.5). Its integrated farm budget run read p99
 9.88 ms and worst 13.73 ms, inside #168's bound. With `-dev backdrop off`
 (sky, fog, scenery and decks hidden) the empty screen read rgb(4,4,4) in all
 eight masks measured from the #170 batch.
+
+### Fighter band separation
+
+Rule: each fighter's lightness band stays clear of the backdrop pixels
+directly around and behind it, at both camera extremes, for the roster's
+darkest fighter (Shadow Hunter, L\* 21.4) and warmest (Chen, a\* 27.9,
+b\* 16.0). Whole-frame contrast and ΔE00 against the ring passed Stratholme
+while Tom lost his fighter among its lit rooftops and fires, because the
+rooftops sit inside the fighters' own lightness range.
+
+Metric: `bun tools/stage/contrast.ts --separation MASK SCENE BACKDROP`. The
+fighters-alone mask gives each fighter's silhouette (the two largest blobs,
+left to right). The fighter band is the P25–P75 L\* of its pixels in the
+scene; the backdrop band is the P25–P75 L\* of the same paused frame with
+both fighters hidden, inside the silhouette dilated by half its height. The
+gap is fighter P25 minus backdrop P75 when the fighter's median is the
+brighter, else backdrop P25 minus fighter P75. `SEPARATION_LIMIT` is 0: the
+bands may not overlap. The stage's figure is its worst fighter in either
+view. Captures: `bun wisp accept --only 'sep-*'` on an offline pair (client a
+measured, 1320×760, Classic, paused with the pause menu hidden).
+
+Native numbers, pair 3, 19 Oct 2026, main before the Stratholme change
+(near / far, Shadow Hunter then Chen):
+
+| Stage | Near | Far | Worst | Result |
+| --- | --- | --- | --- | --- |
+| Frozen Throne | -8.4 / -13.3 | -22.1 / -31.6 | -31.6 | fails |
+| Nordrassil | -10.8 / -16.6 | -10.2 / -26.3 | -26.3 | fails |
+| Gryphon Aerie | -18.5 / -27.9 | -31.3 / -10.5 | -31.3 | fails |
+| Durotar Skies | 2.5 / -6.9 | -32.0 / -32.2 | -32.2 | fails |
+| Naxxramas | -5.7 / -7.1 | -2.0 / -7.8 | -7.8 | fails |
+| Hellfire Citadel | 9.4 / 2.7 | 5.2 / -2.2 | -2.2 | fails |
+| Blackrock | 14.1 / 4.3 | 13.5 / 5.4 | 4.3 | passes |
+| Ahn'Qiraj | -12.4 / -19.7 | -25.0 / 1.7 | -25.0 | fails |
+| Stratholme | -0.1 / -8.5 | 0.0 / -6.3 | -8.5 (-9.7 on a rerun) | fails |
+| Tomb of Sargeras | -21.0 / 0.5 | -14.1 / -20.1 | -21.0 | fails |
+
+After the change (cool smoke fog 3,300–7,000; near-row and gate tint
+52,56,68, mid-row 60,64,76, cathedral 84,88,104; fires moved behind the
+skyline, the centre fire behind the cathedral; key 236,240,255 / 160,168,196
+at 1.15), same pair and procedure: Stratholme near 6.0 / 2.5, far 6.7 / 1.6,
+worst 1.6, passes. The first art pass read -1.0 / -1.7 and the second
++1.4 / -2.7; Chen against the cathedral and the centre fire was the last
+overlap. The empty-backdrop share (headless `--stock-light 6`) fails the 10%
+limit both before (62–76%) and after the second pass (80–86%): the darker
+rooftops sit within ΔE00 12 of the dark LordaeronFallSky in the headless
+render; no native sky-only capture exists yet.
+
+Only Blackrock passes on main. The limit is not loosened for the others: the
+bright-sky stages (Frozen Throne, Durotar, Gryphon Aerie, Ahn'Qiraj,
+Nordrassil, Tomb) put a mid-grey sky band across the fighters' L\* range, and
+their fighters read through hue rather than lightness, which this metric
+does not credit. Each needs its own pass or a measured chroma term before the
+check gates them. Evidence:
+~/.local/state/smashcraft/evidence/strath-contrast/ (native-before-all,
+native-after3-6, side-by-side-after3/).
 
 ### Nordrassil atmosphere (#294)
 

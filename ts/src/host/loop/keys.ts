@@ -394,7 +394,7 @@ export function applyDeveloperCommand(s: ShellState, actor: number, original: st
     startQuickMatch(s, 0, s.build.scenario, undefined, QUICK_CPU_STOCKS);
   } else if (quickStage !== undefined) {
     receipt = "dev: quick match";
-    startQuickMatch(s, quickStage.stage, s.build.scenario, undefined, 1, quickStage);
+    startQuickMatch(s, quickStage.stage, s.build.scenario, quickStage.pair, 1, quickStage);
   } else if (offstageHero !== undefined) {
     receipt = `dev: quick offstage ${fighterKey(offstageHero)}`;
     startQuickMatch(s, 0, "up-special-recovery", offstageHero);
