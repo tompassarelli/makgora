@@ -89,7 +89,7 @@ export class MatchPresentation {
   private readonly resultSounds: sound[] = [];
   private resultEffectsMuted = false;
   private resultBurst = false;
-  private pending: ResultsView | undefined;
+  pending: ResultsView | undefined;
   private delay = 0;
 
   posing: number | undefined;

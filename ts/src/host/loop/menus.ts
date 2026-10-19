@@ -53,8 +53,10 @@ export function choose(s: ShellState, slot: ParticipantSlot, direction: -1 | 1):
     selectCharacter(s.game, slot, nextMatchCharacter(s.game, characterFor(s.game, slot), direction));
     makePreview(s);
   } else if (s.game.phase === Phase.stageMenu) selectStage(s.game, slot, nextStage(s.game.stageChoice, direction));
-  else if (resultChoicesOpen(s.game)) stepResultFocus(s, slot, direction);
+  else if (resultChoicesShown(s)) stepResultFocus(s, slot, direction);
 }
+
+const resultChoicesShown = (s: ShellState): boolean => resultChoicesOpen(s.game) && views(s).match.pending === undefined;
 
 export function stepResultFocus(s: ShellState, slot: ParticipantSlot, direction: number): void {
   const focus = s.resultFocus ??= [DEFAULT_RESULT_PICK, DEFAULT_RESULT_PICK, DEFAULT_RESULT_PICK, DEFAULT_RESULT_PICK];
@@ -63,7 +65,7 @@ export function stepResultFocus(s: ShellState, slot: ParticipantSlot, direction:
 
 export function resultKey(s: ShellState, slot: ParticipantSlot, key: number, action: Action | undefined): boolean {
   const step = key === 0x25 || key === 0x26 || action === Action.moveLeft || action === Action.moveUp ? -1 : key === 0x27 || key === 0x28 || action === Action.moveRight || action === Action.moveDown ? 1 : 0;
-  if (step === 0 || !resultChoicesOpen(s.game)) return false;
+  if (step === 0 || !resultChoicesShown(s)) return false;
   stepResultFocus(s, slot, step);
   return true;
 }
@@ -71,11 +73,11 @@ export function resultKey(s: ShellState, slot: ParticipantSlot, key: number, act
 export function pickResult(s: ShellState, actor: number, choice: number): void {
   if (!isParticipantSlot(actor) || !resultChoicesOpen(s.game)) return;
   stepResultFocus(s, actor, choice - (s.resultFocus?.[actor] ?? DEFAULT_RESULT_PICK));
-  confirm(s, actor);
+  confirm(s, actor, true);
 }
 
 
-export function confirm(s: ShellState, slot: ParticipantSlot): void {
+export function confirm(s: ShellState, slot: ParticipantSlot, clicked = false): void {
   if (s.pauseMenu?.title) {
     s.pauseMenu.title = false;
     return;
@@ -126,6 +128,7 @@ export function confirm(s: ShellState, slot: ParticipantSlot): void {
     }
   } else if (game.phase === Phase.result) {
     if (cancelRematchCountdown(game, slot)) return;
+    if (!clicked && !resultChoicesShown(s)) return;
     const pick = s.resultFocus?.[slot] ?? DEFAULT_RESULT_PICK;
     if (pick !== ResultPick.rematch && pick !== ResultPick.newStage && pick !== ResultPick.characters) return;
     if (!confirmRematch(game, slot, pick)) return;
