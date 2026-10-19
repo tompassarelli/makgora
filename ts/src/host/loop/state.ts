@@ -50,7 +50,7 @@ import { type InputTrace, inputTrace } from "./trace";
 import type { UiObjects } from "./ui";
 import type { NativePadCapture } from "./analogPad";
 import type { HiddenFighter } from "./fighterCloak";
-import { type ChatLog, createChatLog } from "../../game/ui/selectChat";
+import { type ChatLog, createChatLog } from "../../game/ui/chatPanel";
 
 
 export interface StageDrifter {

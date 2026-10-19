@@ -9,11 +9,12 @@ import { shell } from "../src/host/loop/state";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { PICKER_DONE } from "../src/game/ui/settingsUi";
 import { START_BUTTON } from "../src/game/ui/selectionLayout";
-import { SELECT_CHAT_BOX } from "../src/game/ui/selectChat";
+import { MATCH_CHAT_BOX, SELECT_CHAT_BOX } from "../src/game/ui/chatPanel";
+import type { TextBox } from "../src/game/ui/hudLayout";
 import { f32 } from "wisp/src/sim/f32";
 
 const headless = testHeadless(SMASHCRAFT_HEADLESS);
-const CHAT_AREA = [SELECT_CHAT_BOX.left, SELECT_CHAT_BOX.top, f32(SELECT_CHAT_BOX.left + SELECT_CHAT_BOX.width), f32(SELECT_CHAT_BOX.top - SELECT_CHAT_BOX.height)] as const;
+const area = (box: TextBox) => [box.left, box.top, f32(box.left + box.width), f32(box.top - box.height)] as const;
 
 function phaseOf(client: HeadlessClient): Phase {
   let phase: Phase = Phase.characterMenu;
@@ -27,21 +28,21 @@ function overlaps(a: readonly number[], b: readonly number[]): boolean {
   return aLeft < bRight && bLeft < aRight && aBottom < bTop && bBottom < aTop;
 }
 
-function shownChat(client: HeadlessClient): string | undefined {
+function shownChat(client: HeadlessClient, box: TextBox): string | undefined {
   const all = client.frames.snapshot();
   const byId = new Map(all.map(frame => [frame.handle.id, frame]));
   const shown = (frame: FrameSnapshot): boolean => {
     for (let at: FrameSnapshot | undefined = frame; at !== undefined; at = at.parentId === undefined ? undefined : byId.get(at.parentId)) if (!at.visible || at.alpha <= 0) return false;
     return true;
   };
-  const label = all.find(frame => frame.name === "MeleeSelectChat");
+  const label = all.find(frame => frame.name === "MeleeChat");
   if (label === undefined || !shown(label)) return undefined;
-  const covered = all.filter(frame => !/^MeleeSelectChat|Backdrop\d*$/.test(frame.name) && frame.rectangle !== undefined && shown(frame) && overlaps(frame.rectangle, CHAT_AREA));
+  const covered = all.filter(frame => !/^MeleeChat|Backdrop\d*$/.test(frame.name) && frame.rectangle !== undefined && shown(frame) && overlaps(frame.rectangle, area(box)));
   expect(covered.map(frame => frame.name)).toEqual([]);
   return label.text;
 }
 
-test("lobby chat shows on character select and stage select for every player, clear of the cards and controls, and leaves the match to Warcraft's own chat [k1 scenario]", () => {
+test("chat shows on character select and stage select for every player, clear of the cards and controls, and keeps showing in the match clear of the fighter plates, where Warcraft's hidden origin frames draw no chat [k1 scenario]", () => {
   const clients = headless.clients({ install, start });
   clients.start();
   clients.frames(30);
@@ -51,13 +52,13 @@ test("lobby chat shows on character select and stage select for every player, cl
   clients.frames(4);
   for (const client of clients.clients) {
     expect(phaseOf(client)).toBe(Phase.characterMenu);
-    expect(shownChat(client)).toBeUndefined();
+    expect(shownChat(client, SELECT_CHAT_BOX)).toBeUndefined();
   }
   clients.chat(1, "gl hf");
   clients.chat(0, "you too");
   clients.frames(2);
   for (const client of clients.clients) {
-    const text = shownChat(client) ?? "";
+    const text = shownChat(client, SELECT_CHAT_BOX) ?? "";
     expect(text).toContain("gl hf");
     expect(text.indexOf("gl hf")).toBeLessThan(text.indexOf("you too"));
     expect(text.split("\n")[0]).toMatch(/^\|cff0042ff.*\|r: gl hf$/);
@@ -70,7 +71,7 @@ test("lobby chat shows on character select and stage select for every player, cl
   clients.frames(2);
   for (const client of clients.clients) {
     expect(phaseOf(client)).toBe(Phase.stageMenu);
-    expect(shownChat(client)).toContain("pick a stage");
+    expect(shownChat(client, SELECT_CHAT_BOX)).toContain("pick a stage");
   }
   expect(clients.click(0, f32(START_BUTTON.x + f32(0.003)), f32(START_BUTTON.y - f32(0.003)))).toBe(true);
   for (let frame = 0; frame < 120 && !clients.clients.every(client => phaseOf(client) === Phase.match); frame++) clients.frames(1);
@@ -78,8 +79,9 @@ test("lobby chat shows on character select and stage select for every player, cl
   clients.frames(10);
   for (const client of clients.clients) {
     expect(phaseOf(client)).toBe(Phase.match);
-    expect(shownChat(client)).toBeUndefined();
-    client.run(() => { expect(shell().chat.lines.some(line => line.text.includes("in the match"))).toBe(false); });
+    const text = shownChat(client, MATCH_CHAT_BOX) ?? "";
+    expect(text).toContain("in the match");
+    expect(text).toContain("pick a stage");
     expect(client.errors).toEqual([]);
   }
 });

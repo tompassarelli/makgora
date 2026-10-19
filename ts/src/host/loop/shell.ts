@@ -38,7 +38,7 @@ import { PLAYTEST, PLAYTEST_PREFIX, playtestRequested, readPlaytestRequest, serv
 import { STAGE_READY, cancelStageLoad, serviceStageLoad, stageReadyEvent } from "./stageLoad";
 import { STAGE_READY_PREFIX } from "../../game/session/stageLoad";
 import { makePreview } from "./preview";
-import { addChat, ageChat } from "../../game/ui/selectChat";
+import { addChat, ageChat } from "../../game/ui/chatPanel";
 import { HELP_EVENT, helpCommand, serviceHelp, startHelp } from "./help";
 import { preloadStageAssets } from "./stageScenery";
 import * as probe from "./responseProbe";
@@ -202,7 +202,7 @@ function presentMatchFlow(s: ShellState): void {
 
 function chatReceived(s: ShellState): void {
   const slot = GetPlayerId(GetTriggerPlayer());
-  if (!isParticipantSlot(slot) || (s.game.phase !== Phase.characterMenu && s.game.phase !== Phase.stageMenu)) return;
+  if (!isParticipantSlot(slot)) return;
   addChat(s.chat, slot, GetPlayerName(Player(slot)), GetEventPlayerChatString());
 }
 
