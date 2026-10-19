@@ -52,7 +52,7 @@ const loaVault = (distance: number): AuthoredSpecial => ({
 
 
 
-const HEX: AppliedStatus = { kind: HeroStatusKind.hex, frames: 50, group: HeroStatusGroup.silence, immunityFrames: 240 };
+const HEX: AppliedStatus = { kind: HeroStatusKind.hex, frames: 110, group: HeroStatusGroup.silence, immunityFrames: 240 };
 
 const HEX_ORB: SpecialProjectile = {
   model: "Abilities\\Weapons\\WitchDoctorMissile\\WitchDoctorMissile.mdx",
