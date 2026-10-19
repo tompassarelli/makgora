@@ -385,7 +385,7 @@ export class SelectionPanel {
     placeTopLeft(settingsButton, SETTINGS_BOX.x, SETTINGS_BOX.y);
     BlzFrameSetSize(settingsButton, SETTINGS_BOX.width, SETTINGS_BOX.height);
     this.clicks.add(settingsButton, { kind: "settings" }, undefined, "native");
-    const settingsLabel = label(settingsButton, `MeleeSettingsLabel${suffix}`, f32(SETTINGS_BOX.x + 0.003), f32(SETTINGS_BOX.y - 0.003), f32(SETTINGS_BOX.width - 0.006), f32(SETTINGS_BOX.height - 0.006), MENU_STYLE.headerSize);
+    const settingsLabel = label(settingsButton, `MeleeSettingsLabel${suffix}`, f32(SETTINGS_BOX.x + f32(0.003)), f32(SETTINGS_BOX.y - f32(0.003)), f32(SETTINGS_BOX.width - f32(0.006)), f32(SETTINGS_BOX.height - f32(0.006)), MENU_STYLE.headerSize);
     BlzFrameSetTextAlignment(settingsLabel, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
     this.settingsLabel = settingsLabel;
     setFrameText(settingsLabel, `${MENU_STYLE.gold}Controls (F1)|r`);
