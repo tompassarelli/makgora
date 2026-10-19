@@ -30,6 +30,7 @@ export const RATES_RECORD_CHARS = 250;
 interface Second {
   ticks: number;
   draws: number;
+  draw: number;
   events: number;
   lua: number;
   tick: number;
@@ -99,7 +100,7 @@ declare global {
 }
 
 const emptySecond = (): Second => ({
-  ticks: 0, draws: 0, events: 0, lua: 0, tick: 0, tickMax: 0, sim: 0, spec: 0, conf: 0,
+  ticks: 0, draws: 0, draw: 0, events: 0, lua: 0, tick: 0, tickMax: 0, sim: 0, spec: 0, conf: 0,
   held: 0, stalled: 0, gap: 0, gapMax: 0, gapSamples: 0, sends: 0, paused: 0, pauses: 0, menus: 0, tickGap: 0, received: 0, receivedOwn: 0,
   bursts: 0, heldRun: 0, sendFailed: 0,
 });
@@ -288,7 +289,7 @@ function rateTokens(rates: SessionRates): string[] {
   const rollback = s === undefined ? undefined : activeRollback(s);
   const frame = s === undefined ? -1 : rollback?.schedule.speculativeFrame() ?? s.runtime.simulationFrame;
   const window = rollback === undefined ? "" : ` cf=${rollback.schedule.nextConfirmedFrame()} kn=${rollback.schedule.knownThrough()} win=${rollback.window} dl=${rollback.delay} ping=${smoothedRttMs(rollback.net.estimate)} drift=${rates.drift} ${botLine(rates, rollback)} ${takeNetRates(rollback.net)}`;
-  return `cb=${second.ticks} dr=${second.draws} ev=${second.events} sim=${second.sim} spec=${second.spec} conf=${second.conf} held=${second.held} stall=${second.stalled} gap=${gap} gmax=${second.gapMax} lua=${microseconds(second.lua)} tk=${tick} tkmax=${microseconds(second.tickMax)} send=${second.sends} recv=${second.received} rown=${second.receivedOwn} pz=${second.paused} pt=${second.pauses} pm=${second.menus} cbgap=${microseconds(second.tickGap)} bur=${second.bursts} hrun=${second.heldRun} sf=${second.sendFailed} alloc=${heapGrowth(rates)} ${gameSpeed()} ph=${phase} m=${match} f=${frame}${window}`.split(" ");
+  return `cb=${second.ticks} dr=${second.draws} dru=${microseconds(second.draw)} ev=${second.events} sim=${second.sim} spec=${second.spec} conf=${second.conf} held=${second.held} stall=${second.stalled} gap=${gap} gmax=${second.gapMax} lua=${microseconds(second.lua)} tk=${tick} tkmax=${microseconds(second.tickMax)} send=${second.sends} recv=${second.received} rown=${second.receivedOwn} pz=${second.paused} pt=${second.pauses} pm=${second.menus} cbgap=${microseconds(second.tickGap)} bur=${second.bursts} hrun=${second.heldRun} sf=${second.sendFailed} alloc=${heapGrowth(rates)} ${gameSpeed()} ph=${phase} m=${match} f=${frame}${window}`.split(" ");
 }
 
 export function rateRecords(time: number, tokens: readonly string[]): string[] {
@@ -391,7 +392,10 @@ function account(rates: SessionRates, name: string, spent: number, now: number):
     second.tick += spent;
     if (spent > second.tickMax) second.tickMax = spent;
     sampleTick(rates, now, now - spent);
-  } else if (name === DRAW) second.draws++;
+  } else if (name === DRAW) {
+    second.draws++;
+    second.draw += spent;
+  }
   else if (name === INPUT) {
     second.received++;
     if (GetTriggerPlayer() === GetLocalPlayer()) second.receivedOwn++;

@@ -34,7 +34,7 @@ import { writeLines } from "wisp/src/platform/fileio";
 import { confirmedChecksum, startInputTrace, traceParticipant } from "./diagnostics";
 import { probeFrameCostClock } from "./frameCost";
 import { probeRenderClock } from "./renderClock";
-import { startDrawingBetweenFrames } from "./betweenFrames";
+import { drawAtBurstTime } from "./betweenFrames";
 import { showBackdrop, showStageLighting, leverCommand } from "./stageScenery";
 import { fighterHideCommand, hideFighter } from "./fighterCloak";
 import { clearCapturedInputs } from "./inputs";
@@ -457,8 +457,9 @@ export function applyDeveloperCommand(s: ShellState, actor: number, original: st
     SetTerrainFogExV(R2I(v[0] ?? 0), v[1] ?? 0, v[2] ?? 0, v[3] ?? 0, v[4] ?? 0, v[5] ?? 0, v[6] ?? 0, v[7] ?? 0, v[8] ?? 0, v[9] ?? 0, v[10] ?? 0);
     BlzSetTerrainFogDrawOverSky((v[11] ?? 0) > 0.5);
     receipt = `dev: fogv ${message.slice(10)}`;
-  } else if (message === "-dev smooth-draw") {
-    receipt = startDrawingBetweenFrames() ? "dev: smooth draw on" : "dev: smooth draw already on";
+  } else if (message === "-dev smooth-draw on" || message === "-dev smooth-draw off") {
+    drawAtBurstTime(message === "-dev smooth-draw on");
+    receipt = `dev: smooth draw ${message === "-dev smooth-draw on" ? "on" : "off"}`;
   } else if (message === "-dev camera-smooth on" || message === "-dev camera-smooth off") {
     s.cameraTween = message === "-dev camera-smooth on";
     receipt = `dev: camera smooth ${s.cameraTween ? "on" : "off"}`;

@@ -1,14 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
 import { trampoline } from "wisp/src/platform/dispatch";
 import { FRAME_SECONDS } from "../../game/presentation/fighterPose";
 import { effectMotion } from "../../game/render/effects";
@@ -16,7 +5,7 @@ import { effectMotion } from "../../game/render/effects";
 
 export const DRAW_EVENT = "shell.draw";
 
-const DRAW_PERIOD = 0.0;
+const DRAW_PERIOD = 0.0009765625;
 
 const SMOOTHING_FRAMES = 1.5;
 
@@ -45,15 +34,15 @@ export function startFrameClock(tick: timer): void {
 }
 
 
-export function startDrawingBetweenFrames(): boolean {
+export function drawAtBurstTime(on: boolean): void {
   const frames = state();
-  if (frames.drawing) return false;
+  const motion = effectMotion();
+  motion.tracking = on;
+  if (!on) motion.smoothing = false;
+  if (!on || frames.drawing) return;
   frames.drawing = true;
-  effectMotion().tracking = true;
   TimerStart(CreateTimer(), DRAW_PERIOD, true, trampoline(DRAW_EVENT));
-  return true;
 }
-
 
 
 export function beginPresentedFrame(moving: boolean): void {

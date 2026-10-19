@@ -140,12 +140,17 @@ the captured intervals decide the observed recording cadence.
 
 Renderers place moving effects (fighters, their lights, projectiles and pooled
 effects) through `placeEffect` (smashcraft:ts/src/game/render/effects.ts). By
-default it only sets the position. `-dev smooth-draw` starts a zero-period
-draw timer (smashcraft:ts/src/host/loop/betweenFrames.ts); while it fires
-at least 1.5 times per simulation frame, each effect is drawn between where the
-last two simulation frames put it (smashcraft:ts/src/game/render/motion.ts),
-trailing the simulation by one frame and snapping on teleports. It never reads
-or writes simulation state: smashcraft:ts/test/high-refresh.test.ts checks
-that every confirmed checksum of a quick match matches with and without three
-draws per frame. Players' builds keep it off until the native cadence result
-above shows the draw timer tracks the renderer within the frame budget.
+default it only sets the position. `-dev smooth-draw on` starts a 1/1024 s
+draw timer (smashcraft:ts/src/host/loop/betweenFrames.ts). Warcraft runs Lua
+only in turn bursts, so the timer's last callback in each burst places each
+effect at the burst's game time, between where the last two simulation frames
+put it (smashcraft:ts/src/game/render/motion.ts): every burst then advances
+the picture by the same game time, trailing the simulation by at most one
+frame and snapping on teleports. `-dev smooth-draw off` places effects at the
+simulation frame again; the timer keeps running. The rates line's `dru` is the
+draw callbacks' os.clock microseconds per second, and the rates report prints
+`draw us/burst`. Drawing never reads or writes simulation state:
+smashcraft:ts/test/high-refresh.test.ts checks that every confirmed checksum
+of a quick match played in one- and two-frame bursts matches with drawing on
+and off. Players' builds keep it off until a native capture shows even
+fighter steps within 0.5 ms a burst and one frame of added latency.
