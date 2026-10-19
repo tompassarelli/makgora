@@ -43,10 +43,10 @@ BunRuntime.runMain(Effect.gen(function*() {
   const slots = PLAYER_COLORS.slice(0, PARTICIPANT_CAPACITY);
   for (const [slot, color] of slots.entries()) {
     yield* render(`SelectionChipP${slot + 1}`, 'SelectionChip.svg', { CHIP_COLOR: hex(mix(color.rgb, 0x000000, 0.2)), CHIP_LABEL: `P${slot + 1}` }, true);
+    yield* render(`SelectionChipCPUP${slot + 1}`, 'SelectionChip.svg', { CHIP_COLOR: '#626977', CHIP_LABEL: `P${slot + 1}` }, true);
     yield* render(`SelectionCard${color.name}`, 'SelectionCard.svg', { CARD_COLOR: hex(mix(color.rgb, 0x000000, 0.4)), CARD_EDGE: hex(mix(color.rgb, 0xffffff, 0.35)), CARD_METAL: '#bbc6cf' }, false);
     yield* render(`HudPlate${slot}`, 'HudPlate.svg', { PLAYER_COLOR: hex(color.rgb) }, true);
   }
-  yield* render('SelectionChipCPU', 'SelectionChip.svg', { CHIP_COLOR: '#626977', CHIP_LABEL: 'P2' }, true);
   const HAND_POSES = {
     Point: { THUMB: 'M42 66 L34 50 L36 40', INDEX: 'M62 40 L32 22 L13 11', SEAMS: 'M28 25 L36 17 M42 34 L50 25', SHINE: 'M30 18 L15 9' },
     Pinch: { THUMB: 'M40 66 L30 44 L25 30', INDEX: 'M62 40 L44 20 L28 12', SEAMS: 'M27 47 L36 43 M41 25 L49 17', SHINE: 'M29 40 L25 31 M41 17 L30 12' },

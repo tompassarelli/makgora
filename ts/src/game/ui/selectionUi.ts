@@ -941,7 +941,7 @@ export class SelectionPanel {
         setFrameText(frames.settingsLabel, this.menuFocus?.kind === "settings" && this.menuFocus.slot === slot ? "> Opponent settings <" : "Opponent settings");
       }
       BlzFrameSetVisible(frames.chip, active);
-      BlzFrameSetTexture(frames.chip, `war3mapImported\\SelectionChip${human ? `P${I2S(slot + 1)}` : "CPU"}.tga`, 0, true);
+      BlzFrameSetTexture(frames.chip, `war3mapImported\\SelectionChip${human ? "" : "CPU"}P${I2S(slot + 1)}.tga`, 0, true);
       const carried = drag.dragging === slot || (!ready && drag.held === slot && drag.hover !== undefined);
       const chipChoice = tileOfCharacter(choice ?? Character.rifleman);
       if (carried) pinching = true;

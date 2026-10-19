@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { LEFT_KEY, RIGHT_KEY, testHeadless } from "./headless";
 import type { HeadlessClient } from "wisp/src/headless/client";
-import { Phase, ResultPick } from "../src/game/lobby/lobbyState";
+import { Phase, ResultPick, setParticipants } from "../src/game/lobby/lobbyState";
 import { install, start } from "../src/host/entries/playableMain";
 import { Key } from "../src/host/loop/keyEvents";
 import { shell } from "../src/host/loop/state";
@@ -300,6 +300,19 @@ test("with Team Battle on every fighting card wears its team's colour and shows 
       expect(card.texture, `card ${slot}`).toBe(`war3mapImported\\SelectionCard${team}.tga`);
       expect(shown(label.handle.id), `team label ${slot}`).toBe(true);
       expect(label.text.replace("> ", "")).toBe(team);
+    }
+    expect(client.errors).toEqual([]);
+  }
+});
+
+test("each CPU card's chip names its own slot, P3 and P4, not P2 [k1 scenario]", () => {
+  const { clients } = menu();
+  for (const client of clients.clients) client.run(() => setParticipants(shell().game, 3, 12));
+  clients.frames(4);
+  for (const client of clients.clients) {
+    const all = client.frames.snapshot();
+    for (const [slot, chip] of ["SelectionChipP1", "SelectionChipP2", "SelectionChipCPUP3", "SelectionChipCPUP4"].entries()) {
+      expect(all.find(frame => frame.name === `MeleeChip${client.slot}_${slot}`)!.texture, `chip ${slot}`).toBe(`war3mapImported\\${chip}.tga`);
     }
     expect(client.errors).toEqual([]);
   }
