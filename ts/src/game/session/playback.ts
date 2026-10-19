@@ -64,6 +64,10 @@ export interface RollbackPlayback {
   rebase(schedule: ShadowInputSchedule, epoch: number, frame: number): boolean;
 
   visitWorlds(visit: (world: Roster) => void): void;
+
+  repeatedComputerDecisions(): number;
+
+  rerunComputerDecisions(): number;
 }
 
 

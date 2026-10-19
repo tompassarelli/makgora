@@ -4,8 +4,8 @@ import { Phase } from "../../game/lobby/lobbyState";
 import { sourceVersion } from "../../game/shell/sourceVersion";
 import { sessionRatesFile, sessionRatesHeader } from "../../game/core/gameFiles";
 import { smoothedRttMs } from "../../game/netcode/delayPolicy";
-import { takeArrivals } from "./netDelay";
-import { activeRollback, shellState } from "./state";
+import { takeNetRates } from "./netDelay";
+import { type Rollback, activeRollback, shellState } from "./state";
 
 declare const os: { readonly clock?: (this: void) => number } | undefined;
 
@@ -23,6 +23,7 @@ const TOP_EVENTS = 6;
 const TOP_EFFECTS = 6;
 const TOP_SOUNDS = 3;
 const MAX_NAME = 20;
+const BURST_IDLE_US = 2000;
 
 interface Second {
   ticks: number;
@@ -46,6 +47,9 @@ interface Second {
   tickGap: number;
   received: number;
   receivedOwn: number;
+  bursts: number;
+  heldRun: number;
+  sendFailed: number;
 }
 
 interface SessionRates {
@@ -74,6 +78,14 @@ interface SessionRates {
   wasPaused: boolean;
   wasMenu: boolean;
   lastTick: number;
+  heldRun: number;
+  driftEpoch: number;
+  driftCallbacks: number;
+  driftBase: number;
+  drift: number;
+  botRepeated: number;
+  botRerun: number;
+  heap: number;
   tags: Record<number, string | undefined>;
   live: Record<string, number>;
   shortNames: Record<string, string>;
@@ -87,6 +99,7 @@ declare global {
 const emptySecond = (): Second => ({
   ticks: 0, draws: 0, events: 0, lua: 0, tick: 0, tickMax: 0, sim: 0, spec: 0, conf: 0,
   held: 0, stalled: 0, gap: 0, gapMax: 0, gapSamples: 0, sends: 0, paused: 0, pauses: 0, menus: 0, tickGap: 0, received: 0, receivedOwn: 0,
+  bursts: 0, heldRun: 0, sendFailed: 0,
 });
 
 const zeroKinds = (): Record<Kind, number> => ({ trg: 0, tmr: 0, eff: 0, snd: 0, frm: 0, unit: 0 });
@@ -163,7 +176,13 @@ function wrapNatives(rates: SessionRates): void {
     else if (name === "BlzTriggerRegisterPlayerKeyEvent") globals[name] = (...args: unknown[]) => { rates.keyRegistrations++; rates.registrations++; return native(...args); };
     else if (name.startsWith("TriggerRegister") || name.startsWith("BlzTriggerRegister")) globals[name] = (...args: unknown[]) => { rates.registrations++; return native(...args); };
     else if (name === "TriggerAddAction" || name === "TriggerAddCondition") globals[name] = (...args: unknown[]) => { rates.actions++; return native(...args); };
-    else if (name === "BlzSendSyncData") globals[name] = (...args: unknown[]) => { rates.sends++; rates.second.sends++; return native(...args); };
+    else if (name === "BlzSendSyncData") globals[name] = (...args: unknown[]) => {
+      rates.sends++;
+      rates.second.sends++;
+      const sent = native(...args);
+      if (sent === false) rates.second.sendFailed++;
+      return sent;
+    };
     else if (name === "StopSound") globals[name] = (value: unknown, kill: unknown, fade: unknown) => { if (kill === true) released(rates, "snd", value); return native(value, kill, fade); };
   }
 }
@@ -173,9 +192,10 @@ function findClock(): ((this: void) => number) | undefined {
   return os.clock;
 }
 
-function sampleTick(rates: SessionRates, now: number): void {
+function sampleTick(rates: SessionRates, now: number, start: number): void {
   const second = rates.second;
   second.ticks++;
+  if (rates.clock !== undefined && microseconds(start - rates.lastTick) >= BURST_IDLE_US) second.bursts++;
   if (now - rates.lastTick > second.tickGap) second.tickGap = now - rates.lastTick;
   rates.lastTick = now;
   const s = shellState();
@@ -191,10 +211,35 @@ function sampleTick(rates: SessionRates, now: number): void {
   if (sim > rates.lastSim) second.sim += sim - rates.lastSim;
   rates.lastSim = sim;
   const rollback = activeRollback(s);
-  if (rollback === undefined || s.game.phase !== Phase.match) return;
+  if (rollback === undefined || s.game.phase !== Phase.match) rates.heldRun = 0;
+  else sampleMatch(rates, rollback, paused);
+}
+
+function sampleDrift(rates: SessionRates, epoch: number, spec: number, paused: boolean): void {
+  if (epoch !== rates.driftEpoch) {
+    rates.driftEpoch = epoch;
+    rates.driftCallbacks = 0;
+    rates.driftBase = spec;
+  } else if (!paused) rates.driftCallbacks++;
+  rates.drift = rates.driftCallbacks - (spec - rates.driftBase);
+}
+
+function sampleHeld(rates: SessionRates, held: boolean): void {
+  if (!held) {
+    rates.heldRun = 0;
+    return;
+  }
+  rates.second.held++;
+  rates.heldRun++;
+  if (rates.heldRun > rates.second.heldRun) rates.second.heldRun = rates.heldRun;
+}
+
+function sampleMatch(rates: SessionRates, rollback: Rollback, paused: boolean): void {
+  const second = rates.second;
   const { schedule } = rollback;
   const spec = schedule.speculativeFrame();
   const conf = schedule.nextConfirmedFrame();
+  sampleDrift(rates, rollback.epoch, spec, paused);
   if (rollback.epoch === rates.epoch) {
     if (spec > rates.lastSpec) second.spec += spec - rates.lastSpec;
     if (conf > rates.lastConf) second.conf += conf - rates.lastConf;
@@ -206,12 +251,29 @@ function sampleTick(rates: SessionRates, now: number): void {
   second.gap += gap;
   second.gapSamples++;
   if (gap > second.gapMax) second.gapMax = gap;
-  if (rollback.predictionHeld) second.held++;
+  sampleHeld(rates, rollback.predictionHeld);
   if (rollback.stalled > 0) second.stalled++;
 }
 
 function elapsedMs(rates: SessionRates, now: number): number {
   return rates.clock === undefined ? Math.floor(rates.seconds * 1000) : Math.floor((now - rates.started) * 1000);
+}
+
+function botLine(rates: SessionRates, rollback: Rollback): string {
+  const repeated = rollback.playback.repeatedComputerDecisions();
+  const rerun = rollback.playback.rerunComputerDecisions();
+  const text = `bot=${repeated - rates.botRepeated}/${rerun - rates.botRerun}`;
+  rates.botRepeated = repeated;
+  rates.botRerun = rerun;
+  return text;
+}
+
+function heapGrowth(rates: SessionRates): number {
+  if (typeof collectgarbage !== "function") return 0;
+  const heap = Math.floor(collectgarbage("count"));
+  const grown = rates.heap < 0 ? 0 : heap - rates.heap;
+  rates.heap = heap;
+  return grown;
 }
 
 function rateLine(rates: SessionRates, now: number): string {
@@ -223,8 +285,8 @@ function rateLine(rates: SessionRates, now: number): string {
   const match = s === undefined ? -1 : s.replay.serial;
   const rollback = s === undefined ? undefined : activeRollback(s);
   const frame = s === undefined ? -1 : rollback?.schedule.speculativeFrame() ?? s.runtime.simulationFrame;
-  const window = rollback === undefined ? "" : ` cf=${rollback.schedule.nextConfirmedFrame()} kn=${rollback.schedule.knownThrough()} win=${rollback.window} dl=${rollback.delay} ping=${smoothedRttMs(rollback.net.estimate)} ${takeArrivals(rollback.net)}`;
-  return `r t=${elapsedMs(rates, now)} cb=${second.ticks} dr=${second.draws} ev=${second.events} sim=${second.sim} spec=${second.spec} conf=${second.conf} held=${second.held} stall=${second.stalled} gap=${gap} gmax=${second.gapMax} lua=${microseconds(second.lua)} tk=${tick} tkmax=${microseconds(second.tickMax)} send=${second.sends} recv=${second.received} rown=${second.receivedOwn} pz=${second.paused} pt=${second.pauses} pm=${second.menus} cbgap=${microseconds(second.tickGap)} ${gameSpeed()} ph=${phase} m=${match} f=${frame}${window}`;
+  const window = rollback === undefined ? "" : ` cf=${rollback.schedule.nextConfirmedFrame()} kn=${rollback.schedule.knownThrough()} win=${rollback.window} dl=${rollback.delay} ping=${smoothedRttMs(rollback.net.estimate)} drift=${rates.drift} ${botLine(rates, rollback)} ${takeNetRates(rollback.net)}`;
+  return `r t=${elapsedMs(rates, now)} cb=${second.ticks} dr=${second.draws} ev=${second.events} sim=${second.sim} spec=${second.spec} conf=${second.conf} held=${second.held} stall=${second.stalled} gap=${gap} gmax=${second.gapMax} lua=${microseconds(second.lua)} tk=${tick} tkmax=${microseconds(second.tickMax)} send=${second.sends} recv=${second.received} rown=${second.receivedOwn} pz=${second.paused} pt=${second.pauses} pm=${second.menus} cbgap=${microseconds(second.tickGap)} bur=${second.bursts} hrun=${second.heldRun} sf=${second.sendFailed} alloc=${heapGrowth(rates)} ${gameSpeed()} ph=${phase} m=${match} f=${frame}${window}`;
 }
 
 function countLine(rates: SessionRates, now: number): string {
@@ -312,7 +374,7 @@ function account(rates: SessionRates, name: string, spent: number, now: number):
   if (name === TICK) {
     second.tick += spent;
     if (spent > second.tickMax) second.tickMax = spent;
-    sampleTick(rates, now);
+    sampleTick(rates, now, now - spent);
   } else if (name === DRAW) second.draws++;
   else if (name === INPUT) {
     second.received++;
@@ -328,6 +390,7 @@ export function installSessionRates(build: string): void {
     clock, started, secondStarted: started, seconds: 0, load: undefined, build, second: emptySecond(), lines: [], file: 0, named: {},
     epoch: -1, lastSpec: 0, lastConf: 0, lastSim: 0, created: zeroKinds(), destroyed: zeroKinds(),
     keyRegistrations: 0, registrations: 0, actions: 0, sends: 0, handleMax: 0, wrapped: false, wasPaused: false, wasMenu: false, lastTick: started,
+    heldRun: 0, driftEpoch: -1, driftCallbacks: 0, driftBase: 0, drift: 0, botRepeated: 0, botRerun: 0, heap: -1,
     tags: {}, live: {}, shortNames: {},
   };
   wrapNatives(rates);

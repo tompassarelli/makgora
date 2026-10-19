@@ -171,6 +171,7 @@ export class ReplayHistory {
   sameState: (this: void, stored: Readonly<ReplayState>, state: Readonly<ReplayState>, first: number) => boolean = sameReplayState;
   private readonly repeated: { mask: number; after: ReplayState["runtime"] } = { mask: 0, after: createReplaySnapshot().runtime };
   private repeatedDecisions = 0;
+  private rerunDecisions = 0;
   // The corrected state a repair replays, apart from live state, which keeps running.
   private readonly repairState = createReplaySnapshot();
   /** The next frame a pending repair runs; every snapshot before it is corrected. */
@@ -231,6 +232,11 @@ export class ReplayHistory {
   /** Computer decisions repairs took from an earlier run of the same frame instead of deciding again. */
   repeatedComputerDecisions(): number {
     return this.repeatedDecisions;
+  }
+
+  /** Computer decisions repairs made again although the frame's earlier run had decided them. */
+  rerunComputerDecisions(): number {
+    return this.rerunDecisions;
   }
 
   /** The next frame a pending repair replays; stateAfter refuses it and the frame before it. */
@@ -429,6 +435,7 @@ export class ReplayHistory {
       this.repairDirty = dirty;
       this.repairInputs |= at(this.changed, slot);
       if (repeated !== undefined) for (const computer of PARTICIPANT_SLOTS) if (participantActive(repeated.mask, computer)) this.repeatedDecisions++;
+      if (frame + 1 < this.nextFrame) this.countRerun(frame, state, repeated === undefined ? 0 : repeated.mask);
       // The frame's earlier run reached the next snapshot from the camera its own snapshot holds until the repair rewrites it.
       const framed = frame + 1 < this.nextFrame && at(this.follows, this.slotOf(frame + 1)) && (first || sameMatchCamera(state.match.camera, this.snapshotAt(frame).match.camera));
       if (!first) {
@@ -612,6 +619,13 @@ export class ReplayHistory {
     this.repeated.mask = mask;
     this.repeated.after = after;
     return this.repeated;
+  }
+
+  private countRerun(frame: number, state: Readonly<ReplayState>, repeated: number): void {
+    const after = this.snapshotAt(frame + 1).runtime;
+    for (const slot of PARTICIPANT_SLOTS) {
+      if (!participantActive(repeated, slot) && isActive(state.world, slot) && computerActive(state.match, slot) && at(after.botDecisions, slot).decided) this.rerunDecisions++;
+    }
   }
 
   private saveRow(epoch: number, row: Readonly<MatchFrameInput>, predicted: boolean, live: Readonly<ReplayState>): boolean {

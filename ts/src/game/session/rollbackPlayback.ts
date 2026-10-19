@@ -25,6 +25,8 @@ class ReplayHistoryPlayback implements RollbackPlayback {
   private readonly playback = new ShadowInputPlayback();
   private state: MutableReplayState | undefined;
   private current: number | undefined;
+  private repeatedBefore = 0;
+  private rerunBefore = 0;
 
   beginEpoch(epoch: number, window: number): boolean {
     if (epoch < 0 || (this.current !== undefined && epoch <= this.current) || window < 1 || window > REPLAY_MAX_CORRECTION_FRAMES) return false;
@@ -84,6 +86,8 @@ class ReplayHistoryPlayback implements RollbackPlayback {
     if (!schedule.rewindSpeculative(epoch, frame)) return false;
     const history = new ReplayHistory();
     if (!history.beginEpoch(epoch, frame, schedule.rollbackFrames())) return false;
+    this.repeatedBefore += this.history.repeatedComputerDecisions();
+    this.rerunBefore += this.history.rerunComputerDecisions();
     this.history = history;
     this.playback.forgetReconciliation();
     return true;
@@ -91,6 +95,14 @@ class ReplayHistoryPlayback implements RollbackPlayback {
 
   visitWorlds(visit: (world: Roster) => void): void {
     this.history.visitWorlds(visit);
+  }
+
+  repeatedComputerDecisions(): number {
+    return this.repeatedBefore + this.history.repeatedComputerDecisions();
+  }
+
+  rerunComputerDecisions(): number {
+    return this.rerunBefore + this.history.rerunComputerDecisions();
   }
 
   private bind(match: SpeculativeMatch): MutableReplayState {
