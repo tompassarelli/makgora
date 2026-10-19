@@ -9,6 +9,7 @@ import {
   loadProfile,
   NO_SAVED_PROFILE,
   pickBindingPreset,
+  previewStartingBindings,
   saveBindingSettings,
 } from "./bindingSettings";
 import { ButtonClicks, createBackdrop, createText, gameUi, placeTopLeft, setFrameText, styleMenuPanel } from "./frames";
@@ -136,8 +137,8 @@ export class SettingsPanel {
   }
 
   private click(button: SettingsButton, clicker: player): void {
-    if (clicker !== Player(this.participantId)) return;
     const { settings } = this;
+    if (clicker !== Player(this.participantId) || !settings.ready) return;
     if (button.kind === "preset") pickBindingPreset(settings, button.preset);
     else if (button.kind === "profile") loadProfile(settings);
     else if (button.kind === "save") saveBindingSettings(settings);
@@ -151,6 +152,19 @@ export class SettingsPanel {
     return this.open;
   }
 
+
+  preview(): void {
+    if (this.open || this.settings.ready) return;
+    const preview = previewStartingBindings(this.settings);
+    if (preview === undefined) return;
+    BlzFrameSetVisible(this.root, true);
+    this.renderHeader(preview, this.actions.delayInfo(this.participantId));
+    this.renderKeys(preview);
+  }
+
+  endPreview(): void {
+    if (!this.open) BlzFrameSetVisible(this.root, false);
+  }
 
   show(): void {
     if (!this.settings.ready) return;
@@ -177,12 +191,11 @@ export class SettingsPanel {
     if (signature === this.lastSignature) return;
     this.lastSignature = signature;
     BlzFrameSetVisible(this.root, true);
-    this.renderHeader(info);
-    this.renderKeys();
+    this.renderHeader(settings, info);
+    this.renderKeys(settings);
   }
 
-  private renderHeader(info: string): void {
-    const { settings } = this;
+  private renderHeader(settings: Readonly<BindingSettings>, info: string): void {
     const { capture } = settings;
     const selected = settings.fromProfile ? undefined : presetOf(settings.bindings);
     for (const [preset, frame] of this.presets) setFrameText(frame, preset === selected ? `${MENU_STYLE.gold}${PRESET_NAMES[preset]}|r` : PRESET_NAMES[preset]);
@@ -194,8 +207,7 @@ export class SettingsPanel {
     BlzFrameSetText(this.status, settings.message);
   }
 
-  private renderKeys(): void {
-    const { settings } = this;
+  private renderKeys(settings: Readonly<BindingSettings>): void {
     const { capture } = settings;
     for (const { key, frame, action } of this.keys) {
       const bound = actionFor(settings.bindings, key);

@@ -103,6 +103,30 @@ test("every start opens each player's own Controls screen before fighter select,
   expect(clients.firstDivergence()).toBeUndefined();
 });
 
+test("each player's own Controls screen, with their saved profile, is already drawn when the loading screen ends, before the first game frame, and stays unchanged once their synced load opens it [k1 scenario]", () => {
+  const disk: Disk = new Map();
+  const first = started(disk);
+  first.everywhere(() => applyBindingPreset(bindingsHere(0), "custom"));
+  first.chat(0, "-save");
+  first.frames(5);
+
+  const clients = headless.clients(entryFor(BUILD), [0, 1], { files: diskFiles(disk) });
+  clients.start();
+  expect(openOn(clients, 0)).toEqual([false, false]);
+  for (const index of [0, 1]) expect(shown(clients, index, "CONTROLS")).toBe(true);
+  expect(shown(clients, 0, "Saved profile loaded")).toBe(true);
+  expect(shown(clients, 1, "Saved profile loaded"), "each client draws only its own player's screen").toBe(false);
+  expect(shown(clients, 1, "No saved profile")).toBe(true);
+  const panelLines = (index: number): string[] => clients.clients[index]?.frames.shownText().filter(line => /CONTROLS|profile|controls ready|Delay|Recalibrate/.test(line)) ?? [];
+  const drawn = [panelLines(0), panelLines(1)];
+  expect(drawn[0]?.length).toBeGreaterThan(3);
+
+  clients.frames(60);
+  expect(openOn(clients, 0)).toEqual([true, true]);
+  expect([panelLines(0), panelLines(1)], "nothing on the drawn screen changes when it opens").toEqual(drawn);
+  expect(clients.firstDivergence()).toBeUndefined();
+});
+
 test("a saved profile is preselected and announced at start, and Load profile brings it back after trying a preset, on every client [k1 scenario]", () => {
   const disk: Disk = new Map();
   const first = started(disk);
@@ -144,6 +168,15 @@ test("a saved profile is preselected and announced at start, and Load profile br
   clients.frames(2);
   expect(openOn(clients, 0)).toEqual([false, false]);
   expect(clients.clients.map((_, index) => shellOf(clients, index).game.phase)).toEqual([Phase.characterMenu, Phase.characterMenu]);
+  expect(clients.firstDivergence()).toBeUndefined();
+});
+
+test("F9 on the Controls screen closes it, so the quest log F9 opens is not hidden behind it, for that player only [k1 scenario]", () => {
+  const clients = started(new Map());
+  expect(openOn(clients, 0)).toEqual([true, true]);
+  tap(clients, 0, 0x78);
+  expect(openOn(clients, 0)).toEqual([false, false]);
+  expect(openOn(clients, 1)).toEqual([true, true]);
   expect(clients.firstDivergence()).toBeUndefined();
 });
 

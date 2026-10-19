@@ -25,10 +25,12 @@ function files(): PlayerFileQueue {
 }
 
 
+// Engine: Preloader replays the first content it read from a path for the whole session, so a file saved this session is resent from memory.
+const localBindingsText = (): string => globalThis.__smashcraftSavedBindings ?? readChunks(BINDINGS_FILE).join("");
+
 function sendFile(owner: number): void {
   if (GetLocalPlayer() !== Player(owner)) return;
-  // Engine: Preloader replays the first content it read from a path for the whole session, so a file saved this session is resent from memory.
-  const text = globalThis.__smashcraftSavedBindings ?? readChunks(BINDINGS_FILE).join("");
+  const text = localBindingsText();
   let offset = 0;
   while (text.length - offset > CHUNK) {
     BlzSendSyncData(MORE_PREFIX, text.substring(offset, offset + CHUNK));
@@ -69,6 +71,11 @@ export const bindingFiles: BindingPersistence = {
       return;
     }
     enqueuePlayerFile(files(), owner, complete, sendFile);
+  },
+  readLocal(owner) {
+    if (GetLocalPlayer() !== Player(owner)) return undefined;
+    const text = localBindingsText();
+    return text === "" ? { kind: "empty" } : { kind: "loaded", encoded: text };
   },
   save(owner, encoded) {
     if (GetLocalPlayer() === Player(owner) && writeChunks(BINDINGS_FILE, chunks(encoded))) globalThis.__smashcraftSavedBindings = encoded;

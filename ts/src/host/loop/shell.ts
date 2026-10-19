@@ -32,7 +32,7 @@ import * as journalPause from "./journalPause";
 import { KEY_DOWN, KEY_UP, KEY_START_DOWN, KEY_START_UP, KEY_PAUSE_DOWN, KEYBOARD_PAUSE, KEYBOARD_PAUSE_PREFIX, Key, registerKey, syncKeyEvents } from "./keyEvents";
 import { onKeyboardPause, onPauseKeyDown } from "./keyboardPause";
 import { onDevCommand, onDeveloperRestart, onDeveloperTrace, onKeyDown, onKeyUp, onStartKeyDown, onStartKeyUp, onProbeExport, onProbeStart, selectPauseMenu } from "./keys";
-import { openControlsFirst, panelActions, pickResult, serviceAutomaticRematch, startingSelection } from "./menus";
+import { openControlsFirst, panelActions, previewControlsFirst, pickResult, serviceAutomaticRematch, startingSelection } from "./menus";
 import { PLAYER_FILE_RECEIVED, bindingFiles, playerFileReceived, playerFilesOwnerLeft, startPlayerFiles } from "./playerFiles";
 import { PLAYTEST, PLAYTEST_PREFIX, playtestRequested, readPlaytestRequest, servicePlaytestRequest } from "./playtest";
 import { STAGE_READY, cancelStageLoad, serviceStageLoad, stageReadyEvent } from "./stageLoad";
@@ -58,7 +58,6 @@ import { fighterAt, isActive } from "../../game/sim/roster";
 import { PAD_MOUSE, createPadTriggers, padMouse } from "./analogPad";
 import { beforeNativeSoakTick, afterNativeSoakTick } from "../../platform/nativeSoak";
 
-const INIT = "shell.init";
 const TICK = "shell.tick";
 const PLAYER_LEFT = "shell.playerLeft";
 const CONTROL_ACK = "shell.controlAck";
@@ -75,16 +74,6 @@ const PROBE_START = "shell.probeStart";
 const PROBE_EDGES = "shell.probeEdges";
 const PROBE_DUMP = "shell.probeDump";
 const PROBE_KEYS = { f5: 0x74, f6: 0x75, f7: 0x76 } as const;
-
-
-interface PendingStart {
-  readonly build: MapBuild;
-  readonly playback: RollbackPlayback;
-}
-
-declare global {
-  var __smashcraftShellStart: PendingStart | undefined;
-}
 
 
 // #396: the native-input build records each match epoch for at most EPOCH_CALLBACKS callbacks, ending with a checksum of the confirmed state.
@@ -335,13 +324,8 @@ function worldOrigin(): { x: number; y: number; z: number } {
 }
 
 
-function initialize(): void {
-  DestroyTimer(GetExpiredTimer());
-  const pending = globalThis.__smashcraftShellStart;
-  if (pending === undefined || shellState() !== undefined) return;
-  globalThis.__smashcraftShellStart = undefined;
-  const { build } = pending;
-  const origin = worldOrigin();
+function initialize(build: MapBuild, playback: RollbackPlayback, origin: { x: number; y: number; z: number }): void {
+  if (shellState() !== undefined) return;
   BlzHideOriginFrames(true);
 
   if (!BlzLoadTOCFile("war3mapImported\\SmashcraftHUD.toc")) DisplayTextToPlayer(GetLocalPlayer(), 0.0, 0.0, "Smashcraft's menus could not load. Restart the game.");
@@ -353,7 +337,7 @@ function initialize(): void {
 
   for (const slot of PARTICIPANT_SLOTS) SetPlayerColor(Player(slot), ConvertPlayerColor(slot));
   const s = createShellState(build, {
-    origin, frames: view.createStatusFrames(), persistence: bindingFiles, playback: pending.playback,
+    origin, frames: view.createStatusFrames(), persistence: bindingFiles, playback,
     editbox: journalIngress(build) === "editbox" ? new EditboxIngress() : undefined,
   });
   copyMatchState(s.game, startingSelection(build.scenario));
@@ -376,6 +360,7 @@ function initialize(): void {
     if (humanActive(s.game, participant.slot)) initializeBindingSettings(participant.bindings);
     else useDefaultBindings(participant.bindings);
   }
+  previewControlsFirst(s);
 }
 
 
@@ -410,7 +395,6 @@ function completeStartingChoices(): void {
 
 export function installShell(): void {
   on(PAD_MOUSE, withShell(padMouse));
-  on(INIT, initialize);
   on(TICK, withShell(gameTick));
   on(DRAW_EVENT, drawBetweenFrames);
   on(KEY_DOWN, withShell(onKeyDown));
@@ -455,7 +439,7 @@ export function installShell(): void {
 
 
 export function startShell(build: MapBuild, playback: RollbackPlayback): void {
-  globalThis.__smashcraftShellStart = { build, playback };
-  preloadStageAssets(worldOrigin());
-  TimerStart(CreateTimer(), 0.0, false, trampoline(INIT));
+  const origin = worldOrigin();
+  preloadStageAssets(origin);
+  initialize(build, playback, origin);
 }

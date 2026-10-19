@@ -168,7 +168,7 @@ function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = fal
     cancelBindingCapture(bindings);
     return;
   }
-  if (key === Key.escape && settings.isOpen()) {
+  if ((key === Key.escape || key === Key.f9) && settings.isOpen()) {
     settings.close();
     return;
   }

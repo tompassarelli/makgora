@@ -29,6 +29,7 @@ export type BindingLoadResult = { kind: "loaded"; encoded: string } | { kind: "e
 
 export interface BindingPersistence {
   load(owner: number, complete: (result: BindingLoadResult) => void): void;
+  readLocal(owner: number): BindingLoadResult | undefined;
   save(owner: number, encoded: string): void;
 }
 
@@ -83,27 +84,37 @@ export function chooseDelay(settings: BindingSettings, delay: DelayChoice): void
   settings.message = delay === AUTO_DELAY ? "Delay set to Auto. Save to keep it." : `Delay set to ${delay} frames. Save to keep it.`;
 }
 
+function applyStartingLoad(settings: BindingSettings, result: BindingLoadResult): void {
+  const stored = result.kind === "loaded" ? decodeDelay(result.encoded) : undefined;
+  const saved = stored === undefined ? undefined : decodeBindings(stored.bindings);
+  if (stored !== undefined && saved !== undefined) settings.delay = stored.delay;
+  if (saved !== undefined) {
+    settings.bindings = saved;
+    settings.profile = "saved";
+    settings.fromProfile = true;
+    settings.message = "Saved profile loaded. Press Done to choose a fighter.";
+  } else {
+    settings.bindings = presetBindings(DEFAULT_PRESET);
+    settings.profile = result.kind === "unavailable" ? "unavailable" : "none";
+    settings.fromProfile = false;
+    settings.message = result.kind === "loaded" ? `Saved controls were invalid; using ${PRESET_NAMES[DEFAULT_PRESET]} defaults.` : `${PRESET_NAMES[DEFAULT_PRESET]} controls ready. Pick a layout, then press Done.`;
+  }
+  settings.revision++;
+  settings.ready = true;
+}
+
 export function initializeBindingSettings(settings: BindingSettings): void {
   settings.bindings = presetBindings(DEFAULT_PRESET);
   settings.delay = AUTO_DELAY;
-  settings.persistence.load(settings.owner, (result) => {
-    const stored = result.kind === "loaded" ? decodeDelay(result.encoded) : undefined;
-    const saved = stored === undefined ? undefined : decodeBindings(stored.bindings);
-    if (stored !== undefined && saved !== undefined) settings.delay = stored.delay;
-    if (saved !== undefined) {
-      settings.bindings = saved;
-      settings.profile = "saved";
-      settings.fromProfile = true;
-      settings.message = "Saved profile loaded. Press Done to choose a fighter.";
-    } else {
-      settings.bindings = presetBindings(DEFAULT_PRESET);
-      settings.profile = result.kind === "unavailable" ? "unavailable" : "none";
-      settings.fromProfile = false;
-      settings.message = result.kind === "loaded" ? `Saved controls were invalid; using ${PRESET_NAMES[DEFAULT_PRESET]} defaults.` : `${PRESET_NAMES[DEFAULT_PRESET]} controls ready. Pick a layout, then press Done.`;
-    }
-    settings.revision++;
-    settings.ready = true;
-  });
+  settings.persistence.load(settings.owner, result => applyStartingLoad(settings, result));
+}
+
+export function previewStartingBindings(settings: Readonly<BindingSettings>): BindingSettings | undefined {
+  const result = settings.persistence.readLocal(settings.owner);
+  if (result === undefined) return undefined;
+  const preview = createBindingSettings(settings.owner, settings.persistence);
+  applyStartingLoad(preview, result);
+  return preview;
 }
 
 export function loadSavedBindings(settings: BindingSettings, done: (message: string) => void): void {

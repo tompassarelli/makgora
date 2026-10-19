@@ -428,8 +428,16 @@ export function journalMenuKey(s: ShellState, slot: ParticipantSlot, key: number
 
 const ALL_GREETED = 15;
 
+export function previewControlsFirst(s: ShellState): void {
+  if (s.game.phase !== Phase.characterMenu || stageLoading(s)) return;
+  for (const slot of PARTICIPANT_SLOTS) if (humanActive(s.game, slot)) views(s).settings[slot].preview();
+}
+
 export function openControlsFirst(s: ShellState): void {
-  if (s.game.phase !== Phase.characterMenu) s.controlsGreeted = ALL_GREETED;
+  if (s.game.phase !== Phase.characterMenu && s.controlsGreeted !== ALL_GREETED) {
+    s.controlsGreeted = ALL_GREETED;
+    for (const panel of views(s).settings) panel.endPreview();
+  }
   if (s.game.phase !== Phase.characterMenu || s.startingChoicesReady === false || stageLoading(s)) return;
   for (const slot of PARTICIPANT_SLOTS) {
     const greeted = s.controlsGreeted ?? 0;

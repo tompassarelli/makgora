@@ -90,8 +90,9 @@ remain reserved for Warcraft shortcuts. Ctrl+T starts a developer input trace.
 
 Help: type -help (or -commands) in chat for every player command, one line
 each, or press F9 for the quest log's Controls (your current layout and how to
-change it), How to play (stocks, shield, recovery) and Commands entries. A
-line at the start of each game says so.
+change it), How to play (stocks, shield, recovery) and Commands entries; F9 on
+the Controls screen closes it so the quest log shows. A line at the start of
+each game says so.
 
 Saw something wrong? Press K, or hold View on a controller for a second: the
 last ten seconds of the match are saved for a bug report on your computer, in
