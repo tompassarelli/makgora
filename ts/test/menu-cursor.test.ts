@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { LEFT_KEY, RIGHT_KEY, testHeadless } from "./headless";
 import type { HeadlessClient } from "wisp/src/headless/client";
-import { Phase, ResultPick, setParticipants, setTraining } from "../src/game/lobby/lobbyState";
+import { Phase, ResultPick, setItemsOn, setParticipants, setTeamBattle, setTraining } from "../src/game/lobby/lobbyState";
 import { install, start } from "../src/host/entries/playableMain";
 import { Key } from "../src/host/loop/keyEvents";
 import { shell } from "../src/host/loop/state";
@@ -344,6 +344,46 @@ test("a player alone sees the Tutorial button beside the fighter grid in Versus 
       const [otherLeft, otherTop, otherRight, otherBottom] = other.rectangle!;
       const overlaps = left < otherRight && otherLeft < right && bottom < otherTop && otherBottom < top;
       expect(overlaps, `Tutorial overlaps ${other.name} "${other.text}" with training ${training}`).toBe(false);
+    }
+  }
+  expect(client.errors).toEqual([]);
+});
+
+test("no two select-screen controls overlap in Versus, with Items or Team Battle on, or in Training, alone or with a second player [k2 property]", () => {
+  const { clients } = menu();
+  const client = clients.clients[0]!;
+  const layouts = [
+    { humans: 3, items: false, teams: false, training: false },
+    { humans: 1, items: false, teams: false, training: false },
+    { humans: 1, items: true, teams: false, training: false },
+    { humans: 1, items: true, teams: true, training: false },
+    { humans: 3, items: true, teams: true, training: false },
+    { humans: 1, items: false, teams: false, training: true },
+  ];
+  for (const layout of layouts) {
+    client.run(() => {
+      const game = shell().game;
+      setTraining(game, 0, false);
+      setParticipants(game, layout.humans, layout.humans === 1 ? 2 : 0);
+      setItemsOn(game, 0, layout.items);
+      setTeamBattle(game, 0, layout.teams);
+      setTraining(game, 0, layout.training);
+    });
+    clients.frames(4);
+    const all = client.frames.snapshot();
+    const byId = new Map(all.map(frame => [frame.handle.id, frame]));
+    const shown = (id: number | undefined): boolean => {
+      for (let frame = id === undefined ? undefined : byId.get(id); frame !== undefined; frame = frame.parentId === undefined ? undefined : byId.get(frame.parentId)) {
+        if (!frame.visible || frame.alpha <= 0) return false;
+      }
+      return true;
+    };
+    const controls = all.filter(frame => shown(frame.handle.id) && frame.rectangle !== undefined && (frame.name === "ScriptDialogButton" || /^Melee(Settings|Tile)Button/.test(frame.name)));
+    for (const [index, control] of controls.entries()) for (const other of controls.slice(index + 1)) {
+      const [left, top, right, bottom] = control.rectangle!;
+      const [otherLeft, otherTop, otherRight, otherBottom] = other.rectangle!;
+      const overlaps = left + 0.001 < otherRight && otherLeft + 0.001 < right && bottom + 0.001 < otherTop && otherBottom + 0.001 < top;
+      expect(overlaps, `${JSON.stringify(layout)}: ${control.name} "${control.text}" overlaps ${other.name} "${other.text}"`).toBe(false);
     }
   }
   expect(client.errors).toEqual([]);

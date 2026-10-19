@@ -56,7 +56,7 @@ export function createTutorialMenu(owner: framehandle, rules: framehandle, suffi
   add(button(root, f32(0.23), f32(0.315), f32(0.16), f32(0.035), "Start tutorial"), { kind: "tutorialStart" });
   add(button(root, f32(0.41), f32(0.315), f32(0.16), f32(0.035), "Not now"), { kind: "tutorialClose" });
   BlzFrameSetVisible(root, false);
-  const open = add(button(rules, f32(0.05), f32(0.475), f32(0.09), f32(0.027), "Tutorial"), { kind: "tutorialOpen" });
+  const open = add(button(rules, f32(0.05), f32(0.424), f32(0.09), f32(0.027), "Tutorial"), { kind: "tutorialOpen" });
   return { root, lesson, open };
 }
 
