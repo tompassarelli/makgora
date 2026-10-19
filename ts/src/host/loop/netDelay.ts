@@ -4,8 +4,8 @@ import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS } from "../../game/input/participants";
 import { type MatchState, humanActive } from "../../game/lobby/lobbyState";
 import {
-  AUTO_DELAY, DEFAULT_DELAY, type DelayPolicy, HIGH_DELAY_FRAMES, type RttEstimate, agreedDelay, connectionPoor, delayPolicy, expectedRollback, highDelay,
-  nextDelay, observeRtt, requestedDelay, rttEstimate, smoothedRttMs,
+  AUTO_DELAY, DEFAULT_DELAY, type DelayCorrection, type DelayPolicy, HIGH_DELAY_FRAMES, type RttEstimate, agreedDelay, connectionPoor, correctDelay, correctedDelay,
+  delayCorrection, delayPolicy, expectedRollback, highDelay, nextDelay, observeRtt, requestedDelay, rttEstimate, smoothedRttMs,
 } from "../../game/netcode/delayPolicy";
 import { type FixedDelay, isFixedDelay } from "../../game/netcode/fixedSchedule";
 import { PENDING_CAPACITY } from "../../game/netcode/shadowSchedule";
@@ -32,11 +32,15 @@ export interface NetDelay {
   arrivals: number;
   lateSum: number;
   lateMax: number;
+  readonly correction: DelayCorrection;
+  readonly second: { held: number; arrivals: number; deep: number };
+  pingDelay: number;
 }
 
 export function createNetDelay(window: number): NetDelay {
+  const policy = delayPolicy(window);
   return {
-    policy: delayPolicy(window), estimate: rttEstimate(), sentTicks: Array.from({ length: PENDING_CAPACITY }, () => -1),
+    policy, correction: delayCorrection(policy), second: { held: 0, arrivals: 0, deep: 0 }, pingDelay: DEFAULT_DELAY, estimate: rttEstimate(), sentTicks: Array.from({ length: PENDING_CAPACITY }, () => -1),
     proposals: [DEFAULT_DELAY, DEFAULT_DELAY, DEFAULT_DELAY, DEFAULT_DELAY], depths: Array.from({ length: window + 2 }, () => 0), ticks: 0, proposed: DEFAULT_DELAY, depth: 0, shownDepth: 0,
     indicator: undefined, shownText: "", arrivals: 0, lateSum: 0, lateMax: 0,
   };
@@ -101,6 +105,17 @@ export function beginNetEpoch(net: NetDelay): void {
   net.depths.fill(0);
   net.depth = 0;
   resetArrivals(net);
+  resetSecond(net);
+  net.correction.windowSeconds = 0;
+  net.correction.errorSeconds = 0;
+  net.correction.cleanSeconds = 0;
+}
+
+function resetSecond(net: NetDelay): void {
+  const { second } = net;
+  second.held = 0;
+  second.arrivals = 0;
+  second.deep = 0;
 }
 
 function resetArrivals(net: NetDelay): void {
@@ -118,6 +133,9 @@ function noteArrival(net: NetDelay, late: number): void {
   net.lateMax = net.arrivals === 0 ? late : Math.max(net.lateMax, late);
   net.arrivals++;
   net.lateSum += late;
+  const { second } = net;
+  second.arrivals++;
+  if (late > net.policy.budget) second.deep++;
 }
 
 export function takeArrivals(net: NetDelay): string {
@@ -132,8 +150,19 @@ export function noteDepth(net: NetDelay, depth: number): void {
   net.depths[bucket] = at(net.depths, bucket) + 1;
 }
 
-export function serviceNetDelay(net: NetDelay, game: Readonly<MatchState>, local: number, delay: number, inMatch: boolean): void {
+function proposeDelay(net: NetDelay, online: boolean, active: boolean, inMatch: boolean, delay: number): void {
+  if (active && !inMatch) BlzSendSyncData(DELAY_PREFIX, `${PING_MARK}${I2S(net.ticks)}`);
+  if (online && inMatch) correctDelay(net.policy, net.correction, delay, net.second);
+  resetSecond(net);
+  if (!active) return;
+  if (net.estimate.samples > 0) net.pingDelay = nextDelay(net.policy, net.estimate, net.pingDelay);
+  const proposal = correctedDelay(net.policy, net.correction, net.pingDelay);
+  if (proposal !== net.proposed && BlzSendSyncData(DELAY_PREFIX, I2S(proposal))) net.proposed = proposal;
+}
+
+export function serviceNetDelay(net: NetDelay, game: Readonly<MatchState>, local: number, delay: number, inMatch: boolean, held: boolean): void {
   net.ticks++;
+  if (inMatch && held) net.second.held++;
   if (floorMod(net.ticks, SECOND) !== 0) return;
   if (net.indicator === undefined) {
     net.indicator = createText("SmashcraftNetIndicator", gameUi(), 0);
@@ -142,11 +171,7 @@ export function serviceNetDelay(net: NetDelay, game: Readonly<MatchState>, local
     BlzFrameSetVisible(net.indicator, false);
   }
   const online = isOnline(game);
-  if (online && !inMatch && humanActive(game, local)) BlzSendSyncData(DELAY_PREFIX, `${PING_MARK}${I2S(net.ticks)}`);
-  if (online && humanActive(game, local) && net.estimate.samples > 0) {
-    const proposal = nextDelay(net.policy, net.estimate, net.proposed);
-    if (proposal !== net.proposed && BlzSendSyncData(DELAY_PREFIX, I2S(proposal))) net.proposed = proposal;
-  }
+  proposeDelay(net, online, online && humanActive(game, local), inMatch, delay);
   net.shownDepth = net.depth;
   net.depth = 0;
   const poor = connectionPoor(net.policy, net.estimate, delay);

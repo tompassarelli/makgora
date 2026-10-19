@@ -284,29 +284,52 @@ transport (wisp#110) both call it.
   as in Slippi.
 - **Delay setting**, saved per player with the controls (Controls and delay,
   F1 on character select, which is also the lobby): **Auto** (the default) or
-  **Fixed N** frames, 0 to 60 (one step at a time to 12, then every 4th), used as-is. Rollback absorbs the rest. Local
-  matches can lower it to 0 or 1. **Recalibrate** shows the measured ping,
-  Auto's choice and the expected rollback depth, and one press makes that
-  choice fixed.
+  **Fixed N** frames, 0 to 16, used as-is. The button steps one frame at a
+  time from 0 to 16, then back to Auto; a saved profile with any other delay
+  code loads as Auto. Past 16 frames (267 ms) a fighter stops feeling
+  playable, so neither setting goes higher: a connection that needs more
+  holds prediction at the window edge instead. Rollback absorbs the rest.
+  Local matches can lower it to 0 or 1. **Recalibrate** shows the measured
+  ping, Auto's choice and the expected rollback depth, and one press makes
+  that choice fixed.
 - **Lobby agreement:** each player sees the other's request on character
   select. The match uses the higher request, so nobody plays below what they
   asked for. When the agreed delay is 8 frames (133 ms) or more, the lobby
   warns: "Input delay of 8+ frames: this connection will feel sluggish".
-- **Auto, online:** round trip comes from the echo of each sent input row in
-  a match and, on the menus before it, of a one-per-second ping on the delay
-  channel, so the first match of a session already uses a measured delay
-  (Tom's first Battle.net match, 19 October 2026, had no samples yet and ran
-  at 2). It is smoothed in integer
-  milliseconds with Jacobson/Karels (RFC 6298: SRTT gain 1/8, RTTVAR gain
-  1/4). Auto chooses delay = max(2, ceil(one-way frames) − R), using the
-  smoothed trip plus two deviations, and caps it at 60. R, the rollback
-  budget, is 8 frames, a third of the 24-frame window, so a Battle.net relay
-  of 300-700 ms (18-42 frames each way through the host) keeps prediction
-  well inside the window and trades input delay for an even 60 frames a
-  second. Delay rises above 2 only past 2 + R = 10 one-way frames (about
-  333 ms round trip), so ordinary connections keep 2 frames. Auto raises at once but lowers only when one more frame of
-  round trip would still allow the lower value, so jitter cannot flip it back
-  and forth.
+- **Auto, online:** the higher of a ping target and an error-corrected value,
+  capped at 16.
+  - *Ping target:* round trip comes from the echo of each sent input row in
+    a match and, on the menus before it, of a one-per-second ping on the
+    delay channel, so the first match of a session already uses a measured
+    delay (Tom's first Battle.net match, 19 October 2026, had no samples yet
+    and ran at 2). It is smoothed in integer milliseconds with
+    Jacobson/Karels (RFC 6298: SRTT gain 1/8, RTTVAR gain 1/4). The target
+    is max(2, ceil(one-way frames) − R), using the smoothed trip plus two
+    deviations. R, the rollback budget, is 8 frames, a third of the
+    24-frame window. The target rises above 2 only past 2 + R = 10 one-way
+    frames (about 333 ms round trip), so ordinary connections keep 2 frames.
+    It raises at once but lowers only when one more frame of round trip
+    would still allow the lower value, so jitter cannot flip it back and
+    forth.
+  - *Error correction:* each second of a match counts the callbacks whose
+    prediction was held or stalled, the remote rows that arrived, and those
+    that arrived more than R frames behind the speculative cursor (deep). A
+    second is errored when 2 or more callbacks held or more than half the
+    rows came in deep; when 3 of a 5-second window are errored, the
+    corrected value becomes one more than the higher of itself and the
+    current delay. A second is clean when nothing held and at most 5% of the
+    rows came in deep; 30 clean seconds in a row lower it to one below the
+    lower of itself and the current delay. The new value applies at the next
+    match. Measured on the relay harness (smashcraft:ts/test/online-pacing.test.ts,
+    match 793's inputs, three humans and a computer): at 300 and 600 ms
+    round trip the Auto delay holds 60 sim frames a second with no errored
+    seconds; a 1 s relay outage errors at most 2 seconds, so it does not
+    raise the delay; delays that held (600 ms at 4 or 8, the 920 ms match-793
+    profile at any delay) raise it one frame per window. A threshold at R
+    deep for a quarter of the rows errored clean matches (600 ms at 16: a
+    third of rows deep, none held), and a clean second needing every row
+    within R never ran 30 seconds even at 300 ms, so the value could only
+    rise.
 - **When delay changes:** only at match start, on the epoch every client
   begins together, from requests already exchanged through the synchronized
   channel. It never changes mid-exchange.

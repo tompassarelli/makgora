@@ -6,8 +6,6 @@ import { MAX_INPUT_DELAY } from "./fixedSchedule";
 export const DEFAULT_DELAY = 2;
 export const ROLLBACK_BUDGET = 8;
 export const MAX_FIXED_DELAY = MAX_INPUT_DELAY;
-const FINE_DELAY_STEPS = 12;
-const COARSE_DELAY_STEP = 4;
 export const HIGH_DELAY_FRAMES = 8;
 export const AUTO_DELAY = -1;
 export const TIME_SYNC_INTERVAL = 60;
@@ -87,8 +85,7 @@ export const isDelayChoice = (value: number): value is DelayChoice => value === 
 
 export function nextDelayChoice(choice: DelayChoice): DelayChoice {
   if (choice === AUTO_DELAY) return 0;
-  const next = choice < FINE_DELAY_STEPS ? choice + 1 : choice + COARSE_DELAY_STEP;
-  return next > MAX_FIXED_DELAY ? AUTO_DELAY : next;
+  return choice >= MAX_FIXED_DELAY ? AUTO_DELAY : choice + 1;
 }
 
 export const requestedDelay = (choice: DelayChoice, auto: number): number => (choice === AUTO_DELAY ? auto : choice);
@@ -102,3 +99,49 @@ export function agreedDelay(requests: readonly number[], fallback: number = DEFA
 export function timeSyncWait(localAdvantage: number, remoteAdvantage: number, framesSinceWait: number): boolean {
   return framesSinceWait >= TIME_SYNC_INTERVAL && localAdvantage - remoteAdvantage >= 2;
 }
+
+export const HELD_ERROR_CALLBACKS = 2;
+export const DEEP_ERROR_PERCENT = 50;
+export const CLEAN_DEEP_PERCENT = 5;
+export const ERROR_WINDOW_SECONDS = 5;
+export const ERROR_SECONDS = 3;
+export const CLEAN_SECONDS = 30;
+
+export interface DelayCorrection {
+  value: number;
+  windowSeconds: number;
+  errorSeconds: number;
+  cleanSeconds: number;
+}
+
+export interface MatchSecond {
+  readonly held: number;
+  readonly arrivals: number;
+  readonly deep: number;
+}
+
+export const delayCorrection = (policy: DelayPolicy): DelayCorrection => ({ value: policy.floor, windowSeconds: 0, errorSeconds: 0, cleanSeconds: 0 });
+
+export const erroredSecond = (second: MatchSecond): boolean =>
+  second.held >= HELD_ERROR_CALLBACKS || second.deep * 100 > second.arrivals * DEEP_ERROR_PERCENT;
+
+export const cleanSecond = (second: MatchSecond): boolean =>
+  second.held === 0 && second.arrivals > 0 && second.deep * 100 <= second.arrivals * CLEAN_DEEP_PERCENT;
+
+export function correctDelay(policy: DelayPolicy, correction: DelayCorrection, delay: number, second: MatchSecond): void {
+  const errored = erroredSecond(second);
+  correction.windowSeconds++;
+  if (errored) correction.errorSeconds++;
+  if (correction.windowSeconds >= ERROR_WINDOW_SECONDS) {
+    if (correction.errorSeconds >= ERROR_SECONDS) correction.value = clampDelay(policy, Math.max(correction.value, delay) + 1);
+    correction.windowSeconds = 0;
+    correction.errorSeconds = 0;
+  }
+  correction.cleanSeconds = cleanSecond(second) ? correction.cleanSeconds + 1 : 0;
+  if (correction.cleanSeconds < CLEAN_SECONDS) return;
+  correction.cleanSeconds = 0;
+  correction.value = clampDelay(policy, Math.min(correction.value, delay) - 1);
+}
+
+export const correctedDelay = (policy: DelayPolicy, correction: Readonly<DelayCorrection>, pingDelay: number): number =>
+  clampDelay(policy, Math.max(pingDelay, correction.value));

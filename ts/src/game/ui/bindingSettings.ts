@@ -63,7 +63,7 @@ export function createBindingSettings(owner: number, persistence: BindingPersist
 
 
 const DELAY_MARK = "D";
-const DELAY_CODES = "0123456789abcdefghijklmnopqrstuvwxyzBCDEFGHIJKLMNOPQRSTUVWXYZ";
+const DELAY_CODES = "0123456789abcdefg";
 
 export function encodeSettings(settings: Readonly<BindingSettings>): string {
   return `${encodeBindings(settings.bindings)}${DELAY_MARK}${settings.delay === AUTO_DELAY ? "A" : DELAY_CODES.charAt(settings.delay)}`;

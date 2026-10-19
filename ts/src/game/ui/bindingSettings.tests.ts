@@ -21,3 +21,12 @@ test("every delay the settings button reaches, from Auto through the ceiling and
   settings.delay = AUTO_DELAY;
   assertEquals(decodeDelay(encodeSettings(settings)).delay, AUTO_DELAY);
 });
+
+test("a saved profile whose delay code is any other character loads a fixed delay no higher than the ceiling, or Auto [k2 property]", () => {
+  const settings = createBindingSettings(0, NO_STORE);
+  const prefix = encodeSettings(settings).slice(0, -1);
+  for (let code = 33; code < 127; code++) {
+    const delay = decodeDelay(`${prefix}${String.fromCharCode(code)}`).delay;
+    assertTrue(delay === AUTO_DELAY || (delay >= 0 && delay <= MAX_FIXED_DELAY));
+  }
+});
