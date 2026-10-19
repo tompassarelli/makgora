@@ -55,6 +55,7 @@ export interface ImpactPose {
 interface KoPose {
   visible: boolean;
   character: Character;
+  owner: number;
   alpha: number;
   scale: number;
   x: number;
@@ -81,6 +82,7 @@ export interface ImpactState {
   readonly driftZ: number[];
   readonly pitch: number[];
   readonly character: Character[];
+  readonly owner: number[];
   readonly strength: number[];
 }
 
@@ -97,6 +99,7 @@ const EMPTY: Readonly<ImpactState> = {
   driftZ: filled(IMPACT_COUNT, 0.0),
   pitch: filled(IMPACT_COUNT, 0.0),
   character: filled<Character>(IMPACT_COUNT, 1),
+  owner: filled(IMPACT_COUNT, 0),
   strength: filled(IMPACT_COUNT, 0.0),
 };
 
@@ -112,6 +115,7 @@ export function createImpactState(): ImpactState {
     driftZ: EMPTY.driftZ.slice(),
     pitch: EMPTY.pitch.slice(),
     character: EMPTY.character.slice(),
+    owner: EMPTY.owner.slice(),
     strength: EMPTY.strength.slice(),
   };
 }
@@ -129,6 +133,7 @@ export function clearImpactSlot(state: ImpactState, i: number): void {
   state.occupied[kind] = at(state.occupied, kind) & ~(1 << imod(i, IMPACTS_PER_KIND));
   state.ages[i] = undefined;
   state.character[i] = 1;
+  state.owner[i] = 0;
   state.originX[i] = 0.0;
   state.originZ[i] = 0.0;
   state.drift[i] = 0;
@@ -153,6 +158,7 @@ export function copyImpactStateInto(target: ImpactState, source: Readonly<Impact
       }
       target.ages[i] = age;
       target.character[i] = source.character[i] ?? 1;
+      target.owner[i] = source.owner[i] ?? 0;
       target.originX[i] = source.originX[i] ?? 0.0;
       target.originZ[i] = source.originZ[i] ?? 0.0;
       target.drift[i] = source.drift[i] ?? 0;
@@ -166,6 +172,7 @@ export function copyImpactStateInto(target: ImpactState, source: Readonly<Impact
 
 function impactSlotDifference(expected: Readonly<ImpactState>, actual: Readonly<ImpactState>, i: number): string {
   if (expected.character[i] !== actual.character[i]) return "character";
+  if (expected.owner[i] !== actual.owner[i]) return "owner";
   if (expected.ages[i] !== actual.ages[i]) return "age";
   if (expected.originX[i] !== actual.originX[i]) return "originX";
   if (expected.originZ[i] !== actual.originZ[i]) return "originZ";
@@ -180,7 +187,7 @@ export function firstImpactDifference(expected: Readonly<ImpactState>, actual: R
     if (expected.nextSlot[kind] !== actual.nextSlot[kind]) return `nextSlot[${kind}]`;
   }
   for (let i = 0; i < IMPACT_COUNT; i++) {
-    if (expected.character[i] !== actual.character[i] || expected.ages[i] !== actual.ages[i]
+    if (expected.character[i] !== actual.character[i] || expected.owner[i] !== actual.owner[i] || expected.ages[i] !== actual.ages[i]
       || expected.originX[i] !== actual.originX[i] || expected.originZ[i] !== actual.originZ[i]
       || expected.drift[i] !== actual.drift[i] || expected.driftZ[i] !== actual.driftZ[i]
       || expected.pitch[i] !== actual.pitch[i] || expected.strength[i] !== actual.strength[i]) return `slot[${i}].${impactSlotDifference(expected, actual, i)}`;
@@ -263,7 +270,7 @@ function surfaceFlash(state: ImpactState, kind: number, events: Readonly<ImpactE
 }
 
 
-export function emitImpacts(state: ImpactState, events: Readonly<ImpactEvents>, frame: number): void {
+export function emitImpacts(state: ImpactState, events: Readonly<ImpactEvents>, frame: number, owner: number): void {
   const { x, z } = events;
   if (events.grab) spawn(state, IMPACT_GRAB, x, f32(z + 50.0), 0, f32(0.65));
   if (events.throwRelease) spawn(state, IMPACT_THROW, x, f32(z + 50.0), 0, f32(1.1));
@@ -312,6 +319,7 @@ export function emitImpacts(state: ImpactState, events: Readonly<ImpactEvents>, 
     const kind = imod(frame + events.character, 2) === 0 ? IMPACT_STAR_KO : IMPACT_SCREEN_KO;
     const slot = spawn(state, kind, f32(x * f32(0.45)), min(z, 480.0), events.facing, 1.0);
     state.character[slot] = events.character;
+    state.owner[slot] = owner;
   } else if (events.koDirectionX !== 0 || events.koDirectionZ !== 0) {
     const slot = spawn(state, IMPACT_SIDE_KO, x, f32(z + 35.0), events.koDirectionX, 2.0);
     state.driftZ[slot] = events.koDirectionZ * 2.0;
@@ -369,7 +377,7 @@ function impactPose(out: ImpactPose | undefined, alpha: number, scale: number, x
 }
 
 
-const HIDDEN_KO: Readonly<KoPose> = { visible: false, character: 1, alpha: 0, scale: 0.0, x: 0.0, y: 0.0, z: 0.0, pitch: 0.0, yaw: 0.0, roll: 0.0 };
+const HIDDEN_KO: Readonly<KoPose> = { visible: false, character: 1, owner: 0, alpha: 0, scale: 0.0, x: 0.0, y: 0.0, z: 0.0, pitch: 0.0, yaw: 0.0, roll: 0.0 };
 
 
 
@@ -384,6 +392,7 @@ export function projectKo(state: Readonly<ImpactState>, i: number): Readonly<KoP
   const originX = at(state.originX, i);
   const originZ = at(state.originZ, i);
   const character = at(state.character, i);
+  const owner = at(state.owner, i);
   const yaw = drift > 0 ? 0.0 : PI;
   if (idiv(i, IMPACTS_PER_KIND) === IMPACT_STAR_KO) {
     if (age >= KO_STAR_FLIGHT_FRAMES) return HIDDEN_KO;
@@ -392,6 +401,7 @@ export function projectKo(state: Readonly<ImpactState>, i: number): Readonly<KoP
     return {
       visible: true,
       character,
+      owner,
       alpha: 255,
       scale: f32(remaining * remaining),
       x: f32(originX + f32((drift * 75) * t)),
@@ -407,6 +417,7 @@ export function projectKo(state: Readonly<ImpactState>, i: number): Readonly<KoP
   return {
     visible: true,
     character,
+    owner,
     alpha: toInt(f32(255 * f32(1.0 - drop))),
     scale: f32(1.0 + f32(flight * f32(1.7))),
     x: f32(originX + f32((drift * 110) * flight)),

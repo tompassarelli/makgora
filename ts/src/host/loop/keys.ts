@@ -421,7 +421,7 @@ export function applyDeveloperCommand(s: ShellState, actor: number, original: st
     const events = { ...createImpactEvents(), ...scenario.cue };
     events.x = 0.0;
     const ui = views(s);
-    emitImpacts(s.runtime.impacts, events, 8);
+    emitImpacts(s.runtime.impacts, events, 8, 0);
     ui.combat.presentConfirmed(s.devReceipts + 1, 4, events);
     ui.combat.present(s.runtime.impacts, s.runtime.simulationFrame, s.runtime.impacts, true);
     receipt = `dev: effects ${index} ${scenario.model} ${scenario.sound}`;

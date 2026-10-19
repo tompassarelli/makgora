@@ -41,14 +41,14 @@ test("a snapshot restores the impact pool and its ring pointers [k1 scenario]", 
   const events = createImpactEvents();
   events.dodge = DodgeCue.spot;
   events.x = 77.0;
-  emitImpacts(match.runtime.impacts, events, 0);
+  emitImpacts(match.runtime.impacts, events, 0, 0);
   for (let frame = 1; frame <= 5; frame++) advanceImpacts(match.runtime.impacts);
   const saved = createReplaySnapshot();
   captureReplaySnapshot(saved, match.world, match.game, match.inputs, match.runtime);
   const dust = projectImpact(match.runtime.impacts, DUST);
   events.dodge = DodgeCue.roll;
   events.direction = -1;
-  emitImpacts(match.runtime.impacts, events, 0);
+  emitImpacts(match.runtime.impacts, events, 0, 0);
   const changed = createReplaySnapshot();
   captureReplaySnapshot(changed, match.world, match.game, match.inputs, match.runtime);
   assertEquals(stateChecksum(changed), stateChecksum(saved));
@@ -214,4 +214,23 @@ test("replaying a confirmed top KO restores one body and the same stocks [k1 sce
   restoreReplaySnapshot(before, match.world, match.game, match.inputs, match.runtime);
   assertFalse(projectKo(match.runtime.impacts, IMPACT_SCREEN_KO * IMPACTS_PER_KIND).visible);
   assertFalse(projectKo(match.runtime.impacts, IMPACT_STAR_KO * IMPACTS_PER_KIND).visible);
+});
+
+test("a top KO tumble body carries the KO'd player's slot so it wears their colour [k1 scenario]", () => {
+  const match = testMatch(9, Character.rifleman);
+  const fighter = fighterAt(match.world, 3);
+  fighter.motion.z = f32(stageBounds(match.game.stageChoice).blast.top + 1.0);
+  fighter.motion.grounded = false;
+  fighter.launch.knockbackZ = f32(TOP_KO_MINIMUM_UPWARD_KNOCKBACK + 10.0);
+  fighter.down.state = DownState.tumble;
+  fighter.down.frame = 1;
+  executeNext(match);
+  assertTrue(fighter.status.out);
+  const owners: number[] = [];
+  for (let i = IMPACT_STAR_KO * IMPACTS_PER_KIND; i < (IMPACT_SCREEN_KO + 1) * IMPACTS_PER_KIND; i++) {
+    const pose = projectKo(match.runtime.impacts, i);
+    if (pose.visible) owners.push(pose.owner);
+  }
+  assertEquals(owners.length, 1);
+  assertEquals(owners[0], 3);
 });

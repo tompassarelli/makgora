@@ -222,7 +222,7 @@ export function sparkScenes(move: CueMove): { readonly scenes: RenderScene[]; re
     client.run(() => { combat = new CombatEffects(origin); });
     if (combat === undefined) throw new Error("missing impact renderer");
     const impacts = createImpactState();
-    emitImpacts(impacts, events, 0);
+    emitImpacts(impacts, events, 0, 0);
     const scenes: RenderScene[] = [];
     const poses: (readonly ParkPose[])[] = [];
     let empty: RenderScene | undefined;

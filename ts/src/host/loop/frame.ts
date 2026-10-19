@@ -155,7 +155,7 @@ export function applyFrame(s: ShellState, recorded = false): void {
         traceInput(s.trace, `frame ${runtime.simulationFrame} class ${cls} slot ${voiceSlot} live ${live}`);
       }
       : undefined);
-    ui.combat.confirmContacts(runtime.simulationFrame, runtime.frameImpacts[slot]);
+    ui.combat.confirmContacts(runtime.simulationFrame, slot, runtime.frameImpacts[slot]);
     ui.combat.confirmKo(runtime.simulationFrame, slot, fighter, runtime.frameImpacts[slot]);
     ui.placed.presentConfirmed(runtime.simulationFrame, fighter, slot);
     if (!held) {

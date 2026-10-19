@@ -42,7 +42,7 @@ function strike(effect: Readonly<HitEffect>) {
   contactBatch(world, () => queueDamageContact(world, 0, 1, effect, 1, ContactKind.launch, true, undefined));
   finishImpactEventsAfter(events, victim);
   const impacts = createImpactState();
-  emitImpacts(impacts, events, 0);
+  emitImpacts(impacts, events, 0, 0);
   let volume = 0;
   presentImpactSounds(events, (_sound, _x, _z, played) => { volume = Math.max(volume, played); });
   return { attacker, victim, world, events, volume, spark: impacts.strength[IMPACT_HIT * IMPACTS_PER_KIND] ?? 0.0 };

@@ -226,12 +226,12 @@ export function executeMatchFrame(row: MatchFrameInput, game: MatchState, world:
     const f = fighterAt(world, slot);
     finishImpactEventsAfter(runtime.frameImpacts[slot], f, world);
     if (scope !== undefined && slot !== scope.slot && participantActive(scope.reused, slot)) {
-      emitImpacts(runtime.impacts, runtime.frameImpacts[slot], frame);
+      emitImpacts(runtime.impacts, runtime.frameImpacts[slot], frame, slot);
       reusePresentation(runtime, scope.after, slot);
       continue;
     }
     if (game.phase === Phase.match) {
-      emitImpacts(runtime.impacts, runtime.frameImpacts[slot], frame);
+      emitImpacts(runtime.impacts, runtime.frameImpacts[slot], frame, slot);
       advanceSpecialEffect(runtime.specials, f, slot);
       advanceSummons(runtime.summons, f, slot);
     }

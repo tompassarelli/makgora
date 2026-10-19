@@ -95,6 +95,8 @@ export class CombatEffects {
 
   private koParked: (boolean | undefined)[] | undefined;
 
+  private readonly koOwners: (number | undefined)[] = [];
+
   private parked: ParkedFlags | undefined;
 
   private readonly busyKinds: boolean[] = [];
@@ -201,10 +203,10 @@ export class CombatEffects {
 
 
 
-  confirmContacts(frame: number, events: Readonly<ImpactEvents>): void {
+  confirmContacts(frame: number, slot: number, events: Readonly<ImpactEvents>): void {
     if (!events.hit && !events.shieldHit && !events.shieldReflect && !events.shieldBreak) return;
     const late = (this.late ??= createImpactState());
-    emitImpacts(late, events, frame);
+    emitImpacts(late, events, frame, slot);
     let live = 0;
     // Use IMPACT_COUNT because free slots are undefined and Lua length skips them.
     for (let i = 0; i < IMPACT_COUNT; i++) {
@@ -326,6 +328,7 @@ export class CombatEffects {
       }
       koParked[group] = false;
       parked[IMPACT_COUNT + i] = false;
+      this.colourKo(model, i, pose.owner);
       placeEffect(model, this.x + pose.x, this.y + pose.y, this.z + pose.z);
       BlzSetSpecialEffectScale(model, characterModelScale(pose.character) * pose.scale);
       BlzSetSpecialEffectPitch(model, pose.pitch);
@@ -333,6 +336,12 @@ export class CombatEffects {
       BlzSetSpecialEffectRoll(model, pose.roll);
       BlzSetSpecialEffectAlpha(model, pose.alpha);
     }
+  }
+
+  private colourKo(model: effect, i: number, owner: number): void {
+    if (this.koOwners[i] === owner) return;
+    this.koOwners[i] = owner;
+    BlzSetSpecialEffectColorByPlayer(model, Player(owner));
   }
 
   private tint(model: effect, i: number, kind: number, strength: number): void {
