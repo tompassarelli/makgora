@@ -13,7 +13,7 @@ import { Action } from "../input/actions";
 import { type KeyBindings, keyFor, keyLabel } from "../input/keyBindings";
 import { CPU_OPPONENT_COPY } from "./cpuOpponentCopy";
 import { createOpponentSettings } from "./opponentSettingsFrames";
-import { CPU_OPPONENT_DEFAULT, CPU_TIER_DEFAULT } from "../match/cpuProfiles";
+import { CPU_OPPONENT_CHOICE_DEFAULT, CPU_TIER_DEFAULT } from "../match/cpuProfiles";
 import { bindPrototype } from "../../platform/rebind";
 import { PARTICIPANT_SLOTS, type Slots } from "../input/participants";
 import {
@@ -114,7 +114,7 @@ type SelectionButton = { kind: "team"; slot: number } | { kind: "tile"; tile: nu
 type MenuFocus = { readonly kind: "fighter" | "settings" | "team" | "teamBattle" | "friendlyFire"; readonly slot: number };
 const titleCase = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
 function cpuCardSummary(game: Readonly<MatchState>, slot: number): string {
-  return `CPU · ${titleCase(game.cpuOpponents[slot] ?? CPU_OPPONENT_DEFAULT)}\n${titleCase(game.cpuTiers[slot] ?? CPU_TIER_DEFAULT)}`;
+  return `CPU · ${titleCase(game.cpuOpponents[slot] ?? CPU_OPPONENT_CHOICE_DEFAULT)}\n${titleCase(game.cpuTiers[slot] ?? CPU_TIER_DEFAULT)}`;
 }
 
 
@@ -736,7 +736,7 @@ export class SelectionPanel {
   }
 
   private showCpuSettings(game: Readonly<MatchState>, slot: number): void {
-    const opponent = game.cpuOpponents[slot] ?? CPU_OPPONENT_DEFAULT;
+    const opponent = game.cpuOpponents[slot] ?? CPU_OPPONENT_CHOICE_DEFAULT;
     const tier = game.cpuTiers[slot] ?? CPU_TIER_DEFAULT;
     setFrameText(this.cpuTitle, `CPU ${slot + 1} — Opponent settings`);
     for (let row = 0; row < this.cpuValues.length; row++) {

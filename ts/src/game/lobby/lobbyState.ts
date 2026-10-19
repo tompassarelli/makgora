@@ -9,7 +9,7 @@ import { Character, ItemKind, itemBit } from "../sim/codes";
 import { scheduleMatchItems } from "../match/centreItem";
 import { type MatchMeterDrops, copyMatchMeterDrops, createMatchMeterDrops, scheduleMeterDrops } from "../match/meterDrops";
 import { nextMatchSeed } from "../match/botRandom";
-import { CPU_OPPONENT_DEFAULT, CPU_TIERS, CPU_TIER_DEFAULT, type CpuOpponentChoice, type CpuOpponentId, type CpuTier, isCpuOpponentChoice, isCpuTier, resolveCpuOpponent } from "../match/cpuProfiles";
+import { CPU_OPPONENT_CHOICE_DEFAULT, CPU_OPPONENT_DEFAULT, CPU_TIERS, CPU_TIER_DEFAULT, type CpuOpponentChoice, type CpuOpponentId, type CpuTier, isCpuOpponentChoice, isCpuTier, resolveCpuOpponent } from "../match/cpuProfiles";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { type MatchItems, copyMatchItems, createMatchItems } from "../match/items";
 import { type Team } from "../sim/teams";
@@ -100,7 +100,7 @@ export function createMatchState(): MatchState {
   return {
     camera: createMatchCamera(),
     phase: Phase.characterMenu, characterChoices: [defaultChoice(0), defaultChoice(1), defaultChoice(2), defaultChoice(0)], matchSeed: 0,
-    cpuOpponents: [CPU_OPPONENT_DEFAULT, CPU_OPPONENT_DEFAULT, CPU_OPPONENT_DEFAULT, CPU_OPPONENT_DEFAULT],
+    cpuOpponents: [CPU_OPPONENT_CHOICE_DEFAULT, CPU_OPPONENT_CHOICE_DEFAULT, CPU_OPPONENT_CHOICE_DEFAULT, CPU_OPPONENT_CHOICE_DEFAULT],
     cpuTiers: [CPU_TIER_DEFAULT, CPU_TIER_DEFAULT, CPU_TIER_DEFAULT, CPU_TIER_DEFAULT],
     cpuResolvedOpponents: [CPU_OPPONENT_DEFAULT, CPU_OPPONENT_DEFAULT, CPU_OPPONENT_DEFAULT, CPU_OPPONENT_DEFAULT],
     characterReadiness: [false, false, false, false], rematchReadiness: [false, false, false, false],

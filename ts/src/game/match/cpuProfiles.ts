@@ -9,6 +9,7 @@ export const CPU_OPPONENT_CHOICES: readonly CpuOpponentChoice[] = [...CPU_OPPONE
 export const CPU_TIERS = ["rookie", "beginner", "intermediate", "advanced", "expert"] as const;
 export type CpuTier = (typeof CPU_TIERS)[number];
 export const CPU_OPPONENT_DEFAULT: CpuOpponentId = "wren";
+export const CPU_OPPONENT_CHOICE_DEFAULT: CpuOpponentChoice = "random";
 export const CPU_TIER_DEFAULT: CpuTier = "intermediate";
 
 /** Independent authored settings consumed by the shared decision policy. */

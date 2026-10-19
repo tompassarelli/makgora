@@ -278,8 +278,8 @@ Space/E up/down, N Choose, U Back; Enter remains Warcraft chat.
    focus is local. Shared changes refresh an open preview; permission loss
    changes it to read-only.
 
-New CPU slots default to **Wren + Intermediate**, offering varied approachable
-play. Retain choices across New Match, fighter/stage changes and automatic
+New CPU slots default to **Random + Intermediate**, so each match brings a
+different opponent. Retain choices across New Match, fighter/stage changes and automatic
 rematches in the map session; no new cross-session storage is needed. Training
 **Fight** uses these choices; Stand/Shield/etc. keep their explicit behavior.
 

@@ -73,6 +73,18 @@ test("named opponents grow primary and secondary skills at five tiers while reta
   assertTrue(cpuProfile("flint", "expert").repeatPercent > cpuProfile("kite", "expert").repeatPercent);
 });
 
+test("a new CPU slot defaults to Random, and new matches draw more than one identity for it [k1 scenario]", () => {
+  const drawn: string[] = [];
+  for (let seed = 0; seed < 20; seed++) {
+    const game = createMatchState();
+    setParticipants(game, 1, 2);
+    assertEquals(game.cpuOpponents[1], "random");
+    const opponent = resolveCpuOpponent(game.cpuOpponents[1] ?? "random", seed, 1);
+    if (!drawn.includes(opponent)) drawn.push(opponent);
+  }
+  assertTrue(drawn.length > 1);
+});
+
 test("Random draws are replayable across slots and seeds and reach all six identities [k2 property]", () => {
   const seen: string[] = [];
   for (let seed = 0; seed < 150; seed++) for (const slot of PARTICIPANT_SLOTS) {

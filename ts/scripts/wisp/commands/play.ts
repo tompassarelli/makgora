@@ -16,7 +16,7 @@ import { type Client, enterLoginField, runTool } from "wisp/scripts/warcraft/des
 import { platformLayer } from "wisp/scripts/platform/layer";
 import { GameFiles, dataDirectory, readGameFile } from "wisp/scripts/wisp/gameFiles";
 import { type PlayDeclaration, type PlayGame, PlayProblem } from "wisp/scripts/wisp/play";
-import { CPU_OPPONENT_DEFAULT, CPU_TIER_DEFAULT, type CpuOpponentChoice, type CpuTier } from "../../../src/game/match/cpuProfiles";
+import { CPU_OPPONENT_CHOICE_DEFAULT, CPU_TIER_DEFAULT, type CpuOpponentChoice, type CpuTier } from "../../../src/game/match/cpuProfiles";
 import { playtestRequest } from "../../../src/game/session/playtest";
 import { MeleeReady, PLAYTEST_GO_FILE, PLAYTEST_REQUEST_FILE, playtestReceiptFile } from "../boundary";
 import { MELEE_READY_FILE } from "../../../src/game/core/gameFiles";
@@ -50,7 +50,7 @@ interface Playtest {
 export const PLAYTEST: Omit<Playtest, "map" | "helper"> = {
   build: PLAYABLE_BUILD.id,
   computerSlot: 2,
-  computerOpponent: CPU_OPPONENT_DEFAULT,
+  computerOpponent: CPU_OPPONENT_CHOICE_DEFAULT,
   computerTier: CPU_TIER_DEFAULT,
 
   menuReportPort: 47124,
