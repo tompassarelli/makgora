@@ -26,33 +26,23 @@ export function delayPolicy(window: number, ceiling: number = MAX_FIXED_DELAY, b
 export interface RttEstimate {
   samples: number;
   smoothed8: number;
-  variance4: number;
 }
 
-export const rttEstimate = (): RttEstimate => ({ samples: 0, smoothed8: 0, variance4: 0 });
+export const rttEstimate = (): RttEstimate => ({ samples: 0, smoothed8: 0 });
 
 export function resetRtt(estimate: RttEstimate): void {
   estimate.samples = 0;
   estimate.smoothed8 = 0;
-  estimate.variance4 = 0;
 }
 
 export function observeRtt(estimate: RttEstimate, rttMs: number): void {
   const sample = Math.max(0, Math.min(10000, Math.floor(rttMs)));
-  if (estimate.samples === 0) {
-    estimate.smoothed8 = sample * 8;
-    estimate.variance4 = sample * 2;
-  } else {
-    const error = sample - floorDiv(estimate.smoothed8, 8);
-    estimate.variance4 += Math.abs(error) - floorDiv(estimate.variance4, 4);
-    estimate.smoothed8 += error;
-  }
+  estimate.smoothed8 = estimate.samples === 0 ? sample * 8 : estimate.smoothed8 + sample - floorDiv(estimate.smoothed8, 8);
   estimate.samples = Math.min(estimate.samples + 1, 1000000);
 }
 
 export const smoothedRttMs = (estimate: Readonly<RttEstimate>): number => floorDiv(estimate.smoothed8, 8);
 
-const guardedRttMs = (estimate: Readonly<RttEstimate>): number => smoothedRttMs(estimate) + floorDiv(estimate.variance4, 2);
 
 export const oneWayFrames = (rttMs: number): number => Math.max(0, floorDiv(rttMs * 3 + 99, 100));
 
@@ -61,13 +51,13 @@ const clampDelay = (policy: DelayPolicy, delay: number): number => Math.min(poli
 const delayForRtt = (policy: DelayPolicy, rttMs: number): number => clampDelay(policy, oneWayFrames(rttMs) - policy.budget);
 
 export function autoDelay(policy: DelayPolicy, estimate: Readonly<RttEstimate>): number {
-  return estimate.samples === 0 ? policy.floor : delayForRtt(policy, guardedRttMs(estimate));
+  return estimate.samples === 0 ? policy.floor : delayForRtt(policy, smoothedRttMs(estimate));
 }
 
 export function nextDelay(policy: DelayPolicy, estimate: Readonly<RttEstimate>, current: number): number {
   const target = autoDelay(policy, estimate);
   if (target >= current) return target;
-  const lowered = estimate.samples === 0 ? target : delayForRtt(policy, guardedRttMs(estimate) + 34);
+  const lowered = estimate.samples === 0 ? target : delayForRtt(policy, smoothedRttMs(estimate) + 34);
   return lowered < current ? lowered : clampDelay(policy, current);
 }
 

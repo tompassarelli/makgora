@@ -10,6 +10,7 @@ import { DEFAULT_PRESET, keyFor, presetBindings } from "../src/game/input/keyBin
 import { Phase } from "../src/game/lobby/lobbyState";
 import type { MapBuild } from "../src/game/session/build";
 import { PLAYABLE_BUILD } from "../src/game/session/currentBuild";
+import { MAX_INPUT_DELAY } from "../src/game/netcode/fixedSchedule";
 import { REPLAY_MAX_CORRECTION_FRAMES } from "../src/game/replay/limits";
 import { install, startBuild } from "../src/platform/main";
 import { confirmedChecksum } from "../src/host/loop/diagnostics";
@@ -39,6 +40,7 @@ interface Limits {
   readonly held: number;
   readonly stall: number;
   readonly gmax: number;
+  readonly delay: number;
 }
 
 interface Route {
@@ -195,17 +197,18 @@ function play(route: Route, seed: number): Pacing[] {
 
 const THREE = [0, 2, 3];
 const TWO = [0, 1];
-const STEADY: Limits = { sim: 59, held: 2, stall: 2, gmax: REPLAY_MAX_CORRECTION_FRAMES - 1 };
-const OUTAGE: Limits = { sim: 55, held: 7, stall: 5, gmax: REPLAY_MAX_CORRECTION_FRAMES + 12 };
+const STEADY: Limits = { sim: 59, held: 2, stall: 2, gmax: REPLAY_MAX_CORRECTION_FRAMES - 1, delay: MAX_INPUT_DELAY };
+const LEAN: Limits = { ...STEADY, delay: 6 };
+const OUTAGE: Limits = { sim: 55, held: 7, stall: 5, gmax: REPLAY_MAX_CORRECTION_FRAMES + 12, delay: MAX_INPUT_DELAY };
 const ROUTES: readonly Route[] = [
-  { name: "three humans and a computer, 300 ms round trip with Battle.net turn jitter", rttMs: 300, outages: [], humans: THREE, computer: true, limits: STEADY },
+  { name: "three humans and a computer, 300 ms round trip with Battle.net turn jitter", rttMs: 300, outages: [], humans: THREE, computer: true, limits: LEAN },
   { name: "three humans and a computer, 600 ms round trip with Battle.net turn jitter", rttMs: 600, outages: [], humans: THREE, computer: true, limits: STEADY },
   { name: "three humans and a computer, match 793 profile: 920 ms round trip, turn jitter and a 1 s relay outage", rttMs: 920, outages: [{ fromMs: 21000, toMs: 22000 }], humans: THREE, computer: true, limits: OUTAGE },
   { name: "two humans and a computer, 160 ms round trip with Battle.net turn jitter", rttMs: 160, outages: [], humans: TWO, computer: true, limits: STEADY },
 ];
 
 for (const route of ROUTES) {
-  sweep(`${route.name}: the recorded match-793 inputs keep sim, holds, stalls and peak gap per second within the route's limits [k3 measure #14]`, () => {
+  sweep(`${route.name}: the recorded match-793 inputs keep Auto delay, and sim, holds, stalls and peak gap per second, within the route's limits [k3 measure #14]`, () => {
     const measured = play(route, 793);
     measured.forEach((client, index) => console.log(`online pacing ${route.name}, human ${route.humans[index]}: ${JSON.stringify(client)}`));
     for (const client of measured) {
@@ -214,6 +217,7 @@ for (const route of ROUTES) {
       expect(client.held).toBeLessThanOrEqual(route.limits.held);
       expect(client.stall).toBeLessThanOrEqual(route.limits.stall);
       expect(client.gmax).toBeLessThanOrEqual(route.limits.gmax);
+      expect(client.delay).toBeLessThanOrEqual(route.limits.delay);
     }
   }, 600_000);
 }

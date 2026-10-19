@@ -303,9 +303,12 @@ transport (wisp#110) both call it.
     delay channel, so the first match of a session already uses a measured
     delay (Tom's first Battle.net match, 19 October 2026, had no samples yet
     and ran at 2). It is smoothed in integer milliseconds with
-    Jacobson/Karels (RFC 6298: SRTT gain 1/8, RTTVAR gain 1/4). The target
-    is max(2, ceil(one-way frames) − R), using the smoothed trip plus two
-    deviations. R, the rollback budget, is 8 frames, a third of the
+    gain 1/8 (RFC 6298's SRTT). The target is max(2, ceil(one-way frames) −
+    R) on the smoothed trip alone, with no deviation guard: error correction
+    carries the safety margin, so the target is the least delay that should
+    play clean. On the relay harness a two-deviation guard, inflated by the
+    few menu pings before the first match, chose 12-15 frames at 300 ms,
+    where 4 already played 60 frames a second with no holds. R, the rollback budget, is 8 frames, a third of the
     24-frame window. The target rises above 2 only past 2 + R = 10 one-way
     frames (about 333 ms round trip), so ordinary connections keep 2 frames.
     It raises at once but lowers only when one more frame of round trip
