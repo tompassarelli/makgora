@@ -43,6 +43,7 @@
     "plugins/**/*.ts",
     "test/menu-journey.test.ts",
     "test/result-vote.test.ts",
+    "test/online-pacing.test.ts",
     "test/scenery-culling.test.ts",
     "test/anim-judge-identity.test.ts",
     "test/release-tree.test.ts",
