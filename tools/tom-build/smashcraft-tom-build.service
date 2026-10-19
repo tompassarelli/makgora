@@ -3,6 +3,7 @@ Description=Build and install every Smashcraft main landing under Maps/00-Smashc
 Documentation=https://github.com/tompassarelli/smashcraft/blob/main/docs/play.md
 After=network-online.target
 Wants=network-online.target
+StartLimitIntervalSec=0
 
 [Service]
 Type=simple
@@ -13,7 +14,7 @@ ExecStartPre=/usr/bin/env git -C %h/code/smashcraft/worktrees/tom-build-watch ch
 ExecStartPre=/usr/bin/env bun install --frozen-lockfile
 ExecStart=/usr/bin/env bun scripts/tomBuildWatch.ts
 Restart=always
-RestartSec=30
+RestartSec=2
 Nice=10
 IOSchedulingClass=idle
 
