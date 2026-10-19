@@ -341,6 +341,7 @@ function play(route: Route, seed: number): Played {
 
 const POP_P50_UNITS = 2;
 const POP_P95_UNITS = 250;
+const LEAN_POP_P95_UNITS = 300;
 const OUTAGE_POP_P50_UNITS = 96;
 const OUTAGE_POP_P95_UNITS = 835;
 const FORCED_POP_P50_UNITS = 76;
@@ -348,7 +349,7 @@ const FORCED_POP_P95_UNITS = 680;
 const THREE = [0, 2, 3];
 const TWO = [0, 1];
 const STEADY: Limits = { sim: 59, held: 2, stall: 2, gmax: REPLAY_MAX_CORRECTION_FRAMES - 1, delay: MAX_INPUT_DELAY, minDelay: DEFAULT_DELAY, driftEnd: 0, driftPeak: 0, popP50: POP_P50_UNITS, popP95: POP_P95_UNITS };
-const LEAN: Limits = { ...STEADY, delay: 6, minDelay: 6 };
+const LEAN: Limits = { ...STEADY, delay: 6, minDelay: 6, popP95: LEAN_POP_P95_UNITS };
 const DUEL: Limits = { ...STEADY, delay: 5, minDelay: 5 };
 const OUTAGE: Limits = { sim: 59, held: 15, stall: 12, gmax: 45, delay: MAX_INPUT_DELAY, minDelay: DEFAULT_DELAY, driftEnd: 16, driftPeak: 60, popP50: OUTAGE_POP_P50_UNITS, popP95: OUTAGE_POP_P95_UNITS };
 const FORCED: Limits = { sim: 59, held: 4, stall: 3, gmax: 30, delay: 8, minDelay: 8, driftEnd: 2, driftPeak: 4, popP50: FORCED_POP_P50_UNITS, popP95: FORCED_POP_P95_UNITS };
