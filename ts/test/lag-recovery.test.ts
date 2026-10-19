@@ -36,6 +36,7 @@ import { shell } from "../src/host/loop/state";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { JournalHelpers, rowFor } from "./rematch/journalHelper";
 import { sweep } from "./sweep";
+import { passStartControls } from "../scripts/wisp/startControls";
 
 const declarations = readNativeDeclarations();
 
@@ -201,6 +202,9 @@ sweep("after a 2 s stall of one or both games, each client catches up within a s
 
   clients.start();
   for (let frame = 0; frame < 30; frame++) tick();
+  passStartControls(clients, (count) => {
+    for (let frame = 0; frame < count; frame++) tick();
+  });
 
   for (let click = 0; click < 2; click++) clients.everywhere(() => panelActions().selection.cycleMode(0, 2));
   clients.everywhere(() => panelActions().selection.selectCpuChoice(0, 2, Character.rifleman));

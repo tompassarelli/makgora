@@ -28,6 +28,7 @@ import { replayInLua } from "../scripts/wisp/commands/replay";
 import { readReplay } from "../scripts/wisp/replayFiles";
 import { expectSynchronized, value } from "./rematch/playableMatch";
 import { sweep } from "./sweep";
+import { passStartControls } from "../scripts/wisp/startControls";
 
 const headless = testHeadless(PREDICTED_HEADLESS);
 
@@ -73,6 +74,7 @@ sweep("a one-minute keyboard match in the playable build reaches its result and 
   };
   clients.start();
   frames(30);
+  passStartControls(clients, frames);
   for (let i = 0; i < 7; i++) click("lessTime");
   click("moreTime");
 
