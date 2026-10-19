@@ -28,7 +28,7 @@ function shellOf(client: StartClient): unknown {
 export const controlsGreeted = (client: StartClient): boolean => (greetedMask(shellOf(client)) & (1 << client.slot)) !== 0;
 
 export function passStartControls(clients: StartClients, step: (count: number) => void = count => clients.frames(count), limit = 240): void {
-  for (let frame = 0; frame < limit && !clients.clients.every(controlsGreeted); frame++) step(1);
+  for (let frame = 0; frame < limit && !clients.clients.every(client => controlsGreeted(client)); frame++) step(1);
   for (const client of clients.clients) {
     if (!controlsGreeted(client)) throw new Error(`client ${client.slot} never opened its Controls screen`);
     if (!clients.click(client.slot, DONE_X, DONE_Y)) throw new Error(`client ${client.slot} has no Done button under the pointer`);
