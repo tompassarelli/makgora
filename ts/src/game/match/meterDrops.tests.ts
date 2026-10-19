@@ -6,7 +6,7 @@ import { firstStateDifference } from "../replay/difference";
 import { copyReplayState, createReplaySnapshot } from "../replay/snapshot";
 import { prepareQuickMatch } from "../session/devSettings";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
-import { Character } from "../sim/codes";
+import { Character, DownState, LedgeState } from "../sim/codes";
 import { createFighter } from "../sim/fighter";
 import { ROSTER_MANA } from "../sim/mana";
 import { copyControls, createRoster, fighterAt, neutralControls } from "../sim/roster";
@@ -58,6 +58,32 @@ test("the first drop telegraphs three seconds at centre stage and grants exactly
   assertEquals(fighterAt(worlds[0]!, 0).mana.points - fighterAt(worlds[1]!, 0).mana.points, DROP_METER);
   assertEquals(fighterAt(worlds[0]!, 1).mana.points, fighterAt(worlds[1]!, 1).mana.points);
   assertEquals(off.drops.spawnSerial, 0);
+});
+
+test("a fighter rolling or being hit through a drop passes it by, and takes it once the roll or hit ends [k1 scenario]", () => {
+  const passes: ((f: ReturnType<typeof createFighter>) => void)[] = [
+    (f) => { f.dodge.groundFrame = 3; f.dodge.groundDirection = 1; },
+    (f) => { f.down.state = DownState.roll; },
+    (f) => { f.down.state = DownState.techRoll; },
+    (f) => { f.ledge.state = LedgeState.roll; },
+    (f) => { f.launch.hitstun = 10; },
+    (f) => { f.launch.hitlag = 4; },
+  ];
+  for (const pass of passes) {
+    const game = quickGame(17);
+    game.drops.point = 0;
+    const point = meterDropPoint(game.stageChoice, 0);
+    const fighter = createFighter(Character.rifleman, point.x, 1);
+    fighter.motion.z = point.z;
+    const world = createRoster(1, [fighter]);
+    pass(fighter);
+    advanceMeterDrops(game, world);
+    assertEquals(game.drops.pickupSerial, 0);
+    const later = createFighter(Character.rifleman, point.x, 1);
+    later.motion.z = point.z;
+    advanceMeterDrops(game, createRoster(1, [later]));
+    assertEquals(game.drops.pickupSerial, 1);
+  }
 });
 
 test("drops after the first rotate through each stage's fixed points 15–25 seconds after a pickup, the same for the same seed [k1 scenario]", () => {

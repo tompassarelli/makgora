@@ -2,6 +2,7 @@ import { at } from "wisp/src/runtime/lookup";
 import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS } from "../input/participants";
+import { DownState, LedgeState } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { ROSTER_MANA, gainMana } from "../sim/mana";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
@@ -159,6 +160,11 @@ function touchesDrop(f: Readonly<Fighter>, point: DropPoint): boolean {
     && z <= f32(point.z + DROP_HEIGHT) && z >= f32(point.z - melee(bodyTop(f.character)));
 }
 
+function takesDrop(f: Readonly<Fighter>): boolean {
+  const rolling = (f.dodge.groundFrame > 0 && f.dodge.groundDirection !== 0) || f.down.state === DownState.roll || f.down.state === DownState.techRoll || f.ledge.state === LedgeState.roll;
+  return !f.status.out && !rolling && f.launch.hitlag <= 0 && f.launch.hitstun <= 0;
+}
+
 export function advanceMeterDrops(game: MatchState, world: Roster): void {
   const { drops } = game;
   if (drops.nextSpawnFrame !== 0 && game.matchFrame >= drops.nextSpawnFrame) {
@@ -174,7 +180,7 @@ export function advanceMeterDrops(game: MatchState, world: Roster): void {
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;
     const f = fighterAt(world, slot);
-    if (f.status.out || !touchesDrop(f, point)) continue;
+    if (!takesDrop(f) || !touchesDrop(f, point)) continue;
     const gap = Math.abs(f32(f.motion.x - point.x));
     if (taker < 0 || gap < nearest) {
       taker = slot;
