@@ -3,6 +3,7 @@ import { imod } from "wisp/src/sim/intMath";
 import {
   AUTO_DELAY, type DelayPolicy, agreedDelay, connectionPoor, delayPolicy, expectedRollback, highDelay, nextDelay, observeRtt, requestedDelay, rttEstimate,
 } from "./delayPolicy";
+import { REPLAY_MAX_CORRECTION_FRAMES } from "../replay/limits";
 
 const SAMPLES_PER_STOCK = 900;
 
@@ -46,5 +47,19 @@ test("over generated round-trip traces the delay stays within 2 and the ceiling 
       }
     }
     assertTrue(changes <= 1);
+  }
+});
+
+test("over generated jittered round trips up to 1.4 s, Auto leaves at most the rollback budget to prediction, well inside the window, whenever it is below the ceiling [k2 property]", () => {
+  const draw = lcg(793);
+  const policy = delayPolicy(REPLAY_MAX_CORRECTION_FRAMES);
+  assertTrue(policy.budget * 2 < policy.window);
+  for (let trace = 0; trace < 200; trace++) {
+    const baseMs = imod(draw(), 1400);
+    const [delay = -1] = playStocks(policy, [baseMs], imod(draw(), 200), draw());
+    const estimate = rttEstimate();
+    observeRtt(estimate, baseMs);
+    assertTrue(delay >= policy.floor && delay <= policy.ceiling);
+    if (delay < policy.ceiling) assertTrue(expectedRollback(estimate, delay) <= policy.budget);
   }
 });

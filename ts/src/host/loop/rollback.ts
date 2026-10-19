@@ -38,7 +38,7 @@ import { holdPresentedCapture } from "./visualCapture";
 import { visualCaptureStopBefore } from "../../game/session/visualCapture";
 import { samplePad } from "../../game/input/padCapture";
 import { pollPad, recordPadRow } from "./analogPad";
-import { beginNetEpoch, matchDelay, noteDepth, noteEcho, noteSent, requestFor } from "./netDelay";
+import { beginNetEpoch, matchDelay, noteDepth, noteReceived, noteSent, requestFor } from "./netDelay";
 
 
 const STALL_NOTICE_CALLBACKS = 20;
@@ -384,7 +384,7 @@ function receivePacket(s: ShellState, rollback: Rollback, sender: number, packet
       probeInput(probe, "receive", packet.epoch, sender, frame, row.held, row.pressed, row.released, schedule.speculativeFrame());
       if (local) probeTransportReceive(probe, packet.epoch, frame);
     }
-    if (local && receipt === "accepted" && packet.epoch === rollback.epoch) noteEcho(rollback.net, frame);
+    if (receipt === "accepted" && packet.epoch === rollback.epoch) noteReceived(rollback.net, local, frame, schedule.speculativeFrame());
     if (trace.active && local) recordEcho(trace, packet.epoch, frame, receivedCallback, receivedSeconds);
   }
   if (receipt !== "accepted" && receipt !== "wrongEpoch") setStatus(s, "The players could not stay connected. Restart the match.", LASTING);

@@ -1,10 +1,13 @@
 import { floorDiv } from "wisp/src/sim/intMath";
+import { MAX_INPUT_DELAY } from "./fixedSchedule";
 
 // Integer milliseconds and frames only, so Bun and both Lua32 modes decide alike.
 
 export const DEFAULT_DELAY = 2;
-export const ROLLBACK_BUDGET = 7;
-export const MAX_FIXED_DELAY = 8;
+export const ROLLBACK_BUDGET = 8;
+export const MAX_FIXED_DELAY = MAX_INPUT_DELAY;
+const FINE_DELAY_STEPS = 12;
+const COARSE_DELAY_STEP = 4;
 export const HIGH_DELAY_FRAMES = 8;
 export const AUTO_DELAY = -1;
 export const TIME_SYNC_INTERVAL = 60;
@@ -81,6 +84,12 @@ export function connectionPoor(policy: DelayPolicy, estimate: Readonly<RttEstima
 export const highDelay = (delay: number): boolean => delay >= HIGH_DELAY_FRAMES;
 
 export const isDelayChoice = (value: number): value is DelayChoice => value === AUTO_DELAY || (Math.floor(value) === value && value >= 0 && value <= MAX_FIXED_DELAY);
+
+export function nextDelayChoice(choice: DelayChoice): DelayChoice {
+  if (choice === AUTO_DELAY) return 0;
+  const next = choice < FINE_DELAY_STEPS ? choice + 1 : choice + COARSE_DELAY_STEP;
+  return next > MAX_FIXED_DELAY ? AUTO_DELAY : next;
+}
 
 export const requestedDelay = (choice: DelayChoice, auto: number): number => (choice === AUTO_DELAY ? auto : choice);
 

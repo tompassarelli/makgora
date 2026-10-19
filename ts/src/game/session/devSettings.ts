@@ -7,7 +7,7 @@ import { scheduleMeterDrops } from "../match/meterDrops";
 
 
 
-import { type FixedDelay, isFixedDelay } from "../netcode/fixedSchedule";
+import { type FixedDelay, MAX_INPUT_DELAY, isFixedDelay } from "../netcode/fixedSchedule";
 import { parseDecimal } from "../netcode/journal/decimal";
 import { MAX_BATCH } from "../netcode/journal/transport";
 import { PARTICIPANT_SLOTS } from "../input/participants";
@@ -63,7 +63,7 @@ export function applyDevCommand(settings: DevSettings, message: string): string 
   }
   if (message.startsWith("-dev delay ")) {
     const value = commandInteger(message.substring(11));
-    if (value === undefined || !isFixedDelay(value)) return "dev: delay must be 0 to 8";
+    if (value === undefined || !isFixedDelay(value)) return `dev: delay must be 0 to ${MAX_INPUT_DELAY}`;
     settings.delay = value;
     return describeDevSettings(settings);
   }

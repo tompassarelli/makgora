@@ -4,7 +4,7 @@ import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS } from "../../game/input/participants";
 import { type MatchState, humanActive } from "../../game/lobby/lobbyState";
 import {
-  AUTO_DELAY, DEFAULT_DELAY, type DelayPolicy, type RttEstimate, agreedDelay, connectionPoor, delayPolicy, expectedRollback, highDelay,
+  AUTO_DELAY, DEFAULT_DELAY, type DelayPolicy, HIGH_DELAY_FRAMES, type RttEstimate, agreedDelay, connectionPoor, delayPolicy, expectedRollback, highDelay,
   nextDelay, observeRtt, requestedDelay, rttEstimate, smoothedRttMs,
 } from "../../game/netcode/delayPolicy";
 import { type FixedDelay, isFixedDelay } from "../../game/netcode/fixedSchedule";
@@ -14,6 +14,7 @@ import { at } from "wisp/src/runtime/lookup";
 
 export const DELAY_PREFIX = "SC_DY";
 export const DELAY_RECEIVED = "shell.delayProposal";
+const PING_MARK = "p";
 const SECOND = 60;
 
 export interface NetDelay {
@@ -28,13 +29,16 @@ export interface NetDelay {
   shownDepth: number;
   indicator: framehandle | undefined;
   shownText: string;
+  arrivals: number;
+  lateSum: number;
+  lateMax: number;
 }
 
 export function createNetDelay(window: number): NetDelay {
   return {
     policy: delayPolicy(window), estimate: rttEstimate(), sentTicks: Array.from({ length: PENDING_CAPACITY }, () => -1),
     proposals: [DEFAULT_DELAY, DEFAULT_DELAY, DEFAULT_DELAY, DEFAULT_DELAY], depths: Array.from({ length: window + 2 }, () => 0), ticks: 0, proposed: DEFAULT_DELAY, depth: 0, shownDepth: 0,
-    indicator: undefined, shownText: "",
+    indicator: undefined, shownText: "", arrivals: 0, lateSum: 0, lateMax: 0,
   };
 }
 
@@ -67,7 +71,7 @@ export function lobbyDelayText(net: Readonly<NetDelay>, game: Readonly<MatchStat
   }
   const agreed = matchDelay(net, game, choices);
   const line = `Input delay: ${parts.join(" · ")} → ${I2S(agreed)} frames`;
-  return highDelay(agreed) ? `${line}\n|cffff4040Input delay of 8+ frames: this connection will feel sluggish|r` : line;
+  return highDelay(agreed) ? `${line}\n|cffff4040Input delay of ${I2S(HIGH_DELAY_FRAMES)}+ frames: this connection will feel sluggish|r` : line;
 }
 
 export const recalibratedDelay = (net: Readonly<NetDelay>, game: Readonly<MatchState>, slot: number): number => requestFor(net, game, slot, AUTO_DELAY);
@@ -96,6 +100,30 @@ export function beginNetEpoch(net: NetDelay): void {
   net.sentTicks.fill(-1);
   net.depths.fill(0);
   net.depth = 0;
+  resetArrivals(net);
+}
+
+function resetArrivals(net: NetDelay): void {
+  net.arrivals = 0;
+  net.lateSum = 0;
+  net.lateMax = 0;
+}
+
+export function noteReceived(net: NetDelay, own: boolean, frame: number, speculative: number): void {
+  if (own) noteEcho(net, frame);
+  else noteArrival(net, speculative - frame);
+}
+
+function noteArrival(net: NetDelay, late: number): void {
+  net.lateMax = net.arrivals === 0 ? late : Math.max(net.lateMax, late);
+  net.arrivals++;
+  net.lateSum += late;
+}
+
+export function takeArrivals(net: NetDelay): string {
+  const text = `arr=${net.arrivals} late=${net.arrivals === 0 ? 0 : floorDiv(net.lateSum, net.arrivals)} lmax=${net.lateMax}`;
+  resetArrivals(net);
+  return text;
 }
 
 export function noteDepth(net: NetDelay, depth: number): void {
@@ -114,6 +142,7 @@ export function serviceNetDelay(net: NetDelay, game: Readonly<MatchState>, local
     BlzFrameSetVisible(net.indicator, false);
   }
   const online = isOnline(game);
+  if (online && !inMatch && humanActive(game, local)) BlzSendSyncData(DELAY_PREFIX, `${PING_MARK}${I2S(net.ticks)}`);
   if (online && humanActive(game, local) && net.estimate.samples > 0) {
     const proposal = nextDelay(net.policy, net.estimate, net.proposed);
     if (proposal !== net.proposed && BlzSendSyncData(DELAY_PREFIX, I2S(proposal))) net.proposed = proposal;
@@ -130,7 +159,12 @@ export function serviceNetDelay(net: NetDelay, game: Readonly<MatchState>, local
 
 export function receiveDelayProposal(net: NetDelay): void {
   const slot = GetPlayerId(GetTriggerPlayer());
-  const value = S2I(BlzGetTriggerSyncData());
+  const data = BlzGetTriggerSyncData();
+  if (data.startsWith(PING_MARK)) {
+    if (GetTriggerPlayer() === GetLocalPlayer()) observeRtt(net.estimate, floorDiv((net.ticks - S2I(data.substring(PING_MARK.length))) * 100, 3));
+    return;
+  }
+  const value = S2I(data);
   if (slot >= 0 && slot < net.proposals.length && isFixedDelay(value)) net.proposals[slot] = Math.max(DEFAULT_DELAY, value);
 }
 

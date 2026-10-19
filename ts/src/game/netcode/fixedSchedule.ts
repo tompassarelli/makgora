@@ -10,11 +10,13 @@ import { FrameRing } from "./frameRing";
 import { InputLedger, LEDGER_CAPACITY, type Receipt } from "./ledger";
 import { at } from "wisp/src/runtime/lookup";
 
-/** The input delays a schedule supports. */
-export type FixedDelay = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+/** The input delays a schedule supports: one second, well inside the ledger's future limit past a full rollback window. */
+export type FixedDelay = number;
+
+export const MAX_INPUT_DELAY = 60;
 
 export function isFixedDelay(value: number): value is FixedDelay {
-  return Math.floor(value) === value && value >= 0 && value <= 8;
+  return Math.floor(value) === value && value >= 0 && value <= MAX_INPUT_DELAY;
 }
 
 /** The frame a sample taken while `frame` is next belongs to, or undefined past the last frame. */

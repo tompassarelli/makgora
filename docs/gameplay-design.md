@@ -284,7 +284,7 @@ transport (wisp#110) both call it.
   as in Slippi.
 - **Delay setting**, saved per player with the controls (Controls and delay,
   F1 on character select, which is also the lobby): **Auto** (the default) or
-  **Fixed N** frames, 0 to 8, used as-is. Rollback absorbs the rest. Local
+  **Fixed N** frames, 0 to 60 (one step at a time to 12, then every 4th), used as-is. Rollback absorbs the rest. Local
   matches can lower it to 0 or 1. **Recalibrate** shows the measured ping,
   Auto's choice and the expected rollback depth, and one press makes that
   choice fixed.
@@ -292,14 +292,19 @@ transport (wisp#110) both call it.
   select. The match uses the higher request, so nobody plays below what they
   asked for. When the agreed delay is 8 frames (133 ms) or more, the lobby
   warns: "Input delay of 8+ frames: this connection will feel sluggish".
-- **Auto, online:** round trip comes from the input stream itself, the echo
-  of each sent row, with no extra packets. It is smoothed in integer
+- **Auto, online:** round trip comes from the echo of each sent input row in
+  a match and, on the menus before it, of a one-per-second ping on the delay
+  channel, so the first match of a session already uses a measured delay
+  (Tom's first Battle.net match, 19 October 2026, had no samples yet and ran
+  at 2). It is smoothed in integer
   milliseconds with Jacobson/Karels (RFC 6298: SRTT gain 1/8, RTTVAR gain
   1/4). Auto chooses delay = max(2, ceil(one-way frames) − R), using the
-  smoothed trip plus two deviations, and caps it at 8. R, the rollback budget,
-  is 7 frames. Delay rises above 2 only past 2 + R = 9 one-way frames (about
-  300 ms round trip), so ordinary connections keep 2 frames and rollback
-  absorbs the rest. Auto raises at once but lowers only when one more frame of
+  smoothed trip plus two deviations, and caps it at 60. R, the rollback
+  budget, is 8 frames, a third of the 24-frame window, so a Battle.net relay
+  of 300-700 ms (18-42 frames each way through the host) keeps prediction
+  well inside the window and trades input delay for an even 60 frames a
+  second. Delay rises above 2 only past 2 + R = 10 one-way frames (about
+  333 ms round trip), so ordinary connections keep 2 frames. Auto raises at once but lowers only when one more frame of
   round trip would still allow the lower value, so jitter cannot flip it back
   and forth.
 - **When delay changes:** only at match start, on the epoch every client

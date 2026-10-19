@@ -15,7 +15,7 @@ import {
 import { ButtonClicks, createBackdrop, createText, gameUi, placeTopLeft, setFrameText, styleMenuPanel } from "./frames";
 import { MENU_FONT, MENU_STYLE } from "./hudLayout";
 import { KEY_CAP_HEIGHT, keyboardCaps } from "./keyboardLayout";
-import { AUTO_DELAY, MAX_FIXED_DELAY } from "../netcode/delayPolicy";
+import { AUTO_DELAY, nextDelayChoice } from "../netcode/delayPolicy";
 
 export interface SettingsActions {
   closeSettings(participantId: number): void;
@@ -143,7 +143,7 @@ export class SettingsPanel {
     else if (button.kind === "profile") loadProfile(settings);
     else if (button.kind === "save") saveBindingSettings(settings);
     else if (button.kind === "close") this.close();
-    else if (button.kind === "delay") chooseDelay(settings, settings.delay >= MAX_FIXED_DELAY ? AUTO_DELAY : settings.delay + 1);
+    else if (button.kind === "delay") chooseDelay(settings, nextDelayChoice(settings.delay));
     else if (button.kind === "recalibrate") this.actions.recalibrate(this.participantId);
     else beginKeyCapture(settings, button.key);
   }

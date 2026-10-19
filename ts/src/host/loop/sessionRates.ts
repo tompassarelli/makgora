@@ -3,6 +3,8 @@ import { floorMod, idiv } from "wisp/src/sim/intMath";
 import { Phase } from "../../game/lobby/lobbyState";
 import { sourceVersion } from "../../game/shell/sourceVersion";
 import { sessionRatesFile, sessionRatesHeader } from "../../game/core/gameFiles";
+import { smoothedRttMs } from "../../game/netcode/delayPolicy";
+import { takeArrivals } from "./netDelay";
 import { activeRollback, shellState } from "./state";
 
 declare const os: { readonly clock?: (this: void) => number } | undefined;
@@ -221,7 +223,7 @@ function rateLine(rates: SessionRates, now: number): string {
   const match = s === undefined ? -1 : s.replay.serial;
   const rollback = s === undefined ? undefined : activeRollback(s);
   const frame = s === undefined ? -1 : rollback?.schedule.speculativeFrame() ?? s.runtime.simulationFrame;
-  const window = rollback === undefined ? "" : ` cf=${rollback.schedule.nextConfirmedFrame()} kn=${rollback.schedule.knownThrough()} win=${rollback.window}`;
+  const window = rollback === undefined ? "" : ` cf=${rollback.schedule.nextConfirmedFrame()} kn=${rollback.schedule.knownThrough()} win=${rollback.window} dl=${rollback.delay} ping=${smoothedRttMs(rollback.net.estimate)} ${takeArrivals(rollback.net)}`;
   return `r t=${elapsedMs(rates, now)} cb=${second.ticks} dr=${second.draws} ev=${second.events} sim=${second.sim} spec=${second.spec} conf=${second.conf} held=${second.held} stall=${second.stalled} gap=${gap} gmax=${second.gapMax} lua=${microseconds(second.lua)} tk=${tick} tkmax=${microseconds(second.tickMax)} send=${second.sends} recv=${second.received} rown=${second.receivedOwn} pz=${second.paused} pt=${second.pauses} pm=${second.menus} cbgap=${microseconds(second.tickGap)} ${gameSpeed()} ph=${phase} m=${match} f=${frame}${window}`;
 }
 
