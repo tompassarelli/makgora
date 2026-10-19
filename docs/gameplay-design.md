@@ -290,7 +290,9 @@ transport (wisp#110) both call it.
   playable, so neither setting goes higher: a connection that needs more
   holds prediction at the window edge instead. Rollback absorbs the rest.
   Local matches can lower it to 0 or 1. **Recalibrate** shows the measured
-  ping, Auto's choice and the expected rollback depth, and one press makes
+  echo (how long the player's own input row takes to come back through
+  Battle.net's relay and turn wait; the round trip to an opponent is about
+  twice it), Auto's choice and the expected rollback depth, and one press makes
   that choice fixed.
 - **Lobby agreement:** each player sees the other's request on character
   select. The match uses the higher request, so nobody plays below what they

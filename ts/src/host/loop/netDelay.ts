@@ -29,9 +29,15 @@ export interface NetDelay {
   shownDepth: number;
   indicator: framehandle | undefined;
   shownText: string;
-  arrivals: number;
-  lateSum: number;
-  lateMax: number;
+  readonly arrivals: number[];
+  readonly lateSum: number[];
+  readonly lateMax: number[];
+  echoes: number;
+  echoSum: number;
+  echoMax: number;
+  corrections: number;
+  replayed: number;
+  deepest: number;
   readonly correction: DelayCorrection;
   readonly second: { held: number; arrivals: number; deep: number };
   pingDelay: number;
@@ -42,7 +48,8 @@ export function createNetDelay(window: number): NetDelay {
   return {
     policy, correction: delayCorrection(policy), second: { held: 0, arrivals: 0, deep: 0 }, pingDelay: DEFAULT_DELAY, estimate: rttEstimate(), sentTicks: Array.from({ length: PENDING_CAPACITY }, () => -1),
     proposals: [DEFAULT_DELAY, DEFAULT_DELAY, DEFAULT_DELAY, DEFAULT_DELAY], depths: Array.from({ length: window + 2 }, () => 0), ticks: 0, proposed: DEFAULT_DELAY, depth: 0, shownDepth: 0,
-    indicator: undefined, shownText: "", arrivals: 0, lateSum: 0, lateMax: 0,
+    indicator: undefined, shownText: "", arrivals: [0, 0, 0, 0], lateSum: [0, 0, 0, 0], lateMax: [0, 0, 0, 0],
+    echoes: 0, echoSum: 0, echoMax: 0, corrections: 0, replayed: 0, deepest: 0,
   };
 }
 
@@ -83,8 +90,8 @@ export const recalibratedDelay = (net: Readonly<NetDelay>, game: Readonly<MatchS
 export function recalibrateText(net: Readonly<NetDelay>, game: Readonly<MatchState>, slot: number): string {
   const { estimate } = net;
   const auto = recalibratedDelay(net, game, slot);
-  if (estimate.samples === 0) return `Recalibrate: no ping measured yet · Auto ${I2S(auto)} frames`;
-  return `Ping ${I2S(smoothedRttMs(estimate))} ms · Auto ${I2S(auto)} frames · expected rollback ${I2S(expectedRollback(estimate, auto))}`;
+  if (estimate.samples === 0) return `Recalibrate: no echo measured yet · Auto ${I2S(auto)} frames`;
+  return `Echo ${I2S(floorDiv(smoothedRttMs(estimate), 2))} ms · Auto ${I2S(auto)} frames · expected rollback ${I2S(expectedRollback(estimate, auto))}`;
 }
 
 export function noteSent(net: NetDelay, frame: number): void {
@@ -96,8 +103,12 @@ export function noteEcho(net: NetDelay, frame: number): void {
   const sent = at(net.sentTicks, index);
   if (sent < 0) return;
   net.sentTicks[index] = -1;
+  const echo = net.ticks - sent;
+  net.echoMax = net.echoes === 0 ? echo : Math.max(net.echoMax, echo);
+  net.echoes++;
+  net.echoSum += echo;
   // Warcraft relays each sync message through the host, so a row's echo age is the remote row's age too: the round trip is twice it.
-  observeRtt(net.estimate, floorDiv((net.ticks - sent) * 100, 3));
+  observeRtt(net.estimate, floorDiv(echo * 100, 3));
 }
 
 export function beginNetEpoch(net: NetDelay): void {
@@ -119,32 +130,52 @@ function resetSecond(net: NetDelay): void {
 }
 
 function resetArrivals(net: NetDelay): void {
-  net.arrivals = 0;
-  net.lateSum = 0;
-  net.lateMax = 0;
+  net.arrivals.fill(0);
+  net.lateSum.fill(0);
+  net.lateMax.fill(0);
+  net.echoes = 0;
+  net.echoSum = 0;
+  net.echoMax = 0;
+  net.corrections = 0;
+  net.replayed = 0;
+  net.deepest = 0;
 }
 
-export function noteReceived(net: NetDelay, own: boolean, frame: number, speculative: number): void {
+export function noteReceived(net: NetDelay, sender: number, own: boolean, frame: number, speculative: number): void {
   if (own) noteEcho(net, frame);
-  else noteArrival(net, speculative - frame);
+  else if (sender >= 0 && sender < net.arrivals.length) noteArrival(net, sender, speculative - frame);
 }
 
-function noteArrival(net: NetDelay, late: number): void {
-  net.lateMax = net.arrivals === 0 ? late : Math.max(net.lateMax, late);
-  net.arrivals++;
-  net.lateSum += late;
+function noteArrival(net: NetDelay, sender: number, late: number): void {
+  const arrivals = at(net.arrivals, sender);
+  net.lateMax[sender] = arrivals === 0 ? late : Math.max(at(net.lateMax, sender), late);
+  net.arrivals[sender] = arrivals + 1;
+  net.lateSum[sender] = at(net.lateSum, sender) + late;
   const { second } = net;
   second.arrivals++;
   if (late > net.policy.budget) second.deep++;
 }
 
-export function takeArrivals(net: NetDelay): string {
-  const text = `arr=${net.arrivals} late=${net.arrivals === 0 ? 0 : floorDiv(net.lateSum, net.arrivals)} lmax=${net.lateMax}`;
+const meanOf = (sum: number, count: number): number => count === 0 ? 0 : floorDiv(sum, count);
+
+export function takeNetRates(net: NetDelay): string {
+  let total = 0;
+  const senders: string[] = [];
+  for (let slot = 0; slot < net.arrivals.length; slot++) {
+    const arrivals = at(net.arrivals, slot);
+    if (arrivals === 0) continue;
+    total += arrivals;
+    senders.push(`P${slot + 1}:${meanOf(at(net.lateSum, slot), arrivals)}/${at(net.lateMax, slot)}`);
+  }
+  const text = `arr=${total} lt=${senders.length === 0 ? "-" : senders.join(",")} echo=${meanOf(net.echoSum, net.echoes)}/${net.echoMax} rb=${net.corrections} rbf=${net.replayed} rbd=${net.deepest}`;
   resetArrivals(net);
   return text;
 }
 
 export function noteDepth(net: NetDelay, depth: number): void {
+  net.corrections++;
+  net.replayed += depth;
+  net.deepest = Math.max(net.deepest, depth);
   net.depth = Math.max(net.depth, depth);
   const bucket = Math.min(depth, net.depths.length - 1);
   net.depths[bucket] = at(net.depths, bucket) + 1;

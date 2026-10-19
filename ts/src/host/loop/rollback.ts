@@ -384,7 +384,7 @@ function receivePacket(s: ShellState, rollback: Rollback, sender: number, packet
       probeInput(probe, "receive", packet.epoch, sender, frame, row.held, row.pressed, row.released, schedule.speculativeFrame());
       if (local) probeTransportReceive(probe, packet.epoch, frame);
     }
-    if (receipt === "accepted" && packet.epoch === rollback.epoch) noteReceived(rollback.net, local, frame, schedule.speculativeFrame());
+    if (receipt === "accepted" && packet.epoch === rollback.epoch) noteReceived(rollback.net, sender, local, frame, schedule.speculativeFrame());
     if (trace.active && local) recordEcho(trace, packet.epoch, frame, receivedCallback, receivedSeconds);
   }
   if (receipt !== "accepted" && receipt !== "wrongEpoch") setStatus(s, "The players could not stay connected. Restart the match.", LASTING);

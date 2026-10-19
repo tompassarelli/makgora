@@ -62,9 +62,10 @@ function turnsFor(random: Random): number {
   return turns.length - 1;
 }
 
-function relayDelivery(route: Route, seed: number, matchStartMs: () => number | undefined): SyncDelivery {
+function relayDelivery(route: Route, seed: number, matchStartMs: () => number | undefined): SyncDelivery & { readonly senders: ReadonlyMap<number, { readonly baseMs: number }> } {
   const senders = new Map<number, { readonly random: Random; readonly baseMs: number; lastMs: number }>();
   return {
+    senders,
     arrivalFrame: (sender, frame) => {
       let state = senders.get(sender);
       if (state === undefined) {
@@ -125,16 +126,31 @@ interface Pacing {
   readonly gap: number;
   readonly gmax: number;
   readonly worstSim: number;
-  readonly late: number;
-  readonly lmax: number;
+  readonly late: Readonly<Record<number, number>>;
+  readonly lmax: Readonly<Record<number, number>>;
+  readonly echo: number;
+  readonly echoMax: number;
+  readonly rb: number;
+  readonly rbf: number;
+  readonly rbd: number;
+  readonly bur: number;
+  readonly hrun: number;
+  readonly drift: number;
+  readonly driftEnd: number;
+  readonly botHit: number;
+  readonly botMiss: number;
+  readonly alloc: number;
+  readonly sf: number;
 }
 
 const mean = (values: readonly number[]): number => values.reduce((sum, value) => sum + value, 0) / Math.max(1, values.length);
 const tenths = (value: number): number => Math.round(value * 10) / 10;
 
-function pacing(lines: readonly string[]): Pacing {
+function pacing(lines: readonly string[], senders: readonly number[]): Pacing {
   const match = parseSessionRates(lines).seconds.filter(second => second.ph === Phase.match).slice(2, -1);
   const field = (name: string) => match.map(second => second[name] ?? 0);
+  const present = (name: string) => match.flatMap(second => second[name] === undefined ? [] : [second[name] ?? 0]);
+  const perSender = (prefix: string, reduce: (values: readonly number[]) => number) => Object.fromEntries(senders.map(slot => [slot, reduce(present(`${prefix}P${slot + 1}`))]));
   return {
     seconds: match.length,
     delay: Math.max(...field("dl"), -1),
@@ -146,16 +162,35 @@ function pacing(lines: readonly string[]): Pacing {
     gap: tenths(mean(field("gap"))),
     gmax: Math.max(...field("gmax")),
     worstSim: Math.min(...field("sim")),
-    late: tenths(mean(field("late"))),
-    lmax: Math.max(...field("lmax"), -1),
+    late: perSender("late", values => tenths(mean(values))),
+    lmax: perSender("lmax", values => Math.max(...values, -1)),
+    echo: tenths(mean(field("echo"))),
+    echoMax: Math.max(...field("echoMax"), -1),
+    rb: tenths(mean(field("rb"))),
+    rbf: tenths(mean(field("rbf"))),
+    rbd: Math.max(...field("rbd"), -1),
+    bur: tenths(mean(field("bur"))),
+    hrun: Math.max(...field("hrun"), -1),
+    drift: Math.max(...field("drift"), -1),
+    driftEnd: match.at(-1)?.drift ?? -1,
+    botHit: field("botHit").reduce((sum, value) => sum + value, 0),
+    botMiss: field("botMiss").reduce((sum, value) => sum + value, 0),
+    alloc: tenths(mean(field("alloc"))),
+    sf: field("sf").reduce((sum, value) => sum + value, 0),
   };
 }
 
-function play(route: Route, seed: number): Pacing[] {
+interface Played {
+  readonly clients: readonly Pacing[];
+  readonly baseMs: ReadonlyMap<number, number>;
+}
+
+function play(route: Route, seed: number): Played {
   const HUMANS = route.humans;
   let matchStart: number | undefined;
   let wallFrame = 0;
-  const clients = headless.clients({ install, start: () => { startBuild(BUILD); installSessionRates(BUILD.id); } }, HUMANS, { delivery: relayDelivery(route, seed, () => matchStart) });
+  const delivery = relayDelivery(route, seed, () => matchStart);
+  const clients = headless.clients({ install, start: () => { startBuild(BUILD); installSessionRates(BUILD.id); } }, HUMANS, { delivery });
   clients.start();
   clients.frames(MENU_FRAMES);
   wallFrame += MENU_FRAMES;
@@ -188,11 +223,12 @@ function play(route: Route, seed: number): Pacing[] {
       if (seen !== undefined && seen !== checksum) throw new Error(`confirmed frame ${frame} differs between clients`);
     }
   }
-  return HUMANS.map((_, index) => {
+  const measured = HUMANS.map((slot, index) => {
     const files = clients.clients[index]?.files ?? new Map<string, string[]>();
     const lines = [...files.entries()].filter(([name]) => name.startsWith("smashcraft-rates-")).sort(([a], [b]) => a.localeCompare(b)).flatMap(([, rows]) => rows);
-    return pacing(lines);
+    return pacing(lines, HUMANS.filter(other => other !== slot));
   });
+  return { clients: measured, baseMs: new Map([...delivery.senders].map(([sender, state]) => [sender, state.baseMs])) };
 }
 
 const THREE = [0, 2, 3];
@@ -208,8 +244,9 @@ const ROUTES: readonly Route[] = [
 ];
 
 for (const route of ROUTES) {
-  sweep(`${route.name}: the recorded match-793 inputs keep Auto delay, and sim, holds, stalls and peak gap per second, within the route's limits [k3 measure #14]`, () => {
-    const measured = play(route, 793);
+  sweep(`${route.name}: the recorded match-793 inputs keep Auto delay, and sim, holds, stalls and peak gap per second, within the route's limits, with each sender's lateness following its link and no drift without an outage [k3 measure #14]`, () => {
+    const played = play(route, 793);
+    const measured = played.clients;
     measured.forEach((client, index) => console.log(`online pacing ${route.name}, human ${route.humans[index]}: ${JSON.stringify(client)}`));
     for (const client of measured) {
       expect(client.seconds).toBeGreaterThan(20);
@@ -218,6 +255,23 @@ for (const route of ROUTES) {
       expect(client.stall).toBeLessThanOrEqual(route.limits.stall);
       expect(client.gmax).toBeLessThanOrEqual(route.limits.gmax);
       expect(client.delay).toBeLessThanOrEqual(route.limits.delay);
+      expect(client.sf).toBe(0);
+      expect(client.echo).toBeGreaterThan(0);
+      expect(client.rb).toBeGreaterThan(0);
+      expect(client.rbd).toBeLessThanOrEqual(client.gmax + 1);
+      expect(client.bur).toBeGreaterThan(0);
+      expect(client.botHit + client.botMiss).toBeGreaterThan(0);
+      if (route.outages.length === 0) expect(client.drift).toBe(0);
+      else expect(client.driftEnd).toBeGreaterThan(0);
     }
+    if (route.outages.length === 0) measured.forEach((client, index) => {
+      const own = route.humans[index] ?? -1;
+      const senders = route.humans.filter(slot => slot !== own);
+      for (const sender of senders) expect(client.late[sender]).toBeDefined();
+      for (const [a, b] of senders.flatMap(a => senders.map(b => [a, b] as const)).filter(([a, b]) => a < b)) {
+        const configured = ((played.baseMs.get(a) ?? 0) - (played.baseMs.get(b) ?? 0)) / CALLBACK_MS;
+        expect(Math.abs((client.late[a] ?? 0) - (client.late[b] ?? 0) - configured)).toBeLessThanOrEqual(1);
+      }
+    });
   }, 600_000);
 }

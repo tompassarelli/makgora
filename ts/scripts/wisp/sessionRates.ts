@@ -12,6 +12,8 @@ const MIN_MATCH_SECONDS = 20;
 
 export type Fields = Record<string, number>;
 
+const PAIRS: Record<string, readonly [string, string]> = { echo: ["echo", "echoMax"], bot: ["botHit", "botMiss"] };
+
 export interface SessionRateLines {
   readonly header: string | undefined;
   readonly seconds: Fields[];
@@ -25,9 +27,22 @@ function fields(words: readonly string[]): Fields {
   for (const word of words) {
     const at = word.indexOf("=");
     if (at < 0) continue;
-    const [live, created] = word.slice(at + 1).split("/");
-    parsed[word.slice(0, at)] = Number(live);
-    if (created !== undefined) parsed[`${word.slice(0, at)}Made`] = Number(created);
+    const key = word.slice(0, at);
+    const value = word.slice(at + 1);
+    if (key === "lt") {
+      for (const sender of value.split(",")) {
+        const [player, late] = sender.split(":");
+        const [mean, max] = (late ?? "").split("/");
+        if (player === undefined || mean === undefined || max === undefined) continue;
+        parsed[`late${player}`] = Number(mean);
+        parsed[`lmax${player}`] = Number(max);
+      }
+      continue;
+    }
+    const [live, created] = value.split("/");
+    const [first, second] = PAIRS[key] ?? [key, `${key}Made`];
+    parsed[first] = Number(live);
+    if (created !== undefined) parsed[second] = Number(created);
   }
   return parsed;
 }
@@ -67,6 +82,17 @@ function speedFlag(seconds: readonly Fields[]): string {
 const sum = (rows: readonly Fields[], key: string) => rows.reduce((total, row) => total + (row[key] ?? 0), 0);
 const most = (rows: readonly Fields[], key: string) => rows.reduce((top, row) => Math.max(top, row[key] ?? 0), 0);
 const fixed = (value: number, digits = 1) => value.toFixed(digits);
+const mean = (rows: readonly Fields[], key: string) => sum(rows, key) / Math.max(1, rows.length);
+
+function senderLate(seconds: readonly Fields[]): string {
+  const players = [...new Set(seconds.flatMap(row => Object.keys(row).filter(key => key.startsWith("lateP"))))].sort();
+  if (players.length === 0) return "-";
+  return players.map(key => {
+    const player = key.slice("late".length);
+    const rows = seconds.filter(row => row[key] !== undefined);
+    return `${player} ${fixed(mean(rows, key))}/${most(rows, `lmax${player}`)}`;
+  }).join(",");
+}
 
 function minuteRow(minute: Minute, previousEnd: number): string {
   const { seconds, counts, events, live: liveTags } = minute.lines;
@@ -89,6 +115,7 @@ function minuteRow(minute: Minute, previousEnd: number): string {
     `cb/s ${fixed(sum(seconds, "cb") / span)} game/real ${fixed(sum(seconds, "cb") / span / 60, 2)} (min ${seconds.length === 0 ? "-" : Math.min(...seconds.map(row => row.cb ?? 0))})`,
     `sim/s ${fixed(sum(seconds, "sim") / span)} spec/s ${fixed(sum(seconds, "spec") / span)} conf/s ${fixed(sum(seconds, "conf") / span)} spec/cb ${fixed(sum(seconds, "spec") / Math.max(1, sum(seconds, "cb")), 2)}`,
     `held ${fixed(100 * sum(seconds, "held") / Math.max(1, matchTicks), 0)}% stall ${fixed(100 * sum(seconds, "stall") / Math.max(1, matchTicks), 0)}% gap ${fixed(sum(seconds, "gap") / Math.max(1, seconds.length))}/${most(seconds, "gmax")}`,
+    `rollback/s ${fixed(sum(seconds, "rb") / span)} replayed/s ${fixed(sum(seconds, "rbf") / span)} deepest ${most(seconds, "rbd")} echo ${fixed(mean(seconds.filter(row => (row.echoMax ?? 0) > 0), "echo"))}/${most(seconds, "echoMax")} late ${senderLate(seconds)} bursts/s ${fixed(sum(seconds, "bur") / span)} held run ${most(seconds, "hrun")} drift ${seconds.at(-1)?.drift ?? "-"} bot reuse ${sum(seconds, "botHit")}/${sum(seconds, "botHit") + sum(seconds, "botMiss")} heap growth KB/s ${fixed(sum(seconds, "alloc") / span)} failed sends ${sum(seconds, "sf")}`,
     `lua ms/s ${fixed(sum(seconds, "lua") / 1000 / span)} tick us ${fixed(sum(seconds, "tk") / Math.max(1, seconds.length), 0)}/${most(seconds, "tkmax")}`,
     `draw/s ${fixed(sum(seconds, "dr") / span)} ev/s ${fixed(sum(seconds, "ev") / span)} send/s ${fixed(sum(seconds, "send") / span)} recv/s ${fixed(sum(seconds, "recv") / span)} own echo/s ${fixed(sum(seconds, "rown") / span)} window ${seconds.at(-1)?.win ?? "-"} f ${seconds.at(-1)?.f ?? "-"} cf ${seconds.at(-1)?.cf ?? "-"} kn ${seconds.at(-1)?.kn ?? "-"}`,
     `live ${live} kreg ${last.kreg ?? "?"} reg ${last.reg ?? "?"} act ${last.act ?? "?"} hid ${last.hid ?? "?"} heapKb ${last.heap ?? "?"}`,
@@ -98,7 +125,6 @@ function minuteRow(minute: Minute, previousEnd: number): string {
   ].filter(part => part !== "").join(" | ");
 }
 
-const mean = (rows: readonly Fields[], key: string) => sum(rows, key) / Math.max(1, rows.length);
 
 export function forkVerdict(minutes: readonly { readonly minute: number; readonly lines: SessionRateLines }[]): string {
   const match = (seconds: readonly Fields[]) => seconds.filter(row => row.ph === 2);
