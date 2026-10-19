@@ -1,0 +1,499 @@
+wisp-repro 1
+build playable-0047
+frame 480
+checksum 15044:23475
+replay 0
+version 0bdb0af6da3e
+input network
+segment 0 26274:36657
+rows 34:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:64,64,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:64,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,64,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 3:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:128,128,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:128,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:129,1,0,-127,0,0,0,0,0,0,0,1,-1,0,0,-1,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65537,65536,128,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 2:15:65537,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:5,4,65536,-127,-127,0,0,0,0,0,0,1,-1,-1,-1,0,-1/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 3:15:5,0,0,-127,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:6,2,1,127,-127,0,0,0,0,0,0,1,1,-1,0,1,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:6,0,0,127,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:134,128,0,127,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:130,0,4,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 2:15:130,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65666,65536,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65666,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:66,64,65664,127,0,0,0,1,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 2:15:66,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,66,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 20:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65,65,0,-127,0,0,0,-1,0,0,0,1,-1,0,0,-1,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:1,0,64,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:5,4,0,-127,-127,0,0,0,0,0,0,1,-1,-1,-1,0,-1/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 2:15:5,0,0,-127,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:133,128,0,-127,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65542,65538,129,127,-127,0,0,0,0,0,0,1,1,-1,0,1,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65542,0,0,127,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65606,64,0,127,-127,0,0,1,-1,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:66,0,65540,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:66,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,0,64,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 4:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65536,65536,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,4,0,0,-127,0,0,0,0,0,0,1,0,-1,-1,0,-1
+rows 4:15:65536,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65537,1,0,-127,0,0,0,0,0,0,0,1,-1,0,0,-1,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 2:15:65537,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:1,0,65536,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 5:15:1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65664,65664,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65536,0,128,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65536,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+checkpoint 120 9839:25287
+state mask=15 fighters[ 0{ projectiles[ 0{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0
+state velocityZ=~0 } 1{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 2{ serial=0
+state visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 3{ serial=0 visualFamily=1 life=0 x=~0
+state poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 4{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0
+state damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 5{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0
+state kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 6{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F
+state exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 7{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0
+state poolWait=0 velocityX=~0 velocityZ=~0 } 8{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0
+state velocityZ=~0 } 9{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 10{ serial=0
+state visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 11{ serial=0 visualFamily=1 life=0 x=~0
+state poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 12{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0
+state damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 13{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0
+state kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 14{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F
+state exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 15{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0
+state poolWait=0 velocityX=~0 velocityZ=~0 } ] pack[ ] motion{ meleeZ{ published=~0 original=~0 } crouching=F fastFallDownHeld=F deltaZ=~0 stickSideAge=3 z=~0 turnaroundSide=0 x=~-7:58720256:0
+state fastFallInputAge=6 deltaX=~0 previousStickSide=0 turnaroundAge=9 fastFalling=F vz=~0 vx=~0 grounded=T meleeVelocityZ{ published=~0 original=~0 } meleeX{ published=~0 original=~0 } } placed{
+state struck[ ] serial=0 z=~0 life=0 x=~0 direction=1 specialStruck=0 durability=~0 modeFrame=0 mode=0 apart=0 bitten=0 age=0 } water{ entries=0 inWater=F hydraStrikeFrame=-1 hydraFrame=0 hydraX=~0
+state frames=0 } tech{ window=0 pressAge=255 accumulatedPress=F previousPressAge=255 } landing{ lag=0 } attack{ serial=0 hit=F duration=0 pivotGrab=F cooldown=0 frame=0 smashChargeAllowed=F
+state smashChargeFrames=0 smashCharging=F dashGrab=F } mana{ points=0 } status{ poisonFrames=0 armorChills=F damage=~0 condition=0 out=F armorFrames=0 poisonDamage=~0 buffFrames=0
+state freezeImmunityFrames=0 conditionFrames=0 offscreenFrames=0 conditionImmunityFrames=0 respawn=0 poisonEvery=0 invincible=0 divineFrames=0 frozenFrames=0 conditionImmunity[ 0=0 1=0 2=0 ] buff=0
+state conditionGroup=0 armorMaxDamage=~0 stocks=3 } candle{ struck[ ] away=0 z=~0 x=~0 dropSerial=0 state=0 specialStruck=0 snuffSerial=0 returnSerial=0 guard=0 vz=~0 vx=~0 heat=0 lit=T timer=0 }
+state cannon{ passing=F cooldown=0 } down{ faceUp=T frame=0 attackQueued=F waitRemaining=0 state=0 direction=0 } character=3 surfaceRecovery{ state=0 wallJumpsUsed=0 contactNormalX=~0 frame=0
+state wallJumpRepeat=0 wallJumpSide=0 contactX=~0 contactSerial=0 contactApproachSpeed=~0 velocityApplied=F contactZ=~0 wallJumpQueued=F reflectCooldown=0 contactKind=0 contactNormalZ=~0 } jump{
+state serial=0 remaining=2 dodgeQueued=F dodgeZ=0 isDouble=F squat=0 held=F dodgeX=0 ascent=0 inputAge=20 } platform{ downHeld=F downAge=3 dropConsumed=F } hits{ entries[ 0{ attackSerial=0 window=0 }
+state 1{ attackSerial=0 window=0 } 2{ attackSerial=0 window=0 } 3{ attackSerial=0 window=0 } ] lastWindow=0 } ground{ dashDirection=0 pivotDashFrame=0 pivotEligible=F action=0 turnRunPausePending=F
+state runBrakeFramesRemaining=0 actionFrame=0 turnRunEntryFacing=0 pivotDashActionFrame=0 dashGrabWindow=0 pivotGraceFrames=0 turnRunFacingCommandLatched=F dashFrame=0 } bear{ swipeCooldown=0
+state exDamage=F life=0 x=~0 velocityZ=~0 hitSerial=0 velocityX=~0 z=~0 } ledge{ serial=0 grabs=0 frame=0 side=0 regrab=0 state=0 intangible=0 } dodge{ groundDirection=0 airDodging=F
+state groundEntryFacing=0 airUsed=F airMotionFrames=0 groundFrame=0 airFrame=0 } freezeTrap{ cooldown=0 arming=0 z=~0 exReach=F x=~0 serial=0 life=0 } launch{ knockbackX=~0 damageLevel=0
+state diAngleDegrees=~0 sdiNextZ=0 knockbackZ=~0 meleeKnockbackZ{ published=~0 original=~0 } sdiWasGrounded=F sdiStepX=0 sdiNextTravel=0 sdiNextX=0 sdiHitTravel=0 groundKnockbackX=~0 sdiSerial=0
+state hitlagFrames=0 sdiStepTravel=0 sdiLaunchesUpward=F sdiStepZ=0 sdiStringTravel=0 hitlag=0 hitstun=0 asdiSerial=0 diLaunchSpeed=~0 diSerial=0 diPending=F throwHitstun=F sdiFollowup=F
+state hitlagEndAge=16 meleeKnockbackX{ published=~0 original=~0 } } grab{ grabbedFrames=0 serial=0 action=0 mashX=0 frame=0 mashZ=0 pummels=0 heldFrames=0 queuedThrow=0 } special{ lockFrames=0 hit=F
+state action=0 duration=0 direction=0 cooldowns[ 0=0 1=0 2=0 3=0 4=0 5=0 6=0 7=0 8=0 9=0 10=0 11=0 12=0 13=0 14=0 15=0 16=0 ] frame=0 beamZ=~0 ex=F exArmorUsed=F hitTargets[ ] grabFrame=0 fall=F
+state variant=0 guarded=F seekTarget=0 airtimeUses=0 aimZ=0 beamX=~0 beamLength=~0 form=0 aimX=0 } visuals{ grab=0 hit=0 hitHeight=1 hitStrong=F shieldReflect=0 hitElement=0 hitStrength=0 shield=0
+state manaDrained=0 shieldElectric=F hitPummel=F manaDenied=0 hitElectric=F throw=0 } shield{ redParryTried=F meleeRecoilX{ published=~0 original=~0 } triggerWasActive=F pushbackX=~0 breakRemaining=~0
+state strength=~+0:0:0 recoilX=~0 parryBufferDirection=0 raised=F breakSerial=0 breakFrame=0 breakState=0 perfectFrames=0 releaseLag=0 energy=~+5:58720256:0 tiltX=~0 drainResumePending=F parryBuffer=0
+state recoilZ=~0 meleeRecoilZ{ published=~0 original=~0 } perfectActionFrames=0 triggerAge=2 reflectFrames=0 tiltZ=~0 heldFrames=0 stun=0 } facing=1 } 1{ projectiles[ 0{ serial=0 visualFamily=1 life=0
+state x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 1{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0
+state damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 2{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0
+state kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 3{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F
+state exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 4{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0
+state poolWait=0 velocityX=~0 velocityZ=~0 } 5{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0
+state velocityZ=~0 } 6{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 7{ serial=0
+state visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 8{ serial=0 visualFamily=1 life=0 x=~0
+state poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 9{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0
+state damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 10{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0
+state kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 11{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F
+state exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 12{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0
+state poolWait=0 velocityX=~0 velocityZ=~0 } 13{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0
+state velocityZ=~0 } 14{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 15{ serial=0
+state visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } ] pack[ ] motion{ meleeZ{ published=~0
+state original=~0 } crouching=F fastFallDownHeld=F deltaZ=~0 stickSideAge=3 z=~0 turnaroundSide=0 x=~+7:58720256:0 fastFallInputAge=6 deltaX=~0 previousStickSide=0 turnaroundAge=9 fastFalling=F vz=~0
+state vx=~0 grounded=T meleeVelocityZ{ published=~0 original=~0 } meleeX{ published=~0 original=~0 } } placed{ struck[ ] serial=0 z=~0 life=0 x=~0 direction=1 specialStruck=0 durability=~0 modeFrame=0
+state mode=0 apart=0 bitten=0 age=0 } water{ entries=0 inWater=F hydraStrikeFrame=-1 hydraFrame=0 hydraX=~0 frames=0 } tech{ window=0 pressAge=255 accumulatedPress=F previousPressAge=255 } landing{
+state lag=0 } attack{ serial=0 hit=F duration=0 pivotGrab=F cooldown=0 frame=0 smashChargeAllowed=F smashChargeFrames=0 smashCharging=F dashGrab=F } mana{ points=0 } status{ poisonFrames=0
+state armorChills=F damage=~0 condition=0 out=F armorFrames=0 poisonDamage=~0 buffFrames=0 freezeImmunityFrames=0 conditionFrames=0 offscreenFrames=0 conditionImmunityFrames=0 respawn=0 poisonEvery=0
+state invincible=0 divineFrames=0 frozenFrames=0 conditionImmunity[ 0=0 1=0 2=0 ] buff=0 conditionGroup=0 armorMaxDamage=~0 stocks=3 } candle{ struck[ ] away=0 z=~0 x=~0 dropSerial=0 state=0
+state specialStruck=0 snuffSerial=0 returnSerial=0 guard=0 vz=~0 vx=~0 heat=0 lit=T timer=0 } cannon{ passing=F cooldown=0 } down{ faceUp=T frame=0 attackQueued=F waitRemaining=0 state=0 direction=0 }
+state character=2 surfaceRecovery{ state=0 wallJumpsUsed=0 contactNormalX=~0 frame=0 wallJumpRepeat=0 wallJumpSide=0 contactX=~0 contactSerial=0 contactApproachSpeed=~0 velocityApplied=F contactZ=~0
+state wallJumpQueued=F reflectCooldown=0 contactKind=0 contactNormalZ=~0 } jump{ serial=0 remaining=2 dodgeQueued=F dodgeZ=0 isDouble=F squat=0 held=F dodgeX=0 ascent=0 inputAge=20 } platform{
+state downHeld=F downAge=3 dropConsumed=F } hits{ entries[ 0{ attackSerial=0 window=0 } 1{ attackSerial=0 window=0 } 2{ attackSerial=0 window=0 } 3{ attackSerial=0 window=0 } ] lastWindow=0 } ground{
+state dashDirection=0 pivotDashFrame=0 pivotEligible=F action=0 turnRunPausePending=F runBrakeFramesRemaining=0 actionFrame=0 turnRunEntryFacing=0 pivotDashActionFrame=0 dashGrabWindow=0
+state pivotGraceFrames=0 turnRunFacingCommandLatched=F dashFrame=0 } bear{ swipeCooldown=0 exDamage=F life=0 x=~0 velocityZ=~0 hitSerial=0 velocityX=~0 z=~0 } ledge{ serial=0 grabs=0 frame=0 side=0
+state regrab=0 state=0 intangible=0 } dodge{ groundDirection=0 airDodging=F groundEntryFacing=0 airUsed=F airMotionFrames=0 groundFrame=0 airFrame=0 } freezeTrap{ cooldown=0 arming=0 z=~0 exReach=F
+state x=~0 serial=0 life=0 } launch{ knockbackX=~0 damageLevel=0 diAngleDegrees=~0 sdiNextZ=0 knockbackZ=~0 meleeKnockbackZ{ published=~0 original=~0 } sdiWasGrounded=F sdiStepX=0 sdiNextTravel=0
+state sdiNextX=0 sdiHitTravel=0 groundKnockbackX=~0 sdiSerial=0 hitlagFrames=0 sdiStepTravel=0 sdiLaunchesUpward=F sdiStepZ=0 sdiStringTravel=0 hitlag=0 hitstun=0 asdiSerial=0 diLaunchSpeed=~0
+state diSerial=0 diPending=F throwHitstun=F sdiFollowup=F hitlagEndAge=16 meleeKnockbackX{ published=~0 original=~0 } } grab{ grabbedFrames=0 serial=0 action=0 mashX=0 frame=0 mashZ=0 pummels=0
+state heldFrames=0 queuedThrow=0 } special{ lockFrames=0 hit=F action=0 duration=0 direction=0 cooldowns[ 0=0 1=0 2=0 3=0 4=0 5=0 6=0 7=0 8=0 9=0 10=0 11=0 12=0 13=0 14=0 15=0 16=0 ] frame=0 beamZ=~0
+state ex=F exArmorUsed=F hitTargets[ ] grabFrame=0 fall=F variant=0 guarded=F seekTarget=0 airtimeUses=0 aimZ=0 beamX=~0 beamLength=~0 form=0 aimX=0 } visuals{ grab=0 hit=0 hitHeight=1 hitStrong=F
+state shieldReflect=0 hitElement=0 hitStrength=0 shield=0 manaDrained=0 shieldElectric=F hitPummel=F manaDenied=0 hitElectric=F throw=0 } shield{ redParryTried=F meleeRecoilX{ published=~0 original=~0
+state } triggerWasActive=F pushbackX=~0 breakRemaining=~0 strength=~+0:0:0 recoilX=~0 parryBufferDirection=0 raised=F breakSerial=0 breakFrame=0 breakState=0 perfectFrames=0 releaseLag=0
+state energy=~+5:58720256:0 tiltX=~0 drainResumePending=F parryBuffer=0 recoilZ=~0 meleeRecoilZ{ published=~0 original=~0 } perfectActionFrames=0 triggerAge=2 reflectFrames=0 tiltZ=~0 heldFrames=0
+state stun=0 } facing=-1 } 2{ projectiles[ 0{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0
+state velocityZ=~0 } 1{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 2{ serial=0
+state visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 3{ serial=0 visualFamily=1 life=0 x=~0
+state poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 4{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0
+state damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 5{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0
+state kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 6{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F
+state exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 7{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0
+state poolWait=0 velocityX=~0 velocityZ=~0 } 8{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0
+state velocityZ=~0 } 9{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 10{ serial=0
+state visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 11{ serial=0 visualFamily=1 life=0 x=~0
+state poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 12{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0
+state damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 13{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0
+state kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 14{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F
+state exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 15{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0
+state poolWait=0 velocityX=~0 velocityZ=~0 } ] pack[ ] motion{ meleeZ{ published=~0 original=~0 } crouching=F fastFallDownHeld=F deltaZ=~0 stickSideAge=3 z=~0 turnaroundSide=0 x=~-6:16777216:0
+state fastFallInputAge=6 deltaX=~0 previousStickSide=0 turnaroundAge=9 fastFalling=F vz=~0 vx=~0 grounded=T meleeVelocityZ{ published=~0 original=~0 } meleeX{ published=~0 original=~0 } } placed{
+state struck[ ] serial=0 z=~0 life=0 x=~0 direction=1 specialStruck=0 durability=~0 modeFrame=0 mode=0 apart=0 bitten=0 age=0 } water{ entries=0 inWater=F hydraStrikeFrame=-1 hydraFrame=0 hydraX=~0
+state frames=0 } tech{ window=0 pressAge=255 accumulatedPress=F previousPressAge=255 } landing{ lag=0 } attack{ serial=0 hit=F duration=0 pivotGrab=F cooldown=0 frame=0 smashChargeAllowed=F
+state smashChargeFrames=0 smashCharging=F dashGrab=F } mana{ points=0 } status{ poisonFrames=0 armorChills=F damage=~0 condition=0 out=F armorFrames=0 poisonDamage=~0 buffFrames=0
+state freezeImmunityFrames=0 conditionFrames=0 offscreenFrames=0 conditionImmunityFrames=0 respawn=0 poisonEvery=0 invincible=0 divineFrames=0 frozenFrames=0 conditionImmunity[ 0=0 1=0 2=0 ] buff=0
+state conditionGroup=0 armorMaxDamage=~0 stocks=3 } candle{ struck[ ] away=0 z=~0 x=~0 dropSerial=0 state=0 specialStruck=0 snuffSerial=0 returnSerial=0 guard=0 vz=~0 vx=~0 heat=0 lit=T timer=0 }
+state cannon{ passing=F cooldown=0 } down{ faceUp=T frame=0 attackQueued=F waitRemaining=0 state=0 direction=0 } character=10 surfaceRecovery{ state=0 wallJumpsUsed=0 contactNormalX=~0 frame=0
+state wallJumpRepeat=0 wallJumpSide=0 contactX=~0 contactSerial=0 contactApproachSpeed=~0 velocityApplied=F contactZ=~0 wallJumpQueued=F reflectCooldown=0 contactKind=0 contactNormalZ=~0 } jump{
+state serial=0 remaining=2 dodgeQueued=F dodgeZ=0 isDouble=F squat=0 held=F dodgeX=0 ascent=0 inputAge=20 } platform{ downHeld=F downAge=3 dropConsumed=F } hits{ entries[ 0{ attackSerial=0 window=0 }
+state 1{ attackSerial=0 window=0 } 2{ attackSerial=0 window=0 } 3{ attackSerial=0 window=0 } ] lastWindow=0 } ground{ dashDirection=0 pivotDashFrame=0 pivotEligible=F action=0 turnRunPausePending=F
+state runBrakeFramesRemaining=0 actionFrame=0 turnRunEntryFacing=0 pivotDashActionFrame=0 dashGrabWindow=0 pivotGraceFrames=0 turnRunFacingCommandLatched=F dashFrame=0 } bear{ swipeCooldown=0
+state exDamage=F life=0 x=~0 velocityZ=~0 hitSerial=0 velocityX=~0 z=~0 } ledge{ serial=0 grabs=0 frame=0 side=0 regrab=0 state=0 intangible=0 } dodge{ groundDirection=0 airDodging=F
+state groundEntryFacing=0 airUsed=F airMotionFrames=0 groundFrame=0 airFrame=0 } freezeTrap{ cooldown=0 arming=0 z=~0 exReach=F x=~0 serial=0 life=0 } launch{ knockbackX=~0 damageLevel=0
+state diAngleDegrees=~0 sdiNextZ=0 knockbackZ=~0 meleeKnockbackZ{ published=~0 original=~0 } sdiWasGrounded=F sdiStepX=0 sdiNextTravel=0 sdiNextX=0 sdiHitTravel=0 groundKnockbackX=~0 sdiSerial=0
+state hitlagFrames=0 sdiStepTravel=0 sdiLaunchesUpward=F sdiStepZ=0 sdiStringTravel=0 hitlag=0 hitstun=0 asdiSerial=0 diLaunchSpeed=~0 diSerial=0 diPending=F throwHitstun=F sdiFollowup=F
+state hitlagEndAge=16 meleeKnockbackX{ published=~0 original=~0 } } grab{ grabbedFrames=0 serial=0 action=0 mashX=0 frame=0 mashZ=0 pummels=0 heldFrames=0 queuedThrow=0 } special{ lockFrames=0 hit=F
+state action=0 duration=0 direction=0 cooldowns[ 0=0 1=0 2=0 3=0 4=0 5=0 6=0 7=0 8=0 9=0 10=0 11=0 12=0 13=0 14=0 15=0 16=0 ] frame=0 beamZ=~0 ex=F exArmorUsed=F hitTargets[ ] grabFrame=0 fall=F
+state variant=0 guarded=F seekTarget=0 airtimeUses=0 aimZ=0 beamX=~0 beamLength=~0 form=0 aimX=0 } visuals{ grab=0 hit=0 hitHeight=1 hitStrong=F shieldReflect=0 hitElement=0 hitStrength=0 shield=0
+state manaDrained=0 shieldElectric=F hitPummel=F manaDenied=0 hitElectric=F throw=0 } shield{ redParryTried=F meleeRecoilX{ published=~0 original=~0 } triggerWasActive=F pushbackX=~0 breakRemaining=~0
+state strength=~+0:0:0 recoilX=~0 parryBufferDirection=0 raised=F breakSerial=0 breakFrame=0 breakState=0 perfectFrames=0 releaseLag=0 energy=~+5:58720256:0 tiltX=~0 drainResumePending=F parryBuffer=0
+state recoilZ=~0 meleeRecoilZ{ published=~0 original=~0 } perfectActionFrames=0 triggerAge=2 reflectFrames=0 tiltZ=~0 heldFrames=0 stun=0 } facing=1 } 3{ projectiles[ 0{ serial=0 visualFamily=1 life=0
+state x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 1{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0
+state damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 2{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0
+state kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 3{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F
+state exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 4{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0
+state poolWait=0 velocityX=~0 velocityZ=~0 } 5{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0
+state velocityZ=~0 } 6{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 7{ serial=0
+state visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 8{ serial=0 visualFamily=1 life=0 x=~0
+state poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 9{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0
+state damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 10{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0
+state kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 11{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F
+state exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 12{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0
+state poolWait=0 velocityX=~0 velocityZ=~0 } 13{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0
+state velocityZ=~0 } 14{ serial=0 visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } 15{ serial=0
+state visualFamily=1 life=0 x=~0 poolHits=0 damageMultiplier=~+0:0:0 kind=0 z=~0 newlyReflected=F exReach=F direction=0 poolWait=0 velocityX=~0 velocityZ=~0 } ] pack[ ] motion{ meleeZ{ published=~0
+state original=~0 } crouching=F fastFallDownHeld=F deltaZ=~0 stickSideAge=3 z=~0 turnaroundSide=0 x=~+6:16777216:0 fastFallInputAge=6 deltaX=~0 previousStickSide=0 turnaroundAge=9 fastFalling=F vz=~0
+state vx=~0 grounded=T meleeVelocityZ{ published=~0 original=~0 } meleeX{ published=~0 original=~0 } } placed{ struck[ ] serial=0 z=~0 life=0 x=~0 direction=1 specialStruck=0 durability=~0 modeFrame=0
+state mode=0 apart=0 bitten=0 age=0 } water{ entries=0 inWater=F hydraStrikeFrame=-1 hydraFrame=0 hydraX=~0 frames=0 } tech{ window=0 pressAge=255 accumulatedPress=F previousPressAge=255 } landing{
+state lag=0 } attack{ serial=0 hit=F duration=0 pivotGrab=F cooldown=0 frame=0 smashChargeAllowed=F smashChargeFrames=0 smashCharging=F dashGrab=F } mana{ points=0 } status{ poisonFrames=0
+state armorChills=F damage=~0 condition=0 out=F armorFrames=0 poisonDamage=~0 buffFrames=0 freezeImmunityFrames=0 conditionFrames=0 offscreenFrames=0 conditionImmunityFrames=0 respawn=0 poisonEvery=0
+state invincible=0 divineFrames=0 frozenFrames=0 conditionImmunity[ 0=0 1=0 2=0 ] buff=0 conditionGroup=0 armorMaxDamage=~0 stocks=3 } candle{ struck[ ] away=0 z=~0 x=~0 dropSerial=0 state=0
+state specialStruck=0 snuffSerial=0 returnSerial=0 guard=0 vz=~0 vx=~0 heat=0 lit=T timer=0 } cannon{ passing=F cooldown=0 } down{ faceUp=T frame=0 attackQueued=F waitRemaining=0 state=0 direction=0 }
+state character=22 surfaceRecovery{ state=0 wallJumpsUsed=0 contactNormalX=~0 frame=0 wallJumpRepeat=0 wallJumpSide=0 contactX=~0 contactSerial=0 contactApproachSpeed=~0 velocityApplied=F contactZ=~0
+state wallJumpQueued=F reflectCooldown=0 contactKind=0 contactNormalZ=~0 } jump{ serial=0 remaining=2 dodgeQueued=F dodgeZ=0 isDouble=F squat=0 held=F dodgeX=0 ascent=0 inputAge=20 } platform{
+state downHeld=F downAge=3 dropConsumed=F } hits{ entries[ 0{ attackSerial=0 window=0 } 1{ attackSerial=0 window=0 } 2{ attackSerial=0 window=0 } 3{ attackSerial=0 window=0 } ] lastWindow=0 } ground{
+state dashDirection=0 pivotDashFrame=0 pivotEligible=F action=0 turnRunPausePending=F runBrakeFramesRemaining=0 actionFrame=0 turnRunEntryFacing=0 pivotDashActionFrame=0 dashGrabWindow=0
+state pivotGraceFrames=0 turnRunFacingCommandLatched=F dashFrame=0 } bear{ swipeCooldown=0 exDamage=F life=0 x=~0 velocityZ=~0 hitSerial=0 velocityX=~0 z=~0 } ledge{ serial=0 grabs=0 frame=0 side=0
+state regrab=0 state=0 intangible=0 } dodge{ groundDirection=0 airDodging=F groundEntryFacing=0 airUsed=F airMotionFrames=0 groundFrame=0 airFrame=0 } freezeTrap{ cooldown=0 arming=0 z=~0 exReach=F
+state x=~0 serial=0 life=0 } launch{ knockbackX=~0 damageLevel=0 diAngleDegrees=~0 sdiNextZ=0 knockbackZ=~0 meleeKnockbackZ{ published=~0 original=~0 } sdiWasGrounded=F sdiStepX=0 sdiNextTravel=0
+state sdiNextX=0 sdiHitTravel=0 groundKnockbackX=~0 sdiSerial=0 hitlagFrames=0 sdiStepTravel=0 sdiLaunchesUpward=F sdiStepZ=0 sdiStringTravel=0 hitlag=0 hitstun=0 asdiSerial=0 diLaunchSpeed=~0
+state diSerial=0 diPending=F throwHitstun=F sdiFollowup=F hitlagEndAge=16 meleeKnockbackX{ published=~0 original=~0 } } grab{ grabbedFrames=0 serial=0 action=0 mashX=0 frame=0 mashZ=0 pummels=0
+state heldFrames=0 queuedThrow=0 } special{ lockFrames=0 hit=F action=0 duration=0 direction=0 cooldowns[ 0=0 1=0 2=0 3=0 4=0 5=0 6=0 7=0 8=0 9=0 10=0 11=0 12=0 13=0 14=0 15=0 16=0 ] frame=0 beamZ=~0
+state ex=F exArmorUsed=F hitTargets[ ] grabFrame=0 fall=F variant=0 guarded=F seekTarget=0 airtimeUses=0 aimZ=0 beamX=~0 beamLength=~0 form=0 aimX=0 } visuals{ grab=0 hit=0 hitHeight=1 hitStrong=F
+state shieldReflect=0 hitElement=0 hitStrength=0 shield=0 manaDrained=0 shieldElectric=F hitPummel=F manaDenied=0 hitElectric=F throw=0 } shield{ redParryTried=F meleeRecoilX{ published=~0 original=~0
+state } triggerWasActive=F pushbackX=~0 breakRemaining=~0 strength=~+0:0:0 recoilX=~0 parryBufferDirection=0 raised=F breakSerial=0 breakFrame=0 breakState=0 perfectFrames=0 releaseLag=0
+state energy=~+5:58720256:0 tiltX=~0 drainResumePending=F parryBuffer=0 recoilZ=~0 meleeRecoilZ{ published=~0 original=~0 } perfectActionFrames=0 triggerAge=2 reflectFrames=0 tiltZ=~0 heldFrames=0
+state stun=0 } facing=-1 } ] match{ humanFighterMask=13 phase=2 departedMask=0 stockCount=3 matchSeed=0 hazards=T stagePool{ remainingMask=29916 selectedMask=0 only=F } cpuTiers[ 0='intermediate
+state 1='intermediate 2='intermediate 3='intermediate ] items{ lastTaker=-1 nextSpawnFrame=0 pickupSerial=0 nextKind=0 kind=0 on=F enabledMask=5 spawnSerial=0 draws=0 } characterChoices[ 0=3 1=2 2=10
+state 3=22 ] training=F rematchReadiness[ 0=F 1=F 2=F 3=F ] lore=F cpuResolvedOpponents[ 0='wren 1='wren 2='wren 3='wren ] teamChoices[ 0=0 1=1 2=0 3=1 ] drops{ pickupSerial=0 lastTaker=-1
+state spawnSerial=0 on=T nextPoint=0 point=-1 nextSpawnFrame=1081 draws=1 } camera{ z=~+7:16777216:0 x=~0 left=~0 top=~0 boxes[ 0{ top=~0 right=~0 left=~0 bottom=~0 } 1{ top=~0 right=~0 left=~0
+state bottom=~0 } 2{ top=~0 right=~0 left=~0 bottom=~0 } 3{ top=~0 right=~0 left=~0 bottom=~0 } ] initialized=F bottom=~0 right=~0 distance=~+10:27918336:0 tangent=~+-2:4818200:0 } resultPicks[ 0=2
+state 1=2 2=2 3=2 ] stageResolved=T loreBattle=0 timedOut=F cpuOpponents[ 0='wren 1='wren 2='wren 3='wren ] computerMask=2 classicTier=1 startHold=180 classic=F humanCount=4 ultimatesOff=F practice=F
+state characterReadiness[ 0=T 1=T 2=T 3=T ] remainingFrames=25200 matchFrame=0 rematchCountdown=0 trainer{ moveTotal=0 speed=1 lessonCheer=0 damage=0 lessonCount=0 lesson=-1 tech=0 comboDamage=~0
+state latches[ 0{ specialX=0 getupDirection=0 sdiZ=0 specialZ=0 dodgeZ=0 groundDodgeDirection=0 mask=0 ledgeVerticalPressed=0 cStickSideFlick=0 sdiX=0 dodgeX=0 } 1{ specialX=0 getupDirection=0 sdiZ=0
+state specialZ=0 dodgeZ=0 groundDodgeDirection=0 mask=0 ledgeVerticalPressed=0 cStickSideFlick=0 sdiX=0 dodgeX=0 } 2{ specialX=0 getupDirection=0 sdiZ=0 specialZ=0 dodgeZ=0 groundDodgeDirection=0
+state mask=0 ledgeVerticalPressed=0 cStickSideFlick=0 sdiX=0 dodgeX=0 } 3{ specialX=0 getupDirection=0 sdiZ=0 specialZ=0 dodgeZ=0 groundDodgeDirection=0 mask=0 ledgeVerticalPressed=0 cStickSideFlick=0
+state sdiX=0 dodgeX=0 } ] moveStartup=0 escape=0 measureAttacker=-1 comboOpen=F attackerReady=-1 moveSlot=-1 advantageKind=0 moveActive=0 moveForm=0 defenderReady=-1 measureFrames=-1 advantage=0
+state moveStyle=-1 showHitAreas=F moveCharacter=0 speedPhase=0 measureKind=0 measureDefender=-1 comboHits=0 comboDefender=-1 moveSpecial=-1 behaviour=0 } teamBattle=F endless=F humanMask=15
+state stageChoice=11 automaticRematch=F run{ savedComputers=0 tier=0 savedHumanFighters=0 savedHazards=T savedStocks=3 fighter=1 cleared=F boss{ lastWindow=0 kind=0 flash=0 health=0 hitMask=0
+state maxHealth=0 lastSerial=-1 aimX=~0 strike=-1 } active=F savedItems=F player=0 fight=0 damageTaken=~0 lastDamage=~0 savedMinutes=7 outcome=0 continues=0 frames=0 } timeLimitMinutes=7 interrupted=F
+state friendlyFire=F } commands[ 0{ graceFrames=6 consumedMayCharge=F consumedFacing=0 previous{ mayCharge=F frame=0 style=0 facing=0 } queued{ mayCharge=F frame=0 style=0 facing=0 } } 1{
+state graceFrames=6 consumedMayCharge=F consumedFacing=0 previous{ mayCharge=F frame=0 style=0 facing=0 } queued{ mayCharge=F frame=0 style=0 facing=0 } } 2{ graceFrames=6 consumedMayCharge=F
+state consumedFacing=0 previous{ mayCharge=F frame=0 style=0 facing=0 } queued{ mayCharge=F frame=0 style=0 facing=0 } } 3{ graceFrames=6 consumedMayCharge=F consumedFacing=0 previous{ mayCharge=F
+state frame=0 style=0 facing=0 } queued{ mayCharge=F frame=0 style=0 facing=0 } } ] runtime{ observedLegal[ 0=0 1=0 2=0 3=0 ] poses[ 0{ clipTime=~0 animation=' clipName='stand motion{ ledgeJump=F
+state previouslyMoving=F previousOut=F motion=0 ledgeCatchRemaining=0 transitionRemaining=0 previousFacing=0 previousJump=0 previousLedge=0 escapeRemaining=0 respawnRemaining=0 }
+state landingAnimationRate=~+0:0:0 rate=~+0:0:0 jumpAnimationRemaining=0 selectionSerial=0 doubleJumpAnimation=F } 1{ clipTime=~0 animation=' clipName='stand motion{ ledgeJump=F previouslyMoving=F
+state previousOut=F motion=0 ledgeCatchRemaining=0 transitionRemaining=0 previousFacing=0 previousJump=0 previousLedge=0 escapeRemaining=0 respawnRemaining=0 } landingAnimationRate=~+0:0:0
+state rate=~+0:0:0 jumpAnimationRemaining=0 selectionSerial=0 doubleJumpAnimation=F } 2{ clipTime=~0 animation=' clipName='stand motion{ ledgeJump=F previouslyMoving=F previousOut=F motion=0
+state ledgeCatchRemaining=0 transitionRemaining=0 previousFacing=0 previousJump=0 previousLedge=0 escapeRemaining=0 respawnRemaining=0 } landingAnimationRate=~+0:0:0 rate=~+0:0:0
+state jumpAnimationRemaining=0 selectionSerial=0 doubleJumpAnimation=F } 3{ clipTime=~0 animation=' clipName='stand motion{ ledgeJump=F previouslyMoving=F previousOut=F motion=0 ledgeCatchRemaining=0
+state transitionRemaining=0 previousFacing=0 previousJump=0 previousLedge=0 escapeRemaining=0 respawnRemaining=0 } landingAnimationRate=~+0:0:0 rate=~+0:0:0 jumpAnimationRemaining=0 selectionSerial=0
+state doubleJumpAnimation=F } ] simulationFrame=0 observedStarted[ 0=0 1=0 2=0 3=0 ] botMemory{ directions[ 0=0 1=0 2=0 3=0 ] directionFrames[ 0=0 1=0 2=0 3=0 ] history[ ] } botStrategies[ 0{
+state burnStyle=-1 recentOptions[ 0=-1 1=-1 2=-1 3=-1 4=-1 5=-1 6=-1 7=-1 8=-1 9=-1 10=-1 11=-1 ] history[ ] burnGap=0 burnCharacter=-1 observedFrame=-1 opponent=-1 lastOption=-1 burnFrame=-1
+state burnCount=0 burnHurt=F events=0 lastChoice=0 lastSerial=-1 lastContext=0 } 1{ burnStyle=-1 recentOptions[ 0=-1 1=-1 2=-1 3=-1 4=-1 5=-1 6=-1 7=-1 8=-1 9=-1 10=-1 11=-1 ] history[ ] burnGap=0
+state burnCharacter=-1 observedFrame=-1 opponent=-1 lastOption=-1 burnFrame=-1 burnCount=0 burnHurt=F events=0 lastChoice=0 lastSerial=-1 lastContext=0 } 2{ burnStyle=-1 recentOptions[ 0=-1 1=-1 2=-1
+state 3=-1 4=-1 5=-1 6=-1 7=-1 8=-1 9=-1 10=-1 11=-1 ] history[ ] burnGap=0 burnCharacter=-1 observedFrame=-1 opponent=-1 lastOption=-1 burnFrame=-1 burnCount=0 burnHurt=F events=0 lastChoice=0
+state lastSerial=-1 lastContext=0 } 3{ burnStyle=-1 recentOptions[ 0=-1 1=-1 2=-1 3=-1 4=-1 5=-1 6=-1 7=-1 8=-1 9=-1 10=-1 11=-1 ] history[ ] burnGap=0 burnCharacter=-1 observedFrame=-1 opponent=-1
+state lastOption=-1 burnFrame=-1 burnCount=0 burnHurt=F events=0 lastChoice=0 lastSerial=-1 lastContext=0 } ] summons{ bears[ 0{ clipTime=~0 active=F } 1{ clipTime=~0 active=F } 2{ clipTime=~0
+state active=F } 3{ clipTime=~0 active=F } ] bearHitSerial[ 0=0 1=0 2=0 3=0 ] } botDecisions[ 0{ decided=F commands{ previous{ mayCharge=F frame=0 style=0 facing=0 } queued{ mayCharge=F frame=0
+state style=0 facing=0 } consumedFacing=0 consumedMayCharge=F graceFrames=0 } input{ specialZ=0 specialPressed=F direction=0 diStickZ=~0 mashPressed=F down=F resetPressed=F shortHopPressed=F
+state getupDirection=0 jumpPressed=F techPressed=F exPressed=F cStickX=0 shieldStrength=~+0:0:0 attackRequested=F cStickUpFlick=F grabMashPressed=F specialX=0 sdiZ=0 sdiX=0 diStickValid=F dodgeZ=0
+state groundDodgeDirection=0 ledgeVerticalPressed=0 jumpHeld=F diStickX=~0 attackHeld=F dodgeX=0 cStickSideFlick=0 getupAttackPressed=F getupDirectionPressed=F getupStandPressed=F verticalDirection=0
+state walking=F shieldPressed=F ultimatePressed=F grabThrowZ=0 grabThrowX=0 airDodgePressed=F shieldTriggerActive=F cStickZ=0 sdiPulse=F attackPressed=F groundDodgePressed=F shield=F } } 1{ decided=F
+state commands{ previous{ mayCharge=F frame=0 style=0 facing=0 } queued{ mayCharge=F frame=0 style=0 facing=0 } consumedFacing=0 consumedMayCharge=F graceFrames=0 } input{ specialZ=0 specialPressed=F
+state direction=0 diStickZ=~0 mashPressed=F down=F resetPressed=F shortHopPressed=F getupDirection=0 jumpPressed=F techPressed=F exPressed=F cStickX=0 shieldStrength=~+0:0:0 attackRequested=F
+state cStickUpFlick=F grabMashPressed=F specialX=0 sdiZ=0 sdiX=0 diStickValid=F dodgeZ=0 groundDodgeDirection=0 ledgeVerticalPressed=0 jumpHeld=F diStickX=~0 attackHeld=F dodgeX=0 cStickSideFlick=0
+state getupAttackPressed=F getupDirectionPressed=F getupStandPressed=F verticalDirection=0 walking=F shieldPressed=F ultimatePressed=F grabThrowZ=0 grabThrowX=0 airDodgePressed=F shieldTriggerActive=F
+state cStickZ=0 sdiPulse=F attackPressed=F groundDodgePressed=F shield=F } } 2{ decided=F commands{ previous{ mayCharge=F frame=0 style=0 facing=0 } queued{ mayCharge=F frame=0 style=0 facing=0 }
+state consumedFacing=0 consumedMayCharge=F graceFrames=0 } input{ specialZ=0 specialPressed=F direction=0 diStickZ=~0 mashPressed=F down=F resetPressed=F shortHopPressed=F getupDirection=0
+state jumpPressed=F techPressed=F exPressed=F cStickX=0 shieldStrength=~+0:0:0 attackRequested=F cStickUpFlick=F grabMashPressed=F specialX=0 sdiZ=0 sdiX=0 diStickValid=F dodgeZ=0
+state groundDodgeDirection=0 ledgeVerticalPressed=0 jumpHeld=F diStickX=~0 attackHeld=F dodgeX=0 cStickSideFlick=0 getupAttackPressed=F getupDirectionPressed=F getupStandPressed=F verticalDirection=0
+state walking=F shieldPressed=F ultimatePressed=F grabThrowZ=0 grabThrowX=0 airDodgePressed=F shieldTriggerActive=F cStickZ=0 sdiPulse=F attackPressed=F groundDodgePressed=F shield=F } } 3{ decided=F
+state commands{ previous{ mayCharge=F frame=0 style=0 facing=0 } queued{ mayCharge=F frame=0 style=0 facing=0 } consumedFacing=0 consumedMayCharge=F graceFrames=0 } input{ specialZ=0 specialPressed=F
+state direction=0 diStickZ=~0 mashPressed=F down=F resetPressed=F shortHopPressed=F getupDirection=0 jumpPressed=F techPressed=F exPressed=F cStickX=0 shieldStrength=~+0:0:0 attackRequested=F
+state cStickUpFlick=F grabMashPressed=F specialX=0 sdiZ=0 sdiX=0 diStickValid=F dodgeZ=0 groundDodgeDirection=0 ledgeVerticalPressed=0 jumpHeld=F diStickX=~0 attackHeld=F dodgeX=0 cStickSideFlick=0
+state getupAttackPressed=F getupDirectionPressed=F getupStandPressed=F verticalDirection=0 walking=F shieldPressed=F ultimatePressed=F grabThrowZ=0 grabThrowX=0 airDodgePressed=F shieldTriggerActive=F
+state cStickZ=0 sdiPulse=F attackPressed=F groundDodgePressed=F shield=F } } ] botAttackDelays[ 0=~0 1=~0 2=~0 3=~0 ] impacts{ ages[ ] drift[ 0=0 1=0 2=0 3=0 4=0 5=0 6=0 7=0 8=0 9=0 10=0 11=0 12=0
+state 13=0 14=0 15=0 16=0 17=0 18=0 19=0 20=0 21=0 22=0 23=0 24=0 25=0 26=0 27=0 28=0 29=0 30=0 31=0 32=0 33=0 34=0 35=0 36=0 37=0 38=0 39=0 40=0 41=0 42=0 43=0 44=0 45=0 46=0 47=0 48=0 49=0 50=0 51=0
+state 52=0 53=0 54=0 55=0 56=0 57=0 58=0 59=0 60=0 61=0 62=0 63=0 64=0 65=0 66=0 67=0 68=0 69=0 70=0 71=0 72=0 73=0 74=0 75=0 76=0 77=0 78=0 79=0 80=0 81=0 82=0 83=0 84=0 85=0 86=0 87=0 88=0 89=0 90=0
+state 91=0 92=0 93=0 94=0 95=0 96=0 97=0 98=0 99=0 100=0 101=0 102=0 103=0 104=0 105=0 106=0 107=0 108=0 109=0 110=0 111=0 112=0 113=0 114=0 115=0 116=0 117=0 118=0 119=0 120=0 121=0 122=0 123=0 124=0
+state 125=0 126=0 127=0 128=0 129=0 130=0 131=0 132=0 133=0 134=0 135=0 136=0 137=0 138=0 139=0 140=0 141=0 142=0 143=0 144=0 145=0 146=0 147=0 148=0 149=0 150=0 151=0 152=0 153=0 154=0 155=0 156=0
+state 157=0 158=0 159=0 160=0 161=0 162=0 163=0 164=0 165=0 166=0 167=0 168=0 169=0 170=0 171=0 172=0 173=0 174=0 175=0 176=0 177=0 178=0 179=0 180=0 181=0 182=0 183=0 ] nextSlot[ 0=0 1=0 2=0 3=0 4=0
+state 5=0 6=0 7=0 8=0 9=0 10=0 11=0 12=0 13=0 14=0 15=0 16=0 17=0 18=0 19=0 20=0 21=0 22=0 ] occupied[ 0=0 1=0 2=0 3=0 4=0 5=0 6=0 7=0 8=0 9=0 10=0 11=0 12=0 13=0 14=0 15=0 16=0 17=0 18=0 19=0 20=0
+state 21=0 22=0 ] driftZ[ 0=~0 1=~0 2=~0 3=~0 4=~0 5=~0 6=~0 7=~0 8=~0 9=~0 10=~0 11=~0 12=~0 13=~0 14=~0 15=~0 16=~0 17=~0 18=~0 19=~0 20=~0 21=~0 22=~0 23=~0 24=~0 25=~0 26=~0 27=~0 28=~0 29=~0
+state 30=~0 31=~0 32=~0 33=~0 34=~0 35=~0 36=~0 37=~0 38=~0 39=~0 40=~0 41=~0 42=~0 43=~0 44=~0 45=~0 46=~0 47=~0 48=~0 49=~0 50=~0 51=~0 52=~0 53=~0 54=~0 55=~0 56=~0 57=~0 58=~0 59=~0 60=~0 61=~0
+state 62=~0 63=~0 64=~0 65=~0 66=~0 67=~0 68=~0 69=~0 70=~0 71=~0 72=~0 73=~0 74=~0 75=~0 76=~0 77=~0 78=~0 79=~0 80=~0 81=~0 82=~0 83=~0 84=~0 85=~0 86=~0 87=~0 88=~0 89=~0 90=~0 91=~0 92=~0 93=~0
+state 94=~0 95=~0 96=~0 97=~0 98=~0 99=~0 100=~0 101=~0 102=~0 103=~0 104=~0 105=~0 106=~0 107=~0 108=~0 109=~0 110=~0 111=~0 112=~0 113=~0 114=~0 115=~0 116=~0 117=~0 118=~0 119=~0 120=~0 121=~0
+state 122=~0 123=~0 124=~0 125=~0 126=~0 127=~0 128=~0 129=~0 130=~0 131=~0 132=~0 133=~0 134=~0 135=~0 136=~0 137=~0 138=~0 139=~0 140=~0 141=~0 142=~0 143=~0 144=~0 145=~0 146=~0 147=~0 148=~0
+state 149=~0 150=~0 151=~0 152=~0 153=~0 154=~0 155=~0 156=~0 157=~0 158=~0 159=~0 160=~0 161=~0 162=~0 163=~0 164=~0 165=~0 166=~0 167=~0 168=~0 169=~0 170=~0 171=~0 172=~0 173=~0 174=~0 175=~0
+state 176=~0 177=~0 178=~0 179=~0 180=~0 181=~0 182=~0 183=~0 ] strength[ 0=~0 1=~0 2=~0 3=~0 4=~0 5=~0 6=~0 7=~0 8=~0 9=~0 10=~0 11=~0 12=~0 13=~0 14=~0 15=~0 16=~0 17=~0 18=~0 19=~0 20=~0 21=~0
+state 22=~0 23=~0 24=~0 25=~0 26=~0 27=~0 28=~0 29=~0 30=~0 31=~0 32=~0 33=~0 34=~0 35=~0 36=~0 37=~0 38=~0 39=~0 40=~0 41=~0 42=~0 43=~0 44=~0 45=~0 46=~0 47=~0 48=~0 49=~0 50=~0 51=~0 52=~0 53=~0
+state 54=~0 55=~0 56=~0 57=~0 58=~0 59=~0 60=~0 61=~0 62=~0 63=~0 64=~0 65=~0 66=~0 67=~0 68=~0 69=~0 70=~0 71=~0 72=~0 73=~0 74=~0 75=~0 76=~0 77=~0 78=~0 79=~0 80=~0 81=~0 82=~0 83=~0 84=~0 85=~0
+state 86=~0 87=~0 88=~0 89=~0 90=~0 91=~0 92=~0 93=~0 94=~0 95=~0 96=~0 97=~0 98=~0 99=~0 100=~0 101=~0 102=~0 103=~0 104=~0 105=~0 106=~0 107=~0 108=~0 109=~0 110=~0 111=~0 112=~0 113=~0 114=~0
+state 115=~0 116=~0 117=~0 118=~0 119=~0 120=~0 121=~0 122=~0 123=~0 124=~0 125=~0 126=~0 127=~0 128=~0 129=~0 130=~0 131=~0 132=~0 133=~0 134=~0 135=~0 136=~0 137=~0 138=~0 139=~0 140=~0 141=~0
+state 142=~0 143=~0 144=~0 145=~0 146=~0 147=~0 148=~0 149=~0 150=~0 151=~0 152=~0 153=~0 154=~0 155=~0 156=~0 157=~0 158=~0 159=~0 160=~0 161=~0 162=~0 163=~0 164=~0 165=~0 166=~0 167=~0 168=~0
+state 169=~0 170=~0 171=~0 172=~0 173=~0 174=~0 175=~0 176=~0 177=~0 178=~0 179=~0 180=~0 181=~0 182=~0 183=~0 ] originZ[ 0=~0 1=~0 2=~0 3=~0 4=~0 5=~0 6=~0 7=~0 8=~0 9=~0 10=~0 11=~0 12=~0 13=~0
+state 14=~0 15=~0 16=~0 17=~0 18=~0 19=~0 20=~0 21=~0 22=~0 23=~0 24=~0 25=~0 26=~0 27=~0 28=~0 29=~0 30=~0 31=~0 32=~0 33=~0 34=~0 35=~0 36=~0 37=~0 38=~0 39=~0 40=~0 41=~0 42=~0 43=~0 44=~0 45=~0
+state 46=~0 47=~0 48=~0 49=~0 50=~0 51=~0 52=~0 53=~0 54=~0 55=~0 56=~0 57=~0 58=~0 59=~0 60=~0 61=~0 62=~0 63=~0 64=~0 65=~0 66=~0 67=~0 68=~0 69=~0 70=~0 71=~0 72=~0 73=~0 74=~0 75=~0 76=~0 77=~0
+state 78=~0 79=~0 80=~0 81=~0 82=~0 83=~0 84=~0 85=~0 86=~0 87=~0 88=~0 89=~0 90=~0 91=~0 92=~0 93=~0 94=~0 95=~0 96=~0 97=~0 98=~0 99=~0 100=~0 101=~0 102=~0 103=~0 104=~0 105=~0 106=~0 107=~0 108=~0
+state 109=~0 110=~0 111=~0 112=~0 113=~0 114=~0 115=~0 116=~0 117=~0 118=~0 119=~0 120=~0 121=~0 122=~0 123=~0 124=~0 125=~0 126=~0 127=~0 128=~0 129=~0 130=~0 131=~0 132=~0 133=~0 134=~0 135=~0
+state 136=~0 137=~0 138=~0 139=~0 140=~0 141=~0 142=~0 143=~0 144=~0 145=~0 146=~0 147=~0 148=~0 149=~0 150=~0 151=~0 152=~0 153=~0 154=~0 155=~0 156=~0 157=~0 158=~0 159=~0 160=~0 161=~0 162=~0
+state 163=~0 164=~0 165=~0 166=~0 167=~0 168=~0 169=~0 170=~0 171=~0 172=~0 173=~0 174=~0 175=~0 176=~0 177=~0 178=~0 179=~0 180=~0 181=~0 182=~0 183=~0 ] originX[ 0=~0 1=~0 2=~0 3=~0 4=~0 5=~0 6=~0
+state 7=~0 8=~0 9=~0 10=~0 11=~0 12=~0 13=~0 14=~0 15=~0 16=~0 17=~0 18=~0 19=~0 20=~0 21=~0 22=~0 23=~0 24=~0 25=~0 26=~0 27=~0 28=~0 29=~0 30=~0 31=~0 32=~0 33=~0 34=~0 35=~0 36=~0 37=~0 38=~0 39=~0
+state 40=~0 41=~0 42=~0 43=~0 44=~0 45=~0 46=~0 47=~0 48=~0 49=~0 50=~0 51=~0 52=~0 53=~0 54=~0 55=~0 56=~0 57=~0 58=~0 59=~0 60=~0 61=~0 62=~0 63=~0 64=~0 65=~0 66=~0 67=~0 68=~0 69=~0 70=~0 71=~0
+state 72=~0 73=~0 74=~0 75=~0 76=~0 77=~0 78=~0 79=~0 80=~0 81=~0 82=~0 83=~0 84=~0 85=~0 86=~0 87=~0 88=~0 89=~0 90=~0 91=~0 92=~0 93=~0 94=~0 95=~0 96=~0 97=~0 98=~0 99=~0 100=~0 101=~0 102=~0
+state 103=~0 104=~0 105=~0 106=~0 107=~0 108=~0 109=~0 110=~0 111=~0 112=~0 113=~0 114=~0 115=~0 116=~0 117=~0 118=~0 119=~0 120=~0 121=~0 122=~0 123=~0 124=~0 125=~0 126=~0 127=~0 128=~0 129=~0
+state 130=~0 131=~0 132=~0 133=~0 134=~0 135=~0 136=~0 137=~0 138=~0 139=~0 140=~0 141=~0 142=~0 143=~0 144=~0 145=~0 146=~0 147=~0 148=~0 149=~0 150=~0 151=~0 152=~0 153=~0 154=~0 155=~0 156=~0
+state 157=~0 158=~0 159=~0 160=~0 161=~0 162=~0 163=~0 164=~0 165=~0 166=~0 167=~0 168=~0 169=~0 170=~0 171=~0 172=~0 173=~0 174=~0 175=~0 176=~0 177=~0 178=~0 179=~0 180=~0 181=~0 182=~0 183=~0 ]
+state pitch[ 0=~0 1=~0 2=~0 3=~0 4=~0 5=~0 6=~0 7=~0 8=~0 9=~0 10=~0 11=~0 12=~0 13=~0 14=~0 15=~0 16=~0 17=~0 18=~0 19=~0 20=~0 21=~0 22=~0 23=~0 24=~0 25=~0 26=~0 27=~0 28=~0 29=~0 30=~0 31=~0 32=~0
+state 33=~0 34=~0 35=~0 36=~0 37=~0 38=~0 39=~0 40=~0 41=~0 42=~0 43=~0 44=~0 45=~0 46=~0 47=~0 48=~0 49=~0 50=~0 51=~0 52=~0 53=~0 54=~0 55=~0 56=~0 57=~0 58=~0 59=~0 60=~0 61=~0 62=~0 63=~0 64=~0
+state 65=~0 66=~0 67=~0 68=~0 69=~0 70=~0 71=~0 72=~0 73=~0 74=~0 75=~0 76=~0 77=~0 78=~0 79=~0 80=~0 81=~0 82=~0 83=~0 84=~0 85=~0 86=~0 87=~0 88=~0 89=~0 90=~0 91=~0 92=~0 93=~0 94=~0 95=~0 96=~0
+state 97=~0 98=~0 99=~0 100=~0 101=~0 102=~0 103=~0 104=~0 105=~0 106=~0 107=~0 108=~0 109=~0 110=~0 111=~0 112=~0 113=~0 114=~0 115=~0 116=~0 117=~0 118=~0 119=~0 120=~0 121=~0 122=~0 123=~0 124=~0
+state 125=~0 126=~0 127=~0 128=~0 129=~0 130=~0 131=~0 132=~0 133=~0 134=~0 135=~0 136=~0 137=~0 138=~0 139=~0 140=~0 141=~0 142=~0 143=~0 144=~0 145=~0 146=~0 147=~0 148=~0 149=~0 150=~0 151=~0
+state 152=~0 153=~0 154=~0 155=~0 156=~0 157=~0 158=~0 159=~0 160=~0 161=~0 162=~0 163=~0 164=~0 165=~0 166=~0 167=~0 168=~0 169=~0 170=~0 171=~0 172=~0 173=~0 174=~0 175=~0 176=~0 177=~0 178=~0
+state 179=~0 180=~0 181=~0 182=~0 183=~0 ] character[ 0=1 1=1 2=1 3=1 4=1 5=1 6=1 7=1 8=1 9=1 10=1 11=1 12=1 13=1 14=1 15=1 16=1 17=1 18=1 19=1 20=1 21=1 22=1 23=1 24=1 25=1 26=1 27=1 28=1 29=1 30=1
+state 31=1 32=1 33=1 34=1 35=1 36=1 37=1 38=1 39=1 40=1 41=1 42=1 43=1 44=1 45=1 46=1 47=1 48=1 49=1 50=1 51=1 52=1 53=1 54=1 55=1 56=1 57=1 58=1 59=1 60=1 61=1 62=1 63=1 64=1 65=1 66=1 67=1 68=1 69=1
+state 70=1 71=1 72=1 73=1 74=1 75=1 76=1 77=1 78=1 79=1 80=1 81=1 82=1 83=1 84=1 85=1 86=1 87=1 88=1 89=1 90=1 91=1 92=1 93=1 94=1 95=1 96=1 97=1 98=1 99=1 100=1 101=1 102=1 103=1 104=1 105=1 106=1
+state 107=1 108=1 109=1 110=1 111=1 112=1 113=1 114=1 115=1 116=1 117=1 118=1 119=1 120=1 121=1 122=1 123=1 124=1 125=1 126=1 127=1 128=1 129=1 130=1 131=1 132=1 133=1 134=1 135=1 136=1 137=1 138=1
+state 139=1 140=1 141=1 142=1 143=1 144=1 145=1 146=1 147=1 148=1 149=1 150=1 151=1 152=1 153=1 154=1 155=1 156=1 157=1 158=1 159=1 160=1 161=1 162=1 163=1 164=1 165=1 166=1 167=1 168=1 169=1 170=1
+state 171=1 172=1 173=1 174=1 175=1 176=1 177=1 178=1 179=1 180=1 181=1 182=1 183=1 ] } specials{ drainSerial[ 0=0 1=0 2=0 3=0 ] drainAge[ 0=12 1=12 2=12 3=12 ] } frameImpacts[ 0{ shieldElectric=F
+state tier=0 previouslyAirDodging=F direction=0 pummel=F ordinaryLanding=F runningDust=F previousVelocityX=~0 ledgeX=~0 grab=F previousChargeFrames=0 previousSpecialAction=0 contactX=~0
+state previouslyOut=F variant=0 contactZ=~0 previouslyCharging=F koDirectionX=0 shieldCharacter=1 previousSpecialForm=0 surface=0 previousX=~0 throwRelease=F previousSpecialFrame=0 strength=0
+state dodgeTrail=F previousAttackFrame=0 previousThrowVisualSerial=0 jobDone=F previousGroundDodge=0 previousGrabVisualSerial=0 previousLedgeState=0 previousShieldVisualSerial=0 previousAttackSerial=0
+state previousLedgeSerial=0 jumpOriginZ=~0 previousFrozenFrames=0 ledgeCatch=F charge=F previousDownFrame=0 previousHitVisualSerial=0 element=0 normalZ=~0 normalX=~0 surfaceMissedTech=F dodge=0 z=~0
+state x=~0 landing=0 koDirectionZ=0 previousJumpSerial=0 facing=1 previouslyGrounded=T character=1 previousShieldReflectVisualSerial=0 previousZ=~0 jump=0 impact=-1 respawn=F airDodge=F
+state previousSurfaceContactSerial=0 previousShieldBreak=0 launchTrail=F previousDown=0 perform=-1 strong=F shieldBreak=F shieldReflect=F shieldHit=F hitCharacter=1 shieldMove=-1 footstep='none
+state electric=F shieldVariant=0 hitMove=-1 ledgeRecovery=F ready=F movementDust=F swing=-1 hit=F ledgeZ=~0 performSerial=0 previousDashFrame=0 previousLedgeSide=0 jumpOriginX=~0
+state previousBuiltSerial=-1 } 1{ shieldElectric=F tier=0 previouslyAirDodging=F direction=0 pummel=F ordinaryLanding=F runningDust=F previousVelocityX=~0 ledgeX=~0 grab=F previousChargeFrames=0
+state previousSpecialAction=0 contactX=~0 previouslyOut=F variant=0 contactZ=~0 previouslyCharging=F koDirectionX=0 shieldCharacter=1 previousSpecialForm=0 surface=0 previousX=~0 throwRelease=F
+state previousSpecialFrame=0 strength=0 dodgeTrail=F previousAttackFrame=0 previousThrowVisualSerial=0 jobDone=F previousGroundDodge=0 previousGrabVisualSerial=0 previousLedgeState=0
+state previousShieldVisualSerial=0 previousAttackSerial=0 previousLedgeSerial=0 jumpOriginZ=~0 previousFrozenFrames=0 ledgeCatch=F charge=F previousDownFrame=0 previousHitVisualSerial=0 element=0
+state normalZ=~0 normalX=~0 surfaceMissedTech=F dodge=0 z=~0 x=~0 landing=0 koDirectionZ=0 previousJumpSerial=0 facing=1 previouslyGrounded=T character=1 previousShieldReflectVisualSerial=0
+state previousZ=~0 jump=0 impact=-1 respawn=F airDodge=F previousSurfaceContactSerial=0 previousShieldBreak=0 launchTrail=F previousDown=0 perform=-1 strong=F shieldBreak=F shieldReflect=F shieldHit=F
+state hitCharacter=1 shieldMove=-1 footstep='none electric=F shieldVariant=0 hitMove=-1 ledgeRecovery=F ready=F movementDust=F swing=-1 hit=F ledgeZ=~0 performSerial=0 previousDashFrame=0
+state previousLedgeSide=0 jumpOriginX=~0 previousBuiltSerial=-1 } 2{ shieldElectric=F tier=0 previouslyAirDodging=F direction=0 pummel=F ordinaryLanding=F runningDust=F previousVelocityX=~0 ledgeX=~0
+state grab=F previousChargeFrames=0 previousSpecialAction=0 contactX=~0 previouslyOut=F variant=0 contactZ=~0 previouslyCharging=F koDirectionX=0 shieldCharacter=1 previousSpecialForm=0 surface=0
+state previousX=~0 throwRelease=F previousSpecialFrame=0 strength=0 dodgeTrail=F previousAttackFrame=0 previousThrowVisualSerial=0 jobDone=F previousGroundDodge=0 previousGrabVisualSerial=0
+state previousLedgeState=0 previousShieldVisualSerial=0 previousAttackSerial=0 previousLedgeSerial=0 jumpOriginZ=~0 previousFrozenFrames=0 ledgeCatch=F charge=F previousDownFrame=0
+state previousHitVisualSerial=0 element=0 normalZ=~0 normalX=~0 surfaceMissedTech=F dodge=0 z=~0 x=~0 landing=0 koDirectionZ=0 previousJumpSerial=0 facing=1 previouslyGrounded=T character=1
+state previousShieldReflectVisualSerial=0 previousZ=~0 jump=0 impact=-1 respawn=F airDodge=F previousSurfaceContactSerial=0 previousShieldBreak=0 launchTrail=F previousDown=0 perform=-1 strong=F
+state shieldBreak=F shieldReflect=F shieldHit=F hitCharacter=1 shieldMove=-1 footstep='none electric=F shieldVariant=0 hitMove=-1 ledgeRecovery=F ready=F movementDust=F swing=-1 hit=F ledgeZ=~0
+state performSerial=0 previousDashFrame=0 previousLedgeSide=0 jumpOriginX=~0 previousBuiltSerial=-1 } 3{ shieldElectric=F tier=0 previouslyAirDodging=F direction=0 pummel=F ordinaryLanding=F
+state runningDust=F previousVelocityX=~0 ledgeX=~0 grab=F previousChargeFrames=0 previousSpecialAction=0 contactX=~0 previouslyOut=F variant=0 contactZ=~0 previouslyCharging=F koDirectionX=0
+state shieldCharacter=1 previousSpecialForm=0 surface=0 previousX=~0 throwRelease=F previousSpecialFrame=0 strength=0 dodgeTrail=F previousAttackFrame=0 previousThrowVisualSerial=0 jobDone=F
+state previousGroundDodge=0 previousGrabVisualSerial=0 previousLedgeState=0 previousShieldVisualSerial=0 previousAttackSerial=0 previousLedgeSerial=0 jumpOriginZ=~0 previousFrozenFrames=0 ledgeCatch=F
+state charge=F previousDownFrame=0 previousHitVisualSerial=0 element=0 normalZ=~0 normalX=~0 surfaceMissedTech=F dodge=0 z=~0 x=~0 landing=0 koDirectionZ=0 previousJumpSerial=0 facing=1
+state previouslyGrounded=T character=1 previousShieldReflectVisualSerial=0 previousZ=~0 jump=0 impact=-1 respawn=F airDodge=F previousSurfaceContactSerial=0 previousShieldBreak=0 launchTrail=F
+state previousDown=0 perform=-1 strong=F shieldBreak=F shieldReflect=F shieldHit=F hitCharacter=1 shieldMove=-1 footstep='none electric=F shieldVariant=0 hitMove=-1 ledgeRecovery=F ready=F
+state movementDust=F swing=-1 hit=F ledgeZ=~0 performSerial=0 previousDashFrame=0 previousLedgeSide=0 jumpOriginX=~0 previousBuiltSerial=-1 } ] }
+rows 1:15:65536,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,65536,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:1,1,0,-127,0,0,0,0,0,0,0,1,-1,0,0,-1,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 4:15:1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:5,4,0,-127,-127,0,0,0,0,0,0,1,-1,-1,-1,0,-1/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 2:15:5,0,0,-127,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65541,65536,0,-127,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 2:15:65541,0,0,-127,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:4,0,65537,0,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:6,2,0,127,-127,0,0,0,0,0,0,1,1,-1,0,1,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:6,0,0,127,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,0,4,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 2:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 14:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:1,1,0,-127,0,0,0,0,0,0,0,1,-1,0,0,-1,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 7:15:1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 6:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:1,1,0,-127,0,0,0,0,0,0,0,1,-1,0,0,-1,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 5:15:1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 24:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/8,8,0,0,127,0,0,0,0,0,0,1,0,1,1,0,1/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/8,0,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:1,1,0,-127,0,0,0,0,0,0,0,1,-1,0,0,-1,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/8,0,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 2:15:1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/8,0,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4104,4096,0,0,127,0,0,0,0,0,0,0,0,0,0,0,1/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 2:15:1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4104,0,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4104,0,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 5:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4104,0,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,4104,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 7:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,2,0,127,0,0,0,0,0,0,0,1,1,0,0,1,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4096,4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 7:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65538,65536,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65538,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65538,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,0,65536,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 3:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+checkpoint 240 673:45327
+rows 2:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:34,32,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:32,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 2:15:32,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,32,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4096,4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 3:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65666,65666,0,127,0,0,0,0,0,0,0,1,1,0,0,1,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:6,4,65664,127,-127,0,0,0,0,0,0,1,1,-1,-1,0,-1/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:4,0,2,0,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 7:15:4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:5,1,0,-127,-127,0,0,0,0,0,0,1,-1,-1,0,-1,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 5:15:5,0,0,-127,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:1,0,4,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 12:15:1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/1,1,0,-127,0,0,0,0,0,0,0,1,-1,0,0,-1,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 8:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:1,1,0,-127,0,0,0,0,0,0,0,1,-1,0,0,-1,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 7:15:1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65537,65536,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/256,256,0,0,0,255,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65537,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/256,0,0,0,0,255,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65536,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,2,0,127,0,0,0,0,0,0,0,1,1,0,0,1,0/256,0,0,0,0,255,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65536,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,256,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65536,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,65536,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 3:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65536,65536,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 5:15:65536,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,2,65536,127,0,0,0,0,0,0,0,1,1,0,0,1,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/256,256,0,0,0,255,0,0,0,0,0,0,0,0,0,0,0
+rows 5:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/256,0,0,0,0,255,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,256,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 8:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:4,4,2,0,-127,0,0,0,0,0,0,1,0,-1,-1,0,-1/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/256,256,0,0,0,255,0,0,0,0,0,0,0,0,0,0,0
+rows 2:15:4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/256,0,0,0,0,255,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2052,2048,0,0,-127,0,0,0,0,0,0,0,0,0,0,1,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/256,0,0,0,0,255,0,0,0,0,0,0,0,0,0,0,0
+rows 2:15:2052,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/256,0,0,0,0,255,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:4,0,2048,0,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/18,16,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/256,0,0,0,0,255,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/18,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/256,0,0,0,0,255,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:132,128,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/18,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/256,0,0,0,0,255,0,0,0,0,0,0,0,0,0,0,0
+rows 2:15:132,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/18,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/256,0,0,0,0,255,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:132,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/18,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,256,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 3:15:132,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/18,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:4,0,128,0,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/18,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 5:15:4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/18,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/16,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,4,0,0,-127,0,0,0,0,0,0,1,0,-1,-1,0,-1
+rows 5:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+checkpoint 360 1582:8947
+rows 3:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:1,1,0,-127,0,0,0,0,0,0,0,1,-1,0,0,-1,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 7:15:1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65536,65536,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 2:15:65536,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65536,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65536,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,65536,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,2,0,127,0,0,0,0,0,0,0,1,1,0,0,1,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,4,0,0,-127,0,0,0,0,0,0,1,0,-1,-1,0,-1
+rows 2:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,2,0,127,0,0,0,0,0,0,0,1,1,0,0,1,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65538,65536,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 3:15:65538,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,0,65536,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 2:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 2:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/4,4,0,0,-127,0,0,0,0,0,0,1,0,-1,-1,0,-1
+rows 1:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 3:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2050,2048,0,127,0,0,0,0,0,0,0,0,0,0,0,1,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/1,1,0,-127,0,0,0,0,0,0,0,1,-1,0,0,-1,0/0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 2:15:2050,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,0,2048,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/4,4,0,0,-127,0,0,0,0,0,0,1,0,-1,-1,0,-1
+rows 1:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4096,4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65670,65668,0,127,-127,0,0,0,0,0,0,1,1,-1,-1,0,-1/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65668,0,2,0,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65668,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65668,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,65668,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 2:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,4,0,0,-127,0,0,0,0,0,0,1,0,-1,-1,0,-1
+rows 6:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,2,0,127,0,0,0,0,0,0,0,1,1,0,0,1,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,4,0,0,-127,0,0,0,0,0,0,1,0,-1,-1,0,-1
+rows 6:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4096,4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 4:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,4,0,0,-127,0,0,0,0,0,0,1,0,-1,-1,0,-1
+rows 1:15:2,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:32,32,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 3:15:32,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,32,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4096,4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 4:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:130,130,0,127,0,0,0,0,0,0,0,1,1,0,0,1,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:130,0,0,127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:134,4,0,127,-127,0,0,0,0,0,0,1,1,-1,-1,0,-1/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4096,4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:6,0,128,127,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:6,0,0,127,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:4,0,2,0,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0/256,256,0,0,0,255,0,0,0,0,0,0,0,0,0,0,0
+rows 4:15:4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/256,0,0,0,0,255,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/256,0,0,0,0,255,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4096,4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1/256,0,0,0,0,255,0,0,0,0,0,0,0,0,0,0,0
+rows 4:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/256,0,0,0,0,255,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,4096,0,0,0,0,0,0,0,0,0,0,0,0,0,0/256,0,0,0,0,255,0,0,0,0,0,0,0,0,0,0,0
+rows 2:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/256,0,0,0,0,255,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/260,4,0,0,-127,255,0,0,0,0,0,1,0,-1,-1,0,-1
+rows 1:15:4,4,0,0,-127,0,0,0,0,0,0,1,0,-1,-1,0,-1/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,256,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4097,4097,0,-127,0,0,0,0,0,0,0,1,-1,0,0,-1,1/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65540,65536,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4097,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65540,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/4097,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65540,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/1,0,4096,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/4,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:65540,0,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+rows 1:15:0,0,65540,0,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0/1,0,0,-127,0,0,0,0,0,0,0,0,0,0,0,0,0/0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+checkpoint 480 15044:23475
+end 494

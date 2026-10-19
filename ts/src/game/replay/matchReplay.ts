@@ -99,7 +99,7 @@ function foldMatchAndFrame(lanes: Lanes, match: Readonly<MatchState>, runtime: R
     const strategy = runtime.botStrategies[slot];
     if (strategy.observedFrame >= 0) {
       const values = botStrategyValues(strategy);
-      for (let index = 0; index < values.length; index++) foldInteger(lanes, floorMod(base + 6 + index * 31, MODULUS), at(values, index));
+      for (let index = 0; index < values.length; index++) foldNumber(lanes, floorMod(base + 6 + index * 31, MODULUS), at(values, index));
     }
   }
   return `${lanes.first}:${lanes.second}`;

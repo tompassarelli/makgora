@@ -4,7 +4,7 @@
 
 
 
-import { expect } from "bun:test";
+import { expect, test } from "bun:test";
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -140,3 +140,16 @@ sweep("a one-minute keyboard match in the playable build reaches its result and 
   expect(inLua.problems).toEqual([]);
   expect(inLua).toMatchObject({ frames: bun.frames, reached: bun.recorded, recorded: bun.recorded, checksum: bun.checksum });
 }, 120_000);
+
+
+test("an online match whose CPU holds a real-valued burn gap at a checkpoint replays to every recorded checksum [k1 scenario]", () => {
+  const lines = readReplay(join(import.meta.dir, "fixtures/bnet-cpu-real-strategy/replay.txt"));
+  if (typeof lines === "string") throw new Error(lines);
+  const gaps: number[] = [];
+  const result = replayMatch(lines, (state, frame) => {
+    if (frame % 120 === 0) gaps.push(state.runtime.botStrategies[1].burnGap);
+  });
+  expect(gaps.some((gap) => !Number.isInteger(gap))).toBe(true);
+  expect(result.problems).toEqual([]);
+  expect(result.reached).toBe(result.recorded);
+});
