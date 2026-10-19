@@ -4,7 +4,8 @@ import { Phase } from "../../game/lobby/lobbyState";
 import { sourceVersion } from "../../game/shell/sourceVersion";
 import { sessionRatesFile, sessionRatesHeader } from "../../game/core/gameFiles";
 import { smoothedRttMs } from "../../game/netcode/delayPolicy";
-import { takeNetRates } from "./netDelay";
+import { secondFps } from "../../game/netcode/machineRate";
+import { noteLocalSecond, takeNetRates } from "./netDelay";
 import { type Rollback, activeRollback, shellState } from "./state";
 
 declare const os: { readonly clock?: (this: void) => number } | undefined;
@@ -375,8 +376,19 @@ function flush(rates: SessionRates, now: number): void {
   rates.lines = [];
 }
 
+function noteMachineRate(rates: SessionRates, now: number): void {
+  const s = shellState();
+  const net = s?.rollback?.net;
+  if (s === undefined || net === undefined) return;
+  const second = rates.second;
+  const frames = activeRollback(s) !== undefined && s.game.phase === Phase.match ? second.spec : second.ticks;
+  const seconds = rates.clock === undefined ? 1 : now - rates.secondStarted;
+  noteLocalSecond(net, secondFps(frames, seconds), Math.floor(second.lua * 1000));
+}
+
 function closeSecond(rates: SessionRates, now: number): void {
   rates.seconds++;
+  noteMachineRate(rates, now);
   rates.lines.push(...rateRecords(elapsedMs(rates, now), rateTokens(rates)));
   rates.second = emptySecond();
   rates.secondStarted = now;

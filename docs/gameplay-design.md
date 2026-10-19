@@ -297,9 +297,27 @@ transport (wisp#110) both call it.
 - **Lobby agreement:** each player sees the other's request on character
   select. The match uses the higher request, so nobody plays below what they
   asked for. The line leads with the match delay and who set it, then each
-  player's request and echo, e.g. `Input delay 16 frames, set by P3 · P1 2
-  (83 ms) · P2 fixed 9 (283 ms) · P3 16 (583 ms)`, so four players fit one row. When the agreed delay is 8 frames (133 ms) or more, the lobby
+  player's request, echo and measured simulation rate in frames per second,
+  e.g. `Delay 16 frames, set by P3 · P1 2 (83 ms) 60 · P2 fixed 9 (283 ms) 60
+  · P3 16 (583 ms) 40`, so four players fit one row of 106 characters. When the agreed delay is 8 frames (133 ms) or more, the lobby
   warns: "Input delay of 8+ frames: this connection will feel sluggish".
+  Input delay stays the same for every player.
+- **Slow machine:** each client measures, every real second (os.clock), the
+  frames it simulated (speculative frames in a match, callbacks elsewhere,
+  capped at 60) and the milliseconds its Lua callbacks took, and sends the
+  rate on the delay channel, so every client shows the same numbers; none of
+  it enters the simulation or checksums. A client that runs under 55 frames a
+  second while its callbacks take at least 750 ms of the second, for 2
+  seconds in a row, is slow until it has 2 seconds in a row out of that
+  state. Every client then shows "P3's machine is running slow (41 fps) —
+  the match runs at its pace" under the delay line and, in a match, in place
+  of the network indicator, once per episode until it recovers. The busy
+  test names the right player: on the 35%-throttled pair (19 October 2026)
+  both clients simulated the same frames each second (36/s, and 16/s in a
+  harsher run) and ran 60 callbacks a second, but the throttled client's
+  Lua took 819–901 ms of each second against 273 ms on the fast one, and a
+  healthy client at full speed takes about 400 ms. Healthy matches run 58.8
+  to 60 simulated frames a second (#18), so 55 stays clear of them.
 - **Auto, online:** the higher of a ping target and an error-corrected value,
   capped at 16.
   - *Ping target:* round trip comes from the echo of each sent input row in

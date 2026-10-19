@@ -11,6 +11,7 @@ import { type FixedDelay, isFixedDelay } from "../../game/netcode/fixedSchedule"
 import { PENDING_CAPACITY } from "../../game/netcode/shadowSchedule";
 import { createText, gameUi, placeTopLeft } from "../../game/ui/frames";
 import { at } from "wisp/src/runtime/lookup";
+import { type MachineRate, machineRate, noteMachineSecond, slowMachineText } from "../../game/netcode/machineRate";
 import { type Roster, isActive } from "../../game/sim/roster";
 
 export const DELAY_PREFIX = "SC_DY";
@@ -18,6 +19,8 @@ export const DELAY_RECEIVED = "shell.delayProposal";
 const PING_MARK = "p";
 const DELAY_MARK = "d";
 const ECHO_MARK = "e";
+const RATE_MARK = "r";
+const SLOW_MARK = "s";
 const SECOND = 60;
 export const POP_UNITS = 20;
 const POP_BUCKETS = 1024;
@@ -28,6 +31,11 @@ export interface NetDelay {
   readonly sentTicks: number[];
   readonly proposals: number[];
   readonly slotEchoMs: number[];
+  readonly slotFps: number[];
+  readonly slotSlow: boolean[];
+  readonly rate: MachineRate;
+  sentFps: number;
+  sentSlow: boolean;
   readonly depths: number[];
   ticks: number;
   proposed: number;
@@ -58,7 +66,7 @@ export function createNetDelay(window: number): NetDelay {
   const policy = delayPolicy(window);
   return {
     policy, correction: delayCorrection(policy), second: { held: 0, arrivals: 0, deep: 0 }, pingDelay: DEFAULT_DELAY, estimate: rttEstimate(), sentTicks: Array.from({ length: PENDING_CAPACITY }, () => -1),
-    proposals: [DEFAULT_DELAY, DEFAULT_DELAY, DEFAULT_DELAY, DEFAULT_DELAY], slotEchoMs: [-1, -1, -1, -1], depths: Array.from({ length: window + 2 }, () => 0), ticks: 0, proposed: DEFAULT_DELAY, depth: 0, shownDepth: 0,
+    proposals: [DEFAULT_DELAY, DEFAULT_DELAY, DEFAULT_DELAY, DEFAULT_DELAY], slotEchoMs: [-1, -1, -1, -1], slotFps: [-1, -1, -1, -1], slotSlow: [false, false, false, false], rate: machineRate(), sentFps: -1, sentSlow: false, depths: Array.from({ length: window + 2 }, () => 0), ticks: 0, proposed: DEFAULT_DELAY, depth: 0, shownDepth: 0,
     indicator: undefined, shownText: "", arrivals: [0, 0, 0, 0], lateSum: [0, 0, 0, 0], lateMax: [0, 0, 0, 0],
     echoes: 0, echoSum: 0, echoMax: 0, corrections: 0, replayed: 0, deepest: 0,
     popX: [0, 0, 0, 0], popZ: [0, 0, 0, 0], popCounts: Array.from({ length: POP_BUCKETS }, () => 0), popMax: 0, popOver: 0,
@@ -94,11 +102,23 @@ export function lobbyDelayText(net: Readonly<NetDelay>, game: Readonly<MatchStat
     }
     const echo = at(net.slotEchoMs, slot);
     const shown = online && echo >= 0 ? ` (${I2S(echo)} ms)` : "";
-    parts.push(`P${I2S(slot + 1)} ${choice === AUTO_DELAY ? "" : "fixed "}${I2S(request)}${shown}`);
+    const fps = at(net.slotFps, slot);
+    const rate = online && fps >= 0 ? ` ${I2S(fps)}` : "";
+    parts.push(`P${I2S(slot + 1)} ${choice === AUTO_DELAY ? "" : "fixed "}${I2S(request)}${shown}${rate}`);
   }
   const setBy = online && deciders === 1 ? `, set by P${I2S(decider + 1)}` : "";
-  const line = `Input delay ${I2S(agreed)} frames${setBy} · ${parts.join(" · ")}`;
-  return highDelay(agreed) ? `${line}\n|cffff4040Input delay of ${I2S(HIGH_DELAY_FRAMES)}+ frames: this connection will feel sluggish|r` : line;
+  const lines = [`Delay ${I2S(agreed)} frames${setBy} · ${parts.join(" · ")}`];
+  if (highDelay(agreed)) lines.push(`|cffff4040Input delay of ${I2S(HIGH_DELAY_FRAMES)}+ frames: this connection will feel sluggish|r`);
+  const slow = slowMachineLine(net, game);
+  if (slow !== "") lines.push(slow);
+  return lines.join("\n");
+}
+
+export function slowMachineLine(net: Readonly<NetDelay>, game: Readonly<MatchState>): string {
+  if (!isOnline(game)) return "";
+  const warnings: string[] = [];
+  for (const slot of PARTICIPANT_SLOTS) if (humanActive(game, slot) && at(net.slotSlow, slot)) warnings.push(slowMachineText(slot, at(net.slotFps, slot)));
+  return warnings.length === 0 ? "" : `|cffffcc00${warnings.join(" · ")}|r`;
 }
 
 export const echoMs = (estimate: Readonly<RttEstimate>): number => estimate.samples === 0 ? -1 : floorDiv(smoothedRttMs(estimate), 2);
@@ -107,13 +127,17 @@ export interface DelayMessage {
   readonly ping: number;
   readonly delay: number;
   readonly echo: number;
+  readonly fps: number;
+  readonly slow: boolean;
 }
 
-export function delayMessage(ping: number, delay: number, echo: number): string {
+export function delayMessage(ping: number, delay: number, echo: number, fps = -1, slow = false): string {
   const parts: string[] = [];
   if (ping >= 0) parts.push(`${PING_MARK}${I2S(ping)}`);
   parts.push(`${DELAY_MARK}${I2S(delay)}`);
   if (echo >= 0) parts.push(`${ECHO_MARK}${I2S(echo)}`);
+  if (fps >= 0) parts.push(`${RATE_MARK}${I2S(fps)}`);
+  if (slow) parts.push(`${SLOW_MARK}1`);
   return parts.join(" ");
 }
 
@@ -121,14 +145,18 @@ export function parseDelayMessage(data: string): DelayMessage {
   let ping = -1;
   let delay = -1;
   let echo = -1;
+  let fps = -1;
+  let slow = false;
   for (const token of data.split(" ")) {
     const mark = token.substring(0, 1);
     const value = S2I(token.substring(1));
     if (mark === PING_MARK) ping = value;
     else if (mark === DELAY_MARK) delay = value;
     else if (mark === ECHO_MARK) echo = value;
+    else if (mark === RATE_MARK) fps = value;
+    else if (mark === SLOW_MARK) slow = value === 1;
   }
-  return { ping, delay, echo };
+  return { ping, delay, echo, fps, slow };
 }
 
 export const recalibratedDelay = (net: Readonly<NetDelay>, game: Readonly<MatchState>, slot: number): number => requestFor(net, game, slot, AUTO_DELAY);
@@ -261,9 +289,19 @@ function proposeDelay(net: NetDelay, players: number, active: boolean, inMatch: 
   if (!active) return;
   if (net.estimate.samples > 0) net.pingDelay = nextDelay(net.policy, net.estimate, net.pingDelay);
   const proposal = correctedDelay(net.policy, net.correction, net.pingDelay);
-  if (!inMatch || proposal !== net.proposed) {
-    if (BlzSendSyncData(DELAY_PREFIX, delayMessage(inMatch ? -1 : net.ticks, proposal, echoMs(net.estimate)))) net.proposed = proposal;
+  const { rate } = net;
+  const rateChanged = rate.slow !== net.sentSlow || (rate.slow && rate.fps !== net.sentFps);
+  if (!inMatch || proposal !== net.proposed || rateChanged) {
+    if (BlzSendSyncData(DELAY_PREFIX, delayMessage(inMatch ? -1 : net.ticks, proposal, echoMs(net.estimate), rate.fps, rate.slow))) {
+      net.proposed = proposal;
+      net.sentFps = rate.fps;
+      net.sentSlow = rate.slow;
+    }
   }
+}
+
+export function noteLocalSecond(net: NetDelay, fps: number, busyMs: number): void {
+  noteMachineSecond(net.rate, fps, busyMs);
 }
 
 export function serviceNetDelay(net: NetDelay, game: Readonly<MatchState>, local: number, delay: number, inMatch: boolean, held: boolean): void {
@@ -273,7 +311,7 @@ export function serviceNetDelay(net: NetDelay, game: Readonly<MatchState>, local
   if (net.indicator === undefined) {
     net.indicator = createText("SmashcraftNetIndicator", gameUi(), 0);
     placeTopLeft(net.indicator, f32(0.01), f32(0.03));
-    BlzFrameSetSize(net.indicator, f32(0.3), f32(0.016));
+    BlzFrameSetSize(net.indicator, f32(0.5), f32(0.016));
     BlzFrameSetVisible(net.indicator, false);
   }
   const online = isOnline(game);
@@ -281,7 +319,8 @@ export function serviceNetDelay(net: NetDelay, game: Readonly<MatchState>, local
   net.shownDepth = net.depth;
   net.depth = 0;
   const poor = connectionPoor(net.policy, net.estimate, delay);
-  const text = !inMatch || !online || !poor ? "" : `|cffff4040Connection poor|r · input delay ${I2S(delay)} · ${I2S(net.shownDepth)} frames behind`;
+  const slow = inMatch ? slowMachineLine(net, game) : "";
+  const text = slow !== "" ? slow : !inMatch || !online || !poor ? "" : `|cffff4040Connection poor|r · input delay ${I2S(delay)} · ${I2S(net.shownDepth)} frames behind`;
   if (text === net.shownText) return;
   net.shownText = text;
   BlzFrameSetText(net.indicator, text);
@@ -295,6 +334,8 @@ export function receiveDelayProposal(net: NetDelay): void {
   if (slot < 0 || slot >= net.proposals.length) return;
   if (isFixedDelay(message.delay)) net.proposals[slot] = Math.max(DEFAULT_DELAY, message.delay);
   if (message.echo >= 0) net.slotEchoMs[slot] = message.echo;
+  if (message.fps >= 0) net.slotFps[slot] = message.fps;
+  net.slotSlow[slot] = message.slow;
 }
 
 export function registerDelayProposals(handler: string): void {
