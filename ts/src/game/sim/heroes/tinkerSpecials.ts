@@ -26,7 +26,8 @@ const laserRegion = (): MoveRegion => {
   return { ...region, hit: { ...region.hit, minZ: LASER_ORIGIN_Z - LASER_RANGE - LASER_RADIUS, maxZ: LASER_ORIGIN_Z + LASER_RANGE + LASER_RADIUS } };
 };
 const laser = (air: boolean): AuthoredSpecial => ({
-  endFrame: 54, beam: { originX: LASER_ORIGIN_X, originZ: LASER_ORIGIN_Z, range: LASER_RANGE, track: 11.0 },
+  endFrame: 54, motion: [{ ...frames(1, 1), velocityX: 0.0, velocityZ: 0.0 }],
+  beam: { originX: LASER_ORIGIN_X, originZ: LASER_ORIGIN_Z, range: LASER_RANGE, track: 11.0 },
   regions: [laserRegion()], landingLag: air ? 20 : undefined,
 });
 const clockwerk = (velocityZ: number, gravity?: number): SpecialProjectile => ({

@@ -195,3 +195,23 @@ test("Fighter-scoped rollback repair never treats a shield that shortens the EX 
     }
   }
 });
+
+test("Laser stops a running or drifting Tinker dead and holds him still through startup, on the ground and in the air [k1 scenario]", () => {
+  for (const air of [false, true]) {
+    const owner = createFighter(Character.tinker, 0.0, 1);
+    const victim = createReferenceContactFighter(300.0, -1);
+    const { world } = duelPair(owner, victim);
+    const speed = air ? owner.tuning.physics.airSpeed : owner.tuning.physics.runSpeed;
+    if (air) {
+      owner.motion.grounded = false;
+      owner.motion.surface = undefined;
+      place(owner, 0.0, 300.0);
+    }
+    owner.motion.vx = speed;
+    for (let f = 1; f < 20; f++) {
+      stepDuel(world, f === 1 ? PRESS : controls());
+      assertEquals(owner.special.action, SpecialAction.heroSide, `${air ? "air" : "ground"} Laser frame ${f}`);
+      assertEquals(owner.motion.vx, 0.0, `${air ? "air" : "ground"} horizontal speed on Laser frame ${f}`);
+    }
+  }
+});
