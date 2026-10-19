@@ -26,7 +26,7 @@ const LIMBS: Readonly<Record<Limb, readonly [readonly string[], readonly string[
     ],
 };
 
-const FOLLOWERS: readonly (readonly [readonly string[], Side])[] = [[['Bone_Axe_Free', 'Wep01_R0_0_jnt'], 0], [['book_C0_0_jnt'], 1]];
+const FOLLOWERS: readonly (readonly [readonly string[], Side])[] = [[['Bone_Axe_Free', 'Wep01_R0_0_jnt', 'Rifle01'], 0], [['book_C0_0_jnt'], 1]];
 
 function find(model: mdx.Model, names: readonly string[]): mdx.Node | undefined {
     for (const wanted of names) {
