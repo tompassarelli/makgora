@@ -26,6 +26,8 @@ interface BotMatch {
   readonly computers: readonly (readonly [slot: number, character: Character])[];
 
   readonly stagger?: number;
+
+  readonly everyRowChanges?: boolean;
 }
 
 
@@ -126,10 +128,14 @@ export function gameOf(client: HeadlessClient): Game {
 
 
 
+function wobbled(row: InputRow, frame: number): InputRow {
+  return { ...row, axisZ: floorMod(frame, 2) };
+}
+
 export function playBotMatch(clients: Lockstep, match: BotMatch, frames: number, measure: PerfMeasure, build: MapBuild = INTEGRITY_BUILD): { problems: number; lines: string[] } {
   const keyboard = build.input.kind !== "journal";
   const helpers = new JournalHelpers(build.id, true);
-  helpers.rows = (_slot, frame) => botBeatRow(frame);
+  helpers.rows = match.everyRowChanges === true ? (_slot, frame) => wobbled(botBeatRow(frame), frame) : (_slot, frame) => botBeatRow(frame);
   const host = clients.client(0);
 
   let beating = false;

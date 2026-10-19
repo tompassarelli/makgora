@@ -27,7 +27,7 @@ export const SMASHCRAFT_PERF: PerfProject = {
   map: { config: main.configPath, bundle: main.bundlePath },
   program: { config: bundleConfig("perf"), bundle: join(tsDirectory, "build/perf.lua") },
   defaultRun: "quick-match",
-  runs: { bot: integrityMap, "bot-four": integrityMap, "playable-bot-four": playableMap, "playable-duel": playableMap, "playable-human-four": playableMap, ...Object.fromEntries(SELECTABLE_CHARACTERS.map((character) => [`bot-${fighterSlug(character)}`, integrityMap])) },
+  runs: { bot: integrityMap, "bot-four": integrityMap, "playable-bot-four": playableMap, "playable-duel": playableMap, "playable-human-four": playableMap, "rollback-four": playableMap, ...Object.fromEntries(SELECTABLE_CHARACTERS.map((character) => [`bot-${fighterSlug(character)}`, integrityMap])) },
 };
 
 const measure = makePerf(SMASHCRAFT_PERF);
