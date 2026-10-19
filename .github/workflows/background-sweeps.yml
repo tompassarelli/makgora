@@ -84,6 +84,7 @@ jobs:
       - if: matrix.kind == 'bun'
         run: bun run test
         working-directory: ts
+        timeout-minutes: 25
         env:
           TEST_JUNIT_DIR: build/sweep-listing
       - if: matrix.kind == 'lua'
