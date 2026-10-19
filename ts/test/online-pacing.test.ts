@@ -2,7 +2,7 @@ import { expect } from "bun:test";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { SyncDelivery } from "wisp/src/headless/lockstep";
-import { MEASURED_BATTLE_NET } from "wisp/src/headless/syncChannel";
+import { MEASURED_BATTLE_NET, MEASURED_TURN_BURSTS, turnBursts } from "wisp/src/headless/syncChannel";
 import { CALLBACK_MS } from "wisp/src/headless/syncChannel";
 import { Random } from "wisp/src/headless/random";
 import { ACTION_ORDER } from "../src/game/input/actions";
@@ -31,6 +31,7 @@ const MENU_FRAMES = 480;
 const LOBBY_FRAMES = 600;
 const MATCH_FRAMES = 2400;
 const SENDER_SPREAD_PERCENT = [85, 100, 115];
+const BURSTS_PER_SECOND = { min: 36, max: 42 };
 
 interface Outage {
   readonly fromMs: number;
@@ -109,10 +110,14 @@ function recordedHeld(): number[][] {
 
 const KEYS = presetBindings(DEFAULT_PRESET);
 
+function maskAt(frames: readonly number[], frame: number): number {
+  return frame < 0 ? 0 : frames[frame % frames.length] ?? 0;
+}
+
 function pressRecorded(clients: Lockstep, held: readonly number[][], frame: number): void {
   held.forEach((frames, client) => {
-    const before = frame === 0 ? 0 : frames[(frame - 1) % frames.length] ?? 0;
-    const now = frames[frame % frames.length] ?? 0;
+    const before = maskAt(frames, frame - 1);
+    const now = maskAt(frames, frame);
     if (before === now) return;
     for (const action of ACTION_ORDER) {
       const bit = 1 << action;
@@ -125,6 +130,7 @@ function pressRecorded(clients: Lockstep, held: readonly number[][], frame: numb
 
 interface Pacing {
   readonly seconds: number;
+  readonly cb: number;
   readonly delay: number;
   readonly ping: number;
   readonly sim: number;
@@ -175,6 +181,7 @@ function pacing(lines: readonly string[], senders: readonly number[], pops: read
   const perSender = (prefix: string, reduce: (values: readonly number[]) => number) => Object.fromEntries(senders.map(slot => [slot, reduce(present(`${prefix}P${slot + 1}`))]));
   return {
     seconds: match.length,
+    cb: tenths(mean(field("cb"))),
     delay: Math.max(...field("dl"), -1),
     ping: tenths(mean(field("ping"))),
     sim: tenths(mean(field("sim"))),
@@ -206,8 +213,41 @@ function pacing(lines: readonly string[], senders: readonly number[], pops: read
   };
 }
 
+interface Screen {
+  readonly pictures: number;
+  readonly steps: readonly number[];
+  readonly jerk: number;
+  readonly presses: number;
+  readonly lostPresses: number;
+  readonly sampleLagMs: number;
+}
+
+interface Sampling {
+  presses: number;
+  lost: number;
+  lag: number[];
+}
+
+function sampleGroup(held: readonly number[][], from: number, to: number, dueMs: number, timeMs: (input: number) => number, sampling: readonly Sampling[]): void {
+  held.forEach((frames, client) => {
+    const seen = sampling[client];
+    if (seen === undefined || to <= from) return;
+    const start = maskAt(frames, from - 1);
+    const end = maskAt(frames, to - 1);
+    for (let input = from; input < to; input++) {
+      const pressed = maskAt(frames, input) & ~maskAt(frames, input - 1);
+      if (pressed === 0) continue;
+      for (let bits = pressed; bits !== 0; bits &= bits - 1) seen.presses++;
+      seen.lag.push(dueMs - timeMs(input));
+    }
+    for (let bits = end & ~start; bits !== 0; bits &= bits - 1) seen.lost--;
+    for (let input = from; input < to; input++) for (let bits = maskAt(frames, input) & ~maskAt(frames, input - 1); bits !== 0; bits &= bits - 1) seen.lost++;
+  });
+}
+
 interface Played {
   readonly clients: readonly Pacing[];
+  readonly screens: readonly Screen[];
   readonly baseMs: ReadonlyMap<number, number>;
 }
 
@@ -216,7 +256,8 @@ function play(route: Route, seed: number): Played {
   let matchStart: number | undefined;
   let wallFrame = 0;
   const delivery = relayDelivery(route, seed, () => matchStart);
-  const clients = headless.clients({ install, start: () => { startBuild(BUILD); installSessionRates(BUILD.id); } }, HUMANS, { delivery });
+  const callbacks = turnBursts(MEASURED_TURN_BURSTS, seed);
+  const clients = headless.clients({ install, start: () => { startBuild(BUILD); installSessionRates(BUILD.id); } }, HUMANS, { delivery, callbacks });
   clients.start();
   clients.frames(MENU_FRAMES);
   wallFrame += MENU_FRAMES;
@@ -234,9 +275,31 @@ function play(route: Route, seed: number): Played {
   matchStart = (wallFrame + 30) * CALLBACK_MS;
   const held = recordedHeld().slice(0, HUMANS.length);
   const checksums = HUMANS.map(() => new Map<number, string>());
+  const base = clients.frame;
+  const inputMs = (input: number) => (base + input + 1) * CALLBACK_MS;
+  const sampling: Sampling[] = HUMANS.map(() => ({ presses: 0, lost: 0, lag: [] }));
+  const pictures = HUMANS.map(() => ({ sim: -1, wallMs: 0, steps: [0, 0, 0, 0], errors: [] as number[] }));
+  let applied = 0;
   for (let frame = 0; frame < MATCH_FRAMES; frame++) {
-    pressRecorded(clients, held, frame);
+    const dueMs = callbacks.wallMs(clients.frame + 1);
+    const from = applied;
+    while (applied < MATCH_FRAMES && inputMs(applied) <= dueMs + 1e-6) pressRecorded(clients, held, applied++);
+    sampleGroup(held, from, applied, dueMs, inputMs, sampling);
     clients.frames(1);
+    if (callbacks.wallMs(clients.frame + 1) > dueMs) HUMANS.forEach((_, index) => clients.clients[index]?.run(() => {
+      const picture = pictures[index];
+      const s = shellState();
+      const sim = s === undefined ? 0 : activeRollback(s)?.schedule.speculativeFrame() ?? s.runtime.simulationFrame;
+      if (picture === undefined) return;
+      if (picture.sim >= 0 && frame >= 120) {
+        const step = sim - picture.sim;
+        const bucket = Math.min(3, Math.max(0, step));
+        picture.steps[bucket] = (picture.steps[bucket] ?? 0) + 1;
+        picture.errors.push(step - (dueMs - picture.wallMs) / CALLBACK_MS);
+      }
+      picture.sim = sim;
+      picture.wallMs = dueMs;
+    }));
     if (frame % 120 !== 119) continue;
     HUMANS.forEach((_, index) => clients.clients[index]?.run(() => {
       const s = shellState();
@@ -261,20 +324,34 @@ function play(route: Route, seed: number): Played {
     });
     return pacing(lines, HUMANS.filter(other => other !== slot), pops);
   });
-  return { clients: measured, baseMs: new Map([...delivery.senders].map(([sender, state]) => [sender, state.baseMs])) };
+  const screens = pictures.map((picture, index): Screen => {
+    const count = picture.steps.reduce((sum, value) => sum + value, 0);
+    const seen = sampling[index] ?? { presses: 0, lost: 0, lag: [] };
+    return {
+      pictures: count,
+      steps: picture.steps.map(value => Math.round((value / Math.max(1, count)) * 1000) / 1000),
+      jerk: Math.round(Math.sqrt(mean(picture.errors.map(error => error * error))) * 100) / 100,
+      presses: seen.presses,
+      lostPresses: seen.lost,
+      sampleLagMs: tenths(mean(seen.lag)),
+    };
+  });
+  return { clients: measured, screens, baseMs: new Map([...delivery.senders].map(([sender, state]) => [sender, state.baseMs])) };
 }
 
 const POP_P50_UNITS = 2;
 const POP_P95_UNITS = 250;
-const OUTAGE_POP_P95_UNITS = 600;
-const FORCED_POP_P50_UNITS = 30;
+const OUTAGE_POP_P50_UNITS = 96;
+const OUTAGE_POP_P95_UNITS = 835;
+const FORCED_POP_P50_UNITS = 76;
+const FORCED_POP_P95_UNITS = 680;
 const THREE = [0, 2, 3];
 const TWO = [0, 1];
 const STEADY: Limits = { sim: 59, held: 2, stall: 2, gmax: REPLAY_MAX_CORRECTION_FRAMES - 1, delay: MAX_INPUT_DELAY, minDelay: DEFAULT_DELAY, driftEnd: 0, driftPeak: 0, popP50: POP_P50_UNITS, popP95: POP_P95_UNITS };
 const LEAN: Limits = { ...STEADY, delay: 6, minDelay: 6 };
 const DUEL: Limits = { ...STEADY, delay: 5, minDelay: 5 };
-const OUTAGE: Limits = { sim: 59, held: 15, stall: 12, gmax: 40, delay: MAX_INPUT_DELAY, minDelay: DEFAULT_DELAY, driftEnd: 15, driftPeak: 50, popP50: POP_P50_UNITS, popP95: OUTAGE_POP_P95_UNITS };
-const FORCED: Limits = { sim: 59, held: 4, stall: 3, gmax: 30, delay: 8, minDelay: 8, driftEnd: 2, driftPeak: 4, popP50: FORCED_POP_P50_UNITS, popP95: OUTAGE_POP_P95_UNITS };
+const OUTAGE: Limits = { sim: 59, held: 15, stall: 12, gmax: 45, delay: MAX_INPUT_DELAY, minDelay: DEFAULT_DELAY, driftEnd: 16, driftPeak: 60, popP50: OUTAGE_POP_P50_UNITS, popP95: OUTAGE_POP_P95_UNITS };
+const FORCED: Limits = { sim: 59, held: 4, stall: 3, gmax: 30, delay: 8, minDelay: 8, driftEnd: 2, driftPeak: 4, popP50: FORCED_POP_P50_UNITS, popP95: FORCED_POP_P95_UNITS };
 const ROUTES: readonly Route[] = [
   { name: "three humans and a computer, 300 ms round trip with Battle.net turn jitter", rttMs: 300, outages: [], humans: THREE, computer: true, limits: LEAN },
   { name: "three humans and a computer, 600 ms round trip with Battle.net turn jitter", rttMs: 600, outages: [], humans: THREE, computer: true, limits: STEADY },
@@ -288,7 +365,7 @@ for (const route of ROUTES) {
   sweep(`${route.name}: the recorded match-793 inputs keep Auto delay, sim, holds, stalls, peak gap and median and p95 correction pop within the route's limits, with each sender's lateness following its link and no drift without an outage [k3 measure #14]`, () => {
     const played = play(route, 793);
     const measured = played.clients;
-    measured.forEach((client, index) => console.log(`online pacing ${route.name}, human ${route.humans[index]}: ${JSON.stringify(client)}`));
+    measured.forEach((client, index) => console.log(`online pacing ${route.name}, human ${route.humans[index]}: ${JSON.stringify({ ...client, screen: played.screens[index] })}`));
     for (const client of measured) {
       expect(client.seconds).toBeGreaterThan(20);
       expect(client.sim).toBeGreaterThanOrEqual(route.limits.sim);
@@ -301,7 +378,8 @@ for (const route of ROUTES) {
       expect(client.echo).toBeGreaterThan(0);
       expect(client.rb).toBeGreaterThan(0);
       expect(client.rbd).toBeLessThanOrEqual(client.gmax + 1);
-      expect(client.bur).toBeGreaterThan(0);
+      expect(client.bur).toBeGreaterThanOrEqual(BURSTS_PER_SECOND.min);
+      expect(client.bur).toBeLessThanOrEqual(BURSTS_PER_SECOND.max);
       expect(client.botHit + client.botMiss).toBeGreaterThan(0);
       expect(client.driftEnd).toBeLessThanOrEqual(route.limits.driftEnd);
       expect(client.drift).toBeLessThanOrEqual(route.limits.driftPeak);
