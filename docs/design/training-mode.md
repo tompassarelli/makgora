@@ -107,7 +107,9 @@ partner), each with one instruction in the readout's place and a count the
 sim keeps (smashcraft:ts/src/game/match/tutorial.ts). A lesson passes when its
 count reaches its goal; "Well done!" shows for two seconds and the next lesson
 starts. The lesson, its count and that pause are training state, folded into
-the checksum only while a tutorial runs. With Training on, the Tutorial button
+the checksum only while a tutorial runs. Leaving a finished tutorial (pause, then
+Escape) turns Training off, so fighter selection comes back in Versus; leaving
+one partway keeps Training and the lesson. With Training on, the Tutorial button
 opens the menu where any lesson can be chosen and replayed. The same menu
 opens by itself on fighter selection for a player whose client has never
 started a match or answered it (`SmashcraftTutorial.pld`;

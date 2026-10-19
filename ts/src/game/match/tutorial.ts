@@ -51,6 +51,12 @@ export const tutorialOn = (state: Readonly<TrainingState>): boolean => state.les
 
 export const tutorialFinished = (state: Readonly<TrainingState>): boolean => state.lesson >= LESSONS.length;
 
+export function leaveFinishedTutorial(game: MatchState): void {
+  if (!tutorialFinished(game.trainer)) return;
+  game.trainer.lesson = NO_LESSON;
+  game.training = false;
+}
+
 
 export function beginLesson(state: TrainingState, world: Roster, computerMask: number, lesson: number): void {
   state.lesson = lesson;

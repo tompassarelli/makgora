@@ -20,7 +20,7 @@ import { startKeyDown, startKeyUp } from "../../game/match/controls";
 import { Phase, cancelRematchCountdown, characterFor, copyMatchState, firstHumanSlot, humanActive, recallCharacter, selectCharacter, setTraining, setHitAreas } from "../../game/lobby/lobbyState";
 import { ROSTER_MANA } from "../../game/sim/mana";
 import { fighterAt, isActive } from "../../game/sim/roster";
-import { NO_LESSON, tutorialFinished } from "../../game/match/tutorial";
+import { leaveFinishedTutorial } from "../../game/match/tutorial";
 import { METER_COMMAND, classicDevRequest, loreDevRequest, LORE_WIN_COMMAND, winLoreBattle, DESYNC_COMMAND, QUICK_CPU_STOCKS, RESET_COMMAND, QUICK_TRAINING_COMMAND, applyDevCommand, prepareQuickCpu, prepareQuickTraining, quickMatchCpuHero, quickMatchCpuProfile, quickMatchHero, quickMatchHitAreas, quickMatchStocks, quickMatchPair, quickPromoRequest, prepareQuickPromo, quickStageSettings, quickPainHero, quickRecoveryHero, quickOffstageHero } from "../../game/session/devSettings";
 import { fighterName, fighterKey } from "../../game/sim/heroes/registry";
 import { endReplaySegment } from "./replays";
@@ -100,7 +100,7 @@ function exitPausedMatch(s: ShellState, title: boolean): void {
   if (s.game.run.active && s.pauseSelection !== undefined) copyMatchState(s.game, s.pauseSelection);
   s.game.phase = Phase.characterMenu;
   s.game.practice = false;
-  if (tutorialFinished(s.game.trainer)) s.game.trainer.lesson = NO_LESSON;
+  leaveFinishedTutorial(s.game);
   s.game.run.active = false;
   s.session.paused = false;
   const menu = s.pauseMenu ??= { choice: 0, shown: false, title: false };
