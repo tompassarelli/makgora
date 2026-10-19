@@ -95,6 +95,13 @@ of the newest tip. A sha is built once, even after a failure or a restart
 `Smashcraft X.Y.Z abc1234` file and replaces the previous build and any lane
 build.
 
+Each install is held to two speed budgets: the build within 20 s and the
+landed commit installed in Maps within 360 s. An install over either opens or
+comments on the one GitHub issue "Speed budget: a landing took too long to
+reach Tom's Maps folder" for an agent to find the stage that grew and what it
+recomputes whose inputs did not change; the next install within both closes
+it (smashcraft:ts/scripts/tomBuildWatch.ts).
+
 Start it (once, from the main checkout):
 
     mkdir -p ~/.config/systemd/user

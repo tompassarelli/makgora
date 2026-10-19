@@ -15,6 +15,17 @@ import { projectRoot } from "./wisp/project";
 export const TOM_BUILD_LOG = join(homedir(), ".local/state/agents/handoffs/tom-build.log");
 export const TOM_BUILD_ATTEMPTS = join(homedir(), ".local/state/smashcraft/tom-build/attempted");
 const POLL = "10 seconds";
+export const BUILD_BUDGET_SECONDS = 20;
+export const LAND_TO_MAPS_BUDGET_SECONDS = 360;
+export const SPEED_BUDGET_TITLE = "Speed budget: a landing took too long to reach Tom's Maps folder";
+
+export const budgetProblem = (buildMillis: number, landToInstalledMillis: number): string | undefined => {
+  const over = [
+    buildMillis > BUILD_BUDGET_SECONDS * 1000 ? `build ${(buildMillis / 1000).toFixed(1)} s over its ${BUILD_BUDGET_SECONDS} s budget` : undefined,
+    landToInstalledMillis > LAND_TO_MAPS_BUDGET_SECONDS * 1000 ? `landing to Maps ${(landToInstalledMillis / 1000).toFixed(0)} s over its ${LAND_TO_MAPS_BUDGET_SECONDS} s budget` : undefined,
+  ].filter((problem) => problem !== undefined);
+  return over.length === 0 ? undefined : over.join("; ");
+};
 
 export interface Installed {
   readonly version: string;
@@ -27,6 +38,7 @@ export interface WatchSteps<R> {
   readonly landedAt: (sha: string) => Effect.Effect<number, PlayProblem, R>;
   readonly build: (sha: string) => Effect.Effect<Installed, PlayProblem, R>;
   readonly notes: (version: string, sha: string, previous: string | undefined) => Effect.Effect<string, PlayProblem, R>;
+  readonly budget: (sha: string, problem: string | undefined) => Effect.Effect<void, never, R>;
 }
 
 export interface WatchFiles {
@@ -64,6 +76,7 @@ export const watchOnce = <R>(steps: WatchSteps<R>, files: WatchFiles) => Effect.
   const landed = yield* steps.landedAt(sha);
   const line = buildLine(finished, sha, installed, finished - started, finished - landed);
   yield* append(files.log, line);
+  yield* steps.budget(sha, budgetProblem(finished - started, finished - landed));
   yield* steps.notes(installed.version, sha, previous).pipe(
     Effect.tap((path) => Effect.sync(() => console.log(`Playtest checklist ${path}`))),
     Effect.catch(({ problem }) => Effect.sync(() => console.error(`Playtest checklist not written: ${problem}`))),
@@ -112,6 +125,26 @@ export const hostSteps = (predictCost: boolean): WatchSteps<ChildProcessSpawner.
     return version === undefined ? Effect.fail(new PlayProblem({ problem: `not a playable map: ${file}` })) : Effect.succeed({ version, path: installed });
   })),
   notes: writePlaytestChecklist,
+  budget: (sha, problem) => reportBudget(sha, problem).pipe(
+    Effect.catch(({ problem: failure }) => Effect.sync(() => console.error(`Speed budget not reported: ${failure}`))),
+  ),
+});
+
+const gh = (...args: readonly string[]) =>
+  runProcess(ChildProcess.make("gh", args, { cwd: projectRoot, stdin: "ignore" })).pipe(
+    Effect.map((text) => text.trim()),
+    Effect.mapError((cause) => new PlayProblem({ problem: `gh ${args.slice(0, 2).join(" ")}: ${cause.message}` })),
+  );
+
+const reportBudget = (sha: string, problem: string | undefined) => Effect.gen(function*() {
+  const open = (yield* gh("issue", "list", "--state", "open", "--search", `"${SPEED_BUDGET_TITLE}" in:title`, "--json", "number", "--jq", ".[].number")).split("\n").filter((line) => line !== "");
+  const body = `Landing ${sha}: ${problem}.\n\nBudgets: build <= ${BUILD_BUDGET_SECONDS} s, commit to installed in Maps/00-Smashcraft <= ${LAND_TO_MAPS_BUDGET_SECONDS} s, measured by the Tom build watcher (smashcraft:tools/tom-build/, ~/.local/state/agents/handoffs/tom-build.log). Find the stage that grew and what it recomputes whose inputs did not change.`;
+  if (problem === undefined) {
+    for (const number of open) yield* gh("issue", "close", number, "--comment", `Landing ${sha} was within both budgets.`);
+    return;
+  }
+  if (open[0] === undefined) yield* gh("issue", "create", "--title", SPEED_BUDGET_TITLE, "--body", body);
+  else yield* gh("issue", "comment", open[0], "--body", body);
 });
 
 if (import.meta.main) {

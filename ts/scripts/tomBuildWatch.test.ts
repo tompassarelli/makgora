@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
 import { PlayProblem } from "wisp/scripts/wisp/play";
-import { type WatchSteps, newerTip, watch, watchOnce } from "./tomBuildWatch";
+import { type WatchSteps, budgetProblem, newerTip, watch, watchOnce } from "./tomBuildWatch";
 import { playableMapBuild } from "./wisp/currentPlaytest";
 import { PLAYTEST_PREFIX } from "./wisp/project";
 import { PLAYABLE_FILE, PREDICT_COST, type Verdict, costPrediction, installName, landingDecision, verdictOf } from "./wisp/greenBuilds";
@@ -19,6 +19,31 @@ test("a landed tip builds at once with no CI wait, older and unknown shas never 
   expect(newerTip([], undefined)).toBeUndefined();
 });
 
+test("a landing over its build or landing-to-Maps budget is reported, and one within both clears the report [k1 scenario]", async () => {
+  expect(budgetProblem(19_000, 300_000)).toBeUndefined();
+  expect(budgetProblem(21_000, 300_000)).toBe("build 21.0 s over its 20 s budget");
+  expect(budgetProblem(10_000, 361_000)).toBe("landing to Maps 361 s over its 360 s budget");
+  const root = mkdtempSync(join(tmpdir(), "smashcraft-tom-budget-"));
+  try {
+    const files = { log: join(root, "handoffs/tom-build.log"), attempts: join(root, "state/attempted") };
+    const reports: (string | undefined)[] = [];
+    const steps = (landedAgo: number): WatchSteps<never> => ({
+      tip: (previous) => Effect.succeed(previous === sha("a") ? sha("b") : sha("a")),
+      decision: () => Effect.succeed("build"),
+      landedAt: () => Effect.sync(() => Date.now() - landedAgo),
+      notes: () => Effect.succeed("notes.md"),
+      budget: (_, problem) => Effect.sync(() => { reports.push(problem); }),
+      build: () => Effect.succeed({ version: "Smashcraft 0.1.1 aaaaaaa", path: "Maps/x.w3x" }),
+    });
+    await Effect.runPromise(watchOnce(steps(600_000), files));
+    await Effect.runPromise(watchOnce(steps(1_000), files));
+    expect(reports[0]).toMatch(/^landing to Maps 6\d\d s over its 360 s budget$/);
+    expect(reports[1]).toBeUndefined();
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test("tips landing during a build coalesce into one build of the newest, and no sha builds twice, across restarts and failures [k2 property]", async () => {
   const root = mkdtempSync(join(tmpdir(), "smashcraft-tom-build-"));
   try {
@@ -31,6 +56,7 @@ test("tips landing during a build coalesce into one build of the newest, and no 
       decision: () => Effect.succeed("build"),
       landedAt: () => Effect.succeed(0),
       notes: () => Effect.succeed("notes.md"),
+      budget: () => Effect.void,
       build: (revision) => Effect.gen(function*() {
         built.push(revision);
         for (const next of landing[revision] ?? []) remote = next;
@@ -79,6 +105,7 @@ test("a red commit is never built, a pending one waits and builds once its run s
       decision: () => Effect.succeed(landingDecision(verdict)),
       landedAt: () => Effect.succeed(0),
       notes: (version, revision, previous) => Effect.sync(() => { noted.push(`${version} ${revision} ${previous}`); return "notes.md"; }),
+      budget: () => Effect.void,
       build: (revision) => Effect.sync(() => { built.push(revision); return { version: "0.0.1", path: join(root, "Smashcraft 0.0.1 aaaaaaa.w3x") }; }),
     };
     const tick = () => Effect.runPromise(watchOnce(steps, files));
@@ -126,6 +153,7 @@ test("the watcher keeps polling while it runs main's tip and returns, unbuilt, o
       decision: () => Effect.succeed("build"),
       landedAt: () => Effect.succeed(0),
       notes: () => Effect.succeed("notes.md"),
+      budget: () => Effect.void,
       build: (revision) => Effect.sync(() => { built.push(revision); return { version: "0.1.1 aaaaaaa", path: join(root, "Smashcraft 0.1.1 aaaaaaa.w3x") }; }),
     };
     const checks: boolean[] = [];
