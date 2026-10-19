@@ -121,7 +121,7 @@ export function playHandleBaseline(clients: Lockstep, functions: readonly (reado
     }
     until("the result", 2 * 3600, () => gameOf(host).phase === Phase.result);
     until("fighter selection", 20 * 60, () => gameOf(host).phase === Phase.characterMenu, (frame) => {
-      if (floorMod(frame, 30) === 0) clients.press(floorMod(floorDiv(frame, 30), 2), Key.y);
+      if (floorMod(frame, 30) === 0) clients.press(floorMod(floorDiv(frame, 30), 2), gameOf(host).phase === Phase.stageMenu ? Key.escape : Key.y);
     });
     clients.frames(60);
     afterMatches.push(live());

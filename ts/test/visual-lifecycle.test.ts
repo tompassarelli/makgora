@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { createFrameControls } from "../src/game/match/controls";
 import { captureFrame, createMatchFrameInput } from "../src/game/match/frameInput";
-import { beginRematchCountdown, cancelRematchCountdown, Phase, requestStageSelect, requestStart, selectCharacter, tickRematchCountdown } from "../src/game/lobby/lobbyState";
+import { beginRematchCountdown, cancelRematchCountdown, Phase, ResultPick, requestStageSelect, requestStart, selectCharacter, tickRematchCountdown } from "../src/game/lobby/lobbyState";
 import { executeNext, startAtGo, testMatch } from "../src/game/match/testMatch";
 import { IMPACT_DUST, IMPACTS_PER_KIND } from "../src/game/presentation/impactState";
 import { cameraPoint, FLOOR_HEIGHT } from "../src/game/presentation/arenaCamera";
@@ -27,7 +27,7 @@ import { fighterAt } from "../src/game/sim/roster";
 import { install, start } from "../src/platform/main";
 import { applyFrame } from "../src/host/loop/frame";
 import { startMatch } from "../src/host/loop/matchStart";
-import { confirm } from "../src/host/loop/menus";
+import { pickResult } from "../src/host/loop/menus";
 import { shell } from "../src/host/loop/state";
 import { pauseMatchPresentation, renderPersistentPresentation, renderUi, serviceResumePresentation } from "../src/host/loop/view";
 import { testHeadless } from "./headless";
@@ -273,8 +273,8 @@ test("combat effects: rollback, pause/resume and rematch neither replay nor reta
     expect(s.game.phase).toBe(Phase.result);
     expect(visible(client, handles).size).toBe(0);
     expect(hiddenInView(client)).toEqual([]);
-    confirm(s, 0);
-    confirm(s, 1);
+    pickResult(s, 0, ResultPick.characters);
+    pickResult(s, 1, ResultPick.characters);
     expect(s.game.phase).toBe(Phase.characterMenu);
     expect(visible(client, handles).size).toBe(0);
     expect(requestStageSelect(s.game, 0)).toBe(true);
@@ -295,8 +295,8 @@ test("combat effects: rollback, pause/resume and rematch neither replay nor reta
     expect(captureFrame(s.frameInput, 2, s.world.mask, s.produced, s.runtime)).toBe(true);
     applyFrame(s);
     renderPersistentPresentation(s);
-    confirm(s, 0);
-    confirm(s, 1);
+    pickResult(s, 0, ResultPick.characters);
+    pickResult(s, 1, ResultPick.characters);
     expect(requestStageSelect(s.game, 0)).toBe(true);
     expect(startAtGo(s.game, 0)).toBe(true);
     startMatch(s);
@@ -347,8 +347,8 @@ test("combat effects: rollback, pause/resume and rematch neither replay nor reta
     expect(captureFrame(s.frameInput, 61, s.world.mask, s.produced, s.runtime)).toBe(true);
     applyFrame(s);
     renderPersistentPresentation(s);
-    confirm(s, 0);
-    confirm(s, 1);
+    pickResult(s, 0, ResultPick.characters);
+    pickResult(s, 1, ResultPick.characters);
     selectCharacter(s.game, 0, Character.kobold);
     expect(requestStageSelect(s.game, 0)).toBe(true);
     expect(startAtGo(s.game, 0)).toBe(true);
@@ -471,8 +471,8 @@ test("combat effects: rollback, pause/resume and rematch neither replay nor reta
     candleStep();
     expect(s.game.phase).toBe(Phase.result);
     expect(shownFlames()).toEqual([]);
-    confirm(s, 0);
-    confirm(s, 1);
+    pickResult(s, 0, ResultPick.characters);
+    pickResult(s, 1, ResultPick.characters);
     const liveOf = (handles: readonly effect[]) => handles.filter(model => { const pose = effectPoses(client).get(model); return pose !== undefined && pose.destroyed === undefined; }).length;
     expect(liveOf(flames)).toBe(0);
     expect(looseEffects.every(model => effectPoses(client).get(model)?.destroyed !== undefined)).toBe(true);
@@ -675,8 +675,8 @@ test("Mirror Image matches its owning fighter colour across repeated casts, expi
       step();
       expect(s.game.phase).toBe(Phase.result);
       expect(images()).toHaveLength(0);
-      confirm(s, 0);
-      confirm(s, 1);
+      pickResult(s, 0, ResultPick.characters);
+      pickResult(s, 1, ResultPick.characters);
       expect(s.game.phase).toBe(Phase.characterMenu);
       expect(images()).toHaveLength(0);
     }
