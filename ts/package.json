@@ -26,6 +26,7 @@
     "wisp": "bun scripts/wisp.ts",
     "playtest": "bun scripts/playtestLobby.ts",
     "playtest:build": "bun scripts/playtestBuild.ts",
+    "hive:post": "bun scripts/hivePost.ts",
     "rc:build": "bun scripts/rcBuild.ts",
     "update:wisp": "bun scripts/update-wisp.ts",
     "parity": "bun wisp parity numeric"

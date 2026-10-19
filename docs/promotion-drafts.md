@@ -1,6 +1,8 @@
 # Smashcraft 0.1.0 promotion drafts
 
 Private drafts for Tom to post after [the release gates](https://github.com/tompassarelli/smashcraft/issues/346) pass and the map is uploaded to Hive Workshop. These describe the intended 0.1.0 release, not a release available today. The existing [GitHub Issues channel](https://github.com/tompassarelli/smashcraft/issues) is the feedback destination. Download links use the Hive Workshop placeholder; Tom can substitute the map page once it exists. GitHub repositories hold code only, with no map release attachments. Controls, installation and the restart caveat come from [the player guide](player-guide.md).
+The live Hive Workshop page is written in [hive-post.md](hive-post.md) (smashcraft:docs/hive-post.md); `bun run hive:post` in ts/ prints it as Hive BBCode to paste into the page editor (smashcraft:ts/scripts/hivePost.ts): `#` is the centred title and the next line its subtitle, `##` a section heading, `###` a bold label, `-` and `1.` lists, and `**bold**`, `*italic*`, `code` and links convert inline.
+
 
 ## Hive Workshop map page
 
