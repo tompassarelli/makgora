@@ -38,6 +38,7 @@ import { PLAYTEST, PLAYTEST_PREFIX, playtestRequested, readPlaytestRequest, serv
 import { STAGE_READY, cancelStageLoad, serviceStageLoad, stageReadyEvent } from "./stageLoad";
 import { STAGE_READY_PREFIX } from "../../game/session/stageLoad";
 import { makePreview } from "./preview";
+import { addChat, ageChat } from "../../game/ui/selectChat";
 import { HELP_EVENT, helpCommand, serviceHelp, startHelp } from "./help";
 import { preloadStageAssets } from "./stageScenery";
 import * as probe from "./responseProbe";
@@ -66,6 +67,7 @@ const CHAT_CLOSED = "shell.chatClosed";
 const INPUT = "shell.input";
 const DEV_COMMAND = "shell.devCommand";
 const CONTROLS_COMMAND = "shell.controlsCommand";
+const CHAT_RECEIVED = "shell.chatReceived";
 const SAVE_CONTROLS = "-save";
 const LOAD_CONTROLS = "-load";
 const RESTART = "shell.restart";
@@ -117,6 +119,7 @@ function gameTick(s: ShellState): void {
   }
   s.status.seconds = Math.max(0.0, f32(s.status.seconds - FRAME_SECONDS));
   s.moment.notice = Math.max(0.0, f32(s.moment.notice - FRAME_SECONDS));
+  ageChat(s.chat, FRAME_SECONDS);
   serviceMomentSave(s);
   serviceReplay(s);
   captureNativeDriverInputs(s);
@@ -195,6 +198,12 @@ function presentMatchFlow(s: ShellState): void {
   const posing = match.posing;
   const body = posing === undefined ? undefined : s.participants[posing]?.body;
   if (body !== undefined) ShowUnit(body.unit, false);
+}
+
+function chatReceived(s: ShellState): void {
+  const slot = GetPlayerId(GetTriggerPlayer());
+  if (!isParticipantSlot(slot) || (s.game.phase !== Phase.characterMenu && s.game.phase !== Phase.stageMenu)) return;
+  addChat(s.chat, slot, GetPlayerName(Player(slot)), GetEventPlayerChatString());
 }
 
 function controlsCommand(s: ShellState): void {
@@ -303,6 +312,9 @@ function createTriggers(s: ShellState): void {
     TriggerRegisterPlayerChatEvent(controls, Player(slot), LOAD_CONTROLS, true);
   }
   TriggerAddAction(controls, trampoline(CONTROLS_COMMAND));
+  const chat = CreateTrigger();
+  for (const slot of PARTICIPANT_SLOTS) TriggerRegisterPlayerChatEvent(chat, Player(slot), "", false);
+  TriggerAddAction(chat, trampoline(CHAT_RECEIVED));
   syncTrigger(s, PLAYTEST_PREFIX, PLAYTEST, true);
   syncTrigger(s, STAGE_READY_PREFIX, STAGE_READY, true);
   const leave = CreateTrigger();
@@ -412,6 +424,7 @@ export function installShell(): void {
   on(DEV_COMMAND, withShell(onDevCommand));
   on(CONTROLS_COMMAND, withShell(controlsCommand));
   on(HELP_EVENT, helpCommand);
+  on(CHAT_RECEIVED, withShell(chatReceived));
   on(PLAYER_LEFT, withShell(playerLeft));
   on(RESTART, withShell(onDeveloperRestart));
   on(TRACE, withShell(onDeveloperTrace));

@@ -21,6 +21,7 @@ import { isActive } from "../../game/sim/roster";
 import type { MenuControls } from "../../game/ui/frames";
 import { FighterHud, MatchClock, plateManaSlot } from "../../game/ui/matchHud";
 import { TrainingReadout } from "../../game/ui/trainingReadout";
+import { SelectChat } from "../../game/ui/selectChat";
 import { HitAreaPresentation } from "../../game/render/hitAreaPresentation";
 import { EscapeMeter } from "../../game/ui/escapeMeter";
 import { OffscreenBubble } from "../../game/ui/offscreenBubble";
@@ -62,6 +63,7 @@ export interface UiObjects {
   drops: MeterDropPresentation;
   readonly clock: MatchClock;
   readonly training: TrainingReadout;
+  readonly chat: SelectChat;
   readonly huds: Slots<FighterHud>;
   readonly bubbles: Slots<OffscreenBubble>;
   readonly escapeMeters: Slots<EscapeMeter>;
@@ -132,6 +134,7 @@ export function createUi(s: ShellState, actions: PanelActions, selectPause: (cho
     stage: new StagePanel(actions.stage, controls),
     selections: each(slot => new SelectionPanel(actions.selection, slot, controls)),
     settings: each(slot => new SettingsPanel(s.participants[slot].bindings, actions.settings, slot)),
+    chat: new SelectChat(),
     combat: combat = new CombatEffects(s.origin),
     frost: new FrostEffects(s.origin),
     placed: new PlacedObjectEffects(s.origin),

@@ -605,6 +605,7 @@ export function renderUi(s: ShellState): void {
   }
   ui.clock.update(showMatch && game.phase === Phase.match && timedMatch(game), remainingSeconds(game));
   ui.match.presentCountdown(game, showMatch);
+  ui.chat.update(selecting, s.chat);
   ui.training.update(showMatch && game.training && game.phase === Phase.match, game.trainer, localKeys);
   ui.classic?.updateCard(game);
   const cleared = game.lore && game.phase === Phase.result && game.run.active && game.run.cleared ? game.run.current : undefined;

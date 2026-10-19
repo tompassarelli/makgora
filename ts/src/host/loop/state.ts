@@ -50,6 +50,7 @@ import { type InputTrace, inputTrace } from "./trace";
 import type { UiObjects } from "./ui";
 import type { NativePadCapture } from "./analogPad";
 import type { HiddenFighter } from "./fighterCloak";
+import { type ChatLog, createChatLog } from "../../game/ui/selectChat";
 
 
 export interface StageDrifter {
@@ -294,6 +295,7 @@ export interface ShellState {
   readonly frameInput: MatchFrameInput;
   readonly participants: Slots<Participant>;
   readonly status: StatusLine;
+  readonly chat: ChatLog;
   readonly frames: StatusFrames;
   readonly stageDecks: effect[];
 
@@ -424,7 +426,7 @@ export function createShellState(build: MapBuild, setup: ShellSetup): ShellState
     produced: createFrameControls(), runtime: createPacingAndPresentation(), sessionWins: createSessionWins(), session: createMatchControls(),
     frameInput: createMatchFrameInput(),
     participants: [participant(0, persistence), participant(1, persistence), participant(2, persistence), participant(3, persistence)],
-    status: { text: "", seconds: 0.0 }, frames: setup.frames, stageDecks: [], stageDeckParts: [], drawnStage: 0, stageCannon: undefined, stageLava: undefined, stageWind: [], stageScenery: undefined, stageDrifters: [], shadowLightsRaised: false, viewExtreme: undefined, hiddenFighters: [undefined, undefined, undefined, undefined], showcase: createShowcasePads(), showcaseFocus: undefined, showcaseMarkers: [], ui: undefined,
+    status: { text: "", seconds: 0.0 }, chat: createChatLog(), frames: setup.frames, stageDecks: [], stageDeckParts: [], drawnStage: 0, stageCannon: undefined, stageLava: undefined, stageWind: [], stageScenery: undefined, stageDrifters: [], shadowLightsRaised: false, viewExtreme: undefined, hiddenFighters: [undefined, undefined, undefined, undefined], showcase: createShowcasePads(), showcaseFocus: undefined, showcaseMarkers: [], ui: undefined,
     sounds: createModelSoundCursor(ORIGINAL_MODEL_SOUNDS),
     dev: { rollback: isShadow(input) ? input.rollback : 6, delay: isShadow(input) ? input.delay : 3, batch: DEFAULT_BATCH, rematchSeconds: REMATCH_COUNTDOWN_SECONDS }, devReceipts: 0,
     trace: inputTrace(build.responseProbe || build.inputProfile === "native-driver" ? 2048 : 256),
