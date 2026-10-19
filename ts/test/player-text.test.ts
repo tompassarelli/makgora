@@ -226,7 +226,6 @@ test("the playable build keeps selection chips and cursor on their screen and sh
   frames(30);
   for (const { client, view } of records) view.clickNamed(clients, client, `MeleeSettingsCloseHit${client.slot}`);
   frames(2);
-  for (const { client, view } of records) view.clickText(client, "Not now");
   const grid = rosterGrid(PLAYABLE_CHARACTERS.length);
   const point = (x: number, y: number, down: boolean, carrying?: boolean) => {
     for (const client of clients.clients) {
