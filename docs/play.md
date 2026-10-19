@@ -41,18 +41,20 @@ against a computer. The match plays on the keyboard; a pad the service finds
 presses the same keys, and without one play says "keyboard" and goes on. It reuses the signed-in Battle.net launcher and never signs
 in, logs out or switches accounts.
 
-Maps/00-Smashcraft holds one file, the newest installed main build
+Maps/00-Smashcraft has two folders. releases/ keeps every release build
+`Smashcraft X.Y.Z.w3x`; no install ever removes one, and online hosting picks the
+newest of them. dev/ holds the newest installed main build
 `Smashcraft X.Y.Z abc1234.w3x` (version and short commit; the file and in-game
 title carry the same name). Installing a main build (`play`, `playtest:build`,
-the Tom build watcher, `play --install-green`) removes everything else in the
-folder. Only releases are public, so X.Y.Z is the next release, never a build
+the Tom build watcher, `play --install-green`) removes everything else in dev/;
+a build of a release-tagged commit goes to releases/ instead and removes nothing. Only releases are public, so X.Y.Z is the next release, never a build
 counter: the patch after the newest `vX.Y.Z` tag reachable from the commit
 (`git describe --tags --match 'v[0-9]*.[0-9]*.[0-9]*' --exclude 'v*-*'`),
 and the short commit tells development builds apart, so every build after
 v0.1.0 is `Smashcraft 0.1.1 abc1234`. When Tom calls a release candidate, a
 `v0.1.1-rc.N` tag on its commit names the build `Smashcraft 0.1.1 RC-N`
 (the highest N), and the `v0.1.1` release tag names it `Smashcraft 0.1.1`. At
-most one lane or test build for Tom to try sits beside it (lane builds below,
+most one lane or test build for Tom to try sits beside the dev build (lane builds below,
 `play --lobby-only MAP.w3x`); it replaces any earlier one and goes when the next
 main build installs. Test, integrity, capture and diagnostic builds go to a
 private folder or a pool client, never this one: `wisp map build` and
@@ -92,8 +94,8 @@ version numbering and revision locks as `play`, under `Nice=10` and idle I/O.
 Commits that land during a build are not built one by one: the next build is
 of the newest tip. A sha is built once, even after a failure or a restart
 (`~/.local/state/smashcraft/tom-build/attempted`). A new build gets a new
-`Smashcraft X.Y.Z abc1234` file and replaces the previous build and any lane
-build.
+`Smashcraft X.Y.Z abc1234` file in dev/ and replaces the previous build and any
+lane build there; releases/ is left alone.
 
 Each install is held to two speed budgets: the build within 20 s and the
 landed commit installed in Maps within 360 s. An install over either opens or
@@ -125,7 +127,7 @@ and the lane's own tests (test files changed since its merge base with
 origin/main, uncommitted ones included), then builds the lane's working tree
 with the play build (no Lua prediction) as `Smashcraft X.Y.Z-LANE.w3x` in
 `~/.local/state/smashcraft/lane-builds/LANE/`, which holds only that lane's
-newest build. `--install` also installs it in Tom's Maps/00-Smashcraft for him
+newest build. `--install` also installs it in Tom's Maps/00-Smashcraft/dev for him
 to try. X.Y.Z is the next release; LANE is the branch's last segment without `land-`
 (`claude/land-cairne-air-924c72aef489` installs
 `Smashcraft X.Y.Z-cairne-air-924c72aef489.w3x`); `--lane BRANCH` names it
@@ -138,7 +140,7 @@ the lane map.
 
 Players use [smashcraft-client](https://github.com/tompassarelli/smashcraft-client):
 its release bundles the controller service, and its Play launches the current
-map in Maps/00-Smashcraft ([client interface](client-interface.md)). It needs no
+map in Maps/00-Smashcraft/releases ([client interface](client-interface.md)). It needs no
 checkout of this repository.
 
 ## Controller without play

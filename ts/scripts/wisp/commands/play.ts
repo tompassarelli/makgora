@@ -25,7 +25,7 @@ import { accountField, smashcraftWatch } from "../doctor";
 import { currentPlaytest } from "../currentPlaytest";
 import { lobbyController, optionalController } from "../controllerService";
 import { pollUntil } from "../../hostPoll";
-import { installLatest, installTryout } from "../mapLibrary";
+import { installLatest, installTryout, shelfFolder } from "../mapLibrary";
 import { PLAYABLE_FILE } from "../greenBuilds";
 import { reserveStatus } from "../playtestReserve";
 import type { Command } from "wisp/scripts/wisp/command";
@@ -236,7 +236,7 @@ export const play: Command = (args) => Effect.gen(function*() {
     if (maps.length > 1 || (requested !== undefined && (!/\.w3x$/i.test(requested) || requested.startsWith("--")))) return yield* new PlayProblem({ problem: "use play --lobby-only [MAP.w3x]" });
     const current = requested === undefined
       ? yield* currentPlaytest()
-      : { map: { folder: "00-Smashcraft", file: basename(requested), title: basename(requested, ".w3x"), source: resolve(requested) }, helper: undefined };
+      : { map: { folder: shelfFolder(basename(requested)), file: basename(requested), title: basename(requested, ".w3x"), source: resolve(requested) }, helper: undefined };
     yield* Effect.try({ try: () => (PLAYABLE_FILE.test(current.map.file) ? installLatest : installTryout)(documentsFolder(PLAYTEST_PREFIX), current.map.source), catch: (cause) => new PlayProblem({ problem: String(cause) }) });
     const normal = playtest({ ...PLAYTEST, ...current });
     const declaration: PlayDeclaration<GameFiles> = {

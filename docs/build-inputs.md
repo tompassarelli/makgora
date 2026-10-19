@@ -137,8 +137,8 @@ the other poses keep their existing SVG sources. Store the generated
   per-process temporaries.
 - The controller launcher link and the owner's Maps/00-Smashcraft are replaced
   through per-process temporaries (`NAME.PID.next`), renamed in. Installing a
-  main build there removes every other file, so it holds one main build and at
-  most one lane build to try (smashcraft:docs/play.md).
+  main build removes every other file in its dev/ folder, so dev/ holds one main
+  build and at most one lane build to try, and releases/ keeps every release (smashcraft:docs/play.md).
 - Lane, test, integrity and diagnostic builds go to a private folder: a
   per-run temporary removed after the run, a new folder under
   ~/.local/share/smashcraft-build-inputs/, or the lane cache

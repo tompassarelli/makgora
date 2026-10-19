@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -10,7 +10,7 @@ import { runProcess } from "../hostProcess";
 import { currentPlaytest, playName } from "./currentPlaytest";
 import { SMASHCRAFT_ACCEPT } from "./acceptChecks";
 import { GREEN_GATE_LOOKS, greenGateFailures, type GreenGateReport, type Candidate, type RunSummary, buildLabel, farmVerdict, isGreen, parseInstalled, pickGreen, verdictOf } from "./greenBuilds";
-import { installLatest } from "./mapLibrary";
+import { installLatest, installedMaps } from "./mapLibrary";
 import { checklistPath, writePlaytestChecklist } from "./playtestChecklist";
 import { projectRoot } from "./project";
 
@@ -55,9 +55,7 @@ const runs = (args: readonly string[]) => host("gh", ["run", "list", ...args, "-
 const summary = ({ status, conclusion, createdAt }: RunSummary): RunSummary => ({ status, conclusion, createdAt });
 
 function installedBuilds(documents: string) {
-  const root = join(documents, "Maps/00-Smashcraft");
-  return (existsSync(root) ? readdirSync(root) : [])
-    .flatMap((file) => parseInstalled(file) ?? []);
+  return installedMaps(documents).flatMap((file) => parseInstalled(file) ?? []);
 }
 
 const installedCommits = (documents: string): string[] => installedBuilds(documents).flatMap(({ commit }) => commit ?? []);

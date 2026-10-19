@@ -15,6 +15,7 @@ import { buildOnce } from "./buildInputs";
 import { capacityHelper } from "../heavyCapacity";
 import { withLock } from "./fileLock";
 import { PREDICT_COST, installName } from "./greenBuilds";
+import { shelfFolder } from "./mapLibrary";
 import { projectRoot } from "./project";
 
 const inputsRoot = join(homedir(), ".local/share/smashcraft-build-inputs");
@@ -169,7 +170,7 @@ export const currentPlaytest = ({ revision: wanted, helper: wantsHelper = true, 
   const { revision, controller, mainCheckout } = yield* (wanted === undefined ? resolveMain : resolveRevision(wanted));
   const title = yield* playName(revision);
   const final = join(builds, edition === "full" ? revision : `${revision}-${edition}`);
-  const map = { folder: "00-Smashcraft", file: `${title}.w3x`, title, source: join(final, `${title}.w3x`) };
+  const map = { folder: shelfFolder(`${title}.w3x`), file: `${title}.w3x`, title, source: join(final, `${title}.w3x`) };
   const helper = helperPath(controller);
   yield* buildOnce(revisionLock(revision), final, (folder) => existsSync(join(folder, map.file)), `Waiting for another build of ${title}`, (staging) => Effect.gen(function*() {
     console.log(`Building ${title}`);

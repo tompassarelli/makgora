@@ -18,10 +18,15 @@ export const insideTomsLibrary = (path: string) => {
   return from === "" || (!from.startsWith("..") && !isAbsolute(from));
 };
 
+export const RELEASE_FILE = /^Smashcraft \d+\.\d+\.\d+\.w3x$/;
+export type Shelf = "releases" | "dev";
+export const shelfOf = (file: string): Shelf => (RELEASE_FILE.test(file) ? "releases" : "dev");
+export const shelfFolder = (file: string) => `00-Smashcraft/${shelfOf(file)}`;
+
 function place(documents: string, map: string): { root: string; name: string } {
-  const root = library(documents);
-  mkdirSync(root, { recursive: true });
   const name = basename(map);
+  const root = join(library(documents), shelfOf(name));
+  mkdirSync(root, { recursive: true });
   const staged = join(root, `${name}.${process.pid}.next`);
   copyFileSync(map, staged);
   renameSync(staged, join(root, name));
@@ -35,7 +40,7 @@ const remove = (root: string, entries: readonly string[]) => {
 export function installLatest(documents: string, map: string): void {
   if (!PLAYABLE_FILE.test(basename(map))) throw new Error(`not a playable map: ${basename(map)}`);
   const { root, name } = place(documents, map);
-  remove(root, readdirSync(root).filter((entry) => entry !== name));
+  if (shelfOf(name) === "dev") remove(root, readdirSync(root).filter((entry) => entry !== name));
 }
 
 export function installTryout(documents: string, map: string): string {
@@ -45,8 +50,16 @@ export function installTryout(documents: string, map: string): string {
   return join(root, name);
 }
 
-export function newestPlayable(documents: string): string | undefined {
-  const root = library(documents);
-  if (!existsSync(root)) return undefined;
-  return readdirSync(root).filter((entry) => PLAYABLE_FILE.test(entry)).sort((a, b) => b.localeCompare(a, undefined, { numeric: true }))[0];
+const newest = (entries: readonly string[]) => entries.filter((entry) => PLAYABLE_FILE.test(entry)).sort((a, b) => b.localeCompare(a, undefined, { numeric: true }))[0];
+
+export const installedMaps = (documents: string): string[] => (["releases", "dev"] as const)
+  .flatMap((shelf) => { const root = join(library(documents), shelf); return existsSync(root) ? readdirSync(root) : []; });
+
+export function newestPlayable(documents: string): { folder: string; file: string } | undefined {
+  for (const shelf of ["releases", "dev"] as const) {
+    const root = join(library(documents), shelf);
+    const file = existsSync(root) ? newest(readdirSync(root)) : undefined;
+    if (file !== undefined) return { folder: `00-Smashcraft/${shelf}`, file };
+  }
+  return undefined;
 }

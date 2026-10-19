@@ -106,14 +106,14 @@ export const online: Command = ([action, ...args]) => Effect.gen(function*() {
       return yield* new MenuFailure({ operation: "set Allow Local Files", problem: `${install.prefix} is in use; user.reg was left unchanged` });
     }
     case "host": {
-      const file = newestPlayable(install.documents);
-      if (file === undefined) {
+      const map = newestPlayable(install.documents);
+      if (map === undefined) {
         yield* say("Smashcraft isn't in Warcraft III's maps yet. Press Play once to add it.");
-        return yield* new UsageFailure({ problem: `no Smashcraft X.Y.Z.w3x in ${install.documents}/Maps/00-Smashcraft` });
+        return yield* new UsageFailure({ problem: `no Smashcraft X.Y.Z.w3x in ${install.documents}/Maps/00-Smashcraft/releases or dev` });
       }
       yield* explained(Effect.scoped(Effect.gen(function*() {
         const menus = yield* menusOf(install, repair);
-        yield* hostMatch({ menus, map: { folder: "00-Smashcraft", file }, documents: install.documents, say, startNow: startLine, ...(password === undefined ? {} : { password }) });
+        yield* hostMatch({ menus, map, documents: install.documents, say, startNow: startLine, ...(password === undefined ? {} : { password }) });
       }))).pipe(Effect.provide(gameFilesLayer));
       return;
     }
