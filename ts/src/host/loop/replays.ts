@@ -6,7 +6,7 @@
 import { writeLines } from "wisp/src/platform/fileio";
 import { settleNextObservation } from "../../game/match/botPerception";
 import {
-  ReplayBegin, beginMatchReplayFrame, continueMatchReplay, endMatchReplaySegment,
+  PART_LINES, ReplayBegin, beginMatchReplayFrame, continueMatchReplay, endMatchReplaySegment,
   finishMatchReplay, matchReplayDone, matchReplayFrameRan, observationsNeededFrom, replayManifestLines, replayPartLines, takeMatchReplayPart,
 } from "../../game/replay/matchReplay";
 import { momentInput } from "../../game/replay/moment";
@@ -14,6 +14,7 @@ import { sourceVersion } from "../../game/shell/sourceVersion";
 import { replayFile, replayPartFile } from "../../game/core/gameFiles";
 import { takeMatchSerial } from "./matchRecords";
 import type { ShellState } from "./state";
+import { Phase } from "../../game/lobby/lobbyState";
 
 function writePart(s: ShellState, all: boolean): void {
   const { recorder, serial } = s.replay;
@@ -57,6 +58,7 @@ export function serviceReplay(s: ShellState): void {
   if (!recorder.open) return;
   settleNextObservation(s.runtime.botMemory, observationsNeededFrom(recorder));
   continueMatchReplay(recorder);
-  if (matchReplayDone(recorder, s.game)) finishReplay(s);
-  else writePart(s, false);
+  if (s.game.phase === Phase.match && !s.session.paused) return;
+  if (recorder.lines.length >= PART_LINES) writePart(s, false);
+  else if (matchReplayDone(recorder, s.game)) finishReplay(s);
 }
