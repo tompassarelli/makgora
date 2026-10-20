@@ -15,7 +15,6 @@
     "src/**/*.tests.ts",
     "src/game/core/math/parityCorpus.ts",
     "src/platform/airCutoffProbe.ts",
-    "src/host/entries/physicsProbeMain.ts",
     "src/host/entries/frameCostMain.ts",
     "src/host/entries/integrityMain.ts",
     "src/host/entries/playableMain.ts",

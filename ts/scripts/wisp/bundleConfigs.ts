@@ -42,7 +42,6 @@ export const bundleConfigs = {
   "analog-keys": { entry: "src/host/entries/analogKeysMain.ts", bundle: "analog-keys.lua" },
   "analog-cursor": { entry: "src/host/entries/analogCursorMain.ts", bundle: "analog-cursor.lua" },
   "native-perf": { entry: "src/host/entries/nativePerfMain.ts", bundle: "native-perf.lua" },
-  "physics-probe": { entry: "src/host/entries/physicsProbeMain.ts", bundle: "physics-probe.lua" },
   "frame-cost": { entry: "src/host/entries/frameCostMain.ts", bundle: "frame-cost.lua" },
   "damage-blend-probe": { entry: "src/host/entries/damageBlendProbeMain.ts", bundle: "damage-blend-probe.lua" },
   "stack-trace": { entry: "src/host/entries/stackTraceMain.ts", bundle: "stack-trace.lua", compilerOptions: { rootDir: "." }, tstl: stackTraces },
