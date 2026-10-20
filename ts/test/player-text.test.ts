@@ -169,7 +169,7 @@ function recordShown(clients: Lockstep, views: readonly FrameView[], shown: Set<
 
 const developerText = (text: string) => DENIED.filter((term) => text.toLowerCase().includes(term));
 
-test("all-ready controller Start advances selection and enters the match without dropping the menu publication [k1 scenario]", () => {
+test("all-ready controller Start advances selection and enters the match publishing BLOCKED once, never rewriting it during play [k1 scenario]", () => {
   const clients = headless.clients({ install: installPlayable, start: startPlayable });
   clients.start();
   clients.frames(30);
@@ -195,7 +195,7 @@ test("all-ready controller Start advances selection and enters the match without
     expect(shell().menuPublication?.phase).toBe("BLOCKED");
   });
   clients.frames(45);
-  clients.everywhere(() => expect(shell().menuPublication?.ticks ?? 15).toBeLessThan(15));
+  clients.everywhere(() => expect(shell().menuPublication).toEqual({ phase: "BLOCKED", ticks: 45 }));
 });
 
 test("the playable build keeps selection chips and cursor on their screen and shows no developer text through a match and results [k3 measure #346]", () => {

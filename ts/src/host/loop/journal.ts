@@ -354,7 +354,7 @@ export function publishMenu(s: ShellState): void {
   const phase: MenuPhase = isParticipantSlot(slot) && menu !== undefined ? menu : "BLOCKED";
   const previous = s.menuPublication;
   if (previous !== undefined) previous.ticks++;
-  if (phase === previous?.phase && previous.ticks < 15) return;
+  if (phase === previous?.phase && (phase === "BLOCKED" || previous.ticks < 15)) return;
   s.menuPublication = { phase, ticks: 0 };
   const { game } = s;
   writeJournalFile(menuFile(journalIdentity(s, s.rollback?.epoch ?? 0), phase, {
