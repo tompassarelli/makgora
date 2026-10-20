@@ -586,8 +586,8 @@ export function takeMatchReplayPart(recorder: MatchReplayRecorder, all: boolean)
 
   if (all) finishStateText(recorder);
   else if (recorder.text?.fold !== undefined) return undefined;
-  const lines = recorder.lines;
-  recorder.lines = [];
+  const lines = all ? recorder.lines : recorder.lines.slice(0, PART_LINES);
+  recorder.lines = all ? [] : recorder.lines.slice(PART_LINES);
   recorder.parts++;
   return lines;
 }
