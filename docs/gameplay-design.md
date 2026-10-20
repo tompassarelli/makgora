@@ -289,11 +289,10 @@ transport (wisp#110) both call it.
   measured echo, capped at 16 frames (267 ms); past that a connection holds
   prediction at the window edge instead. Local matches use the default.
 - **Lobby agreement:** each player sees every proposal on character select.
-  The match uses the highest proposal for everyone. The line leads with the match delay and who set it, then each
-  player's request, echo and measured simulation rate in frames per second,
-  e.g. `Delay 16 frames, set by P3 · P1 2 (83 ms) 60 · P2 9 (283 ms) 60
-  · P3 16 (583 ms) 40`, so four players fit one row of 106 characters. When the agreed delay is 8 frames (133 ms) or more, the lobby
-  warns: "Input delay of 8+ frames: this connection will feel sluggish".
+  The match uses the highest proposal for everyone. Character select shows it
+  as an "Input delay: N frames" box in the rules block (red from 8 frames,
+  133 ms), and each human card's bottom bar adds that player's echo online,
+  e.g. "P2 · 83 ms", red while their machine runs slow.
   Input delay stays the same for every player.
 - **Slow machine:** each client measures, every real second (os.clock), the
   frames it simulated (speculative frames in a match, callbacks elsewhere,

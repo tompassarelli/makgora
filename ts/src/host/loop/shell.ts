@@ -376,8 +376,8 @@ function serviceDelay(s: ShellState, rollback: Rollback): void {
   const local = localSlot();
   netDelay.serviceNetDelay(rollback.net, s.game, local, rollback.delay, s.game.phase === Phase.match, rollback.predictionHeld || rollback.stalled > 0);
   if (s.game.phase !== Phase.characterMenu || floorMod(rollback.net.ticks, 30) !== 0) return;
-  const text = netDelay.lobbyDelayText(rollback.net, s.game);
-  for (const panel of views(s).selections) panel.showDelay(text);
+  const net = netDelay.lobbyNet(rollback.net, s.game);
+  for (const panel of views(s).selections) panel.showDelay(net);
 }
 
 

@@ -8,6 +8,7 @@ import { RULE_HELP_HEIGHT, RULE_HELP_WIDTH, hoveredRule, ruleHelp, visibleRuleGr
 
 
 import { f32 } from "wisp/src/sim/f32";
+import { at } from "wisp/src/runtime/lookup";
 import { floorMod } from "wisp/src/sim/intMath";
 import { Action } from "../input/actions";
 import type { KeyBindings } from "../input/keyBindings";
@@ -82,6 +83,11 @@ import { slotColor, teamColor } from "./slotColors";
 import { type TutorialButton, type TutorialMenuFrames, createTutorialMenu, markTutorialSeen, offersTutorial, showTutorialLesson, tutorialAvailable, tutorialSeen } from "./tutorialMenu";
 import { ButtonClicks, type MenuControls, bindSyncHandler, consoleUi, coverScreen, createBackdrop, createSyncTrigger, createText, gameUi, highlightText, placeTopLeft, setFrameText, sizeText } from "./frames";
 
+
+export interface LobbyNet {
+  readonly delayText: string;
+  readonly pings: readonly string[];
+}
 
 export interface SelectionActions {
   selectChoice(participantId: number, choice: RosterTile): void;
@@ -264,7 +270,7 @@ export class SelectionPanel {
   private readonly movesTitle: framehandle;
   private readonly movesBody: framehandle;
   private readonly delayLine: framehandle;
-  private shownDelay = "";
+  private net: LobbyNet = { delayText: "", pings: PARTICIPANT_SLOTS.map(() => "") };
 
   private readonly modeLabel: framehandle;
   private readonly stockValue: framehandle;
@@ -397,8 +403,9 @@ export class SelectionPanel {
     BlzFrameSetTextAlignment(settingsLabel, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
     this.settingsLabel = settingsLabel;
     setFrameText(settingsLabel, `${MENU_STYLE.gold}Controls (F1)|r`);
-    this.delayLine = label(root, `MeleeDelayLine${suffix}`, f32(0.06), f32(0.6), f32(0.72), f32(0.03), f32(0.010));
-    BlzFrameSetTextAlignment(this.delayLine, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_RIGHT);
+    const { inputDelay } = RULE_BUTTONS;
+    art(root, `MeleeDelayArt${suffix}`, "war3mapImported\\SelectionAction.tga", inputDelay.x, inputDelay.y, inputDelay.width, inputDelay.height);
+    this.delayLine = label(root, `MeleeDelayLine${suffix}`, f32(inputDelay.x + f32(0.006)), f32(inputDelay.y - f32(0.002)), f32(inputDelay.width - f32(0.012)), f32(inputDelay.height - f32(0.004)), MENU_STYLE.headerSize);
     art(root, `MeleeMovesArt${suffix}`, "war3mapImported\\SelectionAction.tga", MOVES_BOX.x, MOVES_BOX.y, MOVES_BOX.width, MOVES_BOX.height);
     this.movesLabel = label(root, `MeleeMovesLabel${suffix}`, f32(MOVES_BOX.x + f32(0.006)), f32(MOVES_BOX.y - f32(0.002)), f32(MOVES_BOX.width - f32(0.012)), f32(MOVES_BOX.height - f32(0.004)), f32(0.011));
     setFrameText(this.movesLabel, "Moves");
@@ -825,10 +832,9 @@ export class SelectionPanel {
   }
 
 
-  showDelay(text: string): void {
-    if (text === this.shownDelay) return;
-    this.shownDelay = text;
-    setFrameText(this.delayLine, text);
+  showDelay(net: LobbyNet): void {
+    this.net = net;
+    setFrameText(this.delayLine, net.delayText);
   }
 
   update(game: Readonly<MatchState>, loading: boolean, settingsOpen: boolean, menuCursorAllowed: boolean, sessionWins: Readonly<Slots<number>>): void {
@@ -925,7 +931,7 @@ export class SelectionPanel {
       BlzFrameSetVisible(frames.name, active && ready);
       const winsShown = active && ready && sessionWins[slot] > 0;
       presentSessionWinsFrames(frames.wins, sessionWins[slot], active && ready);
-      const statusText = human && !humanPresent(game, slot) ? "No player" : active && !ready ? "Choose fighter" : active && !human ? "CPU" : `P${I2S(slot + 1)}`;
+      const statusText = human && !humanPresent(game, slot) ? "No player" : active && !ready ? "Choose fighter" : active && !human ? "CPU" : `P${I2S(slot + 1)}${at(this.net.pings, slot)}`;
       setFrameText(frames.status, statusText);
       placeBottomBar(frames, slot, winsShown, statusText, `x${I2S(sessionWins[slot])}`);
       if (ready) {

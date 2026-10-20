@@ -4,12 +4,14 @@ import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS } from "../../game/input/participants";
 import { type MatchState, humanActive, humanCount } from "../../game/lobby/lobbyState";
 import {
-  DEFAULT_DELAY, type DelayCorrection, type DelayPolicy, HIGH_DELAY_FRAMES, type RttEstimate, agreedDelay, connectionPoor, correctDelay, correctedDelay,
+  DEFAULT_DELAY, type DelayCorrection, type DelayPolicy, type RttEstimate, agreedDelay, connectionPoor, correctDelay, correctedDelay,
   MAX_FIXED_DELAY, delayCorrection, delayPolicy, highDelay, nextDelay, observeRtt, rollbackBudget, rttEstimate, smoothedRttMs,
 } from "../../game/netcode/delayPolicy";
 import { type FixedDelay, isFixedDelay } from "../../game/netcode/fixedSchedule";
 import { PENDING_CAPACITY } from "../../game/netcode/shadowSchedule";
 import { createText, gameUi, placeTopLeft } from "../../game/ui/frames";
+import { MENU_STYLE } from "../../game/ui/hudLayout";
+import type { LobbyNet } from "../../game/ui/selectionUi";
 import { at } from "wisp/src/runtime/lookup";
 import { type MachineRate, machineRate, noteMachineSecond, slowMachineText } from "../../game/netcode/machineRate";
 import { type Roster, isActive } from "../../game/sim/roster";
@@ -86,31 +88,15 @@ export function matchDelay(net: Readonly<NetDelay>, game: Readonly<MatchState>):
   return isFixedDelay(agreed) ? agreed : DEFAULT_DELAY;
 }
 
-export function lobbyDelayText(net: Readonly<NetDelay>, game: Readonly<MatchState>): string {
-  const parts: string[] = [];
+export function lobbyNet(net: Readonly<NetDelay>, game: Readonly<MatchState>): LobbyNet {
   const online = isOnline(game);
-  const agreed = matchDelay(net, game);
-  let decider = -1;
-  let deciders = 0;
-  for (const slot of PARTICIPANT_SLOTS) {
-    if (!humanActive(game, slot)) continue;
-    const request = requestFor(net, game, slot);
-    if (request === agreed) {
-      decider = slot;
-      deciders++;
-    }
+  const delay = matchDelay(net, game);
+  const pings = PARTICIPANT_SLOTS.map((slot) => {
     const echo = at(net.slotEchoMs, slot);
-    const shown = online && echo >= 0 ? ` (${I2S(echo)} ms)` : "";
-    const fps = at(net.slotFps, slot);
-    const rate = online && fps >= 0 ? ` ${I2S(fps)}` : "";
-    parts.push(`P${I2S(slot + 1)} ${I2S(request)}${shown}${rate}`);
-  }
-  const setBy = online && deciders === 1 ? `, set by P${I2S(decider + 1)}` : "";
-  const lines = [`Delay ${I2S(agreed)} frames${setBy} · ${parts.join(" · ")}`];
-  if (highDelay(agreed)) lines.push(`|cffff4040Input delay of ${I2S(HIGH_DELAY_FRAMES)}+ frames: this connection will feel sluggish|r`);
-  const slow = slowMachineLine(net, game);
-  if (slow !== "") lines.push(slow);
-  return lines.join("\n");
+    if (!online || !humanActive(game, slot) || echo < 0) return "";
+    return at(net.slotSlow, slot) ? ` · |cffff4040${I2S(echo)} ms|r` : ` · ${I2S(echo)} ms`;
+  });
+  return { delayText: `Input delay: ${highDelay(delay) ? "|cffff4040" : MENU_STYLE.gold}${I2S(delay)} frames|r`, pings };
 }
 
 export function slowMachineLine(net: Readonly<NetDelay>, game: Readonly<MatchState>): string {
