@@ -1,4 +1,3 @@
-import { MATCH_CHAT_BOX, SELECT_CHAT_BOX } from "../../game/ui/nativeChat";
 import { shieldEnergyReady, shieldEnergyReceipt } from "../../game/session/shieldEnergyCapture";
 import { writeLines } from "wisp/src/platform/fileio";
 import { computerActive } from "../../game/lobby/lobbyState";
@@ -609,7 +608,6 @@ export function renderUi(s: ShellState): void {
   }
   ui.clock.update(showMatch && game.phase === Phase.match && timedMatch(game), remainingSeconds(game));
   ui.match.presentCountdown(game, showMatch);
-  ui.chat.update(!pauseHudHidden(s), selecting ? SELECT_CHAT_BOX : MATCH_CHAT_BOX);
   ui.training.update(showMatch && game.training && game.phase === Phase.match, game.trainer, localKeys);
   ui.classic?.updateCard(game);
   const cleared = game.lore && game.phase === Phase.result && game.run.active && game.run.cleared ? game.run.current : undefined;
