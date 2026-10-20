@@ -76,7 +76,7 @@ export const copyPart = (name: string, lines: readonly string[]) => [
   "}",
 ];
 
-export const restWalk = (mode: "copy" | "same", lines: string[], group: FighterGroup, rows: readonly FighterFieldRow[], bit: string, walkInto: (indent: string) => void) => {
+export const restWalk = (mode: "copy" | "same", lines: string[], group: FighterGroup, rows: readonly FighterFieldRow[], bit: string, walkInto: (indent: string) => void, used: Set<string>) => {
   const local = group.local;
   const source = sourceLocal(local);
   const prefix = `${group.key}.`;
@@ -86,13 +86,67 @@ export const restWalk = (mode: "copy" | "same", lines: string[], group: FighterG
     lines.push("  }");
     return;
   }
-  lines.push(`  const ${local}: ${group.type} = target.${group.key};`, `  if ((source.restingGroups & ${bit}) === 0) {`, `    const ${source} = source.${group.key};`);
+  const hasArray = rows.some((row) => arrayOf(row) !== undefined);
+  lines.push(hasArray ? `  const ${local} = target.${group.key} as ${group.type};` : `  const ${local}: ${group.type} = target.${group.key};`, `  if ((source.restingGroups & ${bit}) === 0) {`, `    const ${source} = source.${group.key};`);
   walkInto("    ");
   lines.push(`  } else if ((target.restingGroups & ${bit}) === 0) {`);
+  restWrites(lines, "    ", local, rows, prefix, used);
+  lines.push("  }");
+};
+
+export const restWrites = (lines: string[], indent: string, local: string, rows: readonly FighterFieldRow[], prefix: string, used: Set<string>) => {
   for (const row of rows) {
     if (row.copy === "none") continue;
-    if (row.copy !== "plain" || arrayOf(row) !== undefined || leaf(row, prefix).includes(".")) throw new Error(`${row.path}: a resting group copies plain scalars only`);
-    lines.push(`    ${local}.${leaf(row, prefix)} = ${row.init};`);
+    const array = arrayOf(row);
+    if (array !== undefined && array.layout === "scalarArray" && row.init === "noSlots()") {
+      const name = leaf(row, prefix).replace("[]", "");
+      for (let slot = 0; slot < (UNROLLED[array.capacity] ?? 0); slot++) lines.push(`${indent}${local}.${name}[${slot}] = undefined;`);
+      continue;
+    }
+    if (row.copy !== "plain" || array !== undefined || leaf(row, prefix).includes(".")) throw new Error(`${row.path}: a resting group copies plain scalars and empty slot arrays only`);
+    const constant = /^([A-Z]\w*)\./.exec(row.init)?.[1];
+    if (constant !== undefined) used.add(constant);
+    lines.push(`${indent}${local}.${leaf(row, prefix)} = ${row.init};`);
   }
+};
+
+export const packWalk = (mode: "copy" | "same", lines: string[], group: FighterGroup, bit: string, walkInto: (indent: string, local: string, source: string) => void, used: Set<string>) => {
+  const array = FIGHTER_ARRAYS.find((candidate) => candidate.path === "pack");
+  if (array === undefined || array.layout !== "animalMajor") throw new Error("pack needs an animalMajor layout");
+  const length = FIGHTER_FIELDS.find((row) => row.path === "pack.length");
+  if (length === undefined) throw new Error("pack.length row is missing");
+  const index = array.index ?? "animal";
+  const local = group.local;
+  const source = sourceLocal(local);
+  const loop = (indent: string, body: (inner: string) => void) => {
+    lines.push(`${indent}for (let ${index} = 0; ${index} <= source.pack.length; ${index}++) {`, `${indent}  const ${local} = placedObject(target, ${index})${mode === "copy" ? ` as ${group.type}` : ""};`);
+    body(`${indent}  `);
+    lines.push(`${indent}}`);
+  };
+  const compared = (inner: string) => {
+    lines.push(`${inner}const ${source} = placedObject(source, ${index});`);
+    walkInto(inner, local, source);
+  };
+  if (mode === "same") {
+    lines.push(`  if (${sameTest(length, "target.pack.length", "source.pack.length")}) return false;`, `  if ((target.restingGroups & source.restingGroups & ${bit}) === 0) {`);
+    loop("    ", compared);
+    lines.push("  }");
+    return;
+  }
+  if (length.copy !== "plain") throw new Error("pack.length copies plain");
+  lines.push(
+    `  const pack = target.pack as ${group.type}[];`,
+    "  const sourcePack = source.pack;",
+    "  const resized = pack.length !== sourcePack.length;",
+    "  if (resized) {",
+    "    const spares = packSpares(target);",
+    "    while (pack.length < sourcePack.length) pack[pack.length] = spares?.[pack.length] ?? createPlacedObject();",
+    "    pack.length = sourcePack.length;",
+    "  }",
+    `  if ((source.restingGroups & ${bit}) === 0) {`,
+  );
+  loop("    ", compared);
+  lines.push(`  } else if (resized || (target.restingGroups & ${bit}) === 0) {`);
+  loop("    ", (inner) => restWrites(lines, inner, local, FIGHTER_FIELDS.filter((row) => row.path.startsWith("placed.")), "placed.", used));
   lines.push("  }");
 };

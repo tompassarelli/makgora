@@ -9,7 +9,8 @@ import { AttackStyle, ProjectileKind, SpecialAction } from "./codes";
 import { mutableProjectile } from "./fighterProjectiles";
 import { inGrabContext } from "./conditions";
 import { staggerCompanion } from "./companions";
-import { type Fighter, type PlacedObject, placedObject } from "./fighter";
+import { type Fighter, type PlacedObject, mutablePlacedObject, placedObject } from "./fighter";
+import type { Resting } from "./fighterRest";
 import { HERO_PROJECTILE_CAP, placeHeroStrike, runningHeroSpecial, spawnHeroProjectileAt } from "./specials/engine";
 import { CompanionMode, type SpecialPlacement } from "./specials/schema";
 import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "./hitRegions";
@@ -58,7 +59,7 @@ export function placeStrikeBody(target: Capsule, x: number, z: number, radius: n
   target.radius = radius;
 }
 
-function placeBody(placed: Readonly<PlacedObject>, spec: Readonly<SpecialPlacement>): void {
+function placeBody(placed: Resting<PlacedObject>, spec: Readonly<SpecialPlacement>): void {
   placeStrikeBody(body, placed.x, placed.z, spec.radius, spec.height);
 }
 
@@ -153,7 +154,7 @@ function ownedProjectiles(f: Readonly<Fighter>): number {
 }
 
 
-function towardNearestFoe(world: Roster, ownerSlot: number, placed: Readonly<PlacedObject>): number {
+function towardNearestFoe(world: Roster, ownerSlot: number, placed: Resting<PlacedObject>): number {
   let direction = placed.direction;
   let nearest = -1.0;
   for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
@@ -175,9 +176,9 @@ export function advancePlacedObjects(world: Roster): void {
     if (!isActive(world, ownerSlot)) continue;
     const owner = fighterAt(world, ownerSlot);
     for (let animal = 0; animal <= owner.pack.length; animal++) {
-      const placed = placedObject(owner, animal);
-      const spec = placed.spec;
-      if (placed.life <= 0 || spec === undefined) continue;
+      const spec = placedObject(owner, animal).spec;
+      if (placedObject(owner, animal).life <= 0 || spec === undefined) continue;
+      const placed = mutablePlacedObject(owner, animal);
       const channeled = spec.channeled === true;
       if (channeled && runningHeroSpecial(owner)?.placement !== spec) {
         placed.life = 0;

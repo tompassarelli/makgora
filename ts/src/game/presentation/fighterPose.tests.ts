@@ -1,3 +1,4 @@
+import { mutableCandle } from "../sim/fighterRest";
 import { assertEquals, assertGreaterThan, assertTrue, test } from "wisp/src/runtime/testing";
 import { createFrameControls } from "../match/controls";
 import { captureFrame, createMatchFrameInput, executeMatchFrame } from "../match/frameInput";
@@ -62,7 +63,7 @@ test("Kobold switches idle and ground cadence with candle ownership on the same 
     advanceFighterPose(pose, f, world, input, false, false, false, false);
     assertGreaterThan(pose.clipTime, 0.0);
     copyFighterPoseInto(expected, pose, world);
-    f.candle.state = CandleState.held;
+    mutableCandle(f).state = CandleState.held;
     advanceFighterPose(pose, f, world, input, false, false, false, false);
     assertEquals(pose.clipIndex, KOBOLD_CLIPS[gait].index);
     assertEquals(pose.clipTime, 0.0);
@@ -71,7 +72,7 @@ test("Kobold switches idle and ground cadence with candle ownership on the same 
     advanceFighterPose(pose, f, world, input, false, false, false, false);
     assertEquals(firstFighterPoseDifference(expected, pose, world, world), undefined);
     for (const state of [CandleState.resting, CandleState.lost]) {
-      f.candle.state = state;
+      mutableCandle(f).state = state;
       advanceFighterPose(pose, f, world, input, false, false, false, false);
       assertEquals(pose.clipIndex, KOBOLD_BARE_CLIPS[gait].index);
     }

@@ -9,7 +9,7 @@ import { aerialJumps } from "./itemBuffs";
 import { max } from "../core/numbers";
 import { AttackStyle, DASH_GRAB_REQUEST, DownState, GrabAction, LedgeState, ProjectileKind, SpecialAction, SurfaceContact } from "./codes";
 import { cancelsJumpSquat, isTumbling } from "./conditions";
-import { type Fighter, SHIELD_POWERSHIELD_INPUT_WINDOW_FRAMES, placedObject } from "./fighter";
+import { type Fighter, SHIELD_POWERSHIELD_INPUT_WINDOW_FRAMES, mutablePlacedObject, placedObject } from "./fighter";
 import { clearDash } from "./groundMovement";
 import { clearMash } from "./mash";
 import { DOWN_ATTACK_FRAMES, attackDurationFramesForGrounding, isSmashAttack } from "./moves";
@@ -119,8 +119,7 @@ export function cancelSpecialState(f: Fighter): void {
       if (projectile.life > 0 && spec?.cancelOnInterrupt === true && spec.life - projectile.life < (spec.activeFrom ?? 0)) mutableProjectile(f, index).life = 0;
     }
     for (let animal = 0; animal <= f.pack.length; animal++) {
-      const placed = placedObject(f, animal);
-      if (placed.spec?.channeled === true) placed.life = 0;
+      if (placedObject(f, animal).spec?.channeled === true) mutablePlacedObject(f, animal).life = 0;
     }
   }
   special.fall = false;
@@ -134,14 +133,15 @@ export function cancelSpecialState(f: Fighter): void {
 }
 
 
+const restingLife = (life: number) => life === 0 && 1 / life > 0;
+
 export function clearSpecialOnStock(f: Fighter): void {
   cancelSpecialState(f);
   const { special } = f;
   special.fall = false;
   special.hit = false;
   restBear(f);
-  f.placed.life = 0;
-  for (const animal of f.pack) animal.life = 0;
+  for (let animal = 0; animal <= f.pack.length; animal++) if (!restingLife(placedObject(f, animal).life)) mutablePlacedObject(f, animal).life = 0;
   for (let action = 0; action < special.cooldowns.length; action++) special.cooldowns[action] = 0;
   special.direction = 0;
   special.seekTarget = 0;

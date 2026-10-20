@@ -17,6 +17,7 @@ import { observeActionDecision, observeActionStart } from "./observations";
 import { clearDownState } from "./transitions";
 import { stageBounds } from "./stageBounds";
 import { checkBlastZone } from "./stocks";
+import { mutableWater } from "./fighterRest";
 
 
 export const HYDRA_TRIGGER_FRAMES = 150;
@@ -103,15 +104,21 @@ export function swimVelocity(vx: number, direction: number): number {
 
 
 
+function waterHolds(water: Readonly<Fighter["water"]>, now: boolean, grounded: boolean): boolean {
+  return !now && !water.inWater && water.hydraFrame <= 0 && (!grounded || (water.frames === 0 && water.entries === 0));
+}
+
 export function advanceWater(world: Roster, stage: number, matchFrame: number, hazards: boolean): void {
   if (!hasTide(stage)) return;
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;
     const f = fighterAt(world, slot);
     if (f.status.out) continue;
-    const { motion, water } = f;
+    const { motion } = f;
     moveMeleeX(f, tidePush(stage, matchFrame, motion.x, motion.z));
     const now = inSea(stage, motion.x, motion.z);
+    if (waterHolds(f.water, now, motion.grounded)) continue;
+    const water = mutableWater(f);
     if (motion.grounded) {
       water.frames = 0;
       water.entries = 0;
@@ -148,8 +155,8 @@ export function collectHydraContacts(world: Roster, stage: number, matchFrame: n
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;
     const f = fighterAt(world, slot);
-    const { water } = f;
-    if (water.hydraFrame < HYDRA_STRIKE_FRAME) continue;
+    if (f.water.hydraFrame < HYDRA_STRIKE_FRAME) continue;
+    const water = mutableWater(f);
     if (!f.status.out && inSea(stage, f.motion.x, f.motion.z)) hydraCatch(world, slot, stage);
     water.hydraStrikeFrame = matchFrame;
     water.hydraFrame = 0;

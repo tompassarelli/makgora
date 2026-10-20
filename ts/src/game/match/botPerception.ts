@@ -6,7 +6,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../input/participants";
 import { PROJECTILE_CAPACITY, createFighter, type Fighter, type Projectile } from "../sim/fighter";
-import type { Bear } from "../sim/fighterRest";
+import type { Bear, StageCannon } from "../sim/fighterRest";
 import { fighterAt, isActive, type Controls, type Roster } from "../sim/roster";
 import { copyCandleView, sameCandleView } from "../sim/heroes/koboldCandleView";
 
@@ -386,7 +386,7 @@ function copyObservation(target: ObservationFighter, source: Readonly<Fighter>):
   const fromSurfaceRecovery = source.surfaceRecovery;
   surfaceRecovery.state = fromSurfaceRecovery.state;
   surfaceRecovery.frame = fromSurfaceRecovery.frame;
-  const cannon = target.cannon;
+  const cannon: StageCannon = target.cannon;
   const fromCannon = source.cannon;
   cannon.held = fromCannon.held;
   const bear: Bear = target.bear;

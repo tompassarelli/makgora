@@ -25,7 +25,7 @@ import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { type FighterTuning, authoredTuning } from "./tuning";
 import { HitElement } from "./hitRegions";
 import { initializeInfluenceOperands } from "./influenceOperands";
-import { type Bear, type FreezeTrap, RESTING_GROUPS } from "./fighterRest";
+import { type Bear, type Candle, type FreezeTrap, REST_PLACED, RESTING_GROUPS, type Resting, type StageCannon, type Water } from "./fighterRest";
 import type { SpecialPlacement, SpecialProjectile } from "./specials/schema";
 
 export const PROJECTILE_CAPACITY = 16;
@@ -297,25 +297,6 @@ export interface Projectile {
 }
 
 
-interface Candle {
-  heat: number;
-  state: CandleState;
-  lit: boolean;
-  x: number;
-  z: number;
-  vx: number;
-  vz: number;
-  surface: number | undefined;
-  timer: number;
-  away: number;
-  guard: number;
-  readonly struck: (number | undefined)[];
-  specialStruck: number;
-  dropSerial: number;
-  snuffSerial: number;
-  returnSerial: number;
-}
-
 interface Dodge {
   airDodging: boolean;
   airFrame: number;
@@ -412,33 +393,6 @@ interface Ledge {
 }
 
 
-interface StageCannon {
-
-  held: number | undefined;
-
-  firing: number | undefined;
-
-  cooldown: number;
-
-  passing: boolean;
-}
-
-
-interface Water {
-
-  inWater: boolean;
-
-  frames: number;
-
-  entries: number;
-
-  hydraFrame: number;
-
-  hydraX: number;
-
-  hydraStrikeFrame: number;
-}
-
 interface Status {
   offscreenFrames: number;
   damage: number;
@@ -481,29 +435,19 @@ interface Mana {
 
 export interface PlacedObject {
   life: number;
-
   age: number;
   x: number;
   z: number;
-
   direction: number;
   durability: number;
-
   serial: number;
-
   spec: SpecialPlacement | undefined;
-
   readonly struck: (number | undefined)[];
-
   specialStruck: number;
-
   mode: number;
   modeFrame: number;
-
   apart: number;
-
   bitten: number;
-
   surface: number | undefined;
 }
 
@@ -533,14 +477,13 @@ export interface Fighter {
   readonly grab: Grab;
   readonly ledge: Ledge;
   readonly platform: PlatformInput;
-  readonly cannon: StageCannon;
-  readonly water: Water;
+  readonly cannon: Readonly<StageCannon>;
+  readonly water: Readonly<Water>;
   readonly status: Status;
   readonly mana: Mana;
-  readonly candle: Candle;
-  readonly placed: PlacedObject;
-
-  readonly pack: PlacedObject[];
+  readonly candle: Resting<Candle>;
+  readonly placed: Resting<PlacedObject>;
+  readonly pack: readonly Resting<PlacedObject>[];
 }
 
 const repeat = <T>(count: number, make: () => T): T[] => Array.from({ length: count }, () => make());
@@ -803,6 +746,11 @@ export function createPlacedObject(): PlacedObject {
   return { life: 0, age: 0, x: 0.0, z: 0.0, direction: 1, durability: 0.0, serial: 0, spec: undefined, struck: noSlots(), specialStruck: 0, mode: 0, modeFrame: 0, apart: 0, bitten: 0, surface: undefined };
 }
 
-export function placedObject(fighter: Readonly<Fighter>, slot = 0): PlacedObject {
+export function placedObject(fighter: Readonly<Fighter>, slot = 0): Resting<PlacedObject> {
   return slot === 0 ? fighter.placed : at(fighter.pack, slot - 1);
+}
+
+export function mutablePlacedObject(fighter: Fighter, slot = 0): PlacedObject {
+  fighter.restingGroups = fighter.restingGroups & ~REST_PLACED;
+  return placedObject(fighter, slot) as PlacedObject;
 }

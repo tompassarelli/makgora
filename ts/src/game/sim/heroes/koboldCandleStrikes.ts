@@ -6,6 +6,7 @@ import { StrikeKind, type StrikeResult, normalStrike, placeStrikeBody, projectil
 import type { Fighter } from "../fighter";
 import { type Roster, fighterAt, isActive } from "../roster";
 import { sameTeam } from "../teams";
+import { type Candle, mutableCandle } from "../fighterRest";
 import { CANDLE_BODY_HEIGHT, CANDLE_BODY_RADIUS, candleLoose, kickCandle, snuffCandle } from "./koboldCandle";
 
 const body = emptyCapsule();
@@ -18,7 +19,7 @@ function snuffs(result: Readonly<StrikeResult>): boolean {
 
 const contest = { snuffed: false, kickSlot: -1, kickDirection: 0, kickProjectile: -1 };
 
-function contestCandle(world: Roster, ownerSlot: number, candle: Fighter["candle"]): void {
+function contestCandle(world: Roster, ownerSlot: number, candle: Candle): void {
   contest.snuffed = false;
   contest.kickSlot = -1;
   contest.kickDirection = 0;
@@ -47,7 +48,7 @@ export function strikeCandles(world: Roster): void {
     if (!isActive(world, ownerSlot)) continue;
     const owner = fighterAt(world, ownerSlot);
     if (!candleLoose(owner)) continue;
-    const { candle } = owner;
+    const candle = mutableCandle(owner);
     placeStrikeBody(body, candle.x, candle.z, CANDLE_BODY_RADIUS, CANDLE_BODY_HEIGHT);
     contestCandle(world, ownerSlot, candle);
     if (contest.snuffed) snuffCandle(owner);

@@ -15,6 +15,7 @@ import { HYDRA_CATCH_DAMAGE, HYDRA_TELL_FRAMES, HYDRA_TRIGGER_FRAMES } from "./w
 import { SEA_SURFACE_Z, TIDE_SPEED, inSea } from "./stageHazards";
 import { hydraStrikeZ } from "../presentation/stageHazards";
 import { setWorldMotionValue } from "./motion";
+import { mutableWater } from "./fighterRest";
 import { copyControls, createRoster, neutralControls } from "./roster";
 import { chooseRecoveryInput } from "../match/botRecovery";
 import { createFrameControls } from "../match/controls";
@@ -54,7 +55,7 @@ function floater(character: Character): Fighter {
 test("every fighter's water jump and double jump from the surface reach above the deck [k3 measure docs/design/water-stage.md]", () => {
   for (const character of SELECTABLE_CHARACTERS) {
     const f = floater(character);
-    f.water.entries = 1;
+    mutableWater(f).entries = 1;
     advanceSolo(f, TOMB, JUMP, 0.0);
     let highest = f.motion.z;
     let doubled = false;
@@ -159,8 +160,9 @@ test("every computer fighter in the water when the hydra's tell starts leaves it
     const game = createMatchState();
     game.phase = Phase.match; game.stageChoice = TOMB; game.matchFrame = tideFrame;
     fighter.motion.z = SEA_SURFACE_Z; fighter.motion.grounded = false; fighter.motion.surface = undefined;
-    fighter.water.frames = HYDRA_TRIGGER_FRAMES; fighter.water.inWater = true; fighter.water.entries = 1;
-    fighter.water.hydraFrame = 1; fighter.water.hydraX = x;
+    const water = mutableWater(fighter);
+    water.frames = HYDRA_TRIGGER_FRAMES; water.inWater = true; water.entries = 1;
+    water.hydraFrame = 1; water.hydraX = x;
     const frames = createFrameControls();
     const input = neutralControls();
     let struck = false;

@@ -12,7 +12,7 @@ import { AttackStyle, Character, ProjectileKind, SpecialAction } from "../codes"
 import { specialVariant } from "../heroes/koboldCandle";
 import { mutableProjectile } from "../fighterProjectiles";
 import { canAttack, inGrabContext, isIntangible } from "../conditions";
-import { type Fighter, type Projectile, placedObject } from "../fighter";
+import { type Fighter, type Projectile, mutablePlacedObject, placedObject } from "../fighter";
 import { type FighterSpecials, type AuthoredSpecial, CompanionMode, CompanionOrder, type SpecialFollowUp, type SpecialGuard, type SpecialKit, type SpecialBeam, type SpecialMotion, type SpecialPlacement, type SpecialProjectile, FOLLOW_UP_FORM, FollowUpInput, Relocation, SpecialForm, SpecialSlot, specialForm, specialKit, ultimateForm } from "./schema";
 import { type HitRegion, NO_HIT_REGION, authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../hitRegions";
 import { type Controls, type Roster, fighterAt, isActive } from "../roster";
@@ -599,8 +599,8 @@ export function companionReady(f: Readonly<Fighter>, slot = 0): boolean {
 
 
 function orderCompanion(f: Fighter, order: CompanionOrder, slot = 0): void {
-  const placed = placedObject(f, slot);
-  if (placed.life <= 0 || placed.spec?.companion === undefined) return;
+  if (placedObject(f, slot).life <= 0 || placedObject(f, slot).spec?.companion === undefined) return;
+  const placed = mutablePlacedObject(f, slot);
   if (order === CompanionOrder.lunge) {
     if (!companionReady(f, slot)) return;
     placed.mode = CompanionMode.lunge;
@@ -628,8 +628,8 @@ function placeObjects(f: Fighter, spec: Readonly<SpecialPlacement>, frame: numbe
 }
 
 function placeOne(f: Fighter, spec: Readonly<SpecialPlacement>, slot: number, side: number, offsetX: number, deckStage: number | undefined): void {
-  const placed = placedObject(f, slot);
-  if (spec.keepExisting === true && placed.life > 0) return;
+  if (spec.keepExisting === true && placedObject(f, slot).life > 0) return;
+  const placed = mutablePlacedObject(f, slot);
   const facing = f.facing < 0 ? -1 : 1;
   placed.life = spec.life;
   placed.age = 0;
@@ -746,7 +746,7 @@ export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Contr
   }
   applyWindows(f, move, frame);
   if (frame >= heroSpecialEndFrame(f, move)) {
-    if (move.recall === true) f.placed.life = 0;
+    if (move.recall === true) mutablePlacedObject(f).life = 0;
     endHeroSpecial(f, move);
   }
 }
@@ -1002,8 +1002,8 @@ function moveToRelocation(world: Roster, f: Fighter, segment: Readonly<SpecialMo
     f.motion.x = anchor.x;
     f.motion.z = anchor.z;
   } else if (segment.relocate === Relocation.placed) {
-    const { placed } = f;
-    if (placed.life <= 0) return false;
+    if (f.placed.life <= 0) return false;
+    const placed = mutablePlacedObject(f);
     f.motion.x = placed.x;
     f.motion.z = placed.z;
     f.facing = placed.direction;

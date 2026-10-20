@@ -29,6 +29,7 @@ import { type Roster, createRoster, fighterAt, isActive } from "../sim/roster";
 import { authoredTuning } from "../sim/tuning";
 import { settleProjectileSlots } from "../sim/fighterProjectiles";
 import { settleRestingGroups } from "../sim/fighterRest";
+import { mutablePlacedObject } from "../sim/fighter";
 import { canonicalState, fighterSpecialsCanonical, specialMoveCanonical, specialPlacementCanonical, specialProjectileCanonical, stateChecksum } from "./canonical";
 import { type ReplayState, captureReplaySnapshot, copyReplayState, createReplaySnapshot } from "./snapshot";
 
@@ -469,9 +470,8 @@ function rebindAuthoredKit(fighter: Fighter): void {
     if (live.spec !== undefined) mutableProjectile(fighter, i).spec = projectiles.get(specialProjectileCanonical(live.spec, "")) ?? live.spec;
   }
   for (let index = 0; index <= fighter.pack.length; index++) {
-    const animal = placedObject(fighter, index);
-    const placed = animal.spec;
-    if (placed !== undefined) animal.spec = placements.get(specialPlacementCanonical(placed, "")) ?? placed;
+    const placed = placedObject(fighter, index).spec;
+    if (placed !== undefined) mutablePlacedObject(fighter, index).spec = placements.get(specialPlacementCanonical(placed, "")) ?? placed;
   }
 }
 

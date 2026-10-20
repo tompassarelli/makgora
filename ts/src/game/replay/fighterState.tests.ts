@@ -1,3 +1,5 @@
+import { mutableCandle } from "../sim/fighterRest";
+import { mutablePlacedObject } from "../sim/fighter";
 import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
 import { Character } from "../sim/codes";
 import { type Fighter, PROJECTILE_CAPACITY, createFighter } from "../sim/fighter";
@@ -100,8 +102,8 @@ test("fighter replay copies preserve every field, absent hit targets included, a
       assertTrue(sameFighterState(fresh, hitting));
     }
   };
-  for (let slot = 0; slot < 4; slot++) cycleCandle(value => { hitting.candle.struck[slot] = value; }, slot + 4, slot + 8);
-  cycleCandle(value => { hitting.candle.surface = value; }, 2, 0);
+  for (let slot = 0; slot < 4; slot++) cycleCandle(value => { mutableCandle(hitting).struck[slot] = value; }, slot + 4, slot + 8);
+  cycleCandle(value => { mutableCandle(hitting).surface = value; }, 2, 0);
   assertEquals(candleSlots(fresh), "8,9,10,11;0");
   for (const variant of [3, 0]) {
     hitting.special.variant = variant;
@@ -325,8 +327,8 @@ function armedFighters(row: FighterFieldRow, armed: Map<string, Armed>, snapshot
   if (when.includes("poison")) base.status.poisonFrames = 3;
   if (when.includes("buff")) base.status.buff = 1;
   if (when.includes("companion")) {
-    base.placed.spec = companionPlacement();
-    for (const animal of base.pack) animal.spec = base.placed.spec;
+    mutablePlacedObject(base).spec = companionPlacement();
+    for (let animal = 1; animal <= base.pack.length; animal++) mutablePlacedObject(base, animal).spec = base.placed.spec;
   }
   base.projectileSlots = PROJECTILE_CAPACITY;
   base.restingGroups = 0;

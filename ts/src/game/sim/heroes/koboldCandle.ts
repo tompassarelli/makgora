@@ -9,6 +9,7 @@ import { surfaceCount, surfaceLeft, surfaceRight, surfaceShiftX, surfaceZAt } fr
 import { stageBounds } from "../stageBounds";
 import { bodyTop } from "../surfaces";
 import { melee } from "../tuning";
+import { type Candle, REST_CANDLE, mutableCandle, settleCandle } from "../fighterRest";
 
 export const CANDLE_MAX_HEAT = 300;
 export const CANDLE_LEVEL_HEAT = 75;
@@ -50,7 +51,7 @@ export function candleHeatGain(source: Readonly<Fighter>, damage: number): numbe
 }
 
 export function feedCandle(f: Fighter, gain: number): void {
-  f.candle.heat = min(CANDLE_MAX_HEAT, f.candle.heat + gain);
+  mutableCandle(f).heat = min(CANDLE_MAX_HEAT, f.candle.heat + gain);
 }
 
 export function candleDrops(target: Readonly<Fighter>, knockback: number): boolean {
@@ -58,7 +59,7 @@ export function candleDrops(target: Readonly<Fighter>, knockback: number): boole
 }
 
 export function dropCandle(f: Fighter): void {
-  const candle = f.candle;
+  const candle = mutableCandle(f);
   const { x } = f.motion;
   candle.state = CandleState.airborne;
   candle.x = x;
@@ -77,14 +78,14 @@ export function candleLoose(f: Readonly<Fighter>): boolean {
 }
 
 export function kickCandle(f: Fighter, direction: number): void {
-  const candle = f.candle;
+  const candle = mutableCandle(f);
   candle.vx = f32(direction * CANDLE_KICK_SPEED);
   if (candle.state === CandleState.airborne) candle.vz = CANDLE_KICK_RISE;
   candle.timer = CANDLE_UNTOUCHED_FRAMES;
 }
 
 export function snuffCandle(f: Fighter): void {
-  const candle = f.candle;
+  const candle = mutableCandle(f);
   candle.heat = 0;
   candle.lit = false;
   candle.vx = 0.0;
@@ -92,12 +93,12 @@ export function snuffCandle(f: Fighter): void {
   candle.snuffSerial++;
 }
 
-function slowCandle(candle: Fighter["candle"]): void {
+function slowCandle(candle: Candle): void {
   candle.vx = candle.vx > 0.0 ? max(0.0, f32(candle.vx - CANDLE_FRICTION)) : min(0.0, f32(candle.vx + CANDLE_FRICTION));
 }
 
 function holdCandle(f: Fighter): void {
-  const candle = f.candle;
+  const candle = mutableCandle(f);
   candle.state = CandleState.held;
   candle.x = 0.0;
   candle.z = 0.0;
@@ -124,7 +125,8 @@ function canTakeCandle(f: Readonly<Fighter>): boolean {
 }
 
 export function resetCandle(f: Fighter): void {
-  const candle = f.candle;
+  if ((f.restingGroups & REST_CANDLE) !== 0) return;
+  const candle = mutableCandle(f);
   candle.heat = 0;
   candle.state = CandleState.held;
   candle.lit = true;
@@ -138,9 +140,10 @@ export function resetCandle(f: Fighter): void {
   candle.guard = 0;
   for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) candle.struck[slot] = undefined;
   candle.specialStruck = 0;
+  settleCandle(f);
 }
 
-function landCandle(candle: Fighter["candle"], stage: number, frame: number, previousZ: number): void {
+function landCandle(candle: Candle, stage: number, frame: number, previousZ: number): void {
   let landing: number | undefined;
   let landingZ = 0.0;
   for (let surface = 0; surface < surfaceCount(stage); surface++) {
@@ -162,7 +165,9 @@ function landCandle(candle: Fighter["candle"], stage: number, frame: number, pre
 export function advanceCandleBodies(world: Roster, stage: number, frame: number): void {
   for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
     if (!isActive(world, slot)) continue;
-    const candle = fighterAt(world, slot).candle;
+    const owner = fighterAt(world, slot);
+    if (owner.candle.state !== CandleState.resting && owner.candle.state !== CandleState.airborne) continue;
+    const candle = mutableCandle(owner);
     if (candle.state === CandleState.resting && candle.surface !== undefined) {
       const surface = candle.surface;
       candle.x = f32(f32(candle.x + surfaceShiftX(stage, surface, frame)) + candle.vx);
@@ -193,13 +198,15 @@ export function settleCandles(world: Roster, matchFrame: number): void {
   for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
     if (!isActive(world, slot)) continue;
     const f = fighterAt(world, slot);
-    const candle = f.candle;
-    if (candle.state === CandleState.held) {
+    if (f.candle.state === CandleState.held) {
+      if (f.candle.guard === 0 && (!decays || f.candle.heat === 0)) continue;
+      const candle = mutableCandle(f);
       candle.guard = max(0, candle.guard - 1);
       if (decays) candle.heat = max(0, candle.heat - 1);
     } else if (canTakeCandle(f)) {
       holdCandle(f);
     } else {
+      const candle = mutableCandle(f);
       candle.away = min(CANDLE_AWAY_FRAMES, candle.away + 1);
       candle.timer = max(0, candle.timer - 1);
       if (candle.timer === 0 || candle.away >= CANDLE_AWAY_FRAMES) {

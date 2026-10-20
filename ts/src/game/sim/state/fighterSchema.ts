@@ -55,6 +55,7 @@ export const FIGHTER_CONSTANTS: Readonly<Record<string, string>> = {
   SPECIAL_ACTION_CAPACITY: "sim/codes",
   PROJECTILE_CAPACITY: "sim/fighter",
   PACK_CAPACITY: "sim/fighter",
+  CandleState: "sim/codes",
 };
 
 export const FIGHTER_GROUPS: readonly FighterGroup[] = [
@@ -80,12 +81,12 @@ export const FIGHTER_GROUPS: readonly FighterGroup[] = [
   { key: "grab", type: "Grab", local: "grab" },
   { key: "ledge", type: "Ledge", local: "ledge" },
   { key: "platform", type: "PlatformInput", local: "platform" },
-  { key: "cannon", type: "StageCannon", local: "cannon" },
-  { key: "water", type: "Water", local: "water" },
+  { key: "cannon", type: "StageCannon", local: "cannon", rest: "REST_CANNON" },
+  { key: "water", type: "Water", local: "water", rest: "REST_WATER" },
   { key: "status", type: "Status", local: "status" },
   { key: "mana", type: "Mana", local: "mana" },
-  { key: "candle", type: "Candle", local: "candle" },
-  { key: "pack", type: "PlacedObject", local: "placed" },
+  { key: "candle", type: "Candle", local: "candle", rest: "REST_CANDLE" },
+  { key: "pack", type: "PlacedObject", local: "placed", rest: "REST_PLACED" },
 ];
 
 export const FIGHTER_ARRAYS: readonly FighterArray[] = [

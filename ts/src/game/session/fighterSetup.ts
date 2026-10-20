@@ -4,6 +4,7 @@ import { type MatchState, Phase } from "../lobby/lobbyState";
 import { parseDecimal } from "../netcode/journal/decimal";
 import { Character } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
+import { mutableCandle } from "../sim/fighterRest";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { CANDLE_LEVEL_HEAT, CANDLE_MAX_LEVEL, dropCandle, resetCandle } from "../sim/heroes/koboldCandle";
 
@@ -30,7 +31,7 @@ function applyCandleSetup(fighter: Fighter, target: SetupTarget, prepare: () => 
   if (valueText === "drop") dropCandle(fighter);
   else {
     resetCandle(fighter);
-    fighter.candle.heat = value === 0 ? 0 : ((value ?? 0) + 1) * CANDLE_LEVEL_HEAT - 1;
+    mutableCandle(fighter).heat = value === 0 ? 0 : ((value ?? 0) + 1) * CANDLE_LEVEL_HEAT - 1;
   }
   return true;
 }

@@ -8,6 +8,7 @@ import { participantInputs } from "../input/participants";
 import { matchSpawnX } from "../match/step";
 import { Character, ProjectileKind } from "../sim/codes";
 import { type Fighter, PACK_CAPACITY, type PlacedObject, type Projectile, createFighter, packSpares } from "../sim/fighter";
+import type { Resting } from "../sim/fighterRest";
 import { spawnProjectileMotion } from "../sim/projectiles";
 import { createRoster, fighterAt } from "../sim/roster";
 import { canonicalState, stateChecksum, stateHash } from "./canonical";
@@ -159,7 +160,7 @@ test("#400 the state hash tells apart states that hashed equal: seeds a modulus 
 });
 
 /** Every placed object a fighter holds or may grow its pack into. */
-function heldPlacedObjects(fighter: Readonly<Fighter>, into: Set<Readonly<PlacedObject>>): void {
+function heldPlacedObjects(fighter: Readonly<Fighter>, into: Set<Resting<PlacedObject>>): void {
   into.add(fighter.placed);
   for (const animal of fighter.pack) into.add(animal);
   for (const spare of packSpares(fighter) ?? []) into.add(spare);
@@ -168,7 +169,7 @@ function heldPlacedObjects(fighter: Readonly<Fighter>, into: Set<Readonly<Placed
 test("snapshot copies fill a cold ring with Peons and follow a rematch that swaps them out and back in, creating no pack table and allocating nothing for fighters [k1 scenario]", () => {
   const ring: ReplayState[] = [];
   for (let index = 0; index < REPLAY_HISTORY_CAPACITY; index++) ring.push(createReplaySnapshot());
-  const held = new Set<Readonly<PlacedObject>>();
+  const held = new Set<Resting<PlacedObject>>();
   for (const snapshot of ring) for (const slot of SLOTS) heldPlacedObjects(fighterAt(snapshot.world, slot), held);
   const live = fourRiflemen().live;
   const lua = typeof collectgarbage === "function";

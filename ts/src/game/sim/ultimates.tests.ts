@@ -1,3 +1,4 @@
+import { mutablePlacedObject } from "./fighter";
 import { STAGE_CATALOG } from "../menu/stageCatalog";
 import { floorMod } from "wisp/src/sim/intMath";
 import { mutableProjectile } from "./fighterProjectiles";
@@ -946,7 +947,7 @@ function voodoo(facing: number, jabTick: number, survive: boolean): VoodooRun {
     for (const slot of [1, 2]) {
       const ward = placedObject(b.owner, slot);
       const before = lives[slot - 1] ?? 0;
-      if (survive && run.hitFrame >= 0 && ward.life <= 0 && before > 1) ward.life = before - 1;
+      if (survive && run.hitFrame >= 0 && ward.life <= 0 && before > 1) mutablePlacedObject(b.owner, slot).life = before - 1;
       if (run.hitFrame >= 0 && ward.life > 0) run.wardsAfterHit++;
     }
   }

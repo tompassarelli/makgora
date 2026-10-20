@@ -5,7 +5,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { max, min } from "../core/numbers";
 import { AttackStyle } from "./codes";
 import { inGrabContext, isIntangible } from "./conditions";
-import { type Fighter, type PlacedObject, placedObject } from "./fighter";
+import { type Fighter, type PlacedObject, mutablePlacedObject, placedObject } from "./fighter";
 import { runningHeroSpecial, spawnHeroProjectileAt } from "./specials/engine";
 import { CompanionMode, type SpecialCompanion } from "./specials/schema";
 import { applyAttackHit } from "./hits";
@@ -55,7 +55,10 @@ function biteOpponents(world: Roster, ownerSlot: number, placed: PlacedObject, p
 
 export function advanceCompanion(world: Roster, ownerSlot: number, stage: number, matchFrame: number): void {
   const owner = fighterAt(world, ownerSlot);
-  for (let animal = 0; animal <= owner.pack.length; animal++) advanceAnimal(world, ownerSlot, stage, matchFrame, placedObject(owner, animal));
+  for (let animal = 0; animal <= owner.pack.length; animal++) {
+    const placed = placedObject(owner, animal);
+    if (placed.life > 0 && placed.spec?.companion !== undefined) advanceAnimal(world, ownerSlot, stage, matchFrame, mutablePlacedObject(owner, animal));
+  }
 }
 
 function advanceAnimal(world: Roster, ownerSlot: number, stage: number, matchFrame: number, placed: PlacedObject): void {

@@ -1,3 +1,4 @@
+import { mutableCandle } from "../sim/fighterRest";
 // The computer opponent's contracts (#56): it never leaves the stage chasing
 // an opponent who stands on it, it gets up from jab resets, and the same
 // start plays the same match.
@@ -248,7 +249,7 @@ function candleDrops(): { fetched: number; struck: number } {
     const { world } = game;
     const kobold = fighterAt(world, 0);
     for (let frame = 0; frame < 60; frame++) game.step();
-    kobold.candle.heat = imod(drop, 4) === 3 ? 225 : 75;
+    mutableCandle(kobold).heat = imod(drop, 4) === 3 ? 225 : 75;
     contactBatch(world, () => collectDamageContact(world, 1, 0, hitEffect(10.0, 0.0, CANDLE_DROP_KNOCKBACK + 1.0, f32(side * 0.5), f32(0.85)), 1, ContactKind.launch, true, undefined, false));
     let timer = kobold.candle.timer;
     let away = kobold.candle.away;

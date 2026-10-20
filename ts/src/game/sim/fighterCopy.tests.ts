@@ -5,9 +5,9 @@ import { copyFighterState, sameFighterState } from "../../generated/state/fighte
 import { at } from "wisp/src/runtime/lookup";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { Character, HERO_STATUS_GROUPS, SPECIAL_ACTION_CAPACITY } from "./codes";
-import { type Fighter, createFighter, createPlacedObject, placedObject } from "./fighter";
+import { type Fighter, type PlacedObject, createFighter, createPlacedObject, placedObject } from "./fighter";
 import { FIGHTER_ARRAYS, FIGHTER_FIELDS, type FighterFieldRow } from "./state/fighterSchema";
-import { REST_BEAR, REST_FREEZE_TRAP, settleRestingGroups } from "./fighterRest";
+import { REST_BEAR, REST_CANDLE, REST_CANNON, REST_FREEZE_TRAP, REST_PLACED, REST_WATER, RESTING_GROUPS, settleRestingGroups } from "./fighterRest";
 
 type Node = Record<string, unknown>;
 
@@ -52,7 +52,7 @@ function owners(fighter: Fighter, path: string): { readonly owner: Node; readonl
 }
 
 
-const REST_OF: Readonly<Record<string, number>> = { bear: REST_BEAR, freezeTrap: REST_FREEZE_TRAP };
+const REST_OF: Readonly<Record<string, number>> = { bear: REST_BEAR, freezeTrap: REST_FREEZE_TRAP, cannon: REST_CANNON, water: REST_WATER, candle: REST_CANDLE, placed: REST_PLACED, "pack[]": REST_PLACED };
 const WRITABLE = new Set(["real", "bool", "slot", "int", "enum", "optionalInt", "optionalEnum"]);
 
 function pickFor(row: FighterFieldRow, next: (range: number) => number): unknown {
@@ -66,7 +66,7 @@ function pickFor(row: FighterFieldRow, next: (range: number) => number): unknown
 
 function scramble(fighter: Fighter, next: (range: number) => number): void {
   const quiet = Object.keys(REST_OF).filter(() => next(2) === 0);
-  for (let animal = next(3); animal > 0; animal--) fighter.pack.push(createPlacedObject());
+  for (let animal = next(3); animal > 0; animal--) (fighter.pack as PlacedObject[]).push(createPlacedObject());
   for (const row of ROWS) {
     if (next(3) !== 0 || !WRITABLE.has(row.type) || quiet.some((group) => row.path.startsWith(`${group}.`))) continue;
     const pick = () => pickFor(row, next);
@@ -78,7 +78,7 @@ function scramble(fighter: Fighter, next: (range: number) => number): void {
     }
   }
   settleRestingGroups(fighter);
-  fighter.restingGroups = fighter.restingGroups & next(4);
+  fighter.restingGroups = fighter.restingGroups & next(RESTING_GROUPS + 1);
 }
 
 test("the generated fighter copy writes every copied field as a schema-driven copy would, keeping only slots the mask holds, on 300 scrambled fighters with signed zeros, growing and shrinking packs and groups resting on either side [k2 property]", () => {

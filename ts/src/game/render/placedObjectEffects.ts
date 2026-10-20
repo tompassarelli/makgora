@@ -5,6 +5,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { idiv } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { type Fighter, PACK_CAPACITY, type PlacedObject, placedObject } from "../sim/fighter";
+import type { Resting } from "../sim/fighterRest";
 import { type AuthoredSpecial, CompanionMode } from "../sim/specials/schema";
 import { Character } from "../sim/codes";
 import { authoredTuning } from "../sim/tuning";
@@ -146,7 +147,7 @@ export class PlacedObjectEffects {
     this.feedback.present(fighter, slot);
   }
 
-  private presentAnimal(fighter: Readonly<Fighter>, placed: Readonly<PlacedObject>, slot: number): void {
+  private presentAnimal(fighter: Readonly<Fighter>, placed: Resting<PlacedObject>, slot: number): void {
     const look = placed.spec?.model ?? heroLook(fighter.character)?.placedModel ?? DEFAULT_LOOK;
 
     const model = this.paths[slot] === look.path ? this.models[slot] : undefined;
@@ -173,7 +174,7 @@ export class PlacedObjectEffects {
   }
 
 
-  private build(model: effect, slot: number, placed: Readonly<PlacedObject>, crumble: number, built: number): void {
+  private build(model: effect, slot: number, placed: Resting<PlacedObject>, crumble: number, built: number): void {
     const anim = placed.life <= crumble ? 3 : placed.age < built ? 4 : 0;
     const attackStarts = (this.attackStarts ??= []);
     if (this.anims[slot] === anim && attackStarts[slot] === placed.serial) return;
@@ -183,7 +184,7 @@ export class PlacedObjectEffects {
     BlzSetSpecialEffectTimeScale(model, anim === 3 ? f32(DEATH_SECONDS / f32(crumble / 60.0)) : anim === 4 ? f32(BIRTH_SECONDS / f32(built / 60.0)) : 1.0);
   }
 
-  private animate(model: effect, slot: number, placed: Readonly<PlacedObject>, bear: ReturnType<typeof bearState>): void {
+  private animate(model: effect, slot: number, placed: Resting<PlacedObject>, bear: ReturnType<typeof bearState>): void {
     const { x, mode } = placed;
     const partner = placed.spec?.companion;
     let attackStart = -1;

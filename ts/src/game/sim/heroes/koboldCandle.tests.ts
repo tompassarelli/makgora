@@ -1,3 +1,4 @@
+import { mutableCandle } from "../fighterRest";
 import { f32 } from "wisp/src/sim/f32";
 import { assertEquals, assertFalse, assertGreaterThan, assertNear, assertTrue, test } from "wisp/src/runtime/testing";
 import { AttackStyle, CandleState, Character, ContactKind, SpecialAction } from "../codes";
@@ -44,7 +45,7 @@ test("Kobold's candle gains 8 heat per whole percent he lands, at most 75 a hit,
 
 function litKobold(level: number, gap: number, input: Readonly<Controls>): { world: ReturnType<typeof createRoster>; kobold: Fighter; target: Fighter; startX: number } {
   const { world, owner, target } = duelPair(createFighter(Character.kobold, -400.0, 1), createFighter(Character.rifleman, -400.0 + gap, -1));
-  owner.candle.heat = level * CANDLE_LEVEL_HEAT;
+  mutableCandle(owner).heat = level * CANDLE_LEVEL_HEAT;
   const startX = owner.motion.x;
   stepDuel(world, input);
   return { world, kobold: owner, target, startX };
@@ -122,7 +123,7 @@ function strike(world: Roster, source: number, target: number, knockback: number
 function knockedOut(heat = 0, koboldX = -100.0) {
   const match = candleMatch([createFighter(Character.kobold, koboldX, 1), createFighter(Character.rifleman, 300.0, -1)]);
   const kobold = fighterAt(match.world, 0);
-  kobold.candle.heat = heat;
+  mutableCandle(kobold).heat = heat;
   return { ...match, kobold };
 }
 
@@ -226,7 +227,7 @@ function trade(koboldSlot: number): Fighter {
     ? [createFighter(Character.kobold, -100.0, 1), createFighter(Character.rifleman, 100.0, -1)]
     : [createFighter(Character.rifleman, -100.0, 1), createFighter(Character.kobold, 100.0, -1)]);
   const kobold = fighterAt(world, koboldSlot);
-  kobold.candle.heat = 100;
+  mutableCandle(kobold).heat = 100;
   contactBatch(world, () => {
     strike(world, koboldSlot, 1 - koboldSlot, 30.0, 0.0, 1.0, 9.0);
     strike(world, 1 - koboldSlot, koboldSlot, CANDLE_DROP_KNOCKBACK + 1.0);
@@ -260,7 +261,7 @@ test("in a four-fighter trade both Kobolds in the back slots keep their heat gai
 
 test("a candle resting on a sliding deck rides along with it instead of falling off [k1 scenario]", () => {
   const world = createRoster(1, [createFighter(Character.kobold, 0.0, 1)]);
-  const candle = fighterAt(world, 0).candle;
+  const candle = mutableCandle(fighterAt(world, 0));
   const centre = (frame: number) => f32((surfaceLeft(3, 1, frame) + surfaceRight(3, 1, frame)) * 0.5);
   candle.state = CandleState.resting;
   candle.surface = 1;
@@ -276,10 +277,10 @@ test("a candle resting on a sliding deck rides along with it instead of falling 
 function fallenCandle(foes: Fighter[], heat = 150) {
   const match = candleMatch([createFighter(Character.kobold, -100.0, 1), ...foes]);
   const kobold = fighterAt(match.world, 0);
-  kobold.candle.heat = heat;
+  mutableCandle(kobold).heat = heat;
   contactBatch(match.world, () => strike(match.world, 1, 0, CANDLE_DROP_KNOCKBACK + 1.0));
   match.step(40);
-  return { ...match, kobold, candle: kobold.candle };
+  return { ...match, kobold, candle: mutableCandle(kobold) };
 }
 
 function besideCandle(world: Roster, slot: number, candleX: number, side: number): Fighter {

@@ -28,6 +28,7 @@ import { AttackPhase, AttackStyle, Character, ContactKind, DownState, SpecialAct
 import { attackPhase } from "../../src/game/sim/conditions";
 import { beginDamageContacts, finishDamageContacts, queueDamageContact } from "../../src/game/sim/contacts";
 import { type Fighter, createFighter } from "../../src/game/sim/fighter";
+import { mutableCandle } from "../../src/game/sim/fighterRest";
 import { advanceHeroStatus, enterFollowUp, runningHeroSpecial } from "../../src/game/sim/specials/engine";
 import { fighterSlug } from "../../src/game/sim/heroes/registry";
 import { isAerialAttack } from "../../src/game/sim/moves";
@@ -333,7 +334,7 @@ function candleScenes(heat: number): ReturnType<typeof cueScenes> {
     client.run(() => { candle = new CandlePresentation(origin); });
     if (candle === undefined) throw new Error("missing candle renderer");
     const f = createFighter(Character.kobold, 0.0, 1);
-    f.candle.heat = heat;
+    mutableCandle(f).heat = heat;
     const scenes: RenderScene[] = [];
     let empty: RenderScene | undefined;
     for (let tick = 0; tick < LIMIT; tick++) {

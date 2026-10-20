@@ -1,3 +1,4 @@
+import { type Candle, mutableCandle } from "../sim/fighterRest";
 import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
 import { IMPORTED_MUSIC } from "../assets/importedMusicInfo";
 import { VERIFIED_STOCK_SOUNDS } from "../../generated/assets/stockSoundInfo";
@@ -44,10 +45,10 @@ test("every selectable stage plays its own stock Warcraft track [k3 measure docs
 });
 
 
-function presentFrame(match: TestMatch, observation: CueObservation, tally: MatchTally, cues: MatchCue[], serials: number[] = [], simulated?: (candle: Fighter["candle"]) => void): void {
+function presentFrame(match: TestMatch, observation: CueObservation, tally: MatchTally, cues: MatchCue[], serials: number[] = [], simulated?: (candle: Candle) => void): void {
   observeForCues(observation, match.game, match.world);
   executeNext(match);
-  simulated?.(fighterAt(match.world, 0).candle);
+  simulated?.(mutableCandle(fighterAt(match.world, 0)));
   confirmedFrameCues(observation, match.game, match.world, tally, cues, serials);
 }
 
@@ -96,7 +97,7 @@ test("a Kobold's candle drop, snuff and return each cue once on their confirmed 
   const confirmed = createReplaySnapshot();
   captureReplaySnapshot(confirmed, match.world, match.game, match.inputs, match.runtime);
   executeNext(match);
-  fighterAt(match.world, 0).candle.dropSerial++;
+  mutableCandle(fighterAt(match.world, 0)).dropSerial++;
   executeNext(match);
   restoreReplaySnapshot(confirmed, match.world, match.game, match.inputs, match.runtime);
   presentFrame(match, observation, tally, cues, serials);

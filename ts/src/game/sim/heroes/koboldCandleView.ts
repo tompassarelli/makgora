@@ -1,10 +1,11 @@
 import { Character } from "../codes";
 import type { Fighter } from "../fighter";
+import { mutableCandle } from "../fighterRest";
 
 const sameReal = (a: number, b: number): boolean => a === b && (a !== 0 || 1 / a === 1 / b);
 
 export function copyCandleView(target: Fighter, source: Readonly<Fighter>): void {
-  const candle = target.candle;
+  const candle = mutableCandle(target);
   const from = source.candle;
   candle.state = from.state;
   candle.x = from.x;

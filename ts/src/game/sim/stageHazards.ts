@@ -18,6 +18,7 @@ import { stageBounds } from "./stageBounds";
 import { cancelAttack, cancelSpecialState, clearDownState, clearGrabLinks, interruptJumpOrDodge } from "./transitions";
 import { melee } from "./tuning";
 import { knockbackWeight } from "./itemBuffs";
+import { mutableCannon } from "./fighterRest";
 
 
 
@@ -200,7 +201,7 @@ export const inStageCannon = (f: Readonly<Fighter>): boolean => f.cannon.held !=
 
 
 export function endCannonPass(f: Fighter, stage: number): void {
-  if (f.cannon.passing && (f.motion.grounded || f.motion.z > mainDeckZ(stage))) f.cannon.passing = false;
+  if (f.cannon.passing && (f.motion.grounded || f.motion.z > mainDeckZ(stage))) mutableCannon(f).passing = false;
 }
 
 function holdAtCannon(f: Fighter, frame: number): void {
@@ -237,20 +238,21 @@ function catchFighter(world: Roster, slot: number, frame: number): void {
   launch.diPending = false;
   launch.diLaunchSpeed = 0.0;
   f.shield.raised = false;
-  f.cannon.held = 0;
-  f.cannon.firing = undefined;
-  f.cannon.passing = false;
+  const cannon = mutableCannon(f);
+  cannon.held = 0;
+  cannon.firing = undefined;
+  cannon.passing = false;
   holdAtCannon(f, frame);
 }
 
 
 function fire(f: Fighter, frame: number): void {
   holdAtCannon(f, frame);
-  f.cannon.held = undefined;
-  f.cannon.firing = undefined;
-  f.cannon.cooldown = CANNON_RECATCH_FRAMES;
-
-  f.cannon.passing = true;
+  const cannon = mutableCannon(f);
+  cannon.held = undefined;
+  cannon.firing = undefined;
+  cannon.cooldown = CANNON_RECATCH_FRAMES;
+  cannon.passing = true;
   const aim = cannonAim(frame);
   const knockback = contactKnockback(f.status.damage, 0.0, knockbackWeight(f), 0.0, CANNON_BASE_KNOCKBACK, 1.0);
   const { launch } = f;
@@ -284,13 +286,14 @@ export function advanceStageCannon(world: Roster, stage: number, frame: number, 
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;
     const f = fighterAt(world, slot);
-    const { cannon } = f;
-    if (cannon.held === undefined) {
-      if (cannon.cooldown > 0 && f.launch.hitlag <= 0) cannon.cooldown--;
+    const held = f.cannon.held;
+    if (held === undefined) {
+      if (f.cannon.cooldown > 0 && f.launch.hitlag <= 0) mutableCannon(f).cooldown--;
       continue;
     }
+    const cannon = mutableCannon(f);
     occupied = true;
-    cannon.held++;
+    cannon.held = held + 1;
     const input = inputs[slot];
     if (cannon.firing === undefined && (cannon.held >= CANNON_HOLD_FRAMES || input?.attackPressed === true || input?.specialPressed === true)) cannon.firing = 0;
     if (cannon.firing !== undefined) cannon.firing++;
