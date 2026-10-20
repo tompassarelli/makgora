@@ -16,6 +16,7 @@ import { ButtonClicks, createBackdrop, createText, gameUi, placeTopLeft, setFram
 import { MENU_FONT, MENU_STYLE } from "./hudLayout";
 import { KEY_CAP_HEIGHT, keyboardCaps } from "./keyboardLayout";
 import { AUTO_DELAY, nextDelayChoice } from "../netcode/delayPolicy";
+import { START_HINT } from "./helpText";
 
 export interface SettingsActions {
   closeSettings(participantId: number): void;
@@ -201,7 +202,7 @@ export class SettingsPanel {
     for (const [preset, frame] of this.presets) setFrameText(frame, preset === selected ? `${MENU_STYLE.gold}${PRESET_NAMES[preset]}|r` : PRESET_NAMES[preset]);
     setFrameText(this.profileButton, settings.profile !== "saved" ? `|cff808080${NO_SAVED_PROFILE}|r` : settings.fromProfile ? `${MENU_STYLE.gold}Load profile|r` : "Load profile");
     BlzFrameSetText(this.hint, settings.fromProfile ? `${MENU_STYLE.gold}Your saved profile is selected.|r` : selected === undefined ? "Your own keys. Save to keep them." : `${MENU_STYLE.gold}${PRESET_HINTS[selected]}|r`);
-    BlzFrameSetText(this.help, capture === undefined ? "Click a lit key, then press the key you want for that action." : "Press the new key for the flashing action. Escape cancels.");
+    BlzFrameSetText(this.help, capture === undefined ? `Click a lit key, then press the key you want for that action. ${START_HINT}` : "Press the new key for the flashing action. Escape cancels.");
     setFrameText(this.delayButton, settings.delay === AUTO_DELAY ? "Delay: Auto" : `Delay: ${I2S(settings.delay)} frames`);
     BlzFrameSetText(this.delayInfo, info);
     BlzFrameSetText(this.status, settings.message);

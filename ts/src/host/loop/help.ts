@@ -1,12 +1,11 @@
 import { PARTICIPANT_SLOTS, isParticipantSlot } from "../../game/input/participants";
-import { COMMANDS_DESCRIPTION, COMMANDS_TITLE, COMMANDS_COMMAND, CONTROLS_TITLE, HELP_COMMAND, HOW_TO_PLAY, HOW_TO_PLAY_TITLE, PLAYER_COMMANDS, START_HINT, controlsDescription } from "../../game/ui/helpText";
+import { COMMANDS_DESCRIPTION, COMMANDS_TITLE, COMMANDS_COMMAND, CONTROLS_TITLE, HELP_COMMAND, HOW_TO_PLAY, HOW_TO_PLAY_TITLE, PLAYER_COMMANDS, controlsDescription } from "../../game/ui/helpText";
 import { trampoline } from "wisp/src/platform/dispatch";
 import { localParticipantSlot } from "./diagnostics";
 import type { ShellState } from "./state";
 
 export const HELP_EVENT = "shell.help";
 
-const HINT_SECONDS = 20.0;
 const HELP_SECONDS = 30.0;
 
 declare global {
@@ -38,7 +37,6 @@ export function startHelp(s: ShellState): void {
     globalThis.__smashcraftHelpQuests = { controls, revision: -1 };
   }
   serviceHelp(s);
-  for (const slot of PARTICIPANT_SLOTS) DisplayTimedTextToPlayer(Player(slot), 0.0, 0.0, HINT_SECONDS, START_HINT);
 }
 
 export function serviceHelp(s: ShellState): void {
