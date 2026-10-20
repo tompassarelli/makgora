@@ -6,7 +6,7 @@ import { matchSpawnX } from "../../game/match/step";
 import { Character } from "../../game/sim/codes";
 import { createFighter } from "../../game/sim/fighter";
 import { clearDamageContacts } from "../../game/sim/contacts";
-import { copyControls, isActive, neutralControls } from "../../game/sim/roster";
+import { copyControls, isActive, neutralControls, setRosterMask } from "../../game/sim/roster";
 import { createFighterBody, removeFighterBody } from "./fighterBody";
 import { clearAllInputs } from "./inputs";
 import type { ShellState } from "./state";
@@ -39,7 +39,7 @@ export function makePreview(s: ShellState): void {
   clearAllInputs(s);
   removeFighters(s);
   for (const slot of PARTICIPANT_SLOTS) copyControls(s.produced.inputs[slot], NEUTRAL);
-  s.world.mask = fighterMask(s.game);
+  setRosterMask(s.world, fighterMask(s.game));
   layoutHuds(s);
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(s.world, slot)) continue;

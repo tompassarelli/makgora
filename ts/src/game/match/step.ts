@@ -17,7 +17,7 @@ import { updateProjectiles } from "../sim/projectiles";
 import { advancePlacedObjects } from "../sim/placedObjects";
 import { advanceCandleBodies, settleCandles } from "../sim/heroes/koboldCandle";
 import { strikeCandles } from "../sim/heroes/koboldCandleStrikes";
-import { type Roster, copyControls, fighterAt, isActive, neutralControls } from "../sim/roster";
+import { type Roster, copyControls, fighterAt, isActive, neutralControls, setRosterMask } from "../sim/roster";
 import { regenerateShield } from "../sim/shield";
 import { advanceSpecials, startFighterSpecial } from "../sim/specials";
 import { advanceHeroStatus, prepareBansheeContacts } from "../sim/specials/engine";
@@ -168,7 +168,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
     }
   }
   const mask = world.mask;
-  if (scope !== undefined) world.mask = 1 << scope.slot;
+  if (scope !== undefined) setRosterMask(world, 1 << scope.slot);
   carryOnMovingDecks(world, stage, stageFrame);
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;
@@ -280,7 +280,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
     }
   }
   if (scope !== undefined) {
-    world.mask = mask;
+    setRosterMask(world, mask);
     for (const slot of PARTICIPANT_SLOTS) {
       if (slot === scope.slot || !isActive(world, slot)) continue;
       copyFighterState(fighterAt(world, slot), fighterAt(scope.after.world, slot), mask);

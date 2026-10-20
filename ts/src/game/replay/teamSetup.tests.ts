@@ -1,6 +1,7 @@
 import { assertEquals, assertTrue, test } from "wisp/src/runtime/testing";
 import { PARTICIPANT_SLOTS } from "../input/participants";
 import { createFighter } from "../sim/fighter";
+import { setRosterMask } from "../sim/roster";
 import { configureMatchTeams, initializeMatchFighters } from "../match/step";
 import { type Team } from "../sim/teams";
 import { Phase, resolveStocks, setParticipants, winningMask } from "../lobby/lobbyState";
@@ -21,7 +22,7 @@ test("team setup and a seeded 2v2 result retain every team and friendly fire fie
     game.teamChoices[slot] = choices[slot] ?? 0;
     live.world.fighters[slot] = createFighter(game.characterChoices[slot], 0.0, 1);
   }
-  live.world.mask = 15;
+  setRosterMask(live.world, 15);
   game.phase = Phase.match;
   initializeMatchFighters(game, live.world);
   copyReplayState(saved, live);

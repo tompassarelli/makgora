@@ -14,7 +14,7 @@ import {
 import { clearPresentationHistory, createPacingAndPresentation } from "../match/pacingAndPresentation";
 import { initializeMatchFighters, matchSpawnX } from "../match/step";
 import { createFighter } from "../sim/fighter";
-import { copyControls, createRoster, fighterAt, isActive, neutralControls } from "../sim/roster";
+import { copyControls, createRoster, fighterAt, isActive, neutralControls, setRosterMask } from "../sim/roster";
 import { setWorldMotionValue } from "../sim/motion";
 import type { FighterPose } from "../presentation/fighterPose";
 import { canonicalReal, canonicalState } from "./canonical";
@@ -73,7 +73,7 @@ function recordState({ live, observed }: TapeSession): string {
 
 function startMatch(session: TapeSession): boolean {
   const { match, world, controls, runtime } = session.live;
-  world.mask = fighterMask(match);
+  setRosterMask(world, fighterMask(match));
   for (const slot of PARTICIPANT_SLOTS) {
     if (isActive(world, slot)) {
       const x = matchSpawnX(slot, world.mask);

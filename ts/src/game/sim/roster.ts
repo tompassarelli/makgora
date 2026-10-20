@@ -8,7 +8,8 @@ import { PARTICIPANT_CAPACITY } from "../input/participants";
 
 export interface Roster {
 
-  mask: number;
+  readonly mask: number;
+  readonly active: readonly [boolean, boolean, boolean, boolean];
   teamBattle: boolean;
   friendlyFire: boolean;
   readonly teamChoices: Slots<Team>;
@@ -25,17 +26,29 @@ export function createRoster(mask: number, fighters: readonly Fighter[] = []): R
     grabPaused[slot] = false;
     rosterFighters[slot] = fighters[slot];
   }
-  return {
-    mask, teamBattle: false, friendlyFire: false, teamChoices: [0, 1, 0, 1],
+  const roster: Roster = {
+    mask, active: [false, false, false, false], teamBattle: false, friendlyFire: false, teamChoices: [0, 1, 0, 1],
     grabPaused,
     fighters: rosterFighters,
   };
+  setRosterMask(roster, mask);
+  return roster;
+}
+
+
+export function setRosterMask(roster: Roster, mask: number): void {
+  const valid = mask > 0 && mask < 16;
+  const active = roster.active as [boolean, boolean, boolean, boolean];
+  (roster as { mask: number }).mask = mask;
+  active[0] = valid && (mask & 1) !== 0;
+  active[1] = valid && (mask & 2) !== 0;
+  active[2] = valid && (mask & 4) !== 0;
+  active[3] = valid && (mask & 8) !== 0;
 }
 
 
 export function isActive(roster: Roster, slot: number): boolean {
-  const mask = roster.mask;
-  return mask > 0 && mask < 16 && slot >= 0 && slot < 4 && (mask & (1 << slot)) !== 0;
+  return roster.active[slot] === true;
 }
 
 

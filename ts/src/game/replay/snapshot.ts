@@ -4,7 +4,7 @@ import { type FrameControls, createFrameControls } from "../match/controls";
 import { type PacingAndPresentation, copyPacingAndPresentation, createPacingAndPresentation } from "../match/pacingAndPresentation";
 import { type MatchState, copyMatchState, createMatchState } from "../lobby/lobbyState";
 import { PACK_CAPACITY, createFighter } from "../sim/fighter";
-import { type Roster, createRoster, fighterAt, isActive } from "../sim/roster";
+import { type Roster, createRoster, fighterAt, isActive, setRosterMask } from "../sim/roster";
 import { copyFighterState } from "../../generated/state/fighterState";
 
 
@@ -36,7 +36,7 @@ export function createReplaySnapshot(): ReplayState {
 
 export function copyReplayState(target: ReplayState, source: Readonly<ReplayState>): void {
   const mask = source.world.mask;
-  target.world.mask = mask;
+  setRosterMask(target.world, mask);
   target.world.teamBattle = source.world.teamBattle;
   target.world.friendlyFire = source.world.friendlyFire;
   for (const slot of PARTICIPANT_SLOTS) target.world.teamChoices[slot] = source.world.teamChoices[slot];

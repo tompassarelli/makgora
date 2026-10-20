@@ -15,6 +15,7 @@ import { observedFrameLegalActions, observedFrameStartedActions } from "../../ga
 import { Capture } from "../../game/netcode/capture";
 import { PENDING_CAPACITY } from "../../game/netcode/shadowSchedule";
 import { floorMod } from "wisp/src/sim/intMath";
+import { setRosterMask } from "../../game/sim/roster";
 import { at } from "wisp/src/runtime/lookup";
 import { InputBatch } from "../../game/netcode/inputBatch";
 import { KeyboardMailbox } from "../../game/netcode/journal/keyboard";
@@ -86,7 +87,7 @@ export function beginRollbackEpoch(s: ShellState, rollback: Rollback): boolean {
   rollback.knownBefore = 0;
   rollback.repairedFrames = 0;
   rollback.epochCallbacks = 0;
-  speculative.world.mask = s.world.mask;
+  setRosterMask(speculative.world, s.world.mask);
   captureReplaySnapshot(rollback.seed, s.world, s.game, s.controls, s.runtime);
   restoreReplaySnapshot(rollback.seed, speculative.world, speculative.game, speculative.controls, speculative.runtime);
   for (const slot of PARTICIPANT_SLOTS) {
