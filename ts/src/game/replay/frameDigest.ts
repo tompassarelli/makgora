@@ -38,6 +38,18 @@ const FRAME_KEY = 5;
 const slotBase = (slot: number) => floorMod(slot * 977 + 13, MODULUS);
 const fieldKey = (slot: number, record: string, field: string) => floorMod(slotBase(slot) * 31 + keyHash(`${record}.${field}`), MODULUS);
 
+const DIGEST_KEYS: number[] = [];
+
+function digestKey(slot: number, index: number): number {
+  const position = slot * DIGEST_FIELDS.length + index;
+  const known = DIGEST_KEYS[position];
+  if (known !== undefined) return known;
+  const [record, field] = at(DIGEST_FIELDS, index);
+  const key = fieldKey(slot, record, field);
+  DIGEST_KEYS[position] = key;
+  return key;
+}
+
 function digestValue(fighter: Readonly<Fighter>, record: string, field: string): unknown {
   const holder: unknown = fighter;
   const owner = record === "" ? holder : isFields(holder) ? holder[record] : undefined;
@@ -61,7 +73,10 @@ function digestLanes(world: Readonly<Roster>, frame: number): Lanes {
   for (const slot of PARTICIPANT_SLOTS) {
     if (!isActive(world, slot)) continue;
     const fighter = fighterAt(world, slot);
-    for (const [record, field] of DIGEST_FIELDS) foldDigestValue(lanes, fieldKey(slot, record, field), digestValue(fighter, record, field));
+    for (let index = 0; index < DIGEST_FIELDS.length; index++) {
+      const pair = at(DIGEST_FIELDS, index);
+      foldDigestValue(lanes, digestKey(slot, index), digestValue(fighter, pair[0], pair[1]));
+    }
   }
   return lanes;
 }
