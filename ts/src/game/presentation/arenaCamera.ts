@@ -84,10 +84,17 @@ export function extremeCamera(target: MatchCamera, stage: number, aspect: number
 }
 
 
-export function cameraPoint(camera: Readonly<MatchCamera>, aspect: number, x: number, z: number): { readonly column: number; readonly row: number } {
+export interface ScreenPoint {
+  column: number;
+  row: number;
+}
+
+export function cameraPoint(camera: Readonly<MatchCamera>, aspect: number, x: number, z: number, into: ScreenPoint = { column: 0.0, row: 0.0 }): Readonly<ScreenPoint> {
   const dz = z - camera.z;
   const depth = camera.distance - dz * 0.1736481785774231;
-  return { column: 0.5 + (x - camera.x) / (2.0 * depth * camera.tangent * aspect), row: 0.5 - dz * 0.9848077297210693 / (2.0 * depth * camera.tangent) };
+  into.column = 0.5 + (x - camera.x) / (2.0 * depth * camera.tangent * aspect);
+  into.row = 0.5 - dz * 0.9848077297210693 / (2.0 * depth * camera.tangent);
+  return into;
 }
 
 

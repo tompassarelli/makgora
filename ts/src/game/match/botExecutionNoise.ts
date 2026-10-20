@@ -26,10 +26,23 @@ export function defenceSlipRates(execution: number, tier: CpuTier = "expert") {
 }
 
 
+type SlipRates = ReturnType<typeof defenceSlipRates>;
+
+const SLIP_RATES: Partial<Record<CpuTier, Record<number, SlipRates>>> = {};
+
+function cachedSlipRates(execution: number, tier: CpuTier = "expert"): Readonly<SlipRates> {
+  const known = SLIP_RATES[tier] ?? {};
+  SLIP_RATES[tier] = known;
+  const rates = known[execution] ?? defenceSlipRates(execution, tier);
+  known[execution] = rates;
+  return rates;
+}
+
+
 export function chooseHitlagInput(f: Readonly<Fighter>, slot: number, frame: number, skill: CpuSkill, input: Controls): void {
   const { launch } = f;
   if (!launch.diPending) return;
-  const rates = defenceSlipRates(skill.decision.executionPercent, skill.tier);
+  const rates = cachedSlipRates(skill.decision.executionPercent, skill.tier);
   const outward = launch.knockbackX !== 0.0 ? sign(launch.knockbackX) : f.motion.x < 0 ? -1 : 1;
   const upward = Math.abs(launch.knockbackZ) > Math.abs(launch.knockbackX);
   const survival = f.status.damage >= 80 || launch.diLaunchSpeed >= 20.0;
@@ -63,7 +76,7 @@ export function chooseHitlagInput(f: Readonly<Fighter>, slot: number, frame: num
 
 export function applyAerialExecutionNoise(f: Readonly<Fighter>, target: Readonly<Fighter> | undefined, slot: number, skill: CpuSkill, input: Controls): void {
   if (f.launch.hitlag > 0 || f.launch.hitstun > 0 || f.grab.owner !== undefined || f.status.out) return;
-  const rates = defenceSlipRates(skill.decision.executionPercent, skill.tier);
+  const rates = cachedSlipRates(skill.decision.executionPercent, skill.tier);
   if (f.motion.grounded && (input.jumpPressed || f.jump.squat > 0) && !input.jumpHeld) {
     const full = skill.executionMistakes !== false && botChoice(f.jump.serial + 1, slot * 137 + f.character * 11 + 105, 1000) < rates.fullHop;
     input.jumpHeld = full;

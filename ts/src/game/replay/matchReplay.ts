@@ -13,7 +13,7 @@
 
 
 import { at } from "wisp/src/runtime/lookup";
-import { lineTokens, parseRecord, recordTokens } from "wisp/src/runtime/recordText";
+import { type TokenLines, addToken, addWrittenToken, addWrittenTokens, endTokenLine, lineTokens, parseRecord, recordTokens, writeFieldTokens } from "wisp/src/runtime/recordText";
 import { type Repro, type ReproResult, reproLines } from "wisp/src/runtime/repro";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS } from "../input/participants";
@@ -31,7 +31,7 @@ import { BOT_HISTORY_FRAMES, settleObservationChecksum, settleObservations } fro
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import {
   type FrameRows, type FrameScratch, KEYED_BY_ACTION, type MomentInput, type MomentRecorder, ROW_FRAMES, SNAPSHOT_FRAMES,
-  readRun, runCallbackFrame, runToken, sameFrameRows, runNetworkFrame, savedRuntime, savedState, section, wholeNumber,
+  readRun, runCallbackFrame, runToken, sameFrameRows, runNetworkFrame, savedRuntime, savedState, pushSection, sectionLines, wholeNumber,
 } from "./moment";
 import { parseReplayHeader } from "./replayFormat";
 import { type ReplayState, captureReplaySnapshot, copyReplayState, createReplaySnapshot } from "./snapshot";
@@ -207,34 +207,57 @@ function savedStatePieces(pieces: StatePiece[], state: Readonly<ReplayState>, sl
 }
 
 
-function elementTokens(list: readonly unknown[], index: number): readonly string[] | undefined {
-  const tokens = recordTokens({ v: list[index] });
-  if (tokens === undefined) return undefined;
-  const token = tokens[0];
-  return token === undefined ? [] : [`${index}${token.substring(1)}`];
+const INDEX_NAMES: string[] = [];
+
+function indexName(index: number): string {
+  const known = INDEX_NAMES[index];
+  if (known !== undefined) return known;
+  const name = `${index}`;
+  INDEX_NAMES[index] = name;
+  return name;
 }
 
-function pieceTokens(piece: StatePiece, text: StateText): readonly string[] | undefined {
+const emptyFieldTokens = () => recordTokens({}, KEYED_BY_ACTION)?.length;
+
+function writeElement(sink: TokenLines, list: readonly unknown[], index: number): number | undefined {
+  const value = list[index];
+  if (value === undefined) return emptyFieldTokens();
+  const count = writeFieldTokens("v", value);
+  if (count === undefined) return undefined;
+  if (count === 0) return 0;
+  addWrittenToken(sink, 0, indexName(index));
+  return 1;
+}
+
+function writePiece(piece: StatePiece, text: StateText): number | undefined {
+  const sink = text.sink;
   if (typeof piece === "string") {
     text.next++;
-    return [piece];
+    addToken(sink, piece);
+    return 1;
   }
   if ("list" in piece) {
     if (text.element === 0) {
       text.element = 1;
-      if (primitiveList(piece.list)) return [`${piece.name}[`];
-    } else if (text.element <= piece.list.length) return elementTokens(piece.list, text.element++ - 1);
+      if (primitiveList(piece.list)) {
+        addToken(sink, `${piece.name}[`);
+        return 1;
+      }
+    } else if (text.element <= piece.list.length) return writeElement(sink, piece.list, text.element++ - 1);
     else {
       text.element = 0;
       text.next++;
-      return ["]"];
+      addToken(sink, "]");
+      return 1;
     }
     text.element = 0;
   }
   text.next++;
-  const field: Record<string, unknown> = {};
-  field[piece.name] = piece.record[piece.name];
-  return recordTokens(field, KEYED_BY_ACTION);
+  const value = piece.record[piece.name];
+  if (value === undefined) return emptyFieldTokens();
+  const count = writeFieldTokens(piece.name, value, KEYED_BY_ACTION);
+  if (count !== undefined) addWrittenTokens(sink, count);
+  return count;
 }
 
 
@@ -255,7 +278,7 @@ interface StateText {
   pieces: readonly StatePiece[] | undefined;
   next: number;
   element: number;
-  readonly tokens: string[];
+  readonly sink: TokenLines;
 }
 
 export interface MatchReplayRecorder {
@@ -396,18 +419,18 @@ function continueStateText(recorder: MatchReplayRecorder, budget: number): void 
   }
   let written = 0;
   while (text.next < pieces.length && written < budget) {
-    const tokens = pieceTokens(at(pieces, text.next), text);
-    if (tokens === undefined) {
+    const count = writePiece(at(pieces, text.next), text);
+    if (count === undefined) {
       recorder.failed = true;
       continue;
     }
-    for (const token of tokens) text.tokens.push(token);
-    written += tokens.length;
+    written += count;
   }
   if (text.next < pieces.length) return;
   recorder.text = undefined;
   finishCheckpoint(recorder);
-  for (const line of section("state", text.tokens)) recorder.lines.push(line);
+  endTokenLine(text.sink);
+  for (const line of text.sink.lines) recorder.lines.push(line);
 }
 
 
@@ -424,7 +447,7 @@ function beginSegment(recorder: MatchReplayRecorder, start: number, world: Reado
   recorder.digests = [];
   recorder.last = start;
   recorder.ended = false;
-  recorder.text = { segmentLine: recorder.lines.length, fold: beginFold(recorder.start.world), slot: 0, gathered: [], pieces: undefined, next: 0, element: 0, tokens: [] };
+  recorder.text = { segmentLine: recorder.lines.length, fold: beginFold(recorder.start.world), slot: 0, gathered: [], pieces: undefined, next: 0, element: 0, sink: sectionLines("state ", []) };
   recorder.lines.push("segment");
 }
 
@@ -483,9 +506,9 @@ function encodeRows(recorder: MatchReplayRecorder, moment: Readonly<MomentRecord
   finishCheckpoint(recorder);
   if (recorder.runCount > 0) recorder.runs.push(runToken(moment, recorder.runIndex, recorder.runCount));
   recorder.runCount = 0;
-  for (const line of section("rows", recorder.runs)) recorder.lines.push(line);
+  pushSection(recorder.lines, "rows ", recorder.runs);
   recorder.runs = [];
-  if (recorder.digests.length > 0) for (const line of section("digests", recorder.digests)) recorder.lines.push(line);
+  if (recorder.digests.length > 0) pushSection(recorder.lines, "digests ", recorder.digests);
   recorder.digests = [];
   recorder.encoded = last;
   return true;

@@ -19,7 +19,7 @@ import type { FrameControls } from "../../game/match/controls";
 import type { PacingAndPresentation } from "../../game/match/pacingAndPresentation";
 import { type MatchState, DEFAULT_RESULT_PICK, Phase, humanActive, remainingSeconds, resultChoicesOpen, stageClock, timedMatch } from "../../game/lobby/lobbyState";
 import { fighterOffscreen, fitFighterFrames } from "../../game/presentation/fighterFraming";
-import { arenaFarZ, ARENA_CAMERA, FLOOR_HEIGHT, cameraFieldOfView, cameraPoint, extremeCamera, finalCamera, localCamera, resultCamera } from "../../game/presentation/arenaCamera";
+import { arenaFarZ, ARENA_CAMERA, FLOOR_HEIGHT, cameraFieldOfView, type ScreenPoint, cameraPoint, extremeCamera, finalCamera, localCamera, resultCamera } from "../../game/presentation/arenaCamera";
 
 import { beginPauseCamera, advancePauseCamera, pauseCameraAngle, pauseHudHidden } from "./pauseCamera";
 import { type MatchCamera, copyMatchCamera } from "../../game/sim/matchCamera";
@@ -562,16 +562,19 @@ export function lockArenaCamera(s: ShellState): void {
   views(s).drops.present(game);
   for (const slot of PARTICIPANT_SLOTS) {
     const fighter = isActive(world, slot) ? fighterAt(world, slot) : undefined;
-    const point = cameraPoint(framing, aspect, fighter?.motion.x ?? 0.0, (fighter?.motion.z ?? 0.0) + 60.0);
+    const point = cameraPoint(framing, aspect, fighter?.motion.x ?? 0.0, (fighter?.motion.z ?? 0.0) + 60.0, BUBBLE_POINT);
     const outside = fighter !== undefined && fighterOffscreen(framing, aspect, fighter.character, fighter.motion.x, fighter.motion.z);
     views(s).bubbles[slot].update(!pauseHudHidden(s) && game.phase === Phase.match && fighter !== undefined && !fighter.status.out && outside, fighter?.character ?? Character.rifleman, point.column, point.row, aspect);
     readEscapeMeter(world, slot, meter);
     if (game.phase !== Phase.match || pauseHudHidden(s)) meter.shown = false;
-    const meterPoint = cameraPoint(framing, aspect, meter.x, meter.z);
+    const meterPoint = cameraPoint(framing, aspect, meter.x, meter.z, METER_POINT);
     views(s).escapeMeters[slot].update(meter, meterPoint.column, meterPoint.row, aspect);
   }
 }
 
+
+const BUBBLE_POINT: ScreenPoint = { column: 0.0, row: 0.0 };
+const METER_POINT: ScreenPoint = { column: 0.0, row: 0.0 };
 
 const shownMessages: { frames: object | undefined; helpVisible: boolean | undefined; noticeVisible: boolean | undefined; help: string | undefined; notice: string | undefined } = {
   frames: undefined, helpVisible: undefined, noticeVisible: undefined, help: undefined, notice: undefined,

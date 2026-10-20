@@ -92,7 +92,8 @@ export function traceFrameInput(s: ShellState, slot: ParticipantSlot, input: Rea
 
 export function localParticipantSlot(s: Readonly<ShellState>): ParticipantSlot | undefined {
   const slot = localSlot();
-  return PARTICIPANT_SLOTS.find(candidate => candidate === slot && humanActive(s.game, candidate)) ?? firstHumanSlot(s.game);
+  for (const candidate of PARTICIPANT_SLOTS) if (candidate === slot && humanActive(s.game, candidate)) return candidate;
+  return firstHumanSlot(s.game);
 }
 
 

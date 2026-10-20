@@ -25,13 +25,13 @@ The #168 budget gates p99 ≤ 10 ms and worst ≤ 14 ms; CI measures Classic wit
   candidate. The exact command and calibration scope are in
   smashcraft:docs/native-bot-session.md, "Wisp-only frame-cost acceptance".
   `bun wisp perf budget RUN_FILE` holds a `--samples` run to #168's frame
-  budget (p99 10 ms, worst frame 14 ms, predicted). `bun wisp perf profile
+  budget (p99 10 ms, worst frame 14 ms, predicted) and each client's map allocation per frame to 13 KB at the median and 26 KB at the 95th percentile (`--alloc-p50 KB`, `--alloc-p95 KB`; CI's playable-bot-four and rollback-four runs both hold it). `bun wisp perf profile
   playable-bot-four --phases --out FILE` preserves measured samples and each
   client's slow-frame phase samples and simulation/repair step counts;
   profiling is a separate replay, excluded from measured costs. `perf profile RUN --alloc
-  [--top N]` replays the frames at or above any client's 95th percentile of alloc-bytes and
+  [--top N] [--alloc-frames heavy|all]` replays the frames at or above any client's 95th percentile of alloc-bytes and
   lists the `--top` map functions by bytes requested per frame, self and inclusive, over every
-  client, from Wisp's `allocationSampler` (wisp:docs/frame-cost.md); Wisp's headless runtime
+  client (with `--alloc-frames all`, every frame, as KB per minute at 60 frames a second), from Wisp's `allocationSampler` (wisp:docs/frame-cost.md); Wisp's headless runtime
   and emulated natives are their own row. Spike census (#168): `bun wisp
   perf census [--fighter NAME] [--stage ID] [--functions]` plays every
   fighter's moves, specials and follow-ups in a playable-build training match
