@@ -6,11 +6,29 @@ import { analogShieldActive, analogShieldStrength } from "../sim/shield";
 import { squareRoot } from "../sim/warcraftMath";
 import { SHIELD_TILT_STICK_CAP, stickX, stickZ } from "../sim/stick";
 import { STICK_DEADZONE } from "../sim/stickZones";
-import { Action, has, maskOf } from "./actions";
+import { Action, bit, has, maskOf } from "./actions";
 import { type AttackBuffer, clearAttackBuffer, queueAttack } from "./attackBuffer";
 import { groundDodgeIntent, normalAttackStyle } from "./combat";
 import type { Direction, InputRow } from "./inputRow";
 
+const ATTACK_BIT = bit(Action.attack);
+const EX_SPECIAL_BIT = bit(Action.exSpecial);
+const GRAB_BIT = bit(Action.grab);
+const JUMP_BIT = bit(Action.jump);
+const LEFT_TRIGGER_BIT = bit(Action.leftTrigger);
+const LIGHT_SHIELD_BIT = bit(Action.lightShield);
+const MOVE_DOWN_BIT = bit(Action.moveDown);
+const MOVE_LEFT_BIT = bit(Action.moveLeft);
+const MOVE_RIGHT_BIT = bit(Action.moveRight);
+const MOVE_UP_BIT = bit(Action.moveUp);
+const RIGHT_TRIGGER_BIT = bit(Action.rightTrigger);
+const SHORT_HOP_BIT = bit(Action.shortHop);
+const SMASH_DOWN_BIT = bit(Action.smashDown);
+const SMASH_LEFT_BIT = bit(Action.smashLeft);
+const SMASH_RIGHT_BIT = bit(Action.smashRight);
+const SMASH_UP_BIT = bit(Action.smashUp);
+const SPECIAL_BIT = bit(Action.special);
+const WALK_BIT = bit(Action.walk);
 const GRAB_MASH_ACTIONS = maskOf(Action.attack, Action.special, Action.jump, Action.shortHop, Action.grab, Action.leftTrigger, Action.rightTrigger, Action.lightShield);
 const MOVEMENT_ACTIONS = maskOf(Action.moveLeft, Action.moveRight, Action.moveDown, Action.moveUp);
 const TRIGGERS = maskOf(Action.leftTrigger, Action.rightTrigger, Action.lightShield);
@@ -50,56 +68,56 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   destination.sdiPulse = row.sdi;
   destination.sdiX = row.sdiX;
   destination.sdiZ = row.sdiZ;
-  destination.cStickX = (has(held, Action.smashRight) ? 1 : 0) - (has(held, Action.smashLeft) ? 1 : 0);
-  destination.cStickZ = (has(held, Action.smashUp) ? 1 : 0) - (has(held, Action.smashDown) ? 1 : 0);
-  destination.exPressed = has(pressed, Action.exSpecial);
-  destination.specialPressed = has(pressed, Action.special) || destination.exPressed;
-  destination.ultimatePressed = (has(pressed, Action.special) && has(held | pressed, Action.attack)) || (has(pressed, Action.attack) && has(held, Action.special));
-  destination.specialX = destination.specialPressed && !(has(held, Action.walk) && row.specialZ === 0) ? row.specialX : 0;
+  destination.cStickX = ((held & SMASH_RIGHT_BIT) !== 0 ? 1 : 0) - ((held & SMASH_LEFT_BIT) !== 0 ? 1 : 0);
+  destination.cStickZ = ((held & SMASH_UP_BIT) !== 0 ? 1 : 0) - ((held & SMASH_DOWN_BIT) !== 0 ? 1 : 0);
+  destination.exPressed = (pressed & EX_SPECIAL_BIT) !== 0;
+  destination.specialPressed = (pressed & SPECIAL_BIT) !== 0 || destination.exPressed;
+  destination.ultimatePressed = ((pressed & SPECIAL_BIT) !== 0 && ((held | pressed) & ATTACK_BIT) !== 0) || ((pressed & ATTACK_BIT) !== 0 && (held & SPECIAL_BIT) !== 0);
+  destination.specialX = destination.specialPressed && !((held & WALK_BIT) !== 0 && row.specialZ === 0) ? row.specialX : 0;
   destination.specialZ = destination.specialPressed ? row.specialZ : 0;
-  destination.down = has(held, Action.moveDown);
+  destination.down = (held & MOVE_DOWN_BIT) !== 0;
   destination.shieldPressed = (pressed & TRIGGERS) !== 0;
-  const leftPressure = row.triggerLeft > 0 ? row.triggerLeft : has(held | pressed, Action.leftTrigger) ? 255 : has(held | pressed, Action.lightShield) ? 77 : 0;
-  const rightPressure = row.triggerRight > 0 ? row.triggerRight : has(held | pressed, Action.rightTrigger) ? 255 : 0;
+  const leftPressure = row.triggerLeft > 0 ? row.triggerLeft : ((held | pressed) & LEFT_TRIGGER_BIT) !== 0 ? 255 : ((held | pressed) & LIGHT_SHIELD_BIT) !== 0 ? 77 : 0;
+  const rightPressure = row.triggerRight > 0 ? row.triggerRight : ((held | pressed) & RIGHT_TRIGGER_BIT) !== 0 ? 255 : 0;
   const pressure = Math.max(leftPressure, rightPressure);
   destination.shieldTriggerActive = pressure > 0;
   destination.shield = pressure === 255 || analogShieldActive(pressure);
   destination.shieldStrength = pressure === 255 ? 1.0 : analogShieldStrength(pressure);
-  destination.walking = has(held, Action.walk);
+  destination.walking = (held & WALK_BIT) !== 0;
   if (destination.walking && destination.shield) {
     destination.diStickX = Math.max(-SHIELD_TILT_STICK_CAP, Math.min(SHIELD_TILT_STICK_CAP, destination.diStickX));
     destination.diStickZ = Math.max(-SHIELD_TILT_STICK_CAP, Math.min(SHIELD_TILT_STICK_CAP, destination.diStickZ));
   }
-  destination.shortHopPressed = has(pressed, Action.shortHop);
-  destination.jumpPressed = has(pressed, Action.jump) || destination.shortHopPressed;
-  destination.jumpHeld = has(held, Action.jump);
+  destination.shortHopPressed = (pressed & SHORT_HOP_BIT) !== 0;
+  destination.jumpPressed = (pressed & JUMP_BIT) !== 0 || destination.shortHopPressed;
+  destination.jumpHeld = (held & JUMP_BIT) !== 0;
   destination.techPressed = destination.shieldPressed;
   const airborne = (fighter.jump.squat > 0 || !fighter.motion.grounded) && fighter.ledge.state === LedgeState.none;
-  const tiltDodge = !destination.shieldPressed && airborne && destination.shieldTriggerActive && has(pressed, Action.walk) && ((held | pressed) & SMASHES) === 0;
+  const tiltDodge = !destination.shieldPressed && airborne && destination.shieldTriggerActive && (pressed & WALK_BIT) !== 0 && ((held | pressed) & SMASHES) === 0;
   destination.airDodgePressed = destination.shieldPressed || tiltDodge;
   destination.dodgeX = destination.shieldPressed ? row.dodgeX : tiltDodge ? destination.direction : 0;
   destination.dodgeZ = destination.shieldPressed ? row.dodgeZ : tiltDodge ? destination.verticalDirection : 0;
   destination.mashPressed = pressed !== 0;
-  destination.attackPressed = has(pressed, Action.attack);
+  destination.attackPressed = (pressed & ATTACK_BIT) !== 0;
   destination.grabMashPressed = (pressed & GRAB_MASH_ACTIONS) !== 0;
   destination.grabThrowX = sign(row.throwX);
   destination.grabThrowZ = sign(row.throwZ);
   destination.ledgeVerticalPressed = row.ledgeVertical;
   destination.getupAttackPressed = destination.attackPressed || destination.specialPressed;
-  destination.getupStandPressed = has(pressed, Action.moveUp) || destination.jumpPressed || destination.airDodgePressed;
+  destination.getupStandPressed = (pressed & MOVE_UP_BIT) !== 0 || destination.jumpPressed || destination.airDodgePressed;
   destination.getupDirection = edgePair(pressed, Action.moveLeft, Action.moveRight);
   destination.getupDirectionPressed = destination.getupDirection !== 0;
-  destination.cStickUpFlick = has(pressed, Action.smashUp);
+  destination.cStickUpFlick = (pressed & SMASH_UP_BIT) !== 0;
   destination.cStickSideFlick = edgePair(pressed, Action.smashLeft, Action.smashRight);
-  destination.attackHeld = has(held, Action.attack);
-  const leftShield = has(held, Action.leftTrigger) || analogShieldActive(row.triggerLeft);
-  const rightShield = has(held, Action.rightTrigger) || analogShieldActive(row.triggerRight);
+  destination.attackHeld = (held & ATTACK_BIT) !== 0;
+  const leftShield = (held & LEFT_TRIGGER_BIT) !== 0 || analogShieldActive(row.triggerLeft);
+  const rightShield = (held & RIGHT_TRIGGER_BIT) !== 0 || analogShieldActive(row.triggerRight);
   destination.resetPressed = leftShield && rightShield && destination.attackPressed;
 
   const dodge = groundDodgeIntent(destination.shield,
-    has(pressed, Action.moveLeft) && stickX(destination) <= -0.699999988079071,
-    has(pressed, Action.moveRight) && stickX(destination) >= 0.699999988079071,
-    has(pressed, Action.moveDown) && stickZ(destination) <= -0.699999988079071);
+    (pressed & MOVE_LEFT_BIT) !== 0 && stickX(destination) <= -0.699999988079071,
+    (pressed & MOVE_RIGHT_BIT) !== 0 && stickX(destination) >= 0.699999988079071,
+    (pressed & MOVE_DOWN_BIT) !== 0 && stickZ(destination) <= -0.699999988079071);
   destination.groundDodgePressed = dodge !== undefined;
   destination.groundDodgeDirection = dodge ?? 0;
 
@@ -110,10 +128,10 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
       facing: sign(destination.direction), frame, mayCharge: true,
     });
   }
-  if (has(pressed, Action.grab)) queueAttack(attacks, { style: AttackStyle.grab, facing: 0, frame, mayCharge: false });
+  if ((pressed & GRAB_BIT) !== 0) queueAttack(attacks, { style: AttackStyle.grab, facing: 0, frame, mayCharge: false });
   const tilt = destination.walking;
-  if (has(pressed, Action.smashLeft)) queueAttack(attacks, { style: tilt ? AttackStyle.forwardTilt : AttackStyle.forwardSmash, facing: -1, frame, mayCharge: false });
-  if (has(pressed, Action.smashRight)) queueAttack(attacks, { style: tilt ? AttackStyle.forwardTilt : AttackStyle.forwardSmash, facing: 1, frame, mayCharge: false });
-  if (has(pressed, Action.smashUp)) queueAttack(attacks, { style: tilt ? AttackStyle.upTilt : AttackStyle.upSmash, facing: 0, frame, mayCharge: false });
-  if (has(pressed, Action.smashDown)) queueAttack(attacks, { style: tilt ? AttackStyle.downTilt : AttackStyle.downSmash, facing: 0, frame, mayCharge: false });
+  if ((pressed & SMASH_LEFT_BIT) !== 0) queueAttack(attacks, { style: tilt ? AttackStyle.forwardTilt : AttackStyle.forwardSmash, facing: -1, frame, mayCharge: false });
+  if ((pressed & SMASH_RIGHT_BIT) !== 0) queueAttack(attacks, { style: tilt ? AttackStyle.forwardTilt : AttackStyle.forwardSmash, facing: 1, frame, mayCharge: false });
+  if ((pressed & SMASH_UP_BIT) !== 0) queueAttack(attacks, { style: tilt ? AttackStyle.upTilt : AttackStyle.upSmash, facing: 0, frame, mayCharge: false });
+  if ((pressed & SMASH_DOWN_BIT) !== 0) queueAttack(attacks, { style: tilt ? AttackStyle.downTilt : AttackStyle.downSmash, facing: 0, frame, mayCharge: false });
 }
