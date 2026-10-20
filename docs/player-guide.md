@@ -57,7 +57,7 @@ fighter keeps the usual hit and ice colours inside the halo.
 
 ## Menus and controls
 
-Mouse buttons and your left/right keys (S/F on ESDF, W/R on Hitbox) + N select a
+Mouse buttons and your left/right keys (A/D on WASD, W/R on Hitbox) + N select a
 fighter or stage; U goes back. Menus always follow your own bindings, and the
 arrow keys work too. Drag a
 character chip from the active player card onto the roster. New Match retains
@@ -67,7 +67,7 @@ the Warcraft chat box is open, typing never pauses, moves or attacks. Pausing fr
 match time while keeping input handling live. Enter is reserved for Warcraft
 chat.
 
-At fighter selection, up/down (E/D on ESDF, Space/E on Hitbox) moves focus
+At fighter selection, up/down (W/S on WASD, Space/E on Hitbox) moves focus
 between fighter cards and CPU Opponent settings. Left/right changes the focused
 fighter; N opens focused settings. Inside the panel, up/down visits Opponent,
 Difficulty and Done; left/right changes the value. N advances to the next row or chooses Done, and U or Close returns
@@ -76,7 +76,7 @@ and press it again to continue. Controller menus use the left stick to move
 the pointer, A to choose and B to go back. The panel shows your current control bindings.
 
 Every game opens on the Controls screen, one for each player, before fighter
-select. Pick a layout at the top: ESDF (recommended if you're new), Hitbox
+select. Pick a layout at the top: WASD (recommended if you're new), Hitbox
 (Space = up, the leverless controller style) or Custom; picking one saves it as
 your profile. Load profile brings back your saved setup: when you have one it
 is already loaded and selected, and the screen says so; without one the button
@@ -99,8 +99,8 @@ last ten seconds of the match are saved for a bug report on your computer, in
 Warcraft III's CustomMapData folder as smashcraft-repro-*.txt, and "Moment
 saved" appears. The match goes on undisturbed.
 
-ESDF, the default, uses S/F to move, E to aim up, D to fast-fall or drop
-through platforms, Space/8 to jump, A to shield or air-dodge, 0 for light
+WASD, the default, uses A/D to move, W to aim up, S to fast-fall or drop
+through platforms, Space/8 to jump, Q to shield or air-dodge, 0 for light
 shield, O to grab, N to attack, and U for a special. Hitbox moves with W/R,
 aims up with Space and down with E, jumps with 8 and shields with Q (light
 shield 0). Custom is Hitbox with Z/9 to jump, Q/8/G to shield, A for light shield, / for C-stick left and 0/X for EX special. Shield + N or O
@@ -141,12 +141,12 @@ drop consumes that press: held down never fast-falls. Return toward neutral
 (or release the key), then press down again to fast-fall.
 N with a direction performs a smash, or a tilt while walking. B is
 C-stick left; H is down; J is up; M is right. C-stick down-air preserves
-normal aerial momentum. ESDF and Hitbox use 7 for right trigger and 9
+normal aerial momentum. WASD and Hitbox use 7 for right trigger and 9
 for EX special; Custom uses 8 and 0. T is unbound by default.
 
 Specials use U with a direction; every fighter's specials and
 ultimate are listed by name in the [move list](move-list.md). The EX special
-key (9 on ESDF and Hitbox, 0 on Custom) with a direction casts that special's EX
+key (9 on WASD and Hitbox, 0 on Custom) with a direction casts that special's EX
 form, costing one of the super bar's three segments. At a full bar,
 N + U together (A + B in Melee or A + X in Tom's controller layout) is the fighter's ultimate; the
 Ultimates rule at fighter selection turns them off.

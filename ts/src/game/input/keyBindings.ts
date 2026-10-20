@@ -18,16 +18,16 @@ export interface KeyBindings {
 }
 
 
-export type BindingPreset = "esdf" | "standard" | "custom";
+export type BindingPreset = "wasd" | "standard" | "custom";
 
-export const DEFAULT_PRESET: BindingPreset = "esdf";
+export const DEFAULT_PRESET: BindingPreset = "wasd";
 
-export const BINDING_PRESETS: readonly BindingPreset[] = ["esdf", "standard", "custom"];
+export const BINDING_PRESETS: readonly BindingPreset[] = ["wasd", "standard", "custom"];
 
-export const PRESET_NAMES: Readonly<Record<BindingPreset, string>> = { esdf: "ESDF", standard: "Hitbox (Space = up)", custom: "Custom" };
+export const PRESET_NAMES: Readonly<Record<BindingPreset, string>> = { wasd: "WASD", standard: "Hitbox (Space = up)", custom: "Custom" };
 
 export const PRESET_HINTS: Readonly<Record<BindingPreset, string>> = {
-  esdf: "Recommended if you're new",
+  wasd: "Recommended if you're new",
   standard: "Leverless controller style",
   custom: "Hitbox with 9 jump, 8 shield and 0 EX",
 };
@@ -51,23 +51,23 @@ export function slotIndex(action: Action, slot: KeySlot): number {
 
 export function presetBindings(preset: BindingPreset): KeyBindings {
   const custom = preset === "custom";
-  const esdf = preset === "esdf";
+  const wasd = preset === "wasd";
   const keys: number[] = [];
   const bind = (action: Action, first: number, second = EMPTY) => {
     keys[slotIndex(action, 0)] = first;
     keys[slotIndex(action, 1)] = second;
   };
-  bind(Action.moveLeft, code(esdf ? "S" : "W"));
-  bind(Action.moveRight, code(esdf ? "F" : "R"));
-  bind(Action.moveDown, code(esdf ? "D" : "E"));
-  bind(Action.moveUp, esdf ? code("E") : SPACE);
-  if (esdf) bind(Action.jump, SPACE, code("8"));
+  bind(Action.moveLeft, code(wasd ? "A" : "W"));
+  bind(Action.moveRight, code(wasd ? "D" : "R"));
+  bind(Action.moveDown, code(wasd ? "S" : "E"));
+  bind(Action.moveUp, wasd ? code("W") : SPACE);
+  if (wasd) bind(Action.jump, SPACE, code("8"));
   else if (custom) bind(Action.jump, code("Z"), code("9"));
   else bind(Action.jump, code("8"));
   bind(Action.attack, code("N"));
   bind(Action.special, code("U"));
   bind(Action.grab, code("O"));
-  bind(Action.leftTrigger, code(esdf ? "A" : "Q"));
+  bind(Action.leftTrigger, code("Q"));
   if (custom) bind(Action.rightTrigger, code("8"), code("G"));
   else bind(Action.rightTrigger, code("7"));
   bind(Action.smashLeft, code("B"), custom ? SLASH : EMPTY);
@@ -82,29 +82,22 @@ export function presetBindings(preset: BindingPreset): KeyBindings {
   return { keys };
 }
 
-export function previousPresetKeys(preset: "esdf" | "standard"): number[] {
-  const keys = presetBindings(preset).keys.slice();
-  const esdf = preset === "esdf";
+export function previousStandardKeys(): number[] {
+  const keys = presetBindings("standard").keys.slice();
   const bind = (action: Action, first: number, second: number) => {
     keys[slotIndex(action, 0)] = first;
     keys[slotIndex(action, 1)] = second;
   };
-  bind(Action.jump, esdf ? SPACE : code("Z"), code(esdf ? "Z" : "8"));
+  bind(Action.jump, code("Z"), code("8"));
   bind(Action.rightTrigger, code("7"), code("G"));
   bind(Action.smashLeft, code("B"), SLASH);
-  bind(Action.lightShield, code(esdf ? "Q" : "A"), EMPTY);
+  bind(Action.lightShield, code("A"), EMPTY);
   bind(Action.exSpecial, code("9"), code("X"));
   return keys;
 }
 
 function replacePreviousPreset(bindings: KeyBindings): void {
-  for (const preset of ["esdf", "standard"] as const) {
-    const previous = previousPresetKeys(preset);
-    if (previous.every((key, index) => bindings.keys[index] === key)) {
-      bindings.keys = presetBindings(preset).keys;
-      return;
-    }
-  }
+  if (previousStandardKeys().every((key, index) => bindings.keys[index] === key)) bindings.keys = presetBindings("standard").keys;
 }
 
 export function keyFor({ keys }: Readonly<KeyBindings>, action: Action, slot: KeySlot): number | undefined {

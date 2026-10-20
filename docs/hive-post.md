@@ -36,9 +36,9 @@
 
 New here? Place only your own fighter chip and press Y to practice alone.
 
-## Default controls (ESDF)
-- Move: **S**/**F**. Aim up: **E**. Crouch, fast-fall and drop through platforms: **D**
-- Jump: **Space** or **8**. Shield and air dodge: **A**. Light shield: **0**. Grab: **O**
+## Default controls (WASD)
+- Move: **A**/**D**. Aim up: **W**. Crouch, fast-fall and drop through platforms: **S**
+- Jump: **Space** or **8**. Shield and air dodge: **Q**. Light shield: **0**. Grab: **O**
 - Attack: **N**, with a direction for tilts and smashes. Special: **U**, with a direction
 - EX special: **9**, which costs one meter segment. Ultimate: **N + U** together at a full meter
 - Pause: **Backspace**. Confirm: **Y**. Save the last ten seconds for a bug report: **K**

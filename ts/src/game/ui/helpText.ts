@@ -32,7 +32,7 @@ const LAYOUT_ROWS: readonly (readonly [string, Action])[] = [
 export function controlsDescription(bindings: Readonly<KeyBindings>): string {
   const preset = presetOf(bindings);
   const keys = LAYOUT_ROWS.map(([name, action]) => `${name} ${keyLabel(keyFor(bindings, action, 0))}`).join(", ");
-  return `Your layout: ${preset === undefined ? "your own keys" : PRESET_NAMES[preset]}.|n${keys}.|n|nTo change it, press F1 at fighter select: pick ESDF or Hitbox, or Load profile for your saved setup; click a key and press another to rebind it. Save keeps it for next time.`;
+  return `Your layout: ${preset === undefined ? "your own keys" : PRESET_NAMES[preset]}.|n${keys}.|n|nTo change it, press F1 at fighter select: pick WASD or Hitbox, or Load profile for your saved setup; click a key and press another to rebind it. Save keeps it for next time.`;
 }
 
 export const COMMANDS_DESCRIPTION = PLAYER_COMMANDS.join("|n");

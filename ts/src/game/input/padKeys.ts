@@ -6,7 +6,7 @@ export interface PadKey {
   readonly code: number;
 }
 
-// The controller presses these keys; none is in the ESDF, Hitbox or Custom preset, and a player's own binding of one wins.
+// The controller presses these keys; none is in the WASD, Hitbox or Custom preset, and a player's own binding of one wins.
 export const PAD_LAYER: readonly PadKey[] = [
   { action: Action.attack, key: "c", code: 0x43 },
   { action: Action.special, key: "v", code: 0x56 },

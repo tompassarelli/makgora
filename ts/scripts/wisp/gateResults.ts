@@ -37,7 +37,7 @@ const BANNER_SETTLE_MILLIS = Math.ceil(2 * RESULTS_DELAY_FRAMES * 1000 / MATCH_T
 const WALK_HOLDS = 6;
 const WALK_HOLD_SECONDS = 5;
 
-const MOVE_LEFT_KEYS = [...new Set((["esdf", "standard"] as const).flatMap(preset => {
+const MOVE_LEFT_KEYS = [...new Set((["wasd", "standard"] as const).flatMap(preset => {
   const key = keyFor(presetBindings(preset), Action.moveLeft, 0);
   return key === undefined ? [] : [String.fromCharCode(key).toLowerCase()];
 }))];
