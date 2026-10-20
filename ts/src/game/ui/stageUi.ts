@@ -15,7 +15,7 @@ import { dropsSetting, hazardsSetting, rulesSummary } from "../session/messages"
 import { ButtonClicks, type MenuControls, bindSyncHandler, consoleUi, coverScreen, createBackdrop, createSyncTrigger, createText, gameUi, highlightText, placeTopLeft, setFrameText, sizeText } from "./frames";
 import { MENU_STYLE, PANEL_TEXTURE } from "./hudLayout";
 import { StageCard } from "./stageCard";
-import { START_BUTTON, startButtonContains } from "./selectionLayout";
+import { HEADER_BUTTON_HEIGHT, HEADER_BUTTON_TOP, START_BUTTON, startButtonContains } from "./selectionLayout";
 
 
 
@@ -31,8 +31,10 @@ export interface StageActions {
 
 type StageButton = { kind: "stage"; choice: StageChoice } | { kind: "hazards" } | { kind: "drops" } | { kind: "start" } | { kind: "back" } | { kind: "poolOpen" } | { kind: "poolClose" } | { kind: "poolMode" } | { kind: "poolStage"; choice: number };
 
-export const HAZARDS_BUTTON = { x: f32(0.225), y: f32(0.082), width: f32(0.19), height: f32(0.037) } as const;
-export const DROPS_BUTTON = { x: f32(0.42), y: f32(0.082), width: f32(0.12), height: f32(0.037) } as const;
+export const BACK_BUTTON = { x: f32(0.265), y: HEADER_BUTTON_TOP, width: f32(0.17), height: HEADER_BUTTON_HEIGHT } as const;
+export const HAZARDS_BUTTON = { x: f32(0.445), y: HEADER_BUTTON_TOP, width: f32(0.17), height: HEADER_BUTTON_HEIGHT } as const;
+export const DROPS_BUTTON = { x: f32(0.625), y: HEADER_BUTTON_TOP, width: f32(0.13), height: HEADER_BUTTON_HEIGHT } as const;
+export const STAGE_POOL_BUTTON = { x: f32(0.49), y: f32(0.518), width: f32(0.298), height: f32(0.027) } as const;
 
 
 function stageText(parent: framehandle, name: string, x: number, y: number, width: number, height: number, fontSize: number, text: string): framehandle {
@@ -94,12 +96,12 @@ export class StagePanel {
     this.backdrop = createBackdrop("MeleeStageBackdrop", consoleUi(), 800);
     BlzFrameSetTexture(this.backdrop, MENU_STYLE.panelTexture, 0, false);
     coverScreen(this.backdrop);
-    stageText(root, "MeleeStageTitle", f32(0.045), f32(0.575), f32(0.325), f32(0.034), MENU_STYLE.titleSize, `${MENU_STYLE.gold}STAGE SELECT|r`);
-    this.ruleLabel = stageText(root, "MeleeStageRules", f32(0.41), f32(0.575), f32(0.35), f32(0.034), MENU_STYLE.headerSize, "");
-    this.preview = new StageCard(root, "MeleeStagePreview", f32(0.13), f32(0.445), f32(0.31), f32(0.21), false);
-    this.previewName = stageText(root, "MeleeStagePreviewName", f32(0.13), f32(0.225), f32(0.31), f32(0.036), f32(0.022), "");
-    this.previewDescription = stageText(root, "MeleeStageDescription", f32(0.13), f32(0.185), f32(0.31), f32(0.05), f32(0.011), "");
-    stageText(root, "MeleeStageGridTitle", f32(0.454), f32(0.48), f32(0.3), f32(0.022), MENU_STYLE.headerSize, `${MENU_STYLE.gold}CHOOSE A STAGE|r`);
+    stageText(root, "MeleeStageTitle", f32(0.055), f32(0.558), f32(0.2), f32(0.032), MENU_STYLE.titleSize, `${MENU_STYLE.gold}STAGE SELECT|r`);
+    this.ruleLabel = stageText(root, "MeleeStageRules", f32(0.265), f32(0.558), f32(0.49), f32(0.032), MENU_STYLE.headerSize, "");
+    this.preview = new StageCard(root, "MeleeStagePreview", f32(0.045), f32(0.19), f32(0.19), f32(0.13), false);
+    this.previewName = stageText(root, "MeleeStagePreviewName", f32(0.245), f32(0.19), f32(0.235), f32(0.03), f32(0.018), "");
+    this.previewDescription = stageText(root, "MeleeStageDescription", f32(0.245), f32(0.155), f32(0.235), f32(0.06), f32(0.0095), "");
+    stageText(root, "MeleeStageGridTitle", f32(0.49), f32(0.483), f32(0.298), f32(0.022), MENU_STYLE.headerSize, `${MENU_STYLE.gold}CHOOSE A STAGE|r`);
     for (const stage of STAGE_CHOICES) {
       const choice = stage.id;
       const button = BlzCreateFrameByType("BUTTON", `MeleeStageTileButton${I2S(choice)}`, root, "", 0);
@@ -110,7 +112,7 @@ export class StagePanel {
       this.tileNames[choice] = BlzGetFrameByName(`MeleeStageTile${I2S(choice)}Name`, 0);
       setFrameText(this.tileNames[choice], stage.name);
     }
-    dialogButton(root, f32(0.454), f32(0.514), f32(0.3), f32(0.027), "Stage pool", { kind: "poolOpen" });
+    dialogButton(root, STAGE_POOL_BUTTON.x, STAGE_POOL_BUTTON.y, STAGE_POOL_BUTTON.width, STAGE_POOL_BUTTON.height, "Stage pool", { kind: "poolOpen" });
     this.poolRoot = BlzCreateFrameByType("FRAME", "MeleeStagePoolRoot", root, "", 0);
     BlzFrameSetLevel(this.poolRoot, 30);
     const poolBackdrop = createBackdrop("MeleeStagePoolBackdrop", this.poolRoot, 0);
@@ -134,9 +136,9 @@ export class StagePanel {
     const help = journal
       ? "Click a stage or move the stick.\nAny player can choose.\nA / Click: choose · Start: start · Click BACK: back"
       : "Click a stage or use movement controls.\nAny player can choose.\nY: start · Click BACK TO FIGHTERS: back";
-    stageText(root, "MeleeStageHelp", f32(0.454), f32(0.119), f32(0.3), f32(0.025), f32(0.008), help);
+    stageText(root, "MeleeStageHelp", f32(0.49), f32(0.148), f32(0.298), f32(0.03), f32(0.008), help);
     this.startButton = dialogButton(root, START_BUTTON.x, START_BUTTON.y, START_BUTTON.width, START_BUTTON.height, journal ? "START MATCH [A]" : "START MATCH", { kind: "start" });
-    dialogButton(root, f32(0.045), f32(0.082), f32(0.17), f32(0.037), journal ? "BACK" : "BACK TO FIGHTERS", { kind: "back" });
+    dialogButton(root, BACK_BUTTON.x, BACK_BUTTON.y, BACK_BUTTON.width, BACK_BUTTON.height, journal ? "BACK" : "BACK TO FIGHTERS", { kind: "back" });
     this.hazardsToggle = dialogButton(root, HAZARDS_BUTTON.x, HAZARDS_BUTTON.y, HAZARDS_BUTTON.width, HAZARDS_BUTTON.height, "", { kind: "hazards" });
     this.dropsToggle = dialogButton(root, DROPS_BUTTON.x, DROPS_BUTTON.y, DROPS_BUTTON.width, DROPS_BUTTON.height, "", { kind: "drops" });
     this.sync = createSyncTrigger("ui.stage.drop", "stage-drop", PARTICIPANT_SLOTS, (sender, data) => {

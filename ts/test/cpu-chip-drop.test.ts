@@ -9,7 +9,7 @@ import { Phase } from "../src/game/lobby/lobbyState";
 import { PLAYABLE_CHARACTERS } from "../src/game/sim/heroes/registry";
 import type { Character } from "../src/game/sim/codes";
 import { cellRect, rosterGrid } from "../src/game/menu/selectionGrid";
-import { cardX } from "../src/game/menu/selectionDrag";
+import { CARD_WIDTH, cardX, parkedChipCentre } from "../src/game/menu/selectionDrag";
 import { pixelX, pixelY } from "../src/game/menu/pointer";
 import { f32 } from "wisp/src/sim/f32";
 
@@ -60,7 +60,7 @@ function menu() {
     else host.heldMouseButtons.delete(host.natives.MOUSE_BUTTON_TYPE_LEFT);
   };
   const drag = (x: number, y: number) => {
-    const card = { x: f32(cardX(CPU) + f32(0.08)), y: f32(0.17) };
+    const card = { x: f32(cardX(CPU) + f32(CARD_WIDTH / 2)), y: parkedChipCentre(CPU).y };
     point(card.x, card.y, false);
     clients.frames(2);
     point(card.x, card.y, true);
@@ -100,7 +100,7 @@ test("a dragged CPU chip lands on the tile it is released over, and released in 
     expect(expected).not.toBe(before);
     expect(drag(release.x, release.y)).toBe(expected);
   }
-  expect(drag(f32(0.8), f32(0.4))).toBe(fighter(1));
+  expect(drag(f32(0.2), f32(0.4))).toBe(fighter(1));
   for (const client of clients.clients) {
     expect(value(client, () => shell().game.characterChoices[CPU])).toBe(fighter(1));
     expect(client.errors).toEqual([]);

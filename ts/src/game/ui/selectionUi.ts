@@ -1,6 +1,6 @@
 import { type SessionWinsFrames, createSessionWinsFrames, presentSessionWinsFrames } from "./sessionWinsFrames";
 import { nextMatchCharacter, selectableMatchCharacter } from "../lobby/lobbyState";
-import { RULE_BUTTONS, RULE_HEIGHT, type RuleBox, type TrainingSetting, cpuSettingsBox, teamSettingsBox } from "./ruleButtons";
+import { RULE_BUTTONS, RULE_HEIGHT, RULE_ROWS, type RuleBox, type TrainingSetting, cpuSettingsBox, teamSettingsBox } from "./ruleButtons";
 import { RULE_HELP_HEIGHT, RULE_HELP_WIDTH, hoveredRule, ruleHelp, visibleRuleGroups } from "./ruleHelp";
 
 
@@ -39,6 +39,12 @@ import {
   type Roster,
   type RosterChip,
   type RosterTile,
+  CARD_HEIGHT,
+  CARD_TOP,
+  CARD_WIDTH,
+  cardDown,
+  cardRight,
+  cardSize,
   cardX,
   HAND_WIDTH,
   HAND_HEIGHT,
@@ -173,31 +179,34 @@ function label(parent: framehandle, name: string, x: number, y: number, width: n
 }
 
 
-const TAG_SCALE = f32(f32(0.01) / NATIVE_TEXT_BASE);
-const BOTTOM_BAR_TOP = f32(0.077);
-const BAR_COIN = f32(0.011);
-const BAR_GAP = f32(0.003);
-const BAR_LABEL_GAP = f32(0.006);
-const BAR_CHAR_WIDTH = f32(0.0055);
+const TAG_SIZE = cardSize(f32(0.01));
+const TAG_SCALE = f32(TAG_SIZE / NATIVE_TEXT_BASE);
+const BOTTOM_BAR_TOP = cardDown(f32(0.198));
+const BAR_HEIGHT = cardSize(f32(0.012));
+const BAR_TEXT = cardSize(f32(0.009));
+const BAR_COIN = cardSize(f32(0.011));
+const BAR_GAP = cardSize(f32(0.003));
+const BAR_LABEL_GAP = cardSize(f32(0.006));
+const BAR_CHAR_WIDTH = cardSize(f32(0.0055));
 
 function placeBottomBar(frames: { readonly status: framehandle; readonly wins: SessionWinsFrames }, slot: number, winsShown: boolean, statusText: string, countText: string): void {
-  const left = f32(cardX(slot) + f32(0.014));
-  const width = f32(0.132);
+  const left = cardRight(slot, f32(0.014));
+  const width = cardSize(f32(0.132));
   if (!winsShown) {
     placeTopLeft(frames.status, left, BOTTOM_BAR_TOP);
-    BlzFrameSetSize(frames.status, width, f32(0.012));
+    BlzFrameSetSize(frames.status, width, BAR_HEIGHT);
     BlzFrameSetTextAlignment(frames.status, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_CENTER);
     return;
   }
   const statusWidth = f32(I2R(StringLength(statusText)) * BAR_CHAR_WIDTH);
   const countWidth = f32(I2R(StringLength(countText)) * BAR_CHAR_WIDTH);
   const group = f32(f32(f32(statusWidth + countWidth) + BAR_COIN) + f32(BAR_GAP + BAR_LABEL_GAP));
-  const statusRight = f32(f32(f32(cardX(slot) + f32(0.08)) - f32(group / 2)) + statusWidth);
+  const statusRight = f32(f32(cardRight(slot, f32(0.08)) - f32(group / 2)) + statusWidth);
   const coinLeft = f32(statusRight + BAR_LABEL_GAP);
   placeTopLeft(frames.status, left, BOTTOM_BAR_TOP);
-  BlzFrameSetSize(frames.status, f32(statusRight - left), f32(0.012));
+  BlzFrameSetSize(frames.status, f32(statusRight - left), BAR_HEIGHT);
   BlzFrameSetTextAlignment(frames.status, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_RIGHT);
-  placeTopLeft(frames.wins.coin, coinLeft, f32(BOTTOM_BAR_TOP + f32(f32(BAR_COIN - f32(0.012)) / 2)));
+  placeTopLeft(frames.wins.coin, coinLeft, f32(BOTTOM_BAR_TOP + f32(f32(BAR_COIN - BAR_HEIGHT) / 2)));
   BlzFrameSetSize(frames.wins.coin, BAR_COIN, BAR_COIN);
   placeTopLeft(frames.wins.count, f32(f32(coinLeft + BAR_COIN) + BAR_GAP), BOTTOM_BAR_TOP);
 }
@@ -211,7 +220,7 @@ function hotspot(parent: framehandle, x: number, y: number, width: number, heigh
 }
 
 
-const modeBox = (slot: number) => ({ x: f32(cardX(slot) + f32(0.014)), y: f32(0.27), width: f32(0.132), height: f32(0.027) });
+const modeBox = (slot: number) => ({ x: cardRight(slot, f32(0.014)), y: cardDown(f32(0.005)), width: cardSize(f32(0.132)), height: cardSize(f32(0.027)) });
 
 const characterOfTile = (tile: RosterTile): number => PLAYABLE_CHARACTERS[tile] ?? Character.rifleman;
 function tileOfCharacter(character: number): RosterTile {
@@ -322,7 +331,7 @@ export class SelectionPanel {
     this.backdrop = createBackdrop(`MeleeSelectBackdrop${suffix}`, consoleUi(), 400 + participantId);
     BlzFrameSetTexture(this.backdrop, MENU_STYLE.panelTexture, 0, false);
     coverScreen(this.backdrop);
-    art(root, `MeleeModeArt${suffix}`, "war3mapImported\\SelectionAction.tga", headerBoxLeft, f32(0.555), f32(0.295), f32(0.032));
+    art(root, `MeleeModeArt${suffix}`, "war3mapImported\\SelectionAction.tga", headerBoxLeft, RULE_ROWS[1], f32(0.295), RULE_HEIGHT);
     const grid = this.roster.grid;
     const scale = f32(grid.scale);
     for (let choice = 0; choice < grid.count; choice++) {
@@ -347,22 +356,22 @@ export class SelectionPanel {
     this.cards = PARTICIPANT_SLOTS.map((slot) => {
       const x = cardX(slot);
       const name = `${suffix}_${I2S(slot)}`;
-      const card = art(root, `MeleeCard${name}`, "war3mapImported\\SelectionCardGray.tga", x, f32(0.275), f32(0.16), f32(0.22));
+      const card = art(root, `MeleeCard${name}`, "war3mapImported\\SelectionCardGray.tga", x, CARD_TOP, CARD_WIDTH, CARD_HEIGHT);
       const mode = BlzCreateFrameByType("BUTTON", `MeleeModeButton${name}`, root, "", 0);
       const modeArea = modeBox(slot);
       placeTopLeft(mode, modeArea.x, modeArea.y);
       BlzFrameSetSize(mode, modeArea.width, modeArea.height);
       this.clicks.add(mode, { kind: "mode", slot }, undefined, "native");
-      const tag = label(mode, `MeleeTag${name}`, x + f32(0.014), f32(0.267), f32(0.132), f32(0.019), f32(0.01));
+      const tag = label(mode, `MeleeTag${name}`, cardRight(slot, f32(0.014)), cardDown(f32(0.008)), cardSize(f32(0.132)), cardSize(f32(0.019)), TAG_SIZE);
       const teamArea = teamSettingsBox(slot);
       const team = hotspot(root, teamArea.x, teamArea.y, teamArea.width, teamArea.height);
       this.clicks.add(team, { kind: "team", slot }, undefined, "native");
-      const teamLabel = label(root, `MeleeTeam${name}`, teamArea.x, f32(0.267), teamArea.width, f32(0.019), f32(0.01));
-      const portrait = art(root, `MeleePortrait${name}`, portraitTexture(Character.demonHunter, false, slot), x + f32(0.029), f32(0.245), f32(0.102), f32(0.102));
-      const name_ = label(root, `MeleeName${name}`, x + f32(0.008), f32(0.102), f32(0.144), f32(0.019), f32(0.011));
-      const wins = createSessionWinsFrames(root, name, f32(x + f32(0.054)), BOTTOM_BAR_TOP);
-      const status = label(root, `MeleeStatus${name}`, x + f32(0.014), BOTTOM_BAR_TOP, f32(0.132), f32(0.012), f32(0.009));
-      const chip = art(root, `MeleeChip${name}`, `war3mapImported\\SelectionChipP${I2S(slot + 1)}.tga`, x + f32(0.06), f32(0.2), f32(0.06), f32(0.06));
+      const teamLabel = label(root, `MeleeTeam${name}`, teamArea.x, cardDown(f32(0.008)), teamArea.width, cardSize(f32(0.019)), TAG_SIZE);
+      const portrait = art(root, `MeleePortrait${name}`, portraitTexture(Character.demonHunter, false, slot), cardRight(slot, f32(0.029)), cardDown(f32(0.03)), cardSize(f32(0.102)), cardSize(f32(0.102)));
+      const name_ = label(root, `MeleeName${name}`, cardRight(slot, f32(0.008)), cardDown(f32(0.173)), cardSize(f32(0.144)), cardSize(f32(0.019)), cardSize(f32(0.011)));
+      const wins = createSessionWinsFrames(root, name, cardRight(slot, f32(0.054)), BOTTOM_BAR_TOP, BAR_TEXT);
+      const status = label(root, `MeleeStatus${name}`, cardRight(slot, f32(0.014)), BOTTOM_BAR_TOP, cardSize(f32(0.132)), BAR_HEIGHT, BAR_TEXT);
+      const chip = art(root, `MeleeChip${name}`, `war3mapImported\\SelectionChipP${I2S(slot + 1)}.tga`, cardRight(slot, f32(0.06)), cardDown(f32(0.075)), cardSize(f32(0.06)), cardSize(f32(0.06)));
       BlzFrameSetLevel(chip, 10);
       const box = cpuSettingsBox(slot);
       const settings = BlzCreateFrame("ScriptDialogButton", root, 0, 0);
@@ -372,14 +381,14 @@ export class SelectionPanel {
       const settingsLabel = label(settings, `MeleeCpuSettingsLabel${name}`, box.x + f32(0.004), box.y - f32(0.002), box.width - f32(0.008), box.height - f32(0.004), f32(0.0075));
       setFrameText(settingsLabel, "Opponent settings");
       this.clicks.add(settings, { kind: "cpuSettings", slot }, undefined, "native");
-      const summary = label(root, `MeleeCpuSummary${name}`, x + f32(0.004), f32(0.139), f32(0.152), f32(0.031), f32(0.009));
+      const summary = label(root, `MeleeCpuSummary${name}`, cardRight(slot, f32(0.004)), cardDown(f32(0.136)), cardSize(f32(0.152)), cardSize(f32(0.031)), BAR_TEXT);
       return { card, tag, mode, team, teamLabel, portrait, name: name_, status, wins, chip, summary, settings, settingsLabel };
     });
     this.hand = art(root, `MeleeHand${suffix}`, "war3mapImported\\SelectionHandPinch.tga", 0.0, 0.0, HAND_WIDTH, HAND_HEIGHT);
     BlzFrameSetLevel(this.hand, 30);
     BlzFrameSetVisible(this.hand, false);
     art(root, `MeleeConfirmArt${suffix}`, "war3mapImported\\SelectionAction.tga", START_BUTTON.x, START_BUTTON.y, START_BUTTON.width, START_BUTTON.height);
-    this.confirm = label(root, `MeleeConfirmLabel${suffix}`, f32(0.079), f32(0.039), f32(0.219), f32(0.028), f32(0.011));
+    this.confirm = label(root, `MeleeConfirmLabel${suffix}`, f32(START_BUTTON.x + f32(0.006)), f32(START_BUTTON.y - f32(0.002)), f32(START_BUTTON.width - f32(0.012)), f32(START_BUTTON.height - f32(0.004)), f32(0.011));
     this.clicks.add(hotspot(root, START_BUTTON.x, START_BUTTON.y, START_BUTTON.width, START_BUTTON.height), { kind: "start" }, undefined, "native");
     art(root, `MeleeSettingsArt${suffix}`, "war3mapImported\\SelectionAction.tga", SETTINGS_BOX.x, SETTINGS_BOX.y, SETTINGS_BOX.width, SETTINGS_BOX.height);
     const settingsButton = BlzCreateFrameByType("BUTTON", `MeleeSettingsButton${suffix}`, root, "", 0);
@@ -393,7 +402,7 @@ export class SelectionPanel {
     this.delayLine = label(root, `MeleeDelayLine${suffix}`, f32(0.06), f32(0.6), f32(0.72), f32(0.03), f32(0.010));
     BlzFrameSetTextAlignment(this.delayLine, TEXT_JUSTIFY_TOP, TEXT_JUSTIFY_RIGHT);
     art(root, `MeleeMovesArt${suffix}`, "war3mapImported\\SelectionAction.tga", MOVES_BOX.x, MOVES_BOX.y, MOVES_BOX.width, MOVES_BOX.height);
-    this.movesLabel = label(root, `MeleeMovesLabel${suffix}`, f32(0.324), f32(0.039), f32(0.168), f32(0.028), f32(0.011));
+    this.movesLabel = label(root, `MeleeMovesLabel${suffix}`, f32(MOVES_BOX.x + f32(0.006)), f32(MOVES_BOX.y - f32(0.002)), f32(MOVES_BOX.width - f32(0.012)), f32(MOVES_BOX.height - f32(0.004)), f32(0.011));
     setFrameText(this.movesLabel, "Moves");
     this.clicks.add(hotspot(root, MOVES_BOX.x, MOVES_BOX.y, MOVES_BOX.width, MOVES_BOX.height), { kind: "moves" }, undefined, "native");
     const page = (frame: framehandle, x: number, y: number, width: number, height: number) => {
@@ -415,8 +424,8 @@ export class SelectionPanel {
       return this.clicks.add(frame, target, undefined, "native");
     };
     this.modeLabel = page(createText(`MeleeModeLabel${suffix}`, gameUi(), 478 + participantId), titleBox.left, titleBox.top, titleBox.width, titleBox.height);
-    sizeText(this.modeLabel, MENU_STYLE.headerSize, f32(f32(0.295) - 2 * headerInset), f32(0.032));
-    placeTopLeft(this.modeLabel, headerLeft, f32(0.551));
+    sizeText(this.modeLabel, MENU_STYLE.headerSize, f32(f32(0.295) - 2 * headerInset), RULE_HEIGHT);
+    placeTopLeft(this.modeLabel, headerLeft, RULE_ROWS[1]);
     BlzFrameSetTextAlignment(this.modeLabel, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
     BlzFrameSetEnable(this.modeLabel, false);
     this.movesFrames = [
@@ -495,7 +504,7 @@ export class SelectionPanel {
     this.trainingFrames = partnerFrames;
     const { easierClassic, harderClassic } = RULE_BUTTONS;
     this.classicTierValue = label(root, `MeleeClassicTier${suffix}`, easierClassic.x + easierClassic.width, easierClassic.y, harderClassic.x - easierClassic.x - easierClassic.width, RULE_HEIGHT, f32(0.011));
-    this.classicRoute = label(root, `MeleeClassicRoute${suffix}`, f32(0.38), f32(0.553), f32(0.37), f32(0.034), f32(0.0085));
+    this.classicRoute = label(root, `MeleeClassicRoute${suffix}`, f32(0.38), RULE_ROWS[1], f32(0.37), RULE_HEIGHT, f32(0.0085));
     this.classicFrames = [
       ruleButton(easierClassic, { kind: "classicTier", direction: -1 }, "−"),
       ruleButton(harderClassic, { kind: "classicTier", direction: 1 }, "+"),
@@ -912,9 +921,9 @@ export class SelectionPanel {
       BlzFrameSetVisible(frames.teamLabel, teamsShown);
       BlzFrameSetEnable(frames.team, teamsShown && (slot === participantId && human || canChooseComputer(game, participantId, slot)));
       setFrameText(frames.teamLabel, `${this.menuFocus?.kind === "team" && this.menuFocus.slot === slot ? "> " : ""}${TEAM_NAMES[game.teamChoices[slot]]}`);
-      BlzFrameSetSize(frames.mode, game.teamBattle ? f32(0.078) : modeBox(slot).width, modeBox(slot).height);
-      placeTopLeft(frames.tag, f32(cardX(slot) + (game.teamBattle ? f32(0.006) : f32(0.014))), f32(0.267));
-      BlzFrameSetSize(frames.tag, f32((game.teamBattle ? f32(0.068) : f32(0.132)) / TAG_SCALE), f32(f32(0.019) / TAG_SCALE));
+      BlzFrameSetSize(frames.mode, game.teamBattle ? cardSize(f32(0.078)) : modeBox(slot).width, modeBox(slot).height);
+      placeTopLeft(frames.tag, cardRight(slot, game.teamBattle ? f32(0.006) : f32(0.014)), cardDown(f32(0.008)));
+      BlzFrameSetSize(frames.tag, f32(cardSize(game.teamBattle ? f32(0.068) : f32(0.132)) / TAG_SCALE), f32(cardSize(f32(0.019)) / TAG_SCALE));
       const focused = this.menuFocus?.kind === "fighter" && this.menuFocus.slot === slot;
       setFrameText(frames.tag, active ? `${focused ? "> " : ""}${human ? "Player" : "CPU"}${focused ? " <" : ""}` : "Empty");
       BlzFrameSetEnable(frames.mode, canCycleSlotMode(game, participantId, slot));
@@ -931,7 +940,7 @@ export class SelectionPanel {
       }
       const computer = active && !human;
       const preview = cardPortrait(computer);
-      placeTopLeft(frames.portrait, cardX(slot) + (f32(0.16) - preview.size) / 2, preview.top);
+      placeTopLeft(frames.portrait, cardX(slot) + (CARD_WIDTH - preview.size) / 2, preview.top);
       BlzFrameSetSize(frames.portrait, preview.size, preview.size);
       BlzFrameSetVisible(frames.summary, computer);
       BlzFrameSetVisible(frames.settings, computer);

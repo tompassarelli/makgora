@@ -18,8 +18,8 @@ for (const count of [1, 3, 9, 10, 13, 17, 21, 32]) {
       }
       counts[row] = (counts[row] ?? 0) + 1;
       assertEquals(tileAt(grid, (rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2), tile);
-      assertEquals(rect.left >= f32(0.129) && rect.right <= f32(0.801), true);
-      assertEquals(rect.bottom >= f32(0.279) && rect.top <= f32(0.481), true);
+      assertEquals(rect.left >= f32(0.249) && rect.right <= f32(0.801), true);
+      assertEquals(rect.bottom >= f32(0.204) && rect.top <= f32(0.484), true);
       const next = tile + 1 < count ? cellRect(grid, tile + 1) : undefined;
       if (next !== undefined && next.top === rect.top) assertNear(rect.right, next.left, f32(0.000001));
     }
@@ -28,7 +28,7 @@ for (const count of [1, 3, 9, 10, 13, 17, 21, 32]) {
     for (const length of counts) {
       const left = cellRect(grid, first).left;
       const right = cellRect(grid, first + length - 1).right;
-      assertNear((left + right) / 2, f32(0.465), f32(0.000001));
+      assertNear((left + right) / 2, f32(0.525), f32(0.000001));
       const y = (cellRect(grid, first).top + cellRect(grid, first).bottom) / 2;
       assertEquals(tileAt(grid, left - f32(0.001), y), undefined);
       assertEquals(tileAt(grid, right + f32(0.001), y), undefined);

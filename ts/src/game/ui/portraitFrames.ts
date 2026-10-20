@@ -1,4 +1,5 @@
 import { f32 } from "wisp/src/sim/f32";
+import { cardDown, cardSize } from "../menu/selectionDrag";
 
 
 
@@ -27,12 +28,12 @@ export function tilePortrait(scale: number): number {
 }
 
 /** A player card's preview area: below its tag, above its name box, and above the CPU summary on a computer's card. */
-export const CARD_PREVIEW = { top: f32(0.245), bottom: f32(0.103), computerBottom: f32(0.139), computerTop: f32(0.224) } as const;
+export const CARD_PREVIEW = { top: cardDown(f32(0.03)), bottom: cardDown(f32(0.172)), computerBottom: cardDown(f32(0.136)), computerTop: cardDown(f32(0.051)) } as const;
 
 /** The card portrait's square, centred in its card's preview area and as large as the area and the card render allow. */
 export function cardPortrait(computer: boolean): { readonly top: number; readonly size: number } {
   const bottom = computer ? CARD_PREVIEW.computerBottom : CARD_PREVIEW.bottom;
   const top = computer ? CARD_PREVIEW.computerTop : CARD_PREVIEW.top;
-  const size = Math.min(top - bottom, unitsForPixels(CARD_TEXTURE_PX));
+  const size = Math.min(top - bottom, cardSize(unitsForPixels(CARD_TEXTURE_PX)));
   return { top: (top + bottom + size) / 2, size };
 }

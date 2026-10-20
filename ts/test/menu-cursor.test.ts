@@ -7,9 +7,10 @@ import { Key } from "../src/host/loop/keyEvents";
 import { shell } from "../src/host/loop/state";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { cellRect, rosterGrid } from "../src/game/menu/selectionGrid";
-import { cardX } from "../src/game/menu/selectionDrag";
+import { parkedChipCentre } from "../src/game/menu/selectionDrag";
 import { PLAYABLE_CHARACTERS } from "../src/game/sim/heroes/registry";
 import { START_BUTTON } from "../src/game/ui/selectionLayout";
+import { BACK_BUTTON } from "../src/game/ui/stageUi";
 import { PICKER_DONE } from "../src/game/ui/settingsUi";
 import { RULE_BUTTONS } from "../src/game/ui/ruleButtons";
 import { TEAM_NAMES } from "../src/game/sim/teams";
@@ -120,7 +121,7 @@ test("fighter select shows Warcraft's own cursor at rest and hides it only while
   if (seen === undefined) throw new Error("no client");
   const grid = rosterGrid(PLAYABLE_CHARACTERS.length);
   const first = cellRect(grid, 0);
-  const chip = { x: f32(cardX(0) + f32(0.126)), y: f32(0.17) };
+  const chip = parkedChipCentre(0);
   const cell = { x: (first.left + first.right) / 2, y: (first.top + first.bottom) / 2 };
   point(AWAY.x, AWAY.y);
   clients.frames(5);
@@ -215,7 +216,7 @@ test("entering stage select avoids cursor-displacing dialog hover events and cur
   clients.frames(20);
   for (const seen of watches) expect(seen.cursor.length).toBeLessThanOrEqual(1);
 
-  expect(clients.click(0, f32(0.13), f32(0.0635))).toBe(true);
+  expect(clients.click(0, f32(BACK_BUTTON.x + f32(BACK_BUTTON.width / 2)), f32(BACK_BUTTON.y - f32(BACK_BUTTON.height / 2)))).toBe(true);
   clients.frames(10);
   expect(phases()).toEqual([Phase.characterMenu, Phase.characterMenu]);
   point(centre.x, centre.y);

@@ -10,7 +10,7 @@ import { encodePpm } from "wisp/scripts/wisp/frameProbe";
 import { preloadLines } from "wisp/scripts/wisp/preloadRecord";
 import { Action, bit } from "../../src/game/input/actions";
 import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
-import { parkedChipLeft, readyChipSize } from "../../src/game/menu/selectionDrag";
+import { parkedChipCentre, parkedChipLeft, readyChipSize } from "../../src/game/menu/selectionDrag";
 import { PLAYABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";
 import { Phase } from "../../src/game/lobby/lobbyState";
 import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
@@ -132,7 +132,7 @@ export const measureBindingsGate = (clientsFile: string, name: string, directory
     const notNow = words.find(word => word.text === "Not");
     if (notNow !== undefined) yield* click(selected, viewport.x + notNow.x, viewport.y + notNow.y).pipe(Effect.mapError(fail("bindings gate tutorial")));
     const point = (x: number, y: number) => ({ x: Math.round(viewport.x + (viewport.width - viewport.height * 4 / 3) / 2 + x * viewport.height / 0.6), y: Math.round(viewport.y + viewport.height - y * viewport.height / 0.6) });
-    const pin = point(parkedChipLeft(slot, readyChipSize(grid)) + readyChipSize(grid) / 2, 0.17);
+    const pin = point(parkedChipLeft(slot, readyChipSize(grid)) + readyChipSize(grid) / 2, parkedChipCentre(slot).y);
     const cell = cellRect(grid, slot);
     const drop = point((cell.left + cell.right) / 2, (cell.top + cell.bottom) / 2);
     yield* click(selected, pin.x, pin.y).pipe(Effect.mapError(fail("bindings gate pick")));

@@ -8,15 +8,15 @@ export interface SessionWinsFrames {
   shown: boolean | undefined;
 }
 
-export function createSessionWinsFrames(parent: framehandle, name: string, x: number, y: number): SessionWinsFrames {
+export function createSessionWinsFrames(parent: framehandle, name: string, x: number, y: number, size: number): SessionWinsFrames {
   const coin = createBackdrop(`MeleeWinCoin${name}`, parent, 0);
   BlzFrameSetTexture(coin, "UI\\Feedback\\Resources\\ResourceGold.blp", 0, true);
   placeTopLeft(coin, x, y);
-  BlzFrameSetSize(coin, f32(0.014), f32(0.014));
+  BlzFrameSetSize(coin, size, size);
   BlzFrameSetEnable(coin, false);
   const count = createText(`MeleeWinCount${name}`, parent, 0);
-  placeTopLeft(count, f32(x + f32(0.017)), y);
-  sizeText(count, f32(0.009), f32(0.036), f32(0.012));
+  placeTopLeft(count, f32(f32(x + size) + f32(0.003)), y);
+  sizeText(count, size, f32(size * 4), f32(f32(size * 4) / 3));
   BlzFrameSetTextAlignment(count, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
   BlzFrameSetEnable(count, false);
   BlzFrameSetVisible(coin, false);

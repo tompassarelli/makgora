@@ -18,7 +18,7 @@ import { shell } from "../src/host/loop/state";
 import { SMASHCRAFT_HEADLESS } from "../scripts/wisp/headless";
 import { RESULTS_DELAY_FRAMES } from "../src/game/render/matchPresentation";
 import { cellRect, rosterGrid } from "../src/game/menu/selectionGrid";
-import { cardX, readyChipSize } from "../src/game/menu/selectionDrag";
+import { parkedChipCentre, readyChipSize } from "../src/game/menu/selectionDrag";
 import { PLAYABLE_CHARACTERS } from "../src/game/sim/heroes/registry";
 import { f32 } from "wisp/src/sim/f32";
 
@@ -246,8 +246,8 @@ test("the playable build keeps selection chips and cursor on their screen and sh
     }
   };
   point(f32(0.03), f32(0.3), false, false);
-  point(cardX(0) + f32(0.126), f32(0.17), false, false);
-  point(cardX(0) + f32(0.126), f32(0.17), true, true);
+  point(parkedChipCentre(0).x, parkedChipCentre(0).y, false, false);
+  point(parkedChipCentre(0).x, parkedChipCentre(0).y, true, true);
   const first = cellRect(grid, 0);
   point((first.left + first.right) / 2, (first.top + first.bottom) / 2, true, true);
   point((first.left + first.right) / 2, (first.top + first.bottom) / 2, false, false);

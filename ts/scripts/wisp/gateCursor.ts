@@ -8,7 +8,7 @@ import { InputInjection } from "wisp/scripts/platform/services";
 import { AcceptFailure, type ReceiptFile } from "wisp/scripts/wisp/accept";
 import { encodePpm, type Frame } from "wisp/scripts/wisp/frameProbe";
 import { batch, capture, click, focus, loadClients, frameWords } from "wisp/scripts/warcraft/desktop";
-import { carriedChipLeft, carriedChipTop, chipX, chipY, parkedChipLeft, parkedChipTop, readyChipSize, HAND_HEIGHT, HAND_WIDTH, handLeft, handTop } from "../../src/game/menu/selectionDrag";
+import { carriedChipLeft, carriedChipTop, chipX, chipY, parkedChipCentre, parkedChipLeft, parkedChipTop, readyChipSize, HAND_HEIGHT, HAND_WIDTH, handLeft, handTop } from "../../src/game/menu/selectionDrag";
 import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
 import { PLAYABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";
 import { readTga, type Rgba } from "../blp";
@@ -109,7 +109,7 @@ export const measureCursorGate = (clientsFile: string, name: string, directory: 
     for (let index = 0; index < 4; index++) yield* sample(phase, x, y);
     yield* Fiber.join(pressed);
   });
-  const pin = { x: parkedChipLeft(0, readyChipSize(grid)) + readyChipSize(grid) / 2, y: 0.17 };
+  const pin = { x: parkedChipLeft(0, readyChipSize(grid)) + readyChipSize(grid) / 2, y: parkedChipCentre(0).y };
   const control = yield* sample("positive-control", 0.03, 0.3);
   const controlFrame = yield* capture(client, region).pipe(Effect.mapError(fail("cursor gate control")));
   const negativeControlError = stockCursorAt(stock, controlFrame, 0.4, 0.56)?.error;

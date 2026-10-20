@@ -12,11 +12,11 @@ export type RosterTile = number;
 const CELL_WIDTH = f32(0.112);
 const CELL_HEIGHT = f32(0.132);
 
-const REGION_X = f32(0.13);
-const REGION_WIDTH = f32(0.67);
+const REGION_X = f32(0.25);
+const REGION_WIDTH = f32(0.55);
 
-const REGION_BOTTOM = f32(0.28);
-const REGION_HEIGHT = f32(0.2);
+const REGION_BOTTOM = f32(0.205);
+const REGION_HEIGHT = f32(0.278);
 
 export interface RosterGrid {
   readonly count: number;
@@ -53,7 +53,7 @@ export function rosterGrid(count: number): RosterGrid {
   const rows = Math.ceil(count / columns);
   const cellWidth = CELL_WIDTH * best;
   const cellHeight = CELL_HEIGHT * best;
-  return { count, columns, rows, scale: best, cellWidth, cellHeight, left: REGION_X + (REGION_WIDTH - columns * cellWidth) / 2, top: REGION_BOTTOM + rows * cellHeight };
+  return { count, columns, rows, scale: best, cellWidth, cellHeight, left: REGION_X + (REGION_WIDTH - columns * cellWidth) / 2, top: REGION_BOTTOM + (REGION_HEIGHT + rows * cellHeight) / 2 };
 }
 
 export function cellRect(grid: RosterGrid, tile: number): CellRect {

@@ -25,11 +25,11 @@ interface StageDrag {
 const CARRY: StageGesture = { kind: "carry" };
 
 export function stageTileLeft(choice: number): number {
-  return f32(0.45399999618530273 + f32(floorMod(choice === RANDOM_STAGE ? 0 : stageTileIndex(choice) + 1, 3) * 0.10199999809265137));
+  return f32(0.49000000953674316 + f32(floorMod(choice === RANDOM_STAGE ? 0 : stageTileIndex(choice) + 1, 3) * 0.10199999809265137));
 }
 
 export function stageTileTop(choice: number): number {
-  return f32(f32(0.445) - f32(floorDiv(choice === RANDOM_STAGE ? 0 : stageTileIndex(choice) + 1, 3) * f32(0.08)));
+  return f32(f32(0.455) - f32(floorDiv(choice === RANDOM_STAGE ? 0 : stageTileIndex(choice) + 1, 3) * f32(0.08)));
 }
 
 export function stageTileAt(x: number, y: number): StageChoice | undefined {

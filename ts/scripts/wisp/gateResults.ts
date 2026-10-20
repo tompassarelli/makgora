@@ -12,7 +12,7 @@ import { Action } from "../../src/game/input/actions";
 import { keyFor, presetBindings } from "../../src/game/input/keyBindings";
 import { MATCH_TICKS_PER_SECOND, ResultPick } from "../../src/game/lobby/lobbyState";
 import { RESULTS_DELAY_FRAMES } from "../../src/game/render/matchPresentation";
-import { cardX } from "../../src/game/menu/selectionDrag";
+import { parkedChipCentre } from "../../src/game/menu/selectionDrag";
 import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
 import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import { PLAYABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";
@@ -122,7 +122,7 @@ const startMatch = (d: Driver, clients: readonly Client[], host: Client, after: 
   const grid = rosterGrid(PLAYABLE_CHARACTERS.length);
   for (const [slot, client] of clients.entries()) {
     const tile = cellRect(grid, slot);
-    const pin = yield* d.at(client, cardX(slot) + 0.126, 0.17);
+    const pin = yield* d.at(client, parkedChipCentre(slot).x, parkedChipCentre(slot).y);
     const drop = yield* d.at(client, (tile.left + tile.right) / 2, (tile.top + tile.bottom) / 2);
     yield* batch(client, [{ kind: "click", ...pin, holdMillis: 200 }, { kind: "wait", millis: 150 }, { kind: "click", ...drop, holdMillis: 200 }, { kind: "wait", millis: 300 }]).pipe(Effect.mapError(fail("results gate fighters")));
     yield* d.save(`picked-${client.name}.ppm`, yield* d.shot(client));

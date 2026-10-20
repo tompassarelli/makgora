@@ -65,9 +65,22 @@ export function chipY(grid: RosterGrid, slot: number, choice: number): number {
 
 export const readyChipSize = (grid: RosterGrid): number => grid.cellWidth * f32(0.65);
 
+export const CARD_SCALE = f32(0.86);
+export const CARD_WIDTH = f32(f32(0.16) * CARD_SCALE);
+export const CARD_HEIGHT = f32(f32(0.22) * CARD_SCALE);
+export const CARD_TOP = f32(0.198);
+const CARD_LEFT = f32(0.046);
+const CARD_PITCH = f32(0.19);
+
 export function cardX(slot: number): number {
-  return 0.12999999523162842 + slot * 0.17000000178813934;
+  return f32(CARD_LEFT + f32(slot * CARD_PITCH));
 }
+
+export const cardRight = (slot: number, offset: number): number => f32(cardX(slot) + f32(offset * CARD_SCALE));
+
+export const cardDown = (depth: number): number => f32(CARD_TOP - f32(depth * CARD_SCALE));
+
+export const cardSize = (size: number): number => f32(size * CARD_SCALE);
 
 
 function onChip(grid: RosterGrid, slot: number, choice: number, x: number, y: number): boolean {
@@ -79,10 +92,10 @@ function onChip(grid: RosterGrid, slot: number, choice: number, x: number, y: nu
 
 
 export function cardSlot(x: number, y: number, selectable: number): number | undefined {
-  if (y < f32(0.11) || y > f32(0.225)) return undefined;
+  if (y < cardDown(f32(0.165)) || y > cardDown(f32(0.05))) return undefined;
   for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
     const left = cardX(slot);
-    if (x >= left && x <= left + 0.1599999964237213 && participantActive(selectable, slot)) return slot;
+    if (x >= left && x <= f32(left + CARD_WIDTH) && participantActive(selectable, slot)) return slot;
   }
   return undefined;
 }
@@ -153,6 +166,8 @@ export const carriedChipLeft = (x: number, size: number): number => x - size * f
 export const carriedChipTop = (y: number, size: number): number => y + size * f32(0.06);
 
 // A chip not yet on a fighter parks centred on this point of its player card.
-export const parkedChipLeft = (slot: number, size: number): number => cardX(slot) + f32(0.126) - size * f32(0.5);
+export const parkedChipCentre = (slot: number): { readonly x: number; readonly y: number } => ({ x: cardRight(slot, f32(0.126)), y: cardDown(f32(0.105)) });
 
-export const parkedChipTop = (size: number): number => f32(0.17) + size * f32(0.5);
+export const parkedChipLeft = (slot: number, size: number): number => parkedChipCentre(slot).x - size * f32(0.5);
+
+export const parkedChipTop = (size: number): number => cardDown(f32(0.105)) + size * f32(0.5);

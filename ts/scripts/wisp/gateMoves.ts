@@ -7,7 +7,7 @@ import { InputInjection, encodePpm } from "wisp/scripts/platform/services";
 import type { Frame } from "wisp/scripts/wisp/frameProbe";
 import { type Client, batch, capture, captureTimed, click, focus, frameWords, loadClients } from "wisp/scripts/warcraft/desktop";
 import { journalMenuFile } from "../../src/game/core/gameFiles";
-import { cardX } from "../../src/game/menu/selectionDrag";
+import { parkedChipCentre } from "../../src/game/menu/selectionDrag";
 import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
 import { PLAYABLE_BUILD } from "../../src/game/session/currentBuild";
 import { Character } from "../../src/game/sim/codes";
@@ -192,7 +192,7 @@ export const measureMovesGate = (clientsFile: string, directory: string, caster?
     for (const [slot, client] of clients.entries()) {
       const viewport = yield* input.windowRegion(client).pipe(Effect.mapError(fail("moves gate viewport")));
       const cell = cellRect(grid, pair[slot] ?? 0);
-      const pin = point(viewport, cardX(slot) + 0.126, 0.17);
+      const pin = point(viewport, parkedChipCentre(slot).x, parkedChipCentre(slot).y);
       const drop = point(viewport, (cell.left + cell.right) / 2, (cell.top + cell.bottom) / 2);
       yield* focus(client).pipe(Effect.mapError(fail("moves gate pick")));
       yield* batch(client, [{ kind: "click", ...pin, holdMillis: 200 }, { kind: "wait", millis: 150 }, { kind: "click", ...drop, holdMillis: 200 }, { kind: "wait", millis: 300 }]).pipe(Effect.mapError(fail("moves gate pick")));

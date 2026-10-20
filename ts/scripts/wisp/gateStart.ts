@@ -8,7 +8,7 @@ import { InputInjection } from "wisp/scripts/platform/services";
 import { AcceptFailure, type ReceiptFile } from "wisp/scripts/wisp/accept";
 import { encodePpm, type Frame } from "wisp/scripts/wisp/frameProbe";
 import { batch, capture, click, focus, frameWords, loadClients } from "wisp/scripts/warcraft/desktop";
-import { cardX } from "../../src/game/menu/selectionDrag";
+import { parkedChipCentre } from "../../src/game/menu/selectionDrag";
 import { cellRect, rosterGrid } from "../../src/game/menu/selectionGrid";
 import { PLAYABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";
 import { gameProcess } from "../integrity/capture";
@@ -49,7 +49,7 @@ export const measureStartGate = (clientsFile: string, name: string, directory: s
       const notNow = words.find(word => word.text === "Not");
       if (notNow !== undefined) yield* click(selected, region.x + notNow.x, region.y + notNow.y).pipe(Effect.mapError(fail("start gate tutorial")));
       const point = (x: number, y: number) => ({ x: region.x + Math.round((region.width - region.height * 4 / 3) / 2 + x * region.height / 0.6), y: region.y + Math.round(region.height - y * region.height / 0.6) });
-      const pin = point(cardX(slot) + 0.126, 0.17);
+      const pin = point(parkedChipCentre(slot).x, parkedChipCentre(slot).y);
       const tile = cellRect(rosterGrid(PLAYABLE_CHARACTERS.length), slot);
       const drop = point((tile.left + tile.right) / 2, (tile.top + tile.bottom) / 2);
       yield* batch(selected, [{ kind: "click", ...pin, holdMillis: 200 }, { kind: "wait", millis: 100 }, { kind: "click", ...drop, holdMillis: 200 }]).pipe(Effect.mapError(fail("start gate fighters")));
