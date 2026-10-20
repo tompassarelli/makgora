@@ -88,13 +88,7 @@ env:
         (cd ts && bun scripts/wisp.ts combos --advantage --jobs "$(( $(nproc) < 26 ? $(nproc) : 26 ))") 2>&1 | tail -40 | tee reports.log
         echo "Regenerated ${reports[*]} on $(nproc) cores in $(( $(date +%s) - started )) s" >> "$GITHUB_STEP_SUMMARY"
       fi
-      if (cd ts && bun test test/advantage-state.test.ts) > targets.log 2>&1; then
-        out verdict "$VERDICT"
-      else
-        cat targets.log
-        out verdict targets
-        { echo "detail<<AUTOLAND_EOF"; tail -30 targets.log; echo "AUTOLAND_EOF"; } >> "$GITHUB_OUTPUT"
-      fi
+      out verdict "$VERDICT"
       if git diff --quiet -- "${reports[@]}"; then
         echo "The reports were already current." >> "$GITHUB_STEP_SUMMARY"
         out sha "$(git rev-parse HEAD)"

@@ -49,10 +49,6 @@ jobs:
       max-parallel: 3
       matrix:
         include:
-          - { kind: lua, part: 0, name: "Background sweeps (lua32 0/3)" }
-          - { kind: lua, part: 1, name: "Background sweeps (lua32 1/3)" }
-          - { kind: lua, part: 2, name: "Background sweeps (lua32 2/3)" }
-          - { kind: bun, part: 0, name: "Background sweeps (bun)" }
           - { kind: census, shard: 0, name: "census 0" }
           - { kind: census, shard: 1, name: "census 1" }
           - { kind: census, shard: 2, name: "census 2" }

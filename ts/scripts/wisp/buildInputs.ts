@@ -9,7 +9,7 @@ import { Effect, Schema } from "effect";
 import { MapBuildFailure } from "wisp/scripts/wisp/mapBuild";
 import { withLock } from "./fileLock";
 import { shardFiles } from "./inputShards";
-import { projectRoot } from "./project";
+import { projectRoot } from "./projectRoot";
 
 export const INPUTS_STORE = join(homedir(), ".local/share/smashcraft-build-inputs/store");
 /** One pin file per family (build-inputs/FAMILY holds its store hash), so two lanes that store different families never edit the same file (#401); a sharded family pins each fighter's files apart (build-inputs/FAMILY/SHARD), so two lanes that repack different fighters never edit the same file either. */

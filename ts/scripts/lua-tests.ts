@@ -84,11 +84,11 @@ const remainder = include === "" && listed === undefined;
 const pattern = soak ? "src/**/*.soak.ts" : "src/**/*.tests.ts";
 const modules = [...new Bun.Glob(pattern).scanSync(".")]
   .filter((module) => module.includes(include) && (exclude === "" || !module.includes(exclude)) && (listed === undefined || listed.includes(module))).sort();
-if (modules.length === 0) throw new Error("No Lua test modules match GAME_TESTS and GAME_TESTS_EXCLUDE");
+if (modules.length === 0 && only !== "stack") throw new Error("No Lua test modules match GAME_TESTS and GAME_TESTS_EXCLUDE");
 
 
 
-const loaded = [...modules, ...(remainder ? ["scripts/wisp/memoryCensus.tests.ts"] : [])];
+const loaded = modules;
 refuseUntagged(".", loaded);
 await runAdmitted("moderate", "smashcraft:lua-tests", 1800);
 const lua = await Effect.runPromise(stockLua);

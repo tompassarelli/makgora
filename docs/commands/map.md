@@ -32,10 +32,6 @@
   justified import or a cut, rebuild with `MAP_SIZE_UPDATE=1` and commit the
   baseline (smashcraft:docs/design/map-size.md).
 
-- Physics diagnostic: `bun wisp map build --profile physics-probe ...` selects
-  the production numerical fixtures. Rebuild it with
-  `bun wisp map rebuild MAP.w3x --profile physics-probe`; see
-  smashcraft:docs/native-physics-precision.md for the unchanged report gate.
 
 - Frame workload: `bun wisp map build --profile frame-cost ...` runs the
   isolated 4096-frame TypeScript executor and records its complete replay state.

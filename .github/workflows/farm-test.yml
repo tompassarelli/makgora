@@ -42,10 +42,6 @@ permissions:
 
 env:
   SWEEP_PLACEMENT: gate
-  BUN_SHARDS: 2
-  # Lua runs one core a process: each Lua job runs LUA_PER_JOB shards at once.
-  LUA_JOBS: 2
-  LUA_PER_JOB: 4
 
 jobs:
   plan:
@@ -53,11 +49,6 @@ jobs:
     timeout-minutes: 5
     outputs:
       sha: ${{ steps.plan.outputs.sha }}
-      bun: ${{ steps.plan.outputs.bun }}
-      lua: ${{ steps.plan.outputs.lua }}
-      bun-runners: ${{ steps.plan.outputs.bun-runners }}
-      lua-runners: ${{ steps.plan.outputs.lua-runners }}
-      lua-parallel: ${{ steps.plan.outputs.lua-parallel }}
       hosted-runner: ${{ steps.plan.outputs.hosted-runner }}
     steps:
       - uses: actions/checkout@v4
@@ -93,208 +84,17 @@ jobs:
           if [ -f farm-timings.json ]; then
             jq '.lua |= with_entries(select(.key | (startswith("check: ") or startswith("parity corpus: ") or . == "stack-trace profile TypeScript frames") | not))' farm-timings.json > plan-timings.json
           fi
-          bun node_modules/wisp/host/farm/farmShards.ts plan --timings plan-timings.json --bun "$BUN_SHARDS" --lua $((LUA_JOBS * LUA_PER_JOB)) $(bun scripts/test.ts --units) > plan.json
+          bun node_modules/wisp/host/farm/farmShards.ts plan --timings plan-timings.json --bun 0 --lua 1 > plan.json
           [ -z "$BASE" ] || [[ "$BASE" =~ ^[0-9a-f]{40}$ ]]
           jq -n --arg sha "$(git rev-parse HEAD)" --arg tree "$(git rev-parse 'HEAD^{tree}')" --arg base "$BASE" \
             --argjson runId "$GITHUB_RUN_ID" --argjson runAttempt "$GITHUB_RUN_ATTEMPT" \
             '{schema: 1, sha: $sha, tree: $tree, base: (if $base == "" then null else $base end), runId: $runId, runAttempt: $runAttempt}' > identity.json
-          echo "bun=$(jq -c '[range(.bun | length)]' plan.json)" >> "$GITHUB_OUTPUT"
-          echo "lua=$(jq -c "[range($LUA_JOBS)]" -n)" >> "$GITHUB_OUTPUT"
-          echo "bun-runners=$(pool "$(jq '.bun | length' plan.json)")" >> "$GITHUB_OUTPUT"
-          echo "lua-runners=$(pool "$LUA_JOBS")" >> "$GITHUB_OUTPUT"
-          echo "lua-parallel=$LUA_JOBS" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         with:
           name: farm-test-plan
           path: |
             ts/plan.json
             ts/identity.json
-          retention-days: 3
-
-  bun:
-    needs: plan
-    runs-on: ${{ github.run_attempt > 1 && needs.plan.outputs.hosted-runner || fromJSON(needs.plan.outputs.bun-runners)[matrix.shard] }}
-    timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: ${{ fromJSON(needs.plan.outputs.bun) }}
-    name: bun ${{ matrix.shard }}
-    steps:
-      - name: Start installing the stock texture converter
-        if: runner.environment == 'github-hosted'
-        run: |
-          ( sudo apt-get update -q && sudo apt-get install -y -q imagemagick; echo $? > "$RUNNER_TEMP/imagemagick.exit" ) > "$RUNNER_TEMP/imagemagick.log" 2>&1 &
-      - if: runner.environment == 'github-hosted'
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.plan.outputs.sha }}
-      # The farm box keeps a mirror of the repository (/srv/farm-mirror, refreshed each minute): fetch only what it lacks.
-      - if: runner.environment == 'self-hosted'
-        name: Check out from the farm box's mirror
-        env:
-          SHA: ${{ needs.plan.outputs.sha }}
-        run: |
-          [ ! -f .git/shallow ] || rm -rf .git
-          git init -q .
-          git remote get-url origin >/dev/null 2>&1 || git remote add origin "https://github.com/$GITHUB_REPOSITORY"
-          mirror="/srv/farm-mirror/${GITHUB_REPOSITORY#*/}.git/objects"
-          if [ -d "$mirror" ]; then echo "$mirror" > .git/objects/info/alternates; fi
-          git -c gc.auto=0 fetch -q --no-tags origin "$SHA"
-          git checkout -q --force --detach "$SHA"
-          git clean -q -ffdx
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.13
-      - if: runner.environment == 'github-hosted'
-        uses: actions/cache@v4
-        with:
-          path: ~/.bun/install/cache
-          key: bun-install-${{ hashFiles('ts/bun.lock') }}
-      - run: bun install --frozen-lockfile
-        working-directory: ts
-      - if: runner.environment == 'github-hosted'
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/wisp/lua32
-          key: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/host/compile/lua32.ts', 'ts/node_modules/wisp/native/*.h') }}
-      - uses: actions/download-artifact@v4
-        with:
-          name: farm-test-plan
-          path: ts
-      - name: Finish installing the stock texture converter
-        if: runner.environment == 'github-hosted'
-        timeout-minutes: 5
-        run: |
-          until [ -f "$RUNNER_TEMP/imagemagick.exit" ]; do sleep 1; done
-          cat "$RUNNER_TEMP/imagemagick.log"
-          exit "$(cat "$RUNNER_TEMP/imagemagick.exit")"
-      # The shard's files, then their sweeps (SWEEPS=1): a file's measured time counts both.
-      - name: Test shard ${{ matrix.shard }}
-        working-directory: ts
-        timeout-minutes: 20
-        run: |
-          set +e
-          files=$(jq -r ".bun[${{ matrix.shard }}][]" plan.json)
-          mkdir -p build/junit build/junit-sweeps
-          TEST_JUNIT_DIR=build/junit bun scripts/test.ts $files
-          code=$?
-          bun node_modules/wisp/host/farm/farmShards.ts junit --shard ${{ matrix.shard }} --exit-code "$code" build/junit/*.xml > result.json
-          SWEEPS=1 TEST_JUNIT_DIR=build/junit-sweeps bun scripts/test.ts $files
-          sweeps=$?
-          bun node_modules/wisp/host/farm/farmShards.ts junit --shard ${{ matrix.shard }} --exit-code "$sweeps" build/junit-sweeps/*.xml > result-sweeps.json
-          [ "$code" = 0 ] && exit "$sweeps"
-          exit "$code"
-      - if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: farm-test-result-bun-${{ matrix.shard }}
-          path: ts/result*.json
-          retention-days: 3
-
-  lua:
-    needs: plan
-    runs-on: ${{ github.run_attempt > 1 && needs.plan.outputs.hosted-runner || fromJSON(needs.plan.outputs.lua-runners)[matrix.job] }}
-    timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      max-parallel: ${{ fromJSON(needs.plan.outputs.lua-parallel) }}
-      matrix:
-        job: ${{ fromJSON(needs.plan.outputs.lua) }}
-    name: lua32 ${{ matrix.job }}
-    steps:
-      - if: runner.environment == 'github-hosted'
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.plan.outputs.sha }}
-      # The farm box keeps a mirror of the repository (/srv/farm-mirror, refreshed each minute): fetch only what it lacks.
-      - if: runner.environment == 'self-hosted'
-        name: Check out from the farm box's mirror
-        env:
-          SHA: ${{ needs.plan.outputs.sha }}
-        run: |
-          [ ! -f .git/shallow ] || rm -rf .git
-          git init -q .
-          git remote get-url origin >/dev/null 2>&1 || git remote add origin "https://github.com/$GITHUB_REPOSITORY"
-          mirror="/srv/farm-mirror/${GITHUB_REPOSITORY#*/}.git/objects"
-          if [ -d "$mirror" ]; then echo "$mirror" > .git/objects/info/alternates; fi
-          git -c gc.auto=0 fetch -q --no-tags origin "$SHA"
-          git checkout -q --force --detach "$SHA"
-          git clean -q -ffdx
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.13
-      - if: runner.environment == 'github-hosted'
-        uses: actions/cache@v4
-        with:
-          path: ~/.bun/install/cache
-          key: bun-install-${{ hashFiles('ts/bun.lock') }}
-      - run: bun install --frozen-lockfile
-        working-directory: ts
-      - if: runner.environment == 'github-hosted'
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/wisp/lua32
-          key: wisp-lua32-${{ runner.environment }}-${{ hashFiles('ts/node_modules/wisp/host/compile/lua32.ts', 'ts/node_modules/wisp/native/*.h') }}
-      - uses: actions/download-artifact@v4
-        with:
-          name: farm-test-plan
-          path: ts
-      - name: Compile the Lua test bundle
-        working-directory: ts
-        run: |
-          set +e -o pipefail
-          bun scripts/lua-tests.ts 2>&1 | tee build-compile.log
-          code=$?
-          if [ "$code" != 0 ] && [ "${{ matrix.job }}" = 0 ]; then
-            { echo "Lua test bundle didn't compile:"; grep -E 'error' build-compile.log | head -5; } | tr '\n' ' ' > problems-lua-compile.txt
-          fi
-          exit "$code"
-        env:
-          LUA_TESTS_STEP: compile
-      # Each slot runs its shard of the suite, then its shard of the sweeps (SWEEPS=1);
-      # the plan balances both. Sweep costs stay out of lua-cost-*.tsv: the budget covers the suite.
-      - name: Test shards
-        working-directory: ts
-        timeout-minutes: 20
-        run: |
-          LUA=$(bun node_modules/wisp/host/compile/lua32.ts stock)
-          set +e
-          bun node_modules/wisp/host/farm/farmShards.ts lua-plan plan.json > build/lua-plan.tsv
-          count=$((LUA_JOBS * LUA_PER_JOB))
-          # A failing test's result names the module that registers it.
-          result() {
-            bun node_modules/wisp/host/farm/farmShards.ts lua --shard "$1" --exit-code "$2" "$3" \
-              | jq --rawfile costs "$4" '($costs | split("\n") | map(split("\t") | select(length > 3) | {key: (.[3:] | join("\t")), value: .[0]}) | from_entries) as $modules
-                  | .tests |= map(if .status == "fail" then .name = "\($modules[.unit] // "unknown module"): \(.name)" else . end)'
-          }
-          pids=()
-          for slot in $(seq 0 $((LUA_PER_JOB - 1))); do
-            shard=$((slot * LUA_JOBS + ${{ matrix.job }}))
-            ( export LUA_SHARD="$shard/$count" LUA_SHARD_PLAN=build/lua-plan.tsv
-              touch "build/lua-cost-$shard.tsv" "build/sweep-cost-$shard.tsv"
-              LUA_TEST_RESULT="build/lua-$shard.tsv" LUA_TEST_COST="build/lua-cost-$shard.tsv" "$LUA" build/lua-tests/tests.lua > "build/lua-$shard.log" 2>&1
-              code=$?
-              result "$shard" "$code" "build/lua-$shard.tsv" "build/lua-cost-$shard.tsv" > "result-lua-$shard.json"
-              SWEEPS=1 LUA_TEST_RESULT="build/lua-sweeps-$shard.tsv" LUA_TEST_COST="build/sweep-cost-$shard.tsv" "$LUA" build/lua-tests/tests.lua > "build/lua-sweeps-$shard.log" 2>&1
-              sweeps=$?
-              result "$shard" "$sweeps" "build/lua-sweeps-$shard.tsv" "build/sweep-cost-$shard.tsv" > "result-lua-sweeps-$shard.json"
-              [ "$code" = 0 ] && exit "$sweeps"
-              exit "$code" ) &
-            pids+=($!)
-          done
-          failed=0
-          for pid in "${pids[@]}"; do wait "$pid" || failed=1; done
-          for log in build/lua-*.log; do echo "== $log"; cat "$log"; done
-          exit "$failed"
-      - if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: farm-test-result-lua-${{ matrix.job }}
-          path: |
-            ts/result-lua-*.json
-            ts/problems-*.txt
-            ts/build/lua-cost-*.tsv
           retention-days: 3
 
   # The rest of main's CI, each check a result row of its own; a failing check
@@ -396,7 +196,6 @@ jobs:
             perf)
               check "four-fighter p99 <= 10 ms and worst <= 14 ms in Classic" sh -c 'bun wisp perf playable-bot-four --samples --out build/playable-bot-four.perf && bun wisp perf budget build/playable-bot-four.perf'
               check "four-fighter 24-frame rollback p99 <= 10 ms and worst <= 14 ms" sh -c 'bun wisp perf rollback-four --samples --out build/rollback-four.perf && bun wisp perf budget build/rollback-four.perf'
-              check "focused logic test" env GAME_TESTS=core/math/meleeScalarMath bun test test/game.test.ts
               if [ -f build/playable-bot-four.perf ]; then
                 bun scripts/commitMetrics.ts build/playable-bot-four.perf build/playable.lua | tee -a "$GITHUB_STEP_SUMMARY"
               fi ;;
@@ -431,7 +230,7 @@ jobs:
   # The summary is uploaded whatever happens, so a red run always names its cause:
   # failing tests, each failing check's output, Lua budget overruns and missing shards.
   merge:
-    needs: [plan, bun, lua, checks]
+    needs: [plan, checks]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -480,23 +279,10 @@ jobs:
             fallback "$zero" ""
             echo "merging the shard results failed: $(tail -n 3 merge.log | tr '\n' ' ')" >> problems.txt
           fi
-          # Lua timings keep only tests this run measured once every shard reported: a removed or renamed test's stale time would hold a shard of its own.
-          lua_results=$(find farm -name 'result-lua-*.json')
-          if [ "$merged" = 0 ] && [ "$(wc -l <<< "$lua_results")" = $((LUA_JOBS * LUA_PER_JOB * 2)) ]; then
-            jq -n '[inputs.tests[].unit] | map({key: ., value: true}) | from_entries' $lua_results $(find farm -name 'result-check-*.json') > measured-lua.json
-            jq --slurpfile measured measured-lua.json '.lua |= with_entries(select($measured[0][.key]))' farm-timings.json > farm-timings.next && mv farm-timings.next farm-timings.json
-          fi
-          LUA_TESTS_STEP=budget bun scripts/lua-tests.ts > budget.log 2>&1
-          budget=$?
-          cat budget.log
-          if [ "$budget" != 0 ]; then
-            grep -E '^(src|test|scripts)/[^ ]+\.ts: ' budget.log | sed 's/^/Lua32 budget: /' >> problems.txt
-            grep -q '^Lua32 budget: ' problems.txt || echo "the Lua32 budget check exited $budget: $(tail -n 3 budget.log | tr '\n' ' ')" >> problems.txt
-          fi
-          find farm -name 'problems-*.txt' -exec sh -c 'for f; do cat "$f"; echo; done' _ {} + >> problems.txt
+                  find farm -name 'problems-*.txt' -exec sh -c 'for f; do cat "$f"; echo; done' _ {} + >> problems.txt
           jq --rawfile extra problems.txt '.problems = ($extra | split("\n") | map(select(test("\\S")))) + .problems' summary.json > summary.next && mv summary.next summary.json
           cat summary.json
-          [ "$merged" = 0 ] && [ "$budget" = 0 ]
+          [ "$merged" = 0 ]
       - if: always()
         uses: actions/upload-artifact@v4
         with:

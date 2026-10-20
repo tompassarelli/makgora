@@ -9,8 +9,9 @@ import { SourceErrors } from "wisp/scripts/wisp/sourceErrors";
 import { bundleConfig } from "./bundleConfigs";
 import { type Profile, profiles } from "./profiles";
 
-export const tsDirectory = join(import.meta.dir, "../..");
-export const projectRoot = join(tsDirectory, "..");
+import { projectRoot, tsDirectory } from "./projectRoot";
+
+export { projectRoot, tsDirectory };
 export const clientState = join(homedir(), ".local/state/smashcraft/clients.json");
 export const PLAYTEST_PREFIX = join(homedir(), ".local/share/Steam/steamapps/compatdata/3516115571/pfx");
 export const sourceMapDirectory = join(tsDirectory, "build/source-maps");

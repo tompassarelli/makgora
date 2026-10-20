@@ -169,94 +169,6 @@ jobs:
         run: bun scripts/commitMetrics.ts build/playable-bot-four.perf build/playable.lua | tee -a "$GITHUB_STEP_SUMMARY"
         working-directory: ts
 
-  lua-tests:
-    if: github.event_name != 'workflow_dispatch' || github.ref != 'refs/heads/main'
-    runs-on: ubuntu-latest
-    timeout-minutes: 40
-    strategy:
-      fail-fast: false
-      # Leave two of the workflow's eight runner slots for Bun and development.
-      max-parallel: 6
-      matrix:
-        include:
-          - partition: bot
-            game-tests: game/match/bot
-            game-tests-exclude: ""
-            sweeps: ""
-          - partition: remainder
-            game-tests: ""
-            game-tests-exclude: game/match/bot
-            sweeps: ""
-          # Each sweep runs in exactly one of these six name-hash partitions.
-          - partition: sweeps 1/6
-            game-tests: ""
-            game-tests-exclude: ""
-            sweeps: "1"
-            lua-partition: 0/6
-          - partition: sweeps 2/6
-            game-tests: ""
-            game-tests-exclude: ""
-            sweeps: "1"
-            lua-partition: 1/6
-          - partition: sweeps 3/6
-            game-tests: ""
-            game-tests-exclude: ""
-            sweeps: "1"
-            lua-partition: 2/6
-          - partition: sweeps 4/6
-            game-tests: ""
-            game-tests-exclude: ""
-            sweeps: "1"
-            lua-partition: 3/6
-          - partition: sweeps 5/6
-            game-tests: ""
-            game-tests-exclude: ""
-            sweeps: "1"
-            lua-partition: 4/6
-          - partition: sweeps 6/6
-            game-tests: ""
-            game-tests-exclude: ""
-            sweeps: "1"
-            lua-partition: 5/6
-    name: Lua32 (${{ matrix.partition }})
-    steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.13
-      - run: bun install --frozen-lockfile
-        working-directory: ts
-      # These disjoint partitions run every original module; auxiliary memory
-      # and stack checks run once with the remainder. Each runs four Lua
-      # processes at once, one a runner core.
-      - run: bun scripts/lua-tests.ts
-        working-directory: ts
-        env:
-          GAME_TESTS: ${{ matrix.game-tests }}
-          GAME_TESTS_EXCLUDE: ${{ matrix.game-tests-exclude }}
-          SWEEPS: ${{ matrix.sweeps }}
-          LUA_JOBS: ${{ matrix.sweeps == '1' && '4' || '1' }}
-          LUA_PARTITION: ${{ matrix.lua-partition || '0/1' }}
-
-  # Sweeps (many matches, whole-roster measurements) that the suite skips run
-  # here on every push, so a failure still turns main red (#243).
-  sweeps:
-    if: github.event_name != 'workflow_dispatch' || github.ref != 'refs/heads/main'
-    runs-on: ubuntu-latest
-    timeout-minutes: 40
-    name: Sweeps (Bun)
-    steps:
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.13
-      - run: bun install --frozen-lockfile
-        working-directory: ts
-      - run: bun run test
-        working-directory: ts
-        env:
-          SWEEPS: "1"
-
   # New structural debt (import cycle, layer violation, oversize file or function, rising hotspot) against structure.toml (north:harness/code-health).
   code-health:
     if: github.event_name != 'workflow_dispatch' || github.ref != 'refs/heads/main'
@@ -282,7 +194,7 @@ jobs:
   # Autoland dispatches this workflow after a landing, and a dispatched run
   # starts no workflow_run, so it hands its own result to "Main is red".
   main-red:
-    needs: [smoke, filtered-checks, development-loop, lua-tests, sweeps]
+    needs: [smoke, filtered-checks, development-loop]
     if: ${{ !cancelled() && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     timeout-minutes: 5

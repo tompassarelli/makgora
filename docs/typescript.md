@@ -779,10 +779,6 @@ the entry in smashcraft:ts/src/host/entries/integrityMain.ts shares the normal s
 and reload lifecycle. Use this profile for native input-integrity and
 four-fighter match/rematch captures.
 
-`bun wisp map build --profile physics-probe` selects the production numerical
-fixture map instead of the playable entry; the remaining build arguments are
-the same. Rebuild it with `bun wisp map rebuild MAP.w3x --profile physics-probe`.
-The report and required groups are in smashcraft:docs/native-physics-precision.md.
 
 `bun wisp map build --profile frame-cost` packages the isolated 4096-frame
 TypeScript workload. It writes its bundle key and complete replay state to
