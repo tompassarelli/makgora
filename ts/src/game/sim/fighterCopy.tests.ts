@@ -12,8 +12,8 @@ type Node = Record<string, unknown>;
 
 const ROWS = FIGHTER_FIELDS.filter((row) => row.copy !== "none" && !row.path.startsWith("projectiles[]") && !row.path.startsWith("pack"));
 const REALS = [0.0, -0.0, f32(1.5), f32(-2.25), f32(0.001), f32(640.0)];
-const SLOTS = [undefined, 0, 1, 2, 3, 4];
 const SLOT_CHOICES = 6;
+const slotChoice = (choice: number) => (choice === 0 ? undefined : choice - 1);
 const CAPACITIES: Readonly<Record<string, number>> = { PARTICIPANT_CAPACITY, HERO_STATUS_GROUPS, SPECIAL_ACTION_CAPACITY };
 
 // Lua: an array that may hold nil has no reliable length, so every scalar array is walked to its schema capacity.
@@ -24,7 +24,7 @@ function countOf(row: FighterFieldRow): number {
 }
 
 function read(owner: Node, key: string, row: FighterFieldRow, index: number): unknown {
-  return row.path.endsWith("[]") ? (owner[key] as Record<number, unknown>)[index] : owner[key];
+  return row.path.endsWith("[]") ? (owner[key] as unknown[])[index] : owner[key];
 }
 const CHARACTERS = [Character.rifleman, Character.demonHunter, Character.kobold];
 
@@ -59,7 +59,7 @@ function scramble(fighter: Fighter, next: (range: number) => number): void {
       switch (row.type) {
         case "real": return REALS[next(REALS.length)];
         case "bool": return next(2) === 0;
-        case "slot": return SLOTS[next(SLOT_CHOICES)];
+        case "slot": return slotChoice(next(SLOT_CHOICES));
         case "int": case "enum": case "optionalInt": case "optionalEnum": return next(9) - 2;
         default: return undefined;
       }
@@ -67,7 +67,7 @@ function scramble(fighter: Fighter, next: (range: number) => number): void {
     if (pick() === undefined && row.type !== "slot") continue;
     for (const { owner, key } of owners(fighter, row.path)) {
       if (row.path.endsWith("[]")) {
-        const list = owner[key] as Record<number, unknown>;
+        const list = owner[key] as unknown[];
         for (let i = 0; i < countOf(row); i++) list[i] = pick();
       } else owner[key] = pick();
     }
