@@ -5,7 +5,7 @@
 
 
 import { at } from "wisp/src/runtime/lookup";
-import { lineTokens, parseRecord, recordTokens, tokenLines } from "wisp/src/runtime/recordText";
+import { type TokenLines, addToken, createTokenLines, endTokenLine, lineTokens, openTokenLines, parseRecord, recordTokens } from "wisp/src/runtime/recordText";
 import { REPRO_LINE_WIDTH, type Repro, type ReproInspection, type ReproResult } from "wisp/src/runtime/repro";
 import { floorMod } from "wisp/src/sim/intMath";
 import { adaptInput } from "../input/adapter";
@@ -208,20 +208,30 @@ export function savedView(state: Readonly<ReplayState>) {
 }
 
 
-const ROW_TEXT = filled(INPUT_ROW_NUMBERS, 0);
+const ROW_PARTS: (string | number)[] = [];
 
 
-function frameRowText(recorder: MomentRecorder, index: number): string {
+function frameRowText(recorder: MomentRecorder, index: number, count: number): string {
   const mask = at(recorder.rowMasks, index);
-  const slots: string[] = [];
+  let size = 0;
+  ROW_PARTS[size++] = count;
+  ROW_PARTS[size++] = ":";
+  ROW_PARTS[size++] = mask;
+  ROW_PARTS[size++] = ":";
+  let first = true;
   for (const slot of PARTICIPANT_SLOTS) {
     if (!participantActive(mask, slot)) continue;
+    if (!first) ROW_PARTS[size++] = "/";
+    first = false;
     const base = index * INPUT_ROW_NUMBERS;
     const numbers = recorder.rows[slot];
-    for (let field = 0; field < INPUT_ROW_NUMBERS; field++) ROW_TEXT[field] = at(numbers, base + field);
-    slots.push(ROW_TEXT.join(","));
+    for (let field = 0; field < INPUT_ROW_NUMBERS; field++) {
+      if (field > 0) ROW_PARTS[size++] = ",";
+      ROW_PARTS[size++] = at(numbers, base + field);
+    }
   }
-  return `${mask}:${slots.join("/")}`;
+  ROW_PARTS.length = size;
+  return ROW_PARTS.join("");
 }
 
 
@@ -239,7 +249,7 @@ export function sameFrameRows(recorder: MomentRecorder, first: number, second: n
 }
 
 
-export const runToken = (recorder: MomentRecorder, index: number, count: number): string => `${count}:${frameRowText(recorder, index)}`;
+export const runToken = (recorder: MomentRecorder, index: number, count: number): string => frameRowText(recorder, index, count);
 
 
 export function rowTokens(recorder: MomentRecorder, start: number, last: number): string[] {
@@ -273,7 +283,21 @@ function startSnapshot(recorder: MomentRecorder, last: number): number | undefin
   return chosen;
 }
 
-export const section = (word: string, tokens: readonly string[]) => tokenLines(tokens, REPRO_LINE_WIDTH - SECTION_WIDTH).map(line => `${word} ${line}`);
+export const sectionLines = (prefix: string, lines: string[]): TokenLines => createTokenLines(prefix, REPRO_LINE_WIDTH - SECTION_WIDTH, lines);
+
+const SECTION = sectionLines("", []);
+
+export function pushSection(lines: string[], prefix: string, tokens: readonly string[]): void {
+  openTokenLines(SECTION, prefix, REPRO_LINE_WIDTH - SECTION_WIDTH, lines);
+  for (const token of tokens) addToken(SECTION, token);
+  endTokenLine(SECTION);
+}
+
+export function section(word: string, tokens: readonly string[]): string[] {
+  const lines: string[] = [];
+  pushSection(lines, `${word} `, tokens);
+  return lines;
+}
 
 
 

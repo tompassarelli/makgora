@@ -10,7 +10,8 @@ import { RULE_HELP_HEIGHT, RULE_HELP_WIDTH, hoveredRule, ruleHelp, visibleRuleGr
 import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
 import { Action } from "../input/actions";
-import { type KeyBindings, keyFor, keyLabel } from "../input/keyBindings";
+import type { KeyBindings } from "../input/keyBindings";
+import { createMenuPrompt, updateMenuPrompt } from "./menuPrompt";
 import { CPU_OPPONENT_COPY } from "./cpuOpponentCopy";
 import { createOpponentSettings } from "./opponentSettingsFrames";
 import { CPU_OPPONENT_CHOICE_DEFAULT, CPU_TIER_DEFAULT } from "../match/cpuProfiles";
@@ -296,7 +297,7 @@ export class SelectionPanel {
   private readonly cpuPrompt: framehandle;
   private readonly cpuDone: framehandle;
   private readonly cpuSteps: framehandle[] = [];
-  private menuPrompt = "";
+  private readonly menuPrompt = createMenuPrompt();
   private readonly tutorial: TutorialMenuFrames;
 
   private tutorialOpen = false;
@@ -730,9 +731,7 @@ export class SelectionPanel {
   }
 
   menuBindings(bindings: Readonly<KeyBindings>): void {
-    const name = (action: Action) => keyLabel(keyFor(bindings, action, 0));
-    this.menuPrompt = this.controls === "journal" ? "Stick: move pointer · A / Click: choose · Start or click Done: back"
-      : `Move: ${name(Action.moveLeft)}/${name(Action.moveRight)} + ${name(Action.moveUp)}/${name(Action.moveDown)}   Choose: ${name(Action.attack)}   Back: ${name(Action.special)}`;
+    updateMenuPrompt(this.menuPrompt, this.controls, bindings);
   }
 
   private showCpuSettings(game: Readonly<MatchState>, slot: number): void {
@@ -748,7 +747,7 @@ export class SelectionPanel {
     for (const button of this.cpuSteps) BlzFrameSetEnable(button, permission === "");
     setFrameText(this.cpuPreview, copy + permission);
     setFrameText(this.cpuDone, this.cpuFocus === 2 ? "> Done <" : "Done");
-    setFrameText(this.cpuPrompt, this.menuPrompt);
+    setFrameText(this.cpuPrompt, this.menuPrompt.text);
   }
 
   private acceptDrop(data: string): void {

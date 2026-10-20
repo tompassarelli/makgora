@@ -316,12 +316,13 @@ export const profile = (project: PerfProject): Command => (args) => Effect.gen(f
   const top = Number(topText);
   const phases = args.includes("--phases");
   const alloc = args.includes("--alloc");
-  const named = args.filter((arg, index) => !arg.startsWith("--") && !["--worst-frames", "--frames", "--out", "--top"].includes(args[index - 1] ?? ""));
+  const [allocFrames = "heavy"] = flagValues(args, "alloc-frames");
+  const named = args.filter((arg, index) => !arg.startsWith("--") && !["--worst-frames", "--frames", "--out", "--top", "--alloc-frames"].includes(args[index - 1] ?? ""));
   const [name = project.defaultRun ?? "journey"] = named;
   const map = name === (project.defaultRun ?? "journey") ? project.map : project.runs?.[name];
   const worstCount = Number(worstText);
   const frames = Number(framesText);
-  if (map === undefined || named.length > 1 || !(worstCount >= 1) || !(frames >= 1)) return yield* new UsageFailure({ problem: "perf profile takes one run, --worst-frames N and --frames N" });
+  if (map === undefined || named.length > 1 || !(worstCount >= 1) || !(frames >= 1) || !["heavy", "all"].includes(allocFrames)) return yield* new UsageFailure({ problem: "perf profile takes one run, --worst-frames N, --frames N and --alloc-frames heavy|all" });
   const { output } = yield* measureRun(project, name, frames, true);
   const costs: (readonly [frame: number, ms: number, natives: number])[] = [];
   for (const line of output.split("\n")) {
@@ -345,7 +346,7 @@ export const profile = (project: PerfProject): Command => (args) => Effect.gen(f
     }
     for (const rows of bySlot.values()) {
       rows.sort((a, b) => a[1] - b[1]);
-      for (const [frame] of rows.slice(Math.ceil(rows.length * 0.95) - 1)) heavy.add(frame);
+      for (const [frame] of allocFrames === "all" ? rows : rows.slice(Math.ceil(rows.length * 0.95) - 1)) heavy.add(frame);
     }
     for (const frame of heavy) selected.add(frame);
   }
@@ -369,8 +370,10 @@ export const profile = (project: PerfProject): Command => (args) => Effect.gen(f
   const namer = functionNamer(yield* bundleText(map.bundle));
   if (alloc) {
     const sites = [...profileOf(profiled, heavy, "palloc\t")].sort((a, b) => b[1][0] - a[1][0]).slice(0, top);
-    yield* Console.log(`profile ${name}: bytes requested per frame at or above any client's 95th percentile of alloc-bytes, over every client, across ${heavy.size} frames, self / inclusive\n${sites.map(([line, [self, inclusive]]) =>
-      `  ${(self / heavy.size).toFixed(0).padStart(7)} ${(inclusive / heavy.size).toFixed(0).padStart(7)}  ${line < 0 ? "(Wisp headless runtime and emulated natives)" : namer(line)}`).join("\n")}`);
+    const scale = allocFrames === "all" ? 3600 / 1024 / heavy.size : 1 / heavy.size;
+    const heading = allocFrames === "all" ? `KB requested per minute at 60 frames a second, over every client, across all ${heavy.size} frames` : `bytes requested per frame at or above any client's 95th percentile of alloc-bytes, over every client, across ${heavy.size} frames`;
+    yield* Console.log(`profile ${name}: ${heading}, self / inclusive\n${sites.map(([line, [self, inclusive]]) =>
+      `  ${(self * scale).toFixed(0).padStart(7)} ${(inclusive * scale).toFixed(0).padStart(7)}  ${line < 0 ? "(Wisp headless runtime and emulated natives)" : namer(line)}`).join("\n")}`);
     return;
   }
   const baseline = [...profileOf(profiled, base)].sort((a, b) => b[1][1] - a[1][1]).slice(0, 30);

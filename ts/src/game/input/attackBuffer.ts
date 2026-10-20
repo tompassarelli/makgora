@@ -64,13 +64,16 @@ function storeCommand(buffer: AttackBuffer, command: Readonly<AttackCommand>): v
 }
 
 
+function clearCommand(command: StoredAttackCommand): void {
+  command.style = 0;
+  command.facing = 0;
+  command.frame = 0;
+  command.mayCharge = false;
+}
+
 export function clearAttackBuffer(buffer: AttackBuffer): void {
-  for (const command of [buffer.queued, buffer.previous]) {
-    command.style = 0;
-    command.facing = 0;
-    command.frame = 0;
-    command.mayCharge = false;
-  }
+  clearCommand(buffer.queued);
+  clearCommand(buffer.previous);
   buffer.pending = undefined;
   buffer.previousRequest = undefined;
   buffer.consumedFacing = 0;
