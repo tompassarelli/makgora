@@ -28,6 +28,8 @@ import { queueLocalRows } from "../../game/session/localInput";
 import { applyFrame } from "./frame";
 import { ownConfirmedState } from "./confirmedState";
 import { pollLocalKeys } from "./inputs";
+import { beginFrameSection, endFrameSection } from "wisp/src/map/frameSections";
+import { CONFIRMED_SECTION, RECONCILE_SECTION, SPECULATIVE_SECTION } from "./frameSections";
 import { INPUT_PREFIX, failJournal, flushTransport, receiveLifecycle, serviceJournalInput } from "./journal";
 import { epochChecksumDue, probeAdvance, probeCapture, probeClockMs, probeInput, probeIntegrity, probePoll, probeRecording, probeSendFinished, probeTransportReceive, probeTransportSend } from "./responseProbe";
 import { confirmedChecksum } from "./diagnostics";
@@ -298,8 +300,10 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
   const pendingBefore = rollback.playback.pendingRepair(epoch);
   notePopBefore(rollback.net, speculative.world);
   const slot = localSlot();
+  beginFrameSection(RECONCILE_SECTION);
   const reconciled = rollback.playback.reconcile(schedule, epoch, slot, speculative);
   if (reconciled === "rejected") {
+    endFrameSection(RECONCILE_SECTION);
     setStatus(s, "The match could not catch up. Restart the match.", LASTING);
     return;
   }
@@ -324,6 +328,7 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
   const behind = pending === undefined ? 0 : lastConfirmed + 2 - pending;
   const repair = repairBudget(speculativeBudget(journal !== undefined), pending === undefined ? 0 : schedule.speculativeFrame() - pending);
   const repaired = rollback.playback.repair(epoch, speculative, Math.max(repair.frames, behind), Math.max(repair.cost, behind * REPAIR_WHOLE_COST));
+  endFrameSection(RECONCILE_SECTION);
   if (repaired === "rejected") {
     setStatus(s, "The match could not catch up. Restart the match.", LASTING);
     return;
@@ -332,7 +337,10 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
   if ((reconciled !== "unchanged" || pendingBefore !== undefined) && rollback.playback.pendingRepair(epoch) === undefined) notePop(rollback.net, speculative.world);
   let steps = 0;
   while (s.game.phase === Phase.match && schedule.mayAdvanceConfirmed() && schedule.nextConfirmedFrame() <= known && steps < confirmSteps && (stopAt === undefined || schedule.nextConfirmedFrame() < stopAt)) {
-    if (!stepConfirmed(s, rollback)) {
+    beginFrameSection(CONFIRMED_SECTION);
+    const stepped = stepConfirmed(s, rollback);
+    endFrameSection(CONFIRMED_SECTION);
+    if (!stepped) {
       ownConfirmedState(s);
       setStatus(s, "The match could not advance. Restart the match.", LASTING);
       return;
@@ -351,10 +359,14 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
     const paced = journal === undefined ? undefined : resumePresentationHeld(s) ? journal.barrier.paced : pacedStop(journal.barrier);
     const speculativeStop = stopAt === undefined ? paced : paced === undefined ? stopAt : Math.min(stopAt, paced);
     const presentationStop = s.build.responseProbe ? visualCaptureStopBefore(slot, speculativeStop) : speculativeStop;
+    beginFrameSection(SPECULATIVE_SECTION);
     let advanced = rollback.playback.catchUp(schedule, epoch, slot, speculative, speculativeBudget(journal !== undefined), presentationStop, observeSpeculativeFrame);
+    endFrameSection(SPECULATIVE_SECTION);
     if (advanced && keyboard !== undefined && schedule.speculativeFrame() > before && keyboardCatchesUp(schedule.speculativeFrame(), rollback.epochCallbacks, schedule.rollbackFrames(), schedule.remoteThrough(slot))) {
       captureKeyboard(s, rollback, keyboard);
+      beginFrameSection(SPECULATIVE_SECTION);
       advanced = rollback.playback.catchUp(schedule, epoch, slot, speculative, 1, presentationStop, observeSpeculativeFrame);
+      endFrameSection(SPECULATIVE_SECTION);
     }
     const after = schedule.speculativeFrame();
     if (journal !== undefined) settlePace(journal.barrier, after);

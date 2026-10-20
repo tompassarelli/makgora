@@ -10,6 +10,7 @@ import { PARTICIPANT_SLOTS } from "../game/input/participants";
 import { Phase } from "../game/lobby/lobbyState";
 import { parseDecimal } from "../game/netcode/journal/decimal";
 import { shellState } from "../host/loop/state";
+import { FRAME_SECTIONS } from "../host/loop/frameSections";
 
 
 const PERF_COMMAND = "-dev perf";
@@ -40,6 +41,7 @@ export function startMatchFrameMeter(): void {
 
     simulationFrame: () => shellState()?.runtime.simulationFrame ?? 0,
     toggle: PERF_COMMAND,
+    sections: FRAME_SECTIONS,
   });
   on(CAPTURE_HANDLER, captureCommand);
   const chat = CreateTrigger();

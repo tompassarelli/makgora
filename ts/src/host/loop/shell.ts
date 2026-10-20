@@ -19,6 +19,8 @@ import type { RollbackPlayback } from "../../game/session/playback";
 import { cancelBindingCapture, initializeBindingSettings, loadSavedBindings, saveBindingSettings, useDefaultBindings } from "../../game/ui/bindingSettings";
 import { f32 } from "wisp/src/sim/f32";
 import { on, trampoline } from "wisp/src/platform/dispatch";
+import { beginFrameSection, endFrameSection } from "wisp/src/map/frameSections";
+import { CAMERA_SECTION, PRESENTATION_SECTION, UI_SECTION } from "./frameSections";
 import { DRAW_EVENT, beginPresentedFrame, drawBetweenFrames, startFrameClock } from "./betweenFrames";
 import { EDITBOX_ENTER, EditboxIngress } from "../../platform/editboxJournal";
 import { localParticipantSlot, traceTick, writeReadyMarker } from "./diagnostics";
@@ -139,9 +141,15 @@ function gameTick(s: ShellState): void {
   const held = heldVisualFrame(localSlot()) !== undefined || view.resumePresentationHeld(s);
   beginPresentedFrame(s.game.phase === Phase.match && !s.session.paused && !held);
   if (!held) {
+    beginFrameSection(PRESENTATION_SECTION);
     view.renderPersistentPresentation(s);
+    endFrameSection(PRESENTATION_SECTION);
+    beginFrameSection(CAMERA_SECTION);
     view.lockArenaCamera(s);
+    endFrameSection(CAMERA_SECTION);
+    beginFrameSection(UI_SECTION);
     view.renderUi(s);
+    endFrameSection(UI_SECTION);
     holdPresentedCapture(s);
   }
   writeDrawnFrame(s);

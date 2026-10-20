@@ -33,7 +33,9 @@ if (bundle === undefined || declarations === undefined) throw new Error("usage: 
 const map = { filePrefix: "smashcraft", localNatives: SMASHCRAFT_LOCAL_NATIVES, intentionalNoops: SMASHCRAFT_NOOPS, natives: () => smashcraftNativeBehavior() };
 const options = { samples: samples === "samples" };
 const computer = SELECTABLE_CHARACTERS.find((character) => run === `bot-${fighterSlug(character)}`);
-const deep = run === "rollback-four";
+const capturing = run === "native-perf-four";
+const deep = run === "rollback-four" || capturing;
+const CAPTURE_SETTLE_FRAMES = 30;
 const humans = run === "playable-duel" ? HUMAN_DUEL : run === "playable-human-four" ? HUMAN_FOUR : deep ? { ...HUMAN_FOUR, everyRowChanges: true } : undefined;
 const bot = humans ?? (run === "bot" ? BOT_THREE : run === "bot-four" || run === "playable-bot-four" ? BOT_FOUR : computer !== undefined ? botMatchAgainst(computer) : undefined);
 const censusFighter = SELECTABLE_CHARACTERS.find((character) => run === `census-${fighterSlug(character)}`);
@@ -46,6 +48,22 @@ const measured = (headless: LuaHeadlessMap, play: (this: void, clients: Lockstep
   for (const text of profileText.split(",")) if (text !== "") frames.add(Number(text));
   return profileRun(headless, bundle, declarations, frames, play, delivery, os.getenv("PERF_PROFILE_PHASES") === "1");
 };
+function writeCapture(clients: Lockstep, notes: string[]): string[] {
+  const out = os.getenv("PERF_CAPTURE");
+  const receipt = clients.client(0).files.get("smashcraft-perf-capture-p0-run1.txt");
+  if (receipt === undefined) return ["p0 wrote no frame capture"];
+  if (out === undefined) {
+    notes.push(`p0 capture of ${receipt.length - 1} callbacks; set PERF_CAPTURE=FILE to keep it`);
+    return [];
+  }
+  const [file] = io.open(out, "w");
+  if (file === undefined) return [`cannot write ${out}`];
+  for (const line of receipt) file.write(`p0 capture: ${line}\n`);
+  file.close();
+  notes.push(`p0 capture of ${receipt.length - 1} callbacks written to ${out}`);
+  return [];
+}
+
 let problems: number;
 if (censusFighter !== undefined || censusStage !== undefined) {
 
@@ -55,18 +73,26 @@ if (censusFighter !== undefined || censusStage !== undefined) {
 } else if (run === "quick-match") problems = runLuaPerf(map, QUICK_MATCH, bundle, declarations, options);
 else if (bot !== undefined) {
 
-  const predicted = { ...map, localNatives: PREDICTED_LOCAL_NATIVES, players: run === "playable-human-four" || deep ? [0, 1, 2, 3] : [0, 1] };
+  const predicted = { ...map, localNatives: PREDICTED_LOCAL_NATIVES, players: run === "playable-human-four" || deep ? [0, 1, 2, 3] : [0, 1], ...(capturing ? { natives: () => ({ ...smashcraftNativeBehavior(), os: { clock: os.clock } }) } : {}) };
   const build = run.startsWith("playable-") || deep ? PLAYABLE_BUILD : undefined;
   const delivery = deep ? lagSpikeDelivery(syncDelivery(MEASURED_BATTLE_NET, 7), DEEP_ROLLBACK_SPIKES, 4) : syncDelivery(MEASURED_BATTLE_NET, 7);
   const depths: string[] = [];
   const play = (clients: Lockstep, measure: PerfMeasure) => {
     const catchingUp = clients.clients.map(() => 0);
-    const played = () => clients.clients.forEach((client, index) => {
-      if ((confirmedLag(client) ?? 0) > CATCH_UP_FRAMES) catchingUp[index] = (catchingUp[index] ?? 0) + 1;
-    });
+    let requested = false;
+    const played = () => {
+      if (capturing && !requested) {
+        requested = true;
+        clients.chat(0, `-dev capture ${Number(framesText) - CAPTURE_SETTLE_FRAMES}`);
+      }
+      clients.clients.forEach((client, index) => {
+        if ((confirmedLag(client) ?? 0) > CATCH_UP_FRAMES) catchingUp[index] = (catchingUp[index] ?? 0) + 1;
+      });
+    };
     const result = playBotMatch(clients, bot, Number(framesText), measure, build, deep ? played : undefined);
     if (!deep) return result;
     const lines = [...result.lines];
+    if (capturing) lines.push(...writeCapture(clients, depths));
     clients.clients.forEach((client, index) => {
       const depth = deepestRollback(client);
       if (depth === undefined) lines.push(`p${client.slot} has no rollback session`);
@@ -80,5 +106,5 @@ else if (bot !== undefined) {
   };
   problems = measured(predicted, play, delivery);
   for (const line of depths) print(`journey: ${line}`);
-} else throw new Error(`no run named ${run}: quick-match, bot, bot-four, playable-bot-four, playable-duel, playable-human-four, rollback-four or bot-FIGHTER`);
+} else throw new Error(`no run named ${run}: quick-match, bot, bot-four, playable-bot-four, playable-duel, playable-human-four, rollback-four, native-perf-four or bot-FIGHTER`);
 if (problems > 0) os.exit(1);

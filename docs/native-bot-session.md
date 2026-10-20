@@ -640,13 +640,66 @@ fresh file from each client. The receipt records elapsed **clock** milliseconds;
 18,000 callbacks mean five minutes only at 60 callbacks per second. Retain
 actual native start/end times and gameplay phase for the five-minute gate.
 
-From smashcraft:ts/, read a receipt with Wisp's host capture reader:
+### Per-section native capture
+
+The native-perf build times six sections of every captured callback, plus
+the rest of the callback and its Lua heap change: `reconcile` (rollback
+reconcile and repair), `confirmed` (each `stepConfirmed`), `speculative`
+(`catchUp`), `presentation` (`renderPersistentPresentation`), `camera`
+(`lockArenaCamera`) and `ui` (`renderUi`); `other` is everything else.
+The sections only read `os.clock` while a capture runs and change no game
+state. The procedure:
+
+1. Build from smashcraft:ts/ at the commit under test:
+
+   ```sh
+   bun wisp map build --profile native-perf --name "Smashcraft perf $(git rev-parse --short HEAD)" --out /absolute/private/native-perf.w3x
+   ```
+
+2. Host it on a LAN pair (or both signed-in clients) and, in the lobby's
+   character menu, type on the host:
+
+   ```text
+   -dev slots 3 12             # C and D CPU: four fighters
+   -dev fighter 3 Illidan
+   -dev fighter 4 Warden
+   -dev stage 0                # Sky Deck
+   -dev time 10
+   -dev stocks 9
+   ```
+
+   Each line must answer with its `dev:` confirmation, not a refusal. Pick
+   both human fighters through the menus and start; do not use `-dev quick`.
+
+3. After GO!, type `-dev capture 18000` once. Each client answers
+   `dev: capture run=RUN frames=18000 match-frame=N`. Keep all four fighters
+   in the match for the next five minutes.
+
+4. Collect `smashcraft-perf-capture-pSLOT-runRUN.txt` from each client's
+   `CustomMapData`, fresh from this run (a crash, desync or early result
+   voids it).
+
+5. From smashcraft:ts/, print the per-section table of each receipt:
+
+   ```sh
+   bun wisp perf sections /absolute/private/smashcraft-perf-capture-p0-runRUN.txt
+   ```
+
+   It prints each section's median, p95, p99 and worst milliseconds and its
+   share of the worst 1% of callbacks' Lua time, then `other`, `total` (the
+   gated callback cost) and `gc-kb`; `--json` prints the same as one result.
+
+The headless equivalent runs the same build and sections in 32-bit Lua with
+four rollback clients and a capture typed after GO!; its clock is the host's
+Lua32 CPU time under the instruction counter, so compare shares, not
+milliseconds, with native:
 
 ```sh
-bun -e 'import { parseFrameCostCapture, captureDistribution } from "wisp/scripts/wisp/frameCostCapture"; const c = parseFrameCostCapture(await Bun.file(Bun.argv[1]).text()); console.log(JSON.stringify({ elapsed_clock_ms: c.elapsedMs, microseconds: captureDistribution(c) }));' /absolute/path/to/CAPTURE.txt
+PERF_CAPTURE=/absolute/out/headless-capture.txt bun wisp perf native-perf-four --frames 1800
+bun wisp perf sections /absolute/out/headless-capture.txt
 ```
 
-The output gives full-run median, p95, p99 and worst callback cost. The parser
+The `total` row is the full-run median, p95, p99 and worst callback cost. The parser
 rejects incomplete, reordered, clockless and reloaded samples. The #168 script
 gate is p99 at most 10 ms and worst at most 14 ms, over the accepted five-minute
 four-fighter workload; GPU/render time remains outside this meter.
