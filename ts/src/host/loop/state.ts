@@ -274,6 +274,7 @@ export interface ShellState {
   startingChoicesReady?: boolean;
   controlsGreeted?: number;
   readonly camera: MatchCamera;
+  readonly previewCamera: MatchCamera;
   cameraTween?: boolean;
 
   resumePresentationUntil?: number | undefined;
@@ -421,7 +422,7 @@ export function createShellState(build: MapBuild, setup: ShellSetup): ShellState
   const { persistence } = setup;
   const state: ShellState = {
     pad: build.analogPad === undefined ? undefined : { calibration: { first: undefined, last: undefined }, packet: undefined, mouseEvents: 0, syncEvents: 0, startedAt: 0.0, rows: [], mouse: [] },
-    camera: createMatchCamera(),
+    camera: createMatchCamera(), previewCamera: createMatchCamera(),
     build, origin: setup.origin, game: createMatchState(), world: createRoster(0), controls: createBufferedFrameControls(),
     produced: createFrameControls(), runtime: createPacingAndPresentation(), sessionWins: createSessionWins(), session: createMatchControls(),
     frameInput: createMatchFrameInput(),
