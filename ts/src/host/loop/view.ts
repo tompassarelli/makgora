@@ -16,7 +16,7 @@ import { SHOWCASE_PAD_X } from "../../game/session/showcase";
 import type { FighterAgency } from "../../game/presentation/fighterAgency";
 import type { FrameControls } from "../../game/match/controls";
 import type { PacingAndPresentation } from "../../game/match/pacingAndPresentation";
-import { type MatchState, DEFAULT_RESULT_PICK, Phase, humanActive, remainingSeconds, resultChoicesOpen, stageClock, timedMatch } from "../../game/lobby/lobbyState";
+import { type MatchState, DEFAULT_RESULT_PICK, Phase, fighterColor, humanActive, remainingSeconds, resultChoicesOpen, stageClock, timedMatch } from "../../game/lobby/lobbyState";
 import { fighterOffscreen, fitFighterFrames } from "../../game/presentation/fighterFraming";
 import { arenaFarZ, ARENA_CAMERA, FLOOR_HEIGHT, cameraFieldOfView, type ScreenPoint, cameraPoint, extremeCamera, finalCamera, localCamera, resultCamera } from "../../game/presentation/arenaCamera";
 
@@ -41,7 +41,7 @@ import { type Roster, fighterAt, isActive } from "../../game/sim/roster";
 import { surfaceCount, surfaceLeft, surfaceMoves, surfaceRight, surfaceZ } from "../../game/sim/stage";
 import { CANNON_Z, SEA_SURFACE_Z, cannonAim, cannonOn, cannonX, hasTide, hasWind } from "../../game/sim/stageHazards";
 import { localParticipantSlot, traceParticipant } from "./diagnostics";
-import { placeFighterBody, renderDizzy } from "./fighterBody";
+import { colorFighterBody, placeFighterBody, renderDizzy } from "./fighterBody";
 import { concealFighter, concealFighters } from "./fighterCloak";
 import { type ShellState, type StatusFrames, activeRollback, localSlot, playsOnKeyboard } from "./state";
 import { type UiObjects, pauseEffects, views } from "./ui";
@@ -245,6 +245,7 @@ export function renderFighter(s: ShellState, slot: ParticipantSlot, pose: Readon
   if (body === undefined || !isActive(s.world, slot)) return;
   const fighter = fighterAt(s.world, slot);
   renderDizzy(body, fighter, s.game.phase === Phase.match, s.origin);
+  colorFighterBody(body, slot, fighterColor(s.game, slot));
   const hidden = s.hiddenFighters[slot];
   const cloaked = hidden?.body === true;
   if (!cloaked && wasOut && !fighter.status.out) ShowUnit(body.unit, true);
@@ -563,7 +564,7 @@ export function lockArenaCamera(s: ShellState): void {
     const fighter = isActive(world, slot) ? fighterAt(world, slot) : undefined;
     const point = cameraPoint(framing, aspect, fighter?.motion.x ?? 0.0, (fighter?.motion.z ?? 0.0) + 60.0, BUBBLE_POINT);
     const outside = fighter !== undefined && fighterOffscreen(framing, aspect, fighter.character, fighter.motion.x, fighter.motion.z);
-    views(s).bubbles[slot].update(!pauseHudHidden(s) && game.phase === Phase.match && fighter !== undefined && !fighter.status.out && outside, fighter?.character ?? Character.rifleman, game.teamBattle ? game.teamChoices[slot] : slot, point.column, point.row, aspect);
+    views(s).bubbles[slot].update(!pauseHudHidden(s) && game.phase === Phase.match && fighter !== undefined && !fighter.status.out && outside, fighter?.character ?? Character.rifleman, fighterColor(game, slot), point.column, point.row, aspect);
     readEscapeMeter(world, slot, meter);
     if (game.phase !== Phase.match || pauseHudHidden(s)) meter.shown = false;
     const meterPoint = cameraPoint(framing, aspect, meter.x, meter.z, METER_POINT);
@@ -596,7 +597,7 @@ export function renderUi(s: ShellState): void {
   for (const slot of PARTICIPANT_SLOTS) {
     if (s.participants[slot].body !== undefined && isActive(s.world, slot)) {
       const fighter = fighterAt(s.world, slot);
-      ui.huds[slot].update(showMatch, fighter.character, game.teamBattle ? game.teamChoices[slot] : slot, fighter.status.damage, s.game.endless ? 0 : fighter.status.stocks);
+      ui.huds[slot].update(showMatch, fighter.character, fighterColor(game, slot), fighter.status.damage, s.game.endless ? 0 : fighter.status.stocks);
       ui.manaBars[slot].hud.update(showMatch, fighter.mana.points, fighter.visuals.manaDenied, fighter.visuals.manaDrained);
     } else {
       ui.huds[slot].update(false, Character.rifleman, slot, 0.0, 0);

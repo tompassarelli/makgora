@@ -25,6 +25,8 @@ import { clearAllInputs } from "./inputs";
 import { journalIdentity, publishMenu } from "./journal";
 import { syncKeyEvents } from "./keyEvents";
 import { makePreview } from "./preview";
+import { colorFighterBody } from "./fighterBody";
+import { fighterColor } from "../../game/lobby/lobbyState";
 import { beginRollbackEpoch } from "./rollback";
 import type { ShellState } from "./state";
 import { beginFighterRenderers, views } from "./ui";
@@ -88,6 +90,7 @@ export function startMatch(s: ShellState, scenario: Scenario = s.build.scenario,
     if (!isActive(s.world, slot)) continue;
     const participant = s.participants[slot];
     const fighter = fighterAt(s.world, slot);
+    if (participant.body !== undefined) colorFighterBody(participant.body, slot, fighterColor(s.game, slot));
     participant.pooled = beginFighterRenderers(s, slot, fighter.character, pooled);
 
     if (!participant.pooled) continue;

@@ -376,6 +376,10 @@ export function setFriendlyFire(game: MatchState, actor: number, on: boolean): v
   if (settingRules(game, actor) && game.teamBattle) game.friendlyFire = on;
 }
 
+export function fighterColor(game: Readonly<MatchState>, slot: ParticipantSlot): number {
+  return game.teamBattle ? game.teamChoices[slot] : slot;
+}
+
 export function cycleTeam(game: MatchState, actor: number, slot: number, direction: number): void {
   if (game.phase !== Phase.characterMenu || !game.teamBattle || !isParticipantSlot(slot) || !fighterActive(game, slot)
     || !humanPresent(game, actor) || !(actor === slot && humanFighterActive(game, slot) || canChooseComputer(game, actor, slot))) return;

@@ -21,6 +21,13 @@ const DIZZY_MODEL = "Abilities\\Spells\\Human\\Thunderclap\\ThunderclapTarget.md
 
 const placement = { x: 0.0, z: 0.0 };
 
+export function colorFighterBody(body: FighterBody, slot: number, color: number): void {
+  if (body.color === color) return;
+  body.color = color;
+  SetPlayerColor(Player(slot), ConvertPlayerColor(color));
+  SetUnitColor(body.unit, ConvertPlayerColor(color));
+}
+
 export function placeFighterBody(body: FighterBody, fighter: Readonly<Fighter>, origin: WorldOrigin, stage = 0): void {
   fitFighterPlacement(placement, fighter, stage);
   SetUnitX(body.unit, origin.x + placement.x);
@@ -41,7 +48,7 @@ export function createFighterBody(owner: player, fighter: Readonly<Fighter>, ori
   UnitRemoveAbility(unit, CROW_FORM);
   UnitAddAbility(unit, LOCUST);
   PauseUnit(unit, true);
-  const body: FighterBody = { unit, dizzy: undefined, renderedSelection: 0 };
+  const body: FighterBody = { unit, dizzy: undefined, renderedSelection: 0, color: -1 };
   placeFighterBody(body, fighter, origin);
   return body;
 }

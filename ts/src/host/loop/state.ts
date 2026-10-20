@@ -62,6 +62,7 @@ export interface FighterBody {
   dizzy: effect | undefined;
 
   renderedSelection: number;
+  color: number;
 
   cry?: CryGate;
 }
