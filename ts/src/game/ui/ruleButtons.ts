@@ -17,8 +17,8 @@ const stepBox = (x: number, y: number): RuleBox => ({ x, y, width: STEP_WIDTH, h
 const toggleBox = (x: number, y: number): RuleBox => ({ x, y, width: f32(0.178), height: RULE_HEIGHT });
 
 export const RULE_BUTTONS = {
-  teamBattle: { x: f32(0.055), y: ROW_1, width: f32(0.14), height: RULE_HEIGHT },
-  friendlyFire: { x: f32(0.205), y: ROW_1, width: f32(0.14), height: RULE_HEIGHT },
+  teamBattle: { x: f32(0.055), y: ROW_3, width: f32(0.14), height: RULE_HEIGHT },
+  friendlyFire: { x: f32(0.205), y: ROW_3, width: f32(0.14), height: RULE_HEIGHT },
   fewerStocks: stepBox(f32(0.38), ROW_1),
   moreStocks: stepBox(f32(0.528), ROW_1),
   lessTime: stepBox(f32(0.572), ROW_1),
@@ -26,9 +26,9 @@ export const RULE_BUTTONS = {
   endless: toggleBox(f32(0.38), ROW_2),
   automaticRematch: toggleBox(f32(0.572), ROW_2),
   items: { x: f32(0.38), y: ROW_3, width: f32(0.078), height: RULE_HEIGHT },
-  itemSpeed: { x: f32(0.055), y: ROW_3, width: f32(0.14), height: RULE_HEIGHT },
-  itemHeavy: { x: f32(0.205), y: ROW_3, width: f32(0.14), height: RULE_HEIGHT },
-  training: toggleBox(f32(0.572), ROW_3),
+  itemSpeed: { x: f32(0.055), y: ROW_1, width: f32(0.14), height: RULE_HEIGHT },
+  itemHeavy: { x: f32(0.205), y: ROW_1, width: f32(0.14), height: RULE_HEIGHT },
+  training: { x: f32(0.05), y: ROW_2, width: f32(0.295), height: RULE_HEIGHT },
   ultimates: { x: f32(0.462), y: ROW_3, width: f32(0.104), height: RULE_HEIGHT },
   lessBehaviour: stepBox(f32(0.38), ROW_1),
   moreBehaviour: stepBox(f32(0.528), ROW_1),

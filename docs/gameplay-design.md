@@ -282,23 +282,16 @@ transport (wisp#110) both call it.
 
 - **Default 2 frames (33 ms)** against computers, in local versus and online,
   as in Slippi.
-- **Delay setting**, saved per player with the controls (Controls and delay,
-  F1 on character select, which is also the lobby): **Auto** (the default) or
-  **Fixed N** frames, 0 to 16, used as-is. The button steps one frame at a
-  time from 0 to 16, then back to Auto; a saved profile with any other delay
-  code loads as Auto. Past 16 frames (267 ms) a fighter stops feeling
-  playable, so neither setting goes higher: a connection that needs more
-  holds prediction at the window edge instead. Rollback absorbs the rest.
-  Local matches can lower it to 0 or 1. **Recalibrate** shows the measured
-  echo (how long the player's own input row takes to come back through
-  Battle.net's relay and turn wait; the round trip to an opponent is about
-  twice it), Auto's choice and the expected rollback depth, and one press makes
-  that choice fixed.
-- **Lobby agreement:** each player sees the other's request on character
-  select. The match uses the higher request, so nobody plays below what they
-  asked for. The line leads with the match delay and who set it, then each
+- **No per-player setting.** Tom decided, 20 Oct 2026, that delay is
+  universal and never a player choice, so the Controls screen has no delay
+  button and profiles save only keys; a profile saved with an old delay code
+  loads its keys and drops the code. Each client proposes Auto from its
+  measured echo, capped at 16 frames (267 ms); past that a connection holds
+  prediction at the window edge instead. Local matches use the default.
+- **Lobby agreement:** each player sees every proposal on character select.
+  The match uses the highest proposal for everyone. The line leads with the match delay and who set it, then each
   player's request, echo and measured simulation rate in frames per second,
-  e.g. `Delay 16 frames, set by P3 · P1 2 (83 ms) 60 · P2 fixed 9 (283 ms) 60
+  e.g. `Delay 16 frames, set by P3 · P1 2 (83 ms) 60 · P2 9 (283 ms) 60
   · P3 16 (583 ms) 40`, so four players fit one row of 106 characters. When the agreed delay is 8 frames (133 ms) or more, the lobby
   warns: "Input delay of 8+ frames: this connection will feel sluggish".
   Input delay stays the same for every player.

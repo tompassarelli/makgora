@@ -17,7 +17,6 @@ import {
   rebind,
   slotIndex,
 } from "../input/keyBindings";
-import { AUTO_DELAY, type DelayChoice, MAX_FIXED_DELAY } from "../netcode/delayPolicy";
 
 
 export type BindingLoadResult = { kind: "loaded"; encoded: string } | { kind: "empty" } | { kind: "unavailable" };
@@ -45,7 +44,6 @@ export interface BindingSettings {
   readonly owner: number;
   readonly persistence: BindingPersistence;
   bindings: KeyBindings;
-  delay: DelayChoice;
 
   ready: boolean;
   profile: SavedProfile;
@@ -58,36 +56,19 @@ export interface BindingSettings {
 }
 
 export function createBindingSettings(owner: number, persistence: BindingPersistence): BindingSettings {
-  return { owner, persistence, bindings: presetBindings(DEFAULT_PRESET), delay: AUTO_DELAY, ready: false, profile: "unknown", fromProfile: false, capture: undefined, revision: 0, message: "Loading controls..." };
+  return { owner, persistence, bindings: presetBindings(DEFAULT_PRESET), ready: false, profile: "unknown", fromProfile: false, capture: undefined, revision: 0, message: "Loading controls..." };
 }
 
 
-const DELAY_MARK = "D";
-const DELAY_CODES = "0123456789abcdefg";
+const OLD_DELAY_MARK = "D";
 
-export function encodeSettings(settings: Readonly<BindingSettings>): string {
-  return `${encodeBindings(settings.bindings)}${DELAY_MARK}${settings.delay === AUTO_DELAY ? "A" : DELAY_CODES.charAt(settings.delay)}`;
-}
-
-export function decodeDelay(encoded: string): { readonly bindings: string; readonly delay: DelayChoice } {
+function storedBindings(encoded: string): string {
   const at = encoded.length - 2;
-  if (at < 0 || encoded.charAt(at) !== DELAY_MARK) return { bindings: encoded, delay: AUTO_DELAY };
-  const code = encoded.charAt(at + 1);
-  const fixed = DELAY_CODES.indexOf(code);
-  return { bindings: encoded.slice(0, at), delay: fixed >= 0 && fixed <= MAX_FIXED_DELAY ? fixed : AUTO_DELAY };
-}
-
-export function chooseDelay(settings: BindingSettings, delay: DelayChoice): void {
-  if (!settings.ready) return;
-  settings.delay = delay;
-  settings.revision++;
-  settings.message = delay === AUTO_DELAY ? "Delay set to Auto. Save to keep it." : `Delay set to ${delay} frames. Save to keep it.`;
+  return at >= 0 && encoded.charAt(at) === OLD_DELAY_MARK ? encoded.slice(0, at) : encoded;
 }
 
 function applyStartingLoad(settings: BindingSettings, result: BindingLoadResult): void {
-  const stored = result.kind === "loaded" ? decodeDelay(result.encoded) : undefined;
-  const saved = stored === undefined ? undefined : decodeBindings(stored.bindings);
-  if (stored !== undefined && saved !== undefined) settings.delay = stored.delay;
+  const saved = result.kind === "loaded" ? decodeBindings(storedBindings(result.encoded)) : undefined;
   if (saved !== undefined) {
     settings.bindings = saved;
     settings.profile = "saved";
@@ -105,7 +86,6 @@ function applyStartingLoad(settings: BindingSettings, result: BindingLoadResult)
 
 export function initializeBindingSettings(settings: BindingSettings): void {
   settings.bindings = presetBindings(DEFAULT_PRESET);
-  settings.delay = AUTO_DELAY;
   settings.persistence.load(settings.owner, result => applyStartingLoad(settings, result));
 }
 
@@ -120,11 +100,9 @@ export function previewStartingBindings(settings: Readonly<BindingSettings>): Bi
 export function loadSavedBindings(settings: BindingSettings, done: (message: string) => void): void {
   if (!settings.ready) return;
   settings.persistence.load(settings.owner, (result) => {
-    const stored = result.kind === "loaded" ? decodeDelay(result.encoded) : undefined;
-    const saved = stored === undefined ? undefined : decodeBindings(stored.bindings);
-    if (stored !== undefined && saved !== undefined) {
+    const saved = result.kind === "loaded" ? decodeBindings(storedBindings(result.encoded)) : undefined;
+    if (saved !== undefined) {
       settings.bindings = saved;
-      settings.delay = stored.delay;
       settings.capture = undefined;
       settings.revision++;
       settings.profile = "saved";
@@ -141,7 +119,6 @@ export function loadSavedBindings(settings: BindingSettings, done: (message: str
 
 export function useDefaultBindings(settings: BindingSettings): void {
   settings.bindings = presetBindings(DEFAULT_PRESET);
-  settings.delay = AUTO_DELAY;
   settings.ready = true;
   settings.revision++;
 }
@@ -179,7 +156,7 @@ export function captureBinding(settings: BindingSettings, key: number): boolean 
 export function saveBindingSettings(settings: BindingSettings): void {
   if (!settings.ready) return;
   settings.capture = undefined;
-  settings.persistence.save(settings.owner, encodeSettings(settings));
+  settings.persistence.save(settings.owner, encodeBindings(settings.bindings));
   settings.profile = "saved";
   settings.fromProfile = true;
   settings.message = "Controls saved for next time.";

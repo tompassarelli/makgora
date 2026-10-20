@@ -8,10 +8,7 @@ export const DUEL_ROLLBACK_BUDGET = 6;
 export const GROUP_ROLLBACK_BUDGET = 8;
 export const MAX_FIXED_DELAY = MAX_INPUT_DELAY;
 export const HIGH_DELAY_FRAMES = 8;
-export const AUTO_DELAY = -1;
 export const TIME_SYNC_INTERVAL = 60;
-
-export type DelayChoice = number;
 
 export interface DelayPolicy {
   readonly floor: number;
@@ -64,24 +61,11 @@ export function nextDelay(policy: DelayPolicy, estimate: Readonly<RttEstimate>, 
   return lowered < current ? lowered : clampDelay(policy, current);
 }
 
-export function expectedRollback(estimate: Readonly<RttEstimate>, delay: number): number {
-  return Math.max(0, oneWayFrames(smoothedRttMs(estimate)) - delay);
-}
-
 export function connectionPoor(policy: DelayPolicy, estimate: Readonly<RttEstimate>, delay: number): boolean {
   return estimate.samples > 0 && oneWayFrames(smoothedRttMs(estimate)) > policy.budget + delay;
 }
 
 export const highDelay = (delay: number): boolean => delay >= HIGH_DELAY_FRAMES;
-
-export const isDelayChoice = (value: number): value is DelayChoice => value === AUTO_DELAY || (Math.floor(value) === value && value >= 0 && value <= MAX_FIXED_DELAY);
-
-export function nextDelayChoice(choice: DelayChoice): DelayChoice {
-  if (choice === AUTO_DELAY) return 0;
-  return choice >= MAX_FIXED_DELAY ? AUTO_DELAY : choice + 1;
-}
-
-export const requestedDelay = (choice: DelayChoice, auto: number): number => (choice === AUTO_DELAY ? auto : choice);
 
 export function agreedDelay(requests: readonly number[], fallback: number = DEFAULT_DELAY): number {
   let agreed = -1;

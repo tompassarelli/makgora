@@ -60,7 +60,6 @@ export const ultimatesSetting = (on: boolean) => `Ultimates: ${on ? "On" : "Off"
 export const itemKindSetting = (kind: ItemKind, on: boolean) => `${kind === ItemKind.speed ? "Speed" : "Heavy"} item: ${on ? "On" : "Off"}`;
 
 
-export const modeSetting = (game: Readonly<MatchState>) => `Mode: ${game.lore ? "Lore Battles" : game.classic ? "Classic" : game.training ? "Training" : "Versus"}`;
 const BEHAVIOUR_NAMES = ["Stand", "Shield", "Crouch", "Jump", "Attack", "Fight"];
 const ESCAPE_NAMES = ["None", "Toward you", "Away", "Random"];
 const TECH_NAMES = ["None", "In place", "Toward you", "Away", "Random"];

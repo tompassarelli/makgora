@@ -58,7 +58,7 @@ export const checksumRow = (s: ShellState, epoch: number, frame: number): string
 
 export function delayRow(s: ShellState, rollback: Rollback): string {
   const requests: number[] = [];
-  for (const slot of PARTICIPANT_SLOTS) if (humanActive(s.game, slot)) requests.push(requestFor(rollback.net, s.game, slot, s.participants[slot].bindings.delay));
+  for (const slot of PARTICIPANT_SLOTS) if (humanActive(s.game, slot)) requests.push(requestFor(rollback.net, s.game, slot));
   return `delay ${rollback.epoch} ${rollback.delay} ${requests.join(",")}`;
 }
 
@@ -73,7 +73,7 @@ export function beginRollbackEpoch(s: ShellState, rollback: Rollback): boolean {
   const { schedule, speculative } = rollback;
   rollback.epoch++;
   const devDelay = s.build.devConsole && s.dev.delay !== rollback.mode.delay;
-  rollback.delay = rollback.keyboard === undefined || devDelay ? s.dev.delay : matchDelay(rollback.net, s.game, s.participants.map(participant => participant.bindings.delay));
+  rollback.delay = rollback.keyboard === undefined || devDelay ? s.dev.delay : matchDelay(rollback.net, s.game);
   beginNetEpoch(rollback.net);
   rollback.window = s.dev.rollback;
   rollback.batch = s.dev.batch;

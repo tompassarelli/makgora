@@ -70,7 +70,7 @@ import { PLAYABLE_CHARACTERS, fighterName, nextSelectableCharacter } from "../si
 import { fighterPortrait } from "../roster/looks";
 import {
   MOVES_HEADER, itemsSetting, ultimatesSetting, itemKindSetting, automaticRematchSetting, movesPage, selectionModeLabel, endlessSetting, hitAreasSetting, partnerBehaviourSetting, partnerDamageSetting, partnerEscapeSetting,
-  partnerTechSetting, stockSetting, timeSetting, modeSetting, trainingSpeedSetting,
+  partnerTechSetting, stockSetting, timeSetting, trainingSpeedSetting,
 } from "../session/messages";
 import { classicRouteSummary, classicTierSetting } from "../classic/classicText";
 import { loreBattle, loreBattleSetting, loreBattleSummary } from "../classic/loreBattles";
@@ -267,7 +267,6 @@ export class SelectionPanel {
   private shownDelay = "";
 
   private readonly modeLabel: framehandle;
-  private shownMode = "";
   private readonly stockValue: framehandle;
   private readonly timeValue: framehandle;
   private readonly teamToggle: framehandle;
@@ -331,7 +330,6 @@ export class SelectionPanel {
     this.backdrop = createBackdrop(`MeleeSelectBackdrop${suffix}`, consoleUi(), 400 + participantId);
     BlzFrameSetTexture(this.backdrop, MENU_STYLE.panelTexture, 0, false);
     coverScreen(this.backdrop);
-    art(root, `MeleeModeArt${suffix}`, "war3mapImported\\SelectionAction.tga", headerBoxLeft, RULE_ROWS[1], f32(0.295), RULE_HEIGHT);
     const grid = this.roster.grid;
     const scale = f32(grid.scale);
     for (let choice = 0; choice < grid.count; choice++) {
@@ -428,6 +426,7 @@ export class SelectionPanel {
     placeTopLeft(this.modeLabel, headerLeft, RULE_ROWS[1]);
     BlzFrameSetTextAlignment(this.modeLabel, TEXT_JUSTIFY_MIDDLE, TEXT_JUSTIFY_LEFT);
     BlzFrameSetEnable(this.modeLabel, false);
+    setFrameText(this.modeLabel, `${MENU_STYLE.gold}${MOVES_HEADER}|r`);
     this.movesFrames = [
       this.movesTitle, this.movesBody,
       pageButton(`MeleeMovesPrevious${suffix}`, f32(0.2), f32(0.1), "<", { kind: "movesStep", direction: -1 }),
@@ -853,12 +852,7 @@ export class SelectionPanel {
     BlzFrameSetVisible(this.root, visible);
     BlzFrameSetVisible(this.backdrop, visible || (loading && game.phase === Phase.characterMenu && humanActive(game, participantId)));
     for (const frame of this.movesFrames) BlzFrameSetVisible(frame, visible && this.movesOpen);
-    BlzFrameSetVisible(this.modeLabel, visible);
-    const mode = this.movesOpen ? MOVES_HEADER : selectionModeLabel(game);
-    if (mode !== this.shownMode) {
-      this.shownMode = mode;
-      setFrameText(this.modeLabel, `${MENU_STYLE.gold}${mode}|r`);
-    }
+    BlzFrameSetVisible(this.modeLabel, visible && this.movesOpen);
     if (!visible || cpuOpen || this.movesOpen) this.hideHelp();
     if (!visible) {
       this.showHand(false, 0.0, 0.0);
@@ -1026,7 +1020,7 @@ export class SelectionPanel {
       setFrameText(frame, itemKindSetting(kind, (items.enabledMask & itemBit(kind)) !== 0));
       BlzFrameSetVisible(frame, items.on && !training && !classic && !lore);
     }
-    setFrameText(this.trainingToggle, modeSetting(game));
+    setFrameText(this.trainingToggle, `${MENU_STYLE.gold}${selectionModeLabel(game)}|r`);
     const chosen = loreBattle(battle);
     setFrameText(this.classicTierValue, lore ? loreBattleSetting(battle, chosen !== undefined && clears.has(chosen.id)) : classicTierSetting(classicTier));
     setFrameText(this.classicRoute, lore ? loreBattleSummary(battle, clears.count()) : classicRouteSummary(fighter));

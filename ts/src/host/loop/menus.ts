@@ -35,8 +35,6 @@ import { ClassicStep, continueClassic, quitClassic, skipToClassicBoss, startClas
 import { LORE_BATTLES, LoreStep, continueLore, startLore } from "../../game/classic/loreBattles";
 import { clearParticipantInputs, controlsAvailable, currentComputerMask, currentHumanMask } from "./inputs";
 import { startMatch } from "./matchStart";
-import { recalibrateText, recalibratedDelay } from "./netDelay";
-import { chooseDelay } from "../../game/ui/bindingSettings";
 import { cancelStageLoad, requestStageLoad, stageLoading } from "./stageLoad";
 import { endReplaySegment } from "./replays";
 import { makePreview } from "./preview";
@@ -354,13 +352,6 @@ export function panelActions(): PanelActions {
     },
     settings: {
       closeSettings: participant => withSlot(participant, clearParticipantInputs),
-      delayInfo: participant => {
-        const s = shell();
-        return s.rollback === undefined || !isParticipantSlot(participant) ? "" : recalibrateText(s.rollback.net, s.game, participant);
-      },
-      recalibrate: participant => withSlot(participant, (s, slot) => {
-        if (s.rollback !== undefined) chooseDelay(s.participants[slot].bindings, recalibratedDelay(s.rollback.net, s.game, slot));
-      }),
     },
   };
 }

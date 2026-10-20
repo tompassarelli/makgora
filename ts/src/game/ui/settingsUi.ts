@@ -5,7 +5,6 @@ import {
   type BindingSettings,
   beginKeyCapture,
   cancelBindingCapture,
-  chooseDelay,
   loadProfile,
   NO_SAVED_PROFILE,
   pickBindingPreset,
@@ -15,16 +14,13 @@ import {
 import { ButtonClicks, createBackdrop, createText, gameUi, placeTopLeft, setFrameText, styleMenuPanel } from "./frames";
 import { MENU_FONT, MENU_STYLE } from "./hudLayout";
 import { KEY_CAP_HEIGHT, keyboardCaps } from "./keyboardLayout";
-import { AUTO_DELAY, nextDelayChoice } from "../netcode/delayPolicy";
 import { START_HINT } from "./helpText";
 
 export interface SettingsActions {
   closeSettings(participantId: number): void;
-  delayInfo(participantId: number): string;
-  recalibrate(participantId: number): void;
 }
 
-type SettingsButton = { kind: "preset"; preset: BindingPreset } | { kind: "profile" } | { kind: "save" } | { kind: "close" } | { kind: "delay" } | { kind: "recalibrate" } | { kind: "key"; key: number };
+type SettingsButton = { kind: "preset"; preset: BindingPreset } | { kind: "profile" } | { kind: "save" } | { kind: "close" } | { kind: "key"; key: number };
 
 interface KeyButton {
   readonly key: number;
@@ -45,8 +41,6 @@ export class SettingsPanel {
   private readonly hint: framehandle;
   private readonly help: framehandle;
   private readonly status: framehandle;
-  private readonly delayButton: framehandle;
-  private readonly delayInfo: framehandle;
   private readonly presets: readonly (readonly [BindingPreset, framehandle])[];
   private readonly keys: readonly KeyButton[];
   private readonly clicks: ButtonClicks<SettingsButton>;
@@ -118,11 +112,8 @@ export class SettingsPanel {
       return { key, frame: art, action };
     });
     this.status = line("MeleeSettingsStatus", f32(0.12), f32(0.218), f32(0.6), f32(0.018));
-    this.delayInfo = line("MeleeSettingsDelayInfo", f32(0.12), f32(0.196), f32(0.6), f32(0.03), f32(0.0095));
     button("MeleeSettingsSave", f32(0.12), f32(0.155), f32(0.105), f32(0.032), "Save", { kind: "save" });
     button("MeleeSettingsClose", PICKER_DONE.x, PICKER_DONE.y, PICKER_DONE.width, PICKER_DONE.height, "Done", { kind: "close" });
-    this.delayButton = button("MeleeSettingsDelay", f32(0.42), f32(0.155), f32(0.15), f32(0.032), "Delay: Auto", { kind: "delay" }).label;
-    button("MeleeSettingsRecalibrate", f32(0.575), f32(0.155), f32(0.13), f32(0.032), "Recalibrate", { kind: "recalibrate" });
     BlzFrameSetVisible(root, false);
   }
 
@@ -144,8 +135,6 @@ export class SettingsPanel {
     else if (button.kind === "profile") loadProfile(settings);
     else if (button.kind === "save") saveBindingSettings(settings);
     else if (button.kind === "close") this.close();
-    else if (button.kind === "delay") chooseDelay(settings, nextDelayChoice(settings.delay));
-    else if (button.kind === "recalibrate") this.actions.recalibrate(this.participantId);
     else beginKeyCapture(settings, button.key);
   }
 
@@ -159,7 +148,7 @@ export class SettingsPanel {
     const preview = previewStartingBindings(this.settings);
     if (preview === undefined) return;
     BlzFrameSetVisible(this.root, true);
-    this.renderHeader(preview, this.actions.delayInfo(this.participantId));
+    this.renderHeader(preview);
     this.renderKeys(preview);
   }
 
@@ -187,24 +176,21 @@ export class SettingsPanel {
     if (!this.local || !this.open) return;
     const { settings } = this;
     const { capture } = settings;
-    const info = this.actions.delayInfo(this.participantId);
-    const signature = `${encodeBindings(settings.bindings)}${settings.message}${settings.profile}${settings.fromProfile ? "p" : "-"}${capture === undefined ? "-" : I2S(capture.action * 2 + capture.slot)}${I2S(settings.delay)}${info}`;
+    const signature = `${encodeBindings(settings.bindings)}${settings.message}${settings.profile}${settings.fromProfile ? "p" : "-"}${capture === undefined ? "-" : I2S(capture.action * 2 + capture.slot)}`;
     if (signature === this.lastSignature) return;
     this.lastSignature = signature;
     BlzFrameSetVisible(this.root, true);
-    this.renderHeader(settings, info);
+    this.renderHeader(settings);
     this.renderKeys(settings);
   }
 
-  private renderHeader(settings: Readonly<BindingSettings>, info: string): void {
+  private renderHeader(settings: Readonly<BindingSettings>): void {
     const { capture } = settings;
     const selected = settings.fromProfile ? undefined : presetOf(settings.bindings);
     for (const [preset, frame] of this.presets) setFrameText(frame, preset === selected ? `${MENU_STYLE.gold}${PRESET_NAMES[preset]}|r` : PRESET_NAMES[preset]);
     setFrameText(this.profileButton, settings.profile !== "saved" ? `|cff808080${NO_SAVED_PROFILE}|r` : settings.fromProfile ? `${MENU_STYLE.gold}Load profile|r` : "Load profile");
     BlzFrameSetText(this.hint, settings.fromProfile ? `${MENU_STYLE.gold}Your saved profile is selected.|r` : selected === undefined ? "Your own keys. Save to keep them." : `${MENU_STYLE.gold}${PRESET_HINTS[selected]}|r`);
     BlzFrameSetText(this.help, capture === undefined ? `Click a lit key, then press the key you want for that action. ${START_HINT}` : "Press the new key for the flashing action. Escape cancels.");
-    setFrameText(this.delayButton, settings.delay === AUTO_DELAY ? "Delay: Auto" : `Delay: ${I2S(settings.delay)} frames`);
-    BlzFrameSetText(this.delayInfo, info);
     BlzFrameSetText(this.status, settings.message);
   }
 

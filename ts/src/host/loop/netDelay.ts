@@ -4,8 +4,8 @@ import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS } from "../../game/input/participants";
 import { type MatchState, humanActive, humanCount } from "../../game/lobby/lobbyState";
 import {
-  AUTO_DELAY, DEFAULT_DELAY, type DelayCorrection, type DelayPolicy, HIGH_DELAY_FRAMES, type RttEstimate, agreedDelay, connectionPoor, correctDelay, correctedDelay,
-  MAX_FIXED_DELAY, delayCorrection, delayPolicy, expectedRollback, highDelay, nextDelay, observeRtt, requestedDelay, rollbackBudget, rttEstimate, smoothedRttMs,
+  DEFAULT_DELAY, type DelayCorrection, type DelayPolicy, HIGH_DELAY_FRAMES, type RttEstimate, agreedDelay, connectionPoor, correctDelay, correctedDelay,
+  MAX_FIXED_DELAY, delayCorrection, delayPolicy, highDelay, nextDelay, observeRtt, rollbackBudget, rttEstimate, smoothedRttMs,
 } from "../../game/netcode/delayPolicy";
 import { type FixedDelay, isFixedDelay } from "../../game/netcode/fixedSchedule";
 import { PENDING_CAPACITY } from "../../game/netcode/shadowSchedule";
@@ -75,27 +75,26 @@ export function createNetDelay(window: number): NetDelay {
 
 export const isOnline = (game: Readonly<MatchState>): boolean => humanCount(game) > 1;
 
-export function requestFor(net: Readonly<NetDelay>, game: Readonly<MatchState>, slot: number, choice: number): number {
-  return requestedDelay(choice, isOnline(game) ? at(net.proposals, slot) : DEFAULT_DELAY);
+export function requestFor(net: Readonly<NetDelay>, game: Readonly<MatchState>, slot: number): number {
+  return isOnline(game) ? at(net.proposals, slot) : DEFAULT_DELAY;
 }
 
-export function matchDelay(net: Readonly<NetDelay>, game: Readonly<MatchState>, choices: readonly number[]): FixedDelay {
+export function matchDelay(net: Readonly<NetDelay>, game: Readonly<MatchState>): FixedDelay {
   const requests: number[] = [];
-  for (const slot of PARTICIPANT_SLOTS) if (humanActive(game, slot)) requests.push(requestFor(net, game, slot, at(choices, slot)));
+  for (const slot of PARTICIPANT_SLOTS) if (humanActive(game, slot)) requests.push(requestFor(net, game, slot));
   const agreed = agreedDelay(requests);
   return isFixedDelay(agreed) ? agreed : DEFAULT_DELAY;
 }
 
-export function lobbyDelayText(net: Readonly<NetDelay>, game: Readonly<MatchState>, choices: readonly number[]): string {
+export function lobbyDelayText(net: Readonly<NetDelay>, game: Readonly<MatchState>): string {
   const parts: string[] = [];
   const online = isOnline(game);
-  const agreed = matchDelay(net, game, choices);
+  const agreed = matchDelay(net, game);
   let decider = -1;
   let deciders = 0;
   for (const slot of PARTICIPANT_SLOTS) {
     if (!humanActive(game, slot)) continue;
-    const choice = at(choices, slot);
-    const request = requestFor(net, game, slot, choice);
+    const request = requestFor(net, game, slot);
     if (request === agreed) {
       decider = slot;
       deciders++;
@@ -104,7 +103,7 @@ export function lobbyDelayText(net: Readonly<NetDelay>, game: Readonly<MatchStat
     const shown = online && echo >= 0 ? ` (${I2S(echo)} ms)` : "";
     const fps = at(net.slotFps, slot);
     const rate = online && fps >= 0 ? ` ${I2S(fps)}` : "";
-    parts.push(`P${I2S(slot + 1)} ${choice === AUTO_DELAY ? "" : "fixed "}${I2S(request)}${shown}${rate}`);
+    parts.push(`P${I2S(slot + 1)} ${I2S(request)}${shown}${rate}`);
   }
   const setBy = online && deciders === 1 ? `, set by P${I2S(decider + 1)}` : "";
   const lines = [`Delay ${I2S(agreed)} frames${setBy} · ${parts.join(" · ")}`];
@@ -157,15 +156,6 @@ export function parseDelayMessage(data: string): DelayMessage {
     else if (mark === SLOW_MARK) slow = value === 1;
   }
   return { ping, delay, echo, fps, slow };
-}
-
-export const recalibratedDelay = (net: Readonly<NetDelay>, game: Readonly<MatchState>, slot: number): number => requestFor(net, game, slot, AUTO_DELAY);
-
-export function recalibrateText(net: Readonly<NetDelay>, game: Readonly<MatchState>, slot: number): string {
-  const { estimate } = net;
-  const auto = recalibratedDelay(net, game, slot);
-  if (estimate.samples === 0) return `Recalibrate: no echo measured yet · Auto ${I2S(auto)} frames`;
-  return `Echo ${I2S(echoMs(estimate))} ms · Auto ${I2S(auto)} frames · expected rollback ${I2S(expectedRollback(estimate, auto))}`;
 }
 
 export function noteSent(net: NetDelay, frame: number): void {
