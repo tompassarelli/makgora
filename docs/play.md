@@ -127,7 +127,7 @@ and the lane's own tests (test files changed since its merge base with
 origin/main, uncommitted ones included), then builds the lane's working tree
 with the play build (no Lua prediction) as `Smashcraft X.Y.Z-LANE.w3x` in
 `~/.local/state/smashcraft/lane-builds/LANE/`, which holds only that lane's
-newest build. `--install` also installs it in Tom's Maps/00-Smashcraft/dev for him
+newest build. `--install` also installs it in Tom's Maps/00-Smashcraft for him
 to try. X.Y.Z is the next release; LANE is the branch's last segment without `land-`
 (`claude/land-cairne-air-924c72aef489` installs
 `Smashcraft X.Y.Z-cairne-air-924c72aef489.w3x`); `--lane BRANCH` names it
@@ -140,7 +140,7 @@ the lane map.
 
 Players use [smashcraft-client](https://github.com/tompassarelli/smashcraft-client):
 its release bundles the controller service, and its Play launches the current
-map in Maps/00-Smashcraft/releases ([client interface](client-interface.md)). It needs no
+map in Maps/00-Smashcraft ([client interface](client-interface.md)). It needs no
 checkout of this repository.
 
 ## Controller without play

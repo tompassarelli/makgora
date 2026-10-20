@@ -401,7 +401,7 @@ No Smashcraft server is involved, and players are their Battle.net names.
   Join by name.
 - **Host** (`bun wisp online host`, smashcraft:ts/scripts/wisp/online.ts).
   Through Wisp's menu page it creates a private lobby of the newest
-  `Smashcraft X.Y.Z.w3x` in Maps/00-Smashcraft/releases (else dev/), prints `Join code: …`
+  `Smashcraft X.Y.Z.w3x` in Maps/00-Smashcraft (else its newest release candidate or dev build), prints `Join code: …`
   and waits. Once the guest has joined, the host sends `start` on stdin
   (the client's Start now) or starts it in Warcraft III. Readiness sends no
   Battle.net chat. A start the game ignores (a guest still downloading the map)

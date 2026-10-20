@@ -16,7 +16,7 @@ test("a lane map is named Smashcraft <version>-<lane>, one installed lane map re
   const root = mkdtempSync(join(tmpdir(), "smashcraft-lane-build-"));
   try {
     const documents = join(root, "documents");
-    const maps = join(documents, "Maps/00-Smashcraft/dev");
+    const maps = join(documents, "Maps/00-Smashcraft");
     const staging = join(root, "staging");
     mkdirSync(maps, { recursive: true });
     writeFileSync(join(maps, "Smashcraft 0.0.6-dev aaaaaaa.w3x"), "main 6");
