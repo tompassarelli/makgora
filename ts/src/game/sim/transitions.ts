@@ -15,6 +15,7 @@ import { clearMash } from "./mash";
 import { DOWN_ATTACK_FRAMES, attackDurationFramesForGrounding, isSmashAttack } from "./moves";
 import type { Roster } from "./roster";
 import { clearPowershield, clearShieldBreak } from "./shield";
+import { REST_FREEZE_TRAP, mutableFreezeTrap, restBear } from "./fighterRest";
 
 export const LEDGE_REGRAB_FRAMES = 30;
 
@@ -135,23 +136,15 @@ export function cancelSpecialState(f: Fighter): void {
 
 export function clearSpecialOnStock(f: Fighter): void {
   cancelSpecialState(f);
-  const { special, bear } = f;
+  const { special } = f;
   special.fall = false;
   special.hit = false;
-  bear.life = 0;
-  bear.exDamage = false;
+  restBear(f);
   f.placed.life = 0;
   for (const animal of f.pack) animal.life = 0;
-  bear.swipeCooldown = 0;
   for (let action = 0; action < special.cooldowns.length; action++) special.cooldowns[action] = 0;
   special.direction = 0;
   special.seekTarget = 0;
-  bear.x = 0.0;
-  bear.z = 0.0;
-  bear.velocityX = 0.0;
-  bear.velocityZ = 0.0;
-  bear.hitSerial = 0;
-  bear.surface = undefined;
   for (let index = 0; index < f.projectileSlots; index++) {
     const projectile = mutableProjectile(f, index);
     projectile.life = 0;
@@ -181,7 +174,8 @@ export function clearSpecialOnStock(f: Fighter): void {
 }
 
 export function clearOwnedFreezeTrap(f: Fighter): void {
-  const trap = f.freezeTrap;
+  if ((f.restingGroups & REST_FREEZE_TRAP) !== 0) return;
+  const trap = mutableFreezeTrap(f);
   trap.life = 0;
   trap.exReach = false;
   trap.arming = 0;

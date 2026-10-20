@@ -30,6 +30,7 @@ import { RIFLEMAN_BEAR_LIFETIME, advanceBear, recordSpecialHit, specialAlreadyHi
 import { at } from "wisp/src/runtime/lookup";
 import { travelBeforeBodies } from "./travelStop";
 import { advanceHeroSpecial, followUpOnContact, chargedAimX, enterUltimate, chargedAimZ, holdHoveringUltimate, chooseHeroSpecial, enterHeroSpecial, followUpHeroSpecial, heroRegionOrigin, heroSpecialContact, heroStrikeMeetsShield, isHeroSpecialAction, relocateHeroSpecial, runningHeroSpecial, resolveHeroGuards, steerHeroSpecial, stopHeroMotionAtBodies } from "./specials/engine";
+import { mutableBear } from "./fighterRest";
 
 
 export const DEMONHUNTER_MANA_BURN_STARTUP = 16;
@@ -392,7 +393,8 @@ function glide(owner: Fighter, input: Readonly<Controls> | undefined): void {
 
 
 function summonBear(owner: Fighter, stage: number, matchFrame: number): void {
-  const { motion, bear, special } = owner;
+  const { motion, special } = owner;
+  const bear = mutableBear(owner);
   const moveX = special.direction;
   bear.life = RIFLEMAN_BEAR_LIFETIME;
   bear.exDamage = special.ex;

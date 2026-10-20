@@ -13,6 +13,7 @@ import { startFighterSpecial } from "./specials";
 import { setHumanMask } from "../lobby/lobbyState";
 import { produceComputerInput } from "../match/botPlay";
 import { sweep, sweepSeed } from "../core/sweep";
+import { mutableFreezeTrap } from "./fighterRest";
 
 test("Frost Trap appears at frame 22 and releases Rifleman at frame 38 [k3 measure #325]", () => {
   const match = testMatch(3, Character.rifleman);
@@ -46,9 +47,9 @@ test("a jump chosen fifteen frames after thaw leaves before a waiting trap can r
       owner.character = Character.rifleman;
       target.motion.surface = 0;
       target.status.frozenFrames = 1;
-      owner.freezeTrap.life = 900;
-      owner.freezeTrap.surface = target.motion.surface;
-      owner.freezeTrap.x = target.motion.x;
+      mutableFreezeTrap(owner).life = 900;
+      mutableFreezeTrap(owner).surface = target.motion.surface;
+      mutableFreezeTrap(owner).x = target.motion.x;
       executeNext(match);
       assertEquals(target.status.frozenFrames, 0);
       match.inputs.inputs[1].direction = direction;
@@ -70,9 +71,9 @@ function trapFrozenRifleman(): Fighter {
   const target = createFighter(Character.rifleman, 0.0, -1);
   owner.motion.surface = 0;
   target.motion.surface = 0;
-  owner.freezeTrap.life = 30;
-  owner.freezeTrap.x = 0.0;
-  owner.freezeTrap.surface = 0;
+  mutableFreezeTrap(owner).life = 30;
+  mutableFreezeTrap(owner).x = 0.0;
+  mutableFreezeTrap(owner).surface = 0;
   advanceFreezeTraps(testWorld(owner, target), 0, 0);
   assertEquals(target.status.frozenFrames, FREEZE_TRAP_FREEZE_FRAMES);
   return target;

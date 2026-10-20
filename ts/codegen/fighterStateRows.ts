@@ -75,3 +75,24 @@ export const copyPart = (name: string, lines: readonly string[]) => [
   ...lines,
   "}",
 ];
+
+export const restWalk = (mode: "copy" | "same", lines: string[], group: FighterGroup, rows: readonly FighterFieldRow[], bit: string, walkInto: (indent: string) => void) => {
+  const local = group.local;
+  const source = sourceLocal(local);
+  const prefix = `${group.key}.`;
+  if (mode === "same") {
+    lines.push(`  if ((target.restingGroups & source.restingGroups & ${bit}) === 0) {`, `    const ${local} = target.${group.key};`, `    const ${source} = source.${group.key};`);
+    walkInto("    ");
+    lines.push("  }");
+    return;
+  }
+  lines.push(`  const ${local}: ${group.type} = target.${group.key};`, `  if ((source.restingGroups & ${bit}) === 0) {`, `    const ${source} = source.${group.key};`);
+  walkInto("    ");
+  lines.push(`  } else if ((target.restingGroups & ${bit}) === 0) {`);
+  for (const row of rows) {
+    if (row.copy === "none") continue;
+    if (row.copy !== "plain" || arrayOf(row) !== undefined || leaf(row, prefix).includes(".")) throw new Error(`${row.path}: a resting group copies plain scalars only`);
+    lines.push(`    ${local}.${leaf(row, prefix)} = ${row.init};`);
+  }
+  lines.push("  }");
+};

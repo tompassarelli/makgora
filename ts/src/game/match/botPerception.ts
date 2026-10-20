@@ -6,6 +6,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../input/participants";
 import { PROJECTILE_CAPACITY, createFighter, type Fighter, type Projectile } from "../sim/fighter";
+import type { Bear } from "../sim/fighterRest";
 import { fighterAt, isActive, type Controls, type Roster } from "../sim/roster";
 import { copyCandleView, sameCandleView } from "../sim/heroes/koboldCandleView";
 
@@ -291,6 +292,7 @@ function createObservation(): ObservationFighter {
     projectiles: f.projectiles.map(p => ({ ...at(EMPTY.projectiles, 0),
       life: p.life, x: p.x, z: p.z, direction: p.direction, velocityX: p.velocityX, velocityZ: p.velocityZ, serial: p.serial })),
     projectileSlots: PROJECTILE_CAPACITY,
+    restingGroups: 0,
   };
 }
 
@@ -387,7 +389,7 @@ function copyObservation(target: ObservationFighter, source: Readonly<Fighter>):
   const cannon = target.cannon;
   const fromCannon = source.cannon;
   cannon.held = fromCannon.held;
-  const bear = target.bear;
+  const bear: Bear = target.bear;
   const fromBear = source.bear;
   bear.life = fromBear.life;
   bear.x = fromBear.x;

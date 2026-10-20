@@ -7,6 +7,7 @@ import { at } from "wisp/src/runtime/lookup";
 import { moveMeleeX, setWorldMotionValue } from "./motion";
 import { type Roster, fighterAt, isActive } from "./roster";
 import { surfaceCount, surfaceMoves, surfaceShiftX, surfaceShiftZ, surfaceZ } from "./stage";
+import { mutableBear, mutableFreezeTrap } from "./fighterRest";
 
 function carryFighter(f: Fighter, deck: number, shiftX: number, z: number): void {
   const { motion } = f;
@@ -18,12 +19,13 @@ function carryFighter(f: Fighter, deck: number, shiftX: number, z: number): void
 }
 
 function carrySummons(f: Fighter, deck: number, shiftX: number, z: number): void {
-  const { freezeTrap: trap, bear } = f;
-  if (trap.life > 0 && trap.surface === deck) {
+  if (f.freezeTrap.life > 0 && f.freezeTrap.surface === deck) {
+    const trap = mutableFreezeTrap(f);
     trap.x = f32(trap.x + shiftX);
     trap.z = z;
   }
-  if (bear.life > 0 && bear.surface === deck) {
+  if (f.bear.life > 0 && f.bear.surface === deck) {
+    const bear = mutableBear(f);
     bear.x = f32(bear.x + shiftX);
     bear.z = z;
   }

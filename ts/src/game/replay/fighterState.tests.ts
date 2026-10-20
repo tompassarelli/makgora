@@ -43,7 +43,7 @@ function walk(left: object, right: object, path: string, leaves: LeafPair[], rec
     return;
   }
   for (const key of Object.keys(left)) {
-    if (path === "" && (key === "tuning" || key === "projectileSlots")) continue;
+    if (path === "" && (key === "tuning" || key === "projectileSlots" || key === "restingGroups")) continue;
     child(`${path}.${key}`, side => (side as Field)[key], (side, value) => { (side as Field)[key] = value; });
   }
 }
@@ -51,6 +51,8 @@ function walk(left: object, right: object, path: string, leaves: LeafPair[], rec
 function fighterLeaves(left: Fighter, right: Fighter): { leaves: LeafPair[]; records: [object, object][] } {
   left.projectileSlots = PROJECTILE_CAPACITY;
   right.projectileSlots = PROJECTILE_CAPACITY;
+  left.restingGroups = 0;
+  right.restingGroups = 0;
   const leaves: LeafPair[] = [];
   const records: [object, object][] = [];
   walk(left, right, "", leaves, records);
@@ -327,6 +329,7 @@ function armedFighters(row: FighterFieldRow, armed: Map<string, Armed>, snapshot
     for (const animal of base.pack) animal.spec = base.placed.spec;
   }
   base.projectileSlots = PROJECTILE_CAPACITY;
+  base.restingGroups = 0;
   const fighters = { base, changed: createFighter(base.character, 0.0, 1), hash: stateHash(alone(snapshot, base)) };
   armed.set(key, fighters);
   return fighters;
@@ -344,6 +347,14 @@ test("every Fighter schema row, changed alone, is told apart by sameFighterState
     if (row.path === "projectileSlots") {
       changed.projectileSlots--;
       if (!sameFighterState(changed, base) || stateHash(alone(snapshot, changed)) !== hash) misses.push(`${row.path}: a lower bound over resting slots changed the state`);
+      rows++;
+      continue;
+    }
+    if (row.path === "restingGroups") {
+      const resting = createFighter(base.character, 0.0, 1);
+      const awake = createFighter(base.character, 0.0, 1);
+      awake.restingGroups = 0;
+      if (!sameFighterState(awake, resting) || stateHash(alone(snapshot, awake)) !== stateHash(alone(snapshot, resting))) misses.push(`${row.path}: a weaker resting claim over spawn groups changed the state`);
       rows++;
       continue;
     }

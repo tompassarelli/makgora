@@ -35,6 +35,7 @@ export interface FighterGroup {
   readonly key: string;
   readonly type: string;
   readonly local: string;
+  readonly rest?: string;
 }
 
 export interface FighterArray {
@@ -69,8 +70,8 @@ export const FIGHTER_GROUPS: readonly FighterGroup[] = [
   { key: "visuals", type: "VisualSerials", local: "visuals" },
   { key: "special", type: "Special", local: "special" },
   { key: "projectiles", type: "Projectile", local: "projectile" },
-  { key: "bear", type: "Bear", local: "bear" },
-  { key: "freezeTrap", type: "FreezeTrap", local: "trap" },
+  { key: "bear", type: "Bear", local: "bear", rest: "REST_BEAR" },
+  { key: "freezeTrap", type: "FreezeTrap", local: "trap", rest: "REST_FREEZE_TRAP" },
   { key: "dodge", type: "Dodge", local: "dodge" },
   { key: "landing", type: "Landing", local: "landing" },
   { key: "down", type: "Down", local: "down" },
@@ -265,6 +266,7 @@ export const FIGHTER_FIELDS: readonly FighterFieldRow[] = [
   { path: "projectiles[].velocityZ", type: "real", init: "0.0", copy: "plain", same: "sameReal", canon: { name: "projectileVelocityZ[${i}]", writer: "real" }, diff: "projectileVelocityZ[${i}]", respawn: { blast: "0.0", helper: "clearSpecialOnStock", respawn: "0.0" } },
   { path: "projectiles[].serial", type: "int", init: "0", copy: "plain", same: "plain", canon: { name: "projectileSerial[${i}]", writer: "int" }, diff: "projectileSerial[${i}]", respawn: { blast: "0", helper: "clearSpecialOnStock", respawn: "0" } },
   { path: "projectileSlots", type: "int", init: "0", copy: "none", same: "none", canon: "none", diff: "none", respawn: "keep" },
+  { path: "restingGroups", type: "int", init: "RESTING_GROUPS", copy: "none", same: "none", canon: "none", diff: "none", respawn: "keep" },
   { path: "visuals.manaDrained", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "manaDrainedSerial", writer: "int" }, diff: "manaDrainedSerial", respawn: { respawn: "0" } },
   { path: "projectiles[].exReach", type: "bool", init: "false", copy: "plain", same: "plain", canon: { name: "projectileExReach[${i}]", writer: "flagInt" }, diff: "projectileExReach[${i}]", respawn: { blast: "false", helper: "clearSpecialOnStock", respawn: "false" } },
   { path: "projectiles[].poolHits", type: "int", init: "0", copy: "plain", same: "plain", canon: { name: "projectilePoolHits[${i}]", writer: "int", when: ["nonzero"] }, diff: "projectilePoolHits[${i}]", respawn: "keep" },

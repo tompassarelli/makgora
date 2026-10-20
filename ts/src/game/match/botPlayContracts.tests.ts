@@ -193,10 +193,12 @@ test("a computer repeats a decision only from the same state: any change to its 
   // Every number and flag of the computer's own fighter that the copy holds apart from live state.
   fighterAt(game.world, 1).projectileSlots = PROJECTILE_CAPACITY;
   fighterAt(before.world, 1).projectileSlots = PROJECTILE_CAPACITY;
+  fighterAt(game.world, 1).restingGroups = 0;
+  fighterAt(before.world, 1).restingGroups = 0;
   let leaves = 0;
   const visit = (mine: Record<string, unknown>, copy: Record<string, unknown>, depth: number) => {
     for (const key of Object.keys(copy)) {
-      if (depth === 0 && key === "projectileSlots") continue;
+      if (depth === 0 && (key === "projectileSlots" || key === "restingGroups")) continue;
       const value = copy[key];
       const own = mine[key];
       if (typeof value === "number" || typeof value === "boolean") {

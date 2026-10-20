@@ -6,6 +6,7 @@ import { attackStartupFrames } from "./moves";
 import { spawnProjectileMotion, updateProjectiles } from "./projectiles";
 import { createRoster, fighterAt } from "./roster";
 import { advanceFreezeTraps } from "./summons";
+import { mutableFreezeTrap } from "./fighterRest";
 
 function squad(teamBattle: boolean, friendlyFire: boolean) {
   const world = createRoster(7, [createFighter(Character.rifleman, 0.0, 1), createFighter(Character.rifleman, 0.0, -1), createFighter(Character.rifleman, 0.0, -1)]);
@@ -40,7 +41,7 @@ test("team hit eligibility preserves enemies and free for all across melee grabs
     assertEquals(fighterAt(shots, 1).status.damage > 0.0, alliesCanHit);
     assertEquals(fighterAt(shots, 2).status.damage > 0.0, !alliesCanHit);
     const traps = squad(teamBattle, friendlyFire);
-    const trap = fighterAt(traps, 0).freezeTrap;
+    const trap = mutableFreezeTrap(fighterAt(traps, 0));
     trap.life = 30; trap.x = 0.0; trap.surface = 0;
     advanceFreezeTraps(traps, 0, 0);
     assertEquals(fighterAt(traps, 1).status.frozenFrames > 0, alliesCanHit);

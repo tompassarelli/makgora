@@ -12,6 +12,7 @@ import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { type Roster, fighterAt, isActive } from "./roster";
 import { mainDeckLeft, mainDeckRight, mainDeckZAt, surfaceCount, surfaceLeft, surfaceRight, surfaceZAt } from "./stage";
 import { cancelAttack, cancelSpecialState, clearDownState, clearGrabLinks, clearLedge, clearOwnedFreezeTrap } from "./transitions";
+import { mutableBear, mutableFreezeTrap } from "./fighterRest";
 
 export const RIFLEMAN_BEAR_LIFETIME = 60;
 const RIFLEMAN_BEAR_SWIPE_INTERVAL = 20;
@@ -53,10 +54,10 @@ export function canStartFreezeTrap(owner: Fighter): boolean {
 
 export function startFreezeTrap(owner: Fighter, stage: number, matchFrame: number): boolean {
   const { motion } = owner;
-  const trap = owner.freezeTrap;
-  if (owner.character !== Character.rifleman || (motion.grounded && motion.surface === undefined) || trap.life > 0 || trap.cooldown > 0) {
+  if (owner.character !== Character.rifleman || (motion.grounded && motion.surface === undefined) || owner.freezeTrap.life > 0 || owner.freezeTrap.cooldown > 0) {
     return false;
   }
+  const trap = mutableFreezeTrap(owner);
   trap.x = motion.x;
   trap.exReach = owner.special.ex;
   motion.crouching = false;
@@ -123,8 +124,8 @@ export function advanceFreezeTraps(world: Roster, stage: number, matchFrame: num
     if (!isActive(world, ownerSlot)) continue;
     const owner = fighterAt(world, ownerSlot);
 
-    const trap = owner.freezeTrap;
-    if (trap.life > 0 && trap.surface === undefined) {
+    if (owner.freezeTrap.life > 0 && owner.freezeTrap.surface === undefined) {
+      const trap = mutableFreezeTrap(owner);
       const previousZ = trap.z;
       trap.z = f32(trap.z - 8.0);
       for (let surface = 0; surface < surfaceCount(stage); surface++) {
@@ -168,8 +169,8 @@ export function advanceFreezeTraps(world: Roster, stage: number, matchFrame: num
 
 export function advanceBear(world: Roster, ownerSlot: number, stage: number, matchFrame: number): void {
   const owner = fighterAt(world, ownerSlot);
-  const { bear } = owner;
-  if (bear.life <= 0) return;
+  if (owner.bear.life <= 0) return;
+  const bear = mutableBear(owner);
   bear.life--;
   bear.x = f32(bear.x + bear.velocityX);
   if (bear.swipeCooldown > 0) bear.swipeCooldown--;

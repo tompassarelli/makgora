@@ -15,17 +15,18 @@ import { Character } from "../sim/codes";
 import { fighterAt, isActive } from "../sim/roster";
 import { SUMMON_BEAR_ATTACK, SUMMON_BEAR_WALK } from "./summonClipInfo";
 import { createSummonState, firstSummonDifference, projectBear } from "./summonState";
+import { mutableBear } from "../sim/fighterRest";
 
 const TICK = f32(1.0 / 60.0);
 
 test("a bear's clip restores backward from a snapshot and projects read-only [k1 scenario]", () => {
   const match = testMatch(9, Character.rifleman);
   const fighter = fighterAt(match.world, 3);
-  fighter.bear.life = 500;
-  fighter.bear.x = fighter.motion.x;
-  fighter.bear.velocityX = 0.0;
+  mutableBear(fighter).life = 500;
+  mutableBear(fighter).x = fighter.motion.x;
+  mutableBear(fighter).velocityX = 0.0;
   executeNext(match);
-  fighter.bear.hitSerial++;
+  mutableBear(fighter).hitSerial++;
   executeNext(match);
   for (let frame = 1; frame <= 4; frame++) executeNext(match);
   const early = createReplaySnapshot();
@@ -119,9 +120,9 @@ test("sparse and four-slot bears match whether projected or not, and end with th
       for (const slot of PARTICIPANT_SLOTS) {
         if (!isActive(sequential.world, slot) || frame !== slot + 1) continue;
         for (const fighter of [fighterAt(sequential.world, slot), fighterAt(catchup.world, slot)]) {
-          fighter.bear.life = 500;
-          fighter.bear.x = fighter.motion.x;
-          fighter.bear.velocityX = 0.0;
+          mutableBear(fighter).life = 500;
+          mutableBear(fighter).x = fighter.motion.x;
+          mutableBear(fighter).velocityX = 0.0;
         }
       }
       executeNext(sequential);

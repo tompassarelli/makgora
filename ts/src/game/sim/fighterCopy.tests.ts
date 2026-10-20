@@ -7,6 +7,7 @@ import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { Character, HERO_STATUS_GROUPS, SPECIAL_ACTION_CAPACITY } from "./codes";
 import { type Fighter, createFighter, createPlacedObject, placedObject } from "./fighter";
 import { FIGHTER_ARRAYS, FIGHTER_FIELDS, type FighterFieldRow } from "./state/fighterSchema";
+import { REST_BEAR, REST_FREEZE_TRAP, settleRestingGroups } from "./fighterRest";
 
 type Node = Record<string, unknown>;
 
@@ -51,6 +52,7 @@ function owners(fighter: Fighter, path: string): { readonly owner: Node; readonl
 }
 
 
+const REST_OF: Readonly<Record<string, number>> = { bear: REST_BEAR, freezeTrap: REST_FREEZE_TRAP };
 const WRITABLE = new Set(["real", "bool", "slot", "int", "enum", "optionalInt", "optionalEnum"]);
 
 function pickFor(row: FighterFieldRow, next: (range: number) => number): unknown {
@@ -63,9 +65,10 @@ function pickFor(row: FighterFieldRow, next: (range: number) => number): unknown
 }
 
 function scramble(fighter: Fighter, next: (range: number) => number): void {
+  const quiet = Object.keys(REST_OF).filter(() => next(2) === 0);
   for (let animal = next(3); animal > 0; animal--) fighter.pack.push(createPlacedObject());
   for (const row of ROWS) {
-    if (next(3) !== 0 || !WRITABLE.has(row.type)) continue;
+    if (next(3) !== 0 || !WRITABLE.has(row.type) || quiet.some((group) => row.path.startsWith(`${group}.`))) continue;
     const pick = () => pickFor(row, next);
     for (const { owner, key } of owners(fighter, row.path)) {
       if (row.path.endsWith("[]")) {
@@ -74,9 +77,11 @@ function scramble(fighter: Fighter, next: (range: number) => number): void {
       } else owner[key] = pick();
     }
   }
+  settleRestingGroups(fighter);
+  fighter.restingGroups = fighter.restingGroups & next(4);
 }
 
-test("the generated fighter copy writes every copied field as a schema-driven copy would, keeping only slots the mask holds, on 300 scrambled fighters with signed zeros and growing and shrinking packs [k2 property]", () => {
+test("the generated fighter copy writes every copied field as a schema-driven copy would, keeping only slots the mask holds, on 300 scrambled fighters with signed zeros, growing and shrinking packs and groups resting on either side [k2 property]", () => {
   let state = 9;
   const next = (range: number) => {
     state = floorMod(state * 75 + 74, 65537);
@@ -84,14 +89,17 @@ test("the generated fighter copy writes every copied field as a schema-driven co
   };
   let compared = 0;
   let dropped = 0;
+  let restWrites = 0;
   for (let run = 0; run < 300; run++) {
     const source = createFighter(CHARACTERS[next(3)] ?? Character.rifleman, f32(next(100) - 50.0), next(2) === 0 ? 1 : -1);
     const target = createFighter(CHARACTERS[next(3)] ?? Character.rifleman, 0.0, 1);
     scramble(source, next);
     scramble(target, next);
     const mask = next(18) - 1;
+    if ((source.restingGroups & ~target.restingGroups) !== 0) restWrites++;
     copyFighterState(target, source, mask);
     assertEquals(target.pack.length, source.pack.length, `run ${run} pack length`);
+    assertEquals(target.restingGroups, source.restingGroups, `run ${run} resting groups`);
     for (const row of ROWS) {
       const sources = owners(source, row.path);
       const targets = owners(target, row.path);
@@ -112,6 +120,7 @@ test("the generated fighter copy writes every copied field as a schema-driven co
   }
   assertGreaterThan(compared, 300 * ROWS.length);
   assertGreaterThan(dropped, 100);
+  assertGreaterThan(restWrites, 20);
 });
 
 const SAME_ROWS = FIGHTER_FIELDS.filter((row) => row.same !== "none" && !row.path.startsWith("projectiles[]") && !row.path.startsWith("pack"));
@@ -141,7 +150,7 @@ function oracleSame(a: Fighter, b: Fighter): boolean {
   return true;
 }
 
-test("the generated fighter compare answers as a schema-driven compare on 300 copied fighter pairs, each with one field changed, signed zeros flipped and slots dropped [k2 property]", () => {
+test("the generated fighter compare answers as a schema-driven compare on 300 copied fighter pairs, each with one field changed, signed zeros flipped, slots dropped and groups resting on either side [k2 property]", () => {
   let state = 31;
   const next = (range: number) => {
     state = floorMod(state * 75 + 74, 65537);
@@ -161,6 +170,7 @@ test("the generated fighter compare answers as a schema-driven compare on 300 co
       const index = next(countOf(row));
       const current = read(owner, key, row, index);
       const value = current === 0 && next(2) === 0 ? -(current as number) : pickFor(row, next);
+      b.restingGroups = b.restingGroups & ~(REST_OF[row.path.slice(0, row.path.indexOf("."))] ?? 0);
       if (row.path.endsWith("[]")) (owner[key] as unknown[])[index] = value;
       else owner[key] = value;
     }

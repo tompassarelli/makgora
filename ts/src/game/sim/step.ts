@@ -97,6 +97,7 @@ import { freezeMinimumFrames, cancelAttack, clearDownState, clearOwnedFreezeTrap
 import { advanceMash } from "./mash";
 import { WORLD_UNITS_PER_MELEE_UNIT } from "./tuning";
 import { aerialJumps, heavyFall, jumpBuffed, speedBuffed } from "./itemBuffs";
+import { mutableFreezeTrap } from "./fighterRest";
 
 const FAST_FALL_DOWN_THRESHOLD = 0.6625000238418579;
 /** the stick crosses this sideways to count as a fresh flick. */
@@ -147,11 +148,15 @@ function advanceFreeze(f: Fighter, input: Readonly<Controls>): boolean {
     if (remaining === 0) thawFighter(f);
     else status.frozenFrames = remaining;
   }
-  if (trap.cooldown > 0) trap.cooldown--;
+  if (trap.cooldown > 0) {
+    const cooling = mutableFreezeTrap(f);
+    cooling.cooldown--;
+  }
   if (trap.life > 0) {
-    trap.life--;
-    if (trap.arming > 0 && trap.surface !== undefined) trap.arming--;
-    if (trap.life === 0) clearOwnedFreezeTrap(f);
+    const live = mutableFreezeTrap(f);
+    live.life--;
+    if (live.arming > 0 && live.surface !== undefined) live.arming--;
+    if (live.life === 0) clearOwnedFreezeTrap(f);
   }
   return wasFrozen;
 }

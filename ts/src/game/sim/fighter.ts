@@ -25,6 +25,7 @@ import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { type FighterTuning, authoredTuning } from "./tuning";
 import { HitElement } from "./hitRegions";
 import { initializeInfluenceOperands } from "./influenceOperands";
+import { type Bear, type FreezeTrap, RESTING_GROUPS } from "./fighterRest";
 import type { SpecialPlacement, SpecialProjectile } from "./specials/schema";
 
 export const PROJECTILE_CAPACITY = 16;
@@ -296,30 +297,6 @@ export interface Projectile {
 }
 
 
-interface Bear {
-  exDamage: boolean;
-  life: number;
-  x: number;
-  z: number;
-  velocityX: number;
-  velocityZ: number;
-  swipeCooldown: number;
-  hitSerial: number;
-  surface: number | undefined;
-}
-
-interface FreezeTrap {
-  exReach: boolean;
-  life: number;
-  arming: number;
-  x: number;
-  z: number;
-  surface: number | undefined;
-  serial: number;
-
-  cooldown: number;
-}
-
 interface Candle {
   heat: number;
   state: CandleState;
@@ -545,8 +522,9 @@ export interface Fighter {
   readonly special: Special;
   readonly projectiles: readonly Readonly<Projectile>[];
   projectileSlots: number;
-  readonly bear: Bear;
-  readonly freezeTrap: FreezeTrap;
+  readonly bear: Readonly<Bear>;
+  readonly freezeTrap: Readonly<FreezeTrap>;
+  restingGroups: number;
   readonly dodge: Dodge;
   readonly landing: Landing;
   readonly down: Down;
@@ -754,6 +732,7 @@ export function createFighter(character: Character, startX: number, facing: numb
     projectileSlots: 0,
     bear: { exDamage: false, life: 0, x: 0.0, z: 0.0, velocityX: 0.0, velocityZ: 0.0, swipeCooldown: 0, hitSerial: 0, surface: undefined },
     freezeTrap: { exReach: false, life: 0, arming: 0, x: 0.0, z: 0.0, surface: undefined, serial: 0, cooldown: 0 },
+    restingGroups: RESTING_GROUPS,
     dodge: { airDodging: false, airFrame: 0, airUsed: false, airMotionFrames: 0, groundFrame: 0, groundDirection: 0, groundEntryFacing: 0 },
     landing: { lag: 0 },
     down: { state: DownState.none, frame: 0, direction: 0, waitRemaining: 0, faceUp: true, attackQueued: false },

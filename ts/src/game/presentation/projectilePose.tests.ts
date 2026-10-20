@@ -11,6 +11,7 @@ import { createRoster } from "../sim/roster";
 import { projectedProjectile } from "./projectilePose";
 import { LICH_KING_SPECIALS } from "../sim/heroes/lichKingSpecials";
 import { heroProjectileRadius } from "../sim/projectiles";
+import { mutableFreezeTrap } from "../sim/fighterRest";
 
 test("a sparse restore replaces a speculative projectile and freeze state [k1 scenario]", () => {
   const world = createRoster(9);
@@ -31,10 +32,10 @@ test("a sparse restore replaces a speculative projectile and freeze state [k1 sc
   last.velocityZ = 10.0;
   last.kind = ProjectileKind.manaBurn;
   last.serial = 7;
-  fighter.freezeTrap.life = 25;
-  fighter.freezeTrap.arming = 4;
-  fighter.freezeTrap.x = 81.0;
-  fighter.freezeTrap.z = 3.0;
+  mutableFreezeTrap(fighter).life = 25;
+  mutableFreezeTrap(fighter).arming = 4;
+  mutableFreezeTrap(fighter).x = 81.0;
+  mutableFreezeTrap(fighter).z = 3.0;
   fighter.status.frozenFrames = 11;
   captureReplaySnapshot(snapshot, world, game, inputs, runtime);
   const before = projectedProjectile(fighter, index, true);
@@ -44,9 +45,9 @@ test("a sparse restore replaces a speculative projectile and freeze state [k1 sc
   last.velocityX = 30.0;
   last.serial = 8;
   mutableProjectile(fighter, 0).life = 40;
-  fighter.freezeTrap.life = 0;
-  fighter.freezeTrap.arming = 0;
-  fighter.freezeTrap.x = 999.0;
+  mutableFreezeTrap(fighter).life = 0;
+  mutableFreezeTrap(fighter).arming = 0;
+  mutableFreezeTrap(fighter).x = 999.0;
   fighter.status.frozenFrames = 0;
   assertFalse(projectedProjectile(fighter, index, true).visible);
   assertTrue(projectedProjectile(fighter, 0, true).visible);

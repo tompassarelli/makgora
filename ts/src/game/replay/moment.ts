@@ -28,6 +28,7 @@ import type { AuthoredSpecial, FighterSpecials, SpecialPlacement, SpecialProject
 import { type Roster, createRoster, fighterAt, isActive } from "../sim/roster";
 import { authoredTuning } from "../sim/tuning";
 import { settleProjectileSlots } from "../sim/fighterProjectiles";
+import { settleRestingGroups } from "../sim/fighterRest";
 import { canonicalState, fighterSpecialsCanonical, specialMoveCanonical, specialPlacementCanonical, specialProjectileCanonical, stateChecksum } from "./canonical";
 import { type ReplayState, captureReplaySnapshot, copyReplayState, createReplaySnapshot } from "./snapshot";
 
@@ -486,6 +487,7 @@ export function savedState(record: Readonly<Record<string, unknown>>): ReplaySta
     if (!isFighter(fighter)) return undefined;
     rebindAuthoredKit(fighter);
     settleProjectileSlots(fighter);
+    settleRestingGroups(fighter);
     initializeInfluenceOperands(fighter);
     world.fighters[slot] = fighter;
   }

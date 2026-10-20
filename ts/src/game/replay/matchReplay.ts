@@ -142,7 +142,7 @@ function hasIntegerKeys(record: object): boolean {
 
 
 
-const UNSAVED_FIGHTER_FIELDS: readonly string[] = ["tuning", "projectileSlots"];
+const UNSAVED_FIGHTER_FIELDS: readonly string[] = ["tuning", "projectileSlots", "restingGroups"];
 const NO_FIELDS: readonly string[] = [];
 
 
@@ -362,7 +362,7 @@ function stepFold(fold: PendingFold, world: Readonly<Roster>): boolean {
   if (isFields(fighter)) {
     while (fold.field < fields.length && remaining > 0) {
       const key = at(fields, fold.field++);
-      if (fieldName(key) && key !== "tuning" && key !== "projectileSlots") foldValue(fold.lanes, floorMod(base * 31 + keyHash(key), MODULUS), fighter[key], 0);
+      if (fieldName(key) && key !== "tuning" && key !== "projectileSlots" && key !== "restingGroups") foldValue(fold.lanes, floorMod(base * 31 + keyHash(key), MODULUS), fighter[key], 0);
       remaining--;
     }
   }
