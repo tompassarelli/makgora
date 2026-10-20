@@ -39,10 +39,13 @@ export const sameTest = (row: FighterFieldRow, a: string, b: string): string => 
     case "signedZero": return `${a} !== ${b} || (${a} === 0 && 1 / ${a} !== 1 / ${b})`;
     case "signedZeroOptional": return `${a} !== ${b} || (${a} === 0 && ${b} === 0 && 1 / ${a} !== 1 / ${b})`;
     case "plain": return `${a} !== ${b}`;
-    case "sameReal": return `!sameReal(${a}, ${b})`;
+    case "sameReal": return `${a} !== ${b} || (${a} === 0 && 1 / ${a} !== 1 / ${b})`;
     case "none": throw new Error(`${row.path} has no same form`);
   }
 };
+
+export const sameLine = (row: FighterFieldRow, indent: string, a: string, b: string): string =>
+  row.same === "plain" ? `${indent}if (${a} !== ${b}) return false;` : `${indent}{ const a = ${a}, b = ${b}; if (${sameTest(row, "a", "b")}) return false; }`;
 
 export const copyValue = (row: FighterFieldRow, value: string) => (row.copy === "retained" ? `keep[${value} as number]` : value);
 

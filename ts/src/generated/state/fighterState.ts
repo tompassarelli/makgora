@@ -483,9 +483,9 @@ function sameFighterProjectiles(target: Readonly<Fighter>, source: Readonly<Figh
 
 const sameReal = (a: number, b: number) => a === b && (a !== 0 || 1 / a === 1 / b);
 
-export function sameFighterState(target: Readonly<Fighter>, source: Readonly<Fighter>): boolean {
+function sameFighterHead(target: Readonly<Fighter>, source: Readonly<Fighter>): boolean {
   if (target.character !== source.character) return false;
-  if (target.facing !== source.facing || (target.facing === 0 && 1 / target.facing !== 1 / source.facing)) return false;
+  { const a = target.facing, b = source.facing; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   const tuning = target.tuning;
   const sourceTuning = source.tuning;
   if (tuning.physics !== sourceTuning.physics) return false;
@@ -500,130 +500,144 @@ export function sameFighterState(target: Readonly<Fighter>, source: Readonly<Fig
   if (tuning.ultimate !== sourceTuning.ultimate) return false;
   const motion = target.motion;
   const sourceMotion = source.motion;
-  if (motion.x !== sourceMotion.x || (motion.x === 0 && 1 / motion.x !== 1 / sourceMotion.x)) return false;
-  if (motion.z !== sourceMotion.z || (motion.z === 0 && 1 / motion.z !== 1 / sourceMotion.z)) return false;
-  if (motion.deltaX !== sourceMotion.deltaX || (motion.deltaX === 0 && 1 / motion.deltaX !== 1 / sourceMotion.deltaX)) return false;
-  if (motion.deltaZ !== sourceMotion.deltaZ || (motion.deltaZ === 0 && 1 / motion.deltaZ !== 1 / sourceMotion.deltaZ)) return false;
-  if (motion.vx !== sourceMotion.vx || (motion.vx === 0 && 1 / motion.vx !== 1 / sourceMotion.vx)) return false;
-  if (motion.vz !== sourceMotion.vz || (motion.vz === 0 && 1 / motion.vz !== 1 / sourceMotion.vz)) return false;
-  if (motion.meleeX.original !== sourceMotion.meleeX.original || (motion.meleeX.original === 0 && 1 / motion.meleeX.original !== 1 / sourceMotion.meleeX.original)) return false;
-  if (motion.meleeX.published !== sourceMotion.meleeX.published || (motion.meleeX.published === 0 && 1 / motion.meleeX.published !== 1 / sourceMotion.meleeX.published)) return false;
-  if (motion.meleeZ.original !== sourceMotion.meleeZ.original || (motion.meleeZ.original === 0 && 1 / motion.meleeZ.original !== 1 / sourceMotion.meleeZ.original)) return false;
-  if (motion.meleeZ.published !== sourceMotion.meleeZ.published || (motion.meleeZ.published === 0 && 1 / motion.meleeZ.published !== 1 / sourceMotion.meleeZ.published)) return false;
-  if (motion.meleeVelocityZ.original !== sourceMotion.meleeVelocityZ.original || (motion.meleeVelocityZ.original === 0 && 1 / motion.meleeVelocityZ.original !== 1 / sourceMotion.meleeVelocityZ.original)) return false;
-  if (motion.meleeVelocityZ.published !== sourceMotion.meleeVelocityZ.published || (motion.meleeVelocityZ.published === 0 && 1 / motion.meleeVelocityZ.published !== 1 / sourceMotion.meleeVelocityZ.published)) return false;
+  { const a = motion.x, b = sourceMotion.x; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = motion.z, b = sourceMotion.z; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = motion.deltaX, b = sourceMotion.deltaX; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = motion.deltaZ, b = sourceMotion.deltaZ; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = motion.vx, b = sourceMotion.vx; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = motion.vz, b = sourceMotion.vz; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  const meleeXCopy = motion.meleeX;
+  const sourceMeleeXCopy = sourceMotion.meleeX;
+  { const a = meleeXCopy.original, b = sourceMeleeXCopy.original; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = meleeXCopy.published, b = sourceMeleeXCopy.published; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  const meleeZCopy = motion.meleeZ;
+  const sourceMeleeZCopy = sourceMotion.meleeZ;
+  { const a = meleeZCopy.original, b = sourceMeleeZCopy.original; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = meleeZCopy.published, b = sourceMeleeZCopy.published; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  const meleeVelocityZCopy = motion.meleeVelocityZ;
+  const sourceMeleeVelocityZCopy = sourceMotion.meleeVelocityZ;
+  { const a = meleeVelocityZCopy.original, b = sourceMeleeVelocityZCopy.original; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = meleeVelocityZCopy.published, b = sourceMeleeVelocityZCopy.published; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (motion.grounded !== sourceMotion.grounded) return false;
-  if (motion.surface !== sourceMotion.surface || (motion.surface === 0 && sourceMotion.surface === 0 && 1 / motion.surface !== 1 / sourceMotion.surface)) return false;
+  { const a = motion.surface, b = sourceMotion.surface; if (a !== b || (a === 0 && b === 0 && 1 / a !== 1 / b)) return false; }
   if (motion.crouching !== sourceMotion.crouching) return false;
   if (motion.fastFalling !== sourceMotion.fastFalling) return false;
   if (motion.fastFallDownHeld !== sourceMotion.fastFallDownHeld) return false;
-  if (motion.fastFallInputAge !== sourceMotion.fastFallInputAge || (motion.fastFallInputAge === 0 && 1 / motion.fastFallInputAge !== 1 / sourceMotion.fastFallInputAge)) return false;
-  if (motion.previousStickSide !== sourceMotion.previousStickSide || (motion.previousStickSide === 0 && 1 / motion.previousStickSide !== 1 / sourceMotion.previousStickSide)) return false;
-  if (motion.stickSideAge !== sourceMotion.stickSideAge || (motion.stickSideAge === 0 && 1 / motion.stickSideAge !== 1 / sourceMotion.stickSideAge)) return false;
-  if (motion.turnaroundSide !== sourceMotion.turnaroundSide || (motion.turnaroundSide === 0 && 1 / motion.turnaroundSide !== 1 / sourceMotion.turnaroundSide)) return false;
-  if (motion.turnaroundAge !== sourceMotion.turnaroundAge || (motion.turnaroundAge === 0 && 1 / motion.turnaroundAge !== 1 / sourceMotion.turnaroundAge)) return false;
+  { const a = motion.fastFallInputAge, b = sourceMotion.fastFallInputAge; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = motion.previousStickSide, b = sourceMotion.previousStickSide; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = motion.stickSideAge, b = sourceMotion.stickSideAge; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = motion.turnaroundSide, b = sourceMotion.turnaroundSide; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = motion.turnaroundAge, b = sourceMotion.turnaroundAge; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   const ground = target.ground;
   const sourceGround = source.ground;
-  if (ground.dashFrame !== sourceGround.dashFrame || (ground.dashFrame === 0 && 1 / ground.dashFrame !== 1 / sourceGround.dashFrame)) return false;
-  if (ground.dashDirection !== sourceGround.dashDirection || (ground.dashDirection === 0 && 1 / ground.dashDirection !== 1 / sourceGround.dashDirection)) return false;
-  if (ground.action !== sourceGround.action || (ground.action === 0 && 1 / ground.action !== 1 / sourceGround.action)) return false;
-  if (ground.actionFrame !== sourceGround.actionFrame || (ground.actionFrame === 0 && 1 / ground.actionFrame !== 1 / sourceGround.actionFrame)) return false;
-  if (ground.runBrakeFramesRemaining !== sourceGround.runBrakeFramesRemaining || (ground.runBrakeFramesRemaining === 0 && 1 / ground.runBrakeFramesRemaining !== 1 / sourceGround.runBrakeFramesRemaining)) return false;
-  if (ground.turnRunEntryFacing !== sourceGround.turnRunEntryFacing || (ground.turnRunEntryFacing === 0 && 1 / ground.turnRunEntryFacing !== 1 / sourceGround.turnRunEntryFacing)) return false;
+  { const a = ground.dashFrame, b = sourceGround.dashFrame; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = ground.dashDirection, b = sourceGround.dashDirection; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = ground.action, b = sourceGround.action; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = ground.actionFrame, b = sourceGround.actionFrame; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = ground.runBrakeFramesRemaining, b = sourceGround.runBrakeFramesRemaining; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = ground.turnRunEntryFacing, b = sourceGround.turnRunEntryFacing; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (ground.turnRunFacingCommandLatched !== sourceGround.turnRunFacingCommandLatched) return false;
   if (ground.turnRunPausePending !== sourceGround.turnRunPausePending) return false;
   if (ground.pivotEligible !== sourceGround.pivotEligible) return false;
-  if (ground.pivotGraceFrames !== sourceGround.pivotGraceFrames || (ground.pivotGraceFrames === 0 && 1 / ground.pivotGraceFrames !== 1 / sourceGround.pivotGraceFrames)) return false;
-  if (ground.pivotDashFrame !== sourceGround.pivotDashFrame || (ground.pivotDashFrame === 0 && 1 / ground.pivotDashFrame !== 1 / sourceGround.pivotDashFrame)) return false;
-  if (ground.pivotDashActionFrame !== sourceGround.pivotDashActionFrame || (ground.pivotDashActionFrame === 0 && 1 / ground.pivotDashActionFrame !== 1 / sourceGround.pivotDashActionFrame)) return false;
-  if (ground.dashGrabWindow !== sourceGround.dashGrabWindow || (ground.dashGrabWindow === 0 && 1 / ground.dashGrabWindow !== 1 / sourceGround.dashGrabWindow)) return false;
+  { const a = ground.pivotGraceFrames, b = sourceGround.pivotGraceFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = ground.pivotDashFrame, b = sourceGround.pivotDashFrame; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = ground.pivotDashActionFrame, b = sourceGround.pivotDashActionFrame; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = ground.dashGrabWindow, b = sourceGround.dashGrabWindow; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   const jump = target.jump;
   const sourceJump = source.jump;
-  if (jump.inputAge !== sourceJump.inputAge || (jump.inputAge === 0 && 1 / jump.inputAge !== 1 / sourceJump.inputAge)) return false;
-  if (jump.remaining !== sourceJump.remaining || (jump.remaining === 0 && 1 / jump.remaining !== 1 / sourceJump.remaining)) return false;
-  if (jump.serial !== sourceJump.serial || (jump.serial === 0 && 1 / jump.serial !== 1 / sourceJump.serial)) return false;
+  { const a = jump.inputAge, b = sourceJump.inputAge; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = jump.remaining, b = sourceJump.remaining; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = jump.serial, b = sourceJump.serial; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (jump.isDouble !== sourceJump.isDouble) return false;
-  if (jump.squat !== sourceJump.squat || (jump.squat === 0 && 1 / jump.squat !== 1 / sourceJump.squat)) return false;
-  if (jump.ascent !== sourceJump.ascent || (jump.ascent === 0 && 1 / jump.ascent !== 1 / sourceJump.ascent)) return false;
+  { const a = jump.squat, b = sourceJump.squat; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = jump.ascent, b = sourceJump.ascent; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (jump.held !== sourceJump.held) return false;
   if (jump.dodgeQueued !== sourceJump.dodgeQueued) return false;
-  if (jump.dodgeX !== sourceJump.dodgeX || (jump.dodgeX === 0 && 1 / jump.dodgeX !== 1 / sourceJump.dodgeX)) return false;
-  if (jump.dodgeZ !== sourceJump.dodgeZ || (jump.dodgeZ === 0 && 1 / jump.dodgeZ !== 1 / sourceJump.dodgeZ)) return false;
+  { const a = jump.dodgeX, b = sourceJump.dodgeX; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = jump.dodgeZ, b = sourceJump.dodgeZ; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   const launch = target.launch;
   const sourceLaunch = source.launch;
-  if (launch.knockbackX !== sourceLaunch.knockbackX || (launch.knockbackX === 0 && 1 / launch.knockbackX !== 1 / sourceLaunch.knockbackX)) return false;
-  if (launch.knockbackZ !== sourceLaunch.knockbackZ || (launch.knockbackZ === 0 && 1 / launch.knockbackZ !== 1 / sourceLaunch.knockbackZ)) return false;
-  if (launch.meleeKnockbackX.original !== sourceLaunch.meleeKnockbackX.original || (launch.meleeKnockbackX.original === 0 && 1 / launch.meleeKnockbackX.original !== 1 / sourceLaunch.meleeKnockbackX.original)) return false;
-  if (launch.meleeKnockbackX.published !== sourceLaunch.meleeKnockbackX.published || (launch.meleeKnockbackX.published === 0 && 1 / launch.meleeKnockbackX.published !== 1 / sourceLaunch.meleeKnockbackX.published)) return false;
-  if (launch.meleeKnockbackZ.original !== sourceLaunch.meleeKnockbackZ.original || (launch.meleeKnockbackZ.original === 0 && 1 / launch.meleeKnockbackZ.original !== 1 / sourceLaunch.meleeKnockbackZ.original)) return false;
-  if (launch.meleeKnockbackZ.published !== sourceLaunch.meleeKnockbackZ.published || (launch.meleeKnockbackZ.published === 0 && 1 / launch.meleeKnockbackZ.published !== 1 / sourceLaunch.meleeKnockbackZ.published)) return false;
-  if (launch.groundKnockbackX !== sourceLaunch.groundKnockbackX || (launch.groundKnockbackX === 0 && 1 / launch.groundKnockbackX !== 1 / sourceLaunch.groundKnockbackX)) return false;
-  if (launch.knockbackAge !== sourceLaunch.knockbackAge || (launch.knockbackAge === 0 && sourceLaunch.knockbackAge === 0 && 1 / launch.knockbackAge !== 1 / sourceLaunch.knockbackAge)) return false;
-  if (launch.damageLevel !== sourceLaunch.damageLevel || (launch.damageLevel === 0 && 1 / launch.damageLevel !== 1 / sourceLaunch.damageLevel)) return false;
-  if (launch.hitstun !== sourceLaunch.hitstun || (launch.hitstun === 0 && 1 / launch.hitstun !== 1 / sourceLaunch.hitstun)) return false;
+  { const a = launch.knockbackX, b = sourceLaunch.knockbackX; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = launch.knockbackZ, b = sourceLaunch.knockbackZ; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  const meleeKnockbackXCopy = launch.meleeKnockbackX;
+  const sourceMeleeKnockbackXCopy = sourceLaunch.meleeKnockbackX;
+  { const a = meleeKnockbackXCopy.original, b = sourceMeleeKnockbackXCopy.original; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = meleeKnockbackXCopy.published, b = sourceMeleeKnockbackXCopy.published; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  const meleeKnockbackZCopy = launch.meleeKnockbackZ;
+  const sourceMeleeKnockbackZCopy = sourceLaunch.meleeKnockbackZ;
+  { const a = meleeKnockbackZCopy.original, b = sourceMeleeKnockbackZCopy.original; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = meleeKnockbackZCopy.published, b = sourceMeleeKnockbackZCopy.published; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = launch.groundKnockbackX, b = sourceLaunch.groundKnockbackX; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = launch.knockbackAge, b = sourceLaunch.knockbackAge; if (a !== b || (a === 0 && b === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = launch.damageLevel, b = sourceLaunch.damageLevel; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = launch.hitstun, b = sourceLaunch.hitstun; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (launch.throwHitstun !== sourceLaunch.throwHitstun) return false;
-  if (launch.hitlag !== sourceLaunch.hitlag || (launch.hitlag === 0 && 1 / launch.hitlag !== 1 / sourceLaunch.hitlag)) return false;
+  { const a = launch.hitlag, b = sourceLaunch.hitlag; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (launch.diPending !== sourceLaunch.diPending) return false;
   if (launch.hitlagFrames !== sourceLaunch.hitlagFrames) return false;
   if (launch.hitlagEndAge !== sourceLaunch.hitlagEndAge) return false;
   if (launch.sdiFollowup !== sourceLaunch.sdiFollowup) return false;
-  if (launch.diLaunchSpeed !== sourceLaunch.diLaunchSpeed || (launch.diLaunchSpeed === 0 && 1 / launch.diLaunchSpeed !== 1 / sourceLaunch.diLaunchSpeed)) return false;
-  if (launch.diSerial !== sourceLaunch.diSerial || (launch.diSerial === 0 && 1 / launch.diSerial !== 1 / sourceLaunch.diSerial)) return false;
-  if (launch.diAngleDegrees !== sourceLaunch.diAngleDegrees || (launch.diAngleDegrees === 0 && 1 / launch.diAngleDegrees !== 1 / sourceLaunch.diAngleDegrees)) return false;
+  { const a = launch.diLaunchSpeed, b = sourceLaunch.diLaunchSpeed; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = launch.diSerial, b = sourceLaunch.diSerial; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = launch.diAngleDegrees, b = sourceLaunch.diAngleDegrees; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (launch.sdiWasGrounded !== sourceLaunch.sdiWasGrounded) return false;
   if (launch.sdiLaunchesUpward !== sourceLaunch.sdiLaunchesUpward) return false;
-  if (launch.sdiSerial !== sourceLaunch.sdiSerial || (launch.sdiSerial === 0 && 1 / launch.sdiSerial !== 1 / sourceLaunch.sdiSerial)) return false;
-  if (launch.asdiSerial !== sourceLaunch.asdiSerial || (launch.asdiSerial === 0 && 1 / launch.asdiSerial !== 1 / sourceLaunch.asdiSerial)) return false;
-  if (launch.sdiHitTravel !== sourceLaunch.sdiHitTravel || (launch.sdiHitTravel === 0 && 1 / launch.sdiHitTravel !== 1 / sourceLaunch.sdiHitTravel)) return false;
-  if (launch.sdiStringTravel !== sourceLaunch.sdiStringTravel || (launch.sdiStringTravel === 0 && 1 / launch.sdiStringTravel !== 1 / sourceLaunch.sdiStringTravel)) return false;
-  if (launch.sdiStepX !== sourceLaunch.sdiStepX || (launch.sdiStepX === 0 && 1 / launch.sdiStepX !== 1 / sourceLaunch.sdiStepX)) return false;
-  if (launch.sdiStepZ !== sourceLaunch.sdiStepZ || (launch.sdiStepZ === 0 && 1 / launch.sdiStepZ !== 1 / sourceLaunch.sdiStepZ)) return false;
-  if (launch.sdiStepTravel !== sourceLaunch.sdiStepTravel || (launch.sdiStepTravel === 0 && 1 / launch.sdiStepTravel !== 1 / sourceLaunch.sdiStepTravel)) return false;
-  if (launch.sdiNextX !== sourceLaunch.sdiNextX || (launch.sdiNextX === 0 && 1 / launch.sdiNextX !== 1 / sourceLaunch.sdiNextX)) return false;
-  if (launch.sdiNextZ !== sourceLaunch.sdiNextZ || (launch.sdiNextZ === 0 && 1 / launch.sdiNextZ !== 1 / sourceLaunch.sdiNextZ)) return false;
-  if (launch.sdiNextTravel !== sourceLaunch.sdiNextTravel || (launch.sdiNextTravel === 0 && 1 / launch.sdiNextTravel !== 1 / sourceLaunch.sdiNextTravel)) return false;
+  { const a = launch.sdiSerial, b = sourceLaunch.sdiSerial; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = launch.asdiSerial, b = sourceLaunch.asdiSerial; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = launch.sdiHitTravel, b = sourceLaunch.sdiHitTravel; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = launch.sdiStringTravel, b = sourceLaunch.sdiStringTravel; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = launch.sdiStepX, b = sourceLaunch.sdiStepX; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = launch.sdiStepZ, b = sourceLaunch.sdiStepZ; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = launch.sdiStepTravel, b = sourceLaunch.sdiStepTravel; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = launch.sdiNextX, b = sourceLaunch.sdiNextX; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = launch.sdiNextZ, b = sourceLaunch.sdiNextZ; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = launch.sdiNextTravel, b = sourceLaunch.sdiNextTravel; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   const shield = target.shield;
   const sourceShield = source.shield;
   if (shield.raised !== sourceShield.raised) return false;
-  if (shield.tiltX !== sourceShield.tiltX || (shield.tiltX === 0 && 1 / shield.tiltX !== 1 / sourceShield.tiltX)) return false;
-  if (shield.tiltZ !== sourceShield.tiltZ || (shield.tiltZ === 0 && 1 / shield.tiltZ !== 1 / sourceShield.tiltZ)) return false;
-  if (shield.strength !== sourceShield.strength || (shield.strength === 0 && 1 / shield.strength !== 1 / sourceShield.strength)) return false;
-  if (shield.energy !== sourceShield.energy || (shield.energy === 0 && 1 / shield.energy !== 1 / sourceShield.energy)) return false;
-  if (shield.stun !== sourceShield.stun || (shield.stun === 0 && 1 / shield.stun !== 1 / sourceShield.stun)) return false;
-  if (shield.heldFrames !== sourceShield.heldFrames || (shield.heldFrames === 0 && 1 / shield.heldFrames !== 1 / sourceShield.heldFrames)) return false;
-  if (shield.releaseLag !== sourceShield.releaseLag || (shield.releaseLag === 0 && 1 / shield.releaseLag !== 1 / sourceShield.releaseLag)) return false;
-  if (shield.pushbackX !== sourceShield.pushbackX || (shield.pushbackX === 0 && 1 / shield.pushbackX !== 1 / sourceShield.pushbackX)) return false;
-  if (shield.recoilX !== sourceShield.recoilX || (shield.recoilX === 0 && 1 / shield.recoilX !== 1 / sourceShield.recoilX)) return false;
-  if (shield.recoilZ !== sourceShield.recoilZ || (shield.recoilZ === 0 && 1 / shield.recoilZ !== 1 / sourceShield.recoilZ)) return false;
-  if (shield.meleeRecoilX.original !== sourceShield.meleeRecoilX.original || (shield.meleeRecoilX.original === 0 && 1 / shield.meleeRecoilX.original !== 1 / sourceShield.meleeRecoilX.original)) return false;
-  if (shield.meleeRecoilX.published !== sourceShield.meleeRecoilX.published || (shield.meleeRecoilX.published === 0 && 1 / shield.meleeRecoilX.published !== 1 / sourceShield.meleeRecoilX.published)) return false;
-  if (shield.meleeRecoilZ.original !== sourceShield.meleeRecoilZ.original || (shield.meleeRecoilZ.original === 0 && 1 / shield.meleeRecoilZ.original !== 1 / sourceShield.meleeRecoilZ.original)) return false;
-  if (shield.meleeRecoilZ.published !== sourceShield.meleeRecoilZ.published || (shield.meleeRecoilZ.published === 0 && 1 / shield.meleeRecoilZ.published !== 1 / sourceShield.meleeRecoilZ.published)) return false;
+  { const a = shield.tiltX, b = sourceShield.tiltX; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = shield.tiltZ, b = sourceShield.tiltZ; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = shield.strength, b = sourceShield.strength; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = shield.energy, b = sourceShield.energy; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = shield.stun, b = sourceShield.stun; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = shield.heldFrames, b = sourceShield.heldFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = shield.releaseLag, b = sourceShield.releaseLag; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = shield.pushbackX, b = sourceShield.pushbackX; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = shield.recoilX, b = sourceShield.recoilX; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = shield.recoilZ, b = sourceShield.recoilZ; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  const meleeRecoilXCopy = shield.meleeRecoilX;
+  const sourceMeleeRecoilXCopy = sourceShield.meleeRecoilX;
+  { const a = meleeRecoilXCopy.original, b = sourceMeleeRecoilXCopy.original; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = meleeRecoilXCopy.published, b = sourceMeleeRecoilXCopy.published; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  const meleeRecoilZCopy = shield.meleeRecoilZ;
+  const sourceMeleeRecoilZCopy = sourceShield.meleeRecoilZ;
+  { const a = meleeRecoilZCopy.original, b = sourceMeleeRecoilZCopy.original; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = meleeRecoilZCopy.published, b = sourceMeleeRecoilZCopy.published; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (shield.drainResumePending !== sourceShield.drainResumePending) return false;
   if (shield.triggerWasActive !== sourceShield.triggerWasActive) return false;
-  if (shield.triggerAge !== sourceShield.triggerAge || (shield.triggerAge === 0 && 1 / shield.triggerAge !== 1 / sourceShield.triggerAge)) return false;
-  if (shield.reflectFrames !== sourceShield.reflectFrames || (shield.reflectFrames === 0 && 1 / shield.reflectFrames !== 1 / sourceShield.reflectFrames)) return false;
-  if (shield.perfectFrames !== sourceShield.perfectFrames || (shield.perfectFrames === 0 && 1 / shield.perfectFrames !== 1 / sourceShield.perfectFrames)) return false;
-  if (shield.perfectActionFrames !== sourceShield.perfectActionFrames || (shield.perfectActionFrames === 0 && 1 / shield.perfectActionFrames !== 1 / sourceShield.perfectActionFrames)) return false;
+  { const a = shield.triggerAge, b = sourceShield.triggerAge; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = shield.reflectFrames, b = sourceShield.reflectFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = shield.perfectFrames, b = sourceShield.perfectFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = shield.perfectActionFrames, b = sourceShield.perfectActionFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (shield.redParryTried !== sourceShield.redParryTried) return false;
-  if (shield.parryBuffer !== sourceShield.parryBuffer || (shield.parryBuffer === 0 && 1 / shield.parryBuffer !== 1 / sourceShield.parryBuffer)) return false;
-  if (shield.parryBufferDirection !== sourceShield.parryBufferDirection || (shield.parryBufferDirection === 0 && 1 / shield.parryBufferDirection !== 1 / sourceShield.parryBufferDirection)) return false;
-  if (shield.breakState !== sourceShield.breakState || (shield.breakState === 0 && 1 / shield.breakState !== 1 / sourceShield.breakState)) return false;
-  if (shield.breakFrame !== sourceShield.breakFrame || (shield.breakFrame === 0 && 1 / shield.breakFrame !== 1 / sourceShield.breakFrame)) return false;
-  if (shield.breakSerial !== sourceShield.breakSerial || (shield.breakSerial === 0 && 1 / shield.breakSerial !== 1 / sourceShield.breakSerial)) return false;
-  if (shield.breakRemaining !== sourceShield.breakRemaining || (shield.breakRemaining === 0 && 1 / shield.breakRemaining !== 1 / sourceShield.breakRemaining)) return false;
+  { const a = shield.parryBuffer, b = sourceShield.parryBuffer; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = shield.parryBufferDirection, b = sourceShield.parryBufferDirection; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = shield.breakState, b = sourceShield.breakState; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = shield.breakFrame, b = sourceShield.breakFrame; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = shield.breakSerial, b = sourceShield.breakSerial; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = shield.breakRemaining, b = sourceShield.breakRemaining; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   const attack = target.attack;
   const sourceAttack = source.attack;
-  if (attack.style !== sourceAttack.style || (attack.style === 0 && sourceAttack.style === 0 && 1 / attack.style !== 1 / sourceAttack.style)) return false;
-  if (attack.frame !== sourceAttack.frame || (attack.frame === 0 && 1 / attack.frame !== 1 / sourceAttack.frame)) return false;
-  if (attack.duration !== sourceAttack.duration || (attack.duration === 0 && 1 / attack.duration !== 1 / sourceAttack.duration)) return false;
-  if (attack.serial !== sourceAttack.serial || (attack.serial === 0 && 1 / attack.serial !== 1 / sourceAttack.serial)) return false;
+  { const a = attack.style, b = sourceAttack.style; if (a !== b || (a === 0 && b === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = attack.frame, b = sourceAttack.frame; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = attack.duration, b = sourceAttack.duration; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = attack.serial, b = sourceAttack.serial; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (attack.hit !== sourceAttack.hit) return false;
   if (attack.dashGrab !== sourceAttack.dashGrab) return false;
   if (attack.pivotGrab !== sourceAttack.pivotGrab) return false;
-  if (attack.cooldown !== sourceAttack.cooldown || (attack.cooldown === 0 && 1 / attack.cooldown !== 1 / sourceAttack.cooldown)) return false;
+  { const a = attack.cooldown, b = sourceAttack.cooldown; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (attack.smashCharging !== sourceAttack.smashCharging) return false;
-  if (attack.smashChargeFrames !== sourceAttack.smashChargeFrames || (attack.smashChargeFrames === 0 && 1 / attack.smashChargeFrames !== 1 / sourceAttack.smashChargeFrames)) return false;
+  { const a = attack.smashChargeFrames, b = sourceAttack.smashChargeFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (attack.smashChargeAllowed !== sourceAttack.smashChargeAllowed) return false;
   const hits = target.hits;
   const sourceHits = source.hits;
@@ -636,33 +650,37 @@ export function sameFighterState(target: Readonly<Fighter>, source: Readonly<Fig
     if (to.window !== from.window || (to.window === 0 && 1 / to.window !== 1 / from.window)) return false;
   }
   if (hits.lastAttacker !== sourceHits.lastAttacker) return false;
-  if (hits.lastAttackSerial !== sourceHits.lastAttackSerial || (hits.lastAttackSerial === 0 && sourceHits.lastAttackSerial === 0 && 1 / hits.lastAttackSerial !== 1 / sourceHits.lastAttackSerial)) return false;
-  if (hits.lastWindow !== sourceHits.lastWindow || (hits.lastWindow === 0 && 1 / hits.lastWindow !== 1 / sourceHits.lastWindow)) return false;
+  { const a = hits.lastAttackSerial, b = sourceHits.lastAttackSerial; if (a !== b || (a === 0 && b === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = hits.lastWindow, b = sourceHits.lastWindow; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   const visuals = target.visuals;
   const sourceVisuals = source.visuals;
-  if (visuals.grab !== sourceVisuals.grab || (visuals.grab === 0 && 1 / visuals.grab !== 1 / sourceVisuals.grab)) return false;
-  if (visuals.throw !== sourceVisuals.throw || (visuals.throw === 0 && 1 / visuals.throw !== 1 / sourceVisuals.throw)) return false;
-  if (visuals.hit !== sourceVisuals.hit || (visuals.hit === 0 && 1 / visuals.hit !== 1 / sourceVisuals.hit)) return false;
+  { const a = visuals.grab, b = sourceVisuals.grab; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = visuals.throw, b = sourceVisuals.throw; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = visuals.hit, b = sourceVisuals.hit; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (visuals.hitElectric !== sourceVisuals.hitElectric) return false;
-  if (visuals.hitElement !== sourceVisuals.hitElement || (visuals.hitElement === 0 && 1 / visuals.hitElement !== 1 / sourceVisuals.hitElement)) return false;
-  if (visuals.hitStrength !== sourceVisuals.hitStrength || (visuals.hitStrength === 0 && 1 / visuals.hitStrength !== 1 / sourceVisuals.hitStrength)) return false;
+  { const a = visuals.hitElement, b = sourceVisuals.hitElement; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = visuals.hitStrength, b = sourceVisuals.hitStrength; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (visuals.hitStrong !== sourceVisuals.hitStrong) return false;
-  if (visuals.hitHeight !== sourceVisuals.hitHeight || (visuals.hitHeight === 0 && 1 / visuals.hitHeight !== 1 / sourceVisuals.hitHeight)) return false;
+  { const a = visuals.hitHeight, b = sourceVisuals.hitHeight; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (visuals.hitPummel !== sourceVisuals.hitPummel) return false;
   if (visuals.shieldElectric !== sourceVisuals.shieldElectric) return false;
-  if (visuals.shield !== sourceVisuals.shield || (visuals.shield === 0 && 1 / visuals.shield !== 1 / sourceVisuals.shield)) return false;
-  if (visuals.shieldReflect !== sourceVisuals.shieldReflect || (visuals.shieldReflect === 0 && 1 / visuals.shieldReflect !== 1 / sourceVisuals.shieldReflect)) return false;
-  if (visuals.manaDrained !== sourceVisuals.manaDrained || (visuals.manaDrained === 0 && 1 / visuals.manaDrained !== 1 / sourceVisuals.manaDrained)) return false;
-  if (visuals.manaDenied !== sourceVisuals.manaDenied || (visuals.manaDenied === 0 && 1 / visuals.manaDenied !== 1 / sourceVisuals.manaDenied)) return false;
+  { const a = visuals.shield, b = sourceVisuals.shield; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = visuals.shieldReflect, b = sourceVisuals.shieldReflect; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = visuals.manaDrained, b = sourceVisuals.manaDrained; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = visuals.manaDenied, b = sourceVisuals.manaDenied; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  return true;
+}
+
+function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): boolean {
   const special = target.special;
   const sourceSpecial = source.special;
-  if (special.action !== sourceSpecial.action || (special.action === 0 && 1 / special.action !== 1 / sourceSpecial.action)) return false;
+  { const a = special.action, b = sourceSpecial.action; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (special.ex !== sourceSpecial.ex) return false;
   if (special.exArmorUsed !== sourceSpecial.exArmorUsed) return false;
-  if (special.variant !== sourceSpecial.variant || (special.variant === 0 && 1 / special.variant !== 1 / sourceSpecial.variant)) return false;
-  if (special.frame !== sourceSpecial.frame || (special.frame === 0 && 1 / special.frame !== 1 / sourceSpecial.frame)) return false;
-  if (special.duration !== sourceSpecial.duration || (special.duration === 0 && 1 / special.duration !== 1 / sourceSpecial.duration)) return false;
-  if (special.lockFrames !== sourceSpecial.lockFrames || (special.lockFrames === 0 && 1 / special.lockFrames !== 1 / sourceSpecial.lockFrames)) return false;
+  { const a = special.variant, b = sourceSpecial.variant; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = special.frame, b = sourceSpecial.frame; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = special.duration, b = sourceSpecial.duration; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = special.lockFrames, b = sourceSpecial.lockFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (special.fall !== sourceSpecial.fall) return false;
   const cooldowns = special.cooldowns;
   const sourceCooldowns = sourceSpecial.cooldowns;
@@ -671,108 +689,113 @@ export function sameFighterState(target: Readonly<Fighter>, source: Readonly<Fig
     const other = sourceCooldowns[i] ?? 0;
     if (value !== other || (value === 0 && 1 / value !== 1 / other)) return false;
   }
-  if (special.direction !== sourceSpecial.direction || (special.direction === 0 && 1 / special.direction !== 1 / sourceSpecial.direction)) return false;
+  { const a = special.direction, b = sourceSpecial.direction; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (special.hit !== sourceSpecial.hit) return false;
-  for (let i = 0; i < PARTICIPANT_CAPACITY; i++) if (special.hitTargets[i] !== sourceSpecial.hitTargets[i]) return false;
-  if (special.form !== sourceSpecial.form || (special.form === 0 && 1 / special.form !== 1 / sourceSpecial.form)) return false;
-  if (special.aimX !== sourceSpecial.aimX || (special.aimX === 0 && 1 / special.aimX !== 1 / sourceSpecial.aimX)) return false;
-  if (special.aimZ !== sourceSpecial.aimZ || (special.aimZ === 0 && 1 / special.aimZ !== 1 / sourceSpecial.aimZ)) return false;
-  if (special.beamX !== sourceSpecial.beamX || (special.beamX === 0 && 1 / special.beamX !== 1 / sourceSpecial.beamX)) return false;
-  if (special.beamZ !== sourceSpecial.beamZ || (special.beamZ === 0 && 1 / special.beamZ !== 1 / sourceSpecial.beamZ)) return false;
-  if (special.beamLength !== sourceSpecial.beamLength || (special.beamLength === 0 && 1 / special.beamLength !== 1 / sourceSpecial.beamLength)) return false;
-  if (special.airtimeUses !== sourceSpecial.airtimeUses || (special.airtimeUses === 0 && 1 / special.airtimeUses !== 1 / sourceSpecial.airtimeUses)) return false;
-  if (special.grabFrame !== sourceSpecial.grabFrame || (special.grabFrame === 0 && 1 / special.grabFrame !== 1 / sourceSpecial.grabFrame)) return false;
+  const hitTargetsCopy = special.hitTargets;
+  const sourceHitTargetsCopy = sourceSpecial.hitTargets;
+  if (hitTargetsCopy[0] !== sourceHitTargetsCopy[0]) return false;
+  if (hitTargetsCopy[1] !== sourceHitTargetsCopy[1]) return false;
+  if (hitTargetsCopy[2] !== sourceHitTargetsCopy[2]) return false;
+  if (hitTargetsCopy[3] !== sourceHitTargetsCopy[3]) return false;
+  { const a = special.form, b = sourceSpecial.form; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = special.aimX, b = sourceSpecial.aimX; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = special.aimZ, b = sourceSpecial.aimZ; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = special.beamX, b = sourceSpecial.beamX; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = special.beamZ, b = sourceSpecial.beamZ; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = special.beamLength, b = sourceSpecial.beamLength; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = special.airtimeUses, b = sourceSpecial.airtimeUses; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = special.grabFrame, b = sourceSpecial.grabFrame; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (special.seekTarget !== sourceSpecial.seekTarget) return false;
   if (special.guarded !== sourceSpecial.guarded) return false;
   if (!sameFighterProjectiles(target, source)) return false;
   const bear = target.bear;
   const sourceBear = source.bear;
   if (bear.exDamage !== sourceBear.exDamage) return false;
-  if (bear.life !== sourceBear.life || (bear.life === 0 && 1 / bear.life !== 1 / sourceBear.life)) return false;
-  if (bear.x !== sourceBear.x || (bear.x === 0 && 1 / bear.x !== 1 / sourceBear.x)) return false;
-  if (bear.z !== sourceBear.z || (bear.z === 0 && 1 / bear.z !== 1 / sourceBear.z)) return false;
-  if (bear.velocityX !== sourceBear.velocityX || (bear.velocityX === 0 && 1 / bear.velocityX !== 1 / sourceBear.velocityX)) return false;
-  if (bear.velocityZ !== sourceBear.velocityZ || (bear.velocityZ === 0 && 1 / bear.velocityZ !== 1 / sourceBear.velocityZ)) return false;
-  if (bear.swipeCooldown !== sourceBear.swipeCooldown || (bear.swipeCooldown === 0 && 1 / bear.swipeCooldown !== 1 / sourceBear.swipeCooldown)) return false;
-  if (bear.hitSerial !== sourceBear.hitSerial || (bear.hitSerial === 0 && 1 / bear.hitSerial !== 1 / sourceBear.hitSerial)) return false;
-  if (bear.surface !== sourceBear.surface || (bear.surface === 0 && sourceBear.surface === 0 && 1 / bear.surface !== 1 / sourceBear.surface)) return false;
+  { const a = bear.life, b = sourceBear.life; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = bear.x, b = sourceBear.x; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = bear.z, b = sourceBear.z; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = bear.velocityX, b = sourceBear.velocityX; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = bear.velocityZ, b = sourceBear.velocityZ; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = bear.swipeCooldown, b = sourceBear.swipeCooldown; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = bear.hitSerial, b = sourceBear.hitSerial; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = bear.surface, b = sourceBear.surface; if (a !== b || (a === 0 && b === 0 && 1 / a !== 1 / b)) return false; }
   const trap = target.freezeTrap;
   const sourceTrap = source.freezeTrap;
   if (trap.exReach !== sourceTrap.exReach) return false;
-  if (trap.life !== sourceTrap.life || (trap.life === 0 && 1 / trap.life !== 1 / sourceTrap.life)) return false;
-  if (trap.arming !== sourceTrap.arming || (trap.arming === 0 && 1 / trap.arming !== 1 / sourceTrap.arming)) return false;
-  if (trap.x !== sourceTrap.x || (trap.x === 0 && 1 / trap.x !== 1 / sourceTrap.x)) return false;
-  if (trap.z !== sourceTrap.z || (trap.z === 0 && 1 / trap.z !== 1 / sourceTrap.z)) return false;
-  if (trap.surface !== sourceTrap.surface || (trap.surface === 0 && sourceTrap.surface === 0 && 1 / trap.surface !== 1 / sourceTrap.surface)) return false;
-  if (trap.serial !== sourceTrap.serial || (trap.serial === 0 && 1 / trap.serial !== 1 / sourceTrap.serial)) return false;
-  if (trap.cooldown !== sourceTrap.cooldown || (trap.cooldown === 0 && 1 / trap.cooldown !== 1 / sourceTrap.cooldown)) return false;
+  { const a = trap.life, b = sourceTrap.life; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = trap.arming, b = sourceTrap.arming; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = trap.x, b = sourceTrap.x; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = trap.z, b = sourceTrap.z; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = trap.surface, b = sourceTrap.surface; if (a !== b || (a === 0 && b === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = trap.serial, b = sourceTrap.serial; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = trap.cooldown, b = sourceTrap.cooldown; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   const dodge = target.dodge;
   const sourceDodge = source.dodge;
   if (dodge.airDodging !== sourceDodge.airDodging) return false;
-  if (dodge.airFrame !== sourceDodge.airFrame || (dodge.airFrame === 0 && 1 / dodge.airFrame !== 1 / sourceDodge.airFrame)) return false;
+  { const a = dodge.airFrame, b = sourceDodge.airFrame; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (dodge.airUsed !== sourceDodge.airUsed) return false;
-  if (dodge.airMotionFrames !== sourceDodge.airMotionFrames || (dodge.airMotionFrames === 0 && 1 / dodge.airMotionFrames !== 1 / sourceDodge.airMotionFrames)) return false;
-  if (dodge.groundFrame !== sourceDodge.groundFrame || (dodge.groundFrame === 0 && 1 / dodge.groundFrame !== 1 / sourceDodge.groundFrame)) return false;
-  if (dodge.groundDirection !== sourceDodge.groundDirection || (dodge.groundDirection === 0 && 1 / dodge.groundDirection !== 1 / sourceDodge.groundDirection)) return false;
-  if (dodge.groundEntryFacing !== sourceDodge.groundEntryFacing || (dodge.groundEntryFacing === 0 && 1 / dodge.groundEntryFacing !== 1 / sourceDodge.groundEntryFacing)) return false;
+  { const a = dodge.airMotionFrames, b = sourceDodge.airMotionFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = dodge.groundFrame, b = sourceDodge.groundFrame; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = dodge.groundDirection, b = sourceDodge.groundDirection; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = dodge.groundEntryFacing, b = sourceDodge.groundEntryFacing; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   const landing = target.landing;
   const sourceLanding = source.landing;
-  if (landing.lag !== sourceLanding.lag || (landing.lag === 0 && 1 / landing.lag !== 1 / sourceLanding.lag)) return false;
+  { const a = landing.lag, b = sourceLanding.lag; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   const down = target.down;
   const sourceDown = source.down;
-  if (down.state !== sourceDown.state || (down.state === 0 && 1 / down.state !== 1 / sourceDown.state)) return false;
-  if (down.frame !== sourceDown.frame || (down.frame === 0 && 1 / down.frame !== 1 / sourceDown.frame)) return false;
-  if (down.direction !== sourceDown.direction || (down.direction === 0 && 1 / down.direction !== 1 / sourceDown.direction)) return false;
-  if (down.waitRemaining !== sourceDown.waitRemaining || (down.waitRemaining === 0 && 1 / down.waitRemaining !== 1 / sourceDown.waitRemaining)) return false;
+  { const a = down.state, b = sourceDown.state; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = down.frame, b = sourceDown.frame; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = down.direction, b = sourceDown.direction; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = down.waitRemaining, b = sourceDown.waitRemaining; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (down.faceUp !== sourceDown.faceUp) return false;
   if (down.attackQueued !== sourceDown.attackQueued) return false;
   const tech = target.tech;
   const sourceTech = source.tech;
-  if (tech.window !== sourceTech.window || (tech.window === 0 && 1 / tech.window !== 1 / sourceTech.window)) return false;
-  if (tech.pressAge !== sourceTech.pressAge || (tech.pressAge === 0 && 1 / tech.pressAge !== 1 / sourceTech.pressAge)) return false;
-  if (tech.previousPressAge !== sourceTech.previousPressAge || (tech.previousPressAge === 0 && 1 / tech.previousPressAge !== 1 / sourceTech.previousPressAge)) return false;
+  { const a = tech.window, b = sourceTech.window; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = tech.pressAge, b = sourceTech.pressAge; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = tech.previousPressAge, b = sourceTech.previousPressAge; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (tech.accumulatedPress !== sourceTech.accumulatedPress) return false;
   const recovery = target.surfaceRecovery;
   const sourceRecovery = source.surfaceRecovery;
-  if (recovery.state !== sourceRecovery.state || (recovery.state === 0 && 1 / recovery.state !== 1 / sourceRecovery.state)) return false;
-  if (recovery.frame !== sourceRecovery.frame || (recovery.frame === 0 && 1 / recovery.frame !== 1 / sourceRecovery.frame)) return false;
+  { const a = recovery.state, b = sourceRecovery.state; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = recovery.frame, b = sourceRecovery.frame; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (recovery.velocityApplied !== sourceRecovery.velocityApplied) return false;
   if (recovery.wallJumpQueued !== sourceRecovery.wallJumpQueued) return false;
-  if (recovery.wallJumpRepeat !== sourceRecovery.wallJumpRepeat || (recovery.wallJumpRepeat === 0 && 1 / recovery.wallJumpRepeat !== 1 / sourceRecovery.wallJumpRepeat)) return false;
-  if (recovery.wallJumpAge !== sourceRecovery.wallJumpAge || (recovery.wallJumpAge === 0 && sourceRecovery.wallJumpAge === 0 && 1 / recovery.wallJumpAge !== 1 / sourceRecovery.wallJumpAge)) return false;
-  if (recovery.wallJumpSide !== sourceRecovery.wallJumpSide || (recovery.wallJumpSide === 0 && 1 / recovery.wallJumpSide !== 1 / sourceRecovery.wallJumpSide)) return false;
-  if (recovery.wallJumpsUsed !== sourceRecovery.wallJumpsUsed || (recovery.wallJumpsUsed === 0 && 1 / recovery.wallJumpsUsed !== 1 / sourceRecovery.wallJumpsUsed)) return false;
-  if (recovery.reflectCooldown !== sourceRecovery.reflectCooldown || (recovery.reflectCooldown === 0 && 1 / recovery.reflectCooldown !== 1 / sourceRecovery.reflectCooldown)) return false;
-  if (recovery.lastReflectedSurface !== sourceRecovery.lastReflectedSurface || (recovery.lastReflectedSurface === 0 && sourceRecovery.lastReflectedSurface === 0 && 1 / recovery.lastReflectedSurface !== 1 / sourceRecovery.lastReflectedSurface)) return false;
-  if (recovery.contactSerial !== sourceRecovery.contactSerial || (recovery.contactSerial === 0 && 1 / recovery.contactSerial !== 1 / sourceRecovery.contactSerial)) return false;
-  if (recovery.contactKind !== sourceRecovery.contactKind || (recovery.contactKind === 0 && 1 / recovery.contactKind !== 1 / sourceRecovery.contactKind)) return false;
-  if (recovery.contactApproachSpeed !== sourceRecovery.contactApproachSpeed || (recovery.contactApproachSpeed === 0 && 1 / recovery.contactApproachSpeed !== 1 / sourceRecovery.contactApproachSpeed)) return false;
-  if (recovery.contactX !== sourceRecovery.contactX || (recovery.contactX === 0 && 1 / recovery.contactX !== 1 / sourceRecovery.contactX)) return false;
-  if (recovery.contactZ !== sourceRecovery.contactZ || (recovery.contactZ === 0 && 1 / recovery.contactZ !== 1 / sourceRecovery.contactZ)) return false;
-  if (recovery.contactNormalX !== sourceRecovery.contactNormalX || (recovery.contactNormalX === 0 && 1 / recovery.contactNormalX !== 1 / sourceRecovery.contactNormalX)) return false;
-  if (recovery.contactNormalZ !== sourceRecovery.contactNormalZ || (recovery.contactNormalZ === 0 && 1 / recovery.contactNormalZ !== 1 / sourceRecovery.contactNormalZ)) return false;
+  { const a = recovery.wallJumpRepeat, b = sourceRecovery.wallJumpRepeat; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = recovery.wallJumpAge, b = sourceRecovery.wallJumpAge; if (a !== b || (a === 0 && b === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = recovery.wallJumpSide, b = sourceRecovery.wallJumpSide; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = recovery.wallJumpsUsed, b = sourceRecovery.wallJumpsUsed; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = recovery.reflectCooldown, b = sourceRecovery.reflectCooldown; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = recovery.lastReflectedSurface, b = sourceRecovery.lastReflectedSurface; if (a !== b || (a === 0 && b === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = recovery.contactSerial, b = sourceRecovery.contactSerial; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = recovery.contactKind, b = sourceRecovery.contactKind; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = recovery.contactApproachSpeed, b = sourceRecovery.contactApproachSpeed; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = recovery.contactX, b = sourceRecovery.contactX; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = recovery.contactZ, b = sourceRecovery.contactZ; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = recovery.contactNormalX, b = sourceRecovery.contactNormalX; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = recovery.contactNormalZ, b = sourceRecovery.contactNormalZ; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   const grab = target.grab;
   const sourceGrab = source.grab;
-  if (grab.grabbedFrames !== sourceGrab.grabbedFrames || (grab.grabbedFrames === 0 && 1 / grab.grabbedFrames !== 1 / sourceGrab.grabbedFrames)) return false;
-  if (grab.action !== sourceGrab.action || (grab.action === 0 && 1 / grab.action !== 1 / sourceGrab.action)) return false;
-  if (grab.frame !== sourceGrab.frame || (grab.frame === 0 && 1 / grab.frame !== 1 / sourceGrab.frame)) return false;
-  if (grab.serial !== sourceGrab.serial || (grab.serial === 0 && 1 / grab.serial !== 1 / sourceGrab.serial)) return false;
-  if (grab.pummels !== sourceGrab.pummels || (grab.pummels === 0 && 1 / grab.pummels !== 1 / sourceGrab.pummels)) return false;
-  if (grab.heldFrames !== sourceGrab.heldFrames || (grab.heldFrames === 0 && 1 / grab.heldFrames !== 1 / sourceGrab.heldFrames)) return false;
-  if (grab.queuedThrow !== sourceGrab.queuedThrow || (grab.queuedThrow === 0 && 1 / grab.queuedThrow !== 1 / sourceGrab.queuedThrow)) return false;
-  if (grab.mashX !== sourceGrab.mashX || (grab.mashX === 0 && 1 / grab.mashX !== 1 / sourceGrab.mashX)) return false;
-  if (grab.mashZ !== sourceGrab.mashZ || (grab.mashZ === 0 && 1 / grab.mashZ !== 1 / sourceGrab.mashZ)) return false;
+  { const a = grab.grabbedFrames, b = sourceGrab.grabbedFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = grab.action, b = sourceGrab.action; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = grab.frame, b = sourceGrab.frame; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = grab.serial, b = sourceGrab.serial; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = grab.pummels, b = sourceGrab.pummels; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = grab.heldFrames, b = sourceGrab.heldFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = grab.queuedThrow, b = sourceGrab.queuedThrow; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = grab.mashX, b = sourceGrab.mashX; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = grab.mashZ, b = sourceGrab.mashZ; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (grab.owner !== sourceGrab.owner) return false;
   if (grab.target !== sourceGrab.target) return false;
   const ledge = target.ledge;
   const sourceLedge = source.ledge;
-  if (ledge.state !== sourceLedge.state || (ledge.state === 0 && 1 / ledge.state !== 1 / sourceLedge.state)) return false;
-  if (ledge.side !== sourceLedge.side || (ledge.side === 0 && 1 / ledge.side !== 1 / sourceLedge.side)) return false;
-  if (ledge.frame !== sourceLedge.frame || (ledge.frame === 0 && 1 / ledge.frame !== 1 / sourceLedge.frame)) return false;
-  if (ledge.serial !== sourceLedge.serial || (ledge.serial === 0 && 1 / ledge.serial !== 1 / sourceLedge.serial)) return false;
-  if (ledge.intangible !== sourceLedge.intangible || (ledge.intangible === 0 && 1 / ledge.intangible !== 1 / sourceLedge.intangible)) return false;
-  if (ledge.regrab !== sourceLedge.regrab || (ledge.regrab === 0 && 1 / ledge.regrab !== 1 / sourceLedge.regrab)) return false;
-  if (ledge.grabs !== sourceLedge.grabs || (ledge.grabs === 0 && 1 / ledge.grabs !== 1 / sourceLedge.grabs)) return false;
+  { const a = ledge.state, b = sourceLedge.state; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = ledge.side, b = sourceLedge.side; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = ledge.frame, b = sourceLedge.frame; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = ledge.serial, b = sourceLedge.serial; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = ledge.intangible, b = sourceLedge.intangible; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = ledge.regrab, b = sourceLedge.regrab; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = ledge.grabs, b = sourceLedge.grabs; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   const platform = target.platform;
   const sourcePlatform = source.platform;
   if (platform.downHeld !== sourcePlatform.downHeld) return false;
@@ -780,84 +803,102 @@ export function sameFighterState(target: Readonly<Fighter>, source: Readonly<Fig
   if (platform.dropConsumed !== sourcePlatform.dropConsumed) return false;
   const cannon = target.cannon;
   const sourceCannon = source.cannon;
-  if (cannon.held !== sourceCannon.held || (cannon.held === 0 && sourceCannon.held === 0 && 1 / cannon.held !== 1 / sourceCannon.held)) return false;
-  if (cannon.firing !== sourceCannon.firing || (cannon.firing === 0 && sourceCannon.firing === 0 && 1 / cannon.firing !== 1 / sourceCannon.firing)) return false;
-  if (cannon.cooldown !== sourceCannon.cooldown || (cannon.cooldown === 0 && 1 / cannon.cooldown !== 1 / sourceCannon.cooldown)) return false;
+  { const a = cannon.held, b = sourceCannon.held; if (a !== b || (a === 0 && b === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = cannon.firing, b = sourceCannon.firing; if (a !== b || (a === 0 && b === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = cannon.cooldown, b = sourceCannon.cooldown; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (cannon.passing !== sourceCannon.passing) return false;
   const water = target.water;
   const sourceWater = source.water;
   if (water.inWater !== sourceWater.inWater) return false;
-  if (water.frames !== sourceWater.frames || (water.frames === 0 && 1 / water.frames !== 1 / sourceWater.frames)) return false;
-  if (water.entries !== sourceWater.entries || (water.entries === 0 && 1 / water.entries !== 1 / sourceWater.entries)) return false;
-  if (water.hydraFrame !== sourceWater.hydraFrame || (water.hydraFrame === 0 && 1 / water.hydraFrame !== 1 / sourceWater.hydraFrame)) return false;
-  if (water.hydraX !== sourceWater.hydraX || (water.hydraX === 0 && 1 / water.hydraX !== 1 / sourceWater.hydraX)) return false;
+  { const a = water.frames, b = sourceWater.frames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = water.entries, b = sourceWater.entries; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = water.hydraFrame, b = sourceWater.hydraFrame; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = water.hydraX, b = sourceWater.hydraX; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (water.hydraStrikeFrame !== sourceWater.hydraStrikeFrame) return false;
   const status = target.status;
   const sourceStatus = source.status;
-  if (status.damage !== sourceStatus.damage || (status.damage === 0 && 1 / status.damage !== 1 / sourceStatus.damage)) return false;
-  if (status.offscreenFrames !== sourceStatus.offscreenFrames || (status.offscreenFrames === 0 && 1 / status.offscreenFrames !== 1 / sourceStatus.offscreenFrames)) return false;
-  if (status.stocks !== sourceStatus.stocks || (status.stocks === 0 && 1 / status.stocks !== 1 / sourceStatus.stocks)) return false;
-  if (status.respawn !== sourceStatus.respawn || (status.respawn === 0 && 1 / status.respawn !== 1 / sourceStatus.respawn)) return false;
+  { const a = status.damage, b = sourceStatus.damage; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.offscreenFrames, b = sourceStatus.offscreenFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.stocks, b = sourceStatus.stocks; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.respawn, b = sourceStatus.respawn; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (status.out !== sourceStatus.out) return false;
-  if (status.invincible !== sourceStatus.invincible || (status.invincible === 0 && 1 / status.invincible !== 1 / sourceStatus.invincible)) return false;
-  if (status.frozenFrames !== sourceStatus.frozenFrames || (status.frozenFrames === 0 && 1 / status.frozenFrames !== 1 / sourceStatus.frozenFrames)) return false;
-  if (status.freezeImmunityFrames !== sourceStatus.freezeImmunityFrames || (status.freezeImmunityFrames === 0 && 1 / status.freezeImmunityFrames !== 1 / sourceStatus.freezeImmunityFrames)) return false;
-  if (status.armorFrames !== sourceStatus.armorFrames || (status.armorFrames === 0 && 1 / status.armorFrames !== 1 / sourceStatus.armorFrames)) return false;
-  if (status.armorMaxDamage !== sourceStatus.armorMaxDamage || (status.armorMaxDamage === 0 && 1 / status.armorMaxDamage !== 1 / sourceStatus.armorMaxDamage)) return false;
+  { const a = status.invincible, b = sourceStatus.invincible; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.frozenFrames, b = sourceStatus.frozenFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.freezeImmunityFrames, b = sourceStatus.freezeImmunityFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.armorFrames, b = sourceStatus.armorFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.armorMaxDamage, b = sourceStatus.armorMaxDamage; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (status.armorChills !== sourceStatus.armorChills) return false;
-  if (status.condition !== sourceStatus.condition || (status.condition === 0 && 1 / status.condition !== 1 / sourceStatus.condition)) return false;
-  if (status.conditionFrames !== sourceStatus.conditionFrames || (status.conditionFrames === 0 && 1 / status.conditionFrames !== 1 / sourceStatus.conditionFrames)) return false;
-  if (status.conditionGroup !== sourceStatus.conditionGroup || (status.conditionGroup === 0 && 1 / status.conditionGroup !== 1 / sourceStatus.conditionGroup)) return false;
-  if (status.conditionImmunityFrames !== sourceStatus.conditionImmunityFrames || (status.conditionImmunityFrames === 0 && 1 / status.conditionImmunityFrames !== 1 / sourceStatus.conditionImmunityFrames)) return false;
-  for (let i = 0; i < HERO_STATUS_GROUPS; i++) if ((status.conditionImmunity[i] ?? 0) !== (sourceStatus.conditionImmunity[i] ?? 0)) return false;
-  if (status.poisonFrames !== sourceStatus.poisonFrames || (status.poisonFrames === 0 && 1 / status.poisonFrames !== 1 / sourceStatus.poisonFrames)) return false;
-  if (status.poisonEvery !== sourceStatus.poisonEvery || (status.poisonEvery === 0 && 1 / status.poisonEvery !== 1 / sourceStatus.poisonEvery)) return false;
-  if (status.poisonDamage !== sourceStatus.poisonDamage || (status.poisonDamage === 0 && 1 / status.poisonDamage !== 1 / sourceStatus.poisonDamage)) return false;
-  if (status.divineFrames !== sourceStatus.divineFrames || (status.divineFrames === 0 && 1 / status.divineFrames !== 1 / sourceStatus.divineFrames)) return false;
-  if (status.buff !== sourceStatus.buff || (status.buff === 0 && 1 / status.buff !== 1 / sourceStatus.buff)) return false;
-  if (status.buffFrames !== sourceStatus.buffFrames || (status.buffFrames === 0 && 1 / status.buffFrames !== 1 / sourceStatus.buffFrames)) return false;
+  { const a = status.condition, b = sourceStatus.condition; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.conditionFrames, b = sourceStatus.conditionFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.conditionGroup, b = sourceStatus.conditionGroup; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.conditionImmunityFrames, b = sourceStatus.conditionImmunityFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  const conditionImmunityCopy = status.conditionImmunity;
+  const sourceConditionImmunityCopy = sourceStatus.conditionImmunity;
+  if ((conditionImmunityCopy[0] ?? 0) !== (sourceConditionImmunityCopy[0] ?? 0)) return false;
+  if ((conditionImmunityCopy[1] ?? 0) !== (sourceConditionImmunityCopy[1] ?? 0)) return false;
+  if ((conditionImmunityCopy[2] ?? 0) !== (sourceConditionImmunityCopy[2] ?? 0)) return false;
+  { const a = status.poisonFrames, b = sourceStatus.poisonFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.poisonEvery, b = sourceStatus.poisonEvery; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.poisonDamage, b = sourceStatus.poisonDamage; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.divineFrames, b = sourceStatus.divineFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.buff, b = sourceStatus.buff; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = status.buffFrames, b = sourceStatus.buffFrames; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   const mana = target.mana;
   const sourceMana = source.mana;
-  if (mana.points !== sourceMana.points || (mana.points === 0 && 1 / mana.points !== 1 / sourceMana.points)) return false;
+  { const a = mana.points, b = sourceMana.points; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   const candle = target.candle;
   const sourceCandle = source.candle;
-  if (candle.heat !== sourceCandle.heat || (candle.heat === 0 && 1 / candle.heat !== 1 / sourceCandle.heat)) return false;
-  if (candle.state !== sourceCandle.state || (candle.state === 0 && 1 / candle.state !== 1 / sourceCandle.state)) return false;
+  { const a = candle.heat, b = sourceCandle.heat; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = candle.state, b = sourceCandle.state; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (candle.lit !== sourceCandle.lit) return false;
-  if (candle.x !== sourceCandle.x || (candle.x === 0 && 1 / candle.x !== 1 / sourceCandle.x)) return false;
-  if (candle.z !== sourceCandle.z || (candle.z === 0 && 1 / candle.z !== 1 / sourceCandle.z)) return false;
-  if (candle.vx !== sourceCandle.vx || (candle.vx === 0 && 1 / candle.vx !== 1 / sourceCandle.vx)) return false;
-  if (candle.vz !== sourceCandle.vz || (candle.vz === 0 && 1 / candle.vz !== 1 / sourceCandle.vz)) return false;
-  if (candle.surface !== sourceCandle.surface || (candle.surface === 0 && sourceCandle.surface === 0 && 1 / candle.surface !== 1 / sourceCandle.surface)) return false;
-  if (candle.timer !== sourceCandle.timer || (candle.timer === 0 && 1 / candle.timer !== 1 / sourceCandle.timer)) return false;
-  if (candle.away !== sourceCandle.away || (candle.away === 0 && 1 / candle.away !== 1 / sourceCandle.away)) return false;
-  if (candle.guard !== sourceCandle.guard || (candle.guard === 0 && 1 / candle.guard !== 1 / sourceCandle.guard)) return false;
-  for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) if (candle.struck[slot] !== sourceCandle.struck[slot]) return false;
-  if (candle.specialStruck !== sourceCandle.specialStruck || (candle.specialStruck === 0 && 1 / candle.specialStruck !== 1 / sourceCandle.specialStruck)) return false;
-  if (candle.dropSerial !== sourceCandle.dropSerial || (candle.dropSerial === 0 && 1 / candle.dropSerial !== 1 / sourceCandle.dropSerial)) return false;
-  if (candle.snuffSerial !== sourceCandle.snuffSerial || (candle.snuffSerial === 0 && 1 / candle.snuffSerial !== 1 / sourceCandle.snuffSerial)) return false;
-  if (candle.returnSerial !== sourceCandle.returnSerial || (candle.returnSerial === 0 && 1 / candle.returnSerial !== 1 / sourceCandle.returnSerial)) return false;
+  { const a = candle.x, b = sourceCandle.x; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = candle.z, b = sourceCandle.z; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = candle.vx, b = sourceCandle.vx; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = candle.vz, b = sourceCandle.vz; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = candle.surface, b = sourceCandle.surface; if (a !== b || (a === 0 && b === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = candle.timer, b = sourceCandle.timer; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = candle.away, b = sourceCandle.away; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = candle.guard, b = sourceCandle.guard; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  const struckCopy = candle.struck;
+  const sourceStruckCopy = sourceCandle.struck;
+  if (struckCopy[0] !== sourceStruckCopy[0]) return false;
+  if (struckCopy[1] !== sourceStruckCopy[1]) return false;
+  if (struckCopy[2] !== sourceStruckCopy[2]) return false;
+  if (struckCopy[3] !== sourceStruckCopy[3]) return false;
+  { const a = candle.specialStruck, b = sourceCandle.specialStruck; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = candle.dropSerial, b = sourceCandle.dropSerial; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = candle.snuffSerial, b = sourceCandle.snuffSerial; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+  { const a = candle.returnSerial, b = sourceCandle.returnSerial; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (target.pack.length !== source.pack.length || (target.pack.length === 0 && 1 / target.pack.length !== 1 / source.pack.length)) return false;
   for (let animal = 0; animal <= source.pack.length; animal++) {
     const placed = placedObject(target, animal);
     const sourcePlaced = placedObject(source, animal);
-    if (placed.life !== sourcePlaced.life || (placed.life === 0 && 1 / placed.life !== 1 / sourcePlaced.life)) return false;
-    if (placed.age !== sourcePlaced.age || (placed.age === 0 && 1 / placed.age !== 1 / sourcePlaced.age)) return false;
-    if (placed.x !== sourcePlaced.x || (placed.x === 0 && 1 / placed.x !== 1 / sourcePlaced.x)) return false;
-    if (placed.z !== sourcePlaced.z || (placed.z === 0 && 1 / placed.z !== 1 / sourcePlaced.z)) return false;
-    if (placed.direction !== sourcePlaced.direction || (placed.direction === 0 && 1 / placed.direction !== 1 / sourcePlaced.direction)) return false;
-    if (placed.durability !== sourcePlaced.durability || (placed.durability === 0 && 1 / placed.durability !== 1 / sourcePlaced.durability)) return false;
-    if (placed.serial !== sourcePlaced.serial || (placed.serial === 0 && 1 / placed.serial !== 1 / sourcePlaced.serial)) return false;
+    { const a = placed.life, b = sourcePlaced.life; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+    { const a = placed.age, b = sourcePlaced.age; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+    { const a = placed.x, b = sourcePlaced.x; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+    { const a = placed.z, b = sourcePlaced.z; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+    { const a = placed.direction, b = sourcePlaced.direction; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+    { const a = placed.durability, b = sourcePlaced.durability; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+    { const a = placed.serial, b = sourcePlaced.serial; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
     if (placed.spec !== sourcePlaced.spec) return false;
-    for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) if (placed.struck[slot] !== sourcePlaced.struck[slot]) return false;
-    if (placed.specialStruck !== sourcePlaced.specialStruck || (placed.specialStruck === 0 && 1 / placed.specialStruck !== 1 / sourcePlaced.specialStruck)) return false;
-    if (placed.mode !== sourcePlaced.mode || (placed.mode === 0 && 1 / placed.mode !== 1 / sourcePlaced.mode)) return false;
-    if (placed.modeFrame !== sourcePlaced.modeFrame || (placed.modeFrame === 0 && 1 / placed.modeFrame !== 1 / sourcePlaced.modeFrame)) return false;
-    if (placed.apart !== sourcePlaced.apart || (placed.apart === 0 && 1 / placed.apart !== 1 / sourcePlaced.apart)) return false;
-    if (placed.bitten !== sourcePlaced.bitten || (placed.bitten === 0 && 1 / placed.bitten !== 1 / sourcePlaced.bitten)) return false;
-    if (placed.surface !== sourcePlaced.surface || (placed.surface === 0 && sourcePlaced.surface === 0 && 1 / placed.surface !== 1 / sourcePlaced.surface)) return false;
+    const struckCopy = placed.struck;
+    const sourceStruckCopy = sourcePlaced.struck;
+    if (struckCopy[0] !== sourceStruckCopy[0]) return false;
+    if (struckCopy[1] !== sourceStruckCopy[1]) return false;
+    if (struckCopy[2] !== sourceStruckCopy[2]) return false;
+    if (struckCopy[3] !== sourceStruckCopy[3]) return false;
+    { const a = placed.specialStruck, b = sourcePlaced.specialStruck; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+    { const a = placed.mode, b = sourcePlaced.mode; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+    { const a = placed.modeFrame, b = sourcePlaced.modeFrame; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+    { const a = placed.apart, b = sourcePlaced.apart; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+    { const a = placed.bitten, b = sourcePlaced.bitten; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
+    { const a = placed.surface, b = sourcePlaced.surface; if (a !== b || (a === 0 && b === 0 && 1 / a !== 1 / b)) return false; }
   }
   return true;
+}
+
+export function sameFighterState(target: Readonly<Fighter>, source: Readonly<Fighter>): boolean {
+  return sameFighterHead(target, source) && sameFighterTail(target, source);
 }
 
 export interface FighterFieldSink {

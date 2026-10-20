@@ -1,6 +1,6 @@
 import { FIGHTER_ARRAYS, FIGHTER_CONSTANTS, FIGHTER_FIELDS, FIGHTER_GROUPS, FIGHTER_SAME_ORDER } from "../src/game/sim/state/fighterSchema";
 import type { CanonColumn, CanonKit, FighterArray, FighterFieldRow, FighterGroup, Guard } from "../src/game/sim/state/fighterSchema";
-import { UNROLLED, arrayOf, copyHalf, copyPart, copyValue, groupKey, inSameOrder, keeps, leaf, retainedSlots, rowsOf, sameTest, sourceLocal } from "./fighterStateRows";
+import { UNROLLED, sameLine, arrayOf, copyHalf, copyPart, copyValue, groupKey, inSameOrder, keeps, leaf, retainedSlots, rowsOf, sameTest, sourceLocal } from "./fighterStateRows";
 
 export const output = "src/generated/state/fighterState.ts";
 export const producer = "ts/codegen/fighterState.ts";
@@ -28,10 +28,13 @@ const scalarArray = (mode: "copy" | "same", lines: string[], indent: string, tar
     return;
   }
   const unrolled = UNROLLED[array.capacity];
-  if (mode === "copy" && unrolled !== undefined) {
+  if (unrolled !== undefined) {
     const local = `${name}Copy`;
     lines.push(`${indent}const ${local} = ${to};`, `${indent}const ${sourceLocal(local)} = ${from};`);
-    for (let element = 0; element < unrolled; element++) lines.push(`${indent}${local}[${element}] = ${copyValue(row, `${sourceLocal(local)}[${element}]${fallback}`)};`);
+    for (let element = 0; element < unrolled; element++) {
+      if (mode === "copy") lines.push(`${indent}${local}[${element}] = ${copyValue(row, `${sourceLocal(local)}[${element}]${fallback}`)};`);
+      else lines.push(sameLine(row, indent, fallback === "" ? `${local}[${element}]` : `(${local}[${element}]${fallback})`, fallback === "" ? `${sourceLocal(local)}[${element}]` : `(${sourceLocal(local)}[${element}]${fallback})`));
+    }
     return;
   }
   const loop = `${indent}for (let ${index} = 0; ${index} < ${capacity(array)}; ${index}++)`;
@@ -74,7 +77,7 @@ const walk = (mode: "copy" | "same"): Walk => (lines, indent, target, source, un
     if (row[mode] === "none") continue;
     const field = leaf(row, prefix);
     const dot = field.indexOf(".");
-    if (mode === "copy" && dot > 0) {
+    if (dot > 0) {
       const record = field.slice(0, dot);
       const local = `${record}Copy`;
       if (!hoisted.has(record)) {
@@ -82,9 +85,10 @@ const walk = (mode: "copy" | "same"): Walk => (lines, indent, target, source, un
         lines.push(`${indent}const ${local} = ${target}.${record};`, `${indent}const ${sourceLocal(local)} = ${source}.${record};`);
       }
       const rest = field.slice(dot + 1);
-      lines.push(`${indent}${local}.${rest} = ${copyValue(row, `${sourceLocal(local)}.${rest}`)};`);
+      if (mode === "copy") lines.push(`${indent}${local}.${rest} = ${copyValue(row, `${sourceLocal(local)}.${rest}`)};`);
+      else lines.push(sameLine(row, indent, `${local}.${rest}`, `${sourceLocal(local)}.${rest}`));
     } else if (mode === "copy") lines.push(`${indent}${target}.${field} = ${copyValue(row, `${source}.${field}`)};`);
-    else lines.push(`${indent}if (${sameTest(row, `${target}.${field}`, `${source}.${field}`)}) return false;`);
+    else lines.push(sameLine(row, indent, `${target}.${field}`, `${source}.${field}`));
   }
 };
 
@@ -417,7 +421,8 @@ export function renderFighterState(): string {
   const half = copyHalf();
   const copyHead = body("copy", FIGHTER_GROUPS.slice(0, half));
   const copyTail = body("copy", FIGHTER_GROUPS.slice(half));
-  const same = body("same");
+  const sameHead = body("same", FIGHTER_GROUPS.slice(0, half));
+  const sameTail = body("same", FIGHTER_GROUPS.slice(half));
   const projectiles = projectileFunctions();
   const canon = canonWalk();
   for (const name of used) {
@@ -456,9 +461,18 @@ export function renderFighterState(): string {
     "",
     ...projectiles.same,
     "",
-    "export function sameFighterState(target: Readonly<Fighter>, source: Readonly<Fighter>): boolean {",
-    ...same,
+    "function sameFighterHead(target: Readonly<Fighter>, source: Readonly<Fighter>): boolean {",
+    ...sameHead,
     "  return true;",
+    "}",
+    "",
+    "function sameFighterTail(target: Readonly<Fighter>, source: Readonly<Fighter>): boolean {",
+    ...sameTail,
+    "  return true;",
+    "}",
+    "",
+    "export function sameFighterState(target: Readonly<Fighter>, source: Readonly<Fighter>): boolean {",
+    "  return sameFighterHead(target, source) && sameFighterTail(target, source);",
     "}",
     "",
     ...kitInterface(),

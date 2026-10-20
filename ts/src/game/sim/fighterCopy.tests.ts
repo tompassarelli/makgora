@@ -1,7 +1,7 @@
 import { assertEquals, assertGreaterThan, test } from "wisp/src/runtime/testing";
 import { f32 } from "wisp/src/sim/f32";
 import { floorMod } from "wisp/src/sim/intMath";
-import { copyFighterState } from "../../generated/state/fighterState";
+import { copyFighterState, sameFighterState } from "../../generated/state/fighterState";
 import { at } from "wisp/src/runtime/lookup";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { Character, HERO_STATUS_GROUPS, SPECIAL_ACTION_CAPACITY } from "./codes";
@@ -51,20 +51,22 @@ function owners(fighter: Fighter, path: string): { readonly owner: Node; readonl
 }
 
 
+const WRITABLE = new Set(["real", "bool", "slot", "int", "enum", "optionalInt", "optionalEnum"]);
+
+function pickFor(row: FighterFieldRow, next: (range: number) => number): unknown {
+  switch (row.type) {
+    case "real": return REALS[next(REALS.length)];
+    case "bool": return next(2) === 0;
+    case "slot": return slotChoice(next(SLOT_CHOICES));
+    default: return next(9) - 2;
+  }
+}
+
 function scramble(fighter: Fighter, next: (range: number) => number): void {
   for (let animal = next(3); animal > 0; animal--) fighter.pack.push(createPlacedObject());
   for (const row of ROWS) {
-    if (next(3) !== 0) continue;
-    const pick = (): unknown => {
-      switch (row.type) {
-        case "real": return REALS[next(REALS.length)];
-        case "bool": return next(2) === 0;
-        case "slot": return slotChoice(next(SLOT_CHOICES));
-        case "int": case "enum": case "optionalInt": case "optionalEnum": return next(9) - 2;
-        default: return undefined;
-      }
-    };
-    if (pick() === undefined && row.type !== "slot") continue;
+    if (next(3) !== 0 || !WRITABLE.has(row.type)) continue;
+    const pick = () => pickFor(row, next);
     for (const { owner, key } of owners(fighter, row.path)) {
       if (row.path.endsWith("[]")) {
         const list = owner[key] as unknown[];
@@ -110,4 +112,64 @@ test("the generated fighter copy writes every copied field as a schema-driven co
   }
   assertGreaterThan(compared, 300 * ROWS.length);
   assertGreaterThan(dropped, 100);
+});
+
+const SAME_ROWS = FIGHTER_FIELDS.filter((row) => row.same !== "none" && !row.path.startsWith("projectiles[]") && !row.path.startsWith("pack"));
+const PERTURBABLE = SAME_ROWS.filter((row) => WRITABLE.has(row.type));
+
+function fallbackOf(row: FighterFieldRow): number | undefined {
+  const array = FIGHTER_ARRAYS.find((candidate) => `${candidate.path}[]` === row.path);
+  return array?.fallback === undefined ? undefined : 0;
+}
+
+function oracleSame(a: Fighter, b: Fighter): boolean {
+  if (a.pack.length !== b.pack.length) return false;
+  for (const row of SAME_ROWS) {
+    const left = owners(a, row.path);
+    const right = owners(b, row.path);
+    const fallback = fallbackOf(row);
+    for (let o = 0; o < left.length; o++) {
+      const x = at(left, o);
+      const y = at(right, o);
+      for (let i = 0; i < countOf(row); i++) {
+        const p = read(x.owner, x.key, row, i) ?? fallback;
+        const q = read(y.owner, y.key, row, i) ?? fallback;
+        if (row.same === "plain" ? p !== q : !exact(p, q)) return false;
+      }
+    }
+  }
+  return true;
+}
+
+test("the generated fighter compare answers as a schema-driven compare on 300 copied fighter pairs, each with one field changed, signed zeros flipped and slots dropped [k2 property]", () => {
+  let state = 31;
+  const next = (range: number) => {
+    state = floorMod(state * 75 + 74, 65537);
+    return floorMod(state, range);
+  };
+  let equal = 0;
+  let unequal = 0;
+  for (let run = 0; run < 300; run++) {
+    const a = createFighter(CHARACTERS[next(3)] ?? Character.rifleman, f32(next(100) - 50.0), 1);
+    scramble(a, next);
+    const b = createFighter(CHARACTERS[next(3)] ?? Character.rifleman, 0.0, -1);
+    copyFighterState(b, a, next(4) === 0 ? 7 : 15);
+    if (next(3) !== 0) {
+      const row = at(PERTURBABLE, next(PERTURBABLE.length));
+      const targets = owners(b, row.path);
+      const { owner, key } = at(targets, next(targets.length));
+      const index = next(countOf(row));
+      const current = read(owner, key, row, index);
+      const value = current === 0 && next(2) === 0 ? -(current as number) : pickFor(row, next);
+      if (row.path.endsWith("[]")) (owner[key] as unknown[])[index] = value;
+      else owner[key] = value;
+    }
+    const expected = oracleSame(a, b);
+    assertEquals(sameFighterState(a, b), expected, `run ${run} a to b`);
+    assertEquals(sameFighterState(b, a), expected, `run ${run} b to a`);
+    if (expected) equal++;
+    else unequal++;
+  }
+  assertGreaterThan(equal, 50);
+  assertGreaterThan(unequal, 100);
 });
