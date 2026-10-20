@@ -9,6 +9,7 @@ import { type MatchState, humanCount } from "../lobby/lobbyState";
 import { LESSONS, lessonChoiceText } from "../match/tutorial";
 import { MENU_FONT, PANEL_TEXTURE } from "./hudLayout";
 import { createBackdrop, createText, placeTopLeft } from "./frames";
+import { TUTORIAL_BOX } from "./selectionLayout";
 
 export type TutorialButton = { kind: "tutorialOpen" } | { kind: "tutorialStep"; direction: -1 | 1 } | { kind: "tutorialStart" } | { kind: "tutorialClose" };
 
@@ -56,7 +57,7 @@ export function createTutorialMenu(owner: framehandle, rules: framehandle, suffi
   add(button(root, f32(0.23), f32(0.315), f32(0.16), f32(0.035), "Start tutorial"), { kind: "tutorialStart" });
   add(button(root, f32(0.41), f32(0.315), f32(0.16), f32(0.035), "Not now"), { kind: "tutorialClose" });
   BlzFrameSetVisible(root, false);
-  const open = add(button(rules, f32(0.05), f32(0.424), f32(0.09), f32(0.027), "Tutorial"), { kind: "tutorialOpen" });
+  const open = add(button(rules, TUTORIAL_BOX.x, TUTORIAL_BOX.y, TUTORIAL_BOX.width, TUTORIAL_BOX.height, "Tutorial"), { kind: "tutorialOpen" });
   return { root, lesson, open };
 }
 

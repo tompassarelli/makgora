@@ -96,9 +96,9 @@ export class StagePanel {
     coverScreen(this.backdrop);
     stageText(root, "MeleeStageTitle", f32(0.045), f32(0.575), f32(0.325), f32(0.034), MENU_STYLE.titleSize, `${MENU_STYLE.gold}STAGE SELECT|r`);
     this.ruleLabel = stageText(root, "MeleeStageRules", f32(0.41), f32(0.575), f32(0.35), f32(0.034), MENU_STYLE.headerSize, "");
-    this.preview = new StageCard(root, "MeleeStagePreview", f32(0.042), f32(0.445), f32(0.372), 0.25, false);
-    this.previewName = stageText(root, "MeleeStagePreviewName", f32(0.045), f32(0.19), f32(0.37), f32(0.036), f32(0.022), "");
-    this.previewDescription = stageText(root, "MeleeStageDescription", f32(0.045), f32(0.148), f32(0.36), f32(0.05), f32(0.011), "");
+    this.preview = new StageCard(root, "MeleeStagePreview", f32(0.13), f32(0.445), f32(0.31), f32(0.21), false);
+    this.previewName = stageText(root, "MeleeStagePreviewName", f32(0.13), f32(0.225), f32(0.31), f32(0.036), f32(0.022), "");
+    this.previewDescription = stageText(root, "MeleeStageDescription", f32(0.13), f32(0.185), f32(0.31), f32(0.05), f32(0.011), "");
     stageText(root, "MeleeStageGridTitle", f32(0.454), f32(0.48), f32(0.3), f32(0.022), MENU_STYLE.headerSize, `${MENU_STYLE.gold}CHOOSE A STAGE|r`);
     for (const stage of STAGE_CHOICES) {
       const choice = stage.id;

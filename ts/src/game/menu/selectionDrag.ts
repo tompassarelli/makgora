@@ -66,7 +66,7 @@ export function chipY(grid: RosterGrid, slot: number, choice: number): number {
 export const readyChipSize = (grid: RosterGrid): number => grid.cellWidth * f32(0.65);
 
 export function cardX(slot: number): number {
-  return 0.054999999701976776 + slot * 0.17499999701976776;
+  return 0.12999999523162842 + slot * 0.17000000178813934;
 }
 
 

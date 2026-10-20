@@ -12,8 +12,8 @@ export type RosterTile = number;
 const CELL_WIDTH = f32(0.112);
 const CELL_HEIGHT = f32(0.132);
 
-const REGION_X = f32(0.05);
-const REGION_WIDTH = f32(0.7);
+const REGION_X = f32(0.13);
+const REGION_WIDTH = f32(0.67);
 
 const REGION_BOTTOM = f32(0.28);
 const REGION_HEIGHT = f32(0.2);
