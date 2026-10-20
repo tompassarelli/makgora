@@ -93,6 +93,9 @@ Smashcraft follows that shape with Warcraft III's built-in assets
   (Stand Channel or Stand Ready where the model has none). It shouts its battle
   cry over a crowd cheer and its race's victory theme. A KO goes to the last
   fighter whose hit landed.
+- **Choices.** Rematch and New stage go ahead only when every present player
+  picks the same one. Character select goes at once when any player picks it,
+  since a split vote ends there anyway (Tom, 20 Oct 2026).
 - **Selection.** Hovering a fighter or a stage ticks. Confirming a fighter
   clicks and plays that hero's trained-unit line ("Ready" in its sound set),
   the closest Warcraft has to Smash's announced pick. Fighter and stage

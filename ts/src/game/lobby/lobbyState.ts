@@ -622,7 +622,7 @@ export function confirmRematch(game: MatchState, slot: number, pick: ResultPick 
   game.rematchReadiness[slot] = true;
   game.resultPicks[slot] = pick;
   const present = PARTICIPANT_SLOTS.filter(participant => humanPresent(game, participant));
-  if (present.some(participant => !game.rematchReadiness[participant])) return false;
+  if (pick !== ResultPick.characters && present.some(participant => !game.rematchReadiness[participant])) return false;
   const agreed = present.every(participant => game.resultPicks[participant] === pick) ? pick : ResultPick.characters;
   game.rematchReadiness.fill(false);
   game.resultPicks.fill(ResultPick.characters);
