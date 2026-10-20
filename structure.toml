@@ -310,7 +310,9 @@ paths = ["ts/src/game/sim/heroes/releaseRoster.ts"]
 producer = "ts/scripts/releaseRoster.ts"
 # Not declared: platform/damageBlendProbeModels.ts (header names tools/animations/damage-blend-probe.ts, absent at HEAD; S6 deletes
 # the file or restores the producer) and ui/opponentSettingsFrames.ts (producer is wisp:host/compile/frames.ts, outside this tree).
-# S1 adds: paths = ["ts/src/generated/state/**"], producer = "ts/codegen/fighterState.ts".
+[[generated]]
+paths = ["ts/src/generated/state/**"]
+producer = "ts/codegen/fighterState.ts"
 
 [ignore]
 paths = ["repos/**", "evidence/**", "ts/vendor/**", "ts/node_modules/**", "**/fixtures/**", "ts/test/corpus/**", "ts/test/native/pads/**",

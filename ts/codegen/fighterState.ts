@@ -1,51 +1,10 @@
 import { FIGHTER_ARRAYS, FIGHTER_CONSTANTS, FIGHTER_FIELDS, FIGHTER_GROUPS, FIGHTER_SAME_ORDER } from "../src/game/sim/state/fighterSchema";
 import type { CanonColumn, CanonKit, FighterArray, FighterFieldRow, FighterGroup, Guard } from "../src/game/sim/state/fighterSchema";
+import { UNROLLED, arrayOf, copyHalf, copyPart, copyValue, groupKey, inSameOrder, keeps, leaf, retainedSlots, rowsOf, sameTest, sourceLocal } from "./fighterStateRows";
 
 export const output = "src/generated/state/fighterState.ts";
 export const producer = "ts/codegen/fighterState.ts";
 
-const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
-const sourceLocal = (local: string) => `source${capitalize(local)}`;
-
-const groupKey = (row: FighterFieldRow) => {
-  if (row.path.startsWith("placed.") || row.path.startsWith("pack")) return "pack";
-  if (row.path.startsWith("projectiles[]")) return "projectiles";
-  const dot = row.path.indexOf(".");
-  return dot < 0 ? "" : row.path.slice(0, dot);
-};
-
-const arrayOf = (row: FighterFieldRow): FighterArray | undefined => {
-  const marker = row.path.lastIndexOf("[]");
-  if (marker < 0) return undefined;
-  const path = row.path.slice(0, marker);
-  return FIGHTER_ARRAYS.find((array) => array.path === path);
-};
-
-const leaf = (row: FighterFieldRow, prefix: string) => row.path.slice(prefix.length);
-
-const rowsOf = (group: FighterGroup) => FIGHTER_FIELDS.filter((row) => groupKey(row) === group.key && !row.path.startsWith("pack[]"));
-
-const inSameOrder = (mode: "copy" | "same", group: string, rows: readonly FighterFieldRow[], prefix: string): readonly FighterFieldRow[] => {
-  if (mode === "copy") return rows;
-  const order = FIGHTER_SAME_ORDER[group] ?? [];
-  const rank = (row: FighterFieldRow) => {
-    const position = order.indexOf(leaf(row, prefix));
-    return position < 0 ? order.length : position;
-  };
-  return rows.map((row, index) => ({ row, index })).sort((a, b) => rank(a.row) - rank(b.row) || a.index - b.index).map(({ row }) => row);
-};
-
-const sameTest = (row: FighterFieldRow, a: string, b: string): string => {
-  switch (row.same) {
-    case "signedZero": return `${a} !== ${b} || (${a} === 0 && 1 / ${a} !== 1 / ${b})`;
-    case "signedZeroOptional": return `${a} !== ${b} || (${a} === 0 && ${b} === 0 && 1 / ${a} !== 1 / ${b})`;
-    case "plain": return `${a} !== ${b}`;
-    case "sameReal": return `!sameReal(${a}, ${b})`;
-    case "none": throw new Error(`${row.path} has no same form`);
-  }
-};
-
-const copyValue = (row: FighterFieldRow, value: string) => (row.copy === "retained" ? `retained(activeMask, ${value})` : value);
 
 const used = new Set<string>();
 const capacity = (array: FighterArray) => {
@@ -68,6 +27,13 @@ const scalarArray = (mode: "copy" | "same", lines: string[], indent: string, tar
     else lines.push(`${loop} {`, `${indent}  const value = ${name}[${index}]${fallback};`, `${indent}  const other = ${sourceLocal(name)}[${index}]${fallback};`, `${indent}  if (${sameTest(row, "value", "other")}) return false;`, `${indent}}`);
     return;
   }
+  const unrolled = UNROLLED[array.capacity];
+  if (mode === "copy" && unrolled !== undefined) {
+    const local = `${name}Copy`;
+    lines.push(`${indent}const ${local} = ${to};`, `${indent}const ${sourceLocal(local)} = ${from};`);
+    for (let element = 0; element < unrolled; element++) lines.push(`${indent}${local}[${element}] = ${copyValue(row, `${sourceLocal(local)}[${element}]${fallback}`)};`);
+    return;
+  }
   const loop = `${indent}for (let ${index} = 0; ${index} < ${capacity(array)}; ${index}++)`;
   if (mode === "copy") lines.push(`${loop} ${to}[${index}] = ${copyValue(row, `${from}[${index}]${fallback}`)};`);
   else if (fallback === "") lines.push(`${loop} if (${sameTest(row, `${to}[${index}]`, `${from}[${index}]`)}) return false;`);
@@ -88,6 +54,7 @@ const inlineRecords = (mode: "copy" | "same", lines: string[], indent: string, t
 
 const walk = (mode: "copy" | "same"): Walk => (lines, indent, target, source, unordered, prefix, group) => {
   const done = new Set<string>();
+  const hoisted = new Set<string>();
   const rows = inSameOrder(mode, group, unordered, prefix);
   for (const row of rows) {
     const array = arrayOf(row);
@@ -106,7 +73,17 @@ const walk = (mode: "copy" | "same"): Walk => (lines, indent, target, source, un
     }
     if (row[mode] === "none") continue;
     const field = leaf(row, prefix);
-    if (mode === "copy") lines.push(`${indent}${target}.${field} = ${copyValue(row, `${source}.${field}`)};`);
+    const dot = field.indexOf(".");
+    if (mode === "copy" && dot > 0) {
+      const record = field.slice(0, dot);
+      const local = `${record}Copy`;
+      if (!hoisted.has(record)) {
+        hoisted.add(record);
+        lines.push(`${indent}const ${local} = ${target}.${record};`, `${indent}const ${sourceLocal(local)} = ${source}.${record};`);
+      }
+      const rest = field.slice(dot + 1);
+      lines.push(`${indent}${local}.${rest} = ${copyValue(row, `${sourceLocal(local)}.${rest}`)};`);
+    } else if (mode === "copy") lines.push(`${indent}${target}.${field} = ${copyValue(row, `${source}.${field}`)};`);
     else lines.push(`${indent}if (${sameTest(row, `${target}.${field}`, `${source}.${field}`)}) return false;`);
   }
 };
@@ -180,9 +157,12 @@ const packWalk = (mode: "copy" | "same", lines: string[], group: FighterGroup) =
     if (length.copy !== "plain") throw new Error("pack.length copies plain");
     lines.push(
       "  const pack = target.pack;",
-      "  const spares = packSpares(target);",
-      "  while (pack.length < source.pack.length) pack[pack.length] = spares?.[pack.length] ?? createPlacedObject();",
-      "  pack.length = source.pack.length;",
+      "  const sourcePack = source.pack;",
+      "  if (pack.length !== sourcePack.length) {",
+      "    const spares = packSpares(target);",
+      "    while (pack.length < sourcePack.length) pack[pack.length] = spares?.[pack.length] ?? createPlacedObject();",
+      "    pack.length = sourcePack.length;",
+      "  }",
     );
   } else lines.push(`  if (${sameTest(length, "target.pack.length", "source.pack.length")}) return false;`);
   lines.push(`  for (let ${index} = 0; ${index} <= source.pack.length; ${index}++) {`, `    const ${local} = placedObject(target, ${index});`, `    const ${source} = placedObject(source, ${index});`);
@@ -190,9 +170,9 @@ const packWalk = (mode: "copy" | "same", lines: string[], group: FighterGroup) =
   lines.push("  }");
 };
 
-const body = (mode: "copy" | "same"): string[] => {
+const body = (mode: "copy" | "same", groups: readonly FighterGroup[] = FIGHTER_GROUPS): string[] => {
   const lines: string[] = [];
-  for (const group of FIGHTER_GROUPS) {
+  for (const group of groups) {
     if (group.key === "projectiles") {
       lines.push(mode === "copy" ? "  copyFighterProjectiles(target, source);" : "  if (!sameFighterProjectiles(target, source)) return false;");
       continue;
@@ -428,12 +408,15 @@ const checkCoverage = () => {
   if (placed.join() !== pack.join()) throw new Error("pack[] rows must mirror placed rows");
 };
 
+
 export function renderFighterState(): string {
   checkCoverage();
   checkPackCanon();
   used.clear();
   imported.clear();
-  const copy = body("copy");
+  const half = copyHalf();
+  const copyHead = body("copy", FIGHTER_GROUPS.slice(0, half));
+  const copyTail = body("copy", FIGHTER_GROUPS.slice(half));
   const same = body("same");
   const projectiles = projectileFunctions();
   const canon = canonWalk();
@@ -456,13 +439,19 @@ export function renderFighterState(): string {
     'import type { Fighter, Projectile } from "../../game/sim/fighter";',
     ...[...modules].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)).map(([module, names]) => `import { ${names.join(", ")} } from "${specifier(module)}";`),
     "",
-    "const retained = (activeMask: number, slot: number | undefined) =>",
-    "  (slot !== undefined && activeMask > 0 && activeMask < 16 && slot >= 0 && slot < 4 && (activeMask & (1 << slot)) !== 0 ? slot : undefined);",
+    "const NO_SLOTS: Readonly<Record<number, number | undefined>> = {};",
+    `const RETAINED_SLOTS: Readonly<Record<number, Readonly<Record<number, number | undefined>>>> = { ${retainedSlots()} };`,
     "",
     ...projectiles.copy,
     "",
+    ...copyPart("copyFighterHead", copyHead),
+    "",
+    ...copyPart("copyFighterTail", copyTail),
+    "",
     "export function copyFighterState(target: Fighter, source: Readonly<Fighter>, activeMask: number): void {",
-    ...copy,
+    "  const keep = RETAINED_SLOTS[activeMask] ?? NO_SLOTS;",
+    `  copyFighterHead(target, source${keeps(copyHead)});`,
+    `  copyFighterTail(target, source${keeps(copyTail)});`,
     "}",
     "",
     ...projectiles.same,

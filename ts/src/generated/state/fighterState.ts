@@ -5,8 +5,8 @@ import { PARTICIPANT_CAPACITY } from "../../game/input/participants";
 import { Character, HERO_STATUS_GROUPS, SPECIAL_ACTION_CAPACITY, SpecialAction } from "../../game/sim/codes";
 import { at } from "wisp/src/runtime/lookup";
 
-const retained = (activeMask: number, slot: number | undefined) =>
-  (slot !== undefined && activeMask > 0 && activeMask < 16 && slot >= 0 && slot < 4 && (activeMask & (1 << slot)) !== 0 ? slot : undefined);
+const NO_SLOTS: Readonly<Record<number, number | undefined>> = {};
+const RETAINED_SLOTS: Readonly<Record<number, Readonly<Record<number, number | undefined>>>> = { 1: { 0: 0 }, 2: { 1: 1 }, 3: { 0: 0, 1: 1 }, 4: { 2: 2 }, 5: { 0: 0, 2: 2 }, 6: { 1: 1, 2: 2 }, 7: { 0: 0, 1: 1, 2: 2 }, 8: { 3: 3 }, 9: { 0: 0, 3: 3 }, 10: { 1: 1, 3: 3 }, 11: { 0: 0, 1: 1, 3: 3 }, 12: { 2: 2, 3: 3 }, 13: { 0: 0, 2: 2, 3: 3 }, 14: { 1: 1, 2: 2, 3: 3 }, 15: { 0: 0, 1: 1, 2: 2, 3: 3 } };
 
 function copyFighterProjectiles(target: Fighter, source: Readonly<Fighter>): void {
   const targets = target.projectiles;
@@ -45,7 +45,7 @@ function copyFighterProjectiles(target: Fighter, source: Readonly<Fighter>): voi
   target.projectileSlots = slots;
 }
 
-export function copyFighterState(target: Fighter, source: Readonly<Fighter>, activeMask: number): void {
+function copyFighterHead(target: Fighter, source: Readonly<Fighter>, keep: Readonly<Record<number, number | undefined>>): void {
   target.character = source.character;
   target.facing = source.facing;
   const tuning = target.tuning;
@@ -68,12 +68,18 @@ export function copyFighterState(target: Fighter, source: Readonly<Fighter>, act
   motion.z = sourceMotion.z;
   motion.vx = sourceMotion.vx;
   motion.vz = sourceMotion.vz;
-  motion.meleeX.original = sourceMotion.meleeX.original;
-  motion.meleeX.published = sourceMotion.meleeX.published;
-  motion.meleeZ.original = sourceMotion.meleeZ.original;
-  motion.meleeZ.published = sourceMotion.meleeZ.published;
-  motion.meleeVelocityZ.original = sourceMotion.meleeVelocityZ.original;
-  motion.meleeVelocityZ.published = sourceMotion.meleeVelocityZ.published;
+  const meleeXCopy = motion.meleeX;
+  const sourceMeleeXCopy = sourceMotion.meleeX;
+  meleeXCopy.original = sourceMeleeXCopy.original;
+  meleeXCopy.published = sourceMeleeXCopy.published;
+  const meleeZCopy = motion.meleeZ;
+  const sourceMeleeZCopy = sourceMotion.meleeZ;
+  meleeZCopy.original = sourceMeleeZCopy.original;
+  meleeZCopy.published = sourceMeleeZCopy.published;
+  const meleeVelocityZCopy = motion.meleeVelocityZ;
+  const sourceMeleeVelocityZCopy = sourceMotion.meleeVelocityZ;
+  meleeVelocityZCopy.original = sourceMeleeVelocityZCopy.original;
+  meleeVelocityZCopy.published = sourceMeleeVelocityZCopy.published;
   motion.grounded = sourceMotion.grounded;
   motion.crouching = sourceMotion.crouching;
   motion.fastFalling = sourceMotion.fastFalling;
@@ -115,10 +121,14 @@ export function copyFighterState(target: Fighter, source: Readonly<Fighter>, act
   const sourceLaunch = source.launch;
   launch.knockbackX = sourceLaunch.knockbackX;
   launch.knockbackZ = sourceLaunch.knockbackZ;
-  launch.meleeKnockbackX.original = sourceLaunch.meleeKnockbackX.original;
-  launch.meleeKnockbackX.published = sourceLaunch.meleeKnockbackX.published;
-  launch.meleeKnockbackZ.original = sourceLaunch.meleeKnockbackZ.original;
-  launch.meleeKnockbackZ.published = sourceLaunch.meleeKnockbackZ.published;
+  const meleeKnockbackXCopy = launch.meleeKnockbackX;
+  const sourceMeleeKnockbackXCopy = sourceLaunch.meleeKnockbackX;
+  meleeKnockbackXCopy.original = sourceMeleeKnockbackXCopy.original;
+  meleeKnockbackXCopy.published = sourceMeleeKnockbackXCopy.published;
+  const meleeKnockbackZCopy = launch.meleeKnockbackZ;
+  const sourceMeleeKnockbackZCopy = sourceLaunch.meleeKnockbackZ;
+  meleeKnockbackZCopy.original = sourceMeleeKnockbackZCopy.original;
+  meleeKnockbackZCopy.published = sourceMeleeKnockbackZCopy.published;
   launch.hitstun = sourceLaunch.hitstun;
   launch.throwHitstun = sourceLaunch.throwHitstun;
   launch.hitlag = sourceLaunch.hitlag;
@@ -161,10 +171,14 @@ export function copyFighterState(target: Fighter, source: Readonly<Fighter>, act
   shield.pushbackX = sourceShield.pushbackX;
   shield.recoilX = sourceShield.recoilX;
   shield.recoilZ = sourceShield.recoilZ;
-  shield.meleeRecoilX.original = sourceShield.meleeRecoilX.original;
-  shield.meleeRecoilX.published = sourceShield.meleeRecoilX.published;
-  shield.meleeRecoilZ.original = sourceShield.meleeRecoilZ.original;
-  shield.meleeRecoilZ.published = sourceShield.meleeRecoilZ.published;
+  const meleeRecoilXCopy = shield.meleeRecoilX;
+  const sourceMeleeRecoilXCopy = sourceShield.meleeRecoilX;
+  meleeRecoilXCopy.original = sourceMeleeRecoilXCopy.original;
+  meleeRecoilXCopy.published = sourceMeleeRecoilXCopy.published;
+  const meleeRecoilZCopy = shield.meleeRecoilZ;
+  const sourceMeleeRecoilZCopy = sourceShield.meleeRecoilZ;
+  meleeRecoilZCopy.original = sourceMeleeRecoilZCopy.original;
+  meleeRecoilZCopy.published = sourceMeleeRecoilZCopy.published;
   shield.drainResumePending = sourceShield.drainResumePending;
   shield.triggerWasActive = sourceShield.triggerWasActive;
   shield.triggerAge = sourceShield.triggerAge;
@@ -193,11 +207,11 @@ export function copyFighterState(target: Fighter, source: Readonly<Fighter>, act
   for (const to of hits.entries) {
     const from = sourceHits.entries[hit++];
     if (from === undefined) throw new Error(`no hits.entries entry ${hit - 1} to copy`);
-    to.attacker = retained(activeMask, from.attacker);
+    to.attacker = keep[from.attacker as number];
     to.attackSerial = from.attackSerial;
     to.window = from.window;
   }
-  hits.lastAttacker = retained(activeMask, sourceHits.lastAttacker);
+  hits.lastAttacker = keep[sourceHits.lastAttacker as number];
   hits.lastAttackSerial = sourceHits.lastAttackSerial;
   hits.lastWindow = sourceHits.lastWindow;
   const visuals = target.visuals;
@@ -216,9 +230,17 @@ export function copyFighterState(target: Fighter, source: Readonly<Fighter>, act
   visuals.shield = sourceVisuals.shield;
   visuals.shieldReflect = sourceVisuals.shieldReflect;
   visuals.manaDenied = sourceVisuals.manaDenied;
+}
+
+function copyFighterTail(target: Fighter, source: Readonly<Fighter>, keep: Readonly<Record<number, number | undefined>>): void {
   const special = target.special;
   const sourceSpecial = source.special;
-  for (let i = 0; i < PARTICIPANT_CAPACITY; i++) special.hitTargets[i] = retained(activeMask, sourceSpecial.hitTargets[i]);
+  const hitTargetsCopy = special.hitTargets;
+  const sourceHitTargetsCopy = sourceSpecial.hitTargets;
+  hitTargetsCopy[0] = keep[sourceHitTargetsCopy[0] as number];
+  hitTargetsCopy[1] = keep[sourceHitTargetsCopy[1] as number];
+  hitTargetsCopy[2] = keep[sourceHitTargetsCopy[2] as number];
+  hitTargetsCopy[3] = keep[sourceHitTargetsCopy[3] as number];
   special.action = sourceSpecial.action;
   special.ex = sourceSpecial.ex;
   special.exArmorUsed = sourceSpecial.exArmorUsed;
@@ -320,8 +342,8 @@ export function copyFighterState(target: Fighter, source: Readonly<Fighter>, act
   grab.serial = sourceGrab.serial;
   grab.mashX = sourceGrab.mashX;
   grab.mashZ = sourceGrab.mashZ;
-  grab.owner = retained(activeMask, sourceGrab.owner);
-  grab.target = retained(activeMask, sourceGrab.target);
+  grab.owner = keep[sourceGrab.owner as number];
+  grab.target = keep[sourceGrab.target as number];
   const ledge = target.ledge;
   const sourceLedge = source.ledge;
   ledge.state = sourceLedge.state;
@@ -370,7 +392,11 @@ export function copyFighterState(target: Fighter, source: Readonly<Fighter>, act
   status.conditionFrames = sourceStatus.conditionFrames;
   status.conditionGroup = sourceStatus.conditionGroup;
   status.conditionImmunityFrames = sourceStatus.conditionImmunityFrames;
-  for (let i = 0; i < HERO_STATUS_GROUPS; i++) status.conditionImmunity[i] = sourceStatus.conditionImmunity[i] ?? 0;
+  const conditionImmunityCopy = status.conditionImmunity;
+  const sourceConditionImmunityCopy = sourceStatus.conditionImmunity;
+  conditionImmunityCopy[0] = sourceConditionImmunityCopy[0] ?? 0;
+  conditionImmunityCopy[1] = sourceConditionImmunityCopy[1] ?? 0;
+  conditionImmunityCopy[2] = sourceConditionImmunityCopy[2] ?? 0;
   status.poisonFrames = sourceStatus.poisonFrames;
   status.poisonEvery = sourceStatus.poisonEvery;
   status.poisonDamage = sourceStatus.poisonDamage;
@@ -390,15 +416,23 @@ export function copyFighterState(target: Fighter, source: Readonly<Fighter>, act
   candle.timer = sourceCandle.timer;
   candle.away = sourceCandle.away;
   candle.guard = sourceCandle.guard;
-  for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) candle.struck[slot] = sourceCandle.struck[slot];
+  const struckCopy = candle.struck;
+  const sourceStruckCopy = sourceCandle.struck;
+  struckCopy[0] = sourceStruckCopy[0];
+  struckCopy[1] = sourceStruckCopy[1];
+  struckCopy[2] = sourceStruckCopy[2];
+  struckCopy[3] = sourceStruckCopy[3];
   candle.specialStruck = sourceCandle.specialStruck;
   candle.dropSerial = sourceCandle.dropSerial;
   candle.snuffSerial = sourceCandle.snuffSerial;
   candle.returnSerial = sourceCandle.returnSerial;
   const pack = target.pack;
-  const spares = packSpares(target);
-  while (pack.length < source.pack.length) pack[pack.length] = spares?.[pack.length] ?? createPlacedObject();
-  pack.length = source.pack.length;
+  const sourcePack = source.pack;
+  if (pack.length !== sourcePack.length) {
+    const spares = packSpares(target);
+    while (pack.length < sourcePack.length) pack[pack.length] = spares?.[pack.length] ?? createPlacedObject();
+    pack.length = sourcePack.length;
+  }
   for (let animal = 0; animal <= source.pack.length; animal++) {
     const placed = placedObject(target, animal);
     const sourcePlaced = placedObject(source, animal);
@@ -409,7 +443,12 @@ export function copyFighterState(target: Fighter, source: Readonly<Fighter>, act
     placed.direction = sourcePlaced.direction;
     placed.durability = sourcePlaced.durability;
     placed.serial = sourcePlaced.serial;
-    for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) placed.struck[slot] = sourcePlaced.struck[slot];
+    const struckCopy = placed.struck;
+    const sourceStruckCopy = sourcePlaced.struck;
+    struckCopy[0] = sourceStruckCopy[0];
+    struckCopy[1] = sourceStruckCopy[1];
+    struckCopy[2] = sourceStruckCopy[2];
+    struckCopy[3] = sourceStruckCopy[3];
     placed.specialStruck = sourcePlaced.specialStruck;
     placed.mode = sourcePlaced.mode;
     placed.modeFrame = sourcePlaced.modeFrame;
@@ -418,6 +457,12 @@ export function copyFighterState(target: Fighter, source: Readonly<Fighter>, act
     placed.surface = sourcePlaced.surface;
     placed.spec = sourcePlaced.spec;
   }
+}
+
+export function copyFighterState(target: Fighter, source: Readonly<Fighter>, activeMask: number): void {
+  const keep = RETAINED_SLOTS[activeMask] ?? NO_SLOTS;
+  copyFighterHead(target, source, keep);
+  copyFighterTail(target, source, keep);
 }
 
 function sameFighterProjectiles(target: Readonly<Fighter>, source: Readonly<Fighter>): boolean {
