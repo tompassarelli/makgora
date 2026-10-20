@@ -154,7 +154,9 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
   }
   if (game.training) {
 
-    if (PARTICIPANT_SLOTS.some(slot => isActive(world, slot) && humanFighterActive(game, slot) && controls.inputs[slot].resetPressed)) {
+    let resetPressed = false;
+    for (const slot of PARTICIPANT_SLOTS) if (isActive(world, slot) && humanFighterActive(game, slot) && controls.inputs[slot].resetPressed) resetPressed = true;
+    if (resetPressed) {
       resetTrainingPositions(game.trainer, world, game.computerMask, matchSpawnX);
       for (const slot of PARTICIPANT_SLOTS) clearAttackBuffer(controls.commands[slot]);
     }

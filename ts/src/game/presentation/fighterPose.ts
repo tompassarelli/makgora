@@ -127,6 +127,16 @@ export function selectFighterClipName(pose: FighterPose, name: string): void {
 }
 
 
+const MOTION_KEYS: Record<number, string | undefined> = {};
+
+function motionKey(motion: number): string {
+  const known = MOTION_KEYS[motion];
+  if (known !== undefined) return known;
+  const key = `motion${motion}`;
+  MOTION_KEYS[motion] = key;
+  return key;
+}
+
 function playIndex(pose: FighterPose, key: string, index: number): void {
   if (pose.animation === key) return;
   selectFighterClipIndex(pose, index);
@@ -183,7 +193,7 @@ export function advanceFighterPose(
   const rate = selectClip(pose, fighter, world, phase, hit, charging);
 
 
-  const stopped = pose.animation === `motion${IllidanLocomotion.stop}` && pose.motion.transitionRemaining === 0;
+  const stopped = pose.animation === motionKey(IllidanLocomotion.stop) && pose.motion.transitionRemaining === 0;
   pose.rate = fighter.launch.hitlag > 0 || charging || stopped ? 0.0 : rate;
 }
 
@@ -333,18 +343,18 @@ function selectClip(pose: FighterPose, f: Readonly<Fighter>, world: Readonly<Ros
   }
   if (illidan) {
     const { motion } = pose.motion;
-    playIndex(pose, `motion${motion}`, locomotionClipIndex(motion));
+    playIndex(pose, motionKey(motion), locomotionClipIndex(motion));
     return locomotionRate(f, motion);
   }
   const locomotionTable = koboldLocomotionClips(character, f.candle.state) ?? table;
   const groundClip = groundLocomotionClip(character, pose.motion.motion, locomotionTable);
   if (groundClip !== undefined) {
-    playLocomotionIndex(pose, `motion${pose.motion.motion}`, groundClip.index);
+    playLocomotionIndex(pose, motionKey(pose.motion.motion), groundClip.index);
     return groundLocomotionRate(f, pose.motion.motion, groundClip);
   }
   const moving = tableLocomotion(locomotionTable, pose.motion.motion);
   if (moving !== undefined) {
-    playIndex(pose, `motion${pose.motion.motion}`, moving.index);
+    playIndex(pose, motionKey(pose.motion.motion), moving.index);
     return pose.motion.motion === IllidanLocomotion.run ? locomotionRate(f, pose.motion.motion) : tableLocomotionRate(moving, pose.motion.motion);
   }
   const walking = f.motion.grounded && Math.abs(totalVelocityX(f)) > f32(0.1);
