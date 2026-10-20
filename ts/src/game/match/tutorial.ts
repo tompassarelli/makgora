@@ -12,7 +12,7 @@ import { GroundAction, SpecialAction } from "../sim/codes";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { PartnerBehaviour, PartnerEscape, PartnerTech, type TrainingState } from "./trainingState";
 import {
-  type MatchState, Phase, characterFor, computerActive, cycleSlotMode, firstHumanSlot, humanCount, humanFighterActive, humanPresent, requestStageSelect, selectCharacter, selectStage,
+  type MatchState, Phase, characterFor, computerActive, cycleSlotMode, firstHumanSlot, humanCount, humanFighterActive, humanPresent, requestStageSelect, selectCharacter, selectCpuCharacter, selectStage,
   setTraining, setTutorialLesson,
 } from "../lobby/lobbyState";
 
@@ -105,8 +105,8 @@ function countAction(action: LessonAction, world: Roster, playerMask: number, co
     if (!isActive(world, slot)) continue;
     const f = fighterAt(world, slot);
     const player = participantActive(playerMask, slot);
-    const partner = participantActive(computerMask, slot);
-    const byPlayer = f.hits.lastAttacker !== undefined && participantActive(playerMask, f.hits.lastAttacker);
+    const partner = participantActive(computerMask === 0 ? playerMask : computerMask, slot);
+    const byPlayer = f.hits.lastAttacker !== undefined && f.hits.lastAttacker !== slot && participantActive(playerMask, f.hits.lastAttacker);
     if (player && action === LessonAction.dash && f.ground.action === GroundAction.dash && beforeGround[slot] !== GroundAction.dash) count++;
     else if (player && action === LessonAction.doubleJump && f.jump.serial !== beforeJump[slot] && f.jump.isDouble) count++;
     else if (player && action === LessonAction.special && f.special.action !== SpecialAction.none && beforeSpecial[slot] === SpecialAction.none) count++;
@@ -158,14 +158,20 @@ export const TUTORIAL_STAGE = 0;
 
 
 
-export function prepareTutorial(game: MatchState, slot: number): boolean {
-  const first = firstHumanSlot(game);
-  if (first === undefined || game.phase !== Phase.characterMenu || !humanPresent(game, slot) || humanCount(game) > 1) return false;
+function addTutorialPartner(game: MatchState, first: number): void {
   if (!PARTICIPANT_SLOTS.some(other => computerActive(game, other))) {
     const partner = PARTICIPANT_SLOTS.find(other => !humanFighterActive(game, other) && !computerActive(game, other));
 
     if (partner !== undefined) for (let step = 0; step < 2; step++) cycleSlotMode(game, first, partner);
   }
+  if (humanCount(game) > 1) for (const other of PARTICIPANT_SLOTS) if (computerActive(game, other) && !game.characterReadiness[other]) selectCpuCharacter(game, first, other, characterFor(game, other) ?? game.characterChoices[other]);
+}
+
+
+export function prepareTutorial(game: MatchState, slot: number): boolean {
+  const first = firstHumanSlot(game);
+  if (first === undefined || game.phase !== Phase.characterMenu || !humanPresent(game, slot)) return false;
+  addTutorialPartner(game, first);
   setTraining(game, slot, true);
   setTutorialLesson(game, slot, game.trainer.lesson < 0 || game.trainer.lesson >= LESSONS.length ? 0 : game.trainer.lesson, LESSONS.length);
   for (const other of PARTICIPANT_SLOTS) if (humanFighterActive(game, other) && humanPresent(game, other)) selectCharacter(game, other, characterFor(game, other) ?? game.characterChoices[other]);

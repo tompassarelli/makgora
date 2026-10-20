@@ -1,15 +1,18 @@
-# Smashcraft 0.1.2
+# Smashcraft 0.1.3
 *A platform fighter inside Warcraft III*
 
 **Pick a Warcraft hero, fight across floating stages and knock your opponents off the screen.** Smashcraft is a free fan-made platform fighter inspired by Super Smash Bros. Melee, built as a custom map for Warcraft III, with rollback netcode for online games. It is early: tell us what feels off.
 
 **Best in Classic graphics.**
 
+## New in 0.1.3
+- **Tutorial in any lobby:** the Tutorial button now works with other players in the lobby, not only when you play alone. Everyone joins the lessons, with a computer partner when a slot is free.
+
 ## New in 0.1.2
 - **Online play:** input delay is one value for the whole match, the same for every player, set automatically from the slowest connection and capped at 16 frames. Character select shows it with the match rules, and each player's ping on their card. Rollback and pacing are tuned for Battle.net, and the game does less work each frame, so there are fewer stutters.
 - **Chat:** Warcraft's chat shows on character select, stage select and in matches, and the select screens leave a clear column for it.
 - **Select screens:** buttons sit in the header and player cards along the bottom. Click the **VERSUS** header to switch between Versus, Training, Classic and Lore Battles; Team Battle and Friendly Fire sit right below it. In Team Battle, fighters, portraits and the match HUD all take their team's colour.
-- **Tutorial:** offered when you play alone. Lessons and the pause-menu controls name your own keys, and finishing it returns you to Versus.
+- **Tutorial:** lessons and the pause-menu controls name your own keys, and finishing it returns you to Versus.
 - **Fighters:** Tinker stops sliding when he starts the Laser, Shadow Hunter's Hex lasts one second longer, Rifleman keeps his rifle through his victory cheer and Warden's cloak hangs properly in hers. A KO'd fighter tumbles in its colour, and rolling or being hit no longer picks up an EX drop.
 - **Computer opponents:** a new CPU slot starts as a Random opponent, and CPU chips are numbered by their own slot.
 - **Camera:** four-player games ease their zoom, and the pre-match camera no longer shakes.
@@ -26,9 +29,9 @@
 - A super meter for EX specials and ultimates.
 
 ## How to play
-1. Download **Smashcraft 0.1.2.w3x** from this page and put it in your Warcraft III **Maps** folder.
+1. Download **Smashcraft 0.1.3.w3x** from this page and put it in your Warcraft III **Maps** folder.
 2. In Warcraft III's options set **Graphics to Classic**, and restart the game if you just changed it.
-3. Open **Custom Game**, **Local Area Network** or **Battle.net** custom games and pick Smashcraft 0.1.2.
+3. Open **Custom Game**, **Local Area Network** or **Battle.net** custom games and pick Smashcraft 0.1.3.
 4. Choose your controls, your fighter and a stage, then press **Y**.
 
 New here? Place only your own fighter chip and press Y to practice alone.

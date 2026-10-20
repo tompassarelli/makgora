@@ -76,6 +76,6 @@ export function markTutorialSeen(): void {
 }
 
 
-export const tutorialAvailable = (game: Readonly<MatchState>): boolean => humanCount(game) === 1;
+export const tutorialAvailable = (game: Readonly<MatchState>): boolean => humanCount(game) > 0;
 
 export const offersTutorial = (game: Readonly<MatchState>, seen: boolean): boolean => !seen && tutorialAvailable(game);
