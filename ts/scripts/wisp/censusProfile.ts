@@ -8,7 +8,7 @@ import type { ClientScope } from "wisp/src/headless/client";
 import { luaLockstep, readFile } from "wisp/src/headless/lua";
 import type { LuaHeadlessMap } from "wisp/src/headless/lua";
 import type { Lockstep, SyncDelivery } from "wisp/src/headless/lockstep";
-import type { PerfMeasure } from "wisp/src/headless/luaPerf";
+import { allocationSampler, type PerfMeasure } from "wisp/src/headless/luaPerf";
 
 
 const SAMPLE_STEP = 1000;
@@ -21,6 +21,7 @@ export function profileRun(
   play: (this: void, clients: Lockstep, measure: PerfMeasure) => { readonly problems: number; readonly lines: readonly string[] },
   delivery?: SyncDelivery,
   phases = false,
+  alloc = false,
 ): number {
   const bundle = readFile(bundlePath);
   const names = new Map<number, string>();
@@ -88,11 +89,21 @@ export function profileRun(
       }
     }
   };
+  const allocs = new Map<number, Map<number, [number, number]>>();
+  const sampler = allocationSampler();
+  let sampling = false;
   let clients: Lockstep | undefined;
   const scope: ClientScope = {
     enter: (client) => {
       const frame = clients?.frame ?? 0;
       if (!frames.has(frame)) return;
+      if (alloc) {
+        const into = allocs.get(frame) ?? new Map<number, [number, number]>();
+        allocs.set(frame, into);
+        sampling = true;
+        sampler.start(into);
+        return;
+      }
       current = counts.get(frame) ?? new Map();
       counts.set(frame, current);
       if (phases) {
@@ -104,6 +115,8 @@ export function profileRun(
       debug.sethook(sample, phases ? "c" : "", SAMPLE_STEP);
     },
     leave: () => {
+      if (sampling) sampler.stop();
+      sampling = false;
       debug.sethook();
       current = undefined;
       phaseRow = undefined;
@@ -113,6 +126,7 @@ export function profileRun(
   clients = lockstep;
   const result = play(lockstep, { begin: () => undefined, typed: () => undefined });
   for (const [frame, functions] of counts) for (const [line, [self, inclusive]] of functions) print(`prof\t${frame}\t${line}\t${self}\t${inclusive}`);
+  for (const [frame, functions] of allocs) for (const [line, [self, inclusive]] of functions) print(`palloc\t${frame}\t${line}\t${self}\t${inclusive}`);
   for (const [frame, slots] of phaseCounts) for (const [slot, row] of slots) print(`phase\t${frame}\t${slot}\t${row.join("\t")}`);
   for (const line of result.lines) print(`journey: ${line}`);
   return result.problems;

@@ -168,10 +168,10 @@ export function functionNamer(bundle: string): (line: number) => string {
 }
 
 
-function profileOf(output: string, frames: ReadonlySet<number>): Map<number, [number, number]> {
+function profileOf(output: string, frames: ReadonlySet<number>, kind = "prof\t"): Map<number, [number, number]> {
   const totals = new Map<number, [number, number]>();
   for (const text of output.split("\n")) {
-    if (!text.startsWith("prof\t")) continue;
+    if (!text.startsWith(kind)) continue;
     const [, frame = 0, line = 0, self = 0, inclusive = 0] = text.split("\t").map(Number);
     if (!frames.has(frame)) continue;
     const entry = totals.get(line) ?? [0, 0];
@@ -216,11 +216,11 @@ export interface CensusProject {
 const runOf = (entry: CensusEntry) => (entry.group === "stage" ? `census-stage-${entry.name}` : `census-${entry.group}`);
 
 
-export const runLua = (program: string, bundle: string, run: string, frames: number, profileFrames?: readonly number[], phases = false) => stockLua.pipe(
+export const runLua = (program: string, bundle: string, run: string, frames: number, profileFrames?: readonly number[], phases = false, alloc = false) => stockLua.pipe(
   Effect.mapError((problem) => new PerfFailure({ problem })),
 
   Effect.flatMap((lua) => Effect.scoped(Effect.gen(function*() {
-    const env = profileFrames === undefined ? undefined : { PERF_PROFILE_FRAMES: profileFrames.join(","), PERF_PROFILE_PHASES: phases ? "1" : "0" };
+    const env = profileFrames === undefined ? undefined : { PERF_PROFILE_FRAMES: profileFrames.join(","), PERF_PROFILE_PHASES: phases ? "1" : "0", PERF_PROFILE_ALLOC: alloc ? "1" : "0" };
     const child = yield* ChildProcess.make(lua, [program, bundle, join(tsDirectory, "node_modules/wisp/src/natives/warcraft.d.ts"), run, String(frames), "samples"], { env, extendEnv: true, stdin: "ignore" });
     const [out, err, code] = yield* Effect.all([Stream.mkString(Stream.decodeText(child.stdout)), Stream.mkString(Stream.decodeText(child.stderr)), child.exitCode], { concurrency: "unbounded" });
     if (code !== 0) return yield* new PerfFailure({ problem: `${run}: ${lua} exited ${code}: ${err}${out.split("\n").filter((line) => !line.startsWith("frame ")).join("\n")}` });
@@ -315,6 +315,7 @@ export const profile = (project: PerfProject): Command => (args) => Effect.gen(f
   const [topText = "12"] = flagValues(args, "top");
   const top = Number(topText);
   const phases = args.includes("--phases");
+  const alloc = args.includes("--alloc");
   const named = args.filter((arg, index) => !arg.startsWith("--") && !["--worst-frames", "--frames", "--out", "--top"].includes(args[index - 1] ?? ""));
   const [name = project.defaultRun ?? "journey"] = named;
   const map = name === (project.defaultRun ?? "journey") ? project.map : project.runs?.[name];
@@ -331,6 +332,23 @@ export const profile = (project: PerfProject): Command => (args) => Effect.gen(f
   const worst = [...costs].sort((a, b) => b[1] - a[1]).slice(0, worstCount);
   const base = new Set([...costs].sort((a, b) => Math.abs(a[1] - middle) - Math.abs(b[1] - middle)).slice(0, 30).map(([frame]) => frame));
   const selected = new Set([...worst.map(([frame]) => frame), ...base]);
+  const heavy = new Set<number>();
+  if (alloc) {
+    selected.clear();
+    const bySlot = new Map<number, [number, number][]>();
+    for (const text of output.split("\n")) {
+      const match = /^frame (\d+) p(\d+) .* alloc-bytes=(-?\d+) /.exec(text);
+      if (match === null) continue;
+      const rows = bySlot.get(Number(match[2])) ?? [];
+      rows.push([Number(match[1]), Number(match[3])]);
+      bySlot.set(Number(match[2]), rows);
+    }
+    for (const rows of bySlot.values()) {
+      rows.sort((a, b) => a[1] - b[1]);
+      for (const [frame] of rows.slice(Math.ceil(rows.length * 0.95) - 1)) heavy.add(frame);
+    }
+    for (const frame of heavy) selected.add(frame);
+  }
   if (phases) {
     const bySlot = new Map<number, [number, number][]>();
     for (const text of output.split("\n")) {
@@ -346,9 +364,15 @@ export const profile = (project: PerfProject): Command => (args) => Effect.gen(f
       for (const [frame] of rows.slice(Math.ceil(rows.length * 0.95) - 1)) selected.add(frame);
     }
   }
-  const profiled = yield* runLua(project.program.bundle, map.bundle, name, frames, [...selected], phases);
+  const profiled = yield* runLua(project.program.bundle, map.bundle, name, frames, [...selected], phases, alloc);
   if (out !== undefined) yield* Effect.tryPromise({ try: () => Bun.write(out, `${output}\n${profiled}`), catch: (cause) => new PerfFailure({ problem: `writing ${out}: ${describeCause(cause)}` }) });
   const namer = functionNamer(yield* bundleText(map.bundle));
+  if (alloc) {
+    const sites = [...profileOf(profiled, heavy, "palloc\t")].sort((a, b) => b[1][0] - a[1][0]).slice(0, top);
+    yield* Console.log(`profile ${name}: bytes requested per frame at or above any client's 95th percentile of alloc-bytes, over every client, across ${heavy.size} frames, self / inclusive\n${sites.map(([line, [self, inclusive]]) =>
+      `  ${(self / heavy.size).toFixed(0).padStart(7)} ${(inclusive / heavy.size).toFixed(0).padStart(7)}  ${line < 0 ? "(Wisp headless runtime and emulated natives)" : namer(line)}`).join("\n")}`);
+    return;
+  }
   const baseline = [...profileOf(profiled, base)].sort((a, b) => b[1][1] - a[1][1]).slice(0, 30);
   yield* Console.log(`profile ${name}: mean samples across ${base.size} median frames, inclusive / self\n${baseline.map(([line, [self, inclusive]]) =>
     `  ${(inclusive / base.size).toFixed(0).padStart(5)} ${(self / base.size).toFixed(0).padStart(5)}  ${namer(line)}`).join("\n")}`);

@@ -28,7 +28,11 @@ The #168 budget gates p99 ≤ 10 ms and worst ≤ 14 ms; CI measures Classic wit
   budget (p99 10 ms, worst frame 14 ms, predicted). `bun wisp perf profile
   playable-bot-four --phases --out FILE` preserves measured samples and each
   client's slow-frame phase samples and simulation/repair step counts;
-  profiling is a separate replay, excluded from measured costs. Spike census (#168): `bun wisp
+  profiling is a separate replay, excluded from measured costs. `perf profile RUN --alloc
+  [--top N]` replays the frames at or above any client's 95th percentile of alloc-bytes and
+  lists the `--top` map functions by bytes requested per frame, self and inclusive, over every
+  client, from Wisp's `allocationSampler` (wisp:docs/frame-cost.md); Wisp's headless runtime
+  and emulated natives are their own row. Spike census (#168): `bun wisp
   perf census [--fighter NAME] [--stage ID] [--functions]` plays every
   fighter's moves, specials and follow-ups in a playable-build training match
   and every stage's hazards, and lists any entry over 2 ms above its standing

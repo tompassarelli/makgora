@@ -46,7 +46,7 @@ const measured = (headless: LuaHeadlessMap, play: (this: void, clients: Lockstep
   if (profileText === undefined) return runLuaPerfWith(headless, bundle, declarations, play, delivery === undefined ? options : { ...options, delivery });
   const frames = new Set<number>();
   for (const text of profileText.split(",")) if (text !== "") frames.add(Number(text));
-  return profileRun(headless, bundle, declarations, frames, play, delivery, os.getenv("PERF_PROFILE_PHASES") === "1");
+  return profileRun(headless, bundle, declarations, frames, play, delivery, os.getenv("PERF_PROFILE_PHASES") === "1", os.getenv("PERF_PROFILE_ALLOC") === "1");
 };
 function writeCapture(clients: Lockstep, notes: string[]): string[] {
   const out = os.getenv("PERF_CAPTURE");
