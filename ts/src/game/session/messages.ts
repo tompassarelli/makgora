@@ -83,6 +83,8 @@ export function rulesSummary(game: Readonly<MatchState>): string {
 }
 
 const pauseControl = (start: StartControl) => (start === "Start" ? "Start" : "Backspace");
+const PLAYING_HELP_START = "Start: pause. Tap Shield before a hard landing to tech; hold Left/Right for a tech roll.\nEX special key + direction: EX special (one bar segment).\nAttack + Special (A + X): Ultimate (full bar).\nShield then Left/Right: roll; Down: dodge.";
+const PLAYING_HELP_BACKSPACE = "Backspace: pause. Tap Shield before a hard landing to tech; hold Left/Right for a tech roll.\nEX special key + direction: EX special (one bar segment).\nAttack + Special (A + X): Ultimate (full bar).\nShield then Left/Right: roll; Down: dodge.";
 export const pausedMessage = (start: StartControl) => `Paused — press ${pauseControl(start)} to resume.`;
 
 
@@ -103,7 +105,7 @@ export function matchHelp(game: Readonly<MatchState>, paused: boolean, start: St
   }
   if (!playing) return rematchStatus(game, start);
   if (paused) return `PAUSED — Press ${pauseControl(start)} to resume. Combat is frozen.${game.practice || game.endless || game.training ? "\nEscape: back to fighter selection." : ""}`;
-  return `${pauseControl(start)}: pause. Tap Shield before a hard landing to tech; hold Left/Right for a tech roll.\nEX special key + direction: EX special (one bar segment).\nAttack + Special (A + X): Ultimate (full bar).\nShield then Left/Right: roll; Down: dodge.`;
+  return start === "Start" ? PLAYING_HELP_START : PLAYING_HELP_BACKSPACE;
 }
 
 

@@ -170,7 +170,8 @@ export class ShadowInputPlayback {
         if (!sameInput(stored.network[slot], actual[slot])) changed |= 1 << slot;
       }
       // A row that ran on the inputs it keeps changes nothing in history.amend; one now wholly accepted only stops being correctable.
-      const allAccepted = frame <= known || PARTICIPANT_SLOTS.every(slot => slot === localPlayer || !humanActive(match, slot) || schedule.accepted(epoch, slot, frame) !== undefined);
+      let allAccepted = true;
+      if (frame > known) for (const slot of PARTICIPANT_SLOTS) if (allAccepted && slot !== localPlayer && humanActive(match, slot) && schedule.accepted(epoch, slot, frame) === undefined) allAccepted = false;
       if (changed === 0) {
         if (allAccepted && !history.settle(epoch, frame)) return "rejected";
         continue;

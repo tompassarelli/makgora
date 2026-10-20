@@ -215,5 +215,9 @@ export const CONTROL_FIELDS = [
 ] as const satisfies readonly (keyof Controls)[];
 
 export function sameControls(a: Readonly<Controls>, b: Readonly<Controls>): boolean {
-  return CONTROL_FIELDS.every(field => a[field] === b[field]);
+  for (let index = 0; index < CONTROL_FIELDS.length; index++) {
+    const field = CONTROL_FIELDS[index];
+    if (field !== undefined && a[field] !== b[field]) return false;
+  }
+  return true;
 }
