@@ -66,6 +66,7 @@ export class FighterHud {
 
   private readonly body: readonly framehandle[];
   private shownCharacter: number | undefined;
+  private shownColor: number | undefined;
 
   private shownVisible: boolean | undefined;
   private shownDamage: string | undefined;
@@ -127,7 +128,7 @@ export class FighterHud {
     this.body = [this.plate, this.portrait, this.damage, this.tenths, this.name, this.slotLabel];
     for (const frame of [...this.body, ...this.stocks, this.stockCount]) BlzFrameSetLevel(frame, 21);
     this.layout(slot, count);
-    this.update(false, Character.rifleman, 0.0, 0);
+    this.update(false, Character.rifleman, slot, 0.0, 0);
   }
 
   destroy(): void {
@@ -151,16 +152,18 @@ export class FighterHud {
   }
 
 
-  update(visible: boolean, character: Character, damage: number, stocks: number): void {
+  update(visible: boolean, character: Character, color: number, damage: number, stocks: number): void {
     if (this.shownVisible !== visible) {
       this.shownVisible = visible;
       for (const frame of this.body) BlzFrameSetVisible(frame, visible);
     }
-    if (this.shownCharacter !== character) {
+    if (this.shownCharacter !== character || this.shownColor !== color) {
       this.shownCharacter = character;
-      BlzFrameSetTexture(this.portrait, fighterPortrait(character, "Bust", this.slot), 0, true);
+      this.shownColor = color;
+      BlzFrameSetTexture(this.plate, `war3mapImported\\HudPlate${I2S(color)}.tga`, 0, true);
+      BlzFrameSetTexture(this.portrait, fighterPortrait(character, "Bust", color), 0, true);
       BlzFrameSetText(this.name, fighterName(character).toUpperCase());
-      for (const icon of this.stocks) BlzFrameSetTexture(icon, fighterPortrait(character, "Stock", this.slot), 0, true);
+      for (const icon of this.stocks) BlzFrameSetTexture(icon, fighterPortrait(character, "Stock", color), 0, true);
     }
     this.shake(visible, damage);
     if (this.shownDamageValue !== damage) {

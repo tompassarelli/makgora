@@ -79,7 +79,7 @@ import { loreClears } from "../classic/loreClears";
 import { Character, ItemKind, itemBit } from "../sim/codes";
 import { TILE_PORTRAIT_SLOT, cardPortrait, tilePortrait } from "./portraitFrames";
 import { TEAM_NAMES } from "../sim/teams";
-import { slotColor, teamColor } from "./slotColors";
+import { slotColor } from "./slotColors";
 import { type TutorialButton, type TutorialMenuFrames, createTutorialMenu, markTutorialSeen, offersTutorial, showTutorialLesson, tutorialAvailable, tutorialSeen } from "./tutorialMenu";
 import { ButtonClicks, type MenuControls, bindSyncHandler, consoleUi, coverScreen, createBackdrop, createSyncTrigger, createText, gameUi, highlightText, placeTopLeft, setFrameText, sizeText } from "./frames";
 
@@ -915,7 +915,8 @@ export class SelectionPanel {
       const human = humanFighterActive(game, slot);
       const choice = characterFor(game, slot);
       const teamsShown = game.teamBattle && active;
-      const color = teamsShown ? teamColor(game.teamChoices[slot]) : slotColor(slot);
+      const palette = teamsShown ? game.teamChoices[slot] : slot;
+      const color = slotColor(palette);
       BlzFrameSetTexture(frames.card, `war3mapImported\\SelectionCard${active ? color.name : "Gray"}.tga`, 0, true);
       BlzFrameSetVisible(frames.team, teamsShown);
       BlzFrameSetVisible(frames.teamLabel, teamsShown);
@@ -935,7 +936,7 @@ export class SelectionPanel {
       setFrameText(frames.status, statusText);
       placeBottomBar(frames, slot, winsShown, statusText, `x${I2S(sessionWins[slot])}`);
       if (ready) {
-        BlzFrameSetTexture(frames.portrait, portraitTexture(choice, false, slot), 0, true);
+        BlzFrameSetTexture(frames.portrait, portraitTexture(choice, false, palette), 0, true);
         setFrameText(frames.name, nameText(choice));
       }
       const computer = active && !human;

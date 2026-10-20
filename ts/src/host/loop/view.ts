@@ -563,7 +563,7 @@ export function lockArenaCamera(s: ShellState): void {
     const fighter = isActive(world, slot) ? fighterAt(world, slot) : undefined;
     const point = cameraPoint(framing, aspect, fighter?.motion.x ?? 0.0, (fighter?.motion.z ?? 0.0) + 60.0, BUBBLE_POINT);
     const outside = fighter !== undefined && fighterOffscreen(framing, aspect, fighter.character, fighter.motion.x, fighter.motion.z);
-    views(s).bubbles[slot].update(!pauseHudHidden(s) && game.phase === Phase.match && fighter !== undefined && !fighter.status.out && outside, fighter?.character ?? Character.rifleman, point.column, point.row, aspect);
+    views(s).bubbles[slot].update(!pauseHudHidden(s) && game.phase === Phase.match && fighter !== undefined && !fighter.status.out && outside, fighter?.character ?? Character.rifleman, game.teamBattle ? game.teamChoices[slot] : slot, point.column, point.row, aspect);
     readEscapeMeter(world, slot, meter);
     if (game.phase !== Phase.match || pauseHudHidden(s)) meter.shown = false;
     const meterPoint = cameraPoint(framing, aspect, meter.x, meter.z, METER_POINT);
@@ -596,10 +596,10 @@ export function renderUi(s: ShellState): void {
   for (const slot of PARTICIPANT_SLOTS) {
     if (s.participants[slot].body !== undefined && isActive(s.world, slot)) {
       const fighter = fighterAt(s.world, slot);
-      ui.huds[slot].update(showMatch, fighter.character, fighter.status.damage, s.game.endless ? 0 : fighter.status.stocks);
+      ui.huds[slot].update(showMatch, fighter.character, game.teamBattle ? game.teamChoices[slot] : slot, fighter.status.damage, s.game.endless ? 0 : fighter.status.stocks);
       ui.manaBars[slot].hud.update(showMatch, fighter.mana.points, fighter.visuals.manaDenied, fighter.visuals.manaDrained);
     } else {
-      ui.huds[slot].update(false, Character.rifleman, 0.0, 0);
+      ui.huds[slot].update(false, Character.rifleman, slot, 0.0, 0);
       ui.manaBars[slot].hud.update(false, 0, 0, 0);
     }
     ui.selections[slot].menuBindings(s.participants[slot].bindings.bindings);

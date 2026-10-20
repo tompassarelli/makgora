@@ -22,8 +22,9 @@ export class OffscreenBubble {
   private readonly arrow: framehandle;
   private visible = false;
   private character: Character | undefined;
+  private color: number | undefined;
 
-  constructor(private readonly slot: number) {
+  constructor(slot: number) {
 
     const parent = consoleUi();
     this.portrait = createBackdrop(`OffscreenPortrait${I2S(slot)}`, parent, 920 + slot * 2);
@@ -38,16 +39,17 @@ export class OffscreenBubble {
     }
   }
 
-  update(visible: boolean, character: Character, column: number, row: number, aspect: number): void {
+  update(visible: boolean, character: Character, color: number, column: number, row: number, aspect: number): void {
     if (visible !== this.visible) {
       this.visible = visible;
       BlzFrameSetVisible(this.portrait, visible);
       BlzFrameSetVisible(this.arrow, visible);
     }
     if (!visible) return;
-    if (this.character !== character) {
+    if (this.character !== character || this.color !== color) {
       this.character = character;
-      BlzFrameSetTexture(this.portrait, fighterPortrait(character, "Tile", this.slot), 0, true);
+      this.color = color;
+      BlzFrameSetTexture(this.portrait, fighterPortrait(character, "Tile", color), 0, true);
     }
     const position = bubblePosition(column, row);
     const x = f32(0.4) + (position.column - 0.5) * aspect * f32(0.6);
