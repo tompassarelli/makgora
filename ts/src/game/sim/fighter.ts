@@ -543,7 +543,8 @@ export interface Fighter {
   readonly hits: HitRegistry;
   readonly visuals: VisualSerials;
   readonly special: Special;
-  readonly projectiles: Projectile[];
+  readonly projectiles: readonly Readonly<Projectile>[];
+  projectileSlots: number;
   readonly bear: Bear;
   readonly freezeTrap: FreezeTrap;
   readonly dodge: Dodge;
@@ -750,6 +751,7 @@ export function createFighter(character: Character, startX: number, facing: numb
       guarded: false,
     },
     projectiles: repeat(PROJECTILE_CAPACITY, () => emptyProjectile()),
+    projectileSlots: 0,
     bear: { exDamage: false, life: 0, x: 0.0, z: 0.0, velocityX: 0.0, velocityZ: 0.0, swipeCooldown: 0, hitSerial: 0, surface: undefined },
     freezeTrap: { exReach: false, life: 0, arming: 0, x: 0.0, z: 0.0, surface: undefined, serial: 0, cooldown: 0 },
     dodge: { airDodging: false, airFrame: 0, airUsed: false, airMotionFrames: 0, groundFrame: 0, groundDirection: 0, groundEntryFacing: 0 },

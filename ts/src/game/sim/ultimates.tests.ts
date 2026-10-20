@@ -1,5 +1,6 @@
 import { STAGE_CATALOG } from "../menu/stageCatalog";
 import { floorMod } from "wisp/src/sim/intMath";
+import { mutableProjectile } from "./fighterProjectiles";
 import { assertEquals, assertGreaterThan, assertLessThan, assertTrue, test } from "wisp/src/runtime/testing";
 import { sweep, sweepSeed } from "../core/sweep";
 import { clearAttackBuffer } from "../input/attackBuffer";
@@ -598,9 +599,10 @@ test("Cairne centre ankh burst and arrival replay per frame, including a displac
     assertEquals(arrival, answer === "hit" || answer === "wide" || answer === "shield" ? 32 : 26, recorded.join("\n"));
     assertEquals(protectedFrames, 6, recorded.join("\n"));
     copyReplayState(replay, saved);
-    const shifted = fighterAt(replay.world, 0).projectiles.find((projectile) => projectile.life > 0 && projectile.spec === ankhSpec);
-    assertTrue(shifted !== undefined);
-    if (shifted === undefined) throw new Error("missing recorded ankh");
+    const shiftedIndex = fighterAt(replay.world, 0).projectiles.findIndex((projectile) => projectile.life > 0 && projectile.spec === ankhSpec);
+    assertTrue(shiftedIndex >= 0);
+    if (shiftedIndex < 0) throw new Error("missing recorded ankh");
+    const shifted = mutableProjectile(fighterAt(replay.world, 0), shiftedIndex);
     shifted.x = f32(shifted.x + 400.0);
     assertTrue(firstStateDifference(saved, replay) !== undefined);
     assertTrue(stateChecksum(saved) !== stateChecksum(replay));
@@ -669,8 +671,8 @@ function bansheeRun(fault: boolean, saveAt?: (state: ReplayState) => void): Bans
       const xs = pieces.map((piece) => piece.x);
       run.span = f32(Math.max(...xs) - Math.min(...xs));
       if (fault) {
-        const piece = owner.projectiles.find((projectile) => projectile.life > 0 && projectile.spec?.trail !== undefined && projectile.spec.trail.every > 0 && projectile.x === Math.min(...xs));
-        if (piece !== undefined) piece.life -= 10;
+        const piece = owner.projectiles.findIndex((projectile) => projectile.life > 0 && projectile.spec?.trail !== undefined && projectile.spec.trail.every > 0 && projectile.x === Math.min(...xs));
+        if (piece >= 0) mutableProjectile(owner, piece).life -= 10;
       }
     }
     if (target.status.damage > lastTarget && run.contact === 0) {

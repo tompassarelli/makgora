@@ -27,6 +27,7 @@ import { initializeInfluenceOperands } from "../sim/influenceOperands";
 import type { AuthoredSpecial, FighterSpecials, SpecialPlacement, SpecialProjectile } from "../sim/specials/schema";
 import { type Roster, createRoster, fighterAt, isActive } from "../sim/roster";
 import { authoredTuning } from "../sim/tuning";
+import { settleProjectileSlots } from "../sim/fighterProjectiles";
 import { canonicalState, fighterSpecialsCanonical, specialMoveCanonical, specialPlacementCanonical, specialProjectileCanonical, stateChecksum } from "./canonical";
 import { type ReplayState, captureReplaySnapshot, copyReplayState, createReplaySnapshot } from "./snapshot";
 
@@ -484,6 +485,7 @@ export function savedState(record: Readonly<Record<string, unknown>>): ReplaySta
     const fighter = fighters[slot];
     if (!isFighter(fighter)) return undefined;
     rebindAuthoredKit(fighter);
+    settleProjectileSlots(fighter);
     initializeInfluenceOperands(fighter);
     world.fighters[slot] = fighter;
   }

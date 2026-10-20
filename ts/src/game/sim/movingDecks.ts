@@ -2,6 +2,8 @@
 import { f32 } from "wisp/src/sim/f32";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import type { Fighter } from "./fighter";
+import { mutableProjectile } from "./fighterProjectiles";
+import { at } from "wisp/src/runtime/lookup";
 import { moveMeleeX, setWorldMotionValue } from "./motion";
 import { type Roster, fighterAt, isActive } from "./roster";
 import { surfaceCount, surfaceMoves, surfaceShiftX, surfaceShiftZ, surfaceZ } from "./stage";
@@ -28,8 +30,10 @@ function carrySummons(f: Fighter, deck: number, shiftX: number, z: number): void
 }
 
 function carryMarks(f: Fighter, deck: number, shiftX: number, shiftZ: number): void {
-  for (const projectile of f.projectiles) {
-    if (projectile.life <= 0 || projectile.surface !== deck) continue;
+  for (let index = 0; index < f.projectiles.length; index++) {
+    const before = at(f.projectiles, index);
+    if (before.life <= 0 || before.surface !== deck) continue;
+    const projectile = mutableProjectile(f, index);
     projectile.x = f32(projectile.x + shiftX);
     projectile.z = f32(projectile.z + shiftZ);
   }

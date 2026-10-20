@@ -124,7 +124,7 @@ export function foldFields(lanes: Lanes, parent: number, record: unknown, depth:
   if (!isFields(record)) return;
   const fields = record;
   for (const key in fields) {
-    if (!fieldName(key) || (depth === 0 && key === "tuning")) continue;
+    if (!fieldName(key) || (depth === 0 && (key === "tuning" || key === "projectileSlots"))) continue;
     foldValue(lanes, floorMod(parent * 31 + keyHash(key), MODULUS), fields[key], depth);
   }
 }

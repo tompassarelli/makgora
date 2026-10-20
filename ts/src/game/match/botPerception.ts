@@ -5,7 +5,7 @@ import { botObservationCanonical, realParts, splitFiniteReal, writeCanonicalNumb
 import { f32 } from "wisp/src/sim/f32";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS, type ParticipantSlot, type Slots } from "../input/participants";
-import { createFighter, type Fighter, type Projectile } from "../sim/fighter";
+import { PROJECTILE_CAPACITY, createFighter, type Fighter, type Projectile } from "../sim/fighter";
 import { fighterAt, isActive, type Controls, type Roster } from "../sim/roster";
 import { copyCandleView, sameCandleView } from "../sim/heroes/koboldCandleView";
 
@@ -290,6 +290,7 @@ function createObservation(): ObservationFighter {
     bear: { ...EMPTY.bear, life: f.bear.life, x: f.bear.x, z: f.bear.z, hitSerial: f.bear.hitSerial },
     projectiles: f.projectiles.map(p => ({ ...at(EMPTY.projectiles, 0),
       life: p.life, x: p.x, z: p.z, direction: p.direction, velocityX: p.velocityX, velocityZ: p.velocityZ, serial: p.serial })),
+    projectileSlots: PROJECTILE_CAPACITY,
   };
 }
 

@@ -142,13 +142,14 @@ function hasIntegerKeys(record: object): boolean {
 
 
 
-const AUTHORED_FIELD = "tuning";
+const UNSAVED_FIGHTER_FIELDS: readonly string[] = ["tuning", "projectileSlots"];
+const NO_FIELDS: readonly string[] = [];
 
 
-function statePieces(pieces: StatePiece[], record: unknown, depth: number, skip = ""): void {
+function statePieces(pieces: StatePiece[], record: unknown, depth: number, skip = NO_FIELDS): void {
   if (!isFields(record)) return;
   for (const name in record) {
-    if (!fieldName(name) || name === skip) continue;
+    if (!fieldName(name) || skip.includes(name)) continue;
     const value = record[name];
     if (depth < STATE_PIECE_DEPTH && isFields(value) && !Array.isArray(value) && !hasIntegerKeys(value)) {
       pieces.push(`${name}{`);
@@ -193,7 +194,7 @@ function savedStatePieces(pieces: StatePiece[], state: Readonly<ReplayState>, sl
   if (slot < PARTICIPANT_SLOTS.length) {
     if (!isActive(state.world, slot)) return;
     pieces.push(`${slot}{`);
-    statePieces(pieces, fighterAt(state.world, slot), 1, AUTHORED_FIELD);
+    statePieces(pieces, fighterAt(state.world, slot), 1, UNSAVED_FIGHTER_FIELDS);
     pieces.push("}");
     return;
   }
@@ -361,7 +362,7 @@ function stepFold(fold: PendingFold, world: Readonly<Roster>): boolean {
   if (isFields(fighter)) {
     while (fold.field < fields.length && remaining > 0) {
       const key = at(fields, fold.field++);
-      if (fieldName(key) && key !== "tuning") foldValue(fold.lanes, floorMod(base * 31 + keyHash(key), MODULUS), fighter[key], 0);
+      if (fieldName(key) && key !== "tuning" && key !== "projectileSlots") foldValue(fold.lanes, floorMod(base * 31 + keyHash(key), MODULUS), fighter[key], 0);
       remaining--;
     }
   }

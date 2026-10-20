@@ -1,5 +1,6 @@
 import { floorMod } from "wisp/src/sim/intMath";
 import { at } from "wisp/src/runtime/lookup";
+import { mutableProjectile } from "../sim/fighterProjectiles";
 import { assertEquals, assertFalse, assertLessThan, assertTrue, test } from "wisp/src/runtime/testing";
 import { attackBuffer } from "../input/attackBuffer";
 import { captureNetworkFrame, createMatchFrameInput, resetMatchFrameInput } from "../match/frameInput";
@@ -106,7 +107,7 @@ test("the per-frame state hash agrees with the canonical checksum on which state
   copyReplayState(copy, played.live);
   assertEquals(stateHash(copy), stateHash(played.live));
   const changes: ((state: typeof copy) => void)[] = [
-    state => { at(fighterAt(state.world, 2).projectiles, 3).x += 0.25; },
+    state => { mutableProjectile(fighterAt(state.world, 2), 3).x += 0.25; },
     state => { fighterAt(state.world, 1).motion.vx = -fighterAt(state.world, 1).motion.vx - 1.0; },
     state => { state.match.matchSeed++; },
     state => { state.runtime.botAttackDelays[0] += 1.5; },

@@ -14,7 +14,7 @@ import { collectDamageContact } from "../sim/contacts";
 import { contactBatch, hitEffect } from "../sim/testWorld";
 import { isHeroSpecialAction } from "../sim/specials/engine";
 import { HERO_ROSTER } from "../sim/heroes/registry";
-import { createFighter } from "../sim/fighter";
+import { PROJECTILE_CAPACITY, createFighter } from "../sim/fighter";
 import { copyControls, createRoster, fighterAt, isActive, neutralControls } from "../sim/roster";
 import { surfaceLeft, surfaceRight } from "../sim/stage";
 import { FREEZE_TRAP_FREEZE_FRAMES } from "../sim/summons";
@@ -191,9 +191,12 @@ test("a computer repeats a decision only from the same state: any change to its 
   const same = () => sameComputerInputs(game.match, game.world, game.runtime, before.match, before.world, before.runtime, 1, frame);
   assertTrue(same());
   // Every number and flag of the computer's own fighter that the copy holds apart from live state.
+  fighterAt(game.world, 1).projectileSlots = PROJECTILE_CAPACITY;
+  fighterAt(before.world, 1).projectileSlots = PROJECTILE_CAPACITY;
   let leaves = 0;
   const visit = (mine: Record<string, unknown>, copy: Record<string, unknown>, depth: number) => {
     for (const key of Object.keys(copy)) {
+      if (depth === 0 && key === "projectileSlots") continue;
       const value = copy[key];
       const own = mine[key];
       if (typeof value === "number" || typeof value === "boolean") {

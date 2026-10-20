@@ -4,7 +4,7 @@
 import { clearTechInput } from "./geometry/techInput";
 import { at } from "wisp/src/runtime/lookup";
 import { floorDiv } from "wisp/src/sim/intMath";
-import { mutableProjectile } from "./fighterProjectiles";
+import { mutableProjectile, restProjectiles } from "./fighterProjectiles";
 import { aerialJumps } from "./itemBuffs";
 import { max } from "../core/numbers";
 import { AttackStyle, DASH_GRAB_REQUEST, DownState, GrabAction, LedgeState, ProjectileKind, SpecialAction, SurfaceContact } from "./codes";
@@ -152,7 +152,7 @@ export function clearSpecialOnStock(f: Fighter): void {
   bear.velocityZ = 0.0;
   bear.hitSerial = 0;
   bear.surface = undefined;
-  for (let index = 0; index < f.projectiles.length; index++) {
+  for (let index = 0; index < f.projectileSlots; index++) {
     const projectile = mutableProjectile(f, index);
     projectile.life = 0;
     projectile.x = 0.0;
@@ -169,6 +169,7 @@ export function clearSpecialOnStock(f: Fighter): void {
     projectile.spec = undefined;
     projectile.surface = undefined;
   }
+  restProjectiles(f, f.character);
   special.form = 0;
   special.variant = 0;
   special.aimX = 0;

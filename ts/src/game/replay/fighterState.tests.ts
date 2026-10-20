@@ -1,6 +1,6 @@
 import { assertEquals, assertFalse, assertTrue, test } from "wisp/src/runtime/testing";
 import { Character } from "../sim/codes";
-import { type Fighter, createFighter } from "../sim/fighter";
+import { type Fighter, PROJECTILE_CAPACITY, createFighter } from "../sim/fighter";
 import { firstFighterDifference, sameReplayState } from "./difference";
 import { copyFighterState, sameFighterState } from "../../generated/state/fighterState";
 import { createRoster } from "../sim/roster";
@@ -43,12 +43,14 @@ function walk(left: object, right: object, path: string, leaves: LeafPair[], rec
     return;
   }
   for (const key of Object.keys(left)) {
-    if (path === "" && key === "tuning") continue;
+    if (path === "" && (key === "tuning" || key === "projectileSlots")) continue;
     child(`${path}.${key}`, side => (side as Field)[key], (side, value) => { (side as Field)[key] = value; });
   }
 }
 
 function fighterLeaves(left: Fighter, right: Fighter): { leaves: LeafPair[]; records: [object, object][] } {
+  left.projectileSlots = PROJECTILE_CAPACITY;
+  right.projectileSlots = PROJECTILE_CAPACITY;
   const leaves: LeafPair[] = [];
   const records: [object, object][] = [];
   walk(left, right, "", leaves, records);
@@ -324,6 +326,7 @@ function armedFighters(row: FighterFieldRow, armed: Map<string, Armed>, snapshot
     base.placed.spec = companionPlacement();
     for (const animal of base.pack) animal.spec = base.placed.spec;
   }
+  base.projectileSlots = PROJECTILE_CAPACITY;
   const fighters = { base, changed: createFighter(base.character, 0.0, 1), hash: stateHash(alone(snapshot, base)) };
   armed.set(key, fighters);
   return fighters;
@@ -338,6 +341,12 @@ test("every Fighter schema row, changed alone, is told apart by sameFighterState
     const { base, changed, hash } = armedFighters(row, armed, snapshot);
     copyFighterState(changed, base, 1);
     if (!sameFighterState(changed, base)) misses.push(`${row.path}: the copy differs`);
+    if (row.path === "projectileSlots") {
+      changed.projectileSlots--;
+      if (!sameFighterState(changed, base) || stateHash(alone(snapshot, changed)) !== hash) misses.push(`${row.path}: a lower bound over resting slots changed the state`);
+      rows++;
+      continue;
+    }
     if (row.type === "length") {
       const list = leafValue(schemaLeaf(changed, row.path.slice(0, -".length".length))) as unknown[];
       list.length = list.length - 1;
