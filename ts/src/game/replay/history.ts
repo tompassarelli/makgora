@@ -439,8 +439,8 @@ export class ReplayHistory {
       // The frame's earlier run reached the next snapshot from the camera its own snapshot holds until the repair rewrites it.
       const framed = frame + 1 < this.nextFrame && at(this.follows, this.slotOf(frame + 1)) && (first || sameMatchCamera(state.match.camera, this.snapshotAt(frame).match.camera));
       if (!first) {
-        // Fighters the repair hasn't changed already match the snapshot.
-        this.copySnapshot(frame, state, unchanged, state.world.mask & ~this.repairShown);
+        // Fighters the repair hasn't changed, and computers repeatedComputers found equal to it, already match the snapshot.
+        this.copySnapshot(frame, state, unchanged | (repeated?.mask ?? 0), state.world.mask & ~this.repairShown);
         // Either the state this repair carried from the frame before or the one its previous call left.
         this.follows[slot] = true;
       }

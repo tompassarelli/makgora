@@ -449,6 +449,69 @@ test("a repair that repeats unchanged computer decisions reaches the state of pl
   assertGreaterThan(history.repeatedComputerDecisions(), 0);
 });
 
+test("after repairs that repeat a computer's decisions, every stored snapshot equals the straight match's state before that frame, poses included [k1 scenario]", () => {
+  const late = 4;
+  const straight = createTapeWorld({ stocks: 99, second: createFighter(Character.rifleman, 45.0, -1) });
+  const rolled = createTapeWorld({ stocks: 99, second: createFighter(Character.rifleman, 45.0, -1) });
+  straight.live.match.computerMask = 2;
+  rolled.live.match.computerMask = 2;
+  const history = new ReplayHistory();
+  const corrections = new ReplayCorrections();
+  assertTrue(history.beginEpoch(1, 1, REPLAY_MAX_CORRECTION_FRAMES));
+  assertTrue(corrections.beginEpoch(1));
+  const actual = participantInputs();
+  const predicted = participantInputs();
+  const actualAt = (frame: number) => {
+    const human = actual[0];
+    human.axisX = floorMod(floorDiv(frame, 11), 2) === 0 ? 100 : -100;
+    human.held = floorMod(frame, 7) < 2 ? bit(Action.attack) : 0;
+    human.pressed = floorMod(frame, 7) === 0 ? bit(Action.attack) : 0;
+    return actual;
+  };
+  const row = createMatchFrameInput();
+  const actualRow = createMatchFrameInput();
+  const confirm = (frame: number) => {
+    resetMatchFrameInput(actualRow);
+    assertTrue(captureNetworkFrame(actualRow, frame, actualAt(frame), rolled.live.world, 1));
+    corrections.clear();
+    assertTrue(corrections.add(actualRow));
+    assertTrue(history.correct(1, corrections, rolled.live) !== "rejected");
+  };
+  const before: ReplayState[] = [];
+  const last = 160;
+  for (let frame = 1; frame <= last; frame++) {
+    const state = createReplaySnapshot();
+    copyReplayState(state, straight.live);
+    before[frame] = state;
+    resetMatchFrameInput(row);
+    assertTrue(captureNetworkFrame(row, frame, actualAt(frame), straight.live.world, 1));
+    execute(straight, row);
+    const known = actualAt(Math.max(1, frame - late))[0];
+    predicted[0].axisX = known.axisX;
+    predicted[0].held = known.held;
+    predicted[0].pressed = 0;
+    resetMatchFrameInput(row);
+    assertTrue(captureNetworkFrame(row, frame, predicted, rolled.live.world, 1));
+    assertTrue(history.saveSpeculative(1, row, rolled.live));
+    execute(rolled, row);
+    if (frame > late) confirm(frame - late);
+  }
+  for (let frame = last - late + 1; frame <= last; frame++) confirm(frame);
+  assertEquals(history.pendingRepairFrame(1), undefined);
+  assertGreaterThan(history.repeatedComputerDecisions(), 0);
+  const stored = createReplaySnapshot();
+  let checked = 0;
+  for (let frame = history.firstRetainedFrame(); frame <= history.lastRecordedFrame(); frame++) {
+    const expected = before[frame];
+    if (expected === undefined) continue;
+    assertTrue(history.restore(1, frame, stored));
+    assertEquals(syncDifference(expected, stored), undefined, `frame ${frame}`);
+    assertEquals(firstPoseDifference(expected, stored), undefined, `frame ${frame} pose`);
+    checked++;
+  }
+  assertGreaterThan(checked, REPLAY_HISTORY_CAPACITY - 2);
+});
+
 /**
  * Four humans; slot 0's stick turns every 10 frames and its rows arrive 4
  * frames late, so each turn is mispredicted and repaired. Slot 1 jabs every
