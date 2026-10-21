@@ -253,7 +253,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
     if (hadDashGrabWindow[slot] && f.ground.dashGrabWindow > 0 && !f.attack.dashGrab) f.ground.dashGrabWindow = Math.max(0, f.ground.dashGrabWindow - 1);
   }
   for (const slot of PARTICIPANT_SLOTS) if (isActive(world, slot)) prepareBansheeContacts(fighterAt(world, slot));
-  resolveAttacks(world);
+  resolveAttacks(world, stage);
   if (bossFight) strikeBoss(game.run.boss, world, bossClock(game.matchFrame, game.startHold), game.run.player);
   advanceSpecials(world, stage, stageFrame, controls.inputs);
   updateProjectiles(world, stage, stageFrame);

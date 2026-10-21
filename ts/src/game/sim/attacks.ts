@@ -12,6 +12,7 @@ import type { Fighter } from "./fighter";
 import { type HitRegion, NO_HIT_REGION, authoredHitRegion, authoredHitRegionCount, copyHitEffect, copyHitRegion, emptyHitRegion, SHARED_GRAB_REGION } from "./hitRegions";
 import { applyAttackHit } from "./hits";
 import { hangsOnLedge } from "./ledge";
+import { belowStandingPlatform } from "./platformMoves";
 import { isAerialAttack, isJab } from "./moves";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { spawnProjectile } from "./projectiles";
@@ -84,7 +85,7 @@ function grabTargetZ(attacker: Readonly<Fighter>, target: Readonly<Fighter>): nu
 
 
 
-function selectHitRegion(world: Roster, attackerSlot: number, targetSlot: number, out: HitRegion): boolean {
+function selectHitRegion(world: Roster, attackerSlot: number, targetSlot: number, out: HitRegion, stage: number | undefined): boolean {
   const attacker = fighterAt(world, attackerSlot);
   const target = fighterAt(world, targetSlot);
   copyHitRegion(out, NO_HIT_REGION);
@@ -93,7 +94,7 @@ function selectHitRegion(world: Roster, attackerSlot: number, targetSlot: number
   if (attack.style === undefined) return false;
 
   const grabsDivine = attack.style === AttackStyle.grab && target.status.divineFrames > 0;
-  if (attacker.status.out || attacker.launch.hitlag > 0 || target.status.out || (isIntangible(target) && !grabsDivine)) return false;
+  if (attacker.status.out || attacker.launch.hitlag > 0 || target.status.out || (isIntangible(target) && !grabsDivine) || belowStandingPlatform(attacker, target, stage)) return false;
   if (attack.style === AttackStyle.grab && !canBeGrabbed(target)) return false;
   if (attack.style === AttackStyle.grab) {
     const startup = attackStartup(attacker, attack.style);
@@ -208,7 +209,7 @@ function contactBetween(source: number, target: number): HitRegion {
 }
 
 
-export function resolveAttacks(world: Roster): void {
+export function resolveAttacks(world: Roster, stage?: number): void {
   const ownsBatch = openDamageContacts();
   const { styles, shots, facings, clashed, choices, grabbed, spent } = scratch;
   for (let source = 0; source < PARTICIPANT_CAPACITY; source++) {
@@ -221,7 +222,7 @@ export function resolveAttacks(world: Roster): void {
     choices[source] = undefined;
     grabbed[source] = false;
     for (let target = 0; target < PARTICIPANT_CAPACITY; target++) {
-      if (isActive(world, target) && canHit(world, source, target)) spent[source * PARTICIPANT_CAPACITY + target] = selectHitRegion(world, source, target, contactBetween(source, target));
+      if (isActive(world, target) && canHit(world, source, target)) spent[source * PARTICIPANT_CAPACITY + target] = selectHitRegion(world, source, target, contactBetween(source, target), stage);
     }
   }
 

@@ -95,3 +95,9 @@ export function beginPlatformContact(f: Fighter, stage: number, matchFrame: numb
   dropPlatform(f, stage, matchFrame, deck);
   return true;
 }
+
+export function belowStandingPlatform(attacker: Readonly<Fighter>, target: Readonly<Fighter>, stage: number | undefined): boolean {
+  const { motion } = attacker;
+  if (stage === undefined || !motion.grounded || motion.surface === undefined || !surfacePass(stage, motion.surface)) return false;
+  return addFloat32(target.motion.z, melee(bodyTop(target.character))) < motion.z;
+}

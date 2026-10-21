@@ -25,6 +25,7 @@ import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { spawnBlasterShot, spawnProjectileMotion } from "./projectiles";
 import { type Controls, type Roster, copyControls, fighterAt, isActive, neutralControls } from "./roster";
 import { floorBelow, surfaceZAt } from "./stage";
+import { belowStandingPlatform } from "./platformMoves";
 import { advanceCompanion } from "./companions";
 import { RIFLEMAN_BEAR_LIFETIME, advanceBear, recordSpecialHit, specialAlreadyHit, canStartFreezeTrap, startFreezeTrap } from "./summons";
 import { at } from "wisp/src/runtime/lookup";
@@ -792,9 +793,10 @@ export function advanceSpecials(world: Roster, stage: number, matchFrame: number
     if (!active[ownerSlot]) continue;
     for (let targetSlot = 0; targetSlot < PARTICIPANT_CAPACITY; targetSlot++) {
       if (!isActive(world, targetSlot) || !canHit(world, ownerSlot, targetSlot)) continue;
-      contacts[ownerSlot * PARTICIPANT_CAPACITY + targetSlot] = isHeroSpecialAction(owner.special.action)
-        ? heroSpecialContact(owner, fighterAt(world, targetSlot), specialAlreadyHit(owner, targetSlot))
-        : demonHunterSpecialContact(owner, targetSlot, fighterAt(world, targetSlot));
+      const target = fighterAt(world, targetSlot);
+      contacts[ownerSlot * PARTICIPANT_CAPACITY + targetSlot] = belowStandingPlatform(owner, target, stage) ? NO_HIT_REGION
+        : isHeroSpecialAction(owner.special.action) ? heroSpecialContact(owner, target, specialAlreadyHit(owner, targetSlot))
+        : demonHunterSpecialContact(owner, targetSlot, target);
     }
   }
   for (let ownerSlot = 0; ownerSlot < PARTICIPANT_CAPACITY; ownerSlot++) {
