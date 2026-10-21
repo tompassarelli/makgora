@@ -244,6 +244,8 @@ export interface SpecialPlacement {
   readonly spread?: { readonly offsets: readonly number[]; readonly every: number } | undefined;
   readonly aimed?: boolean | undefined;
   readonly crumble?: number | undefined;
+  readonly atMark?: SpecialProjectile | undefined;
+  readonly aura?: true | undefined;
 
   readonly companion?: SpecialCompanion | undefined;
 }
@@ -260,6 +262,7 @@ export interface SpecialCompanion {
   readonly lungeDrop?: number | undefined;
 
   readonly volleyFrames?: readonly number[] | undefined;
+  readonly engage?: number | undefined;
 
   readonly followSpeed: number;
   readonly followBehind: number;

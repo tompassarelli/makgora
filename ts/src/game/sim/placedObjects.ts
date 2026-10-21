@@ -200,7 +200,8 @@ export function advancePlacedObjects(world: Roster): void {
       if (placed.life <= crumble) continue;
       let scheduled = false;
       for (const age of spec.fireAges) if (age === placed.age) scheduled = true;
-      const fires = scheduled && placed.mode === CompanionMode.follow && !inGrabContext(owner) && owner.launch.hitstun <= 0 && !owner.status.out;
+      const ready = placed.mode === CompanionMode.follow || spec.aura === true && placed.mode !== CompanionMode.stunned;
+      const fires = scheduled && ready && !inGrabContext(owner) && owner.launch.hitstun <= 0 && !owner.status.out;
       const last = spec.fireAges[spec.fireAges.length - 1];
       const shot = spec.finalShot !== undefined && placed.age === last ? spec.finalShot : spec.shot;
       if (fires && shot !== undefined && (channeled || ownedProjectiles(owner) < HERO_PROJECTILE_CAP)) {

@@ -986,7 +986,7 @@ Standing grab 7/3/26, reach 0.65H. Pummel: claw squeeze. No automatic lifesteal.
 | Up | Toss into bat cloud | 9 | f15, R11 | 85, JUGGLE |
 | Down | Claw pin then kick free | 8 | f19, R25 | 65, CHASE |
 
-**Ultimate — Infernal:** f30 cast places a clearly visible marker 1.2H ahead. An infernal lands at f60 for 14 damage, LAUNCH at 75 degrees, radius 0.8H, then stays as a stationary hazard for 180 frames. It performs exactly two telegraphed swipes at spawn+60 and spawn+120, each 10 damage, EDGE at 40 degrees, reach 0.8H, with 20 durability. No autonomous chasing, invulnerable summon, or instant full-stage hit. Dreadlord’s casting action ends f75.
+**Ultimate — Summon Inferno:** a burning mark 260 ahead; f40 the meteor crashes there for 14% at 80°, and an Infernal rises on the mark and fights for 300 frames: it walks slowly toward the nearest foe and slams with a 16-frame wind-up (9%, 45°, KO near 150% on a heavy), and its immolation burns 1.5% around it every 30 frames. It has 30 durability, a hit mid-slam staggers it, and it vanishes when its owner loses the stock. Dreadlord's casting action ends f56. No invulnerable summon or instant full-stage hit.
 
 **Required counterplay test:** Sleep from neutral must be jumpable or shieldable and cannot reset its own sleep chain. Vampiric Pounce should lose to a preemptive attack and to a correctly spaced retreat.
 

@@ -614,10 +614,14 @@ function orderCompanion(f: Fighter, order: CompanionOrder, slot = 0): void {
 }
 
 
-function placeObjects(f: Fighter, spec: Readonly<SpecialPlacement>, frame: number, stage: number): void {
+function placeObjects(f: Fighter, spec: Readonly<SpecialPlacement>, frame: number, stage: number, matchFrame: number): void {
   const spread = spec.spread;
   if (spread === undefined) {
     if (spec.frame !== frame) return;
+    if (spec.atMark !== undefined) {
+      placeOnMark(f, spec, spec.atMark, stage, matchFrame);
+      return;
+    }
     placeOne(f, spec, spec.slot ?? 0, 1, spec.offsetX, undefined);
     if (spec.outwardPair === true) placeOne(f, spec, (spec.slot ?? 0) + 1, -1, spec.offsetX, undefined);
     return;
@@ -625,6 +629,20 @@ function placeObjects(f: Fighter, spec: Readonly<SpecialPlacement>, frame: numbe
   for (let index = 0; index < spread.offsets.length; index++) {
     if (spec.frame + index * spread.every === frame) placeOne(f, spec, (spec.slot ?? 0) + index, 1, at(spread.offsets, index), stage);
   }
+}
+
+function placeOnMark(f: Fighter, spec: Readonly<SpecialPlacement>, mark: Readonly<SpecialProjectile>, stage: number, matchFrame: number): void {
+  const drawn = projectileAnchor(f, mark);
+  if (drawn === undefined) return;
+  const surface = floorSurfaceBelow(stage, matchFrame, drawn.x, f32(drawn.z + spec.height));
+  if (surface === undefined) return;
+  const slot = spec.slot ?? 0;
+  placeOne(f, spec, slot, 1, 0.0, undefined);
+  const placed = mutablePlacedObject(f, slot);
+  placed.x = drawn.x;
+  placed.z = surfaceZAt(stage, surface, matchFrame, drawn.x);
+  placed.surface = surface;
+  placed.mode = CompanionMode.stunned;
 }
 
 function placeOne(f: Fighter, spec: Readonly<SpecialPlacement>, slot: number, side: number, offsetX: number, deckStage: number | undefined): void {
@@ -736,7 +754,7 @@ export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Contr
   if (move.beam !== undefined && world !== undefined) trackBeam(f, world, move.beam, frame);
   applyMotion(f, move, frame, input, world);
   for (const spec of move.projectiles ?? []) if (spec.spawnFrame === frame) spawnHeroProjectile(f, spec, f.attack.serial + 1, stage, matchFrame, world);
-  if (move.placement !== undefined) placeObjects(f, move.placement, frame, stage);
+  if (move.placement !== undefined) placeObjects(f, move.placement, frame, stage, matchFrame);
   if (move.command?.frame === frame) orderCompanion(f, move.command.order, move.command.slot);
   if (move.burst?.frame === frame) burstProjectiles(f, move.burst.from, move.burst.into);
   if (move.ritual?.frame === frame) {

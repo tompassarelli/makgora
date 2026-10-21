@@ -2,7 +2,7 @@ import { f32 } from "wisp/src/sim/f32";
 import { Character, HeroStatusGroup, HeroStatusKind, HitElement, ItemKind } from "./codes";
 import { CHILL } from "./chill";
 import { heroRegion, type MoveRegion, type StrikeCapsule } from "./heroMoves";
-import { FollowUpInput, Relocation, frames, type AuthoredSpecial, type SpecialProjectile } from "./specials/schema";
+import { FollowUpInput, Relocation, frames, type AuthoredSpecial, type SpecialCompanion, type SpecialPlacement, type SpecialProjectile } from "./specials/schema";
 import type { AppliedStatus } from "./heroStatus";
 import type { HitEffect } from "./hitRegions";
 import { type HurtPart, type HurtPose, hurtPart, hurtPose } from "./hurtboxes";
@@ -134,8 +134,20 @@ const FORSAKEN_PALADIN: AuthoredSpecial = {
 
 const INFERNO_MARK = { ...mark("Abilities\\Spells\\Human\\MarkOfChaos\\MarkOfChaosTarget.mdx", 4, 37, 260.0), ...ON_FLOOR };
 const INFERNO_CRASH = { ...mark("Abilities\\Spells\\Other\\Incinerate\\FireLordDeathExplode.mdx", 40, 14, 0.0), atMark: INFERNO_MARK };
+const INFERNAL_IMMOLATION: SpecialProjectile = shot(0, 0.0, 70.0, 0.0, 0.0, 6, 75.0, hit(1.5, 70, 15.0, 20.0, HitElement.fire), "Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedDamage.mdx");
+const INFERNAL: SpecialCompanion = {
+  followSpeed: 2.5, followBehind: 80.0, returnSpeed: 4.0, engage: 120.0,
+  lungeStartup: 16, lungeActive: 6, lungeRecovery: 44, lungeTravel: 50.0,
+  bite: capsule(10.0, 30.0, 120.0, 60.0, 55.0), biteEffect: hit(9.0, 45, 72.0, 40.0, HitElement.fire),
+  stunFrames: 24, leash: 900.0, leashFrames: 120,
+};
+const INFERNAL_PLACEMENT: SpecialPlacement = {
+  frame: 40, offsetX: 0.0, radius: 50.0, height: 170.0, durability: 30.0, life: 300,
+  fireAges: [30, 60, 90, 120, 150, 180, 210, 240, 270], shot: INFERNAL_IMMOLATION, aura: true, atMark: INFERNO_MARK, companion: INFERNAL,
+  model: { path: "Units\\Demon\\Infernal\\Infernal.mdl", height: 240.0, alpha: 255 },
+};
 const DREADLORD: AuthoredSpecial = {
-  name: "Inferno", endFrame: 56,
+  name: "Summon Inferno", endFrame: 56,
   projectiles: [
     INFERNO_MARK,
     { ...mark("Abilities\\Weapons\\DemolisherFireMissile\\DemolisherFireMissile.mdx", 28, 12, 0.0, 600.0), velocityZ: -48.0, atMark: INFERNO_MARK },
@@ -143,6 +155,7 @@ const DREADLORD: AuthoredSpecial = {
   ],
   regions: [heroRegion(40, 42, capsule(0.0, 20.0, 0.0, 120.0, 100.0), hit(14.0, 80, 90.0, 45.0, HitElement.fire))],
   regionOrigin: INFERNO_CRASH,
+  placement: INFERNAL_PLACEMENT,
 };
 
 const VOODOO_AURA = "Abilities\\Spells\\Orc\\Voodoo\\VoodooAura.mdx";
@@ -423,7 +436,7 @@ const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined 
   [Character.warden]: "The Avatar of Vengeance rises behind her and throws four ghostly glaives. Break it or dodge the glaives.",
   [Character.lich]: "A frost wyrm sweeps straight ahead at body height. Jump or shield it.",
   [Character.forsakenPaladin]: "A golden circle marks where the Light's judgment will fall, then blesses the ground twice. Leave the circle.",
-  [Character.dreadlord]: "An Infernal crashes onto a burning mark ahead. Leave the mark.",
+  [Character.dreadlord]: "An Infernal crashes onto a burning mark ahead, then fights at your side. Break it or keep away from its flames.",
   [Character.shadowHunter]: "He dances while two serpent wards beside him spit bolts outward, then a launcher. The wards can't be hurt; hit him to end the dance and sink them.",
   [Character.pitLord]: "A clawed grab that ignores shields brands the victim with Doom, burning on after the throw. Jump or roll away.",
   [Character.beastmaster]: "His pack stampedes past: a low quilbeast, a bear, then a high hawk. Jump, shield, then stay low.",
