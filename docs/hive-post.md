@@ -1,9 +1,12 @@
-# Smashcraft 0.1.3
+# Smashcraft 0.1.4
 *A platform fighter inside Warcraft III*
 
 **Pick a Warcraft hero, fight across floating stages and knock your opponents off the screen.** Smashcraft is a free fan-made platform fighter inspired by Super Smash Bros. Melee, built as a custom map for Warcraft III, with rollback netcode for online games. It is early: tell us what feels off.
 
 **Best in Classic graphics.**
+
+## New in 0.1.4
+- **WASD controls:** the default layout is now WASD: A/D move, W aims up, S crouches and drops through platforms, and Q shields. A saved ESDF profile keeps its keys and shows as Custom.
 
 ## New in 0.1.3
 - **Tutorial in any lobby:** the Tutorial button now works with other players in the lobby, not only when you play alone. Everyone joins the lessons, with a computer partner when a slot is free.
@@ -29,9 +32,9 @@
 - A super meter for EX specials and ultimates.
 
 ## How to play
-1. Download **Smashcraft 0.1.3.w3x** from this page and put it in your Warcraft III **Maps** folder.
+1. Download **Smashcraft 0.1.4.w3x** from this page and put it in your Warcraft III **Maps** folder.
 2. In Warcraft III's options set **Graphics to Classic**, and restart the game if you just changed it.
-3. Open **Custom Game**, **Local Area Network** or **Battle.net** custom games and pick Smashcraft 0.1.3.
+3. Open **Custom Game**, **Local Area Network** or **Battle.net** custom games and pick Smashcraft 0.1.4.
 4. Choose your controls, your fighter and a stage, then press **Y**.
 
 New here? Place only your own fighter chip and press Y to practice alone.
