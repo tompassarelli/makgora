@@ -14,6 +14,7 @@ depth to Warcraft III's heroes, with the rollback netcode that online play needs
 
 Download the map from [Hive Workshop](https://www.hiveworkshop.com/threads/smashcraft-0-1-0.375492/).
 How to play: [player guide](docs/player-guide.md).
+Find games, ask questions and report bugs on [Discord](https://discord.gg/JQGZs2UJR).
 The GitHub repositories contain code only; maps are distributed on Hive Workshop,
 not committed to Git or attached to GitHub releases.
 The desktop client (controller, play, history, stats, replays, online) is
