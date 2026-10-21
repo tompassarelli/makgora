@@ -1,7 +1,7 @@
 # Smashcraft
 
 <p align="center">
-  <img src="docs/assets/smashcraft-wordmark.svg" alt="Smashcraft" width="100%">
+  <img src="docs/assets/smashcraft-banner.jpg" alt="Smashcraft" width="100%">
 </p>
 
 Smashcraft is an in-development platform fighter for Warcraft III, inspired by
