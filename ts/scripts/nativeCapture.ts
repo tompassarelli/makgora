@@ -26,7 +26,7 @@ import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Effect, Layer, Schema } from "effect";
 import { ChildProcess } from "effect/process";
 import { runProcess } from "./hostProcess";
-import { resolveTools, withRuntimeTools } from "./wisp/nativeTools";
+import { onlyClient, resolveTools, withRuntimeTools } from "./wisp/nativeTools";
 import { CLASSIC_BUILDS } from "./wisp/classicBuilds";
 import { capture, loadClients } from "wisp/scripts/warcraft/desktop";
 import { type Frame, decodePpm, encodePpm } from "wisp/scripts/wisp/frameProbe";
@@ -245,7 +245,7 @@ export const runCaptures = (args: readonly string[]) => Effect.scoped(Effect.gen
   const runtimeClients = join(out, "runtime-clients.json");
   yield* attempt("resolve capture client tools", () => {
     mkdirSync(out, { recursive: true });
-    writeFileSync(runtimeClients, withRuntimeTools(readFileSync(clientsFile, "utf8"), tools));
+    writeFileSync(runtimeClients, withRuntimeTools(onlyClient(readFileSync(clientsFile, "utf8"), clientName), tools));
   });
   const client = (yield* loadClients(runtimeClients).pipe(Effect.mapError(failure => new CaptureFailure({ problem: `${failure.operation}: ${failure.cause}` })))).find(row => row.name === clientName);
   if (client === undefined) return yield* new CaptureFailure({ problem: `${clientName} isn't in ${clientsFile}` });

@@ -108,6 +108,12 @@ export const withRuntimeTools = (clientsJson: string, tools: Readonly<Record<str
   return `${JSON.stringify({ ...base, tools }, null, 2)}\n`;
 };
 
+export const onlyClient = (clientsJson: string, name: string): string => {
+  const parsed: unknown = JSON.parse(clientsJson);
+  if (typeof parsed !== "object" || parsed === null || !("clients" in parsed) || !Array.isArray(parsed.clients)) return clientsJson;
+  return JSON.stringify({ ...parsed, clients: parsed.clients.filter((entry: unknown) => typeof entry === "object" && entry !== null && "name" in entry && entry.name === name) });
+};
+
 export const readClientEntries = (path: string): readonly ClientEntry[] => {
   const parsed: unknown = JSON.parse(readFileSync(path, "utf8"));
   const clients = typeof parsed === "object" && parsed !== null && "clients" in parsed && Array.isArray(parsed.clients) ? parsed.clients : [];
