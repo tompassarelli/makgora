@@ -134,7 +134,7 @@ const FORSAKEN_PALADIN: AuthoredSpecial = {
 
 const INFERNO_MARK = { ...mark("Abilities\\Spells\\Human\\MarkOfChaos\\MarkOfChaosTarget.mdx", 4, 37, 260.0), ...ON_FLOOR };
 const INFERNO_CRASH = { ...mark("Abilities\\Spells\\Other\\Incinerate\\FireLordDeathExplode.mdx", 40, 14, 0.0), atMark: INFERNO_MARK };
-const INFERNAL_IMMOLATION: SpecialProjectile = shot(0, 0.0, 70.0, 0.0, 0.0, 6, 75.0, hit(1.5, 70, 15.0, 20.0, HitElement.fire), "Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedDamage.mdx");
+const INFERNAL_IMMOLATION: SpecialProjectile = shot(0, 0.0, 70.0, 0.0, 0.0, 6, 75.0, hit(1.5, 70, 15.0, 20.0, HitElement.fire), "Abilities\\Weapons\\DemolisherFireMissile\\DemolisherFireMissile.mdx");
 const INFERNAL: SpecialCompanion = {
   followSpeed: 2.5, followBehind: 80.0, returnSpeed: 4.0, engage: 120.0,
   lungeStartup: 16, lungeActive: 6, lungeRecovery: 44, lungeTravel: 50.0,
