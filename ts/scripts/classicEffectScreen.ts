@@ -6,6 +6,7 @@ import { decodePpm } from "wisp/scripts/wisp/frameProbe";
 import { decodePng } from "wisp/scripts/wisp/fidelity/image";
 import { frameStamp } from "./nativeCaptureVerdict";
 import { effectSourceDigest } from "./wisp/effectVisibility";
+import { CLASSIC_BUILDS } from "./wisp/classicBuilds";
 import { measureFootprint, screenReport, screenAcceptanceProblem, type ScreenSample } from "./wisp/classicEffectScreen";
 
 const Box = Schema.Struct({ x: Schema.Finite, y: Schema.Finite, width: Schema.Finite, height: Schema.Finite });
@@ -49,7 +50,7 @@ export const readScreenCaptures = Effect.fnUntraced(function*(path: string) {
         for (const reference of [frame.shown, frame.off, frame.repeatedOff]) {
           const receiptPath = resolve(root, reference.receipt), receipt = yield* readJson(receiptPath, Receipt);
           hashes.set(receiptPath, sha256(yield* readText(receiptPath)));
-          if (receipt.build.installed !== "3.0.0.24268" || !receipt.build.equal || receipt.build.offline !== true || receipt.missed.length > 0 || resolve(dirname(receiptPath), receipt.map) !== map) return yield* new ScreenEvidenceFailure({ problem: "native receipt has wrong build/map or missed captures" });
+          if (!CLASSIC_BUILDS.includes(receipt.build.installed) || !receipt.build.equal || receipt.build.offline !== true || receipt.missed.length > 0 || resolve(dirname(receiptPath), receipt.map) !== map) return yield* new ScreenEvidenceFailure({ problem: "native receipt has wrong build/map or missed captures" });
           const fixtureIndex = manifest.fixtures.findIndex(row => row.name === reference.fixture);
           const fixture = manifest.fixtures[fixtureIndex];
           const saved = receipt.captures.find(row => row.fixture === reference.fixture && row.frame === frame.frame && row.phase === reference.phase);
