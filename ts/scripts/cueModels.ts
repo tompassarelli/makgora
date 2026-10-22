@@ -2,7 +2,7 @@ import { join } from "node:path";
 import { Console, Effect } from "effect";
 import { BunRuntime } from "@effect/platform-bun";
 import { EffectCheckFailure, readEffectReport, CALIBRATION_SUMMARY, EFFECT_CALIBRATION } from "./wisp/effectVisibility";
-import { CUE_MODEL_RECORD, cueModels, formatEffectRecord, effectRecordProblem, effectRecordUnknowns, effectFindings, effectCalibrationProblem } from "./wisp/cueModels";
+import { CUE_MODEL_RECORD, cueModels, formatEffectRecord, staleRecordRows, RECORD_COMMAND, effectRecordProblem, effectRecordUnknowns, effectFindings, effectCalibrationProblem } from "./wisp/cueModels";
 import { readScreenCaptures } from "./classicEffectScreen";
 import { screenReport, screenAcceptanceProblem } from "./wisp/classicEffectScreen";
 
@@ -22,6 +22,13 @@ BunRuntime.runMain(Effect.gen(function*() {
     for (const finding of "findings" in judged ? judged.findings : []) yield* Console.log(`${finding.fighter}\t${finding.move}\t${finding.model}\t${finding.status}\t${finding.reason.replace(/[\t\r\n]/g, " ")}`);
     const calibration = effectFindings(text, EFFECT_CALIBRATION.map(({ use }) => use));
     for (const [index, finding] of ("findings" in calibration ? calibration.findings : []).entries()) yield* Console.log(`calibration ${EFFECT_CALIBRATION[index]?.expect ?? ""}\t${finding.fighter}\t${finding.move}\t${finding.model}\t${finding.status}\t${finding.reason}`);
+  }
+  if (process.argv.includes("--check-record")) {
+    const at = process.argv.indexOf("--storage"), storage = at < 0 ? undefined : process.argv[at + 1];
+    const report = yield* readEffectReport(storage === undefined ? {} : { storage });
+    const stale = staleRecordRows(text, formatEffectRecord(report));
+    if (stale.length > 0) return yield* new EffectCheckFailure({ problem: `Classic effect record differs from a re-record of this install in ${stale.length} rows (${stale.slice(0, 5).join(", ")}${stale.length > 5 ? ", ..." : ""}); run ${RECORD_COMMAND} and commit the record` });
+    yield* Console.log(`cue models: record matches a re-record of this install (${report.facts.size} models)`);
   }
   const problem = effectRecordProblem(text) ?? effectCalibrationProblem(text);
   if (problem !== undefined) return yield* new EffectCheckFailure({ problem });

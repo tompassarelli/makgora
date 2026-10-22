@@ -394,6 +394,7 @@ export function effectSourceDigest(root = join(import.meta.dir, "../../..")): st
 export class EffectCheckFailure extends Schema.TaggedError<EffectCheckFailure>()("EffectCheckFailure", { problem: Schema.String }) {
   override get message(): string { return this.problem; }
 }
+export const CLASSIC_BUILDS: readonly string[] = ["3.0.0.24268", "3.0.1.24371"];
 // Facts read only whether a texture exists, and each cache stores a texture in its own decoded form.
 const TEXTURE = /\.(blp|tga|dds|png|tif)$/i;
 
@@ -401,7 +402,7 @@ const TEXTURE = /\.(blp|tga|dds|png|tif)$/i;
 export const readEffectReport = Effect.fnUntraced(function*(options: RenderAssetOptions = {}) {
   const build = yield* readStockBuild(options.storage ?? stockStorage()).pipe(Effect.mapError((failure) => new EffectCheckFailure({ problem: `Classic stock: ${failure.message}` })));
   const { Version: version, "Build Key": buildKey } = build.fields;
-  if (version !== "3.0.0.24268" || buildKey === undefined || buildKey === "") return yield* new EffectCheckFailure({ problem: `Classic calibration needs one 3.0.0.24268 build, got ${version ?? "none"} in ${build.storage}` });
+  if (version === undefined || !CLASSIC_BUILDS.includes(version) || buildKey === undefined || buildKey === "") return yield* new EffectCheckFailure({ problem: `Classic calibration needs a ${CLASSIC_BUILDS.join(" or ")} build, got ${version ?? "none"} in ${build.storage}` });
   const info = `${version}\t${buildKey}`;
   const store = headlessRender({ ...options, strict: true });
   const input = (path: string) => store.readAsset(path, "classic");
