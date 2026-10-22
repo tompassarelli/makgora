@@ -12,7 +12,7 @@ import { on, trampoline } from "wisp/src/platform/dispatch";
 import { writeLines } from "wisp/src/platform/fileio";
 import { f32 } from "wisp/src/sim/f32";
 import { CAPTURE_FIXTURES, type CaptureFixture, SILHOUETTE_HIDDEN_FRAME } from "../../platform/captureFixtures";
-import { applyDeveloperCommand } from "../loop/keys";
+import { applyDeveloperCommand } from "../loop/developerCommands";
 import { bareFighter } from "../loop/fighterCloak";
 import { paintDrawnStamp } from "../loop/drawnStamp";
 import { CAPTURE_STATUS_FILE } from "../../game/core/gameFiles";

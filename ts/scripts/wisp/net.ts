@@ -87,7 +87,7 @@ export async function createNetStandalone(link: LockstepLink, slot: number, opti
     const build: MapBuild = { ...PLAYABLE_BUILD, devConsole: true };
     const lockstep = runtime.clients({ install: () => main.install(build), start: () => main.startBuild(build) }, [slot], { humans: [0, 1], link, keepCalls: 0 });
     const client = lockstep.client(slot);
-    const { applyDeveloperCommand }: { applyDeveloperCommand(state: State, slot: number, text: string): void } = await import(join(platform, "../host/loop/keys.ts"));
+    const { applyDeveloperCommand }: { applyDeveloperCommand(state: State, slot: number, text: string): void } = await import(join(platform, "../host/loop/developerCommands.ts"));
     const scripted = options.script === undefined ? undefined : padInputs(padEdges(options.script).edges, slot);
     const chat = (options.script ?? "").split("\n").map((line) => line.trim()).filter((line) => line.startsWith("#! chat ")).map((line) => line.substring(8));
     let latest: StandaloneInput = { buttons: [], axisX: 0, axisY: 0 };

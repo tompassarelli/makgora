@@ -1,59 +1,34 @@
-import { SHIELD_ENERGY_SAMPLES } from "../../game/session/shieldEnergyCapture";
-import { PartnerBehaviour } from "../../game/match/trainingState";
-import { traceSetup } from "../../game/session/traceSettings";
-import { startNativeSoak } from "../../platform/nativeSoak";
 import { NATIVE_PREFLIGHT_KEY, inputPreflightLine } from "../../game/input/nativePreflight";
 import { INPUT_PREFLIGHT_FILE } from "../../game/core/gameFiles";
 import { cameraKey, returnPauseMenu, pauseCameraKey, pauseHeldKeys } from "./pauseCamera";
-import { HIT_PRESENTATION_CASES } from "../../game/session/hitPresentationCases";
-import { createImpactEvents } from "../../game/presentation/impactEvents";
-import { emitImpacts } from "../../game/presentation/impactState";
 
 
 import { Action } from "../../game/input/actions";
 import { sampleKeys } from "../../game/input/keyboardCapture";
 import { menuAction } from "../../game/input/keyBindings";
 import { isCarrierKey } from "../../game/netcode/journal/keyboard";
-import { PARTICIPANT_SLOTS, type ParticipantSlot, isParticipantSlot } from "../../game/input/participants";
+import { type ParticipantSlot, isParticipantSlot } from "../../game/input/participants";
 import { heldActions, keyDown, pressKey, releaseKey } from "../../game/input/playerKeys";
 import { startKeyDown, startKeyUp } from "../../game/match/controls";
-import { Phase, cancelRematchCountdown, characterFor, copyMatchState, firstHumanSlot, humanActive, recallCharacter, selectCharacter, setTraining, setHitAreas } from "../../game/lobby/lobbyState";
-import { ROSTER_MANA } from "../../game/sim/mana";
-import { fighterAt, isActive } from "../../game/sim/roster";
+import { Phase, cancelRematchCountdown, characterFor, copyMatchState, firstHumanSlot, humanActive, recallCharacter, selectCharacter } from "../../game/lobby/lobbyState";
 import { leaveFinishedTutorial } from "../../game/match/tutorial";
-import { METER_COMMAND, classicDevRequest, loreDevRequest, LORE_WIN_COMMAND, winLoreBattle, DESYNC_COMMAND, QUICK_CPU_STOCKS, RESET_COMMAND, QUICK_TRAINING_COMMAND, applyDevCommand, prepareQuickCpu, prepareQuickTraining, quickMatchCpuHero, quickMatchCpuProfile, quickMatchHero, quickMatchHitAreas, quickMatchStocks, quickMatchPair, quickPromoRequest, prepareQuickPromo, quickStageSettings, quickPainHero, quickRecoveryHero, quickOffstageHero } from "../../game/session/devSettings";
-import { fighterName, fighterKey } from "../../game/sim/heroes/registry";
+import { fighterName } from "../../game/sim/heroes/registry";
 import { endReplaySegment } from "./replays";
-import { devReceiptFile } from "../../game/session/journalFiles";
-import { applyFighterSetup } from "../../game/session/fighterSetup";
-import { prepareDevState, commitDevState } from "./devState";
-import { applySetupCommand } from "../../game/session/sessionSetup";
 import { pausedMessage } from "../../game/session/messages";
 import { cancelBindingCapture, captureBinding } from "../../game/ui/bindingSettings";
 import { writeLines } from "wisp/src/platform/fileio";
 import { confirmedChecksum, startInputTrace, traceParticipant } from "./diagnostics";
-import { probeFrameCostClock } from "./frameCost";
-import { probeRenderClock } from "./renderClock";
-import { drawAtBurstTime } from "./betweenFrames";
-import { showBackdrop, showStageLighting, leverCommand } from "./stageScenery";
-import { fighterHideCommand, hideFighter } from "./fighterCloak";
 import { clearCapturedInputs } from "./inputs";
-import { journalEpoch, journalIdentity } from "./journal";
+import { journalEpoch } from "./journal";
 import { chatBusy, requestPause } from "./journalPause";
 import { Key, keyEventAllowed, syncKeyEvents } from "./keyEvents";
-import { startBodyFit } from "./bodyFit";
-import { startAgencyFixture } from "./agencyFixture";
-import { applyShowcaseCommand } from "./showcase";
-import { showcaseRequest } from "../../game/session/showcase";
-import { clearVisualCapture, configureVisualCapture } from "../../game/session/visualCapture";
-import { back, choose, confirm, journalMenuKey, openSettingsScreen, resultKey, resetToStartingSelection, startDevClassic, startDevLore, startQuickMatch } from "./menus";
-import { LORE_BATTLES } from "../../game/classic/loreBattles";
+import { back, choose, confirm, journalMenuKey, openSettingsScreen, resultKey } from "./menus";
 import { makePreview } from "./preview";
 import { exportProbe, probeIntegrity, probeRecording, startProbe } from "./responseProbe";
 import { type ShellState, activeRollback, cancelPendingPlaytest, keepShellMomentEnd, localSlot, playsOnKeyboard } from "./state";
 import { clearMatchEffects, views } from "./ui";
 import { ownConfirmedState } from "./confirmedState";
-import { LASTING, pauseMatchPresentation, renderFighter, renderPersistentPresentation, setStatus } from "./view";
+import { LASTING, pauseMatchPresentation, setStatus } from "./view";
 import { osKeyDown } from "../../platform/osKeys";
 
 
@@ -126,6 +101,22 @@ export function selectPauseMenu(s: ShellState, actor: number, choice: number): v
   } else exitPausedMatch(s, choice === 2);
 }
 
+function pausedMatchKeyDown(s: ShellState, slot: ParticipantSlot, key: number, menu: Action | undefined): void {
+  if (GetTriggerPlayer() === GetLocalPlayer() && pauseCameraKey(key)) {
+    if (s.rollback?.journal?.editbox === undefined || playsOnKeyboard(s.rollback.journal, slot)) cameraKey(s, key, true);
+    return;
+  }
+  if (GetTriggerPlayer() === GetLocalPlayer()) returnPauseMenu(s);
+  const pause = s.pauseMenu ??= { choice: 0, shown: true, title: false };
+  if (key === Key.f2 && s.game.training) s.trainingHints = !s.trainingHints;
+  else if (menu === Action.moveUp) pause.choice = pause.choice === 0 ? 2 : pause.choice - 1;
+  else if (menu === Action.moveDown) pause.choice = pause.choice === 2 ? 0 : pause.choice + 1;
+  else if (key === Key.escape || menu === Action.special) exitPausedMatch(s, false);
+  else if (menu === Action.attack) {
+    selectPauseMenu(s, slot, pause.choice);
+  }
+}
+
 function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = false): void {
   if (!humanActive(s.game, slot)) return;
   const key = GetHandleId(BlzGetTriggerPlayerKey());
@@ -149,19 +140,7 @@ function participantKeyDown(s: ShellState, slot: ParticipantSlot, startKey = fal
     return;
   }
   if (s.game.phase === Phase.match && s.session.paused) {
-    if (GetTriggerPlayer() === GetLocalPlayer() && pauseCameraKey(key)) {
-      if (s.rollback?.journal?.editbox === undefined || playsOnKeyboard(s.rollback.journal, slot)) cameraKey(s, key, true);
-      return;
-    }
-    if (GetTriggerPlayer() === GetLocalPlayer()) returnPauseMenu(s);
-    const pause = s.pauseMenu ??= { choice: 0, shown: true, title: false };
-    if (key === Key.f2 && s.game.training) s.trainingHints = !s.trainingHints;
-    else if (menu === Action.moveUp) pause.choice = pause.choice === 0 ? 2 : pause.choice - 1;
-    else if (menu === Action.moveDown) pause.choice = pause.choice === 2 ? 0 : pause.choice + 1;
-    else if (key === Key.escape || menu === Action.special) exitPausedMatch(s, false);
-    else if (menu === Action.attack) {
-      selectPauseMenu(s, slot, pause.choice);
-    }
+    pausedMatchKeyDown(s, slot, key, menu);
     return;
   }
   if (key === Key.escape && bindings.capture !== undefined) {
@@ -286,198 +265,4 @@ export function onProbeExport(s: ShellState): void {
   const rollback = activeRollback(s);
   if (rollback !== undefined) probeIntegrity(s.probe, `checksum ${rollback.epoch} ${s.runtime.simulationFrame} ${confirmedChecksum(s)} ${s.game.phase}`);
   exportProbe(s.probe);
-}
-
-
-
-
-
-export function onDevCommand(s: ShellState): void {
-  applyDeveloperCommand(s, GetPlayerId(GetTriggerPlayer()), GetEventPlayerChatString());
-}
-
-
-const CINE_OFF_SUFFIX = " |cine off";
-
-
-export function applyDeveloperCommand(s: ShellState, actor: number, original: string): void {
-  if (!s.build.devConsole) return;
-  ownConfirmedState(s);
-  if (original === RESET_COMMAND) {
-    s.promoHudHidden = false;
-    clearVisualCapture(localSlot());
-    for (const slot of PARTICIPANT_SLOTS) s.hiddenFighters[slot] = undefined;
-    pauseMatchPresentation(s, s.session.paused);
-  }
-  const trace = traceSetup(original);
-  if (original === RESET_COMMAND) s.trace.limit = undefined;
-  if (s.build.responseProbe && trace.callbacks !== undefined) s.trace.limit = trace.callbacks;
-  const captured = s.build.responseProbe ? configureVisualCapture(trace.command, localSlot()) : trace.command;
-  const cineOff = captured.endsWith(CINE_OFF_SUFFIX);
-  if (cineOff || original === RESET_COMMAND) views(s).combat.cineFilter = !cineOff;
-  const message = cineOff ? captured.substring(0, captured.length - CINE_OFF_SUFFIX.length) : captured;
-  if (message.startsWith("-dev setup ")) {
-    const commands = message.substring(11).split(";");
-    if (commands.length > 32 || commands.some(command => command.length === 0 || command.startsWith("setup "))) return;
-    for (const command of commands) applyDeveloperCommand(s, actor, `-dev ${command}`);
-    return;
-  }
-  let fighterEdited = false;
-  const fighterSetup = applyFighterSetup(s.game, s.world, message, () => { prepareDevState(s); fighterEdited = true; });
-  if (fighterEdited) commitDevState(s);
-  let receipt: string | undefined;
-  const promo = quickPromoRequest(message);
-  const quickStage = quickStageSettings(message);
-  const quickHero = quickMatchHero(message);
-  const quickPair = quickMatchPair(message);
-  const recoveryHero = quickRecoveryHero(message);
-  const offstageHero = quickOffstageHero(message);
-  const painHero = quickPainHero(message);
-  const quickCpu = quickMatchCpuProfile(message);
-  const fighterHide = fighterHideCommand(message);
-  const showcase = showcaseRequest(message);
-
-  const setup = applySetupCommand(s.game, actor, message);
-  if (setup === `dev: stage ${s.game.stageChoice}` && s.game.phase === Phase.characterMenu) s.dev.stageChoice = s.game.stageChoice;
-  const classic = classicDevRequest(message);
-  const lore = loreDevRequest(message, LORE_BATTLES.length);
-  if (fighterSetup !== undefined) {
-    receipt = fighterSetup;
-  } else if (message === "-dev trace") {
-    receipt = "dev: trace";
-  } else if (message === "-dev soak") {
-    receipt = startNativeSoak(s) ? "dev: native soak four CPUs" : "dev: native soak requires an integrity map at selection";
-  } else if (showcase !== undefined) {
-    receipt = applyShowcaseCommand(s, showcase, () => applyDeveloperCommand(s, actor, RESET_COMMAND));
-  } else if (message === LORE_WIN_COMMAND) {
-    if (!winLoreBattle(s.game, s.world)) return;
-    receipt = "dev: lore win";
-  } else if (lore !== undefined) {
-    receipt = `dev: lore ${lore}`;
-    startDevLore(s, lore);
-  } else if (classic !== undefined) {
-    receipt = `dev: classic ${fighterKey(classic.character)}${classic.boss ? " boss" : ""}`;
-    startDevClassic(s, classic.character, classic.boss);
-  } else if (message.startsWith("-dev shield-energy ")) {
-    const sample = SHIELD_ENERGY_SAMPLES.find(value => message === `-dev shield-energy ${value}`);
-    if (sample === undefined || !s.game.training || s.game.phase !== Phase.match) return;
-    s.dev.shieldEnergyCapture = { sample, pending: true, lines: sample === "down" ? [] : s.dev.shieldEnergyCapture?.lines ?? [] };
-    s.game.trainer.behaviour = sample === "down" ? PartnerBehaviour.stand : PartnerBehaviour.shield;
-    s.session.paused = sample === "down";
-    pauseMatchPresentation(s, s.session.paused, true);
-    renderPersistentPresentation(s);
-    receipt = `dev: shield energy ${sample}`;
-  } else if (message === QUICK_TRAINING_COMMAND) {
-    receipt = "dev: quick training";
-    prepareQuickTraining(s.game);
-    startQuickMatch(s, 0);
-  } else if (message === RESET_COMMAND) {
-    receipt = "dev: reset";
-    resetToStartingSelection(s);
-  } else if (message.startsWith(METER_COMMAND)) {
-    const points = S2I(message.substring(METER_COMMAND.length));
-    if (s.game.phase !== Phase.match || points < 0 || points > ROSTER_MANA.max) return;
-    for (const slot of PARTICIPANT_SLOTS) if (isActive(s.world, slot)) fighterAt(s.world, slot).mana.points = points;
-    receipt = `dev: meter ${points}`;
-  } else if (message === "-dev camera") {
-    receipt = "dev: camera match";
-    startQuickMatch(s, 0, "camera");
-  } else if (promo !== undefined) {
-    if (!prepareQuickPromo(s.game, promo.pair)) return;
-    s.promoHudHidden = true;
-    ClearTextMessages();
-    receipt = "dev: quick promo";
-    startQuickMatch(s, promo.stage, "normal", undefined, QUICK_CPU_STOCKS);
-  } else if (quickCpu !== undefined) {
-    receipt = `dev: quick match cpu ${quickCpu}`;
-    prepareQuickCpu(s.game, quickCpu, quickMatchCpuHero(message));
-    startQuickMatch(s, 0, s.build.scenario, undefined, QUICK_CPU_STOCKS);
-  } else if (quickStage !== undefined) {
-    receipt = "dev: quick match";
-    startQuickMatch(s, quickStage.stage, s.build.scenario, quickStage.pair, 1, quickStage);
-  } else if (offstageHero !== undefined) {
-    receipt = `dev: quick offstage ${fighterKey(offstageHero)}`;
-    startQuickMatch(s, 0, "up-special-recovery", offstageHero);
-  } else if (recoveryHero !== undefined) {
-    receipt = `dev: quick recovery ${fighterKey(recoveryHero)}`;
-    startQuickMatch(s, 0, "knockdown", recoveryHero);
-  } else if (painHero !== undefined) {
-    receipt = `dev: quick ${painHero.scenario} ${fighterKey(painHero.character)}`;
-    startQuickMatch(s, 0, painHero.scenario, painHero.character);
-  } else if (quickPair !== undefined) {
-    receipt = `dev: quick match ${fighterKey(quickPair[0])} / ${fighterKey(quickPair[1])}`;
-    startQuickMatch(s, 0, s.build.scenario, quickPair);
-  } else if (quickHero !== undefined) {
-    receipt = `dev: quick match ${fighterKey(quickHero)}`;
-    if (quickMatchHitAreas(message)) {
-      setTraining(s.game, actor, true);
-      setHitAreas(s.game, actor, true);
-    }
-    startQuickMatch(s, 0, s.build.scenario, quickHero, quickMatchStocks(message));
-  } else if (message.startsWith("-dev effects ")) {
-    const index = S2I(message.slice(13));
-    const scenario = HIT_PRESENTATION_CASES[index];
-    if (scenario === undefined || s.game.phase !== Phase.match) return;
-    const events = { ...createImpactEvents(), ...scenario.cue };
-    events.x = 0.0;
-    const ui = views(s);
-    emitImpacts(s.runtime.impacts, events, 8, 0);
-    ui.combat.presentConfirmed(s.devReceipts + 1, 4, events);
-    ui.combat.present(s.runtime.impacts, s.runtime.simulationFrame, s.runtime.impacts, true);
-    receipt = `dev: effects ${index} ${scenario.model} ${scenario.sound}`;
-  } else if (message === "-dev frame-cost-clock") {
-    receipt = "dev: frame cost clock probe";
-    probeFrameCostClock();
-  } else if (message === "-dev backdrop off" || message === "-dev backdrop on") {
-    const visible = message === "-dev backdrop on";
-    receipt = `dev: backdrop ${visible ? "on" : "off"}`;
-    showBackdrop(s, visible);
-  } else if (message === "-dev lighting stock" || message === "-dev lighting stage") {
-    const authored = message === "-dev lighting stage";
-    showStageLighting(s, authored);
-    for (const slot of PARTICIPANT_SLOTS) renderFighter(s, slot, s.runtime.poses[slot], s.participants[slot].before.out);
-    renderPersistentPresentation(s);
-    receipt = `dev: lighting ${authored ? "stage" : "stock"}`;
-  } else if (message === "-dev view near" || message === "-dev view far" || message === "-dev view off") {
-    s.viewExtreme = message === "-dev view near" ? "near" : message === "-dev view far" ? "far" : undefined;
-    receipt = `dev: view ${s.viewExtreme ?? "off"}`;
-  } else if (fighterHide !== undefined) {
-    if (!hideFighter(s, fighterHide.slot, fighterHide.hidden)) return;
-    if (!fighterHide.hidden) renderPersistentPresentation(s);
-    receipt = `dev: fighter ${fighterHide.slot} ${fighterHide.hidden ? "hidden" : "shown"}`;
-  } else if (message.startsWith("-dev lever ")) {
-    const words = message.slice(11).split(" ");
-    leverCommand(s, words[0] ?? "", words[1] ?? "", words[2] ?? "");
-    receipt = "";
-  } else if (message.startsWith("-dev fogv ")) {
-
-    const v = message.slice(10).split(" ").map((word) => S2R(word));
-    if (v.length < 11) return;
-    s.stageFogOverride = true;
-    SetTerrainFogExV(R2I(v[0] ?? 0), v[1] ?? 0, v[2] ?? 0, v[3] ?? 0, v[4] ?? 0, v[5] ?? 0, v[6] ?? 0, v[7] ?? 0, v[8] ?? 0, v[9] ?? 0, v[10] ?? 0);
-    BlzSetTerrainFogDrawOverSky((v[11] ?? 0) > 0.5);
-    receipt = `dev: fogv ${message.slice(10)}`;
-  } else if (message === "-dev smooth-draw on" || message === "-dev smooth-draw off") {
-    drawAtBurstTime(message === "-dev smooth-draw on");
-    receipt = `dev: smooth draw ${message === "-dev smooth-draw on" ? "on" : "off"}`;
-  } else if (message === "-dev camera-smooth on" || message === "-dev camera-smooth off") {
-    s.cameraTween = message === "-dev camera-smooth on";
-    receipt = `dev: camera smooth ${s.cameraTween ? "on" : "off"}`;
-  } else if (message === "-dev render-clock") {
-    receipt = "dev: render clock probe";
-    probeRenderClock();
-  } else if (message === DESYNC_COMMAND) {
-    const slot = actor;
-    receipt = `dev: desync from player ${slot + 1}'s client`;
-    // Creating a handle on one client alone diverges Warcraft's handle counter and tempest checksum.
-    if (slot === GetPlayerId(GetLocalPlayer())) CreateTimer();
-  } else if (setup !== undefined) {
-    receipt = setup;
-    makePreview(s);
-  } else receipt = startAgencyFixture(s, message) ?? startBodyFit(s, message) ?? applyDevCommand(s.dev, message);
-  if (receipt === undefined) return;
-  s.devReceipts++;
-  if (!s.promoHudHidden) DisplayTextToPlayer(GetLocalPlayer(), 0.0, 0.0, receipt);
-  const file = devReceiptFile(journalIdentity(s, s.rollback?.epoch ?? 0), s.devReceipts, s.dev, s.game);
-  writeLines(file.name, file.lines);
 }

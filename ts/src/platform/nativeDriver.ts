@@ -15,7 +15,8 @@ import { DASH_STICK_THRESHOLD, STICK_DEADZONE, TAP_JUMP_STICK_THRESHOLD, TRIGGER
 import { finishInputTrace } from "../host/loop/trace";
 import { confirmedChecksum, startInputTrace } from "../host/loop/diagnostics";
 import { pauseMatchPresentation } from "../host/loop/view";
-import { applyDeveloperCommand, startDown } from "../host/loop/keys";
+import { startDown } from "../host/loop/keys";
+import { applyDeveloperCommand } from "../host/loop/developerCommands";
 import { shell, type ShellState, localSlot } from "../host/loop/state";
 import { paintDrawnStamp } from "../host/loop/drawnStamp";
 import { fighterAt, neutralControls } from "../game/sim/roster";

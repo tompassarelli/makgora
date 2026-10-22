@@ -33,7 +33,8 @@ import { INPUT_PREFIX, journalEpoch, publishMenu, serviceJournalEnd } from "./jo
 import * as journalPause from "./journalPause";
 import { KEY_DOWN, KEY_UP, KEY_START_DOWN, KEY_START_UP, KEY_PAUSE_DOWN, KEYBOARD_PAUSE, KEYBOARD_PAUSE_PREFIX, Key, registerKey, syncKeyEvents } from "./keyEvents";
 import { onKeyboardPause, onPauseKeyDown } from "./keyboardPause";
-import { onDevCommand, onDeveloperRestart, onDeveloperTrace, onKeyDown, onKeyUp, onStartKeyDown, onStartKeyUp, onProbeExport, onProbeStart, selectPauseMenu } from "./keys";
+import { onDeveloperRestart, onDeveloperTrace, onKeyDown, onKeyUp, onStartKeyDown, onStartKeyUp, onProbeExport, onProbeStart, selectPauseMenu } from "./keys";
+import { onDevCommand } from "./developerCommands";
 import { openControlsFirst, panelActions, previewControlsFirst, pickResult, serviceAutomaticRematch, startingSelection } from "./menus";
 import { PLAYER_FILE_RECEIVED, bindingFiles, playerFileReceived, playerFilesOwnerLeft, startPlayerFiles } from "./playerFiles";
 import { PLAYTEST, PLAYTEST_PREFIX, playtestRequested, readPlaytestRequest, servicePlaytestRequest } from "./playtest";

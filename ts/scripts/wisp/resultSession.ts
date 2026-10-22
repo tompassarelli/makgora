@@ -26,7 +26,7 @@ export async function createResultSession(winner: Character, loser: Character): 
     const loop = join(import.meta.dir, "../../src/host/loop");
     interface State { readonly game: { readonly phase: number }; readonly world: unknown }
     const { shell }: { shell(): State } = await import(join(loop, "state.ts"));
-    const { applyDeveloperCommand }: { applyDeveloperCommand(state: State, slot: number, text: string): void } = await import(join(loop, "keys.ts"));
+    const { applyDeveloperCommand }: { applyDeveloperCommand(state: State, slot: number, text: string): void } = await import(join(loop, "developerCommands.ts"));
     const { views }: { views(state: State): { readonly match: { readonly resultFrames: number } } } = await import(join(loop, "ui.ts"));
     const { fighterAt }: { fighterAt(world: unknown, slot: number): { readonly status: { stocks: number; out: boolean } } } = await import(join(import.meta.dir, "../../src/game/sim/roster.ts"));
     const main: { install(build: MapBuild): void; startBuild(build: MapBuild): void } = await import(join(import.meta.dir, "../../src/platform/main.ts"));
