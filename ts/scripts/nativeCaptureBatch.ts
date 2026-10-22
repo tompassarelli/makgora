@@ -5,7 +5,7 @@ import { Effect, Exit, Fiber, Schema, Scope } from "effect";
 import { ChildProcess } from "effect/process";
 import { runProcess } from "./hostProcess";
 import { resolveTools, withRuntimeTools } from "./wisp/nativeTools";
-import { attachedPoolReady, attachExistingPool } from "./wisp/nativePool";
+import { attachedPoolReady, attachExistingPool, pairClientCount } from "./wisp/nativePool";
 import { processIsAlive } from "./wisp/commands/pairClaim";
 import { pollUntil } from "./hostPoll";
 
@@ -21,9 +21,10 @@ const option = (args: readonly string[], name: string) => {
 const rowManifest = Schema.fromJsonString(Schema.Struct({ map: Schema.String, mapSha256: Schema.String, sourceRevision: Schema.String, fixtures: Schema.Array(Schema.Struct({ name: Schema.String, frames: Schema.Array(Schema.Finite), silhouette: Schema.optional(Schema.Struct({ slot: Schema.Finite, fighter: Schema.String, move: Schema.String, width: Schema.Finite, height: Schema.Finite })) })) }));
 const planSchema = Schema.fromJsonString(Schema.Struct({ version: Schema.Literals([1]), sourceRevision: Schema.String, rows: Schema.Array(Schema.Struct({ name: Schema.String, map: Schema.String, manifest: Schema.String, mapSha256: Schema.String, frames: Schema.Array(Schema.Finite) })) }));
 const checkpointSchema = Schema.Struct({ version: Schema.Literals([1]), mapSha256: Schema.String, sourceRevision: Schema.String, captures: Schema.Array(Schema.Struct({ fixture: Schema.String, frame: Schema.Finite, phase: Schema.String, file: Schema.String, width: Schema.Finite, height: Schema.Finite })) });
-const poolRecord = Schema.fromJsonString(Schema.Struct({ pairs: Schema.Array(Schema.Struct({ id: Schema.Int, runs: Schema.Struct({ a: Schema.String, b: Schema.String }) })) }));
+const poolRecord = Schema.fromJsonString(Schema.Struct({ pairs: Schema.Array(Schema.Struct({ id: Schema.Int, runs: Schema.Struct({ a: Schema.String, b: Schema.optionalKey(Schema.String) }) })) }));
 const lanState = join(process.env.XDG_STATE_HOME ?? join(homedir(), ".local/state"), "wisp/lan");
 const pairStatusSchema = Schema.Struct({
+  network: Schema.optionalKey(Schema.Boolean),
   clients: Schema.Array(Schema.Struct({ name: Schema.String, pid: Schema.optionalKey(Schema.Finite) })),
   game: Schema.optional(Schema.Struct({ phase: Schema.String, players: Schema.Array(Schema.Struct({ label: Schema.String, connected: Schema.Boolean })) })),
 });
@@ -80,13 +81,13 @@ const poolScope = (pair: number, desktop: string, capacity: string, network: boo
     if (child !== undefined && child.exitCode !== null) return yield* new CaptureBatchFailure({ problem: `pair ${pair} pool exited` });
     const status = yield* pairStatus(pair).pipe(Effect.orElseSucceed(() => undefined));
     return attachedPoolReady(status) ? status : undefined;
-  }), { every: "2 seconds", within: "150 seconds", orElse: () => Effect.fail(new CaptureBatchFailure({ problem: `pair ${pair} did not recover two running clients` })) });
+  }), { every: "2 seconds", within: "150 seconds", orElse: () => Effect.fail(new CaptureBatchFailure({ problem: `pair ${pair} did not recover its running clients` })) });
   const tools = yield* resolveTools(["xdotool"]);
   const poolText = yield* Effect.try({ try: () => readFileSync(join(lanState, "pool.json"), "utf8"), catch: cause => new CaptureBatchFailure({ problem: String(cause) }) });
   const record = yield* Schema.decodeEffect(poolRecord)(poolText).pipe(Effect.mapError(cause => new CaptureBatchFailure({ problem: String(cause) })));
   const entry = record.pairs.find(entry => entry.id === pair);
   if (entry === undefined) return yield* new CaptureBatchFailure({ problem: "pair missing from pool.json" });
-  const desktops = [entry.runs.a, entry.runs.b];
+  const desktops = entry.runs.b === undefined ? [entry.runs.a] : [entry.runs.a, entry.runs.b];
   yield* pollUntil(Effect.gen(function*() {
     if (child !== undefined && child.exitCode !== null) return yield* new CaptureBatchFailure({ problem: `pair ${pair} pool exited` });
     const checks = yield* Effect.forEach(desktops, run => clientWindowExists(tools.xdotool ?? "xdotool", run), { concurrency: "unbounded" });
@@ -112,7 +113,7 @@ const monitorDrop = (pair: number, pool: PairPool, row: { readonly name: string;
     if (pool.child !== undefined && pool.child.exitCode !== null) return `pair ${pair} pool exited`;
     const status = yield* pairStatus(pair).pipe(Effect.result);
     if (status._tag === "Failure") return `pair ${pair} status failed: ${String(status.failure)}`;
-    if (status.success.clients.length !== 2 || status.success.clients.some(client => client.pid === undefined)) return `pair ${pair} has a dropped client process`;
+    if (status.success.clients.length !== pairClientCount(status.success) || status.success.clients.some(client => client.pid === undefined)) return `pair ${pair} has a dropped client process`;
     if (status.success.game?.phase === "playing" && status.success.game.players.some(player => !player.connected)) return `pair ${pair} has a disconnected match client`;
     if (status.success.game?.phase === "over" && !checkpointComplete(out, row, sourceRevision, double)) return `pair ${pair} match ended before row ${row.name} completed`;
   }
