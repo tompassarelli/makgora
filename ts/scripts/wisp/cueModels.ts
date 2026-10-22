@@ -31,7 +31,7 @@ type RecordedFacts = { readonly problem: string } | { readonly facts: ReadonlyMa
 export function recordedFacts(text: string): RecordedFacts {
   const headers = text.split("\n").filter((line) => line.startsWith("classic-facts\t")).map((line) => line.split("\t"));
   const header = headers[0];
-  if (headers.length !== 1 || header?.[1] !== String(FACTS_VERSION) || !/^[0-9a-f]{64}$/.test(header[2] ?? "")) return { problem: `Classic effect record is missing or stale: it holds no model facts from extractor version ${FACTS_VERSION}; from ts/ on a machine with the Warcraft III 3.0.0.24268 install run ${RECORD_COMMAND} and commit the record` };
+  if (headers.length !== 1 || header?.[1] !== String(FACTS_VERSION) || !/^[0-9a-f]{64}$/.test(header[2] ?? "")) return { problem: `Classic effect record is missing or stale: it holds no model facts from extractor version ${FACTS_VERSION}; from ts/ on a machine with the Warcraft III 3.0.0.24268 or 3.0.1.24371 install run ${RECORD_COMMAND} and commit the record` };
   const facts = new Map<string, ModelFacts | null>();
   let edited = 0;
   for (const line of factRows(text)) {
@@ -48,7 +48,7 @@ export function effectFindings(text: string, uses: readonly EffectUse[] = effect
   const unrecorded = uses.filter((use) => !recorded.facts.has(modelFactsKey(use.model)));
   if (unrecorded.length > 0) {
     const models = [...new Set(unrecorded.map((use) => modelFactsKey(use.model)))];
-    return { problem: `Classic effect record is missing or stale: no model facts for ${models.length} newly used models; from ts/ on a machine with the Warcraft III 3.0.0.24268 install run ${RECORD_COMMAND} and commit the record: ${models.map((model) => `${model} (${unrecorded.filter((use) => modelFactsKey(use.model) === model).map((use) => `${use.fighter}/${use.move}`).join(", ")})`).join("; ")}` };
+    return { problem: `Classic effect record is missing or stale: no model facts for ${models.length} newly used models; from ts/ on a machine with the Warcraft III 3.0.0.24268 or 3.0.1.24371 install run ${RECORD_COMMAND} and commit the record: ${models.map((model) => `${model} (${unrecorded.filter((use) => modelFactsKey(use.model) === model).map((use) => `${use.fighter}/${use.move}`).join(", ")})`).join("; ")}` };
   }
   return { findings: uses.map((use) => judgeUse(use, recorded.facts.get(modelFactsKey(use.model)) ?? null)) };
 }
@@ -68,4 +68,10 @@ export function effectRecordUnknowns(text: string, uses: readonly EffectUse[] = 
 export function effectCalibrationProblem(text: string): string | undefined {
   const judged = effectFindings(text, EFFECT_CALIBRATION.map(({ use }) => use));
   return "problem" in judged ? judged.problem : calibrationProblem(judged.findings);
+}
+
+export function staleRecordRows(recorded: string, fresh: string): string[] {
+  const keyed = (text: string) => new Map([...text.split("\n").filter((line) => line.startsWith("classic-facts\t")).map((line): [string, string] => ["classic-facts", line]), ...factRows(text).map((line): [string, string] => [line.split("\t")[1] ?? line, line])]);
+  const now = keyed(fresh), then = keyed(recorded);
+  return [...new Set([...then.keys(), ...now.keys()])].filter((key) => then.get(key) !== now.get(key)).sort();
 }
