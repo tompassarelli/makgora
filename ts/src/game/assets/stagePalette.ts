@@ -119,7 +119,7 @@ export const STAGE_DECK_PALETTES: readonly { readonly stage: number; readonly th
     body: { texture: "TerrainArt\\Outland\\Outland_Rock.blp" },
     underside: { texture: "TerrainArt\\Outland\\Outland_Abyss.blp" },
     platform: {
-      top: { texture: "TerrainArt\\BlackCitadel\\Citadel_LargeBricks.blp" },
+      top: { texture: "TerrainArt\\Outland\\Outland_FlatStonesLight.blp", crop: [0, 0, 0.125, 0.25] },
       lip: { texture: "Textures\\DemonRune1.blp" },
       body: { texture: "TerrainArt\\Outland\\Outland_Rock.blp" },
       underside: { texture: "TerrainArt\\Outland\\Outland_Abyss.blp" },
