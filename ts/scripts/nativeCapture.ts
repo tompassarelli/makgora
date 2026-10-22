@@ -27,6 +27,7 @@ import { Effect, Layer, Schema } from "effect";
 import { ChildProcess } from "effect/process";
 import { runProcess } from "./hostProcess";
 import { resolveTools, withRuntimeTools } from "./wisp/nativeTools";
+import { CLASSIC_BUILDS } from "./wisp/classicBuilds";
 import { capture, loadClients } from "wisp/scripts/warcraft/desktop";
 import { type Frame, decodePpm, encodePpm } from "wisp/scripts/wisp/frameProbe";
 import { preloadLines } from "wisp/scripts/wisp/preloadRecord";
@@ -206,7 +207,7 @@ const readBinding = (args: readonly string[]) => Effect.gen(function*() {
   const { build, branch } = yield* attempt("read .build.info", () => installedBuild(readFileSync(join(install, ".build.info"), "utf8")));
   const offlineBuild = option(args, "--offline-build");
   if (offlineBuild !== undefined) {
-    if (offlineBuild !== "3.0.0.24268" || build !== offlineBuild) return yield* new CaptureFailure({ problem: "offline Classic capture requires installed 3.0.0.24268" });
+    if (!CLASSIC_BUILDS.includes(offlineBuild) || build !== offlineBuild) return yield* new CaptureFailure({ problem: `offline Classic capture requires an installed ${CLASSIC_BUILDS.join(" or ")}, got ${build}` });
     return { install, readAt: new Date().toISOString(), installed: build, live: build, equal: true, offline: true };
   }
   const versions = versionsFile === undefined

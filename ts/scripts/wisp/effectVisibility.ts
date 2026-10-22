@@ -18,6 +18,7 @@ import { FIGHTER_ULTIMATES } from "../../src/game/sim/ultimates";
 import { summonClip, summonClipCount, SUMMON_BEAR } from "../../src/game/presentation/summonClipInfo";
 import type { AuthoredSpecial, SpecialProjectile } from "../../src/game/sim/specials/schema";
 import { POPCORN_CUE_MODELS } from "../../src/game/presentation/cueEmitterInfo";
+import { CLASSIC_BUILDS } from "./classicBuilds";
 import { impactModel, impactAnimation, impactStartSeconds, impactModelScale } from "../../src/game/presentation/hitPresentation";
 import { IMPACT_KIND_COUNT } from "../../src/game/presentation/impactState";
 import { STOCK_MODELS } from "../../src/game/render/effects";
@@ -394,7 +395,6 @@ export function effectSourceDigest(root = join(import.meta.dir, "../../..")): st
 export class EffectCheckFailure extends Schema.TaggedError<EffectCheckFailure>()("EffectCheckFailure", { problem: Schema.String }) {
   override get message(): string { return this.problem; }
 }
-export const CLASSIC_BUILDS: readonly string[] = ["3.0.0.24268", "3.0.1.24371"];
 // Facts read only whether a texture exists, and each cache stores a texture in its own decoded form.
 const TEXTURE = /\.(blp|tga|dds|png|tif)$/i;
 
