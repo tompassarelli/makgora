@@ -9,7 +9,9 @@ install, and run clone-a only through its launch.sh.
   clients with no account from one updated install (a clone's
   `pfx/drive_c/Program Files (x86)/Warcraft III`, under 1 s for 4 pairs); `bun wisp lan pool --pairs N [--pool-profile
   parity|visual]` runs them in pairs, each pair in a network namespace with
-  only loopback (foreground, admitted by the capacity helper); `bun wisp lan
+  only loopback unless `--network` with one `--pair K` opens that pair for
+  solo games, which 3.0.1.24371 needs to start; a networked pair refuses LAN
+  play (foreground, admitted by the capacity helper); `bun wisp lan
   fresh MAP.w3x [--pair K]` hosts and starts a LAN match on Wisp's own host;
   `lan status`, `lan end --pair K`. The host logs every turn's actions and
   compares checksums each turn. Joining LAN games needs Wisp's private LAN

@@ -62,7 +62,7 @@ const stopPool = (child: Bun.Subprocess) => Effect.gen(function*() {
   }
 });
 
-const poolScope = (pair: number, desktop: string, capacity: string) => Effect.gen(function*() {
+const poolScope = (pair: number, desktop: string, capacity: string, network: boolean) => Effect.gen(function*() {
   const scope = yield* Scope.fork(yield* Effect.scope);
   const existing = yield* pairStatus(pair).pipe(Effect.orElseSucceed(() => undefined));
   const holder = yield* Effect.try({ try: () => {
@@ -71,7 +71,7 @@ const poolScope = (pair: number, desktop: string, capacity: string) => Effect.ge
   }, catch: cause => new CaptureBatchFailure({ problem: String(cause) }) });
   const child = attachExistingPool(existing, Number.isInteger(holder) && holder > 1 && processIsAlive(holder)) ? undefined : yield* Effect.acquireRelease(
     Effect.try({
-      try: () => Bun.spawn([process.execPath, "scripts/wisp.ts", "lan", "pool", "--foreground", "--pair", String(pair), "--pool-profile", "visual", "--desktop", desktop, "--capacity", capacity], { cwd: tsDirectory, stdin: "ignore", stdout: "inherit", stderr: "inherit" }),
+      try: () => Bun.spawn([process.execPath, "scripts/wisp.ts", "lan", "pool", "--foreground", "--pair", String(pair), "--pool-profile", "visual", "--desktop", desktop, "--capacity", capacity, ...(network ? ["--network"] : [])], { cwd: tsDirectory, stdin: "ignore", stdout: "inherit", stderr: "inherit" }),
       catch: cause => new CaptureBatchFailure({ problem: `start pair ${pair} pool: ${String(cause)}` }),
     }),
     stopPool,
@@ -159,7 +159,8 @@ export const nativeCaptureBatch = (args: readonly string[]) => Effect.scoped(Eff
   const build = option(args, "--offline-build") ?? "3.0.0.24268";
   const minutes = Number(option(args, "--minutes") ?? "20");
   const solo = args.includes("--solo");
-  if (planPath === undefined || out === undefined || desktop === undefined || capacity === undefined || clientsFile === undefined || client === undefined || install === undefined || !Number.isInteger(pair) || !Number.isFinite(minutes) || minutes < 1 || (solo && args.includes("--signed-in"))) return yield* new CaptureBatchFailure({ problem: "usage: batch --plan capture-batch.json --out DIR --pair K --desktop PRIVATE_DESKTOP_SH --capacity MACHINE_CAPACITY_HELPER --clients-file FILE --client NAME --install DIR [--offline-build 3.0.0.24268|3.0.1.24371] [--minutes N] [--solo | --signed-in]" });
+  const network = args.includes("--network");
+  if (planPath === undefined || out === undefined || desktop === undefined || capacity === undefined || clientsFile === undefined || client === undefined || install === undefined || !Number.isInteger(pair) || !Number.isFinite(minutes) || minutes < 1 || (solo && args.includes("--signed-in")) || (network && !solo)) return yield* new CaptureBatchFailure({ problem: "usage: batch --plan capture-batch.json --out DIR --pair K --desktop PRIVATE_DESKTOP_SH --capacity MACHINE_CAPACITY_HELPER --clients-file FILE --client NAME --install DIR [--offline-build 3.0.0.24268|3.0.1.24371] [--minutes N] [--solo [--network] | --signed-in]" });
   const planText = yield* Effect.try({ try: () => readFileSync(planPath, "utf8"), catch: cause => new CaptureBatchFailure({ problem: `read ${planPath}: ${String(cause)}` }) });
   const plan = yield* Schema.decodeEffect(planSchema)(planText).pipe(Effect.mapError(cause => new CaptureBatchFailure({ problem: `decode ${planPath}: ${String(cause)}` })));
   yield* Effect.try({ try: () => mkdirSync(out, { recursive: true }), catch: cause => new CaptureBatchFailure({ problem: `create ${out}: ${String(cause)}` }) });
@@ -167,7 +168,7 @@ export const nativeCaptureBatch = (args: readonly string[]) => Effect.scoped(Eff
   const runtimeClients = join(out, "runtime-clients.json");
   const writeRuntimeClients = Effect.try({ try: () => writeFileSync(runtimeClients, withRuntimeTools(readFileSync(clientsFile, "utf8"), tools)), catch: cause => new CaptureBatchFailure({ problem: String(cause) }) });
   const currentScope = yield* Effect.scope;
-  const acquirePool = () => (args.includes("--signed-in") ? Scope.fork(currentScope).pipe(Effect.map(scope => ({ scope, child: undefined, signedClients: runtimeClients } satisfies PairPool))) : poolScope(pair, desktop, capacity)).pipe(Effect.tap(() => writeRuntimeClients));
+  const acquirePool = () => (args.includes("--signed-in") ? Scope.fork(currentScope).pipe(Effect.map(scope => ({ scope, child: undefined, signedClients: runtimeClients } satisfies PairPool))) : poolScope(pair, desktop, capacity, network)).pipe(Effect.tap(() => writeRuntimeClients));
   let pool: PairPool = yield* acquirePool();
   let stale = false;
   let completed = 0;
