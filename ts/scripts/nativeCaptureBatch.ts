@@ -71,7 +71,7 @@ const poolScope = (pair: number, desktop: string, capacity: string, solo: boolea
     return existsSync(path) ? Number(readFileSync(path, "utf8").trim()) : 0;
   }, catch: cause => new CaptureBatchFailure({ problem: String(cause) }) });
   const attach = attachExistingPool(existing, Number.isInteger(holder) && holder > 1 && processIsAlive(holder));
-  if (attach && solo) return yield* new CaptureBatchFailure({ problem: `pair ${pair} is already running; a --solo batch restarts its pair between rows, so stop it first (bun wisp lan stop --pair ${pair})` });
+  if (attach && solo) return yield* new CaptureBatchFailure({ problem: `pair ${pair} is already running; a --solo batch restarts its pair between rows, so stop it first (\`bun wisp lan stop --pair ${pair}\` for a pool unit, Ctrl-C for a foreground \`lan pool\`)` });
   const child = attach ? undefined : yield* Effect.acquireRelease(
     Effect.try({
       try: () => Bun.spawn([process.execPath, "scripts/wisp.ts", "lan", "pool", "--foreground", "--pair", String(pair), "--pool-profile", "visual", "--desktop", desktop, "--capacity", capacity, ...(network ? ["--network"] : [])], { cwd: tsDirectory, stdin: "ignore", stdout: "inherit", stderr: "inherit" }),
