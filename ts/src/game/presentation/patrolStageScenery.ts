@@ -133,9 +133,9 @@ export const NAXXRAMAS_SCENERY: StageScenery = {
 };
 
 export const HELLFIRE_SCENERY: StageScenery = {
-  farZ: 17000.0,
+  farZ: 11000.0,
   sky: STAGE_SKY_MODELS[14] ?? "",
-  fog: { start: 3300.0, end: 16000.0, red: 0.3125, green: 0.203125, blue: 0.171875 },
+  fog: { start: 3300.0, end: 10000.0, red: 0.3125, green: 0.203125, blue: 0.171875 },
   floor: { model: STAGE_GROUND_MODEL, z: -1300.0, color: [52, 24, 18] },
   pieces: [
     { model: SPIRES, x: -3800.0, y: 4500.0, z: -1321.0, scale: 5.0, yaw: 175.0, matrixScale: [1.75, 1.0, 0.75] },
@@ -148,8 +148,10 @@ export const HELLFIRE_SCENERY: StageScenery = {
     { model: SPIRES, x: 2500.0, y: 4300.0, z: -1786.0, scale: 4.5, yaw: 170.0, matrixScale: [2.0, 1.0, 1.0] },
     { model: SPIRES, x: 3400.0, y: 4650.0, z: -1341.0, scale: 5.0, yaw: 190.0, matrixScale: [1.75, 1.0, 0.75] },
     { model: SPIRES, x: 4050.0, y: 4400.0, z: -1918.0, scale: 6.5, yaw: 180.0, matrixScale: [1.5, 1.0, 0.75] },
+    { model: SPIRES, x: -1700.0, y: 6700.0, z: -1500.0, scale: 8.5, yaw: 215.0, matrixScale: [1.5, 1.0, 1.0] },
+    { model: SPIRES, x: 900.0, y: 6900.0, z: -1500.0, scale: 9.5, yaw: 175.0, matrixScale: [1.5, 1.0, 1.0] },
+    { model: SPIRES, x: 2600.0, y: 6600.0, z: -1500.0, scale: 8.0, yaw: 150.0, matrixScale: [1.75, 1.0, 1.0] },
     { model: "Abilities\\Spells\\NightElf\\Immolation\\ImmolationTarget.mdx", x: -1850.0, y: 4500.0, z: -1100.0, scale: 0.75, yaw: 0.0 },
-    { model: "Abilities\\Spells\\NightElf\\Immolation\\ImmolationTarget.mdx", x: 2500.0, y: 4300.0, z: 280.0, scale: 0.5, yaw: 0.0 },
     { model: "Doodads\\Outland\\Rocks\\Outland_Spires\\Outland_Spires7.mdx", x: -3600.0, y: 1450.0, z: -1400.0, scale: 1.5, yaw: 20.0, matrixScale: [3.75, 1.0, 1.375], color: [120, 64, 52] },
     { model: "Doodads\\Outland\\Rocks\\Outland_Rock\\Outland_Rock5.mdx", x: -2500.0, y: 1650.0, z: -1400.0, scale: 7.5, yaw: 160.0, matrixScale: [1.5, 1.0, 1.25], color: [120, 64, 52] },
     { model: "Doodads\\Outland\\Rocks\\Outland_Spires\\Outland_Spires7.mdx", x: -1400.0, y: 1500.0, z: -1400.0, scale: 1.25, yaw: 250.0, matrixScale: [4.0, 1.0, 1.25], color: [120, 64, 52] },
