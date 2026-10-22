@@ -111,7 +111,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: [perf, parity, corpus]
+        group: [perf, rollback, parity, corpus]
     name: ${{ matrix.group }}
     steps:
       - uses: actions/checkout@v4
@@ -195,10 +195,11 @@ jobs:
           case "$GROUP" in
             perf)
               check "four-fighter p99 <= 10 ms and worst <= 14 ms in Classic" sh -c 'bun wisp perf playable-bot-four --samples --out build/playable-bot-four.perf && bun wisp perf budget build/playable-bot-four.perf'
-              check "four-fighter 24-frame rollback p99 <= 10 ms and worst <= 14 ms" sh -c 'bun wisp perf rollback-four --samples --out build/rollback-four.perf && bun wisp perf budget build/rollback-four.perf'
               if [ -f build/playable-bot-four.perf ]; then
                 bun scripts/commitMetrics.ts build/playable-bot-four.perf build/playable.lua | tee -a "$GITHUB_STEP_SUMMARY"
               fi ;;
+            rollback)
+              check "four-fighter 24-frame rollback p99 <= 10 ms and worst <= 14 ms" sh -c 'bun wisp perf rollback-four --samples --out build/rollback-four.perf && bun wisp perf budget build/rollback-four.perf' ;;
             parity)
               # Tapes and the numeric corpus in stock Lua32 and in one whose raw float + - * round toward zero must equal Bun (wisp:docs/headless.md#raw-float-rounding).
               check "parity tapes and numeric" sh -c 'bun wisp parity tapes && bun wisp parity numeric'
@@ -268,7 +269,7 @@ jobs:
           zero='{"passed":0,"failed":0,"skipped":0,"shards":0,"slowestShardSeconds":0}'
           fallback "$zero" '"the merge step did not finish: see its log"'
           : > problems.txt
-          for group in perf parity corpus; do
+          for group in perf rollback parity corpus; do
             [ -n "$(find farm \( -name "result-check-$group.json" -o -name "skipped-check-$group.txt" \))" ] || echo "check group $group neither ran nor was filtered out: it left no result" >> problems.txt
           done
           [ "$PLAN_RESULT" = success ] || echo "the plan job ended $PLAN_RESULT, so no shard ran: see its log" >> problems.txt
