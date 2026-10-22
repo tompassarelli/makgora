@@ -443,7 +443,7 @@ const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined 
   [Character.lichKing]: "Runes mark the ground under the nearest foe; the dead claw up there a moment later. Step off the mark.",
   [Character.thrall]: "Tremors run along the ground both ways. Jump them or stand on a platform.",
   [Character.jaina]: "A ray of frost sweeps down from high ahead of her to the floor. Get behind her or shield.",
-  [Character.sylvanas]: "She becomes a banshee and dives through the nearest foe, leaving a shadow trail that stings anyone standing in it. Hit her while she changes; roll through the dive or shield it.",
+  [Character.sylvanas]: "She becomes a banshee, homes in on the nearest foe and passes through them, leaving a shadow trail that stings anyone standing in it. Hit her while she changes; shield, roll through a level dive or run across her path.",
   [Character.cairne]: "An ankh appears at centre stage. After 24 frames it bursts, then he teleports there with 6 frames of intangibility. Shield or leave the ankh; punish his arrival recovery.",
   [Character.chen]: "He splits into Earth, Storm and Fire, which strike around him one after another.",
   [Character.peon]: "He builds five Orc watch towers in quick succession across the stage; each shoots arrows at the nearest foe for about three seconds, then crumbles. Break a tower, shield or dodge the arrows, or hit him while he builds.",

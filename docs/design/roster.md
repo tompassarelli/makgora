@@ -1430,7 +1430,7 @@ Standing grab 7/2/23, reach 0.50H. Pummel: dagger hilt, never lifesteal.
 | Up | Spectral hand toss | 6 | f14, R20 | 85, LAUNCH |
 | Down | Dagger trip | 5 | f17, R23 | 70, LINK |
 
-**Ultimate — Banshee’s Wail:** replaces literal Charm. f36 visible ground startup, a 70-degree frontal cone reaching 1.5H, active 4 frames, 18 damage, KILL at 45 degrees, R42. Shieldable, no control reversal, mind control, full-screen silence, or unavoidable hit. Spectral faces make the startup easy to read.
+**Ultimate — Banshee Form:** replaces literal Charm. f1–18 a hittable transformation that a hit cancels; f19–98 she is intangible and homes at 9 a frame on the foe nearest at activation, turning at most 4° a frame, for 14% at 45° on contact, then carries through and leaves a shadow trail that ticks 1% jab flinches, at most 20% from one use (numbers in [ultimates](ultimates.md)). Shieldable, rolled through when she dives level, and escaped by running across a dive from above; no control reversal, mind control, full-screen silence, or unavoidable hit.
 
 **Required counterplay test:** her basic arrow must leave time to approach between shots. Skeleton destruction meaningfully removes pressure; silence cannot take away recovery or create a permanent status loop.
 
