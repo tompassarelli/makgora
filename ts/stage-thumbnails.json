@@ -3,9 +3,9 @@
     {
       "stage": 2,
       "file": "StageCardFrozenThrone.blp",
-      "inputs": "7ebc7478f51cdecdbdb44416ccd4fb7b007ea64f520261676ce9a6a0122681d8",
-      "sha256": "67777abd43c6e519a4cd34434c745e0bacffdd65c2925dad15d8db9a525cd63e",
-      "bytes": 77271
+      "inputs": "bae489035f42524062dfec9a5a4d35f593064c5e8bb012bd9e0d9e3b1914bdb1",
+      "sha256": "3c47add095b4a757d667d8a44878bbe0d138c257debdc55c6da207655591dbdf",
+      "bytes": 76482
     },
     {
       "stage": 10,

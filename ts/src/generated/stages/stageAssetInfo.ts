@@ -2,7 +2,7 @@
 /** Each selectable stage's deck models in its palette: the raised decks' slab, which the map scales to each deck, and the main deck, drawn from its collision outline in arena units. */
 export const STAGE_DECK_MODELS: Readonly<Record<number, { readonly slab: string; readonly main: string; readonly alternate?: string }>> = {
   0: { slab: "war3mapImported\\StageDeck-7e2aae2330a24a8ac729f2e74e7461292e493daebf98cda5c5d99fc07e302052.mdx", main: "war3mapImported\\StageMainDeck-d84846d2cdced8d9736dca878d5d1fb303a50f512a0dea0eb06142af33fe1b06.mdx" },
-  2: { slab: "war3mapImported\\StageDeck-490d920caa3293c2b59c64fd20600753fb50fb37792456ac09ca32120fcf9abc.mdx", main: "war3mapImported\\StageMainDeck-5ee5bfbdf7780ff3af5d5a6c8c5a04b1269bfa71600aaa2877b0130a1d59c7e9.mdx" },
+  2: { slab: "war3mapImported\\StageDeck-5f2c10179af1500b356fc5def3f5b43890a82d8b19632f430ae6f5aba87ae841.mdx", main: "war3mapImported\\StageMainDeck-64d5ee428756754c4d28a046f54eec5622d250b52999fbf3ee046dbaea52fc0e.mdx" },
   10: { slab: "war3mapImported\\StageDeck-e67c2bd403254af5d4788cb7267df87b66871fdb97ca6125b2839e9d4599b937.mdx", main: "war3mapImported\\StageMainDeck-76b0baa5202daea3df8832a5e868bb3ad106ca48823e2a1a846088388f8b79a1.mdx" },
   11: { slab: "war3mapImported\\StageDeck-46d3e1533ec507ee9756d96b95b077596ac8ac527ade934265918bf3a35ff9ef.mdx", main: "war3mapImported\\StageMainDeck-fe065b7681d386e05382f03eafb53b9fd1ed525c1b32949b0699e8a49579161e.mdx", alternate: "war3mapImported\\StageDeck-6cf55f4c398fe902a2025f11b959e627452ccce8b3042ceac596a45f2077ccad.mdx" },
   3: { slab: "war3mapImported\\StageDeck-f50de2749e88b8f23c39e407d754a9ba2b5da1ce35cd1a3705e38f460ffcd4e2.mdx", main: "war3mapImported\\StageMainDeck-d515d10e84d10f2948cef82813083f8738ddebdcaadb52815b72e9d1f3f59db0.mdx" },
