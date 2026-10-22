@@ -83,7 +83,7 @@ const poolScope = (pair: number, desktop: string, capacity: string, solo: boolea
     if (child !== undefined && child.exitCode !== null) return yield* new CaptureBatchFailure({ problem: `pair ${pair} pool exited` });
     const status = yield* pairStatus(pair).pipe(Effect.orElseSucceed(() => undefined));
     return attachedPoolReady(status) ? status : undefined;
-  }), { every: "2 seconds", within: "150 seconds", orElse: () => Effect.fail(new CaptureBatchFailure({ problem: `pair ${pair} did not recover its running clients` })) });
+  }), { every: "2 seconds", within: "8 minutes", orElse: () => Effect.fail(new CaptureBatchFailure({ problem: `pair ${pair} did not recover its running clients` })) });
   const tools = yield* resolveTools(["xdotool"]);
   const poolText = yield* Effect.try({ try: () => readFileSync(join(lanState, "pool.json"), "utf8"), catch: cause => new CaptureBatchFailure({ problem: String(cause) }) });
   const record = yield* Schema.decodeEffect(poolRecord)(poolText).pipe(Effect.mapError(cause => new CaptureBatchFailure({ problem: String(cause) })));
