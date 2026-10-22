@@ -18,7 +18,7 @@ import { playComboRoute } from "../../../src/game/match/comboRoute";
 import { Character } from "../../../src/game/sim/codes";
 import { SELECTABLE_CHARACTERS, fighterName } from "../../../src/game/sim/heroes/registry";
 import { type FighterSummary, MAX_CONVERSIONS, OPPONENTS, PERCENTS, POSITIONS, type RouteRecord, type UnitReport, fighterNamed, summarize } from "../../comboExplorer";
-import { type AdvantageRow, TARGETS, advantagePage, unmet } from "../../advantageState";
+import { type AdvantageRow, TARGETS, type ZeroToDeath, advantagePage, unmet } from "../../advantageState";
 import { admit } from "../../heavyCapacity";
 
 const moveData = join(import.meta.dir, "../../../../tools/move-data");
@@ -69,24 +69,28 @@ const UnitReportSchema = Schema.Struct({
 });
 
 
-const measureUnits = (units: readonly Unit[], jobs: number) => Effect.gen(function* () {
+const inWorkers = <U, R>(script: URL, units: readonly U[], jobs: number, name: (unit: U) => string, progress: (unit: U, result: R) => string) => Effect.gen(function* () {
   let done = 0;
   const started = performance.now();
   return yield* Effect.forEach(units, (unit) => Effect.scoped(Effect.gen(function* () {
     const worker = yield* Effect.acquireRelease(
-      Effect.sync(() => new Worker(new URL("../../comboExplorerWorker.ts", import.meta.url).href)),
+      Effect.sync(() => new Worker(script.href)),
       (thread) => Effect.sync(() => thread.terminate()),
     );
-    const report = yield* Effect.callback<UnitReport, CombosFailure>((resume) => {
-      worker.onmessage = (event: MessageEvent<UnitReport>) => resume(Effect.succeed(event.data));
-      worker.onerror = (event) => resume(Effect.fail(failure(new Error(`${fighterName(unit.attacker)} on ${fighterName(unit.opponent)} at ${unit.position}: ${event.message}`))));
+    const result = yield* Effect.callback<R, CombosFailure>((resume) => {
+      worker.onmessage = (event: MessageEvent<R>) => resume(Effect.succeed(event.data));
+      worker.onerror = (event) => resume(Effect.fail(failure(new Error(`${name(unit)}: ${event.message}`))));
       worker.postMessage(unit);
     });
     done++;
-    yield* Console.error(`combos: ${done}/${units.length} ${fighterName(unit.attacker)} on ${fighterName(unit.opponent)} at ${unit.position}, ${((performance.now() - started) / 1000).toFixed(0)} s`);
-    return report;
+    yield* Console.error(`combos: ${done}/${units.length} ${progress(unit, result)}, ${((performance.now() - started) / 1000).toFixed(0)} s`);
+    return result;
   })), { concurrency: jobs });
 });
+
+const unitName = (unit: Unit): string => `${fighterName(unit.attacker)} on ${fighterName(unit.opponent)} at ${unit.position}`;
+const measureUnits = (units: readonly Unit[], jobs: number) =>
+  inWorkers<Unit, UnitReport>(new URL("../../comboExplorerWorker.ts", import.meta.url), units, jobs, unitName, unitName);
 
 
 function replayProblems(routes: readonly (RouteRecord & { readonly fighter: string; readonly opponent: string; readonly position: string })[]): string[] {
@@ -178,24 +182,9 @@ const AdvantageRowSchema = Schema.Struct({
   zeroToDeath: Schema.Array(Schema.String),
 });
 
-const measureAdvantage = (units: readonly AdvantageUnit[], jobs: number) => Effect.gen(function* () {
-  let done = 0;
-  const started = performance.now();
-  return yield* Effect.forEach(units, (unit) => Effect.scoped(Effect.gen(function* () {
-    const worker = yield* Effect.acquireRelease(
-      Effect.sync(() => new Worker(new URL("../../advantageStateWorker.ts", import.meta.url).href)),
-      (thread) => Effect.sync(() => thread.terminate()),
-    );
-    const row = yield* Effect.callback<AdvantageRow, CombosFailure>((resume) => {
-      worker.onmessage = (event: MessageEvent<AdvantageRow>) => resume(Effect.succeed(event.data));
-      worker.onerror = (event) => resume(Effect.fail(failure(new Error(`${fighterName(unit.attacker)} advantage state: ${event.message}`))));
-      worker.postMessage(unit);
-    });
-    done++;
-    yield* Console.error(`combos: ${done}/${units.length} ${row.fighter} against the ${row.target} target, ${((performance.now() - started) / 1000).toFixed(0)} s`);
-    return row;
-  })), { concurrency: jobs });
-});
+const measureAdvantage = (units: readonly AdvantageUnit[], jobs: number) =>
+  inWorkers<AdvantageUnit, AdvantageRow>(new URL("../../advantageStateWorker.ts", import.meta.url), units, jobs,
+    (unit) => `${fighterName(unit.attacker)} advantage state`, (_, row) => `${row.fighter} against the ${row.target} target`);
 
 interface AdvantageUnit {
   readonly attacker: Character;
@@ -254,6 +243,19 @@ const advantage = (attackers: readonly Character[], jobs: number, partial: boole
   yield* writeAdvantage([...kept, ...rows], rows);
 });
 
+const zeroToDeath = (attackers: readonly Character[], jobs: number) => Effect.gen(function* () {
+  const units = attackers.flatMap((attacker) => TARGETS.flatMap((_, target) => POSITIONS.map((position) => ({ attacker, target, position }))));
+  const found = (yield* inWorkers<(typeof units)[number], readonly ZeroToDeath[]>(new URL("../../zeroToDeathWorker.ts", import.meta.url), units, jobs,
+    (unit) => `${fighterName(unit.attacker)} zero-to-death`,
+    (unit, own) => `${fighterName(unit.attacker)} against the ${TARGETS[unit.target]?.weight} target at the ${unit.position}, ${own.length} found`,
+  ).pipe(step(`${units.length} fighter, target and position zero-to-death searches on ${jobs} threads`))).flat();
+  yield* Console.log([
+    ...attackers.map((attacker) => `${fighterName(attacker)}: ${found.filter((own) => own.fighter === fighterName(attacker)).length} true zero-to-death`),
+    ...found.map((own) => `  ${own.fighter} ${own.opener} takes the ${own.target} target's stock from 0% at the ${own.position} against DI ${own.di}: ${own.moves.join(" → ")}. Inputs: ${describeInputs(own.held)}.`),
+  ].join("\n"));
+  if (found.length > 0) return yield* new CombosFailure({ problem: `${found.length} true zero-to-death routes` });
+});
+
 const mergeAdvantage = (files: readonly string[]) => Effect.gen(function* () {
   const rows = (yield* Effect.forEach(files, (file) => readText(file).pipe(Effect.flatMap(decodeRows)))).flat();
   const expected = SELECTABLE_CHARACTERS.flatMap((attacker) => TARGETS.map((target) => `${fighterName(attacker)} ${target.weight}`)).sort();
@@ -264,7 +266,7 @@ const mergeAdvantage = (files: readonly string[]) => Effect.gen(function* () {
 
 export const combos: Command = (args) => Effect.gen(function*() {
   const parsed = yield* Effect.try({
-    try: () => parseArgs({ args: [...args], options: { fighter: { type: "string", multiple: true }, jobs: { type: "string" }, advantage: { type: "boolean" }, shard: { type: "string" }, rows: { type: "string" }, merge: { type: "string", multiple: true } }, strict: true }).values,
+    try: () => parseArgs({ args: [...args], options: { fighter: { type: "string", multiple: true }, jobs: { type: "string" }, advantage: { type: "boolean" }, "zero-to-death": { type: "boolean" }, shard: { type: "string" }, rows: { type: "string" }, merge: { type: "string", multiple: true } }, strict: true }).values,
     catch: (cause) => new UsageFailure({ problem: describeCause(cause) }),
   });
   const names = parsed.fighter ?? [];
@@ -284,6 +286,7 @@ export const combos: Command = (args) => Effect.gen(function*() {
     if (code !== 0) return yield* new CombosFailure({ problem: `the admitted run exited ${code}` });
     return;
   }
+  if (parsed["zero-to-death"] === true) return yield* zeroToDeath(attackers.filter((attacker): attacker is Character => attacker !== undefined), jobs);
   if (parsed.advantage === true) return yield* advantage(attackers.filter((attacker): attacker is Character => attacker !== undefined), jobs, names.length > 0, shard);
   const units: Unit[] = attackers.flatMap((attacker) => attacker === undefined ? [] : OPPONENTS.flatMap((opponent) => POSITIONS.map((position) => ({ attacker, opponent, position }))));
   const reports = yield* measureUnits(units, jobs).pipe(step(`${units.length} fighter, opponent and position cells on ${jobs} threads`));

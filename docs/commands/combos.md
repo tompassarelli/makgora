@@ -12,3 +12,10 @@
   smashcraft:docs/gameplay-design.md, "Advantage state" (#388). Autoland
   regenerates the whole roster for every landing (docs/ci.md#autoland); run
   only `--fighter NAME` locally to inspect a change.
+
+- Zero-to-death: `bun wisp combos --zero-to-death [--fighter NAME]... [--jobs N]`
+  runs every opener from 0% against the light, medium and heavy targets at the
+  centre and the ledge against the escape-optimal DI, lists each route that
+  takes the stock without a read, tech chase or edge-guard between hits, with
+  its frame-by-frame inputs, and fails when it finds one
+  (smashcraft:docs/gameplay-design.md, "Advantage state", #44).

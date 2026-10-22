@@ -182,10 +182,22 @@ export function advantageRow(attacker: Character, target: (typeof TARGETS)[numbe
   };
 }
 
-export function trueZeroToDeaths(attacker: Character, targets: readonly (typeof TARGETS)[number][] = TARGETS, positions: readonly Position[] = POSITIONS): string[] {
+export interface ZeroToDeath {
+  readonly fighter: string;
+  readonly target: TargetWeight;
+  readonly position: Position;
+  readonly opener: string;
+  readonly di: Di;
+  readonly moves: readonly string[];
+  readonly held: readonly number[];
+}
+
+export function trueZeroToDeaths(attacker: Character, targets: readonly (typeof TARGETS)[number][] = TARGETS, positions: readonly Position[] = POSITIONS): ZeroToDeath[] {
   return targets.flatMap((target) => positions.flatMap((position) => OPENERS.flatMap((opener) => {
     const { escape, escapeDi } = measureCell(attacker, target.character, opener, 0, position);
-    return escape?.ko === true ? [`${fighterName(attacker)} takes the ${target.weight} target's stock from 0% at the ${position} against DI ${escapeDi}: ${escape.moves.join(", ")}`] : [];
+    return escape?.ko === true && escapeDi !== undefined
+      ? [{ fighter: fighterName(attacker), target: target.weight, position, opener: opener.name, di: escapeDi, moves: escape.moves, held: escape.route.held }]
+      : [];
   })));
 }
 
