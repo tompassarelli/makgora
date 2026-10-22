@@ -163,7 +163,7 @@ const VOODOO_WARD_MARK = "Abilities\\Spells\\Orc\\Voodoo\\VoodooAuraTarget.mdx";
 const VOODOO_BOLT = "Abilities\\Weapons\\SerpentWardMissile\\SerpentWardMissile.mdx";
 const VOODOO_END = 105;
 const VOODOO_WARD_FRAME = 16;
-const voodooBolt = (effect: HitEffect): SpecialProjectile => shot(0, 30.0, 50.0, 14.0, 0.0, 24, 26.0, effect, VOODOO_BOLT);
+const voodooBolt = (effect: HitEffect): SpecialProjectile => ({ ...shot(0, 30.0, 50.0, 14.0, 0.0, 24, 26.0, effect, VOODOO_BOLT), modelRadius: 13.0 });
 const SHADOW_HUNTER: AuthoredSpecial = {
   name: "Big Bad Voodoo", endFrame: VOODOO_END,
   projectiles: [{ ...mark(VOODOO_AURA, 2, VOODOO_END - 2, 0.0), cancelOnInterrupt: true }],
@@ -173,7 +173,6 @@ const SHADOW_HUNTER: AuthoredSpecial = {
     shot: voodooBolt(hit(4.0, 40, 20.0, 30.0, HitElement.poison)),
     finalShot: voodooBolt(hit(8.0, 45, 85.0, 45.0, HitElement.poison)),
     mark: { ...mark(VOODOO_WARD_MARK, 0, VOODOO_END - VOODOO_WARD_FRAME, 0.0), cancelOnInterrupt: true },
-    model: { path: "Units\\Orc\\SerpentWard\\SerpentWard.mdx", height: 300.0, alpha: 255 },
   },
 };
 

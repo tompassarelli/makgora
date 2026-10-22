@@ -17,8 +17,10 @@ import { bindPrototype } from "../../platform/rebind";
 
 
 const PLACED_OBJECT_MODEL = "Units\\Orc\\SerpentWard\\SerpentWard.mdx";
-const MODEL_HEIGHT = 300.0;
-const DEFAULT_LOOK: { readonly path: string; readonly height: number; readonly alpha: number; readonly finished?: true } = { path: PLACED_OBJECT_MODEL, height: MODEL_HEIGHT, alpha: 255 };
+const MODEL_HEIGHT = 105.0;
+const MODEL_TURN = f32(0.785398185);
+interface PlacedLook { readonly path: string; readonly height: number; readonly alpha: number; readonly finished?: true; readonly turn?: number }
+const DEFAULT_LOOK: PlacedLook = { path: PLACED_OBJECT_MODEL, height: MODEL_HEIGHT, alpha: 255, turn: MODEL_TURN };
 const ANIMALS = PACK_CAPACITY + 1;
 const BIRTH_SECONDS = 60.0;
 const DEATH_SECONDS = f32(2.333);
@@ -148,7 +150,7 @@ export class PlacedObjectEffects {
   }
 
   private presentAnimal(fighter: Readonly<Fighter>, placed: Resting<PlacedObject>, slot: number): void {
-    const look = placed.spec?.model ?? heroLook(fighter.character)?.placedModel ?? DEFAULT_LOOK;
+    const look: PlacedLook = placed.spec?.model ?? heroLook(fighter.character)?.placedModel ?? DEFAULT_LOOK;
 
     const model = this.paths[slot] === look.path ? this.models[slot] : undefined;
     const spec = placed.spec;
@@ -161,11 +163,13 @@ export class PlacedObjectEffects {
     parked[slot] = false;
     const { x, y, z } = this.origin;
     placeEffect(model, x + placed.x, y, z + placed.z);
-    BlzSetSpecialEffectYaw(model, placed.direction > 0 ? 0.0 : f32(3.14159274));
+    const turn = look.turn ?? 0.0;
+    BlzSetSpecialEffectYaw(model, placed.direction > 0 ? -turn : f32(f32(3.14159274) + turn));
     const bear = placed === fighter.placed ? bearState(fighter) : undefined;
     if (spec.companion !== undefined) this.animate(model, slot, placed, bear);
     else if (spec.crumble !== undefined) this.build(model, slot, placed, spec.crumble, spec.fireAges[0] ?? 1);
     else if (look.finished === true) this.build(model, slot, placed, 0, 0);
+    else this.animate(model, slot, placed, bear);
     BlzSetSpecialEffectScale(model, f32(spec.height / look.height * (bear === "CHARGING" ? 1.25 : 1.0)));
 
     const left = f32(Math.max(0.0, placed.durability) / spec.durability);
