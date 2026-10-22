@@ -11,7 +11,7 @@ import { type FixedDelay, isFixedDelay } from "../../game/netcode/fixedSchedule"
 import { PENDING_CAPACITY } from "../../game/netcode/shadowSchedule";
 import { createText, gameUi, placeTopLeft } from "../../game/ui/frames";
 import { MENU_STYLE } from "../../game/ui/hudLayout";
-import type { LobbyNet } from "../../game/ui/selectionUi";
+import type { LobbyNet } from "../../game/ui/selectionActions";
 import { at } from "wisp/src/runtime/lookup";
 import { type MachineRate, machineRate, noteMachineSecond, slowMachineText } from "../../game/netcode/machineRate";
 import { type Roster, isActive } from "../../game/sim/roster";

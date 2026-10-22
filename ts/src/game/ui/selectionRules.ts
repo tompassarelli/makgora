@@ -1,0 +1,124 @@
+import { RULE_BUTTONS, RULE_HEIGHT, RULE_ROWS, type RuleBox, type TrainingSetting } from "./ruleButtons";
+import { f32 } from "wisp/src/sim/f32";
+import type { MatchState } from "../lobby/lobbyState";
+import { MENU_STYLE } from "./hudLayout";
+import { ItemKind, itemBit } from "../sim/codes";
+import { type TutorialMenuFrames, showTutorialLesson } from "./tutorialMenu";
+import { placeTopLeft, setFrameText } from "./frames";
+import { label } from "./selectionFrames";
+import type { SelectionActions } from "./selectionActions";
+
+export type RuleButton = { kind: "teamBattle" } | { kind: "friendlyFire" } | { kind: "stocks"; direction: -1 | 1 } | { kind: "time"; direction: -1 | 1 } | { kind: "endless" } | { kind: "automaticRematch" }
+  | { kind: "items" } | { kind: "ultimates" } | { kind: "itemKind"; item: ItemKind } | { kind: "training" } | { kind: "partner"; setting: TrainingSetting; direction: -1 | 1 } | { kind: "hitAreas" } | { kind: "speed" }
+  | { kind: "classicTier"; direction: -1 | 1 };
+
+type AddRule = (frame: framehandle, target: RuleButton) => framehandle;
+
+export interface MatchRuleFrames {
+  readonly steps: readonly framehandle[];
+  readonly stockValue: framehandle;
+  readonly timeValue: framehandle;
+  readonly teamToggle: framehandle;
+  readonly friendlyFireToggle: framehandle;
+  readonly endlessToggle: framehandle;
+  readonly rematchToggle: framehandle;
+  readonly itemsToggle: framehandle;
+  readonly ultimatesToggle: framehandle;
+  readonly itemToggles: readonly framehandle[];
+  readonly trainingToggle: framehandle;
+  readonly hitAreasToggle: framehandle;
+  readonly speedToggle: framehandle;
+  readonly partnerValues: readonly framehandle[];
+  readonly trainingFrames: readonly framehandle[];
+}
+
+export interface RuleFrames extends MatchRuleFrames {
+  readonly classicFrames: readonly framehandle[];
+  readonly classicTierValue: framehandle;
+  readonly classicRoute: framehandle;
+  readonly matchRuleFrames: readonly framehandle[];
+}
+
+function ruleButton(root: framehandle, add: AddRule, box: RuleBox, target: RuleButton, text: string): framehandle {
+  const frame = BlzCreateFrame("ScriptDialogButton", root, 0, 0);
+  placeTopLeft(frame, box.x, box.y);
+  BlzFrameSetSize(frame, box.width, box.height);
+  setFrameText(frame, text);
+  BlzFrameSetFont(frame, MENU_STYLE.font, MENU_STYLE.headerSize, 0);
+  BlzFrameSetFont(BlzGetFrameByName("ScriptDialogButtonText", 0), MENU_STYLE.font, MENU_STYLE.headerSize, 0);
+  return add(frame, target);
+}
+
+export function createMatchRules(root: framehandle, suffix: string, add: AddRule): MatchRuleFrames {
+  const { fewerStocks, moreStocks, lessTime, moreTime, endless, automaticRematch } = RULE_BUTTONS;
+  const steps = [
+    ruleButton(root, add, fewerStocks, { kind: "stocks", direction: -1 }, "−"),
+    ruleButton(root, add, moreStocks, { kind: "stocks", direction: 1 }, "+"),
+    ruleButton(root, add, lessTime, { kind: "time", direction: -1 }, "−"),
+    ruleButton(root, add, moreTime, { kind: "time", direction: 1 }, "+"),
+  ];
+  const valueX = fewerStocks.x + fewerStocks.width;
+  const valueWidth = moreStocks.x - valueX;
+  const stockValue = label(root, `MeleeRulesStocks${suffix}`, valueX, fewerStocks.y, valueWidth, RULE_HEIGHT, MENU_STYLE.headerSize);
+  const timeValue = label(root, `MeleeRulesTime${suffix}`, lessTime.x + lessTime.width, lessTime.y, moreTime.x - lessTime.x - lessTime.width, RULE_HEIGHT, MENU_STYLE.headerSize);
+  const teamToggle = ruleButton(root, add, RULE_BUTTONS.teamBattle, { kind: "teamBattle" }, "");
+  const friendlyFireToggle = ruleButton(root, add, RULE_BUTTONS.friendlyFire, { kind: "friendlyFire" }, "");
+  const endlessToggle = ruleButton(root, add, endless, { kind: "endless" }, "");
+  const rematchToggle = ruleButton(root, add, automaticRematch, { kind: "automaticRematch" }, "");
+  const itemsToggle = ruleButton(root, add, RULE_BUTTONS.items, { kind: "items" }, "");
+  const ultimatesToggle = ruleButton(root, add, RULE_BUTTONS.ultimates, { kind: "ultimates" }, "");
+  const itemToggles = [
+    ruleButton(root, add, RULE_BUTTONS.itemSpeed, { kind: "itemKind", item: ItemKind.speed }, ""),
+    ruleButton(root, add, RULE_BUTTONS.itemHeavy, { kind: "itemKind", item: ItemKind.heavy }, ""),
+  ];
+  const trainingToggle = ruleButton(root, add, RULE_BUTTONS.training, { kind: "training" }, "");
+  const hitAreasToggle = ruleButton(root, add, RULE_BUTTONS.hitAreas, { kind: "hitAreas" }, "");
+  const speedToggle = ruleButton(root, add, RULE_BUTTONS.speed, { kind: "speed" }, "");
+  const partnerRows: readonly (readonly [TrainingSetting, RuleBox, RuleBox])[] = [
+    ["behaviour", RULE_BUTTONS.lessBehaviour, RULE_BUTTONS.moreBehaviour],
+    ["escape", RULE_BUTTONS.lessEscape, RULE_BUTTONS.moreEscape],
+    ["tech", RULE_BUTTONS.lessTech, RULE_BUTTONS.moreTech],
+    ["damage", RULE_BUTTONS.lessDamage, RULE_BUTTONS.moreDamage],
+  ];
+  const partnerFrames: framehandle[] = [hitAreasToggle, speedToggle];
+  const partnerValues = partnerRows.map(([setting, less, more]) => {
+    partnerFrames.push(ruleButton(root, add, less, { kind: "partner", setting, direction: -1 }, "−"), ruleButton(root, add, more, { kind: "partner", setting, direction: 1 }, "+"));
+    const value = label(root, `MeleeTraining${setting}${suffix}`, less.x + less.width, less.y, more.x - less.x - less.width, RULE_HEIGHT, f32(0.009));
+    partnerFrames.push(value);
+    return value;
+  });
+  return {
+    steps, stockValue, timeValue, teamToggle, friendlyFireToggle, endlessToggle, rematchToggle, itemsToggle, ultimatesToggle, itemToggles, trainingToggle, hitAreasToggle, speedToggle,
+    partnerValues, trainingFrames: partnerFrames,
+  };
+}
+
+export function createClassicRules(root: framehandle, suffix: string, add: AddRule, match: MatchRuleFrames): RuleFrames {
+  const { easierClassic, harderClassic } = RULE_BUTTONS;
+  const classicTierValue = label(root, `MeleeClassicTier${suffix}`, easierClassic.x + easierClassic.width, easierClassic.y, harderClassic.x - easierClassic.x - easierClassic.width, RULE_HEIGHT, f32(0.011));
+  const classicRoute = label(root, `MeleeClassicRoute${suffix}`, f32(0.38), RULE_ROWS[1], f32(0.37), RULE_HEIGHT, f32(0.0085));
+  const classicFrames = [
+    ruleButton(root, add, easierClassic, { kind: "classicTier", direction: -1 }, "−"),
+    ruleButton(root, add, harderClassic, { kind: "classicTier", direction: 1 }, "+"),
+    classicTierValue, classicRoute,
+  ];
+  const matchRuleFrames = [...match.steps, match.stockValue, match.timeValue, match.teamToggle, match.endlessToggle, match.rematchToggle, match.itemsToggle, match.ultimatesToggle];
+  return { ...match, classicFrames, classicTierValue, classicRoute, matchRuleFrames };
+}
+
+export function applyRuleButton(actions: SelectionActions, participantId: number, button: RuleButton): void {
+  if (button.kind === "teamBattle") actions.toggleTeamBattle(participantId);
+  else if (button.kind === "friendlyFire") actions.toggleFriendlyFire(participantId);
+  else if (button.kind === "stocks") actions.changeStocks(participantId, button.direction);
+  else if (button.kind === "time") actions.changeTime(participantId, button.direction);
+  else if (button.kind === "endless") actions.toggleEndless(participantId);
+  else if (button.kind === "items") actions.toggleItems(participantId);
+  else if (button.kind === "ultimates") actions.toggleUltimates(participantId);
+  else if (button.kind === "itemKind") actions.toggleItemKind(participantId, button.item);
+  else if (button.kind === "training") actions.cycleMatchMode(participantId);
+  else if (button.kind === "classicTier") actions.stepClassicTier(participantId, button.direction);
+  else if (button.kind === "partner") actions.stepTraining(participantId, button.setting, button.direction);
+  else if (button.kind === "hitAreas") actions.toggleHitAreas(participantId);
+  else if (button.kind === "speed") actions.stepSpeed(participantId);
+  else actions.toggleAutomaticRematch(participantId);
+}
