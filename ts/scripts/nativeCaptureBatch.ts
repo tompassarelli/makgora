@@ -63,14 +63,16 @@ const stopPool = (child: Bun.Subprocess) => Effect.gen(function*() {
   }
 });
 
-const poolScope = (pair: number, desktop: string, capacity: string, network: boolean) => Effect.gen(function*() {
+const poolScope = (pair: number, desktop: string, capacity: string, solo: boolean, network: boolean) => Effect.gen(function*() {
   const scope = yield* Scope.fork(yield* Effect.scope);
   const existing = yield* pairStatus(pair).pipe(Effect.orElseSucceed(() => undefined));
   const holder = yield* Effect.try({ try: () => {
     const path = join(lanState, `pair-${pair}`, "pool.pid");
     return existsSync(path) ? Number(readFileSync(path, "utf8").trim()) : 0;
   }, catch: cause => new CaptureBatchFailure({ problem: String(cause) }) });
-  const child = attachExistingPool(existing, Number.isInteger(holder) && holder > 1 && processIsAlive(holder)) ? undefined : yield* Effect.acquireRelease(
+  const attach = attachExistingPool(existing, Number.isInteger(holder) && holder > 1 && processIsAlive(holder));
+  if (attach && solo) return yield* new CaptureBatchFailure({ problem: `pair ${pair} is already running; a --solo batch restarts its pair between rows, so stop it first (bun wisp lan stop --pair ${pair})` });
+  const child = attach ? undefined : yield* Effect.acquireRelease(
     Effect.try({
       try: () => Bun.spawn([process.execPath, "scripts/wisp.ts", "lan", "pool", "--foreground", "--pair", String(pair), "--pool-profile", "visual", "--desktop", desktop, "--capacity", capacity, ...(network ? ["--network"] : [])], { cwd: tsDirectory, stdin: "ignore", stdout: "inherit", stderr: "inherit" }),
       catch: cause => new CaptureBatchFailure({ problem: `start pair ${pair} pool: ${String(cause)}` }),
@@ -169,7 +171,7 @@ export const nativeCaptureBatch = (args: readonly string[]) => Effect.scoped(Eff
   const runtimeClients = join(out, "runtime-clients.json");
   const writeRuntimeClients = Effect.try({ try: () => writeFileSync(runtimeClients, withRuntimeTools(readFileSync(clientsFile, "utf8"), tools)), catch: cause => new CaptureBatchFailure({ problem: String(cause) }) });
   const currentScope = yield* Effect.scope;
-  const acquirePool = () => (args.includes("--signed-in") ? Scope.fork(currentScope).pipe(Effect.map(scope => ({ scope, child: undefined, signedClients: runtimeClients } satisfies PairPool))) : poolScope(pair, desktop, capacity, network)).pipe(Effect.tap(() => writeRuntimeClients));
+  const acquirePool = () => (args.includes("--signed-in") ? Scope.fork(currentScope).pipe(Effect.map(scope => ({ scope, child: undefined, signedClients: runtimeClients } satisfies PairPool))) : poolScope(pair, desktop, capacity, solo, network)).pipe(Effect.tap(() => writeRuntimeClients));
   let pool: PairPool = yield* acquirePool();
   let stale = false;
   let completed = 0;
@@ -198,7 +200,7 @@ export const nativeCaptureBatch = (args: readonly string[]) => Effect.scoped(Eff
         console.log(`row ${row.name}: complete (${completed}/${plan.rows.length})`);
       } else {
         lastReason = result._tag === "Failure" ? String(result.failure) : result.success.kind === "complete" ? "capture process returned without a complete row" : result.success.reason;
-        console.log(`row ${row.name}: ${lastReason}; restarting pair (${attempt}/4)`);
+        console.log(`row ${row.name}: ${lastReason} (attempt ${attempt}/4)`);
         stale = true;
       }
     }
