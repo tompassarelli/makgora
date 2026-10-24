@@ -1,17 +1,19 @@
 # #190: blinks of exact length set b just past the end of a's Vanishing Act: b retreats to x 360 (Last Word),
 # a blinks to x -60, b blinks to x 180, then a blinks from x -60 to x 120, ending 60 short of b.
+# Melee preset (B special, X jump, LB EX special), the one the EX scripts of this folder need.
 #! chat -dev quick hero medivh
+#! preset melee
 550 b stick 0 -1
-550 b tap X 2
+550 b tap B 2
 553 b stick 0 0
 610 a stick 1 0
-610 a tap X 2
+610 a tap B 2
 612 a stick 0 0
 670 b stick -1 0
-670 b tap X 2
+670 b tap B 2
 672 b stick 0 0
 730 a stick 1 0
-730 a tap X 2
+730 a tap B 2
 732 a stick 0 0
 740 a capture
 800 a press VIEW

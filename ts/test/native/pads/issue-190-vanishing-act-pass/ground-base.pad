@@ -1,9 +1,11 @@
 # #190: Medivh (a) dashes to about x 120, then Vanishing Act blinks through Medivh (b) standing at x 240.
+# Melee preset (B special, X jump, LB EX special), the one the EX scripts of this folder need.
 #! chat -dev quick hero medivh
+#! preset melee
 540 a stick 1 0
 548 a stick 0 0
 600 a stick 1 0
-600 a tap X 2
+600 a tap B 2
 602 a stick 0 0
 610 a capture
 680 a press VIEW

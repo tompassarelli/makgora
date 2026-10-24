@@ -1,17 +1,20 @@
 # #190: Medivh (a) dashes to about x 120; both jump together and Vanishing Act blinks through b in the air.
+# Melee preset (B special, X jump, LB EX special), the one the EX scripts of this folder need.
 #! chat -dev quick hero medivh
+#! preset melee
 540 a stick 1 0
 548 a stick 0 0
-600 a tap B 2
-600 b tap B 2
+600 a tap X 2
+600 b tap X 2
 604 a stick 1 0
-604 a tap X 2
+604 a tap B 2
 606 a stick 0 0
 614 a capture
 680 a press VIEW
 750 a release VIEW
-# The cast starts on the press, in the air; on its frame 11 the pass hits airborne b once and launches it upward.
-#! expect b 600 applied jump
+# Both leave the ground after three frames of jumpsquat; a casts on its first airborne frame, and on
+# the cast's frame 11 the pass hits airborne b once and launches it upward.
+#! expect b 603 applied jump
 #! expect a 604 special 14 form 0
 #! absent b 540-612 damage
 #! expect b 613-615 damage 5.871
