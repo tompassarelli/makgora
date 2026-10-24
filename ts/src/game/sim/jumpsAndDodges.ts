@@ -14,7 +14,7 @@ import { melee } from "./tuning";
 const AIR_DODGE_SPEED = melee(f32(3.1));
 export const AIR_DODGE_DECAY = 0.8999999761581421;
 
-const AIR_DODGE_DECAY_FRAMES = 29;
+export const AIR_DODGE_DECAY_FRAMES = 29;
 export const AIR_DODGE_ANIMATION_FRAMES = 49;
 // Cos and Sin of 18 * bj_DEGTORAD, as the Wurst interpreter evaluates them in binary32.
 const SHALLOW_DODGE_COS = 0.9510565996170044;
@@ -99,6 +99,13 @@ export function beginAirDodge(f: Fighter, horizontal: number, vertical: number, 
   recovery.contactZ = 0.0;
   recovery.contactNormalX = 0.0;
   recovery.contactNormalZ = 0.0;
+}
+
+export function endFinishedAirDodge(f: Fighter): void {
+  const { dodge } = f;
+  if (!dodge.airDodging || dodge.airFrame < AIR_DODGE_DECAY_FRAMES) return;
+  dodge.airDodging = false;
+  dodge.airFrame = 0;
 }
 
 export function canBeginGroundDodge(f: Fighter): boolean {

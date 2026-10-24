@@ -46,7 +46,7 @@ import { heroMotionHolds, heroMotionPassesPlatforms, jumpCancelHeroSpecial } fro
 import { carryHeroStatus } from "./heroStatus";
 import { exSpecialPressed } from "./exSpecials";
 import { demonHunterGliding, demonHunterJumpOrGlideCancel } from "./specials";
-import { AIR_DODGE_ANIMATION_FRAMES, AIR_DODGE_DECAY, beginAirDodge, beginGroundDodge, beginJump, canBeginGroundDodge } from "./jumpsAndDodges";
+import { AIR_DODGE_DECAY, AIR_DODGE_DECAY_FRAMES, beginAirDodge, beginGroundDodge, beginJump, canBeginGroundDodge, endFinishedAirDodge } from "./jumpsAndDodges";
 import { ageKnockback, applyDirectionalInfluence, decayKnockback } from "./knockback";
 import { advanceLedge } from "./ledge";
 import { EdgePass, passThroughEdge, rideWall, teleportsThisFrame } from "./edgeRecovery";
@@ -476,6 +476,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   if (launch.hitlag <= 0) {
     f.surfaceRecovery.reflectCooldown = max(0, f.surfaceRecovery.reflectCooldown - 1);
     endFinishedDownStates(f);
+    endFinishedAirDodge(f);
   }
   const wallJumped = advanceSurfaceRecovery(f, input);
   const wallTechStartup = f.surfaceRecovery.state === SurfaceContact.techWall && f.surfaceRecovery.frame < WALL_TECH_STARTUP_FRAMES;
@@ -552,11 +553,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   const forcedShield = shield.raised && shield.stun > 0;
   shield.stun = max(0, shield.stun - 1);
   status.invincible = max(0, status.invincible - 1);
-  if (dodge.airDodging) dodge.airFrame = min(AIR_DODGE_ANIMATION_FRAMES, dodge.airFrame + 1);
-  if (dodge.airDodging && dodge.airFrame >= AIR_DODGE_ANIMATION_FRAMES) {
-    dodge.airDodging = false;
-    dodge.airFrame = 0;
-  }
+  if (dodge.airDodging) dodge.airFrame = min(AIR_DODGE_DECAY_FRAMES, dodge.airFrame + 1);
   const dodgeActive = dodge.airMotionFrames > 0;
   dodge.airMotionFrames = max(0, dodge.airMotionFrames - 1);
   shield.releaseLag = max(0, shield.releaseLag - 1);
