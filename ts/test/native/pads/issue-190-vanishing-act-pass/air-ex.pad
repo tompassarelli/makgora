@@ -1,5 +1,5 @@
 # #190: Medivh (a) dashes to about x 120; both jump together and EX Vanishing Act blinks through b in the air.
-# Melee preset: LB is the EX special; the setup fills both bars, since an EX costs a third of one.
+# Melee preset: LB is Strong (#186), and Strong + B the EX; the setup fills both bars, since an EX costs a third of one.
 #! chat -dev setup quick hero medivh;meter 100
 #! preset melee
 540 a stick 1 0
@@ -7,8 +7,10 @@
 600 a tap X 2
 600 b tap X 2
 604 a stick 1 0
-604 a tap LB 2
+604 a press LB
+604 a tap B 2
 606 a stick 0 0
+606 a release LB
 614 a capture
 680 a press VIEW
 750 a release VIEW
