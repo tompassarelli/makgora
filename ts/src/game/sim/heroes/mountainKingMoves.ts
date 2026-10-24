@@ -141,23 +141,23 @@ export const MOUNTAIN_KING_MOVES: FighterMoves = {
       heroRegion(11, 13, capsule(0.0, 18.0, 0.0, 62.0, 24.0), NEUTRAL_AIR_BACK),
     ]),
     [AttackStyle.forwardAir]: heroMove(16, 3, 30, 21, [
-      frame(16, circle(72.0, 32.0, 20.0), FORWARD_AIR_HEAD, FORWARD_AIR_GROUNDED_HEAD),
-      frame(17, circle(f32(MEDIUM - 20.0), 5.0, 20.0), FORWARD_AIR_HEAD, FORWARD_AIR_GROUNDED_HEAD),
-      frame(18, circle(72.0, -25.0, 20.0), FORWARD_AIR_HEAD, FORWARD_AIR_GROUNDED_HEAD),
-      frame(16, capsule(16.0, 54.0, 62.0, 36.0, 8.0), FORWARD_AIR_HANDLE),
-      frame(17, capsule(16.0, 50.0, 74.0, 13.0, 8.0), FORWARD_AIR_HANDLE),
-      frame(18, capsule(16.0, 46.0, 64.0, -13.0, 8.0), FORWARD_AIR_HANDLE),
+      frame(16, circle(46.0, 46.0, 20.0), FORWARD_AIR_HEAD, FORWARD_AIR_GROUNDED_HEAD),
+      frame(17, circle(49.0, 25.0, 20.0), FORWARD_AIR_HEAD, FORWARD_AIR_GROUNDED_HEAD),
+      frame(18, circle(46.0, 4.0, 20.0), FORWARD_AIR_HEAD, FORWARD_AIR_GROUNDED_HEAD),
+      frame(16, capsule(16.0, 54.0, 36.0, 48.0, 8.0), FORWARD_AIR_HANDLE),
+      frame(17, capsule(16.0, 50.0, 40.0, 30.0, 8.0), FORWARD_AIR_HANDLE),
+      frame(18, capsule(16.0, 46.0, 38.0, 10.0, 8.0), FORWARD_AIR_HANDLE),
     ]),
     [AttackStyle.backAir]: heroMove(10, 3, 25, 15, [
-      frame(10, capsule(-18.0, 60.0, -f32(MEDIUM - 12.0), 65.0, 12.0), BACK_AIR),
-      frame(11, capsule(-18.0, 45.0, -f32(MEDIUM - 12.0), 40.0, 12.0), BACK_AIR),
-      frame(12, capsule(-18.0, 30.0, -80.0, 18.0, 12.0), BACK_AIR),
+      frame(10, capsule(-18.0, 60.0, -60.0, 70.0, 12.0), BACK_AIR),
+      frame(11, capsule(-18.0, 45.0, -60.0, 45.0, 12.0), BACK_AIR),
+      frame(12, capsule(-18.0, 30.0, -56.0, 20.0, 12.0), BACK_AIR),
     ]),
     [AttackStyle.upAir]: heroMove(7, 4, 22, 13, [
       heroRegion(7, 10, capsule(0.0, 52.0, 0.0, f32(SHORT - 12.0), 12.0), UP_AIR),
     ]),
     [AttackStyle.downAir]: heroMove(12, 5, 29, 20, [
-      heroRegion(12, 16, capsule(0.0, 5.0, 0.0, -f32(SHORT - 14.0), 14.0), DOWN_AIR, DOWN_AIR_GROUNDED),
+      heroRegion(12, 16, capsule(0.0, 22.0, 0.0, -2.0, 14.0), DOWN_AIR, DOWN_AIR_GROUNDED),
     ]),
     [AttackStyle.grab]: heroMove(8, 2, 25, 0, [
       heroRegion(8, 9, capsule(14.0, 14.0, f32(GRAB - 14.0), 24.0, 14.0), GRAB_CONTACT),

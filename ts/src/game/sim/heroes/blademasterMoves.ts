@@ -78,7 +78,7 @@ const BLADESTORM_PLUNGE = 25;
 const BLADESTORM_LAST = 34;
 const BLADESTORM_TOTAL = 46;
 const BLADESTORM_REACH = f32(M - BLADE_RADIUS);
-const BLADESTORM = drillStrikes(-6.0, -96.0, BLADESTORM_REACH,
+const BLADESTORM = drillStrikes(5.0, -55.0, 75.0,
   { centre: linkAt(2.0, 10.0, 90), front: linkAt(2.0, 10.0, 100), back: linkAt(2.0, 10.0, 80) },
   { centre: linkAt(2.0, 20.0, 270), front: linkAt(2.0, 20.0, 250), back: linkAt(2.0, 20.0, 290) });
 const bladestorm: AuthoredMove = {

@@ -87,7 +87,7 @@ const SKY_LIFT: readonly Strike[] = [
 
 
 const KNIFE_REACH = f32(S + 10.0);
-const fallingKnives = (damage: number, base: number) => drillStrikes(-4.0, -70.0, KNIFE_REACH,
+const fallingKnives = (damage: number, base: number) => drillStrikes(30.0, -30.0, KNIFE_REACH,
   { centre: linkAt(damage, base, 270), front: linkAt(damage, base, 250), back: linkAt(damage, base, 290) },
   { centre: linkAt(damage, base, 270), front: linkAt(damage, base, 250), back: linkAt(damage, base, 290) });
 const FALLING_KNIVES: AuthoredMove = {
