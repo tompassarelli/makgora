@@ -139,7 +139,7 @@ export function flushTransport(s: ShellState, rollback: Rollback, journal: Journ
     for (let frame = firstFrame; frame <= lastFrame; frame++) recordSend(s.trace, rollback.epoch, frame);
     traceInput(s.trace, `journal sent frame ${firstFrame} count ${lastFrame - firstFrame + 1} bytes ${message.wire.length}`);
   }
-  journal.outgoing.sent(message);
+  journal.outgoing.sent(message, rollback.batch);
 }
 
 

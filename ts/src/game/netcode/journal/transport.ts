@@ -13,6 +13,8 @@ export const DEFAULT_BATCH = 6;
 
 export const MAX_BATCH = 12;
 
+export const BURST_MESSAGES = 2;
+
 
 export function decodeTransport(wire: string): readonly InputPacket[] | undefined {
   if (wire.startsWith("I5")) return decodeInputMessage(wire);
@@ -33,6 +35,8 @@ export class OutgoingInput {
   private nextUnsent = 1;
   private admitted = 0;
   private idle = MAX_BATCH;
+  private credit = BURST_MESSAGES * MAX_BATCH;
+  private pressPending = false;
 
 
   begin(epoch: number, firstFrame: number): void {
@@ -41,6 +45,8 @@ export class OutgoingInput {
     this.nextUnsent = firstFrame;
     this.admitted = firstFrame - 1;
     this.idle = MAX_BATCH;
+    this.credit = BURST_MESSAGES * MAX_BATCH;
+    this.pressPending = false;
   }
 
 
@@ -48,12 +54,14 @@ export class OutgoingInput {
     if (frame !== this.admitted + 1 || !this.rows.vacant(frame)) return false;
     this.rows.store(frame, row);
     this.admitted = frame;
+    if (row.pressed !== 0) this.pressPending = true;
     return true;
   }
 
 
   tick(): void {
     if (this.idle < MAX_BATCH) this.idle++;
+    if (this.credit < BURST_MESSAGES * MAX_BATCH) this.credit++;
   }
 
 
@@ -63,15 +71,18 @@ export class OutgoingInput {
 
 
   ready(batch: number): InputMessage | undefined {
-    if (this.idle < batch || this.nextUnsent > this.admitted) return undefined;
+    if (this.nextUnsent > this.admitted || this.credit < batch) return undefined;
+    if (this.idle < batch && !this.pressPending) return undefined;
     return encodeInputMessage(this.epoch, this.nextUnsent, this.admitted, frame => this.row(frame));
   }
 
 
-  sent(message: InputMessage): void {
+  sent(message: InputMessage, batch: number): void {
     for (let frame = message.firstFrame; frame <= message.lastFrame; frame++) this.rows.release(frame);
     this.nextUnsent = message.lastFrame + 1;
     this.idle = 0;
+    this.credit = Math.min(this.credit, BURST_MESSAGES * batch) - batch;
+    this.pressPending = false;
   }
 
 

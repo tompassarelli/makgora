@@ -366,8 +366,14 @@ hosting comparison remains unproved.
 
 ## Synchronized input transport
 
-Each client sends its journal's admitted rows in at most one `SC_GP` message
-per 6 callbacks (10 a second at 60 callbacks a second). A message carries
+Each client sends its journal's admitted rows in one `SC_GP` message every 6
+callbacks (10 a second at 60 callbacks a second), and sends at once on the
+callback that admits a row with a new press. A token bucket caps both: a
+message spends 6 callbacks of credit, credit refills one a callback up to two
+messages' worth, and nothing is sent without a message's credit, so the
+average stays at 10 a second, a burst is at most two messages, and the
+6-callback cadence is never delayed (#215,
+smashcraft:ts/src/game/netcode/journal/transport.ts). A message carries
 every admitted frame not yet sent, in order, as an I5 message
 (smashcraft:ts/src/game/input/wire.ts): the first frame's row, then only rows
 that differ from holding the row before them, each after a count of held
