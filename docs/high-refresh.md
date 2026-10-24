@@ -86,6 +86,38 @@ individual sub-step callback costs cannot be resolved, and this does not
 measure a future interpolation pass. These measurements concern the two timer
 candidates, not a guarantee about every engine mechanism.
 
+The probe was repeated on 25 October 2026 against Wisp's deadline-paced LAN
+host (wisp:docs/relay.md, "Turn cadence"). The run used the development map
+built from source `3636da27b3` on offline LAN pair 2 of the laptop, with
+Warcraft III 3.0.0.24268. Wisp's `hfr` profile drew an 800×600 Classic client
+capped at 144 fps. Each private output read back 840×640 at 144.000000 Hz
+after `wlr-randr --custom-mode 840x640@144Hz`. The first match after the pool
+started was discarded. Each turn length then got a new game, `-dev quick` and
+one `-dev render-clock`.
+
+Every run had 2 Warcraft clients live, and CPU `some avg10` stayed at or below
+1.4. Renderer fps comes from three `DXVK_HUD=fps,frametimes` readings per
+client, taken during the probe. Game pace is the probe's game time divided by
+its `os.clock` time. Each value is client a / client b, period-0 timer, with
+the 1/1024 s timer in brackets.
+
+| Turns | Bursts/s | Median game-time step | Callbacks per burst (p50) | Renderer fps | Game pace |
+| --- | --- | --- | --- | --- | --- |
+| 8 ms | 98.1 / 80.8 (99.3 / 86.6) | 10.010 / 10.254 ms (9.766 / 10.742) | 100 / 103 (10 / 11) | 143.4 / 145.7 (139.2–153.4) | 1.0007 / 1.0009 |
+| 17/17/16 ms | 91.9 / 92.8 (92.4 / 92.8) | 10.010 / 10.010 ms (9.766 / 9.766) | 100 / 100 (10 / 10) | 152.1 / 153.2 (151.0–155.9) | 1.0012 / 1.0004 |
+
+Interpolation is not feasible with 8 ms turns. Bursts/s reached 68% and 55% of
+renderer fps, against the 90% the verdict requires, although game pace held
+within 1.000 ± 0.002. The 8 ms turns gave no more bursts than the 17/17/16
+control. Both settled near 90 bursts a second, about one burst every 1.6 drawn
+frames, so the turn length does not set the callback cadence. An 8 ms turn
+also allows at most 125 bursts a second, which the 90% rule meets only below
+about 139 fps; the renderer ran above that. Players' builds therefore keep
+presentation at the 60 Hz simulation update, and the optional interpolation
+stays disabled. Raw reports, HUD captures, mode read-backs and pressure logs
+are retained at
+`~/.local/state/smashcraft/evidence/sc-18-realtime-laptop/h229/`.
+
 For a high-refresh private run, verify the compositor output as well as the
 game's FPS cap. The private-desktop launcher creates its output at 60 Hz;
 raising the game cap alone left the renderer at 56.6–58.9 fps. On the exact
