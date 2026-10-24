@@ -1309,3 +1309,56 @@ No run desynced. The headless pair reproduces the loss with Wisp's
 attack taps in a two-human rollback match on keyboard input gave 0 pressed
 rows before the fix and 12 after; 5-frame and 1-frame holds alternating with
 taps also gave 12.
+
+## Held-key reads under round-trip delay (wisp#32, 24 October 2026)
+
+Asked: does `BlzIsKeyPressed` report a press only once the press's
+synchronized key event has gone to the host and back? If so, every
+millisecond of round trip, and every turn of a relay's jitter buffer, adds
+to a player's own input delay. Measured on Warcraft III 3.0.0.24268
+(Classic, offline LAN pair 1 on gex45, 60 fps cap), integrity build of
+59824cc9b, Rifleman quick match, light scripted taps of `c` for
+50–90 ms every 280–520 ms on both clients through private-desktop XTEST,
+80 s per run, the host deadline-paced at `--turn-ms 17,17,16` (Wisp
+origin/main's LAN host, which Smashcraft's pinned Wisp does not have yet).
+`wisp lan netem --pair 1 --rtt R` delayed every loopback send by R/2 for
+R = 0, 100 and 200 ms, no loss, then R = 0 again. The first match after the
+pool started was thrown away.
+
+Method. `-dev callback-clock` records `os.clock` at every `shell.tick`
+callback with the raw `BlzIsKeyPressed` state, and at every synchronized
+key-down event of the probe key. The driver stamps each press on the host's
+wall clock. `os.clock` minus wall time held its median within 2 ms over the
+four measured runs on each client process, so one per-client offset, fitted once at R = 0 as the moment a
+press reaches the client's input pump, places every later run's callbacks
+on the press's clock. Press-to-held is from the press to the first callback
+that reads the key down; zero is that fitted pump arrival, so values below
+zero are presses that arrived early in their frame. Held-to-event and
+press-to-host need no fitted offset (one clock each).
+
+| RTT | Client | Taps seen | Press to held p50 (p5–p95) ms | Held to key-down event p50 (p5–p95) ms | Press to host p50 ms | Raw key down inside the key-down handler |
+| --- | --- | --- | --- | --- | --- | --- |
+| 0 | a | 187/187 | 4.0 (−7.0–16.1) | 26.3 (22.5–41.3) | 11.4 | 184/187 |
+| 0 | b | 192/192 | 5.7 (−5.7–17.0) | 26.3 (22.2–48.8) | 12.3 | 188/192 |
+| 100 | a | 187/187 | 3.9 (−6.6–14.9) | 126.4 (121.3–149.0) | 62.8 | 0/187 |
+| 100 | b | 192/192 | 3.9 (−7.2–16.3) | 126.8 (121.1–150.2) | 62.9 | 0/192 |
+| 200 | a | 187/187 | 5.0 (−6.4–16.3) | 226.6 (214.8–250.7) | 113.8 | 0/187 |
+| 200 | b | 192/192 | 4.2 (−6.1–16.3) | 226.4 (220.4–248.3) | 114.0 | 0/192 |
+| 0, after | a | 187/187 | 3.8 (−8.1–15.4) | 26.5 (21.1–49.5) | 12.8 | 183/187 |
+| 0, after | b | 192/192 | 4.1 (−7.3–15.9) | 26.7 (21.6–50.0) | 13.7 | 190/192 |
+
+Every run held 60.00 turns a second at game pace 1.000 with no host waits
+and no desync.
+
+**Verdict: the read is local.** Adding 200 ms of round trip moved the
+press-to-held median by +1.0 ms on client a and −1.5 ms on client b, under
+one 16.7 ms frame, while the key-down event moved by the full 200 ms and
+the press reached the host 100 ms later. By wisp#32's rule (the read waits
+for the echo if the median grows by at least half the added RTT, and is
+local if it moves by less than one frame), `BlzIsKeyPressed` reads the
+client's own input pump, as smashcraft#218 found at RTT 0. At 100 and
+200 ms a 50–90 ms tap was already released when its event arrived, so the
+raw state read up inside every handler. A player's own pressed row
+therefore does not pay the relay's round trip or jitter-buffer depth; the
+opponent's view and rollback depth do (wisp:docs/relay.md, "How it meets
+Smashcraft's frame-stamped inputs and rollback").
