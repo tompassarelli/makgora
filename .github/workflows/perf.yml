@@ -23,17 +23,27 @@ on:
 
 run-name: Perf ${{ inputs.ref }} ${{ inputs.tag }}
 
-concurrency:
-  group: perf ${{ inputs.lane || inputs.ref }} ${{ inputs.runs }}
-  cancel-in-progress: true
-
 permissions:
   contents: read
   actions: write
 
 jobs:
-  perf:
+  plan:
     runs-on: ubuntu-latest
+    outputs:
+      key: ${{ steps.key.outputs.key }}
+    steps:
+      - id: key
+        env:
+          RUNS: ${{ inputs.runs }}
+        # GitHub rejects a concurrency group over 400 characters, so the run set is keyed by its hash.
+        run: echo "key=$(printf '%s' "$RUNS" | sha256sum | cut -c1-12)" >> "$GITHUB_OUTPUT"
+  perf:
+    needs: plan
+    runs-on: ubuntu-latest
+    concurrency:
+      group: perf ${{ inputs.lane || inputs.ref }} ${{ needs.plan.outputs.key }} ${{ matrix.run }}
+      cancel-in-progress: true
     timeout-minutes: 10
     strategy:
       fail-fast: false
