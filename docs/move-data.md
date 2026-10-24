@@ -154,7 +154,7 @@ appears.
 
 How far each aerial's hit region reaches past what the fighter draws (#222),
 measured with `bun wisp view reachcues --assets "$(bun wisp inputs path assets)"`
-(from ts/) on 24 October 2026. For each aerial, played in the air facing right,
+(from ts/) on 25 October 2026 at 14a47e72c2. For each aerial, played in the air facing right,
 the drawn Classic model (body and held weapon, skinned at the clip time the
 fighter pool shows) is projected onto the stage plane on every active frame,
 and its bounding box over those frames is the drawn swept area. The value is
@@ -162,8 +162,8 @@ the hit capsules' furthest reach past that box on any side, in world units,
 then in body heights (H = 132 units), then the side. Negative values stay
 inside the drawn area. The margin is 0.15 H (20 units), the same one
 `view reachcues` uses for reach flares (#481); smashcraft:docs/disjoint-legibility.md
-sets no tighter one. **over** marks an aerial past the margin; every one is a
-box in #223. Cairne's down air belongs to #96.
+sets no tighter one. No aerial is past the margin since #223 (21 fighters refitted to their drawn
+models, no disjoint cited). Cairne's down air belongs to #96.
 
 | Fighter | Neutral air | Forward air | Back air | Up air | Down air |
 | --- | --- | --- | --- | --- | --- |
