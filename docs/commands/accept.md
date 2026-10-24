@@ -24,14 +24,16 @@
   `bun wisp smoke --native --pair K [--map CANDIDATE.w3x] [--shard N...]`
   runs every shard on the green candidate (the commit `play --install-green`
   picks, built once through the play build path, or `--map`) as its own
-  `accept --only gate-moves-NN gate-specials-spot-NN` run, stopped at 300 s,
+  `accept --only gate-moves-NN gate-specials-spot-NN` run under a quiet native
+  lease held only while that run lasts; the run is stopped at 280 s and the
+  lease released, so no shard holds the clients or the lease 5 minutes,
   writes each report under
   `~/.local/state/smashcraft/green-builds/accept/SHA256/classic/gate-moves-NN/`
   where the green install reads it, prints and saves the per-move table
   `smoke.md` beside them, and exits nonzero on a crash, a stopped run, a dead
-  key or a move that fails to start. Run it inside
-  `machine-capacity session --class native --new-clients 0 --quiet` on a
-  running pool pair. A shard: turns on Training on the candidate and stage
+  key or a move that fails to start. A lease the helper has not reserved
+  within 120 s fails the shard. Run it from a private desktop on a running
+  pool pair. A shard: turns on Training on the candidate and stage
   hazards off on the stage screen (a match whose replay shows hazards on fails
   its setup), then plays its fighter pair from fighter select: each standard
   keyboard key once, every normal, aerial and special after a training reset,

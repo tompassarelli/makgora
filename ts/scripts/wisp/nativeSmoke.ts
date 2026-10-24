@@ -15,7 +15,7 @@ import { greenMain, greenState } from "./installGreen";
 import { SMOKE_TABLE_HEADER } from "./smokeJudge";
 import { movesShardId, smokePairs, smokeShardLabel, smokeShards, specialsShardId } from "./smokeShards";
 
-export const SHARD_RUN_SECONDS = 300;
+export const SHARD_RUN_SECONDS = 280;
 const WISP_PROGRAM = join(import.meta.dir, "../wisp.ts");
 
 class NativeSmokeFailure extends Schema.TaggedError<NativeSmokeFailure>()("NativeSmokeFailure", { problem: Schema.String }) {
