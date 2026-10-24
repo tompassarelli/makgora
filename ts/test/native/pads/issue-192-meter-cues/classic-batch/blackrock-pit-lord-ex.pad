@@ -1,7 +1,10 @@
 # #192 Classic batch, Pit Lord on Blackrock: a's full bar wears the flame aura; a's EX neutral special
 # (LB + B) plays the EX sound and the EX aura on frame 840, after the setup chat has left the screen, and puts the flame aura out.
+# b dashes off the cannon vent on frame 100, so the vent's blasts cannot end the match before the cast.
 #! chat -dev setup quick stage 12 pair pit lord / peon;meter 100
 #! preset melee
+100 b stick -1 0
+112 b stick 0 0
 828 a capture
 839 a capture
 840 a press LB
