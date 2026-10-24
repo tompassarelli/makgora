@@ -1,7 +1,7 @@
 import type { Character } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import type { Cue } from "../presentation/specialCues";
-import { EX_AURA, EX_CAST_VOLUME, type MeterCueFit, type MeterCueState, type MeterCueView, SUPER_AURA, ULTIMATE_BURST, ULTIMATE_CAST_VOLUME, clearMeterCueState, createMeterCueState, meterCueFit, observeMeterCues, ultimateFirstEffectFrame } from "../presentation/meterCues";
+import { EX_AURA, EX_AURA_FRAMES, EX_CAST_VOLUME, type MeterCueFit, type MeterCueState, type MeterCueView, SUPER_AURA, ULTIMATE_BURST, ULTIMATE_BURST_FRAMES, ULTIMATE_CAST_VOLUME, clearCastCue, clearMeterCueState, confirmCastCue, createCastCue, createMeterCueState, exCastFrame, hideCastCue, meterCueFit, observeMeterCues, presentCastCue, ultimateCastFrame, ultimateFirstEffectFrame, ultimateReady } from "../presentation/meterCues";
 import { type WorldOrigin, effectMotion, hideEffect, placeEffect } from "./effects";
 
 class MeterCueModel {
@@ -88,10 +88,11 @@ class MeterCueModel {
   }
 }
 
-/** The EX cast aura, the full-bar flame aura and the ultimate's flame burst over one fighter (docs/design/ultimates.md): sounds and trace follow confirmed frames, pictures the presented frame. */
+/** The EX cast aura, the full-bar flame aura and the ultimate's flame burst over one fighter (docs/design/ultimates.md): sounds and trace follow confirmed frames; each cast's picture starts on the first presented frame holding it and plays in full. */
 export class MeterCueEffects {
   private readonly heard: MeterCueState = createMeterCueState();
-  private readonly seen: MeterCueState = createMeterCueState();
+  private readonly exCast = createCastCue(EX_AURA_FRAMES);
+  private readonly burstCast = createCastCue(ULTIMATE_BURST_FRAMES);
   private readonly traced: MeterCueView = createMeterCueState().view;
   private readonly exAura: MeterCueModel;
   private readonly superAura: MeterCueModel;
@@ -111,7 +112,10 @@ export class MeterCueEffects {
   }
 
   confirm(frame: number, fighter: Readonly<Fighter> | undefined, playing: boolean, ultimatesOff: boolean, trace?: (text: string) => void): void {
-    const view = observeMeterCues(this.heard, playing ? fighter : undefined, ultimatesOff);
+    const live = playing ? fighter : undefined;
+    const view = observeMeterCues(this.heard, live, ultimatesOff);
+    confirmCastCue(this.exCast, exCastFrame(live, frame));
+    confirmCastCue(this.burstCast, ultimateCastFrame(live, frame));
     if (fighter === undefined || !playing) {
       if (this.traced.exAura || this.traced.superAura || this.traced.burst) this.forget();
       return;
@@ -148,9 +152,8 @@ export class MeterCueEffects {
     trace?.(`ex-aura ${view.exAura ? "on" : "off"} action ${action} action-frame ${frame}`);
   }
 
-  present(fighter: Readonly<Fighter> | undefined, playing: boolean, ultimatesOff: boolean, trace?: (text: string) => void): void {
+  present(frame: number, fighter: Readonly<Fighter> | undefined, playing: boolean, ultimatesOff: boolean, trace?: (text: string) => void): void {
     const live = playing ? fighter : undefined;
-    const view = observeMeterCues(this.seen, live, ultimatesOff);
     if (live === undefined) {
       this.hideModels();
       return;
@@ -158,9 +161,12 @@ export class MeterCueEffects {
     this.burst.follow(live, this.front);
     this.exAura.follow(live, this.front);
     this.superAura.follow(live, this.front);
-    this.superAura.show(view.superAura, live, this.front);
-    if (this.burst.show(view.burst, live, this.front)) trace?.(`ultimate-burst ${view.burst ? "on" : "off"} action-frame ${live.special.frame}`);
-    if (this.exAura.show(view.exAura, live, this.front)) trace?.(`ex-aura ${view.exAura ? "on" : "off"} action-frame ${live.special.frame}`);
+    this.superAura.show(ultimateReady(live, ultimatesOff), live, this.front);
+    const { action } = live.special;
+    const burst = presentCastCue(this.burstCast, frame, ultimateCastFrame(live, frame), action);
+    if (this.burst.show(burst, live, this.front)) trace?.(`ultimate-burst ${burst ? "on" : "off"} action-frame ${live.special.frame} cast ${this.burstCast.cast}`);
+    const exAura = presentCastCue(this.exCast, frame, exCastFrame(live, frame), action);
+    if (this.exAura.show(exAura, live, this.front)) trace?.(`ex-aura ${exAura ? "on" : "off"} action-frame ${live.special.frame} cast ${this.exCast.cast}`);
   }
 
   /** The trace line and frame that lit the full-bar aura still showing, for a trace that starts after it. */
@@ -181,6 +187,8 @@ export class MeterCueEffects {
   }
 
   clear(): void {
+    clearCastCue(this.exCast);
+    clearCastCue(this.burstCast);
     this.forget();
     this.hideModels();
   }
@@ -196,7 +204,8 @@ export class MeterCueEffects {
   }
 
   private hideModels(): void {
-    clearMeterCueState(this.seen);
+    hideCastCue(this.exCast);
+    hideCastCue(this.burstCast);
     if (this.burst.showing()) this.burst.clear();
     if (this.exAura.showing()) this.exAura.clear();
     if (this.superAura.showing()) this.superAura.clear();
@@ -207,7 +216,8 @@ export class MeterCueEffects {
     this.exAura.destroy();
     this.superAura.destroy();
     clearMeterCueState(this.heard);
-    clearMeterCueState(this.seen);
+    clearCastCue(this.exCast);
+    clearCastCue(this.burstCast);
     KillSoundWhenDone(this.exSound);
     KillSoundWhenDone(this.ultimateSound);
   }
