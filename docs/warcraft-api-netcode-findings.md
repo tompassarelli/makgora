@@ -1120,3 +1120,110 @@ presence ±4. Every other Desync.log section matches.
   `ipse` is Tempest/Ipse, records #1 and #2 are the presence head and births.
   Diff A against B by section and turn. One section differing names the
   subsystem.
+## Input sampling against the LAN host's turn interval (24 October 2026)
+
+Asked: can Smashcraft sample more than about 40 inputs a second if the host
+sends turns faster than Battle.net's 25 ms? Measured on Warcraft III
+3.0.0.24268 (Classic, offline LAN pair 0 on gex45, 60 fps cap), integrity
+build from this commit's source, Rifleman mirror quick match with nine stocks.
+
+Method. `-dev callback-clock N` (development builds only,
+smashcraft:ts/src/host/loop/callbackClock.ts) records `os.clock` (1 ms
+resolution, smashcraft:docs/high-refresh.md) at every `shell.tick` callback
+and whether `BlzIsKeyPressed` reports the attack key `c` down, plus the
+rollback counters every 600 callbacks, into
+`smashcraft-callback-clock-pSLOT-runN.txt`. A host-side driver pressed `c`
+on both clients through private-desktop XTEST every 280–520 ms for 50–90 ms,
+stamping each press on CLOCK_MONOTONIC (worst send lateness 0.7 ms); heavy
+runs added a random tap of `[ ] ; ' t v 1 2` every 30–80 ms on each client.
+Each run lasted 80 s (the 25 ms heavy run 120 s); runs over 5 minutes were
+not made (no long native runs before 0.1.0). The host's action log gave turn
+times and each client's synchronized key actions. Host CPU pressure stayed
+under 1.3% (`/proc/pressure/cpu` avg10) in every run.
+
+**The key state we read follows the synchronized key events.** Smashcraft
+registers every bound key with `BlzTriggerRegisterPlayerKeyEvent`, so each
+press and release also travels to the host as a `key` action. In every run,
+the probe-key presses that `BlzIsKeyPressed` never reported down at any
+callback were the presses whose key-down and key-up actions the host relayed
+in the same turn:
+
+| Run | Client | Presses | Down and up in one turn | Presses minus those | Seen down |
+| --- | --- | --- | --- | --- | --- |
+| 25 ms, heavy | a | 289 | 108 | 181 | 182 |
+| 25 ms, heavy | b | 290 | 140 | 150 | 150 |
+| 25 ms, light | a | 187 | 13 | 174 | 174 |
+| 25 ms, light | b | 192 | 22 | 170 | 170 |
+| 16 ms, light | a | 187 | 50 | 137 | 136 |
+| 16 ms, light | b | 191 | 82 | 109 | 109 |
+| 16 ms, heavy | a | 187 | 7 | 180 | 187 |
+| 16 ms, heavy | b | 189 | 12 | 177 | 189 |
+| 25 ms deadline-paced, light | a | 187 | 0 | 187 | 187 |
+| 25 ms deadline-paced, light | b | 191 | 0 | 191 | 191 |
+
+Eight of ten client-runs match to one press; the 16 ms heavy run saw every
+press although 7 and 12 of them arrived as one-turn pairs, so the reading is
+not purely the synchronized event. Either way, a tap is lost when the client
+holds both its edges until one send, which happens when the client stalls:
+the press's key action reached the host 19–23 ms after the press at the
+median in clean runs, but 340–1,260 ms at the 90th percentile in runs where
+a client fell behind.
+
+**Callback cadence.** On the LAN and in a solo game alike, a client runs one
+60 Hz callback per burst, at about the rendered-frame rate, not a burst of
+callbacks per arriving turn as on Battle.net (wisp:docs/network-model.md,
+"Turn-burst callbacks"). Gaps between consecutive callbacks, both clients
+pooled, in ms; "Seen" is taps `BlzIsKeyPressed` reported down over taps sent;
+"Spread" is the range of press-to-sample delays after removing the unknown
+`os.clock` offset, with the p5–p95 spread in sampled frames:
+
+| Setting | Input | Turns/s | Game s per wall s | Host waits | Gap p10/p50/p90/p99 | 1 callback per burst | Seen | Spread ms (frames) | Rollbacks/min | Frames rolled back/min | Deepest |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 25 ms, wall-measured steps | light | 43.7 | 0.999 | 0 | 9/16/25/33 | 99.6–99.8% | 174/187, 170/192 | 72–80 (2) | 227–232 | 1,730–1,770 | 17–23 |
+| 25 ms, wall-measured steps | heavy, first match | 35.1 | 0.827 | 77 | 2–7/15–16/25/209–212 | 96.9–98.3% | 182/289, 150/290 | 81–87 (3–5) | 275–324 | 4,010–4,260 | 24 |
+| 16 ms | light, first match | 63.1 | 0.945 | 48 | 7–10/16/22–23/108–135 | 97.7–99.1% | 136/187, 109/192 | 73–79 (3–4) | 151–171 | 1,650 | 24 |
+| 16 ms | heavy | 67.3 | 0.999 | 0 | 8/16/26/30–31 | 100% | 187/187, 189/189 | 57–63 (2) | 581–583 | 4,890–4,920 | 14–15 |
+| 25 ms, deadline-paced | light | 39.9 | 0.998 | 1 | 8–9/16–17/26/30 | 100% | 187/187, 191/192 | 32–40 (1) | 233–252 | 1,710–1,760 | 11–12 |
+| 17/17/16 | light | 60.0 | 1.000 | 2 | 8/16/26/30–31 | 100% | 187/187, 190/192 | 37–42 (1) | 243–249 | 1,480 | 10–11 |
+| 17/17/16 | heavy | 60.0 | 1.000 | 0 | 9/16/26/31 | 100% | 187/187, 189/189 | 47–50 (2) | 583 | 5,090–5,110 | 14 |
+| Solo (no host) | light | — | 1.000 | — | 8–9/15–16/26/31–32 | 100% | 187/187, 192/192 | 40–48 (1–2) | 0 | 0 | 0 |
+
+No run desynced (host checksum compare, action log). Client CPU was 0.8–1.3
+cores for both clients together. The two runs marked "first match" were each
+the first match after the pool started; they stalled for up to 670 ms, the
+host waited on a client more than 50 turns behind, and they lost the most
+taps, so a pool's first match is not a fair turn-rate sample. At 25 ms the
+host ran 43.7 turns a second at a mean step of 22.9 ms, because it took each
+step from the wall time since the last turn; Wisp now paces every turn length
+against a deadline (wisp:docs/lan.md, "Turn pacing"). Effect 4.0.3's
+`Schedule.fixed`, the earlier pacer, fires 107 times a second for a 16.6667 ms
+period: the first 17/17/16 attempt ran 92 turns a second at game pace 1.54
+and lost 93% of one client's taps; it is excluded from the table.
+
+The pacer, not the turn length, made the difference. With the old pacer, 25 ms
+turns carried jittery game steps, client a's presses reached the host in
+19–23 ms at the median (61–79 ms at the 90th percentile) and 7–11% of taps
+were lost. With deadline pacing (the same Wisp host change, 25 ms steps
+exactly, 39.9 turns a second), presses reached the host in 9 ms (20 ms),
+no tap was lost and the press-to-sample spread was 32–40 ms, as good as the
+17/17/16 cycle (4 ms, 19 ms; 37–42 ms) and the solo game (40–48 ms). A 16 ms
+turn is shorter than a 60 Hz frame, so the host sends about 62 turns for
+every 60 callbacks and some turns carry no callback; its clean heavy run lost
+no taps but spread press-to-sample delays over 57–63 ms.
+
+Not measured here: the parity-tape check per setting (`bun wisp pad` cannot
+take a turn length; headless parity is independent of the host's turn
+length), runs longer than 80–120 s, and renderer frame times.
+
+**Recommendation.** On a LAN the client samples once per rendered frame
+whatever the turn length, so a shorter turn does not raise the sampling rate.
+What mattered was steady turns: a deadline-paced host at 25 ms sampled as
+well as a 17/17/16 cycle and as a solo game, with every tap seen and a 1-frame
+spread. Keep Wisp's default at Battle.net's 25 ms, now deadline-paced, so
+native checks see the grid players get; `--turn-ms 17,17,16` stays available
+for one turn per frame. A relay Smashcraft runs itself should pace turns
+against deadlines; 17/17/16 bought no measured sampling gain over 25 ms here,
+only fewer frames per turn. The remaining lever is the dropped tap
+(smashcraft#218): a stalled client can send a tap's press and release
+together, and in light-input runs exactly those taps never showed as held
+keys.
