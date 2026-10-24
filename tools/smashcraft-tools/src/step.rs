@@ -18,7 +18,6 @@ pub struct Run {
     program: OsString,
     arguments: Vec<OsString>,
     directory: Option<PathBuf>,
-    unset: Option<&'static str>,
     log: Option<PathBuf>,
 }
 
@@ -28,7 +27,6 @@ impl Run {
             program: program.into(),
             arguments: Vec::new(),
             directory: None,
-            unset: None,
             log: None,
         }
     }
@@ -53,19 +51,11 @@ impl Run {
         self
     }
 
-    pub fn without(mut self, name: &'static str) -> Self {
-        self.unset = Some(name);
-        self
-    }
-
     fn execute(&self) -> Outcome {
         let mut command = Command::new(&self.program);
         command.args(&self.arguments);
         if let Some(directory) = &self.directory {
             command.current_dir(directory);
-        }
-        if let Some(name) = self.unset {
-            command.env_remove(name);
         }
         if let Some(log) = &self.log {
             let file = File::create(log)
@@ -87,9 +77,6 @@ impl fmt::Display for Step {
         };
         if let Some(directory) = &run.directory {
             write!(formatter, "[{}] ", directory.display())?;
-        }
-        if let Some(name) = run.unset {
-            write!(formatter, "-{name} ")?;
         }
         write!(formatter, "{}", run.program.to_string_lossy())?;
         for argument in &run.arguments {

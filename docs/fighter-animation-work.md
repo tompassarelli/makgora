@@ -1241,11 +1241,15 @@ From smashcraft:ts/ in your lane:
 The Lich King (#167) is drawn by Kwaliti's Hive model (LichKing2.mdx, kept with
 the private build inputs), which has only thirteen stock sequences.
 `smashcraft-tools build-lichking [INPUTS]` authors the rest:
-smashcraft:tools/animations/lichking.py imports the model into Blender at 60
-frames a second, so clip frame N is attack frame N, and keys every missing action
-on its skeleton. It uses the same scheme as strikes.py: body lean, twist, hip
-step and somersault, hand and foot goals solved through each limb, and
-Frostmourne aimed by an angle in the stage plane.
+smashcraft:tools/animations/lichking-clips.ts lists the clips, and
+smashcraft:tools/animations/lichking-authoring.ts keys each on the model's
+skeleton at 60 frames a second, so clip frame N is attack frame N. Its
+helpers (`author`, `swing`, `reuse`, `zero`) use the same scheme as strikes.py:
+body lean, twist, hip step and somersault, hand and foot goals solved through
+each limb, and Frostmourne aimed by an angle in the stage plane. They were
+ported from the Blender script that first authored these clips (#85) and read
+the built-ins the way its importer did: keys on whole frames, rotations with
+w ≥ 0, linearly interpolated.
 Built-ins are reused where they fit. Attack - 1 and Attack - 2 (jab 1 and 2),
 Spell Throw (Howling Blast) and Death (knockdown) are
 retimed piecewise so that the frame where Frostmourne's point reaches farthest
@@ -1253,17 +1257,15 @@ toward the strike (or the chest reaches the floor) lands on the move's first
 active frame. Every swing is timed to the kit's frames
 (smashcraft:ts/src/game/sim/heroes/lichKingMoves.ts).
 
-The exporter's round trip drops the model's particle emitters and renames
-nodes. smashcraft:tools/animations/package-lichking.ts therefore ships the original
-MDX unchanged, with each authored sequence appended after the built-ins (whose
-indices never move). The skeleton keys come from the export, thinned to those
-that linear interpolation cannot reproduce. Every other track (emitters,
+smashcraft:tools/animations/package-lichking.ts ships the original MDX
+unchanged, with each authored sequence appended after the built-ins (whose
+indices never move). The skeleton keys come from the authored clips, thinned to
+those that linear interpolation cannot reproduce. Every other track (emitters,
 geoset colour, events) comes from the clip's donor built-in, scaled to the new
 length. It writes `LichKingFighter.mdx`, which the map imports as
 war3mapImported\LichKing2.mdx, and regenerates
 smashcraft:ts/src/game/presentation/heroes/lichKingClipInfo.ts (sequence name
-to index and frames). Run Blender inside the capacity scope (`machine-capacity
-run --class moderate`).
+to index and frames).
 
 Defile's cast (#174) lifts Frostmourne above his shoulder, plants its point in
 the ground on frame 20, holds the planted silhouette through frame 26, then
@@ -1284,8 +1286,7 @@ retained for the portraits.
 For additive clips, pass the immutable shipped model as the second argument
 to `smashcraft-tools build-lichking`; its packager's
 `--append-to EXISTING.mdx` retains the existing sequences and their tracks,
-then appends only new names. This avoids Blender's millisecond interval
-rounding changing previously shipped clips as the export grows.
+then appends only new names, so the shipped clips stay byte for byte as they are.
 
 His third jab plays its full authored thrust, whose shorter hip step leaves
 its drawn reach below the forward tilt. `bun wisp view reach --assets DIR

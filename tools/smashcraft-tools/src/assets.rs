@@ -228,40 +228,18 @@ impl Sources {
         existing: Option<&str>,
         extra: &[String],
     ) -> Vec<Step> {
-        let build = inputs.join("build");
-        let (source, authored) = (
-            inputs.join("src/LichKing2.mdx"),
-            build.join("LichKing2.mdl"),
-        );
-        let author = self
-            .blender(
-                "lichking.py",
-                &[authored.as_os_str(), build.as_os_str()],
-                build.join("author.log"),
-            )
-            .without("LD_LIBRARY_PATH");
-        let package = Run::new("bun")
-            .arg(self.animations().join("package-lichking.ts"))
-            .arg(&source)
-            .arg(&build)
-            .arg(inputs.join("LichKingFighter.mdx"))
-            .args(
-                existing
-                    .into_iter()
-                    .flat_map(|model| ["--append-to", model]),
-            )
-            .args(extra);
-        vec![
-            Step::Directory(build.clone()),
-            Step::Run(
-                Run::new("bun")
-                    .arg(self.animations().join("convert.ts"))
-                    .arg(&source)
-                    .arg(&authored),
-            ),
-            Step::Run(author),
-            Step::Run(package),
-        ]
+        vec![Step::Run(
+            Run::new("bun")
+                .arg(self.animations().join("package-lichking.ts"))
+                .arg(inputs.join("src/LichKing2.mdx"))
+                .arg(inputs.join("LichKingFighter.mdx"))
+                .args(
+                    existing
+                        .into_iter()
+                        .flat_map(|model| ["--append-to", model]),
+                )
+                .args(extra),
+        )]
     }
 }
 
@@ -393,17 +371,13 @@ mod tests {
         let extra = ["--replace".to_owned(), "Stand".to_owned()];
         let steps = rendered(&sources().build_lichking(Path::new("/in"), Some("/old.mdx"), &extra));
         assert_eq!(
-            steps[2],
-            "-LD_LIBRARY_PATH blender --background --threads 2 --python-exit-code 1 --python /p/tools/animations/lichking.py -- /in/build/LichKing2.mdl /in/build > /in/build/author.log"
-        );
-        assert_eq!(
-            steps[3],
-            "bun /p/tools/animations/package-lichking.ts /in/src/LichKing2.mdx /in/build /in/LichKingFighter.mdx --append-to /old.mdx --replace Stand"
+            steps,
+            ["bun /p/tools/animations/package-lichking.ts /in/src/LichKing2.mdx /in/LichKingFighter.mdx --append-to /old.mdx --replace Stand"]
         );
         let fresh = rendered(&sources().build_lichking(Path::new("/in"), None, &extra));
         assert_eq!(
-            fresh[3],
-            "bun /p/tools/animations/package-lichking.ts /in/src/LichKing2.mdx /in/build /in/LichKingFighter.mdx --replace Stand"
+            fresh[0],
+            "bun /p/tools/animations/package-lichking.ts /in/src/LichKing2.mdx /in/LichKingFighter.mdx --replace Stand"
         );
     }
 
