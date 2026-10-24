@@ -4,18 +4,20 @@ import type { Fighter } from "../sim/fighter";
 import { hurtCapsule } from "../sim/geometry/contactGeometry";
 import { ROSTER_MANA } from "../sim/mana";
 import { type AuthoredSpecial, FOLLOW_UP_FORM } from "../sim/specials/schema";
-import { characterModelScale } from "./modelScale";
-import { CUE_ANCHORS, type Cue } from "./specialCues";
+import type { Cue } from "./specialCues";
 
-export const EX_AURA: Cue = { model: "Abilities\\Spells\\Human\\InnerFire\\InnerFireTarget.mdx", anchor: "feet", scale: 1.0, sequence: "birth", sound: "DivineShield" };
-export const SUPER_AURA: Cue = { model: "Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedTarget.mdx", anchor: "feet", scale: 1.0, sequence: "stand" };
-export const ULTIMATE_BURST: Cue = { model: "Abilities\\Spells\\Other\\Incinerate\\FireLordDeathExplode.mdx", anchor: "body", scale: f32(0.6), sequence: "birth", sound: "FlameStrike" };
-export const METER_CUES: readonly Cue[] = [EX_AURA, SUPER_AURA, ULTIMATE_BURST];
-export const METER_CUE_MOVES: readonly (readonly [string, Cue])[] = [["EX aura", EX_AURA], ["full-bar flame aura", SUPER_AURA], ["ultimate flame burst", ULTIMATE_BURST]];
+export interface MeterCue extends Cue {
+  readonly lift: number;
+}
 
-export const SUPER_AURA_UNIT_RADIUS = 22.0;
-export const SUPER_AURA_UNIT_HEIGHT = 90.0;
-export const SUPER_AURA_LIFT = f32(0.15);
+export const EX_AURA: MeterCue = { model: "Abilities\\Spells\\Human\\DivineShield\\DivineShieldTarget.mdx", anchor: "feet", scale: 1.0, lift: 0.0, sequence: "birth", sound: "DivineShield" };
+export const SUPER_AURA: MeterCue = { model: "Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedTarget.mdx", anchor: "feet", scale: 1.0, lift: f32(0.15), sequence: "stand" };
+export const ULTIMATE_BURST: MeterCue = { model: "Abilities\\Spells\\Other\\Doom\\DoomDeath.mdx", anchor: "feet", scale: f32(0.4), lift: 0.0, sequence: "birth", sound: "FlameStrike" };
+export const METER_CUES: readonly MeterCue[] = [EX_AURA, SUPER_AURA, ULTIMATE_BURST];
+export const METER_CUE_MOVES: readonly (readonly [string, MeterCue])[] = [["EX aura", EX_AURA], ["full-bar flame aura", SUPER_AURA], ["ultimate flame burst", ULTIMATE_BURST]];
+
+export const METER_CUE_UNIT_RADIUS = 22.0;
+export const METER_CUE_UNIT_HEIGHT = 90.0;
 
 export interface MeterCueFit {
   readonly scale: number;
@@ -23,17 +25,11 @@ export interface MeterCueFit {
   readonly z: number;
 }
 
-export function meterCueFit(cue: Cue, character: Character): MeterCueFit {
-  const scale = characterModelScale(character);
-  const anchor = CUE_ANCHORS[cue.anchor];
-  return { scale: f32(cue.scale * scale), x: f32(anchor.x * scale), z: f32(anchor.z * scale) };
-}
-
-export function superAuraFit(character: Character): MeterCueFit {
+export function meterCueFit(cue: MeterCue, character: Character): MeterCueFit {
   const body = hurtCapsule(character);
   const top = f32(body.z2 + body.radius);
-  const size = Math.max(f32(body.radius / SUPER_AURA_UNIT_RADIUS), f32(top / SUPER_AURA_UNIT_HEIGHT));
-  return { scale: f32(SUPER_AURA.scale * size), x: 0.0, z: f32(top * SUPER_AURA_LIFT) };
+  const size = Math.max(f32(body.radius / METER_CUE_UNIT_RADIUS), f32(top / METER_CUE_UNIT_HEIGHT));
+  return { scale: f32(cue.scale * size), x: 0.0, z: f32(top * cue.lift) };
 }
 
 export const EX_AURA_FRAMES = 30;
