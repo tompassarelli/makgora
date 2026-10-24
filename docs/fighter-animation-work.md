@@ -1232,7 +1232,7 @@ From smashcraft:ts/ in your lane:
 2. `cp -rL "$(bun wisp inputs path assets)/original-clips-static-lights" NEW && chmod -R u+w NEW`,
    then from the repository root `bun tools/animations/export-original-clips.ts
    --assets "$(cd ts && bun wisp inputs path assets)" --out NEW --keep-unchanged`.
-3. `bun wisp inputs add original-clips-static-lights NEW`, build with
+3. `bun wisp inputs add original-clips-static-lights NEW --fighter SLUG` for each fighter you changed, build with
    `bun wisp map build --profile playable --edition full --name NAME --out OUT.w3x`, and commit
    the changed shard pins under build-inputs/original-clips-static-lights/ with the clip module.
 
@@ -1473,7 +1473,7 @@ By default the generator also writes individual Tinker clips under
 when the shared exporter will create them. For the combined build, first copy
 the current private assets' complete `hero-models` family to a writable private
 staging directory, replace only its `herotinker.mdx` with the generated model,
-and store that whole family with `bun wisp inputs add hero-models STAGED_HERO_MODELS`
+and store that whole family with `bun wisp inputs add hero-models STAGED_HERO_MODELS --fighter goblin-tinker`
 from `ts/`. Preserve the other fighters in that staging family.
 
 Once the roster is contiguous through Tinker (Character 19), seed a writable
@@ -1481,6 +1481,6 @@ private pool from the current assets' `original-clips-static-lights` family and
 run `bun tools/animations/export-original-clips.ts --assets PRIVATE_ASSETS --out PRIVATE_POOL --keep-unchanged`
 from the root. This regenerates every fighter's file under `ts/src/generated/clips/` and checks
 retained fighters against their source and clip hashes. Store that pool with
-`bun wisp inputs add original-clips-static-lights PRIVATE_POOL`, then run
+`bun wisp inputs add original-clips-static-lights PRIVATE_POOL --all`, then run
 `bun wisp view motion --assets PRIVATE_ASSETS` from `ts/` for the assembled roster.
 Native launches remain a separate playtest.

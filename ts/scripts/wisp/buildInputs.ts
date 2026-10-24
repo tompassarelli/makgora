@@ -191,10 +191,10 @@ export async function storeFamily(family: Family, source: string, store = INPUTS
   return storeFiles(family, file === undefined ? listFiles(source).map((path) => [join(source, path), path] as const) : [[source, file] as const], store);
 }
 
-export async function storeShards(family: Family, source: string, store = INPUTS_STORE): Promise<Record<string, string>> {
+export async function storeShards(family: Family, source: string, store = INPUTS_STORE, only?: ReadonlySet<string>): Promise<Record<string, string>> {
   const shards = shardFiles(family, source, listFiles(source));
   const hashes: Record<string, string> = {};
-  for (const [shard, files] of [...shards].sort(([a], [b]) => a.localeCompare(b))) hashes[shard] = await storeFiles(family, files.map((path) => [join(source, path), path] as const), store);
+  for (const [shard, files] of [...shards].sort(([a], [b]) => a.localeCompare(b))) if (only === undefined || only.has(shard)) hashes[shard] = await storeFiles(family, files.map((path) => [join(source, path), path] as const), store);
   return hashes;
 }
 

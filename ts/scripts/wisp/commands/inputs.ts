@@ -20,21 +20,30 @@ import { FAMILIES, FAMILY_NAMES, type Family, INPUTS_STORE, MANIFEST, checkoutIn
 
 const isFamily = (name: string): name is Family => name in FAMILIES;
 
-const add = (family: string, source: string) => Effect.gen(function*() {
+const ADD_USAGE = "inputs add FAMILY PATH [--fighter SHARD]... | inputs add FAMILY PATH --all (a sharded family needs --fighter for the shards to pin, or --all)";
+
+const add = (family: string, source: string, scope: readonly string[], all: boolean) => Effect.gen(function*() {
   if (!isFamily(family)) return yield* new UsageFailure({ problem: `inputs add takes one of ${FAMILY_NAMES.join(", ")}` });
-  if (isSharded(family)) return yield* addShards(family, source);
+  if (isSharded(family)) {
+    if (all === (scope.length > 0)) return yield* new UsageFailure({ problem: ADD_USAGE });
+    return yield* addShards(family, source, all ? undefined : new Set(scope));
+  }
+  if (all || scope.length > 0) return yield* new UsageFailure({ problem: `${family} is not sharded; ${ADD_USAGE}` });
   const hash = yield* Effect.tryPromise({ try: () => storeFamily(family, source), catch: (cause) => new MapBuildFailure({ operation: "store build input", path: source, cause }) });
   yield* Effect.try({ try: () => writePin(family, hash), catch: (cause) => new MapBuildFailure({ operation: "write build inputs", path: MANIFEST, cause }) });
   console.log(`${family} ${hash}\nwrote it into ${MANIFEST}/${family}; commit the change to build with it`);
 });
 
-const addShards = (family: Family, source: string) => Effect.gen(function*() {
-  const shards = yield* Effect.tryPromise({ try: () => storeShards(family, source), catch: (cause) => new MapBuildFailure({ operation: "store build input", path: source, cause }) });
+const addShards = (family: Family, source: string, only: ReadonlySet<string> | undefined) => Effect.gen(function*() {
+  const shards = yield* Effect.tryPromise({ try: () => storeShards(family, source, INPUTS_STORE, only), catch: (cause) => new MapBuildFailure({ operation: "store build input", path: source, cause }) });
   const before = yield* Effect.try({ try: () => readPins()[family], catch: (cause) => new MapBuildFailure({ operation: "read build inputs", path: MANIFEST, cause }) });
-  yield* Effect.try({ try: () => writeShardPins(family, shards), catch: (cause) => new MapBuildFailure({ operation: "write build inputs", path: MANIFEST, cause }) });
   const old = typeof before === "object" ? before : {};
-  const changed = [...new Set([...Object.keys(old), ...Object.keys(shards)])].sort().filter((shard) => old[shard] !== shards[shard]);
-  console.log(`${family}: ${Object.keys(shards).length} shards, changed ${changed.length === 0 ? "none" : changed.join(" ")}\nwrote them into ${MANIFEST}/${family}/; commit the change to build with it`);
+  const missing = [...only ?? []].filter((shard) => !(shard in shards));
+  if (missing.length > 0) return yield* new UsageFailure({ problem: `${family} has no files for ${missing.join(" ")} in ${source}` });
+  const pinned = only === undefined ? shards : { ...old, ...shards };
+  yield* Effect.try({ try: () => writeShardPins(family, pinned), catch: (cause) => new MapBuildFailure({ operation: "write build inputs", path: MANIFEST, cause }) });
+  const changed = [...new Set([...Object.keys(old), ...Object.keys(pinned)])].sort().filter((shard) => old[shard] !== pinned[shard]);
+  console.log(`${family}: ${Object.keys(pinned).length} shards, changed ${changed.length === 0 ? "none" : changed.join(" ")}\nwrote them into ${MANIFEST}/${family}/; commit the change to build with it`);
 });
 
 const git = (...args: string[]) => Effect.try({
@@ -89,8 +98,9 @@ const prune = (args: readonly string[]) => Effect.gen(function*() {
 
 export const inputs: Command = (args) => Effect.gen(function*() {
   const [verb, ...rest] = args;
-  const [family, source, ...extra] = rest;
-  if (verb === "add" && family !== undefined && source !== undefined && extra.length === 0) return yield* add(family, source);
+  const [family, source, ...flags] = rest;
+  const scope = flagValues(flags, "fighter"), all = flags.includes("--all");
+  if (verb === "add" && family !== undefined && source !== undefined && flags.length === scope.length * 2 + (all ? 1 : 0)) return yield* add(family, source, scope, all);
   if (verb === "derive") return yield* derive(rest);
   if (verb === "prune") return yield* prune(rest);
   if (verb === "check" && rest.length === 0) {
@@ -105,5 +115,5 @@ export const inputs: Command = (args) => Effect.gen(function*() {
     if (name === "base" || name === "container" || name === "assets" || name === "summon") return console.log(paths[name]);
     return yield* new UsageFailure({ problem: "inputs path takes base, container, assets or summon" });
   }
-  return yield* new UsageFailure({ problem: "inputs takes add FAMILY PATH | derive [--fighter NAME]... [--rebuild | --check] | prune [--scratch NAME]... | check | path [base|container|assets|summon]" });
+  return yield* new UsageFailure({ problem: "inputs takes add FAMILY PATH [--fighter SHARD]... [--all] | derive [--fighter NAME]... [--rebuild | --check] | prune [--scratch NAME]... | check | path [base|container|assets|summon]" });
 });

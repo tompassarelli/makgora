@@ -29,7 +29,12 @@ with, one file per family, so a commit fixes its art exactly as it fixes its cod
   named after the fighter (`KoboldTimelineBody-…`, `original-clips-evidence/Kobold.json`,
   `white-flash-imports/Kobold.txt`) and every texture its white list names; the rest is
   `shared`. The clip pool keeps one evidence record per fighter and impact-assets one
-  white import list per fighter, so no file holds two fighters' data. Two lanes that
+  white import list per fighter, so no file holds two fighters' data. A staged
+  folder is a copy of the whole family, so a stale copy of another fighter's file
+  would repin that fighter: `inputs add FAMILY DIR --fighter SLUG`... stores and
+  repins only the named shards (`shared` names the rest) and leaves every other pin
+  file untouched, and `--all` repins every shard; a sharded add with neither is
+  refused (#202). Two lanes that
   repack different fighters write different pin files and land in parallel.
 - **Resolve and verify.** `bun wisp map build` without `--base`, `--container`,
   `--assets` or `--summon` reads the checkout's manifest, rehashes every family

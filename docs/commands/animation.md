@@ -176,7 +176,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   bodies and refreshes its clip table and timeline model facts; it compares every played pose
   with the pool it reads, so export a fighter whose played clips changed with
   `export-original-clips.ts --only FIGHTER` first.
-  Store the family with `bun wisp inputs add original-clips-static-lights PRIVATE_POOL`.
+  Store the family with `bun wisp inputs add original-clips-static-lights PRIVATE_POOL --all`.
 
 - Key jitter (from ts/): `bun wisp anim jitter [--fighter NAME]...`
   fails when a curved key segment between keys at most 50 ms apart leaves its keys (#479);
