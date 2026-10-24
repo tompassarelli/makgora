@@ -30,11 +30,13 @@
 #! absent b 60-199 damage
 #! expect a 200 special 13 form 0
 # 1ed1f22499 (#414 step 3) set Shadow Strike to 3.816 and Pursuit to 7.633; the lighter hits shorten hitlag, so Pursuit ends a frame sooner.
-#! expect b 229 damage 3.816
-#! expect b 289 damage 4.816 hitlag 0 hitstun 0
+# a6a7bb6119 (#188) brakes b's dash slide under its raised shield, so Shadow Strike lands a frame later and Pursuit
+# stops 9.6 further on (probe with that brake neutralised keeps 229, 289 and 133.715; trace: run 40099478236).
+#! expect b 230 damage 3.816
+#! expect b 290 damage 4.816 hitlag 0 hitstun 0
 #! expect a 290 special 14 form 4
 #! expect b 307 damage 12.449
-#! expect a 333 special 0 form 4 action-frame 0 x 133.715
+#! expect a 333 special 0 form 4 action-frame 0 x 143.315
 #! expect a 440 special 14 form 0
 #! expect b 450 damage 20.082
 #! expect a 600 special 16 form 0
