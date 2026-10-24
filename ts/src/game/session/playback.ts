@@ -2,7 +2,9 @@
 
 
 import type { InputRow } from "../input/inputRow";
+import { REPAIR_SCOPED_COST } from "../replay/history";
 import { REPLAY_HISTORY_CAPACITY } from "../replay/limits";
+import { floorDiv } from "wisp/src/sim/intMath";
 import type { FrameControls } from "../match/controls";
 import type { PacingAndPresentation } from "../match/pacingAndPresentation";
 import type { MatchFrameInput } from "../match/frameInput";
@@ -87,15 +89,14 @@ export const CATCH_UP_FRAMES = 6;
 
 
 
-const REPAIR_FRAMES = 4;
 
-// Bound repair to two whole four-fighter frames per callback: each costs about 2.5 ms in Lua32 (#168).
-
+// A callback's own frames cost about two units per fighter, so its repair keeps the rest: two whole four-fighter frames at about 2.5 ms each in Lua32 (#168).
 
 
 
 
-const REPAIR_COST = 8;
+
+const REPAIR_HEADROOM = 16;
 
 
 
@@ -105,9 +106,10 @@ const REPAIR_COST = 8;
 
 
 export function repairBudget(speculative: number, depth: number, whole: number): { readonly frames: number; readonly cost: number } {
-  if (depth <= REPLAY_HISTORY_CAPACITY / 2) return { frames: REPAIR_FRAMES, cost: REPAIR_COST };
-  const frames = Math.max(REPAIR_FRAMES, speculative + 1);
-  return { frames, cost: Math.max(REPAIR_COST, (speculative + 1) * whole) };
+  const cost = REPAIR_HEADROOM - 2 * whole;
+  const steps = floorDiv(cost, REPAIR_SCOPED_COST);
+  if (depth <= REPLAY_HISTORY_CAPACITY / 2) return { frames: steps, cost };
+  return { frames: Math.max(steps, speculative + 1), cost: Math.max(cost, (speculative + 1) * whole) };
 }
 
 
