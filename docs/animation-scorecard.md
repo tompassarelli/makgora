@@ -94,9 +94,10 @@ five lines, including an independent judgement, in each supported look.
 `bun wisp anim judge fetch` retrieves private reference GIFs from SmashWiki.
 `bun wisp anim judge prepare --out PRIVATE_DIR [--fighter F]...`
 renders batches; `--move FIGHTER:MOVE` selects particular moves. It accepts
-the scoring command's graphics and asset flags. The camera follows each
-pose's height while preserving gameplay scale, so flight does not crop the
-body out of its strip; a movement strip (crouch, ledge hang, double jump)
+the scoring command's graphics and asset flags. The camera holds the
+move's first-frame height, as a match camera does, so a drop or rise shows in
+the tiles; it follows only the travel beyond 60 gameplay pixels, so flight does
+not crop the body out of its strip, and gameplay scale is unchanged; a movement strip (crouch, ledge hang, double jump)
 instead holds the camera on the drawn floor and grows upward so a jump shows
 its real height above it. Read `docs/animation-judge-brief.md` in a fresh judge
 context and write its requested JSONL. `bun wisp anim judge record
