@@ -37,3 +37,4 @@ jobs:
           name: cpu-calibration
           path: ts/build/cpu-calibration/
           retention-days: 30
+# Farm counterfactual lane for smashcraft 44; Autoland refuses workflow edits so this never lands.
