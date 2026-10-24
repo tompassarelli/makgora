@@ -9,6 +9,7 @@ import { FighterAgencyForecast } from "../../game/presentation/fighterAgency";
 import { FrostEffects } from "../../game/render/frostEffects";
 import { ElementEffects } from "../../game/render/elementEffects";
 import { SpecialCueEffects } from "../../game/render/specialCueEffects";
+import { MeterCueEffects } from "../../game/render/meterCueEffects";
 import { PlacedObjectEffects } from "../../game/render/placedObjectEffects";
 import { MatchPresentation } from "../../game/render/matchPresentation";
 import { modelSoundPresentation } from "../../game/render/modelSoundPresentation";
@@ -49,6 +50,7 @@ interface FighterRenderers {
   readonly projectiles: ProjectilePresentation;
 
   readonly cues?: SpecialCueEffects | undefined;
+  readonly meter?: MeterCueEffects | undefined;
   readonly pool: FighterPoolPresentation | undefined;
   readonly agency: AgencyMarker;
   readonly flash: BodyFlash;
@@ -151,6 +153,7 @@ function endFighterRenderers(renderers: FighterRenderers | undefined): void {
   renderers?.shield.destroy();
   renderers?.projectiles.destroy();
   renderers?.cues?.destroy();
+  renderers?.meter?.destroy();
   renderers?.pool?.destroy();
   renderers?.agency.destroy();
   renderers?.flash.destroy();
@@ -182,7 +185,8 @@ export function beginFighterRenderers(s: ShellState, slot: ParticipantSlot, char
   endFighterRenderers(ui.fighters[slot]);
   const pool = pooled ? new FighterPoolPresentation(character, slot, s.origin) : undefined;
   ui.placed.prepareFighter(slot, character);
-  ui.fighters[slot] = { character, shield: new ShieldPresentation(slot, s.origin), projectiles: new ProjectilePresentation(character, s.origin, opponentCharacters(s, slot)), cues: new SpecialCueEffects(character, s.origin, sharedPlay()), pool, agency: new AgencyMarker(s.origin), flash: new BodyFlash(character, s.origin),
+  const shared = sharedPlay();
+  ui.fighters[slot] = { character, shield: new ShieldPresentation(slot, s.origin), projectiles: new ProjectilePresentation(character, s.origin, opponentCharacters(s, slot)), cues: new SpecialCueEffects(character, s.origin, shared), meter: new MeterCueEffects(character, s.origin, shared), pool, agency: new AgencyMarker(s.origin), flash: new BodyFlash(character, s.origin),
     candle: character === Character.kobold ? new CandlePresentation(s.origin) : undefined,
     hitAreas: s.game.training && s.game.trainer.showHitAreas ? new HitAreaPresentation(s.origin) : undefined,
   };
@@ -276,6 +280,7 @@ export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (c
     bindPrototype(renderers.shield, ShieldPresentation.prototype);
     bindPrototype(renderers.projectiles, ProjectilePresentation.prototype);
     if (renderers.cues !== undefined) bindPrototype(renderers.cues, SpecialCueEffects.prototype);
+    if (renderers.meter !== undefined) bindPrototype(renderers.meter, MeterCueEffects.prototype);
     if (renderers.pool !== undefined) bindPrototype(renderers.pool, FighterPoolPresentation.prototype);
     bindPrototype(renderers.agency, AgencyMarker.prototype);
     bindPrototype(renderers.flash, BodyFlash.prototype);
@@ -298,6 +303,7 @@ export function clearMatchEffects(s: ShellState): void {
   ui.special.clear();
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.projectiles.clear();
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.cues?.clear();
+  for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.meter?.clear();
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.candle?.hide();
   ui.classic?.endMatch();
 }
@@ -309,5 +315,6 @@ export function pauseEffects(s: ShellState, paused: boolean): void {
   ui.elements.setPaused(paused);
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.projectiles.setPaused(paused);
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.cues?.setPaused(paused);
+  for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.meter?.setPaused(paused);
   for (const slot of PARTICIPANT_SLOTS) ui.fighters[slot]?.candle?.setPaused(paused);
 }

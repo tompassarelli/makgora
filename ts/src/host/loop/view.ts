@@ -480,6 +480,7 @@ export function renderPersistentPresentation(s: ShellState): void {
     renderers?.shield.present(fighter, playing);
     renderers?.projectiles.present(fighter, playing, s.session.paused);
     renderers?.cues?.present(fighter, playing, s.session.paused);
+    renderers?.meter?.present(fighter, playing);
     renderers?.hitAreas?.present(live);
   }
   const capture = s.dev.shieldEnergyCapture;

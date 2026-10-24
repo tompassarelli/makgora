@@ -15,6 +15,7 @@ import {STAGE_CATALOG} from '../../ts/src/game/menu/stageCatalog';
 import {hitPresentationSoundLabels} from '../../ts/src/game/session/hitPresentationCases';
 import {tierSoundPaths} from '../../ts/src/game/presentation/moveTiers';
 import {moveSoundLabels} from '../../ts/src/game/presentation/moveSounds';
+import {meterCueSoundLabels} from '../../ts/src/game/presentation/meterCues';
 
 const option = (name: string) => { const index = process.argv.indexOf(name); return index < 0 ? undefined : process.argv[index + 1]; };
 const extract = option('--extract');
@@ -74,7 +75,7 @@ for (const table of ['AnimSounds', 'AbilitySounds', 'UnitCombatSounds']) {
   if (await child.exited !== 0) throw new Error(`cannot read ${table}.slk from the installed game`);
   for (const [label, files] of soundTable(await Bun.file(output).text())) if (!labelFiles.has(label)) labelFiles.set(label, files);
 }
-const labels = [...new Set([...hitPresentationSoundLabels(), ...moveSoundLabels(SELECTABLE_CHARACTERS)])];
+const labels = [...new Set([...hitPresentationSoundLabels(), ...moveSoundLabels(SELECTABLE_CHARACTERS), ...meterCueSoundLabels()])];
 
 for (const label of labels) if (label.includes('\\')) labelFiles.set(label, [label]);
 const unknownLabels = labels.filter(label => !labelFiles.has(label));

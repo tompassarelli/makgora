@@ -147,12 +147,22 @@ Volumes are Warcraft's 0–127:
 | Element sweetener | 100 |
 | Shield | 100, over Defend at 90 |
 | Voice | 100 |
+| EX cast (Divine Shield) | 110 |
+| Ultimate cast (Flame Strike) | 127 |
 
 Hits are always louder than swings, following SF4's rebalance [19]. A frame
 plays at most four move layers:
 
 - **perform:** whoosh, model swing and voice;
 - **strong hit:** body, strong sweetener and element.
+
+**Meter casts (#192).** An EX special and an ultimate each add one
+fighter-wide cast sound on the cast's first confirmed frame, over the special's
+own perform layer: Divine Shield for EX, a bright chime no move uses, and Flame
+Strike's eruption for the ultimate, matching its flame burst
+(smashcraft:ts/src/game/presentation/meterCues.ts). They are the same for
+every fighter, so a player learns one sound for each, and they play outside the
+four move layers and the voice budget, like the special cues' own sounds.
 
 Sounds are 3D at the fighter (`CombatSoundsEAX`, 600 to 3500 units), so the
 camera's stereo places them.
