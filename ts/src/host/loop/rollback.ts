@@ -24,7 +24,7 @@ import { JournalInputSource } from "../../game/netcode/journal/source";
 import { captureReplaySnapshot, restoreReplaySnapshot } from "../../game/replay/snapshot";
 import { pacedStop, resetPauseBarrier, settlePace, stopFrame } from "../../game/session/pauseBarrier";
 import { confirmedBudget, keyboardCatchesUp, repairBudget, speculativeBudget } from "../../game/session/playback";
-import { REPAIR_WHOLE_COST } from "../../game/replay/history";
+import { wholeRepairCost } from "../../game/replay/history";
 import { queueLocalRows } from "../../game/session/localInput";
 import { applyFrame } from "./frame";
 import { ownConfirmedState } from "./confirmedState";
@@ -328,8 +328,9 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
   const lastConfirmed = Math.min(confirmable, schedule.nextConfirmedFrame() + confirmSteps - 1, stopAt === undefined ? Number.POSITIVE_INFINITY : stopAt - 1);
   const pending = rollback.playback.pendingRepair(epoch);
   const behind = pending === undefined ? 0 : lastConfirmed + 2 - pending;
-  const repair = repairBudget(speculativeBudget(journal !== undefined), pending === undefined ? 0 : schedule.speculativeFrame() - pending);
-  const repaired = rollback.playback.repair(epoch, speculative, Math.max(repair.frames, behind), Math.max(repair.cost, behind * REPAIR_WHOLE_COST));
+  const whole = wholeRepairCost(speculative.world);
+  const repair = repairBudget(speculativeBudget(journal !== undefined), pending === undefined ? 0 : schedule.speculativeFrame() - pending, whole);
+  const repaired = rollback.playback.repair(epoch, speculative, Math.max(repair.frames, behind), Math.max(repair.cost, behind * whole));
   endFrameSection(RECONCILE_SECTION);
   if (repaired === "rejected") {
     setStatus(s, "The match could not catch up. Restart the match.", LASTING);
