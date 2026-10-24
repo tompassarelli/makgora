@@ -70,7 +70,7 @@ export const KILL_CONFIRMS: readonly KillConfirm[] = [];
 export const FLAG_KINDS = ["true-chain", "low-agency-link", "long-no-control", "loop"] as const;
 export type FlagKind = (typeof FLAG_KINDS)[number];
 
-/** The candidate rule numbers: E and T are Tom's to pick; chainMax and loopRepeats name the rest of the rule's shape. */
+/** The agency rule's numbers: E and T as chosen on smashcraft#63; chainMax and loopRepeats name the rest of the rule's shape. */
 export interface AgencyRule {
   /** A link keeps the victim a real chance when at least this share of weighted options escape it. */
   readonly escapeFloor: number;
@@ -83,7 +83,7 @@ export interface AgencyRule {
 }
 
 export const TICKS_PER_SECOND = 60;
-export const DEFAULT_RULE: AgencyRule = { escapeFloor: 0.2, controlFrames: 2.5 * TICKS_PER_SECOND, chainMax: 2, loopRepeats: 3 };
+export const DEFAULT_RULE: AgencyRule = { escapeFloor: 0.1, controlFrames: 3 * TICKS_PER_SECOND, chainMax: 2, loopRepeats: 3 };
 
 export interface AgencyFlag {
   readonly kind: FlagKind;
@@ -155,7 +155,7 @@ function loopFlag(string: AgencyString, between: readonly AgencyLink[], rule: Ag
   return undefined;
 }
 
-/** The finding kinds a measured string earns under a candidate rule: true-chain, low-agency-link, long-no-control, loop. */
+/** The finding kinds a measured string earns under a rule: true-chain, low-agency-link, long-no-control, loop. */
 export function flagString(string: AgencyString, rule: AgencyRule = DEFAULT_RULE, confirms: readonly KillConfirm[] = KILL_CONFIRMS): AgencyFlag[] {
   const flags: AgencyFlag[] = [];
   const between = string.links.filter((link) => !link.within);

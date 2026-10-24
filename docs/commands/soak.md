@@ -43,8 +43,8 @@
   true moves (no actionable frame between them; one move instance's hits count once)
   branched over every victim option (smashcraft#10 C12): `true-chain` (more than
   `--chain-max`, 2, follow-ups no option escapes), `low-agency-link` (a later
-  follow-up escaped by under `--escape-floor`, 0.2, of options), `long-no-control`
-  (links each under that floor for over `--control-seconds`, 2.5) and `loop` (a
+  follow-up escaped by under `--escape-floor`, 0.1, of options), `long-no-control`
+  (links each under that floor for over `--control-seconds`, 3) and `loop` (a
   block repeated `--loop-repeats`, 3, times with the escape not rising), each naming
   its causing move property, over the `--agency-strings` (6) longest strings a match;
   fighter

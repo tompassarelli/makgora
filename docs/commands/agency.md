@@ -9,6 +9,9 @@
 
 - Branch a string: `bun scripts/agencyMeasure.ts --first N --count M --max-strings K --out FILE`
   branches the sim at each hit of the recorded strings over every victim option
-  and records per-link escape; `bun scripts/agencyTable.ts FILE...` flags those
-  strings (true-chain, low-agency-link, long-no-control, loop) and prints how many
-  each (E, T) pair flags (smashcraft#10 C12).
+  and records per-link escape; `bun scripts/agencyTable.ts [--e PERCENT] [--t SECONDS] FILE...`
+  flags those strings (true-chain, low-agency-link, long-no-control, loop)
+  under the agency rule, E 10% and T 3 s by default (#63; smashcraft:docs/gameplay-design.md,
+  "Combo structure"), counts them, and prints how many each candidate (E, T)
+  pair flags (smashcraft#10 C12). The playtester (smashcraft:ts/scripts/playtest.ts)
+  uses the same defaults.

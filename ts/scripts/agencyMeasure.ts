@@ -1,5 +1,6 @@
 import { parseArgs } from "node:util";
 import { type BranchPolicy, DEFAULT_POLICY, type StringMeasure, measureCombos } from "./agencyBranch";
+import { DEFAULT_RULE, TICKS_PER_SECOND, flagString } from "./agencyCore";
 import { DEFAULT_CONFIG, planMatches } from "./playtestCore";
 import { ROSTER, observeReal } from "./playtest";
 
@@ -22,4 +23,5 @@ for (const spec of specs) {
 const text = JSON.stringify(measured, null, 1);
 if (values.out === undefined) console.log(text);
 else await Bun.write(values.out, `${text}\n`);
-console.error(`${measured.length} strings, ${measured.reduce((sum, string) => sum + string.links.length, 0)} links`);
+const flagged = measured.filter((string) => flagString(string, DEFAULT_RULE).length > 0).length;
+console.error(`${measured.length} strings, ${measured.reduce((sum, string) => sum + string.links.length, 0)} links, ${flagged} flagged under E ${(100 * DEFAULT_RULE.escapeFloor).toFixed(0)}%, T ${DEFAULT_RULE.controlFrames / TICKS_PER_SECOND} s`);

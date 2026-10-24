@@ -261,7 +261,10 @@ Historical fixture before #339: - **Not a Melee clone.** Melee's data is a refer
 - **No false agency.** Players must never believe they can escape when they
   can't. Wobbling and 0-to-death chain grabs are the anti-pattern
   ([Melee case study](design/melee/techniques.md#jank)). Locked states should
-  be legible (#68).
+  be legible (#68). Combos follow the agency rule (#63; see "Combo
+  structure"): at most 2 true links except declared kill confirms, at least
+  E = 10% escape at every later link, at most T = 3 s without control, and no
+  loop whose escape does not rise.
 - **SDI without teleport jank** (#70).
 - **Non-interactive execution is dubious** (6 Oct, #54; see "L-cancelling" below).
 - **Short true combos, devastating combos through reads** (6 Oct, #83; see
@@ -584,26 +587,40 @@ not granted by one hit.
 - One hit never guarantees a stock (see also "No false agency", #68).
 
 Terms for measuring it. An **opening** is a hit or grab that lands. A
-**guaranteed follow-up** lands whatever the victim does: every DI direction
-including none, SDI, tech in place, left, right or missed, jump, air dodge and
-mash. A **read** is a follow-up that lands against some of those choices but
-not all, when the victim makes one it beats. A **string** is an opening and the
-follow-ups that land after it.
+**link** is the step from one hit of a string to the next; hits of one move
+instance (a multi-hit move, a grab's pummels and throw) are not separate links.
+A link's **escape** is the weighted share of the victim's options at that hit
+(every DI direction including none, SDI, tech in place, left, right or missed,
+getups, jump, air dodge, shield, attack, special and mash) whose branch avoids
+the next hit. A **true link** has no escaping option. A **read** is a link that
+some options escape. A **string** is an opening and the follow-ups that land
+after it.
 
-Accepted measurement targets for #83, following the owner's 6 Oct 2026
-authorization to carry out the recommendations. The interaction graph reports
-violations to guide balance work; this measurement issue does not rebalance
-every move ([interaction graph](design/interaction-graph.md)).
+The agency rule, which replaces #83's counting of guaranteed follow-ups and
+guaranteed damage; the numbers E = 10% and T = 3 s were chosen on #63 from the
+distribution of flagged strings over candidate pairs. Ultimates follow the same
+rule. The playtester's combo findings and `bun scripts/agencyTable.ts`
+(smashcraft:docs/commands/agency.md) flag each break by its kind, from
+smashcraft:ts/scripts/agencyCore.ts; the findings guide move design and
+rebalance nothing by themselves ([interaction graph](design/interaction-graph.md)).
 
-| Target | Accepted | Breaks it |
+| Target | Accepted | Breaks it (flag) |
 |---|---|---|
-| Guaranteed follow-ups after an opening | at most 2, at every percent | a string of 4 or more hits that no victim choice escapes |
-| Guaranteed damage from one opening, by the victim's percent when it lands | at most 30% at 0–99%; from 100%, a guaranteed string may end in a KO | more damage than that before the victim has a choice that escapes |
+| True links after an opening | at most 2 in a row, except a declared kill confirm | 3 or more consecutive links no victim option escapes (true-chain) |
+| Escape at every later link | from the third follow-up on, at least E = 10% of weighted options escape | a later link escaped by under 10% (low-agency-link) |
+| Time without control | at most T = 3 s of hitstun and knockdown in links that each escape under 10% | consecutive links under 10% spanning more than 3 s (long-no-control) |
+| Repeated loops | a repeated block of moves becomes easier to escape each time | the same block 3 times in a row with no rise in its escape (loop) |
 | Reads for 0-to-death | about 2–3: from 0%, no opening takes the stock with fewer than 2 reads, and each fighter has openings that take it with 3 | a stock taken from 0% with 0 or 1 reads; or a fighter with no 0-to-death path even with 3 reads |
 
-The damage cap is chosen to fit the reads target: an opening and 2–3 reads,
-each followed by guaranteed follow-ups worth up to about 30%, bring a victim
-from 0% to roughly 90–120% before the last hit.
+A **kill confirm** lets a declared follow-up be a true link when the victim's
+percent after the opener lies in its window. Each is a row of the kill-confirm
+table (`KILL_CONFIRMS` in smashcraft:ts/scripts/agencyCore.ts): fighter,
+opener, follow-up and percent window. The table starts empty, and no confirm
+holds outside its declared row.
+
+The stale-moves rule stays ("Stale moves and freshness bonuses"): no mechanic gets weaker or stronger with
+repetition, so a loop is broken by the victim's options at its links, never by
+a repeated move losing knockback or damage.
 
 ## Throw regrabs
 
