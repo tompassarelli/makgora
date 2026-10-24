@@ -323,8 +323,10 @@ transport (wisp#110) both call it.
   both clients simulated the same frames each second (36/s, and 16/s in a
   harsher run) and ran 60 callbacks a second, but the throttled client's
   Lua took 819–901 ms of each second against 273 ms on the fast one, and a
-  healthy client at full speed takes about 400 ms. Healthy matches run 58.8
-  to 60 simulated frames a second (#18), so 55 stays clear of them.
+  healthy client at full speed takes about 400 ms. Healthy matches run 60
+  simulated frames a real second since the playable build steps from real
+  time (59.98 on a laptop pair whose game clock gave 59.86 callbacks, #18),
+  so 55 stays clear of them.
 - **Auto, online:** the higher of a ping target and an error-corrected value,
   capped at 16.
   - *Ping target:* round trip comes from the echo of each sent input row in

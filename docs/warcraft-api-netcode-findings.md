@@ -478,7 +478,9 @@ keyboard's clock therefore follows the furthest frame another player has
 already sent (`ShadowInputSchedule.othersThrough`), its rows admitted under
 the same `CATCH_UP_FRAMES` cap. In `bun wisp soak --policy absent --matches
 20`, 3 matches stayed behind their input for good without it and none with
-it (6 October 2026).
+it (6 October 2026). That holds for the journal build's keyboard fallback; the
+playable build's keyboard loop now takes its frame target from real time
+(below, "Stepping the simulation from real time").
 
 The helpers' frames are never moved: re-anchoring a stalled player's clock
 would put rows on frames other than the ones #26's integrity check expects
@@ -638,6 +640,71 @@ Wisp's LAN host loses a further 0.03–0.1% in LAN games, because each turn's
 length is rounded to whole milliseconds and the remainder is dropped
 (wisp:host/lan/host.ts, `step`): host game time ran 0.999–0.9997 of wall time
 in 24 October action logs. Evidence: ~/.local/state/smashcraft/evidence/sc-18-fps/.
+
+## Stepping the simulation from real time
+
+The playable build's keyboard loop used to run one extra frame in a callback
+only while its frame was at or under the epoch's callback count, so it
+simulated as many frames as Warcraft's game clock gave callbacks: 59.71 a real
+second by 512 game seconds and 58.82 past 1024 (above). It now takes its frame
+target from real time (smashcraft:ts/src/host/loop/realFrames.ts, c8482811a8).
+On the epoch's first unpaused match callback, and again on resume, it stores
+the current frame and `os.clock`; after that a frame is due when
+`anchorFrame + floor(60 × (os.clock − anchorSeconds))` reaches it, read as one
+absolute subtraction each callback, never as a sum of steps, so the error stays
+one clock step. The due frame is held within `CATCH_UP_FRAMES` (6) of the last
+frame run on both sides. A debt over 6 re-anchors to that frame plus 6, so a
+stall is dropped as before and a client never bursts. A lead over 6, from
+frames another path ran ahead such as catching up after a stall, re-anchors to
+that frame minus 6; a smaller lead is repaid by skipping the extra frame.
+Forgiving every lead (53ef6d7938) let callback jitter ratchet into extra
+frames, 61.05 a real second on the laptop pair, until d9e69a1617. The
+extra frame still needs the 4-frame margin inside the rollback window, and now
+also a callback that confirmed at most 3 frames and repaired none, so it never
+lands on a confirm-6 or repair callback; at most two speculative frames run a
+callback. Without `os.clock`, or from 65536 s of process uptime, where its
+binary32 step passes 4 ms, the target is the callback count again.
+
+The reading changes only how many frames a callback runs. It is never sent,
+snapshotted or checksummed; rows stay keyed by frame and confirmed state
+depends only on accepted rows, the precedent the journal path's catch-up set
+(above, "Catching up after a stall"). Commit 5179da085 had chosen the callback
+count because a wall clock "would leave one client a permanent frame ahead";
+the rollback window bounds that lead and every epoch re-anchors, and the checks
+below measured it. Adjusting the tick timer's period per client was rejected:
+callbacks already run exactly 60 a game second, and a per-client period makes
+timer expiry, which is synchronized state, differ between clients.
+
+Headless checks, uncommitted scripts with the command and output on
+smashcraft#18 (issue comment 6388239655, 24 October 2026), since Smashcraft's
+unit tests were removed on 2026-10-20:
+
+- The due-frame function in Bun and Lua32 for clock starts 8192–65474 s: `due`
+  never decreased, debt after a re-anchor stayed at most 6, and without a clock
+  `due` equalled the callback count.
+- Two playable clients, 3,600 callbacks with wall time n·FRAME_MS/0.97613
+  (the 2.39% loss): 3,688 frames ran against 3,687.01 due, at most 2 a
+  callback, and 0 of 1,483 confirmed checksums differed. With even callbacks
+  frames equalled callbacks; with the measured Battle.net turn bursts the end
+  was +1.45 frames, again 0 differences.
+- The same match with client B's clock at wall × (1 + 2e-4) + 0.012 s: 0 of
+  1,482 checksums differed, 14,696 rows matched, `waitingFor` stayed 0, the
+  lead peaked at 18 frames (R − 4 = 20) and the end gap was 0.
+
+Native check (smashcraft#18 box E, 24 October 2026): one offline LAN pool pair
+on the laptop, Classic 3.0.0.24268, the playable build from d9e69a1617, one
+Endless quick match of 280 game seconds with 2 live clients throughout and CPU
+pressure at most 0.54. Over 128–280 s on clients a and b: game time ran 0.99683
+and 0.99692 of real time, callbacks ran 59.86 a real second, and the clients
+simulated 59.978 and 59.986 frames a real second, against 59.869 on the
+callback-count target in the same window. Debt stayed at -1 or above, the two
+clients' game clocks agreed within 0.009%, own echo stayed flat, and 0 of 11,312
+checksums each differed. The worst callback per second was at most 10.009 ms in
+99% of seconds (the 10 ms bucket at the clock's 1.0009 ms step) and at most
+10.986 ms overall. Two earlier runs found the two pacing defects above: client
+a held the callback rate after a 2.86 s gap (negative debt never re-anchored,
+fixed in 53ef6d7938), then both clients overshot to 61.05 (fixed in
+d9e69a1617). Evidence: ~/.local/state/smashcraft/evidence/sc-18-realtime-laptop/.
 
 ## Native 0.0.29 short transport comparison
 
