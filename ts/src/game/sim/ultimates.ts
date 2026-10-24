@@ -245,14 +245,17 @@ const SYLVANAS: AuthoredSpecial = {
 };
 
 const CAIRNE_ANKH: SpecialProjectile = {
-  ...mark("Abilities\\Spells\\Orc\\Reincarnation\\ReincarnationTarget.mdx", 1, 36, 0.0), atStageCentre: true, cancelOnInterrupt: true,
+  ...mark("Abilities\\Spells\\Orc\\Reincarnation\\ReincarnationTarget.mdx", 1, 36, 0.0), atStageCentre: true, cancelOnInterrupt: true, modelRadius: 0.5,
 };
 const CAIRNE: AuthoredSpecial = {
   name: "Reincarnation", endFrame: 50,
   projectiles: [
     CAIRNE_ANKH,
+    ...[f32(0.83), f32(0.76), f32(0.71), f32(0.66)].map((modelRadius): SpecialProjectile => ({ ...mark("UI\\Feedback\\SelectionCircle\\SelectionCircle.mdx", 1, 36, 0.0, 230.0), atStageCentre: true, cancelOnInterrupt: true, modelRadius })),
     { ...mark("Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx", 25, 10, 0.0), atStageCentre: true, cancelOnInterrupt: true },
-    { ...mark("Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdx", 25, 10, 0.0), atStageCentre: true, cancelOnInterrupt: true },
+    { ...mark("Abilities\\Spells\\Human\\HolyBolt\\HolyBoltSpecialArt.mdx", 25, 16, 0.0), atStageCentre: true, cancelOnInterrupt: true, modelRadius: f32(0.625) },
+    { ...mark("Abilities\\Spells\\Human\\Thunderclap\\ThunderClapCaster.mdx", 25, 14, 0.0), atStageCentre: true, cancelOnInterrupt: true, modelRadius: f32(1.23) },
+    { ...mark("Abilities\\Spells\\Human\\MassTeleport\\MassTeleportCaster.mdx", 20, 24, 0.0), cancelOnInterrupt: true },
   ],
   regionOrigin: CAIRNE_ANKH,
   regions: [heroRegion(25, 27, capsule(-140.0, 50.0, 140.0, 50.0, 50.0), hit(12.0, 85, 60.0, 55.0, HitElement.holy))],
