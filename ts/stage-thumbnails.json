@@ -38,9 +38,9 @@
     {
       "stage": 14,
       "file": "StageCardHellfire.blp",
-      "inputs": "4a827cd857cc6b3bbe90613e7d5812a3e0cb509c06e60d7efb5ea3a0394f88ce",
-      "sha256": "f8f106619ffeb664262d59a870490121c48c838707b1ad6fa48cd560da32bdcc",
-      "bytes": 48361
+      "inputs": "f5ef71e692e0d4edc06b302437dbc9cb64836b3f0bacaa52c13c730c4aa81d85",
+      "sha256": "0f8a42d87fbdfd865c86edd789aade927ae599bf15005ca48b0c546e08e91bf3",
+      "bytes": 48423
     },
     {
       "stage": 12,
