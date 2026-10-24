@@ -47,11 +47,11 @@ on another fresh attack. The listed L is the final landing lag consumed by the h
 | Input | Motion and role | F/A/R/L; damage | Warcraft source | Smash reference |
 |---|---|---|---|---|
 | Jab 1 / 2 / 3 | Left claw, right claw, wrench shove; short interrupt chain | 4/2/12/0; 3, 4/2/12/0; 3, 6/3/18/0; 5 | Claw-pack melee | [R.O.B. jab](https://www.ssbwiki.com/R.O.B._(SSBU)) |
-| Forward tilt, high, low | Claw extends level, above shoulder, or along ankles | 8/3/20/0; 7.5 | Claw-pack | [R.O.B. forward tilt](https://www.ssbwiki.com/R.O.B._(SSBU)) |
+| Forward tilt, high, low | Claw extends level, above shoulder, or along ankles | 8/3/17/0; 7.5 | Claw-pack | [R.O.B. forward tilt](https://www.ssbwiki.com/R.O.B._(SSBU)) |
 | Up tilt | Both clamps scoop overhead; launcher | 7/4/22/0; 7 | Claw-pack | [R.O.B. up tilt](https://www.ssbwiki.com/R.O.B._(SSBU)) |
 | Down tilt | Low wrench sweep, modest upward launch | 6/3/19/0; 6 | Engineering Upgrade tools | [R.O.B. down tilt](https://www.ssbwiki.com/R.O.B._(SSBU)) |
-| Dash attack | Claw-pack shoulder shove, 38 units startup travel | 10/4/26/0; 9.375 | Claw-pack | [Snake dash attack](https://www.ssbwiki.com/Snake_(SSBU)) |
-| Forward smash | Hammer-tank arm crashes forward; long whiff punish | 20/4/34/0; 15.75 | Robo-Goblin Demolish | [R.O.B. forward smash](https://www.ssbwiki.com/R.O.B._(SSBU)) |
+| Dash attack | Claw-pack shoulder shove, 38 units startup travel | 10/4/23/0; 9.375 | Claw-pack | [Snake dash attack](https://www.ssbwiki.com/Snake_(SSBU)) |
+| Forward smash | Hammer-tank arm crashes forward; long whiff punish | 20/4/31/0; 16.25 | Robo-Goblin Demolish | [R.O.B. forward smash](https://www.ssbwiki.com/R.O.B._(SSBU)) |
 | Up smash | Exhaust punches vertically; narrow landing read | 17/5/32/0; 16 | Rocket machinery | [R.O.B. up smash](https://www.ssbwiki.com/R.O.B._(SSBU)) |
 | Down smash | Wrench sweeps front then back; one hit per target | 16/6/32/0; 13 | Demolish | [R.O.B. down smash](https://www.ssbwiki.com/R.O.B._(SSBU)) |
 | Neutral air | Wide claw-pack sweep, front then back | 8/6/24/16; 9 | Claw-pack | [R.O.B. neutral air](https://www.ssbwiki.com/R.O.B._(SSBU)) |

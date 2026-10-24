@@ -53,14 +53,14 @@ const walkMotion = [{ ...frames(8, 31), velocityX: WALK_SPEED, velocityZ: 0.0, s
 const WALK_BRANCHES = frames(10, 31);
 
 
-const backstab: AuthoredSpecial = { name: "Backstab", endFrame: 30, hurt: [hurtPose(4, 12, LOW_CUT_ARM)], motion: [{ ...frames(1, 1), ...STOP }], regions: cut(6, [52.0, 45.0, 38.0], L, { ...hit(8.5, "EDGE", 40), growth: 116.0 }) };
+const backstab: AuthoredSpecial = { name: "Backstab", endFrame: 33, hurt: [hurtPose(4, 12, LOW_CUT_ARM)], motion: [{ ...frames(1, 1), ...STOP }], regions: cut(6, [52.0, 45.0, 38.0], L, { ...hit(8.5, "EDGE", 40), growth: 116.0 }) };
 
 const stepOut: AuthoredSpecial = { name: "Step Out", endFrame: 8, motion: [{ ...frames(1, 1), ...STOP }] };
 
 const windWalk = (air: boolean): AuthoredSpecial => {
   const finish = (special: AuthoredSpecial): AuthoredSpecial => (air ? { ...special, helpless: true } : special);
   return finish({
-    endFrame: 44,
+    endFrame: 47,
     motion: walkMotion,
     oncePerAirtime: air ? true : undefined,
     followUps: [

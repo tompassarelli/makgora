@@ -107,9 +107,9 @@ export const BEASTMASTER_MOVES: FighterMoves = {
       capsule(10.0, 40.0, f32(S + 4.0), 46.0, 14.0),
     ], hit(4.336845397949219, "POKE", 40, 1.0, HitElement.normal))),
 
-    [AttackStyle.forwardTilt]: heroMove(10, 3, 23, 0, chop(10, [75.0, 50.0, 28.0], L, hit(8.7459716796875, "EDGE", 35))),
-    [AttackStyle.forwardTiltUp]: heroMove(10, 3, 23, 0, chop(10, [115.0, 135.0, 150.0], L, hit(8.7459716796875, "EDGE", 50))),
-    [AttackStyle.forwardTiltDown]: heroMove(10, 3, 23, 0, chop(10, [10.0, -10.0, -30.0], L, hit(8.7459716796875, "EDGE", 20))),
+    [AttackStyle.forwardTilt]: heroMove(10, 3, 24, 0, chop(10, [75.0, 50.0, 28.0], L, hit(8.7459716796875, "EDGE", 35))),
+    [AttackStyle.forwardTiltUp]: heroMove(10, 3, 24, 0, chop(10, [115.0, 135.0, 150.0], L, hit(8.7459716796875, "EDGE", 50))),
+    [AttackStyle.forwardTiltDown]: heroMove(10, 3, 24, 0, chop(10, [10.0, -10.0, -30.0], L, hit(8.7459716796875, "EDGE", 20))),
 
     [AttackStyle.upTilt]: heroMove(9, 4, 23, 0, path(9, [
       capsule(25.0, 70.0, 55.0, 105.0),

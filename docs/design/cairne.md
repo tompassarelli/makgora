@@ -49,8 +49,8 @@ link names a relationship, not copied frame data or geometry.
 | Forward tilt, all angles | 14/4/29; 13 damage; totem sweeps from high to low, reaches 170. | [Totem][wc] | [Bowser's deliberate forward tilt][bowser] |
 | Up tilt | 13/5/27; 12 damage; raised totem launches at 85 degrees. | [Totem][wc] | [K. Rool's overhead control][krool] |
 | Down tilt | 11/3/25; 10 damage; low shaft lifts at 70 degrees. | [Totem][wc] | [K. Rool's low ground coverage][krool] |
-| Dash attack | 16/5/33; 15 damage; exposed shoulder drives forward 32 units. | [Endurance Aura][wc] | [K. Rool's committed body charge][krool] |
-| Forward smash | 28/4/42; head 25, shaft 19 damage; 190 reach and long punish window. | [Totem/War Stomp][wc] | [Bowser's hard read][bowser] |
+| Dash attack | 16/5/36; 15 damage; exposed shoulder drives forward 32 units. | [Endurance Aura][wc] | [K. Rool's committed body charge][krool] |
+| Forward smash | 28/4/45; head 25, shaft 19 damage; 190 reach and long punish window. | [Totem/War Stomp][wc] | [Bowser's hard read][bowser] |
 | Up smash | 25/5/39; 23 damage; narrow overhead pillar, weak lateral coverage. | [Totem][wc] | [K. Rool's vertical commitment][krool] |
 | Down smash | 23/7/40; 19 damage; front then rear ground sweep. | [War Stomp][wc] | [Bowser's two-sided punish][bowser] |
 | Neutral air | 12/7/29/L22; 13 damage; totem circles front then back. | [Totem][wc] | [Bowser's surrounding aerial][bowser] |

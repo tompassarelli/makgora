@@ -146,7 +146,7 @@ the longest low poke on the roster; on shield its tip leaves him out of the defe
 | Normal | F/A/R | Damage | Reach | Launch | Angled | Inspired by |
 | --- | --- | --- | --- | --- | --- | --- |
 | Jab | 3/2/13 | 4 | 0.62H | 50, 55/22 | | Marth jab (fast check) |
-| Forward tilt | 7/3/20 | 8 inner, 11 tip | 1.25H | 30, 100/24 tip | no | Marth forward tilt (non-angled arc) |
+| Forward tilt | 7/3/22 | 8 inner, 11 tip | 1.25H | 30, 100/24 tip | no | Marth forward tilt (non-angled arc) |
 | Up tilt | 6/5/18 | 7 | 0.85H arc over him | 85, 70/38 | | Marth up tilt (covers behind) |
 | Down tilt | 6/2/10 | 5 inner, 8 tip | 1.20H, below 0.15H | 20, 60/18 | | Marth down tilt (long thin poke) |
 
@@ -227,7 +227,7 @@ ledge-hanging fighter's body is.
 | Normal | F/A/R | Damage | Reach | Launch | Angled | Inspired by |
 | --- | --- | --- | --- | --- | --- | --- |
 | Jab | 4/2/12 | 3 | 0.70H | 35, 50/16 | | Glaive-handle check |
-| Forward tilt | 9/2/21 | 11 (9 before #105 pass 4) | 1.20H | 35, 75/18 | up 55, down 15 | Ike forward tilt (an angled sword) |
+| Forward tilt | 9/2/19 | 11 (9 before #105 pass 4) | 1.20H | 35, 75/18 | up 55, down 15 | Ike forward tilt (an angled sword) |
 | Up tilt | 7/5/19 | 7 | 0.80H, above | 80, 95/20 | | Glaive twirl overhead |
 | Down tilt | 7/2/16 | 7 (5 before #105 pass 4) | 1.15H, tip to −0.25H | 30, 70/22 | | Captain Falcon down tilt (an edge tool) |
 
@@ -255,7 +255,7 @@ the victim over his shoulder and behind him.
 | Normal | F/A/R | Damage | Reach | Launch | Angled | Inspired by |
 | --- | --- | --- | --- | --- | --- | --- |
 | Jab | 4/2/14 | 4 | 0.55H | 35, 55/12 | | Axe hilt |
-| Forward tilt | 10/3/23 | 11 | 1.10H | 35, 100/22 | up 50, down 20 | Broad axe |
+| Forward tilt | 10/3/24 | 11 | 1.10H | 35, 100/22 | up 50, down 20 | Broad axe |
 | Up tilt | 9/4/23 | 9 | 0.80H, up to 1.3H | 85, 95/20 | | Axe over the shoulder |
 | Down tilt | 8/3/22 | 7 | 0.80H, below 0.15H | 80, fixed 45 | | Melee Mario's set-knockback down angle |
 
@@ -403,10 +403,10 @@ Each now has one role:
 | Fighter | Role | F/A/R | Slide | Damage | Launch | Inspired by |
 | --- | --- | --- | --- | --- | --- | --- |
 | Warden | Fast, low commitment | 5/3/18 | 0.40H | 7 | 50, 70/24 | Sheik and Fox dash attacks (frames 4–6) |
-| Blademaster | Sliding long poke | 9/4/22 | 0.70H | 8.5 strong, 7 tip | 30, 100/24 | Marth dash attack |
+| Blademaster | Sliding long poke | 9/4/25 | 0.70H | 8.5 strong, 7 tip | 30, 100/24 | Marth dash attack |
 | Mountain King | Launcher, body only | 11/5/26 | 0.60H | 13.75 | 75, 95/30 | Donkey Kong dash attack |
 | Dreadlord | Cross-up | 7/4/24 | 1.00H, passes through | 9 | 60, 90/22, front then back | Ultimate's pass-through dash attacks |
-| Shadow Hunter | Multi-hit | 8/9/20 | 0.50H | 3 + 3 + 5 | last hit 45, 100/22 | Kirby's and Luigi's multi-hit dash attacks |
+| Shadow Hunter | Multi-hit | 8/9/18 | 0.50H | 3 + 3 + 5 | last hit 45, 100/22 | Kirby's and Luigi's multi-hit dash attacks |
 | Forsaken Paladin | Heavy, pushes off shield | 12/3/20 | 0.35H | 14.75 | 30, 100/26 | Ganondorf dash attack |
 | Lich | Hovering low glide | 10/6/22 | 0.80H | 8 | 25, 90/30 | Mewtwo dash attack (slow, lingering) |
 | Rifleman | Rifle lunge | 11/3/26 | 0.50H | 8.25 | 40, 114/22 | Falco dash attack |

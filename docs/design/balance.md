@@ -498,6 +498,22 @@ Righteous Fury keeps its damage, since its EX would kill earlier than the
 15% bound. Every changed kill percent stays within 15% of the fixed baseline
 and every change inside its ±25% and ±3-frame bounds.
 
+24 Oct 2026 (#45 pass 3, 45–55% Wren field, frames only). After the #223
+aerial refits, the Wren Expert field on aacadefb0a (Balance run 40124983073,
+400 a pair) put Blademaster at 61%, Cairne 58%, Kael'thas 56% and
+Malfurion, Anub'arak and Beastmaster at 55.1–55.4%; Goblin Tinker 36% and
+Shadow Hunter 44%. Pass 2's damage raises had left Tinker where he was, so
+this pass moves recovery frames and keeps every kill percent. Blademaster's
+forward tilt recovers 2 frames later and his dash attack 1; Wind Walk ends at
+47 and Backstab at 33, so a read walk-in costs more; his forward smash is
+unchanged. Cairne's dash attack and forward smash and Anub'arak's and
+Malfurion's dash attacks recover 2–3 frames later, Kael'thas's dash attack 2
+and forward smash 1, Beastmaster's forward tilts 1. Tinker's forward tilts,
+dash attack and forward smash recover 3 frames sooner and his forward smash
+deals 16.25 (kill 42%, baseline 48%); Shadow Hunter's forward tilt and dash
+attack recover 2 frames sooner. No change adds a fixed-baseline or feel-lock
+miss.
+
 ## Player panel and equal skill ceilings (#358)
 
 Every fighter targets a 45–55% mean over all six Expert personalities, with
