@@ -26,7 +26,9 @@ import { CHARACTER_NAMES, FIGHTER_MODELS, STYLE_NAMES, loadDrawnModel, sampleAtt
 import { characterModelScale } from "../../../src/game/presentation/modelScale";
 import { type DrawnReachRow, REACH_CHECKED, drawnReachSource, measureDrawnReach } from "../drawnReach";
 import { DRAWN_REACH } from "../drawnReachInfo";
-import { measureStrikeMoments, strikeMomentSource } from "../strikeMoments";
+import { measureStrikeMoments, staleStrikeFighters, strikeMomentSource } from "../strikeMoments";
+import { HERO_STRIKE_MOMENTS } from "../../../src/game/presentation/heroStrikeMomentInfo";
+import { checkoutInputs } from "../buildInputs";
 import { BODY_HEIGHT, type ReachCueRow, measureReachCue, measuredStyles, reachCueSource, showsReachCue } from "../reachCues";
 import { HERO_ROSTER, SELECTABLE_CHARACTERS, isSelectableCharacter, fighterName, fighterSlug } from "../../../src/game/sim/heroes/registry";
 import { DRAWN_STRIDES } from "../../../src/game/presentation/drawnStrideInfo";
@@ -161,11 +163,12 @@ const STRIKE_TABLE = join(import.meta.dir, "../../../src/game/presentation/heroS
 
 
 const strikes = (args: readonly string[]) => Effect.scoped(Effect.gen(function*() {
-  const options = Object.fromEntries(args.flatMap((arg, index) => (arg.startsWith("--") && args[index + 1] !== undefined ? [[arg.slice(2), args[index + 1]]] : [])));
+  const check = args.length === 1 && args[0] === "--check";
+  const options: Record<string, string | undefined> = check ? { assets: (yield* checkoutInputs()).assets } : Object.fromEntries(args.flatMap((arg, index) => (arg.startsWith("--") && args[index + 1] !== undefined ? [[arg.slice(2), args[index + 1]]] : [])));
   const { extractor, storage, assets } = options;
   const extractStock = extractor !== undefined && storage !== undefined;
-  if (!(assets !== undefined && args.length === 2 || extractStock && args.length === (assets === undefined ? 4 : 6))) {
-    return yield* new UsageFailure({ problem: "view strikes takes --assets DIR or --extractor CASC_EXTRACT --storage WARCRAFT_DIR [--assets DIR]" });
+  if (!(check || assets !== undefined && args.length === 2 || extractStock && args.length === (assets === undefined ? 4 : 6))) {
+    return yield* new UsageFailure({ problem: "view strikes takes --check, --assets DIR or --extractor CASC_EXTRACT --storage WARCRAFT_DIR [--assets DIR]" });
   }
   const scratch = yield* Effect.acquireRelease(
     Effect.sync(() => mkdtempSync(join(tmpdir(), "smashcraft-strikes."))),
@@ -187,7 +190,14 @@ const strikes = (args: readonly string[]) => Effect.scoped(Effect.gen(function*(
     try: () => measureStrikeMoments((model) => Bun.file(files.get(model) ?? "").arrayBuffer()),
     catch: (cause) => new MapBuildFailure({ operation: "measure strike moments", path: STRIKE_TABLE, cause }),
   });
-  yield* Effect.tryPromise({ try: () => Bun.write(STRIKE_TABLE, strikeMomentSource(moments)), catch: (cause) => new MapBuildFailure({ operation: "write strike moments", path: STRIKE_TABLE, cause }) });
+  const source = strikeMomentSource(moments);
+  if (check) {
+    const committed = yield* Effect.tryPromise({ try: () => Bun.file(STRIKE_TABLE).text(), catch: (cause) => new MapBuildFailure({ operation: "read strike moments", path: STRIKE_TABLE, cause }) });
+    if (committed === source) return yield* Console.log(`${moments.length} strike moments match the committed models: ${STRIKE_TABLE}`);
+    const stale = staleStrikeFighters(moments, HERO_STRIKE_MOMENTS, HERO_ROSTER.map(({ character }) => character)).map(fighterSlug);
+    return yield* new MapBuildFailure({ operation: "check strike moments", path: STRIKE_TABLE, cause: `the committed strike table differs from what ${stale.length > 0 ? stale.join(", ") : "the roster"} measure from their committed models; run bun wisp view strikes --assets "$(bun wisp inputs path assets)" and commit the table` });
+  }
+  yield* Effect.tryPromise({ try: () => Bun.write(STRIKE_TABLE, source), catch: (cause) => new MapBuildFailure({ operation: "write strike moments", path: STRIKE_TABLE, cause }) });
   yield* Console.log(`${moments.length} strike moments: ${STRIKE_TABLE}`);
 }));
 

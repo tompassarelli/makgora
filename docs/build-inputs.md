@@ -102,7 +102,10 @@ code:
    (smashcraft:ts/scripts/wisp/fighterArtChanges.ts). It also measures each
    checked fighter's strike moments from its committed model and fails when
    `heroStrikeMomentInfo.ts` holds different rows for him; regenerate them with
-   `bun wisp view strikes --assets "$(bun wisp inputs path assets)"`.
+   `bun wisp view strikes --assets "$(bun wisp inputs path assets)"`. Pre-push also
+   runs `bun wisp view strikes --check` over every fighter when a landing changes a
+   pin, the measurement's imports (move data, clip tables, looks) or the table itself
+   (smashcraft:ts/scripts/prePush.ts, `strikeInputs`).
    A derive that fails keeps its step logs in derive/run-*/ beside the store;
    `bun wisp inputs prune [--scratch NAME]...` removes the runs older than the
    derive lease, and each named scratch folder under the build-inputs root,

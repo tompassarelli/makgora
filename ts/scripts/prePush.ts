@@ -37,10 +37,12 @@ const MAP_INPUTS = [...MODEL_INPUTS, "ts/src/generated/clips/", "ts/scripts/preP
 
 
 const CUE_CHECK = "ts/scripts/cueModels.ts";
+const STRIKE_COMMAND = "ts/scripts/wisp/commands/view.ts";
+const STRIKE_MEASURES = ["ts/scripts/wisp/strikeMoments.ts", "ts/scripts/heroModelSource.ts", "ts/src/game/presentation/heroStrikeMomentInfo.ts"];
 const SUITE_INPUTS = [".github/workflows/farm-test.yml", ".github/workflows/autoland.yml", "ts/scripts/suiteParity.ts", "ts/scripts/prePush.ts"];
 const SCRIPT_INPUTS = ["ts/scripts", "ts/src", "ts/package.json", "ts/bunfig.toml"];
 
-export function cueInputs(): Set<string> {
+function importClosure(entry: string): string[] {
   const transpiler = new Bun.Transpiler({ loader: "ts" });
   const seen = new Set<string>();
   const visit = (file: string) => {
@@ -53,15 +55,24 @@ export function cueInputs(): Set<string> {
       if (found !== undefined) visit(found);
     }
   };
-  visit(join(root, CUE_CHECK));
-  return new Set([CUE_MODEL_RECORD, ...effectPlaybackInputs(root), ...[...seen].map((file) => relative(root, file))]);
+  visit(join(root, entry));
+  return [...seen].map((file) => relative(root, file));
 }
 
-export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = new Set()): Check[] {
+export function cueInputs(): Set<string> {
+  return new Set([CUE_MODEL_RECORD, ...effectPlaybackInputs(root), ...importClosure(CUE_CHECK)]);
+}
+
+export function strikeInputs(): Set<string> {
+  return new Set(["build-inputs/", STRIKE_COMMAND, ...STRIKE_MEASURES.flatMap(importClosure)]);
+}
+
+export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = new Set(), strikes: ReadonlySet<string> = new Set()): Check[] {
   const ts = paths.some((path) => path.startsWith("ts/") || path === "typescript-toolchain.lock");
   const animation = paths.some((path) => ANIMATION_INPUTS.some((input) => path === input || input.endsWith("/") && path.startsWith(input)));
   const models = paths.some((path) => MODEL_INPUTS.some((input) => path === input || input.endsWith("/") && path.startsWith(input)));
   const cueModels = touchesCueInputs(paths, cues);
+  const strikeMoments = touchesCueInputs(paths, strikes);
   const mapInputs = paths.some((path) => MAP_INPUTS.some((input) => path === input || input.endsWith("/") && path.startsWith(input)));
   const suites = paths.some((path) => SUITE_INPUTS.includes(path));
   const fighterArt = changedFighters(paths, derivedStepCode());
@@ -82,6 +93,9 @@ export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = 
     ] : []),
     ...(fighterArt.length > 0 ? [
       { name: `fighter art reproduces (${fighterArt.join(", ")})`, directory: "ts", args: ["scripts/wisp.ts", "inputs", "derive", "--check", ...fighterArt.flatMap((slug) => ["--fighter", slug])], fix: "derive the listed fighters from this landing's producers and commit their pins and generated files (smashcraft:docs/build-inputs.md, \"Change art\").", hosted: false, privateStore: true },
+    ] : []),
+    ...(strikeMoments ? [
+      { name: "strike moments match the committed models", directory: "ts", args: ["scripts/wisp.ts", "view", "strikes", "--check"], fix: "regenerate the table with bun wisp view strikes --assets \"$(bun wisp inputs path assets)\" from ts/ and commit it (smashcraft:docs/build-inputs.md, \"Change art\").", hosted: false, privateStore: true },
     ] : []),
     ...(animation ? [
       { name: "animation jitter [k3 measure #479]", directory: "ts", args: ["scripts/wisp.ts", "anim", "jitter"], fix: "regenerate the clip pool through thinKeys so close Hermite keys carry slopes (smashcraft:docs/commands/animation.md).", hosted: false, inputs: ["build-inputs", "tools/animations", ...SCRIPT_INPUTS] },
@@ -162,6 +176,7 @@ export interface CheckRun { readonly exitCode: number; readonly stdout: string; 
 export interface Local {
   readonly hosted: boolean;
   readonly cues: () => ReadonlySet<string>;
+  readonly strikes: () => ReadonlySet<string>;
   readonly changed: (local: string, remote: string) => Effect.Effect<readonly string[], PrePushRefusal>;
   readonly head: Effect.Effect<string, PrePushRefusal>;
   readonly dirty: (directories: readonly string[]) => Effect.Effect<string, PrePushRefusal>;
@@ -197,6 +212,7 @@ const runCheck = (check: Check) => Effect.gen(function*() {
 export const laptop: Local = {
   hosted: process.env.GITHUB_ACTIONS === "true",
   cues: cueInputs,
+  strikes: strikeInputs,
   changed: changedPaths,
   head: git("rev-parse", "HEAD"),
   dirty: (directories) => git("status", "--porcelain", "--", ...directories),
@@ -255,7 +271,7 @@ export const prePush = (input: string, landing: { readonly gate: typeof farmGate
     return commit === undefined || remote === undefined || ZERO.test(commit) || remoteRef?.startsWith("refs/tags/") ? [] : [{ commit, remoteRef, remote }];
   });
   const paths = [...new Set((yield* Effect.forEach(pushed, ({ commit, remote }) => local.changed(commit, remote))).flat())];
-  const selected = checksFor(paths, local.cues()).filter((check) => !(check.privateStore && local.hosted));
+  const selected = checksFor(paths, local.cues(), local.strikes()).filter((check) => !(check.privateStore && local.hosted));
   const toMain = pushed.some(({ remoteRef }) => remoteRef === "refs/heads/main");
   const handsOff = pushed.some(({ remoteRef }) => remoteRef === "refs/heads/main" || remoteRef?.startsWith(HAND_OFF) === true);
   const lands = handsOff ? autolandLands(yield* landing.queue, paths) : false;
