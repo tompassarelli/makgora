@@ -1,0 +1,27 @@
+# #192 Classic batch, Jaina Proudmoore on Blackrock: a's full bar wears the flame aura; a's EX neutral special
+# (LB + B) plays the EX sound and the EX aura on frame 60 and puts the flame aura out.
+#! chat -dev setup quick stage 12 pair jaina proudmoore / peon;meter 100
+#! preset melee
+40 a capture
+48 a capture
+56 a capture
+59 a capture
+60 a press LB
+60 a tap B 2
+60 a capture
+61 a capture
+62 a release LB
+62 a capture
+64 a capture
+67 a capture
+71 a capture
+76 a capture
+106 a press VIEW
+176 a release VIEW
+#! expect a 0-59 meter-cue super-aura on mana 100
+#! expect a 60 special EX
+#! expect a 60 meter-cue super-aura off
+#! expect a 60 meter-cue ex-sound DivineShield
+#! expect a 60 meter-cue ex-aura on
+#! expect a 90 meter-cue ex-aura off
+#! absent a 61-89 meter-cue ex-aura off
