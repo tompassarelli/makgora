@@ -65,7 +65,7 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Goblin Tinker | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place dash, dash attack; tech in down smash; tech away dash grab, back throw; missed tech dash, dash attack; trap dash, dash attack covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Goblin Tinker | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Goblin Tinker | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in forward smash; tech away dash, dash attack; missed tech down smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 40% → up air against 5/5 DI |
-| Kael'thas Sunstrider | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in down smash; tech away full hop, forward air; missed tech forward smash; trap down smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Kael'thas Sunstrider | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in down smash; tech away dash grab, up throw, forward tilt; missed tech forward smash; trap down smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Kael'thas Sunstrider | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, back throw; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Kael'thas Sunstrider | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in up smash; tech away short hop, neutral special, jab; missed tech forward smash; trap short hop, neutral special, jab covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Murloc | light | yes | yes | yes | yes | yes | forward throw at 60%: tech in place dash grab, back throw; tech in forward smash; tech away dash grab, back throw; missed tech dash grab, back throw; trap dash grab, back throw covers tech in place, missed tech | up throw at 20% → up air against 4/5 DI |
@@ -347,15 +347,15 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Murloc | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Grom Hellscream | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Grom Hellscream | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Grom Hellscream | light | up throw | 1/0 | 1/1 in forward tilt, out down smash | 1/1 in short hop, back air, out down special | 1/1 in dash, dash attack, out down special |
+| Grom Hellscream | light | up throw | 1/0 | 1/1 in forward tilt, out down smash | 1/1 in forward tilt, out down special | 1/1 in dash, dash attack, out down special |
 | Grom Hellscream | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Grom Hellscream | medium | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Grom Hellscream | medium | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Grom Hellscream | medium | up throw | 1/1 | 1/1 in forward tilt, out forward smash | 1/1 in short hop, back air, out down special | 1/1 in dash, dash attack, out down special |
+| Grom Hellscream | medium | up throw | 1/1 | 1/1 in forward tilt, out forward smash | 1/1 in dash, dash attack, out down special | 1/1 in dash, dash attack, out down special |
 | Grom Hellscream | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Grom Hellscream | heavy | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Grom Hellscream | heavy | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Grom Hellscream | heavy | up throw | 1/0 | 1/1 in forward tilt, out down smash | 1/1 in short hop, back air, out forward smash | 1/1 in short hop, back air, out down special |
+| Grom Hellscream | heavy | up throw | 1/0 | 1/1 in forward tilt, out down smash | 1/1 in forward tilt, out forward smash | 1/1 in forward tilt, out down special |
 | Grom Hellscream | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Kobold | light | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Kobold | light | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
