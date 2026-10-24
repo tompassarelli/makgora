@@ -267,7 +267,6 @@ export function specialProjectileCanonical(spec: Readonly<SpecialProjectile>, pr
     int("returns.age", spec.returns.age);
     real("returns.speed", spec.returns.speed);
   }
-  if (spec.trail !== undefined) int("trail.every", spec.trail.every);
   if (spec.pool !== undefined) {
     int("pool.every", spec.pool.every);
     real("pool.growth", spec.pool.growth);

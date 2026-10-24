@@ -1,6 +1,5 @@
 import { canHit, sameTeam } from "./teams";
 
-import { imod } from "wisp/src/sim/intMath";
 
 import { max, min } from "../core/numbers";
 import { roundToFloat32 } from "wisp/src/sim/binary32";
@@ -369,32 +368,6 @@ function flyHeroProjectile(world: Roster, ownerSlot: number, projectile: Project
 }
 
 
-const trailPiece = emptyCapsule();
-
-function strikeFromTrail(world: Roster, ownerSlot: number): void {
-  const owner = fighterAt(world, ownerSlot);
-  let struck = 0;
-  for (const piece of owner.projectiles) {
-    if (piece.life <= 0 || piece.kind !== ProjectileKind.hero || piece.spec === undefined) continue;
-    const every = piece.spec.trail?.every ?? 0;
-    if (every <= 0 || imod(piece.life, every) !== every - 1) continue;
-    trailPiece.x1 = piece.x;
-    trailPiece.z1 = piece.z;
-    trailPiece.x2 = piece.x;
-    trailPiece.z2 = piece.z;
-    trailPiece.radius = piece.spec.radius;
-    for (let targetSlot = 0; targetSlot < PARTICIPANT_CAPACITY; targetSlot++) {
-      const bit = 1 << targetSlot;
-      if ((struck & bit) !== 0 || !isActive(world, targetSlot) || !canHit(world, ownerSlot, targetSlot) || targets.out[targetSlot] || targets.intangible[targetSlot]) continue;
-      const target = fighterAt(world, targetSlot);
-      if (!capsulesIntersect(trailPiece, placeCapsule(heroTarget, hurtCapsule(target.character), at(targets.x, targetSlot), at(targets.z, targetSlot), target.facing))) continue;
-      struck |= bit;
-      collectDamageContact(world, ownerSlot, targetSlot, piece.spec.effect, piece.direction, ContactKind.flinch, false, undefined, target.shield.raised, undefined, piece.z, piece.visualFamily);
-    }
-  }
-}
-
-
 function side(ax: number, az: number, bx: number, bz: number, cx: number, cz: number): number {
   return f32(f32(f32(bx - ax) * f32(cz - az)) - f32(f32(bz - az) * f32(cx - ax)));
 }
@@ -555,7 +528,6 @@ export function updateProjectiles(world: Roster, stage?: number, matchFrame = 0)
       }
     }
   }
-  for (let ownerSlot = 0; ownerSlot < PARTICIPANT_CAPACITY; ownerSlot++) if (isActive(world, ownerSlot)) strikeFromTrail(world, ownerSlot);
   for (let slot = 0; slot < PARTICIPANT_CAPACITY; slot++) {
     if (!isActive(world, slot)) continue;
     const fighter = fighterAt(world, slot);

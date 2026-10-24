@@ -172,8 +172,6 @@ export interface SpecialProjectile {
   readonly homing?: { readonly turn: number; readonly maxRise: number } | undefined;
   /** On body or shield contact it becomes this projectile where it is, which deals the hit and then only shows. */
   readonly burstInto?: SpecialProjectile | undefined;
-  /** A still piece of a lingering trail, outside the projectile cap: on each frame its life is one less than a multiple of `every`, it strikes each foe inside once. */
-  readonly trail?: { readonly every: number } | undefined;
 }
 
 export interface SpecialBeam {

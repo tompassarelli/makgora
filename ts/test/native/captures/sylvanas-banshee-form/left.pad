@@ -1,0 +1,40 @@
+# Sylvanas Banshee Form native proof, flying left: she transforms on ultimate frames 1-18, dives through the standing Mountain King; the drawn banshee should cover her contact capsule.
+#! chat -dev setup quick pair mountain king / sylvanas windrunner;meter 100
+#! cue 61-78 transform: effect=PossessionTarget
+#! cue 79-158 banshee: effect=Banshee
+60 b press A
+61 b tap X 2
+62 a capture
+64 b release A
+66 a capture
+70 a capture
+74 a capture
+78 a capture
+82 a capture
+86 a capture
+90 a capture
+94 a capture
+98 a capture
+102 a capture
+106 a capture
+110 a capture
+114 a capture
+118 a capture
+122 a capture
+126 a capture
+130 a capture
+134 a capture
+138 a capture
+142 a capture
+146 a capture
+150 a capture
+154 a capture
+158 a capture
+162 a capture
+166 a capture
+170 a capture
+174 a capture
+178 a capture
+182 a capture
+186 a capture
+190 a capture

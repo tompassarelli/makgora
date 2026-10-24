@@ -65,7 +65,6 @@ interface Risen {
 
 interface Pool {
   readonly path: string;
-  readonly drawn: string;
   readonly defile: boolean;
   readonly effects: readonly number[];
   readonly boundaries: readonly (readonly number[])[];
@@ -112,19 +111,16 @@ export class ProjectilePresentation {
     const paths = fighterProjectileModels(character);
     const ultimateOnly = paths.filter((path, index) => index > 0 && !hero && ultimateProjectiles(character).some((spec) => spec.model === path));
     paths.forEach((path, index) => {
-
-      const trail = ultimateProjectiles(character).some((spec) => spec.model === path && spec.trail !== undefined);
-      const size = trail ? PROJECTILE_CAPACITY - HERO_PROJECTILE_CAP : hero ? HERO_PROJECTILE_CAP + 1 : index === 0 ? PROJECTILE_CAPACITY - 4 * ultimateOnly.length : 4;
+      const size = hero ? HERO_PROJECTILE_CAP + 1 : index === 0 ? PROJECTILE_CAPACITY - 4 * ultimateOnly.length : 4;
       const effects: number[] = [];
       const boundaries: number[][] = [];
       const raised: number[][] = [];
       const specials = heroDefinition(character)?.specials;
 
       const defilePool = character === Character.lichKing && specials !== undefined && heroProjectileArt(specials).some(({ spec }) => spec.model === path && spec.pool !== undefined);
-      const drawn = trail ? IMPACT_DEFILE_MODEL : path;
-      const groundPool = (specials !== undefined && heroProjectileArt(specials).some(({ spec }) => spec.model === path && spec.pool !== undefined && spec.pool.growth > 0.0)) || PROJECTILE_DRAW_OFFSETS[drawn]?.disc !== undefined;
+      const groundPool = (specials !== undefined && heroProjectileArt(specials).some(({ spec }) => spec.model === path && spec.pool !== undefined && spec.pool.growth > 0.0)) || PROJECTILE_DRAW_OFFSETS[path]?.disc !== undefined;
       for (let slot = 0; slot < size; slot++) {
-        effects.push(addPoolEffect(this.models, this.visible, drawn, this.origin));
+        effects.push(addPoolEffect(this.models, this.visible, path, this.origin));
         const crowd: number[] = [];
         if (character === Character.lichKing && path.includes("ImpaleHitTarget")) {
           for (let layer = 0; layer <= RAISED_LAYOUT.length; layer++) {
@@ -151,9 +147,9 @@ export class ProjectilePresentation {
           boundaries.push(layers);
         }
       }
-      this.pools.push({ path, drawn, defile: defilePool, effects, boundaries, raised });
+      this.pools.push({ path, defile: defilePool, effects, boundaries, raised });
     });
-    for (const path of opponentReflectedModels(opponents, this.pools.map((pool) => pool.path))) this.pools.push({ path, drawn: path, defile: false, effects: addPoolEffects(this.models, this.visible, path, this.origin, HERO_PROJECTILE_CAP + 1), boundaries: [], raised: [] });
+    for (const path of opponentReflectedModels(opponents, this.pools.map((pool) => pool.path))) this.pools.push({ path, defile: false, effects: addPoolEffects(this.models, this.visible, path, this.origin, HERO_PROJECTILE_CAP + 1), boundaries: [], raised: [] });
     for (let index = 0; index < PROJECTILE_CAPACITY; index++) this.assigned.push(-1);
     this.clear();
   }
@@ -326,8 +322,8 @@ export class ProjectilePresentation {
       this.lingering[slot] = 0;
       parked[slot] = false;
       const projectile = fighter?.projectiles[index];
-      const draw = pool === undefined ? undefined : PROJECTILE_DRAW_OFFSETS[pool.drawn];
-      const cue = pool === undefined ? undefined : PROJECTILE_DRAW_CUES[pool.drawn];
+      const draw = pool === undefined ? undefined : PROJECTILE_DRAW_OFFSETS[pool.path];
+      const cue = pool === undefined ? undefined : PROJECTILE_DRAW_CUES[pool.path];
       const lichKing = fighter?.character === Character.lichKing;
       const risen = lichKing && pool?.path.includes("ImpaleHitTarget") === true;
       const tell = lichKing && pool?.path.includes("AnimateDeadTarget") === true;
@@ -357,13 +353,6 @@ export class ProjectilePresentation {
       BlzSetSpecialEffectScale(model, pose.modelScale * (cue?.scale ?? 1.0));
       tintProjectile(model, cue);
       if (draw?.width !== undefined || draw?.height !== undefined) BlzSetSpecialEffectMatrixScale(model, draw.width ?? 1.0, 1.0, draw.height ?? 1.0);
-      if (projectile?.spec?.trail !== undefined) {
-        BlzSetSpecialEffectPitch(model, 0.0);
-        BlzSetSpecialEffectRoll(model, f32(Math.PI * 0.5));
-        BlzSetSpecialEffectMatrixScale(model, 1.0, f32(1.0 / f32(0.6)), f32(1.0 / f32(0.6)));
-        BlzSetSpecialEffectScale(model, pose.dangerRadius);
-        BlzSetSpecialEffectColor(model, 40, 24, 64);
-      }
       BlzSetSpecialEffectAlpha(model, 255);
       BlzSetSpecialEffectTimeScale(model, paused ? 0.0 : 1.0);
       if (draw?.seconds !== undefined) {
@@ -403,8 +392,8 @@ export class ProjectilePresentation {
         BlzSetSpecialEffectTimeScale(model, 0.0);
       } else if (cue?.birth === undefined && projectile?.spec !== undefined && projectile.velocityX === 0.0 && projectile.velocityZ === 0.0) {
 
-        if (pool !== undefined && STATIONARY_PARTICLE_MODELS.includes(pool.drawn)) {
-          if ((born || !paused) && restartsStationaryField(pool.drawn, projectile.spec.life - projectile.life, born)) BlzSetSpecialEffectTime(model, STATIONARY_SECONDS);
+        if (pool !== undefined && STATIONARY_PARTICLE_MODELS.includes(pool.path)) {
+          if ((born || !paused) && restartsStationaryField(pool.path, projectile.spec.life - projectile.life, born)) BlzSetSpecialEffectTime(model, STATIONARY_SECONDS);
         } else {
           BlzSetSpecialEffectTime(model, STATIONARY_SECONDS);
           BlzSetSpecialEffectTimeScale(model, 0.0);

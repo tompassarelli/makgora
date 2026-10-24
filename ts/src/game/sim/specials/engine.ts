@@ -56,7 +56,7 @@ function requestedSlot(input: Readonly<Controls>): SpecialSlot {
 function ownedCount(f: Readonly<Fighter>, spec: Readonly<SpecialProjectile> | undefined): number {
   let count = 0;
   for (const projectile of f.projectiles) {
-    if (projectile.life > 0 && projectile.kind === ProjectileKind.hero && (spec === undefined ? projectile.spec?.trail === undefined : projectile.spec === spec)) count++;
+    if (projectile.life > 0 && projectile.kind === ProjectileKind.hero && (spec === undefined || projectile.spec === spec)) count++;
   }
   return count;
 }
@@ -739,7 +739,7 @@ function burstProjectiles(f: Fighter, from: Readonly<SpecialProjectile>, into: R
   for (const before of f.projectiles) {
     index++;
     if (before.life <= 0 || before.kind !== ProjectileKind.hero
-      || (before.spec !== from && before.spec !== ordinary?.from && before.spec !== upgraded?.from && (from.trail === undefined || before.spec?.trail !== from.trail))) continue;
+      || (before.spec !== from && before.spec !== ordinary?.from && before.spec !== upgraded?.from)) continue;
     const result = upgraded !== undefined && before.spec === upgraded.from ? upgraded.into : into;
     const projectile = mutableProjectile(f, index);
     projectile.spec = result;

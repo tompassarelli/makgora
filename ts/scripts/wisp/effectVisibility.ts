@@ -223,7 +223,7 @@ function projectileUse(character: Character, fighter: string, move: string, spec
   const cue = PROJECTILE_DRAW_CUES[model];
   const travels = spec.velocityX !== 0 || spec.velocityZ !== 0;
   const birthNamed = BIRTH_MISSILES.some((name) => model.includes(name));
-  const base = { fighter, move, kind: "projectile" as const, model, travels, anchored: "projectile" as const, scale: spec.trail === undefined ? cue?.scale ?? 1 : spec.radius, lifetime: spec.life / 60, anchor: "projectile", width: draw?.width, height: draw?.height };
+  const base = { fighter, move, kind: "projectile" as const, model, travels, anchored: "projectile" as const, scale: cue?.scale ?? 1, lifetime: spec.life / 60, anchor: "projectile", width: draw?.width, height: draw?.height };
   if (character === Character.lichKing && spec.pool !== undefined) return { ...base, sequence: "stand", seconds: 0, timeScale: 1, playbackUnknown: "Defile per-frame age seeking and armed visibility is unmodeled" };
   if (character === Character.lichKing && model.includes("ImpaleHitTarget")) return { ...base, sequence: "birth", seconds: STATIONARY_SECONDS, timeScale: 0, alpha: RISEN_ALPHA };
   if (character === Character.lichKing && model.includes("AnimateDeadTarget")) return { ...base, sequence: "birth", seconds: 0, timeScale: 1, playbackUnknown: "Val'kyr tell per-frame lifetime seeking is unmodeled" };
