@@ -13,6 +13,7 @@ import { SWING_SOUND, SoundTier, TIER_HIT_VOLUME, TIER_SWING_PITCH, TIER_SWING_V
 
 export const SPECIAL_MOVE = 100;
 export const SPECIAL_SLOT_NAMES = ["Neutral special", "Side special", "Up special", "Down special"] as const;
+export const ULTIMATE_MOVE = SPECIAL_MOVE + SPECIAL_SLOT_NAMES.length;
 
 export const Weapon = { blade: 0, axe: 1, hammer: 2, blunt: 3, claw: 4, rock: 5 } as const;
 export type Weapon = (typeof Weapon)[keyof typeof Weapon];
@@ -48,6 +49,7 @@ interface FighterSound {
   readonly effort?: readonly string[] | undefined;
   readonly strong: string;
   readonly specials: readonly [SpecialSound, SpecialSound, SpecialSound, SpecialSound];
+  readonly ultimate?: SpecialSound | undefined;
   readonly normals?: { readonly [style: number]: { readonly perform?: string; readonly hit?: string } | undefined } | undefined;
 }
 
@@ -114,6 +116,7 @@ export const FIGHTER_SOUNDS: { readonly [character: number]: FighterSound | unde
   [Character.sylvanas]: {
     weapon: Weapon.blunt, strong: "BlackArrowHit",
     specials: [s("ArrowLaunch", "BlackArrowHit"), s("Silence", "Curse"), s("BansheeMissileLaunch", "BansheeMissileHit"), s("BansheeMissileLaunch", "BansheeMissileHit")],
+    ultimate: s("PossessionMissileLaunch", "PossessionMissileHit"),
   },
   [Character.cairne]: {
     weapon: Weapon.rock, swing: ["HeroTaurenChieftainAttack1", "HeroTaurenChieftainAttack2"], strong: "Pulverize",
@@ -205,7 +208,7 @@ function resolve(character: Character, move: number): MoveSound | undefined {
   if (fighter === undefined) return undefined;
   const { weapon } = fighter;
   if (!isNormalMove(move)) {
-    const special = fighter.specials[move - SPECIAL_MOVE];
+    const special = move === ULTIMATE_MOVE ? fighter.ultimate : fighter.specials[move - SPECIAL_MOVE];
     if (special === undefined) return undefined;
     return {
       perform: special.perform === undefined ? [] : [layer([special.perform], special.performVolume ?? PERFORM_VOLUME)],
@@ -319,11 +322,21 @@ export function moveSoundLabels(characters: readonly Character[]): string[] {
       if (row === undefined) continue;
       for (const each of [...row.perform, ...row.hit, ...row.strong, ...row.shield, ...row.impact, ...(row.voice === undefined ? [] : [row.voice])]) each.sounds.forEach((sound) => add(sound));
     }
-    for (let slot = 0; slot < 4; slot++) {
-      const row = moveSound(character, specialMove(slot));
+    for (let move = SPECIAL_MOVE; move <= ULTIMATE_MOVE; move++) {
+      const row = moveSound(character, move);
       if (row === undefined) continue;
       for (const each of [...row.perform, ...row.hit, ...row.strong, ...row.shield, ...row.impact, ...(row.voice === undefined ? [] : [row.voice])]) each.sounds.forEach((sound) => add(sound));
     }
   }
   return labels;
+}
+
+export function ultimateCastSound(character: Character): string | undefined {
+  return FIGHTER_SOUNDS[character]?.ultimate?.perform;
+}
+
+export function specialSoundMove(character: Character, action: SpecialAction): number {
+  if (action === SpecialAction.heroUltimate) return FIGHTER_SOUNDS[character]?.ultimate === undefined ? -1 : ULTIMATE_MOVE;
+  const slot = specialSlot(action);
+  return slot < 0 ? -1 : specialMove(slot);
 }

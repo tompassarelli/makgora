@@ -10,7 +10,7 @@ import { WORLD_UNITS_PER_MELEE_UNIT } from "../sim/tuning";
 import { type Roster, fighterAt, isActive } from "../sim/roster";
 import { AttackStyle } from "../sim/codes";
 import { moveTier } from "./moveTiers";
-import { hasImpactSound, specialMove, specialSlot } from "./moveSounds";
+import { hasImpactSound, specialMove, specialSlot, specialSoundMove } from "./moveSounds";
 import { runningHeroSpecial } from "../sim/specials/engine";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
 import { ProjectileKind, SpecialAction } from "../sim/codes";
@@ -283,12 +283,13 @@ function strikingMove(fighter: Readonly<Fighter>, world: Readonly<Roster> | unde
   for (let slot = 0; slot < PARTICIPANT_CAPACITY && move < 0; slot++) {
     if (!isActive(world, slot)) continue;
     const attacker = fighterAt(world, slot);
-    if (attacker === fighter || specialSlot(attacker.special.action) < 0) continue;
+    const struck = specialSoundMove(attacker.character, attacker.special.action);
+    if (attacker === fighter || struck < 0) continue;
     for (let entry = 0; entry < PARTICIPANT_CAPACITY; entry++) {
       const target = attacker.special.hitTargets[entry];
       if (target !== undefined && isActive(world, target) && fighterAt(world, target) === fighter) {
         character = attacker.character;
-        move = specialMove(specialSlot(attacker.special.action));
+        move = struck;
       }
     }
   }

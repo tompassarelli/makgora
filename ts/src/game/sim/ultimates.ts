@@ -224,16 +224,17 @@ const JAINA: AuthoredSpecial = {
 
 const BANSHEE_SPEED = 9.0;
 const BANSHEE_TURN = { turnCos: f32(0.9975640502598242), turnSin: f32(0.0697564737441253) };
+const BANSHEE_CARRY_SPEED = 13.0;
 const BANSHEE_CARRY: AuthoredSpecial = {
-  endFrame: 29,
-  motion: [{ ...frames(1, 9), velocityX: 0.0, velocityZ: 0.0, seek: { speed: BANSHEE_SPEED, turnCos: 1.0, turnSin: 0.0 } }, { ...frames(10, 10), velocityX: 0.0, velocityZ: 0.0 }],
-  intangible: frames(1, 9),
+  endFrame: 41,
+  motion: [{ ...frames(1, 20), velocityX: 0.0, velocityZ: 0.0, seek: { speed: BANSHEE_CARRY_SPEED, turnCos: 1.0, turnSin: 0.0 } }, { ...frames(21, 21), velocityX: 0.0, velocityZ: 0.0 }],
+  intangible: frames(1, 20),
 };
 const SYLVANAS: AuthoredSpecial = {
   name: "Banshee Form", endFrame: 128,
   projectiles: [mark("Abilities\\Spells\\Undead\\Possession\\PossessionCaster.mdx", 2, 17, 0.0)],
   motion: [
-    { ...frames(1, 18), velocityX: 0.0, velocityZ: 0.0 },
+    { ...frames(1, 18), velocityX: 0.0, velocityZ: 1.5 },
     { ...frames(19, 98), velocityX: 0.0, velocityZ: 0.0, seek: { speed: BANSHEE_SPEED, ...BANSHEE_TURN } },
     { ...frames(99, 99), velocityX: 0.0, velocityZ: 0.0 },
   ],
