@@ -40,15 +40,15 @@ export const poolUnitCommand = (args: readonly string[], path: string, uid: numb
 
 const currentUid = () => process.getuid?.() ?? 0;
 
+const unitPath = () => [...(process.env["PATH"] ?? "").split(delimiter), "/run/current-system/sw/bin", "/run/wrappers/bin"].filter((entry) => entry !== "").join(delimiter);
+
 /** A call on the user manager, on its own runtime dir and bus, never the caller's: inside a private desktop those name the desktop's private ones. */
 export const userManager = (program: string, args: readonly string[], uid = currentUid()) =>
-  ChildProcess.make(program, args, { env: userSessionEnv(uid), extendEnv: true, stdin: "ignore" });
+  ChildProcess.make(program, args, { env: { ...userSessionEnv(uid), PATH: unitPath() }, extendEnv: true, stdin: "ignore" });
 
 const unitActive = (unit: string) => runProcess(userManager("systemctl", ["--user", "is-active", unit])).pipe(
   Effect.map((state) => state === "active"), Effect.orElseSucceed(() => false),
 );
-
-const unitPath = () => [...(process.env["PATH"] ?? "").split(delimiter), "/run/current-system/sw/bin", "/run/wrappers/bin"].filter((entry) => entry !== "").join(delimiter);
 
 const withoutPairFlags = (args: readonly string[]) => args.filter((arg, index) => !["--pair", "--pairs"].includes(arg) && !arg.startsWith("--pair=") && !arg.startsWith("--pairs=") && !["--pair", "--pairs"].includes(args[index - 1] ?? ""));
 
@@ -95,7 +95,7 @@ export const poolStart: Command = (args) => {
 
 export const poolStop: Command = (args) => Effect.gen(function*() {
   const ids = flagValues(args, "pair").map(Number);
-  const listed = yield* runProcess(userManager("systemctl", ["--user", "list-units", "--plain", "--no-legend", "--all", `${POOL_UNIT_PREFIX}-*.service`])).pipe(Effect.orElseSucceed(() => ""));
+  const listed = yield* runProcess(userManager("systemctl", ["--user", "list-units", "--plain", "--no-legend", "--all", `${POOL_UNIT_PREFIX}-*.service`])).pipe(Effect.mapError((cause) => new LanFailure({ problem: `list pool units: ${cause.message}` })));
   const units = listed.split("\n").flatMap((line) => /^(\S+)\.service/.exec(line.trim())?.[1] ?? []).filter((unit) => ids.length === 0 || ids.some((id) => unit.split("-").slice(3).map(Number).includes(id)));
   if (units.length === 0) return yield* Console.log("no pool unit is running");
   for (const unit of units) {
