@@ -378,9 +378,10 @@ transport (wisp#110) both call it.
     from the smoothed mean trip, and Battle.net's turn waits put the latest
     rows 9 to 10 frames past the mean (gmax 17 at a mean gap of 10 at
     160 ms), so R sits below Slippi's cap. Groups measured lower pop at R 8
-    only because the slowest link sets the shared delay and the faster pairs
-    run with spare frames; the slowest pair in a group pops as a duel does,
-    so Tom set one R for every match on 25 October 2026, the duel's 6. A rerun
+    only because the harness keyed the recorded inputs by client index, so
+    with humans in slots 1, 3 and 4 one human never pressed a key (see
+    *Relay delivery and groups*); Tom set one R for every match on 25
+    October 2026, the duel's 6. A rerun
     on 25 October 2026 with evenly paced
     callbacks (one per frame, as a 16.7 ms turn gives) against Battle.net's
     25 ms bursts, five seeds, gave the same ranking: at 300 ms the worst p95
@@ -393,6 +394,84 @@ transport (wisp#110) both call it.
     The harness locks Auto at 5 for the 300 ms duel and 6 for 300 ms with
     three humans, a median pop of at most 2 and a p95 of at most 250 per
     client.
+  - *Relay delivery (25 Oct 2026, #219):* the same harness reran the sweep
+    under Wisp's relay model (wisp#40, wisp:docs/network-model.md "Relay
+    delivery", run at Wisp 2574ea6): `relayDelivery` and `relayCallbacks`
+    with `MEASURED_RELAY`'s 8 ms turns, 2 ms jitter, 2% loss and D = 4,
+    each player's link a round trip of half the route's times 85%, 100% or
+    115% (as the Battle.net arm spreads its one-way base), seeds 1 to 3,
+    match 793's inputs keyed by slot, beside the Battle.net arm (turn waits
+    and 25 ms bursts) on the same seeds. All 162 runs played with equal
+    confirmed checksums. Per-correction pop, median and p95 in units, over
+    every human client and seed (p95 is the worst client's, then the range):
+
+    | Route | R | Relay Auto | Relay p50 | Relay p95 | Battle.net Auto | Battle.net p50 | Battle.net p95 |
+    | --- | --- | --- | --- | --- | --- | --- | --- |
+    | Duel 160 ms | 5 | 2 | 0 | 104 (92-104) | 2-4 | 0-3 | 229 (40-229) |
+    | Duel 160 ms | 6 | 2 | 0 | 104 (92-104) | 2-3 | 0-4 | 227 (72-227) |
+    | Duel 160 ms | 7 | 2 | 0 | 104 (92-104) | 2 | 0-3 | 228 (68-228) |
+    | Duel 160 ms | 8 | 2 | 0 | 104 (92-104) | 2 | 0 | 158 (80-158) |
+    | Duel 160 ms | 10 | 2 | 0 | 104 (92-104) | 2 | 0 | 242 (109-242) |
+    | Duel 300 ms | 5 | 6 | 0 | 104 (56-104) | 7-9 | 0 | 181 (37-181) |
+    | Duel 300 ms | 6 | 5 | 0 | 174 (80-174) | 6-8 | 0-1 | 250 (40-250) |
+    | Duel 300 ms | 7 | 4 | 0 | 156 (110-156) | 5-7 | 0 | 242 (116-242) |
+    | Duel 300 ms | 8 | 3 | 0 | 169 (92-169) | 4-6 | 0-6 | 256 (113-256) |
+    | Duel 300 ms | 10 | 2 | 0-6 | 205 (171-205) | 2-4 | 0-11 | 259 (90-259) |
+    | Duel 450 ms | 5 | 10-11 | 0 | 125 (41-125) | 11-13 | 0 | 167 (36-167) |
+    | Duel 450 ms | 6 | 9-10 | 0 | 124 (49-124) | 10-12 | 0 | 241 (74-241) |
+    | Duel 450 ms | 7 | 8-9 | 0 | 111 (73-111) | 9-11 | 0 | 229 (63-229) |
+    | Duel 450 ms | 8 | 7-8 | 0 | 220 (72-220) | 8-10 | 0-10 | 257 (88-257) |
+    | Duel 450 ms | 10 | 5-6 | 0-18 | 314 (131-314) | 6-8 | 0-8 | 253 (78-253) |
+    | Three humans 300 ms | 5 | 7-8 | 0 | 180 (50-180) | 7-8 | 0 | 330 (156-330) |
+    | Three humans 300 ms | 6 | 6-7 | 0 | 204 (63-204) | 6-7 | 0-4 | 285 (174-285) |
+    | Three humans 300 ms | 7 | 5-6 | 0 | 240 (145-240) | 5-6 | 0-1 | 381 (236-381) |
+    | Three humans 300 ms | 8 | 4-5 | 0-19 | 293 (162-293) | 4-5 | 0-13 | 380 (218-380) |
+    | Three humans 300 ms | 10 | 2-3 | 0 | 425 (253-425) | 2-3 | 0-30 | 548 (292-548) |
+    | Three humans 600 ms | 5 | 16 | 0 | 127 (33-127) | 16 | 0 | 380 (137-380) |
+    | Three humans 600 ms | 6 | 16 | 0 | 127 (33-127) | 16 | 0 | 309 (137-309) |
+    | Three humans 600 ms | 7 | 16 | 0 | 127 (33-127) | 16 | 0-2 | 329 (137-329) |
+    | Three humans 600 ms | 8 | 15 | 0 | 240 (94-240) | 15 | 0 | 407 (158-407) |
+    | Three humans 600 ms | 10 | 13 | 0 | 471 (178-471) | 13 | 0-11 | 417 (273-417) |
+
+    The relay's even turns take Battle.net's burst tail off every duel:
+    the 160 ms duel's floor drops from 158-242 to 104. Under the budget rule
+    (a duel p95 of at most 200 on every duel route), R 7 holds on the relay
+    at 104, 156 and 111, one frame below R 6's Auto at 300 and 450 ms, so a
+    relayed match's budget should be 7; R 8 fails at 450 ms
+    (220). Battle.net keeps 6: its duel p95 already exceeds 200 at R 6 on
+    these seeds and no R brings it under. The map cannot yet tell a relayed
+    match from a Battle.net one, so every match still uses 6 until #240
+    hands it that fact.
+  - *Relay delivery and groups (25 Oct 2026, #219):* groups no longer get a
+    larger budget, and the measurement shows they should not. Keyed by slot,
+    three humans pop more than a duel at the same R and route on both
+    deliveries (relay 300 ms: 204 against 174 at R 6, 293 against 169 at
+    R 8). Probes on the same relay runs, uncommitted, separate the causes:
+    - *Pop per correcting sender* (corrections whose late changed rows all
+      came from one sender): 38-136 at R 6 for most pairs, within a duel's
+      80-174; rows from the slowest (115%) link reach 180-354. Mixed
+      corrections, where two senders' late changes land in one correction,
+      are 20-33% of a group's corrections and carry the tail: p95 180-595 at
+      R 6 and 252-528 at R 8. A duel has none.
+    - *Per-fighter correction distance* (p95 of each fighter moved in more
+      than 10% of corrections): 32-175 at R 6, within a duel's 80-174, so no
+      single fighter jumps further; the group's pop is the largest of more
+      fighters moved at once.
+    - *Input density per human at the same R:* with the old keying (one
+      human idle, so each client received changed rows from one sender
+      instead of two), mixed corrections fell to 0-24% and the Battle.net
+      worst p95 fell from 285 to 223 at R 6 and from 380 to 263 at R 8: the
+      lower group pop of 19 October came from the idle human.
+    - *Spare frames:* giving all three links the same round trip (no faster
+      pairs) raised the relay's 300 ms p95 from 204 to 293 at R 6 and from
+      293 to 428 at R 8, so the spread lowers group pop but not to a duel's.
+    So a group's extra pop comes from simultaneous corrections from more
+    active senders, which grows with R; a larger group budget would add to
+    it. The harness was the deleted online-pacing test (restored from
+    7aeb7b735^) run as an uncommitted script, with probes in notePop (each
+    fighter's distance) and receivePacket (each remote row's sender, whether
+    it landed behind the speculative cursor and whether it pressed or
+    released anything); #219 has the commands and outputs.
 - **When delay changes:** only at match start, on the epoch every client
   begins together, from requests already exchanged through the synchronized
   channel. It never changes mid-exchange.
