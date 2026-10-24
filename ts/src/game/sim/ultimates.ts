@@ -243,21 +243,18 @@ const SYLVANAS: AuthoredSpecial = {
   refreshesAir: true,
 };
 
-const CAIRNE_ANKH: SpecialProjectile = {
-  ...mark("Abilities\\Spells\\Orc\\Reincarnation\\ReincarnationTarget.mdx", 1, 36, 0.0), atStageCentre: true, cancelOnInterrupt: true,
+const NO_FOLLOW_UP = frames(999, 999);
+const ANCESTRAL_PILLAR: AuthoredSpecial = {
+  name: "Ancestral Pillar", endFrame: 40, intangible: frames(1, 12),
+  projectiles: [mark("Abilities\\Spells\\Orc\\Reincarnation\\ReincarnationTarget.mdx", 1, 18, 0.0)],
+  regions: [heroRegion(4, 7, capsule(-140.0, 40.0, 140.0, 40.0, 100.0), hit(18.0, 70, 85.0, 45.0, HitElement.holy))],
 };
 const CAIRNE: AuthoredSpecial = {
-  name: "Reincarnation", endFrame: 50,
-  projectiles: [
-    CAIRNE_ANKH,
-    { ...mark("Abilities\\Spells\\Human\\Resurrect\\ResurrectTarget.mdx", 25, 10, 0.0), atStageCentre: true, cancelOnInterrupt: true },
-    { ...mark("Abilities\\Spells\\Orc\\WarStomp\\WarStompCaster.mdx", 25, 10, 0.0), atStageCentre: true, cancelOnInterrupt: true },
-  ],
-  regionOrigin: CAIRNE_ANKH,
-  regions: [heroRegion(25, 27, capsule(-140.0, 50.0, 140.0, 50.0, 50.0), hit(12.0, 85, 60.0, 55.0, HitElement.holy))],
-  motion: [{ ...frames(26, 26), velocityX: 0.0, velocityZ: 0.0, relocateProjectile: CAIRNE_ANKH }],
-  // The engine primes intangibility one frame ahead, so arrival protection starts at teleport frame 26.
-  intangible: frames(27, 31),
+  name: "Reincarnation", endFrame: 75, groundOnly: true,
+  projectiles: [mark("Abilities\\Spells\\Orc\\Reincarnation\\ReincarnationTarget.mdx", 1, 49, 0.0)],
+  intangible: frames(7, 50),
+  guard: { ...frames(7, 50), heal: 0.0, counter: true },
+  followUps: [{ window: NO_FOLLOW_UP, special: ANCESTRAL_PILLAR }],
 };
 
 const SPIRIT = "units\\creeps\\PandarenBrewmaster\\PandarenBrewmaster.mdl";
@@ -433,7 +430,7 @@ const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined 
   [Character.thrall]: "Tremors run along the ground both ways. Jump them or stand on a platform.",
   [Character.jaina]: "A ray of frost sweeps down from high ahead of her to the floor. Get behind her or shield.",
   [Character.sylvanas]: "She becomes a banshee, homes in on the nearest foe and passes through them. Hit her while she changes; shield, roll through a level dive or run across her path.",
-  [Character.cairne]: "An ankh appears at centre stage. After 24 frames it bursts, then he teleports there with 6 frames of intangibility. Shield or leave the ankh; punish his arrival recovery.",
+  [Character.cairne]: "He waits with the ancestors: a strike that would hit him raises a spirit pillar instead. Don't strike; grab or wait.",
   [Character.chen]: "He splits into Earth, Storm and Fire, which strike around him one after another.",
   [Character.peon]: "He builds five Orc watch towers in quick succession across the stage; each shoots arrows at the nearest foe for about three seconds, then crumbles. Break a tower, shield or dodge the arrows, or hit him while he builds.",
   [Character.tinker]: "His Robo-Goblin waddles ahead and explodes. Walk away or shield the blast.",
