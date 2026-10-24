@@ -37,8 +37,14 @@ fighter can act), so line 2 measures the transition the game draws.
    larger IoU of windup/contact and contact/mid-recovery. More is clearer.
 5. **Judgement:** a fresh agent reads six gameplay-size key poses beside a
    Melee reference, scoring readability, weight, anticipation, follow-through
-   and character independently. Every judged line must be at least 4/5.
-   An unjudged move has no passing line 5.
+   and character independently. Three fresh judges score each clip, and
+   line 5 passes when the per-line median of the first three judgements of
+   that clip is at least 4/5 on every line. A move with fewer than three
+   judgements of its current clip has no passing line 5, and judgements past
+   the third do not count, so re-judging cannot roll a pass. Decided
+   2026-10-24 by the proxy under Tom's standing direction (north gate 34),
+   because one judge's score varied by about one point per line on the same
+   clip; the 4/5 bar and the gameplay-size framing stay.
 
 `anim score` also writes `build/anim-score/classic-crouch.tsv`: each fighter's crouch pose-contrast
 line (#376). It holds down for 40 frames (the 24-frame crouch clip, then its held
@@ -95,7 +101,7 @@ instead holds the camera on the drawn floor and grows upward so a jump shows
 its real height above it. Read `docs/animation-judge-brief.md` in a fresh judge
 context and write its requested JSONL. `bun wisp anim judge record
 PRIVATE_DIR/scores-*.jsonl` validates and stores numerical judgements in
-`tools/move-data/anim-score/judge.jsonl`, each tagged with the identity of the clip it judged: a digest of the key-frame poses `prepare` rendered, written to PRIVATE_DIR/clips.json and attached by `record`. Line 5 averages only the judgements whose identity matches the clip the scorecard samples now, so a re-authored move drops its old clip's scores; judgements recorded before identities existed count only while no judgement of that move names a clip (#95). Reference pixels stay outside Git.
+`tools/move-data/anim-score/judge.jsonl`, each tagged with the identity of the clip it judged: a digest of the key-frame poses `prepare` rendered, written to PRIVATE_DIR/clips.json and attached by `record`. Line 5 takes the per-line median of the first three judgements whose identity matches the clip the scorecard samples now, so a re-authored move drops its old clip's scores; judgements recorded before identities existed count only while no judgement of that move names a clip (#95). Reference pixels stay outside Git.
 
 ## Thresholds
 

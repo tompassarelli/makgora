@@ -23,6 +23,14 @@ export function currentJudgements<Entry extends { readonly clip?: string | undef
   return identified.length === 0 ? own : identified.filter((entry) => entry.clip === clip);
 }
 
+export const JUDGES_PER_CLIP = 3;
+
+export function judgePanel<Entry extends { readonly clip?: string | undefined }>(own: readonly Entry[], clip: string): readonly Entry[] {
+  return currentJudgements(own, clip).slice(0, JUDGES_PER_CLIP);
+}
+
+export const median = (values: readonly number[]): number => [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)] ?? 0;
+
 const PREPARED_CLIPS = "clips.json";
 const PreparedClips = Schema.fromJsonString(Schema.Struct({ look: Schema.String, clips: Schema.Record(Schema.String, Schema.String) }));
 

@@ -22,7 +22,7 @@ import { runProcess } from "../../hostProcess";
 import { CROUCH_THRESHOLDS, DOUBLE_JUMP_THRESHOLDS, LEDGE_THRESHOLDS, type MoveScore, THRESHOLDS, scoreCrouch, scoreDoubleJump, scoreLedgeHang, scoreMove } from "../animScore";
 import { type CrouchClipKind, type SampledMove, gameplayPixelsPerUnit, loadBody, sampleCrouch, sampleFighter, sampleJumps, sampleLedgeHang } from "../animScoreSample";
 import { answerKey, type ColdStrip, coldReadBatch, coldReadBatches, isMovementMove, ledgeCorner, type MovementMove, movementCrop, movementFrames, stageDrawArgs, stageShape, stripId } from "../animMovementRows";
-import { clipIdentity, currentJudgements, judgementKey, withPreparedClips, writePreparedClips } from "../animJudgeIdentity";
+import { JUDGES_PER_CLIP, clipIdentity, judgePanel, judgementKey, median, withPreparedClips, writePreparedClips } from "../animJudgeIdentity";
 import { assetsView, readManifest } from "../buildInputs";
 import { headlessRender } from "../headlessRender";
 import { projectRoot } from "../project";
@@ -96,12 +96,12 @@ interface Row {
   readonly score: MoveScore;
   readonly frames: { readonly firstActive: number; readonly lastActive: number; readonly end: number };
   readonly clip: string;
-  readonly judged: { readonly count: number; readonly lowest: number; readonly means: readonly number[] } | undefined;
+  readonly judged: { readonly count: number; readonly lowest: number; readonly medians: readonly number[]; readonly pass: boolean } | undefined;
   readonly reference: ReturnType<typeof meleeTiming>;
 }
 
 const passCount = (row: Row) => [row.score.line1.pass, row.score.line2.pass, row.score.line3.pass, row.score.line4.pass].filter(Boolean).length
-  + (row.judged !== undefined && row.judged.lowest >= JUDGE_PASS ? 1 : 0);
+  + (row.judged?.pass === true ? 1 : 0);
 const lines = (row: Row) => row.judged === undefined ? 4 : 5;
 
 const worstFirst = (a: Row, b: Row) => (lines(b) - passCount(b)) - (lines(a) - passCount(a)) || b.score.shortfall - a.score.shortfall || a.fighter.localeCompare(b.fighter) || a.move.localeCompare(b.move);
@@ -118,7 +118,7 @@ function tsvRow(row: Row): string {
     mark(line2.pass), n(line2.endError), n(line2.jump), n(line2.overshoot),
     mark(line3.pass), line3.windup, line3.peak, line3.settle, n(line3.fill), row.frames.firstActive, row.frames.lastActive, row.frames.end,
     mark(line4.pass), n(line4.contrast), n(line4.windupContact), n(line4.contactRecovery),
-    j === undefined ? "unjudged" : mark(j.lowest >= JUDGE_PASS), j?.count ?? 0, j === undefined ? "" : n(j.lowest), ...JUDGE_LINES.map((_, index) => j === undefined ? "" : n(j.means[index] ?? 0)),
+    j === undefined ? "unjudged" : mark(j.pass), j?.count ?? 0, j === undefined ? "" : n(j.lowest), ...JUDGE_LINES.map((_, index) => j === undefined ? "" : n(j.medians[index] ?? 0)),
     row.reference === undefined ? "" : `${row.reference.character} ${row.reference.action}`, row.reference?.start ?? "", row.reference?.total ?? "", line1.rule, n(line1.limbDrive)].join("\t");
 }
 
@@ -154,12 +154,12 @@ const measure = (fighters: readonly Character[], assets: string) => Effect.gen(f
       const score = yield* Effect.try({ try: () => scoreMove(sample, THRESHOLDS[sample.moveClass]), catch: (cause) => new AnimFailure({ problem: `${fighter} ${sampled.move}: ${String(cause)}` }) });
       const frames = { firstActive: sample.firstActive, lastActive: sample.lastActive, end: sampled.endFrame };
       const clip = clipIdentity(keyFrames({ score, frames }).map((index) => sample.frames[index]));
-      const own = currentJudgements(judged.filter((entry) => entry.fighter === fighter && entry.move === sampled.move), clip);
-      const means = JUDGE_LINES.map((line) => own.reduce((sum, entry) => sum + entry[line], 0) / Math.max(1, own.length));
+      const panel = judgePanel(judged.filter((entry) => entry.fighter === fighter && entry.move === sampled.move), clip);
+      const medians = JUDGE_LINES.map((line) => median(panel.map((entry) => entry[line])));
       rows.push({
         fighter, move: sampled.move, moveClass: sample.moveClass, score,
         frames, clip,
-        judged: own.length === 0 ? undefined : { count: own.length, lowest: Math.min(...means), means },
+        judged: panel.length === 0 ? undefined : { count: panel.length, lowest: Math.min(...medians), medians, pass: panel.length === JUDGES_PER_CLIP && Math.min(...medians) >= JUDGE_PASS },
         reference: meleeTiming(records, fighter, sampled.move),
       });
       samples.set(`${fighter}/${sampled.move}`, sampled);
@@ -189,14 +189,14 @@ const score: Command = (args) => Effect.gen(function*() {
   yield* Console.log(`worst first (${look}; L1 body, L2 return to ready, L3 phases, L4 contrast, L5 judged):`);
   for (const row of sorted.slice(0, 40)) {
     const { line1, line2, line3, line4 } = row.score;
-    yield* Console.log(`${String(passCount(row)).padStart(1)}/${lines(row)} ${`${row.fighter} ${row.move}`.padEnd(34)} L1 ${mark(line1.pass)} ${line1.rule === "limb" ? `limb ${n(line1.limbDrive)}` : n(line1.bodyShare)}/${n(line1.massShift)}  L2 ${mark(line2.pass)} ${n(line2.endError)}/${n(line2.jump)}/${n(line2.overshoot)}  L3 ${mark(line3.pass)} w${line3.windup} p${line3.peak} a${row.frames.firstActive} fill ${n(line3.fill)}  L4 ${mark(line4.pass)} ${n(line4.contrast)}  L5 ${row.judged === undefined ? "unjudged" : `${mark(row.judged.lowest >= JUDGE_PASS)} ${n(row.judged.lowest)}`}`);
+    yield* Console.log(`${String(passCount(row)).padStart(1)}/${lines(row)} ${`${row.fighter} ${row.move}`.padEnd(34)} L1 ${mark(line1.pass)} ${line1.rule === "limb" ? `limb ${n(line1.limbDrive)}` : n(line1.bodyShare)}/${n(line1.massShift)}  L2 ${mark(line2.pass)} ${n(line2.endError)}/${n(line2.jump)}/${n(line2.overshoot)}  L3 ${mark(line3.pass)} w${line3.windup} p${line3.peak} a${row.frames.firstActive} fill ${n(line3.fill)}  L4 ${mark(line4.pass)} ${n(line4.contrast)}  L5 ${row.judged === undefined ? "unjudged" : `${mark(row.judged.pass)} ${n(row.judged.lowest)} (${row.judged.count}/${JUDGES_PER_CLIP} judges)`}`);
   }
   const fighterRows = new Map<string, Row[]>();
   for (const row of rows) fighterRows.set(row.fighter, [...(fighterRows.get(row.fighter) ?? []), row]);
   yield* Console.log("\nper fighter (moves passing every measured line; each line's passes):");
   for (const [fighter, own] of fighterRows) {
     const count = (pick: (row: Row) => boolean) => own.filter(pick).length;
-    yield* Console.log(`${fighter.padEnd(18)} ${count((row) => row.score.line1.pass && row.score.line2.pass && row.score.line3.pass && row.score.line4.pass)}/${own.length} all  L1 ${count((row) => row.score.line1.pass)}  L2 ${count((row) => row.score.line2.pass)}  L3 ${count((row) => row.score.line3.pass)}  L4 ${count((row) => row.score.line4.pass)}  L5 ${count((row) => row.judged !== undefined && row.judged.lowest >= JUDGE_PASS)}/${count((row) => row.judged !== undefined)} judged`);
+    yield* Console.log(`${fighter.padEnd(18)} ${count((row) => row.score.line1.pass && row.score.line2.pass && row.score.line3.pass && row.score.line4.pass)}/${own.length} all  L1 ${count((row) => row.score.line1.pass)}  L2 ${count((row) => row.score.line2.pass)}  L3 ${count((row) => row.score.line3.pass)}  L4 ${count((row) => row.score.line4.pass)}  L5 ${count((row) => row.judged?.pass === true)}/${count((row) => row.judged !== undefined)} judged`);
   }
   yield* Console.log(`${rows.length} rows; ${relative(projectRoot, table)}`);
 
