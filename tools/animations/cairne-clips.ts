@@ -97,11 +97,11 @@ const strikes: Partial<Record<HeroPose, Strike>> = {
       {frame:28,gesture:{chest:42,twist:0,yaw:160,arm:-60,elbow:5,free:-54,pitch:20,step:22,leftHip:-24,rightHip:-12,leftKnee:24,rightKnee:8,head:-14},target:[-148,10]}],
     follow:{chest:44,twist:10,yaw:180,arm:-58,elbow:5,free:-52,pitch:22,step:24,leftHip:-26,rightHip:-12,leftKnee:26,rightKnee:8,head:-12},followAt:34,reach:[-158,8]},
   downAir:{prep:{chest:20,arm:-170,elbow:40,free:-150,freeElbow:35,pitch:-6,leftHip:-112,rightHip:-104,leftKnee:126,rightKnee:120,head:8,rise:16},prepAt:10,prepTarget:[-40,235],
-    hit:{chest:16,arm:-20,elbow:10,free:-55,freeElbow:20,pitch:4,leftHip:32,rightHip:-14,leftKnee:4,rightKnee:-2,head:22,rise:-14},hitTarget:[-30,25],
+    hit:{chest:8,arm:-30,elbow:10,free:-100,freeElbow:20,pitch:2,leftHip:30,rightHip:-6,leftKnee:0,rightKnee:0,head:12,rise:-14},hitTarget:[64,32],
     mid:[{frame:18,gesture:{chest:26,arm:-180,elbow:45,free:-160,freeElbow:40,pitch:-8,leftHip:-120,rightHip:-112,leftKnee:134,rightKnee:128,head:12,rise:22},target:[-45,240]},
-      {frame:23,gesture:{chest:20,arm:-15,elbow:10,free:-50,freeElbow:20,pitch:5,leftHip:32,rightHip:-14,leftKnee:0,rightKnee:-4,head:24,rise:-48},target:[-34,18]}],
-    follow:{chest:18,arm:-20,elbow:15,free:-50,freeElbow:25,pitch:4,leftHip:24,rightHip:-10,leftKnee:12,rightKnee:10,head:20,rise:-30},followAt:26,reach:[-60,25],settle:0.5,restTarget:[-90,38],
-    rest:{chest:10,arm:-25,elbow:12,free:-40,freeElbow:12,leftHip:-2,rightHip:-1,leftKnee:8,rightKnee:6,head:10,rise:-18}},
+      {frame:23,gesture:{chest:22,arm:-10,elbow:8,free:-85,freeElbow:20,pitch:0,leftHip:26,rightHip:-8,leftKnee:12,rightKnee:14,head:16,rise:-48},target:[20,-5]}],
+    follow:{chest:32,arm:20,elbow:10,free:-60,freeElbow:25,pitch:-4,leftHip:-8,rightHip:-24,leftKnee:36,rightKnee:42,head:16,rise:-6},followAt:26,reach:[-30,0],settle:0.72,restTarget:[-112,138],
+    rest:{chest:-3,arm:50,elbow:20,free:-85,freeElbow:30,pitch:3,leftHip:-3,rightHip:-12,leftKnee:22,rightKnee:20,head:-10,rise:0}},
 };
 for (const [pose, style, gesture] of normals) {
   const move = CAIRNE_MOVES.normals[style]; ensure(move, `${pose}: missing timing`);
