@@ -1,0 +1,91 @@
+# #188: Jaina shields out of a dash (frame 7 of the dash), right then left.
+# a raises shield the frame it lets go of the stick; b lets go with no input.
+# Under shield a brakes by double traction above walk speed, then by traction,
+# and stops 5 frames before b's released dash (traction alone).
+#! chat -dev quick hero jaina proudmoore
+60 a stick 1 0
+60 b stick 1 0
+66 a stick 0 0
+66 a shield 1
+66 b stick 0 0
+116 a shield 0
+130 a stick -1 0
+130 b stick -1 0
+136 a stick 0 0
+136 a shield 1
+136 b stick 0 0
+186 a shield 0
+# Expected, frame by frame (Bun sim of this script): ground speed under shield and each stop.
+#! expect a 66 shield tilt x 0.000 z 0.000 raised 1 grounded 1 roll 0 jump 0
+#! expect a 66 ground-speed vx 6.240 shield 1
+#! expect a 67 ground-speed vx 5.880 shield 1
+#! expect a 68 ground-speed vx 5.520 shield 1
+#! expect a 69 ground-speed vx 5.160 shield 1
+#! expect a 70 ground-speed vx 4.800 shield 1
+#! expect a 71 ground-speed vx 4.620 shield 1
+#! expect a 72 ground-speed vx 4.440 shield 1
+#! expect a 73 ground-speed vx 4.260 shield 1
+#! expect a 74 ground-speed vx 4.080 shield 1
+#! expect a 75 ground-speed vx 3.900 shield 1
+#! expect a 76 ground-speed vx 3.720 shield 1
+#! expect a 77 ground-speed vx 3.540 shield 1
+#! expect a 78 ground-speed vx 3.360 shield 1
+#! expect a 79 ground-speed vx 3.180 shield 1
+#! expect a 80 ground-speed vx 3.000 shield 1
+#! expect a 81 ground-speed vx 2.820 shield 1
+#! expect a 82 ground-speed vx 2.640 shield 1
+#! expect a 83 ground-speed vx 2.460 shield 1
+#! expect a 84 ground-speed vx 2.280 shield 1
+#! expect a 85 ground-speed vx 2.100 shield 1
+#! expect a 86 ground-speed vx 1.920 shield 1
+#! expect a 87 ground-speed vx 1.740 shield 1
+#! expect a 88 ground-speed vx 1.560 shield 1
+#! expect a 89 ground-speed vx 1.380 shield 1
+#! expect a 90 ground-speed vx 1.200 shield 1
+#! expect a 91 ground-speed vx 1.020 shield 1
+#! expect a 92 ground-speed vx 0.840 shield 1
+#! expect a 93 ground-speed vx 0.660 shield 1
+#! expect a 94 ground-speed vx 0.480 shield 1
+#! expect a 95 ground-speed vx 0.300 shield 1
+#! expect a 96 ground-speed vx 0.120 shield 1
+#! expect a 97 ground-speed vx 0.000 shield 1
+#! expect b 102 ground-speed vx 0.000 shield 0
+#! expect a 116 shield tilt x 0.000 z 0.000 raised 0 grounded 1 roll 0 jump 0
+#! expect a 136 shield tilt x 0.000 z 0.000 raised 1 grounded 1 roll 0 jump 0
+#! expect a 136 ground-speed vx -6.240 shield 1
+#! expect a 137 ground-speed vx -5.880 shield 1
+#! expect a 138 ground-speed vx -5.520 shield 1
+#! expect a 139 ground-speed vx -5.160 shield 1
+#! expect a 140 ground-speed vx -4.800 shield 1
+#! expect a 141 ground-speed vx -4.620 shield 1
+#! expect a 142 ground-speed vx -4.440 shield 1
+#! expect a 143 ground-speed vx -4.260 shield 1
+#! expect a 144 ground-speed vx -4.080 shield 1
+#! expect a 145 ground-speed vx -3.900 shield 1
+#! expect a 146 ground-speed vx -3.720 shield 1
+#! expect a 147 ground-speed vx -3.540 shield 1
+#! expect a 148 ground-speed vx -3.360 shield 1
+#! expect a 149 ground-speed vx -3.180 shield 1
+#! expect a 150 ground-speed vx -3.000 shield 1
+#! expect a 151 ground-speed vx -2.820 shield 1
+#! expect a 152 ground-speed vx -2.640 shield 1
+#! expect a 153 ground-speed vx -2.460 shield 1
+#! expect a 154 ground-speed vx -2.280 shield 1
+#! expect a 155 ground-speed vx -2.100 shield 1
+#! expect a 156 ground-speed vx -1.920 shield 1
+#! expect a 157 ground-speed vx -1.740 shield 1
+#! expect a 158 ground-speed vx -1.560 shield 1
+#! expect a 159 ground-speed vx -1.380 shield 1
+#! expect a 160 ground-speed vx -1.200 shield 1
+#! expect a 161 ground-speed vx -1.020 shield 1
+#! expect a 162 ground-speed vx -0.840 shield 1
+#! expect a 163 ground-speed vx -0.660 shield 1
+#! expect a 164 ground-speed vx -0.480 shield 1
+#! expect a 165 ground-speed vx -0.300 shield 1
+#! expect a 166 ground-speed vx -0.120 shield 1
+#! expect a 167 ground-speed vx 0.000 shield 1
+#! expect b 172 ground-speed vx 0.000 shield 0
+#! expect a 186 shield tilt x 0.000 z 0.000 raised 0 grounded 1 roll 0 jump 0
+# View held a second: the moment the parity check replays.
+300 a press VIEW
+370 a release VIEW

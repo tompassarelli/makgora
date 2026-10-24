@@ -51,6 +51,7 @@ function observe(before: FrameObservation, fighter: Readonly<Fighter>): void {
   before.shieldRaised = fighter.shield.raised;
   before.shieldTiltX = fighter.shield.tiltX;
   before.shieldTiltZ = fighter.shield.tiltZ;
+  before.groundSpeed = fighter.motion.vx;
   before.surface = fighter.motion.surface;
   before.dropConsumed = fighter.platform.dropConsumed;
 }
@@ -65,6 +66,9 @@ function reportChanges(s: ShellState, slot: ParticipantSlot, before: Readonly<Fr
 function traceChanges(s: ShellState, slot: ParticipantSlot, before: Readonly<FrameObservation>, f: Readonly<Fighter>): void {
   if (before.shieldRaised !== f.shield.raised || before.shieldTiltX !== f.shield.tiltX || before.shieldTiltZ !== f.shield.tiltZ) {
     traceParticipant(s, slot, `shield tilt x ${R2S(f.shield.tiltX)} z ${R2S(f.shield.tiltZ)} raised ${bit(f.shield.raised)} grounded ${bit(f.motion.grounded)} roll ${f.dodge.groundFrame} jump ${f.jump.squat}`);
+  }
+  if (f.motion.grounded && before.groundSpeed !== f.motion.vx && (f.shield.raised || f.motion.vx === 0)) {
+    traceParticipant(s, slot, `ground-speed vx ${R2S(f.motion.vx)} shield ${bit(f.shield.raised)}`);
   }
   if (before.ground !== f.ground.action || before.facing !== f.facing) {
     traceParticipant(s, slot, `ground action ${f.ground.action} facing ${f.facing} dash-frame ${f.ground.dashFrame}`);

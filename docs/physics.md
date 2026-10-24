@@ -1910,12 +1910,19 @@ The Lich is the light target of the advantage-state targets
 out of Dreadlord's tech chase and Rifleman's DI mix-up, so it stays at 0.06.
 Jaina, Malfurion, Medivh and Kael'thas slide further than the targets measure.
 
-Standing, crouching and landing (landing lag, including a wavedash or
-waveland's air-dodge landing) brake by twice the traction while the fighter
+Standing, crouching, shielding and landing (landing lag, including a wavedash
+or waveland's air-dodge landing) brake by twice the traction while the fighter
 moves faster than its walk speed, then by traction, as in Melee
-(https://www.ssbwiki.com/Traction). Dash, run, run brake, turn-run, attacks,
-shield, jump squat and knockback brake by traction alone
-(`restingTraction`, smashcraft:ts/src/game/sim/groundMovement.ts). With the
+(https://www.ssbwiki.com/Traction), so a shield raised out of a dash, run or
+landing slide stops no later than letting go of the stick (#188,
+smashcraft:ts/test/native/pads/issue-188-shield-brake/). Dash, run, run brake,
+turn-run, attacks, jump squat and knockback brake by traction alone
+(`restingTraction`, smashcraft:ts/src/game/sim/groundMovement.ts); shield
+pushback from a hit is its own channel and keeps decaying by traction. Only
+Jaina's wavedash is still faster than her walk when its landing lag ends, so
+hers is the one wavedash-into-shield slide that shortens: 251.1 units over 52
+frames before, 203.4 over 44 now, with the shield rising and dropping on the
+same frames. With the
 air dodge at Melee's 3.1 (2.65 units a frame at landing) a wavedash, whole slide,
 measured in the headless sim:
 

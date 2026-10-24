@@ -138,7 +138,7 @@ function advanceActionClock(f: Fighter, direction: number): void {
 
 export function restingTraction(f: Readonly<Fighter>, traction: number): number {
   const resting = f.landing.lag > 0 || (f.ground.action === GroundAction.none && f.ground.dashFrame === 0 && f.attack.style === undefined
-    && f.special.action === SpecialAction.none && !f.shield.raised && f.jump.squat <= 0);
+    && f.special.action === SpecialAction.none && f.jump.squat <= 0);
   return resting && Math.abs(f.motion.vx) > f.tuning.physics.walkSpeed ? f32(traction * 2.0) : traction;
 }
 
