@@ -203,22 +203,25 @@ export function specialSlot(action: SpecialAction): number {
   }
 }
 
+function resolveSpecial(fighter: FighterSound, move: number): MoveSound | undefined {
+  const special = move === ULTIMATE_MOVE ? fighter.ultimate : fighter.specials[move - SPECIAL_MOVE];
+  if (special === undefined) return undefined;
+  const { weapon } = fighter;
+  return {
+    perform: special.perform === undefined ? [] : [layer([special.perform], special.performVolume ?? PERFORM_VOLUME)],
+    hit: [layer([special.hit], at(TIER_HIT_VOLUME, SoundTier.medium))],
+    strong: [layer([special.hit], at(TIER_HIT_VOLUME, SoundTier.large)), layer([fighter.strong], SWEETENER_VOLUME)],
+    shield: [layer([at(at(METAL, weapon), SoundTier.medium)], SHIELD_VOLUME)],
+    impact: special.impact === undefined ? [] : [layer([special.impact], at(TIER_HIT_VOLUME, SoundTier.large))],
+    voice: undefined,
+  };
+}
+
 function resolve(character: Character, move: number): MoveSound | undefined {
   const fighter = FIGHTER_SOUNDS[character];
   if (fighter === undefined) return undefined;
+  if (!isNormalMove(move)) return resolveSpecial(fighter, move);
   const { weapon } = fighter;
-  if (!isNormalMove(move)) {
-    const special = move === ULTIMATE_MOVE ? fighter.ultimate : fighter.specials[move - SPECIAL_MOVE];
-    if (special === undefined) return undefined;
-    return {
-      perform: special.perform === undefined ? [] : [layer([special.perform], special.performVolume ?? PERFORM_VOLUME)],
-      hit: [layer([special.hit], at(TIER_HIT_VOLUME, SoundTier.medium))],
-      strong: [layer([special.hit], at(TIER_HIT_VOLUME, SoundTier.large)), layer([fighter.strong], SWEETENER_VOLUME)],
-      shield: [layer([at(at(METAL, weapon), SoundTier.medium)], SHIELD_VOLUME)],
-      impact: special.impact === undefined ? [] : [layer([special.impact], at(TIER_HIT_VOLUME, SoundTier.large))],
-      voice: undefined,
-    };
-  }
   const style = move;
   const tier = moveTier(character, style);
   const own = fighter.normals?.[style];
