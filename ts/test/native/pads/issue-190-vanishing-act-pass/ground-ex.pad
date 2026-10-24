@@ -1,5 +1,5 @@
 # #190: Medivh (a) dashes to about x 120, then EX Vanishing Act blinks through Medivh (b) standing at x 240.
-# Melee preset: LB is Strong (#186), and Strong + B the EX; the setup fills both bars, since an EX costs a third of one.
+# Melee preset: LB held with B casts the EX special; the setup fills both bars, since an EX costs a third of one.
 #! chat -dev setup quick hero medivh;meter 100
 #! preset melee
 540 a stick 1 0
