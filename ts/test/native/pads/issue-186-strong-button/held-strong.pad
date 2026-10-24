@@ -1,0 +1,25 @@
+# #186: neutral Strong + A in the air is the neutral air (style 12), not the forward air (13) the
+# grounded forward smash would turn into. A + B asks for the ultimate even with Strong held, so with
+# Strong and A held, B below a full bar casts the plain special (Thrall's neutral, 13) and spends
+# nothing. The melee preset: A attack, B special, Y jump, LB Strong. The setup gives Thrall a 50.
+#! chat -dev setup quick hero thrall;meter 50
+#! preset melee
+60 a tap Y 2
+72 a press LB
+72 a tap A 2
+74 a release LB
+#! expect a 72-75 applied attack 1 style 12
+#! absent a 60-200 applied attack 1 style 13
+# Strong + A held through the forward smash and its charge, then B once a acts again.
+300 a press LB
+300 a press A
+#! expect a 300-303 applied attack 2 style 4
+520 a tap B 2
+524 a release A
+524 a release LB
+#! expect a 520-523 special 13 form 0
+#! absent a 290-700 special EX
+#! absent a 290-700 special 17
+700 a capture
+740 a press VIEW
+810 a release VIEW
