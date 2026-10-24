@@ -568,6 +568,43 @@ In that session such a press of A's, made while B's game was stopped,
 started 66 callbacks after capture, and #26's re-run had one at 5 that
 waited for A's rows.
 
+## Game clock against real time — 24 October
+
+Warcraft's game clock loses real time in steps that double at power-of-two game
+times, and every timer callback follows it. A solo Classic 3.0.0.24268 game on
+gex45 (offline LAN client lan3a, its own local game, no Wisp host), playable
+build at 77f0e75003a6 plus `gms`, one idle human against an intermediate
+computer in Endless, ran 1,750 game seconds. Each second's `gms` is the game
+time a 512-second reference timer advanced against `os.clock`; `os.clock`
+matched the rates files' modification times to 3 ms over 947 s.
+
+| Game seconds | Records | Game/real | Loss | Callbacks per real s | Callbacks per game s |
+| --- | --- | --- | --- | --- | --- |
+| 0–64 | 63 | 0.99917 | 0.08% | 59.98 | 60.03 |
+| 64–128 | 64 | 0.99893 | 0.11% | 59.98 | 60.05 |
+| 128–256 | 127 | 0.99738 | 0.26% | 59.89 | 60.05 |
+| 256–512 | 255 | 0.99431 | 0.57% | 59.71 | 60.05 |
+| 512–1024 | 514 | 0.98830 | 1.17% | 59.34 | 60.04 |
+| 1024–1750 | 726 | 0.97613 | 2.39% | 58.82 | 60.26 |
+
+The loss doubles with each binade and is flat inside one, as when the game
+clock is a binary32 sum of short real-time steps. Callbacks per game second
+stay 60.0, so the timer does not round. The map simulated every callback
+(held and stalled 0, speculative frames equal to callbacks) on 11% of each real
+second in Lua (mean 109 ms, worst 206 ms), so map cost does not hold frames
+back. Contention does not make it: the 174 s while another pair ran averaged
+game/real 0.999, the 1,569 quiet seconds after it 0.984, falling with game
+time. It explains the 14 October Battle.net games easing to about 58.8 after
+minute 17 (1024 s is 17.1 minutes). The clock starts at zero with each
+Warcraft game; rematches inside one game keep it running. Per-second `sim`
+dips (to 50) are own-input echoes confirming in batches, not lost frames;
+the rate a player sees is `spec`.
+
+Wisp's LAN host loses a further 0.03–0.1% in LAN games, because each turn's
+length is rounded to whole milliseconds and the remainder is dropped
+(wisp:host/lan/host.ts, `step`): host game time ran 0.999–0.9997 of wall time
+in 24 October action logs. Evidence: ~/.local/state/smashcraft/evidence/sc-18-fps/.
+
 ## Native 0.0.29 short transport comparison
 
 Same two retained clients, slots 0/2, exact 0.0.29 artifact cited above.
