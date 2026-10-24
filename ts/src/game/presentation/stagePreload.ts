@@ -27,10 +27,16 @@ export function deckModel(stage: number, index: number): string {
 
 
 
+function passSlabDepth(stage: number): number {
+  if (stage === TOMB_OF_SARGERAS_STAGE) return 2.0;
+  if (stage === CARRIED_TEST_STAGE) return 0.75;
+  return f32(0.45);
+}
+
 export function slabScale(stage: number, index: number, width: number): readonly [x: number, y: number, z: number] | undefined {
   if (index === 0) return undefined;
   const pass = surfacePass(stage, index);
-  return [width / 100, pass ? f32(0.65) : 1.0, pass ? stage === TOMB_OF_SARGERAS_STAGE ? 2.0 : f32(0.45) : 1.0];
+  return [width / 100, pass ? f32(0.65) : 1.0, pass ? passSlabDepth(stage) : 1.0];
 }
 
 
