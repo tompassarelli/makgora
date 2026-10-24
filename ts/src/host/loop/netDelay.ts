@@ -5,7 +5,7 @@ import { PARTICIPANT_SLOTS } from "../../game/input/participants";
 import { type MatchState, humanActive, humanCount } from "../../game/lobby/lobbyState";
 import {
   DEFAULT_DELAY, type DelayCorrection, type DelayPolicy, type RttEstimate, agreedDelay, connectionPoor, correctDelay, correctedDelay,
-  MAX_FIXED_DELAY, delayCorrection, delayPolicy, highDelay, nextDelay, observeRtt, rollbackBudget, rttEstimate, smoothedRttMs,
+  delayCorrection, delayPolicy, highDelay, nextDelay, observeRtt, rttEstimate, smoothedRttMs,
 } from "../../game/netcode/delayPolicy";
 import { type FixedDelay, isFixedDelay } from "../../game/netcode/fixedSchedule";
 import { PENDING_CAPACITY } from "../../game/netcode/shadowSchedule";
@@ -258,8 +258,6 @@ export function notePop(net: NetDelay, world: Readonly<Roster>): void {
 
 function proposeDelay(net: NetDelay, players: number, active: boolean, inMatch: boolean, delay: number): void {
   const online = players > 1;
-  const budget = rollbackBudget(players);
-  if (!inMatch && budget !== net.policy.budget) net.policy = delayPolicy(net.policy.window, MAX_FIXED_DELAY, budget);
   if (online && inMatch) correctDelay(net.policy, net.correction, delay, net.second);
   resetSecond(net);
   if (!active) return;

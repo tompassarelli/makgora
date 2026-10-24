@@ -335,12 +335,10 @@ transport (wisp#110) both call it.
     play clean. On the relay harness a two-deviation guard, inflated by the
     few menu pings before the first match, chose 12-15 frames at 300 ms,
     where 4 already played 60 frames a second with no holds. R, the rollback
-    budget, depends on the human count, which every client sees alike, so the
-    delay stays universal within a match: 6 frames with two humans, one under
-    Slippi's `ROLLBACK_MAX_FRAMES`, and 8 with three or more, GGPO's
-    `MAX_PREDICTION_FRAMES` (see *Choosing R*). The target rises above 2 only
-    past 2 + R one-way frames (about 270 ms round trip in a duel, 333 ms in a
-    group), so ordinary connections keep 2 frames.
+    budget, is 6 frames in every match, one under Slippi's
+    `ROLLBACK_MAX_FRAMES` (see *Choosing R*). The target rises above 2 only
+    past 2 + R one-way frames (about 270 ms round trip), so ordinary
+    connections keep 2 frames.
     It raises at once but lowers only when one more frame of round trip
     would still allow the lower value, so jitter cannot flip it back and
     forth.
@@ -375,14 +373,15 @@ transport (wisp#110) both call it.
     145 and 123 at Auto 5 to 7 and 9 to 12 frames; R 7 gives 209 and 164
     one frame lower; R 8 gives 224 and 196 with the median rising to 2 to 5
     units. Three humans at 300 and 600 ms: R 8 gives 175 and 144 at Auto 4
-    to 6 and 14 to 15; R 10 gives 192 and 212 with the median off 0. So a
-    duel uses R 6 and three or more humans R 8. Slippi's 7 and GGPO's 8 cap
-    how late any row may arrive, while R is subtracted from the smoothed mean
-    trip, and Battle.net's turn waits put the latest rows 9 to 10 frames past
-    the mean (gmax 17 at a mean gap of 10 at 160 ms), so a duel needs an R
-    below Slippi's cap. In a group the slowest link sets the shared delay
-    and the faster pairs run with spare frames, which is why GGPO's 8 still
-    fits. Holds, stalls and sim were the same at every R (60 sim frames a
+    to 6 and 14 to 15; R 10 gives 192 and 212 with the median off 0. Slippi's
+    7 and GGPO's 8 cap how late any row may arrive, while R is subtracted
+    from the smoothed mean trip, and Battle.net's turn waits put the latest
+    rows 9 to 10 frames past the mean (gmax 17 at a mean gap of 10 at
+    160 ms), so R sits below Slippi's cap. Groups measured lower pop at R 8
+    only because the slowest link sets the shared delay and the faster pairs
+    run with spare frames; the slowest pair in a group pops as a duel does,
+    so Tom set one R for every match on 25 October 2026, the duel's 6. Holds,
+    stalls and sim were the same at every R (60 sim frames a
     second, no holds); replayed frames rise about 6 a second per frame of R.
     The harness locks Auto at 5 for the 300 ms duel and 6 for 300 ms with
     three humans, a median pop of at most 2 and a p95 of at most 250 per
