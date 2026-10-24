@@ -127,12 +127,12 @@ function selectHitRegion(world: Roster, attackerSlot: number, targetSlot: number
 
 
 
-function groundOption(style: AttackStyle): GroundOption | undefined {
+function groundOption(style: AttackStyle, dashStartTilt: boolean): GroundOption | undefined {
   switch (style) {
     case AttackStyle.jab: return GroundOption.jab;
     case AttackStyle.forwardTilt:
     case AttackStyle.forwardTiltUp:
-    case AttackStyle.forwardTiltDown: return GroundOption.forwardTilt;
+    case AttackStyle.forwardTiltDown: return dashStartTilt ? GroundOption.forwardTilt : GroundOption.tilt;
     case AttackStyle.upTilt:
     case AttackStyle.downTilt: return GroundOption.tilt;
     case AttackStyle.forwardSmash: return GroundOption.forwardSmash;
@@ -144,8 +144,8 @@ function groundOption(style: AttackStyle): GroundOption | undefined {
 }
 
 
-export function groundGatedStyle(f: Readonly<Fighter>, style: AttackStyle): AttackStyle | undefined {
-  const option = groundOption(style);
+export function groundGatedStyle(f: Readonly<Fighter>, style: AttackStyle, dashStartTilt = false): AttackStyle | undefined {
+  const option = groundOption(style, dashStartTilt);
   if (option === undefined) return style;
   const state = groundState(f);
   const frame = f.ground.actionFrame;
@@ -157,7 +157,7 @@ export function groundGatedStyle(f: Readonly<Fighter>, style: AttackStyle): Atta
 }
 
 
-export function beginFighterAttack(world: Roster, slot: number, style: AttackStyle | undefined, mayCharge: boolean): void {
+export function beginFighterAttack(world: Roster, slot: number, style: AttackStyle | undefined, mayCharge: boolean, dashStartTilt = false): void {
   if (style === undefined) return;
   const fighter = fighterAt(world, slot);
   const { grounded } = fighter.motion;
@@ -166,7 +166,7 @@ export function beginFighterAttack(world: Roster, slot: number, style: AttackSty
     beginAttack(fighter, chained, false);
     return;
   }
-  const gated = grounded ? groundGatedStyle(fighter, style) : style;
+  const gated = grounded ? groundGatedStyle(fighter, style, dashStartTilt) : style;
   if (gated === undefined) return;
   const action = fighter.tuning.moves !== undefined && gated === AttackStyle.dashAttack
     ? fighter.tuning.moves.dashAttack

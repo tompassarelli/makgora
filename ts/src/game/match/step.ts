@@ -248,7 +248,7 @@ export function stepMatch(game: MatchState, world: Roster, controls: FrameContro
     const serial = f.attack.serial;
     const actionBits = style === AttackStyle.grab || style === DASH_GRAB_REQUEST ? 160 : 32;
     if (style !== undefined && canStartAttackStyle(f, style)) observedFrameLegalActions[slot] |= actionBits;
-    beginFighterAttack(world, slot, style, command?.mayCharge === true && controls.inputs[slot].attackHeld);
+    beginFighterAttack(world, slot, style, command?.mayCharge === true && controls.inputs[slot].attackHeld, humanFighterActive(game, slot));
     if (f.attack.serial !== serial) observedFrameStartedActions[slot] |= actionBits;
     if (hadDashGrabWindow[slot] && f.ground.dashGrabWindow > 0 && !f.attack.dashGrab) f.ground.dashGrabWindow = Math.max(0, f.ground.dashGrabWindow - 1);
   }
