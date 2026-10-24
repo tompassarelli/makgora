@@ -32,15 +32,15 @@
 # Expected, frame by frame (headless run of this script):
 #! expect a 60 special 14 form 0
 #! expect a 75 special-form 6 action 14
-# 8cd9c77933 (#414) set Backstab to 9.294 and the swap slash to 7.745.
-#! expect b 80 damage 9.294
+# acc966bbfb (#45) cut Backstab to 8.5 and 8cd9c77933 (#414) set the swap slash to 7.745 (trace: run 40099235057).
+#! expect b 80 damage 8.500
 #! expect a 200 special 16 form 0
 # #333 (cb83c0780) slows b's entry dash; #338 (8a9eb0218) pushes their
 # overlapping bodies apart before Mirror Image leaves its 132-unit step.
 # 7bc2877cdb's per-hero traction and b's longer dash move this stop: probe run 39008307513 with traction neutralised keeps -216.196 (trace: run 39025737993).
 #! expect a 223 special 0 form 0 action-frame 0 x -214.636
 #! expect a 260 special 16 form 3
-#! expect b 267 damage 17.039
+#! expect b 267 damage 16.245
 #! expect a 650 special 16 form 3
 #! absent b 620-700 damage
 #! scene a MirrorImageCaster

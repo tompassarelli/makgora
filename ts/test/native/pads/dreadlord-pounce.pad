@@ -37,12 +37,12 @@
 #! expect a 376 grab-hold start
 #! expect a 392 grab-hold end
 #! expect a 392 damage 3.894
-#! expect b 392 damage 22.165
+#! expect b 392 damage 21.454
 #! scene a SleepSpecialArt
 #! scene a CarrionSwarmMissile
 #! scene a VampPotionCaster
 #! scene a BloodImpact
-# Damage uses the current kit: Sleep 1.810, Swarm 7.894 and bite 12.461 from 1ed1f22499 (#414 step 3; trace: run 39009305845); bite heals exactly 4.
+# Damage uses the current kit: Sleep 1.810 and Swarm 7.894 from 1ed1f22499 (#414 step 3; trace: run 39009305845), and bite 11.75 from acc966bbfb (#45; trace: run 40099235057); bite heals exactly 4.
 # View held a second, twice: the moments the parity check replays.
 500 a press VIEW
 570 a release VIEW
