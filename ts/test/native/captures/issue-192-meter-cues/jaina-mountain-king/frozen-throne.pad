@@ -1,0 +1,15 @@
+# #192 native readability on stage 2: both full bars wear the flame aura; a (jaina proudmoore) casts its EX neutral special
+# (LB + X: Strong + Special) and b (mountain king) its ultimate (A + X: Attack + Special), on the same frames, held before either can hit at gameplay zoom.
+#! chat -dev setup quick stage 2 pair jaina proudmoore / mountain king;meter 100
+#! cue 0-50 flame: effect=ImmolationRedTarget
+#! cue 60-63 ex: sound=DivineShield effect=DivineShieldTarget
+#! cue 61-63 ultimate: sound=FlameStrike effect=DoomDeath
+50 a capture
+60 a press LB
+60 a tap X 2
+60 b press A
+61 b tap X 2
+62 a release LB
+63 b release A
+63 a capture
+70 a capture

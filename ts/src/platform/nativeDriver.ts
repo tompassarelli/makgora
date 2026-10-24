@@ -128,7 +128,7 @@ function padSample(pad: Pad): void {
   set(Action.attack, (pad.buttons & 1) !== 0);
   set(Action.jump, (pad.buttons & 10) !== 0);
   set(Action.special, (pad.buttons & 4) !== 0);
-  set(Action.walk, (pad.buttons & 16) !== 0);
+  set(Action.strong, (pad.buttons & 16) !== 0);
   set(Action.grab, (pad.buttons & 32) !== 0);
   set(Action.leftTrigger, pad.shield > f32(TRIGGER_PRESS_LEVEL / TRIGGER_FULL_LEVEL));
   set(Action.moveLeft, x < 0.0); set(Action.moveRight, x > 0.0);
