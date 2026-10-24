@@ -12,7 +12,7 @@ import { ensure, onGlobalClock, tracks } from './original-clips';
 import { bodyJoint, followers, limbJoint, type Limb, type Side } from '../../ts/scripts/wisp/victoryJoints';
 import { RAISED_FRAME, UPRIGHT_LIMIT_DEGREES, torsoLean } from '../../ts/scripts/wisp/victoryTorso';
 
-type Arms = 'rest' | 'low' | 'raised' | 'pumped';
+type Arms = 'rest' | 'low' | 'raised' | 'pumped' | 'chest' | 'wide' | 'wave' | 'overhead';
 interface Beat { readonly frame: number; readonly arms: Arms | readonly [Arms, Arms]; readonly chest: number; readonly head: number; readonly hop: number }
 const CHEER: readonly Beat[] = [
     { frame: 0, arms: 'rest', chest: 0, head: 0, hop: 0 }, { frame: 8, arms: 'low', chest: 20, head: 12, hop: 0 },
@@ -32,6 +32,17 @@ const alternating = (low: Arms): readonly Beat[] => [
 const PUMPS: Readonly<Record<number, { readonly low: Arms; readonly hop: number }>> = {
     [Character.lich]: { low: 'pumped', hop: 1 }, [Character.tinker]: { low: 'pumped', hop: 1 },
     [Character.shadowHunter]: { low: 'pumped', hop: 1 }, [Character.chen]: { low: 'pumped', hop: 1 }, [Character.kobold]: { low: 'pumped', hop: 1 },
+};
+const sided = (weapon: Side, held: Arms, free: Arms): readonly [Arms, Arms] => weapon === 0 ? [held, free] : [free, held];
+const step = (weapon: Side, frame: number, held: Arms, free: Arms, chest: number, head: number, hop = 0): Beat =>
+    ({ frame, arms: held === 'rest' && free === 'rest' ? 'rest' : sided(weapon, held, free), chest, head, hop });
+const bow = (weapon: Side): readonly Beat[] => [
+    step(weapon, 0, 'rest', 'rest', 0, 0), step(weapon, 15, 'chest', 'wave', -10, -18), step(weapon, 28, 'chest', 'wide', 0, 0),
+    step(weapon, 45, 'chest', 'wide', 40, 35), step(weapon, 60, 'chest', 'low', 40, 35), step(weapon, 75, 'chest', 'overhead', -10, -18),
+    step(weapon, 90, 'rest', 'rest', 0, 0),
+];
+const DESIGNED: Readonly<Record<number, readonly Beat[]>> = {
+    [Character.warden]: bow(0),
 };
 const HANGING: Readonly<Record<number, readonly string[]>> = {
     [Character.warden]: ['Mesh06', 'Mesh45', 'Mesh46', 'Mesh05'],
@@ -65,9 +76,10 @@ for (const character of characters) {
     const name = `${fighter.name} Victory`;
     const source = parseMDX(await Bun.file(join(assets, fighter.source)).arrayBuffer()), model = structuredClone(source);
     const existing = source.Sequences.findIndex(sequence => sequence.Name === name);
-    const pumps = PUMPS[character], hops = BOUNCE[character], bouncing = hops !== undefined || pumps !== undefined;
-    const cheer = pumps === undefined ? CHEER : alternating(pumps.low);
-    const beats = cheer.map(beat => pumps !== undefined ? { ...beat, hop: beat.hop * pumps.hop } : bouncing ? { ...beat, hop: hops?.[beat.frame] ?? 0 } : beat);
+    const design = DESIGNED[character];
+    const pumps = PUMPS[character], hops = BOUNCE[character], bouncing = hops !== undefined || pumps !== undefined || design !== undefined;
+    const cheer = design ?? (pumps === undefined ? CHEER : alternating(pumps.low));
+    const beats = design ?? cheer.map(beat => pumps !== undefined ? { ...beat, hop: beat.hop * pumps.hop } : bouncing ? { ...beat, hop: hops?.[beat.frame] ?? 0 } : beat);
     const idle = (sequence: mdx.Sequence) => /^stand(\s*-?\s*1)?$/.test(sequence.Name.trim().toLowerCase());
     const stand = source.Sequences.find(sequence => sequence.Name.trim().toLowerCase() === 'stand') ?? source.Sequences.find(idle);
     ensure(stand !== undefined, `${fighter.name} has no Stand sequence`);
@@ -110,7 +122,7 @@ for (const character of characters) {
         settle(root.Translation);
     }
     const rest = new Map<mdx.Node, Float32Array>();
-    for (const joint of new Set([chest, head, spine, ...arms.flatMap(([shoulder, elbow, hand]) => [shoulder!, elbow!, ...(pumps !== undefined && hand!.Rotation ? [hand!] : [])])])) {
+    for (const joint of new Set([chest, head, spine, ...arms.flatMap(([shoulder, elbow, hand]) => [shoulder!, elbow!, ...((pumps !== undefined || design !== undefined) && hand!.Rotation ? [hand!] : [])])])) {
         ensure(joint.Rotation, `${fighter.name}'s ${joint.Name} has no rotation track`);
         if (!joint.Rotation.Keys.some(key => key.Frame === time(0))) { for (const { frame } of cheer) joint.Rotation.Keys.push({ Frame: time(frame), Vector: new Float32Array([0, 0, 0, 1]), ...(joint.Rotation.LineType >= mdx.LineType.Hermite ? { InTan: new Float32Array([0, 0, 0, 1]), OutTan: new Float32Array([0, 0, 0, 1]) } : {}) }); settle(joint.Rotation); }
         rest.set(joint, joint.Rotation.Keys.find(key => key.Frame === time(0))!.Vector.slice() as Float32Array);
@@ -138,16 +150,20 @@ for (const character of characters) {
         low: (shoulder, side) => [shoulder[0]!, outward(shoulder, side, 0.25), shoulder[2]! - reach[side]! * 0.9],
         raised: (shoulder, side) => [shoulder[0]!, outward(shoulder, side, bouncing ? 0.5 : 0.25), shoulder[2]! + reach[side]! * 0.92],
         pumped: (shoulder, side) => [shoulder[0]!, outward(shoulder, side, 0.55), shoulder[2]! + reach[side]! * 0.55],
+        chest: (shoulder, side) => [shoulder[0]! + reach[side]! * 0.45, centre + (shoulder[1]! - centre) * 0.3, shoulder[2]! - reach[side]! * 0.35],
+        wide: (shoulder, side) => [shoulder[0]!, outward(shoulder, side, 0.95), shoulder[2]! - reach[side]! * 0.1],
+        wave: (shoulder, side) => [shoulder[0]!, outward(shoulder, side, 0.85), shoulder[2]! + reach[side]! * 0.6],
+        overhead: (shoulder, side) => [shoulder[0]!, outward(shoulder, side, 0.2), shoulder[2]! + reach[side]! * 0.98],
     };
     const solved = new Map<string, number[]>();
     const below = (child: mdx.Node, ancestor: mdx.Node): boolean => { let at: mdx.Node | undefined = child; while (at !== undefined && at.Parent != null && at.Parent !== -1) { if (at.Parent === ancestor.ObjectId) return true; at = model.Nodes[at.Parent]; } return false; };
-    const held = bouncing ? arms.flatMap(([, , hand], side) => model.Nodes.filter(candidate => candidate !== undefined && /^weapon ref$/i.test(candidate.Name.trim()) && below(candidate, hand!)).map(weapon => ({ side, hand: hand!, weapon }))).at(0) : undefined;
+    const held = bouncing && design === undefined ? arms.flatMap(([, , hand], side) => model.Nodes.filter(candidate => candidate !== undefined && /^weapon ref$/i.test(candidate.Name.trim()) && below(candidate, hand!)).map(weapon => ({ side, hand: hand!, weapon }))).at(0) : undefined;
     const direction = (from: mdx.Node, to: mdx.Node) => { const [a, b] = [pivot(from), pivot(to)]; const d = [0, 1, 2].map(i => b[i]! - a[i]!); const length = Math.hypot(...d); return d.map(v => v / length); };
     const upright = held === undefined ? undefined : (() => { renderer.setSequence(source.Sequences.indexOf(stand)); data.frame = stand.Interval[0]!; renderer.update(0); return direction(held.hand, held.weapon); })();
     for (const beat of beats) {
         pose(chest, beat.frame, beat.chest); pose(head, beat.frame, beat.head);
         const sides = typeof beat.arms === 'string' ? [beat.arms, beat.arms] as const : beat.arms;
-        if (sides.some(kind => kind === 'raised' || kind === 'pumped')) {
+        if (sides.some(kind => kind === 'raised' || kind === 'pumped' || kind === 'wave' || kind === 'overhead')) {
             const lean = () => torsoLean(model, index, time(beat.frame) - cutoff, renderer);
             const rear = (value: number, axis: number) => { const own = spine === chest ? beat.chest : 0; pose(spine, beat.frame, axis === 0 ? value + own : own, axis === 1 ? value : 0, axis === 2 ? value : 0); };
             const known = solved.get('rear');

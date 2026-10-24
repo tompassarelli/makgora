@@ -9,8 +9,8 @@ import { victoryAnimation } from '../../ts/src/game/presentation/matchAudio';
 import { SELECTABLE_CHARACTERS, fighterName } from '../../ts/src/game/sim/heroes/registry';
 import { ensure } from './original-clips';
 
-const [outputArg] = process.argv.slice(2);
-ensure(outputArg, 'usage: bun tools/animations/victory-captures.ts PRIVATE_OUTPUT');
+const [outputArg, ...only] = process.argv.slice(2);
+ensure(outputArg, 'usage: bun tools/animations/victory-captures.ts PRIVATE_OUTPUT [FIGHTER_NAME...]');
 const output = resolve(outputArg);
 ensure(relative(resolve(import.meta.dir, '../..'), output).startsWith('..'), 'Captures stay private');
 const STRIP_FRAMES = 6;
@@ -19,6 +19,7 @@ await Effect.runPromise(Effect.gen(function*() {
     const assets = assetsView(yield* readManifest());
     const scenes: RenderScene[] = [];
     for (const [index, winner] of SELECTABLE_CHARACTERS.entries()) {
+        if (only.length > 0 && !only.includes(fighterName(winner))) continue;
         const loser = SELECTABLE_CHARACTERS[(index + 1) % SELECTABLE_CHARACTERS.length];
         const name = fighterName(winner);
         const clipIndex = originalClipNamed(winner, victoryAnimation(winner));
@@ -46,6 +47,6 @@ await Effect.runPromise(Effect.gen(function*() {
     for (const [directory, drawn] of [['classic', scenes], ['classic-poses', poses]] as const) {
         const images = yield* renderScenes(project, drawn, join(output, directory), 'classic');
         for (const image of images) ensure(image.notDrawn.length === 0, `${directory}/${image.frame}: ${image.notDrawn.join('; ')}`);
-        console.log(`VICTORY_STRIPS_PASS ${directory}: ${SELECTABLE_CHARACTERS.length} winners, ${images.length} frames; ${output}`);
+        console.log(`VICTORY_STRIPS_PASS ${directory}: ${scenes.length / STRIP_FRAMES} winners, ${images.length} frames; ${output}`);
     }
 }));
