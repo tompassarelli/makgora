@@ -1,5 +1,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { basename, dirname, join } from "node:path";
+import { Console, Effect } from "effect";
+import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
 import { preloadLines } from "wisp/scripts/wisp/preloadRecord";
 
 const DEFAULT_FOLDER = join(process.env.HOME ?? "", ".local/share/Steam/steamapps/compatdata/3516115571/pfx/drive_c/users/steamuser/Documents/Warcraft III/CustomMapData");
@@ -9,6 +11,7 @@ const SLOW_SIM = 55;
 const SLOW_CB = 55;
 const SLOW_DRAW = 57;
 const MIN_MATCH_SECONDS = 20;
+const DEBT_FLAG = 2;
 
 export type Fields = Record<string, number>;
 
@@ -106,6 +109,11 @@ function gameClock(seconds: readonly Fields[], span: number): string {
   return `game/real ${fixed(game / span, 4)} cb/game s ${fixed(sum(timed, "cb") / Math.max(0.001, game), 2)}`;
 }
 
+function realDebt(seconds: readonly Fields[]): string {
+  const due = seconds.filter(row => row.due !== undefined);
+  return due.length === 0 ? "due -" : `due ${due.at(-1)?.due}/${most(due, "due")}`;
+}
+
 function minuteRow(minute: Minute, previousEnd: number): string {
   const { seconds, counts, events, live: liveTags } = minute.lines;
   const end = seconds.at(-1)?.t ?? previousEnd;
@@ -116,6 +124,7 @@ function minuteRow(minute: Minute, previousEnd: number): string {
     sum(seconds, "pm") > 0 ? `MENU(${sum(seconds, "pm")})` : "",
     most(seconds, "cbgap") > GAP_FLAG_US ? `GAP(${fixed(most(seconds, "cbgap") / 1000, 0)} ms, focus?)` : "",
     speedFlag(seconds),
+    most(seconds, "due") > DEBT_FLAG ? `DEBT(${most(seconds, "due")} frames due past spec)` : "",
     span > seconds.length + 5 ? `MISSING(${fixed(span - seconds.length, 0)} s without lines)` : "",
   ].filter(flag => flag !== "").join(" ");
   const last = counts.at(-1) ?? {};
@@ -125,8 +134,10 @@ function minuteRow(minute: Minute, previousEnd: number): string {
   return [
     `  min ${String(minute.minute).padStart(3)} t ${fixed(end / 1000, 0).padStart(5)}s`,
     `cb/s ${fixed(sum(seconds, "cb") / span)} (min ${seconds.length === 0 ? "-" : Math.min(...seconds.map(row => row.cb ?? 0))})`,
+    `spec/real s ${fixed(sum(seconds, "spec") / span)}`,
     gameClock(seconds, span),
-    `sim/s ${fixed(sum(seconds, "sim") / span)} spec/s ${fixed(sum(seconds, "spec") / span)} conf/s ${fixed(sum(seconds, "conf") / span)} spec/cb ${fixed(sum(seconds, "spec") / Math.max(1, sum(seconds, "cb")), 2)}`,
+    realDebt(seconds),
+    `sim/s ${fixed(sum(seconds, "sim") / span)} conf/s ${fixed(sum(seconds, "conf") / span)} spec/cb ${fixed(sum(seconds, "spec") / Math.max(1, sum(seconds, "cb")), 2)}`,
     `held ${fixed(100 * sum(seconds, "held") / Math.max(1, matchTicks), 0)}% stall ${fixed(100 * sum(seconds, "stall") / Math.max(1, matchTicks), 0)}% gap ${fixed(sum(seconds, "gap") / Math.max(1, seconds.length))}/${most(seconds, "gmax")}`,
     `rollback/s ${fixed(sum(seconds, "rb") / span)} replayed/s ${fixed(sum(seconds, "rbf") / span)} deepest ${most(seconds, "rbd")} pop ${most(seconds, "pop")} over 20/s ${fixed(sum(seconds, "popOver") / span)} echo ${fixed(mean(seconds.filter(row => (row.echoMax ?? 0) > 0), "echo"))}/${most(seconds, "echoMax")} late ${senderLate(seconds)} bursts/s ${fixed(sum(seconds, "bur") / span)} held run ${most(seconds, "hrun")} drift ${seconds.at(-1)?.drift ?? "-"} bot reuse ${sum(seconds, "botHit")}/${sum(seconds, "botHit") + sum(seconds, "botMiss")} heap growth KB/s ${fixed(sum(seconds, "alloc") / span)} failed sends ${sum(seconds, "sf")}`,
     `lua ms/s ${fixed(sum(seconds, "lua") / 1000 / span)} tick us ${fixed(sum(seconds, "tk") / Math.max(1, seconds.length), 0)}/${most(seconds, "tkmax")}`,
@@ -157,16 +168,18 @@ export function forkVerdict(minutes: readonly { readonly minute: number; readonl
   return `  fork: echo-wait (cb ${fixed(cb)}/s, sim ${fixed(sim)}/s, held ${fixed(100 * sum(slow, "held") / Math.max(1, sum(slow, "cb")), 0)}%, gap ${fixed(mean(slow, "gap"))}, own echo ${fixed(mean(slow, "rown"))}/s), ${at}`;
 }
 
-export function sessionRateReport(folder: string): string[] {
+export function sessionRateReport(path: string): string[] {
   const loads = new Map<string, Minute[]>();
-  for (const name of readdirSync(folder)) {
+  const single = statSync(path).isFile();
+  const folder = single ? dirname(path) : path;
+  for (const name of single ? [basename(path)] : readdirSync(folder)) {
     const match = RATES_FILE.exec(name);
     if (match === null) continue;
-    const path = join(folder, name);
-    const text = readFileSync(path, "utf8");
+    const file = join(folder, name);
+    const text = readFileSync(file, "utf8");
     const lines = preloadLines(text) ?? text.split(/\r?\n/);
     const minutes = loads.get(match[1] ?? "") ?? [];
-    minutes.push({ minute: Number(match[2]), mtime: statSync(path).mtimeMs, lines: parseSessionRates(lines) });
+    minutes.push({ minute: Number(match[2]), mtime: statSync(file).mtimeMs, lines: parseSessionRates(lines) });
     loads.set(match[1] ?? "", minutes);
   }
   if (loads.size === 0) return [`no smashcraft-rates files in ${folder}`];
@@ -190,5 +203,11 @@ export function sessionRateReport(folder: string): string[] {
   }
   return report;
 }
+
+export const rates: Command = (args) => Effect.gen(function*() {
+  if (args.length > 1) return yield* new UsageFailure({ problem: "perf rates takes one smashcraft-rates file or CustomMapData folder" });
+  const path = args[0] ?? DEFAULT_FOLDER;
+  yield* Console.log(sessionRateReport(path).join("\n"));
+});
 
 if (import.meta.main) console.log(sessionRateReport(process.argv[2] ?? DEFAULT_FOLDER).join("\n"));

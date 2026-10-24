@@ -195,6 +195,8 @@ function wrapNatives(rates: SessionRates): void {
   }
 }
 
+export const realFrameDebt = (): number => 0;
+
 function findClock(): ((this: void) => number) | undefined {
   if (typeof os !== "object" || os === null || typeof os.clock !== "function") return undefined;
   return os.clock;
@@ -312,7 +314,7 @@ function rateTokens(rates: SessionRates): string[] {
   const match = s === undefined ? -1 : s.replay.serial;
   const rollback = s === undefined ? undefined : activeRollback(s);
   const frame = s === undefined ? -1 : rollback?.schedule.speculativeFrame() ?? s.runtime.simulationFrame;
-  const window = rollback === undefined ? "" : ` cf=${rollback.schedule.nextConfirmedFrame()} kn=${rollback.schedule.knownThrough()} win=${rollback.window} dl=${rollback.delay} ping=${smoothedRttMs(rollback.net.estimate)} drift=${rates.drift} ${botLine(rates, rollback)} ${takeNetRates(rollback.net)}`;
+  const window = rollback === undefined ? "" : ` cf=${rollback.schedule.nextConfirmedFrame()} kn=${rollback.schedule.knownThrough()} win=${rollback.window} dl=${rollback.delay} ping=${smoothedRttMs(rollback.net.estimate)} drift=${rates.drift} due=${realFrameDebt()} ${botLine(rates, rollback)} ${takeNetRates(rollback.net)}`;
   return `cb=${second.ticks} dr=${second.draws} dru=${microseconds(second.draw)} ev=${second.events} sim=${second.sim} spec=${second.spec} conf=${second.conf} held=${second.held} stall=${second.stalled} gap=${gap} gmax=${second.gapMax} gms=${gameMs(rates)} lua=${microseconds(second.lua)} tk=${tick} tkmax=${microseconds(second.tickMax)} send=${second.sends} recv=${second.received} rown=${second.receivedOwn} pz=${second.paused} pt=${second.pauses} pm=${second.menus} cbgap=${microseconds(second.tickGap)} bur=${second.bursts} hrun=${second.heldRun} sf=${second.sendFailed} alloc=${heapGrowth(rates)} ${gameSpeed()} ph=${phase} m=${match} f=${frame}${window}`.split(" ");
 }
 
