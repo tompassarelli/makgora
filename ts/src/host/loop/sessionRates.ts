@@ -314,21 +314,31 @@ function rateTokens(rates: SessionRates): string[] {
   const match = s === undefined ? -1 : s.replay.serial;
   const rollback = s === undefined ? undefined : activeRollback(s);
   const frame = s === undefined ? -1 : rollback?.schedule.speculativeFrame() ?? s.runtime.simulationFrame;
-  const window = rollback === undefined ? "" : ` cf=${rollback.schedule.nextConfirmedFrame()} kn=${rollback.schedule.knownThrough()} win=${rollback.window} dl=${rollback.delay} ping=${smoothedRttMs(rollback.net.estimate)} drift=${rates.drift} due=${realFrameDebt(rollback)} ${botLine(rates, rollback)} ${takeNetRates(rollback.net)}`;
-  return `cb=${second.ticks} dr=${second.draws} dru=${microseconds(second.draw)} ev=${second.events} sim=${second.sim} spec=${second.spec} conf=${second.conf} held=${second.held} stall=${second.stalled} gap=${gap} gmax=${second.gapMax} gms=${gameMs(rates)} lua=${microseconds(second.lua)} tk=${tick} tkmax=${microseconds(second.tickMax)} send=${second.sends} recv=${second.received} rown=${second.receivedOwn} pz=${second.paused} pt=${second.pauses} pm=${second.menus} cbgap=${microseconds(second.tickGap)} bur=${second.bursts} hrun=${second.heldRun} sf=${second.sendFailed} alloc=${heapGrowth(rates)} ${gameSpeed()} ph=${phase} m=${match} f=${frame}${window}`.split(" ");
+  const window = rollback === undefined ? [] : [`cf=${rollback.schedule.nextConfirmedFrame()}`, `kn=${rollback.schedule.knownThrough()}`, `win=${rollback.window}`, `dl=${rollback.delay}`, `ping=${smoothedRttMs(rollback.net.estimate)}`, `drift=${rates.drift}`, `due=${realFrameDebt(rollback)}`, botLine(rates, rollback), ...takeNetRates(rollback.net).split(" ")];
+  return [
+    `cb=${second.ticks}`, `dr=${second.draws}`, `dru=${microseconds(second.draw)}`, `ev=${second.events}`, `sim=${second.sim}`, `spec=${second.spec}`, `conf=${second.conf}`, `held=${second.held}`, `stall=${second.stalled}`,
+    `gap=${gap}`, `gmax=${second.gapMax}`, `gms=${gameMs(rates)}`, `lua=${microseconds(second.lua)}`, `tk=${tick}`, `tkmax=${microseconds(second.tickMax)}`, `send=${second.sends}`, `recv=${second.received}`, `rown=${second.receivedOwn}`,
+    `pz=${second.paused}`, `pt=${second.pauses}`, `pm=${second.menus}`, `cbgap=${microseconds(second.tickGap)}`, `bur=${second.bursts}`, `hrun=${second.heldRun}`, `sf=${second.sendFailed}`, `alloc=${heapGrowth(rates)}`, gameSpeed(),
+    `ph=${phase}`, `m=${match}`, `f=${frame}`, ...window,
+  ];
 }
 
 export function rateRecords(time: number, tokens: readonly string[]): string[] {
   const records: string[] = [];
-  let record = `r t=${time}`;
+  const first = `r t=${time}`;
+  let record = [first];
+  let length = first.length;
   for (const token of tokens) {
-    if (record.length + 1 + token.length > RATES_RECORD_CHARS) {
-      records.push(record);
-      record = `r${records.length + 1} t=${time}`;
+    if (length + 1 + token.length > RATES_RECORD_CHARS) {
+      records.push(record.join(" "));
+      const next = `r${records.length + 1} t=${time}`;
+      record = [next];
+      length = next.length;
     }
-    record += ` ${token}`;
+    record.push(token);
+    length += 1 + token.length;
   }
-  records.push(record);
+  records.push(record.join(" "));
   return records;
 }
 
