@@ -150,3 +150,49 @@ direction from each killing move's authored launch angle, and they report
 KO percent and hit distance as not recorded. A balance worker runs the
 report before and after a change, and confirms that no new contradiction
 appears.
+
+## Aerial reach
+
+How far each aerial's hit region reaches past what the fighter draws (#222),
+measured with `bun wisp view reachcues --assets "$(bun wisp inputs path assets)"`
+(from ts/) on 24 October 2026. For each aerial, played in the air facing right,
+the drawn Classic model (body and held weapon, skinned at the clip time the
+fighter pool shows) is projected onto the stage plane on every active frame,
+and its bounding box over those frames is the drawn swept area. The value is
+the hit capsules' furthest reach past that box on any side, in world units,
+then in body heights (H = 132 units), then the side. Negative values stay
+inside the drawn area. The margin is 0.15 H (20 units), the same one
+`view reachcues` uses for reach flares (#481); smashcraft:docs/disjoint-legibility.md
+sets no tighter one. **over** marks an aerial past the margin; every one is a
+box in #223. Cairne's down air belongs to #96.
+
+| Fighter | Neutral air | Forward air | Back air | Up air | Down air |
+| --- | --- | --- | --- | --- | --- |
+| rifleman | 28 (0.21) back **over** | 85 (0.65) front **over** | 58 (0.44) back **over** | 66 (0.5) up **over** | 3 (0.02) down |
+| illidan | 13 (0.1) back | 60 (0.46) front **over** | 52 (0.39) back **over** | 23 (0.17) up **over** | 18 (0.13) down |
+| blademaster | -29 (-0.22) down | -23 (-0.17) front | -25 (-0.19) back | -35 (-0.26) front | 58 (0.44) down **over** |
+| mountain-king | 4 (0.03) down | 55 (0.41) front **over** | 42 (0.32) back **over** | -22 (-0.16) front | 74 (0.56) down **over** |
+| warden | 12 (0.09) back | 18 (0.14) front | 3 (0.02) back | -32 (-0.24) front | 57 (0.43) down **over** |
+| lich | 73 (0.55) down **over** | 51 (0.39) front **over** | 18 (0.13) back | -9 (-0.07) up | 132 (1) down **over** |
+| forsaken-paladin | 0 (0) back | -3 (-0.02) down | -6 (-0.05) back | -1 (-0.01) back | -15 (-0.12) back |
+| dreadlord | 64 (0.48) back **over** | 44 (0.33) front **over** | 67 (0.51) back **over** | -52 (-0.39) front | 108 (0.82) down **over** |
+| shadow-hunter | -1 (-0.01) back | 42 (0.32) front **over** | 10 (0.07) down | -41 (-0.31) front | 32 (0.24) front **over** |
+| pit-lord | 14 (0.11) back | -25 (-0.19) up | -17 (-0.13) down | -86 (-0.65) front | 86 (0.65) down **over** |
+| beastmaster | 50 (0.38) front **over** | 0 (0) down | -5 (-0.04) down | -20 (-0.15) back | 76 (0.57) down **over** |
+| lich-king | 14 (0.1) down | 27 (0.2) up **over** | -10 (-0.08) back | 56 (0.42) back **over** | 32 (0.24) down **over** |
+| thrall | -2 (-0.01) up | 0 (0) up | -13 (-0.1) back | 2 (0.01) up | 17 (0.13) front |
+| jaina-proudmoore | 35 (0.27) back **over** | 56 (0.42) front **over** | 41 (0.31) back **over** | 26 (0.2) up **over** | 88 (0.67) down **over** |
+| sylvanas-windrunner | 29 (0.22) back **over** | 48 (0.36) front **over** | 64 (0.48) back **over** | -24 (-0.18) up | 52 (0.39) down **over** |
+| cairne-bloodhoof | -22 (-0.17) back | -1 (-0.01) front | -18 (-0.13) down | 14 (0.1) up | -47 (-0.36) back |
+| chen-stormstout | 3 (0.02) back | -20 (-0.15) front | -10 (-0.08) back | -23 (-0.18) front | 46 (0.35) down **over** |
+| peon | 15 (0.11) back | 0 (0) front | -1 (0) back | 0 (0) back | -4 (-0.03) front |
+| goblin-tinker | 47 (0.35) back **over** | 33 (0.25) front **over** | 57 (0.43) back **over** | -4 (-0.03) front | 108 (0.82) down **over** |
+| kael'thas-sunstrider | 16 (0.12) front | 66 (0.5) front **over** | 34 (0.26) back **over** | 4 (0.03) front | 60 (0.45) down **over** |
+| murloc | 8 (0.06) back | 24 (0.18) front **over** | 27 (0.2) back **over** | 8 (0.06) up | 37 (0.28) down **over** |
+| grom-hellscream | 9 (0.07) front | 13 (0.1) front | 63 (0.48) back **over** | -34 (-0.26) up | 49 (0.37) down **over** |
+| anub'arak | 16 (0.12) front | 20 (0.15) front | -12 (-0.09) front | -59 (-0.45) front | 59 (0.44) down **over** |
+| malfurion-stormrage | 9 (0.07) back | 77 (0.58) front **over** | 55 (0.42) back **over** | 0 (0) front | 112 (0.85) down **over** |
+| medivh | 12 (0.09) back | -4 (-0.03) front | -1 (-0.01) back | 20 (0.15) up | 34 (0.26) down **over** |
+| kobold | -10 (-0.08) back | 2 (0.02) front | -1 (-0.01) back | 2 (0.01) up | 10 (0.08) down |
+
+Before #222, Illidan's and Rifleman's down airs used the shared vertical down-air capsule and reached 215 (1.63) and 187 (1.42) below the drawn feet; both now sit on the driven leg.

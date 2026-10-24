@@ -201,9 +201,10 @@ const BACK_AIR = ordinary(-155.0, 0.0, -65.0, 100.0, attackDamage(AttackStyle.ba
 const BACK_AIR_LINGERING = ordinary(-155.0, 0.0, -65.0, 100.0, 5.0, -DIAGONAL_UNIT);
 const UP_AIR = region(-105.0, 105.0, 20.0, 190.0, 4.0, 60.0, 14.0, 0.25, 0.968245804309845);
 const UP_AIR_FINISHER = region(-105.0, 105.0, 20.0, 190.0, 8.0, 110.0, 24.0, 0.25, 0.968245804309845, 2);
-const downAir = (minX: number, maxX: number, damage: number) =>
-  region(minX, maxX, -180.0, -10.0, damage, ORDINARY_HIT_GROWTH_PERCENT, ORDINARY_HIT_BASE_KNOCKBACK, 0.25, -0.968245804309845);
-const DOWN_AIR = downAir(-95.0, 95.0, attackDamage(AttackStyle.downAir));
+const DOWN_AIR = {
+  ...region(-16.0, 22.0, -36.0, 28.0, attackDamage(AttackStyle.downAir), ORDINARY_HIT_GROWTH_PERCENT, ORDINARY_HIT_BASE_KNOCKBACK, 0.25, -0.968245804309845),
+  strike: { x1: 2.0, z1: 10.0, x2: 4.0, z2: -18.0, radius: 18.0 },
+};
 
 const SHARED_UP_SMASH = reachRegion(AttackStyle.upSmash);
 
