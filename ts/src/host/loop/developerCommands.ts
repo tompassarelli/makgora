@@ -18,6 +18,7 @@ import { applySetupCommand } from "../../game/session/sessionSetup";
 import { writeLines } from "wisp/src/platform/fileio";
 import { probeFrameCostClock } from "./frameCost";
 import { probeRenderClock } from "./renderClock";
+import { probeCallbackClock } from "./callbackClock";
 import { drawAtBurstTime } from "./betweenFrames";
 import { showBackdrop, showStageLighting, leverCommand } from "./stageScenery";
 import { fighterHideCommand, hideFighter } from "./fighterCloak";
@@ -268,6 +269,10 @@ function probeReceipt(s: ShellState, actor: number, message: string, requests: D
   if (message === "-dev render-clock") {
     probeRenderClock();
     return "dev: render clock probe";
+  }
+  if (message.startsWith("-dev callback-clock ")) {
+    const callbacks = S2I(message.substring(20));
+    return callbacks > 0 && probeCallbackClock(0x43, callbacks) ? `dev: callback clock ${callbacks}` : undefined;
   }
   if (message === DESYNC_COMMAND) return desyncReceipt(actor);
   if (setup !== undefined) {
