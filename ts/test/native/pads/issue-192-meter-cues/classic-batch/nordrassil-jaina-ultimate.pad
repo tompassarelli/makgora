@@ -1,0 +1,27 @@
+# #192 Classic batch, Jaina Proudmoore on Nordrassil: holding A and pressing B casts the ultimate on frame 61,
+# which puts the flame aura out, plays the ultimate sound and the flame burst, gone 16 frames later.
+#! chat -dev setup quick stage 10 pair jaina proudmoore / peon;meter 100
+#! preset melee
+58 a capture
+60 a press A
+61 a tap B 2
+61 a capture
+62 a capture
+63 a capture
+64 a release A
+64 a capture
+66 a capture
+68 a capture
+71 a capture
+74 a capture
+77 a capture
+110 a press VIEW
+180 a release VIEW
+#! expect a 0-59 meter-cue super-aura on mana 100
+#! expect a 61 special 17
+#! expect a 61 meter-cue super-aura off mana 0
+#! expect a 61 meter-cue ultimate-sound FlameStrike action-frame 1 first-own-effect 2
+#! expect a 61 meter-cue ultimate-burst on action-frame 1
+#! expect a 77 meter-cue ultimate-burst off action-frame 17
+#! absent a 61-180 meter-cue ex-
+#! absent a 62-180 meter-cue super-aura on
