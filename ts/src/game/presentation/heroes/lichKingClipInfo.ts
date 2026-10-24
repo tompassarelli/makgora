@@ -99,4 +99,5 @@ export const LICH_KING_SEQUENCES = {
   "Paired Grab throwDown": { index: 94, frames: 60 },
   "Paired Grab victimThrowDown": { index: 95, frames: 60 },
   "Attack Gesture forwardTiltDown": { index: 96, frames: 38 },
+  "LichKing Victory": { index: 97, frames: 90 },
 } as const;
