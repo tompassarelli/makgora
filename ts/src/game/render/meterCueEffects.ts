@@ -88,11 +88,9 @@ class MeterCueModel {
   }
 }
 
-/** The EX cast aura, the full-bar flame aura and the ultimate's flame burst over one fighter (docs/design/ultimates.md): sounds and trace follow confirmed frames, pictures the presented frame. */
+/** The EX cast aura, the full-bar flame aura and the ultimate's flame burst over one fighter (docs/design/ultimates.md). */
 export class MeterCueEffects {
-  private readonly heard: MeterCueState = createMeterCueState();
-  private readonly seen: MeterCueState = createMeterCueState();
-  private readonly traced: MeterCueView = createMeterCueState().view;
+  private readonly state: MeterCueState = createMeterCueState();
   private readonly exAura: MeterCueModel;
   private readonly superAura: MeterCueModel;
   private readonly burst: MeterCueModel;
@@ -111,13 +109,12 @@ export class MeterCueEffects {
   }
 
   confirm(frame: number, fighter: Readonly<Fighter> | undefined, playing: boolean, ultimatesOff: boolean, trace?: (text: string) => void): void {
-    const view = observeMeterCues(this.heard, playing ? fighter : undefined, ultimatesOff);
+    const view = observeMeterCues(this.state, playing ? fighter : undefined, ultimatesOff);
     if (fighter === undefined || !playing) {
-      if (this.traced.exAura || this.traced.superAura || this.traced.burst) this.forget();
+      if (this.burst.showing() || this.exAura.showing() || this.superAura.showing()) this.clear();
       return;
     }
-    if (view.superAura !== this.traced.superAura) {
-      this.traced.superAura = view.superAura;
+    if (this.superAura.show(view.superAura, fighter, this.front)) {
       const line = `super-aura ${view.superAura ? "on" : "off"} mana ${fighter.mana.points}`;
       this.lit = view.superAura ? { frame, line } : undefined;
       trace?.(line);
@@ -132,9 +129,7 @@ export class MeterCueEffects {
       this.play(this.ultimateSound, fighter, ULTIMATE_CAST_VOLUME);
       trace?.(`ultimate-sound ${ULTIMATE_BURST.sound ?? ""} action-frame ${frame} first-own-effect ${ultimateFirstEffectFrame(fighter.tuning.ultimate)}`);
     }
-    if (view.burst === this.traced.burst) return;
-    this.traced.burst = view.burst;
-    trace?.(`ultimate-burst ${view.burst ? "on" : "off"} action-frame ${frame}`);
+    if (this.burst.show(view.burst, fighter, this.front)) trace?.(`ultimate-burst ${view.burst ? "on" : "off"} action-frame ${frame}`);
   }
 
   private confirmEx(view: Readonly<MeterCueView>, fighter: Readonly<Fighter>, trace: ((text: string) => void) | undefined): void {
@@ -143,24 +138,14 @@ export class MeterCueEffects {
       this.play(this.exSound, fighter, EX_CAST_VOLUME);
       trace?.(`ex-sound ${EX_AURA.sound ?? ""} action ${action} action-frame ${frame}`);
     }
-    if (view.exAura === this.traced.exAura) return;
-    this.traced.exAura = view.exAura;
-    trace?.(`ex-aura ${view.exAura ? "on" : "off"} action ${action} action-frame ${frame}`);
+    if (this.exAura.show(view.exAura, fighter, this.front)) trace?.(`ex-aura ${view.exAura ? "on" : "off"} action ${action} action-frame ${frame}`);
   }
 
-  present(fighter: Readonly<Fighter> | undefined, playing: boolean, ultimatesOff: boolean): void {
+  present(fighter: Readonly<Fighter> | undefined, playing: boolean): void {
     const live = playing ? fighter : undefined;
-    const view = observeMeterCues(this.seen, live, ultimatesOff);
-    if (live === undefined) {
-      this.hideModels();
-      return;
-    }
     this.burst.follow(live, this.front);
     this.exAura.follow(live, this.front);
     this.superAura.follow(live, this.front);
-    this.superAura.show(view.superAura, live, this.front);
-    this.burst.show(view.burst, live, this.front);
-    this.exAura.show(view.exAura, live, this.front);
   }
 
   /** The trace line and frame that lit the full-bar aura still showing, for a trace that starts after it. */
@@ -181,33 +166,20 @@ export class MeterCueEffects {
   }
 
   clear(): void {
-    this.forget();
-    this.hideModels();
-  }
-
-  private forget(): void {
-    clearMeterCueState(this.heard);
-    this.traced.exAura = false;
-    this.traced.superAura = false;
-    this.traced.burst = false;
+    clearMeterCueState(this.state);
     this.lit = undefined;
+    this.burst.clear();
+    this.exAura.clear();
+    this.superAura.clear();
     StopSound(this.exSound, false, false);
     StopSound(this.ultimateSound, false, false);
-  }
-
-  private hideModels(): void {
-    clearMeterCueState(this.seen);
-    if (this.burst.showing()) this.burst.clear();
-    if (this.exAura.showing()) this.exAura.clear();
-    if (this.superAura.showing()) this.superAura.clear();
   }
 
   destroy(): void {
     this.burst.destroy();
     this.exAura.destroy();
     this.superAura.destroy();
-    clearMeterCueState(this.heard);
-    clearMeterCueState(this.seen);
+    clearMeterCueState(this.state);
     KillSoundWhenDone(this.exSound);
     KillSoundWhenDone(this.ultimateSound);
   }
