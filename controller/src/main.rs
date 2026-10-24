@@ -2337,7 +2337,7 @@ mod linux {
         }
         let (cx, cy) = c_stick(s.cx, s.cy);
         if s.right_stick == padbridge::model::RightStick::Tilt && (cx != 0 || cy != 0) {
-            held |= WALK;
+            held |= RIGHT_STICK_TILT_HOLD;
         }
         if cx < 0 {
             held |= SMASH_LEFT;

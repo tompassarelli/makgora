@@ -161,7 +161,10 @@
       "when": {
         "setting": "rightStick",
         "value": "tilt"
-      }
+      },
+      "hold": [
+        "6"
+      ]
     },
     {
       "control": "right_down",
@@ -185,7 +188,10 @@
       "when": {
         "setting": "rightStick",
         "value": "tilt"
-      }
+      },
+      "hold": [
+        "6"
+      ]
     },
     {
       "control": "right_left",
@@ -209,7 +215,10 @@
       "when": {
         "setting": "rightStick",
         "value": "tilt"
-      }
+      },
+      "hold": [
+        "6"
+      ]
     },
     {
       "control": "right_right",
@@ -233,7 +242,10 @@
       "when": {
         "setting": "rightStick",
         "value": "tilt"
-      }
+      },
+      "hold": [
+        "6"
+      ]
     }
   ],
   "thresholds": {

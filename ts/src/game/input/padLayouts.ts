@@ -22,6 +22,7 @@ export interface PadBinding {
   readonly action: Action | typeof PAUSE;
   readonly label: string;
   readonly when?: { readonly setting: PadSetting; readonly value: string };
+  readonly hold?: readonly Action[];
 }
 
 export interface PadLayout {
@@ -42,7 +43,7 @@ const shields: readonly PadBinding[] = [
 
 const rightStick = (control: PadControl, action: Action, smash: string, tilt: string): PadBinding[] => [
   when("rightStick", "smash", bind(control, action, smash)),
-  when("rightStick", "tilt", bind(control, action, tilt)),
+  { ...when("rightStick", "tilt", bind(control, action, tilt)), hold: [Action.walk] },
 ];
 
 const shared: readonly PadBinding[] = [

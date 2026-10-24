@@ -90,6 +90,7 @@ function layoutRow(binding: PadBinding) {
     action: binding.action === PAUSE ? PAUSE : actionName(binding.action),
     label: binding.label,
     ...(binding.when === undefined ? {} : { when: binding.when }),
+    ...(binding.hold === undefined ? {} : { hold: binding.hold.map((action) => padLayerKey(action).key) }),
   };
 }
 
