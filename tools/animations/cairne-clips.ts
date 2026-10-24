@@ -29,7 +29,7 @@ ensure(input && output && relative(project, output).startsWith(".."), "usage: bu
 const source = parseSource(await Bun.file(input).arrayBuffer()), model = structuredClone(source);
 ensure(source.Sequences.length === 12 && source.Nodes.some(n => n.Name === "Bone_Axe_Free"), "Expected classic Tauren Chieftain");
 const stand = source.Sequences[4]!, idleSequence = source.Sequences[0]!;
-interface Gesture { chest?: number; twist?: number; head?: number; arm?: number; elbow?: number; free?: number; freeElbow?: number; hip?: number; knee?: number; lean?: number; yaw?: number; leftHip?: number; rightHip?: number; leftKnee?: number; rightKnee?: number; step?: number; pitch?: number; rise?: number; spin?: number; depth?: number }
+interface Gesture { chest?: number; twist?: number; head?: number; arm?: number; elbow?: number; free?: number; freeElbow?: number; hip?: number; knee?: number; lean?: number; yaw?: number; leftHip?: number; rightHip?: number; leftKnee?: number; rightKnee?: number; step?: number; pitch?: number; rise?: number; spin?: number; depth?: number; shin?: number; leftShin?: number; rightShin?: number; hoof?: number; leftHoof?: number; rightHoof?: number; pelvis?: number; slide?: number }
 interface Phase { frame: number; gesture: Gesture; target?: readonly [number,number]; grip?: readonly [number,number]; idle?: boolean }
 interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; stock?: number; stockHit?: number; prepTravel?: number; hold?: boolean; air?: boolean; roll?: number; first?: Gesture; phases?: readonly Phase[]; target?: readonly [number, number]; damage?: boolean; beats?: readonly Phase[]; gore?: "travel" | "hold" | "recovery"; settleFrom?: number; stockFrom?: number }
 interface Strike { prep: Gesture; hit: Gesture; follow: Gesture; prepAt?: number; followAt?: number; settle?: number; rest?: Gesture; restTarget?: readonly [number,number]; restGrip?: readonly [number,number]; prepTarget?: readonly [number,number]; hitTarget?: readonly [number,number]; hitGrip?: readonly [number,number]; followGrip?: readonly [number,number]; mid?: readonly Phase[]; aim?: boolean; reach?: readonly [number,number]; air?: boolean }
@@ -244,15 +244,13 @@ function rotation(base: ArrayLike<number>, pitch:number, yaw=0): Float32Array<Ar
   const q=quat.create(); quat.rotateY(q,q,pitch*Math.PI/180); quat.rotateZ(q,q,yaw*Math.PI/180);
   quat.multiply(q,q,Float32Array.from(base)); quat.normalize(q,q); return new Float32Array(q);
 }
-function joint(name:string,g:Gesture):[number,number] {
-  if(name==="Root")return [(g.lean??0)-(g.pitch??0),g.yaw??0];
-  if(name==="Bone_Chest")return [g.chest??0,g.twist??0]; if(name==="Bone_Head")return [g.head??0,0];
-  if(name==="Bone_UpperArmR")return [g.arm??0,0]; if(name==="Bone_LowerArmR")return [g.elbow??0,0];
-  if(name==="Bone_UpperArmL")return [g.free??0,0]; if(name==="Bone_LowerArmL")return [g.freeElbow??0,0];
-  if(name==="Bone_UpperlegL")return [g.leftHip??g.hip??0,0]; if(name==="Bone_UpperlegR")return [g.rightHip??(g.hip??0)*0.55,0];
-  if(name==="Bone_Leg2L")return [g.leftKnee??g.knee??0,0]; if(name==="Bone_Leg2R")return [g.rightKnee??g.knee??0,0];
-  return [0,0];
-}
+const joints:Record<string,(g:Gesture)=>[number,number]>={
+  Root:g=>[(g.lean??0)-(g.pitch??0),g.yaw??0], Bone_Chest:g=>[g.chest??0,g.twist??0], Bone_Head:g=>[g.head??0,0],
+  Bone_UpperArmR:g=>[g.arm??0,0], Bone_LowerArmR:g=>[g.elbow??0,0], Bone_UpperArmL:g=>[g.free??0,0], Bone_LowerArmL:g=>[g.freeElbow??0,0],
+  Bone_UpperlegL:g=>[g.leftHip??g.hip??0,0], Bone_UpperlegR:g=>[g.rightHip??(g.hip??0)*0.55,0], Bone_Leg2L:g=>[g.leftKnee??g.knee??0,0], Bone_Leg2R:g=>[g.rightKnee??g.knee??0,0],
+  Bone_Leg3L:g=>[g.leftShin??g.shin??0,0], Bone_Leg3R:g=>[g.rightShin??g.shin??0,0], Bone_FootL:g=>[g.leftHoof??g.hoof??0,0], Bone_FootR:g=>[g.rightHoof??g.hoof??0,0], Bone_Pelvis:g=>[g.pelvis??0,0],
+};
+const joint=(name:string,g:Gesture):[number,number]=>Object.hasOwn(joints,name)?joints[name]!(g):[0,0];
 const originals=new Map<string,mdx.AnimVector>(); tracks(source,(track,path)=>originals.set(path,track));
 const render=new ModelRenderer(model), data=Reflect.get(render,"rendererData");
 const hand=model.Nodes.find(n=>n.Name==="Bone_HandR")!,weapon=model.Nodes.find(n=>n.Name==="Bone_Axe_Free")!,main=model.Nodes.find(n=>n.Name==="Main")!;
@@ -326,7 +324,7 @@ for (const [ordinal,action] of [...actions,...damageActions,...goreActions].entr
     const armKey=shoulder.Rotation!.Keys.find(k=>k.Frame===start+Math.round(phase.frame*1000/60))!,elbowKey=elbow.Rotation!.Keys.find(k=>k.Frame===start+Math.round(phase.frame*1000/60))!;
     const angles=[phase.gesture.arm??0,0,phase.gesture.elbow??0,0],authored=angles.slice(),pull=action.beats?0.05:0,depth=0.5,flat=3000;
     const loss=()=>{armKey.Vector=rotation(baseline(shoulder),angles[0]!,angles[1]!);elbowKey.Vector=rotation(baseline(elbow),angles[2]!,angles[3]!);
-      evaluate(index,phase.frame);const facingCamera=()=>{const turn=mat3.create(),n=vec3.create();mat3.fromMat4(turn,data.nodes[hand.ObjectId].matrix);vec3.transformMat3(n,bladeNormal,turn);return n[1]!/vec3.length(n);};const point=vec3.create();vec3.transformMat4(point,weaponPoint,data.nodes[hand.ObjectId].matrix);
+      evaluate(index,phase.frame);const facingCamera=()=>{const turn=mat3.create(),n=vec3.create();mat3.fromMat4(turn,data.nodes[hand.ObjectId].matrix);vec3.transformMat3(n,bladeNormal,turn);return n[1]!/vec3.length(n);};const point=vec3.scaleAndAdd(vec3.create(),weaponPoint,shaft,phase.gesture.slide??0);vec3.transformMat4(point,point,data.nodes[hand.ObjectId].matrix);
       const plane=phase.gesture.depth,grip=vec3.create();if(phase.grip||plane!==undefined)vec3.transformMat4(grip,handPivot,data.nodes[hand.ObjectId].matrix);
       return (point[0]!-phase.target![0])**2+(point[2]!-phase.target![1])**2+(phase.grip?(grip[0]!-phase.grip[0])**2+(grip[2]!-phase.grip[1])**2:0)+(plane===undefined?depth*point[1]!**2:4*((point[1]!-plane)**2+(grip[1]!-plane)**2))+flat*(1-Math.abs(facingCamera()))**2+pull*angles.reduce((sum,angle,axis)=>sum+(angle-authored[axis]!)**2,0);};
     for(let pass=0;pass<4;pass++)for(let axis=0;axis<4;axis++){let best=Infinity,bestAngle=angles[axis]!;for(let centre=pull?authored[axis]!:0,angle=centre-180;angle<=centre+180;angle+=pass<2?15:5){angles[axis]=angle;const value=loss();if(value<best){best=value;bestAngle=angle;}}angles[axis]=bestAngle;}
@@ -348,7 +346,7 @@ for (const [ordinal,action] of [...actions,...damageActions,...goreActions].entr
   const idleWeight=(frame:number)=>frame<=idleFrom?0:Math.min(1,(frame-idleFrom)/(idleAt-idleFrom));
   for(let frame=0;frame<=action.frames;frame++){
     evaluate(index,frame);const world=mat4.create(),local=mat4.create();mat4.multiply(world,data.nodes[hand.ObjectId].matrix,mixMatrix(offset,idleOffset,idleWeight(frame)));
-    const spin=along(phases,frame,p=>p.gesture.spin??0);if(spin!==0){const turn=mat4.create();mat4.translate(turn,turn,handPivot);mat4.rotate(turn,turn,spin*Math.PI/180,shaft);vec3.negate(unpivot,handPivot);mat4.translate(turn,turn,unpivot);mat4.multiply(world,data.nodes[hand.ObjectId].matrix,mat4.multiply(turn,turn,mixMatrix(offset,idleOffset,idleWeight(frame))));}
+    const spin=along(phases,frame,p=>p.gesture.spin??0),slide=along(phases,frame,p=>p.gesture.slide??0);if(spin!==0||slide!==0){const turn=mat4.create();mat4.translate(turn,turn,vec3.scale(vec3.create(),shaft,slide));mat4.translate(turn,turn,handPivot);mat4.rotate(turn,turn,spin*Math.PI/180,shaft);vec3.negate(unpivot,handPivot);mat4.translate(turn,turn,unpivot);mat4.multiply(world,data.nodes[hand.ObjectId].matrix,mat4.multiply(turn,turn,mixMatrix(offset,idleOffset,idleWeight(frame))));}
     ensure(mat4.invert(local,data.nodes[main.ObjectId].matrix),"Main pose is singular");mat4.multiply(local,local,world);addTransform(weapon,frame,local);
   }
   weapon.Rotation!.Keys.sort((a,b)=>a.Frame-b.Frame);weapon.Translation!.Keys.sort((a,b)=>a.Frame-b.Frame);
