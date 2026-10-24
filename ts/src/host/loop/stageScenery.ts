@@ -152,6 +152,7 @@ export function leverCommand(s: ShellState, name: string, a: string, b: string):
   if (name === "fog") showStageFog(s, a === "on");
   else if (name === "density") BlzSetTerrainFogMaxLinearDensity(S2R(a));
   else if (name === "oversky") BlzSetTerrainFogDrawOverSky(a === "on");
+  else if (name === "sky") BlzShowSkyBox(a === "on");
   else if (name === "camz") cameraZOverride.z = a === "off" ? undefined : S2R(a);
   else if (name === "shadows") BlzSetMinShadowCastingPointLightCount(S2I(a));
   else if (name === "light") {

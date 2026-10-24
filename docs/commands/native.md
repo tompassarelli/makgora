@@ -55,8 +55,11 @@ wall time, pixel legibility, calibrated crops and one-pair versus two-pair
 throughput still require measurement on the assigned VM clients.
 
 Development builds expose the retained 3.0.0 lever diagnostic: `-dev lever fog on|off`,
-`-dev lever density NUMBER`, `-dev lever oversky on|off`, `-dev lever shadows COUNT`
-and `-dev lever light INDEX on|off`. Compare `-dev lighting stock|stage` and
+`-dev lever density NUMBER`, `-dev lever oversky on|off`, `-dev lever sky on|off`,
+`-dev lever shadows COUNT` and `-dev lever light INDEX on|off`. `-dev backdrop off`
+followed by `-dev lever sky on` shows only the sky behind the fighters, a still
+light backdrop for native silhouette captures (wisp#2); `-dev backdrop off` alone
+leaves them on black. Compare `-dev lighting stock|stage` and
 `-dev backdrop on|off` in the same paused scene. Use `-dev view near|far` with
 `-dev lever camz -100000|100000` to reach the camera's lowest or highest allowed
 height; `-dev lever camz off` restores the normal extreme height and
