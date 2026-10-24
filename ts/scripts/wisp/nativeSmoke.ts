@@ -2,7 +2,8 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { BunServices } from "@effect/platform-bun";
-import { Effect, Schema } from "effect";
+import { Deferred, Effect, Schema, Stream } from "effect";
+import { ChildProcess } from "effect/process";
 import { UsageFailure, flagValues } from "wisp/scripts/wisp/command";
 import { quietNativeSessionArgs } from "wisp/scripts/wisp/quietNativeCapacity";
 import { fighterName, PLAYABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";
@@ -55,39 +56,18 @@ const managerEnv = () => ({ ...process.env, ...userSessionEnv(process.getuid?.()
 
 export const LEASE_WAIT_SECONDS = 120;
 
-const reserved = async (lease: Bun.Subprocess<"ignore", "ignore", "pipe">): Promise<boolean> => {
-  const reader = lease.stderr.getReader();
-  const deadline = setTimeout(() => lease.kill("SIGTERM"), LEASE_WAIT_SECONDS * 1000);
-  let text = "";
-  try {
-    for (let chunk = await reader.read(); !chunk.done; chunk = await reader.read()) {
-      process.stderr.write(chunk.value);
-      text += new TextDecoder().decode(chunk.value);
-      if (/"decision":"RESERVED"/.test(text)) {
-        void (async () => {
-          for (let rest = await reader.read(); !rest.done; rest = await reader.read()) process.stderr.write(rest.value);
-        })();
-        return true;
-      }
-    }
-    return false;
-  } finally {
-    clearTimeout(deadline);
-  }
-};
-
-const quietLease = (owner: string) => Effect.acquireRelease(
-  Effect.tryPromise({
-    try: async () => {
-      if (!admitsThroughHelper()) return undefined;
-      const lease = Bun.spawn([process.execPath, ...quietNativeSessionArgs(capacityHelper, owner)], { env: managerEnv(), stdin: "ignore", stdout: "ignore", stderr: "pipe" });
-      if (!(await reserved(lease))) throw new Error(`the quiet native lease exited ${await lease.exited} before RESERVED or within ${LEASE_WAIT_SECONDS} s`);
-      return lease;
-    },
-    catch: cause => new NativeSmokeFailure({ problem: `quiet native lease for ${owner}: ${cause instanceof Error ? cause.message : String(cause)}` }),
-  }),
-  lease => lease === undefined ? Effect.void : stopBunProcess(lease),
-);
+const quietLease = (owner: string) => Effect.gen(function*() {
+  if (!admitsThroughHelper()) return;
+  const handle = yield* ChildProcess.make(process.execPath, [...quietNativeSessionArgs(capacityHelper, owner)], { env: userSessionEnv(process.getuid?.() ?? 0), extendEnv: true, stdin: "ignore", stdout: "ignore", stderr: "pipe", forceKillAfter: "5 seconds" });
+  const reserved = yield* Deferred.make<void>();
+  yield* handle.stderr.pipe(
+    Stream.decodeText(), Stream.splitLines,
+    Stream.tap(line => Effect.sync(() => console.error(line)).pipe(Effect.andThen(/"decision":"RESERVED"/.test(line) ? Deferred.succeed(reserved, undefined) : Effect.void))),
+    Stream.runDrain, Effect.forkScoped,
+  );
+  const granted = yield* Deferred.await(reserved).pipe(Effect.raceFirst(handle.exitCode.pipe(Effect.as(false))), Effect.map(value => value !== false), Effect.timeoutOption(`${LEASE_WAIT_SECONDS} seconds`));
+  if (granted._tag === "None" || !granted.value) return yield* new NativeSmokeFailure({ problem: `quiet native lease for ${owner}: not reserved within ${LEASE_WAIT_SECONDS} s or it exited first` });
+}).pipe(Effect.mapError(cause => cause instanceof NativeSmokeFailure ? cause : new NativeSmokeFailure({ problem: `quiet native lease for ${owner}: ${cause.message}` })));
 
 const runShard = (shard: number, pair: string, map: string, directory: string) => Effect.scoped(quietLease(`smashcraft-smoke-${smokeShardLabel(shard)}`).pipe(Effect.andThen(Effect.acquireUseRelease(
   Effect.try({
