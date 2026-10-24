@@ -4,9 +4,11 @@ import { join } from "node:path";
 import { BunServices } from "@effect/platform-bun";
 import { Effect, Schema } from "effect";
 import { UsageFailure, flagValues } from "wisp/scripts/wisp/command";
-import { withQuietNativeCapacity } from "wisp/scripts/wisp/quietNativeCapacity";
+import { quietNativeSessionArgs } from "wisp/scripts/wisp/quietNativeCapacity";
 import { fighterName, PLAYABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";
+import { capacityHelper, admitsThroughHelper } from "../heavyCapacity";
 import { stopBunProcess } from "../hostProcess";
+import { userSessionEnv } from "./commands/nativeUnit";
 import { currentPlaytest } from "./currentPlaytest";
 import { isGreen } from "./greenBuilds";
 import { greenMain, greenState } from "./installGreen";
@@ -49,7 +51,45 @@ export const shardPassed = ({ code, verdicts, rows }: ShardOutcome): boolean =>
 
 const frozen = ({ rows }: ShardOutcome): boolean => rows.some(row => row.split("\t")[3] === "INVALID");
 
-const runShard = (shard: number, pair: string, map: string, directory: string) => withQuietNativeCapacity(`smashcraft-smoke-${smokeShardLabel(shard)}`, Effect.acquireUseRelease(
+const managerEnv = () => ({ ...process.env, ...userSessionEnv(process.getuid?.() ?? 0) });
+
+export const LEASE_WAIT_SECONDS = 120;
+
+const reserved = async (lease: Bun.Subprocess<"ignore", "ignore", "pipe">): Promise<boolean> => {
+  const reader = lease.stderr.getReader();
+  const deadline = setTimeout(() => lease.kill("SIGTERM"), LEASE_WAIT_SECONDS * 1000);
+  let text = "";
+  try {
+    for (let chunk = await reader.read(); !chunk.done; chunk = await reader.read()) {
+      process.stderr.write(chunk.value);
+      text += new TextDecoder().decode(chunk.value);
+      if (/"decision":"RESERVED"/.test(text)) {
+        void (async () => {
+          for (let rest = await reader.read(); !rest.done; rest = await reader.read()) process.stderr.write(rest.value);
+        })();
+        return true;
+      }
+    }
+    return false;
+  } finally {
+    clearTimeout(deadline);
+  }
+};
+
+const quietLease = (owner: string) => Effect.acquireRelease(
+  Effect.tryPromise({
+    try: async () => {
+      if (!admitsThroughHelper()) return undefined;
+      const lease = Bun.spawn([process.execPath, ...quietNativeSessionArgs(capacityHelper, owner)], { env: managerEnv(), stdin: "ignore", stdout: "ignore", stderr: "pipe" });
+      if (!(await reserved(lease))) throw new Error(`the quiet native lease exited ${await lease.exited} before RESERVED or within ${LEASE_WAIT_SECONDS} s`);
+      return lease;
+    },
+    catch: cause => new NativeSmokeFailure({ problem: `quiet native lease for ${owner}: ${cause instanceof Error ? cause.message : String(cause)}` }),
+  }),
+  lease => lease === undefined ? Effect.void : stopBunProcess(lease),
+);
+
+const runShard = (shard: number, pair: string, map: string, directory: string) => Effect.scoped(quietLease(`smashcraft-smoke-${smokeShardLabel(shard)}`).pipe(Effect.andThen(Effect.acquireUseRelease(
   Effect.try({
     try: () => {
       mkdirSync(directory, { recursive: true, mode: 0o700 });
@@ -61,8 +101,8 @@ const runShard = (shard: number, pair: string, map: string, directory: string) =
     Effect.timeoutOption(`${SHARD_RUN_SECONDS} seconds`),
     Effect.map(exited => outcome(shard, directory, exited._tag === "Some" ? exited.value : "timeout", Math.round((performance.now() - started) / 1000))),
   ),
-  ({ child }) => stopBunProcess(child).pipe(Effect.andThen(Effect.promise(() => Bun.spawn(["systemctl", "--user", "stop", `smashcraft-accept-${child.pid}.service`], { stdout: "ignore", stderr: "ignore" }).exited))),
-));
+  ({ child }) => stopBunProcess(child).pipe(Effect.andThen(Effect.promise(() => Bun.spawn(["systemctl", "--user", "stop", `smashcraft-accept-${child.pid}.service`], { env: managerEnv(), stdout: "ignore", stderr: "ignore" }).exited))),
+))));
 
 const pairLabel = (shard: number) => (smokePairs()[shard] ?? []).map(choice => fighterName(PLAYABLE_CHARACTERS[choice] ?? 0)).join(" vs ");
 
