@@ -201,23 +201,23 @@ export const LICH_KING_MOVES: FighterMoves = {
       ], hit(13.75, "POKE", 50, -1.0)),
     ]),
 
-    [AttackStyle.forwardAir]: heroMove(14, 4, 30, 17, sweep(14, [140.0, 96.0, 52.0, 14.0], f32(HERO_REFERENCE_HEIGHT * f32(1.25)), hit(16.0, "KILL", 40))),
+    [AttackStyle.forwardAir]: heroMove(14, 4, 30, 17, sweep(14, [130.0, 96.0, 52.0, 14.0], f32(HERO_REFERENCE_HEIGHT * f32(1.2)), hit(16.0, "KILL", 40))),
 
     [AttackStyle.backAir]: heroMove(11, 4, 26, 15, sweep(11, [110.0, 80.0, 56.0, 34.0], L, hit(16.0, "KILL", 40, -1.0), -1.0)),
     [AttackStyle.upAir]: heroMove(10, 5, 25, 13, path(10, [
-      capsule(40.0, 110.0, 80.0, f32(L + 20.0)),
-      capsule(20.0, 120.0, 30.0, f32(L + 40.0)),
+      capsule(22.0, 110.0, 40.0, f32(L + 20.0)),
+      capsule(12.0, 120.0, 24.0, f32(L + 40.0)),
       capsule(0.0, 120.0, 0.0, f32(L + 46.0)),
-      capsule(-20.0, 120.0, -30.0, f32(L + 40.0)),
-      capsule(-40.0, 110.0, -80.0, f32(L + 20.0)),
+      capsule(-12.0, 120.0, -24.0, f32(L + 40.0)),
+      capsule(-22.0, 110.0, -40.0, f32(L + 20.0)),
     ], hit(15.0, "LAUNCH", 85))),
 
     [AttackStyle.downAir]: heroMove(18, 5, 33, 23, path(18, [
-      capsule(8.0, 30.0, 8.0, -60.0, 14.0),
-      capsule(6.0, 30.0, 6.0, -66.0, 14.0),
-      capsule(4.0, 30.0, 4.0, -70.0, 14.0),
-      capsule(4.0, 30.0, 4.0, -70.0, 14.0),
-      capsule(4.0, 30.0, 4.0, -66.0, 14.0),
+      capsule(8.0, 30.0, 8.0, -46.0, 14.0),
+      capsule(6.0, 30.0, 6.0, -52.0, 14.0),
+      capsule(4.0, 30.0, 4.0, -56.0, 14.0),
+      capsule(4.0, 30.0, 4.0, -56.0, 14.0),
+      capsule(4.0, 30.0, 4.0, -52.0, 14.0),
     ], hit(17.25, "SPIKE", 270), hit(17.25, "SPIKE", 55))),
     [AttackStyle.grab]: heroMove(9, 2, 27, 0, [heroRegion(9, 10,
       capsule(30.0, 62.0, f32(M - 10.0), 60.0, 13.0),

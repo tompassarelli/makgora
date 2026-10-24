@@ -179,12 +179,12 @@ box in #223. Cairne's down air belongs to #96.
 | shadow-hunter | -1 (-0.01) back | -3 (-0.02) front | 10 (0.07) down | -41 (-0.31) front | 16 (0.12) down |
 | pit-lord | 14 (0.11) back | -25 (-0.19) up | -17 (-0.13) down | -86 (-0.65) front | 18 (0.13) down |
 | beastmaster | 10 (0.07) front | 0 (0) down | -5 (-0.04) down | -20 (-0.15) back | 15 (0.11) down |
-| lich-king | 14 (0.1) down | 27 (0.2) up **over** | -10 (-0.08) back | 56 (0.42) back **over** | 32 (0.24) down **over** |
+| lich-king | 14 (0.1) down | 17 (0.13) up | -10 (-0.08) back | 16 (0.12) back | 18 (0.14) down |
 | thrall | -2 (-0.01) up | 0 (0) up | -13 (-0.1) back | 2 (0.01) up | 17 (0.13) front |
-| jaina-proudmoore | 35 (0.27) back **over** | 56 (0.42) front **over** | 41 (0.31) back **over** | 26 (0.2) up **over** | 88 (0.67) down **over** |
-| sylvanas-windrunner | 29 (0.22) back **over** | 48 (0.36) front **over** | 64 (0.48) back **over** | -24 (-0.18) up | 52 (0.39) down **over** |
+| jaina-proudmoore | 17 (0.13) back | 17 (0.13) front | 17 (0.13) back | 16 (0.12) up | 16 (0.12) down |
+| sylvanas-windrunner | 17 (0.13) back | 16 (0.12) front | 18 (0.13) back | -24 (-0.18) up | 18 (0.14) down |
 | cairne-bloodhoof | -22 (-0.17) back | -1 (-0.01) front | -18 (-0.13) down | 14 (0.1) up | -47 (-0.36) back |
-| chen-stormstout | 3 (0.02) back | -20 (-0.15) front | -10 (-0.08) back | -23 (-0.18) front | 46 (0.35) down **over** |
+| chen-stormstout | 3 (0.02) back | -20 (-0.15) front | -10 (-0.08) back | -23 (-0.18) front | 18 (0.14) down |
 | peon | 15 (0.11) back | 0 (0) front | -1 (0) back | 0 (0) back | -4 (-0.03) front |
 | goblin-tinker | 47 (0.35) back **over** | 33 (0.25) front **over** | 57 (0.43) back **over** | -4 (-0.03) front | 108 (0.82) down **over** |
 | kael'thas-sunstrider | 16 (0.12) front | 66 (0.5) front **over** | 34 (0.26) back **over** | 4 (0.03) front | 60 (0.45) down **over** |

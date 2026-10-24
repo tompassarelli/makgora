@@ -50,7 +50,7 @@ export const CHEN_MOVES: FighterMoves = {
     [AttackStyle.forwardAir]: heroMove(11, 4, 27, 17, [region(11, 14, 16.0, 45.0, 78.0, 50.0, 13.0, finish(11.244239807128906))]),
     [AttackStyle.backAir]: heroMove(8, 3, 23, 14, [region(8, 10, -18.0, 42.0, -76.0, 45.0, 13.0, finish(10.307220458984375, true))]),
     [AttackStyle.upAir]: heroMove(7, 4, 22, 14, [region(7, 10, -22.0, 102.0, 28.0, 110.0, 13.0, lift(7.49616003036499))]),
-    [AttackStyle.downAir]: heroMove(14, 4, 30, 21, [heroRegion(14, 17, chenCapsule(12.0, 6.0, 12.0, -60.0, 13.0), chenHit(11.244239807128906, 101.86412811279297, 24.0, 0.0, -1.0), lift(11.244239807128906))]),
+    [AttackStyle.downAir]: heroMove(14, 4, 30, 21, [heroRegion(14, 17, chenCapsule(12.0, 6.0, 12.0, -32.0, 13.0), chenHit(11.244239807128906, 101.86412811279297, 24.0, 0.0, -1.0), lift(11.244239807128906))]),
     [AttackStyle.grab]: heroMove(7, 2, 24, 0, [region(7, 8, 18.0, 50.0, 52.0, 48.0, 12.0, chenHit(0.0, 0.0, 0.0, 0.0, 0.0))]),
   },
   throws: {

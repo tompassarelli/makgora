@@ -32,13 +32,13 @@ const NORMALS: FighterMoves["normals"] = {
     heroRegion(17, 19, sylvanasStrike(-18.0, 24.0, -100.0, 10.0), sylvanasHit(11.663999557495117, 25, 103.0999984741211, 25.0, true)),
   ]),
   [AttackStyle.neutralAir]: heroMove(6, 5, 18, 12, [
-    heroRegion(6, 8, sylvanasStrike(18.0, 50.0, 80.0, 40.0), sylvanasHit(6.803999900817871, 50)),
-    heroRegion(9, 10, sylvanasStrike(-18.0, 50.0, -80.0, 40.0), sylvanasHit(6.803999900817871, 50, 87.63500213623047, 22.0, true)),
+    heroRegion(6, 8, sylvanasStrike(18.0, 50.0, 68.0, 40.0), sylvanasHit(6.803999900817871, 50)),
+    heroRegion(9, 10, sylvanasStrike(-18.0, 50.0, -68.0, 40.0), sylvanasHit(6.803999900817871, 50, 87.63500213623047, 22.0, true)),
   ]),
-  [AttackStyle.forwardAir]: bow(10, 3, 23, 16, sylvanasStrike(18.0, 54.0, 112.0, 48.0), sylvanasHit(9.720000267028809, 40, 103.0999984741211, 24.0)),
-  [AttackStyle.backAir]: bow(8, 3, 22, 12, sylvanasStrike(-18.0, 50.0, -102.0, 54.0), sylvanasHit(10.692000389099121, 35, 108.25499725341797, 26.0, true)),
+  [AttackStyle.forwardAir]: bow(10, 3, 23, 16, sylvanasStrike(18.0, 54.0, 80.0, 48.0), sylvanasHit(9.720000267028809, 40, 103.0999984741211, 24.0)),
+  [AttackStyle.backAir]: bow(8, 3, 22, 12, sylvanasStrike(-18.0, 50.0, -56.0, 54.0), sylvanasHit(10.692000389099121, 35, 108.25499725341797, 26.0, true)),
   [AttackStyle.upAir]: bow(8, 4, 20, 12, sylvanasStrike(0.0, 68.0, 0.0, 118.0), sylvanasHit(7.776000022888184, 85, 92.79000091552734, 24.0)),
-  [AttackStyle.downAir]: bow(12, 4, 28, 20, sylvanasStrike(0.0, 16.0, 8.0, -82.0), SPIKE, sylvanasHit(10.692000389099121, 55, 103.0999984741211, 24.0)),
+  [AttackStyle.downAir]: bow(12, 4, 28, 20, sylvanasStrike(0.0, 16.0, 8.0, -48.0), SPIKE, sylvanasHit(10.692000389099121, 55, 103.0999984741211, 24.0)),
   [AttackStyle.grab]: bow(7, 2, 23, 0, sylvanasStrike(12.0, 50.0, 48.0, 44.0, 12.0), NOTHING),
 };
 
