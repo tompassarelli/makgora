@@ -4,7 +4,7 @@ import { join } from "node:path";
 import { BunServices } from "@effect/platform-bun";
 import { Effect, Schema } from "effect";
 import { UsageFailure, flagValues } from "wisp/scripts/wisp/command";
-import { PlayProblem } from "wisp/scripts/wisp/play";
+import { withQuietNativeCapacity } from "wisp/scripts/wisp/quietNativeCapacity";
 import { fighterName, PLAYABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";
 import { stopBunProcess } from "../hostProcess";
 import { currentPlaytest } from "./currentPlaytest";
@@ -49,7 +49,7 @@ export const shardPassed = ({ code, verdicts, rows }: ShardOutcome): boolean =>
 
 const frozen = ({ rows }: ShardOutcome): boolean => rows.some(row => row.split("\t")[3] === "INVALID");
 
-const runShard = (shard: number, pair: string, map: string, directory: string) => Effect.acquireUseRelease(
+const runShard = (shard: number, pair: string, map: string, directory: string) => withQuietNativeCapacity(`smashcraft-smoke-${smokeShardLabel(shard)}`, Effect.acquireUseRelease(
   Effect.try({
     try: () => {
       mkdirSync(directory, { recursive: true, mode: 0o700 });
@@ -62,7 +62,7 @@ const runShard = (shard: number, pair: string, map: string, directory: string) =
     Effect.map(exited => outcome(shard, directory, exited._tag === "Some" ? exited.value : "timeout", Math.round((performance.now() - started) / 1000))),
   ),
   ({ child }) => stopBunProcess(child).pipe(Effect.andThen(Effect.promise(() => Bun.spawn(["systemctl", "--user", "stop", `smashcraft-accept-${child.pid}.service`], { stdout: "ignore", stderr: "ignore" }).exited))),
-);
+));
 
 const pairLabel = (shard: number) => (smokePairs()[shard] ?? []).map(choice => fighterName(PLAYABLE_CHARACTERS[choice] ?? 0)).join(" vs ");
 
@@ -102,4 +102,4 @@ export const nativeSmoke = (args: readonly string[]) => Effect.gen(function*() {
   console.log(`Smoke table ${join(root, "smoke.md")}`);
   const failed = outcomes.filter(item => !shardPassed(item));
   if (failed.length > 0) return yield* new NativeSmokeFailure({ problem: `native move smoke failed shards ${failed.map(({ shard }) => smokeShardLabel(shard)).join(", ")}` });
-}).pipe(Effect.mapError(cause => cause instanceof PlayProblem ? new NativeSmokeFailure({ problem: cause.problem }) : cause), Effect.provide(BunServices.layer));
+}).pipe(Effect.mapError(cause => cause instanceof UsageFailure || cause instanceof NativeSmokeFailure ? cause : new NativeSmokeFailure({ problem: cause.message })), Effect.provide(BunServices.layer));
