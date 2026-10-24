@@ -41,8 +41,14 @@ const bow = (weapon: Side): readonly Beat[] => [
     step(weapon, 45, 'chest', 'wide', 40, 35), step(weapon, 60, 'chest', 'low', 40, 35), step(weapon, 75, 'chest', 'overhead', -10, -18),
     step(weapon, 90, 'rest', 'rest', 0, 0),
 ];
+const fists = (weapon: Side): readonly Beat[] => [
+    step(weapon, 0, 'rest', 'rest', 0, 0), step(weapon, 8, 'rest', 'low', 18, 10),
+    step(weapon, 15, 'rest', 'overhead', -12, -22, 0.35), step(weapon, 30, 'rest', 'pumped', -6, -10), step(weapon, 45, 'rest', 'overhead', -12, -22, 0.35),
+    step(weapon, 60, 'rest', 'pumped', -6, -10), step(weapon, 75, 'rest', 'overhead', -12, -22, 0.35), step(weapon, 90, 'rest', 'rest', 0, 0),
+];
 const DESIGNED: Readonly<Record<number, readonly Beat[]>> = {
     [Character.warden]: bow(0),
+    [Character.sylvanas]: fists(1),
 };
 const HANGING: Readonly<Record<number, readonly string[]>> = {
     [Character.warden]: ['Mesh06', 'Mesh45', 'Mesh46', 'Mesh05'],
