@@ -28,6 +28,7 @@ import { wholeRepairCost } from "../../game/replay/history";
 import { queueLocalRows } from "../../game/session/localInput";
 import { applyFrame } from "./frame";
 import { ownConfirmedState } from "./confirmedState";
+import { noteCallbackClockRow } from "./callbackClock";
 import { pollLocalKeys } from "./inputs";
 import { beginFrameSection, endFrameSection } from "wisp/src/map/frameSections";
 import { CONFIRMED_SECTION, RECONCILE_SECTION, SPECULATIVE_SECTION } from "./frameSections";
@@ -205,6 +206,7 @@ function captureKeyboard(s: ShellState, rollback: Rollback, keyboard: KeyboardRo
     return;
   }
   recordPadRow(s, epoch, target, keyboard.capture.row);
+  noteCallbackClockRow(target, keyboard.capture.row.pressed);
   if (probeRecording(probe)) {
     const row = keyboard.capture.row;
     const slot = localSlot();

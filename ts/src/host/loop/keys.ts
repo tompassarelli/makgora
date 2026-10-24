@@ -29,7 +29,7 @@ import { type ShellState, activeRollback, cancelPendingPlaytest, keepShellMoment
 import { clearMatchEffects, views } from "./ui";
 import { ownConfirmedState } from "./confirmedState";
 import { LASTING, pauseMatchPresentation, setStatus } from "./view";
-import { osKeyDown } from "../../platform/osKeys";
+import { noteKeyDownEvent, osKeyDown } from "../../platform/osKeys";
 
 
 function journalOwnsKey(s: ShellState, slot: ParticipantSlot, key: number): boolean {
@@ -216,7 +216,9 @@ function triggerSlot(): ParticipantSlot | undefined {
 
 export function onKeyDown(s: ShellState): void {
   const slot = triggerSlot();
-  if (GetHandleId(BlzGetTriggerPlayerKey()) === NATIVE_PREFLIGHT_KEY.code) {
+  const key = GetHandleId(BlzGetTriggerPlayerKey());
+  if (GetTriggerPlayer() === GetLocalPlayer()) noteKeyDownEvent(s.localKeys, key, activeRollback(s) !== undefined && s.game.phase === Phase.match && !s.session.paused);
+  if (key === NATIVE_PREFLIGHT_KEY.code) {
     if (slot === localSlot()) writeLines(INPUT_PREFLIGHT_FILE, [inputPreflightLine(s.build.id)]);
     return;
   }

@@ -21,6 +21,7 @@ import { CATCH_UP_FRAMES } from "../../game/session/playback";
 import { readChunk, writeLines } from "wisp/src/platform/fileio";
 import { pollMailbox, releaseMessage } from "../../platform/keyboardJournal";
 import { startInputTrace } from "./diagnostics";
+import { noteCallbackClockRow } from "./callbackClock";
 import { pollLocalKeys } from "./inputs";
 import { views } from "./ui";
 import { probeClockMs, probeFileRead, probeInput, probeIntegrity, probePoll, probeSendFinished, probeTransportSend } from "./responseProbe";
@@ -291,6 +292,7 @@ export function serviceJournalInput(s: ShellState, rollback: Rollback, journal: 
       if (rollback.predictionHeld && row.pressed !== 0) probeIntegrity(s.probe, `held ${rollback.epoch} ${slot} ${frame}`);
       if (s.trace.active) s.trace.window.localCaptures++;
       if (row.pressed !== 0) traceInput(s.trace, `admitted frame ${frame} pressed ${row.pressed}`);
+      noteCallbackClockRow(frame, row.pressed);
     }
     for (let index = 0; index < rows; index++) {
       const row = packet.rows[index];
