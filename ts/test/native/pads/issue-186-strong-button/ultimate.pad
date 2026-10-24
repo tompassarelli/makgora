@@ -1,0 +1,11 @@
+# #186: at a full bar, A + Special (A + X in this script preset and Tom's layout, A + B in Melee's)
+# is still the ultimate (special 17), never an EX special, now that Strong + Special is the EX.
+# The match starts at an empty bar, so the setup fills it.
+#! chat -dev setup quick hero thrall;meter 100
+60 a tap A 2
+60 a tap X 2
+#! expect a 60-63 special 17
+#! absent a 55-300 special EX
+300 a capture
+340 a press VIEW
+410 a release VIEW

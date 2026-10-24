@@ -1,0 +1,11 @@
+# #186: computer players still start smashes and cast EX specials now that a human's smash needs
+# Strong + A and EX needs Strong + Special. A Wren Expert computer (slot c, Illidan) against a and b,
+# who stand. Illidan's computer casts Mana Burn (9) as an EX from its spacing kit (botKitOptions)
+# while it holds a segment, so the setup gives every fighter two; Thrall's computer only upgrades a
+# special when its opponent attacks. Style 3 is the down smash.
+#! chat -dev setup quick cpu wren expert hero Illidan;meter 66
+#! expect c 29-31 applied attack 1 style 3
+#! expect c 126-129 special EX 9
+300 a capture
+340 a press VIEW
+410 a release VIEW

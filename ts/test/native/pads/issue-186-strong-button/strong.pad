@@ -1,0 +1,49 @@
+# #186: Strong + A gives the smash and Strong + B the EX special. The hidden script preset has no
+# Strong button (padbridge PadPreset::Script), so this one speaks the melee preset:
+# A attack, B special, LB Strong. The setup fills Thrall a's bar; styles: 3 down smash, 4 forward smash.
+#! chat -dev setup quick hero thrall;meter 100
+#! preset melee
+# Strong + A + forward: the forward smash.
+60 a stick 1 0
+60 a press LB
+60 a tap A 2
+62 a stick 0 0
+62 a release LB
+#! expect a 60-63 applied attack 1 style 4
+# Strong + A + down from a crouch: the down smash.
+160 a stick 0 -1
+166 a press LB
+166 a tap A 2
+170 a stick 0 0
+170 a release LB
+#! expect a 166-169 applied attack 2 style 3
+# Strong + A with no direction: the forward smash.
+260 a press LB
+260 a tap A 2
+262 a release LB
+#! expect a 260-263 applied attack 3 style 4
+# Strong + B + forward: the EX side special (Thrall's 14) for one of three segments.
+360 a stick -1 0
+360 a press LB
+360 a tap B 2
+362 a stick 0 0
+362 a release LB
+#! expect a 360-363 special 14
+#! expect a 360-363 special EX 14 mana 67
+# B + forward alone: the free side special.
+480 a stick 1 0
+480 a tap B 2
+482 a stick 0 0
+#! expect a 480-483 special 14
+#! absent a 470-700 special EX
+# Strong held after a tap of A: the forward smash charges, so a acts later than the 56 frames of
+# the uncharged one at 260 (actionable again at 316).
+560 a press LB
+560 a tap A 2
+600 a release LB
+#! expect a 560-563 applied attack 4 style 4
+#! absent a 600-625 recovery down 0 actionable 1
+#! expect a 626-700 recovery down 0 actionable 1
+700 a capture
+740 a press VIEW
+810 a release VIEW
