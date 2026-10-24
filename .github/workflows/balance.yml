@@ -454,3 +454,4 @@ jobs:
           grep -q '^Skill ceiling: pass.' ts/balance/table.md
           grep -q '^Balance gate .*: passes\.' ts/balance/table.md
           if [ "${{ inputs.probe }}" != "0" ]; then grep -q '^Balanced .*: passes\.' ts/balance/table.md; fi
+# Scratch A/B baseline lane: this workflow edit keeps Autoland from ever landing it.
