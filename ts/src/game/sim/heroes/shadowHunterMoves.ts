@@ -43,7 +43,7 @@ function chop(first: number, heights: readonly number[], reach: number, effect: 
 
 const GLAIVE_SPINS = [9, 12, 15, 18] as const;
 const GLAIVE_THROW = 21;
-const GLAIVE_REACH = f32(M - BLADE_RADIUS);
+const GLAIVE_REACH = 76.0;
 
 const GLAIVE_FLING: Readonly<HitEffect> = { ...hit(3.502342700958252, "EDGE", 25), base: 65.0 };
 const GLAIVE = drillStrikes(-4.0, -80.0, GLAIVE_REACH,
@@ -133,7 +133,7 @@ export const SHADOW_HUNTER_MOVES: FighterMoves = {
         capsule(-18.0, 32.0, -f32(M - BLADE_RADIUS), 32.0),
       ], hit(7.004685401916504, "POKE", 50, -1.0)),
     ]),
-    [AttackStyle.forwardAir]: heroMove(10, 3, 25, 15, chop(10, [65.0, 45.0, 25.0], L, hit(9.63144302368164, "EDGE", 40))),
+    [AttackStyle.forwardAir]: heroMove(10, 3, 25, 15, chop(10, [55.0, 35.0, 15.0], 100.0, hit(9.63144302368164, "EDGE", 40))),
 
     [AttackStyle.backAir]: heroMove(8, 3, 23, 13, path(8, [
       capsule(-12.0, 24.0, -f32(M - 12.0), 30.0, 12.0),

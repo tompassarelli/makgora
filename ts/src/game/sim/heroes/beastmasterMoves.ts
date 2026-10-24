@@ -159,8 +159,8 @@ export const BEASTMASTER_MOVES: FighterMoves = {
 
     [AttackStyle.neutralAir]: heroMove(8, 6, 23, 15, [
       ...path(8, [
-        capsule(20.0, 40.0, f32(M - AXE_RADIUS), 40.0),
-        capsule(15.0, 60.0, 65.0, 95.0),
+        capsule(20.0, 40.0, 56.0, 40.0),
+        capsule(15.0, 60.0, 50.0, 90.0),
         capsule(0.0, 65.0, 0.0, f32(M + 20.0)),
       ], hit(7.228075981140137, "POKE", 50)),
       ...path(11, [
@@ -186,10 +186,10 @@ export const BEASTMASTER_MOVES: FighterMoves = {
     ], hit(6.505268573760986, "LAUNCH", 85))),
 
     [AttackStyle.downAir]: heroMove(16, 4, 32, 22, path(16, [
-      capsule(10.0, 10.0, 20.0, -f32(M - 30.0)),
-      capsule(5.0, 10.0, 10.0, -f32(M - 25.0)),
-      capsule(0.0, 10.0, 0.0, -f32(M - 25.0)),
-      capsule(-5.0, 10.0, -10.0, -f32(M - 30.0)),
+      capsule(10.0, 10.0, 16.0, -18.0),
+      capsule(5.0, 10.0, 8.0, -20.0),
+      capsule(0.0, 10.0, 0.0, -20.0),
+      capsule(-5.0, 10.0, -10.0, -18.0),
     ], hit(9.396498680114746, "SPIKE", 270), hit(9.396498680114746, "SPIKE", 55))),
     [AttackStyle.grab]: heroMove(8, 2, 25, 0, [heroRegion(8, 9,
       capsule(18.0, 52.0, f32(f32(HERO_REFERENCE_HEIGHT * f32(0.60)) - 10.0), 50.0, 10.0),

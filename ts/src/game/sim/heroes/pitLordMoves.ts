@@ -246,11 +246,11 @@ export const PIT_LORD_MOVES: FighterMoves = {
     ], hit(14.43239974975586, "LAUNCH", 85, 1.0, HitElement.normal))),
 
     [AttackStyle.downAir]: heroMove(20, 5, 38, 28, path(20, [
-      capsule(-20.0, 10.0, -20.0, -62.0, 18.0),
-      capsule(-10.0, 10.0, -10.0, -62.0, 18.0),
-      capsule(0.0, 10.0, 0.0, -62.0, 18.0),
-      capsule(10.0, 10.0, 10.0, -62.0, 18.0),
-      capsule(20.0, 10.0, 20.0, -62.0, 18.0),
+      capsule(-20.0, 50.0, -20.0, 6.0, 18.0),
+      capsule(-10.0, 50.0, -10.0, 6.0, 18.0),
+      capsule(0.0, 50.0, 0.0, 6.0, 18.0),
+      capsule(10.0, 50.0, 10.0, 6.0, 18.0),
+      capsule(20.0, 50.0, 20.0, 6.0, 18.0),
     ], hit(21.64859962463379, "SPIKE", 270, 1.0, HitElement.normal), hit(21.64859962463379, "SPIKE", 55, 1.0, HitElement.normal))),
 
     [AttackStyle.grab]: heroMove(10, 3, 32, 0, [heroRegion(10, 12,

@@ -175,10 +175,10 @@ box in #223. Cairne's down air belongs to #96.
 | warden | 12 (0.09) back | 18 (0.14) front | 3 (0.02) back | -32 (-0.24) front | 17 (0.13) down |
 | lich | 17 (0.13) front | 13 (0.1) front | 18 (0.13) back | -9 (-0.07) up | 17 (0.13) down |
 | forsaken-paladin | 0 (0) back | -3 (-0.02) down | -6 (-0.05) back | -1 (-0.01) back | -15 (-0.12) back |
-| dreadlord | 64 (0.48) back **over** | 44 (0.33) front **over** | 67 (0.51) back **over** | -52 (-0.39) front | 108 (0.82) down **over** |
-| shadow-hunter | -1 (-0.01) back | 42 (0.32) front **over** | 10 (0.07) down | -41 (-0.31) front | 32 (0.24) front **over** |
-| pit-lord | 14 (0.11) back | -25 (-0.19) up | -17 (-0.13) down | -86 (-0.65) front | 86 (0.65) down **over** |
-| beastmaster | 50 (0.38) front **over** | 0 (0) down | -5 (-0.04) down | -20 (-0.15) back | 76 (0.57) down **over** |
+| dreadlord | 8 (0.06) back | -7 (-0.05) front | 10 (0.08) back | -52 (-0.39) front | 13 (0.09) down |
+| shadow-hunter | -1 (-0.01) back | -3 (-0.02) front | 10 (0.07) down | -41 (-0.31) front | 16 (0.12) down |
+| pit-lord | 14 (0.11) back | -25 (-0.19) up | -17 (-0.13) down | -86 (-0.65) front | 18 (0.13) down |
+| beastmaster | 10 (0.07) front | 0 (0) down | -5 (-0.04) down | -20 (-0.15) back | 15 (0.11) down |
 | lich-king | 14 (0.1) down | 27 (0.2) up **over** | -10 (-0.08) back | 56 (0.42) back **over** | 32 (0.24) down **over** |
 | thrall | -2 (-0.01) up | 0 (0) up | -13 (-0.1) back | 2 (0.01) up | 17 (0.13) front |
 | jaina-proudmoore | 35 (0.27) back **over** | 56 (0.42) front **over** | 41 (0.31) back **over** | 26 (0.2) up **over** | 88 (0.67) down **over** |
