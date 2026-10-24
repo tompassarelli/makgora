@@ -168,8 +168,8 @@ box in #223. Cairne's down air belongs to #96.
 
 | Fighter | Neutral air | Forward air | Back air | Up air | Down air |
 | --- | --- | --- | --- | --- | --- |
-| rifleman | 28 (0.21) back **over** | 85 (0.65) front **over** | 58 (0.44) back **over** | 66 (0.5) up **over** | 3 (0.02) down |
-| illidan | 13 (0.1) back | 60 (0.46) front **over** | 52 (0.39) back **over** | 23 (0.17) up **over** | 18 (0.13) down |
+| rifleman | 0 (0) back | 2 (0.02) front | -1 (-0.01) back | 4 (0.03) up | 3 (0.02) down |
+| illidan | 13 (0.1) back | 3 (0.02) front | 0 (0) back | 3 (0.02) up | 18 (0.13) down |
 | blademaster | -29 (-0.22) down | -23 (-0.17) front | -25 (-0.19) back | -35 (-0.26) front | 18 (0.14) front |
 | mountain-king | 4 (0.03) down | 18 (0.14) front | 8 (0.06) back | -22 (-0.16) front | 17 (0.13) down |
 | warden | 12 (0.09) back | 18 (0.14) front | 3 (0.02) back | -32 (-0.24) front | 17 (0.13) down |

@@ -121,8 +121,8 @@ const DEMON_HUNTER_REGIONS: { readonly [style: number]: Readonly<HitRegion> } = 
   [AttackStyle.forwardTiltDown]: region(0.0, 135.0, -145.0, 5.0, 8.0, 80.0, 20.0, 0.8799999952316284, -0.47999998927116394),
   [AttackStyle.neutralAir]: region(-115.0, 115.0, -45.0, 100.0, 7.0, 95.0, 16.0, DIAGONAL_UNIT, DIAGONAL_UNIT),
   [AttackStyle.forwardAir]: region(0.0, 175.0, -55.0, 115.0, 6.0, 85.0, 18.0, 0.9399999976158142, 0.3400000035762787),
-  [AttackStyle.backAir]: region(-175.0, 0.0, -55.0, 115.0, 6.0, 85.0, 18.0, -0.9399999976158142, 0.3400000035762787),
-  [AttackStyle.upAir]: region(-115.0, 115.0, 10.0, 205.0, 8.0, 105.0, 19.0, 0.2199999988079071, 0.9750000238418579),
+  [AttackStyle.backAir]: { ...region(-99.0, 4.0, 76.0, 114.0, 6.0, 85.0, 18.0, -0.9399999976158142, 0.3400000035762787), strike: { x1: -85.0, z1: 100.0, x2: -10.0, z2: 90.0, radius: 14.0 } },
+  [AttackStyle.upAir]: { ...region(-40.0, 40.0, 30.0, 195.0, 8.0, 105.0, 19.0, 0.2199999988079071, 0.9750000238418579), strike: { x1: 0.0, z1: 70.0, x2: 0.0, z2: 155.0, radius: 40.0 } },
   [AttackStyle.downAir]: { ...region(-16.0, 22.0, -33.0, 48.0, 9.0, 100.0, 20.0, 0.1599999964237213, -0.9869999885559082), strike: { x1: 2.0, z1: 30.0, x2: 4.0, z2: -15.0, radius: 18.0 } },
 };
 
@@ -130,8 +130,8 @@ const DEMON_HUNTER_REGIONS: { readonly [style: number]: Readonly<HitRegion> } = 
 
 
 export const DEMON_HUNTER_NEUTRAL_AIR_CLEAN_FRAMES = 4;
-const FORWARD_AIR_LINK = region(0.0, 175.0, -55.0, 115.0, 2.0, 10.0, 30.0, -0.258819043636322, 0.9659258127212524);
-const FORWARD_AIR_LAUNCH = region(0.0, 150.0, -40.0, 110.0, 3.0, 85.0, 18.0, 0.7660444378852844, 0.6427876353263855, 2);
+const FORWARD_AIR_LINK = { ...region(-4.0, 94.0, 66.0, 94.0, 2.0, 10.0, 30.0, -0.258819043636322, 0.9659258127212524), strike: { x1: 10.0, z1: 80.0, x2: 80.0, z2: 80.0, radius: 14.0 } };
+const FORWARD_AIR_LAUNCH = { ...region(-9.0, 84.0, 61.0, 89.0, 3.0, 85.0, 18.0, 0.7660444378852844, 0.6427876353263855, 2), strike: { x1: 5.0, z1: 75.0, x2: 70.0, z2: 75.0, radius: 14.0 } };
 const NEUTRAL_AIR_CLEAN = { ...DEMON_HUNTER_REGIONS[AttackStyle.neutralAir] ?? NO_HIT_REGION, effect: strongHit((DEMON_HUNTER_REGIONS[AttackStyle.neutralAir] ?? NO_HIT_REGION).effect) };
 const NEUTRAL_AIR_LATE = { ...NEUTRAL_AIR_CLEAN, effect: weakHit(NEUTRAL_AIR_CLEAN.effect) };
 const AZZINOTH_GLAIVES = { ...region(-190.0, 190.0, -60.0, 60.0, 13.0, 95.0, 22.0, 0.258819043636322, 0.9659258127212524), effect: downSmashHit(region(-190.0, 190.0, -60.0, 60.0, 13.0, 95.0, 22.0, 0.258819043636322, 0.9659258127212524).effect) };
@@ -194,13 +194,13 @@ const GETUP_ATTACK = region(
   -attackReach(AttackStyle.getupAttack), attackReach(AttackStyle.getupAttack), -130.0, 130.0,
   DOWN_ATTACK_DAMAGE, ORDINARY_HIT_GROWTH_PERCENT, DOWN_ATTACK_BASE_KNOCKBACK, DIAGONAL_UNIT, DIAGONAL_UNIT,
 );
-const NEUTRAL_AIR = ordinary(-90.0, 90.0, -65.0, 90.0, attackDamage(AttackStyle.neutralAir));
-const NEUTRAL_AIR_LINGERING = ordinary(-90.0, 90.0, -65.0, 90.0, 5.0);
-const FORWARD_AIR = ordinary(0.0, 165.0, -65.0, 100.0, attackDamage(AttackStyle.forwardAir));
-const BACK_AIR = ordinary(-155.0, 0.0, -65.0, 100.0, attackDamage(AttackStyle.backAir), -DIAGONAL_UNIT);
-const BACK_AIR_LINGERING = ordinary(-155.0, 0.0, -65.0, 100.0, 5.0, -DIAGONAL_UNIT);
-const UP_AIR = region(-105.0, 105.0, 20.0, 190.0, 4.0, 60.0, 14.0, 0.25, 0.968245804309845);
-const UP_AIR_FINISHER = region(-105.0, 105.0, 20.0, 190.0, 8.0, 110.0, 24.0, 0.25, 0.968245804309845, 2);
+const NEUTRAL_AIR = { ...ordinary(-38.0, 90.0, 35.0, 55.0, attackDamage(AttackStyle.neutralAir)), strike: { x1: -28.0, z1: 45.0, x2: 80.0, z2: 45.0, radius: 10.0 } };
+const NEUTRAL_AIR_LINGERING = { ...ordinary(-38.0, 90.0, 35.0, 55.0, 5.0), strike: { x1: -28.0, z1: 45.0, x2: 80.0, z2: 45.0, radius: 10.0 } };
+const FORWARD_AIR = { ...ordinary(-2.0, 58.0, 10.0, 42.0, attackDamage(AttackStyle.forwardAir)), strike: { x1: 12.0, z1: 28.0, x2: 44.0, z2: 24.0, radius: 14.0 } };
+const BACK_AIR = { ...ordinary(-72.0, 9.0, 41.0, 86.0, attackDamage(AttackStyle.backAir), -DIAGONAL_UNIT), strike: { x1: -58.0, z1: 72.0, x2: -5.0, z2: 55.0, radius: 14.0 } };
+const BACK_AIR_LINGERING = { ...ordinary(-72.0, 9.0, 41.0, 86.0, 5.0, -DIAGONAL_UNIT), strike: { x1: -58.0, z1: 72.0, x2: -5.0, z2: 55.0, radius: 14.0 } };
+const UP_AIR = { ...region(-28.0, 12.0, 60.0, 138.0, 4.0, 60.0, 14.0, 0.25, 0.968245804309845), strike: { x1: -8.0, z1: 80.0, x2: -8.0, z2: 118.0, radius: 20.0 } };
+const UP_AIR_FINISHER = { ...region(-28.0, 12.0, 60.0, 138.0, 8.0, 110.0, 24.0, 0.25, 0.968245804309845, 2), strike: { x1: -8.0, z1: 80.0, x2: -8.0, z2: 118.0, radius: 20.0 } };
 const DOWN_AIR = {
   ...region(-16.0, 22.0, -36.0, 28.0, attackDamage(AttackStyle.downAir), ORDINARY_HIT_GROWTH_PERCENT, ORDINARY_HIT_BASE_KNOCKBACK, 0.25, -0.968245804309845),
   strike: { x1: 2.0, z1: 10.0, x2: 4.0, z2: -18.0, radius: 18.0 },
