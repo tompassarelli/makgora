@@ -141,7 +141,7 @@ jobs:
           path: ts/census
       # Pairs compare only within one instrument: the Lua32 build and the profiler that measured them.
       - id: instrument
-        run: echo "key=${{ hashFiles('ts/node_modules/wisp/host/compile/lua32.ts', 'ts/node_modules/wisp/native/*.h', 'ts/node_modules/wisp/src/headless/luaPerf.ts') }}" >> "$GITHUB_OUTPUT"
+        run: echo "key=taps-land-${{ hashFiles('ts/node_modules/wisp/host/compile/lua32.ts', 'ts/node_modules/wisp/native/*.h', 'ts/node_modules/wisp/src/headless/luaPerf.ts') }}" >> "$GITHUB_OUTPUT"
       - name: Fetch main's last green Background census pairs
         working-directory: ts
         timeout-minutes: 3
