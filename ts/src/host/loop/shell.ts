@@ -60,6 +60,7 @@ import { beforeNativeDriverTick, afterNativeDriverTick, captureNativeDriverInput
 import { fighterAt, isActive } from "../../game/sim/roster";
 import { PAD_MOUSE, createPadTriggers, padMouse } from "./analogPad";
 import { beforeNativeSoakTick, afterNativeSoakTick } from "../../platform/nativeSoak";
+import { afterProbedTick, beforeProbedTick } from "./tickProbe";
 
 const TICK = "shell.tick";
 const PLAYER_LEFT = "shell.playerLeft";
@@ -91,6 +92,7 @@ function serviceEpochWindow(s: ShellState, recorder: probe.ResponseProbe): void 
 
 function gameTick(s: ShellState): void {
   beforeNativeSoakTick(s);
+  beforeProbedTick(s);
   if (!beforeNativeDriverTick(s)) return;
   if (s.build.pausePositionProbe && s.game.phase === Phase.match && s.probe?.run === 0) probe.startProbe(s.probe, false);
   if (s.build.epochProbe === true && s.probe !== undefined) serviceEpochWindow(s, s.probe);
@@ -188,6 +190,7 @@ function gameTick(s: ShellState): void {
   writeReadyMarker(s);
   afterNativeDriverTick(s);
   afterNativeSoakTick(s);
+  afterProbedTick(s);
 }
 
 

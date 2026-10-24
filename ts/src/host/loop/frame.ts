@@ -24,6 +24,7 @@ import { type FrameObservation, type ShellState, activeRollback, localSlot } fro
 import { heldVisualFrame } from "../../game/session/visualCapture";
 import { clearMatchEffects, views } from "./ui";
 import { traceInput } from "./trace";
+import { probedSound } from "./tickProbe";
 import { probeRecording } from "./responseProbe";
 import { MatchCue } from "../../game/presentation/matchAudio";
 import { resultsView } from "../../game/presentation/matchCues";
@@ -178,7 +179,7 @@ export function applyFrame(s: ShellState, recorded = false): void {
         traceInput(s.trace, `participant ${slot} frame ${runtime.simulationFrame} sound ${sound} volume ${volume} pitch ${canonicalReal(pitch)}`);
         traceInput(s.trace, `frame ${runtime.simulationFrame} class ${cls} slot ${voiceSlot} live ${live}`);
       }
-      : undefined);
+      : probedSound(runtime.simulationFrame, slot));
     ui.combat.confirmContacts(runtime.simulationFrame, slot, runtime.frameImpacts[slot]);
     ui.combat.confirmKo(runtime.simulationFrame, slot, fighter, runtime.frameImpacts[slot]);
     ui.placed.presentConfirmed(runtime.simulationFrame, fighter, slot);

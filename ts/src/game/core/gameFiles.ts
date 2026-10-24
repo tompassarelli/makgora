@@ -45,6 +45,8 @@ export const drawnFrameFile = (build: string, slot: number) => `smashcraft-drawn
 export const drawnFrameLine = (build: string, epoch: number, frame: number) => `SMASHCRAFT DRAWN v=1 build=${build} epoch=${epoch} frame=${frame}`;
 
 export const NATIVE_SOAK_FILE = "smashcraft-native-soak.txt";
+export const VOICE_LOG_FILE = "smashcraft-voice-log.txt";
+export const VOICE_CHECK_SCRIPT = 63;
 
 export const sessionRatesFile = (load: string, minute: number) => `smashcraft-rates-${load}-${minute}.txt`;
 export const sessionRatesHeader = (load: string, minute: number, build: string, version: string, clock: boolean) => `smashcraft-rates v=1 load=${load} minute=${minute} build=${build} version=${version} clock=${clock ? "os" : "ticks"}`;

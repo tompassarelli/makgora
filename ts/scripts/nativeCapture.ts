@@ -50,7 +50,7 @@ const attempt = <A>(operation: string, run: () => A) => Effect.try({ try: run, c
 
 const FIXTURES_MODULE = join(import.meta.dir, "../src/platform/captureFixtures.ts");
 
-function option(args: readonly string[], name: string): string | undefined {
+export function option(args: readonly string[], name: string): string | undefined {
   const index = args.indexOf(name);
   return index < 0 ? undefined : args[index + 1];
 }
@@ -154,7 +154,7 @@ const sinkSerial = (sink: string) => Effect.gen(function*() {
 });
 
 
-const recordAudio = (sink: string, file: string, started: number) => Effect.gen(function*() {
+export const recordAudio = (sink: string, file: string, started: number) => Effect.gen(function*() {
   const chosen = yield* sinkSerial(sink);
   const startedMs = Date.now() - started;
   yield* ChildProcess.make("pw-record", ["--target", String(chosen.serial), "-P", "{ stream.capture.sink=true }", "--rate", "48000", "--channels", "2", "--format", "s16", file], { stdin: "ignore", stdout: "ignore", stderr: "inherit", killSignal: "SIGINT", forceKillAfter: "3 seconds" })
@@ -197,7 +197,7 @@ export function bindBuild(installed: string, live: string, freeBytes: number, up
   return binding;
 }
 
-const readBinding = (args: readonly string[]) => Effect.gen(function*() {
+export const readBinding = (args: readonly string[]) => Effect.gen(function*() {
   const install = option(args, "--install");
   if (install === undefined) return yield* new CaptureFailure({ problem: "--install DIR names the installation whose .build.info the captures bind to" });
   const versionsFile = option(args, "--versions");

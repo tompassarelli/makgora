@@ -90,6 +90,19 @@ back exactly what was drawn (receipt `dev: fighter SLOT hidden|shown`).
   PAD|DIR...` plays the scripts headlessly on the map's schedule and checks
   each `#! cue FROM[-TO] NAME: sound=… effect=… tint=b shake=b recoil=b` line
   against the held capture frames, without a Warcraft client.
+- Voice budget (#30): `bun wisp map build --profile voice-check --out MAP.w3x`
+  starts four Wren Expert computers over three stocks and two minutes as soon
+  as fighter selection opens, paints the drawn stamp on every match frame, and
+  at the match's end writes `smashcraft-voice-log.txt`: each admitted combat
+  voice with its frame, the frame drawn that tick, fighter, class, voice slot,
+  live voices and volume. Host it with `bun wisp fresh MAP.w3x --no-quick
+  --clients-file FILE` while `bun scripts/voiceCheck.ts run --clients-file
+  FILE --client NAME --install DIR --out DIR` records the client's sink audio
+  and stamped screens on one clock (at most 5 minutes);
+  `bun scripts/voiceCheck.ts judge DIR` writes `onsets.tsv` and
+  `verdict.json`. A hit passes when its audio onset, after the median latency
+  of non-hit voices with no other voice within 150 ms, lies within one frame of the
+  moment its frame was drawn.
 - Offline Classic capture batches can use `bun scripts/nativeCapture.ts chunks
   --out DIR PAD|DIR...` to build a separate map per row and write
   `capture-batch.json`. Run it with `bun scripts/nativeCapture.ts batch --plan
@@ -123,7 +136,7 @@ Keep ordinary combat completion intact; do not force a win to shorten a test.
 
 Frame acceptance follows the root AGENTS.md budget.
 
-Never touch Tom’s install; run account a only as clone-a through its
+Never touch Tom’s install; run clone-a only through its
 launch.sh, which yields to Tom’s game. The offline LAN pool is the default for pad parity,
 captures, `accept` checks and desync hunts.
 
