@@ -148,7 +148,7 @@ export class MeterCueEffects {
     trace?.(`ex-aura ${view.exAura ? "on" : "off"} action ${action} action-frame ${frame}`);
   }
 
-  present(fighter: Readonly<Fighter> | undefined, playing: boolean, ultimatesOff: boolean): void {
+  present(fighter: Readonly<Fighter> | undefined, playing: boolean, ultimatesOff: boolean, trace?: (text: string) => void): void {
     const live = playing ? fighter : undefined;
     const view = observeMeterCues(this.seen, live, ultimatesOff);
     if (live === undefined) {
@@ -159,8 +159,8 @@ export class MeterCueEffects {
     this.exAura.follow(live, this.front);
     this.superAura.follow(live, this.front);
     this.superAura.show(view.superAura, live, this.front);
-    this.burst.show(view.burst, live, this.front);
-    this.exAura.show(view.exAura, live, this.front);
+    if (this.burst.show(view.burst, live, this.front)) trace?.(`ultimate-burst ${view.burst ? "on" : "off"} action-frame ${live.special.frame}`);
+    if (this.exAura.show(view.exAura, live, this.front)) trace?.(`ex-aura ${view.exAura ? "on" : "off"} action-frame ${live.special.frame}`);
   }
 
   /** The trace line and frame that lit the full-bar aura still showing, for a trace that starts after it. */

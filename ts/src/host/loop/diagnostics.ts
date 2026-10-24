@@ -19,6 +19,10 @@ import { type InputTrace, beginInputTrace, closeTraceWindow, finishInputTrace, t
 
 const bit = (value: boolean) => (value ? "1" : "0");
 
+export function presentedCueTrace(s: ShellState, slot: number, frame: number): ((text: string) => void) | undefined {
+  return s.trace.active ? (text) => traceInput(s.trace, `participant ${slot} presented ${frame} confirmed ${s.runtime.simulationFrame} meter-cue ${text}`) : undefined;
+}
+
 export function traceParticipant(s: ShellState, slot: number, entry: string): void {
   traceInput(s.trace, `participant ${slot} frame ${s.runtime.simulationFrame} phase ${s.game.phase} ${entry}`);
 }
