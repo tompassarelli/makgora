@@ -49,7 +49,7 @@ export function sampleKeys(capture: KeyboardCapture, held: number): boolean {
   const z = vertical(held);
 
 
-  if ((has(rose, Action.special) && !has(row.pressed, Action.special)) || (has(rose, Action.strong) && !has(row.pressed, Action.strong))) {
+  if (has(rose, Action.special) && !has(row.pressed, Action.special)) {
     row.specialX = x;
     row.specialZ = z;
   }

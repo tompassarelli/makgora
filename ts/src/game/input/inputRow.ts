@@ -74,7 +74,7 @@ export function isInputRow(row: Required<RowFields>): row is InputRow {
     && isDirection(row.sdiX) && isDirection(row.sdiZ) && isDirection(row.ledgeVertical)
     && inRange(row.throwX, -THROW_CONTRIBUTION_LIMIT, THROW_CONTRIBUTION_LIMIT)
     && inRange(row.throwZ, -THROW_CONTRIBUTION_LIMIT, THROW_CONTRIBUTION_LIMIT)
-    && (has(row.pressed, Action.special) || has(row.pressed, Action.strong) || (row.specialX === 0 && row.specialZ === 0))
+    && (has(row.pressed, Action.special) || (row.specialX === 0 && row.specialZ === 0))
     && (has(row.pressed, Action.leftTrigger) || has(row.pressed, Action.rightTrigger) || has(row.pressed, Action.lightShield) || (row.dodgeX === 0 && row.dodgeZ === 0))
     && row.sdi === (row.sdiX !== 0 || row.sdiZ !== 0)
     && (row.ledgeVertical === 0 || has(row.pressed, Action.moveUp) || has(row.pressed, Action.moveDown));
