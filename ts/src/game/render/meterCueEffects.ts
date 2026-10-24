@@ -8,6 +8,7 @@ import { type WorldOrigin, effectMotion, hideEffect, placeEffect } from "./effec
 class MeterCueModel {
   private model: effect | undefined;
   private shown = false;
+  private seekAgain = false;
 
   // Online, Warcraft handles must be born on the same turn on every client, so shared play parks one handle made at startup instead of making one when the cue shows.
   constructor(private readonly cue: Cue, private readonly origin: WorldOrigin, private readonly shared: boolean) {
@@ -36,6 +37,7 @@ class MeterCueModel {
     BlzSetSpecialEffectTimeScale(model, 1.0);
     if (this.cue.sequence !== undefined) BlzSetSpecialEffectAnimation(model, this.cue.sequence);
     BlzSetSpecialEffectTime(model, 0.0);
+    this.seekAgain = true;
     return true;
   }
 
@@ -44,6 +46,10 @@ class MeterCueModel {
     if (!this.shown || model === undefined || fighter === undefined) return;
     const { x, y, z } = this.at(fighter, front, scale);
     placeEffect(model, x, y, z);
+    if (!this.seekAgain) return;
+    // Warcraft discards animation seeks in the callback selecting the animation (#58 native rulers).
+    BlzSetSpecialEffectTime(model, 0.0);
+    this.seekAgain = false;
   }
 
   setPaused(paused: boolean): void {
@@ -52,6 +58,7 @@ class MeterCueModel {
 
   clear(): void {
     this.shown = false;
+    this.seekAgain = false;
     this.hide();
   }
 
@@ -138,6 +145,12 @@ export class MeterCueEffects {
     this.burst.follow(live, this.front, this.scale);
     this.exAura.follow(live, this.front, this.scale);
     this.superAura.follow(live, this.front, this.scale);
+  }
+
+  rebindModels(bind: (object: object, prototype: object) => void): void {
+    bind(this.exAura, MeterCueModel.prototype);
+    bind(this.superAura, MeterCueModel.prototype);
+    bind(this.burst, MeterCueModel.prototype);
   }
 
   setPaused(paused: boolean): void {

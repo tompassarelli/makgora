@@ -280,7 +280,10 @@ export function recreateUi(s: ShellState, actions: PanelActions, selectPause: (c
     bindPrototype(renderers.shield, ShieldPresentation.prototype);
     bindPrototype(renderers.projectiles, ProjectilePresentation.prototype);
     if (renderers.cues !== undefined) bindPrototype(renderers.cues, SpecialCueEffects.prototype);
-    if (renderers.meter !== undefined) bindPrototype(renderers.meter, MeterCueEffects.prototype);
+    if (renderers.meter !== undefined) {
+      bindPrototype(renderers.meter, MeterCueEffects.prototype);
+      renderers.meter.rebindModels(bindPrototype);
+    }
     if (renderers.pool !== undefined) bindPrototype(renderers.pool, FighterPoolPresentation.prototype);
     bindPrototype(renderers.agency, AgencyMarker.prototype);
     bindPrototype(renderers.flash, BodyFlash.prototype);
