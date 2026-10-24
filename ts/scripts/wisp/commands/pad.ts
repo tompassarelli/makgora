@@ -60,7 +60,7 @@ import { clientState } from "../project";
 import { onHealthyClients, readClientsFile } from "../doctor";
 import { resolveTools } from "../nativeTools";
 import { DevCommandReceipt, nativeChatEntryReceipt } from "../boundary";
-import { type CurrentChatEntry, currentChatEntry, selectionChatBootstrapRequired } from "../padChat";
+import { type CurrentChatEntry, currentChatEntry, journalChatEntry, selectionChatBootstrapRequired } from "../padChat";
 import { devCommandReceiptFile } from "../../../src/game/core/gameFiles";
 import { Phase } from "../../../src/game/lobby/lobbyState";
 import { hostLoad, inQuietNativeWindow, windowLoad } from "../quietWindow";
@@ -318,10 +318,7 @@ export const nativeChat = (session: NativeSession, text: string) => setupCommand
   const receipt = () => existsSync(path) ? nativeChatReceipt(readFileSync(path, "latin1")) : undefined;
   const before = receipt();
   if (before === undefined || before.epoch !== epoch || before.chatState !== 0) return yield* new IntegrityFailure({ operation: "open chat", path, cause: "journal is not receiving input" });
-  yield* openChat(host, tryIntegrity("read chat entry", path, () => {
-    const current = receipt();
-    return current?.epoch === epoch && (current.chatState === 0 || current.chatState === 3) ? { available: true, open: current.chatState === 3, modified: current.chat } : undefined;
-  }));
+  yield* openChat(host, tryIntegrity("read chat entry", path, () => journalChatEntry(receipt(), epoch, Date.now() - statSync(path).mtimeMs)));
   yield* sendLine(host, text);
 }));
 
