@@ -3,7 +3,7 @@ import { Phase } from "../../game/lobby/lobbyState";
 import { clearVisualCapture, heldVisualFrame, holdVisualFrame, releaseVisualFrame, visualCapture, visualReleaseFile } from "../../game/session/visualCapture";
 import { drawnFrame } from "./drawnFrame";
 import { type ShellState, localSlot } from "./state";
-import { lockArenaCamera, pauseMatchPresentation, renderPersistentPresentation, renderUi } from "./view";
+import { resumePresentationHeld, lockArenaCamera, pauseMatchPresentation, renderPersistentPresentation, renderUi } from "./view";
 
 
 export function serviceVisualCapture(s: ShellState): void {
@@ -24,6 +24,7 @@ export function holdPresentedCapture(s: ShellState): void {
   if (!s.build.responseProbe || s.game.phase !== Phase.match || heldVisualFrame(localSlot()) !== undefined) return;
   const { epoch, frame } = drawnFrame(s);
   if (holdVisualFrame(localSlot(), epoch, frame)) {
+    if (resumePresentationHeld(s)) pauseMatchPresentation(s, false, true);
     renderPersistentPresentation(s);
     lockArenaCamera(s);
     renderUi(s);
