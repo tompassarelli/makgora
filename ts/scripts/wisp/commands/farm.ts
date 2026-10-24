@@ -48,8 +48,19 @@ const admission = (workflow: FarmWorkflow, given: string | undefined, named: str
   return { sha, verdict: admit({ workflow, sha, onMain, revertedBy: revertedBy(sha, after), lane, onLane, autoland: autoland === "" ? undefined : { state: autoland.split("\t")[0] ?? "", description: autoland.split("\t").slice(1).join("\t") } }) };
 });
 
+const PADS = "ts/test/native/pads";
 
-const balanceResult = (repo: string, id: number, state: RunState) => Effect.gen(function*() {
+const unmatchedPads = (sha: string, names: readonly string[]) => Effect.gen(function*() {
+  const files = (yield* run(["git", "ls-tree", "-r", "--name-only", "--full-tree", sha, `${PADS}/`])).split("\n").filter(Boolean).map((file) => file.slice(PADS.length + 1));
+  const playable = (folder: string) => files.some((file) => file.endsWith(".pad") && file.startsWith(folder) && !file.slice(folder.length).includes("/"));
+  return names.filter((name) => {
+    const entry = name.replace(/^\.\//, "").replace(/\/+$/, "");
+    return entry === "." || entry === "" ? !playable("") : !files.includes(entry) && !playable(`${entry}/`);
+  });
+});
+
+
+const balanceResult =(repo: string, id: number, state: RunState) => Effect.gen(function*() {
   const folder = mkdtempSync(join(tmpdir(), "farm-balance-"));
   const downloaded = yield* run(["gh", "run", "download", String(id), "-R", repo, "-n", "balance-field", "-D", folder]).pipe(Effect.as(true), Effect.orElseSucceed(() => false));
   if (downloaded) {
@@ -133,6 +144,8 @@ export const farm: Command = (args) => Effect.gen(function*() {
   const repo = yield* currentRepo;
   const admitted = yield* admission(job, parsed.values.ref, parsed.values.lane, repo);
   if (admitted.verdict.kind === "refuse") return yield* new FarmFailure({ problem: `not dispatched: ${admitted.verdict.why}` });
+  const unmatched = job === "pads" ? yield* unmatchedPads(admitted.sha, parsed.values.only ?? []) : [];
+  if (unmatched.length > 0) return yield* new UsageFailure({ problem: `not dispatched: no pad script at ${admitted.sha.slice(0, 12)} matches --only ${unmatched.join(", ")} (name a file or folder under ${PADS})` });
   if (job === "test") return yield* farmTest({ ref: parsed.values.ref, wait: parsed.values.wait === true });
   const verdict = admitted.verdict;
   const runs = perfRuns.length > 0 ? perfRuns : ["playable-bot-four"];
