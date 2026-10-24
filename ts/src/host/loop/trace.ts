@@ -5,7 +5,7 @@
 
 import { INPUT_TRACE_FILE, traceEndLines } from "../../game/core/gameFiles";
 import { floorMod } from "wisp/src/sim/intMath";
-import type { ParticipantSlot, Slots } from "../../game/input/participants";
+import { type ParticipantSlot, type Slots, isParticipantSlot } from "../../game/input/participants";
 import { writeLines } from "wisp/src/platform/fileio";
 import type { StateChecksumFold } from "../../game/replay/canonical";
 
@@ -231,6 +231,15 @@ export function recordBatchWait(trace: InputTrace, callbacks: number, seconds: n
   wait.sumSeconds += seconds;
   wait.maxSeconds = Math.max(wait.maxSeconds, seconds);
 }
+
+export function countReceipt(trace: InputTrace, sender: number, accepted: boolean, rows: number): void {
+  if (!trace.active) return;
+  if (accepted && isParticipantSlot(sender)) {
+    trace.window.accepted[sender]++;
+    trace.window.receivedRows[sender] += rows;
+  } else trace.window.rejected++;
+}
+
 
 export function traceParticipantWindow(trace: InputTrace, slot: ParticipantSlot): void {
   const w = trace.window;
