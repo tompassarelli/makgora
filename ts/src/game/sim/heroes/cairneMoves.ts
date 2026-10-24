@@ -114,6 +114,6 @@ export const CAIRNE_MOVES: FighterMoves = {
     [GrabAction.throwForward]: { contactFrame: 19, totalFrames: 45, effect: cairneHit(8.86208438873291, "edge", 35) },
     [GrabAction.throwBack]: { contactFrame: 23, totalFrames: 54, effect: cairneHit(10.473372459411621, "kill", 40, -1) },
     [GrabAction.throwUp]: { contactFrame: 21, totalFrames: 32, effect: cairneHit(8.756999015808105, "juggle", 85) },
-    [GrabAction.throwDown]: { contactFrame: 24, totalFrames: 51, effect: cairneHit(7.250796318054199, "chase", 80) },
+    [GrabAction.throwDown]: { contactFrame: 24, totalFrames: 51, effect: cairneHit(7.250796318054199, "chase", 25) },
   },
 };

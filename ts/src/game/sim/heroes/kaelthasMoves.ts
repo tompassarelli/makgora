@@ -61,6 +61,6 @@ export const KAELTHAS_MOVES: FighterMoves = {
     [GrabAction.throwForward]: throwMove(14, 22, ordinary(7.59276008605957, 35)),
     [GrabAction.throwBack]: throwMove(17, 25, ordinary(9.76211929321289, 40, 104.5669937133789, 28.0, true)),
     [GrabAction.throwUp]: throwMove(16, 15, ordinary(7.59276008605957, 90, 52.28349685668945, 50.0)),
-    [GrabAction.throwDown]: throwMove(18, 24, ordinary(6.508080005645752, 70, 38.02436065673828, 75.0)),
+    [GrabAction.throwDown]: throwMove(18, 24, ordinary(6.508080005645752, 25, 38.02436065673828, 75.0)),
   },
 };

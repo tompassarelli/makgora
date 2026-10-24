@@ -62,6 +62,6 @@ export const JAINA_MOVES: FighterMoves = {
     [GrabAction.throwForward]: { contactFrame: 14, totalFrames: 36, effect: jainaHit(7.018144130706787, 35, 114.2136459350586, 24.0) },
     [GrabAction.throwBack]: { contactFrame: 17, totalFrames: 41, effect: jainaHit(7.895411968231201, 40, 117.47689056396484, 24.0, true) },
     [GrabAction.throwUp]: { contactFrame: 15, totalFrames: 25, effect: jainaHit(6.140875816345215, 90, 76.14242553710938, 45.0) },
-    [GrabAction.throwDown]: { contactFrame: 19, totalFrames: 43, effect: jainaHit(5.263607978820801, 70, 43.50996017456055, 75.0) },
+    [GrabAction.throwDown]: { contactFrame: 19, totalFrames: 43, effect: jainaHit(5.263607978820801, 25, 43.50996017456055, 75.0) },
   },
 };

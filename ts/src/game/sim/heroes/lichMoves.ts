@@ -468,6 +468,6 @@ export const LICH_MOVES: FighterMoves = {
     [GrabAction.throwForward]: throwMove(14, 23, 8.727526664733887, "EDGE", 35),
     [GrabAction.throwBack]: throwMove(18, 26, 9.974315643310547, "EDGE", 40, true),
     [GrabAction.throwUp]: throwMove(17, 13, 8.727526664733887, "JUGGLE", 90),
-    [GrabAction.throwDown]: throwMove(19, 26, 7.48073673248291, "CHASE", 70),
+    [GrabAction.throwDown]: throwMove(19, 26, 7.48073673248291, "CHASE", 25),
   },
 };
