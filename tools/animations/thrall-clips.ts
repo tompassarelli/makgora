@@ -30,16 +30,18 @@ const low: Gesture = {chest:10,waist:5,arm:-25,wrist:0,leftArm:-35,head:-15,wolf
 const back: Gesture = {chest:-15,waist:-20,arm:55,wrist:35,leftArm:-40,head:15,yaw:150,neck:-10};
 const cast: Gesture = {chest:-20,waist:8,arm:-115,wrist:20,leftArm:-120,head:-20,neck:-10,front:-10};
 const brace: Gesture = {chest:35,waist:10,arm:-45,wrist:25,leftArm:-60,head:-20,wolf:6,front:35,back:35};
-const kickCoil: Gesture = {chest:65,waist:10,arm:-110,wrist:45,leftArm:-40,head:-25,look:30,yaw:-10,turn:8,shift:5,wolf:12,neck:-25,front:35,back:-85};
-const kick: Gesture = {chest:5,waist:-5,arm:-150,wrist:30,leftArm:-60,head:5,look:75,yaw:35,turn:-18,shift:-3,wolf:-20,neck:20,front:-35,back:100};
-const kickRecoil: Gesture = {chest:25,waist:0,arm:-160,wrist:25,leftArm:-55,head:5,look:40,yaw:20,turn:-6,shift:-4,wolf:-8,neck:5,front:-10,back:40};
-const hammerCoil: Gesture = {chest:40,waist:15,arm:-185,wrist:45,leftArm:-70,head:-15,look:-30,yaw:-35,turn:-15,shift:6,lean:6,wolf:10,neck:-15,front:20,back:-30};
-const hammerHit: Gesture = {...back,chest:-35,waist:-25,yaw:170,shift:-10,lean:-14,wolf:-8,neck:-20,front:-25,back:-25,look:20};
-const hammerHold: Gesture = {...hammerHit,chest:-40,yaw:178,shift:-12,lean:-17};
+const kickCoil: Gesture = {chest:55,waist:10,arm:-172,wrist:50,leftArm:-40,head:-35,look:30,yaw:-10,turn:8,shift:10,lean:-8,wolf:18,neck:-30,front:50,back:-120,hock:30};
+const kick: Gesture = {chest:-10,waist:-5,arm:-190,wrist:30,leftArm:-60,head:5,look:75,yaw:10,turn:-18,shift:-3,wolf:-20,neck:20,front:-35,back:100};
+const kickRecoil: Gesture = {chest:5,waist:0,arm:-185,wrist:25,leftArm:-55,head:5,look:40,yaw:10,turn:-6,shift:-4,wolf:-8,neck:5,front:-10,back:40};
+const hammerCoil: Gesture = {chest:5,waist:15,arm:-185,wrist:25,leftArm:-70,head:-15,look:-30,yaw:0,turn:-15,shift:6,lean:6,wolf:10,neck:-15,front:20,back:-30};
+const hammerHit: Gesture = {...back,chest:-20,waist:-25,yaw:120,shift:-5,lean:-6,wolf:-8,neck:-20,front:-25,back:-25,look:20};
+const hammerHold: Gesture = {...hammerHit,chest:-22,yaw:125,shift:-6,lean:-8};
+const unwind: Gesture = {chest:-14,waist:-15,arm:-105,wrist:25,leftArm:-46,look:15,yaw:94,shift:-4,lean:-5,wolf:-5,neck:-15,front:-18,back:-18};
 const backAirKeys = (kickAt: number, hammerAt: number, frames: number): Key[] => [
- {frame:0,gesture:{},ik:0}, {frame:kickAt-4,gesture:kickCoil,ik:0}, {frame:kickAt-2,gesture:{...kickCoil,chest:70,back:-95,wolf:14},ik:0},
+ {frame:0,gesture:{},ik:0}, {frame:kickAt-4,gesture:kickCoil,ik:0}, {frame:kickAt-2,gesture:{...kickCoil,chest:60,arm:-176,front:55,back:-130,hock:35,wolf:22,shift:12},ik:0},
  {frame:kickAt,gesture:kick,ik:0}, {frame:kickAt+1,gesture:{...kick,back:125,wolf:-26,turn:-22,shift:-13},ik:0}, {frame:kickAt+3,gesture:kickRecoil,ik:0},
- {frame:hammerAt-3,gesture:hammerCoil,ik:0}, {frame:hammerAt,gesture:hammerHit,ik:1}, {frame:hammerAt+3,gesture:hammerHold,ik:1.05},
+ {frame:hammerAt-3,gesture:hammerCoil,ik:0}, {frame:hammerAt,gesture:hammerHit,ik:1}, {frame:hammerAt+3,gesture:hammerHold,ik:1},
+ {frame:hammerAt+11,gesture:unwind,ik:0},
  {frame:frames-2,gesture:{},ik:0}, {frame:frames,gesture:{},ik:0},
 ];
 const headAnticipation: Partial<Record<HeroPose, number>> = { jab: 30, jab2: 30, forwardTilt: 15, forwardTiltDown: 45, downTilt: 45, dashAttack: 75 };
@@ -112,7 +114,7 @@ for(const [ordinal,action]of [...actions,...damageActions].entries()){
  if(!center.Translation)center.Translation={LineType:1,GlobalSeqId: NO_GLOBAL_SEQ,Keys:source.Sequences.flatMap(s=>Array.from(s.Interval).map(Frame=>({Frame,Vector:new Float32Array([0,0,0])})))};
  if (["jab","jab2","forwardTilt","forwardTiltUp","forwardTiltDown","upTilt","downTilt","dashAttack","forwardSmash","upSmash","downSmash","neutralAir","forwardAir","backAir","upAir","downAir","throwForward","throwBack","throwUp","throwDown"].includes(action.pose)) {
   const headContact = ["jab","jab2","forwardTilt"].includes(action.pose);
-  const target = action.pose === "jab" ? [45,70] : action.pose === "jab2" ? [50,72] : action.pose === "forwardTilt" ? [92,75] : action.pose.includes("Up") || action.pose.startsWith("up") ? [5,180] : action.pose==="downAir" ? [20,105] : action.pose.includes("Down") || action.pose.startsWith("down") ? [30,110] : action.pose.includes("Back") || action.pose.startsWith("back") ? [-65,135] : [60,130];
+  const target = action.pose === "backAir" ? [-56,108] : action.pose === "jab" ? [45,70] : action.pose === "jab2" ? [50,72] : action.pose === "forwardTilt" ? [92,75] : action.pose.includes("Up") || action.pose.startsWith("up") ? [5,180] : action.pose==="downAir" ? [20,105] : action.pose.includes("Down") || action.pose.startsWith("down") ? [30,110] : action.pose.includes("Back") || action.pose.startsWith("back") ? [-65,135] : [60,130];
 
   const renderer = new ModelRenderer(model), data = Reflect.get(renderer,"rendererData");renderer.setSequence(index);data.frame=start+Math.round((action.reach??action.contact)*1000/60);
   const arm=model.Nodes.find(n=>n.Name==="Bone Rider R Arm")!,wrist=model.Nodes.find(n=>n.Name==="Bone Rider R Wrist")!,weapon=model.Nodes.find(n=>n.Name==="Weapon Ref")!,pivot=model.PivotPoints[weapon.ObjectId]!;
