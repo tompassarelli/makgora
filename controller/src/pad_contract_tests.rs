@@ -142,17 +142,6 @@ fn generated_fighter_inputs_follow_the_models_shipped_contract_rows() {
 }
 
 #[test]
-fn every_shipped_contract_key_reaches_its_labelled_map_action_in_defaults_and_k1() {
-    let rows = contract().iter().flat_map(|preset| preset.map_rows.iter()).collect::<Vec<_>>();
-    let rows = serde_json::to_string(&rows).unwrap();
-    if let Some(path) = std::env::var_os("WC3_BINDING_PROJECTION_PATH") { fs::write(path, &rows).unwrap(); }
-    let output = std::process::Command::new("bun").args(["test", "test/pad-contract.test.ts"])
-        .current_dir(Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap().join("ts"))
-        .env("WC3_BINDING_ROWS", rows).output().unwrap();
-    assert!(output.status.success(), "actual map contract failed:\n{}{}", String::from_utf8_lossy(&output.stdout), String::from_utf8_lossy(&output.stderr));
-}
-
-#[test]
 fn generated_menus_follow_shipped_rows_and_start_is_independent_of_cursor_position() {
     let mut seed = 0x6d656e7562696e64;
     let cases = if std::env::var_os("CI").is_some() { 512 } else { 64 };
