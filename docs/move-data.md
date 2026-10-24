@@ -5,8 +5,7 @@ Historical record: the captures, trial tables and asset measurements below descr
 For executable contact, punish and follow-up comparisons under named conditions,
 see smashcraft:docs/move-comparisons.md.
 
-Run `~/code/smashcraft/worktrees/playable-integration-20261005/tools/move-data/export.sh`
-(or the same command in the current owned checkout) to run the pinned Bun
+Run `tools/move-data/export.sh` from a checkout to run the pinned Bun
 toolchain over Smashcraft's TypeScript simulation and write
 smashcraft:build/move-export/moves.jsonl. The script reads timing, hit-region,
 capsule, contact-math and motion facts directly from the game modules; it does
