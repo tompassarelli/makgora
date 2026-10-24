@@ -35,7 +35,7 @@ import { INPUT_PREFIX, failJournal, flushTransport, receiveLifecycle, serviceJou
 import { epochChecksumDue, probeAdvance, probeCapture, probeClockMs, probeInput, probeIntegrity, probePoll, probeRecording, probeSendFinished, probeTransportReceive, probeTransportSend } from "./responseProbe";
 import { confirmedChecksum } from "./diagnostics";
 import { type KeyboardRollback, type Rollback, type ShellState, localSlot, shell } from "./state";
-import { recordBatchWait, recordEcho, recordSend, resetEchoRing, traceInput, traceSeconds } from "./trace";
+import { countReceipt, recordBatchWait, recordEcho, recordSend, resetEchoRing, traceInput, traceSeconds } from "./trace";
 import { LASTING, resumePresentationHeld, setStatus } from "./view";
 import { holdPresentedCapture } from "./visualCapture";
 import { visualCaptureStopBefore } from "../../game/session/visualCapture";
@@ -416,11 +416,7 @@ function receivePacket(s: ShellState, rollback: Rollback, sender: number, packet
     if (receipt === "accepted" && !local && row.pressed !== 0) traceInput(trace, `received participant ${sender} frame ${frame} pressed ${row.pressed}`);
   }
   if (receipt !== "accepted" && receipt !== "wrongEpoch") setStatus(s, "The players could not stay connected. Restart the match.", LASTING);
-  if (!trace.active) return;
-  if (receipt === "accepted" && isParticipantSlot(sender)) {
-    trace.window.accepted[sender]++;
-    trace.window.receivedRows[sender] += packet.rows.length;
-  } else trace.window.rejected++;
+  countReceipt(trace, sender, receipt === "accepted", packet.rows.length);
 }
 
 
