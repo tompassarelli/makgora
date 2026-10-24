@@ -104,12 +104,22 @@ env:
   LANES_QUERY: >-
     query($owner: String!, $name: String!, $endCursor: String) { repository(owner: $owner, name: $name) {
     refs(refPrefix: "refs/heads/claude/", first: 100, after: $endCursor) { pageInfo { hasNextPage endCursor }
-    nodes { name target { oid ... on Commit { message status { context(name: "autoland") { state description createdAt } } } } } } } }
+    nodes { name target { oid ... on Commit { message status { context(name: "autoland") { state description createdAt } denylist: context(name: "denylist") { state } } } } } } } }
   LANES_JQ: >-
     .data.repository.refs.nodes[] | {issues: ([.target.message |
     scan("(?:^|[^A-Za-z0-9_/#-])(?:" + env.GH_REPO + "|" + (env.GH_REPO | split("/")[1]) + ")?#([0-9]+)|https://github.com/" + env.GH_REPO + "/issues/([0-9]+)")
     | .[] | select(. != null and . != "") | tonumber] | unique), branch: ("claude/" + .name), tip: .target.oid,
-    status: (.target.status.context | if . == null then null else {state: (.state | ascii_downcase), description, at: .createdAt} end)}
+    status: (.target.status.context | if . == null then null else {state: (.state | ascii_downcase), description, at: .createdAt} end),
+    denylist: (.target.status.denylist.state // null | if . == null then null else ascii_downcase end)}
+  ATTEST: |
+    attested() {
+      local cli="$1" branch="$2" tip="$3" verdict state description
+      IFS=$'\t' read -r verdict state description <<< "$(bun "$cli" attest "$(gh api "repos/$GH_REPO/commits/$tip/status" --jq '[.statuses[] | select(.context == "denylist")][0].state // ""')")"
+      [ "$verdict" != test ] || return 0
+      gh api "repos/$GH_REPO/statuses/$tip" -f state="${state:-pending}" -f context=autoland -f description="$description" -f target_url="$RUN_URL" > /dev/null
+      echo "\`$branch\` (${tip:0:10}): $description" >> "$GITHUB_STEP_SUMMARY"
+      return 1
+    }
   FLAG_CONFLICT: |
     flag() {
       local branch="$1" tip="$2" text="$3" marker="<!-- autoland-conflict $2 ${4:-resolved} -->" lane="<!-- autoland-conflict-lane $1 $2 -->" issue alarm
@@ -216,6 +226,8 @@ jobs:
               echo "\`$branch\` no longer waits at ${tip:0:10} (${current:-no status}): nothing to test" >> "$GITHUB_STEP_SUMMARY"
               out verdict none; exit 0
             fi
+            eval "$ATTEST"
+            attested ts/scripts/autoland.ts "$branch" "$tip" || { out verdict none; exit 0; }
             printf '%s\t%s\t\t\n' "$branch" "$tip" > lanes.tsv
           else
             bash -euo pipefail -c "$FETCH_LANES" > lanes.json
@@ -639,6 +651,10 @@ jobs:
               done 3< late.tsv
             fi
           fi
+          eval "$ATTEST"
+          unattested=""
+          for i in "${!tips[@]}"; do attested "$late_cli" "${branches[i]}" "${tips[i]}" || unattested=1; done
+          [ -z "$unattested" ] || { echo "a tip lacks a deny-list success: nothing lands" >> "$GITHUB_STEP_SUMMARY"; exit 0; }
           if ! git push origin "$SHA:refs/heads/main" 2> push.log; then
             cat push.log
             if hand_back_record "$(cat push.log)"; then exit 1; fi
@@ -769,6 +785,11 @@ jobs:
           jq -e 'type == "array"' runs.json > /dev/null || { echo "::error title=Autoland plan input::runs.json is empty or truncated"; exit 1; }
           bun ts/scripts/autoland.ts plan --lanes lanes.json --runs runs.json --retry "$RETRY" > plan.tsv
           while IFS=$'\t' read -r -u 3 action branch tip slot; do
+            if [ "$action" = hold ] || [ "$action" = refuse ]; then
+              gh api "repos/$GH_REPO/statuses/$tip" -f state="$([ "$action" = refuse ] && echo failure || echo pending)" -f context=autoland -f description="$slot" -f target_url="$RUN_URL" > /dev/null || echo "::warning::couldn't set $branch's status"
+              echo "\`$branch\` (${tip:0:10}): $slot" >> "$GITHUB_STEP_SUMMARY"
+              continue
+            fi
             if [ "$action" = test ] && [[ " $RETRY " != *" $branch "* ]]; then
               gh api "repos/$GH_REPO/commits/$tip/statuses?per_page=100" --jq '[.[] | select(.context == "autoland") | .description]' > statuses.json
               if [ "$(bun ts/scripts/autoland.ts loop --statuses statuses.json)" = true ]; then

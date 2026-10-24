@@ -1,11 +1,11 @@
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { parseArgs } from "node:util";
-import { JOB_BUDGET, autoclose, issueRefs, pendingChecks, busy, laneRerun, type CiJob, flaggedLanes, pinFamily, resolveConflicts, type Conflict, forecast, judge, landing, parseList, lateLane, looping, handbackDue, pastMain, plan, stalled, stuckRuns, train, trainStep, type Job, type Lane, type Run, type Status, type Tree } from "./autolandCore";
+import { ATTESTED, JOB_BUDGET, attestation, autoclose, issueRefs, pendingChecks, busy, laneRerun, type CiJob, flaggedLanes, pinFamily, resolveConflicts, type Conflict, forecast, judge, landing, parseList, lateLane, looping, handbackDue, pastMain, plan, stalled, stuckRuns, train, trainStep, type Job, type Lane, type Run, type Status, type Tree } from "./autolandCore";
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null;
 const isStatus = (value: unknown): value is Status => isRecord(value) && typeof value.state === "string" && typeof value.description === "string" && typeof value.at === "string";
-const isLane = (value: unknown): value is Lane => isRecord(value) && typeof value.branch === "string" && typeof value.tip === "string" && (value.status === null || isStatus(value.status)) && (value.since === undefined || typeof value.since === "string") && (value.labels === undefined || (Array.isArray(value.labels) && value.labels.every((label: unknown) => typeof label === "string"))) && (value.milestones === undefined || (Array.isArray(value.milestones) && value.milestones.every((title: unknown) => typeof title === "string")));
+const isLane = (value: unknown): value is Lane => isRecord(value) && typeof value.branch === "string" && typeof value.tip === "string" && (value.status === null || isStatus(value.status)) && (value.denylist === undefined || value.denylist === null || typeof value.denylist === "string") && (value.since === undefined || typeof value.since === "string") && (value.labels === undefined || (Array.isArray(value.labels) && value.labels.every((label: unknown) => typeof label === "string"))) && (value.milestones === undefined || (Array.isArray(value.milestones) && value.milestones.every((title: unknown) => typeof title === "string")));
 const isJob = (value: unknown): value is Job => isRecord(value) && (value.name === undefined || typeof value.name === "string") && typeof value.status === "string" && typeof value.created === "string" && (value.started === null || typeof value.started === "string") && Array.isArray(value.labels) && value.labels.every((label: unknown) => typeof label === "string");
 const isRun = (value: unknown): value is Run => isRecord(value) && typeof value.title === "string" && typeof value.status === "string" && (value.id === undefined || typeof value.id === "number") && (value.created === undefined || typeof value.created === "string") && (value.jobs === undefined || (Array.isArray(value.jobs) && value.jobs.every(isJob)));
 const isResult = (value: unknown): value is { check: string; passed: boolean } => isRecord(value) && typeof value.check === "string" && typeof value.passed === "boolean";
@@ -79,7 +79,11 @@ if (import.meta.main) {
   if (command === "plan") {
     const result = plan(readList(values.lanes, isLane), readList(values.runs, isRun), now, (values.retry ?? "").split(/\s+/).filter(Boolean));
     for (const order of result.test) console.log(["test", order.branch, order.tip, order.slot].join("\t"));
+    for (const order of result.attest) console.log([order.verdict, order.branch, order.tip, ATTESTED[order.verdict].description].join("\t"));
     if (result.train) console.log("train");
+  } else if (command === "attest") {
+    const verdict = attestation(positionals[1] ?? null);
+    console.log(verdict === "test" ? verdict : [verdict, ATTESTED[verdict].state, ATTESTED[verdict].description].join("\t"));
   } else if (command === "busy") {
     const runs = readList(values.runs, isRun);
     console.log(`${busy(runs)}/${JOB_BUDGET} now, ${forecast(runs, now)} at the next peak`);
@@ -125,7 +129,7 @@ if (import.meta.main) {
   } else if (command === "judge") {
     console.log(judge(Number(values.count), values.green === "true"));
   } else {
-    console.error("usage: autoland.ts plan --lanes FILE --runs FILE [--retry BRANCHES] [--now ISO] | busy --runs FILE [--now ISO] | train --lanes FILE [--now ISO] | judge --count N --green true|false | rerun --jobs FILE --attempt N --count TEST_FAILURES | sweep --runs FILE [--now ISO] | stalled --lanes FILE --landed ISO [--now ISO] | handback --lanes FILE [--now ISO] | loop --statuses FILE | flagged --bodies FILE --lanes FILE | resolve --conflicts FILE [--store DIR] | refs --messages FILE | checks --body FILE | autoclose --body FILE --sha SHA [--results FILE] | train-step land|retest... | late BRANCH ACTUAL BASE TESTED MAIN... --lanes FILE --retry BRANCHES [--rebased TREE] [--green true|false] | past-main BASE TESTED MAIN... [--rebased TREE] | landing --solo true|false BASE TESTED MAIN... [--rebased TREE] (git ls-tree -r -z files)");
+    console.error("usage: autoland.ts plan --lanes FILE --runs FILE [--retry BRANCHES] [--now ISO] | attest [DENYLIST_STATE] | busy --runs FILE [--now ISO] | train --lanes FILE [--now ISO] | judge --count N --green true|false | rerun --jobs FILE --attempt N --count TEST_FAILURES | sweep --runs FILE [--now ISO] | stalled --lanes FILE --landed ISO [--now ISO] | handback --lanes FILE [--now ISO] | loop --statuses FILE | flagged --bodies FILE --lanes FILE | resolve --conflicts FILE [--store DIR] | refs --messages FILE | checks --body FILE | autoclose --body FILE --sha SHA [--results FILE] | train-step land|retest... | late BRANCH ACTUAL BASE TESTED MAIN... --lanes FILE --retry BRANCHES [--rebased TREE] [--green true|false] | past-main BASE TESTED MAIN... [--rebased TREE] | landing --solo true|false BASE TESTED MAIN... [--rebased TREE] (git ls-tree -r -z files)");
     process.exit(2);
   }
 }

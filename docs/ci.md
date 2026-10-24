@@ -46,7 +46,13 @@ clean) and the hash of ts/bun.lock, recorded under
 else pushes main, so no landing restarts another's suites.
 
 1. **Queue.** A push marks the branch tip with a pending `autoland` commit
-   status ("queued") and starts a plan run.
+   status ("queued") and starts a plan run. A tip is tested, trained or
+   landed only once a machine holding the private deny-list has attested it
+   with a `denylist` commit status of success, which it follows by
+   dispatching `-f branch=` for that branch; a failure refuses the lane
+   ("deny-list refused: reword and push again") and a missing or pending one
+   holds it as "waiting for the deny-list attestation" (`attestation` in
+   smashcraft:ts/scripts/autolandCore.ts, re-checked before every push to main).
 2. **Test alone.** A plan run gives each idle test slot the next waiting
    tip (priority, then arrival); the other tips keep "queued" until a plan
    finds a slot free, so no run waits on a busy slot. A test run is: the tip rebased onto main, the pre-push gate

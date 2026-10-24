@@ -11,7 +11,7 @@ export const DIRECT_CAP = 2;
 export const DISPATCHED = 2;
 
 export interface Status { readonly state: string; readonly description: string; readonly at: string }
-export interface Lane { readonly branch: string; readonly tip: string; readonly status: Status | null; readonly since?: string; readonly labels?: readonly string[]; readonly milestones?: readonly string[] }
+export interface Lane { readonly branch: string; readonly tip: string; readonly status: Status | null; readonly denylist?: string | null; readonly since?: string; readonly labels?: readonly string[]; readonly milestones?: readonly string[] }
 export interface Job { readonly name?: string; readonly status: string; readonly created: string; readonly started: string | null; readonly labels: readonly string[] }
 export interface Run { readonly title: string; readonly status: string; readonly id?: number; readonly created?: string; readonly jobs?: readonly Job[] }
 
@@ -28,6 +28,14 @@ const PASSED = /^passed alone on ([0-9a-f]{40}) as tree ([0-9a-f]{40})$/;
 const LEGACY_TITLE = /^Autoland (claude\/\S+(?: claude\/\S+)*)$/;
 
 export type LaneState = "test" | "testing" | "passed" | "held" | "done";
+
+export type Attestation = "test" | "hold" | "refuse";
+export const ATTESTED: Record<Exclude<Attestation, "test">, { readonly state: "pending" | "failure"; readonly description: string }> = {
+  hold: { state: "pending", description: "waiting for the deny-list attestation" },
+  refuse: { state: "failure", description: "deny-list refused: reword and push again" },
+};
+
+export const attestation = (denylist: string | null | undefined): Attestation => denylist === "success" ? "test" : denylist === "failure" ? "refuse" : "hold";
 
 export function passedAlone(lane: Lane): { readonly base: string; readonly tree: string } | undefined {
   const [, base, tree] = (lane.status?.state === "pending" ? PASSED.exec(lane.status.description) : null) ?? [];
@@ -52,7 +60,8 @@ const aged = (lane: Lane, now: number): number => waited(lane) !== "" && minutes
 const byArrival = (lanes: readonly Lane[], now: number): Lane[] => lanes.toSorted((a, b) => aged(a, now) - aged(b, now) || (aged(a, now) === 0 ? 0 : priority(a) - priority(b)) || waited(a).localeCompare(waited(b)) || a.branch.localeCompare(b.branch));
 
 export interface TestOrder { readonly branch: string; readonly tip: string; readonly slot: number }
-export interface Plan { readonly test: readonly TestOrder[]; readonly train: boolean }
+export interface AttestOrder { readonly branch: string; readonly tip: string; readonly verdict: Exclude<Attestation, "test"> }
+export interface Plan { readonly test: readonly TestOrder[]; readonly attest: readonly AttestOrder[]; readonly train: boolean }
 
 const SUITE_JOB = /^suite \//;
 
@@ -83,9 +92,17 @@ export function plan(lanes: readonly Lane[], runs: readonly Run[], now: number, 
   const peak = forecast(runs, now);
   const free = Array.from({ length: TEST_SLOTS }, (_, slot) => slot).filter((slot) => !runs.some((run) => run.status !== "completed" && TEST_TITLE.exec(run.title)?.[1] === String(slot)));
   const test: TestOrder[] = [];
+  const attest: AttestOrder[] = [];
   let passed = false;
   for (const lane of byArrival(lanes, now)) {
     const state = laneState(lane, runs, retried, now);
+    if (state !== "test" && state !== "passed") continue;
+    const verdict = attestation(lane.denylist);
+    if (verdict !== "test") {
+      const want = ATTESTED[verdict];
+      if (lane.status?.state !== want.state || lane.status.description !== want.description) attest.push({ branch: lane.branch, tip: lane.tip, verdict });
+      continue;
+    }
     passed ||= state === "passed";
     if (state !== "test") continue;
     if (held + RUN_BUILD * (test.length + 1) > JOB_BUDGET || peak + RUN_PEAK * (test.length + 1) > JOB_BUDGET) continue;
@@ -94,7 +111,7 @@ export function plan(lanes: readonly Lane[], runs: readonly Run[], now: number, 
     test.push({ branch: lane.branch, tip: lane.tip, slot });
   }
   const trainOpen = runs.some((run) => run.title === TRAIN_TITLE && run.status !== "completed");
-  return { test, train: passed && !trainOpen };
+  return { test, attest, train: passed && !trainOpen };
 }
 
 export interface TrainLane { readonly branch: string; readonly tip: string; readonly base: string; readonly tree: string }
@@ -102,7 +119,7 @@ export interface TrainLane { readonly branch: string; readonly tip: string; read
 export function train(lanes: readonly Lane[], now: number): TrainLane[] {
   return byArrival(lanes, now).flatMap((lane) => {
     const passed = passedAlone(lane);
-    return passed === undefined ? [] : [{ branch: lane.branch, tip: lane.tip, ...passed }];
+    return passed === undefined || attestation(lane.denylist) !== "test" ? [] : [{ branch: lane.branch, tip: lane.tip, ...passed }];
   }).slice(0, TRAIN_CAP);
 }
 
