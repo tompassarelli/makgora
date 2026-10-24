@@ -72,8 +72,8 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   destination.cStickZ = ((held & SMASH_UP_BIT) !== 0 ? 1 : 0) - ((held & SMASH_DOWN_BIT) !== 0 ? 1 : 0);
   const strong = ((held | pressed) & STRONG_BIT) !== 0;
   destination.specialPressed = (pressed & SPECIAL_BIT) !== 0;
-  destination.exPressed = destination.specialPressed && strong;
   destination.ultimatePressed = ((pressed & SPECIAL_BIT) !== 0 && ((held | pressed) & ATTACK_BIT) !== 0) || ((pressed & ATTACK_BIT) !== 0 && (held & SPECIAL_BIT) !== 0);
+  destination.exPressed = destination.specialPressed && strong && !destination.ultimatePressed;
   destination.specialX = destination.specialPressed && !((held & WALK_BIT) !== 0 && row.specialZ === 0) ? row.specialX : 0;
   destination.specialZ = destination.specialPressed ? row.specialZ : 0;
   destination.down = (held & MOVE_DOWN_BIT) !== 0;
