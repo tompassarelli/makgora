@@ -127,16 +127,16 @@ for (const [pose, key, gesture, contact] of [
 }
 const damageActions: Action[] = [];
 for (let height=0;height<3;height++) for (let strength=0;strength<3;strength++) {
-  const gain=[0.55,0.9,1.3][strength]!;
+  const gain=(height===2?[0.9,1.15,1.45]:[0.55,0.9,1.3])[strength]!;
   const gesture:Gesture = height===0 ? {hip:-55*gain,knee:75*gain,chest:24*gain,head:-12*gain,arm:25*gain,free:35*gain}
     : height===1 ? {chest:48*gain,head:-24*gain,hip:-22*gain,knee:25*gain,arm:-35*gain,free:-45*gain,yaw:18*gain}
-    : {head:-50*gain,chest:-28*gain,arm:42*gain,free:55*gain,hip:15*gain,knee:22*gain};
+    : {head:-50*gain,chest:-28*gain,lean:-20*gain,arm:42*gain,free:55*gain,hip:15*gain,knee:22*gain};
   damageActions.push({pose:"damageGround",frames:24,contact:0,gesture,hold:true,damage:true});
 }
 if (replacing) {
-  ensure(selectedPoses.every(pose => actions.some(action => action.pose === pose)), "Unknown Forsaken pose");
+  ensure(selectedPoses.every(pose => pose === "pain" || actions.some(action => action.pose === pose)), "Unknown Forsaken pose");
   actions.splice(0, actions.length, ...actions.filter(action => selectedPoses.includes(action.pose)));
-  damageActions.length = 0;
+  if (!selectedPoses.includes("pain")) damageActions.length = 0;
 }
 function rotation(base: ArrayLike<number>, pitch:number, yaw=0,roll=0): Float32Array<ArrayBuffer> {
   const q=quat.create(); quat.rotateY(q,q,pitch*Math.PI/180); quat.rotateZ(q,q,yaw*Math.PI/180);quat.rotateX(q,q,roll*Math.PI/180);
@@ -164,7 +164,7 @@ const weaponRef=model.Nodes.find(n=>n.Name==="Weapon Ref")!,weaponPivot=model.Pi
 const weaponPoint=vec3.fromValues(weaponPivot[0]!,weaponPivot[1]!,weaponPivot[2]!);vec3.transformMat4(weaponPoint,weaponPoint,data.nodes[weaponRef.ObjectId].matrix);
 const inverseHand=mat4.create();ensure(mat4.invert(inverseHand,handRest),"Hand pose is singular");vec3.transformMat4(weaponPoint,weaponPoint,inverseHand);
 let cursor=Math.max(...source.Sequences.map(s=>s.Interval[1]))+100;
-const authoredIndices = new Map<string, number>();
+const authoredIndices = new Map<string, number>(), painIndices: number[] = [];
 const bindings:string[]=[],damageBindings:string[]=[],records:{pose:string;index:number;frames:number;contact:number}[]=[];
 for (const [ordinal,action] of [...actions,...damageActions].entries()) {
   const name=action.damage?`Forsaken Paladin Pain ${Math.floor((ordinal-actions.length)/3)} ${(ordinal-actions.length)%3}`:action.pose==="downAir"?"Down Air Sword Drop":`Forsaken Paladin ${action.pose}`;
@@ -177,7 +177,7 @@ for (const [ordinal,action] of [...actions,...damageActions].entries()) {
     ensure(model.Sequences[index]!.Interval[1] === end, `${name}: timing changed`);
     tracks(model, track => { if (!onGlobalClock(track)) track.Keys.splice(0, track.Keys.length, ...track.Keys.filter(key => key.Frame < start || key.Frame > end)); });
   }
-  authoredIndices.set(action.pose, index);
+  if (action.damage) painIndices.push(index); else authoredIndices.set(action.pose, index);
   if (existing < 0) model.Sequences.push({...stand,Name:name,Interval:new Uint32Array([start,end]),NonLooping:!action.hold,MoveSpeed:0,Rarity:0,
     MinimumExtent:new Float32Array([-320,-320,-200]),MaximumExtent:new Float32Array([320,320,360]),BoundsRadius:440});
   const coil=blend(ready,action.gesture,-(COIL[action.pose]??0.32));
@@ -275,12 +275,12 @@ const strides:DrawnStride[]=Object.entries(DRAWN_STRIDES).flatMap(([character,ro
 for(const motion of ["walk","run"] as const)strides.push(measureDrawnStride(bytes,after,Character.forsakenPaladin,motion,"Units\\Creeps\\HeroForsakenPaladin\\HeroForsakenPaladin.mdx"));
 if (!replacing) await Bun.write(join(project,"ts/src/game/presentation/drawnStrideInfo.ts"),drawnStrideSource(strides));
 let preserved=0;
-for(const [index,sequence]of source.Sequences.entries())if(![...authoredIndices.values()].includes(index))for(const part of [0,0.5,1]){const time=(sequence.Interval[1]-sequence.Interval[0])*part/1000,a=before.triangles(index,time,1),b=after.triangles(index,time,1);
+for(const [index,sequence]of source.Sequences.entries())if(![...authoredIndices.values(),...painIndices].includes(index))for(const part of [0,0.5,1]){const time=(sequence.Interval[1]-sequence.Interval[0])*part/1000,a=before.triangles(index,time,1),b=after.triangles(index,time,1);
   ensure(a.length===b.length&&a.every((v,i)=>Math.abs(v-b[i]!)<0.001),`${sequence.Name}: stock pose changed`);preserved++;}
 const motions=actions.map((action,ordinal)=>{const index=authoredIndices.get(action.pose)!,first=after.triangles(index,0,1),contact=after.triangles(index,action.pose.startsWith("victim")?0.5:action.contact/60,1);let motion=0;
   ensure(first.length>0&&contact.length===first.length,`${action.pose}: body missing`);for(let i=0;i<first.length;i+=2)motion=Math.max(motion,Math.hypot(contact[i]!-first[i]!,contact[i+1]!-first[i+1]!));
   if(!action.hold)ensure(motion>=8,`${action.pose}: no local gesture (${motion})`);return {pose:action.pose,motion};});
-const pain=damageActions.map((_,ordinal)=>after.triangles(source.Sequences.length+actions.length+ordinal,0,1));
+const pain=painIndices.map(index=>after.triangles(index,0,1));
 for(let a=0;a<pain.length;a++)for(let b=a+1;b<pain.length;b++)ensure(pain[a]!.some((v,i)=>Math.abs(v-pain[b]![i]!)>2),`Pain ${a}/${b}: same silhouette`);
 for(const pose of ["dashAttack","upSmash","forwardTilt","upTilt","downTilt","downSmash","neutralAir","backAir","upAir","downAir","neutralSpecial","sideSpecial","upSpecial","downSpecial","rollForward","throwForward","throwBack","throwUp","throwDown"] as const){
   const ordinal=actions.findIndex(a=>a.pose===pose); if(ordinal < 0)continue; const action=actions[ordinal]!;

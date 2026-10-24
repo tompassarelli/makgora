@@ -208,6 +208,8 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `bun tools/animations/forsaken-paladin-clips.ts STOCK_FORSAKEN_PALADIN.mdx PRIVATE_OUTPUT`
   keeps the stock Forsaken body, sword and rig, and
   authors his strikes, recovery, paired throws and nine pain poses.
+  Given the shipped model and pose names (or `pain` for the nine pain cells)
+  instead, it re-authors only those clips in place at their indices and lengths.
   `bun tools/animations/stock-forsaken-model.ts STOCK_CLASSIC_FORSAKEN.mdx AUTHORED_FORSAKEN.mdx PRIVATE_OUTPUT.mdx`
   restores the stock Classic mesh and version-1800 skin while retaining the shipped motion.
   `bun tools/animations/forsaken-paladin-weapon-clips.ts STOCK_FORSAKEN.mdx AUTHORED_FORSAKEN.mdx PRIVATE_OUTPUT`
