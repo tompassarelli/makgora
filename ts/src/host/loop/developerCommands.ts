@@ -78,7 +78,14 @@ function developerMessage(s: ShellState, original: string): string {
 function applySetupCommands(s: ShellState, actor: number, message: string): void {
   const commands = message.substring(11).split(";");
   if (commands.length > 32 || commands.some(command => command.length === 0 || command.startsWith("setup "))) return;
-  for (const command of commands) applyDeveloperCommand(s, actor, `-dev ${command}`);
+  s.devStep = 0;
+  s.devSteps = commands.length;
+  for (const command of commands) {
+    s.devStep++;
+    applyDeveloperCommand(s, actor, `-dev ${command}`);
+  }
+  s.devStep = 1;
+  s.devSteps = 1;
 }
 
 function editFighters(s: ShellState, message: string): string | undefined {
@@ -324,6 +331,6 @@ function desyncReceipt(actor: number): string {
 function writeDeveloperReceipt(s: ShellState, receipt: string): void {
   s.devReceipts++;
   if (!s.promoHudHidden) DisplayTextToPlayer(GetLocalPlayer(), 0.0, 0.0, receipt);
-  const file = devReceiptFile(journalIdentity(s, s.rollback?.epoch ?? 0), s.devReceipts, s.dev, s.game);
+  const file = devReceiptFile(journalIdentity(s, s.rollback?.epoch ?? 0), s.devReceipts, s.devStep, s.devSteps, s.dev, s.game);
   writeLines(file.name, file.lines);
 }
