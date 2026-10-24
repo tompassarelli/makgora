@@ -29,7 +29,7 @@ export function deckModel(stage: number, index: number): string {
 
 function passSlabDepth(stage: number): number {
   if (stage === TOMB_OF_SARGERAS_STAGE) return 2.0;
-  if (stage === CARRIED_TEST_STAGE) return 0.75;
+  if (stage === CARRIED_TEST_STAGE) return 1.0;
   return f32(0.45);
 }
 

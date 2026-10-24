@@ -456,10 +456,13 @@ Nordrassil, Blackrock and Hellfire keep their depth-pass look. Rules 17 and
 
 - **Gryphon Aerie: Aerie Peak** (round 3). Palette: bare grey granite, green valley
   floor, cool blue haze; no red rock and no moss. Skyline: one peak
-  under the aviary in the centre, a tall crag at the left edge and a
+  in the centre, a tall crag at the left edge and a
   shoulder at the right, low knolls between them so the far granite peaks
-  and the sky show through. Wildhammer buildings on the knolls: a second
-  gryphon roost on the left, the forge on the right. Near and mid: the
+  and the sky show through. Wildhammer buildings on the knolls: the
+  gryphon roost on the left, clear of the top platform's path so its gold
+  cage never sits behind the plank (#237), the forge on the right. The
+  platforms are dark marble slabs with a gold lip, the top plank's body
+  Wildhammer blue, so they read against the grey granite. Near and mid: the
   generated granite crags and knolls, dark near and paler mid, the
   backdrop tinted cool blue; two natural rock arches tinted grey in the
   valley.
