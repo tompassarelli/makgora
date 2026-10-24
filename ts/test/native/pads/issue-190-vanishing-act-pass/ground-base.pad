@@ -1,0 +1,16 @@
+# #190: Medivh (a) dashes to about x 120, then Vanishing Act blinks through Medivh (b) standing at x 240.
+#! chat -dev quick hero medivh
+540 a stick 1 0
+548 a stick 0 0
+600 a stick 1 0
+600 a tap X 2
+602 a stick 0 0
+610 a capture
+680 a press VIEW
+750 a release VIEW
+# The cast starts on the press; on its frame 11 the pass hits b once, on the ground, and launches it upward.
+#! expect a 600 special 14 form 0
+#! absent b 540-608 damage
+#! expect b 609-611 damage 5.871
+#! expect b 609-611 launch up 1 from-air 0
+#! absent b 612-680 damage

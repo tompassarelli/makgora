@@ -101,6 +101,7 @@ function traceChanges(s: ShellState, slot: ParticipantSlot, before: Readonly<Fra
     else if (!f.motion.grounded && before.surface !== undefined) traceParticipant(s, slot, `platform drop deck ${before.surface}`);
   }
   if (before.damage !== f.status.damage) traceParticipant(s, slot, `damage ${R2S(f.status.damage)} hitlag ${f.launch.hitlag} hitstun ${f.launch.hitstun} height ${f.visuals.hitHeight} strength ${f.visuals.hitStrength} clip ${s.runtime.poses[slot].clipIndex ?? -1}`);
+  if (before.damage !== f.status.damage) traceParticipant(s, slot, `launch up ${bit(f.launch.knockbackZ > 0.0)} from-air ${bit(before.surface === undefined)} x ${R2S(f.launch.knockbackX)} z ${R2S(f.launch.knockbackZ)}`);
   const influence = before.di !== f.launch.diSerial ? influenceOperands(f) : undefined;
   if (influence !== undefined) {
 
