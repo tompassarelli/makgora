@@ -40,7 +40,7 @@ import { isIntangible } from "../../game/sim/conditions";
 import { type Roster, fighterAt, isActive } from "../../game/sim/roster";
 import { surfaceCount, surfaceLeft, surfaceMoves, surfaceRight, surfaceZ } from "../../game/sim/stage";
 import { CANNON_Z, SEA_SURFACE_Z, cannonAim, cannonOn, cannonX, hasTide, hasWind } from "../../game/sim/stageHazards";
-import { localParticipantSlot, traceParticipant } from "./diagnostics";
+import { localParticipantSlot, presentedCueTrace, traceParticipant } from "./diagnostics";
 import { colorFighterBody, placeFighterBody, renderDizzy } from "./fighterBody";
 import { concealFighter, concealFighters } from "./fighterCloak";
 import { type ShellState, type StatusFrames, activeRollback, localSlot, playsOnKeyboard } from "./state";
@@ -480,7 +480,7 @@ export function renderPersistentPresentation(s: ShellState): void {
     renderers?.shield.present(fighter, playing);
     renderers?.projectiles.present(fighter, playing, s.session.paused);
     renderers?.cues?.present(fighter, playing, s.session.paused);
-    renderers?.meter?.present(fighter, playing, game.ultimatesOff);
+    renderers?.meter?.present(fighter, playing, game.ultimatesOff, presentedCueTrace(s, slot, runtime.simulationFrame));
     renderers?.hitAreas?.present(live);
   }
   const capture = s.dev.shieldEnergyCapture;
