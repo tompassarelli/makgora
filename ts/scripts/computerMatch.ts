@@ -1,7 +1,7 @@
 import { f32 } from "wisp/src/sim/f32";
 import { clearAttackBuffer } from "../src/game/input/attackBuffer";
 import { PARTICIPANT_SLOTS } from "../src/game/input/participants";
-import { MATCH_TICKS_PER_SECOND, Phase, createMatchState, setParticipants, type MatchState } from "../src/game/lobby/lobbyState";
+import { MATCH_TICKS_PER_SECOND, Phase, createMatchState, setComputerParticipants, type MatchState } from "../src/game/lobby/lobbyState";
 import { produceComputerInput } from "../src/game/match/botPlay";
 import { createFrameControls } from "../src/game/match/controls";
 import { captureFrame, createMatchFrameInput, executeMatchFrame } from "../src/game/match/frameInput";
@@ -31,7 +31,7 @@ export function playComputerMatch(scenario: ComputerMatch, onFrame: (match: Read
   });
   const mask = (1 << characters.length) - 1;
   const match = createMatchState();
-  setParticipants(match, 0, mask);
+  setComputerParticipants(match, mask);
   characters.forEach((character, slot) => { match.characterChoices[slot] = character; });
   match.stageChoice = scenario.stage;
   match.stockCount = scenario.stocks;

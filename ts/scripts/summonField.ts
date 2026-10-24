@@ -7,7 +7,7 @@ import { createFrameControls } from "../src/game/match/controls";
 import { isCpuTier, type CpuTier } from "../src/game/match/cpuProfiles";
 import { captureFrame, createMatchFrameInput, executeMatchFrame } from "../src/game/match/frameInput";
 import { createPacingAndPresentation } from "../src/game/match/pacingAndPresentation";
-import { MATCH_TICKS_PER_SECOND, Phase, createMatchState, setParticipants } from "../src/game/lobby/lobbyState";
+import { MATCH_TICKS_PER_SECOND, Phase, createMatchState, setComputerParticipants } from "../src/game/lobby/lobbyState";
 import { initializeMatchFighters, matchSpawnX } from "../src/game/match/step";
 import type { Character } from "../src/game/sim/codes";
 import { canAttack } from "../src/game/sim/conditions";
@@ -53,7 +53,7 @@ export function playSummonMatch(summon: Summon, foe: Character, tier: CpuTier, s
   if (beastmaster === undefined) throw new Error("no beastmaster");
   const { slot, animal, window } = SUMMONS[summon];
   const match = createMatchState();
-  setParticipants(match, 0, 3);
+  setComputerParticipants(match, 3);
   match.characterChoices[0] = beastmaster;
   match.characterChoices[1] = foe;
   match.stageChoice = STAGE;

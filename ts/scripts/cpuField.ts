@@ -21,7 +21,7 @@ import { PARTICIPANT_SLOTS } from "../src/game/input/participants";
 import { type FrameControls, createFrameControls } from "../src/game/match/controls";
 import { type MatchFrameInput, captureFrame, createMatchFrameInput, executeMatchFrame } from "../src/game/match/frameInput";
 import { type PacingAndPresentation, createPacingAndPresentation } from "../src/game/match/pacingAndPresentation";
-import { MATCH_TICKS_PER_SECOND, type MatchState, Phase, createMatchState, setParticipants } from "../src/game/lobby/lobbyState";
+import { MATCH_TICKS_PER_SECOND, type MatchState, Phase, createMatchState, setComputerParticipants } from "../src/game/lobby/lobbyState";
 import { initializeMatchFighters, matchSpawnX } from "../src/game/match/step";
 import { scheduleMeterDrops } from "../src/game/match/meterDrops";
 import { produceComputerInput } from "../src/game/match/botPlay";
@@ -398,7 +398,7 @@ export function openFieldMatch(a: Character, b: Character, stageName: string, va
 
   if (xs.some((x) => x <= mainDeckLeft(stage) + 40 || x >= mainDeckRight(stage) - 40)) return undefined;
   const match = createMatchState();
-  setParticipants(match, 0, 3);
+  setComputerParticipants(match, 3);
   match.characterChoices[0] = a;
   match.characterChoices[1] = b;
   match.stageChoice = stage;

@@ -182,6 +182,16 @@ export function setParticipants(game: MatchState, humans: number, computers: num
   updateConnectedHumans(game, humans);
 }
 
+export function setComputerParticipants(game: MatchState, computers: number): void {
+  if (!isParticipantMask(computers) || game.phase === Phase.match) return;
+  for (const slot of PARTICIPANT_SLOTS) {
+    game.characterReadiness[slot] = participantActive(computers, slot);
+    game.rematchReadiness[slot] = false;
+  }
+  game.humanFighterMask = 0;
+  game.computerMask = computers;
+}
+
 export function canCycleSlotMode(game: Readonly<MatchState>, actor: number, slot: number): boolean {
   return game.phase === Phase.characterMenu && humanPresent(game, actor) && isParticipantSlot(slot) && (actor === slot || actor === firstHumanSlot(game));
 }
