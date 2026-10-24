@@ -50,6 +50,7 @@ import { type InputTrace, inputTrace } from "./trace";
 import type { UiObjects } from "./ui";
 import type { NativePadCapture } from "./analogPad";
 import type { HiddenFighter } from "./fighterCloak";
+import { type KeyTracker, keyTracker } from "../../platform/osKeys";
 
 
 export interface StageDrifter {
@@ -337,6 +338,7 @@ export interface ShellState {
   readonly probe: ResponseProbe | undefined;
   readonly rollback: Rollback | undefined;
   readonly keyEvents: KeyEvents;
+  readonly localKeys: KeyTracker;
   readyMarkerWritten: boolean;
   restartRequested: boolean;
 
@@ -440,7 +442,7 @@ export function createShellState(build: MapBuild, setup: ShellSetup): ShellState
     trace: inputTrace(build.responseProbe || build.inputProfile === "native-driver" ? 2048 : 256),
     probe: createResponseProbe(build.id),
     rollback: isShadow(input) ? rollback(input, setup.playback, setup.editbox) : undefined,
-    keyEvents: { down: undefined, up: undefined, enabled: true, escapeOnly: false }, readyMarkerWritten: false, restartRequested: false,
+    keyEvents: { down: undefined, up: undefined, enabled: true, escapeOnly: false }, localKeys: keyTracker(), readyMarkerWritten: false, restartRequested: false,
     diagnostic: createReplaySnapshot(), moment: momentSaves(), replay: replayRecording(),
   };
 

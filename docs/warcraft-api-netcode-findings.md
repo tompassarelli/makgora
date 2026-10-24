@@ -1227,3 +1227,60 @@ only fewer frames per turn. The remaining lever is the dropped tap
 (smashcraft#218): a stalled client can send a tap's press and release
 together, and in light-input runs exactly those taps never showed as held
 keys.
+
+## Taps a stalled client never polls (smashcraft#218, 24 October 2026)
+
+Measured on Warcraft III 3.0.0.24268 (Classic, offline LAN pair 2 on gex45,
+Wisp's wall-measured 25 ms turns), integrity build, Rifleman quick match,
+light scripted taps of `c` (attack) for 50–90 ms every 280–520 ms on both
+clients through private-desktop XTEST, 80 s per run. `-dev callback-clock`
+now also records, for the local player and the probe key, every
+synchronized key-down and key-up event with `BlzIsKeyPressed` read inside
+the handler, and every admitted journal row whose pressed mask is set.
+
+**`BlzIsKeyPressed` follows the client's own input pump, not the
+synchronized key event.** In a run without stalls, the raw state rose at a
+callback 3 callbacks (p50 and p90; at most 6) before the key-down event of
+the same tap fired, and the key was already released inside the handler for
+44–53 of 187–192 taps; inside every key-up handler it read released. So a
+tap is lost when the client's pump takes both of its edges before the next
+60 Hz callback, which is what a client stall does; the stalled client then
+sends both key actions at once, which is why the host relayed the lost taps'
+down and up in one turn.
+
+To reproduce stalls on demand, a host-side driver stopped one client's
+Warcraft III process (SIGSTOP, SIGCONT) for 120–250 ms every 0.9–1.6 s,
+alternating clients, about 170 stops per run.
+
+**Fix.** The local player's key-down events are reconciled with the polled
+state (smashcraft:ts/src/platform/osKeys.ts, per client in `ShellState`):
+each rise a poll observes is matched by the key-down event that follows it
+within 240 polls; a key-down event with no observed rise is a press the
+polls missed and is owed. A poll reports one owed press as held when the key
+is up and the previous poll reported it up, so every owed press becomes its
+own pressed row and release row, also when the key is held again when the
+event arrives or several events arrive together. A rise that comes while a
+press is owed takes the owed press (the headless order, where the event
+comes first). Events owe a press only in a running, unpaused rollback match.
+Replaying this rule over the recorded raw states and events of all twelve
+client-runs gives exactly one press per key-down event in each; the first
+version, with one owed slot, dropped one of two events that arrived while
+the key was held (192 events, 191 presses).
+
+| Run | Client | Taps sent | Host one-turn pairs | Pressed rows |
+| --- | --- | --- | --- | --- |
+| before, no stalls | a | 187 | 0 | 187 |
+| before, no stalls | b | 192 (191 reached the host) | 0 | 191 |
+| before, stalls | a | 187 | 55 | 130 |
+| before, stalls | b | 192 | 90 | 99 |
+| after, stalls | a | 187 | 55 | 187 |
+| after, stalls | b | 192 | 50 | 192 |
+| after, no stalls | a | 187 | 0 | 187 |
+| after, no stalls | b | 192 | 0 | 192 |
+
+No run desynced. The headless pair reproduces the loss with Wisp's
+`Lockstep.press`, which sends a key's down and up before the next callback
+(headless key state follows the event, the opposite order to native): 12
+attack taps in a two-human rollback match on keyboard input gave 0 pressed
+rows before the fix and 12 after; 5-frame and 1-frame holds alternating with
+taps also gave 12.

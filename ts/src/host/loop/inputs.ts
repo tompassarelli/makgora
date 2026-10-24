@@ -12,7 +12,7 @@ import { humanFighterActive, humanPresent } from "../../game/lobby/lobbyState";
 import { type ShellState, keepShellMomentEnd, localSlot } from "./state";
 import { settingsOpen } from "./ui";
 import { ownConfirmedState } from "./confirmedState";
-import { osKeyDown } from "../../platform/osKeys";
+import { beginKeyPoll, osKeyDown, polledKeyDown } from "../../platform/osKeys";
 
 
 export function currentHumanMask(departed: number): number {
@@ -68,6 +68,7 @@ export function controlsAvailable(s: Readonly<ShellState>, slot: ParticipantSlot
 
 
 export function pollLocalKeys(s: Readonly<ShellState>): number {
+  beginKeyPoll(s.localKeys);
   const slot = localSlot();
   if (!isParticipantSlot(slot) || !BlzIsLocalClientActive() || !humanFighterActive(s.game, slot) || (s.chatOpen?.() ?? warcraftChatOpen(s.chatFrame))) return 0;
   const { bindings } = s.participants[slot].bindings;
@@ -78,7 +79,7 @@ export function pollLocalKeys(s: Readonly<ShellState>): number {
       if (key !== undefined && !osKeyDown(key)) menuHeld.splice(index, 1);
     }
   }
-  const pressed = (key: number | undefined) => key !== undefined && !menuHeld?.includes(key) && osKeyDown(key);
+  const pressed = (key: number | undefined) => key !== undefined && !menuHeld?.includes(key) && polledKeyDown(s.localKeys, key);
   let held = 0;
   for (const action of ACTION_ORDER) {
     if (pressed(keyFor(bindings, action, 0)) || pressed(keyFor(bindings, action, 1))) held |= bit(action);
