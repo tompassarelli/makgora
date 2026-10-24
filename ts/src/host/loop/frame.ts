@@ -57,6 +57,7 @@ function observe(before: FrameObservation, fighter: Readonly<Fighter>): void {
   before.dropConsumed = fighter.platform.dropConsumed;
   before.dodgeMoved = before.dodgeMotion > 0;
   before.dodgeMotion = fighter.dodge.airMotionFrames;
+  before.grounded = fighter.motion.grounded;
   before.fastFalling = fighter.motion.fastFalling;
   before.crouching = fighter.motion.crouching;
   before.reflect = fighter.visuals.shieldReflect;
@@ -96,6 +97,7 @@ function traceChanges(s: ShellState, slot: ParticipantSlot, before: Readonly<Fra
   if (before.ledge !== f.ledge.state) traceParticipant(s, slot, `ledge ${f.ledge.state} x ${R2S(f.motion.x)} z ${R2S(f.motion.z)}`);
   if (before.dodgeMoved && before.dodgeMotion === 0 && !f.motion.grounded) traceParticipant(s, slot, `fall gravity z ${R2S(f.motion.z)}`);
   if (!before.fastFalling && f.motion.fastFalling) traceParticipant(s, slot, `fall fast z ${R2S(f.motion.z)}`);
+  if (!before.grounded && f.motion.grounded) traceParticipant(s, slot, `land lag ${f.landing.lag} x ${R2S(f.motion.x)}`);
   if (before.crouching !== f.motion.crouching) traceParticipant(s, slot, `crouch ${bit(f.motion.crouching)}`);
   if (before.jump !== f.jump.serial) traceParticipant(s, slot, `applied jump ${f.jump.serial} double ${bit(f.jump.isDouble)} z ${R2S(f.motion.z)}`);
   if (!before.dropConsumed && f.platform.dropConsumed) {

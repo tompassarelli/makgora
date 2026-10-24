@@ -1,0 +1,20 @@
+# #206: Cairne (a) short-hops toward a standing Mountain King (b) and inputs the down air on his first
+# airborne frame; the clean stomp hits b while Cairne is still in the air, and he lands only after the hit.
+#! chat -dev quick pair Cairne Bloodhoof / Mountain King
+# b dashes in and stops against Cairne.
+40 b stick -1 0
+62 b stick 0 0
+# Short hop drifting forward, down air on the first airborne frame.
+120 a tap B 1
+121 a stick 1 0
+123 a cstick 0 -1
+124 a cstick 0 0
+150 a stick 0 0
+#! expect a 123 applied jump
+#! expect a 123 applied attack
+#! expect b 136 damage 18.000
+#! absent a 120-136 land
+#! expect a 150 land lag 28
+# View held a second: the moment the parity check replays.
+260 a press VIEW
+330 a release VIEW

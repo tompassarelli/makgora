@@ -69,7 +69,7 @@ export const CAIRNE_MOVES: FighterMoves = {
       [AttackStyle.forwardAir]: pose(18, 26, arm(90.0, 90.0)),
       [AttackStyle.backAir]: pose(13, 20, arm(-86.0, 80.0)),
       [AttackStyle.upAir]: pose(10, 18, hurtPart(0.0, 120.0, 0.0, 188.0, 22.0)),
-      [AttackStyle.downAir]: pose(21, 27, arm(10.0, 15.0)),
+      [AttackStyle.downAir]: pose(14, 20, arm(10.0, 15.0)),
       [AttackStyle.grab]: pose(8, 15, arm(96.0, 62.0)),
     },
   },
@@ -103,9 +103,9 @@ export const CAIRNE_MOVES: FighterMoves = {
     [AttackStyle.forwardAir]: heroMove(20, 4, 36, 26, sweep(20, 175.0, [165.0, 110.0, 55.0, 0.0], 15.307236671447754, "kill")),
     [AttackStyle.backAir]: heroMove(15, 4, 30, 22, sweep(15, 155.0, [120.0, 90.0, 60.0, 30.0], 12.890304565429688, "edge", -1)),
     [AttackStyle.upAir]: heroMove(12, 4, 28, 20, [strike(12, 15, c(0.0, 125.0, 0.0, 194.0, 20.0), 10.473372459411621, "launch", 85)]),
-    [AttackStyle.downAir]: heroMove(21, 7, 32, 28, [
-      heroRegion(21, 23, c(0.0, 30.0, 0.0, -80.0, 20.0), cairneHit(18.0, "stompMeteor", 270), cairneHit(18.0, "stompMeteor", 55)),
-      strike(24, 27, c(0.0, 30.0, 0.0, -80.0, 18.0), 12.0, "stompLate", 55),
+    [AttackStyle.downAir]: heroMove(14, 7, 39, 28, [
+      heroRegion(14, 16, c(0.0, 30.0, 0.0, -80.0, 20.0), cairneHit(18.0, "stompMeteor", 270), cairneHit(18.0, "stompMeteor", 55)),
+      strike(17, 20, c(0.0, 30.0, 0.0, -80.0, 18.0), 12.0, "stompLate", 55),
     ]),
     [AttackStyle.grab]: heroMove(10, 3, 31, 0, [heroRegion(10, 12, c(30.0, 65.0, 98.0, 60.0), { damage: 0.0, ...NO_LAUNCH })]),
   },

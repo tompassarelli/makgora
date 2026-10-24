@@ -93,6 +93,7 @@ export interface FrameObservation {
   dropConsumed: boolean;
   dodgeMotion: number;
   dodgeMoved: boolean;
+  grounded: boolean;
   fastFalling: boolean;
   crouching: boolean;
   reflect: number;
@@ -371,7 +372,7 @@ export function shell(): ShellState {
 }
 
 function observation(): FrameObservation {
-  return { out: false, holding: false, actionable: false, attack: 0, jump: 0, down: 0, shieldBreak: 0, breakState: 0, ledge: 0, special: 0, grab: 0, di: 0, damage: 0, form: 0, ground: 0, facing: 0, shieldRaised: false, shieldTiltX: 0.0, shieldTiltZ: 0.0, groundSpeed: 0.0, surface: undefined, dropConsumed: false, dodgeMotion: 0, dodgeMoved: false, fastFalling: false, crouching: false, reflect: 0, projectileLives: [] };
+  return { out: false, holding: false, actionable: false, attack: 0, jump: 0, down: 0, shieldBreak: 0, breakState: 0, ledge: 0, special: 0, grab: 0, di: 0, damage: 0, form: 0, ground: 0, facing: 0, shieldRaised: false, shieldTiltX: 0.0, shieldTiltZ: 0.0, groundSpeed: 0.0, surface: undefined, dropConsumed: false, dodgeMotion: 0, dodgeMoved: false, grounded: false, fastFalling: false, crouching: false, reflect: 0, projectileLives: [] };
 }
 
 function participant(slot: ParticipantSlot, persistence: BindingPersistence): Participant {
