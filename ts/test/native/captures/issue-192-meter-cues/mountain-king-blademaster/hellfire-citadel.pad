@@ -2,7 +2,7 @@
 # (LB + X: Strong + Special) and b (blademaster) its ultimate (A + X: Attack + Special), on the same frames, held before either can hit at gameplay zoom.
 #! chat -dev setup quick stage 14 pair mountain king / blademaster;meter 100
 #! cue 0-50 flame: effect=ImmolationRedTarget
-#! cue 60-63 ex: sound=DivineShield effect=DivineShieldTarget
+#! cue 60-63 ex: sound=DivineShield effect=TomeOfRetrainingCaster
 #! cue 61-63 ultimate: sound=FlameStrike effect=DoomDeath
 50 a capture
 60 a press LB

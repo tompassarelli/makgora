@@ -10,7 +10,7 @@ export interface MeterCue extends Cue {
   readonly lift: number;
 }
 
-export const EX_AURA: MeterCue = { model: "Abilities\\Spells\\Human\\DivineShield\\DivineShieldTarget.mdx", anchor: "feet", scale: 1.0, lift: 0.0, sequence: "birth", sound: "DivineShield" };
+export const EX_AURA: MeterCue = { model: "Abilities\\Spells\\Items\\TomeOfRetraining\\TomeOfRetrainingCaster.mdx", anchor: "feet", scale: 1.0, lift: 0.0, sequence: "birth", sound: "DivineShield" };
 export const SUPER_AURA: MeterCue = { model: "Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedTarget.mdx", anchor: "feet", scale: 1.0, lift: f32(0.15), sequence: "stand" };
 export const ULTIMATE_BURST: MeterCue = { model: "Abilities\\Spells\\Other\\Doom\\DoomDeath.mdx", anchor: "feet", scale: f32(0.4), lift: 0.0, sequence: "birth", sound: "FlameStrike" };
 export const METER_CUES: readonly MeterCue[] = [EX_AURA, SUPER_AURA, ULTIMATE_BURST];
