@@ -102,6 +102,14 @@ export function reflectedProjectileModels(character: Character): readonly string
 }
 
 
+/** Opponents' reflectable projectile models a fighter's renderer has no pool for yet, each once. */
+export function opponentReflectedModels(opponents: readonly Character[], taken: readonly string[]): string[] {
+  const models: string[] = [];
+  for (const opponent of opponents) for (const path of reflectedProjectileModels(opponent)) if (!taken.includes(path) && !models.includes(path)) models.push(path);
+  return models;
+}
+
+
 export function ultimateProjectiles(character: Character): readonly SpecialProjectile[] {
   const specs: SpecialProjectile[] = [];
   formProjectiles(FIGHTER_ULTIMATES[character], specs);

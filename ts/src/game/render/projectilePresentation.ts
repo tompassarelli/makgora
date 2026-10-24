@@ -9,7 +9,7 @@ import { heroDefinition } from "../sim/heroes/registry";
 import { HERO_PROJECTILE_CAP } from "../sim/specials/engine";
 import { f32 } from "wisp/src/sim/f32";
 import { PARKED_CUE_TIME_SCALE, type ParkedFlags, type WorldOrigin, parkCue } from "./effects";
-import { PROJECTILE_DRAW_CUES, PROJECTILE_DRAW_OFFSETS, fighterProjectileModels, projectileModelOf, reflectedProjectileModels, restartsStationaryField, ultimateProjectiles } from "../presentation/projectileArt";
+import { PROJECTILE_DRAW_CUES, PROJECTILE_DRAW_OFFSETS, fighterProjectileModels, opponentReflectedModels, projectileModelOf, restartsStationaryField, ultimateProjectiles } from "../presentation/projectileArt";
 import { projectedProjectile } from "../presentation/projectilePose";
 import { IMPACT_DEFILE_MODEL } from "../assets/impactAssetInfo";
 import { heroProjectileArt } from "../presentation/projectileArt";
@@ -17,6 +17,7 @@ import { carrierDrawsMark } from "../presentation/ultimateVoice";
 import { ARENA_CAMERA } from "../presentation/arenaCamera";
 import { cosineTurns, sineTurns } from "../sim/mathTables";
 import { tintProjectile } from "./projectileTint";
+import { addPoolEffect, addPoolEffects } from "./projectilePoolEffects";
 
 export const STATIONARY_PARTICLE_MODELS = [
   "Abilities\\Spells\\Human\\Blizzard\\BlizzardTarget.mdx",
@@ -121,7 +122,7 @@ export class ProjectilePresentation {
       const drawn = trail ? IMPACT_DEFILE_MODEL : path;
       const groundPool = (specials !== undefined && heroProjectileArt(specials).some(({ spec }) => spec.model === path && spec.pool !== undefined && spec.pool.growth > 0.0)) || PROJECTILE_DRAW_OFFSETS[drawn]?.disc !== undefined;
       for (let slot = 0; slot < size; slot++) {
-        effects.push(this.addEffect(drawn));
+        effects.push(addPoolEffect(this.models, this.visible, drawn, this.origin));
         const crowd: number[] = [];
         if (character === Character.lichKing && path.includes("ImpaleHitTarget")) {
           for (let layer = 0; layer <= RAISED_LAYOUT.length; layer++) {
@@ -150,33 +151,11 @@ export class ProjectilePresentation {
       }
       this.pools.push({ path, drawn, defile: defilePool, effects, boundaries, raised });
     });
-    const taken = this.pools.map((pool) => pool.path);
-    for (const opponent of opponents) {
-      for (const path of reflectedProjectileModels(opponent)) {
-        if (taken.includes(path)) continue;
-        taken.push(path);
-        const effects: number[] = [];
-        for (let slot = 0; slot <= HERO_PROJECTILE_CAP; slot++) effects.push(this.addEffect(path));
-        this.pools.push({ path, drawn: path, defile: false, effects, boundaries: [], raised: [] });
-      }
-    }
+    for (const path of opponentReflectedModels(opponents, this.pools.map((pool) => pool.path))) this.pools.push({ path, drawn: path, defile: false, effects: addPoolEffects(this.models, this.visible, path, this.origin, HERO_PROJECTILE_CAP + 1), boundaries: [], raised: [] });
     for (let index = 0; index < PROJECTILE_CAPACITY; index++) this.assigned.push(-1);
     this.clear();
   }
 
-
-  private addEffect(drawn: string): number {
-    const index = this.models.length;
-    const model = AddSpecialEffect(drawn, this.origin.x, this.origin.y);
-    this.models.push(model);
-    const draw = PROJECTILE_DRAW_OFFSETS[drawn];
-    if (draw?.sequence !== undefined) {
-      BlzSetSpecialEffectAnimation(model, draw.sequence);
-      BlzSetSpecialEffectTime(model, draw.seconds ?? 0.0);
-    }
-    this.visible.push(false);
-    return index;
-  }
 
   private hide(model: effect, parked: ParkedFlags, index: number): void {
     parkCue(model, this.origin, parked, index);
