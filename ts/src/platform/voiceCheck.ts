@@ -6,6 +6,7 @@ import { at } from "wisp/src/runtime/lookup";
 import { writeLines } from "wisp/src/platform/fileio";
 import { startQuickMatch } from "../host/loop/menus";
 import { paintDrawnStamp } from "../host/loop/drawnStamp";
+import { presentedFrame } from "../host/loop/presentedMatch";
 import { type ShellState } from "../host/loop/state";
 import { type SoundPlayed, installTickProbe } from "../host/loop/tickProbe";
 
@@ -57,7 +58,7 @@ function voicePlayed(frame: number, fighter: number): SoundPlayed | undefined {
 function afterVoiceCheckTick(s: ShellState): void {
   const check = globalThis.__smashcraftVoiceCheck;
   if (check === undefined || !check.started || check.written) return;
-  const drawn = s.runtime.simulationFrame;
+  const drawn = presentedFrame(s);
   for (const line of check.pending) check.lines.push(`${drawn} ${line}`);
   check.pending.length = 0;
   if (s.game.phase === Phase.match) {

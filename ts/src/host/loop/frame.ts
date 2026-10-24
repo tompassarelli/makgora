@@ -17,7 +17,8 @@ import { influenceOperands } from "../../game/sim/knockback";
 import { canonicalReal } from "../../game/replay/canonical";
 import type { Fighter } from "../../game/sim/fighter";
 import { projectileModelOf } from "../../game/presentation/projectileArt";
-import { fighterAt, isActive } from "../../game/sim/roster";
+import { type Roster, fighterAt, isActive } from "../../game/sim/roster";
+import type { PacingAndPresentation } from "../../game/match/pacingAndPresentation";
 import { traceFrameInput, traceParticipant } from "./diagnostics";
 import { confirmModelSounds } from "../../game/render/modelSounds";
 import { type FrameObservation, type ShellState, activeRollback, localSlot } from "./state";
@@ -202,6 +203,14 @@ export function applyFrame(s: ShellState, recorded = false): void {
   ui.match.beginResults(resultsView(s.game, world, ui.match.tally), call === undefined ? 0 : RESULTS_DELAY_FRAMES);
   writeMatchRecord(s);
   setStatus(s, resultMessage(s.game), LASTING);
+}
+
+
+export function presentPredictedHits(s: ShellState, frame: number, world: Readonly<Roster>, runtime: Readonly<PacingAndPresentation>): void {
+  // Presentation only: a predicted sound never feeds the simulation, a snapshot or a checksum.
+  if (s.build.presentation !== "pool-predicted" || s.trace.active || s.game.phase !== Phase.match) return;
+  const ui = views(s);
+  for (const slot of PARTICIPANT_SLOTS) if (isActive(world, slot)) ui.combat.presentPredicted(frame, slot, runtime.frameImpacts[slot], probedSound(frame, slot));
 }
 
 

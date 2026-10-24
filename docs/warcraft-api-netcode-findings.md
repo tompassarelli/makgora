@@ -574,6 +574,34 @@ In that session such a press of A's, made while B's game was stopped,
 started 66 callbacks after capture, and #26's re-run had one at 5 that
 waited for A's rows.
 
+## Hit sounds on predicted frames (smashcraft#30, 24 October 2026)
+
+The playable build draws the speculative match, but sounds started only on
+confirmed frames, and the local input delay of 2 keeps confirmation a frame
+or two behind even with no remote player. A native voice check on main
+fb77ff639 heard 124 of 238 hit sounds on the drawn hitstop frame, 76 one
+frame late and 38 two late. A hit sound (the hit voice class) now starts as
+the speculative frame that lands the hit runs, and the confirmed frame and any
+re-run of that frame skip it by the fighter, frame and hit, shield and special
+serials (smashcraft:ts/src/game/render/combatEffects.ts, `presentPredicted`).
+Movement, special and KO sounds still start on confirmed frames, and the
+voice cap, priority and ducking are unchanged.
+
+A rollback that erases a predicted hit does not cut its sound: rollback
+fighting games keep sounds that already started, and a wrong sound is rarer
+than a late one, since prediction misses only when a remote input changed.
+A hit that first appears in a rollback's replayed frame still sounds on
+its confirmed frame. The decision is presentation only: it never reaches the
+simulation, a snapshot or a checksum.
+
+A headless Lua32 run of the playable build with four Expert computers, one
+client and a 25 ms local turn (confirmation one or two frames behind) started
+202 of 202 hit sounds on the callback that first drew their frame; before the
+change 189 started one callback late and 13 two late. With a second client
+playing over measured Battle.net delivery (392 corrections, deepest 17
+frames), 160 of 162 started on that callback, none twice, and the two late
+ones were hits first produced by a replayed frame.
+
 ## Game clock against real time — 24 October
 
 Warcraft's game clock loses real time in steps that double at power-of-two game

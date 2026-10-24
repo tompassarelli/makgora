@@ -73,9 +73,13 @@ small where pitch carries the tier.
 **Rollback.** Audio is "a particularly difficult problem in rollback games"
 [23]; SFxT lost sounds whose trigger frames were skipped [24]. Skullgirls writes
 only a desired sound state and syncs real playback on non-rollback frames [25].
-Smashcraft is simpler: presentation plays sounds only from confirmed frames, so
-a rollback never replays or loses one (smashcraft:ts/src/game/render/combatEffects.ts,
-`presentConfirmed`).
+Smashcraft starts a hit sound (the hit voice class) on the first speculative
+frame that runs its hit, so it sounds on the callback that draws the hitstop,
+and every other sound on its confirmed frame. Each early start is keyed by the
+fighter, frame and hit, shield and special serials, so the confirmed frame and a
+re-run of the same frame never start it again; a rollback that erases the hit
+does not cut it (smashcraft:ts/src/game/render/combatEffects.ts,
+`presentPredicted`, `presentConfirmed`; #30).
 
 Not verified: per-element sound allocation by tier in Melee, SF6 and Rivals 2
 sound or rollback-audio specifics, stereo panning rules, and loudness numbers

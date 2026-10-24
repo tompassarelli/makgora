@@ -26,7 +26,7 @@ import { pacedStop, resetPauseBarrier, settlePace, stopFrame } from "../../game/
 import { confirmedBudget, keyboardCatchesUp, repairBudget, speculativeBudget } from "../../game/session/playback";
 import { wholeRepairCost } from "../../game/replay/history";
 import { queueLocalRows } from "../../game/session/localInput";
-import { applyFrame } from "./frame";
+import { applyFrame, presentPredictedHits } from "./frame";
 import { ownConfirmedState } from "./confirmedState";
 import { noteCallbackClockRow } from "./callbackClock";
 import { pollLocalKeys } from "./inputs";
@@ -262,6 +262,7 @@ function observeSpeculativeFrame(frame: number, local: Readonly<InputRow>): void
   const s = shell();
   holdPresentedCapture(s);
   const rollback = s.rollback;
+  if (rollback !== undefined) presentPredictedHits(s, frame, rollback.speculative.world, rollback.speculative.runtime);
   const slot = localSlot();
   if (rollback === undefined || !isParticipantSlot(slot) || !probeRecording(s.probe)) return;
   const { epoch, schedule } = rollback;
