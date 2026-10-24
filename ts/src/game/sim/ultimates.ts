@@ -170,8 +170,8 @@ const SHADOW_HUNTER: AuthoredSpecial = {
   placement: {
     frame: VOODOO_WARD_FRAME, slot: 1, offsetX: 140.0, radius: 30.0, height: 130.0, durability: 1.0, life: VOODOO_END - VOODOO_WARD_FRAME + 1,
     fireAges: [7, 22, 37, 52], outwardPair: true, channeled: true,
-    shot: voodooBolt(hit(4.0, 40, 20.0, 30.0, HitElement.poison)),
-    finalShot: voodooBolt(hit(8.0, 45, 85.0, 45.0, HitElement.poison)),
+    shot: voodooBolt(hit(5.0, 40, 20.0, 30.0, HitElement.poison)),
+    finalShot: voodooBolt(hit(12.0, 45, 90.0, 60.0, HitElement.poison)),
     mark: { ...mark(VOODOO_WARD_MARK, 0, VOODOO_END - VOODOO_WARD_FRAME, 0.0), cancelOnInterrupt: true },
   },
 };
