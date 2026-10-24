@@ -96,6 +96,11 @@ of the newest tip. A sha is built once, even after a failure or a restart
 (`~/.local/state/smashcraft/tom-build/attempted`). A new build gets a new
 `Smashcraft X.Y.Z-dev abc1234` file in dev/ and replaces the previous build and any
 lane build there; releases/ is left alone.
+While Warcraft III runs in Tom's prefix the watcher builds nothing, and a
+build that finishes while it runs is not copied; that sha stays unattempted, so
+it builds and installs once the game closes. Each install writes the same
+playtest notes as `bun wisp play --install-green`
+(smashcraft:docs/commands/play.md).
 
 Each install is held to two speed budgets: the build within 20 s and the
 landed commit installed in Maps within 360 s. An install over either opens or

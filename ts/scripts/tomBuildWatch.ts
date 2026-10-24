@@ -1,16 +1,18 @@
-import { appendFileSync, existsSync, mkdirSync, readFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
-import { dirname, join } from "node:path";
+import { basename, dirname, join } from "node:path";
 import { BunRuntime, BunServices } from "@effect/platform-bun";
 import { Clock, type Duration, Effect } from "effect";
 import { ChildProcess, type ChildProcessSpawner } from "effect/process";
 import { PlayProblem } from "wisp/scripts/wisp/play";
 import { runProcess } from "./hostProcess";
-import { installPlaytest } from "./playtestBuild";
 import { type LandingDecision, buildLabel, costPrediction } from "./wisp/greenBuilds";
 import { writePlaytestChecklist } from "./wisp/playtestChecklist";
-import { TOM_EDITION } from "./wisp/currentPlaytest";
-import { projectRoot } from "./wisp/project";
+import { TOM_EDITION, currentPlaytest } from "./wisp/currentPlaytest";
+import { installLatest, library } from "./wisp/mapLibrary";
+import { PLAYTEST_PREFIX, projectRoot } from "./wisp/project";
+import { clientHold } from "./wisp/runningGames";
+import { documentsFolder } from "wisp/scripts/warcraft/battleNet";
 
 export const TOM_BUILD_LOG = join(homedir(), ".local/state/agents/handoffs/tom-build.log");
 export const TOM_BUILD_ATTEMPTS = join(homedir(), ".local/state/smashcraft/tom-build/attempted");
@@ -27,6 +29,11 @@ export const budgetProblem = (buildMillis: number, landToInstalledMillis: number
   return over.length === 0 ? undefined : over.join("; ");
 };
 
+export interface Built {
+  readonly version: string;
+  readonly source: string;
+}
+
 export interface Installed {
   readonly version: string;
   readonly path: string;
@@ -36,7 +43,9 @@ export interface WatchSteps<R> {
   readonly tip: (previous: string | undefined) => Effect.Effect<string | undefined, PlayProblem, R>;
   readonly decision: (sha: string) => Effect.Effect<LandingDecision, PlayProblem, R>;
   readonly landedAt: (sha: string) => Effect.Effect<number, PlayProblem, R>;
-  readonly build: (sha: string) => Effect.Effect<Installed, PlayProblem, R>;
+  readonly held: Effect.Effect<string | undefined, PlayProblem, R>;
+  readonly build: (sha: string) => Effect.Effect<Built, PlayProblem, R>;
+  readonly install: (built: Built) => Effect.Effect<Installed, PlayProblem, R>;
   readonly notes: (version: string, sha: string, previous: string | undefined) => Effect.Effect<string, PlayProblem, R>;
   readonly budget: (sha: string, problem: string | undefined) => Effect.Effect<void, never, R>;
 }
@@ -59,6 +68,11 @@ const append = (path: string, line: string) => Effect.try({
   catch: (cause) => new PlayProblem({ problem: `can't write ${path}: ${String(cause)}` }),
 });
 
+const forget = (path: string, sha: string) => Effect.try({
+  try: () => writeFileSync(path, lines(path).filter((line) => line !== sha).map((line) => `${line}\n`).join("")),
+  catch: (cause) => new PlayProblem({ problem: `can't write ${path}: ${String(cause)}` }),
+});
+
 export const buildLine = (finished: number, sha: string, { version, path }: Installed, buildMillis: number, landToInstalledMillis: number) =>
   `${new Date(finished).toISOString()} ${sha} ${version.replaceAll(" ", "-")} ${(buildMillis / 1000).toFixed(1)} ${(landToInstalledMillis / 1000).toFixed(1)} ${path}`;
 
@@ -66,12 +80,20 @@ export const watchOnce = <R>(steps: WatchSteps<R>, files: WatchFiles) => Effect.
   const previous = lines(files.log).at(-1)?.split(" ")[1];
   const sha = yield* steps.tip(previous);
   if (sha === undefined || attemptedShas(files).has(sha)) return undefined;
+  if ((yield* steps.held) !== undefined) return undefined;
   const decision = yield* steps.decision(sha);
   if (decision === "wait") return undefined;
   yield* append(files.attempts, sha);
   if (decision === "red") return undefined;
   const started = yield* Clock.currentTimeMillis;
-  const installed = yield* steps.build(sha);
+  const built = yield* steps.build(sha);
+  const late = yield* steps.held;
+  if (late !== undefined) {
+    yield* forget(files.attempts, sha);
+    console.log(`Held ${sha.slice(0, 7)}: ${late}`);
+    return undefined;
+  }
+  const installed = yield* steps.install(built);
   const finished = yield* Clock.currentTimeMillis;
   const landed = yield* steps.landedAt(sha);
   const line = buildLine(finished, sha, installed, finished - started, finished - landed);
@@ -120,10 +142,19 @@ export const hostSteps = (predictCost: boolean): WatchSteps<ChildProcessSpawner.
   }),
   decision: () => Effect.succeed("build"),
   landedAt: (sha) => git("show", "-s", "--format=%ct", sha).pipe(Effect.map((seconds) => Number(seconds) * 1000)),
-  build: (sha) => installPlaytest(sha, predictCost, false, TOM_EDITION).pipe(Effect.flatMap(({ file, installed }) => {
+  held: clientHold(documentsFolder(PLAYTEST_PREFIX)),
+  build: (sha) => currentPlaytest({ revision: sha, predictCost, helper: false, edition: TOM_EDITION }).pipe(Effect.flatMap(({ map: { file, source } }) => {
     const version = buildLabel(file);
-    return version === undefined ? Effect.fail(new PlayProblem({ problem: `not a playable map: ${file}` })) : Effect.succeed({ version, path: installed });
+    return version === undefined ? Effect.fail(new PlayProblem({ problem: `not a playable map: ${file}` })) : Effect.succeed({ version, source });
   })),
+  install: ({ version, source }) => Effect.try({
+    try: () => {
+      const documents = documentsFolder(PLAYTEST_PREFIX);
+      installLatest(documents, source);
+      return { version, path: join(library(documents), basename(source)) };
+    },
+    catch: (cause) => new PlayProblem({ problem: String(cause) }),
+  }),
   notes: writePlaytestChecklist,
   budget: (sha, problem) => reportBudget(sha, problem).pipe(
     Effect.catch(({ problem: failure }) => Effect.sync(() => console.error(`Speed budget not reported: ${failure}`))),

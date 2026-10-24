@@ -8,7 +8,8 @@ Classic playable map (the edition Tom plays, about 47 MB; `wisp play` keeps the
 private full HD build) with the play build path, without the optional controller helper,
 and installs it under Maps/00-Smashcraft (smashcraft:docs/play.md); `wisp play`
 builds the helper when Tom starts a controller session. Commits that land during a build
-are skipped for the newest tip. Between landings it only fetches.
+are skipped for the newest tip. Between landings it only fetches. While Warcraft III
+runs in Tom's prefix it builds nothing and copies nothing (smashcraft:docs/play.md).
 
 To install and start the unit:
 

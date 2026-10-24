@@ -9,10 +9,11 @@ import { PlayProblem } from "wisp/scripts/wisp/play";
 import { runProcess } from "../hostProcess";
 import { currentPlaytest, playName } from "./currentPlaytest";
 import { SMASHCRAFT_ACCEPT } from "./acceptChecks";
-import { GREEN_GATE_LOOKS, greenGateFailures, type GreenGateReport, type Candidate, type RunSummary, buildLabel, farmVerdict, isGreen, parseInstalled, pickGreen, verdictOf } from "./greenBuilds";
+import { GREEN_GATE_LOOKS, greenGateFailures, type GreenGateReport, type Candidate, type RunSummary, buildLabel, farmVerdict, greenStep, isGreen, parseInstalled, verdictOf } from "./greenBuilds";
 import { installLatest, installedMaps } from "./mapLibrary";
 import { checklistPath, writePlaytestChecklist } from "./playtestChecklist";
 import { projectRoot } from "./project";
+import { clientHold } from "./runningGames";
 
 const COMMITS_CONSIDERED = 20;
 const FARM_RUNS_LISTED = 200;
@@ -56,6 +57,19 @@ const runs = (args: readonly string[]) => host("gh", ["run", "list", ...args, "-
   Effect.flatMap((text) => decodeRuns(text).pipe(Effect.mapError(problem))),
 );
 
+const writeStatus = (stateDirectory: string, status: object) => Effect.try({
+  try: () => {
+    mkdirSync(stateDirectory, { recursive: true, mode: 0o700 });
+    const file = join(stateDirectory, "status.json");
+    const staged = `${file}.${process.pid}.next`;
+    writeFileSync(staged, `${JSON.stringify(status, null, 2)}\n`, { mode: 0o600 });
+    renameSync(staged, file);
+  }, catch: (cause) => new PlayProblem({ problem: String(cause) }),
+});
+
+const hold = (revision: string, reason: string, stateDirectory = greenState) =>
+  writeStatus(stateDirectory, { revision, state: "held-running-client", reason }).pipe(Effect.map(() => console.log(`Held ${revision.slice(0, 7)}: ${reason}`)));
+
 const summary = ({ status, conclusion, createdAt }: RunSummary): RunSummary => ({ status, conclusion, createdAt });
 
 function installedBuilds(documents: string) {
@@ -87,17 +101,9 @@ export const installAcceptedGreen = (documents: string, map: string, revision: s
     }
   }
   const failures = [...unreadable, ...greenGateFailures(mapSha256, declared, reports)];
-  yield* Effect.try({
-    try: () => {
-      mkdirSync(stateDirectory, { recursive: true, mode: 0o700 });
-      const status = join(stateDirectory, "status.json");
-      const staged = `${status}.${process.pid}.next`;
-      writeFileSync(staged, `${JSON.stringify({ revision, candidate: map, candidateMapSha256: mapSha256,
-        state: failures.length === 0 ? "accepted" : !enforce ? "installed-unverified" : unreadable.length > 0 ? "pending-native" : "blocked", failures,
-        acceptanceDirectory: join(stateDirectory, "accept", mapSha256) }, null, 2)}\n`, { mode: 0o600 });
-      renameSync(staged, status);
-    }, catch: (cause) => new PlayProblem({ problem: String(cause) }),
-  });
+  yield* writeStatus(stateDirectory, { revision, candidate: map, candidateMapSha256: mapSha256,
+    state: failures.length === 0 ? "accepted" : !enforce ? "installed-unverified" : unreadable.length > 0 ? "pending-native" : "blocked", failures,
+    acceptanceDirectory: join(stateDirectory, "accept", mapSha256) });
   if (enforce && failures.length > 0) return yield* new PlayProblem({ problem: `Kept last good installed map: ${failures.map(({ look, id, reason }) => `${look} ${id}: ${reason}`).join("; ")}; status ${join(stateDirectory, "status.json")}` });
   yield* Effect.try({ try: () => installLatest(documents, map), catch: (cause) => new PlayProblem({ problem: String(cause) }) });
 });
@@ -133,33 +139,39 @@ export const greenMain = Effect.gen(function*() {
   return considered;
 });
 
-export const installGreen = (documents: string, dryRun = false) => Effect.gen(function*() {
+export const installGreen = <E, R>(documents: string, dryRun: boolean, controller: Effect.Effect<string, E, R>) => Effect.gen(function*() {
   const considered = yield* greenMain;
 
   const installed = installedCommits(documents);
-  const pick = pickGreen(considered, installed);
+  const step = greenStep(considered, installed, yield* clientHold(documents));
   if (dryRun) {
-    console.log(`Dry run: newest green main ${considered.find(isGreen)?.sha ?? "none"}; ${pick === undefined ? "no install (already installed, newer installed, or no green commit)" : `would stage ${pick.sha}; install requires exact candidate gate-* PASS in Classic`}`);
-    if (pick !== undefined) console.log(`Dry run: would write playtest checklist ${checklistPath(buildLabel(`${yield* playName(pick.sha)}.w3x`) ?? pick.sha)} for ${previousInstalled(documents) ?? `${pick.sha.slice(0, 7)}^`}..${pick.sha.slice(0, 7)}`);
+    console.log(`Dry run: newest green main ${considered.find(isGreen)?.sha ?? "none"}; ${step.kind === "none" ? "no install (already installed, newer installed, or no green commit)" : step.kind === "hold" ? `would hold ${step.candidate.sha}: ${step.reason}` : `would stage ${step.candidate.sha}; install requires exact candidate gate-* PASS in Classic`}`);
+    if (step.kind === "install") console.log(`Dry run: would write playtest notes ${checklistPath(buildLabel(`${yield* playName(step.candidate.sha)}.w3x`) ?? step.candidate.sha)} for ${previousInstalled(documents) ?? `${step.candidate.sha.slice(0, 7)}^`}..${step.candidate.sha.slice(0, 7)}`);
     return;
   }
 
-  if (pick === undefined) {
-    console.log(considered.some(({ ci, farm }) => ci === "success" && farm === "success")
+  if (step.kind === "none") {
+    console.log(considered.some(isGreen)
       ? "The newest green commit on main is already installed (or an installed build is newer)"
       : `No green commit among the newest ${considered.length} on main (${considered.map(({ sha, ci, farm }) => `${sha.slice(0, 7)} ci ${ci} farm ${farm}`).join("; ")})`);
     return;
   }
+  if (step.kind === "hold") return yield* hold(step.candidate.sha, step.reason);
 
+  const pick = step.candidate;
   const previous = previousInstalled(documents);
   const { map } = yield* currentPlaytest({ revision: pick.sha, helper: false });
+  const late = greenStep([pick], installedCommits(documents), yield* clientHold(documents));
+  if (late.kind === "hold") return yield* hold(pick.sha, late.reason);
+  if (late.kind === "none") return console.log(`${pick.sha.slice(0, 7)} was installed while it built`);
+  console.log(`Controller helper: ${yield* controller}`);
   yield* installAcceptedGreen(documents, map.source, pick.sha, SMASHCRAFT_ACCEPT.checks.filter(({ id }) => id.startsWith("gate-")).map(({ id }) => id));
   console.log(`Installed ${map.title} under Maps/${map.folder}`);
   const label = buildLabel(map.file);
   if (label !== undefined) {
     yield* writePlaytestChecklist(label, pick.sha, previous).pipe(
-      Effect.map((path) => console.log(`Playtest checklist ${path}`)),
-      Effect.catch(({ problem }) => Effect.sync(() => console.warn(`Playtest checklist not written: ${problem}`))),
+      Effect.map((path) => console.log(`Playtest notes ${path}`)),
+      Effect.catch(({ problem }) => Effect.sync(() => console.warn(`Playtest notes not written: ${problem}`))),
     );
   }
 }).pipe(Effect.provide(BunServices.layer));

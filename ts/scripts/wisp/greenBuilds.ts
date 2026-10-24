@@ -75,6 +75,18 @@ export function pickGreen(commits: readonly Candidate[], installed: readonly str
   return commits[index];
 }
 
+export type GreenStep =
+  | { readonly kind: "install"; readonly candidate: Candidate }
+  | { readonly kind: "hold"; readonly candidate: Candidate; readonly reason: string }
+  | { readonly kind: "none" };
+
+export function greenStep(commits: readonly Candidate[], installed: readonly string[], hold: string | undefined): GreenStep {
+  const candidate = pickGreen(commits, installed);
+  if (candidate === undefined) return { kind: "none" };
+  if (hold !== undefined) return { kind: "hold", candidate, reason: hold };
+  return { kind: "install", candidate };
+}
+
 export const GREEN_GATE_CHECKS: readonly string[] = [
   "gate-cursor-visible", "gate-start-anywhere", "gate-bindings", ...smokeShardIds(),
 ];

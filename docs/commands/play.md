@@ -37,7 +37,15 @@
   installed build. Plato reads the candidate and failing check ids/reasons in
   `~/.local/state/smashcraft/green-builds/status.json`.
   A red, pending or missing CI/farm run is never built, and an older green
-  commit never replaces a newer installed build. The systemd user service
+  commit never replaces a newer installed build. While Warcraft III runs in
+  Tom's prefix, the install holds: it builds nothing, leaves the controller
+  service and Maps/00-Smashcraft as they are, and status.json reads
+  `held-running-client`; it checks again after building. It never signs in or
+  reads account a's secrets. Each install writes playtest notes,
+  `~/.local/state/agents/handoffs/playtest-VERSION.md`, listing only the
+  unticked boxes whose leading label names Tom, such as `(Tom)`, on the open
+  issues the commits since the previous installed build refer to; a failed issue
+  fetch writes no notes rather than an empty list. The systemd user service
   (smashcraft:tools/green-builds/) has no timer; it runs only when queued on
   the laptop's ledger runner. It consumes native reports; it has no route to
   dispatch remote Classic.

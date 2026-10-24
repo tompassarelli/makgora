@@ -255,8 +255,7 @@ export const play: Command = (args) => Effect.gen(function*() {
   }
   if (args.includes("--install-green")) {
     const { installGreen } = yield* Effect.tryPromise({ try: () => import("../installGreen"), catch: (cause) => new PlayProblem({ problem: String(cause) }) });
-    if (!args.includes("--dry-run")) console.log(`Controller helper: ${yield* optionalController()}`);
-    return yield* installGreen(documentsFolder(PLAYTEST_PREFIX), args.includes("--dry-run"));
+    return yield* installGreen(documentsFolder(PLAYTEST_PREFIX), args.includes("--dry-run"), optionalController());
   }
   yield* signInTom;
   const current = yield* currentPlaytest();
