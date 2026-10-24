@@ -158,22 +158,16 @@ const DREADLORD: AuthoredSpecial = {
   placement: INFERNAL_PLACEMENT,
 };
 
-const VOODOO_AURA = "Abilities\\Spells\\Orc\\Voodoo\\VoodooAura.mdx";
-const VOODOO_WARD_MARK = "Abilities\\Spells\\Orc\\Voodoo\\VoodooAuraTarget.mdx";
-const VOODOO_BOLT = "Abilities\\Weapons\\SerpentWardMissile\\SerpentWardMissile.mdx";
-const VOODOO_END = 105;
-const VOODOO_WARD_FRAME = 16;
-const voodooBolt = (effect: HitEffect): SpecialProjectile => ({ ...shot(0, 30.0, 50.0, 14.0, 0.0, 24, 26.0, effect, VOODOO_BOLT), modelRadius: 13.0 });
+const VOODOO_PULSES = [30, 50, 70] as const;
 const SHADOW_HUNTER: AuthoredSpecial = {
-  name: "Big Bad Voodoo", endFrame: VOODOO_END,
-  projectiles: [{ ...mark(VOODOO_AURA, 2, VOODOO_END - 2, 0.0), cancelOnInterrupt: true }],
-  placement: {
-    frame: VOODOO_WARD_FRAME, slot: 1, offsetX: 140.0, radius: 30.0, height: 130.0, durability: 1.0, life: VOODOO_END - VOODOO_WARD_FRAME + 1,
-    fireAges: [7, 22, 37, 52], outwardPair: true, channeled: true,
-    shot: voodooBolt(hit(4.0, 40, 20.0, 30.0, HitElement.poison)),
-    finalShot: voodooBolt(hit(8.0, 45, 85.0, 45.0, HitElement.poison)),
-    mark: { ...mark(VOODOO_WARD_MARK, 0, VOODOO_END - VOODOO_WARD_FRAME, 0.0), cancelOnInterrupt: true },
-  },
+  name: "Big Bad Voodoo", endFrame: 120,
+  intangible: frames(13, 90),
+  projectiles: [mark("Abilities\\Spells\\Orc\\Voodoo\\VoodooAura.mdx", 2, 88, 0.0)],
+  regions: [
+    ...VOODOO_PULSES.map((first): MoveRegion => heroRegion(first, first, capsule(-200.0, 40.0, 200.0, 40.0, 60.0), hit(3.0, 80, 10.0, 30.0, HitElement.dark))),
+    heroRegion(90, 92, capsule(-200.0, 50.0, 200.0, 50.0, 90.0), hit(12.0, 80, 85.0, 45.0, HitElement.dark)),
+  ],
+  rehits: [...VOODOO_PULSES, 90],
 };
 
 const DOOM: AppliedStatus = { kind: HeroStatusKind.poison, frames: 180, group: HeroStatusGroup.sleep, immunityFrames: 0, tick: { every: 15, damage: 1.0 } };
@@ -464,7 +458,7 @@ export const ULTIMATE_REACH: { readonly [character: number]: { readonly near: nu
   [Character.lich]: { near: 0.0, far: 600.0 },
   [Character.forsakenPaladin]: { near: 150.0, far: 300.0 },
   [Character.dreadlord]: { near: 190.0, far: 330.0 },
-  [Character.shadowHunter]: { near: 180.0, far: 480.0 },
+  [Character.shadowHunter]: { near: 0.0, far: 170.0 },
   [Character.pitLord]: { near: 40.0, far: 120.0 },
   [Character.beastmaster]: { near: 100.0, far: 700.0 },
   [Character.lichKing]: { near: 150.0, far: 600.0 },
