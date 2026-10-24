@@ -85,6 +85,9 @@ const turnHazardsOff = (host: Client, view: Viewport) => Effect.gen(function*() 
   return yield* new AcceptFailure({ operation: "moves gate hazards", problem: `the stage screen does not read "Hazards: Off" after ${HAZARD_TRIES} tries` });
 });
 
+const stuckFrames = (clients: readonly Client[], wanted: string, save: (file: string, bytes: Uint8Array) => Effect.Effect<void, AcceptFailure>) =>
+  Effect.forEach(clients, (client, slot) => capture(client).pipe(Effect.flatMap(frame => save(`stuck-${wanted}-p${slot + 1}.ppm`, encodePpm(frame))), Effect.ignore), { discard: true });
+
 export interface MovesGateReceipts {
   readonly moves: ReceiptFile;
   readonly specials: ReceiptFile;
@@ -140,7 +143,7 @@ export const measureMovesGate = (clientsFile: string, directory: string, caster?
     catch: cause => new AcceptFailure({ operation: "moves gate menu", problem: String(cause) }),
   }).pipe(Effect.flatMap(latest => JournalMenu.decode(latest.file, latest.text).pipe(Effect.map(value => ({ ...value, modified: latest.modified })), Effect.mapError(fail("moves gate menu")))));
   const phase = (wanted: string, after: number, seconds: number) => pollUntil(menu().pipe(Effect.map(value => value.phase === wanted && value.modified >= after ? value : undefined)), {
-    every: "100 millis", within: `${seconds} seconds`, orElse: () => Effect.fail(new AcceptFailure({ operation: "moves gate menu", problem: `no ${wanted} journal phase within ${seconds} s` })),
+    every: "100 millis", within: `${seconds} seconds`, orElse: () => stuckFrames(clients, wanted, save).pipe(Effect.andThen(Effect.fail(new AcceptFailure({ operation: "moves gate menu", problem: `no ${wanted} journal phase within ${seconds} s; stuck-${wanted}-pN.ppm hold each client's screen` })))),
   });
   const xdotool = (client: Client, args: readonly string[]) => runProcess(ChildProcess.make(client.tools.xdotool, args, { env: { ...Bun.env, ...client.x11 }, stdin: "ignore" })).pipe(Effect.mapError(fail(`moves gate input ${client.name}`)));
   const pointerX = (client: Client) => runProcess(ChildProcess.make(client.tools.xdotool, ["getmouselocation", "--shell"], { env: { ...Bun.env, ...client.x11 }, stdin: "ignore" })).pipe(Effect.map(text => Number(/^X=(\d+)$/m.exec(text)?.[1])), Effect.mapError(fail(`moves gate pointer ${client.name}`)));
