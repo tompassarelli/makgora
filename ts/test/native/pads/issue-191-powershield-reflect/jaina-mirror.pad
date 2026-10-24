@@ -2,8 +2,7 @@
 # a (Jaina) fires its neutral special at 600 from x -240; b (Jaina) at x 240 powershields it with
 # one full trigger press. A reflection sends back a's own projectile: same family (a's fighter
 # code), kind and model, half damage, turned around and owned by b (the `reflect` line on b's
-# trace), and it strikes a, never b. Frames come from replaying this script's inputs through the
-# match step from the quick-pair start; not yet run headless here (no /dev/uinput).
+# trace), and it strikes a, never b. Frames are read from this script's headless farm trace.
 # Syntax and checks: smashcraft:docs/native-bot-session.md.
 #! chat -dev quick pair jaina proudmoore / jaina proudmoore
 600 a tap X 2
