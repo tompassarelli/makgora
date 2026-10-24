@@ -1177,19 +1177,26 @@ pooled, in ms; "Seen" is taps `BlzIsKeyPressed` reported down over taps sent;
 "Spread" is the range of press-to-sample delays after removing the unknown
 `os.clock` offset, with the p5–p95 spread in sampled frames:
 
-| Setting | Input | Turns/s | Game s per wall s | Host waits | Gap p10/p50/p90/p99 | 1 callback per burst | Seen | Spread ms (frames) | Rollbacks/min | Frames rolled back/min | Deepest |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 25 ms, wall-measured steps | light | 43.7 | 0.999 | 0 | 9/16/25/33 | 99.6–99.8% | 174/187, 170/192 | 72–80 (2) | 227–232 | 1,730–1,770 | 17–23 |
-| 25 ms, wall-measured steps | heavy, first match | 35.1 | 0.827 | 77 | 2–7/15–16/25/209–212 | 96.9–98.3% | 182/289, 150/290 | 81–87 (3–5) | 275–324 | 4,010–4,260 | 24 |
-| 16 ms | light, first match | 63.1 | 0.945 | 48 | 7–10/16/22–23/108–135 | 97.7–99.1% | 136/187, 109/192 | 73–79 (3–4) | 151–171 | 1,650 | 24 |
-| 16 ms | heavy | 67.3 | 0.999 | 0 | 8/16/26/30–31 | 100% | 187/187, 189/189 | 57–63 (2) | 581–583 | 4,890–4,920 | 14–15 |
-| 25 ms, deadline-paced | light | 39.9 | 0.998 | 1 | 8–9/16–17/26/30 | 100% | 187/187, 191/192 | 32–40 (1) | 233–252 | 1,710–1,760 | 11–12 |
-| 17/17/16 | light | 60.0 | 1.000 | 2 | 8/16/26/30–31 | 100% | 187/187, 190/192 | 37–42 (1) | 243–249 | 1,480 | 10–11 |
-| 17/17/16 | heavy | 60.0 | 1.000 | 0 | 9/16/26/31 | 100% | 187/187, 189/189 | 47–50 (2) | 583 | 5,090–5,110 | 14 |
-| Solo (no host) | light | — | 1.000 | — | 8–9/15–16/26/31–32 | 100% | 187/187, 192/192 | 40–48 (1–2) | 0 | 0 | 0 |
+| Setting | Input | Turns/s | Game s per wall s | Host waits | Gap p10/p50/p90/p99 | 1 callback per burst | Seen | Spread ms (frames) | Rollbacks/min | Frames rolled back/min | Deepest | Desyncs | Client cores |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 25 ms, wall-measured steps | light | 43.7 | 0.999 | 0 | 9/16/25/33 | 99.6–99.8% | 174/187, 170/192 | 72–80 (2) | 227–232 | 1,730–1,770 | 17–23 | 0 | — |
+| 25 ms, wall-measured steps | heavy, first match | 35.1 | 0.827 | 77 | 2–7/15–16/25/209–212 | 96.9–98.3% | 182/289, 150/290 | 81–87 (3–5) | 275–324 | 4,010–4,260 | 24 | 0 | — |
+| 16 ms | light, first match | 63.1 | 0.945 | 48 | 7–10/16/22–23/108–135 | 97.7–99.1% | 136/187, 109/192 | 73–79 (3–4) | 151–171 | 1,650 | 24 | 0 | — |
+| 16 ms | heavy | 67.3 | 0.999 | 0 | 8/16/26/30–31 | 100% | 187/187, 189/189 | 57–63 (2) | 581–583 | 4,890–4,920 | 14–15 | 0 | — |
+| 25 ms, deadline-paced | light | 39.9 | 0.998 | 1 | 8–9/16–17/26/30 | 100% | 187/187, 191/192 | 32–40 (1) | 233–252 | 1,710–1,760 | 11–12 | 0 | — |
+| 17/17/16 | light | 60.0 | 1.000 | 2 | 8/16/26/30–31 | 100% | 187/187, 190/192 | 37–42 (1) | 243–249 | 1,480 | 10–11 | 0 | — |
+| 17/17/16 | heavy | 60.0 | 1.000 | 0 | 9/16/26/31 | 100% | 187/187, 189/189 | 47–50 (2) | 583 | 5,090–5,110 | 14 | 0 | — |
+| Solo (no host) | light | — | 1.000 | — | 8–9/15–16/26/31–32 | 100% | 187/187, 192/192 | 40–48 (1–2) | 0 | 0 | 0 | — | — |
+| 17/17/16, second session | light | 60.0 | 1.000 | 1 | 8/16/26/32 | 100% | 187/187, 192/192 | 48–64 (2) | 247–249 | 1,460–1,490 | 11–12 | 0 | 1.26 |
+| 17/17/16, second session | heavy | 60.0 | 1.000 | 0 | 9/16/26/31 | 100% | 183/187, 188/189 | 43–74 (1–2) | 576–582 | 4,980–5,180 | 23–24 | 0 | 1.20 |
+| 10 ms, second session | light | 100.0 | 1.000 | 0 | 8/16/27/33 | 100% | 187/187, 191/192 | 43–53 (1) | 231–255 | 1,280–1,330 | 10–15 | 0 | 1.01 |
+| 10 ms, second session | heavy | 100.0 | 1.000 | 0 | 8/16/27/32–33 | 100% | 187/187, 189/189 | 40 (1) | 583–584 | 4,560–4,570 | 11–12 | 0 | 1.16 |
+| 8 ms, second session | light | 125.0 | 1.000 | 0 | 7–8/17/26/33–34 | 100% | 187/187, 192/192 | 37–58 (1) | 248 | 1,100–1,130 | 8 | 0 | 1.08 |
+| 8 ms, second session | heavy | 125.0 | 1.000 | 0 | 8–9/17/25/32 | 100% | 187/187, 189/189 | 44–49 (1) | 583–584 | 4,470–4,500 | 11 | 0 | 1.24 |
 
 No run desynced (host checksum compare, action log). Client CPU was 0.8–1.3
-cores for both clients together. The two runs marked "first match" were each
+cores for both clients together in the first session, which did not record it
+per run. The two runs marked "first match" were each
 the first match after the pool started; they stalled for up to 670 ms, the
 host waited on a client more than 50 turns behind, and they lost the most
 taps, so a pool's first match is not a fair turn-rate sample. At 25 ms the
@@ -1214,6 +1221,24 @@ no taps but spread press-to-sample delays over 57–63 ms.
 Not measured here: the parity-tape check per setting (`bun wisp pad` cannot
 take a turn length; headless parity is independent of the host's turn
 length), runs longer than 80–120 s, and renderer frame times.
+
+**Shorter turns (second session, wisp#31).** The rows marked "second
+session" ran later the same day on pair 0 in one pool session, after a
+discarded first match: the integrity build of smashcraft 3f765ea24 (before
+the smashcraft#218 tap fix), Wisp's deadline-paced host from wisp d04d0c5,
+the same driver and seed, 80 s per run. Client cores are both clients'
+CPU time over the run's wall time. At 10 ms and 8 ms the host held 100.0 and
+125.0 turns a second at game pace 1.000 with no host wait, the clients stayed
+1–3 turns behind, and the client still ran one callback per rendered frame.
+Lost taps were 0 light and 5 heavy at 17/17/16, 1 and 0 at 10 ms, and 0 and 0
+at 8 ms; neither shorter turn used more than 0.04 more cores. The press
+reached the host sooner with light input, at a median of 8 ms at 10 ms and
+5 ms at 8 ms, against 13–15 ms at 17/17/16; with heavy input it took
+29–35 ms at the median whatever the turn length, so the client's own send,
+not the turn, set that delay. By wisp:docs/relay.md's rule (zero desyncs,
+game pace 1.000 ± 0.002, no more lost taps, at most 0.2 more cores than
+17/17/16 in the same session), 8 ms is the shortest clean turn measured; 10 ms
+misses by its one extra lost tap with light input.
 
 **Recommendation.** On a LAN the client samples once per rendered frame
 whatever the turn length, so a shorter turn does not raise the sampling rate.
