@@ -133,7 +133,7 @@ export function openDamageContacts(): boolean {
 export function collectDamageContact(
   world: Roster, sourceSlot: number, targetSlot: number, effect: Readonly<HitEffect>, facing: number,
   kind: ContactKind, direct: boolean, throwInput: Readonly<Controls> | undefined, shieldContact: boolean,
-  status?: Readonly<AppliedStatus>, contactZ?: number,
+  status?: Readonly<AppliedStatus>, contactZ?: number, family?: Character,
 ): void {
   if (sourceSlot !== targetSlot && !canHit(world, sourceSlot, targetSlot)) return;
   const source = fighterAt(world, sourceSlot);
@@ -148,7 +148,7 @@ export function collectDamageContact(
   contact.source = sourceSlot;
   contact.target = targetSlot;
   copyHitEffect(contact.effect, effect);
-  const traits = contactTraits(source, kind, direct);
+  const traits = contactTraits(source, kind, direct, family);
   if (traits.mana !== true) {
     contact.effect.manaDrain = undefined;
     contact.effect.manaSteal = undefined;
@@ -193,7 +193,7 @@ export function collectDamageContact(
   }
 
   contact.hitlagDamage = contact.effect.damage;
-  if (source.character === Character.forsakenPaladin) contact.effect.damage = multiplyFloat32(contact.effect.damage, FORSAKEN_PALADIN_DAMAGE_MULTIPLIER);
+  if ((family ?? source.character) === Character.forsakenPaladin) contact.effect.damage = multiplyFloat32(contact.effect.damage, FORSAKEN_PALADIN_DAMAGE_MULTIPLIER);
 }
 
 

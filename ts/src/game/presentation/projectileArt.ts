@@ -85,6 +85,23 @@ export function fighterProjectileModels(character: Character): readonly string[]
 }
 
 
+function addLaterModels(spec: Readonly<SpecialProjectile> | undefined, models: string[]): void {
+  if (spec === undefined) return;
+  if (spec.model !== undefined && !models.includes(spec.model)) models.push(spec.model);
+  addLaterModels(spec.expiresInto, models);
+  addLaterModels(spec.burstInto, models);
+}
+
+
+export function reflectedProjectileModels(character: Character): readonly string[] {
+  const specials = heroDefinition(character)?.specials;
+  const models: string[] = specials === undefined ? (ORIGINAL_KINDS[character] ?? [ProjectileKind.blaster]).map((kind) => ORIGINAL_PROJECTILE_MODELS[kind]) : [];
+  const specs = [...(specials === undefined ? [] : heroProjectileArt(specials).map(({ spec }) => spec)), ...ultimateProjectiles(character)];
+  for (const spec of specs) if (spec.reflectable) addLaterModels(spec, models);
+  return models;
+}
+
+
 export function ultimateProjectiles(character: Character): readonly SpecialProjectile[] {
   const specs: SpecialProjectile[] = [];
   formProjectiles(FIGHTER_ULTIMATES[character], specs);

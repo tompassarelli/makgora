@@ -80,8 +80,8 @@ for (const key in IDENTITY_TRAITS) {
   SPAWNED_TRAITS[character] = spawned;
 }
 
-/** The traits a contact may carry: the source's current move for its own body, grabs and throws; its spawned objects otherwise. */
-export function contactTraits(source: Readonly<Fighter>, kind: ContactKind, direct: boolean): TraitSet {
+/** The traits a contact may carry: the source's current move for its own body, grabs and throws; otherwise those of the fighter whose special spawned the object, which a reflection does not change. */
+export function contactTraits(source: Readonly<Fighter>, kind: ContactKind, direct: boolean, family = source.character): TraitSet {
   if (direct || kind === ContactKind.throw || kind === ContactKind.pummel) return currentTraits(source);
-  return SPAWNED_TRAITS[source.character] ?? NO_TRAITS;
+  return SPAWNED_TRAITS[family] ?? NO_TRAITS;
 }

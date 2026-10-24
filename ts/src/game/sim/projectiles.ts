@@ -162,7 +162,7 @@ function applyProjectileHit(world: Roster, ownerSlot: number, targetSlot: number
   if (projectile.kind === ProjectileKind.hero && spec !== undefined) {
     copyHitEffect(projectileHit, heroProjectileEffect(projectile, spec));
     projectileHit.damage = projectileDamage(projectile);
-    collectDamageContact(world, ownerSlot, targetSlot, projectileHit, projectile.direction, ContactKind.launch, false, undefined, shieldContact, spec.status, projectile.z);
+    collectDamageContact(world, ownerSlot, targetSlot, projectileHit, projectile.direction, ContactKind.launch, false, undefined, shieldContact, spec.status, projectile.z, projectile.visualFamily);
     return;
   }
   const { kind } = projectile;
@@ -170,7 +170,7 @@ function applyProjectileHit(world: Roster, ownerSlot: number, targetSlot: number
   const flinch = kind === ProjectileKind.blaster || kind === ProjectileKind.manaBurn;
   collectDamageContact(world, ownerSlot, targetSlot, effect, projectile.direction,
     flinch ? ContactKind.flinch : ContactKind.launch, false, undefined, shieldContact,
-    kind === ProjectileKind.manaBurn ? MANA_BURN_STUN : undefined, projectile.z);
+    kind === ProjectileKind.manaBurn ? MANA_BURN_STUN : undefined, projectile.z, projectile.visualFamily);
 }
 
 
@@ -389,7 +389,7 @@ function strikeFromTrail(world: Roster, ownerSlot: number): void {
       const target = fighterAt(world, targetSlot);
       if (!capsulesIntersect(trailPiece, placeCapsule(heroTarget, hurtCapsule(target.character), at(targets.x, targetSlot), at(targets.z, targetSlot), target.facing))) continue;
       struck |= bit;
-      collectDamageContact(world, ownerSlot, targetSlot, piece.spec.effect, piece.direction, ContactKind.flinch, false, undefined, target.shield.raised, undefined, piece.z);
+      collectDamageContact(world, ownerSlot, targetSlot, piece.spec.effect, piece.direction, ContactKind.flinch, false, undefined, target.shield.raised, undefined, piece.z, piece.visualFamily);
     }
   }
 }

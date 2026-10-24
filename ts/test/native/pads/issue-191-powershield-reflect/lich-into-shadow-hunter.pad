@@ -1,0 +1,18 @@
+# #191 Lich into Shadow Hunter: a powershield returns the Lich's frost missile
+# a (Lich) fires its neutral special at 600 from x -240; b (Shadow Hunter) at x 240 powershields it with
+# one full trigger press. A reflection sends back a's own projectile: same family (a's fighter
+# code), kind and model, half damage, turned around and owned by b (the `reflect` line on b's
+# trace), and it strikes a, never b. Frames come from replaying this script's inputs through the
+# match step from the quick-pair start; not yet run headless here (no /dev/uinput).
+# Syntax and checks: smashcraft:docs/native-bot-session.md.
+#! chat -dev quick pair lich / shadow hunter
+600 a tap X 2
+644 b shield 1
+674 b shield 0
+# View held a second: a moment the parity check replays.
+718 a press VIEW
+788 a release VIEW
+# Expected (replay of this script): b's press reflects on the next frame; the projectile hits a for half its damage.
+#! expect b 645 reflect family 6 kind 5 model Abilities\Weapons\LichMissile\LichMissile.mdx direction -1 multiplier 0.500 life 51
+#! expect a 688 damage 5.611
+#! absent b 600-718 damage

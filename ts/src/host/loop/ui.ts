@@ -17,7 +17,7 @@ import { ProjectilePresentation } from "../../game/render/projectilePresentation
 import { ShieldPresentation } from "../../game/render/shieldPresentation";
 import { SpecialEffects } from "../../game/render/specialEffects";
 import { Character } from "../../game/sim/codes";
-import { isActive } from "../../game/sim/roster";
+import { fighterAt, isActive } from "../../game/sim/roster";
 import type { MenuControls } from "../../game/ui/frames";
 import { FighterHud, MatchClock, plateManaSlot } from "../../game/ui/matchHud";
 import { TrainingReadout } from "../../game/ui/trainingReadout";
@@ -171,12 +171,18 @@ function sharedPlay(): boolean {
   return humans > 1;
 }
 
+function opponentCharacters(s: ShellState, slot: ParticipantSlot): Character[] {
+  const characters: Character[] = [];
+  for (const other of PARTICIPANT_SLOTS) if (other !== slot && isActive(s.world, other)) characters.push(fighterAt(s.world, other).character);
+  return characters;
+}
+
 export function beginFighterRenderers(s: ShellState, slot: ParticipantSlot, character: Character, pooled: boolean): boolean {
   const ui = views(s);
   endFighterRenderers(ui.fighters[slot]);
   const pool = pooled ? new FighterPoolPresentation(character, slot, s.origin) : undefined;
   ui.placed.prepareFighter(slot, character);
-  ui.fighters[slot] = { character, shield: new ShieldPresentation(slot, s.origin), projectiles: new ProjectilePresentation(character, s.origin), cues: new SpecialCueEffects(character, s.origin, sharedPlay()), pool, agency: new AgencyMarker(s.origin), flash: new BodyFlash(character, s.origin),
+  ui.fighters[slot] = { character, shield: new ShieldPresentation(slot, s.origin), projectiles: new ProjectilePresentation(character, s.origin, opponentCharacters(s, slot)), cues: new SpecialCueEffects(character, s.origin, sharedPlay()), pool, agency: new AgencyMarker(s.origin), flash: new BodyFlash(character, s.origin),
     candle: character === Character.kobold ? new CandlePresentation(s.origin) : undefined,
     hitAreas: s.game.training && s.game.trainer.showHitAreas ? new HitAreaPresentation(s.origin) : undefined,
   };

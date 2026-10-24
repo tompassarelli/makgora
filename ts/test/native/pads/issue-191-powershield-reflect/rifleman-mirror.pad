@@ -1,0 +1,18 @@
+# #191 Rifleman mirror: a powershield returns Rifleman's blaster shot
+# a (Rifleman) fires its neutral special at 600 from x -240; b (Rifleman) at x 240 powershields it with
+# one full trigger press. A reflection sends back a's own projectile: same family (a's fighter
+# code), kind and model, half damage, turned around and owned by b (the `reflect` line on b's
+# trace), and it strikes a, never b. Frames come from replaying this script's inputs through the
+# match step from the quick-pair start; not yet run headless here (no /dev/uinput).
+# Syntax and checks: smashcraft:docs/native-bot-session.md.
+#! chat -dev quick pair rifleman / rifleman
+600 a tap X 2
+617 b shield 1
+647 b shield 0
+# View held a second: a moment the parity check replays.
+665 a press VIEW
+735 a release VIEW
+# Expected (replay of this script): b's press reflects on the next frame; the projectile hits a for half its damage.
+#! expect b 618 reflect family 1 kind 0 model Abilities\Weapons\CannonTowerMissile\CannonTowerMissile.mdx direction -1 multiplier 0.500 life 49
+#! expect a 635 damage 1.395
+#! absent b 600-665 damage

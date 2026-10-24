@@ -302,8 +302,8 @@ function strikingMove(fighter: Readonly<Fighter>, world: Readonly<Roster> | unde
         const distance = f32(Math.abs(f32(projectile.x - fighter.motion.x)) + Math.abs(f32(projectile.z - f32(fighter.motion.z + PROJECTILE_BODY_Z))));
         if (projectile.serial === 0 || distance >= nearest) continue;
         nearest = distance;
-        character = owner.character;
-        move = specialMove(projectile.kind === ProjectileKind.recoil ? 2 : projectile.kind === ProjectileKind.hero ? projectileSlot(owner.character, projectile.spec) : 0);
+        character = projectile.visualFamily;
+        move = specialMove(projectile.kind === ProjectileKind.recoil ? 2 : projectile.kind === ProjectileKind.hero ? projectileSlot(projectile.visualFamily, projectile.spec) : 0);
       }
     }
   }

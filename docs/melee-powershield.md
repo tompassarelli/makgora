@@ -209,6 +209,16 @@ the swept circle in the simulation's x/z plane. Reflection transfers ownership
 to the defender and applies the observed common damage multiplier `0.5` and
 speed multiplier `0.699999988079071`. It keeps the source projectile's authored
 visual family when ownership changes and carries that identity through replay.
+Everything else about the projectile follows that family, not its new owner
+(#191): the hit's spawned traits (Banish spell amplification) and fighter-wide
+damage scale (Forsaken Paladin's 0.8) come from the thrower, the hit sound names
+the thrower's move, and each fighter's projectile renderer is built at match
+start with effects for its opponents' reflectable projectile models, so the
+reflector draws the thrower's model rather than falling back to its own. The
+headless trace logs each reflection on the reflector's line as `reflect family
+F kind K model M direction D multiplier X life L`; the pad scripts in
+smashcraft:ts/test/native/pads/issue-191-powershield-reflect/ assert it, the
+return hit on the thrower and a second powershield handing it back.
 An accepted reflection increments a separate deterministic presentation serial;
 the existing impact journal uses it to emit one shield-success flash, separate
 from an ordinary blocked-hit flash.

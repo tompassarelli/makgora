@@ -16,6 +16,7 @@ import { canAttack } from "../../game/sim/conditions";
 import { influenceOperands } from "../../game/sim/knockback";
 import { canonicalReal } from "../../game/replay/canonical";
 import type { Fighter } from "../../game/sim/fighter";
+import { projectileModelOf } from "../../game/presentation/projectileArt";
 import { fighterAt, isActive } from "../../game/sim/roster";
 import { traceFrameInput, traceParticipant } from "./diagnostics";
 import { confirmModelSounds } from "../../game/render/modelSounds";
@@ -57,6 +58,8 @@ function observe(before: FrameObservation, fighter: Readonly<Fighter>): void {
   before.dodgeMoved = before.dodgeMotion > 0;
   before.dodgeMotion = fighter.dodge.airMotionFrames;
   before.fastFalling = fighter.motion.fastFalling;
+  before.reflect = fighter.visuals.shieldReflect;
+  for (let index = 0; index < fighter.projectiles.length; index++) before.projectileLives[index] = fighter.projectiles[index]?.life ?? 0;
 }
 
 const bit = (value: boolean) => (value ? "1" : "0");
@@ -106,6 +109,13 @@ function traceChanges(s: ShellState, slot: ParticipantSlot, before: Readonly<Fra
     traceParticipant(s, slot, `di ${f.launch.diSerial} ${exact}`);
   }
   if (before.attack !== f.attack.serial) traceParticipant(s, slot, `applied attack ${f.attack.serial} style ${f.attack.style ?? -1}`);
+  if (before.reflect !== f.visuals.shieldReflect) {
+    for (let index = 0; index < f.projectiles.length; index++) {
+      const projectile = f.projectiles[index];
+      if (projectile === undefined || projectile.life <= 0 || (before.projectileLives[index] ?? 0) > 0) continue;
+      traceParticipant(s, slot, `reflect family ${projectile.visualFamily} kind ${projectile.kind} model ${projectileModelOf(projectile) ?? "none"} direction ${projectile.direction} multiplier ${R2S(projectile.damageMultiplier)} life ${projectile.life}`);
+    }
+  }
 }
 
 
