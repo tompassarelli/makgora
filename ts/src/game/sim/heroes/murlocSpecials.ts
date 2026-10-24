@@ -30,7 +30,7 @@ const PLAGUE: AppliedStatus = { kind: HeroStatusKind.poison, frames: 180, group:
 const DISEASE_CLOUD: AuthoredSpecial = {
   endFrame: 38, cooldownFrames: 150, groundOnly: true,
   projectiles: [{
-    model: "Units\\Undead\\PlagueCloud\\PlagueCloud.mdx",
+    model: "war3mapImported\\MurlocSwampCloud.mdx",
     spawnFrame: 14, offsetX: 40.0, offsetZ: 6.0, velocityX: 0.0, velocityZ: 0.0, life: 150, radius: 50.0,
     effect: { ...murlocHit(2.4977293014526367, 80, 27.065372467041016, 30.0, false, HitElement.poison) },
     reflectable: false, limit: 1, needsLineOfSight: true, status: PLAGUE,

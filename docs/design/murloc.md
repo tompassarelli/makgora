@@ -18,8 +18,11 @@ for the down special. Tidal Rush and Tide Spout turn the murloc's swimming
 into a belly slide and a water spout. Presentation is the stock classic
 Tiderunner, `units\creeps\Murloc\Murloc.mdl` (unit `nmrl`, model scale 1.0),
 its command icon `BTNMurloc` and its own `Murloc` unit sounds; the stock
-Ensnare and Plague Cloud models draw the specials. No downloaded art or
-recordings are needed.
+Ensnare model draws the specials. Disease Cloud draws as a murky swamp cloud:
+private copies of the stock Plague Cloud models whose particle colours are
+darkened to bog green (`MurlocSwampCloud`, `MurlocSwampMist`), because the
+stock lime reads as the Abomination's Scourge cloud (#39). No downloaded art
+or recordings are needed.
 
 The stock model has nine sequences: two stands, a ready stand (Stand -3), a
 walk, Attack - 1 (claw swipe), Attack Spell (a thrown arm), Death and two

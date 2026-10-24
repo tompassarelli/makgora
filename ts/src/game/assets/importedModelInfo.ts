@@ -24,10 +24,16 @@ export const VALKYR_MODEL = "Units\\Undead\\Banshee\\Banshee.mdx";
 
 export const GROM_BLOODLUST_MODEL = "war3mapImported\\GromBloodlustQuiet.mdx";
 
+export const MURLOC_SWAMP_CLOUD_MODEL = "war3mapImported\\MurlocSwampCloud.mdx";
+
+export const MURLOC_SWAMP_MIST_MODEL = "war3mapImported\\MurlocSwampMist.mdx";
+
 export const SCOURGE_WALL_MODEL = "war3mapImported\\UndeadWalls.mdx";
 
 export const IMPORTED_MODEL_FILES: readonly { readonly entry: string; readonly file: string }[] = [
   { entry: GROM_BLOODLUST_MODEL, file: "GromBloodlustQuiet.mdx" },
+  { entry: MURLOC_SWAMP_CLOUD_MODEL, file: "MurlocSwampCloud.mdx" },
+  { entry: MURLOC_SWAMP_MIST_MODEL, file: "MurlocSwampMist.mdx" },
   { entry: SCOURGE_WALL_MODEL, file: "UndeadWalls.mdx" },
   { entry: LICH_KING_MODEL, file: "LichKing2.mdx" },
   // Warcraft derives a unit portrait path by appending "_Portrait".

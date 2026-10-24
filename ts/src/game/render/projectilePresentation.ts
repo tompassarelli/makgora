@@ -13,6 +13,7 @@ import { PROJECTILE_DRAW_CUES, PROJECTILE_DRAW_OFFSETS, fighterProjectileModels,
 import { projectedProjectile } from "../presentation/projectilePose";
 import { opponentReflectedModels } from "../presentation/reflectedProjectileArt";
 import { IMPACT_DEFILE_MODEL } from "../assets/impactAssetInfo";
+import { MURLOC_SWAMP_CLOUD_MODEL } from "../assets/importedModelInfo";
 import { heroProjectileArt } from "../presentation/projectileArt";
 import { carrierDrawsMark } from "../presentation/ultimateVoice";
 import { ARENA_CAMERA } from "../presentation/arenaCamera";
@@ -31,7 +32,7 @@ export const STATIONARY_PARTICLE_MODELS = [
   "Abilities\\Spells\\Other\\BreathOfFire\\BreathOfFireDamage.mdx",
   "Abilities\\Spells\\NightElf\\TargetArtLumber\\TargetArtLumber.mdx",
   "Objects\\Spawnmodels\\Other\\NeutralBuildingExplosion\\NeutralBuildingExplosion.mdx",
-  "Units\\Undead\\PlagueCloud\\PlagueCloud.mdx",
+  MURLOC_SWAMP_CLOUD_MODEL,
   "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveDamage.mdx",
   "Objects\\Spawnmodels\\Undead\\ImpaleTargetDust\\ImpaleTargetDust.mdx",
 ];
