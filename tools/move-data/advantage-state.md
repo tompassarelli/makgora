@@ -55,7 +55,7 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Sylvanas Windrunner | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away short hop, neutral air; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 0% → up air against 5/5 DI |
 | Cairne Bloodhoof | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash, down smash, full hop, forward air; tech in down smash; tech away full hop, forward air; missed tech down smash, down smash, full hop, forward air; trap down smash, down smash, full hop, forward air covers tech in place, tech in, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Cairne Bloodhoof | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash, down smash, full hop, forward air; tech in down smash; tech away full hop, forward air; missed tech down smash, down smash, full hop, forward air; trap down smash, down smash, full hop, forward air covers tech in place, tech in, tech away, missed tech | up throw at 60% → up tilt against 4/5 DI |
-| Cairne Bloodhoof | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place dash, dash attack; tech in up smash; tech away full hop, forward air; missed tech dash, dash attack; trap dash, dash attack covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Cairne Bloodhoof | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down air, jab, down smash, down smash, full hop, forward air; tech in up smash; tech away full hop, forward air; missed tech short hop, down air, jab, down smash, down smash, full hop, forward air; trap short hop, down air, jab, down smash, down smash, full hop, forward air covers tech in place, tech in, tech away | up throw at 0% → up tilt against 4/5 DI |
 | Chen Stormstout | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, forward air; tech in forward smash; tech away dash grab, back throw; missed tech short hop, forward air; trap short hop, forward air covers tech in place, missed tech | up throw at 40% → up air against 5/5 DI |
 | Chen Stormstout | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, forward air; tech in forward smash; tech away dash grab, back throw; missed tech short hop, forward air; trap short hop, forward air covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Chen Stormstout | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away full hop, forward air; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 60% → up air against 5/5 DI |
@@ -275,11 +275,11 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Sylvanas Windrunner | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Cairne Bloodhoof | light | up throw | 1/1 | 1/1 KD in up tilt, out dash, dash attack | 1/1 KD in up special, out down tilt | 1/1 in short hop, back air, out forward tilt |
+| Cairne Bloodhoof | light | up throw | 1/1 | 1/1 KD in short hop, down air, out dash, dash attack | 1/1 KD in up special, out down tilt | 1/1 in full hop in place, down air, out forward tilt |
 | Cairne Bloodhoof | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | medium | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | medium | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Cairne Bloodhoof | medium | up throw | 1/1 in forward tilt, out down tilt | 1/1 KD in down tilt, out dash, dash attack | 1/1 KD in up special, out down tilt | 1/1 in forward tilt, out dash, dash attack |
+| Cairne Bloodhoof | medium | up throw | 1/1 in forward tilt, out down tilt | 1/1 KD in short hop, down air, out dash, dash attack | 1/1 KD in up special, out down tilt | 2/2 in short hop, down air, out dash, dash attack |
 | Cairne Bloodhoof | medium | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | heavy | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Cairne Bloodhoof | heavy | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
