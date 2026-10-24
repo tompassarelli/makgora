@@ -2305,7 +2305,7 @@ mod linux {
                 let Press::Key(key) = binding.press else { return None };
                 let &(_, action) = PAD_KEYS.iter().find(|(name, _)| *name == key.as_str())?;
                 let action = match action {
-                    ATTACK | SPECIAL | JUMP | SHORT_HOP | GRAB | WALK | EX_SPECIAL => action,
+                    ATTACK | SPECIAL | JUMP | SHORT_HOP | GRAB | WALK | STRONG => action,
                     LEFT_TRIGGER | RIGHT_TRIGGER | LIGHT_SHIELD if source == LT_SOURCE && action != RIGHT_TRIGGER => LEFT_TRIGGER,
                     LEFT_TRIGGER | RIGHT_TRIGGER | LIGHT_SHIELD => RIGHT_TRIGGER,
                     _ => return None,
@@ -2391,9 +2391,9 @@ mod linux {
         use padbridge::model::{PadPreset, TriggerShield, TriggerShields};
         let (a, b, x, y, lb, rb, l3) = (1 << 0, 1 << 1, 1 << 2, 1 << 3, 1 << 4, 1 << 5, 1 << 6);
         for (preset, expected) in [
-            (PadPreset::Melee, [ATTACK, SPECIAL, JUMP, JUMP, EX_SPECIAL, GRAB, 0]),
-            (PadPreset::ZJump, [ATTACK, SPECIAL, GRAB, JUMP, EX_SPECIAL, JUMP, 0]),
-            (PadPreset::Tom, [ATTACK, GRAB, SPECIAL, JUMP, SHORT_HOP, EX_SPECIAL, 0]),
+            (PadPreset::Melee, [ATTACK, SPECIAL, JUMP, JUMP, STRONG, GRAB, 0]),
+            (PadPreset::ZJump, [ATTACK, SPECIAL, GRAB, JUMP, STRONG, JUMP, 0]),
+            (PadPreset::Tom, [ATTACK, GRAB, SPECIAL, JUMP, SHORT_HOP, STRONG, 0]),
             (PadPreset::Script, [ATTACK, JUMP, SPECIAL, JUMP, WALK, GRAB, SHORT_HOP]),
         ] {
             let state = State { preset, ..State::default() };
