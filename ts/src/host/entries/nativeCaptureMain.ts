@@ -17,7 +17,7 @@ import { bareFighter } from "../loop/fighterCloak";
 import { paintDrawnStamp } from "../loop/drawnStamp";
 import { CAPTURE_STATUS_FILE } from "../../game/core/gameFiles";
 
-const BUILD: MapBuild = { ...NATIVE_DRIVER_BUILD, presentation: "pool-predicted" };
+const BUILD: MapBuild = { ...NATIVE_DRIVER_BUILD, presentation: "pool-predicted", receiptsOnScreen: false, disjointCues: false };
 const TICK = "capture.fixtures";
 
 const WARMUP_TICKS = 300;

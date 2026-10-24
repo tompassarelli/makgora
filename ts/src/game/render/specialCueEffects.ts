@@ -72,9 +72,9 @@ export class SpecialCueEffects {
   private readonly cueSounds: { [name: string]: sound | undefined } = {};
 
   // Online, Warcraft handles must be born on the same turn on every client, so shared play restarts emitters made here instead of making fresh ones on confirmed frames.
-  constructor(private readonly character: Character, private readonly origin: WorldOrigin, private readonly shared = false) {
+  constructor(private readonly character: Character, private readonly origin: WorldOrigin, private readonly shared: boolean, disjointCues: boolean) {
     this.missing = AddSpecialEffect(MISSING_CUE_MODEL, origin.x, origin.y);
-    this.areas = new HitAreaEffects(character, origin);
+    this.areas = new HitAreaEffects(character, origin, disjointCues);
     this.front = origin.y - 12.0;
     this.scale = characterModelScale(character);
     for (const shown of fighterRenderedCues(character)) {

@@ -10,13 +10,9 @@ export interface HiddenFighter {
 
 const drawn: effect[] = [];
 
-function fighterEffects(s: ShellState, slot: ParticipantSlot, everything: boolean): effect[] {
+function fighterEffects(s: ShellState, slot: ParticipantSlot): effect[] {
   drawn.length = 0;
   const renderers = s.ui?.fighters[slot];
-  if (!everything) {
-    renderers?.cues?.weaponEffects(drawn);
-    return drawn;
-  }
   const dizzy = s.participants[slot].body?.dizzy;
   if (dizzy !== undefined) drawn.push(dizzy);
   if (renderers === undefined) return drawn;
@@ -35,7 +31,7 @@ export function concealFighter(s: ShellState, slot: ParticipantSlot): void {
   const body = s.participants[slot].body;
   if (body !== undefined && hidden.body) ShowUnit(body.unit, false);
   if (body !== undefined && hidden.bare) BlzShowUnitTeamGlow(body.unit, false);
-  for (const model of fighterEffects(s, slot, hidden.body)) BlzSetSpecialEffectScale(model, 0.0);
+  if (hidden.body) for (const model of fighterEffects(s, slot)) BlzSetSpecialEffectScale(model, 0.0);
 }
 
 export function concealFighters(s: ShellState): void {

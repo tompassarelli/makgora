@@ -16,6 +16,8 @@ export const INTEGRITY_BUILD: MapBuild = {
   responseProbe: true,
   devConsole: true,
   errorsOnScreen: true,
+  receiptsOnScreen: true,
+  disjointCues: true,
   hotReload: true,
 };
 
@@ -28,6 +30,8 @@ export const PLAYABLE_BUILD: MapBuild = {
   responseProbe: false,
   devConsole: false,
   errorsOnScreen: false,
+  receiptsOnScreen: true,
+  disjointCues: true,
   hotReload: false,
 };
 
@@ -40,6 +44,8 @@ export const CURRENT_BUILD: MapBuild = {
   responseProbe: false,
   devConsole: true,
   errorsOnScreen: true,
+  receiptsOnScreen: true,
+  disjointCues: true,
   hotReload: true,
 };
 

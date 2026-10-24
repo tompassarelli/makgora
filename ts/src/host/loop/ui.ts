@@ -186,7 +186,7 @@ export function beginFighterRenderers(s: ShellState, slot: ParticipantSlot, char
   const pool = pooled ? new FighterPoolPresentation(character, slot, s.origin) : undefined;
   ui.placed.prepareFighter(slot, character);
   const shared = sharedPlay();
-  ui.fighters[slot] = { character, shield: new ShieldPresentation(slot, s.origin), projectiles: new ProjectilePresentation(character, s.origin, opponentCharacters(s, slot)), cues: new SpecialCueEffects(character, s.origin, shared), meter: new MeterCueEffects(character, s.origin, shared), pool, agency: new AgencyMarker(s.origin), flash: new BodyFlash(character, s.origin),
+  ui.fighters[slot] = { character, shield: new ShieldPresentation(slot, s.origin), projectiles: new ProjectilePresentation(character, s.origin, opponentCharacters(s, slot)), cues: new SpecialCueEffects(character, s.origin, shared, s.build.disjointCues), meter: new MeterCueEffects(character, s.origin, shared), pool, agency: new AgencyMarker(s.origin), flash: new BodyFlash(character, s.origin),
     candle: character === Character.kobold ? new CandlePresentation(s.origin) : undefined,
     hitAreas: s.game.training && s.game.trainer.showHitAreas ? new HitAreaPresentation(s.origin) : undefined,
   };
