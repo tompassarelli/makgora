@@ -48,8 +48,8 @@
       "press": "key",
       "key": "`",
       "code": 192,
-      "action": "exSpecial",
-      "label": "EX special"
+      "action": "strong",
+      "label": "Strong"
     },
     {
       "control": "lt",

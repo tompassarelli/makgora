@@ -18,7 +18,7 @@ const STICK_DIGITAL = 7000;
 const C_STICK_DIGITAL = 11000;
 const TRIGGER_DIGITAL = 4000;
 const SHIELDS = bit(Action.leftTrigger) | bit(Action.rightTrigger);
-const SPECIALS = bit(Action.special) | bit(Action.exSpecial);
+const SPECIALS = bit(Action.special) | bit(Action.strong);
 
 
 export interface Pad {
@@ -33,7 +33,7 @@ export interface Pad {
   readonly rightTrigger?: boolean;
   readonly tilt?: boolean;
   readonly shortHop?: boolean;
-  readonly exSpecial?: boolean;
+  readonly strong?: boolean;
   readonly rightStickTilts?: boolean;
 }
 
@@ -52,7 +52,7 @@ function heldActions(pad: Pad): number {
   if (pad.jump === true) held |= bit(Action.jump);
   if (pad.tilt === true) held |= bit(Action.walk);
   if (pad.shortHop === true) held |= bit(Action.shortHop);
-  if (pad.exSpecial === true) held |= bit(Action.exSpecial);
+  if (pad.strong === true) held |= bit(Action.strong);
   if (x < -STICK_DIGITAL) held |= bit(Action.moveLeft);
   if (x > STICK_DIGITAL) held |= bit(Action.moveRight);
   if (up < -STICK_DIGITAL) held |= bit(Action.moveDown);

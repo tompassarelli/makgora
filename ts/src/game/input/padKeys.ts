@@ -17,7 +17,7 @@ export const PAD_LAYER: readonly PadKey[] = [
   { action: Action.rightTrigger, key: "4", code: 0x34 },
   { action: Action.lightShield, key: "5", code: 0x35 },
   { action: Action.walk, key: "6", code: 0x36 },
-  { action: Action.exSpecial, key: "`", code: 0xc0 },
+  { action: Action.strong, key: "`", code: 0xc0 },
   { action: Action.moveLeft, key: "[", code: 0xdb },
   { action: Action.moveRight, key: "]", code: 0xdd },
   { action: Action.moveUp, key: ";", code: 0xba },

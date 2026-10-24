@@ -12,7 +12,6 @@ import { groundDodgeIntent, normalAttackStyle } from "./combat";
 import type { Direction, InputRow } from "./inputRow";
 
 const ATTACK_BIT = bit(Action.attack);
-const EX_SPECIAL_BIT = bit(Action.exSpecial);
 const GRAB_BIT = bit(Action.grab);
 const JUMP_BIT = bit(Action.jump);
 const LEFT_TRIGGER_BIT = bit(Action.leftTrigger);
@@ -28,6 +27,7 @@ const SMASH_LEFT_BIT = bit(Action.smashLeft);
 const SMASH_RIGHT_BIT = bit(Action.smashRight);
 const SMASH_UP_BIT = bit(Action.smashUp);
 const SPECIAL_BIT = bit(Action.special);
+const STRONG_BIT = bit(Action.strong);
 const WALK_BIT = bit(Action.walk);
 const GRAB_MASH_ACTIONS = maskOf(Action.attack, Action.special, Action.jump, Action.shortHop, Action.grab, Action.leftTrigger, Action.rightTrigger, Action.lightShield);
 const MOVEMENT_ACTIONS = maskOf(Action.moveLeft, Action.moveRight, Action.moveDown, Action.moveUp);
@@ -70,8 +70,9 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   destination.sdiZ = row.sdiZ;
   destination.cStickX = ((held & SMASH_RIGHT_BIT) !== 0 ? 1 : 0) - ((held & SMASH_LEFT_BIT) !== 0 ? 1 : 0);
   destination.cStickZ = ((held & SMASH_UP_BIT) !== 0 ? 1 : 0) - ((held & SMASH_DOWN_BIT) !== 0 ? 1 : 0);
-  destination.exPressed = (pressed & EX_SPECIAL_BIT) !== 0;
-  destination.specialPressed = (pressed & SPECIAL_BIT) !== 0 || destination.exPressed;
+  const strong = ((held | pressed) & STRONG_BIT) !== 0;
+  destination.specialPressed = (pressed & SPECIAL_BIT) !== 0;
+  destination.exPressed = destination.specialPressed && strong;
   destination.ultimatePressed = ((pressed & SPECIAL_BIT) !== 0 && ((held | pressed) & ATTACK_BIT) !== 0) || ((pressed & ATTACK_BIT) !== 0 && (held & SPECIAL_BIT) !== 0);
   destination.specialX = destination.specialPressed && !((held & WALK_BIT) !== 0 && row.specialZ === 0) ? row.specialX : 0;
   destination.specialZ = destination.specialPressed ? row.specialZ : 0;
@@ -109,7 +110,7 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   destination.getupDirectionPressed = destination.getupDirection !== 0;
   destination.cStickUpFlick = (pressed & SMASH_UP_BIT) !== 0;
   destination.cStickSideFlick = edgePair(pressed, Action.smashLeft, Action.smashRight);
-  destination.attackHeld = (held & ATTACK_BIT) !== 0;
+  destination.attackHeld = (held & (ATTACK_BIT | STRONG_BIT)) !== 0;
   const leftShield = (held & LEFT_TRIGGER_BIT) !== 0 || analogShieldActive(row.triggerLeft);
   const rightShield = (held & RIGHT_TRIGGER_BIT) !== 0 || analogShieldActive(row.triggerRight);
   destination.resetPressed = leftShield && rightShield && destination.attackPressed;
@@ -121,10 +122,10 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   destination.groundDodgePressed = dodge !== undefined;
   destination.groundDodgeDirection = dodge ?? 0;
 
-  if (destination.attackPressed || (destination.attackHeld && (pressed & MOVEMENT_ACTIONS) !== 0)) {
+  if (destination.attackPressed || ((held & ATTACK_BIT) !== 0 && (pressed & MOVEMENT_ACTIONS) !== 0)) {
     const shieldGrab = fighter.motion.grounded && (fighter.shield.raised || destination.shield);
     queueAttack(attacks, {
-      style: normalAttackStyle(destination.direction, destination.verticalDirection, destination.walking, shieldGrab),
+      style: normalAttackStyle(destination.direction, destination.verticalDirection, destination.walking, strong, shieldGrab),
       facing: sign(destination.direction), frame, mayCharge: true,
     });
   }

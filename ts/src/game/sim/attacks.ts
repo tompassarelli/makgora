@@ -132,7 +132,7 @@ function groundOption(style: AttackStyle): GroundOption | undefined {
     case AttackStyle.jab: return GroundOption.jab;
     case AttackStyle.forwardTilt:
     case AttackStyle.forwardTiltUp:
-    case AttackStyle.forwardTiltDown:
+    case AttackStyle.forwardTiltDown: return GroundOption.forwardTilt;
     case AttackStyle.upTilt:
     case AttackStyle.downTilt: return GroundOption.tilt;
     case AttackStyle.forwardSmash: return GroundOption.forwardSmash;

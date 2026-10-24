@@ -26,15 +26,16 @@ export function groundDodgeIntent(shielding: boolean, left: boolean, right: bool
   return left === right ? undefined : left ? -1 : 1;
 }
 
-export function normalAttackStyle(horizontal: number, vertical: number, walking: boolean, shieldGrab: boolean): AttackStyle {
+export function normalAttackStyle(horizontal: number, vertical: number, walking: boolean, strong: boolean, shieldGrab: boolean): AttackStyle {
   if (shieldGrab) return AttackStyle.grab;
+  if (strong) return vertical > 0 ? AttackStyle.upSmash : vertical < 0 ? AttackStyle.downSmash : AttackStyle.forwardSmash;
   if (walking && horizontal !== 0) {
     if (vertical > 0) return AttackStyle.forwardTiltUp;
     if (vertical < 0) return AttackStyle.forwardTiltDown;
     return AttackStyle.forwardTilt;
   }
-  if (vertical > 0) return walking ? AttackStyle.upTilt : AttackStyle.upSmash;
-  if (vertical < 0) return walking ? AttackStyle.downTilt : AttackStyle.downSmash;
-  if (horizontal !== 0) return walking ? AttackStyle.forwardTilt : AttackStyle.forwardSmash;
+  if (vertical > 0) return AttackStyle.upTilt;
+  if (vertical < 0) return AttackStyle.downTilt;
+  if (horizontal !== 0) return AttackStyle.forwardTilt;
   return AttackStyle.jab;
 }

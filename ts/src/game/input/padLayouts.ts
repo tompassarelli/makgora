@@ -64,7 +64,7 @@ export const PAD_LAYOUTS: readonly PadLayout[] = [
     label: "Melee",
     bindings: [
       bind("a", Action.attack, "Attack"), bind("b", Action.special, "Special"), bind("x", Action.jump, "Jump"), bind("y", Action.jump, "Jump"),
-      bind("rb", Action.grab, "Grab"), bind("lb", Action.exSpecial, "EX special"), ...shared,
+      bind("rb", Action.grab, "Grab"), bind("lb", Action.strong, "Strong"), ...shared,
     ],
   },
   {
@@ -72,7 +72,7 @@ export const PAD_LAYOUTS: readonly PadLayout[] = [
     label: "Z jump",
     bindings: [
       bind("a", Action.attack, "Attack"), bind("b", Action.special, "Special"), bind("x", Action.grab, "Grab"), bind("y", Action.jump, "Jump"),
-      bind("rb", Action.jump, "Jump"), bind("lb", Action.exSpecial, "EX special"), ...shared,
+      bind("rb", Action.jump, "Jump"), bind("lb", Action.strong, "Strong"), ...shared,
     ],
   },
   {
@@ -80,7 +80,7 @@ export const PAD_LAYOUTS: readonly PadLayout[] = [
     label: "Tom",
     bindings: [
       bind("a", Action.attack, "Attack"), bind("b", Action.grab, "Grab"), bind("x", Action.special, "Special"), bind("y", Action.jump, "Jump"),
-      bind("lb", Action.shortHop, "Short hop"), bind("rb", Action.exSpecial, "EX special"), ...shared,
+      bind("lb", Action.shortHop, "Short hop"), bind("rb", Action.strong, "Strong"), ...shared,
     ],
   },
 ];

@@ -9,9 +9,9 @@ controller is optional: the Smashcraft controller helper turns its buttons
 and sticks into its own pad keys, which work with any Controls layout, so
 pad players keep whichever layout they like (the Controls screen that opens each game, or F1, changes it; it saves straight away).
 The default Melee layout uses A to
-attack, B for specials, X/Y to jump, RB to grab and LB for an EX special;
+attack, B for specials, X/Y to jump, RB to grab and LB for Strong;
 Tom's layout uses A to attack, X for specials, Y to jump, B to grab, LB to
-short hop and RB for an EX special. In both layouts, either trigger shields or air-dodges and
+short hop and RB for Strong. In both layouts, either trigger shields or air-dodges and
 Start pauses. The current prototype includes character and stage
 selection, 26 fighters, a bot opponent, floating platforms, blast zones,
 stocks, rematches, and configurable controls.
@@ -103,7 +103,7 @@ WASD, the default, uses A/D to move, W to aim up, S to fast-fall or drop
 through platforms, Space/8 to jump, Q to shield or air-dodge, 0 for light
 shield, O to grab, N to attack, and U for a special. Hitbox moves with W/R,
 aims up with Space and down with E, jumps with 8 and shields with Q (light
-shield 0). Custom is Hitbox with Z/9 to jump, Q/8/G to shield, A for light shield, / for C-stick left and 0/X for EX special. Shield + N or O
+shield 0). Custom is Hitbox with Z/9 to jump, Q/8/G to shield, A for light shield, / for C-stick left and 0/X for Strong. Shield + N or O
 grabs. While holding an
 opponent, tap N to pummel once or a movement/C-stick direction to throw forward,
 backward, up, or down; after the pummel, throw or the opponent goes free. Mash
@@ -139,14 +139,14 @@ gives down-B. Release down, then hard-press it to drop immediately. Analog
 inputs need a quick flick; keyboard inputs need a fresh down-key press. The
 drop consumes that press: held down never fast-falls. Return toward neutral
 (or release the key), then press down again to fast-fall.
-N with a direction performs a smash, or a tilt while walking. B is
+N with a direction performs a tilt, a fresh flick included; out of a run (or a dash after its first three frames) N is the dash attack. Hold Strong (9 on WASD and Hitbox, 0 on Custom, LB or RB on a pad) and press N for a smash: up, down, or forward with a side direction or none. Keep holding Strong or N to charge it. B is
 C-stick left; H is down; J is up; M is right. C-stick down-air preserves
 normal aerial momentum. WASD and Hitbox use 7 for right trigger and 9
-for EX special; Custom uses 8 and 0. T is unbound by default.
+for Strong; Custom uses 8 and 0. T is unbound by default.
 
 Specials use U with a direction; every fighter's specials and
-ultimate are listed by name in the [move list](move-list.md). The EX special
-key (9 on WASD and Hitbox, 0 on Custom) with a direction casts that special's EX
+ultimate are listed by name in the [move list](move-list.md). Strong + U
+with a direction casts that special's EX
 form, costing one of the super bar's three segments. At a full bar,
 N + U together (A + B in Melee or A + X in Tom's controller layout) is the fighter's ultimate; the
 Ultimates rule at fighter selection turns them off.

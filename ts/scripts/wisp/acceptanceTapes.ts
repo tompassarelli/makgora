@@ -34,7 +34,7 @@ SOURCES.set(STICK_JUMP, Action.jump);
 
 const LEFT = "W", RIGHT = "R", DOWN = "E", UP = "SPACE", JUMP = "8", JUMP_ALT = padSource(Action.jump), ATTACK = "N", SPECIAL = "U",
   GRAB = "O", SHIELD_LEFT = "Q", SHIELD_RIGHT = "7", SHIELD_RIGHT_ALT = padSource(Action.rightTrigger), LIGHT_SHIELD = "0", C_LEFT = "B", C_LEFT_ALT = padSource(Action.smashLeft), C_RIGHT = "M", C_UP = "J",
-  C_DOWN = "H", WALK = "P", SHORT_HOP = "I", EX = "9", EX_ALT = padSource(Action.exSpecial);
+  C_DOWN = "H", WALK = "P", SHORT_HOP = "I", EX = "9", EX_ALT = padSource(Action.strong);
 
 
 const TOWARD = "toward", AWAY = "away";

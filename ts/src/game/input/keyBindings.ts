@@ -77,8 +77,8 @@ export function presetBindings(preset: BindingPreset): KeyBindings {
   bind(Action.walk, code("P"));
   bind(Action.lightShield, code(custom ? "A" : "0"));
   bind(Action.shortHop, code("I"));
-  if (custom) bind(Action.exSpecial, code("0"), code("X"));
-  else bind(Action.exSpecial, code("9"));
+  if (custom) bind(Action.strong, code("0"), code("X"));
+  else bind(Action.strong, code("9"));
   return { keys };
 }
 
@@ -92,7 +92,7 @@ export function previousStandardKeys(): number[] {
   bind(Action.rightTrigger, code("7"), code("G"));
   bind(Action.smashLeft, code("B"), SLASH);
   bind(Action.lightShield, code("A"), EMPTY);
-  bind(Action.exSpecial, code("9"), code("X"));
+  bind(Action.strong, code("9"), code("X"));
   return keys;
 }
 
@@ -193,14 +193,14 @@ function upgradeToCurrentKeys(bindings: KeyBindings, version: string): void {
 
 function upgradeToPreviousKeys(bindings: KeyBindings, version: string): void {
   const { keys } = bindings;
-  if (keyFor(bindings, Action.exSpecial, 0) === code("X") && keyFor(bindings, Action.exSpecial, 1) === undefined) {
-    keys[slotIndex(Action.exSpecial, 0)] = EMPTY;
-    keys[slotIndex(Action.exSpecial, 1)] = code("X");
+  if (keyFor(bindings, Action.strong, 0) === code("X") && keyFor(bindings, Action.strong, 1) === undefined) {
+    keys[slotIndex(Action.strong, 0)] = EMPTY;
+    keys[slotIndex(Action.strong, 1)] = code("X");
   }
   upgradeDefaults(bindings, version);
-  if (keyFor(bindings, Action.exSpecial, 0) === undefined) {
+  if (keyFor(bindings, Action.strong, 0) === undefined) {
     const ex = keyFor(bindings, Action.jump, 1) === code("9") ? code("0") : code("9");
-    if (!keys.includes(ex)) rebind(bindings, Action.exSpecial, 0, ex);
+    if (!keys.includes(ex)) rebind(bindings, Action.strong, 0, ex);
   }
 }
 
@@ -216,7 +216,7 @@ function upgradeDefaults(bindings: KeyBindings, version: string): void {
   }
   if (keyFor(bindings, Action.lightShield, 1) === undefined && free(code("T"))) rebind(bindings, Action.lightShield, 1, code("T"));
   if (keyFor(bindings, Action.rightTrigger, 1) === undefined && free(code("G"))) rebind(bindings, Action.rightTrigger, 1, code("G"));
-  if (keyFor(bindings, Action.exSpecial, 1) === undefined && free(code("X"))) rebind(bindings, Action.exSpecial, 1, code("X"));
+  if (keyFor(bindings, Action.strong, 1) === undefined && free(code("X"))) rebind(bindings, Action.strong, 1, code("X"));
   if (first(Action.shortHop) === undefined) {
     const hop = first(Action.jump) === code("I") ? code("Z") : code("I");
     if (free(hop)) rebind(bindings, Action.shortHop, 0, hop);
@@ -283,7 +283,7 @@ export const ACTION_LABELS: Readonly<Record<Action, string>> = {
   [Action.walk]: "Tilt",
   [Action.lightShield]: "Light shield",
   [Action.shortHop]: "Short hop (LB in the tom pad layout)",
-  [Action.exSpecial]: "EX special",
+  [Action.strong]: "Strong (smash, EX special)",
 };
 
 export const ACTION_KEY_LABELS: Readonly<Record<Action, string>> = {
@@ -304,7 +304,7 @@ export const ACTION_KEY_LABELS: Readonly<Record<Action, string>> = {
   [Action.walk]: "Tilt",
   [Action.lightShield]: "Light sh.",
   [Action.shortHop]: "Hop",
-  [Action.exSpecial]: "EX",
+  [Action.strong]: "Strong",
 };
 
 export function keyLabel(key: number | undefined): string {

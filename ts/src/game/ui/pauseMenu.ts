@@ -95,11 +95,11 @@ export class PauseMenu {
     BlzFrameSetText(this.help, `${MENU_STYLE.text}${title ? "A / Start / Click: Play" : "Stick / arrows: choose · A: select · Click: select\nStart / Y: resume · Escape: character select"}|r`);
     BlzFrameSetVisible(this.controlsTitle, !title);
     BlzFrameSetVisible(this.controls, !title);
-    const [shield, special, attack, jump, up, down] = [Action.leftTrigger, Action.special, Action.attack, Action.jump, Action.moveUp, Action.moveDown].map((action) => keyNames(bindings, action));
+    const [shield, special, attack, jump, up, down, strong] = [Action.leftTrigger, Action.special, Action.attack, Action.jump, Action.moveUp, Action.moveDown, Action.strong].map((action) => keyNames(bindings, action));
     const sides = `${keyNames(bindings, Action.moveLeft)}/${keyNames(bindings, Action.moveRight)}`;
-    BlzFrameSetText(this.controls, MENU_STYLE.text + `${keyNames(bindings, Action.leftTrigger)}: full shield · ${keyNames(bindings, Action.lightShield)}: light shield · ${keyNames(bindings, Action.walk)}: tilt · ${keyNames(bindings, Action.shortHop)}: short hop · ${keyNames(bindings, Action.exSpecial)}: meter\n`
+    BlzFrameSetText(this.controls, MENU_STYLE.text + `${keyNames(bindings, Action.leftTrigger)}: full shield · ${keyNames(bindings, Action.lightShield)}: light shield · ${keyNames(bindings, Action.walk)}: tilt · ${keyNames(bindings, Action.shortHop)}: short hop · ${keyNames(bindings, Action.strong)}: strong\n`
       + `${shield} just before landing: tech (hold ${sides} to roll)\n`
-      + `${shield} + ${special}: EX (one bar) · ${attack} + ${special}: Ultimate (full bar)\n`
+      + `${strong} + ${attack}: smash · ${strong} + ${special}: EX (one bar) · ${attack} + ${special}: Ultimate (full bar)\n`
       + `${shield} + ${sides}: roll · ${shield} + ${down}: dodge\n`
       + `Downed: ${attack}/${special}: strike · ${up}/${jump}/${shield}: stand · ${sides}: roll\n`
       + `Ledge: ${up}/toward: climb · ${jump}: leap · ${shield}: roll · ${attack}: strike · ${down}/away: let go`

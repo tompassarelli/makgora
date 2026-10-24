@@ -98,7 +98,7 @@ Run at its run frame only with the stick past 0.625 forward.
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Stand | neutral | yes | yes | – | yes | yes | yes | yes | dash, smash turn | – |
 | Walk slow/middle/fast | walk zone; re-enters Dash when the stick then flicks past 0.8 within the window (a Melee routine in Walk's list) | yes | yes | – | yes | yes | yes | yes | dash | – |
-| Initial dash | dash zone from stand, walk or crouch, or a dash back | no: A gives the dash attack | forward smash on frames 1–3 only; the slide brakes as if the stick were released | frames 1–20 | dash grab | yes | yes (relaxed) | no | dash back (the dash dance) | – |
+| Initial dash | dash zone from stand, walk or crouch, or a dash back | forward tilt on frames 1–3 only (#186); otherwise A gives the dash attack | forward smash on frames 1–3 only; the slide brakes as if the stick were released | frames 1–20 | dash grab | yes | yes (relaxed) | no | dash back (the dash dance) | – |
 | Run | dash held forward to its run frame | no: A gives the dash attack | no | yes | dash grab | yes | yes (relaxed) | no | no | turn-run at x ≤ −0.375 |
 | Run brake | run with \|x\| < 0.625 | no | no | no | no | no | yes (relaxed) | yes: crouch from run goes through here | no | turn-run within its command window |
 | Turn-run | run or run brake turned | no | no | no | pivot grab (Smashcraft, #337) | no | yes (relaxed) | no | no | – |
@@ -123,6 +123,16 @@ Where Smashcraft keeps its own rule, and why:
 - Rolls come from shield on every state that allows shield (Melee also rolls
   out of dash frames 1–3,).
 - The forward-smash window applies to every initial dash, including dash backs.
+- Smashes come only from the Strong button (#186, after Rivals of Aether's
+  strong attack): Strong + A gives the up, down or forward smash (forward with
+  no direction too), and holding Strong or A charges it. A direction + A is
+  always a tilt; a fresh flick dashes on its first frame, so the forward tilt
+  takes the dash's frames 1–3 that the forward smash had, and a flick + A
+  gives the forward tilt where Melee gives the forward smash. Out of a run, or
+  a dash past frame 3, A stays the dash attack: there is no tilt out of run.
+  Strong + B with a direction is the special's EX form; A + B at a full bar
+  stays the ultimate. The C-stick keeps its smashes (tilts with the walk
+  modifier or its tilt setting).
 - A held stick at full deflection (keyboard keys and a pad at the rim) still
   dashes when it was not a fresh flick, keeping the walk modifier's release
   to a dash (smashcraft:docs/physics.md); a pad held at 0.8–0.99 walks fast.

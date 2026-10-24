@@ -53,6 +53,7 @@ export const GroundOption = {
   dash: 9,
   walk: 10,
   turnRun: 11,
+  forwardTilt: 12,
 } as const;
 export type GroundOption = (typeof GroundOption)[keyof typeof GroundOption];
 
@@ -85,7 +86,7 @@ export function groundOptionAllowed(state: GroundState, frame: number, option: G
     case GroundState.crouch:
       return option !== GroundOption.dashAttack && option !== GroundOption.turnRun && option !== GroundOption.walk;
     case GroundState.dash:
-      if (option === GroundOption.forwardSmash) return frame <= DASH_SMASH_LAST_FRAME;
+      if (option === GroundOption.forwardSmash || option === GroundOption.forwardTilt) return frame <= DASH_SMASH_LAST_FRAME;
       if (option === GroundOption.dashAttack) return frame <= DASH_ATTACK_LAST_FRAME;
       return option === GroundOption.grab || option === GroundOption.shield || option === GroundOption.jump || option === GroundOption.dash;
     case GroundState.run:
