@@ -47,8 +47,8 @@ export function realFramesDue(real: RealFrames, callbacks: number, ran: number, 
     return real.due;
   }
   real.due = real.anchorFrame + Math.floor(f32(f32(seconds - real.anchorSeconds) * FRAMES_PER_SECOND));
-  if (real.due < ran || real.due - ran > CATCH_UP_FRAMES) {
-    anchor(real, Math.min(Math.max(real.due, ran), ran + CATCH_UP_FRAMES), seconds, callbacks, true);
+  if (Math.abs(real.due - ran) > CATCH_UP_FRAMES) {
+    anchor(real, Math.min(Math.max(real.due, ran - CATCH_UP_FRAMES), ran + CATCH_UP_FRAMES), seconds, callbacks, true);
     real.due = real.anchorFrame;
   }
   return real.due;
