@@ -11,7 +11,7 @@ import { passStartControls } from "./startControls";
 import type { Lockstep } from "wisp/src/headless/lockstep";
 import type { PerfMeasure } from "wisp/src/headless/luaPerf";
 import { Phase, type MatchState } from "../../src/game/lobby/lobbyState";
-import { Character } from "../../src/game/sim/codes";
+import { Character, SpecialAction } from "../../src/game/sim/codes";
 import { Action } from "../../src/game/input/actions";
 import { DEFAULT_PRESET, keyFor, presetBindings } from "../../src/game/input/keyBindings";
 import { canAttack } from "../../src/game/sim/conditions";
@@ -179,8 +179,13 @@ function approach(clients: Lockstep): readonly [number, number] {
   return [first, clients.frame];
 }
 
-function playMove(clients: Lockstep, move: CensusMove): readonly [number, number] {
+function playMove(clients: Lockstep, move: CensusMove): readonly [number, number, number | undefined] {
   const first = clients.frame + 1;
+  const before = fighterAt(shellOf(clients).world, 0);
+  const attackSerial = before.attack.serial;
+  const grabSerial = before.grab.serial;
+  let action = before.special.action;
+  let started: number | undefined;
   for (let at = 0; at < MOVE_FRAMES; at++) {
     for (const [when, key, kind] of move.keys) {
       if (when !== at) continue;
@@ -188,8 +193,12 @@ function playMove(clients: Lockstep, move: CensusMove): readonly [number, number
       else keyEvent(clients, key, kind === "down");
     }
     clients.frames(1);
+    if (started !== undefined) continue;
+    const { attack, grab, special } = fighterAt(shellOf(clients).world, 0);
+    if (attack.serial !== attackSerial || grab.serial !== grabSerial || (special.action !== action && special.action !== SpecialAction.none)) started = at;
+    action = special.action;
   }
-  return [first, clients.frame];
+  return [first, clients.frame, started];
 }
 
 function problemsOf(clients: Lockstep): { problems: number; lines: string[] } {
@@ -201,12 +210,18 @@ function problemsOf(clients: Lockstep): { problems: number; lines: string[] } {
 
 export function playFighterCensus(clients: Lockstep, measure: PerfMeasure, fighter: Character, label: string): { problems: number; lines: string[] } {
   startTraining(clients, measure, fighter, CENSUS_STAGE);
+  const unstarted: string[] = [];
   for (const move of CENSUS_MOVES) {
     const [baseFirst, baseLast] = approach(clients);
-    const [moveFirst, moveLast] = playMove(clients, move);
-    print(`census\t${label}\t${move.name}\t${baseFirst}\t${baseLast}\t${moveFirst}\t${moveLast}`);
+    const [moveFirst, moveLast, started] = playMove(clients, move);
+    if (started === undefined) unstarted.push(move.name);
+    print(`census\t${label}\t${move.name}\t${baseFirst}\t${baseLast}\t${moveFirst}\t${moveLast}\t${started ?? "never"}`);
   }
-  return problemsOf(clients);
+  const result = problemsOf(clients);
+  const [firstUnstarted] = unstarted;
+  if (firstUnstarted === undefined) return result;
+  const lines = [...result.lines, `${label}: ${firstUnstarted} never started; ${unstarted.length} of ${CENSUS_MOVES.length} census moves never started`];
+  return { problems: lines.length, lines };
 }
 
 

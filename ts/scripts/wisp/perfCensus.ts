@@ -46,6 +46,7 @@ export interface CensusEntry {
   readonly worstFrame: number;
   readonly baseFrames: readonly [number, number];
   readonly spikeMs: number;
+  readonly startedAt: number | undefined;
 
   readonly instructions: number;
   readonly natives: number;
@@ -113,7 +114,7 @@ function censusEntries(output: string): CensusEntry[] {
       }
       return picked;
     };
-    return marks.map(([, group = "", name = "", baseFirst, baseLast, moveFirst, moveLast]) => {
+    return marks.map(([, group = "", name = "", baseFirst, baseLast, moveFirst, moveLast, started]) => {
       const base = range(Number(baseFirst), Number(baseLast));
       const move = range(Number(moveFirst), Number(moveLast));
       const baselineMs = median(base.map(predictedMs));
@@ -129,7 +130,7 @@ function censusEntries(output: string): CensusEntry[] {
       });
       return {
         group, name, baselineMs, worstMs, worstAt, spikeMs: worstMs - baselineMs,
-        worstFrame: Number(moveFirst) + worstAt, baseFrames: [Number(baseFirst), Number(baseLast)],
+        worstFrame: Number(moveFirst) + worstAt, baseFrames: [Number(baseFirst), Number(baseLast)], startedAt: started === undefined || started === "never" ? undefined : Number(started),
         instructions: worst.instructions - median(base.map((frame) => frame.instructions)),
         natives: worst.natives - median(base.map((frame) => frame.natives)),
         allocatedKb: worst.allocatedKb - median(base.map((frame) => frame.allocatedKb)),
@@ -139,9 +140,9 @@ function censusEntries(output: string): CensusEntry[] {
 }
 
 export function censusLines(entries: readonly CensusEntry[], limitMs: number): string[] {
-  const lines = ["group         entry                              base ms  worst ms  spike ms  at   +instructions  +natives  +KB"];
+  const lines = ["group         entry                              base ms  worst ms  spike ms  at  start  +instructions  +natives  +KB"];
   for (const entry of entries) {
-    lines.push(`${entry.group.padEnd(13)} ${entry.name.padEnd(34)} ${entry.baselineMs.toFixed(2).padStart(7)}  ${entry.worstMs.toFixed(2).padStart(8)}  ${entry.spikeMs.toFixed(2).padStart(8)}  ${String(entry.worstAt).padStart(3)}  ${String(Math.round(entry.instructions)).padStart(13)}  ${String(Math.round(entry.natives)).padStart(8)}  ${entry.allocatedKb.toFixed(0).padStart(3)}${entry.spikeMs > limitMs ? "  OVER" : ""}`);
+    lines.push(`${entry.group.padEnd(13)} ${entry.name.padEnd(34)} ${entry.baselineMs.toFixed(2).padStart(7)}  ${entry.worstMs.toFixed(2).padStart(8)}  ${entry.spikeMs.toFixed(2).padStart(8)}  ${String(entry.worstAt).padStart(3)}  ${(entry.startedAt === undefined ? "-" : String(entry.startedAt)).padStart(5)}  ${String(Math.round(entry.instructions)).padStart(13)}  ${String(Math.round(entry.natives)).padStart(8)}  ${entry.allocatedKb.toFixed(0).padStart(3)}${entry.spikeMs > limitMs ? "  OVER" : ""}`);
   }
   const worst = [...entries].sort((a, b) => b.spikeMs - a.spikeMs)[0];
   if (worst !== undefined) lines.push(`${entries.length} entries; worst spike ${worst.spikeMs.toFixed(2)} ms (${worst.group} ${worst.name}); ${entries.filter((entry) => entry.spikeMs > limitMs).length} over ${limitMs} ms`);
