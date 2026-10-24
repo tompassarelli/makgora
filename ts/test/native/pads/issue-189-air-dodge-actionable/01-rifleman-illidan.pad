@@ -1,0 +1,112 @@
+# #189: Rifleman (a) and Illidan (b) each air dodge once per airtime, four airtimes;
+# gravity returns 29 frames after the dodge, and that frame is the first that accepts jump, special,
+# aerial and fast fall, while a different action pressed one frame earlier is refused.
+#! chat -dev quick pair Rifleman / Illidan
+# Airtimes start on frames 40, 200, 360 and 520; gravity returns on 81, 241, 401 and 594, probing
+# jump, special, aerial and fast fall in turn. Each fighter turns to face away before the special.
+40 a press B
+40 b press B
+52 a stick 1 0
+52 a shield 1
+52 b stick 1 0
+52 b shield 1
+53 a shield 0
+53 a stick 0 0
+53 b shield 0
+53 b stick 0 0
+54 a release B
+54 b release B
+80 a tap A 1
+80 b tap A 1
+81 a tap B 1
+81 b tap B 1
+180 a stick -1 0
+180 b stick 1 0
+182 a stick 0 0
+182 b stick 0 0
+200 a press B
+200 b press B
+212 a stick -1 0
+212 a shield 1
+212 b stick -1 0
+212 b shield 1
+213 a shield 0
+213 a stick 0 0
+213 b shield 0
+213 b stick 0 0
+214 a release B
+214 b release B
+240 a tap B 1
+240 b tap B 1
+241 a tap X 1
+241 b tap X 1
+360 a press B
+360 b press B
+372 a stick 1 0
+372 a shield 1
+372 b stick -1 0
+372 b shield 1
+373 a shield 0
+373 a stick 0 0
+373 b shield 0
+373 b stick 0 0
+374 a release B
+374 b release B
+400 a tap X 1
+400 b tap X 1
+401 a tap A 1
+401 b tap A 1
+520 a press B
+520 b press B
+534 a release B
+534 b release B
+542 a tap Y 1
+542 b tap Y 1
+565 a stick -1 -1
+565 a shield 1
+565 b stick -1 -1
+565 b shield 1
+566 a shield 0
+566 a stick 0 0
+566 b shield 0
+566 b stick 0 0
+593 a stick 0 -1
+593 b stick 0 -1
+598 a stick 0 0
+598 b stick 0 0
+680 a press VIEW
+750 a release VIEW
+#! absent a 52-80 fall gravity
+#! expect a 81 fall gravity
+#! absent a 52-80 applied attack
+#! expect a 81 applied jump
+#! absent a 212-240 fall gravity
+#! expect a 241 fall gravity
+#! absent a 212-240 applied jump
+#! expect a 241 special
+#! absent a 372-400 fall gravity
+#! expect a 401 fall gravity
+#! absent a 372-400 special
+#! expect a 401 applied attack
+#! absent a 565-593 fall gravity
+#! expect a 594 fall gravity
+#! absent a 565-593 fall fast
+#! expect a 594 fall fast
+#! absent b 52-80 fall gravity
+#! expect b 81 fall gravity
+#! absent b 52-80 applied attack
+#! expect b 81 applied jump
+#! absent b 212-240 fall gravity
+#! expect b 241 fall gravity
+#! absent b 212-240 applied jump
+#! expect b 241 special
+#! absent b 372-400 fall gravity
+#! expect b 401 fall gravity
+#! absent b 372-400 special
+#! expect b 401 applied attack
+#! absent b 565-593 fall gravity
+#! expect b 594 fall gravity
+#! absent b 565-593 fall fast
+#! expect b 594 fall fast
+#! absent a 40-680 damage
+#! absent b 40-680 damage

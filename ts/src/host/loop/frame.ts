@@ -54,6 +54,9 @@ function observe(before: FrameObservation, fighter: Readonly<Fighter>): void {
   before.groundSpeed = fighter.motion.vx;
   before.surface = fighter.motion.surface;
   before.dropConsumed = fighter.platform.dropConsumed;
+  before.dodgeMoved = before.dodgeMotion > 0;
+  before.dodgeMotion = fighter.dodge.airMotionFrames;
+  before.fastFalling = fighter.motion.fastFalling;
 }
 
 const bit = (value: boolean) => (value ? "1" : "0");
@@ -87,6 +90,8 @@ function traceChanges(s: ShellState, slot: ParticipantSlot, before: Readonly<Fra
   }
   if (before.breakState !== f.shield.breakState) traceParticipant(s, slot, `shield-break ${f.shield.breakState} z ${R2S(f.motion.z)} remaining ${R2S(f.shield.breakRemaining)}`);
   if (before.ledge !== f.ledge.state) traceParticipant(s, slot, `ledge ${f.ledge.state} x ${R2S(f.motion.x)} z ${R2S(f.motion.z)}`);
+  if (before.dodgeMoved && before.dodgeMotion === 0 && !f.motion.grounded) traceParticipant(s, slot, `fall gravity z ${R2S(f.motion.z)}`);
+  if (!before.fastFalling && f.motion.fastFalling) traceParticipant(s, slot, `fall fast z ${R2S(f.motion.z)}`);
   if (before.jump !== f.jump.serial) traceParticipant(s, slot, `applied jump ${f.jump.serial} double ${bit(f.jump.isDouble)} z ${R2S(f.motion.z)}`);
   if (!before.dropConsumed && f.platform.dropConsumed) {
     if (f.motion.grounded && f.motion.surface !== undefined) traceParticipant(s, slot, `platform mount deck ${f.motion.surface}`);
