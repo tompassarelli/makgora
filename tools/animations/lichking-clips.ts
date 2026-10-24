@@ -236,10 +236,19 @@ function ledges(kit: Kit): Clip[] {
 const DEFILE_WIND: Beat = { step: [-6, 0], lean: -10, twist: -16, handR: [24, -32, 160], handL: [28, 16, 146], aim: 90 };
 const DEFILE_CAST: Beat = { step: [10, -8], lean: 6, twist: 8, handR: [62, -28, 150], handL: [48, 12, 140], aim: -90, footL: [42, 14, 1] };
 const RISE: Beat = { lean: -8, handR: [6, -26, 148], aim: 92, handL: [24, 30, 132], footR: [4, -16, 6], footL: [-4, 14, 6] };
+const BLAST_STRIDE: Beat = { footR: [78, -18, 1] };
+const BLAST_COIL: Beat = { ...BLAST_STRIDE, step: [38, -8], lean: -16, twist: 32, handR: [-4, -34, 118], aim: 140, handL: [44, 16, 96] };
+const BLAST_RELEASE: Beat = { ...BLAST_STRIDE, step: [64, -16], lean: 30, twist: -12, handR: [36, -30, 102], aim: -4, handL: [18, 26, 92] };
+const BLAST_FOLLOW: Beat = { ...BLAST_STRIDE, step: [68, -24], lean: 40, twist: -26, handR: [30, -28, 70], aim: -38, handL: [-2, 28, 86] };
 
 function specials(kit: Kit): Clip[] {
     return [
-        reuse(kit, "Special Neutral", "Spell Throw", zero(29), 56),
+        author(kit, "Special Neutral", beats({
+            0: {}, 5: { step: [16, -2], lean: -4, twist: 12, handR: [10, -32, 104], aim: 80, footR: [26, -24, 22] },
+            12: BLAST_COIL, [zero(29) - 4]: { ...BLAST_COIL, step: [40, -14], lean: -22, twist: 38, handR: [-8, -34, 120], aim: 150 },
+            [zero(29)]: BLAST_RELEASE, 34: BLAST_FOLLOW,
+            47: { step: [8, -2], lean: 2, handR: [22, -30, 90], aim: 30, footR: [6, -26, 16] }, 56: {},
+        }), { copyOf: "Spell Throw" }),
         author(kit, "Special Down", beats({
             0: {}, 9: DEFILE_WIND, 14: DEFILE_WIND, [zero(20)]: DEFILE_CAST, 25: DEFILE_CAST,
             33: { step: [6, -10], lean: 16, handR: [34, -30, 114], handL: [32, 20, 106], aim: -65 }, 46: {}, 50: {},
