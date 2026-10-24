@@ -16,6 +16,7 @@ export interface StrikeCapsule {
   readonly x2: number;
   readonly z2: number;
   readonly radius: number;
+  readonly path?: true | undefined;
 }
 
 export interface MoveRegion {

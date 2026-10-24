@@ -9,15 +9,20 @@ const omen = (ex: boolean): AuthoredSpecial => ({
     effect: medivhHit(ex ? 14.090401649475098 : 10.567800521850586, 80, 50.66062545776367, 50.0), reflectable: true, limit: 1,
     model: "Abilities\\Weapons\\PriestMissile\\PriestMissile.mdl" }],
 });
-const vanish = (ex: boolean, retreat: boolean): AuthoredSpecial => ({
-  endFrame: 38, landingLag: 20, intangible: frames(9, 10), defensiveUse: retreat, helplessOnMiss: true,
-  motion: [{ ...frames(1, 9), velocityX: 0.0, velocityZ: 0.0 },
-    { ...frames(10, 10), velocityX: retreat ? (ex ? -160.0 : -120.0) : (ex ? 250.0 : 180.0), velocityZ: 0.0, throughEdge: true },
-    { ...frames(11, 38), velocityX: 0.0, velocityZ: 0.0 }],
-  regions: [heroRegion(retreat ? 13 : 12, retreat ? 15 : 14,
+const blinkPass = (ex: boolean) => heroRegion(11, 11, { x1: 0.0, z1: 55.0, x2: 0.0, z2: 55.0, radius: 24.0, path: true },
+  medivhHit(ex ? 8.219401359558105 : 5.87100076675415, 90, 50.66062545776367, 60.0));
+const vanish = (ex: boolean, retreat: boolean): AuthoredSpecial => {
+  const arrival = heroRegion(retreat ? 13 : 12, retreat ? 15 : 14,
     { x1: retreat ? -35.0 : 15.0, z1: 50.0, x2: retreat ? 35.0 : 100.0, z2: 50.0, radius: retreat ? (ex ? 40.0 : 28.0) : 14.0 },
-    medivhHit(retreat ? (ex ? 10.567800521850586 : 5.87100076675415) : (ex ? 12.9162015914917 : 8.219401359558105), 80, 41.44960403442383, 106.25))],
-});
+    medivhHit(retreat ? (ex ? 10.567800521850586 : 5.87100076675415) : (ex ? 12.9162015914917 : 8.219401359558105), 80, 41.44960403442383, 106.25));
+  return {
+    endFrame: 38, landingLag: 20, intangible: frames(9, 10), defensiveUse: retreat, helplessOnMiss: true,
+    motion: [{ ...frames(1, 9), velocityX: 0.0, velocityZ: 0.0 },
+      { ...frames(10, 10), velocityX: retreat ? (ex ? -160.0 : -120.0) : (ex ? 250.0 : 180.0), velocityZ: 0.0, throughEdge: true },
+      { ...frames(11, 38), velocityX: 0.0, velocityZ: 0.0 }],
+    regions: retreat ? [arrival] : [blinkPass(ex), arrival],
+  };
+};
 const raven = (ex: boolean): AuthoredSpecial => ({
   endFrame: 36, aimFrames: 8, oncePerAirtime: true, helpless: true, landingLag: 24,
   motion: [{ ...frames(1, 8), velocityX: 0.0, velocityZ: 0.0 },
@@ -27,7 +32,7 @@ const raven = (ex: boolean): AuthoredSpecial => ({
 
 export const MEDIVH_SPECIALS: FighterSpecials = {
   neutral: { name: "Arcane Omen", description: "Send a slow omen ahead. Shield it or jump over it.", ground: { ...omen(false), ex: omen(true) } },
-  side: { name: "Vanishing Act", description: "Blink forward and strike. Your arrival is open to a punish.", ground: { ...vanish(false, false), ex: vanish(true, false) } },
+  side: { name: "Vanishing Act", description: "Blink forward, popping up anyone you pass through, and strike. Your arrival is open to a punish.", ground: { ...vanish(false, false), ex: vanish(true, false) } },
   up: { name: "Raven Flight", description: "Aim and become a raven. Fall helpless after the flight.", ground: { ...raven(false), ex: raven(true) } },
   down: { name: "Last Word", description: "Blink back and burst outward. Bait an impatient chase.", ground: { ...vanish(false, true), ex: vanish(true, true) } },
 };

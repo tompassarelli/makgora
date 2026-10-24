@@ -3,7 +3,8 @@
 
 
 import { join } from "node:path";
-import { SELECTABLE_CHARACTERS, fighterName } from "../src/game/sim/heroes/registry";
+import { SELECTABLE_CHARACTERS, fighterName, heroDefinition } from "../src/game/sim/heroes/registry";
+import { type AuthoredSpecial, type FighterSpecials, SpecialSlot, specialKit } from "../src/game/sim/specials/schema";
 import { SPECIAL_INPUTS, fighterKit, normalName } from "../src/game/sim/moveNames";
 import { WORLD_UNITS_PER_MELEE_UNIT, authoredTuning } from "../src/game/sim/tuning";
 import { EdgeGuardTool, edgeGuardTool } from "../src/game/match/edgeGuardScenarios";
@@ -13,6 +14,28 @@ export const MOVE_LIST_PATH = join(import.meta.dir, "../../docs/move-list.md");
 
 const cell = (text: string) => text.replaceAll("|", "\\|");
 const percent = (damage: number) => `${Math.round(damage * 10) / 10}%`;
+const one = (value: number) => `${Math.round(value * 10) / 10}`;
+
+function pathHitRows(specials: FighterSpecials | undefined): string[] {
+  if (specials === undefined) return [];
+  const rows: string[] = [];
+  [SpecialSlot.neutral, SpecialSlot.side, SpecialSlot.up, SpecialSlot.down].forEach((slot, index) => {
+    const kit = specialKit(specials, slot);
+    const forms: [string, AuthoredSpecial | undefined][] = [["", kit.ground], [" in the air", kit.air]];
+    for (const [where, move] of forms) {
+      if (move === undefined) continue;
+      (move.regions ?? []).forEach((region, at) => {
+        if (region.hit.strike?.path !== true) return;
+        const { damage, launchX, launchZ, base, growth } = region.hit.effect;
+        const ex = move.ex?.regions?.[at]?.hit.effect.damage;
+        const angle = Math.round(Math.atan2(launchZ, Math.abs(launchX)) * 180 / Math.PI);
+        const frames = region.firstFrame === region.lastFrame ? `frame ${region.firstFrame + 1}` : `frames ${region.firstFrame + 1}-${region.lastFrame + 1}`;
+        rows.push(`| ${SPECIAL_INPUTS[index] ?? "Special"}, path${where} | ${cell(kit.name)} | Hits each opponent its travel crosses once, ${frames}: ${percent(damage)}${ex === undefined ? "" : ` (EX ${percent(ex)})`}, launch ${angle}°, base ${one(base)}, growth ${one(growth)}. |`);
+      });
+    }
+  });
+  return rows;
+}
 
 export function moveListMarkdown(): string {
   const lines = [
@@ -37,6 +60,7 @@ export function moveListMarkdown(): string {
       const forms = special.forms.length === 0 ? "" : ` (${special.forms.map((form) => form.name).join(", ")})`;
       lines.push(`| ${SPECIAL_INPUTS[slot] ?? "Special"} | ${cell(special.name)}${cell(forms)} | ${cell(special.description)} |`);
     });
+    lines.push(...pathHitRows(heroDefinition(character)?.specials));
     lines.push(`| Jab, repeated | ${cell(kit.jab.name)} | ${cell(kit.jab.description)} |`);
     const tool = edgeGuardTool(character) === EdgeGuardTool.forwardAir ? "Forward air" : "Down air";
     lines.push(`| Edge-guard tool | ${tool} | Read offstage, it kills this fighter's own predictable recovery at 40% (recorded in edgeGuard.tests.ts). |`);

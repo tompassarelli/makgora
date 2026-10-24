@@ -13,6 +13,7 @@ import { specialVariant } from "../heroes/koboldCandle";
 import { mutableProjectile } from "../fighterProjectiles";
 import { canAttack, inGrabContext, isIntangible } from "../conditions";
 import { type Fighter, type Projectile, mutablePlacedObject, placedObject } from "../fighter";
+import type { StrikeCapsule } from "../heroMoves";
 import { type FighterSpecials, type AuthoredSpecial, CompanionMode, CompanionOrder, type SpecialFollowUp, type SpecialGuard, type SpecialKit, type SpecialBeam, type SpecialMotion, type SpecialPlacement, type SpecialProjectile, FOLLOW_UP_FORM, FollowUpInput, Relocation, SpecialForm, SpecialSlot, specialForm, specialKit, ultimateForm } from "./schema";
 import { type HitRegion, NO_HIT_REGION, authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../hitRegions";
 import { type Controls, type Roster, fighterAt, isActive } from "../roster";
@@ -487,9 +488,15 @@ export function beamSegment(out: Capsule, owner: Readonly<Fighter>, beam: Readon
 }
 
 
-export function placeHeroStrike(out: Capsule, owner: Readonly<Fighter>, path: Readonly<Capsule>, originX: number, originZ: number): Capsule {
+export function placeHeroStrike(out: Capsule, owner: Readonly<Fighter>, path: Readonly<StrikeCapsule>, originX: number, originZ: number): Capsule {
   const beam = runningHeroSpecial(owner)?.beam;
-  return beam === undefined ? placeCapsule(out, path, originX, originZ, owner.facing) : beamSegment(out, owner, beam, path.radius);
+  if (beam !== undefined) return beamSegment(out, owner, beam, path.radius);
+  placeCapsule(out, path, originX, originZ, owner.facing);
+  if (path.path === true) {
+    out.x1 = f32(out.x1 - owner.motion.deltaX);
+    out.z1 = f32(out.z1 - owner.motion.deltaZ);
+  }
+  return out;
 }
 
 
