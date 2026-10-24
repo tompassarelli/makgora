@@ -23,10 +23,6 @@ on:
 
 run-name: Headless pads ${{ inputs.ref }} ${{ inputs.tag }}
 
-concurrency:
-  group: headless-pads ${{ inputs.lane || inputs.ref }} ${{ inputs.dirs }}
-  cancel-in-progress: true
-
 permissions:
   contents: read
   actions: write
@@ -41,10 +37,16 @@ jobs:
     outputs:
       sha: ${{ steps.plan.outputs.sha }}
       pads: ${{ steps.plan.outputs.pads }}
+      key: ${{ steps.key.outputs.key }}
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref }}
+      - id: key
+        env:
+          DIRS: ${{ inputs.dirs }}
+        # GitHub rejects a concurrency group over 400 characters, so the script set is keyed by its hash.
+        run: echo "key=$(printf '%s' "$DIRS" | sha256sum | cut -c1-12)" >> "$GITHUB_OUTPUT"
       - id: plan
         run: |
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
@@ -81,6 +83,9 @@ jobs:
   pad:
     needs: [plan, helper]
     runs-on: ubuntu-latest
+    concurrency:
+      group: headless-pads ${{ inputs.lane || inputs.ref }} ${{ needs.plan.outputs.key }} ${{ matrix.pad }}
+      cancel-in-progress: true
     timeout-minutes: 6
     strategy:
       fail-fast: false
