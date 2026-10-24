@@ -44,7 +44,12 @@ fighter can act), so line 2 measures the transition the game draws.
    the third do not count, so re-judging cannot roll a pass. Decided
    2026-10-24 by the proxy under Tom's standing direction (north gate 34),
    because one judge's score varied by about one point per line on the same
-   clip; the 4/5 bar and the gameplay-size framing stay.
+   clip; the 4/5 bar stays. Judges see the key poses at the match camera's
+   typical framing rather than its widest, with the 4/5 bar and three judges
+   unchanged: Tom's decision of 2026-10-24 via north gate 36, because the
+   widest framing shows a fighter smaller than a match usually does. Lines
+   1–4 keep the far camera's pixel scale, since nothing ties their
+   measurements to the judge framing, so their calibrated thresholds stand.
 
 `anim score` also writes `build/anim-score/classic-crouch.tsv`: each fighter's crouch pose-contrast
 line (#376). It holds down for 40 frames (the 24-frame crouch clip, then its held
@@ -94,16 +99,23 @@ five lines, including an independent judgement, in each supported look.
 `bun wisp anim judge fetch` retrieves private reference GIFs from SmashWiki.
 `bun wisp anim judge prepare --out PRIVATE_DIR [--fighter F]...`
 renders batches; `--move FIGHTER:MOVE` selects particular moves. It accepts
-the scoring command's graphics and asset flags. The camera holds
+the scoring command's graphics and asset flags. A move strip renders at the
+match camera's typical framing, `JUDGE_CAMERA` in
+`ts/scripts/wisp/animJudgeCamera.ts`: the median per-frame camera distance
+of one seeded two-fighter computer match on Frozen Throne, which
+`bun scripts/matchFraming.ts` (from `ts/`) replays and prints beside the
+widest framing (917.7 against 2132.3, so a fighter draws 2.32 times larger).
+Each tile is cropped to the drawn extent of the move's six key poses plus a
+margin, never enlarged. The camera holds
 still at the middle of the move's height range, as a match camera does, so a
 drop or rise shows in the tiles; it follows only travel that would put the body
-more than 50 gameplay pixels from that height, so flight does not crop the body
-out of its strip, and gameplay scale is unchanged; a movement strip (crouch, ledge hang, double jump)
-instead holds the camera on the drawn floor and grows upward so a jump shows
+more than 50 pixels from that height, so flight does not crop the body
+out of its strip; a movement strip (crouch, ledge hang, double jump)
+keeps the widest framing and instead holds the camera on the drawn floor and grows upward so a jump shows
 its real height above it. Read `docs/animation-judge-brief.md` in a fresh judge
 context and write its requested JSONL. `bun wisp anim judge record
 PRIVATE_DIR/scores-*.jsonl` validates and stores numerical judgements in
-`tools/move-data/anim-score/judge.jsonl`, each tagged with the identity of the clip it judged: a digest of the key-frame poses `prepare` rendered, written to PRIVATE_DIR/clips.json and attached by `record`. Line 5 takes the per-line median of the first three judgements whose identity matches the clip the scorecard samples now, so a re-authored move drops its old clip's scores; judgements recorded before identities existed count only while no judgement of that move names a clip (#95). Reference pixels stay outside Git.
+`tools/move-data/anim-score/judge.jsonl`, each tagged with the identity of the clip it judged: a digest of the judge framing and the key-frame poses `prepare` rendered, written to PRIVATE_DIR/clips.json and attached by `record`. Line 5 takes the per-line median of the first three judgements whose identity matches the clip the scorecard samples now, so a re-authored move or a changed framing drops the old clip's scores, and a judgement recorded before identities existed no longer counts (#95, #96). Reference pixels stay outside Git.
 
 ## Thresholds
 

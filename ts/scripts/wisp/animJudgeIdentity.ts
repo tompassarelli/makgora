@@ -5,8 +5,8 @@ import type { ScoreFrame } from "./animScore";
 
 const QUANTUM = 0.05;
 
-export function clipIdentity(frames: readonly (ScoreFrame | undefined)[]): string {
-  const hasher = new Bun.CryptoHasher("sha256");
+export function clipIdentity(frames: readonly (ScoreFrame | undefined)[], framing: string): string {
+  const hasher = new Bun.CryptoHasher("sha256").update(`${framing}|`);
   for (const frame of frames) {
     if (frame === undefined) {
       hasher.update("missing|");
@@ -18,15 +18,10 @@ export function clipIdentity(frames: readonly (ScoreFrame | undefined)[]): strin
   return hasher.digest("hex").slice(0, 16);
 }
 
-export function currentJudgements<Entry extends { readonly clip?: string | undefined }>(own: readonly Entry[], clip: string): readonly Entry[] {
-  const identified = own.filter((entry) => entry.clip !== undefined);
-  return identified.length === 0 ? own : identified.filter((entry) => entry.clip === clip);
-}
-
 export const JUDGES_PER_CLIP = 3;
 
 export function judgePanel<Entry extends { readonly clip?: string | undefined }>(own: readonly Entry[], clip: string): readonly Entry[] {
-  return currentJudgements(own, clip).slice(0, JUDGES_PER_CLIP);
+  return own.filter((entry) => entry.clip === clip).slice(0, JUDGES_PER_CLIP);
 }
 
 export const median = (values: readonly number[]): number => [...values].sort((a, b) => a - b)[Math.floor(values.length / 2)] ?? 0;

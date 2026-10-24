@@ -12,22 +12,15 @@
 import { writeFileSync } from "node:fs";
 import { parseArgs } from "node:util";
 import { f32 } from "wisp/src/sim/f32";
-import { clearAttackBuffer } from "../src/game/input/attackBuffer";
 import { PARTICIPANT_SLOTS, type Slots } from "../src/game/input/participants";
-import { produceComputerInput } from "../src/game/match/botPlay";
-import { createFrameControls } from "../src/game/match/controls";
-import { captureFrame, createMatchFrameInput, executeMatchFrame } from "../src/game/match/frameInput";
-import { createPacingAndPresentation } from "../src/game/match/pacingAndPresentation";
-import { MATCH_TICKS_PER_SECOND, Phase, createMatchState, setParticipants } from "../src/game/lobby/lobbyState";
-import { initializeMatchFighters, matchSpawnX } from "../src/game/match/step";
-import { createFighter } from "../src/game/sim/fighter";
-import { selectableCharacterBySlug } from "../src/game/sim/heroes/registry";
+import { MATCH_TICKS_PER_SECOND } from "../src/game/lobby/lobbyState";
 import { MATCH_CAMERA_ASPECT, outsideCamera } from "../src/game/sim/matchCamera";
-import { copyControls, createRoster, fighterAt, isActive, neutralControls, type Roster } from "../src/game/sim/roster";
+import { fighterAt, isActive, type Roster } from "../src/game/sim/roster";
 import { stageBounds } from "../src/game/sim/stageBounds";
+import { type ComputerMatch, playComputerMatch } from "./computerMatch";
 
 
-interface CameraScenario { readonly fighters: readonly string[]; readonly stage: number; readonly shift: number }
+type CameraScenario = Pick<ComputerMatch, "fighters" | "stage" | "shift">;
 
 export const CAMERA_SCENARIOS: readonly CameraScenario[] = [
   { fighters: ["illidan", "blademaster"], stage: 0, shift: 0.0 },
@@ -44,7 +37,6 @@ export const FOUR_PLAYER_CAMERA_SCENARIOS: readonly CameraScenario[] = [
   { fighters: ["dreadlord", "illidan", "blademaster", "warden"], stage: 2, shift: 0.0 },
 ];
 
-const NEUTRAL = neutralControls();
 const REVERSAL_FLOOR = 0.0005;
 const radians = (degrees: number) => (degrees * Math.PI) / 180.0;
 
@@ -156,45 +148,15 @@ function observe(into: Samples, before: View, now: View, last: [number, number, 
 }
 
 function playScenario(scenario: CameraScenario, ours: Samples, melee: Samples): void {
-  const characters = scenario.fighters.map((slug) => {
-    const character = selectableCharacterBySlug(slug);
-    if (character === undefined) throw new Error(`unknown fighter ${slug}`);
-    return character;
-  });
-  const mask = (1 << characters.length) - 1;
-  const match = createMatchState();
-  setParticipants(match, 0, mask);
-  characters.forEach((character, slot) => { match.characterChoices[slot] = character; });
-  match.stageChoice = scenario.stage;
-  match.stockCount = 2;
-  match.timeLimitMinutes = 1;
-  match.remainingFrames = 60 * MATCH_TICKS_PER_SECOND;
-  match.phase = Phase.match;
-  const world = createRoster(mask, characters.map((character, slot) => createFighter(character, f32(matchSpawnX(slot) + scenario.shift), matchSpawnX(slot) < 0.0 ? 1 : -1)));
-  const controls = createFrameControls();
-  const produced = createFrameControls();
-  const runtime = createPacingAndPresentation();
-  const row = createMatchFrameInput();
-  initializeMatchFighters(match, world);
-  const camera = match.camera;
   const reference = new MeleeCamera();
   let previous: { ours: View; melee: View } | undefined;
   const lastOurs: [number, number, number] = [0, 0, 0];
   const lastMelee: [number, number, number] = [0, 0, 0];
   const velocityOurs: [number, number, number] = [0, 0, 0];
   const velocityMelee: [number, number, number] = [0, 0, 0];
-  let frame = 0;
-  while (match.phase === Phase.match && frame < 65 * MATCH_TICKS_PER_SECOND) {
-    frame = runtime.simulationFrame + 1;
-    for (const slot of PARTICIPANT_SLOTS) {
-      copyControls(produced.inputs[slot], NEUTRAL);
-      clearAttackBuffer(produced.commands[slot]);
-      if (slot < characters.length) produceComputerInput(match, world, runtime, slot, frame, produced.inputs[slot], produced.commands[slot]);
-    }
-    if (!captureFrame(row, frame, world.mask, produced, runtime)) throw new Error(`capture refused frame ${frame}`);
-    if (!executeMatchFrame(row, match, world, controls, runtime, frame)) throw new Error(`execution refused frame ${frame}`);
+  playComputerMatch({ ...scenario, stocks: 2, minutes: 1, frameLimit: 65 * MATCH_TICKS_PER_SECOND }, ({ camera }, world) => {
     const meleeView = reference.step(world, scenario.stage);
-    if (!camera.initialized || meleeView === undefined) continue;
+    if (!camera.initialized || meleeView === undefined) return;
     const height = 2.0 * camera.distance * camera.tangent;
     const oursView = { x: camera.x, z: camera.z, distance: camera.distance, width: height * MATCH_CAMERA_ASPECT, height };
     if (previous !== undefined) {
@@ -203,7 +165,7 @@ function playScenario(scenario: CameraScenario, ours: Samples, melee: Samples): 
       observe(melee, previous.melee, meleeView, lastMelee, velocityMelee);
     }
     previous = { ours: oursView, melee: meleeView };
-  }
+  });
 }
 
 const quantile = (sorted: readonly number[], q: number): number => sorted[Math.min(sorted.length - 1, Math.floor(q * sorted.length))] ?? 0;

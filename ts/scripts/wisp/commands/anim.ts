@@ -19,9 +19,9 @@ import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../../../src/ga
 import { createMatchCamera, MATCH_CAMERA_ASPECT } from "../../../src/game/sim/matchCamera";
 import { FROZEN_THRONE_STAGE } from "../../../src/game/sim/stage";
 import { runProcess } from "../../hostProcess";
-import { CROUCH_THRESHOLDS, DOUBLE_JUMP_THRESHOLDS, LEDGE_THRESHOLDS, type MoveScore, THRESHOLDS, scoreCrouch, scoreDoubleJump, scoreLedgeHang, scoreMove } from "../animScore";
+import { CROUCH_THRESHOLDS, DOUBLE_JUMP_THRESHOLDS, LEDGE_THRESHOLDS, type MoveScore, type ScoreFrame, THRESHOLDS, scoreCrouch, scoreDoubleJump, scoreLedgeHang, scoreMove } from "../animScore";
 import { type CrouchClipKind, type SampledMove, gameplayPixelsPerUnit, loadBody, sampleCrouch, sampleFighter, sampleJumps, sampleLedgeHang } from "../animScoreSample";
-import { heldHeight } from "../animJudgeCamera";
+import { CAMERA_LIFT, heldHeight, judgeCamera, judgeCrop, judgeFraming, judgePixelsPerUnit } from "../animJudgeCamera";
 import { answerKey, type ColdStrip, coldReadBatch, coldReadBatches, isMovementMove, ledgeCorner, type MovementMove, movementCrop, movementFrames, stageDrawArgs, stageShape, stripId } from "../animMovementRows";
 import { JUDGES_PER_CLIP, clipIdentity, judgePanel, judgementKey, median, withPreparedClips, writePreparedClips } from "../animJudgeIdentity";
 import { assetsView, readManifest } from "../buildInputs";
@@ -154,7 +154,7 @@ const measure = (fighters: readonly Character[], assets: string) => Effect.gen(f
       const { sample } = sampled;
       const score = yield* Effect.try({ try: () => scoreMove(sample, THRESHOLDS[sample.moveClass]), catch: (cause) => new AnimFailure({ problem: `${fighter} ${sampled.move}: ${String(cause)}` }) });
       const frames = { firstActive: sample.firstActive, lastActive: sample.lastActive, end: sampled.endFrame };
-      const clip = clipIdentity(keyFrames({ score, frames }).map((index) => sample.frames[index]));
+      const clip = clipIdentity(keyFrames({ score, frames }).map((index) => sample.frames[index]), judgeFraming());
       const panel = judgePanel(judged.filter((entry) => entry.fighter === fighter && entry.move === sampled.move), clip);
       const medians = JUDGE_LINES.map((line) => median(panel.map((entry) => entry[line])));
       rows.push({
@@ -190,7 +190,7 @@ const score: Command = (args) => Effect.gen(function*() {
   yield* Console.log(`worst first (${look}; L1 body, L2 return to ready, L3 phases, L4 contrast, L5 judged):`);
   for (const row of sorted.slice(0, 40)) {
     const { line1, line2, line3, line4 } = row.score;
-    yield* Console.log(`${String(passCount(row)).padStart(1)}/${lines(row)} ${`${row.fighter} ${row.move}`.padEnd(34)} L1 ${mark(line1.pass)} ${line1.rule === "limb" ? `limb ${n(line1.limbDrive)}` : n(line1.bodyShare)}/${n(line1.massShift)}  L2 ${mark(line2.pass)} ${n(line2.endError)}/${n(line2.jump)}/${n(line2.overshoot)}  L3 ${mark(line3.pass)} w${line3.windup} p${line3.peak} a${row.frames.firstActive} fill ${n(line3.fill)}  L4 ${mark(line4.pass)} ${n(line4.contrast)}  L5 ${row.judged === undefined ? "unjudged" : `${mark(row.judged.pass)} ${n(row.judged.lowest)} (${row.judged.count}/${JUDGES_PER_CLIP} judges)`}`);
+    yield* Console.log(`${String(passCount(row)).padStart(1)}/${lines(row)} ${`${row.fighter} ${row.move}`.padEnd(34)} L1 ${mark(line1.pass)} ${line1.rule === "limb" ? `limb ${n(line1.limbDrive)}` : n(line1.bodyShare)}/${n(line1.massShift)}  L2 ${mark(line2.pass)} ${n(line2.endError)}/${n(line2.jump)}/${n(line2.overshoot)}  L3 ${mark(line3.pass)} w${line3.windup} p${line3.peak} a${row.frames.firstActive} fill ${n(line3.fill)}  L4 ${mark(line4.pass)} ${n(line4.contrast)}  L5 ${row.judged === undefined ? `unjudged (0/${JUDGES_PER_CLIP} judges)` : `${mark(row.judged.pass)} ${n(row.judged.lowest)} (${row.judged.count}/${JUDGES_PER_CLIP} judges)`}`);
   }
   const fighterRows = new Map<string, Row[]>();
   for (const row of rows) fighterRows.set(row.fighter, [...(fighterRows.get(row.fighter) ?? []), row]);
@@ -245,7 +245,7 @@ const score: Command = (args) => Effect.gen(function*() {
 
 const JUDGE_BATCH = 6;
 
-interface Strip { readonly fighter: string; readonly move: string; readonly seconds: readonly number[]; readonly heights: readonly number[]; readonly caption: string; readonly movement: boolean }
+interface Strip { readonly fighter: string; readonly move: string; readonly seconds: readonly number[]; readonly heights: readonly number[]; readonly poses: readonly (ScoreFrame | undefined)[]; readonly caption: string; readonly movement: boolean }
 
 
 const keyFrames = (row: Pick<Row, "score" | "frames">) => [...new Set([0, row.score.keys.windup, row.score.keys.contact, row.frames.lastActive, row.score.keys.recovery, row.frames.end])].sort((a, b) => a - b);
@@ -330,7 +330,7 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
     if (sampled === undefined) continue;
     const reference = referenceFor(references, row.fighter, row.move);
     const indices = keyFrames(row);
-    strips.push({ fighter: row.fighter, move: row.move, seconds: indices.map((index) => sampled.seconds[index] ?? 0), heights: indices.map((index) => sampled.heights[index] ?? 0),
+    strips.push({ fighter: row.fighter, move: row.move, seconds: indices.map((index) => sampled.seconds[index] ?? 0), heights: indices.map((index) => sampled.heights[index] ?? 0), poses: indices.map((index) => sampled.sample.frames[index]),
       caption: `Top row, ours: frames ${indices.join(", ")} (start, windup, contact on the first active frame ${row.frames.firstActive}, last active, recovery, end of ${row.frames.end}). Bottom row: ${reference === undefined ? "no reference animation on file; judge against the brief's standard" : `Melee ${reference.character.replaceAll("_", " ")}'s ${REFERENCE_ACTIONS[row.move]?.wiki} (hitbox view)`}.`, movement: false });
   }
   for (const entry of wanted ?? []) {
@@ -339,7 +339,7 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
     const character = fighters.find((candidate) => fighterSlug(candidate) === slug);
     if (character === undefined) continue;
     const { seconds, heights } = yield* attempt(`sample ${slug} ${move}`, async () => movementFrames(move, await loadBody(assets, character), character));
-    strips.push({ fighter: slug, move, seconds, heights, caption: "", movement: true });
+    strips.push({ fighter: slug, move, seconds, heights, poses: [], caption: "", movement: true });
   }
   if (strips.length === 0) return yield* new UsageFailure({ problem: "no scored move matches" });
 
@@ -348,22 +348,22 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
   const base = captureScene(session.client, { visibleOnly: true });
   const bodyEffect = base.effects.find((effect) => /TimelineBody/.test(effect.model)) ?? base.effects[0];
   if (bodyEffect === undefined) return yield* new AnimFailure({ problem: "the sample scene has no fighter body to render" });
-  const camera = createMatchCamera();
-  extremeCamera(camera, FROZEN_THRONE_STAGE, MATCH_CAMERA_ASPECT, "far");
+  const far = createMatchCamera(), judge = judgeCamera();
+  extremeCamera(far, FROZEN_THRONE_STAGE, MATCH_CAMERA_ASPECT, "far");
   const scenes: RenderScene[] = [];
   const frameIds = new Map<string, number[]>();
   for (const strip of strips) {
     const character = SELECTABLE_CHARACTERS.find((candidate) => fighterSlug(candidate) === strip.fighter) ?? 0;
     const clip = originalClip(character, 0);
     if (clip === undefined) continue;
-    const ids: number[] = [];
+    const ids: number[] = [], camera = strip.movement ? far : judge;
     for (const [index, seconds] of strip.seconds.entries()) {
       const id = scenes.length;
       ids.push(id);
       const z = FLOOR_HEIGHT + (strip.heights[index] ?? 0);
       scenes.push({
         ...base, frame: id, units: [], ui: [], textTags: [],
-        camera: { ...base.camera, x: 0, y: 0, fields: { ...base.camera.fields, CAMERA_FIELD_TARGET_DISTANCE: camera.distance, CAMERA_FIELD_ZOFFSET: FLOOR_HEIGHT + (strip.movement ? 0 : heldHeight(strip.heights, index, gameplayPixelsPerUnit())) + 90, CAMERA_FIELD_FIELD_OF_VIEW: cameraFieldOfView(camera, MATCH_CAMERA_ASPECT) } },
+        camera: { ...base.camera, x: 0, y: 0, fields: { ...base.camera.fields, CAMERA_FIELD_TARGET_DISTANCE: camera.distance, CAMERA_FIELD_ZOFFSET: FLOOR_HEIGHT + (strip.movement ? 0 : heldHeight(strip.heights, index, judgePixelsPerUnit())) + CAMERA_LIFT, CAMERA_FIELD_FIELD_OF_VIEW: cameraFieldOfView(camera, MATCH_CAMERA_ASPECT) } },
         effects: [{ ...bodyEffect, model: clip.modelPath, animation: "Stand", animationElapsed: seconds, animationClock: 0, timeScale: 0, x: 0, y: 0, z, yaw: 0, teamColor: 0, alpha: 255 }],
       });
     }
@@ -388,8 +388,8 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
     }
     const ours = join(output, "moves", `${row.fighter}-${row.move}-ours.png`);
     mkdirSync(join(output, "moves"), { recursive: true });
-
-    yield* runProcess(ChildProcess.make("magick", [...crops.flatMap((crop) => ["(", crop, "-gravity", "center", "-crop", "480x360+0-60", "+repage", ")"]), "+append", ours]));
+    const tile = judgeCrop(row.poses, row.heights, judgePixelsPerUnit());
+    yield* runProcess(ChildProcess.make("magick", [...crops.flatMap((crop) => ["(", crop, "-gravity", "NorthWest", "-crop", `${tile.width}x${tile.height}+${tile.x}+${tile.y}`, "+repage", ")"]), "+append", ours]));
     const reference = referenceFor(references, row.fighter, row.move);
     const side = join(output, "moves", `${row.fighter}-${row.move}.png`);
     if (reference !== undefined) {
@@ -397,7 +397,7 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
       const gif = join(REFERENCE_DIRECTORY, reference.file);
       const count = Number((yield* runProcess(ChildProcess.make("magick", ["identify", "-format", "%n\n", gif]))).split("\n")[0] ?? 1);
       const picks = Array.from({ length: Math.min(8, count) }, (_, index) => Math.round(index * (count - 1) / Math.max(1, Math.min(8, count) - 1)));
-      yield* runProcess(ChildProcess.make("magick", [`${gif}[${picks.join(",")}]`, "-coalesce", "-resize", "x360", "+append", strip]));
+      yield* runProcess(ChildProcess.make("magick", [`${gif}[${picks.join(",")}]`, "-coalesce", "-resize", `x${tile.height}`, "+append", "-resize", `${tile.width * crops.length}x>`, strip]));
       yield* runProcess(ChildProcess.make("magick", [ours, strip, "-gravity", "west", "-background", "#101522", "-append", side]));
     } else yield* runProcess(ChildProcess.make("magick", [ours, side]));
     const batch = batches.at(-1);

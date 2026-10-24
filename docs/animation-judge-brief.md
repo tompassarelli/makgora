@@ -10,8 +10,8 @@ animation scorecard (smashcraft:docs/animation-scorecard.md, #367).
 Each move is one image (open it with your file-reading tool):
 
 - **Top row, ours:** the move's key frames drawn by the game's renderer with
-  the gameplay camera at its widest framing (the smallest a fighter appears in
-  a match), cropped but not enlarged: the move's first frame, the windup
+  the gameplay camera at its typical framing (the size a fighter usually
+  appears in a match), cropped to the move but not enlarged: the move's first frame, the windup
   extreme, contact (the first frame that can hit), the last active frame, the
   middle of the recovery, and the last frame of the move. The fighter faces
   right.
