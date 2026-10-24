@@ -128,5 +128,7 @@ export const speculativeBudget = (journal: boolean): number => (journal ? CATCH_
 
 const KEYBOARD_CATCH_UP_MARGIN = 4;
 
-export const keyboardCatchesUp = (frame: number, callbacks: number, window: number, remoteThrough: number): boolean =>
-  frame <= callbacks && window - (frame - remoteThrough) >= KEYBOARD_CATCH_UP_MARGIN;
+const KEYBOARD_CATCH_UP_CONFIRMED = 3;
+
+export const keyboardCatchesUp = (frame: number, due: number, window: number, remoteThrough: number, confirmed: number, repaired: number): boolean =>
+  frame <= due && confirmed <= KEYBOARD_CATCH_UP_CONFIRMED && repaired === 0 && window - (frame - remoteThrough) >= KEYBOARD_CATCH_UP_MARGIN;

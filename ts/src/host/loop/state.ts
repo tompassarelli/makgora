@@ -45,6 +45,7 @@ import { createFighter } from "../../game/sim/fighter";
 import { type Roster, createRoster } from "../../game/sim/roster";
 import { type BindingPersistence, type BindingSettings, createBindingSettings } from "../../game/ui/bindingSettings";
 import type { EditboxIngress } from "../../platform/editboxJournal";
+import { type RealFrames, realFrames } from "./realFrames";
 import { type ResponseProbe, createResponseProbe } from "./responseProbe";
 import { type InputTrace, inputTrace } from "./trace";
 import type { UiObjects } from "./ui";
@@ -135,6 +136,7 @@ export interface KeyboardRollback {
   lastTarget: number | undefined;
   readonly stamps: CaptureStamp[];
   readonly pairedSends: boolean;
+  readonly real: RealFrames;
 }
 
 
@@ -408,7 +410,7 @@ function rollback(mode: ShadowInputMode, playback: RollbackPlayback, editbox: Ed
     keyboard: mode.kind === "keyboard"
       ? {
         capture: keyboardCapture(), outgoing: new InputBatch(0), nextSend: 1, lastTarget: undefined, pairedSends: mode.pairedSends,
-        stamps: Array.from({ length: PENDING_CAPACITY }, () => ({ traced: false, callback: 0, seconds: 0.0 })),
+        stamps: Array.from({ length: PENDING_CAPACITY }, () => ({ traced: false, callback: 0, seconds: 0.0 })), real: realFrames(),
       }
       : undefined,
     journal: mode.kind === "journal" ? journal(mode.ingress, editbox) : undefined,

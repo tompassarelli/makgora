@@ -42,6 +42,7 @@ import { holdPresentedCapture } from "./visualCapture";
 import { visualCaptureStopBefore } from "../../game/session/visualCapture";
 import { samplePad } from "../../game/input/padCapture";
 import { pollPad, recordPadRow } from "./analogPad";
+import { beginRealFrames, pauseRealFrames, realFramesDue, realSeconds } from "./realFrames";
 import { beginNetEpoch, matchDelay, noteDepth, notePop, notePopBefore, noteReceived, noteSent, requestFor } from "./netDelay";
 
 
@@ -100,6 +101,7 @@ export function beginRollbackEpoch(s: ShellState, rollback: Rollback): boolean {
   const { keyboard, journal } = rollback;
   if (keyboard !== undefined) {
     keyboard.lastTarget = undefined;
+    beginRealFrames(keyboard.real);
     keyboard.outgoing = new InputBatch(rollback.epoch);
     keyboard.nextSend = rollback.delay + 1;
     resetKeys(keyboard.capture, pollLocalKeys(s));
@@ -280,6 +282,7 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
   const known = rollback.knownBefore;
   rollback.knownBefore = schedule.knownThrough();
   rollback.repairedFrames = 0;
+  if (keyboard !== undefined && (s.game.phase !== Phase.match || s.session.paused)) pauseRealFrames(keyboard.real);
   if (s.game.phase !== Phase.match) {
     if (keyboard !== undefined) sendBatch(s, rollback, keyboard);
     noteWaiting(rollback, 0, 0);
@@ -370,7 +373,8 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
     beginFrameSection(SPECULATIVE_SECTION);
     let advanced = rollback.playback.catchUp(schedule, epoch, slot, speculative, speculativeBudget(journal !== undefined), presentationStop, observeSpeculativeFrame);
     endFrameSection(SPECULATIVE_SECTION);
-    if (advanced && keyboard !== undefined && schedule.speculativeFrame() > before && keyboardCatchesUp(schedule.speculativeFrame(), rollback.epochCallbacks, schedule.rollbackFrames(), schedule.remoteThrough(slot))) {
+    const due = keyboard === undefined ? 0 : realFramesDue(keyboard.real, rollback.epochCallbacks, schedule.speculativeFrame() - 1, realSeconds());
+    if (advanced && keyboard !== undefined && schedule.speculativeFrame() > before && keyboardCatchesUp(schedule.speculativeFrame(), due, schedule.rollbackFrames(), schedule.remoteThrough(slot), steps, repaired)) {
       captureKeyboard(s, rollback, keyboard);
       beginFrameSection(SPECULATIVE_SECTION);
       advanced = rollback.playback.catchUp(schedule, epoch, slot, speculative, 1, presentationStop, observeSpeculativeFrame);
