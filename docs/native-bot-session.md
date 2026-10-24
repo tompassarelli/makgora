@@ -299,7 +299,8 @@ resume acknowledgments retained (#206, wisp#86).
 - Each `#! expect CLIENT FRAME TEXT`, `#! absent CLIENT FROM-TO TEXT` and
   `#! scene CLIENT MODEL` line in the script holds on both sides. A
   `#! chat TEXT` line names the command that starts the match when `--chat`
-  gives none.
+  gives none. A `#! preset NAME` line names the padbridge preset its helpers
+  speak (see below).
 
 A press that never landed natively fails all three. Fighter lines include
 each damage change and each change of a special's form (a glide, a Chaos
@@ -340,7 +341,10 @@ requires the authored View export.
 The hosted `203/tap-jump.pad` case enables `WC3_TAP_JUMP=on`, and
 `controls/z-jump.pad` selects `WC3_PAD_PRESET=z-jump`, as their original headers
 require. Other cases use tap jump off and the hidden `script` preset, the
-encoding of every recorded pad script.
+encoding of every recorded pad script. A script that needs another preset's
+buttons (the Strong button is in melee, not script) names it in its own
+`#! preset NAME` line, which wins over `WC3_PAD_PRESET`; a batch's helpers start
+once, so a batch mixing presets is refused with its scripts listed per preset.
 
 ### Many scripts in one game
 

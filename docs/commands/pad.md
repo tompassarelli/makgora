@@ -41,6 +41,11 @@
   beside `--headless-jobs` reference runs; each realtime process takes about
   1.1 cores (1.6 peak), so lease `heavy` with `--headless-jobs 2`: starved
   processes start scripts late ("helpers reported the match at frame N").
+  Helpers speak padbridge's preset from the script's `#! preset NAME` line
+  (melee, tom, z-jump or script), else `WC3_PAD_PRESET`, else the hidden
+  `script` preset; a helper log's first line is its command. A batch's helpers
+  start once, so a batch whose scripts resolve to different presets is refused
+  with its scripts listed per preset; run each group as its own batch.
 
 - Pad cut (#233): `bun scripts/nativePadCut233.ts --pair N --clients-file FILE --helper PADBRIDGE --map MAP --out DIR --app-id NAME=ID --app-id NAME=ID` uses one existing offline LAN pair, stops its own controller producer for 1 s, and checks the HUD waiting count and normal match results.
 

@@ -11,8 +11,10 @@
 import { ABS_RX, ABS_RY, ABS_X, ABS_Y, ABS_Z, BTN_A, BTN_B, BTN_SELECT, BTN_START, BTN_TL, BTN_TR, BTN_X, BTN_Y, EV_ABS, EV_KEY, type SourceEdge } from "./linuxInput";
 import type { Slot } from "./reconcile";
 
-/** Recorded pad scripts and test drivers speak padbridge's hidden `script` preset; WC3_PAD_PRESET picks another for a preset check. */
-export const padScriptPreset = (): readonly string[] => ["--preset", process.env.WC3_PAD_PRESET ?? "script"];
+/** Recorded pad scripts and test drivers speak padbridge's hidden `script` preset; a script's `#! preset NAME` line, else WC3_PAD_PRESET, picks another. */
+export const padPreset = (named?: string): string => named ?? process.env.WC3_PAD_PRESET ?? "script";
+
+export const padScriptPreset = (named?: string): readonly string[] => ["--preset", padPreset(named)];
 
 export const PAD_SCRIPT_BUTTONS: Readonly<Record<string, number>> = { A: BTN_A, B: BTN_B, X: BTN_X, Y: BTN_Y, LB: BTN_TL, RB: BTN_TR, TL: BTN_TL, TR: BTN_TR, START: BTN_START, VIEW: BTN_SELECT };
 

@@ -46,7 +46,7 @@ import { IntegrityFailure, producerLine, tryIntegrity } from "../../integrity/ev
 import { loadEntry } from "../../integrity/headless";
 import { type Pad, inject, monotonicNs, openPad } from "../../integrity/linux";
 import { BTN_SELECT, PAD_BUTTONS } from "../../integrity/linuxInput";
-import { MATCH_REPLAY_NAME, REPRO_NAME, TRACE_FILE, checkHeadlessRun, compareRuns, comparisonSteps, scriptChat, padTraceCommand, padTraceLength } from "../../integrity/padParity";
+import { MATCH_REPLAY_NAME, REPRO_NAME, TRACE_FILE, checkHeadlessRun, compareRuns, comparisonSteps, scriptChat, scriptPreset, padTraceCommand, padTraceLength } from "../../integrity/padParity";
 import type { Schedule, ScheduleReply, ScheduledEdge } from "../../integrity/padScheduleWorker";
 import { type PadStep, type SentEdge, deadlineOrder, frameWriteNs, landEdges, matchStart, padScriptPreset, parsePadScript, ruleFrame } from "../../integrity/padScript";
 import { SLOTS } from "../../integrity/reconcile";
@@ -231,6 +231,7 @@ export interface PadOptions {
   readonly build: string;
   readonly out: string;
   readonly chat: string | undefined;
+  readonly preset?: string | undefined;
   readonly candidate?: string | undefined;
   readonly render?: string | undefined;
   readonly renderFrames?: readonly number[] | undefined;
@@ -240,7 +241,7 @@ export interface PadOptions {
 }
 
 
-export const nativeSession = (out: string, helper: string, build: string, appIds: ReadonlyMap<string, string>, clientsFile: string = clientState) => Effect.gen(function*() {
+export const nativeSession = (out: string, helper: string, preset: string | undefined, build: string, appIds: ReadonlyMap<string, string>, clientsFile: string = clientState) => Effect.gen(function*() {
   const startedMs = Date.now();
   const loaded = yield* loadClients(clientsFile).pipe(Effect.mapError(fromDesktop));
   if (loaded.length !== 2) return yield* new IntegrityFailure({ operation: "load clients", path: clientsFile, cause: `${loaded.length} clients, need 2` });
@@ -257,7 +258,7 @@ export const nativeSession = (out: string, helper: string, build: string, appIds
     const device = yield* openPad([...PAD_BUTTONS, BTN_SELECT]);
     pads.push(device);
     helpers.push(yield* startHelper([
-      helper, "--follow-matches", ...padScriptPreset(), "--build", build, "--slot", String(slot), "--device", device.device, "--out", at(data, slot),
+      helper, "--follow-matches", ...padScriptPreset(preset), "--build", build, "--slot", String(slot), "--device", device.device, "--out", at(data, slot),
       "--editbox-display", client.x11.DISPLAY ?? "", "--x11-window", client.window, "--pid", String(pid), "--private-wlr-app-id", appId, "--trace",
     ], { ...Bun.env, ...client.x11, ...client.wayland }, join(out, `helper-${slot}.log`)));
   }
@@ -417,7 +418,7 @@ export const nativeScript = (session: NativeSession, options: PadOptions) => Eff
 
 
 export const native = (options: PadOptions, appIds: ReadonlyMap<string, string>, clientsFile: string = clientState) => Effect.scoped(Effect.gen(function*() {
-  const session = yield* nativeSession(join(options.out, "session"), options.helper, options.build, appIds, clientsFile);
+  const session = yield* nativeSession(join(options.out, "session"), options.helper, options.preset, options.build, appIds, clientsFile);
   yield* verifySessionInput(session, clientsFile);
   return yield* nativeScript(session, options);
 }));
@@ -471,7 +472,7 @@ const scheduled = (worker: Worker, schedule: Schedule) => Effect.callback<readon
 
 
 
-export const headlessSession = (dir: string, helper: string, build: string, afterDraw?: (clients: readonly HeadlessClient[]) => void, arrivals?: PauseArrivals) => Effect.gen(function*() {
+export const headlessSession = (dir: string, helper: string, preset: string | undefined, build: string, afterDraw?: (clients: readonly HeadlessClient[]) => void, arrivals?: PauseArrivals) => Effect.gen(function*() {
   yield* tryIntegrity("create pad directory", dir, () => mkdirSync(dir, { recursive: true }));
   const entry = yield* loadEntry;
   const runtime = yield* Effect.acquireRelease(Effect.sync(() => installHeadless(PREDICTED_HEADLESS)), (installed) => Effect.sync(installed.restore));
@@ -485,7 +486,7 @@ export const headlessSession = (dir: string, helper: string, build: string, afte
     const device = yield* openPad([...PAD_BUTTONS, BTN_SELECT]);
     pads.push(device);
     helpers.push(yield* startHelper([
-      helper, "--follow-matches", ...padScriptPreset(), "--build", build, "--slot", String(slot), "--device", device.device, "--out", at(data, slot), "--text-out", textPath, "--trace",
+      helper, "--follow-matches", ...padScriptPreset(preset), "--build", build, "--slot", String(slot), "--device", device.device, "--out", at(data, slot), "--text-out", textPath, "--trace",
     ], Bun.env, join(dir, `helper-${slot}.log`)));
   }
   const worker = yield* scheduleThread;
@@ -557,7 +558,7 @@ const headless = (options: PadOptions) => Effect.gen(function*() {
   const captures = options.chat !== undefined && options.steps.some((step) => step.kind === "capture");
   const frames = !captures ? undefined : (yield* Effect.promise(() => import("../padRender"))).padRender(options.out, options.build, options.steps, token, options.render === undefined ? [] : options.renderFrames);
   const result = yield* Effect.scoped(Effect.gen(function*() {
-    const session = yield* headlessSession(options.out, options.helper, options.build, frames?.afterDraw, options.arrivals);
+    const session = yield* headlessSession(options.out, options.helper, options.preset, options.build, frames?.afterDraw, options.arrivals);
     return yield* headlessScript(session, frames === undefined || options.chat === undefined ? options : { ...options, chat: visualCaptureCommand(options.chat, token, options.steps) });
   }));
   if (frames !== undefined && options.render !== undefined) {
@@ -606,17 +607,14 @@ const pad: Command = (args) => Effect.gen(function*() {
   if (compare !== undefined && !isHeadless) return yield* new UsageFailure({ problem: "--compare NATIVE_DIR goes with --headless" });
   const script = yield* Effect.try({ try: () => readFileSync(scriptPath, "utf8"), catch: (cause) => new UsageFailure({ problem: describeCause(cause) }) });
   const steps = yield* Effect.try({ try: () => compare === undefined ? parsePadScript(script) : comparisonSteps(script, scriptPath), catch: (cause) => new UsageFailure({ problem: describeCause(cause) }) });
+  const preset = yield* Effect.try({ try: () => scriptPreset(script, scriptPath), catch: (cause) => new UsageFailure({ problem: describeCause(cause) }) });
   if (renderFrames !== undefined && renderFrames.some((frame) => !steps.some((step) => step.kind === "capture" && step.frame === frame))) return yield* new UsageFailure({ problem: "every --frames value must name a capture in the pad script" });
   const replay = parsed.values["replay-arrivals"];
   if (replay !== undefined && !isHeadless) return yield* new UsageFailure({ problem: "--replay-arrivals NATIVE_DIR goes with --headless" });
   const arrivals = replay === undefined ? undefined : yield* Effect.try({ try: () => measuredPauseArrivals(replay), catch: (cause) => new UsageFailure({ problem: describeCause(cause) }) });
-  const options: PadOptions = { scriptPath, steps, helper, build, out, chat: chat ?? scriptChat(script), candidate: parsed.values.map, render: parsed.values.render, renderFrames, graphics, arrivals };
+  const options: PadOptions = { scriptPath, steps, helper, build, out, chat: chat ?? scriptChat(script), preset, candidate: parsed.values.map, render: parsed.values.render, renderFrames, graphics, arrivals };
   if (!isHeadless) {
-    const appIds = new Map<string, string>();
-    for (const entry of parsed.values["app-id"] ?? []) {
-      const separator = entry.indexOf("=");
-      if (separator > 0) appIds.set(entry.slice(0, separator), entry.slice(separator + 1));
-    }
+    const appIds = appIdMap(parsed.values["app-id"] ?? []);
     const retries = Number(parsed.values.retries ?? "3");
     const map = parsed.values.map;
     let attempt = 0;
@@ -649,6 +647,11 @@ const pad: Command = (args) => Effect.gen(function*() {
   if (!report.passed) return yield* new IntegrityFailure({ operation: "pad expectations", path: out, cause: "the script's expectations don't hold headless" });
 });
 
+const appIdMap = (entries: readonly string[]): ReadonlyMap<string, string> => new Map(entries.flatMap((entry) => {
+  const separator = entry.indexOf("=");
+  return separator > 0 ? [[entry.slice(0, separator), entry.slice(separator + 1)] as const] : [];
+}));
+
 export const drivesClients = (rawArgs: readonly string[]) => !rawArgs.includes("--headless") && !rawArgs.includes("--help") && !rawArgs.includes("-h");
 
 export const padCommand: Command = withNativeUnit("pad", drivesClients, pad);
@@ -670,11 +673,7 @@ const scriptBatch = (values: { readonly [name: string]: string | boolean | reado
   }
   const pairCount = text("pairs");
   const clientsFile = text("clients-file") ?? clientState;
-  const appIds = new Map<string, string>();
-  for (const entry of Array.isArray(values["app-id"]) ? values["app-id"] : []) {
-    const separator = entry.indexOf("=");
-    if (separator > 0) appIds.set(entry.slice(0, separator), entry.slice(separator + 1));
-  }
+  const appIds = appIdMap(Array.isArray(values["app-id"]) ? values["app-id"] : []);
   const tools = yield* resolveTools();
   const pairs = yield* Effect.try({
     try: () => {

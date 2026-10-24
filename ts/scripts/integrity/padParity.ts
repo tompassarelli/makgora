@@ -131,7 +131,7 @@ export function parseExpectations(script: string): readonly Expectation[] {
   script.split("\n").forEach((raw, index) => {
     const match = /^\s*#!\s*(expect|absent)\s+([abcd])\s+(\d+)(?:-(\d+))?\s+(.+?)\s*$/.exec(raw);
     if (match === null) {
-      if (/^\s*#!/.test(raw) && !/^\s*#!\s*(scene|chat)\s/.test(raw)) throw new Error(`pad script line ${index + 1}: a #! line is "#! expect CLIENT FRAME TEXT", "#! absent CLIENT FROM-TO TEXT", "#! scene CLIENT MODEL" or "#! chat TEXT"`);
+      if (/^\s*#!/.test(raw) && !/^\s*#!\s*(scene|chat|preset)\s/.test(raw)) throw new Error(`pad script line ${index + 1}: a #! line is "#! expect CLIENT FRAME TEXT", "#! absent CLIENT FROM-TO TEXT", "#! scene CLIENT MODEL", "#! chat TEXT" or "#! preset NAME"`);
       return;
     }
     const from = Number(match[3]);
@@ -333,6 +333,15 @@ export function checkHeadlessRun(headlessDir: string, script: string): ParityRep
 
 export function scriptChat(script: string): string | undefined {
   return /^\s*#!\s*chat\s+(.+?)\s*$/m.exec(script)?.[1];
+}
+
+
+export function scriptPreset(script: string, path: string): string | undefined {
+  const lines = script.split("\n").filter((raw) => /^\s*#!\s*preset\b/.test(raw));
+  if (lines.length === 0) return undefined;
+  const name = lines.length === 1 ? /^\s*#!\s*preset\s+(\S+)\s*$/.exec(lines[0] ?? "")?.[1] : undefined;
+  if (name === undefined) throw new Error(`${path}: a script names its padbridge preset in one "#! preset NAME" line`);
+  return name;
 }
 
 

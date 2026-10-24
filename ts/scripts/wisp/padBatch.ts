@@ -34,8 +34,8 @@ import { devCommandReceiptFile } from "../../src/game/core/gameFiles";
 import { IntegrityFailure, tryIntegrity } from "../integrity/evidence";
 import { pollUntil } from "../hostPoll";
 import { monotonicNs } from "../integrity/linux";
-import { compareRuns, comparisonSteps, scriptChat } from "../integrity/padParity";
-import { parsePadScript } from "../integrity/padScript";
+import { compareRuns, comparisonSteps, scriptChat, scriptPreset } from "../integrity/padParity";
+import { padPreset, parsePadScript } from "../integrity/padScript";
 import { onHealthyClients } from "./doctor";
 import { withRuntimeTools } from "./nativeTools";
 import { type PadOptions, type NativeSession, headlessScript, headlessSession, nativeChat, nativeScript, nativeSession, verifySessionInput } from "./commands/pad";
@@ -201,6 +201,7 @@ interface ScriptRun {
   readonly text: string;
   readonly steps: ReturnType<typeof parsePadScript>;
   readonly chat: string;
+  readonly preset: string;
   readonly label: string;
   readonly dir: string;
 }
@@ -227,13 +228,19 @@ const prepare = (options: BatchOptions, native = false) => Effect.gen(function*(
       const chat = scriptChat(text);
       if (chat === undefined) throw new Error(`${script} has no \`#! chat\` line: a batch starts each match with its script's command`);
       const steps = comparisonSteps(text, script);
+      const preset = padPreset(scriptPreset(text, script));
       const name = label(script, taken);
-      const dir = join(options.out, name);
-      mkdirSync(dir, { recursive: true });
-      return { script, text, steps, chat, label: name, dir };
+      return { script, text, steps, chat, preset, label: name, dir: join(options.out, name) };
     }),
     catch: (cause) => new UsageFailure({ problem: describeCause(cause) }),
   });
+  const presets = Map.groupBy(runs, (run) => run.preset);
+  if (presets.size > 1) {
+    const groups = [...presets].map(([preset, group]) => `${preset}: ${group.map((run) => run.script).join(", ")}`).join("; ");
+    return yield* new UsageFailure({ problem: `a batch starts its helpers once, under one padbridge preset, but its scripts name ${presets.size}: ${groups}; run each preset's scripts as their own batch` });
+  }
+  const preset = runs[0]?.preset;
+  yield* Effect.try({ try: () => runs.forEach((run) => mkdirSync(run.dir, { recursive: true })), catch: (cause) => new IntegrityFailure({ operation: "create script directory", path: options.out, cause }) });
 
 
   const references = new Map<string, Deferred.Deferred<{ code: number; seconds: number; ended: number }, IntegrityFailure>>();
@@ -278,7 +285,7 @@ const prepare = (options: BatchOptions, native = false) => Effect.gen(function*(
       made.compare = seconds(at);
     })).pipe(Scope.provide(batchScope)));
   });
-  return { runs, report, compareLater, reports, compares };
+  return { runs, preset, report, compareLater, reports, compares };
 });
 
 
@@ -306,7 +313,7 @@ export const padBatch = (options: NativeBatchOptions) => Effect.gen(function*() 
   if (hot && build !== INTEGRITY_BUILD.id) return yield* new UsageFailure({ problem: `--hot reloads the integrity map's TypeScript; --build ${build} is another map` });
   const started = performance.now();
   mkdirSync(options.out, { recursive: true });
-  const { runs, report, compareLater, reports, compares } = yield* prepare(options, true);
+  const { runs, preset, report, compareLater, reports, compares } = yield* prepare(options, true);
   const quietWindow = yield* windowLoad;
   let next = 0;
   const worker = (pair: PadPair) => Effect.scoped(Effect.gen(function*() {
@@ -322,7 +329,7 @@ export const padBatch = (options: NativeBatchOptions) => Effect.gen(function*() 
     const ensureSession = Effect.gen(function*() {
       if (session !== undefined) return session;
       if (gameScope === undefined) return yield* new IntegrityFailure({ operation: "start native session", path: pair.name, cause: "no game scope" });
-      const started = yield* nativeSession(join(options.out, `${pair.name}-session-${gameNumber++}`), options.helper, build, pair.appIds, pair.clients).pipe(Scope.provide(gameScope));
+      const started = yield* nativeSession(join(options.out, `${pair.name}-session-${gameNumber++}`), options.helper, preset, build, pair.appIds, pair.clients).pipe(Scope.provide(gameScope));
       if (!hot) yield* verifySessionInput(started, pair.clients);
       session = started;
       return session;
@@ -442,7 +449,7 @@ export const padBatch = (options: NativeBatchOptions) => Effect.gen(function*() 
 export const headlessBatch = (options: BatchOptions) => Effect.gen(function*() {
   const started = performance.now();
   mkdirSync(options.out, { recursive: true });
-  const { runs, report, compareLater, reports, compares } = yield* prepare(options);
+  const { runs, preset, report, compareLater, reports, compares } = yield* prepare(options);
   const made = runs.map((run) => report(run, "session"));
 
 
@@ -450,7 +457,7 @@ export const headlessBatch = (options: BatchOptions) => Effect.gen(function*() {
 
 
   const session = (start: number, number: number) => Effect.scoped(Effect.gen(function*() {
-    const clients = yield* headlessSession(join(options.out, `session-${number}`), options.helper, options.build);
+    const clients = yield* headlessSession(join(options.out, `session-${number}`), options.helper, preset, options.build);
     let played = false;
     for (let index = start; index < runs.length; index++) {
       const run = runs[index];

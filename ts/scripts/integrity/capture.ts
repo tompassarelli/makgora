@@ -1,7 +1,7 @@
 
 
 
-import { closeSync, mkdirSync, openSync, readFileSync, writeFileSync } from "node:fs";
+import { closeSync, mkdirSync, openSync, readFileSync, writeFileSync, writeSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { parseArgs } from "node:util";
 import type { Subprocess } from "bun";
@@ -138,6 +138,7 @@ const stopHelper = (helper: Subprocess) =>
 export const startHelper = (command: readonly string[], env: Record<string, string | undefined>, logPath: string) =>
   Effect.gen(function*() {
     const log = yield* Effect.acquireRelease(tryIntegrity("open helper log", logPath, () => openSync(logPath, "w")), (fd) => Effect.sync(() => closeSync(fd)));
+    yield* tryIntegrity("write helper command", logPath, () => writeSync(log, `helper: ${command.join(" ")}\n`));
     return yield* Effect.acquireRelease(
       tryIntegrity("start helper", command[0] ?? "", () => Bun.spawn([...command], { env, stdin: "ignore", stdout: log, stderr: log })),
       stopHelper,
