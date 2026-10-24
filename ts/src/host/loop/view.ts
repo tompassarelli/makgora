@@ -341,7 +341,8 @@ function markAgency(ui: UiObjects, world: Readonly<Roster>, stage: number, match
   for (const slot of PARTICIPANT_SLOTS) {
     const forecast = ui.fighters[slot]?.agency.forecast;
     if (forecast === undefined || !isActive(world, slot)) continue;
-    const immediate = forecast.immediate(world, slot, stage, matchFrame);
+    const immediate = forecast.immediate(world, slot, stage, matchFrame, budget);
+    budget -= forecast.throwStepsSpent();
     if (immediate !== undefined) {
       forecast.cancel();
       agencyMarks[slot] = immediate;

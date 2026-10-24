@@ -48,6 +48,20 @@ export class FighterAgencyForecast {
   private readonly thrown = createFighter(Character.demonHunter, 0.0, 1, PACK_CAPACITY);
   private readonly throwWorld = createRoster(3, [this.holder, this.thrown]);
   private readonly throwInputs = [neutralControls(), neutralControls()];
+  private readonly throwTech = { pressAge: 255, previousPressAge: 255, accumulatedPress: false };
+  private throwRunning = false;
+  private throwOwner = -1;
+  private throwSerial = 0;
+  private throwAction: GrabAction = GrabAction.none;
+  private throwStage = 0;
+  private throwFrame = 0;
+  private throwOffset = 0;
+  private throwNextCheck = 0;
+  private throwResultOwner = -1;
+  private throwResultSerial = 0;
+  private throwResultAction: GrabAction = GrabAction.none;
+  private throwCounts = false;
+  private throwSpent = 0;
 
 
   private forecastFrame?: number;
@@ -73,7 +87,8 @@ export class FighterAgencyForecast {
   }
 
 
-  immediate(world: Readonly<Roster>, slot: number, stage: number, frame: number): FighterAgency | undefined {
+  immediate(world: Readonly<Roster>, slot: number, stage: number, frame: number, throwSteps = TECH_WINDOW_FRAMES): FighterAgency | undefined {
+    this.throwSpent = 0;
     const f = fighterAt(world, slot);
     if (f.status.out) return "act";
     if (f.status.frozenFrames > 1) return "none";
@@ -86,7 +101,7 @@ export class FighterAgencyForecast {
       const free = owner.launch.hitlag <= 0 && f.launch.hitlag <= 0;
       const release = grabContactFrame(owner.grab.action, owner.tuning.moves) - owner.grab.frame;
 
-      if (free && release <= TECH_WINDOW_FRAMES && this.techPressCounts(world, owner, f, stage, frame)) return "act";
+      if (free && release <= TECH_WINDOW_FRAMES && this.techPressCounts(world, f.grab.owner, f, stage, frame, throwSteps)) return "act";
       return free && release === 1 ? "di" : "none";
     }
     if (f.status.frozenFrames === 0 && f.launch.hitlag === 0
@@ -224,46 +239,91 @@ export class FighterAgencyForecast {
   }
 
 
-  private techPressCounts(world: Readonly<Roster>, owner: Readonly<Fighter>, thrown: Readonly<Fighter>, stage: number, frame: number): boolean {
-    copyFighterState(this.holder, owner, world.mask);
-    copyFighterState(this.thrown, thrown, world.mask);
-    this.holder.grab.target = 1;
-    this.thrown.grab.owner = 0;
-    this.pressedTech.pressAge = thrown.tech.pressAge;
-    this.pressedTech.previousPressAge = thrown.tech.previousPressAge;
-    this.pressedTech.accumulatedPress = thrown.tech.accumulatedPress;
+  throwStepsSpent(): number {
+    return this.throwSpent;
+  }
+
+
+  private techPressCounts(world: Readonly<Roster>, ownerSlot: number, thrown: Readonly<Fighter>, stage: number, frame: number, maxSteps: number): boolean {
+    const owner = fighterAt(world, ownerSlot);
+    const { serial, action } = owner.grab;
+    const sameThrow = this.throwOwner === ownerSlot && this.throwSerial === serial && this.throwAction === action;
+    if (!this.throwRunning || !sameThrow || frame < this.throwFrame || frame - this.throwFrame > TECH_WINDOW_FRAMES) {
+      copyFighterState(this.holder, owner, world.mask);
+      copyFighterState(this.thrown, thrown, world.mask);
+      this.holder.grab.target = 1;
+      this.thrown.grab.owner = 0;
+      this.throwTech.pressAge = thrown.tech.pressAge;
+      this.throwTech.previousPressAge = thrown.tech.previousPressAge;
+      this.throwTech.accumulatedPress = thrown.tech.accumulatedPress;
+      this.throwOwner = ownerSlot;
+      this.throwSerial = serial;
+      this.throwAction = action;
+      this.throwStage = stage;
+      this.throwFrame = frame;
+      this.throwOffset = 0;
+      this.throwNextCheck = 0;
+      this.throwRunning = true;
+    }
+    const counts = this.advanceThrow(maxSteps);
+    if (counts !== undefined) {
+      this.throwRunning = false;
+      this.throwResultOwner = ownerSlot;
+      this.throwResultSerial = serial;
+      this.throwResultAction = action;
+      this.throwCounts = counts;
+      return counts;
+    }
+    return this.throwResultOwner === ownerSlot && this.throwResultSerial === serial && this.throwResultAction === action && this.throwCounts;
+  }
+
+
+  private advanceThrow(maxSteps: number): boolean | undefined {
     const legal = observedActions.legal;
     const started = observedActions.started;
-    let nextCheck = 0;
     try {
-      for (let offset = 0; offset < TECH_WINDOW_FRAMES; offset++) {
-        const before = this.thrown.down.state;
-        const recoverySerial = this.thrown.surfaceRecovery.contactSerial;
-        advanceTechInput(this.pressedTech, offset === 0, this.thrown.launch.hitlag > 1);
-
-
-        const linked = !this.bounded || this.thrown.grab.owner !== undefined || this.holder.grab.target !== undefined;
-        if (linked) advanceFighterMotion(this.throwWorld, 0, stage, frame + offset + 1, this.throwInputs[0] ?? neutralControls(), 0.0);
-        advanceFighterMotion(this.throwWorld, 1, stage, frame + offset + 1, this.throwInputs[1] ?? neutralControls(), 0.0);
-        if (linked) {
-          resolveGrabs(this.throwWorld);
-          advanceGrabs(this.throwWorld, this.throwInputs);
-          resolveGrabs(this.throwWorld);
+      for (let offset = this.throwOffset; offset < TECH_WINDOW_FRAMES; offset++) {
+        if (this.throwSpent >= maxSteps) {
+          this.throwOffset = offset;
+          return undefined;
         }
-        const floorContact = before === DownState.tumble && this.thrown.down.state !== DownState.tumble;
-        const solidContact = before === DownState.tumble && this.thrown.surfaceRecovery.contactSerial !== recoverySerial;
-        if (floorContact || solidContact) return techInputEligible(this.pressedTech) !== techInputEligible(this.thrown.tech);
-        if (this.thrown.grab.owner === undefined && this.thrown.down.state !== DownState.tumble) return false;
-
-        if (offset >= nextCheck && this.bounded && this.thrown.grab.owner === undefined && this.holder.grab.target === undefined && clearFlight(this.thrown)) {
-          if (surelyClear(this.thrown, stage, frame + offset + 1, TECH_WINDOW_FRAMES - 1 - offset)) return false;
-          nextCheck = offset + CLEARANCE_RECHECK;
-        }
+        this.throwSpent++;
+        const settled = this.throwStep(offset);
+        if (settled !== undefined) return settled;
       }
     } finally {
       observedActions.legal = legal;
       observedActions.started = started;
     }
     return false;
+  }
+
+
+  private throwStep(offset: number): boolean | undefined {
+    const stage = this.throwStage;
+    const frame = this.throwFrame;
+    const before = this.thrown.down.state;
+    const recoverySerial = this.thrown.surfaceRecovery.contactSerial;
+    advanceTechInput(this.throwTech, offset === 0, this.thrown.launch.hitlag > 1);
+
+
+    const linked = !this.bounded || this.thrown.grab.owner !== undefined || this.holder.grab.target !== undefined;
+    if (linked) advanceFighterMotion(this.throwWorld, 0, stage, frame + offset + 1, this.throwInputs[0] ?? neutralControls(), 0.0);
+    advanceFighterMotion(this.throwWorld, 1, stage, frame + offset + 1, this.throwInputs[1] ?? neutralControls(), 0.0);
+    if (linked) {
+      resolveGrabs(this.throwWorld);
+      advanceGrabs(this.throwWorld, this.throwInputs);
+      resolveGrabs(this.throwWorld);
+    }
+    const floorContact = before === DownState.tumble && this.thrown.down.state !== DownState.tumble;
+    const solidContact = before === DownState.tumble && this.thrown.surfaceRecovery.contactSerial !== recoverySerial;
+    if (floorContact || solidContact) return techInputEligible(this.throwTech) !== techInputEligible(this.thrown.tech);
+    if (this.thrown.grab.owner === undefined && this.thrown.down.state !== DownState.tumble) return false;
+
+    if (offset >= this.throwNextCheck && this.bounded && this.thrown.grab.owner === undefined && this.holder.grab.target === undefined && clearFlight(this.thrown)) {
+      if (surelyClear(this.thrown, stage, frame + offset + 1, TECH_WINDOW_FRAMES - 1 - offset)) return false;
+      this.throwNextCheck = offset + CLEARANCE_RECHECK;
+    }
+    return undefined;
   }
 }
