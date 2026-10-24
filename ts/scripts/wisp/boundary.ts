@@ -29,13 +29,15 @@ export const MeleeReady = preloadRecord(
 export const DevCommandReceipt = preloadRecord(
   {
     head: [
-      "SMASHCRAFT DEV v=1 build={build} receipt={receipt} epoch={epoch} rb={rollback} delay={delay} batch={batch} rematchSeconds={rematchSeconds} ",
+      "SMASHCRAFT DEV v=1 build={build} receipt={receipt} step={step} steps={steps} epoch={epoch} rb={rollback} delay={delay} batch={batch} rematchSeconds={rematchSeconds} ",
       "SETUP phase={phase} human-fighters={humanFighters} computers={computers} characters={characters} stocks={stocks} minutes={minutes} automatic-rematch={automaticRematch} team-battle={teamBattle} friendly-fire={friendlyFire} teams={teams} stage={stage} ",
     ],
   },
   Schema.Struct({
     build: Schema.NonEmptyString,
     receipt: Count.check(Schema.isGreaterThanOrEqualTo(1)),
+    step: Count.check(Schema.isGreaterThanOrEqualTo(1)),
+    steps: Count.check(Schema.isGreaterThanOrEqualTo(1)),
     epoch: Count,
     rollback: Count.check(Schema.isGreaterThanOrEqualTo(1)),
     delay: Count,

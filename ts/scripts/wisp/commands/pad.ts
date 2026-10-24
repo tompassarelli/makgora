@@ -79,6 +79,8 @@ type DevReceipt = Effect.Success<ReturnType<typeof DevCommandReceipt.decode>>;
 
 export function requestedSetup(command: string, receipt: DevReceipt): boolean {
   const original = (command.split(" |trace ")[0] ?? command).split(" |capture ")[0] ?? command;
+  const steps = original.startsWith("-dev setup ") ? original.substring(11).split(";").length : 1;
+  if (receipt.step !== steps || receipt.steps !== steps) return false;
   if (original === "-dev reset") return receipt.phase === Phase.characterMenu;
   const hero = quickMatchHero(original) ?? quickRecoveryHero(original) ?? quickOffstageHero(original) ?? quickPainHero(original)?.character;
   if (hero !== undefined) return receipt.phase === Phase.match && receipt.characters.split(",").every((value, slot) => (receipt.humanFighters & (1 << slot)) === 0 || Number(value) === hero);
