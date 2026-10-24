@@ -32,17 +32,20 @@ const source = parseSource(await Bun.file(input).arrayBuffer()), model = structu
 ensure((painOnly || source.Sequences.length === 12) && source.Nodes.some(n => n.Name === "Bone_Axe_Free"), "Expected classic Tauren Chieftain");
 const stand = source.Sequences[4]!, idleSequence = source.Sequences[0]!;
 interface Gesture { chest?: number; twist?: number; head?: number; arm?: number; elbow?: number; free?: number; freeElbow?: number; hip?: number; knee?: number; lean?: number; yaw?: number; leftHip?: number; rightHip?: number; leftKnee?: number; rightKnee?: number; step?: number; pitch?: number; rise?: number; spin?: number; depth?: number; shin?: number; leftShin?: number; rightShin?: number; hoof?: number; leftHoof?: number; rightHoof?: number; pelvis?: number; slide?: number }
-interface Phase { frame: number; gesture: Gesture; target?: readonly [number,number]; grip?: readonly [number,number]; idle?: boolean }
+interface Phase { frame: number; gesture: Gesture; target?: readonly [number,number]; grip?: readonly [number,number]; idle?: boolean; glide?: boolean }
 interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; stock?: number; stockHit?: number; prepTravel?: number; hold?: boolean; air?: boolean; roll?: number; first?: Gesture; phases?: readonly Phase[]; target?: readonly [number, number]; damage?: boolean; beats?: readonly Phase[]; gore?: "travel" | "hold" | "recovery"; settleFrom?: number; stockFrom?: number }
-interface Strike { prep: Gesture; hit: Gesture; follow: Gesture; prepAt?: number; followAt?: number; settle?: number; rest?: Gesture; restTarget?: readonly [number,number]; restGrip?: readonly [number,number]; prepTarget?: readonly [number,number]; hitTarget?: readonly [number,number]; hitGrip?: readonly [number,number]; followGrip?: readonly [number,number]; mid?: readonly Phase[]; aim?: boolean; reach?: readonly [number,number]; air?: boolean }
+interface Strike { prep: Gesture; hit: Gesture; follow: Gesture; prepAt?: number; followAt?: number; settle?: number; rest?: Gesture; restTarget?: readonly [number,number]; restGrip?: readonly [number,number]; prepTarget?: readonly [number,number]; hitTarget?: readonly [number,number]; hitGrip?: readonly [number,number]; followGrip?: readonly [number,number]; mid?: readonly Phase[]; aim?: boolean; reach?: readonly [number,number]; air?: boolean; glide?: number }
 const strikeBeats=(move:{startupFrames:number;totalFrames:number;regions:readonly {firstFrame:number;lastFrame:number;hit:{strike?:{x2:number;z2:number}}}[]},s:Strike):Phase[]=>{
   const contact=move.startupFrames,end=move.totalFrames,lastActive=Math.max(...move.regions.map(r=>r.lastFrame));
   const followAt=s.followAt??Math.min(end-4,lastActive+2),settleAt=Math.round(followAt+(end-followAt)*(s.settle??0.55));
   const strike=move.regions[0]!.hit.strike!;
-  return [{frame:0,gesture:ready},{frame:s.prepAt??Math.max(1,contact-Math.max(2,Math.round(contact*0.3))),gesture:s.prep,target:s.prepTarget},
+  const beats:Phase[]=[{frame:0,gesture:ready},{frame:s.prepAt??Math.max(1,contact-Math.max(2,Math.round(contact*0.3))),gesture:s.prep,target:s.prepTarget},
     {frame:contact,gesture:s.hit,target:s.hitTarget??(s.aim?[strike.x2,strike.z2]:undefined),grip:s.hitGrip},...(s.mid??[]),{frame:followAt,gesture:s.follow,target:s.reach,grip:s.followGrip},
     {frame:settleAt,gesture:s.rest??blend(s.follow,ready,0.62),target:s.restTarget,grip:s.restGrip},{frame:end-1,gesture:ready,idle:!s.air},{frame:end,gesture:ready,idle:!s.air}].sort((a,b)=>a.frame-b.frame);
+  return s.glide?glide(beats,followAt,s.glide):beats;
 };
+const glide=(beats:Phase[],from:number,step:number):Phase[]=>beats.flatMap((p,i)=>{const next=beats[i+1];if(p.frame<from||!next)return [p];
+  return [p,...Array.from({length:Math.max(0,Math.ceil((next.frame-p.frame)/step)-1)},(_,k)=>{const frame=p.frame+(k+1)*step,t=(frame-p.frame)/(next.frame-p.frame);return {frame,gesture:blend(p.gesture,next.gesture,t),glide:true};})];});
 const blend=(a:Gesture,b:Gesture,t:number):Gesture=>Object.fromEntries([...new Set([...Object.keys(a),...Object.keys(b)])].map(k=>[k,(a[k as keyof Gesture]??0)*(1-t)+(b[k as keyof Gesture]??0)*t]));
 const ready: Gesture = {};
 const reach: Gesture = { chest: 22, arm: -75, elbow: 35, free: -48, hip: -12, knee: 18, head: -12 };
@@ -99,11 +102,11 @@ const strikes: Partial<Record<HeroPose, Strike>> = {
       {frame:28,gesture:{chest:42,twist:0,yaw:160,arm:-60,elbow:5,free:-54,pitch:20,step:22,leftHip:-24,rightHip:-12,leftKnee:24,rightKnee:8,head:-14},target:[-148,10]}],
     follow:{chest:44,twist:10,yaw:180,arm:-58,elbow:5,free:-52,pitch:22,step:24,leftHip:-26,rightHip:-12,leftKnee:26,rightKnee:8,head:-12},followAt:34,reach:[-158,8]},
   downAir:{prep:{chest:-10,arm:-185,elbow:30,free:-140,freeElbow:30,pitch:-10,leftHip:-110,rightHip:-102,leftKnee:124,rightKnee:118,head:-6,rise:16},prepAt:6,prepTarget:[-40,240],
-    hit:{chest:40,arm:-10,elbow:60,free:60,freeElbow:20,pitch:0,leftHip:10,rightHip:6,leftKnee:-18,rightKnee:-18,head:20,rise:-60,depth:0},hitTarget:[50,-10],hitGrip:[45,40],
+    hit:{chest:8,arm:-10,elbow:60,free:-150,freeElbow:20,pitch:0,lean:-10,leftHip:10,rightHip:-24,leftKnee:-40,rightKnee:-30,leftShin:40,rightShin:70,leftHoof:30,rightHoof:-26,slide:25,head:-10,depth:0,rise:-60},hitTarget:[95,-50],hitGrip:[75,5],
     mid:[{frame:11,gesture:{chest:-16,arm:-195,elbow:35,free:-160,freeElbow:30,pitch:-14,leftHip:-130,rightHip:-122,leftKnee:146,rightKnee:140,head:-10,rise:28},target:[-45,255]},
-      {frame:16,gesture:{chest:45,arm:-10,elbow:60,free:65,freeElbow:20,pitch:0,leftHip:10,rightHip:6,leftKnee:-20,rightKnee:-20,head:22,rise:-88,depth:0},target:[50,-10],grip:[45,40]}],
-    follow:{chest:25,arm:-10,elbow:60,free:-40,freeElbow:25,pitch:0,leftHip:-30,rightHip:-26,leftKnee:45,rightKnee:40,head:20,rise:-45,depth:0},followAt:19,reach:[55,0],followGrip:[35,60],settle:0.5,restTarget:[-60,40],restGrip:[-10,70],
-    rest:{chest:12,arm:-30,elbow:30,free:-30,freeElbow:30,pitch:0,leftHip:-45,rightHip:-40,leftKnee:65,rightKnee:60,head:6,rise:-24,depth:-40}},
+      {frame:16,gesture:{chest:8,arm:-10,elbow:60,free:-150,freeElbow:20,pitch:0,lean:-10,leftHip:10,rightHip:-24,leftKnee:-40,rightKnee:-30,leftShin:40,rightShin:70,leftHoof:30,rightHoof:-26,slide:25,head:-10,depth:0,rise:-88},target:[95,-50],grip:[75,5]}],
+    follow:{chest:42,arm:-10,elbow:60,free:-40,freeElbow:25,pitch:0,leftHip:-56,rightHip:-52,leftKnee:75,rightKnee:70,head:18,rise:-38,depth:0},followAt:19,reach:[55,-30],followGrip:[35,20],settle:0.5,restTarget:[125,95],restGrip:[50,45],glide:2,
+    rest:{chest:16,arm:-60,elbow:35,free:-50,freeElbow:25,pitch:0,leftHip:-40,rightHip:-36,leftKnee:54,rightKnee:50,head:8,rise:-16,depth:-10}},
 };
 for (const [pose, style, gesture] of normals) {
   const move = CAIRNE_MOVES.normals[style]; ensure(move, `${pose}: missing timing`);
@@ -317,7 +320,7 @@ for (const [ordinal,action] of [...actions,...damageActions,...goreActions].entr
     const first=donor.Keys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1]);if(!first)return;
     const idleKey=donor.Keys.find(k=>k.Frame>=idleSequence.Interval[0]&&k.Frame<=idleSequence.Interval[1])??{...first,Vector:resting(path,first.Vector)};
     const match=/^\.(Bones|Helpers)\.(\d+)\.Rotation$/.exec(path),node=match?source[match[1] as "Bones"|"Helpers"][Number(match[2])]:undefined;
-    for(const phase of phases){const base=phase.idle?idleKey:first;const [pitch,yaw]=node?joint(node.Name,phase.gesture):[0,0];const Vector=node?rotation(base.Vector,pitch,yaw):base.Vector.slice();
+    for(const phase of phases){if(phase.glide&&(node?.Name==="Bone_UpperArmR"||node?.Name==="Bone_LowerArmR"))continue;const base=phase.idle?idleKey:first;const [pitch,yaw]=node?joint(node.Name,phase.gesture):[0,0];const Vector=node?rotation(base.Vector,pitch,yaw):base.Vector.slice();
       const tangent=()=>match||track.LineType===mdx.LineType.Bezier?Vector.slice():new Float32Array(Vector.length);
       track.Keys.push({...base,Frame:start+Math.round(phase.frame*1000/60),Vector,...first.InTan?{InTan:tangent(),OutTan:tangent()}: {}});}
   });
