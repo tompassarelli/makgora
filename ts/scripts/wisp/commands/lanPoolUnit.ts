@@ -6,7 +6,7 @@ import { ChildProcess } from "effect/process";
 import { type Command, UsageFailure, flagValues } from "wisp/scripts/wisp/command";
 import { lan as frameworkLan } from "wisp/scripts/wisp/commands/lan";
 import { LanFailure } from "wisp/scripts/wisp/lan/join";
-import { agentSocket, readPool } from "wisp/scripts/wisp/lan/pool";
+import { agentSocket, readPool, stopPairScopes } from "wisp/scripts/wisp/lan/pool";
 import { pollUntil } from "../../hostPoll";
 import { runProcess } from "../../hostProcess";
 import { projectRoot } from "../project";
@@ -118,6 +118,10 @@ export const poolStop: Command = (args) => Effect.gen(function*() {
       }
     }
     yield* runProcess(userManager("systemctl", ["--user", "stop", unit])).pipe(Effect.mapError((cause) => new LanFailure({ problem: `stop ${unit}: ${cause.message}` })));
+    for (const id of pairIds) {
+      const left = yield* stopPairScopes(id, (name, lease) => Console.log(`${name} outlived ${unit} (lease ${lease}); killing its capacity scope`));
+      if (left.length > 0) return yield* new LanFailure({ problem: `stopped ${unit}, but the capacity scope of ${left.join(" and ")} still runs` });
+    }
     for (const id of pairIds) yield* Effect.try({ try: () => releasePair(id, process.env["NORTH_FLEET_SESSION"] ?? ""), catch: cause => new LanFailure({ problem: String(cause) }) });
     yield* Console.log(`stopped ${unit}`);
   }
