@@ -99,6 +99,13 @@ function senderLate(seconds: readonly Fields[]): string {
   }).join(",");
 }
 
+function gameClock(seconds: readonly Fields[], span: number): string {
+  const timed = seconds.filter(row => row.gms !== undefined);
+  if (timed.length === 0) return "game clock -";
+  const game = sum(timed, "gms") / 1000;
+  return `game/real ${fixed(game / span, 4)} cb/game s ${fixed(sum(timed, "cb") / Math.max(0.001, game), 2)}`;
+}
+
 function minuteRow(minute: Minute, previousEnd: number): string {
   const { seconds, counts, events, live: liveTags } = minute.lines;
   const end = seconds.at(-1)?.t ?? previousEnd;
@@ -117,7 +124,8 @@ function minuteRow(minute: Minute, previousEnd: number): string {
   const tagged = liveTags.slice(-2).join(" ");
   return [
     `  min ${String(minute.minute).padStart(3)} t ${fixed(end / 1000, 0).padStart(5)}s`,
-    `cb/s ${fixed(sum(seconds, "cb") / span)} game/real ${fixed(sum(seconds, "cb") / span / 60, 2)} (min ${seconds.length === 0 ? "-" : Math.min(...seconds.map(row => row.cb ?? 0))})`,
+    `cb/s ${fixed(sum(seconds, "cb") / span)} (min ${seconds.length === 0 ? "-" : Math.min(...seconds.map(row => row.cb ?? 0))})`,
+    gameClock(seconds, span),
     `sim/s ${fixed(sum(seconds, "sim") / span)} spec/s ${fixed(sum(seconds, "spec") / span)} conf/s ${fixed(sum(seconds, "conf") / span)} spec/cb ${fixed(sum(seconds, "spec") / Math.max(1, sum(seconds, "cb")), 2)}`,
     `held ${fixed(100 * sum(seconds, "held") / Math.max(1, matchTicks), 0)}% stall ${fixed(100 * sum(seconds, "stall") / Math.max(1, matchTicks), 0)}% gap ${fixed(sum(seconds, "gap") / Math.max(1, seconds.length))}/${most(seconds, "gmax")}`,
     `rollback/s ${fixed(sum(seconds, "rb") / span)} replayed/s ${fixed(sum(seconds, "rbf") / span)} deepest ${most(seconds, "rbd")} pop ${most(seconds, "pop")} over 20/s ${fixed(sum(seconds, "popOver") / span)} echo ${fixed(mean(seconds.filter(row => (row.echoMax ?? 0) > 0), "echo"))}/${most(seconds, "echoMax")} late ${senderLate(seconds)} bursts/s ${fixed(sum(seconds, "bur") / span)} held run ${most(seconds, "hrun")} drift ${seconds.at(-1)?.drift ?? "-"} bot reuse ${sum(seconds, "botHit")}/${sum(seconds, "botHit") + sum(seconds, "botMiss")} heap growth KB/s ${fixed(sum(seconds, "alloc") / span)} failed sends ${sum(seconds, "sf")}`,

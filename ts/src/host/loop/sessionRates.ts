@@ -25,6 +25,7 @@ const TOP_EFFECTS = 6;
 const TOP_SOUNDS = 3;
 const MAX_NAME = 20;
 const BURST_IDLE_US = 2000;
+const GAME_CLOCK_PERIOD = 512.0;
 // Warcraft III cuts each Preload string at 259 characters, so every rates record stays within this.
 export const RATES_RECORD_CHARS = 250;
 
@@ -90,6 +91,9 @@ interface SessionRates {
   botRepeated: number;
   botRerun: number;
   heap: number;
+  gameClock: timer | undefined;
+  gamePeriods: number;
+  lastGame: number;
   tags: Record<number, string | undefined>;
   live: Record<string, number>;
   shortNames: Record<string, string>;
@@ -259,6 +263,25 @@ function sampleMatch(rates: SessionRates, rollback: Rollback, paused: boolean): 
   if (rollback.stalled > 0) second.stalled++;
 }
 
+function gameSeconds(rates: SessionRates): number {
+  const reference = rates.gameClock;
+  return reference === undefined ? 0 : rates.gamePeriods * GAME_CLOCK_PERIOD + TimerGetElapsed(reference);
+}
+
+function gameMs(rates: SessionRates): number {
+  const game = gameSeconds(rates);
+  const advanced = microseconds(game - rates.lastGame);
+  rates.lastGame = game;
+  return idiv(advanced, 1000);
+}
+
+function startGameClock(rates: SessionRates): void {
+  if (rates.gameClock !== undefined) return;
+  const reference = CreateTimer();
+  rates.gameClock = reference;
+  TimerStart(reference, GAME_CLOCK_PERIOD, true, () => { rates.gamePeriods++; });
+}
+
 function elapsedMs(rates: SessionRates, now: number): number {
   return rates.clock === undefined ? Math.floor(rates.seconds * 1000) : Math.floor((now - rates.started) * 1000);
 }
@@ -290,7 +313,7 @@ function rateTokens(rates: SessionRates): string[] {
   const rollback = s === undefined ? undefined : activeRollback(s);
   const frame = s === undefined ? -1 : rollback?.schedule.speculativeFrame() ?? s.runtime.simulationFrame;
   const window = rollback === undefined ? "" : ` cf=${rollback.schedule.nextConfirmedFrame()} kn=${rollback.schedule.knownThrough()} win=${rollback.window} dl=${rollback.delay} ping=${smoothedRttMs(rollback.net.estimate)} drift=${rates.drift} ${botLine(rates, rollback)} ${takeNetRates(rollback.net)}`;
-  return `cb=${second.ticks} dr=${second.draws} dru=${microseconds(second.draw)} ev=${second.events} sim=${second.sim} spec=${second.spec} conf=${second.conf} held=${second.held} stall=${second.stalled} gap=${gap} gmax=${second.gapMax} lua=${microseconds(second.lua)} tk=${tick} tkmax=${microseconds(second.tickMax)} send=${second.sends} recv=${second.received} rown=${second.receivedOwn} pz=${second.paused} pt=${second.pauses} pm=${second.menus} cbgap=${microseconds(second.tickGap)} bur=${second.bursts} hrun=${second.heldRun} sf=${second.sendFailed} alloc=${heapGrowth(rates)} ${gameSpeed()} ph=${phase} m=${match} f=${frame}${window}`.split(" ");
+  return `cb=${second.ticks} dr=${second.draws} dru=${microseconds(second.draw)} ev=${second.events} sim=${second.sim} spec=${second.spec} conf=${second.conf} held=${second.held} stall=${second.stalled} gap=${gap} gmax=${second.gapMax} gms=${gameMs(rates)} lua=${microseconds(second.lua)} tk=${tick} tkmax=${microseconds(second.tickMax)} send=${second.sends} recv=${second.received} rown=${second.receivedOwn} pz=${second.paused} pt=${second.pauses} pm=${second.menus} cbgap=${microseconds(second.tickGap)} bur=${second.bursts} hrun=${second.heldRun} sf=${second.sendFailed} alloc=${heapGrowth(rates)} ${gameSpeed()} ph=${phase} m=${match} f=${frame}${window}`.split(" ");
 }
 
 export function rateRecords(time: number, tokens: readonly string[]): string[] {
@@ -423,9 +446,11 @@ export function installSessionRates(build: string): void {
     epoch: -1, lastSpec: 0, lastConf: 0, lastSim: 0, created: zeroKinds(), destroyed: zeroKinds(),
     keyRegistrations: 0, registrations: 0, actions: 0, sends: 0, handleMax: 0, wrapped: false, wasPaused: false, wasMenu: false, lastTick: started,
     heldRun: 0, driftEpoch: -1, driftCallbacks: 0, driftBase: 0, drift: 0, botRepeated: 0, botRerun: 0, heap: -1,
+    gameClock: undefined, gamePeriods: 0, lastGame: 0,
     tags: {}, live: {}, shortNames: {},
   };
   wrapNatives(rates);
+  startGameClock(rates);
   const table = globalThis.__smashcraftDispatch;
   if (table === undefined) return;
   const plain = table.run;

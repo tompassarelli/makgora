@@ -91,7 +91,7 @@ export function playtest({ build, map, helper, computerSlot, computerOpponent, c
     Effect.catchTag("MalformedGameFile", () => Effect.void),
     Effect.mapError(problem),
   );
-  const request = playtestRequest(1 << computerSlot, computerOpponent, computerTier);
+  const request = playtestRequest(1 << computerSlot, computerOpponent, computerTier, false);
   const files = (documents: string) => ({
     request: join(dataDirectory(documents), PLAYTEST_REQUEST_FILE),
     go: join(dataDirectory(documents), PLAYTEST_GO_FILE),
