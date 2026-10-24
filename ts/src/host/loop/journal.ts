@@ -290,6 +290,7 @@ export function serviceJournalInput(s: ShellState, rollback: Rollback, journal: 
       probeInput(s.probe, "capture", rollback.epoch, slot, frame, row.held, row.pressed, row.released, schedule.speculativeFrame());
       if (rollback.predictionHeld && row.pressed !== 0) probeIntegrity(s.probe, `held ${rollback.epoch} ${slot} ${frame}`);
       if (s.trace.active) s.trace.window.localCaptures++;
+      if (row.pressed !== 0) traceInput(s.trace, `admitted frame ${frame} pressed ${row.pressed}`);
     }
     for (let index = 0; index < rows; index++) {
       const row = packet.rows[index];

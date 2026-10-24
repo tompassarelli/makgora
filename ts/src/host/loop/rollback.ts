@@ -35,7 +35,7 @@ import { INPUT_PREFIX, failJournal, flushTransport, receiveLifecycle, serviceJou
 import { epochChecksumDue, probeAdvance, probeCapture, probeClockMs, probeInput, probeIntegrity, probePoll, probeRecording, probeSendFinished, probeTransportReceive, probeTransportSend } from "./responseProbe";
 import { confirmedChecksum } from "./diagnostics";
 import { type KeyboardRollback, type Rollback, type ShellState, localSlot, shell } from "./state";
-import { recordBatchWait, recordEcho, recordSend, resetEchoRing, traceSeconds } from "./trace";
+import { recordBatchWait, recordEcho, recordSend, resetEchoRing, traceInput, traceSeconds } from "./trace";
 import { LASTING, resumePresentationHeld, setStatus } from "./view";
 import { holdPresentedCapture } from "./visualCapture";
 import { visualCaptureStopBefore } from "../../game/session/visualCapture";
@@ -318,6 +318,7 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
       trace.window.maxReplayDepth = Math.max(trace.window.maxReplayDepth, depth);
     }
     probeIntegrity(probe, `rollback ${epoch} ${depth}`);
+    traceInput(trace, `rollback from ${reconciled.replayedFrom} depth ${depth}`);
   }
   const confirmable = Math.min(schedule.confirmedFrame(), known);
   const confirmSteps = confirmedBudget(confirmable - schedule.nextConfirmedFrame() + 1, journal !== undefined);
@@ -335,7 +336,10 @@ export function rollbackTick(s: ShellState, rollback: Rollback): void {
     return;
   }
   rollback.repairedFrames = repaired;
-  if ((reconciled !== "unchanged" || pendingBefore !== undefined) && rollback.playback.pendingRepair(epoch) === undefined) notePop(rollback.net, speculative.world);
+  if ((reconciled !== "unchanged" || pendingBefore !== undefined) && rollback.playback.pendingRepair(epoch) === undefined) {
+    notePop(rollback.net, speculative.world);
+    traceInput(trace, `repaired through ${speculative.runtime.simulationFrame}`);
+  }
   let steps = 0;
   while (s.game.phase === Phase.match && schedule.mayAdvanceConfirmed() && schedule.nextConfirmedFrame() <= known && steps < confirmSteps && (stopAt === undefined || schedule.nextConfirmedFrame() < stopAt)) {
     beginFrameSection(CONFIRMED_SECTION);
@@ -408,6 +412,7 @@ function receivePacket(s: ShellState, rollback: Rollback, sender: number, packet
     }
     if (receipt === "accepted" && packet.epoch === rollback.epoch) noteReceived(rollback.net, sender, local, frame, schedule.speculativeFrame());
     if (trace.active && local) recordEcho(trace, packet.epoch, frame, receivedCallback, receivedSeconds);
+    if (receipt === "accepted" && !local && row.pressed !== 0) traceInput(trace, `received participant ${sender} frame ${frame} pressed ${row.pressed}`);
   }
   if (receipt !== "accepted" && receipt !== "wrongEpoch") setStatus(s, "The players could not stay connected. Restart the match.", LASTING);
   if (!trace.active) return;
