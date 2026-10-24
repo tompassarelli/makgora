@@ -2,6 +2,11 @@ import { AttackStyle } from "../sim/codes";
 import type { Direction } from "./inputRow";
 
 
+function sideAir(style: AttackStyle, facing: number, direction: number): AttackStyle {
+  if (direction === 0) return style === AttackStyle.forwardSmash ? AttackStyle.neutralAir : AttackStyle.forwardAir;
+  return direction === facing ? AttackStyle.forwardAir : AttackStyle.backAir;
+}
+
 export function attackStyleForGrounding(style: AttackStyle | undefined, grounded: boolean, facing: number, direction: number): AttackStyle | undefined {
   if (grounded || style === undefined || style === AttackStyle.shot) return style;
   switch (style) {
@@ -13,8 +18,7 @@ export function attackStyleForGrounding(style: AttackStyle | undefined, grounded
     case AttackStyle.downTilt:
     case AttackStyle.forwardTiltDown: return AttackStyle.downAir;
     case AttackStyle.forwardSmash:
-    case AttackStyle.forwardTilt:
-      return direction !== 0 && direction !== facing ? AttackStyle.backAir : AttackStyle.forwardAir;
+    case AttackStyle.forwardTilt: return sideAir(style, facing, direction);
     default: return undefined;
   }
 }
