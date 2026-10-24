@@ -7,7 +7,7 @@ import { fighterSlug } from "../../src/game/sim/heroes/registry";
 import { fighters } from "../heroModelSource";
 import { stopBunProcess } from "../hostProcess";
 import { pruneWhiteTextures } from "../whiteImports";
-import { type Family, INPUTS_STORE, type Manifest, type Pin, assetsView, listFiles, mergeShards, publish, readManifest, removeTree, seal, storeShards, writeShardPins } from "./buildInputs";
+import { ASSET_FAMILIES, FETCH_HINT, type Family, INPUTS_STORE, type Manifest, type Pin, assetsView, listFiles, mergeShards, publish, readManifest, removeTree, seal, storeShards, unstoredPins, writeShardPins } from "./buildInputs";
 import { stockStorage } from "./renderAssetStore";
 import { SHARED_SHARD, shardFiles } from "./inputShards";
 import { MODEL_FACTS_DIRECTORY, modelFactsFile, writeGenerated } from "./modelFactsTable";
@@ -145,6 +145,8 @@ export interface FighterPlan { readonly fighter: Fighter; readonly keys: readonl
 
 export const planFighters = (names: readonly string[], rebuild: boolean) => Effect.gen(function*() {
   const manifest = yield* readManifest();
+  const unstored = unstoredPins(manifest, ASSET_FAMILIES);
+  if (unstored.length > 0) return yield* failure("find build inputs", INPUTS_STORE, `${unstored.map(({ family, hash }) => `${family} ${hash}`).join(", ")} not in the store; ${FETCH_HINT}`);
   const assets = yield* Effect.try({ try: () => assetsView(manifest), catch: (cause) => failure("link assets", INPUTS_STORE, cause) });
   const roster = [...fighters].map(([character, { name, source }]) => ({ character, name, source, slug: fighterSlug(character) }));
   const named = (fighter: Fighter, name: string) => fighter.name === name || fighter.slug === name;

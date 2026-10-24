@@ -16,7 +16,8 @@ import { projectRoot } from "../project";
 import { HERO_STRIKE_MOMENTS } from "../../../src/game/presentation/heroStrikeMomentInfo";
 import { measureStrikeMoments, staleStrikeFighters } from "../strikeMoments";
 import { heroModelSource } from "../../heroModelSource";
-import { FAMILIES, FAMILY_NAMES, type Family, INPUTS_STORE, MANIFEST, checkoutInputs, isSharded, readPins, storeFamily, storeShards, writePin, writeShardPins } from "../buildInputs";
+import { FAMILIES, FAMILY_NAMES, type Family, INPUTS_STORE, MANIFEST, checkoutInputs, isSharded, readManifest, readPins, storeFamily, storeShards, unstoredPins, writePin, writeShardPins } from "../buildInputs";
+import { fetchEntry } from "../inputsFetch";
 
 const isFamily = (name: string): name is Family => name in FAMILIES;
 
@@ -96,6 +97,22 @@ const prune = (args: readonly string[]) => Effect.gen(function*() {
   console.log(removed.length === 0 ? "nothing to prune" : `removed ${removed.length} folders`);
 });
 
+const fetch = (hosts: readonly string[]) => Effect.gen(function*() {
+  if (hosts.length === 0 || hosts.some((host) => host.startsWith("-"))) return yield* new UsageFailure({ problem: "inputs fetch takes HOST..., the ssh hosts to copy missing store entries from, tried in order" });
+  const missing = unstoredPins(yield* readManifest());
+  if (missing.length === 0) return console.log(`every entry ${MANIFEST} pins is already in ${INPUTS_STORE}`);
+  const unfetched = yield* Effect.forEach(missing, ({ family, hash }) => Effect.gen(function*() {
+    for (const host of hosts) {
+      const result = yield* Effect.tryPromise({ try: () => fetchEntry(host, family, hash), catch: (cause) => new MapBuildFailure({ operation: "fetch build input", path: `${host}:${family}/${hash}`, cause: String(cause) }) });
+      if (result === "fetched") return void console.log(`fetched ${family} ${hash} from ${host}`);
+    }
+    return `${family} ${hash}`;
+  }), { concurrency: 4 });
+  const absent = unfetched.filter((entry) => entry !== undefined);
+  if (absent.length > 0) return yield* new MapBuildFailure({ operation: "fetch build inputs", path: INPUTS_STORE, cause: `no host of ${hosts.join(", ")} stores these; fetch them from the host that stored them or produce them again:\n${absent.join("\n")}` });
+  console.log(`fetched ${missing.length} entries, each verified by its hash`);
+});
+
 export const inputs: Command = (args) => Effect.gen(function*() {
   const [verb, ...rest] = args;
   const [family, source, ...flags] = rest;
@@ -103,6 +120,7 @@ export const inputs: Command = (args) => Effect.gen(function*() {
   if (verb === "add" && family !== undefined && source !== undefined && flags.length === scope.length * 2 + (all ? 1 : 0)) return yield* add(family, source, scope, all);
   if (verb === "derive") return yield* derive(rest);
   if (verb === "prune") return yield* prune(rest);
+  if (verb === "fetch") return yield* fetch(rest);
   if (verb === "check" && rest.length === 0) {
     const paths = yield* checkoutInputs();
     console.log(`every family in ${MANIFEST} is stored and unchanged\n--assets ${paths.assets}`);
@@ -115,5 +133,5 @@ export const inputs: Command = (args) => Effect.gen(function*() {
     if (name === "base" || name === "container" || name === "assets" || name === "summon") return console.log(paths[name]);
     return yield* new UsageFailure({ problem: "inputs path takes base, container, assets or summon" });
   }
-  return yield* new UsageFailure({ problem: "inputs takes add FAMILY PATH [--fighter SHARD]... [--all] | derive [--fighter NAME]... [--rebuild | --check] | prune [--scratch NAME]... | check | path [base|container|assets|summon]" });
+  return yield* new UsageFailure({ problem: "inputs takes add FAMILY PATH [--fighter SHARD]... [--all] | derive [--fighter NAME]... [--rebuild | --check] | fetch HOST... | prune [--scratch NAME]... | check | path [base|container|assets|summon]" });
 });

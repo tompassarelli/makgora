@@ -243,9 +243,15 @@ export const regenerate = (family: Family, pin: Pin) =>
   (typeof pin === "string" ? `(it must hash to ${pin}, or commit the hash it writes into build-inputs/${family})` : `(commit the shard hashes it writes into build-inputs/${family}/)`);
 
 
+export const FETCH_HINT = "when another host stored it, run `bun wisp inputs fetch HOST` from the checkout to copy every pinned entry this store lacks";
+
+export const unstoredPins = (manifest: Manifest, families: readonly Family[] = FAMILY_NAMES, store = INPUTS_STORE) =>
+  families.flatMap((family) => pinHashes(manifest[family]).filter((hash) => !existsSync(join(store, family, hash))).map((hash) => ({ family, hash })));
+
+
 export const verifiedFamily = (family: Family, hash: string, store = INPUTS_STORE) => Effect.gen(function*() {
   const directory = join(store, family, hash);
-  if (!existsSync(directory)) return yield* failure("find build input", directory, `${family} ${hash} is not in the store; ${regenerate(family, hash)}`);
+  if (!existsSync(directory)) return yield* failure("find build input", directory, `${family} ${hash} is not in the store; ${FETCH_HINT}, else ${regenerate(family, hash)}`);
   const actual = yield* Effect.tryPromise({ try: () => hashTree(directory), catch: (cause) => failure("hash build input", directory, String(cause)) });
   if (actual !== hash) {
     return yield* failure("verify build input", directory, `${family} was changed in place (it hashes to ${actual}); stored inputs are never edited: ${regenerate(family, hash)}`);

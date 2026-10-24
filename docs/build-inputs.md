@@ -44,6 +44,18 @@ with, one file per family, so a commit fixes its art exactly as it fixes its cod
   the hashes it names; a sharded family's folder there hard-links its shards'
   files into the one folder tools read. An input given on the command line overrides the
   manifest's for experiments.
+- **Hosts.** Each host keeps its own store, and `inputs add` and `inputs derive`
+  write only the local one, so a pin landed from one host names entries the others
+  lack until they copy them. `bun wisp inputs fetch HOST...` (from smashcraft:ts/)
+  copies every entry the checkout pins and this store lacks from the first named host
+  that holds it, over ssh as a tar stream into a staging folder beside the store,
+  rehashes the copy, seals it and publishes it by one rename like `inputs add`
+  (smashcraft:ts/scripts/wisp/inputsFetch.ts). A copy that hashes otherwise is
+  refused. `map build`, `inputs check` and `inputs derive` name this command when
+  a pinned entry is missing. Adding pushes nowhere: the publishing host need not
+  reach every builder or know which hosts build, and the host that lacks an entry
+  learns it at its next build. The store is licensed art: it moves only between
+  your own hosts over ssh, never through Git or a public service.
 - **Play.** `bun wisp play` builds main from main's manifest. Builders of a
   revision share the lock ~/.local/share/smashcraft-build-inputs/locks/play-REVISION.lock
   (flock(2), released by the kernel when its holder exits): the first builds
