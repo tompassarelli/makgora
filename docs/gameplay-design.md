@@ -125,13 +125,15 @@ Where Smashcraft keeps its own rule, and why:
 - The forward-smash window applies to every initial dash, including dash backs.
 - Smashes come only from the Strong button (#186, after Rivals of Aether's
   strong attack): Strong + A gives the up, down or forward smash (forward with
-  no direction too), and holding Strong or A charges it. A direction + A is
-  always a tilt; a fresh flick dashes on its first frame, so the forward tilt
+  no direction too; in the air, Strong + A gives the aerial for that
+  direction, the neutral air with none), and holding Strong or A charges it.
+  A direction + A is always a tilt; a fresh flick dashes on its first frame, so the forward tilt
   takes the dash's frames 1–3 that the forward smash had, and a flick + A
   gives the forward tilt where Melee gives the forward smash. Out of a run, or
   a dash past frame 3, A stays the dash attack: there is no tilt out of run.
   Strong + B with a direction is the special's EX form; A + B at a full bar
-  stays the ultimate. The C-stick keeps its smashes (tilts with the walk
+  stays the ultimate, Strong held or not, and below a full bar it is the
+  plain special. The C-stick keeps its smashes (tilts with the walk
   modifier or its tilt setting).
 - A held stick at full deflection (keyboard keys and a pad at the rim) still
   dashes when it was not a fresh flick, keeping the walk modifier's release
@@ -787,9 +789,9 @@ rule over all 13 selectable fighters.
   modifier or toggle; fast fall needs down with neutral horizontal input. The
   implementation is in smashcraft:docs/physics.md, "Default digital wavedash
   and fast-fall directions".
-- **Attack inputs** (owner): neutral attack is the jab, attack with a direction
-  is a smash, and attack with a direction while holding the walk modifier is a
-  tilt (smashcraft:docs/physics.md, "Prototype attack phases").
+- **Attack inputs** (owner; Strong since #186): neutral attack is the jab,
+  attack with a direction is a tilt, and attack while holding Strong is a smash
+  (smashcraft:docs/physics.md, "Prototype attack phases").
 - **Shared dodge and knockdown timing**: every fighter uses the owner's common
   dodge profile in the table above, and one knockdown profile recorded in
   smashcraft:docs/physics.md, "Grounded knockdown and jab resets", as the
@@ -813,7 +815,7 @@ The specification answers these design questions for the expansion:
 | Physical differences | Use each hero's relative weight, run and air-speed table as initial tuning. The complete candidate table spans weight 0.85–1.28, run 0.80–1.14 and air 0.75–1.22 (of 1.00 Melee units a frame since #190). Jump velocity and gravity initially inherit the reference. |
 | Archetypes | State each fighter's purpose and exploitable weakness before building its moves. |
 | Meter | 100 mana, full on spawn; normal/throw hits earn 1 per whole percent (12 cap), hits taken earn 1 per 2 whole percent (6 cap), and a perfect shield/parry earns 8. Idle, movement and shielding earn nothing. Specials pay their listed costs; normals/grabs are free; up specials retain free recovery. |
-| EX specials | Shield + neutral or side Special spends the normal cost plus 25 mana for one-hit startup armor. See the EX table below. There are no ultimates. Existing per-move cooldowns remain part of each kit. |
+| EX specials | Strong + Special spends the normal cost plus 25 mana for one-hit startup armor. See the EX table below. A + Special at a full bar is the ultimate. Existing per-move cooldowns remain part of each kit. |
 
 ### Build-and-spend mana and EX specials
 
@@ -829,11 +831,11 @@ Idle time, movement and shielding earn nothing; there is no idle refill
 (smashcraft:docs/design/mana.md). There is no spending delay. Offense builds the budget faster than waiting;
 recovery remains available through the existing free up-special forms.
 
-Hold either Shield and press neutral or side Special to request EX, on the
-same frame as an ordinary special. The chord takes priority over a shield,
-roll or air dodge, and can leave an actionable shield. It cannot cancel
-hitstun, shieldstun, release lag, attacks or other action locks. Up/down
-specials and follow-up inputs retain their ordinary behavior. If the chosen
+Hold Strong and press Special to request EX, on the same frame as an
+ordinary special; with A also held the press asks for the ultimate instead,
+and a declined ultimate is the ordinary special. It cannot cancel hitstun,
+shieldstun, release lag, attacks or other action locks. Follow-up inputs
+retain their ordinary behavior. If the chosen
 form's cost plus 25 is unaffordable, the same press starts its ordinary
 version and pays its ordinary cost; if that is also unaffordable, the
 existing refusal applies. Recalls and alternate forms pay their own cost

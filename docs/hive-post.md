@@ -42,8 +42,8 @@ New here? Place only your own fighter chip and press Y to practice alone.
 ## Default controls (WASD)
 - Move: **A**/**D**. Aim up: **W**. Crouch, fast-fall and drop through platforms: **S**
 - Jump: **Space** or **8**. Shield and air dodge: **Q**. Light shield: **0**. Grab: **O**
-- Attack: **N**, with a direction for tilts and smashes. Special: **U**, with a direction
-- EX special: **9**, which costs one meter segment. Ultimate: **N + U** together at a full meter
+- Attack: **N**, with a direction for tilts. Hold Strong (**9**) and press **N** for smashes: up, down, or forward with a side direction or none. Special: **U**, with a direction
+- EX special: **9 + U** with a direction, which costs one meter segment. Ultimate: **N + U** together at a full meter
 - Pause: **Backspace**. Confirm: **Y**. Save the last ten seconds for a bug report: **K**
 
 Rebind any key on the Controls screen, or press **F1** before a match. The full guide is in the GitHub repository: [smashcraft/docs/player-guide.md at main · tompassarelli/smashcraft](https://github.com/tompassarelli/smashcraft/blob/main/docs/player-guide.md)

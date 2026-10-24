@@ -24,8 +24,8 @@ This is the first public version; it's early, expect rough edges, tell us what f
 | B | Special | Grab |
 | X | Jump | Special |
 | Y | Jump | Jump |
-| LB | Unbound | Short hop, even when held |
-| RB | Grab | Meter: hold with X for an EX special |
+| LB | Strong: hold with A for a smash, with B for an EX special | Short hop, even when held |
+| RB | Grab | Strong: hold with A for a smash, with X for an EX special |
 | LT (left trigger) | Shield / air-dodge | Shield / air-dodge |
 | RT (right trigger) | Shield / air-dodge | Shield / air-dodge |
 | Left stick | Move; up aims, down crouches / fast-falls / drops through platforms | Same |
