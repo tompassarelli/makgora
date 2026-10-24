@@ -1,0 +1,103 @@
+# #187: in the air, down held with the tilt modifier (LB in the script preset) never fast-falls
+# and A gives the down aerial; b taps plain down with neutral horizontal input and fast-falls.
+# Both tap down for two frames in every four through the first airtime, so a fresh press lands
+# after the apex whatever the jump height.
+#! chat -dev quick pair Rifleman / Illidan
+40 a press B
+40 b press B
+45 a press LB
+54 a release B
+54 b release B
+58 a stick 0 -1
+58 b stick 0 -1
+60 a stick 0 0
+60 b stick 0 0
+62 a stick 0 -1
+62 b stick 0 -1
+64 a stick 0 0
+64 b stick 0 0
+66 a stick 0 -1
+66 b stick 0 -1
+68 a stick 0 0
+68 b stick 0 0
+70 a stick 0 -1
+70 b stick 0 -1
+72 a stick 0 0
+72 b stick 0 0
+74 a stick 0 -1
+74 b stick 0 -1
+76 a stick 0 0
+76 b stick 0 0
+78 a stick 0 -1
+78 b stick 0 -1
+80 a stick 0 0
+80 b stick 0 0
+82 a stick 0 -1
+82 b stick 0 -1
+84 a stick 0 0
+84 b stick 0 0
+86 a stick 0 -1
+86 b stick 0 -1
+88 a stick 0 0
+88 b stick 0 0
+90 a stick 0 -1
+90 b stick 0 -1
+92 a stick 0 0
+92 b stick 0 0
+94 a stick 0 -1
+94 b stick 0 -1
+96 a stick 0 0
+96 b stick 0 0
+98 a stick 0 -1
+98 b stick 0 -1
+100 a stick 0 0
+100 b stick 0 0
+102 a stick 0 -1
+102 b stick 0 -1
+104 a stick 0 0
+104 b stick 0 0
+106 a stick 0 -1
+106 b stick 0 -1
+108 a stick 0 0
+108 b stick 0 0
+110 a stick 0 -1
+110 b stick 0 -1
+112 a stick 0 0
+112 b stick 0 0
+114 a stick 0 -1
+114 b stick 0 -1
+116 a stick 0 0
+116 b stick 0 0
+118 a stick 0 -1
+118 b stick 0 -1
+120 a stick 0 0
+120 b stick 0 0
+122 a stick 0 -1
+122 b stick 0 -1
+124 a stick 0 0
+124 b stick 0 0
+126 a stick 0 -1
+126 b stick 0 -1
+128 a stick 0 0
+128 b stick 0 0
+130 a stick 0 -1
+130 b stick 0 -1
+132 a stick 0 0
+132 b stick 0 0
+200 a press B
+200 b press B
+214 a release B
+214 b release B
+222 a stick 0 -1
+222 b stick 0 -1
+224 a tap A 1
+224 b tap A 1
+270 a stick 0 0
+270 b stick 0 0
+272 a release LB
+#! absent a 40-300 fall fast
+#! expect b 58-134 fall fast
+#! expect a 224-226 applied attack 1 style 16
+#! expect b 224-226 applied attack 1 style 16
+340 a press VIEW
+410 a release VIEW

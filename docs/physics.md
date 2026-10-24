@@ -2481,7 +2481,9 @@ is not the one for Melee's longest wavedash
 (smashcraft:docs/design/melee/movement.md).
 
 Fast-fall now requires down with neutral horizontal input. Down-left/down-right
-continue air drift without selecting fast-fall speed. Shield dodges, DI, down
+continue air drift without selecting fast-fall speed. Down held with the tilt
+modifier is a tilt input: it neither crouches nor fast-falls, and A gives the
+down tilt or down aerial (#187). Shield dodges, DI, down
 attacks and platform-drop handling retain their separate inputs. Existing
 fast-fall descent/actionability rules remain; native feel needs the new build.
 

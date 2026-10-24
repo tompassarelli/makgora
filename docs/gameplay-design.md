@@ -786,7 +786,9 @@ rule over all 13 selectable fighters.
   padbridge:README.md ("Fighter layout").
 - **Digital air dodge and fast fall** (owner-selected, 30 Sep): a
   horizontal-only air dodge angles 18° below horizontal by default, with no
-  modifier or toggle; fast fall needs down with neutral horizontal input. The
+  modifier or toggle; fast fall needs down with neutral horizontal input and
+  no tilt modifier, since modifier + down is a tilt input that neither crouches
+  nor fast-falls (#187). The
   implementation is in smashcraft:docs/physics.md, "Default digital wavedash
   and fast-fall directions".
 - **Attack inputs** (owner; Strong since #186): neutral attack is the jab,

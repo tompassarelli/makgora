@@ -1,0 +1,18 @@
+# #187: on the ground, full down held with the tilt modifier (LB in the script preset) is a tilt
+# input: a never crouches, so no crouch cancel, and A gives the down tilt; b holds plain down,
+# crouches, and its A is the same down tilt.
+#! chat -dev quick pair Rifleman / Illidan
+60 a press LB
+62 a stick 0 -1
+62 b stick 0 -1
+100 a tap A 1
+100 b tap A 1
+160 a stick 0 0
+160 b stick 0 0
+162 a release LB
+#! absent a 60-170 crouch 1
+#! expect a 100-102 applied attack 1 style 8
+#! expect b 62-64 crouch 1
+#! expect b 100-102 applied attack 1 style 8
+240 a press VIEW
+310 a release VIEW

@@ -76,7 +76,7 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   destination.exPressed = destination.specialPressed && strong && !destination.ultimatePressed;
   destination.specialX = destination.specialPressed && !((held & WALK_BIT) !== 0 && row.specialZ === 0) ? row.specialX : 0;
   destination.specialZ = destination.specialPressed ? row.specialZ : 0;
-  destination.down = (held & MOVE_DOWN_BIT) !== 0;
+  destination.down = (held & MOVE_DOWN_BIT) !== 0 && (held & WALK_BIT) === 0;
   destination.shieldPressed = (pressed & TRIGGERS) !== 0;
   const leftPressure = row.triggerLeft > 0 ? row.triggerLeft : ((held | pressed) & LEFT_TRIGGER_BIT) !== 0 ? 255 : ((held | pressed) & LIGHT_SHIELD_BIT) !== 0 ? 77 : 0;
   const rightPressure = row.triggerRight > 0 ? row.triggerRight : ((held | pressed) & RIGHT_TRIGGER_BIT) !== 0 ? 255 : 0;
