@@ -97,11 +97,14 @@ const strikes: Partial<Record<HeroPose, Strike>> = {
       {frame:28,gesture:{chest:42,twist:0,yaw:160,arm:-60,elbow:5,free:-54,pitch:20,step:22,leftHip:-24,rightHip:-12,leftKnee:24,rightKnee:8,head:-14},target:[-148,10]}],
     follow:{chest:44,twist:10,yaw:180,arm:-58,elbow:5,free:-52,pitch:22,step:24,leftHip:-26,rightHip:-12,leftKnee:26,rightKnee:8,head:-12},followAt:34,reach:[-158,8]},
   downAir:{prep:{chest:-10,arm:-185,elbow:30,free:-140,freeElbow:30,pitch:-10,leftHip:-110,rightHip:-102,leftKnee:124,rightKnee:118,head:-6,rise:16},prepAt:6,prepTarget:[-40,240],
-    hit:{chest:40,arm:-10,elbow:60,free:60,freeElbow:20,pitch:0,leftHip:10,rightHip:6,leftKnee:-18,rightKnee:-18,head:20,rise:-60,depth:0},hitTarget:[50,-10],hitGrip:[45,40],
+    hit:{chest:10,lean:-10,arm:-60,elbow:90,free:65,freeElbow:20,pitch:0,leftHip:5,rightHip:5,leftKnee:-8,rightKnee:-8,head:10,rise:-55,depth:0},hitTarget:[70,5],hitGrip:[47,54],
     mid:[{frame:11,gesture:{chest:-16,arm:-195,elbow:35,free:-160,freeElbow:30,pitch:-14,leftHip:-130,rightHip:-122,leftKnee:146,rightKnee:140,head:-10,rise:28},target:[-45,255]},
-      {frame:16,gesture:{chest:45,arm:-10,elbow:60,free:65,freeElbow:20,pitch:0,leftHip:10,rightHip:6,leftKnee:-20,rightKnee:-20,head:22,rise:-88,depth:0},target:[50,-10],grip:[45,40]}],
-    follow:{chest:25,arm:-10,elbow:60,free:-40,freeElbow:25,pitch:0,leftHip:-30,rightHip:-26,leftKnee:45,rightKnee:40,head:20,rise:-45,depth:0},followAt:19,reach:[55,0],followGrip:[35,60],settle:0.5,restTarget:[-60,40],restGrip:[-10,70],
-    rest:{chest:12,arm:-30,elbow:30,free:-30,freeElbow:30,pitch:0,leftHip:-45,rightHip:-40,leftKnee:65,rightKnee:60,head:6,rise:-24,depth:-40}},
+      {frame:12,gesture:{chest:0,arm:-150,elbow:0,free:-48,freeElbow:25,pitch:-7,leftHip:-62,rightHip:-58,leftKnee:69,rightKnee:66,head:0,rise:-14,depth:0},target:[60,114],grip:[6,109]},
+      {frame:14,gesture:{chest:18,arm:-30,elbow:60,free:65,freeElbow:20,pitch:0,leftHip:5,rightHip:5,leftKnee:-8,rightKnee:-8,head:10,rise:-60,depth:0},target:[40,-10],grip:[29,43]},
+      {frame:16,gesture:{chest:25,arm:-30,elbow:30,free:65,freeElbow:20,pitch:0,leftHip:5,rightHip:5,leftKnee:-8,rightKnee:-8,head:12,rise:-88,depth:0},target:[15,-22],grip:[23,31]},
+      {frame:24,gesture:{chest:30,lean:0,arm:-30,elbow:60,free:-25,freeElbow:25,pitch:0,leftHip:-43,rightHip:-38,leftKnee:67,rightKnee:62,head:18,rise:-39},target:[-110,30],grip:[-56,32]}],
+    follow:{chest:30,arm:-30,elbow:60,free:-20,freeElbow:25,pitch:0,leftHip:-45,rightHip:-40,leftKnee:70,rightKnee:65,head:20,rise:-40,depth:0},followAt:19,reach:[-40,-30],followGrip:[-8,14],settle:0.5,restTarget:[-110,41],restGrip:[-57,49],
+    rest:{chest:17,arm:-30,elbow:60,free:-30,freeElbow:30,pitch:0,leftHip:-45,rightHip:-40,leftKnee:65,rightKnee:60,head:6,rise:-22,depth:-40}},
 };
 for (const [pose, style, gesture] of normals) {
   const move = CAIRNE_MOVES.normals[style]; ensure(move, `${pose}: missing timing`);
