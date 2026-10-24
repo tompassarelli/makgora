@@ -29,17 +29,17 @@ ensure(input && output && relative(project, output).startsWith(".."), "usage: bu
 const source = parseSource(await Bun.file(input).arrayBuffer()), model = structuredClone(source);
 ensure(source.Sequences.length === 12 && source.Nodes.some(n => n.Name === "Bone_Axe_Free"), "Expected classic Tauren Chieftain");
 const stand = source.Sequences[4]!, idleSequence = source.Sequences[0]!;
-interface Gesture { chest?: number; twist?: number; head?: number; arm?: number; elbow?: number; free?: number; freeElbow?: number; hip?: number; knee?: number; lean?: number; yaw?: number; leftHip?: number; rightHip?: number; leftKnee?: number; rightKnee?: number; step?: number; pitch?: number; rise?: number }
-interface Phase { frame: number; gesture: Gesture; target?: readonly [number,number]; idle?: boolean }
+interface Gesture { chest?: number; twist?: number; head?: number; arm?: number; elbow?: number; free?: number; freeElbow?: number; hip?: number; knee?: number; lean?: number; yaw?: number; leftHip?: number; rightHip?: number; leftKnee?: number; rightKnee?: number; step?: number; pitch?: number; rise?: number; spin?: number; depth?: number }
+interface Phase { frame: number; gesture: Gesture; target?: readonly [number,number]; grip?: readonly [number,number]; idle?: boolean }
 interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; stock?: number; stockHit?: number; prepTravel?: number; hold?: boolean; air?: boolean; roll?: number; first?: Gesture; phases?: readonly Phase[]; target?: readonly [number, number]; damage?: boolean; beats?: readonly Phase[]; gore?: "travel" | "hold" | "recovery"; settleFrom?: number; stockFrom?: number }
-interface Strike { prep: Gesture; hit: Gesture; follow: Gesture; prepAt?: number; followAt?: number; settle?: number; rest?: Gesture; restTarget?: readonly [number,number]; prepTarget?: readonly [number,number]; hitTarget?: readonly [number,number]; mid?: readonly Phase[]; aim?: boolean; reach?: readonly [number,number]; air?: boolean }
+interface Strike { prep: Gesture; hit: Gesture; follow: Gesture; prepAt?: number; followAt?: number; settle?: number; rest?: Gesture; restTarget?: readonly [number,number]; restGrip?: readonly [number,number]; prepTarget?: readonly [number,number]; hitTarget?: readonly [number,number]; hitGrip?: readonly [number,number]; followGrip?: readonly [number,number]; mid?: readonly Phase[]; aim?: boolean; reach?: readonly [number,number]; air?: boolean }
 const strikeBeats=(move:{startupFrames:number;totalFrames:number;regions:readonly {firstFrame:number;lastFrame:number;hit:{strike?:{x2:number;z2:number}}}[]},s:Strike):Phase[]=>{
   const contact=move.startupFrames,end=move.totalFrames,lastActive=Math.max(...move.regions.map(r=>r.lastFrame));
   const followAt=s.followAt??Math.min(end-4,lastActive+2),settleAt=Math.round(followAt+(end-followAt)*(s.settle??0.55));
   const strike=move.regions[0]!.hit.strike!;
   return [{frame:0,gesture:ready},{frame:s.prepAt??Math.max(1,contact-Math.max(2,Math.round(contact*0.3))),gesture:s.prep,target:s.prepTarget},
-    {frame:contact,gesture:s.hit,target:s.hitTarget??(s.aim?[strike.x2,strike.z2]:undefined)},...(s.mid??[]),{frame:followAt,gesture:s.follow,target:s.reach},
-    {frame:settleAt,gesture:s.rest??blend(s.follow,ready,0.62),target:s.restTarget},{frame:end-1,gesture:ready,idle:!s.air},{frame:end,gesture:ready,idle:!s.air}].sort((a,b)=>a.frame-b.frame);
+    {frame:contact,gesture:s.hit,target:s.hitTarget??(s.aim?[strike.x2,strike.z2]:undefined),grip:s.hitGrip},...(s.mid??[]),{frame:followAt,gesture:s.follow,target:s.reach,grip:s.followGrip},
+    {frame:settleAt,gesture:s.rest??blend(s.follow,ready,0.62),target:s.restTarget,grip:s.restGrip},{frame:end-1,gesture:ready,idle:!s.air},{frame:end,gesture:ready,idle:!s.air}].sort((a,b)=>a.frame-b.frame);
 };
 const blend=(a:Gesture,b:Gesture,t:number):Gesture=>Object.fromEntries([...new Set([...Object.keys(a),...Object.keys(b)])].map(k=>[k,(a[k as keyof Gesture]??0)*(1-t)+(b[k as keyof Gesture]??0)*t]));
 const ready: Gesture = {};
@@ -96,12 +96,12 @@ const strikes: Partial<Record<HeroPose, Strike>> = {
     mid:[{frame:24,gesture:{chest:-10,twist:-20,yaw:150,arm:-150,elbow:15,free:-140,pitch:-6,leftHip:-86,rightHip:-68,leftKnee:88,rightKnee:86,head:-16},target:[-70,70]},
       {frame:28,gesture:{chest:42,twist:0,yaw:160,arm:-60,elbow:5,free:-54,pitch:20,step:22,leftHip:-24,rightHip:-12,leftKnee:24,rightKnee:8,head:-14},target:[-148,10]}],
     follow:{chest:44,twist:10,yaw:180,arm:-58,elbow:5,free:-52,pitch:22,step:24,leftHip:-26,rightHip:-12,leftKnee:26,rightKnee:8,head:-12},followAt:34,reach:[-158,8]},
-  downAir:{prep:{chest:14,arm:-170,elbow:40,free:-150,freeElbow:35,pitch:-8,leftHip:-112,rightHip:-104,leftKnee:126,rightKnee:120,head:2,rise:16},prepAt:6,prepTarget:[-30,240],
-    hit:{chest:10,arm:-40,elbow:5,free:60,freeElbow:20,pitch:0,leftHip:12,rightHip:-4,leftKnee:-2,rightKnee:-4,head:26,rise:-18},hitTarget:[95,15],
-    mid:[{frame:11,gesture:{chest:6,arm:-182,elbow:45,free:-172,freeElbow:40,pitch:-12,leftHip:-124,rightHip:-116,leftKnee:136,rightKnee:130,head:-4,rise:24},target:[-28,250]},
-      {frame:16,gesture:{chest:24,arm:-30,elbow:5,free:70,freeElbow:20,pitch:4,leftHip:14,rightHip:-2,leftKnee:-4,rightKnee:-6,head:28,rise:-46},target:[90,0]}],
-    follow:{chest:52,arm:30,elbow:10,free:-60,freeElbow:30,pitch:14,leftHip:-46,rightHip:-36,leftKnee:74,rightKnee:68,head:24,rise:-40},followAt:19,reach:[-95,-5],settle:0.55,restTarget:[-65,115],
-    rest:{chest:12,arm:-120,elbow:60,free:-30,freeElbow:30,pitch:2,leftHip:-62,rightHip:-50,leftKnee:88,rightKnee:80,head:4,rise:-24}},
+  downAir:{prep:{chest:-10,arm:-185,elbow:30,free:-140,freeElbow:30,pitch:-10,leftHip:-110,rightHip:-102,leftKnee:124,rightKnee:118,head:-6,rise:16},prepAt:6,prepTarget:[-40,240],
+    hit:{chest:40,arm:-10,elbow:60,free:60,freeElbow:20,pitch:0,leftHip:10,rightHip:6,leftKnee:-18,rightKnee:-18,head:20,rise:-60,depth:0},hitTarget:[50,-10],hitGrip:[45,40],
+    mid:[{frame:11,gesture:{chest:-16,arm:-195,elbow:35,free:-160,freeElbow:30,pitch:-14,leftHip:-130,rightHip:-122,leftKnee:146,rightKnee:140,head:-10,rise:28},target:[-45,255]},
+      {frame:16,gesture:{chest:45,arm:-10,elbow:60,free:65,freeElbow:20,pitch:0,leftHip:10,rightHip:6,leftKnee:-20,rightKnee:-20,head:22,rise:-88,depth:0},target:[50,-10],grip:[45,40]}],
+    follow:{chest:25,arm:-10,elbow:60,free:-40,freeElbow:25,pitch:0,leftHip:-30,rightHip:-26,leftKnee:45,rightKnee:40,head:20,rise:-45,depth:0},followAt:19,reach:[55,0],followGrip:[35,60],settle:0.5,restTarget:[-60,40],restGrip:[-10,70],
+    rest:{chest:12,arm:-30,elbow:30,free:-30,freeElbow:30,pitch:0,leftHip:-45,rightHip:-40,leftKnee:65,rightKnee:60,head:6,rise:-24,depth:-40}},
 };
 for (const [pose, style, gesture] of normals) {
   const move = CAIRNE_MOVES.normals[style]; ensure(move, `${pose}: missing timing`);
@@ -260,9 +260,10 @@ const evaluate=(index:number,frame:number)=>{render.setSequence(index);data.fram
 evaluate(4,0);
 const handRest=mat4.clone(data.nodes[hand.ObjectId].matrix),axeRest=mat4.clone(data.nodes[weapon.ObjectId].matrix),offset=mat4.create();
 ensure(mat4.invert(offset,handRest),"Hand's stock pose is singular"); mat4.multiply(offset,offset,axeRest);
-const weaponRef=model.Nodes.find(n=>n.Name==="Weapon Ref")!,weaponPivot=model.PivotPoints[weaponRef.ObjectId]!;
+const weaponRef=model.Nodes.find(n=>n.Name==="Weapon Ref")!,weaponPivot=model.PivotPoints[weaponRef.ObjectId]!,handPivot=vec3.fromValues(model.PivotPoints[hand.ObjectId]![0]!,model.PivotPoints[hand.ObjectId]![1]!,model.PivotPoints[hand.ObjectId]![2]!);
 const weaponPoint=vec3.fromValues(weaponPivot[0]!,weaponPivot[1]!,weaponPivot[2]!);vec3.transformMat4(weaponPoint,weaponPoint,data.nodes[weaponRef.ObjectId].matrix);
 const inverseHand=mat4.create();ensure(mat4.invert(inverseHand,handRest),"Hand pose is singular");vec3.transformMat4(weaponPoint,weaponPoint,inverseHand);
+const shaft=vec3.normalize(vec3.create(),vec3.subtract(vec3.create(),weaponPoint,handPivot)),unpivot=vec3.create();
 const bladeNormal=vec3.fromValues(0,1,0);{const turn=mat3.create();mat3.fromMat4(turn,inverseHand);vec3.transformMat3(bladeNormal,bladeNormal,turn);vec3.normalize(bladeNormal,bladeNormal);}
 evaluate(0,0);const idleOffset=mat4.create();ensure(mat4.invert(idleOffset,data.nodes[hand.ObjectId].matrix),"Hand's idle pose is singular");mat4.multiply(idleOffset,idleOffset,data.nodes[weapon.ObjectId].matrix);
 const mixMatrix=(a:mat4,b:mat4,t:number)=>{const qa=quat.create(),qb=quat.create(),ta=vec3.create(),tb=vec3.create(),out=mat4.create();mat4.getRotation(qa,a);mat4.getRotation(qb,b);mat4.getTranslation(ta,a);mat4.getTranslation(tb,b);
@@ -326,7 +327,8 @@ for (const [ordinal,action] of [...actions,...damageActions,...goreActions].entr
     const angles=[phase.gesture.arm??0,0,phase.gesture.elbow??0,0],authored=angles.slice(),pull=action.beats?0.05:0,depth=0.5,flat=3000;
     const loss=()=>{armKey.Vector=rotation(baseline(shoulder),angles[0]!,angles[1]!);elbowKey.Vector=rotation(baseline(elbow),angles[2]!,angles[3]!);
       evaluate(index,phase.frame);const facingCamera=()=>{const turn=mat3.create(),n=vec3.create();mat3.fromMat4(turn,data.nodes[hand.ObjectId].matrix);vec3.transformMat3(n,bladeNormal,turn);return n[1]!/vec3.length(n);};const point=vec3.create();vec3.transformMat4(point,weaponPoint,data.nodes[hand.ObjectId].matrix);
-      return (point[0]!-phase.target![0])**2+(point[2]!-phase.target![1])**2+depth*point[1]!**2+flat*(1-Math.abs(facingCamera()))**2+pull*angles.reduce((sum,angle,axis)=>sum+(angle-authored[axis]!)**2,0);};
+      const plane=phase.gesture.depth,grip=vec3.create();if(phase.grip||plane!==undefined)vec3.transformMat4(grip,handPivot,data.nodes[hand.ObjectId].matrix);
+      return (point[0]!-phase.target![0])**2+(point[2]!-phase.target![1])**2+(phase.grip?(grip[0]!-phase.grip[0])**2+(grip[2]!-phase.grip[1])**2:0)+(plane===undefined?depth*point[1]!**2:4*((point[1]!-plane)**2+(grip[1]!-plane)**2))+flat*(1-Math.abs(facingCamera()))**2+pull*angles.reduce((sum,angle,axis)=>sum+(angle-authored[axis]!)**2,0);};
     for(let pass=0;pass<4;pass++)for(let axis=0;axis<4;axis++){let best=Infinity,bestAngle=angles[axis]!;for(let centre=pull?authored[axis]!:0,angle=centre-180;angle<=centre+180;angle+=pass<2?15:5){angles[axis]=angle;const value=loss();if(value<best){best=value;bestAngle=angle;}}angles[axis]=bestAngle;}
     loss();for(const key of [armKey,elbowKey])if(key.InTan){key.InTan=key.Vector.slice();key.OutTan=key.Vector.slice();}
   }
@@ -346,6 +348,7 @@ for (const [ordinal,action] of [...actions,...damageActions,...goreActions].entr
   const idleWeight=(frame:number)=>frame<=idleFrom?0:Math.min(1,(frame-idleFrom)/(idleAt-idleFrom));
   for(let frame=0;frame<=action.frames;frame++){
     evaluate(index,frame);const world=mat4.create(),local=mat4.create();mat4.multiply(world,data.nodes[hand.ObjectId].matrix,mixMatrix(offset,idleOffset,idleWeight(frame)));
+    const spin=along(phases,frame,p=>p.gesture.spin??0);if(spin!==0){const turn=mat4.create();mat4.translate(turn,turn,handPivot);mat4.rotate(turn,turn,spin*Math.PI/180,shaft);vec3.negate(unpivot,handPivot);mat4.translate(turn,turn,unpivot);mat4.multiply(world,data.nodes[hand.ObjectId].matrix,mat4.multiply(turn,turn,mixMatrix(offset,idleOffset,idleWeight(frame))));}
     ensure(mat4.invert(local,data.nodes[main.ObjectId].matrix),"Main pose is singular");mat4.multiply(local,local,world);addTransform(weapon,frame,local);
   }
   weapon.Rotation!.Keys.sort((a,b)=>a.Frame-b.Frame);weapon.Translation!.Keys.sort((a,b)=>a.Frame-b.Frame);
