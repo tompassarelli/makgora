@@ -1,0 +1,12 @@
+#! chat -dev quick stage 3 pair blademaster / thrall
+#! cue 126-139 hit: tint=b
+40 a stick 0.7 0
+40 b stick -0.7 0
+89 a stick 0 0
+103 b stick 0 0
+115 a tap B 1
+118 a cstick 1 0
+121 a cstick 0 0
+121 a capture
+128 a capture
+137 a capture
