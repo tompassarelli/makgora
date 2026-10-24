@@ -1,15 +1,40 @@
 import { f32 } from "wisp/src/sim/f32";
-import { SpecialAction } from "../sim/codes";
+import { type Character, SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
+import { hurtCapsule } from "../sim/geometry/contactGeometry";
 import { ROSTER_MANA } from "../sim/mana";
 import { type AuthoredSpecial, FOLLOW_UP_FORM } from "../sim/specials/schema";
-import type { Cue } from "./specialCues";
+import { characterModelScale } from "./modelScale";
+import { CUE_ANCHORS, type Cue } from "./specialCues";
 
 export const EX_AURA: Cue = { model: "Abilities\\Spells\\Human\\InnerFire\\InnerFireTarget.mdx", anchor: "feet", scale: 1.0, sequence: "birth", sound: "DivineShield" };
 export const SUPER_AURA: Cue = { model: "Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedTarget.mdx", anchor: "feet", scale: 1.0, sequence: "stand" };
 export const ULTIMATE_BURST: Cue = { model: "Abilities\\Spells\\Other\\Incinerate\\FireLordDeathExplode.mdx", anchor: "body", scale: f32(0.6), sequence: "birth", sound: "FlameStrike" };
 export const METER_CUES: readonly Cue[] = [EX_AURA, SUPER_AURA, ULTIMATE_BURST];
 export const METER_CUE_MOVES: readonly (readonly [string, Cue])[] = [["EX aura", EX_AURA], ["full-bar flame aura", SUPER_AURA], ["ultimate flame burst", ULTIMATE_BURST]];
+
+export const SUPER_AURA_UNIT_RADIUS = 22.0;
+export const SUPER_AURA_UNIT_HEIGHT = 90.0;
+export const SUPER_AURA_LIFT = f32(0.15);
+
+export interface MeterCueFit {
+  readonly scale: number;
+  readonly x: number;
+  readonly z: number;
+}
+
+export function meterCueFit(cue: Cue, character: Character): MeterCueFit {
+  const scale = characterModelScale(character);
+  const anchor = CUE_ANCHORS[cue.anchor];
+  return { scale: f32(cue.scale * scale), x: f32(anchor.x * scale), z: f32(anchor.z * scale) };
+}
+
+export function superAuraFit(character: Character): MeterCueFit {
+  const body = hurtCapsule(character);
+  const top = f32(body.z2 + body.radius);
+  const size = Math.max(f32(body.radius / SUPER_AURA_UNIT_RADIUS), f32(top / SUPER_AURA_UNIT_HEIGHT));
+  return { scale: f32(SUPER_AURA.scale * size), x: 0.0, z: f32(top * SUPER_AURA_LIFT) };
+}
 
 export const EX_AURA_FRAMES = 30;
 export const ULTIMATE_BURST_FRAMES = 16;
