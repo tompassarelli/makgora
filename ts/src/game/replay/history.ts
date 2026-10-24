@@ -31,8 +31,14 @@ import { sameMatchCamera } from "../sim/matchCamera";
 import { firstFighterPoseDifference } from "../presentation/fighterPose";
 import { firstSummonPoseDifference } from "../presentation/summonPose";
 
-/** A whole repaired frame's cost against a repair's budget, where a fighter-scoped one costs 1. */
-export const REPAIR_WHOLE_COST = 2;
+/** A fighter-scoped repaired frame's cost against a repair's budget, where a whole one costs one unit per active fighter and never less. */
+export const REPAIR_SCOPED_COST = 2;
+
+export function wholeRepairCost(world: Readonly<Roster>): number {
+  let fighters = 0;
+  for (const slot of PARTICIPANT_SLOTS) if (isActive(world, slot)) fighters++;
+  return Math.max(REPAIR_SCOPED_COST, fighters);
+}
 
 /** How repairs choose fighter-scoped steps: by the eligibility tests, never, or always (a test's broken eligibility). */
 export type ScopedRepair = "auto" | "off" | "force";
@@ -390,8 +396,8 @@ export class ReplayHistory {
 
   /**
    * Replays a pending amendment in the history's own state, at most budget
-   * frames and `cost` units (a whole frame REPAIR_WHOLE_COST, a scoped one
-   * 1, and always at least one frame), refreshing each snapshot it passes.
+   * frames and `cost` units (a whole frame wholeRepairCost, a scoped one
+   * REPAIR_SCOPED_COST, and always at least one frame), refreshing each snapshot it passes.
    * Live state keeps running the present meanwhile; once the repair reaches
    * it, the corrected state replaces live state. Once the corrected state
    * equals a stored snapshot, every later frame whose row and run are
@@ -404,7 +410,8 @@ export class ReplayHistory {
     if (start === undefined) return 0;
     if (live.runtime.simulationFrame !== this.nextFrame - 1 || !this.contains(epoch, start)) return "rejected";
     // A repair that surely reaches the present in this call replays in live state, which it replaces anyway.
-    const direct = !this.repairPositioned && this.nextFrame - start <= budget && (this.nextFrame - start) * REPAIR_WHOLE_COST <= cost;
+    const whole = wholeRepairCost(live.world);
+    const direct = !this.repairPositioned && this.nextFrame - start <= budget && (this.nextFrame - start) * whole <= cost;
     const state = direct ? live : this.repairState;
     // Positioning copies the start's snapshot, so the first frame needn't write it back onto itself.
     let restored = false;
@@ -429,7 +436,7 @@ export class ReplayHistory {
       const dirty = this.repairDirty | at(this.changed, slot);
       const repeated = this.repeatedComputers(frame, state, first, unchanged);
       const scoped = this.scopedSlot(frame, state, repeated, dirty);
-      const price = scoped === undefined ? REPAIR_WHOLE_COST : 1;
+      const price = scoped === undefined ? whole : REPAIR_SCOPED_COST;
       if (steps > 0 && spent + price > cost) break;
       spent += price;
       this.repairDirty = dirty;
