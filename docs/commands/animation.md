@@ -94,6 +94,8 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   Murloc's normal, special, paired throw, recovery and nine pain gestures to the
   stock Tiderunner, preserves its nine sequences and writes both-facing sheets;
   run it twice for a fresh clip table, since its reach search reads the table.
+  Given the shipped model and `pain` instead, it re-authors only the nine pain
+  clips in place at their indices and lengths and checks every other pose is unchanged.
   Add `--kobold` with the stock Kobold input to author Kobold's pick, candle,
   recovery, throw and nine pain gestures and refresh only his clip/stride rows.
   `bun tools/animations/kobold-clips.ts AUTHORED_KOBOLD.mdx PRIVATE_OUTPUT` then

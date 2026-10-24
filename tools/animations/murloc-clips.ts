@@ -32,11 +32,12 @@ const slug = fighterName.toLowerCase();
 const kitMoves = kobold ? KOBOLD_MOVES : MURLOC_MOVES;
 const kitSpecials = kobold ? KOBOLD_SPECIALS : MURLOC_SPECIALS;
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
+const painOnly = process.argv.includes("pain");
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/murloc-clips.ts STOCK_MURLOC.mdx PRIVATE_OUTPUT");
+ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/murloc-clips.ts STOCK_MURLOC.mdx|SHIPPED_MURLOC.mdx PRIVATE_OUTPUT [pain] [--kobold]");
 const originalBytes = await Bun.file(input).arrayBuffer();
 const source = parseMDX(originalBytes), model = structuredClone(source);
-ensure(source.Sequences.length === 9 && source.Helpers.some(b => b.Name === "Bone_Hand_R"), "Expected original classic Murloc Tiderunner");
+ensure((painOnly || source.Sequences.length === 9) && source.Helpers.some(b => b.Name === "Bone_Hand_R"), "Expected original classic Murloc Tiderunner");
 const stand = source.Sequences[kobold ? 0 : 2]!;
 interface Gesture { chest?: number; pelvis?: number; arm?: number; elbow?: number; hand?: number; leftArm?: number; leftElbow?: number; head?: number; thigh?: number; knee?: number; leftThigh?: number; yaw?: number; lean?: number; }
 interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; hold?: boolean; air?: boolean; roll?: number; target?: readonly [number, number]; paired?: boolean; pain?: boolean; }
@@ -128,7 +129,7 @@ for (let height = 0; height < 3; height++) for (let strength = 0; strength < 3; 
   const gain = [0.5, 0.9, 1.3][strength]!;
   damageActions.push({ pose: "damageGround", frames: 24, contact: 1, hold: true, pain: true,
     gesture: height === 0 ? { thigh: 65 * gain, knee: -65 * gain, leftThigh: -50 * gain, pelvis: 28 * gain, chest: 25 * gain, head: -15 * gain }
-    : height === 1 ? { chest: 55 * gain, pelvis: -25 * gain, arm: 30 * gain, leftArm: 35 * gain, head: 12 * gain }
+    : height === 1 ? { chest: 55 * gain, pelvis: -25 * gain, arm: -75 * gain, elbow: 20 * gain, leftArm: 35 * gain, head: 12 * gain }
     : { head: -45 * gain, chest: -35 * gain, arm: 45 * gain, leftArm: 55 * gain, pelvis: 10 * gain } });
 }
 function rotated(q: ArrayLike<number>, y: number, z = 0) {
@@ -157,11 +158,21 @@ const originals = new Map<string, mdx.AnimVector>(); tracks(source, (t, p) => or
 let cursor = Math.max(...source.Sequences.map(s => s.Interval[1])) + 100;
 const cutoff = cursor, bindings: string[] = [], damageBindings: string[] = [];
 const records: { pose: string; index: number; frames: number; contact: number }[] = [];
+if (painOnly) actions.length = 0;
 for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
-  const index = model.Sequences.length, start = cursor, end = start + Math.round(action.frames * 1000 / 60); cursor = end + 100;
   const name = ordinal < actions.length ? `${fighterName} ${action.pose}` : `${fighterName} Damage ${Math.floor((ordinal - actions.length) / 3)} ${(ordinal - actions.length) % 3}`;
-  model.Sequences.push({ ...stand, Name: name, Interval: new Uint32Array([start, end]), NonLooping: true, MoveSpeed: 0, Rarity: 0,
-    MinimumExtent: new Float32Array([-300, -300, -200]), MaximumExtent: new Float32Array([300, 300, 350]), BoundsRadius: 400 });
+  const existing = painOnly ? model.Sequences.findIndex(sequence => sequence.Name === name) : -1;
+  ensure(!painOnly || existing >= 0, `${name}: shipped sequence missing`);
+  const index = existing >= 0 ? existing : model.Sequences.length;
+  const start = existing >= 0 ? model.Sequences[index]!.Interval[0]! : cursor, end = start + Math.round(action.frames * 1000 / 60);
+  if (existing >= 0) {
+    ensure(model.Sequences[index]!.Interval[1] === end, `${name}: timing changed`);
+    tracks(model, track => { if (!globalClock(track)) track.Keys = track.Keys.filter(key => key.Frame < start || key.Frame > end); });
+  } else {
+    cursor = end + 100;
+    model.Sequences.push({ ...stand, Name: name, Interval: new Uint32Array([start, end]), NonLooping: true, MoveSpeed: 0, Rarity: 0,
+      MinimumExtent: new Float32Array([-300, -300, -200]), MaximumExtent: new Float32Array([300, 300, 350]), BoundsRadius: 400 });
+  }
   const phaseFrames = [...new Set([0, Math.max(1, action.contact - 3), action.contact, Math.min(action.frames - 1, action.contact + 4), action.frames,
     ...(action.roll ? Array.from({ length: Math.ceil(action.frames / 3) }, (_, i) => i * 3) : []),
     ...(action.pose === "victimPummel" ? [action.contact - 1] : [])])].sort((a, b) => a - b);
@@ -180,6 +191,7 @@ for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
       track.Keys.push({ ...first, Frame: start + Math.round(frame * 1000 / 60), Vector, ...(first.InTan ? { InTan: tangent(), OutTan: tangent() } : {}) });
     }
   });
+  if (painOnly) tracks(model, track => track.Keys.sort((a, b) => a.Frame - b.Frame));
   if (action.target) {
     const renderer = new ModelRenderer(model), data = Reflect.get(renderer, "rendererData"); renderer.setSequence(index); data.frame = start + Math.round(action.contact * 1000 / 60);
     const arm = model.Nodes.find(n => n.Name === "Bone_Arm1_R")!, elbow = model.Nodes.find(n => n.Name === "Bone_Arm2_R")!, hand = model.Nodes.find(n => n.Name === "Bone_Hand_R")!, pivot = model.PivotPoints[hand.ObjectId]!;
@@ -222,7 +234,7 @@ for (const [ordinal, action] of actions.entries()) if (/^victim(Pummel|Throw)/.t
   records[ordinal]!.frames = 60; records[ordinal]!.contact = 30;
 }
 
-await Bun.write(join(project, `ts/src/game/sim/heroes/${slug}Clips.ts`), [
+if (!painOnly) await Bun.write(join(project, `ts/src/game/sim/heroes/${slug}Clips.ts`), [
   `// Generated by tools/animations/murloc-clips.ts from the stock classic ${fighterName} rig.`,
   'import { f32 } from "wisp/src/sim/f32";', 'import type { HeroClip, HeroClipTable } from "./hero";',
   `export const ${fighterName.toUpperCase()}_MODEL_FILE = ${JSON.stringify(["units", "creeps", fighterName, `${fighterName}.mdl`].join(String.fromCharCode(92)))};`,
@@ -232,7 +244,7 @@ await Bun.write(join(project, `ts/src/game/sim/heroes/${slug}Clips.ts`), [
 ].join("\n"));
 const normalReach = [];
 let tiltForward = 0;
-for (const style of [AttackStyle.forwardTilt, AttackStyle.jab, AttackStyle.jab2, AttackStyle.forwardTiltUp,
+if (!painOnly) for (const style of [AttackStyle.forwardTilt, AttackStyle.jab, AttackStyle.jab2, AttackStyle.forwardTiltUp,
   AttackStyle.forwardTiltDown, AttackStyle.upTilt, AttackStyle.downTilt, AttackStyle.dashAttack]) {
   const ordinal = normals.findIndex(normal => normal[1] === style), action = actions[ordinal]!;
   const index = source.Sequences.length + ordinal, [start, end] = model.Sequences[index]!.Interval;
@@ -282,9 +294,17 @@ for (const style of [AttackStyle.forwardTilt, AttackStyle.jab, AttackStyle.jab2,
       }
   ensure(selected, `${action.pose}: no skinned recoil/contact pose meets original reach gates`);
 }
-const stripped = structuredClone(model); stripped.Sequences = stripped.Sequences.slice(0, source.Sequences.length);
-tracks(stripped, track => { if (!globalClock(track)) track.Keys = track.Keys.filter(k => k.Frame < cutoff); });
-ensure(isDeepStrictEqual(stripped, source), "Authored suffix changed original body or animation");
+if (painOnly) {
+  const before = new DrawnModel(originalBytes, 1), after = new DrawnModel(generateMDX(model), 1), authored = new Set(records.map(record => record.index));
+  for (const [index, sequence] of source.Sequences.entries()) if (!authored.has(index)) for (const part of [0, 0.5, 1]) {
+    const time = (sequence.Interval[1]! - sequence.Interval[0]!) * part / 1000, a = before.triangles(index, time, 1), b = after.triangles(index, time, 1);
+    ensure(a.length === b.length && a.every((v, i) => Math.abs(v - b[i]!) < 0.001), `${sequence.Name}: shipped pose changed`);
+  }
+} else {
+  const stripped = structuredClone(model); stripped.Sequences = stripped.Sequences.slice(0, source.Sequences.length);
+  tracks(stripped, track => { if (!globalClock(track)) track.Keys = track.Keys.filter(k => k.Frame < cutoff); });
+  ensure(isDeepStrictEqual(stripped, source), "Authored suffix changed original body or animation");
+}
 const bytes = generateMDX(model), decoded = parseMDX(bytes);
 ensure(isDeepStrictEqual(parseMDX(generateMDX(decoded)), decoded), "MDX round trip changed model");
 mkdirSync(output, { recursive: true }); await Bun.write(join(output, `${slug}.mdx`), bytes);
@@ -293,7 +313,7 @@ const finalDrawn = new DrawnModel(bytes, 0.62);
 const distance = (a: Float32Array, b: Float32Array) => { ensure(a.length === b.length && a.length > 0, "Missing drawn body"); let maximum = 0; for (let i = 0; i < a.length; i += 2) maximum = Math.max(maximum, Math.hypot(a[i]! - b[i]!, a[i + 1]! - b[i + 1]!)); return maximum; };
 let measured = 0;
 for (const [i, action] of [...actions, ...damageActions].entries()) {
-  const index = source.Sequences.length + i;
+  const index = records[i]!.index;
   const first = finalDrawn.triangles(index, 0, 1), contact = finalDrawn.triangles(index, action.contact / 60, 1);
   ensure(action.hold ? distance(contact, finalDrawn.triangles(index, action.frames / 60, 1)) < 0.01 : distance(first, contact) > 3, `${action.pose}: dead or drifting gesture`);
   const panels: PoseFrame[] = [1, -1].flatMap(facing => [0, Math.max(1, action.contact - 3), action.contact, Math.min(action.frames, action.contact + 4), action.frames].map(frame => ({ frame, phase: frame < action.contact ? AttackPhase.startup : frame <= action.contact + 4 ? AttackPhase.active : AttackPhase.recovery, x: 0, z: 0, facing, parts: [], strikes: [], clip: index, seconds: frame / 60 })));
