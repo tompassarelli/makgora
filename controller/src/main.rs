@@ -1686,9 +1686,14 @@ mod linux {
             }
             // SAFETY: successful fstatfs initialized stat.
             let kind = unsafe { stat.assume_init() }.f_type;
-            // Local btrfs, XFS and tmpfs store subsecond timestamps.
+            // Local btrfs, XFS and tmpfs store subsecond timestamps; ext4 does only with large inodes.
             // Unknown/coarse/network filesystems do not share this contract.
-            if !matches!(kind, 0x9123683e | 0x58465342 | 0x01021994) {
+            let subsecond = match kind {
+                0x9123683e | 0x58465342 | 0x01021994 => true,
+                0xef53 => directory.metadata()?.mtime_nsec() != 0,
+                _ => false,
+            };
+            if !subsecond {
                 return Err(io::Error::other(format!("unsupported control timestamp filesystem {kind:#x}")));
             }
             let mut resolution = libc::timespec { tv_sec: 0, tv_nsec: 0 };
