@@ -2,7 +2,7 @@ import type { Character } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { characterModelScale } from "../presentation/modelScale";
 import { CUE_ANCHORS, type Cue } from "../presentation/specialCues";
-import { EX_AURA, EX_CAST_VOLUME, type MeterCueState, SUPER_AURA, ULTIMATE_BURST, ULTIMATE_CAST_VOLUME, clearMeterCueState, createMeterCueState, observeMeterCues, ultimateFirstEffectFrame } from "../presentation/meterCues";
+import { EX_AURA, EX_CAST_VOLUME, type MeterCueState, type MeterCueView, SUPER_AURA, ULTIMATE_BURST, ULTIMATE_CAST_VOLUME, clearMeterCueState, createMeterCueState, observeMeterCues, ultimateFirstEffectFrame } from "../presentation/meterCues";
 import { type WorldOrigin, effectMotion, hideEffect, placeEffect } from "./effects";
 
 class MeterCueModel {
@@ -110,13 +110,22 @@ export class MeterCueEffects {
       if (this.burst.showing() || this.exAura.showing() || this.superAura.showing()) this.clear();
       return;
     }
-    const { action, frame } = fighter.special;
     if (this.superAura.show(view.superAura, fighter, this.front, this.scale)) trace?.(`super-aura ${view.superAura ? "on" : "off"} mana ${fighter.mana.points}`);
+    this.confirmUltimate(view, fighter, trace);
+    this.confirmEx(view, fighter, trace);
+  }
+
+  private confirmUltimate(view: Readonly<MeterCueView>, fighter: Readonly<Fighter>, trace: ((text: string) => void) | undefined): void {
+    const { frame } = fighter.special;
     if (view.ultimateSound) {
       this.play(this.ultimateSound, fighter, ULTIMATE_CAST_VOLUME);
       trace?.(`ultimate-sound ${ULTIMATE_BURST.sound ?? ""} action-frame ${frame} first-own-effect ${ultimateFirstEffectFrame(fighter.tuning.ultimate)}`);
     }
     if (this.burst.show(view.burst, fighter, this.front, this.scale)) trace?.(`ultimate-burst ${view.burst ? "on" : "off"} action-frame ${frame}`);
+  }
+
+  private confirmEx(view: Readonly<MeterCueView>, fighter: Readonly<Fighter>, trace: ((text: string) => void) | undefined): void {
+    const { action, frame } = fighter.special;
     if (view.exSound) {
       this.play(this.exSound, fighter, EX_CAST_VOLUME);
       trace?.(`ex-sound ${EX_AURA.sound ?? ""} action ${action} action-frame ${frame}`);
