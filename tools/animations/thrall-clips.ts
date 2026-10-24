@@ -21,7 +21,7 @@ const source = parseSource(await Bun.file(input).arrayBuffer()), model = structu
 ensure(source.Sequences.length === 7 && source.Bones.some(b => b.Name === "Hammer"), "Expected original classic mounted Thrall");
 const stand = source.Sequences[0]!;
 const hero = heroDefinition(Character.thrall); ensure(hero, "Register Thrall before exporting his clips");
-interface Gesture { chest?: number; waist?: number; arm?: number; wrist?: number; leftArm?: number; head?: number; wolf?: number; neck?: number; front?: number; back?: number; yaw?: number; lean?: number; turn?: number; look?: number; hock?: number; }
+interface Gesture { chest?: number; waist?: number; arm?: number; wrist?: number; leftArm?: number; head?: number; wolf?: number; neck?: number; front?: number; back?: number; yaw?: number; lean?: number; turn?: number; look?: number; hock?: number; shift?: number; }
 interface Key { frame: number; gesture: Gesture; ik: number; }
 interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; hold?: boolean; air?: boolean; roll?: number; pain?: boolean; keys?: readonly Key[]; reach?: number; }
 const forward: Gesture = {chest:20,waist:-10,arm:-95,wrist:35,leftArm:-35,head:-10,neck:-8,front:15};
@@ -30,15 +30,15 @@ const low: Gesture = {chest:10,waist:5,arm:-25,wrist:0,leftArm:-35,head:-15,wolf
 const back: Gesture = {chest:-15,waist:-20,arm:55,wrist:35,leftArm:-40,head:15,yaw:150,neck:-10};
 const cast: Gesture = {chest:-20,waist:8,arm:-115,wrist:20,leftArm:-120,head:-20,neck:-10,front:-10};
 const brace: Gesture = {chest:35,waist:10,arm:-45,wrist:25,leftArm:-60,head:-20,wolf:6,front:35,back:35};
-const kickCoil: Gesture = {chest:45,waist:5,arm:-170,wrist:30,leftArm:-75,head:-15,look:60,yaw:-15,turn:8,wolf:12,neck:-25,front:35,back:-85};
-const kick: Gesture = {chest:50,waist:5,arm:-175,wrist:30,leftArm:-75,head:-10,look:75,yaw:35,turn:-18,wolf:-20,neck:20,front:-35,back:100};
-const kickRecoil: Gesture = {chest:25,waist:0,arm:-160,wrist:25,leftArm:-55,head:5,look:40,yaw:20,turn:-6,wolf:-8,neck:5,front:-10,back:40};
-const hammerCoil: Gesture = {chest:40,waist:15,arm:-185,wrist:45,leftArm:-70,head:-15,look:-30,yaw:-35,turn:-15,lean:6,wolf:10,neck:-15,front:20,back:-30};
-const hammerHit: Gesture = {...back,chest:-35,waist:-25,yaw:170,turn:18,lean:-10,wolf:-8,neck:-20,front:-25,back:-25,look:20};
-const hammerHold: Gesture = {...hammerHit,chest:-40,yaw:178,turn:22,lean:-12};
+const kickCoil: Gesture = {chest:65,waist:10,arm:-110,wrist:45,leftArm:-40,head:-25,look:30,yaw:-10,turn:8,shift:5,wolf:12,neck:-25,front:35,back:-85};
+const kick: Gesture = {chest:5,waist:-5,arm:-150,wrist:30,leftArm:-60,head:5,look:75,yaw:35,turn:-18,shift:-3,wolf:-20,neck:20,front:-35,back:100};
+const kickRecoil: Gesture = {chest:25,waist:0,arm:-160,wrist:25,leftArm:-55,head:5,look:40,yaw:20,turn:-6,shift:-4,wolf:-8,neck:5,front:-10,back:40};
+const hammerCoil: Gesture = {chest:40,waist:15,arm:-185,wrist:45,leftArm:-70,head:-15,look:-30,yaw:-35,turn:-15,shift:6,lean:6,wolf:10,neck:-15,front:20,back:-30};
+const hammerHit: Gesture = {...back,chest:-35,waist:-25,yaw:170,shift:-10,lean:-14,wolf:-8,neck:-20,front:-25,back:-25,look:20};
+const hammerHold: Gesture = {...hammerHit,chest:-40,yaw:178,shift:-12,lean:-17};
 const backAirKeys = (kickAt: number, hammerAt: number, frames: number): Key[] => [
- {frame:0,gesture:{},ik:0}, {frame:kickAt-4,gesture:kickCoil,ik:0}, {frame:kickAt-2,gesture:{...kickCoil,chest:50,back:-95,wolf:14},ik:0},
- {frame:kickAt,gesture:kick,ik:0}, {frame:kickAt+1,gesture:{...kick,back:125,wolf:-26,turn:-22},ik:0}, {frame:kickAt+3,gesture:kickRecoil,ik:0},
+ {frame:0,gesture:{},ik:0}, {frame:kickAt-4,gesture:kickCoil,ik:0}, {frame:kickAt-2,gesture:{...kickCoil,chest:70,back:-95,wolf:14},ik:0},
+ {frame:kickAt,gesture:kick,ik:0}, {frame:kickAt+1,gesture:{...kick,back:125,wolf:-26,turn:-22,shift:-13},ik:0}, {frame:kickAt+3,gesture:kickRecoil,ik:0},
  {frame:hammerAt-3,gesture:hammerCoil,ik:0}, {frame:hammerAt,gesture:hammerHit,ik:1}, {frame:hammerAt+3,gesture:hammerHold,ik:1.05},
  {frame:frames-2,gesture:{},ik:0}, {frame:frames,gesture:{},ik:0},
 ];
@@ -138,7 +138,7 @@ for(const [ordinal,action]of [...actions,...damageActions].entries()){
  const beforeKeys=center.Translation.Keys.filter(k=>k.Frame<start||k.Frame>end);
  const drawn=new DrawnModel(generateMDX(model),1);
  const translations:mdx.AnimKeyframe[]=[];
- for(const {frame}of phases){const triangle=drawn.triangles(index,frame/60,1);let lowest=Infinity;for(let i=1;i<triangle.length;i+=2)lowest=Math.min(lowest,triangle[i]!);const old=center.Translation.Keys.find(k=>k.Frame===start+Math.round(frame*1000/60));translations.push({Frame:start+Math.round(frame*1000/60),Vector:new Float32Array([old?.Vector[0]??0,old?.Vector[1]??0,(old?.Vector[2]??0)-(action.air?0:lowest)]),...(center.Translation.LineType>1?{InTan:new Float32Array([0,0,0]),OutTan:new Float32Array([0,0,0])}:{})});}
+ for(const {frame,gesture}of phases){const triangle=drawn.triangles(index,frame/60,1);let lowest=Infinity;for(let i=1;i<triangle.length;i+=2)lowest=Math.min(lowest,triangle[i]!);const old=center.Translation.Keys.find(k=>k.Frame===start+Math.round(frame*1000/60));translations.push({Frame:start+Math.round(frame*1000/60),Vector:new Float32Array([(old?.Vector[0]??0)+(gesture.shift??0),old?.Vector[1]??0,(old?.Vector[2]??0)-(action.air?0:lowest)]),...(center.Translation.LineType>1?{InTan:new Float32Array([0,0,0]),OutTan:new Float32Array([0,0,0])}:{})});}
  center.Translation.Keys=[...beforeKeys,...translations];
  const victimContact=/^victim(Pummel|Throw)/.test(action.pose);
  (ordinal<actions.length?bindings:damageBindings).push({pose:ordinal<actions.length?action.pose:undefined,index,victimContact});
