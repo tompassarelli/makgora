@@ -214,16 +214,31 @@ function kick(pose: HeroPose, style: AttackStyle, target: readonly [number, numb
 }
 const STILL: Gesture = { arm: 110, elbow: -60, free: 50, freeElbow: -30 };
 const still = (k: number): Gesture => ({ arm: STILL.arm! * k, elbow: STILL.elbow! * k, free: STILL.free! * k, freeElbow: STILL.freeElbow! * k });
-function sideKick(pose: HeroPose, style: AttackStyle, chamber: readonly [number, number], target: readonly [number, number], through: readonly [number, number], lean: number, back: readonly [number, number], fold: readonly [number, number] = chamber, stride = 1): Authored {
+function sideKick(pose: HeroPose, style: AttackStyle, chamber: readonly [number, number], target: readonly [number, number], through: readonly [number, number], lean: number, back: readonly [number, number]): Authored {
   const { contact, total } = timing(style);
   return { pose, style, support: "L", phases: [
     { frame: 0, gesture: READY },
     { frame: Math.max(1, contact - 6), gesture: { ...still(1), lean: lean * 0.2, backKnee: 70 }, reach: ["footR", -14, 22] },
-    { frame: contact - 2, gesture: { ...still(1), lean: lean * 0.6, chest: lean * 0.2, backKnee: 125, step: 4 * stride }, reach: ["footR", chamber[0], chamber[1]] },
-    { frame: contact, gesture: { ...still(1), lean, chest: lean * 0.4, head: -lean * 0.4, backKnee: 0, step: 8 * stride }, reach: ["footR", target[0], target[1]] },
-    { frame: contact + 2, gesture: { ...still(1), lean: lean * 1.05, chest: lean * 0.45, head: -lean * 0.4, backKnee: 0, step: 9 * stride }, reach: ["footR", through[0], through[1]] },
-    { frame: contact + 3, gesture: { ...still(1), lean: lean * 0.95, chest: lean * 0.4, head: -lean * 0.35, backKnee: 30, step: 8 * stride }, reach: ["footR", back[0], back[1]] },
-    { frame: contact + 8, gesture: { ...still(1), lean: lean * 0.5, chest: lean * 0.2, backKnee: 120, step: 6 * stride }, reach: ["footR", fold[0], fold[1]] },
+    { frame: contact - 2, gesture: { ...still(1), lean: lean * 0.6, chest: lean * 0.2, backKnee: 125, step: 4 }, reach: ["footR", chamber[0], chamber[1]] },
+    { frame: contact, gesture: { ...still(1), lean, chest: lean * 0.4, head: -lean * 0.4, backKnee: 0, step: 8 }, reach: ["footR", target[0], target[1]] },
+    { frame: contact + 2, gesture: { ...still(1), lean: lean * 1.05, chest: lean * 0.45, head: -lean * 0.4, backKnee: 0, step: 9 }, reach: ["footR", through[0], through[1]] },
+    { frame: contact + 3, gesture: { ...still(1), lean: lean * 0.95, chest: lean * 0.4, head: -lean * 0.35, backKnee: 30, step: 8 }, reach: ["footR", back[0], back[1]] },
+    { frame: contact + 8, gesture: { ...still(1), lean: lean * 0.5, chest: lean * 0.2, backKnee: 120, step: 6 }, reach: ["footR", chamber[0], chamber[1]] },
+    { frame: total, gesture: READY },
+  ] };
+}
+function upAngledKick(): Authored {
+  const { contact, total } = timing(AttackStyle.forwardTiltUp);
+  const kick = (lean: number, chest: number, backKnee: number, step: number, spin = 0): Gesture => ({ ...still(1), lean, chest, head: -0.6 * chest, backKnee, step, spin });
+  return { pose: "forwardTiltUp", style: AttackStyle.forwardTiltUp, support: "L", anatomical: true, phases: [
+    { frame: 0, gesture: READY },
+    { frame: contact - 6, gesture: kick(-2, -4, 90, 3), reach: ["footR", 4, 34] },
+    { frame: contact - 2, gesture: kick(-6, -14, 125, 10, 8), reach: ["footR", 34, 86] },
+    { frame: contact, gesture: kick(-10, -20, 0, 18, 15), reach: ["footR", 76, 106] },
+    { frame: contact + 2, gesture: kick(-10, -22, 0, 20, 15), reach: ["footR", 78, 110] },
+    { frame: contact + 3, gesture: kick(-6, -14, 100, 16, 8), reach: ["footR", 36, 72] },
+    { frame: contact + 6, gesture: { ...kick(-2, -4, 20, 8), ...still(0.4) }, reach: ["footR", 12, 4] },
+    { frame: contact + 10, gesture: { ...still(0.1), step: 2 }, reach: ["footR", 4, 2] },
     { frame: total, gesture: READY },
   ] };
 }
@@ -380,7 +395,7 @@ const POSES: Readonly<Record<string, () => Authored>> = {
   forwardTiltDown: kicked(() => kick("forwardTiltDown", AttackStyle.forwardTiltDown, [76, 26], -8, [80, 24], -30, -8)),
   downTilt: kicked(downTilt), jab: kicked(jab), upTilt: kicked(upTilt), dashAttack: kicked(dashAttack),
   forwardTilt: kicked(() => sideKick("forwardTilt", AttackStyle.forwardTilt, [34, 64], [88, 60], [100, 61], -8, [66, 41])),
-  forwardTiltUp: kicked(() => sideKick("forwardTiltUp", AttackStyle.forwardTiltUp, [30, 80], [74, 108], [82, 120], -26, [34, 72], [30, 40], 2.5)),
+  forwardTiltUp: kicked(upAngledKick),
 };
 
 function rotation(base: ArrayLike<number>, pitch: number, yaw = 0, roll = 0): Float32Array<ArrayBuffer> {
