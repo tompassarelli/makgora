@@ -158,8 +158,8 @@ plays at most four move layers:
 
 **Meter casts (#192).** An EX special and an ultimate each add one
 fighter-wide cast sound on the cast's first confirmed frame, over the special's
-own perform layer: Divine Shield for EX, a bright chime no move uses, and Flame
-Strike's eruption for the ultimate, matching its flame burst
+own perform layer: Divine Shield for EX, a bright chime no move uses, matching its gold bubble, and Flame
+Strike's eruption for the ultimate, matching its fire tower
 (smashcraft:ts/src/game/presentation/meterCues.ts). They are the same for
 every fighter, so a player learns one sound for each, and they play outside the
 four move layers and the voice budget, like the special cues' own sounds.
