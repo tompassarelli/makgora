@@ -12,7 +12,6 @@ export function install(this: void): void {
 }
 
 export function start(this: void): void {
-  startBuild(CURRENT_BUILD);
-  startMatchSceneReport();
+  startBuild(CURRENT_BUILD, startMatchSceneReport);
   startMatchFrameMeter();
 }

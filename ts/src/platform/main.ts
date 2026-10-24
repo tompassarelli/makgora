@@ -26,9 +26,10 @@ export function install(this: void, build: MapBuild = CURRENT_BUILD): void {
 }
 
 
-export function startBuild(this: void, build: MapBuild): void {
+export function startBuild(this: void, build: MapBuild, beforeShell?: (this: void) => void): void {
   install(build);
   startModelFailures();
+  beforeShell?.();
   startShell(build, replayHistoryPlayback());
   if (build.hotReload) startHotReload();
 }

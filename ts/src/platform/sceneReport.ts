@@ -18,7 +18,7 @@ export function startMatchSceneReport(): void {
 
     parked: (_x, _y, z) => {
       const s = shellState();
-      if (s === undefined) return false;
+      if (s === undefined) return true;
       const ground = s.origin.z - FLOOR_HEIGHT;
       return Math.abs(z - ground) < 1.0 || z < ground - HIDDEN_EFFECT_DEPTH + 1.0;
     },

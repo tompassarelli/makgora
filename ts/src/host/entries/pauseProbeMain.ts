@@ -6,7 +6,6 @@ import { startMatchSceneReport } from "../../platform/sceneReport";
 export { install } from "./integrityMain";
 
 export function start(this: void): void {
-  startBuild({ ...INTEGRITY_BUILD, pausePositionProbe: true });
-  startMatchSceneReport();
+  startBuild({ ...INTEGRITY_BUILD, pausePositionProbe: true }, startMatchSceneReport);
   startMatchFrameMeter();
 }
