@@ -471,7 +471,7 @@ export const ULTIMATE_REACH: { readonly [character: number]: { readonly near: nu
   [Character.thrall]: { near: 60.0, far: 600.0 },
   [Character.jaina]: { near: 120.0, far: 500.0 },
   [Character.sylvanas]: { near: 150.0, far: 600.0 },
-  [Character.cairne]: { near: 0.0, far: 0.0 },
+  [Character.cairne]: { near: 0.0, far: 1200.0 },
   [Character.chen]: { near: 0.0, far: 240.0 },
   [Character.peon]: { near: 0.0, far: 600.0 },
   [Character.tinker]: { near: 80.0, far: 300.0 },

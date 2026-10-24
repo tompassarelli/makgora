@@ -136,7 +136,9 @@ Frames count from the input frame (frame 1 is the first frame after it).
 - Computer fighters press it at a full bar when the target is inside the
   move's authored reach (ULTIMATE_REACH), as often as their kit options;
   Rookie never does, Lich presses it at a target in the air within 600, a
-  raised shield stops the press, and Cairne does not aim it yet. In the air
+  raised shield stops the press, and Cairne presses it at a level foe
+  anywhere within 1200, the main deck's width, because his ankh lands at
+  centre stage whatever the foe's distance from him. In the air
   they press it only over the main deck and never a ground-only one, because
   the caster cannot act again until it ends; a `needsFloorBelow` one is aimed
   from the floor beneath them, not from their height, and skipped where
