@@ -178,7 +178,7 @@ export function applyFrame(s: ShellState, recorded = false): void {
     ui.combat.confirmContacts(runtime.simulationFrame, slot, runtime.frameImpacts[slot]);
     ui.combat.confirmKo(runtime.simulationFrame, slot, fighter, runtime.frameImpacts[slot]);
     ui.placed.presentConfirmed(runtime.simulationFrame, fighter, slot);
-    ui.fighters[slot]?.meter?.confirm(fighter, s.game.phase === Phase.match, s.game.ultimatesOff, s.trace.active ? (text) => traceParticipant(s, slot, `meter-cue ${text}`) : undefined);
+    ui.fighters[slot]?.meter?.confirm(runtime.simulationFrame, fighter, s.game.phase === Phase.match, s.game.ultimatesOff, s.trace.active ? (text) => traceParticipant(s, slot, `meter-cue ${text}`) : undefined);
     if (!held) {
       renderFighter(s, slot, runtime.poses[slot], participant.before.out);
       ui.special.presentConfirmedAnimated(runtime.simulationFrame, fighter, slot);

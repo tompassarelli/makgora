@@ -100,6 +100,7 @@ export class MeterCueEffects {
   private readonly ultimateSound: sound;
   private readonly front: number;
   private readonly scale: number;
+  private lit: { readonly frame: number; readonly line: string } | undefined;
 
   constructor(character: Character, private readonly origin: WorldOrigin, shared = false) {
     this.front = origin.y - 12.0;
@@ -111,13 +112,17 @@ export class MeterCueEffects {
     this.ultimateSound = CreateSoundFromLabel(ULTIMATE_BURST.sound ?? "", false, true, true, 10, 10);
   }
 
-  confirm(fighter: Readonly<Fighter> | undefined, playing: boolean, ultimatesOff: boolean, trace?: (text: string) => void): void {
+  confirm(frame: number, fighter: Readonly<Fighter> | undefined, playing: boolean, ultimatesOff: boolean, trace?: (text: string) => void): void {
     const view = observeMeterCues(this.state, playing ? fighter : undefined, ultimatesOff);
     if (fighter === undefined || !playing) {
       if (this.burst.showing() || this.exAura.showing() || this.superAura.showing()) this.clear();
       return;
     }
-    if (this.superAura.show(view.superAura, fighter, this.front, this.scale)) trace?.(`super-aura ${view.superAura ? "on" : "off"} mana ${fighter.mana.points}`);
+    if (this.superAura.show(view.superAura, fighter, this.front, this.scale)) {
+      const line = `super-aura ${view.superAura ? "on" : "off"} mana ${fighter.mana.points}`;
+      this.lit = view.superAura ? { frame, line } : undefined;
+      trace?.(line);
+    }
     this.confirmUltimate(view, fighter, trace);
     this.confirmEx(view, fighter, trace);
   }
@@ -147,6 +152,11 @@ export class MeterCueEffects {
     this.superAura.follow(live, this.front, this.scale);
   }
 
+  /** The trace line and frame that lit the full-bar aura still showing, for a trace that starts after it. */
+  litAura(): { readonly frame: number; readonly line: string } | undefined {
+    return this.lit;
+  }
+
   rebindModels(bind: (object: object, prototype: object) => void): void {
     bind(this.exAura, MeterCueModel.prototype);
     bind(this.superAura, MeterCueModel.prototype);
@@ -161,6 +171,7 @@ export class MeterCueEffects {
 
   clear(): void {
     clearMeterCueState(this.state);
+    this.lit = undefined;
     this.burst.clear();
     this.exAura.clear();
     this.superAura.clear();

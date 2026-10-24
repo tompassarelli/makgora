@@ -68,6 +68,13 @@ export function traceSelectionState(s: ShellState, reason: string): void {
   }
 }
 
+function traceLitMeterCues(s: ShellState): void {
+  for (const slot of PARTICIPANT_SLOTS) {
+    const lit = s.ui?.fighters[slot]?.meter?.litAura();
+    if (lit !== undefined) traceInput(s.trace, `participant ${slot} frame ${lit.frame} phase ${s.game.phase} meter-cue ${lit.line}`);
+  }
+}
+
 export function startInputTrace(s: ShellState): void {
   beginInputTrace(s.trace);
   const stamps = s.rollback?.keyboard?.stamps;
@@ -76,6 +83,7 @@ export function startInputTrace(s: ShellState): void {
   traceInput(s.trace, `humans ${s.game.humanCount} frame ${s.runtime.simulationFrame} phase ${s.game.phase}`);
   traceConfirmedState(s);
   traceSelectionState(s, "trace-start");
+  traceLitMeterCues(s);
   const receiptStarted = traceSeconds(s.trace);
   writeLines(INPUT_START_FILE, [traceStartLine(s.build.id)]);
   traceInput(s.trace, `trace-start receipt native-seconds ${R2S(traceSeconds(s.trace) - receiptStarted)}`);
