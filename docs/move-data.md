@@ -190,9 +190,9 @@ box in #223. Cairne's down air belongs to #96.
 | kael'thas-sunstrider | 16 (0.12) front | 66 (0.5) front **over** | 34 (0.26) back **over** | 4 (0.03) front | 60 (0.45) down **over** |
 | murloc | 8 (0.06) back | 24 (0.18) front **over** | 27 (0.2) back **over** | 8 (0.06) up | 37 (0.28) down **over** |
 | grom-hellscream | 9 (0.07) front | 13 (0.1) front | 63 (0.48) back **over** | -34 (-0.26) up | 49 (0.37) down **over** |
-| anub'arak | 16 (0.12) front | 20 (0.15) front | -12 (-0.09) front | -59 (-0.45) front | 59 (0.44) down **over** |
-| malfurion-stormrage | 9 (0.07) back | 77 (0.58) front **over** | 55 (0.42) back **over** | 0 (0) front | 112 (0.85) down **over** |
-| medivh | 12 (0.09) back | -4 (-0.03) front | -1 (-0.01) back | 20 (0.15) up | 34 (0.26) down **over** |
+| anub'arak | 16 (0.12) front | 20 (0.15) front | -12 (-0.09) front | -59 (-0.45) front | -8 (-0.06) down |
+| malfurion-stormrage | 9 (0.07) back | 1 (0.01) front | 1 (0.01) back | 0 (0) front | 8 (0.06) down |
+| medivh | 12 (0.09) back | -4 (-0.03) front | -1 (-0.01) back | 19 (0.15) up | -1 (-0.01) down |
 | kobold | -10 (-0.08) back | 2 (0.02) front | -1 (-0.01) back | 2 (0.01) up | 10 (0.08) down |
 
 Before #222, Illidan's and Rifleman's down airs used the shared vertical down-air capsule and reached 215 (1.63) and 187 (1.42) below the drawn feet; both now sit on the driven leg.
