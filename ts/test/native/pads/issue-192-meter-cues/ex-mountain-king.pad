@@ -3,7 +3,9 @@
 # flame aura out; b's plain neutral special plays neither and keeps b's aura lit.
 #! chat -dev setup quick hero mountain king;meter 100
 #! preset melee
-60 a tap LB 2
+60 a press LB
+60 a tap B 2
+62 a release LB
 150 b tap B 2
 300 a press VIEW
 370 a release VIEW
