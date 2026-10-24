@@ -1,3 +1,5 @@
+import { smokeShardIds } from "./smokeShards";
+
 export type Verdict = "success" | "failure" | "pending" | "missing";
 
 export interface RunSummary {
@@ -73,9 +75,9 @@ export function pickGreen(commits: readonly Candidate[], installed: readonly str
   return commits[index];
 }
 
-export const GREEN_GATE_CHECKS = [
-  "gate-cursor-visible", "gate-start-anywhere", "gate-bindings", "gate-moves", "gate-specials-spot",
-] as const;
+export const GREEN_GATE_CHECKS: readonly string[] = [
+  "gate-cursor-visible", "gate-start-anywhere", "gate-bindings", ...smokeShardIds(),
+];
 export const GREEN_GATE_LOOKS = ["classic"] as const;
 
 export interface GreenGateReport {
@@ -98,17 +100,16 @@ export function greenGateFailures(mapSha256: string, declared: readonly string[]
   }
   for (const look of GREEN_GATE_LOOKS) {
     const matching = reports.filter(report => report.graphicsLook === look);
-    const report = matching[0];
-    if (matching.length !== 1 || report === undefined) {
-      failures.push({ look, id: "gate-report", reason: `expected one report, found ${matching.length}` });
+    if (matching.length === 0) {
+      failures.push({ look, id: "gate-report", reason: "expected a report, found none" });
       continue;
     }
-    if (report.candidateMapSha256 !== mapSha256) {
+    if (matching.some(report => report.candidateMapSha256 !== mapSha256)) {
       failures.push({ look, id: "gate-map", reason: "report map SHA256 differs from the built candidate" });
       continue;
     }
     for (const id of required) {
-      const results = report.results.filter(result => result.id === id);
+      const results = matching.flatMap(report => report.results).filter(result => result.id === id);
       const result = results[0];
       if (results.length !== 1 || result === undefined) failures.push({ look, id, reason: `expected one result, found ${results.length}` });
       else if (result.verdict !== "pass") failures.push({ look, id, reason: `${result.verdict}: ${result.reason}` });

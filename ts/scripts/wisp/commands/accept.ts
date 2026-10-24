@@ -45,6 +45,7 @@ import { measureCursorGate } from "../gateCursor";
 import { measureStartGate } from "../gateStart";
 import { measureBindingsGate } from "../gateBindings";
 import { measureMovesGate } from "../gateMoves";
+import { movesShardId, parseShardChat } from "../smokeShards";
 import { measureResultsGate } from "../gateResults";
 
 const ReportMetadata = Schema.fromJsonString(Schema.Record(Schema.String, Schema.Unknown));
@@ -353,9 +354,9 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
         Effect.tap(receipts => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipts.specials]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
       ) : text === "gate:results" ? measureResultsGate(selectedClients, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), "gate-results-rematch", name)).pipe(
         Effect.tap(receipt => Effect.sync(() => measurements.set(name, [...(measurements.get(name) ?? []), receipt]))), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
-      ) : text === "gate:moves" ? measureMovesGate(selectedClients, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), "gate-moves", name)).pipe(
+      ) : parseShardChat(text, "moves") !== undefined ? measureMovesGate(selectedClients, join(flagValues(args, "out")[0] ?? join(homedir(), ".local/state/smashcraft/accept"), movesShardId(parseShardChat(text, "moves") ?? 0), name), undefined, parseShardChat(text, "moves")).pipe(
         Effect.tap(receipts => Effect.sync(() => { measurements.set(name, [...(measurements.get(name) ?? []), receipts.moves]); specials.set(name, receipts.specials); })), Effect.asVoid, Effect.provide(Layer.mergeAll(BunServices.layer, platformLayer())),
-      ) : text === "gate:specials" ? Effect.gen(function*() {
+      ) : parseShardChat(text, "specials") !== undefined ? Effect.gen(function*() {
         const measured = specials.get(name);
         if (measured === undefined) return yield* new AcceptFailure({ operation: "specials gate", problem: "gate-moves did not run in this session; the specials spot check reads its settle frames" });
         measurements.set(name, [...(measurements.get(name) ?? []), { ...measured, modified: yield* Clock.currentTimeMillis }]);

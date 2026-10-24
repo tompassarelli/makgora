@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -41,7 +41,11 @@ const GateReport = Schema.Struct({
   results: Schema.Array(Schema.Struct({ id: Schema.String, verdict: Schema.Literals(["pass", "fail", "needs-look"]), reason: Schema.String })),
 });
 const decodeGateReport = Schema.decodeUnknownEffect(Schema.fromJsonString(GateReport));
-const greenState = join(homedir(), ".local/state/smashcraft/green-builds");
+export const greenState = join(homedir(), ".local/state/smashcraft/green-builds");
+
+export const gateReportFiles = (directory: string): string[] => existsSync(directory)
+  ? [join(directory, "report.json"), ...readdirSync(directory, { withFileTypes: true }).filter(entry => entry.isDirectory()).map(entry => join(directory, entry.name, "report.json"))].filter(file => existsSync(file))
+  : [];
 
 const problem = (cause: { readonly message: string }) => new PlayProblem({ problem: cause.message });
 
@@ -74,12 +78,13 @@ export const installAcceptedGreen = (documents: string, map: string, revision: s
   const reports: GreenGateReport[] = [];
   const unreadable: { look: string; id: string; reason: string }[] = [];
   for (const look of GREEN_GATE_LOOKS) {
-    const file = join(stateDirectory, "accept", mapSha256, look, "report.json");
-    const report = yield* Effect.tryPromise({ try: () => Bun.file(file).text(), catch: (cause) => new PlayProblem({ problem: `${file}: ${String(cause)}` }) }).pipe(
-      Effect.flatMap(text => decodeGateReport(text).pipe(Effect.mapError(problem))), Effect.result,
-    );
-    if (report._tag === "Success") reports.push(report.success);
-    else unreadable.push({ look, id: "gate-report", reason: report.failure.problem });
+    for (const file of gateReportFiles(join(stateDirectory, "accept", mapSha256, look))) {
+      const report = yield* Effect.tryPromise({ try: () => Bun.file(file).text(), catch: (cause) => new PlayProblem({ problem: `${file}: ${String(cause)}` }) }).pipe(
+        Effect.flatMap(text => decodeGateReport(text).pipe(Effect.mapError(problem))), Effect.result,
+      );
+      if (report._tag === "Success") reports.push(report.success);
+      else unreadable.push({ look, id: "gate-report", reason: report.failure.problem });
+    }
   }
   const failures = [...unreadable, ...greenGateFailures(mapSha256, declared, reports)];
   yield* Effect.try({
@@ -97,7 +102,7 @@ export const installAcceptedGreen = (documents: string, map: string, revision: s
   yield* Effect.try({ try: () => installLatest(documents, map), catch: (cause) => new PlayProblem({ problem: String(cause) }) });
 });
 
-export const installGreen = (documents: string, dryRun = false) => Effect.gen(function*() {
+export const greenMain = Effect.gen(function*() {
   yield* host("git", ["fetch", "origin", "main"]);
   const listed = yield* host("git", ["rev-list", "--first-parent", "-n", String(COMMITS_CONSIDERED), "origin/main"]);
   const shas = listed.split("\n").filter((sha) => /^[a-f0-9]{40}$/.test(sha));
@@ -125,6 +130,11 @@ export const installGreen = (documents: string, dryRun = false) => Effect.gen(fu
     considered.push({ sha, ci, farm });
     if (ci === "success" && farm === "success") break;
   }
+  return considered;
+});
+
+export const installGreen = (documents: string, dryRun = false) => Effect.gen(function*() {
+  const considered = yield* greenMain;
 
   const installed = installedCommits(documents);
   const pick = pickGreen(considered, installed);
@@ -137,7 +147,7 @@ export const installGreen = (documents: string, dryRun = false) => Effect.gen(fu
   if (pick === undefined) {
     console.log(considered.some(({ ci, farm }) => ci === "success" && farm === "success")
       ? "The newest green commit on main is already installed (or an installed build is newer)"
-      : `No green commit among the newest ${shas.length} on main (${considered.map(({ sha, ci, farm }) => `${sha.slice(0, 7)} ci ${ci} farm ${farm}`).join("; ")})`);
+      : `No green commit among the newest ${considered.length} on main (${considered.map(({ sha, ci, farm }) => `${sha.slice(0, 7)} ci ${ci} farm ${farm}`).join("; ")})`);
     return;
   }
 

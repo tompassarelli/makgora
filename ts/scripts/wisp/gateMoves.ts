@@ -19,8 +19,9 @@ import { runProcess } from "../hostProcess";
 import { JournalMenu } from "./boundary";
 import { readReplay } from "./replayFiles";
 import { type MapStall, readMapStalls } from "./mapStalls";
-import { type SmokeVerdict, disturbedSteps, judgeSmoke, mergeVerdicts, smokeLines, smokePace, smokeReceipt } from "./smokeJudge";
+import { type SmokeVerdict, disturbedSteps, judgeSmoke, mergeVerdicts, smokeLines, smokePace, smokeReceipt, smokeTable } from "./smokeJudge";
 import { smokeApproaches } from "./smokeRehearsal";
+import { smokePairs } from "./smokeShards";
 import { FRAME_MILLIS, RESET_LEAD, SETTLE_AT, type SettlePoint, settlePoints, neutralSpecialSchedule, smokeSchedule, xdotoolArgs } from "./smokeTape";
 import { type Settle, type SpotResult, brightCount, playArea, specialsReceipt, specialsSpot } from "./specialsSpot";
 
@@ -40,9 +41,6 @@ export const isReplayFromMatch = (file: string, modified: number, started: numbe
   REPLAY.test(file) && modified >= started;
 
 const spotLines = (fighters: readonly string[], results: readonly SpotResult[]) => results.map(({ step, pass, reason }) => `${pass ? "PASS" : "FAIL"} ${fighters.join(" vs ")} ${step}: ${reason}`);
-
-export const smokePairs = (roster: readonly number[] = PLAYABLE_CHARACTERS): (readonly [number, number])[] =>
-  Array.from({ length: Math.ceil(roster.length / 2) }, (_, index) => [2 * index, (2 * index + 1) % roster.length] as const);
 
 interface Viewport {
   readonly x: number;
@@ -127,7 +125,7 @@ const matchRecord =(header: readonly string[], verdict: SmokeVerdict, results: r
   ...settles.map(({ step, count, onTime }) => `settle ${step} bright=${count}${onTime ? "" : " late"}`),
 ].join("\n")}\n`;
 
-export const measureMovesGate = (clientsFile: string, directory: string, caster?: 0 | 1 | "both") => Effect.gen(function*() {
+export const measureMovesGate = (clientsFile: string, directory: string, caster?: 0 | 1 | "both", shard?: number) => Effect.gen(function*() {
   const clients = yield* loadClients(clientsFile).pipe(Effect.mapError(fail("moves gate clients")));
   const [host, guest] = clients;
   if (host === undefined || guest === undefined || clients.length !== 2) return yield* new AcceptFailure({ operation: "moves gate", problem: "requires the selected offline pair" });
@@ -241,7 +239,7 @@ export const measureMovesGate = (clientsFile: string, directory: string, caster?
     const stalls = yield* matchStalls(clients, [manifest, yield* newestReplay(join(guest.documents, "CustomMapData"), picked, index + 1)], picked);
     return { manifest, lines, schedule, runs, stalls };
   });
-  for (const [index, pair] of (caster === undefined ? smokePairs() : [NEUTRAL_SPECIAL_PAIR]).entries()) {
+  for (const [index, pair] of (caster !== undefined ? [NEUTRAL_SPECIAL_PAIR] : shard === undefined ? smokePairs() : smokePairs().slice(shard, shard + 1)).entries()) {
     const characters = pair.map(choice => PLAYABLE_CHARACTERS[choice] ?? Character.rifleman);
     const fighters = characters.map(fighterName);
     const name = `match-${String(index + 1).padStart(2, "0")}`;
@@ -257,10 +255,10 @@ export const measureMovesGate = (clientsFile: string, directory: string, caster?
       const results = specialsSpot(settles, area);
       const failedSpots = results.filter(({ pass }) => !pass).map(({ step }) => step);
       const frozen = disturbedSteps(verdict, failedSpots);
-      const final = frozen.length === 0 || attempt === MATCH_ATTEMPTS;
+      const final = frozen.length === 0 || attempt === (shard === undefined ? MATCH_ATTEMPTS : 1);
       const stem = final ? name : `${name}-invalid-${attempt}`;
       yield* Effect.forEach(spotFrameFiles(stem, runs, caster === undefined ? failedSpots : results.map(({ step }) => step)), ([file, bytes]) => save(file, bytes), { discard: true });
-      yield* save(`${stem}.txt`, matchRecord([`replay ${manifest}`, `fighters ${fighters.join(" vs ")}`, `attempt ${attempt}`, `pace played ${played.toFixed(4)} next ${pace.toFixed(4)}`, ...stallLines(stalls), ...invalid], verdict, results, fighters, settles.flat()));
+      yield* Effect.all([save(`${stem}.txt`, matchRecord([`replay ${manifest}`, `fighters ${fighters.join(" vs ")}`, `attempt ${attempt}`, `pace played ${played.toFixed(4)} next ${pace.toFixed(4)}`, ...stallLines(stalls), ...invalid], verdict, results, fighters, settles.flat())), save(`${stem}.tsv`, smokeTable(verdict))]);
       if (final) {
         verdicts.push({ fighters, verdict });
         spots.push({ fighters, results });

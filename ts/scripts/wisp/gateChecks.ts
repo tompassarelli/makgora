@@ -1,5 +1,5 @@
 import type { NativeCheck, Rule } from "wisp/scripts/wisp/accept";
-import { PLAYABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";
+import { movesShardId, smokePairs, smokeShardLabel, smokeShards, specialsShardId } from "./smokeShards";
 import { neutralSpecialChecks } from "./neutralSpecialChecks";
 
 export const gateChecks = (noErrors: Rule): NativeCheck[] => [
@@ -24,14 +24,19 @@ export const gateChecks = (noErrors: Rule): NativeCheck[] => [
     pass: [noErrors, { kind: "receipt", client: "a", pattern: "^SMASHCRAFT GATE results stocks=1 epoch=\\d+ result=1 cursor=1 held=1 rematch=1 pass=1$", min: 1 }],
   },
   ...neutralSpecialChecks(noErrors),
-  {
-    id: "gate-moves", closes: "smashcraft-dev#467", map: "gate-playable", session: "gate-moves",
-    setup: [{ chat: "gate:moves", client: "a" }],
-    pass: [noErrors, { kind: "receipt", client: "a", pattern: `^SMASHCRAFT GATE moves fighters=${PLAYABLE_CHARACTERS.length} moves=(\\d+) started=\\1 keys=(\\d+) live=\\2 replayed=1 pass=1$`, min: 1 }],
-  },
-  {
-    id: "gate-specials-spot", after: "gate-moves", closes: "smashcraft-dev#467", map: "gate-playable", session: "gate-moves",
-    setup: [{ chat: "gate:specials", client: "a" }],
-    pass: [noErrors, { kind: "receipt", client: "a", pattern: `^SMASHCRAFT GATE specials fighters=${PLAYABLE_CHARACTERS.length} checked=([1-9]\\d*) clear=\\1 pass=1$`, min: 1 }],
-  },
+  ...smokeShards().flatMap((shard): NativeCheck[] => {
+    const fighters = new Set(smokePairs()[shard]).size;
+    return [
+      {
+        id: movesShardId(shard), closes: "smashcraft#32", map: "gate-playable", session: movesShardId(shard),
+        setup: [{ chat: `gate:moves:${smokeShardLabel(shard)}`, client: "a" }],
+        pass: [noErrors, { kind: "receipt", client: "a", pattern: `^SMASHCRAFT GATE moves fighters=${fighters} moves=(\\d+) started=\\1 keys=(\\d+) live=\\2 replayed=1 pass=1$`, min: 1 }],
+      },
+      {
+        id: specialsShardId(shard), after: movesShardId(shard), closes: "smashcraft#32", map: "gate-playable", session: movesShardId(shard),
+        setup: [{ chat: `gate:specials:${smokeShardLabel(shard)}`, client: "a" }],
+        pass: [noErrors, { kind: "receipt", client: "a", pattern: `^SMASHCRAFT GATE specials fighters=${fighters} checked=([1-9]\\d*) clear=\\1 pass=1$`, min: 1 }],
+      },
+    ];
+  }),
 ];

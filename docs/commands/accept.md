@@ -18,27 +18,41 @@
   presentation .w3x and .w3x.base.lua). When accept reports that the map
   does not carry a model, build a new dated set with `bun wisp map build
   --profile main` rather than overwriting an old one.
-  Move smoke (dev#467): `bun wisp accept --only gate-moves --pair K --map CANDIDATE.w3x`
-  turns on Training on the candidate and stage hazards off on each stage
-  screen (a match whose replay shows hazards on fails its setup), then plays
-  every fighter pair from fighter select: each standard keyboard key once, every normal, aerial and
-  special after a training reset, and the ultimate after both fighters charge
-  their mana. Each match ends from the pause menu, and its own replay is judged
-  headless (smashcraft:ts/scripts/wisp/smokeJudge.ts): the replay must reach
-  every recorded checksum, every key must reach the game and every move must
-  start, or `gate-moves` fails and the green install keeps the last good map.
+  Move smoke (#32): one check pair per fighter pair, `gate-moves-NN` and
+  `gate-specials-spot-NN` for NN 01-13 (smashcraft:ts/scripts/wisp/smokeShards.ts),
+  so each shard is one session and one match that fits a 5-minute native run.
+  `bun wisp smoke --native --pair K [--map CANDIDATE.w3x] [--shard N...]`
+  runs every shard on the green candidate (the commit `play --install-green`
+  picks, built once through the play build path, or `--map`) as its own
+  `accept --only gate-moves-NN gate-specials-spot-NN` run, stopped at 300 s,
+  writes each report under
+  `~/.local/state/smashcraft/green-builds/accept/SHA256/classic/gate-moves-NN/`
+  where the green install reads it, prints and saves the per-move table
+  `smoke.md` beside them, and exits nonzero on a crash, a stopped run, a dead
+  key or a move that fails to start. Run it inside
+  `machine-capacity session --class native --new-clients 0 --quiet` on a
+  running pool pair. A shard: turns on Training on the candidate and stage
+  hazards off on the stage screen (a match whose replay shows hazards on fails
+  its setup), then plays its fighter pair from fighter select: each standard
+  keyboard key once, every normal, aerial and special after a training reset,
+  and the ultimate after both fighters charge their mana. The match ends from
+  the pause menu, and its own replay is judged headless
+  (smashcraft:ts/scripts/wisp/smokeJudge.ts): the replay must reach every
+  recorded checksum, every key must reach the game and every move must start,
+  or the shard fails and the green install keeps the last good map.
+  `match-NN.tsv` lists each key and move with its verdict.
   Keys go out through xdotool with no per-key delay, timed from the game
   rate each match's replay measures. When a step's next reset arrives more
   than 24 frames early, the client froze for that long; a failed move or spot
   check in such a step makes the match invalid. The map's own rates lines
   name every callback gap for the replay, and a failed key or move whose tap
   fell inside a gap longer than that tap is invalid too, because the game
-  polls keys once a tick and never saw it. An invalid match is played again,
-  up to three attempts, keeping `match-NN-invalid-K.txt` and its reasons. A
+  polls keys once a tick and never saw it. A shard plays its match once, and
+  `smoke --native` reruns an invalid shard once in a new run. A
   failed spot check also keeps its before and after frames as PPM files.
   `bun wisp smoke` rehearses the same tapes headless on every pair in about ten
   seconds; run it after changing a fighter's inputs or kit.
-  `gate-specials-spot` runs in the same session, after `gate-moves`: at each
+  `gate-specials-spot-NN` runs in the same session, after `gate-moves-NN`: at each
   rest between training resets the host frame's bright play-area pixels are
   counted, and a special or ultimate fails when the next rest is brighter than
   the rest before it by more than three times the largest rest-to-rest change

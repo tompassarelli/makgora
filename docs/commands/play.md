@@ -28,7 +28,11 @@
   Native owners run `bun wisp accept --only gate-* --map CANDIDATE --out DIR`
   on the Classic pool's clients and retain the existing `report.json`, with top-level
   `candidateMapSha256` and `graphicsLook` (`classic`), under
-  `~/.local/state/smashcraft/green-builds/accept/SHA256/LOOK/report.json`.
+  `~/.local/state/smashcraft/green-builds/accept/SHA256/LOOK/report.json`
+  or one subfolder down, `LOOK/RUN/report.json`; the install reads them all
+  and needs each check passed in exactly one. `bun wisp smoke --native --pair K`
+  smokes every move of the same green candidate one fighter pair per run and
+  writes its shard reports there (smashcraft:docs/commands/accept.md).
   Missing checks, reports, looks, mismatched bytes and `needs-look` keep the last
   installed build. Plato reads the candidate and failing check ids/reasons in
   `~/.local/state/smashcraft/green-builds/status.json`.

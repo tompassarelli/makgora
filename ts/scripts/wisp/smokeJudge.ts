@@ -209,3 +209,13 @@ export function smokePace(lines: readonly string[], { results, frozen }: Pick<Sm
   const steady = sweep.slice(0, -1).every((step, index) => Math.abs((rises[index + 1] ?? 0) - (rises[index] ?? 0) - step.frames * pace) <= PACE_GAP_FRAMES);
   return steady ? pace : undefined;
 }
+
+export const SMOKE_TABLE_HEADER = "fighter\tkind\tstep\tresult\treason";
+
+export const smokeTable = ({ replay, results, frozen }: SmokeVerdict): string => `${[
+  SMOKE_TABLE_HEADER,
+  ...replay.problems.map((problem) => `match\treplay\treplay\tFAIL\t${problem}`),
+  ...(replay.reached === replay.recorded ? [] : [`match\treplay\tchecksums\tFAIL\treached ${replay.reached} of ${replay.recorded}`]),
+  ...results.map(({ fighter, kind, step, pass, reason }) => `${fighter}\t${kind}\t${step}\t${pass ? "PASS" : "FAIL"}\t${reason}`),
+  ...frozen.map(({ slot, step, lost }) => `P${slot + 1}\tfreeze\t${step}\tINVALID\tthe client lost ${lost} frames`),
+].join("\n")}\n`;
