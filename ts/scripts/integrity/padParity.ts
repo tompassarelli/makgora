@@ -73,7 +73,7 @@ interface Trace {
 }
 
 
-const COMPARED = /^phase \d+ (special |special-form |applied attack |applied jump |platform mount |platform drop |damage \d|recovery |grab action |grab-hold |shield-break |shield tilt |ledge |di |ground action |ground-speed |fall |reflect |launch up |meter-cue )/;
+const COMPARED = /^phase \d+ (special |special-form |applied attack |applied jump |platform mount |platform drop |damage \d|recovery |grab action |grab-hold |shield-break |shield tilt |ledge |di |ground action |ground-speed |fall |crouch |reflect |launch up |meter-cue )/;
 
 export function parseTrace(lines: readonly string[]): Trace {
   const checksums = new Map<number, string>();

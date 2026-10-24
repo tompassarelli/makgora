@@ -295,7 +295,7 @@ resume acknowledgments retained (#206, wisp#86).
   native match ran the intended presses), and their starting states are
   compared field by field, so a checksum difference names its fields.
 - The confirmed fighter lines in the traces are equal: specials, attacks,
-  jumps, hits, reflections and recoveries, each with its frame.
+  jumps, crouches, hits, reflections and recoveries, each with its frame.
 - Each `#! expect CLIENT FRAME TEXT`, `#! absent CLIENT FROM-TO TEXT` and
   `#! scene CLIENT MODEL` line in the script holds on both sides. A
   `#! chat TEXT` line names the command that starts the match when `--chat`
