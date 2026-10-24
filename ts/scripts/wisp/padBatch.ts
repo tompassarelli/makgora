@@ -377,7 +377,7 @@ export const padBatch = (options: NativeBatchOptions) => Effect.gen(function*() 
             made.reset += seconds(at);
 
             if (done._tag === "Failure") previous = "broken";
-            else writeFileSync(join(run.dir, "reset.json"), `${JSON.stringify(done.value, null, 2)}\n`);
+            writeFileSync(join(run.dir, "reset.json"), `${JSON.stringify(done._tag === "Failure" ? { command: RESET_COMMAND, failed: describeCause(done.cause) } : done.value, null, 2)}\n`);
           }
         }
         let freshGame = false;
