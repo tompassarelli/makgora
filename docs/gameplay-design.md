@@ -380,7 +380,14 @@ transport (wisp#110) both call it.
     160 ms), so R sits below Slippi's cap. Groups measured lower pop at R 8
     only because the slowest link sets the shared delay and the faster pairs
     run with spare frames; the slowest pair in a group pops as a duel does,
-    so Tom set one R for every match on 25 October 2026, the duel's 6. Holds,
+    so Tom set one R for every match on 25 October 2026, the duel's 6. A rerun
+    on 25 October 2026 with evenly paced
+    callbacks (one per frame, as a 16.7 ms turn gives) against Battle.net's
+    25 ms bursts, five seeds, gave the same ranking: at 300 ms the worst p95
+    was 211 (bursts) and 237 (even) at R 6, 228 and 323 at R 7, 283 and 266
+    at R 8, with mean p95 rising about 10% per frame of R. Below a 266 ms
+    round trip every R from 6 to 8 sits at the 2-frame floor, so R 7 would
+    only take one frame off links slower than 266 ms, at more pop. Holds,
     stalls and sim were the same at every R (60 sim frames a
     second, no holds); replayed frames rise about 6 a second per frame of R.
     The harness locks Auto at 5 for the 300 ms duel and 6 for 300 ms with
