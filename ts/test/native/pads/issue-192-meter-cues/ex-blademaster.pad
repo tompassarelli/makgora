@@ -2,10 +2,9 @@
 # a short EX aura on its first frame, on top of the special's own cues, and spending a segment puts the
 # flame aura out; b's plain neutral special plays neither and keeps b's aura lit.
 #! chat -dev setup quick hero blademaster;meter 100
-60 a shield 1
-60 a tap X 2
-63 a shield 0
-150 b tap X 2
+#! preset melee
+60 a tap LB 2
+150 b tap B 2
 300 a press VIEW
 370 a release VIEW
 #! expect a 0-59 meter-cue super-aura on mana 100

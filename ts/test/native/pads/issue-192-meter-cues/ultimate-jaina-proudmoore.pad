@@ -10,7 +10,7 @@
 #! expect a 0-59 meter-cue super-aura on mana 100
 #! expect a 61 special 17
 #! expect a 61 meter-cue super-aura off mana 0
-#! expect a 61 meter-cue ultimate-sound FlameStrike action-frame 1 first-own-effect
+#! expect a 61 meter-cue ultimate-sound FlameStrike action-frame 1 first-own-effect 2
 #! expect a 61 meter-cue ultimate-burst on action-frame 1
 #! expect a 77 meter-cue ultimate-burst off action-frame 17
 #! absent a 61-370 meter-cue ex-
