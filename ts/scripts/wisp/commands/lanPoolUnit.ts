@@ -93,12 +93,23 @@ export const poolStart: Command = (args) => {
   }).pipe(Effect.provide(BunServices.layer));
 };
 
+/** The fleet session a pool unit was started from, read from its `systemctl show --property=Environment` value. */
+export const unitFleetSession = (environment: string) => /(?:^|\s)NORTH_FLEET_SESSION=(\S*)/.exec(environment)?.[1] ?? "";
+
 export const poolStop: Command = (args) => Effect.gen(function*() {
   const ids = flagValues(args, "pair").map(Number);
   const listed = yield* runProcess(userManager("systemctl", ["--user", "list-units", "--plain", "--no-legend", "--all", `${POOL_UNIT_PREFIX}-*.service`])).pipe(Effect.mapError((cause) => new LanFailure({ problem: `list pool units: ${cause.message}` })));
   const units = listed.split("\n").flatMap((line) => /^(\S+)\.service/.exec(line.trim())?.[1] ?? []).filter((unit) => ids.length === 0 || ids.some((id) => unit.split("-").slice(3).map(Number).includes(id)));
   if (units.length === 0) return yield* Console.log("no pool unit is running");
+  const session = process.env["NORTH_FLEET_SESSION"] ?? "";
   for (const unit of units) {
+    const environment = yield* runProcess(userManager("systemctl", ["--user", "show", unit, "--property=Environment", "--value"])).pipe(Effect.mapError((cause) => new LanFailure({ problem: `read ${unit} owner: ${cause.message}` })));
+    const owner = unitFleetSession(environment);
+    if (owner !== session) {
+      if (ids.length > 0) return yield* new LanFailure({ problem: `${unit} belongs to fleet session ${owner || "(none)"}; only that session stops it` });
+      yield* Console.log(`left ${unit}: it belongs to fleet session ${owner || "(none)"}`);
+      continue;
+    }
     const pairIds = unit.split("-").slice(3).map(Number);
     for (const id of pairIds) {
       const claim = readPairClaim(id);

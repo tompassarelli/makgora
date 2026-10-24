@@ -1,7 +1,7 @@
 # Lan
 
-The signed-in pairs are clone-c+clone-b and clone-a+clone-d; never touch Tom’s
-install, and run clone-a only through its launch.sh.
+South's battlenet-accounts skill names the signed-in pairs and how each one
+runs; never touch Tom’s install.
 
 - Offline LAN pool, the default for native testing (see "Native testing and
   UI"), on live build 3.0.0.24268 only (the private LAN plugin refuses other
@@ -33,3 +33,7 @@ To label an already-running pool explicitly, run
 `bun wisp lan release --pair 0` stops the pool and releases the claim. A live
 claim from another session refuses with its owner, session and PID; a claim
 whose pool process exited can be taken over and reports that takeover.
+
+`bun wisp lan stop` stops only the pool units started from the caller's
+`NORTH_FLEET_SESSION` and names each other session's unit it leaves running;
+`--pair K` on another session's unit refuses with its owner.
