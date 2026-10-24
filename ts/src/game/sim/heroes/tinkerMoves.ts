@@ -51,13 +51,13 @@ export const TINKER_MOVES: FighterMoves = {
       region(19, 21, claw(-20.0, 14.0, -107.0, 10.0, 13.0), tinkerHit(11.138550758361816, "edge", 25, -1.0)),
     ]),
     [AttackStyle.neutralAir]: heroMove(8, 6, 24, 16, [
-      region(8, 10, claw(10.0, 55.0, 86.0, 45.0, 14.0), tinkerHit(7.711304664611816, "poke", 45)),
-      region(11, 13, claw(-10.0, 55.0, -86.0, 45.0, 14.0), tinkerHit(7.711304664611816, "poke", 45, -1.0)),
+      region(8, 10, claw(10.0, 55.0, 62.0, 50.0, 14.0), tinkerHit(7.711304664611816, "poke", 45)),
+      region(11, 13, claw(-10.0, 55.0, -36.0, 50.0, 14.0), tinkerHit(7.711304664611816, "poke", 45, -1.0)),
     ]),
-    [AttackStyle.forwardAir]: heroMove(10, 3, 24, 16, poke(10, 12, 95.0, 65.0, tinkerHit(8.568116188049316, "edge", 35))),
-    [AttackStyle.backAir]: heroMove(12, 3, 26, 18, [region(12, 14, claw(-20.0, 38.0, -102.0, 44.0, 15.0), tinkerHit(10.281740188598633, "edge", 35, -1.0, HitElement.fire))]),
+    [AttackStyle.forwardAir]: heroMove(10, 3, 24, 16, poke(10, 12, 70.0, 68.0, tinkerHit(8.568116188049316, "edge", 35))),
+    [AttackStyle.backAir]: heroMove(12, 3, 26, 18, [region(12, 14, claw(-20.0, 55.0, -54.0, 65.0, 15.0), tinkerHit(10.281740188598633, "edge", 35, -1.0, HitElement.fire))]),
     [AttackStyle.upAir]: heroMove(8, 4, 23, 14, [region(8, 11, claw(-20.0, 88.0, 24.0, 143.0, 13.0), tinkerHit(6.854493141174316, "launch", 85))]),
-    [AttackStyle.downAir]: heroMove(16, 4, 31, 22, [region(16, 19, claw(0.0, 10.0, 0.0, -98.0, 16.0), tinkerHit(10.281740188598633, "spike", 270, 1.0, HitElement.fire), tinkerHit(10.281740188598633, "spike", 55, 1.0, HitElement.fire))]),
+    [AttackStyle.downAir]: heroMove(16, 4, 31, 22, [region(16, 19, claw(6.0, 22.0, 14.0, 0.0, 16.0), tinkerHit(10.281740188598633, "spike", 270, 1.0, HitElement.fire), tinkerHit(10.281740188598633, "spike", 55, 1.0, HitElement.fire))]),
     [AttackStyle.grab]: heroMove(8, 2, 25, 0, [region(8, 9, claw(20.0, 45.0, 64.0, 46.0, 12.0), none)]),
   },
   throws: {
