@@ -21,7 +21,7 @@ import { runProcess } from "../hostProcess";
 import { JournalMenu } from "./boundary";
 import { readReplay } from "./replayFiles";
 import { type MapStall, readMapStalls } from "./mapStalls";
-import { type SmokeVerdict, disturbedSteps, judgeSmoke, mergeVerdicts, smokeLines, smokePace, smokeReceipt, smokeTable } from "./smokeJudge";
+import { type SmokeVerdict, disturbedSteps, judgeSmoke, mergeVerdicts, smokeLines, smokeMatchFailures, smokePace, smokeReceipt, smokeTable } from "./smokeJudge";
 import { smokeApproaches } from "./smokeRehearsal";
 import { smokePairs } from "./smokeShards";
 import { FRAME_MILLIS, RESET_LEAD, SETTLE_AT, SMOKE_BINDINGS, SMOKE_PRESET, type SettlePoint, keyName, settlePoints, neutralSpecialSchedule, smokeSchedule, xdotoolArgs } from "./smokeTape";
@@ -334,7 +334,7 @@ export const measureMovesGate = (clientsFile: string, directory: string, caster?
       const final = frozen.length === 0 || attempt === (shard === undefined ? MATCH_ATTEMPTS : 1);
       const stem = final ? name : `${name}-invalid-${attempt}`;
       yield* Effect.forEach(spotFrameFiles(stem, runs, caster === undefined ? failedSpots : results.map(({ step }) => step)), ([file, bytes]) => save(file, bytes), { discard: true });
-      yield* Effect.all([save(`${stem}.txt`, matchRecord([`replay ${manifest}`, `fighters ${fighters.join(" vs ")}`, `attempt ${attempt}`, `pace played ${played.toFixed(4)} next ${pace.toFixed(4)}`, ...stallLines(stalls), ...invalid], verdict, results, fighters, settles.flat())), save(`${stem}.tsv`, smokeTable(verdict))]);
+      yield* Effect.all([save(`${stem}.txt`, matchRecord([`replay ${manifest}`, `fighters ${fighters.join(" vs ")}`, `attempt ${attempt}`, `pace played ${played.toFixed(4)} next ${pace.toFixed(4)}`, ...stallLines(stalls), ...invalid], verdict, results, fighters, settles.flat())), save(`${stem}.tsv`, smokeTable(verdict)), save(`${stem}.json`, `${JSON.stringify(smokeMatchFailures(verdict))}\n`)]);
       if (final) {
         verdicts.push({ fighters, verdict });
         spots.push({ fighters, results });

@@ -6,6 +6,15 @@ its own detached worktree, `worktrees/green-builds-runner`, moved to
 only when queued on the laptop's ledger runner, so nothing builds while no work
 is queued.
 
+Each run smokes every move of the candidate natively on the pool pair named by
+`SMOKE_PAIR` (`systemctl --user edit smashcraft-green-builds.service`, then
+`Environment=SMOKE_PAIR=K`); without it the install refuses. A smoke crash, a
+dead binding or a move that fails to start always keeps the last installed
+build; every other native gate failure blocks only with
+`SMASHCRAFT_GREEN_GATE=enforce` and otherwise installs as
+`installed-unverified`. The 13 shards take about an hour, so the unit allows
+150 minutes.
+
 To install the unit:
 
     mkdir -p ~/.config/systemd/user

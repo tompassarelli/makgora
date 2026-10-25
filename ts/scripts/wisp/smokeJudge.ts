@@ -210,6 +210,18 @@ export function smokePace(lines: readonly string[], { results, frozen }: Pick<Sm
   return steady ? pace : undefined;
 }
 
+export interface SmokeMatchFailures {
+  readonly deadBindings: readonly string[];
+  readonly movesNotStarted: readonly string[];
+}
+
+const failedSteps = (results: readonly StepResult[], kind: StepResult["kind"]) => results.filter(result => result.kind === kind && !result.pass).map(({ slot, fighter, step, reason }) => `P${slot + 1} ${fighter} ${step}: ${reason}`);
+
+export const smokeMatchFailures = ({ results }: Pick<SmokeVerdict, "results">): SmokeMatchFailures => ({
+  deadBindings: failedSteps(results, "binding"),
+  movesNotStarted: failedSteps(results, "move"),
+});
+
 export const SMOKE_TABLE_HEADER = "fighter\tkind\tstep\tresult\treason";
 
 export const smokeTable = ({ replay, results, frozen }: SmokeVerdict): string => `${[

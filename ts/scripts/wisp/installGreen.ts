@@ -9,7 +9,7 @@ import { PlayProblem } from "wisp/scripts/wisp/play";
 import { runProcess } from "../hostProcess";
 import { currentPlaytest, playName } from "./currentPlaytest";
 import { SMASHCRAFT_ACCEPT } from "./acceptChecks";
-import { GREEN_GATE_LOOKS, greenGateFailures, type GreenGateReport, type Candidate, type RunSummary, buildLabel, farmVerdict, greenStep, isGreen, parseInstalled, verdictOf } from "./greenBuilds";
+import { GREEN_GATE_LOOKS, greenGateFailures, greenInstallDecision, smokeBlocks, type GreenGateReport, type SmokeReport, type Candidate, type RunSummary, buildLabel, farmVerdict, greenStep, isGreen, parseInstalled, verdictOf } from "./greenBuilds";
 import { installLatest, installedMaps } from "./mapLibrary";
 import { checklistPath, writePlaytestChecklist } from "./playtestChecklist";
 import { projectRoot } from "./project";
@@ -42,7 +42,15 @@ const GateReport = Schema.Struct({
   results: Schema.Array(Schema.Struct({ id: Schema.String, verdict: Schema.Literals(["pass", "fail", "needs-look"]), reason: Schema.String })),
 });
 const decodeGateReport = Schema.decodeUnknownEffect(Schema.fromJsonString(GateReport));
+
+const SmokeResult = Schema.Struct({
+  candidateMapSha256: Schema.String,
+  shards: Schema.Array(Schema.Struct({ shard: Schema.String, run: Schema.String, crash: Schema.Boolean, deadBindings: Schema.Array(Schema.String), movesNotStarted: Schema.Array(Schema.String) })),
+});
+const decodeSmokeResult = Schema.decodeUnknownEffect(Schema.fromJsonString(SmokeResult));
 export const greenState = join(homedir(), ".local/state/smashcraft/green-builds");
+
+export const smokeResultFile = (mapSha256: string, stateDirectory = greenState): string => join(stateDirectory, "accept", mapSha256, "classic", "smoke.json");
 
 export const gateReportFiles = (directory: string): string[] => existsSync(directory)
   ? [join(directory, "report.json"), ...readdirSync(directory, { withFileTypes: true }).filter(entry => entry.isDirectory()).map(entry => join(directory, entry.name, "report.json"))].filter(file => existsSync(file))
@@ -100,11 +108,16 @@ export const installAcceptedGreen = (documents: string, map: string, revision: s
       else unreadable.push({ look, id: "gate-report", reason: report.failure.problem });
     }
   }
+  const smokeFile = smokeResultFile(mapSha256, stateDirectory);
+  const smoke = existsSync(smokeFile) ? yield* Effect.tryPromise({ try: () => Bun.file(smokeFile).text(), catch: (cause) => new PlayProblem({ problem: `${smokeFile}: ${String(cause)}` }) }).pipe(
+    Effect.flatMap(text => decodeSmokeResult(text).pipe(Effect.mapError(problem))), Effect.map((report): SmokeReport | undefined => report), Effect.orElseSucceed(() => undefined),
+  ) : undefined;
+  const blocking = smokeBlocks(mapSha256, smoke);
   const failures = [...unreadable, ...greenGateFailures(mapSha256, declared, reports)];
-  yield* writeStatus(stateDirectory, { revision, candidate: map, candidateMapSha256: mapSha256,
-    state: failures.length === 0 ? "accepted" : !enforce ? "installed-unverified" : unreadable.length > 0 ? "pending-native" : "blocked", failures,
+  const decision = greenInstallDecision(failures, blocking, unreadable.length > 0, enforce);
+  yield* writeStatus(stateDirectory, { revision, candidate: map, candidateMapSha256: mapSha256, state: decision.state, blocking, failures,
     acceptanceDirectory: join(stateDirectory, "accept", mapSha256) });
-  if (enforce && failures.length > 0) return yield* new PlayProblem({ problem: `Kept last good installed map: ${failures.map(({ look, id, reason }) => `${look} ${id}: ${reason}`).join("; ")}; status ${join(stateDirectory, "status.json")}` });
+  if (!decision.install) return yield* new PlayProblem({ problem: `Kept last good installed map: ${(blocking.length > 0 ? blocking : failures).map(({ look, id, reason }) => `${look} ${id}: ${reason}`).join("; ")}; status ${join(stateDirectory, "status.json")}` });
   yield* Effect.try({ try: () => installLatest(documents, map), catch: (cause) => new PlayProblem({ problem: String(cause) }) });
 });
 
@@ -139,13 +152,13 @@ export const greenMain = Effect.gen(function*() {
   return considered;
 });
 
-export const installGreen = <E, R>(documents: string, dryRun: boolean, controller: Effect.Effect<string, E, R>) => Effect.gen(function*() {
+export const installGreen = <E, R, SE extends { readonly message: string }, SR>(documents: string, dryRun: boolean, smoke: ((map: string) => Effect.Effect<unknown, SE, SR>) | undefined, controller: Effect.Effect<string, E, R>) => Effect.gen(function*() {
   const considered = yield* greenMain;
 
   const installed = installedCommits(documents);
   const step = greenStep(considered, installed, yield* clientHold(documents));
   if (dryRun) {
-    console.log(`Dry run: newest green main ${considered.find(isGreen)?.sha ?? "none"}; ${step.kind === "none" ? "no install (already installed, newer installed, or no green commit)" : step.kind === "hold" ? `would hold ${step.candidate.sha}: ${step.reason}` : `would stage ${step.candidate.sha}; install requires exact candidate gate-* PASS in Classic`}`);
+    console.log(`Dry run: newest green main ${considered.find(isGreen)?.sha ?? "none"}; ${step.kind === "none" ? "no install (already installed, newer installed, or no green commit)" : step.kind === "hold" ? `would hold ${step.candidate.sha}: ${step.reason}` : `would stage ${step.candidate.sha}, run the move smoke on it and refuse a smoke crash, dead binding or move that fails to start; other gate-* failures ${process.env.SMASHCRAFT_GREEN_GATE === "enforce" ? "block" : "are recorded"}`}`);
     if (step.kind === "install") console.log(`Dry run: would write playtest notes ${checklistPath(buildLabel(`${yield* playName(step.candidate.sha)}.w3x`) ?? step.candidate.sha)} for ${previousInstalled(documents) ?? `${step.candidate.sha.slice(0, 7)}^`}..${step.candidate.sha.slice(0, 7)}`);
     return;
   }
@@ -157,6 +170,7 @@ export const installGreen = <E, R>(documents: string, dryRun: boolean, controlle
     return;
   }
   if (step.kind === "hold") return yield* hold(step.candidate.sha, step.reason);
+  if (smoke === undefined) return yield* new PlayProblem({ problem: "play --install-green needs --pair K, the offline pool pair its move smoke runs on" });
 
   const pick = step.candidate;
   const previous = previousInstalled(documents);
@@ -165,6 +179,7 @@ export const installGreen = <E, R>(documents: string, dryRun: boolean, controlle
   if (late.kind === "hold") return yield* hold(pick.sha, late.reason);
   if (late.kind === "none") return console.log(`${pick.sha.slice(0, 7)} was installed while it built`);
   console.log(`Controller helper: ${yield* controller}`);
+  yield* smoke(map.source).pipe(Effect.mapError(problem));
   yield* installAcceptedGreen(documents, map.source, pick.sha, SMASHCRAFT_ACCEPT.checks.filter(({ id }) => id.startsWith("gate-")).map(({ id }) => id));
   console.log(`Installed ${map.title} under Maps/${map.folder}`);
   const label = buildLabel(map.file);

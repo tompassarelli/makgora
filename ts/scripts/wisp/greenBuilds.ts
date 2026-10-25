@@ -1,4 +1,4 @@
-import { smokeShardIds } from "./smokeShards";
+import { movesShardId, smokeShardIds, smokeShardLabel, smokeShards } from "./smokeShards";
 
 export type Verdict = "success" | "failure" | "pending" | "missing";
 
@@ -128,4 +128,46 @@ export function greenGateFailures(mapSha256: string, declared: readonly string[]
     }
   }
   return failures;
+}
+
+export interface SmokeShardReport {
+  readonly shard: string;
+  readonly run: string;
+  readonly crash: boolean;
+  readonly deadBindings: readonly string[];
+  readonly movesNotStarted: readonly string[];
+}
+
+export interface SmokeReport {
+  readonly candidateMapSha256: string;
+  readonly shards: readonly SmokeShardReport[];
+}
+
+export function smokeBlocks(mapSha256: string, smoke: SmokeReport | undefined): GreenGateFailure[] {
+  if (smoke === undefined) return [{ look: "classic", id: "smoke", reason: "smoke crash: no move smoke report for the candidate" }];
+  if (smoke.candidateMapSha256 !== mapSha256) return [{ look: "classic", id: "smoke", reason: "smoke crash: the move smoke report's map SHA256 differs from the built candidate" }];
+  return smokeShards().flatMap((shard): GreenGateFailure[] => {
+    const id = movesShardId(shard);
+    const report = smoke.shards.find(item => item.shard === smokeShardLabel(shard));
+    if (report === undefined) return [{ look: "classic", id, reason: "smoke crash: the shard has no smoke result" }];
+    return [
+      ...report.crash ? [{ look: "classic", id, reason: `smoke crash: ${report.run}` }] : [],
+      ...report.deadBindings.map(step => ({ look: "classic", id, reason: `dead binding: ${step}` })),
+      ...report.movesNotStarted.map(step => ({ look: "classic", id, reason: `move did not start: ${step}` })),
+    ];
+  });
+}
+
+export type GreenInstallState = "accepted" | "installed-unverified" | "pending-native" | "blocked";
+
+export interface GreenInstallDecision {
+  readonly state: GreenInstallState;
+  readonly install: boolean;
+}
+
+export function greenInstallDecision(failures: readonly GreenGateFailure[], blocking: readonly GreenGateFailure[], unreadable: boolean, enforce: boolean): GreenInstallDecision {
+  if (blocking.length > 0) return { state: "blocked", install: false };
+  if (failures.length === 0) return { state: "accepted", install: true };
+  if (!enforce) return { state: "installed-unverified", install: true };
+  return { state: unreadable ? "pending-native" : "blocked", install: false };
 }

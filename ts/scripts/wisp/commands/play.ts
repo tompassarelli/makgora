@@ -28,7 +28,7 @@ import { pollUntil } from "../../hostPoll";
 import { MAP_FOLDER, installLatest, installTryout } from "../mapLibrary";
 import { PLAYABLE_FILE } from "../greenBuilds";
 import { reserveStatus } from "../playtestReserve";
-import type { Command } from "wisp/scripts/wisp/command";
+import { type Command, flagValues } from "wisp/scripts/wisp/command";
 import { PLAYABLE_BUILD } from "../../../src/game/session/currentBuild";
 import type { PlayTools } from "wisp/scripts/platform/play";
 
@@ -255,7 +255,9 @@ export const play: Command = (args) => Effect.gen(function*() {
   }
   if (args.includes("--install-green")) {
     const { installGreen } = yield* Effect.tryPromise({ try: () => import("../installGreen"), catch: (cause) => new PlayProblem({ problem: String(cause) }) });
-    return yield* installGreen(documentsFolder(PLAYTEST_PREFIX), args.includes("--dry-run"), optionalController());
+    const { runNativeSmoke } = yield* Effect.tryPromise({ try: () => import("../nativeSmoke"), catch: (cause) => new PlayProblem({ problem: String(cause) }) });
+    const pair = flagValues(args, "pair")[0];
+    return yield* installGreen(documentsFolder(PLAYTEST_PREFIX), args.includes("--dry-run"), pair === undefined ? undefined : (map: string) => runNativeSmoke(pair, map), optionalController());
   }
   yield* signInTom;
   const current = yield* currentPlaytest();

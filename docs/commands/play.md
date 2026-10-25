@@ -30,11 +30,20 @@
   `candidateMapSha256` and `graphicsLook` (`classic`), under
   `~/.local/state/smashcraft/green-builds/accept/SHA256/LOOK/report.json`
   or one subfolder down, `LOOK/RUN/report.json`; the install reads them all
-  and needs each check passed in exactly one. `bun wisp smoke --native --pair K`
-  smokes every move of the same green candidate one fighter pair per run and
-  writes its shard reports there (smashcraft:docs/commands/accept.md).
-  Missing checks, reports, looks, mismatched bytes and `needs-look` keep the last
-  installed build. Plato reads the candidate and failing check ids/reasons in
+  and needs each check passed in exactly one. `--pair K` names the offline
+  pool pair the install runs `bun wisp smoke --native` on: after building
+  every candidate it would install, it smokes every move of that candidate one
+  fighter pair per run, writes its shard reports there
+  (smashcraft:docs/commands/accept.md) and `smoke.json` beside them, which
+  records per shard whether the run crashed (stopped, not run, or ended without
+  a judged match), its dead bindings and its moves that failed to start.
+  Without `--pair` the install refuses before building.
+  A smoke crash, a dead binding or a move that fails to start, or a missing
+  or mismatched `smoke.json`, always keeps the last installed build, and
+  status.json reads `blocked` with them under `blocking`. With
+  `SMASHCRAFT_GREEN_GATE=enforce`, missing checks, reports, looks, mismatched
+  bytes, `needs-look` and every other failed check keep the last installed
+  build too. Plato reads the candidate and failing check ids/reasons in
   `~/.local/state/smashcraft/green-builds/status.json`.
   A red, pending or missing CI/farm run is never built, and an older green
   commit never replaces a newer installed build. While Warcraft III runs in
@@ -52,8 +61,10 @@
   `bun wisp play --install-green --dry-run` reports the newest green commit and
   proposed install without building, installing or starting the controller helper.
   `SMASHCRAFT_GREEN_GATE=enforce` is the one switch back to the native gate that
-  blocks; unset, the gate is a report (the install proceeds and status.json
-  reads `installed-unverified` with the gate failures).
+  blocks on every failure; unset, only the smoke's crash, dead-binding and
+  move-start failures block, and every other gate failure is a report (the
+  install proceeds and status.json reads `installed-unverified` with the gate
+  failures).
 
 - Standalone play: `bun wisp play --standalone` opens the Wisp browser player
   with a full three-stock Illidan against Wren Expert Rifleman. `--script FILE`
