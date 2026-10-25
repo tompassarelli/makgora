@@ -22,6 +22,7 @@ const SIM = "ts/src/game/sim";
 const LEDGE = `${SIM}/ledge.ts`;
 const PLATFORMS = `${SIM}/platformMoves.ts`;
 const STICK_ZONES = `${SIM}/stickZones.ts`;
+const STICK_DEADZONE_URL = "https://smashboards.com/threads/%E2%80%9Cup-down-zoning%E2%80%9D-your-loose-zone-for-simpler-shield-dropping.441075";
 const AERIALS = [AttackStyle.neutralAir, AttackStyle.forwardAir, AttackStyle.backAir, AttackStyle.upAir, AttackStyle.downAir] as const;
 const ALWAYS_CANCELLED = "every aerial lands with the halved lag, with no input";
 
@@ -74,7 +75,7 @@ export const MOVEMENT_ROWS: readonly LedgerRow[] = [
     id: "aerial-auto-cancel", family: "movement", name: "Aerial auto-cancel windows",
     melee: { value: "per aerial: landing before or after its window takes normal landing lag", source: wiki("Auto-cancel") }, ours: () => "none",
     anchor: { file: `${SIM}/moves.ts`, symbol: "attackLandingLag" },
-    status: { kind: "open", reason: "missing: every aerial takes its landing lag whatever the frame", issue: 292 },
+    status: { kind: "open", reason: "missing: every aerial takes its landing lag whatever the frame", issue: 293 },
   },
   {
     id: "edge-cancel", family: "movement", name: "Edge cancel",
@@ -85,14 +86,14 @@ export const MOVEMENT_ROWS: readonly LedgerRow[] = [
     id: "edge-shield-slide-off", family: "movement", name: "Shield pushed off an edge",
     melee: { undocumented: "no public page states what a shielding fighter does after sliding off", source: wiki("Edge_cancel") }, ours: () => "falls helpless",
     anchor: { file: `${SIM}/step.ts`, symbol: "slideOffEdge" },
-    status: { kind: "open", reason: "ours; needs a public source or Tom's decision", issue: 292 },
+    status: { kind: "open", reason: "ours; no public source gives Melee's value", issue: 293 },
   },
   {
     id: "ledge-catch-box", family: "movement", name: "Ledge catch box",
     melee: { undocumented: "no public page states the catch box in Melee units", source: wiki("Edge") },
     ours: () => `Rifleman ${snapText(Character.rifleman)}; Illidan ${snapText(Character.demonHunter)}; heroes Fox's scaled by body height`,
     anchor: { file: LEDGE, symbol: "ledgeCatchBox" },
-    status: { kind: "open", reason: "boxes said to be Fox's, Falco's and Captain Falcon's; needs a public source", issue: 292 },
+    status: { kind: "open", reason: "boxes said to be Fox's, Falco's and Captain Falcon's; no public source gives Melee's box", issue: 293 },
   },
   {
     id: "ledge-intangibility", family: "movement", name: "Ledge intangibility on the first grab",
@@ -112,9 +113,10 @@ export const MOVEMENT_ROWS: readonly LedgerRow[] = [
   },
   {
     id: "ledge-hang-limit", family: "movement", name: "Ledge hang limit",
-    melee: { undocumented: "SmashWiki's Edge page lists a limit that has not been read into the references", source: wiki("Edge") }, ours: () => LEDGE_HANG_LIMIT_FRAMES,
+    melee: { value: "660 frames under 100%, 480 from 100%", source: wiki("Edge") },
+    ours: () => `${LEDGE_HANG_LIMIT_FRAMES} frames at any percent`,
     anchor: { file: LEDGE, symbol: "LEDGE_HANG_LIMIT_FRAMES" },
-    status: { kind: "open", reason: "ours: a first value for Tom to tune (docs/gameplay-design.md, Ledge hang limit)", issue: 292 },
+    status: { kind: "open", reason: "ours: a first value for Tom to tune (docs/gameplay-design.md, Ledge hang limit), shorter than Melee's 11 and 8 seconds", issue: 293 },
   },
   {
     id: "ledgedash-intangibility", family: "movement", name: "Ledge intangibility after letting go (ledgedash)",
@@ -142,15 +144,15 @@ export const MOVEMENT_ROWS: readonly LedgerRow[] = [
   },
   {
     id: "stick-deadzone", family: "movement", name: "Stick deadzone",
-    melee: { value: 0.2875, source: wiki("Control_stick") }, ours: () => STICK_DEADZONE,
+    melee: { value: 0.2875, source: STICK_DEADZONE_URL }, ours: () => STICK_DEADZONE,
     anchor: { file: STICK_ZONES, symbol: "STICK_DEADZONE" },
-    status: { kind: "open", reason: "0.28 against the commonly quoted 0.2875; needs a public source or Tom's decision", issue: 292 },
+    status: { kind: "open", reason: "ours treats |x| < 0.28 as neutral, Melee |x| < 0.2875; on Melee's 80-step stick both leave steps 0-22 neutral, on our 127-step pad ours makes step 36 live", issue: 293 },
   },
   {
     id: "stick-smash-deadzone", family: "movement", name: "Smash flick deadzone",
     melee: { undocumented: "no public page states the value a flick must start inside", source: wiki("Control_stick") }, ours: () => STICK_SMASH_DEADZONE,
     anchor: { file: STICK_ZONES, symbol: "STICK_SMASH_DEADZONE" },
-    status: { kind: "open", reason: "ours; needs a public source or Tom's decision", issue: 292 },
+    status: { kind: "open", reason: "ours; no public source gives Melee's value", issue: 293 },
   },
   {
     id: "stick-dash", family: "movement", name: "Dash stick threshold",

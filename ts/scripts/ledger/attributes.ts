@@ -48,9 +48,9 @@ const ATTRIBUTES: readonly Attribute[] = [
 const OUTSIDE_SPREAD = "ours, outside Melee's spread; needs Tom's decision";
 
 const STATUS: Readonly<Record<string, Status>> = {
-  "thrall-weight": { kind: "open", reason: OUTSIDE_SPREAD, issue: 292 },
-  "cairne-bloodhoof-weight": { kind: "open", reason: OUTSIDE_SPREAD, issue: 292 },
-  "illidan-short-jump": { kind: "open", reason: OUTSIDE_SPREAD, issue: 292 },
+  "thrall-weight": { kind: "open", reason: OUTSIDE_SPREAD, issue: 293 },
+  "cairne-bloodhoof-weight": { kind: "open", reason: OUTSIDE_SPREAD, issue: 293 },
+  "illidan-short-jump": { kind: "open", reason: OUTSIDE_SPREAD, issue: 293 },
 };
 
 function meleeFighter(name: string): CharacterAttributes {

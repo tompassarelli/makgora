@@ -127,7 +127,7 @@ export const HIT_ROWS: readonly LedgerRow[] = [
     id: "set-knockback", family: "hits", name: "Set knockback",
     melee: { value: MELEE_SET_KNOCKBACK, source: wiki("Knockback") }, ours: setKnockback,
     anchor: { file: KNOCKBACK, symbol: "effectKnockback" },
-    status: { kind: "open", reason: "a move's setKnockback is the knockback itself, so weight, growth and base no longer apply", issue: 292 },
+    status: { kind: "open", reason: "a move's setKnockback is the knockback itself, so weight, growth and base no longer apply", issue: 293 },
   },
   {
     id: "crouch-cancel-knockback", family: "hits", name: "Crouch cancel knockback",
@@ -136,9 +136,8 @@ export const HIT_ROWS: readonly LedgerRow[] = [
   },
   {
     id: "smash-charge-victim-knockback", family: "hits", name: "Knockback on a victim charging a smash",
-    melee: { undocumented: "no public page states a multiplier", source: wiki("Knockback") }, ours: () => SMASH_CHARGE_VICTIM_KNOCKBACK_SCALE,
-    anchor: { file: KNOCKBACK, symbol: "SMASH_CHARGE_VICTIM_KNOCKBACK_SCALE" },
-    status: { kind: "open", reason: "ours; needs a public source or Tom's decision", issue: 292 },
+    melee: { value: 1.2, source: wiki("Knockback") }, ours: () => SMASH_CHARGE_VICTIM_KNOCKBACK_SCALE,
+    anchor: { file: KNOCKBACK, symbol: "SMASH_CHARGE_VICTIM_KNOCKBACK_SCALE" }, status: PARITY,
   },
   {
     id: "hitlag", family: "hits", name: "Hitlag, probed at damage 1-50",
@@ -166,7 +165,7 @@ export const HIT_ROWS: readonly LedgerRow[] = [
     id: "strong-hit-hitlag", family: "hits", name: "Extra hitlag on a strong hit",
     melee: { value: 0, source: wiki("Hitlag") }, ours: () => STRONG_HIT_EXTRA_HITLAG,
     anchor: { file: KNOCKBACK, symbol: "STRONG_HIT_EXTRA_HITLAG" },
-    status: { kind: "open", reason: "ours: both fighters freeze 3 more frames on a strong hit; Melee's strength is per-hitbox values", issue: 292 },
+    status: { kind: "open", reason: "ours: both fighters freeze 3 more frames on a strong hit; Melee's hitlag comes from each hit's damage alone, ⌊d/3 + 3⌋", issue: 293 },
   },
   {
     id: "who-freezes", family: "hits", name: "Who freezes in hitlag, probed headless",
@@ -195,9 +194,14 @@ export const HIT_ROWS: readonly LedgerRow[] = [
   },
   {
     id: "knockback-stacking", family: "hits", name: "Frames before a new launch merges with the old instead of replacing it",
-    melee: { undocumented: "not on SmashWiki", source: wiki("Knockback") }, ours: () => KNOCKBACK_STACKING_FRAMES,
-    anchor: { file: KNOCKBACK, symbol: "KNOCKBACK_STACKING_FRAMES" },
-    status: { kind: "open", reason: "ours; needs a public source or Tom's decision", issue: 292 },
+    melee: { value: 10, source: wiki("Knockback") }, ours: () => KNOCKBACK_STACKING_FRAMES,
+    anchor: { file: KNOCKBACK, symbol: "KNOCKBACK_STACKING_FRAMES" }, status: PARITY,
+  },
+  {
+    id: "knockback-stacking-grounded", family: "hits", name: "A second hit on a fighter it leaves grounded",
+    melee: { value: "replaces the first launch", source: wiki("Knockback") }, ours: () => "merges with the first launch past the stacking frames",
+    anchor: { file: KNOCKBACK, symbol: "installDamageLaunch" },
+    status: { kind: "open", reason: "ours merges a late second launch whether or not it lifts the target; Melee merges only when the target leaves the ground", issue: 293 },
   },
   {
     id: "di-angle", family: "hits", name: "Trajectory DI, most degrees",
@@ -287,6 +291,12 @@ export const HIT_ROWS: readonly LedgerRow[] = [
     melee: { value: "authored per hitbox", source: wiki("Fox_(SSBM)/Neutral_aerial") },
     ours: () => `weak hit ${shortNumber(WEAK_HIT_DAMAGE_SCALE)}× damage, ${shortNumber(WEAK_HIT_KNOCKBACK_SCALE)}× growth and base`,
     anchor: { file: "ts/src/game/sim/strongHits.ts", symbol: "WEAK_HIT_DAMAGE_SCALE" },
-    status: { kind: "open", reason: "ours: one global ratio instead of per-hitbox values", issue: 292 },
+    status: { kind: "open", reason: "ours: one global ratio instead of per-hitbox values", issue: 293 },
+  },
+  {
+    id: "percent-cap", family: "hits", name: "Percent cap",
+    melee: { value: 999, source: wiki("Damage") }, ours: () => "none",
+    anchor: { file: "ts/src/game/sim/contacts.ts", symbol: "resolveDamageContacts" },
+    status: { kind: "open", reason: "missing: percent grows without a ceiling", issue: 293 },
   },
 ];

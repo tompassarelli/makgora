@@ -35,7 +35,7 @@ const DAMAGE = range(1, 50);
 const PERCENT = range(0, 300);
 
 const SHARED_PROFILE = { kind: "open", reason: "one shared profile for every fighter against Melee's per-fighter values", issue: 293 } as const;
-const NO_SOURCE = { kind: "open", reason: "ours; needs a public source or Tom's decision", issue: 292 } as const;
+const NO_SOURCE = { kind: "open", reason: "ours; no public source gives Melee's value", issue: 293 } as const;
 
 const FIGHT_CORE: readonly FightCoreRow[] = readFightCore(ROOT);
 
