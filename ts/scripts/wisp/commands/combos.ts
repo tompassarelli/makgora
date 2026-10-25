@@ -24,6 +24,7 @@ import { ComboObjectivesSchema, objectiveMisses, objectiveName } from "../../com
 import { type LinkCell, type LinkRow, type LinkUnit, linksPage } from "../../comboLinks";
 import { FOX_CASES, FOX_FIXTURE, caseLine, judge } from "../../comboValidation";
 import { foxFixture } from "../../ledger/fixtures/fox";
+import { FIXTURE_FIGHTERS } from "../../ledger/fixtures/fighters";
 
 const moveData = join(import.meta.dir, "../../../../tools/move-data");
 const unitsFile = join(moveData, "combos/units.jsonl");
@@ -337,7 +338,7 @@ export const combos: Command = (args) => Effect.gen(function*() {
   const names = parsed.fighter ?? [];
   const attackers = names.length === 0 ? SELECTABLE_CHARACTERS : names.map(fighterNamed);
   const unknown = names.filter((_, index) => attackers[index] === undefined);
-  if (unknown.length > 0) return yield* new UsageFailure({ problem: `--fighter takes ${SELECTABLE_CHARACTERS.map(fighterName).join(", ")}; not ${unknown.join(", ")}` });
+  if (unknown.length > 0) return yield* new UsageFailure({ problem: `--fighter takes ${[...SELECTABLE_CHARACTERS, ...FIXTURE_FIGHTERS].map(fighterName).join(", ")}; not ${unknown.join(", ")}` });
   const jobs = Number(parsed.jobs ?? "6");
   if (!Number.isInteger(jobs) || jobs < 1) return yield* new UsageFailure({ problem: "--jobs takes a whole number of worker threads" });
   if (parsed.merge !== undefined) return yield* mergeAdvantage(parsed.merge);

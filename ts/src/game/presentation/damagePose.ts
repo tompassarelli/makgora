@@ -5,6 +5,7 @@ import { at } from "wisp/src/runtime/lookup";
 import type { HeroClip } from "../sim/heroes/hero";
 import { DAMAGE_CLIPS } from "./damageClipInfo";
 import { heroLook } from "../roster/looks";
+import { lookCharacter } from "../sim/heroes/registry";
 
 
 export const DamagePose = { none: 0, ground: 1, air: 2, tumble: 3, shield: 4 } as const;
@@ -12,7 +13,7 @@ export type DamagePose = (typeof DamagePose)[keyof typeof DamagePose];
 
 
 export function contactDamageClips(character: number): readonly HeroClip[] | undefined {
-  return heroLook(character)?.damageClips ?? DAMAGE_CLIPS[character];
+  return heroLook(character)?.damageClips ?? DAMAGE_CLIPS[lookCharacter(character)];
 }
 
 

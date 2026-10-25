@@ -10,6 +10,7 @@ export interface Cited<T> { readonly value: T; readonly source: string }
 const ROOT = resolve(import.meta.dir, "../../../..");
 const RECORDS_FILE = "references/melee-frame-data/records.jsonl";
 const LIBMELEE_FILE = "references/melee-frame-data/libmelee.jsonl";
+const PHASES_FILE = "references/melee-frame-data/fightcore-phases.jsonl";
 
 const FrameRecord = Schema.Struct({
   character: Schema.String, category: Schema.String, action: Schema.NullOr(Schema.String),
@@ -19,6 +20,12 @@ const Hitbox = Schema.Struct({ size: Schema.Finite, x: Schema.Finite, y: Schema.
 const HitboxFrame = Schema.Struct({ frame: Schema.Finite, hitboxes: Schema.Array(Hitbox) });
 const MotionRecord = Schema.Struct({ character: Schema.String, category: Schema.String, action: Schema.String, hitbox_frames: Schema.Array(HitboxFrame) });
 export type HitboxFrame = typeof HitboxFrame.Type;
+const PhaseHitbox = Schema.Struct({
+  name: Schema.String, damage: Schema.Finite, angle: Schema.Finite, base_knockback: Schema.Finite, knockback_growth: Schema.Finite,
+  set_knockback: Schema.Finite, effect: Schema.String, weight_independent: Schema.Boolean,
+});
+const Phase = Schema.Struct({ character: Schema.String, move: Schema.String, phase: Schema.Finite, start: Schema.Finite, end: Schema.Finite, hitboxes: Schema.Array(PhaseHitbox) });
+export type Phase = typeof Phase.Type;
 
 const jsonl = <S extends Schema.Top>(file: string, schema: S): S["Type"][] =>
   readFileSync(join(ROOT, file), "utf8").trim().split("\n").map((line) => {
@@ -28,20 +35,28 @@ const jsonl = <S extends Schema.Top>(file: string, schema: S): S["Type"][] =>
   });
 
 const MOVES = [
-  { id: "jab1", fightCore: "Jab 1", category: "attacks", action: "jab1" },
-  { id: "jab2", fightCore: "Jab 2", category: "attacks", action: "jab2" },
-  { id: "rapidJab", fightCore: "Rapid Jabs", category: "attacks", action: "jab3" },
-  { id: "upTilt", fightCore: "Up Tilt", category: "attacks", action: "utilt" },
-  { id: "downTilt", fightCore: "Down Tilt", category: "attacks", action: "dtilt" },
-  { id: "neutralAir", fightCore: "Neutral Air", category: "attacks", action: "nair" },
-  { id: "upAir", fightCore: "Up Air", category: "attacks", action: "uair" },
-  { id: "downAir", fightCore: "Down Air", category: "attacks", action: "dair" },
-  { id: "backAir", fightCore: "Back Air", category: "attacks", action: "bair" },
-  { id: "reflector", fightCore: "Reflector", category: "attacks", action: "down_b" },
-  { id: "aerialReflector", fightCore: "Reflector (Air)", category: "attacks", action: "adown_b" },
-  { id: "grab", fightCore: "Grab", category: "grabs", action: "standing_grab" },
-  { id: "upThrow", fightCore: "Up throw", category: "throws", action: "up_throw" },
-  { id: "downThrow", fightCore: "Down throw", category: "throws", action: "down_throw" },
+  { id: "jab1", fightCore: "Jab 1", category: "attacks", action: "jab1", phases: "jab1" },
+  { id: "jab2", fightCore: "Jab 2", category: "attacks", action: "jab2", phases: "jab2" },
+  { id: "rapidJab", fightCore: "Rapid Jabs", category: "attacks", action: "jab3", phases: "rjab" },
+  { id: "forwardTilt", fightCore: "Forward Tilt", category: "attacks", action: "ftilt", phases: "ftilt" },
+  { id: "upTilt", fightCore: "Up Tilt", category: "attacks", action: "utilt", phases: "utilt" },
+  { id: "downTilt", fightCore: "Down Tilt", category: "attacks", action: "dtilt", phases: "dtilt" },
+  { id: "dashAttack", fightCore: "Dashattack", category: "attacks", action: "dattack", phases: "dattack" },
+  { id: "forwardSmash", fightCore: "Forward Smash", category: "attacks", action: "fsmash", phases: "fsmash" },
+  { id: "upSmash", fightCore: "Up Smash", category: "attacks", action: "usmash", phases: "usmash" },
+  { id: "downSmash", fightCore: "Down Smash", category: "attacks", action: "dsmash", phases: "dsmash" },
+  { id: "neutralAir", fightCore: "Neutral Air", category: "attacks", action: "nair", phases: "nair" },
+  { id: "forwardAir", fightCore: "Forward Air", category: "attacks", action: "fair", phases: "fair" },
+  { id: "backAir", fightCore: "Back Air", category: "attacks", action: "bair", phases: "bair" },
+  { id: "upAir", fightCore: "Up Air", category: "attacks", action: "uair", phases: "uair" },
+  { id: "downAir", fightCore: "Down Air", category: "attacks", action: "dair", phases: "dair" },
+  { id: "reflector", fightCore: "Reflector", category: "attacks", action: "down_b", phases: "downb" },
+  { id: "aerialReflector", fightCore: "Reflector (Air)", category: "attacks", action: "adown_b", phases: "adownb" },
+  { id: "grab", fightCore: "Grab", category: "grabs", action: "standing_grab", phases: "grab" },
+  { id: "forwardThrow", fightCore: "Forward throw", category: "throws", action: "forward_throw", phases: "fthrow" },
+  { id: "backThrow", fightCore: "Back throw", category: "throws", action: "back_throw", phases: "bthrow" },
+  { id: "upThrow", fightCore: "Up throw", category: "throws", action: "up_throw", phases: "uthrow" },
+  { id: "downThrow", fightCore: "Down throw", category: "throws", action: "down_throw", phases: "dthrow" },
 ] as const;
 export type FoxMoveId = (typeof MOVES)[number]["id"];
 
@@ -53,6 +68,7 @@ export interface FoxMove {
   readonly hitboxes: { readonly [F in HitboxField]: Cited<FightCoreRow[F]> };
   readonly frames: Readonly<Record<string, Cited<number | null>>> | null;
   readonly positions: Cited<readonly HitboxFrame[]> | null;
+  readonly phases: Cited<readonly Phase[]>;
 }
 
 export interface FoxFixture {
@@ -60,7 +76,14 @@ export interface FoxFixture {
   readonly moves: readonly FoxMove[];
 }
 
-function move(spec: (typeof MOVES)[number], fightCore: readonly FightCoreRow[], records: readonly (typeof FrameRecord.Type)[], motion: readonly (typeof MotionRecord.Type)[]): FoxMove {
+interface Sources {
+  readonly fightCore: readonly FightCoreRow[];
+  readonly records: readonly (typeof FrameRecord.Type)[];
+  readonly motion: readonly (typeof MotionRecord.Type)[];
+  readonly phases: readonly Phase[];
+}
+
+function move(spec: (typeof MOVES)[number], { fightCore, records, motion, phases }: Sources): FoxMove {
   const row = fightCore.find((candidate) => candidate.character === "Fox" && candidate.move === spec.fightCore);
   if (row === undefined) throw new Error(`fightcore.csv has no Fox "${spec.fightCore}"`);
   const key = `(fox, ${spec.category}, ${spec.action})`;
@@ -71,6 +94,7 @@ function move(spec: (typeof MOVES)[number], fightCore: readonly FightCoreRow[], 
     hitboxes: Object.fromEntries(HITBOX_FIELDS.map((field) => [field, { value: row[field], source: fightCoreSource(row, field) }])) as FoxMove["hitboxes"],
     frames: record === undefined ? null : Object.fromEntries(Object.entries(record.values).map(([field, value]) => [field, { value, source: `${RECORDS_FILE} ${key} values.${field}` }])),
     positions: recorded === undefined ? null : { value: recorded.hitbox_frames, source: `${LIBMELEE_FILE} ${key} hitbox_frames` },
+    phases: { value: phases.filter((phase) => phase.character === "fox" && phase.move === spec.phases), source: `${PHASES_FILE} (fox, ${spec.phases})` },
   };
 }
 
@@ -78,10 +102,10 @@ export function foxFixture(): FoxFixture {
   const fox = readCharacterAttributes(ROOT).find((row) => row.character === "Fox");
   if (fox === undefined) throw new Error("character-attributes.csv has no Fox row");
   const fields = Object.keys(ATTRIBUTE_COLUMNS) as AttributeField[];
-  const fightCore = readFightCore(ROOT), records = jsonl(RECORDS_FILE, FrameRecord), motion = jsonl(LIBMELEE_FILE, MotionRecord);
+  const sources: Sources = { fightCore: readFightCore(ROOT), records: jsonl(RECORDS_FILE, FrameRecord), motion: jsonl(LIBMELEE_FILE, MotionRecord), phases: jsonl(PHASES_FILE, Phase) };
   return {
     attributes: Object.fromEntries(fields.map((field) => [field, { value: fox[field], source: attributeSource("Fox", field) }])) as FoxFixture["attributes"],
-    moves: MOVES.map((spec) => move(spec, fightCore, records, motion)),
+    moves: MOVES.map((spec) => move(spec, sources)),
   };
 }
 
@@ -105,11 +129,12 @@ export function oracleDifferences(fixture: FoxFixture): string[] {
 }
 
 export function fixtureGaps(fixture: FoxFixture): string[] {
-  return fixture.moves.flatMap(({ id, frames, positions, hitboxes: { damage, angle, firstActive, lastActive } }) => [
+  return fixture.moves.flatMap(({ id, frames, positions, phases, hitboxes: { damage, angle, firstActive, lastActive } }) => [
     ...(frames === null ? [`${id}: records.jsonl has no frames or landing lag`] : []),
     ...(positions === null ? [`${id}: libmelee.jsonl has no hitbox positions or radii`] : []),
     ...(damage.value.length > 0 && angle.value.length === 0 ? [`${id}: fightcore.csv gives damage but no angle`] : []),
-    ...(damage.value.length > 1 ? [`${id}: fightcore.csv gives ${damage.value.length} hitboxes but only the move's active frames ${firstActive.value}-${lastActive.value}, not each hitbox's`] : []),
+    ...(phases.value.length === 0 ? [`${id}: fightcore-phases.jsonl has no phases`] : []),
+    ...(damage.value.length > 1 && phases.value.length === 0 ? [`${id}: fightcore.csv gives ${damage.value.length} hitboxes but only the move's active frames ${firstActive.value}-${lastActive.value}, not each hitbox's`] : []),
   ]);
 }
 

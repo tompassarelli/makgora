@@ -28,6 +28,10 @@
   DI-dependent, read, none). It writes
   smashcraft:tools/move-data/links/<fighter>.jsonl and .md
   (smashcraft:docs/design/melee-parity-plan.md, "Combo analyzer", #294).
+  `--fighter fixture:fox` runs Melee's Fox, a check-only fighter built from
+  references/melee-frame-data (smashcraft:ts/scripts/ledger/fixtures/fighters.ts,
+  #296); `bun ts/scripts/ledger/fixtures/fighters.ts` lists what the corpus
+  does not give it. It is absent from the roster and the map.
 
 - Objectives: `bun wisp combos --objectives` checks each declared target in
   smashcraft:tools/move-data/combo-objectives.json (an opener hit at a percent

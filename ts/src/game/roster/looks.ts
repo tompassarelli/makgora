@@ -2,7 +2,7 @@ import { Character } from "../sim/codes";
 import { DREADLORD_GROUND, LICH_GROUND, MOUNTAIN_KING_GROUND, SHADOW_HUNTER_GROUND, WARDEN_GROUND } from "../sim/heroes/groundNormals";
 import { BEASTMASTER_MOVES } from "../sim/heroes/beastmasterMoves";
 import type { HeroLook } from "../presentation/model/look";
-import { type PortraitKind, RENDERED_FIGHTERS, fighterRenderName } from "../sim/heroes/registry";
+import { type PortraitKind, RENDERED_FIGHTERS, fighterRenderName, lookCharacter } from "../sim/heroes/registry";
 import { anubarakLook } from "../presentation/heroes/anubarakLook";
 import { beastmasterLook } from "../presentation/heroes/beastmasterLook";
 import { blademasterLook } from "../presentation/heroes/blademasterLook";
@@ -56,7 +56,7 @@ const LOOKS: { readonly [character: number]: HeroLook | undefined } = {
 };
 
 export function heroLook(character: number): HeroLook | undefined {
-  return LOOKS[character];
+  return LOOKS[lookCharacter(character)];
 }
 
 export function fighterPortrait(character: number, kind: PortraitKind, slot?: number): string {

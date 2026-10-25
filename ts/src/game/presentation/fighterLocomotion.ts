@@ -7,6 +7,7 @@ import { characterClips } from "./fighterClips";
 import * as dh from "./demonHunterAssetInfo";
 import { IllidanLocomotion } from "./illidanMotion";
 import { DRAWN_STRIDES } from "./drawnStrideInfo";
+import { lookCharacter } from "../sim/heroes/registry";
 
 const named = (character: Character, name: string): HeroClip | undefined => {
   const index = originalClipNamed(character, name);
@@ -39,7 +40,7 @@ export function groundLocomotionClip(character: Character, motion: IllidanLocomo
 
 export function groundLocomotionRate(f: Readonly<Fighter>, motion: IllidanLocomotion, clip?: HeroClip): number {
   const gait = motion === IllidanLocomotion.walk ? "walk" : "run";
-  const stride = DRAWN_STRIDES[f.character]?.[gait];
+  const stride = DRAWN_STRIDES[lookCharacter(f.character)]?.[gait];
   if (stride === undefined) throw new Error(`missing drawn stride for ${f.character}/${gait}`);
   const speed = clip === undefined ? stride.speed : stride.alternates?.[clip.index] ?? stride.speed;
   return f32(f32(Math.abs(f.motion.vx) * 60.0) / speed);

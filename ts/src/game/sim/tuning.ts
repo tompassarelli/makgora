@@ -11,7 +11,7 @@ import type { FighterMoves } from "./heroMoves";
 import type { AuthoredSpecial, FighterSpecials } from "./specials/schema";
 import { FIGHTER_ULTIMATES } from "./ultimates";
 import { fighterShield, heroBody } from "./heroes/heroBodies";
-import { heroDefinition } from "./heroes/registry";
+import { type CheckHero, heroDefinition, registerCheckHero } from "./heroes/registry";
 import { originalFighterMoves } from "./originalMoves";
 
 export const WORLD_UNITS_PER_MELEE_UNIT = 6.0;
@@ -405,15 +405,31 @@ function heroGroundRules(character: Character): GroundMovementRules {
   return rules;
 }
 
+export interface CheckFighter {
+  readonly hero: CheckHero;
+  readonly physics: FighterPhysics;
+  readonly ground: GroundMovementRules;
+  readonly look: Character;
+}
+
+const checkMotion: ({ readonly physics: FighterPhysics; readonly ground: GroundMovementRules } | undefined)[] = [];
+
+export function registerCheckFighter({ hero, physics, ground, look }: CheckFighter): Character {
+  const character = registerCheckHero(hero, look);
+  checkMotion[character] = { physics, ground };
+  return character;
+}
+
 export function authoredTuning(character: Character): FighterTuning {
   const hero = heroDefinition(character);
+  const check = checkMotion[character];
   return {
     moves: hero?.moves ?? originalFighterMoves(character),
     specials: hero?.specials,
     ultimate: FIGHTER_ULTIMATES[character],
-    physics: authoredPhysics(character),
+    physics: check?.physics ?? authoredPhysics(character),
     surface: authoredSurfaceRecovery(character),
-    ground: heroGroundRules(character),
+    ground: check?.ground ?? heroGroundRules(character),
     dashGrab: AUTHORED_DASH_GRAB_RULES,
     shield: heroShieldGeometry(character),
     tech: character === Character.demonHunter ? CAPTAIN_FALCON_TECH_TIMING : AUTHORED_TECH_TIMING,

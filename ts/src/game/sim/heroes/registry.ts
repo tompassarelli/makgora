@@ -61,8 +61,32 @@ const BY_CHARACTER: { readonly [character: number]: HeroDefinition | undefined }
   [Character.malfurion]: MALFURION_HERO,
 };
 
+export type CheckHero = Omit<HeroDefinition, "character" | "complete">;
+
+interface CheckHeroEntry {
+  readonly hero: HeroDefinition;
+  readonly look: Character;
+}
+
+const FIRST_CHECK_CHARACTER = 64;
+const CHECK_HEROES: CheckHeroEntry[] = [];
+
+export function registerCheckHero(hero: CheckHero, look: Character): Character {
+  const character = (FIRST_CHECK_CHARACTER + CHECK_HEROES.length) as Character;
+  CHECK_HEROES.push({ hero: { ...hero, character, complete: false }, look });
+  return character;
+}
+
+function checkHero(character: number): CheckHeroEntry | undefined {
+  return character < FIRST_CHECK_CHARACTER ? undefined : CHECK_HEROES[character - FIRST_CHECK_CHARACTER];
+}
+
+export function lookCharacter(character: number): number {
+  return checkHero(character)?.look ?? character;
+}
+
 export function heroDefinition(character: number): HeroDefinition | undefined {
-  return BY_CHARACTER[character];
+  return BY_CHARACTER[character] ?? checkHero(character)?.hero;
 }
 
 
