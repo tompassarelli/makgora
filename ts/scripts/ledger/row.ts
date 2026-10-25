@@ -1,15 +1,18 @@
 export type Value = number | string;
 
-export type Family = "hits" | "defence";
+export type Family = "hits" | "defence" | "movement" | "attributes";
 
 export const FAMILY_TITLES: Readonly<Record<Family, string>> = {
   hits: "Hits, knockback and hitstun",
   defence: "Defence: techs, knockdown, getups, shield, grabs and throws",
+  movement: "Movement, landing, ledges, platforms and the stick",
+  attributes: "Fighter attributes",
 };
 
 export type Melee =
   | { readonly value: Value; readonly source: string }
-  | { readonly undocumented: string; readonly source: string };
+  | { readonly undocumented: string; readonly source: string }
+  | { readonly spread: readonly [number, number]; readonly note: string; readonly source: string };
 
 export type Status =
   | { readonly kind: "parity" }
@@ -24,6 +27,7 @@ export interface Anchor {
 export interface LedgerRow {
   readonly id: string;
   readonly family: Family;
+  readonly block?: string;
   readonly name: string;
   readonly melee: Melee;
   readonly ours: () => Value;
@@ -73,3 +77,11 @@ export function probe<Input>(formula: Formula<Input>): () => Value {
 }
 
 export const range = (from: number, to: number, step = 1): number[] => Array.from({ length: Math.floor((to - from) / step) + 1 }, (_, index) => from + index * step);
+
+export type ReadSource = (file: string) => string | undefined;
+
+export interface FamilyNote {
+  readonly family: Family;
+  readonly lines: readonly string[];
+  readonly problems: readonly string[];
+}

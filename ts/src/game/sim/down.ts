@@ -23,7 +23,7 @@ import { isHeroSpecialAction, landHeroSpecial } from "./specials/engine";
 import { aerialJumps, groundedJumps } from "./itemBuffs";
 
 export const AIR_DODGE_LANDING_LAG = 10;
-const EMPTY_LANDING_LAG = 4;
+export const EMPTY_LANDING_LAG = 4;
 export const GROUND_ROLL_SPEED = 8.0;
 export const GROUND_ROLL_MOVE_START = 4;
 export const GROUND_ROLL_MOVE_END = 19;

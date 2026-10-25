@@ -6,13 +6,13 @@ import { attackStartupFrames, characterAttackActiveFrames, jabChainFrom, nextJab
 
 export const GROUND_ROLL_FRAMES = 31;
 export const GROUND_ROLL_INTANGIBLE_START = 4;
-const GROUND_ROLL_INTANGIBLE_END = 19;
+export const GROUND_ROLL_INTANGIBLE_END = 19;
 export const SPOT_DODGE_FRAMES = 22;
 export const SPOT_DODGE_INTANGIBLE_START = 2;
 export const SPOT_DODGE_INTANGIBLE_END = 15;
 
-const AIR_DODGE_INTANGIBLE_START = 4;
-const AIR_DODGE_INTANGIBLE_END = 29;
+export const AIR_DODGE_INTANGIBLE_START = 4;
+export const AIR_DODGE_INTANGIBLE_END = 29;
 export const DOWN_RECOVERY_INTANGIBLE_FRAMES = 20;
 export const DOWN_ROLL_INTANGIBLE_FRAMES_BACK_UP = 23;
 export const DOWN_ROLL_INTANGIBLE_FRAMES_BACK_DOWN = 20;

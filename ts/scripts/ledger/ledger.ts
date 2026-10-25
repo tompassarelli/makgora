@@ -1,8 +1,10 @@
+import { ATTRIBUTE_ROWS, sharedRecordNote } from "./attributes";
 import { DEFENCE_ROWS } from "./defence";
 import { HIT_ROWS } from "./hits";
-import { type Anchor, FAMILY_TITLES, type Family, type LedgerRow, type Status, type Value, sameValue, showValue } from "./row";
+import { MOVEMENT_ROWS } from "./movement";
+import { type Anchor, FAMILY_TITLES, type Family, type FamilyNote, type LedgerRow, type Melee, type ReadSource, type Status, type Value, sameValue, shortNumber, showValue } from "./row";
 
-export const LEDGER_ROWS: readonly LedgerRow[] = [...HIT_ROWS, ...DEFENCE_ROWS];
+export const LEDGER_ROWS: readonly LedgerRow[] = [...HIT_ROWS, ...DEFENCE_ROWS, ...MOVEMENT_ROWS, ...ATTRIBUTE_ROWS];
 
 export const PAGE_PATH = "docs/design/melee-parity.md";
 
@@ -13,7 +15,7 @@ export interface Evaluated {
   readonly checkLine: number | undefined;
 }
 
-export type ReadSource = (file: string) => string | undefined;
+export const familyNotes = (read: ReadSource): FamilyNote[] => [sharedRecordNote(read)];
 
 const escapeRegExp = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -44,6 +46,13 @@ function rowProblems({ row, ours, line, checkLine }: Evaluated): string[] {
   if (row.checkedBy !== undefined && checkLine === undefined) problems.push(`${row.id}: check ${row.checkedBy.symbol} no longer resolves in ${row.checkedBy.file}`);
   if (row.status.kind === "deviation" && !/^\d{4}-\d{2}-\d{2}$/.test(row.status.decided)) problems.push(`${row.id}: deviation needs Tom's decision date as YYYY-MM-DD`);
   if (ours instanceof Error) return [...problems, `${row.id}: reading our value failed: ${ours.message}`];
+  if ("spread" in row.melee) {
+    const [low, high] = row.melee.spread;
+    const inside = typeof ours === "number" && Math.fround(ours) >= Math.fround(low) && Math.fround(ours) <= Math.fround(high);
+    if (inside && row.status.kind !== "parity") problems.push(`${row.id}: ${row.status.kind === "deviation" ? "deviation" : "open row"} is now inside Melee's spread; make it parity`);
+    if (!inside && row.status.kind === "parity") problems.push(`${row.id}: ours ${showValue(ours)} is outside Melee's spread ${spreadText(row.melee.spread)} with no deviation row`);
+    return problems;
+  }
   if (!("value" in row.melee)) {
     if (row.status.kind === "parity") problems.push(`${row.id}: Melee's value is undocumented, so the row cannot be parity`);
     return problems;
@@ -54,10 +63,12 @@ function rowProblems({ row, ours, line, checkLine }: Evaluated): string[] {
   return problems;
 }
 
-export function ledgerProblems(evaluated: readonly Evaluated[]): string[] {
+export const spreadText = ([low, high]: readonly [number, number]): string => `${shortNumber(low)}–${shortNumber(high)}`;
+
+export function ledgerProblems(evaluated: readonly Evaluated[], notes: readonly FamilyNote[]): string[] {
   const seen = new Set<string>();
   const duplicates = evaluated.filter(({ row }) => (seen.has(row.id) ? true : (seen.add(row.id), false))).map(({ row }) => `${row.id}: duplicate row id`);
-  return [...duplicates, ...evaluated.flatMap(rowProblems)];
+  return [...duplicates, ...evaluated.flatMap(rowProblems), ...notes.flatMap(({ problems }) => problems)];
 }
 
 export const openRows = (evaluated: readonly Evaluated[]): Evaluated[] => evaluated.filter(({ row }) => row.status.kind === "open");
@@ -72,29 +83,39 @@ export function statusText(status: Status): string {
   return `open: ${status.reason}${status.issue === undefined ? "" : ` (#${status.issue})`}`;
 }
 
+const meleeText = (melee: Melee): string =>
+  "value" in melee ? showValue(melee.value) : "spread" in melee ? `${spreadText(melee.spread)}${melee.note}` : `not documented: ${melee.undocumented}`;
+
 const codeLink = (anchor: Anchor, line: number | undefined): string => {
   const file = anchor.file.split("/").at(-1) ?? anchor.file;
   return line === undefined ? `${anchor.symbol} unresolved` : `[${file}:${line}](../../${anchor.file}#L${line}) \`${anchor.symbol}\``;
 };
 
 function rowLine({ row, ours, line, checkLine }: Evaluated): string {
-  const melee = "value" in row.melee ? showValue(row.melee.value) : `not documented: ${row.melee.undocumented}`;
+  const melee = meleeText(row.melee);
   const code = row.checkedBy === undefined ? codeLink(row.anchor, line) : `${codeLink(row.anchor, line)}; checked by ${codeLink(row.checkedBy, checkLine)}`;
   const value = ours instanceof Error ? `error: ${ours.message}` : showValue(ours);
   return `| ${cell(row.name)} \`${row.id}\` | ${cell(value)} | [${cell(melee)}](${row.melee.source}) | ${code} | ${cell(statusText(row.status))} |`;
 }
 
-export function ledgerPage(evaluated: readonly Evaluated[]): string {
+export function ledgerPage(evaluated: readonly Evaluated[], notes: readonly FamilyNote[]): string {
   const count = (kind: Status["kind"]): number => evaluated.filter(({ row }) => row.status.kind === kind).length;
   const families = [...new Set(evaluated.map(({ row }) => row.family))] as Family[];
-  const sections = families.flatMap((family) => [
-    "",
-    `## ${FAMILY_TITLES[family]}`,
-    "",
-    "| Row | Ours | Melee | Code | Status |",
-    "|---|---|---|---|---|",
-    ...evaluated.filter(({ row }) => row.family === family).map(rowLine),
-  ]);
+  const table = (rows: readonly Evaluated[]): string[] => ["", "| Row | Ours | Melee | Code | Status |", "|---|---|---|---|---|", ...rows.map(rowLine)];
+  const sections = families.flatMap((family) => {
+    const rows = evaluated.filter(({ row }) => row.family === family);
+    const blocks = [...new Set(rows.map(({ row }) => row.block))];
+    const note = notes.filter((entry) => entry.family === family).flatMap(({ lines }) => ["", ...lines]);
+    return [
+      "",
+      `## ${FAMILY_TITLES[family]}`,
+      ...note,
+      ...blocks.flatMap((block) => [
+        ...(block === undefined ? [] : ["", `### ${block}`]),
+        ...table(rows.filter(({ row }) => row.block === block)),
+      ]),
+    ];
+  });
   return [
     "# Melee parity",
     "",
