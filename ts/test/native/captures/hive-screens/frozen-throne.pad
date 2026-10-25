@@ -1,11 +1,4 @@
-#! chat -dev quick stage 2 pair lich king / anub'arak
-#! cue 135-148 hit: tint=b
-40 a stick 0.7 0
-40 b stick -0.7 0
-96 a stick 0 0
-100 b stick 0 0
-115 a cstick 1 0
-119 a cstick 0 0
-130 a capture
-137 a capture
-146 a capture
+#! chat -dev quick promo stage 2 pair lich king / anub'arak
+931 a capture
+1175 a capture
+2765 a capture

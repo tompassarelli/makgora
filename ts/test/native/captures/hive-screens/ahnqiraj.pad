@@ -1,11 +1,5 @@
-#! chat -dev quick stage 13 pair cairne bloodhoof / chen stormstout
-#! cue 132-145 hit: tint=b
-40 a stick 0.7 0
-40 b stick -0.7 0
-100 b stick 0 0
-105 a stick 0 0
-115 a cstick 0 -1
-119 a cstick 0 0
-127 a capture
-134 a capture
-143 a capture
+#! chat -dev quick promo stage 13 pair cairne bloodhoof / chen stormstout
+900 a capture
+1276 a capture
+1556 a capture
+2115 a capture
