@@ -37,7 +37,9 @@
   (smashcraft:docs/commands/accept.md) and `smoke.json` beside them, which
   records per shard whether the run crashed (stopped, not run, or ended without
   a judged match), its dead bindings and its moves that failed to start.
-  Without `--pair` the install refuses before building.
+  Without `--pair` the install builds and reads the `smoke.json` an earlier
+  whole `bun wisp smoke --native --pair K` run on this machine wrote for the
+  candidate's bytes; a missing one blocks the install like a smoke crash.
   A smoke crash, a dead binding or a move that fails to start, or a missing
   or mismatched `smoke.json`, always keeps the last installed build, and
   status.json reads `blocked` with them under `blocking`. With

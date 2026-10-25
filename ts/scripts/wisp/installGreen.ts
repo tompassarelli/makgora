@@ -158,7 +158,7 @@ export const installGreen = <E, R, SE extends { readonly message: string }, SR>(
   const installed = installedCommits(documents);
   const step = greenStep(considered, installed, yield* clientHold(documents));
   if (dryRun) {
-    console.log(`Dry run: newest green main ${considered.find(isGreen)?.sha ?? "none"}; ${step.kind === "none" ? "no install (already installed, newer installed, or no green commit)" : step.kind === "hold" ? `would hold ${step.candidate.sha}: ${step.reason}` : `would stage ${step.candidate.sha}, run the move smoke on it and refuse a smoke crash, dead binding or move that fails to start; other gate-* failures ${process.env.SMASHCRAFT_GREEN_GATE === "enforce" ? "block" : "are recorded"}`}`);
+    console.log(`Dry run: newest green main ${considered.find(isGreen)?.sha ?? "none"}; ${step.kind === "none" ? "no install (already installed, newer installed, or no green commit)" : step.kind === "hold" ? `would hold ${step.candidate.sha}: ${step.reason}` : `would stage ${step.candidate.sha}, ${smoke === undefined ? "read its existing smoke.json" : "run the move smoke on it"} and refuse a smoke crash, dead binding or move that fails to start; other gate-* failures ${process.env.SMASHCRAFT_GREEN_GATE === "enforce" ? "block" : "are recorded"}`}`);
     if (step.kind === "install") console.log(`Dry run: would write playtest notes ${checklistPath(buildLabel(`${yield* playName(step.candidate.sha)}.w3x`) ?? step.candidate.sha)} for ${previousInstalled(documents) ?? `${step.candidate.sha.slice(0, 7)}^`}..${step.candidate.sha.slice(0, 7)}`);
     return;
   }
@@ -170,7 +170,6 @@ export const installGreen = <E, R, SE extends { readonly message: string }, SR>(
     return;
   }
   if (step.kind === "hold") return yield* hold(step.candidate.sha, step.reason);
-  if (smoke === undefined) return yield* new PlayProblem({ problem: "play --install-green needs --pair K, the offline pool pair its move smoke runs on" });
 
   const pick = step.candidate;
   const previous = previousInstalled(documents);
@@ -179,7 +178,7 @@ export const installGreen = <E, R, SE extends { readonly message: string }, SR>(
   if (late.kind === "hold") return yield* hold(pick.sha, late.reason);
   if (late.kind === "none") return console.log(`${pick.sha.slice(0, 7)} was installed while it built`);
   console.log(`Controller helper: ${yield* controller}`);
-  yield* smoke(map.source).pipe(Effect.mapError(problem));
+  if (smoke !== undefined) yield* smoke(map.source).pipe(Effect.mapError(problem));
   yield* installAcceptedGreen(documents, map.source, pick.sha, SMASHCRAFT_ACCEPT.checks.filter(({ id }) => id.startsWith("gate-")).map(({ id }) => id));
   console.log(`Installed ${map.title} under Maps/${map.folder}`);
   const label = buildLabel(map.file);
