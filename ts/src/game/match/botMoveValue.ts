@@ -7,7 +7,7 @@ import { AttackStyle } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import { authoredHitRegion, emptyHitRegion, type HitEffect } from "../sim/hitRegions";
 import { attackDurationFramesForGrounding, attackStartupFrames, isSmashAttack } from "../sim/moves";
-import { contactKnockback } from "../sim/knockback";
+import { effectKnockback } from "../sim/knockback";
 import { stageBounds } from "../sim/stageBounds";
 import type { MatchState } from "../lobby/lobbyState";
 import { botChance, botChoice } from "./botRandom";
@@ -106,7 +106,7 @@ export function comebackPressure(own: Readonly<Fighter>, target: Readonly<Fighte
 
 export function estimatedMoveValue(move: MoveEstimate, own: Readonly<Fighter>, target: Readonly<Fighter>, stage: number, success: number, policy: CpuDecisionPolicy, pressure: number): number {
   const afterDamage = f32(target.status.damage + move.damage);
-  const knockback = contactKnockback(afterDamage, move.damage, knockbackWeight(target), move.effect.growth, move.effect.base, 1.0);
+  const knockback = effectKnockback(move.effect, afterDamage, move.damage, knockbackWeight(target));
   const blast = stageBounds(stage).blast;
   const outward = target.motion.x >= 0.0 ? 1 : -1;
   const facing = target.motion.x >= own.motion.x ? 1 : -1;

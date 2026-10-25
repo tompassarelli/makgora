@@ -18,7 +18,10 @@ described here. Fan of Knives now:
 - Strikes on frames 4-7. On the ground only ahead of her: a 24-radius knife
   capsule from 48 to 92 out at 56 up, which a reference body touches exactly
   when its feet are inside Immolate's ground box (0 to 140 ahead, 80 below
-  to 100 above). 6.1% sent sideways, base 21, growth 105.
+  to 100 above). 6.1% pushing the foe back at 15 degrees with a set
+  knockback of 60 at every percent: below the tumble threshold (80), its
+  launch speed stays under the landing-knockdown speed, so the foe never
+  tumbles, is never downed and lands on its feet (Tom, 26 Oct).
 - In the air the strike is below her: a 34-radius capsule from -12 to 12 at
   24 below, Immolate's air box (±70, 170 below to 30 above) by the same
   rule, the same damage spiking downward (base 26, growth 110).

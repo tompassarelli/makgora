@@ -43,6 +43,8 @@ export interface HitEffect {
   carry?: boolean | undefined;
 
   strong?: boolean | undefined;
+
+  setKnockback?: number | undefined;
 }
 
 export interface HitRegion {
@@ -76,6 +78,7 @@ export function copyHitEffect(target: HitEffect, source: Readonly<HitEffect>): v
   target.manaSteal = source.manaSteal;
   target.carry = source.carry;
   target.strong = source.strong;
+  target.setKnockback = source.setKnockback;
 }
 
 export function copyHitRegion(target: HitRegion, source: Readonly<HitRegion>): void {

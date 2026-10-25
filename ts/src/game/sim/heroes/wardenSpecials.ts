@@ -71,7 +71,8 @@ const BLINK = blink(f32(H * f32(3.5)));
 const FAN_FRAMES = 27;
 const FAN_JUMP_CANCEL = 4;
 const FAN_DAMAGE = f32(6.1061435);
-const FAN_GROUND_HIT = { damage: FAN_DAMAGE, growth: 105.0, base: 21.0, launchX: 1.0, launchZ: 0.0, electric: false, element: HitElement.slash };
+const FAN_SET_KNOCKBACK = 60.0;
+const FAN_GROUND_HIT = { damage: FAN_DAMAGE, growth: 0.0, base: 0.0, launchX: f32(0.965925826), launchZ: f32(0.258819045), electric: false, element: HitElement.slash, setKnockback: FAN_SET_KNOCKBACK };
 const FAN_AIR_HIT = { damage: FAN_DAMAGE, growth: 110.0, base: 26.0, launchX: 0.11999999731779099, launchZ: -0.9929999709129333, electric: false, element: HitElement.slash };
 const FAN_OF_KNIVES: AuthoredSpecial = {
   endFrame: FAN_FRAMES, regions: [heroRegion(4, 7, blade(48.0, 56.0, 92.0, 56.0, 24.0), FAN_GROUND_HIT)], strikeStatus: POISON, jumpCancelFrame: FAN_JUMP_CANCEL,
@@ -85,5 +86,5 @@ export const WARDEN_SPECIALS: FighterSpecials = {
   neutral: withExKit({ name: "Shadow Strike", description: "A slow dagger that marks and poisons its target.", ground: SHADOW_STRIKE }, { damage: 1.25 }),
   side: withExKit({ name: "Shadow Pursuit", description: "Appear behind a marked opponent and slash; with no mark nearby, a dashing Pursuit Lunge.", ground: PURSUIT_LUNGE, air: PURSUIT_LUNGE_AIR, marked: { special: SHADOW_PURSUIT, range: PURSUIT_REACH } }, { damage: 1.25 }),
   up: withExKit({ name: "Blink", description: "Teleport in any of eight directions; the landing spot is open to a punish.", ground: BLINK }, { travel: 1.25 }),
-  down: withExKit({ name: "Fan of Knives", description: "A knife burst ahead of her on frames 4-7 that sends foes sideways, marking and poisoning them; jump out of it from frame 4, and in the air it strikes below her, spiking foes, and nearly stops her fall.", ground: FAN_OF_KNIVES, air: FAN_OF_KNIVES_AIR }, { damage: 1.25 }),
+  down: withExKit({ name: "Fan of Knives", description: "A knife burst ahead of her on frames 4-7 that pushes foes back along a low angle with the same knockback at every percent, never knocking them down, marking and poisoning them; jump out of it from frame 4, and in the air it strikes below her, spiking foes, and nearly stops her fall.", ground: FAN_OF_KNIVES, air: FAN_OF_KNIVES_AIR }, { damage: 1.25 }),
 };

@@ -1,47 +1,42 @@
-# #272: Maiev's Fan of Knives after the swap with Immolate: a front-only burst on frames 4-7 that sends foes sideways,
+# #272: Maiev's Fan of Knives after the swap with Immolate: a front-only burst on frames 4-7 that pushes foes back
+# along a low angle with a set knockback that never knocks them down (Tom, 26 Oct),
 # and a jump cancel from its frame 4; maiev-fan-spike.pad checks the air spike and stall.
 # Warden a against Warden b; syntax and checks: smashcraft:docs/native-bot-session.md.
 #! chat -dev quick hero warden
-# b dashes in, then a dashes to close the gap.
+# b dashes in, then a dashes to about 46 short of b.
 40 b stick -1 0
 43 b stick 0 0
 50 a stick 1 0
 56 a stick 0 0
-# Fan of Knives on the ground with b in front.
-90 a stick 0 -1
-90 a tap X 2
-91 a stick 0 0
-# a turns away from b: the burst misses b behind her.
-200 a stick -0.5 0
-204 a stick 0 0
-240 a stick 0 -1
-240 a tap X 2
-241 a stick 0 0
-# a turns back: from the same spot the burst reaches b in front.
-300 a stick 0.5 0
-304 a stick 0 0
-340 a stick 0 -1
-340 a tap X 2
-341 a stick 0 0
+# a turns away from b: the burst misses b just behind her.
+90 a stick -0.5 0
+94 a stick 0 0
+120 a stick 0 -1
+120 a tap X 2
+121 a stick 0 0
+# a turns back: from the same spot the burst strikes b in front on its frame 4.
+160 a stick 0.5 0
+164 a stick 0 0
+200 a stick 0 -1
+200 a tap X 2
+201 a stick 0 0
 # Fan of Knives in the air, cancelled by a double jump on the first frame it allows (its frame 4 has passed).
 420 a tap B 8
 432 a stick 0 -1
 432 a tap X 2
 433 a stick 0 0
 436 a tap B 2
-# Expected, frame by frame (headless run of this script): b in front is struck on frame 4 and sent sideways; from the
-# same spot b behind is untouched; the jump cancels it in the air.
-#! expect a 90 special 16 form 0 action-frame 1 x 2.880
-#! absent b 90-92 damage
-#! expect b 93 damage 6.106 hitlag 5 hitstun 17
-#! expect b 93 launch up 0 from-air 0 x 7.990 z 0.000
-#! expect a 200 ground action 0 facing -1
-#! expect a 240 special 16 form 0 action-frame 1 x -0.389
-#! absent b 240-266 damage
-#! expect a 300 ground action 0 facing 1
-#! expect a 340 special 16 form 0 action-frame 1 x 2.880
-#! expect b 343 damage 15.212 hitlag 5 hitstun 20
-#! expect b 343 launch up 0 from-air 0 x 9.181 z 0.000
+# Expected, frame by frame (headless run of this script): b behind is untouched; b in front is struck on frame 4,
+# pushed back at a low angle and lands on its feet; the jump cancels it in the air.
+#! expect a 90 ground action 0 facing -1
+#! expect a 120 special 16 form 0 action-frame 1 x -0.389
+#! absent b 120-146 damage
+#! expect a 160 ground action 0 facing 1
+#! expect a 200 special 16 form 0 action-frame 1 x 2.880
+#! absent b 200-202 damage
+#! expect b 203 damage 6.106 hitlag 5 hitstun 24
+#! expect b 203 launch up 1 from-air 0 x 10.432 z 2.795
+#! absent b 203-260 recovery down 1
 #! expect a 432 special 16 form 1 action-frame 1 x 2.880 z 158.700
 #! expect a 436 special 0 form 1 action-frame 0 x 2.880 z 179.676
 #! expect a 436 applied jump 2 double 1

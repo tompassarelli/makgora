@@ -15,8 +15,8 @@ import type { Fighter } from "./fighter";
 import { HitElement, type HitEffect, copyHitEffect, emptyHitEffect } from "./hitRegions";
 import {
   applyDirectionalInfluence,
-  contactKnockback,
   damageLevelForKnockback,
+  effectKnockback,
   hitContextKnockback,
   installDamageLaunch,
   ordinaryHitlagFrames,
@@ -308,7 +308,7 @@ function resolveDamageContacts(world: Roster, slot: number): void {
     }
     if (contact.kind === ContactKind.flinch) flinch ??= index;
     if (contact.kind === ContactKind.launch || contact.kind === ContactKind.throw) {
-      const magnitude = contactKnockback(postHitPercent, damage, knockbackWeight(target), contact.effect.growth, contact.effect.base, 1.0);
+      const magnitude = effectKnockback(contact.effect, postHitPercent, damage, knockbackWeight(target));
       const knockback = contact.kind === ContactKind.throw ? magnitude : hitContextKnockback(magnitude, contact.crouching, contact.smashCharging);
 
       if (knockback > strongest) {

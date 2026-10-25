@@ -59,6 +59,16 @@ export function contactKnockback(postHitPercent: number, hitDamage: number, vict
   return multiplyFloat32(scaledLaunchGrowth(contribution, victimWeight, growthPercent, baseKnockback), roundToFloat32(contextScale));
 }
 
+export interface KnockbackTerms {
+  readonly growth: number;
+  readonly base: number;
+  readonly setKnockback?: number | undefined;
+}
+
+export function effectKnockback(effect: KnockbackTerms, postHitPercent: number, hitDamage: number, victimWeight: number): number {
+  return effect.setKnockback ?? contactKnockback(postHitPercent, hitDamage, victimWeight, effect.growth, effect.base, 1.0);
+}
+
 export function fixedHitKnockback(fixedPower: number, victimWeight: number, growthPercent: number, baseKnockback: number, contextScale: number): number {
   const power = multiplyFloat32(toReal(fixedPower), 10.0);
   const damageGrowth = multiplyFloat32(power, 0.05000000074505806);
