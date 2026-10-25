@@ -222,6 +222,9 @@ hold on that commit:
   every row is parity or a deviation with Tom's decision date.
 - `bun wisp oracle` passes.
 - `bun wisp combos --validate` passes the Fox cases (#297).
+- The FightCore threshold oracle passes (#314): for every move and target
+  fighter, our formula gives FightCore's percent for knockback 80 (tumble, ASDI
+  down), 120 (tumble under crouch cancel), 32 and 48 (Sakurai-angle edges).
 - Parity tapes are 0 divergent in both Lua32 modes.
 
 A later deviation is reverted to Melee's handling by row: the row records
@@ -250,6 +253,13 @@ Built on the existing headless sim and search, not beside them.
   against meleeframedata (#310); a check-only module transcribes Fox's attributes and hitboxes as
   numbers; the sim loads it as a check-only fighter absent from the roster and
   the map.
+- Threshold oracle (#313, #314, #315): FightCore's move pages give each hitbox
+  phase with its frame range, attacker and defender hitlag and shieldstun, and
+  per target fighter the percent where knockback reaches 80, 120, 32 and 48 at
+  each staleness. Intaken for Fox and Falco first, then all 26, they are golden
+  oracles that test weight, integer damage, crouch cancel and the 80 and 32
+  rules end to end; stale rows run through a Melee-only staling path, since
+  Smashcraft has no staling.
 - Validation (#297): at least 8 cited Fox cases, including expected
   non-combos and DI-dependent links, must come out in the right class with
   deviations switched to Melee for the run.
@@ -303,7 +313,7 @@ Running work is absorbed, not restarted:
 1. Clean room: #285, #286.
 2. Ledger: #287, #288, #289, #290; the move-data checks repair #309.
 3. Fixes and decisions: Sakurai angle #291, unknown rows #292, Tom's decisions #293.
-4. Analyzer: link table #294, FightCore reader #310, Fox fixture #295, fixture fighter #296, validation #297, attribution #298, objectives #299.
+4. Analyzer: link table #294, FightCore reader #310, per-phase and threshold intake #313 then #315, threshold oracle #314, Fox fixture #295, fixture fighter #296, validation #297, attribution #298, objectives #299.
 5. Baseline tag #302; combo-ease measure #300 and Tom's pick #301.
 6. Maiev: targets #303, movement #304, aerials #305, ground game and throws #306, edge guard #307, balance field #308.
 
@@ -317,8 +327,10 @@ velocities, air speed, mobility and friction, ground friction, dash and walk,
 weight, shield size, per-aerial landing lag, and ledge and wall jumps. Still
 missing:
 
-- Hitlag multipliers by element and effect: SmashWiki "Hitlag".
-- Hitbox IDs and priorities within a move: SmashWiki's "<fighter>
+- Hitlag multipliers by element and effect: FightCore's move pages give the
+  attacker's and defender's hitlag per phase (#313), from which the
+  multipliers can be checked; SmashWiki "Hitlag" states them.
+- Hitbox priorities within a move (FightCore gives phases, not IDs): SmashWiki's "<fighter>
   (SSBM)/<move>" Hitbox Data tables (seen on "Fox (SSBM)/Neutral aerial") and
   "Priority".
 - Universal engine constants with a public source: knockback stacking under 10
