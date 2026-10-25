@@ -1280,13 +1280,7 @@ Stage 1's two raised decks are pass-through platforms, as in Melee: a fighter
 rises through them from below and lands on top only while descending onto
 them, and Down drops through them. They have no walls or underside, so they
 never stop upward motion, bump a fighter's head, rebound a launch or allow a
-wall or ceiling tech. In Melee a platform is a floor line flagged
-`LINE_FLAG_PLATFORM`:
-`mpCheckFloor` hits a level floor line only while
-the ECB bottom descends, `mpCheckCeiling` scans ceiling-kind lines only, and
-`mpJointUpdateDynamics` disables a platform line that is not floor-kind;
-`mpColl_80044628_Floor` skips the platform being
-dropped through. The main deck's walls and underside are below.
+wall or ceiling tech. The main deck's walls and underside are below.
 
 Tom’s final 14 Oct 2026 rule replaces #103/#392’s climb and descent states.
 Rising through a platform while holding Down past the deadzone, without an
@@ -1333,7 +1327,7 @@ Jaina's wavedash is still faster than her walk when its landing lag ends, so
 hers is the one wavedash-into-shield slide that shortens: 251.1 units over 52
 frames before, 203.4 over 44 now, with the shield rising and dropping on the
 same frames. With the
-air dodge at Melee's 3.1 (2.65 units a frame at landing) a wavedash, whole slide,
+air dodge at 3.1 (2.65 units a frame at landing) a wavedash, whole slide,
 measured in the headless sim:
 
 | Hero (traction, walk) | Wavedash before (3.4 dodge) | Wavedash now | Run brake before | Run brake now |
@@ -1351,7 +1345,7 @@ have cut that to 29-35; the lower traction spread keeps the median near the
 old length for the fast runners while the casters slide much further and
 the heaviest less. smashcraft:ts/src/game/sim/floorFriction.tests.ts
 reproduces Melee's Fox, Marth and Luigi wavedash lengths (31.0, 41.5, 83.8)
-with Melee's dodge, and checks that Jaina slides furthest. The computer's slide predictions
+with a 3.1 dodge, and checks that Jaina slides furthest. The computer's slide predictions
 (smashcraft:ts/src/game/match/botFooting.ts, botCorner.ts) brake landing and
 standing slides by the same doubled rule.
 
@@ -1369,14 +1363,9 @@ unchanged, so a fighter starts moving as on ground but stops late. In the air
 and on ordinary decks the friction is exactly one and the arithmetic is
 unchanged.
 
-Melee multiplies traction by the floor material's friction the same way, in
-a Melee routine and the
-material table a Melee routine: 1.0 for most
-materials (including Melee's water, which only splashes), 0.9 for Great Bay's
-turtle, 0.2 for ice and 0.1 for the UFO. Melee also scales the ground
-acceleration itself, which makes starting on ice sluggish.
-Tom decided, 7 Oct (delegated): shallow water uses 0.5, between the turtle and
-ice, so slides are clearly longer without Icicle Mountain's ice, and only the
+Melee has slippery floors too, such as Icicle Mountain's ice, where a fighter
+slides further and starts sluggishly; its water only splashes.
+Tom decided, 7 Oct (delegated): shallow water uses 0.5, so slides are clearly longer without Icicle Mountain's ice, and only the
 slowing is scaled, so water is slippery, not sticky. The computer players'
 slide prediction (smashcraft:ts/src/game/match/botFooting.ts) uses the same
 friction. smashcraft:ts/src/game/sim/floorFriction.tests.ts compares each
@@ -1384,38 +1373,14 @@ slide on ordinary ground and water with the same fighter and input.
 
 ## Main deck walls and underside
 
-Every stage's main deck has Final Destination's side walls and underside.
-Final Destination is the reference because stage 0 is its layout, one flat
-deck, and stage 1 keeps the same main deck. The lines come from its
-`coll_data` (Melee `MapCollData`, `MapLine`; loaded by
-`mpLibLoad` in Melee) in the owner's Melee
-GrNLa.dat (611125 bytes, SHA-1 fa607d7bb7dd4072d2d3968e1e31fd458bc397f8),
-whose `grGroundParam` scale is 1. The private reader is
-~/.local/share/smashcraft-melee-reference/stage-collision-facts.ts; only the
-numbers below are kept.
-
-Below its floor (ledge vertices at x ±85.5657, y 0) each side is five
-wall lines and a short sloped underside, in Melee units:
-
-| Line | Kind | From | To |
-| --- | --- | --- | --- |
-| 9 | right wall | (85.5657, 0) | (85.5657, -10.5) |
-| 10 | right wall | (85.5657, -10.5) | (65.7993, -20.4538) |
-| 7 | right wall | (65.7993, -20.4538) | (65.8374, -31.3443) |
-| 8 | right wall | (65.8374, -31.3443) | (61.4195, -47.3663) |
-| 6 | right wall | (61.4195, -47.3663) | (53.7736, -54.2584) |
-| 5 | ceiling | (53.7736, -54.2584) | (47.4560, -55.3882) |
-| 4 | ceiling | (47.4560, -55.3882) | (-47.4560, -55.3882) |
-
-Lines 3, 15, 14, 12, 13 and 11 mirror lines 5, 6, 8, 7, 10 and 9 on the left.
-The face kinds are Melee's: line 10 slopes in under the ledge but is a wall,
-so a launch into it can wall tech. smashcraft:ts/src/game/sim/stage.ts keeps
-each side's lines as far from its own ledge as they are from Final
-Destination's, at six world units per Melee unit. Smashcraft's deck is 200 Melee units wide to Final
-Destination's 171.13, so the level underside spans the wider deck between the
-sides: in world units the walls drop straight from each ledge (x ±600) to z -63,
-slope in to x ±481.4 at z -122.7, and meet the underside at z -332.33,
-which spans x ±371.3. The main deck's model is drawn from these lines on
+Every stage's main deck has side walls and an underside, shaped after Final
+Destination's sides as a player sees them: below each ledge the side drops,
+slopes in under the ledge and meets a short sloped underside. Smashcraft's
+geometry is its own, in smashcraft:ts/src/game/sim/stage.ts: in world units
+the walls drop straight from each ledge (x ±600) to z -63, slope in to x ±481.4
+at z -122.7, and meet the underside at z -332.33, which spans x ±371.3. The
+face under the ledge slopes in but is a wall, so a launch into it can wall
+tech. The main deck's model is drawn from these lines on
 every stage: smashcraft:ts/scripts/stageDeck.ts extrudes the walking line,
 walls and underside 60 units to each side of the fighters' plane, and
 smashcraft:tools/stage/package.ts writes it at arena scale, named after its
@@ -1424,36 +1389,24 @@ model is the one drawn from the current lines, that its front faces' outline
 is those lines on both shipped stages, and that its model facts' bounds reach
 each wall and the underside. Stage 1's raised decks keep the scaled slab.
 
-Historical fixture before #339: A fighter meets a wall with its flank: Melee's ECB side touches the wall, and
-a Melee routine keeps an airborne ECB at
-least 2 units a side. Smashcraft fighters use that 2-unit half-width
+Historical fixture before #339: A fighter meets a wall with its flank. Smashcraft fighters use a 2-unit half-width
 (`BODY_HALF_WIDTH`, smashcraft:ts/src/game/sim/surfaces.ts), so a fighter
 stopped against the wall below a ledge stands 12 world units outside it, and
 its ledge catch box (which adds the same half-width) still holds the ledge.
-Undersides and other ceilings stop the fighter's top: Melee's airborne ECB
-top, the highest of the six ECB bones its fighter data lists (ftData x44),
-which falls and jumps load with no pad. In each
-reference model's bind pose (PlFxNr.dat, PlFcNr.dat, PlCaNr.dat, read by
-~/.local/share/smashcraft-melee-reference/ecb-top-facts.ts) times its
-`model_scaling` that is Fox's 11.625 x 0.96 = 11.16 for Archer,
-Falco's 12.5 x 1.1 = 13.75 for Rifleman and Captain Falcon's 19.36 x 0.97 =
-18.78 for Illidan, Melee units (`bodyTop`, smashcraft:ts/src/game/sim/surfaces.ts).
+Undersides and other ceilings stop the fighter's top, Smashcraft's body top of
+11.16 Melee units for Archer, 13.75 for Rifleman and 18.78 for Illidan
+(`bodyTop`, smashcraft:ts/src/game/sim/surfaces.ts).
 The contact, and the ceiling tech or bounce that starts from it, is on the
-ceiling; the fighter stands its top below it. The animation moves Melee's
-bones, so its ECB top changes from frame to frame; Smashcraft keeps the bind
-pose's. Under the main deck's underside the bottom blast zone (-420) leaves
+ceiling; the fighter stands its top below it. Smashcraft keeps this top fixed through animation. Under the main deck's underside the bottom blast zone (-420) leaves
 Archer 20.7 world units and Rifleman 5.2, and Illidan none: his position
-would be past it (#80 lowers it to Final Destination's). A wall moves the fighter but not its own velocity,
-as Melee's airborne collision only moves the position: launch velocity into the wall stops, or a
+would be past it (#80 lowers it). A wall moves the fighter but not its own velocity: launch velocity into the wall stops, or a
 tumbling launch rebounds at 0.8, and a fighter that rises past the wall's top
 carries on over the stage. An underside stops a rise. A fighter that slips past
 a ledge's corner within its half-width of the wall, as when running off the
-ledge, is moved out sideways to its flank, as Melee's ECB slides off the
-corner. A wall tech pushes off along the facing it turns to, away from even a
+ledge, is moved out sideways to its flank. A wall tech pushes off along the facing it turns to, away from even a
 sloped wall; see "Wall and ceiling techs and wall jumps" below.
 
-Ledge actions don't collide with the body; Melee's cliff actions run their own
-collision. Climbs, rolls and ledge attacks pass through
+Ledge actions don't collide with the body. Climbs, rolls and ledge attacks pass through
 it onto the floor. A ledge jump starts beside the wall below the ledge, slides
 up its face and carries its inward speed onto the stage. Wall and ceiling
 contact tests on raised decks use `SOLID_DECK_TEST_STAGE`
@@ -1465,64 +1418,27 @@ each fighter into the side through helper journal rows and techs off it, and
 the oracle's wall/ceiling and ledge rows check where launches meet the side and
 underside, the techs off them and a catch from against the wall.
 
-## Camera limits, off-screen damage and blast zones (Melee reference)
+## Camera limits, off-screen damage and blast zones
 
-Melee gives each stage three nested regions. The numbers below come from the
-owner's Melee files through the private readers
-~/.local/share/smashcraft-melee-reference/blast-zone-facts.ts,
-camera-facts.ts and offscreen-damage-facts.ts. Only the numbers are kept.
-
-**Stage points.** A stage's `map_head` general points set the camera offset (0x94),
-camera range (0x95, 0x96) and dead range (0x97, 0x98). a Melee routine and
-a Melee routine store them relative to the offset, and
-Melee adds it back, so the absolute values are the
-points themselves. In Melee units:
-
-| Stage file | Offset | Camera left/right | Camera top/bottom | Blast left/right | Blast top/bottom |
-| --- | --- | --- | --- | --- | --- |
-| GrNLa.dat (Final Destination, SHA-1 fa607d7b) | (0, 12) | -170 / 170 | 114 / -80 | -246 / 246 | 188 / -140 |
-| GrNBa.dat (Battlefield) | (0, 44) | -200 / 200 | 170 / -59 | -280 / 280 | 250 / -136 |
-| GrSt.dat (Yoshi's Story) | (0, 44) | -180 / 179 | 169 / -71 | -251 / 248 | 240 / -130 |
-| GrOp.dat (Dream Land) | (0, 9) | -165 / 165 | 190 / -81 | -255 / 255 | 250 / -123 |
-| GrIz.dat (Fountain of Dreams) | (0, 40) | -165 / 165 | 150 / -113 | -265 / 265 | 270 / -195 |
-| GrPs.dat (Pokémon Stadium) | none | -181 / 180.25 | 142 / -66 | -230 / 230 | 180 / -111 |
-
-Pokémon Stadium's file has no offset point, so a Melee routine reports
-"use dummy CamRange" and uses its default range (-170, 170, 120, -60); its
-dead range is the points above. Converted the way the main deck's walls are
-(each side keeps its distance from its own ledge, ±85.5657 on Final
-Destination; heights are six world units per Melee unit above the floor),
-Final Destination's camera limits are x ±1106.6, z -480 to 684, and its
-blast zones x ±1562.6, z -840 and 1128.
-
-**KO.** a Melee routine runs after each
-frame's movement: right
-if x > right, left if x < left, top if y > top and the fighter is grounded,
-frozen or launched upward faster than  = 2.4 Melee units/frame,
-bottom if y < bottom. Every comparison is strict.
-
-**Camera.** Melee a Melee routine frames the
-fighters' camera boxes, eases toward that framing and keeps the view inside
-the camera range; smashcraft:docs/melee-camera.md lists its steps, constants
-and where our camera differs.
-
-**Off-screen.** A fighter is off-screen when its camera bone projects outside
-the screen (a Melee routine, Melee;
-a Melee routine). The magnifier then draws
-it at the screen edge along the direction from the screen's centre, clamped
-to ±252.7 × ±162.7 of the 640×480 frame, with an arrow rotated to that
-direction. `Fighter_procAnim` counts frames in
-the magnifier while the fighter's percent is under  = 150 and
-deals  = 1% every  = 60 consecutive frames, resetting
-the count whenever the fighter is back on screen; at 150% or more the count
-neither runs nor resets. Versus matches enable it (training, home-run contest, all-star and
-some events clear it).
+Melee gives each stage three nested regions: the camera range the view stays
+inside, the wider blast zone whose crossing is a KO, and between them the
+off-screen band where a fighter shows in a magnifying bubble at the screen
+edge and slowly takes damage (SmashWiki "Blast zone"). A fighter is KO'd off
+the top only when grounded, frozen or launched upward fast enough. Melee's
+stage coordinates and its off-screen damage rate are not on a public page, so
+Smashcraft's are its own, held in smashcraft:ts/src/game/sim/stageBounds.ts:
+on the flat-deck layouts its camera limits are x ±1106.6, z -480 to 684, and
+its blast zones x ±1562.6, z -840 and 1128 world units. Every KO comparison is
+strict, checked after each frame's movement. The off-screen rule deals 1% every
+60 consecutive frames out of view while the fighter is under 150%, resetting
+whenever it is back in view; at 150% or more the count neither runs nor resets.
+The camera's steps are in smashcraft:docs/melee-camera.md.
 
 Smashcraft stores one **16:9 match view** and each fighter's magnifier timer
 in deterministic snapshots. Its subject extents, eye-distance easing and
-interest rates use the reference values (smashcraft:docs/melee-camera.md). The camera remains a side
+interest rates are in smashcraft:docs/melee-camera.md. The camera remains a side
 view: Warcraft keeps the yaw at 90° and the downward pitch at 10°; the field
-of view eases its half-angle tangent between the cited 30° and 38° endpoints
+of view eases its half-angle tangent between 30° and 38°
 by 10% each frame. This is the projection used by
 smashcraft:ts/src/game/sim/matchCamera.ts, not Melee's rotating 3D camera.
 Local rendering reads that view, adapts it to the monitor's aspect, and never
@@ -1532,8 +1448,7 @@ stage camera limits, counts toward the 60-frame damage rule. Practice disables
 that rule. At 150% the counter is retained, even on returning to view.
 
 The current flat deck and two-bridge layout use Final Destination's bounds;
-Frozen Throne's Battlefield layout uses GrNBa.dat's points, with each side's
-distance from its ±68.4 Melee ledges preserved. In world units its camera is
+Frozen Throne's Battlefield-style layout has its own bounds. In world units its camera is
 x ±1389.6, z -354..1020, and its blast region x ±1869.6, z -816..1500.
 smashcraft:ts/src/game/sim/stageBounds.ts owns these conversions.
 
@@ -1545,8 +1460,8 @@ adaptation. Recovery within 100
 world units of the main deck underside keeps the fighter and nearby underside
 above the HUD; a distant high fighter may then use a bubble. Bubbles project
 the fighter's camera point against the actual local view and place its portrait
-and directional chevron along the ray from the screen centre, using Melee's
-magnifier inset and staying above the HUD. They receive no input focus.
+and directional chevron along the ray from the screen centre, inset from the
+edge and staying above the HUD. They receive no input focus.
 
 In a development build, `-dev camera` starts a one-stock match with the first
 fighter frozen outside the camera limits for three seconds, then its retained
