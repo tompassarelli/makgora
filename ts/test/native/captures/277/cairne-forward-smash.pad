@@ -1,0 +1,74 @@
+# #277: Cairne's forward smash, alternately right and left, twelve times per facing; each swing captures one frame from start+20 to start+31, the follow-through that bobbed before 566f11a64.
+#! chat -dev quick hero cairne bloodhoof
+200 a cstick 1 0
+202 a cstick 0 0
+220 a capture
+300 a cstick -1 0
+302 a cstick 0 0
+320 a capture
+400 a cstick 1 0
+402 a cstick 0 0
+421 a capture
+500 a cstick -1 0
+502 a cstick 0 0
+521 a capture
+600 a cstick 1 0
+602 a cstick 0 0
+622 a capture
+700 a cstick -1 0
+702 a cstick 0 0
+722 a capture
+800 a cstick 1 0
+802 a cstick 0 0
+823 a capture
+900 a cstick -1 0
+902 a cstick 0 0
+923 a capture
+1000 a cstick 1 0
+1002 a cstick 0 0
+1024 a capture
+1100 a cstick -1 0
+1102 a cstick 0 0
+1124 a capture
+1200 a cstick 1 0
+1202 a cstick 0 0
+1225 a capture
+1300 a cstick -1 0
+1302 a cstick 0 0
+1325 a capture
+1400 a cstick 1 0
+1402 a cstick 0 0
+1426 a capture
+1500 a cstick -1 0
+1502 a cstick 0 0
+1526 a capture
+1600 a cstick 1 0
+1602 a cstick 0 0
+1627 a capture
+1700 a cstick -1 0
+1702 a cstick 0 0
+1727 a capture
+1800 a cstick 1 0
+1802 a cstick 0 0
+1828 a capture
+1900 a cstick -1 0
+1902 a cstick 0 0
+1928 a capture
+2000 a cstick 1 0
+2002 a cstick 0 0
+2029 a capture
+2100 a cstick -1 0
+2102 a cstick 0 0
+2129 a capture
+2200 a cstick 1 0
+2202 a cstick 0 0
+2230 a capture
+2300 a cstick -1 0
+2302 a cstick 0 0
+2330 a capture
+2400 a cstick 1 0
+2402 a cstick 0 0
+2431 a capture
+2500 a cstick -1 0
+2502 a cstick 0 0
+2531 a capture

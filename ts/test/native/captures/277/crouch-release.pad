@@ -1,0 +1,50 @@
+# #277: both fighters crouch 40 frames and stand, eight times; each cycle captures one frame from release-1 to release+6, so the strip reads one drawn frame per image.
+#! chat -dev quick hero cairne bloodhoof
+200 a stick 0 -1
+200 b stick 0 -1
+239 a capture
+239 b capture
+240 a stick 0 0
+240 b stick 0 0
+290 a stick 0 -1
+290 b stick 0 -1
+330 a stick 0 0
+330 b stick 0 0
+330 a capture
+330 b capture
+380 a stick 0 -1
+380 b stick 0 -1
+420 a stick 0 0
+420 b stick 0 0
+421 a capture
+421 b capture
+470 a stick 0 -1
+470 b stick 0 -1
+510 a stick 0 0
+510 b stick 0 0
+512 a capture
+512 b capture
+560 a stick 0 -1
+560 b stick 0 -1
+600 a stick 0 0
+600 b stick 0 0
+603 a capture
+603 b capture
+650 a stick 0 -1
+650 b stick 0 -1
+690 a stick 0 0
+690 b stick 0 0
+694 a capture
+694 b capture
+740 a stick 0 -1
+740 b stick 0 -1
+780 a stick 0 0
+780 b stick 0 0
+785 a capture
+785 b capture
+830 a stick 0 -1
+830 b stick 0 -1
+870 a stick 0 0
+870 b stick 0 0
+876 a capture
+876 b capture

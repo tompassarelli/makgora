@@ -1,0 +1,20 @@
+# #277: a real jab trade; each fighter's hitlag frames 150-154 are captured, where the victim's shake must still show.
+#! chat -dev pain middle large cairne bloodhoof
+146 a tap A 2
+146 b tap A 2
+149 a capture
+149 b capture
+150 a capture
+150 b capture
+151 a capture
+151 b capture
+152 a capture
+152 b capture
+153 a capture
+153 b capture
+154 a capture
+154 b capture
+155 a capture
+155 b capture
+159 a capture
+159 b capture

@@ -198,6 +198,12 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   through the Main key it had just written, so each frame's height mirrored the last and his
   forward smash bobbed 19.5 units (#277); every other fighter stays under 0.8. `BOB_EXEMPTIONS`
   names a clip still bobbing from a tracked cause, and the check fails once it stops.
+- Drawn path (from ts/): `bun scripts/wisp/drawnPath.ts PAD FRAMES` plays a pad script headless
+  through the predicted pool presentation and prints, per frame and fighter, the clip, its time,
+  the placed x/z and the drawn x/z (placement plus the clip's bone centroid sampled from the
+  model). It flags and exits nonzero when a drawn axis turns back twice in a row by more than
+  2 units outside hitlag, or a non-looping clip's time stops rising before its end. The #277
+  pads in smashcraft:ts/test/native/captures/277/ run through it unchanged.
 
 - White body flashes (from the repository root):
   `bun tools/animations/white-flash-models.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--character ID]`
