@@ -58,9 +58,9 @@ export const THRALL_MOVES: FighterMoves = {
   },
   throws: {
     [GrabAction.pummel]: { contactFrame: 5, totalFrames: 12, effect: thrallHit(3.072000026702881, 90, 0.0, 0.0) },
-    [GrabAction.throwForward]: { contactFrame: 14, totalFrames: 34, effect: thrallHit(8.192000389099121, 35, 88.73999786376953, 28.0) },
-    [GrabAction.throwBack]: { contactFrame: 18, totalFrames: 40, effect: thrallHit(10.239999771118164, 40, 103.52999877929688, 30.0, true) },
+    [GrabAction.throwForward]: { contactFrame: 14, totalFrames: 34, effect: thrallHit(8.192000389099121, 35, 40.0, 67.0) },
+    [GrabAction.throwBack]: { contactFrame: 18, totalFrames: 40, effect: thrallHit(10.239999771118164, 40, 30.0, 74.0, true) },
     [GrabAction.throwUp]: { contactFrame: 15, totalFrames: 28, effect: thrallHit(7.168000221252441, 75, 83.80999755859375, 60.0, true) },
-    [GrabAction.throwDown]: { contactFrame: 19, totalFrames: 42, effect: thrallHit(6.144000053405762, 70, 39.439998626708984, 75.0) },
+    [GrabAction.throwDown]: { contactFrame: 19, totalFrames: 42, effect: thrallHit(6.144000053405762, 70, 28.0, 104.0) },
   },
 };

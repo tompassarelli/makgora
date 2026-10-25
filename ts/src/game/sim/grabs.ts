@@ -70,11 +70,12 @@ function escapeGrab(world: Roster, ownerSlot: number, targetSlot: number): void 
 export function authoredThrowEffect(action: GrabAction, moves?: FighterMoves): Readonly<HitEffect> {
   const up = action === GrabAction.throwUp;
   const down = action === GrabAction.throwDown;
+  const back = action === GrabAction.throwBack;
   throwHit.damage = up ? 6.0 : down ? 5.0 : 7.0;
 
 
-  throwHit.growth = down ? 40.0 : up ? 55.0 : 70.0;
-  throwHit.base = down ? 75.0 : 45.0;
+  throwHit.growth = down ? 28.5 : up ? 55.0 : back ? 20.5 : 31.5;
+  throwHit.base = down ? 104.0 : up ? 45.0 : back ? 89.0 : 84.0;
   throwHit.launchX = up ? 0.17364799976348877 : down ? 0.3420201241970062 : 0.8660249710083008;
   throwHit.launchZ = up ? 0.9848080277442932 : down ? 0.9396926164627075 : 0.5;
   throwHit.element = undefined;

@@ -99,8 +99,8 @@ const bladestorm: AuthoredMove = {
   landingHit: { firstFrame: BLADESTORM_TOTAL, totalFrames: BLADESTORM_TOTAL + 12 },
 };
 
-function authoredThrow(releaseFrame: number, recovery: number, damage: number, kind: Parameters<typeof hit>[1], angle: Angle, facing = 1.0): AuthoredThrow {
-  return { contactFrame: releaseFrame, totalFrames: releaseFrame + recovery, effect: hit(damage, kind, angle, facing) };
+function authoredThrow(releaseFrame: number, recovery: number, effect: Readonly<HitEffect>): AuthoredThrow {
+  return { contactFrame: releaseFrame, totalFrames: releaseFrame + recovery, effect };
 }
 
 
@@ -296,10 +296,10 @@ export const BLADEMASTER_MOVES: FighterMoves = {
   },
   throws: {
     [GrabAction.pummel]: { contactFrame: 5, totalFrames: 12, effect: { damage: 2.865000009536743, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } },
-    [GrabAction.throwForward]: authoredThrow(12, 18, 5.589328765869141, "EDGE", 35),
-    [GrabAction.throwBack]: authoredThrow(15, 22, 6.196170330047607, "EDGE", 40, -1.0),
-    [GrabAction.throwUp]: authoredThrow(13, 10, 4.647127628326416, "JUGGLE", 85),
-    [GrabAction.throwDown]: authoredThrow(16, 20, 3.992377519607544, "CHASE", 25),
+    [GrabAction.throwForward]: authoredThrow(12, 18, { ...hit(5.589328765869141, "EDGE", 35), growth: 49.0, base: 61.0 }),
+    [GrabAction.throwBack]: authoredThrow(15, 22, { ...hit(6.196170330047607, "EDGE", 40, -1.0), growth: 31.5, base: 66.0 }),
+    [GrabAction.throwUp]: authoredThrow(13, 10, hit(4.647127628326416, "JUGGLE", 85)),
+    [GrabAction.throwDown]: authoredThrow(16, 20, { ...hit(3.992377519607544, "CHASE", 25), growth: 31.0, base: 104.0 }),
   },
   dashAttack: AttackStyle.dashAttack,
   hurtboxes: BODY,

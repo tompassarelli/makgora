@@ -69,8 +69,8 @@ function spin(first: number, active: number, effect: Readonly<HitEffect>): reado
   return regions;
 }
 
-function throwMove(release: number, recovery: number, damage: number, kind: Parameters<typeof wardenHit>[1], angle: Angle, facing = 1.0) {
-  return { contactFrame: release, totalFrames: release + recovery, effect: wardenHit(damage, kind, angle, facing) };
+function throwMove(release: number, recovery: number, effect: Readonly<HitEffect>) {
+  return { contactFrame: release, totalFrames: release + recovery, effect };
 }
 
 const FORWARD_AIR = wardenHit(7.6326799392700195, "EDGE", 40);
@@ -231,9 +231,9 @@ export const WARDEN_MOVES: FighterMoves = {
   hurtboxes: wardenHurtboxes(),
   throws: {
     [GrabAction.pummel]: { contactFrame: 5, totalFrames: 12, effect: { damage: 3.0, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } },
-    [GrabAction.throwForward]: throwMove(10, 18, 4.579607963562012, "EDGE", 35),
-    [GrabAction.throwBack]: throwMove(14, 21, 5.3428754806518555, "EDGE", 40, -1.0),
-    [GrabAction.throwUp]: throwMove(11, 9, 3.8163399696350098, "JUGGLE", 85),
-    [GrabAction.throwDown]: throwMove(14, 20, 3.053071975708008, "CHASE", 25),
+    [GrabAction.throwForward]: throwMove(10, 18, { ...wardenHit(4.579607963562012, "EDGE", 35), growth: 56.0, base: 61.0 }),
+    [GrabAction.throwBack]: throwMove(14, 21, { ...wardenHit(5.3428754806518555, "EDGE", 40, -1.0), growth: 36.0, base: 66.0 }),
+    [GrabAction.throwUp]: throwMove(11, 9, wardenHit(3.8163399696350098, "JUGGLE", 85)),
+    [GrabAction.throwDown]: throwMove(14, 20, { ...wardenHit(3.053071975708008, "CHASE", 25), growth: 35.0, base: 104.0 }),
   },
 };
