@@ -32,7 +32,10 @@ export function servicePlaytestRequest(s: ShellState): void {
   if (state.request === undefined || state.sent || s.game.phase !== Phase.characterMenu) return;
   if (++state.looked < LOOK_FRAMES) return;
   state.looked = 0;
-  if (readChunk(PLAYTEST_GO_FILE) === undefined) return;
+  if (!state.go) {
+    state.go = readChunk(PLAYTEST_GO_FILE) !== undefined;
+    return;
+  }
   state.sent = true;
   BlzSendSyncData(PLAYTEST_PREFIX, state.request);
 }
