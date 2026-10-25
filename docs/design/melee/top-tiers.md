@@ -513,3 +513,114 @@ Source: `references/melee-frame-data/character-attributes.csv`, columns `Jump V 
 | Measure | Fighters | Top eight: median (range) | Other eighteen: median (range) | Fox | Falco | Marth | Sheik | Jigglypuff | Captain Falcon | Peach | Ice Climbers |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Aerial jump height × aerial jumps | 20 | 35.3 (25.2–41.8) | 26.7 (20.9–32.7) | 40.2 (#2) | 41.8 (#1) | 25.2 (#15) | 38.0 (#3) | – | 28.6 (#10) | – | 32.5 (#5) |
+
+## What sets each one apart
+
+Each fighter's defining moves and attributes, with the measure from the tables above that shows it and its rank among the fighters with a value. The rationale is our summary of the cited public pages; the numbers come from the generator, never from the prose.
+
+### Fox
+
+Fox is ranked best in the game because every part of his kit is fast: he leaves the ground, attacks and moves sooner than anyone, so he wins most exchanges on speed alone.
+
+- **Jump squat** (jump squat 3, rank 1= of 26): the shortest wait before leaving the ground makes short hops, wavedashes and jump-cancelled moves the quickest in the cast.
+- **Shine (Reflector)** (down special startup 1, rank 1= of 26): an instant hit that is jump-cancellable, used out of shield, in combos and as the core of his pressure on shield.
+- **Fast-fall speed** (fast-fall speed 3.40, rank 3 of 26): dropping quickly makes his aerials safe on shield and lets him land and act again before the opponent can punish.
+- **Run speed** (run speed 2.20, rank 2 of 26): he covers the stage faster than almost anyone, which lets him whiff-punish and chase from far away.
+- **Up smash** (up smash knockback at 100% 235.2, rank 2 of 26): a fast, strong vertical finisher he can use from a run, which turns many combos into kills.
+
+Rationale: [SmashWiki, Fox (SSBM)](https://www.ssbwiki.com/Fox_(SSBM)), [SmashWiki, Tier list (SSBM)](https://www.ssbwiki.com/Tier_list_(SSBM)).
+
+### Falco
+
+Falco shares Fox's speed on the ground but trades some mobility for a stronger ranged and close-range game, built on lasers and pressure that is hard to escape.
+
+- **Fall speed** (fall speed 3.10, rank 1 of 26): the fastest fall in the game shortens his time in the air, so his pressure is tight and his aerials come out low and safe.
+- **Blaster** (neutral special active span 100, rank 1= of 25): lasers that stop opponents in place let him control space from range and start his approach on his terms.
+- **Shine (Reflector)** (down special startup 1, rank 1= of 26): an instant spike-like reflector that starts combos and pressure, and can send fighters off stage at a low angle.
+- **Down tilt** (down tilt knockback at 100% 195.8, rank 1 of 26): a quick grounded hit with strong upward knockback that leads straight into his aerial follow-ups.
+- **Aerial jump** (recovery distance from aerial jumps 41.8, rank 1 of 20): a very high second jump helps make up for a short side recovery and gives him vertical reach in combos.
+
+Rationale: [SmashWiki, Falco (SSBM)](https://www.ssbwiki.com/Falco_(SSBM)), [SmashWiki, Tier list (SSBM)](https://www.ssbwiki.com/Tier_list_(SSBM)).
+
+### Marth
+
+Marth controls space with a long, disjointed sword whose tip deals far more damage, and turns that reach into chain grabs and edge guards.
+
+- **Forward air** (forward air startup 4, rank 1= of 26): a fast wide arc that walls opponents out, combos into itself and is his main tool for spacing and edge guarding.
+- **Low landing lag** (forward air L-cancelled landing lag 7, rank 1= of 26): his aerials end quickly on landing, so swings that miss or hit shield are hard to punish.
+- **Forward smash** (forward smash startup 10, rank 1= of 25): a fast, long-reaching finisher whose tipped hit kills at modest damage.
+- **Grab range** (grab range 18.7, rank 6 of 26): a long grab feeds his chain grabs and throw combos on the fast-falling space animals.
+- **Run speed** (run speed 1.80, rank 3= of 26): good ground speed and a long dash dance make his spacing traps fast to reset.
+
+Rationale: [SmashWiki, Marth (SSBM)](https://www.ssbwiki.com/Marth_(SSBM)), [SmashWiki, Tier list (SSBM)](https://www.ssbwiki.com/Tier_list_(SSBM)).
+
+### Sheik
+
+Sheik pairs very fast, safe normal attacks with a projectile and a throw that sets up tech chases, so she punishes reliably and wins neutral without big risk.
+
+- **Needle Storm** (neutral special startup 4, rank 1 of 25): quick needles she can store and release give her a ranged tool that forces opponents to approach.
+- **Forward tilt** (forward tilt startup 5, rank 3= of 26): a fast upward kick that chains into itself on many fighters at low damage.
+- **Up tilt** (up tilt end lag after the last active frame 1, rank 1 of 25): it lingers and ends almost at once, so it is a safe anti-air and combo link.
+- **Neutral air** (neutral air startup 3, rank 1= of 26): a fast lingering kick that beats approaches and works as her out-of-shield answer.
+- **Jump squat** (jump squat 3, rank 1= of 26): among the quickest jumps in the game, which speeds up every aerial and out-of-shield option.
+
+Rationale: [SmashWiki, Sheik (SSBM)](https://www.ssbwiki.com/Sheik_(SSBM)), [SmashWiki, Tier list (SSBM)](https://www.ssbwiki.com/Tier_list_(SSBM)).
+
+### Jigglypuff
+
+Jigglypuff wins in the air: she moves faster horizontally there than anyone, has several jumps, and can end a stock from one opening with Rest.
+
+- **Air speed** (air speed 1.35, rank 1 of 26): the best air control in the game lets her drift in and out of range, the basis of her spacing with back air.
+- **Rest** (down special startup 1, rank 1= of 26): an instant, very strong hit that kills at low damage when it lands, at the cost of a long sleep when it misses.
+- **Fall speed** (fall speed 1.30, rank 26 of 26): the slowest fall makes her easy to juggle but lets her stay off stage and edge guard longer than anyone.
+- **Light weight** (weight 60, rank 24= of 26): she is among the lightest, the price of her air game: one clean hit can end her stock early.
+
+Rationale: [SmashWiki, Jigglypuff (SSBM)](https://www.ssbwiki.com/Jigglypuff_(SSBM)), [SmashWiki, Tier list (SSBM)](https://www.ssbwiki.com/Tier_list_(SSBM)).
+
+### Captain Falcon
+
+Captain Falcon is the fastest runner in the game with heavy, falling-fast combos, so one opening often becomes a long combo that ends in a powerful knee.
+
+- **Run speed** (run speed 2.30, rank 1 of 26): the fastest run in the game lets him punish from across the stage and reset his approach at will.
+- **Initial dash** (initial dash speed 2.00, rank 1 of 26): the fastest dash start gives him the strongest dash dance for baiting and whiff-punishing.
+- **Fast-fall speed** (fast-fall speed 3.50, rank 1= of 26): a heavy fast-faller lands his aerials quickly and keeps his combos tight.
+- **Knee Smash (forward air)** (forward air knockback at 100% 207.2, rank 3 of 26): a sweet-spot hit with very high knockback that kills early and finishes his combos.
+- **Up air** (up air L-cancelled landing lag 7, rank 1= of 26): a quick juggle with little landing lag that strings into itself and into the knee.
+
+Rationale: [SmashWiki, Captain Falcon (SSBM)](https://www.ssbwiki.com/Captain_Falcon_(SSBM)), [SmashWiki, Tier list (SSBM)](https://www.ssbwiki.com/Tier_list_(SSBM)).
+
+### Peach
+
+Peach floats to throw aerials just above the ground with almost no landing lag, and backs it up with a strong down smash and turnips from range.
+
+- **Down air** (down air end lag after the last active frame 2, rank 1 of 26): a multi-hit drill that ends quickly, so she can float it on shield and follow up.
+- **Low landing lag** (back air L-cancelled landing lag 7, rank 1= of 26): her aerials land with little lag, and floating lets her use them low without landing at all.
+- **Neutral air** (neutral air startup 3, rank 1= of 26): a fast, lasting hit that is her quickest answer close in and out of shield.
+- **Down smash** (down smash active span 22, rank 1= of 26): a long multi-hit spin that can deal heavy damage in one hit and covers both sides.
+- **Dash grab** (dash grab startup 6, rank 1 of 26): a fast running grab that leads into her throws and tech chases.
+
+Rationale: [SmashWiki, Peach (SSBM)](https://www.ssbwiki.com/Peach_(SSBM)), [SmashWiki, Tier list (SSBM)](https://www.ssbwiki.com/Tier_list_(SSBM)).
+
+### Ice Climbers
+
+The Ice Climbers fight as a pair: Nana copies Popo with a delay, so together they hit twice, and their grab game turns one grab into a kill.
+
+- **Jump squat** (jump squat 3, rank 1= of 26): a short jump wait speeds up their wavedashes and aerials and the way they move the pair as one.
+- **Jab** (jab 1 end lag after the last active frame 8, rank 1 of 26): a jab that ends almost at once, which keeps the pair's pressure on shield nearly continuous.
+- **Dash grab** (dash grab startup 7, rank 2 of 26): a quick grab feeds their chain grabs, where the two climbers trade throws and hits until the opponent can kill.
+- **Back air** (back air knockback at 0% 62.7, rank 2 of 26): a strong aerial even at low damage, and doubled by Nana, so it controls space well.
+- **Down air** (down air startup 3, rank 1 of 26): a fast multi-hit aerial they use to pressure low and to cover landings.
+
+Rationale: [SmashWiki, Ice Climbers (SSBM)](https://www.ssbwiki.com/Ice_Climbers_(SSBM)), [SmashWiki, Wobbling](https://www.ssbwiki.com/Wobbling), [SmashWiki, Tier list (SSBM)](https://www.ssbwiki.com/Tier_list_(SSBM)).
+
+## Shared patterns
+
+Traits most of the eight share, each with its measure, as candidate guidance for our fighters' budgets. A count says how many of the eight sit on the same side of the other eighteen's median as the top eight's median.
+
+- **Fast fall** (fall speed: top eight median 2.17, other eighteen median 1.86; 5 of the 8 above it): most of the eight fall faster than the rest, so their aerials land and act sooner; give pressure fighters a high fall speed.
+- **Fast-fall speed** (fast-fall speed: top eight median 2.75, other eighteen median 2.30; 5 of the 8 above it): a fast fast-fall makes aerials safe on shield; keep it high on fighters meant to pressure.
+- **Fast down air** (down air startup: top eight median 6, other eighteen median 14; 6 of the 8 below it): the eight's down airs come out far sooner than the rest's, so they work as combo and pressure tools rather than slow spikes; budget at least one fast low-hitting aerial.
+- **Dash start** (initial dash speed: top eight median 1.60, other eighteen median 1.40; 5 of the 8 above it): a fast initial dash powers dash dancing and whiff punishes; pair it with a fast run.
+- **Light weight** (weight: top eight median 88, other eighteen median 97; 7 of the 8 below it): the eight weigh less than the rest, so speed is paid for with early deaths; tie a light weight to a fast kit.
+- **Fast down special** (down special startup: top eight median 10, other eighteen median 16; 5 of the 8 below it): several of the eight have a near-instant down special for escapes, combos or kills; give each fighter one fast panic or combo tool.
+- **Fast forward air** (forward air startup: top eight median 7, other eighteen median 10; 5 of the 8 below it): a quick forward air is the eight's common spacing aerial; budget it faster than the cast median.

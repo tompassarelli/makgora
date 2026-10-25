@@ -1,0 +1,163 @@
+export interface MeasureKey { readonly section: string; readonly measure: string; readonly row?: string }
+export interface Trait { readonly name: string; readonly measure: MeasureKey; readonly why: string }
+export interface Source { readonly title: string; readonly url: string }
+export interface FighterTaste { readonly id: string; readonly summary: string; readonly traits: readonly Trait[]; readonly sources: readonly Source[] }
+export interface Pattern { readonly name: string; readonly measure: MeasureKey; readonly guidance: string }
+
+const wiki = (page: string, title: string): Source => ({ title: `SmashWiki, ${title}`, url: `https://www.ssbwiki.com/${page}` });
+const TIER_LIST = wiki("Tier_list_(SSBM)", "Tier list (SSBM)");
+const attributes = (measure: string): MeasureKey => ({ section: "Attributes", measure });
+
+export const TASTE: readonly FighterTaste[] = [
+  {
+    id: "fox",
+    summary: "Fox is ranked best in the game because every part of his kit is fast: he leaves the ground, attacks and moves sooner than anyone, so he wins most exchanges on speed alone.",
+    traits: [
+      { name: "Jump squat", measure: attributes("Jump squat"),
+        why: "the shortest wait before leaving the ground makes short hops, wavedashes and jump-cancelled moves the quickest in the cast." },
+      { name: "Shine (Reflector)", measure: { section: "Specials", measure: "Startup", row: "Down special" },
+        why: "an instant hit that is jump-cancellable, used out of shield, in combos and as the core of his pressure on shield." },
+      { name: "Fast-fall speed", measure: attributes("Fast-fall speed"),
+        why: "dropping quickly makes his aerials safe on shield and lets him land and act again before the opponent can punish." },
+      { name: "Run speed", measure: attributes("Run speed"),
+        why: "he covers the stage faster than almost anyone, which lets him whiff-punish and chase from far away." },
+      { name: "Up smash", measure: { section: "Smashes", measure: "Knockback at 100%", row: "Up smash" },
+        why: "a fast, strong vertical finisher he can use from a run, which turns many combos into kills." },
+    ],
+    sources: [wiki("Fox_(SSBM)", "Fox (SSBM)"), TIER_LIST],
+  },
+  {
+    id: "falco",
+    summary: "Falco shares Fox's speed on the ground but trades some mobility for a stronger ranged and close-range game, built on lasers and pressure that is hard to escape.",
+    traits: [
+      { name: "Fall speed", measure: attributes("Fall speed"),
+        why: "the fastest fall in the game shortens his time in the air, so his pressure is tight and his aerials come out low and safe." },
+      { name: "Blaster", measure: { section: "Specials", measure: "Active span", row: "Neutral special" },
+        why: "lasers that stop opponents in place let him control space from range and start his approach on his terms." },
+      { name: "Shine (Reflector)", measure: { section: "Specials", measure: "Startup", row: "Down special" },
+        why: "an instant spike-like reflector that starts combos and pressure, and can send fighters off stage at a low angle." },
+      { name: "Down tilt", measure: { section: "Tilts", measure: "Knockback at 100%", row: "Down tilt" },
+        why: "a quick grounded hit with strong upward knockback that leads straight into his aerial follow-ups." },
+      { name: "Aerial jump", measure: attributes("Recovery distance from aerial jumps"),
+        why: "a very high second jump helps make up for a short side recovery and gives him vertical reach in combos." },
+    ],
+    sources: [wiki("Falco_(SSBM)", "Falco (SSBM)"), TIER_LIST],
+  },
+  {
+    id: "marth",
+    summary: "Marth controls space with a long, disjointed sword whose tip deals far more damage, and turns that reach into chain grabs and edge guards.",
+    traits: [
+      { name: "Forward air", measure: { section: "Aerials", measure: "Startup", row: "Forward air" },
+        why: "a fast wide arc that walls opponents out, combos into itself and is his main tool for spacing and edge guarding." },
+      { name: "Low landing lag", measure: { section: "Aerials", measure: "L-cancelled landing lag", row: "Forward air" },
+        why: "his aerials end quickly on landing, so swings that miss or hit shield are hard to punish." },
+      { name: "Forward smash", measure: { section: "Smashes", measure: "Startup", row: "Forward smash" },
+        why: "a fast, long-reaching finisher whose tipped hit kills at modest damage." },
+      { name: "Grab range", measure: attributes("Grab range"),
+        why: "a long grab feeds his chain grabs and throw combos on the fast-falling space animals." },
+      { name: "Run speed", measure: attributes("Run speed"),
+        why: "good ground speed and a long dash dance make his spacing traps fast to reset." },
+    ],
+    sources: [wiki("Marth_(SSBM)", "Marth (SSBM)"), TIER_LIST],
+  },
+  {
+    id: "sheik",
+    summary: "Sheik pairs very fast, safe normal attacks with a projectile and a throw that sets up tech chases, so she punishes reliably and wins neutral without big risk.",
+    traits: [
+      { name: "Needle Storm", measure: { section: "Specials", measure: "Startup", row: "Neutral special" },
+        why: "quick needles she can store and release give her a ranged tool that forces opponents to approach." },
+      { name: "Forward tilt", measure: { section: "Tilts", measure: "Startup", row: "Forward tilt" },
+        why: "a fast upward kick that chains into itself on many fighters at low damage." },
+      { name: "Up tilt", measure: { section: "Tilts", measure: "End lag after the last active frame", row: "Up tilt" },
+        why: "it lingers and ends almost at once, so it is a safe anti-air and combo link." },
+      { name: "Neutral air", measure: { section: "Aerials", measure: "Startup", row: "Neutral air" },
+        why: "a fast lingering kick that beats approaches and works as her out-of-shield answer." },
+      { name: "Jump squat", measure: attributes("Jump squat"),
+        why: "among the quickest jumps in the game, which speeds up every aerial and out-of-shield option." },
+    ],
+    sources: [wiki("Sheik_(SSBM)", "Sheik (SSBM)"), TIER_LIST],
+  },
+  {
+    id: "jigglypuff",
+    summary: "Jigglypuff wins in the air: she moves faster horizontally there than anyone, has several jumps, and can end a stock from one opening with Rest.",
+    traits: [
+      { name: "Air speed", measure: attributes("Air speed"),
+        why: "the best air control in the game lets her drift in and out of range, the basis of her spacing with back air." },
+      { name: "Rest", measure: { section: "Specials", measure: "Startup", row: "Down special" },
+        why: "an instant, very strong hit that kills at low damage when it lands, at the cost of a long sleep when it misses." },
+      { name: "Fall speed", measure: attributes("Fall speed"),
+        why: "the slowest fall makes her easy to juggle but lets her stay off stage and edge guard longer than anyone." },
+      { name: "Light weight", measure: attributes("Weight"),
+        why: "she is among the lightest, the price of her air game: one clean hit can end her stock early." },
+    ],
+    sources: [wiki("Jigglypuff_(SSBM)", "Jigglypuff (SSBM)"), TIER_LIST],
+  },
+  {
+    id: "captain_falcon",
+    summary: "Captain Falcon is the fastest runner in the game with heavy, falling-fast combos, so one opening often becomes a long combo that ends in a powerful knee.",
+    traits: [
+      { name: "Run speed", measure: attributes("Run speed"),
+        why: "the fastest run in the game lets him punish from across the stage and reset his approach at will." },
+      { name: "Initial dash", measure: attributes("Initial dash speed"),
+        why: "the fastest dash start gives him the strongest dash dance for baiting and whiff-punishing." },
+      { name: "Fast-fall speed", measure: attributes("Fast-fall speed"),
+        why: "a heavy fast-faller lands his aerials quickly and keeps his combos tight." },
+      { name: "Knee Smash (forward air)", measure: { section: "Aerials", measure: "Knockback at 100%", row: "Forward air" },
+        why: "a sweet-spot hit with very high knockback that kills early and finishes his combos." },
+      { name: "Up air", measure: { section: "Aerials", measure: "L-cancelled landing lag", row: "Up air" },
+        why: "a quick juggle with little landing lag that strings into itself and into the knee." },
+    ],
+    sources: [wiki("Captain_Falcon_(SSBM)", "Captain Falcon (SSBM)"), TIER_LIST],
+  },
+  {
+    id: "peach",
+    summary: "Peach floats to throw aerials just above the ground with almost no landing lag, and backs it up with a strong down smash and turnips from range.",
+    traits: [
+      { name: "Down air", measure: { section: "Aerials", measure: "End lag after the last active frame", row: "Down air" },
+        why: "a multi-hit drill that ends quickly, so she can float it on shield and follow up." },
+      { name: "Low landing lag", measure: { section: "Aerials", measure: "L-cancelled landing lag", row: "Back air" },
+        why: "her aerials land with little lag, and floating lets her use them low without landing at all." },
+      { name: "Neutral air", measure: { section: "Aerials", measure: "Startup", row: "Neutral air" },
+        why: "a fast, lasting hit that is her quickest answer close in and out of shield." },
+      { name: "Down smash", measure: { section: "Smashes", measure: "Active span", row: "Down smash" },
+        why: "a long multi-hit spin that can deal heavy damage in one hit and covers both sides." },
+      { name: "Dash grab", measure: { section: "Grabs", measure: "Startup", row: "Dash grab" },
+        why: "a fast running grab that leads into her throws and tech chases." },
+    ],
+    sources: [wiki("Peach_(SSBM)", "Peach (SSBM)"), TIER_LIST],
+  },
+  {
+    id: "ice_climbers",
+    summary: "The Ice Climbers fight as a pair: Nana copies Popo with a delay, so together they hit twice, and their grab game turns one grab into a kill.",
+    traits: [
+      { name: "Jump squat", measure: attributes("Jump squat"),
+        why: "a short jump wait speeds up their wavedashes and aerials and the way they move the pair as one." },
+      { name: "Jab", measure: { section: "Jab", measure: "End lag after the last active frame", row: "Jab 1" },
+        why: "a jab that ends almost at once, which keeps the pair's pressure on shield nearly continuous." },
+      { name: "Dash grab", measure: { section: "Grabs", measure: "Startup", row: "Dash grab" },
+        why: "a quick grab feeds their chain grabs, where the two climbers trade throws and hits until the opponent can kill." },
+      { name: "Back air", measure: { section: "Aerials", measure: "Knockback at 0%", row: "Back air" },
+        why: "a strong aerial even at low damage, and doubled by Nana, so it controls space well." },
+      { name: "Down air", measure: { section: "Aerials", measure: "Startup", row: "Down air" },
+        why: "a fast multi-hit aerial they use to pressure low and to cover landings." },
+    ],
+    sources: [wiki("Ice_Climbers_(SSBM)", "Ice Climbers (SSBM)"), wiki("Wobbling", "Wobbling"), TIER_LIST],
+  },
+];
+
+export const PATTERNS: readonly Pattern[] = [
+  { name: "Fast fall", measure: attributes("Fall speed"),
+    guidance: "most of the eight fall faster than the rest, so their aerials land and act sooner; give pressure fighters a high fall speed." },
+  { name: "Fast-fall speed", measure: attributes("Fast-fall speed"),
+    guidance: "a fast fast-fall makes aerials safe on shield; keep it high on fighters meant to pressure." },
+  { name: "Fast down air", measure: { section: "Aerials", measure: "Startup", row: "Down air" },
+    guidance: "the eight's down airs come out far sooner than the rest's, so they work as combo and pressure tools rather than slow spikes; budget at least one fast low-hitting aerial." },
+  { name: "Dash start", measure: attributes("Initial dash speed"),
+    guidance: "a fast initial dash powers dash dancing and whiff punishes; pair it with a fast run." },
+  { name: "Light weight", measure: attributes("Weight"),
+    guidance: "the eight weigh less than the rest, so speed is paid for with early deaths; tie a light weight to a fast kit." },
+  { name: "Fast down special", measure: { section: "Specials", measure: "Startup", row: "Down special" },
+    guidance: "several of the eight have a near-instant down special for escapes, combos or kills; give each fighter one fast panic or combo tool." },
+  { name: "Fast forward air", measure: { section: "Aerials", measure: "Startup", row: "Forward air" },
+    guidance: "a quick forward air is the eight's common spacing aerial; budget it faster than the cast median." },
+];

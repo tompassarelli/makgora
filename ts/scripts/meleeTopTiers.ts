@@ -2,6 +2,7 @@ import { join } from "node:path";
 import {
   ATTRIBUTES, FIGHTCORE, type Fighter, fighters, firstNumber, LIBMELEE, loadReference, RECORDS, ROOT, TOP_EIGHT,
 } from "./meleeReferenceData";
+import { type FighterTaste, type MeasureKey, PATTERNS, TASTE } from "./meleeTopTierTaste";
 
 const PAGE = "docs/design/melee/top-tiers.md";
 const VICTIM_WEIGHT = 100;
@@ -242,6 +243,64 @@ function renderSection(section: Section): string {
   return parts.join("\n\n");
 }
 
+const lowerFirst = (s: string): string => (s.charAt(1) === "-" ? s : s.charAt(0).toLowerCase() + s.slice(1));
+
+interface Located { readonly measure: Measure; readonly row: Row; readonly phrase: string }
+function locate(key: MeasureKey): Located {
+  const measure = SECTIONS.find((s) => s.title === key.section)?.measures.find((m) => m.title === key.measure);
+  const row = key.row === undefined ? measure?.rows[0] : measure?.rows.find((r) => r.label === key.row);
+  if (measure === undefined || row === undefined) throw new Error(`no measure ${key.section} / ${key.measure} / ${key.row ?? "first row"}`);
+  const phrase = key.row === undefined ? lowerFirst(measure.title) : `${lowerFirst(key.row)} ${lowerFirst(measure.title)}`;
+  return { measure, row, phrase };
+}
+
+function standing(key: MeasureKey, f: Fighter): string {
+  const { measure, row, phrase } = locate(key);
+  const values = roster.map(row.value), i = roster.indexOf(f), v = values[i] ?? null;
+  if (v === null) throw new Error(`${f.name} has no value for ${phrase}`);
+  const count = values.filter((w) => w !== null).length;
+  return `${phrase} ${format(measure.digits)(v)}, rank ${rank(values, measure.order)[i] ?? ""} of ${count}`;
+}
+
+function handWritten(text: string): string {
+  if (/\d/.test(text)) throw new Error(`hand-written prose quotes a number; let the generator render it: ${text}`);
+  return text;
+}
+
+function renderTaste(taste: FighterTaste): string {
+  const f = top.find((t) => t.id === taste.id);
+  if (f === undefined) throw new Error(`${taste.id} is not in the top eight`);
+  const traits = taste.traits.map((t) => `- **${handWritten(t.name)}** (${standing(t.measure, f)}): ${handWritten(t.why)}`);
+  const sources = taste.sources.map((s) => `[${s.title}](${s.url})`).join(", ");
+  return [`### ${f.name}`, handWritten(taste.summary), traits.join("\n"), `Rationale: ${sources}.`].join("\n\n");
+}
+
+function renderPattern(pattern: (typeof PATTERNS)[number]): string {
+  const { measure, row, phrase } = locate(pattern.measure);
+  const fmt = format(measure.digits);
+  const values = roster.map((f) => ({ f, v: row.value(f) }));
+  const pick = (inTop: boolean) => values.flatMap(({ f, v }) => (v === null || TOP_EIGHT.includes(f.id) !== inTop ? [] : [v]));
+  const topValues = pick(true), rest = median(pick(false));
+  const centre = median(topValues), side = Math.sign(centre - rest);
+  const along = topValues.filter((v) => Math.sign(v - rest) === side).length;
+  return `- **${handWritten(pattern.name)}** (${phrase}: top eight median ${fmt(centre)}, other eighteen median ${fmt(rest)}; `
+    + `${along} of the ${topValues.length} ${side < 0 ? "below" : "above"} it): ${handWritten(pattern.guidance)}`;
+}
+
+function renderGuide(): string {
+  if (TASTE.map((t) => t.id).join() !== TOP_EIGHT.join()) throw new Error("the taste guide must cover the top eight in order");
+  return [
+    "## What sets each one apart",
+    "Each fighter's defining moves and attributes, with the measure from the tables above that shows it and its rank among the fighters with a value. "
+      + "The rationale is our summary of the cited public pages; the numbers come from the generator, never from the prose.",
+    ...TASTE.map(renderTaste),
+    "## Shared patterns",
+    "Traits most of the eight share, each with its measure, as candidate guidance for our fighters' budgets. "
+      + "A count says how many of the eight sit on the same side of the other eighteen's median as the top eight's median.",
+    PATTERNS.map(renderPattern).join("\n"),
+  ].join("\n\n");
+}
+
 export function renderPage(): string {
   const header = [
     "# Melee's top eight against the cast",
@@ -255,7 +314,7 @@ export function renderPage(): string {
       + "`=` marks a tie, and the Fighters column says how many have one. Frames count from 1. "
       + "The disc revision is not stated by the sources.",
   ].join("\n");
-  return `${[header, ...SECTIONS.map(renderSection)].join("\n\n")}\n`;
+  return `${[header, ...SECTIONS.map(renderSection), renderGuide()].join("\n\n")}\n`;
 }
 
 if (import.meta.main) {
