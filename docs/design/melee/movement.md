@@ -27,10 +27,9 @@ to <!-- v:run.max -->2.30<!-- /v --> (<!-- v:run.maxWho -->Captain Falcon<!-- /v
 (<!-- v:dashSpeed.maxWho -->Captain Falcon<!-- /v -->). <!-- v:dashOverRun -->Falco, Jigglypuff, Pichu, Samus and Young Link<!-- /v --> dash faster
 than they run, so their dash slows into the run.
 
-The dash's command stream sets a flag on a fighter-specific frame; from that
-frame a held stick turns the dash into a run. Before it, a
-fresh smash the other way turns the fighter into a new dash the other way
-: repeated, that is the dash dance. Holding the stick
+After a fighter-specific number of frames a held stick turns the dash into a
+run. Before that, a fresh smash the other way turns the fighter into a new dash
+the other way: repeated, that is the dash dance. Holding the stick
 backward without a smash changes the dash's velocity without turning, which
 players call a moonwalk. The initial dash, the frames before a run can start,
 lasts from <!-- v:initialDash.min -->7<!-- /v --> frames (<!-- v:initialDash.minWho -->Sheik<!-- /v -->)
