@@ -13,6 +13,7 @@ import { platformLayer } from "wisp/scripts/platform/layer";
 import { profiles } from "./wisp/profiles";
 import { releaseEntry } from "./wisp/commands/release";
 import { nativeEntry } from "./wisp/commands/native";
+import { throwParityEntry } from "./wisp/commands/throwParity";
 
 const PROFILE = `[--profile ${profiles.join("|")}]`;
 
@@ -32,6 +33,7 @@ const COMMANDS: Record<string, { readonly usage: string; readonly load: () => Pr
   smoke: { usage: "smoke [--native --pair K [--map MAP.w3x] [--shard N...]]   (the move smoke rig: every key reaches the game and every move starts; headless on every fighter pair, or --native on the green candidate, one accept run under 5 minutes per fighter pair; scripts/wisp/smokeTape.ts)", load: async () => (await import("./wisp/commands/smoke")).smoke },
   envelope: { usage: "envelope [--ranges] [--json] [--top N]   (advisory: every move of the 26 fighters outside its genre frame-data class envelope, ranked by distance: docs/move-data.md, \"Genre envelope\")", load: async () => (await import("./wisp/commands/envelope")).envelope },
   strengths: { usage: "strengths FIELD.json   (per-fighter KO direction, KO percent, edge-guard and spacing profile against tools/move-data/fighter-strengths.json)", load: async () => (await import("./wisp/commands/strengths")).strengths },
+  "throw-parity": throwParityEntry,
   combos: { usage: "combos [--fighter NAME]... [--jobs N] [--advantage | --zero-to-death]", load: async () => (await import("./wisp/commands/combos")).combos },
   parity: { usage: "parity numeric [RESULT_FILE ...] | tapes | corpus [DIR ...] | corpus keep RECORDING...   (native recordings replayed headless: scripts/wisp/corpus.ts)", load: async () => (await import("./wisp/commands/parity")).parity },
   integrity: { usage: "integrity capture [--four-fighters | --playable] OPTIONS... | capture --screen --clients-file FILE --client NAME --out PRIVATE_DIR [--count N] [--region X,Y,WIDTH,HEIGHT] | result CAPTURE_DIR | headless --helper BINARY --out DIR | delay RUN_DIR...   (input delay and rollback depth per client from saved integrity rows, #396)", load: async () => (await import("./wisp/commands/parity")).integrity },

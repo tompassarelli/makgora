@@ -1,7 +1,8 @@
 /build/
 /.clj-kondo/
 /tools/animations/node_modules/
-/tools/move-data/interactions/
+/tools/move-data/interactions/*
+!/tools/move-data/interactions/throw-parity.md
 /tools/move-data/combos/
 /tools/slippi/node_modules/
 # Generated from tracked sources by ts/scripts/generated.ts (#401).
