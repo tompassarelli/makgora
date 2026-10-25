@@ -2,7 +2,7 @@
 
 `smashcraft-tom-build.service` runs `bun scripts/tomBuildWatch.ts` from its own
 detached worktree `~/code/smashcraft/worktrees/tom-build-watch/ts`, which it moves
-to `origin/main` on each start, under `Nice=10` and idle I/O. Every 30 s it fetches
+to `origin/main` on each start, under `Nice=10` and idle I/O. Every 10 s it fetches
 `origin/main`; when the tip is a commit it has not built, it builds that tip's
 Classic playable map (the edition Tom plays, about 47 MB; `wisp play` keeps the
 private full HD build) with the play build path, without the optional controller helper,
@@ -27,8 +27,14 @@ named and installed by the newest watcher code. To stop it, and keep it from sta
 
 Each installed build appends one line to
 `~/.local/state/agents/handoffs/tom-build.log`:
-`<utc> <sha> <version> <build_s> <land_to_installed_s> <install path>`.
-Land time is the commit's committer time. A failed build is in
+`<utc> <sha> <version> <build_s> <land_to_installed_s> <land_to_main_s> <cpu_pressure_peak> <live_clients> <stages> <install path>`.
+Land time is the commit's committer time; `land_to_main_s` ends when GitHub
+records the push to main, so it is the lane's pre-land gates. `cpu_pressure_peak`
+is the host's `/proc/pressure/cpu` some avg10 peak during the build, `live_clients`
+the Warcraft III processes on the host, and `stages` the build's
+`checkout=S,bun-install=S,map-build=S,checkout-removal=S,maps-copy=S`; `-` is
+unknown. A build above 20% pressure counts against neither budget: the watcher
+neither files nor closes a speed-budget issue for it. A failed build is in
 `journalctl --user -u smashcraft-tom-build`. Every sha the watcher starts is
 recorded in `~/.local/state/smashcraft/tom-build/attempted`, so it never builds
 a sha twice, even after a failure or restart.

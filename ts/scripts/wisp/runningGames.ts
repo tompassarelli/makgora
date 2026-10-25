@@ -11,6 +11,13 @@ export const runningGames = (documents: string) => Effect.gen(function*() {
   return games.map(({ pid }) => pid);
 });
 
-export const clientHold = (documents: string) => runningGames(documents).pipe(Effect.map((pids) => pids.length === 0
+export const liveClients = ProcessTable.use((table) => table.list).pipe(
+  // The kernel truncates comm to 15 bytes.
+  Effect.map((processes) => processes.filter(({ name }) => name === "Warcraft III.ex").length),
+  Effect.provide(platformLayer()),
+  Effect.orElseSucceed(() => undefined),
+);
+
+export const clientHold =(documents: string) => runningGames(documents).pipe(Effect.map((pids) => pids.length === 0
   ? undefined
   : `Warcraft III is running in Tom's prefix (pid ${pids.join(", ")}); its maps and controller stay as they are until it closes`));

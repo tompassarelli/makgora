@@ -8,30 +8,67 @@ import { PlayProblem } from "wisp/scripts/wisp/play";
 import { runProcess } from "./hostProcess";
 import { type LandingDecision, buildLabel, costPrediction } from "./wisp/greenBuilds";
 import { writePlaytestChecklist } from "./wisp/playtestChecklist";
-import { TOM_EDITION, currentPlaytest } from "./wisp/currentPlaytest";
+import { type BuildStage, TOM_EDITION, currentPlaytest } from "./wisp/currentPlaytest";
 import { installLatest, library } from "./wisp/mapLibrary";
 import { PLAYTEST_PREFIX, projectRoot } from "./wisp/project";
-import { clientHold } from "./wisp/runningGames";
+import { clientHold, liveClients } from "./wisp/runningGames";
 import { documentsFolder } from "wisp/scripts/warcraft/battleNet";
+import { platformLayer } from "wisp/scripts/platform/layer";
+import { withPressure } from "wisp/scripts/wisp/testRunner";
 
 export const TOM_BUILD_LOG = join(homedir(), ".local/state/agents/handoffs/tom-build.log");
 export const TOM_BUILD_ATTEMPTS = join(homedir(), ".local/state/smashcraft/tom-build/attempted");
 const POLL = "10 seconds";
 export const BUILD_BUDGET_SECONDS = 20;
 export const LAND_TO_MAPS_BUDGET_SECONDS = 360;
+export const BUSY_PRESSURE = 20;
 export const SPEED_BUDGET_TITLE = "Speed budget: a landing took too long to reach Tom's Maps folder";
 
-export const budgetProblem = (buildMillis: number, landToInstalledMillis: number): string | undefined => {
+export interface Load {
+  readonly pressure: number | undefined;
+  readonly clients: number | undefined;
+}
+
+export interface Timing {
+  readonly landed: number;
+  readonly onMain: number | undefined;
+  readonly started: number;
+  readonly finished: number;
+  readonly stages: readonly BuildStage[];
+  readonly load: Load;
+}
+
+export const buildMillis = ({ started, finished }: Timing) => finished - started;
+export const landToInstalledMillis = ({ landed, finished }: Timing) => finished - landed;
+
+export const busy = ({ load: { pressure } }: Timing) => pressure !== undefined && pressure > BUSY_PRESSURE;
+
+export const budgetProblem = (timing: Timing): string | undefined => {
+  const build = buildMillis(timing);
+  const landing = landToInstalledMillis(timing);
   const over = [
-    buildMillis > BUILD_BUDGET_SECONDS * 1000 ? `build ${(buildMillis / 1000).toFixed(1)} s over its ${BUILD_BUDGET_SECONDS} s budget` : undefined,
-    landToInstalledMillis > LAND_TO_MAPS_BUDGET_SECONDS * 1000 ? `landing to Maps ${(landToInstalledMillis / 1000).toFixed(0)} s over its ${LAND_TO_MAPS_BUDGET_SECONDS} s budget` : undefined,
+    build > BUILD_BUDGET_SECONDS * 1000 ? `build ${(build / 1000).toFixed(1)} s over its ${BUILD_BUDGET_SECONDS} s budget` : undefined,
+    landing > LAND_TO_MAPS_BUDGET_SECONDS * 1000 ? `landing to Maps ${(landing / 1000).toFixed(0)} s over its ${LAND_TO_MAPS_BUDGET_SECONDS} s budget` : undefined,
   ].filter((problem) => problem !== undefined);
   return over.length === 0 ? undefined : over.join("; ");
+};
+
+const seconds = (millis: number | undefined) => millis === undefined ? "-" : (millis / 1000).toFixed(1);
+const known = (value: number | undefined) => value === undefined ? "-" : String(value);
+
+export const stageReport = (timing: Timing) => {
+  const { landed, onMain, started, stages, load } = timing;
+  const arrival = onMain === undefined
+    ? `Commit to build start ${seconds(started - landed)} s (when it reached main is unknown)`
+    : `Commit to main ${seconds(onMain - landed)} s (the lane's pre-land gates), main to build start ${seconds(started - onMain)} s (watcher restart, poll and any hold while Tom's Warcraft III ran)`;
+  const build = stages.map(({ name, millis }) => `${name} ${seconds(millis)} s`).join(", ");
+  return `${arrival}; build ${build}. Build host: CPU pressure some avg10 peak ${known(load.pressure)}%, ${known(load.clients)} live Warcraft III clients; a build above ${BUSY_PRESSURE}% counts against neither budget.`;
 };
 
 export interface Built {
   readonly version: string;
   readonly source: string;
+  readonly stages: readonly BuildStage[];
 }
 
 export interface Installed {
@@ -43,11 +80,13 @@ export interface WatchSteps<R> {
   readonly tip: (previous: string | undefined) => Effect.Effect<string | undefined, PlayProblem, R>;
   readonly decision: (sha: string) => Effect.Effect<LandingDecision, PlayProblem, R>;
   readonly landedAt: (sha: string) => Effect.Effect<number, PlayProblem, R>;
+  readonly onMain: (sha: string) => Effect.Effect<number | undefined, never, R>;
+  readonly measured: <A>(work: Effect.Effect<A, PlayProblem, R>) => Effect.Effect<readonly [A, Load], PlayProblem, R>;
   readonly held: Effect.Effect<string | undefined, PlayProblem, R>;
   readonly build: (sha: string) => Effect.Effect<Built, PlayProblem, R>;
   readonly install: (built: Built) => Effect.Effect<Installed, PlayProblem, R>;
   readonly notes: (version: string, sha: string, previous: string | undefined) => Effect.Effect<string, PlayProblem, R>;
-  readonly budget: (sha: string, problem: string | undefined) => Effect.Effect<void, never, R>;
+  readonly budget: (sha: string, timing: Timing) => Effect.Effect<void, never, R>;
 }
 
 export interface WatchFiles {
@@ -73,8 +112,12 @@ const forget = (path: string, sha: string) => Effect.try({
   catch: (cause) => new PlayProblem({ problem: `can't write ${path}: ${String(cause)}` }),
 });
 
-export const buildLine = (finished: number, sha: string, { version, path }: Installed, buildMillis: number, landToInstalledMillis: number) =>
-  `${new Date(finished).toISOString()} ${sha} ${version.replaceAll(" ", "-")} ${(buildMillis / 1000).toFixed(1)} ${(landToInstalledMillis / 1000).toFixed(1)} ${path}`;
+export const buildLine = (sha: string, { version, path }: Installed, timing: Timing) => {
+  const { landed, onMain, finished, stages, load } = timing;
+  const stageField = stages.length === 0 ? "-" : stages.map(({ name, millis }) => `${name}=${seconds(millis)}`).join(",");
+  return [new Date(finished).toISOString(), sha, version.replaceAll(" ", "-"), seconds(buildMillis(timing)), seconds(landToInstalledMillis(timing)),
+    seconds(onMain === undefined ? undefined : onMain - landed), known(load.pressure), known(load.clients), stageField, path].join(" ");
+};
 
 export const watchOnce = <R>(steps: WatchSteps<R>, files: WatchFiles) => Effect.gen(function*() {
   const previous = lines(files.log).at(-1)?.split(" ")[1];
@@ -86,19 +129,22 @@ export const watchOnce = <R>(steps: WatchSteps<R>, files: WatchFiles) => Effect.
   yield* append(files.attempts, sha);
   if (decision === "red") return undefined;
   const started = yield* Clock.currentTimeMillis;
-  const built = yield* steps.build(sha);
+  const [built, load] = yield* steps.measured(steps.build(sha));
   const late = yield* steps.held;
   if (late !== undefined) {
     yield* forget(files.attempts, sha);
     console.log(`Held ${sha.slice(0, 7)}: ${late}`);
     return undefined;
   }
+  const copying = yield* Clock.currentTimeMillis;
   const installed = yield* steps.install(built);
   const finished = yield* Clock.currentTimeMillis;
   const landed = yield* steps.landedAt(sha);
-  const line = buildLine(finished, sha, installed, finished - started, finished - landed);
+  const onMain = yield* steps.onMain(sha);
+  const timing: Timing = { landed, onMain, started, finished, stages: [...built.stages, { name: "maps-copy", millis: finished - copying }], load };
+  const line = buildLine(sha, installed, timing);
   yield* append(files.log, line);
-  yield* steps.budget(sha, budgetProblem(finished - started, finished - landed));
+  yield* steps.budget(sha, timing);
   yield* steps.notes(installed.version, sha, previous).pipe(
     Effect.tap((path) => Effect.sync(() => console.log(`Playtest checklist ${path}`))),
     Effect.catch(({ problem }) => Effect.sync(() => console.error(`Playtest checklist not written: ${problem}`))),
@@ -142,10 +188,22 @@ export const hostSteps = (predictCost: boolean): WatchSteps<ChildProcessSpawner.
   }),
   decision: () => Effect.succeed("build"),
   landedAt: (sha) => git("show", "-s", "--format=%ct", sha).pipe(Effect.map((seconds) => Number(seconds) * 1000)),
+  onMain: (sha) => gh("api", "repos/{owner}/{repo}/activity?ref=refs/heads/main&activity_type=push&per_page=50", "--jq", `.[] | select(.after == "${sha}") | .timestamp`).pipe(
+    Effect.map((text) => Date.parse(text.split("\n")[0] ?? "")),
+    Effect.map((at) => Number.isNaN(at) ? undefined : at),
+    Effect.orElseSucceed(() => undefined),
+  ),
+  measured: (work) => Effect.gen(function*() {
+    const before = yield* liveClients;
+    const { value, pressure } = yield* withPressure(work).pipe(Effect.provide(platformLayer()));
+    const after = yield* liveClients;
+    const clients = before === undefined || after === undefined ? undefined : Math.max(before, after);
+    return [value, { pressure: pressure.peak, clients }] as const;
+  }),
   held: clientHold(documentsFolder(PLAYTEST_PREFIX)),
-  build: (sha) => currentPlaytest({ revision: sha, predictCost, helper: false, edition: TOM_EDITION }).pipe(Effect.flatMap(({ map: { file, source } }) => {
+  build: (sha) => currentPlaytest({ revision: sha, predictCost, helper: false, edition: TOM_EDITION }).pipe(Effect.flatMap(({ map: { file, source }, stages }) => {
     const version = buildLabel(file);
-    return version === undefined ? Effect.fail(new PlayProblem({ problem: `not a playable map: ${file}` })) : Effect.succeed({ version, source });
+    return version === undefined ? Effect.fail(new PlayProblem({ problem: `not a playable map: ${file}` })) : Effect.succeed({ version, source, stages });
   })),
   install: ({ version, source }) => Effect.try({
     try: () => {
@@ -156,7 +214,9 @@ export const hostSteps = (predictCost: boolean): WatchSteps<ChildProcessSpawner.
     catch: (cause) => new PlayProblem({ problem: String(cause) }),
   }),
   notes: writePlaytestChecklist,
-  budget: (sha, problem) => reportBudget(sha, problem).pipe(
+  budget: (sha, timing) => (busy(timing)
+    ? Effect.sync(() => console.log(`Landing ${sha.slice(0, 7)} counts against neither budget: CPU pressure peaked at ${timing.load.pressure}% during its build, above ${BUSY_PRESSURE}%`))
+    : reportBudget(sha, timing)).pipe(
     Effect.catch(({ problem: failure }) => Effect.sync(() => console.error(`Speed budget not reported: ${failure}`))),
   ),
 });
@@ -167,11 +227,12 @@ const gh = (...args: readonly string[]) =>
     Effect.mapError((cause) => new PlayProblem({ problem: `gh ${args.slice(0, 2).join(" ")}: ${cause.message}` })),
   );
 
-const reportBudget = (sha: string, problem: string | undefined) => Effect.gen(function*() {
+const reportBudget = (sha: string, timing: Timing) => Effect.gen(function*() {
+  const problem = budgetProblem(timing);
   const open = (yield* gh("issue", "list", "--state", "open", "--search", `"${SPEED_BUDGET_TITLE}" in:title`, "--json", "number", "--jq", ".[].number")).split("\n").filter((line) => line !== "");
-  const body = `Landing ${sha}: ${problem}.\n\nBudgets: build <= ${BUILD_BUDGET_SECONDS} s, commit to installed in Maps/00-Smashcraft <= ${LAND_TO_MAPS_BUDGET_SECONDS} s, measured by the Tom build watcher (smashcraft:tools/tom-build/, ~/.local/state/agents/handoffs/tom-build.log). Find the stage that grew and what it recomputes whose inputs did not change.`;
+  const body = `Landing ${sha}: ${problem}.\n\n${stageReport(timing)}\n\nBudgets: build <= ${BUILD_BUDGET_SECONDS} s, commit to installed in Maps/00-Smashcraft <= ${LAND_TO_MAPS_BUDGET_SECONDS} s, measured by the Tom build watcher (smashcraft:tools/tom-build/, ~/.local/state/agents/handoffs/tom-build.log). Find the stage that grew and what it recomputes whose inputs did not change.`;
   if (problem === undefined) {
-    for (const number of open) yield* gh("issue", "close", number, "--comment", `Landing ${sha} was within both budgets.`);
+    for (const number of open) yield* gh("issue", "close", number, "--comment", `Landing ${sha} was within both budgets. ${stageReport(timing)}`);
     return;
   }
   if (open[0] === undefined) yield* gh("issue", "create", "--title", SPEED_BUDGET_TITLE, "--body", body);

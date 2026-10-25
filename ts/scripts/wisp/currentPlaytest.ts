@@ -7,7 +7,7 @@ import { copyFileSync, existsSync, mkdirSync, renameSync, rmSync } from "node:fs
 import { homedir } from "node:os";
 import { join, dirname } from "node:path";
 import { BunServices } from "@effect/platform-bun";
-import { Effect } from "effect";
+import { Clock, Effect } from "effect";
 import { ChildProcess } from "effect/process";
 import { PlayProblem } from "wisp/scripts/wisp/play";
 import { runProcess } from "../hostProcess";
@@ -160,6 +160,18 @@ export interface PlaytestOptions {
   readonly edition?: Edition;
 }
 
+export interface BuildStage {
+  readonly name: string;
+  readonly millis: number;
+}
+
+export const timedStage = (stages: BuildStage[], name: string) => <A, E, R>(work: Effect.Effect<A, E, R>) => Effect.gen(function*() {
+  const started = yield* Clock.currentTimeMillis;
+  const value = yield* work;
+  stages.push({ name, millis: (yield* Clock.currentTimeMillis) - started });
+  return value;
+});
+
 export type Edition = "classic" | "full";
 export const TOM_EDITION: Edition = "classic";
 
@@ -172,15 +184,16 @@ export const currentPlaytest = ({ revision: wanted, helper: wantsHelper = true, 
   const final = join(builds, edition === "full" ? revision : `${revision}-${edition}`);
   const map = { folder: MAP_FOLDER, file: `${title}.w3x`, title, source: join(final, `${title}.w3x`) };
   const helper = helperPath(controller);
+  const stages: BuildStage[] = [];
   yield* buildOnce(revisionLock(revision), final, (folder) => existsSync(join(folder, map.file)), `Waiting for another build of ${title}`, (staging) => Effect.gen(function*() {
     console.log(`Building ${title}`);
-    const lane = yield* buildLane(mainCheckout, revision);
-    yield* run(join(lane, "ts"), ["bun", "install", "--frozen-lockfile"]);
-    yield* run(join(lane, "ts"), playableMapBuild(title, join(staging, map.file), predictCost, edition));
+    const lane = yield* buildLane(mainCheckout, revision).pipe(timedStage(stages, "checkout"));
+    yield* run(join(lane, "ts"), ["bun", "install", "--frozen-lockfile"]).pipe(timedStage(stages, "bun-install"));
+    yield* run(join(lane, "ts"), playableMapBuild(title, join(staging, map.file), predictCost, edition)).pipe(timedStage(stages, "map-build"));
     if (wantsHelper && !existsSync(helper)) {
       yield* buildHelper(lane, helper).pipe(Effect.catch((problem) => Effect.sync(() => console.log(`No controller helper for this build (${problem.problem}); the keyboard plays`))));
     }
-    yield* removeLane(mainCheckout, revision);
+    yield* removeLane(mainCheckout, revision).pipe(timedStage(stages, "checkout-removal"));
   })).pipe(Effect.mapError((cause) => cause instanceof PlayProblem ? cause : new PlayProblem({ problem: cause.message })));
-  return { map, helper: existsSync(helper) ? helper : undefined };
+  return { map, helper: existsSync(helper) ? helper : undefined, stages };
 }).pipe(Effect.provide(BunServices.layer));

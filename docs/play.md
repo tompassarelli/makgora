@@ -120,9 +120,10 @@ Stop it with `systemctl --user disable --now smashcraft-tom-build.service`;
 `bun scripts/tomBuildWatch.ts` from ts/ runs it in the foreground. Each
 installed build appends one line to `~/.local/state/agents/handoffs/tom-build.log`:
 
-    <utc> <sha> <version> <build_s> <land_to_installed_s> <install path>
+    <utc> <sha> <version> <build_s> <land_to_installed_s> <land_to_main_s> <cpu_pressure_peak> <live_clients> <stages> <install path>
 
-`land_to_installed_s` counts from the commit's committer time. Failed builds
+`land_to_installed_s` counts from the commit's committer time; the other
+fields name the stage a slow landing spent its time in (smashcraft:tools/tom-build/README.md). Failed builds
 are in `journalctl --user -u smashcraft-tom-build`.
 
 ## Lane builds before landing
