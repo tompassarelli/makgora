@@ -5,12 +5,12 @@ import { allAttackCueModels } from "../../src/game/presentation/attackCues";
 import { allProjectileModels } from "../../src/game/presentation/projectileArt";
 import { Character } from "../../src/game/sim/codes";
 import { CANDLE_FLAME_MODELS, CANDLE_SMOKE } from "../../src/game/presentation/candleLook";
-import { METER_CUES } from "../../src/game/presentation/meterCues";
+import { METER_CUES, ultimateBurst } from "../../src/game/presentation/meterCues";
 
 export const CUE_MODEL_RECORD = "ts/scripts/wisp/cue-models.tsv";
 export const RECORD_COMMAND = "bun scripts/cueModels.ts --record";
 
-export const cueModels = () => [...new Set([...Object.values(Character).flatMap(character => fighterCueList(character).map(cue => cue.model)), ...allAttackCueModels(), ...allProjectileModels(), ...CANDLE_FLAME_MODELS, CANDLE_SMOKE.model, ...METER_CUES.map(cue => cue.model), MISSING_CUE_MODEL])];
+export const cueModels = () => [...new Set([...Object.values(Character).flatMap(character => fighterCueList(character).map(cue => cue.model)), ...allAttackCueModels(), ...allProjectileModels(), ...CANDLE_FLAME_MODELS, CANDLE_SMOKE.model, ...METER_CUES.map(cue => cue.model), ...Object.values(Character).map(character => ultimateBurst(character).model), MISSING_CUE_MODEL])];
 
 export function touchesCueInputs(paths: readonly string[], inputs: ReadonlySet<string>): boolean {
   return paths.some(path => inputs.has(path) || [...inputs].some(input => input.endsWith("/") && path.startsWith(input)));

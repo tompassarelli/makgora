@@ -5,6 +5,7 @@ import { hurtCapsule } from "../sim/geometry/contactGeometry";
 import { ROSTER_MANA } from "../sim/mana";
 import { type AuthoredSpecial, FOLLOW_UP_FORM } from "../sim/specials/schema";
 import type { Cue } from "./specialCues";
+import { heroLook } from "../roster/looks";
 
 export interface MeterCue extends Cue {
   readonly lift: number;
@@ -14,7 +15,15 @@ export const EX_AURA: MeterCue = { model: "Abilities\\Spells\\Items\\TomeOfRetra
 export const SUPER_AURA: MeterCue = { model: "Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedTarget.mdx", anchor: "feet", scale: 1.0, lift: f32(0.15), sequence: "stand" };
 export const ULTIMATE_BURST: MeterCue = { model: "Abilities\\Spells\\Other\\Doom\\DoomDeath.mdx", anchor: "feet", scale: f32(0.4), lift: 0.0, sequence: "birth", sound: "FlameStrike" };
 export const METER_CUES: readonly MeterCue[] = [EX_AURA, SUPER_AURA, ULTIMATE_BURST];
-export const METER_CUE_MOVES: readonly (readonly [string, MeterCue])[] = [["EX aura", EX_AURA], ["full-bar flame aura", SUPER_AURA], ["ultimate flame burst", ULTIMATE_BURST]];
+
+export function ultimateBurst(character: Character): MeterCue {
+  const burst = heroLook(character)?.ultimateBurst;
+  return burst === undefined ? ULTIMATE_BURST : { ...burst, anchor: "feet" };
+}
+
+export function meterCueMoves(character: Character): readonly (readonly [string, MeterCue])[] {
+  return [["EX aura", EX_AURA], ["full-bar flame aura", SUPER_AURA], ["ultimate burst", ultimateBurst(character)]];
+}
 
 export const METER_CUE_UNIT_RADIUS = 22.0;
 export const METER_CUE_UNIT_HEIGHT = 90.0;

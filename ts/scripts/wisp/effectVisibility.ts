@@ -28,7 +28,7 @@ import { IMPACT_DUST_MODEL, IMPACT_ROLL_MODEL, IMPACT_TECH_MODEL, IMPACT_DEFILE_
 import { headlessRender } from "./headlessRender";
 import { readStockBuild, stockStorage, type RenderAssetOptions } from "./renderAssetStore";
 import { heroLook } from "../../src/game/roster/looks";
-import { METER_CUE_MOVES, meterCueFit } from "../../src/game/presentation/meterCues";
+import { meterCueFit, meterCueMoves } from "../../src/game/presentation/meterCues";
 
 /** How one move shows one model in Classic: the sequence and seek it plays, its time scale, and whether its anchor travels. */
 export interface EffectUse {
@@ -291,7 +291,7 @@ export function effectUses(): EffectUse[] {
       visit(kit.ground, `${slot} ground`); visit(kit.air, `${slot} air`); visit(kit.recall, `${slot} recall`); visit(kit.marked?.special, `${slot} marked`);
     }
     visit(FIGHTER_ULTIMATES[character], "ultimate");
-    uses.push(...METER_CUE_MOVES.map(([move, cue]) => cueUse(fighter, move, "presentation effect", { ...cue, scale: meterCueFit(cue, character).scale })));
+    uses.push(...meterCueMoves(character).map(([move, cue]) => cueUse(fighter, move, "presentation effect", { ...cue, scale: meterCueFit(cue, character).scale })));
   }
   for (let clip = 0; clip < summonClipCount(SUMMON_BEAR); clip++) uses.push(supplemental(fighterSlug(Character.rifleman), `Bear summon clip ${clip}`, summonClip(SUMMON_BEAR, clip).modelPath, "summonPresentation seeking playback is unmodeled"));
   for (const [move, model] of [["Fel Rush aura", IMPACT_ROLL_MODEL], ["Immolate flames", STOCK_MODELS.immolationTarget], ["Mana Burn hand", STOCK_MODELS.manaBurnTarget], ["Wing Ascent trail", IMPACT_DUST_MODEL], ["Mana Burn drain flash", IMPACT_TECH_MODEL], ["silence status", STOCK_MODELS.silenceTarget], ["Eye Blast marks", STOCK_MODELS.greenDragonMissile]] as const) uses.push(supplemental(fighterSlug(Character.demonHunter), move, model, "specialEffects producer playback requires an observed frame trace"));

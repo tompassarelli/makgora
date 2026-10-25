@@ -1,7 +1,7 @@
 import type { Character } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import type { Cue } from "../presentation/specialCues";
-import { EX_AURA, EX_AURA_FRAMES, EX_CAST_VOLUME, type MeterCueFit, type MeterCueState, type MeterCueView, SUPER_AURA, ULTIMATE_BURST, ULTIMATE_BURST_FRAMES, ULTIMATE_CAST_VOLUME, clearCastCue, clearMeterCueState, confirmCastCue, createCastCue, createMeterCueState, exCastFrame, hideCastCue, meterCueFit, observeMeterCues, presentCastCue, ultimateCastFrame, ultimateFirstEffectFrame, ultimateReady } from "../presentation/meterCues";
+import { EX_AURA, EX_AURA_FRAMES, EX_CAST_VOLUME, type MeterCueFit, type MeterCueState, type MeterCueView, SUPER_AURA, ULTIMATE_BURST, ULTIMATE_BURST_FRAMES, ultimateBurst, ULTIMATE_CAST_VOLUME, clearCastCue, clearMeterCueState, confirmCastCue, createCastCue, createMeterCueState, exCastFrame, hideCastCue, meterCueFit, observeMeterCues, presentCastCue, ultimateCastFrame, ultimateFirstEffectFrame, ultimateReady } from "../presentation/meterCues";
 import { type WorldOrigin, effectMotion, hideEffect, placeEffect } from "./effects";
 import { ultimateCastSound } from "../presentation/moveSounds";
 
@@ -109,7 +109,8 @@ export class MeterCueEffects {
     this.front = origin.y - 12.0;
     this.exAura = new MeterCueModel(EX_AURA, meterCueFit(EX_AURA, character), origin, shared);
     this.superAura = new MeterCueModel(SUPER_AURA, meterCueFit(SUPER_AURA, character), origin, shared);
-    this.burst = new MeterCueModel(ULTIMATE_BURST, meterCueFit(ULTIMATE_BURST, character), origin, shared);
+    const burst = ultimateBurst(character);
+    this.burst = new MeterCueModel(burst, meterCueFit(burst, character), origin, shared);
     this.exSound = CreateSoundFromLabel(EX_AURA.sound ?? "", false, true, true, 10, 10);
     this.ultimateSound = CreateSoundFromLabel(this.ultimateLabel, false, true, true, 10, 10);
   }

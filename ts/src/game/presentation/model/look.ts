@@ -18,6 +18,15 @@ export interface HeroLook {
   readonly fallback: HeroClip;
 
   readonly commandGrab?: CommandGrabClips | undefined;
+
+  readonly ultimateBurst?: UltimateBurstLook | undefined;
+}
+
+export interface UltimateBurstLook {
+  readonly model: string;
+  readonly scale: number;
+  readonly lift: number;
+  readonly sequence?: string | undefined;
 }
 
 export const STOCK_FALLBACK_CLIP: HeroClip = { index: 0, seconds: 1.0 };

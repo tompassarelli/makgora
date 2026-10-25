@@ -165,8 +165,8 @@ const FROST_TRAP = cue(FROST_TRAP_MODEL, "feet", f32(0.4));
 const BANSHEE_FORM: MoveCues = {
   spell: "Banshee Form",
   startup: cue("Abilities\\Spells\\Undead\\Possession\\PossessionTarget.mdx", "body", f32(0.8)),
-  active: { ...timed(cue("Units\\Undead\\Banshee\\Banshee.mdx", "body", f32(0.9)), "walk", 0.0), alpha: 150 },
-  body: { red: 140, green: 110, blue: 190, alpha: 110 },
+  active: { ...timed(cue("Units\\Undead\\Banshee\\Banshee.mdx", "body", f32(1.1)), "walk", 0.0), alpha: 140, color: [170, 230, 255] },
+  body: { red: 150, green: 140, blue: 210, alpha: 50 },
 };
 const DREADLORD_BITE_CUES: MoveCues = { spell: "Healing bite", startup: VAMPIRIC, active: cue("Abilities\\Weapons\\Blood\\BloodImpact.mdx", "ahead", 1.0) };
 const VOODOO = cue("Abilities\\Spells\\Orc\\TrollBerserk\\TrollBeserkerTarget.mdx", "hand", f32(0.7));
