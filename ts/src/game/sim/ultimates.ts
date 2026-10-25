@@ -225,11 +225,11 @@ const JAINA: AuthoredSpecial = {
 
 const BANSHEE_SPEED = 9.0;
 const BANSHEE_TURN = { turnCos: f32(0.9902680687415704), turnSin: f32(0.13917310096006544) };
-const BANSHEE_CARRY_SPEED = 13.0;
+const BANSHEE_CARRY_SPEED = 20.0;
 const BANSHEE_CARRY: AuthoredSpecial = {
-  endFrame: 41,
-  motion: [{ ...frames(1, 20), velocityX: 0.0, velocityZ: 0.0, seek: { speed: BANSHEE_CARRY_SPEED, turnCos: 1.0, turnSin: 0.0 } }, { ...frames(21, 21), velocityX: 0.0, velocityZ: 0.0 }],
-  intangible: frames(1, 20),
+  endFrame: 35,
+  motion: [{ ...frames(1, 14), velocityX: 0.0, velocityZ: 0.0, seek: { speed: BANSHEE_CARRY_SPEED, turnCos: 1.0, turnSin: 0.0 } }, { ...frames(15, 15), velocityX: 0.0, velocityZ: 0.0 }],
+  intangible: frames(1, 14),
 };
 const SYLVANAS: AuthoredSpecial = {
   name: "Banshee Form", endFrame: 128,
