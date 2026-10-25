@@ -60,13 +60,11 @@ const coil = pose([-16,-25,135],[-65,-20,180],-12,-20,24,35);
 interface Body { lean: number; twist: number; knee: number; offhand: number; drop: number; pitch: number }
 const swing = (x: number, z: number, degrees: number, b: Body) =>
   pose([x,-24,z],[x+100*Math.cos(degrees*Math.PI/180),-24,z+100*Math.sin(degrees*Math.PI/180)],b.lean,b.twist,b.knee,b.offhand,0,b.drop,b.pitch);
-const frontChop = (drop: number, pitch: number): Body => ({lean:25,twist:14,knee:25,offhand:65,drop,pitch});
-const backChop: Body = {lean:10,twist:-26,knee:25,offhand:65,drop:-16,pitch:-18};
-const frontRise: Body = {lean:5,twist:16,knee:60,offhand:50,drop:-6,pitch:5};
-const backRise: Body = {lean:-4,twist:-20,knee:60,offhand:50,drop:-6,pitch:-4};
-const frontCock = swing(26,122,62,{lean:-8,twist:8,knee:65,offhand:45,drop:-2,pitch:-4});
-const backCock = swing(-12,124,100,{lean:-10,twist:-16,knee:70,offhand:45,drop:-2,pitch:-8});
-const plunge = (drop: number) => swing(10,60,-88,{lean:8,twist:0,knee:0,offhand:20,drop,pitch:0});
+const curl = (pitch: number, lean: number, knee: number, drop: number, twist = 0, offhand = 60): Body => ({lean,twist,knee,offhand,drop,pitch});
+const arc = (degrees: number, b: Body) => swing(22*Math.cos(degrees*Math.PI/180),88+b.drop+26*Math.sin(degrees*Math.PI/180),degrees,b);
+const frontStrike = [arc(225,curl(10,10,70,-14,6)),arc(270,curl(46,32,100,-34,12,70)),arc(320,curl(54,38,110,-36,16,75)),arc(345,curl(20,8,60,-20,6,50))] as const;
+const backStrike = [arc(270,curl(38,30,96,-34,-14,70)),arc(220,curl(42,32,104,-34,-24,75)),arc(195,curl(8,-4,58,-20,-14,50))] as const;
+const dive = (x: number, z: number, degrees: number, lean: number, knee: number, drop: number, pitch: number) => swing(x,z,degrees,{lean,twist:0,knee,offhand:70,drop,pitch});
 const gestures = [
   {key:"jab",name:"Jab Quick Cut",style:AttackStyle.jab,prep:pose([10,-50,120],[-45,-50,170],-5,-12),hit:pose([46,-24,76],[128,-24,65],8,8,16),exit:pose([42,-25,64],[65,-24,12],12,16)},
   {key:"jab2",name:"Jab Returning Cut",style:AttackStyle.jab2,prep:pose([30,-24,58],[78,-24,8],14,18),hit:pose([48,-24,74],[135,-24,91],3,-12,20),exit:pose([15,-25,126],[-40,-24,160],-4,-20)},
@@ -87,15 +85,14 @@ const gestures = [
 ] as const;
 const replacements = [
   {key:"downAir",name:"Down Air Sword Plunge",style:AttackStyle.downAir,keys:[
-    [0,guard],[5,swing(-14,126,140,{lean:-12,twist:-20,knee:95,offhand:40,drop:20,pitch:-25})],
-    [8,swing(-4,62,-112,{lean:15,twist:-6,knee:60,offhand:55,drop:-10,pitch:8})],
-    [9,swing(8,48,-82,frontChop(-26,34))],[10,swing(24,22,-50,{lean:28,twist:16,knee:22,offhand:65,drop:-52,pitch:34})],[11,frontCock],
-    [12,swing(-10,54,-105,backChop)],[13,swing(-30,96,160,backRise)],[14,backCock],
-    [15,swing(8,56,-70,frontChop(-16,28))],[16,swing(40,96,20,frontRise)],[17,frontCock],
-    [18,swing(-10,54,-105,backChop)],[19,swing(-30,96,160,backRise)],[20,backCock],
-    [21,swing(8,56,-70,frontChop(-16,28))],[22,swing(8,124,80,{lean:-10,twist:0,knee:55,offhand:45,drop:4,pitch:-10})],
-    [24,plunge(-10)],[33,swing(12,64,-80,{lean:9,twist:1,knee:3,offhand:22,drop:-14,pitch:0})],[37,swing(18,76,-48,{lean:7,twist:3,knee:8,offhand:28,drop:-9,pitch:1})],
-    [41,swing(26,90,0,{lean:4,twist:3,knee:10,offhand:26,drop:-4,pitch:0})],[45,guard],[46,guard],
+    [0,guard],[3,swing(-6,118,115,curl(-14,-8,55,8,-10,40))],[5,swing(-26,134,150,curl(-34,-18,100,18,-22,45))],[7,arc(190,curl(-12,-6,80,0,-10,55))],
+    [8,frontStrike[0]],[9,frontStrike[1]],[10,frontStrike[2]],[11,frontStrike[3]],
+    [12,backStrike[0]],[13,backStrike[1]],[14,backStrike[2]],
+    [15,frontStrike[1]],[16,frontStrike[2]],[17,frontStrike[3]],
+    [18,backStrike[0]],[19,backStrike[1]],[20,backStrike[2]],
+    [21,frontStrike[1]],[22,frontStrike[2]],[23,swing(8,124,-70,curl(-14,-10,60,-8,0,45))],
+    [24,dive(20,52,-90,30,20,-28,30)],[28,dive(26,40,-92,38,15,-36,42)],[33,dive(30,30,-95,45,10,-44,52)],
+    [35,swing(22,32,-100,curl(20,40,90,-42,0,60))],[38,swing(14,30,-110,curl(10,32,80,-40,0,55))],[41,swing(20,60,-60,curl(4,18,50,-22,2,40))],[43,swing(24,86,5,curl(0,6,22,-8,2,30))],[45,guard],[46,guard],
   ]},
 ] as const;
 type Gesture = (typeof gestures)[number] | (typeof replacements)[number];
@@ -122,6 +119,9 @@ for (const [path,t] of donor) {
   const k=t.Keys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1]);
   if(k)base.set(path,Float32Array.from(k.Vector));
 }
+const rootRotation=[...donor.keys()].find(path=>{const m=/^\.(Bones|Helpers)\.(\d+)\.Rotation$/.exec(path);return m!==null&&source[m[1] as "Bones"|"Helpers"][Number(m[2])]?.Name==="Bone_Root";});
+ensure(rootRotation,"missing root rotation");
+if(!base.has(rootRotation))base.set(rootRotation,new Float32Array([0,0,0,1]));
 const nodes=[...model.Bones,...model.Helpers], nodeByName=(name:string)=>{const n=nodes.find(n=>n.Name===name);ensure(n,name);return n;};
 const arm=[nodeByName("Bone_Arm1_R"),nodeByName("Bone_Arm2_R")],hand=nodeByName("Bone_Hand_R"),tip=nodeByName("Shimmer");
 let cursor=Math.max(...source.Sequences.map(s=>s.Interval[1]))+100;
@@ -134,8 +134,8 @@ function timeline(g: Gesture, first: number, last: number, total: number): { con
   return {controlFrames:[0,Math.max(1,first-3),first,("second" in g?g.second:last+2),total],poses:[guard,g.prep,g.hit,g.exit,guard]};
 }
 function posedJoint(name: string, q: Float32Array<ArrayBuffer>, p: Pose): Float32Array<ArrayBuffer> {
-  if(name==="Bone_Chest")return rotate(rotate(q,[0,1,0],p.lean+p.pitch),[0,0,1],p.twist);
-  if(name==="Bone_Pelvis")return rotate(rotate(q,[0,1,0],p.pitch),[0,0,1],-p.twist*0.35);
+  if(name==="Bone_Root")return rotate(q,[0,1,0],p.pitch);
+  if(name==="Bone_Chest")return rotate(rotate(q,[0,1,0],p.lean),[0,0,1],p.twist);
   if(name==="Bone_Head")return rotate(q,[0,1,0],-p.lean*0.4);
   if(name==="Bone_Arm1_L")return rotate(q,[0,1,0],-p.offhand);
   if(name==="Bone_Arm2_L")return rotate(q,[0,1,0],p.offhand*0.5);
