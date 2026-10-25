@@ -256,9 +256,11 @@ export interface ReplayRecording {
   serial: number;
 
   recordSerial: number | undefined;
+
+  reservedSerial: number | undefined;
 }
 
-export const replayRecording = (): ReplayRecording => ({ recorder: createMatchReplayRecorder(), serial: 0, recordSerial: undefined });
+export const replayRecording = (): ReplayRecording => ({ recorder: createMatchReplayRecorder(), serial: 0, recordSerial: undefined, reservedSerial: undefined });
 
 
 interface KeyEvents {

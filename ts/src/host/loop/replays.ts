@@ -12,7 +12,7 @@ import {
 import { momentInput } from "../../game/replay/moment";
 import { sourceVersion } from "../../game/shell/sourceVersion";
 import { replayFile, replayPartFile } from "../../game/core/gameFiles";
-import { takeMatchSerial } from "./matchRecords";
+import { claimMatchSerial } from "./matchRecords";
 import type { ShellState } from "./state";
 import { Phase } from "../../game/lobby/lobbyState";
 
@@ -37,7 +37,7 @@ export function beginReplayFrame(s: ShellState, frame: number): void {
   if (recorder.open && frame === 1) finishReplay(s);
   const begun = beginMatchReplayFrame(recorder, s.moment.recorder, frame, momentInput(s.build), s.world, s.game, s.controls, s.runtime);
   if (begun !== ReplayBegin.opened) return;
-  const serial = takeMatchSerial();
+  const serial = claimMatchSerial(s);
   s.replay.serial = serial;
   s.replay.recordSerial = serial;
 }

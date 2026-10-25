@@ -23,6 +23,7 @@ import { surfaceCount } from "../../game/sim/stage";
 import { writeLines } from "wisp/src/platform/fileio";
 import { clearAllInputs } from "./inputs";
 import { journalIdentity, publishMenu } from "./journal";
+import { reserveMatchSerial } from "./matchRecords";
 import { syncKeyEvents } from "./keyEvents";
 import { makePreview } from "./preview";
 import { colorFighterBody } from "./fighterBody";
@@ -37,6 +38,7 @@ export function startMatch(s: ShellState, scenario: Scenario = s.build.scenario,
   delete s.dev.shieldEnergyCapture;
 
   beginSessionMatch(s.sessionWins);
+  reserveMatchSerial(s);
   publishMenu(s);
   holdGameSpeed();
   const wasPaused = s.session.paused;

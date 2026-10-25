@@ -264,8 +264,9 @@ synchronized and the simulation is unchanged.
 - **File name.** `smashcraft-match-<serial>.txt`.
 - **Serial.** It counts across sessions through
   `smashcraft-match-index.pld`. The map reads that file once a session,
-  because Preloader keeps the first content it read, and writes it before
-  each record so a serial is never reused.
+  because Preloader keeps the first content it read. `startMatch` takes the
+  serial and writes the index, so the write runs before the first frame, and
+  the replay and the record share it so a serial is never reused.
 
 ```text
 smashcraft-match v=1 build=BUILD serial=12 local=P1 mode=versus

@@ -25,7 +25,7 @@ export function readMatchIndex(): void {
 }
 
 
-export function takeMatchSerial(): number {
+function takeMatchSerial(): number {
   const serial = globalThis.__smashcraftMatchSerial ?? nextSerial(readChunk(MATCH_RECORD_INDEX_FILE));
   globalThis.__smashcraftMatchSerial = serial + 1;
   writeChunks(MATCH_RECORD_INDEX_FILE, [`${serial + 1}`]);
@@ -33,9 +33,21 @@ export function takeMatchSerial(): number {
 }
 
 
+export function reserveMatchSerial(s: ShellState): void {
+  s.replay.reservedSerial ??= takeMatchSerial();
+}
+
+
+export function claimMatchSerial(s: ShellState): number {
+  const serial = s.replay.reservedSerial ?? takeMatchSerial();
+  s.replay.reservedSerial = undefined;
+  return serial;
+}
+
+
 export function writeMatchRecord(s: ShellState): void {
   exportPad(s);
-  const serial = s.replay.recordSerial ?? takeMatchSerial();
+  const serial = s.replay.recordSerial ?? claimMatchSerial(s);
   s.replay.recordSerial = undefined;
   const players: Slots<string | undefined> = [undefined, undefined, undefined, undefined];
   for (const slot of PARTICIPANT_SLOTS) players[slot] = GetPlayerName(Player(slot));
