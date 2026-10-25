@@ -9,6 +9,7 @@ import { quietNativeSessionArgs } from "wisp/scripts/wisp/quietNativeCapacity";
 import { fighterName, PLAYABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";
 import { capacityHelper, admitsThroughHelper } from "../heavyCapacity";
 import { stopBunProcess } from "../hostProcess";
+import { pairRestartFile } from "./commands/lanPoolUnit";
 import { userSessionEnv } from "./commands/nativeUnit";
 import { currentPlaytest } from "./currentPlaytest";
 import { type SmokeReport, isGreen } from "./greenBuilds";
@@ -35,6 +36,7 @@ interface ShardOutcome {
   readonly verdicts: readonly { readonly id: string; readonly verdict: string; readonly reason: string }[];
   readonly rows: readonly string[];
   readonly failures: SmokeMatchFailures | undefined;
+  readonly restart?: string;
   readonly seconds: number;
 }
 
@@ -59,7 +61,8 @@ const outcome = (shard: number, directory: string, code: number | "timeout", sec
   const decoded = existsSync(report) ? Schema.decodeOption(Report)(readFileSync(report, "utf8")) : undefined;
   const verdicts = decoded?._tag === "Some" ? decoded.value.results.filter(({ id }) => id === movesShardId(shard) || id === specialsShardId(shard)) : [];
   const rows = tables(directory).flatMap(file => readFileSync(file, "utf8").split("\n").slice(1).filter(line => line !== ""));
-  return { shard, code, verdicts, rows, failures: matchFailures(directory, since), seconds };
+  const restart = existsSync(pairRestartFile(directory)) ? readFileSync(pairRestartFile(directory), "utf8").trim() : undefined;
+  return { shard, code, verdicts, rows, failures: matchFailures(directory, since), seconds, ...(restart === undefined ? {} : { restart }) };
 };
 
 export const shardPassed = ({ code, verdicts, rows }: ShardOutcome): boolean =>
@@ -103,6 +106,8 @@ const runShard = (shard: number, pair: string, map: string, directory: string) =
 
 const runText = ({ code, problem }: ShardOutcome): string => code === "timeout" ? `stopped at ${SHARD_RUN_SECONDS} s` : code === "error" ? `not run: ${problem ?? "unknown"}` : `exit ${code}`;
 
+const runLine = (item: ShardOutcome): string => item.restart === undefined ? runText(item) : `${runText(item)}; ${item.restart}`;
+
 export const shardCrashed = (item: ShardOutcome): boolean => typeof item.code !== "number" || item.failures === undefined || item.verdicts.length !== 2;
 
 export const smokeResult = (sha256: string, outcomes: readonly ShardOutcome[]): SmokeReport => ({
@@ -110,6 +115,7 @@ export const smokeResult = (sha256: string, outcomes: readonly ShardOutcome[]): 
   shards: outcomes.map(item => ({
     shard: smokeShardLabel(item.shard), run: runText(item), crash: shardCrashed(item),
     deadBindings: item.failures?.deadBindings ?? [], movesNotStarted: item.failures?.movesNotStarted ?? [],
+    ...(item.restart === undefined ? {} : { restart: item.restart }),
   })),
 });
 
@@ -118,7 +124,7 @@ const pairLabel = (shard: number) => (smokePairs()[shard] ?? []).map(choice => f
 export const smokeReport = (map: string, sha256: string, outcomes: readonly ShardOutcome[]): string => [
   `# Native move smoke`, "", `Candidate: ${map}`, `SHA256: ${sha256}`, "",
   "| Shard | Fighters | Run | Seconds | Verdict |", "|---|---|---|---|---|",
-  ...outcomes.map(item => `| ${smokeShardLabel(item.shard)} | ${pairLabel(item.shard)} | ${runText(item).replaceAll("|", "/")} | ${item.seconds} | ${shardPassed(item) ? "PASS" : `FAIL ${item.verdicts.filter(({ verdict }) => verdict !== "pass").map(({ id, verdict, reason }) => `${id} ${verdict}: ${reason}`).join("; ").replaceAll("|", "/")}`} |`),
+  ...outcomes.map(item => `| ${smokeShardLabel(item.shard)} | ${pairLabel(item.shard)} | ${runLine(item).replaceAll("|", "/")} | ${item.seconds} | ${shardPassed(item) ? "PASS" : `FAIL ${item.verdicts.filter(({ verdict }) => verdict !== "pass").map(({ id, verdict, reason }) => `${id} ${verdict}: ${reason}`).join("; ").replaceAll("|", "/")}`} |`),
   "", `| Shard | ${SMOKE_TABLE_HEADER.split("\t").join(" | ")} |`, "|---|---|---|---|---|---|",
   ...outcomes.flatMap(item => item.rows.map(row => `| ${smokeShardLabel(item.shard)} | ${row.replaceAll("|", "/").split("\t").join(" | ")} |`)),
   "",
@@ -139,6 +145,7 @@ export const runNativeSmoke = (pair: string, map: string, shards: readonly numbe
   for (const shard of shards) {
     const directory = join(root, movesShardId(shard));
     rmSync(smokeShardFile(sha256, shard), { force: true });
+    rmSync(pairRestartFile(directory), { force: true });
     const first = yield* runShard(shard, pair, map, directory);
     const outcome = !shardPassed(first) && frozen(first) ? yield* runShard(shard, pair, map, directory) : first;
     outcomes.push(outcome);

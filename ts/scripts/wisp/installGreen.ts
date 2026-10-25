@@ -46,7 +46,7 @@ const decodeGateReport = Schema.decodeUnknownEffect(Schema.fromJsonString(GateRe
 
 const SmokeResult = Schema.Struct({
   candidateMapSha256: Schema.String,
-  shards: Schema.Array(Schema.Struct({ shard: Schema.String, run: Schema.String, crash: Schema.Boolean, deadBindings: Schema.Array(Schema.String), movesNotStarted: Schema.Array(Schema.String) })),
+  shards: Schema.Array(Schema.Struct({ shard: Schema.String, run: Schema.String, crash: Schema.Boolean, deadBindings: Schema.Array(Schema.String), movesNotStarted: Schema.Array(Schema.String), restart: Schema.optionalKey(Schema.String) })),
 });
 const decodeSmokeResult = Schema.decodeUnknownEffect(Schema.fromJsonString(SmokeResult));
 export const greenState = join(homedir(), ".local/state/smashcraft/green-builds");
