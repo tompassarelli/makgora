@@ -14,6 +14,7 @@
 
 import { at } from "wisp/src/runtime/lookup";
 import { type TokenLines, addToken, addWrittenToken, addWrittenTokens, endTokenLine, lineTokens, parseRecord, recordTokens, writeFieldTokens } from "wisp/src/runtime/recordText";
+import { type FieldCursor, beginFieldSlices, createFieldCursor, fieldSlicesOpen, writeFieldSlice } from "wisp/src/runtime/recordSlices";
 import { type Repro, type ReproResult, reproLines } from "wisp/src/runtime/repro";
 import { floorDiv, floorMod } from "wisp/src/sim/intMath";
 import { PARTICIPANT_SLOTS } from "../input/participants";
@@ -230,14 +231,14 @@ function writeElement(sink: TokenLines, list: readonly unknown[], index: number)
   return 1;
 }
 
-function writePiece(piece: StatePiece, text: StateText): number | undefined {
+function writePiece(piece: StatePiece, text: StateText, budget: number): number | undefined {
   const sink = text.sink;
   if (typeof piece === "string") {
     text.next++;
     addToken(sink, piece);
     return 1;
   }
-  if ("list" in piece) {
+  if (!fieldSlicesOpen(text.cursor) && "list" in piece) {
     if (text.element === 0) {
       text.element = 1;
       if (primitiveList(piece.list)) {
@@ -253,12 +254,19 @@ function writePiece(piece: StatePiece, text: StateText): number | undefined {
     }
     text.element = 0;
   }
-  text.next++;
-  const value = piece.record[piece.name];
-  if (value === undefined) return emptyFieldTokens();
-  const count = writeFieldTokens(piece.name, value, KEYED_BY_ACTION);
-  if (count !== undefined) addWrittenTokens(sink, count);
-  return count;
+  const { cursor } = text;
+  if (!fieldSlicesOpen(cursor)) {
+    const value = piece.record[piece.name];
+    if (value === undefined || !beginFieldSlices(cursor, piece.name, value, KEYED_BY_ACTION)) {
+      text.next++;
+      return value === undefined ? emptyFieldTokens() : undefined;
+    }
+  }
+  const count = writeFieldSlice(cursor, budget);
+  if (!fieldSlicesOpen(cursor)) text.next++;
+  if (count === undefined) return undefined;
+  addWrittenTokens(sink, count);
+  return cursor.steps;
 }
 
 
@@ -280,6 +288,7 @@ interface StateText {
   next: number;
   element: number;
   readonly sink: TokenLines;
+  readonly cursor: FieldCursor;
 }
 
 export interface MatchReplayRecorder {
@@ -396,6 +405,21 @@ function finishStateText(recorder: MatchReplayRecorder): void {
 }
 
 
+function endStateText(recorder: MatchReplayRecorder, text: StateText, wait: boolean): void {
+  if (wait && recorder.checkpoint !== undefined) return;
+  recorder.text = undefined;
+  finishCheckpoint(recorder);
+  endTokenLine(text.sink);
+  for (const line of text.sink.lines) recorder.lines.push(line);
+}
+
+
+function finishWrittenStateText(recorder: MatchReplayRecorder): void {
+  const text = recorder.text;
+  if (text?.pieces !== undefined && text.next >= text.pieces.length) endStateText(recorder, text, false);
+}
+
+
 function continueStateText(recorder: MatchReplayRecorder, budget: number): void {
   const text = recorder.text;
   if (text === undefined) return;
@@ -420,7 +444,7 @@ function continueStateText(recorder: MatchReplayRecorder, budget: number): void 
   }
   let written = 0;
   while (text.next < pieces.length && written < budget) {
-    const count = writePiece(at(pieces, text.next), text);
+    const count = writePiece(at(pieces, text.next), text, budget - written);
     if (count === undefined) {
       recorder.failed = true;
       continue;
@@ -428,10 +452,7 @@ function continueStateText(recorder: MatchReplayRecorder, budget: number): void 
     written += count;
   }
   if (text.next < pieces.length) return;
-  recorder.text = undefined;
-  finishCheckpoint(recorder);
-  endTokenLine(text.sink);
-  for (const line of text.sink.lines) recorder.lines.push(line);
+  endStateText(recorder, text, !all);
 }
 
 
@@ -448,7 +469,7 @@ function beginSegment(recorder: MatchReplayRecorder, start: number, world: Reado
   recorder.digests = [];
   recorder.last = start;
   recorder.ended = false;
-  recorder.text = { segmentLine: recorder.lines.length, fold: beginFold(recorder.start.world), slot: 0, gathered: [], pieces: undefined, next: 0, element: 0, sink: sectionLines("state ", []) };
+  recorder.text = { segmentLine: recorder.lines.length, fold: beginFold(recorder.start.world), slot: 0, gathered: [], pieces: undefined, next: 0, element: 0, sink: sectionLines("state ", []), cursor: createFieldCursor() };
   recorder.lines.push("segment");
 }
 
@@ -505,6 +526,7 @@ function encodeRows(recorder: MatchReplayRecorder, moment: Readonly<MomentRecord
   if (last <= recorder.encoded) return true;
   if (!scanRows(recorder, moment, last)) return false;
   finishCheckpoint(recorder);
+  finishWrittenStateText(recorder);
   if (recorder.runCount > 0) recorder.runs.push(runToken(moment, recorder.runIndex, recorder.runCount));
   recorder.runCount = 0;
   pushSection(recorder.lines, "rows ", recorder.runs);
