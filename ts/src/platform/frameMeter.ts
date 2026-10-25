@@ -9,11 +9,23 @@ import { installFrameMeter as installWispFrameMeter, startFrameCostCapture, star
 import { PARTICIPANT_SLOTS } from "../game/input/participants";
 import { Phase } from "../game/lobby/lobbyState";
 import { parseDecimal } from "../game/netcode/journal/decimal";
-import { shellState } from "../host/loop/state";
+import { activeRollback, shellState } from "../host/loop/state";
 import { FRAME_SECTIONS } from "../host/loop/frameSections";
 
 
 const PERF_COMMAND = "-dev perf";
+
+function speculativeFrame(): number {
+  const state = shellState();
+  const rollback = state === undefined ? undefined : activeRollback(state);
+  return rollback?.schedule.speculativeFrame() ?? -1;
+}
+
+const CAPTURE_STAMPS = [
+  { name: "frame", read: () => shellState()?.runtime.simulationFrame ?? -1 },
+  { name: "speculative", read: speculativeFrame },
+  { name: "replay", read: () => shellState()?.replay.serial ?? -1 },
+];
 
 const CAPTURE_COMMAND = "-dev capture ";
 const CAPTURE_HANDLER = "frameMeter.capture";
@@ -42,6 +54,7 @@ export function startMatchFrameMeter(): void {
     simulationFrame: () => shellState()?.runtime.simulationFrame ?? 0,
     toggle: PERF_COMMAND,
     sections: FRAME_SECTIONS,
+    stamps: CAPTURE_STAMPS,
   });
   on(CAPTURE_HANDLER, captureCommand);
   const chat = CreateTrigger();
