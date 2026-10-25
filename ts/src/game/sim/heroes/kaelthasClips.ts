@@ -11,7 +11,7 @@ export const KAELTHAS_CLIPS = { idle: KAELTHAS_FALLBACK, walk: { index: 2, secon
   forwardTiltDown: { index: 15, seconds: f32(0.517), aligned: true },
   upTilt: { index: 16, seconds: f32(0.517), aligned: true },
   downTilt: { index: 17, seconds: f32(0.45), aligned: true },
-  dashAttack: { index: 18, seconds: f32(0.617), aligned: true },
+  dashAttack: { index: 18, seconds: f32(0.633), aligned: true },
   forwardSmash: { index: 19, seconds: f32(0.767), aligned: true },
   upSmash: { index: 20, seconds: f32(0.883), aligned: true },
   downSmash: { index: 21, seconds: f32(0.917), aligned: true },

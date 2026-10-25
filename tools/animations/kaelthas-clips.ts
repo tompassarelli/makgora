@@ -23,12 +23,12 @@ function tracks(value: unknown, visit: (track: mdx.AnimVector, path: string) => 
 const globalClock = (track: mdx.AnimVector) => track.GlobalSeqId != null && track.GlobalSeqId !== -1 && track.GlobalSeqId !== 0xffffffff;
 const args = process.argv.slice(2);
 const [input, output] = args.slice(0, 2).map(p => resolve(p));
-const painOnly = args.includes("pain");
+const replaced = args.slice(2), inPlace = replaced.length > 0, painOnly = replaced.includes("pain");
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/kaelthas-clips.ts STOCK_BLOOD_MAGE.mdx|SHIPPED_BLOOD_MAGE.mdx PRIVATE_OUTPUT [pain]");
+ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/kaelthas-clips.ts STOCK_BLOOD_MAGE.mdx|SHIPPED_BLOOD_MAGE.mdx PRIVATE_OUTPUT [pain] [POSE...]");
 const originalBytes = await Bun.file(input).arrayBuffer();
 const source = parseMDX(originalBytes), model = structuredClone(source);
-ensure((painOnly ? source.Sequences.some(s => s.Name === "Kaelthas Damage 0 0") : source.Sequences.length === 11) && source.Bones.some(b => b.Name === "Bone_Hand_R"), "Expected original classic Blood Mage");
+ensure((inPlace ? source.Sequences.some(s => s.Name === "Kaelthas Damage 0 0") : source.Sequences.length === 11) && source.Bones.some(b => b.Name === "Bone_Hand_R"), "Expected original classic Blood Mage");
 const stand = source.Sequences[0]!;
 interface Gesture { chest?: number; pelvis?: number; arm?: number; elbow?: number; hand?: number; leftArm?: number; leftElbow?: number; head?: number; thigh?: number; knee?: number; leftKnee?: number; leftThigh?: number; yaw?: number; lean?: number; tx?: number; tz?: number; }
 type Ease = "in" | "out" | "inout" | "linear";
@@ -42,7 +42,7 @@ const back: Gesture = { chest: -12, pelvis: -15, arm: 40, leftArm: -55, head: 20
 const cast: Gesture = { chest: -15, pelvis: 8, arm: -120, elbow: -30, leftArm: -115, leftElbow: -20, head: -12 };
 const brace: Gesture = { chest: 28, pelvis: 12, arm: -50, elbow: -30, leftArm: -70, leftElbow: -25, head: -15, thigh: 38, knee: -65, leftThigh: -35 };
 const actions: Action[] = [];
-interface Strike { w: Gesture; c: Gesture; o: Gesture; r: Gesture; late: number; mid?: number; lead?: number }
+interface Strike { w: Gesture; c: Gesture; o: Gesture; r: Gesture; late: number; mid?: number; lead?: number; hold?: Gesture }
 const along = (from: Gesture, to: Gesture, amount: number): Gesture => {
   const out: Gesture = {};
   for (const field of GESTURE_FIELDS) out[field] = (from[field] ?? 0) + ((to[field] ?? 0) - (from[field] ?? 0)) * amount;
@@ -55,7 +55,8 @@ function strikeKeys(total: number, startup: number, active: number, strike: Stri
   if (strike.lead !== undefined && c - 1 > w) { const arms = along(strike.w, strike.c, strike.lead);
     keys.push({ frame: c - 1, g: { ...strike.c, arm: arms.arm, elbow: arms.elbow, leftArm: arms.leftArm, leftElbow: arms.leftElbow }, ease: "in" }, { frame: c, g: strike.c, ease: "linear" }); }
   else keys.push({ frame: c, g: strike.c, ease: "in" });
-  if (last > c && last < peak) keys.push({ frame: last, g: along(strike.c, strike.o, 0.85), ease: "linear" }, { frame: peak, g: strike.o, ease: "out" });
+  if (strike.hold && last > peak) keys.push({ frame: peak, g: strike.o, ease: "out" }, { frame: last, g: strike.hold, ease: "linear" });
+  else if (last > c && last < peak) keys.push({ frame: last, g: along(strike.c, strike.o, 0.85), ease: "linear" }, { frame: peak, g: strike.o, ease: "out" });
   else keys.push({ frame: peak, g: strike.o, ease: "out" });
   const middle = Math.round(Math.max(last, peak) + (end - Math.max(last, peak)) * (strike.mid ?? 0.5));
   if (middle > peak + 1 && middle < end - 1) keys.push({ frame: middle, g: strike.r, ease: "linear" });
@@ -87,9 +88,11 @@ const RAW_STRIKES: Partial<Record<HeroPose, Strike>> = {
   downTilt: { late: 2, w: { thigh: -45, knee: -75, leftThigh: 25, leftKnee: -45, tx: -40, lean: 30, arm: -45, leftArm: 20 },
     c: { thigh: -45, knee: -75, leftThigh: 25, leftKnee: -45, tx: 16, lean: 36, arm: -45, leftArm: 30 }, o: { thigh: -45, knee: -75, leftThigh: 25, leftKnee: -45, tx: 20, lean: 37, arm: -45, leftArm: 32 },
     r: { thigh: -15, knee: -25, tx: -4, lean: 8, arm: -25 } },
-  dashAttack: { late: 2, w: { ...STEP, tx: -24, lean: -8, arm: -88, leftArm: -50 },
-    c: { ...STEP, tx: 22, lean: 14, arm: -90, leftArm: 40 }, o: { ...STEP, tx: 27, lean: 15, arm: -90, leftArm: 45 },
-    r: { tx: -5, lean: -3, arm: -35, leftArm: -10 } },
+  dashAttack: { late: 2, mid: 0.5, w: { thigh: 9, knee: 0, leftThigh: 29, leftKnee: 10, tx: -50, lean: -24, chest: -18, yaw: -35, head: 12, arm: -30, elbow: 0, leftArm: -50, leftElbow: -70 },
+    c: { thigh: -57, knee: 25, leftThigh: 13, leftKnee: 0, tx: 26, lean: 22, chest: 12, yaw: 25, head: -10, arm: -120, leftArm: -165, leftElbow: -10 },
+    o: { thigh: -59, knee: 27, leftThigh: 12, leftKnee: 0, tx: 30, lean: 24, chest: 14, yaw: 28, head: -10, arm: -123, leftArm: -150, leftElbow: -10 },
+    hold: { thigh: -72, knee: 40, leftThigh: 10, leftKnee: 0, tx: 30, lean: 34, chest: 18, yaw: 12, head: -16, arm: -140, leftArm: -110, leftElbow: 0 },
+    r: { thigh: -45, knee: 20, leftThigh: 5, tx: 16, lean: 16, chest: 10, yaw: 6, arm: -60, elbow: -20, leftArm: -50, leftElbow: -20 } },
   forwardSmash: { late: 2, mid: 0.6, w: { ...LOAD, tx: -18, lean: -14, arm: 40, elbow: -60, leftArm: 30, leftElbow: -60 },
     c: { ...STEP, tx: 20, lean: 14, arm: -95, leftArm: -95 }, o: { ...STEP, tx: 27, lean: 17, arm: -125, leftArm: -125 },
     r: { tx: 2, lean: -5, arm: -40, elbow: -40, leftArm: -40, leftElbow: -40 } },
@@ -215,7 +218,11 @@ for (let height = 0; height < 3; height++) for (let strength = 0; strength < 3; 
     : height === 1 ? { chest: 55 * gain, pelvis: -25 * gain, arm: 30 * gain, leftArm: 35 * gain, head: 12 * gain }
     : { head: -50 * stretch, chest: -40 * stretch, lean: -12 * stretch, pelvis: 15 * stretch, arm: 50 * stretch, leftArm: -150 * stretch, leftElbow: -20 * stretch, tz: 5 * stretch } });
 }
-if (painOnly) actions.length = 0;
+if (inPlace) {
+  ensure(replaced.every(pose => pose === "pain" || actions.some(action => action.pose === pose)), `unknown pose in ${replaced.join(" ")}`);
+  actions.splice(0, actions.length, ...actions.filter(action => replaced.includes(action.pose)));
+  if (!painOnly) damageActions.length = 0;
+}
 function rotated(q: ArrayLike<number>, y: number, z = 0) {
   const a = y * Math.PI / 360, b = z * Math.PI / 360;
   const [i, j, k, l] = [-Math.sin(a) * Math.sin(b), Math.sin(a) * Math.cos(b), Math.cos(a) * Math.sin(b), Math.cos(a) * Math.cos(b)];
@@ -259,13 +266,15 @@ const cutoff = cursor, bindings: string[] = [], damageBindings: string[] = [];
 const records: { pose: string; index: number; frames: number; contact: number }[] = [];
 for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
   const name = ordinal < actions.length ? `Kaelthas ${action.pose}` : `Kaelthas Damage ${Math.floor((ordinal - actions.length) / 3)} ${(ordinal - actions.length) % 3}`;
-  const existing = painOnly ? model.Sequences.findIndex(sequence => sequence.Name === name) : -1;
-  ensure(!painOnly || existing >= 0, `${name}: shipped sequence missing`);
+  const existing = inPlace ? model.Sequences.findIndex(sequence => sequence.Name === name) : -1;
+  ensure(!inPlace || existing >= 0, `${name}: shipped sequence missing`);
   const index = existing >= 0 ? existing : model.Sequences.length;
   const start = existing >= 0 ? model.Sequences[index]!.Interval[0]! : cursor, end = start + Math.round(action.frames * 1000 / 60);
   if (existing >= 0) {
-    ensure(model.Sequences[index]!.Interval[1] === end, `${name}: timing changed`);
-    tracks(model, track => { if (!globalClock(track)) track.Keys = track.Keys.filter(key => key.Frame < start || key.Frame > end); });
+    const shipped = model.Sequences[index]!.Interval[1]!, next = Math.min(...model.Sequences.map(sequence => sequence.Interval[0]!).filter(first => first > start));
+    ensure(end < next, `${name}: no room before the next sequence`);
+    tracks(model, track => { if (!globalClock(track)) track.Keys = track.Keys.filter(key => key.Frame < start || key.Frame > Math.max(end, shipped)); });
+    model.Sequences[index]!.Interval = new Uint32Array([start, end]);
   } else {
     cursor = end + 100;
     model.Sequences.push({ ...stand, Name: name, Interval: new Uint32Array([start, end]), NonLooping: true, MoveSpeed: 0, Rarity: 0,
@@ -294,7 +303,7 @@ for (const [ordinal, action] of [...actions, ...damageActions].entries()) {
       track.Keys.push({ ...first, Frame: start + Math.round(frame * 1000 / 60), Vector, ...(first.InTan ? { InTan: tangent(), OutTan: tangent() } : {}) });
     }
   });
-  if (painOnly) tracks(model, track => track.Keys.sort((a, b) => a.Frame - b.Frame));
+  if (inPlace) tracks(model, track => track.Keys.sort((a, b) => a.Frame - b.Frame));
   if (action.target && !action.keys) {
     const renderer = new ModelRenderer(model), data = Reflect.get(renderer, "rendererData"); renderer.setSequence(index); data.frame = start + Math.round(action.contact * 1000 / 60);
     const arm = model.Nodes.find(n => n.Name === "Bone_Arm1_R")!, elbow = model.Nodes.find(n => n.Name === "Bone_Arm2_R")!, hand = model.Nodes.find(n => n.Name === "Bone_Hand_R")!, pivot = model.PivotPoints[hand.ObjectId]!;
@@ -339,7 +348,7 @@ for (const [ordinal, action] of actions.entries()) if (/^victim(Pummel|Throw)/.t
   records[ordinal]!.frames = 60; records[ordinal]!.contact = 30;
 }
 const normalReach: unknown[] = [];
-if (painOnly) {
+if (inPlace) {
   const before = new DrawnModel(originalBytes, 1), after = new DrawnModel(generateMDX(model), 1), authored = new Set(records.map(record => record.index));
   for (const [index, sequence] of source.Sequences.entries()) if (!authored.has(index)) for (const part of [0, 0.5, 1]) {
     const time = (sequence.Interval[1]! - sequence.Interval[0]!) * part / 1000, a = before.triangles(index, time, 1), b = after.triangles(index, time, 1);
@@ -353,7 +362,15 @@ if (painOnly) {
 const bytes = generateMDX(model), decoded = parseMDX(bytes);
 ensure(isDeepStrictEqual(parseMDX(generateMDX(decoded)), decoded), "MDX round trip changed model");
 mkdirSync(output, { recursive: true }); await Bun.write(join(output, "herobloodelf.mdx"), bytes);
-if (!painOnly) await Bun.write(join(project, "ts/src/game/sim/heroes/kaelthasClips.ts"), [
+const clipTable = join(project, "ts/src/game/sim/heroes/kaelthasClips.ts");
+if (inPlace) {
+  let table = await Bun.file(clipTable).text();
+  for (const binding of bindings) {
+    const line = new RegExp(`^  ${binding.trim().split(":")[0]}: .*,$`, "m");
+    ensure(line.test(table), `${binding}: no binding to replace`); table = table.replace(line, () => binding);
+  }
+  await Bun.write(clipTable, table);
+} else await Bun.write(clipTable, [
   "",
   'import { f32 } from "wisp/src/sim/f32";', 'import type { HeroClip, HeroClipTable } from "./hero";',
   'export const KAELTHAS_MODEL_FILE = "units\\\\human\\\\HeroBloodElf\\\\HeroBloodElf.mdl";',
@@ -373,6 +390,8 @@ for (const [i, action] of [...actions, ...damageActions].entries()) {
 }
 await Bun.write(join(output, "kaelthas-clips.json"), JSON.stringify({ stockSequences: source.Sequences.length, appended: records.length, measuredBothFacings: measured, records }, null, 2) + "\n");
 await Bun.write(join(output, "normal-reach.json"), JSON.stringify(normalReach, null, 2) + "\n");
-const gate = painGate(bytes, Character.kaelthas, 0, records.slice(-9).map(record => record.index));
-console.log(gate.report); ensure(gate.pass, "Kaelthas pain gate failed");
+if (damageActions.length) {
+  const gate = painGate(bytes, Character.kaelthas, 0, records.slice(-9).map(record => record.index));
+  console.log(gate.report); ensure(gate.pass, "Kaelthas pain gate failed");
+}
 console.log(`KAELTHAS_CLIPS_PASS ${records.length} authored clips; ${source.Sequences.length} stock sequences retained; ${measured} both-facing sheets; private output ${output}`);

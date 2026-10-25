@@ -93,6 +93,9 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `bun tools/animations/kaelthas-clips.ts STOCK_BLOOD_MAGE.mdx PRIVATE_OUTPUT`
   appends Kael’thas’s normal, special, paired throw, recovery and nine pain
   gestures, preserves all eleven stock sequences, and writes both-facing sheets.
+  Given the shipped model and `pain` or pose names (`dashAttack`) instead, it
+  re-authors only those clips in place at their indices, fits a retimed clip
+  before the next sequence, rewrites its binding and checks every other pose is unchanged.
   `bun tools/animations/murloc-clips.ts STOCK_MURLOC.mdx PRIVATE_OUTPUT` appends the
   Murloc's normal, special, paired throw, recovery and nine pain gestures to the
   stock Tiderunner, preserves its nine sequences and writes both-facing sheets;
