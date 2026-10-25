@@ -27,7 +27,7 @@ export const MURLOC_MOVES: FighterMoves = {
       [AttackStyle.jab]: reach(2, 6, 40.0, 40.0), [AttackStyle.jab2]: reach(4, 8, 46.0, 40.0),
       [AttackStyle.forwardTilt]: reach(5, 10, 50.0, 40.0), [AttackStyle.forwardTiltUp]: reach(5, 10, 48.0, 66.0),
       [AttackStyle.forwardTiltDown]: reach(5, 10, 50.0, 16.0), [AttackStyle.upTilt]: reach(4, 10, 12.0, 90.0),
-      [AttackStyle.downTilt]: reach(4, 9, 46.0, 12.0), [AttackStyle.dashAttack]: reach(6, 13, 46.0, 30.0),
+      [AttackStyle.downTilt]: reach(4, 9, 46.0, 12.0), [AttackStyle.dashAttack]: reach(4, 19, 46.0, 30.0),
       [AttackStyle.forwardSmash]: reach(12, 18, 58.0, 40.0), [AttackStyle.upSmash]: reach(9, 16, 10.0, 96.0),
       [AttackStyle.downSmash]: reach(10, 17, 52.0, 14.0), [AttackStyle.neutralAir]: reach(4, 12, 30.0, 44.0),
       [AttackStyle.forwardAir]: reach(5, 11, 50.0, 46.0), [AttackStyle.backAir]: reach(6, 12, -50.0, 40.0),
@@ -41,7 +41,7 @@ export const MURLOC_MOVES: FighterMoves = {
     [AttackStyle.forwardTilt]: tilt(40.0, 35), [AttackStyle.forwardTiltUp]: tilt(64.0, 55), [AttackStyle.forwardTiltDown]: tilt(14.0, 25),
     [AttackStyle.upTilt]: heroMove(5, 4, 18, 0, [heroRegion(5, 8, claw(14.0, 50.0, 6.0, 90.0, 14.0), ordinary(8.742053031921387, 90, 81.19612121582031, 22.0))]),
     [AttackStyle.downTilt]: heroMove(5, 3, 16, 0, [heroRegion(5, 7, claw(18.0, 8.0, 60.0, 8.0), ordinary(7.493188381195068, 80, 81.19612121582031, 22.0))]),
-    [AttackStyle.dashAttack]: heroMove(7, 5, 26, 0, [heroRegion(7, 11, claw(16.0, 26.0, 64.0, 26.0, 14.0), ordinary(11.239782333374023, 55))], 48.0, true),
+    [AttackStyle.dashAttack]: heroMove(6, 12, 20, 0, [heroRegion(6, 17, claw(16.0, 26.0, 64.0, 26.0, 14.0), ordinary(11.239782333374023, 55))], 48.0, true),
     [AttackStyle.forwardSmash]: heroMove(14, 3, 36, 0, [heroRegion(14, 16, claw(24.0, 40.0, 86.0, 40.0, 12.0), ordinary(17.167999267578125, 35, 107.0719985961914, 26.0))]),
     [AttackStyle.upSmash]: heroMove(11, 4, 34, 0, [heroRegion(11, 14, claw(0.0, 40.0, 0.0, 114.0, 16.0), ordinary(18.732969284057617, 90, 94.72880554199219, 26.0))]),
     [AttackStyle.downSmash]: heroMove(12, 4, 34, 0, [
