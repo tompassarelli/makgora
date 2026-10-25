@@ -114,6 +114,7 @@ export function finishLanding(f: Fighter, stage: number, matchFrame: number, inp
     landingState.lag = max(landingState.lag, EMPTY_LANDING_LAG);
   }
   dodge.airUsed = false;
+  dodge.airMotionFrames = 0;
   f.ledge.grabs = 0;
   if (dodge.airDodging) {
     landingState.lag = AIR_DODGE_LANDING_LAG;

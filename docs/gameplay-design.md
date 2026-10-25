@@ -2032,23 +2032,41 @@ makes the edge a place the attacker wants to put the opponent. Being near it or
 off the stage is dangerous; the attacker has options at the edge that the
 centre does not offer.
 
-### Edge cancels
+### Edge cancels (#275)
 
-An aerial's landing lag, or a ground move's end lag, ends on the frame the
-fighter slides off the surface. It applies to the stage edge and to the ends of
-platforms alike, and covers every landing lag (aerial, air dodge, special).
+A fighter that slides off a surface while still committed on the ground enters
+fall on its first airborne frame: no remaining landing lag, no remaining move,
+its horizontal speed kept and normal gravity from that frame. It applies to the
+stage lip and to the ends of platforms alike.
 
 | | Melee | Ultimate | Smashcraft |
 | --- | --- | --- | --- |
-| Landing lag when sliding off an edge | Cancelled for any landing; the fighter enters fall with no lag ([SmashWiki](https://ssbwiki.com/Edge_cancel)) | Restricted to specific actions; Smash 4 allowed it only on an air dodge facing the ledge | Cancelled for every landing lag, on the first airborne frame |
-| End lag of a ground move | Cancelled for specials used at the lip ([SmashWiki](https://ssbwiki.com/Edge_cancel)) | Not sourced | Cancelled once the move's active frames are over; startup and active frames are kept |
+| Landing lag when sliding off an edge | Cancelled for any landing: aerial, empty and freefall landings; the fighter falls with its air momentum and aerial options ([SmashWiki](https://www.ssbwiki.com/Edge_cancel)) | Restricted to specific actions; Smash 4 allowed it only on an air dodge facing the ledge | Cancelled for every landing lag (aerial, empty, air dodge or waveland, special fall) |
+| A grounded attack carried off an edge | Cancelled: shield pushback or a windbox that slides the attacker off ends the attack ([SmashWiki](https://www.ssbwiki.com/Edge_cancel), shield pushback and windbox variants) | Not sourced | Cancelled in any phase, startup and active frames included |
+| Grounded specials | Per move; SmashWiki lists the Melee specials whose grounded part or landing cancels | Per move | Not changed here: each hero special keeps its own grounded and airborne handling |
 
 Frames: the cancel takes effect on the frame the fighter leaves the surface, so
 a fighter that lands with 7 frames of lag one frame from the lip is actionable
-in the air on the next frame. A move still in startup or its active frames is
-not cancelled; a hit, knockdown, grab or shield takes precedence over it.
-L-cancelling stays removed, so the cancel is the only way to shorten landing
-lag and it is a position decision, not an input chore.
+in the air on the next frame. A hit, knockdown, grab or shield takes precedence
+over it. A landing also ends what is left of the air dodge's motion, so a
+waveland slid off an edge falls under gravity instead of drifting on the air
+dodge's decay; before #275 that leftover motion held a fighter nearly level
+above the platform for up to 27 frames. L-cancelling stays removed, so the
+cancel is the only way to shorten landing lag and it is a position decision,
+not an input chore.
+
+Melee mechanics this does not model, named so they are not mistaken for
+parity: the backward edge slip (SmashWiki's [Edge slip](https://www.ssbwiki.com/Edge_slip)
+puts a fighter who slips off facing away into a short helpless animation;
+Smashcraft's shield slide-off falls helpless instead), and slow walks that
+teeter at the edge. Rolls and spot dodges stop at the edge as before.
+
+The tape checker holds the rule on every acceptance tape
+(ts/scripts/wisp/acceptanceTapes.ts): a fighter that leaves a surface during
+landing lag, air dodge motion or a ground move must have no lag, move or air
+dodge motion left and must not rise for its next four frames. The tapes
+`edge-cancel-waveland-platform`, `edge-cancel-waveland-lip` and
+`edge-cancel-dash-attack-platform` exercise each case.
 
 The attacker's options out of the cancel, each deterministic and visible on the
 tapes `edge-cancel-turnaround` and `edge-cancel-back-air`:

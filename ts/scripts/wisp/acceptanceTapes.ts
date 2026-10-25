@@ -11,7 +11,9 @@ import { actionFor, keyLabel, presetBindings } from "../../src/game/input/keyBin
 import { padLayerKey } from "../../src/game/input/padKeys";
 import { TAPE_HEADER, decodeTape } from "../../src/game/replay/tape";
 import { type TapeSession, createTapeSession, performTapeOperation } from "../../src/game/replay/tapeRunner";
-import { Character } from "../../src/game/sim/codes";
+import { Character, DownState, LedgeState } from "../../src/game/sim/codes";
+import type { Fighter } from "../../src/game/sim/fighter";
+import { isAerialAttack } from "../../src/game/sim/moves";
 import { type Controls, fighterAt, isActive, neutralControls } from "../../src/game/sim/roster";
 import { surfaceShiftX, surfaceShiftZ } from "../../src/game/sim/stage";
 import { windPush } from "../../src/game/sim/stageHazards";
@@ -109,6 +111,52 @@ function exercised(session: TapeSession, exercise: "pushed" | "carried" | "shiel
   return edge;
 }
 
+interface SlideMemory {
+  grounded: boolean;
+  held: boolean;
+  free: boolean;
+  vz: number;
+  jumps: number;
+  falling: number;
+}
+
+const FALL_CHECK_FRAMES = 4;
+
+function heldOnGround(f: Readonly<Fighter>): boolean {
+  return f.landing.lag > 0 || f.dodge.airMotionFrames > 0 || (f.attack.style !== undefined && !isAerialAttack(f.attack.style));
+}
+
+function freeToFall(f: Readonly<Fighter>): boolean {
+  return f.launch.hitstun <= 0 && f.launch.hitlag <= 0 && f.down.state === DownState.none && !f.shield.raised && f.shield.stun <= 0
+    && f.grab.target === undefined && f.ledge.state === LedgeState.none && f.jump.squat <= 0;
+}
+
+function slideFallFault(f: Readonly<Fighter>, before: SlideMemory | undefined): string | undefined {
+  const { motion } = f;
+  if (before === undefined || motion.grounded || !freeToFall(f)) return undefined;
+  if (before.grounded && before.held && before.free) {
+    if (f.landing.lag > 0 || f.attack.style !== undefined || f.attack.cooldown > 0) return `still in lag after sliding off (landing ${f.landing.lag}, attack ${f.attack.style}, cooldown ${f.attack.cooldown})`;
+    if (f.dodge.airMotionFrames > 0) return `still carried by ${f.dodge.airMotionFrames} frames of air dodge motion after sliding off`;
+    if (f.special.fall) return "helpless after sliding off";
+  }
+  if (before.falling > 0 && f.jump.remaining === before.jumps && motion.vz > before.vz) return `held height after sliding off: vertical speed rose from ${before.vz} to ${motion.vz}`;
+  return undefined;
+}
+
+function checkSlideFalls(session: TapeSession, memory: SlideMemory[]): void {
+  const { world, match } = session.live;
+  for (const slot of [0, 1]) {
+    if (!isActive(world, slot)) continue;
+    const fighter = fighterAt(world, slot);
+    const before = memory[slot];
+    const fault = slideFallFault(fighter, before);
+    if (fault !== undefined) throw new Error(`fighter ${slot} at frame ${stageClock(match)}, x ${fighter.motion.x}, z ${fighter.motion.z}: ${fault}`);
+    const slid = before !== undefined && before.grounded && before.held && before.free && !fighter.motion.grounded;
+    const falling = fighter.motion.grounded || !freeToFall(fighter) ? 0 : slid ? FALL_CHECK_FRAMES : Math.max(0, (before?.falling ?? 0) - 1);
+    memory[slot] = { grounded: fighter.motion.grounded, held: heldOnGround(fighter), free: freeToFall(fighter), vz: fighter.motion.vz, jumps: fighter.jump.remaining, falling };
+  }
+}
+
 const NEUTRAL = Object.entries(neutralControls());
 
 function formatControls(controls: Controls, attacks: AttackBuffer): string {
@@ -148,6 +196,7 @@ function playMatch(script: MatchScript, session: TapeSession, play: (...lines: s
   const hold = session.live.match.startHold;
   let moved = false;
   const memory: EdgeMemory[] = [];
+  const slides: SlideMemory[] = [];
   for (let at = 1; at <= hold; at++) play(`frame ${at}`);
   for (let frame = 1; frame <= script.frames; frame++) {
     const at = frame + hold;
@@ -191,6 +240,7 @@ function playMatch(script: MatchScript, session: TapeSession, play: (...lines: s
     }
     if (first !== undefined) play(`rollback ${first + hold} ${at}`);
     if (script.exercise !== undefined && !moved) moved = exercised(session, script.exercise, memory);
+    checkSlideFalls(session, slides);
   }
   if (script.exercise !== undefined && !moved) throw new Error(`no fighter was ${script.exercise} by the stage on stage ${script.stage}`);
   const { drops } = session.live.match;
@@ -509,6 +559,24 @@ export function generateTapes(): Map<string, string> {
       characters: [Character.rifleman, Character.rifleman], stage: 0, stocks: 3, minutes: 0, frames: 120,
       holds: [[[1, 3, JUMP], [1, 36, RIGHT], [20, 2, ATTACK], [32, 2, C_LEFT]], [[1, 120, SHIELD_LEFT]]],
       approaches: [[], []], rollbacks: [[30, 60]], exercise: "edgeCancel",
+    }])],
+    ["edge-cancel-waveland-platform", recordTape("A waveland slides off the end of a platform and falls at once, with rollback.", [{
+      placement: "test-air 0 100 182",
+      characters: [Character.rifleman, Character.rifleman], stage: 3, stocks: 3, minutes: 0, frames: 90,
+      holds: [[[1, 1, JUMP], [2, 1, RIGHT, DOWN, SHIELD_LEFT]], []],
+      approaches: [[], []], rollbacks: [[10, 40]], exercise: "edgeCancel",
+    }])],
+    ["edge-cancel-waveland-lip", recordTape("A waveland slides off the stage lip and falls at once, with rollback.", [{
+      placement: "test-air 0 520 2",
+      characters: [Character.rifleman, Character.rifleman], stage: 0, stocks: 3, minutes: 0, frames: 90,
+      holds: [[[1, 1, JUMP], [2, 1, RIGHT, DOWN, SHIELD_LEFT]], []],
+      approaches: [[], []], rollbacks: [[10, 40]], exercise: "edgeCancel",
+    }])],
+    ["edge-cancel-dash-attack-platform", recordTape("A dash attack carries the fighter off the end of a platform; the attack ends and the fighter falls, with rollback.", [{
+      placement: "test-air 0 0 182",
+      characters: [Character.rifleman, Character.rifleman], stage: 3, stocks: 3, minutes: 0, frames: 90,
+      holds: [[[1, 30, RIGHT], [16, 2, ATTACK]], []],
+      approaches: [[], []], rollbacks: [[10, 40]], exercise: "edgeCancel",
     }])],
     ["shield-slide-off", recordTape("A shielding fighter at the edge is pushed off by repeated hits and falls helpless, with rollback.", [{
       placement: "test-air 0 592 0",

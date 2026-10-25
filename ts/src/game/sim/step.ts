@@ -5,13 +5,12 @@
 import { max, min } from "../core/numbers";
 import { divideFloat32, roundToFloat32, subtractFloat32 } from "wisp/src/sim/binary32";
 import { f32 } from "wisp/src/sim/f32";
-import { AttackPhase, Character, DownState, GroundAction, LedgeState, ParryBuffer, ShieldBreak, SpecialAction, SurfaceContact } from "./codes";
+import { Character, DownState, GroundAction, LedgeState, ParryBuffer, ShieldBreak, SpecialAction, SurfaceContact } from "./codes";
 import {
   SPOT_DODGE_FRAMES,
   GROUND_ROLL_FRAMES,
   WALL_TECH_STARTUP_FRAMES,
   canAttack,
-  attackPhase,
   canStartAttack,
   inGrabContext,
   isFloorTeching,
@@ -326,7 +325,7 @@ function slideOffEdge(f: Fighter): void {
     return;
   }
   landing.lag = 0;
-  if (attackPhase(f) === AttackPhase.recovery) cancelAttack(f);
+  if (f.attack.style !== undefined) cancelAttack(f);
 }
 
 function moveHorizontally(f: Fighter, stage: number, matchFrame: number, dashEntryDisplacementAdjustment: number): void {
