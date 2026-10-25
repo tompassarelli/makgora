@@ -101,6 +101,10 @@ const strikes: Partial<Record<HeroPose, Strike>> = {
     mid:[{frame:24,gesture:{chest:-10,twist:-20,yaw:150,arm:-150,elbow:15,free:-140,pitch:-6,leftHip:-86,rightHip:-68,leftKnee:88,rightKnee:86,head:-16},target:[-70,70]},
       {frame:28,gesture:{chest:42,twist:0,yaw:160,arm:-60,elbow:5,free:-54,pitch:20,step:22,leftHip:-24,rightHip:-12,leftKnee:24,rightKnee:8,head:-14},target:[-148,10]}],
     follow:{chest:44,twist:10,yaw:180,arm:-58,elbow:5,free:-52,pitch:22,step:24,leftHip:-26,rightHip:-12,leftKnee:26,rightKnee:8,head:-12},followAt:34,reach:[-158,8]},
+  backAir:{prep:{chest:-24,yaw:100,arm:-170,elbow:30,free:-90,freeElbow:20,hip:25,knee:50,head:-18},prepAt:8,prepTarget:[-10,230],
+    mid:[{frame:10,gesture:{chest:-26,yaw:104,arm:-172,elbow:30,free:-90,freeElbow:20,hip:26,knee:52,head:-18},target:[-14,232]}],
+    hit:{chest:-18,yaw:145,arm:-110,elbow:35,free:-60,hip:-12,knee:18,head:-12,depth:40},aim:true,
+    follow:{chest:10,yaw:150,arm:-65,elbow:35,free:-50,hip:-22,knee:28,head:-8,depth:40},followAt:17,reach:[-141,30]},
   downAir:{prep:{chest:-24,arm:-190,elbow:30,free:-185,freeElbow:30,pitch:-14,lean:-8,leftHip:-110,rightHip:-102,leftKnee:124,rightKnee:118,head:-12,rise:16,grip2:-40},prepAt:6,prepTarget:[-70,235],
     hit:{chest:30,arm:-15,elbow:5,free:-15,freeElbow:5,pitch:6,leftHip:-70,rightHip:-64,leftKnee:100,rightKnee:94,head:15,rise:-60,depth:0,grip2:-40},hitTarget:[30,-130],hitGrip:[35,-35],
     mid:[{frame:11,gesture:{chest:-38,arm:-205,elbow:40,free:-200,freeElbow:35,pitch:-20,lean:-15,leftHip:-130,rightHip:-122,leftKnee:146,rightKnee:140,head:-18,rise:28,grip2:-40},target:[-100,222]},
@@ -113,7 +117,7 @@ for (const [pose, style, gesture] of normals) {
   const strike = strikes[pose];
   if (strike) { actions.push({pose,frames:move.totalFrames,contact:move.startupFrames,gesture:strike.hit,beats:strikeBeats(move,{...strike,air:pose.endsWith("Air")}),air:pose.endsWith("Air")}); continue; }
   const first = move.startupFrames;
-  const sweeping = ["forwardTilt","forwardTiltUp","forwardTiltDown","forwardSmash","forwardAir","backAir","upTilt","downSmash","neutralAir"].includes(pose);
+  const sweeping = ["forwardTilt","forwardTiltUp","forwardTiltDown","forwardSmash","forwardAir","upTilt","downSmash","neutralAir"].includes(pose);
   const phases:Phase[]|undefined = sweeping ? move.regions.map(region => ({frame: region.firstFrame, target:[region.hit.strike!.x2,region.hit.strike!.z2],gesture: {...gesture,
     arm: (gesture.arm ?? 0) + ((region.hit.strike?.z2??0) > 130 ? -45 : (region.hit.strike?.z2??0) < 40 ? 45 : 0),
     yaw: (region.hit.strike?.x2??0) < 0 ? 145 : 0,
