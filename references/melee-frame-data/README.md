@@ -219,7 +219,7 @@ and SHA-256. The replays are read by `replay-intake.ts`, written for this
 corpus from Project Slippi's public replay specification
 (https://github.com/project-slippi/slippi-wiki/blob/master/SPEC.md); no
 parser library is used. Only positions, facing, action state and its frame
-counter are read. No disc data or disc-extracted table is used.
+counter are read; nothing comes from the game's files.
 
 A dash attack counts when it is entered from another state, stays grounded at
 one height and facing, its frame counter rises by one every frame (no hitlag,
