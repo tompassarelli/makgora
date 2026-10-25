@@ -1,0 +1,22 @@
+# #260: Thrall's back air shows the wolf's kick at its first hit and the hammer flung out behind at its second, in both facings; syntax and checks: smashcraft:docs/native-bot-session.md.
+#! chat -dev quick hero thrall
+# Both full-hop facing each other, then back air with the C-stick away from the other; captures at its start, windup, first hit, second hit, last active and recovery.
+40 a press Y
+40 b press Y
+48 a release Y
+48 b release Y
+54 a cstick -1 0
+54 b cstick 1 0
+54 a capture
+58 a cstick 0 0
+58 b cstick 0 0
+59 a capture
+61 a capture
+70 a capture
+72 a capture
+84 a capture
+#! expect a 54 applied attack 1 style 14
+#! expect b 54 applied attack 1 style 14
+# Save a moment for checksum and fighter-line parity.
+120 a press VIEW
+190 a release VIEW
