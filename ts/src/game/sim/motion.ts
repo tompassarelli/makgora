@@ -204,7 +204,6 @@ function retailAirDecaySquaredCutoff(decay: number): number {
 }
 
 const KNOCKBACK_DECAY_PER_FRAME = 0.050999999046325684;
-// Common-data value x3E8 from the cited NTSC 1.02 extraction; values are Melee units.
 const AIR_SHIELD_RECOIL_DECAY = multiplyFloat32(0.05000000074505806, WORLD_UNITS_PER_MELEE_UNIT);
 export const AIR_KNOCKBACK_DECAY = roundToFloat32(KNOCKBACK_DECAY_PER_FRAME);
 export const AIR_RECOIL_DECAY = divideFloat32(AIR_SHIELD_RECOIL_DECAY, WORLD_UNITS_PER_MELEE_UNIT);

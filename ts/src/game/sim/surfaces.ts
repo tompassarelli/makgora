@@ -35,7 +35,6 @@ const WALL_JUMPS_USED_LIMIT = 255;
 export const BODY_HALF_WIDTH = 2.0;
 const BODY_REACH = melee(BODY_HALF_WIDTH);
 
-// ECB top heights use the six bind-pose bones times model_scaling (ftData x44; PlFxNr.dat, PlFcNr.dat, PlCaNr.dat).
 
 
 

@@ -513,7 +513,6 @@ interface ReferencePoint {
   readonly z: number;
 }
 
-// Final Destination collision lines retain GrNLa.dat coll_data order.
 
 
 

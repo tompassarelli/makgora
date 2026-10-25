@@ -8,17 +8,36 @@ export const REACH_EXEMPT = ["ts/scripts/cleanRoom.ts", "ts/test/clean-room.test
 
 const REACH_SCAN_BYTES = 2_000_000;
 
+const OFFSET = String.raw`x(?!(?:11|32|64|86)(?![0-9A-F]))[0-9A-F]{2,4}`;
+
 export const REACH_RULES: readonly { readonly name: string; readonly pattern: RegExp }[] = [
   { name: "a game-binary address or offset", pattern: /\bRVA\b|\+0x[0-9a-fA-F]{2,}\b|\b0x0*6[fF]{3}[0-9a-fA-F]{8}\b|\b0x80(?!000000\b)[0-9a-fA-F]{6}\b|\b80(?=[0-9A-F]*[A-F])[0-9A-F]{6}\b/ },
   { name: "a decompiled symbol name", pattern: /\b(?![a-zA-Z]{2,4}_80)[a-zA-Z][a-zA-Z0-9]*_80[0-9A-F]{6}\b|\b(?:ft|gr|it|mp|cm|lb|gm|pl|ef|mn|db)[A-Z]?[A-Za-z0-9]*_[A-Z][A-Za-z0-9_]*\b/ },
   { name: "a Melee game-file name", pattern: /\bPlCo\b|\bPl[A-Z][a-z]\.dat\b|GALE01|\bmain\.dol\b/ },
+  { name: "an offset-named game field", pattern: new RegExp(String.raw`(?<![\\\w%])${OFFSET}_[A-Za-z]|[\x60"'.]${OFFSET}[\x60"']|(?<![\\\w%])x(?=[0-9A-F]{0,3}[A-F])[0-9A-F]{2,4}\b|\bftData[\s_]${OFFSET}\b`) },
+  { name: "a retail-file source", pattern: /\bcoll_data\b|\bretail-(?:roster|action-lengths)\b/ },
+  { name: "an extraction or decompilation cited as a source", pattern: /\b(?:NTSC|PAL|1\.02|disc|retail|cited|Melee)\b[\w. '-]{0,24}?\bextract(?:ion|ed)\b|\b(?:from|per|cited?|via|in) (?:the |Melee's )?decomp(?:ilation|iled)?\b/i },
 ];
+
+const PENDING_DOCS = "Melee docs re-cite public sources in #286";
+
+export const REACH_ALLOWLIST: readonly { readonly path: string; readonly rule: string; readonly reason: string }[] = [
+  { path: "docs/delivery-goal.md", rule: "an extraction or decompilation cited as a source", reason: "states the clean-room policy and cites nothing" },
+  { path: "docs/design/melee/aerials-on-shield.md", rule: "an offset-named game field", reason: PENDING_DOCS },
+  { path: "docs/design/melee/hit-effects.md", rule: "an offset-named game field", reason: PENDING_DOCS },
+  { path: "docs/design/stages.md", rule: "a retail-file source", reason: PENDING_DOCS },
+  { path: "docs/design/tilts.md", rule: "an offset-named game field", reason: PENDING_DOCS },
+  { path: "docs/physics.md", rule: "an offset-named game field", reason: PENDING_DOCS },
+  { path: "docs/physics.md", rule: "a retail-file source", reason: PENDING_DOCS },
+];
+
+const allowed = (path: string, rule: string) => REACH_ALLOWLIST.some((entry) => entry.path === path && entry.rule === rule);
 
 export interface Line { readonly path: string; readonly line: number; readonly text: string }
 
 export function reachProblems(lines: readonly Line[]): string[] {
   return lines.filter(({ path }) => !REACH_EXEMPT.includes(path)).flatMap(({ path, line, text }) => REACH_RULES
-    .filter(({ pattern }) => pattern.test(text))
+    .filter(({ name, pattern }) => !allowed(path, name) && pattern.test(text))
     .map(({ name }) => `clean room: ${path}:${line} has ${name}. Measure from outside the game instead (README "Principles").`));
 }
 
@@ -37,7 +56,7 @@ const reach = (root: string) => Effect.promise(async () => {
 
 const check = (root: string) => Effect.gen(function*() {
   const problems = [...yield* cleanRoom(root, SMASHCRAFT_POLICY), ...yield* reach(root)];
-  if (problems.length === 0) return yield* Console.log("clean room: no game files, copied game scripts, memory access, game addresses or decompiled symbols outside the allowlist");
+  if (problems.length === 0) return yield* Console.log("clean room: no game files, copied game scripts, memory access, game addresses, offset-named fields, retail-file sources or decompiled symbols outside the allowlist");
   yield* Effect.forEach(problems, (problem) => Console.error(problem), { discard: true });
   process.exit(1);
 });

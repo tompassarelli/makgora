@@ -119,7 +119,7 @@ export const INITIAL_DASH_SPEED = melee(1.899999976158142);
 const GROUND_ACCELERATION_MULTIPLIER = 0.10000000149011612;
 const GROUND_ACCELERATION_BASE = 0.019999999552965164;
 const GROUND_SPEED_CAP = melee(3.0);
-/**  air_max_horizontal_velocity: 3.0 for every Melee fighter but Falco (retail-roster.json). */
+/** Maximum Horizontal Velocity (in the air): 3 for every Melee fighter but Falco (references/melee-frame-data/character-attributes.csv). */
 const AIR_MAX_HORIZONTAL_VELOCITY = melee(3.0);
 
 const ORIGINAL_ACCELERATION = {

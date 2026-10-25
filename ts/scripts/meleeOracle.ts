@@ -467,12 +467,13 @@ function getupFrames(character: Character, option: DownState, choose: readonly A
 
 const GETUP_ORDER = "DownBound ends into get-up attack, then held stick roll, else DownWait";
 const C_STICK_GETUP = "DownWait: a C-stick up crossing 0.6625 attacks, a C-stick sideways crossing 0.2 within range of horizontal rolls";
-const DOWN_ANIMATIONS = "Fox/Falco animation frames (retail-action-lengths.json)";
+const GETUP_DATA = "Fox/Falco getups from references/melee-frame-data/fightcore.csv";
+const NO_PUBLIC_SOURCE = "our design target; no public page states it";
 
 const GETUPS: readonly Scenario[] = [
   {
     area: "getup", name: "frames in down-bound before a held roll",
-    cite: `${DOWN_ANIMATIONS} DownBoundU 26, entered without an extra animation step`,
+    cite: `down-bound 26 frames, ${NO_PUBLIC_SOURCE}`,
     run: (c) => forReference(c, () => ({ expected: 26, actual: framesIn(knockdown(c, 80, () => [Action.moveRight]), DownState.bound) })),
   },
   {
@@ -492,17 +493,17 @@ const GETUPS: readonly Scenario[] = [
   },
   {
     area: "getup", name: "get-up stand frames",
-    cite: `${DOWN_ANIMATIONS} DownStandU 30, entered without an extra step`,
+    cite: `get-up stand 30 frames, ${NO_PUBLIC_SOURCE}`,
     run: (c) => forReference(c, () => ({ expected: 30, actual: getupFrames(c, DownState.stand, [Action.moveUp]) })),
   },
   {
     area: "getup", name: "get-up roll frames",
-    cite: `${DOWN_ANIMATIONS} DownFowardU 36`,
+    cite: `${GETUP_DATA} Getup-Roll Forward 35`,
     run: (c) => forReference(c, () => ({ expected: 35, actual: getupFrames(c, DownState.roll, [Action.moveRight]) })),
   },
   {
     area: "getup", name: "get-up attack frames",
-    cite: `${DOWN_ANIMATIONS} DownAttackU 50`,
+    cite: `${GETUP_DATA} Getup-Attack 49`,
     run: (c) => forReference(c, () => ({ expected: 49, actual: getupFrames(c, DownState.attack, [Action.attack]) })),
   },
   {
@@ -734,7 +735,7 @@ const REFERENCE_RIGHT_SIDE: readonly (readonly [number, number])[] = [
 ];
 
 const REFERENCE_UNDERSIDE_Y = -55.38819885253906;
-const STAGE_COLLISION = "Final Destination's coll_data: rightWall lines 9, 10, 7, 8, 6, ceiling lines 5, 4; each side kept as far from its ledge, the underside spanning the wider deck";
+const STAGE_COLLISION = "Final Destination's main-deck side and underside as stage.ts lays them out; each side kept as far from its ledge, the underside spanning the wider deck";
 
 const RIGHT_LEDGE = mainDeckRight(0);
 
@@ -1159,7 +1160,7 @@ function actsAfterAirDodge(character: Character): boolean {
 
 const wavelandFall: Fall = { setup: (f) => airborne(f, 0.0, 6.0), held: (n) => (n === 1 ? [Action.moveDown, Action.leftTrigger] : []) };
 
-const DODGE_DATA = "Fox/Falco animation frames (retail-action-lengths.json)";
+const DODGE_DATA = "Fox/Falco dodges from references/melee-frame-data/records.jsonl";
 const DODGE_INTANGIBLE = "Fox/Falco intangibility from public frame data (EscapeN, EscapeF, EscapeAir), as references/melee-frame-data/records.jsonl reports for the ground dodges";
 
 const SHIELD_RELEASE_DEPARTURE = "Shield release lag: 11 frames, Ultimate's value (owner decision 2026-10-06, #100)";
@@ -1168,19 +1169,19 @@ const AIR_DODGE_DEPARTURE = "Air dodge: once per airtime, ends actionable, refre
 const SHIELD_AND_DODGES: readonly Scenario[] = [
   {
     area: "shield/dodge", name: "shield release: frames until an attack starts",
-    cite: `${DODGE_DATA} GuardOff 15, entered without an extra step`,
+    cite: "SmashWiki Shield: Melee shield drop lag 15 frames",
     departure: SHIELD_RELEASE_DEPARTURE,
     run: (c) => forReference(c, () => ({ expected: 15, actual: shieldReleaseLag(c) })),
   },
   {
     area: "shield/dodge", name: "spot dodge frames",
-    cite: `${DODGE_DATA} EscapeN 23`,
+    cite: `${DODGE_DATA} spot_dodge total 22`,
     run: (c) => forReference(c, () => ({ expected: 22, actual: groundDodge(c, Action.moveDown).frames })),
   },
   { area: "shield/dodge", name: "spot dodge intangible frames", cite: DODGE_INTANGIBLE, run: (c) => forReference(c, () => ({ expected: "2-15", actual: groundDodge(c, Action.moveDown).intangible })) },
   {
     area: "shield/dodge", name: "forward roll frames",
-    cite: `${DODGE_DATA} EscapeF 32`,
+    cite: `${DODGE_DATA} forward_roll total 31`,
     run: (c) => forReference(c, () => ({ expected: 31, actual: groundDodge(c, Action.moveRight).frames })),
   },
   { area: "shield/dodge", name: "forward roll intangible frames", cite: DODGE_INTANGIBLE, run: (c) => forReference(c, () => ({ expected: "4-19", actual: groundDodge(c, Action.moveRight).intangible })) },
