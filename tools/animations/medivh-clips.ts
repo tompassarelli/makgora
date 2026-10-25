@@ -19,17 +19,18 @@ import { highestGrip, ledgeGripOffset } from "./ledge-grip";
 import { ensure, parseSource, tracks, onGlobalClock, encodeVerified } from "./original-clips";
 class ClipFailure extends Schema.TaggedError<ClipFailure>()("ClipFailure", { cause: Schema.Unknown }) {}
 BunRuntime.runMain(Effect.tryPromise({ try: async () => {
-const [input, output] = process.argv.slice(2).map(p => resolve(p));
+const args = process.argv.slice(2), [input, output] = args.slice(0, 2).map(p => resolve(p)), replaced = args.slice(2), inPlace = replaced.length > 0;
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/medivh-clips.ts STOCK_MEDIVH.mdx PRIVATE_OUTPUT");
+ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/medivh-clips.ts STOCK_MEDIVH.mdx|SHIPPED_MEDIVH.mdx PRIVATE_OUTPUT [POSE...]");
 const source = parseSource(await Bun.file(input).arrayBuffer()), model = structuredClone(source);
-ensure(source.Sequences.length === 22 && source.Bones.some(b => b.Name === "Staff"), "Expected original classic Medivh");
+ensure((inPlace ? source.Sequences.some(s => s.Name === "Medivh Damage 0 0") : source.Sequences.length === 22) && source.Bones.some(b => b.Name === "Staff"), "Expected original classic Medivh");
 const stand = source.Sequences[0]!;
 const hero = heroDefinition(Character.medivh); ensure(hero, "Register Medivh before exporting his clips");
 const HANG_SLACK=8,hangHands=["Bone_Hand_L","Bone_Hand_R"].map(name=>model.Nodes.findIndex(n=>n?.Name===name));
 function hangRoot(drawn:DrawnModel,index:number,time:number,old?:ArrayLike<number>){const [x,z]=ledgeGripOffset(drawn,index,time,highestGrip(drawn,index,time,hangHands),Character.medivh);return new Float32Array([(old?.[0]??0)+x-HANG_SLACK,old?.[1]??0,(old?.[2]??0)+z]);}
-interface Gesture { chest?: number; waist?: number; arm?: number; wrist?: number; leftArm?: number; head?: number; front?: number; back?: number; kneeFront?: number; kneeBack?: number; yaw?: number; lean?: number; }
-interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; hold?: boolean; air?: boolean; roll?: number; }
+interface Gesture { tx?: number; chest?: number; waist?: number; arm?: number; wrist?: number; leftArm?: number; head?: number; front?: number; back?: number; kneeFront?: number; kneeBack?: number; yaw?: number; lean?: number; }
+interface Beat { frame: number; g: Gesture; hand: Point; direction: Point; }
+interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; hold?: boolean; air?: boolean; roll?: number; beats?: readonly Beat[]; }
 const forward: Gesture = {chest:23,arm:-80,wrist:15,leftArm:-55,head:-15,front:18,back:-12};
 const overhead: Gesture = {chest:-12,arm:-140,wrist:10,leftArm:-85,head:-10,front:-12,back:10};
 const low: Gesture = {chest:48,arm:20,wrist:35,leftArm:-35,head:-28,front:-80,back:-70,kneeFront:130,kneeBack:120};
@@ -44,7 +45,17 @@ const normals: readonly [HeroPose, AttackStyle, Gesture][] = [
  ["forwardSmash",AttackStyle.forwardSmash,{...forward,chest:35,waist:-20,arm:-115,wrist:60}], ["upSmash",AttackStyle.upSmash,{...overhead,chest:-30,arm:-175}], ["downSmash",AttackStyle.downSmash,low],
  ["neutralAir",AttackStyle.neutralAir,{...forward,yaw:70}], ["forwardAir",AttackStyle.forwardAir,{...forward}], ["backAir",AttackStyle.backAir,back], ["upAir",AttackStyle.upAir,overhead], ["downAir",AttackStyle.downAir,{...low,lean:45,front:45}],
 ];
-for (const [pose,style,gesture] of normals) { const move=hero.moves.normals[style];ensure(move,`${pose}: missing move timing`); actions.push({pose,frames:move.totalFrames,contact:move.startupFrames,gesture,air:pose.endsWith("Air")}); }
+const beats: Partial<Record<HeroPose,(move:{startupFrames:number;activeFrames:number;totalFrames:number})=>readonly Beat[]>> = {
+ dashAttack:({startupFrames:c,activeFrames:a,totalFrames:t})=>[
+  {frame:0,g:{lean:4,chest:6,head:-4,arm:-20,front:-20,back:15},hand:[30,-18,64],direction:[1,0,0.1]},
+  {frame:Math.max(1,c-3),g:{tx:-22,lean:-14,chest:-12,head:12,arm:-45,front:-40,back:30,kneeFront:60,kneeBack:50},hand:[30,-18,62],direction:[1,0,0]},
+  {frame:c,g:{tx:14,lean:18,chest:22,head:-14,arm:50,wrist:20,front:-45,back:30},hand:[40,-18,56],direction:[1,0,0]},
+  {frame:c+2,g:{tx:18,lean:20,chest:24,head:-16,arm:55,wrist:20,front:-50,back:32},hand:[46,-18,52],direction:[1,0,-0.05]},
+  {frame:c+a-1,g:{tx:8,lean:18,chest:26,head:-18,arm:60,wrist:25,front:-65,back:34,kneeFront:85},hand:[36,-18,44],direction:[1,0,-0.25]},
+  {frame:Math.round(c+a+(t-c-a)*0.5),g:{tx:2,lean:4,chest:6,head:-6,arm:20,front:-20,back:10},hand:[26,-18,62],direction:[0.6,0,0.8]},
+ ],
+};
+for (const [pose,style,gesture] of normals) { const move=hero.moves.normals[style];ensure(move,`${pose}: missing move timing`); actions.push({pose,frames:move.totalFrames,contact:move.startupFrames,gesture,air:pose.endsWith("Air"),beats:beats[pose]?.(move)}); }
 const extra: readonly [HeroPose,number,number,Gesture][] = [
  ["crouch",30,12,brace],["landing",8,2,brace],["shield",30,8,{...brace,leftArm:-100}],["airDodge",49,4,{...brace,lean:-25}], ["smashCharge",30,8,{...overhead,arm:-100}],["dizzy",60,25,{chest:-15,head:30,arm:20,leftArm:15}],
  ["turn",8,4,{yaw:140,chest:-12}], ["stop",8,3,{...brace,lean:-18}], ["jumpSquat",5,4,{...brace,front:55,back:55}],
@@ -123,16 +134,21 @@ function joint(name:string,g:Gesture):[number,number]{
 }
 const originals=new Map<string,mdx.AnimVector>();tracks(source,(t,p)=>originals.set(p,t));
 let cursor=Math.max(...source.Sequences.map(s=>s.Interval[1]))+100;
-const bindings:string[]=[],damageBindings:string[]=[], records:unknown[]=[];
+const bindings:string[]=[],damageBindings:string[]=[], records:{pose:string;index:number;frames:number;contact:number}[]=[];
 const damageActions:Action[]=[];
-for(let height=0;height<3;height++)for(let strength=0;strength<3;strength++){const gain=[0.45,0.8,1.2][strength]!;damageActions.push({pose:"damageGround",frames:24,contact:3,hold:true,gesture:height===0?{front:65*gain,back:55*gain,waist:25*gain,chest:25*gain,head:-15*gain}:height===1?{chest:55*gain,waist:-25*gain,arm:30*gain,leftArm:35*gain}:{head:-45*gain,chest:-35*gain,arm:45*gain,leftArm:55*gain}});}
+for(let height=0;height<3;height++)for(let strength=0;strength<3;strength++){const gain=[0.45,0.8,1.2][strength]!;if(!inPlace)damageActions.push({pose:"damageGround",frames:24,contact:3,hold:true,gesture:height===0?{front:65*gain,back:55*gain,waist:25*gain,chest:25*gain,head:-15*gain}:height===1?{chest:55*gain,waist:-25*gain,arm:30*gain,leftArm:35*gain}:{head:-45*gain,chest:-35*gain,arm:45*gain,leftArm:55*gain}});}
+if(inPlace){ensure(replaced.every(pose=>actions.some(action=>action.pose===pose)),`unknown pose in ${replaced.join(" ")}`);actions.splice(0,actions.length,...actions.filter(action=>replaced.includes(action.pose)));}
 for(const [ordinal,action]of [...actions,...damageActions].entries()){
- const index=model.Sequences.length,start=cursor,end=start+Math.round(action.frames*1000/60);cursor=end+100;
  const name=ordinal<actions.length?`Medivh ${action.pose}`:`Medivh Damage ${Math.floor((ordinal-actions.length)/3)} ${((ordinal-actions.length)%3)}`;
- model.Sequences.push({...stand,Name:name,Interval:new Uint32Array([start,end]),NonLooping:true,MoveSpeed:0,Rarity:0,MinimumExtent:new Float32Array([-300,-300,-200]),MaximumExtent:new Float32Array([300,300,350]),BoundsRadius:400});
+ const existing=inPlace?model.Sequences.findIndex(sequence=>sequence.Name===name):-1;ensure(!inPlace||existing>=0,`${name}: shipped sequence missing`);
+ const index=existing>=0?existing:model.Sequences.length,start=existing>=0?model.Sequences[index]!.Interval[0]!:cursor,end=start+Math.round(action.frames*1000/60);
+ if(existing>=0){const shipped=model.Sequences[index]!.Interval[1]!,next=Math.min(...model.Sequences.map(sequence=>sequence.Interval[0]!).filter(first=>first>start));ensure(end<next,`${name}: no room before the next sequence`);
+  tracks(model,track=>{if(!onGlobalClock(track))track.Keys=track.Keys.filter(key=>key.Frame<start||key.Frame>Math.max(end,shipped));});model.Sequences[index]!.Interval=new Uint32Array([start,end]);}
+ else{cursor=end+100;model.Sequences.push({...stand,Name:name,Interval:new Uint32Array([start,end]),NonLooping:true,MoveSpeed:0,Rarity:0,MinimumExtent:new Float32Array([-300,-300,-200]),MaximumExtent:new Float32Array([300,300,350]),BoundsRadius:400});}
  const reverse=action.pose==="downSmash"?action.contact+3:action.pose==="getUpAttack"?action.contact+2:undefined;
- const phaseFrames=[...new Set([0,Math.max(1,action.contact-3),action.contact,Math.min(action.frames-1,action.contact+4),action.frames,...action.roll?[0.25,0.5,0.75].map(p=>Math.round(action.frames*p)):[],...reverse?[reverse]:[]])].sort((a,b)=>a-b);
- const phases=phaseFrames.map(frame=>({frame,amount:action.hold?1:action.roll?Math.sin(Math.PI*frame/action.frames):frame===0||frame===action.frames?0:frame===Math.max(1,action.contact-3)?-0.3:1}));
+ const beatAt=(frame:number)=>action.beats?.find(beat=>beat.frame===frame);
+ const phaseFrames=action.beats?[...new Set([0,...action.beats.map(beat=>beat.frame),action.frames])]:[...new Set([0,Math.max(1,action.contact-3),action.contact,Math.min(action.frames-1,action.contact+4),action.frames,...action.roll?[0.25,0.5,0.75].map(p=>Math.round(action.frames*p)):[],...reverse?[reverse]:[]])].sort((a,b)=>a-b);
+ const phases=phaseFrames.map(frame=>({frame,amount:action.beats?beatAt(frame)?1:0:action.hold?1:action.roll?Math.sin(Math.PI*frame/action.frames):frame===0||frame===action.frames?0:frame===Math.max(1,action.contact-3)?-0.3:1}));
  tracks(model,(track,path)=>{
   const donor=originals.get(path);if(!donor||onGlobalClock(donor))return;
   const flight=action.pose==="upSpecial"||action.pose==="upSpecialAir";
@@ -144,7 +160,7 @@ for(const [ordinal,action]of [...actions,...damageActions].entries()){
   if(!first&&/^\.(Bones|Helpers)\.\d+\.(Rotation|Translation|Scaling)$/.test(path)){const Vector=new Float32Array(path.endsWith("Rotation")?[0,0,0,1]:path.endsWith("Scaling")?[1,1,1]:[0,0,0]);first={Frame:stand.Interval[0],Vector,...track.LineType>1?{InTan:Vector.slice(),OutTan:Vector.slice()}: {}};}
   if(!first)return;
   const match=/^\.(Bones|Helpers)\.(\d+)\.Rotation$/.exec(path),node=match?source[match[1] as "Bones"|"Helpers"][Number(match[2])]:undefined;
-  for(const {frame,amount}of phases){let Vector=first.Vector.slice();if(node){let[y,z]=joint(node.Name,action.gesture);if(node.Name==="Bone_Root"&&action.roll)y=frame/action.frames*360*action.roll;else y*=amount;z*=amount;if(node.Name==="Bone_Chest"&&reverse&&frame>=reverse&&frame<action.frames)z=165;if(node.Name==="Bone_Root"&&(action.pose==="getUp"||action.pose==="getUpAttack")&&frame<action.contact)y=85*(1-frame/action.contact);Vector=rotated(first.Vector,y,z);}
+  for(const {frame,amount}of phases){let Vector=first.Vector.slice();if(node){let[y,z]=joint(node.Name,beatAt(frame)?.g??action.gesture);if(node.Name==="Bone_Root"&&action.roll)y=frame/action.frames*360*action.roll;else y*=amount;z*=amount;if(node.Name==="Bone_Chest"&&reverse&&frame>=reverse&&frame<action.frames)z=165;if(node.Name==="Bone_Root"&&(action.pose==="getUp"||action.pose==="getUpAttack")&&frame<action.contact)y=85*(1-frame/action.contact);Vector=rotated(first.Vector,y,z);}
    const tangent=()=>match||track.LineType===mdx.LineType.Bezier?Vector.slice():new Float32Array(Vector.length);
    track.Keys.push({...first,Frame:start+Math.round(frame*1000/60),Vector,...first.InTan?{InTan:tangent(),OutTan:tangent()}: {}});
   }
@@ -153,7 +169,9 @@ for(const [ordinal,action]of [...actions,...damageActions].entries()){
   for(const anim of model.GeosetAnims){if(!anim.Alpha||typeof anim.Alpha==="number")continue;anim.Alpha.Keys=anim.Alpha.Keys.filter(k=>k.Frame<start||k.Frame>end);for(const frame of [0,8,9,28,29,action.frames])anim.Alpha.Keys.push({Frame:start+Math.round(frame*1000/60),Vector:new Float32Array([anim.GeosetId===0?(frame>=9&&frame<=28?0:1):(frame>=9&&frame<=28?1:0)])});anim.Alpha.LineType=0;}
   const bird=model.Nodes.find(n=>n?.Name==="Bone00")!;if(!bird.Translation)bird.Translation={LineType:1,GlobalSeqId: NO_GLOBAL_SEQ,Keys:source.Sequences.flatMap(s=>Array.from(s.Interval).map(Frame=>({Frame,Vector:new Float32Array([0,0,0])})))};bird.Translation.Keys=bird.Translation.Keys.filter(k=>k.Frame<start||k.Frame>end);for(const frame of [0,action.frames])bird.Translation.Keys.push({Frame:start+Math.round(frame*1000/60),Vector:new Float32Array([0,0,75]),...(bird.Translation.LineType>1?{InTan:new Float32Array([0,0,0]),OutTan:new Float32Array([0,0,0])}:{})});
  }
- const aim=contactAim(action.pose);if(ordinal<actions.length&&aim&&action.pose!=="upSpecial"&&action.pose!=="upSpecialAir")aimArm(index,start,action,phases,true,aim.hand,aim.direction);
+ if(inPlace)tracks(model,track=>track.Keys.sort((a,b)=>a.Frame-b.Frame));
+ if(action.beats)for(const beat of action.beats)aimArm(index,start,{...action,contact:beat.frame},[{frame:beat.frame,amount:1}],true,beat.hand,beat.direction);
+ const aim=contactAim(action.pose);if(ordinal<actions.length&&aim&&!action.beats&&action.pose!=="upSpecial"&&action.pose!=="upSpecialAir")aimArm(index,start,action,phases,true,aim.hand,aim.direction);
  if(reverse)aimArm(index,start,{...action,contact:reverse},phases.filter(p=>p.frame>=reverse),true,[-35,-18,28],[-1,0,-0.2]);
  if(["grab","grabHold","pummel","throwForward","neutralSpecial","neutralSpecialAir"].includes(action.pose))aimArm(index,start,action,phases,true,[36,12,65]);
  if(["sideSpecial","sideSpecialAir"].includes(action.pose))aimArm(index,start,action,phases,true,[27,12,112]);
@@ -161,11 +179,11 @@ for(const [ordinal,action]of [...actions,...damageActions].entries()){
 
  const center=model.Nodes.find(b=>b.Name==="Bone_Root");ensure(center,"No Medivh root");
  if(!center.Translation)center.Translation={LineType:1,GlobalSeqId: NO_GLOBAL_SEQ,Keys:source.Sequences.flatMap(s=>Array.from(s.Interval).map(Frame=>({Frame,Vector:new Float32Array([0,0,0])})))};
- const beforeKeys=center.Translation.Keys.filter(k=>k.Frame<start);
+ const beforeKeys=center.Translation.Keys.filter(k=>k.Frame<start||(inPlace&&k.Frame>end));
  const drawn=new DrawnModel(generateMDX(model),1);
  const translations:mdx.AnimKeyframe[]=[];
- for(const {frame}of phases){const triangle=drawn.triangles(index,frame/60,1);let lowest=Infinity;for(let i=1;i<triangle.length;i+=2)lowest=Math.min(lowest,triangle[i]!);const old=center.Translation.Keys.find(k=>k.Frame===start+Math.round(frame*1000/60));translations.push({Frame:start+Math.round(frame*1000/60),Vector:(action.pose==="ledgeHang"?hangRoot(drawn,index,frame/60,old?.Vector):undefined)??new Float32Array([old?.Vector[0]??0,old?.Vector[1]??0,(old?.Vector[2]??0)-(action.air||action.pose==="upSpecial"?0:lowest)]),...(center.Translation.LineType>1?{InTan:new Float32Array([0,0,0]),OutTan:new Float32Array([0,0,0])}:{})});}
- center.Translation.Keys=[...beforeKeys,...translations];
+ for(const {frame}of phases){const triangle=drawn.triangles(index,frame/60,1);let lowest=Infinity;for(let i=1;i<triangle.length;i+=2)lowest=Math.min(lowest,triangle[i]!);const old=center.Translation.Keys.find(k=>k.Frame===start+Math.round(frame*1000/60));translations.push({Frame:start+Math.round(frame*1000/60),Vector:(action.pose==="ledgeHang"?hangRoot(drawn,index,frame/60,old?.Vector):undefined)??new Float32Array([(old?.Vector[0]??0)+(beatAt(frame)?.g.tx??0),old?.Vector[1]??0,(old?.Vector[2]??0)-(action.air||action.pose==="upSpecial"?0:lowest)]),...(center.Translation.LineType>1?{InTan:new Float32Array([0,0,0]),OutTan:new Float32Array([0,0,0])}:{})});}
+ center.Translation.Keys=[...beforeKeys,...translations].sort((a,b)=>a.Frame-b.Frame);
  const victimContact=/^victim(Pummel|Throw)/.test(action.pose);
  const pairedContact=/^(pummel|throw|victimPummel|victimThrow)/.test(action.pose)?`, contact: ${seconds(victimContact?0.5:action.contact/60)}`:"";
  const binding=`{ index: ${index}, seconds: ${seconds(victimContact?1:(end-start)/1000)}, aligned: true${pairedContact} }`;
@@ -173,6 +191,7 @@ for(const [ordinal,action]of [...actions,...damageActions].entries()){
  records.push({pose:name,index,frames:victimContact?60:action.frames,contact:victimContact?30:action.contact});
 }
 
+if(!inPlace){
 const upTiltOrdinal=actions.findIndex(action=>action.pose==="upTilt"),upTiltAction=actions[upTiltOrdinal]!,upTiltIndex=source.Sequences.length+upTiltOrdinal;
 const upTiltSequence=model.Sequences[upTiltIndex]!,upTiltStart=upTiltSequence.Interval[0],upTiltEnd=upTiltSequence.Interval[1];
 const upTiltFrame=(frame:number)=>upTiltStart+Math.round(frame*1000/60),upTiltCoil=upTiltFrame(upTiltAction.contact-3);
@@ -189,14 +208,17 @@ for(const frame of [0,upTiltAction.contact-3,upTiltAction.contact+7,upTiltAction
 const upTiltDrawn=new DrawnModel(generateMDX(model),1),upTiltTriangles=upTiltDrawn.triangles(upTiltIndex,(upTiltCoil-upTiltStart)/1000,1);
 let upTiltFloor=Infinity;for(let i=1;i<upTiltTriangles.length;i+=2)upTiltFloor=Math.min(upTiltFloor,upTiltTriangles[i]!);
 const upTiltRoot=model.Nodes.find(node=>node?.Name==="Bone_Root")!.Translation!.Keys.find(key=>key.Frame===upTiltCoil)!;upTiltRoot.Vector[2]!-=upTiltFloor;
+}
 
-for(const [ordinal,action]of actions.entries())if(/^victim(Pummel|Throw)/.test(action.pose)){
+if(!inPlace)for(const [ordinal,action]of actions.entries())if(/^victim(Pummel|Throw)/.test(action.pose)){
  const sequence=model.Sequences[source.Sequences.length+ordinal]!,[first,last]=sequence.Interval,contact=first!+Math.round(action.contact*1000/60),start=cursor;cursor=start+1100;
  tracks(model,track=>{if(onGlobalClock(track))return;for(const key of track.Keys)if(key.Frame>=first!&&key.Frame<=last!)key.Frame=start+(key.Frame<=contact?Math.round((key.Frame-first!)/(contact-first!)*500):500+Math.round((key.Frame-contact)/(last!-contact)*500));track.Keys.sort((a,b)=>a.Frame-b.Frame);});
  sequence.Interval=new Uint32Array([start,start+1000]);
 }
 const bytes=encodeVerified(parseSource(generateMDX(model)));mkdirSync(output,{recursive:true});await Bun.write(join(output,"medivh.mdx"),bytes);
-await Bun.write(join(project,"ts/src/game/presentation/heroes/medivhClips.ts"),[
+const clipTable=join(project,"ts/src/game/presentation/heroes/medivhClips.ts");
+if(inPlace){let table=await Bun.file(clipTable).text();for(const binding of bindings){const line=new RegExp(`^  ${binding.trim().split(":")[0]}: .*,$`,"m");ensure(line.test(table),`${binding}: no binding to replace`);table=table.replace(line,()=>binding);}await Bun.write(clipTable,table);}
+else await Bun.write(clipTable,[
  "// Generated by tools/animations/medivh-clips.ts from the stock classic Medivh rig.",'import { f32 } from "wisp/src/sim/f32";', 'import type { HeroClip, HeroClipTable } from "../../sim/heroes/hero";',
  'export const MEDIVH_MODEL_FILE = '+JSON.stringify("units\\creeps\\Medivh\\Medivh.mdl")+';',
  'export const MEDIVH_FALLBACK: HeroClip = { index: 0, seconds: 1.5 };',
@@ -205,8 +227,9 @@ await Bun.write(join(project,"ts/src/game/presentation/heroes/medivhClips.ts"),[
 ].join("\n"));
 const finalDrawn=new DrawnModel(bytes,1.0);
 const beforeDrawn=new DrawnModel(generateMDX(source),1.0);
-for(const [index,sequence] of source.Sequences.entries()) for(const phase of [0,0.5,1]) { const time=(sequence.Interval[1]-sequence.Interval[0])*phase/1000; const before=beforeDrawn.triangles(index,time,1), after=finalDrawn.triangles(index,time,1); ensure(before.length===after.length&&before.every((v,i)=>Math.abs(v-after[i]!)<0.001),`Medivh stock clip ${index} changed`); }
-for(const pose of ["forwardTilt","forwardTiltUp","forwardTiltDown","upTilt","downTilt","downSmash","backAir","downAir","neutralSpecial","sideSpecial","upSpecial","downSpecial","rollForward","getUp","getUpAttack","grab","grabHold","pummel","throwForward","throwBack","throwUp","throwDown"]){const i=actions.findIndex(a=>a.pose===pose),action=actions[i]!;const sequence=source.Sequences.length+i;const panels:PoseFrame[]=[1,-1].flatMap(facing=>[0,Math.max(1,action.contact-3),action.contact,action.contact+4,action.frames].map(frame=>({frame,phase:frame<action.contact?AttackPhase.startup:frame<=action.contact+4?AttackPhase.active:AttackPhase.recovery,x:0,z:0,facing,parts:[],strikes:[],clip:sequence,seconds:Math.min(action.frames,frame)/60})));await Bun.write(join(output,`${pose}.png`),sheet(`Medivh ${pose}`,finalDrawn,panels,5).png);}
+const authored=new Set(records.map(record=>record.index));
+for(const [index,sequence] of source.Sequences.entries()) if(!authored.has(index)&&(inPlace||index<22)) for(const phase of [0,0.5,1]) { const time=(sequence.Interval[1]-sequence.Interval[0])*phase/1000; const before=beforeDrawn.triangles(index,time,1), after=finalDrawn.triangles(index,time,1); ensure(before.length===after.length&&before.every((v,i)=>Math.abs(v-after[i]!)<0.001),`Medivh clip ${index} changed`); }
+for(const pose of ["dashAttack","forwardTilt","forwardTiltUp","forwardTiltDown","upTilt","downTilt","downSmash","backAir","downAir","neutralSpecial","sideSpecial","upSpecial","downSpecial","rollForward","getUp","getUpAttack","grab","grabHold","pummel","throwForward","throwBack","throwUp","throwDown"]){const i=actions.findIndex(a=>a.pose===pose);if(i<0)continue;const action=actions[i]!,sequence=records[i]!.index;const panels:PoseFrame[]=[1,-1].flatMap(facing=>[0,Math.max(1,action.contact-3),action.contact,action.contact+4,action.frames].map(frame=>({frame,phase:frame<action.contact?AttackPhase.startup:frame<=action.contact+4?AttackPhase.active:AttackPhase.recovery,x:0,z:0,facing,parts:[],strikes:[],clip:sequence,seconds:Math.min(action.frames,frame)/60})));await Bun.write(join(output,`${pose}.png`),sheet(`Medivh ${pose}`,finalDrawn,panels,5).png);}
 await Bun.write(join(output,"medivh-clips.json"),JSON.stringify({stockSequences:source.Sequences.length,appended:records.length,records},null,2)+"\n");console.log(`MEDIVH_CLIPS_PASS ${records.length} authored clips; ${source.Sequences.length} stock sequences retained; private output ${output}`);
 
 }, catch: cause => new ClipFailure({ cause }) }));

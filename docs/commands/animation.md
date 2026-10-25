@@ -153,6 +153,9 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `bun tools/animations/medivh-clips.ts STOCK_MEDIVH.mdx PRIVATE_OUTPUT`
   appends staff, blink, raven, grab, recovery and nine pain clips, preserving the
   22 stock sequences. Store `hero-models`, export only Medivh, then timeline it.
+  Given the shipped model and pose names (`dashAttack`) instead, it re-authors only
+  those clips in place at their indices, fits a retimed clip before the next sequence,
+  rewrites its binding and checks every other clip is unchanged.
 
 - Jaina animation authoring (from the repository root):
   `bun tools/animations/jaina-clips.ts STOCK_JAINA.mdx PRIVATE_OUTPUT`
