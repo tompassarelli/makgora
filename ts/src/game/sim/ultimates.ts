@@ -133,7 +133,8 @@ const FORSAKEN_PALADIN: AuthoredSpecial = {
   rehits: [52, 64],
 };
 
-const INFERNO_MARK = { ...mark("Abilities\\Spells\\Human\\MarkOfChaos\\MarkOfChaosTarget.mdx", 4, 37, 260.0), ...ON_FLOOR };
+const INFERNAL_RADIUS = 50.0;
+const INFERNO_MARK = { ...mark("Abilities\\Spells\\Human\\MarkOfChaos\\MarkOfChaosTarget.mdx", 4, 37, 260.0), ...ON_FLOOR, ledgeInset: INFERNAL_RADIUS };
 const INFERNO_CRASH = { ...mark("Abilities\\Spells\\Other\\Incinerate\\FireLordDeathExplode.mdx", 40, 14, 0.0), atMark: INFERNO_MARK };
 const INFERNAL_IMMOLATION: SpecialProjectile = shot(0, 0.0, 70.0, 0.0, 0.0, 6, 75.0, hit(1.5, 70, 15.0, 20.0, HitElement.fire), "Abilities\\Weapons\\DemolisherFireMissile\\DemolisherFireMissile.mdx");
 const INFERNAL: SpecialCompanion = {
@@ -143,7 +144,7 @@ const INFERNAL: SpecialCompanion = {
   stunFrames: 24, leash: 900.0, leashFrames: 120,
 };
 const INFERNAL_PLACEMENT: SpecialPlacement = {
-  frame: 40, offsetX: 0.0, radius: 50.0, height: 170.0, durability: 30.0, life: 300,
+  frame: 40, offsetX: 0.0, radius: INFERNAL_RADIUS, height: 170.0, durability: 30.0, life: 300,
   fireAges: [30, 60, 90, 120, 150, 180, 210, 240, 270], shot: INFERNAL_IMMOLATION, aura: true, atMark: INFERNO_MARK, companion: INFERNAL,
   model: { path: "Units\\Demon\\Infernal\\Infernal.mdl", height: 240.0, alpha: 255 },
 };

@@ -25,7 +25,7 @@ import { shieldCenterX, shieldCenterZ } from "../shieldTilt";
 import { type Capsule, attackCapsule, emptyCapsule, placeCapsule, segmentBoxesOverlap } from "../geometry/contactGeometry";
 import { HurtContact, strikeHurtContact } from "../hurtboxes";
 import { PARTICIPANT_CAPACITY } from "../../input/participants";
-import { floorBelow, floorSurfaceBelow, mainDeckLeft, mainDeckRight, mainDeckZAt, solidSurfaceAt, solidSurfaceCount, surfaceMoves, surfaceZAt } from "../stage";
+import { floorBelow, floorSurfaceBelow, mainDeckLeft, mainDeckRight, mainDeckZAt, solidSurfaceAt, solidSurfaceCount, surfaceCount, surfaceLeft, surfaceMoves, surfaceRight, surfaceZAt } from "../stage";
 import { clearMotionValue, setWorldMotionValue } from "../motion";
 import { currentTraits } from "../identityTraits";
 import { squareRoot } from "../warcraftMath";
@@ -292,6 +292,21 @@ function nearestFoe(world: Roster | undefined, owner: Readonly<Fighter>): Fighte
   return nearest;
 }
 
+function markX(owner: Readonly<Fighter>, spec: Readonly<SpecialProjectile>, stage: number, matchFrame: number, x: number): number {
+  if (spec.ledgeInset === undefined || floorBelow(stage, matchFrame, x, owner.motion.z) !== undefined) return x;
+  if (!owner.motion.grounded && floorBelow(stage, matchFrame, owner.motion.x, owner.motion.z) === undefined) return x;
+  const facing = owner.facing;
+  let ledge: number | undefined;
+  for (let index = 0; index < surfaceCount(stage); index++) {
+    const edge = facing > 0 ? surfaceRight(stage, index, matchFrame) : surfaceLeft(stage, index, matchFrame);
+    const near = facing > 0 ? surfaceLeft(stage, index, matchFrame) : surfaceRight(stage, index, matchFrame);
+    if (f32(f32(edge - owner.motion.x) * facing) < 0.0 || f32(f32(near - x) * facing) > 0.0) continue;
+    if (surfaceZAt(stage, index, matchFrame, edge) > owner.motion.z) continue;
+    if (ledge === undefined || f32(f32(edge - ledge) * facing) > 0.0) ledge = edge;
+  }
+  return ledge === undefined ? x : f32(ledge - f32(facing * spec.ledgeInset));
+}
+
 function markBaseZ(owner: Readonly<Fighter>, spec: Readonly<SpecialProjectile>, stage: number, matchFrame: number, x: number): number {
   if (spec.dropsToFloor !== true || owner.motion.grounded) return owner.motion.z;
   const pastLedge = runningHeroSpecial(owner)?.needsFloorBelow === true ? floorBelow(stage, matchFrame, owner.motion.x, owner.motion.z) : undefined;
@@ -320,7 +335,7 @@ function spawnHeroProjectile(owner: Fighter, spec: Readonly<SpecialProjectile>, 
   if (spec.atMark !== undefined && drawn === undefined) return;
   const foe = spec.atFoe === true ? nearestFoe(world, owner) : undefined;
   const centreX = f32(f32(mainDeckLeft(stage) + mainDeckRight(stage)) * 0.5);
-  const x = drawn !== undefined ? f32(drawn.x + f32(owner.facing * spec.offsetX)) : spec.atStageCentre === true ? centreX : foe !== undefined ? foe.motion.x : f32(owner.motion.x + f32(owner.facing * spec.offsetX));
+  const x = drawn !== undefined ? f32(drawn.x + f32(owner.facing * spec.offsetX)) : spec.atStageCentre === true ? centreX : foe !== undefined ? foe.motion.x : markX(owner, spec, stage, matchFrame, f32(owner.motion.x + f32(owner.facing * spec.offsetX)));
   const z = drawn !== undefined ? f32(drawn.z + spec.offsetZ) : spec.atStageCentre === true ? f32(mainDeckZAt(stage, x) + spec.offsetZ) : foe !== undefined ? f32(foe.motion.z + spec.offsetZ) : f32(markBaseZ(owner, spec, stage, matchFrame, x) + spec.offsetZ);
   if (spec.needsLineOfSight === true && !clearLine(stage, owner.motion.x, z, x, z)) return;
   const up = owner.special.aimZ > 0 && spec.upVelocityX !== undefined;

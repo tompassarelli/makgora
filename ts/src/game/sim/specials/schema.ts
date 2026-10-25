@@ -162,6 +162,9 @@ export interface SpecialProjectile {
 
   readonly dropsToFloor?: boolean | undefined;
 
+  /** Pulls a spot over the void back along the caster's facing to this far inside the farthest ledge under him, when he stands on or over a floor. */
+  readonly ledgeInset?: number | undefined;
+
   /** Spawns at the move's live mark of this spec, offset from it, and not at all once that mark is gone. */
   readonly atMark?: SpecialProjectile | undefined;
 
