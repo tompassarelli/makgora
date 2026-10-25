@@ -22,8 +22,9 @@ export function judgeStrip(crops: readonly string[], labels: readonly string[], 
 
 export function judgeFrameLabel(keys: JudgeKeys, frame: number): string {
   const hit = keys.hits.length > 1 ? keys.hits.indexOf(frame) : -1;
+  const rewind = keys.hits.length > 1 ? keys.hitWindups.indexOf(frame) : -1;
   const roles = [
-    frame === 0 ? "start" : "", frame === keys.windup ? "windup" : "", hit >= 0 ? `hit ${hit + 1}` : frame === keys.contact ? "contact" : "",
+    frame === 0 ? "start" : "", frame === keys.windup ? "windup" : "", rewind >= 0 ? `hit ${rewind + 2} windup` : "", hit >= 0 ? `hit ${hit + 1}` : frame === keys.contact ? "contact" : "",
     frame === keys.lastActive ? "last active" : "", frame === keys.recovery ? "recovery" : "", frame === keys.end ? "end" : "",
   ].filter((role) => role !== "");
   return `frame ${frame}: ${roles.join(", ")}`;
