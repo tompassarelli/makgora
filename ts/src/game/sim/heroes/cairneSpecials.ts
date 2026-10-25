@@ -6,14 +6,14 @@ import { hurtPart } from "../hurtboxes";
 import { NO_LAUNCH, cairneCapsule as c, cairneHit as hit, cairneHurtPose } from "./cairneMoves";
 
 const shockwave = (air: boolean): AuthoredSpecial => ({
-  endFrame: 58, landingLag: air ? 24 : undefined,
+  endFrame: 61, landingLag: air ? 24 : undefined,
   projectiles: [{ spawnFrame: 24, offsetX: 72.0, offsetZ: 36.0, velocityX: 13.0, velocityZ: 0.0,
-    life: 38, radius: 20.0, effect: hit(8.056439399719238, "edge", 35), reflectable: true, limit: 1,
+    life: 38, radius: 20.0, effect: hit(7.5, "edge", 35), reflectable: true, limit: 1,
     model: "Abilities\\Spells\\Other\\CrushingWave\\CrushingWaveMissile.mdx" }],
 });
 const GORE_HORNS = cairneHurtPose(8, 25, hurtPart(30.0, 80.0, 75.0, 70.0, 22.0));
 const gore = (air: boolean): AuthoredSpecial => ({
-  endFrame: 58, hurt: GORE_HORNS,
+  endFrame: 60, hurt: GORE_HORNS,
   motion: [{ ...frames(12, 25), velocityX: air ? 8.0 : 10.0, velocityZ: 0.0, stopsAtBody: true }, { ...frames(26, 26), velocityX: 0.0, velocityZ: 0.0 }],
   commandGrab: { ...frames(12, 24), strike: c(40.0, 62.0, 100.0, 48.0, 24.0), holdFrames: 20, effect: hit(10.763999938964844, "kill", 40), recovery: 22 },
   ...(air ? { oncePerAirtime: true, helpless: true, landingLag: 24 } : {}),

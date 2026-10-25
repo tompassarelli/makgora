@@ -62,7 +62,7 @@ export const CAIRNE_MOVES: FighterMoves = {
       [AttackStyle.upTilt]: pose(11, 19, arm(25.0, 162.0)),
       [AttackStyle.downTilt]: pose(9, 15, arm(80.0, 28.0)),
       [AttackStyle.dashAttack]: pose(14, 23, hurtPart(15.0, 60.0, 95.0, 75.0, 34.0)),
-      [AttackStyle.forwardSmash]: pose(26, 34, arm(95.0, 100.0)),
+      [AttackStyle.forwardSmash]: pose(28, 36, arm(95.0, 100.0)),
       [AttackStyle.upSmash]: pose(23, 32, arm(15.0, 178.0)),
       [AttackStyle.downSmash]: pairedPose(19, 26, 32, arm(85.0, 25.0), arm(-85.0, 25.0)),
       [AttackStyle.neutralAir]: pairedPose(10, 13, 21, arm(82.0, 100.0), arm(-82.0, 100.0)),
@@ -85,10 +85,10 @@ export const CAIRNE_MOVES: FighterMoves = {
       strike(16, 17, c(-30.0, 115.0, -90.0, 175.0), 9.66772747039795, "launch", 85),
     ]),
     [AttackStyle.downTilt]: heroMove(11, 3, 25, 0, [strike(11, 13, c(34.0, 25.0, 140.0, 14.0), 8.056439399719238, "launch", 70)]),
-    [AttackStyle.dashAttack]: heroMove(16, 5, 36, 0, [strike(16, 20, c(20.0, 60.0, 95.0, 75.0, 32.0), 12.084660530090332, "kill", 40)], 32.0, true),
-    [AttackStyle.forwardSmash]: heroMove(28, 4, 45, 0, [
-      ...[180.0, 120.0, 60.0, 10.0].map((z, i) => strongRegion(strike(28 + i, 28 + i, c(148.0, z, 175.0, z, 15.0), 20.14109992980957, "kill", 40))),
-      ...sweep(28, 145.0, [180.0, 120.0, 60.0, 10.0], 15.307236671447754, "kill"),
+    [AttackStyle.dashAttack]: heroMove(16, 5, 36, 0, [strike(16, 20, c(20.0, 60.0, 95.0, 75.0, 32.0), 11.25, "kill", 40)], 32.0, true),
+    [AttackStyle.forwardSmash]: heroMove(30, 4, 43, 0, [
+      ...[180.0, 120.0, 60.0, 10.0].map((z, i) => strongRegion(strike(30 + i, 30 + i, c(148.0, z, 175.0, z, 15.0), 20.14109992980957, "kill", 40))),
+      ...sweep(30, 145.0, [180.0, 120.0, 60.0, 10.0], 15.307236671447754, "kill"),
     ]),
     [AttackStyle.upSmash]: heroMove(25, 5, 39, 0, [strike(25, 29, c(0.0, 115.0, 0.0, 245.0, 20.0), 18.52981185913086, "kill", 85)]),
     [AttackStyle.downSmash]: heroMove(19, 14, 13, 0, [

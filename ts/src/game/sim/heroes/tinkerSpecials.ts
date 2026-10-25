@@ -8,7 +8,7 @@ import { claw, tinkerHit } from "./tinkerMoves";
 const rocket = (spawnFrame: number): SpecialProjectile => ({
   model: "Abilities\\Weapons\\RocketMissile\\RocketMissile.mdl",
   spawnFrame, offsetX: 35.0, offsetZ: 45.0, velocityX: 10.0, velocityZ: 2.0,
-  gravity: f32(0.12), life: 44, radius: 15.0, effect: tinkerHit(3.75, "poke", 55, 1.0, HitElement.fire),
+  gravity: f32(0.12), life: 44, radius: 15.0, effect: tinkerHit(4.5, "poke", 55, 1.0, HitElement.fire),
   reflectable: true, limit: 3,
 });
 const rockets = (air: boolean): AuthoredSpecial => ({ endFrame: 43, projectiles: [rocket(14), rocket(20), rocket(26)], landingLag: air ? 20 : undefined });
@@ -33,7 +33,7 @@ const laser = (air: boolean): AuthoredSpecial => ({
 const clockwerk = (velocityZ: number, gravity?: number): SpecialProjectile => ({
   model: "Units\\Creeps\\HeroTinkerRobot\\HeroTinkerRobot.mdl",
   spawnFrame: 0, offsetX: 20.0, offsetZ: 16.0, velocityX: 7.0, velocityZ, gravity,
-  life: 44, radius: 18.0, effect: tinkerHit(5.140870094299316, "poke", 35, 1.0, HitElement.fire), reflectable: true, limit: 3,
+  life: 44, radius: 18.0, effect: tinkerHit(6.0, "poke", 35, 1.0, HitElement.fire), reflectable: true, limit: 3,
 });
 const goblinDrop: SpecialProjectile = { ...clockwerk(-3.0, f32(0.25)), spawnFrame: 10, velocityX: 3.0, life: 40 };
 
