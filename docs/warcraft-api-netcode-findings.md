@@ -372,7 +372,12 @@ callback that admits a row with a new press. A token bucket caps both: a
 message spends 6 callbacks of credit, credit refills one a callback up to two
 messages' worth, and nothing is sent without a message's credit, so the
 average stays at 10 a second, a burst is at most two messages, and the
-6-callback cadence is never delayed (#215,
+6-callback cadence is never delayed. The one exception is a press right
+after a message that held one, such as an ultimate's second press one
+callback after its first: it goes out on any credit not below zero, so the
+two presses are the two-message burst, and credit may fall to one message
+below zero until the cadence refills it. No three messages go on
+consecutive callbacks (#215,
 smashcraft:ts/src/game/netcode/journal/transport.ts). A message carries
 every admitted frame not yet sent, in order, as an I5 message
 (smashcraft:ts/src/game/input/wire.ts): the first frame's row, then only rows

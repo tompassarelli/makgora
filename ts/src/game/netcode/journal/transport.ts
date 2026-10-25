@@ -37,6 +37,8 @@ export class OutgoingInput {
   private idle = MAX_BATCH;
   private credit = BURST_MESSAGES * MAX_BATCH;
   private pressPending = false;
+  private pressSent = false;
+  private gap = MAX_BATCH;
 
 
   begin(epoch: number, firstFrame: number): void {
@@ -47,6 +49,8 @@ export class OutgoingInput {
     this.idle = MAX_BATCH;
     this.credit = BURST_MESSAGES * MAX_BATCH;
     this.pressPending = false;
+    this.pressSent = false;
+    this.gap = MAX_BATCH;
   }
 
 
@@ -71,7 +75,9 @@ export class OutgoingInput {
 
 
   ready(batch: number): InputMessage | undefined {
-    if (this.nextUnsent > this.admitted || this.credit < batch) return undefined;
+    if (this.nextUnsent > this.admitted) return undefined;
+    const burst = this.pressPending && this.pressSent && this.credit >= 0 && (this.idle > 1 || this.gap > 1);
+    if (this.credit < batch && !burst) return undefined;
     if (this.idle < batch && !this.pressPending) return undefined;
     return encodeInputMessage(this.epoch, this.nextUnsent, this.admitted, frame => this.row(frame));
   }
@@ -80,8 +86,10 @@ export class OutgoingInput {
   sent(message: InputMessage, batch: number): void {
     for (let frame = message.firstFrame; frame <= message.lastFrame; frame++) this.rows.release(frame);
     this.nextUnsent = message.lastFrame + 1;
+    this.gap = this.idle;
     this.idle = 0;
     this.credit = Math.min(this.credit, BURST_MESSAGES * batch) - batch;
+    this.pressSent = this.pressPending;
     this.pressPending = false;
   }
 
