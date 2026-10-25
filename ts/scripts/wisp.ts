@@ -81,11 +81,10 @@ if (name === undefined || entry === undefined) {
 const command = await entry.load();
 
 const teardown: Teardown = (exit) => {
-  if (Exit.isFailure(exit)) {
-    if (!Cause.hasInterruptsOnly(exit.cause)) console.error(Cause.pretty(exit.cause));
-    process.exit(Cause.hasInterruptsOnly(exit.cause) ? 130 : 1);
-  }
-  process.exit();
+  if (Exit.isSuccess(exit)) process.exit();
+  if (Cause.hasInterruptsOnly(exit.cause)) process.exit(130);
+  console.error(Cause.pretty(exit.cause));
+  process.exit(1);
 };
 
 
