@@ -8,553 +8,104 @@ rollback and prediction use that same frame, with no accumulated stage timer.
 The main deck stays fixed. Hidden test stages 3 and 4 provide a Smashville-style
 back-and-forth platform and independent loop/lift patterns.
 
-Grounded fighters ride their floor before their own motion, including hitlag,
-as Melee's `Fighter_procUpdate` adds `mpGetSpeed` to grounded position. Grounded traps and bears ride the same way,
-following grounded items in Melee Landing remaps the
-previous endpoint by the floor's displacement (`mpCheckFloorRemap` in
-Melee); an already carried fighter is not shifted twice.
-Down presses retain Melee's pass-through gate, and floor tech recovery rides
-the platform. Moving raised platforms have no ledge: Melee's Stadium platform
-line 0 and Icicle Mountain lines 0–2 have `LINE_FLAG_PLATFORM` without
-`LINE_FLAG_LEDGE` (GrSt.dat/GrIz.dat). Main-deck ledges retain their usual catch
-rules. Path dimensions and schedules are authored here; they are inspired by
-Ultimate's layouts, without claiming Ultimate's exact timing.
-
-The live simulation is smashcraft:ts/src/game/sim/. The numerical fixture suites
-are smashcraft:ts/src/game/sim/physicsPrecisionState.tests.ts,
-smashcraft:ts/src/game/sim/physicsPrecisionScalar.tests.ts and
-smashcraft:ts/src/game/sim/physicsPrecisionMotion.tests.ts; their headless and
-native commands are in smashcraft:docs/native-physics-precision.md.
-Wurst source paths, compiler pins and test results below describe their
-recorded historical revisions.
-
-## Analog shield pressure and hitlag observations — 2026-10-04
-
-The existing analog trigger bytes now preserve shield strength through input,
-guard drain, contact damage/stun/pushback, relative visual size and replay.
-Digital clicks remain full strength; analog pressure activates at byte 77.
-The 54 original pressure/health/contact rows match production emitted Lua.
-Four connected tests cover input thresholds, minimum hold, contact freezes and
-replay restoration. Details and boundaries:
-smashcraft:docs/melee-analog-shield.md. Projectile powershield input timing and
-reflection are now implemented against an authored SmashCraft shield circle.
-Melee perfect contacts also preserve shield health, use the observed unmodified
-defender pushback with the same cap/stun, and emit a success flash. Their
-four-sample timer is replayed; full callback ordering and post-contact
-actionability still need verification. Twelve ordinary/perfect contact pushback
-observations match emitted Lua alongside the existing 54 analog rows;
-ordinary melee shield geometry/pokes/tilt, physical analog capture and native
-verification remain open. See smashcraft:docs/melee-powershield.md.
-
-The original capped hitlag calculation also matches 52 ordinary/electric and
-crouching observations without a production formula change; see
-smashcraft:docs/melee-hitlag-scalars.md. Ordinary/fixed launch matches 50
-magnitudes and 150 context adjustments, and hitstun matches 23 duration/level
-observations. These scalar checks do not establish ordered gameplay traces.
-The assembled emitted-Lua probe passes fourteen groups with zero errors or
-warnings; the normal simulation suite passes 592/592 with one existing
-unused-import warning. Evidence:
-smashcraft:build/analog-precision-integration.log and
-smashcraft:build/analog-normal-integration.log.
-
-## Flat-ground displacement and shield-motion arithmetic — 2026-10-04
-
-Ordinary flat-ground displacement now rounds self movement, launch and attacker
-recoil additions separately in that order. Digital defender and attacker ground
-decrements also round their operands, friction product and results. A shield
-contact replaces prior self ground speed rather than adding pushback to it.
-Original fighter tuning is unchanged, and stale moves stay omitted
-(smashcraft:docs/gameplay-design.md).
-
-The independently observed corpus in
-the recorded design targets contains 22
-composed original arithmetic cases and four original shield-entry store cases.
-The production emitted-Lua comparison reported 30 mismatches before repair
-and passes afterward; see smashcraft:docs/melee-ground-motion.md for operation
-addresses, comparison details and limitations. The integrated normal Tests
-filter passes 534/534, zero errors and one existing unused-import warning:
-smashcraft:build/ground-motion-integration-tests.log. This does not prove slopes,
-faster-than-walk friction branches, shield contact magnitudes, full original
-trajectories or native gameplay. The native arithmetic diagnostic builder now
-includes these cases; its runtime acceptance remains open.
-
-## Airborne recoil cutoff state correction — 2026-10-04
-
-The original below-cutoff recoil branch clears horizontal attacker recoil and
-vertical launch, retaining vertical attacker recoil and horizontal launch.
-Four private executions of its unchanged comparison/stores confirm these
-numeric state effects. Production now applies launch decay before recoil decay
-and preserves this retail interaction, while skipping an empty recoil vector.
-The numerical facts and scope are in
-the recorded design targets and
-smashcraft:docs/melee-air-cutoff.md.
-
-The previous cutoff fixture incorrectly composed both recoil axes as zero
-below the boundary; it did not execute the original cutoff stores. Its
-classification proof remains valid. Corrected emitted-Lua comparisons failed
-on recoil boundary case 9 before repair and pass all eighteen boundary cases
-plus four cross-channel cases afterward. Evidence:
-smashcraft:build/recoil-cutoff-state-before.log and
-smashcraft:build/recoil-cutoff-state-after.log. PhysicsTests pass 64/64 with zero
-errors and one existing warning; evidence is
-smashcraft:build/recoil-cutoff-state-physics-tests.log. Native gameplay remains unverified.
-
-## Exact airborne below-cutoff-or-decay decision — 2026-10-04
-
-Airborne launch and attacker recoil now compare their binary32 squared speed
-with a derived boundary instead of invoking Warcraft SquareRoot. The original
-three-refinement arithmetic, IBM's estimate accuracy contract, and exact integer
-boundary inequalities establish the same below-cutoff-or-decay decision for the two
-fixed retail constants under round-to-nearest. The derivation and its scope are
-in smashcraft:docs/melee-air-cutoff.md.
-
-Eighteen vectors around both boundaries match the original refinement block
-and scalar routines in emitted Lua. Below-cutoff state composition was corrected
-as described above; the earlier check did not establish the recoil stores. The original
-refinement runs privately under QEMU with only its return boundary patched.
-The error argument covers permissible estimate variation separately; it does
-not assume that QEMU's estimate equals Gekko's. The previous host-Lua square
-root also passed these cases; the replacement removes the native dependency
-for this rule. PhysicsTests pass 64/64. Other square-root uses and native map
-verification remain unfinished.
-
-## Airborne attacker recoil arithmetic — 2026-10-04
-
-The retail recoil branch at  calls atan2f;  rounds the
-vertical square and  fuses the horizontal square-plus-sum. Cosine and
-sine calls at / feed axis `fnmsubs` at
-/, both loading . These numeric operation
-facts identify the same direction/subtraction pattern as airborne launch decay.
-Production now shares that calculation, with the separate recoil decay
-0.05000000074505806 Melee units.
-
-the recorded design targets records
-eleven above-cutoff vectors from original scalar execution and independently
-authored PPC subtraction. The emitted-Lua production probe failed on the first
-recoil case before repair and passes all 22 recoil axes afterward, alongside
-the 22 launch axes and 22 resulting horizontal positions. Evidence:
-smashcraft:build/air-recoil-before.log and smashcraft:build/air-recoil-after.log.
-This is not execution of the original gameplay routine. The below-cutoff decision
-uses the verified derived boundary above; native recoil remains unverified.
-
-## Airborne horizontal position order — 2026-10-04
-
-Ordinary airborne horizontal position now adds self velocity, launch velocity,
-then attacker shield recoil separately, rounding each addition in Melee units.
-Airborne defender shield pushback is already cleared before this phase.
-Grounded motion, sampled ground rolls, and recovery displacement remain on
-their existing paths and need separate source-order verification.
-
-The emitted-Lua axis probe also checks eleven resulting horizontal positions
-from initial Melee x = -60 and self velocity = 0.25, using the independently
-recorded launch-axis outputs. Expected additions use IEEE binary32 arithmetic,
-not a recorded full-game position trace. The first case failed before the
-position repair; all eleven pass afterward. Evidence:
-smashcraft:build/air-position-before.log and smashcraft:build/air-position-after.log.
-This does not establish native collision or trajectory fidelity.
-
-## Airborne knockback axis arithmetic — 2026-10-04
-
-Airborne launch decay now converts the velocity operands to binary32 Melee
-units, rounds the vertical square, uses one fused horizontal square-plus-sum,
-and compares the rounded speed with the retail decay using strict less-than.
-Above the cutoff it computes the direction using the independently authored
-Melee scalar approximation and subtracts each decay component with one fused
-rounding. It preserves the original tiny cardinal-axis residues instead of
-forcing those axes to zero through radial rescaling.
-
-the recorded design targets records
-eleven above-cutoff vectors. Their direction values come from original scalar
-routines executed under QEMU PPC750; their final axes come from independently
-authored PPC `fnmsubs` arithmetic. This does not execute the original gameplay
-function. The production emitted-Lua probe failed on case zero before the
-repair and passes all 22 exact axis outputs afterward. Evidence:
-smashcraft:build/air-decay-before.log and smashcraft:build/air-decay-after.log.
-
-The cutoff uses the derived squared-speed boundary described above. Native
-trajectories remain unverified.
-
-## Recorded vertical precision — 2026-10-04
-
-Ordinary gravity subtraction now rounds both operands and the result in Melee
-units. Vertical position adds self velocity, then launch velocity, then attacker
-shield recoil, rounding each addition separately. Shield-break falling uses
-the same gravity and position arithmetic. Zero displacement preserves authored
-stationary surface coordinates exactly. Original fighter stats remain authored.
-
-The emitted-Lua probe generated from
-the recorded design targets failed on its
-first recorded frame before the repair and passes all ten exact positions on
-both original fighter hosts afterward. Only recorded gravity and terminal speed
-are injected; these are test rigs, not roster changes. Evidence:
-smashcraft:build/gravity-lua-before.log and smashcraft:build/gravity-lua-after.log.
-
-The probe uses the compiler-owned Lua native fixture pinned separately by
-`luaTestRuntimeCommit` in smashcraft:wurst-toolchain.lock. Its SquareRoot repair
-does not change the compiler artifact and does not establish Warcraft native
-square-root precision. Shared scalar approximations and their bounded proof
-are documented in smashcraft:docs/melee-scalar-math.md; Gekko square-root cutoff
-behavior, horizontal position order, and native
-trajectory verification remain open.
-
-## Verified retail combat parameters — 2026-10-03
-
-Ordinary launching contacts now use the independently recorded Melee
-common parameters. The private reference's Melee SHA-1 is
-`08e0bf20134dfcb260699671004527b2d6bb1a45`. Original game files remain outside
-this repository. These numbers are our own design targets, set from public frame
-data (SmashWiki, Smashboards) and from watching the game; the Wurst
-implementation is written from scratch against them.
-
-The adopted values are = 10 moving frames before launch merging, = 0.029999999329447746 launch speed per knockback unit, = 0.4000000059604645 hitstun frames per knockback unit, and = 10/21/32 for the four damage reaction levels. Levels are
-selected from the unrounded scaled knockback; the stun counter truncates it,
-with a minimum of one. The fourth level selects tumble. Common flat-ground
-knockback friction = 1 multiplies the fighter's traction.
-
-During the first nine moving frames since a launch, a new launch replaces the
-old vector. Starting on frame ten, opposite components add and same-direction
-components keep the greater magnitude, independently on each axis. The age
-freezes during hitlag and advances on the frame hitlag expires. The contact
-batch first chooses its strongest launch, then merges it once with residual
-motion. Hitstun and reaction level belong to the new winning hit. The saved age
-saturates at ten because later values do not affect this decision.
-
-A grounded, downward or horizontal hit below tumble strength stays on the
-floor. Its new tangent velocity is retained separately from the transient
-merged vector so the next ground step decays the actual new ground launch.
-An upward hit leaves the ground. A tumble-strength hit more than
-0.1745329201221466 radians below the flat floor reflects its vertical
-component upward by 0.800000011920929, retaining horizontal speed.
-Shallower downward tumble launches remain downward for ordinary collision
-resolution. Airborne targets do not receive this contact-time floor bounce.
-These rules preserve the original roster's authored weights, traction, move
-power and direction vectors; no reference fighter is added to the roster.
-
-Replay copying and exact comparison include the age, ground tangent velocity
-and damage level. Reset and stock loss clear them; launch-clearing actions also
-clear the tangent channel. Focused tests exercise the nine/ten-frame boundary,
-frozen age, axis merging, strongest-contact selection, ground traction,
-all three damage-level thresholds, nine/eleven-degree floor launches and exact
-snapshot restoration. Their synthetic expected values are arithmetic checks,
-not newly captured game traces. The existing independent grounded-damage and
-movement recordings remain part of the same physics test package.
-`bash test.sh PhysicsTests` passed **48/48**, with zero compiler errors and one
-existing unused-import warning; evidence is
-smashcraft:build/retail-combat-tests.log. Exact retention checks preserve the
-pre-contact vector rather than approximating its accumulated float32 decay.
-
-This change covers contact-time launch selection and flat-floor attenuation.
-General wall/ceiling geometry, collision-time rebounds/landing limits, analog
-input, and special damage states are separate seams. No full-combat parity or
-native game observation is claimed by these focused checks.
-
-## Grounded digital shield correction — 2026-10-03
-
-Production contact resolution now assigns defender shield pushback and direct
-grounded-attacker recoil to separate motion channels. Held movement and launch
-knockback retain their own values. Both shield channels freeze during hitlag,
-then resume on its zero frame; defender motion decays by the actor's traction,
-and grounded attacker recoil uses the sampled 1.1 traction factor. A later
-clean hit, shield break or respawn clears the interrupted shield motion.
-Replay snapshots copy and compare both channels and the shield-drain transition.
-
-The paired reference below passes through the actual contact queue and
-production `advance`, assigning Jigglypuff traction to the defender and Sheik
-traction to the attacker across all Rifleman host combinations. It
-checks contact health/stun/freeze, nine successive positions, guard-transition
-drain timing, contact direction, detached sources and a perturbed recoil that
-is detected at the first released frame. Position tolerance is 0.001 world
-units; contact speed and shield-health tolerance is 0.0001. The final focused
-shield suite passed **45/45** and the final aggregate passed **427/427**, zero
-errors and one existing unused-import warning
-(smashcraft:build/physics-shield-tests.log). The integrated Wurst sources are
-identical to that checked final result; no redundant aggregate was run.
-
-This verifies one grounded digital-contact case, not complete shielding parity.
-Airborne attacker recoil remains unsupported and these grounded channels clear
-on leaving the floor. Analog/powershield rules, raw common-table/revision
-identity, cap/stacking cases, broader contact/actionability comparisons and
-native play remain required. The cap of two Melee units follows the published
-formula but is not exercised by this recording. Original playable fighter
-stats and moves were not retuned by this change.
-
-Map `melee-physics-foundation-r7` built with zero errors and six existing
-warnings; Lua syntax and packaged script/assets checks passed
-(smashcraft:build/physics-map-r7.log). The 16,092,788-byte artifact has SHA-256
-`1e6adac28e3933d75fcd3c047536b7a4f96d5d9b5e56622f78a97515368c8a95`.
-It is installed as `Smashcraft_Melee_Physics_r7.w3x` in
-`~/.local/share/Steam/steamapps/compatdata/3516115571/pfx/drive_c/users/steamuser/Documents/Warcraft III/Maps`,
-compared byte-for-byte with the build. Existing candidates and concurrent
-clients remain preserved. Native r7 gameplay has not been observed.
-
-## Paired digital shield reference — 2026-10-03
-
-the recorded design targets retains
-twelve original states around Sheik's jab against Jigglypuff's full digital
-shield on Final Destination, frames 10523–10534 of the public `air_dodge.slp`
-fixture. Both inputs are neutral horizontally. The retained numerical fields
-match the original parser output; the frame-data corpus
-(smashcraft:references/melee-frame-data/records.jsonl) reports four damage and
-three shieldstun frames for the jab.
-
-Contact frame 10525 reports four hitlag frames. Both actors remain stationary
-through 10528, then move on frame 10529 when hitlag reaches zero. The defender
-starts with ground speed 0.45600005984306335 Melee units/frame and decays by
-approximately 0.09 each released step. The attacker moves by approximately
-−0.212, −0.124 and −0.036 units on its first three released steps. Slippi's
-exported self-induced speeds omit that separate attacker recoil velocity, so
-the attacker's positions are the relevant evidence. GuardSetOff occupies
-released frames 10529–10531; Guard resumes at 10532, while ordinary held drain
-resumes at 10533.
-
-The published factual formulas at https://www.ssbwiki.com/Shield#Shield_pushback
-give digital defender pushback `min(2, (integerDamage * 0.09 + 0.4) * 0.6)` and
-attacker recoil `integerDamage * 0.07 + 0.02`. This four-damage contact agrees
-with defender speed 0.456 and initial attacker recoil 0.3. The recorded
-attacker decay is 0.088; a separate attacker ground-friction multiplier is a
-design target still to be set. Raw common values and game revision are
-still unresolved. The published Jigglypuff DAT JSON independently supplies
-traction 0.09000000357627869 and walk maximum 0.699999988079071. Defender
-pushback starts below that walk maximum and decays by ordinary actor traction;
-using Fox/Falco traction 0.08 and compensating with a 1.125 multiplier would
-produce a passing trace with the wrong shared rule. The fixture must assign
-the observation's actual character parameters. This recording identifies
-NTSC, not a verified NTSC 1.02
-disc or unmodified gameplay build. Analog shielding, powershields, defender
-cap behavior and airborne attacker recoil are outside this excerpt.
-
-## Original fighter tuning and reference test rigs — 2026-10-03
-
-Smashcraft's fighters are original characters, and Melee physics verification
-concerns shared equations and state rules (smashcraft:docs/gameplay-design.md,
-"Principles"). Historical source mappings below describe prior work.
-
-smashcraft:wurst/Simulation.wurst now gives each actor a `fighterPhysics` value
-with weight, gravity, terminal/fast-fall speeds, drift and friction/caps,
-ground speeds/traction, jump parameters and shield-break speed. Shared physics
-uses those actor parameters. Named Rifleman and Demon Hunter defaults
-preserve current numerical tuning; this separation makes no new balance choice.
-Character identity continues to select authored moves and presentation. Illidan's
-movement conveniences remain explicit behavior, and roll/move data are
-still their authored, separate mechanics.
-
-The Falco parameter rig exists only in smashcraft:wurst/PhysicsTests.wurst.
-Recorded fall/jump comparisons explicitly assign the original-game values to
-both Rifleman host actors. They no longer rely on Rifleman's defaults
-happening to match. Tests also exercise different gravity, jump timing/speeds
-and damage-contact weight on the same host identity. Parameters are copied by
-value in replay snapshots, participate in replay equality, and survive respawn.
-An older test which changed only character ID now assigns its intended Demon
-Hunter parameters explicitly.
-
-The integrated suite passed **423/423**, zero errors and one existing unused-
-import warning (smashcraft:build/physics-parameters-tests.log). The source merge
-adds no further simulation changes beyond that checked commit. Original-game
-reference revision gaps, broader physics cases and native gameplay remain
-unresolved; a correct test rig enables those checks and does not itself prove
-the entire Melee physics foundation.
-
-Map `melee-physics-foundation-r6` built with zero errors and six existing
-warnings; Lua syntax and packaged script/assets checks passed
-(smashcraft:build/physics-map-r6.log). It was installed under the unique filename
-`Smashcraft_Melee_Physics_r6.w3x` in
-`~/.local/share/Steam/steamapps/compatdata/3516115571/pfx/drive_c/users/steamuser/Documents/Warcraft III/Maps`
-and compared byte-for-byte with the build. Existing candidates and concurrent
-clients remain preserved. Native r6 gameplay has not been observed.
-
-## Recorded grounded damage correction — 2026-10-03
-
-The production simulation now resumes physics, input gates and state countdowns
-on the frame hitlag reaches zero. The previous branch decremented to zero and
-returned, adding one frozen frame. The boundary is shared by ordinary damage,
-grab pause, ledge and shield-break progression; release DI/ASDI occurs before
-resumed physics. Existing exact freeze-frame expectations were updated to that
-boundary without changing their numerical tolerances.
-
-Grounded knockback on the current flat surfaces now decays by ground traction,
-clamps to zero without reversing, and has zero vertical knockback. Airborne
-knockback retains radial decay of 0.051 Melee units/frame. The earlier code
-applied airborne decay to both states.
-
-the recorded design targets records
-Captain Falcon's grounded damage state on frames 3432–3445 of the public
-Slippi `techTester.slp` fixture. Frame 3436 has zero hitlag, hitstun countdown 9
-and resumed displacement. Before repair our countdown remained 10. The first
-released knockback velocity should be 4.05764687 world units/frame; the old
-ground decay produced approximately 4.23164677. Published Captain Falcon
-traction is 0.07999999821186066, exactly matching the extracted Fox/Falco
-profiles used for this shared-rule comparison.
-
-The full production fixture compares thirteen successive states: frozen frames,
-release, horizontal displacement/velocity, hitstun expiry and crouch/actionability.
-It detects deliberately perturbed knockback on original frame 3433. Position
-tolerance is 0.0001 world units and velocity tolerance is 0.00001; floor origin
-is normalized. The fourteen retained states and traction were checked against
-their original intake fields. The assembled suite passed **419/419**, zero
-compiler errors and one existing unused-import warning
-(smashcraft:build/physics-grounded-release-aggregate.log).
-
-This is a bounded recorded comparison, not full NTSC 1.02 acceptance. The source
-is NTSC but its disc revision and modification status are unknown. It begins
-after accepted launch, so it does not verify the move's damage/weight formula,
-DI/SDI, tumble, shields or whole-character movement. Common multiplier
-has not been independently extracted; the recording supports the effective
-traction product for this flat-floor case. Sloped surfaces, wall/ceiling bounces,
-remaining common values and native gameplay remain unresolved. Independently
-authored Wurst uses factual observations, with no copied gameplay implementation.
-
-Map `melee-physics-foundation-r5` built with zero errors and six existing
-warnings. Existing Lua syntax and packaged script/assets checks passed
-(smashcraft:build/physics-map-r5.log). The unique candidate was installed as
-`~/.local/share/Steam/steamapps/compatdata/3516115571/pfx/drive_c/users/steamuser/Documents/Warcraft III/Maps/Smashcraft_Melee_Physics_r5.w3x`
-and compared byte-for-byte with the build. Earlier candidates remain available.
-The two existing Warcraft clients/private desktops belong to concurrent work;
-they were preserved. Native r5 gameplay has not been observed.
-
-## Physics integration — 2026-10-03
-
-The physics changes were reconciled with public `main` in
-~/code/smashcraft/worktrees/melee-physics-public, retaining its two-fighter
-interfaces. The aggregate passed **402/402** tests with zero compiler errors
-(smashcraft:build/physics-public.log). The focused snapshot test then passed
-**1/1**, including nonzero crouch and roll-entry-facing restoration
-(smashcraft:build/physics-replay.log). The map `melee-physics-foundation-r1`
-built with zero compiler errors and six warnings; source staging, Lua syntax
-and packaged script/assets passed the existing build checks
-(smashcraft:build/physics-map.log). Native gameplay of this build remains
-unobserved. Earlier checkpoint logs below describe their named historical builds.
-
-The isolated development source passed 497/497 before this pass and 504/504
-after the combined corrections. Its unrelated networking/presentation changes
-are not part of this physics merge, and the concurrent development tree was
-not modified. Numerical agreement in these tests does not establish NTSC 1.02
-equivalence without the missing parameters and original-game comparisons.
-
-| Rule group | Implemented and checked | Still required for parity |
-| --- | --- | --- |
-| Movement | Extracted jump speeds, full squat duration, ground/aerial entry ordering, takeoff momentum, air drift/overspeed, sampled roll travel, persistent fast-fall state, and five recorded dash-braking updates | Revision identity, complete frame trajectories, dash/run/turn common values and transitions, walk acceleration, and full EscapeAir animation/fall-special transition parity |
-| Damage | Integer individual hit power, fractional same-frame total, strongest-contact selection, fixed knockback, cap, sampled crouch/smash modifiers and recorded flat-ground traction decay | Common-table confirmation, successive-frame stacking and other grounded surface conditions |
-| Hitlag/hitstun | Separate counters, electric effects carried through contact resolution, crouch arithmetic, direct/detached source pause and recorded same-frame hitlag release | Broader original-game ordered traces, revision identity and verified common values |
-| Shields | Integer shieldstun power, shield-break launch speed, recorded grounded digital defender pushback/attacker recoil and guard-drain timing; airborne attacker recoil initializes from  `hit_weight_mul`, retains a separate x/z vector, decays by , and is included in replay; bounded powershield timer plus swept-circle projectile reflection, replayed source visual family and reflection cue | Ordinary melee powershield contacts, shield geometry/pokes/tilt, physical analog capture and broader paired displacement/actionability traces |
-| DI/recovery | Actual-vector DI normalization, grounded non-upward launch selection, existing floor tech/miss-tech/getup and sampled roll paths | Ground-bounce values, wall/ceiling collision geometry, tumble exceptions and threshold/tech traces |
-| Replay/map | Crouch and roll-entry-facing snapshot restoration; map compilation and packaging | Native connected movement/contact/recovery check of this build |
-
-The parameter corpus and explicit missing offsets are in
-the recorded design targets. The local retail
-NTSC 1.02 reference identifies main DOL SHA1
-`08e0bf20134dfcb260699671004527b2d6bb1a45` and Melee SHA1
-`c904de0c4c5eb3ef65211a75d8bd70ca5b0f9f41`;  are now confirmed from that table. Published character dumps still lack
-disc-revision metadata, and other missing values are not filled by guesses.
-Illidan keeps his original tuning; the digital dodge and
-fast-fall controls and the absence of stale moves are owner decisions in
-smashcraft:docs/gameplay-design.md.
-
-Airborne shield contact adds a per-axis relative-motion term scaled by
-`min(defender weight / attacker weight, 1) × hit_weight_mul`; 
-sets `hit_weight_mul` to 0.25. Same-direction movement subtracts the attacker's
-step from the defender's; opposing movement uses the defender's step. This is
-covered by a production-step contact test, including both weight-ratio ranges
-and accumulation. The retained Slippi airborne contact still does not expose
-the recoil vector, so the formula is source-derived rather than directly
-validated against that trace.
-
-Airborne shield recoil uses  = 0.05 Melee units per frame; on
-flat-ground contact the horizontal channel uses traction ×  = 1.1,
-and its vertical component is discarded. The values come from
-`technospider-ssbm/melee-shield-tilt` revision
-`e8c05c2a0ed3419c1f461d0a5cb11728d01aa3b1`. Its listed Melee SHA1 matches the
-locally inspected retail NTSC 1.02 common table. The airborne multiplier is
-also a design target here; only the published numerical parameters are used.
-The retained airborne shield contact in
-the recorded design targets
-shows the attacker frozen through hitlag and moving again on the first release
-sample, but does not expose the shield-recoil vector. The common-derived
-initialization and resulting displacement therefore remain unverified by this
-trace.
-
-The next acceptance sequence and GitHub dependencies are in
-smashcraft:evidence/melee-foundation-roadmap.md. The factual frame-data intake at
-smashcraft:references/melee-frame-data/README.md supports move research; it is
-not a physics oracle, does not establish game revision, and supplies no hitbox
-geometry. Its raw `gravity` field means fast-fall speed and `stun` means
-shieldstun. No physics behavior changed as part of that intake.
-
-Wurst owns our independently authored simulation. Its mechanics and numerical
-parameters are our own design targets, taken from public frame data (SmashWiki,
-Smashboards) and from watching the game. No game assets or implementation text
-are incorporated.
-
-## Combat corrections — 2026-10-03
-
-Low-knockback horizontal/downward hits on a grounded fighter now keep that
-fighter grounded and project launch onto the flat floor. Upward hits and
-tumble-strength hits still leave the ground. Grounded launch cannot be steered
-off the floor by DI. This adopts the factual floor-normal selection in
-Melee at the revision above; it does not
-adopt the still-unverified grounded friction multiplier or ground-bounce data.
-The existing 80-knockback tumble threshold remains the documented baseline.
-
-DI now normalizes against the actual launch vector instead of the pre-direction
-speed. Several custom attacks have nonunit direction vectors;
-those directions no longer reduce the maximum DI rotation below 18 degrees.
-Their authored launch speeds and directions remain unchanged. The factual
-reference is the actual-vector normalization in the same damage module.
-
-Digital shieldstun truncates incoming hit power before calculating its duration,
-matching the integer damage input of the shield contact path in
-Melee Shield damage itself remains
-fractional. Rifleman shield breaks now launch with their mapped
-Fox/Falco character attribute, 3.299999952316284 Melee units/frame (19.7999997139
-world units/frame), instead of the original 24-world-unit tuning. Illidan keeps
-24. The factual parameter is character attribute in the public Fox/Falco
-DAT JSON at https://melee.theshoemaker.de/dat-dumps/Fox.json and
-https://melee.theshoemaker.de/dat-dumps/Falco.json; the publisher's disc revision
-is unknown. These are independently authored mechanics, with no copied or
-translated gameplay implementation.
-
-The focused combat tests cover contact, four frozen ticks, grounded launch and
-the 31st actionable tick; 79.8916667/80.3544444 knockback cases straddle the
-tumble boundary both on the floor and in the air. Separate cases check actual
-vector DI, fractional shieldstun boundaries and shield-break contact/freeze/
-first movement. These are numerical and behavioral tests, not an independent
-game-execution oracle or a claim of full Melee parity.
-`bash test.sh combat` passed 11/11 with zero compiler errors; evidence is
-smashcraft:build/combat-tests.log. Existing airborne DI tests now explicitly
-initialize an airborne fighter; their rotation and speed assertions are intact.
-
-Remaining combat gaps require verified common data: the cross-frame launch
-stacking gate, grounded knockback friction, ground-bounce angle
-and multiplier, defender shield pushback, and attacker pushback/decay. Wall/ceiling collision and bounce geometry are
-also absent from the current platform-only stage model. Existing floor tech,
-missed-tech recovery and their provisional timing are unchanged. No missing
-values were guessed, and these gaps remain open.
-
-## Current correction checkpoint — 2026-10-01
-
-Historical fixture before #339: The integrated suite passes 402/402 in
-smashcraft:build/physics-aggregate.log. The normal map builds and installs as
-`illidan-physics-complete`; build evidence is smashcraft:build/physics-map.log.
-Native entry showed that build ID, Archer versus Rifleman, and working jump,
-aerial attack and pause controls. The trace records the accepted ground
-jump at frame 63 and aerial attack at frame 91, with zero dropped rows:
-smashcraft:build/physics-native-controls-trace.txt. The final paused capture is
-smashcraft:build/illidan-native/physics-controls-accepted.png. This short native
-check does not measure every collision frame or prove the numerical formulas.
-The corrections below retain the shared dodge durations, the 18-degree digital
-wavedash, neutral-horizontal fast-fall and the absence of stale moves
-(smashcraft:docs/gameplay-design.md).
-Illidan retains original jump tuning and 128-unit roll paths; his drift follows the shared rule since #190.
-
-Full Melee parity is not established. Rifleman forward-roll logical
-facing now changes at the observed frame-20 event, with entry-facing travel
-and pose retained throughout the roll (2026-10-02 correction below). Same-frame
-damage now collects in one batch before selecting the strongest launch, as
-described below. Missing common-data values leave launch stacking, ground launch
-friction, tumble/bounce details, dash transitions and shield pushback unresolved.
-Native roll-presentation and simultaneous-contact evidence remain outstanding.
-Common-parameter work requires an extracted common table or another verified
-numerical source. The public extracted-data index supplies character tables,
-but no common table. Earlier checkpoint sections record historical tuning.
+Grounded fighters ride their floor before their own motion, hitlag included,
+and grounded traps and bears ride the same way. Landing remaps the previous
+endpoint by the floor's displacement, so an already carried fighter is not
+shifted twice. Down presses keep the pass-through gate, and floor tech recovery
+rides the platform. Moving raised platforms have no ledge; main-deck ledges keep their usual
+catch rules. Path dimensions and schedules are authored
+here; they are inspired by Ultimate's layouts, without claiming Ultimate's
+exact timing.
+
+The live simulation is smashcraft:ts/src/game/sim/; native precision commands
+are in smashcraft:docs/native-physics-precision.md.
+
+## Launch, hitstun and stacking
+
+A launch's speed is its knockback × 0.03 Melee units a frame, and airborne it
+decays by 0.051 a frame (SmashWiki "Knockback"). Hitstun is knockback × 0.4
+frames (SmashWiki "Hitstun"; smashcraft:docs/melee-hitstun-boundaries.md), and a
+hit that would give 32 frames of hitstun or more, 80 knockback, tumbles
+(SmashWiki "Tumble"). Hitlag follows SmashWiki "Hitlag"
+(smashcraft:docs/melee-hitlag-scalars.md). The simulation resumes physics,
+input gates and countdowns on the frame hitlag reaches zero; release DI and
+ASDI happen before that frame's physics.
+
+Two launches stack only when the second comes 10 or more frames after the
+first; otherwise the second replaces the first (SmashWiki "Knockback",
+section "Knockback stacking"). From frame ten Smashcraft merges each axis: opposite
+components add and same-direction components keep the greater magnitude. The
+launch age freezes during hitlag. The contact batch first chooses its strongest
+launch, then merges it once with residual motion; hitstun and reaction level
+belong to the winning hit. Replay copying and exact comparison include the age,
+ground tangent velocity and damage level, and reset and stock loss clear them.
+
+A grounded hit below tumble strength that sends the fighter down or sideways
+keeps it on the floor and projects the launch onto it, and DI cannot steer it
+off; an upward or tumble-strength hit leaves the ground. Grounded knockback
+decays by the fighter's ground friction (Captain Falcon, Fox and Falco 0.08,
+Jigglypuff 0.09; smashcraft:references/melee-frame-data/character-attributes.csv)
+and never reverses. A tumble-strength hit steeply into the floor bounces off it;
+the angle and the bounce's speed are Smashcraft's, in
+smashcraft:ts/src/game/sim/knockback.ts, as no public page states Melee's.
+
+DI rotates the actual launch vector by at most 18° (SmashWiki "Directional
+influence"), normalizing against the vector rather than the pre-direction
+speed, so attacks with nonunit direction vectors keep the full rotation.
+
+## Shield contact motion
+
+A shield hit gives the defender pushback of (damage × 0.09 + 0.4) × shield, at
+most 2, and the attacker recoil of damage × 0.07 + 0.02 (SmashWiki "Shield",
+section "Shield pushback"). Shieldstun truncates the hit's damage to an integer first;
+shield damage stays fractional. Defender pushback and grounded attacker recoil
+are separate motion channels from held movement and launch. Both freeze during
+hitlag and resume on its zero frame; defender pushback decays by the fighter's
+ground friction. A later clean hit, shield break or respawn clears them, and
+replay snapshots copy and compare them with the shield-drain transition.
+Attacker recoil in the air keeps its own decaying vector
+(smashcraft:docs/melee-air-cutoff.md), and its direction uses the shared scalar
+approximation (smashcraft:docs/melee-scalar-math.md). The grounded recoil
+friction factor, the airborne recoil decay and the airborne relative-motion
+weight are Smashcraft's, in smashcraft:ts/src/game/sim/shield.ts and
+smashcraft:ts/src/game/sim/motion.ts. A broken shield launches the fighter at
+its shield-break initial velocity: Rifleman's is Fox and Falco's 3.3 Melee
+units a frame (character-attributes.csv), Illidan keeps 24 world units.
+
+Analog pressure and powershields are in smashcraft:docs/melee-analog-shield.md
+and smashcraft:docs/melee-powershield.md.
+
+## Arithmetic order
+
+Positions add self velocity, then launch, then attacker recoil, rounding each
+addition to binary32 in Melee units, on the ground
+(smashcraft:docs/melee-ground-motion.md) and in the air alike. Gravity
+subtraction rounds both operands and the result. Airborne launch converts its
+velocity to binary32 Melee units, rounds the vertical square, fuses the
+horizontal square-plus-sum, and compares the speed with the decay through the
+derived boundary of smashcraft:docs/melee-air-cutoff.md. Above the cutoff it
+takes the direction from the shared scalar approximation and subtracts each
+decay component with one fused rounding, keeping tiny cardinal-axis residues
+rather than forcing those axes to zero. Zero displacement keeps authored
+stationary surface coordinates exactly. These orders are Smashcraft's
+determinism rules.
+
+## Fighter parameters
+
+Smashcraft's fighters are original characters, and Melee verification concerns
+shared equations and state rules (smashcraft:docs/gameplay-design.md,
+"Principles"). Each fighter carries its own weight, gravity, fall and fast-fall
+speeds, drift, friction and caps, ground speeds, jump parameters and
+shield-break speed; shared physics reads those, and replay snapshots copy and
+compare them. Reference fighters exist only as test rigs, assigned their
+values from smashcraft:references/melee-frame-data/character-attributes.csv.
+Illidan keeps his original tuning; the digital dodge and fast-fall controls
+and the absence of stale moves are owner decisions in
+smashcraft:docs/gameplay-design.md. The frame-data corpus at
+smashcraft:references/melee-frame-data/README.md supports move research; it
+supplies no hitbox geometry beyond libmelee's recorded positions, its raw
+`gravity` field is not gravity and `stun` means shieldstun (its README has
+the traps).
 
 ## Simultaneous damage contacts — 2026-10-02
 
@@ -635,27 +186,6 @@ orientation. These numerical checks do not prove native clip playback. This
 change has not been built into or installed as a map; native presentation still
 needs a parent-owned build and observation.
 
-## Observed mechanics
-
-These observations describe behavior; they do not establish numerical parity.
-Paths below use `melee:` for ~/code/resources/melee.
-
-| Mechanic | Reference | Observation and test target |
-| --- | --- | --- |
-| Jump squat / short hop | Melee | Ground jump has startup. Releasing jump during startup selects short hop; test release versus hold with explicit frame sequences. |
-| Character movement | Melee, a Melee routine | Gravity, terminal fall velocity, fast-fall velocity, air drift, ground friction, jump velocity, and jump startup are separate character parameters. Test caps and transitions separately. |
-| Initial dash / dash dance | Melee; Melee; Melee | Initial dash and run are distinct actions. Dash accepts early opposite-direction input; run has a separate turning action that changes momentum. Timing depends on common data and animation commands; no exact duration was extracted. |
-| Air dodge | Melee | Direction chooses a velocity of common magnitude; neutral input produces zero initial dodge velocity. Dodge velocity decays. Ground contact enters special landing. Test diagonal normalization and retained horizontal motion through landing. |
-| Shield | Melee | Shield health and analog shield strength affect shield size; held shield drains health. Our keyboard controls initially provide a full-strength digital shield. |
-| Shield grab | Melee; Melee | The active guard input handler accepts grab while shield is held and begins the catch action. Our simulation lets only grounded grab (style 5) start directly from an active, unstunned shield; it keeps hitlag, hitstun, shieldstun, landing, cooldown and other action locks in force. Starting that grab drops the shield without adding shield-release lag. Grab during shield-release lag is not implemented. |
-| Knockback | Melee; Melee | Knockback magnitude/angle, damage state, and hitlag callbacks are distinct. Common data includes per-frame knockback decay; character data includes weight. Keep hitlag and hitstun separate. |
-| Hitlag pose versus damage reaction | Melee, Fighter_procAnim; Melee | Normal animation stepping and animation callbacks are gated during hitlag. Damage handling selects and evaluates a damage motion before installing hitlag callbacks; the victim need not freeze its pre-hit attack pose. Input processing and SDI remain separate from frozen animation. Every fighter needs authored damage reactions and exact contact-pose holds; this source observation does not establish Warcraft pose-restoration parity. |
-
-Many numerical values are loaded through common/character data rather than
-literal constants in these source files. The inspected checkout does not yet
-provide verified numerical values for our parameter table. Do not substitute
-field offsets for values or label remembered numbers as measured data.
-
 ## Initial implementation choices
 
 Use a fixed logical frame step; frame counters drive jump squat, air dodge,
@@ -665,8 +195,8 @@ step's physics. Record the actual implemented rate with the simulation tests.
 
 The simulation uses 60 logical frames/second and six Warcraft world units per
 Melee distance unit. Movement, gravity, shield energy and ordinary knockback
-use the numerical baseline below. Ground-jump launch speeds now use published
-Fox/Falco DAT attributes, and aerial jumps multiply the full-jump attribute by
+use the numerical baseline below. Ground-jump launch speeds use Fox and Falco's
+attributes (smashcraft:references/melee-frame-data/character-attributes.csv), and aerial jumps multiply the full-jump attribute by
 the published aerial multiplier. The first ground-jump tick preserves launch
 velocity; subsequent ticks apply gravity. The six reference-table apex targets
 remain checked below. Digital direction input, simplified collision shapes and
@@ -677,7 +207,7 @@ from above only; air-dodge landing momentum; shield drain/regeneration/break and
 stun; hitlag freeze then knockback/hitstun; one stock per blast-zone crossing;
 respawn and final-stock result. Tests must call the simulation used by the map.
 
-## Documented numerical baseline (NTSC Melee)
+## Documented numerical baseline (Melee)
 
 Ordinary empty landings now apply four recovery ticks for either fighter.
 The independent implementation starts this only on an airborne-to-ground
@@ -693,7 +223,7 @@ sources below. Light/heavy landing selection by fall speed is not modeled;
 ordinary airborne contacts use this one recovery duration.
 
 Retrieved 2026-09-29 from SmashWiki's character Stats tables. These are reported
-reference values, not measurements of our map or extracted local binary data.
+reference values, not measurements of our map.
 Sources: https://www.ssbwiki.com/Fox_(SSBM) and
 https://www.ssbwiki.com/Falco_(SSBM). Only factual parameters are recorded here;
 no article prose or implementation is reused. Cached pages are build artifacts.
@@ -722,13 +252,8 @@ no article prose or implementation is reused. Cached pages are build artifacts.
 | Double-jump height | 40.204 | 41.778 |
 | Empty landing frames | 4 | 4 |
 
-The added horizontal attributes were checked against a Melee routine offsets
-using complete attribute arrays near the start of the public Fox/Falco DAT
-JSON at https://melee.theshoemaker.de/dat-dumps/Fox.json and
-https://melee.theshoemaker.de/dat-dumps/Falco.json. The cached downloads are
-partial files, not complete valid JSON documents. The current complete intake
-is recorded in the recorded design targets; the
-publisher does not identify its disc revision. Ground takeoff scales prior
+The horizontal attributes agree with SuperCombo Wiki's table in
+smashcraft:references/melee-frame-data/character-attributes.csv. Ground takeoff scales prior
 self velocity, adds held-direction momentum, then caps it. Aerial jump replaces
 horizontal self velocity, including zero for neutral input. Countersteering
 preserves overspeed; matching input above the drift target brakes by air friction
@@ -774,16 +299,13 @@ is not proof that the entire table has been adopted or that feel matches.
 
 ## Top blast-zone eligibility checkpoint
 
-Production top-boundary death now requires position strictly above the boundary
-and either grounded state, an active frozen state, or upward knockback strictly
-greater than 2.4000000953674316 Melee units/frame. Ordinary jump velocity does
-not meet the launch requirement. Production tests cover jump-only ascent, the
-exact launch threshold, a qualifying launch, and contact exactly at the top
-boundary. Numerical facts are in
-the recorded design targets.
-This does not verify the complete death state machine: Melee's special forced
-top-death flag (including its Jigglypuff shield-break case), star/screen selection,
-camera constraints and death/respawn phase clocks remain open. Side and bottom
+Production top-boundary death requires position strictly above the boundary
+and either grounded state, an active frozen state, or upward knockback above
+Smashcraft's launch threshold in smashcraft:ts/src/game/sim/, which no public
+page states for Melee. Ordinary jump velocity does not meet it. Production tests
+cover jump-only ascent, the exact launch threshold, a qualifying launch, and
+contact exactly at the top boundary. Star and screen KO selection, camera
+constraints and death/respawn phase clocks remain open. Side and bottom
 comparisons now also require strict crossing; the six-test blast-zone group
 passes boundary-adjacent cases and the existing stock/ASDI cases. Frozen-state
 release ordering is still unverified.
@@ -800,16 +322,11 @@ target and ground speed cap. The original roster currently shares authored
 defaults of 0.1, 0.02 and 3 Melee units/frame for those three values; these are
 Smashcraft tuning choices and are not imported Falco/Fox character stats.
 
-The test-only Falco rig injects the independently recorded values 0.1, 0.02
-and 3. A frame-by-frame test begins at frame -35 in Walk with ground velocity
--0.19, then records Dash at frame -34 with position advanced by -0.19 while
-ground velocity has changed to -1.9. Frame -33 advances by -1.82. Tests match
-this entry sequence and the next five overspeed-braking positions and velocities
-on both Rifleman hosts; deliberately perturbed starting velocities
-are detected at the first sample. This confirms the shared entry displacement
-ordering and the recorded overspeed-braking branch. The recording does not
-verify under-target acceleration, run transitions, turning, analog-stick
-scaling or the disc revision.
+The test-only Falco rig injects Falco's dash and run accelerations 0.1 and
+0.02 and ground maximum 3 (character-attributes.csv). A frame-by-frame test checks the walk-to-dash entry, where the dash's initial
+velocity 1.9 (character-attributes.csv) replaces the walk velocity, and the next
+five overspeed-braking positions and velocities on both Rifleman hosts;
+deliberately perturbed starting velocities are detected at the first sample.
 
 Holding the stick backward during the initial dash without a fresh smash is a
 moonwalk, as in Melee. The fighter stays in Dash, keeps its dash direction and
@@ -823,7 +340,7 @@ a fresh smash back is still a dash-dance turn. The first two samples of a tilt
 hold velocity while a smash can still arrive. The moonwalk ends at the dash's
 run-enable frame; a stick still held back then turns the fighter as before.
 Released, the dash slides on by the fighter's traction, so lower traction
-slides farther back. Dash entry replaces earlier velocity (the recorded Falco
+slides farther back. Dash entry replaces earlier velocity (the Falco
 entry above); SmashWiki's moonwalk reverses most fighters from a standstill
 without carrying them past their start, and the 2.25 factor is set to that.
 Blademaster at traction 0.06, tilting back for three frames and then holding
@@ -833,42 +350,22 @@ the dash began.
 
 The authored dash window and three-sample stick reversal policy are specified
 in [gameplay design](gameplay-design.md#dash-dancing). Run-turn braking remains
-an explicit authored action rule. The authored phase
-no longer holds dash speed. The retail event facts in
-the recorded design targets now
-contradict using that single cutoff for all transitions: Dash enables Run at
-animation frame 12 for Fox/Falco and 16 for Captain Falcon; the separate common
-early dash-input gate is 20. TurnRun sets its second command variable at frame
-9. RunBrake sets its first variable at frame 0 and clears it at frame 15.
-These are animation timeline facts, not independently observed simulation
-ticks. Production needs distinct Dash, Run, TurnRun and RunBrake action rules,
-actor-owned command timing, input priority, and paired boundary traces.
-Opposite-direction run motion changes facing only after velocity crosses zero;
-that does not prove the TurnRun command gate. No gameplay implementation from
-the unlicensed local reference was copied or translated.
-
-The simulation now records a separate ground action state and actor-owned
-command clock. Dash entry consumes its first animation update before movement.
-Explicit NTSC test rigs use Dash-to-Run command frames 12 (Fox/Falco) and 16
-(Captain Falcon), TurnRun's facing command at frame 9 and animation end at
-frame 20 (Fox/Falco) or 22 (Captain Falcon), plus the RunBrake opposite-input
-command window through frame 14, closing at frame 15. The command events and
-animation lengths come from the retail records above. TurnRun freezes at its
-frame-9 command until velocity along its entry-facing direction is at most
-0.01 Melee units (0.06 simulation world units); a subsequent action update
-flips facing, then the remaining animation frames run before the action returns
-to Run. RunBrake's command check does not make forward input enter Run;
-opposite input can enter TurnRun at RunBrake's current animation frame. Original
-Smashcraft fighters keep authored timing (currently 14/9/20/15); this is not
-asserted as retail parity. NTSC RunBrake ends when its animation clip ends or
-its 30-frame fighter countdown expires, whichever comes first. The recorded
-clip lengths are 18 frames for Fox/Falco and 28 for Captain Falcon. TurnRun
-completion enters Run only while forward input remains held; otherwise it
-returns to Wait.
-Exact event-to-simulation-tick scheduling, Dash opposite-input priority,
-animation rate interactions, and run-entry delay still need paired retail
-traces. Replay capture and equality include all ground-action clocks, the
-RunBrake countdown, and actor rule values.
+an explicit authored action rule, and the authored phase no longer holds dash
+speed. The simulation keeps separate Dash, Run, TurnRun and RunBrake ground
+actions with an actor-owned command clock; Dash entry consumes its first
+animation update before movement. TurnRun holds its facing step until velocity
+along its entry-facing direction is at most 0.01 Melee units (0.06 world
+units); the next action update flips facing, then the remaining animation
+frames run before the action returns to Run. RunBrake's command check does not
+make forward input enter Run; opposite input can enter TurnRun at RunBrake's
+current frame. RunBrake ends when its clip ends or its fighter countdown
+expires, whichever comes first; Fox and Falco's countdown is 30 frames
+(character-attributes.csv, "Maximum RunBrake Frames"). TurnRun completion enters
+Run only while forward input remains held; otherwise it returns to Wait.
+Smashcraft fighters keep authored timing (currently 14/9/20/15). The command
+frames of Melee's dash, run, turn and brake actions are not on a public page,
+so test rigs use the same authored timing. Replay capture and equality include
+all ground-action clocks, the RunBrake countdown and actor rule values.
 
 The walk modifier immediately selects the existing 1.6/1.4 walk speeds and
 clears the dash phase; releasing it starts a fresh initial dash. Jumps, shields,
@@ -893,11 +390,9 @@ started. `PlayerInputState.consumeMovementX()` commits that horizontal press
 once when neither direction remains held, then returns neutral on following
 ticks. Opposing held directions and opposing taps in the same commit remain
 neutral. Both players use this sampler; committed input rows retain the result
-for replay. Existing dash speed and neutral traction are unchanged. The local
-reference's a Melee routine/a Melee routine at the revision above separately
-identify the initial velocity impulse and subsequent ground acceleration and
-friction; those behavioral facts support preserving a short tap, not copying
-its implementation or claiming our full dash model now matches Melee.
+for replay. Existing dash speed and neutral traction are unchanged. A dash starts with an initial velocity and then accelerates or brakes by
+ground acceleration and friction (character-attributes.csv), which supports
+preserving a short tap.
 
 Grounded Shield + normal Attack now chooses the same grab command as O for
 both fighters, including pressing shield and Attack within one frame. The
