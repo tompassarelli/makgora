@@ -2,16 +2,19 @@ import { f32 } from "wisp/src/sim/f32";
 import type { ComboSetup } from "../src/game/match/comboRoute";
 import { frameSteered } from "../src/game/match/padScene";
 import { stateChecksum } from "../src/game/replay/canonical";
-import { AttackStyle, Character, DownState, ShieldBreak } from "../src/game/sim/codes";
-import { canAttack, canBeGrabbed, canShieldGrab } from "../src/game/sim/conditions";
+import { AttackStyle, Character, DownState } from "../src/game/sim/codes";
+import { canAttack, canBeGrabbed } from "../src/game/sim/conditions";
 import type { Fighter } from "../src/game/sim/fighter";
 import { fighterName } from "../src/game/sim/heroes/registry";
 import { attackStartupFrames } from "../src/game/sim/moves";
+import { totalVelocityZ } from "../src/game/sim/motion";
+import { floorBelow } from "../src/game/sim/stage";
 import { copyControls, neutralControls } from "../src/game/sim/roster";
 import { DEFAULT_POLICY, VICTIM_OPTIONS, type VictimOption } from "./agencyBranch";
+import { onShield } from "./comboLinkShield";
 import {
   AERIAL_HEIGHTS, AIR_MODES, DASH_GRAB, DIS, type Defender, type Di, FINE_FRAMES, GATE_X, GATE_Z, GROUND_MODES, type Mode, type Move,
-  OPENERS, type Opener, type Saved, SPACINGS, STAND, Sim, defenderMask, free, openerRoot, owned, settled, setupFor, started, startedOf, toward,
+  OPENERS, type Opener, type Saved, SPACINGS, STAND, Sim, defenderMask, free, openerRoot, owned, settled, setupFor, started, startedOf,
 } from "./comboExplorer";
 
 export const LINK_PERCENTS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150] as const;
@@ -33,6 +36,7 @@ export const CANDIDATES = 4;
 const SETUP_SPACINGS: readonly number[] = [...new Set([...SPACINGS, ...Array.from({ length: 30 }, (_, index) => (index + 1) * 10)])];
 const SETUP_HEIGHTS: readonly (readonly [number, number])[] = [...AERIAL_HEIGHTS, ...[20, 60, 80, 120, 140, 160].map((height) => [height, 0] as const)];
 const NEUTRAL = neutralControls();
+const TECH_LEAD_FRAMES = 10;
 
 export interface LinkRow {
   readonly fighter: string;
@@ -59,7 +63,7 @@ export interface LinkRow {
 export interface LinkOpener {
   readonly attacker: Character;
   readonly opener: number;
-  readonly melee?: string;
+  readonly melee?: readonly string[];
 }
 
 export interface LinkUnit extends LinkOpener {
@@ -87,18 +91,58 @@ const landedRegion = (sim: Sim, opener: Opener): Region => {
   return sim.b.visuals.hitStrong ? regions.strong : regions.weak ?? regions.strong;
 };
 
-function setupsFor(attacker: Character, victim: Character, opener: Opener): Map<Region, ComboSetup> {
-  const found = new Map<Region, ComboSetup>();
-  const heights = opener.airborne === true ? SETUP_HEIGHTS : [[0, 0] as const];
-  for (const height of heights) for (const spacing of SETUP_SPACINGS) {
+const NO_DI: Defender = { name: "none", di: "none" };
+
+interface Standing {
+  readonly advantage: number;
+  readonly gap: number;
+}
+
+function standingAfter(sim: Sim, from: Saved): Standing {
+  const idle = idleTrack(sim, from, NO_DI);
+  if (idle === "ko") return { advantage: LIMIT, gap: 0 };
+  if (idle === undefined) return { advantage: -LIMIT, gap: Infinity };
+  release(idle);
+  return { advantage: idle.free - idle.start, gap: Math.abs((idle.bx[idle.start] ?? 0) - (idle.ax[idle.start] ?? 0)) };
+}
+
+interface Approach {
+  readonly setup: ComboSetup;
+  readonly opener: Opener;
+}
+
+type Measured = Approach & Standing;
+
+function approachesFor(attacker: Character, victim: Character, opener: Opener): Map<Region, readonly Approach[]> {
+  const most = new Map<Region, Measured>();
+  const closest = new Map<Region, Measured>();
+  const airborne = opener.airborne === true;
+  const variants = airborne ? [opener, { ...opener, drift: true }] : [opener];
+  for (const variant of variants) for (const height of airborne ? SETUP_HEIGHTS : [[0, 0] as const]) for (const spacing of SETUP_SPACINGS) {
     const setup: ComboSetup = { ...setupFor(attacker, victim, opener, 0, "centre", spacing, height), defenderWeight: 75 };
-    const played = openerRoot(setup, opener, { name: "none", di: "none" });
+    const played = openerRoot(setup, variant, NO_DI);
     if (played === undefined) continue;
     const region = landedRegion(played.sim, opener);
-    if (!found.has(region)) found.set(region, setup);
+    const measured: Measured = { setup, opener: variant, ...standingAfter(played.sim, played.root.saved) };
     free(played.root.saved);
+    if (measured.advantage > (most.get(region)?.advantage ?? -Infinity)) most.set(region, measured);
+    if (measured.advantage > 0 && measured.gap < (closest.get(region)?.gap ?? Infinity)) closest.set(region, measured);
   }
-  return found;
+  return new Map([...most].map(([region, best]) => {
+    const near = closest.get(region);
+    return [region, near === undefined || near === best ? [best] : [best, near]];
+  }));
+}
+
+const CLASS_RANK: Readonly<Record<LinkClass, number>> = { none: 0, read: 1, "DI-dependent": 2, true: 3 };
+
+function approachRows(attacker: Character, approaches: readonly Approach[], region: Region, percent: number, weight: number): LinkRow[] {
+  const [first, ...rest] = approaches.map((approach) => cellRows(attacker, approach, region, percent, weight)).filter((rows) => rows.length > 0);
+  if (first === undefined) return [];
+  return first.map((row, index) => rest.reduce((best, rows) => {
+    const other = rows[index];
+    return other !== undefined && CLASS_RANK[other.class] > CLASS_RANK[best.class] ? other : best;
+  }, row));
 }
 
 interface Track {
@@ -263,10 +307,17 @@ function candidates(sim: Sim, from: Saved, d: Defender, idle: Idle): Map<string,
   return byFollowUp;
 }
 
+function landsWithin(sim: Sim, b: Readonly<Fighter>, frames: number): boolean {
+  const fall = -totalVelocityZ(b);
+  if (b.motion.grounded || fall <= 0) return false;
+  const floor = floorBelow(sim.setup.stage, sim.scene.runtime.simulationFrame, b.motion.x, b.motion.z);
+  return floor !== undefined && b.motion.z - floor <= fall * frames;
+}
+
 function stepVictim(sim: Sim, n: number, d: Defender, am: number, option: VictimOption | undefined, acted: { k: number; away: number }): void {
   const a = sim.a;
   const b = sim.b;
-  const acting = option !== undefined && !owned(b);
+  const acting = option !== undefined && (!owned(b) || (option.beforeLanding === true && landsWithin(sim, b, TECH_LEAD_FRAMES)));
   if (acting && acted.k === 0) acted.away = Math.sign(b.motion.x - a.motion.x) || 1;
   if (acting) acted.k++;
   const bm = defenderMask(d, n, undefined, b, a);
@@ -355,8 +406,6 @@ function classOf(outcomes: ReadonlyMap<Di, DiOutcome | undefined>, surviving: re
   return reaching.length === surviving.length ? "true" : "DI-dependent";
 }
 
-const SHIELD = VICTIM_OPTIONS.find((option) => option.id === "shield");
-
 const launchAngle = (sim: Sim): number | undefined => {
   const { a, b } = sim;
   if (b.motion.grounded) return undefined;
@@ -375,52 +424,7 @@ function koesAt(setup: ComboSetup, opener: Opener, region: Region): boolean {
   return false;
 }
 
-interface Shielded {
-  readonly shieldAdvantage: number;
-  readonly shieldDamage: number;
-  readonly shieldBreak: boolean;
-}
-
-function onShield(setup: ComboSetup, opener: Opener): Shielded | undefined {
-  if (opener.throw !== undefined || SHIELD === undefined) return undefined;
-  const sim = new Sim(setup);
-  const d: Defender = { name: "none", di: "none" };
-  const dash = opener.dash ?? 0;
-  let contacts = 0;
-  let damage = 0;
-  let drain = 0;
-  let attackerFree: number | undefined;
-  let victimFree: number | undefined;
-  for (let n = 1; n <= LIMIT * 2; n++) {
-    const a = sim.a;
-    const b = sim.b;
-    const am = n <= dash ? toward(a, b) : n === dash + 1 ? opener.move.press(a, b) : 0;
-    const shields = b.visuals.shield;
-    const energy = b.shield.energy;
-    frameSteered(sim.scene, (slot) => (slot === 0 ? am : slot === 1 ? defenderMask(d, n, undefined, b, a) : 0), (controls, slot) => {
-      if (slot !== 1) return;
-      copyControls(controls, NEUTRAL);
-      SHIELD.press(controls, n, 1);
-    });
-    if (sim.b.visuals.shield !== shields) {
-      contacts++;
-      damage = f32(damage + Math.max(0, energy - sim.b.shield.energy - drain));
-      attackerFree = undefined;
-      victimFree = undefined;
-    } else drain = Math.max(0, energy - sim.b.shield.energy);
-    if (sim.b.shield.breakState !== ShieldBreak.none) return { shieldAdvantage: 0, shieldDamage: Math.round(damage * 10) / 10, shieldBreak: true };
-    if (contacts === 0) {
-      if (n > LIMIT) return undefined;
-      continue;
-    }
-    if (attackerFree === undefined && canAttack(sim.a)) attackerFree = n;
-    if (victimFree === undefined && canShieldGrab(sim.b)) victimFree = n;
-    if (attackerFree !== undefined && victimFree !== undefined) return { shieldAdvantage: victimFree - attackerFree, shieldDamage: Math.round(damage * 10) / 10, shieldBreak: false };
-  }
-  return undefined;
-}
-
-function cellRows(attacker: Character, opener: Opener, setup: ComboSetup, region: Region, percent: number, weight: number): LinkRow[] {
+function cellRows(attacker: Character, { setup, opener }: Approach, region: Region, percent: number, weight: number): LinkRow[] {
   let angle: number | undefined;
   const cells = new Map<Di, CellLinks | undefined>();
   for (const di of DIS) {
@@ -438,7 +442,7 @@ function cellRows(attacker: Character, opener: Opener, setup: ComboSetup, region
   const spacing = f32(setup.defenderX - setup.attackerX);
   const ledge = { ...setupFor(attacker, setup.defender, opener, percent, "ledge", spacing, [setup.attackerZ, setup.defenderZ]), defenderWeight: weight };
   const ledgeKo = koesAt(ledge, opener, region);
-  const shield = onShield({ ...setup, defenderWeight: weight }, opener);
+  const shield = onShield({ ...setup, defenderWeight: weight }, opener, LIMIT);
   const surviving = DIS.filter((di) => cells.get(di)?.ko !== true);
   return FOLLOW_UPS.map((followUp) => {
     const outcomes = new Map<Di, DiOutcome | undefined>(DIS.map((di) => [di, cells.get(di)?.byFollowUp.get(followUp)]));
@@ -465,12 +469,11 @@ function openerAt(index: number): Opener {
 }
 
 export function measureLinks(unit: LinkUnit): LinkRow[] {
-  const opener = openerAt(unit.opener);
-  const setups = setupsFor(unit.attacker, LINK_VICTIM, opener);
+  const approaches = approachesFor(unit.attacker, LINK_VICTIM, openerAt(unit.opener));
   return REGIONS.flatMap((region) => {
-    const setup = setups.get(region);
-    if (setup === undefined) return [];
-    return (unit.percents ?? LINK_PERCENTS).flatMap((percent) => LINK_WEIGHTS.flatMap((weight) => cellRows(unit.attacker, opener, setup, region, percent, weight)));
+    const own = approaches.get(region);
+    if (own === undefined) return [];
+    return (unit.percents ?? LINK_PERCENTS).flatMap((percent) => LINK_WEIGHTS.flatMap((weight) => approachRows(unit.attacker, own, region, percent, weight)));
   });
 }
 
@@ -482,7 +485,6 @@ export interface LinkCell extends LinkOpener {
 }
 
 export function measureLinkCell(cell: LinkCell): LinkRow[] {
-  const opener = openerAt(cell.opener);
-  const setup = setupsFor(cell.attacker, cell.victim, opener).get(cell.region);
-  return setup === undefined ? [] : cellRows(cell.attacker, opener, setup, cell.region, cell.percent, cell.weight);
+  const own = approachesFor(cell.attacker, cell.victim, openerAt(cell.opener)).get(cell.region);
+  return own === undefined ? [] : approachRows(cell.attacker, own, cell.region, cell.percent, cell.weight);
 }

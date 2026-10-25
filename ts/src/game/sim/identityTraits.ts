@@ -61,7 +61,7 @@ export function traitMove(action: SpecialAction): TraitMove | undefined {
 }
 
 export function moveTraits(character: Character, move: TraitMove | undefined): TraitSet {
-  return move === undefined ? NO_TRAITS : IDENTITY_TRAITS[character][move] ?? NO_TRAITS;
+  return move === undefined ? NO_TRAITS : IDENTITY_TRAITS[character]?.[move] ?? NO_TRAITS;
 }
 
 /** The traits of the move the fighter is performing now. */

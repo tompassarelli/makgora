@@ -132,6 +132,7 @@ interface Opener {
   readonly dash?: number;
   readonly airborne?: boolean;
   readonly facingAway?: boolean;
+  readonly drift?: boolean;
 }
 
 export const OPENERS: readonly Opener[] = [
@@ -711,6 +712,7 @@ function openerRoot(setup: ComboSetup, opener: Opener, d: Defender): { readonly 
     if (opener.throw !== undefined && a.grab.action === GrabAction.hold) am = n % 2 === 0 ? throwMask(a, opener.throw) : 0;
     else if (n <= dash) am = toward(a, b);
     else if (n === dash + 1) am = opener.move.press(a, b);
+    else if (opener.drift === true) am = toward(a, b);
     const bm = defenderMask(d, n, undefined, b, a);
     attacker.push(am);
     defender.push(bm);

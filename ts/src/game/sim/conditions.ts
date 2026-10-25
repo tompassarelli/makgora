@@ -2,6 +2,7 @@
 
 import { AttackPhase, AttackStyle, DASH_GRAB_REQUEST, DownState, GrabAction, LedgeState, ShieldBreak, SurfaceContact } from "./codes";
 import type { Fighter } from "./fighter";
+import { meleeHandling } from "./meleeHandling";
 import { attackStartupFrames, characterAttackActiveFrames, jabChainFrom, nextJab } from "./moves";
 
 export const GROUND_ROLL_FRAMES = 31;
@@ -56,7 +57,7 @@ export function inGrabContext(f: Readonly<Fighter>): boolean {
 
 
 export function canBeGrabbed(f: Readonly<Fighter>): boolean {
-  return f.status.frozenFrames <= 0 && !(f.launch.throwHitstun && f.launch.hitstun > 0);
+  return f.status.frozenFrames <= 0 && (meleeHandling.throwsAllowRegrab || !(f.launch.throwHitstun && f.launch.hitstun > 0));
 }
 
 

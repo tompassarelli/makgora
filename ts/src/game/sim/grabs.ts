@@ -84,6 +84,7 @@ export function authoredThrowEffect(action: GrabAction, moves?: FighterMoves): R
   throwHit.manaDrain = undefined;
   throwHit.manaSteal = undefined;
   throwHit.setKnockback = undefined;
+  throwHit.fixedPower = undefined;
   throwHit.stunFrames = undefined;
   const authored = moves?.throws[action];
   if (authored !== undefined) copyHitEffect(throwHit, authored.effect);

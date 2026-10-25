@@ -51,7 +51,8 @@
 
 - Validation: `bun wisp combos --validate [--jobs N]` runs the cited Fox cases
   in smashcraft:ts/scripts/comboValidation.ts on the Fox fixture fighter
-  against itself at Fox's weight, each through the link table's measure, and
-  fails when one comes out of its Melee class (true, DI-dependent, or no
-  combo meaning read or none) (smashcraft:docs/design/melee-parity-plan.md,
+  against itself at Fox's weight, each through the link table's measure with
+  every ledger row that has a switch on Melee's handling, and fails when one
+  comes out of its Melee class (true, DI-dependent, or no combo meaning read
+  or none) (smashcraft:docs/design/melee-parity-plan.md,
   "Combo analyzer", #297).

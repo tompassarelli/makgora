@@ -82,10 +82,13 @@ export interface KnockbackTerms {
   readonly growth: number;
   readonly base: number;
   readonly setKnockback?: number | undefined;
+  readonly fixedPower?: number | undefined;
 }
 
 export function effectKnockback(effect: KnockbackTerms, postHitPercent: number, hitDamage: number, victimWeight: number): number {
-  return effect.setKnockback ?? contactKnockback(postHitPercent, hitDamage, victimWeight, effect.growth, effect.base, 1.0);
+  if (effect.setKnockback !== undefined) return effect.setKnockback;
+  return effect.fixedPower === undefined ? contactKnockback(postHitPercent, hitDamage, victimWeight, effect.growth, effect.base, 1.0)
+    : fixedHitKnockback(effect.fixedPower, victimWeight, effect.growth, effect.base, 1.0);
 }
 
 export function fixedHitKnockback(fixedPower: number, victimWeight: number, growthPercent: number, baseKnockback: number, contextScale: number): number {

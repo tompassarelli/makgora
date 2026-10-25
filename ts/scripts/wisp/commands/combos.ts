@@ -25,7 +25,7 @@ import type { LinkCell, LinkRow, LinkUnit } from "../../comboLinks";
 import { ATTRIBUTION_PERCENTS, linkGains } from "../../comboLinkGains";
 import { linksPage } from "../../comboLinksPage";
 import { LINKS_DIR, linkSlug } from "../../linkTable";
-import { meleeSwitchRefusal } from "../../ledger/meleeSwitches";
+import { meleeSwitchRefusal, switchableRows } from "../../ledger/meleeSwitches";
 import { FOX_CASES, FOX_FIXTURE, caseLine, judge } from "../../comboValidation";
 import { foxFixture } from "../../ledger/fixtures/fox";
 import { FIXTURE_FIGHTERS } from "../../ledger/fixtures/fighters";
@@ -347,11 +347,12 @@ const validate = (jobs: number) => Effect.gen(function* () {
   if (fox === undefined) return yield* new CombosFailure({ problem: `the sim has no ${FOX_FIXTURE} fighter to validate against (#296)` });
   const weight = foxFixture().attributes.weight.value[0];
   if (weight === undefined) return yield* new CombosFailure({ problem: "the Fox fixture has no weight" });
+  const melee = switchableRows();
   const cells = yield* Effect.forEach(FOX_CASES, (kase) => {
     const opener = OPENERS.findIndex((own) => own.name === kase.opener);
     return opener < 0
       ? Effect.fail(new CombosFailure({ problem: `no opener named ${kase.opener}` }))
-      : Effect.succeed<LinkCell>({ attacker: fox, victim: fox, opener, region: kase.region, percent: kase.percent, weight });
+      : Effect.succeed<LinkCell>({ attacker: fox, victim: fox, opener, region: kase.region, percent: kase.percent, weight, melee });
   });
   const found = yield* inWorkers<LinkCell, readonly LinkRow[]>(new URL("../../comboLinkCellWorker.ts", import.meta.url), cells, jobs,
     (cell) => `${OPENERS[cell.opener]?.name} at ${cell.percent}%`,
@@ -359,7 +360,7 @@ const validate = (jobs: number) => Effect.gen(function* () {
   ).pipe(step(`${cells.length} Fox cases on ${jobs} threads`));
   const results = FOX_CASES.map((kase, index) => judge(kase, found[index] ?? []));
   const misses = results.filter((result) => !result.passed).length;
-  yield* Console.log([...results.map(caseLine), `${results.length - misses} of ${results.length} Fox cases come out in their Melee class`].join("\n"));
+  yield* Console.log([...results.map(caseLine), `${results.length - misses} of ${results.length} Fox cases come out in their Melee class with ${melee.join(", ")} on Melee's handling`].join("\n"));
   if (misses > 0) return yield* new CombosFailure({ problem: `${misses} Fox cases missed their Melee class` });
 });
 
@@ -368,7 +369,7 @@ const signed = (value: number): string => (value > 0 ? `+${value}` : `${value}`)
 const meleeLinks = (attackers: readonly Character[], meleeRows: readonly string[], jobs: number) => Effect.forEach(attackers, (attacker) => Effect.gen(function* () {
   const before = yield* linkRows(attacker, { percents: ATTRIBUTION_PERCENTS }, jobs, "");
   yield* Effect.forEach(meleeRows, (row) => Effect.gen(function* () {
-    const after = yield* linkRows(attacker, { percents: ATTRIBUTION_PERCENTS, melee: row }, jobs, ` on Melee's ${row}`);
+    const after = yield* linkRows(attacker, { percents: ATTRIBUTION_PERCENTS, melee: [row] }, jobs, ` on Melee's ${row}`);
     const file = join(meleeLinksDir, row, `${linkSlug(attacker)}.jsonl`);
     yield* Effect.tryPromise({ try: () => Bun.write(file, after.map((own) => JSON.stringify(own)).join("\n") + "\n"), catch: failure });
     yield* Console.log([

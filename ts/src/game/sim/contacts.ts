@@ -49,6 +49,7 @@ import { dealtManaGain, gainMana, takenManaGain } from "./mana";
 import { candleDrops, candleHeatGain, dropCandle, feedCandle } from "./heroes/koboldCandle";
 import { EX_ARMOR_DAMAGE, exArmorActive } from "./exSpecials";
 import { contactTraits } from "./identityTraits";
+import { MELEE_THROW_WEIGHT, meleeHandling } from "./meleeHandling";
 import { FORSAKEN_PALADIN_DAMAGE_MULTIPLIER, forsakenPaladinSwordContact } from "./heroes/forsakenPaladinSword";
 
 
@@ -59,6 +60,7 @@ interface DamageContact {
   facing: number;
   kind: ContactKind;
   direct: boolean;
+  strong: boolean;
   strongHitlag: number;
   hitlagDamage: number;
   blocked: boolean;
@@ -84,7 +86,7 @@ interface DamageContact {
 
 function emptyContact(): DamageContact {
   return {
-    source: 0, target: 0, effect: emptyHitEffect(), facing: 0, kind: ContactKind.launch, direct: false, strongHitlag: 0, hitlagDamage: 0.0, blocked: false,
+    source: 0, target: 0, effect: emptyHitEffect(), facing: 0, kind: ContactKind.launch, direct: false, strong: false, strongHitlag: 0, hitlagDamage: 0.0, blocked: false,
     crouching: false, grounded: false, sourceGrounded: false, sourceAerial: false, sourceDeltaX: 0.0, sourceDeltaZ: 0.0, sourceVelocityX: 0.0, sourceVelocityZ: 0.0, targetDeltaX: 0.0,
     targetDeltaZ: 0.0, down: false, smashCharging: false, throwInput: undefined, status: undefined,
     height: 1,
@@ -159,7 +161,8 @@ export function collectDamageContact(
   contact.facing = facing;
   contact.kind = kind;
   contact.direct = direct;
-  contact.strongHitlag = kind === ContactKind.launch && (effect.strong === true || forsakenPaladinSwordContact(source, effect.damage, direct)) ? STRONG_HIT_EXTRA_HITLAG : 0;
+  contact.strong = kind === ContactKind.launch && (effect.strong === true || forsakenPaladinSwordContact(source, effect.damage, direct));
+  contact.strongHitlag = contact.strong && !meleeHandling.strongHitsAddNoHitlag ? STRONG_HIT_EXTRA_HITLAG : 0;
   contact.blocked = !unblockable && shieldContact;
   contact.crouching = target.motion.crouching;
   contact.grounded = target.motion.grounded;
@@ -309,7 +312,8 @@ function resolveDamageContacts(world: Roster, slot: number): void {
     if (contact.kind === ContactKind.flinch) flinch ??= index;
     if (contact.kind === ContactKind.launch || contact.kind === ContactKind.throw) {
       const stuns = contact.kind === ContactKind.launch && contact.effect.stunFrames !== undefined && launch.stunAge >= STUN_REPEAT_FRAMES;
-      const magnitude = stuns ? STUN_KNOCKBACK : effectKnockback(contact.effect, postHitPercent, damage, knockbackWeight(target));
+      const weight = contact.kind === ContactKind.throw && meleeHandling.throwsAtNeutralWeight ? MELEE_THROW_WEIGHT : knockbackWeight(target);
+      const magnitude = stuns ? STUN_KNOCKBACK : effectKnockback(contact.effect, postHitPercent, damage, weight);
       const knockback = contact.kind === ContactKind.throw ? magnitude : hitContextKnockback(magnitude, contact.crouching, contact.smashCharging);
 
       if (knockback > strongest) {
@@ -324,7 +328,7 @@ function resolveDamageContacts(world: Roster, slot: number): void {
     target.visuals.hit++;
     target.visuals.hitElectric = effectContact.effect.electric;
     target.visuals.hitElement = effectContact.effect.element ?? (effectContact.effect.electric ? HitElement.electric : HitElement.normal);
-    target.visuals.hitStrong = effectContact.strongHitlag > 0;
+    target.visuals.hitStrong = effectContact.strong;
     target.visuals.hitStrength = target.visuals.hitStrong || strongest >= 180.0 ? 2 : strongest >= 80.0 ? 1 : 0;
     target.visuals.hitHeight = effectContact.height;
     target.visuals.hitPummel = effectContact.kind === ContactKind.pummel;

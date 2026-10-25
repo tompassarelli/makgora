@@ -223,7 +223,7 @@ export function attackCapsule(target: Capsule, style: number | undefined, reach:
 
 
 
-const REFERENCE_HURT_CAPSULE: Readonly<Capsule> = { x1: 0.0, z1: 4.0, x2: 0.0, z2: 88.0, radius: 24.0 };
+export const REFERENCE_HURT_CAPSULE: Readonly<Capsule> = { x1: 0.0, z1: 4.0, x2: 0.0, z2: 88.0, radius: 24.0 };
 const ORIGINAL_HURT_CAPSULES: Readonly<Record<number, Readonly<Capsule>>> = {
   1:
   { x1: 0.0, z1: 4.0, x2: 0.0, z2: 61.0, radius: 26.0 },

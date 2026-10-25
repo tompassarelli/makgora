@@ -6,6 +6,7 @@ import { captureFrame, executeMatchFrame } from "../src/game/match/frameInput";
 import { produceComputerInput } from "../src/game/match/botPlay";
 import { isCpuTier } from "../src/game/match/cpuProfiles";
 import { observeDamageContacts } from "../src/game/sim/contacts";
+import { TECH_REPEAT_MINIMUM_AGE_FRAMES } from "../src/game/sim/geometry/techInput";
 import { selectableCharacterBySlug } from "../src/game/sim/heroes/registry";
 import { type Controls, copyControls, fighterAt, neutralControls } from "../src/game/sim/roster";
 import { type AgencyLink, type AgencyString, type OptionWeights, type BranchOutcome, conversion, linkEscape } from "./agencyCore";
@@ -20,6 +21,7 @@ type Slot = 0 | 1;
 export interface VictimOption {
   readonly id: string;
   readonly press: (input: Controls, k: number, away: number) => void;
+  readonly beforeLanding?: true;
 }
 
 const DIRECTIONS: readonly (readonly [string, number, number])[] = [
@@ -41,8 +43,8 @@ export const VICTIM_OPTIONS: readonly VictimOption[] = [
   })),
   { id: "shield", press: (input, k) => { input.shield = true; input.shieldTriggerActive = true; input.shieldPressed = pulse(k); input.shieldStrength = 1.0; } },
   ...sides.map(([name, side]): VictimOption => ({
-    id: `tech-${name}`,
-    press: (input, k, away) => { input.techPressed = pulse(k, 3); input.direction = side * away; },
+    id: `tech-${name}`, beforeLanding: true,
+    press: (input, k, away) => { input.techPressed = pulse(k, TECH_REPEAT_MINIMUM_AGE_FRAMES + 1); input.direction = side * away; },
   })),
   { id: "getup-stand", press: (input, k) => { input.getupStandPressed = pulse(k); } },
   { id: "getup-attack", press: (input, k) => { input.getupAttackPressed = pulse(k); } },
