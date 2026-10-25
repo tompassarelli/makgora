@@ -354,7 +354,7 @@ export function beginAttack(attacker: Fighter, style: AttackStyle, mayCharge: bo
   attack.smashChargeFrames = 0;
   attack.smashChargeAllowed = isSmashAttack(resolvedStyle) && mayCharge;
   attack.cooldown = attack.duration;
-  if (attacker.tuning.moves?.normals[resolvedStyle]?.startupTravelX !== undefined) attacker.motion.vx = 0.0;
+  if (attacker.tuning.moves?.normals[resolvedStyle]?.travelX !== undefined) attacker.motion.vx = 0.0;
 }
 
 

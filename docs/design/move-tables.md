@@ -150,8 +150,9 @@ already stores them.
 | startup, active, total | today's `startupFrames`, `activeFrames`, `totalFrames` (specials: `endFrame` in total) |
 | landingLag | frames; `-1` uses the shared aerial value |
 | chainsFrom | jab chain frame, `-1` none |
-| flags | bit field: helpless, oncePerAirtime, facesStick, recallsProjectiles, startupStopsAtBody, landingHit |
-| startupTravelX | units over startup |
+| flags | bit field: helpless, oncePerAirtime, facesStick, recallsProjectiles, travelStopsAtBody, landingHit |
+| travelX | units, spread evenly over frames 1 to travelFrames |
+| travelFrames | last frame of the travel; defaults to startup |
 | hitFirst, hitCount | slice of `hits` |
 | motionFirst, motionCount | slice of `motion` |
 | shotFirst, shotCount | slice of `shots` |

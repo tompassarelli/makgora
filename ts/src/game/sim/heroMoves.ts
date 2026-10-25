@@ -39,8 +39,9 @@ export interface AuthoredMove {
   readonly landingLag: number;
   readonly regions: readonly MoveRegion[];
 
-  readonly startupTravelX?: number | undefined;
-  readonly startupStopsAtBody?: boolean | undefined;
+  readonly travelX?: number | undefined;
+  readonly travelStopsAtBody?: boolean | undefined;
+  readonly travelFrames?: number | undefined;
 
 
 
@@ -91,8 +92,18 @@ export interface FighterMoves {
 }
 
 
-export function heroMove(firstActive: number, active: number, recovery: number, landingLag: number, regions: readonly MoveRegion[], startupTravelX?: number, startupStopsAtBody?: boolean): AuthoredMove {
-  return { startupFrames: firstActive - 1, activeFrames: active, totalFrames: firstActive - 1 + active + recovery, landingLag, regions, startupTravelX, startupStopsAtBody };
+export function heroMove(firstActive: number, active: number, recovery: number, landingLag: number, regions: readonly MoveRegion[], travelX?: number, travelStopsAtBody?: boolean): AuthoredMove {
+  return { startupFrames: firstActive - 1, activeFrames: active, totalFrames: firstActive - 1 + active + recovery, landingLag, regions, travelX, travelStopsAtBody };
+}
+
+
+export function moveTravelFrames(move: Readonly<AuthoredMove>): number {
+  return move.travelFrames ?? move.startupFrames;
+}
+
+
+export function travelThrough(move: AuthoredMove, lastFrame: number): AuthoredMove {
+  return { ...move, travelFrames: lastFrame };
 }
 
 

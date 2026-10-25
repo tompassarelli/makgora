@@ -134,8 +134,9 @@ export function fighterMovesCanonical(moves: FighterMoves | undefined, prefix = 
     int(`${name}.active`, move.activeFrames);
     int(`${name}.total`, move.totalFrames);
     int(`${name}.landingLag`, move.landingLag);
-    real(`${name}.travel`, move.startupTravelX ?? 0.0);
-    int(`${name}.stopsAtBody`, move.startupStopsAtBody ? 1 : 0);
+    real(`${name}.travel`, move.travelX ?? 0.0);
+    int(`${name}.stopsAtBody`, move.travelStopsAtBody ? 1 : 0);
+    if (move.travelFrames !== undefined) int(`${name}.travelFrames`, move.travelFrames);
     if (move.chainsFrom !== undefined) int(`${name}.chainsFrom`, move.chainsFrom);
 
     const phases = move.fall ?? [];

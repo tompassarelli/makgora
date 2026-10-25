@@ -17,7 +17,7 @@ import { firstMeterDropsDifference } from "../match/meterDrops";
 import { AttackStyle, LAST_ATTACK_STYLE } from "../sim/codes";
 import { SELECTABLE_CHARACTERS } from "../sim/heroes/registry";
 import { authoredTuning } from "../sim/tuning";
-import type { FighterMoves, StrikeCapsule } from "../sim/heroMoves";
+import { type FighterMoves, type StrikeCapsule, moveTravelFrames } from "../sim/heroMoves";
 import { attackCapsule, emptyCapsule, hurtCapsule } from "../sim/geometry/contactGeometry";
 import { type HitRegion, authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../sim/hitRegions";
 import { type HurtPart, type HurtPose, shippedHurtboxes } from "../sim/hurtboxes";
@@ -44,8 +44,8 @@ function buildAuthoredTravel(): { [character: number]: AuthoredTravel | undefine
     for (let style = 0; style <= LAST_ATTACK_STYLE; style++) {
       const move = moves.normals[style];
       const positions = [0.0];
-      if (move?.startupTravelX !== undefined && move.startupFrames > 0) {
-        const step = f32(move.startupTravelX / move.startupFrames);
+      if (move?.travelX !== undefined && move.startupFrames > 0) {
+        const step = f32(move.travelX / move.startupFrames);
         let x = 0.0;
         for (let frame = 1; frame <= move.startupFrames; frame++) {
           x = f32(x + step);
@@ -67,7 +67,7 @@ function authoredStartupStep(fighter: Readonly<Fighter>): number {
   const travel = authoredTravel[fighter.character];
   if (travel === undefined || travel.moves !== fighter.tuning.moves) return 0.0;
   const move = travel.moves.normals[style];
-  if (move?.startupTravelX === undefined || fighter.attack.frame >= move.startupFrames) return 0.0;
+  if (move?.travelX === undefined || fighter.attack.frame >= moveTravelFrames(move)) return 0.0;
   const positions = at(travel.startup, style);
   const frame = fighter.attack.frame;
   return f32(f32(at(positions, frame + 1) - at(positions, frame)) * fighter.facing);

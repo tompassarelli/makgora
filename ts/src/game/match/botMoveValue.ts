@@ -92,7 +92,7 @@ function estimate(own: Readonly<Fighter>, option: number): MoveEstimate | undefi
     damage = hit.effect.damage;
     effect = { ...hit.effect };
   }
-  return { damage, effect, startup, recovery: Math.max(0, attackDurationFramesForGrounding(style, own.motion.grounded, own.tuning.moves) - startup), travel: move?.startupTravelX ?? 0.0 };
+  return { damage, effect, startup, recovery: Math.max(0, attackDurationFramesForGrounding(style, own.motion.grounded, own.tuning.moves) - startup), travel: move?.travelX ?? 0.0 };
 }
 
 

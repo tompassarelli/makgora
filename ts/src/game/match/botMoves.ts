@@ -122,7 +122,7 @@ export function moveReachAhead(character: Character, style: AttackStyle, target:
 
 
 export function aheadX(f: Readonly<Fighter>, target: Readonly<Fighter>, frames: number, style?: AttackStyle, observationAge = 0, stage = -1, matchFrame = 0): number {
-  const startupTravel = style === undefined ? undefined : f.tuning.moves?.normals[style]?.startupTravelX;
+  const startupTravel = style === undefined ? undefined : f.tuning.moves?.normals[style]?.travelX;
   const observedNow = horizontalAhead(target, observationAge, stage, matchFrame);
   const toward = observedNow < f.motion.x ? -1 : 1;
 

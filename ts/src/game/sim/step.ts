@@ -65,6 +65,7 @@ import { observeActionDecision, observeActionStart } from "./observations";
 import * as platforms from "./platformMoves";
 import { type Controls, type Roster, fighterAt } from "./roster";
 import { travelBeforeBodies } from "./travelStop";
+import { moveTravelFrames } from "./heroMoves";
 import {
   SHIELD_MIN_HOLD_FRAMES,
   SHIELD_PERFECT_ACTIVE_FRAMES,
@@ -115,8 +116,8 @@ function attackStartupTravel(world: Roster, slot: number): number {
   const move = f.attack.style === undefined ? undefined : f.tuning.moves?.normals[f.attack.style];
   const lunge = felLungeStep(f.character, f.attack.style, f.attack.frame, f.attack.smashCharging, f.attack.smashChargeFrames);
   if (lunge > 0.0 && f.motion.grounded) return f32(travelBeforeBodies(world, slot, lunge, true) * f.facing);
-  if (move?.startupTravelX === undefined || !f.motion.grounded || f.attack.frame <= 0 || f.attack.frame > move.startupFrames) return 0.0;
-  const distance = travelBeforeBodies(world, slot, f32(move.startupTravelX / move.startupFrames), move.startupStopsAtBody === true);
+  if (move?.travelX === undefined || !f.motion.grounded || f.attack.frame <= 0 || f.attack.frame > move.startupFrames) return 0.0;
+  const distance = travelBeforeBodies(world, slot, f32(move.travelX / move.startupFrames), move.travelStopsAtBody === true);
   return f32(distance * f.facing);
 }
 

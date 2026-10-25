@@ -48,7 +48,7 @@ export function moveShape(character: Character, style: AttackStyle): Shape {
   const poses = hurt.attacks[style] ?? [];
   const partsAt = (frame: number): readonly HurtPart[] => poses.find((p) => frame >= p.firstFrame && frame <= p.lastFrame)?.parts ?? hurt.stand;
   const total = attackDurationFramesForGrounding(style, true, moves);
-  const travel = moves?.normals[style]?.startupTravelX ?? 0;
+  const travel = moves?.normals[style]?.travelX ?? 0;
   const hits: { frame: number; minX: number; maxX: number; maxZ: number; damage: number; overFront: number; overTop: number }[] = [];
   for (let frame = 0; frame < total; frame++) {
     for (let index = 0; index < authoredHitRegionCount(style, moves); index++) {
