@@ -33,7 +33,7 @@ import { clientArguments } from "./client";
 import { freshMatch, readyAfter, sendDevCommand } from "./fresh";
 import { profileOptions } from "./map";
 import { checkClients, onHealthyClients, readClientsFile, smashcraftWatch } from "../doctor";
-import { droppedPair, pairDropText, pairRestartFile, restartDroppedPair } from "./lanPoolUnit";
+import { droppedPair, pairDropText, restartDroppedPairInto } from "./lanPoolUnit";
 import { withNativeUnit } from "./nativeUnit";
 import { liveProcesses, ownPids, pairHolders } from "./pairGuard";
 import { assertPairClaim } from "./pairClaim";
@@ -292,12 +292,7 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
   }
   if (solo && requested.length !== 1) return yield* new UsageFailure({ problem: "--solo requires one --pair K; each client plays its own single-player game" });
   const id = requested.length === 1 ? Number(requested[0]) : undefined;
-  const restarted = id === undefined || dryRun ? undefined : yield* restartDroppedPair(id).pipe(Effect.mapError(cause => new AcceptFailure({ operation: `restart pair ${id}`, problem: describeCause(cause) })));
-  const [out] = flagValues(args, "out");
-  if (restarted !== undefined && out !== undefined) {
-    mkdirSync(out, { recursive: true });
-    writeFileSync(pairRestartFile(out), `${pairDropText(restarted)}; restarted the pair\n`);
-  }
+  if (id !== undefined && !dryRun) yield* restartDroppedPairInto(id, flagValues(args, "out")[0]).pipe(Effect.mapError(cause => new AcceptFailure({ operation: `restart pair ${id}`, problem: describeCause(cause) })));
   const pair = id === undefined ? undefined : yield* Effect.try({
     try: () => {
       const selected = lanPairs(LAN_POOL_FILE, { ids: [id] })[0];

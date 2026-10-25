@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, statSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { delimiter, join } from "node:path";
 import { BunServices } from "@effect/platform-bun";
 import { Console, Effect } from "effect";
@@ -183,3 +183,9 @@ export const restartDroppedPair = (pair: number) => Effect.gen(function*() {
   yield* poolStart(["--pair", String(pair), ...(found.profile === undefined ? [] : ["--pool-profile", found.profile])]);
   return found.drop;
 }).pipe(Effect.provide(BunServices.layer));
+
+export const restartDroppedPairInto = (pair: number, directory: string | undefined) => restartDroppedPair(pair).pipe(Effect.tap(drop => Effect.sync(() => {
+  if (drop === undefined || directory === undefined) return;
+  mkdirSync(directory, { recursive: true });
+  writeFileSync(pairRestartFile(directory), `${pairDropText(drop)}; restarted the pair\n`);
+})));
