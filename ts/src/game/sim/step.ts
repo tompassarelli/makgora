@@ -569,7 +569,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   const canSteer = !authoredMotion && down.state === DownState.none && launch.hitstun <= 0 && (!dodge.airDodging || !dodgeActive) && !isGroundDodging(f)
     && shield.releaseLag <= 0 && f.landing.lag <= 0 && shield.stun <= 0 && jump.squat <= 0 && !smashChargePaused
     && (!motion.grounded || attack.cooldown <= 0) && f.surfaceRecovery.state !== SurfaceContact.techWall;
-  motion.crouching = (input.down && wantsCrouch(f, input, horizontalStick) || (motion.crouching && f.platform.dropConsumed && f.platform.downHeld && input.direction === 0)) && motion.grounded && canSteer && !wantsShield
+  motion.crouching = ((input.down || motion.crouching) && wantsCrouch(f, input, horizontalStick) || (motion.crouching && f.platform.dropConsumed && f.platform.downHeld && input.direction === 0)) && motion.grounded && canSteer && !wantsShield
     && attack.style === undefined && f.special.action === SpecialAction.none
     && groundOptionOpen(f, GroundOption.crouch);
   if (motion.crouching) direction = 0;

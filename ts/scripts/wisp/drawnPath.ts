@@ -49,7 +49,7 @@ const { shell } = await import(join(platform, "../host/loop/state.ts"));
 const { views } = await import(join(platform, "../host/loop/ui.ts"));
 const { presentedMatch } = await import(join(platform, "../host/loop/presentedMatch.ts"));
 console.log("frame\tslot\tclip\tseconds\tplacedX\tplacedZ\tdrawnX\tdrawnZ\thitlag\tflag");
-const previous = new Map<number, { x: number; z: number; dx: number; dz: number; pdx: number; pdz: number; quiet: boolean; clip: number | undefined; seconds: number; hitlag: number }>();
+const previous = new Map<number, { x: number; z: number; dx: number; dz: number; pdx: number; pdz: number; quiet: boolean; clip: number | undefined; seconds: number; hitlag: number; leftClip: number | undefined; leftAt: number }>();
 let flagged = 0;
 for (let step = 0; step < Number(framesText); step++) {
   session.step({ buttons: [], axisX: 0, axisY: 0 });
@@ -69,7 +69,7 @@ for (let step = 0; step < Number(framesText); step++) {
       const hitlag = fighter.launch.hitlag;
       const last = previous.get(slot);
       const flags: string[] = [];
-      let dx = 0, dz = 0, quiet = false;
+      let dx = 0, dz = 0, quiet = false, leftClip = last?.leftClip, leftAt = last?.leftAt ?? -1;
       if (last !== undefined) {
         dx = x - last.x;
         dz = z - last.z;
@@ -78,10 +78,15 @@ for (let step = 0; step < Number(framesText); step++) {
         if (zigzag(dx, last.dx, last.pdx)) flags.push(`x-zigzag ${last.pdx.toFixed(1)} ${last.dx.toFixed(1)} ${dx.toFixed(1)}`);
         if (zigzag(dz, last.dz, last.pdz)) flags.push(`z-zigzag ${last.pdz.toFixed(1)} ${last.dz.toFixed(1)} ${dz.toFixed(1)}`);
         const info = clip === undefined ? undefined : originalClip(fighter.character, clip);
+        if (clip !== last.clip) {
+          if (clip === leftClip && step - leftAt <= 2 && hitlag === 0 && last.hitlag === 0) flags.push(`clip-flap ${last.clip} ${clip}`);
+          leftClip = last.clip;
+          leftAt = step;
+        }
         if (info !== undefined && !info.looping && clip === last.clip && seconds <= last.seconds && seconds < info.endSeconds - info.startSeconds - 0.0001 && hitlag === 0 && last.hitlag === 0) flags.push("time-held");
       }
       flagged += flags.length;
-      previous.set(slot, { x, z, dx, dz, pdx: last?.dx ?? 0, pdz: last?.dz ?? 0, quiet, clip, seconds, hitlag });
+      previous.set(slot, { x, z, dx, dz, pdx: last?.dx ?? 0, pdz: last?.dz ?? 0, quiet, clip, seconds, hitlag, leftClip, leftAt });
       console.log([step, slot, clip, seconds.toFixed(4), pool.placement.x.toFixed(2), pool.placement.z.toFixed(2), x.toFixed(2), z.toFixed(2), hitlag, flags.join("; ")].join("\t"));
     }
   });

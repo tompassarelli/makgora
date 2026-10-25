@@ -39,7 +39,7 @@ export function groundOptionOpen(f: Readonly<Fighter>, option: GroundOption): bo
 
 export function wantsCrouch(f: Readonly<Fighter>, input: Readonly<Controls>, horizontalStick: number): boolean {
   const z = stickZ(input);
-  return stickZone(horizontalStick, z < 0 ? z : -1.0, f.motion.stickSideAge, TAP_JUMP_WINDOW, f.facing, groundState(f)) === StickZone.crouch;
+  return stickZone(horizontalStick, input.down && z >= 0 ? -1.0 : z, f.motion.stickSideAge, TAP_JUMP_WINDOW, f.facing, groundState(f)) === StickZone.crouch;
 }
 
 export function clearDash(f: Fighter): void {

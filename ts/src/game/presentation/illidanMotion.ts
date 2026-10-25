@@ -126,7 +126,7 @@ export function advanceIllidanMotion(history: IllidanMotion, fighter: Readonly<F
     history.motion = IllidanLocomotion.stop;
     history.transitionRemaining = TRANSITION_FRAMES;
   } else if (history.transitionRemaining > 0) history.transitionRemaining--;
-  else if (controls.down && controls.direction === 0) history.motion = IllidanLocomotion.crouch;
+  else if (motion.crouching) history.motion = IllidanLocomotion.crouch;
   else if (ground.dashFrame > 0 && ground.dashFrame <= INITIAL_DASH_FRAMES && controls.direction !== 0) history.motion = IllidanLocomotion.dash;
   else if (moving) {
     if (controls.direction !== 0) history.motion = controls.walking ? IllidanLocomotion.walk : IllidanLocomotion.run;

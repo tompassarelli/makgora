@@ -202,8 +202,11 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   through the predicted pool presentation and prints, per frame and fighter, the clip, its time,
   the placed x/z and the drawn x/z (placement plus the clip's bone centroid sampled from the
   model). It flags and exits nonzero when a drawn axis turns back twice in a row by more than
-  2 units outside hitlag, or a non-looping clip's time stops rising before its end. The #277
-  pads in smashcraft:ts/test/native/captures/277/ run through it unchanged.
+  2 units outside hitlag, a clip returns to the one it left within two frames outside hitlag
+  (`clip-flap`, a pose flickering between two states), or a non-looping clip's time stops rising
+  before its end. The #277 pads in smashcraft:ts/test/native/captures/277/ run through it
+  unchanged; crouch-release-analog.pad releases over 2–6 frames and rests the stick with noise
+  inside Melee's 0.625–0.6875 crouch band.
 
 - White body flashes (from the repository root):
   `bun tools/animations/white-flash-models.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--character ID]`
