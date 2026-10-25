@@ -14,11 +14,14 @@ import { LEDGE_ROLL_FRAMES } from "../../ts/src/game/sim/ledge";
 import { GROUND_ROLL_FRAMES } from "../../ts/src/game/sim/conditions";
 import { seconds } from "./asset-info";
 import { ensure, parseSource, tracks, onGlobalClock, encodeVerified } from "./original-clips";
-const [input, output] = process.argv.slice(2).map(p => resolve(p));
+import { HIGH_STRETCH, PAIN_GAIN, PainBody, painGate } from "./pain-gate";
+const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
+const painOnly = process.argv.includes("pain");
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/malfurion-clips.ts STOCK_MALFURION.mdx PRIVATE_OUTPUT");
-const source = parseSource(await Bun.file(input).arrayBuffer()), model = structuredClone(source);
-ensure(source.Sequences.length === 8 && source.Helpers.some(b => b.Name === "Bone_Arm1_RArchDruid"), "Expected original classic Malfurion");
+ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/malfurion-clips.ts STOCK_MALFURION.mdx|SHIPPED_MALFURION.mdx PRIVATE_OUTPUT [pain]");
+const originalBytes = await Bun.file(input).arrayBuffer();
+const source = parseSource(originalBytes), model = structuredClone(source);
+ensure((painOnly || source.Sequences.length === 8) && source.Helpers.some(b => b.Name === "Bone_Arm1_RArchDruid"), "Expected original classic Malfurion");
 const stand = source.Sequences[0]!;
 const hero = heroDefinition(Character.malfurion); ensure(hero, "Register Malfurion before exporting his clips");
 interface Gesture { chest?: number; waist?: number; arm?: number; wrist?: number; leftArm?: number; head?: number; front?: number; back?: number; kneeFront?: number; kneeBack?: number; yaw?: number; lean?: number; }
@@ -29,6 +32,10 @@ const low: Gesture = {chest:48,arm:20,wrist:35,leftArm:-35,head:-28,front:-80,ba
 const back: Gesture = {chest:-12,arm:55,wrist:25,leftArm:-30,head:15,yaw:155,front:12,back:12};
 const cast: Gesture = {chest:10,arm:-85,wrist:15,leftArm:-100,head:-10,front:8};
 const brace: Gesture = {chest:20,arm:-35,wrist:25,leftArm:-50,head:-10,front:25,back:25};
+const STAFF = ["Object16ArchDruid"];
+const PAIN_LOW = (g: number): Gesture => ({front:-55*g,kneeFront:65*g,back:15*g,kneeBack:95*g,chest:28*g,head:-12*g,wrist:-95,leftArm:-45*g});
+const PAIN_MIDDLE = (g: number): Gesture => ({chest:55*g,waist:-25*g,arm:30*g,leftArm:35*g,head:20*g});
+const PAIN_HIGH = (s: number): Gesture => ({head:-55*s,chest:-40*s,lean:-22*s,arm:-120,leftArm:-150*s,front:-20*s,kneeFront:0,kneeBack:0});
 const actions: Action[] = [];
 const normals: readonly [HeroPose, AttackStyle, Gesture][] = [
  ["jab",AttackStyle.jab,{...forward,arm:-42,chest:6}], ["jab2",AttackStyle.jab2,{...forward,arm:-92,chest:22}],
@@ -119,11 +126,16 @@ const originals=new Map<string,mdx.AnimVector>();tracks(source,(t,p)=>originals.
 let cursor=Math.max(...source.Sequences.map(s=>s.Interval[1]))+100;
 const bindings:string[]=[],damageBindings:string[]=[], records:unknown[]=[];
 const damageActions:Action[]=[];
-for(let height=0;height<3;height++)for(let strength=0;strength<3;strength++){const gain=[0.45,0.8,1.2][strength]!;damageActions.push({pose:"damageGround",frames:24,contact:3,hold:true,gesture:height===0?{front:65*gain,back:55*gain,waist:25*gain,chest:25*gain,head:-15*gain}:height===1?{chest:55*gain,waist:-25*gain,arm:30*gain,leftArm:35*gain}:{head:-45*gain,chest:-35*gain,arm:45*gain,leftArm:55*gain}});}
+for(let height=0;height<3;height++)for(let strength=0;strength<3;strength++){const gain=PAIN_GAIN[strength]!,stretch=HIGH_STRETCH[strength]!;damageActions.push({pose:"damageGround",frames:24,contact:3,hold:true,gesture:height===0?PAIN_LOW(gain):height===1?PAIN_MIDDLE(gain):PAIN_HIGH(stretch)});}
+if(painOnly)actions.length=0;
+const painCells:number[]=[];
 for(const [ordinal,action]of [...actions,...damageActions].entries()){
- const index=model.Sequences.length,start=cursor,end=start+Math.round(action.frames*1000/60);cursor=end+100;
  const name=ordinal<actions.length?`Malfurion ${action.pose}`:`Malfurion Damage ${Math.floor((ordinal-actions.length)/3)} ${((ordinal-actions.length)%3)}`;
- model.Sequences.push({...stand,Name:name,Interval:new Uint32Array([start,end]),NonLooping:true,MoveSpeed:0,Rarity:0,MinimumExtent:new Float32Array([-300,-300,-200]),MaximumExtent:new Float32Array([300,300,350]),BoundsRadius:400});
+ const existing=painOnly?model.Sequences.findIndex(sequence=>sequence.Name===name):-1;ensure(!painOnly||existing>=0,`${name}: shipped sequence missing`);
+ const index=existing>=0?existing:model.Sequences.length,start=existing>=0?model.Sequences[index]!.Interval[0]!:cursor,end=start+Math.round(action.frames*1000/60);
+ if(ordinal>=actions.length)painCells.push(index);
+ if(existing>=0){ensure(model.Sequences[index]!.Interval[1]===end,`${name}: timing changed`);tracks(model,track=>{if(!onGlobalClock(track))track.Keys=track.Keys.filter(key=>key.Frame<start||key.Frame>end);});}
+ else {cursor=end+100;model.Sequences.push({...stand,Name:name,Interval:new Uint32Array([start,end]),NonLooping:true,MoveSpeed:0,Rarity:0,MinimumExtent:new Float32Array([-300,-300,-200]),MaximumExtent:new Float32Array([300,300,350]),BoundsRadius:400});}
  const reverse=action.pose==="downSmash"?action.contact+3:action.pose==="getUpAttack"?action.contact+2:undefined;
  const phaseFrames=[...new Set([0,Math.max(1,action.contact-3),action.contact,Math.min(action.frames-1,action.contact+4),action.frames,...action.roll?[0.25,0.5,0.75].map(p=>Math.round(action.frames*p)):[],...reverse?[reverse]:[],...action.pose.startsWith("neutralSpecial")?[action.frames-12]:[]])].sort((a,b)=>a-b);
  const phases=phaseFrames.map(frame=>({frame,amount:action.hold?1:action.roll?Math.sin(Math.PI*frame/action.frames):frame===0||frame===action.frames?0:frame===Math.max(1,action.contact-3)?-0.3:1}));
@@ -138,6 +150,7 @@ for(const [ordinal,action]of [...actions,...damageActions].entries()){
    track.Keys.push({...first,Frame:start+Math.round(frame*1000/60),Vector,...first.InTan?{InTan:tangent(),OutTan:tangent()}: {}});
   }
  });
+ if(painOnly)tracks(model,track=>track.Keys.sort((a,b)=>a.Frame-b.Frame));
  const aim=contactAim(action.pose);if(ordinal<actions.length&&aim)aimArm(index,start,action,phases,true,[aim.hand[0],18,aim.hand[2]],aim.direction);
  if(reverse)aimArm(index,start,{...action,contact:reverse},phases.filter(p=>p.frame>=reverse),true,[-35,18,28],[-1,0,-0.2]);
  if(["grab","grabHold","pummel","throwForward","neutralSpecial","neutralSpecialAir"].includes(action.pose))aimArm(index,start,action,phases,false,[36,-12,65]);
@@ -146,11 +159,11 @@ for(const [ordinal,action]of [...actions,...damageActions].entries()){
 
  const center=model.Nodes.find(b=>b.Name==="Bone_RootArchDruid");ensure(center,"No Malfurion root");
  if(!center.Translation)center.Translation={LineType:1,GlobalSeqId: NO_GLOBAL_SEQ,Keys:source.Sequences.flatMap(s=>Array.from(s.Interval).map(Frame=>({Frame,Vector:new Float32Array([0,0,0])})))};
- const beforeKeys=center.Translation.Keys.filter(k=>k.Frame<start);
- const drawn=new DrawnModel(generateMDX(model),1);
+ const beforeKeys=center.Translation.Keys.filter(k=>k.Frame<start||k.Frame>end);
+ const posedBytes=generateMDX(model),drawn=new DrawnModel(posedBytes,1),body=ordinal>=actions.length?new PainBody(posedBytes,Character.malfurion,STAFF):undefined;
  const translations:mdx.AnimKeyframe[]=[];
- for(const {frame}of phases){const triangle=drawn.triangles(index,frame/60,1);let lowest=Infinity;for(let i=1;i<triangle.length;i+=2)lowest=Math.min(lowest,triangle[i]!);const old=center.Translation.Keys.find(k=>k.Frame===start+Math.round(frame*1000/60));translations.push({Frame:start+Math.round(frame*1000/60),Vector:new Float32Array([old?.Vector[0]??0,old?.Vector[1]??0,(old?.Vector[2]??0)-(action.air?0:lowest)]),...(center.Translation.LineType>1?{InTan:new Float32Array([0,0,0]),OutTan:new Float32Array([0,0,0])}:{})});}
- center.Translation.Keys=[...beforeKeys,...translations];
+ for(const {frame}of phases){let lowest=Infinity;if(body)lowest=body.floor(index,frame/60);else{const triangle=drawn.triangles(index,frame/60,1);for(let i=1;i<triangle.length;i+=2)lowest=Math.min(lowest,triangle[i]!);}const old=center.Translation.Keys.find(k=>k.Frame===start+Math.round(frame*1000/60));translations.push({Frame:start+Math.round(frame*1000/60),Vector:new Float32Array([old?.Vector[0]??0,old?.Vector[1]??0,(old?.Vector[2]??0)-(action.air?0:lowest)]),...(center.Translation.LineType>1?{InTan:new Float32Array([0,0,0]),OutTan:new Float32Array([0,0,0])}:{})});}
+ center.Translation.Keys=[...beforeKeys,...translations].sort((a,b)=>a.Frame-b.Frame);
  const step=({jab:35,jab2:10,forwardTilt:45,forwardTiltUp:45,forwardTiltDown:45,downTilt:45,dashAttack:45} as Partial<Record<HeroPose,number>>)[action.pose];
  const rise=action.pose==="upAir"?38:0;
  if(step!==undefined||rise>0){
@@ -174,6 +187,7 @@ for(const [ordinal,action]of [...actions,...damageActions].entries()){
  records.push({pose:name,index,frames:victimContact?60:action.frames,contact:victimContact?30:action.contact});
 }
 
+if(!painOnly){
 const upTiltOrdinal=actions.findIndex(action=>action.pose==="upTilt"),upTiltAction=actions[upTiltOrdinal]!,upTiltIndex=source.Sequences.length+upTiltOrdinal;
 const upTiltSequence=model.Sequences[upTiltIndex]!,upTiltStart=upTiltSequence.Interval[0],upTiltEnd=upTiltSequence.Interval[1];
 const upTiltFrame=(frame:number)=>upTiltStart+Math.round(frame*1000/60),upTiltCoil=upTiltFrame(upTiltAction.contact-3);
@@ -195,7 +209,16 @@ for(const [ordinal,action]of actions.entries())if(/^victim(Pummel|Throw)/.test(a
  tracks(model,track=>{if(onGlobalClock(track))return;for(const key of track.Keys)if(key.Frame>=first!&&key.Frame<=last!)key.Frame=start+(key.Frame<=contact?Math.round((key.Frame-first!)/(contact-first!)*500):500+Math.round((key.Frame-contact)/(last!-contact)*500));track.Keys.sort((a,b)=>a.Frame-b.Frame);});
  sequence.Interval=new Uint32Array([start,start+1000]);
 }
+}
 const bytes=encodeVerified(parseSource(generateMDX(model)));mkdirSync(output,{recursive:true});await Bun.write(join(output,"malfurion.mdx"),bytes);
+if(painOnly){
+ const before=new DrawnModel(originalBytes,1),after=new DrawnModel(bytes,1);
+ for(const [index,sequence]of source.Sequences.entries())if(!painCells.includes(index))for(const part of [0,0.5,1]){const time=(sequence.Interval[1]!-sequence.Interval[0]!)*part/1000,a=before.triangles(index,time,1),b=after.triangles(index,time,1);ensure(a.length===b.length&&a.every((v,i)=>Math.abs(v-b[i]!)<0.001),`${sequence.Name}: shipped pose changed`);}
+ const gate=painGate(bytes,Character.malfurion,0,painCells,STAFF);console.log(gate.report);
+ await Bun.write(join(output,"pain.png"),sheet("Malfurion pain",after,[1,-1].flatMap(facing=>painCells.map((clip,cell)=>({frame:cell,phase:AttackPhase.active,x:0,z:0,facing,parts:[],strikes:[],clip,seconds:0}))),9).png);
+ ensure(gate.pass,"Malfurion pain gate failed");
+ console.log(`MALFURION_PAIN_PASS ${painCells.length} pain cells re-authored; ${source.Sequences.length-painCells.length} shipped sequences unchanged; private output ${output}`);
+}else{
 await Bun.write(join(project,"ts/src/game/presentation/heroes/malfurionClips.ts"),[
  "// Generated by tools/animations/malfurion-clips.ts from the stock classic Malfurion rig.",'import { f32 } from "wisp/src/sim/f32";', 'import type { HeroClip, HeroClipTable } from "../../sim/heroes/hero";',
  'export const MALFURION_MODEL_FILE = "units\\\\nightelf\\\\Furion\\\\Furion.mdl";',
@@ -208,3 +231,4 @@ const beforeDrawn=new DrawnModel(generateMDX(source),1.0);
 for(const [index,sequence] of source.Sequences.entries()) for(const phase of [0,0.5,1]) { const time=(sequence.Interval[1]-sequence.Interval[0])*phase/1000; const before=beforeDrawn.triangles(index,time,1), after=finalDrawn.triangles(index,time,1); ensure(before.length===after.length&&before.every((v,i)=>Math.abs(v-after[i]!)<0.001),`Malfurion stock clip ${index} changed`); }
 for(const pose of ["forwardTilt","forwardTiltUp","forwardTiltDown","upTilt","downTilt","downSmash","backAir","downAir","neutralSpecial","sideSpecial","upSpecial","downSpecial","rollForward","getUp","getUpAttack","grab","grabHold","pummel","throwForward","throwBack","throwUp","throwDown"]){const i=actions.findIndex(a=>a.pose===pose),action=actions[i]!;const sequence=source.Sequences.length+i;const panels:PoseFrame[]=[1,-1].flatMap(facing=>[0,Math.max(1,action.contact-3),action.contact,action.contact+4,action.frames].map(frame=>({frame,phase:frame<action.contact?AttackPhase.startup:frame<=action.contact+4?AttackPhase.active:AttackPhase.recovery,x:0,z:0,facing,parts:[],strikes:[],clip:sequence,seconds:Math.min(action.frames,frame)/60})));await Bun.write(join(output,`${pose}.png`),sheet(`Malfurion ${pose}`,finalDrawn,panels,5).png);}
 await Bun.write(join(output,"malfurion-clips.json"),JSON.stringify({stockSequences:source.Sequences.length,appended:records.length,records},null,2)+"\n");console.log(`MALFURION_CLIPS_PASS ${records.length} authored clips; ${source.Sequences.length} stock sequences retained; private output ${output}`);
+}

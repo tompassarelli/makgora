@@ -28,13 +28,13 @@ export class PainBody {
   private readonly hand: number;
   readonly armed: boolean;
 
-  constructor(bytes: ArrayBuffer, character: Character) {
+  constructor(bytes: ArrayBuffer, character: Character, carriedNodes: readonly string[] = []) {
     const rig = FIGHTER_RIGS.get(character)?.classic;
     if (rig === undefined) throw new Error(`no rig for character ${character}`);
     this.drawn = new DrawnModel(bytes, 1);
     const nodes = this.drawn.nodes();
     const id = (name: string | undefined) => nodes.findIndex(node => node.name === name);
-    const held = new Set([rig.weapon, rig["weapon.L"]].flatMap(name => name === undefined ? [] : [id(name)]).filter(node => node >= 0));
+    const held = new Set([rig.weapon, rig["weapon.L"], ...carriedNodes].flatMap(name => name === undefined ? [] : [id(name)]).filter(node => node >= 0));
     const under = (roots: ReadonlySet<number>, node: number): boolean => node >= 0 && (roots.has(node) || under(roots, nodes[node]?.parent ?? -1));
     const carried = (node: number) => under(held, node);
     const head = new Set([id(rig.head)].filter(node => node >= 0));
@@ -75,9 +75,9 @@ export function standIndex(bytes: ArrayBuffer): number {
 
 const distance = (a: Point, b: Point) => Math.hypot(a[0] - b[0], a[1] - b[1]);
 
-export function painGate(bytes: ArrayBuffer, character: Character, idle: number, cells: readonly number[]): { readonly pass: boolean; readonly report: string } {
+export function painGate(bytes: ArrayBuffer, character: Character, idle: number, cells: readonly number[], carriedNodes: readonly string[] = []): { readonly pass: boolean; readonly report: string } {
   if (cells.length !== 9) throw new Error(`pain gate needs nine cells, got ${cells.length}`);
-  const body = new PainBody(bytes, character);
+  const body = new PainBody(bytes, character, carriedNodes);
   const rest = body.measure(idle, 0);
   const posed = cells.map(cell => body.measure(cell, 0));
   const failures: string[] = [];
