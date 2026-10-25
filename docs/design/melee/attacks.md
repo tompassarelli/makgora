@@ -217,6 +217,80 @@ frame. At their best timing and ignoring spacing, the median fastest option
 On frames alone most grounded normals are punishable and most well-timed
 aerials are not; spacing, pushback and drift decide the rest.
 
+## Dash attacks
+
+Every Melee fighter's dash attack has the same shape at a different speed: a
+fast start out of a run, a long hitbox, a long recovery, and a loss on shield
+wherever it lands. `ts/scripts/meleeDashAttacks.ts` derives the rule below from
+all 26 fighters and rewrites the tables (`bun scripts/meleeDashAttacks.ts`,
+`--check` to compare). Frames, damage and shieldstun are meleeframedata.com's;
+Young Link, absent there, and the interruptible frame where it is missing come
+from FightCore; Luigi's and Young Link's shieldstun come from SmashWiki's
+⌊(damage + 4.45) / 2.235⌋, which matches all 24 reported dash-attack figures. Run speed and
+weight are from `character-attributes.csv`. The terms are those of "Reading the
+numbers"; the active span counts every frame from the first hitbox to the last.
+
+The rule, as ranges across the 26:
+
+- **Startup** frame 4 to 12, half of them 6 to 9. A dash attack is a mid-speed
+  normal, slower than a jab and as fast as a tilt.
+- **Active span** 2 to 35 frames, median 12: a meaty hitbox that covers the
+  ground the run carries it over. The short ones (Ice Climbers 2, Marth and
+  Roy 4) are sword or hammer swings; the longest (Kirby, Luigi) are multi-hit
+  slides.
+- **Ending lag** after the last hitbox 8 to 38 frames, median 21; the attacker
+  acts on frame 36 to 60, half of them by 38.5. Fighters with a long active span
+  carry less ending lag (rank correlation −0.72), so the whole move stays near 38 frames.
+- **On shield** every dash attack loses: −20 to −52 hit on its first active
+  frame, −2 to −32 on its last, median −15. With a 6-frame out-of-shield option
+  (the median above), 24 of 26 are punishable even at their latest contact;
+  only Mewtwo's and Mr. Game & Watch's, both −2, are not.
+- **Weight** has a weak trend: heavier fighters start slightly later (rank
+  correlation 0.35); nothing else follows weight or run speed beyond ±0.35.
+  Bowser and Donkey Kong are the outliers, slow to start and, with Pichu and Pikachu, the least safe.
+- **Travel** against run speed waits on the per-frame travel data of #318.
+
+<!-- dash-attacks -->
+| Measure | Least | Lower quartile | Median | Upper quartile | Greatest | Rank correlation with weight | With run speed |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Startup | 4 | 6 | 7 | 9 | 12 | 0.35 | 0.09 |
+| Active span | 2 | 8 | 12 | 15 | 35 | −0.17 | −0.18 |
+| Ending lag after the last hitbox | 8 | 17.3 | 21 | 24.8 | 38 | 0.12 | 0.21 |
+| Actionable | 36 | 38 | 38.5 | 41.5 | 60 | 0.09 | 0.08 |
+| Shieldstun | 2 | 6 | 6 | 7 | 8 | 0.26 | −0.34 |
+| On shield, first active frame | −52 | −27 | −25 | −22.2 | −20 | 0.09 | −0.05 |
+| On shield, last active frame | −32 | −19 | −15 | −12 | −2 | −0.12 | −0.20 |
+
+| Fighter | Startup | Last active | Active span | Ending lag | Actionable | Damage | Shieldstun | On shield, first | On shield, last | Run speed | Weight |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Bowser | 10 | 17 | 8 | 38 | 56 | 11 | 6 | −39 | −32 | 1.5 | 117 |
+| Captain Falcon | 7 | 16 | 10 | 21 | 38 | 10 | 6 | −24 | −15 | 2.3 | 104 |
+| Donkey Kong | 9 | 20 | 12 | 34 | 55 | 11 | 6 | −39 | −28 | 1.6 | 114 |
+| Dr. Mario | 6 | 25 | 20 | 12 | 38 | 9 | 6 | −25 | −6 | 1.5 | 100 |
+| Falco | 4 | 17 | 14 | 18 | 36 | 9 | 6 | −25 | −12 | 1.5 | 80 |
+| Fox | 4 | 17 | 14 | 18 | 36 | 7 | 5 | −26 | −13 | 2.2 | 75 |
+| Ganondorf | 7 | 16 | 10 | 21 | 38 | 14 | 8 | −22 | −13 | 1.4 | 109 |
+| Ice Climbers | 11 | 12 | 2 | 25 | 38 | 9 | 6 | −20 | −19 | 1.4 | 88 |
+| Jigglypuff | 4 | 14 | 11 | 24 | 39 | 12 | 7 | −27 | −17 | 1.1 | 60 |
+| Kirby | 9 | 43 | 35 | 16 | 60 | 8 | 5 | −45 | −11 | 1.4 | 70 |
+| Link | 7 | 12 | 6 | 27 | 40 | 12 | 7 | −25 | −20 | 1.3 | 104 |
+| Luigi | 4 | 37 | 34 | 21 | 59 | 2 | 2 | −52 | −19 | 1.3 | 100 |
+| Mario | 6 | 25 | 20 | 12 | 38 | 9 | 6 | −25 | −6 | 1.5 | 100 |
+| Marth | 12 | 15 | 4 | 24 | 40 | 12 | 7 | −20 | −17 | 1.8 | 87 |
+| Mewtwo | 10 | 29 | 20 | 8 | 38 | 9 | 6 | −21 | −2 | 1.4 | 85 |
+| Mr. Game & Watch | 6 | 29 | 24 | 8 | 38 | 9 | 6 | −25 | −2 | 1.5 | 60 |
+| Ness | 8 | 22 | 15 | 17 | 40 | 5 | 4 | −27 | −13 | 1.4 | 94 |
+| Peach | 6 | 20 | 15 | 15 | 36 | 12 | 7 | −22 | −8 | 1.3 | 90 |
+| Pichu | 5 | 16 | 12 | 33 | 50 | 8 | 5 | −39 | −28 | 1.7 | 55 |
+| Pikachu | 5 | 16 | 12 | 33 | 50 | 8 | 5 | −39 | −28 | 1.8 | 80 |
+| Roy | 12 | 15 | 4 | 24 | 40 | 12 | 7 | −20 | −17 | 1.6 | 85 |
+| Samus | 7 | 16 | 10 | 21 | 38 | 13 | 7 | −23 | −14 | 1.4 | 110 |
+| Sheik | 6 | 12 | 7 | 23 | 36 | 10 | 6 | −23 | −17 | 1.8 | 90 |
+| Yoshi | 10 | 23 | 14 | 18 | 42 | 9 | 6 | −25 | −12 | 1.6 | 108 |
+| Young Link | 7 | 12 | 6 | 27 | 40 | 11 | 6 | −26 | −21 | 1.6 | 85 |
+| Zelda | 6 | 13 | 8 | 22 | 36 | 13 | 7 | −22 | −15 | 1.1 | 90 |
+<!-- /dash-attacks -->
+
 ## Aerials on shield by timing, spacing and drift
 
 Four things set what an aerial on shield leaves behind.
