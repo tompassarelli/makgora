@@ -20,8 +20,10 @@ import { SELECTABLE_CHARACTERS, fighterName } from "../../../src/game/sim/heroes
 import { type FighterSummary, MAX_CONVERSIONS, OPENERS, OPPONENTS, PERCENTS, POSITIONS, type RouteRecord, type UnitReport, fighterNamed, summarize } from "../../comboExplorer";
 import { type AdvantageRow, TARGETS, type ZeroToDeath, advantagePage, unmet } from "../../advantageState";
 import { admit } from "../../heavyCapacity";
-import { type LinkRow, type LinkUnit, linksPage } from "../../comboLinks";
 import { ComboObjectivesSchema, objectiveMisses, objectiveName } from "../../comboObjectives";
+import { type LinkCell, type LinkRow, type LinkUnit, linksPage } from "../../comboLinks";
+import { FOX_CASES, FOX_FIXTURE, caseLine, judge } from "../../comboValidation";
+import { foxFixture } from "../../ledger/fixtures/fox";
 
 const moveData = join(import.meta.dir, "../../../../tools/move-data");
 const unitsFile = join(moveData, "combos/units.jsonl");
@@ -306,9 +308,30 @@ const objectives = Effect.gen(function* () {
   if (misses.length > 0) return yield* new CombosFailure({ problem: `${misses.length} combo objectives miss` });
 });
 
+const validate = (jobs: number) => Effect.gen(function* () {
+  const fox = fighterNamed(FOX_FIXTURE);
+  if (fox === undefined) return yield* new CombosFailure({ problem: `the sim has no ${FOX_FIXTURE} fighter to validate against (#296)` });
+  const weight = foxFixture().attributes.weight.value[0];
+  if (weight === undefined) return yield* new CombosFailure({ problem: "the Fox fixture has no weight" });
+  const cells = yield* Effect.forEach(FOX_CASES, (kase) => {
+    const opener = OPENERS.findIndex((own) => own.name === kase.opener);
+    return opener < 0
+      ? Effect.fail(new CombosFailure({ problem: `no opener named ${kase.opener}` }))
+      : Effect.succeed<LinkCell>({ attacker: fox, victim: fox, opener, region: kase.region, percent: kase.percent, weight });
+  });
+  const found = yield* inWorkers<LinkCell, readonly LinkRow[]>(new URL("../../comboLinkCellWorker.ts", import.meta.url), cells, jobs,
+    (cell) => `${OPENERS[cell.opener]?.name} at ${cell.percent}%`,
+    (cell, rows) => `${OPENERS[cell.opener]?.name} at ${cell.percent}%, ${rows.length} follow-ups`,
+  ).pipe(step(`${cells.length} Fox cases on ${jobs} threads`));
+  const results = FOX_CASES.map((kase, index) => judge(kase, found[index] ?? []));
+  const misses = results.filter((result) => !result.passed).length;
+  yield* Console.log([...results.map(caseLine), `${results.length - misses} of ${results.length} Fox cases come out in their Melee class`].join("\n"));
+  if (misses > 0) return yield* new CombosFailure({ problem: `${misses} Fox cases missed their Melee class` });
+});
+
 export const combos: Command = (args) => Effect.gen(function*() {
   const parsed = yield* Effect.try({
-    try: () => parseArgs({ args: [...args], options: { fighter: { type: "string", multiple: true }, jobs: { type: "string" }, advantage: { type: "boolean" }, links: { type: "boolean" }, objectives: { type: "boolean" }, "zero-to-death": { type: "boolean" }, shard: { type: "string" }, rows: { type: "string" }, merge: { type: "string", multiple: true } }, strict: true }).values,
+    try: () => parseArgs({ args: [...args], options: { fighter: { type: "string", multiple: true }, jobs: { type: "string" }, advantage: { type: "boolean" }, links: { type: "boolean" }, objectives: { type: "boolean" }, validate: { type: "boolean" }, "zero-to-death": { type: "boolean" }, shard: { type: "string" }, rows: { type: "string" }, merge: { type: "string", multiple: true } }, strict: true }).values,
     catch: (cause) => new UsageFailure({ problem: describeCause(cause) }),
   });
   const names = parsed.fighter ?? [];
@@ -329,6 +352,7 @@ export const combos: Command = (args) => Effect.gen(function*() {
     if (code !== 0) return yield* new CombosFailure({ problem: `the admitted run exited ${code}` });
     return;
   }
+  if (parsed.validate === true) return yield* validate(jobs);
   if (parsed.links === true) return yield* links(attackers.filter((attacker): attacker is Character => attacker !== undefined), jobs);
   if (parsed["zero-to-death"] === true) return yield* zeroToDeath(attackers.filter((attacker): attacker is Character => attacker !== undefined), jobs);
   if (parsed.advantage === true) return yield* advantage(attackers.filter((attacker): attacker is Character => attacker !== undefined), jobs, names.length > 0, shard);

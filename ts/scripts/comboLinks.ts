@@ -77,11 +77,11 @@ const landedRegion = (sim: Sim, opener: Opener): Region => {
   return sim.b.visuals.hitStrong ? regions.strong : regions.weak ?? regions.strong;
 };
 
-function setupsFor(attacker: Character, opener: Opener): Map<Region, ComboSetup> {
+function setupsFor(attacker: Character, victim: Character, opener: Opener): Map<Region, ComboSetup> {
   const found = new Map<Region, ComboSetup>();
   const heights = opener.airborne === true ? SETUP_HEIGHTS : [[0, 0] as const];
   for (const height of heights) for (const spacing of SETUP_SPACINGS) {
-    const setup: ComboSetup = { ...setupFor(attacker, LINK_VICTIM, opener, 0, "centre", spacing, height), defenderWeight: 75 };
+    const setup: ComboSetup = { ...setupFor(attacker, victim, opener, 0, "centre", spacing, height), defenderWeight: 75 };
     const played = openerRoot(setup, opener, { name: "none", di: "none" });
     if (played === undefined) continue;
     const region = landedRegion(played.sim, opener);
@@ -345,42 +345,60 @@ function classOf(outcomes: ReadonlyMap<Di, DiOutcome | undefined>, surviving: re
   return reaching.length === surviving.length ? "true" : "DI-dependent";
 }
 
-export function measureLinks(unit: LinkUnit): LinkRow[] {
-  const opener = OPENERS[unit.opener];
-  if (opener === undefined) throw new Error(`no opener ${unit.opener}`);
-  const setups = setupsFor(unit.attacker, opener);
-  const rows: LinkRow[] = [];
-  for (const region of REGIONS) {
-    const setup = setups.get(region);
-    if (setup === undefined) continue;
-    for (const percent of LINK_PERCENTS) for (const weight of LINK_WEIGHTS) {
-      const cells = new Map<Di, CellLinks | undefined>();
-      for (const di of DIS) {
-        const d: Defender = { name: di, di };
-        const played = openerRoot({ ...setup, percent, defenderWeight: weight }, opener, d);
-        if (played === undefined) continue;
-        if (landedRegion(played.sim, opener) === region) cells.set(di, linkCell(played.sim, played.root.saved, d));
-        free(played.root.saved);
-      }
-      const none = cells.get("none");
-      if (none === undefined) continue;
-      const surviving = DIS.filter((di) => cells.get(di)?.ko !== true);
-      for (const followUp of FOLLOW_UPS) {
-        const outcomes = new Map<Di, DiOutcome | undefined>(DIS.map((di) => [di, cells.get(di)?.byFollowUp.get(followUp)]));
-        const own = outcomes.get("none");
-        const escapes = new Set(DIS.flatMap((di) => outcomes.get(di)?.escapes ?? []));
-        rows.push({
-          fighter: fighterName(unit.attacker), opener: opener.name, region, percent, weight, followUp,
-          ...(none.ko ? { ko: true } : { advantage: none.advantage }), reach: own !== undefined,
-          ...(own === undefined ? {} : { contact: own.contact, input: own.input }),
-          class: classOf(outcomes, surviving),
-          diEscapes: surviving.filter((di) => outcomes.get(di) === undefined),
-          optionEscapes: VICTIM_OPTIONS.map((option) => option.id).filter((id) => escapes.has(id)),
-        });
-      }
-    }
+function cellRows(attacker: Character, opener: Opener, setup: ComboSetup, region: Region, percent: number, weight: number): LinkRow[] {
+  const cells = new Map<Di, CellLinks | undefined>();
+  for (const di of DIS) {
+    const d: Defender = { name: di, di };
+    const played = openerRoot({ ...setup, percent, defenderWeight: weight }, opener, d);
+    if (played === undefined) continue;
+    if (landedRegion(played.sim, opener) === region) cells.set(di, linkCell(played.sim, played.root.saved, d));
+    free(played.root.saved);
   }
-  return rows;
+  const none = cells.get("none");
+  if (none === undefined) return [];
+  const surviving = DIS.filter((di) => cells.get(di)?.ko !== true);
+  return FOLLOW_UPS.map((followUp) => {
+    const outcomes = new Map<Di, DiOutcome | undefined>(DIS.map((di) => [di, cells.get(di)?.byFollowUp.get(followUp)]));
+    const own = outcomes.get("none");
+    const escapes = new Set(DIS.flatMap((di) => outcomes.get(di)?.escapes ?? []));
+    return {
+      fighter: fighterName(attacker), opener: opener.name, region, percent, weight, followUp,
+      ...(none.ko ? { ko: true } : { advantage: none.advantage }), reach: own !== undefined,
+      ...(own === undefined ? {} : { contact: own.contact, input: own.input }),
+      class: classOf(outcomes, surviving),
+      diEscapes: surviving.filter((di) => outcomes.get(di) === undefined),
+      optionEscapes: VICTIM_OPTIONS.map((option) => option.id).filter((id) => escapes.has(id)),
+    };
+  });
+}
+
+function openerAt(index: number): Opener {
+  const opener = OPENERS[index];
+  if (opener === undefined) throw new Error(`no opener ${index}`);
+  return opener;
+}
+
+export function measureLinks(unit: LinkUnit): LinkRow[] {
+  const opener = openerAt(unit.opener);
+  const setups = setupsFor(unit.attacker, LINK_VICTIM, opener);
+  return REGIONS.flatMap((region) => {
+    const setup = setups.get(region);
+    if (setup === undefined) return [];
+    return LINK_PERCENTS.flatMap((percent) => LINK_WEIGHTS.flatMap((weight) => cellRows(unit.attacker, opener, setup, region, percent, weight)));
+  });
+}
+
+export interface LinkCell extends LinkUnit {
+  readonly victim: Character;
+  readonly region: Region;
+  readonly percent: number;
+  readonly weight: number;
+}
+
+export function measureLinkCell(cell: LinkCell): LinkRow[] {
+  const opener = openerAt(cell.opener);
+  const setup = setupsFor(cell.attacker, cell.victim, opener).get(cell.region);
+  return setup === undefined ? [] : cellRows(cell.attacker, opener, setup, cell.region, cell.percent, cell.weight);
 }
 
 const CLASS_MARK: Readonly<Record<LinkClass, string>> = { true: "T", "DI-dependent": "DI", read: "R", none: "·" };

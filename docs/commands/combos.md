@@ -35,3 +35,10 @@
   optionally with DIs that must not escape) against the committed link table,
   names every row and percent that misses and fails
   (smashcraft:docs/design/melee-parity-plan.md, "Combo analyzer", #299).
+
+- Validation: `bun wisp combos --validate [--jobs N]` runs the cited Fox cases
+  in smashcraft:ts/scripts/comboValidation.ts on the Fox fixture fighter
+  against itself at Fox's weight, each through the link table's measure, and
+  fails when one comes out of its Melee class (true, DI-dependent, or no
+  combo meaning read or none) (smashcraft:docs/design/melee-parity-plan.md,
+  "Combo analyzer", #297).
