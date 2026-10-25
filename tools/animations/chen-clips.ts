@@ -303,7 +303,11 @@ for (const [ordinal, action] of [...actions, ...damage].entries()) {
       return [0, 1, 2].map(k => a[k] * p[0] + a[4 + k] * p[1] + a[8 + k] * p[2] + a[12 + k]); };
     const offset = (sequence: number, frame: number) => { renderer.setSequence(sequence); data.frame = frame; renderer.update(0);
       const top = at(rope), bottom = at(hung); return [0, 1, 2].map(k => bottom[k]! - top[k]!); };
-    const hang = offset(9, stand.Interval[0]);
+    const reach = Math.hypot(...offset(9, stand.Interval[0])), butt = model.Nodes.find(n => n.Name === "Box02");
+    ensure(butt, "Chen staff missing");
+    renderer.setSequence(index); data.frame = start; renderer.update(0);
+    const tip = at(rope), shaft = at(butt).map((v, k) => v - tip[k]!), length = Math.hypot(...shaft);
+    const lay = shaft.map((v, k) => v / length + (k === 2 ? -0.6 : 0)), size = Math.hypot(...lay), hang = lay.map(v => v / size * reach);
     const angles = [0, 0];
     const loss = () => {
       for (const key of keys) { key.Vector = rotated(base, angles[0]!, angles[1]!); if (key.InTan) { key.InTan = key.Vector.slice(); key.OutTan = key.Vector.slice(); } }
