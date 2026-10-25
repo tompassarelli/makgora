@@ -607,6 +607,8 @@ function replayMoment(repro: Repro, requested?: number): { readonly result: Repr
   copyReplayState(state, moment.state);
   const restored = checksumOf(checksums, state);
   if (restored !== moment.startChecksum) problems.push(`the snapshot of frame ${moment.start} restores to checksum ${restored}; the game recorded ${moment.startChecksum}`);
+  const startRecorded = moment.checkpoints.get(moment.start);
+  if (startRecorded !== undefined && restored !== startRecorded) problems.push(`frame ${moment.start} restores to checksum ${restored}; the game recorded ${startRecorded}`);
   let inspection: ReproInspection | undefined;
   const capture = (frame: number): void => {
     if (frame !== requested) return;

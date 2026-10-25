@@ -236,12 +236,12 @@ export function compareRuns(nativeDir: string, headlessDir: string, script: stri
 
       const start = Number(/^start (\d+) /m.exec(moment.lines.join("\n"))?.[1] ?? Number.NaN);
       const checkpoints = new Map<number, string>();
-      for (const [frame, checksum] of nativeTrace.checksums) if (frame > start && frame <= moment.frame) checkpoints.set(frame, checksum);
-      for (const saved of nativeMoments) if (saved.frame > start && saved.frame <= moment.frame) checkpoints.set(saved.frame, saved.checksum);
+      for (const [frame, checksum] of nativeTrace.checksums) if (frame >= start && frame <= moment.frame) checkpoints.set(frame, checksum);
+      for (const saved of nativeMoments) if (saved.frame >= start && saved.frame <= moment.frame) checkpoints.set(saved.frame, saved.checksum);
       const replay = replayRepro({ ...moment, lines: [...moment.lines, ...[...checkpoints].map(([frame, checksum]) => `checkpoint ${frame} ${checksum}`)] });
       problems.push(...replay.problems.map((problem) => `checksum parity (moment ending ${moment.frame}): ${problem}`));
       for (const frame of checkpoints.keys()) checked.add(frame);
-      lines.push(`checksums: ${checkpoints.size} native confirmed-state checksums on frames ${[...checkpoints.keys()].sort((x, y) => x - y).join(", ")} replay ${replay.problems.length === 0 ? "equal" : "UNEQUAL"} in the headless moment of frames ${start + 1}-${moment.frame}`);
+      lines.push(`checksums: ${checkpoints.size} native confirmed-state checksums on frames ${[...checkpoints.keys()].sort((x, y) => x - y).join(", ")} replay ${replay.problems.length === 0 ? "equal" : "UNEQUAL"} in the headless moment of frames ${start}-${moment.frame}`);
     }
     if (headlessMoments.length > 0 && checked.size < 2) problems.push(`checksum parity: only ${checked.size} native checksums fall in the headless moments`);
     const compared = momentDifferences(nativeMoments, headlessMoments);
