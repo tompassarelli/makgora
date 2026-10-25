@@ -11,9 +11,9 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Rifleman | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, forward throw, jab; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 5/5 DI |
 | Rifleman | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, forward throw, jab; missed tech forward smash; trap forward smash covers tech in place, missed tech | up throw at 0% → up tilt against 5/5 DI |
 | Rifleman | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place forward smash; tech in forward smash; tech away dash grab, forward throw, jab; missed tech forward smash; trap forward smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
-| Illidan | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in down smash; tech away dash grab, forward throw, dash, dash attack; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
-| Illidan | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash; tech in down smash; tech away dash grab, forward throw, dash, dash attack; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 60% → up tilt against 5/5 DI |
-| Illidan | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down air, down special; tech in up smash; tech away short hop, forward air; missed tech down smash; trap short hop, forward air covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 5/5 DI |
+| Illidan | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, up air, down special; tech in down smash; tech away dash grab, forward throw; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 0% → up air against 4/5 DI |
+| Illidan | medium | yes | yes | **no** | yes | yes | down throw at 0%: tech in place down smash; tech in down smash; tech away dash grab, forward throw; missed tech down smash; trap down smash covers tech in place, tech in, missed tech | up throw at 20% → up tilt against 1/5 DI |
+| Illidan | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place short hop, down air, down special; tech in up smash; tech away short hop, forward air; missed tech down smash; trap short hop, forward air covers tech in place, tech away, missed tech | up throw at 0% → up air against 4/5 DI |
 | Blademaster | light | yes | yes | yes | yes | yes | forward throw at 60%: tech in place dash grab, back throw, dash, dash attack; tech in forward smash; tech away dash grab, back throw, dash, dash attack; missed tech dash grab, back throw, dash, dash attack; trap dash grab, back throw, dash, dash attack covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
 | Blademaster | medium | yes | yes | yes | yes | yes | forward throw at 60%: tech in place dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack; tech in full hop in place, forward air, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack; tech away dash grab, back throw, dash grab, back throw, dash, dash attack; missed tech dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack; trap dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
 | Blademaster | heavy | yes | yes | yes | yes | yes | down throw at 0%: tech in place dash, dash attack; tech in forward smash; tech away dash, dash attack; missed tech dash, dash attack; trap dash, dash attack covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 5/5 DI |
@@ -107,15 +107,15 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Rifleman | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Illidan | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Illidan | light | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Illidan | light | up throw | 1/1 | 1/1 KD in up smash, out down smash | 1/1 KD in up smash, out down smash | 1/1 KD in up smash, out down smash |
+| Illidan | light | up throw | 1/1 in up smash, out down smash | 1/1 KD in up smash, out down smash | 1/1 KD in up smash, out down smash | 1/1 KD in up smash, out down smash |
 | Illidan | light | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Illidan | medium | forward throw | 0/0 | 1/1 in down smash, out dash, dash attack | 0/0 KD | 0/0 KD |
-| Illidan | medium | back throw | 0/0 | 1/1 in down smash, out dash, dash attack | 0/0 KD | 0/0 KD |
+| Illidan | medium | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
+| Illidan | medium | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Illidan | medium | up throw | 1/1 in up smash, out down smash | 1/1 KD in up smash, out down smash | 1/1 KD in up smash, out down smash | 1/1 KD in up smash, out down smash |
 | Illidan | medium | down throw | 0/0 KD | 0/0 KD | 0/0 | 0/0 KD |
-| Illidan | heavy | forward throw | 0/0 | 1/1 | 1/1 | 0/0 KD |
-| Illidan | heavy | back throw | 0/0 | 1/1 | 1/1 | 0/0 KD |
-| Illidan | heavy | up throw | 1/1 | 1/1 | 1/1 KD in up smash, out down smash | 1/1 KD in up smash, out down smash |
+| Illidan | heavy | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
+| Illidan | heavy | back throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
+| Illidan | heavy | up throw | 1/1 in up smash, out down smash | 1/1 in up smash, out down smash | 1/1 KD in up smash, out down smash | 1/1 KD in up smash, out down smash |
 | Illidan | heavy | down throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Blademaster | light | forward throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
 | Blademaster | light | back throw | 0/0 | 0/0 | 0/0 | 0/0 KD |
