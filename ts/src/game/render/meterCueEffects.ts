@@ -1,4 +1,4 @@
-import type { Character } from "../sim/codes";
+import { type Character, SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
 import type { Cue } from "../presentation/specialCues";
 import { EX_AURA, EX_AURA_FRAMES, EX_CAST_VOLUME, type MeterCueFit, type MeterCueState, type MeterCueView, SUPER_AURA, ULTIMATE_BURST, ULTIMATE_BURST_FRAMES, ultimateBurst, ULTIMATE_CAST_VOLUME, clearCastCue, clearMeterCueState, confirmCastCue, createCastCue, createMeterCueState, exCastFrame, hideCastCue, meterCueFit, observeMeterCues, presentCastCue, ultimateCastFrame, ultimateFirstEffectFrame, ultimateReady } from "../presentation/meterCues";
@@ -89,7 +89,7 @@ class MeterCueModel {
   }
 }
 
-/** The EX cast aura, the full-bar flame aura and the ultimate's flame burst over one fighter (docs/design/ultimates.md): sounds and trace follow confirmed frames; each cast's picture starts on the first presented frame holding it and plays in full. */
+/** The EX cast aura, the full-bar flame aura and the ultimate's flame burst over one fighter (docs/design/ultimates.md): sounds and trace follow confirmed frames; each cast's picture starts on the first presented or confirmed frame holding it and plays in full. */
 export class MeterCueEffects {
   private readonly heard: MeterCueState = createMeterCueState();
   private readonly exCast = createCastCue(EX_AURA_FRAMES);
@@ -118,8 +118,8 @@ export class MeterCueEffects {
   confirm(frame: number, fighter: Readonly<Fighter> | undefined, playing: boolean, ultimatesOff: boolean, trace?: (text: string) => void): void {
     const live = playing ? fighter : undefined;
     const view = observeMeterCues(this.heard, live, ultimatesOff);
-    confirmCastCue(this.exCast, exCastFrame(live, frame));
-    confirmCastCue(this.burstCast, ultimateCastFrame(live, frame));
+    confirmCastCue(this.exCast, exCastFrame(live, frame), live?.special.action ?? SpecialAction.none);
+    confirmCastCue(this.burstCast, ultimateCastFrame(live, frame), live?.special.action ?? SpecialAction.none);
     if (fighter === undefined || !playing) {
       if (this.traced.exAura || this.traced.superAura || this.traced.burst) this.forget();
       return;

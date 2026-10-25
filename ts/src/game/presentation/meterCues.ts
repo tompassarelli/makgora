@@ -125,7 +125,7 @@ export function ultimateCastFrame(fighter: Readonly<Fighter> | undefined, frame:
   return fighter.special.action === SpecialAction.heroUltimate ? frame - fighter.special.frame + 1 : NO_CAST;
 }
 
-/** A cast cue starts on the first presented frame holding the cast, plays `frames` presented frames, stops if a rollback removes a cast no confirmed frame held, and never restarts for that cast. */
+/** A cast cue starts on the first presented or confirmed frame holding the cast, plays `frames` presented frames, stops if a rollback removes a cast no confirmed frame held, and never restarts for that cast. */
 export interface CastCue {
   readonly frames: number;
   cast: number;
@@ -134,11 +134,13 @@ export interface CastCue {
   heldAt: number;
   live: boolean;
   confirmed: number;
+  confirmedAction: SpecialAction;
   confirmedHeld: boolean;
+  shown: number;
 }
 
 export function createCastCue(frames: number): CastCue {
-  return { frames, cast: NO_CAST, action: SpecialAction.none, start: 0, heldAt: 0, live: false, confirmed: NO_CAST, confirmedHeld: false };
+  return { frames, cast: NO_CAST, action: SpecialAction.none, start: 0, heldAt: 0, live: false, confirmed: NO_CAST, confirmedAction: SpecialAction.none, confirmedHeld: false, shown: NO_CAST };
 }
 
 export function hideCastCue(cue: CastCue): void {
@@ -152,27 +154,38 @@ export function clearCastCue(cue: CastCue): void {
   cue.start = 0;
   cue.heldAt = 0;
   cue.confirmed = NO_CAST;
+  cue.confirmedAction = SpecialAction.none;
   cue.confirmedHeld = false;
+  cue.shown = NO_CAST;
 }
 
 function near(cue: Readonly<CastCue>, cast: number, other: number): boolean {
   return cast !== NO_CAST && other !== NO_CAST && Math.abs(cast - other) <= cue.frames;
 }
 
-export function confirmCastCue(cue: CastCue, cast: number): void {
-  if (cast !== NO_CAST && !cue.confirmedHeld) cue.confirmed = cast;
+export function confirmCastCue(cue: CastCue, cast: number, action: SpecialAction): void {
+  if (cast !== NO_CAST && !cue.confirmedHeld) {
+    cue.confirmed = cast;
+    cue.confirmedAction = action;
+  }
   cue.confirmedHeld = cast !== NO_CAST;
+}
+
+function startCastCue(cue: CastCue, frame: number, cast: number, action: SpecialAction): void {
+  cue.cast = cast;
+  cue.action = action;
+  cue.start = frame;
+  cue.live = true;
+  cue.shown = cast;
 }
 
 export function presentCastCue(cue: CastCue, frame: number, cast: number, action: SpecialAction): boolean {
   if (cast !== NO_CAST) {
     const held = cue.cast !== NO_CAST && action === cue.action && ((frame >= cue.heldAt && frame - cue.heldAt <= 1) || near(cue, cast, cue.cast));
-    if (!held) {
-      cue.cast = cast;
-      cue.action = action;
-      cue.start = frame;
-      cue.live = true;
-    }
+    if (!held) startCastCue(cue, frame, cast, action);
+    cue.heldAt = frame;
+  } else if (cue.confirmedHeld && !near(cue, cue.confirmed, cue.shown)) {
+    startCastCue(cue, frame, cue.confirmed, cue.confirmedAction);
     cue.heldAt = frame;
   } else if (cue.cast !== NO_CAST && !near(cue, cue.cast, cue.confirmed)) {
     hideCastCue(cue);
