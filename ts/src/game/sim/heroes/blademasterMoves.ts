@@ -302,7 +302,5 @@ export const BLADEMASTER_MOVES: FighterMoves = {
     [GrabAction.throwDown]: authoredThrow(16, 20, 3.992377519607544, "CHASE", 25),
   },
   dashAttack: AttackStyle.dashAttack,
-  smashMaxChargeFrames: 45,
-  smashMaxDamageMultiplier: 1.25,
   hurtboxes: BODY,
 };

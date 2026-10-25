@@ -66,7 +66,7 @@ on another fresh attack. The listed L is the final landing lag consumed by the h
 | Down throw | Wrench presses the target into a low outward bounce | contact 19, total 44; 6 damage | Demolish | [R.O.B. down throw](https://www.ssbwiki.com/R.O.B._(SSBU)) |
 | Get-up / ledge attack | Shared two-sided recovery attack / climbing claw | Shared roster timing and contact | Claw-pack | [R.O.B. floor/edge attacks](https://www.ssbwiki.com/R.O.B._(SSBU)) |
 
-Smashes charge at most 45 frames for up to 1.25× damage. Up tilt and up throw
+Smashes use the shared charge (physics.md, "Smash charge"). Up tilt and up throw
 start juggles; down throw starts a tech chase. There is no bury or forced
 follow-up. DI, SDI, jump, air dodge and the shared floor-tech options remain
 the defender's responses. Grabs use the common mash escape and one-pummel rule.

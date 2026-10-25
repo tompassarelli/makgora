@@ -4,7 +4,7 @@ import { AttackStyle, Character } from "./codes";
 import { createFighter, type Fighter } from "./fighter";
 import type { FighterMoves } from "./heroMoves";
 import { hurtPart, hurtPose } from "./hurtboxes";
-import { attackActiveFrames, attackStartupFrames, SMASH_MAX_CHARGE_FRAMES, SMASH_MAX_DAMAGE_MULTIPLIER } from "./moves";
+import { attackActiveFrames, attackStartupFrames } from "./moves";
 import { AUTHORED_PHYSICS } from "./tuning";
 
 // The shared contact specs use a 132-unit body with radius 24 (docs/hurtboxes.md).
@@ -16,8 +16,6 @@ const REFERENCE_CONTACT_MOVES: FighterMoves = {
   normals: {},
   throws: {},
   dashAttack: AttackStyle.dashAttack,
-  smashMaxChargeFrames: SMASH_MAX_CHARGE_FRAMES,
-  smashMaxDamageMultiplier: SMASH_MAX_DAMAGE_MULTIPLIER,
   hurtboxes: {
     stand: REFERENCE_STAND,
     attacks: {

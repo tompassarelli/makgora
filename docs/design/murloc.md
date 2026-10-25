@@ -75,7 +75,7 @@ and action.
 Launch classes: 70/18 for pokes, 90/22 for launchers, 105/26 for finishers
 (forward smash 112/26, back air 110/26),
 90/22 for the spike, 55/50 for up throw and 40/75 for down throw. Smashes
-charge for at most 45 frames to 1.25 damage. Shared grab escape, pummel limit,
+use the shared charge (physics.md, "Smash charge"). Shared grab escape, pummel limit,
 DI/SDI, techs and shield rules apply. No guaranteed repeat-grab or net loop
 is designed: Ensnare's slow lowers top speeds only, so the victim keeps every
 action, shield, jump and dodge.

@@ -81,7 +81,7 @@ analogues, not copied timing.
 | Up tilt | Crouch, then the whole body rises with the hand overhead. Anti-air; loses to a cross-up. | 8/4/20; 8%; height 136; 90° | [Mewtwo up tilt][mw] |
 | Down tilt | Drops low and sweeps the floor with a long reach; pops up for a juggle. Shield or jump the sweep. | 7/3/18; 6%; 94; 80° | [Mewtwo down tilt][mw] |
 | Dash attack | Leaps shoulder-first behind a palm, 64-unit slide. Commits past a shield. | 10/4/26; 9%; 94; 55° | [Mewtwo dash attack][mw] |
-| Forward smash | Coils back over the rear leg, then lunges both palms into a fire lance. Kill move from about 95%; 13 frames is readable, punish the 34-frame end. | 13/3/34; 15.5% (×1.25 charged); 138; 35° | [Mewtwo forward smash][mw] |
+| Forward smash | Coils back over the rear leg, then lunges both palms into a fire lance. Kill move from about 95%; 13 frames is readable, punish the 34-frame end. | 13/3/34; 15.5% (×1.3671 charged); 138; 35° | [Mewtwo forward smash][mw] |
 | Up smash | Squats with the hands at the hip, then rises onto his toes and erupts overhead. Catches landings; slow against grounded rushes. | 18/5/31; 15%; height 157; 90° | [Mewtwo up smash][mw] |
 | Down smash | Splits his stance and sweeps flame low in front and behind. Roll read; jump it. | 20/4/32; 14%; ±111; 25° | [Mewtwo down smash][mw] |
 | Neutral air | Tucks and turns a full circle, a sphere ring around him. Close escape. | 8/6/22, land 14; 7%; ±40 r25; 55° | [Mewtwo neutral air][mw] |

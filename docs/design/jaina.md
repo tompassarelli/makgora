@@ -59,7 +59,7 @@ Staff strikes and frost spells multiply their authored knockback growth by
 | Down air | Downward icicle; meteor in air, diagonal launch on floor | 16/3/30; land 22 | 12 | [Blizzard][archmage] | [Zelda down aerial][zelda] |
 | Get-up / ledge attack | Staff sweeps both sides / pushes off the ledge | shared roster timing | 6 / 7 | [Archmage staff attack][archmage] | [Zelda floor/ledge attacks][zelda] |
 
-Smashes charge up to 45 frames for 1.25 damage. No normal has extra shield
+Smashes use the shared charge (physics.md, "Smash charge"). No normal has extra shield
 damage. Down tilt and up throw start follow-ups; neither is described as a
 guaranteed string. The victim can DI the launch, jump or dodge once released,
 and choose all shared tech options on landing. Throw hitstun keeps regrabs

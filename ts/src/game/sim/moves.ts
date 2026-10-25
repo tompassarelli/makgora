@@ -9,6 +9,8 @@ import type { AuthoredFall, FighterMoves } from "./heroMoves";
 
 export const SMASH_MAX_CHARGE_FRAMES = 60;
 export const SMASH_MAX_DAMAGE_MULTIPLIER = 1.3671000003814697;
+const SMASH_FULL_CHARGE_HOLD_FRAMES = 120;
+export const SMASH_MAX_HOLD_FRAMES = SMASH_MAX_CHARGE_FRAMES + SMASH_FULL_CHARGE_HOLD_FRAMES;
 export const LEDGE_ATTACK_FRAMES = 40;
 export const DOWN_ATTACK_FRAMES = 49;
 export const DOWN_ATTACK_STARTUP_FRAMES = 16;
@@ -167,11 +169,9 @@ export function attackDamage(style: AttackStyle): number {
 }
 
 
-export function smashDamageMultiplier(chargeFrames: number, moves?: FighterMoves): number {
-  const frames = moves?.smashMaxChargeFrames ?? SMASH_MAX_CHARGE_FRAMES;
-  const multiplier = moves?.smashMaxDamageMultiplier ?? SMASH_MAX_DAMAGE_MULTIPLIER;
-  const charge = max(0, min(frames, chargeFrames));
-  return f32(1.0 + f32(f32(f32(multiplier - 1.0) * charge) / frames));
+export function smashDamageMultiplier(chargeFrames: number): number {
+  const charge = max(0, min(SMASH_MAX_CHARGE_FRAMES, chargeFrames));
+  return f32(1.0 + f32(f32(f32(SMASH_MAX_DAMAGE_MULTIPLIER - 1.0) * charge) / SMASH_MAX_CHARGE_FRAMES));
 }
 
 export function attackReach(style: AttackStyle): number {

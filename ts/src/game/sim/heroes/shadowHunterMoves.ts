@@ -99,8 +99,6 @@ const SHADOW_HUNTER_BODY: FighterHurtboxes = {
 
 export const SHADOW_HUNTER_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack,
-  smashMaxChargeFrames: 45,
-  smashMaxDamageMultiplier: 1.25,
   hurtboxes: SHADOW_HUNTER_BODY,
   normals: {
     ...SHADOW_HUNTER_GROUND.normals,

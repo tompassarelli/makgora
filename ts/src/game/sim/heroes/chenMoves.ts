@@ -21,7 +21,7 @@ const reach = (first: number, last: number, x: number, z: number): readonly Hurt
 const tilt = (height: number, length: number, tip: number, hand?: StrikeCapsule) => heroMove(9, 3, 21, 0, [region(9, 11, 22.0, 58.0, 96.0, height, 12.0, poke(8.43317985534668)), region(9, 11, 96, height, length, tip, 12, poke(8.43317985534668)), ...(hand === undefined ? [] : [heroRegion(9, 11, hand, poke(8.43317985534668))])]);
 
 export const CHEN_MOVES: FighterMoves = {
-  dashAttack: AttackStyle.dashAttack, smashMaxChargeFrames: 45, smashMaxDamageMultiplier: 1.25,
+  dashAttack: AttackStyle.dashAttack,
   hurtboxes: {
     stand: [body], attacks: {
       [AttackStyle.jab]: reach(3, 8, 48.0, 64.0), [AttackStyle.jab2]: reach(4, 9, 50.0, 58.0), [AttackStyle.jab3]: reach(6, 12, 44.0, 52.0),

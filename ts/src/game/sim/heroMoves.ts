@@ -85,8 +85,6 @@ export interface FighterMoves {
 
   readonly throws: { readonly [action: number]: AuthoredThrow | undefined };
   readonly dashAttack: AttackStyle;
-  readonly smashMaxChargeFrames: number;
-  readonly smashMaxDamageMultiplier: number;
 
 
   readonly hurtboxes?: FighterHurtboxes | undefined;

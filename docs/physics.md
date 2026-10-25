@@ -1801,9 +1801,18 @@ are not taken from it.
 
 The prototype lets a grounded up, down, or forward smash started through the
 normal Attack binding pause just before its active frames. Holding Attack
-accumulates at most 60 logical ticks; releasing it, reaching the cap, or
-leaving the ground resumes the attack. Damage scales linearly to 1.3671× and
-feeds the ordinary knockback calculation. Hitlag pauses charge accumulation;
+charges for 60 logical ticks, damage scaling linearly to 1.3671× and feeding
+the ordinary knockback calculation. The smash then holds at full charge for up
+to 120 more ticks (180 in all) with no further damage or knockback gain;
+releasing Attack, reaching tick 180, or leaving the ground resumes the attack.
+Every fighter and smash follows this one rule, none with its own charge length,
+multiplier or hold.
+
+The extra hold is Tom's deviation from Melee (26 Oct 2026, #328), taken from
+Ultimate: SmashWiki's [Smash attack](https://www.ssbwiki.com/Smash_attack) and
+[Charge](https://www.ssbwiki.com/Charge) pages give Ultimate 60 frames of
+charge, then 120 more frames of hold that add no damage. It is a row in
+smashcraft:docs/gameplay-design.md "Deviations from Melee". Hitlag pauses charge accumulation;
 fighter steering and attack/cooldown clocks pause while ordinary world timers,
 gravity and platform motion continue. C-stick/direct smash commands are
 immediate. These state and input rules are prototype choices, not claims of

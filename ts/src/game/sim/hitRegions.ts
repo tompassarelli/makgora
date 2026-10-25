@@ -268,7 +268,7 @@ export function authoredHitRegion(out: HitRegion, character: Character, style: A
   if (authored !== undefined) {
     const region = authored.regions[index];
     copyHitRegion(out, region !== undefined && frame >= region.firstFrame && frame <= region.lastFrame ? region.hit : NO_HIT_REGION);
-    if (isSmashAttack(style)) out.effect.damage = f32(out.effect.damage * smashDamageMultiplier(chargeFrames, moves));
+    if (isSmashAttack(style)) out.effect.damage = f32(out.effect.damage * smashDamageMultiplier(chargeFrames));
     return out;
   }
   if (style === undefined || style === AttackStyle.shot) {

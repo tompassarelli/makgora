@@ -31,8 +31,6 @@ const FORWARD_SMASH = peonHit(20.479999542236328, 40, 122.13999938964844, 28.0);
 
 export const PEON_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack,
-  smashMaxChargeFrames: 45,
-  smashMaxDamageMultiplier: 1.25,
   hurtboxes: {
     stand: [BODY],
     attacks: {

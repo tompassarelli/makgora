@@ -69,7 +69,7 @@ The shared grab escape, throw immunity and hitstun inputs remain active.
 The single shared pummel deals 3 damage at frame 60 and ends at frame 68.
 Get-up and ledge attacks use the same hammer sweep vocabulary and shared
 action rules. Only weapon reach is disjoint; shoulder and limb attacks expose
-matching hurt volumes. Smashes charge up to 45 frames for at most 1.25× damage.
+matching hurt volumes. Smashes use the shared charge (physics.md, "Smash charge").
 
 The rider folds forward for grounded jabs and forward tilt. Measured active
 hammer bounds are x33–54/z49–96 for jab, x37–61/z51–97 for jab 2 and

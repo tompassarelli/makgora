@@ -14,7 +14,7 @@ const paw = hurtPart(48.0, 34.0, 96.0, 34.0, 20.0);
 const down = { damage: 13.0, growth: 103.52999877929688, base: 24.0, launchX: 0.0, launchZ: -1.0, electric: false, element: HitElement.normal };
 
 export const THRALL_MOVES: FighterMoves = {
-  dashAttack: AttackStyle.dashAttack, smashMaxChargeFrames: 45, smashMaxDamageMultiplier: 1.25,
+  dashAttack: AttackStyle.dashAttack,
   hurtboxes: {
     stand: [body, wolf],
     attacks: {

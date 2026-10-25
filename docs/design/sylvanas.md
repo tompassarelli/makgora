@@ -74,7 +74,7 @@ bow positions. Aerial landing lag is halved automatically by the common rule.
 
 All ordinary hitlag, shielding and launch formulas apply. Normals have no
 armor, intangibility, mana cost or cancel beyond shared jab and smash rules.
-Smashes charge at most 45 frames for at most 1.25× damage. A bow is a
+Smashes use the shared charge (physics.md, "Smash charge"). A bow is a
 disjoint; the reaching arm and kicking leg remain hittable. Up/down tilt and
 up throw create follow-ups that still use DI, SDI, air dodge and techs; there
 is no scripted follow-up or command-grab loop through throw hitstun.

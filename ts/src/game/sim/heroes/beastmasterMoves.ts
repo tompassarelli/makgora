@@ -87,8 +87,6 @@ const NO_LAUNCH = { growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric
 
 export const BEASTMASTER_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack,
-  smashMaxChargeFrames: 45,
-  smashMaxDamageMultiplier: 1.25,
   hurtboxes: BEASTMASTER_BODY,
   normals: {
 

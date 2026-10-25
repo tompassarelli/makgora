@@ -112,8 +112,6 @@ const FROSTMOURNE_SWEEP = heroMove(11, 4, 21, 0, sweep(11, [150.0, 106.0, 60.0, 
 
 export const LICH_KING_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack,
-  smashMaxChargeFrames: 45,
-  smashMaxDamageMultiplier: f32(1.3),
   hurtboxes: LICH_KING_BODY,
   normals: {
 

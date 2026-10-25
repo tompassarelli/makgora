@@ -84,7 +84,7 @@ function emitMoves(): void {
       const active = characterAttackActiveFrames(character, style, moves);
       const total = attackDurationFramesForGrounding(style, !isAerialAttack(style), moves);
       const recovery = total - startup - active;
-      const multiplier = isSmashAttack(style) ? smashDamageMultiplier(charge, moves) : 1;
+      const multiplier = isSmashAttack(style) ? smashDamageMultiplier(charge) : 1;
       const hurt = hurtCapsule(character);
       const move = { kind: "move", character, move: names[style], style, chargeFrames: charge, startup, active, recovery, totalUnpaused: total,
         landingLag: attackLandingLag(style, moves), observedLandingLag: observeLandingLag(character, style),

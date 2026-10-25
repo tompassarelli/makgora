@@ -2,7 +2,6 @@
 
 
 
-import { SMASH_MAX_CHARGE_FRAMES, SMASH_MAX_DAMAGE_MULTIPLIER } from "./moves";
 import { f32 } from "wisp/src/sim/f32";
 import { AttackStyle, Character, GrabAction } from "./codes";
 import type { FighterMoves } from "./heroMoves";
@@ -14,8 +13,6 @@ function originalMoves(character: Character, kit: GroundKit, throws: FighterMove
     normals: kit.normals,
     throws,
     dashAttack: AttackStyle.dashAttack,
-    smashMaxChargeFrames: SMASH_MAX_CHARGE_FRAMES,
-    smashMaxDamageMultiplier: SMASH_MAX_DAMAGE_MULTIPLIER,
   };
   return { ...moves, hurtboxes: shippedHurtboxes(character, moves) };
 }

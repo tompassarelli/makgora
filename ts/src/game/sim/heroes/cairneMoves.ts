@@ -50,7 +50,7 @@ const FORWARD_TILT = heroMove(14, 4, 29, 0, sweep(14, 170.0, [170.0, 115.0, 60.0
 export const NO_LAUNCH = { growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } as const;
 
 export const CAIRNE_MOVES: FighterMoves = {
-  dashAttack: AttackStyle.dashAttack, smashMaxChargeFrames: 45, smashMaxDamageMultiplier: 1.25,
+  dashAttack: AttackStyle.dashAttack,
   hurtboxes: {
     stand: [BODY],
     attacks: {

@@ -11,7 +11,7 @@ const rear = hurtPart(-50.0, 45.0, -50.0, 75.0, 29.0);
 const tilt = (z: number, angle: 25 | 40 | 55) => heroMove(10, 4, 24, 0, [heroRegion(10, 13, claw(32.0, 60.0, 124.0, z), anubarakHit(13.626359939575195, angle))]);
 
 export const ANUBARAK_MOVES: FighterMoves = {
-  dashAttack: AttackStyle.dashAttack, smashMaxChargeFrames: 45, smashMaxDamageMultiplier: 1.25,
+  dashAttack: AttackStyle.dashAttack,
   hurtboxes: {
     stand: [shell, hurtPart(20.0, 76.0, 52.0, 100.0, 20.0), rear],
     crouch: [hurtPart(-28.0, 24.0, 22.0, 55.0, 35.0)],

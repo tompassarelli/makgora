@@ -142,8 +142,6 @@ const CLEAVING_SWEEP = heroMove(13, 4, 33, 0, cleave(13, [150.0, 100.0, 50.0, 10
 
 export const PIT_LORD_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack,
-  smashMaxChargeFrames: 45,
-  smashMaxDamageMultiplier: 1.25,
   hurtboxes: PIT_LORD_BODY,
   normals: {
 

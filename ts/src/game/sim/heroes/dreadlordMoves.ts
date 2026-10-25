@@ -262,8 +262,6 @@ function attachedBodies(): FighterHurtboxes {
 
 export const DREADLORD_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack,
-  smashMaxChargeFrames: 45,
-  smashMaxDamageMultiplier: 1.25,
   normals: NORMALS,
   hurtboxes: attachedBodies(),
   throws: {

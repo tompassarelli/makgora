@@ -28,7 +28,7 @@ const limb = (first: number, last: number, x: number, z: number) => [heroHurtPos
 const none = { damage: 0.0, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } as const;
 
 export const TINKER_MOVES: FighterMoves = {
-  dashAttack: AttackStyle.dashAttack, smashMaxChargeFrames: 45, smashMaxDamageMultiplier: 1.25,
+  dashAttack: AttackStyle.dashAttack,
   hurtboxes: { stand: [BODY], attacks: {
     [AttackStyle.jab]: limb(4, 5, 38.0, 48.0), [AttackStyle.jab2]: limb(4, 5, 40.0, 56.0),
     [AttackStyle.jab3]: limb(6, 8, 43.0, 48.0), [AttackStyle.grab]: limb(8, 9, 55.0, 46.0),

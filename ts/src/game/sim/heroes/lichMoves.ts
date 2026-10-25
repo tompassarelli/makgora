@@ -431,8 +431,6 @@ export const LICH_DECAY_BODY: readonly HurtPose[] = [
 const GRAB_EFFECT ={ damage: 0.0, growth: 0.0, base: 0.0, launchX: 0.0, launchZ: 0.0, electric: false } as const;
 export const LICH_MOVES: FighterMoves = {
   dashAttack: AttackStyle.dashAttack,
-  smashMaxChargeFrames: 45,
-  smashMaxDamageMultiplier: 1.25,
   hurtboxes: LICH_BODY,
   normals: {
     ...LICH_GROUND.normals,

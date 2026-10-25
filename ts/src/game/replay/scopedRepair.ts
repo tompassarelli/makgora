@@ -122,7 +122,7 @@ function rosterReach(): Extent {
     const tuning = authoredTuning(character);
     const { moves, specials, physics } = tuning;
     const normal = { x: 0.0, z: 0.0 };
-    const charges = [0, moves?.smashMaxChargeFrames ?? SMASH_MAX_CHARGE_FRAMES];
+    const charges = [0, SMASH_MAX_CHARGE_FRAMES];
     for (const style of Object.values(AttackStyle)) {
       const authored = style === AttackStyle.grab ? undefined : moves?.normals[style];
       if (authored !== undefined) {
