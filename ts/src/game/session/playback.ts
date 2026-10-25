@@ -119,8 +119,11 @@ export function repairBudget(speculative: number, depth: number, whole: number):
 
 const KEYBOARD_CONFIRMED = 2;
 
+const PACED_CONFIRMABLE = 2;
+
 // Confirmed frames make natives every client must call in the same callback, so nothing local may change this.
-export const confirmedBudget = (confirmable: number, journal: boolean): number => (journal ? (confirmable > 2 * CATCH_UP_FRAMES ? CATCH_UP_FRAMES : 3) : KEYBOARD_CONFIRMED);
+export const confirmedBudget = (confirmable: number, journal: boolean): number =>
+  confirmable <= PACED_CONFIRMABLE ? 1 : journal ? (confirmable > 2 * CATCH_UP_FRAMES ? CATCH_UP_FRAMES : 3) : KEYBOARD_CONFIRMED;
 
 
 

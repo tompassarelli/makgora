@@ -685,6 +685,16 @@ because speculative frames do not wait on confirmation. Going from 3 to 2 in
 predicted, and a 6-frame debt took 3.75 callbacks on average (at most 10)
 instead of 2.86 (at most 6).
 
+With 2 or fewer confirmable frames, every callback confirms 1, in both
+paths (smashcraft#239). Native rows arrive two frames every other callback:
+the laptop native-perf capture at 33ee5f809 confirmed exactly 0 or 2 frames in
+each of its 7,200 callbacks, half each, and the 2-frame half held 9 of the 10
+callbacks over 10 ms and 74 of the 81 over 8 ms (mean 5.96 ms against 4.68).
+Spreading the pair over two callbacks moves 1.37 ms of confirmed work off
+every other callback. A backlog above 2 frames still confirms 2 (3 or 6 on the
+journal path). The limit depends only on the confirmable count, which every
+client reaches in the same callback.
+
 The reading changes only how many frames a callback runs. It is never sent,
 snapshotted or checksummed; rows stay keyed by frame and confirmed state
 depends only on accepted rows, the precedent the journal path's catch-up set
