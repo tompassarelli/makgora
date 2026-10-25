@@ -289,7 +289,7 @@ export const measureMovesGate = (clientsFile: string, directory: string, caster?
     }
     const ended = yield* Clock.currentTimeMillis;
     yield* focus(host).pipe(Effect.mapError(fail("moves gate exit")));
-    yield* tap(host, "y");
+    yield* tap(host, "BackSpace");
     yield* Effect.sleep(PAUSE_SETTLE);
     yield* tap(host, "e");
     yield* Effect.sleep("300 millis");
