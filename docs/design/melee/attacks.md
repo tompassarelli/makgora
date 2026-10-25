@@ -25,7 +25,7 @@ fighter more than they share a pattern. Conventions and sources are in the
   attacker's landing lag starts the next frame; the advantage is shieldstun
   minus landing lag. An L, R or Z press within <!-- v:lcancel.window -->7<!-- /v -->
   frames before landing divides the aerial's landing lag by
-  <!-- v:lcancel.divisor -->2<!-- /v --> (a Melee routine, the
+  <!-- v:lcancel.divisor -->2<!-- /v -->, rounded down (SmashWiki "L-canceling": the
   L-cancel); both cases are given. An aerial that lands while its own flag is
   clear (its autocancel frames) takes the ordinary landing instead.
 - **Reach** is the farthest edge of any of the move's hitboxes from the

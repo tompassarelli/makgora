@@ -85,8 +85,8 @@ from the dash's first frame to the frame before a run can start.
 
 A ground jump spends the fighter's jump squat on the ground.
 Releasing jump during the squat selects the short hop's launch speed, holding it
-the full jump's. The takeoff frame moves the fighter by its launch speed alone
-(a Melee routine skips its first frame); every later frame subtracts gravity
+the full jump's. The takeoff frame moves the fighter by its launch speed alone;
+every later frame subtracts gravity
 and caps the fall at the fighter's fall speed. An aerial jump
 launches at the full jump's speed times the fighter's aerial multiplier and
 falls from its first frame.
@@ -199,16 +199,12 @@ one way, during the fighter's full-hop air time.
 
 ## Wavedash and waveland
 
-An air dodge sets the fighter's velocity to <!-- v:airdodge.force -->3.10<!-- /v -->
-units per frame in the stick's direction, then multiplies it by
-<!-- v:airdodge.decay -->0.90<!-- /v --> every frame before it moves
-, so the first frame already covers
-<!-- v:airdodge.firstFrame -->2.79<!-- /v --> units. Touching the ground ends it in a
-landing that lasts <!-- v:waveland.lag -->10<!-- /v --> frames
-, and the horizontal velocity becomes the
+An air dodge gives the fighter a short burst of speed in the stick's direction
+(SmashWiki "Air dodge"), which slows each frame. Touching the ground ends it in a
+landing that lasts <!-- v:waveland.lag -->10<!-- /v --> frames (SmashWiki
+"Wavedash"), and the horizontal velocity becomes the
 fighter's ground speed, braked by traction as above. The air dodge can be
-entered on the very frame a jump leaves the ground (a Melee routine checks it
-on the frame a Melee routine runs), so a dodge angled into the floor lands at
+entered on the very frame a jump leaves the ground, so a dodge angled into the floor lands at
 once: a wavedash. The same landing from a dodge above a floor or platform is a
 waveland, which skips the jump squat.
 
@@ -265,10 +261,8 @@ slide" runs until the fighter stops.
 
 From shield, a stick sideways rolls and a stick down spot-dodges. Both are animation-driven: the animation's
 own translation moves the fighter, so roll distance is a
-per-fighter recording rather than a parameter. Intangibility comes from the
-action's command stream setting the body's collision state;
-a forward roll turns the fighter around when its stream raises a flag that
-a Melee routine reads.
+per-fighter recording rather than a parameter. Intangibility covers the middle of each
+dodge; a forward roll turns the fighter around partway through.
 
 Rolls last <!-- v:rollFrames.min -->31<!-- /v --> to <!-- v:rollFrames.max -->44<!-- /v --> frames
 (median <!-- v:rollFrames.median -->31<!-- /v -->) and spot dodges
@@ -280,9 +274,10 @@ median <!-- v:rollTravel.median -->34.5<!-- /v -->. An air dodge is intangible o
 <!-- v:airDodge.windowOthers -->Bowser 3–29, Peach 4–19 and Zelda 4–19<!-- /v -->) and lasts <!-- v:airDodge.frames -->49<!-- /v --> frames
 (otherwise <!-- v:airDodge.framesOthers -->Dr. Mario 48, Ice Climbers 48, Luigi 48, Mario 48, Mewtwo 39 and Ness 48<!-- /v -->).
 
-Frame counts are from meleeframedata.com; intangibility from the retail command
-streams (frames from the frame the state is set to the frame before it is
-cleared); travel from libmelee's recordings, where present.
+Frame counts and ground-dodge intangibility are from meleeframedata.com
+(references/melee-frame-data/records.jsonl, `dodges`); air-dodge intangibility
+from SmashWiki "Air dodge"; travel from libmelee's recordings
+(references/melee-frame-data/libmelee.jsonl), where present.
 
 <!-- table:dodges -->
 | Fighter | Spot dodge | Intangible | Roll | Intangible (forward / back) | Forward roll travel | Back roll travel | Air dodge intangible |

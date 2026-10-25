@@ -65,6 +65,6 @@ Melee's competitive scene outlived its successors' changes: players kept the
 techniques Brawl removed, settled tournament rules among themselves, and
 argued for years about which emergent techniques to allow, as the wobbling ban
 shows ([SmashWiki Wobbling](https://www.ssbwiki.com/Wobbling)). The frame data
-used in these pages exists because the community extracted and published it
+used in these pages exists because the community measured and published it
 (meleeframedata.com, credited in smashcraft:references/melee-frame-data/README.md;
 libmelee, [altf4/libmelee](https://github.com/altf4/libmelee)).

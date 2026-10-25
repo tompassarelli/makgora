@@ -4,7 +4,7 @@ How safe a Melee aerial is against a shield is not a property of the move. It
 is arithmetic on the hit's shieldstun, the frames the attacker still has to
 fall, its landing lag, the defender's fastest out-of-shield option, and the
 spacing that decides whether that option reaches. This page derives each term
-from public frame data (NTSC 1.02) and works
+from public frame data and works
 examples. Per-move frame data, the cast-wide tables and pushback are in
 [Attacks](attacks.md#aerials-on-shield-by-timing-spacing-and-drift);
 conventions and sources are in the [README](README.md).
@@ -25,22 +25,17 @@ the advantage is at most −*k*, if it reaches.
 
 ### Shieldstun
 
-A hit on a shield sends the defender into GuardSetOff. Its
-animation is rescaled to last 1.5 × power × (1 − (light × (0.7 − 0.05) + 0.05)) + 2
-frames, where power is the hit's truncated damage (`x19A4`, the largest hit
-that frame) and light the trigger's light-shield amount (common `x28C`,
-`x2E4`, `x2E8`, `x290`). For a full press that is
-<!-- v:aos.stunFactor -->0.45<!-- /v --> × damage + <!-- v:aos.stunBase -->2<!-- /v -->;
-for the lightest shield <!-- v:aos.lightFactor -->1.425<!-- /v --> × damage + 2,
-much more stun but more pushback and a smaller bubble
-(smashcraft:docs/melee-analog-shield.md). The animation counts out as
-⌊(0.45 × damage + 2) × 200/201⌋ action frames (smashcraft:docs/physics.md,
-"Shield-break recovery"), which reproduces meleeframedata.com's shieldstun for
+A hit on a shield puts the defender in shieldstun. SmashWiki "Shield" gives it
+for a full press as (damage × <!-- v:aos.stunFactor -->0.45<!-- /v --> +
+<!-- v:aos.stunBase -->2<!-- /v -->) × 200/201 frames, where damage is the
+largest hit that frame; a lighter shield takes more stun, more pushback and
+has a smaller bubble (smashcraft:docs/melee-analog-shield.md). Truncated to
+whole frames, this reproduces meleeframedata.com's shieldstun
+(references/melee-frame-data/records.jsonl, `stun`) for
 <!-- v:aos.agree -->398 of 412<!-- /v --> attacks
 (<!-- v:aos.agreeOffByOne -->6<!-- /v --> of the rest differ by one frame).
-Nothing can be done during it: a Melee routine is empty, so a press
-made then is not kept, and when the animation ends the fighter is back in
-Guard, whose interrupts read that frame's input.
+Nothing can be done during it, and when it ends the fighter is back in its
+held shield, acting on that frame's input.
 
 Shieldstun grows with damage only. It is the same for ground and aerial
 attacks, and nothing about the hit's knockback, angle or element enters it.
@@ -59,11 +54,8 @@ attacks, and nothing about the hit's knockback, angle or element enters it.
 
 ### Hitlag on shield
 
-Both fighters take hitlag from a shield hit. The defender's shield callback
-records the hit's integer damage (`x19A4`), the attacker's records the same
-damage (`dmg.x1924`), and both reach the ordinary hitlag routine
-(a Melee routine from the hit dispatch in fighter.c): ⌊damage/3 + 3⌋,
-at most 20, the crouch multiplier applying only to a crouching state. The
+Both fighters take hitlag from a shield hit, the ordinary
+⌊damage/3 + 3⌋ frames, at most 20 (SmashWiki "Hitlag"). The
 attacker's fall stops for those frames as well, so hitlag shifts both
 timelines together. During it the defender can shift its shield along the
 floor with a fresh stick press and once more on
@@ -71,13 +63,13 @@ release; the attacker cannot act on the hit until it ends.
 
 ### Landing lag and fast fall
 
-Landing during an aerial enters a Melee routine: the move's own
-landing lag from the fighter's attributes (`landingairn_lag` and so on), or,
-if the aerial's flag (`cmd_vars[0]`) is clear, an ordinary landing of the
-fighter's `normal_landing_lag` (<!-- v:knee.normalLanding -->4<!-- /v --> for
-Captain Falcon): the autocancel. An L, R or Z press within
-<!-- v:lcancel.window -->7<!-- /v --> frames before landing divides the lag by
-<!-- v:lcancel.divisor -->2<!-- /v -->, truncated, at least 1: the L-cancel.
+Landing during an aerial costs the move's own landing lag, or, inside the
+move's autocancel window, only the fighter's ordinary landing
+(<!-- v:knee.normalLanding -->4<!-- /v --> frames for Captain Falcon,
+references/melee-frame-data/character-attributes.csv): the autocancel
+(references/melee-frame-data/fightcore.csv, Landing lag and Autocancel). An
+L, R or Z press within <!-- v:lcancel.window -->7<!-- /v --> frames before
+landing halves the lag: the L-cancel (SmashWiki "L-canceling").
 
 Fast fall replaces the fall speed with the fighter's
 fast-fall speed once the hop is past its apex. It shortens *T*, so the same
@@ -91,8 +83,8 @@ From a held shield a fighter can grab, jump, roll, spot
 dodge or drop through a platform; dropping the shield costs the release lag in
 [Defence](defense.md#shield). The options that punish an aerial:
 
-- **Shield grab.** Shield held and A pressed (a Melee routine: the
-  shield in held buttons, A in this frame's presses). There is no input
+- **Shield grab.** Shield held and A pressed (SmashWiki "Shield": a grab
+  is a simultaneous shield and attack input). There is no input
   buffer: the press has to land on the first frame the shield is back in
   Guard, and a press during shieldstun is lost. Players hold the shield and
   press A on that frame; a grab pressed too early comes out as nothing.

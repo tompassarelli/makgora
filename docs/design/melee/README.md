@@ -1,6 +1,6 @@
 # Melee case study
 
-A descriptive study of Super Smash Bros. Melee (NTSC 1.02) for what it is: its
+A descriptive study of Super Smash Bros. Melee for what it is: its
 movement, its attacks and defences, how its cast trades weight against speed
 against frame data, the techniques players found in it, and why it came out
 this way. It states no preference. What Smashcraft takes from Melee, changes or
@@ -30,10 +30,10 @@ smashcraft:references/melee-frame-data/: meleeframedata.com's database
 (startup, active frames, interruptible frame, total, shieldstun, damage,
 landing lag) and libmelee's recorded hitbox positions and dodge travel. Its
 README records provenance and the meaning and traps of every field. Fighter
-attributes (speeds, gravity, jump heights, weights) are the public values that
-SmashWiki and the frame-data sites list. The generator that once filled these
-pages from a private reference roster is retired; edit the values by hand,
-citing a public source (README "Principles").
+attributes (speeds, gravity, jump heights, weights) are SuperCombo Wiki's
+table in references/melee-frame-data/character-attributes.csv and the values
+SmashWiki lists. Edit the values by hand, citing a public source (README
+"Principles").
 
 ## Conventions
 

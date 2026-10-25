@@ -25,8 +25,7 @@ the developers had noticed it during development and left it in
 ### Dash dance and moonwalk
 
 During the initial dash, a fresh smash of the stick the other way turns the
-fighter into a new dash in that direction (a Melee routine →
-a Melee routine); repeating it makes the fighter flicker back and forth
+fighter into a new dash in that direction; repeating it makes the fighter flicker back and forth
 in place, threatening both directions: the [dash dance](https://www.ssbwiki.com/Dash_dance).
 Holding the stick backward without the smash accelerates the dash backward
 while the fighter keeps facing forward: the [moonwalk](https://www.ssbwiki.com/Moonwalk).
@@ -39,8 +38,7 @@ A short hop (jump released during the squat), a fast fall as soon as the hop
 starts descending, and an L-cancel on landing combine into the
 [SHFFL](https://www.ssbwiki.com/SHFFL): an aerial that comes out and lands in
 the shortest time the fighter allows. The L-cancel is an L, R or Z press shortly
-before landing that divides the aerial's landing lag (a Melee routine;
-[Attacks](attacks.md#reading-the-numbers) has the window). It existed in the
+before landing that halves the aerial's landing lag ([Attacks](attacks.md#reading-the-numbers) has the window). It existed in the
 first game as the Z-cancel and was removed from Brawl onward
 ([SmashWiki L-cancel](https://www.ssbwiki.com/L-cancel)).
 
@@ -113,9 +111,7 @@ chains and not others.
 
 ### SDI teleports
 
-SDI moves the fighter's position directly, not its velocity
-(a Melee routine adds the stick times a fixed step to the
-position), once per fresh stick movement and as often as every frame of
+SDI moves the fighter's position directly, not its velocity, once per fresh stick movement and as often as every frame of
 hitlag. Long hitlag therefore lets a defender jump sideways by tens of units
 while frozen, up to <!-- v:sdi.maxDistance -->123<!-- /v --> units at the hitlag cap
 ([Defence](defense.md#influence-on-knockback)). Multi-hit moves give a hitlag
@@ -132,5 +128,5 @@ shield recoil has decayed can lose all of its vertical knockback in the air
 later, as if it hit an invisible ceiling. The airborne recoil decay clears the
 fighter's vertical knockback instead of the recoil's vertical part: the
 line is a known bug, and
-smashcraft:docs/melee-air-cutoff.md records the retail behaviour
+smashcraft:docs/melee-air-cutoff.md records how Smashcraft keeps it
 ([SmashWiki](https://www.ssbwiki.com/Invisible_ceiling_glitch)).
