@@ -188,8 +188,9 @@ pending `autoland` status or an Autoland run is unfinished, Autoland heartbeat
 the sweep every 5 minutes; it stops after 10 empty minutes and hands off to a
 successor after 5.5 hours. Every Autoland plan and every sweep starts a
 heartbeat when none is running or queued, so a push restarts it. Each finished
-Autoland or Farm test run also starts the sweep (skipped within 2 minutes of
-the last one). GitHub's 5-minute schedule is a last resort: this repository's
+Autoland or Farm test run also starts the sweep. Any sweep but a `dry-run` or
+`landed` one stops after one API call when another finished under 2 minutes
+ago, and only a full sweep runs the superseded-lane job, on its run list. GitHub's 5-minute schedule is a last resort: this repository's
 schedules run about 6.5 hours late (#513). Stop the heartbeat with
 `gh variable set AUTOLAND_HEARTBEAT --body off`, then cancel its run. The sweep lists
 the unfinished Autoland runs with their jobs, and `stuckRuns` in
