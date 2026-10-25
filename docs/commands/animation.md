@@ -212,6 +212,10 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   `bun tools/animations/cairne-clips.ts STOCK_TAUREN.mdx PRIVATE_OUTPUT`
   appends the complete halberd kit, recovery, paired grabs and nine pain clips
   to the private classic Tauren Chieftain model, preserving its stock clips.
+  It rebuilds from stock, so follow it with `jump-clips.ts --character 16` and
+  `victory-clips.ts --character 16` to re-append his double jump (96) and victory (97);
+  `bun run check` (smashcraft:ts/scripts/clipBindingsCheck.ts) refuses a clip binding
+  past the end of a fighter's model (#278).
 
 - Forsaken Paladin animation authoring (from the repository root):
   `bun tools/animations/forsaken-paladin-clips.ts STOCK_FORSAKEN_PALADIN.mdx PRIVATE_OUTPUT`

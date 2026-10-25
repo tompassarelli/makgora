@@ -323,6 +323,15 @@ export const SMASHCRAFT_ACCEPT: AcceptSuite = {
     },
 
     {
+      id: "278-cairne-double-jump",
+      closes: "smashcraft#278 box 3",
+      map: heroProfile("Cairne Bloodhoof"),
+      setup: [{ waitMs: 3000 }, { keys: ["8"], client: "a" }, { waitMs: 350 }, { keys: ["8"], client: "a" }],
+      capture: [{ kind: "frames", name: "double-jump", client: "a", count: 12, everyMs: 50 }],
+      pass: [NO_IMPORT_FAILURES, NO_ERRORS],
+      look: "Cairne drawn on every frame of his double jump, knees lifting as he rises; no frame missing his body",
+    },
+    {
       id: "153-mana-full",
       closes: "smashcraft#153 box 5 (full bars)",
       map: heroProfile("Forsaken Paladin"),
