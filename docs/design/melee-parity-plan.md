@@ -65,7 +65,7 @@ Melee-exact formula, hitstun at 0% is the same as Fox's neutral air or higher:
 | Maiev neutral air, POKE 4.58% at 50° | 14 / 14 | 20 / 18 | 26 / 22 |
 | Maiev forward air, EDGE 7.63% | 20 / 19 | 32 / 27 | 44 / 35 |
 | Maiev up throw, JUGGLE 3.82% | 23 / 23 | 26 / 25 | 30 / 27 |
-| Fox neutral air clean, 12% Sakurai, base 10, growth 100 (FightCore Fox page, captured 2026-10-26; SmashWiki "Fox (SSBM)/Neutral aerial") | 17 / 15 | 31 / 24 | 46 / 34 |
+| Fox neutral air clean, 12% Sakurai, base 10, growth 100 (FC; SmashWiki "Fox (SSBM)/Neutral aerial") | 17 / 15 | 31 / 24 | 46 / 34 |
 | Fox neutral air late, 9%, base 0, growth 100 (same sources) | 10 / 9 | 22 / 17 | 33 / 24 |
 
 Hitstun frames. Maiev's rows come from her presets through
@@ -97,7 +97,7 @@ ledger issues (#287, #288, #289) turn each line into a generated row; anchors
 here are from main at 938bf89c8 and the tool resolves them afresh on every run.
 Sources name the SmashWiki page unless marked: MFD is
 `references/melee-frame-data/records.jsonl` (meleeframedata.com), FC is
-FightCore.gg (#310), CS is our case study in `docs/design/melee/`.
+`references/melee-frame-data/fightcore.csv` (FightCore.gg export for all 26 fighters, read through #310), CS is our case study in `docs/design/melee/`.
 
 ### Hits, knockback and hitstun
 
@@ -135,12 +135,12 @@ FightCore.gg (#310), CS is our case study in `docs/design/melee/`.
 | Item | Our code | Ours | Melee and source | Status |
 |---|---|---|---|---|
 | Tech window and lockout | `ts/src/game/sim/geometry/techInput.ts:5-6,40-47` | 20, 40 | 20, 40 (Tech) | match |
-| Tech in place and roll | `ts/src/game/sim/down.ts:30-31,45`; `ts/src/game/sim/conditions.ts:21-22` | 26 frames, intangible 1-20; roll 40, 1-34; one profile | Per fighter (Tech; FC Fox "Techs") | deviation, shared profile |
-| Missed tech | `ts/src/game/sim/down.ts:32,169`; `ts/src/game/sim/step.ts:166-169` | DownBound 26 | Per fighter (Knockdown) | needs public source, #292 |
+| Tech in place and roll | `ts/src/game/sim/down.ts:30-31,45`; `ts/src/game/sim/conditions.ts:21-22` | 26 frames, intangible 1-20; roll 40, 1-34; one profile | Per fighter (Tech; FC Getups/Techs rows) | deviation, shared profile |
+| Missed tech | `ts/src/game/sim/down.ts:32,169`; `ts/src/game/sim/step.ts:166-169` | DownBound 26 | Per fighter (Knockdown; FC Getups/Techs rows) | compare per fighter, #288 |
 | Floor rebound on missed tech | `ts/src/game/sim/down.ts:82-101`; `ts/src/game/sim/surfaces.ts:16-18` | Rebounds ×0.8 | Fall stops (Meteor smash) | deviation, Tom 2026-10-15 |
 | Down-wait timeout | `ts/src/game/sim/down.ts:33,185-192` | 220 then stand | Not on SmashWiki | no data |
 | Jab reset | `ts/src/game/sim/down.ts:36,38`; `ts/src/game/sim/contacts.ts:386,398` | Damage ≤ 7 below tumble resets | Docs disagree, under 7 or 7 or less (Lock) | open, #286, #292 |
-| Getup stand, roll, attack | `ts/src/game/sim/down.ts:34-43`; `ts/src/game/sim/moves.ts:13-19`; `ts/src/game/sim/conditions.ts:16-20` | 30; 35; 49 with startup 16; one profile | Per fighter (Getup) | deviation, shared profile |
+| Getup stand, roll, attack | `ts/src/game/sim/down.ts:34-43`; `ts/src/game/sim/moves.ts:13-19`; `ts/src/game/sim/conditions.ts:16-20` | 30; 35; 49 with startup 16; one profile | Per fighter (Getup; FC Getups/Techs rows) | deviation, shared profile |
 | Wall and ceiling tech | `ts/src/game/sim/surfaces.ts:19-21,200-215`; `ts/src/game/sim/tuning.ts:355-362` | 5-frame hang, 14 intangible; ceiling impulse frame 14 | Same window as floor tech (Tech) | match |
 | Shieldstun, ground | `ts/src/game/sim/shield.ts:34-37,68-87` | ⌊(0.45d + 2)·200/201⌋ | Same (Shield; CS aerials-on-shield.md) | match |
 | Shieldstun, aerials | same | Damage term ×4/3 | As ground | deviation, #106 |
@@ -165,7 +165,7 @@ FightCore.gg (#310), CS is our case study in `docs/design/melee/`.
 | Aerial auto-cancel | none | Not modelled | Per aerial, for example Fox neutral air before frame 4 and from 36 (FC) | missing, #292 |
 | Edge cancel | `ts/src/game/sim/step.ts:313-329,659-662` | Landing lag cancels off an edge; shield slide-off falls helpless | Landing lag cancels off an edge (Edge cancel); our shield slide-off rule is ours | deviation for the shield case, #275 |
 | Ledge catch box | `ts/src/game/sim/ledge.ts:52-58,82-90,155-169` | Fox and Falco boxes | Same (Edge) | match |
-| Ledge intangibility | `ts/src/game/sim/ledge.ts:21-26,213-214` | 30, 8 fewer each regrab | 30 every grab (Edge) | deviation, #386 |
+| Ledge intangibility | `ts/src/game/sim/ledge.ts:21-26,213-214` | 30, 8 fewer each regrab | 30 every grab (Edge; FC Edge rows per fighter) | deviation, #386 |
 | Ledge regrab lock | `ts/src/game/sim/transitions.ts:20,74-77` | 30 | 30 (Edge) | match |
 | Ledge hang limit | `ts/src/game/sim/ledge.ts:23,273` | 300 then drop | none | deviation, #411 |
 | Ledgedash intangibility | `ts/src/game/sim/transitions.ts:66-71` | Lost on letting go | Kept (Ledge-dash) | deviation, `docs/gameplay-design.md:2100` |
@@ -243,9 +243,10 @@ Built on the existing headless sim and search, not beside them.
   true (every option is hit), DI-dependent (only some DI escapes), read
   (another option escapes), none. Output `tools/move-data/links/<fighter>.jsonl`
   and a page; byte-identical across runs.
-- Fox fixture (#310, #295, #296): FightCore's Fox page, captured by Tom on
-  2026-10-26, enters `references/melee-frame-data/` as a third input with
-  provenance; a check-only module transcribes Fox's attributes and hitboxes as
+- Fox fixture (#310, #295, #296): FightCore's export for all 26 fighters
+  (`references/melee-frame-data/fightcore.csv`, per-hitbox angle, base, growth
+  and set knockback, getups, techs and ledge options) gets a typed reader checked
+  against meleeframedata (#310); a check-only module transcribes Fox's attributes and hitboxes as
   numbers; the sim loads it as a check-only fighter absent from the roster and
   the map.
 - Validation (#297): at least 8 cited Fox cases, including expected
@@ -301,28 +302,29 @@ Running work is absorbed, not restarted:
 1. Clean room: #285, #286.
 2. Ledger: #287, #288, #289, #290; the move-data checks repair #309.
 3. Fixes and decisions: Sakurai angle #291, unknown rows #292, Tom's decisions #293.
-4. Analyzer: link table #294, FightCore intake #310, Fox fixture #295, fixture fighter #296, validation #297, attribution #298, objectives #299.
+4. Analyzer: link table #294, FightCore reader #310, Fox fixture #295, fixture fighter #296, validation #297, attribution #298, objectives #299.
 5. Baseline tag #302; combo-ease measure #300 and Tom's pick #301.
 6. Maiev: targets #303, movement #304, aerials #305, ground game and throws #306, edge guard #307, balance field #308.
 
 ## Numbers we lack
 
-- Per-hitbox values for Fox: FightCore gives strong and weak pairs per move,
-  not hitbox IDs, radii or positions; SmashWiki's "Fox (SSBM)/<move>" Hitbox
-  Data tables give IDs, radii and bones (seen on "Fox (SSBM)/Neutral aerial"),
-  libmelee gives positions. Falco needs the same capture of his FightCore page.
-- Per-character air and fall attributes (air acceleration, air friction,
-  terminal speed, double-jump multiplier, traction) for the cast beyond Fox and
-  Falco: SmashWiki's per-character "(SSBM)" pages and its attribute ranking
-  pages ("Weight", "Falling speed", "Air speed", "Air acceleration", "Traction",
-  "Jumpsquat", "Dash", "Run").
-- Shield values with a public source: SmashWiki "Shield" and "Shieldstun";
-  universal tech, missed-tech and getup timings: SmashWiki "Tech",
-  "Knockdown", "Getup", "Getup attack", and FightCore's per-fighter "Techs" and
-  dodge entries.
-- Hitlag multipliers by element and set knockback rules: SmashWiki "Hitlag" and
-  "Knockback".
-- Knockback stacking under 10 frames and the down-wait timeout: no public page
-  found; they stay `no data` rows until one is.
-- Cited Fox combo and non-combo percents for validation: SmashWiki move pages
-  mention some; percent charts from community guides are needed for the rest.
+`references/melee-frame-data/fightcore.csv` gives per-hitbox angle, base,
+growth and set knockback for every move of all 26 fighters, plus their getups,
+techs and ledge options; libmelee gives hitbox positions. Still missing:
+
+- Per-fighter air and fall attributes beyond the `misc` rows of
+  `records.jsonl` (air acceleration, air friction, terminal speed, double-jump
+  multiplier, jump velocities, traction): SmashWiki's per-character "(SSBM)"
+  pages and its attribute ranking pages ("Weight", "Falling speed", "Air
+  speed", "Air acceleration", "Traction", "Jumpsquat", "Dash", "Run").
+- Hitlag multipliers by element and effect: SmashWiki "Hitlag".
+- Hitbox IDs and priorities within a move: SmashWiki's "<fighter>
+  (SSBM)/<move>" Hitbox Data tables (seen on "Fox (SSBM)/Neutral aerial") and
+  "Priority".
+- Universal engine constants with a public source: knockback stacking under 10
+  frames, the down-wait timeout, the smash-charge knockback multiplier and the
+  stick deadzone (SmashWiki "Knockback", "Knockdown", "Control stick", or
+  Smashboards write-ups). Without one they stay `no data` rows.
+- Cited Fox combo and non-combo percents for the analyzer's validation:
+  SmashWiki move pages mention some; community percent charts are needed for
+  the rest.
