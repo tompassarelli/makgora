@@ -5,7 +5,7 @@ import { beginDamageContacts, collectDamageContact, finishDamageContacts } from 
 import {
   CROUCH_CANCEL_KNOCKBACK_SCALE, DI_MAX_DEGREES, ELECTRIC_HITLAG_SCALE, HITLAG_CAP_FRAMES, HITSTUN_FRAMES_PER_KNOCKBACK, KNOCKBACK_CAP,
   KNOCKBACK_DAMAGE_SCALE, KNOCKBACK_GROWTH_ADDEND, KNOCKBACK_GROWTH_SCALE, KNOCKBACK_LAUNCH_SPEED, KNOCKBACK_PERCENT_SCALE, KNOCKBACK_STACKING_FRAMES,
-  SMASH_CHARGE_VICTIM_KNOCKBACK_SCALE, STRONG_HIT_EXTRA_HITLAG, damageLevelForKnockback, launchWeightFactor, victimHitlagFrames,
+  SMASH_CHARGE_VICTIM_KNOCKBACK_SCALE, STRONG_HIT_EXTRA_HITLAG, damageLevelForKnockback, effectKnockback, fixedHitKnockback, launchWeightFactor, victimHitlagFrames,
 } from "../../src/game/sim/knockback";
 import { AIR_KNOCKBACK_DECAY } from "../../src/game/sim/motion";
 import { SMASH_FULL_CHARGE_HOLD_FRAMES, SMASH_MAX_CHARGE_FRAMES, SMASH_MAX_DAMAGE_MULTIPLIER } from "../../src/game/sim/moves";
@@ -42,6 +42,16 @@ function whoFreezes(): string {
 }
 
 const tumbleKnockback = (): number => range(0, 200).find((knockback) => damageLevelForKnockback(knockback) === 3) ?? Number.NaN;
+
+const MELEE_SET_KNOCKBACK = "percent 10 and the set value as damage, through the formula";
+
+function setKnockback(): string {
+  const grid = range(40, 160, 20).flatMap((weight) => [0, 50, 100].map((growth) => ({ weight, growth })));
+  const differs = grid.find(({ weight, growth }) => effectKnockback({ growth, base: 10, setKnockback: 60 }, 80, 12, weight) !== fixedHitKnockback(60, weight, growth, 10, 1.0));
+  if (differs === undefined) return MELEE_SET_KNOCKBACK;
+  const fixed = grid.every(({ weight, growth }) => effectKnockback({ growth, base: 10, setKnockback: 60 }, 80, 12, weight) === 60);
+  return fixed ? "the knockback itself, whatever the weight, growth and base" : `differs at weight ${differs.weight}, growth ${differs.growth}`;
+}
 
 const meleeHitlag = (damage: number): number => Math.floor(damage / 3 + 3);
 
@@ -89,10 +99,9 @@ export const HIT_ROWS: readonly LedgerRow[] = [
   },
   {
     id: "set-knockback", family: "hits", name: "Set knockback",
-    melee: { value: "a hitbox field: percent 10, damage the set value", source: wiki("Knockback") },
-    ours: () => "formula only, no move field",
-    anchor: { file: KNOCKBACK, symbol: "fixedHitKnockback" },
-    status: { kind: "open", reason: "fixedHitKnockback has Melee's formula, but no move can author set knockback until the setKnockback field lands", issue: 272 },
+    melee: { value: MELEE_SET_KNOCKBACK, source: wiki("Knockback") }, ours: setKnockback,
+    anchor: { file: KNOCKBACK, symbol: "effectKnockback" },
+    status: { kind: "open", reason: "a move's setKnockback is the knockback itself, so weight, growth and base no longer apply", issue: 292 },
   },
   {
     id: "crouch-cancel-knockback", family: "hits", name: "Crouch cancel knockback",
