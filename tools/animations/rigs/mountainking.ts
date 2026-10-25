@@ -20,8 +20,8 @@ export const classic = {
 } as const;
 export const pain = {
     rows: {
-        low: { turn: { chest: 10, head: 15 } },
-        middle: { turn: { pelvis: 20, chest: 65, head: 75 }, aim: { 'arm.weapon': 120, 'forearm.weapon': 60, 'arm.free': 120, 'forearm.free': 60 } },
+        low: { turn: { chest: 25, head: 15 }, aim: { 'thigh.front': 50, 'shin.front': 160, 'thigh.back': 210, 'shin.back': 285, 'arm.weapon': 270, 'forearm.weapon': 290, 'arm.free': 130, 'forearm.free': 120 } },
+        middle: { turn: { pelvis: 70, chest: 70, head: 75 }, aim: { 'arm.weapon': 305, 'forearm.weapon': 246, 'arm.free': 266, 'forearm.free': 227 } },
         high: { aim: { 'arm.weapon': 250, 'forearm.weapon': 300 } },
     },
 } as const;
