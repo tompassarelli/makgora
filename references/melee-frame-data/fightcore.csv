@@ -1,0 +1,1216 @@
+Character,Section,Move,"Frame Timeline","First Active","Last Active","Total Frames",IASA,"Landing lag","Landing fall special lag",Autocancel,Damage,Angle,Effect,"Base Knockback","Knockback Growth","Set Knockback"
+Bowser,Air,"Neutral Air","1 8 23 49",8,23,49,48,"30 (15 L-Cancelled)",-,"<8 39>",13%,361,Normal,20,80,-
+Bowser,Air,"Up Air","1 22 25 47",22,25,47,45,"30 (15 L-Cancelled)",-,"<10 39>",17%,85,Normal,50,100,-
+Bowser,Air,"Back Air","1 9 10 11 17 49",9,17,49,-,"35 (17 L-Cancelled)",-,"<9 44>","13 / 9%","24 / 361",Slash,25,80,-
+Bowser,Air,"Forward Air","1 8 11 45",8,11,45,42,"30 (15 L-Cancelled)",-,"<9 30>","11 / 14 / 12%",361,Normal,50,80,-
+Bowser,Air,"Down Air","1 14 15 17 18 20 21 23 24 26 27 29 30 32 33 35 36 38 39 79",14,39,79,78,"40 (20 L-Cancelled)",-,"<14 69>",3%,80,Slash,-,100,10
+Bowser,Grounded,"Jab 1","1 7 9 24",7,9,24,21,-,-,-,5%,83,Slash,-,100,20
+Bowser,Grounded,"Jab 2","1 8 10 29",8,10,29,26,-,-,-,6%,361,Slash,30,110,-
+Bowser,Grounded,Dashattack,"1 10 13 14 17 59",10,17,59,56,-,-,-,"11 / 8%",80,Normal,"120 / 80",30,-
+Bowser,Grounded,"Up Smash","1 16 21 30 59",16,30,59,53,-,-,-,"17 / 20 / 12%","90 / 74","Slash / Normal","40 / 60","86 / 100",-
+Bowser,Grounded,"Forward Smash","1 29 33 69",29,33,69,66,-,-,-,24%,"60 / 361",Normal,30,100,-
+Bowser,Grounded,"Down Smash","1 14 15 17 18 20 21 23 24 26 27 29 30 32 69",14,32,69,68,-,-,-,"2 / 10%","150 / 190 / 90",Slash,40,"50 / 140",-
+Bowser,Tilt,"Forward Tilt","1 12 16 47",12,16,47,37,-,-,-,"13 / 14 / 12%",361,Normal,25,100,-
+Bowser,Tilt,"Forward Tilt (Up)","1 12 16 47",12,16,47,37,-,-,-,"15 / 13%",361,Normal,29,100,-
+Bowser,Tilt,"Forward Tilt (Down)","1 12 16 47",12,16,47,37,-,-,-,"13 / 11%",361,Normal,"31 / 32",100,-
+Bowser,Tilt,"Up Tilt","1 7 10 54",7,10,54,50,-,-,-,13%,100,Slash,40,120,-
+Bowser,Tilt,"Down Tilt","1 14 18 27 31 59",14,31,59,55,-,-,-,"13 / 10%",361,Slash,"15 / 12",100,-
+Bowser,Special,"Fire Breath","0 1 92",23,62,92,-,-,-,-,2%,60,Flame,12,50,-
+Bowser,Special,"Fire Breath (Air)","0 1 92",23,62,92,-,-,-,-,2%,60,Flame,12,50,-
+Bowser,Special,"Koopa Klaw","0 1 16 18 59",16,18,59,-,-,-,-,"10 / 12 / 4 / 11%","80 / 30 / 361","Slash / Normal","80 / 0 / 12 / 140 / 62","90 / 0 / 20 / 15 / 88",-
+Bowser,Special,"Koopa Klaw (Air)","0 1 16 18 59",16,18,59,-,-,-,-,"12 / 10 / 4 / 11%","80 / 30 / 361","Slash / Normal","80 / 0 / 12 / 140 / 62","90 / 0 / 20 / 15 / 88",-
+Bowser,Special,"Bowser Bomb","0 1 106",42,47,106,-,-,-,-,"21 / 8%",76,Normal,"45 / 60",72,-
+Bowser,Special,"Bowser Bomb (Air)","0 1",32,-,-,-,-,-,-,"21 / 8%",76,Normal,"45 / 60",72,-
+Bowser,Special,"Whirling Fortress","1 5 6 7 26 46 79",5,46,79,-,-,-,-,"13 / 5 / 3%","80 / 90 / 70","Normal / Slash","90 / 80 / 50","80 / 50",-
+Bowser,Special,"Whirling Fortress (Air)","1 5 6 7 34 46 49",5,46,49,-,-,-,-,"10 / 3 / 2%","80 / 84","Normal / Slash","80 / 50","60 / 20",-
+Bowser,Grab/Throw,Grab,"1 9 10 40",9,10,40,-,-,-,-,-,361,Grab,-,100,-
+Bowser,Grab/Throw,Dashgrab,"1 10 12 50",10,12,50,-,-,-,-,-,361,Grab,-,100,-
+Bowser,Grab/Throw,Pummel,"0 1 9",-,-,-,-,-,-,-,3%,80,Normal,-,100,30
+Bowser,Grab/Throw,"Forward throw","0 1 59",-,-,59,-,-,-,-,10%,45,Normal,60,50,-
+Bowser,Grab/Throw,"Back throw","0 1 39",-,-,39,-,-,-,-,10%,45,Normal,60,50,-
+Bowser,Grab/Throw,"Up throw","1 20 23 24 27 28 31 32 35 36 39 40 43 44 47 48 51 52 55",11,28,43,-,-,-,-,1%,-,Slash,-,100,-
+Bowser,Grab/Throw,"Down throw","1 39 47",-,-,39,-,-,-,-,12%,-,Normal,-,100,-
+Bowser,Dodge,Spotdodge,"1 42",4,24,42,-,-,-,-,,,,,,
+Bowser,Dodge,Airdodge,"1 49",2,-,49,-,-,-,-,,,,,,
+Bowser,Dodge,"Roll backwards","1 39",4,19,39,-,-,-,-,,,,,,
+Bowser,Dodge,"Roll forwards","1 39",4,19,39,-,-,-,-,,,,,,
+Bowser,Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+Bowser,Getups/Techs,"Getup-Attack (Stomach)","0 1 49",-,-,49,-,-,-,-,6%,361,Normal,80,50,-
+Bowser,Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Bowser,Getups/Techs,"Getup-Roll Forward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Bowser,Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Bowser,Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Bowser,Getups/Techs,Tech-Wall,"1 31",-,-,31,6,-,-,-,,,,,,
+Bowser,Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+Bowser,Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+Bowser,Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+Bowser,Getups/Techs,"Tech-Roll Backward","1 40",-,-,40,-,-,-,-,,,,,,
+Bowser,Edge,"Edge attack","0 1",-,-,-,-,-,-,-,"10 / 8%",361,Normal,-,100,90
+"Captain Falcon",Air,"Neutral Air","1 7 12 20 29 44",7,29,44,-,"15 (7 L-Cancelled)",-,"<4 33>","6 / 5 / 7%","74 / 82 / 78 / 361",Normal,"0 / 40",100,"40 / 0"
+"Captain Falcon",Air,"Up Air","1 6 10 11 13 33",6,13,33,30,"15 (7 L-Cancelled)",-,"<1 21>","13 / 12 / 10%","361 / 30",Normal,"10 / 8","100 / 80",-
+"Captain Falcon",Air,"Back Air","1 10 13 14 17 35",10,17,35,29,"18 (9 L-Cancelled)",-,"<7 20>","14 / 8%",361,Normal,"0 / 20",100,-
+"Captain Falcon",Air,"Forward Air","1 14 16 17 30 39",14,30,39,36,"19 (9 L-Cancelled)",-,"<7 34>","18 / 6%","32 / 361","Electric / Normal","24 / 35","100 / 80",-
+"Captain Falcon",Air,"Down Air","1 16 20 44",16,20,44,38,"24 (12 L-Cancelled)",-,"<4 35>",16%,"270 / 290",Normal,40,100,-
+"Captain Falcon",Grounded,"Jab 1","1 3 5 21",3,5,21,16,-,-,-,2%,80,Normal,-,100,20
+"Captain Falcon",Grounded,"Jab 2","1 4 6 19",4,6,19,18,-,-,-,3%,80,Normal,-,100,20
+"Captain Falcon",Grounded,"Jab 3","1 6 9 10 12 31",6,12,31,23,-,-,-,"8 / 6%",361,Normal,"20 / 0",100,-
+"Captain Falcon",Grounded,"Rapid Jabs","0 1 4 5",-,-,-,-,-,-,-,1%,361,Normal,-,70,-
+"Captain Falcon",Grounded,Dashattack,"1 7 9 10 16 39",7,16,39,38,-,-,-,"10 / 7%",361,Normal,"22 / 10","90 / 50",-
+"Captain Falcon",Grounded,"Up Smash","1 21 22 27 28 54",21,28,54,40,-,-,-,"8 / 14 / 13 / 12%","100 / 90 / 80",Normal,"0 / 30","100 / 105 / 128 / 110 / 126","100 / 80 / 0"
+"Captain Falcon",Grounded,"Forward Smash","1 18 21 64",18,21,64,60,-,-,-,20%,361,Fire,24,100,-
+"Captain Falcon",Grounded,"Down Smash","1 19 22 29 32 49",19,32,49,45,-,-,-,"18 / 16%",361,Normal,"30 / 20",100,-
+"Captain Falcon",Tilt,"Forward Tilt","1 9 11 29",9,11,29,-,-,-,-,11%,361,Normal,10,100,-
+"Captain Falcon",Tilt,"Forward Tilt (Up)","1 9 11 29",9,11,29,-,-,-,-,"11 / 12%",361,Normal,10,100,-
+"Captain Falcon",Tilt,"Forward Tilt (Down)","1 9 11 29",9,11,29,-,-,-,-,"10 / 11%",361,Normal,"0 / 10",100,-
+"Captain Falcon",Tilt,"Up Tilt","1 17 21 39",17,21,39,38,-,-,-,13%,361,Normal,50,80,-
+"Captain Falcon",Tilt,"Down Tilt","1 10 15 35",10,15,35,35,-,-,-,12%,"60 / 70 / 80",Normal,25,75,-
+"Captain Falcon",Special,"Falcon Punch","1 52 56 99",52,56,99,65,-,-,-,"25 / 27 / 23%",361,Flame,30,102,-
+"Captain Falcon",Special,"Falcon Punch (Air)","1 52 56 99",52,56,99,65,-,-,-,"23 / 25 / 27%",361,Flame,40,102,-
+"Captain Falcon",Special,"Raptor Boost","0 1 79",15,34,79,-,-,-,-,"0 / 7%","361 / 90 / 270","Inert / Flame","0 / 78 / 60","0 / 80 / 70",-
+"Captain Falcon",Special,"Raptor Boost (Air)","0 1 79",15,34,79,-,20,-,-,"7 / 0%","90 / 361 / 270","Flame / Inert","78 / 0 / 60","80 / 0 / 70",-
+"Captain Falcon",Special,"Facon kick","0 1 14 16 17 24 25 32 64",14,32,64,-,-,-,-,"15 / 12 / 9%","361 / 80 / 90","Flame / Normal","50 / 80","70 / 60 / 50 / 20",-
+"Captain Falcon",Special,"Falcon Kick (Air)","0 1 57",15,29,57,-,45,-,-,"15 / 13 / 11%",361,Flame,40,"70 / 65 / 60",-
+"Captain Falcon",Special,"Falcon Dive","0 1 64",13,33,64,-,-,-,-,"6 / 12 / 8%","0 / 361","Normal / Flame","70 / 40 / 100","50 / 82 / 10",-
+"Captain Falcon",Special,"Falcon Dive (Air)","0 1 64",13,33,64,-,-,-,-,"6 / 12 / 8%","0 / 361","Normal / Flame","70 / 40 / 100","50 / 82 / 10",-
+"Captain Falcon",Grab/Throw,Grab,"1 7 8 30",7,8,30,-,-,-,-,-,361,Grab,-,100,-
+"Captain Falcon",Grab/Throw,Dashgrab,"1 11 12 40",11,12,40,-,-,-,-,-,361,Grab,-,100,-
+"Captain Falcon",Grab/Throw,Pummel,"0 1 4",-,-,-,-,-,-,-,3%,80,Normal,-,100,30
+"Captain Falcon",Grab/Throw,"Forward throw","1 11 17 39",11,17,39,-,-,-,-,5%,80,Normal,70,100,-
+"Captain Falcon",Grab/Throw,"Back throw","1 12 19 49",12,19,49,-,-,-,-,5%,70,Normal,70,100,-
+"Captain Falcon",Grab/Throw,"Up throw","1 11 28 43",11,28,43,-,-,-,-,4%,80,Normal,60,100,-
+"Captain Falcon",Grab/Throw,"Down throw","0 1 39",-,-,39,-,-,-,-,7%,65,Normal,75,34,-
+"Captain Falcon",Dodge,Spotdodge,"1 32",3,20,32,-,-,-,-,,,,,,
+"Captain Falcon",Dodge,Airdodge,"1 49",-,-,49,-,-,-,-,,,,,,
+"Captain Falcon",Dodge,"Roll backwards","1 31",4,19,31,-,-,-,-,,,,,,
+"Captain Falcon",Dodge,"Roll forwards","1 31",4,19,31,-,-,-,-,,,,,,
+"Captain Falcon",Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+"Captain Falcon",Getups/Techs,"Getup-Attack (Stomach)","0 1 49",-,-,49,-,-,-,-,6%,361,Normal,80,50,-
+"Captain Falcon",Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+"Captain Falcon",Getups/Techs,"Getup-Roll Forward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+"Captain Falcon",Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+"Captain Falcon",Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+"Captain Falcon",Getups/Techs,Tech-Wall,"1 31",-,-,31,6,-,-,-,,,,,,
+"Captain Falcon",Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+"Captain Falcon",Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+"Captain Falcon",Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+"Captain Falcon",Getups/Techs,"Tech-Roll Backward","1 40",-,-,40,-,-,-,-,,,,,,
+"Captain Falcon",Edge,"Edge attack","0 1",-,-,-,-,-,-,-,"8 / 10%",361,Normal,-,100,90
+"Donkey Kong",Air,"Neutral Air","1 10 13 14 26 43",10,26,43,39,"20 (10 L-Cancelled)",-,"<10 38>","12 / 10%",361,Normal,-,100,-
+"Donkey Kong",Air,"Up Air","1 6 8 44",6,8,44,38,"25 (12 L-Cancelled)",-,"<6 12>",14%,90,Normal,32,90,-
+"Donkey Kong",Air,"Back Air","0 1 39",7,15,39,32,"15 (7 L-Cancelled)",-,"<7 19>","13 / 9%",361,Normal,"10 / 0",100,-
+"Donkey Kong",Air,"Forward Air","1 25 26 27 29 59",25,29,59,-,"30 (15 L-Cancelled)",-,"<1 59>",16%,"361 / 270",Normal,"20 / 50","100 / 80",-
+"Donkey Kong",Air,"Down Air","1 18 23 54",18,23,54,-,"31 (15 L-Cancelled)",-,"<3 49>","16 / 13%",270,Normal,"38 / 20",90,-
+"Donkey Kong",Grounded,"Jab 1","1 5 7 24",5,7,24,-,-,-,-,4%,361,Normal,-,100,-
+"Donkey Kong",Grounded,"Jab 2","1 4 10 33",4,10,33,-,-,-,-,6%,361,Normal,-,100,-
+"Donkey Kong",Grounded,Dashattack,"1 9 12 13 20 54",9,20,54,-,-,-,-,"11 / 9%",100,Normal,"115 / 0","15 / 100","0 / 120"
+"Donkey Kong",Grounded,"Up Smash","1 14 16 53",14,16,53,-,-,-,-,18%,90,Normal,40,93,-
+"Donkey Kong",Grounded,"Forward Smash","1 22 23 54",22,23,54,-,-,-,-,"19 / 21 / 20 / 18%",361,Normal,"18 / 22","100 / 94",-
+"Donkey Kong",Grounded,"Down Smash","1 10 13 55",10,13,55,-,-,-,-,"14 / 16%","98 / 115",Normal,35,100,-
+"Donkey Kong",Tilt,"Forward Tilt","1 8 11 33",8,11,33,-,-,-,-,10%,361,Normal,10,100,-
+"Donkey Kong",Tilt,"Forward Tilt (Up)","1 8 11 33",8,11,33,-,-,-,-,11%,361,Normal,10,100,-
+"Donkey Kong",Tilt,"Forward Tilt (Down)","1 8 11 33",8,11,33,-,-,-,-,9%,361,Normal,10,100,-
+"Donkey Kong",Tilt,"Up Tilt","1 6 11 39",6,11,39,-,-,-,-,"10 / 11 / 9%",100,Normal,40,"110 / 115 / 105",-
+"Donkey Kong",Tilt,"Down Tilt","1 6 9 22",17,21,46,-,-,-,-,"12 / 10 / 16 / 27%","80 / 361",Normal,"15 / 40 / 10","100 / 90",-
+"Donkey Kong",Special,Headbutt,"0 1 59",20,21,59,-,-,-,-,5%,270,Bury,-,100,100
+"Donkey Kong",Special,"Headbutt (Air)","0 1 59",20,21,59,-,-,-,-,10%,270,Normal,-,100,100
+"Donkey Kong",Special,"Hand Slap","0 1 60",19,31,60,-,-,-,-,11%,84,Normal,"20 / 30",100,110
+"Donkey Kong",Special,"Hand Slap (Air)","0 1 60",19,31,60,-,-,-,-,11%,84,Normal,"20 / 30",100,110
+"Donkey Kong",Special,"Spinning Kong","0 1 84",3,58,84,-,-,-,-,"12 / 8 / 3%",361,Normal,"60 / 50 / 10","100 / 70 / 90",-
+"Donkey Kong",Special,"Spinning Kong (Air)","0 1 84",2,66,84,-,-,-,-,"10 / 5 / 4 / 2%",361,Normal,"40 / 20 / 0","80 / 70 / 100",-
+"Donkey Kong",Grab/Throw,Grab,"1 8 9 30",8,9,30,-,-,-,-,-,361,Grab,-,100,-
+"Donkey Kong",Grab/Throw,Dashgrab,"1 10 11 40",10,11,40,-,-,-,-,-,361,Grab,-,100,-
+"Donkey Kong",Grab/Throw,Pummel,"0 1 9 10",-,-,-,-,-,-,-,3%,80,Normal,-,100,30
+"Donkey Kong",Grab/Throw,"Back throw","0 1 39",-,-,39,-,-,-,-,11%,135,Normal,60,65,-
+"Donkey Kong",Grab/Throw,"Up throw","0 1 43",-,-,43,-,-,-,-,9%,90,Normal,70,50,-
+"Donkey Kong",Grab/Throw,"Down throw","0 1 59",-,-,59,-,-,-,-,7%,361,Normal,60,45,-
+"Donkey Kong",Grab/Throw,cargo_fthrow,"0 1",-,-,-,-,-,-,-,8%,55,Normal,80,50,-
+"Donkey Kong",Grab/Throw,cargo_bthrow,"0 1",-,-,-,-,-,-,-,8%,125,Normal,80,50,-
+"Donkey Kong",Grab/Throw,cargo_uthrow,"0 1",-,-,-,-,-,-,-,7%,90,Normal,90,30,-
+"Donkey Kong",Grab/Throw,cargo_dthrow,"0 1",-,-,-,-,-,-,-,6%,40,Normal,65,26,-
+"Donkey Kong",Dodge,Spotdodge,"1 37",2,23,37,-,-,-,-,,,,,,
+"Donkey Kong",Dodge,Airdodge,"1 49",-,-,49,-,-,-,-,,,,,,
+"Donkey Kong",Dodge,"Roll backwards","1 31",4,19,31,-,-,-,-,,,,,,
+"Donkey Kong",Dodge,"Roll forwards","1 31",4,19,31,-,-,-,-,,,,,,
+"Donkey Kong",Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+"Donkey Kong",Getups/Techs,"Getup-Attack (Stomach)","0 1 49",-,-,49,-,-,-,-,6%,361,Normal,80,50,-
+"Donkey Kong",Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+"Donkey Kong",Getups/Techs,"Getup-Roll Forward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+"Donkey Kong",Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+"Donkey Kong",Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+"Donkey Kong",Getups/Techs,Tech-Wall,"1 30",-,-,30,6,-,-,-,,,,,,
+"Donkey Kong",Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+"Donkey Kong",Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+"Donkey Kong",Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+"Donkey Kong",Getups/Techs,"Tech-Roll Backward","1 40",-,-,40,-,-,-,-,,,,,,
+"Donkey Kong",Edge,"Edge attack","0 1",-,-,-,-,-,-,-,"10 / 8%",361,Normal,-,100,90
+"Dr. Mario",Air,"Neutral Air","1 3 19 20 31 45",3,31,45,-,"18 (9 L-Cancelled)",-,"<3 35>","10 / 14%","50 / 361",Normal,20,100,-
+"Dr. Mario",Air,"Up Air","1 4 9 33",4,9,33,30,"18 (9 L-Cancelled)",-,"<2 15>",10%,55,Normal,-,100,-
+"Dr. Mario",Air,"Back Air","1 6 8 9 16 28",6,16,28,-,"18 (9 L-Cancelled)",-,"<6 18>","8 / 7%","28 / 361",Normal,"43 / 20","65 / 100",-
+"Dr. Mario",Air,"Forward Air","1 18 22 74",18,22,74,60,"25 (12 L-Cancelled)",-,"<3 42>","17 / 16%",60,Normal,"50 / 40",100,-
+"Dr. Mario",Air,"Down Air","1 10 11 13 14 16 17 19 20 22 23 25 26 28 29 38",10,32,38,38,"24 (12 L-Cancelled)",-,"<6 35>",3%,80,Normal,-,100,30
+"Dr. Mario",Grounded,"Jab 1","1 2 3 15",2,3,15,-,-,-,-,4%,"83 / 85",Normal,-,100,30
+"Dr. Mario",Grounded,"Jab 2","1 2 3 17",2,3,17,-,-,-,-,3%,"83 / 85",Normal,-,100,30
+"Dr. Mario",Grounded,"Jab 3","1 4 8 21",4,8,21,-,-,-,-,6%,361,Normal,18,100,-
+"Dr. Mario",Grounded,Dashattack,"1 6 9 10 25 43",6,25,43,38,-,-,-,"9 / 8%","80 / 85",Normal,"70 / 60","30 / 50",-
+"Dr. Mario",Grounded,"Up Smash","1 9 10 11 39",9,11,39,-,-,-,-,"16 / 13%","83 / 259 / 76",Normal,35,95,-
+"Dr. Mario",Grounded,"Forward Smash","1 12 16 41",12,16,41,-,-,-,-,19%,361,Electric,30,97,-
+"Dr. Mario",Grounded,"Down Smash","1 5 6 14 15 37",5,15,37,-,-,-,-,"18 / 17 / 13 / 15%",361,Normal,"45 / 40",75,-
+"Dr. Mario",Tilt,"Forward Tilt","1 4 8 29",4,8,29,-,-,-,-,8%,361,Normal,10,100,-
+"Dr. Mario",Tilt,"Forward Tilt (Up)","1 4 8 29",4,8,29,-,-,-,-,9%,361,Normal,11,100,-
+"Dr. Mario",Tilt,"Forward Tilt (Down)","1 4 8 29",4,8,29,-,-,-,-,7%,361,Normal,9,100,-
+"Dr. Mario",Tilt,"Up Tilt","1 4 5 13 30",4,13,30,30,-,-,-,"10 / 8%","361 / 100",Normal,"20 / 30","95 / 118 / 120 / 122",-
+"Dr. Mario",Tilt,"Down Tilt","1 5 8 34",5,8,34,-,-,-,-,9%,150,Normal,20,82,-
+"Dr. Mario",Special,Megavitamins,"0 1 43",14,89,43,-,-,-,-,8%,361,Normal,5,25,-
+"Dr. Mario",Special,"Megavitamins (Air)","0 1 43",14,89,43,-,-,-,-,8%,361,Normal,5,25,-
+"Dr. Mario",Special,"Super Sheet","1 12 14 35",12,14,35,-,-,-,-,"10 / 12%",110,Reverse,30,80,-
+"Dr. Mario",Special,"Super Sheet (Air)","1 12 14 35",12,14,35,-,-,-,-,"12 / 10%",110,Reverse,30,80,-
+"Dr. Mario",Special,"Dr. Tornado","0 1 79",8,39,79,-,-,-,-,"3 / 2 / 4%","140 / 180 / 100 / 361",Normal,"0 / 40 / 75","0 / 120","40 / 5 / 0"
+"Dr. Mario",Special,"Dr. Tornado (Air)","0 1 79",8,39,79,-,-,-,-,"3 / 2 / 1 / 4%","140 / 160 / 100 / 361",Normal,"0 / 40 / 50 / 80","0 / 120","40 / 1 / 0"
+"Dr. Mario",Special,"Super Jump Punch","0 1 3 20 21 37",3,21,37,-,30,-,-,"5 / 2 / 3%","90 / 70 / 74 / 78 / 72 / 80",Coin,"0 / 40","100 / 160","150 / 140 / 180 / 120 / 90 / 0"
+"Dr. Mario",Special,"Super Jump Punch (Air)","0 1 37",3,21,37,-,30,-,-,"5 / 2 / 3%","70 / 90 / 74 / 78 / 72 / 80",Coin,"0 / 40","100 / 160","150 / 140 / 180 / 90 / 120 / 0"
+"Dr. Mario",Grab/Throw,Grab,"1 7 8 30",7,8,30,-,-,-,-,-,361,Grab,-,100,-
+"Dr. Mario",Grab/Throw,Dashgrab,"1 11 12 40",11,12,40,-,-,-,-,-,361,Grab,-,100,-
+"Dr. Mario",Grab/Throw,Pummel,"0 1 16",-,-,-,-,-,-,-,3%,80,Normal,-,100,30
+"Dr. Mario",Grab/Throw,"Forward throw","0 1 27",-,-,27,-,-,-,-,9%,45,Normal,60,72,-
+"Dr. Mario",Grab/Throw,"Back throw","0 1 66",-,-,66,-,-,-,-,12%,135,Normal,80,72,-
+"Dr. Mario",Grab/Throw,"Up throw","0 1 39",-,-,39,-,-,-,-,8%,90,Normal,70,80,-
+"Dr. Mario",Grab/Throw,"Down throw","0 1 39",-,-,39,-,-,-,-,6%,90,Normal,75,40,-
+"Dr. Mario",Dodge,Spotdodge,"1 22",2,15,22,-,-,-,-,,,,,,
+"Dr. Mario",Dodge,Airdodge,"1 48",-,-,48,-,-,-,-,,,,,,
+"Dr. Mario",Dodge,"Roll backwards","1 31",4,19,31,-,-,-,-,,,,,,
+"Dr. Mario",Dodge,"Roll forwards","1 31",4,19,31,-,-,-,-,,,,,,
+"Dr. Mario",Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+"Dr. Mario",Getups/Techs,"Getup-Attack (Stomach)","0 1 49",-,-,49,-,-,-,-,6%,361,Normal,"80 / 0","50 / 100","0 / 90"
+"Dr. Mario",Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+"Dr. Mario",Getups/Techs,"Getup-Roll Forward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+"Dr. Mario",Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+"Dr. Mario",Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+"Dr. Mario",Getups/Techs,Tech-Wall,"1 31",-,-,31,6,-,-,-,,,,,,
+"Dr. Mario",Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+"Dr. Mario",Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+"Dr. Mario",Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+"Dr. Mario",Getups/Techs,"Tech-Roll Backward","1 40",-,-,40,-,-,-,-,,,,,,
+"Dr. Mario",Edge,"Edge attack","0 1",-,-,-,-,-,-,-,"10 / 6 / 8%",361,Normal,-,100,90
+Falco,Air,"Neutral Air","1 4 7 8 31 49",4,31,49,42,"15 (7 L-Cancelled)",-,"<4 36>","12 / 9%",361,Normal,"10 / 0",100,-
+Falco,Air,"Up Air","1 8 9 11 14 39",8,14,39,36,"18 (9 L-Cancelled)",-,"<8 25>","6 / 10%","90 / 70","Slash / Normal","40 / 30 / 22","20 / 120",-
+Falco,Air,"Back Air","1 4 7 19 39",4,19,39,38,"20 (10 L-Cancelled)",-,"<4 22>","9 / 15%",361,Normal,-,100,-
+Falco,Air,"Forward Air","1 6 8 16 18 24 26 33 35 43 45 59",6,45,59,53,"22 (11 L-Cancelled)",-,"<6 48>","9 / 8 / 7 / 5 / 3%",361,Normal,"10 / 50",100,-
+Falco,Air,"Down Air","1 5 14 15 24 49",5,24,49,-,"18 (9 L-Cancelled)",-,"<5 29>","12 / 9%",290,Normal,"10 / 20",100,-
+Falco,Grounded,"Jab 1","1 2 3 17",2,3,17,16,-,-,-,4%,70,Normal,-,100,-
+Falco,Grounded,"Jab 2","1 2 3 19",2,3,19,18,-,-,-,4%,50,Normal,-,100,-
+Falco,Grounded,"Rapid Jabs","0 1 2 3",-,-,-,-,-,-,-,1%,80,Normal,10,80,-
+Falco,Grounded,Dashattack,"1 4 7 8 17 39",4,17,39,36,-,-,-,"9 / 6%",72,Normal,"35 / 20",90,-
+Falco,Grounded,"Up Smash","1 7 10 11 15 43",7,15,43,-,-,-,-,"14 / 12%","95 / 361",Normal,"25 / 10",100,-
+Falco,Grounded,"Forward Smash","1 12 16 17 21 39",12,21,39,-,-,-,-,"17 / 14%","110 / 361",Normal,"40 / 10","90 / 105",-
+Falco,Grounded,"Down Smash","1 6 10 49",6,10,49,46,-,-,-,"16 / 13%","25 / 80",Normal,20,70,-
+Falco,Tilt,"Forward Tilt","1 5 9 26",5,9,26,-,-,-,-,9%,361,Normal,-,100,-
+Falco,Tilt,"Forward Tilt (Up)","1 5 9 26",5,9,26,-,-,-,-,9%,361,Normal,-,100,-
+Falco,Tilt,"Forward Tilt (Down)","1 5 9 26",5,9,26,-,-,-,-,9%,361,Normal,-,100,-
+Falco,Tilt,"Up Tilt","1 5 11 23",5,11,23,23,-,-,-,9%,"97 / 90",Normal,30,120,-
+Falco,Tilt,"Down Tilt","1 7 9 29",7,9,29,28,-,-,-,13%,75,Slash,25,125,-
+Falco,Special,Blaster,"0 1 57",23,122,57,-,-,-,-,3%,361,Normal,-,100,5
+Falco,Special,"Blaster (Air)","0 1 42",13,112,42,-,-,-,-,3%,361,Normal,-,100,5
+Falco,Special,"Falco Phantasm","0 1 59",18,21,59,-,-,-,-,7%,65,Slash,74,60,-
+Falco,Special,"Falco Phantasm (Air)","0 1 59",18,21,59,-,20,-,-,7%,270,Slash,70,70,-
+Falco,Special,Reflector,"0 1 3",1,1,3,-,-,-,-,8%,84,Electric,110,50,-
+Falco,Special,"Reflector (Air)","0 1 3",1,1,3,-,-,-,-,8%,84,Electric,110,50,-
+Falco,Special,"Fire Bird","0 1 84",43,64,84,-,6,-,-,16%,80,Flame,80,60,-
+Falco,Special,"Fire Bird (Air)","0 1 84",43,64,84,-,6,-,-,16%,80,Flame,80,60,-
+Falco,Grab/Throw,Grab,"1 7 8 30",7,8,30,-,-,-,-,-,361,Grab,-,100,-
+Falco,Grab/Throw,Dashgrab,"1 12 13 40",12,13,40,-,-,-,-,-,361,Grab,-,100,-
+Falco,Grab/Throw,Pummel,"0 1 4",-,-,-,-,-,-,-,3%,80,Normal,-,100,30
+Falco,Grab/Throw,"Forward throw","1 10 33",10,10,33,-,-,-,-,4%,60,Normal,60,180,-
+Falco,Grab/Throw,"Back throw","0 1 38",15,21,38,-,-,-,-,2%,124,Normal,80,85,-
+Falco,Grab/Throw,"Up throw","0 1 38",18,24,38,-,-,-,-,2%,90,Normal,75,110,-
+Falco,Grab/Throw,"Down throw","0 1 43",23,31,43,-,-,-,-,1%,270,Normal,150,40,-
+Falco,Dodge,Spotdodge,"1 22",2,15,22,-,-,-,-,,,,,,
+Falco,Dodge,Airdodge,"1 49",-,-,49,-,-,-,-,,,,,,
+Falco,Dodge,"Roll backwards","1 31",4,19,31,-,-,-,-,,,,,,
+Falco,Dodge,"Roll forwards","1 31",4,19,31,-,-,-,-,,,,,,
+Falco,Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+Falco,Getups/Techs,"Getup-Attack (Stomach)","0 1 49",-,-,49,-,-,-,-,6%,361,Normal,80,50,-
+Falco,Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Falco,Getups/Techs,"Getup-Roll Forward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Falco,Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Falco,Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Falco,Getups/Techs,Tech-Wall,"1 31",-,-,31,6,-,-,-,,,,,,
+Falco,Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+Falco,Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+Falco,Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+Falco,Getups/Techs,"Tech-Roll Backward","1 40",-,-,40,-,-,-,-,,,,,,
+Falco,Edge,"Edge attack","0 1",-,-,-,-,-,-,-,"8 / 6%",361,Normal,-,100,90
+Fox,Air,"Neutral Air","1 4 7 8 31 49",4,31,49,42,"15 (7 L-Cancelled)",-,"<4 36>","12 / 9%",361,Normal,"10 / 0",100,-
+Fox,Air,"Up Air","1 8 9 11 14 39",8,14,39,-,"18 (9 L-Cancelled)",-,"<8 25>","5 / 13%","92 / 85",Normal,"0 / 40","120 / 116","30 / 0"
+Fox,Air,"Back Air","1 4 7 19 39",4,19,39,38,"20 (10 L-Cancelled)",-,"<4 22>","15 / 9%",361,Normal,-,100,-
+Fox,Air,"Forward Air","1 6 8 16 18 24 26 33 35 43 45 59",6,45,59,53,"22 (11 L-Cancelled)",-,"<6 48>","7 / 5 / 6 / 4 / 3%",361,Normal,"10 / 50",100,-
+Fox,Air,"Down Air","1 5 6 8 9 11 12 14 15 17 18 20 21 23 24 49",5,24,49,-,"18 (9 L-Cancelled)",-,"<5 33>","2 / 3%",290,Normal,-,100,30
+Fox,Grounded,"Jab 1","1 2 3 17",2,3,17,16,-,-,-,4%,70,Normal,-,100,-
+Fox,Grounded,"Jab 2","1 2 3 19",2,3,19,18,-,-,-,4%,70,Normal,-,100,-
+Fox,Grounded,"Rapid Jabs","0 1 2 3",-,-,-,-,-,-,-,1%,78,Normal,10,80,-
+Fox,Grounded,Dashattack,"1 4 7 8 17 39",4,17,39,36,-,-,-,"7 / 5%",72,Normal,"35 / 20",90,-
+Fox,Grounded,"Up Smash","1 7 9 10 17 41",7,17,41,-,-,-,-,"18 / 13%","80 / 361",Normal,"30 / 10","112 / 100",-
+Fox,Grounded,"Forward Smash","1 12 16 17 22 39",12,22,39,-,-,-,-,"15 / 12%",361,Normal,"10 / 2","105 / 100",-
+Fox,Grounded,"Down Smash","1 6 10 49",6,10,49,46,-,-,-,"12 / 15%","361 / 25",Normal,20,65,-
+Fox,Tilt,"Forward Tilt","1 5 8 26",5,8,26,-,-,-,-,9%,361,Normal,-,100,-
+Fox,Tilt,"Forward Tilt (Up)","1 5 8 26",5,8,26,-,-,-,-,9%,361,Normal,-,100,-
+Fox,Tilt,"Forward Tilt (Down)","1 5 8 26",5,8,26,-,-,-,-,9%,361,Normal,-,100,-
+Fox,Tilt,"Up Tilt","1 5 11 23",5,11,23,23,-,-,-,"12 / 9%","110 / 80 / 84",Normal,18,140,-
+Fox,Tilt,"Down Tilt","1 7 9 29",7,9,29,28,-,-,-,10%,"70 / 90 / 80",Normal,25,125,-
+Fox,Special,Blaster,"0 1 36",10,44,36,-,-,-,-,3%,361,Normal,-,-,-
+Fox,Special,"Blaster (Air)","0 1 36",10,44,36,-,-,-,-,3%,361,Normal,-,-,-
+Fox,Special,"Fox Illusion","0 1 63",22,25,63,-,-,-,-,7%,80,Slash,68,40,-
+Fox,Special,"Fox Illusion (Air)","0 1 63",22,25,63,-,20,-,-,7%,80,Slash,68,60,-
+Fox,Special,Reflector,"1 3",1,1,3,-,-,-,-,5%,-,Electric,-,100,80
+Fox,Special,"Reflector (Air)","1 3",1,1,3,-,-,-,-,5%,-,Electric,-,100,80
+Fox,Special,"Fire Fox","0 1 92",20,72,92,-,6,-,-,"2 / 14%","70 / 80",Flame,"40 / 60","40 / 60",-
+Fox,Special,"Fire Fox (Air)","0 1 92",20,72,92,-,6,-,-,"2 / 14%","70 / 80",Flame,"40 / 60","40 / 60",-
+Fox,Grab/Throw,Grab,"1 7 8 30",7,8,30,-,-,-,-,-,361,Grab,-,100,-
+Fox,Grab/Throw,Dashgrab,"1 12 13 40",12,13,40,-,-,-,-,-,361,Grab,-,100,-
+Fox,Grab/Throw,Pummel,"0 1 4",-,-,-,-,-,-,-,3%,80,Normal,-,100,30
+Fox,Grab/Throw,"Forward throw","1 10 33",10,10,33,-,-,-,-,4%,55,Normal,10,100,140
+Fox,Grab/Throw,"Back throw","0 1 38",15,21,38,-,-,-,-,2%,124,Normal,80,85,-
+Fox,Grab/Throw,"Up throw","0 1 38",18,24,38,-,-,-,-,2%,90,Normal,75,110,-
+Fox,Grab/Throw,"Down throw","0 1 43",23,31,43,-,-,-,-,1%,270,Normal,150,40,-
+Fox,Dodge,Spotdodge,"1 22",2,15,22,-,-,-,-,,,,,,
+Fox,Dodge,Airdodge,"1 49",-,-,49,-,-,-,-,,,,,,
+Fox,Dodge,"Roll backwards","1 31",4,19,31,-,-,-,-,,,,,,
+Fox,Dodge,"Roll forwards","1 31",4,19,31,-,-,-,-,,,,,,
+Fox,Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+Fox,Getups/Techs,"Getup-Attack (Stomach)","0 1 49",-,-,49,-,-,-,-,6%,361,Normal,80,50,-
+Fox,Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Fox,Getups/Techs,"Getup-Roll Forward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Fox,Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Fox,Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Fox,Getups/Techs,Tech-Wall,"1 31",-,-,31,6,-,-,-,,,,,,
+Fox,Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+Fox,Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+Fox,Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+Fox,Getups/Techs,"Tech-Roll Backward","1 40",-,-,40,-,-,-,-,,,,,,
+Fox,Edge,"Edge attack","0 1",-,-,-,-,-,-,-,"8 / 6%",361,Normal,-,100,90
+Fox,Edge,Jump,"0 1",-,-,-,-,-,-,-,,,,,,
+Ganondorf,Air,"Neutral Air","1 7 8 20 21 44",7,21,44,-,"25 (12 L-Cancelled)",-,"<4 25>",12%,"60 / 55 / 65 / 361",Normal,"30 / 50",100,-
+Ganondorf,Air,"Up Air","1 6 10 11 13 14 16 33",6,16,33,30,"25 (12 L-Cancelled)",-,"<1 21>","13 / 12 / 10 / 8 / 6%","361 / 30 / 0",Normal,"35 / 30 / 20","100 / 80 / 70",-
+Ganondorf,Air,"Back Air","1 10 15 35",10,15,35,29,"25 (12 L-Cancelled)",-,"<7 18>",16%,361,Normal,"10 / 30",100,-
+Ganondorf,Air,"Forward Air","1 14 19 44",14,19,44,35,"25 (12 L-Cancelled)",-,"<7 33>",17%,361,Normal,60,80,-
+Ganondorf,Air,"Down Air","1 16 20 44",16,20,44,38,"35 (17 L-Cancelled)",-,"<4 35>",22%,270,Electric,50,100,-
+Ganondorf,Grounded,"Jab 1","1 3 5 21",3,5,21,19,-,-,-,"8 / 7%",361,Electric,30,100,-
+Ganondorf,Grounded,Dashattack,"1 7 9 10 16 39",7,16,39,38,-,-,-,"14 / 10%","115 / 110",Normal,"40 / 25","80 / 60",-
+Ganondorf,Grounded,"Up Smash","1 21 23 26 29 54",21,29,54,40,-,-,-,"22 / 19%","361 / 90 / 80",Normal,"50 / 40",80,-
+Ganondorf,Grounded,"Forward Smash","1 20 24 66",20,24,66,60,-,-,-,22%,70,Darkness,40,83,-
+Ganondorf,Grounded,"Down Smash","1 19 22 29 32 49",19,32,49,47,-,-,-,"8 / 14 / 12%","160 / 120",Normal,"0 / 60","100 / 110","90 / 130 / 0"
+Ganondorf,Tilt,"Forward Tilt","1 9 11 29",9,11,29,-,-,-,-,"13 / 12 / 11%",361,Normal,20,100,-
+Ganondorf,Tilt,"Forward Tilt (Up)","1 9 11 29",9,11,29,-,-,-,-,"13 / 14 / 12%",361,Normal,20,100,-
+Ganondorf,Tilt,"Forward Tilt (Down)","1 9 11 29",9,11,29,-,-,-,-,"11 / 12 / 10%",361,Normal,20,100,-
+Ganondorf,Tilt,"Up Tilt","1 81 83 114",81,83,114,113,-,-,-,27%,361,Fire,110,80,-
+Ganondorf,Tilt,"Down Tilt","1 10 12 35",10,12,35,35,-,-,-,12%,"60 / 80 / 70",Normal,30,100,-
+Ganondorf,Special,"Warlock Punch","1 70 72 119",70,72,119,117,-,-,-,"32 / 30 / 34%",361,Darkness,30,100,-
+Ganondorf,Special,"Gerudo Dragon","0 1 79",15,34,79,-,-,-,-,"0 / 17 / 16%","361 / 105 / 70","Inert / Darkness","0 / 60 / 50","0 / 69 / 65",-
+Ganondorf,Special,"Gerudo Dragon (Air)","0 1 79",15,34,79,-,40,-,-,"17 / 0 / 16%","105 / 361 / 70","Darkness / Inert","60 / 0 / 50","69 / 0 / 65",-
+Ganondorf,Special,"Wizard's Foot","0 1 14 34 77",14,34,77,-,-,-,-,"15 / 12%","361 / 80","Darkness / Normal",60,"85 / 20",-
+Ganondorf,Special,"Wizard's Foot (Air)","0 1 58",15,29,58,-,57,-,-,"14 / 12%","290 / 80","Darkness / Normal","50 / 60","80 / 20",-
+Ganondorf,Special,"Dark Dive","0 1 64",13,33,64,-,30,-,-,"1 / 15%",361,Electric,"60 / 40","100 / 82",-
+Ganondorf,Special,"Dark Dive (Air)","0 1 64",13,33,64,-,30,-,-,"1 / 15%",361,Electric,"60 / 40","100 / 82",-
+Ganondorf,Grab/Throw,Grab,"1 7 8 30",7,8,30,-,-,-,-,-,361,Grab,-,100,-
+Ganondorf,Grab/Throw,Dashgrab,"1 11 13 40",11,13,40,-,-,-,-,-,361,Grab,-,100,-
+Ganondorf,Grab/Throw,Pummel,"0 1 4",-,-,-,-,-,-,-,3%,80,Normal,-,100,30
+Ganondorf,Grab/Throw,"Forward throw","1 11 17 39",11,17,39,-,-,-,-,5%,80,Normal,70,100,-
+Ganondorf,Grab/Throw,"Back throw","1 12 19 49",12,19,49,-,-,-,-,5%,70,Normal,70,100,-
+Ganondorf,Grab/Throw,"Up throw","1 11 28 43",11,28,43,-,-,-,-,4%,80,Normal,60,100,-
+Ganondorf,Grab/Throw,"Down throw","0 1 39",-,-,39,-,-,-,-,7%,100,Normal,75,36,-
+Ganondorf,Dodge,Spotdodge,"1 32",2,20,32,-,-,-,-,,,,,,
+Ganondorf,Dodge,Airdodge,"1 49",-,-,49,-,-,-,-,,,,,,
+Ganondorf,Dodge,"Roll backwards","1 31",4,19,31,-,-,-,-,,,,,,
+Ganondorf,Dodge,"Roll forwards","1 31",4,19,31,-,-,-,-,,,,,,
+Ganondorf,Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+Ganondorf,Getups/Techs,"Getup-Attack (Stomach)","0 1 49",-,-,49,-,-,-,-,6%,361,Normal,80,50,-
+Ganondorf,Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Ganondorf,Getups/Techs,"Getup-Roll Forward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Ganondorf,Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Ganondorf,Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Ganondorf,Getups/Techs,Tech-Wall,"1 31",-,-,31,6,-,-,-,,,,,,
+Ganondorf,Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+Ganondorf,Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+Ganondorf,Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+Ganondorf,Getups/Techs,"Tech-Roll Backward","1 40",-,-,40,-,-,-,-,,,,,,
+Ganondorf,Edge,"Edge attack","0 1",-,-,-,-,-,-,-,"8 / 10%",361,Normal,-,100,90
+"Ice Climbers",Air,"Neutral Air","1 6 23 49",6,23,49,46,"20 (10 L-Cancelled)",-,"<6 29>",8%,361,Normal,20,100,-
+"Ice Climbers",Air,"Up Air","1 6 9 10 23 39",6,23,39,30,"32 (16 L-Cancelled)",-,"<6 26>","9 / 7%",70,Normal,10,140,-
+"Ice Climbers",Air,"Back Air","1 8 11 39",8,11,39,36,"20 (10 L-Cancelled)",-,"<8 18>","12 / 11%",361,Normal,30,"110 / 100",-
+"Ice Climbers",Air,"Forward Air","1 19 22 59",19,22,59,55,"20 (10 L-Cancelled)",-,"<2 55>","9 / 11 / 10%","70 / 270",Normal,40,100,-
+"Ice Climbers",Air,"Down Air","1 3 52 65",3,52,65,64,"25 (12 L-Cancelled)",-,"<3 57>",9%,361,Normal,-,110,36
+"Ice Climbers",Grounded,"Jab 1","1 4 7 29",4,7,29,16,-,-,-,2%,45,Normal,-,100,-
+"Ice Climbers",Grounded,"Jab 2","1 5 7 29",5,7,29,19,-,-,-,4%,45,Normal,-,100,30
+"Ice Climbers",Grounded,Dashattack,"1 11 12 41",11,12,41,38,-,-,-,9%,80,Normal,90,40,-
+"Ice Climbers",Grounded,"Up Smash","1 14 18 49",14,18,49,44,-,-,-,11%,83,Normal,50,128,-
+"Ice Climbers",Grounded,"Forward Smash","1 13 14 47",13,14,47,47,-,-,-,"10 / 14%",361,Normal,40,105,-
+"Ice Climbers",Grounded,"Down Smash","1 6 11 39",6,11,39,36,-,-,-,12%,361,Normal,50,110,-
+"Ice Climbers",Tilt,"Forward Tilt","1 6 9 31",6,9,31,28,-,-,-,8%,361,Normal,26,100,-
+"Ice Climbers",Tilt,"Forward Tilt (Up)","1 6 9 31",6,9,31,28,-,-,-,8%,361,Normal,26,100,-
+"Ice Climbers",Tilt,"Forward Tilt (Down)","1 6 9 29 30 31",6,9,31,28,-,-,-,"8 / 1%","361 / 95",Normal,"26 / 15","100 / 20",-
+"Ice Climbers",Tilt,"Up Tilt","1 8 9 11 12 14 15 17 18 20 21 23 24 26 49",8,26,49,42,-,-,-,"1 / 7%","95 / 90",Normal,"15 / 40","20 / 100",-
+"Ice Climbers",Tilt,"Down Tilt","1 8 11 34",8,11,34,29,-,-,-,5%,70,Normal,30,100,-
+"Ice Climbers",Special,"Ice Shot","0 1 59",15,20,59,-,-,-,-,"9 / 5%","80 / 361","Normal / Freezing","80 / 5","60 / 50",-
+"Ice Climbers",Special,"Squall Hammer","0 1 89",12,55,89,-,-,-,-,"4 / 2%",70,Normal,5,130,-
+"Ice Climbers",Special,"Squall Hammer (Air)","0 1 89",12,55,89,-,-,-,-,"4 / 2%",70,Normal,5,130,-
+"Ice Climbers",Special,Blizzard,"0 1 79",16,66,79,-,-,-,-,"3 / 2 / 1%","70 / 361",Freezing,5,"320 / 130 / 25",-
+"Ice Climbers",Special,"Blizzard (Air)","0 1 79",16,66,79,-,-,-,-,"3 / 2 / 1%","70 / 361",Freezing,5,"320 / 130 / 25",-
+"Ice Climbers",Special,Belay,"0 1 89",17,59,89,-,-,-,-,16%,80,Normal,60,60,-
+"Ice Climbers",Special,"Belay (Air)","0 1 89",17,59,89,-,-,-,-,16%,80,Normal,60,60,-
+"Ice Climbers",Grab/Throw,Grab,"1 7 8 30",7,8,30,-,-,-,-,-,361,Grab,-,100,-
+"Ice Climbers",Grab/Throw,Dashgrab,"1 7 8 40",7,8,40,-,-,-,-,-,361,Grab,-,100,-
+"Ice Climbers",Grab/Throw,Pummel,"0 1 12 13",-,-,-,-,-,-,-,3%,80,Normal,-,100,30
+"Ice Climbers",Grab/Throw,"Forward throw","1 24 27 49",24,27,49,-,-,-,-,6%,361,Normal,-,-,90
+"Ice Climbers",Grab/Throw,"Back throw","0 1 39",-,-,39,-,-,-,-,7%,120,Normal,80,30,-
+"Ice Climbers",Grab/Throw,"Up throw","1 25 30 59",25,30,59,-,-,-,-,6%,361,Normal,-,-,90
+"Ice Climbers",Grab/Throw,"Down throw","0 1 49",-,-,49,-,-,-,-,6%,80,Normal,70,40,-
+"Ice Climbers",Dodge,Spotdodge,"1 27",2,18,27,-,-,-,-,,,,,,
+"Ice Climbers",Dodge,Airdodge,"1 48",-,-,48,-,-,-,-,,,,,,
+"Ice Climbers",Dodge,"Roll backwards","1 31",4,19,31,-,-,-,-,,,,,,
+"Ice Climbers",Dodge,"Roll forwards","1 31",4,19,31,-,-,-,-,,,,,,
+"Ice Climbers",Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+"Ice Climbers",Getups/Techs,"Getup-Attack (Stomach)","0 1 49",-,-,49,-,-,-,-,6%,361,Normal,80,50,-
+"Ice Climbers",Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+"Ice Climbers",Getups/Techs,"Getup-Roll Forward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+"Ice Climbers",Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+"Ice Climbers",Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+"Ice Climbers",Getups/Techs,Tech-Wall,"1 25",-,-,25,6,-,-,-,,,,,,
+"Ice Climbers",Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+"Ice Climbers",Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+"Ice Climbers",Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+"Ice Climbers",Getups/Techs,"Tech-Roll Backward","1 40",-,-,40,-,-,-,-,,,,,,
+"Ice Climbers",Edge,"Edge attack","0 1",-,-,-,-,-,-,-,"10 / 8 / 6%",361,Normal,-,100,90
+Jigglypuff,Air,"Neutral Air","1 6 7 8 28 49",6,28,49,-,"20 (10 L-Cancelled)",-,"<6 28>","12 / 9%",361,Normal,10,"70 / 80",-
+Jigglypuff,Air,"Up Air","1 9 12 39",9,12,39,38,"20 (10 L-Cancelled)",-,"<9 36>",12%,90,Normal,30,100,-
+Jigglypuff,Air,"Back Air","1 9 12 39",9,12,39,31,"20 (10 L-Cancelled)",-,"<9 24>",12%,361,Normal,10,100,-
+Jigglypuff,Air,"Forward Air","1 7 8 9 22 39",7,22,39,35,"20 (10 L-Cancelled)",-,"<7 33>","10 / 12 / 7%",361,Normal,10,"100 / 80",-
+Jigglypuff,Air,"Down Air","1 5 6 8 9 11 12 14 15 17 18 20 21 23 24 26 27 49",5,27,49,-,"30 (15 L-Cancelled)",-,"<5 39>",2%,"270 / 30",Normal,"20 / 10",100,-
+Jigglypuff,Grounded,"Jab 1","1 5 6 17",5,6,17,16,-,-,-,3%,361,Normal,8,50,-
+Jigglypuff,Grounded,"Jab 2","1 5 6 19",5,6,19,16,-,-,-,3%,361,Normal,16,50,-
+Jigglypuff,Grounded,Dashattack,"1 4 8 9 14 39",4,14,39,39,-,-,-,"12 / 8%",361,Normal,"16 / 8",100,-
+Jigglypuff,Grounded,"Up Smash","1 7 10 54",7,10,54,45,-,-,-,"15 / 14%",90,Normal,20,110,-
+Jigglypuff,Grounded,"Forward Smash","1 12 15 16 20 44",12,20,44,-,-,-,-,"17 / 13%",361,Normal,"10 / 6","118 / 105",-
+Jigglypuff,Grounded,"Down Smash","1 9 10 54",9,10,54,48,-,-,-,12%,-,Normal,34,66,-
+Jigglypuff,Tilt,"Forward Tilt","1 6 9 27",6,9,27,-,-,-,-,10%,361,Normal,8,100,-
+Jigglypuff,Tilt,"Forward Tilt (Up)","1 6 9 27",6,9,27,-,-,-,-,10%,361,Normal,8,100,-
+Jigglypuff,Tilt,"Forward Tilt (Down)","1 6 9 27",6,9,27,-,-,-,-,10%,361,Normal,8,100,-
+Jigglypuff,Tilt,"Up Tilt","1 8 9 10 14 23",8,14,23,-,-,-,-,"9 / 8%","96 / 88",Normal,40,120,-
+Jigglypuff,Tilt,"Down Tilt","1 10 12 39",-,-,-,-,-,-,-,10%,20,Normal,30,120,-
+Jigglypuff,Special,"Neutral special  (Air)","0 1",-,-,-,-,-,-,-,10%,90,Normal,30,102,-
+Jigglypuff,Special,Pound,"1 12 27 45",12,27,45,-,-,-,-,13%,"90 / 120",Normal,52,75,-
+Jigglypuff,Special,"Pound (Air)","0 1 45",12,27,45,-,-,-,-,13%,"120 / 90",Normal,52,75,-
+Jigglypuff,Special,Rest,"1 249",1,1,249,-,-,-,-,28%,361,Flame,78,120,-
+Jigglypuff,Special,"Rest (Air)","1 249",1,1,249,-,-,-,-,28%,361,Flame,78,120,-
+Jigglypuff,Special,Sing,"1 28 125 179",28,125,179,-,-,-,-,-,361,Sleep,-,100,-
+Jigglypuff,Special,"Sing (Air)","0 1 179",28,125,179,-,-,-,-,-,361,Sleep,-,100,-
+Jigglypuff,Grab/Throw,Grab,"1 7 8 30",7,8,30,-,-,-,-,-,361,Grab,-,100,-
+Jigglypuff,Grab/Throw,Dashgrab,"1 11 12 40",11,12,40,-,-,-,-,-,361,Grab,-,100,-
+Jigglypuff,Grab/Throw,Pummel,"0 1 10 11",-,-,-,-,-,-,-,3%,361,Normal,-,100,30
+Jigglypuff,Grab/Throw,"Forward throw","1 10 35",10,10,35,-,-,-,-,7%,361,Normal,40,110,-
+Jigglypuff,Grab/Throw,"Back throw","0 1 49",-,-,49,-,-,-,-,10%,135,Normal,90,25,-
+Jigglypuff,Grab/Throw,"Up throw","0 1 41",-,-,41,-,-,-,-,11%,90,Normal,130,25,-
+Jigglypuff,Grab/Throw,"Down throw","1 10 12 23 25 36 38 49 51 62 64 75 84",10,75,84,-,-,-,-,"1 / 3%",40,Normal,"0 / 10",100,"25 / 0"
+Jigglypuff,Dodge,Spotdodge,"1 27",2,15,27,-,-,-,-,,,,,,
+Jigglypuff,Dodge,Airdodge,"1 49",-,-,49,-,-,-,-,,,,,,
+Jigglypuff,Dodge,"Roll backwards","1 34",4,19,34,-,-,-,-,,,,,,
+Jigglypuff,Dodge,"Roll forwards","1 34",2,18,34,-,-,-,-,,,,,,
+Jigglypuff,Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+Jigglypuff,Getups/Techs,"Getup-Attack (Stomach)","0 1 49",-,-,49,-,-,-,-,"6 / 8%",361,Normal,80,50,-
+Jigglypuff,Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Jigglypuff,Getups/Techs,"Getup-Roll Forward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Jigglypuff,Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Jigglypuff,Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Jigglypuff,Getups/Techs,Tech-Wall,"1 31",-,-,31,6,-,-,-,,,,,,
+Jigglypuff,Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+Jigglypuff,Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+Jigglypuff,Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+Jigglypuff,Getups/Techs,"Tech-Roll Backward","1 40",-,-,40,-,-,-,-,,,,,,
+Jigglypuff,Edge,"Edge attack","0 1",-,-,-,-,-,-,-,6%,361,Normal,-,100,90
+Kirby,Air,"Neutral Air","1 10 11 17 18 29 30 34 79",10,34,79,50,"15 (7 L-Cancelled)",-,"<10 37>","12 / 10 / 8 / 6%",361,Normal,10,80,-
+Kirby,Air,"Up Air","1 11 13 39",11,13,39,36,"15 (7 L-Cancelled)",-,"<11 16>",15%,361,Normal,30,100,-
+Kirby,Air,"Back Air","1 6 8 9 20 43",6,20,43,36,"15 (7 L-Cancelled)",-,"<6 27>","14 / 10%",361,Normal,"10 / 0",100,-
+Kirby,Air,"Forward Air","1 10 11 17 18 25 26 49",10,26,49,40,"20 (10 L-Cancelled)",-,"<10 37>","5 / 8%","60 / 361",Normal,30,"70 / 130",-
+Kirby,Air,"Down Air","1 18 19 21 22 24 25 27 28 30 31 33 34 59",18,34,59,55,"20 (10 L-Cancelled)",-,"<18 47>",3%,270,Normal,30,100,-
+Kirby,Grounded,"Jab 1","1 3 4 17",3,4,17,16,-,-,-,3%,361,Normal,8,50,-
+Kirby,Grounded,"Jab 2","1 2 3 19",2,3,19,16,-,-,-,4%,70,Normal,8,50,-
+Kirby,Grounded,"Rapid Jabs","1 2 3 19",2,3,19,-,-,-,-,1%,65,Normal,8,50,-
+Kirby,Grounded,Dashattack,"1 9 15 16 43 63",9,43,63,60,-,-,-,"8 / 5%",105,Fire,"70 / 50",66,-
+Kirby,Grounded,"Up Smash","1 13 14 15 16 23 49",13,23,49,-,-,-,-,"15 / 13 / 14 / 12%","75 / 88 / 50","Slash / Normal","30 / 20 / 10","118 / 110 / 100 / 50",-
+Kirby,Grounded,"Forward Smash","1 13 15 16 21 49",13,21,49,-,-,-,-,"15 / 13%","361 / 75",Normal,"24 / 18",96,-
+Kirby,Grounded,"Down Smash","1 7 9 10 22 55",7,22,55,50,-,-,-,"14 / 12 / 10%","76 / 28",Normal,"30 / 20","100 / 80",-
+Kirby,Tilt,"Forward Tilt","1 5 8 32",5,8,32,28,-,-,-,11%,361,Normal,8,100,-
+Kirby,Tilt,"Forward Tilt (Up)","1 5 8 32",5,8,32,28,-,-,-,11%,361,Normal,8,100,-
+Kirby,Tilt,"Forward Tilt (Down)","1 5 8 32",5,8,32,28,-,-,-,11%,361,Normal,8,100,-
+Kirby,Tilt,"Up Tilt","1 4 5 7 23",4,7,23,-,-,-,-,"8 / 6%","92 / 88",Normal,40,"118 / 114",-
+Kirby,Tilt,"Down Tilt","1 4 7 29",4,7,29,-,-,-,-,10%,20,Normal,40,30,-
+Kirby,Special,Swallow,"0 1 79",17,60,79,-,-,-,-,18%,361,Normal,60,30,-
+Kirby,Special,"Swallow (air)","0 1 79",17,60,79,-,-,-,-,18%,361,Normal,60,30,-
+Kirby,Special,"Hammer Hit","1 22 28 59",22,28,59,-,-,-,-,"16 / 23%",60,Normal,"50 / 65","50 / 76",-
+Kirby,Special,"Hammer Spin (Air)","0 1 69",30,47,78,-,-,-,-,18%,70,Normal,65,55,-
+Kirby,Special,"Stone (Air)","0 1 78",30,47,78,-,-,-,-,18%,70,Normal,65,55,-
+Kirby,Special,"Final Cutter","0 1 23 24 47 49 90",23,49,90,-,-,-,-,"6 / 8 / 2%","361 / 88 / 96 / 275",Slash,"60 / 0","30 / 100","0 / 117 / 102 / 100"
+Kirby,Special,"Final Cutter (Air)","0 1 34",2,26,34,-,-,-,-,"6 / 8 / 2%","361 / 88 / 96 / 275",Slash,"60 / 0","30 / 100","0 / 102 / 117 / 100"
+Kirby,Grab/Throw,Grab,"1 7 8 30",7,8,30,-,-,-,-,-,361,Grab,-,100,-
+Kirby,Grab/Throw,Dashgrab,"1 11 12 40",11,12,40,-,-,-,-,-,361,Grab,-,100,-
+Kirby,Grab/Throw,Pummel,"0 1 9",-,-,-,-,-,-,-,3%,80,Normal,-,100,30
+Kirby,Grab/Throw,"Forward throw","0 1 61",-,-,61,-,-,-,-,8%,65,Normal,40,100,-
+Kirby,Grab/Throw,"Back throw","0 1 49",-,-,49,-,-,-,-,8%,120,Normal,80,50,-
+Kirby,Grab/Throw,"Up throw","0 1 79",-,-,79,-,-,-,-,10%,90,Normal,70,70,-
+Kirby,Grab/Throw,"Down throw","1 10 11 14 15 18 19 22 23 26 27 30 31 34 35 38 39 42 43 46 47 56 87",10,56,87,-,-,-,-,"0 / 1%","270 / 90",Normal,"0 / 10",100,"10 / 0"
+Kirby,Dodge,Spotdodge,"1 22",2,15,22,-,-,-,-,,,,,,
+Kirby,Dodge,Airdodge,"1 49",-,-,49,-,-,-,-,,,,,,
+Kirby,Dodge,"Roll backwards","1 31",4,19,31,-,-,-,-,,,,,,
+Kirby,Dodge,"Roll forwards","1 31",4,19,31,-,-,-,-,,,,,,
+Kirby,Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+Kirby,Getups/Techs,"Getup-Attack (Stomach)","0 1 49",-,-,49,-,-,-,-,6%,361,Normal,80,50,-
+Kirby,Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Kirby,Getups/Techs,"Getup-Roll Forward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Kirby,Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Kirby,Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Kirby,Getups/Techs,Tech-Wall,"1 31",-,-,31,6,-,-,-,,,,,,
+Kirby,Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+Kirby,Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+Kirby,Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+Kirby,Getups/Techs,"Tech-Roll Backward","1 40",-,-,40,-,-,-,-,,,,,,
+Kirby,Edge,"Edge attack","0 1",-,-,-,-,-,-,-,3%,361,Normal,-,-,-
+Kirby,Edge,"Ganondorf Special","0 1",-,-,-,-,-,-,-,10%,"20 / 90",Normal,30,"120 / 102",-
+Kirby,Edge,"Link Special","0 1",-,-,-,-,-,-,-,"1 / 2 / 4 / 5%","10 / 361",Slash,"12 / 40 / 50","40 / 100",-
+Link,Air,Hookshot,"1 59",11,18,59,-,30,-,-,,,,,,
+Link,Air,"Neutral Air","1 4 5 41",4,39,41,36,"15 (7 L-Cancelled)",-,"<4 31>","11 / 9 / 8%",361,Normal,15,100,-
+Link,Air,"Up Air","1 5 7 8 49 69",5,49,69,60,"30 (15 L-Cancelled)",-,"<5 55>","16 / 12%",80,Slash,25,85,-
+Link,Air,"Back Air","1 6 9 18 23 39",6,23,39,30,"15 (7 L-Cancelled)",-,"<1 28>",7%,361,Normal,"0 / 15",100,-
+Link,Air,"Forward Air","1 14 16 30 33 55",14,33,55,-,"15 (7 L-Cancelled)",-,"<1 50>","13 / 8%",361,Slash,"5 / 0","100 / 90",-
+Link,Air,"Down Air","1 13 15 16 64 89",13,64,89,80,"50 (25 L-Cancelled)",-,"<13 64>","22 / 20 / 19%",65,Slash,"50 / 40",80,-
+Link,Grounded,"Jab 1","1 6 8 24",6,8,24,20,-,-,-,5%,361,Slash,10,60,-
+Link,Grounded,"Jab 2","1 6 7 21",6,7,21,17,-,-,-,3%,361,Slash,10,60,-
+Link,Grounded,"Jab 3","1 6 10 49",6,10,49,32,-,-,-,6%,361,Slash,10,100,-
+Link,Grounded,"Rapid Jabs","1 2 3 34",9,10,34,-,-,-,-,1%,-,Slash,15,"60 / 50 / 40",-
+Link,Grounded,Dashattack,"1 7 12 53",7,12,53,40,-,-,-,"11 / 9 / 12%","70 / 90 / 60 / 80",Slash,10,100,-
+Link,Grounded,"Up Smash","1 11 15 26 28 41 43 60",11,43,60,52,-,-,-,"4 / 2 / 9 / 10%","98 / 90 / 80",Slash,"40 / 0 / 90","100 / 80","33 / 26 / 30 / 37 / 40 / 0"
+Link,Grounded,"Forward Smash","1 15 18 49",15,18,49,-,-,-,-,"14 / 13%",361,Slash,30,"85 / 83",-
+Link,Grounded,"Forward Smash 2","1 59",10,13,59,50,-,-,-,,,,,,
+Link,Grounded,"Down Smash","1 9 11 21 23 49",16,19,39,-,-,-,-,"14 / 15 / 13%",361,Slash,"2 / 5",90,-
+Link,Tilt,"Up Tilt","1 9 15 29",9,15,29,-,-,-,-,9%,"95 / 85",Slash,30,"122 / 123 / 124 / 130",-
+Link,Tilt,"Down Tilt","1 14 16 39",18,78,42,-,-,-,-,"1 / 5 / 6 / 7 / 8 / 9 / 10 / 11 / 12 / 13 / 14 / 18%",70,Slash,8,50,-
+Link,Special,Boomerang,"0 1 45",27,168,45,-,-,-,-,"6 / 3 / 17 / 15%","65 / 70","Slash / Normal","55 / 25","30 / 26",-
+Link,Special,"Boomerang (Air)","0 1 45",27,168,45,-,-,-,-,"6 / 3 / 17 / 15%","65 / 70","Slash / Normal","55 / 25","30 / 26",-
+Link,Special,Bomb,"0 1 316",39,316,316,-,-,-,-,"4 / 8 / 7 / 6 / 1%",70,Flame,60,"60 / 30",-
+Link,Special,"Bomb (Air)","0 1 316",39,316,316,-,-,-,-,"6 / 5%",70,Flame,60,30,-
+Link,Special,"Spin Attack","1 8 14 15 41 79",8,41,79,-,-,-,-,"15 / 5%","361 / 0",Slash,"32 / 60","95 / 100",-
+Link,Special,"Spin Attack (Air)","1 8 13 16 20 22 27 31 37 46 50 79",8,50,79,-,24,-,-,"6 / 4 / 2%","80 / 75 / 86 / 90 / 361",Slash,"0 / 40","100 / 160","68 / 72 / 60 / 64 / 55 / 58 / 43 / 46 / 0"
+Link,Grab/Throw,Grab,"1 11 13 17 85",11,17,85,-,-,-,-,-,361,Grab,-,100,-
+Link,Grab/Throw,Dashgrab,"1 12 17 95",12,17,95,-,-,-,-,-,361,Grab,-,100,-
+Link,Grab/Throw,Pummel,"0 1 9",-,-,-,-,-,-,-,3%,361,Normal,-,100,-
+Link,Grab/Throw,"Forward throw","1 12 15 39",12,15,39,-,-,-,-,3%,361,Normal,-,-,90
+Link,Grab/Throw,"Back throw","1 11 15 39",11,15,39,-,-,-,-,3%,361,Normal,-,-,90
+Link,Grab/Throw,"Up throw","1 26 49",26,26,49,-,-,-,-,4%,20,Slash,50,100,-
+Link,Grab/Throw,"Down throw","1 22 23 49",22,23,49,-,-,-,-,2%,361,Normal,-,-,90
+Link,Dodge,Spotdodge,"1 22",2,15,22,-,-,-,-,,,,,,
+Link,Dodge,Airdodge,"1 49",-,-,49,-,-,-,-,,,,,,
+Link,Dodge,"Roll backwards","1 37",4,19,37,-,-,-,-,,,,,,
+Link,Dodge,"Roll forwards","1 37",4,19,37,-,-,-,-,,,,,,
+Link,Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+Link,Getups/Techs,"Getup-Attack (Stomach)","0 1 49",-,-,49,-,-,-,-,6%,361,Slash,80,50,-
+Link,Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Link,Getups/Techs,"Getup-Roll Forward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Link,Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Link,Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Link,Getups/Techs,Tech-Wall,"1 31",-,-,31,6,-,-,-,,,,,,
+Link,Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+Link,Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+Link,Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+Link,Getups/Techs,"Tech-Roll Backward","1 40",-,-,40,-,-,-,-,,,,,,
+Link,Edge,"Edge attack","0 1",-,-,-,-,-,-,-,8%,361,Normal,-,100,90
+Luigi,Air,"Neutral Air","1 3 6 7 31 45",3,31,45,-,"15 (7 L-Cancelled)",-,"<3 35>","15 / 8%",90,Normal,20,100,-
+Luigi,Air,"Up Air","1 5 7 33",5,7,33,30,"15 (7 L-Cancelled)",-,"<2 15>",13%,55,Normal,-,100,-
+Luigi,Air,"Back Air","1 6 17 28",6,17,28,-,"15 (7 L-Cancelled)",-,"<6 18>",11%,361,Normal,12,100,-
+Luigi,Air,"Forward Air","1 7 10 34",7,10,34,33,"25 (12 L-Cancelled)",-,"<2 19>",12%,361,Normal,43,100,-
+Luigi,Air,"Down Air","1 10 14 32",10,14,32,29,"18 (9 L-Cancelled)",-,"<6 23>",16%,"270 / 361",Normal,20,100,-
+Luigi,Grounded,"Jab 1","1 2 3 15",2,3,15,-,-,-,-,3%,"83 / 85",Normal,-,100,20
+Luigi,Grounded,"Jab 2","1 2 3 17",2,3,17,-,-,-,-,2%,"85 / 83",Normal,-,100,20
+Luigi,Grounded,"Jab 3","1 4 5 29",4,5,29,22,-,-,-,5%,361,Normal,10,100,-
+Luigi,Grounded,Dashattack,"1 4 10 16 22 29 37 63",4,37,63,59,-,-,-,2%,361,Normal,2,100,-
+Luigi,Grounded,"Up Smash","1 9 11 39",9,11,39,-,-,-,-,17%,110,Normal,35,98,-
+Luigi,Grounded,"Forward Smash","1 12 13 41",12,13,41,-,-,-,-,13%,55,Slash,20,135,-
+Luigi,Grounded,"Down Smash","1 5 6 14 15 37",5,15,37,-,-,-,-,17%,90,Normal,40,80,-
+Luigi,Tilt,"Forward Tilt","1 4 8 32",4,8,32,32,-,-,-,10%,361,Normal,2,100,-
+Luigi,Tilt,"Forward Tilt (Up)","1 4 8 32",4,8,32,32,-,-,-,10%,361,Normal,2,100,-
+Luigi,Tilt,"Forward Tilt (Down)","1 4 8 32",4,8,32,32,-,-,-,10%,361,Normal,2,100,1
+Luigi,Tilt,"Up Tilt","1 4 12 29",4,12,29,-,-,-,-,9%,100,Normal,30,"127 / 125 / 123",-
+Luigi,Tilt,"Down Tilt","1 5 8 34",5,44,74,-,-,-,-,9%,80,Normal,10,80,-
+Luigi,Special,Fireball,"0 1 46",23,62,92,-,-,-,-,"25 / 5 / 9 / 26%",361,Flame,20,"100 / 80",-
+Luigi,Special,"Green Missile (Air)","0 1 92",23,62,92,-,-,-,-,"25 / 5 / 9 / 26%",361,Flame,20,"100 / 80",-
+Luigi,Special,"Luigi Cyclone","1 6 29 43 79",6,43,79,-,-,-,-,"8 / 12%",90,Normal,50,80,-
+Luigi,Special,"Luigi Cyclone (Air)","1 6 29 43 79",6,43,79,-,-,-,-,"9 / 12%",90,Normal,50,80,-
+Luigi,Special,"Super Jump Punch","1 5 6 23 39",5,23,39,-,40,-,-,"25 / 1%","90 / 80","Flame / Coin","70 / 1","73 / 1",-
+Luigi,Special,"Super Jump Punch (Air)","1 5 39",5,23,39,-,40,-,-,20%,90,Flame,58,72,-
+Luigi,Grab/Throw,Grab,"1 7 8 30",7,8,30,-,-,-,-,-,361,Grab,-,100,-
+Luigi,Grab/Throw,Dashgrab,"1 11 12 40",11,12,40,-,-,-,-,-,361,Grab,-,100,-
+Luigi,Grab/Throw,Pummel,"0 1 16",-,-,-,-,-,-,-,3%,80,Normal,-,100,30
+Luigi,Grab/Throw,"Forward throw","0 1 27",-,-,27,-,-,-,-,8%,45,Normal,60,65,-
+Luigi,Grab/Throw,"Back throw","0 1 66",-,-,66,-,-,-,-,10%,135,Normal,80,65,-
+Luigi,Grab/Throw,"Up throw","0 1 39",-,-,39,-,-,-,-,7%,100,Normal,70,72,-
+Luigi,Grab/Throw,"Down throw","0 1 39",-,-,39,-,-,-,-,7%,110,Normal,75,30,-
+Luigi,Dodge,Spotdodge,"1 22",2,15,22,-,-,-,-,,,,,,
+Luigi,Dodge,Airdodge,"1 48",-,-,48,-,-,-,-,,,,,,
+Luigi,Dodge,"Roll backwards","1 31",4,19,31,-,-,-,-,,,,,,
+Luigi,Dodge,"Roll forwards","1 31",4,19,31,-,-,-,-,,,,,,
+Luigi,Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+Luigi,Getups/Techs,"Getup-Attack (Stomach)","0 1 49",-,-,49,-,-,-,-,6%,361,Normal,"80 / 0","50 / 100","0 / 90"
+Luigi,Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Luigi,Getups/Techs,"Getup-Roll Forward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Luigi,Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Luigi,Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Luigi,Getups/Techs,Tech-Wall,"1 31",-,-,31,6,-,-,-,,,,,,
+Luigi,Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+Luigi,Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+Luigi,Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+Luigi,Getups/Techs,"Tech-Roll Backward","1 40",-,-,40,-,-,-,-,,,,,,
+Luigi,Edge,"Edge attack","0 1",-,-,-,-,-,-,-,"10 / 6 / 8%",361,Normal,-,100,90
+Luigi,Edge,Taunt,"1 70",45,45,70,-,-,-,-,,,,,,
+Mario,Air,"Neutral Air","1 3 6 7 32 45",3,32,45,-,"16 (8 L-Cancelled)",-,"<3 35>","12 / 8%",361,Normal,"20 / 15",100,-
+Mario,Air,"Up Air","1 4 9 33",4,9,33,30,"15 (7 L-Cancelled)",-,"<2 15>",11%,55,Normal,-,100,-
+Mario,Air,"Back Air","1 6 8 9 17 28",6,17,28,-,"15 (7 L-Cancelled)",-,"<6 18>","11 / 9%",361,Normal,"10 / 7",100,-
+Mario,Air,"Forward Air","1 18 22 74",18,22,74,60,"21 (10 L-Cancelled)",-,"<3 42>",15%,280,Normal,30,70,-
+Mario,Air,"Down Air","1 10 11 13 14 16 17 19 20 22 23 25 26 28 29 38",10,29,38,38,"23 (11 L-Cancelled)",-,"<6 32>",2%,94,Normal,-,100,30
+Mario,Grounded,"Jab 1","1 2 3 15",2,3,15,-,-,-,-,3%,"83 / 85",Normal,-,100,20
+Mario,Grounded,"Jab 2","1 2 3 17",2,3,17,-,-,-,-,2%,"83 / 85",Normal,-,100,20
+Mario,Grounded,"Jab 3","1 4 8 21",4,8,21,-,-,-,-,5%,361,Normal,10,100,-
+Mario,Grounded,Dashattack,"1 6 9 10 25 48",6,25,48,38,-,-,-,"9 / 7%","110 / 120",Normal,"70 / 45","50 / 30",-
+Mario,Grounded,"Up Smash","1 9 11 39",9,11,39,-,-,-,-,15%,83,Normal,32,97,-
+Mario,Grounded,"Forward Smash","1 12 16 41",12,16,41,-,-,-,-,"10 / 18 / 11%",361,"Normal / Fire",25,"96 / 95",-
+Mario,Grounded,"Down Smash","1 5 6 14 37",5,14,37,-,-,-,-,"16 / 10 / 12%",361,Normal,"40 / 35",75,-
+Mario,Tilt,"Forward Tilt","1 5 7 32",5,7,32,-,-,-,-,9%,361,Normal,6,100,-
+Mario,Tilt,"Forward Tilt (Up)","1 5 7 32",5,7,32,-,-,-,-,10%,361,Normal,6,100,-
+Mario,Tilt,"Forward Tilt (Down)","1 5 7 32",5,7,32,-,-,-,-,8%,361,Normal,6,100,1
+Mario,Tilt,"Up Tilt","1 4 12 30",4,12,30,30,-,-,-,8%,96,Normal,26,"125 / 120 / 122",-
+Mario,Tilt,"Down Tilt","1 5 8 34",5,8,34,-,-,-,-,"9 / 8%",80,Normal,10,80,-
+Mario,Special,Fireball,"0 1 43",14,89,43,-,-,-,-,6%,361,Flame,5,25,-
+Mario,Special,Cape,"1 12 14 35",12,14,35,-,-,-,-,"10 / 8%",110,Reverse,30,80,-
+Mario,Special,"Cape (Air)","1 12 14 35",12,14,35,-,-,-,-,"7 / 9%",110,Reverse,30,80,-
+Mario,Special,"Mario Tornado","0 1 79",8,39,79,-,-,-,-,"2 / 1 / 5%","140 / 180 / 100 / 80",Normal,"0 / 40 / 60","0 / 115","40 / 1 / 0"
+Mario,Special,"Mario Tornado (Air)","0 1 79",8,39,79,-,-,-,-,"2 / 1 / 3%","140 / 160 / 270 / 100 / 80",Normal,"0 / 40 / 60 / 10 / 50 / 70","0 / 120","40 / 1 / 0"
+Mario,Special,"Super Jump Punch","1 3 6 7 14 22 23 24 37",3,24,37,-,-,-,-,"5 / 1 / 3%","90 / 70 / 78 / 74 / 72 / 50",Coin,"0 / 40","100 / 140","130 / 150 / 110 / 90 / 120 / 0"
+Mario,Special,"Super Jump Punch (Air)","1 3 6 7 14 15 22 23 24 37",3,24,37,-,-,-,-,"5 / 1 / 3%","70 / 90 / 74 / 78 / 72 / 50",Coin,"0 / 40","100 / 140","130 / 110 / 150 / 90 / 120 / 0"
+Mario,Grab/Throw,Grab,"1 7 8 30",7,8,30,-,-,-,-,-,361,Grab,-,100,-
+Mario,Grab/Throw,Dashgrab,"1 11 12 40",11,12,40,-,-,-,-,-,361,Grab,-,100,-
+Mario,Grab/Throw,Pummel,"0 1 16",-,-,-,-,-,-,-,3%,80,Normal,-,100,30
+Mario,Grab/Throw,"Forward throw","0 1 27",-,-,27,-,-,-,-,9%,45,Normal,60,65,-
+Mario,Grab/Throw,"Back throw","0 1 66",-,-,66,-,-,-,-,12%,135,Normal,80,65,-
+Mario,Grab/Throw,"Up throw","0 1 39",-,-,39,-,-,-,-,8%,90,Normal,70,72,-
+Mario,Grab/Throw,"Down throw","0 1 39",-,-,39,-,-,-,-,6%,90,Normal,75,30,-
+Mario,Dodge,Spotdodge,"1 22",2,15,22,-,-,-,-,,,,,,
+Mario,Dodge,Airdodge,"1 48",-,-,48,-,-,-,-,,,,,,
+Mario,Dodge,"Roll backwards","1 31",4,19,31,-,-,-,-,,,,,,
+Mario,Dodge,"Roll forwards","1 31",4,19,31,-,-,-,-,,,,,,
+Mario,Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+Mario,Getups/Techs,"Getup-Attack (Stomach)","0 1 49",-,-,49,-,-,-,-,6%,361,Normal,"80 / 0","50 / 100","0 / 90"
+Mario,Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Mario,Getups/Techs,"Getup-Roll Forward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Mario,Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Mario,Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Mario,Getups/Techs,Tech-Wall,"1 31",-,-,31,6,-,-,-,,,,,,
+Mario,Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+Mario,Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+Mario,Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+Mario,Getups/Techs,"Tech-Roll Backward","1 40",-,-,40,-,-,-,-,,,,,,
+Mario,Edge,"Edge attack","0 1",-,-,-,-,-,-,-,"10 / 6 / 8%",361,Normal,-,100,90
+Marth,Air,"Neutral Air","1 6 7 15 21 49",6,21,49,-,"15 (7 L-Cancelled)",-,"<6 24>","4 / 10%","100 / 90 / 361","Slash / Normal","30 / 50","40 / 80",-
+Marth,Air,"Up Air","1 5 8 45",5,8,45,-,"15 (7 L-Cancelled)",-,"<5 26>","9 / 13 / 10%","80 / 90","Slash / Normal","20 / 18 / 40 / 30",70,-
+Marth,Air,"Back Air","1 7 11 39",7,11,39,35,"24 (12 L-Cancelled)",-,"<1 31>","9 / 13 / 10%",361,Slash,"25 / 10 / 30",70,-
+Marth,Air,"Forward Air","1 4 7 33",4,7,33,30,"15 (7 L-Cancelled)",-,"<1 26>","9 / 10 / 13%","361 / 67",Slash,"20 / 30 / 42",70,-
+Marth,Air,"Down Air","1 6 9 59",6,9,59,-,"32 (16 L-Cancelled)",-,"<6 47>","9 / 13 / 10%","361 / 290 / 80",Slash,"20 / 40 / 30",70,-
+Marth,Grounded,"Jab 1","1 4 7 27",4,7,27,26,-,-,-,"4 / 6%",361,Slash,"20 / 30","50 / 60",-
+Marth,Grounded,"Jab 2","1 4 8 27",4,8,27,26,-,-,-,"4 / 6%",361,Slash,"20 / 30","50 / 60",-
+Marth,Grounded,Dashattack,"1 12 15 49",12,15,49,40,-,-,-,"12 / 11 / 9%","110 / 361","Slash / Normal","70 / 35","55 / 60",-
+Marth,Grounded,"Up Smash","1 13 16 54",13,16,54,46,-,-,-,"8 / 18 / 15%","70 / 90","Normal / Slash","0 / 60 / 30","100 / 80","100 / 0"
+Marth,Grounded,"Forward Smash","1 10 13 49",10,13,49,48,-,-,-,"14 / 20%",361,Slash,"60 / 80",70,-
+Marth,Grounded,"Down Smash","1 5 7 20 22 64",5,22,64,62,-,-,-,"11 / 16%","75 / 361 / 70",Slash,"70 / 16 / 20 / 15 / 30","72 / 100",-
+Marth,Tilt,"Forward Tilt","1 7 10 35",7,10,35,-,-,-,-,"9 / 13%",361,Slash,"30 / 60",70,-
+Marth,Tilt,"Up Tilt","1 6 8 9 12 39",6,12,39,32,-,-,-,"9 / 12 / 8 / 13 / 10%","110 / 361 / 85",Slash,"40 / 50 / 30","120 / 100 / 118 / 116",-
+Marth,Tilt,"Down Tilt","1 7 9 49",7,9,49,20,-,-,-,"8 / 10 / 9%",30,Slash,"20 / 50 / 40 / 25",40,-
+Marth,Special,"Sword Dance (2, Neutral/Side/Down)","0 1 40",14,16,40,-,-,-,-,5%,"80 / 105 / 50 / 70",Slash,16,100,-
+Marth,Special,"Sword Dance (2, Up)","0 1 40",12,15,40,-,-,-,-,5%,"90 / 79 / 85",Slash,"60 / 85 / 30 / 70",40,-
+Marth,Special,"Sword Dance (3, Side/Neutral)","0 1 46",11,14,46,-,-,-,-,10%,361,Slash,-,160,-
+Marth,Special,"Sword Dance (3, Up)","0 1 46",13,17,46,-,-,-,-,6%,80,Slash,60,60,-
+Marth,Special,"Sword Dance (3, Down)","0 1 46",15,18,46,-,-,-,-,12%,270,Slash,50,100,-
+Marth,Special,"Sword Dance (4, Side/Neutral)","0 1 50",23,26,50,-,-,-,-,14%,361,Slash,15,120,-
+Marth,Special,"Sword Dance (4, Up)","0 1 50",20,25,50,-,-,-,-,10%,80,Slash,40,130,-
+Marth,Special,"Sword Dance (4, Down)","0 1 60",16,20,29,-,-,-,-,"7 / 28%",361,Slash,"30 / 34 / 40",100,-
+Marth,Special,"Sword Dance (1, Side)","0 1 29",6,8,29,-,-,-,-,4%,"96 / 76 / 80 / 85",Slash,55,25,-
+Marth,Special,"Sword Dance (1, Side) (Air)","0 1 29",6,8,29,-,-,-,-,4%,"80 / 76 / 85 / 96",Slash,55,25,-
+Marth,Special,Counter,"0 1 59",5,29,59,-,-,-,-,7%,361,Slash,90,35,-
+Marth,Special,"Counter (Air)","0 1 59",5,29,59,-,-,-,-,7%,361,Slash,90,35,-
+Marth,Special,"Dolphin Slash","0 1 39",5,11,39,-,-,-,-,"10 / 13%","74 / 361",Slash,"60 / 80",70,-
+Marth,Special,"Dolphin Slash (Air)","0 1 39",5,11,39,-,-,-,-,"6 / 7%","74 / 361","Normal / Slash",20,90,-
+Marth,Grab/Throw,Grab,"1 7 8 30",7,8,30,-,-,-,-,-,361,Grab,-,100,-
+Marth,Grab/Throw,Dashgrab,"1 10 11 40",10,11,40,-,-,-,-,-,361,Grab,-,100,-
+Marth,Grab/Throw,Pummel,"0 1 6",-,-,-,-,-,-,-,3%,80,Normal,-,100,30
+Marth,Grab/Throw,"Forward throw","0 1 31",-,-,31,-,-,-,-,4%,50,Normal,70,45,-
+Marth,Grab/Throw,"Back throw","0 1 44",-,-,44,-,-,-,-,4%,117,Normal,70,60,-
+Marth,Grab/Throw,"Up throw","0 1 44",-,-,44,-,-,-,-,4%,93,Normal,60,130,-
+Marth,Grab/Throw,"Down throw","0 1 42",-,-,42,-,-,-,-,5%,135,Normal,65,50,-
+Marth,Dodge,Spotdodge,"1 27",2,18,27,-,-,-,-,,,,,,
+Marth,Dodge,Airdodge,"1 49",4,29,49,-,-,-,-,,,,,,
+Marth,Dodge,"Roll backwards","1 35",4,23,35,-,-,-,-,,,,,,
+Marth,Dodge,"Roll forwards","1 35",4,19,35,-,-,-,-,,,,,,
+Marth,Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+Marth,Getups/Techs,"Getup-Attack (Stomach)","0 1 49",-,-,49,-,-,-,-,6%,361,Slash,80,50,-
+Marth,Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Marth,Getups/Techs,"Getup-Roll Forward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Marth,Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Marth,Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Marth,Getups/Techs,Tech-Wall,"1 31",-,-,31,6,-,-,-,,,,,,
+Marth,Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+Marth,Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+Marth,Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+Marth,Getups/Techs,"Tech-Roll Backward","1 40",-,-,40,-,-,-,-,,,,,,
+Marth,Edge,"Edge attack","0 1",-,-,-,-,-,-,-,"8 / 6%",361,Normal,-,100,90
+Mewtwo,Air,"Neutral Air","1 5 6 9 10 13 14 17 18 21 22 25 26 29 30 33 34 37 38 54",5,38,54,42,"26 (13 L-Cancelled)",-,"<5 36>","1 / 2 / 4%","110 / 160 / 361",Electric,"20 / 70","100 / 80","40 / 20 / 0"
+Mewtwo,Air,"Up Air","1 9 11 37",9,11,37,35,"20 (10 L-Cancelled)",-,"<4 32>","10 / 12 / 14%",55,Normal,-,100,-
+Mewtwo,Air,"Back Air","1 12 15 31",12,15,31,-,"28 (14 L-Cancelled)",-,"<3 29>","13 / 9 / 11%",361,Normal,-,100,-
+Mewtwo,Air,"Forward Air","1 5 7 39",5,7,39,36,"25 (12 L-Cancelled)",-,"<1 34>",14%,84,Darkness,40,100,-
+Mewtwo,Air,"Down Air","1 18 21 57",18,21,57,47,"28 (14 L-Cancelled)",-,"<6 44>","15 / 16 / 14%",270,Normal,10,100,-
+Mewtwo,Grounded,"Jab 1","1 8 29",8,8,29,26,-,-,-,6%,83,Darkness,-,100,20
+Mewtwo,Grounded,"Rapid Jabs","1 6 13 20 27 34 41 48 50",6,48,50,-,-,-,-,2%,70,Darkness,-,70,-
+Mewtwo,Grounded,Dashattack,"1 10 14 15 29 49",10,29,49,38,-,-,-,"9 / 6%","110 / 80",Darkness,"80 / 40",60,-
+Mewtwo,Grounded,"Up Smash","1 9 10 13 14 17 18 21 22 25 26 29 30 33 34 79",9,34,79,70,-,-,-,"1 / 10%","170 / 95 / 90 / 80",Darkness,"0 / 40","100 / 118","18 / 40 / 8 / 0"
+Mewtwo,Grounded,"Forward Smash","1 18 19 59",18,19,59,52,-,-,-,"12 / 20%",361,Darkness,"30 / 21","80 / 75",-
+Mewtwo,Grounded,"Down Smash","1 20 21 59",20,21,59,38,-,-,-,15%,361,Darkness,20,103,-
+Mewtwo,Tilt,"Forward Tilt","1 6 8 31",6,8,31,29,-,-,-,"10 / 5 / 8%",361,Slash,"20 / 0 / 10",100,-
+Mewtwo,Tilt,"Forward Tilt (Up)","1 6 8 31",6,8,31,29,-,-,-,"10 / 8 / 5%",361,Slash,"20 / 10 / 0",100,-
+Mewtwo,Tilt,"Forward Tilt (Down)","1 6 8 31",6,8,31,29,-,-,-,"8 / 5 / 10%",361,Slash,"10 / 0 / 20",100,-
+Mewtwo,Tilt,"Up Tilt","1 6 7 11 31",6,11,31,28,-,-,-,"5 / 10 / 8 / 6%","361 / 110 / 78",Normal,"0 / 70 / 50 / 40 / 60","80 / 115 / 114",-
+Mewtwo,Tilt,"Down Tilt","1 5 7 29",17,17,26,-,-,-,-,"2 / 3 / 5 / 8 / 11 / 14 / 17 / 20 / 25%","80 / 361","Electric / Darkness","20 / 15 / 25 / 30 / 35 / 40 / 45 / 50","100 / 35 / 40 / 45 / 50 / 55 / 60 / 65 / 70",-
+Mewtwo,Special,Confusion,"1 12 15 55",12,15,55,-,-,-,-,10%,280,Normal,50,16,-
+Mewtwo,Special,"Confusion (Air)","1 12 15 55",12,15,55,-,-,-,-,10%,280,Normal,50,16,-
+Mewtwo,Special,Disable,"1 15 21 41",15,21,41,-,-,-,-,1%,361,Stun,100,100,-
+Mewtwo,Special,"Disable (Air)","1 15 21 41",15,21,41,-,-,-,-,1%,361,Stun,100,100,-
+Mewtwo,Special,Teleport,"1 32",7,17,32,-,-,-,-,,,,,,
+Mewtwo,Special,"Teleport (Air)","1 32",7,17,32,-,-,-,-,,,,,,
+Mewtwo,Grab/Throw,Grab,"1 7 8 30",7,8,30,-,-,-,-,-,361,Grab,-,100,-
+Mewtwo,Grab/Throw,Dashgrab,"1 9 10 40",15,24,49,-,-,-,-,5%,80,Normal,40,"104 / 105",-
+Mewtwo,Dodge,Spotdodge,"1 37",2,21,37,-,-,-,-,,,,,,
+Mewtwo,Dodge,Airdodge,"1 39",-,-,39,-,-,-,-,,,,,,
+Mewtwo,Dodge,"Roll backwards","1 37",4,20,37,-,-,-,-,,,,,,
+Mewtwo,Dodge,"Roll forwards","1 37",4,22,37,-,-,-,-,,,,,,
+Mewtwo,Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+Mewtwo,Getups/Techs,"Getup-Attack (Stomach)","0 1 49",-,-,49,-,-,-,-,"5 / 6 / 7%",361,"Electric / Normal / Slash",80,50,-
+Mewtwo,Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Mewtwo,Getups/Techs,"Getup-Roll Forward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Mewtwo,Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Mewtwo,Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Mewtwo,Getups/Techs,Tech-Wall,"1 31",-,-,31,6,-,-,-,,,,,,
+Mewtwo,Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+Mewtwo,Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+Mewtwo,Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+Mewtwo,Getups/Techs,"Tech-Roll Backward","1 40",-,-,40,-,-,-,-,,,,,,
+Mewtwo,Edge,"Edge attack","0 1",-,-,-,-,-,-,-,"10 / 8 / 6%",361,Normal,-,100,90
+"Mr. Game & Watch",Air,"Neutral Air","1 20 29 44",20,29,44,-,15,-,"<3 44>",16%,361,Normal,20,100,-
+"Mr. Game & Watch",Air,"Up Air","1 7 16 21 22 39",7,22,39,-,15,-,"<7 39>","7 / 9%","94 / 90",Normal,"12 / 55",100,-
+"Mr. Game & Watch",Air,"Back Air","0 1 39",10,24,39,-,18,-,"<10 39>",3%,68,Slash,80,60,-
+"Mr. Game & Watch",Air,"Forward Air","1 10 12 13 32 44",10,32,44,-,"25 (12 L-Cancelled)",-,"<3 44>","16 / 6%",361,Normal,"30 / 10",80,-
+"Mr. Game & Watch",Air,"Down Air","1 12 13 38 49",12,38,49,-,"20 (10 L-Cancelled)",-,"<6 49>","14 / 13%","270 / 60",Normal,20,100,-
+"Mr. Game & Watch",Grounded,"Jab 1","1 4 6 17",4,6,17,16,-,-,-,3%,"83 / 85",Normal,-,100,20
+"Mr. Game & Watch",Grounded,"Rapid Jabs","0 1 7 9",-,-,-,-,-,-,-,3%,70,Normal,-,100,18
+"Mr. Game & Watch",Grounded,Dashattack,"1 6 29 37",6,29,37,-,-,-,-,9%,120,Normal,70,30,-
+"Mr. Game & Watch",Grounded,"Up Smash","1 24 28 44",24,28,44,40,-,-,-,18%,83,Normal,40,96,-
+"Mr. Game & Watch",Grounded,"Forward Smash","1 13 16 17 33 44",13,33,44,42,-,-,-,"18 / 14 / 6%","55 / 361","Fire / Normal",44,100,-
+"Mr. Game & Watch",Grounded,"Down Smash","1 15 19 34",15,19,34,-,-,-,-,"16 / 10%","80 / 20",Normal,"60 / 10","90 / 50",-
+"Mr. Game & Watch",Tilt,"Forward Tilt","1 13 30 44",13,30,44,42,-,-,-,10%,361,Normal,10,100,-
+"Mr. Game & Watch",Tilt,"Up Tilt","1 9 29 31",9,29,31,-,-,-,-,9%,100,Normal,30,"125 / 123 / 127",-
+"Mr. Game & Watch",Tilt,"Down Tilt","1 6 13 29",6,13,29,26,-,-,-,"12 / 9%","85 / 361",Normal,"65 / 80","100 / 40",-
+"Mr. Game & Watch",Special,Chef,"0 1 49",16,29,49,-,-,-,-,"2 / 4 / 6 / 8 / 3 / 12 / 14 / 32%","361 / 140 / 40 / 75 / 20 / 80","Normal / Slash / Electric / Flame / Freezing","0 / 10 / 45 / 50 / 30 / 100","0 / 40 / 50 / 80 / 100","0 / 70"
+"Mr. Game & Watch",Special,"Judgement (Air)","0 1 49",16,29,49,-,-,-,-,"2 / 4 / 6 / 8 / 3 / 12 / 14 / 32%","361 / 140 / 40 / 75 / 20 / 80","Normal / Slash / Electric / Flame / Freezing","0 / 10 / 45 / 50 / 30 / 100","0 / 40 / 50 / 80 / 100","0 / 70"
+"Mr. Game & Watch",Special,"Oil Panic","0 1 49",2,37,49,-,-,-,-,"5 / 9 / 14 / 19 / 23 / 27 / 32 / 36 / 41 / 50 / 117 / 167%",361,Normal,30,80,-
+"Mr. Game & Watch",Special,"Oil Panic (Air)","0 1 49",2,37,49,-,-,-,-,1%,361,Normal,30,80,-
+"Mr. Game & Watch",Special,Fire,"0 1 39",1,37,39,-,40,-,-,6%,80,Normal,50,80,-
+"Mr. Game & Watch",Special,"Fire (Air)","0 1 39",1,37,39,-,40,-,-,6%,80,Normal,50,80,-
+"Mr. Game & Watch",Grab/Throw,Grab,"1 7 8 30",7,8,30,-,-,-,-,-,361,Grab,-,100,-
+"Mr. Game & Watch",Grab/Throw,Dashgrab,"1 11 12 40",11,12,40,-,-,-,-,-,361,Grab,-,100,-
+"Mr. Game & Watch",Grab/Throw,Pummel,"0 1 12",-,-,-,-,-,-,-,3%,80,Normal,-,100,30
+"Mr. Game & Watch",Grab/Throw,"Forward throw","0 1 27",-,-,27,-,-,-,-,8%,68,Normal,100,40,-
+"Mr. Game & Watch",Grab/Throw,"Back throw","0 1 66",-,-,66,-,-,-,-,8%,112,Normal,100,40,-
+"Mr. Game & Watch",Grab/Throw,"Up throw","0 1 39",-,-,39,-,-,-,-,8%,90,Normal,100,40,-
+"Mr. Game & Watch",Grab/Throw,"Down throw","0 1 39",-,-,39,-,-,-,-,8%,88,Normal,80,40,-
+"Mr. Game & Watch",Dodge,Spotdodge,"1 32",2,12,32,-,-,-,-,,,,,,
+"Mr. Game & Watch",Dodge,Airdodge,"1 49",-,-,49,-,-,-,-,,,,,,
+"Mr. Game & Watch",Dodge,"Roll backwards","1 35",4,19,35,-,-,-,-,,,,,,
+"Mr. Game & Watch",Dodge,"Roll forwards","1 35",4,19,35,-,-,-,-,,,,,,
+"Mr. Game & Watch",Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+"Mr. Game & Watch",Getups/Techs,"Getup-Attack (Stomach)","0 1 49",-,-,49,-,-,-,-,6%,361,Normal,80,50,-
+"Mr. Game & Watch",Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+"Mr. Game & Watch",Getups/Techs,"Getup-Roll Forward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+"Mr. Game & Watch",Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+"Mr. Game & Watch",Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+"Mr. Game & Watch",Getups/Techs,Tech-Wall,"1 31",-,-,31,6,-,-,-,,,,,,
+"Mr. Game & Watch",Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+"Mr. Game & Watch",Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+"Mr. Game & Watch",Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+"Mr. Game & Watch",Getups/Techs,"Tech-Roll Backward","1 40",-,-,40,-,-,-,-,,,,,,
+"Mr. Game & Watch",Edge,"Edge attack","0 1",-,-,-,-,-,-,-,"6 / 8%",361,Normal,80,50,-
+Ness,Air,"Neutral Air","1 5 12 13 23 39",5,23,39,-,"22 (11 L-Cancelled)",-,"<5 26>","11 / 8%",361,Normal,"15 / 0",100,-
+Ness,Air,"Up Air","1 8 11 45",8,11,45,42,"18 (9 L-Cancelled)",-,"<8 26>",13%,85,Normal,13,109,-
+Ness,Air,"Back Air","1 10 11 12 19 39",10,19,39,36,"18 (9 L-Cancelled)",-,"<10 24>","16 / 10%",361,"Electric / Normal","16 / 0",100,-
+Ness,Air,"Forward Air","1 8 10 11 13 14 16 17 19 20 21 41",8,21,41,40,"18 (9 L-Cancelled)",-,"<8 29>","2 / 3 / 5%",361,"Normal / Electric","16 / 24","100 / 135",-
+Ness,Air,"Down Air","1 20 28 59",20,28,59,-,"28 (14 L-Cancelled)",-,"<20 28>",12%,270,Normal,90,70,-
+Ness,Grounded,usmash_charge,"0 1",-,-,-,-,-,-,-,,,,,,
+Ness,Grounded,dsmash_charge,"0 1",-,-,-,-,-,-,-,,,,,,
+Ness,Grounded,"Jab 1","1 3 4 19",3,4,19,-,-,-,-,3%,361,Normal,8,50,-
+Ness,Grounded,"Jab 2","1 3 4 19",3,4,19,-,-,-,-,2%,70,Normal,8,50,-
+Ness,Grounded,"Jab 3","1 6 7 8 9 29",6,9,29,-,-,-,-,4%,361,Normal,16,100,-
+Ness,Grounded,Dashattack,"1 8 15 22 41",8,22,41,40,-,-,-,"5 / 4%","100 / 0 / 361 / 20","Electric / Normal","60 / 18 / 0 / 70","70 / 100","0 / 60"
+Ness,Grounded,"Up Smash","1 12 14 15 31 49",12,31,49,49,-,-,-,"9 / 6%","70 / 80",Normal,"80 / 60","80 / 45",-
+Ness,Grounded,"Forward Smash","1 16 17 49",16,17,49,-,-,-,-,"18 / 24 / 22 / 20%",361,Normal,50,62,-
+Ness,Grounded,"Down Smash","1 12 13 31 61",12,31,61,59,-,-,-,"11 / 7%",70,Normal,70,"80 / 60",-
+Ness,Tilt,"Forward Tilt","1 7 11 34",7,11,34,-,-,-,-,11%,361,Normal,12,100,-
+Ness,Tilt,"Forward Tilt (Up)","1 7 11 34",7,11,34,-,-,-,-,12%,361,Normal,12,100,-
+Ness,Tilt,"Forward Tilt (Down)","1 7 11 34",7,11,34,-,-,-,-,10%,361,Normal,12,100,-
+Ness,Tilt,"Up Tilt","1 5 9 39",5,9,39,32,-,-,-,7%,96,Normal,42,126,-
+Ness,Tilt,"Down Tilt","1 3 5 13",64,77,109,-,-,-,-,"11 / 12 / 13 / 14 / 15 / 16 / 17 / 18 / 19 / 20 / 21 / 22 / 23 / 24 / 25 / 26 / 27 / 28 / 29 / 30 / 31 / 32 / 33 / 34 / 35 / 36%",70,Electric,20,70,-
+Ness,Special,"PK Flash (Air)","0 1 109",64,77,109,-,-,-,-,"11 / 12 / 13 / 14 / 15 / 16 / 17 / 18 / 19 / 20 / 21 / 22 / 23 / 24 / 25 / 26 / 27 / 28 / 29 / 30 / 31 / 32 / 33 / 34 / 35 / 36%",70,Electric,20,70,-
+Ness,Special,"PK Fire","0 1 69",20,40,69,-,-,-,-,"2 / 3%","80 / 90 / 93",Flame,"40 / 10 / 24",50,-
+Ness,Special,"PK Fire (Air)","0 1 69",20,40,69,-,30,-,-,"2 / 3%","80 / 90 / 93",Flame,"40 / 10 / 24",50,-
+Ness,Special,"PSI Magnet","1 59",10,39,59,-,-,-,-,,,,,,
+Ness,Special,"PSI Magnet (Air)","1 59",19,139,193,-,30,-,-,"8 / 1%","110 / 80",Electric,"70 / 4","50 / 40",-
+Ness,Special,"PK Thunder (Air)","0 1 193",19,139,193,-,30,-,-,"8 / 1%","110 / 80",Electric,"70 / 4","50 / 40",-
+Ness,Grab/Throw,Grab,"1 8 9 30",8,9,30,-,-,-,-,-,361,Grab,-,100,-
+Ness,Grab/Throw,Dashgrab,"1 10 11 40",10,11,40,-,-,-,-,-,361,Grab,-,100,-
+Ness,Grab/Throw,Pummel,"0 1 15",-,-,-,-,-,-,-,3%,80,Normal,-,100,30
+Ness,Grab/Throw,"Forward throw","0 1 52",-,-,52,-,-,-,-,11%,45,Normal,120,10,-
+Ness,Grab/Throw,"Back throw","0 1 52",-,-,52,-,-,-,-,11%,135,Normal,15,130,-
+Ness,Grab/Throw,"Up throw","0 1 55",-,-,55,-,-,-,-,10%,90,Normal,105,40,-
+Ness,Grab/Throw,"Down throw","1 10 13 14 17 18 21 22 25 26 29 30 33 49",10,33,49,-,-,-,-,1%,361,Fire,-,100,-
+Ness,Dodge,Spotdodge,"1 27",2,18,27,-,-,-,-,,,,,,
+Ness,Dodge,Airdodge,"1 48",-,-,48,-,-,-,-,,,,,,
+Ness,Dodge,"Roll backwards","1 31",4,19,31,-,-,-,-,,,,,,
+Ness,Dodge,"Roll forwards","1 31",4,19,31,-,-,-,-,,,,,,
+Ness,Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+Ness,Getups/Techs,"Getup-Attack (Stomach)","0 1 49",-,-,49,-,-,-,-,6%,361,Normal,"80 / 0","50 / 100","0 / 90"
+Ness,Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Ness,Getups/Techs,"Getup-Roll Forward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Ness,Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Ness,Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Ness,Getups/Techs,Tech-Wall,"1 31",-,-,31,6,-,-,-,,,,,,
+Ness,Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+Ness,Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+Ness,Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+Ness,Getups/Techs,"Tech-Roll Backward","1 40",-,-,40,-,-,-,-,,,,,,
+Ness,Edge,"Edge attack","0 1",-,-,-,-,-,-,-,"10 / 6 / 8%",361,Normal,-,100,90
+Peach,Air,"Neutral Air","1 3 6 7 23 49",3,23,49,42,"17 (8 L-Cancelled)",-,"<3 35>","14 / 9 / 10%",361,Normal,"20 / 0",100,-
+Peach,Air,"Up Air","1 7 11 35",7,11,35,34,"15 (7 L-Cancelled)",-,"<7 21>","11 / 14 / 12%","361 / 80",Normal,-,120,-
+Peach,Air,"Back Air","1 6 9 10 22 44",6,22,44,38,"15 (7 L-Cancelled)",-,"<6 22>","14 / 10%",361,Normal,"0 / 10","100 / 90",-
+Peach,Air,"Forward Air","1 16 20 54",16,20,54,51,"25 (12 L-Cancelled)",-,"<16 38>",15%,361,Normal,60,70,-
+Peach,Air,"Down Air","1 12 13 18 19 24 25 30 31 39",12,31,39,36,"15 (7 L-Cancelled)",-,"<12 39>",3%,90,Normal,"16 / 12",50,-
+Peach,Grounded,"Jab 1","1 2 3 19",2,3,19,16,-,-,-,3%,"74 / 78",Normal,-,100,20
+Peach,Grounded,"Jab 2","1 2 3 19",2,3,19,16,-,-,-,2%,361,Normal,30,100,-
+Peach,Grounded,Dashattack,"1 6 8 9 20 37",6,20,37,36,-,-,-,"12 / 9 / 8 / 7%","80 / 361",Normal,"70 / 50 / 20",70,-
+Peach,Grounded,"Up Smash","1 13 22 44",15,18,47,-,-,-,-,"13 / 17 / 15 / 12%","361 / 45 / 80 / 29",Normal,"50 / 70 / 75 / 65","50 / 60 / 35",-
+Peach,Grounded,"Down Smash","1 5 6 9 10 13 14 17 18 21 22 39",5,22,39,-,-,-,-,"14 / 12%",140,Normal,"40 / 35",80,-
+Peach,Tilt,"Forward Tilt","1 6 7 8 13 41",6,13,41,37,-,-,-,"10 / 11 / 13 / 6%","80 / 100 / 90","Slash / Normal","35 / 55","85 / 50",-
+Peach,Tilt,"Up Tilt","1 9 13 39",9,13,39,37,-,-,-,12%,80,Normal,48,72,-
+Peach,Tilt,"Down Tilt","1 12 13 27",12,13,27,26,-,-,-,12%,"270 / 80",Normal,"60 / 15",100,-
+Peach,Special,bob_omb,"0 1",-,-,-,-,-,-,-,,,,,,
+Peach,Special,Toad,"0 1 64",10,30,64,-,-,-,-,3%,80,Normal,80,50,-
+Peach,Special,"Peach Bomber","0 1 46",21,31,46,-,33,-,-,"16 / 18%","70 / 55",Flame,"80 / 100",40,-
+Peach,Special,"Peach Bomber (Air)","0 1 56",31,41,56,-,33,-,-,"16 / 18%","70 / 55",Flame,"80 / 100",40,-
+Peach,Special,Vegetable,"0 1 29",29,29,29,-,-,-,-,2%,361,Normal,25,60,-
+Peach,Special,"Vegetable (Air)","0 1 29",6,29,40,-,30,-,-,"5 / 1%","70 / 78 / 74 / 72",Normal,-,100,"150 / 90 / 120 / 60"
+Peach,Special,"Peach Parasol (Air)","0 1 40",6,29,40,-,30,-,-,"5 / 1%","70 / 74 / 78 / 72",Normal,-,100,"150 / 120 / 90 / 60"
+Peach,Grab/Throw,Grab,"1 7 8 30",7,8,30,-,-,-,-,-,361,Grab,-,100,-
+Peach,Grab/Throw,Dashgrab,"1 7 8 40",7,8,40,-,-,-,-,-,361,Grab,-,100,-
+Peach,Grab/Throw,Pummel,"0 1 13 15",-,-,-,-,-,-,-,3%,80,Normal,-,100,30
+Peach,Grab/Throw,"Forward throw","1 14 33",14,14,33,-,-,-,-,2%,80,Normal,10,200,-
+Peach,Grab/Throw,"Back throw","1 20 49",20,20,49,-,-,-,-,2%,70,Normal,10,200,-
+Peach,Grab/Throw,"Up throw","1 20 24 49",20,24,49,-,-,-,-,2%,80,Normal,-,100,20
+Peach,Grab/Throw,"Down throw","1 34 42 64",34,42,64,-,-,-,-,-,270,Normal,-,100,20
+Peach,Dodge,Spotdodge,"1 27",2,18,27,-,-,-,-,,,,,,
+Peach,Dodge,Airdodge,"1 49",4,19,49,-,-,-,-,,,,,,
+Peach,Dodge,"Roll backwards","1 31",4,19,31,-,-,-,-,,,,,,
+Peach,Dodge,"Roll forwards","1 31",4,19,31,-,-,-,-,,,,,,
+Peach,Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+Peach,Getups/Techs,"Getup-Attack (Stomach)","0 1 49",-,-,49,-,-,-,-,"6 / 8%",361,Normal,70,50,-
+Peach,Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Peach,Getups/Techs,"Getup-Roll Forward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Peach,Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Peach,Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Peach,Getups/Techs,Tech-Wall,"1 31",-,-,31,6,-,-,-,,,,,,
+Peach,Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+Peach,Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+Peach,Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+Peach,Getups/Techs,"Tech-Roll Backward","1 40",-,-,-,-,-,-,-,"10 / 8 / 6%",361,Normal,-,100,90
+Peach,Edge,beamsword,"0 1",-,-,-,-,-,-,-,,,,,,
+Peach,Edge,mr_saturn,"0 1",-,-,-,-,-,-,-,,,,,,
+Pichu,Air,"Neutral Air","1 3 10 11 28 39",3,28,39,-,"12 (6 L-Cancelled)",-,"<3 34>","12 / 9%",361,Normal,"18 / 0",100,-
+Pichu,Air,"Up Air","1 4 5 6 7 8 9 27",4,9,27,-,"18 (9 L-Cancelled)",-,"<4 17>",4%,80,Normal,100,60,-
+Pichu,Air,"Back Air","1 4 7 8 37 59",4,37,59,-,"18 (9 L-Cancelled)",-,"<4 49>",9%,361,Normal,20,100,-
+Pichu,Air,"Forward Air","1 10 12 14 16 18 20 22 24 39",10,24,39,-,"15 (7 L-Cancelled)",-,"<10 33>",2%,361,Electric,-,100,30
+Pichu,Air,"Down Air","1 14 26 57",14,26,57,48,"26 (13 L-Cancelled)",-,"<1 38>",12%,361,Electric,20,100,-
+Pichu,Grounded,"Jab 1","1 2 3 21",2,3,21,-,-,-,-,2%,-,Normal,7,50,-
+Pichu,Grounded,Dashattack,"1 5 16 49",5,16,49,-,-,-,-,8%,361,Normal,40,70,-
+Pichu,Grounded,"Up Smash","1 9 11 43",9,11,43,41,-,-,-,16%,95,Normal,"40 / 50",105,-
+Pichu,Grounded,"Forward Smash","1 16 18 19 21 22 24 25 27 28 30 31 33 49",16,33,49,-,-,-,-,"2 / 6%","180 / 20 / 0 / 361",Electric,"10 / 90","50 / 140",-
+Pichu,Grounded,"Down Smash","1 7 13 54",7,13,54,-,-,-,-,13%,160,Normal,30,70,-
+Pichu,Tilt,"Forward Tilt","1 5 14 29",5,14,29,-,-,-,-,8%,361,Normal,10,100,-
+Pichu,Tilt,"Forward Tilt (Up)","1 5 14 29",5,14,29,-,-,-,-,9%,361,Normal,10,100,-
+Pichu,Tilt,"Forward Tilt (Down)","1 5 14 29",5,14,29,-,-,-,-,7%,361,Normal,10,100,-
+Pichu,Tilt,"Up Tilt","1 7 14 23",7,14,23,-,-,-,-,6%,95,Normal,"25 / 20",120,-
+Pichu,Tilt,"Down Tilt","1 7 9 21",7,9,21,19,-,-,-,7%,35,Normal,12,100,-
+Pichu,Special,"Thunder Jolt","0 1 57",18,117,57,-,-,-,-,7%,361,Electric,10,20,-
+Pichu,Special,"Thunder Jolt (Air)","0 1 57",5,40,70,-,30,-,-,"4 / 7 / 39%",361,Electric,15,90,-
+Pichu,Special,Thunder,"1 20 40 48 49 109",20,49,109,-,-,-,-,"4 / 13%","94 / 361",Electric,"80 / 90","55 / 60",-
+Pichu,Special,"Thunder (Air)","0 1 109",20,49,109,-,-,-,-,"4 / 13%","94 / 361",Electric,"80 / 90","55 / 60",-
+Pichu,Special,Agility,"1 158",13,71,158,-,12,-,-,,,,,,
+Pichu,Special,"Agility (Air)","1 158",13,71,158,-,12,-,-,,,,,,
+Pichu,Grab/Throw,Grab,"1 7 8 30",7,8,30,-,-,-,-,-,361,Grab,-,100,-
+Pichu,Grab/Throw,Dashgrab,"1 11 12 40",11,12,40,-,-,-,-,-,361,Grab,-,100,-
+Pichu,Grab/Throw,Pummel,"0 1 2",-,-,-,-,-,-,-,3%,80,Electric,-,100,30
+Pichu,Grab/Throw,"Forward throw","1 10 13 14 17 18 21 22 25 26 29 43",10,29,43,-,-,-,-,2%,361,Electric,-,100,-
+Pichu,Grab/Throw,"Back throw","0 1 49",-,-,49,-,-,-,-,9%,135,Electric,75,50,-
+Pichu,Grab/Throw,"Up throw","1 14 19 43",14,19,43,-,-,-,-,5%,361,Normal,-,-,90
+Pichu,Grab/Throw,"Down throw","1 12 19 47",12,19,47,-,-,-,-,5%,361,Normal,-,-,90
+Pichu,Dodge,Spotdodge,"1 22",2,15,22,-,-,-,-,,,,,,
+Pichu,Dodge,Airdodge,"1 49",-,-,49,-,-,-,-,,,,,,
+Pichu,Dodge,"Roll backwards","1 31",4,19,31,-,-,-,-,,,,,,
+Pichu,Dodge,"Roll forwards","1 31",4,19,31,-,-,-,-,,,,,,
+Pichu,Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+Pichu,Getups/Techs,"Getup-Attack (Stomach)","0 1 50",-,-,50,-,-,-,-,6%,361,Normal,80,50,-
+Pichu,Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Pichu,Getups/Techs,"Getup-Roll Forward (Stomach)","1 36",-,-,36,-,-,-,-,,,,,,
+Pichu,Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Pichu,Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Pichu,Getups/Techs,Tech-Wall,"1 31",-,-,31,6,-,-,-,,,,,,
+Pichu,Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+Pichu,Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+Pichu,Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+Pichu,Getups/Techs,"Tech-Roll Backward","1 40",-,-,40,-,-,-,-,,,,,,
+Pichu,Edge,"Edge attack","0 1",-,-,-,-,-,-,-,"6 / 8%",361,Normal,-,100,100
+Pikachu,Air,"Neutral Air","1 3 10 11 28 39",3,28,39,-,"15 (7 L-Cancelled)",-,"<3 34>","12 / 9%",361,Normal,"18 / 0",100,-
+Pikachu,Air,"Up Air","1 3 4 5 6 7 8 27",3,8,27,-,"26 (13 L-Cancelled)",-,"<3 17>",4%,"80 / 0 / 130",Normal,"100 / 60 / 80",60,-
+Pikachu,Air,"Back Air","1 4 7 8 37 59",4,37,59,-,"30 (15 L-Cancelled)",-,"<4 49>","12 / 9%",361,Normal,20,100,-
+Pikachu,Air,"Forward Air","1 10 12 14 16 18 20 22 24 39",10,24,39,-,"20 (10 L-Cancelled)",-,"<10 33>",2%,361,Electric,-,100,30
+Pikachu,Air,"Down Air","1 14 26 57",14,26,57,48,"40 (20 L-Cancelled)",-,"<1 38>",12%,361,Electric,20,100,-
+Pikachu,Grounded,"Jab 1","1 2 3 21",2,3,21,-,-,-,-,2%,-,Normal,7,50,-
+Pikachu,Grounded,Dashattack,"1 5 16 49",5,16,49,-,-,-,-,8%,361,Normal,40,70,-
+Pikachu,Grounded,"Up Smash","1 8 10 11 13 14 17 43",8,17,43,41,-,-,-,"19 / 18 / 17 / 13 / 7%","85 / 90 / 40",Normal,"40 / 30 / 5","110 / 100 / 48",-
+Pikachu,Grounded,"Forward Smash","1 16 18 19 21 22 23 49",16,23,49,-,-,-,-,"21 / 19 / 18%",361,Electric,"25 / 22","92 / 90 / 95 / 85",-
+Pikachu,Grounded,"Down Smash","1 7 8 10 11 13 14 16 17 19 20 22 23 25 54",7,25,54,51,-,-,-,"2 / 3%","170 / 90 / 70",Electric,"70 / 30","30 / 170",-
+Pikachu,Tilt,"Forward Tilt","1 5 14 29",5,14,29,-,-,-,-,8%,361,Normal,10,100,-
+Pikachu,Tilt,"Forward Tilt (Up)","1 5 14 29",5,14,29,-,-,-,-,9%,361,Normal,10,100,-
+Pikachu,Tilt,"Forward Tilt (Down)","1 5 14 29",5,14,29,-,-,-,-,7%,361,Normal,10,100,-
+Pikachu,Tilt,"Up Tilt","1 7 14 23",7,14,23,-,-,-,-,"7 / 6%","96 / 88",Normal,"45 / 40",124,-
+Pikachu,Tilt,"Down Tilt","1 7 9 21",7,9,21,19,-,-,-,7%,35,Normal,12,100,-
+Pikachu,Special,"Thunder Jolt","0 1 57",18,117,57,-,-,-,-,7%,361,Electric,10,20,-
+Pikachu,Special,"Thunder Jolt (Air)","0 1 57",5,40,70,-,-,-,-,"4 / 9 / 29%",361,Electric,15,90,-
+Pikachu,Special,Thunder,"1 20 40 48 70 109",20,49,109,-,-,-,-,"10 / 17%","70 / 361",Electric,100,"50 / 60",-
+Pikachu,Special,"Thunder (Air)","0 1 109",20,49,109,-,-,-,-,"10 / 17%","70 / 361",Electric,100,"50 / 60",-
+Pikachu,Special,"Quick Attack","0 1 149",13,-,149,-,24,-,-,"3 / 2%",-,Electric,5,40,-
+Pikachu,Special,"Quick Attack (Air)","0 1 149",13,-,149,-,24,-,-,"3 / 2%",-,Electric,5,40,-
+Pikachu,Grab/Throw,Grab,"1 7 8 30",7,8,30,-,-,-,-,-,361,Grab,-,100,-
+Pikachu,Grab/Throw,Dashgrab,"1 11 12 40",11,12,40,-,-,-,-,-,361,Grab,-,100,-
+Pikachu,Grab/Throw,Pummel,"0 1 2",-,-,-,-,-,-,-,3%,80,Electric,-,100,30
+Pikachu,Grab/Throw,"Forward throw","1 10 13 14 17 18 21 22 25 26 29 43",10,29,43,-,-,-,-,2%,361,Electric,-,100,-
+Pikachu,Grab/Throw,"Back throw","0 1 49",-,-,49,-,-,-,-,9%,135,Electric,75,50,-
+Pikachu,Grab/Throw,"Up throw","1 14 19 43",14,19,43,-,-,-,-,5%,361,Normal,-,-,90
+Pikachu,Grab/Throw,"Down throw","1 12 19 47",12,19,47,-,-,-,-,5%,361,Normal,-,-,90
+Pikachu,Dodge,Spotdodge,"1 22",2,15,22,-,-,-,-,,,,,,
+Pikachu,Dodge,Airdodge,"1 49",-,-,49,-,-,-,-,,,,,,
+Pikachu,Dodge,"Roll backwards","1 31",4,19,31,-,-,-,-,,,,,,
+Pikachu,Dodge,"Roll forwards","1 31",4,19,31,-,-,-,-,,,,,,
+Pikachu,Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+Pikachu,Getups/Techs,"Getup-Attack (Stomach)","0 1 50",-,-,50,-,-,-,-,6%,361,Normal,80,50,-
+Pikachu,Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Pikachu,Getups/Techs,"Getup-Roll Forward (Stomach)","1 36",-,-,36,-,-,-,-,,,,,,
+Pikachu,Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Pikachu,Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Pikachu,Getups/Techs,Tech-Wall,"1 31",-,-,31,6,-,-,-,,,,,,
+Pikachu,Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+Pikachu,Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+Pikachu,Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+Pikachu,Getups/Techs,"Tech-Roll Backward","1 40",-,-,40,-,-,-,-,,,,,,
+Pikachu,Edge,"Edge attack","0 1",-,-,-,-,-,-,-,6%,361,Normal,-,100,100
+Roy,Air,"Neutral Air","1 7 8 17 20 57",7,20,57,50,"20 (10 L-Cancelled)",-,"<7 31>","4 / 8 / 6%","100 / 90 / 361","Slash / Normal","30 / 50","40 / 80",-
+Roy,Air,"Up Air","1 5 10 52",5,10,52,49,"18 (9 L-Cancelled)",-,"<5 29>","6 / 9%",80,"Normal / Slash","10 / 20",70,-
+Roy,Air,"Back Air","1 8 10 45",8,10,45,43,"24 (12 L-Cancelled)",-,"<1 33>","6 / 9%",361,"Normal / Slash","10 / 30",70,-
+Roy,Air,"Forward Air","1 5 7 38",5,7,38,35,"20 (10 L-Cancelled)",-,"<1 29>","8 / 5%",361,"Slash / Normal","30 / 10",70,-
+Roy,Air,"Down Air","1 7 10 68",7,10,68,64,"32 (16 L-Cancelled)",-,"<7 54>","9 / 6%","270 / 361 / 90","Slash / Normal",40,70,-
+Roy,Grounded,"Jab 1","1 4 7 31",4,7,31,26,-,-,-,"3 / 6 / 5%",361,"Normal / Slash","5 / 30",60,-
+Roy,Grounded,Dashattack,"1 12 15 57",12,15,57,40,-,-,-,"12 / 6%","110 / 361","Slash / Normal","70 / 35","55 / 60",-
+Roy,Grounded,"Up Smash","1 15 16 17 18 19 20 21 22 23 24 62",15,24,62,46,-,-,-,"2 / 10%","259 / 98 / 90",Fire,"0 / 73","100 / 90","120 / 0"
+Roy,Grounded,"Forward Smash","1 12 14 57",12,14,57,54,-,-,-,"20 / 12%",361,"Slash / Normal","80 / 30",65,-
+Roy,Grounded,"Down Smash","1 6 8 23 25 74",6,25,74,72,-,-,-,"21 / 14 / 16 / 8%","75 / 361","Slash / Normal","42 / 15","70 / 100 / 68",-
+Roy,Tilt,"Forward Tilt","1 9 13 40",9,13,40,40,-,-,-,"12 / 7 / 10%",361,"Slash / Normal","60 / 30",70,-
+Roy,Tilt,"Up Tilt","1 7 9 10 13 45",7,13,45,40,-,-,-,"9 / 6 / 10 / 8%","110 / 361 / 85","Slash / Normal","35 / 20","118 / 100 / 116 / 120",-
+Roy,Tilt,"Down Tilt","1 8 10 57",8,10,57,20,-,-,-,"12 / 10 / 6%",80,"Slash / Normal","90 / 70",40,-
+Roy,Special,"Double Edged Dance (2 Forward/Neutral/Down)","0 1 40",14,16,40,-,-,-,-,"4 / 6%","105 / 35 / 56 / 80","Normal / Slash","20 / 40","60 / 35",-
+Roy,Special,"Double Edged Dance (2, Up)","0 1 40",12,15,40,-,-,-,-,"6 / 4%",96,"Slash / Normal",50,30,-
+Roy,Special,"Double Edged Dance (3, Forward/Neutral)","0 1 46",11,14,46,-,-,-,-,"10 / 8%",361,"Slash / Normal",50,110,-
+Roy,Special,"Double Edged Dance (3, Up)","0 1 46",13,17,46,-,-,-,-,"10 / 8 / 7 / 5%","280 / 270 / 60","Slash / Normal","80 / 36 / 60","60 / 40",-
+Roy,Special,"Double Edged Dance (3, Down)","0 1 46",-,-,46,-,-,-,-,"3 / 5%","75 / 90 / 95 / 64",Flame,"0 / 30 / 70",100,"30 / 0"
+Roy,Special,"Double Edged Dance (4, Forward/Neutral)","0 1 50",23,26,50,-,-,-,-,"13 / 10%",361,Flame,35,135,-
+Roy,Special,"Double Edged Dance (4, Up)","0 1 50",20,25,50,-,-,-,-,"10 / 13%",40,Flame,22,130,-
+Roy,Special,"Double Edged Dance (4, Down)","0 1 50",-,-,50,-,-,-,-,"3 / 5%","80 / 361",Flame,"2 / 30","40 / 110",-
+Roy,Special,"Flare Blade","0 1 45",16,21,45,-,-,-,-,"6 / 50%",361,Flame,"40 / 50","110 / 83",-
+Roy,Special,"Double Edged Dance","0 1 29",6,8,29,-,-,-,-,"5 / 4%","60 / 96 / 85 / 80","Slash / Normal","50 / 40",25,-
+Roy,Special,"Double Edged Dance (Air)","0 1 29",6,8,29,-,-,-,-,"5 / 4%","60 / 96 / 80 / 85","Slash / Normal","50 / 40",25,-
+Roy,Special,Counter,"0 1 59",8,20,59,-,-,-,-,1%,361,Flame,30,"70 / 90",-
+Roy,Special,"Counter (Air)","0 1 59",8,20,59,-,-,-,-,1%,361,Flame,30,"90 / 70",-
+Roy,Special,Blazer,"0 1 48",9,21,48,-,30,-,-,"5 / 3 / 2 / 1%","84 / 361","Flame / Slash","0 / 10",100,"200 / 80 / 160 / 0 / 100"
+Roy,Special,"Blazer (Air)","0 1 48",9,21,48,-,30,-,-,"3 / 5 / 2 / 1%","361 / 84","Slash / Flame","0 / 10",100,"80 / 200 / 160 / 0 / 100"
+Roy,Grab/Throw,Grab,"1 7 8 30",7,8,30,-,-,-,-,-,361,Grab,-,100,-
+Roy,Grab/Throw,Dashgrab,"1 10 11 40",10,11,40,-,-,-,-,-,361,Grab,-,100,-
+Roy,Grab/Throw,Pummel,"0 1 6",-,-,-,-,-,-,-,3%,80,Normal,-,100,30
+Roy,Grab/Throw,"Forward throw","0 1 31",-,-,31,-,-,-,-,5%,45,Normal,70,45,-
+Roy,Grab/Throw,"Back throw","0 1 44",-,-,44,-,-,-,-,5%,117,Normal,70,45,-
+Roy,Grab/Throw,"Up throw","0 1 44",-,-,44,-,-,-,-,5%,97,Normal,60,130,-
+Roy,Grab/Throw,"Down throw","0 1 42",-,-,42,-,-,-,-,6%,120,Normal,65,60,-
+Roy,Dodge,Spotdodge,"1 27",2,18,27,-,-,-,-,,,,,,
+Roy,Dodge,Airdodge,"1 49",-,-,49,-,-,-,-,,,,,,
+Roy,Dodge,"Roll backwards","1 35",4,23,35,-,-,-,-,,,,,,
+Roy,Dodge,"Roll forwards","1 35",4,19,35,-,-,-,-,,,,,,
+Roy,Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+Roy,Getups/Techs,"Getup-Attack (Stomach)","0 1 49",-,-,49,-,-,-,-,6%,361,Slash,80,50,-
+Roy,Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Roy,Getups/Techs,"Getup-Roll Forward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Roy,Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Roy,Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Roy,Getups/Techs,Tech-Wall,"1 31",-,-,31,6,-,-,-,,,,,,
+Roy,Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+Roy,Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+Roy,Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+Roy,Getups/Techs,"Tech-Roll Backward","1 40",-,-,40,-,-,-,-,,,,,,
+Roy,Edge,"Edge attack","0 1",-,-,-,-,-,-,-,"8 / 6%",361,Normal,-,100,90
+Roy,Edge,"Edge Attack (Slow)","0 1",-,-,-,-,-,-,-,,,,,,
+Roy,Edge,"Edge Climb","0 1",-,-,-,-,-,-,-,,,,,,
+Roy,Edge,"Edge Climb (Slow)","0 1",-,-,-,-,-,-,-,,,,,,
+Roy,Edge,"Edge Roll Up","0 1",-,-,-,-,-,-,-,,,,,,
+Roy,Edge,"Edge Roll Up (Slow)","0 1",-,-,-,-,-,-,-,,,,,,
+Roy,Edge,"Edge Jump Up","0 1",-,-,-,-,-,-,-,,,,,,
+Roy,Edge,"Edge Jump Up (Slow)","0 1",-,-,-,-,-,-,-,,,,,,
+Samus,Air,"Air Grapple","1 60",10,28,60,-,30,-,-,,,,,,
+Samus,Air,"Neutral Air","1 5 8 9 29 49",5,29,49,40,"15 (7 L-Cancelled)",-,"<5 34>","14 / 10%",361,Normal,10,100,-
+Samus,Air,"Up Air","1 5 6 8 9 11 12 14 15 17 18 20 21 39",5,21,39,39,"15 (7 L-Cancelled)",-,"<5 33>","3 / 1 / 4%","90 / 361 / 80",Normal,"0 / 40","100 / 130 / 120","30 / 0"
+Samus,Air,"Back Air","1 9 12 39",9,12,39,37,"15 (7 L-Cancelled)",-,"<9 30>","10 / 14%",361,Normal,"30 / 42",100,-
+Samus,Air,"Forward Air","1 4 5 11 12 18 19 25 26 30 31 55",4,31,55,50,"15 (7 L-Cancelled)",-,"<1 46>",5%,"85 / 361",Fire,20,100,-
+Samus,Air,"Down Air","1 18 22 54",18,22,54,49,"15 (7 L-Cancelled)",-,"<3 33>",16%,270,Normal,30,100,-
+Samus,Grounded,"Jab 1","1 3 4 17",3,4,17,-,-,-,-,3%,361,Normal,-,100,-
+Samus,Grounded,"Jab 2","1 4 6 29",4,6,29,-,-,-,-,7%,361,Normal,15,100,-
+Samus,Grounded,Dashattack,"1 7 9 10 16 37",7,16,37,-,-,-,-,"13 / 9%",60,Normal,22,105,-
+Samus,Grounded,"Up Smash","1 12 14 16 18 20 22 24 26 28 29 59",12,29,59,58,-,-,-,"4 / 5 / 6%","130 / 120 / 90 / 85 / 80",Fire,"50 / 35 / 25 / 30","50 / 120",-
+Samus,Grounded,"Forward Smash","1 10 13 43",10,13,43,-,-,-,-,14%,361,Normal,30,104,-
+Samus,Grounded,"Down Smash","1 6 8 14 16 48",6,16,48,45,-,-,-,"16 / 15%",120,Normal,"110 / 90","50 / 40",-
+Samus,Tilt,"Forward Tilt","1 6 8 31",6,8,31,30,-,-,-,10%,361,Normal,10,100,-
+Samus,Tilt,"Forward Tilt (Up)","1 6 8 31",6,8,31,30,-,-,-,11%,361,Normal,10,100,-
+Samus,Tilt,"Forward Tilt (Down)","1 6 8 31",6,8,31,30,-,-,-,9%,361,Normal,10,100,-
+Samus,Tilt,"Up Tilt","1 14 17 39",14,17,39,35,-,-,-,"12 / 13%","361 / 270",Normal,40,100,-
+Samus,Tilt,"Down Tilt","1 6 8 39",14,83,44,-,-,-,-,"3 / 5 / 8 / 11 / 14 / 18 / 21 / 25%",361,Electric,"14 / 16 / 20 / 24 / 28 / 32 / 36 / 50","42 / 46 / 50 / 54 / 58 / 62 / 66 / 72",-
+Samus,Special,"Homing Missle","0 1 49",22,98,49,-,-,-,-,"5 / 12%","0 / 361",Flame,"24 / 30","20 / 100",-
+Samus,Special,"Homing Missle (Air)","0 1 49",15,91,49,-,-,-,-,"5 / 12%","0 / 361",Flame,"24 / 30","20 / 100",-
+Samus,Special,Bomb,"0 1 53",10,83,53,-,-,-,-,4%,361,Flame,10,45,-
+Samus,Special,"Bomb (Air)","0 1 53",10,83,53,-,-,-,-,4%,361,Flame,10,45,-
+Samus,Special,"Screw Attack","0 1 49",4,33,49,-,24,-,-,"2 / 1%","100 / 105 / 200 / 110 / 70","Normal / Electric","100 / 130 / 70 / 110 / 40 / 0",100,"0 / 80"
+Samus,Special,"Screw Attack (Air)","0 1 47",4,31,47,-,24,-,-,1%,"140 / 110 / 70","Normal / Electric","25 / 100 / 80 / 0","0 / 100","0 / 80"
+Samus,Grab/Throw,Grab,"1 18 19 20 22 23 25 26 28 29 31 32 34 35 37 94",18,37,94,-,-,-,-,-,361,Grab,-,100,-
+Samus,Grab/Throw,Dashgrab,"1 18 20 21 22 23 25 26 28 29 31 32 33 74",18,33,74,-,-,-,-,-,361,Grab,-,100,-
+Samus,Grab/Throw,Pummel,"0 1 9",-,-,-,-,-,-,-,3%,80,Normal,-,100,30
+Samus,Grab/Throw,"Forward throw","0 1 41",-,-,41,-,-,-,-,9%,42,Normal,50,45,-
+Samus,Grab/Throw,"Back throw","0 1 41",-,-,41,-,-,-,-,8%,140,Normal,50,42,-
+Samus,Grab/Throw,"Up throw","1 13 15 17 19 21 23 25 41",13,25,41,-,-,-,-,-,361,Normal,-,100,-
+Samus,Grab/Throw,"Down throw","0 1 41",-,-,41,-,-,-,-,6%,80,Normal,80,20,-
+Samus,Dodge,Spotdodge,"1 22",2,15,22,-,-,-,-,,,,,,
+Samus,Dodge,Airdodge,"1 49",-,-,49,-,-,-,-,,,,,,
+Samus,Dodge,"Roll backwards","1 44",4,23,44,-,-,-,-,,,,,,
+Samus,Dodge,"Roll forwards","1 44",4,23,44,-,-,-,-,,,,,,
+Samus,Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+Samus,Getups/Techs,"Getup-Attack (Stomach)","0 1 49",-,-,49,-,-,-,-,"8 / 6%",361,Normal,"80 / 0","50 / 100","0 / 90"
+Samus,Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Samus,Getups/Techs,"Getup-Roll Forward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Samus,Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Samus,Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Samus,Getups/Techs,Tech-Wall,"1 31",-,-,31,6,-,-,-,,,,,,
+Samus,Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+Samus,Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+Samus,Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+Samus,Getups/Techs,"Tech-Roll Backward","1 40",-,-,40,-,-,-,-,,,,,,
+Samus,Edge,"Edge attack","0 1",-,-,-,-,-,-,-,10%,361,Normal,-,100,90
+Sheik,Air,"Neutral Air","1 3 6 7 30 48",3,30,48,42,"16 (8 L-Cancelled)",-,"<3 30>","14 / 10 / 9%",361,Normal,-,100,-
+Sheik,Air,"Up Air","1 5 7 8 20 39",5,20,39,37,"24 (12 L-Cancelled)",-,"<5 29>","12 / 9%","80 / 70",Normal,"15 / 10",120,-
+Sheik,Air,"Back Air","1 4 7 8 19 37",4,19,37,-,"16 (8 L-Cancelled)",-,"<4 24>","8 / 14 / 10 / 9 / 7 / 6%",361,Normal,"0 / 12 / 5 / 4 / 8",100,-
+Sheik,Air,"Forward Air","1 5 7 33",5,7,33,-,"16 (8 L-Cancelled)",-,"<5 10>",13%,25,Normal,-,100,-
+Sheik,Air,"Down Air","1 15 33 48",15,33,48,-,"20 (10 L-Cancelled)",-,"<3 48>",11%,80,Normal,30,90,-
+Sheik,Grounded,"Jab 1","1 2 3 17",2,3,17,16,-,-,-,4%,70,Slash,-,100,-
+Sheik,Grounded,"Jab 2","1 2 4 17",2,4,17,16,-,-,-,3%,70,Slash,-,100,-
+Sheik,Grounded,"Rapid Jabs","1 3 4 9 10 15 16 21 22 27 28 33 34 35",3,34,35,-,-,-,-,1%,80,Normal,10,80,-
+Sheik,Grounded,Dashattack,"1 6 7 12 37",6,12,37,36,-,-,-,"10 / 7%","80 / 361","Slash / Normal","34 / 15",100,-
+Sheik,Grounded,"Up Smash","1 12 14 16 47",12,16,47,40,-,-,-,"17 / 13%","90 / 78 / 88",Slash,"50 / 38","105 / 100",-
+Sheik,Grounded,"Forward Smash","1 12 27 29 50",12,29,50,46,-,-,-,"5 / 10%","78 / 70 / 361",Normal,"0 / 50","100 / 70","60 / 0"
+Sheik,Grounded,"Down Smash","1 5 9 16 19 22 24 49",5,24,49,46,-,-,-,"13 / 10%","40 / 50",Normal,35,80,-
+Sheik,Tilt,"Forward Tilt","1 5 10 29",5,10,29,27,-,-,-,7%,74,Normal,40,100,-
+Sheik,Tilt,"Up Tilt","1 5 10 19 24 33",5,24,33,26,-,-,-,"8 / 4%",80,Normal,10,"120 / 140",-
+Sheik,Tilt,"Down Tilt","1 5 8 29",5,8,29,28,-,-,-,8%,"70 / 90",Normal,35,80,-
+Sheik,Special,"Needle Storm","0 1 40",4,19,40,-,-,-,-,3%,"70 / 0",Slash,24,34,-
+Sheik,Special,"Needle Storm (Air)","0 1 39",11,26,39,-,-,-,-,3%,"70 / 0",Slash,24,34,-
+Sheik,Special,Chain,"0 1 75",22,65,75,-,-,-,-,"3 / 5%","361 / 60 / 70 / 80","Slash / Electric","6 / 8 / 14 / 35",30,-
+Sheik,Special,"Chain (Air)","0 1 75",22,65,75,-,-,-,-,"5 / 3%","80 / 70 / 60 / 361","Electric / Slash","35 / 14 / 8 / 6",30,-
+Sheik,Special,Transform,"1 62",27,36,62,-,-,-,-,,,,,,
+Sheik,Special,"Transform (Air)","1 62",27,36,62,-,-,-,-,,,,,,
+Sheik,Special,Vanish,"1 36 42 94",36,42,94,-,30,-,-,12%,90,Flame,80,60,-
+Sheik,Special,"Up B (Air)","1 36 42 94",36,42,94,-,30,-,-,12%,90,Flame,80,60,-
+Sheik,Grab/Throw,Grab,"1 7 8 30",6,7,30,-,-,-,-,-,361,Grab,-,100,-
+Sheik,Grab/Throw,Dashgrab,"1 8 9 40",8,9,40,-,-,-,-,-,361,Grab,-,100,-
+Sheik,Grab/Throw,Pummel,"0 1 9",-,-,-,-,-,-,-,3%,80,Normal,-,100,30
+Sheik,Grab/Throw,"Forward throw","1 20 23 47",20,23,47,-,-,-,-,6%,361,Normal,-,-,80
+Sheik,Grab/Throw,"Back throw","1 15 19 47",15,19,47,-,-,-,-,5%,361,Normal,-,-,80
+Sheik,Grab/Throw,"Up throw","1 19 22 57",19,22,57,-,-,-,-,6%,361,Normal,-,-,90
+Sheik,Grab/Throw,"Down throw","1 31 35 57",31,35,57,-,-,-,-,5%,361,Normal,-,-,90
+Sheik,Dodge,Spotdodge,"1 22",2,15,22,-,-,-,-,,,,,,
+Sheik,Dodge,Airdodge,"1 49",-,-,49,-,-,-,-,,,,,,
+Sheik,Dodge,"Roll backwards","1 31",4,19,31,-,-,-,-,,,,,,
+Sheik,Dodge,"Roll forwards","1 31",4,19,31,-,-,-,-,,,,,,
+Sheik,Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+Sheik,Getups/Techs,"Getup-Attack (Stomach)","0 1 49",-,-,49,-,-,-,-,6%,361,Normal,80,50,-
+Sheik,Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Sheik,Getups/Techs,"Getup-Roll Forward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Sheik,Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Sheik,Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Sheik,Getups/Techs,Tech-Wall,"1 31",-,-,31,6,-,-,-,,,,,,
+Sheik,Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+Sheik,Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+Sheik,Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+Sheik,Getups/Techs,"Tech-Roll Backward","1 40",-,-,40,-,-,-,-,,,,,,
+Sheik,Edge,"Edge attack","0 1",-,-,-,-,-,-,-,"8 / 6%",361,Normal,-,100,90
+Yoshi,Air,"Neutral Air","1 3 6 7 33 47",3,33,47,45,"15 (7 L-Cancelled)",-,"<3 35>","14 / 10%",361,Normal,"15 / 0",100,-
+Yoshi,Air,"Up Air","1 5 6 39",5,6,39,39,"19 (9 L-Cancelled)",-,"<5 32>",13%,90,Normal,25,100,-
+Yoshi,Air,"Back Air","1 10 12 16 18 23 25 28 30 39",10,30,39,38,"15 (7 L-Cancelled)",-,"<10 32>","7 / 6 / 5 / 4%",60,Normal,"10 / 40",100,-
+Yoshi,Air,"Forward Air","1 19 21 49",19,21,49,44,"21 (10 L-Cancelled)",-,"<4 35>",17%,270,Normal,30,100,-
+Yoshi,Air,"Down Air","1 18 20 22 24 26 28 30 32 34 36 38 40 42 44 59",18,44,59,53,"26 (13 L-Cancelled)",-,"<16 49>",4%,270,Normal,5,90,-
+Yoshi,Grounded,"Jab 1","1 3 5 17",3,5,17,-,-,-,-,3%,361,Normal,8,50,-
+Yoshi,Grounded,"Jab 2","1 3 5 19",3,5,19,-,-,-,-,5%,361,Normal,8,120,-
+Yoshi,Grounded,Dashattack,"1 10 13 14 23 43",10,23,43,42,-,-,-,"9 / 8%",361,Normal,15,100,-
+Yoshi,Grounded,"Up Smash","1 11 15 43",11,15,43,40,-,-,-,14%,75,Normal,26,108,-
+Yoshi,Grounded,"Forward Smash","1 14 16 47",14,16,47,44,-,-,-,16%,361,Normal,32,94,-
+Yoshi,Grounded,"Down Smash","1 6 8 21 22 49",6,22,49,-,-,-,-,"14 / 12%",30,Normal,50,"60 / 75 / 80",-
+Yoshi,Tilt,"Forward Tilt","1 6 8 29",6,8,29,-,-,-,-,12%,"60 / 80 / 70",Normal,40,80,-
+Yoshi,Tilt,"Forward Tilt (Up)","1 6 8 29",6,8,29,-,-,-,-,13%,"80 / 70 / 60",Normal,40,80,-
+Yoshi,Tilt,"Forward Tilt (Down)","1 6 8 29",6,8,29,-,-,-,-,11%,"60 / 70 / 80",Normal,40,80,-
+Yoshi,Tilt,"Up Tilt","1 8 12 29",8,12,29,-,-,-,-,10%,100,Normal,72,40,-
+Yoshi,Tilt,"Down Tilt","1 8 10 23",8,10,23,-,-,-,-,10%,28,Normal,-,100,100
+Yoshi,Special,"Egg Lay","0 1 39",17,21,39,-,-,-,-,7%,361,Normal,-,100,-
+Yoshi,Special,"Side special","0 1",-,-,-,-,-,-,-,"4 / 5 / 6 / 7 / 8 / 9 / 10 / 11 / 12 / 13%",80,Normal,43,70,-
+Yoshi,Special,"Side special (Air)","0 1",-,-,-,-,-,-,-,"4 / 5 / 6 / 7 / 8 / 9 / 10 / 11 / 12 / 13%",80,Normal,43,70,-
+Yoshi,Special,"Yoshi Bomb","0 1 76",27,52,76,-,-,-,-,"16 / 1%","80 / 361",Normal,50,"98 / 50",-
+Yoshi,Special,"Yoshi Bomb (Air)","0 1",19,-,-,-,-,-,-,"14 / 1%","80 / 361",Normal,"46 / 50","96 / 50",-
+Yoshi,Special,"Egg Throw","0 1 54",18,74,54,-,-,-,-,"12 / 10%",70,Normal,45,40,-
+Yoshi,Special,"Egg Throw (Air)","0 1 54",18,74,54,-,-,-,-,"12 / 10%",70,Normal,45,40,-
+Yoshi,Grab/Throw,Grab,"1 18 23 79",18,23,79,-,-,-,-,-,361,Grab,-,100,-
+Yoshi,Grab/Throw,Dashgrab,"1 11 16 70",11,16,70,-,-,-,-,-,361,Grab,-,100,-
+Yoshi,Grab/Throw,Pummel,"0 1 9",-,-,-,-,-,-,-,3%,80,Normal,-,100,30
+Yoshi,Grab/Throw,"Forward throw","0 1 39",-,-,39,-,-,-,-,6%,45,Normal,40,66,-
+Yoshi,Grab/Throw,"Back throw","0 1 43",-,-,43,-,-,-,-,6%,135,Normal,40,66,-
+Yoshi,Grab/Throw,"Up throw","0 1 43",-,-,43,-,-,-,-,5%,90,Normal,65,43,-
+Yoshi,Grab/Throw,"Down throw","0 1 43",-,-,43,-,-,-,-,4%,80,Normal,120,20,-
+Yoshi,Dodge,Spotdodge,"1 22",2,15,22,-,-,-,-,,,,,,
+Yoshi,Dodge,Airdodge,"1 49",-,-,49,-,-,-,-,,,,,,
+Yoshi,Dodge,"Roll backwards","1 37",4,19,37,-,-,-,-,,,,,,
+Yoshi,Dodge,"Roll forwards","1 37",4,19,37,-,-,-,-,,,,,,
+Yoshi,Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+Yoshi,Getups/Techs,"Getup-Attack (Stomach)","0 1 49",-,-,49,-,-,-,-,6%,361,Normal,80,50,-
+Yoshi,Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Yoshi,Getups/Techs,"Getup-Roll Forward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Yoshi,Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Yoshi,Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Yoshi,Getups/Techs,Tech-Wall,"1 31",-,-,31,6,-,-,-,,,,,,
+Yoshi,Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+Yoshi,Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+Yoshi,Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+Yoshi,Getups/Techs,"Tech-Roll Backward","1 40",-,-,40,-,-,-,-,,,,,,
+Yoshi,Edge,"Edge attack","0 1",-,-,-,-,-,-,-,"12 / 6%",361,Normal,-,100,100
+"Young Link",Air,Tether,"1 60",11,15,60,-,30,-,-,,,,,,
+"Young Link",Air,"Neutral Air","1 4 5 6 27 39",4,27,39,36,"15 (7 L-Cancelled)",-,"<4 31>","12 / 8%",361,Normal,"15 / 10",100,-
+"Young Link",Air,"Up Air","1 5 7 8 49 69",5,49,69,-,"30 (15 L-Cancelled)",-,"<5 55>","15 / 12%",80,Slash,25,85,-
+"Young Link",Air,"Back Air","1 6 9 18 23 39",6,23,39,30,"15 (7 L-Cancelled)",-,"<1 28>",7%,361,Normal,"0 / 15",100,-
+"Young Link",Air,"Forward Air","1 14 16 17 33 55",14,33,55,47,"15 (7 L-Cancelled)",-,"<1 46>","9 / 12 / 11 / 7 / 8 / 5%","361 / 76",Slash,"5 / 0","100 / 90",-
+"Young Link",Air,"Down Air","1 13 15 16 64 89",13,64,89,80,"50 (25 L-Cancelled)",-,"<13 64>","16 / 14 / 17 / 21%","270 / 70","Fire / Slash","70 / 40",100,-
+"Young Link",Grounded,"Jab 1","1 6 8 23",6,8,23,20,-,-,-,3%,361,Slash,10,60,-
+"Young Link",Grounded,"Jab 2","1 7 8 22",7,8,22,18,-,-,-,2%,361,Slash,10,60,-
+"Young Link",Grounded,"Jab 3","1 7 11 50",7,11,50,33,-,-,-,5%,361,Slash,10,100,-
+"Young Link",Grounded,"Rapid Jabs","1 5 7 35",3,32,35,-,-,-,-,1%,-,Slash,15,"60 / 40 / 50",-
+"Young Link",Grounded,Dashattack,"1 7 12 53",7,12,53,40,-,-,-,"10 / 11%",361,Slash,10,100,-
+"Young Link",Grounded,"Up Smash","1 11 14 26 28 40 42 43 44 60",11,44,60,52,-,-,-,"3 / 2 / 8 / 7 / 9%","98 / 90 / 100 / 30",Slash,"40 / 0 / 70 / 50","100 / 70","31 / 23 / 29 / 35 / 28 / 37 / 0"
+"Young Link",Grounded,"Forward Smash","1 15 17 49",15,17,49,-,-,-,-,10%,75,Slash,-,100,40
+"Young Link",Grounded,"Forward Smash 2","1 40",10,13,40,-,-,-,-,,,,,,
+"Young Link",Grounded,"Down Smash","1 9 11 21 23",9,11,23,42,-,-,-,"7 / 13 / 6 / 12%","30 / 70",Slash,"30 / 25","90 / 70",-
+"Young Link",Tilt,"Forward Tilt","1 11 13 33",11,13,33,-,-,-,-,"10 / 11 / 12%",361,Slash,"2 / 5",100,-
+"Young Link",Tilt,"Up Tilt","1 9 15 29",9,15,29,-,-,-,-,8%,"85 / 70",Slash,20,"126 / 130 / 128 / 124",-
+"Young Link",Tilt,"Down Tilt","1 14 16 39",14,46,38,-,-,-,-,"1 / 8 / 9 / 10 / 11 / 12 / 15%",80,Flame,45,30,-
+"Young Link",Special,Boomerang,"0 1 45",27,167,45,-,-,-,-,"19 / 17 / 7 / 2%","70 / 75 / 90",Normal,"55 / 40",30,-
+"Young Link",Special,"Boomerang (Air)","0 1 45",27,167,45,-,-,-,-,"19 / 17 / 7 / 2%","70 / 75 / 90",Normal,"55 / 40",30,-
+"Young Link",Special,Bomb,"0 1",16,40,-,-,-,-,-,"2 / 9 / 8 / 7%","110 / 120",Flame,"40 / 50","70 / 30",-
+"Young Link",Special,"Bomb (Air)","0 1",16,40,-,-,-,-,-,"7 / 6%",120,Flame,50,30,-
+"Young Link",Special,"Spin Attack","0 1 79",8,44,79,-,-,-,-,"1 / 3%","173 / 80",Slash,"60 / 80","40 / 100",-
+"Young Link",Special,"Spin Attack (Air)","0 1 80",8,50,80,-,-,-,-,"3 / 2%","79 / 60 / 70 / 88 / 361",Slash,"0 / 40","100 / 180","80 / 72 / 70 / 68 / 0"
+"Young Link",Grab/Throw,Grab,"1 11 13 14 85",11,14,85,-,-,-,-,-,361,Grab,-,100,-
+"Young Link",Grab/Throw,Dashgrab,"1 14 15 17 95",14,17,95,-,-,-,-,-,361,Grab,-,100,-
+"Young Link",Grab/Throw,Pummel,"0 1 9",-,-,-,-,-,-,-,3%,361,Normal,-,100,-
+"Young Link",Grab/Throw,"Forward throw","1 12 15 39",12,15,39,-,-,-,-,3%,361,Normal,-,-,90
+"Young Link",Grab/Throw,"Back throw","1 11 15 39",11,15,39,-,-,-,-,3%,361,Normal,-,-,90
+"Young Link",Grab/Throw,"Up throw","1 26 49",26,26,49,-,-,-,-,4%,20,Slash,35,100,-
+"Young Link",Grab/Throw,"Down throw","1 22 23 49",22,23,49,-,-,-,-,2%,361,Normal,-,-,90
+"Young Link",Dodge,Spotdodge,"1 22",2,15,22,-,-,-,-,,,,,,
+"Young Link",Dodge,Airdodge,"1 49",4,29,49,-,-,-,-,,,,,,
+"Young Link",Dodge,"Roll backwards","1 38",4,20,38,-,-,-,-,,,,,,
+"Young Link",Dodge,"Roll forwards","1 38",4,20,38,-,-,-,-,,,,,,
+"Young Link",Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+"Young Link",Getups/Techs,"Getup-Attack (Stomach)","0 1 49",-,-,49,-,-,-,-,6%,361,Slash,80,50,-
+"Young Link",Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+"Young Link",Getups/Techs,"Getup-Roll Forward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+"Young Link",Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+"Young Link",Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+"Young Link",Getups/Techs,Tech-Wall,"1 31",-,-,31,6,-,-,-,,,,,,
+"Young Link",Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+"Young Link",Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+"Young Link",Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+"Young Link",Getups/Techs,"Tech-Roll Backward","1 40",-,-,40,-,-,-,-,,,,,,
+"Young Link",Edge,"Edge attack","0 1",-,-,-,-,-,-,-,8%,361,Normal,-,100,90
+Zelda,Air,"Neutral Air","1 6 7 10 11 14 15 18 19 22 23 26 27 49",6,31,49,42,"18 (9 L-Cancelled)",-,"<6 37>","2 / 3 / 5%","130 / 90 / 361",Normal,"0 / 40","100 / 90 / 130 / 120","70 / 120 / 50 / 0"
+Zelda,Air,"Up Air","1 14 16 54",14,16,54,-,"25 (12 L-Cancelled)",-,"<14 44>",13%,90,Fire,-,120,-
+Zelda,Air,"Back Air","1 5 8 35",5,8,35,33,"18 (9 L-Cancelled)",-,"<5 25>","10 / 20%",361,"Normal / Electric","0 / 30","80 / 96",-
+Zelda,Air,"Forward Air","1 8 11 39",8,11,39,36,"18 (9 L-Cancelled)",-,"<8 24>","20 / 10%",361,"Electric / Normal","30 / 0","96 / 80",-
+Zelda,Air,"Down Air","1 14 17 43",14,17,43,43,"24 (12 L-Cancelled)",-,"<1 39>","8 / 7%",275,Normal,"5 / 0","100 / 80",-
+Zelda,Grounded,"Jab 1","1 11 13 15 29",11,15,29,27,-,-,-,2%,361,Electric,10,100,-
+Zelda,Grounded,Dashattack,"1 6 8 9 13 37",6,13,37,36,-,-,-,"13 / 9 / 7 / 8%","90 / 361",Electric,"70 / 50 / 20",70,-
+Zelda,Grounded,"Up Smash","1 5 7 9 11 13 15 17 24 26 28 30 32 34 56",5,34,56,51,-,-,-,"1 / 5%","170 / 90 / 110",Electric,"0 / 20","100 / 210","20 / 16 / 45 / 0"
+Zelda,Grounded,"Forward Smash","1 16 18 20 22 24 39",16,24,39,-,-,-,-,"1 / 14%","160 / 60 / 45 / 30 / 361","Normal / Electric","0 / 50","100 / 98","40 / 12 / 11 / 13 / 0"
+Zelda,Grounded,"Down Smash","1 4 7 13 16 39",4,16,39,32,-,-,-,11%,30,Normal,20,"90 / 80",-
+Zelda,Tilt,"Forward Tilt","1 12 14 37",12,14,37,37,-,-,-,"11 / 12 / 13%","361 / 110","Normal / Slash",50,88,-
+Zelda,Tilt,"Forward Tilt (Up)","1 12 14 37",12,14,37,37,-,-,-,"11 / 12 / 13%","361 / 110","Normal / Slash",50,88,-
+Zelda,Tilt,"Forward Tilt (Down)","1 12 14 37",12,14,37,37,-,-,-,"13 / 12 / 11%","110 / 361","Slash / Normal",50,88,-
+Zelda,Tilt,"Up Tilt","1 10 24 43",10,24,43,40,-,-,-,11%,70,Electric,65,105,-
+Zelda,Tilt,"Down Tilt","1 5 7 31",5,7,31,30,-,-,-,"8 / 7%","270 / 80",Normal,20,80,-
+Zelda,Special,"Nayru's Love","0 1 59",12,27,59,-,-,-,-,"1 / 2 / 5 / 4%","10 / 361",Slash,"12 / 50 / 40","40 / 100",-
+Zelda,Special,"Din's Fire","0 1 77",60,62,77,-,-,-,-,8%,70,Flame,40,60,-
+Zelda,Special,"Din's Fire (Air)","0 1 77",60,62,77,-,-,-,-,8%,70,Flame,40,60,-
+Zelda,Special,Transform,"1 69",34,43,69,-,-,-,-,,,,,,
+Zelda,Special,"Transform (Air)","1 69",34,43,69,-,-,-,-,,,,,,
+Zelda,Special,"Farores Wind","0 1 114",10,11,114,-,30,-,-,4%,"80 / 361","Slash / Flame",-,100,120
+Zelda,Special,"Farores Wind (Air)","0 1 114",12,13,40,-,-,-,-,-,361,Grab,-,100,-
+Zelda,Grab/Throw,Pummel,"0 1 6 8",-,-,-,-,-,-,-,3%,80,Electric,-,100,30
+Zelda,Grab/Throw,"Forward throw","0 1 49",-,-,49,-,-,-,-,12%,45,Normal,70,50,-
+Zelda,Grab/Throw,"Back throw","0 1 49",-,-,49,-,-,-,-,11%,135,Normal,80,60,-
+Zelda,Grab/Throw,"Up throw","0 1 49",-,-,49,-,-,-,-,11%,90,Normal,80,50,-
+Zelda,Grab/Throw,"Down throw","1 24 25 30 31 36 37 42 43 48 49 64",24,49,64,-,-,-,-,2%,40,Electric,-,100,25
+Zelda,Dodge,Spotdodge,"1 32",3,20,32,-,-,-,-,,,,,,
+Zelda,Dodge,Airdodge,"1 49",4,19,49,-,-,-,-,,,,,,
+Zelda,Dodge,"Roll backwards","1 31",4,19,31,-,-,-,-,,,,,,
+Zelda,Dodge,"Roll forwards","1 31",4,19,31,-,-,-,-,,,,,,
+Zelda,Getups/Techs,"Getup-Attack (Back)","1 49",-,-,49,-,-,-,-,,,,,,
+Zelda,Getups/Techs,"Getup-Attack (Stomach)","0 1 49",-,-,49,-,-,-,-,"6 / 8%",361,Normal,70,50,-
+Zelda,Getups/Techs,"Getup-Roll Forward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Zelda,Getups/Techs,"Getup-Roll Forward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Zelda,Getups/Techs,"Getup-Roll Backward (Back)","1 35",-,-,35,-,-,-,-,,,,,,
+Zelda,Getups/Techs,"Getup-Roll Backward (Stomach)","1 35",-,-,35,-,-,-,-,,,,,,
+Zelda,Getups/Techs,Tech-Wall,"1 31",-,-,31,6,-,-,-,,,,,,
+Zelda,Getups/Techs,"Tech-Wall Jump","1 40",-,-,40,1,-,-,-,,,,,,
+Zelda,Getups/Techs,Tech-Neutral,"1 26",-,-,26,-,-,-,-,,,,,,
+Zelda,Getups/Techs,"Tech-Roll Forward","1 40",-,-,40,-,-,-,-,,,,,,
+Zelda,Getups/Techs,"Tech-Roll Backward","1 40",-,-,40,-,-,-,-,,,,,,
+Zelda,Edge,"Edge attack","0 1",-,-,-,-,-,-,-,"8 / 10 / 6%",361,Normal,-,100,90

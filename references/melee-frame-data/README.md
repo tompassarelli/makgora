@@ -1,10 +1,12 @@
 # Melee frame-data reference
 
 Smashcraft's one corpus of Melee frame data: a factual research reference, not a
-physics specification or an importable character definition. It has two
+physics specification or an importable character definition. It has three
 inputs, each with its own provenance: meleeframedata.com's database
-(`records.jsonl`, below) and libmelee's recorded per-frame table
-(`libmelee.jsonl`, under "libmelee hitbox positions and dodge travel").
+(`records.jsonl`, below), libmelee's recorded per-frame table
+(`libmelee.jsonl`, under "libmelee hitbox positions and dodge travel") and
+FightCore's frame data with knockback values (`fightcore.csv`, under
+"FightCore knockback and getup data").
 Physics parameters and retail observations are in
 smashcraft:docs/smash-melee-reference/README.md.
 
@@ -177,3 +179,46 @@ bun references/melee-frame-data/libmelee-intake.ts /tmp/libmelee-framedata.csv r
 
 The tool checks the input hash, refuses non-numeric values and frame gaps, and
 checks the two representative records.
+
+## FightCore knockback and getup data
+
+`smashcraft:references/melee-frame-data/fightcore.csv` is FightCore's Melee frame
+data for all 26 fighters, 1215 rows, one per `(Character, Section, Move)`. It
+adds what the other two inputs lack: each move's launch angle, base knockback,
+knockback growth and set knockback, and the getup, tech, ledge and dodge
+options per fighter.
+
+Source: the FightCore frame-data export `fightcore_melee_frame_data.xlsx`
+(https://www.fightcore.gg), downloaded by Tom on 2026-10-26, SHA-256
+`f75fed5ed62a4524465b96ce5d576102c01a9f81bbb6c235adf22fb70bb0e96d`. The file is
+the workbook's "All Characters" sheet converted with `ssconvert`; the 26
+per-character sheets hold the same rows. No reuse license was found with the
+export; only factual numbers and move names are kept, and FightCore's GIFs and
+animation credits are left out. The disc revision is not stated.
+
+Columns, as FightCore names them:
+
+| Column | Meaning / limit |
+|---|---|
+| Section | Air (133), Grounded (168), Tilt (115), Special (193), Grab/Throw (178), Dodge (104), Edge (38), Getups/Techs (286) |
+| Frame Timeline | Frame numbers where the move changes phase (start, active edges, IASA, end) |
+| First Active, Last Active, Total Frames, IASA | Frames, counting from 1; `-` where not applicable |
+| Landing lag | `N (M L-Cancelled)` for aerials |
+| Autocancel | `<A B>`: auto-cancels when landing before frame A or from frame B |
+| Damage | Per hitbox or hit, `/`-separated, strongest first, e.g. `12 / 9%` |
+| Angle | Launch angle in degrees; 361 is the Sakurai angle |
+| Base Knockback, Knockback Growth, Set Knockback | Per hitbox, `/`-separated in the Damage order; `-` where absent |
+
+`/`-separated values list a move's hitboxes or hits, not separate moves, and a
+column may hold one value for all of them. Hitbox positions and sizes are not
+in this file; `libmelee.jsonl` has them. Representative check: Fox's neutral air
+is active 4-31 of 49, IASA 42, landing lag 15 (7 L-cancelled), autocancel
+`<4 36>`, as in `records.jsonl`, with angle 361, base knockback `10 / 0` and
+growth 100.
+
+Repeat the intake from the checkout's root:
+
+```sh
+ssconvert -S fightcore_melee_frame_data.xlsx /tmp/fightcore.csv
+cp /tmp/fightcore.csv.0 references/melee-frame-data/fightcore.csv
+```
