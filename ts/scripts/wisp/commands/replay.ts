@@ -51,8 +51,10 @@ const compileReplayLua = Effect.gen(function*() {
 }).pipe(Effect.provide(BunServices.layer));
 
 
+const PROFILE_LINE = /^(frame|prof)\t/;
+
 export function parseLuaReport(stdout: string): MatchReplayResult | undefined {
-  const lines = stdout.split("\n").filter((line) => line.length > 0);
+  const lines = stdout.split("\n").filter((line) => line.length > 0 && !PROFILE_LINE.test(line));
   const match = /^frames (\d+) reached (\d+) recorded (\d+) checksum (\S*) digests (\d+) divergent (\d+)$/.exec(lines[0] ?? "");
   if (match === null) return undefined;
   return {
@@ -78,7 +80,7 @@ export const replayInLua = (file: string, given?: string) => Effect.gen(function
   );
   const result = parseLuaReport(stdout);
   if (exitCode !== 0 || result === undefined) return yield* new ReplayFailure({ problem: `32-bit Lua stopped: ${stderr.trim() || stdout.trim() || `exit ${exitCode}`}` });
-  return result;
+  return { ...result, profile: stdout.split("\n").filter((line) => PROFILE_LINE.test(line)) };
 });
 
 export const replay: Command = (args) => Effect.gen(function*() {
@@ -103,9 +105,11 @@ export const replay: Command = (args) => Effect.gen(function*() {
   yield* Console.log(`${basename(file)}: replay ${header.serial}, build ${header.repro.build}, version ${header.version}, ${header.repro.frame} frames`);
   const lua = replayInLua(joined).pipe(step("replay in 32-bit Lua"));
   const bun = Effect.try({ try: () => replayMatch(lines), catch: (cause) => new ReplayFailure({ problem: `the replay stopped in Bun: ${describeCause(cause)}` }) }).pipe(step("replay in Bun"));
-  const [luaResult, bunResult] = yield* Effect.all([lua, bun], { concurrency: 2 }).pipe(Effect.ensuring(Effect.sync(() => {
+  const profiling = process.env.PERF_PROFILE_FRAMES !== undefined;
+  const [luaResult, bunResult] = yield* Effect.all([lua, bun], { concurrency: profiling ? 1 : 2 }).pipe(Effect.ensuring(Effect.sync(() => {
     if (out === undefined) rmSync(joined, { force: true });
   })));
+  if (profiling) yield* Console.log(luaResult.profile.join("\n"));
   yield* Console.log([...report("bun", bunResult), ...report("lua32", luaResult)].join("\n"));
   if (out !== undefined) yield* Console.log(`wrote ${out}`);
   if (!passed(bunResult) || !passed(luaResult)) return yield* new ReplayFailure({ problem: "the replay doesn't reach every recorded checksum" });

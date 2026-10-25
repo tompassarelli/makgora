@@ -682,9 +682,12 @@ state. The procedure:
    `dev: capture run=RUN frames=18000 match-frame=N`. Keep all four fighters
    in the match for the next five minutes.
 
-4. Collect `smashcraft-perf-capture-pSLOT-runRUN.txt` from each client's
-   `CustomMapData`, fresh from this run (a crash, desync or early result
-   voids it).
+4. Type `-dev reset` once the capture is written: replay parts are written
+   only once the match leaves play, so without it the pool stops before the
+   client writes `smashcraft-replay-REPLAY.txt`. Collect
+   `smashcraft-perf-capture-pSLOT-runRUN.txt` and the replay with its parts
+   from each client's `CustomMapData`, fresh from this run (a crash, desync
+   or early result voids it).
 
 5. From smashcraft:ts/, print the per-section table of each receipt:
 
@@ -699,7 +702,16 @@ state. The procedure:
    frame), `speculative` frame, `replay` (the match's replay serial) and
    section milliseconds; `--json` prints the same as one result. A spike's
    `replay` names the client's `smashcraft-replay-REPLAY.txt`, and `bun wisp
-   replay` of it reaches that `frame` headless.
+   replay` of it reaches that `frame` headless. With
+   `PERF_PROFILE_FRAMES=F,...` the 32-bit Lua replay prints every frame as
+   `frame F US INSTRUCTIONS BYTES` (its microseconds, Lua instructions to
+   the nearest thousand and heap change) and, for the listed frames, `prof F
+   SELF INCLUSIVE FUNCTION` instruction samples; the listed frames' own time
+   and bytes include the sampling, so read their cost from a run that lists
+   none (`PERF_PROFILE_FRAMES=0`). `PERF_PROFILE_ALLOC=1` stops the
+   collector, so `BYTES` is the frame's allocation and `US` leaves out
+   collection. The replay runs the simulation with its computer decisions,
+   and no rollback snapshots, presentation or natives.
 
 The headless equivalent runs the same build and sections in 32-bit Lua with
 four rollback clients and a capture typed after GO!; its clock is the host's
