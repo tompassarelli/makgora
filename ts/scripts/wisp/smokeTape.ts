@@ -61,14 +61,16 @@ function afterReset(name: string, presses: readonly Press[], frames: number, exp
 
 export const approachStep = (slot: number, frames: number): SmokeStep => ({ name: "approach", presses: [{ at: 0, keys: [key(Action.walk), key(facingOf(slot) > 0 ? Action.moveRight : Action.moveLeft)], hold: frames }], frames });
 
-function charge(slot: number, approaches: readonly [number, number]): SmokeStep[] {
+export const strikeStep = (slot: number, approach: number): SmokeStep => {
   const smash = key(facingOf(slot) > 0 ? Action.smashRight : Action.smashLeft);
+  return { name: "strike", presses: Array.from({ length: STRIKES }, (_, strike): Press => ({ at: approach + 4 + strike * STRIKE_EVERY, keys: [smash], hold: 4 })), frames: approach + 4 + STRIKES * STRIKE_EVERY };
+};
+
+function charge(slot: number, approaches: readonly [number, number]): SmokeStep[] {
   return Array.from({ length: MANA_CYCLES }, (_, cycle) => {
     const striker = cycle % 2;
     const approach = approaches[1 - striker] ?? APPROACH_FRAMES;
-    const presses = striker === slot
-      ? Array.from({ length: STRIKES }, (_, strike): Press => ({ at: approach + 4 + strike * STRIKE_EVERY, keys: [smash], hold: 4 }))
-      : approachStep(slot, approach).presses;
+    const presses = striker === slot ? strikeStep(slot, approach).presses : approachStep(slot, approach).presses;
     return afterReset(`charge ${cycle + 1}`, presses, approach + 4 + STRIKES * STRIKE_EVERY);
   });
 }

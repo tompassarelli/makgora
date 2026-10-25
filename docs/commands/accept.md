@@ -37,7 +37,10 @@
   hazards off on the stage screen (a match whose replay shows hazards on fails
   its setup), then plays its fighter pair from fighter select: each standard
   keyboard key once, every normal, aerial and special after a training reset,
-  and the ultimate after both fighters charge their mana. The match ends from
+  and the ultimate after both fighters charge their mana. In each charge cycle
+  the walker stops at the middle of the approach lengths for which the
+  striker's smash lands on that opponent headless, so a frame of key timing
+  either way still lands it. The match ends from
   the pause menu, and its own replay is judged headless
   (smashcraft:ts/scripts/wisp/smokeJudge.ts): the replay must reach every
   recorded checksum, every key must reach the game and every move must start,
@@ -56,7 +59,7 @@
   polls keys once a tick and never saw it. A shard plays its match once, and
   `smoke --native` reruns an invalid shard once in a new run. A
   failed spot check also keeps its before and after frames as PPM files.
-  `bun wisp smoke` rehearses the same tapes headless on every pair in about ten
+  `bun wisp smoke` rehearses the same tapes headless on every pair in about 20
   seconds; run it after changing a fighter's inputs or kit.
   `gate-specials-spot-NN` runs in the same session, after `gate-moves-NN`: at each
   rest between training resets the host frame's bright play-area pixels are

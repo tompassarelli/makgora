@@ -7,12 +7,13 @@ import { Character } from "../../src/game/sim/codes";
 import { createFighter } from "../../src/game/sim/fighter";
 import { fighterAt } from "../../src/game/sim/roster";
 import { type SmokeVerdict, judgeSmoke } from "./smokeJudge";
-import { SMOKE_BINDINGS, type SmokeSegment, approachStep, heldMasks, keyboardRows, segmentFrames, smokeSchedule } from "./smokeTape";
+import { SMOKE_BINDINGS, type SmokeSegment, approachStep, heldMasks, keyboardRows, segmentFrames, smokeSchedule, strikeStep } from "./smokeTape";
 
 const LEAD_FRAMES = 30;
 const BETWEEN_FRAMES = 60;
 const CONTACT_GAP = 80;
 const APPROACH_LIMIT = 240;
+const APPROACH_SEARCH = 12;
 
 function recorded(first: Character, second: Character, frames: number, rows: readonly (readonly InputRow[])[], hazards = false): string[] {
   const idle = emptyInput();
@@ -32,12 +33,10 @@ function recorded(first: Character, second: Character, frames: number, rows: rea
   }));
 }
 
-export function approachFrames(character: Character, slot: number): number {
-  const masks = heldMasks([approachStep(slot, APPROACH_LIMIT)], SMOKE_BINDINGS);
-  const walking = keyboardRows(masks);
-  const fighters: [Character, Character] = slot === 0 ? [character, Character.rifleman] : [Character.rifleman, character];
+function contactFrames(fighters: readonly [Character, Character], walker: number): number {
+  const walking = keyboardRows(heldMasks([approachStep(walker, APPROACH_LIMIT)], SMOKE_BINDINGS));
   let arrived = APPROACH_LIMIT;
-  replayMatch(recorded(fighters[0], fighters[1], APPROACH_LIMIT, slot === 0 ? [walking] : [[], walking]), (state, frame) => {
+  replayMatch(recorded(fighters[0], fighters[1], APPROACH_LIMIT, walker === 0 ? [walking] : [[], walking]), (state, frame) => {
     if (arrived < APPROACH_LIMIT) return;
     const gap = Math.abs(fighterAt(state.world, 0).motion.x - fighterAt(state.world, 1).motion.x);
     if (gap <= CONTACT_GAP) arrived = frame;
@@ -45,7 +44,31 @@ export function approachFrames(character: Character, slot: number): number {
   return arrived;
 }
 
-export const smokeApproaches = (first: Character, second: Character): [number, number] => [approachFrames(first, 0), approachFrames(second, 1)];
+function strikeLands(fighters: readonly [Character, Character], walker: number, approach: number): boolean {
+  const striker = 1 - walker;
+  const strike = strikeStep(striker, approach);
+  const walking = keyboardRows(heldMasks([approachStep(walker, approach)], SMOKE_BINDINGS));
+  const striking = keyboardRows(heldMasks([strike], SMOKE_BINDINGS));
+  let landed = false;
+  replayMatch(recorded(fighters[0], fighters[1], strike.frames, walker === 0 ? [walking, striking] : [striking, walking]), (state) => {
+    landed ||= fighterAt(state.world, striker).mana.points > 0;
+  });
+  return landed;
+}
+
+export function approachFrames(fighters: readonly [Character, Character], walker: number): number {
+  const contact = contactFrames(fighters, walker);
+  const lands = (approach: number) => approach >= 1 && approach <= APPROACH_LIMIT && strikeLands(fighters, walker, approach);
+  const found = Array.from({ length: APPROACH_SEARCH + 1 }, (_, offset) => [contact - offset, contact + offset]).flat().find(lands);
+  if (found === undefined) return contact;
+  let low = found;
+  let high = found;
+  while (found - low < APPROACH_SEARCH && lands(low - 1)) low--;
+  while (high - found < APPROACH_SEARCH && lands(high + 1)) high++;
+  return Math.floor((low + high) / 2);
+}
+
+export const smokeApproaches = (first: Character, second: Character): [number, number] => [approachFrames([first, second], 0), approachFrames([first, second], 1)];
 
 export interface TapeSpan {
   readonly segment: number;
