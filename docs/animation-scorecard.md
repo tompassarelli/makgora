@@ -137,7 +137,7 @@ Tom as better examples are authored.
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | jab | .41 | .15 | .053 | .029 | .029 | 1 | .86 | .36 |
 | tilt | .90 | .023 | .053 | .055 | .029 | 2 | .53 | .16 |
-| smash | .29 | .071 | .026 | .014 | .095 | 3 | .84 | .43 |
+| smash | .29 | .071 | .026 | .025 | .095 | 3 | .84 | .43 |
 | aerial | .29 | .023 | .008 | .015 | .12 | 3 | .53 | .25 |
 | special | .90 | .20 | .046 | .055 | .039 | 1 | .90 | .48 |
 
@@ -158,6 +158,10 @@ down smash; tilt weight uses Mountain King's angled up tilt and Thrall's
 forward tilt. Jab return uses Grom's jab and Lich King's second jab. Special
 weight/return use Mountain King's and Beastmaster's neutral specials.
 The repaired Pit Lord back-air calibrates aerial return and contrast.
+Smash jump is .025, not the .014 calibrated on its one move: under .014
+Shadow Hunter's forward smash only fit by spreading the return so evenly
+that a cold viewer read a held pose, while every follow-through a viewer
+could see measured .0146–.025 (#70, 2026-10-25).
 Anticipation uses the good jabs, Pit Lord/Lich King/Mountain King tilts,
 Blademaster up smash and Beastmaster neutral special. Contrast uses each
 class's good readability examples. Tilt return, aerial weight/timing

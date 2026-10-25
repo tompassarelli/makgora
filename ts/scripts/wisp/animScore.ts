@@ -96,7 +96,7 @@ export interface MoveScore {
 export const THRESHOLDS: Readonly<Record<MoveClass, ClassThresholds>> = {
   jab: { bodyShare: 0.41, massShift: 0.15, endError: 0.053, jump: 0.029, overshoot: 0.029, peakLate: 1, fill: 0.86, contrast: 0.36 },
   tilt: { bodyShare: 0.9, massShift: 0.023, endError: 0.053, jump: 0.055, overshoot: 0.029, peakLate: 2, fill: 0.53, contrast: 0.16 },
-  smash: { bodyShare: 0.29, massShift: 0.071, endError: 0.026, jump: 0.014, overshoot: 0.095, peakLate: 3, fill: 0.84, contrast: 0.43 },
+  smash: { bodyShare: 0.29, massShift: 0.071, endError: 0.026, jump: 0.025, overshoot: 0.095, peakLate: 3, fill: 0.84, contrast: 0.43 },
   aerial: { bodyShare: 0.29, massShift: 0.023, endError: 0.008, jump: 0.015, overshoot: 0.12, peakLate: 3, fill: 0.53, contrast: 0.25 },
   special: { bodyShare: 0.9, massShift: 0.2, endError: 0.046, jump: 0.055, overshoot: 0.039, peakLate: 1, fill: 0.9, contrast: 0.48 },
 };
