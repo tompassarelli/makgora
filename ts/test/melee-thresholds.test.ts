@@ -1,10 +1,10 @@
 import { expect, test } from "bun:test";
-import { damageLevelForKnockback, hitContextKnockback, HITSTUN_FRAMES_PER_KNOCKBACK } from "../src/game/sim/knockback";
+import { hitContextKnockback, TUMBLE_KNOCKBACK } from "../src/game/sim/knockback";
 import { SHIPPED_THRESHOLD_RULES, type ThresholdOptions, type ThresholdRules, compareThresholds } from "../scripts/meleeThresholds";
 import { sweep } from "./sweep";
 
-const MOVED_HITSTUN_FRAMES_PER_KNOCKBACK = HITSTUN_FRAMES_PER_KNOCKBACK + 0.01;
-const tumblesMoved = (knockback: number): boolean => damageLevelForKnockback((knockback * MOVED_HITSTUN_FRAMES_PER_KNOCKBACK) / HITSTUN_FRAMES_PER_KNOCKBACK) === 3;
+const MOVED_TUMBLE_KNOCKBACK = TUMBLE_KNOCKBACK - 2;
+const tumblesMoved = (knockback: number): boolean => knockback >= MOVED_TUMBLE_KNOCKBACK;
 const MOVED_RULES: ThresholdRules = {
   ...SHIPPED_THRESHOLD_RULES,
   80: tumblesMoved,
@@ -18,10 +18,10 @@ function expectEveryDisagreementNamed(options: ThresholdOptions): void {
   expect(problems.filter((problem) => problem.startsWith("threshold disagreement: ")).length).toBe(disagreements);
 }
 
-test("every threshold disagreement is a named problem when the hitstun factor moves [k2 property]", () => {
+test("every threshold disagreement is a named problem when the tumble knockback moves [k2 property]", () => {
   expectEveryDisagreementNamed({ attacker: "falco" });
 });
 
-sweep("every FightCore threshold disagreement is a named problem when the hitstun factor moves [k2 property]", () => {
+sweep("every FightCore threshold disagreement is a named problem when the tumble knockback moves [k2 property]", () => {
   expectEveryDisagreementNamed({});
 }, 120_000);
