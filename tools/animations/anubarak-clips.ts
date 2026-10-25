@@ -35,7 +35,7 @@ if (source.Sequences.length > 17) {
 const model = structuredClone(source);
 ensure(source.Sequences.length === 17 && source.Helpers.some(b => b.Name === "Bone_ArmClawR"), "Expected original classic Crypt Lord");
 const stand = source.Sequences[0]!;
-interface Gesture { chest?: number; pelvis?: number; arm?: number; elbow?: number; wrist?: number; hand?: number; leftArm?: number; leftElbow?: number; leftWrist?: number; head?: number; thigh?: number; knee?: number; leftThigh?: number; yaw?: number; lean?: number; }
+interface Gesture { chest?: number; pelvis?: number; arm?: number; elbow?: number; wrist?: number; hand?: number; leftArm?: number; leftElbow?: number; leftWrist?: number; head?: number; thigh?: number; knee?: number; leftThigh?: number; frontThigh?: number; leftFrontThigh?: number; yaw?: number; lean?: number; }
 interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; hold?: boolean; air?: boolean; roll?: number; target?: readonly [number, number]; paired?: boolean; pain?: boolean; }
 const forward: Gesture = { chest: 15, pelvis: -8, arm: -95, elbow: 15, leftArm: -35, leftElbow: -20, head: -8, thigh: 12, leftThigh: -8 };
 const overhead: Gesture = { chest: -18, pelvis: 8, arm: -165, elbow: -10, leftArm: -140, head: -18, thigh: -12, leftThigh: 15 };
@@ -63,7 +63,7 @@ const lunges: Partial<Record<HeroPose, Lunge>> = {
   neutralAir: { contact: 9, x: 12, back: 6 },
   forwardAir: { contact: 12, x: 20, back: 10 },
   backAir: { contact: 10, x: -70, back: 35 },
-  dashAttack: { contact: 11, x: 40, back: 20 },
+  dashAttack: { contact: 8, x: 56, back: 26, over: 0.4 },
   downAir: { contact: 16, z: -12, back: 6 },
   neutralSpecial: { contact: 17, x: 32, back: 16, over: 0.4, ramp: 8 },
   upSpecial: { contact: 8, z: 34, back: 24 },
@@ -83,6 +83,7 @@ const rakes: Partial<Record<HeroPose, Rake>> = {
   downSmash: { contact: 15, through: 20, windup: { chest: -25, pelvis: -15, lean: -12, arm: -220, elbow: 80, wrist: 40, leftArm: -220, leftElbow: 80, leftWrist: 40, head: -20 }, strike: { chest: 45, pelvis: 18, lean: 18, arm: -170, elbow: 70, wrist: 80, head: 15, leftArm: -200, leftElbow: 90, leftWrist: 40, thigh: 30, knee: -40 }, follow: { chest: 30, pelvis: 20, lean: 5, yaw: 150, arm: -150, elbow: 80, wrist: 80, leftArm: -150, leftElbow: 80, leftWrist: 60, thigh: 35, knee: -45 }, carry: { frame: 30, gesture: { chest: 30, pelvis: 20, yaw: 120, arm: -60, elbow: 60, wrist: 60, leftArm: -60, leftElbow: 60, leftWrist: 60, thigh: 30, knee: -40 } } },
   forwardTiltDown: { contact: 9, through: 12, windup: { chest: -20, pelvis: -12, lean: -10, arm: -230, elbow: 70, wrist: 40, leftArm: -60, head: -20 }, strike: { chest: 55, pelvis: 18, lean: 22, arm: -150, elbow: 40, wrist: 30, head: 15, leftArm: -60, thigh: 30, knee: -40 }, follow: { chest: 45, pelvis: 28, lean: 18, arm: -80, elbow: 100, wrist: 60, head: 15, leftArm: -60, thigh: 40, knee: -50, leftThigh: -20 }, carry: { frame: 20, gesture: { chest: 40, pelvis: 28, lean: 12, arm: 0, elbow: 0, wrist: 30, head: 10, leftArm: -60, thigh: 35, knee: -45 } } },
   downTilt: { contact: 7, through: 10, windup: { chest: -15, pelvis: -10, lean: -8, arm: -220, elbow: 80, wrist: 40, leftArm: -40, head: -15, thigh: 20, knee: -30 }, strike: { chest: 55, pelvis: 20, lean: 22, arm: -130, elbow: 40, wrist: 30, hand: 0, head: 20, thigh: 40, knee: -50, leftArm: -60 }, follow: { chest: 20, pelvis: 20, arm: -40, elbow: 60, wrist: 70, hand: 30, head: 15, thigh: 35, knee: -45, leftArm: -60 }, carry: { frame: 18, gesture: { chest: 15, pelvis: 15, lean: -5, arm: 20, wrist: 30, head: 10, thigh: 30, knee: -40, leftArm: -60 } } },
+  dashAttack: { contact: 8, through: 19, windup: { chest: -10, pelvis: -8, lean: -18, arm: -230, elbow: 70, wrist: 40, leftArm: -200, leftElbow: 60, head: -18, thigh: 25, knee: -35, leftThigh: 15, frontThigh: 15, leftFrontThigh: 15 }, strike: { chest: 8, arm: -110, elbow: -10, leftArm: -95, leftElbow: -15, head: 15, thigh: 50, knee: -10, leftThigh: 50, frontThigh: -45, leftFrontThigh: -45 }, follow: { chest: 20, lean: 4, arm: -55, elbow: -35, wrist: 20, leftArm: -40, leftElbow: -30, leftWrist: 20, head: 25, thigh: 55, knee: -10, leftThigh: 55, frontThigh: -50, leftFrontThigh: -50 }, carry: { frame: 30, gesture: { chest: -10, lean: -6, arm: -125, elbow: 45, wrist: 20, leftArm: -115, leftElbow: 40, head: -6, frontThigh: 15, leftFrontThigh: 15 } } },
   forwardAir: { contact: 12, through: 15, windup: { chest: -22, pelvis: -14, lean: -12, arm: -190, elbow: 20, leftArm: -80, thigh: 25, leftThigh: -25 }, strike: { chest: 30, pelvis: 24, lean: 14, arm: -100, elbow: 20, leftArm: -100, thigh: -20, leftThigh: 20 }, follow: { chest: 48, pelvis: 32, lean: 20, arm: 100, elbow: 20, leftArm: -120, thigh: -35, leftThigh: 35 } },
   backAir: { contact: 10, through: 13, windup: { chest: 22, pelvis: 15, lean: 12, arm: 190, elbow: 20, leftArm: 70 }, strike: { chest: -28, pelvis: -20, lean: -15, arm: 100, elbow: 20, leftArm: 100 }, follow: { chest: -45, pelvis: -30, lean: -20, arm: -100, elbow: 20, leftArm: -100 } },
   neutralSpecial: { contact: 18, through: 26, ...scythe(35, 15) },
@@ -194,22 +195,16 @@ function rotated(q: ArrayLike<number>, y: number, z = 0) {
   const out = [l! * x + i! * t + j! * w - k! * v, l! * v - i! * w + j! * t + k! * x, l! * w + i! * v - j! * x + k! * t, l! * t - i! * x - j! * v - k! * w];
   const length = Math.hypot(...out); return new Float32Array(out.map(n => n / length));
 }
+const jointPitch: Readonly<Record<string, readonly [keyof Gesture, number]>> = {
+  Bone_Chest: ["chest", 1], Bone_Pelvis: ["pelvis", 1], Bone_Head: ["head", 1], Bone_Root: ["lean", 1],
+  Bone_Arm1R: ["arm", 0.65], Bone_Arm2R: ["elbow", 1], Bone_Arm3R: ["wrist", 1], Bone_ArmClawR: ["hand", 1],
+  Bone_Arm1L: ["leftArm", 0.65], Bone_Arm2L: ["leftElbow", 1], Bone_Arm3L: ["leftWrist", 1],
+  Bone_LFLeg09: ["thigh", 1], Bone_LFLeg13: ["leftThigh", 1], Bone_LFLeg10: ["knee", 1], Bone_LFLeg14: ["knee", 1],
+  Bone_LFLeg07: ["frontThigh", 1], Bone_LFLeg04: ["leftFrontThigh", 1],
+};
 function joint(name: string, g: Gesture): [number, number] {
-  if (name === "Bone_Chest") return [g.chest ?? 0, g.yaw ?? 0];
-  if (name === "Bone_Pelvis") return [g.pelvis ?? 0, 0];
-  if (name === "Bone_Arm1R") return [(g.arm ?? 0) * 0.65, 0];
-  if (name === "Bone_Arm2R") return [g.elbow ?? 0, 0];
-  if (name === "Bone_Arm3R") return [g.wrist ?? 0, 0];
-  if (name === "Bone_ArmClawR") return [g.hand ?? 0, 0];
-  if (name === "Bone_Arm1L") return [(g.leftArm ?? 0) * 0.65, 0];
-  if (name === "Bone_Arm2L") return [g.leftElbow ?? 0, 0];
-  if (name === "Bone_Arm3L") return [g.leftWrist ?? 0, 0];
-  if (name === "Bone_Head") return [g.head ?? 0, 0];
-  if (name === "Bone_LFLeg09") return [g.thigh ?? 0, 0];
-  if (name === "Bone_LFLeg13") return [g.leftThigh ?? 0, 0];
-  if (/^Bone_LFLeg(?:10|14)$/.test(name)) return [g.knee ?? 0, 0];
-  if (name === "Bone_Root") return [g.lean ?? 0, 0];
-  return [0, 0];
+  const pitch = jointPitch[name];
+  return [pitch ? (g[pitch[0]] ?? 0) * pitch[1] : 0, name === "Bone_Chest" ? g.yaw ?? 0 : 0];
 }
 function blend(from: ArrayLike<number>, to: ArrayLike<number>, weight: number): Float32Array<ArrayBuffer> {
   let dot = 0; for (let i = 0; i < 4; i++) dot += from[i]! * to[i]!;
