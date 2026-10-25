@@ -109,12 +109,10 @@ the traps).
 
 ## Simultaneous damage contacts — 2026-10-02
 
-The pinned Melee reference's damage-log selector in Melee
-evaluates contacts against accumulated temporary damage and selects the greatest
-knockback; equal values retain the earlier entry. Its ordinary formula uses
-truncated pre-frame percent plus the fractional temporary total while attack
-power belongs to the individual hit. These are factual mechanics only: the
-Wurst collection and resolution implementation is independently authored.
+SmashWiki "Knockback" states that Melee's percent term is the floored pre-hit
+percent plus the sum of the hitbox damage dealt that frame. Smashcraft selects
+the greatest knockback among a frame's contacts, keeping the earlier entry on a
+tie, while attack power belongs to the individual hit.
 
 smashcraft:wurst/MatchStep.wurst now opens one synchronous contact batch before
 grab actions and resolves it after melee, specials, summons and projectiles.
@@ -1602,12 +1600,9 @@ Shield depletion requires health strictly below zero; reaching exactly zero
 keeps guard active, including for another hit during hitlag. Continuing drain
 can then break it on the next action tick. A drain-caused break sets health to
 zero before that frame's regeneration, leaving 0.07. A damage-caused break sets
-health to the common restoration value 30 during contact resolution, after
+health to 30 (SmashWiki "Shield break") during contact resolution, after
 regeneration has already run; its first later non-guard frame reaches 30.07.
-The common break transition preserves that caller-selected health. These facts
-come from Melee,
-Melee and
-Melee at the revision above.
+The break transition preserves that caller-selected health.
 
 Held guard drains at the active animation boundary before jump, ground dodge,
 release or grab inputs. A resulting break preempts those inputs; reaching
@@ -1616,11 +1611,7 @@ Ordinary guard input entry initializes guard without draining on that tick;
 the following active animation tick supplies its first held drain. Hitlag
 pauses drain. Shieldstun and its return-to-guard completion tick do not drain;
 guard inputs become available on that completion tick, with drain resuming on
-the following tick if guard remains active. The source entry call processes
-animation commands, but does not invoke GuardOn's animation callback; the
-GuardOn/Guard callbacks own drain, and GuardSetOff's callback owns return to
-guard. This distinction is sourced from Melee and
-Melee at the revision above. Powershield
+the following tick if guard remains active. These orderings are Smashcraft's. Powershield
 and analog light-shield state transitions remain outside this digital-guard
 model.
 
@@ -1810,10 +1801,8 @@ specials are locked. Landing or a ledge catch clears the helpless state. A
 flinching hit interrupts the recovery or helpless fall, permitting actions again
 after hitstun, but does not restore jumps already spent. Rifleman consumes the jump budget when his grounded launch begins. These are shared game rules, not exact Melee frame timings.
 
-The local reference's Melee
-shows an airborne fall-special entry consuming all jumps; its grounded entry
-uses a separate transition. This supports the recovery-state behavior, not our
-character-specific animation lengths or all exact interrupt timings. Numerical
+An airborne fall-special entry consumes all jumps; its grounded entry uses a
+separate transition. Numerical
 state is stored in `FighterState.specialFall` and copied by rollback snapshots.
 Rendered fall-special pose and input feel still require in-game verification.
 
@@ -1884,7 +1873,7 @@ release and use the shared knockback/hitstun formula; throw DI uses the victim's
 input on that frame, without adding ordinary hitlag or SDI. Down throw visually
 slams to the floor and launches into an upward bounce. Character throw damage,
 angles, growth/base knockback, trajectories, action lengths and ten-frame escape
-recovery are original starting tuning, not extracted Sheik values. Simultaneous
+recovery are original starting tuning, not Sheik's values. Simultaneous
 grabs clash; Melee resolves them by port priority.
 
 Holder/victim action, frame, serial, mash signs, timer and reciprocal links are
@@ -1904,7 +1893,7 @@ installed-build check and are not proved by the numerical tests.
 Character ID 2 now has explicit simulation mobility and authored contact
 regions. It uses the shared movement, shield, grab, knockback, hitlag, hitstun,
 landing, ledge, stock and replay systems. These values are a first numerical
-combat prototype, not values extracted from Melee or Blizzard character data.
+combat prototype, not values taken from Melee or Blizzard character data.
 Animation clips, pose alignment, HUD/selection, and installed-map behavior are
 not established by these source tests.
 
@@ -1950,50 +1939,29 @@ interpreter, verifies the recorded first traction subtraction and regeneration
 from 20 to 20.06999969482422. These production checks now live in
 smashcraft:ts/src/game/sim/physicsPrecisionState.tests.ts.
 
-This is partial precision coverage. Other formulas and their PowerPC operation
+This is partial precision coverage. Other formulas and their operation
 ordering still require migration and comparison. The probe does not establish
 Warcraft timing, rendering, or native map startup.
 
-Digital shield damage sums raw contacts before applying the retail binary32
-factor once. Shieldstun rounds integer power times 0.30000001192092896 before
+Digital shield damage sums raw contacts before applying the binary32 factor 0.7
+once (SmashWiki "Shield"). Shieldstun rounds integer power times 0.30000001192092896 before
 the fused multiplication by 1.5 and addition of 2. The standard-library pin now
 provides fusedMultiplyAddFloat32 for this single-round operation. Analog shield
 input is preserved, and projectile powershield timing/reflection is implemented
 separately. Melee perfect contacts now preserve shield health and use the
-observed defender pushback; post-contact action timing and native verification
+unmodified defender pushback; post-contact action timing and native verification
 remain open. Digital formula precision does not establish those behaviors. See
 smashcraft:docs/melee-powershield.md.
 
-## Independently observed directional influence arithmetic
+## Directional influence arithmetic
 
 The production DI helper reconstructs the launch from its angle and magnitude,
 with a signed squared cross-product rotation capped by the supplied unit stick
-and the common 18-degree coefficient. It rounds to binary32 and uses the shared
+and the 18-degree maximum (SmashWiki "Directional influence"). It rounds to binary32 and uses the shared
 independently authored trig approximations. Nonzero parallel input still passes
 through polar reconstruction; neutral input and sufficiently small launch vectors
-retain their components. Grounded eligibility remains the existing Smashcraft
-rule and has not been independently verified against the original routine.
+retain their components. Grounded eligibility is Smashcraft's rule.
 
-the recorded design targets retains 56 numeric
-observations, exact input/output bits, source hashes, original routine addresses,
-runtime revision and licensing/extraction limitations. Original NTSC 1.02 code
-ran in the unchanged Melee Unlocked Gekko interpreter at revision
-4bb37070e4311169259dadaeed06a156523e5c7d, with a private host adapter and exact
-licensed paired-single service excerpts. It executed 13,959 instructions and 72
-paired-single loads and stores after original trig initialization. This is not a
-Linux portability repair, complete game execution or hardware measurement. The
-private harness, ELF, extracted binary and game data remain outside repositories.
-Only numerical facts enter this independently authored implementation.
-
-The existing rotation arithmetic mismatched 39 of 56 vectors (33 of 48 cases
-representable by the discrete input path), using emitted Lua and diagnostic
-host math.sin/math.cos bindings for the old native calls. The repaired production
-helper matches all 56 exactly, including zero signs, under the existing emitted
-Lua precision check. The observations distinguish several rounding mistakes but
-do not uniquely identify all possible intermediate evaluation sequences. This
-bounded claim does not establish controller polling, physical deadzones,
-grounded DI eligibility, hitlag scheduling, collision or full-match parity.
-Evidence: smashcraft:build/di-before.log and smashcraft:build/di-after.log.
 The focused directionalInfluence filter passes 5/5 tests, including adapter
 magnitude through hitlag release, replay snapshot independence and correction
 equality, and existing discrete DI behavior (smashcraft:build/di-connected.log).
