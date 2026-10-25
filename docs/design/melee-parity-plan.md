@@ -319,18 +319,23 @@ reason.
 - **Range triangle and smash budget** (#318, #319): jab wins up close; tilts
   beat jabs and some short-hop aerials on speed. Tom's move-budget rule
   (2026-10-26): every smash is more committal than its matching tilt (later
-  start, more total frames) and pays that back on at least one axis besides
-  power. The axes are (a) reach equal to the tilt's or slightly more, (b) a
-  meatier hitbox that stays out longer, or (c) hurtbox manipulation that dodges
-  situationally, as Captain Falcon's forward smash leans back under grabs. Power
-  is a separate axis of the same budget. In `records.jsonl`, smash totals
+  start, more total frames) and pays that back on at least one option
+  (corrected the same day: power splits into options of its own). The options
+  are (a) reach equal to the tilt's or slightly more, (b) a meatier, longer
+  hitbox, (d) a launcher from low percent, (e) an early kill, (f) damage, (g)
+  a launch angle as a tool (spike, semi-spike or tech-chase angle), (h) coverage
+  (both sides, overhead, platforms, ledge), (i) disjoint, (j) intangibility or a
+  hurtbox shift on chosen frames (Captain Falcon's forward smash leans back under
+  grabs), (k) shield pressure, (l) a sweetspot or tipper, and (m) out-of-shield
+  or jump-cancel access. The combo analyzer supplies (d), (e), (g) and (k)
+  (#326); frame, hitbox and hurtbox data supply the rest (#319). In `records.jsonl`, smash totals
   average 49 frames against 33 for tilts. Active spans average 6.9 against 5.0
   forward, 11.7 against 8.3 up and 12.0 against 4.1 down. Reach is unproven
   until forward travel is added: libmelee positions omit it, so forward smash
   out-reaches forward tilt for only 11 of 23. #318 adds travel, measures every
-  axis and records the rule in `docs/gameplay-design.md`. #319 fails a smash
-  that is more committal but wins on none of reach, active span or hurtbox
-  manipulation, with recorded exceptions.
+  option and records the rule in `docs/gameplay-design.md`. #319 and #326 fail a smash
+  that is more committal but wins on no option, unless an exception records
+  Tom's reason.
 - **Hitbox radius bands** (#320): Melee's largest hitbox radius per move type,
   median across fighters in Melee units: jab and tilts 3.9, forward and down
   smash 4.7, up smash 5.1, aerials 4.3-5.5, dash attack 4.5. Ours, relative to
@@ -357,7 +362,7 @@ reason.
 5. Baseline tag #302; combo-ease measure #300 and Tom's pick #301.
 6. Maiev: targets #303, movement #304, aerials #305, ground game and throws #306, edge guard #307, balance field #308.
 
-7. Move shapes: travel and reach #318, shapes check #319, radius bands #320, dash-attack rule #321, dash-attack retunes #322, #323, #324.
+7. Move shapes: travel and reach #318, shapes check #319, analyzer options #326, radius bands #320, dash-attack rule #321, dash-attack retunes #322, #323, #324.
 
 ## Numbers we lack
 
