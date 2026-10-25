@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { Console, Effect, Schema } from "effect";
 import { type Command, UsageFailure, describeCause } from "wisp/scripts/wisp/command";
-import { LEDGER_ROWS, PAGE_PATH, evaluate, ledgerPage, ledgerProblems, openRows, statusText, withoutAnchorLines } from "../../ledger/ledger";
+import { LEDGER_ROWS, PAGE_PATH, evaluate, ledgerPage, ledgerProblems, openRows, statusText } from "../../ledger/ledger";
 
 const root = join(import.meta.dir, "../../../..");
 const pageFile = join(root, PAGE_PATH);
@@ -35,12 +35,8 @@ export const ledger: Command = (args) => {
     const problems = ledgerProblems(rows);
     if (mode === "--check") {
       const written = existsSync(pageFile) ? readFileSync(pageFile, "utf8") : undefined;
-      const drifted = written !== undefined && written !== page && withoutAnchorLines(written) === withoutAnchorLines(page);
-      const stale = written === page || drifted ? [] : [`${PAGE_PATH} is stale: run bun wisp ledger`];
-      yield* failOn([...problems, ...stale]);
-      return yield* Console.log(drifted
-        ? `${rows.length} ledger rows hold; only anchor line numbers moved in ${PAGE_PATH}, which bun wisp ledger rewrites`
-        : `${rows.length} ledger rows hold and ${PAGE_PATH} is current`);
+      yield* failOn([...problems, ...(written === page ? [] : [`${PAGE_PATH} is stale: run bun wisp ledger`])]);
+      return yield* Console.log(`${rows.length} ledger rows hold and ${PAGE_PATH} is current`);
     }
     yield* Effect.tryPromise({ try: () => Bun.write(pageFile, page), catch: (cause) => new LedgerFailure({ problems: [describeCause(cause)] }) });
     yield* Console.log(`Wrote ${PAGE_PATH}: ${rows.length} rows`);

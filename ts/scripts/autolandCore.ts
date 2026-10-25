@@ -220,7 +220,7 @@ export function landing(solo: boolean, base: Tree, tested: Tree, main: readonly 
   return solo ? "passed" : "wait";
 }
 
-export const GENERATED_REPORTS: readonly string[] = ["tools/move-data/advantage-state.jsonl", "tools/move-data/advantage-state.md", "ts/test/lua/cost-baseline.tsv"];
+export const GENERATED_REPORTS: readonly string[] = ["tools/move-data/advantage-state.jsonl", "tools/move-data/advantage-state.md", "ts/test/lua/cost-baseline.tsv", "docs/design/melee-parity.md"];
 export const CACHE_RECORDS: readonly string[] = ["ts/scripts/wisp/cue-models.tsv"];
 const PIN = /^build-inputs\/([^/]+)(?:\/[^/.][^/]*)?$/;
 export const pinFamily = (path: string): string | undefined => PIN.exec(path)?.[1];

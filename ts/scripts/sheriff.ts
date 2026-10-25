@@ -64,7 +64,7 @@ export function decide({ run, previous, commits, workflowFiles }: Situation): Ve
 
 export const LANE_TRAILER = "Autoland-Lane:";
 const REPORTS_TRAILER = "Autoland-Reports: 1";
-const REPORT_FILES = new Set(["tools/move-data/advantage-state.jsonl", "tools/move-data/advantage-state.md"]);
+const REPORT_FILES = new Set(["tools/move-data/advantage-state.jsonl", "tools/move-data/advantage-state.md", "docs/design/melee-parity.md"]);
 const LaneRecord = Schema.fromJsonString(Schema.Struct({ branch: Schema.String, count: Schema.Int, issues: Schema.Array(Schema.Int) }));
 export interface LandedLane {
   readonly branch: string;

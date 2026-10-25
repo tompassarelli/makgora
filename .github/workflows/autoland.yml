@@ -72,6 +72,7 @@ env:
     }
   REPORTS_RUN: |
     install_reports() { (cd ts && bun install --frozen-lockfile); }
+    regenerate_page() { (cd ts && bun scripts/wisp.ts ledger) > ledger.log 2>&1 || true; }
     regenerate_reports() {
       set -euo pipefail
       out() { echo "$1=$2" >> "$GITHUB_OUTPUT"; }
@@ -88,6 +89,8 @@ env:
         (cd ts && bun scripts/wisp.ts combos --advantage --jobs "$(( $(nproc) < 26 ? $(nproc) : 26 ))") 2>&1 | tail -40 | tee reports.log
         echo "Regenerated ${reports[*]} on $(nproc) cores in $(( $(date +%s) - started )) s" >> "$GITHUB_STEP_SUMMARY"
       fi
+      regenerate_page
+      reports+=(docs/design/melee-parity.md)
       out verdict "$VERDICT"
       if git diff --quiet -- "${reports[@]}"; then
         echo "The reports were already current." >> "$GITHUB_STEP_SUMMARY"
@@ -301,6 +304,10 @@ jobs:
           out branches "${branches# }"
           out tips "${tips# }"
           if [ -z "$branches" ]; then out verdict none; exit 0; fi
+          eval "$REPORTS_RUN"
+          if [ -z "$tested" ] && install_reports > ledger.log 2>&1 && regenerate_page && ! git diff --quiet -- docs/design/melee-parity.md; then
+            git commit -q -m "Regenerate the Melee parity page for $(echo $branches)" --trailer "Autoland-Reports: 1" -- docs/design/melee-parity.md
+          fi
           sha=$(git rev-parse HEAD)
           scratch="farm/autoland-${sha:0:12}"
           out sha "$sha"
