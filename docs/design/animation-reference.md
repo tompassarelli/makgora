@@ -135,7 +135,7 @@ Jump physics and counts are unchanged; only the body's gesture differs.
 | Lich | float | He has no legs and levitates: arms spread and robes trail as he turns once backward. |
 | Forsaken Paladin | front flip | An undead knight past caring for his armour's weight: a full forward flip, sword out. |
 | Dreadlord | wing beat | Bat wings: a strong downward beat with the cloak. |
-| Shadow Hunter | twist | Voodoo dancer: a corkscrew turn about his body's long axis. |
+| Shadow Hunter | front flip | A nimble voodoo dancer: a tucked forward somersault; his corkscrew twist read as his spinning neutral air (#257). |
 | Pit Lord | heave | A huge demon: a whole-body heave with arms thrown up, no flip. |
 | Beastmaster | back flip | A rugged hunter: a back flip with axes spread. |
 | Lich King | float | Regal and armoured: arms and cloak spread as he turns once slowly backward. |

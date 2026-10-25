@@ -78,13 +78,15 @@ function jump(): Authored {
 }
 
 function doubleJump(): Authored {
+  const tuck: Gesture = { chest: 30, head: 20, arm: -205, elbow: 15, wrist: -60, free: -100, freeElbow: 90, frontHip: 120, frontKnee: -150, frontFoot: 45, backHip: 110, backKnee: -140, backFoot: 45, cloth: 20 };
   return { pose: "doubleJump", frames: 30, airborne: true, phases: [
-    { frame: 0, gesture: { ...FALL, spin: 0 } },
-    { frame: 3, gesture: { spin: 50, chest: 10, head: -18, arm: -205, elbow: 15, wrist: -60, free: -40, freeElbow: 40, frontHip: 11, frontKnee: 26, frontFoot: 10, backHip: -7, backKnee: 44, backFoot: 10, cloth: -50, clothTip: -20 } },
-    { frame: 8, gesture: { spin: 140, chest: 0, head: -12, arm: -205, elbow: 15, wrist: -60, free: -170, freeElbow: 5, frontHip: 111, frontKnee: -145, frontFoot: 45, backHip: 98, backKnee: -127, backFoot: 45, cloth: 15 } },
-    { frame: 14, gesture: { spin: 230, chest: 6, head: -8, arm: -205, elbow: 15, wrist: -60, free: -135, freeElbow: 15, frontHip: 81, frontKnee: -94, frontFoot: 30, backHip: 73, backKnee: -76, backFoot: 30, cloth: 0 } },
-    { frame: 20, gesture: { spin: 300, chest: 10, head: -5, arm: -205, elbow: 15, wrist: -60, free: -95, freeElbow: 25, frontHip: 61, frontKnee: -66, frontFoot: 20, backHip: 58, backKnee: -54, backFoot: 20, cloth: -20 } },
-    { frame: 30, gesture: { ...FALL, spin: 360 } },
+    { frame: 0, gesture: FALL },
+    { frame: 3, gesture: { lean: 25, chest: 14, head: 4, arm: -205, elbow: 15, wrist: -60, free: -150, freeElbow: 20, frontHip: 80, frontKnee: -100, frontFoot: 30, backHip: 70, backKnee: -90, backFoot: 30, cloth: 0 } },
+    { frame: 7, gesture: { ...tuck, lean: 110 } },
+    { frame: 12, gesture: { ...tuck, lean: 210 } },
+    { frame: 17, gesture: { ...tuck, lean: 290, chest: 18, head: 8, frontHip: 95, frontKnee: -115, backHip: 90, backKnee: -105 } },
+    { frame: 23, gesture: { ...FALL, lean: 345, free: -110, freeElbow: 20 } },
+    { frame: 30, gesture: { ...FALL, lean: 360 } },
   ] };
 }
 
