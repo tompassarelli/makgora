@@ -27,7 +27,7 @@ export const GROM_MOVES: FighterMoves = {
     [AttackStyle.forwardTilt]: tilt(55.0, 35), [AttackStyle.forwardTiltUp]: tilt(96.0, 55), [AttackStyle.forwardTiltDown]: tilt(18.0, 25),
     [AttackStyle.upTilt]: move(8, 4, 26, 0, [heroRegion(8, 11, axe(60.0, 119.0, 6.0, 144.0, 14.0), gromHit(6.516936302185059, 90, 94.76093292236328, 23.399999618530273))]),
     [AttackStyle.downTilt]: move(7, 3, 24, 0, [heroRegion(7, 9, axe(18.0, 12.0, 96.0, 12.0), gromHit(5.792831897735596, 80, 78.03841400146484, 30.600000381469727))]),
-    [AttackStyle.dashAttack]: move(7, 12, 38, 0, [heroRegion(7, 18, axe(16.0, 46.0, 133.0, 62.0, 18.0), gromHit(8.76165771484375, 55))], 52.0, true),
+    [AttackStyle.dashAttack]: move(7, 12, 38, 0, [heroRegion(7, 18, axe(16.0, 46.0, 133.0, 62.0, 18.0), gromHit(8.76165771484375, 55))]),
     [AttackStyle.forwardSmash]: tipperMove(move(18, 4, 46, 0, [heroRegion(18, 21, axe(24.0, 90.0, 132.0, 40.0), gromHit(15.930286407470703, 35, 124.86146545410156, 25.200000762939453))]), 0.30000001192092896),
     [AttackStyle.upSmash]: move(14, 4, 42, 0, [heroRegion(14, 17, axe(0.0, 60.0, 0.0, 160.0, 16.0), gromHit(12.309768676757812, 90, 120.4021224975586, 25.200000762939453))]),
     [AttackStyle.downSmash]: move(15, 6, 44, 0, [heroRegion(15, 17, axe(18.0, 12.0, 112.0, 12.0), gromHit(11.585663795471191, 25, 120.4021224975586, 25.200000762939453)), heroRegion(18, 20, axe(-18.0, 12.0, -112.0, 12.0), gromHit(11.585663795471191, 25, 120.4021224975586, 25.200000762939453, true))]),
