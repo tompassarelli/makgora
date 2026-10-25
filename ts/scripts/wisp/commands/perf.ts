@@ -23,6 +23,8 @@ const integrityMap = { config: integrity.configPath, bundle: integrity.bundlePat
 const playable = buildProject("playable");
 const playableMap = { config: playable.configPath, bundle: playable.bundlePath };
 const nativePerf = buildProject("native-perf");
+const censusBuild = buildProject("census");
+const censusMap = { config: censusBuild.configPath, bundle: censusBuild.bundlePath };
 
 
 export const SMASHCRAFT_PERF: PerfProject = {
@@ -33,7 +35,7 @@ export const SMASHCRAFT_PERF: PerfProject = {
 };
 
 const measure = makePerf(SMASHCRAFT_PERF);
-const spikeCensus = census({ map: playableMap, program: SMASHCRAFT_PERF.program });
+const spikeCensus = census({ map: censusMap, program: SMASHCRAFT_PERF.program });
 
 const runProfile = profile(SMASHCRAFT_PERF);
 const compare = comparePairRuns(measure);

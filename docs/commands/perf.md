@@ -35,7 +35,9 @@ The #168 budget gates p99 ≤ 10 ms and worst ≤ 14 ms; CI measures Classic wit
   and emulated natives are their own row. Spike census (#168): `bun wisp
   perf census [--fighter NAME] [--stage ID] [--functions]` plays every
   fighter's moves, specials and follow-ups in a playable-build training match
-  and every stage's hazards, and lists any entry over 2 ms above its standing
+  and every stage's hazards on the `census` profile, the playable build without
+  the host's session rates, whose 10 s file flush would otherwise be a pair's
+  worst frame (#349), and lists any entry over 2 ms above its standing
   baseline without failing; `--functions` names the map functions of each worst frame. Run it
   on the farm (`bun wisp farm perf "census --fighter rifleman --functions"`).
   Per-pair gate (#405): `perf census --pairs FILE` writes each fighter pair's
