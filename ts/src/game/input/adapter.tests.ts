@@ -7,7 +7,10 @@ import { surfaceLeft, surfaceRight, surfaceZ } from "../sim/stage";
 import { SHIELD_TILT_STICK_CAP, TILT_STICK_DOWN, TILT_STICK_UP, TILT_STICK_X, stickX, stickZ } from "../sim/stick";
 import { CROUCH_STICK_THRESHOLD, DASH_STICK_THRESHOLD, GroundState, StickZone, TAP_JUMP_STICK_THRESHOLD, stickZone } from "../sim/stickZones";
 import { bodyTop } from "../sim/surfaces";
-import { advanceSolo } from "../sim/testWorld";
+import { beginFighterAttack } from "../sim/attacks";
+import { attackStyleForGrounding } from "./combat";
+import { advanceFighter } from "../sim/step";
+import { advanceSolo, soloWorld } from "../sim/testWorld";
 import { melee } from "../sim/tuning";
 import { Action, maskOf } from "./actions";
 import { adaptInput } from "./adapter";
@@ -118,4 +121,42 @@ test("held tilt + down on a pass-through platform neither crouches, drops nor fa
     assertTrue(walker.ground.action !== GroundAction.dash && walker.ground.action !== GroundAction.run);
   }
   assertTrue(walker.motion.vx > 0);
+});
+
+function fullHop(down: number, downAir: boolean) {
+  const fighter = createFighter(Character.rifleman, CENTRE, 1);
+  fighter.motion.grounded = true; fighter.motion.surface = 0; fighter.motion.z = surfaceZ(STAGE, 0, 0);
+  const world = soloWorld(fighter);
+  const driver = keyboardDriver(fighter);
+  driver.step(0);
+  let standsRising = false;
+  let passed = false;
+  let style: AttackStyle | undefined;
+  for (let frame = 0; frame < 60; frame++) {
+    const attack = downAir && style === undefined && !fighter.motion.grounded ? maskOf(Action.attack) : 0;
+    const input = driver.sample((frame < 12 ? maskOf(Action.jump) : 0) | down | attack);
+    const taken = attackStyleForGrounding(driver.attack() as AttackStyle | undefined, fighter.motion.grounded, fighter.facing, 0);
+    if (taken !== undefined) { style = taken; beginFighterAttack(world, 0, taken, false); }
+    const rising = !fighter.motion.grounded && fighter.motion.vz > 0;
+    advanceFighter(world, 0, STAGE, input, 0.0);
+    if (rising && fighter.motion.grounded && fighter.motion.surface === DECK) standsRising = true;
+    if (!fighter.motion.grounded && fighter.motion.z > DECK_Z) passed = true;
+  }
+  return { standsRising, passed, style };
+}
+
+test("a full hop under a platform with tilt + down rises through it into a down air; full down stands on it unless the down air is out [k1 scenario]", () => {
+  for (const downAir of [false, true]) {
+    const tilted = fullHop(tilt(Action.moveDown), downAir);
+    assertEquals(tilted.standsRising, false, `tilt + down, down air ${downAir}: stood on the platform while rising`);
+    assertEquals(tilted.passed, true, `tilt + down, down air ${downAir}: never rose above the platform`);
+    assertEquals(tilted.style, downAir ? AttackStyle.downAir : undefined);
+  }
+  const mounted = fullHop(maskOf(Action.moveDown), false);
+  assertTrue(mounted.standsRising);
+  assertFalse(mounted.passed);
+  const diving = fullHop(maskOf(Action.moveDown), true);
+  assertEquals(diving.style, AttackStyle.downAir);
+  assertFalse(diving.standsRising);
+  assertTrue(diving.passed);
 });

@@ -139,7 +139,7 @@ press drops you through it).
 Attacks buffer for six frames, including through jump squat. Hold P to walk;
 Hold down while rising into a platform without an aerial to stand on it
 instantly, with a small landing puff. Without down, or during an aerial, you
-pass through. Held down keeps you crouching; attack gives down tilt and special
+pass through; so does down with the tilt modifier held. Held down keeps you crouching; attack gives down tilt and special
 gives down-B. Release down, then hard-press it to drop immediately. Analog
 inputs need a quick flick; keyboard inputs need a fresh down-key press. The
 drop consumes that press: held down never fast-falls. Return toward neutral
