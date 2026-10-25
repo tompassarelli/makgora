@@ -29,6 +29,14 @@ const actions = new Map<number, [string, string]>([
   [212, ["grabs", "standing_grab"]], [214, ["grabs", "dash_grab"]],
   [233, ["dodges", "forward_roll"]], [234, ["dodges", "back_roll"]], [235, ["dodges", "spot_dodge"]],
 ]);
+// libmelee leaves these fighters' own action states unnamed; each matches records.jsonl's length and hit frames (Peach's three items: SmashWiki, hits 15-18 of 47).
+const fighterActions = new Map<string, [string, string]>([
+  ["8/341", ["attacks", "fsmash"]], ["8/342", ["attacks", "usmash"]], ["8/345", ["attacks", "dsmash"]],
+  ["9/349", ["attacks", "fsmash"]],
+  ["24/341", ["attacks", "jab1"]], ["24/345", ["attacks", "dtilt"]], ["24/346", ["attacks", "fsmash"]],
+]);
+const actionOf = (character: number, action: number): [string, string] | undefined =>
+  actions.get(action) ?? fighterActions.get(`${character}/${action}`);
 
 const lines = bytes.toString("utf8").trimEnd().split("\n");
 const header = lines[0]?.split(",").map((name) => name.replaceAll('"', ""));
@@ -54,7 +62,7 @@ const grouped = new Map<string, { character: number; action: number; frames: Fra
 for (const line of lines.slice(1)) {
   const cells = line.split(",");
   const character = number(cells[column("character")]), action = number(cells[column("action")]);
-  if (!characters.has(character) || !actions.has(action)) continue;
+  if (!characters.has(character) || actionOf(character, action) === undefined) continue;
   const hitboxes = [1, 2, 3, 4].filter((n) => flag(cells[column(`hitbox_${n}_status`)])).map((n) => ({
     size: number(cells[column(`hitbox_${n}_size`)]), x: number(cells[column(`hitbox_${n}_x`)]), y: number(cells[column(`hitbox_${n}_y`)]),
   }));
@@ -70,7 +78,7 @@ for (const line of lines.slice(1)) {
 
 const records = [...grouped.values()].map(({ character, action, frames }) => {
   frames.sort((a, b) => a.frame - b.frame);
-  const [category, name] = actions.get(action) ?? ["", ""];
+  const [category, name] = actionOf(character, action) ?? ["", ""];
   frames.forEach((frame, index) => { if (frame.frame !== index + 1) throw new Error(`Frame gap in ${character}/${action}`); });
   const firstIasa = frames.find((frame) => frame.iasa)?.frame ?? null;
   const firstTurn = frames.find((frame) => frame.facing_changed)?.frame ?? null;

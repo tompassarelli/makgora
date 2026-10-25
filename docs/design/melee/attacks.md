@@ -109,14 +109,14 @@ The median radius column is in Melee units and needs no body size.
 <!-- table:radiusBands -->
 | Move | Fighters | Median radius | Lower quartile | Median | Upper quartile |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| jab | 25 | 3.91 | 0.246 | 0.286 | 0.316 |
+| jab | 26 | 3.91 | 0.248 | 0.288 | 0.333 |
 | forward tilt | 26 | 3.91 | 0.259 | 0.290 | 0.330 |
 | up tilt | 26 | 4.69 | 0.290 | 0.352 | 0.400 |
-| down tilt | 25 | 3.91 | 0.261 | 0.315 | 0.339 |
+| down tilt | 26 | 4.10 | 0.262 | 0.316 | 0.345 |
 | dash attack | 18 | 4.49 | 0.299 | 0.342 | 0.376 |
-| forward smash | 23 | 4.69 | 0.293 | 0.336 | 0.364 |
-| up smash | 25 | 5.08 | 0.337 | 0.379 | 0.450 |
-| down smash | 25 | 4.69 | 0.291 | 0.330 | 0.380 |
+| forward smash | 26 | 4.49 | 0.268 | 0.333 | 0.365 |
+| up smash | 26 | 4.88 | 0.323 | 0.377 | 0.446 |
+| down smash | 26 | 4.69 | 0.290 | 0.330 | 0.380 |
 | neutral air | 25 | 4.30 | 0.264 | 0.313 | 0.386 |
 | forward air | 26 | 5.12 | 0.332 | 0.361 | 0.417 |
 | back air | 25 | 4.88 | 0.322 | 0.348 | 0.372 |
@@ -426,10 +426,10 @@ Roy's on 6 against 8), and pay for it in total frames instead.
 **Travel decides forward reach.** Several forward smashes step or slide into
 the swing: Sheik's carries her about 24 units, Ganondorf's, Falco's, Fox's,
 Kirby's, Captain Falcon's and Jigglypuff's 14 to 18. Counting that travel,
-forward smash reaches at least as far as forward tilt for 18 of 23 fighters with
-both recorded; standing still it would for 11. Down smash reaches as far ahead
-as down tilt for only 8 of 24, and up smash reaches as high as up tilt for
-15 of 25.
+forward smash reaches at least as far as forward tilt for 20 of 25 fighters with
+both recorded; standing still it would for 13. Down smash reaches as far ahead
+as down tilt for only 9 of 26, and up smash reaches as high as up tilt for
+16 of 26.
 
 **What a smash buys.** Counting how many fighters' smashes beat their tilt on
 each option (Tom's lettering, in
@@ -437,23 +437,23 @@ each option (Tom's lettering, in
 
 | Option | Forward | Up | Down |
 | --- | ---: | ---: | ---: |
-| (a) reach at least the tilt's | 18 | 15 | 8 |
+| (a) reach at least the tilt's | 20 | 16 | 9 |
 | (b) longer active span | 12 | 15 | 21 |
 | (f) more damage | 22 | 21 | 24 |
 | (g) a low or downward launch angle the tilt lacks | 1 | 2 | 4 |
-| (h) coverage: higher, or behind the fighter | 6 | 12 | 23 |
-| (i) hitbox centre farther from the body | 11 | 9 | 5 |
+| (h) coverage: higher, or behind the fighter | 7 | 13 | 24 |
+| (i) hitbox centre farther from the body | 12 | 10 | 6 |
 | (j) intangibility the tilt lacks | 1 | 10 | 6 |
 | (k) at least as safe on shield | 8 | 9 | 9 |
 | (l) a sweetspot at least 1.2 times its weakest hit | 9 | 13 | 14 |
 | (m) out-of-shield access | 0 | 26 | 0 |
 
 Every smash wins on at least one option besides out-of-shield access: on
-average 3.5 forward, 4.1 up and 4.4 down. Damage is the near-universal payment;
+average 3.7 forward, 4.2 up and 4.5 down. Damage is the near-universal payment;
 the exceptions trade it for something else, such as Link's and Young Link's
 forward smashes (less damage, more reach and a disjointed blade) or Samus's and
 Zelda's up smashes (multi-hit fields that last 18 and 32 frames). Down smash is
-Melee's coverage move: 23 of 26 reach farther behind the fighter than the down
+Melee's coverage move: 24 of 26 reach farther behind the fighter than the down
 tilt. Up smash is the out-of-shield move: every fighter can start it from
 the jump squat, which a shield can enter at once, while a tilt waits out the
 shield release.
@@ -465,6 +465,5 @@ need hit advantage and KO percent, which the combo analyzer will measure.
 Ledge coverage, hurtbox shifts that are not intangibility (Captain Falcon's
 leaning forward smash), shield damage beyond its damage-driven share and
 disjoint measured against hurtboxes are not in these sources. libmelee has
-no recording of eight dash attacks and of Mr. Game & Watch's jab, down tilt
-and forward smash, Ness's three smashes and Peach's forward smash, so those
-rows lack reach and travel.
+no recording of eight dash attacks, and neither frame table has Peach's forward
+smash, so her forward row is empty.

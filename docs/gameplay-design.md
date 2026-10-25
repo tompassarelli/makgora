@@ -1636,7 +1636,7 @@ Melee mostly follows the rule, measured in
 nearly every smash has more total frames than its tilt and every one wins on at
 least one option, damage most often, coverage for down smash and out-of-shield
 access for up smash. Counting the fighter's own travel, forward smash reaches
-as far as forward tilt for 18 of 23 fighters. Melee departs from the startup
+as far as forward tilt for 20 of 25 fighters. Melee departs from the startup
 half: only 7 of 26 down smashes start later than the down tilt. Smashcraft
 keeps both halves of the commitment for its own fighters: `bun wisp shapes`
 prints each fighter's smash against its tilt on startup, total and the options

@@ -136,7 +136,7 @@ and representative site values rather than merely replacing the checksum.
 `smashcraft:references/melee-frame-data/libmelee.jsonl` reduces libmelee's
 recorded frame table to what meleeframedata.com's database lacks: where each
 normal attack's and grab's hitboxes are, frame by frame, and how far each attack
-and ground dodge moves the fighter on each frame. It has 469 records, one per `(character, action)`,
+and ground dodge moves the fighter on each frame. It has 476 records, one per `(character, action)`,
 for the 26 fighters (Popo stands for the Ice Climbers; Nana is left out).
 
 Source: https://github.com/altf4/libmelee at revision
@@ -168,11 +168,19 @@ Each record has:
   that frame gives its reach from where the move started.
 
 Coverage is libmelee's. Of jab, the three tilts, the three smashes and dash
-attack, 193 of the 208 for 26 fighters are recorded; libmelee has none for the
+attack, 200 of the 208 for 26 fighters are recorded; libmelee has none for the
 dash attacks of Bowser, Donkey Kong, Jigglypuff, Kirby, Luigi, Mario, Roy and
-Yoshi, for Mr. Game & Watch's jab, down tilt and forward smash, Ness's three
-smashes or Peach's forward smash (their own action states, which libmelee does
-not name). Up to four hitboxes per frame are recorded. Positions describe the
+Yoshi. Mr. Game & Watch's jab, down tilt and forward smash, Ness's three
+smashes and Peach's forward smash are those fighters' own action states, which
+libmelee records but does not name; each is identified by its recorded length
+and hit frames matching `records.jsonl` (Ness's forward smash 49 frames hitting
+16 to 17, up smash 49 hitting 12 to 31, down smash 61 hitting 12 to 31; Mr.
+Game & Watch's jab 17 hitting 4 to 6, down tilt 29 hitting 6 to 13, forward
+smash 44 hitting 13 to 33). Peach's forward smash is in neither frame table;
+libmelee records three states of 47 frames hitting 15 to 18, her golf club,
+frying pan and tennis racket, which SmashWiki's move page
+(https://www.ssbwiki.com/Peach_(SSBM)/Forward_smash) times the same, and the
+first is kept. Up to four hitboxes per frame are recorded. Positions describe the
 recorded animation, not the full collision geometry; hurtboxes are not
 recorded. Representative checks: Fox's jab hitboxes are on frames 2 and 3, as
 in `records.jsonl`, and his forward roll turns on frame 20 of 31. His forward
