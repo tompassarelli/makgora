@@ -35,6 +35,11 @@ export const DI_MAX_DEGREES = 18.0;
 const GROUND_LAUNCH_BOUNCE_ANGLE = 0.1745329201221466;
 const GROUND_LAUNCH_REBOUND = 0.800000011920929;
 const RADIANS_TO_DEGREES = 57.295780181884766;
+const DEGREES_TO_RADIANS = 0.01745329238474369;
+export const SAKURAI_LOW_KNOCKBACK = 32.0;
+export const SAKURAI_HIGH_KNOCKBACK = 32.099998474121094;
+export const SAKURAI_GROUNDED_DEGREES = 44.0;
+export const SAKURAI_AIRBORNE_DEGREES = 45.0;
 
 export const ORDINARY_HIT_GROWTH_PERCENT: number = 100.0;
 export const ORDINARY_HIT_BASE_KNOCKBACK: number = 20.0;
@@ -132,6 +137,24 @@ export function damageLevelForKnockback(knockback: number): number {
   if (knockback >= TUMBLE_KNOCKBACK) return 3;
   if (knockback >= STRONG_DAMAGE_KNOCKBACK) return 2;
   return knockback >= MEDIUM_DAMAGE_KNOCKBACK ? 1 : 0;
+}
+
+export function sakuraiDegrees(knockback: number, grounded: boolean): number {
+  if (!grounded) return SAKURAI_AIRBORNE_DEGREES;
+  const magnitude = roundToFloat32(knockback);
+  if (magnitude < SAKURAI_LOW_KNOCKBACK) return 0.0;
+  if (magnitude >= SAKURAI_HIGH_KNOCKBACK) return SAKURAI_GROUNDED_DEGREES;
+  const blend = divideFloat32(subtractFloat32(magnitude, SAKURAI_LOW_KNOCKBACK), subtractFloat32(SAKURAI_HIGH_KNOCKBACK, SAKURAI_LOW_KNOCKBACK));
+  return multiplyFloat32(blend, SAKURAI_GROUNDED_DEGREES);
+}
+
+const sakuraiDirection = { x: 0.0, z: 0.0 };
+
+export function sakuraiLaunchDirection(knockback: number, grounded: boolean): Readonly<{ x: number; z: number }> {
+  const radians = multiplyFloat32(sakuraiDegrees(knockback, grounded), DEGREES_TO_RADIANS);
+  sakuraiDirection.x = meleeCos(radians);
+  sakuraiDirection.z = meleeSin(radians);
+  return sakuraiDirection;
 }
 
 /** in Melee units per frame. */

@@ -108,7 +108,7 @@ Sources name the SmashWiki page unless marked: MFD is
 | Weight term | `ts/src/game/sim/knockback.ts:40-44` | 200/(w+100) | Same (Knockback; CS archetypes.md:13-19) | match |
 | Set knockback | `ts/src/game/sim/knockback.ts:62-67` | Formula present, no move field; #272 adds `setKnockback` | Set knockback replaces percent with 10 and damage with the set value (Knockback) | missing in play until #272 |
 | Launch angle | `ts/src/game/sim/hitRegions.ts:30-31`; `ts/src/game/sim/contacts.ts:404` | Fixed direction per hit, mirrored by facing | Angle per hitbox | match in kind |
-| Sakurai angle | none | none | 361: grounded 0° under 32 knockback, 44° above 32.1; airborne 45° (Sakurai Angle) | missing, #291 |
+| Sakurai angle | `ts/src/game/sim/knockback.ts` `sakuraiDegrees`; `sakurai` on a hit | Same, opt-in per hit; no move uses it yet | 361: grounded 0° under 32 knockback, 44° above 32.1; airborne 45° (Sakurai Angle) | match, #291 |
 | Grounded low launch and bounce | `ts/src/game/sim/knockback.ts:122-134` | Below tumble with flat or downward direction stays grounded; tumble downward bounces ×0.8 | Ground hit below tumble stays grounded; spiked victims bounce (Knockback, Meteor smash) | match |
 | Crouch cancel | `ts/src/game/sim/knockback.ts:72,89` | Knockback ×2/3, hitlag ×2/3; throws exempt | ×2/3 knockback (Crouch cancel; CS defense.md:99-101) | match |
 | Smash-charge victim | `ts/src/game/sim/knockback.ts:73` | ×1.2 | Not confirmed on a public page | needs public source, #292 |

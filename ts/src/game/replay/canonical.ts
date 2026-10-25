@@ -30,6 +30,8 @@ import { RIFLEMAN_MOVES } from "../sim/originalMoves";
 
 const REPLAY_CHECKSUM_MODULUS = 1_000_003;
 
+const bit = (flag: boolean | undefined): number => (flag === true ? 1 : 0);
+
 
 function writeIntegerBytes(emit: (code: number) => void, value: number): void {
   if (value < -2147483648 || value > 2147483647) {
@@ -233,7 +235,7 @@ export function specialProjectileCanonical(spec: Readonly<SpecialProjectile>, pr
   result.push(hitEffectCanonical(spec.effect, `${prefix}.effect`));
   int("reflectable", spec.reflectable ? 1 : 0);
   int("limit", spec.limit);
-  int("cancelOnInterrupt", spec.cancelOnInterrupt === true ? 1 : 0);
+  int("cancelOnInterrupt", bit(spec.cancelOnInterrupt));
   if (spec.atStageCentre === true) int("atStageCentre", 1);
   if (spec.returnEffect !== undefined) result.push(hitEffectCanonical(spec.returnEffect, `${prefix}.returnEffect`));
   if (spec.catchHeal !== undefined) {
@@ -250,7 +252,7 @@ export function specialProjectileCanonical(spec: Readonly<SpecialProjectile>, pr
       real("status.tick.damage", spec.status.tick.damage);
     }
   }
-  int("needsLineOfSight", spec.needsLineOfSight === true ? 1 : 0);
+  int("needsLineOfSight", bit(spec.needsLineOfSight));
   if (spec.returns !== undefined) {
     int("returns.age", spec.returns.age);
     real("returns.speed", spec.returns.speed);
@@ -340,7 +342,7 @@ function hitEffectCanonical(hit: Readonly<HitEffect>, prefix: string): string {
   return canonicalRealField(`${prefix}.damage`, hit.damage) + canonicalRealField(`${prefix}.growth`, hit.growth)
     + canonicalRealField(`${prefix}.base`, hit.base) + canonicalRealField(`${prefix}.launchX`, hit.launchX)
     + canonicalRealField(`${prefix}.launchZ`, hit.launchZ) + canonicalInt(`${prefix}.electric`, hit.electric ? 1 : 0)
-    + canonicalInt(`${prefix}.element`, hit.element ?? 0) + (hit.carry === true ? canonicalInt(`${prefix}.carry`, 1) : "")
+    + canonicalInt(`${prefix}.element`, hit.element ?? 0) + (hit.carry === true ? canonicalInt(`${prefix}.carry`, 1) : "") + (hit.sakurai === true ? canonicalInt(`${prefix}.sakurai`, 1) : "")
     + optionalField(`${prefix}.manaSteal`, hit.manaSteal, canonicalInt)
     + optionalField(`${prefix}.setKnockback`, hit.setKnockback, canonicalRealField)
     + optionalField(`${prefix}.stunFrames`, hit.stunFrames, canonicalInt);
@@ -383,9 +385,9 @@ export function specialMoveCanonical(move: Readonly<AuthoredSpecial>, name: stri
     real("beam.range", move.beam.range);
     real("beam.track", move.beam.track);
   }
-  int("groundOnly", move.groundOnly === true ? 1 : 0);
-  int("oncePerAirtime", move.oncePerAirtime === true ? 1 : 0);
-  int("helpless", move.helpless === true ? 1 : 0);
+  int("groundOnly", bit(move.groundOnly));
+  int("oncePerAirtime", bit(move.oncePerAirtime));
+  int("helpless", bit(move.helpless));
   int("landingLag", move.landingLag ?? -1);
   if (move.facesStick === true) int("facesStick", 1);
   int("intangible.first", move.intangible?.first ?? -1);
@@ -393,7 +395,7 @@ export function specialMoveCanonical(move: Readonly<AuthoredSpecial>, name: stri
   int("armor.first", move.armor?.first ?? -1);
   int("armor.last", move.armor?.last ?? -1);
   real("armor.maxDamage", move.armor?.maxDamage ?? 0.0);
-  int("armor.shell", move.armor?.shell === true ? 1 : 0);
+  int("armor.shell", bit(move.armor?.shell));
   if (move.armor?.chillsStriker === true) int("armor.chillsStriker", 1);
   if (move.burst !== undefined) {
     int("burst.frame", move.burst.frame);
@@ -507,7 +509,7 @@ export function specialMoveCanonical(move: Readonly<AuthoredSpecial>, name: stri
     int(`followUp[${index}].first`, followUp.window.first);
     int(`followUp[${index}].last`, followUp.window.last);
     int(`followUp[${index}].input`, followUp.input ?? 0);
-    int(`followUp[${index}].facesStick`, followUp.facesStick === true ? 1 : 0);
+    int(`followUp[${index}].facesStick`, bit(followUp.facesStick));
     result.push(specialMoveCanonical(followUp.special, `${name}.followUp[${index}]`));
   }
   return result.join("");

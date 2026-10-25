@@ -47,6 +47,8 @@ export interface HitEffect {
   setKnockback?: number | undefined;
 
   stunFrames?: number | undefined;
+
+  sakurai?: boolean | undefined;
 }
 
 export interface HitRegion {
@@ -82,6 +84,7 @@ export function copyHitEffect(target: HitEffect, source: Readonly<HitEffect>): v
   target.strong = source.strong;
   target.setKnockback = source.setKnockback;
   target.stunFrames = source.stunFrames;
+  target.sakurai = source.sakurai;
 }
 
 export function copyHitRegion(target: HitRegion, source: Readonly<HitRegion>): void {

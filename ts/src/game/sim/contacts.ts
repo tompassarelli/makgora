@@ -17,6 +17,7 @@ import {
   effectKnockback,
   hitContextKnockback,
   installDamageLaunch,
+  sakuraiLaunchDirection,
   ordinaryHitlagFrames,
   STRONG_HIT_EXTRA_HITLAG,
   ordinaryHitstunFrames,
@@ -404,7 +405,10 @@ function resolveDamageContacts(world: Roster, slot: number): void {
   target.motion.vx = 0.0;
   target.motion.vz = 0.0;
   if (stunWinner) launch.stunAge = 0;
-  installDamageLaunch(target, strongest, stunWinner ? chosen.facing : multiplyFloat32(chosen.facing, chosen.effect.launchX), stunWinner ? 0.0 : chosen.effect.launchZ, chosen.grounded);
+  const sakurai = !stunWinner && chosen.effect.sakurai === true ? sakuraiLaunchDirection(strongest, chosen.grounded) : undefined;
+  const directionX = stunWinner ? 1.0 : sakurai === undefined ? chosen.effect.launchX : sakurai.x;
+  const directionZ = stunWinner ? 0.0 : sakurai === undefined ? chosen.effect.launchZ : sakurai.z;
+  installDamageLaunch(target, strongest, multiplyFloat32(chosen.facing, directionX), directionZ, chosen.grounded);
   if (candleDrops(target, strongest)) candleDrop[slot] = true;
   if (chosen.direct && chosen.effect.carry === true && !target.motion.grounded) {
     target.motion.vx = chosen.sourceVelocityX;

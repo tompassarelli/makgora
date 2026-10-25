@@ -5,7 +5,8 @@ import { beginDamageContacts, collectDamageContact, finishDamageContacts } from 
 import {
   CROUCH_CANCEL_KNOCKBACK_SCALE, DI_MAX_DEGREES, ELECTRIC_HITLAG_SCALE, HITLAG_CAP_FRAMES, HITSTUN_FRAMES_PER_KNOCKBACK, KNOCKBACK_CAP,
   KNOCKBACK_DAMAGE_SCALE, KNOCKBACK_GROWTH_ADDEND, KNOCKBACK_GROWTH_SCALE, KNOCKBACK_LAUNCH_SPEED, KNOCKBACK_PERCENT_SCALE, KNOCKBACK_STACKING_FRAMES,
-  SMASH_CHARGE_VICTIM_KNOCKBACK_SCALE, STRONG_HIT_EXTRA_HITLAG, damageLevelForKnockback, effectKnockback, fixedHitKnockback, launchWeightFactor, ordinaryHitKnockback, victimHitlagFrames,
+  SAKURAI_AIRBORNE_DEGREES, SAKURAI_GROUNDED_DEGREES, SAKURAI_HIGH_KNOCKBACK, SAKURAI_LOW_KNOCKBACK, SMASH_CHARGE_VICTIM_KNOCKBACK_SCALE, STRONG_HIT_EXTRA_HITLAG,
+  damageLevelForKnockback, effectKnockback, fixedHitKnockback, launchWeightFactor, ordinaryHitKnockback, victimHitlagFrames,
 } from "../../src/game/sim/knockback";
 import { AIR_KNOCKBACK_DECAY } from "../../src/game/sim/motion";
 import { SMASH_FULL_CHARGE_HOLD_FRAMES, SMASH_MAX_CHARGE_FRAMES, SMASH_MAX_DAMAGE_MULTIPLIER } from "../../src/game/sim/moves";
@@ -39,6 +40,31 @@ function whoFreezes(): string {
   const projectile = frozen(false, false);
   if (direct === "attacker and victim" && shield === direct && projectile === "victim only") return MELEE_FREEZE;
   return `direct hit: ${direct}; shield hit: ${shield}; projectile: ${projectile}`;
+}
+
+const MELEE_SAKURAI = "grounded 0° under 32 knockback, 44° from 32.1; airborne 45°";
+const FACINGS = [1, -1];
+
+function sakuraiLaunch(knockback: number, airborne: boolean, facing: number): string {
+  const s: Scene = solo(0, Character.rifleman);
+  const victim = fighter(s, 0);
+  if (airborne) victim.motion.grounded = false;
+  beginDamageContacts();
+  collectDamageContact(s.world, 1, 0, { damage: 1.0, growth: 0.0, base: knockback, launchX: 1.0, launchZ: 0.0, electric: false, sakurai: true }, facing, ContactKind.launch, true, undefined, false);
+  finishDamageContacts(s.world);
+  const { knockbackX, knockbackZ } = victim.launch;
+  const degrees = Math.round((Math.atan2(knockbackZ, Math.abs(knockbackX)) * 180) / Math.PI);
+  return `${degrees}°${victim.motion.grounded ? " grounded" : ""}${Math.sign(knockbackX) === facing ? "" : " unmirrored"}`;
+}
+
+function sakuraiAngle(): string {
+  const cases: readonly [string, number, boolean, string][] = [
+    ["grounded at 31", 31, false, "0° grounded"], ["grounded at 33", 33, false, `${SAKURAI_GROUNDED_DEGREES}°`], ["airborne at 31", 31, true, `${SAKURAI_AIRBORNE_DEGREES}°`],
+  ];
+  const differs = cases.flatMap(([label, knockback, airborne, expected]) => FACINGS.map((facing) => [`${label} facing ${facing}`, sakuraiLaunch(knockback, airborne, facing), expected]))
+    .filter(([, launched, expected]) => launched !== expected);
+  if (differs.length > 0) return differs.map(([label, launched]) => `${label}: ${launched}`).join("; ");
+  return `grounded 0° under ${SAKURAI_LOW_KNOCKBACK} knockback, ${SAKURAI_GROUNDED_DEGREES}° from ${shortNumber(SAKURAI_HIGH_KNOCKBACK)}; airborne ${SAKURAI_AIRBORNE_DEGREES}°`;
 }
 
 const tumbleKnockback = (): number => range(0, 200).find((knockback) => damageLevelForKnockback(knockback) === 3) ?? Number.NaN;
@@ -196,10 +222,9 @@ export const HIT_ROWS: readonly LedgerRow[] = [
     status: { kind: "deviation", reason: "keeps SDI choices useful while bounding visible jumps and repeated-hit travel (docs/gameplay-design.md, Bounded SDI)", decided: "2026-10-06" },
   },
   {
-    id: "sakurai-angle", family: "hits", name: "Sakurai angle (361)",
-    melee: { value: "grounded 0° under 32 knockback, 44° from 32.1; airborne 45°", source: wiki("Sakurai_angle") }, ours: () => "none",
-    anchor: { file: "ts/src/game/sim/hitRegions.ts", symbol: "HitEffect" },
-    status: { kind: "open", reason: "missing: every hit launches along its authored direction", issue: 291 },
+    id: "sakurai-angle", family: "hits", name: "Sakurai angle (361), probed headless at knockback 31 and 33, both facings",
+    melee: { value: MELEE_SAKURAI, source: wiki("Sakurai_angle") }, ours: sakuraiAngle,
+    anchor: { file: KNOCKBACK, symbol: "sakuraiDegrees" }, status: PARITY,
   },
   {
     id: "smash-charge-frames", family: "hits", name: "Smash charge frames to full charge",
