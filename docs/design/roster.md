@@ -1209,10 +1209,10 @@ away from the edge.
 | Forward tilt — Piston Arm | 10/3/24 | 7.5 | L, 35, POKE | Disjointed metal tip; extension visibly retracts |
 | Up tilt — Gear Lift | 9/4/23 | 8 | M, 85, LAUNCH | Mechanical arm above head |
 | Down tilt — Low Spanner | 7/3/20 | 6 | M, 65, LINK | Thin ground poke |
-| Dash attack — Wheel Ram | 11/5/28 | 9.375 | M, 45, LAUNCH | Body collision, not armored |
-| Forward smash — Hydraulic Punch | 21/3/37 | 16.25 | XL, 35, KILL | Slow long piston; handle 11 damage |
-| Up smash — Spring Hammer | 18/4/33 | 17 | L, 90, KILL | Strong vertical tool |
-| Down smash — Dual Pistons | 17/5/35 | 14 | L, 25, EDGE | Front/rear extensions, one hit |
+| Dash attack — Wheel Ram | 11/5/28 | 9.75 | M, 45, LAUNCH | Body collision, not armored |
+| Forward smash — Hydraulic Punch | 18/3/37 | 16.25 | XL, 35, KILL | Slow long piston; handle 11 damage |
+| Up smash — Spring Hammer | 15/4/33 | 15.5 | L, 90, KILL | Strong vertical tool |
+| Down smash — Dual Pistons | 17/5/35 | 12.5 | L, 25, EDGE | Front/rear extensions, one hit |
 | Neutral air — Gear Spin | 8/6/23; L15 | 9 | M, 50, POKE | Attached machinery circle |
 | Forward air — Extendable Wrench | 12/3/27; L17 | 12 | L, 40, EDGE | Main air reach |
 | Back air — Exhaust Kick | 10/4/25; L15 | 12 | M, 35, KILL | Short flame cone attached to body |
@@ -1504,8 +1504,8 @@ above; damage and launch classes are provisional. The move list
 | Forward tilt, Frostmourne Sweep | 11/4/24 | 15 | 1.35H | From his shoulder to the floor: not angled |
 | Up tilt, Overhead Reap | 10/5/23 | 11 | arc to 1.45H | Covers behind him |
 | Down tilt, Frozen Ground | 9/4/22 | 6 + 6 | 1.1H front, 0.9H back | Front, then behind: the two-sided sweep |
-| Dash attack | 12/4/30 | 11 | 1.1H | Travels 40 in startup, stops at a body |
-| Forward smash, Frostmourne Cleave | 22/4/38 | 24.75 tip, 20.5 inner | 1.35H | The tip sweetspot |
+| Dash attack | 10/4/29 | 11 | 1.1H | Travels 40 in startup, stops at a body |
+| Forward smash, Frostmourne Cleave | 19/4/38 | 24.75 tip, 20.5 inner | 1.35H | The tip sweetspot |
 | Up smash, Remorseless Winter | 18/8/38 | 15, then 10 | 0.72H all round | A burst around him, then a weaker gust |
 | Down smash, Quake | 17/6/40 | 14 + 14 | 1.1H each side | Front f17-19, back f20-22 |
 | Neutral air | 10/8/24, land 16 | 11 + 11 | 1.1H | Front then back |

@@ -49,8 +49,8 @@ link names a relationship, not copied frame data or geometry.
 | Forward tilt, all angles | 14/4/29; 13 damage; totem sweeps from high to low, reaches 170. | [Totem][wc] | [Bowser's deliberate forward tilt][bowser] |
 | Up tilt | 13/5/27; 12 damage; raised totem launches at 85 degrees. | [Totem][wc] | [K. Rool's overhead control][krool] |
 | Down tilt | 11/3/25; 10 damage; low shaft lifts at 70 degrees. | [Totem][wc] | [K. Rool's low ground coverage][krool] |
-| Dash attack | 16/5/36; 15 damage; exposed shoulder drives forward 32 units. | [Endurance Aura][wc] | [K. Rool's committed body charge][krool] |
-| Forward smash | 28/4/45; head 25, shaft 19 damage; 190 reach and long punish window. | [Totem/War Stomp][wc] | [Bowser's hard read][bowser] |
+| Dash attack | 16/5/36; 11.25 damage; exposed shoulder drives forward 32 units. | [Endurance Aura][wc] | [K. Rool's committed body charge][krool] |
+| Forward smash | 30/4/43; head 25, shaft 19 damage; 190 reach and long punish window. | [Totem/War Stomp][wc] | [Bowser's hard read][bowser] |
 | Up smash | 25/5/39; 23 damage; narrow overhead pillar, weak lateral coverage. | [Totem][wc] | [K. Rool's vertical commitment][krool] |
 | Down smash | 23/7/40; 19 damage; front then rear ground sweep. | [War Stomp][wc] | [Bowser's two-sided punish][bowser] |
 | Neutral air | 12/7/29/L22; 13 damage; totem circles front then back. | [Totem][wc] | [Bowser's surrounding aerial][bowser] |
@@ -70,8 +70,8 @@ link names a relationship, not copied frame data or geometry.
 
 | Input | Original contract, reward and counterplay | Warcraft source | Smash reference |
 | --- | --- | --- | --- |
-| Neutral: **Shockwave** | 15 mana; wave f24, end f58. One reflectable wave, 10 damage, radius 20, speed 13/frame and life 38. It starts 72 units ahead at height 36. Jump above it or shield and close during recovery. Air form has 24 landing frames and no stall. | [Shockwave][wc] | [Eruption's planted ground attack][eruption] |
-| Side: **Bloodhoof Gore** | Paws the ground through f11, then charges about 140 units over f12–25 with lowered horns. The horn capsule catches a grounded or shielding foe on f12–24, holds 20 frames and flings it for 13 damage at 40 degrees with kill strength; 22 recovery frames after a catch, 32 after a whiff. The horns are hittable from f5 to f28. Jump the 86-unit capsule top, spot dodge, roll or hit him during the paw. Air form is once per airtime, ends helpless and has 24 landing frames. EX adds 25% damage. | [Tauren charge][wc] | [Dreadlord-style command grab: Ganondorf's Flame Choke as a shield-beating read][ganon] |
+| Neutral: **Shockwave** | 15 mana; wave f24, end f61. One reflectable wave, 7.5 damage, radius 20, speed 13/frame and life 38. It starts 72 units ahead at height 36. Jump above it or shield and close during recovery. Air form has 24 landing frames and no stall. | [Shockwave][wc] | [Eruption's planted ground attack][eruption] |
+| Side: **Bloodhoof Gore** | Paws the ground through f11, then charges about 140 units over f12–25 with lowered horns. The horn capsule catches a grounded or shielding foe on f12–24, holds 20 frames and flings it for 13 damage at 40 degrees with kill strength; 22 recovery frames after a catch, 34 after a whiff. The horns are hittable from f5 to f28. Jump the 86-unit capsule top, spot dodge, roll or hit him during the paw. Air form is once per airtime, ends helpless and has 24 landing frames. EX adds 25% damage. | [Tauren charge][wc] | [Dreadlord-style command grab: Ganondorf's Flame Choke as a shield-beating read][ganon] |
 | Up: **Spirit Lift** | 15 mana; hovers through f10, then rises 2.7H and steers up to 1.35H with the stick over f11–32; totem f11–16 for 9 damage at 80 degrees. Free form rises 2H/steers 0.82H with no hit. One use per airtime, spends aerial jump, ends helpless. Sides and landing remain exposed. | [Ancestral spirit of Reincarnation][wc] | [Bowser's finite recovery commitment][bowser] |
 | Down: **War Stomp** | Rears up wreathed in Endurance: armor absorbs one hit of 8 damage or less on f6–19, and a heavier hit, grab or throw interrupts it. Stomp f20–23, end f54: front and rear low regions reach 130 units each side and an inner region f20–21 covers bodies pressed against him, 9.75 damage launching at 80 degrees (85 inside). The stock War Stomp ring bursts at his hooves on f20, drawn at the regions' 130 reach; it never hits. Air form has 26 landing frames. EX scales armor by 1.5 and reach, ring included, by 1.2. | [War Stomp, Endurance Aura][wc] | [Hand Slap's low surrounding launcher][slap] |
 | Ultimate: **Ancestral Reincarnation** | Designed for the roster's future ultimate mode: one grounded 60-frame ritual at 100+ damage heals 35 once per match; taking a hit interrupts and spends it. No invulnerability or stock revival. Like today's hero ultimates, named metadata only while the shared ultimate action is disabled. | [Reincarnation][wc] | [Bowser's survival traded against commitment][bowser] |
@@ -146,5 +146,5 @@ Expert gameplan: Choose armor, stomp, grabs and slow kill commitments around opp
 
 ## Signature strong/weak move (#389)
 
-Forward smash, split by position: strong hit sweetspot, frames 28-31, 25%; weak hit sourspot, frames 28-31, 19%. The totem's head carries the earth's weight; the haft only shoves.
+Forward smash, split by position: strong hit sweetspot, frames 30-33, 25%; weak hit sourspot, frames 30-33, 19%. The totem's head carries the earth's weight; the haft only shoves.
 The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-weak-hits-389) and every split in the [move list](../move-list.md).

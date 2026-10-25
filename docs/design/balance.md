@@ -514,6 +514,21 @@ deals 16.25 (kill 42%, baseline 48%); Shadow Hunter's forward tilt and dash
 attack recover 2 frames sooner. No change adds a fixed-baseline or feel-lock
 miss.
 
+25 Oct 2026 (#45 pass 4, 45–55% Wren field). On 69d6977fd2 (Balance run
+40134258732, 400 a pair) Cairne read 58.6%, Lich King 44.8% and Goblin
+Tinker 38.4%. Cairne's forward smash already sits outside its kill-percent
+lock (25 against a baseline of 21), so its growth stays and its swing lands 2
+frames later on the same total; Shockwave deals 7.5 and ends at 61, Gore ends
+at 60 and his dash attack deals 11.25 (kill 65%, baseline 58%). Tinker's
+forward and up smash start 3 frames sooner on the same totals; his up smash
+deals 15.5 (kill 119%, baseline 132%), down smash 12.5 (kill 98%, baseline
+108%), dash attack 9.75, rockets 4.5 and Clockwerk Goblins 6. Lich King's dash
+attack and forward smash recovery were already at the 3-frame floor, so his
+forward smash starts 3 frames sooner and his dash attack 2, on the same totals.
+A lane probe of the three fighters' 72 pairs at 120 a pair (run 40149071697)
+read Cairne 52%, Tinker 48% and Lich King 49%. No change adds a
+fixed-baseline or feel-lock miss.
+
 ## Player panel and equal skill ceilings (#358)
 
 Every fighter targets a 45–55% mean over all six Expert personalities, with

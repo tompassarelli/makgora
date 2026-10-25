@@ -50,10 +50,10 @@ on another fresh attack. The listed L is the final landing lag consumed by the h
 | Forward tilt, high, low | Claw extends level, above shoulder, or along ankles | 8/3/17/0; 7.5 | Claw-pack | [R.O.B. forward tilt](https://www.ssbwiki.com/R.O.B._(SSBU)) |
 | Up tilt | Both clamps scoop overhead; launcher | 7/4/22/0; 7 | Claw-pack | [R.O.B. up tilt](https://www.ssbwiki.com/R.O.B._(SSBU)) |
 | Down tilt | Low wrench sweep, modest upward launch | 6/3/19/0; 6 | Engineering Upgrade tools | [R.O.B. down tilt](https://www.ssbwiki.com/R.O.B._(SSBU)) |
-| Dash attack | Claw-pack shoulder shove, 38 units startup travel | 10/4/23/0; 9.375 | Claw-pack | [Snake dash attack](https://www.ssbwiki.com/Snake_(SSBU)) |
-| Forward smash | Hammer-tank arm crashes forward; long whiff punish | 20/4/31/0; 16.25 | Robo-Goblin Demolish | [R.O.B. forward smash](https://www.ssbwiki.com/R.O.B._(SSBU)) |
-| Up smash | Exhaust punches vertically; narrow landing read | 17/5/32/0; 16 | Rocket machinery | [R.O.B. up smash](https://www.ssbwiki.com/R.O.B._(SSBU)) |
-| Down smash | Wrench sweeps front then back; one hit per target | 16/6/32/0; 13 | Demolish | [R.O.B. down smash](https://www.ssbwiki.com/R.O.B._(SSBU)) |
+| Dash attack | Claw-pack shoulder shove, 38 units startup travel | 10/4/23/0; 9.75 | Claw-pack | [Snake dash attack](https://www.ssbwiki.com/Snake_(SSBU)) |
+| Forward smash | Hammer-tank arm crashes forward; long whiff punish | 17/4/34/0; 16.25 | Robo-Goblin Demolish | [R.O.B. forward smash](https://www.ssbwiki.com/R.O.B._(SSBU)) |
+| Up smash | Exhaust punches vertically; narrow landing read | 14/5/35/0; 15.5 | Rocket machinery | [R.O.B. up smash](https://www.ssbwiki.com/R.O.B._(SSBU)) |
+| Down smash | Wrench sweeps front then back; one hit per target | 16/6/32/0; 12.5 | Demolish | [R.O.B. down smash](https://www.ssbwiki.com/R.O.B._(SSBU)) |
 | Neutral air | Wide claw-pack sweep, front then back | 8/6/24/16; 9 | Claw-pack | [R.O.B. neutral air](https://www.ssbwiki.com/R.O.B._(SSBU)) |
 | Forward air | Two claws thrust forward; modest range | 10/3/24/16; 10 | Claw-pack | [R.O.B. forward air](https://www.ssbwiki.com/R.O.B._(SSBU)) |
 | Back air | Rear exhaust burst; commits to rear spacing | 12/3/26/18; 12 | Rocket machinery | [R.O.B. back air](https://www.ssbwiki.com/R.O.B._(SSBU)) |
@@ -82,7 +82,7 @@ angles, damage and base knockback retain their authored values.
 
 | Input | Original Smashcraft rule | Warcraft source | Smash comparison |
 |---|---|---|---|
-| Neutral: Cluster Rockets | 10 mana; rockets on 14/20/26, 3.75 damage each, short rising arc from 45 units above the feet, reflectable, ends 43; air landing 20. Each rocket is one contact. Interrupting ends unlaunched rockets. | [Cluster Rockets](https://wowpedia.fandom.com/wiki/Tinker_(Warcraft_III)#Cluster_Rockets) | [Snake grenade](https://www.ssbwiki.com/Hand_Grenade), staggered space control |
+| Neutral: Cluster Rockets | 10 mana; rockets on 14/20/26, 4.5 damage each, short rising arc from 45 units above the feet, reflectable, ends 43; air landing 20. Each rocket is one contact. Interrupting ends unlaunched rockets. | [Cluster Rockets](https://wowpedia.fandom.com/wiki/Tinker_(Warcraft_III)#Cluster_Rockets) | [Snake grenade](https://www.ssbwiki.com/Hand_Grenade), staggered space control |
 | Side: Laser | He stops dead on frame 1, ground or air, dropping any run or drift momentum; his mechanical arms glow with laser light on 1–19, then a beam fires on 20–27 from his arm through an aim point that snaps to the nearest opponent in front within 360 units on frame 1 and follows that opponent at up to 11 units/frame; 7 fire damage, launch at 70°, one hit; end 54; air landing 20. A shield blocks it on reaction and punishes the end lag; rolling behind him or leaving range escapes; an air dodge outruns the aim. EX: 25% more damage and range. Reasoning: [gameplay design](../gameplay-design.md#tinker-laser). | [Laser](https://dota2.fandom.com/wiki/Tinker#Laser), Dota 2 | [Ike's Eruption](https://www.ssbwiki.com/Eruption) for the punishable commitment |
 | Down: Pocket Factory | Ground placement; in the air he drops one Clockwerk Goblin on 10 (landing 16) and landing before it turns into the grounded build. 20 mana, placement 24, end 48; 24 durability, life 240, goblins at ages 35/80/125/170/215, each 6 damage and travels forward at its release height for at most 44 frames, ending before the next launch. Recast recalls for free in 36 frames. One factory; destroy it or hit Tinker to stop its fire. | [Pocket Factory](https://liquipedia.net/warcraft/Tinker) | [Gyro](https://www.ssbwiki.com/Gyro) and [Wario Bike](https://www.ssbwiki.com/Wario_Bike) |
 | Up: Rocket Boots | 15 mana, hovers through 6, burn 7–29 at 14 vertical units/frame, live horizontal steering 5 units/frame; ignition blast 7–10 around the body for 5 fire damage at 85°; free burn 9 vertical/4 drift with no blast; ends 32 in helpless fall and spends aerial jump. Can start on ground or in air once per airtime. No armor. | Engineering Upgrade applied to rocket pack | [Robo Burner](https://www.ssbwiki.com/Robo_Burner) |
@@ -135,5 +135,5 @@ Expert gameplan: Arrange machines and missiles to cover routes and convert their
 
 ## Signature strong/weak move (#389)
 
-Forward smash, split by position: strong hit sweetspot, frames 20-23, 15.75%; weak hit sourspot, frames 20-23, 11%. The claw clamps hardest at full extension; the arm only pushes.
+Forward smash, split by position: strong hit sweetspot, frames 17-20, 16.25%; weak hit sourspot, frames 17-20, 11%. The claw clamps hardest at full extension; the arm only pushes.
 The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-weak-hits-389) and every split in the [move list](../move-list.md).
