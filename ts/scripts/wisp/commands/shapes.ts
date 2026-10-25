@@ -3,6 +3,7 @@ import { Console, Effect, Schema } from "effect";
 import { type Command, UsageFailure, describeCause } from "wisp/scripts/wisp/command";
 import type { Row, Shape } from "../../moveShapes";
 import type { RadiusRow } from "../../moveRadius";
+import type { DashAttackRow } from "../../dashAttackShapes";
 
 class ShapesFailure extends Schema.TaggedError<ShapesFailure>()("ShapesFailure", { problems: Schema.Array(Schema.String) }) {
   override get message(): string {
@@ -31,6 +32,9 @@ const describe = (row: Row, options: readonly string[]): string => {
 const describeRadius = (r: RadiusRow): string =>
   `${r.fighter} ${r.move}: radius ${n(r.radius)} ÷ shield ${n(r.shield)} = ${r.relative.toFixed(3)}, Melee band ${r.band.low.toFixed(3)} to ${r.band.high.toFixed(3)} ${r.pass ? "pass" : "FAIL"}`;
 
+const describeDashAttack = (row: DashAttackRow): string =>
+  `${row.fighter} dash attack: ${row.measures.map((m) => `${m.measure.label.toLowerCase()} ${m.measure.format(m.value)} (${m.measure.format(m.least)} to ${m.measure.format(m.greatest)}) ${m.pass ? "pass" : "FAIL"}`).join(", ")}`;
+
 export const shapes: Command = (args) => Effect.gen(function*() {
   const { values } = yield* Effect.try({
     try: () => parseArgs({ args: [...args], options: { check: { type: "boolean" } }, strict: true }),
@@ -47,13 +51,19 @@ export const shapes: Command = (args) => Effect.gen(function*() {
   const documented = yield* Effect.try({ try: () => documentedBands(), catch: failure });
   const radiusExceptions = yield* Effect.try({ try: () => readRadiusExceptions(), catch: failure });
   const radiusResult = checkRadii(radii, radiusExceptions);
+  const { rosterDashAttacks } = yield* Effect.promise(() => import("../../dashAttackShapes"));
+  const dashAttacks = yield* Effect.try({ try: rosterDashAttacks, catch: failure });
+  const outside = dashAttacks.filter((r) => r.measures.some((m) => !m.pass));
   if (values.check !== true) {
     yield* Console.log("Each cell is smash/tilt; startup is the first hit frame, reach and disjoint in game units, an option ends + when the smash wins it. Launcher, early kill, launch angle and shield pressure come from the link table against a Fox-weight victim (75), each naming its row as opener, region, percent, weight and follow-up.");
     for (const row of rows) yield* Console.log(describe(row, OPTIONS));
     yield* Console.log("Largest hitbox radius over shield radius, against Melee's interquartile range for the move type (docs/design/melee/attacks.md, \"Hitbox size\").");
     for (const row of radii) yield* Console.log(describeRadius(row));
+    yield* Console.log("Each dash attack against Melee's range across its 26 fighters (docs/design/melee/attacks.md, \"Dash attacks\"); travel is in Melee units, entering from a full run.");
+    for (const row of dashAttacks) yield* Console.log(describeDashAttack(row));
   }
   yield* Console.log(`${rows.length} smash/tilt pairs, ${result.excused.length} recorded exceptions, ${result.failures.length} unexcused failures, ${result.stale.length} stale exceptions.`);
+  yield* Console.log(`${dashAttacks.length} dash attacks, ${outside.length} outside Melee's rule: ${outside.map((r) => r.fighter).join(", ") || "none"}; reported for the retunes, not gated.`);
   yield* Console.log(`${radii.length} hitbox radii, ${radiusResult.excused.length} recorded exceptions, ${radiusResult.failures.length} unexcused failures, ${radiusResult.stale.length} stale exceptions.`);
   const problems = [
     ...result.failures.map((v) => `${v.fighter} ${v.direction} ${v.rule}: ${v.detail}; retune it or record Tom's reason in tools/move-data/move-shape-exceptions.json`),
@@ -65,4 +75,4 @@ export const shapes: Command = (args) => Effect.gen(function*() {
   if (problems.length > 0) return yield* new ShapesFailure({ problems });
 });
 
-export const shapesEntry = { usage: "shapes [--check]   (move shapes per fighter: the range triangle and the smash budget against tilts, with recorded exceptions in tools/move-data/move-shape-exceptions.json: docs/gameplay-design.md, \"Smash attacks against tilts\"; and each move's largest hitbox radius against Melee's band, with exceptions in tools/move-data/move-radius-exceptions.json: docs/design/melee/attacks.md, \"Hitbox size\")", load: async () => shapes };
+export const shapesEntry = { usage: "shapes [--check]   (move shapes per fighter: the range triangle and the smash budget against tilts, with recorded exceptions in tools/move-data/move-shape-exceptions.json: docs/gameplay-design.md, \"Smash attacks against tilts\"; each move's largest hitbox radius against Melee's band, with exceptions in tools/move-data/move-radius-exceptions.json: docs/design/melee/attacks.md, \"Hitbox size\"; and each dash attack against Melee's dash-attack rule: docs/design/melee/attacks.md, \"Dash attacks\")", load: async () => shapes };

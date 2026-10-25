@@ -24,6 +24,11 @@ const NAMES: Readonly<Record<string, string>> = {
 };
 const ATTRIBUTE_NAMES: Readonly<Record<string, string>> = { "Dr Mario": "Dr. Mario", "Game & Watch": "Mr. Game & Watch" };
 
+const Motion = Schema.Struct({ character: Schema.String, action: Schema.String, locomotion_x: Schema.NullOr(Schema.Array(Schema.Finite)) });
+const motions = new Map((await Bun.file(join(REFERENCES, "libmelee.jsonl")).text()).trim().split("\n")
+  .map((line) => Schema.decodeUnknownSync(Motion)(JSON.parse(line)))
+  .flatMap((m) => (m.action === "dattack" && m.locomotion_x !== null ? [[m.character, m.locomotion_x] as const] : [])));
+
 const records = (await Bun.file(join(REFERENCES, "records.jsonl")).text()).trim().split("\n")
   .map((line) => Schema.decodeUnknownSync(FrameRecord)(JSON.parse(line)))
   .filter((r) => r.action === "dattack");
@@ -39,7 +44,7 @@ const attributes = new Map(attributeRows.map((c) => [ATTRIBUTE_NAMES[c[0] ?? ""]
 
 const shieldstunFromDamage = (damage: number): number => Math.floor((damage + 4.45) / 2.235);
 
-interface DashAttack {
+export interface DashAttack {
   readonly name: string;
   readonly startup: number;
   readonly lastActive: number;
@@ -48,8 +53,9 @@ interface DashAttack {
   readonly shieldstun: number;
   readonly run: number;
   readonly weight: number;
+  readonly travel: readonly number[] | undefined;
 }
-const dashAttacks: DashAttack[] = Object.entries(NAMES).map(([id, name]) => {
+export const dashAttacks: DashAttack[] = Object.entries(NAMES).map(([id, name]) => {
   const values = records.find((r) => r.character === id)?.values ?? {};
   const fc = fightcore.get(name);
   const body = attributes.get(name);
@@ -61,15 +67,24 @@ const dashAttacks: DashAttack[] = Object.entries(NAMES).map(([id, name]) => {
   return {
     name, startup: pick("start", first(fc[4])), lastActive: pick("end", first(fc[5])), actionable: iasa ?? total + 1,
     damage, shieldstun: values.stun ?? shieldstunFromDamage(damage), run: body.run, weight: body.weight,
+    travel: motions.get(id),
   };
 }).sort((a, b) => a.name.localeCompare(b.name));
 if (dashAttacks.length !== 26) throw new Error(`expected 26 dash attacks, got ${dashAttacks.length}`);
 
-const span = (d: DashAttack): number => d.lastActive - d.startup + 1;
-const endlag = (d: DashAttack): number => d.actionable - d.lastActive - 1;
+export const span = (d: DashAttack): number => d.lastActive - d.startup + 1;
+export const endlag = (d: DashAttack): number => d.actionable - d.lastActive - 1;
 const onShield = (d: DashAttack, contact: number): number => contact + d.shieldstun + 1 - d.actionable;
-const early = (d: DashAttack): number => onShield(d, d.startup);
-const late = (d: DashAttack): number => onShield(d, d.lastActive);
+export const early = (d: DashAttack): number => onShield(d, d.startup);
+export const late = (d: DashAttack): number => onShield(d, d.lastActive);
+const travelled = (steps: readonly number[] | undefined, frames: number): number | undefined =>
+  steps?.slice(0, frames).reduce((sum, v) => sum + v, 0);
+export const travelToLastActive = (d: DashAttack): number | undefined => travelled(d.travel, d.lastActive);
+export const travelToActionable = (d: DashAttack): number | undefined => travelled(d.travel, d.actionable - 1);
+export const travelPerRun = (d: DashAttack): number | undefined => {
+  const travel = travelToActionable(d);
+  return travel === undefined ? undefined : travel / d.run;
+};
 
 function quantile(values: readonly number[], q: number): number {
   const sorted = [...values].sort((a, b) => a - b), at = (sorted.length - 1) * q, lo = Math.floor(at), hi = Math.ceil(at);
@@ -95,10 +110,12 @@ function spearman(a: readonly number[], b: readonly number[]): number {
 const minus = (text: string): string => text.replace(/^-/, "−");
 const signed = (v: number): string => (v > 0 ? `+${v}` : minus(String(Math.round(v * 10) / 10)));
 const plain = (v: number): string => String(Math.round(v * 10) / 10);
+const optional = (v: number | undefined): string => (v === undefined ? "–" : plain(v));
 const table = (head: readonly string[], align: string, rows: readonly (readonly string[])[]): string =>
   [head, [...align].map((a) => (a === "r" ? "---:" : "---")), ...rows].map((cells) => `| ${cells.join(" | ")} |`).join("\n");
 
-const MEASURES: readonly { label: string; of: (d: DashAttack) => number; format: (v: number) => string }[] = [
+export interface Measure { readonly label: string; readonly of: (d: DashAttack) => number | undefined; readonly format: (v: number) => string }
+export const MEASURES: readonly Measure[] = [
   { label: "Startup", of: (d) => d.startup, format: plain },
   { label: "Active span", of: span, format: plain },
   { label: "Ending lag after the last hitbox", of: endlag, format: plain },
@@ -106,19 +123,28 @@ const MEASURES: readonly { label: string; of: (d: DashAttack) => number; format:
   { label: "Shieldstun", of: (d) => d.shieldstun, format: plain },
   { label: "On shield, first active frame", of: early, format: signed },
   { label: "On shield, last active frame", of: late, format: signed },
+  { label: "Travel to the last hitbox", of: travelToLastActive, format: plain },
+  { label: "Travel to actionable", of: travelToActionable, format: plain },
+  { label: "Travel to actionable ÷ run speed", of: travelPerRun, format: plain },
 ];
+const measured = (m: Measure): { d: DashAttack; v: number }[] =>
+  dashAttacks.flatMap((d) => { const v = m.of(d); return v === undefined ? [] : [{ d, v }]; });
+export const ruleRange = (m: Measure): { least: number; greatest: number } => {
+  const vs = measured(m).map((x) => x.v);
+  return { least: Math.min(...vs), greatest: Math.max(...vs) };
+};
 const correlation = (v: number): string => minus(v.toFixed(2));
 const rule = table(["Measure", "Least", "Lower quartile", "Median", "Upper quartile", "Greatest", "Rank correlation with weight", "With run speed"], "lrrrrrrr",
   MEASURES.map((m) => {
-    const vs = dashAttacks.map(m.of);
+    const xs = measured(m), vs = xs.map((x) => x.v);
     return [m.label, ...[0, 0.25, 0.5, 0.75, 1].map((q) => m.format(quantile(vs, q))),
-      correlation(spearman(dashAttacks.map((d) => d.weight), vs)), correlation(spearman(dashAttacks.map((d) => d.run), vs))];
+      correlation(spearman(xs.map((x) => x.d.weight), vs)), correlation(spearman(xs.map((x) => x.d.run), vs))];
   }));
 const roster = table(
-  ["Fighter", "Startup", "Last active", "Active span", "Ending lag", "Actionable", "Damage", "Shieldstun", "On shield, first", "On shield, last", "Run speed", "Weight"],
-  "lrrrrrrrrrrr",
+  ["Fighter", "Startup", "Last active", "Active span", "Ending lag", "Actionable", "Damage", "Shieldstun", "On shield, first", "On shield, last", "Travel to last hitbox", "Travel ÷ run speed", "Run speed", "Weight"],
+  "lrrrrrrrrrrrrr",
   dashAttacks.map((d) => [d.name, plain(d.startup), plain(d.lastActive), plain(span(d)), plain(endlag(d)), plain(d.actionable), plain(d.damage),
-    plain(d.shieldstun), signed(early(d)), signed(late(d)), plain(d.run), plain(d.weight)]),
+    plain(d.shieldstun), signed(early(d)), signed(late(d)), optional(travelToLastActive(d)), optional(travelPerRun(d)), plain(d.run), plain(d.weight)]),
 );
 const block = `<!-- dash-attacks -->\n${rule}\n\n${roster}\n<!-- /dash-attacks -->`;
 

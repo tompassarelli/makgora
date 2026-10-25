@@ -270,7 +270,8 @@ all 26 fighters and rewrites the tables (`bun scripts/meleeDashAttacks.ts`,
 Young Link, absent there, and the interruptible frame where it is missing come
 from FightCore; Luigi's and Young Link's shieldstun come from SmashWiki's
 ⌊(damage + 4.45) / 2.235⌋, which matches all 24 reported dash-attack figures. Run speed and
-weight are from `character-attributes.csv`. The terms are those of "Reading the
+weight are from `character-attributes.csv`, travel from libmelee's per-frame
+motion in `libmelee.jsonl`, in Melee units. The terms are those of "Reading the
 numbers"; the active span counts every frame from the first hitbox to the last.
 
 The rule, as ranges across the 26:
@@ -291,7 +292,17 @@ The rule, as ranges across the 26:
 - **Weight** has a weak trend: heavier fighters start slightly later (rank
   correlation 0.35); nothing else follows weight or run speed beyond ±0.35.
   Bowser and Donkey Kong are the outliers, slow to start and, with Pichu and Pikachu, the least safe.
-- **Travel** against run speed waits on the per-frame travel data of #318.
+- **Travel** comes from the move's own motion, not the run. Of the 18 recorded
+  (libmelee has none for Bowser, Donkey Kong, Jigglypuff, Kirby, Luigi, Mario,
+  Roy and Yoshi; #353 measures them), the fighter covers 12.7 to 30.7 units by
+  its last hitbox, median 22.2, and 18.8 to 42 by the frame it can act, median
+  33.1. That distance does not follow run speed (rank correlation 0.07), so a
+  slow runner's dash attack covers more frames of its run: 11 to 31, median 19.
+  Heavier fighters travel slightly further (0.44).
+
+`bun wisp shapes` reports each of our dash attacks against these ranges,
+entering from a full run, and lists the fighters outside them; it does not fail
+`--check` until the dash-attack retunes land.
 
 <!-- dash-attacks -->
 | Measure | Least | Lower quartile | Median | Upper quartile | Greatest | Rank correlation with weight | With run speed |
@@ -303,35 +314,38 @@ The rule, as ranges across the 26:
 | Shieldstun | 2 | 6 | 6 | 7 | 8 | 0.26 | −0.34 |
 | On shield, first active frame | −52 | −27 | −25 | −22.2 | −20 | 0.09 | −0.05 |
 | On shield, last active frame | −32 | −19 | −15 | −12 | −2 | −0.12 | −0.20 |
+| Travel to the last hitbox | 12.7 | 16.3 | 22.2 | 24.1 | 30.7 | 0.38 | −0.01 |
+| Travel to actionable | 18.8 | 26.1 | 33.1 | 37 | 42 | 0.44 | 0.07 |
+| Travel to actionable ÷ run speed | 10.9 | 16.1 | 19.4 | 24 | 31.1 | 0.61 | −0.55 |
 
-| Fighter | Startup | Last active | Active span | Ending lag | Actionable | Damage | Shieldstun | On shield, first | On shield, last | Run speed | Weight |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Bowser | 10 | 17 | 8 | 38 | 56 | 11 | 6 | −39 | −32 | 1.5 | 117 |
-| Captain Falcon | 7 | 16 | 10 | 21 | 38 | 10 | 6 | −24 | −15 | 2.3 | 104 |
-| Donkey Kong | 9 | 20 | 12 | 34 | 55 | 11 | 6 | −39 | −28 | 1.6 | 114 |
-| Dr. Mario | 6 | 25 | 20 | 12 | 38 | 9 | 6 | −25 | −6 | 1.5 | 100 |
-| Falco | 4 | 17 | 14 | 18 | 36 | 9 | 6 | −25 | −12 | 1.5 | 80 |
-| Fox | 4 | 17 | 14 | 18 | 36 | 7 | 5 | −26 | −13 | 2.2 | 75 |
-| Ganondorf | 7 | 16 | 10 | 21 | 38 | 14 | 8 | −22 | −13 | 1.4 | 109 |
-| Ice Climbers | 11 | 12 | 2 | 25 | 38 | 9 | 6 | −20 | −19 | 1.4 | 88 |
-| Jigglypuff | 4 | 14 | 11 | 24 | 39 | 12 | 7 | −27 | −17 | 1.1 | 60 |
-| Kirby | 9 | 43 | 35 | 16 | 60 | 8 | 5 | −45 | −11 | 1.4 | 70 |
-| Link | 7 | 12 | 6 | 27 | 40 | 12 | 7 | −25 | −20 | 1.3 | 104 |
-| Luigi | 4 | 37 | 34 | 21 | 59 | 2 | 2 | −52 | −19 | 1.3 | 100 |
-| Mario | 6 | 25 | 20 | 12 | 38 | 9 | 6 | −25 | −6 | 1.5 | 100 |
-| Marth | 12 | 15 | 4 | 24 | 40 | 12 | 7 | −20 | −17 | 1.8 | 87 |
-| Mewtwo | 10 | 29 | 20 | 8 | 38 | 9 | 6 | −21 | −2 | 1.4 | 85 |
-| Mr. Game & Watch | 6 | 29 | 24 | 8 | 38 | 9 | 6 | −25 | −2 | 1.5 | 60 |
-| Ness | 8 | 22 | 15 | 17 | 40 | 5 | 4 | −27 | −13 | 1.4 | 94 |
-| Peach | 6 | 20 | 15 | 15 | 36 | 12 | 7 | −22 | −8 | 1.3 | 90 |
-| Pichu | 5 | 16 | 12 | 33 | 50 | 8 | 5 | −39 | −28 | 1.7 | 55 |
-| Pikachu | 5 | 16 | 12 | 33 | 50 | 8 | 5 | −39 | −28 | 1.8 | 80 |
-| Roy | 12 | 15 | 4 | 24 | 40 | 12 | 7 | −20 | −17 | 1.6 | 85 |
-| Samus | 7 | 16 | 10 | 21 | 38 | 13 | 7 | −23 | −14 | 1.4 | 110 |
-| Sheik | 6 | 12 | 7 | 23 | 36 | 10 | 6 | −23 | −17 | 1.8 | 90 |
-| Yoshi | 10 | 23 | 14 | 18 | 42 | 9 | 6 | −25 | −12 | 1.6 | 108 |
-| Young Link | 7 | 12 | 6 | 27 | 40 | 11 | 6 | −26 | −21 | 1.6 | 85 |
-| Zelda | 6 | 13 | 8 | 22 | 36 | 13 | 7 | −22 | −15 | 1.1 | 90 |
+| Fighter | Startup | Last active | Active span | Ending lag | Actionable | Damage | Shieldstun | On shield, first | On shield, last | Travel to last hitbox | Travel ÷ run speed | Run speed | Weight |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Bowser | 10 | 17 | 8 | 38 | 56 | 11 | 6 | −39 | −32 | – | – | 1.5 | 117 |
+| Captain Falcon | 7 | 16 | 10 | 21 | 38 | 10 | 6 | −24 | −15 | 20.9 | 16.4 | 2.3 | 104 |
+| Donkey Kong | 9 | 20 | 12 | 34 | 55 | 11 | 6 | −39 | −28 | – | – | 1.6 | 114 |
+| Dr. Mario | 6 | 25 | 20 | 12 | 38 | 9 | 6 | −25 | −6 | 28.7 | 21.8 | 1.5 | 100 |
+| Falco | 4 | 17 | 14 | 18 | 36 | 9 | 6 | −25 | −12 | 22.9 | 25.7 | 1.5 | 80 |
+| Fox | 4 | 17 | 14 | 18 | 36 | 7 | 5 | −26 | −13 | 20 | 15.3 | 2.2 | 75 |
+| Ganondorf | 7 | 16 | 10 | 21 | 38 | 14 | 8 | −22 | −13 | 23.3 | 31.1 | 1.4 | 109 |
+| Ice Climbers | 11 | 12 | 2 | 25 | 38 | 9 | 6 | −20 | −19 | 18.4 | 27.1 | 1.4 | 88 |
+| Jigglypuff | 4 | 14 | 11 | 24 | 39 | 12 | 7 | −27 | −17 | – | – | 1.1 | 60 |
+| Kirby | 9 | 43 | 35 | 16 | 60 | 8 | 5 | −45 | −11 | – | – | 1.4 | 70 |
+| Link | 7 | 12 | 6 | 27 | 40 | 12 | 7 | −25 | −20 | 13.8 | 22 | 1.3 | 104 |
+| Luigi | 4 | 37 | 34 | 21 | 59 | 2 | 2 | −52 | −19 | – | – | 1.3 | 100 |
+| Mario | 6 | 25 | 20 | 12 | 38 | 9 | 6 | −25 | −6 | – | – | 1.5 | 100 |
+| Marth | 12 | 15 | 4 | 24 | 40 | 12 | 7 | −20 | −17 | 21.7 | 16 | 1.8 | 87 |
+| Mewtwo | 10 | 29 | 20 | 8 | 38 | 9 | 6 | −21 | −2 | 25.4 | 24.6 | 1.4 | 85 |
+| Mr. Game & Watch | 6 | 29 | 24 | 8 | 38 | 9 | 6 | −25 | −2 | 15.3 | 13.6 | 1.5 | 60 |
+| Ness | 8 | 22 | 15 | 17 | 40 | 5 | 4 | −27 | −13 | 22.7 | 20.9 | 1.4 | 94 |
+| Peach | 6 | 20 | 15 | 15 | 36 | 12 | 7 | −22 | −8 | 24.3 | 19.5 | 1.3 | 90 |
+| Pichu | 5 | 16 | 12 | 33 | 50 | 8 | 5 | −39 | −28 | 13 | 10.9 | 1.7 | 55 |
+| Pikachu | 5 | 16 | 12 | 33 | 50 | 8 | 5 | −39 | −28 | 23.5 | 18.8 | 1.8 | 80 |
+| Roy | 12 | 15 | 4 | 24 | 40 | 12 | 7 | −20 | −17 | – | – | 1.6 | 85 |
+| Samus | 7 | 16 | 10 | 21 | 38 | 13 | 7 | −23 | −14 | 28 | 28.3 | 1.4 | 110 |
+| Sheik | 6 | 12 | 7 | 23 | 36 | 10 | 6 | −23 | −17 | 30.7 | 19.4 | 1.8 | 90 |
+| Yoshi | 10 | 23 | 14 | 18 | 42 | 9 | 6 | −25 | −12 | – | – | 1.6 | 108 |
+| Young Link | 7 | 12 | 6 | 27 | 40 | 11 | 6 | −26 | −21 | 12.7 | 14.4 | 1.6 | 85 |
+| Zelda | 6 | 13 | 8 | 22 | 36 | 13 | 7 | −22 | −15 | 15.6 | 18.7 | 1.1 | 90 |
 <!-- /dash-attacks -->
 
 ## Aerials on shield by timing, spacing and drift
