@@ -222,3 +222,28 @@ Repeat the intake from the checkout's root:
 ssconvert -S fightcore_melee_frame_data.xlsx /tmp/fightcore.csv
 cp /tmp/fightcore.csv.0 references/melee-frame-data/fightcore.csv
 ```
+
+## Character attributes
+
+`smashcraft:references/melee-frame-data/character-attributes.csv` lists each of
+the 26 fighters' movement and body attributes, one row per fighter and 97
+named columns: walk, dash and run speeds and accelerations, ground friction,
+jump squat, jump and short-hop initial velocities, air jump multipliers,
+number of jumps, gravity, terminal and fast-fall velocity, air mobility, air
+speed and air friction, weight, model scale, shield size, normal and per-aerial
+landing lag, ledge-jump and wall-jump velocities, and similar. Column names are
+the spreadsheet's own, including its question marks on uncertain fields and its
+blank headers.
+
+Source: the SuperCombo Wiki table "SSBM/Character Attributes"
+(https://wiki.supercombo.gg/w/SSBM/Character_Attributes), exported as
+`ssbm_character_attributes.csv` and downloaded by Tom on 2026-10-26, SHA-256
+`c0338e7abadeea674381442b74549a420cd3ab13ce2c155121c9f8927b0e80f1`. Two kinds of
+row are dropped: the row of data-file offsets under the header, and the six
+non-playable entries whose names start with `zz`. Only factual numbers are
+kept, credited to that page; the wiki's prose is not copied. The disc revision
+is not stated.
+
+Units are Melee units and frames. Representative check: Fox's jump squat is 3,
+as in `records.jsonl`, and his terminal velocity 2.8 is the value that file
+mislabels `gravity`; his gravity is 0.23 and fast-fall velocity 3.4.
