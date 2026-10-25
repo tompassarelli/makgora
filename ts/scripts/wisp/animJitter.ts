@@ -24,6 +24,12 @@ export const SPAN_ALLOWANCE = 0.5;
 
 export const JITTER_EXEMPTIONS: ReadonlyMap<string, string> = new Map();
 
+/** Root translation may turn back twice in a row by this many units; Cairne's grounding feedback bobbed his body up to 24.8 (#277) while every other fighter stays under 0.8. */
+export const BOB_LIMIT = 2.0;
+
+/** Clips, as `fighter/sequence`, whose root still bobs past `BOB_LIMIT` from a cause tracked by the named issue; the check fails once one stops bobbing. */
+export const BOB_EXEMPTIONS: ReadonlyMap<string, string> = new Map();
+
 const STEPS = 8;
 
 type Quat = readonly [number, number, number, number];
@@ -101,3 +107,67 @@ export function clipJitter(model: mdx.Model, from: number, to: number): ClipJitt
 /** Rotation is reported but not gated: a Hermite rotation tangent is a quaternion control point, and stock clips leave the arc by design. */
 export const jitters = (jitter: ClipJitter) =>
   jitter.translation > JITTER_LIMITS.translation || jitter.scaling > JITTER_LIMITS.scaling;
+
+/** The worst back-and-forth of a root node's translation keys turning twice in a row at most `JITTER_SPAN_MS` apart: the whole body bobbing every frame. */
+export function rootBob(model: mdx.Model, from: number, to: number): TrackJitter | undefined {
+  let worst: TrackJitter | undefined;
+  for (const group of NODE_GROUPS) for (const node of model[group]) {
+    if (node.Parent !== undefined && node.Parent !== null && node.Parent >= 0) continue;
+    const track = node.Translation as mdx.AnimVector | undefined;
+    if (track === undefined || track.GlobalSeqId !== null && track.GlobalSeqId !== undefined && track.GlobalSeqId >= 0) continue;
+    const keys = track.Keys.filter((key) => key.Frame >= from && key.Frame <= to);
+    for (let index = 3; index < keys.length; index++) {
+      const run = keys.slice(index - 3, index + 1);
+      if (run.some((key, at) => at > 0 && key.Frame - run[at - 1]!.Frame > JITTER_SPAN_MS)) continue;
+      for (let axis = 0; axis < run[0]!.Vector.length; axis++) {
+        const [d1, d2, d3] = [1, 2, 3].map((at) => run[at]!.Vector[axis]! - run[at - 1]!.Vector[axis]!) as [number, number, number];
+        if (d1 * d2 >= 0 || d2 * d3 >= 0) continue;
+        const excess = Math.min(Math.abs(d1), Math.abs(d2), Math.abs(d3));
+        if (excess > (worst?.excess ?? 0)) worst = { node: node.Name, property: "Translation", frame: run[1]!.Frame, excess };
+      }
+    }
+  }
+  return worst;
+}
+
+/** Collects every measured clip's key jitter and root bob against their limits and exemptions, for `bun wisp anim jitter`. */
+export class JitterReport {
+  private clips = 0;
+  private readonly offenders: string[] = [];
+  private readonly exempt = new Map<string, number>();
+  private readonly bodies = new Set<string>();
+  private readonly bobbing: string[] = [];
+  private readonly bobExempt = new Set<string>();
+
+  measure(model: mdx.Model, from: number, to: number, fighter: string, sequence: string | number): void {
+    const body = `classic:${fighter}`, clip = `${fighter}/${sequence}`, measured = clipJitter(model, from, to), bob = rootBob(model, from, to);
+    this.clips++;
+    this.bodies.add(body);
+    if (bob !== undefined && bob.excess > BOB_LIMIT) {
+      if (BOB_EXEMPTIONS.has(clip)) this.bobExempt.add(clip);
+      else this.bobbing.push(`${clip}\t${bob.node} Translation @${bob.frame}\t${bob.excess.toFixed(2)}`);
+    }
+    if (!jitters(measured)) return;
+    if (JITTER_EXEMPTIONS.has(body)) { this.exempt.set(body, (this.exempt.get(body) ?? 0) + 1); return; }
+    const worst = measured.worst;
+    this.offenders.push(`classic\t${fighter}\t${sequence}\t${measured.translation.toFixed(2)}\t${measured.scaling.toFixed(3)}\t${measured.rotation.toFixed(1)}\t${worst === undefined ? "" : `${worst.node} ${worst.property} @${worst.frame}`}`);
+  }
+
+  report(): string {
+    return [
+      "look\tfighter\tsequence\ttranslation\tscaling\trotation\tworst", ...this.offenders, `${this.offenders.length} jittering clips of ${this.clips}`,
+      ...[...this.exempt].map(([body, count]) => `${body}: ${count} jittering clips exempt (${JITTER_EXEMPTIONS.get(body)})`),
+      "root bob\tworst\tunits", ...this.bobbing, `${this.bobbing.length} bobbing clips of ${this.clips}`,
+    ].join("\n");
+  }
+
+  problem(): string | undefined {
+    const staleBobs = [...BOB_EXEMPTIONS.keys()].filter((clip) => !this.bobExempt.has(clip) && this.bodies.has(`classic:${clip.split("/")[0]}`));
+    if (staleBobs.length > 0) return `${staleBobs.join(", ")} no longer bob; remove their entries from BOB_EXEMPTIONS in smashcraft:ts/scripts/wisp/animJitter.ts`;
+    if (this.bobbing.length > 0) return `${this.bobbing.length} clips bob their root back and forth between frames; ground every frame from a pose measured before the root keys are rewritten`;
+    const stale = [...JITTER_EXEMPTIONS.keys()].filter((body) => !this.exempt.has(body) && this.bodies.has(body));
+    if (stale.length > 0) return `${stale.join(", ")} no longer jitter; remove their entries from JITTER_EXEMPTIONS in smashcraft:ts/scripts/wisp/animJitter.ts`;
+    if (this.offenders.length > 0) return `${this.offenders.length} clips leave their keys between frames; write curved tangents as slopes (zero for a hold) or use Linear keys`;
+    return undefined;
+  }
+}

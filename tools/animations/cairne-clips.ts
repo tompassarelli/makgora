@@ -374,8 +374,10 @@ for (const [ordinal,action] of [...actions,...damageActions,...goreActions].entr
 
   const drawn=new DrawnModel(generateMDX(model),1),painBody=action.damage?new PainBody(generateMDX(model),Character.cairne):undefined;const rootTrack=main.Translation!;
   if(!action.air){const mainKeys=source.Nodes[main.ObjectId]!.Translation!.Keys,mainDonor=mainKeys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1])!,mainIdle=mainKeys.find(k=>k.Frame>=idleSequence.Interval[0]&&k.Frame<=idleSequence.Interval[1])??{...mainDonor,Vector:resting(".Translation",mainDonor.Vector)};
-    for(let frame=0;frame<=action.frames;frame++){const vertices=drawn.triangles(index,frame/60,1);let floor=Infinity;for(let i=1;i<vertices.length;i+=2)floor=Math.min(floor,vertices[i]!);
-      if(action.beats){evaluate(index,frame);floor=soles()-soleRest;}if(painBody)floor=painBody.floor(index,frame/60);
+    // Every floor is read before Main is rewritten: a sole read through a freshly written Main key feeds it back and alternates the next frame's height.
+    const floors=Array.from({length:action.frames+1},(_,frame)=>{if(painBody)return painBody.floor(index,frame/60);if(action.beats){evaluate(index,frame);return soles()-soleRest;}
+      const vertices=drawn.triangles(index,frame/60,1);let floor=Infinity;for(let i=1;i<vertices.length;i+=2)floor=Math.min(floor,vertices[i]!);return floor;});
+    for(let frame=0;frame<=action.frames;frame++){const floor=floors[frame]!;
       const Frame=start+Math.round(frame*1000/60),w=idleWeight(frame),Vector=mainDonor.Vector.map((v,i)=>v*(1-w)+mainIdle.Vector[i]!*w);Vector[2]=Vector[2]!-floor;
       if(action.beats)Vector[0]=Vector[0]!+along(action.beats,frame,p=>p.gesture.step??0);
       if(action.prepTravel&&frame<action.contact){const wind=Math.max(1,action.contact-3);Vector[0]=Vector[0]!-action.prepTravel*(frame<=wind?frame/wind:(action.contact-frame)/(action.contact-wind));}

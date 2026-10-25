@@ -193,6 +193,11 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   its keys past the limit, and flat handles on held axes, so regenerating through it fixes
   an offender. `JITTER_EXEMPTIONS` in smashcraft:ts/scripts/wisp/animJitter.ts names a fighter
   that cannot yet be regenerated, with its issue; the check fails once that fighter stops jittering.
+  It also fails when a root node's translation keys turn back twice in a row by more than
+  `BOB_LIMIT` (2 units): the whole body bobbing every frame. Cairne's grounding read his soles
+  through the Main key it had just written, so each frame's height mirrored the last and his
+  forward smash bobbed 19.5 units (#277); every other fighter stays under 0.8. `BOB_EXEMPTIONS`
+  names a clip still bobbing from a tracked cause, and the check fails once it stops.
 
 - White body flashes (from the repository root):
   `bun tools/animations/white-flash-models.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--character ID]`

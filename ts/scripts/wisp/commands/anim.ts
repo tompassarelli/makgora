@@ -12,7 +12,7 @@ import { type Command, UsageFailure } from "wisp/scripts/wisp/command";
 import { captureScene, renderScenes, type RenderScene } from "wisp/scripts/wisp/headlessRender";
 import { originalClip, originalClipCount, originalClipNames } from "../../../src/generated/clips/fighterOriginalClipInfo";
 import { parseMDX } from "../../clipNodes";
-import { clipJitter, JITTER_EXEMPTIONS, jitters } from "../animJitter";
+import { JitterReport } from "../animJitter";
 import { extremeCamera, cameraFieldOfView, FLOOR_HEIGHT } from "../../../src/game/presentation/arenaCamera";
 import type { Character } from "../../../src/game/sim/codes";
 import { SELECTABLE_CHARACTERS, fighterName, fighterSlug } from "../../../src/game/sim/heroes/registry";
@@ -454,10 +454,7 @@ const jitter: Command = (args) => Effect.gen(function*() {
   const assets = flags.get("--assets")?.[0] ?? assetsView(yield* readManifest());
   const root = join(assets, "original-clips-static-lights/imports");
   const models = new Map<string, ReturnType<typeof parseMDX>>();
-  const offenders: string[] = [];
-  const exempt = new Map<string, number>();
-  const measuredBodies = new Set<string>();
-  let clips = 0;
+  const report = new JitterReport();
   for (const character of fighters) {
     const names = new Map([...originalClipNames(character)].map(([name, index]) => [index, name] as const));
     for (let index = 0; index < originalClipCount(character); index++) {
@@ -466,28 +463,18 @@ const jitter: Command = (args) => Effect.gen(function*() {
       const relativePath = clip.modelPath.replaceAll("\\", "/");
       const own = join(root, relativePath);
       if (!existsSync(own)) continue;
-      const body = `classic:${fighterSlug(character)}`;
       let model = models.get(own);
       if (model === undefined) {
         model = yield* attempt(`read ${own}`, async () => parseMDX(await Bun.file(own).arrayBuffer()));
         models.set(own, model);
       }
       const base = clip.timeline === true ? 0 : model.Sequences[0]?.Interval[0] ?? 0;
-      const measured = clipJitter(model, base + clip.startSeconds * 1000, base + clip.endSeconds * 1000);
-      clips++;
-      measuredBodies.add(body);
-      if (!jitters(measured)) continue;
-      const worst = measured.worst;
-      if (JITTER_EXEMPTIONS.has(body)) { exempt.set(body, (exempt.get(body) ?? 0) + 1); continue; }
-      offenders.push(`classic\t${fighterSlug(character)}\t${names.get(index) ?? index}\t${measured.translation.toFixed(2)}\t${measured.scaling.toFixed(3)}\t${measured.rotation.toFixed(1)}\t${worst === undefined ? "" : `${worst.node} ${worst.property} @${worst.frame}`}`);
+      report.measure(model, base + clip.startSeconds * 1000, base + clip.endSeconds * 1000, fighterSlug(character), names.get(index) ?? index);
     }
   }
-  yield* Console.log(["look\tfighter\tsequence\ttranslation\tscaling\trotation\tworst", ...offenders].join("\n"));
-  yield* Console.log(`${offenders.length} jittering clips of ${clips}`);
-  for (const [body, count] of exempt) yield* Console.log(`${body}: ${count} jittering clips exempt (${JITTER_EXEMPTIONS.get(body)})`);
-  const stale = [...JITTER_EXEMPTIONS.keys()].filter((body) => !exempt.has(body) && measuredBodies.has(body));
-  if (stale.length > 0) return yield* new AnimFailure({ problem: `${stale.join(", ")} no longer jitter; remove their entries from JITTER_EXEMPTIONS in smashcraft:ts/scripts/wisp/animJitter.ts` });
-  if (offenders.length > 0) return yield* new AnimFailure({ problem: `${offenders.length} clips leave their keys between frames; write curved tangents as slopes (zero for a hold) or use Linear keys` });
+  yield* Console.log(report.report());
+  const problem = report.problem();
+  if (problem !== undefined) return yield* new AnimFailure({ problem });
 }).pipe(Effect.provide(BunServices.layer));
 
 export const anim: Command = ([mode, verb, ...rest]) => {
