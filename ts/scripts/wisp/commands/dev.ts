@@ -19,7 +19,6 @@ export const SMASHCRAFT_DEV: DevProject = {
     preload: ["test/host-natives.ts"],
     reads: {
       "scripts/greenBuilds.test.ts": [],
-      "test/advantage-state.test.ts": ["../tools/move-data/advantage-state.jsonl"],
       "test/autoland-sweep.test.ts": ["test/fixtures/autoland-backlog.json", "scripts/autoland.ts", "scripts/autolandCore.ts", "scripts/autolandSuperseded.ts", "../.github/workflows/autoland.yml", "../.github/workflows/autoland-sweep.yml"],
       "test/classic-effect-screen.test.ts": ["src/**", "../build-inputs/**", "../typescript-toolchain.lock"],
       "test/drawn-size.test.ts": ["../build-inputs/**"],
