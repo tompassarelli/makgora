@@ -32,9 +32,10 @@ imported models failing.
 The map takes the request through two files in CustomMapData: play leaves
 `smashcraft-play.txt` (`PLAY v=1 computers=4`) before Warcraft starts, and
 the first human's client reads it once at map start; only then does it look
-for `smashcraft-play-go.txt`, which play writes once the helper runs. The first human asks
-for the start 30 callbacks after it reads that file, so the read never
-lands in the match's first second. Each client then adds the computers and starts the match on the default stage
+for `smashcraft-play-go.txt`, which play writes once the helper runs. Once the first human
+reads that file it syncs a hold, on which both clients stop refreshing their
+menu files, and it asks for the start 30 callbacks later, so neither that
+read nor a menu write lands in the match's first second. Each client then adds the computers and starts the match on the default stage
 and writes `smashcraft-play-pN.txt` (`… started` or `… refused`). Maps built
 before this ignore the request. The helper keeps running after the command
 ends, with its output in ~/.local/state/smashcraft/play-helper.log; stop it

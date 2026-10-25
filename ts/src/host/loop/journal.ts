@@ -25,7 +25,7 @@ import { noteCallbackClockRow } from "./callbackClock";
 import { pollLocalKeys } from "./inputs";
 import { views } from "./ui";
 import { probeClockMs, probeFileRead, probeInput, probeIntegrity, probePoll, probeSendFinished, probeTransportSend } from "./responseProbe";
-import { type Journal, type Rollback, type ShellState, localSlot, playsOnKeyboard } from "./state";
+import { type Journal, type Rollback, type ShellState, localSlot, playsOnKeyboard, playtestProgress } from "./state";
 import { recordSend, traceInput } from "./trace";
 import { LASTING, setStatus } from "./view";
 
@@ -357,7 +357,7 @@ export function publishMenu(s: ShellState): void {
   const phase: MenuPhase = isParticipantSlot(slot) && menu !== undefined ? menu : "BLOCKED";
   const previous = s.menuPublication;
   if (previous !== undefined) previous.ticks++;
-  if (s.stageLoad !== undefined || (phase === previous?.phase && (phase === "BLOCKED" || previous.ticks < 15))) return;
+  if (s.stageLoad !== undefined || playtestProgress().starting || (phase === previous?.phase && (phase === "BLOCKED" || previous.ticks < 15))) return;
   s.menuPublication = { phase, ticks: 0 };
   const { game } = s;
   writeJournalFile(menuFile(journalIdentity(s, s.rollback?.epoch ?? 0), phase, {

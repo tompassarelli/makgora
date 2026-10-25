@@ -18,6 +18,7 @@ import { type ShellState, localSlot, playtestProgress } from "./state";
 export const PLAYTEST = "shell.playtest";
 export const PLAYTEST_PREFIX = "SC_PLAY";
 const LOOK_FRAMES = 30;
+const PLAYTEST_HOLD = "HOLD";
 
 
 export function readPlaytestRequest(s: ShellState): void {
@@ -32,8 +33,10 @@ export function servicePlaytestRequest(s: ShellState): void {
   if (state.request === undefined || state.sent || s.game.phase !== Phase.characterMenu) return;
   if (++state.looked < LOOK_FRAMES) return;
   state.looked = 0;
-  if (!state.go) {
-    state.go = readChunk(PLAYTEST_GO_FILE) !== undefined;
+  if (!state.starting) {
+    if (readChunk(PLAYTEST_GO_FILE) === undefined) return;
+    state.starting = true;
+    BlzSendSyncData(PLAYTEST_PREFIX, PLAYTEST_HOLD);
     return;
   }
   state.sent = true;
@@ -44,8 +47,13 @@ export function servicePlaytestRequest(s: ShellState): void {
 export function playtestRequested(s: ShellState): void {
   if (GetPlayerId(GetTriggerPlayer()) !== firstHumanSlot(s.game)) return;
   const line = BlzGetTriggerSyncData();
+  if (line === PLAYTEST_HOLD) {
+    playtestProgress().starting = true;
+    return;
+  }
   const request = parsePlaytestRequest(line);
   const started = !playtestProgress().cancelled && request !== undefined && startPlaytest(s, request);
+  playtestProgress().starting = false;
   const slot = localSlot();
   if (isParticipantSlot(slot)) writeLine(playtestReceiptFile(slot), `${line} ${started ? "started" : "refused"}`);
 }
