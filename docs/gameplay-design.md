@@ -92,6 +92,22 @@ Run at its run frame only with the stick past 0.625 forward.
 #392's platform bands reuse the deadzone, the 0.6875 crouch threshold and the
 0.6625 jump threshold ([Platforms](#platforms)).
 
+The tilt modifier shortens the stick as a box controller's modifier does
+(#282): the input adapter scales each axis so a full press sends x = ±0.7875,
+up 0.65 and down −0.675, one Melee stick unit (0.0125) inside dash, fast walk
+and smash turn (0.8), tap jump (0.6625) and crouch and platform drop (0.6875).
+Diagonals and analog sticks scale by the same per-axis limits, and DI, shield
+tilt, air drift and specials read the shortened values; tilt + shield still
+clamps to 0.65, under rolls and spot dodge (0.7). Side walks in the walk-middle
+zone at one full walk speed, up stays under tap jump, and down neither
+crouches, fast-falls nor drops (fast-fall and crouch also need the digital
+down the modifier clears, #187); a crouch already held stays until −0.625.
+Up + modifier in a dash or run is above the relaxed 0.5625, which would tap
+jump in Melee; tap jump is off here, so nothing jumps. Wall jumps need
+x ≥ 0.8, so the modifier never wall-jumps. The values are
+`TILT_STICK_X`, `TILT_STICK_UP` and `TILT_STICK_DOWN` in
+smashcraft:ts/src/game/sim/stick.ts.
+
 ### States and their options
 
 | State | Entered by | Tilts / jab | Smashes | Dash attack | Grab | Shield | Jump | Crouch | Dash / dash dance | Run turnaround |
@@ -892,7 +908,9 @@ rule over all 13 selectable fighters.
   horizontal-only air dodge angles 18° below horizontal by default, with no
   modifier or toggle; fast fall needs down with neutral horizontal input and
   no tilt modifier, since modifier + down is a tilt input that neither crouches
-  nor fast-falls (#187). The
+  nor fast-falls (#187). The modifier sends x = ±0.7875, up 0.65 and down
+  −0.675, just inside dash, tap jump and crouch (#282, [Stick
+  zones](#stick-zones)). The
   implementation is in smashcraft:docs/physics.md, "Default digital wavedash
   and fast-fall directions".
 - **Attack inputs** (owner; Strong since #186): neutral attack is the jab,

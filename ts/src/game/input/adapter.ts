@@ -4,7 +4,7 @@ import type { Fighter } from "../sim/fighter";
 import type { Controls } from "../sim/roster";
 import { analogShieldActive, analogShieldStrength } from "../sim/shield";
 import { squareRoot } from "../sim/warcraftMath";
-import { SHIELD_TILT_STICK_CAP, stickX, stickZ } from "../sim/stick";
+import { SHIELD_TILT_STICK_CAP, stickX, stickZ, tiltStickX, tiltStickZ } from "../sim/stick";
 import { STICK_DEADZONE } from "../sim/stickZones";
 import { Action, bit, has, maskOf } from "./actions";
 import { type AttackBuffer, clearAttackBuffer, queueAttack } from "./attackBuffer";
@@ -65,6 +65,12 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
     destination.diStickX = f32(destination.diStickX / length);
     destination.diStickZ = f32(destination.diStickZ / length);
   }
+  destination.walking = (held & WALK_BIT) !== 0;
+  if (destination.walking) {
+    destination.diStickX = tiltStickX(destination.diStickX);
+    destination.diStickZ = tiltStickZ(destination.diStickZ);
+    destination.driftStickX = tiltStickX(destination.driftStickX);
+  }
   destination.sdiPulse = row.sdi;
   destination.sdiX = row.sdiX;
   destination.sdiZ = row.sdiZ;
@@ -84,7 +90,6 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   destination.shieldTriggerActive = pressure > 0;
   destination.shield = pressure === 255 || analogShieldActive(pressure);
   destination.shieldStrength = pressure === 255 ? 1.0 : analogShieldStrength(pressure);
-  destination.walking = (held & WALK_BIT) !== 0;
   if (destination.walking && destination.shield) {
     destination.diStickX = Math.max(-SHIELD_TILT_STICK_CAP, Math.min(SHIELD_TILT_STICK_CAP, destination.diStickX));
     destination.diStickZ = Math.max(-SHIELD_TILT_STICK_CAP, Math.min(SHIELD_TILT_STICK_CAP, destination.diStickZ));
