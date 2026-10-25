@@ -694,7 +694,12 @@ state. The procedure:
 
    It prints each section's median, p95, p99 and worst milliseconds and its
    share of the worst 1% of callbacks' Lua time, then `other`, `total` (the
-   gated callback cost) and `gc-kb`; `--json` prints the same as one result.
+   gated callback cost) and `gc-kb`, then each of the worst 1% of callbacks:
+   its sample, total milliseconds, catch-up, `frame` (confirmed simulation
+   frame), `speculative` frame, `replay` (the match's replay serial) and
+   section milliseconds; `--json` prints the same as one result. A spike's
+   `replay` names the client's `smashcraft-replay-REPLAY.txt`, and `bun wisp
+   replay` of it reaches that `frame` headless.
 
 The headless equivalent runs the same build and sections in 32-bit Lua with
 four rollback clients and a capture typed after GO!; its clock is the host's
