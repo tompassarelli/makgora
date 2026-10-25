@@ -28,7 +28,7 @@ export class PrePushRefusal extends Schema.TaggedError<PrePushRefusal>()("PrePus
   }
 }
 
-export interface Check { readonly name: string; readonly directory: string; readonly args: readonly string[]; readonly fix?: string; readonly hosted: boolean; readonly inputs?: readonly string[]; readonly privateStore?: boolean }
+export interface Check { readonly name: string; readonly directory: string; readonly args: readonly string[]; readonly fix?: string; readonly hosted: boolean; readonly inputs?: readonly string[]; readonly privateStore?: boolean; readonly machineTool?: boolean }
 
 
 const ANIMATION_INPUTS = ["build-inputs/original-clips-static-lights/", "tools/animations/", "ts/scripts/keyThin.ts", "ts/scripts/modelTracks.ts", "ts/scripts/poseError.ts", "ts/scripts/wisp/animJitter.ts"];
@@ -41,6 +41,9 @@ const STRIKE_COMMAND = "ts/scripts/wisp/commands/view.ts";
 const STRIKE_MEASURES = ["ts/scripts/wisp/strikeMoments.ts", "ts/scripts/heroModelSource.ts", "ts/src/game/presentation/heroStrikeMomentInfo.ts"];
 const SUITE_INPUTS = [".github/workflows/farm-test.yml", ".github/workflows/autoland.yml", "ts/scripts/suiteParity.ts", "ts/scripts/prePush.ts"];
 const SCRIPT_INPUTS = ["ts/scripts", "ts/src", "ts/package.json", "ts/bunfig.toml"];
+const EFFECT_KIT_INPUTS = /^(ts\/|contracts\/|repos\/effect|effect-kit\.json$|typescript-toolchain\.lock$)/;
+export const NORTH = join(homedir(), "code/north/main");
+export const EFFECT_KIT = join(NORTH, "agent-machinery/scripts/effect-kit.mjs");
 
 function importClosure(entry: string): string[] {
   const transpiler = new Bun.Transpiler({ loader: "ts" });
@@ -75,11 +78,15 @@ export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = 
   const strikeMoments = touchesCueInputs(paths, strikes);
   const mapInputs = paths.some((path) => MAP_INPUTS.some((input) => path === input || input.endsWith("/") && path.startsWith(input)));
   const suites = paths.some((path) => SUITE_INPUTS.includes(path));
+  const effectKit = paths.some((path) => EFFECT_KIT_INPUTS.test(path));
   const fighterArt = changedFighters(paths, derivedStepCode());
   return [
     ...(paths.length > 0 ? [{ name: "clean room", directory: "ts", args: ["scripts/cleanRoom.ts"], fix: "follow wisp:docs/clean-room.md and the line above.", hosted: true }] : []),
     ...(ts ? [
       { name: "kind tags and type-check ts", directory: "ts", args: ["run", "check"], fix: "end each refused test title with its kind tag (listed above) or delete the test; fix each type error.", hosted: true },
+    ] : []),
+    ...(effectKit ? [
+      { name: "effect-kit check", directory: ".", args: [EFFECT_KIT, "check"], fix: `CI runs north's effect-kit check (smashcraft:.github/workflows/ci.yml); fix each problem above, or if ${EFFECT_KIT} is missing, git clone https://github.com/tompassarelli/north ${NORTH} (git -C ${NORTH} pull keeps it on the main CI clones).`, hosted: false, machineTool: true },
     ] : []),
     ...(suites ? [
       { name: "Autoland suite covers the farm suite", directory: "ts", args: ["scripts/suiteParity.ts"], fix: "give Autoland's suite every farm-test job and input, since safe-push hands a lane to Autoland without its own farm run (smashcraft:docs/ci.md, \"Autoland\").", hosted: true },
@@ -222,7 +229,7 @@ export const laptop: Local = {
 };
 
 export const runChecks = (checks: readonly Check[], local: Local) => Effect.forEach(checks, (check) => Effect.gen(function*() {
-  const key = check.privateStore ? Option.none<string>() : yield* local.key(check);
+  const key = check.privateStore || check.machineTool ? Option.none<string>() : yield* local.key(check);
   if (Option.isSome(key) && (yield* local.cache.has(key.value))) return yield* Console.error(`pre-push: ${check.name} passed before on these inputs (cache ${key.value.slice(0, 12)})`);
   const started = performance.now();
   const child = yield* local.runner(check);
@@ -271,7 +278,7 @@ export const prePush = (input: string, landing: { readonly gate: typeof farmGate
     return commit === undefined || remote === undefined || ZERO.test(commit) || remoteRef?.startsWith("refs/tags/") ? [] : [{ commit, remoteRef, remote }];
   });
   const paths = [...new Set((yield* Effect.forEach(pushed, ({ commit, remote }) => local.changed(commit, remote))).flat())];
-  const selected = checksFor(paths, local.cues(), local.strikes()).filter((check) => !(check.privateStore && local.hosted));
+  const selected = checksFor(paths, local.cues(), local.strikes()).filter((check) => !((check.privateStore || check.machineTool) && local.hosted));
   const toMain = pushed.some(({ remoteRef }) => remoteRef === "refs/heads/main");
   const handsOff = pushed.some(({ remoteRef }) => remoteRef === "refs/heads/main" || remoteRef?.startsWith(HAND_OFF) === true);
   const lands = handsOff ? autolandLands(yield* landing.queue, paths) : false;
@@ -279,7 +286,7 @@ export const prePush = (input: string, landing: { readonly gate: typeof farmGate
   const deferred = lands ? selected.filter(({ hosted }) => hosted) : [];
   if (checks.length === 0 && !toMain) return;
   const head = yield* local.head;
-  const dirty = checks.length === 0 ? "" : yield* local.dirty(checks.some(({ privateStore }) => privateStore) ? ["."] : [...new Set(checks.map(({ directory }) => directory))]);
+  const dirty = checks.length === 0 ? "" : yield* local.dirty(checks.some(({ privateStore, machineTool }) => privateStore || machineTool) ? ["."] : [...new Set(checks.map(({ directory }) => directory))]);
   if (pushed.some(({ commit }) => commit !== head) || dirty !== "") {
     return yield* new PrePushRefusal({ problem: `pre-push: the checks read the working tree, so push the clean checked-out commit (HEAD ${head.slice(0, 12)}).\n${dirty}` });
   }

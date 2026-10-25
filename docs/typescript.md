@@ -146,6 +146,15 @@ unstable `effect/process` (`allowedUnstableApis` in smashcraft:ts/tsconfig.json)
 and smashcraft:typescript-toolchain.lock pins `@effect/platform-bun` (its
 `@effect/platform-node-shared` overridden to the same version) with Effect.
 
+north's `effect-kit check` enforces these rules: CI clones north's main and
+runs it (smashcraft:.github/workflows/ci.yml), and the pre-push gate
+(smashcraft:ts/scripts/prePush.ts) runs the same script from the machine's
+north main checkout, `~/code/north/main/agent-machinery/scripts/effect-kit.mjs`,
+before every landing that touches `ts/`, `contracts/`, `repos/effect`,
+effect-kit.json or typescript-toolchain.lock. Both run north's main, so keep
+that checkout pulled; when it is missing the gate refuses with the clone
+command. Hosted runs of the hook skip it, since CI and Autoland's suite run it.
+
 ### Effect on the host
 
 Wisp's host tools use Effect for asynchronous orchestration: typed failures,

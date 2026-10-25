@@ -34,7 +34,8 @@ autoland`); its pre-push gate runs no farm suite for that hand-off, since
 Autoland's suite covers every farm-test job
 (smashcraft:ts/scripts/suiteParity.ts). For that hand-off the gate also runs
 locally only the checks that need private or local inputs (generated models
-stored, animation jitter); every hosted check it selects (`hosted` in
+stored, animation jitter, and effect-kit check from the machine's north
+checkout, smashcraft:docs/typescript.md#host-tools); every hosted check it selects (`hosted` in
 smashcraft:ts/scripts/prePush.ts: clean room, kind tags and type-check, suite
 parity, cue models) runs instead in this same hook when Autoland's build
 pushes the rebased candidate to `farm/autoland-SHA`, and a refusal there fails
