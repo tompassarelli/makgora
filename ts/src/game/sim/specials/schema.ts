@@ -81,6 +81,9 @@ export interface SpecialMotion extends FrameWindow {
 
   readonly throughEdge?: boolean | undefined;
 
+  /** On its first frame, after the move has connected, turns to face the first fighter it struck. */
+  readonly facesStruck?: true | undefined;
+
   /** Flies at `speed` toward the foe locked on its first frame, turning at most the angle whose cosine and sine it names a frame, through platforms. */
   readonly seek?: { readonly speed: number; readonly turnCos: number; readonly turnSin: number } | undefined;
 }

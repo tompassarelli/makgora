@@ -17,6 +17,7 @@ import {
   ParryBuffer,
   ProjectileKind,
   SPECIAL_ACTION_CAPACITY,
+  STUN_REPEAT_FRAMES,
   ShieldBreak,
   SpecialAction,
   SurfaceContact,
@@ -124,6 +125,7 @@ interface Launch {
   groundKnockbackX: number;
 
   knockbackAge: number | undefined;
+  stunAge: number;
   damageLevel: number;
   hitstun: number;
 
@@ -575,6 +577,7 @@ export function createFighter(character: Character, startX: number, facing: numb
       meleeKnockbackZ: { original: 0.0, published: 0.0 },
       groundKnockbackX: 0.0,
       knockbackAge: undefined,
+      stunAge: STUN_REPEAT_FRAMES,
       damageLevel: 0,
       hitstun: 0,
       throwHitstun: false,

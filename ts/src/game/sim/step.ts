@@ -5,7 +5,7 @@
 import { max, min } from "../core/numbers";
 import { divideFloat32, roundToFloat32, subtractFloat32 } from "wisp/src/sim/binary32";
 import { f32 } from "wisp/src/sim/f32";
-import { Character, DownState, GroundAction, LedgeState, ParryBuffer, ShieldBreak, SpecialAction, SurfaceContact } from "./codes";
+import { Character, DownState, GroundAction, LedgeState, ParryBuffer, STUN_REPEAT_FRAMES, ShieldBreak, SpecialAction, SurfaceContact } from "./codes";
 import {
   SPOT_DODGE_FRAMES,
   GROUND_ROLL_FRAMES,
@@ -440,6 +440,7 @@ export function advanceFighterMotion(world: Roster, slot: number, stage: number,
   const hitlagBefore = launch.hitlag;
   launch.hitlag = max(0, launch.hitlag - 1);
   launch.hitlagEndAge = hitlagBefore > 0 ? 0 : min(16, launch.hitlagEndAge + 1);
+  launch.stunAge = min(STUN_REPEAT_FRAMES, launch.stunAge + 1);
 
   let parryOption: ParryBuffer = ParryBuffer.none;
   const parryDirection = shield.parryBufferDirection;

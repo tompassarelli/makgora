@@ -162,6 +162,8 @@ export const HeroStatusGroup = { sleep: 0, silence: 1, chill: 2 } as const;
 export type HeroStatusGroup = (typeof HeroStatusGroup)[keyof typeof HeroStatusGroup];
 export const HERO_STATUS_GROUPS = 3;
 
+export const STUN_REPEAT_FRAMES = 120;
+
 // Append only: these pickup codes are serialized in replay text.
 export const ItemKind = { none: 0, speed: 1, heavy: 3 } as const;
 export type ItemKind = (typeof ItemKind)[keyof typeof ItemKind];
