@@ -17,3 +17,8 @@ export const classic = {
     'ankle.R': 'Bone_Foot_R',
     weapon: 'Object08',
 } as const;
+export const pain = {
+    rows: {
+        high: { aim: { 'arm.free': 250, 'forearm.free': 270 } },
+    },
+} as const;

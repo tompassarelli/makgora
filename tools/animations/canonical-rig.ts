@@ -21,6 +21,20 @@ export interface FighterRig {
     readonly character: Character;
     /** Classic skeleton → rig: the Classic node that carries each humanoid joint. */
     readonly classic: Readonly<Partial<Record<HumanoidJoint, string>>>;
+    readonly pain?: PainCorrection;
+}
+
+export type PainHeight = "low" | "middle" | "high";
+export type PainLimb = "thigh.front" | "shin.front" | "thigh.back" | "shin.back" | "arm.weapon" | "forearm.weapon" | "arm.free" | "forearm.free";
+export type PainTurn = "pelvis" | "chest" | "neck" | "head" | "wrist.weapon" | "wrist.free";
+export interface PainRow {
+    readonly turn?: Readonly<Partial<Record<PainTurn, number>>>;
+    readonly aim?: Readonly<Partial<Record<PainLimb, number>>>;
+    readonly drop?: number;
+}
+export interface PainCorrection {
+    readonly segments?: readonly { readonly node: string; readonly child: string; readonly limb: PainLimb }[];
+    readonly rows?: Readonly<Partial<Record<PainHeight, PainRow>>>;
 }
 
 function renamed(model: mdx.Model, names: ReadonlyMap<string, string>): mdx.Model {

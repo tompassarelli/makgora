@@ -1356,12 +1356,17 @@ with Pit Lord, through `-dev quick pair FIRST / SECOND`.
 
 ## Contact pain poses
 
-smashcraft:tools/animations/damage-clips.ts appends nine non-looping clips per
-fighter: low, middle and high contact, each small, medium and large. Existing
-local joints articulate the face/chest for a high hit, fold the body around
-the abdomen for a middle hit, and pull the knees up with a counterbalancing
-chest for a low hit. The floating Lich expresses low hits through its neck
-and body. Weapons inherit their attached arm transforms.
+smashcraft:tools/animations/damage-clips.ts re-keys, in place, the nine
+"Damage Grid" clips (low, middle and high contact, each small, medium and
+large) of the fighters named with `--fighter`, and proves every other drawn
+pose unchanged. Poses are authored on the canonical rig in side-view world
+angles: a low hit kneels the back leg and buckles the front, a middle hit
+folds the torso at the waist over straight legs, and a high hit throws the
+head and chest back with straightened knees and the free arm overhead.
+Strength scales by PAIN_GAIN and HIGH_STRETCH, the body (without its held
+weapon) is set on the idle floor, and a weapon not parented to a hand follows
+the nearest hand. A fighter's corrections live in the `pain` export of its
+rig file under smashcraft:tools/animations/rigs/.
 
 The contact frame immediately selects the clip's already recoiling first
 pose and holds its time zero during hitstop. After hitstop, non-tumbling

@@ -18,3 +18,10 @@ export const classic = {
     weapon: '1Cylinder04',
     'weapon.L': '1Cylinder03',
 } as const;
+export const pain = {
+    rows: {
+        low: { turn: { chest: 10, head: 15 } },
+        middle: { turn: { pelvis: 20, chest: 65, head: 75 }, aim: { 'arm.weapon': 120, 'forearm.weapon': 60, 'arm.free': 120, 'forearm.free': 60 } },
+        high: { aim: { 'arm.weapon': 250, 'forearm.weapon': 300 } },
+    },
+} as const;

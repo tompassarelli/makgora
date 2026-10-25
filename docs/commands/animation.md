@@ -234,9 +234,9 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   (smashcraft:docs/design/chen.md).
 
 - Damage reactions (from the repository root):
-  `bun tools/animations/damage-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT`
-  appends all fighters' nine articulated contact reactions, checks their
-  drawn first poses, and preserves old sequences. Store changed model families
+  `bun tools/animations/damage-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT --fighter NAME...`
+  re-keys the named fighters' nine Damage Grid pain clips in place, gates them
+  with pain-gate.ts and proves every other sequence unchanged. Store changed model families
   and refresh the clip pool (smashcraft:docs/fighter-animation-work.md).
 
 Fighter portraits: `bun scripts/fighterPortraits.ts PRIVATE_OUTPUT` (from ts/, through the

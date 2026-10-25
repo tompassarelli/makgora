@@ -11,3 +11,8 @@ export const classic = {
     'elbow.R': 'Mesh04',
     'wrist.R': 'Mesh02',
 } as const;
+export const pain = {
+    rows: {
+        low: { turn: { chest: -10, head: 10 }, drop: -14 },
+    },
+} as const;
