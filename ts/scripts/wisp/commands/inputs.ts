@@ -103,7 +103,7 @@ const fetch = (hosts: readonly string[]) => Effect.gen(function*() {
   if (missing.length === 0) return console.log(`every entry ${MANIFEST} pins is already in ${INPUTS_STORE}`);
   const unfetched = yield* Effect.forEach(missing, ({ family, hash }) => Effect.gen(function*() {
     for (const host of hosts) {
-      const result = yield* Effect.tryPromise({ try: () => fetchEntry(host, family, hash), catch: (cause) => new MapBuildFailure({ operation: "fetch build input", path: `${host}:${family}/${hash}`, cause: String(cause) }) });
+      const result = yield* fetchEntry(host, family, hash);
       if (result === "fetched") return void console.log(`fetched ${family} ${hash} from ${host}`);
     }
     return `${family} ${hash}`;
