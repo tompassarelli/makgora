@@ -1,0 +1,69 @@
+# Illidan's Wing Dive native proof, facing left: Wing Ascent from the ground, a second special on its 17th frame backflips about 6 frames and dives forward and down with no direction held; later a second ascent dives up and forward. Both dives end in helpless fall.
+#! chat -dev setup quick pair rifleman / illidan
+#! cue 76-80 backflip: effect=PossessionMissile
+#! cue 81-92 dive: effect=ImmolationTarget
+#! cue 236-240 backflip: effect=PossessionMissile
+#! cue 241-252 dive: effect=ImmolationTarget
+60 b stick 0 1
+60 b tap X 2
+60 b capture
+61 b stick 0 0
+62 b capture
+64 b capture
+66 b capture
+68 b capture
+70 b capture
+72 b capture
+74 b capture
+76 b tap X 2
+76 b capture
+78 b capture
+80 b capture
+82 b capture
+84 b capture
+86 b capture
+88 b capture
+90 b capture
+92 b capture
+94 b capture
+96 b capture
+98 b capture
+100 b capture
+102 b capture
+104 b capture
+106 b capture
+108 b capture
+110 b capture
+112 b capture
+220 b stick 0 1
+220 b tap X 2
+220 b capture
+221 b stick 0 0
+222 b capture
+224 b capture
+226 b capture
+228 b capture
+230 b capture
+232 b capture
+234 b capture
+236 b stick -1 1
+236 b tap X 2
+236 b capture
+237 b stick 0 0
+238 b capture
+240 b capture
+242 b capture
+244 b capture
+246 b capture
+248 b capture
+250 b capture
+252 b capture
+254 b capture
+256 b capture
+258 b capture
+260 b capture
+262 b capture
+264 b capture
+266 b capture
+268 b capture
+270 b capture
