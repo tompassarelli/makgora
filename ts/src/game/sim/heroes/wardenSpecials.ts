@@ -16,7 +16,7 @@ const blade = (x1: number, z1: number, x2: number, z2: number, radius = KNIFE_RA
 
 
 
-const POISON: AppliedStatus = { kind: HeroStatusKind.poison, frames: 180, group: HeroStatusGroup.sleep, immunityFrames: 0, tick: { every: 60, damage: 1.0 } };
+export const POISON: AppliedStatus = { kind: HeroStatusKind.poison, frames: 180, group: HeroStatusGroup.sleep, immunityFrames: 0, tick: { every: 60, damage: 1.0 } };
 const SHADOW_STRIKE: AuthoredSpecial = {
   endFrame: 57,
   projectiles: [{
@@ -30,10 +30,17 @@ const SHADOW_STRIKE: AuthoredSpecial = {
 
 const LUNGE_TRAVEL_FRAMES = 10;
 const LUNGE_SPEED = f32(H / f32(LUNGE_TRAVEL_FRAMES));
-const lungeRegions = (): readonly MoveRegion[] => [heroRegion(11, 14, blade(16.0, 48.0, f32(f32(H * f32(0.80)) - KNIFE_RADIUS), 44.0), wardenHit(7.6326799392700195, "EDGE", 35))];
+const LUNGE_STUN_FRAMES = 52;
+const PURSUIT_STUN_FRAMES = 40;
+const pursuitHit = (stunFrames: number) => ({ ...wardenHit(7.6326799392700195, "POKE", 35), stunFrames });
+const LUNGE_PASS_RADIUS = 20.0;
+const lungeRegions = (): readonly MoveRegion[] => [
+  heroRegion(11, 14, blade(16.0, 48.0, f32(f32(H * f32(0.80)) - KNIFE_RADIUS), 44.0), pursuitHit(LUNGE_STUN_FRAMES)),
+  heroRegion(5, 14, { x1: 0.0, z1: 48.0, x2: 0.0, z2: 48.0, radius: LUNGE_PASS_RADIUS, path: true }, pursuitHit(LUNGE_STUN_FRAMES)),
+];
 const PURSUIT_LUNGE: AuthoredSpecial = {
   name: "Pursuit Lunge", endFrame: 40, regions: lungeRegions(),
-  motion: [{ ...frames(5, 14), velocityX: LUNGE_SPEED, velocityZ: 0.0 }, { ...frames(15, 15), velocityX: 0.0, velocityZ: 0.0 }],
+  motion: [{ ...frames(5, 14), velocityX: LUNGE_SPEED, velocityZ: 0.0 }, { ...frames(15, 15), velocityX: 0.0, velocityZ: 0.0, facesStruck: true }],
 };
 
 
@@ -42,14 +49,14 @@ const PURSUIT_REACH = f32(H * f32(2.5));
 const SHADOW_PURSUIT: AuthoredSpecial = {
   endFrame: 40,
   motion: [{ ...frames(15, 15), velocityX: 0.0, velocityZ: 0.0, relocate: Relocation.behindMark, relocateReach: PURSUIT_REACH }],
-  regions: [heroRegion(18, 20, blade(16.0, 48.0, f32(f32(H * f32(0.80)) - KNIFE_RADIUS), 44.0), wardenHit(7.6326799392700195, "EDGE", 35))],
+  regions: [heroRegion(18, 20, blade(16.0, 48.0, f32(f32(H * f32(0.80)) - KNIFE_RADIUS), 44.0), pursuitHit(PURSUIT_STUN_FRAMES))],
 };
 
 
 const LUNGE_TILT = { x: f32(0.939692621), z: f32(0.342020143) };
 const PURSUIT_LUNGE_AIR: AuthoredSpecial = {
   ...PURSUIT_LUNGE, oncePerAirtime: true, helpless: true, landingLag: 12, aimFrames: 4,
-  motion: [{ ...frames(5, 14), velocityX: LUNGE_SPEED, velocityZ: 0.0, aimedTilt: LUNGE_TILT }, { ...frames(15, 15), velocityX: 0.0, velocityZ: 0.0 }],
+  motion: [{ ...frames(5, 14), velocityX: LUNGE_SPEED, velocityZ: 0.0, aimedTilt: LUNGE_TILT }, { ...frames(15, 15), velocityX: 0.0, velocityZ: 0.0, facesStruck: true }],
 };
 
 
@@ -97,7 +104,7 @@ function withFanEx(kit: SpecialKit): SpecialKit {
 
 export const WARDEN_SPECIALS: FighterSpecials = {
   neutral: withExKit({ name: "Shadow Strike", description: "A slow dagger that marks and poisons its target.", ground: SHADOW_STRIKE }, { damage: 1.25 }),
-  side: withExKit({ name: "Shadow Pursuit", description: "Appear behind a marked opponent and slash; with no mark nearby, a dashing Pursuit Lunge.", ground: PURSUIT_LUNGE, air: PURSUIT_LUNGE_AIR, marked: { special: SHADOW_PURSUIT, range: PURSUIT_REACH } }, { damage: 1.25 }),
+  side: withExKit({ name: "Shadow Pursuit", description: "Appear behind a marked opponent and slash; with no mark nearby, a Pursuit Lunge that cuts through them and turns to face them. Either hit stuns in place for a grab or Fan of Knives; a second stun within two seconds only knocks them away.", ground: PURSUIT_LUNGE, air: PURSUIT_LUNGE_AIR, marked: { special: SHADOW_PURSUIT, range: PURSUIT_REACH } }, { damage: 1.25 }),
   up: withExKit({ name: "Blink", description: "Teleport in any of eight directions; the landing spot is open to a punish.", ground: BLINK }, { travel: 1.25 }),
   down: withFanEx({ name: "Fan of Knives", description: "A frame-one knife burst around her that pops foes upward, marking and poisoning them; jump out of it from frame 4, and in the air it holds her in place.", ground: FAN_OF_KNIVES, air: FAN_OF_KNIVES_AIR }),
 };

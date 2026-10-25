@@ -123,6 +123,7 @@ export function firstFighterDifference(expected: Readonly<Fighter>, actual: Read
   record("motionKnockbackZ", e.launch.meleeKnockbackZ, a.launch.meleeKnockbackZ, MELEE_VALUE_KEYS);
   add("groundKnockbackX", e.launch.groundKnockbackX, a.launch.groundKnockbackX);
   add("knockbackAgeFrames", e.launch.knockbackAge ?? -1, a.launch.knockbackAge ?? -1);
+  add("stunAge", e.launch.stunAge, a.launch.stunAge);
   add("damageLevel", e.launch.damageLevel, a.launch.damageLevel);
   add("shieldPushbackX", e.shield.pushbackX, a.shield.pushbackX);
   add("shieldRecoilX", e.shield.recoilX, a.shield.recoilX);

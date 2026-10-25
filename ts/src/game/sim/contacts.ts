@@ -4,7 +4,7 @@ import { canHit } from "./teams";
 
 import { max, min } from "../core/numbers";
 import { addFloat32, divideFloat32, multiplyFloat32, roundToFloat32, subtractFloat32, toInt } from "wisp/src/sim/binary32";
-import { Character, ContactKind, DownState, HeroStatusKind } from "./codes";
+import { Character, ContactKind, DownState, HeroStatusKind, STUN_REPEAT_FRAMES } from "./codes";
 import { f32 } from "wisp/src/sim/f32";
 
 /** A Banished fighter takes this much more damage from Kael's spells. */
@@ -22,6 +22,8 @@ import {
   ordinaryHitlagFrames,
   STRONG_HIT_EXTRA_HITLAG,
   ordinaryHitstunFrames,
+  STUN_KNOCKBACK,
+  stunHitstunFrames,
   victimHitlagFrames,
 } from "./knockback";
 import { PARTICIPANT_CAPACITY } from "../input/participants";
@@ -238,6 +240,7 @@ function resolveDamageContacts(world: Roster, slot: number): void {
   let shieldDamage = 0.0;
   let winner: number | undefined;
   let strongest = -1.0;
+  let stunWinner = false;
   let flinch: number | undefined;
   let hurtContact: number | undefined;
   let visualContact: number | undefined;
@@ -308,12 +311,14 @@ function resolveDamageContacts(world: Roster, slot: number): void {
     }
     if (contact.kind === ContactKind.flinch) flinch ??= index;
     if (contact.kind === ContactKind.launch || contact.kind === ContactKind.throw) {
-      const magnitude = contactKnockback(postHitPercent, damage, knockbackWeight(target), contact.effect.growth, contact.effect.base, 1.0);
+      const stuns = contact.kind === ContactKind.launch && contact.effect.stunFrames !== undefined && launch.stunAge >= STUN_REPEAT_FRAMES;
+      const magnitude = stuns ? STUN_KNOCKBACK : contactKnockback(postHitPercent, damage, knockbackWeight(target), contact.effect.growth, contact.effect.base, 1.0);
       const knockback = contact.kind === ContactKind.throw ? magnitude : hitContextKnockback(magnitude, contact.crouching, contact.smashCharging);
 
       if (knockback > strongest) {
         strongest = knockback;
         winner = index;
+        stunWinner = stuns;
       }
     }
   }
@@ -392,7 +397,8 @@ function resolveDamageContacts(world: Roster, slot: number): void {
   if (!jabReset) clearDownState(target);
   cancelAttack(target);
   cancelSpecialState(target);
-  launch.hitstun = winner !== undefined ? ordinaryHitstunFrames(strongest) : max(launch.hitstun, flinchHitstunFrames(chosen.effect.damage));
+  launch.hitstun = winner === undefined ? max(launch.hitstun, flinchHitstunFrames(chosen.effect.damage))
+    : stunWinner ? stunHitstunFrames(chosen.effect.stunFrames ?? 0, postHitPercent) : ordinaryHitstunFrames(strongest);
   launch.throwHitstun = chosen.kind === ContactKind.throw && launch.hitstun > 0;
   if (jabReset) {
     beginDownDamage(target, launch.hitstun);
@@ -401,7 +407,8 @@ function resolveDamageContacts(world: Roster, slot: number): void {
   if (winner === undefined) return;
   target.motion.vx = 0.0;
   target.motion.vz = 0.0;
-  installDamageLaunch(target, strongest, multiplyFloat32(chosen.facing, chosen.effect.launchX), chosen.effect.launchZ, chosen.grounded);
+  if (stunWinner) launch.stunAge = 0;
+  installDamageLaunch(target, strongest, stunWinner ? chosen.facing : multiplyFloat32(chosen.facing, chosen.effect.launchX), stunWinner ? 0.0 : chosen.effect.launchZ, chosen.grounded);
   if (candleDrops(target, strongest)) candleDrop[slot] = true;
   if (chosen.direct && chosen.effect.carry === true && !target.motion.grounded) {
     target.motion.vx = chosen.sourceVelocityX;

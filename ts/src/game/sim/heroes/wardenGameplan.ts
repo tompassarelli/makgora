@@ -32,6 +32,7 @@ export const WARDEN_GAMEPLAN: FighterGameplan = {
     { starter: AttackStyle.upAir, followUps: [AttackStyle.upAir] },
     { starter: GameplanThrow.up, followUps: [AttackStyle.upAir] },
     { starter: GameplanThrow.down, followUps: [AttackStyle.forwardAir, AttackStyle.upAir] },
+    { starter: GameplanSpecial.side, followUps: [AttackStyle.grab, GameplanSpecial.down] },
   ],
   kills: [
     { move: AttackStyle.backAir, fromPercent: 90 },

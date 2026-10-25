@@ -137,6 +137,7 @@ function copyFighterHead(target: Fighter, source: Readonly<Fighter>, keep: Reado
   launch.diPending = sourceLaunch.diPending;
   launch.diLaunchSpeed = sourceLaunch.diLaunchSpeed;
   launch.hitlagFrames = sourceLaunch.hitlagFrames;
+  launch.stunAge = sourceLaunch.stunAge;
   launch.hitlagEndAge = sourceLaunch.hitlagEndAge;
   launch.sdiFollowup = sourceLaunch.sdiFollowup;
   launch.diSerial = sourceLaunch.diSerial;
@@ -658,6 +659,7 @@ function sameFighterHead(target: Readonly<Fighter>, source: Readonly<Fighter>): 
   { const a = meleeKnockbackZCopy.published, b = sourceMeleeKnockbackZCopy.published; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = launch.groundKnockbackX, b = sourceLaunch.groundKnockbackX; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = launch.knockbackAge, b = sourceLaunch.knockbackAge; if (a !== b || (a === 0 && b === 0 && 1 / a !== 1 / b)) return false; }
+  if (launch.stunAge !== sourceLaunch.stunAge) return false;
   { const a = launch.damageLevel, b = sourceLaunch.damageLevel; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   { const a = launch.hitstun, b = sourceLaunch.hitstun; if (a !== b || (a === 0 && 1 / a !== 1 / b)) return false; }
   if (launch.throwHitstun !== sourceLaunch.throwHitstun) return false;
@@ -1126,6 +1128,7 @@ export function writeFighterFields(sink: FighterFieldSink, prefix: string, fight
   sink.bool(prefix, "diPending", launch.diPending);
   sink.real(prefix, "diLaunchSpeed", launch.diLaunchSpeed);
   sink.int(prefix, "hitlagFrames", launch.hitlagFrames);
+  sink.int(prefix, "stunAge", launch.stunAge);
   sink.int(prefix, "hitlagEndAge", launch.hitlagEndAge);
   sink.bool(prefix, "sdiFollowup", launch.sdiFollowup);
   sink.int(prefix, "diSerial", launch.diSerial);

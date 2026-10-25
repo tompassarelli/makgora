@@ -123,17 +123,7 @@ export function fighterMovesCanonical(moves: FighterMoves | undefined, prefix = 
   const result: string[] = [canonicalInt(`${prefix}.dashAttack`, moves.dashAttack)];
   const int = (name: string, value: number) => { result.push(canonicalInt(`${prefix}.${name}`, value)); };
   const real = (name: string, value: number) => { result.push(canonicalRealField(`${prefix}.${name}`, value)); };
-  const effect = (name: string, hit: Readonly<HitEffect>) => {
-    real(`${name}.damage`, hit.damage);
-    real(`${name}.growth`, hit.growth);
-    real(`${name}.base`, hit.base);
-    real(`${name}.launchX`, hit.launchX);
-    real(`${name}.launchZ`, hit.launchZ);
-    int(`${name}.electric`, hit.electric ? 1 : 0);
-    int(`${name}.element`, hit.element ?? 0);
-    if (hit.carry === true) int(`${name}.carry`, 1);
-    if (hit.manaSteal !== undefined) int(`${name}.manaSteal`, hit.manaSteal);
-  };
+  const effect = (name: string, hit: Readonly<HitEffect>) => { result.push(hitEffectCanonical(hit, `${prefix}.${name}`)); };
   for (let style = 0; style <= LAST_ATTACK_STYLE; style++) {
     const move = moves.normals[style];
     if (move === undefined) continue;
@@ -347,7 +337,8 @@ function hitEffectCanonical(hit: Readonly<HitEffect>, prefix: string): string {
     + canonicalRealField(`${prefix}.base`, hit.base) + canonicalRealField(`${prefix}.launchX`, hit.launchX)
     + canonicalRealField(`${prefix}.launchZ`, hit.launchZ) + canonicalInt(`${prefix}.electric`, hit.electric ? 1 : 0)
     + canonicalInt(`${prefix}.element`, hit.element ?? 0) + (hit.carry === true ? canonicalInt(`${prefix}.carry`, 1) : "")
-    + (hit.manaSteal === undefined ? "" : canonicalInt(`${prefix}.manaSteal`, hit.manaSteal));
+    + (hit.manaSteal === undefined ? "" : canonicalInt(`${prefix}.manaSteal`, hit.manaSteal))
+    + (hit.stunFrames === undefined ? "" : canonicalInt(`${prefix}.stunFrames`, hit.stunFrames));
 }
 
 
