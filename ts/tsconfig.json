@@ -48,6 +48,7 @@
     "test/anim-judge-identity.test.ts",
     "test/release-tree.test.ts",
     "test/advantage-state.test.ts",
+    "test/melee-thresholds.test.ts",
     "test/voice-trace.test.ts",
     "test/aerial-down-specials.test.ts",
     "test/zero-to-death.test.ts",

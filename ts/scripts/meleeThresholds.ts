@@ -30,15 +30,17 @@ export interface ThresholdHit {
 const tumbles = (knockback: number): boolean => damageLevelForKnockback(knockback) === 3;
 const crouchCancelled = (knockback: number): number => hitContextKnockback(knockback, true, false);
 
-const REACHES: Readonly<Record<ThresholdKnockback, (knockback: number) => boolean>> = {
+export type ThresholdRules = Readonly<Record<ThresholdKnockback, (knockback: number) => boolean>>;
+
+export const SHIPPED_THRESHOLD_RULES: ThresholdRules = {
   80: tumbles,
   120: (knockback) => tumbles(crouchCancelled(knockback)),
   32: (knockback) => knockback >= SAKURAI_GROUNDED_KNOCKBACK,
   48: (knockback) => crouchCancelled(knockback) >= SAKURAI_GROUNDED_KNOCKBACK,
 };
 
-function lowestPercent(threshold: ThresholdKnockback, knockbackAt: (preHitPercent: number) => number): ThresholdPercent {
-  const reaches = (percent: number): boolean => REACHES[threshold](knockbackAt(percent));
+function lowestPercent(rules: ThresholdRules, threshold: ThresholdKnockback, knockbackAt: (preHitPercent: number) => number): ThresholdPercent {
+  const reaches = (percent: number): boolean => rules[threshold](knockbackAt(percent));
   if (!reaches(MELEE_PERCENT_LIMIT)) return "never";
   let [low, high] = [-1, MELEE_PERCENT_LIMIT];
   while (high - low > 1) {
@@ -62,11 +64,11 @@ export function meleeStaledKnockback(hit: ThresholdHit, preHitPercent: number, s
   return contactKnockback(postHitPercent, hit.damage, hit.weight, hit.growth, hit.base, ORDINARY_HIT_CONTEXT_SCALE);
 }
 
-export const shippedThresholdPercent = (hit: ThresholdHit, threshold: ThresholdKnockback): ThresholdPercent =>
-  lowestPercent(threshold, (percent) => shippedKnockback(hit, percent));
+export const shippedThresholdPercent = (hit: ThresholdHit, threshold: ThresholdKnockback, rules = SHIPPED_THRESHOLD_RULES): ThresholdPercent =>
+  lowestPercent(rules, threshold, (percent) => shippedKnockback(hit, percent));
 
-export const meleeStaledThresholdPercent = (hit: ThresholdHit, threshold: ThresholdKnockback, staleness: number): ThresholdPercent =>
-  lowestPercent(threshold, (percent) => meleeStaledKnockback(hit, percent, staleness));
+export const meleeStaledThresholdPercent = (hit: ThresholdHit, threshold: ThresholdKnockback, staleness: number, rules = SHIPPED_THRESHOLD_RULES): ThresholdPercent =>
+  lowestPercent(rules, threshold, (percent) => meleeStaledKnockback(hit, percent, staleness));
 
 const exact = (value: number): bigint => {
   if (!Number.isInteger(value)) throw new Error(`exact knockback needs integer hit data, got ${value}`);
@@ -116,12 +118,18 @@ const recordName = (record: Threshold): string => `${record.character} ${record.
 const describe = ({ record, threshold, staleness, fightCore, ours }: ThresholdComparison): string =>
   `${recordName(record)}, knockback ${threshold}, staleness ${staleness}: FightCore ${fightCore}%, ours ${ours}%`;
 
-export function compareThresholds(root = ROOT): ThresholdReport {
+export interface ThresholdOptions {
+  readonly root?: string;
+  readonly rules?: ThresholdRules;
+  readonly attacker?: string;
+}
+
+export function compareThresholds({ root = ROOT, rules = SHIPPED_THRESHOLD_RULES, attacker }: ThresholdOptions = {}): ThresholdReport {
   const weights = new Map(readCharacterAttributes(root).map((row) => [nameKey(row.character), row.weight[0]]));
   const phases = new Map(readFightCorePhases(root).map((phase) => [`${phase.character} ${phase.move} ${phase.phase}`, phase]));
   const comparisons: ThresholdComparison[] = [];
   const problems: string[] = [];
-  for (const record of readFightCoreThresholds(root)) {
+  for (const record of readFightCoreThresholds(root).filter((entry) => attacker === undefined || entry.character === attacker)) {
     const hitboxes = record.hitboxes.map((id) => phases.get(`${record.character} ${record.move} ${record.phase}`)?.hitboxes.find((hitbox) => hitbox.name === id));
     const [first] = hitboxes;
     if (first === undefined || hitboxes.some((hitbox) => hitbox === undefined || !sameHit(hitbox, first))) {
@@ -143,13 +151,13 @@ export function compareThresholds(root = ROOT): ThresholdReport {
       if (percents.length !== record.staleness.length) problems.push(`${recordName(record)}: ${percents.length} percents for ${record.staleness.length} staleness levels at knockback ${threshold}`);
       percents.forEach((fightCore, index) => {
         const staleness = record.staleness[index] ?? 0;
-        const ours = staleness === 0 ? shippedThresholdPercent(hit, threshold) : meleeStaledThresholdPercent(hit, threshold, staleness);
+        const ours = staleness === 0 ? shippedThresholdPercent(hit, threshold, rules) : meleeStaledThresholdPercent(hit, threshold, staleness, rules);
         comparisons.push({ record, threshold, staleness, fightCore, ours, agreement: agreement(hit, threshold, staleness, fightCore, ours) });
       });
     }
   }
-  problems.push(...comparisons.filter((row) => row.agreement === "disagree").map((row) => `threshold disagreement: ${describe(row)}`));
-  return { comparisons, problems };
+  const disagreements = comparisons.filter((row) => row.agreement === "disagree").map((row) => `threshold disagreement: ${describe(row)}`);
+  return { comparisons, problems: [...problems, ...disagreements] };
 }
 
 function namedRows(comparisons: readonly ThresholdComparison[], kind: Agreement, title: string): string[] {
