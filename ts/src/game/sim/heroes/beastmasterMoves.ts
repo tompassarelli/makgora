@@ -59,7 +59,7 @@ const BEASTMASTER_BODY: FighterHurtboxes = {
     [AttackStyle.forwardTiltDown]: reaching(10, 3, limb(12.0, 58.0, 58.0, 38.0)),
     [AttackStyle.upTilt]: reaching(9, 4, RAISED_ARMS),
     [AttackStyle.downTilt]: reaching(8, 3, limb(12.0, 35.0, 52.0, 18.0)),
-    [AttackStyle.dashAttack]: reaching(11, 5, limb(10.0, 50.0, 48.0, 62.0, 18.0)),
+    [AttackStyle.dashAttack]: reaching(7, 10, limb(10.0, 50.0, 48.0, 62.0, 18.0)),
     [AttackStyle.forwardSmash]: reaching(21, 4, limb(12.0, 85.0, 70.0, 80.0)),
     [AttackStyle.upSmash]: reaching(18, 5, RAISED_ARMS),
     [AttackStyle.downSmash]: [
@@ -124,13 +124,13 @@ export const BEASTMASTER_MOVES: FighterMoves = {
     ], { ...hit(5.059652805328369, "LINK", 80), growth: 0.0, base: 45.0 })),
 
 
-    [AttackStyle.dashAttack]: heroMove(11, 5, 28, 0, path(11, [
+    [AttackStyle.dashAttack]: heroMove(7, 10, 21, 0, [...path(7, [
       capsule(10.0, 55.0, f32(M - 22.0), 60.0, 22.0),
       capsule(10.0, 55.0, f32(M - 22.0), 58.0, 22.0),
       capsule(10.0, 54.0, f32(M - 22.0), 56.0, 22.0),
       capsule(10.0, 52.0, f32(M - 24.0), 54.0, 20.0),
       capsule(10.0, 50.0, f32(M - 26.0), 52.0, 18.0),
-    ], hit(9.541059494018555, "LAUNCH", 45, -1.0, HitElement.normal)), f32(HERO_REFERENCE_HEIGHT * f32(0.5))),
+    ], hit(9.541059494018555, "LAUNCH", 45, -1.0, HitElement.normal)), heroRegion(12, 16, capsule(10.0, 50.0, f32(M - 26.0), 52.0, 18.0), hit(9.541059494018555, "LAUNCH", 45, -1.0, HitElement.normal))], f32(HERO_REFERENCE_HEIGHT * f32(0.5))),
 
     [AttackStyle.forwardSmash]: tipperMove(heroMove(21, 4, 36, 0, chop(21, [120.0, 85.0, 50.0, 20.0], L, hit(15.901766777038574, "KILL", 40))), 0.25),
 

@@ -74,7 +74,7 @@ const LICH_KING_BODY: FighterHurtboxes = {
     [AttackStyle.forwardTiltDown]: reaching(11, 4, FORWARD_ARM),
     [AttackStyle.upTilt]: reaching(10, 5, RAISED_ARM),
     [AttackStyle.downTilt]: [heroHurtPose(7, 10, LOW_ARM), heroHurtPose(11, 14, arm(-20.0, 60.0, -64.0, 40.0))],
-    [AttackStyle.dashAttack]: reaching(10, 4, arm(20.0, 70.0, 70.0, 66.0)),
+    [AttackStyle.dashAttack]: reaching(8, 10, arm(20.0, 70.0, 70.0, 66.0)),
     [AttackStyle.forwardSmash]: reaching(19, 4, arm(20.0, 100.0, 72.0, 90.0)),
     [AttackStyle.upSmash]: reaching(18, 8, RAISED_ARM),
     [AttackStyle.downSmash]: [heroHurtPose(15, 19, LOW_ARM), heroHurtPose(20, 24, arm(-20.0, 60.0, -64.0, 40.0))],
@@ -153,12 +153,12 @@ export const LICH_KING_MOVES: FighterMoves = {
       ], hit(7.5, "POKE", 25, -1.0)),
     ]), inspiredBy: "Two-sided sweeps (Ganondorf's and Ike's down smashes, at tilt speed)" },
 
-    [AttackStyle.dashAttack]: { ...heroMove(10, 4, 29, 0, path(10, [
+    [AttackStyle.dashAttack]: { ...heroMove(8, 10, 21, 0, [...path(8, [
       capsule(20.0, 66.0, f32(L - 4.0), 64.0, 13.0),
       capsule(20.0, 64.0, f32(L - 4.0), 62.0, 13.0),
       capsule(20.0, 62.0, f32(L - 8.0), 60.0, 12.0),
       capsule(20.0, 60.0, f32(L - 12.0), 58.0, 12.0),
-    ], { ...hit(13.75, "LAUNCH", 55), growth: 88.0 }), 40.0, true), inspiredBy: "Arthas's charge at Stratholme" },
+    ], { ...hit(13.75, "LAUNCH", 55), growth: 88.0 }), heroRegion(12, 17, capsule(20.0, 60.0, f32(L - 12.0), 58.0, 12.0), { ...hit(13.75, "LAUNCH", 55), growth: 88.0 })], 40.0, true), inspiredBy: "Arthas's charge at Stratholme" },
 
     [AttackStyle.forwardSmash]: { ...heroMove(19, 4, 38, 0, [
       ...[130.0, 96.0, 60.0, 16.0].map((z, index) => heroRegion(19 + index, 19 + index,

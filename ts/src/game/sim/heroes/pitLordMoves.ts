@@ -86,7 +86,7 @@ const PIT_LORD_BODY: FighterHurtboxes = {
       hurtPose(25, 35, [hurtPart(-48.0, 24.0, 47.0, 110.0, 49.0)]),
     ],
     [AttackStyle.dashAttack]: [
-      hurtPose(0, 51, [hurtPart(-40.0, 20.0, 40.0, 111.0, 48.0)]),
+      hurtPose(0, 39, [hurtPart(-40.0, 20.0, 40.0, 111.0, 48.0)]),
     ],
     [AttackStyle.forwardSmash]: [
       hurtPose(0, 11, [hurtPart(-48.0, 14.0, 16.0, 95.0, 50.0)]),
@@ -177,14 +177,14 @@ export const PIT_LORD_MOVES: FighterMoves = {
 
     ], hit(12.027000427246094, "EDGE", 340, 1.0, HitElement.normal))),
 
-    [AttackStyle.dashAttack]: heroMove(15, 6, 32, 0, path(15, [
+    [AttackStyle.dashAttack]: heroMove(9, 8, 24, 0, [...path(9, [
       capsule(20.0, 60.0, f32(L - 30.0), 60.0, 30.0),
       capsule(20.0, 60.0, f32(L - 30.0), 58.0, 30.0),
       capsule(20.0, 58.0, f32(L - 30.0), 56.0, 30.0),
       capsule(20.0, 56.0, f32(L - 32.0), 54.0, 28.0),
       capsule(20.0, 54.0, f32(L - 34.0), 52.0, 26.0),
       capsule(20.0, 52.0, f32(L - 36.0), 50.0, 24.0),
-    ], hit(19.24319839477539, "KILL", 40, 1.0, HitElement.normal)), 40.0),
+    ], hit(19.24319839477539, "KILL", 40, 1.0, HitElement.normal)), heroRegion(15, 16, capsule(20.0, 52.0, f32(L - 36.0), 50.0, 24.0), hit(19.24319839477539, "KILL", 40, 1.0, HitElement.normal))], 40.0),
 
     [AttackStyle.forwardSmash]: heroMove(27, 4, 43, 0, [
       ...[150.0, 100.0, 50.0, 10.0].map((z, index) => heroRegion(27 + index, 27 + index,

@@ -41,7 +41,7 @@ export const PEON_MOVES: FighterMoves = {
       [AttackStyle.forwardTiltDown]: reaching(8, 10, 55.0, 28.0),
       [AttackStyle.upTilt]: reaching(7, 10, 12.0, 92.0),
       [AttackStyle.downTilt]: reaching(6, 8, 45.0, 18.0),
-      [AttackStyle.dashAttack]: reaching(10, 13, 54.0, 38.0),
+      [AttackStyle.dashAttack]: reaching(7, 14, 54.0, 38.0),
       [AttackStyle.forwardSmash]: [arm(20, 26, 18.0, 60.0, 6.0, 68.0)],
       [AttackStyle.upSmash]: [heroHurtPose(15, 22, [BODY,
         hurtPart(12.0, 64.0, 12.0, 84.0, 10.0), hurtPart(-12.0, 66.0, -22.0, 82.0, 10.0)])],
@@ -67,7 +67,7 @@ export const PEON_MOVES: FighterMoves = {
       peonHit(10.239999771118164, 40))),
     [AttackStyle.upTilt]: heroMove(7, 4, 20, 0, swing(7, [[45.0, 106.0], [15.0, 118.0], [-15.0, 118.0], [-36.0, 102.0]], 8.192000389099121, 85, 68.94999694824219, 40.0)),
     [AttackStyle.downTilt]: heroMove(6, 3, 19, 0, swing(6, [[74.0, 8.0], [74.0, 16.0], [66.0, 28.0]], 7.168000221252441, 70, 72.0, 45.0)),
-    [AttackStyle.dashAttack]: heroMove(10, 4, 43, 0, swing(10, [[80.0, 38.0], [80.0, 42.0], [74.0, 48.0], [68.0, 50.0]], 11.263999938964844, 55), 34.0, true),
+    [AttackStyle.dashAttack]: heroMove(7, 8, 24, 0, [...swing(7, [[80.0, 38.0], [80.0, 42.0], [74.0, 48.0], [68.0, 50.0]], 11.263999938964844, 55), heroRegion(11, 14, blade(16.0, 48.0, 68.0, 50.0), peonHit(11.263999938964844, 55, 88.6500015258789, 22.0))], 34.0, true),
     [AttackStyle.forwardSmash]: heroMove(22, 3, 35, 0, [
       ...tipper(axe(22, [[40.0, 52.0, 65.0, 68.0, 8.0], [34.0, 51.0, 61.0, 51.0, 8.0]], FORWARD_SMASH), 0.25),
       ...cleanLate(axe(24, [[26.0, 40.0, 51.0, 37.0, 8.0]], FORWARD_SMASH), 0),
