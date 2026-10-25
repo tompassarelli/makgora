@@ -140,6 +140,8 @@ export interface SpecialProjectile {
 
   readonly modelRadius?: number | undefined;
 
+  readonly modelOffsetZ?: number | undefined;
+
 
 
 

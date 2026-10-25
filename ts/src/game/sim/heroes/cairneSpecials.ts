@@ -9,7 +9,7 @@ const shockwave = (air: boolean): AuthoredSpecial => ({
   endFrame: 61, landingLag: air ? 24 : undefined,
   projectiles: [{ spawnFrame: 24, offsetX: 72.0, offsetZ: 36.0, velocityX: 13.0, velocityZ: 0.0,
     life: 38, radius: 20.0, effect: hit(7.5, "edge", 35), reflectable: true, limit: 1,
-    modelRadius: 32.0, model: "Abilities\\Spells\\Orc\\Shockwave\\ShockwaveMissile.mdx" }],
+    modelRadius: f32(320.0 / 17.0), modelOffsetZ: -22.0, model: "Abilities\\Spells\\Orc\\Shockwave\\ShockwaveMissile.mdx" }],
 });
 const GORE_HORNS = cairneHurtPose(8, 25, hurtPart(30.0, 80.0, 75.0, 70.0, 22.0));
 const gore = (air: boolean): AuthoredSpecial => ({
