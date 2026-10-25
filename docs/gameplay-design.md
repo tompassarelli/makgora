@@ -1569,7 +1569,7 @@ Signature moves, with each move's regions, frames and damage in the generated
 | Thrall | Forward smash (Doomhammer impact) | Timing |
 | Jaina | Neutral air (arcane burst) | Timing |
 | Sylvanas | Forward smash (blade point) | Position |
-| Cairne | Forward smash (totem head) | Position |
+| Cairne | Forward smash (halberd head) | Position |
 | Chen | Neutral air (flying kick) | Timing |
 | Peon | Forward smash (pick point) | Position |
 | Tinker | Forward smash (claw at full extension) | Position |

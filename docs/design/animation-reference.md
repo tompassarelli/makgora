@@ -142,7 +142,7 @@ Jump physics and counts are unchanged; only the body's gesture differs.
 | Thrall | front flip | Rides a wolf: mount and rider somersault forward, hammer up. |
 | Jaina | back flip | A light mage: a back flip with robes flaring. |
 | Sylvanas | back flip | An agile ranger; a backward somersault keeps her bow clear. |
-| Cairne | knee lift | A giant tauren: knees drive up under his totem, no flip. |
+| Cairne | knee lift | A giant tauren: knees drive up under his halberd, no flip. |
 | Chen | cannonball | Round brewmaster: a tight tuck that rolls once forward, keg and all. |
 | Peon | scramble | Comic worker: legs pedal and arms flail as he tumbles once forward. |
 | Goblin Tinker | heave | His claw pack thrusts him up: legs dangle and the body tilts forward. |

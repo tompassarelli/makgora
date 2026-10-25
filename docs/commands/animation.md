@@ -207,7 +207,7 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
 
 - Cairne animation authoring (from the repository root):
   `bun tools/animations/cairne-clips.ts STOCK_TAUREN.mdx PRIVATE_OUTPUT`
-  appends the complete totem kit, recovery, paired grabs and nine pain clips
+  appends the complete halberd kit, recovery, paired grabs and nine pain clips
   to the private classic Tauren Chieftain model, preserving its stock clips.
 
 - Forsaken Paladin animation authoring (from the repository root):

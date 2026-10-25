@@ -155,7 +155,7 @@ His reach is useful but his commitment and weak chase are exploitable.
 | Thrall | Held sword and short holy patch instead of lightning and spirit crossfire. |
 | Jaina | Close weapon contact instead of aimed spell rain. |
 | Sylvanas | A sword slow instead of ranged silence or possession. |
-| Cairne | A narrow sword blade and small patch instead of wide totem/stomp. |
+| Cairne | A narrow sword blade and small patch instead of wide halberd/stomp. |
 | Chen | Single committed hits instead of stance branches and haze/flame. |
 | Peon | No burrow, building or resource summon. |
 | Tinker | Direct weapon contact instead of factory or transformation. |

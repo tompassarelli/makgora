@@ -142,7 +142,7 @@ const REASONS: { readonly [character: number]: { readonly [style: number]: strin
   [Character.thrall]: { [AttackStyle.forwardSmash]: "The Doomhammer lands its full weight only on impact; the follow-through is a weak shove." },
   [Character.jaina]: { [AttackStyle.neutralAir]: "An arcane burst strongest as it forms and fading as it lingers: a landing and edge-guard cover." },
   [Character.sylvanas]: { [AttackStyle.forwardSmash]: "The blade's point: the Windrunner is rewarded for keeping her distance." },
-  [Character.cairne]: { [AttackStyle.forwardSmash]: "The totem's head carries the earth's weight; the haft only shoves." },
+  [Character.cairne]: { [AttackStyle.forwardSmash]: "The halberd's head carries the earth's weight; the haft only shoves." },
   [Character.chen]: { [AttackStyle.neutralAir]: "A drunken flying kick: hit early to punish, let it linger to cover a landing." },
   [Character.peon]: { [AttackStyle.forwardSmash]: "The pick bites hardest at its point, like a swing at the mine." },
   [Character.tinker]: { [AttackStyle.forwardSmash]: "The claw clamps hardest at full extension; the arm only pushes." },

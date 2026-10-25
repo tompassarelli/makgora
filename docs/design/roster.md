@@ -2122,7 +2122,7 @@ none of the current kits needs a replacement effect. Archer is removed by #339; 
 | Thrall | Mounted hammer reach, lightning and wolves | Counted Windfury |
 | Jaina | Staff strikes, Blizzard placement and Water Elemental | Faster hidden meter regeneration |
 | Sylvanas | Bow-and-dagger actions, Silence and chosen escape | Banked Black Quiver damage |
-| Cairne | Large visible body, totem swings and guard read | Timed Endurance speed and stock heal bank |
+| Cairne | Large visible body, halberd swings and guard read | Timed Endurance speed and stock heal bank |
 | Chen | Heavy staff actions and chosen Earth/Fire/Storm branch | Counted Drunken Brawler |
 | Peon | Tool strikes, chosen building and visible burrow | Pillage meter refund and stock heal bank |
 | Tinker | Claw pack, factory placement and tracking Laser | Banked Engineering Upgrade |
