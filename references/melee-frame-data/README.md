@@ -337,7 +337,11 @@ keeps the fresh damage in the knockback term.
 `fightcore-thresholds.ts` reads both files. `bun wisp oracle` checks every
 threshold percent against our knockback formula (`ts/scripts/meleeThresholds.ts`):
 fresh percents through the shipped `ts/src/game/sim/knockback.ts`, stale ones
-through a Melee-only staling path, since Smashcraft has no staling.
+through a Melee-only staling path, since Smashcraft has no staling. Two
+kinds of FightCore percent are named ledger rows instead of disagreements:
+percents above Melee's 999% damage limit (`knockback-threshold-percent-limit`)
+and the "never" its rule gives a zero-growth hitbox whose base knockback
+already reaches the threshold (`knockback-zero-growth`, Samus's up special).
 
 Repeat the intake from the checkout's root (about 25 minutes the first time at one
 request a second, seconds from the page cache in the first directory):

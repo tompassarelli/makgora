@@ -5,14 +5,14 @@ import { beginDamageContacts, collectDamageContact, finishDamageContacts } from 
 import {
   CROUCH_CANCEL_KNOCKBACK_SCALE, DI_MAX_DEGREES, ELECTRIC_HITLAG_SCALE, HITLAG_CAP_FRAMES, HITSTUN_FRAMES_PER_KNOCKBACK, KNOCKBACK_CAP,
   KNOCKBACK_DAMAGE_SCALE, KNOCKBACK_GROWTH_ADDEND, KNOCKBACK_GROWTH_SCALE, KNOCKBACK_LAUNCH_SPEED, KNOCKBACK_PERCENT_SCALE, KNOCKBACK_STACKING_FRAMES,
-  SMASH_CHARGE_VICTIM_KNOCKBACK_SCALE, STRONG_HIT_EXTRA_HITLAG, damageLevelForKnockback, effectKnockback, fixedHitKnockback, launchWeightFactor, victimHitlagFrames,
+  SMASH_CHARGE_VICTIM_KNOCKBACK_SCALE, STRONG_HIT_EXTRA_HITLAG, damageLevelForKnockback, effectKnockback, fixedHitKnockback, launchWeightFactor, ordinaryHitKnockback, victimHitlagFrames,
 } from "../../src/game/sim/knockback";
 import { AIR_KNOCKBACK_DECAY } from "../../src/game/sim/motion";
 import { SMASH_FULL_CHARGE_HOLD_FRAMES, SMASH_MAX_CHARGE_FRAMES, SMASH_MAX_DAMAGE_MULTIPLIER } from "../../src/game/sim/moves";
 import { ASDI_TRAVEL, HIT_TRAVEL, SDI_PULSE_TRAVEL, SDI_STEP_TRAVEL, STRING_TRAVEL } from "../../src/game/sim/smashDirectionalInfluence";
 import { WEAK_HIT_DAMAGE_SCALE, WEAK_HIT_KNOCKBACK_SCALE } from "../../src/game/sim/strongHits";
 import { FIGHTCORE_URL } from "../../../references/melee-frame-data/fightcore";
-import { compareThresholds } from "../meleeThresholds";
+import { MELEE_PERCENT_LIMIT, compareThresholds } from "../meleeThresholds";
 import { type LedgerRow, PARITY, probe, range, shortNumber } from "./row";
 
 const wiki = (page: string): string => `https://www.ssbwiki.com/${page}`;
@@ -234,6 +234,22 @@ export const HIT_ROWS: readonly LedgerRow[] = [
     anchor: { file: KNOCKBACK, symbol: "contactKnockback" },
     checkedBy: { file: "ts/scripts/meleeThresholds.ts", symbol: "knockbackEqualsExactly" },
     status: { kind: "open", reason: "no public source gives Melee's operation order, which decides an exact tie; measuring one from outside settles it (Falco's second up-air hit, hitbox id2, against Samus at 280%: tumble or not)", issue: 311 },
+  },
+  {
+    id: "knockback-threshold-percent-limit", family: "hits", name: "Damage limit, past which FightCore's threshold percents never occur",
+    melee: { value: 999, source: wiki("Damage") }, ours: () => MELEE_PERCENT_LIMIT,
+    anchor: { file: "ts/scripts/meleeThresholds.ts", symbol: "MELEE_PERCENT_LIMIT" },
+    checkedBy: { file: "ts/scripts/meleeThresholds.ts", symbol: "compareThresholds" }, status: PARITY,
+  },
+  {
+    id: "knockback-zero-growth", family: "hits", name: "Knockback with zero growth, which FightCore's threshold table shows as never",
+    melee: { value: "base knockback", source: wiki("Knockback") },
+    ours: probe({
+      text: "base knockback", inputs: range(0, 200, 10), label: (base) => `base ${base}`,
+      ours: (base) => ordinaryHitKnockback(50, 10, 100, 0, base, 1), melee: (base) => base,
+    }),
+    anchor: { file: KNOCKBACK, symbol: "contactKnockback" },
+    checkedBy: { file: "ts/scripts/meleeThresholds.ts", symbol: "compareThresholds" }, status: PARITY,
   },
   {
     id: "clank", family: "hits", name: "Clank and priority",

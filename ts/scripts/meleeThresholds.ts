@@ -16,6 +16,8 @@ export const WEIGHT_INDEPENDENT_WEIGHT = 100;
 export const SAKURAI_SOURCE = "https://www.ssbwiki.com/Sakurai_angle";
 export const STALING_SOURCE = "https://www.ssbwiki.com/Stale-move_negation";
 export const TIE_LEDGER_ROW = "knockback-threshold-ties";
+export const ABOVE_LIMIT_LEDGER_ROW = "knockback-threshold-percent-limit";
+export const ZERO_GROWTH_LEDGER_ROW = "knockback-zero-growth";
 
 export interface ThresholdHit {
   readonly damage: number;
@@ -79,7 +81,7 @@ export function knockbackEqualsExactly(hit: ThresholdHit, preHitPercent: number,
   return scaledGrowth === 10000n * (exact(knockback) - base) * (weight + 100n);
 }
 
-export type Agreement = "agree" | "tie" | "disagree";
+export type Agreement = "agree" | "tie" | "above limit" | "zero growth" | "disagree";
 
 export interface ThresholdComparison {
   readonly record: Threshold;
@@ -97,6 +99,8 @@ export interface ThresholdReport {
 
 function agreement(hit: ThresholdHit, threshold: ThresholdKnockback, staleness: number, fightCore: ThresholdPercent, ours: ThresholdPercent): Agreement {
   if (fightCore === ours) return "agree";
+  if (typeof fightCore === "number" && fightCore > MELEE_PERCENT_LIMIT && ours === "never") return "above limit";
+  if (fightCore === "never" && hit.growth === 0 && hit.set === 0 && ours === 0) return "zero growth";
   if (fightCore === "never" || ours === "never" || Math.abs(fightCore - ours) !== 1) return "disagree";
   return knockbackEqualsExactly(hit, Math.min(fightCore, ours), staleness, threshold) ? "tie" : "disagree";
 }
@@ -148,10 +152,16 @@ export function compareThresholds(root = ROOT): ThresholdReport {
   return { comparisons, problems };
 }
 
+function namedRows(comparisons: readonly ThresholdComparison[], kind: Agreement, title: string): string[] {
+  const rows = comparisons.filter((row) => row.agreement === kind);
+  const moves = [...new Set(rows.map(({ record }) => `${record.character} ${record.move} phase ${record.phase} ${record.hitboxes.join("+")}`))];
+  return rows.length === 0 ? [] : ["", `${rows.length} ${title}, in ${moves.length} hitbox groups:`, ...moves.map((move) => `  ${move}`)];
+}
+
 export function formatThresholds({ comparisons, problems }: ThresholdReport): string {
   const line = (label: string, rows: readonly ThresholdComparison[]): string => {
     const count = (kind: Agreement): number => rows.filter((row) => row.agreement === kind).length;
-    return `    ${label.padEnd(28)} ${String(rows.length).padStart(6)} percents: ${count("agree")} agree, ${count("tie")} exact ties, ${count("disagree")} disagree`;
+    return `    ${label.padEnd(28)} ${String(rows.length).padStart(6)} percents: ${count("agree")} agree, ${count("tie")} exact ties, ${count("above limit")} above 999%, ${count("zero growth")} zero growth, ${count("disagree")} disagree`;
   };
   const ties = comparisons.filter((row) => row.agreement === "tie");
   return [
@@ -163,6 +173,8 @@ export function formatThresholds({ comparisons, problems }: ThresholdReport): st
     ...THRESHOLD_KNOCKBACKS.map((threshold) => line(`knockback ${threshold}`, comparisons.filter((row) => row.threshold === threshold))),
     line("all", comparisons),
     ...(ties.length === 0 ? [] : ["", `exact ties (knockback equals the threshold in exact arithmetic; ledger row ${TIE_LEDGER_ROW}):`, ...ties.map((row) => `  ${describe(row)}`)]),
+    ...namedRows(comparisons, "above limit", `FightCore percents above Melee's ${MELEE_PERCENT_LIMIT}% limit, never in ours (ledger row ${ABOVE_LIMIT_LEDGER_ROW})`),
+    ...namedRows(comparisons, "zero growth", `zero-growth hitboxes whose base knockback reaches the threshold at 0%, which FightCore shows as never (ledger row ${ZERO_GROWTH_LEDGER_ROW})`),
     ...(problems.length === 0 ? [] : ["", "threshold problems:", ...problems.map((problem) => `  ${problem}`)]),
   ].join("\n");
 }
