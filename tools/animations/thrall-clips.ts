@@ -13,6 +13,7 @@ import { seconds } from "./asset-info";
 import { measureDrawnStride, drawnStrideSource } from "../../ts/scripts/wisp/drawnMotion";
 import { DRAWN_STRIDES } from "../../ts/src/game/presentation/drawnStrideInfo";
 import { ensure, parseSource, tracks, onGlobalClock, encodeVerified } from "./original-clips";
+import { PAIN_GAIN, HIGH_STRETCH, PainBody, painGate } from "./pain-gate";
 const [input, output] = process.argv.slice(2,4).map(p => resolve(p));
 const replacements = process.argv.slice(4);
 const project = resolve(import.meta.dir, "../..");
@@ -84,7 +85,7 @@ let cursor=Math.max(...(retained?.Sequences??source.Sequences).map(s=>s.Interval
 interface Binding { pose: HeroPose|undefined; index: number; victimContact: boolean; }
 const bindings:Binding[]=[],damageBindings:Binding[]=[], records:unknown[]=[];
 const damageActions:Action[]=[];
-for(let height=0;height<3;height++)for(let strength=0;strength<3;strength++){const gain=[0.45,0.8,1.2][strength]!;damageActions.push({pose:"damageGround",frames:24,contact:3,hold:true,pain:true,gesture:height===0?{front:65*gain,back:55*gain,wolf:18*gain,waist:25*gain,chest:25*gain,head:-15*gain}:height===1?{chest:55*gain,waist:-25*gain,arm:30*gain,leftArm:35*gain,wolf:8*gain}:{head:-45*gain,chest:-35*gain,arm:45*gain,leftArm:55*gain,neck:-15*gain}});}
+for(let height=0;height<3;height++)for(let strength=0;strength<3;strength++){const gain=PAIN_GAIN[strength]!,stretch=HIGH_STRETCH[strength]!;damageActions.push({pose:"damageGround",frames:24,contact:3,hold:true,pain:true,gesture:height===0?{lean:18*gain,front:75*gain,back:25*gain,neck:25*gain,wolf:12*gain,chest:30*gain,waist:10*gain,head:-10*gain,arm:20*gain,leftArm:40*gain}:height===1?{chest:80*gain,yaw:15*gain,waist:15*gain,arm:-15*gain,wrist:30*gain,leftArm:70*gain,head:30*gain,neck:-15*gain}:{lean:-22*stretch,neck:-35*stretch,front:-45*stretch,back:30*stretch,chest:-45*stretch,waist:-35*stretch,head:-45*stretch,arm:70*stretch,leftArm:100*stretch}});}
 for(const [ordinal,action]of [...actions,...damageActions].entries()){
  const index=model.Sequences.length;
  const name=ordinal<actions.length?`Thrall ${action.pose}`:`Thrall Damage ${Math.floor((ordinal-actions.length)/3)} ${((ordinal-actions.length)%3)}`;
@@ -140,7 +141,8 @@ for(const [ordinal,action]of [...actions,...damageActions].entries()){
  const beforeKeys=center.Translation.Keys.filter(k=>k.Frame<start||k.Frame>end);
  const drawn=new DrawnModel(generateMDX(model),1);
  const translations:mdx.AnimKeyframe[]=[];
- for(const {frame,gesture}of phases){const triangle=drawn.triangles(index,frame/60,1);let lowest=Infinity;for(let i=1;i<triangle.length;i+=2)lowest=Math.min(lowest,triangle[i]!);const old=center.Translation.Keys.find(k=>k.Frame===start+Math.round(frame*1000/60));translations.push({Frame:start+Math.round(frame*1000/60),Vector:new Float32Array([(old?.Vector[0]??0)+(gesture.shift??0),old?.Vector[1]??0,(old?.Vector[2]??0)-(action.air?0:lowest)]),...(center.Translation.LineType>1?{InTan:new Float32Array([0,0,0]),OutTan:new Float32Array([0,0,0])}:{})});}
+ const body=action.pain?new PainBody(generateMDX(model),Character.thrall):undefined;
+ for(const {frame,gesture}of phases){let lowest=Infinity;if(body)lowest=body.floor(index,frame/60);else{const triangle=drawn.triangles(index,frame/60,1);for(let i=1;i<triangle.length;i+=2)lowest=Math.min(lowest,triangle[i]!);}const old=center.Translation.Keys.find(k=>k.Frame===start+Math.round(frame*1000/60));translations.push({Frame:start+Math.round(frame*1000/60),Vector:new Float32Array([(old?.Vector[0]??0)+(gesture.shift??0),old?.Vector[1]??0,(old?.Vector[2]??0)-(action.air?0:lowest)]),...(center.Translation.LineType>1?{InTan:new Float32Array([0,0,0]),OutTan:new Float32Array([0,0,0])}:{})});}
  center.Translation.Keys=[...beforeKeys,...translations];
  const victimContact=/^victim(Pummel|Throw)/.test(action.pose);
  (ordinal<actions.length?bindings:damageBindings).push({pose:ordinal<actions.length?action.pose:undefined,index,victimContact});
@@ -173,6 +175,7 @@ if(replacements.length === 0 || replacements.some(pose=>!pose.startsWith("Thrall
 ].join("\n"));
 const finalDrawn=new DrawnModel(bytes,1.0);
 const painPoses=damageActions.map((_,ordinal)=>finalDrawn.triangles(source.Sequences.length+actions.length+ordinal,0,1));
+const gate=painGate(bytes,Character.thrall,0,damageActions.map((_,ordinal)=>source.Sequences.length+actions.length+ordinal));console.log(gate.report);ensure(gate.pass,"Thrall pain poses fail the pain gate");
 for(let a=0;a<painPoses.length;a++)for(let b=a+1;b<painPoses.length;b++)ensure(painPoses[a]!.some((value,index)=>Math.abs(value-painPoses[b]![index]!)>2),`Thrall pain ${a}/${b}: first poses are duplicates`);
 const strides=Object.entries(DRAWN_STRIDES).flatMap(([character,data])=>data?(["walk","run"] as const).map(motion=>({character:Number(character) as Character,motion,...data[motion]})):[]).filter(row=>row.character!==Character.thrall);
 for(const motion of ["walk","run"] as const)strides.push(measureDrawnStride(bytes,finalDrawn,Character.thrall,motion,"units\\orc\\Thrall\\Thrall.mdl"));
