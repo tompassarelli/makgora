@@ -4,8 +4,8 @@ import type { Fighter } from "../sim/fighter";
 import type { Controls } from "../sim/roster";
 import { analogShieldActive, analogShieldStrength } from "../sim/shield";
 import { squareRoot } from "../sim/warcraftMath";
-import { SHIELD_TILT_STICK_CAP, stickX, stickZ, tiltStickX, tiltStickZ } from "../sim/stick";
-import { STICK_DEADZONE } from "../sim/stickZones";
+import { stickX, stickZ, tiltStickX, tiltStickZ } from "../sim/stick";
+import { SHIELD_DODGE_STICK_THRESHOLD, STICK_DEADZONE } from "../sim/stickZones";
 import { Action, bit, has, maskOf } from "./actions";
 import { type AttackBuffer, clearAttackBuffer, queueAttack } from "./attackBuffer";
 import { groundDodgeIntent, normalAttackStyle } from "./combat";
@@ -90,10 +90,6 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   destination.shieldTriggerActive = pressure > 0;
   destination.shield = pressure === 255 || analogShieldActive(pressure);
   destination.shieldStrength = pressure === 255 ? 1.0 : analogShieldStrength(pressure);
-  if (destination.walking && destination.shield) {
-    destination.diStickX = Math.max(-SHIELD_TILT_STICK_CAP, Math.min(SHIELD_TILT_STICK_CAP, destination.diStickX));
-    destination.diStickZ = Math.max(-SHIELD_TILT_STICK_CAP, Math.min(SHIELD_TILT_STICK_CAP, destination.diStickZ));
-  }
   destination.shortHopPressed = (pressed & SHORT_HOP_BIT) !== 0;
   destination.jumpPressed = (pressed & JUMP_BIT) !== 0 || destination.shortHopPressed;
   destination.jumpHeld = (held & JUMP_BIT) !== 0;
@@ -121,9 +117,9 @@ export function adaptInput(row: Readonly<InputRow>, fighter: Readonly<Fighter>, 
   destination.resetPressed = leftShield && rightShield && destination.attackPressed;
 
   const dodge = groundDodgeIntent(destination.shield,
-    (pressed & MOVE_LEFT_BIT) !== 0 && stickX(destination) <= -0.699999988079071,
-    (pressed & MOVE_RIGHT_BIT) !== 0 && stickX(destination) >= 0.699999988079071,
-    (pressed & MOVE_DOWN_BIT) !== 0 && stickZ(destination) <= -0.699999988079071);
+    (pressed & MOVE_LEFT_BIT) !== 0 && stickX(destination) <= -SHIELD_DODGE_STICK_THRESHOLD,
+    (pressed & MOVE_RIGHT_BIT) !== 0 && stickX(destination) >= SHIELD_DODGE_STICK_THRESHOLD,
+    (pressed & MOVE_DOWN_BIT) !== 0 && stickZ(destination) <= -SHIELD_DODGE_STICK_THRESHOLD);
   destination.groundDodgePressed = dodge !== undefined;
   destination.groundDodgeDirection = dodge ?? 0;
 

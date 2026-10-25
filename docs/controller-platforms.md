@@ -19,8 +19,8 @@ X/Y jump, RB grab, both triggers shield, no tilt or short-hop button),
 Y and LB jump, RT tilt, LT shield, L3 short hop). Recorded pad scripts and test
 drivers use the hidden **script** preset (B/Y jump, X special, LB tilt, both
 triggers shield). Holding tilt, on a pad or the keyboard, shortens the stick
-like a box controller's modifier: a full press sends x = ±0.7875, up 0.65 and
-down −0.675, just inside dash, tap jump and crouch (#282,
+like a box controller's modifier: a full press sends x = ±0.6875, up 0.65 and
+down −0.675, just inside roll and spot dodge, tap jump and crouch (#282,
 smashcraft:docs/gameplay-design.md, "Stick zones"). A GameCube pad maps by its printed letters only in the SDL
 helper; the service reads evdev and does not tell GameCube pads apart yet.
 

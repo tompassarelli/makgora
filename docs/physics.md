@@ -2484,7 +2484,7 @@ Fast-fall now requires down with neutral horizontal input. Down-left/down-right
 continue air drift without selecting fast-fall speed. Down held with the tilt
 modifier is a tilt input: it neither crouches nor fast-falls, and A gives the
 down tilt or down aerial (#187). The modifier also shortens the stick to
-x = ±0.7875, up 0.65 and down −0.675, so the platform drop at −0.6875 never
+x = ±0.6875, up 0.65 and down −0.675, so the platform drop at −0.6875 never
 fires either (#282, smashcraft:docs/gameplay-design.md, "Stick zones"). Shield dodges, DI, down
 attacks and platform-drop handling retain their separate inputs. Existing
 fast-fall descent/actionability rules remain; native feel needs the new build.
