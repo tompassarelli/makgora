@@ -47,7 +47,9 @@ clean) and the hash of ts/bun.lock, recorded under
 else pushes main, so no landing restarts another's suites.
 
 1. **Queue.** A push marks the branch tip with a pending `autoland` commit
-   status ("queued") and starts a plan run. A tip is tested, trained or
+   status ("queued") and starts a plan run, unless a plain plan that hasn't
+   started yet or the test runs holding all three slots (each ends in a plan)
+   will read the tip anyway, so a burst of pushes costs one plan (#350). A tip is tested, trained or
    landed only once a machine holding the private deny-list has attested it
    with a `denylist` commit status of success, which it follows by
    dispatching `-f branch=` for that branch; a failure refuses the lane
@@ -65,8 +67,11 @@ else pushes main, so no landing restarts another's suites.
    left at the new run's peak (11 jobs for 2 min, then decaying to 1 by 3 min; a run with no
    `suite /` job yet counts 11, and one whose `suite` job was skipped, such as a
    train landing passed-alone trees, counts only its running jobs), and logs "Autoland hosted jobs: N/32 now, M at
-   the next peak". The train is never held by that budget. A lane whose first
-   `autoland` status is over 60 min old goes ahead of every other, oldest first.
+   the next peak"; a plan reads the runs' jobs only when a slot is free and a
+   lane waits to test, since the budget decides nothing otherwise (#350). The train is never held by that budget. A lane that arrived over 60 min
+   ago goes ahead of every other, oldest first; its arrival is its push run's
+   start from one list of Autoland's push runs, or its first `autoland` status
+   when that list misses it (#350).
    Because tests run outside the landing queue, a red tip gets its failed status and run summary within minutes. A
    conflicting tip, or one that changes `.github/workflows/` (the workflow
    token can't push those), is refused. A green tip lands straight from its
@@ -100,7 +105,7 @@ else pushes main, so no landing restarts another's suites.
    which runs only its smoke and filtered-checks jobs for a landed commit.
 5. **Red.** A red lone tip gets a failed status, and its run fails with a
    job summary and annotation saying "Autoland didn't land" and naming the
-   files or tests. Each plan run dry-merges every pending lane with main (`git merge-tree`), so a conflict is flagged within one plan after main moves (the sweep plans every 5 minutes), and a conflicting rebase comments once on each issue the lane's commits reference (Refs/Fixes #N) and raises the "Autoland stalled" alarm; when every conflict is a generated report (taken from main, then regenerated) or a build-inputs pin whose families merge file by file in a reachable store (`resolveConflicts` in smashcraft:ts/scripts/autolandCore.ts), it resolves them and the lane goes on, and source conflicts are never resolved (#513). The Classic effect record (smashcraft:ts/scripts/wisp/cue-models.tsv) is neither: it needs the private Classic cache, so a conflict in it refuses the lane with the re-record command instead of keeping either side, and the suite's corpus checks run `bun scripts/cueModels.ts` so a candidate tree whose record is stale never lands. A stale record reported by the candidate's checks or final push returns `local refresh required: Classic effect record` to the local safe-push waiter, which exits 75 and retains the source lane and queue branch for local repair and requeue. The alarm stays open until each flagged lane is pushed again, lands or is deleted. A lane failure that measured nothing (the sheriff's `unmeasured` rule in smashcraft:ts/scripts/autolandCore.ts, with no failing test) instead keeps the lane pending as "rerunning run N", and the next sweep reruns that run's failed jobs once; a second such failure or any measured one fails the lane. Every other failure (a red suite, a workflow change, a test loop) comments "lane failed: REASON" once on the same issues, and `threads unowned` (north) lists an issue whose lane failed after its claim as UNOWNED with that reason, so the next tick restaffs it. Each sweep deletes a lane as superseded, and comments so once on its issues, when its clean `git merge-tree --write-tree` with current main equals main's tree, regardless of its last conclusion; it also keeps the separate rule deleting a failed lane when a newer live lane pushed after the failure refs the same issue. An unfinished Autoland run holds its named lanes, and an active unnamed train holds every lane. Read outcomes with
+   files or tests. Each plan run dry-merges every pending lane with main (`git merge-tree`), so a conflict is flagged within one plan after main moves (the sweep plans every 5 minutes while a test slot is free), and a conflicting rebase comments once on each issue the lane's commits reference (Refs/Fixes #N) and raises the "Autoland stalled" alarm; when every conflict is a generated report (taken from main, then regenerated) or a build-inputs pin whose families merge file by file in a reachable store (`resolveConflicts` in smashcraft:ts/scripts/autolandCore.ts), it resolves them and the lane goes on, and source conflicts are never resolved (#513). The Classic effect record (smashcraft:ts/scripts/wisp/cue-models.tsv) is neither: it needs the private Classic cache, so a conflict in it refuses the lane with the re-record command instead of keeping either side, and the suite's corpus checks run `bun scripts/cueModels.ts` so a candidate tree whose record is stale never lands. A stale record reported by the candidate's checks or final push returns `local refresh required: Classic effect record` to the local safe-push waiter, which exits 75 and retains the source lane and queue branch for local repair and requeue. The alarm stays open until each flagged lane is pushed again, lands or is deleted. A lane failure that measured nothing (the sheriff's `unmeasured` rule in smashcraft:ts/scripts/autolandCore.ts, with no failing test) instead keeps the lane pending as "rerunning run N", and the next sweep reruns that run's failed jobs once; a second such failure or any measured one fails the lane. Every other failure (a red suite, a workflow change, a test loop) comments "lane failed: REASON" once on the same issues, and `threads unowned` (north) lists an issue whose lane failed after its claim as UNOWNED with that reason, so the next tick restaffs it. Each sweep deletes a lane as superseded, and comments so once on its issues, when its clean `git merge-tree --write-tree` with current main equals main's tree, regardless of its last conclusion; it also keeps the separate rule deleting a failed lane when a newer live lane pushed after the failure refs the same issue. An unfinished Autoland run holds its named lanes, and an active unnamed train holds every lane. Read outcomes with
    `gh run list --workflow autoland.yml` and `gh run view RUN_ID`, or the
    tip's `autoland` commit status. The branch stays; push a fix to it and it queues
    again. A red train of several tips sends each back to testing alone; the
@@ -201,8 +206,9 @@ any run where:
 
 The sweep and heartbeat also list unfinished Farm test runs (each requested or finished one starts a sweep) and cancel them on the same job, run and pending bounds without requeueing, so `bun wisp farm test --wait` in safe-push fails within a minute with no summary instead of holding the landing lock.
 
-Once the cancelled runs finish, and on every sweep while lanes are pending
-and no plan is unfinished, the sweep dispatches a plan, which tests
+Once the cancelled runs finish, and on every sweep while lanes are pending,
+no plan is unfinished and a test slot holds no run (each test run ends in a
+plan), the sweep dispatches a plan, which tests
 their lanes again in free slots and starts a train for tips that passed.
 A plan refuses a tip already tested alone 3 times (a hang, train-failure or
 retry loop) with a failed status; `-f branch=` retries it. While main has

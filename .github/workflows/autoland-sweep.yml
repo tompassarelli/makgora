@@ -114,7 +114,8 @@ jobs:
           echo "main last moved at $landed; $pending lanes pending; stalled: $stalled" >> "$GITHUB_STEP_SUMMARY"
           [ "$DRY_RUN" = false ] || exit 0
           planning=$(jq '[.[] | select(.title | startswith("Autoland plan"))] | length' runs.json)
-          if [ "$replan" = 1 ] || [ "$stalled" = true ] || { [ "$pending" -gt 0 ] && [ "$planning" = 0 ]; }; then
+          slots=$(jq '[.[].title | capture("^Autoland test (?<slot>[0-9]+) ").slot] | unique | length' runs.json)
+          if [ "$replan" = 1 ] || [ "$stalled" = true ] || { [ "$pending" -gt 0 ] && [ "$planning" = 0 ] && [ "$slots" -lt 3 ]; }; then
             gh workflow run autoland.yml --ref main
             echo "Requeued: dispatched an Autoland plan" >> "$GITHUB_STEP_SUMMARY"
           fi

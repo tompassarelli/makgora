@@ -4,7 +4,8 @@
 recursive sub-issues, including closed issues. `--fix` adds missing milestones
 and attaches outside issues when an epic label or issue link identifies one
 parent. Ambiguous parents are listed for the proxy and keep the check failing.
-The daily Release tree workflow checks this invariant; Autoland planning warns.
+The daily Release tree workflow checks this invariant; Autoland planning
+doesn't run it, since its walk spends one API call per tree issue (#350).
 
 Smashcraft is a platform fighter for Warcraft III, written in TypeScript and
 compiled to Lua with TypeScriptToLua. Wisp and Bun are the supported build,

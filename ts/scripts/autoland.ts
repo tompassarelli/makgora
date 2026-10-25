@@ -1,7 +1,7 @@
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { appendFileSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { parseArgs } from "node:util";
-import { ATTESTED, JOB_BUDGET, attestation, autoclose, issueRefs, pendingChecks, busy, laneRerun, type CiJob, flaggedLanes, pinFamily, resolveConflicts, type Conflict, forecast, judge, landing, parseList, lateLane, looping, handbackDue, pastMain, plan, stalled, stuckRuns, train, trainStep, type Job, type Lane, type Run, type Status, type Tree } from "./autolandCore";
+import { ATTESTED, JOB_BUDGET, attestation, autoclose, issueRefs, pendingChecks, busy, laneRerun, type CiJob, flaggedLanes, jobReads, jobsMatter, laneSince, listedRuns, openRuns, sinceMisses, pinFamily, resolveConflicts, type Conflict, forecast, judge, landing, parseList, lateLane, looping, handbackDue, pastMain, plan, stalled, stuckRuns, train, trainStep, type Job, type Lane, type Run, type Status, type Tree } from "./autolandCore";
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null;
 const isStatus = (value: unknown): value is Status => isRecord(value) && typeof value.state === "string" && typeof value.description === "string" && typeof value.at === "string";
@@ -16,6 +16,9 @@ function readList<T>(file: string | undefined, is: (value: unknown) => value is 
   if (file === undefined) return [];
   return parseList(readFileSync(file, "utf8"), file, is);
 }
+
+const readJson = (file: string | undefined): unknown => file === undefined ? undefined : JSON.parse(readFileSync(file, "utf8"));
+const readTable = (file: string | undefined): Record<string, unknown> => { const value = readJson(file); return isRecord(value) ? value : {}; };
 
 const isStages = (value: unknown): value is { path: string; base: string; ours: string; theirs: string } => isRecord(value) && ["path", "base", "ours", "theirs"].every((key) => typeof value[key] === "string");
 
@@ -72,7 +75,7 @@ if (import.meta.main) {
   const { values, positionals } = parseArgs({
     args: process.argv.slice(2),
     allowPositionals: true,
-    options: { conflicts: { type: "string" }, bodies: { type: "string" }, store: { type: "string" }, rebased: { type: "string" }, lanes: { type: "string" }, runs: { type: "string" }, retry: { type: "string" }, count: { type: "string" }, green: { type: "string" }, now: { type: "string" }, landed: { type: "string" }, statuses: { type: "string" }, messages: { type: "string" }, body: { type: "string" }, results: { type: "string" }, sha: { type: "string" }, jobs: { type: "string" }, attempt: { type: "string" }, solo: { type: "string" } },
+    options: { conflicts: { type: "string" }, bodies: { type: "string" }, store: { type: "string" }, rebased: { type: "string" }, lanes: { type: "string" }, runs: { type: "string" }, retry: { type: "string" }, count: { type: "string" }, green: { type: "string" }, now: { type: "string" }, landed: { type: "string" }, statuses: { type: "string" }, messages: { type: "string" }, body: { type: "string" }, results: { type: "string" }, sha: { type: "string" }, jobs: { type: "string" }, attempt: { type: "string" }, solo: { type: "string" }, self: { type: "string" }, summary: { type: "string" }, pushes: { type: "string" }, lists: { type: "string" } },
   });
   const command = positionals[0];
   const now = Date.parse(values.now ?? new Date().toISOString());
@@ -87,6 +90,22 @@ if (import.meta.main) {
   } else if (command === "busy") {
     const runs = readList(values.runs, isRun);
     console.log(`${busy(runs)}/${JOB_BUDGET} now, ${forecast(runs, now)} at the next peak`);
+  } else if (command === "since-misses") {
+    for (const tip of sinceMisses(readList(values.lanes, isLane), readJson(values.pushes))) console.log(tip);
+  } else if (command === "since") {
+    console.log(JSON.stringify(laneSince(readList(values.lanes, isLane), readJson(values.pushes), readTable(values.statuses))));
+  } else if (command === "job-reads" || command === "runs") {
+    const lanes = readList(values.lanes, isLane);
+    const retry = (values.retry ?? "").split(/\s+/).filter(Boolean);
+    const listedOpen = listedRuns(readList(values.lists, isRecord), Number(values.self));
+    const reads = jobReads(lanes, listedOpen, now, retry);
+    if (command === "job-reads") for (const id of reads) console.log(id);
+    else {
+      const runs = openRuns(listedOpen, reads, readTable(values.jobs));
+      const line = jobsMatter(lanes, runs, now, retry) ? `${busy(runs)}/${JOB_BUDGET} now, ${forecast(runs, now)} at the next peak` : "not read: no free test slot or no lane to test";
+      if (values.summary !== undefined) appendFileSync(values.summary, `Autoland hosted jobs: ${line}\n`);
+      console.log(JSON.stringify(runs));
+    }
   } else if (command === "train") {
     for (const lane of train(readList(values.lanes, isLane), now)) console.log([lane.branch, lane.tip, lane.base, lane.tree].join("\t"));
   } else if (command === "sweep") {
@@ -129,7 +148,7 @@ if (import.meta.main) {
   } else if (command === "judge") {
     console.log(judge(Number(values.count), values.green === "true"));
   } else {
-    console.error("usage: autoland.ts plan --lanes FILE --runs FILE [--retry BRANCHES] [--now ISO] | attest [DENYLIST_STATE] | busy --runs FILE [--now ISO] | train --lanes FILE [--now ISO] | judge --count N --green true|false | rerun --jobs FILE --attempt N --count TEST_FAILURES | sweep --runs FILE [--now ISO] | stalled --lanes FILE --landed ISO [--now ISO] | handback --lanes FILE [--now ISO] | loop --statuses FILE | flagged --bodies FILE --lanes FILE | resolve --conflicts FILE [--store DIR] | refs --messages FILE | checks --body FILE | autoclose --body FILE --sha SHA [--results FILE] | train-step land|retest... | late BRANCH ACTUAL BASE TESTED MAIN... --lanes FILE --retry BRANCHES [--rebased TREE] [--green true|false] | past-main BASE TESTED MAIN... [--rebased TREE] | landing --solo true|false BASE TESTED MAIN... [--rebased TREE] (git ls-tree -r -z files)");
+    console.error("usage: autoland.ts plan --lanes FILE --runs FILE [--retry BRANCHES] [--now ISO] | since-misses --lanes FILE --pushes FILE | since --lanes FILE --pushes FILE --statuses FILE | job-reads --lanes FILE --lists FILE --self RUN_ID [--retry BRANCHES] [--now ISO] | runs --lanes FILE --lists FILE --jobs FILE --self RUN_ID [--retry BRANCHES] [--summary FILE] [--now ISO] | attest [DENYLIST_STATE] | busy --runs FILE [--now ISO] | train --lanes FILE [--now ISO] | judge --count N --green true|false | rerun --jobs FILE --attempt N --count TEST_FAILURES | sweep --runs FILE [--now ISO] | stalled --lanes FILE --landed ISO [--now ISO] | handback --lanes FILE [--now ISO] | loop --statuses FILE | flagged --bodies FILE --lanes FILE | resolve --conflicts FILE [--store DIR] | refs --messages FILE | checks --body FILE | autoclose --body FILE --sha SHA [--results FILE] | train-step land|retest... | late BRANCH ACTUAL BASE TESTED MAIN... --lanes FILE --retry BRANCHES [--rebased TREE] [--green true|false] | past-main BASE TESTED MAIN... [--rebased TREE] | landing --solo true|false BASE TESTED MAIN... [--rebased TREE] (git ls-tree -r -z files)");
     process.exit(2);
   }
 }

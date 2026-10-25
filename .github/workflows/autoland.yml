@@ -122,7 +122,7 @@ env:
   ATTEST: |
     attested() {
       local cli="$1" branch="$2" tip="$3" verdict state description
-      IFS=$'\t' read -r verdict state description <<< "$(bun "$cli" attest "$(gh api "repos/$GH_REPO/commits/$tip/status" --jq '[.statuses[] | select(.context == "denylist")][0].state // ""')")"
+      IFS=$'\t' read -r verdict state description <<< "$(bun "$cli" attest "${4-$(gh api "repos/$GH_REPO/commits/$tip/status" --jq '[.statuses[] | select(.context == "denylist")][0].state // ""')}")"
       [ "$verdict" != test ] || return 0
       gh api "repos/$GH_REPO/statuses/$tip" -f state="${state:-pending}" -f context=autoland -f description="$description" -f target_url="$RUN_URL" > /dev/null
       echo "\`$branch\` (${tip:0:10}): $description" >> "$GITHUB_STEP_SUMMARY"
@@ -149,9 +149,12 @@ env:
     }
   FETCH_LANES: |
     gh api graphql --paginate -F owner="${GH_REPO%/*}" -F name="${GH_REPO#*/}" -f query="$LANES_QUERY" --jq "$LANES_JQ" | jq -s . > lane-refs.json
-    jq -r '.[] | select(.status.state == "pending") | .tip' lane-refs.json | while read -r tip; do
-      gh api "repos/$GH_REPO/commits/$tip/statuses?per_page=100" --jq "{\"$tip\": ([.[] | select(.context == \"autoland\") | .created_at] | min)}" || echo '{}'
-    done | jq -s 'add // {}' > since.json
+    gh api "repos/$GH_REPO/actions/workflows/autoland.yml/runs?event=push&per_page=100" > push-runs.json || echo '{}' > push-runs.json
+    bun ts/scripts/autoland.ts since-misses --lanes lane-refs.json --pushes push-runs.json | while read -r tip; do
+      statuses=$(gh api "repos/$GH_REPO/commits/$tip/statuses?per_page=100") || statuses='[]'
+      printf '%s' "$statuses" | jq -c --arg tip "$tip" '{($tip): .}'
+    done | jq -s 'add // {}' > lane-statuses.json
+    bun ts/scripts/autoland.ts since --lanes lane-refs.json --pushes push-runs.json --statuses lane-statuses.json > since.json
     jq --slurpfile since since.json 'map(. + ($since[0][.tip] // null | if . == null then {} else {since: .} end))' lane-refs.json > lane-since.json && mv lane-since.json lane-refs.json
     fields=$(jq -r '[.[].issues[]] | unique | map("i\(.): issue(number: \(.)) { labels(first: 100) { nodes { name } } milestone { title } }") | join(" ")' lane-refs.json)
     if [ -z "$fields" ]; then
@@ -178,7 +181,13 @@ jobs:
     steps:
       - run: |
           gh api "repos/$GH_REPO/statuses/$GITHUB_SHA" -f state=pending -f context=autoland -f description=queued -f target_url="$RUN_URL" > /dev/null
-          gh workflow run autoland.yml --ref main
+          covered=$(gh api "repos/$GH_REPO/actions/workflows/autoland.yml/runs?per_page=100" --jq '[.workflow_runs[] | select(.status != "completed")]
+            | any(.display_title == "Autoland plan" and .status != "in_progress") or ([.[].display_title | capture("^Autoland test (?<slot>[0-9]+) ").slot] | unique | length >= 3)' || echo false)
+          if [ "$covered" = true ]; then
+            echo "A plan that hasn't started, or the plan ending each test run that fills all three slots, reads this tip: no new plan" >> "$GITHUB_STEP_SUMMARY"
+          else
+            gh workflow run autoland.yml --ref main
+          fi
 
   build:
     if: github.event_name == 'workflow_dispatch' && (inputs.test != '' || inputs.train != '')
@@ -229,13 +238,15 @@ jobs:
           out base "$base"
           if [ -n "$TEST" ]; then
             read -r branch tip <<< "$TEST"
-            current=$(gh api "repos/$GH_REPO/commits/$tip/status" --jq '([.statuses[] | select(.context == "autoland")][0] // {}) | "\(.state // ""):\(.description // "")"')
+            gh api "repos/$GH_REPO/commits/$tip/status" > tip-status.json
+            current=$(jq -r '([.statuses[] | select(.context == "autoland")][0] // {}) | "\(.state // ""):\(.description // "")"' tip-status.json)
+            denylist=$(jq -r '[.statuses[] | select(.context == "denylist")][0].state // ""' tip-status.json)
             if [ "$(git rev-parse -q --verify "refs/remotes/origin/$branch")" != "$tip" ] || [ "${current%%:*}" != pending ] || [[ "${current#*:}" == "passed alone on "* ]]; then
               echo "\`$branch\` no longer waits at ${tip:0:10} (${current:-no status}): nothing to test" >> "$GITHUB_STEP_SUMMARY"
               out verdict none; exit 0
             fi
             eval "$ATTEST"
-            attested ts/scripts/autoland.ts "$branch" "$tip" || { out verdict none; exit 0; }
+            attested ts/scripts/autoland.ts "$branch" "$tip" "$denylist" || { out verdict none; exit 0; }
             printf '%s\t%s\t\t\n' "$branch" "$tip" > lanes.tsv
           else
             bash -euo pipefail -c "$FETCH_LANES" > lanes.json
@@ -426,12 +437,14 @@ jobs:
           measure() { (cd ts && bun scripts/wisp.ts combos --advantage --shard "$1/3" --rows "$PWD/../advantage-rows/advantage-rows-$1.jsonl" --jobs "$(nproc)") 2>&1 | tail -40; }
           measure 0
           for shard in 1 2; do
+            delay=5
             while :; do
               url=$(gh api "repos/$GH_REPO/actions/runs/$GITHUB_RUN_ID/artifacts?name=advantage-rows-$shard" --jq '.artifacts[0].archive_download_url // ""' || true)
               if [ -n "$url" ] && gh api "$url" > "$RUNNER_TEMP/rows.zip" && unzip -o -q "$RUNNER_TEMP/rows.zip" -d advantage-rows; then break; fi
               ended=$(gh api "repos/$GH_REPO/actions/runs/$GITHUB_RUN_ID/attempts/$GITHUB_RUN_ATTEMPT/jobs?per_page=100" --jq "[.jobs[] | select(.name == \"reports shard $shard\" and .status == \"completed\")] | length" || echo 0)
               if [ "$ended" != 0 ] && [ -z "$url" ]; then echo "Shard $shard ended without rows; measuring it here"; measure "$shard"; break; fi
-              sleep 5
+              sleep "$delay"
+              delay=$(( delay * 2 < 60 ? delay * 2 : 60 ))
             done
           done
           echo "Measured and collected the three advantage shards in $(( $(date +%s) - started )) s" >> "$GITHUB_STEP_SUMMARY"
@@ -734,11 +747,6 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.13
-      - name: Check release tree
-        working-directory: ts
-        run: |
-          bun install --frozen-lockfile
-          bun wisp release tree || echo "::warning title=Release tree drift::Release milestone and root #1 differ or could not be checked; see check output"
       - env:
           RETRY: ${{ inputs.branch }}
         run: |
@@ -777,23 +785,18 @@ jobs:
             jq --arg branch "$branch" 'map(select(.branch != $branch))' lanes.json > lanes.next && mv lanes.next lanes.json
           done 3< pending.tsv
           if [ "${{ vars.AUTOLAND_HEARTBEAT }}" != off ]; then
-            beating=0
-            for state in requested pending waiting queued in_progress; do
-              beating=$(( beating + $(gh api "repos/$GH_REPO/actions/workflows/autoland-heartbeat.yml/runs?status=$state&per_page=1" --jq .total_count) ))
-            done
+            beating=$(gh api "repos/$GH_REPO/actions/workflows/autoland-heartbeat.yml/runs?per_page=10" --jq '[.workflow_runs[] | select(.status != "completed")] | length')
             [ "$beating" != 0 ] || gh workflow run autoland-heartbeat.yml --ref main || echo "::warning::couldn't start the Autoland heartbeat"
           fi
           for state in requested pending waiting queued in_progress; do
-            gh api "repos/$GH_REPO/actions/workflows/autoland.yml/runs?status=$state&per_page=100" \
-              --jq ".workflow_runs[] | select(.id != $GITHUB_RUN_ID) | {id, title: .display_title, status}"
-          done | jq -c . | while read -r run; do
-            case "$(jq -r .status <<< "$run")" in
-              queued | in_progress) gh api "repos/$GH_REPO/actions/runs/$(jq -r .id <<< "$run")/jobs?per_page=100" \
-                --jq '[.jobs[] | {name, status, created: .created_at, started: .started_at, labels}]' | jq -c --argjson run "$run" '$run + {jobs: .}' ;;
-              *) jq -c '. + {jobs: []}' <<< "$run" ;;
-            esac
-          done | jq -s . > runs.json
-          echo "Autoland hosted jobs: $(bun ts/scripts/autoland.ts busy --runs runs.json)" >> "$GITHUB_STEP_SUMMARY"
+            gh api "repos/$GH_REPO/actions/workflows/autoland.yml/runs?status=$state&per_page=100"
+          done | jq -s . > run-lists.json
+          bun ts/scripts/autoland.ts job-reads --lanes lanes.json --lists run-lists.json --self "$GITHUB_RUN_ID" --retry "$RETRY" > job-reads.txt
+          while read -r id; do
+            jobs=$(gh api "repos/$GH_REPO/actions/runs/$id/jobs?per_page=100")
+            printf '%s' "$jobs" | jq -c --arg id "$id" '{($id): .}'
+          done < job-reads.txt | jq -s 'add // {}' > run-jobs.json
+          bun ts/scripts/autoland.ts runs --lanes lanes.json --lists run-lists.json --jobs run-jobs.json --self "$GITHUB_RUN_ID" --retry "$RETRY" --summary "$GITHUB_STEP_SUMMARY" > runs.json
           jq -e 'type == "array"' runs.json > /dev/null || { echo "::error title=Autoland plan input::runs.json is empty or truncated"; exit 1; }
           bun ts/scripts/autoland.ts plan --lanes lanes.json --runs runs.json --retry "$RETRY" > plan.tsv
           while IFS=$'\t' read -r -u 3 action branch tip slot; do

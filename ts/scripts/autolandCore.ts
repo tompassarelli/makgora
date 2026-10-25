@@ -86,11 +86,19 @@ export const forecast = (runs: readonly Run[], now: number): number => runs.filt
   return sum + (step(now, start) >= PROFILE.length ? held : Math.min(held, PROFILE[step(now + LEAD, start)] ?? 0));
 }, 0);
 
+const freeSlots = (runs: readonly Run[]): number[] =>
+  Array.from({ length: TEST_SLOTS }, (_, slot) => slot).filter((slot) => !runs.some((run) => run.status !== "completed" && TEST_TITLE.exec(run.title)?.[1] === String(slot)));
+
+export const jobsMatter = (lanes: readonly Lane[], runs: readonly Run[], now: number, retry: readonly string[] = []): boolean => {
+  const retried = new Set(retry);
+  return freeSlots(runs).length > 0 && lanes.some((lane) => laneState(lane, runs, retried, now) === "test" && attestation(lane.denylist) === "test");
+};
+
 export function plan(lanes: readonly Lane[], runs: readonly Run[], now: number, retry: readonly string[] = []): Plan {
   const retried = new Set(retry);
   const held = busy(runs);
   const peak = forecast(runs, now);
-  const free = Array.from({ length: TEST_SLOTS }, (_, slot) => slot).filter((slot) => !runs.some((run) => run.status !== "completed" && TEST_TITLE.exec(run.title)?.[1] === String(slot)));
+  const free = freeSlots(runs);
   const test: TestOrder[] = [];
   const attest: AttestOrder[] = [];
   let passed = false;
@@ -377,3 +385,61 @@ export const CONFLICT_STATUS = "conflicts with main ";
 
 export const handbackDue = (lanes: readonly Lane[], now: number): Lane[] =>
   lanes.filter((lane) => lane.status?.state === "pending" && lane.status.description.startsWith(CONFLICT_STATUS) && minutes(now, lane.status.at) >= BOUND.handback);
+
+export const OPEN_STATES = ["requested", "pending", "waiting", "queued", "in_progress"] as const;
+
+const isObject = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null;
+const listed = (value: unknown, key?: string): Record<string, unknown>[] => {
+  const list = key === undefined ? value : isObject(value) ? value[key] : undefined;
+  return Array.isArray(list) ? list.filter(isObject) : [];
+};
+const text = (value: unknown): string | undefined => typeof value === "string" ? value : undefined;
+
+const pushTimes = (pushRuns: unknown): ReadonlyMap<string, string> => {
+  const pushed = new Map<string, string>();
+  for (const run of listed(pushRuns, "workflow_runs")) {
+    const key = `${text(run.head_branch)} ${text(run.head_sha)}`;
+    const at = text(run.created_at);
+    const was = pushed.get(key);
+    if (at !== undefined && (was === undefined || at < was)) pushed.set(key, at);
+  }
+  return pushed;
+};
+
+const pendingLanes = (lanes: readonly Lane[]): Lane[] => lanes.filter((lane) => lane.status?.state === "pending");
+
+export const sinceMisses = (lanes: readonly Lane[], pushRuns: unknown): string[] => {
+  const pushed = pushTimes(pushRuns);
+  return [...new Set(pendingLanes(lanes).filter((lane) => !pushed.has(`${lane.branch} ${lane.tip}`)).map((lane) => lane.tip))];
+};
+
+const firstStatus = (statuses: unknown): string | undefined => listed(statuses).flatMap((status) => {
+  const at = text(status.created_at);
+  return status.context === "autoland" && at !== undefined ? [at] : [];
+}).toSorted()[0];
+
+export function laneSince(lanes: readonly Lane[], pushRuns: unknown, statuses: Readonly<Record<string, unknown>>): Record<string, string> {
+  const pushed = pushTimes(pushRuns);
+  const since: Record<string, string> = {};
+  for (const lane of pendingLanes(lanes)) {
+    const at = pushed.get(`${lane.branch} ${lane.tip}`) ?? firstStatus(statuses[lane.tip]);
+    if (at !== undefined) since[lane.tip] = at;
+  }
+  return since;
+}
+
+export const listedRuns = (lists: readonly unknown[], self: number): Run[] => lists.flatMap((list) => listed(list, "workflow_runs").flatMap((run) =>
+  typeof run.id === "number" && run.id !== self ? [{ id: run.id, title: text(run.display_title) ?? "", status: text(run.status) ?? "" }] : []));
+
+export const jobReads = (lanes: readonly Lane[], runs: readonly Run[], now: number, retry: readonly string[] = []): number[] =>
+  jobsMatter(lanes, runs, now, retry) ? runs.flatMap((run) => run.id !== undefined && (run.status === "queued" || run.status === "in_progress") ? [run.id] : []) : [];
+
+const jobsOf = (value: unknown): Job[] => listed(value, "jobs").map((job) => ({
+  name: text(job.name) ?? "", status: text(job.status) ?? "", created: text(job.created_at) ?? "", started: text(job.started_at) ?? null,
+  labels: Array.isArray(job.labels) ? job.labels.filter((label): label is string => typeof label === "string") : [],
+}));
+
+export function openRuns(runs: readonly Run[], reads: readonly number[], jobs: Readonly<Record<string, unknown>>): Run[] {
+  if (reads.length === 0) return [...runs];
+  return runs.map((run) => ({ ...run, jobs: run.id !== undefined && reads.includes(run.id) ? jobsOf(jobs[String(run.id)]) : [] }));
+}
