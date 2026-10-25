@@ -32,19 +32,18 @@ const back: Gesture = {chest:-15,waist:-20,arm:55,wrist:35,leftArm:-40,head:15,y
 const cast: Gesture = {chest:-20,waist:8,arm:-115,wrist:20,leftArm:-120,head:-20,neck:-10,front:-10};
 const brace: Gesture = {chest:35,waist:10,arm:-45,wrist:25,leftArm:-60,head:-20,wolf:6,front:35,back:35};
 const kickCoil: Gesture = {chest:55,waist:10,arm:-172,wrist:50,leftArm:-40,head:-35,look:30,yaw:-10,turn:8,shift:10,lean:-8,wolf:18,neck:-30,front:50,back:-120,hock:30};
-const kick: Gesture = {chest:-10,waist:-10,arm:35,wrist:75,leftArm:-60,head:5,look:75,yaw:10,turn:-18,shift:-3,wolf:0,neck:20,front:-35,back:60};
-const kickRecoil: Gesture = {chest:10,waist:-5,arm:40,wrist:45,leftArm:-55,head:5,look:40,yaw:10,turn:-6,shift:-4,wolf:-8,neck:5,front:-10,back:40};
+const kick: Gesture = {chest:-10,waist:-10,arm:35,wrist:75,leftArm:-60,head:5,look:75,yaw:10,turn:-18,shift:-25,wolf:-20,neck:20,front:-35,back:100};
+const kickRecoil: Gesture = {chest:10,waist:-5,lean:-28,arm:40,wrist:45,leftArm:-55,head:5,look:40,yaw:10,turn:-6,shift:-30,wolf:-8,neck:5,front:-10,back:40};
 const hammerCoil: Gesture = {chest:30,waist:15,arm:-175,wrist:40,leftArm:-70,head:-20,look:-30,yaw:-10,turn:-15,shift:8,lean:8,wolf:12,neck:-15,front:25,back:-35};
-const hammerHit: Gesture = {...back,chest:-5,waist:-10,yaw:30,shift:-12,lean:-6,turn:-20,wolf:-12,neck:-25,front:-35,back:-30,look:20};
-const hammerChop: Gesture = {chest:-22,waist:-15,arm:80,wrist:0,leftArm:-45,head:10,look:20,yaw:-20,turn:-20,shift:-12,lean:-10,wolf:4,neck:-15,front:-25,back:20};
-const unwind: Gesture = {chest:-12,waist:-10,arm:60,wrist:30,leftArm:-35,look:10,yaw:20,turn:-8,shift:-6,lean:-5,wolf:-6,neck:-8,front:20,back:-10};
-const settle: Gesture = {chest:12,waist:4,arm:-20,wrist:8,leftArm:-8,head:-4,wolf:5,neck:4,front:10,back:8,shift:2};
-const coilReach = [55,165] as const, kickReach = [-90,140] as const, hammerReach = [-105,98] as const, chopReach = [-90,72] as const, trailReach = [-38,88] as const;
+const hammerHit: Gesture = {...back,chest:-24,waist:-10,yaw:30,shift:-12,lean:-22,turn:-20,wolf:-12,neck:-25,front:-35,back:-30,look:20};
+const unwind: Gesture = {chest:-10,waist:-8,arm:50,wrist:25,leftArm:-30,look:10,yaw:16,turn:-8,shift:-6,lean:-8,wolf:-6,neck:-8,front:12,back:-8};
+const settle: Gesture = {chest:6,waist:2,arm:-10,wrist:5,leftArm:-6,head:-3,wolf:3,neck:3,front:6,back:5,shift:1};
+const coilReach = [55,165] as const, kickReach = [-90,140] as const, kickFollow = [-90,140] as const, hammerReach = [-90,100] as const, trailReach = [-42,88] as const, followReach = [-88,78] as const;
 const backAirKeys = (kickAt: number, hammerAt: number, frames: number): Key[] => [
  {frame:0,gesture:{},ik:0}, {frame:kickAt-4,gesture:kickCoil,ik:1,target:coilReach}, {frame:kickAt-2,gesture:{...kickCoil,chest:60,front:55,back:-130,hock:35,wolf:22,shift:12},ik:1,target:coilReach},
- {frame:kickAt,gesture:{...kick,lean:-18},ik:1,target:kickReach}, {frame:kickAt+1,gesture:{...kick,lean:-18,back:75,wolf:4,turn:-22,shift:-13},ik:1,target:kickReach}, {frame:kickAt+3,gesture:kickRecoil,ik:0},
- {frame:hammerAt-3,gesture:hammerCoil,ik:0}, {frame:hammerAt,gesture:{...hammerHit,lean:-22,wolf:-12,chest:-24,shift:-24},ik:1,target:hammerReach}, {frame:hammerAt+2,gesture:{...hammerHit,lean:-32,wolf:-16,chest:-34,waist:-20,shift:-28},ik:1,target:hammerReach},
- {frame:hammerAt+5,gesture:hammerChop,ik:1,target:chopReach}, {frame:frames-13,gesture:unwind,ik:1,target:trailReach}, {frame:frames-6,gesture:settle,ik:0},
+ {frame:kickAt,gesture:{...kick,lean:-18},ik:1,target:kickReach}, {frame:kickAt+1,gesture:{...kick,lean:-18,back:70,wolf:-35,turn:-22,shift:-60},ik:1,target:kickFollow}, {frame:kickAt+3,gesture:kickRecoil,ik:0},
+ {frame:hammerAt-3,gesture:hammerCoil,ik:0}, {frame:hammerAt,gesture:hammerHit,ik:1,target:hammerReach}, {frame:hammerAt+2,gesture:{...hammerHit,lean:-8,chest:-12,wolf:-4,turn:-8,shift:-6},ik:1,target:followReach},
+ {frame:hammerAt+10,gesture:unwind,ik:1,target:trailReach}, {frame:frames-5,gesture:settle,ik:0},
  {frame:frames-2,gesture:{},ik:0}, {frame:frames,gesture:{},ik:0},
 ];
 const headAnticipation: Partial<Record<HeroPose, number>> = { jab: 30, jab2: 30, forwardTilt: 15, forwardTiltDown: 45, downTilt: 45, dashAttack: 75 };
