@@ -12,10 +12,11 @@ import type { Capsule } from "../../src/game/sim/geometry/contactGeometry";
 import { fighterHurtParts } from "../../src/game/sim/hurtboxes";
 import { snapToLedge } from "../../src/game/sim/ledge";
 import { beginDamageContacts, finishDamageContacts } from "../../src/game/sim/contacts";
+import { attackPhase } from "../../src/game/sim/conditions";
 import { type Fighter, createFighter } from "../../src/game/sim/fighter";
 import { advanceHeroStatus, runningHeroSpecial } from "../../src/game/sim/specials/engine";
 import { HERO_ROSTER, fighterSlug } from "../../src/game/sim/heroes/registry";
-import { authoredHitRegionCount } from "../../src/game/sim/hitRegions";
+import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../../src/game/sim/hitRegions";
 import { createMatchCamera, MATCH_CAMERA_ASPECT } from "../../src/game/sim/matchCamera";
 import { advancePlacedObjects } from "../../src/game/sim/placedObjects";
 import { updateProjectiles } from "../../src/game/sim/projectiles";
@@ -26,6 +27,7 @@ import { advanceFighter } from "../../src/game/sim/step";
 import type { MoveClass, MoveSample, ScoreFrame, ScoreSkeleton } from "./animScore";
 import { DrawnModel } from "./drawnModel";
 import { capture, type PoseFrame } from "./hurtboxView";
+import { hitStarts } from "./animJudgeFrames";
 
 
 
@@ -183,6 +185,14 @@ const strikeEnd = (capsule: { readonly x1: number; readonly z1: number; readonly
   Math.hypot(capsule.x2, capsule.z2 - chestZ) >= Math.hypot(capsule.x1, capsule.z1 - chestZ) ? { x: capsule.x2, z: capsule.z2 } : { x: capsule.x1, z: capsule.z1 };
 
 
+function openWindows(f: Fighter): number[] {
+  const style = f.attack.style;
+  if (style === undefined || style === AttackStyle.shot || attackPhase(f) !== AttackPhase.active) return [];
+  const region = emptyHitRegion();
+  return Array.from({ length: authoredHitRegionCount(style, f.tuning.moves) }, (_, index) => authoredHitRegion(region, f.character, style, f.attack.frame, f.attack.smashChargeFrames, index, f.tuning.moves).window).filter((window) => window > 0);
+}
+
+
 export function sampleNormal(model: DrawnModel, skeleton: ScoreSkeleton, character: Character, entry: (typeof SCORED_NORMALS)[number], pixelsPerUnit: number): SampledMove | undefined {
   const f = createFighter(character, 0.0, 1);
   if (authoredHitRegionCount(entry.style, f.tuning.moves) === 0) return undefined;
@@ -194,12 +204,14 @@ export function sampleNormal(model: DrawnModel, skeleton: ScoreSkeleton, charact
   if (f.attack.style !== entry.style) return undefined;
   advanceFighterPose(p, f, world, input, false, false, true, false);
   const frames: PoseFrame[] = [capture(f, p)];
+  const windows = [openWindows(f)];
   let moveFrames = 0;
   while (frames.length < LIMIT) {
     advanceFighter(world, 0, 0, input, 0.0);
     advanceFighterPose(p, f, world, input, false, false, false, false);
     if (f.attack.style !== entry.style && moveFrames === 0) moveFrames = frames.length;
     frames.push(capture(f, p));
+    windows.push(openWindows(f));
     if (moveFrames > 0 && frames.length >= moveFrames + AFTER_FRAMES) break;
   }
   if (moveFrames === 0) moveFrames = frames.length;
@@ -215,7 +227,7 @@ export function sampleNormal(model: DrawnModel, skeleton: ScoreSkeleton, charact
   const chestZ = skeleton.chest === undefined ? 50 : posed[first]?.nodes[skeleton.chest * 2 + 1] ?? 50;
   return {
     move: entry.move, endFrame: moveFrames - 1, seconds: frames.map((frame) => timelineSeconds(character, frame)), heights: frames.map((frame) => frame.z - (entry.aerial ? 900.0 - 300.0 : 0.0)),
-    sample: { moveClass: entry.moveClass, limbStrike: LIMB_STRIKES[fighterSlug(character)]?.includes(entry.move) === true, frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, strike: strikeEnd(local, chestZ), pixelsPerUnit },
+    sample: { moveClass: entry.moveClass, limbStrike: LIMB_STRIKES[fighterSlug(character)]?.includes(entry.move) === true, frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, hits: hitStarts(windows.slice(0, moveFrames)), strike: strikeEnd(local, chestZ), pixelsPerUnit },
   };
 }
 
@@ -231,6 +243,7 @@ export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, charac
   const press = { ...neutralControls(), specialPressed: true, ultimatePressed: entry.ultimate === true, attackHeld: entry.ultimate === true, specialX: entry.x, specialZ: entry.z };
   const frames: PoseFrame[] = [];
   const activeFrames: number[] = [];
+  const windows: number[][] = [];
   let strike: { x: number; z: number } | undefined;
   let moveFrames = 0;
   for (let tick = 0; tick < LIMIT; tick++) {
@@ -249,6 +262,7 @@ export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, charac
         : (candidate.activeFrom ?? 0) <= candidate.life ? candidate.spawnFrame - 1 === frame : candidate.expiresInto !== undefined && candidate.spawnFrame - 1 + candidate.life === frame);
       const grab = move?.commandGrab !== undefined && frame >= move.commandGrab.first - 1 && frame <= move.commandGrab.last - 1 ? move.commandGrab : undefined;
       const placed = move?.placement?.frame === frame + 1 ? move.placement : undefined;
+      windows[frames.length] = (move?.regions ?? []).filter((candidate) => frame >= candidate.firstFrame && frame <= candidate.lastFrame && candidate.hit.strike !== undefined).map((candidate) => candidate.hit.window);
       if (region !== undefined || projectile !== undefined || grab !== undefined || placed !== undefined) {
         activeFrames.push(frames.length);
         if (strike === undefined && region?.hit.strike !== undefined) strike = strikeEnd(region.hit.strike, 50);
@@ -271,7 +285,7 @@ export function sampleSpecial(model: DrawnModel, skeleton: ScoreSkeleton, charac
   if (ready === undefined) return undefined;
   return {
     move: entry.move, endFrame: moveFrames - 1, seconds: frames.map((frame) => timelineSeconds(character, frame)), heights: frames.map((frame) => frame.z),
-    sample: { moveClass: "special", limbStrike: LIMB_STRIKES[fighterSlug(character)]?.includes(entry.move) === true, frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, strike, pixelsPerUnit },
+    sample: { moveClass: "special", limbStrike: LIMB_STRIKES[fighterSlug(character)]?.includes(entry.move) === true, frames: posed, moveFrames, ready, skeleton, firstActive: first, lastActive: last, hits: hitStarts(Array.from({ length: moveFrames }, (_, index) => windows[index] ?? [])), strike, pixelsPerUnit },
   };
 }
 

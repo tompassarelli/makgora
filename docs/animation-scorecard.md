@@ -36,7 +36,8 @@ fighter can act), so line 2 measures the transition the game draws.
 4. **Contrast:** rasterize the drawn triangles, then take one minus the
    larger IoU of windup/contact and contact/mid-recovery. More is clearer.
 5. **Judgement:** a fresh agent reads six gameplay-size key poses beside a
-   Melee reference, scoring readability, weight, anticipation, follow-through
+   Melee reference (a move with several hits adds each hit's contact frame,
+   so the motion behind every hit is in view), scoring readability, weight, anticipation, follow-through
    and character independently. Three fresh judges score each clip, and
    line 5 passes when the per-line median of the first three judgements of
    that clip is at least 4/5 on every line. A move with fewer than three

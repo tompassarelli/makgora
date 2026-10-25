@@ -24,6 +24,7 @@ import { type CrouchClipKind, type SampledMove, gameplayPixelsPerUnit, loadBody,
 import { CAMERA_LIFT, heldHeight, judgeCamera, judgeCrop, judgeFraming, judgePixelsPerUnit } from "../animJudgeCamera";
 import { answerKey, type ColdStrip, coldReadBatch, coldReadBatches, isMovementMove, ledgeCorner, type MovementMove, movementCrop, movementFrames, stageDrawArgs, stageShape, stripId } from "../animMovementRows";
 import { JUDGES_PER_CLIP, clipIdentity, judgePanel, judgementKey, median, withPreparedClips, writePreparedClips } from "../animJudgeIdentity";
+import { judgeKeyFrames } from "../animJudgeFrames";
 import { assetsView, readManifest } from "../buildInputs";
 import { headlessRender } from "../headlessRender";
 import { projectRoot } from "../project";
@@ -95,7 +96,7 @@ interface Row {
   readonly move: string;
   readonly moveClass: string;
   readonly score: MoveScore;
-  readonly frames: { readonly firstActive: number; readonly lastActive: number; readonly end: number };
+  readonly frames: { readonly firstActive: number; readonly lastActive: number; readonly end: number; readonly hits: readonly number[] };
   readonly clip: string;
   readonly judged: { readonly count: number; readonly lowest: number; readonly medians: readonly number[]; readonly pass: boolean } | undefined;
   readonly reference: ReturnType<typeof meleeTiming>;
@@ -153,7 +154,7 @@ const measure = (fighters: readonly Character[], assets: string) => Effect.gen(f
     for (const sampled of moves) {
       const { sample } = sampled;
       const score = yield* Effect.try({ try: () => scoreMove(sample, THRESHOLDS[sample.moveClass]), catch: (cause) => new AnimFailure({ problem: `${fighter} ${sampled.move}: ${String(cause)}` }) });
-      const frames = { firstActive: sample.firstActive, lastActive: sample.lastActive, end: sampled.endFrame };
+      const frames = { firstActive: sample.firstActive, lastActive: sample.lastActive, end: sampled.endFrame, hits: sample.hits };
       const clip = clipIdentity(keyFrames({ score, frames }).map((index) => sample.frames[index]), judgeFraming());
       const panel = judgePanel(judged.filter((entry) => entry.fighter === fighter && entry.move === sampled.move), clip);
       const medians = JUDGE_LINES.map((line) => median(panel.map((entry) => entry[line])));
@@ -248,7 +249,7 @@ const JUDGE_BATCH = 6;
 interface Strip { readonly fighter: string; readonly move: string; readonly seconds: readonly number[]; readonly heights: readonly number[]; readonly poses: readonly (ScoreFrame | undefined)[]; readonly caption: string; readonly movement: boolean }
 
 
-const keyFrames = (row: Pick<Row, "score" | "frames">) => [...new Set([0, row.score.keys.windup, row.score.keys.contact, row.frames.lastActive, row.score.keys.recovery, row.frames.end])].sort((a, b) => a - b);
+const keyFrames = (row: Pick<Row, "score" | "frames">) => judgeKeyFrames({ ...row.score.keys, lastActive: row.frames.lastActive, end: row.frames.end, hits: row.frames.hits });
 
 const ReferenceEntry = Schema.Struct({ file: Schema.String, source: Schema.String, character: Schema.String, move: Schema.String });
 const ReferenceManifest = Schema.fromJsonString(Schema.Record(Schema.String, ReferenceEntry));
@@ -331,7 +332,7 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
     const reference = referenceFor(references, row.fighter, row.move);
     const indices = keyFrames(row);
     strips.push({ fighter: row.fighter, move: row.move, seconds: indices.map((index) => sampled.seconds[index] ?? 0), heights: indices.map((index) => sampled.heights[index] ?? 0), poses: indices.map((index) => sampled.sample.frames[index]),
-      caption: `Top row, ours: frames ${indices.join(", ")} (start, windup, contact on the first active frame ${row.frames.firstActive}, last active, recovery, end of ${row.frames.end}). Bottom row: ${reference === undefined ? "no reference animation on file; judge against the brief's standard" : `Melee ${reference.character.replaceAll("_", " ")}'s ${REFERENCE_ACTIONS[row.move]?.wiki} (hitbox view)`}.`, movement: false });
+      caption: `Top row, ours: frames ${indices.join(", ")} (start, windup, contact on the first active frame ${row.frames.firstActive}${row.frames.hits.length > 1 ? `, each hit's contact on ${row.frames.hits.join(", ")}` : ""}, last active, recovery, end of ${row.frames.end}). Bottom row: ${reference === undefined ? "no reference animation on file; judge against the brief's standard" : `Melee ${reference.character.replaceAll("_", " ")}'s ${REFERENCE_ACTIONS[row.move]?.wiki} (hitbox view)`}.`, movement: false });
   }
   for (const entry of wanted ?? []) {
     const [slug = "", move = ""] = entry.split(":");
