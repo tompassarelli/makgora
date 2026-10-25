@@ -35,32 +35,32 @@ Each fighter against a light (Kel'Thuzad), medium (Rifleman) and heavy (Cairne B
 | Shadow Hunter | light | yes | **no** | yes | yes | yes | down smash at 20%: tech in place uncovered; tech in short hop, forward air, dash grab, back throw; tech away uncovered; missed tech uncovered; trap short hop, forward air, dash grab, back throw covers tech in place, tech in, missed tech | up throw at 0% → up air against 5/5 DI |
 | Shadow Hunter | medium | yes | **no** | yes | yes | yes | forward throw at 60%: tech in place dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack; tech in forward smash; tech away uncovered; missed tech dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack, dash grab, back throw; trap dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack, dash grab, back throw covers tech in place, tech in, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Shadow Hunter | heavy | yes | yes | yes | yes | yes | forward throw at 40%: tech in place dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack; tech in forward smash; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack; missed tech dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack; trap dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
-| Pit Lord | light | yes | yes | yes | yes | yes | down throw at 40%: tech in place full hop, forward air; tech in up smash; tech away dash grab, back throw; missed tech full hop, forward air; trap full hop, forward air covers tech in place, missed tech | up throw at 0% → up tilt against 5/5 DI |
-| Pit Lord | medium | yes | **no** | yes | yes | yes | down throw at 40%: tech in place dash, dash attack; tech in full hop +4, down air; tech away uncovered; missed tech dash, dash attack; trap dash, dash attack covers tech in place, missed tech | up throw at 60% → up tilt against 4/5 DI |
-| Pit Lord | heavy | yes | yes | yes | yes | yes | down throw at 40%: tech in place full hop, forward air; tech in full hop +4, down air, dash, dash attack; tech away dash grab, back throw; missed tech full hop, forward air; trap full hop +4, down air, dash, dash attack covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
-| Rexxar | light | yes | yes | yes | yes | yes | down throw at 20%: tech in place full hop, forward air; tech in up smash, forward smash; tech away dash grab, back throw; missed tech short hop, forward air; trap full hop, forward air covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Rexxar | medium | yes | yes | yes | yes | yes | down throw at 20%: tech in place dash, dash attack, dash, dash attack, dash, dash attack, dash, dash attack, dash, dash attack, dash grab, back throw; tech in up smash, short hop, forward air, dash grab, back throw, dash grab, back throw; tech away dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw; missed tech dash, dash attack, forward tilt; trap up smash, short hop, forward air, dash grab, back throw, dash grab, back throw covers tech in place, tech in, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Rexxar | heavy | yes | yes | yes | yes | yes | down throw at 40%: tech in place dash, dash attack, forward tilt; tech in up smash, forward smash; tech away dash grab, up throw, up smash, dash, dash attack, dash, dash attack, dash, dash attack, dash, dash attack; missed tech short hop, forward air; trap dash, dash attack, forward tilt covers tech in place, tech in, missed tech | up throw at 40% → up air against 5/5 DI |
+| Pit Lord | light | yes | yes | yes | yes | yes | down throw at 20%: tech in place full hop, forward air; tech in full hop +4, down air, dash, dash attack; tech away dash grab, back throw; missed tech full hop, forward air; trap full hop +4, down air, dash, dash attack covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 5/5 DI |
+| Pit Lord | medium | yes | yes | yes | yes | yes | down throw at 20%: tech in place dash, dash attack; tech in full hop +4, down air, dash, dash attack; tech away dash grab, back throw; missed tech dash, dash attack; trap full hop +4, down air, dash, dash attack covers tech in place, tech in, missed tech | up throw at 60% → up tilt against 4/5 DI |
+| Pit Lord | heavy | yes | yes | yes | yes | yes | down throw at 20%: tech in place full hop, forward air; tech in up smash, forward smash; tech away dash grab, back throw; missed tech full hop, forward air; trap full hop, forward air covers tech in place, missed tech | up throw at 0% → up tilt against 5/5 DI |
+| Rexxar | light | yes | yes | yes | yes | yes | down throw at 20%: tech in place dash, dash attack, dash, dash attack, dash, dash attack, dash, dash attack, dash, dash attack, dash, dash attack, dash grab, back throw; tech in up smash, forward smash; tech away dash grab, back throw; missed tech dash, dash attack, dash, dash attack; trap dash, dash attack, dash, dash attack, dash, dash attack, dash, dash attack, dash, dash attack, dash, dash attack, dash grab, back throw covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Rexxar | medium | yes | yes | yes | yes | yes | down throw at 20%: tech in place dash, dash attack, dash, dash attack, dash, dash attack, dash, dash attack, dash, dash attack, dash, dash attack, dash grab, back throw; tech in up smash, short hop, forward air, dash grab, back throw, dash, dash attack, dash, dash attack, dash, dash attack; tech away dash grab, back throw, dash, dash attack, dash, dash attack, dash, dash attack, dash, dash attack, dash, dash attack, dash grab, back throw; missed tech dash, dash attack, dash, dash attack, dash, dash attack, dash, dash attack, dash, dash attack, dash, dash attack, dash grab, back throw; trap up smash, short hop, forward air, dash grab, back throw, dash, dash attack, dash, dash attack, dash, dash attack covers tech in place, tech in, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Rexxar | heavy | yes | yes | yes | yes | yes | down throw at 40%: tech in place up tilt, up smash, short hop, forward air; tech in dash, dash attack, dash, dash attack, dash, dash attack, dash, dash attack, dash, dash attack, dash, dash attack, dash, dash attack, dash grab, back throw; tech away forward smash; missed tech up tilt, up smash, short hop, forward air; trap dash, dash attack, dash, dash attack, dash, dash attack, dash, dash attack, dash, dash attack, dash, dash attack, dash, dash attack, dash grab, back throw covers tech in place, tech in, tech away, missed tech | up throw at 40% → up air against 5/5 DI |
 | Lich King | light | yes | yes | yes | yes | yes | down throw at 20%: tech in place full hop, forward air; tech in up smash, up tilt, forward smash; tech away dash grab, back throw; missed tech short hop, forward air; trap full hop, forward air covers tech in place, missed tech | up throw at 0% → up tilt against 5/5 DI |
 | Lich King | medium | yes | yes | yes | yes | yes | down throw at 40%: tech in place short hop +4, forward air; tech in up smash, forward smash; tech away dash grab, back throw; missed tech short hop, forward air; trap short hop +4, forward air covers tech in place, missed tech | up throw at 60% → up tilt against 4/5 DI |
-| Lich King | heavy | yes | yes | yes | yes | yes | down throw at 40%: tech in place full hop, forward air; tech in up smash, down smash; tech away dash grab, back throw; missed tech short hop, forward air; trap full hop, forward air covers tech in place, missed tech | up throw at 20% → up tilt against 5/5 DI |
+| Lich King | heavy | yes | yes | yes | **no** | yes | down throw at 40%: tech in place full hop, forward air, dash, dash attack; tech in up smash, down smash; tech away dash grab, back throw; missed tech full hop, forward air, dash, dash attack; trap full hop, forward air, dash, dash attack covers tech in place, tech away, missed tech | up throw at 20% → up tilt against 5/5 DI |
 | Thrall | light | yes | yes | yes | yes | yes | down throw at 20%: tech in place dash, dash attack; tech in forward smash; tech away dash grab, back throw; missed tech dash, dash attack; trap dash, dash attack covers tech in place, missed tech | up throw at 40% → up air against 4/5 DI |
-| Thrall | medium | yes | yes | yes | yes | yes | down throw at 20%: tech in place dash, dash attack; tech in short hop, neutral air, dash, dash attack; tech away neutral special; missed tech dash, dash attack; trap neutral special covers tech in place, tech in, tech away, missed tech | up throw at 60% → up air against 4/5 DI |
-| Thrall | heavy | yes | yes | yes | yes | yes | down throw at 40%: tech in place dash, dash attack; tech in short hop, neutral air, dash, dash attack; tech away dash grab, back throw; missed tech dash, dash attack; trap short hop, neutral air, dash, dash attack covers tech in place, tech in, missed tech | up throw at 20% → up tilt against 4/5 DI |
+| Thrall | medium | yes | yes | yes | yes | yes | back throw at 0%: tech in place dash, dash attack; tech in down smash; tech away full hop, neutral special; missed tech dash, dash attack; trap full hop, neutral special covers tech in place, tech away, missed tech | up throw at 60% → up air against 4/5 DI |
+| Thrall | heavy | yes | yes | yes | yes | yes | forward throw at 20%: tech in place dash, dash attack; tech in forward smash; tech away neutral special; missed tech dash, dash attack; trap neutral special covers tech in place, tech in, tech away, missed tech | up throw at 20% → up tilt against 4/5 DI |
 | Jaina Proudmoore | light | yes | yes | yes | yes | yes | down throw at 40%: tech in place dash, dash attack; tech in forward smash; tech away neutral special; missed tech dash, dash attack; trap neutral special covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Jaina Proudmoore | medium | yes | yes | yes | yes | yes | down throw at 40%: tech in place dash, dash attack; tech in forward smash; tech away short hop, neutral special; missed tech dash, dash attack; trap short hop, neutral special covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Jaina Proudmoore | heavy | yes | yes | yes | yes | yes | down throw at 40%: tech in place dash, dash attack; tech in full hop +4, down air, down smash; tech away neutral special; missed tech dash, dash attack; trap full hop +4, down air, down smash covers tech in place, tech in, missed tech | up throw at 40% → up air against 5/5 DI |
-| Sylvanas Windrunner | light | yes | **no** | yes | yes | yes | forward throw at 40%: tech in place dash grab, down throw, short hop, forward air; tech in short hop +4, down air, dash, dash attack; tech away uncovered; missed tech dash grab, down throw, short hop, forward air; trap short hop +4, down air, dash, dash attack covers tech in place, tech in, missed tech | up throw at 0% → up air against 4/5 DI |
-| Sylvanas Windrunner | medium | yes | **no** | yes | yes | yes | back throw at 40%: tech in place dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw; tech in full hop in place, down air, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw; tech away uncovered; missed tech dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw; trap dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw covers tech in place, tech in, missed tech | up throw at 40% → up air against 4/5 DI |
+| Jaina Proudmoore | heavy | yes | **no** | yes | yes | yes | forward throw at 20%: tech in place dash, dash attack; tech in short hop, forward air, short hop, forward air, dash, dash attack; tech away uncovered; missed tech dash, dash attack; trap short hop, forward air, short hop, forward air, dash, dash attack covers tech in place, tech in, tech away, missed tech | up throw at 40% → up air against 5/5 DI |
+| Sylvanas Windrunner | light | yes | **no** | yes | yes | yes | forward throw at 40%: tech in place dash grab, back throw, dash, dash attack; tech in short hop +4, down air, dash, dash attack; tech away uncovered; missed tech dash grab, back throw, dash, dash attack; trap dash grab, back throw, dash, dash attack covers tech in place, tech in, missed tech | up throw at 0% → up air against 4/5 DI |
+| Sylvanas Windrunner | medium | yes | **no** | yes | yes | yes | forward throw at 40%: tech in place dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack; tech in full hop, back air, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack; tech away uncovered; missed tech dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack; trap dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack covers tech in place, tech in, missed tech | up throw at 40% → up air against 4/5 DI |
 | Sylvanas Windrunner | heavy | yes | yes | yes | yes | yes | forward throw at 40%: tech in place dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack; tech in short hop +4, down air, short hop, down air, forward smash; tech away dash grab, back throw, dash, dash attack; missed tech dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack; trap dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash, dash attack covers tech in place, tech in, missed tech | up throw at 0% → up air against 5/5 DI |
 | Cairne Bloodhoof | light | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash, dash, dash attack; tech in down smash; tech away full hop +4, forward air; missed tech down smash, dash, dash attack; trap down smash covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Cairne Bloodhoof | medium | yes | yes | yes | yes | yes | down throw at 0%: tech in place down smash, dash, dash attack; tech in down smash; tech away dash grab, back throw; missed tech down smash, dash, dash attack; trap down smash covers tech in place, tech in, missed tech | up throw at 60% → up tilt against 4/5 DI |
-| Cairne Bloodhoof | heavy | yes | yes | yes | yes | yes | down smash at 20%: tech in place down smash, full hop, down air; tech in down smash, down smash, dash grab, down throw, forward smash; tech away full hop, forward air; missed tech down smash, full hop, down air; trap down smash, down smash, dash grab, down throw, forward smash covers tech in place, tech in, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Cairne Bloodhoof | heavy | yes | yes | yes | **no** | yes | down smash at 20%: tech in place down smash, full hop, down air; tech in down smash, down smash, dash, dash attack; tech away full hop, forward air; missed tech down smash, full hop, down air; trap down smash, down smash, dash, dash attack covers tech in place, tech in, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Chen Stormstout | light | yes | yes | yes | yes | yes | forward throw at 0%: tech in place dash, dash attack; tech in up smash, up smash, full hop, down air, forward smash; tech away full hop, neutral special; missed tech dash, dash attack; trap full hop, neutral special covers tech in place, tech away, missed tech | up throw at 40% → up air against 5/5 DI |
 | Chen Stormstout | medium | yes | yes | yes | yes | yes | forward throw at 0%: tech in place dash grab, back throw, dash, dash attack; tech in up smash, up smash, forward smash; tech away full hop, neutral special; missed tech dash grab, back throw, dash, dash attack; trap dash grab, back throw, dash, dash attack covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Chen Stormstout | heavy | yes | yes | yes | yes | yes | back throw at 0%: tech in place dash, dash attack; tech in forward smash; tech away short hop, neutral special; missed tech dash, dash attack; trap short hop, neutral special covers tech in place, tech away, missed tech | up throw at 60% → up air against 5/5 DI |
 | Peon | light | yes | yes | yes | yes | yes | down tilt at 40%: tech in place short hop, down air, dash grab, back throw; tech in forward smash; tech away dash grab, back throw; missed tech short hop, down air, dash grab, back throw; trap short hop, down air, dash grab, back throw covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
-| Peon | medium | yes | yes | yes | yes | yes | down tilt at 40%: tech in place short hop, down air, dash, dash attack; tech in dash, dash attack; tech away dash grab, back throw; missed tech short hop, down air, dash, dash attack; trap short hop, down air, dash, dash attack covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
+| Peon | medium | yes | yes | yes | yes | yes | down tilt at 40%: tech in place short hop, down air, dash, dash attack; tech in dash, dash attack, dash, dash attack; tech away dash grab, back throw; missed tech short hop, down air, dash, dash attack; trap short hop, down air, dash, dash attack covers tech in place, tech away, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Peon | heavy | yes | yes | yes | yes | yes | down tilt at 60%: tech in place short hop, down air, dash, dash attack; tech in forward smash; tech away full hop, neutral air, short hop, down special; missed tech short hop, down air, dash, dash attack; trap short hop, down air, dash, dash attack covers tech in place, tech away, missed tech | up throw at 0% → up air against 5/5 DI |
 | Goblin Tinker | light | yes | yes | yes | yes | yes | down throw at 40%: tech in place dash, dash attack; tech in short hop, back air; tech away dash grab, back throw; missed tech dash, dash attack; trap dash, dash attack covers tech in place, missed tech | up throw at 0% → up tilt against 4/5 DI |
 | Goblin Tinker | medium | yes | **no** | yes | yes | yes | back throw at 40%: tech in place dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw; tech in up smash, up smash, full hop, back air; tech away uncovered; missed tech dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw; trap dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw, dash grab, back throw covers tech in place, tech in, missed tech | up throw at 0% → up tilt against 4/5 DI |
@@ -203,43 +203,43 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Shadow Hunter | heavy | down throw | 0/0 | 1/0 | 1/0 | 1/0 |
 | Pit Lord | light | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Pit Lord | light | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Pit Lord | light | up throw | 1/1 | 1/1 KD in short hop, back air, out dash, dash attack | 1/0 KD | 1/1 in up tilt, out dash, dash attack |
-| Pit Lord | light | down throw | 0/0 | 0/0 | 0/0 KD | 0/0 |
+| Pit Lord | light | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 KD in short hop, back air, out dash, dash attack | 1/1 in up tilt, out dash, dash attack | 1/1 |
+| Pit Lord | light | down throw | 0/0 | 0/0 KD | 0/0 | 0/0 |
 | Pit Lord | medium | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Pit Lord | medium | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Pit Lord | medium | up throw | 1/1 | 1/1 KD in short hop, back air, out dash, dash attack | 1/1 in up special, out forward tilt | 1/1 in up tilt, out dash, dash attack |
-| Pit Lord | medium | down throw | 0/0 | 0/0 | 0/0 KD | 0/0 |
+| Pit Lord | medium | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 KD in short hop, back air, out dash, dash attack | 1/1 | 1/1 |
+| Pit Lord | medium | down throw | 0/0 | 0/0 KD | 0/0 | 0/0 |
 | Pit Lord | heavy | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Pit Lord | heavy | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Pit Lord | heavy | up throw | 1/1 | 1/1 in forward tilt, out dash, dash attack | 1/1 KD in short hop, back air, out dash, dash attack | 1/1 KD in forward tilt, out down tilt |
-| Pit Lord | heavy | down throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
+| Pit Lord | heavy | up throw | 1/1 | 1/1 KD | 1/1 KD | 1/1 KD in forward tilt, out dash, dash attack |
+| Pit Lord | heavy | down throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 |
 | Rexxar | light | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Rexxar | light | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Rexxar | light | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 KD | 1/1 KD in forward tilt, out dash, dash attack | 1/1 KD in forward tilt, out dash, dash attack |
-| Rexxar | light | down throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Rexxar | light | down throw | 0/0 | 0/0 KD | 1/0 KD | 1/0 KD |
 | Rexxar | medium | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Rexxar | medium | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Rexxar | medium | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 KD | 1/1 KD in forward tilt, out dash, dash attack | 1/1 in forward tilt, out down smash |
-| Rexxar | medium | down throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Rexxar | medium | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 KD | 1/1 KD in forward tilt, out dash, dash attack | 1/1 in forward tilt, out dash, dash attack |
+| Rexxar | medium | down throw | 0/0 | 0/0 KD | 1/0 KD | 1/0 KD |
 | Rexxar | heavy | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Rexxar | heavy | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Rexxar | heavy | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 | 2/1 KD | 1/1 KD in forward tilt, out dash, dash attack |
-| Rexxar | heavy | down throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
+| Rexxar | heavy | down throw | 0/0 | 0/0 | 1/0 KD | 1/0 KD |
 | Lich King | light | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Lich King | light | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Lich King | light | up throw | 1/1 | 1/1 KD | 1/0 KD | 1/1 in up tilt, out forward tilt |
-| Lich King | light | down throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Lich King | light | down throw | 0/0 | 0/0 KD | 0/0 KD | 1/0 KD |
 | Lich King | medium | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Lich King | medium | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Lich King | medium | up throw | 1/1 in up special, out down tilt | 1/1 KD | 1/1 in up special, out down tilt | 1/1 in up tilt, out forward tilt |
-| Lich King | medium | down throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
+| Lich King | medium | up throw | 1/1 | 1/1 KD | 1/1 KD in up special, out dash, dash attack | 1/1 in up tilt, out forward tilt |
+| Lich King | medium | down throw | 0/0 | 0/0 | 0/0 KD | 1/0 KD |
 | Lich King | heavy | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Lich King | heavy | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Lich King | heavy | up throw | 1/1 in up special, out down tilt | 1/1 | 1/1 KD | 1/0 KD |
-| Lich King | heavy | down throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
+| Lich King | heavy | up throw | 1/1 | 1/1 | 1/1 KD | 1/0 KD |
+| Lich King | heavy | down throw | 0/0 | 0/0 | 0/0 KD | 1/0 KD |
 | Thrall | light | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Thrall | light | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Thrall | light | up throw | 1/1 | 1/1 KD in forward tilt, out down smash | 1/1 in dash, dash attack, out forward smash | 1/1 in dash, dash attack, out forward smash |
+| Thrall | light | up throw | 1/1 | 1/1 KD in dash, dash attack, out down smash | 1/1 in dash, dash attack, out forward smash | 1/1 in dash, dash attack, out forward smash |
 | Thrall | light | down throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 |
 | Thrall | medium | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Thrall | medium | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
@@ -260,30 +260,30 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Jaina Proudmoore | heavy | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Jaina Proudmoore | heavy | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Jaina Proudmoore | heavy | up throw | 1/1 in short hop, back air, out dash, dash attack | 1/1 in short hop, back air, out down smash | 1/1 KD in up smash, out forward smash | 1/1 KD in short hop, back air, out dash, dash attack |
-| Jaina Proudmoore | heavy | down throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
+| Jaina Proudmoore | heavy | down throw | 0/0 | 1/0 | 1/0 KD | 1/0 KD |
 | Sylvanas Windrunner | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Sylvanas Windrunner | light | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Sylvanas Windrunner | light | up throw | 1/1 in forward smash, out down smash | 1/1 KD in short hop, back air, out down smash | 1/1 in forward smash, out down smash | 1/1 in dash, dash attack, out down smash |
-| Sylvanas Windrunner | light | down throw | 0/0 | 0/0 | 0/0 | 1/0 |
-| Sylvanas Windrunner | medium | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
+| Sylvanas Windrunner | light | down throw | 1/0 | 1/0 | 1/0 | 1/0 |
+| Sylvanas Windrunner | medium | forward throw | 1/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Sylvanas Windrunner | medium | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Sylvanas Windrunner | medium | up throw | 1/1 in forward smash, out down smash | 1/1 KD in short hop, back air, out down smash | 1/1 in forward smash, out down smash | 1/1 in forward smash, out down smash |
-| Sylvanas Windrunner | medium | down throw | 0/0 | 0/0 | 1/0 | 1/0 |
-| Sylvanas Windrunner | heavy | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
-| Sylvanas Windrunner | heavy | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
+| Sylvanas Windrunner | medium | down throw | 1/0 | 1/0 | 1/0 | 1/0 |
+| Sylvanas Windrunner | heavy | forward throw | 1/1 | 1/1 | 0/0 KD | 0/0 KD |
+| Sylvanas Windrunner | heavy | back throw | 1/0 | 1/1 | 0/0 KD | 0/0 KD |
 | Sylvanas Windrunner | heavy | up throw | 1/1 | 1/1 in dash, dash attack, out forward smash | 1/1 KD in short hop, back air, out forward smash | 2/1 |
-| Sylvanas Windrunner | heavy | down throw | 0/0 | 0/0 | 1/0 | 1/0 |
+| Sylvanas Windrunner | heavy | down throw | 1/0 | 1/0 | 1/0 | 1/0 |
 | Cairne Bloodhoof | light | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | light | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Cairne Bloodhoof | light | up throw | 1/1 | 1/1 KD in short hop, down air, out dash, dash attack | 1/1 KD in up special, out down tilt | 1/1 in full hop in place, down air, out forward tilt |
-| Cairne Bloodhoof | light | down throw | 0/0 KD | 1/0 | 1/0 KD | 1/0 |
+| Cairne Bloodhoof | light | up throw | 1/1 | 1/1 KD in short hop, down air, out dash, dash attack | 1/1 KD in up special, out dash, dash attack | 1/1 in full hop in place, down air, out dash, dash attack |
+| Cairne Bloodhoof | light | down throw | 0/0 KD | 1/0 KD | 1/0 KD | 1/0 |
 | Cairne Bloodhoof | medium | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | medium | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
-| Cairne Bloodhoof | medium | up throw | 1/1 in forward tilt, out down tilt | 1/1 KD in short hop, down air, out dash, dash attack | 1/1 KD in up special, out down tilt | 2/2 in short hop, down air, out dash, dash attack |
-| Cairne Bloodhoof | medium | down throw | 0/0 KD | 1/0 | 1/0 KD | 1/0 |
+| Cairne Bloodhoof | medium | up throw | 1/1 | 1/1 KD in short hop, down air, out dash, dash attack | 1/1 KD | 2/2 in short hop, down air, out dash, dash attack |
+| Cairne Bloodhoof | medium | down throw | 0/0 KD | 1/0 KD | 1/0 KD | 1/0 |
 | Cairne Bloodhoof | heavy | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Cairne Bloodhoof | heavy | back throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
-| Cairne Bloodhoof | heavy | up throw | 1/1 in up tilt, out down tilt | 1/1 | 2/1 | 1/1 KD in forward tilt, out down tilt |
+| Cairne Bloodhoof | heavy | up throw | 1/1 | 1/1 KD | 2/1 | 1/1 KD |
 | Cairne Bloodhoof | heavy | down throw | 1/0 | 1/0 | 1/0 KD | 1/0 KD |
 | Chen Stormstout | light | forward throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Chen Stormstout | light | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
@@ -292,11 +292,11 @@ Follow-ups that land without a read: without DI / with the escape-optimal DI. A 
 | Chen Stormstout | medium | forward throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Chen Stormstout | medium | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Chen Stormstout | medium | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in forward tilt, out dash, dash attack | 2/1 in up smash, out down smash | 1/1 in short hop, back air, out dash, dash attack |
-| Chen Stormstout | medium | down throw | 0/0 | 0/0 | 0/0 | 0/0 |
-| Chen Stormstout | heavy | forward throw | 0/0 | 0/0 KD | 0/0 KD | 0/0 KD |
+| Chen Stormstout | medium | down throw | 0/0 | 0/0 | 0/0 | 1/0 |
+| Chen Stormstout | heavy | forward throw | 1/0 | 0/0 KD | 0/0 KD | 0/0 KD |
 | Chen Stormstout | heavy | back throw | 0/0 KD | 0/0 KD | 0/0 KD | 0/0 KD |
 | Chen Stormstout | heavy | up throw | 1/1 in forward tilt, out dash, dash attack | 1/1 in short hop, back air, out dash, dash attack | 1/1 in up smash, out down smash | 1/1 in up smash, out down smash |
-| Chen Stormstout | heavy | down throw | 0/0 | 0/0 KD | 1/0 | 1/0 |
+| Chen Stormstout | heavy | down throw | 0/0 | 1/0 | 1/0 | 1/0 |
 | Peon | light | forward throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Peon | light | back throw | 0/0 | 0/0 | 0/0 KD | 0/0 KD |
 | Peon | light | up throw | 1/1 in down special, out dash, dash attack | 1/1 in down special, out short hop, forward air | 1/1 in up smash, out short hop, forward air | 1/1 in down special, out dash, dash attack |
