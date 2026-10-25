@@ -13,7 +13,7 @@ import { seconds } from "./asset-info";
 import { encodeVerified, ensure, hash, onGlobalClock, originalBodyClip, parseSource, tracks } from "./original-clips";
 import { HIGH_STRETCH, PAIN_GAIN, PainBody, painGate, standIndex } from "./pain-gate";
 
-interface Shape { chest?: number; head?: number; right?: number; left?: number; elbow?: number; legs?: number; knees?: number; root?: number; yaw?: number; height?: number; hands?: number }
+interface Shape { chest?: number; head?: number; right?: number; left?: number; elbow?: number; legs?: number; knees?: number; root?: number; yaw?: number; height?: number; hands?: number; travel?: number }
 interface Phase extends Shape { frame: number }
 interface Action { pose: string; frames: number; contact?: number; phases: Phase[]; donor?: number; loop?: boolean }
 const strike = (pose: string, first: number, active: number, recovery: number, contact: Shape, prepare: Shape = {chest: -12, right: -20, left: -15}, donor = 6): Action => ({
@@ -41,11 +41,11 @@ const actions: Action[] = [
   strike("forwardTiltDown",8,3,20,{right:15,left:10,chest:45,elbow:-35,legs:32,knees:45},{chest:-25,right:-45,left:-35}),
   strike("upTilt",7,4,22,{right:-45,left:-45,chest:0,elbow:0},{chest:35,right:30,left:30,legs:35,knees:45}),
   strike("downTilt",6,3,19,{right:32,left:-28,chest:45,legs:45,knees:65,yaw:25}),
-  {pose:"dashAttack",frames:39,donor:6,phases:[{frame:0},{frame:4,root:-12,chest:-40,head:12,right:-70,left:-60,legs:35,knees:55},
-    {frame:7,root:8,chest:40,right:50,left:54,elbow:-45,legs:30,knees:20},{frame:9,root:12,chest:46,right:56,left:58,elbow:-54,legs:38,knees:18},
-    {frame:12,root:14,chest:48,head:-8,right:66,left:56,elbow:-50,legs:42,knees:16},{frame:15,root:15,chest:49,head:6,right:54,left:70,elbow:-50,legs:46,knees:14},
-    {frame:18,root:20,chest:52,right:62,left:62,elbow:-50,legs:50,knees:12},{frame:22,root:21,chest:54,head:8,right:72,left:70,elbow:-38,legs:44,knees:28},
-    {frame:33,root:-2,chest:-5,head:-3,right:-5,left:-4,legs:3,knees:4},{frame:39}]},
+  {pose:"dashAttack",frames:39,donor:6,phases:[{frame:0},{frame:4,travel:-22,root:-16,chest:-18,head:12,right:-168,left:-158,elbow:10,legs:36,knees:70},
+    {frame:7,travel:20,root:30,chest:30,head:-10,right:30,left:34,elbow:-55,legs:-30,knees:45},{frame:9,travel:24,root:32,chest:30,right:26,left:30,elbow:-56,legs:-34,knees:48},
+    {frame:13,travel:22.5,root:32,chest:26,head:-4,right:10,left:16,elbow:-56,legs:-34,knees:48},{frame:16,travel:22,root:31,chest:20,right:-4,left:2,elbow:-54,legs:-34,knees:48},
+    {frame:18,travel:21.5,root:30,chest:16,head:4,right:-14,left:-8,elbow:-52,legs:-34,knees:48},{frame:22,travel:21,root:20,chest:8,head:6,right:-24,left:-18,elbow:-44,legs:-24,knees:46},
+    {frame:29,travel:9,root:-10,chest:-12,head:-8,right:32,left:28,elbow:-10,legs:18,knees:56},{frame:34,travel:2,root:-4,chest:-5,head:-3,right:8,left:6,elbow:-2,legs:6,knees:16},{frame:39}]},
   strike("forwardSmash",20,4,34,{right:80,left:28,chest:30,elbow:-42},{right:-58,left:-28,chest:-20},16),
   strike("upSmash",17,5,32,{right:-90,left:-90,chest:-8,legs:-12},{right:8,left:8,chest:32,legs:35,knees:55}),
   strike("downSmash",16,6,32,{right:46,left:46,chest:32,yaw:155,legs:32,knees:45},{right:-24,left:20,chest:-15,yaw:-55}),
@@ -138,7 +138,7 @@ function sample(track: mdx.AnimVector, sequence: number, progress=0): Float32Arr
 function shapeAt(action:Action,frame:number):Shape {
   const a=action.phases.findLast(p=>p.frame<=frame)??action.phases[0]!,b=action.phases.find(p=>p.frame>=frame)??action.phases.at(-1)!;
   const t=a.frame===b.frame?0:(frame-a.frame)/(b.frame-a.frame);
-  return Object.fromEntries(["chest","head","right","left","elbow","legs","knees","root","yaw","height","hands"].map(k=>[k,(a[k as keyof Shape]??0)*(1-t)+(b[k as keyof Shape]??0)*t]));
+  return Object.fromEntries(["chest","head","right","left","elbow","legs","knees","root","yaw","height","hands","travel"].map(k=>[k,(a[k as keyof Shape]??0)*(1-t)+(b[k as keyof Shape]??0)*t]));
 }
 function rotate(q:Float32Array|Int32Array,degrees:number,axis=1):Float32Array {
   const r=[0,0,0,Math.cos(degrees*Math.PI/360)];r[axis]=Math.sin(degrees*Math.PI/360);
@@ -195,7 +195,7 @@ for(const [offset,action]of actions.entries()){
   for(let frame=0;frame<=action.frames;frame++){
     const triangles=unplanted.triangles(23+offset,frame/60,1);let lowest=Infinity;
     for(let i=1;i<triangles.length;i+=2)lowest=Math.min(lowest,triangles[i]!);
-    motion.Translation!.Keys.push({Frame:start+Math.round(frame*1000/60),Vector:new Float32Array([0,0,-lowest])});
+    motion.Translation!.Keys.push({Frame:start+Math.round(frame*1000/60),Vector:new Float32Array([shapeAt(action,frame).travel??0,0,-lowest])});
   }
 }
 
@@ -323,7 +323,7 @@ function plantFloor(chosen:readonly Action[],cells:readonly number[],low:(cell:n
   for(const [n,action]of chosen.entries()){
     const start=model.Sequences[cells[n]!]!.Interval[0]!;
     const lows=Array.from({length:action.frames+1},(_,frame)=>low(cells[n]!,frame/60));
-    for(const [frame,lowest]of lows.entries())floor.Translation!.Keys.find(k=>k.Frame===frameKey(start,frame))!.Vector=new Float32Array([0,0,-lowest]);
+    for(const [frame,lowest]of lows.entries())floor.Translation!.Keys.find(k=>k.Frame===frameKey(start,frame))!.Vector=new Float32Array([shapeAt(action,frame).travel??0,0,-lowest]);
   }
 }
 function frameKey(start:number,frame:number){return start+Math.round(frame*1000/60);}

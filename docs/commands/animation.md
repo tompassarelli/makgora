@@ -171,7 +171,9 @@ smashcraft:docs/design/animation-reference.md. Reference pixels remain private.
   (smashcraft:docs/fighter-animation-work.md, "Goblin Tinker"). Given the shipped
   model instead, `pain` re-keys the nine pain cells and `rekey POSE...` re-keys the
   named clips in place at their shipped indices and lengths, leaving every other
-  sequence unchanged.
+  sequence unchanged. A phase's `travel` moves the whole drawn body forward by that
+  many model units through the floor-planting helper, so a lunge carries its mass
+  toward the target instead of tipping in place.
 
 - Lich King animation authoring (from the repository root):
   `tools/smashcraft-tools/target/release/smashcraft-tools build-lichking [PRIVATE_INPUTS] [IMMUTABLE_EXISTING_MODEL] [--replace NAME]...`
