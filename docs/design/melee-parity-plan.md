@@ -316,14 +316,21 @@ shapes`, reads our kit values as `ts/scripts/balanceKit.ts` does, and its
 `--check` runs in `bun run check`. Each rule lists its exceptions, each with a
 reason.
 
-- **Range triangle** (#318, #319): jab wins up close; tilts beat jabs and some
-  short-hop aerials on speed; smashes start later and have more end lag. In
-  `libmelee.jsonl`, smash startup is later than the matching tilt for 22 of 23
-  fighters (Link is the exception, frame 15 against 16). Forward smash reaches
-  further than forward tilt for only 11 of 23, because libmelee positions leave
-  out the fighter's own travel during the move. So the reach ordering becomes a
-  rule only after travel is added from a public source and the ordering is
-  measured again (#318).
+- **Range triangle and smash budget** (#318, #319): jab wins up close; tilts
+  beat jabs and some short-hop aerials on speed. Tom's move-budget rule
+  (2026-10-26): every smash is more committal than its matching tilt (later
+  start, more total frames) and pays that back on at least one axis besides
+  power. The axes are (a) reach equal to the tilt's or slightly more, (b) a
+  meatier hitbox that stays out longer, or (c) hurtbox manipulation that dodges
+  situationally, as Captain Falcon's forward smash leans back under grabs. Power
+  is a separate axis of the same budget. In `records.jsonl`, smash totals
+  average 49 frames against 33 for tilts. Active spans average 6.9 against 5.0
+  forward, 11.7 against 8.3 up and 12.0 against 4.1 down. Reach is unproven
+  until forward travel is added: libmelee positions omit it, so forward smash
+  out-reaches forward tilt for only 11 of 23. #318 adds travel, measures every
+  axis and records the rule in `docs/gameplay-design.md`. #319 fails a smash
+  that is more committal but wins on none of reach, active span or hurtbox
+  manipulation, with recorded exceptions.
 - **Hitbox radius bands** (#320): Melee's largest hitbox radius per move type,
   median across fighters in Melee units: jab and tilts 3.9, forward and down
   smash 4.7, up smash 5.1, aerials 4.3-5.5, dash attack 4.5. Ours, relative to
