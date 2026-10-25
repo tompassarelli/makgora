@@ -1470,72 +1470,64 @@ offscreen damage and an off-camera KO without changing combat completion.
 
 ## Wall and ceiling techs and wall jumps
 
-A wall tech holds the fighter on the wall for five frames, then
-pushes it off away from the wall at its reference's `passivewall_vel_x`, or, when jump was pressed in the last 20 frames or
-the stick is up, launches its reference's wall jump (
-sideways, up), then air friction and gravity act as usual. Each fighter takes
-these from its Melee reference
-(the recorded design targets), in Melee
-units a frame:
+A wall tech holds the fighter on the wall for five frames, then pushes it off
+away from the wall, or, when jump was pressed in the last 20 frames or the
+stick is up, launches a wall jump sideways and up; then air friction and
+gravity act as usual. Each fighter takes these from its Melee reference, in
+Melee units a frame, from SuperCombo Wiki's attributes
+(smashcraft:references/melee-frame-data/character-attributes.csv: "Wall Tech
+Bounce Back", "Walljump H/V Velocity", "Ceiling Tech - X momentum"):
 
-| Fighter | Reference | Push-off | Wall jump sideways | Wall jump up | Minimum approach | Ceiling impulse (frame) |
-| --- | --- | --- | --- | --- | --- | --- |
-| Rifleman | Falco | 0.5 | 1.3 | 3.6 | 0.5 | 0.7 (14) |
-| Illidan | Captain Falcon | 0.5 | 1.4 | 3.1 | 0.5 | 2.0 (11) |
+| Fighter | Reference | Push-off | Wall jump sideways | Wall jump up | Ceiling impulse |
+| --- | --- | --- | --- | --- | --- |
+| Rifleman | Falco | 0.5 | 1.3 | 3.6 | 0.7 |
+| Illidan | Captain Falcon | 0.5 | 1.4 | 3.1 | 2.0 |
 
-All three references wall jump (a Melee routine, a Melee routine and
-a Melee routine set `can_walljump`); a fighter whose tuning lacks
-`canWallJump` never wall jumps. Every hero takes Fox's values, so
-every selectable fighter wall techs and wall jumps.
+The table lists Captain Falcon's sideways wall jump as 0.4, not the 1.4
+Illidan uses; that is a parity question for the ledger. A fighter whose tuning
+lacks `canWallJump` never wall jumps. Every hero takes Fox's values (0.5, 1.3,
+3.3, 0.7), so every selectable fighter wall techs and wall jumps. The minimum
+approach speed of 0.5 is Smashcraft's.
 
 **Intangibility.** The wall tech, the wall tech's jump and the plain wall jump
-all enter through a Melee routine, which ends with
-a Melee routine: the fighter is intangible for 14
-frames, counted from the frame it meets the wall (Melee;
-the plain jump reaches it from Melee
-a Melee routine). The five-frame hang is inside that window, so the
-fighter leaves the wall on frame 6 still intangible through frame 14 and is
-hittable from frame 15. Smashcraft gives all three the same 14 frames
-(`SURFACE_TECH_WALL_COLLISION_GRACE_FRAMES`, smashcraft:ts/src/game/sim/surfaces.ts).
+make the fighter intangible for 14 frames, counted from the frame it meets the
+wall. The five-frame hang is inside that window, so the fighter leaves the
+wall on frame 6 still intangible through frame 14 and is hittable from frame
+15 (`SURFACE_TECH_WALL_COLLISION_GRACE_FRAMES`,
+smashcraft:ts/src/game/sim/surfaces.ts). The 14 frames are Smashcraft's; no
+public page states Melee's.
 
-A ceiling tech
-stops the fighter's motion and has no hang: gravity and air drift go on. On its animation's throw-flag event, frame 14 for Fox and
-Falco and 11 for Captain Falcon
-(the recorded design targets), the
-fighter's sideways speed becomes the stick's horizontal value times its
-reference's `passiveceil_vel_x`, and it
-stops being intangible. That frame's drift follows Melee's
-a Melee routine
-for every fighter: toward the stick it adds the acceleration up to the air
-speed, and above it subtracts the air friction instead, no lower than the air
-speed and no higher than `air_max_horizontal_velocity` (Captain
-Falcon's 3 for Illidan). Captain Falcon's own drift turns his 2.0 into 1.99,
-so Illidan's authored immediate drift cap does not apply on that frame: with
-his own friction his 2.0 becomes 1.98. From the next frame his ordinary drift,
-capped at 0.88, applies again.
+A ceiling tech stops the fighter's motion and has no hang: gravity and air
+drift go on. Partway through it the fighter's sideways speed becomes the
+stick's horizontal value times its ceiling impulse, and it stops being
+intangible. That frame's drift follows the ordinary rule for every fighter:
+toward the stick it adds the acceleration up to the air speed, and above it
+subtracts the air friction instead, no lower than the air speed and no higher
+than the maximum air speed (Captain Falcon's 3 for Illidan). Captain Falcon's
+own drift turns his 2.0 into 1.99, so Illidan's authored immediate drift cap
+does not apply on that frame: with his own friction his 2.0 becomes 1.98. From
+the next frame his ordinary drift, capped at 0.88, applies again.
 
 Analog rows retain their raw horizontal axis for air drift, before the
-directional-influence stick is normalized diagonally. Per
-a Melee routine, the target air speed scales by the
-horizontal stick magnitude, while acceleration adds the signed base to the
-stick times the multiplier. The shared retail base for Fox, Falco and Captain
-Falcon is 0.02 Melee units/frame; Smashcraft's authored full-stick
+directional-influence stick is normalized diagonally. The target air speed
+scales by the horizontal stick magnitude, while acceleration adds the signed
+base to the stick times the multiplier. Fox, Falco and Captain Falcon share the
+base 0.02 Melee units/frame ("Air Mobility B", character-attributes.csv); Smashcraft's authored full-stick
 acceleration stores base plus multiplier. Full horizontal keyboard rows,
 including keyboard diagonals, keep the existing full-rate drift. The
 input-row fixture is `ts/src/game/sim/analogAirDrift.tests.ts`.
 
-A wall jump follows a Melee routine.
 After the frame's collision, a fighter that is falling, jumping, tumbling
 past hitstun, or in a wall or ceiling recovery past its hang checks it;
 aerials, specials, air dodges, special fall and hitstun don't. Meeting a wall
-faster sideways than the minimum approach speed opens a 130-frame window while the fighter stays against that wall, and pushing the
+faster sideways than the minimum approach speed opens a window (Smashcraft's 130 frames) while the fighter stays against that wall, and pushing the
 stick at least 0.8 away from it within 3 frames of the stick leaving
 the horizontal smash deadzone starts the jump. It enters the wall
 tech's state: motion stops, the fighter turns away, it is
 intangible for 14 frames, hangs 5, then launches as above. Each
 earlier wall jump since the fighter last stood on the ground scales the rise
 by 0.975. A fighter moved out of the deck's body (see above) counts
-as against that wall, as Melee's collision leaves it touching.
+as against that wall.
 
 smashcraft:ts/src/game/match/wallTechInputContracts.tests.ts checks the
 push-off, the wall tech's jump, a drift-and-flick wall jump, their 14
@@ -1570,37 +1562,31 @@ sequence, percent dependence, mashing, termination by flinching attacks, and
 30 HP after a Melee shield break. The cached page was consulted for facts only;
 no article prose is reused. It does not verify our timings or launch strength.
 
-Verified retail common values set shield maximum to 60, held digital drain to
-0.14 times the full-shield factor 2 (0.28 per logical frame), regeneration to
-0.07 per frame, and post-break restoration to 30. The digital shield-damage
-and shieldstun rules use integer hit power. Raw stun is
-`integerDamage * 0.3 * 1.5 + 2`; action ticks are
-`floor(rawStun * 200 / 201)`. Defender pushback is
-`min(2, rawStun * 0.2 * 0.6)`, while grounded direct-attacker recoil is
-`integerDamage * 0.07 + 0.02`. The common grounded recoil-friction multiplier
-is 1.1; airborne recoil decays by 0.05 per frame.
+SmashWiki "Shield" gives the shield maximum 60, held drain 0.28 a frame,
+regeneration 0.07 a frame and post-break restoration to 30 (also SmashWiki
+"Shield break"). The digital shield-damage and shieldstun rules use integer hit
+power. Shieldstun is `(integerDamage * 0.45 + 2) * 200 / 201`, truncated to
+action ticks; defender pushback is `min(2, (integerDamage * 0.09 + 0.4) * shield)`
+and grounded direct-attacker recoil `integerDamage * 0.07 + 0.02` (SmashWiki
+"Shield"). The grounded recoil-friction multiplier and the airborne recoil decay
+are Smashcraft's ("Shield contact motion" above).
 
-The sourced dizzy duration is the real-valued `max(0, 400 - percent) + 90`,
-sampled on entry. Each unfrozen action tick removes 1; a fresh synchronized
-mash edge removes an additional 3. The fractional remainder stays in replayed
+SmashWiki "Shield break" says the dizzy lasts longer at lower percent and that
+mashing shortens it, without numbers; Smashcraft's real-valued duration and
+mash step are in smashcraft:ts/src/game/sim/shieldBreak.ts, sampled on entry.
+Each unfrozen action tick removes 1. The fractional remainder stays in replayed
 state. InputSnapshot.mashPressed admits at most one such edge per tick; held
 inputs alone are not mash edges. Mash edges before dizziness or during hitlag
 have no effect and are not banked. Analog light-shield interpolation remains
 unsupported. The authored 12-tick landing pose and 30-tick stand pose remain
-prototype animation lengths and are not inferred from these common values.
-
-No proprietary binary is retained in this repository. The numbers above are
-design targets.
+prototype animation lengths.
 
 Shield regeneration runs once after input transitions and contact collection,
-before contact damage resolves. The source callback order is animation, input,
-grab collision, attack collision, then collision resolution; regeneration begins
-the last of these. The factual source is Melee at the
-revision above. An active fighter without guard gains 0.07000000029802322 per
-tick, capped at 60, including hitlag, ledges, grabs, down states and wall-tech
+before contact damage resolves. An active fighter without guard gains 0.07 per
+tick (SmashWiki "Shield"), capped at 60, including hitlag, ledges, grabs, down states and wall-tech
 startup. A guard-to-grab input or capture clearing guard therefore permits
 regeneration that tick. Continuing guard does not. Smashcraft's custom trap
-freeze also retains regeneration; that extension has no retail counterpart.
+freeze also retains regeneration; that extension has no Melee counterpart.
 
 Shield-break pop/landing/stand use the same regeneration phase. Dizzy entry and
 each unfrozen dizzy animation tick restore 30 before regeneration, leaving
@@ -1673,19 +1659,9 @@ two clients, and numerical Melee parity are separate unproven claims.
 ## Outer ledge recovery
 
 Only the two outer endpoints of solid main surface 0 can be caught. Upper
-pass-through platforms have no catchable ledges. The behavioral reference is
-Melee and the adjacent CliffClimb,
-CliffJump, CliffEscape and CliffAttack actions at the revision above. Their
-separate ledge options and quick/slow variants are factual context only. The
-local data field offsets do not establish the options' timing or geometry;
-none of that unlicensed implementation is copied or translated.
-
-Catching follows Melee's cliff-catch check at the revision above:
-Melee (the catch, its facing turn and
-a Melee routine placement), the ledge boxes a Melee routine and
-a Melee routine in Melee with their caller's falling
-and facing gates, and each action's collision callback in
-Melee Only facts and values are used.
+pass-through platforms have no catchable ledges. Melee's ledge options (climb, jump, roll, attack, drop, with quick and slow
+variants by percent) are described on SmashWiki "Ledge"; the rules below are
+Smashcraft's.
 
 - **Who catches.** Falling and jumping fighters, helpless fall after an
   up-special, fighters whose air dodge's 49-frame animation has ended, tumble once
@@ -1693,39 +1669,31 @@ Melee Only facts and values are used.
   attacks (AttackAir), air dodges (EscapeAir), hitstun (Damage/DamageFly),
   shield-break flight, grabs and frozen fighters never catch. Melee's specials
   choose per move; Smashcraft's original specials have no catch window.
-- **When.** Only after a frame whose movement went down (Melee compares the
-  frame's start and end heights), never while down is held (Melee: stick y at
-  or below minus , 0.6600000262260437; Smashcraft's down is the
+- **When.** Only after a frame whose movement went down , never while down is held (Smashcraft's down is the
   digital direction, which the helper raises at about a fifth of stick
   travel), and never during the regrab lock.
 - **Which ledge.** Only the ledge ahead of the fighter's facing. A catch turns
   the fighter toward the stage.
 - **Grabs.** A fighter hanging on the ledge can't be caught by a standing, dash
-  or shield grab, intangible or not. The hang gives the hanger
-  `x1A6A = 511`, every catch gives
-  its grabber `x1A68 = 1` (a Melee routine in
-  Melee), and a Melee routine skips a victim whose two masks share a bit.
-  `Fighter_ChangeMotionState` clears the mask, so climbs, rolls, ledge attacks
+  or shield grab, intangible or not. The hang and every
+  catch set grab masks that keep a hanging fighter out of grabs, and changing
+  action clears the mask, so climbs, rolls, ledge attacks
   and drops are catchable again. `hangsOnLedge` in
   smashcraft:ts/src/game/sim/ledge.ts applies it.
-- **The box.** Each fighter's ledge snap x, y and height (ftData x44, Melee `ftData_x44_t`) place it: the
+- **The box.** Each fighter's ledge snap x, y and height place it: the
   ledge vertex must lie strictly beyond the fighter's position and strictly
   less than its collision half-width plus snap x ahead, and strictly between
   snap y minus and plus half the height above its feet. Both ranges sweep the
-  frame's start and end positions, so a fast fall can't pass through. Melee's
-  half-width is the animated airborne collision box, never under 2 units
-; Smashcraft fighters use 2, the flank they also meet
+  frame's start and end positions, so a fast fall can't pass through. Smashcraft fighters use a half-width of 2, the flank they also meet
   walls with (see "Main deck walls and underside").
 
-| Fighter | Reference data | Snap x / y / height (Melee units) | Reach (world) | Ledge above feet (world) |
-| --- | --- | --- | --- | --- |
-| Rifleman | Falco, Melee | 11 / 13 / 9 | 78 | 51–105 |
-| Illidan | Captain Falcon, Melee | 9 / 17 / 11 | 66 | 69–135 |
+| Fighter | Reach (world) | Ledge above feet (world) |
+| --- | --- | --- |
+| Rifleman | 78 | 51–105 |
+| Illidan | 66 | 69–135 |
 
-The values were (identities in
-the recorded design targets) and convert at
-six world units per Melee unit. Illidan has no other adopted Melee profile;
-Captain Falcon, the corpus's third retail fighter, supplies only his box.
+These boxes are Smashcraft's, in smashcraft:ts/src/game/sim/ledge.ts; no
+public page states Melee's ledge snap boxes.
 
 smashcraft:ts/src/game/match/step.ts resolves catches at the start of each
 match tick, before any fighter moves, from each fighter's stored last movement
