@@ -308,6 +308,39 @@ Running work is absorbed, not restarted:
   her edge-guard tools (#307).
 - Tilt-modifier values (#282) land as filed; they are the stick rows of #289.
 
+## Move shapes
+
+Tom asked (2026-10-26) for rules on move shape, drawn from Melee data, as
+checks in the character-creation and balance tooling. A command, `bun wisp
+shapes`, reads our kit values as `ts/scripts/balanceKit.ts` does, and its
+`--check` runs in `bun run check`. Each rule lists its exceptions, each with a
+reason.
+
+- **Range triangle** (#318, #319): jab wins up close; tilts beat jabs and some
+  short-hop aerials on speed; smashes start later and have more end lag. In
+  `libmelee.jsonl`, smash startup is later than the matching tilt for 22 of 23
+  fighters (Link is the exception, frame 15 against 16). Forward smash reaches
+  further than forward tilt for only 11 of 23, because libmelee positions leave
+  out the fighter's own travel during the move. So the reach ordering becomes a
+  rule only after travel is added from a public source and the ordering is
+  measured again (#318).
+- **Hitbox radius bands** (#320): Melee's largest hitbox radius per move type,
+  median across fighters in Melee units: jab and tilts 3.9, forward and down
+  smash 4.7, up smash 5.1, aerials 4.3-5.5, dash attack 4.5. Ours, relative to
+  body size, must sit in the band for the move type.
+- **Dash attacks** (#321-#324): Melee's share one shape at different speeds.
+  From `records.jsonl`: Fox and Falco active 4-17, total 39; Sheik 6-12, total
+  37; Captain Falcon 7-16, total 39; Mario 6-25, total 48; Marth 12-15, total
+  49. Shieldstun is 5-7, so they are punishable on shield, and the fighter keeps
+  its run momentum through the move. Ours are inconsistent: Maiev 5-7, total 18;
+  Mountain King 11-15, total 26. The rule is derived from all 26 fighters, then
+  our 26 dash attacks are retuned to it in three batches. Each fighter whose
+  animation no longer reads as a lunging dash attack gets its own re-authoring
+  issue.
+- **Later tuning note, not part of parity:** Tom thinks Melee's dash attacks are
+  a little too strong at high percent. Revisit this after the baseline, as a
+  deviation row with its own decision.
+
 ## Order of work
 
 1. Clean room: #285, #286.
@@ -316,6 +349,8 @@ Running work is absorbed, not restarted:
 4. Analyzer: link table #294, FightCore reader #310, per-phase and threshold intake #313 then #315, threshold oracle #314, Fox fixture #295, fixture fighter #296, validation #297, attribution #298, objectives #299.
 5. Baseline tag #302; combo-ease measure #300 and Tom's pick #301.
 6. Maiev: targets #303, movement #304, aerials #305, ground game and throws #306, edge guard #307, balance field #308.
+
+7. Move shapes: travel and reach #318, shapes check #319, radius bands #320, dash-attack rule #321, dash-attack retunes #322, #323, #324.
 
 ## Numbers we lack
 
