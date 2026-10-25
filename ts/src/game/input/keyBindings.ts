@@ -45,6 +45,24 @@ const code = (character: string) => character.charCodeAt(0);
 
 const RESERVED_KEYS: readonly number[] = [8, 13, 27, 75, 89, 112, 116, 117, 118];
 
+const RESERVED_REASONS: Readonly<Record<number, string>> = {
+  8: "Backspace is reserved for Pause",
+  13: "Enter is reserved for Warcraft chat",
+  27: "Escape is reserved for cancel",
+  75: "K is reserved for saving a moment",
+  89: "Y is reserved for Start",
+  112: "F1 is reserved for this screen",
+  116: "F5 is reserved for Warcraft shortcuts",
+  117: "F6 is reserved for Warcraft shortcuts",
+  118: "F7 is reserved for Warcraft shortcuts",
+};
+
+export const CLEAR_KEY = 0x2e;
+
+export function reservedReason(key: number): string | undefined {
+  return RESERVED_REASONS[key];
+}
+
 export function slotIndex(action: Action, slot: KeySlot): number {
   return action * 2 + slot;
 }
@@ -157,6 +175,33 @@ function bindSlot(keys: number[], index: number, key: number): boolean {
 export function rebind(bindings: KeyBindings, action: Action, slot: KeySlot, key: number | undefined): boolean {
   if (key === EMPTY) return false;
   return bindSlot(bindings.keys, slotIndex(action, slot), key ?? EMPTY);
+}
+
+export type AssignResult = { kind: "bound" } | { kind: "swapped"; with: Action } | { kind: "reserved"; reason: string } | { kind: "invalid" };
+
+export function assignKey(bindings: KeyBindings, action: Action, slot: KeySlot, key: number): AssignResult {
+  const reason = reservedReason(key);
+  if (reason !== undefined) return { kind: "reserved", reason };
+  if (key < 1 || key > 255) return { kind: "invalid" };
+  const { keys } = bindings;
+  const index = slotIndex(action, slot);
+  const other = keys.indexOf(key);
+  if (other < 0 || other === index) {
+    keys[index] = key;
+    return { kind: "bound" };
+  }
+  keys[other] = keys[index] ?? EMPTY;
+  keys[index] = key;
+  const held = ACTION_ORDER[floorDiv(other, 2)];
+  return held === undefined || held === action ? { kind: "bound" } : { kind: "swapped", with: held };
+}
+
+export function clearSlot(bindings: KeyBindings, action: Action, slot: KeySlot): void {
+  bindings.keys[slotIndex(action, slot)] = EMPTY;
+}
+
+export function unboundActions(bindings: Readonly<KeyBindings>): Action[] {
+  return ACTION_ORDER.filter((action) => keyFor(bindings, action, 0) === undefined && keyFor(bindings, action, 1) === undefined);
 }
 
 

@@ -13,9 +13,15 @@ import {
   decodeBindings,
   encodeBindings,
   presetBindings,
+  presetOf,
   actionFor,
-  rebind,
+  assignKey,
+  CLEAR_KEY,
+  clearSlot,
+  keyFor,
+  keyLabel,
   slotIndex,
+  unboundActions,
 } from "../input/keyBindings";
 
 
@@ -49,6 +55,7 @@ export interface BindingSettings {
   profile: SavedProfile;
   fromProfile: boolean;
   capture: BindingCapture | undefined;
+  layout: BindingPreset;
 
   revision: number;
 
@@ -56,7 +63,7 @@ export interface BindingSettings {
 }
 
 export function createBindingSettings(owner: number, persistence: BindingPersistence): BindingSettings {
-  return { owner, persistence, bindings: presetBindings(DEFAULT_PRESET), ready: false, profile: "unknown", fromProfile: false, capture: undefined, revision: 0, message: "Loading controls..." };
+  return { owner, persistence, bindings: presetBindings(DEFAULT_PRESET), ready: false, profile: "unknown", fromProfile: false, capture: undefined, layout: DEFAULT_PRESET, revision: 0, message: "Loading controls..." };
 }
 
 
@@ -71,11 +78,13 @@ function applyStartingLoad(settings: BindingSettings, result: BindingLoadResult)
   const saved = result.kind === "loaded" ? decodeBindings(storedBindings(result.encoded)) : undefined;
   if (saved !== undefined) {
     settings.bindings = saved;
+    settings.layout = presetOf(saved) ?? settings.layout;
     settings.profile = "saved";
     settings.fromProfile = true;
     settings.message = "Saved profile loaded. Press Done to choose a fighter.";
   } else {
     settings.bindings = presetBindings(DEFAULT_PRESET);
+    settings.layout = DEFAULT_PRESET;
     settings.profile = result.kind === "unavailable" ? "unavailable" : "none";
     settings.fromProfile = false;
     settings.message = result.kind === "loaded" ? `Saved controls were invalid; using ${PRESET_NAMES[DEFAULT_PRESET]} defaults.` : `${PRESET_NAMES[DEFAULT_PRESET]} controls ready. Pick a layout, then press Done.`;
@@ -103,6 +112,7 @@ export function loadSavedBindings(settings: BindingSettings, done: (message: str
     const saved = result.kind === "loaded" ? decodeBindings(storedBindings(result.encoded)) : undefined;
     if (saved !== undefined) {
       settings.bindings = saved;
+      settings.layout = presetOf(saved) ?? settings.layout;
       settings.capture = undefined;
       settings.revision++;
       settings.profile = "saved";
@@ -126,6 +136,7 @@ export function useDefaultBindings(settings: BindingSettings): void {
 export function applyBindingPreset(settings: BindingSettings, preset: BindingPreset): void {
   if (!settings.ready) return;
   settings.bindings = presetBindings(preset);
+  settings.layout = preset;
   settings.revision++;
   settings.fromProfile = false;
   settings.capture = undefined;
@@ -135,22 +146,56 @@ export function applyBindingPreset(settings: BindingSettings, preset: BindingPre
 export function beginBindingCapture(settings: BindingSettings, action: Action, slot: KeySlot): void {
   if (!settings.ready) return;
   settings.capture = { action, slot };
-  settings.message = `Press a key for ${ACTION_LABELS[action]}.`;
+  settings.message = `Press a key for ${ACTION_LABELS[action]}. Delete clears it, Escape cancels.`;
 }
 
+function edited(settings: BindingSettings, message: string): void {
+  settings.capture = undefined;
+  settings.revision++;
+  settings.fromProfile = false;
+  settings.message = message;
+}
+
+function clearedMessage(settings: Readonly<BindingSettings>, action: Action, key: number | undefined): string {
+  const unbound = keyFor(settings.bindings, action, 0) === undefined && keyFor(settings.bindings, action, 1) === undefined;
+  return unbound ? `${ACTION_LABELS[action]} is now unbound.` : `${keyLabel(key)} cleared from ${ACTION_LABELS[action]}.`;
+}
 
 export function captureBinding(settings: BindingSettings, key: number): boolean {
   const { capture } = settings;
   if (capture === undefined) return false;
-  if (rebind(settings.bindings, capture.action, capture.slot, key)) {
-    settings.capture = undefined;
-    settings.revision++;
-    settings.fromProfile = false;
-    settings.message = "Binding updated.";
-  } else {
-    settings.message = "That key is reserved or already assigned. Press another key.";
+  if (key === CLEAR_KEY) {
+    const old = keyFor(settings.bindings, capture.action, capture.slot);
+    clearSlot(settings.bindings, capture.action, capture.slot);
+    edited(settings, clearedMessage(settings, capture.action, old));
+    return true;
   }
+  const result = assignKey(settings.bindings, capture.action, capture.slot, key);
+  if (result.kind === "swapped") edited(settings, `Swapped with ${ACTION_LABELS[result.with]}.`);
+  else if (result.kind === "bound") edited(settings, "Binding updated.");
+  else if (result.kind === "reserved") settings.message = `${result.reason}. Press another key.`;
+  else settings.message = "That key can't be bound. Press another key.";
   return true;
+}
+
+export function clearKey(settings: BindingSettings, key: number): void {
+  if (!settings.ready) return;
+  const action = key === 0 ? undefined : actionFor(settings.bindings, key);
+  if (action === undefined) return;
+  const slot = settings.bindings.keys.indexOf(key) === slotIndex(action, 0) ? 0 : 1;
+  clearSlot(settings.bindings, action, slot);
+  edited(settings, clearedMessage(settings, action, key));
+}
+
+export function bindFirstUnbound(settings: BindingSettings): void {
+  const action = unboundActions(settings.bindings)[0];
+  if (action !== undefined) beginBindingCapture(settings, action, 0);
+}
+
+export function resetToLayout(settings: BindingSettings): void {
+  if (!settings.ready) return;
+  settings.bindings = presetBindings(settings.layout);
+  edited(settings, `${PRESET_NAMES[settings.layout]} defaults restored. Save to keep them.`);
 }
 
 export function saveBindingSettings(settings: BindingSettings): void {
@@ -163,6 +208,7 @@ export function saveBindingSettings(settings: BindingSettings): void {
 }
 
 export function cancelBindingCapture(settings: BindingSettings): void {
+  if (settings.capture !== undefined) settings.message = "Rebind cancelled.";
   settings.capture = undefined;
 }
 

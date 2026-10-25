@@ -81,12 +81,17 @@ select. Pick a layout at the top: WASD (recommended if you're new), Hitbox
 your profile. Load profile brings back your saved setup: when you have one it
 is already loaded and selected, and the screen says so; without one the button
 reads "No saved profile". Below, the keyboard lights every bound key with its
-action; click a lit key, press the key you want instead, then Save. Escape
-cancels a rebind. Done (or Escape) closes the screen and goes on to fighter
+action; click a lit key, press the key you want instead, then Save. If another
+action already held that key, the two swap and the screen says "Swapped with"
+that action. Press Delete instead of a key to clear the slot, or click the small x
+on a lit key's corner; an action left with no key is listed as Unbound, and a Bind button captures a key for it. Escape cancels a
+rebind. Reset to layout brings back the defaults of the layout you picked.
+Done (or Escape) closes the screen and goes on to fighter
 select; each player confirms their own. F1 opens it again before a match.
 Type -save in chat to save your current controls and delay, or -load to
 bring back your saved ones. Y (Start), Backspace (Pause) and K (save a moment) are reserved; F6 and F7
-remain reserved for Warcraft shortcuts. Ctrl+T starts a developer input trace.
+remain reserved for Warcraft shortcuts. Pressing a reserved key during a rebind
+is refused and the screen names what it is reserved for. Ctrl+T starts a developer input trace.
 
 Help: type -help (or -commands) in chat for every player command, one line
 each, or press F9 for the quest log's Controls (your current layout and how to
