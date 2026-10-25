@@ -62,9 +62,8 @@ const swing = (x: number, z: number, degrees: number, b: Body) =>
   pose([x,-24,z],[x+100*Math.cos(degrees*Math.PI/180),-24,z+100*Math.sin(degrees*Math.PI/180)],b.lean,b.twist,b.knee,b.offhand,0,b.drop,b.pitch);
 const curl = (pitch: number, lean: number, knee: number, drop: number, twist = 0, offhand = 60): Body => ({lean,twist,knee,offhand,drop,pitch});
 const arc = (degrees: number, b: Body) => swing(22*Math.cos(degrees*Math.PI/180),88+b.drop+26*Math.sin(degrees*Math.PI/180),degrees,b);
-const frontStrike = [arc(225,curl(10,10,70,-14,6)),arc(270,curl(46,32,100,-34,12,70)),arc(320,curl(54,38,110,-36,16,75)),arc(345,curl(20,8,60,-20,6,50))] as const;
-const backStrike = [arc(270,curl(38,30,96,-34,-14,70)),arc(220,curl(42,32,104,-34,-24,75)),arc(195,curl(8,-4,58,-20,-14,50))] as const;
-const dive = (x: number, z: number, degrees: number, lean: number, knee: number, drop: number, pitch: number) => swing(x,z,degrees,{lean,twist:0,knee,offhand:70,drop,pitch});
+const frontStrike = [arc(225,curl(10,10,70,-14,6)),arc(300,curl(46,36,100,-34,24,70)),arc(330,curl(54,38,110,-36,20,75)),arc(350,curl(20,8,60,-20,6,50))] as const;
+const backStrike = [arc(240,curl(38,16,96,-34,-28,70)),arc(208,curl(42,32,104,-34,-24,75)),arc(195,curl(8,-4,58,-20,-14,50))] as const;
 const gestures = [
   {key:"jab",name:"Jab Quick Cut",style:AttackStyle.jab,prep:pose([10,-50,120],[-45,-50,170],-5,-12),hit:pose([46,-24,76],[128,-24,65],8,8,16),exit:pose([42,-25,64],[65,-24,12],12,16)},
   {key:"jab2",name:"Jab Returning Cut",style:AttackStyle.jab2,prep:pose([30,-24,58],[78,-24,8],14,18),hit:pose([48,-24,74],[135,-24,91],3,-12,20),exit:pose([15,-25,126],[-40,-24,160],-4,-20)},
@@ -91,8 +90,8 @@ const replacements = [
     [15,frontStrike[1]],[16,frontStrike[2]],[17,frontStrike[3]],
     [18,backStrike[0]],[19,backStrike[1]],[20,backStrike[2]],
     [21,frontStrike[1]],[22,frontStrike[2]],[23,swing(8,124,-70,curl(-14,-10,60,-8,0,45))],
-    [24,dive(20,52,-90,30,20,-28,30)],[28,dive(26,40,-92,38,15,-36,42)],[33,dive(30,30,-95,45,10,-44,52)],
-    [35,swing(22,32,-100,curl(20,40,90,-42,0,60))],[38,swing(14,30,-110,curl(10,32,80,-40,0,55))],[41,swing(20,60,-60,curl(4,18,50,-22,2,40))],[43,swing(24,86,5,curl(0,6,22,-8,2,30))],[45,guard],[46,guard],
+    [24,swing(30,62,-45,curl(34,26,36,-24,10,65))],[27,swing(14,54,-90,curl(48,34,14,-36,4,70))],[30,swing(-8,60,-140,curl(24,18,20,-24,-8,65))],[33,swing(-20,74,180,curl(0,4,8,-12,-12,50))],
+    [36,swing(-20,90,150,curl(0,3,9,-10,-8,45))],[39,swing(-8,112,110,curl(0,3,10,-6,-4,36))],[42,swing(12,112,68,curl(0,2,11,-3,0,30))],[45,guard],[46,guard],
   ]},
 ] as const;
 type Gesture = (typeof gestures)[number] | (typeof replacements)[number];
