@@ -15,7 +15,7 @@ on:
         description: Commit to measure, on main or on the lane
         default: main
       lane:
-        description: The claude/ lane whose tip this measures; empty for main
+        description: The claude/ lane or probe/ branch whose tip this measures; empty for main
         default: ""
       opponent:
         description: Both computers' named opponent

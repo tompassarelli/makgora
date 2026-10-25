@@ -36,7 +36,7 @@ export function revertedBy(sha: string, after: readonly MainCommit[]): string | 
 }
 
 export function laneAllowed(workflow: FarmWorkflow, lane: string): boolean {
-  return MAIN_ONLY.has(workflow) ? /^claude\/[^/]/.test(lane) : /^(claude|farm)\/[^/]/.test(lane);
+  return MAIN_ONLY.has(workflow) ? /^(claude|probe)\/[^/]/.test(lane) : /^(claude|farm)\/[^/]/.test(lane);
 }
 
 export function liveness(facts: Facts): Verdict {
@@ -45,7 +45,7 @@ export function liveness(facts: Facts): Verdict {
   if (lane !== undefined && facts.onLane) return { live: true, why: `${short} is on ${lane}` };
   if (facts.onMain && facts.revertedBy === undefined) return { live: true, why: `${short} is on main` };
   if (facts.onMain) return { live: false, why: `${short} was reverted on main by ${facts.revertedBy?.slice(0, 12)}` };
-  if (facts.lane !== undefined && lane === undefined) return { live: false, why: `${facts.workflow} runs only on main or a claude/ lane, not ${facts.lane}` };
+  if (facts.lane !== undefined && lane === undefined) return { live: false, why: `${facts.workflow} runs only on main, a claude/ lane or a probe/ branch, not ${facts.lane}` };
   return { live: false, why: lane === undefined ? `${short} isn't on main` : `${short} isn't on main or on ${lane}` };
 }
 
@@ -61,7 +61,7 @@ export function admit(facts: Facts & { readonly autoland: AutolandStatus | undef
   const verdict = liveness(facts);
   if (verdict.live) return { kind: "dispatch", lane: facts.lane !== undefined && facts.onLane ? facts.lane : "" };
   if (!MAIN_ONLY.has(facts.workflow) && facts.lane === undefined && !facts.onMain) return { kind: "scratch" };
-  return { kind: "refuse", why: MAIN_ONLY.has(facts.workflow) && facts.lane === undefined && !facts.onMain ? `${verdict.why}: ${facts.workflow} runs only on main or on a lane tip pushed to claude/NAME (--lane NAME)` : verdict.why };
+  return { kind: "refuse", why: MAIN_ONLY.has(facts.workflow) && facts.lane === undefined && !facts.onMain ? `${verdict.why}: ${facts.workflow} runs only on main, on a lane tip pushed to claude/NAME (--lane NAME) or on a probe/NAME branch (--lane probe/NAME)` : verdict.why };
 }
 
 export function balanceTimeouts(perPair: number, probe: number): { readonly shard: number; readonly probe: number } {

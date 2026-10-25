@@ -6,10 +6,13 @@
   on main (main's CI runs these suites) or pending in Autoland (queued,
   testing alone, passed alone or in a train: Autoland runs them).
   Balance and Playtest run only on a commit on main or on a lane tip named
-  with `--lane NAME` (pushed to `claude/NAME`), never on a scratch branch;
-  memory soaks, perf, pads and difficulty runs may also use a `farm/` scratch
-  branch, the place for scratch instrumentation, since Autoland lands every
-  pushed `claude/` lane.
+  with `--lane NAME` (pushed to `claude/NAME`) or on a `probe/NAME` branch
+  (`safe-push --to probe/NAME`, then `--lane probe/NAME`), never on a scratch
+  branch. A `probe/` branch is a candidate measured by the farm field only:
+  Autoland never lands it, and its author deletes it once the result is
+  read. Memory soaks, perf, pads and difficulty runs may also use a `farm/`
+  scratch branch, the place for scratch instrumentation, since Autoland lands
+  every pushed `claude/` lane, including one pushed only to be measured.
   A newer run of the same shape on the same line (main, the lane or the
   scratch commit) cancels the older one (each `--matchups` run is its own shape,
   because GitHub refuses a run whose concurrency group holds a long pair list),
