@@ -39,8 +39,7 @@ export const SHIPPED_THRESHOLD_RULES: ThresholdRules = {
   48: (knockback) => crouchCancelled(knockback) >= SAKURAI_GROUNDED_KNOCKBACK,
 };
 
-function lowestPercent(rules: ThresholdRules, threshold: ThresholdKnockback, knockbackAt: (preHitPercent: number) => number): ThresholdPercent {
-  const reaches = (percent: number): boolean => rules[threshold](knockbackAt(percent));
+function bisect(reaches: (percent: number) => boolean): ThresholdPercent {
   if (!reaches(MELEE_PERCENT_LIMIT)) return "never";
   let [low, high] = [-1, MELEE_PERCENT_LIMIT];
   while (high - low > 1) {
@@ -49,6 +48,21 @@ function lowestPercent(rules: ThresholdRules, threshold: ThresholdKnockback, kno
     else low = middle;
   }
   return high;
+}
+
+function lowestPercent(rules: ThresholdRules, threshold: ThresholdKnockback, knockbackAt: (preHitPercent: number) => number, estimateAt: (preHitPercent: number) => number): ThresholdPercent {
+  const reaches = (percent: number): boolean => rules[threshold](knockbackAt(percent));
+  const seed = bisect((percent) => rules[threshold](estimateAt(percent)));
+  if (seed === "never" || !reaches(seed)) return bisect(reaches);
+  return seed === 0 || !reaches(seed - 1) ? seed : bisect(reaches);
+}
+
+function estimatedKnockback(hit: ThresholdHit, preHitPercent: number, staleness: number): number {
+  const power = hit.set > 0 ? hit.set * 10 : hit.damage > 0 ? Math.max(1, Math.trunc(hit.damage)) : 0;
+  const percent = hit.set > 0 ? 10 : staleness === 0 ? Math.max(0, Math.trunc(preHitPercent)) + hit.damage : preHitPercent + hit.damage * (1 - staleness);
+  const weight = hit.weight * 0.01;
+  const growth = 1.4 * (0.1 * percent + 0.05 * percent * power) * (2 - (2 * weight) / (weight + 1)) + 18;
+  return Math.min(2500, hit.growth * 0.01 * growth + hit.base);
 }
 
 function shippedKnockback(hit: ThresholdHit, preHitPercent: number): number {
@@ -65,10 +79,10 @@ export function meleeStaledKnockback(hit: ThresholdHit, preHitPercent: number, s
 }
 
 export const shippedThresholdPercent = (hit: ThresholdHit, threshold: ThresholdKnockback, rules = SHIPPED_THRESHOLD_RULES): ThresholdPercent =>
-  lowestPercent(rules, threshold, (percent) => shippedKnockback(hit, percent));
+  lowestPercent(rules, threshold, (percent) => shippedKnockback(hit, percent), (percent) => estimatedKnockback(hit, percent, 0));
 
 export const meleeStaledThresholdPercent = (hit: ThresholdHit, threshold: ThresholdKnockback, staleness: number, rules = SHIPPED_THRESHOLD_RULES): ThresholdPercent =>
-  lowestPercent(rules, threshold, (percent) => meleeStaledKnockback(hit, percent, staleness));
+  lowestPercent(rules, threshold, (percent) => meleeStaledKnockback(hit, percent, staleness), (percent) => estimatedKnockback(hit, percent, staleness));
 
 const exact = (value: number): bigint => {
   if (!Number.isInteger(value)) throw new Error(`exact knockback needs integer hit data, got ${value}`);
@@ -129,6 +143,7 @@ export function compareThresholds({ root = ROOT, rules = SHIPPED_THRESHOLD_RULES
   const phases = new Map(readFightCorePhases(root).map((phase) => [`${phase.character} ${phase.move} ${phase.phase}`, phase]));
   const comparisons: ThresholdComparison[] = [];
   const problems: string[] = [];
+  const searches = new Map<string, Map<number, ThresholdPercent>>();
   for (const record of readFightCoreThresholds(root).filter((entry) => attacker === undefined || entry.character === attacker)) {
     const hitboxes = record.hitboxes.map((id) => phases.get(`${record.character} ${record.move} ${record.phase}`)?.hitboxes.find((hitbox) => hitbox.name === id));
     const [first] = hitboxes;
@@ -148,10 +163,14 @@ export function compareThresholds({ root = ROOT, rules = SHIPPED_THRESHOLD_RULES
     for (const threshold of THRESHOLD_KNOCKBACKS) {
       const percents = record.percent[threshold];
       if (percents === undefined) continue;
+      const key = `${threshold} ${hit.damage} ${hit.base} ${hit.growth} ${hit.set} ${hit.weight}`;
+      const searched = searches.get(key) ?? new Map<number, ThresholdPercent>();
+      searches.set(key, searched);
       if (percents.length !== record.staleness.length) problems.push(`${recordName(record)}: ${percents.length} percents for ${record.staleness.length} staleness levels at knockback ${threshold}`);
       percents.forEach((fightCore, index) => {
         const staleness = record.staleness[index] ?? 0;
-        const ours = staleness === 0 ? shippedThresholdPercent(hit, threshold, rules) : meleeStaledThresholdPercent(hit, threshold, staleness, rules);
+        const ours = searched.get(staleness) ?? (staleness === 0 ? shippedThresholdPercent(hit, threshold, rules) : meleeStaledThresholdPercent(hit, threshold, staleness, rules));
+        searched.set(staleness, ours);
         comparisons.push({ record, threshold, staleness, fightCore, ours, agreement: agreement(hit, threshold, staleness, fightCore, ours) });
       });
     }
