@@ -1657,8 +1657,13 @@ least one option, damage most often, coverage for down smash and out-of-shield
 access for up smash. Counting the fighter's own travel, forward smash reaches
 as far as forward tilt for 18 of 23 fighters. Melee departs from the startup
 half: only 7 of 26 down smashes start later than the down tilt. Smashcraft
-keeps both halves of the commitment for its own fighters; the roster check
-is #319.
+keeps both halves of the commitment for its own fighters: `bun wisp shapes`
+prints each fighter's smash against its tilt on startup, total and the options
+measured from frame, hitbox and hurtbox data, and `bun wisp shapes --check`, run
+by `bun run check`, fails a broken range triangle (jab, then tilt, then smash)
+or a more committal smash that wins on no option, unless
+`tools/move-data/move-shape-exceptions.json` records the reason (#319). Launcher,
+early kill, launch angle and shield pressure join the check in #326.
 
 ## Legible locked states (#68)
 

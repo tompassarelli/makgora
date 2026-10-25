@@ -120,9 +120,12 @@ const CHARACTER_HURTBOXES: Readonly<Record<number, FighterHurtboxes>> = {
 
 
 export function fighterHurtboxes(f: Readonly<Fighter>): Readonly<FighterHurtboxes> {
-  const moves = f.tuning.moves;
-  if (moves !== undefined) return moves.hurtboxes ?? defaultHurtboxes(f.character);
-  return CHARACTER_HURTBOXES[f.character] ?? FALLBACK_HURTBOXES;
+  return authoredHurtboxes(f.character, f.tuning.moves);
+}
+
+export function authoredHurtboxes(character: Character, moves: FighterMoves | undefined): Readonly<FighterHurtboxes> {
+  if (moves !== undefined) return moves.hurtboxes ?? defaultHurtboxes(character);
+  return CHARACTER_HURTBOXES[character] ?? FALLBACK_HURTBOXES;
 }
 
 const DEFAULTS: FighterHurtboxes[] = [];
