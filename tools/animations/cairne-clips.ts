@@ -31,7 +31,7 @@ ensure(input && output && relative(project, output).startsWith(".."), "usage: bu
 const source = parseSource(await Bun.file(input).arrayBuffer()), model = structuredClone(source);
 ensure((painOnly || source.Sequences.length === 12) && source.Nodes.some(n => n.Name === "Bone_Axe_Free"), "Expected classic Tauren Chieftain");
 const stand = source.Sequences[4]!, idleSequence = source.Sequences[0]!;
-interface Gesture { chest?: number; twist?: number; head?: number; arm?: number; elbow?: number; free?: number; freeElbow?: number; hip?: number; knee?: number; lean?: number; yaw?: number; leftHip?: number; rightHip?: number; leftKnee?: number; rightKnee?: number; step?: number; pitch?: number; rise?: number; spin?: number; depth?: number; shin?: number; leftShin?: number; rightShin?: number; hoof?: number; leftHoof?: number; rightHoof?: number; pelvis?: number; slide?: number }
+interface Gesture { chest?: number; twist?: number; head?: number; arm?: number; elbow?: number; free?: number; freeElbow?: number; hip?: number; knee?: number; lean?: number; yaw?: number; leftHip?: number; rightHip?: number; leftKnee?: number; rightKnee?: number; step?: number; pitch?: number; rise?: number; spin?: number; depth?: number; shin?: number; leftShin?: number; rightShin?: number; hoof?: number; leftHoof?: number; rightHoof?: number; pelvis?: number; slide?: number; grip2?: number }
 interface Phase { frame: number; gesture: Gesture; target?: readonly [number,number]; grip?: readonly [number,number]; idle?: boolean; glide?: boolean }
 interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; stock?: number; stockHit?: number; prepTravel?: number; hold?: boolean; air?: boolean; roll?: number; first?: Gesture; phases?: readonly Phase[]; target?: readonly [number, number]; damage?: boolean; beats?: readonly Phase[]; gore?: "travel" | "hold" | "recovery"; settleFrom?: number; stockFrom?: number }
 interface Strike { prep: Gesture; hit: Gesture; follow: Gesture; prepAt?: number; followAt?: number; settle?: number; rest?: Gesture; restTarget?: readonly [number,number]; restGrip?: readonly [number,number]; prepTarget?: readonly [number,number]; hitTarget?: readonly [number,number]; hitGrip?: readonly [number,number]; followGrip?: readonly [number,number]; mid?: readonly Phase[]; aim?: boolean; reach?: readonly [number,number]; air?: boolean; glide?: number }
@@ -101,12 +101,12 @@ const strikes: Partial<Record<HeroPose, Strike>> = {
     mid:[{frame:24,gesture:{chest:-10,twist:-20,yaw:150,arm:-150,elbow:15,free:-140,pitch:-6,leftHip:-86,rightHip:-68,leftKnee:88,rightKnee:86,head:-16},target:[-70,70]},
       {frame:28,gesture:{chest:42,twist:0,yaw:160,arm:-60,elbow:5,free:-54,pitch:20,step:22,leftHip:-24,rightHip:-12,leftKnee:24,rightKnee:8,head:-14},target:[-148,10]}],
     follow:{chest:44,twist:10,yaw:180,arm:-58,elbow:5,free:-52,pitch:22,step:24,leftHip:-26,rightHip:-12,leftKnee:26,rightKnee:8,head:-12},followAt:34,reach:[-158,8]},
-  downAir:{prep:{chest:-10,arm:-185,elbow:30,free:-140,freeElbow:30,pitch:-10,leftHip:-110,rightHip:-102,leftKnee:124,rightKnee:118,head:-6,rise:16},prepAt:6,prepTarget:[-40,240],
-    hit:{chest:8,arm:-10,elbow:60,free:-150,freeElbow:20,pitch:0,lean:-10,leftHip:10,rightHip:-24,leftKnee:-40,rightKnee:-30,leftShin:40,rightShin:70,leftHoof:30,rightHoof:-26,slide:25,head:-10,depth:0,rise:-60},hitTarget:[95,-50],hitGrip:[75,5],
-    mid:[{frame:11,gesture:{chest:-16,arm:-195,elbow:35,free:-160,freeElbow:30,pitch:-14,leftHip:-130,rightHip:-122,leftKnee:146,rightKnee:140,head:-10,rise:28},target:[-45,255]},
-      {frame:16,gesture:{chest:8,arm:-10,elbow:60,free:-150,freeElbow:20,pitch:0,lean:-10,leftHip:10,rightHip:-24,leftKnee:-40,rightKnee:-30,leftShin:40,rightShin:70,leftHoof:30,rightHoof:-26,slide:25,head:-10,depth:0,rise:-88},target:[95,-50],grip:[75,5]}],
-    follow:{chest:42,arm:-10,elbow:60,free:-40,freeElbow:25,pitch:0,leftHip:-56,rightHip:-52,leftKnee:75,rightKnee:70,head:18,rise:-38,depth:0},followAt:19,reach:[55,-30],followGrip:[35,20],settle:0.5,restTarget:[125,95],restGrip:[50,45],glide:2,
-    rest:{chest:16,arm:-60,elbow:35,free:-50,freeElbow:25,pitch:0,leftHip:-40,rightHip:-36,leftKnee:54,rightKnee:50,head:8,rise:-16,depth:-10}},
+  downAir:{prep:{chest:-24,arm:-190,elbow:30,free:-185,freeElbow:30,pitch:-14,lean:-8,leftHip:-110,rightHip:-102,leftKnee:124,rightKnee:118,head:-12,rise:16,grip2:-40},prepAt:6,prepTarget:[-70,235],
+    hit:{chest:30,arm:-15,elbow:5,free:-15,freeElbow:5,pitch:6,leftHip:-70,rightHip:-64,leftKnee:100,rightKnee:94,head:15,rise:-60,depth:0,grip2:-40},hitTarget:[30,-130],hitGrip:[35,-35],
+    mid:[{frame:11,gesture:{chest:-38,arm:-205,elbow:40,free:-200,freeElbow:35,pitch:-20,lean:-15,leftHip:-130,rightHip:-122,leftKnee:146,rightKnee:140,head:-18,rise:28,grip2:-40},target:[-100,222]},
+      {frame:16,gesture:{chest:45,arm:-10,elbow:5,free:-10,freeElbow:5,pitch:10,leftHip:-78,rightHip:-72,leftKnee:110,rightKnee:104,head:24,rise:-88,depth:0,grip2:-40},target:[20,-135],grip:[30,-42]}],
+    follow:{chest:70,arm:15,elbow:20,free:15,freeElbow:20,pitch:14,leftHip:-84,rightHip:-78,leftKnee:112,rightKnee:106,head:30,rise:-30,depth:0,grip2:-40},followAt:19,reach:[-30,-105],followGrip:[12,-28],settle:0.55,restTarget:[75,-5],restGrip:[40,25],glide:2,
+    rest:{chest:26,arm:-60,elbow:35,free:-50,freeElbow:25,pitch:2,leftHip:-44,rightHip:-40,leftKnee:60,rightKnee:56,head:10,rise:-12,depth:-10}},
 };
 for (const [pose, style, gesture] of normals) {
   const move = CAIRNE_MOVES.normals[style]; ensure(move, `${pose}: missing timing`);
@@ -320,7 +320,7 @@ for (const [ordinal,action] of [...actions,...damageActions,...goreActions].entr
     const first=donor.Keys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1]);if(!first)return;
     const idleKey=donor.Keys.find(k=>k.Frame>=idleSequence.Interval[0]&&k.Frame<=idleSequence.Interval[1])??{...first,Vector:resting(path,first.Vector)};
     const match=/^\.(Bones|Helpers)\.(\d+)\.Rotation$/.exec(path),node=match?source[match[1] as "Bones"|"Helpers"][Number(match[2])]:undefined;
-    for(const phase of phases){if(phase.glide&&(node?.Name==="Bone_UpperArmR"||node?.Name==="Bone_LowerArmR"))continue;const base=phase.idle?idleKey:first;const [pitch,yaw]=node?joint(node.Name,phase.gesture):[0,0];const Vector=node?rotation(base.Vector,pitch,yaw):base.Vector.slice();
+    for(const phase of phases){if(phase.glide&&["Bone_UpperArmR","Bone_LowerArmR","Bone_UpperArmL","Bone_LowerArmL"].includes(node?.Name??""))continue;const base=phase.idle?idleKey:first;const [pitch,yaw]=node?joint(node.Name,phase.gesture):[0,0];const Vector=node?rotation(base.Vector,pitch,yaw):base.Vector.slice();
       const tangent=()=>match||track.LineType===mdx.LineType.Bezier?Vector.slice():new Float32Array(Vector.length);
       track.Keys.push({...base,Frame:start+Math.round(phase.frame*1000/60),Vector,...first.InTan?{InTan:tangent(),OutTan:tangent()}: {}});}
   });
@@ -328,6 +328,7 @@ for (const [ordinal,action] of [...actions,...damageActions,...goreActions].entr
 
 
   const shoulder=model.Nodes.find(n=>n.Name==="Bone_UpperArmR")!,elbow=model.Nodes.find(n=>n.Name==="Bone_LowerArmR")!;
+  const freeShoulder=model.Nodes.find(n=>n.Name==="Bone_UpperArmL")!,freeElbow=model.Nodes.find(n=>n.Name==="Bone_LowerArmL")!,offHand=model.Nodes.find(n=>n.Name==="Bone_HandL")!,offPivot=vec3.fromValues(...model.PivotPoints[offHand.ObjectId]! as unknown as [number,number,number]);
   const baseline=(node:mdx.Node)=>source.Nodes[node.ObjectId]!.Rotation!.Keys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1])!.Vector;
   for(const phase of phases)if(phase.target){
     const armKey=shoulder.Rotation!.Keys.find(k=>k.Frame===start+Math.round(phase.frame*1000/60))!,elbowKey=elbow.Rotation!.Keys.find(k=>k.Frame===start+Math.round(phase.frame*1000/60))!;
@@ -338,7 +339,18 @@ for (const [ordinal,action] of [...actions,...damageActions,...goreActions].entr
       return (point[0]!-phase.target![0])**2+(point[2]!-phase.target![1])**2+(phase.grip?(grip[0]!-phase.grip[0])**2+(grip[2]!-phase.grip[1])**2:0)+(plane===undefined?depth*point[1]!**2:4*((point[1]!-plane)**2+(grip[1]!-plane)**2))+flat*(1-Math.abs(facingCamera()))**2+pull*angles.reduce((sum,angle,axis)=>sum+(angle-authored[axis]!)**2,0);};
     for(let pass=0;pass<4;pass++)for(let axis=0;axis<4;axis++){let best=Infinity,bestAngle=angles[axis]!;for(let centre=pull?authored[axis]!:0,angle=centre-180;angle<=centre+180;angle+=pass<2?15:5){angles[axis]=angle;const value=loss();if(value<best){best=value;bestAngle=angle;}}angles[axis]=bestAngle;}
     loss();for(const key of [armKey,elbowKey])if(key.InTan){key.InTan=key.Vector.slice();key.OutTan=key.Vector.slice();}
+    if(phase.gesture.grip2!==undefined){
+      const frame=start+Math.round(phase.frame*1000/60),keys=[freeShoulder,freeElbow].map(n=>n.Rotation!.Keys.find(k=>k.Frame===frame)!),free=[phase.gesture.free??0,0,phase.gesture.freeElbow??0,0],seed=free.slice();
+      const want=vec3.scaleAndAdd(vec3.create(),handPivot,shaft,phase.gesture.grip2);vec3.transformMat4(want,want,data.nodes[hand.ObjectId].matrix);
+      const offLoss=()=>{keys[0]!.Vector=rotation(baseline(freeShoulder),free[0]!,free[1]!);keys[1]!.Vector=rotation(baseline(freeElbow),free[2]!,free[3]!);evaluate(index,phase.frame);return vec3.squaredDistance(want,vec3.transformMat4(vec3.create(),offPivot,data.nodes[offHand.ObjectId].matrix))+0.05*free.reduce((sum,angle,axis)=>sum+(angle-seed[axis]!)**2,0);};
+      for(let pass=0;pass<4;pass++)for(let axis=0;axis<4;axis++){let best=Infinity,bestAngle=free[axis]!;for(let angle=seed[axis]!-180;angle<=seed[axis]!+180;angle+=pass<2?15:5){free[axis]=angle;const value=offLoss();if(value<best){best=value;bestAngle=angle;}}free[axis]=bestAngle;}
+      offLoss();for(const key of keys)if(key.InTan){key.InTan=key.Vector.slice();key.OutTan=key.Vector.slice();}
+    }
   }
+  for(const node of [shoulder,elbow,freeShoulder,freeElbow]){const keys=node.Rotation!.Keys;keys.sort((a,b)=>a.Frame-b.Frame);
+    for(const phase of phases)if(phase.glide){const frame=start+Math.round(phase.frame*1000/60),before=keys.filter(k=>k.Frame<frame).at(-1),after=keys.find(k=>k.Frame>frame);if(!before||!after)continue;
+      const Vector=new Float32Array(quat.slerp(quat.create(),before.Vector as unknown as quat,after.Vector as unknown as quat,(frame-before.Frame)/(after.Frame-before.Frame)));
+      keys.push({...before,Frame:frame,Vector,...before.InTan?{InTan:Vector.slice(),OutTan:Vector.slice()}:{}});keys.sort((a,b)=>a.Frame-b.Frame);}}
 
 
   const addTransform=(node:mdx.Node,frame:number,matrix:mat4)=>{
