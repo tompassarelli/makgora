@@ -332,13 +332,18 @@ export function specialPlacementCanonical(spec: Readonly<SpecialPlacement>, pref
   return result.join("");
 }
 
+function optionalField(name: string, value: number | undefined, write: (name: string, value: number) => string): string {
+  return value === undefined ? "" : write(name, value);
+}
+
 function hitEffectCanonical(hit: Readonly<HitEffect>, prefix: string): string {
   return canonicalRealField(`${prefix}.damage`, hit.damage) + canonicalRealField(`${prefix}.growth`, hit.growth)
     + canonicalRealField(`${prefix}.base`, hit.base) + canonicalRealField(`${prefix}.launchX`, hit.launchX)
     + canonicalRealField(`${prefix}.launchZ`, hit.launchZ) + canonicalInt(`${prefix}.electric`, hit.electric ? 1 : 0)
     + canonicalInt(`${prefix}.element`, hit.element ?? 0) + (hit.carry === true ? canonicalInt(`${prefix}.carry`, 1) : "")
-    + (hit.manaSteal === undefined ? "" : canonicalInt(`${prefix}.manaSteal`, hit.manaSteal))
-    + (hit.setKnockback === undefined ? "" : canonicalRealField(`${prefix}.setKnockback`, hit.setKnockback));
+    + optionalField(`${prefix}.manaSteal`, hit.manaSteal, canonicalInt)
+    + optionalField(`${prefix}.setKnockback`, hit.setKnockback, canonicalRealField)
+    + optionalField(`${prefix}.stunFrames`, hit.stunFrames, canonicalInt);
 }
 
 

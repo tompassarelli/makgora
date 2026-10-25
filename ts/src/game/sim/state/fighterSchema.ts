@@ -56,6 +56,7 @@ export const FIGHTER_CONSTANTS: Readonly<Record<string, string>> = {
   PROJECTILE_CAPACITY: "sim/fighter",
   PACK_CAPACITY: "sim/fighter",
   CandleState: "sim/codes",
+  STUN_REPEAT_FRAMES: "sim/codes",
 };
 
 export const FIGHTER_GROUPS: readonly FighterGroup[] = [
@@ -107,7 +108,7 @@ export const FIGHTER_SAME_ORDER: Readonly<Record<string, readonly string[]>> = {
   motion: ["x", "z", "deltaX", "deltaZ", "vx", "vz", "meleeX.original", "meleeX.published", "meleeZ.original", "meleeZ.published", "meleeVelocityZ.original", "meleeVelocityZ.published", "grounded", "surface", "crouching", "fastFalling", "fastFallDownHeld", "fastFallInputAge", "previousStickSide", "stickSideAge", "turnaroundSide", "turnaroundAge"],
   ground: ["dashFrame", "dashDirection", "action", "actionFrame", "runBrakeFramesRemaining", "turnRunEntryFacing", "turnRunFacingCommandLatched", "turnRunPausePending", "pivotEligible", "pivotGraceFrames", "pivotDashFrame", "pivotDashActionFrame", "dashGrabWindow"],
   jump: ["inputAge", "remaining", "serial", "isDouble", "squat", "ascent", "held", "dodgeQueued", "dodgeX", "dodgeZ"],
-  launch: ["knockbackX", "knockbackZ", "meleeKnockbackX.original", "meleeKnockbackX.published", "meleeKnockbackZ.original", "meleeKnockbackZ.published", "groundKnockbackX", "knockbackAge", "damageLevel", "hitstun", "throwHitstun", "hitlag", "diPending", "hitlagFrames", "hitlagEndAge", "sdiFollowup", "diLaunchSpeed", "diSerial", "diAngleDegrees", "sdiWasGrounded", "sdiLaunchesUpward", "sdiSerial", "asdiSerial", "sdiHitTravel", "sdiStringTravel", "sdiStepX", "sdiStepZ", "sdiStepTravel", "sdiNextX", "sdiNextZ", "sdiNextTravel"],
+  launch: ["knockbackX", "knockbackZ", "meleeKnockbackX.original", "meleeKnockbackX.published", "meleeKnockbackZ.original", "meleeKnockbackZ.published", "groundKnockbackX", "knockbackAge", "stunAge", "damageLevel", "hitstun", "throwHitstun", "hitlag", "diPending", "hitlagFrames", "hitlagEndAge", "sdiFollowup", "diLaunchSpeed", "diSerial", "diAngleDegrees", "sdiWasGrounded", "sdiLaunchesUpward", "sdiSerial", "asdiSerial", "sdiHitTravel", "sdiStringTravel", "sdiStepX", "sdiStepZ", "sdiStepTravel", "sdiNextX", "sdiNextZ", "sdiNextTravel"],
   shield: ["raised", "tiltX", "tiltZ", "strength", "energy", "stun", "heldFrames", "releaseLag", "pushbackX", "recoilX", "recoilZ", "meleeRecoilX.original", "meleeRecoilX.published", "meleeRecoilZ.original", "meleeRecoilZ.published", "drainResumePending", "triggerWasActive", "triggerAge", "reflectFrames", "perfectFrames", "perfectActionFrames", "redParryTried", "parryBuffer", "parryBufferDirection", "breakState", "breakFrame", "breakSerial", "breakRemaining"],
   attack: ["style", "frame", "duration", "serial", "hit", "dashGrab", "pivotGrab", "cooldown", "smashCharging", "smashChargeFrames", "smashChargeAllowed"],
   hits: ["entries[].attacker", "entries[].attackSerial", "entries[].window", "lastAttacker", "lastAttackSerial", "lastWindow"],
@@ -223,6 +224,7 @@ export const FIGHTER_FIELDS: readonly FighterFieldRow[] = [
   { path: "launch.diPending", type: "bool", init: "false", copy: "plain", same: "plain", canon: { name: "diPending", writer: "bool" }, diff: "diPending", respawn: { blast: "false", respawn: "false" } },
   { path: "launch.diLaunchSpeed", type: "real", init: "0.0", copy: "plain", same: "signedZero", canon: { name: "diLaunchSpeed", writer: "real" }, diff: "diLaunchSpeed", respawn: { blast: "0.0", respawn: "0.0" } },
   { path: "launch.hitlagFrames", type: "int", init: "0", copy: "plain", same: "plain", canon: { name: "hitlagFrames", writer: "int" }, diff: "hitlagFrames", respawn: "keep" },
+  { path: "launch.stunAge", type: "int", init: "STUN_REPEAT_FRAMES", copy: "plain", same: "plain", canon: { name: "stunAge", writer: "int" }, diff: "stunAge", respawn: "keep" },
   { path: "launch.hitlagEndAge", type: "int", init: "16", copy: "plain", same: "plain", canon: { name: "hitlagEndAge", writer: "int" }, diff: "hitlagEndAge", respawn: "keep" },
   { path: "launch.sdiFollowup", type: "bool", init: "false", copy: "plain", same: "plain", canon: { name: "sdiFollowup", writer: "bool" }, diff: "sdiFollowup", respawn: "keep" },
   { path: "launch.diSerial", type: "int", init: "0", copy: "plain", same: "signedZero", canon: { name: "diSerial", writer: "int" }, diff: "diSerial", respawn: { respawn: "0" } },

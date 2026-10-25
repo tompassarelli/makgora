@@ -576,6 +576,13 @@ export function heroMotionPassesPlatforms(f: Readonly<Fighter>): boolean {
   return false;
 }
 
+function faceStruck(f: Fighter, world: Roster): void {
+  const slot = f.special.hitTargets[0];
+  if (!f.special.hit || slot === undefined || !isActive(world, slot)) return;
+  const gap = f32(fighterAt(world, slot).motion.x - f.motion.x);
+  if (gap !== 0.0) f.facing = gap < 0 ? -1 : 1;
+}
+
 function applyMotion(f: Fighter, move: Readonly<AuthoredSpecial>, frame: number, input: Readonly<Controls> | undefined, world: Roster | undefined): void {
   const { motion, special } = f;
   holdHoveringUltimate(f);
@@ -607,6 +614,7 @@ function applyMotion(f: Fighter, move: Readonly<AuthoredSpecial>, frame: number,
     }
     motion.vx = velocityX;
     motion.vz = velocityZ;
+    if (segment.facesStruck === true && frame === segment.first && world !== undefined) faceStruck(f, world);
     if (velocityZ > 0 && motion.grounded) {
       motion.grounded = false;
       motion.surface = undefined;
