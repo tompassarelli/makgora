@@ -44,6 +44,17 @@ const NEUTRAL_SPECIAL_PAIR = [PLAYABLE_CHARACTERS.indexOf(Character.thrall), PLA
 // A fresh private desktop's Xwayland drops the first XTEST motion.
 const POINTER_PRIME_ATTEMPTS = 3;
 
+const xset = Effect.suspend(() => {
+  const found = Bun.which("xset");
+  return found !== null ? Effect.succeed(found) : runProcess(ChildProcess.make("nix", ["build", "--no-link", "--print-out-paths", "nixpkgs#xorg.xset"], { stdin: "ignore" })).pipe(Effect.map(out => join(out.trim().split("\n")[0] ?? "", "bin", "xset")));
+});
+
+// Xwayland's autorepeat turns a tape key held past 660 ms into fresh presses that the game keeps reading after its keyup.
+const stopAutorepeat = (client: Client) => xset.pipe(
+  Effect.flatMap(path => runProcess(ChildProcess.make(path, ["r", "off"], { env: { ...Bun.env, ...client.x11 }, stdin: "ignore" }))),
+  Effect.mapError(fail(`moves gate autorepeat ${client.name}`)),
+);
+
 export const isReplayFromMatch = (file: string, modified: number, started: number): boolean =>
   REPLAY.test(file) && modified >= started;
 
@@ -227,6 +238,7 @@ export const measureMovesGate = (clientsFile: string, directory: string, caster?
   for (const client of clients) {
     yield* focus(client).pipe(Effect.mapError(fail("moves gate setup")));
     yield* prime(client);
+    yield* stopAutorepeat(client);
     yield* reachFighterSelect(client, save);
   }
   const hostView = yield* input.windowRegion(host).pipe(Effect.mapError(fail("moves gate viewport")));
