@@ -22,5 +22,5 @@
     }
   },
   "files": ["node_modules/wisp/src/natives/warcraft.d.ts"],
-  "include": ["../tools/animations/**/*.ts"]
+  "include": ["../tools/animations/**/*.ts", "../references/melee-frame-data/**/*.ts"]
 }

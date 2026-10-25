@@ -223,6 +223,35 @@ ssconvert -S fightcore_melee_frame_data.xlsx /tmp/fightcore.csv
 cp /tmp/fightcore.csv.0 references/melee-frame-data/fightcore.csv
 ```
 
+`readers.ts` is the typed TypeScript boundary for this CSV and the character
+attributes CSV below. FightCore knockback columns are ordered per hitbox in
+the same order as `Damage`; the angle `361` remains a numeric Sakurai-angle
+marker. `check-readers.ts` prints disagreements for every direct action-name
+match and the `misc` rows. Its field rules are explicit: first/last active,
+total, IASA, ordinary/L-cancelled landing lag, autocancel boundaries and
+strongest/weakest damage compare with the corresponding columns;
+attributes `Weight`, `Terminal Velocity`, `JumpSquat Frames`, `Dash
+Initial Velocity`, and `Dash & Run Terminal Velocity` compare with
+`misc.weight`, `misc.gravity` (which matches terminal velocity despite its
+source label), `misc.jump_squat`, `misc.walk_speed` (the source label says
+walking speed; it matches dash initial velocity), and `misc.run_speed`,
+respectively. The attribute gravity and fast-fall velocity have no matching
+`misc` fields, so the reader keeps them available without inventing a
+comparison. A null in either source means the field is not compared.
+Slash-separated attributes are preserved; they agree with a scalar reference
+only when exactly one value is present and equal.
+
+For parity intake, `records.jsonl` remains authoritative for its reported
+timing, landing lag, autocancel and damage fields; FightCore is authoritative
+for per-hitbox angle, base knockback, growth, set knockback and getup/tech
+rows. `character-attributes.csv` is authoritative for per-fighter attributes.
+The comparison reports differences without changing either source or choosing
+a value on behalf of later tooling. Run it with:
+
+```sh
+bun references/melee-frame-data/check-readers.ts
+```
+
 ## Character attributes
 
 `smashcraft:references/melee-frame-data/character-attributes.csv` lists each of
