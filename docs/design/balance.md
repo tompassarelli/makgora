@@ -529,6 +529,19 @@ A lane probe of the three fighters' 72 pairs at 120 a pair (run 40149071697)
 read Cairne 52%, Tinker 48% and Lich King 49%. No change adds a
 fixed-baseline or feel-lock miss.
 
+25 Oct 2026 (#266, Blademaster without his forward smash). On 8b2120af61
+(Balance run 40151181673, 400 a pair) Blademaster read 61%. His forward smash
+took 69% of the stocks he won and keeps its damage, growth and kill percent,
+so this pass slows the damage that sets it up. His forward tilts deal 7.9 and
+6.0 (from 9.17 and 7.41), his down tilt 5.95 and 3.72 (from 7.41 and 4.63) and
+his dash attack 7.2 and 5.75 (from 8.5 and 7.0). Each hit's growth rises just
+enough to hold its kill percent: forward tilts 113.6 and 79.8, down tilt tip
+71.6, dash attack 105 and 89.5. Forward tilts recover 1 frame later, down tilt
+3, and the dash attack swings 2 frames later on the same total. A probe of his
+25 pairs at 400 a pair on a `probe/` branch (run 40200022190) read 52.7%; the
+damage cuts alone read 55.2% (run 40200007303). No change adds a
+fixed-baseline or feel-lock miss.
+
 ## Player panel and equal skill ceilings (#358)
 
 Every fighter targets a 45–55% mean over all six Expert personalities, with
