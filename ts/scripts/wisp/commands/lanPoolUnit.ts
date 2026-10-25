@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, readdirSync, statSync } from "node:fs";
 import { delimiter, join } from "node:path";
 import { BunServices } from "@effect/platform-bun";
 import { Console, Effect } from "effect";
@@ -9,6 +9,7 @@ import { LanFailure } from "wisp/scripts/wisp/lan/join";
 import { agentSocket, readPool, stopPairScopes } from "wisp/scripts/wisp/lan/pool";
 import { pollUntil } from "../../hostPoll";
 import { runProcess } from "../../hostProcess";
+import { readClientEntries } from "../nativeTools";
 import { projectRoot } from "../project";
 import { userSessionEnv } from "./nativeUnit";
 import { privateDesktopUnitEnv } from "./privateDesktopUnitEnv";
@@ -141,12 +142,44 @@ const pairStatus = (pair: number) => Effect.tryPromise({
   catch: () => undefined,
 }).pipe(Effect.orElseSucceed(() => undefined));
 
-/** Restarts a pair whose client dropped, through the pool's own unit; reports whether it did. */
-export const restartDroppedPair = (pair: number) => Effect.gen(function*() {
-  if (!pairNeedsRestart(yield* pairStatus(pair))) return false;
+export interface PairDrop {
+  readonly pair: number;
+  readonly dropped: readonly string[];
+  readonly crashes: readonly string[];
+}
+
+export const crashReports = (clientsFile: string): string[] => {
+  if (!existsSync(clientsFile)) return [];
+  const since = statSync(clientsFile).mtimeMs;
+  return readClientEntries(clientsFile).flatMap(({ name, documents }) => {
+    const errors = join(documents, "Errors");
+    return existsSync(errors) ? readdirSync(errors).filter(entry => statSync(join(errors, entry)).mtimeMs >= since).sort().map(entry => `${name}: Errors/${entry}`) : [];
+  });
+};
+
+export const pairDropText = ({ pair, dropped, crashes }: PairDrop): string =>
+  `pair ${pair} lost ${dropped.join(" and ")}; ${crashes.length === 0 ? "no Errors/ crash report since the pair started" : `crash ${crashes.join(", ")}`}`;
+
+const pairDropOf = (pair: number) => Effect.gen(function*() {
+  const status = yield* pairStatus(pair);
+  if (!pairNeedsRestart(status)) return undefined;
   const known = yield* readPool.pipe(Effect.orElseSucceed(() => undefined));
-  yield* Console.log(`pair ${pair}: a client dropped; restarting the pair`);
+  const clients = known?.pairs.find(item => item.id === pair)?.clients;
+  const dropped = status === undefined ? ["its agent"] : status.clients.filter(({ pid }) => pid === undefined).map(({ name }) => `client ${name}`);
+  const drop: PairDrop = { pair, dropped: dropped.length === 0 ? ["a client"] : dropped, crashes: clients === undefined ? [] : crashReports(clients) };
+  return { drop, profile: known?.profile };
+});
+
+export const droppedPair = (pair: number) => pairDropOf(pair).pipe(Effect.map(found => found?.drop), Effect.provide(BunServices.layer));
+
+export const pairRestartFile = (directory: string): string => join(directory, "pair-restart.txt");
+
+/** Restarts a pair whose client dropped, through the pool's own unit; returns what dropped, or undefined when nothing did. */
+export const restartDroppedPair = (pair: number) => Effect.gen(function*() {
+  const found = yield* pairDropOf(pair);
+  if (found === undefined) return undefined;
+  yield* Console.log(`${pairDropText(found.drop)}; restarting the pair`);
   yield* poolStop(["--pair", String(pair)]);
-  yield* poolStart(["--pair", String(pair), ...(known?.profile === undefined ? [] : ["--pool-profile", known.profile])]);
-  return true;
+  yield* poolStart(["--pair", String(pair), ...(found.profile === undefined ? [] : ["--pool-profile", found.profile])]);
+  return found.drop;
 }).pipe(Effect.provide(BunServices.layer));

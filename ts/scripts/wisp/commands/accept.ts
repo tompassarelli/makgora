@@ -33,7 +33,7 @@ import { clientArguments } from "./client";
 import { freshMatch, readyAfter, sendDevCommand } from "./fresh";
 import { profileOptions } from "./map";
 import { checkClients, onHealthyClients, readClientsFile, smashcraftWatch } from "../doctor";
-import { restartDroppedPair } from "./lanPoolUnit";
+import { droppedPair, pairDropText, pairRestartFile, restartDroppedPair } from "./lanPoolUnit";
 import { withNativeUnit } from "./nativeUnit";
 import { liveProcesses, ownPids, pairHolders } from "./pairGuard";
 import { assertPairClaim } from "./pairClaim";
@@ -292,6 +292,12 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
   }
   if (solo && requested.length !== 1) return yield* new UsageFailure({ problem: "--solo requires one --pair K; each client plays its own single-player game" });
   const id = requested.length === 1 ? Number(requested[0]) : undefined;
+  const restarted = id === undefined || dryRun ? undefined : yield* restartDroppedPair(id).pipe(Effect.mapError(cause => new AcceptFailure({ operation: `restart pair ${id}`, problem: describeCause(cause) })));
+  const [out] = flagValues(args, "out");
+  if (restarted !== undefined && out !== undefined) {
+    mkdirSync(out, { recursive: true });
+    writeFileSync(pairRestartFile(out), `${pairDropText(restarted)}; restarted the pair\n`);
+  }
   const pair = id === undefined ? undefined : yield* Effect.try({
     try: () => {
       const selected = lanPairs(LAN_POOL_FILE, { ids: [id] })[0];
@@ -327,13 +333,13 @@ const acceptHere: Command = (rawArgs) => Effect.gen(function*() {
       if (profile.quick !== "") yield* (solo ? sendSoloDevCommand(profile.quick) : sendDevCommand(profile.quick)).pipe(step(profile.quick));
     }).pipe(Effect.provide(Layer.merge(options.services.pipe(Layer.provideMerge(Clients.layer(selectedClients))), smashcraftWatch)));
   });
-  const recoverDropped = pair?.lan === undefined
-    ? checkClients(() => undefined, selectedClients).pipe(Effect.as(false), Effect.orElseSucceed(() => false))
-    : restartDroppedPair(pair.lan).pipe(Effect.mapError(cause => new AcceptFailure({ operation: `restart pair ${pair.lan}`, problem: describeCause(cause) })));
-  const start = (map: string) => recoverDropped.pipe(
-    Effect.andThen(startSession(map)),
-    Effect.catch(failure => recoverDropped.pipe(Effect.flatMap(restarted => restarted ? startSession(map) : Effect.fail(failure)))),
-  );
+  const checked = checkClients(() => undefined, selectedClients).pipe(Effect.orElseSucceed(() => undefined));
+  const lanId = pair?.lan;
+  const start = (map: string) => lanId === undefined
+    ? checked.pipe(Effect.andThen(startSession(map)), Effect.tapError(() => checked))
+    : startSession(map).pipe(Effect.catch(failure => droppedPair(lanId).pipe(Effect.flatMap(drop => drop === undefined
+      ? Effect.fail(failure)
+      : Effect.fail(new AcceptFailure({ operation: `start ${map}`, problem: `${pairDropText(drop)}; the next accept on pair ${drop.pair} restarts it` }))))));
   const liveDriver = liveAcceptDriver({
     start,
     receipt: (name) => name.startsWith("smashcraft-dev-") || name.startsWith("smashcraft-stage-") || name.startsWith("smashcraft-error-") || name.startsWith("smashcraft-render-clock-") || name.startsWith("smashcraft-replay-"),

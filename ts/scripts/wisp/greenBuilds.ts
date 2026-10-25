@@ -136,6 +136,7 @@ export interface SmokeShardReport {
   readonly crash: boolean;
   readonly deadBindings: readonly string[];
   readonly movesNotStarted: readonly string[];
+  readonly restart?: string;
 }
 
 export interface SmokeReport {
