@@ -126,11 +126,11 @@ for (const [pose, key, gesture, contact, target] of [
 }
 const damageActions: Action[] = [];
 for (let height = 0; height < 3; height++) for (let strength = 0; strength < 3; strength++) {
-  const gain = (height === 2 ? [0.9, 1.15, 1.45] : [0.5, 0.9, 1.3])[strength]!;
+  const gain = [0.7, 0.9, 1.3][strength]!, stretch = [0.8, 1, 1.2][strength]!;
   damageActions.push({ pose: "damageGround", frames: 24, contact: 1, hold: true, pain: true,
-    gesture: height === 0 ? { thigh: 65 * gain, knee: -65 * gain, leftThigh: -50 * gain, pelvis: 28 * gain, chest: 25 * gain, head: -15 * gain }
-    : height === 1 ? { chest: 55 * gain, pelvis: -25 * gain, arm: -75 * gain, elbow: 20 * gain, leftArm: 35 * gain, head: 12 * gain }
-    : { head: 60 * gain, chest: 25 * gain, arm: -110 * gain, leftArm: 55 * gain, pelvis: -10 * gain } });
+    gesture: height === 0 ? { thigh: 65 * gain, knee: -65 * gain, leftThigh: -50 * gain, pelvis: 28 * gain, chest: 25 * gain, head: -15 * gain, elbow: -60, hand: -70 }
+    : height === 1 ? { chest: 55 * gain, pelvis: -25 * gain, arm: -75 * gain, elbow: 20 * gain, leftArm: 35 * gain, head: 12 * gain, hand: -70 }
+    : { head: 35 * stretch, chest: 8 * stretch, leftArm: 130 * stretch, leftElbow: 20 * stretch, knee: -35 * stretch, hand: -70 } });
 }
 function rotated(q: ArrayLike<number>, y: number, z = 0) {
   const a = y * Math.PI / 360, b = z * Math.PI / 360;
