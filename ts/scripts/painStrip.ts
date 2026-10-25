@@ -27,6 +27,7 @@ const USAGE = "usage: bun scripts/painStrip.ts OUT_DIR [--resolution WxH] [--fig
 const CHAT_FRAME = 30;
 const FIRST_OBSERVED = 40;
 const HELD_FRAMES = 14;
+const SCENES_PER_RENDER = 6;
 const QUIET_ARENA = [`${HAZARDS_COMMAND}off`, `${ITEMS_COMMAND}off`, `${DROPS_COMMAND}off`];
 const LAST_OBSERVED = 420;
 const SHEET_ORDER = ["high-small", "high-medium", "high-large", "middle-small", "middle-medium", "middle-large", "low-small", "low-medium", "low-large"];
@@ -123,7 +124,8 @@ export const painStrip = (args: readonly string[]) => Effect.gen(function*() {
   for (const shot of missed) yield* Effect.logError(`${shot.fighter} ${shot.category}: clip ${shot.expectedClip} never shown between frames ${FIRST_OBSERVED} and ${LAST_OBSERVED}`);
   const drawn = shots.flatMap((shot, id) => shot.first === undefined || shot.held === undefined ? [] : [{ shot, id, first: { ...shot.first, matchFrame: id * 2 }, held: { ...shot.held, matchFrame: id * 2 + 1 } }]);
   const raw = join(out, "raw");
-  yield* renderScenes({ ...headlessRender(), ...screen }, drawn.flatMap(({ first, held }) => [first, held]), raw);
+  const scenes = drawn.flatMap(({ first, held }) => [first, held]);
+  for (let at = 0; at < scenes.length; at += SCENES_PER_RENDER) yield* renderScenes({ ...headlessRender(), ...screen }, scenes.slice(at, at + SCENES_PER_RENDER), raw);
   const font = yield* runProcess(ChildProcess.make("fc-match", ["-f", "%{file}", "sans"], { stdin: "ignore" }));
   const sheets: string[] = [];
   for (const character of characters) {
