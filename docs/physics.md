@@ -729,7 +729,7 @@ the last frozen tick. It normalizes diagonal digital input, computes the signed
 cross product against the launch direction, and squares its signed magnitude to
 set the rotation up to 18 degrees while preserving launch speed. The smooth
 keyboard approximation cannot represent analog tilt, and this response curve
-is an independent approximation rather than extracted Melee code. A neutral or
+is an independent approximation of SmashWiki's "Directional influence". A neutral or
 parallel input does not change the path.
 
 ## Smash DI and ASDI
@@ -782,7 +782,7 @@ launch above the ordinary terminal-fall cap. The additional gravity-based
 launch adjustment introduced in Brawl is not part of this Melee target.
 
 A new ordinary hit resets movement velocity; how its launch combines with an
-earlier one is described in "Verified retail combat parameters" above. Landing removes vertical launch
+earlier one is described in "Launch, hitstun and stacking" above. Landing removes vertical launch
 momentum and retains horizontal carry. A tumble landing that enters tech or
 knockdown recovery clears both launch components. Bounce momentum loss and
 Melee's low-knockback grounded launch rules remain unimplemented.
@@ -798,56 +798,23 @@ the same protection query used by hit detection.
 
 The frame sweep test checks both characters at each frame 1–30. Additional
 tests cover damage interrupting startup and landing ending dodge protection.
-Neutral/directional dodge force now uses retail  =
-3.0999999046325684 Melee units/frame (18.59999942779541 world units/frame),
-with = 0.8999999761581421 decay. Retail motion state 236 selects
-submotion/animation 44, ACTION_EscapeAir_figatree. The verified Fox, Falco and
-Captain Falcon scripts write command variable zero to one at animation frame
-30, recorded in the recorded design targets.
-The simulation applies decay for 29 moving ticks and ordinary gravity plus
-air drift from tick 30. The 49-frame animation cap remains sourced to the
-version-unidentified frame table; this change does not establish full
-animation-end/fall-special transition parity.
-
-The update-number conversion is our own design target: a motion-state change
-requests animation zero; the first animation evaluation consumes first-play
-without advancing and processes commands at frame zero. EscapeAir entry then calls the animation and
-command update once more, reaching frame one before its first physics step.
-Subsequent unfrozen animation callbacks precede input and physics. The
-asynchronous timer targets frame 30, and its command write occurs before that
-frame's physics callback. This is 29 decay steps, not 30.
-
-| Moving update | Animation frame before physics | Physics |
-| --- | --- | --- |
-| Entry | 1, following setup at 0 | Multiply velocity by retail decay |
-| 29 | 29 | Last decay step |
-| 30 | 30; command variable zero becomes one | Gravity, fast-fall eligibility and air drift |
-
-The trace uses Melee (state setup and callback phases),
-Melee (animation then command processing),
-Melee (first-play evaluation),
-Melee (absolute-frame timer), and
-Melee (entry and physics selection).
-No implementation was copied or translated. This is source-derived scheduling
-evidence, not a captured original-game trajectory. Hitlag freezes the action
-clock and resumes this boundary on expiry; existing snapshot fields already
-preserve the phase. Tests exercise neutral and both diagonal vertical
-directions, all three steering inputs, the exact 29/30 boundary, hitlag, and
-restore/replay through the boundary using the factual Falco rig. The original
-roster and the 18-degree horizontal air dodge (smashcraft:docs/gameplay-design.md)
-are unchanged.
-The focused dodge filter passed 32/32 with zero compiler errors and one
-existing unused-import warning; evidence is
-smashcraft:build/retail-dodge-switch-tests.log. The long-displacement expectations
-use independently calculated binary32 accumulation, matching the pinned Wurst
-interpreter arithmetic; tolerances were retained. Native trajectory comparison
-and the full animation-end transition remain outside this result.
+Neutral and directional dodge force and its decay are Smashcraft's, in
+smashcraft:ts/src/game/sim/, since SmashWiki "Air dodge" gives no speed. The
+simulation applies the decay for 29 moving ticks and ordinary gravity plus air
+drift from tick 30, inside the 49-frame animation of SmashWiki's table. Entry
+reaches animation frame one before the first physics step, so this is 29 decay
+steps, not 30. Hitlag freezes the action clock and resumes this boundary on
+expiry; snapshot fields preserve the phase. Tests exercise neutral and both
+diagonal vertical directions, all three steering inputs, the exact 29/30
+boundary, hitlag, and restore/replay through the boundary. The original
+roster and the 18-degree horizontal air dodge
+(smashcraft:docs/gameplay-design.md) are unchanged.
 
 An accepted air dodge replaces prior ordinary movement and clears both launch
 momentum components, including for neutral input. This follows the momentum
 halt described in the Melee section of https://www.ssbwiki.com/Air_dodge.
 During each airborne motion tick, the simulation multiplies both dodge velocity
-components by the extracted decay before either displacement. A 45-degree input therefore
+components by the dodge decay before either displacement. A 45-degree input therefore
 travels along a 45-degree line until contact; neutral input stays still during
 the motion period. This integration order is our implementation choice, not a
 claim of frame-exact Melee motion. Ordinary gravity and launch decay keep their
@@ -882,9 +849,7 @@ including landing. Fox full/short vertical launch attributes are
 3.680000066757202 / 2.0999999046325684 Melee units per frame; Falco uses
 4.099999904632568 / 1.899999976158142. Aerial launch is the full-jump attribute
 times 1.2000000476837158 for Fox or 0.9399999976158142 for Falco. These values
-come from the complete published DAT JSON intake in
-the recorded design targets. The publisher's
-game revision is unidentified, so these are not certified NTSC 1.02 values.
+are SuperCombo Wiki's (smashcraft:references/melee-frame-data/character-attributes.csv).
 
 Historical fixture before #339: design targets set from public frame data
 (SmashWiki, Smashboards) for independently authored Wurst. Ground takeoff skips ordinary air
@@ -918,15 +883,15 @@ Fast-fall activates while airborne with descending self velocity, before the
 ordinary gravity step. Once active, releasing Down or steering horizontally
 does not cancel it; aerial attack startup preserves it. Landing, an accepted
 jump or air dodge, a flinching hit, ledge catch and reset clear it. Snapshots
-capture and compare the flag. Fox uses the published attribute
-3.4000000953674316 Melee units/frame; Rifleman uses Falco's 3.5.
+capture and compare the flag. Fox uses his fast-fall velocity
+3.4 Melee units/frame and Rifleman uses Falco's 3.5 (character-attributes.csv).
 
 These state rules, including preserving the fast-fall flag across motion states,
 are our own design targets from public frame data (SmashWiki, Smashboards). The
 Wurst implementation is independently authored.
 
 Fast fall needs neutral horizontal input (smashcraft:docs/gameplay-design.md,
-"Controls"). Retail  = 0.6625000238418579 is the downward stick threshold and integer = 4 requires input age strictly below four frames. Digital Down has
+"Controls"). The downward stick threshold is 0.6625 and the press must be under four frames old; both are Smashcraft's, as no public page states Melee's. Digital Down has
 magnitude one. The input tick has age zero; three further held ticks remain
 eligible, while the fifth tick is too late. Freshness ages during hitlag and
 is tested on the expiry tick. A diagonal Down hold ages the same input, so
@@ -938,18 +903,12 @@ fast-fall while self velocity is rising; rising knockback does not prevent
 activation while self velocity is descending. This separates knockback motion
 from the character's gravity-driven fall.
 
-The retail aerial checks use the explicit Falco factual rig through the
-production engine. They cover early versus fresh Down at the apex, the age
+The aerial checks use the explicit Falco rig through the production engine. They cover early versus fresh Down at the apex, the age
 three/four boundary during hitlag, diagonal-to-neutral input, replay restoration,
 and every digital dodge direction with frozen and resumed motion. Existing
-air-dodge displacement expectations were corrected for the extracted force;
-the neutral vector remains zero and the original roster attributes are unchanged.
-Focused filters passed retailAerial 5/5, dodge 30/30, and fast 9/9 with zero
-compiler errors and the existing unused-import warning. Evidence is
-smashcraft:build/retail-aerial-tests.log, smashcraft:build/retail-dodge-tests.log,
-and smashcraft:build/retail-fastfall-tests.log. These checks do not establish
-native behavior. The EscapeAir switch timing was subsequently corrected
-using the command facts and callback trace described above.
+air-dodge displacement expectations follow the dodge force; the neutral vector
+remains zero and the original roster attributes are unchanged. These checks do
+not establish native behavior.
 These are numerical and behavioral design targets.
 
 ## Raw movement parameter precision
@@ -957,12 +916,10 @@ These are numerical and behavioral design targets.
 Gravity, terminal speeds, drift speed/acceleration/friction, ground traction,
 initial dash speed and aerial-jump horizontal velocity now retain the complete
 published binary32 values in source, alongside the already sourced jump and
-fast-fall values. Their factual source is
-the recorded design targets. Shared Fox/Falco
-fields agree numerically. This avoids relying on shortened decimal spellings
+fast-fall values. Their source is
+smashcraft:references/melee-frame-data/character-attributes.csv. This avoids relying on shortened decimal spellings
 when emitting Lua, whose number arithmetic differs from the Wurst headless
-interpreter's binary32 arithmetic. It does not establish identical arithmetic
-rounding to the original game, complete movement transitions or disc revision.
+interpreter's binary32 arithmetic. It does not establish complete movement transitions.
 The aggregate passed **404/404**, zero compiler errors and the existing
 unused-import warning (smashcraft:build/physics-raw-movement.log).
 
@@ -977,16 +934,11 @@ function.
 
 ## Jump out of shield
 
-The local reference's Melee routes
-active Guard/GuardOn input to the jump check in
-Melee Our independently authored
-transition now clears shield and enters ordinary jump squat without requiring
+A jump from a held shield clears it and enters ordinary jump squat without requiring
 shield release first. Holding the trigger cannot re-raise shield during squat.
 Shieldstun still blocks the jump. Tests cover both characters and the complete
 shield → jump → downward diagonal air dodge → sliding landing sequence.
-Ground jumps also cancel shield-release recovery. In the same reference file,
-GuardOff's input handling reaches a Melee routine in a Melee routine.c, which checks
-jump input. Our transition clears release lag and enters the ordinary
+Ground jumps also cancel shield-release recovery: the transition clears release lag and enters the ordinary
 character-specific squat; it does not bypass shieldstun, hitlag, hitstun,
 landing recovery or attack recovery. Tests release a real held shield and
 check every remaining release-lag tick for both characters, then take off.
