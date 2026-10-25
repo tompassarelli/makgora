@@ -1622,6 +1622,44 @@ Signature moves, with each move's regions, frames and damage in the generated
 | Medivh | Neutral air (arcane ring) | Timing |
 | Anub'arak | Forward smash (impaling claw) | Position |
 
+## Smash attacks against tilts
+
+Tom's decision of 26 Oct 2026 (#318), corrected the same day so that power
+splits into options of its own. Every smash is more committal than the tilt of
+its direction: it starts later and has more total frames. It pays that back on
+at least one of these options, chosen per move:
+
+- (a) reach equal to the tilt's or slightly more;
+- (b) a meatier hitbox that stays out longer and controls space;
+- (d) launcher: an angle and knockback that start a juggle or combo from low
+  percent, measured as frame advantage on hit;
+- (e) early kill: a markedly lower KO percent than the fighter's other moves,
+  on a Fox-weight foe at centre stage and at the ledge;
+- (f) damage;
+- (g) launch angle as a tool: a spike or semi-spike for edge guarding, or a low
+  angle that sets up tech chases;
+- (h) coverage: both sides (down smash), an arc over the head or onto platforms
+  (up smash), or the ledge against a ledge hang;
+- (i) disjoint: a weapon hitbox well beyond the hurtbox;
+- (j) intangibility or a hurtbox shift on chosen frames;
+- (k) shield pressure: shieldstun or shield damage that makes it safe or breaks
+  shields;
+- (l) a sweetspot or tipper that rewards precise spacing;
+- (m) out-of-shield or jump-cancel access.
+
+A smash may give up reach below the tilt's for another option. There is no
+(c); the earlier hurtbox option became (j).
+
+Melee mostly follows the rule, measured in
+[Smash attacks against tilts](design/melee/attacks.md#smash-attacks-against-tilts):
+nearly every smash has more total frames than its tilt and every one wins on at
+least one option, damage most often, coverage for down smash and out-of-shield
+access for up smash. Counting the fighter's own travel, forward smash reaches
+as far as forward tilt for 18 of 23 fighters. Melee departs from the startup
+half: only 7 of 26 down smashes start later than the down tilt. Smashcraft
+keeps both halves of the commitment for its own fighters; the roster check
+is #319.
+
 ## Legible locked states (#68)
 
 No false agency asks that a fighter who can't get out knows it. The agency

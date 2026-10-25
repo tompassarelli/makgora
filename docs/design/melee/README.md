@@ -28,7 +28,7 @@ The numbers in these pages are frozen gameplay facts, kept as our own design
 reference. Per-move frame data comes from
 smashcraft:references/melee-frame-data/: meleeframedata.com's database
 (startup, active frames, interruptible frame, total, shieldstun, damage,
-landing lag) and libmelee's recorded hitbox positions and dodge travel. Its
+landing lag) and libmelee's recorded hitbox positions and attack and dodge travel. Its
 README records provenance and the meaning and traps of every field. Fighter
 attributes (speeds, gravity, jump heights, weights) are SuperCombo Wiki's
 table in references/melee-frame-data/character-attributes.csv and the values

@@ -1,5 +1,5 @@
 // Foreign-data boundary only: reduces libmelee's recorded per-frame table to the
-// hitbox positions of normal attacks and grabs and the travel of ground dodges.
+// hitbox positions of normal attacks and grabs and the travel of attacks and ground dodges.
 // Usage: bun libmelee-intake.ts FRAMEDATA.csv OUTPUT_DIRECTORY
 import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
@@ -79,7 +79,7 @@ const records = [...grouped.values()].map(({ character, action, frames }) => {
     source: { repository: "https://github.com/altf4/libmelee", revision, path: "melee/framedata.csv", libmelee_character: character, libmelee_action: action },
     frame_index_origin: 1, recorded_frames: frames.length, first_iasa_frame: firstIasa, first_facing_changed_frame: firstTurn,
     hitbox_frames: frames.filter((frame) => frame.hitboxes.length > 0).map(({ frame, hitboxes }) => ({ frame, hitboxes })),
-    locomotion_x: category === "dodges" ? frames.map((frame) => frame.locomotion_x) : null,
+    locomotion_x: category === "grabs" ? null : frames.map((frame) => frame.locomotion_x),
   };
 });
 records.sort((a, b) => JSON.stringify([a.character, a.category, a.action]).localeCompare(JSON.stringify([b.character, b.category, b.action])));

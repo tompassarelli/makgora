@@ -362,3 +362,66 @@ after landing from full air speed while fading.
 | Young Link | Neutral air | 0 | −8 | −15 | 11.1 | 3.7 | 5.8 |
 | Zelda | Forward air | +1 | −8 | −23 | 16.8 | 7.0 | 2.5 |
 <!-- /table -->
+
+## Smash attacks against tilts
+
+Each smash attack paired with the tilt of the same direction, for all 26
+fighters, by `bun ts/scripts/meleeSmashBudget.ts` (run from the checkout root's
+`ts/`). The script reads meleeframedata.com's timing, damage and shieldstun,
+libmelee's hitbox positions and per-frame travel, FightCore's launch angles and
+SmashWiki's intangibility frames, and prints the full table. Here **reach**
+adds the fighter's own forward travel up to the frame of the farthest hitbox,
+which the Reach table above leaves out.
+
+**Commitment.** A smash nearly always costs more frames in total than its tilt:
+24 of 25 forward, 23 of 25 up and 25 of 26 down smashes last longer. Startup is
+another matter by direction. 23 of 25 forward and 22 of 26 up smashes come out
+later than the tilt, but only 7 of 26 down smashes do: most down smashes start
+on the same frame as the down tilt or sooner (Marth's on frame 5 against 7,
+Roy's on 6 against 8), and pay for it in total frames instead.
+
+**Travel decides forward reach.** Several forward smashes step or slide into
+the swing: Sheik's carries her about 24 units, Ganondorf's, Falco's, Fox's,
+Kirby's, Captain Falcon's and Jigglypuff's 14 to 18. Counting that travel,
+forward smash reaches at least as far as forward tilt for 18 of 23 fighters with
+both recorded; standing still it would for 11. Down smash reaches as far ahead
+as down tilt for only 8 of 24, and up smash reaches as high as up tilt for
+15 of 25.
+
+**What a smash buys.** Counting how many fighters' smashes beat their tilt on
+each option (Tom's lettering, in
+[the design decision](../../gameplay-design.md#smash-attacks-against-tilts)):
+
+| Option | Forward | Up | Down |
+| --- | ---: | ---: | ---: |
+| (a) reach at least the tilt's | 18 | 15 | 8 |
+| (b) longer active span | 12 | 15 | 21 |
+| (f) more damage | 22 | 21 | 24 |
+| (g) a low or downward launch angle the tilt lacks | 1 | 2 | 4 |
+| (h) coverage: higher, or behind the fighter | 6 | 12 | 23 |
+| (i) hitbox centre farther from the body | 11 | 9 | 5 |
+| (j) intangibility the tilt lacks | 1 | 10 | 6 |
+| (k) at least as safe on shield | 8 | 9 | 9 |
+| (l) a sweetspot at least 1.2 times its weakest hit | 9 | 13 | 14 |
+| (m) out-of-shield access | 0 | 26 | 0 |
+
+Every smash wins on at least one option besides out-of-shield access: on
+average 3.5 forward, 4.1 up and 4.4 down. Damage is the near-universal payment;
+the exceptions trade it for something else, such as Link's and Young Link's
+forward smashes (less damage, more reach and a disjointed blade) or Samus's and
+Zelda's up smashes (multi-hit fields that last 18 and 32 frames). Down smash is
+Melee's coverage move: 23 of 26 reach farther behind the fighter than the down
+tilt. Up smash is the out-of-shield move: every fighter can start it from
+the jump squat, which a shield can enter at once, while a tilt waits out the
+shield release.
+
+Thresholds: geometric ties are within 0.5 units; a launch angle counts as a
+tool at 25° or less or pointing downward, leaving out the Sakurai angle (361);
+shield safety compares the last active frame. Launcher and early-kill value
+need hit advantage and KO percent, which the combo analyzer will measure.
+Ledge coverage, hurtbox shifts that are not intangibility (Captain Falcon's
+leaning forward smash), shield damage beyond its damage-driven share and
+disjoint measured against hurtboxes are not in these sources. libmelee has
+no recording of eight dash attacks and of Mr. Game & Watch's jab, down tilt
+and forward smash, Ness's three smashes and Peach's forward smash, so those
+rows lack reach and travel.

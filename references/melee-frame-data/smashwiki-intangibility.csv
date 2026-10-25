@@ -1,0 +1,22 @@
+character,action,body_part,first_frame,last_frame
+bowser,usmash,Entire body,16,17
+donkey_kong,usmash,,12,16
+dr._mario,usmash,Head,9,11
+falco,usmash,Head,1,10
+falco,dsmash,Legs,1,6
+fox,usmash,Head,1,9
+fox,dsmash,Legs,6,6
+jigglypuff,dsmash,Feet,9,10
+kirby,dsmash,Feet,7,9
+luigi,usmash,Head,9,11
+mario,usmash,Head,9,11
+mr._game_&_watch,usmash,Head,24,28
+ness,utilt,Head,5,6
+peach,utilt,Head,9,13
+peach,usmash,Head and arms,13,22
+sheik,usmash,,12,16
+sheik,dsmash,Legs,5,5
+yoshi,dattack,,5,13
+yoshi,fsmash,,12,16
+yoshi,usmash,Head,11,15
+zelda,dsmash,Leg,4,16

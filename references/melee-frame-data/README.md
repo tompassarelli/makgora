@@ -135,8 +135,8 @@ and representative site values rather than merely replacing the checksum.
 
 `smashcraft:references/melee-frame-data/libmelee.jsonl` reduces libmelee's
 recorded frame table to what meleeframedata.com's database lacks: where each
-normal attack's and grab's hitboxes are, frame by frame, and how far each ground
-dodge moves the fighter. It has 469 records, one per `(character, action)`,
+normal attack's and grab's hitboxes are, frame by frame, and how far each attack
+and ground dodge moves the fighter on each frame. It has 469 records, one per `(character, action)`,
 for the 26 fighters (Popo stands for the Ice Climbers; Nana is left out).
 
 Source: https://github.com/altf4/libmelee at revision
@@ -162,14 +162,22 @@ Each record has:
 - `hitbox_frames`: each frame with an active hitbox, and for each hitbox its
   `size` (radius) and `x`, `y` position relative to the fighter, in Melee
   units, with `x` positive ahead of the fighter.
-- `locomotion_x`: for dodges, the fighter's horizontal movement on every frame;
-  null otherwise.
+- `locomotion_x`: for attacks and dodges, the fighter's horizontal movement on
+  every frame, positive forward; null for grabs. The forward travel up to frame
+  *n* is the sum of the first *n* entries; adding a hitbox's `x` and `size` on
+  that frame gives its reach from where the move started.
 
-Coverage is libmelee's: some fighters lack a dash attack or forward smash
-record, and up to four hitboxes per frame are recorded. Positions describe the
+Coverage is libmelee's. Of jab, the three tilts, the three smashes and dash
+attack, 193 of the 208 for 26 fighters are recorded; libmelee has none for the
+dash attacks of Bowser, Donkey Kong, Jigglypuff, Kirby, Luigi, Mario, Roy and
+Yoshi, for Mr. Game & Watch's jab, down tilt and forward smash, Ness's three
+smashes or Peach's forward smash (their own action states, which libmelee does
+not name). Up to four hitboxes per frame are recorded. Positions describe the
 recorded animation, not the full collision geometry; hurtboxes are not
 recorded. Representative checks: Fox's jab hitboxes are on frames 2 and 3, as
-in `records.jsonl`, and his forward roll turns on frame 20 of 31.
+in `records.jsonl`, and his forward roll turns on frame 20 of 31. His forward
+smash travels 1.34 units a frame on frames 9 to 14 and about 1 a frame to
+frame 30.
 
 Repeat the intake from the checkout's root (seconds):
 
@@ -389,3 +397,21 @@ per fighter with the movement and body columns typed (weight, run velocity and
 air speed as `/`-separated lists, since some fighters carry two values; hex
 cells such as `0x02` as numbers) and every other named column kept as text.
 `attributeSource` names the page, fighter and column a value came from.
+
+## SmashWiki attack intangibility
+
+`smashcraft:references/melee-frame-data/smashwiki-intangibility.csv` lists the
+Melee jabs, tilts, smashes and dash attacks that make part of the fighter
+intangible, one row per move: `character` and `action` in this corpus's
+identifiers, `body_part` (blank where the page gives none) and the
+`first_frame` and `last_frame` of the intangibility, counting from 1. Moves not
+listed have none on the page.
+
+Source: SmashWiki's "Intangibility" article
+(https://www.ssbwiki.com/Intangibility), revision 1997771 of 2025-08-23, read as
+wikitext on 2026-10-25 (SHA-256
+`8fcbc2bf53623d64041639a4f7636f6cc447cb40a8d897c4e96c5bb4ca44d6ca`). Only the
+Melee frame numbers and body parts of its moveset table are kept; the page's
+prose is not copied. Hurtbox shifts that are not intangibility, such as a lean,
+are not recorded. Representative check: Fox's up smash makes his head
+intangible on frames 1 to 9 and his down smash his legs on frame 6.
