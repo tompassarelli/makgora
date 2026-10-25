@@ -66,6 +66,7 @@ interface SessionRates {
   build: string;
   second: Second;
   lines: string[];
+  headed: boolean;
   file: number;
   named: Record<string, number>;
   epoch: number;
@@ -407,10 +408,13 @@ function liveLines(rates: SessionRates, now: number): readonly string[] {
 function flush(rates: SessionRates, now: number): void {
   rates.lines.push(countLine(rates, now), eventLine(rates, now), ...liveLines(rates, now));
   const load = rates.load ??= `${globalThis.__smashcraftMatchSerial ?? 0}-${microseconds(rates.started)}`;
-  writeLines(sessionRatesFile(load, rates.file), [sessionRatesHeader(load, rates.file, rates.build, sourceVersion(), rates.clock !== undefined), ...rates.lines]);
+  if (!rates.headed) rates.lines.unshift(sessionRatesHeader(load, rates.file, rates.build, sourceVersion(), rates.clock !== undefined));
+  rates.headed = true;
+  writeLines(sessionRatesFile(load, rates.file), rates.lines);
   if (rates.seconds - rates.file * SECONDS_PER_FILE < SECONDS_PER_FILE) return;
   rates.file++;
   rates.lines = [];
+  rates.headed = false;
 }
 
 function noteMachineRate(rates: SessionRates, now: number): void {
@@ -456,7 +460,7 @@ export function installSessionRates(build: string): void {
   const clock = findClock();
   const started = clock === undefined ? 0 : clock();
   const rates = globalThis.__smashcraftSessionRates ??= {
-    clock, started, secondStarted: started, seconds: 0, load: undefined, build, second: emptySecond(), lines: [], file: 0, named: {},
+    clock, started, secondStarted: started, seconds: 0, load: undefined, build, second: emptySecond(), lines: [], headed: false, file: 0, named: {},
     epoch: -1, lastSpec: 0, lastConf: 0, lastSim: 0, created: zeroKinds(), destroyed: zeroKinds(),
     keyRegistrations: 0, registrations: 0, actions: 0, sends: 0, handleMax: 0, wrapped: false, wasPaused: false, wasMenu: false, lastTick: started,
     heldRun: 0, driftEpoch: -1, driftCallbacks: 0, driftBase: 0, drift: 0, botRepeated: 0, botRerun: 0, heap: -1,
