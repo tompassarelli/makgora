@@ -33,12 +33,15 @@
   #296); `bun ts/scripts/ledger/fixtures/fighters.ts` lists what the corpus
   does not give it. It is absent from the roster and the map.
 
-- Objectives: `bun wisp combos --objectives` checks each declared target in
-  smashcraft:tools/move-data/combo-objectives.json (an opener hit at a percent
-  window into a follow-up, against a victim weight, at least a class and
-  optionally with DIs that must not escape) against the committed link table,
-  names every row and percent that misses and fails
-  (smashcraft:docs/design/melee-parity-plan.md, "Combo analyzer", #299).
+- Objectives: `bun wisp combos --objectives [--fighter NAME]` checks each
+  declared target in smashcraft:tools/move-data/combo-objectives.json. Its
+  `links` (an opener hit at a percent window into a follow-up, against a
+  victim weight, at least a class and optionally with DIs that must not
+  escape) are checked against the committed link table; its `throws` declare
+  each fighter's four throw roles, and each named fighter's throws are
+  simulated against their role's test. It names every row, percent and throw
+  that misses and fails (smashcraft:docs/design/melee-parity-plan.md, "Combo
+  analyzer", #299 and #332).
 
 - Validation: `bun wisp combos --validate [--jobs N]` runs the cited Fox cases
   in smashcraft:ts/scripts/comboValidation.ts on the Fox fixture fighter

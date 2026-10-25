@@ -20,11 +20,12 @@ import { SELECTABLE_CHARACTERS, fighterName } from "../../../src/game/sim/heroes
 import { type FighterSummary, MAX_CONVERSIONS, OPENERS, OPPONENTS, PERCENTS, POSITIONS, type RouteRecord, type UnitReport, fighterNamed, summarize } from "../../comboExplorer";
 import { type AdvantageRow, TARGETS, type ZeroToDeath, advantagePage, unmet } from "../../advantageState";
 import { admit } from "../../heavyCapacity";
-import { ComboObjectivesSchema, objectiveMisses, objectiveName } from "../../comboObjectives";
+import { type ComboObjective, ComboObjectivesSchema, objectiveMisses, objectiveName, throwDeclarations } from "../../comboObjectives";
 import { type LinkCell, type LinkRow, type LinkUnit, linksPage } from "../../comboLinks";
 import { FOX_CASES, FOX_FIXTURE, caseLine, judge } from "../../comboValidation";
 import { foxFixture } from "../../ledger/fixtures/fox";
 import { FIXTURE_FIGHTERS } from "../../ledger/fixtures/fighters";
+import { type ThrowDeclaration, type ThrowRoleResult, type ThrowRoleUnit, VICTIM, VICTIM_WEIGHT, coverageProblems } from "../../throwRoleObjectives";
 
 const moveData = join(import.meta.dir, "../../../../tools/move-data");
 const unitsFile = join(moveData, "combos/units.jsonl");
@@ -292,8 +293,7 @@ const links = (attackers: readonly Character[], jobs: number) => Effect.forEach(
   yield* Console.log(`${fighterName(attacker)} links: ${rows.length} rows, ${count("true")} true, ${count("DI-dependent")} DI-dependent, ${count("read")} read, ${count("none")} none`);
 }), { discard: true });
 
-const objectives = Effect.gen(function* () {
-  const declared = yield* readText(objectivesFile).pipe(Effect.flatMap((text) => Schema.decodeEffect(Schema.fromJsonString(ComboObjectivesSchema))(text).pipe(Effect.mapError(failure))));
+const linkObjectives = (declared: readonly ComboObjective[]) => Effect.gen(function* () {
   const fighters = [...new Set(declared.map((objective) => objective.fighter))];
   const rows = (yield* Effect.forEach(fighters, (fighter) => {
     const attacker = fighterNamed(fighter);
@@ -306,7 +306,35 @@ const objectives = Effect.gen(function* () {
     return own.length === 0 ? [] : [`  ${objectiveName(objective)}: ${own.join("; ")}`];
   });
   yield* Console.log([`combo objectives: ${declared.length - misses.length} of ${declared.length} hold in tools/move-data/links against tools/move-data/combo-objectives.json`, ...misses].join("\n"));
-  if (misses.length > 0) return yield* new CombosFailure({ problem: `${misses.length} combo objectives miss` });
+  return misses.length;
+});
+
+const throwRoles = (declarations: readonly ThrowDeclaration[], attackers: readonly Character[], jobs: number) => Effect.gen(function* () {
+  const undeclared = SELECTABLE_CHARACTERS.map(fighterName).filter((name) => !declarations.some((declaration) => declaration.fighter === name));
+  const unknown = [...new Set(declarations.map((declaration) => declaration.fighter).filter((fighter) => fighterNamed(fighter) === undefined))];
+  const coverage = [...coverageProblems(declarations), ...undeclared.map((name) => `${name} declares no throw roles`), ...unknown.map((name) => `${name} is not a selectable fighter`)];
+  const units: ThrowRoleUnit[] = declarations.flatMap((declaration) => {
+    const attacker = fighterNamed(declaration.fighter);
+    return attacker === undefined || !attackers.includes(attacker) ? [] : [{ attacker, declaration }];
+  });
+  const results = yield* inWorkers<ThrowRoleUnit, ThrowRoleResult>(new URL("../../throwRoleObjectivesWorker.ts", import.meta.url), units, jobs,
+    (unit) => `${unit.declaration.fighter} ${unit.declaration.throw} throw as ${unit.declaration.role}`,
+    (unit, result) => `${result.fighter} ${unit.declaration.throw} throw as ${result.role}: ${result.passes ? "pass" : "fail"}`,
+  ).pipe(step(`${units.length} declared throw roles on ${jobs} threads`));
+  const failed = results.filter((result) => !result.passes).length;
+  yield* Console.log([
+    `throw roles: ${results.length - failed} of ${results.length} declared throws do their role (victim ${fighterName(VICTIM)} at weight ${VICTIM_WEIGHT})`,
+    ...results.map((result) => `  ${result.passes ? "pass" : "FAIL"} ${result.fighter} ${result.throw} throw, ${result.role} at ${result.percents.join("/")}%: ${result.measured}${result.passes ? "" : ` — ${result.problems.join("; ")}`}`),
+    ...coverage.map((problem) => `  coverage: ${problem}`),
+  ].join("\n"));
+  return failed + coverage.length;
+});
+
+const objectives = (attackers: readonly Character[], jobs: number) => Effect.gen(function* () {
+  const declared = yield* readText(objectivesFile).pipe(Effect.flatMap((text) => Schema.decodeEffect(Schema.fromJsonString(ComboObjectivesSchema))(text).pipe(Effect.mapError(failure))));
+  const links = yield* linkObjectives(declared.links);
+  const throws = yield* throwRoles(throwDeclarations(declared), attackers, jobs);
+  if (links + throws > 0) return yield* new CombosFailure({ problem: `${links} combo objectives and ${throws} throw-role rules miss` });
 });
 
 const validate = (jobs: number) => Effect.gen(function* () {
@@ -342,7 +370,6 @@ export const combos: Command = (args) => Effect.gen(function*() {
   const jobs = Number(parsed.jobs ?? "6");
   if (!Number.isInteger(jobs) || jobs < 1) return yield* new UsageFailure({ problem: "--jobs takes a whole number of worker threads" });
   if (parsed.merge !== undefined) return yield* mergeAdvantage(parsed.merge);
-  if (parsed.objectives === true) return yield* objectives;
   const shardMatch = parsed.shard?.match(/^(\d+)\/(\d+)$/);
   const shard = shardMatch === undefined || shardMatch === null ? undefined : { index: Number(shardMatch[1]), count: Number(shardMatch[2]), rows: parsed.rows ?? "" };
   if (parsed.shard !== undefined && (shard === undefined || shard.index >= shard.count || shard.rows === "" || parsed.advantage !== true || names.length > 0)) {
@@ -354,6 +381,7 @@ export const combos: Command = (args) => Effect.gen(function*() {
     return;
   }
   if (parsed.validate === true) return yield* validate(jobs);
+  if (parsed.objectives === true) return yield* objectives(attackers.filter((attacker): attacker is Character => attacker !== undefined), jobs);
   if (parsed.links === true) return yield* links(attackers.filter((attacker): attacker is Character => attacker !== undefined), jobs);
   if (parsed["zero-to-death"] === true) return yield* zeroToDeath(attackers.filter((attacker): attacker is Character => attacker !== undefined), jobs);
   if (parsed.advantage === true) return yield* advantage(attackers.filter((attacker): attacker is Character => attacker !== undefined), jobs, names.length > 0, shard);

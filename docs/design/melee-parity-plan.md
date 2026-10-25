@@ -280,6 +280,17 @@ Built on the existing headless sim and search, not beside them.
   rows are Maiev's down tilt into down tilt at 0-20% (true), and up smash at
   30-50% and neutral air at 100-150% into grab with DI in or none, all
   against weight 75.
+- Throw roles (#332): the same file's `throws` declares each fighter's four
+  throws by role from [throw roles](throw-roles.md) (Rule B, #331), with the
+  role's percents unless a throw gives its own. After the link rows,
+  `--objectives` runs each role's test from that page's menu on the combo
+  explorer against a Kobold at weight 75 under DI none, in, out, up and down
+  (`ts/scripts/throwRoleObjectives.ts`), checks that each fighter covers at
+  least three roles, and names every throw that misses. This part simulates,
+  so it runs under heavy admission, one `--fighter` at a time for the roster.
+  The first declarations are today's slots: up throws combo starters, down
+  throws tech-chase starters, the KILL-class back throws kill throws, every
+  other forward and back throw positional.
 
 The agency rule (`docs/gameplay-design.md:578`, at most 2 true links in a row,
 0-to-death in 2-3 reads) stays the guard against loops; the objectives set the
