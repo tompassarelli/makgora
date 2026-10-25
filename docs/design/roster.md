@@ -678,7 +678,7 @@ The roster table is in [gameplay-design.md](../gameplay-design.md#strong-and-wea
 | Neutral B | **Shadow Strike:** one slow thrown blade; 5 impact damage, POKE at 35 degrees, plus 3 damage over 180 frames in three 1-damage ticks; the poison is the **mark** for Shadow Pursuit (#126, smashcraft:docs/design/kit-review-1.md). Speed 0.11H/frame, life 30, radius 0.13H. Reflectable; poison never flinches and does not stack. | Spawn f16, end f37; 5 mana |
 | Side B | **Pursuit Lunge:** 1.0H dash slash, 10 damage, EDGE at 35 degrees. Against a marked opponent within 2.5H it is **Shadow Pursuit** (#126): a 14-frame tell, then on f15 she appears just behind the target facing it, spending the mark, and slashes f18–20 for 10, EDGE at 35 degrees; ends f40; no intangibility. Hold up/down on entry for a shallow +20/−20 degree air trajectory; no late steering. Air use once per airtime and ends helpless. No invulnerability. | f11–14 active, R26; 15 mana |
 | Up B | **Blink:** choose one of eight directions from held input at entry, travel up to 3.5H; f1–7 vulnerable, f8–10 intangible, endpoint vulnerable from f11. No hitbox. A path entering the main-deck lip within 0.5H below its top may pass: an endpoint above stays there, an endpoint within 0.5H of a free ledge catches, and one farther in lands. A taken ledge leaves her outside; deeper entry stops against the stage. Free version travels 1.9H in the chosen direction, with no intangibility. | Displacement f9; f11–30 endpoint recovery then helpless; 20 mana |
-| Down B | **Fan of Knives:** throw a wide outward burst reaching 1.30H around Warden, on ground or in air, for 7 damage, POKE at 45 degrees outward; every body hit is poisoned and marked for Shadow Pursuit. Seven knives spray outward from a coiled cast; immediate release, no stored charge ([design](warden-fan-of-knives.md), #239). | f9–11 active, R27; 18 mana |
+| Down B | **Fan of Knives**, Illidan's former Immolate shape (#272): on the ground a burst ahead of her only, f4–7, Immolate's ground box (a foe whose feet are up to 140 ahead, 80 below to 100 above), 6.1 damage sent sideways (base 21, growth 105); in the air the burst is Immolate's box below her (±70, 170 below to 30 above), a spike at the same damage (base 26, growth 110), and her vertical speed is held at zero, so she nearly stops falling. Jump-cancellable from f4; every body hit is poisoned and marked for Shadow Pursuit. EX: 25% more damage ([design](warden-fan-of-knives.md)). | f4–7 active, end f27; 18 mana |
 
 ### Grab and throws
 
@@ -1667,7 +1667,11 @@ He reaches farther and deals less: the twin-glaive forward air 3 + 4, back air 6
 smash 10, all at 85 knockback growth, and his smashes start from 20 base
 knockback like everyone's ordinary hits. Every hit he lands drains the
 target's mana, more for big hits and combo enders, and his side special is
-Fel Rush ([Illidan](illidan.md), #147). **Weakness:** his light hits make
+Fel Rush ([Illidan](illidan.md), #147). His down special, Immolate, is
+Maiev's former Fan of Knives shape (#272): one frame-one burst on both sides
+of him that pops foes upward (85 degrees, base 75, growth 50) for 7 damage on
+the ground and 9 in the air, with an intangible first frame; it holds him in
+place in the air, a jump cancels it from frame 4, and EX reaches 25% farther. **Weakness:** his light hits make
 him land more of them to take a stock.
 
 **Gameplan** (smashcraft:ts/src/game/sim/illidanGameplan.ts): he fights in

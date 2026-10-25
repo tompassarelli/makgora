@@ -1,0 +1,27 @@
+# #272: Maiev's Fan of Knives in the air after the swap with Immolate: Immolate's box below her spikes an airborne b
+# downward, and her fall nearly stops (vertical speed held at zero, one frame of gravity a frame) until it ends.
+# Warden a against Warden b; syntax and checks: smashcraft:docs/native-bot-session.md.
+#! chat -dev quick hero warden
+# b dashes in, then a dashes to about 46 short of b.
+40 b stick -1 0
+43 b stick 0 0
+50 a stick 1 0
+56 a stick 0 0
+# a full-hops and casts Fan of Knives at the top, run to its end; b short-hops up into the burst below her.
+87 a tap B 8
+98 b tap B 2
+99 a stick 0 -1
+99 a tap X 2
+100 a stick 0 0
+# Expected, frame by frame (headless run of this script): b is struck on Fan of Knives' frame 4 and spiked down;
+# a sinks one frame of gravity a frame, from 158.700 to 122.820, holding x.
+#! expect a 99 special 16 form 1 action-frame 1 x 2.880 z 158.700
+#! absent b 99-101 damage
+#! expect b 102 damage 6.106 hitlag 5 hitstun 20
+#! expect b 102 launch up 0 from-air 1 x 1.091 z -9.027
+#! expect a 129 special 0 form 1 action-frame 0 x 2.880 z 122.820
+# View held a second: the first of two moments the parity check replays.
+500 a press VIEW
+570 a release VIEW
+1000 a press VIEW
+1070 a release VIEW

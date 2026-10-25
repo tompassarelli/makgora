@@ -776,6 +776,7 @@ export function advanceHeroSpecial(f: Fighter, stage = 0, input?: Readonly<Contr
   if (frame === 1 && world !== undefined && f.special.seekTarget === 0 && seeks(move)) f.special.seekTarget = seekTargetSlot(world, f) + 1;
   if (move.beam !== undefined && world !== undefined) trackBeam(f, world, move.beam, frame);
   applyMotion(f, move, frame, input, world);
+  if (inWindow(move.airStall, frame) && !f.motion.grounded) f.motion.vz = 0.0;
   for (const spec of move.projectiles ?? []) if (spec.spawnFrame === frame) spawnHeroProjectile(f, spec, f.attack.serial + 1, stage, matchFrame, world);
   if (move.placement !== undefined) placeObjects(f, move.placement, frame, stage, matchFrame);
   if (move.command?.frame === frame) orderCompanion(f, move.command.order, move.command.slot);

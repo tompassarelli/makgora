@@ -17,7 +17,7 @@ import { attackStartupFrames, characterAttackActiveFrames } from "../sim/moves";
 import { BLASTER_PROJECTILE_RADIUS } from "../sim/projectiles";
 import type { FighterMoves } from "../sim/heroMoves";
 import type { Controls } from "../sim/roster";
-import { immolationRegion } from "../sim/specials";
+import { DEMONHUNTER_IMMOLATE_STARTUP, immolationRegion } from "../sim/specials";
 import { deckUnder, heightAhead, horizontalAhead, safeAt, slideStaysOnDeck } from "./botFooting";
 import { HeroSpecialUse, confirmOnly, confirms, heroSpecialUse } from "./botHeroKit";
 import { SpecialSlot } from "../sim/specials/schema";
@@ -285,9 +285,9 @@ function addCloseSpecials(f: Readonly<Fighter>, target: Readonly<Fighter>, stage
       break;
     }
     case Character.demonHunter: {
-      const region = immolationRegion(motion.grounded);
-      const localX = f32(aheadX(f, target, 4, undefined, observationAge) * f.facing);
-      const localZ = aheadZ(f, target, 4);
+      const localX = f32(aheadX(f, target, DEMONHUNTER_IMMOLATE_STARTUP, undefined, observationAge) * f.facing);
+      const localZ = aheadZ(f, target, DEMONHUNTER_IMMOLATE_STARTUP);
+      const region = immolationRegion(motion.grounded, false, localX < 0);
 
       if (localX >= region.minX && localX <= region.maxX && localZ >= region.minZ && localZ <= region.maxZ && (motion.grounded || safeAt(stage, motion.x, 0.0)) && specialReady(f, DOWN_SPECIAL)) options[added++] = DOWN_SPECIAL;
       break;

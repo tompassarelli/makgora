@@ -27,10 +27,10 @@ export const AERIAL_DOWN_FRAMES = 120;
 /** Each fighter's aerial down special, as the #448 lead approved it. */
 export const AERIAL_DOWN_CHOICES: Readonly<Record<number, string>> = {
   [Character.rifleman]: "Freeze Trap tossed in the air falls and arms on deck contact",
-  [Character.demonHunter]: "Immolate in the air, a shine-like stall that a jump cancels",
+  [Character.demonHunter]: "Immolate in the air, a Falco-style shine that holds him in place and a jump cancels",
   [Character.blademaster]: "Mirror Image placed in the air, then a backward step",
   [Character.mountainKing]: "aerial Thunder Clap; lands into the grounded clap",
-  [Character.warden]: "Fan of Knives in the air, a Falco-style shine that holds her in place and a jump cancels",
+  [Character.warden]: "Fan of Knives in the air, a spike below her that nearly stops her fall and a jump cancels",
   [Character.lich]: "Frost Armor cast in the air; lands into the grounded cast",
   [Character.forsakenPaladin]: "downward holy pulse with the Consecration hit",
   [Character.dreadlord]: "aerial Sleep orb; lands into the grounded cast",

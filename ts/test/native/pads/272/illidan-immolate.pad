@@ -1,0 +1,49 @@
+# #272: Illidan's Immolate after the swap with Fan of Knives: a frame-one burst on both sides that pops foes upward,
+# a jump cancel from its frame 4, and in the air it holds him in place.
+# Illidan a against Illidan b; syntax and checks: smashcraft:docs/native-bot-session.md.
+#! chat -dev quick hero illidan
+# Both dash in, b ending about 80 in front of a.
+40 b stick -1 0
+48 b stick 0 0
+50 a stick 1 0
+58 a stick 0 0
+# Immolate on the ground with b in front.
+92 a stick 0 -1
+92 a tap X 2
+93 a stick 0 0
+# a turns away from b and Immolates with b behind.
+200 a stick -0.5 0
+204 a stick 0 0
+240 a stick 0 -1
+240 a tap X 2
+241 a stick 0 0
+# Immolate in the air, cancelled by a double jump on the first frame it allows (its frame 4 has passed).
+320 a tap B 8
+332 a stick 0 -1
+332 a tap X 2
+333 a stick 0 0
+336 a tap B 2
+# Immolate in the air, run to its end.
+420 a tap B 8
+432 a stick 0 -1
+432 a tap X 2
+433 a stick 0 0
+# Expected, frame by frame (headless run of this script): b in front at 92 and behind at 240 is struck on Immolate's
+# frame 1 and popped up and away from a; in the air a holds x and z to the end; the jump cancels it.
+#! expect a 92 special 12 form 0 action-frame 1 x -39.480
+#! expect b 92 damage 7.000 hitlag 5 hitstun 34
+#! expect b 92 launch up 1 from-air 0 x 1.354 z 15.472
+#! expect a 200 ground action 0 facing -1
+#! expect a 240 special 12 form 0 action-frame 1 x -42.740
+#! expect b 240 damage 14.000 hitlag 5 hitstun 35
+#! expect b 240 launch up 1 from-air 0 x 1.391 z 15.894
+#! expect a 332 special 12 form 0 action-frame 1
+#! expect a 336 special 0 form 0 action-frame 0 x -42.740 z 203.660
+#! expect a 336 applied jump 2 double 1
+#! expect a 432 special 12 form 0 action-frame 1 x -42.740 z 179.300
+#! expect a 458 special 0 form 0 action-frame 0 x -42.740 z 179.300
+# View held a second: the first of two moments the parity check replays.
+500 a press VIEW
+570 a release VIEW
+1000 a press VIEW
+1070 a release VIEW

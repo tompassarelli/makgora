@@ -329,6 +329,8 @@ export interface AuthoredSpecial {
   readonly motion?: readonly SpecialMotion[] | undefined;
   readonly projectiles?: readonly SpecialProjectile[] | undefined;
   readonly intangible?: FrameWindow | undefined;
+
+  readonly airStall?: FrameWindow | undefined;
   readonly armor?: SpecialArmor | undefined;
   readonly guard?: SpecialGuard | undefined;
 

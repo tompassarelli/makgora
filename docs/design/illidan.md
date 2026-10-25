@@ -195,7 +195,8 @@ smashcraft:ts/src/game/sim/projectiles.ts.
   then ascent).
 - **Immolate on the ground, jump-cancellable** (#128): the Warcraft III
   Immolation as a shine, which Tom asked for. Kept, and in the air it stalls
-  his fall like the shine (below).
+  him like the shine (below). Since #272 it has Maiev's former Fan of Knives
+  shape: Tom asked on 25 Oct to swap the two down specials' behaviour.
 
 ## The raid boss across his normals (owner direction)
 
@@ -308,12 +309,17 @@ Tom (17 Oct): in the air, Immolate nearly neutralizes his vertical momentum,
 as Fox's shine does in Melee. Down special in the air is Immolate, not Flame
 Crash:
 
-- The same timing as on the ground: startup 4, active 4, 27 in all,
-  jump-cancellable from frame 4.
-- Starting it zeroes his vertical speed, and every frame of it holds it at
-  zero, so he sinks only one frame of gravity a frame.
-- Its strike is the aerial Immolation: ±70 wide, 170 below him to 30 above,
-  9%, a spike, drain 6.
+- The same timing as on the ground: it strikes on frame 1 only, his first
+  frame is intangible, 27 in all, jump-cancellable from frame 4.
+- Every frame of it zeroes his horizontal and vertical speed, so he hangs in
+  place.
+- Its strike since #272 is Fan of Knives' former shape on both sides of him:
+  a foe whose feet are within 116 to either side and 104 below to 108 above
+  (140, 114 and 118 for EX) is popped away from him at 85 degrees, base 75,
+  growth 50; 7% on the ground, 9% in the air, drain 6. Those bounds are Fan
+  of Knives' knife capsule (0.7 fighter heights out, 0.3 radius, centred 48
+  up) grown by a reference body, since Immolate tests the foe's feet and Fan
+  of Knives tested its hurtbox.
 
 Counterplay: he hangs in place for 27 frames unless he jumps out, so a
 fighter outside the flames punishes the stall; offstage the jump cancel

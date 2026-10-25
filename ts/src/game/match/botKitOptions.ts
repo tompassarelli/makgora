@@ -22,7 +22,7 @@ import { heroStatusBlocksActions } from "../sim/heroStatus";
 import { type AuthoredSpecial, type SpecialFollowUp, type SpecialProjectile, CompanionOrder, FOLLOW_UP_FORM, FollowUpInput, SpecialSlot, specialKit } from "../sim/specials/schema";
 import type { Controls } from "../sim/roster";
 import {
-  FEL_RUSH_BRANCH_FIRST, FEL_RUSH_BRANCH_LAST, FEL_RUSH_SPEED, FEL_RUSH_FIRST, FEL_RUSH_LAST, DEMONHUNTER_DIVE_FIRST, DEMONHUNTER_DIVE_FRAMES, DEMONHUNTER_DIVE_LAST, DEMONHUNTER_DIVE_SPEED, DEMONHUNTER_IMMOLATE_ACTIVE, DEMONHUNTER_IMMOLATE_STARTUP,
+  FEL_RUSH_BRANCH_FIRST, FEL_RUSH_BRANCH_LAST, FEL_RUSH_SPEED, FEL_RUSH_FIRST, FEL_RUSH_LAST, DEMONHUNTER_DIVE_FIRST, DEMONHUNTER_DIVE_FRAMES, DEMONHUNTER_DIVE_LAST, DEMONHUNTER_DIVE_SPEED, DEMONHUNTER_IMMOLATE_JUMP_CANCEL,
   RIFLEMAN_RECOVERY_STARTUP_FRAMES, RIFLEMAN_SECOND_SHOT_FIRST, RIFLEMAN_SECOND_SHOT_FORM, RIFLEMAN_SECOND_SHOT_LAST,
 } from "../sim/specials";
 import { floorBelow, mainDeckLeft, mainDeckRight, mainDeckZ } from "../sim/stage";
@@ -484,7 +484,7 @@ export function steerRunningSpecial(f: Readonly<Fighter>, target: Readonly<Fight
     }
     case SpecialAction.demonHunterImmolate:
 
-      if (special.frame < DEMONHUNTER_IMMOLATE_STARTUP + DEMONHUNTER_IMMOLATE_ACTIVE || (!motion.grounded && f.jump.remaining <= 0)) return false;
+      if (special.frame < DEMONHUNTER_IMMOLATE_JUMP_CANCEL || (!motion.grounded && f.jump.remaining <= 0)) return false;
       input.jumpPressed = true;
       input.jumpHeld = target !== undefined && f32(target.motion.z - motion.z) > 60.0;
       return true;

@@ -40,7 +40,7 @@ export class HitAreaEffects {
     if (fighter !== undefined && playing && !fighter.status.out && DISJOINT_CUES[fighter.character] !== undefined) {
       const style = fighter.attack.style;
       const normal = style !== undefined && this.styles.includes(style);
-      const count = normal ? authoredHitRegionCount(style, fighter.tuning.moves) : runningHeroSpecial(fighter)?.regions?.length ?? 1;
+      const count = normal ? authoredHitRegionCount(style, fighter.tuning.moves) : runningHeroSpecial(fighter)?.regions?.length ?? 2;
       for (let index = 0; index < count; index++) {
         if (fighter.character === Character.warden && fighter.special.action === SpecialAction.heroDown) continue;
         const region = normal ? authoredHitRegion(this.region, fighter.character, style, fighter.attack.frame, fighter.attack.smashChargeFrames, index, fighter.tuning.moves) : specialAreaRegion(fighter, index);

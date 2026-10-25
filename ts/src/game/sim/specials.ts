@@ -93,8 +93,9 @@ const DEMONHUNTER_BACKFLIP_RISE = 10.0;
 const DEMONHUNTER_BACKFLIP_FALL = 2.0;
 const DEMONHUNTER_DIVE_CARRY = 5.0;
 export const DEMONHUNTER_DIVE_LANDING_LAG = 10;
-export const DEMONHUNTER_IMMOLATE_STARTUP = 4;
-export const DEMONHUNTER_IMMOLATE_ACTIVE = 4;
+export const DEMONHUNTER_IMMOLATE_STARTUP = 1;
+export const DEMONHUNTER_IMMOLATE_ACTIVE = 1;
+export const DEMONHUNTER_IMMOLATE_JUMP_CANCEL = 4;
 export const DEMONHUNTER_IMMOLATE_DURATION = 27;
 
 
@@ -252,7 +253,7 @@ function secondRecoilShot(owner: Fighter, input: Readonly<Controls>): boolean {
 export function demonHunterJumpOrAttackBranch(owner: Fighter, input: Readonly<Controls>): void {
   const { special } = owner;
   if (owner.character !== Character.demonHunter || owner.launch.hitlag > 0) return;
-  if (input.jumpPressed && special.action === SpecialAction.demonHunterImmolate && special.form === 0 && special.frame >= DEMONHUNTER_IMMOLATE_STARTUP) {
+  if (input.jumpPressed && special.action === SpecialAction.demonHunterImmolate && special.form === 0 && special.frame >= DEMONHUNTER_IMMOLATE_JUMP_CANCEL) {
     special.action = SpecialAction.none;
     special.frame = 0;
     special.lockFrames = 0;
@@ -298,6 +299,7 @@ function startBranchPhase(owner: Fighter, form: number, frames: number): void {
 
 export function demonHunterAuthoredMotion(f: Readonly<Fighter>): boolean {
   const { special } = f;
+  if (special.action === SpecialAction.demonHunterImmolate) return !f.motion.grounded;
   if (special.action === SpecialAction.demonHunterFelRush) {
     return special.form === 0 ? special.frame < FEL_RUSH_LAST : special.form === VENGEFUL_RETREAT_FORM && special.frame < VENGEFUL_RETREAT_MOVE_LAST;
   }
@@ -309,7 +311,9 @@ export function demonHunterAuthoredMotion(f: Readonly<Fighter>): boolean {
 
 
 function stallImmolate(owner: Fighter): void {
-  if (!owner.motion.grounded) owner.motion.vz = 0.0;
+  if (owner.motion.grounded) return;
+  owner.motion.vx = 0.0;
+  owner.motion.vz = 0.0;
 }
 
 
@@ -455,6 +459,7 @@ function startDemonHunterSpecial(owner: Fighter, action: SpecialAction, moveX: n
     startSpecialAction(owner, action, DEMONHUNTER_IMMOLATE_DURATION, moveX);
     special.cooldowns[action] = 24;
     special.hit = false;
+    owner.status.invincible = max(owner.status.invincible, 2);
     stallImmolate(owner);
     return true;
   }
@@ -686,18 +691,23 @@ function advanceSpecialAction(owner: Fighter, stage: number, matchFrame: number,
   if (special.action === SpecialAction.demonHunterImmolate && special.frame >= special.duration) endSpecialAction(owner, false);
 }
 
-const IMMOLATE_GROUND: Readonly<HitRegion> = {
-  minX: 0.0, maxX: 140.0, minZ: -80.0, maxZ: 100.0,
-  effect: { damage: 7.0, growth: 105.0, base: 21.0, launchX: 1.0, launchZ: 0.0, electric: false, element: HitElement.fire, manaDrain: 6 },
-  window: 1,
-};
-const IMMOLATE_AIR: Readonly<HitRegion> = {
-  minX: -70.0, maxX: 70.0, minZ: -170.0, maxZ: 30.0,
-  effect: { damage: 9.0, growth: 110.0, base: 26.0, launchX: 0.11999999731779099, launchZ: -0.9929999709129333, electric: false, element: HitElement.fire, manaDrain: 6 },
-  window: 1,
-};
-const IMMOLATE_GROUND_EX = exDamageRegion(IMMOLATE_GROUND);
-const IMMOLATE_AIR_EX = exDamageRegion(IMMOLATE_AIR);
+const IMMOLATE_REACH = 116.0;
+const IMMOLATE_REACH_EX = 140.0;
+
+function immolateRegion(damage: number, reach: number, minZ: number, maxZ: number, facing: number): Readonly<HitRegion> {
+  return {
+    minX: facing > 0 ? 0.0 : -reach, maxX: facing > 0 ? reach : 0.0, minZ, maxZ,
+    effect: { damage, growth: 49.62688064575195, base: 75.0, launchX: f32(facing * 0.08715574443340302), launchZ: 0.9961947202682495, electric: false, element: HitElement.fire, manaDrain: 6 },
+    window: 1,
+  };
+}
+
+const immolateSides = (damage: number, reach: number, minZ: number, maxZ: number): readonly Readonly<HitRegion>[] =>
+  [immolateRegion(damage, reach, minZ, maxZ, 1.0), immolateRegion(damage, reach, minZ, maxZ, -1.0)];
+const IMMOLATE_GROUND = immolateSides(7.0, IMMOLATE_REACH, -104.0, 108.0);
+const IMMOLATE_AIR = immolateSides(9.0, IMMOLATE_REACH, -104.0, 108.0);
+const IMMOLATE_GROUND_EX = immolateSides(7.0, IMMOLATE_REACH_EX, -114.0, 118.0);
+const IMMOLATE_AIR_EX = immolateSides(9.0, IMMOLATE_REACH_EX, -114.0, 118.0);
 
 function exDamageRegion(region: Readonly<HitRegion>): Readonly<HitRegion> {
   return {
@@ -708,7 +718,8 @@ function exDamageRegion(region: Readonly<HitRegion>): Readonly<HitRegion> {
 }
 
 
-export const immolationRegion = (grounded: boolean, ex = false): Readonly<HitRegion> => (grounded ? ex ? IMMOLATE_GROUND_EX : IMMOLATE_GROUND : ex ? IMMOLATE_AIR_EX : IMMOLATE_AIR);
+export const immolationRegion = (grounded: boolean, ex = false, behind = false): Readonly<HitRegion> =>
+  at(grounded ? ex ? IMMOLATE_GROUND_EX : IMMOLATE_GROUND : ex ? IMMOLATE_AIR_EX : IMMOLATE_AIR, behind ? 1 : 0);
 
 
 
@@ -797,7 +808,7 @@ function demonHunterSpecialContact(owner: Fighter, targetSlot: number, target: F
   if (special.frame >= DEMONHUNTER_IMMOLATE_STARTUP + DEMONHUNTER_IMMOLATE_ACTIVE || target.status.out || isIntangible(target)) return NO_HIT_REGION;
   const localX = f32(f32(target.motion.x - owner.motion.x) * owner.facing);
   const localZ = f32(target.motion.z - owner.motion.z);
-  const contact = immolationRegion(owner.motion.grounded, special.ex);
+  const contact = immolationRegion(owner.motion.grounded, special.ex, localX < 0);
   const inside = localX >= contact.minX && localX <= contact.maxX && localZ >= contact.minZ && localZ <= contact.maxZ;
   return inside ? contact : NO_HIT_REGION;
 }

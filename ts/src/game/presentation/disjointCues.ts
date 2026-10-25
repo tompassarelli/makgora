@@ -59,12 +59,15 @@ export function specialAreaRegion(fighter: Readonly<Fighter>, index: number): Re
     const frame = fighter.special.frame - 1;
     return region !== undefined && frame >= region.firstFrame && frame <= region.lastFrame ? region.hit : NO_HIT_REGION;
   }
-  if (index > 0 || fighter.character !== Character.demonHunter) return NO_HIT_REGION;
+  if (fighter.character !== Character.demonHunter) return NO_HIT_REGION;
   const { action, form, frame } = fighter.special;
+  if (action === SpecialAction.demonHunterImmolate && index <= 1) {
+    return frame >= DEMONHUNTER_IMMOLATE_STARTUP && frame < DEMONHUNTER_IMMOLATE_STARTUP + DEMONHUNTER_IMMOLATE_ACTIVE ? immolationRegion(fighter.motion.grounded, fighter.special.ex, index === 1) : NO_HIT_REGION;
+  }
+  if (index > 0) return NO_HIT_REGION;
   if (action === SpecialAction.demonHunterFelRush) return felRushRegion(form, frame);
   if (action === SpecialAction.demonHunterWingAscent) return wingDiveRegion(form, frame);
-  if (action !== SpecialAction.demonHunterImmolate) return NO_HIT_REGION;
-  return frame >= DEMONHUNTER_IMMOLATE_STARTUP && frame < DEMONHUNTER_IMMOLATE_STARTUP + DEMONHUNTER_IMMOLATE_ACTIVE ? immolationRegion(fighter.motion.grounded) : NO_HIT_REGION;
+  return NO_HIT_REGION;
 }
 
 export interface HitAreaPose { visible: boolean; x: number; z: number; scale: number; }

@@ -11,7 +11,24 @@ upward angle with high base knockback pops the foe into a follow-up
 [SmashWiki: Falco's down special](https://www.ssbwiki.com/Falco_(SSBM)/Down_special),
 [Liquipedia: Frame](https://liquipedia.net/smash/Frame)).
 
-Fan of Knives copies that shape:
+Tom (25 Oct, #272) swapped the two down specials' behaviour: Fan of Knives
+now has Illidan's former Immolate shape, and Immolate has the shine
+described here. Fan of Knives now:
+
+- Strikes on frames 4-7. On the ground only ahead of her: a 24-radius knife
+  capsule from 48 to 92 out at 56 up, which a reference body touches exactly
+  when its feet are inside Immolate's ground box (0 to 140 ahead, 80 below
+  to 100 above). 6.1% sent sideways, base 21, growth 105.
+- In the air the strike is below her: a 34-radius capsule from -12 to 12 at
+  24 below, Immolate's air box (±70, 170 below to 30 above) by the same
+  rule, the same damage spiking downward (base 26, growth 110).
+- In the air every frame holds her vertical speed at zero while her air
+  drift and gravity still act, so she sinks one frame of gravity a frame.
+- Jump-cancellable from frame 4, 27 frames uncancelled, no intangible frame.
+- Anyone hit is still marked and poisoned for Shadow Pursuit.
+- EX: 25% more damage.
+
+Until #272 Fan of Knives copied the Falco shape:
 
 - One active frame, frame 1, on both sides of her body: 8% at 85 degrees
   with the CHASE knockback (base 75, growth about 50), a pop of about 0.6
