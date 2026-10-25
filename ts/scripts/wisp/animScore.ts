@@ -85,7 +85,7 @@ export interface MoveScore {
   readonly line3: LineThree;
   readonly line4: LineFour;
 
-  readonly keys: { readonly windup: number; readonly contact: number; readonly recovery: number };
+  readonly keys: { readonly windup: number; readonly contact: number; readonly recovery: number; readonly hitWindups: readonly number[] };
 
   readonly shortfall: number;
 }
@@ -351,6 +351,12 @@ export function scoreMove(sample: MoveSample, thresholds: ClassThresholds): Move
   for (let index = 0; index < moveFrames; index++) if (tipAt(index) > tipAt(peak) + 1e-6) peak = index;
   let windup = 0;
   for (let index = 0; index <= Math.min(peak, contact); index++) if (tipAt(index) < tipAt(windup) - 1e-6) windup = index;
+  const hitWindups = sample.hits.slice(1).flatMap((hit, index) => {
+    const after = (sample.hits[index] ?? hit) + 1;
+    let back = after;
+    for (let frame = after; frame < hit; frame++) if (tipAt(frame) < tipAt(back) - 1e-6) back = frame;
+    return after < hit ? [back] : [];
+  });
   const limb = strikingLimb(skeleton, frames, tip, windup, contact, height);
 
   const rootAt = (index: number) => limb === undefined ? tipAt(index) : along(point(frames[index]?.nodes ?? new Float32Array(0), limb.root));
@@ -419,5 +425,5 @@ export function scoreMove(sample: MoveSample, thresholds: ClassThresholds): Move
   const shortfall = (rule === "limb" ? short(limbDrive, LIMB_STRIKE.limbDrive) : short(bodyShare, thresholds.bodyShare)) + short(massShift, thresholds.massShift)
     + over(endError, thresholds.endError) + over(jump, thresholds.jump) + short(overshoot, thresholds.overshoot)
     + (windupOk ? 0 : 1) + (peakOk ? 0 : 1) + short(fill, thresholds.fill) + short(contrast, thresholds.contrast);
-  return { line1, line2, line3, line4, keys: { windup: windupKey, contact, recovery }, shortfall };
+  return { line1, line2, line3, line4, keys: { windup: windupKey, contact, recovery, hitWindups }, shortfall };
 }

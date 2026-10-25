@@ -14,10 +14,11 @@ Each move is one image (open it with your file-reading tool):
   appears in a match), cropped to the move but not enlarged: the move's first frame, the windup
   extreme, contact (the first frame that can hit), the last active frame, the
   middle of the recovery, and the last frame of the move. A move that hits
-  several times adds each hit's contact frame, so you can see the motion that
-  makes every hit; the caption lists them. Panels read left to right in rows
-  of at most four, each labelled below with its frame number and role (for
-  example `frame 12: hit 2`). The fighter faces right.
+  several times adds each hit's contact frame and each later hit's windup
+  extreme, so you can see the motion that makes every hit; the caption lists
+  them. Panels read left to right in rows of at most four, each labelled
+  below with its frame number and role (for example `frame 9: hit 2 windup`
+  or `frame 12: hit 2`). The fighter faces right.
 - **Bottom row, reference:** frames of a Melee move of the same kind, from
   SmashWiki's hitbox animations (coloured bubbles are hit regions; ignore
   them and the different art style). When no reference exists the bottom row

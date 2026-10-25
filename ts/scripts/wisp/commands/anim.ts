@@ -333,7 +333,7 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
     const reference = referenceFor(references, row.fighter, row.move);
     const indices = judgeKeyFrames(judgeKeys(row));
     strips.push({ fighter: row.fighter, move: row.move, seconds: indices.map((index) => sampled.seconds[index] ?? 0), heights: indices.map((index) => sampled.heights[index] ?? 0), poses: indices.map((index) => sampled.sample.frames[index]), labels: indices.map((index) => judgeFrameLabel(judgeKeys(row), index)),
-      caption: `Upper rows, ours: frames ${indices.join(", ")} (start, windup, contact on the first active frame ${row.frames.firstActive}${row.frames.hits.length > 1 ? `, each hit's contact on ${row.frames.hits.join(", ")}` : ""}, last active, recovery, end of ${row.frames.end}). Bottom row: ${reference === undefined ? "no reference animation on file; judge against the brief's standard" : `Melee ${reference.character.replaceAll("_", " ")}'s ${REFERENCE_ACTIONS[row.move]?.wiki} (hitbox view)`}.`, movement: false });
+      caption: `Upper rows, ours: frames ${indices.join(", ")} (start, windup, contact on the first active frame ${row.frames.firstActive}${row.frames.hits.length > 1 ? `, each hit's contact on ${row.frames.hits.join(", ")}${row.score.keys.hitWindups.length > 0 ? `, each later hit's windup on ${row.score.keys.hitWindups.join(", ")}` : ""}` : ""}, last active, recovery, end of ${row.frames.end}). Bottom row: ${reference === undefined ? "no reference animation on file; judge against the brief's standard" : `Melee ${reference.character.replaceAll("_", " ")}'s ${REFERENCE_ACTIONS[row.move]?.wiki} (hitbox view)`}.`, movement: false });
   }
   for (const entry of wanted ?? []) {
     const [slug = "", move = ""] = entry.split(":");
