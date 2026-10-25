@@ -14,7 +14,7 @@
     "incremental": true,
     "declaration": true,
     "emitDeclarationOnly": true,
-    "rootDir": ".",
+    "rootDir": "..",
     "outDir": "build/typecheck-host",
     "tsBuildInfoFile": "build/typecheck-host.tsbuildinfo",
     "skipLibCheck": true,

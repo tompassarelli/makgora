@@ -223,6 +223,14 @@ ssconvert -S fightcore_melee_frame_data.xlsx /tmp/fightcore.csv
 cp /tmp/fightcore.csv.0 references/melee-frame-data/fightcore.csv
 ```
 
+`smashcraft:references/melee-frame-data/fightcore.ts` reads the file into typed
+rows: frames as numbers or null for `-`, landing lag split into normal and
+L-cancelled, autocancel as its two frames, and Damage, Angle, Effect, Base
+Knockback, Knockback Growth and Set Knockback as per-hitbox arrays, empty for
+`-`. Angle 361 stays 361 (`SAKURAI_ANGLE`). It refuses a row with an unknown
+section, a wrong cell count or a non-numeric value, and `fightCoreSource` names
+the row and column a value came from.
+
 ## Character attributes
 
 `smashcraft:references/melee-frame-data/character-attributes.csv` lists each of
@@ -247,3 +255,9 @@ is not stated.
 Units are Melee units and frames. Representative check: Fox's jump squat is 3,
 as in `records.jsonl`, and his terminal velocity 2.8 is the value that file
 mislabels `gravity`; his gravity is 0.23 and fast-fall velocity 3.4.
+
+`smashcraft:references/melee-frame-data/character-attributes.ts` reads one row
+per fighter with the movement and body columns typed (weight, run velocity and
+air speed as `/`-separated lists, since some fighters carry two values; hex
+cells such as `0x02` as numbers) and every other named column kept as text.
+`attributeSource` names the page, fighter and column a value came from.

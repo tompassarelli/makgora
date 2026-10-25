@@ -33,7 +33,7 @@ const melee = (world: number): number => world / WORLD_UNITS_PER_MELEE_UNIT;
 
 
 
-interface ReferenceFighter {
+export interface ReferenceFighter {
   readonly jumpSquat: number;
   readonly jumpVelocity: number;
   readonly hopVelocity: number;
@@ -45,7 +45,7 @@ interface ReferenceFighter {
   readonly walkVelocity: number;
 }
 
-const FOX: ReferenceFighter = {
+export const FOX: ReferenceFighter = {
   jumpSquat: 3, jumpVelocity: 3.680000066757202, hopVelocity: 2.0999999046325684,
   aerialJumpMultiplier: 1.2000000476837158, gravity: 0.23000000417232513, fastFallVelocity: 3.4000000953674316,
   dashInitialVelocity: 1.899999976158142, runVelocity: 2.200000047683716, walkVelocity: 1.600000023841858,

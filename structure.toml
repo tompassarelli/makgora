@@ -21,7 +21,7 @@ name = "tests"
 thresholds = { function_lines = 150, function_complexity = 30 }
 paths = ["**/*.tests.ts", "**/*.test.ts", "**/*.soak.ts", "ts/test/**"]
 responsibility = "Colocated Lua tests, Bun integration tests and their helpers."
-may_use = ["core", "input", "generated", "sim", "fighter-kit", "snapshot", "ai", "roster", "lobby", "match", "replay", "netcode", "fighter-look", "presentation", "render", "ui", "session", "classic", "host", "scripts", "tools"]
+may_use = ["core", "input", "generated", "sim", "fighter-kit", "snapshot", "ai", "roster", "lobby", "match", "replay", "netcode", "fighter-look", "presentation", "render", "ui", "session", "classic", "host", "scripts", "tools", "references"]
 
 # ---------- generated (exempt from size rules via [[generated]]; module only for import direction) ----------
 [[module]]
@@ -173,7 +173,7 @@ thresholds = { function_lines = 150, function_complexity = 30 }
 paths = ["ts/scripts/**", "ts/commands/**", "ts/bin/**", "ts/host/**", "ts/landing/**", "ts/analysis/**", "ts/art/**", "ts/native/**",
          "ts/testing/**", "ts/codegen/**", "ts/generated/**", "ts/plugins/**", "ts/*.ts"]
 responsibility = "bun wisp verbs, landing bots, sim analysis harnesses, codegen and the test runner."
-may_use = ["host", "classic", "session", "ui", "render", "presentation", "fighter-look", "replay", "netcode", "match", "lobby", "roster", "ai", "snapshot", "sim", "fighter-kit", "input", "core", "generated"]
+may_use = ["host", "classic", "session", "ui", "render", "presentation", "fighter-look", "replay", "netcode", "match", "lobby", "roster", "ai", "snapshot", "sim", "fighter-kit", "input", "core", "generated", "references"]
 
 [[module]]
 name = "host-tools"
@@ -184,9 +184,16 @@ may_use = []
 [[module]]
 name = "tools"
 thresholds = { function_lines = 150, function_complexity = 30 }
-paths = ["tools/**", "references/**"]
+paths = ["tools/**"]
 responsibility = "Art, stage, effect and Slippi pipelines that write generated files."
-may_use = ["scripts", "host", "presentation", "fighter-look", "roster", "match", "sim", "fighter-kit", "input", "core", "generated"]
+may_use = ["scripts", "host", "presentation", "fighter-look", "roster", "match", "sim", "fighter-kit", "input", "core", "generated", "references"]
+
+[[module]]
+name = "references"
+thresholds = { function_lines = 150, function_complexity = 30 }
+paths = ["references/**"]
+responsibility = "Public Melee reference data, its intakes and its typed readers."
+may_use = []
 
 [[module]]
 name = "controller"
