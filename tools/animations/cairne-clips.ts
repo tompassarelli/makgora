@@ -13,6 +13,7 @@ import type { HeroPose } from "../../ts/src/game/sim/heroes/hero";
 import { CAIRNE_MOVES } from "../../ts/src/game/sim/heroes/cairneMoves";
 import { CAIRNE_SPECIALS } from "../../ts/src/game/sim/heroes/cairneSpecials";
 import { seconds } from "./asset-info";
+import { PainBody, PAIN_GAIN, HIGH_STRETCH, painGate, standIndex } from "./pain-gate";
 function ensure(ok: unknown, why: string): asserts ok { if (!ok) throw new Error(why); }
 function tracks(value: unknown, visit: (track: mdx.AnimVector, path: string) => void, path = "") {
   if (!value || typeof value !== "object" || ArrayBuffer.isView(value)) return;
@@ -23,11 +24,12 @@ const onGlobalClock=(track:mdx.AnimVector)=>track.GlobalSeqId!=null&&track.Globa
 function parseSource(bytes:ArrayBuffer){const parsed=parseMDX(bytes);ensure(Buffer.from(generateMDX(parsed)).equals(Buffer.from(bytes)),"Stock MDX does not round trip");return parsed;}
 function encodeVerified(value:mdx.Model){const bytes=generateMDX(value);ensure(isDeepStrictEqual(value,parseMDX(bytes)),"Authored MDX does not round trip");return bytes;}
 
-const [input, output] = process.argv.slice(2).map(p => resolve(p));
+const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
+const painOnly = process.argv.includes("pain");
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/cairne-clips.ts STOCK_TAUREN.mdx PRIVATE_OUTPUT");
+ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/cairne-clips.ts STOCK_TAUREN.mdx|SHIPPED_TAUREN.mdx PRIVATE_OUTPUT [pain]");
 const source = parseSource(await Bun.file(input).arrayBuffer()), model = structuredClone(source);
-ensure(source.Sequences.length === 12 && source.Nodes.some(n => n.Name === "Bone_Axe_Free"), "Expected classic Tauren Chieftain");
+ensure((painOnly || source.Sequences.length === 12) && source.Nodes.some(n => n.Name === "Bone_Axe_Free"), "Expected classic Tauren Chieftain");
 const stand = source.Sequences[4]!, idleSequence = source.Sequences[0]!;
 interface Gesture { chest?: number; twist?: number; head?: number; arm?: number; elbow?: number; free?: number; freeElbow?: number; hip?: number; knee?: number; lean?: number; yaw?: number; leftHip?: number; rightHip?: number; leftKnee?: number; rightKnee?: number; step?: number; pitch?: number; rise?: number; spin?: number; depth?: number; shin?: number; leftShin?: number; rightShin?: number; hoof?: number; leftHoof?: number; rightHoof?: number; pelvis?: number; slide?: number }
 interface Phase { frame: number; gesture: Gesture; target?: readonly [number,number]; grip?: readonly [number,number]; idle?: boolean }
@@ -234,10 +236,10 @@ const goreActions: Action[] = [
 ];
 const damageActions: Action[] = [];
 for (let height=0;height<3;height++) for (let strength=0;strength<3;strength++) {
-  const gain=[0.55,0.9,1.3][strength]!;
-  const gesture:Gesture = height===0 ? {hip:-55*gain,knee:75*gain,chest:24*gain,head:-12*gain,arm:25*gain,free:35*gain}
-    : height===1 ? {chest:48*gain,head:-24*gain,hip:-22*gain,knee:25*gain,arm:-35*gain,free:-45*gain,yaw:18*gain}
-    : {head:-50*gain,chest:-28*gain,arm:42*gain,free:55*gain,hip:15*gain,knee:22*gain};
+  const gain=PAIN_GAIN[strength]!,stretch=HIGH_STRETCH[strength]!;
+  const gesture:Gesture = height===0 ? {leftHip:-70*gain,leftKnee:100*gain,rightHip:25*gain,rightKnee:45*gain,chest:30*gain,head:15*gain,lean:12*gain,arm:20*gain,free:-30*gain}
+    : height===1 ? {chest:48*gain,head:-24*gain,hip:-15*gain,knee:18*gain,arm:-35*gain,free:-45*gain,yaw:18*gain}
+    : {head:-45*stretch,chest:-30*stretch,lean:-10*stretch,arm:35*stretch,free:-150*stretch,freeElbow:20*stretch,hip:8*stretch,knee:-20*stretch};
   damageActions.push({pose:"damageGround",frames:24,contact:0,gesture,hold:true,damage:true});
 }
 function rotation(base: ArrayLike<number>, pitch:number, yaw=0): Float32Array<ArrayBuffer> {
@@ -279,11 +281,14 @@ const farthestReach=(clip:number)=>{const [first,last]=source.Sequences[clip]!.I
   return at;};
 let cursor=Math.max(...source.Sequences.map(s=>s.Interval[1]))+100;
 const bindings:string[]=[],damageBindings:string[]=[],goreBindings:string[]=[],records:{pose:string;index:number;frames:number;contact:number}[]=[];
+if(painOnly){actions.length=0;goreActions.length=0;}
 for (const [ordinal,action] of [...actions,...damageActions,...goreActions].entries()) {
-  const index=model.Sequences.length,start=cursor,end=start+Math.round(action.frames*1000/60);cursor=end+100;
   const name=action.gore?`Cairne Gore ${action.gore}`:action.damage?`Cairne Pain ${Math.floor((ordinal-actions.length)/3)} ${(ordinal-actions.length)%3}`:`Cairne ${action.pose}`;
-  model.Sequences.push({...stand,Name:name,Interval:new Uint32Array([start,end]),NonLooping:!action.hold,MoveSpeed:0,Rarity:0,
-    MinimumExtent:new Float32Array([-320,-320,-200]),MaximumExtent:new Float32Array([320,320,360]),BoundsRadius:440});
+  const existing=painOnly?model.Sequences.findIndex(sequence=>sequence.Name===name):-1;ensure(!painOnly||existing>=0,`${name}: shipped sequence missing`);
+  const index=existing>=0?existing:model.Sequences.length,start=existing>=0?model.Sequences[index]!.Interval[0]!:cursor,end=start+Math.round(action.frames*1000/60);
+  if(existing>=0){ensure(model.Sequences[index]!.Interval[1]===end,`${name}: timing changed`);tracks(model,track=>{if(!onGlobalClock(track))track.Keys=track.Keys.filter(key=>key.Frame<start||key.Frame>end);});}
+  else{cursor=end+100;model.Sequences.push({...stand,Name:name,Interval:new Uint32Array([start,end]),NonLooping:!action.hold,MoveSpeed:0,Rarity:0,
+    MinimumExtent:new Float32Array([-320,-320,-200]),MaximumExtent:new Float32Array([320,320,360]),BoundsRadius:440});}
   if(action.stock!==undefined){const [stockFirst,last]=source.Sequences[action.stock]!.Interval,first=stockFirst+(action.stockFrom??0),hit=stockFirst+(action.stockHit??farthestReach(action.stock)),contact=start+Math.round(action.contact*1000/60);
     const wind=Math.max(start,contact-(hit-first)),tail=Math.min(end,contact+(last-hit));
     const retimed=(frame:number)=>frame<=hit?wind+Math.round((frame-first)/Math.max(1,hit-first)*(contact-wind)):contact+Math.round((frame-hit)/Math.max(1,last-hit)*(tail-contact));
@@ -316,6 +321,7 @@ for (const [ordinal,action] of [...actions,...damageActions,...goreActions].entr
       const tangent=()=>match||track.LineType===mdx.LineType.Bezier?Vector.slice():new Float32Array(Vector.length);
       track.Keys.push({...base,Frame:start+Math.round(phase.frame*1000/60),Vector,...first.InTan?{InTan:tangent(),OutTan:tangent()}: {}});}
   });
+  if(painOnly)tracks(model,track=>track.Keys.sort((a,b)=>a.Frame-b.Frame));
 
 
   const shoulder=model.Nodes.find(n=>n.Name==="Bone_UpperArmR")!,elbow=model.Nodes.find(n=>n.Name==="Bone_LowerArmR")!;
@@ -351,10 +357,10 @@ for (const [ordinal,action] of [...actions,...damageActions,...goreActions].entr
   }
   weapon.Rotation!.Keys.sort((a,b)=>a.Frame-b.Frame);weapon.Translation!.Keys.sort((a,b)=>a.Frame-b.Frame);
 
-  const drawn=new DrawnModel(generateMDX(model),1);const rootTrack=main.Translation!;
+  const drawn=new DrawnModel(generateMDX(model),1),painBody=action.damage?new PainBody(generateMDX(model),Character.cairne):undefined;const rootTrack=main.Translation!;
   if(!action.air){const mainKeys=source.Nodes[main.ObjectId]!.Translation!.Keys,mainDonor=mainKeys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1])!,mainIdle=mainKeys.find(k=>k.Frame>=idleSequence.Interval[0]&&k.Frame<=idleSequence.Interval[1])??{...mainDonor,Vector:resting(".Translation",mainDonor.Vector)};
     for(let frame=0;frame<=action.frames;frame++){const vertices=drawn.triangles(index,frame/60,1);let floor=Infinity;for(let i=1;i<vertices.length;i+=2)floor=Math.min(floor,vertices[i]!);
-      if(action.beats){evaluate(index,frame);floor=soles()-soleRest;}
+      if(action.beats){evaluate(index,frame);floor=soles()-soleRest;}if(painBody)floor=painBody.floor(index,frame/60);
       const Frame=start+Math.round(frame*1000/60),w=idleWeight(frame),Vector=mainDonor.Vector.map((v,i)=>v*(1-w)+mainIdle.Vector[i]!*w);Vector[2]=Vector[2]!-floor;
       if(action.beats)Vector[0]=Vector[0]!+along(action.beats,frame,p=>p.gesture.step??0);
       if(action.prepTravel&&frame<action.contact){const wind=Math.max(1,action.contact-3);Vector[0]=Vector[0]!-action.prepTravel*(frame<=wind?frame/wind:(action.contact-frame)/(action.contact-wind));}
@@ -380,7 +386,15 @@ for(const [ordinal,action]of actions.entries())if(action.pose.startsWith("victim
   tracks(model,track=>{if(onGlobalClock(track))return;for(const key of track.Keys)if(key.Frame>=first&&key.Frame<=last)key.Frame=start+(key.Frame<=contact?Math.round((key.Frame-first)/(contact-first)*500):500+Math.round((key.Frame-contact)/(last-contact)*500));track.Keys.sort((a,b)=>a.Frame-b.Frame);});
   sequence.Interval=new Uint32Array([start,start+1000]);
 }
-const bytes=encodeVerified(parseSource(generateMDX(model)));mkdirSync(output,{recursive:true});await Bun.write(join(output,"herotaurenchieftain.mdx"),bytes);
+if(painOnly)tracks(model,track=>track.Keys.sort((a,b)=>a.Frame-b.Frame));
+const bytes=encodeVerified(parseSource(generateMDX(model)));
+const painCells=records.filter(record=>record.pose.startsWith("Cairne Pain ")).map(record=>record.index),gate=painGate(bytes,Character.cairne,standIndex(bytes),painCells);
+console.log(gate.report);ensure(gate.pass,"Cairne pain poses fail the pain gate");
+mkdirSync(output,{recursive:true});await Bun.write(join(output,"herotaurenchieftain.mdx"),bytes);
+if(painOnly){const before=new DrawnModel(generateMDX(source),1),after=new DrawnModel(bytes,1),authored=new Set(painCells);let kept=0;
+  for(const [index,sequence]of source.Sequences.entries())if(!authored.has(index))for(const part of [0,0.5,1]){const time=(sequence.Interval[1]-sequence.Interval[0])*part/1000,a=before.triangles(index,time,1),b=after.triangles(index,time,1);
+    ensure(a.length===b.length&&a.every((v,i)=>Math.abs(v-b[i]!)<0.001),`${sequence.Name}: shipped pose changed`);kept++;}
+  console.log(`CAIRNE_PAIN_PASS ${painCells.length} pain clips re-authored; ${kept} shipped pose samples unchanged; ${output}`);process.exit(0);}
 await Bun.write(join(project,"ts/src/game/presentation/heroes/cairneClips.ts"),[
   "// Generated by tools/animations/cairne-clips.ts; regenerate instead of editing.", 'import { f32 } from "wisp/src/sim/f32";', 'import type { CommandGrabClips, HeroClip, HeroClipTable } from "../../sim/heroes/hero";',
   'export const CAIRNE_FALLBACK: HeroClip = { index: 4, seconds: 2.0 };',
