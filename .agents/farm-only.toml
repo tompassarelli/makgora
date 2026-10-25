@@ -6,7 +6,7 @@ why = "whole-roster advantage sweep, about 6 cores"
 
 [[command]]
 pattern = ["bun", "wisp", "combos"]
-narrowing = ["--fighter"]
+narrowing = ["--fighter", "--objectives"]
 farm = "rerun with --fighter NAME per fighter"
 why = "whole-roster combo generator"
 

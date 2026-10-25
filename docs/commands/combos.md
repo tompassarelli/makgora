@@ -28,3 +28,10 @@
   DI-dependent, read, none). It writes
   smashcraft:tools/move-data/links/<fighter>.jsonl and .md
   (smashcraft:docs/design/melee-parity-plan.md, "Combo analyzer", #294).
+
+- Objectives: `bun wisp combos --objectives` checks each declared target in
+  smashcraft:tools/move-data/combo-objectives.json (an opener hit at a percent
+  window into a follow-up, against a victim weight, at least a class and
+  optionally with DIs that must not escape) against the committed link table,
+  names every row and percent that misses and fails
+  (smashcraft:docs/design/melee-parity-plan.md, "Combo analyzer", #299).

@@ -21,6 +21,7 @@ import { type FighterSummary, MAX_CONVERSIONS, OPENERS, OPPONENTS, PERCENTS, POS
 import { type AdvantageRow, TARGETS, type ZeroToDeath, advantagePage, unmet } from "../../advantageState";
 import { admit } from "../../heavyCapacity";
 import { type LinkRow, type LinkUnit, linksPage } from "../../comboLinks";
+import { ComboObjectivesSchema, objectiveMisses, objectiveName } from "../../comboObjectives";
 
 const moveData = join(import.meta.dir, "../../../../tools/move-data");
 const unitsFile = join(moveData, "combos/units.jsonl");
@@ -29,6 +30,7 @@ const pageFile = join(moveData, "combo-potential.md");
 const advantageFile = join(moveData, "advantage-state.jsonl");
 const advantagePageFile = join(moveData, "advantage-state.md");
 const linksDir = join(moveData, "links");
+const objectivesFile = join(moveData, "combo-objectives.json");
 
 class CombosFailure extends Schema.TaggedError<CombosFailure>()("CombosFailure", { problem: Schema.String }) {
   override get message(): string {
@@ -287,9 +289,26 @@ const links = (attackers: readonly Character[], jobs: number) => Effect.forEach(
   yield* Console.log(`${fighterName(attacker)} links: ${rows.length} rows, ${count("true")} true, ${count("DI-dependent")} DI-dependent, ${count("read")} read, ${count("none")} none`);
 }), { discard: true });
 
+const objectives = Effect.gen(function* () {
+  const declared = yield* readText(objectivesFile).pipe(Effect.flatMap((text) => Schema.decodeEffect(Schema.fromJsonString(ComboObjectivesSchema))(text).pipe(Effect.mapError(failure))));
+  const fighters = [...new Set(declared.map((objective) => objective.fighter))];
+  const rows = (yield* Effect.forEach(fighters, (fighter) => {
+    const attacker = fighterNamed(fighter);
+    if (attacker === undefined) return Effect.fail(new CombosFailure({ problem: `combo objectives name ${fighter}, not a selectable fighter` }));
+    return readText(join(linksDir, `${linkSlug(attacker)}.jsonl`)).pipe(
+      Effect.map((text) => text.split("\n").filter((line) => line !== "").map((line) => JSON.parse(line) as LinkRow)));
+  })).flat();
+  const misses = declared.flatMap((objective) => {
+    const own = objectiveMisses(objective, rows);
+    return own.length === 0 ? [] : [`  ${objectiveName(objective)}: ${own.join("; ")}`];
+  });
+  yield* Console.log([`combo objectives: ${declared.length - misses.length} of ${declared.length} hold in tools/move-data/links against tools/move-data/combo-objectives.json`, ...misses].join("\n"));
+  if (misses.length > 0) return yield* new CombosFailure({ problem: `${misses.length} combo objectives miss` });
+});
+
 export const combos: Command = (args) => Effect.gen(function*() {
   const parsed = yield* Effect.try({
-    try: () => parseArgs({ args: [...args], options: { fighter: { type: "string", multiple: true }, jobs: { type: "string" }, advantage: { type: "boolean" }, links: { type: "boolean" }, "zero-to-death": { type: "boolean" }, shard: { type: "string" }, rows: { type: "string" }, merge: { type: "string", multiple: true } }, strict: true }).values,
+    try: () => parseArgs({ args: [...args], options: { fighter: { type: "string", multiple: true }, jobs: { type: "string" }, advantage: { type: "boolean" }, links: { type: "boolean" }, objectives: { type: "boolean" }, "zero-to-death": { type: "boolean" }, shard: { type: "string" }, rows: { type: "string" }, merge: { type: "string", multiple: true } }, strict: true }).values,
     catch: (cause) => new UsageFailure({ problem: describeCause(cause) }),
   });
   const names = parsed.fighter ?? [];
@@ -299,6 +318,7 @@ export const combos: Command = (args) => Effect.gen(function*() {
   const jobs = Number(parsed.jobs ?? "6");
   if (!Number.isInteger(jobs) || jobs < 1) return yield* new UsageFailure({ problem: "--jobs takes a whole number of worker threads" });
   if (parsed.merge !== undefined) return yield* mergeAdvantage(parsed.merge);
+  if (parsed.objectives === true) return yield* objectives;
   const shardMatch = parsed.shard?.match(/^(\d+)\/(\d+)$/);
   const shard = shardMatch === undefined || shardMatch === null ? undefined : { index: Number(shardMatch[1]), count: Number(shardMatch[2]), rows: parsed.rows ?? "" };
   if (parsed.shard !== undefined && (shard === undefined || shard.index >= shard.count || shard.rows === "" || parsed.advantage !== true || names.length > 0)) {

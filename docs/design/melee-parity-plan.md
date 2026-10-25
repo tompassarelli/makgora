@@ -268,9 +268,18 @@ Built on the existing headless sim and search, not beside them.
   0-60% with one deviation at a time on Melee's handling, counting restored
   links. This answers which deviation kills neutral air into grab with numbers,
   not guesses.
-- Objectives (#299): rows in `tools/move-data/combo-objectives.ts` (fighter,
-  opener, percent window, weight band, follow-up, required class);
-  `bun wisp combos --objectives` fails on a miss.
+- Objectives (#299): rows in `tools/move-data/combo-objectives.json` (fighter,
+  opener, region class, percent window, victim weight, follow-up, required
+  class, and optionally the DIs that must not escape), decoded by
+  `ts/scripts/comboObjectives.ts`. `bun wisp combos --objectives` reads the
+  committed link table without simulating: each link-table percent inside the
+  window needs a row whose class is at least the required one (true over
+  DI-dependent over read) and whose DI escapes miss every listed DI. It names
+  each missed row and percent and exits non-zero. JSON rather than TypeScript
+  because scripts may not import from tools (`structure.toml`). The starter
+  rows are Maiev's down tilt into down tilt at 0-20% (true), and up smash at
+  30-50% and neutral air at 100-150% into grab with DI in or none, all
+  against weight 75.
 
 The agency rule (`docs/gameplay-design.md:578`, at most 2 true links in a row,
 0-to-death in 2-3 reads) stays the guard against loops; the objectives set the

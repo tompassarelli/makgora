@@ -1,0 +1,5 @@
+[
+  { "fighter": "Maiev Shadowsong", "opener": "down tilt", "region": "clean", "percent": [0, 20], "weight": 75, "followUp": "down tilt", "class": "true" },
+  { "fighter": "Maiev Shadowsong", "opener": "up smash", "region": "clean", "percent": [30, 50], "weight": 75, "followUp": "grab", "class": "DI-dependent", "di": ["in", "none"] },
+  { "fighter": "Maiev Shadowsong", "opener": "neutral air", "region": "clean", "percent": [100, 150], "weight": 75, "followUp": "grab", "class": "DI-dependent", "di": ["in", "none"] }
+]
