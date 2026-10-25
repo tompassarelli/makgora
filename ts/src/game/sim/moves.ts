@@ -9,7 +9,7 @@ import type { AuthoredFall, FighterMoves } from "./heroMoves";
 
 export const SMASH_MAX_CHARGE_FRAMES = 60;
 export const SMASH_MAX_DAMAGE_MULTIPLIER = 1.3671000003814697;
-const SMASH_FULL_CHARGE_HOLD_FRAMES = 120;
+export const SMASH_FULL_CHARGE_HOLD_FRAMES = 120;
 export const SMASH_MAX_HOLD_FRAMES = SMASH_MAX_CHARGE_FRAMES + SMASH_FULL_CHARGE_HOLD_FRAMES;
 export const LEDGE_ATTACK_FRAMES = 40;
 export const DOWN_ATTACK_FRAMES = 49;

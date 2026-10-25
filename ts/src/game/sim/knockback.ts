@@ -15,9 +15,20 @@ import type { Controls } from "./roster";
 import { melee } from "./tuning";
 import { squareRoot } from "./warcraftMath";
 
-const KNOCKBACK_LAUNCH_SCALE = melee(0.029999999329447746);
-const HITSTUN_FRAMES_PER_KNOCKBACK = 0.4000000059604645;
-const KNOCKBACK_STACKING_FRAMES = 10;
+export const KNOCKBACK_LAUNCH_SPEED = 0.029999999329447746;
+const KNOCKBACK_LAUNCH_SCALE = melee(KNOCKBACK_LAUNCH_SPEED);
+export const HITSTUN_FRAMES_PER_KNOCKBACK = 0.4000000059604645;
+export const KNOCKBACK_STACKING_FRAMES = 10;
+export const KNOCKBACK_PERCENT_SCALE = 0.10000000149011612;
+export const KNOCKBACK_DAMAGE_SCALE = 0.05000000074505806;
+export const KNOCKBACK_GROWTH_SCALE = 1.399999976158142;
+export const KNOCKBACK_GROWTH_ADDEND = 18.0;
+export const KNOCKBACK_CAP = 2500.0;
+export const CROUCH_CANCEL_KNOCKBACK_SCALE = 0.6666666865348816;
+export const SMASH_CHARGE_VICTIM_KNOCKBACK_SCALE = 1.2000000476837158;
+export const ELECTRIC_HITLAG_SCALE = 1.5;
+export const HITLAG_CAP_FRAMES = 20;
+export const DI_MAX_DEGREES = 18.0;
 const GROUND_LAUNCH_BOUNCE_ANGLE = 0.1745329201221466;
 const GROUND_LAUNCH_REBOUND = 0.800000011920929;
 const RADIANS_TO_DEGREES = 57.295780181884766;
@@ -37,7 +48,7 @@ export function integerHitPower(hitDamage: number): number {
   return damage > 0 ? max(1, toInt(damage)) : 0;
 }
 
-function launchWeightFactor(victimWeight: number): number {
+export function launchWeightFactor(victimWeight: number): number {
   const weight = multiplyFloat32(roundToFloat32(victimWeight), 0.009999999776482582);
   const fraction = divideFloat32(multiplyFloat32(weight, 2.0), addFloat32(weight, 1.0));
   return subtractFloat32(2.0, fraction);
@@ -45,17 +56,17 @@ function launchWeightFactor(victimWeight: number): number {
 
 function scaledLaunchGrowth(contribution: number, victimWeight: number, growthPercent: number, baseKnockback: number): number {
   const weighted = multiplyFloat32(contribution, launchWeightFactor(victimWeight));
-  const growth = fusedMultiplyAddFloat32(1.399999976158142, weighted, 18.0);
+  const growth = fusedMultiplyAddFloat32(KNOCKBACK_GROWTH_SCALE, weighted, KNOCKBACK_GROWTH_ADDEND);
   const multiplier = multiplyFloat32(roundToFloat32(growthPercent), 0.009999999776482582);
-  return min(2500.0, fusedMultiplyAddFloat32(multiplier, growth, roundToFloat32(baseKnockback)));
+  return min(KNOCKBACK_CAP, fusedMultiplyAddFloat32(multiplier, growth, roundToFloat32(baseKnockback)));
 }
 
 
 export function contactKnockback(postHitPercent: number, hitDamage: number, victimWeight: number, growthPercent: number, baseKnockback: number, contextScale: number): number {
   const percent = roundToFloat32(postHitPercent);
   const powered = multiplyFloat32(percent, toReal(integerHitPower(hitDamage)));
-  const damageGrowth = multiplyFloat32(powered, 0.05000000074505806);
-  const contribution = fusedMultiplyAddFloat32(0.10000000149011612, percent, damageGrowth);
+  const damageGrowth = multiplyFloat32(powered, KNOCKBACK_DAMAGE_SCALE);
+  const contribution = fusedMultiplyAddFloat32(KNOCKBACK_PERCENT_SCALE, percent, damageGrowth);
   return multiplyFloat32(scaledLaunchGrowth(contribution, victimWeight, growthPercent, baseKnockback), roundToFloat32(contextScale));
 }
 
@@ -71,16 +82,16 @@ export function effectKnockback(effect: KnockbackTerms, postHitPercent: number, 
 
 export function fixedHitKnockback(fixedPower: number, victimWeight: number, growthPercent: number, baseKnockback: number, contextScale: number): number {
   const power = multiplyFloat32(toReal(fixedPower), 10.0);
-  const damageGrowth = multiplyFloat32(power, 0.05000000074505806);
-  const contribution = fusedMultiplyAddFloat32(10.0, 0.10000000149011612, damageGrowth);
+  const damageGrowth = multiplyFloat32(power, KNOCKBACK_DAMAGE_SCALE);
+  const contribution = fusedMultiplyAddFloat32(10.0, KNOCKBACK_PERCENT_SCALE, damageGrowth);
   return multiplyFloat32(scaledLaunchGrowth(contribution, victimWeight, growthPercent, baseKnockback), roundToFloat32(contextScale));
 }
 
 
 export function hitContextKnockback(knockback: number, crouching: boolean, smashCharging: boolean): number {
   let result = roundToFloat32(knockback);
-  if (crouching) result = multiplyFloat32(result, 0.6666666865348816);
-  if (smashCharging) result = multiplyFloat32(result, 1.2000000476837158);
+  if (crouching) result = multiplyFloat32(result, CROUCH_CANCEL_KNOCKBACK_SCALE);
+  if (smashCharging) result = multiplyFloat32(result, SMASH_CHARGE_VICTIM_KNOCKBACK_SCALE);
   return result;
 }
 
@@ -95,8 +106,8 @@ export const STRONG_HIT_EXTRA_HITLAG = 3;
 export function victimHitlagFrames(hitDamage: number, electric: boolean, crouching: boolean): number {
   if (hitDamage <= 0) return 0;
   const base = toInt(f32(f32(integerHitPower(hitDamage) / 3.0) + 3));
-  const effectFrames = electric ? toInt(f32(base * 1.5)) : base;
-  return min(20, crouching ? toInt(f32(f32(effectFrames * 2.0) / 3.0)) : effectFrames);
+  const effectFrames = electric ? toInt(f32(base * ELECTRIC_HITLAG_SCALE)) : base;
+  return min(HITLAG_CAP_FRAMES, crouching ? toInt(f32(f32(effectFrames * 2.0) / 3.0)) : effectFrames);
 }
 
 export function ordinaryHitlagFrames(hitDamage: number): number {
@@ -220,7 +231,7 @@ export function directionalInfluenceVector(x: number, z: number, stickX: number,
   const speed = roundToFloat32(squareRoot(square));
   const cross = -fusedMultiplyAddFloat32(vertical, inputX, -multiplyFloat32(horizontal, inputZ));
   const fraction = divideFloat32(multiplyFloat32(cross, cross), square);
-  const degrees = f32(multiplyFloat32(fraction, 18.0) * (cross < 0 ? -1 : 1));
+  const degrees = f32(multiplyFloat32(fraction, DI_MAX_DEGREES) * (cross < 0 ? -1 : 1));
   const angle = fusedMultiplyAddFloat32(degrees, 0.01745329238474369, meleeAtan2(vertical, horizontal));
   influence.velocityX = multiplyFloat32(speed, meleeCos(angle));
   influence.velocityZ = multiplyFloat32(speed, meleeSin(angle));

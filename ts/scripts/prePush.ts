@@ -83,7 +83,7 @@ export function checksFor(paths: readonly string[], cues: ReadonlySet<string> = 
   return [
     ...(paths.length > 0 ? [{ name: "clean room", directory: "ts", args: ["scripts/cleanRoom.ts"], fix: "follow wisp:docs/clean-room.md and the line above.", hosted: true }] : []),
     ...(ts ? [
-      { name: "kind tags and type-check ts", directory: "ts", args: ["run", "check"], fix: "end each refused test title with its kind tag (listed above) or delete the test; fix each type error.", hosted: true },
+      { name: "kind tags, parity ledger and type-check ts", directory: "ts", args: ["run", "check"], fix: "end each refused test title with its kind tag (listed above) or delete the test; for a ledger row, regenerate docs/design/melee-parity.md with bun wisp ledger or give the named row the status it now needs (docs/design/melee-parity-plan.md, \"Ledger\"); fix each type error.", hosted: true },
     ] : []),
     ...(effectKit ? [
       { name: "effect-kit check", directory: ".", args: [EFFECT_KIT, "check"], fix: `CI runs north's effect-kit check (smashcraft:.github/workflows/ci.yml); fix each problem above, or if ${EFFECT_KIT} is missing, git clone https://github.com/tompassarelli/north ${NORTH} (git -C ${NORTH} pull keeps it on the main CI clones).`, hosted: false, machineTool: true },

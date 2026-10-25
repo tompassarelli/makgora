@@ -323,6 +323,9 @@ producer = "ts/scripts/releaseRoster.ts"
 [[generated]]
 paths = ["ts/src/generated/state/**"]
 producer = "ts/codegen/fighterState.ts"
+[[generated]]
+paths = ["docs/design/melee-parity.md"]
+producer = "ts/scripts/wisp/commands/ledger.ts"
 
 [ignore]
 paths = ["repos/**", "evidence/**", "ts/vendor/**", "ts/node_modules/**", "**/fixtures/**", "ts/test/corpus/**", "ts/test/native/pads/**",
