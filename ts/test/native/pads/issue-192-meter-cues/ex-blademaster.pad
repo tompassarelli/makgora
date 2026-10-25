@@ -1,6 +1,7 @@
 # #192: with a full bar both fighters wear the flame aura; a's EX neutral special plays the EX sound and
 # a short EX aura on its first frame, on top of the special's own cues, and spending a segment puts the
-# flame aura out; b's plain neutral special plays neither and keeps b's aura lit.
+# flame aura out, leaving two segments, so a wears the EX-ready frost swirl; b's plain neutral special plays
+# neither and keeps b's aura lit.
 #! chat -dev setup quick hero blademaster;meter 100
 #! preset melee
 60 a press LB
@@ -16,6 +17,8 @@
 #! expect a 60 meter-cue ex-sound DivineShield
 #! expect a 60 meter-cue ex-aura on
 #! expect a 90 meter-cue ex-aura off
+#! absent a 0-59 meter-cue ex-ready
+#! expect a 60 meter-cue ex-ready on mana 67
 #! absent a 61-89 meter-cue ex-aura off
 #! expect b 150 special
 #! absent b 0-370 meter-cue ex-

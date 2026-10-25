@@ -9,12 +9,14 @@ import { heroLook } from "../roster/looks";
 
 export interface MeterCue extends Cue {
   readonly lift: number;
+  readonly alpha?: number | undefined;
 }
 
-export const EX_AURA: MeterCue = { model: "Abilities\\Spells\\Items\\TomeOfRetraining\\TomeOfRetrainingCaster.mdx", anchor: "feet", scale: 1.0, lift: 0.0, sequence: "birth", sound: "DivineShield" };
+export const EX_AURA: MeterCue = { model: "Abilities\\Spells\\Items\\TomeOfRetraining\\TomeOfRetrainingCaster.mdx", anchor: "feet", scale: f32(0.7), lift: 0.0, alpha: 150, sequence: "birth", sound: "DivineShield" };
+export const EX_READY: MeterCue = { model: "Abilities\\Spells\\Undead\\FrostArmor\\FrostArmorTarget.mdx", anchor: "feet", scale: f32(0.5), lift: f32(0.1), sequence: "stand" };
 export const SUPER_AURA: MeterCue = { model: "Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedTarget.mdx", anchor: "feet", scale: 1.0, lift: f32(0.15), sequence: "stand" };
 export const ULTIMATE_BURST: MeterCue = { model: "Abilities\\Spells\\Other\\Doom\\DoomDeath.mdx", anchor: "feet", scale: f32(0.4), lift: 0.0, sequence: "birth", sound: "FlameStrike" };
-export const METER_CUES: readonly MeterCue[] = [EX_AURA, SUPER_AURA, ULTIMATE_BURST];
+export const METER_CUES: readonly MeterCue[] = [EX_AURA, EX_READY, SUPER_AURA, ULTIMATE_BURST];
 
 export function ultimateBurst(character: Character): MeterCue {
   const burst = heroLook(character)?.ultimateBurst;
@@ -22,7 +24,7 @@ export function ultimateBurst(character: Character): MeterCue {
 }
 
 export function meterCueMoves(character: Character): readonly (readonly [string, MeterCue])[] {
-  return [["EX aura", EX_AURA], ["full-bar flame aura", SUPER_AURA], ["ultimate burst", ultimateBurst(character)]];
+  return [["EX aura", EX_AURA], ["EX-ready frost swirl", EX_READY], ["full-bar flame aura", SUPER_AURA], ["ultimate burst", ultimateBurst(character)]];
 }
 
 export const METER_CUE_UNIT_RADIUS = 22.0;
@@ -62,6 +64,7 @@ export function ultimateFirstEffectFrame(move: Readonly<AuthoredSpecial> | undef
 
 export interface MeterCueView {
   exAura: boolean;
+  exReady: boolean;
   superAura: boolean;
   burst: boolean;
   exSound: boolean;
@@ -74,13 +77,14 @@ export interface MeterCueState {
 }
 
 export function createMeterCueState(): MeterCueState {
-  return { action: SpecialAction.none, view: { exAura: false, superAura: false, burst: false, exSound: false, ultimateSound: false } };
+  return { action: SpecialAction.none, view: { exAura: false, exReady: false, superAura: false, burst: false, exSound: false, ultimateSound: false } };
 }
 
 export function clearMeterCueState(state: MeterCueState): void {
   state.action = SpecialAction.none;
   const { view } = state;
   view.exAura = false;
+  view.exReady = false;
   view.superAura = false;
   view.burst = false;
   view.exSound = false;
@@ -89,6 +93,10 @@ export function clearMeterCueState(state: MeterCueState): void {
 
 export function ultimateReady(fighter: Readonly<Fighter>, ultimatesOff: boolean): boolean {
   return !ultimatesOff && fighter.tuning.ultimate !== undefined && !fighter.status.out && fighter.mana.points >= ROSTER_MANA.max && fighter.special.action !== SpecialAction.heroUltimate;
+}
+
+export function exReady(fighter: Readonly<Fighter>, ultimatesOff: boolean): boolean {
+  return !fighter.status.out && fighter.mana.points >= ROSTER_MANA.exCost && fighter.special.action !== SpecialAction.heroUltimate && !ultimateReady(fighter, ultimatesOff);
 }
 
 /** Reads one confirmed frame of the fighter into the meter cues it shows; sounds are true only on the frame their cast starts. */
@@ -107,6 +115,7 @@ export function observeMeterCues(state: MeterCueState, fighter: Readonly<Fighter
   view.burst = ultimate && frame <= ULTIMATE_BURST_FRAMES;
   view.exAura = ex && !ultimate && action !== SpecialAction.none && form < FOLLOW_UP_FORM && frame <= EX_AURA_FRAMES;
   view.superAura = ultimateReady(fighter, ultimatesOff);
+  view.exReady = exReady(fighter, ultimatesOff);
   return view;
 }
 
