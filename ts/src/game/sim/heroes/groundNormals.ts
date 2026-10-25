@@ -127,7 +127,8 @@ export const MOUNTAIN_KING_GROUND: GroundKit = {
       groundHit(11.049999237060547, 85, 77.3499984741211, 10.0, MK))),
 
 
-    [AttackStyle.dashAttack]: heroMove(11, 5, 26, 0, [held(11, 15, [4.0, 12.0, 4.0, 65.0], 24.0, groundHit(13.75, 75, 104.9749984741211, 30.0, MK))], 79.0, true),
+    [AttackStyle.dashAttack]: heroMove(10, 10, 22, 0, [held(10, 13, [4.0, 12.0, 4.0, 65.0], 24.0, groundHit(13.75, 75, 104.9749984741211, 30.0, MK)),
+      held(14, 19, [4.0, 12.0, 4.0, 65.0], 24.0, groundHit(9.0, 75, 90.0, 26.0, MK))], 79.0, true),
   },
   reaches: {
     [AttackStyle.jab]: [40.0, 42.0], [AttackStyle.jab2]: [42.0, 46.0], [AttackStyle.forwardTilt]: [46.0, 52.0], [AttackStyle.forwardTiltUp]: [42.0, 72.0], [AttackStyle.forwardTiltDown]: [44.0, 34.0],
@@ -150,8 +151,8 @@ export const WARDEN_GROUND: GroundKit = {
     [AttackStyle.upTilt]: heroMove(4, 4, 16, 0, swing(4, [[18.0, 40.0, 95.0, 60.0], [16.0, 50.0, 70.0, 90.0], [8.0, 56.0, 35.0, 99.0], [0.0, 56.0, -10.0, 99.0]], 6.0,
       groundHit(6.0, 90, 60.0, 32.0, WD))),
     [AttackStyle.downTilt]: heroMove(3, 2, 9, 0, swing(3, [[16.0, 8.0, 99.0, 8.0], [16.0, 5.0, 99.0, 5.0]], 6.0, groundHit(3.0, 0, 20.0, 32.0, WD))),
-    [AttackStyle.dashAttack]: heroMove(5, 3, 18, 0, swing(5, [[18.0, 30.0, 105.0, 40.0], [18.0, 40.0, 105.0, 52.0], [18.0, 50.0, 100.0, 62.0]], 6.0,
-      groundHit(7.0, 50, 70.0, 24.0, WD)), 53.0, true),
+    [AttackStyle.dashAttack]: heroMove(5, 10, 21, 0, [...swing(5, [[18.0, 30.0, 105.0, 40.0], [18.0, 40.0, 105.0, 52.0], [18.0, 50.0, 100.0, 62.0]], 6.0,
+      groundHit(7.0, 50, 70.0, 24.0, WD)), held(8, 14, [18.0, 50.0, 100.0, 62.0], 6.0, groundHit(5.0, 50, 60.0, 20.0, WD))], 53.0, true),
   },
   reaches: {},
 };
@@ -174,7 +175,7 @@ export const LICH_GROUND: GroundKit = {
     ]),
     [AttackStyle.downTilt]: heroMove(10, 4, 19, 0, swing(10, [[20.0, 6.0, 90.0, 6.0], [20.0, 5.0, 120.0, 5.0], [20.0, 4.0, 144.0, 4.0], [20.0, 4.0, 144.0, 4.0]], 8.0,
       groundHit(6.0, 30, 70.0, 25.0, LICH))),
-    [AttackStyle.dashAttack]: heroMove(10, 6, 22, 0, [held(10, 15, [18.0, 14.0, 96.0, 10.0], 10.0, groundHit(8.0, 25, 90.0, 30.0, LICH))], 105.0, true),
+    [AttackStyle.dashAttack]: heroMove(10, 8, 20, 0, [held(10, 17, [18.0, 14.0, 96.0, 10.0], 10.0, groundHit(8.0, 25, 90.0, 30.0, LICH))], 105.0, true),
   },
   reaches: {
     [AttackStyle.jab]: [50.0, 44.0], [AttackStyle.jab2]: [52.0, 44.0], [AttackStyle.forwardTilt]: [26.0, 47.0], [AttackStyle.forwardTiltUp]: [26.0, 80.0], [AttackStyle.forwardTiltDown]: [26.0, 22.0],
@@ -193,7 +194,7 @@ export const FORSAKEN_PALADIN_GROUND: GroundKit = {
     [AttackStyle.upTilt]: heroMove(10, 4, 22, 0, swing(10, [[20.0, 90.0, 70.0, 136.0], [12.0, 100.0, 30.0, 160.0], [4.0, 106.0, -10.0, 160.0], [-6.0, 100.0, -34.0, 138.0]], 14.0,
       groundHit(12.0, 85, 105.0, 28.0, FORSAKEN_PALADIN))),
     [AttackStyle.downTilt]: heroMove(9, 3, 20, 0, swing(9, [[14.0, 10.0, 124.0, 10.0], [14.0, 8.0, 124.0, 6.0], [14.0, 6.0, 110.0, 2.0]], 8.0, groundHit(9.0, 10, 40.0, 72.0, FORSAKEN_PALADIN))),
-    [AttackStyle.dashAttack]: heroMove(12, 3, 20, 0, swing(12, [[20.0, 90.0, 120.0, 60.0], [20.0, 60.0, 125.0, 20.0], [20.0, 40.0, 115.0, 6.0]], 12.0,
+    [AttackStyle.dashAttack]: heroMove(12, 4, 26, 0, swing(12, [[20.0, 90.0, 120.0, 60.0], [20.0, 60.0, 125.0, 20.0], [20.0, 40.0, 115.0, 6.0], [20.0, 40.0, 115.0, 6.0]], 12.0,
       groundHit(14.75, 30, 100.0, 26.0, FORSAKEN_PALADIN)), 46.0, true),
   },
   reaches: {
@@ -220,9 +221,9 @@ export const DREADLORD_GROUND: GroundKit = {
       groundHit(8.145000457763672, 90, 81.45000457763672, 25.0, DL))),
     [AttackStyle.downTilt]: heroMove(6, 3, 18, 0, swing(6, [[16.0, 12.0, 95.0, 12.0], [16.0, 10.0, 95.0, 6.0], [16.0, 8.0, 80.0, 2.0]], 10.0, groundHit(5.430000305175781, 180, 27.150001525878906, 30.0, DL))),
 
-    [AttackStyle.dashAttack]: heroMove(7, 4, 24, 0, [
-      ...swing(7, [[16.0, 40.0, 90.0, 46.0], [16.0, 40.0, 90.0, 40.0]], 10.0, groundHit(8.145000457763672, 60, 81.45000457763672, 22.0, DL)),
-      ...swing(9, [[-16.0, 40.0, -90.0, 46.0], [-16.0, 40.0, -90.0, 40.0]], 10.0, groundHit(8.145000457763672, 60, 81.45000457763672, 22.0, DL, true)),
+    [AttackStyle.dashAttack]: heroMove(7, 8, 24, 0, [
+      ...swing(7, [[16.0, 40.0, 90.0, 46.0], [16.0, 40.0, 90.0, 40.0], [16.0, 40.0, 90.0, 40.0], [16.0, 40.0, 90.0, 40.0]], 10.0, groundHit(8.145000457763672, 60, 81.45000457763672, 22.0, DL)),
+      ...swing(11, [[-16.0, 40.0, -90.0, 46.0], [-16.0, 40.0, -90.0, 40.0], [-16.0, 40.0, -90.0, 40.0], [-16.0, 40.0, -90.0, 40.0]], 10.0, groundHit(8.145000457763672, 60, 81.45000457763672, 22.0, DL, true)),
     ], 132.0),
   },
   reaches: {},
@@ -246,7 +247,7 @@ export const SHADOW_HUNTER_GROUND: GroundKit = {
       [-40.0, 120.0, 60.0, 135.0], [-55.0, 128.0, 55.0, 128.0], [-60.0, 135.0, 40.0, 120.0], [-55.0, 128.0, 55.0, 128.0], [-40.0, 120.0, 60.0, 135.0],
     ], 9.0, groundHit(6.929999828338623, 80, 95.0, 20.0, SH))),
     [AttackStyle.downTilt]: heroMove(7, 2, 16, 0, swing(7, [[18.0, 12.0, 145.0, -20.0], [18.0, 10.0, 145.0, -26.0]], 7.0, groundHit(8.5, 30, 70.0, 22.0, SH))),
-    [AttackStyle.dashAttack]: heroMove(8, 9, 18, 0, [
+    [AttackStyle.dashAttack]: heroMove(8, 9, 21, 0, [
       held(8, 10, [20.0, 30.0, 100.0, 60.0], 7.0, spin(2.9700000286102295, 0, 15.0, 25.0), 1),
       held(11, 13, [20.0, 60.0, 100.0, 30.0], 7.0, spin(2.9700000286102295, 0, 15.0, 25.0), 2),
       held(14, 16, [20.0, 30.0, 100.0, 60.0], 7.0, spin(4.949999809265137, 45, 100.0, 22.0), 3),
@@ -275,8 +276,8 @@ export const RIFLEMAN_GROUND: GroundKit = {
       groundHit(7.440000057220459, 90, 74.4000015258789, 26.0, RIFLE))),
     [AttackStyle.downTilt]: heroMove(7, 3, 22, 0, swing(7, [[14.0, 10.0, 108.0, 10.0], [14.0, 8.0, 108.0, 6.0], [14.0, 6.0, 100.0, 2.0]], 10.0,
       groundHit(9.300000190734863, 80, 41.85000228881836, 50.0, RIFLE))),
-    [AttackStyle.dashAttack]: heroMove(11, 3, 26, 0, swing(11, [[18.0, 50.0, 140.0, 52.0], [18.0, 50.0, 140.0, 50.0], [18.0, 48.0, 130.0, 48.0]], 10.0,
-      groundHit(8.25, 40, 114.0, 22.0, RIFLE)), 66.0, true),
+    [AttackStyle.dashAttack]: heroMove(9, 8, 22, 0, [...swing(9, [[18.0, 50.0, 140.0, 52.0], [18.0, 50.0, 140.0, 50.0], [18.0, 48.0, 130.0, 48.0]], 10.0,
+      groundHit(8.25, 40, 114.0, 22.0, RIFLE)), held(12, 16, [18.0, 48.0, 130.0, 48.0], 10.0, groundHit(6.0, 40, 100.0, 20.0, RIFLE))], 66.0, true),
   },
   reaches: {},
 };

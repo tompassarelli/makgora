@@ -23,6 +23,7 @@ export const DOWN_ATTACK_BASE_KNOCKBACK = 75.0;
 export const DEMON_HUNTER_FORWARD_AIR_ACTIVE = 6;
 export const DEMON_HUNTER_DOWN_SMASH_ACTIVE = 9;
 export const DEMON_HUNTER_FORWARD_SMASH_ACTIVE = 3;
+export const DEMON_HUNTER_DASH_ATTACK_ACTIVE = 10;
 
 export const FEL_LUNGE_BASE = 40.0;
 export const FEL_LUNGE_CHARGE = 30.0;
@@ -202,6 +203,7 @@ export function attackStartupFrames(style: AttackStyle, moves?: FighterMoves): n
       return 16;
     case AttackStyle.demonHunterDashAttack:
     case AttackStyle.dashAttack:
+      return 6;
     case AttackStyle.jab:
     case AttackStyle.jab2:
       return 4;
@@ -264,6 +266,7 @@ export function characterAttackActiveFrames(character: Character, style: AttackS
     if (style === AttackStyle.forwardAir) return DEMON_HUNTER_FORWARD_AIR_ACTIVE;
     if (style === AttackStyle.downSmash) return DEMON_HUNTER_DOWN_SMASH_ACTIVE;
     if (style === AttackStyle.forwardSmash) return DEMON_HUNTER_FORWARD_SMASH_ACTIVE;
+    if (style === AttackStyle.demonHunterDashAttack) return DEMON_HUNTER_DASH_ATTACK_ACTIVE;
   }
   return attackActiveFrames(style);
 }
@@ -278,7 +281,7 @@ export function attackDurationFramesForGrounding(style: AttackStyle, grounded: b
       return LEDGE_ATTACK_FRAMES;
     case AttackStyle.demonHunterDashAttack:
     case AttackStyle.dashAttack:
-      return 32;
+      return 37;
     case AttackStyle.neutralAir:
       return 41;
     case AttackStyle.forwardAir:
