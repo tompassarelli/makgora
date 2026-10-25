@@ -52,7 +52,8 @@
   or the shard fails. `match-NN.tsv` lists each key and move with its
   verdict, and `match-NN.json` its dead bindings and moves that did not start;
   each shard's folder gets a `smoke.json` with them, its `pair-restart.txt` line
-  in `restart` and the Run column when accept restarted the pair, and whether the shard
+  in `restart` and the Run column when the pair was restarted (the native smoke
+  restarts a dropped pair before each shard's 280 s budget starts), and whether the shard
   crashed, written when that shard finishes, and `play --install-green`, which runs this smoke on each candidate,
   refuses any of the three whatever `SMASHCRAFT_GREEN_GATE` says. A `--shard`
   run replaces only its own shards' `smoke.json`, so runs of a few shards on

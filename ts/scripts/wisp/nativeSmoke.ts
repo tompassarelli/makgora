@@ -9,7 +9,7 @@ import { quietNativeSessionArgs } from "wisp/scripts/wisp/quietNativeCapacity";
 import { fighterName, PLAYABLE_CHARACTERS } from "../../src/game/sim/heroes/registry";
 import { capacityHelper, admitsThroughHelper } from "../heavyCapacity";
 import { stopBunProcess } from "../hostProcess";
-import { pairRestartFile } from "./commands/lanPoolUnit";
+import { pairRestartFile, restartDroppedPairInto } from "./commands/lanPoolUnit";
 import { userSessionEnv } from "./commands/nativeUnit";
 import { currentPlaytest } from "./currentPlaytest";
 import { type SmokeReport, isGreen } from "./greenBuilds";
@@ -40,8 +40,8 @@ interface ShardOutcome {
   readonly seconds: number;
 }
 
-const tables = (directory: string): string[] => existsSync(directory)
-  ? readdirSync(directory, { recursive: true, encoding: "utf8" }).filter(file => /(^|\/)match-\d+\.tsv$/.test(file)).sort().map(file => join(directory, file))
+const tables = (directory: string, since: number): string[] => existsSync(directory)
+  ? readdirSync(directory, { recursive: true, encoding: "utf8" }).filter(file => /(^|\/)match-\d+\.tsv$/.test(file)).sort().map(file => join(directory, file)).filter(file => statSync(file).mtimeMs >= since)
   : [];
 
 const matchFailures = (directory: string, since: number): SmokeMatchFailures | undefined => {
@@ -58,9 +58,9 @@ const matchFailures = (directory: string, since: number): SmokeMatchFailures | u
 
 const outcome = (shard: number, directory: string, code: number | "timeout", seconds: number, since: number): ShardOutcome => {
   const report = join(directory, "report.json");
-  const decoded = existsSync(report) ? Schema.decodeOption(Report)(readFileSync(report, "utf8")) : undefined;
+  const decoded = existsSync(report) && statSync(report).mtimeMs >= since ? Schema.decodeOption(Report)(readFileSync(report, "utf8")) : undefined;
   const verdicts = decoded?._tag === "Some" ? decoded.value.results.filter(({ id }) => id === movesShardId(shard) || id === specialsShardId(shard)) : [];
-  const rows = tables(directory).flatMap(file => readFileSync(file, "utf8").split("\n").slice(1).filter(line => line !== ""));
+  const rows = tables(directory, since).flatMap(file => readFileSync(file, "utf8").split("\n").slice(1).filter(line => line !== ""));
   const restart = existsSync(pairRestartFile(directory)) ? readFileSync(pairRestartFile(directory), "utf8").trim() : undefined;
   return { shard, code, verdicts, rows, failures: matchFailures(directory, since), seconds, ...(restart === undefined ? {} : { restart }) };
 };
@@ -87,7 +87,9 @@ const quietLease = (owner: string) => Effect.gen(function*() {
   if (granted._tag === "None" || !granted.value) return yield* new NativeSmokeFailure({ problem: `quiet native lease for ${owner}: not reserved within ${LEASE_WAIT_SECONDS} s or it exited first` });
 }).pipe(Effect.mapError(cause => cause instanceof NativeSmokeFailure ? cause : new NativeSmokeFailure({ problem: `quiet native lease for ${owner}: ${cause.message}` })));
 
-const runShard = (shard: number, pair: string, map: string, directory: string) => Effect.scoped(quietLease(`smashcraft-smoke-${smokeShardLabel(shard)}`).pipe(Effect.andThen(Effect.acquireUseRelease(
+const restartPair = (pair: string, directory: string) => restartDroppedPairInto(Number(pair), directory).pipe(Effect.mapError(cause => new NativeSmokeFailure({ problem: `restart pair ${pair}: ${cause.message}` })));
+
+const runShard = (shard: number, pair: string, map: string, directory: string) => Effect.scoped(restartPair(pair, directory).pipe(Effect.andThen(quietLease(`smashcraft-smoke-${smokeShardLabel(shard)}`)), Effect.andThen(Effect.acquireUseRelease(
   Effect.try({
     try: () => {
       mkdirSync(directory, { recursive: true, mode: 0o700 });
