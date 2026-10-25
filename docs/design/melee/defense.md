@@ -109,9 +109,9 @@ pressing early or repeatedly fails (smashcraft:docs/melee-tech-input.md has
 the exact frame rule). A tech either stays in place or rolls forward or back,
 all intangible. A missed tech knocks the fighter down; it may lie for up to
 <!-- v:knockdown.wait -->220<!-- /v --> frames, then get up in place, roll either
-way or attack. Hits totalling less than <!-- v:jabReset.damage -->7<!-- /v --> damage
-on a downed fighter replay a short damage animation instead of launching it
-: the jab reset, which forces a get-up.
+way or attack. Hits totalling <!-- v:jabReset.damage -->7<!-- /v --> damage or less
+on a downed fighter replay a short damage animation instead of launching it:
+the jab reset, which forces a get-up (SmashWiki "Lock").
 
 ## Ledges
 
