@@ -25,6 +25,7 @@ import { CAMERA_LIFT, heldHeight, judgeCamera, judgeCrop, judgeFraming, judgePix
 import { answerKey, type ColdStrip, coldReadBatch, coldReadBatches, isMovementMove, ledgeCorner, type MovementMove, movementCrop, movementFrames, stageDrawArgs, stageShape, stripId } from "../animMovementRows";
 import { JUDGES_PER_CLIP, clipIdentity, judgePanel, judgementKey, median, withPreparedClips, writePreparedClips } from "../animJudgeIdentity";
 import { judgeKeyFrames } from "../animJudgeFrames";
+import { judgeFrameLabel, judgeStrip } from "../animJudgeStrip";
 import { assetsView, readManifest } from "../buildInputs";
 import { headlessRender } from "../headlessRender";
 import { projectRoot } from "../project";
@@ -155,7 +156,7 @@ const measure = (fighters: readonly Character[], assets: string) => Effect.gen(f
       const { sample } = sampled;
       const score = yield* Effect.try({ try: () => scoreMove(sample, THRESHOLDS[sample.moveClass]), catch: (cause) => new AnimFailure({ problem: `${fighter} ${sampled.move}: ${String(cause)}` }) });
       const frames = { firstActive: sample.firstActive, lastActive: sample.lastActive, end: sampled.endFrame, hits: sample.hits };
-      const clip = clipIdentity(keyFrames({ score, frames }).map((index) => sample.frames[index]), judgeFraming());
+      const clip = clipIdentity(judgeKeyFrames(judgeKeys({ score, frames })).map((index) => sample.frames[index]), judgeFraming());
       const panel = judgePanel(judged.filter((entry) => entry.fighter === fighter && entry.move === sampled.move), clip);
       const medians = JUDGE_LINES.map((line) => median(panel.map((entry) => entry[line])));
       rows.push({
@@ -246,10 +247,10 @@ const score: Command = (args) => Effect.gen(function*() {
 
 const JUDGE_BATCH = 6;
 
-interface Strip { readonly fighter: string; readonly move: string; readonly seconds: readonly number[]; readonly heights: readonly number[]; readonly poses: readonly (ScoreFrame | undefined)[]; readonly caption: string; readonly movement: boolean }
+interface Strip { readonly fighter: string; readonly move: string; readonly seconds: readonly number[]; readonly heights: readonly number[]; readonly poses: readonly (ScoreFrame | undefined)[]; readonly labels: readonly string[]; readonly caption: string; readonly movement: boolean }
 
 
-const keyFrames = (row: Pick<Row, "score" | "frames">) => judgeKeyFrames({ ...row.score.keys, lastActive: row.frames.lastActive, end: row.frames.end, hits: row.frames.hits });
+const judgeKeys = (row: Pick<Row, "score" | "frames">) => ({ ...row.score.keys, lastActive: row.frames.lastActive, end: row.frames.end, hits: row.frames.hits });
 
 const ReferenceEntry = Schema.Struct({ file: Schema.String, source: Schema.String, character: Schema.String, move: Schema.String });
 const ReferenceManifest = Schema.fromJsonString(Schema.Record(Schema.String, ReferenceEntry));
@@ -330,9 +331,9 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
     const sampled = samples.get(`${row.fighter}/${row.move}`);
     if (sampled === undefined) continue;
     const reference = referenceFor(references, row.fighter, row.move);
-    const indices = keyFrames(row);
-    strips.push({ fighter: row.fighter, move: row.move, seconds: indices.map((index) => sampled.seconds[index] ?? 0), heights: indices.map((index) => sampled.heights[index] ?? 0), poses: indices.map((index) => sampled.sample.frames[index]),
-      caption: `Top row, ours: frames ${indices.join(", ")} (start, windup, contact on the first active frame ${row.frames.firstActive}${row.frames.hits.length > 1 ? `, each hit's contact on ${row.frames.hits.join(", ")}` : ""}, last active, recovery, end of ${row.frames.end}). Bottom row: ${reference === undefined ? "no reference animation on file; judge against the brief's standard" : `Melee ${reference.character.replaceAll("_", " ")}'s ${REFERENCE_ACTIONS[row.move]?.wiki} (hitbox view)`}.`, movement: false });
+    const indices = judgeKeyFrames(judgeKeys(row));
+    strips.push({ fighter: row.fighter, move: row.move, seconds: indices.map((index) => sampled.seconds[index] ?? 0), heights: indices.map((index) => sampled.heights[index] ?? 0), poses: indices.map((index) => sampled.sample.frames[index]), labels: indices.map((index) => judgeFrameLabel(judgeKeys(row), index)),
+      caption: `Upper rows, ours: frames ${indices.join(", ")} (start, windup, contact on the first active frame ${row.frames.firstActive}${row.frames.hits.length > 1 ? `, each hit's contact on ${row.frames.hits.join(", ")}` : ""}, last active, recovery, end of ${row.frames.end}). Bottom row: ${reference === undefined ? "no reference animation on file; judge against the brief's standard" : `Melee ${reference.character.replaceAll("_", " ")}'s ${REFERENCE_ACTIONS[row.move]?.wiki} (hitbox view)`}.`, movement: false });
   }
   for (const entry of wanted ?? []) {
     const [slug = "", move = ""] = entry.split(":");
@@ -340,7 +341,7 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
     const character = fighters.find((candidate) => fighterSlug(candidate) === slug);
     if (character === undefined) continue;
     const { seconds, heights } = yield* attempt(`sample ${slug} ${move}`, async () => movementFrames(move, await loadBody(assets, character), character));
-    strips.push({ fighter: slug, move, seconds, heights, poses: [], caption: "", movement: true });
+    strips.push({ fighter: slug, move, seconds, heights, poses: [], labels: [], caption: "", movement: true });
   }
   if (strips.length === 0) return yield* new UsageFailure({ problem: "no scored move matches" });
 
@@ -375,22 +376,22 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
   const batches: string[][] = [];
   const size = JUDGE_BATCH;
   const cold: ColdStrip[] = [];
+  mkdirSync(join(output, "moves"), { recursive: true });
   for (const row of strips) {
     const key = `${row.fighter}/${row.move}`;
     const ids = frameIds.get(key) ?? [];
     const crops = ids.map((id) => join(output, "frames", `p${base.client}-frame-${id}.png`));
     if (row.movement) {
       const id = stripId(look, row.fighter, row.move), anonymous = join(output, "moves", `strip-${id}.png`);
-      mkdirSync(join(output, "moves"), { recursive: true });
       const stage = stageDrawArgs(stageShape(row.move as MovementMove, gameplayPixelsPerUnit())), window = movementCrop(row.heights, gameplayPixelsPerUnit());
       yield* runProcess(ChildProcess.make("magick", [...crops.flatMap((crop) => ["(", crop, ...stage, "-gravity", "center", "-crop", window, "+repage", ")"]), "+append", anonymous]));
       cold.push({ id, fighter: row.fighter, move: row.move as MovementMove, path: anonymous });
       continue;
     }
     const ours = join(output, "moves", `${row.fighter}-${row.move}-ours.png`);
-    mkdirSync(join(output, "moves"), { recursive: true });
     const tile = judgeCrop(row.poses, row.heights, judgePixelsPerUnit());
-    yield* runProcess(ChildProcess.make("magick", [...crops.flatMap((crop) => ["(", crop, "-gravity", "NorthWest", "-crop", `${tile.width}x${tile.height}+${tile.x}+${tile.y}`, "+repage", ")"]), "+append", ours]));
+    const { args, width } = judgeStrip(crops, row.labels, tile, ours);
+    yield* runProcess(ChildProcess.make("magick", args));
     const reference = referenceFor(references, row.fighter, row.move);
     const side = join(output, "moves", `${row.fighter}-${row.move}.png`);
     if (reference !== undefined) {
@@ -398,7 +399,7 @@ const prepare = (args: readonly string[]) => Effect.gen(function*() {
       const gif = join(REFERENCE_DIRECTORY, reference.file);
       const count = Number((yield* runProcess(ChildProcess.make("magick", ["identify", "-format", "%n\n", gif]))).split("\n")[0] ?? 1);
       const picks = Array.from({ length: Math.min(8, count) }, (_, index) => Math.round(index * (count - 1) / Math.max(1, Math.min(8, count) - 1)));
-      yield* runProcess(ChildProcess.make("magick", [`${gif}[${picks.join(",")}]`, "-coalesce", "-resize", `x${tile.height}`, "+append", "-resize", `${tile.width * crops.length}x>`, strip]));
+      yield* runProcess(ChildProcess.make("magick", [`${gif}[${picks.join(",")}]`, "-coalesce", "-resize", `x${tile.height}`, "+append", "-resize", `${width}x>`, strip]));
       yield* runProcess(ChildProcess.make("magick", [ours, strip, "-gravity", "west", "-background", "#101522", "-append", side]));
     } else yield* runProcess(ChildProcess.make("magick", [ours, side]));
     const batch = batches.at(-1);
