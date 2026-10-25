@@ -1662,7 +1662,13 @@ measured from frame, hitbox and hurtbox data, and `bun wisp shapes --check`, run
 by `bun run check`, fails a broken range triangle (jab, then tilt, then smash)
 or a more committal smash that wins on no option, unless
 `tools/move-data/move-shape-exceptions.json` records the reason (#319). Launcher,
-early kill, launch angle and shield pressure join the check in #326.
+early kill, launch angle and shield pressure come from the link table of
+`bun wisp combos --links` against a Fox-weight victim (75), and each value names
+the row it is read from (#326): (d) wins on a true or DI-dependent link at 30%
+or less; (e) on a KO, at centre or at the ledge, at least 20% before any of the
+fighter's non-smash moves; (g) on a launch of 20° or lower; (k) on an
+on-shield frame advantage at least the tilt's, or a shield break. A fighter
+without a link table shows these four as unmeasured.
 
 ## Legible locked states (#68)
 

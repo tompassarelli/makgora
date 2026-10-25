@@ -21,7 +21,9 @@ import { type FighterSummary, MAX_CONVERSIONS, OPENERS, OPPONENTS, PERCENTS, POS
 import { type AdvantageRow, TARGETS, type ZeroToDeath, advantagePage, unmet } from "../../advantageState";
 import { admit } from "../../heavyCapacity";
 import { type ComboObjective, ComboObjectivesSchema, objectiveMisses, objectiveName, throwDeclarations } from "../../comboObjectives";
-import { type LinkCell, type LinkRow, type LinkUnit, linksPage } from "../../comboLinks";
+import type { LinkCell, LinkRow, LinkUnit } from "../../comboLinks";
+import { linksPage } from "../../comboLinksPage";
+import { LINKS_DIR, linkSlug } from "../../linkTable";
 import { FOX_CASES, FOX_FIXTURE, caseLine, judge } from "../../comboValidation";
 import { foxFixture } from "../../ledger/fixtures/fox";
 import { FIXTURE_FIGHTERS } from "../../ledger/fixtures/fighters";
@@ -33,7 +35,6 @@ const summaryFile = join(moveData, "combo-potential.json");
 const pageFile = join(moveData, "combo-potential.md");
 const advantageFile = join(moveData, "advantage-state.jsonl");
 const advantagePageFile = join(moveData, "advantage-state.md");
-const linksDir = join(moveData, "links");
 const objectivesFile = join(moveData, "combo-objectives.json");
 
 class CombosFailure extends Schema.TaggedError<CombosFailure>()("CombosFailure", { problem: Schema.String }) {
@@ -272,8 +273,6 @@ const mergeAdvantage = (files: readonly string[]) => Effect.gen(function* () {
   yield* writeAdvantage(rows, rows);
 });
 
-const linkSlug = (attacker: Character): string => (fighterName(attacker).split(" ")[0] ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
-
 const links = (attackers: readonly Character[], jobs: number) => Effect.forEach(attackers, (attacker) => Effect.gen(function* () {
   const units: LinkUnit[] = OPENERS.map((_, opener) => ({ attacker, opener }));
   const found = yield* inWorkers<LinkUnit, readonly LinkRow[]>(new URL("../../comboLinksWorker.ts", import.meta.url), units, jobs,
@@ -281,7 +280,7 @@ const links = (attackers: readonly Character[], jobs: number) => Effect.forEach(
     (unit, rows) => `${fighterName(unit.attacker)} ${OPENERS[unit.opener]?.name}, ${rows.length} rows`,
   ).pipe(step(`${units.length} ${fighterName(attacker)} openers' links on ${jobs} threads`));
   const rows = found.flat();
-  const file = join(linksDir, linkSlug(attacker));
+  const file = join(LINKS_DIR, linkSlug(attacker));
   yield* Effect.tryPromise({
     try: async () => {
       await Bun.write(`${file}.jsonl`, rows.map((row) => JSON.stringify(row)).join("\n") + "\n");
@@ -298,7 +297,7 @@ const linkObjectives = (declared: readonly ComboObjective[]) => Effect.gen(funct
   const rows = (yield* Effect.forEach(fighters, (fighter) => {
     const attacker = fighterNamed(fighter);
     if (attacker === undefined) return Effect.fail(new CombosFailure({ problem: `combo objectives name ${fighter}, not a selectable fighter` }));
-    return readText(join(linksDir, `${linkSlug(attacker)}.jsonl`)).pipe(
+    return readText(join(LINKS_DIR, `${linkSlug(attacker)}.jsonl`)).pipe(
       Effect.map((text) => text.split("\n").filter((line) => line !== "").map((line) => JSON.parse(line) as LinkRow)));
   })).flat();
   const misses = declared.flatMap((objective) => {

@@ -2,8 +2,8 @@ import { f32 } from "wisp/src/sim/f32";
 import type { ComboSetup } from "../src/game/match/comboRoute";
 import { frameSteered } from "../src/game/match/padScene";
 import { stateChecksum } from "../src/game/replay/canonical";
-import { AttackStyle, Character, DownState } from "../src/game/sim/codes";
-import { canAttack, canBeGrabbed } from "../src/game/sim/conditions";
+import { AttackStyle, Character, DownState, ShieldBreak } from "../src/game/sim/codes";
+import { canAttack, canBeGrabbed, canShieldGrab } from "../src/game/sim/conditions";
 import type { Fighter } from "../src/game/sim/fighter";
 import { fighterName } from "../src/game/sim/heroes/registry";
 import { attackStartupFrames } from "../src/game/sim/moves";
@@ -11,7 +11,7 @@ import { copyControls, neutralControls } from "../src/game/sim/roster";
 import { DEFAULT_POLICY, VICTIM_OPTIONS, type VictimOption } from "./agencyBranch";
 import {
   AERIAL_HEIGHTS, AIR_MODES, DASH_GRAB, DIS, type Defender, type Di, FINE_FRAMES, GATE_X, GATE_Z, GROUND_MODES, type Mode, type Move,
-  OPENERS, type Opener, type Saved, SPACINGS, STAND, Sim, defenderMask, free, openerRoot, owned, settled, setupFor, started, startedOf,
+  OPENERS, type Opener, type Saved, SPACINGS, STAND, Sim, defenderMask, free, openerRoot, owned, settled, setupFor, started, startedOf, toward,
 } from "./comboExplorer";
 
 export const LINK_PERCENTS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150] as const;
@@ -27,9 +27,9 @@ export type Region = "clean" | "late" | "sweet" | "sour";
 export const REGIONS: readonly Region[] = ["clean", "late", "sweet", "sour"];
 export type LinkClass = "true" | "DI-dependent" | "read" | "none";
 
-const SLACK = DEFAULT_POLICY.slack;
+export const SLACK = DEFAULT_POLICY.slack;
 const LIMIT = 150;
-const CANDIDATES = 4;
+export const CANDIDATES = 4;
 const SETUP_SPACINGS: readonly number[] = [...new Set([...SPACINGS, ...Array.from({ length: 30 }, (_, index) => (index + 1) * 10)])];
 const SETUP_HEIGHTS: readonly (readonly [number, number])[] = [...AERIAL_HEIGHTS, ...[20, 60, 80, 120, 140, 160].map((height) => [height, 0] as const)];
 const NEUTRAL = neutralControls();
@@ -43,6 +43,11 @@ export interface LinkRow {
   readonly followUp: string;
   readonly advantage?: number;
   readonly ko?: true;
+  readonly angle?: number;
+  readonly ledgeKo?: true;
+  readonly shieldAdvantage?: number;
+  readonly shieldDamage?: number;
+  readonly shieldBreak?: true;
   readonly reach: boolean;
   readonly contact?: number;
   readonly input?: string;
@@ -345,17 +350,90 @@ function classOf(outcomes: ReadonlyMap<Di, DiOutcome | undefined>, surviving: re
   return reaching.length === surviving.length ? "true" : "DI-dependent";
 }
 
+const SHIELD = VICTIM_OPTIONS.find((option) => option.id === "shield");
+
+const launchAngle = (sim: Sim): number | undefined => {
+  const { a, b } = sim;
+  if (b.motion.grounded) return undefined;
+  const away = Math.sign(b.motion.x - a.motion.x) || 1;
+  return Math.round((Math.atan2(b.launch.knockbackZ, b.launch.knockbackX * away) * 180) / Math.PI);
+};
+
+function koesAt(setup: ComboSetup, opener: Opener, region: Region): boolean {
+  const d: Defender = { name: "none", di: "none" };
+  const played = openerRoot(setup, opener, d);
+  if (played === undefined) return false;
+  const idle = landedRegion(played.sim, opener) === region ? idleTrack(played.sim, played.root.saved, d) : undefined;
+  free(played.root.saved);
+  if (idle === "ko") return true;
+  if (idle !== undefined) release(idle);
+  return false;
+}
+
+interface Shielded {
+  readonly shieldAdvantage: number;
+  readonly shieldDamage: number;
+  readonly shieldBreak: boolean;
+}
+
+function onShield(setup: ComboSetup, opener: Opener): Shielded | undefined {
+  if (opener.throw !== undefined || SHIELD === undefined) return undefined;
+  const sim = new Sim(setup);
+  const d: Defender = { name: "none", di: "none" };
+  const dash = opener.dash ?? 0;
+  let contacts = 0;
+  let damage = 0;
+  let drain = 0;
+  let attackerFree: number | undefined;
+  let victimFree: number | undefined;
+  for (let n = 1; n <= LIMIT * 2; n++) {
+    const a = sim.a;
+    const b = sim.b;
+    const am = n <= dash ? toward(a, b) : n === dash + 1 ? opener.move.press(a, b) : 0;
+    const shields = b.visuals.shield;
+    const energy = b.shield.energy;
+    frameSteered(sim.scene, (slot) => (slot === 0 ? am : slot === 1 ? defenderMask(d, n, undefined, b, a) : 0), (controls, slot) => {
+      if (slot !== 1) return;
+      copyControls(controls, NEUTRAL);
+      SHIELD.press(controls, n, 1);
+    });
+    if (sim.b.visuals.shield !== shields) {
+      contacts++;
+      damage = f32(damage + Math.max(0, energy - sim.b.shield.energy - drain));
+      attackerFree = undefined;
+      victimFree = undefined;
+    } else drain = Math.max(0, energy - sim.b.shield.energy);
+    if (sim.b.shield.breakState !== ShieldBreak.none) return { shieldAdvantage: 0, shieldDamage: Math.round(damage * 10) / 10, shieldBreak: true };
+    if (contacts === 0) {
+      if (n > LIMIT) return undefined;
+      continue;
+    }
+    if (attackerFree === undefined && canAttack(sim.a)) attackerFree = n;
+    if (victimFree === undefined && canShieldGrab(sim.b)) victimFree = n;
+    if (attackerFree !== undefined && victimFree !== undefined) return { shieldAdvantage: victimFree - attackerFree, shieldDamage: Math.round(damage * 10) / 10, shieldBreak: false };
+  }
+  return undefined;
+}
+
 function cellRows(attacker: Character, opener: Opener, setup: ComboSetup, region: Region, percent: number, weight: number): LinkRow[] {
+  let angle: number | undefined;
   const cells = new Map<Di, CellLinks | undefined>();
   for (const di of DIS) {
     const d: Defender = { name: di, di };
     const played = openerRoot({ ...setup, percent, defenderWeight: weight }, opener, d);
     if (played === undefined) continue;
-    if (landedRegion(played.sim, opener) === region) cells.set(di, linkCell(played.sim, played.root.saved, d));
+    if (landedRegion(played.sim, opener) === region) {
+      if (di === "none") angle = launchAngle(played.sim);
+      cells.set(di, linkCell(played.sim, played.root.saved, d));
+    }
     free(played.root.saved);
   }
   const none = cells.get("none");
   if (none === undefined) return [];
+  const spacing = f32(setup.defenderX - setup.attackerX);
+  const ledge = { ...setupFor(attacker, setup.defender, opener, percent, "ledge", spacing, [setup.attackerZ, setup.defenderZ]), defenderWeight: weight };
+  const ledgeKo = koesAt(ledge, opener, region);
+  const shield = onShield({ ...setup, defenderWeight: weight }, opener);
   const surviving = DIS.filter((di) => cells.get(di)?.ko !== true);
   return FOLLOW_UPS.map((followUp) => {
     const outcomes = new Map<Di, DiOutcome | undefined>(DIS.map((di) => [di, cells.get(di)?.byFollowUp.get(followUp)]));
@@ -363,7 +441,10 @@ function cellRows(attacker: Character, opener: Opener, setup: ComboSetup, region
     const escapes = new Set(DIS.flatMap((di) => outcomes.get(di)?.escapes ?? []));
     return {
       fighter: fighterName(attacker), opener: opener.name, region, percent, weight, followUp,
-      ...(none.ko ? { ko: true } : { advantage: none.advantage }), reach: own !== undefined,
+      ...(none.ko ? { ko: true } : { advantage: none.advantage }),
+      ...(angle === undefined ? {} : { angle }), ...(ledgeKo ? { ledgeKo: true } : {}),
+      ...(shield === undefined ? {} : { shieldAdvantage: shield.shieldAdvantage, shieldDamage: shield.shieldDamage, ...(shield.shieldBreak ? { shieldBreak: true } : {}) }),
+      reach: own !== undefined,
       ...(own === undefined ? {} : { contact: own.contact, input: own.input }),
       class: classOf(outcomes, surviving),
       diEscapes: surviving.filter((di) => outcomes.get(di) === undefined),
@@ -401,38 +482,3 @@ export function measureLinkCell(cell: LinkCell): LinkRow[] {
   return setup === undefined ? [] : cellRows(cell.attacker, opener, setup, cell.region, cell.percent, cell.weight);
 }
 
-const CLASS_MARK: Readonly<Record<LinkClass, string>> = { true: "T", "DI-dependent": "DI", read: "R", none: "·" };
-
-export function linksPage(fighter: string, rows: readonly LinkRow[]): string {
-  const sections = [...new Set(rows.map((row) => `${row.opener}|${row.region}`))];
-  const missing = OPENERS.map((opener) => opener.name).filter((name) => !rows.some((row) => row.opener === name));
-  return [
-    `# ${fighter} links`, "",
-    `Generated by \`bun wisp combos --links --fighter ${fighter.split(" ")[0]}\`; do not edit. Each opener hit, by region class, lands on ${fighterName(LINK_VICTIM)} at the stage's centre with its weight set to ${LINK_WEIGHTS.join(", ")} (Melee units; Fox is 75), at ${LINK_PERCENTS[0]}–${LINK_PERCENTS.at(-1)}% before the hit, under DI ${DIS.join(", ")}. For each follow-up the combo explorer's attacker inputs are searched for a hit that lands at most ${SLACK} frames after the victim can act, and the ${CANDIDATES} earliest are replayed against every victim option of the agency measure that changes where the victim ends up.`, "",
-    "Classes, over the DIs the opener does not kill through: T true (every DI and every option is hit), DI DI-dependent (only some DI escape), R read (an option other than DI escapes), · none (no DI lets it land). Frame advantage is the victim's first actionable frame minus the attacker's, without DI; KO marks an opener that takes the stock without DI. The rows in the `.jsonl` beside this page add each follow-up's input, contact frame and escapes.", "",
-    ...(missing.length === 0 ? [] : [`No setup lands a hit with ${missing.join(", ")}, so ${missing.length === 1 ? "it has" : "they have"} no rows.`, ""]),
-    ...sections.flatMap((section) => {
-      const [opener, region] = section.split("|");
-      const own = rows.filter((row) => row.opener === opener && row.region === region);
-      const percents = LINK_PERCENTS.filter((percent) => own.some((row) => row.percent === percent));
-      const at = (weight: number, percent: number, followUp?: string) =>
-        own.find((row) => row.weight === weight && row.percent === percent && (followUp === undefined || row.followUp === followUp));
-      const advantage = (weight: number, percent: number): string => {
-        const row = at(weight, percent);
-        return row === undefined ? "" : row.advantage === undefined ? "KO" : `${row.advantage > 0 ? "+" : ""}${row.advantage}`;
-      };
-      const mark = (weight: number, percent: number, followUp: string): string => {
-        const row = at(weight, percent, followUp);
-        return row === undefined ? "" : CLASS_MARK[row.class];
-      };
-      return [
-        `## ${opener} (${region})`, "",
-        `| Link | Weight | ${percents.map((percent) => `${percent}%`).join(" | ")} |`,
-        `| --- | --- | ${percents.map(() => "---").join(" | ")} |`,
-        ...LINK_WEIGHTS.map((weight) => `| frame advantage | ${weight} | ${percents.map((percent) => advantage(weight, percent)).join(" | ")} |`),
-        ...FOLLOW_UPS.flatMap((followUp) => LINK_WEIGHTS.map((weight) => `| ${opener} into ${followUp} | ${weight} | ${percents.map((percent) => mark(weight, percent, followUp)).join(" | ")} |`)),
-        "",
-      ];
-    }),
-  ].join("\n");
-}

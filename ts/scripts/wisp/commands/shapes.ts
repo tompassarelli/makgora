@@ -16,11 +16,16 @@ const cell = (s: Shape, t: Shape, pick: (x: Shape) => number | boolean): string 
   return `${show(pick(s))}/${show(pick(t))}`;
 };
 
+const linked = (row: Row): string =>
+  row.links === undefined
+    ? "d launcher, e early kill, g launch angle, k shield pressure: no link table, run bun wisp combos --links"
+    : row.links.map((l) => `${l.option}${l.won ? "+" : "-"} (${l.value}; row ${l.row ?? "none"})`).join(" ");
+
 const describe = (row: Row, options: readonly string[]): string => {
   const { smash: s, tilt: t } = row;
   const won = options.map((o) => `${o}${row.won.some((w) => w === o) ? "+" : "-"}`).join(" ");
   const verdicts = row.verdicts.map((v) => `${v.rule} ${v.pass ? "pass" : "FAIL"} (${v.detail})`).join("; ");
-  return `${row.fighter} ${row.direction}: startup ${cell(s, t, (x) => x.startup)}, total ${cell(s, t, (x) => x.total)}, active ${cell(s, t, (x) => x.active)}, reach ${cell(s, t, (x) => x.reach)}, height ${cell(s, t, (x) => x.height)}, behind ${cell(s, t, (x) => x.behind)}, disjoint ${cell(s, t, (x) => x.disjoint)}, damage ${cell(s, t, (x) => x.damage)}, strong÷weak ${cell(s, t, (x) => x.sweetspot)}, intangible ${cell(s, t, (x) => x.intangible)}, out of shield ${cell(s, t, (x) => x.outOfShield)} | ${won} | ${verdicts}`;
+  return `${row.fighter} ${row.direction}: startup ${cell(s, t, (x) => x.startup)}, total ${cell(s, t, (x) => x.total)}, active ${cell(s, t, (x) => x.active)}, reach ${cell(s, t, (x) => x.reach)}, height ${cell(s, t, (x) => x.height)}, behind ${cell(s, t, (x) => x.behind)}, disjoint ${cell(s, t, (x) => x.disjoint)}, damage ${cell(s, t, (x) => x.damage)}, strong÷weak ${cell(s, t, (x) => x.sweetspot)}, intangible ${cell(s, t, (x) => x.intangible)}, out of shield ${cell(s, t, (x) => x.outOfShield)} | ${won} | ${linked(row)} | ${verdicts}`;
 };
 
 const describeRadius = (r: RadiusRow): string =>
@@ -43,7 +48,7 @@ export const shapes: Command = (args) => Effect.gen(function*() {
   const radiusExceptions = yield* Effect.try({ try: () => readRadiusExceptions(), catch: failure });
   const radiusResult = checkRadii(radii, radiusExceptions);
   if (values.check !== true) {
-    yield* Console.log("Each cell is smash/tilt; startup is the first hit frame, reach and disjoint in game units, an option ends + when the smash wins it.");
+    yield* Console.log("Each cell is smash/tilt; startup is the first hit frame, reach and disjoint in game units, an option ends + when the smash wins it. Launcher, early kill, launch angle and shield pressure come from the link table against a Fox-weight victim (75), each naming its row as opener, region, percent, weight and follow-up.");
     for (const row of rows) yield* Console.log(describe(row, OPTIONS));
     yield* Console.log("Largest hitbox radius over shield radius, against Melee's interquartile range for the move type (docs/design/melee/attacks.md, \"Hitbox size\").");
     for (const row of radii) yield* Console.log(describeRadius(row));

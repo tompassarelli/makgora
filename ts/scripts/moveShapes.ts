@@ -8,6 +8,7 @@ import { authoredHitRegion, authoredHitRegionCount, emptyHitRegion } from "../sr
 import { authoredHurtboxes, HurtState, type HurtPart } from "../src/game/sim/hurtboxes";
 import { attackDurationFramesForGrounding, attackStartupFrames } from "../src/game/sim/moves";
 import { cancelsJumpSquat } from "../src/game/sim/conditions";
+import { type LinkEvidence, type LinkOption, linkOptions, readLinkTable } from "./linkTable";
 
 export const EXCEPTIONS_FILE = join(import.meta.dir, "../../tools/move-data/move-shape-exceptions.json");
 
@@ -19,7 +20,7 @@ export const DIRECTIONS = [
 export type Direction = (typeof DIRECTIONS)[number]["name"];
 
 export const OPTIONS = ["a reach", "b active", "f damage", "h coverage", "i disjoint", "j intangible", "l sweetspot", "m out of shield"] as const;
-export type Option = (typeof OPTIONS)[number];
+export type Option = (typeof OPTIONS)[number] | LinkOption;
 
 const GEOMETRY_TIE = 4;
 const SWEETSPOT = 1.2;
@@ -88,14 +89,14 @@ export function optionsWon(direction: Direction, s: Shape, t: Shape): Option[] {
 
 export type Rule = "range triangle" | "smash budget";
 export interface Verdict { readonly fighter: string; readonly direction: Direction; readonly rule: Rule; readonly pass: boolean; readonly detail: string }
-export interface Row { readonly fighter: string; readonly direction: Direction; readonly jab: number; readonly smash: Shape; readonly tilt: Shape; readonly won: readonly Option[]; readonly verdicts: readonly Verdict[] }
+export interface Row { readonly fighter: string; readonly direction: Direction; readonly jab: number; readonly smash: Shape; readonly tilt: Shape; readonly won: readonly Option[]; readonly links: readonly LinkEvidence[] | undefined; readonly verdicts: readonly Verdict[] }
 
-export function judge(fighter: string, direction: Direction, jab: number, smash: Shape, tilt: Shape): Row {
-  const won = optionsWon(direction, smash, tilt);
+export function judge(fighter: string, direction: Direction, jab: number, smash: Shape, tilt: Shape, links?: readonly LinkEvidence[]): Row {
+  const won = [...optionsWon(direction, smash, tilt), ...(links ?? []).filter((l) => l.won).map((l) => l.option)].sort();
   const triangle = jab < tilt.startup && tilt.startup < smash.startup;
   const committal = smash.startup > tilt.startup && smash.total > tilt.total;
   return {
-    fighter, direction, jab, smash, tilt, won,
+    fighter, direction, jab, smash, tilt, won, links,
     verdicts: [
       { fighter, direction, rule: "range triangle", pass: triangle, detail: `jab ${jab}, tilt ${tilt.startup}, smash ${smash.startup}` },
       { fighter, direction, rule: "smash budget", pass: !committal || won.length > 0, detail: committal ? `more committal, wins on ${won.join(", ") || "no option"}` : "not more committal" },
@@ -106,7 +107,8 @@ export function judge(fighter: string, direction: Direction, jab: number, smash:
 export function rosterShapes(): Row[] {
   return SELECTABLE_CHARACTERS.flatMap((character) => {
     const jab = attackStartupFrames(AttackStyle.jab, authoredTuning(character).moves) + 1;
-    return DIRECTIONS.map((d) => judge(fighterSlug(character), d.name, jab, moveShape(character, d.smash), moveShape(character, d.tilt)));
+    const table = readLinkTable(character);
+    return DIRECTIONS.map((d) => judge(fighterSlug(character), d.name, jab, moveShape(character, d.smash), moveShape(character, d.tilt), table && linkOptions(table, `${d.name} smash`, `${d.name} tilt`)));
   });
 }
 
