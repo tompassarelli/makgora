@@ -40,6 +40,7 @@ test("passes ordinary hex, coordinates and policy text [k2 property]", () => {
 });
 
 test("allows a listed file only for its listed rule [k2 property]", () => {
-  expect(refused("`coll_data` (Melee `MapCollData`)", "docs/physics.md")).toBe(false);
-  expect(refused("main.dol", "docs/physics.md")).toBe(true);
+  expect(refused("read from the decompilation", "docs/delivery-goal.md")).toBe(false);
+  expect(refused("main.dol", "docs/delivery-goal.md")).toBe(true);
+  expect(refused("`coll_data` (Melee `MapCollData`)", "docs/physics.md")).toBe(true);
 });

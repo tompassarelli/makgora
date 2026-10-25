@@ -19,16 +19,8 @@ export const REACH_RULES: readonly { readonly name: string; readonly pattern: Re
   { name: "an extraction or decompilation cited as a source", pattern: /\b(?:NTSC|PAL|1\.02|disc|retail|cited|Melee)\b[\w. '-]{0,24}?\bextract(?:ion|ed)\b|\b(?:from|per|cited?|via|in) (?:the |Melee's )?decomp(?:ilation|iled)?\b/i },
 ];
 
-const PENDING_DOCS = "Melee docs re-cite public sources in #286";
-
 export const REACH_ALLOWLIST: readonly { readonly path: string; readonly rule: string; readonly reason: string }[] = [
   { path: "docs/delivery-goal.md", rule: "an extraction or decompilation cited as a source", reason: "states the clean-room policy and cites nothing" },
-  { path: "docs/design/melee/aerials-on-shield.md", rule: "an offset-named game field", reason: PENDING_DOCS },
-  { path: "docs/design/melee/hit-effects.md", rule: "an offset-named game field", reason: PENDING_DOCS },
-  { path: "docs/design/stages.md", rule: "a retail-file source", reason: PENDING_DOCS },
-  { path: "docs/design/tilts.md", rule: "an offset-named game field", reason: PENDING_DOCS },
-  { path: "docs/physics.md", rule: "an offset-named game field", reason: PENDING_DOCS },
-  { path: "docs/physics.md", rule: "a retail-file source", reason: PENDING_DOCS },
 ];
 
 const allowed = (path: string, rule: string) => REACH_ALLOWLIST.some((entry) => entry.path === path && entry.rule === rule);

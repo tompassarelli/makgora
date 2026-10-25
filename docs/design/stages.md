@@ -10,28 +10,24 @@ How each stage's sky and scenery are composed is in [stage art](stage-art.md);
 which fighter calls each stage home is in [home stages](home-stages.md).
 
 Units: Melee lengths are Melee units; Ultimate lengths are Ultimate units (its
-Battlefield is 160 wide against Melee's 136.8). Smashcraft's world uses 6
+Battlefield is 160 wide). Smashcraft's world uses 6
 world units per Melee unit (smashcraft:ts/src/game/sim/tuning.ts).
 
 ## Melee's competitive stages
 
 ### Layouts
 
-Read from the NTSC 1.02 disc's stage files (collision `coll_data`, ground
-scale `grGroundParam`, blast zone points 0x97/0x98; the private readers
-are stage-collision-facts.ts and blast-zone-facts.ts under
-~/.local/share/smashcraft-melee-reference/). Every value is scaled by the
-stage's ground scale. Heights are the platform's top surface above the main
-floor.
+As a player sees them (SmashWiki's stage pages); Melee's stage coordinates are
+not on a public page, so no lengths are recorded here.
 
-| Stage | Scale | Main floor (ledge to ledge) | Platforms (height × width) | Blast zones (side, top, bottom) |
-|---|---|---|---|---|
-| Battlefield (GrNBa) | 0.8 | ±68.4 (136.8) | two at 27.2 × 37.6 (x ±20 to ±57.6); one at 54.4 × 37.6 | ±224, 200, −108.8 |
-| Final Destination (GrNLa) | 1.0 | ±85.57 (171.1) | none | ±246, 188, −140 |
-| Pokémon Stadium (GrPs), neutral form | 1.0 | ±87.75 (175.5) | two at 25 × 30 (x ±25 to ±55) | ±230, 180, −111 |
-| Yoshi's Story (GrSt) | 0.7 | ±56 (flat ±39.2, then slopes down 3.5) | two at 23.45 × 31.5 (x ±28 to ±59.5); one at 42 × 31.5; Randall 11.9 wide | −175.7 / +173.6, 168, −91 |
-| Dream Land N64 (GrOp) | 1.0 | ±77.27 (154.5) | left 30.14 × 29.7, right 30.24 × 31.4; top 51.43 × 38.0 | ±255, 250, −123 |
-| Fountain of Dreams (GrIz) | 0.75 | ±63.35 (126.7) | three 28.5 wide; the sides move up and down (below) | ±198.75, 202.5, −146.25 |
+| Stage | Main floor | Platforms |
+|---|---|---|
+| Battlefield | small, flat, with an underside to pass beneath | two low side platforms and one high centre platform |
+| Final Destination | the largest flat floor of the six | none |
+| Pokémon Stadium, neutral form | large and flat | two low platforms; it transforms (below) |
+| Yoshi's Story | the smallest, flat in the middle and sloping down at the edges | two side platforms and a top one; Randall the cloud below each edge |
+| Dream Land N64 | large and flat | two side platforms and a top one, all high |
+| Fountain of Dreams | small and flat | three platforms; the sides move up and down (below) |
 
 Walls and undersides: Final Destination and Battlefield have undersides a
 fighter can pass beneath; Yoshi's Story's and Fountain of Dreams' walls run
@@ -218,21 +214,14 @@ that circle camping wins (Temple, Kongo Jungle).
 
 ### Dream Land's wind (Whispy Woods)
 
-Melee with GrOp.dat's `yakumono_param`:
-
-- Whispy idles for a random 600 to 1,200 frames (10 to 20 s), blinking every
-  180 to 360 frames.
-- He then turns towards the side the fighters are on (random if both), and
-  blows. The blow animation plays a sound on frame 45 and pushes fighters on
-  frames 46 to 319 (up to 4.6 s), with a camera quake.
-- The push is 0.2 units per frame horizontally, inside a box near the floor
-  (y −10 to 40; x −74 to −18 when blowing left, −17 to 76 when blowing right).
-- Telegraph: the turn and the frame-45 sound; the timing itself is random.
+Whispy idles for a random while, blinking, then turns towards the side the
+fighters are on and blows, pushing fighters near the floor away from him for a
+few seconds, with a sound and a camera shake (SmashWiki, Dream Land N64).
+Telegraph: the turn and the sound; the timing itself is random.
 
 ### Yoshi's Story's Randall
 
-Randall is a map animation with moving collision (Melee;
-only its puff effect is random). He is absent for the first ten seconds, then
+Randall is a cloud with moving collision. He is absent for the first ten seconds, then
 emerges every ten seconds on alternating sides; a full trip through the stage
 and out the other side takes 20 seconds. Players track him by the timer: he
 enters the stage when the seconds digit shows 9 and comes out at 4, from the
@@ -241,17 +230,10 @@ read off the clock, he is an accepted recovery aid.
 
 ### Kongo Jungle N64's barrel
 
-Melee with GrOk.dat's `yakumono_param`:
-
-- The barrel moves along its path under the stage: it accelerates by 0.005 to
-  full speed, travels 3,000 to 6,000 frames, decelerates, and pauses 300 to
-  600 frames (all ranges random).
-- It turns: waits 180 to 360 frames, then rolls 90 to 110 frames at 4° per
-  frame towards a direction drawn by weight: up 50, up-left and up-right 10
-  each, the five others 1 each (up two times in three).
-- A fighter within 15 units is caught; the barrel fires on a press or after
-  479 to 480 frames (8 s), and 10 frames into the shot the fighter takes a
-  0-damage launch of base knockback 180 in the barrel's direction.
+The barrel moves along a path under the stage, pausing and turning at random,
+mostly to point up. A fighter that touches it is caught and fired out on a
+press or after a few seconds, in the barrel's direction (SmashWiki, Kongo
+Jungle N64).
 
 ### Why Kongo Jungle and similar stages left the lists
 
@@ -436,8 +418,7 @@ widths are given as the reference stage's, in Melee units unless noted.
 
 1. **Frozen Throne** (Undead, Icecrown): Battlefield layout, blizzard visuals,
    tournament standard. Battlefield is the default game-one stage in both games.
-   Layout: 136.8 wide, platforms 27.2 and 54.4 high, 37.6 wide; blast zones
-   ±224, 200, −108.8. No hazard. Assets: the Frozen Throne and Lich King
+   Layout: Battlefield's two low and one high platform. No hazard. Assets: the Frozen Throne and Lich King
    cinematic doodads, Icecrown obelisks, pillars and glacier, a Frost Wyrm
    circling for the animated background; sky BlizzardSky or
    LordaeronWinterSkyPurple in classic (IcecrownGlacierSky is HD only); Northrend

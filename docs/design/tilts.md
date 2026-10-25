@@ -281,13 +281,13 @@ Repeatability is the jab's identity; a tilt never chains.
 - A chain step needs a fresh A press, never a held button:
   a Melee routine and `checkAttack12`/`checkAttack13` read
   `pressed_buttons`.
-- A press is latched (`mv.co.attack1.x0`) while a per-fighter input window
-  counts down (`co_attrs.jab_2_input_window` and `jab_3_input_window`,
-  Melee). The next jab starts only once the
-  animation script's "set jab combo" event allows it, so an early press waits.
+- A press is kept while a per-fighter input window counts down
+  (smashcraft:references/melee-frame-data/character-attributes.csv, "Jab 2
+  Window?" and "Jab 3 Window?"). The next jab starts only once the jab's
+  animation allows it, so an early press waits.
 - With no press, the jab plays out and returns to Wait.
-- Rapid jab counts A press and release edges across the
-  chain (`x1A54` against `rapid_jab_window`). Its loop ends after one
+- Rapid jab counts A press and release edges across the chain against the
+  fighter's rapid-jab window (character-attributes.csv, "Rapid Jab Window"). Its loop ends after one
   animation cycle without an edge, so it needs mashing.
 - Melee's jab rows (smashcraft:references/melee-frame-data/records.jsonl,
   start/damage):
