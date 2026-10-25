@@ -148,14 +148,14 @@ export const HIT_ROWS: readonly LedgerRow[] = [
     anchor: { file: "ts/src/game/sim/contacts.ts", symbol: "collectDamageContact" }, status: PARITY,
   },
   {
-    id: "hitstun", family: "hits", name: "Hitstun frames per knockback (⌊0.4·KB⌋)",
+    id: "hitstun", family: "hits", name: "Hitstun frames per knockback (⌊0.4·KB⌋), the combo-ease knob",
     melee: { value: 0.4, source: wiki("Hitstun") }, ours: () => HITSTUN_FRAMES_PER_KNOCKBACK,
     anchor: { file: KNOCKBACK, symbol: "HITSTUN_FRAMES_PER_KNOCKBACK" }, status: PARITY,
   },
   {
     id: "tumble", family: "hits", name: "Tumble threshold, the least knockback that tumbles",
     melee: { value: 80, source: wiki("Tumble") }, ours: tumbleKnockback,
-    anchor: { file: KNOCKBACK, symbol: "damageLevelForKnockback" }, status: PARITY,
+    anchor: { file: KNOCKBACK, symbol: "TUMBLE_KNOCKBACK" }, status: PARITY,
   },
   {
     id: "launch-speed", family: "hits", name: "Launch speed per knockback (Melee units a frame)",

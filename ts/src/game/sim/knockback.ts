@@ -18,6 +18,9 @@ import { squareRoot } from "./warcraftMath";
 export const KNOCKBACK_LAUNCH_SPEED = 0.029999999329447746;
 const KNOCKBACK_LAUNCH_SCALE = melee(KNOCKBACK_LAUNCH_SPEED);
 export const HITSTUN_FRAMES_PER_KNOCKBACK = 0.4000000059604645;
+const MEDIUM_DAMAGE_KNOCKBACK = 25.0;
+const STRONG_DAMAGE_KNOCKBACK = 52.5;
+export const TUMBLE_KNOCKBACK = 80.0;
 export const KNOCKBACK_STACKING_FRAMES = 10;
 export const KNOCKBACK_PERCENT_SCALE = 0.10000000149011612;
 export const KNOCKBACK_DAMAGE_SCALE = 0.05000000074505806;
@@ -126,10 +129,9 @@ export function stunHitstunFrames(stunFrames: number, postHitPercent: number): n
 }
 
 export function damageLevelForKnockback(knockback: number): number {
-  const scaled = f32(knockback * HITSTUN_FRAMES_PER_KNOCKBACK);
-  if (scaled >= 32) return 3;
-  if (scaled >= 21) return 2;
-  return scaled >= 10 ? 1 : 0;
+  if (knockback >= TUMBLE_KNOCKBACK) return 3;
+  if (knockback >= STRONG_DAMAGE_KNOCKBACK) return 2;
+  return knockback >= MEDIUM_DAMAGE_KNOCKBACK ? 1 : 0;
 }
 
 /** in Melee units per frame. */
