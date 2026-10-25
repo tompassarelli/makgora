@@ -103,7 +103,7 @@ WASD, the default, uses A/D to move, W to aim up, S to fast-fall or drop
 through platforms, Space/8 to jump, Q to shield or air-dodge, 0 for light
 shield, O to grab, N to attack, and U for a special. Hitbox moves with W/R,
 aims up with Space and down with E, jumps with 8 and shields with Q (light
-shield 0). Custom is Hitbox with Z/9 to jump, Q/8/G to shield, A for light shield, / for C-stick left, P/X for Strong and 0 for Tilt. Shield + N or O
+shield 0). Custom is Hitbox with Z/9 to jump, Q/8/G to shield, A for light shield, / for C-stick left and 0/X for Strong. Shield + N or O
 grabs. While holding an
 opponent, tap N to pummel once or a movement/C-stick direction to throw forward,
 backward, up, or down; after the pummel, throw or the opponent goes free. Mash
@@ -131,7 +131,7 @@ lasts until the dash would become a run. On keyboard, hold down together with
 the back key: the diagonal counts as a light tilt (on a platform, a fresh down
 press drops you through it).
 
-Attacks buffer for six frames, including through jump squat. Hold P (0 on Custom) to walk;
+Attacks buffer for six frames, including through jump squat. Hold P to walk;
 Hold down while rising into a platform without an aerial to stand on it
 instantly, with a small landing puff. Without down, or during an aerial, you
 pass through. Held down keeps you crouching; attack gives down tilt and special
@@ -139,10 +139,10 @@ gives down-B. Release down, then hard-press it to drop immediately. Analog
 inputs need a quick flick; keyboard inputs need a fresh down-key press. The
 drop consumes that press: held down never fast-falls. Return toward neutral
 (or release the key), then press down again to fast-fall.
-N with a direction performs a tilt, a fresh flick included; out of a run (or a dash after its first three frames) N is the dash attack. Hold Strong (9 on WASD and Hitbox, P on Custom, LB or RB on a pad) and press N for a smash: up, down, or forward with a side direction or none. Keep holding Strong or N to charge it. B is
+N with a direction performs a tilt, a fresh flick included; out of a run (or a dash after its first three frames) N is the dash attack. Hold Strong (9 on WASD and Hitbox, 0 on Custom, LB or RB on a pad) and press N for a smash: up, down, or forward with a side direction or none. Keep holding Strong or N to charge it. B is
 C-stick left; H is down; J is up; M is right. C-stick down-air preserves
 normal aerial momentum. WASD and Hitbox use 7 for right trigger and 9
-for Strong; Custom uses 8 and P. T is unbound by default.
+for Strong; Custom uses 8 and 0. T is unbound by default.
 
 Specials use U with a direction; every fighter's specials and
 ultimate are listed by name in the [move list](move-list.md). Strong + U

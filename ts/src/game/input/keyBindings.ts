@@ -74,10 +74,10 @@ export function presetBindings(preset: BindingPreset): KeyBindings {
   bind(Action.smashRight, code("M"));
   bind(Action.smashUp, code("J"));
   bind(Action.smashDown, code("H"));
-  bind(Action.walk, code(custom ? "0" : "P"));
+  bind(Action.walk, code("P"));
   bind(Action.lightShield, code(custom ? "A" : "0"));
   bind(Action.shortHop, code("I"));
-  if (custom) bind(Action.strong, code("P"), code("X"));
+  if (custom) bind(Action.strong, code("0"), code("X"));
   else bind(Action.strong, code("9"));
   return { keys };
 }
