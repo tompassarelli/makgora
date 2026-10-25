@@ -14,9 +14,9 @@ import { encodeVerified, ensure, onGlobalClock, parseSource, tracks } from "./or
 import { fighters } from "../../ts/scripts/heroModelSource";
 
 const [input, output] = process.argv.slice(2, 4).map(p => resolve(p));
-const replaceOnly = process.argv.includes("--replace-down-air");
+const replaceOnly = process.argv.includes("--in-place");
 const project = resolve(import.meta.dir, "../..");
-ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--replace-down-air]");
+ensure(input && output && relative(project, output).startsWith(".."), "usage: bun tools/animations/blademaster-clips.ts PRIVATE_ASSETS PRIVATE_OUTPUT [--in-place]");
 const fighter = fighters.get(Character.blademaster)!; ensure(fighter, "missing Blademaster");
 const shipped = parseSource(await Bun.file(join(input, fighter.source)).arrayBuffer());
 const source = replaceOnly ? shipped : swordGestureBaseModel(shipped) ?? shipped;
@@ -66,6 +66,8 @@ const figure = (x: number, z: number, degrees: number, s: Stance): Pose => {
   const f: Figure = {pitch:0,chest:0,chestTwist:0,pelvis:0,pelvisTwist:0,...s};
   return {...swing(x,z+s.drop,degrees,{lean:f.chest,twist:f.chestTwist,knee:0,offhand:s.offhand??55,drop:s.drop,pitch:f.pitch}),figure:f};
 };
+const fallReady = figure(12,74,-128,{pitch:4,chest:8,left:[40,70],right:[18,48],drop:0,offhand:45});
+const airborne: readonly string[] = ["neutralAir","forwardAir","backAir","upAir"];
 const gestures = [
   {key:"jab",name:"Jab Quick Cut",style:AttackStyle.jab,prep:pose([10,-50,120],[-45,-50,170],-5,-12),hit:pose([46,-24,76],[128,-24,65],8,8,16),exit:pose([42,-25,64],[65,-24,12],12,16)},
   {key:"jab2",name:"Jab Returning Cut",style:AttackStyle.jab2,prep:pose([30,-24,58],[78,-24,8],14,18),hit:pose([48,-24,74],[135,-24,91],3,-12,20),exit:pose([15,-25,126],[-40,-24,160],-4,-20)},
@@ -78,50 +80,60 @@ const gestures = [
   {key:"forwardSmash",name:"Smash Shoulder Cleave",style:AttackStyle.forwardSmash,prep:pose([-25,-24,139],[-65,-24,220],-20,-32,36,60),hit:pose([52,-24,112],[150,-24,50],35,35,50,80),exit:pose([44,-24,48],[96,-24,-20],32,40,42)},
   {key:"upSmash",name:"Smash Sky Splitter",style:AttackStyle.upSmash,prep:pose([-8,-24,58],[-62,-24,0],24,-20,48,50),hit:pose([12,-24,150],[12,-24,252],-16,10,10,65),exit:pose([-25,-24,143],[-88,-24,214],-10,22,18)},
   {key:"downSmash",name:"Smash Front Rear Sweep",style:AttackStyle.downSmash,prep:pose([-22,-50,65],[-85,-50,95],16,-24,40,45),hit:pose([50,-50,40],[146,-50,12],18,35,72,90),exit:pose([-48,-50,39],[-146,-50,8],23,-35,65,70),second:16},
-  {key:"neutralAir",name:"Air Crescent Slash",style:AttackStyle.neutralAir,prep:pose([-15,-24,121],[-70,-24,172],-9,-18,48,50),hit:pose([48,-24,99],[140,-24,117],4,12,38,55),exit:pose([-40,-24,96],[-130,-24,121],-5,-25,54,65),second:12},
-  {key:"forwardAir",name:"Air Forward Cleave",style:AttackStyle.forwardAir,prep:pose([-5,-24,144],[-45,-24,225],-15,-22,55,50),hit:pose([52,-24,95],[140,-24,49],16,18,40,60),exit:pose([43,-24,52],[90,-24,-25],22,30,64,65)},
-  {key:"backAir",name:"Air Turning Back Cut",style:AttackStyle.backAir,prep:pose([26,-24,130],[95,-24,192],-10,20,52,45),hit:pose([-42,-24,100],[-138,-24,83],-12,-55,44,65),exit:pose([-40,-24,112],[-115,-24,174],-6,-65,62,60)},
-  {key:"upAir",name:"Air Upward Pierce",style:AttackStyle.upAir,prep:pose([10,-24,88],[52,-24,6],20,-12,62,45),hit:pose([7,-24,147],[7,-24,246],-14,10,80,70,65),exit:pose([24,-24,136],[62,-24,219],-5,18,64,55,35)},
+  {key:"neutralAir",name:"Air Crescent Slash",style:AttackStyle.neutralAir,lift:[2,pose([-12,-24,104],[-110,-24,120],-6,-12,44,48)],prep:pose([-15,-24,121],[-70,-24,172],-9,-18,48,50),hit:pose([48,-24,99],[140,-24,117],4,12,38,55),carry:[[9,pose([40,-24,52],[120,-24,0],14,16,40,60)],[11,pose([4,-24,58],[-40,-24,-30],6,-6,46,62)]],exit:pose([-40,-24,96],[-130,-24,121],-5,-25,54,65),second:12},
+  {key:"forwardAir",name:"Air Forward Cleave",style:AttackStyle.forwardAir,lift:[3,pose([-14,-24,108],[-114,-24,112],-8,-14,50,48)],prep:pose([-20,-24,140],[-90,-24,212],-15,-22,55,50),hit:pose([52,-24,95],[140,-24,49],16,18,40,60),exit:pose([43,-24,52],[90,-24,-25],22,30,64,65)},
+  {key:"backAir",name:"Air Turning Back Cut",style:AttackStyle.backAir,lift:[2,pose([8,-24,128],[12,-24,228],-4,8,48,45)],prep:pose([26,-24,130],[95,-24,192],-10,20,52,45),hit:pose([-42,-24,100],[-138,-24,83],-12,-55,44,65,35),exit:pose([-58,-24,84],[-150,-24,40],-10,-62,58,60,28),second:10,settle:[[31,fallReady]]},
+  {key:"upAir",name:"Air Upward Pierce",style:AttackStyle.upAir,prep:pose([10,-24,82],[52,-24,0],20,-12,62,45,0,-6),hit:pose([7,-24,151],[7,-24,250],-14,10,80,70,65,4),exit:pose([-2,-24,128],[-58,-24,216],-10,6,64,55,35,-2),settle:[[16,pose([-20,-24,124],[-110,-24,170],-8,-4,62,52,25,-2)],[21,pose([-6,-24,90],[-80,-24,22],-2,-2,50,47,8)],[25,fallReady]]},
   {key:"throwBack",name:"Throw Back Heave",style:undefined,prep:pose([40,-24,105],[100,-24,148],10,18,30,75),hit:pose([-40,-24,140],[-125,-24,196],-18,-45,28,90),exit:pose([-30,-24,119],[-100,-24,150],-6,-55,20,55)},
 ] as const;
 const replacements = [
   {key:"downAir",name:"Down Air Sword Plunge",style:AttackStyle.downAir,keys:[
-    [0,guard],
+    [0,fallReady],
     [3,figure(-10,128,120,{pitch:-20,chest:-14,left:[60,100],right:[45,90],drop:10,offhand:40})],
     [5,figure(-30,140,160,{pitch:-34,chest:-20,chestTwist:-24,pelvisTwist:12,left:[90,130],right:[75,125],drop:20,offhand:35})],
     [7,figure(14,118,40,{pitch:10,chest:20,left:[40,80],right:[20,60],drop:4,offhand:55})],
     [8,figure(34,62,-18,{pitch:36,chest:30,chestTwist:16,left:[-10,30],right:[0,45],drop:-30,offhand:70})],
     [9,figure(34,58,-62,{pitch:50,chest:34,chestTwist:22,pelvis:-8,pelvisTwist:-14,left:[-30,8],right:[-20,20],drop:-40,offhand:85})],
-    [10,figure(28,62,-128,{pitch:54,chest:36,chestTwist:18,pelvis:-8,left:[-35,8],right:[-25,25],drop:-36,offhand:85})],
-    [11,figure(0,140,95,{pitch:-8,chest:-12,chestTwist:-20,left:[100,135],right:[60,20],drop:-28,offhand:20})],
-    [12,figure(10,66,-90,{pitch:20,chest:24,chestTwist:-26,pelvisTwist:20,left:[95,130],right:[90,125],drop:-26,offhand:70})],
-    [13,figure(-28,72,-165,{pitch:-44,chest:-16,chestTwist:-34,pelvisTwist:16,left:[88,10],right:[62,40],drop:-23,offhand:60})],
-    [14,figure(-30,110,178,{pitch:20,chest:10,chestTwist:30,pelvisTwist:-20,left:[20,90],right:[45,120],drop:-20,offhand:60})],
-    [15,figure(32,64,-85,{pitch:32,chest:30,chestTwist:40,pelvis:6,pelvisTwist:-24,left:[75,5],right:[-35,100],drop:-20,offhand:85})],
-    [16,figure(26,62,-120,{pitch:34,chest:30,chestTwist:36,pelvis:6,pelvisTwist:-24,left:[72,8],right:[-38,105],drop:-21,offhand:85})],
-    [17,figure(20,130,95,{pitch:-10,chest:-14,chestTwist:-18,left:[20,60],right:[40,90],drop:-18,offhand:45})],
-    [18,figure(40,56,-88,{pitch:6,chest:16,chestTwist:-10,pelvis:-10,left:[-8,4],right:[10,20],drop:-24,offhand:65})],
-    [19,figure(-34,72,-168,{pitch:-32,chest:-22,chestTwist:-42,pelvis:-10,pelvisTwist:26,left:[-38,115],right:[72,22],drop:-21,offhand:30})],
-    [20,figure(-10,150,135,{pitch:-46,chest:-26,chestTwist:-30,pelvisTwist:14,left:[-20,60],right:[30,110],drop:-6,offhand:15})],
-    [21,figure(30,62,-70,{pitch:40,chest:36,chestTwist:-30,pelvis:10,pelvisTwist:30,left:[85,120],right:[-25,15],drop:-22,offhand:85})],
-    [22,figure(24,60,-112,{pitch:42,chest:38,chestTwist:-30,pelvis:10,pelvisTwist:30,left:[85,120],right:[-28,15],drop:-23,offhand:85})],
-    [23,figure(16,142,110,{pitch:-22,chest:-16,chestTwist:16,left:[60,105],right:[65,110],drop:-10,offhand:40})],
-    [24,figure(24,70,-90,{pitch:30,chest:34,pelvis:-6,left:[-20,30],right:[-10,45],drop:-18,offhand:75})],
-    [27,figure(20,72,-92,{pitch:34,chest:36,pelvis:-6,left:[-25,25],right:[-12,40],drop:-22,offhand:75})],
-    [30,figure(16,72,-118,{pitch:18,chest:22,left:[25,65],right:[35,75],drop:-20,offhand:55})],
-    [33,figure(13,70,-150,{pitch:2,chest:6,left:[12,25],right:[4,20],drop:-14,offhand:30})],
-    [37,swing(12,76,-185,{lean:5,twist:2,knee:9,offhand:28,drop:-10,pitch:1})],
-    [40,swing(14,86,152,{lean:3,twist:2,knee:10,offhand:27,drop:-6,pitch:0})],
-    [43,swing(18,94,130,{lean:1,twist:1,knee:11,offhand:26,drop:-2,pitch:0})],[45,guard],[46,guard],
+    [10,figure(-24,138,140,{pitch:-34,chest:-20,chestTwist:-20,pelvisTwist:10,left:[20,60],right:[0,30],drop:-8,offhand:30})],
+    [11,figure(24,126,20,{pitch:8,chest:8,chestTwist:-24,pelvisTwist:14,left:[60,95],right:[55,90],drop:-22,offhand:50})],
+    [12,figure(28,72,-72,{pitch:46,chest:36,chestTwist:-20,pelvisTwist:16,left:[95,130],right:[90,125],drop:-36,offhand:80})],
+    [13,figure(-28,128,165,{pitch:-34,chest:-20,chestTwist:-30,pelvisTwist:16,left:[10,40],right:[30,90],drop:-10,offhand:40})],
+    [14,figure(26,124,20,{pitch:12,chest:12,chestTwist:10,pelvisTwist:-8,left:[50,40],right:[0,90],drop:-22,offhand:60})],
+    [15,figure(32,72,-72,{pitch:50,chest:34,chestTwist:40,pelvis:6,pelvisTwist:-24,left:[75,5],right:[-35,100],drop:-36,offhand:85})],
+    [16,figure(-20,145,125,{pitch:-30,chest:-14,chestTwist:-10,left:[30,60],right:[20,50],drop:-6,offhand:40})],
+    [17,figure(28,120,15,{pitch:12,chest:12,left:[-10,30],right:[-5,25],drop:-22,offhand:50})],
+    [18,figure(30,72,-72,{pitch:54,chest:40,chestTwist:-6,pelvis:-6,left:[-60,0],right:[-50,5],drop:-36,offhand:30})],
+    [19,figure(-26,140,150,{pitch:-40,chest:-24,chestTwist:20,left:[40,50],right:[25,70],drop:-8,offhand:20})],
+    [20,figure(22,118,20,{pitch:10,chest:8,chestTwist:6,left:[20,20],right:[-15,25],drop:-22,offhand:50})],
+    [21,figure(30,72,-72,{pitch:46,chest:34,chestTwist:-30,pelvis:8,pelvisTwist:30,left:[90,10],right:[-35,10],drop:-36,offhand:85})],
+    [22,figure(-18,150,110,{pitch:-34,chest:-22,chestTwist:-24,pelvisTwist:12,left:[30,100],right:[-20,40],drop:-6,offhand:25})],
+    [23,figure(22,126,30,{pitch:12,chest:14,chestTwist:-10,left:[70,90],right:[10,110],drop:-22,offhand:60})],
+    [24,figure(28,72,-72,{pitch:50,chest:40,chestTwist:14,pelvisTwist:-10,left:[60,120],right:[-70,120],drop:-36,offhand:85})],
+    [26,figure(12,56,-120,{pitch:54,chest:41,chestTwist:11,pelvisTwist:-9,left:[53,113],right:[-57,113],drop:-36,offhand:85})],
+    [27,figure(4,36,-100,{pitch:56,chest:42,chestTwist:10,pelvisTwist:-8,left:[50,110],right:[-50,110],drop:-36,offhand:85})],
+    [30,figure(4,62,-152,{pitch:40,chest:32,chestTwist:4,left:[42,92],right:[-10,80],drop:-24,offhand:70})],
+    [33,figure(4,66,-160,{pitch:22,chest:22,left:[38,80],right:[8,60],drop:-12,offhand:58})],
+    [37,figure(7,70,-149,{pitch:16,chest:17,left:[39,77],right:[11,56],drop:-8,offhand:54})],
+    [41,figure(10,72,-138,{pitch:10,chest:12,left:[40,73],right:[15,52],drop:-4,offhand:49})],
+    [45,fallReady],[46,fallReady],
   ]},
 ] as const;
-type Gesture = (typeof gestures)[number] | (typeof replacements)[number];
+const held = [
+  {key:"jump",name:"Air Jump Rise",frames:24,keys:[
+    [0,guard],
+    [8,figure(10,96,-160,{pitch:-6,chest:-4,left:[30,55],right:[10,35],drop:6,offhand:55})],
+    [16,figure(12,82,-140,{pitch:0,chest:4,left:[45,80],right:[22,55],drop:3,offhand:50})],
+    [24,fallReady],
+  ]},
+  {key:"fall",name:"Air Fall Ready",frames:30,keys:[[0,fallReady],[30,fallReady]]},
+] as const;
+type Gesture = (typeof gestures)[number] | (typeof replacements)[number] | (typeof held)[number];
 
 function writeBindings(bindings: readonly string[], names: readonly string[]) {
   return Bun.write(join(project,"ts/src/game/presentation/blademasterClipInfo.ts"),["// Generated by tools/animations/blademaster-clips.ts; regenerate instead of editing.",'import { f32 } from "wisp/src/sim/f32";','import type { HeroClipTable } from "../sim/heroes/hero";',"export const BLADEMASTER_AUTHORED_CLIPS = {",...bindings,"} as const satisfies HeroClipTable;","","export const BLADEMASTER_AUTHORED_CLIP_NAMES = {",...names,"} as const;",""].join("\n"));
 }
 
-const frameAligned = (style: AttackStyle | undefined) => style !== undefined && ([AttackStyle.jab, AttackStyle.jab2, AttackStyle.forwardTilt, AttackStyle.forwardTiltUp, AttackStyle.forwardTiltDown, AttackStyle.upTilt, AttackStyle.downTilt, AttackStyle.dashAttack, AttackStyle.downAir] as readonly AttackStyle[]).includes(style);
+const frameAligned = (style: AttackStyle | undefined) => style !== undefined && ([AttackStyle.jab, AttackStyle.jab2, AttackStyle.forwardTilt, AttackStyle.forwardTiltUp, AttackStyle.forwardTiltDown, AttackStyle.upTilt, AttackStyle.downTilt, AttackStyle.dashAttack, AttackStyle.neutralAir, AttackStyle.forwardAir, AttackStyle.backAir, AttackStyle.upAir, AttackStyle.downAir] as readonly AttackStyle[]).includes(style);
 
 
 function multiply(a: ArrayLike<number>, b: ArrayLike<number>): Float32Array<ArrayBuffer> {
@@ -145,13 +157,17 @@ if(!base.has(pelvisRotation))base.set(pelvisRotation,new Float32Array([0,0,0,1])
 const nodes=[...model.Bones,...model.Helpers], nodeByName=(name:string)=>{const n=nodes.find(n=>n.Name===name);ensure(n,name);return n;};
 const arm=[nodeByName("Bone_Arm1_R"),nodeByName("Bone_Arm2_R")],hand=nodeByName("Bone_Hand_R"),tip=nodeByName("Shimmer");
 let cursor=Math.max(...source.Sequences.map(s=>s.Interval[1]))+100;
+const replaced=new Set<number>();
+const gestureSequence=(name:string,start:number,end:number):mdx.Sequence=>({...stand,Name:`Sword Gesture ${name}`,Interval:new Uint32Array([start,end]),NonLooping:true,MoveSpeed:0,Rarity:0,MinimumExtent:new Float32Array([-300,-300,-200]),MaximumExtent:new Float32Array([300,300,350]),BoundsRadius:400});
 interface ClipRecord { pose:string; name:string; index:number; first:number; last:number; total:number; seconds:number; strikeSeconds:number; controlFrames:number[] }
 const records: ClipRecord[]=[],bindings:string[]=[],names:string[]=[];
 function timeline(g: Gesture, first: number, last: number, total: number): { controlFrames: number[]; poses: Pose[] } {
   if("keys" in g)return {controlFrames:g.keys.map(([frame])=>frame),poses:g.keys.map(([,p])=>p)};
   if(g.style===AttackStyle.upTilt)return {controlFrames:[0,first-3,first,first+1,first+2,first+3,last,last+2,total-4,total],poses:[guard,pose([30,-50,70],[115,-50,5],14,-15,34,40),pose([40,-50,120],[165,-50,120],8,-10),pose([28,-50,140],[108,-50,242],-6,-4),pose([0,-50,150],[-22,-50,275],-10,0),pose([-28,-50,140],[-131,-50,212],-6,4),pose([-40,-50,120],[-165,-50,120],4,10),pose([0,-50,145],[0,-50,270],-6,14),pose([30,-50,115],[-15,-50,235],0,4),guard]};
   if(g.style===AttackStyle.forwardTiltUp)return {controlFrames:[0,Math.max(1,first-3),first,last+2,total-4,total],poses:[guard,g.prep,g.hit,pose([0,-50,145],[0,-50,270],-6,14),pose([30,-50,115],[-15,-50,235],0,4),guard]};
-  return {controlFrames:[0,Math.max(1,first-3),first,("second" in g?g.second:last+2),total],poses:[guard,g.prep,g.hit,g.exit,guard]};
+  const rest=airborne.includes(g.key)?fallReady:guard;
+  const carry="carry" in g?g.carry:[],lift="lift" in g?[g.lift]:[],settle="settle" in g?g.settle:[];
+  return {controlFrames:[0,...lift.map(([frame])=>frame),Math.max(1,first-3),first,...carry.map(([frame])=>frame),("second" in g?g.second:last+2),...settle.map(([frame])=>frame),total],poses:[rest,...lift.map(([,p])=>p),g.prep,g.hit,...carry.map(([,p])=>p),g.exit,...settle.map(([,p])=>p),rest]};
 }
 function posedJoint(name: string, q: Float32Array<ArrayBuffer>, p: Pose): Float32Array<ArrayBuffer> {
   const f=p.figure;
@@ -195,15 +211,33 @@ function reach(temp: mdx.Model, start: number, p: Pose, g: Gesture) {
     const n=temp.Nodes[joint.ObjectId]!,key=n.Rotation?.Keys.at(-1);ensure(key,"missing joint rotation");key.Vector=rotate(key.Vector,local as unknown as V,Math.acos(Math.max(-1,Math.min(1,av.reduce((s,v,i)=>s+v*bv[i]!,0))))*180/Math.PI);renderer.update(0);
   };
   for(let iteration=0;iteration<12;iteration++)for(const joint of arm.toReversed())aim(joint,hand,p.hand);
-  if(g.style===AttackStyle.upTilt) aim(hand,sword!,p.tip,new Float32Array([90.45929718017578,63.46139907836914,82.50170135498047]));
+  if("style" in g&&g.style===AttackStyle.upTilt) aim(hand,sword!,p.tip,new Float32Array([90.45929718017578,63.46139907836914,82.50170135498047]));
   else for(let iteration=0;iteration<("keys" in g?8:1);iteration++)aim(hand,tip,p.tip);
+}
+function settle(name: string, frames: number, p: Pose, g: Gesture) {
+  const index=model.Sequences.findIndex(s=>s.Name===name),sequence=model.Sequences[index];ensure(sequence,`missing ${name}`);
+  const start=sequence.Interval[0],end=sequence.Interval[1],from=Math.round(end-frames*1000/60);
+  const temp=posedModel(p,sequence,start);reach(temp,start,p,g);
+  const goal=new Map<string,Float32Array>();
+  tracks(temp,(t,path)=>{const q=base.has(path)&&!onGlobalClock(t)?t.Keys.at(-1)?.Vector:undefined;if(q)goal.set(path,Float32Array.from(q));});
+  const blend=(a:ArrayLike<number>,b:ArrayLike<number>,w:number)=>{
+    const sign=a.length===4&&Array.from(a).reduce((sum,v,i)=>sum+v*b[i]!,0)<0?-1:1,mixed=Float32Array.from(a,(v,i)=>v*(1-w)+sign*b[i]!*w);
+    if(a.length!==4)return mixed;const n=Math.hypot(...mixed);return mixed.map(v=>v/n);
+  };
+  tracks(model,(t,path)=>{const target=goal.get(path);if(!target||onGlobalClock(t))return;
+    const inside=t.Keys.filter(k=>k.Frame>=start&&k.Frame<=end),before=inside.filter(k=>k.Frame<=from).at(-1),after=inside.find(k=>k.Frame>=from);
+    const hold=before&&after&&after.Frame>before.Frame?blend(before.Vector,after.Vector,(from-before.Frame)/(after.Frame-before.Frame)):Float32Array.from((before??after??{Vector:target}).Vector);
+    const keys=[{Frame:from,Vector:hold},...inside.filter(k=>k.Frame>from&&k.Frame<end).map(k=>{const x=(k.Frame-from)/(end-from);return {Frame:k.Frame,Vector:blend(k.Vector,target,x*x*(3-2*x))};}),{Frame:end,Vector:Float32Array.from(target)}];
+    t.Keys=t.Keys.filter(k=>k.Frame<start||k.Frame>end||k.Frame<from).concat(keys.map(k=>({...k,...(t.LineType>=mdx.LineType.Hermite?{InTan:k.Vector.slice(),OutTan:k.Vector.slice()}:{})}))).sort((a,b)=>a.Frame-b.Frame);
+  });
+  replaced.add(index);
 }
 function author(g: Gesture, index: number, start: number, end: number, first: number, last: number, total: number): number[] {
   const {controlFrames,poses}=timeline(g,first,last,total);
   const values=new Map<string,Float32Array[]>();
   for(let phase=0;phase<poses.length;phase++){
     const p=poses[phase]!,temp=posedModel(p,model.Sequences[index]!,start);
-    if(phase!==0&&phase!==poses.length-1&&p!==guard)reach(temp,start,p,g);
+    if(p!==guard)reach(temp,start,p,g);
     tracks(temp,(t,path)=>{const q=base.has(path)&&!onGlobalClock(t)?t.Keys.at(-1)?.Vector:undefined;if(q){const list=values.get(path)??[];list.push(Float32Array.from(q));values.set(path,list);}});
   }
   tracks(model,(t,path)=>{const v=base.get(path);if(!v||onGlobalClock(t))return;
@@ -213,21 +247,30 @@ function author(g: Gesture, index: number, start: number, end: number, first: nu
   });
   return controlFrames;
 }
-for(const g of replaceOnly ? [] : gestures){
+for(const g of replaceOnly ? gestures.filter(g=>airborne.includes(g.key)) : gestures){
   const move=g.style===undefined?undefined:hero.moves.normals[g.style];
   const thrown=hero.moves.throws[GrabAction.throwBack];ensure(move||thrown,"missing timing");
   const existing = shipped.Sequences.find(s => s.Name === `Sword Gesture ${g.name}`);
   const first=move?.startupFrames??thrown!.contactFrame,total=existing ? Math.round((existing.Interval[1]-existing.Interval[0])*60/1000) : move?.totalFrames??thrown!.totalFrames;
   const last=first+(move?.activeFrames??1)-1;
-  const start=existing?.Interval[0]??cursor,end=existing?.Interval[1]??start+Math.round(total*1000/60),index=model.Sequences.length;cursor=end+100;
+  const start=existing?.Interval[0]??cursor,end=existing?.Interval[1]??start+Math.round(total*1000/60),present=model.Sequences.findIndex(s=>s.Name===`Sword Gesture ${g.name}`),index=present<0?model.Sequences.length:present;cursor=Math.max(cursor,end+100);
   ensure(existing === undefined || shipped.Sequences.indexOf(existing) === index, "gesture index changed");
-  model.Sequences.push({...stand,Name:`Sword Gesture ${g.name}`,Interval:new Uint32Array([start,end]),NonLooping:true,MoveSpeed:0,Rarity:0,MinimumExtent:new Float32Array([-300,-300,-200]),MaximumExtent:new Float32Array([300,300,350]),BoundsRadius:400});
-  const controlFrames=author(g,index,start,end,first,last,total);
-  bindings.push(`  ${g.key}: { index: ${index}, seconds: ${seconds((end-start)/1000)}${frameAligned(g.style) ? ", aligned: true" : ""} },`);
-  names.push(`  ${g.key}: ${JSON.stringify(`Sword Gesture ${g.name}`)},`);
+  if(present<0)model.Sequences.push(gestureSequence(g.name,start,end));
+  const controlFrames=author(g,index,start,end,first,last,total);replaced.add(index);
   records.push({pose:g.key,name:`Sword Gesture ${g.name}`,index,first,last,total,seconds:(end-start)/1000,strikeSeconds:Math.round(first*1000/60)/1000,controlFrames});
 }
-const replaced=new Set<number>();
+for(const g of held){
+  const name=`Sword Gesture ${g.name}`,present=model.Sequences.findIndex(s=>s.Name===name),index=present<0?model.Sequences.length:present;
+  const start=model.Sequences[index]?.Interval[0]??cursor,end=model.Sequences[index]?.Interval[1]??start+Math.round(g.frames*1000/60);cursor=Math.max(cursor,end+100);
+  if(present<0)model.Sequences.push(gestureSequence(g.name,start,end));
+  author(g,index,start,end,0,0,g.frames);replaced.add(index);
+}
+settle("Jump Motion doubleJump",12,fallReady,held[1]);
+for(const g of [...gestures,...held]){
+  const index=model.Sequences.findIndex(s=>s.Name===`Sword Gesture ${g.name}`),sequence=model.Sequences[index];ensure(sequence,`missing ${g.name}`);
+  bindings.push(`  ${g.key}: { index: ${index}, seconds: ${seconds((sequence.Interval[1]-sequence.Interval[0])/1000)}${"style"in g&&frameAligned(g.style) ? ", aligned: true" : ""} },`);
+  names.push(`  ${g.key}: ${JSON.stringify(`Sword Gesture ${g.name}`)},`);
+}
 for(const g of replacements){
   const move=hero.moves.normals[g.style],index=model.Sequences.findIndex(s=>s.Name===g.name),start=model.Sequences[index]?.Interval[0],end=model.Sequences[index]?.Interval[1];
   ensure(move&&start!==undefined&&end!==undefined,`missing ${g.name}`);
@@ -239,10 +282,11 @@ for(const g of replacements){
 const bytes=encodeVerified(parseSource(generateMDX(model))),before=new DrawnModel(generateMDX(source),1),after=new DrawnModel(bytes,1);
 for(const [index,s]of source.Sequences.entries())if(!replaced.has(index))for(const fraction of [0,0.5,1]){const t=(s.Interval[1]-s.Interval[0])*fraction/1000,a=before.triangles(index,t,1),b=after.triangles(index,t,1);ensure(a.length===b.length&&a.every((v,i)=>Math.abs(v-b[i]!)<0.001),`${s.Name}: shipped pose changed`);}
 mkdirSync(join(output,"hero-models"),{recursive:true});await Bun.write(join(output,fighter.source),bytes);
-if(!replaceOnly)await writeBindings(bindings, names);
+await writeBindings(bindings, names);
 await Bun.write(join(output,"blademaster-clips.json"),JSON.stringify({sourceSequences:source.Sequences.length,records},null,2)+"\n");
 const frames=records.flatMap(r=>[Math.max(1,r.first-3),r.first,r.controlFrames[3]!].map(frame=>({frame,facing:1,clip:r.index,seconds:frame/60,phase:AttackPhase.active,x:0,z:0,parts:[],strikes:[]})));
 await Bun.write(join(output,"Blademaster-gestures.png"),sheet("Blademaster",after,frames,6).png);
+for(const g of held){const index=model.Sequences.findIndex(s=>s.Name===`Sword Gesture ${g.name}`);await Bun.write(join(output,`Blademaster-${g.key}.png`),sheet(g.name,after,[0,g.frames/2,g.frames].flatMap(frame=>[1,-1].map(facing=>({frame,facing,clip:index,seconds:frame/60,phase:AttackPhase.none,x:0,z:0,parts:[],strikes:[]}))),6).png);}
 for(const r of records)await Bun.write(join(output,`Blademaster-${r.pose}-hit.png`),sheet(r.name,after,[1,-1].map(facing=>({frame:r.first,facing,clip:r.index,seconds:r.strikeSeconds,phase:AttackPhase.active,x:0,z:0,parts:[],strikes:[]})),2).png);
 const contacts=records.map(r=>after.triangles(r.index,r.strikeSeconds,1));
 let closest=Infinity;
