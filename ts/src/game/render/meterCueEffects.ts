@@ -1,7 +1,6 @@
 import { type Character, SpecialAction } from "../sim/codes";
 import type { Fighter } from "../sim/fighter";
-import type { Cue } from "../presentation/specialCues";
-import { EX_AURA, EX_AURA_FRAMES, EX_CAST_VOLUME, EX_READY, type MeterCueFit, type MeterCueState, type MeterCueView, SUPER_AURA, ULTIMATE_BURST, ULTIMATE_BURST_FRAMES, ultimateBurst, ULTIMATE_CAST_VOLUME, clearCastCue, clearMeterCueState, confirmCastCue, createCastCue, createMeterCueState, exCastFrame, exReady, hideCastCue, meterCueFit, observeMeterCues, presentCastCue, ultimateCastFrame, ultimateFirstEffectFrame, ultimateReady } from "../presentation/meterCues";
+import { EX_AURA, EX_AURA_FRAMES, EX_CAST_VOLUME, EX_READY, type MeterCue, type MeterCueFit, type MeterCueState, type MeterCueView, SUPER_AURA, ULTIMATE_BURST, ULTIMATE_BURST_FRAMES, ultimateBurst, ULTIMATE_CAST_VOLUME, clearCastCue, clearMeterCueState, confirmCastCue, createCastCue, createMeterCueState, exCastFrame, exReady, hideCastCue, meterCueFit, observeMeterCues, presentCastCue, ultimateCastFrame, ultimateFirstEffectFrame, ultimateReady } from "../presentation/meterCues";
 import { type WorldOrigin, effectMotion, hideEffect, placeEffect } from "./effects";
 import { ultimateCastSound } from "../presentation/moveSounds";
 
@@ -9,9 +8,10 @@ class MeterCueModel {
   private model: effect | undefined;
   private shown = false;
   private seekAgain = false;
+  private started = 0;
 
   // Online, Warcraft handles must be born on the same turn on every client, so shared play parks one handle made at startup instead of making one when the cue shows.
-  constructor(private readonly cue: Cue, private readonly fit: MeterCueFit, private readonly origin: WorldOrigin, private readonly shared: boolean) {
+  constructor(private readonly cue: MeterCue, private readonly fit: MeterCueFit, private readonly origin: WorldOrigin, private readonly shared: boolean) {
     if (!shared) return;
     this.model = AddSpecialEffect(cue.model, origin.x, origin.y);
     hideEffect(this.model, origin);
@@ -21,7 +21,7 @@ class MeterCueModel {
     return this.shown;
   }
 
-  show(shown: boolean, fighter: Readonly<Fighter>, front: number): boolean {
+  show(shown: boolean, fighter: Readonly<Fighter>, front: number, frame: number): boolean {
     if (shown === this.shown) return false;
     this.shown = shown;
     if (!shown) {
@@ -36,17 +36,20 @@ class MeterCueModel {
     BlzSetSpecialEffectScale(model, this.fit.scale);
     if (this.cue.alpha !== undefined) BlzSetSpecialEffectAlpha(model, this.cue.alpha);
     BlzSetSpecialEffectTimeScale(model, 1.0);
-    if (this.cue.sequence !== undefined) BlzSetSpecialEffectAnimation(model, this.cue.sequence);
-    BlzSetSpecialEffectTime(model, 0.0);
-    this.seekAgain = true;
+    this.restart(model, frame);
     return true;
   }
 
-  follow(fighter: Readonly<Fighter> | undefined, front: number): void {
+  follow(fighter: Readonly<Fighter> | undefined, front: number, frame: number): void {
     const model = this.model;
     if (!this.shown || model === undefined || fighter === undefined) return;
     const { x, y, z } = this.at(fighter, front);
     placeEffect(model, x, y, z);
+    const { loopFrames } = this.cue;
+    if (loopFrames !== undefined && (frame < this.started || frame - this.started >= loopFrames)) {
+      this.restart(model, frame);
+      return;
+    }
     if (!this.seekAgain) return;
     // Warcraft discards animation seeks in the callback selecting the animation (#58 native rulers).
     BlzSetSpecialEffectTime(model, 0.0);
@@ -67,6 +70,13 @@ class MeterCueModel {
     this.clear();
     if (this.model !== undefined) DestroyEffect(this.model);
     this.model = undefined;
+  }
+
+  private restart(model: effect, frame: number): void {
+    if (this.cue.sequence !== undefined) BlzSetSpecialEffectAnimation(model, this.cue.sequence);
+    BlzSetSpecialEffectTime(model, 0.0);
+    this.seekAgain = true;
+    this.started = frame;
   }
 
   private readonly placed = { x: 0.0, y: 0.0, z: 0.0 };
@@ -90,7 +100,7 @@ class MeterCueModel {
   }
 }
 
-/** The EX cast aura, the EX-ready frost swirl, the full-bar flame aura and the ultimate's flame burst over one fighter (docs/design/ultimates.md): sounds and trace follow confirmed frames; each cast's picture starts on the first presented or confirmed frame holding it and plays in full. */
+/** The EX cast aura, the EX-ready frost swirl, the full-bar fire column and the ultimate's flame burst over one fighter (docs/design/ultimates.md): sounds and trace follow confirmed frames; each cast's picture starts on the first presented or confirmed frame holding it and plays in full. */
 export class MeterCueEffects {
   private readonly heard: MeterCueState = createMeterCueState();
   private readonly exCast = createCastCue(EX_AURA_FRAMES);
@@ -169,17 +179,17 @@ export class MeterCueEffects {
       this.hideModels();
       return;
     }
-    this.burst.follow(live, this.front);
-    this.exAura.follow(live, this.front);
-    this.superAura.follow(live, this.front);
-    this.exSwirl.follow(live, this.front);
-    this.exSwirl.show(exReady(live, ultimatesOff), live, this.front);
-    this.superAura.show(ultimateReady(live, ultimatesOff), live, this.front);
+    this.burst.follow(live, this.front, frame);
+    this.exAura.follow(live, this.front, frame);
+    this.superAura.follow(live, this.front, frame);
+    this.exSwirl.follow(live, this.front, frame);
+    this.exSwirl.show(exReady(live, ultimatesOff), live, this.front, frame);
+    this.superAura.show(ultimateReady(live, ultimatesOff), live, this.front, frame);
     const { action } = live.special;
     const burst = presentCastCue(this.burstCast, frame, ultimateCastFrame(live, frame), action);
-    if (this.burst.show(burst, live, this.front)) trace?.(`ultimate-burst ${burst ? "on" : "off"} action-frame ${live.special.frame} cast ${this.burstCast.cast}`);
+    if (this.burst.show(burst, live, this.front, frame)) trace?.(`ultimate-burst ${burst ? "on" : "off"} action-frame ${live.special.frame} cast ${this.burstCast.cast}`);
     const exAura = presentCastCue(this.exCast, frame, exCastFrame(live, frame), action);
-    if (this.exAura.show(exAura, live, this.front)) trace?.(`ex-aura ${exAura ? "on" : "off"} action-frame ${live.special.frame} cast ${this.exCast.cast}`);
+    if (this.exAura.show(exAura, live, this.front, frame)) trace?.(`ex-aura ${exAura ? "on" : "off"} action-frame ${live.special.frame} cast ${this.exCast.cast}`);
   }
 
   /** The trace line and frame that lit the full-bar aura still showing, for a trace that starts after it. */

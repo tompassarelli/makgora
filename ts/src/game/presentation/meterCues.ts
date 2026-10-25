@@ -10,11 +10,12 @@ import { heroLook } from "../roster/looks";
 export interface MeterCue extends Cue {
   readonly lift: number;
   readonly alpha?: number | undefined;
+  readonly loopFrames?: number | undefined;
 }
 
 export const EX_AURA: MeterCue = { model: "Abilities\\Spells\\Items\\TomeOfRetraining\\TomeOfRetrainingCaster.mdx", anchor: "feet", scale: f32(0.7), lift: 0.0, alpha: 150, sequence: "birth", sound: "DivineShield" };
 export const EX_READY: MeterCue = { model: "Abilities\\Spells\\Undead\\FrostArmor\\FrostArmorTarget.mdx", anchor: "feet", scale: f32(0.5), lift: f32(0.1), sequence: "stand" };
-export const SUPER_AURA: MeterCue = { model: "Abilities\\Spells\\Other\\ImmolationRed\\ImmolationRedTarget.mdx", anchor: "feet", scale: 1.0, lift: f32(0.15), sequence: "stand" };
+export const SUPER_AURA: MeterCue = { model: "Doodads\\Cinematic\\FireTrapUp\\FireTrapUp.mdx", anchor: "feet", scale: f32(0.5), lift: 0.0, sequence: "stand", loopFrames: 50 };
 export const ULTIMATE_BURST: MeterCue = { model: "Abilities\\Spells\\Other\\Doom\\DoomDeath.mdx", anchor: "feet", scale: f32(0.4), lift: 0.0, sequence: "birth", sound: "FlameStrike" };
 export const METER_CUES: readonly MeterCue[] = [EX_AURA, EX_READY, SUPER_AURA, ULTIMATE_BURST];
 
@@ -24,7 +25,7 @@ export function ultimateBurst(character: Character): MeterCue {
 }
 
 export function meterCueMoves(character: Character): readonly (readonly [string, MeterCue])[] {
-  return [["EX aura", EX_AURA], ["EX-ready frost swirl", EX_READY], ["full-bar flame aura", SUPER_AURA], ["ultimate burst", ultimateBurst(character)]];
+  return [["EX aura", EX_AURA], ["EX-ready frost swirl", EX_READY], ["full-bar fire column", SUPER_AURA], ["ultimate burst", ultimateBurst(character)]];
 }
 
 export const METER_CUE_UNIT_RADIUS = 22.0;
