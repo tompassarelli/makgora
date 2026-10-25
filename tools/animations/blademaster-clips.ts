@@ -53,20 +53,19 @@ if (!replaceOnly) {
 const model = structuredClone(source), hero = heroDefinition(Character.blademaster); ensure(hero, "missing moves");
 const stand = source.Sequences.find(s => s.Name === "Stand Ready"); ensure(stand, "missing guard");
 type V = readonly [number, number, number];
-interface Pose { hand: V; tip: V; lean: number; twist: number; knee: number; offhand: number; legSplit:number; drop:number; pitch:number }
+interface Figure { pitch: number; chest: number; chestTwist: number; pelvis: number; pelvisTwist: number; left: readonly [number, number]; right: readonly [number, number] }
+interface Pose { hand: V; tip: V; lean: number; twist: number; knee: number; offhand: number; legSplit:number; drop:number; pitch:number; figure?: Figure }
 const pose = (hand: V, tip: V, lean = 0, twist = 0, knee = 12, offhand = 25, legSplit=0, drop=0, pitch=0): Pose => ({hand, tip, lean, twist, knee, offhand, legSplit, drop, pitch});
 const guard = pose([26,-25,100],[100,-25,145]);
 const coil = pose([-16,-25,135],[-65,-20,180],-12,-20,24,35);
 interface Body { lean: number; twist: number; knee: number; offhand: number; drop: number; pitch: number }
 const swing = (x: number, z: number, degrees: number, b: Body) =>
   pose([x,-24,z],[x+100*Math.cos(degrees*Math.PI/180),-24,z+100*Math.sin(degrees*Math.PI/180)],b.lean,b.twist,b.knee,b.offhand,0,b.drop,b.pitch);
-const frontChop = (drop: number, pitch: number): Body => ({lean:25,twist:14,knee:25,offhand:65,drop,pitch});
-const backChop: Body = {lean:10,twist:-26,knee:25,offhand:65,drop:-16,pitch:-18};
-const frontRise: Body = {lean:5,twist:16,knee:60,offhand:50,drop:-6,pitch:5};
-const backRise: Body = {lean:-4,twist:-20,knee:60,offhand:50,drop:-6,pitch:-4};
-const frontCock = swing(26,122,62,{lean:-8,twist:8,knee:65,offhand:45,drop:-2,pitch:-4});
-const backCock = swing(-12,124,100,{lean:-10,twist:-16,knee:70,offhand:45,drop:-2,pitch:-8});
-const plunge = (drop: number) => swing(10,60,-88,{lean:8,twist:0,knee:0,offhand:20,drop,pitch:0});
+interface Stance extends Partial<Omit<Figure, "left" | "right">> { left: readonly [number, number]; right: readonly [number, number]; drop: number; offhand?: number }
+const figure = (x: number, z: number, degrees: number, s: Stance): Pose => {
+  const f: Figure = {pitch:0,chest:0,chestTwist:0,pelvis:0,pelvisTwist:0,...s};
+  return {...swing(x,z+s.drop,degrees,{lean:f.chest,twist:f.chestTwist,knee:0,offhand:s.offhand??55,drop:s.drop,pitch:f.pitch}),figure:f};
+};
 const gestures = [
   {key:"jab",name:"Jab Quick Cut",style:AttackStyle.jab,prep:pose([10,-50,120],[-45,-50,170],-5,-12),hit:pose([46,-24,76],[128,-24,65],8,8,16),exit:pose([42,-25,64],[65,-24,12],12,16)},
   {key:"jab2",name:"Jab Returning Cut",style:AttackStyle.jab2,prep:pose([30,-24,58],[78,-24,8],14,18),hit:pose([48,-24,74],[135,-24,91],3,-12,20),exit:pose([15,-25,126],[-40,-24,160],-4,-20)},
@@ -87,15 +86,32 @@ const gestures = [
 ] as const;
 const replacements = [
   {key:"downAir",name:"Down Air Sword Plunge",style:AttackStyle.downAir,keys:[
-    [0,guard],[5,swing(-14,126,140,{lean:-12,twist:-20,knee:95,offhand:40,drop:20,pitch:-25})],
-    [8,swing(-4,62,-112,{lean:15,twist:-6,knee:60,offhand:55,drop:-10,pitch:8})],
-    [9,swing(8,48,-82,frontChop(-26,34))],[10,swing(24,22,-50,{lean:28,twist:16,knee:22,offhand:65,drop:-52,pitch:34})],[11,frontCock],
-    [12,swing(-10,54,-105,backChop)],[13,swing(-30,96,160,backRise)],[14,backCock],
-    [15,swing(8,56,-70,frontChop(-16,28))],[16,swing(40,96,20,frontRise)],[17,frontCock],
-    [18,swing(-10,54,-105,backChop)],[19,swing(-30,96,160,backRise)],[20,backCock],
-    [21,swing(8,56,-70,frontChop(-16,28))],[22,swing(8,124,80,{lean:-10,twist:0,knee:55,offhand:45,drop:4,pitch:-10})],
-    [24,plunge(-10)],[33,swing(12,64,-80,{lean:9,twist:1,knee:3,offhand:22,drop:-14,pitch:0})],[37,swing(18,76,-48,{lean:7,twist:3,knee:8,offhand:28,drop:-9,pitch:1})],
-    [41,swing(26,90,0,{lean:4,twist:3,knee:10,offhand:26,drop:-4,pitch:0})],[45,guard],[46,guard],
+    [0,guard],
+    [3,figure(-10,128,120,{pitch:-20,chest:-14,left:[60,100],right:[45,90],drop:10,offhand:40})],
+    [5,figure(-30,140,160,{pitch:-34,chest:-20,chestTwist:-24,pelvisTwist:12,left:[90,130],right:[75,125],drop:20,offhand:35})],
+    [7,figure(14,118,40,{pitch:10,chest:20,left:[40,80],right:[20,60],drop:4,offhand:55})],
+    [8,figure(34,62,-18,{pitch:36,chest:30,chestTwist:16,left:[-10,30],right:[0,45],drop:-30,offhand:70})],
+    [9,figure(34,58,-62,{pitch:50,chest:34,chestTwist:22,pelvis:-8,pelvisTwist:-14,left:[-30,8],right:[-20,20],drop:-40,offhand:85})],
+    [10,figure(28,62,-128,{pitch:54,chest:36,chestTwist:18,pelvis:-8,left:[-35,8],right:[-25,25],drop:-36,offhand:85})],
+    [11,figure(22,114,70,{pitch:-6,chest:-10,chestTwist:-14,left:[60,100],right:[70,110],drop:-22,offhand:45})],
+    [12,figure(-16,66,-124,{pitch:-40,chest:-14,chestTwist:-34,pelvisTwist:16,left:[85,10],right:[60,40],drop:-22,offhand:60})],
+    [13,figure(-28,72,-165,{pitch:-44,chest:-16,chestTwist:-34,pelvisTwist:16,left:[88,10],right:[62,40],drop:-23,offhand:60})],
+    [14,figure(-16,124,135,{pitch:-4,chest:0,chestTwist:12,left:[45,95],right:[60,115],drop:-18,offhand:40})],
+    [15,figure(34,66,-55,{pitch:30,chest:28,chestTwist:40,pelvis:6,pelvisTwist:-24,left:[75,5],right:[-35,100],drop:-20,offhand:85})],
+    [16,figure(30,62,-110,{pitch:34,chest:30,chestTwist:36,pelvis:6,pelvisTwist:-24,left:[72,8],right:[-38,105],drop:-21,offhand:85})],
+    [17,figure(24,118,70,{pitch:-4,chest:-10,chestTwist:-18,left:[25,65],right:[45,95],drop:-18,offhand:45})],
+    [18,figure(-20,64,-128,{pitch:-28,chest:-20,chestTwist:-42,pelvis:-10,pelvisTwist:26,left:[-35,110],right:[70,20],drop:-20,offhand:30})],
+    [19,figure(-34,72,-168,{pitch:-32,chest:-22,chestTwist:-42,pelvis:-10,pelvisTwist:26,left:[-38,115],right:[72,22],drop:-21,offhand:30})],
+    [20,figure(-26,140,160,{pitch:-30,chest:-20,left:[90,130],right:[80,125],drop:-6,offhand:35})],
+    [21,figure(32,62,-60,{pitch:44,chest:40,chestTwist:12,pelvis:10,left:[80,120],right:[65,110],drop:-22,offhand:85})],
+    [22,figure(28,60,-115,{pitch:46,chest:42,chestTwist:10,pelvis:10,left:[82,122],right:[68,112],drop:-23,offhand:85})],
+    [23,figure(20,140,85,{pitch:-16,chest:-12,left:[70,115],right:[75,120],drop:-10,offhand:40})],
+    [24,figure(22,74,-88,{pitch:24,chest:28,left:[-10,40],right:[0,55],drop:-18,offhand:75})],
+    [27,figure(20,74,-92,{pitch:30,chest:32,pelvis:-6,left:[-15,30],right:[-5,40],drop:-22,offhand:75})],
+    [30,figure(16,72,-90,{pitch:14,chest:20,left:[30,70],right:[40,80],drop:-20,offhand:55})],
+    [33,figure(14,68,-82,{pitch:2,chest:10,left:[12,25],right:[4,20],drop:-14,offhand:30})],
+    [37,swing(18,76,-16,{lean:7,twist:3,knee:8,offhand:28,drop:-9,pitch:1})],
+    [41,swing(26,90,50,{lean:4,twist:3,knee:10,offhand:26,drop:-4,pitch:0})],[45,guard],[46,guard],
   ]},
 ] as const;
 type Gesture = (typeof gestures)[number] | (typeof replacements)[number];
@@ -122,6 +138,9 @@ for (const [path,t] of donor) {
   const k=t.Keys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1]);
   if(k)base.set(path,Float32Array.from(k.Vector));
 }
+const pelvisRotation=[...donor.keys()].find(path=>{const m=/^\.(Bones|Helpers)\.(\d+)\.Rotation$/.exec(path);return m!==null&&source[m[1] as "Bones"|"Helpers"][Number(m[2])]?.Name==="Bone_Pelvis";});
+ensure(pelvisRotation,"missing pelvis rotation");
+if(!base.has(pelvisRotation))base.set(pelvisRotation,new Float32Array([0,0,0,1]));
 const nodes=[...model.Bones,...model.Helpers], nodeByName=(name:string)=>{const n=nodes.find(n=>n.Name===name);ensure(n,name);return n;};
 const arm=[nodeByName("Bone_Arm1_R"),nodeByName("Bone_Arm2_R")],hand=nodeByName("Bone_Hand_R"),tip=nodeByName("Shimmer");
 let cursor=Math.max(...source.Sequences.map(s=>s.Interval[1]))+100;
@@ -134,6 +153,14 @@ function timeline(g: Gesture, first: number, last: number, total: number): { con
   return {controlFrames:[0,Math.max(1,first-3),first,("second" in g?g.second:last+2),total],poses:[guard,g.prep,g.hit,g.exit,guard]};
 }
 function posedJoint(name: string, q: Float32Array<ArrayBuffer>, p: Pose): Float32Array<ArrayBuffer> {
+  const f=p.figure;
+  if(f){
+    if(name==="Bone_Chest")return rotate(rotate(q,[0,1,0],f.pitch+f.chest),[0,0,1],f.chestTwist);
+    if(name==="Bone_Pelvis")return rotate(rotate(q,[0,1,0],f.pitch+f.pelvis),[0,0,1],f.pelvisTwist);
+    if(name==="Bone_Head")return rotate(q,[0,1,0],-f.chest*0.3);
+    const leg=/^Bone_Leg([12])_([LR])$/.exec(name);
+    if(leg){const [hip,knee]=leg[2]==="L"?f.left:f.right;return rotate(q,[0,1,0],leg[1]==="1"?-hip:knee);}
+  }
   if(name==="Bone_Chest")return rotate(rotate(q,[0,1,0],p.lean+p.pitch),[0,0,1],p.twist);
   if(name==="Bone_Pelvis")return rotate(rotate(q,[0,1,0],p.pitch),[0,0,1],-p.twist*0.35);
   if(name==="Bone_Head")return rotate(q,[0,1,0],-p.lean*0.4);
