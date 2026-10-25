@@ -91,7 +91,12 @@ env:
       fi
       regenerate_page
       reports+=(docs/design/melee-parity.md)
-      out verdict "$VERDICT"
+      verdict=$VERDICT
+      if ! (cd ts && bun scripts/wisp.ts ledger --check) > ledger.log 2>&1; then
+        verdict=check
+        { echo "detail<<AUTOLAND_EOF"; tail -40 ledger.log; echo "AUTOLAND_EOF"; } >> "$GITHUB_OUTPUT"
+      fi
+      out verdict "$verdict"
       if git diff --quiet -- "${reports[@]}"; then
         echo "The reports were already current." >> "$GITHUB_STEP_SUMMARY"
         out sha "$(git rev-parse HEAD)"
