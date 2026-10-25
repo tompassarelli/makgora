@@ -15,7 +15,7 @@ export interface MeterCue extends Cue {
 
 export const EX_AURA: MeterCue = { model: "Abilities\\Spells\\Items\\TomeOfRetraining\\TomeOfRetrainingCaster.mdx", anchor: "feet", scale: f32(0.7), lift: 0.0, alpha: 150, sequence: "birth", sound: "DivineShield" };
 export const EX_READY: MeterCue = { model: "Abilities\\Spells\\Undead\\FrostArmor\\FrostArmorTarget.mdx", anchor: "feet", scale: f32(0.5), lift: f32(0.1), sequence: "stand" };
-export const SUPER_AURA: MeterCue = { model: "Doodads\\Cinematic\\FireTrapUp\\FireTrapUp.mdx", anchor: "feet", scale: f32(0.5), lift: 0.0, sequence: "stand", loopFrames: 50 };
+export const SUPER_AURA: MeterCue = { model: "Doodads\\Cinematic\\FireTrapUp\\FireTrapUp.mdx", anchor: "feet", scale: f32(0.35), lift: 0.0, alpha: 140, sequence: "stand", loopFrames: 50 };
 export const ULTIMATE_BURST: MeterCue = { model: "Abilities\\Spells\\Other\\Doom\\DoomDeath.mdx", anchor: "feet", scale: f32(0.4), lift: 0.0, sequence: "birth", sound: "FlameStrike" };
 export const METER_CUES: readonly MeterCue[] = [EX_AURA, EX_READY, SUPER_AURA, ULTIMATE_BURST];
 
