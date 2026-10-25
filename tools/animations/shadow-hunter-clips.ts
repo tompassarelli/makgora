@@ -27,7 +27,7 @@ interface Gesture {
   drop?: number; lunge?: number; spin?: number; step?: number;
 }
 type End = "handL" | "handR" | "footL" | "footR";
-interface Phase { frame: number; gesture: Gesture; tip?: readonly [number, number] | readonly [number, number, number]; grip?: readonly [number, number]; reach?: readonly [End, number, number]; extraReach?: readonly [End, number, number]; follow?: boolean }
+interface Phase { frame: number; gesture: Gesture; tip?: readonly [number, number] | readonly [number, number, number]; grip?: readonly [number, number]; reach?: readonly [End, number, number]; extraReach?: readonly [End, number, number]; floor?: boolean; settle?: number; lift?: readonly [number, number] }
 interface Authored {
   pose: HeroPose; style?: AttackStyle; phases: readonly Phase[]; airborne?: boolean; frames?: number; looping?: boolean; forms?: readonly HeroPose[]; bind?: boolean;
   ground?: "cloth" | "sole" | "ledge"; support?: "L" | "R"; contact?: number; anatomical?: boolean;
@@ -88,16 +88,16 @@ function doubleJump(): Authored {
   ] };
 }
 
-const RECOVERY_TIP = (k: number) => [182 - 120 * k + 10 * Math.sin(Math.PI * k), 22 + 12 * k + 48 * Math.sin(Math.PI * k)] as const;
+const LIFT = [-50, -30] as const;
 function forwardSmash(): Authored {
   const move = SHADOW_HUNTER_MOVES.normals[AttackStyle.forwardSmash]!;
-  const contact = move.startupFrames, total = move.totalFrames, lag = total - 8 - (contact + 2);
+  const contact = move.startupFrames, total = move.totalFrames;
   const coil: Gesture = { lean: -20, chest: -26, chestTurn: -40, head: 22, arm: -210, elbow: 40, wrist: -20, free: 25, freeElbow: 40, beard: 12, lunge: -13 };
   const strike = (arm: number, lean: number, lunge: number): Gesture => ({ lean, chest: 12, chestTurn: 22, head: -12, arm, elbow: 0, wrist: 10,
     free: -40, freeElbow: 20, beard: -20, lunge });
-  const held = strike(-90, 21, 24), rest: Gesture = { chest: 3, arm: -20, elbow: 10 };
+  const through: Gesture = { ...strike(-85, 27, 25), chest: 14, chestTurn: 24, head: -14, free: -30, freeElbow: 25, beard: -22 };
+  const settle = (frame: number, k: number, foot: readonly ["footL", number, number]) => ({ frame, gesture: blend(through, {}, k), settle: k, lift: [LIFT[0] * Math.sin(Math.PI * k), LIFT[1] * Math.sin(Math.PI * k)] as const, reach: foot, extraReach: back });
   const back = ["footR", -7, 5] as const, front = (x: number, z = 5) => ["footL", x, z] as const;
-  const stepBack = (k: number) => k < 0.5 ? front(32) : front(32 - 37 * (k - 0.5) / 0.5, 5 + 10 * Math.sin(Math.PI * (k - 0.5) / 0.5));
   return { pose: "forwardSmash", style: AttackStyle.forwardSmash, anatomical: true, phases: [
     { frame: 0, gesture: READY },
     { frame: 5, gesture: { ...coil, lean: -6, chest: -8, chestTurn: -12, lunge: -3 }, tip: [-20, 175], reach: front(-5), extraReach: back },
@@ -105,9 +105,13 @@ function forwardSmash(): Authored {
     { frame: contact - 1, gesture: { ...coil, chest: -30, chestTurn: -56, lean: -20, lunge: 0 }, tip: [-120, 165], reach: front(22, 11), extraReach: back },
     { frame: contact, gesture: strike(-150, 18, 22), tip: [150, 100], reach: front(32), extraReach: back },
     { frame: contact + 1, gesture: strike(-110, 22, 25), tip: [186, 60], reach: front(32), extraReach: back },
-    { frame: contact + 2, gesture: held, tip: [182, 22], reach: front(32), extraReach: back },
-    ...[0.2, 0.4, 0.55, 0.7, 0.85].map(k => ({ frame: contact + 2 + Math.round(lag * k), gesture: blend(held, rest, k), tip: RECOVERY_TIP(k), follow: true, reach: stepBack(k), extraReach: back })),
-    { frame: total - 7, gesture: rest, tip: [63, 35], follow: true, reach: front(-5), extraReach: back },
+    { frame: contact + 2, gesture: strike(-85, 26, 26), tip: [150, 22], floor: true, reach: front(34), extraReach: back },
+    settle(contact + 5, 0.2, front(34)),
+    settle(contact + 9, 0.4, front(33)),
+    settle(contact + 14, 0.6, front(28, 8)),
+    settle(contact + 19, 0.77, front(19, 12)),
+    settle(contact + 25, 0.9, front(7, 11)),
+    settle(contact + 31, 0.98, front(-4, 6)),
     { frame: total, gesture: READY },
   ] };
 }
@@ -532,10 +536,10 @@ function aimTip(action: Authored, start: number) {
   const arm = named("Bone_Arm1_R"), elbow = named("Bone_Arm2_R");
   const gripAt = () => worldOf(hand);
   let solved: number[] | undefined;
-  for (const phase of action.phases) if (phase.tip) {
-    const at = time(start, phase.frame), tip = phase.tip;
+  for (const phase of action.phases) if (phase.tip || phase.settle !== undefined) {
+    const at = time(start, phase.frame);
     const keys = [arm, elbow, hand].map(n => n.Rotation!.Keys.find(k => k.Frame === at)!);
-    const angles = phase.follow && solved ? solved.slice() : [phase.gesture.arm ?? 0, phase.gesture.armYaw ?? 0, 0, phase.gesture.elbow ?? 0, phase.gesture.wrist ?? 0, phase.gesture.wristRoll ?? 0];
+    const angles = [phase.gesture.arm ?? 0, phase.gesture.armYaw ?? 0, 0, phase.gesture.elbow ?? 0, phase.gesture.wrist ?? 0, phase.gesture.wristRoll ?? 0];
     const apply = () => {
       keys[0]!.Vector = rotation(baseOf(arm), angles[0]!, angles[1]!, angles[2]!);
       keys[1]!.Vector = rotation(baseOf(elbow), angles[3]!, 0, 0);
@@ -543,10 +547,12 @@ function aimTip(action: Authored, start: number) {
       for (const key of keys) if (key.InTan) { key.InTan = key.Vector.slice(); key.OutTan = key.Vector.slice(); }
       data.frame = at; renderer.update(0);
     };
+    if (phase.settle !== undefined) { ensure(solved, `${action.pose} f${phase.frame}: settle needs an earlier aimed key`); angles.splice(0, 6, ...solved.map(a => a * (1 - phase.settle!))); angles[0]! += phase.lift?.[0] ?? 0; angles[4]! += phase.lift?.[1] ?? 0; apply(); continue; }
+    const tip = phase.tip!;
     const loss = () => { apply(); const p = tipAt(), g = phase.grip ? gripAt() : undefined;
       return (p[0]! - tip[0]) ** 2 + (p[2]! - tip[1]) ** 2 + (tip[2] === undefined ? 0.3 * p[1]! ** 2 : (p[1]! - tip[2]) ** 2)
-        + (g ? (g[0]! - phase.grip![0]) ** 2 + (g[2]! - phase.grip![1]) ** 2 : 0) + (action.ground === "cloth" || paired(action.pose) ? 40 * Math.max(0, 3 - bladeFloor()) ** 2 : 0); };
-    for (let pass = phase.follow && solved ? 2 : 0; pass < 4; pass++) for (const axis of [0, 3, 4, 1, 2, 5]) {
+        + (g ? (g[0]! - phase.grip![0]) ** 2 + (g[2]! - phase.grip![1]) ** 2 : 0) + (action.ground === "cloth" || paired(action.pose) || phase.floor ? 40 * Math.max(0, 3 - bladeFloor()) ** 2 : 0); };
+    for (let pass = 0; pass < 4; pass++) for (const axis of [0, 3, 4, 1, 2, 5]) {
       let best = Infinity, bestAngle = angles[axis]!;
       const centre = angles[axis]!, span = pass < 2 ? 180 : 30, step = pass < 2 ? 10 : 2;
       for (let angle = centre - span; angle <= centre + span; angle += step) { angles[axis] = angle; const value = loss(); if (value < best) { best = value; bestAngle = angle; } }
