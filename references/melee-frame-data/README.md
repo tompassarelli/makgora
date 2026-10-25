@@ -5,8 +5,9 @@ physics specification or an importable character definition. It has three
 inputs, each with its own provenance: meleeframedata.com's database
 (`records.jsonl`, below), libmelee's recorded per-frame table
 (`libmelee.jsonl`, under "libmelee hitbox positions and dodge travel") and
-FightCore's frame data with knockback values (`fightcore.csv`, under
-"FightCore knockback and getup data").
+FightCore's frame data with knockback values (`fightcore.csv`, with Fox's and
+Falco's per-phase hitboxes and knockdown thresholds in `fightcore-phases.jsonl`
+and `fightcore-thresholds.jsonl`, under "FightCore knockback and getup data").
 Physics parameters and retail observations are in
 smashcraft:docs/smash-melee-reference/README.md.
 
@@ -230,6 +231,71 @@ Knockback, Knockback Growth and Set Knockback as per-hitbox arrays, empty for
 `-`. Angle 361 stays 361 (`SAKURAI_ANGLE`). It refuses a row with an unknown
 section, a wrong cell count or a non-numeric value, and `fightCoreSource` names
 the row and column a value came from.
+
+### Per-phase hitboxes and knockdown thresholds (Fox and Falco)
+
+The export collapses each move's hitboxes into one row. FightCore's move pages
+give them per phase, and per target fighter the percent where each hitbox
+reaches a knockdown threshold. `fightcore-intake.ts` reads the public pages
+of https://www.fightcore.gg for Fox and Falco: every move page with hits
+(`/characters/<id>/<fighter>/moves/<move id>/<move>/`) and the 26 fighter
+pages for target weights, fetched on 2026-10-26 (Next.js build
+`mCnHWCVj-AuXOKBpo5Uk9`), at most one request a second. Each record carries
+its page URL, fetch date and build. Only numbers and move names are kept; the
+pages' GIFs and animation credits are left out. FightCore's site code
+(https://github.com/FightCore/fightcore-next) carries no license; its data
+repository (https://github.com/FightCore/frame-data, GPL-3.0) says its JSON
+and CSV files are free to be used by others.
+
+- `fightcore-phases.jsonl`: one record per `(character, move, phase)` for
+  every Fox and Falco move FightCore lists with hits; moves without hits
+  (dodges, rolls, techs, jump) have none. `start`/`end` are the phase's active
+  frames, counting from 1; `0`/`0` where FightCore gives no range. `hitboxes` lists the phase's hitboxes (`id0`...)
+  with damage, angle (361 the Sakurai angle), base and set knockback, growth,
+  effect, weight independence, attacker and defender hitlag, each again when
+  the defender crouches, and shieldstun.
+- `fightcore-thresholds.jsonl`: for each phase of the moves FightCore gives a
+  crouch-cancel table (not grabs, pummels or throws), one record per hitbox
+  group (hitboxes of the phase with equal damage, angle, base, growth and set
+  knockback) and target fighter. `percent` maps the knockback threshold to the
+  target's lowest pre-hit percent that reaches it, one value per `staleness`:
+  80 (tumble, ASDI down fails), 120 (tumble through crouch cancel), and for
+  Sakurai-angle hitboxes 32 and 48 (the knockback where the angle stops
+  sending at 0 degrees for ASDI down and crouch cancel). `"never"` is
+  FightCore's "Never breaks"; set knockback is either 0 or never.
+
+How they relate to the export: the export's `Damage`, `Angle`,
+`Base Knockback`, `Knockback Growth` and `Set Knockback` columns list the
+distinct values over all of a move's phases and hitboxes, `-` standing for 0,
+so each column's value set equals the set over the move's phase records, and
+`First Active`/`Last Active` span the phases' ranges. The intake prints every
+move where they differ. On 2026-10-26 every value set agreed for all Fox and
+Falco moves; 24 frame ranges differ, all where one side gives none. The pages
+give no range (`0`/`0`) for the up, back and down throws, the specials (Blaster, Fox Illusion,
+Falco Phantasm, Fire Fox, Fire Bird, Falco's Reflector, ground and air) where
+the export has active frames, and the export gives none for the pummel (pages
+4-4) and the rapid jabs (pages 2-3) of both fighters.
+
+Thresholds: a page renders only its first phase's first hitbox, with fresh
+staleness and percents rounded up, which is what FightCore labels its
+"Ceiling percentages" default. The other phases, hitboxes and staleness
+levels are what the page shows when its tabs and staleness queue are clicked:
+FightCore's stated rule, percent `= (100 + weight) / 14 × ((100 / growth) ×
+(threshold − base) − 18) / (damage + 2) − damage × (1 − staleness)`, rounded
+up, and for set knockback the weight-dependent set-knockback formula. The
+intake applies that rule to every hitbox and refuses to write unless it
+reproduces every rendered card exactly. `staleness` lists the reductions when
+the move fills FightCore's nine-slot queue from slot 1 (0.09, then 0.08, …,
+0.01), from fresh to nine uses: 0, 0.09, 0.17, 0.24, 0.30, 0.35, 0.39, 0.42,
+0.44, 0.45. FightCore's rule subtracts the staled damage from the percent but
+keeps the fresh damage in the knockback term.
+
+Repeat the intake from the checkout's root (about two minutes; fetched pages
+are cached in the first directory):
+
+```sh
+bun references/melee-frame-data/fightcore-intake.ts /tmp/fightcore-pages references/melee-frame-data
+```
 
 ## Character attributes
 
