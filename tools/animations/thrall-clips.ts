@@ -23,8 +23,8 @@ ensure(source.Sequences.length === 7 && source.Bones.some(b => b.Name === "Hamme
 const stand = source.Sequences[0]!;
 const hero = heroDefinition(Character.thrall); ensure(hero, "Register Thrall before exporting his clips");
 interface Gesture { chest?: number; waist?: number; arm?: number; wrist?: number; leftArm?: number; head?: number; wolf?: number; neck?: number; front?: number; back?: number; yaw?: number; lean?: number; turn?: number; look?: number; hock?: number; shift?: number; }
-interface Key { frame: number; gesture: Gesture; ik: number; }
-interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; hold?: boolean; air?: boolean; roll?: number; pain?: boolean; keys?: readonly Key[]; reach?: number; }
+interface Key { frame: number; gesture: Gesture; ik: number; target?: readonly [number, number]; }
+interface Action { pose: HeroPose; frames: number; contact: number; gesture: Gesture; hold?: boolean; air?: boolean; roll?: number; pain?: boolean; keys?: readonly Key[]; }
 const forward: Gesture = {chest:20,waist:-10,arm:-95,wrist:35,leftArm:-35,head:-10,neck:-8,front:15};
 const overhead: Gesture = {chest:-18,waist:10,arm:-165,wrist:25,leftArm:-65,head:-15,wolf:-8,front:-30,back:15};
 const low: Gesture = {chest:10,waist:5,arm:-25,wrist:0,leftArm:-35,head:-15,wolf:5,neck:10,front:-55,back:15};
@@ -32,17 +32,19 @@ const back: Gesture = {chest:-15,waist:-20,arm:55,wrist:35,leftArm:-40,head:15,y
 const cast: Gesture = {chest:-20,waist:8,arm:-115,wrist:20,leftArm:-120,head:-20,neck:-10,front:-10};
 const brace: Gesture = {chest:35,waist:10,arm:-45,wrist:25,leftArm:-60,head:-20,wolf:6,front:35,back:35};
 const kickCoil: Gesture = {chest:55,waist:10,arm:-172,wrist:50,leftArm:-40,head:-35,look:30,yaw:-10,turn:8,shift:10,lean:-8,wolf:18,neck:-30,front:50,back:-120,hock:30};
-const kick: Gesture = {chest:-10,waist:-5,arm:-190,wrist:30,leftArm:-60,head:5,look:75,yaw:10,turn:-18,shift:-3,wolf:-20,neck:20,front:-35,back:100};
-const kickRecoil: Gesture = {chest:5,waist:0,arm:-185,wrist:25,leftArm:-55,head:5,look:40,yaw:10,turn:-6,shift:-4,wolf:-8,neck:5,front:-10,back:40};
-const hammerCoil: Gesture = {chest:5,waist:15,arm:-185,wrist:25,leftArm:-70,head:-15,look:-30,yaw:0,turn:-15,shift:6,lean:6,wolf:10,neck:-15,front:20,back:-30};
-const hammerHit: Gesture = {...back,chest:-20,waist:-25,yaw:120,shift:-5,lean:-6,wolf:-8,neck:-20,front:-25,back:-25,look:20};
-const hammerHold: Gesture = {...hammerHit,chest:-22,yaw:125,shift:-6,lean:-8};
-const unwind: Gesture = {chest:-14,waist:-15,arm:-105,wrist:25,leftArm:-46,look:15,yaw:94,shift:-4,lean:-5,wolf:-5,neck:-15,front:-18,back:-18};
+const kick: Gesture = {chest:-10,waist:-10,arm:35,wrist:75,leftArm:-60,head:5,look:75,yaw:10,turn:-18,shift:-3,wolf:0,neck:20,front:-35,back:60};
+const kickRecoil: Gesture = {chest:10,waist:-5,arm:40,wrist:45,leftArm:-55,head:5,look:40,yaw:10,turn:-6,shift:-4,wolf:-8,neck:5,front:-10,back:40};
+const hammerCoil: Gesture = {chest:30,waist:15,arm:-175,wrist:40,leftArm:-70,head:-20,look:-30,yaw:-10,turn:-15,shift:8,lean:8,wolf:12,neck:-15,front:25,back:-35};
+const hammerHit: Gesture = {...back,chest:-5,waist:-10,yaw:30,shift:-12,lean:-6,turn:-20,wolf:-12,neck:-25,front:-35,back:-30,look:20};
+const hammerChop: Gesture = {chest:-22,waist:-15,arm:80,wrist:0,leftArm:-45,head:10,look:20,yaw:-20,turn:-20,shift:-12,lean:-10,wolf:4,neck:-15,front:-25,back:20};
+const unwind: Gesture = {chest:-12,waist:-10,arm:60,wrist:30,leftArm:-35,look:10,yaw:20,turn:-8,shift:-6,lean:-5,wolf:-6,neck:-8,front:20,back:-10};
+const settle: Gesture = {chest:12,waist:4,arm:-20,wrist:8,leftArm:-8,head:-4,wolf:5,neck:4,front:10,back:8,shift:2};
+const coilReach = [55,165] as const, kickReach = [-90,140] as const, hammerReach = [-105,98] as const, chopReach = [-90,72] as const, trailReach = [-38,88] as const;
 const backAirKeys = (kickAt: number, hammerAt: number, frames: number): Key[] => [
- {frame:0,gesture:{},ik:0}, {frame:kickAt-4,gesture:kickCoil,ik:0}, {frame:kickAt-2,gesture:{...kickCoil,chest:60,arm:-176,front:55,back:-130,hock:35,wolf:22,shift:12},ik:0},
- {frame:kickAt,gesture:kick,ik:0}, {frame:kickAt+1,gesture:{...kick,back:125,wolf:-26,turn:-22,shift:-13},ik:0}, {frame:kickAt+3,gesture:kickRecoil,ik:0},
- {frame:hammerAt-3,gesture:hammerCoil,ik:0}, {frame:hammerAt,gesture:hammerHit,ik:1}, {frame:hammerAt+3,gesture:hammerHold,ik:1},
- {frame:hammerAt+11,gesture:unwind,ik:0},
+ {frame:0,gesture:{},ik:0}, {frame:kickAt-4,gesture:kickCoil,ik:1,target:coilReach}, {frame:kickAt-2,gesture:{...kickCoil,chest:60,front:55,back:-130,hock:35,wolf:22,shift:12},ik:1,target:coilReach},
+ {frame:kickAt,gesture:{...kick,lean:-18},ik:1,target:kickReach}, {frame:kickAt+1,gesture:{...kick,lean:-18,back:75,wolf:4,turn:-22,shift:-13},ik:1,target:kickReach}, {frame:kickAt+3,gesture:kickRecoil,ik:0},
+ {frame:hammerAt-3,gesture:hammerCoil,ik:0}, {frame:hammerAt,gesture:{...hammerHit,lean:-22,wolf:-12,chest:-24,shift:-24},ik:1,target:hammerReach}, {frame:hammerAt+2,gesture:{...hammerHit,lean:-32,wolf:-16,chest:-34,waist:-20,shift:-28},ik:1,target:hammerReach},
+ {frame:hammerAt+5,gesture:hammerChop,ik:1,target:chopReach}, {frame:frames-13,gesture:unwind,ik:1,target:trailReach}, {frame:frames-6,gesture:settle,ik:0},
  {frame:frames-2,gesture:{},ik:0}, {frame:frames,gesture:{},ik:0},
 ];
 const headAnticipation: Partial<Record<HeroPose, number>> = { jab: 30, jab2: 30, forwardTilt: 15, forwardTiltDown: 45, downTilt: 45, dashAttack: 75 };
@@ -54,7 +56,7 @@ const normals: readonly [HeroPose, AttackStyle, Gesture][] = [
  ["forwardSmash",AttackStyle.forwardSmash,{...forward,chest:35,waist:-20,arm:-115,wrist:60}], ["upSmash",AttackStyle.upSmash,{...overhead,chest:-30,arm:-175}], ["downSmash",AttackStyle.downSmash,{...low,chest:70,yaw:45}],
  ["neutralAir",AttackStyle.neutralAir,{...forward,yaw:70}], ["forwardAir",AttackStyle.forwardAir,{...forward,wolf:12}], ["backAir",AttackStyle.backAir,back], ["upAir",AttackStyle.upAir,overhead], ["downAir",AttackStyle.downAir,{...low,front:-65,neck:15}],
 ];
-for (const [pose,style,gesture] of normals) { const move=hero.moves.normals[style];ensure(move,`${pose}: missing move timing`); const [kickRegion,hammerRegion]=move.regions; const beats=pose==="backAir"&&kickRegion&&hammerRegion?{keys:backAirKeys(kickRegion.firstFrame,hammerRegion.firstFrame,move.totalFrames),reach:hammerRegion.firstFrame}:{}; actions.push({pose,frames:move.totalFrames,contact:move.startupFrames,gesture,air:pose.endsWith("Air"),...beats}); }
+for (const [pose,style,gesture] of normals) { const move=hero.moves.normals[style];ensure(move,`${pose}: missing move timing`); const [kickRegion,hammerRegion]=move.regions; const beats=pose==="backAir"&&kickRegion&&hammerRegion?{keys:backAirKeys(kickRegion.firstFrame,hammerRegion.firstFrame,move.totalFrames)}:{}; actions.push({pose,frames:move.totalFrames,contact:move.startupFrames,gesture,air:pose.endsWith("Air"),...beats}); }
 const extra: readonly [HeroPose,number,number,Gesture][] = [
  ["crouch",30,12,brace],["landing",8,2,brace],["shield",30,8,{...brace,leftArm:-100}],["airDodge",49,4,{...brace,lean:-25}], ["smashCharge",30,8,{...overhead,arm:-100}],["dizzy",60,25,{chest:-15,head:30,arm:20,leftArm:15,neck:15}],
  ["turn",8,4,{yaw:140,chest:-12,neck:-15}], ["stop",8,3,{...brace,lean:-18}], ["jumpSquat",5,4,{...brace,wolf:12,front:55,back:55}],
@@ -97,7 +99,7 @@ for(const [ordinal,action]of [...actions,...damageActions].entries()){
  if(!reuse)cursor=end+100;
  model.Sequences.push({...stand,Name:name,Interval:new Uint32Array([start,end]),NonLooping:true,MoveSpeed:0,Rarity:0,MinimumExtent:new Float32Array([-300,-300,-200]),MaximumExtent:new Float32Array([300,300,350]),BoundsRadius:400});
  const phaseFrames=[0,Math.max(1,action.contact-3),action.contact,Math.min(action.frames-1,action.contact+4),action.frames];
- const phases=action.keys?action.keys.map(k=>({frame:k.frame,amount:1,gesture:k.gesture,ik:k.ik})):phaseFrames.map((frame,i)=>{const amount=action.pain?1:i===0?0:i===1?-0.3:i===4?(action.hold?1:0):1;return {frame,amount,gesture:action.gesture,ik:amount};});
+ const phases:{frame:number;amount:number;gesture:Gesture;ik:number;target?:readonly [number,number]}[]=action.keys?action.keys.map(k=>({frame:k.frame,amount:1,gesture:k.gesture,ik:k.ik,target:k.target})):phaseFrames.map((frame,i)=>{const amount=action.pain?1:i===0?0:i===1?-0.3:i===4?(action.hold?1:0):1;return {frame,amount,gesture:action.gesture,ik:amount};});
  tracks(model,(track,path)=>{
   const donor=originals.get(path);if(!donor||onGlobalClock(donor))return;let first=donor.Keys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1]);
   if(!first && /^\.(Bones|Helpers)\.\d+\.(Rotation|Translation|Scaling)$/.test(path)){const Vector=new Float32Array(path.endsWith("Rotation")?[0,0,0,1]:path.endsWith("Scaling")?[1,1,1]:[0,0,0]);first={Frame:stand.Interval[0],Vector,...track.LineType>1?{InTan:Vector.slice(),OutTan:Vector.slice()}: {}};}
@@ -115,20 +117,24 @@ for(const [ordinal,action]of [...actions,...damageActions].entries()){
  if(!center.Translation)center.Translation={LineType:1,GlobalSeqId: NO_GLOBAL_SEQ,Keys:source.Sequences.flatMap(s=>Array.from(s.Interval).map(Frame=>({Frame,Vector:new Float32Array([0,0,0])})))};
  if (["jab","jab2","forwardTilt","forwardTiltUp","forwardTiltDown","upTilt","downTilt","dashAttack","forwardSmash","upSmash","downSmash","neutralAir","forwardAir","backAir","upAir","downAir","throwForward","throwBack","throwUp","throwDown"].includes(action.pose)) {
   const headContact = ["jab","jab2","forwardTilt"].includes(action.pose);
-  const target = action.pose === "backAir" ? [-56,108] : action.pose === "jab" ? [45,70] : action.pose === "jab2" ? [50,72] : action.pose === "forwardTilt" ? [92,75] : action.pose.includes("Up") || action.pose.startsWith("up") ? [5,180] : action.pose==="downAir" ? [20,105] : action.pose.includes("Down") || action.pose.startsWith("down") ? [30,110] : action.pose.includes("Back") || action.pose.startsWith("back") ? [-65,135] : [60,130];
+  const target = action.pose === "jab" ? [45,70] : action.pose === "jab2" ? [50,72] : action.pose === "forwardTilt" ? [92,75] : action.pose.includes("Up") || action.pose.startsWith("up") ? [5,180] : action.pose==="downAir" ? [20,105] : action.pose.includes("Down") || action.pose.startsWith("down") ? [30,110] : action.pose.includes("Back") || action.pose.startsWith("back") ? [-65,135] : [60,130];
 
-  const renderer = new ModelRenderer(model), data = Reflect.get(renderer,"rendererData");renderer.setSequence(index);data.frame=start+Math.round((action.reach??action.contact)*1000/60);
+  const renderer = new ModelRenderer(model), data = Reflect.get(renderer,"rendererData");renderer.setSequence(index);
   const arm=model.Nodes.find(n=>n.Name==="Bone Rider R Arm")!,wrist=model.Nodes.find(n=>n.Name==="Bone Rider R Wrist")!,weapon=model.Nodes.find(n=>n.Name==="Weapon Ref")!,pivot=model.PivotPoints[weapon.ObjectId]!;
   const donor=(n:mdx.Model["Nodes"][number])=>source.Nodes[n.ObjectId]!.Rotation!.Keys.find(k=>k.Frame>=stand.Interval[0]&&k.Frame<=stand.Interval[1])!.Vector;
   const armBase=donor(arm),wristBase=donor(wrist);
   const hammer=model.Nodes.find(n=>n.Name==="Hammer")!;
   const head=source.Geosets.filter(g=>source.Materials[g.MaterialID]!.Layers.some(layer=>Number(layer.FilterMode)<=2)).flatMap(g=>Array.from({length:g.Vertices.length/3},(_,i)=>i).filter(i=>g.Groups[g.VertexGroup[i]!]!.includes(hammer.ObjectId)&&g.Vertices[i*3]!>=0).map(i=>[g.Vertices[i*3]!,g.Vertices[i*3+1]!,g.Vertices[i*3+2]!]));
   const contactPoint=headContact?head[0]!.map((_,i)=>(Math.min(...head.map(p=>p[i]!))+Math.max(...head.map(p=>p[i]!)))/2):pivot;
-  const set=(n:mdx.Model["Nodes"][number],base:ArrayLike<number>,y:number,z:number)=>{ for(const {frame,ik}of phases) {if(action.keys&&ik===0)continue;const key=n.Rotation!.Keys.find(k=>k.Frame===start+Math.round(frame*1000/60))!;key.Vector=rotated(base,y*ik,z*ik);if(key.InTan){key.InTan=key.Vector.slice();key.OutTan=key.Vector.slice();}} };
+  const solves=action.keys?.some(k=>k.target)?[...new Map(action.keys.filter(k=>k.target).reverse().map(k=>[k.target!,{frame:k.frame,target:k.target!}])).values()]:[{frame:action.contact,target}];
+  for(const solve of solves){
+  data.frame=start+Math.round(solve.frame*1000/60);
+  const set=(n:mdx.Model["Nodes"][number],base:ArrayLike<number>,y:number,z:number)=>{ for(const {frame,ik,target:goal}of phases) {if(action.keys&&ik===0||solves.length>1&&goal!==solve.target)continue;const key=n.Rotation!.Keys.find(k=>k.Frame===start+Math.round(frame*1000/60))!;key.Vector=rotated(base,y*ik,z*ik);if(key.InTan){key.InTan=key.Vector.slice();key.OutTan=key.Vector.slice();}} };
   let angles=[0,0,0,0];
-  const loss=()=>{set(arm,armBase,angles[0]!,angles[1]!);set(wrist,wristBase,angles[2]!,angles[3]!);renderer.update(0);const mat=data.nodes[headContact?hammer.ObjectId:weapon.ObjectId].matrix;const x=mat[0]*contactPoint[0]!+mat[4]*contactPoint[1]!+mat[8]*contactPoint[2]!+mat[12],z=mat[2]*contactPoint[0]!+mat[6]*contactPoint[1]!+mat[10]*contactPoint[2]!+mat[14];return (x-target[0]!)**2+(z-target[1]!)**2;};
+  const loss=()=>{set(arm,armBase,angles[0]!,angles[1]!);set(wrist,wristBase,angles[2]!,angles[3]!);renderer.update(0);const mat=data.nodes[headContact?hammer.ObjectId:weapon.ObjectId].matrix;const x=mat[0]*contactPoint[0]!+mat[4]*contactPoint[1]!+mat[8]*contactPoint[2]!+mat[12],z=mat[2]*contactPoint[0]!+mat[6]*contactPoint[1]!+mat[10]*contactPoint[2]!+mat[14];return (x-solve.target[0]!)**2+(z-solve.target[1]!)**2;};
   for(let pass=0;pass<4;pass++)for(let dim=0;dim<4;dim++){let best=Infinity,bestAngle=0;for(let value=-180;value<=180;value+=pass<2?15:5){angles[dim]=value;const distance=loss();if(distance<best){best=distance;bestAngle=value;}}angles[dim]=bestAngle;}
   loss();
+  }
   if(headContact){
    const waist=model.Nodes.find(n=>n.Name==="Bone Rider Waist")!,parent=data.nodes[waist.Parent!].matrix,mat=data.nodes[hammer.ObjectId].matrix;
    const x=mat[0]*contactPoint[0]!+mat[4]*contactPoint[1]!+mat[8]*contactPoint[2]!+mat[12],z=mat[2]*contactPoint[0]!+mat[6]*contactPoint[1]!+mat[10]*contactPoint[2]!+mat[14];
