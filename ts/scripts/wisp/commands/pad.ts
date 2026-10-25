@@ -586,7 +586,7 @@ const pad: Command = (args) => Effect.gen(function*() {
     } }),
     catch: (cause) => new UsageFailure({ problem: describeCause(cause) }),
   });
-  if (parsed.values.headless !== true) {
+  if (parsed.values.headless !== true && parsed.values.pairs === undefined && (parsed.values.pair?.length ?? 0) === 0) {
     const clientsFile = parsed.values["clients-file"] ?? clientState;
     yield* Effect.try({ try: () => readClientsFile(clientsFile), catch: (cause) => new UsageFailure({ problem: `can't read the clients from ${clientsFile}: ${describeCause(cause)}` }) });
   }
