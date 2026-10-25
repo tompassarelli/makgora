@@ -1,7 +1,8 @@
+import { DEFENCE_ROWS } from "./defence";
 import { HIT_ROWS } from "./hits";
 import { type Anchor, FAMILY_TITLES, type Family, type LedgerRow, type Status, type Value, sameValue, showValue } from "./row";
 
-export const LEDGER_ROWS: readonly LedgerRow[] = [...HIT_ROWS];
+export const LEDGER_ROWS: readonly LedgerRow[] = [...HIT_ROWS, ...DEFENCE_ROWS];
 
 export const PAGE_PATH = "docs/design/melee-parity.md";
 

@@ -1,9 +1,10 @@
 export type Value = number | string;
 
-export type Family = "hits";
+export type Family = "hits" | "defence";
 
 export const FAMILY_TITLES: Readonly<Record<Family, string>> = {
   hits: "Hits, knockback and hitstun",
+  defence: "Defence: techs, knockdown, getups, shield, grabs and throws",
 };
 
 export type Melee =

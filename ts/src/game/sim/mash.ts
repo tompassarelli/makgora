@@ -4,7 +4,7 @@ import { max, min } from "../core/numbers";
 import type { Controls } from "./roster";
 
 
-const MASH_FRAMES = 8;
+export const MASH_FRAMES = 8;
 
 
 interface MashMemory {

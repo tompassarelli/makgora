@@ -1842,33 +1842,39 @@ native multiplayer behavior require a loaded Warcraft build to validate.
 
 ## Grab, pummel, throw and escape
 
-The capture timer now uses `floor(76 + 1.6 * damage_at_capture)` rather than
-20 frames. This is the equal-ranking Melee profile reported by
-https://www.ssbwiki.com/Grab. Smashcraft currently applies no ranking/handicap
-adjustment. That is an explicit simplification; it does not claim full Melee
-capture parity. Damage during a hold does not recalculate its initial timer.
+The capture timer is `floor(90 + 1.75 * damage_at_capture)` frames in integer
+math (`grabHoldFrames` in smashcraft:ts/src/game/sim/moves.ts), Ultimate's
+formula rather than Melee's equal-ranking `floor(76 + 1.6 * damage)`
+(https://www.ssbwiki.com/Grab); Tom chose it on 2026-10-14, and the
+`grab-hold` row of smashcraft:docs/design/melee-parity.md records the
+deviation. Damage during a hold does not recalculate its initial timer.
 
 The input behavior is our own design target. Any fresh Attack/Special/Jump/Grab/
 shield-button edge supplies one mash contribution per frame. Multiple buttons
 in that frame still count once. A change to either or both remembered nonneutral
 movement-axis signs supplies a separate contribution; neutral does not erase
-the remembered sign. Each contribution removes six frames, in addition to the
-ordinary countdown. The six-frame value comes from the published grab
-reference. C-stick and walk-modifier inputs are not grab-mash buttons.
+the remembered sign. Each contribution removes eight frames (`MASH_FRAMES`,
+Ultimate's stick value; Melee's is six), in addition to the ordinary
+countdown, but no hold ends before its 60th frame (`GRAB_HOLD_MINIMUM_FRAMES`).
+C-stick and walk-modifier inputs are not grab-mash buttons.
 
-Fresh Attack has priority over direction when selecting a held action. Attack
-starts one pummel; holding it cannot repeat. Fresh movement or C-stick direction
-selects a throw relative to the holder's facing (vertical takes priority on a
-diagonal). Commands during pummel/throw recovery are discarded, not buffered
-into another action. Escape is evaluated before a new pummel/throw selection.
+Fresh Attack has priority over direction when selecting a held action. Each
+fresh Attack press in the hold starts a pummel, so pummels repeat as in Melee;
+holding Attack does not. Fresh movement or C-stick direction selects a throw
+relative to the holder's facing (vertical takes priority on a diagonal). A
+throw pressed during a pummel starts when the pummel ends; other commands
+during pummel/throw recovery are discarded. Escape is evaluated before a new
+pummel/throw selection.
 Once a throw begins its victim stays committed until release or interruption.
 Ordinary attack requests are cleared throughout both ends of the grab context,
 including its final tick. Special input cannot leak through on release.
 
 Contact/release and total frame counts are one-based and owned by
-smashcraft:wurst/Simulation.wurst (`grabContactFrame`, `grabActionDuration`).
-Pummel deals three damage once, without launch, and freezes both clips and the
-hold timer during its normal hitlag. The four throws each deal damage once at
+smashcraft:ts/src/game/sim/moves.ts (`grabContactFrame`, `grabActionDuration`).
+A pummel lasts 7 frames and connects on frame 3 unless a kit authors its own,
+dealing three damage without launch and spending 3 frames of the victim's
+remaining hold, never the last one; it freezes both clips and the hold timer
+during its normal hitlag. The four throws each deal damage once at
 release and use the shared knockback/hitstun formula; throw DI uses the victim's
 input on that frame, without adding ordinary hitlag or SDI. Down throw visually
 slams to the floor and launches into an upward bounce. Character throw damage,
