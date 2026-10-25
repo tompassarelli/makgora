@@ -277,6 +277,18 @@ function quietSmoke(target:mdx.Model,cells:readonly number[]){
       visibility.Keys.sort((a,b)=>a.Frame-b.Frame);}
   }
 }
+function verifyPain(bytes:ArrayBuffer,cells:readonly number[]):DrawnModel{
+  const drawn=new DrawnModel(bytes,1),before=new DrawnModel(generateMDX(source),1);
+  for(const [index,s]of source.Sequences.entries())if(!cells.includes(index))for(const progress of [0,.5,1]){
+    const time=(s.Interval[1]!-s.Interval[0]!)*progress/1000,a=before.triangles(index,time,1),b=drawn.triangles(index,time,1);
+    ensure(a.length===b.length&&a.every((v,i)=>Math.abs(v-b[i]!)<.001),`${s.Name}: shipped pose changed`);
+  }
+  for(let a=0;a<cells.length;a++)for(let b=a+1;b<cells.length;b++){
+    const first=drawn.triangles(cells[a]!,0,1),second=drawn.triangles(cells[b]!,0,1);
+    ensure(first.length===second.length&&first.some((v,i)=>Math.abs(v-second[i]!)>2),`Pain cells ${a}/${b} share a silhouette`);
+  }
+  return drawn;
+}
 async function authorPain(){
   const pains=actions.filter(a=>a.pose.startsWith("pain"));
   const cells=pains.map(a=>{const i=model.Sequences.findIndex(s=>s.Name===`Tinker ${a.pose}`);ensure(i>=0,`${a.pose}: shipped sequence missing`);return i;});
@@ -311,15 +323,7 @@ async function authorPain(){
     const lows=Array.from({length:action.frames+1},(_,frame)=>body.floor(cells[n]!,frame/60));
     for(const [frame,low]of lows.entries())floor.Translation.Keys.find(k=>k.Frame===frameKey(start,frame))!.Vector=new Float32Array([0,0,-low]);
   }
-  const bytes=encodeVerified(parseSource(generateMDX(model))),drawn=new DrawnModel(bytes,1),before=new DrawnModel(generateMDX(source),1);
-  for(const [index,s]of source.Sequences.entries())if(!cells.includes(index))for(const progress of [0,.5,1]){
-    const time=(s.Interval[1]!-s.Interval[0]!)*progress/1000,a=before.triangles(index,time,1),b=drawn.triangles(index,time,1);
-    ensure(a.length===b.length&&a.every((v,i)=>Math.abs(v-b[i]!)<.001),`${s.Name}: shipped pose changed`);
-  }
-  for(let a=0;a<cells.length;a++)for(let b=a+1;b<cells.length;b++){
-    const first=drawn.triangles(cells[a]!,0,1),second=drawn.triangles(cells[b]!,0,1);
-    ensure(first.length===second.length&&first.some((v,i)=>Math.abs(v-second[i]!)>2),`Pain cells ${a}/${b} share a silhouette`);
-  }
+  const bytes=encodeVerified(parseSource(generateMDX(model))),drawn=verifyPain(bytes,cells);
   const gate=painGate(bytes,Character.tinker,standIndex(bytes),cells);
   console.log(gate.report);ensure(gate.pass,"Tinker pain poses fail the pain gate");
   await Bun.write(join(output,"hero-models/herotinker.mdx"),bytes);
