@@ -1,4 +1,4 @@
-# Sylvanas Banshee Form native proof, flying right: she transforms on ultimate frames 1-18, homes onto the Mountain King as he runs under her dive, turns back after him and passes through him; the drawn banshee should cover her contact capsule.
+# Sylvanas Banshee Form native proof, flying right: she transforms on ultimate frames 1-18 and glides low at the Mountain King; he runs at her and rolls through her, and she swings up and back round after him and passes through him; the drawn banshee should cover her contact capsule.
 #! chat -dev setup quick pair sylvanas windrunner / mountain king;meter 100
 #! cue 61-78 transform: effect=PossessionTarget
 #! cue 79-158 banshee: effect=Banshee
@@ -8,20 +8,23 @@
 64 a release A
 66 a capture
 70 a capture
+71 b stick -1 0
 74 a capture
-76 b stick -1 0
 78 a capture
 82 a capture
 86 a capture
+88 b stick 0 0
+89 b shield 1
+89 b stick -1 0
+90 b shield 0
+90 b stick 0 0
 90 a capture
 94 a capture
-96 b stick 1 0
 98 a capture
 102 a capture
 106 a capture
 110 a capture
 114 a capture
-116 b stick 0 0
 118 a capture
 122 a capture
 126 a capture

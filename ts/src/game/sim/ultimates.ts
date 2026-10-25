@@ -224,7 +224,7 @@ const JAINA: AuthoredSpecial = {
 };
 
 const BANSHEE_SPEED = 9.0;
-const BANSHEE_TURN = { turnCos: f32(0.9975640502598242), turnSin: f32(0.0697564737441253) };
+const BANSHEE_TURN = { turnCos: f32(0.9902680687415704), turnSin: f32(0.13917310096006544) };
 const BANSHEE_CARRY_SPEED = 13.0;
 const BANSHEE_CARRY: AuthoredSpecial = {
   endFrame: 41,
@@ -235,7 +235,8 @@ const SYLVANAS: AuthoredSpecial = {
   name: "Banshee Form", endFrame: 128,
   projectiles: [mark("Abilities\\Spells\\Undead\\Possession\\PossessionCaster.mdx", 2, 17, 0.0)],
   motion: [
-    { ...frames(1, 18), velocityX: 0.0, velocityZ: 1.5 },
+    { ...frames(1, 17), velocityX: 0.0, velocityZ: 1.0 },
+    { ...frames(18, 18), velocityX: 1.0, velocityZ: 0.0 },
     { ...frames(19, 98), velocityX: 0.0, velocityZ: 0.0, seek: { speed: BANSHEE_SPEED, ...BANSHEE_TURN } },
     { ...frames(99, 99), velocityX: 0.0, velocityZ: 0.0 },
   ],
@@ -436,7 +437,7 @@ const ULTIMATE_DESCRIPTIONS: { readonly [character: number]: string | undefined 
   [Character.lichKing]: "Runes mark the ground under the nearest foe; the dead claw up there a moment later. Step off the mark.",
   [Character.thrall]: "Tremors run along the ground both ways. Jump them or stand on a platform.",
   [Character.jaina]: "A ray of frost sweeps down from high ahead of her to the floor. Get behind her or shield.",
-  [Character.sylvanas]: "She becomes a banshee, homes in on the nearest foe and passes through them. Hit her while she changes; shield, roll under her dive or run out of her path.",
+  [Character.sylvanas]: "She becomes a banshee, glides low at the nearest foe, swings back round after them and passes through them. Hit her while she changes; shield, roll through her late or run away.",
   [Character.cairne]: "An ankh appears at centre stage. After 24 frames it bursts, then he teleports there with 6 frames of intangibility. Shield or leave the ankh; punish his arrival recovery.",
   [Character.chen]: "He splits into Earth, Storm and Fire, which strike around him one after another.",
   [Character.peon]: "He builds five Orc watch towers in quick succession across the stage; each shoots arrows at the nearest foe for about three seconds, then crumbles. Break a tower, shield or dodge the arrows, or hit him while he builds.",

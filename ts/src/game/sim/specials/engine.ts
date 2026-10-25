@@ -536,7 +536,8 @@ function seekFoe(f: Fighter, world: Roster, speed: number, turnCos: number, turn
         headingX = wantX;
         headingZ = wantZ;
       } else {
-        const sine = f32(f32(headingX * wantZ) - f32(headingZ * wantX)) >= 0.0 ? turnSin : -turnSin;
+        const cross = f32(f32(headingX * wantZ) - f32(headingZ * wantX));
+        const sine = cross > 0.0 || (cross === 0.0 && (headingX !== 0.0 ? headingX > 0.0 : f.facing > 0)) ? turnSin : -turnSin;
         const turnedX = f32(f32(headingX * turnCos) - f32(headingZ * sine));
         const turnedZ = f32(f32(headingZ * turnCos) + f32(headingX * sine));
         length = squareRoot(f32(f32(turnedX * turnedX) + f32(turnedZ * turnedZ)));
