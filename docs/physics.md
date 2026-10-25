@@ -449,24 +449,20 @@ shieldstun ticks. Previously the zero-power conversion produced a different
 launch and only one shieldstun tick. The focused timing check passed **5/5**
 with zero compiler errors (smashcraft:build/physics-fractional-power.log).
 These checks establish the conversion and existing formula behavior, not
-independent NTSC 1.02 frame-trace or native-game parity.
+independent frame-trace or native-game parity.
 
 Stale moves and freshness bonuses are omitted (smashcraft:docs/gameplay-design.md,
 “Stale moves and freshness bonuses”): there is no staling queue or projectile
 staleness snapshot.
 
-September 30 reference check: SmashWiki's Hitstun article identifies the
-unconditional subtraction of one frame with Ultimate, not Melee. The local
-Melee reference, revision above, initializes the damage counter from truncated
-scaled knockback in Melee and decrements
-it before the damage state's input transitions. Keep floor(0.4*K); jump and
-attack must become eligible on the same expiry tick. The focused test exposed
+SmashWiki's Hitstun article identifies the unconditional subtraction of one
+frame with Ultimate, not Melee. Smashcraft keeps floor(0.4*K) and decrements
+the counter before the damage state's input transitions, so jump and attack
+become eligible on the same expiry tick. The focused test exposed
 and corrected our jump check occurring before the hitstun decrement.
 
-Melee, a Melee routine, confirms separate truncation
-stages for base duration, effect multiplier and crouch multiplier.
-Melee caps the result using common data. SmashWiki's
-Hitlag article supplies the numeric normal rule and cap of 20. Normal hits now
+SmashWiki's Hitlag article gives separate truncation stages for base
+duration, effect multiplier and crouch multiplier, and the cap of 20. Normal hits now
 derive hitlag from damage (zero damage gives zero), including tip/weak regions;
 shield contacts pause the victim's shieldstun during hitlag, and detached
 projectiles/summons do not freeze the summoner. Numerical crouch state is
@@ -545,11 +541,11 @@ delayed-input counterexample, with zero compiler errors and the existing
 unused-import warning (smashcraft:build/physics-slippi-jump.log).
 
 Launch speed already uses 0.03*K, converted by the six-world-units scale.
-Tumble follows the reference's damage-level selection: level 3,
-DamageFly, when knockback times = 0.4 reaches = 32, grounded or
-airborne. Only tumbling landings tech or knock down; a weaker airborne hit
-lands, or keeps its stun below = 0.5, because its launch never reaches
-the = 5 knockdown speed.
+A hit tumbles when knockback × 0.4 reaches 32 frames of hitstun (SmashWiki
+"Tumble"), grounded or airborne. Only tumbling landings tech or knock down; a
+weaker airborne hit lands, or keeps its stun below launch speed 0.5 (SmashWiki
+"Hitstun"), because its launch never reaches Smashcraft's knockdown speed in
+smashcraft:ts/src/game/sim/knockback.ts.
 smashcraft:ts/src/game/sim/tumbleLandings.tests.ts checks every authored move
 of each fighter at 10, 50 and 100 percent, grounded and airborne.
 
@@ -629,27 +625,25 @@ the running client has not loaded it and native combat feel is unverified.
 
 ## Grounded knockdown and jab resets
 
-Our design target, from public frame data (SmashWiki Get-up attack and Tech
-pages), is separate bound, wait, down-damage, stand, get-up attack, and
-directional-roll states. The reference values are recorded in this document.
+Our design target, from public frame data (SmashWiki "Get-up attack" and
+"Tech"), is separate bound, wait, down-damage, stand, get-up attack and
+directional-roll states. The input thresholds and the down-wait timeout below
+are Smashcraft's, held in smashcraft:ts/src/game/sim/down.ts; no public page
+states Melee's.
 
-- DownBound's entry forgets earlier A/B presses. As the bound ends,
-  a Melee routine starts a get-up attack pressed during it (A/B press
-  age under = 60 frames, longer than any bound), else a get-up roll
-  from the held stick, else enters DownWait with = 220 frames.
-  DownWait reads that same frame's input.
+- DownBound's entry forgets earlier A/B presses. As the bound ends, a get-up
+  attack pressed during it starts (presses stay live longer than any bound),
+  else a get-up roll from the held stick, else DownWait, which stands once its
+  timeout runs out. DownWait reads that same frame's input.
 - DownWait counts down, then stands. Each frame it takes, in order: an A or B
-  press (get-up attack), the stick at least = 0.2 sideways and less
-  than = 50 degrees above horizontal (roll forward or back relative to
-  facing), and the stick at least = 0.2 up at 50 degrees or more, or an
-  L/R press (stand).
-- A C-stick flick does the same on the frame it crosses its threshold:
-  a Melee routine and a Melee routine attack on an up crossing of =
-  0.6625, and
-  a Melee routine rolls on a sideways crossing of within the
-  roll angle, preferring it to the left stick. The roll is
-  forward or back by the flick's side. The C-stick is digital here, so a press
-  of its smash direction is the crossing; held through the wait it does nothing.
+  press (get-up attack), the stick tilted sideways below the roll angle (roll
+  forward or back relative to facing), and the stick tilted up at the roll
+  angle or more, or an L/R press (stand).
+- A C-stick flick does the same on the frame it crosses its threshold: an up
+  crossing attacks and a sideways crossing within the roll angle rolls,
+  preferring it to the left stick. The roll is forward or back by the flick's
+  side. The C-stick is digital here, so a press of its smash direction is the
+  crossing; held through the wait it does nothing.
 - Smashcraft also stands on Jump and treats a sideways press released within
   its input row as a roll, for keyboards.
 
@@ -657,50 +651,30 @@ smashcraft:ts/src/game/match/knockdownInputContracts.tests.ts drives these
 through helper rows, journal packets and synchronized input messages after
 low-, medium- and high-percent knockdowns.
 
-The extracted Sheik actions provide `DownBoundU/D` 26-frame clips,
-`DownDamageU/D` 14-frame clips, and `DownStandU/D` 30-frame clips. The
-frame-data records give Sheik 49 ticks for each get-up attack and 35 ticks for
-each directional get-up roll. Other characters' recorded action lengths vary
-by one or more ticks. Smashcraft uses one shared profile (smashcraft:docs/gameplay-design.md,
-"Controls"): 26 bound,
-13 down-damage, 30 stand, 49 get-up attack, and 35 get-up roll ticks. These
-shared values are action timing choices informed by the extracted data, not a
-claim that every Melee character shares them. The authored source starts clips
-at animation frame 0 while simulation actions count from frame 1.
+FightCore gives Sheik 49 frames for each get-up attack and 35 for each
+directional get-up roll (smashcraft:references/melee-frame-data/fightcore.csv,
+"Getups/Techs"); other characters' lengths vary by one or more frames.
+Smashcraft uses one shared profile (smashcraft:docs/gameplay-design.md,
+"Controls"): 26 bound, 13 down-damage, 30 stand, 49 get-up attack and 35 get-up
+roll ticks. The bound, down-damage and stand lengths and the get-up
+intangibility (20 frames for stand and forward roll, 23 for a backward roll
+face-up, 20 face-down, 27 and 22 for the Up and Down get-up attacks) are
+Smashcraft's timing; no public page states Melee's. Animation frame 0 is shown
+on simulation recovery frame 1, so protection through animation frame N covers
+simulation frames 1 through N.
 
-The Sheik `DownStand` event streams set body-collision state 2 initially and
-restore state 0 at animation frame 20. `DownBackU` restores state 0 at frame
-23, while `DownBackD`, `DownFowardU`, and `DownFowardD` restore it at frame 20.
-The get-up attack streams restore state 0 after their waits: `DownAttackU`
-reaches frame 24 and then waits 3 more frames (frame 27); `DownAttackD` reaches
-frame 20 and then waits 2 more (frame 22). The extractor documents events
-`0x68`, `0x6C`, and `0x70` as body/bone collision changes with invincibility
-data.
-
-Animation frame 0 is shown on simulation recovery frame 1. A restore event at
-animation frame N therefore protects simulation frames 1 through N; frame N+1
-is the first unprotected simulation frame. Smashcraft uses 20 frames for
-stand/forward roll, 23 for a backward roll while face-up, 20 for a backward
-roll while face-down, and 27/22 for Up/Down get-up attacks. This mapping
-accounts for the `waitFor` delays and remains subject to native gameplay
-verification.
-
-The down-damage entry compares the frame's summed damage (`percentTemp`,
-accumulated per contact in Melee) against = 7.
-A frame whose contacts sum to 7 damage or less on a fighter in
-DownBound, DownWait, or DownDamage enters the 13-tick
-DownDamage reaction. Its hitstun is retained; after the animation, remaining
-hitstun sets the down-wait timeout, and an expired timer forces stand. Damage
-above 7 interrupts the grounded recovery and follows ordinary launch
+A frame whose contacts sum to 7 damage or less on a fighter in DownBound,
+DownWait or DownDamage is a jab reset (SmashWiki "Lock": the hit "can only deal
+a maximum of 7%") and enters the 13-tick DownDamage reaction. Its hitstun is
+retained; after the animation, remaining hitstun sets the down-wait timeout,
+and an expired timer forces stand. Damage above 7 interrupts the grounded
+recovery and follows ordinary launch
 resolution. Damage-only arrows do not enter DownDamage.
 
 The numerical face-up/down choice follows the sign of the launch's vertical
 component. This stable approximation selects the two reference action families;
 it does not simulate Melee's joint rotation. The update pins downed fighters to
-their selected stage surface. The target bounce behavior depends
-on floor collision and common data; the prototype still omits physical rebound
-and uses an immediate grounded bound. A face/rotation or rebound correction
-requires the missing common collision data and a native pose check.
+their selected stage surface. The prototype omits physical rebound and uses an immediate grounded bound.
 
 Get-up attack damage, hit shape, knockback, and startup remain Smashcraft move
 tuning, not character move data from Melee. The implementation now records
@@ -714,8 +688,8 @@ Melee is the design target here, from public sources only:
 - A tumble-strength downward hit on a grounded target bounces it off the floor
   with 20% less knockback ([SmashWiki, Meteor smash](https://www.ssbwiki.com/Meteor_smash)).
   Smashcraft reflects the vertical launch upward at 0.800000011920929 when the
-  hit points more than 0.1745329201221466 radians below the floor (see
-  "Verified retail combat parameters"); at high percent this carries the
+  hit points more than Smashcraft's 10° below the floor
+  ("Launch, hitstun and stacking"); at high percent this carries the
   target off the top blast zone.
 - Meteor smashes on grounded targets cannot be teched up to Brawl
   ([SmashWiki, Tech](https://www.ssbwiki.com/Tech)), so the bounce happens
