@@ -230,7 +230,35 @@ L-cancelled, autocancel as its two frames, and Damage, Angle, Effect, Base
 Knockback, Knockback Growth and Set Knockback as per-hitbox arrays, empty for
 `-`. Angle 361 stays 361 (`SAKURAI_ANGLE`). It refuses a row with an unknown
 section, a wrong cell count or a non-numeric value, and `fightCoreSource` names
-the row and column a value came from.
+the row and column a value came from. `character-attributes.ts` reads every
+named movement and body field, with slash-separated fields preserved as arrays
+and `attributeSource` naming the page, fighter and column. Both modules are
+used by `ts/scripts/ledger/fixtures/fox.ts` and type-checked by `bun run check`.
+
+`check-readers.ts` prints disagreements for every move with an explicit action mapping and
+the `misc` rows. Its field rules are explicit: first/last active, total, IASA,
+ordinary/L-cancelled landing lag, autocancel boundaries and strongest/weakest
+damage compare with the corresponding columns; attributes `Weight`, `Terminal
+Velocity`, `JumpSquat Frames`, `Dash Initial Velocity`, and `Dash & Run
+Terminal Velocity` compare with `misc.weight`, `misc.gravity` (which matches
+terminal velocity despite its source label), `misc.jump_squat`,
+`misc.walk_speed` (the source label says walking speed; it matches dash initial
+velocity), and `misc.run_speed`, respectively. The attribute gravity and
+fast-fall velocity have no matching `misc` fields. A null in either source
+means the field is not compared. Slash-separated attributes are preserved;
+they agree with a scalar reference only when exactly one value is present and
+equal.
+
+For parity intake, `records.jsonl` remains authoritative for its reported
+timing, landing lag, autocancel and damage fields; FightCore is authoritative
+for per-hitbox angle, base knockback, growth, set knockback and getup/tech
+rows. `character-attributes.csv` is authoritative for per-fighter attributes.
+The comparison reports differences without changing either source or choosing
+a value on behalf of later tooling. Run it with:
+
+```sh
+bun references/melee-frame-data/check-readers.ts
+```
 
 ### Per-phase hitboxes and knockdown thresholds (Fox and Falco)
 
