@@ -78,7 +78,7 @@
 #! expect a 700 special 12 form 0
 #! expect a 847 special 11 form 0
 #! expect a 863 special-form 1 action 11
-#! expect a 869 special-form 2 action 11
+#! expect a 868 special-form 2 action 11
 #! scene a ManaBurnTarget
 #! scene a SpellBreakerAttack
 #! scene a DemonHunterMissile

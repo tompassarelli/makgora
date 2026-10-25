@@ -64,8 +64,8 @@
 #! expect a 728 applied jump
 #! expect a 847 special 11 form 0
 #! expect a 863 special-form 1 action 11
-#! expect a 869 special-form 2 action 11
-#! expect a 890 special 0 form 2
+#! expect a 868 special-form 2 action 11
+#! expect a 881 special 0 form 2
 #! scene a ManaBurnTarget
 #! scene a DemonHunterMissile
 1000 a press VIEW
