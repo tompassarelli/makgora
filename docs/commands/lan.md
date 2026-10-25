@@ -8,7 +8,8 @@ runs; never touch Tom’s install.
   builds): `bun wisp lan setup --from INSTALL [--pairs N]` creates throwaway
   clients with no account from one updated install (a clone's
   `pfx/drive_c/Program Files (x86)/Warcraft III`, under 1 s for 4 pairs); `bun wisp lan pool --pairs N [--pool-profile
-  parity|visual]` runs them in pairs, each pair in a network namespace with
+  parity|visual] [--cpus LIST]` runs them in pairs (`--cpus 0-11` pins every
+  client to gex45's performance cores for native timing evidence), each pair in a network namespace with
   only loopback unless `--network` with one `--pair K` opens that pair for
   solo games, which 3.0.1.24371 needs to start; a networked pair refuses LAN
   play (foreground, admitted by the capacity helper); `bun wisp lan

@@ -28,6 +28,11 @@ export const poolPairIds = (args: readonly string[]): readonly number[] => {
 
 export const poolUnitName = (ids: readonly number[]) => `${POOL_UNIT_PREFIX}-${ids.join("-")}`;
 
+const CPU_LIST = /^\d+(-\d+)?(,\d+(-\d+)?)*$/;
+
+/** The `--cpus LIST` affinity of the pool unit, which every client's capacity scope inherits, so native evidence can run on the performance cores. */
+export const poolCpus = (args: readonly string[]) => flagValues(args, "cpus")[0];
+
 /** The transient user unit that owns a pool: it outlives the caller's shell, tool limits and cgroup, and `lan stop` stops it. */
 export const poolUnitCommand = (args: readonly string[], path: string, uid: number, runtime = process.execPath, env = process.env, readDisplay?: (run: string) => string): readonly string[] => [
   "systemd-run", "--user", "--collect", `--unit=${poolUnitName(poolPairIds(args))}`,
@@ -36,6 +41,7 @@ export const poolUnitCommand = (args: readonly string[], path: string, uid: numb
   ...privateDesktopUnitEnv(env, readDisplay),
   ...(env["NORTH_FLEET_SESSION"] === undefined ? [] : [`--setenv=NORTH_FLEET_SESSION=${env["NORTH_FLEET_SESSION"]}`]),
   "--property=KillMode=control-group", "--property=TimeoutStopSec=180",
+  ...(poolCpus(args) === undefined ? [] : [`--property=CPUAffinity=${poolCpus(args)}`]),
   "--", runtime, WISP_PROGRAM, "lan", "pool", ...args.filter((arg) => arg !== FOREGROUND), FOREGROUND,
 ];
 
@@ -58,7 +64,7 @@ export const poolStart: Command = (args) => {
     const ids = poolPairIds(args);
     const session = process.env["NORTH_FLEET_SESSION"] ?? "";
     const [owner = session] = flagValues(args, "owner");
-    const clean = args.filter((arg, index) => arg !== FOREGROUND && arg !== "--owner" && args[index - 1] !== "--owner" && !arg.startsWith("--owner="));
+    const clean = args.filter((arg, index) => arg !== FOREGROUND && !["--owner", "--cpus"].includes(arg) && !["--owner", "--cpus"].includes(args[index - 1] ?? "") && !arg.startsWith("--owner=") && !arg.startsWith("--cpus="));
     return Effect.scoped(Effect.gen(function*() {
       for (const id of ids) if (id === 0) {
         yield* Effect.acquireRelease(
@@ -74,6 +80,8 @@ export const poolStart: Command = (args) => {
     const rest = withoutPairFlags(args);
     return Effect.forEach(ids, (id) => poolStart([...rest, "--pair", String(id)]), { discard: true });
   }
+  const cpus = poolCpus(args);
+  if (cpus !== undefined && !CPU_LIST.test(cpus)) return Effect.fail(new UsageFailure({ problem: `--cpus takes a CPU list such as 0-11, not ${cpus}` }));
   if (ids.includes(0) && process.env["NORTH_FLEET_SESSION"] === undefined) return Effect.fail(new LanFailure({ problem: "pair 0 pool requires NORTH_FLEET_SESSION so its claim names the fleet owner" }));
   const [owner] = flagValues(args, "owner");
   const ownedArgs = owner === undefined ? [...args, "--owner", process.env["NORTH_FLEET_SESSION"] ?? ""] : args;
